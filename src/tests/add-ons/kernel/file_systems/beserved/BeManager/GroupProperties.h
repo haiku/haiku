@@ -10,6 +10,7 @@ class MemberItem : public ListItem
 		void ItemDeselected();
 };
 
+class BTextControl;
 
 class GroupPropertiesView : public BView
 {

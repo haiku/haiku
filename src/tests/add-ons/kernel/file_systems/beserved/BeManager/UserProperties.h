@@ -1,3 +1,11 @@
+#ifndef _UserProperties_h_
+#define _UserProperties_h_
+
+class BTextControl;
+class BCheckBox;
+class BMenu;
+class BMenuField;
+
 class UserPropertiesView : public BView
 {
 	public:
@@ -67,3 +75,4 @@ class UserPropertiesPanel : public BWindow
 		bool newUser;
 		bool cancelled;
 };
+#endif

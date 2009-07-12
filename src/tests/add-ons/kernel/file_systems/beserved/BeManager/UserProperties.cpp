@@ -262,7 +262,7 @@ void UserPropertiesPanel::MessageReceived(BMessage *msg)
 
 	switch (msg->what)
 	{
-		case MSG_USER_BROWSE:
+		case MSG_USER_BROWSE:{
 			BMessenger messenger(this);
 			filePanel = new BFilePanel(B_OPEN_PANEL, &messenger, &entryRef,
 				B_DIRECTORY_NODE, false);
@@ -271,6 +271,7 @@ void UserPropertiesPanel::MessageReceived(BMessage *msg)
 			filePanel->Window()->SetTitle("User Home");
 			filePanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
 			break;
+		}
 
 		case B_REFS_RECEIVED:
 			msg->FindRef("refs", &entryRef);

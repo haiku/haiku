@@ -220,24 +220,24 @@ typedef struct vnode_ops {
 	op_read_query			(*read_query);
 } vnode_ops;
 
-extern _IMPEXP_KERNEL int	new_path(const char *path, char **copy);
-extern _IMPEXP_KERNEL void	free_path(char *p);
+extern int	new_path(const char *path, char **copy);
+extern void	free_path(char *p);
 
-extern _IMPEXP_KERNEL int	notify_listener(int op, nspace_id nsid,
+extern int	notify_listener(int op, nspace_id nsid,
 									vnode_id vnida,	vnode_id vnidb,
 									vnode_id vnidc, const char *name);
-extern _IMPEXP_KERNEL void	notify_select_event(selectsync *sync, uint32 ref);
-extern _IMPEXP_KERNEL int	send_notification(port_id port, long token,
+extern void	notify_select_event(selectsync *sync, uint32 ref);
+extern int	send_notification(port_id port, long token,
 									ulong what, long op, nspace_id nsida,
 									nspace_id nsidb, vnode_id vnida,
 									vnode_id vnidb, vnode_id vnidc,
 									const char *name);
-extern _IMPEXP_KERNEL int	get_vnode(nspace_id nsid, vnode_id vnid, void **data);
-extern _IMPEXP_KERNEL int	put_vnode(nspace_id nsid, vnode_id vnid);
-extern _IMPEXP_KERNEL int	new_vnode(nspace_id nsid, vnode_id vnid, void *data);
-extern _IMPEXP_KERNEL int	remove_vnode(nspace_id nsid, vnode_id vnid);
-extern _IMPEXP_KERNEL int	unremove_vnode(nspace_id nsid, vnode_id vnid);
-extern _IMPEXP_KERNEL int	is_vnode_removed(nspace_id nsid, vnode_id vnid);
+extern int	get_vnode(nspace_id nsid, vnode_id vnid, void **data);
+extern int	put_vnode(nspace_id nsid, vnode_id vnid);
+extern int	new_vnode(nspace_id nsid, vnode_id vnid, void *data);
+extern int	remove_vnode(nspace_id nsid, vnode_id vnid);
+extern int	unremove_vnode(nspace_id nsid, vnode_id vnid);
+extern int	is_vnode_removed(nspace_id nsid, vnode_id vnid);
 
 
 extern _EXPORT vnode_ops	fs_entry;

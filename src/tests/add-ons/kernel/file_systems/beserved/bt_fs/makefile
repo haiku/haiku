@@ -91,7 +91,7 @@ endif
 	OBJ_DIR		:= obj.$(CPU)
 
 # 	specify that the binary should be created in the object directory
-	TARGET		:= $(OBJ_DIR)/$(NAME)
+	TARGET		:= ../Release/$(NAME)
 
 #	specify the mimeset tool
 	MIMESET		:= mimeset

@@ -11,6 +11,8 @@
 
 #include "IconListItem.h"
 
+class BStatusBar;
+
 
 class MyNetView : public BView
 {

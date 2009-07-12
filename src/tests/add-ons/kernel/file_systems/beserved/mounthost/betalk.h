@@ -19,7 +19,11 @@
 #include "sys/stat.h"
 #include "fcntl.h"
 #include "errno.h"
+#ifdef __BEOS__
+#include <bone/sys/socket.h>
+#else
 #include "socket.h"
+#endif
 #include "ctype.h"
 
 #ifndef NULL

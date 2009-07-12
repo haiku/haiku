@@ -9,7 +9,11 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <Roster.h>
+#ifdef __BEOS__
+#include <bone/sys/socket.h>
+#else
 #include "socket.h"
+#endif
 
 #include "betalk.h"
 #include "rpc.h"

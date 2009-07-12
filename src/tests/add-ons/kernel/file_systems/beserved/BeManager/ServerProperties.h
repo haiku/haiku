@@ -1,3 +1,5 @@
+class BCheckBox;
+
 class ServerPropertiesView : public BView
 {
 	public:

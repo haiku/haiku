@@ -67,7 +67,7 @@ void btUnlock(sem_id semaphore, int32 *atomic);
 
 int generateTicket(const char *client, const char *server, unsigned char *key, char *ticket);
 void recordLogin(char *server, char *share, char *client, bool authenticated);
-void strlwr(char *str);
+//void strlwr(char *str);
 
 int cmdAuthenticate(unsigned int addr, char *client, char *token, char *response);
 int cmdReadUsers(DIR **dir, char *user, char *fullName);
@@ -720,13 +720,13 @@ int generateTicket(const char *client, const char *server, unsigned char *key, c
 }
 
 // strlwr()
-//
+/*
 void strlwr(char *str)
 {
 	char *p;
 	for (p = str; *p; p++)
 		*p = tolower(*p);
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////
 

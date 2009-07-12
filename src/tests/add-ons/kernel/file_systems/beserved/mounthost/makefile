@@ -41,8 +41,8 @@ RSRCS=
 # 	if there is another naming scheme use the full binary
 #	name: my_library.so or my_lib.a
 #	libroot.so never needs to be specified here, although libbe.so does
-LIBS= be net besure
-		
+LIBS= be bind socket beserved
+
 
 #	specify the paths to directories where additional
 # 	libraries are to be found.  /boot/develop/lib/PLATFORM/ is
@@ -50,12 +50,12 @@ LIBS= be net besure
 #	makefile.  The paths included may not be recursive, so
 #	specify all of the needed paths explicitly
 #	Directories containing source-files are automatically added.
-LIBPATHS= 
+LIBPATHS= ../transport
 
 #	specify additional directories where header files can be found
 # 	directories where sources are found are included automatically
 #	included.
-INCPATHS=
+INCPATHS=/boot/develop/headers/be/bone/sys
 
 #	specify the level of optimization that you desire
 #	NONE, SOME, FULL
@@ -92,7 +92,7 @@ endif
 	OBJ_DIR		:= obj.$(CPU)
 
 # 	specify that the binary should be created in the object directory
-	TARGET		:= $(OBJ_DIR)/$(NAME)
+	TARGET		:= ../Release/$(NAME)
 
 #	specify the mimeset tool
 	MIMESET		:= mimeset

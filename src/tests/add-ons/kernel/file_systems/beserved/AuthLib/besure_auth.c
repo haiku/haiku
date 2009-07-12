@@ -27,7 +27,7 @@ typedef struct
 
 
 static uint32 genUniqueId(char *str);
-static void strlwr(char *str);
+//static void strlwr(char *str);
 static void removeFiles(char *folder, char *file);
 static void recvAlarm(int signal);
 static key_value *GetNextKey(FILE *fp);
@@ -406,13 +406,13 @@ bool getGroupDesc(char *group, char *desc, int bufSize)
 }
 
 // strlwr()
-//
+/*
 static void strlwr(char *str)
 {
 	char *p;
 	for (p = str; *p; p++)
 		*p = tolower(*p);
-}
+}*/
 
 // genUniqueId()
 //
