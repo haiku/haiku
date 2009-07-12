@@ -164,7 +164,7 @@ struct cache_transaction {
 	bigtime_t		last_used;
 };
 
-#if BLOCK_CACHE_BLOCK_TRACING
+#if BLOCK_CACHE_BLOCK_TRACING && !defined(BUILDING_USERLAND_FS_SERVER)
 namespace BlockTracing {
 
 class Action : public AbstractTraceEntry {
@@ -415,7 +415,7 @@ private:
 #endif
 
 
-#if BLOCK_CACHE_TRANSACTION_TRACING
+#if BLOCK_CACHE_TRANSACTION_TRACING && !defined(BUILDING_USERLAND_FS_SERVER)
 namespace TransactionTracing {
 
 class Action : public AbstractTraceEntry {
