@@ -79,46 +79,45 @@ PCApplication::ReadyToRun()
 	Preferences preferences(kPreferencesFileName);
 	int32 version = 0;
 	preferences.ReadInt32(version, kVersionName);
-	if (version != kCurrentVersion) {
-		BAlert* alert = new BAlert("", "Do you want ProcessController to live in the Deskbar?",
-			"Don't", "Install", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	
+	BDeskbar deskbar;
+	bool hasOne = deskbar.HasItem(kDeskbarItemName);
+	
+	BAlert* alert = NULL;
+	if (!hasOne || (hasOne && version != kCurrentVersion)) {
+		alert = new BAlert("", 
+			"Do you want ProcessController to live in the Deskbar?", "Don't", 
+			"Install", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
-
-		if (alert->Go()) {
-			bool hasOne = false;
-			{
-				BDeskbar deskbar;
-				if (deskbar.HasItem(kDeskbarItemName))
-					hasOne = true;
-			}
-
-			if (hasOne) {
-				// Restart deskbar to make sure the new version is picked up
-				team_id deskbarTeam = be_roster->TeamFor(kDeskbarSig);
-				if (deskbarTeam >= 0) {
-					BMessenger messenger(NULL, deskbarTeam);
-					messenger.SendMessage(B_QUIT_REQUESTED);
-					int	k = 500;
-					do {
-						snooze (10000);
-					} while (be_roster->IsRunning(kDeskbarSig) && k-- > 0);
-				}
-				be_roster->Launch(kDeskbarSig);
-				int	k = 500;
-				do {
-					snooze (10000);
-				} while (!be_roster->IsRunning(kDeskbarSig) && k-- > 0);
-			}
-
-			BDeskbar deskbar;
-			if (!deskbar.HasItem(kDeskbarItemName))
-				move_to_deskbar(deskbar);
-
-			Quit();
-			return;
-		}
+	} else {
+		BAlert alertTemp("", 
+			"ProcessController are already installed in Deskbar.","Ok", NULL, 
+			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alertTemp.Go();
 	}
-
+			
+	if (alert != NULL && alert->Go()) {
+		// Restart deskbar to make sure the new version is picked up
+		team_id deskbarTeam = be_roster->TeamFor(kDeskbarSig);
+		if (deskbarTeam >= 0) {
+			BMessenger messenger(NULL, deskbarTeam);
+			messenger.SendMessage(B_QUIT_REQUESTED);
+			int	k = 500;
+			do {
+				snooze (10000);
+			} while (be_roster->IsRunning(kDeskbarSig) && k-- > 0);
+		}
+		be_roster->Launch(kDeskbarSig);
+		int	k = 500;
+		do {
+			snooze (10000);
+		} while (!be_roster->IsRunning(kDeskbarSig) && k-- > 0);
+		BDeskbar deskbar;
+		if (!deskbar.HasItem(kDeskbarItemName))
+			move_to_deskbar(deskbar);
+		Quit();
+		return;
+	}
 	new PCWindow();
 
 	// quit other eventually running instances
