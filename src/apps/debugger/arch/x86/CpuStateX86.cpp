@@ -55,7 +55,7 @@ CpuStateX86::InstructionPointer() const
 
 
 bool
-CpuStateX86::GetRegisterValue(const Register* reg, BVariant& _value)
+CpuStateX86::GetRegisterValue(const Register* reg, BVariant& _value) const
 {
 	int32 index = reg->Index();
 	if (!IsRegisterSet(index))
@@ -69,6 +69,19 @@ CpuStateX86::GetRegisterValue(const Register* reg, BVariant& _value)
 	else
 		_value.SetTo(fIntRegisters[index]);
 
+	return true;
+}
+
+
+bool
+CpuStateX86::SetRegisterValue(const Register* reg, const BVariant& value)
+{
+	int32 index = reg->Index();
+	if (index >= X86_INT_REGISTER_END)
+		return false;
+
+	fIntRegisters[index] = value.ToUInt32();
+	fSetRegisters[index] = 1;
 	return true;
 }
 

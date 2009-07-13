@@ -5,9 +5,11 @@
 #ifndef ARCHITECTURE_H
 #define ARCHITECTURE_H
 
+
 #include <OS.h>
 
 #include <Referenceable.h>
+#include <Variant.h>
 
 #include "Types.h"
 
@@ -19,6 +21,7 @@ class Image;
 class ImageDebugInfoProvider;
 class InstructionInfo;
 class Register;
+class RegisterMap;
 class StackFrame;
 class StackTrace;
 class Statement;
@@ -36,6 +39,11 @@ public:
 	virtual	int32				CountRegisters() const = 0;
 	virtual	const Register*		Registers() const = 0;
 
+	virtual	status_t			GetDwarfRegisterMaps(RegisterMap** _toDwarf,
+									RegisterMap** _fromDwarf) const = 0;
+										// returns references
+
+	virtual	status_t			CreateCpuState(CpuState*& _state) = 0;
 	virtual	status_t			CreateCpuState(const void* cpuStateData,
 									size_t size, CpuState*& _state) = 0;
 	virtual	status_t			CreateStackFrame(Image* image,
@@ -54,6 +62,10 @@ public:
 										// Called after a CreateStackFrame()
 										// with the image/function corresponding
 										// to the CPU state.
+
+	virtual	status_t			ReadValueFromMemory(target_addr_t address,
+									uint32 valueType, BVariant& _value) const
+										= 0;
 
 	virtual	status_t			DisassembleCode(FunctionDebugInfo* function,
 									const void* buffer, size_t bufferSize,

@@ -22,7 +22,9 @@ public:
 
 	virtual	target_addr_t		InstructionPointer() const = 0;
 	virtual	bool				GetRegisterValue(const Register* reg,
-									BVariant& _value) = 0;
+									BVariant& _value) const = 0;
+	virtual	bool				SetRegisterValue(const Register* reg,
+									const BVariant& value) = 0;
 };
 
 

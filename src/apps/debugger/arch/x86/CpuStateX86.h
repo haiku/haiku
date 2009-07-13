@@ -48,7 +48,9 @@ public:
 
 	virtual	target_addr_t		InstructionPointer() const;
 	virtual	bool				GetRegisterValue(const Register* reg,
-									BVariant& _value);
+									BVariant& _value) const;
+	virtual	bool				SetRegisterValue(const Register* reg,
+									const BVariant& value);
 
 			uint32				InterruptVector() const
 									{ return fInterruptVector; }

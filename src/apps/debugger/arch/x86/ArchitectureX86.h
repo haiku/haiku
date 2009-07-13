@@ -5,6 +5,7 @@
 #ifndef ARCHITECTURE_X86_H
 #define ARCHITECTURE_X86_H
 
+
 #include "Architecture.h"
 #include "Array.h"
 #include "Register.h"
@@ -20,6 +21,10 @@ public:
 	virtual	int32				CountRegisters() const;
 	virtual	const Register*		Registers() const;
 
+	virtual	status_t			GetDwarfRegisterMaps(RegisterMap** _toDwarf,
+									RegisterMap** _fromDwarf) const;
+
+	virtual	status_t			CreateCpuState(CpuState*& _state);
 	virtual	status_t			CreateCpuState(const void* cpuStateData,
 									size_t size, CpuState*& _state);
 	virtual	status_t			CreateStackFrame(Image* image,
@@ -33,6 +38,9 @@ public:
 									FunctionDebugInfo* previousFunction,
 									CpuState* previousCpuState);
 
+	virtual	status_t			ReadValueFromMemory(target_addr_t address,
+									uint32 valueType, BVariant& _value) const;
+
 	virtual	status_t			DisassembleCode(FunctionDebugInfo* function,
 									const void* buffer, size_t bufferSize,
 									DisassembledCode*& _sourceCode);
@@ -43,18 +51,24 @@ public:
 									InstructionInfo& _info);
 
 private:
+			struct ToDwarfRegisterMap;
+			struct FromDwarfRegisterMap;
+
+private:
 			void				_AddRegister(int32 index, const char* name,
-									register_format format, uint32 bitSize,
-									register_type type);
+									uint32 bitSize, uint32 valueType,
+									register_type type, bool calleePreserved);
 			void				_AddIntegerRegister(int32 index,
-									const char* name, uint32 bitSize,
-									register_type type);
+									const char* name, uint32 valueType,
+									register_type type, bool calleePreserved);
 
 			bool				_HasFunctionPrologue(
 									FunctionDebugInfo* function) const;
 
 private:
 			Array<Register>		fRegisters;
+			ToDwarfRegisterMap*	fToDwarfRegisterMap;
+			FromDwarfRegisterMap* fFromDwarfRegisterMap;
 };
 
 

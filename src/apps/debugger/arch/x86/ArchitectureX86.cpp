@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "ArchitectureX86.h"
 
 #include <new>
@@ -15,6 +16,7 @@
 #include "DisassembledCode.h"
 #include "FunctionDebugInfo.h"
 #include "InstructionInfo.h"
+#include "RegisterMap.h"
 #include "StackFrame.h"
 #include "Statement.h"
 #include "TeamMemory.h"
@@ -22,15 +24,98 @@
 #include "disasm/DisassemblerX86.h"
 
 
+static const int32 kFromDwarfRegisters[] = {
+	X86_REGISTER_EAX,
+	X86_REGISTER_ECX,
+	X86_REGISTER_EDX,
+	X86_REGISTER_EBX,
+	X86_REGISTER_ESP,
+	X86_REGISTER_EBP,
+	X86_REGISTER_ESI,
+	X86_REGISTER_EDI,
+	X86_REGISTER_EIP,
+	-1,	// eflags
+	-1,	// trap number
+	-1,	// st(0)
+	-1,	// st(1)
+	-1,	// st(2)
+	-1,	// st(3)
+	-1,	// st(4)
+	-1,	// st(5)
+	-1,	// st(6)
+	-1,	// st(7)
+	-1,	// ?
+	-1,	// ?
+	-1, -1, -1, -1, -1, -1, -1, -1,	// SSE
+	-1, -1, -1, -1, -1, -1, -1, -1	// MMX
+};
+static const int32 kFromDwarfRegisterCount = sizeof(kFromDwarfRegisters) / 4;
+
+
+// #pragma mark - ToDwarfRegisterMap
+
+
+struct ArchitectureX86::ToDwarfRegisterMap : RegisterMap {
+	ToDwarfRegisterMap()
+	{
+		// init the index array from the reverse map
+		memset(fIndices, -1, sizeof(fIndices));
+		for (int32 i = 0; i < kFromDwarfRegisterCount; i++) {
+			if (kFromDwarfRegisters[i] >= 0)
+				fIndices[kFromDwarfRegisters[i]] = i;
+		}
+	}
+
+	virtual int32 CountRegisters() const
+	{
+		return X86_REGISTER_COUNT;
+	}
+
+	virtual int32 MapRegisterIndex(int32 index) const
+	{
+		return index >= 0 && index < X86_REGISTER_COUNT ? fIndices[index] : -1;
+	}
+
+private:
+	int32	fIndices[X86_REGISTER_COUNT];
+};
+
+
+// #pragma mark - FromDwarfRegisterMap
+
+
+struct ArchitectureX86::FromDwarfRegisterMap : RegisterMap {
+	virtual int32 CountRegisters() const
+	{
+		return kFromDwarfRegisterCount;
+	}
+
+	virtual int32 MapRegisterIndex(int32 index) const
+	{
+		return index >= 0 && index < kFromDwarfRegisterCount
+			? kFromDwarfRegisters[index] : -1;
+	}
+};
+
+
+// #pragma mark - ArchitectureX86
+
+
 ArchitectureX86::ArchitectureX86(TeamMemory* teamMemory)
 	:
-	Architecture(teamMemory)
+	Architecture(teamMemory),
+	fToDwarfRegisterMap(NULL),
+	fFromDwarfRegisterMap(NULL)
 {
 }
 
 
 ArchitectureX86::~ArchitectureX86()
 {
+	if (fToDwarfRegisterMap != NULL)
+		fToDwarfRegisterMap->ReleaseReference();
+	if (fFromDwarfRegisterMap != NULL)
+		fFromDwarfRegisterMap->ReleaseReference();
 }
 
 
@@ -38,42 +123,48 @@ status_t
 ArchitectureX86::Init()
 {
 	try {
-		_AddIntegerRegister(X86_REGISTER_EIP, "eip", 32,
-			REGISTER_TYPE_INSTRUCTION_POINTER);
-		_AddIntegerRegister(X86_REGISTER_ESP, "esp", 32,
-			REGISTER_TYPE_STACK_POINTER);
-		_AddIntegerRegister(X86_REGISTER_EBP, "ebp", 32,
-			REGISTER_TYPE_GENERAL_PURPOSE);
+		_AddIntegerRegister(X86_REGISTER_EIP, "eip", B_UINT32_TYPE,
+			REGISTER_TYPE_INSTRUCTION_POINTER, false);
+		_AddIntegerRegister(X86_REGISTER_ESP, "esp", B_UINT32_TYPE,
+			REGISTER_TYPE_STACK_POINTER, true);
+		_AddIntegerRegister(X86_REGISTER_EBP, "ebp", B_UINT32_TYPE,
+			REGISTER_TYPE_GENERAL_PURPOSE, true);
 
-		_AddIntegerRegister(X86_REGISTER_EAX, "eax", 32,
-			REGISTER_TYPE_GENERAL_PURPOSE);
-		_AddIntegerRegister(X86_REGISTER_EBX, "ebx", 32,
-			REGISTER_TYPE_GENERAL_PURPOSE);
-		_AddIntegerRegister(X86_REGISTER_ECX, "ecx", 32,
-			REGISTER_TYPE_GENERAL_PURPOSE);
-		_AddIntegerRegister(X86_REGISTER_EDX, "edx", 32,
-			REGISTER_TYPE_GENERAL_PURPOSE);
+		_AddIntegerRegister(X86_REGISTER_EAX, "eax", B_UINT32_TYPE,
+			REGISTER_TYPE_GENERAL_PURPOSE, false);
+		_AddIntegerRegister(X86_REGISTER_EBX, "ebx", B_UINT32_TYPE,
+			REGISTER_TYPE_GENERAL_PURPOSE, true);
+		_AddIntegerRegister(X86_REGISTER_ECX, "ecx", B_UINT32_TYPE,
+			REGISTER_TYPE_GENERAL_PURPOSE, false);
+		_AddIntegerRegister(X86_REGISTER_EDX, "edx", B_UINT32_TYPE,
+			REGISTER_TYPE_GENERAL_PURPOSE, false);
 
-		_AddIntegerRegister(X86_REGISTER_ESI, "esi", 32,
-			REGISTER_TYPE_GENERAL_PURPOSE);
-		_AddIntegerRegister(X86_REGISTER_EDI, "edi", 32,
-			REGISTER_TYPE_GENERAL_PURPOSE);
+		_AddIntegerRegister(X86_REGISTER_ESI, "esi", B_UINT32_TYPE,
+			REGISTER_TYPE_GENERAL_PURPOSE, true);
+		_AddIntegerRegister(X86_REGISTER_EDI, "edi", B_UINT32_TYPE,
+			REGISTER_TYPE_GENERAL_PURPOSE, true);
 
-		_AddIntegerRegister(X86_REGISTER_CS, "cs", 16,
-			REGISTER_TYPE_SPECIAL_PURPOSE);
-		_AddIntegerRegister(X86_REGISTER_DS, "ds", 16,
-			REGISTER_TYPE_SPECIAL_PURPOSE);
-		_AddIntegerRegister(X86_REGISTER_ES, "es", 16,
-			REGISTER_TYPE_SPECIAL_PURPOSE);
-		_AddIntegerRegister(X86_REGISTER_FS, "fs", 16,
-			REGISTER_TYPE_SPECIAL_PURPOSE);
-		_AddIntegerRegister(X86_REGISTER_GS, "gs", 16,
-			REGISTER_TYPE_SPECIAL_PURPOSE);
-		_AddIntegerRegister(X86_REGISTER_SS, "ss", 16,
-			REGISTER_TYPE_SPECIAL_PURPOSE);
+		_AddIntegerRegister(X86_REGISTER_CS, "cs", B_UINT16_TYPE,
+			REGISTER_TYPE_SPECIAL_PURPOSE, true);
+		_AddIntegerRegister(X86_REGISTER_DS, "ds", B_UINT16_TYPE,
+			REGISTER_TYPE_SPECIAL_PURPOSE, true);
+		_AddIntegerRegister(X86_REGISTER_ES, "es", B_UINT16_TYPE,
+			REGISTER_TYPE_SPECIAL_PURPOSE, true);
+		_AddIntegerRegister(X86_REGISTER_FS, "fs", B_UINT16_TYPE,
+			REGISTER_TYPE_SPECIAL_PURPOSE, true);
+		_AddIntegerRegister(X86_REGISTER_GS, "gs", B_UINT16_TYPE,
+			REGISTER_TYPE_SPECIAL_PURPOSE, true);
+		_AddIntegerRegister(X86_REGISTER_SS, "ss", B_UINT16_TYPE,
+			REGISTER_TYPE_SPECIAL_PURPOSE, true);
 	} catch (std::bad_alloc) {
 		return B_NO_MEMORY;
 	}
+
+	fToDwarfRegisterMap = new(std::nothrow) ToDwarfRegisterMap;
+	fFromDwarfRegisterMap = new(std::nothrow) FromDwarfRegisterMap;
+
+	if (fToDwarfRegisterMap == NULL || fFromDwarfRegisterMap == NULL)
+		return B_NO_MEMORY;
 
 	return B_OK;
 }
@@ -90,6 +181,36 @@ const Register*
 ArchitectureX86::Registers() const
 {
 	return fRegisters.Elements();
+}
+
+
+status_t
+ArchitectureX86::GetDwarfRegisterMaps(RegisterMap** _toDwarf,
+	RegisterMap** _fromDwarf) const
+{
+	if (_toDwarf != NULL) {
+		*_toDwarf = fToDwarfRegisterMap;
+		fToDwarfRegisterMap->AcquireReference();
+	}
+
+	if (_fromDwarf != NULL) {
+		*_fromDwarf = fFromDwarfRegisterMap;
+		fFromDwarfRegisterMap->AcquireReference();
+	}
+
+	return B_OK;
+}
+
+
+status_t
+ArchitectureX86::CreateCpuState(CpuState*& _state)
+{
+	CpuStateX86* state = new(std::nothrow) CpuStateX86;
+	if (state == NULL)
+		return B_NO_MEMORY;
+
+	_state = state;
+	return B_OK;
 }
 
 
@@ -270,6 +391,62 @@ ArchitectureX86::UpdateStackFrameCpuState(const StackFrame* frame,
 
 
 status_t
+ArchitectureX86::ReadValueFromMemory(target_addr_t address, uint32 valueType,
+	BVariant& _value) const
+{
+	uint8 buffer[64];
+	size_t size = BVariant::SizeOfType(valueType);
+	if (size == 0 || size > sizeof(buffer))
+		return B_BAD_VALUE;
+
+	ssize_t bytesRead = fTeamMemory->ReadMemory(address, buffer, size);
+	if (bytesRead < 0)
+		return bytesRead;
+	if ((size_t)bytesRead != size)
+		return B_ERROR;
+
+	// TODO: We need to swap endianess, if the host is big endian!
+
+	switch (valueType) {
+		case B_INT8_TYPE:
+			_value.SetTo(*(int8*)buffer);
+			return B_OK;
+		case B_UINT8_TYPE:
+			_value.SetTo(*(uint8*)buffer);
+			return B_OK;
+		case B_INT16_TYPE:
+			_value.SetTo(*(int16*)buffer);
+			return B_OK;
+		case B_UINT16_TYPE:
+			_value.SetTo(*(uint16*)buffer);
+			return B_OK;
+		case B_INT32_TYPE:
+			_value.SetTo(*(int32*)buffer);
+			return B_OK;
+		case B_UINT32_TYPE:
+			_value.SetTo(*(uint32*)buffer);
+			return B_OK;
+		case B_INT64_TYPE:
+			_value.SetTo(*(int64*)buffer);
+			return B_OK;
+		case B_UINT64_TYPE:
+			_value.SetTo(*(uint64*)buffer);
+			return B_OK;
+		case B_FLOAT_TYPE:
+			_value.SetTo(*(float*)buffer);
+				// TODO: float on the host might work differently!
+			return B_OK;
+		case B_DOUBLE_TYPE:
+			_value.SetTo(*(double*)buffer);
+				// TODO: double on the host might work differently!
+			return B_OK;
+		default:
+			return B_BAD_VALUE;
+	}
+}
+
+
+status_t
 ArchitectureX86::DisassembleCode(FunctionDebugInfo* function,
 	const void* buffer, size_t bufferSize, DisassembledCode*& _sourceCode)
 {
@@ -382,18 +559,21 @@ ArchitectureX86::GetInstructionInfo(target_addr_t address,
 
 void
 ArchitectureX86::_AddRegister(int32 index, const char* name,
-	register_format format, uint32 bitSize, register_type type)
+	uint32 bitSize, uint32 valueType, register_type type, bool calleePreserved)
 {
-	if (!fRegisters.Add(Register(index, name, format, bitSize, type)))
+	if (!fRegisters.Add(Register(index, name, bitSize, valueType, type,
+			calleePreserved))) {
 		throw std::bad_alloc();
+	}
 }
 
 
 void
 ArchitectureX86::_AddIntegerRegister(int32 index, const char* name,
-	uint32 bitSize, register_type type)
+	uint32 valueType, register_type type, bool calleePreserved)
 {
-	_AddRegister(index, name, REGISTER_FORMAT_INTEGER, bitSize, type);
+	_AddRegister(index, name, 8 * BVariant::SizeOfType(valueType), valueType,
+		type, calleePreserved);
 }
 
 

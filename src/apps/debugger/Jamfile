@@ -44,6 +44,7 @@ Application Debugger :
 	CpuState.cpp
 	InstructionInfo.cpp
 	Register.cpp
+	RegisterMap.cpp
 
 	# arch/x86
 	ArchitectureX86.cpp
