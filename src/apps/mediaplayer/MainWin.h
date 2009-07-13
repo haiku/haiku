@@ -51,6 +51,7 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				WindowActivated(bool active);
 	virtual	bool				QuitRequested();
+	virtual	void				MenusBeginning();
 
 			void				OpenPlaylistItem(const PlaylistItemRef& item);
 
@@ -58,6 +59,11 @@ public:
 			void				ShowPlaylistWindow();
 			void				ShowSettingsWindow();
 
+			void				VideoAspectChange(int forcedWidth,
+									int forcedHeight, float widthScale);
+			void				VideoAspectChange(float widthScale);
+			void				VideoAspectChange(int widthAspect,
+									int heightAspect);
 			void				VideoFormatChange(int width, int height,
 									int widthAspect, int heightAspect);
 
@@ -75,6 +81,7 @@ private:
 			void				_SetWindowSizeLimits();
 			void				_GetUnscaledVideoSize(int& videoWidth,
 									int& videoHeight) const;
+			int					_CurrentVideoSizeInPercent() const;
 			void				_ResizeWindow(int percent);
 			void				_ResizeVideoView(int x, int y, int width,
 									int height);
@@ -88,7 +95,6 @@ private:
 			status_t			_KeyDown(BMessage* message);
 
 			void				_ToggleFullscreen();
-			void				_ToggleKeepAspectRatio();
 			void				_ToggleAlwaysOnTop();
 			void				_ToggleNoInterface();
 
@@ -129,7 +135,6 @@ private:
 			Controller*			fController;
 			ControllerObserver*	fControllerObserver;
 			volatile bool		fIsFullscreen;
-			volatile bool		fKeepAspectRatio;
 			volatile bool		fAlwaysOnTop;
 			volatile bool		fNoInterface;
 			int					fSourceWidth;

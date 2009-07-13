@@ -68,20 +68,23 @@ enum {
 	M_FILE_QUIT,
 	M_VIEW_SIZE,
 	M_TOGGLE_FULLSCREEN,
-	M_TOGGLE_KEEP_ASPECT_RATIO,
 	M_TOGGLE_ALWAYS_ON_TOP,
 	M_TOGGLE_NO_INTERFACE,
 	M_VOLUME_UP,
 	M_VOLUME_DOWN,
 	M_SKIP_NEXT,
 	M_SKIP_PREV,
-	M_ASPECT_100000_1,
-	M_ASPECT_106666_1,
-	M_ASPECT_109091_1,
-	M_ASPECT_141176_1,
-	M_ASPECT_720_576,
-	M_ASPECT_704_576,
-	M_ASPECT_544_576,
+
+	// The common display aspect ratios
+	M_ASPECT_SAME_AS_SOURCE,
+	M_ASPECT_NO_DISTORTION,
+	M_ASPECT_4_3,
+	M_ASPECT_16_9,
+	M_ASPECT_83_50,
+	M_ASPECT_7_4,
+	M_ASPECT_37_20,
+	M_ASPECT_47_20,
+
 	M_SELECT_AUDIO_TRACK		= 0x00000800,
 	M_SELECT_AUDIO_TRACK_END	= 0x00000fff,
 	M_SELECT_VIDEO_TRACK		= 0x00010000,
@@ -111,7 +114,6 @@ MainWin::MainWin()
 			| OBSERVE_PLAYBACK_STATE_CHANGES | OBSERVE_POSITION_CHANGES
 			| OBSERVE_VOLUME_CHANGES)),
 	  fIsFullscreen(false),
-	  fKeepAspectRatio(true),
 	  fAlwaysOnTop(false),
 	  fNoInterface(false),
 	  fSourceWidth(-1),
@@ -527,10 +529,6 @@ MainWin::MessageReceived(BMessage *msg)
 			_ToggleFullscreen();
 			break;
 
-		case M_TOGGLE_KEEP_ASPECT_RATIO:
-			_ToggleKeepAspectRatio();
-			break;
-
 		case M_TOGGLE_ALWAYS_ON_TOP:
 			_ToggleAlwaysOnTop();
 			break;
@@ -591,39 +589,50 @@ MainWin::MessageReceived(BMessage *msg)
 			fController->VolumeDown();
 			break;
 
-		case M_ASPECT_100000_1:
-			VideoFormatChange(fSourceWidth, fSourceHeight,
-				fSourceWidth, fSourceHeight);
+		case M_ASPECT_SAME_AS_SOURCE:
+			if (fHasVideo) {
+				int width;
+				int height;
+				int widthAspect;
+				int heightAspect;
+				fController->GetSize(&width, &height,
+					&widthAspect, &heightAspect);
+				VideoFormatChange(width, fSourceHeight,
+					widthAspect, heightAspect);
+			}
 			break;
 
-		case M_ASPECT_106666_1:
-			VideoFormatChange(fSourceWidth, fSourceHeight,
-				lround(1.06666 * fSourceWidth), fSourceHeight);
+		case M_ASPECT_NO_DISTORTION:
+			if (fHasVideo) {
+				int width;
+				int height;
+				fController->GetSize(&width, &height);
+				VideoFormatChange(width, height, width, height);
+			}
 			break;
 
-		case M_ASPECT_109091_1:
-			VideoFormatChange(fSourceWidth, fSourceHeight,
-				lround(1.09091 * fSourceWidth), fSourceHeight);
+		case M_ASPECT_4_3:
+			VideoAspectChange(4, 3);
 			break;
 
-		case M_ASPECT_141176_1:
-			VideoFormatChange(fSourceWidth, fSourceHeight,
-				lround(1.41176 * fSourceWidth), fSourceHeight);
+		case M_ASPECT_16_9: // 1.77 : 1
+			VideoAspectChange(16, 9);
 			break;
 
-		case M_ASPECT_720_576:
-			VideoFormatChange(720, 576,
-				lround(1.06666 * fSourceWidth), fSourceHeight);
+		case M_ASPECT_83_50: // 1.66 : 1
+			VideoAspectChange(83, 50);
 			break;
 
-		case M_ASPECT_704_576:
-			VideoFormatChange(704, 576,
-				lround(1.09091 * fSourceWidth), fSourceHeight);
+		case M_ASPECT_7_4: // 1.75 : 1
+			VideoAspectChange(7, 4);
 			break;
 
-		case M_ASPECT_544_576:
-			VideoFormatChange(544, 576,
-				lround(1.41176 * fSourceWidth), fSourceHeight);
+		case M_ASPECT_37_20: // 1.85 : 1
+			VideoAspectChange(37, 20);
+			break;
+
+		case M_ASPECT_47_20: // 2.35 : 1
+			VideoAspectChange(47, 20);
 			break;
 
 		case M_SET_PLAYLIST_POSITION:
@@ -697,6 +706,13 @@ MainWin::QuitRequested()
 {
 	be_app->PostMessage(M_PLAYER_QUIT);
 	return true;
+}
+
+
+void
+MainWin::MenusBeginning()
+{
+	_SetupVideoAspectItems(fVideoAspectMenu);
 }
 
 
@@ -783,20 +799,69 @@ MainWin::ShowPlaylistWindow()
 
 
 void
+MainWin::VideoAspectChange(int forcedWidth, int forcedHeight, float widthScale)
+{
+	// Force specific source size and pixel width scale.
+	if (fHasVideo) {
+		int width;
+		int height;
+		fController->GetSize(&width, &height);
+		VideoFormatChange(forcedWidth, forcedHeight,
+			lround(width * widthScale), height);
+	}
+}
+
+
+void
+MainWin::VideoAspectChange(float widthScale)
+{
+	// Called when video aspect ratio changes and the original
+	// width/height should be restored too, display aspect is not known,
+	// only pixel width scale.
+	if (fHasVideo) {
+		int width;
+		int height;
+		fController->GetSize(&width, &height);
+		VideoFormatChange(width, height, lround(width * widthScale), height);
+	}
+}
+
+
+void
+MainWin::VideoAspectChange(int widthAspect, int heightAspect)
+{
+	// Called when video aspect ratio changes and the original
+	// width/height should be restored too.
+	if (fHasVideo) {
+		int width;
+		int height;
+		fController->GetSize(&width, &height);
+		VideoFormatChange(width, height, widthAspect, heightAspect);
+	}
+}
+
+
+void
 MainWin::VideoFormatChange(int width, int height, int widthAspect,
 	int heightAspect)
 {
-	// called when video format or aspect ratio changes
+	// Called when video format or aspect ratio changes.
 
 	printf("VideoFormatChange enter: width %d, height %d, "
 		"aspect ratio: %d:%d\n", width, height, widthAspect, heightAspect);
 
- 	fSourceWidth  = width;
- 	fSourceHeight = height;
- 	fWidthAspect   = widthAspect;
- 	fHeightAspect  = heightAspect;
+	// remember current view scale
+	int percent = _CurrentVideoSizeInPercent();
 
- 	FrameResized(Bounds().Width(), Bounds().Height());
+ 	fSourceWidth = width;
+ 	fSourceHeight = height;
+ 	fWidthAspect = widthAspect;
+ 	fHeightAspect = heightAspect;
+
+	if (percent == 100)
+		_ResizeWindow(100);
+	else
+	 	FrameResized(Bounds().Width(), Bounds().Height());
 
 	printf("VideoFormatChange leave\n");
 }
@@ -836,6 +901,8 @@ MainWin::_SetupWindow()
 	fAudioMenu->SetEnabled(fHasAudio);
 	int previousSourceWidth = fSourceWidth;
 	int previousSourceHeight = fSourceHeight;
+	int previousWidthAspect = fWidthAspect;
+	int previousHeightAspect = fHeightAspect;
 	if (fHasVideo) {
 		fController->GetSize(&fSourceWidth, &fSourceHeight,
 			&fWidthAspect, &fHeightAspect);
@@ -849,7 +916,9 @@ MainWin::_SetupWindow()
 
 	// adopt the size and window layout if necessary
 	if (!fIsFullscreen && (previousSourceWidth != fSourceWidth
-			|| previousSourceHeight != fSourceHeight)) {
+			|| previousSourceHeight != fSourceHeight
+			|| previousWidthAspect != fWidthAspect
+			|| previousHeightAspect != fHeightAspect)) {
 		_ResizeWindow(100);
 	}
 
@@ -936,10 +1005,6 @@ MainWin::_CreateMenu()
 
 	_SetupVideoAspectItems(fVideoAspectMenu);
 	fVideoMenu->AddItem(fVideoAspectMenu);
-	item = new BMenuItem("Keep Aspect Ratio",
-		new BMessage(M_TOGGLE_KEEP_ASPECT_RATIO), 'K');
-	item->SetMarked(fKeepAspectRatio);
-	fVideoMenu->AddItem(item);
 
 	fNoInterfaceMenuItem = new BMenuItem("No Interface",
 		new BMessage(M_TOGGLE_NO_INTERFACE), 'B');
@@ -957,20 +1022,54 @@ MainWin::_CreateMenu()
 void
 MainWin::_SetupVideoAspectItems(BMenu* menu)
 {
-	menu->AddItem(new BMenuItem("1 : 1",
-		new BMessage(M_ASPECT_100000_1)));
-	menu->AddItem(new BMenuItem("1.06666 : 1",
-		new BMessage(M_ASPECT_106666_1)));
-	menu->AddItem(new BMenuItem("1.09091 : 1",
-		new BMessage(M_ASPECT_109091_1)));
-	menu->AddItem(new BMenuItem("1.41176 : 1",
-		new BMessage(M_ASPECT_141176_1)));
-	menu->AddItem(new BMenuItem("Force 720 x 576, Aspect 4:3",
-		new BMessage(M_ASPECT_720_576)));
-	menu->AddItem(new BMenuItem("Force 704 x 576, Aspect 4:3",
-		new BMessage(M_ASPECT_704_576)));
-	menu->AddItem(new BMenuItem("Force 544 x 576, Aspect 4:3",
-		new BMessage(M_ASPECT_544_576)));
+	BMenuItem* item;
+	while ((item = menu->RemoveItem(0L)) != NULL)
+		delete item;
+
+	int width;
+	int height;
+	int widthAspect;
+	int heightAspect;
+	fController->GetSize(&width, &height, &widthAspect, &heightAspect);
+		// We don't care if there is a video track at all. In that
+		// case we should end up not marking any item.
+
+	// NOTE: The item marking may end up marking for example both
+	// "Stream Settings" and "16 : 9" if the stream settings happen to
+	// be "16 : 9".
+
+	menu->AddItem(item = new BMenuItem("Stream Settings",
+		new BMessage(M_ASPECT_SAME_AS_SOURCE)));
+	item->SetMarked(widthAspect == fWidthAspect
+		&& heightAspect == fHeightAspect);
+
+	menu->AddItem(item = new BMenuItem("No Aspect Correction",
+		new BMessage(M_ASPECT_NO_DISTORTION)));
+	item->SetMarked(width == fWidthAspect && height == fHeightAspect);
+
+	menu->AddSeparatorItem();
+
+	menu->AddItem(item = new BMenuItem("4 : 3",
+		new BMessage(M_ASPECT_4_3)));
+	item->SetMarked(fWidthAspect == 4 && fHeightAspect == 3);
+	menu->AddItem(item = new BMenuItem("16 : 9",
+		new BMessage(M_ASPECT_16_9)));
+	item->SetMarked(fWidthAspect == 16 && fHeightAspect == 9);
+
+	menu->AddSeparatorItem();
+
+	menu->AddItem(item = new BMenuItem("1.66 : 1",
+		new BMessage(M_ASPECT_83_50)));
+	item->SetMarked(fWidthAspect == 83 && fHeightAspect == 50);
+	menu->AddItem(item = new BMenuItem("1.75 : 1",
+		new BMessage(M_ASPECT_7_4)));
+	item->SetMarked(fWidthAspect == 7 && fHeightAspect == 4);
+	menu->AddItem(item = new BMenuItem("1.85 : 1 (American)",
+		new BMessage(M_ASPECT_37_20)));
+	item->SetMarked(fWidthAspect == 37 && fHeightAspect == 20);
+	menu->AddItem(item = new BMenuItem("2.35 : 1 (Cinemascope)",
+		new BMessage(M_ASPECT_47_20)));
+	item->SetMarked(fWidthAspect == 47 && fHeightAspect == 20);
 }
 
 
@@ -1057,6 +1156,28 @@ MainWin::_SetWindowSizeLimits()
 }
 
 
+int
+MainWin::_CurrentVideoSizeInPercent() const
+{
+	if (!fHasVideo)
+		return 0;
+
+	int videoWidth;
+	int videoHeight;
+	_GetUnscaledVideoSize(videoWidth, videoHeight);
+
+	int viewWidth = fVideoView->Bounds().IntegerWidth() + 1;
+	int viewHeight = fVideoView->Bounds().IntegerHeight() + 1;
+
+	int widthPercent = videoWidth * 100 / viewWidth;
+	int heightPercent = videoHeight * 100 / viewHeight;
+
+	if (widthPercent > heightPercent)
+		return widthPercent;
+	return heightPercent;
+}
+
+
 void
 MainWin::_ResizeWindow(int percent)
 {
@@ -1086,32 +1207,26 @@ MainWin::_ResizeVideoView(int x, int y, int width, int height)
 	printf("_ResizeVideoView: %d,%d, width %d, height %d\n", x, y,
 		width, height);
 
-	if (fKeepAspectRatio) {
-		// Keep aspect ratio, place video view inside
-		// the background area (may create black bars).
-		int videoWidth;
-		int videoHeight;
-		_GetUnscaledVideoSize(videoWidth, videoHeight);
-		float scaledWidth  = videoWidth;
-		float scaledHeight = videoHeight;
-		float factor = min_c(width / scaledWidth, height / scaledHeight);
-		int renderWidth = lround(scaledWidth * factor);
-		int renderHeight = lround(scaledHeight * factor);
-		if (renderWidth > width)
-			renderWidth = width;
-		if (renderHeight > height)
-			renderHeight = height;
+	// Keep aspect ratio, place video view inside
+	// the background area (may create black bars).
+	int videoWidth;
+	int videoHeight;
+	_GetUnscaledVideoSize(videoWidth, videoHeight);
+	float scaledWidth  = videoWidth;
+	float scaledHeight = videoHeight;
+	float factor = min_c(width / scaledWidth, height / scaledHeight);
+	int renderWidth = lround(scaledWidth * factor);
+	int renderHeight = lround(scaledHeight * factor);
+	if (renderWidth > width)
+		renderWidth = width;
+	if (renderHeight > height)
+		renderHeight = height;
 
-		int xOffset = x + (width - renderWidth) / 2;
-		int yOffset = y + (height - renderHeight) / 2;
+	int xOffset = x + (width - renderWidth) / 2;
+	int yOffset = y + (height - renderHeight) / 2;
 
-		fVideoView->MoveTo(xOffset, yOffset);
-		fVideoView->ResizeTo(renderWidth - 1, renderHeight - 1);
-
-	} else {
-		fVideoView->MoveTo(x, y);
-		fVideoView->ResizeTo(width - 1, height - 1);
-	}
+	fVideoView->MoveTo(xOffset, yOffset);
+	fVideoView->ResizeTo(renderWidth - 1, renderHeight - 1);
 }
 
 
@@ -1246,11 +1361,6 @@ MainWin::_ShowContextMenu(const BPoint &screen_point)
 	_SetupVideoAspectItems(aspectSubMenu);
 	aspectSubMenu->SetTargetForItems(this);
 	menu->AddItem(item = new BMenuItem(aspectSubMenu));
-	item->SetEnabled(fHasVideo);
-
-	menu->AddItem(item = new BMenuItem("Keep Aspect Ratio",
-		new BMessage(M_TOGGLE_KEEP_ASPECT_RATIO), 'K'));
-	item->SetMarked(fKeepAspectRatio);
 	item->SetEnabled(fHasVideo);
 
 	menu->AddItem(item = new BMenuItem("No Interface",
@@ -1469,16 +1579,6 @@ MainWin::_ToggleFullscreen()
 
 	printf("_ToggleFullscreen leave\n");
 }
-
-void
-MainWin::_ToggleKeepAspectRatio()
-{
-	fKeepAspectRatio = !fKeepAspectRatio;
-	FrameResized(Bounds().Width(), Bounds().Height());
-
-	_MarkItem(fVideoMenu, M_TOGGLE_KEEP_ASPECT_RATIO, fKeepAspectRatio);
-}
-
 
 void
 MainWin::_ToggleAlwaysOnTop()
