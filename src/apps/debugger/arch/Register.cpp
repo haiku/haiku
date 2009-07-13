@@ -35,7 +35,7 @@ Register::Register(int32 index, const char* name, uint32 bitSize,
 			fFormat = REGISTER_FORMAT_FLOAT;
 			break;
 		default:
-			fFormat = 0;
+			fFormat = REGISTER_FORMAT_INTEGER;
 			break;
 	}
 }
