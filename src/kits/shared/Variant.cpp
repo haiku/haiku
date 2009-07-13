@@ -220,6 +220,38 @@ BVariant::_SetTo(const BVariant& other)
 }
 
 
+/*static*/ size_t
+BVariant::SizeOfType(uint32 type)
+{
+	switch (type) {
+		case B_INT8_TYPE:
+			return 1;
+		case B_UINT8_TYPE:
+			return 1;
+		case B_INT16_TYPE:
+			return 2;
+		case B_UINT16_TYPE:
+			return 2;
+		case B_INT32_TYPE:
+			return 4;
+		case B_UINT32_TYPE:
+			return 4;
+		case B_INT64_TYPE:
+			return 8;
+		case B_UINT64_TYPE:
+			return 8;
+		case B_FLOAT_TYPE:
+			return sizeof(float);
+		case B_DOUBLE_TYPE:
+			return sizeof(double);
+		case B_POINTER_TYPE:
+			return sizeof(void*);
+		default:
+			return 0;
+	}
+}
+
+
 void
 BVariant::_SetTo(int8 value)
 {

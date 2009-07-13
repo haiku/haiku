@@ -73,6 +73,8 @@ public:
 			void*				ToPointer() const;
 			const char*			ToString() const;
 
+	static	size_t				SizeOfType(uint32 type);
+
 private:
 			void				_SetTo(const BVariant& other);
 			void				_SetTo(int8 value);
