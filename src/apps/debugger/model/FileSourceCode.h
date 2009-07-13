@@ -20,7 +20,8 @@ class SourceFile;
 class FileSourceCode : public SourceCode {
 public:
 								FileSourceCode(LocatableFile* file,
-									SourceFile* sourceFile);
+									SourceFile* sourceFile,
+									SourceLanguage* language);
 	virtual						~FileSourceCode();
 
 			status_t			Init();
@@ -29,6 +30,8 @@ public:
 
 	virtual	bool				Lock();
 	virtual	void				Unlock();
+
+	virtual	SourceLanguage*		GetSourceLanguage() const;
 
 	virtual	int32				CountLines() const;
 	virtual	const char*			LineAt(int32 index) const;
@@ -49,6 +52,7 @@ private:
 			BLocker				fLock;
 			LocatableFile*		fFile;
 			SourceFile*			fSourceFile;
+			SourceLanguage*		fLanguage;
 			Array<SourceLocation> fSourceLocations;
 };
 

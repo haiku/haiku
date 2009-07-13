@@ -24,6 +24,7 @@
 #include "ImageDebugInfo.h"
 #include "LocatableFile.h"
 #include "SourceFile.h"
+#include "SourceLanguage.h"
 #include "SpecificImageDebugInfo.h"
 #include "StringUtils.h"
 
@@ -161,6 +162,11 @@ struct TeamDebugInfo::SourceFileEntry : public HashTableLink<SourceFileEntry> {
 			return NULL;
 
 		return fFunctions.ItemAt(index - 1);
+	}
+
+	Function* FunctionAt(int32 index) const
+	{
+		return fFunctions.ItemAt(index);
 	}
 
 private:
@@ -378,6 +384,20 @@ TeamDebugInfo::LoadSourceCode(LocatableFile* file, FileSourceCode*& _sourceCode)
 		return B_OK;
 	}
 
+	// get the source language from some function's image debug info
+	Function* function = entry->FunctionAt(0);
+	if (function == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	FunctionDebugInfo* functionDebugInfo
+		= function->FirstInstance()->GetFunctionDebugInfo();
+	SourceLanguage* language;
+	status_t error = functionDebugInfo->GetSpecificImageDebugInfo()
+		->GetSourceLanguage(functionDebugInfo, language);
+	if (error != B_OK)
+		return error;
+	Reference<SourceLanguage> languageReference(language, true);
+
 	// no source code yet
 //	locker.Unlock();
 	// TODO: It would be nice to unlock here, but we need to iterate through
@@ -387,12 +407,12 @@ TeamDebugInfo::LoadSourceCode(LocatableFile* file, FileSourceCode*& _sourceCode)
 
 	// load the source file
 	SourceFile* sourceFile;
-	status_t error = fFileManager->LoadSourceFile(file, sourceFile);
+	error = fFileManager->LoadSourceFile(file, sourceFile);
 	if (error != B_OK)
 		return error;
 
 	// create the source code
-	sourceCode = new(std::nothrow) FileSourceCode(file, sourceFile);
+	sourceCode = new(std::nothrow) FileSourceCode(file, sourceFile, language);
 	sourceFile->ReleaseReference();
 	if (sourceCode == NULL)
 		return B_NO_MEMORY;

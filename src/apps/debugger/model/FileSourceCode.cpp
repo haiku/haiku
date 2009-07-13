@@ -10,22 +10,27 @@
 
 #include "LocatableFile.h"
 #include "SourceFile.h"
+#include "SourceLanguage.h"
 #include "SourceLocation.h"
 
 
-FileSourceCode::FileSourceCode(LocatableFile* file, SourceFile* sourceFile)
+FileSourceCode::FileSourceCode(LocatableFile* file, SourceFile* sourceFile,
+	SourceLanguage* language)
 	:
 	fLock("source code"),
 	fFile(file),
-	fSourceFile(sourceFile)
+	fSourceFile(sourceFile),
+	fLanguage(language)
 {
 	fFile->AcquireReference();
 	fSourceFile->AcquireReference();
+	fLanguage->AcquireReference();
 }
 
 
 FileSourceCode::~FileSourceCode()
 {
+	fLanguage->ReleaseReference();
 	fSourceFile->ReleaseReference();
 	fFile->ReleaseReference();
 }
@@ -62,6 +67,13 @@ void
 FileSourceCode::Unlock()
 {
 	fLock.Unlock();
+}
+
+
+SourceLanguage*
+FileSourceCode::GetSourceLanguage() const
+{
+	return fLanguage;
 }
 
 

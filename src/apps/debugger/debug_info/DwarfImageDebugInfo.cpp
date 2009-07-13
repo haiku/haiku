@@ -17,7 +17,9 @@
 #include <AutoLocker.h>
 
 #include "Architecture.h"
+#include "CLanguage.h"
 #include "CompilationUnit.h"
+#include "CppLanguage.h"
 #include "CpuState.h"
 #include "DebugInfoEntries.h"
 #include "Dwarf.h"
@@ -36,6 +38,7 @@
 #include "Statement.h"
 #include "StringUtils.h"
 #include "TeamMemory.h"
+#include "UnsupportedLanguage.h"
 
 
 // #pragma mark - UnwindTargetInterface
@@ -522,6 +525,40 @@ printf("  -> found statement!\n");
 	}
 
 	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+DwarfImageDebugInfo::GetSourceLanguage(FunctionDebugInfo* _function,
+	SourceLanguage*& _language)
+{
+	DwarfFunctionDebugInfo* function
+		= dynamic_cast<DwarfFunctionDebugInfo*>(_function);
+	if (function == NULL)
+		return B_BAD_VALUE;
+
+	SourceLanguage* language;
+	CompilationUnit* unit = function->GetCompilationUnit();
+	switch (unit->UnitEntry()->Language()) {
+		case DW_LANG_C89:
+		case DW_LANG_C:
+		case DW_LANG_C99:
+			language = new(std::nothrow) CLanguage;
+			break;
+		case DW_LANG_C_plus_plus:
+			language = new(std::nothrow) CppLanguage;
+			break;
+		case 0:
+		default:
+			language = new(std::nothrow) UnsupportedLanguage;
+			break;
+	}
+
+	if (language == NULL)
+		return B_NO_MEMORY;
+
+	_language = language;
+	return B_OK;
 }
 
 

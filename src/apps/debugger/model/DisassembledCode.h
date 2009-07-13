@@ -17,11 +17,13 @@ class ContiguousStatement;
 
 class DisassembledCode : public SourceCode {
 public:
-								DisassembledCode();
+								DisassembledCode(SourceLanguage* language);
 								~DisassembledCode();
 
 	virtual	bool				Lock();
 	virtual	void				Unlock();
+
+	virtual	SourceLanguage*		GetSourceLanguage() const;
 
 	virtual	int32				CountLines() const;
 	virtual	const char*			LineAt(int32 index) const;
@@ -59,6 +61,7 @@ private:
 									const ContiguousStatement* statement);
 
 private:
+			SourceLanguage*		fLanguage;
 			LineList			fLines;
 			StatementList		fStatements;
 };

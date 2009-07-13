@@ -20,6 +20,7 @@
 #include "StackFrame.h"
 #include "Statement.h"
 #include "TeamMemory.h"
+#include "X86AssemblyLanguage.h"
 
 #include "disasm/DisassemblerX86.h"
 
@@ -104,6 +105,7 @@ struct ArchitectureX86::FromDwarfRegisterMap : RegisterMap {
 ArchitectureX86::ArchitectureX86(TeamMemory* teamMemory)
 	:
 	Architecture(teamMemory),
+	fAssemblyLanguage(NULL),
 	fToDwarfRegisterMap(NULL),
 	fFromDwarfRegisterMap(NULL)
 {
@@ -116,12 +118,18 @@ ArchitectureX86::~ArchitectureX86()
 		fToDwarfRegisterMap->ReleaseReference();
 	if (fFromDwarfRegisterMap != NULL)
 		fFromDwarfRegisterMap->ReleaseReference();
+	if (fAssemblyLanguage != NULL)
+		fAssemblyLanguage->ReleaseReference();
 }
 
 
 status_t
 ArchitectureX86::Init()
 {
+	fAssemblyLanguage = new(std::nothrow) X86AssemblyLanguage;
+	if (fAssemblyLanguage == NULL)
+		return B_NO_MEMORY;
+
 	try {
 		_AddIntegerRegister(X86_REGISTER_EIP, "eip", B_UINT32_TYPE,
 			REGISTER_TYPE_INSTRUCTION_POINTER, false);
@@ -450,7 +458,8 @@ status_t
 ArchitectureX86::DisassembleCode(FunctionDebugInfo* function,
 	const void* buffer, size_t bufferSize, DisassembledCode*& _sourceCode)
 {
-	DisassembledCode* source = new(std::nothrow) DisassembledCode;
+	DisassembledCode* source = new(std::nothrow) DisassembledCode(
+		fAssemblyLanguage);
 	if (source == NULL)
 		return B_NO_MEMORY;
 	Reference<DisassembledCode> sourceReference(source, true);

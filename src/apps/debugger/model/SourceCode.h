@@ -12,6 +12,7 @@
 
 
 class LocatableFile;
+class SourceLanguage;
 class SourceLocation;
 class Statement;
 
@@ -24,6 +25,8 @@ public:
 	// mutable data.
 	virtual	bool				Lock() = 0;
 	virtual	void				Unlock() = 0;
+
+	virtual	SourceLanguage*		GetSourceLanguage() const = 0;
 
 	virtual	int32				CountLines() const = 0;
 	virtual	const char*			LineAt(int32 index) const = 0;

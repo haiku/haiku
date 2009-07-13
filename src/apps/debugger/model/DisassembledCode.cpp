@@ -13,6 +13,7 @@
 
 #include <String.h>
 
+#include "SourceLanguage.h"
 #include "Statement.h"
 
 
@@ -29,10 +30,12 @@ struct DisassembledCode::Line {
 };
 
 
-DisassembledCode::DisassembledCode()
+DisassembledCode::DisassembledCode(SourceLanguage* language)
 	:
+	fLanguage(language),
 	fLines(20, true)
 {
+	fLanguage->AcquireReference();
 }
 
 
@@ -40,6 +43,8 @@ DisassembledCode::~DisassembledCode()
 {
 	for (int32 i = 0; Statement* statement = fStatements.ItemAt(i); i++)
 		statement->RemoveReference();
+
+	fLanguage->ReleaseReference();
 }
 
 
@@ -54,6 +59,13 @@ DisassembledCode::Lock()
 void
 DisassembledCode::Unlock()
 {
+}
+
+
+SourceLanguage*
+DisassembledCode::GetSourceLanguage() const
+{
+	return fLanguage;
 }
 
 

@@ -11,6 +11,9 @@
 #include "Register.h"
 
 
+class SourceLanguage;
+
+
 class ArchitectureX86 : public Architecture {
 public:
 								ArchitectureX86(TeamMemory* teamMemory);
@@ -67,6 +70,7 @@ private:
 
 private:
 			Array<Register>		fRegisters;
+			SourceLanguage*		fAssemblyLanguage;
 			ToDwarfRegisterMap*	fToDwarfRegisterMap;
 			FromDwarfRegisterMap* fFromDwarfRegisterMap;
 };

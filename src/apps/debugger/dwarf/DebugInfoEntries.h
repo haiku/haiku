@@ -146,6 +146,8 @@ public:
 			const char*			CompilationDir() const
 									{ return fCompilationDir; }
 
+			uint16				Language() const	{ return fLanguage; }
+
 			const DebugInfoEntryList& Types() const	{ return fTypes; }
 			const DebugInfoEntryList& OtherChildren() const
 										{ return fOtherChildren; }

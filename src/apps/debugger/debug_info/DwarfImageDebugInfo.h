@@ -53,6 +53,9 @@ public:
 									const SourceLocation& sourceLocation,
 									Statement*& _statement);
 
+	virtual	status_t			GetSourceLanguage(FunctionDebugInfo* function,
+									SourceLanguage*& _language);
+
 	virtual	ssize_t				ReadCode(target_addr_t address, void* buffer,
 									size_t size);
 

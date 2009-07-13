@@ -104,6 +104,14 @@ DebuggerImageDebugInfo::GetStatementAtSourceLocation(
 }
 
 
+status_t
+DebuggerImageDebugInfo::GetSourceLanguage(FunctionDebugInfo* function,
+	SourceLanguage*& _language)
+{
+	return B_UNSUPPORTED;
+}
+
+
 ssize_t
 DebuggerImageDebugInfo::ReadCode(target_addr_t address, void* buffer,
 	size_t size)

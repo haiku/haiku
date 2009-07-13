@@ -14,6 +14,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) files ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 
@@ -106,6 +107,15 @@ Application Debugger :
 	TeamMemory.cpp
 	Thread.cpp
 	ThreadInfo.cpp
+
+	# source_language
+	CLanguage.cpp
+	CLanguageFamily.cpp
+	CppLanguage.cpp
+	SourceLanguage.cpp
+	SyntaxHighlighter.cpp
+	UnsupportedLanguage.cpp
+	X86AssemblyLanguage.cpp
 
 	# types
 	TargetAddressRangeList.cpp

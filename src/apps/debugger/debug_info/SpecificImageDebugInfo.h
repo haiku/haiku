@@ -18,6 +18,7 @@ class FileSourceCode;
 class FunctionDebugInfo;
 class Image;
 class LocatableFile;
+class SourceLanguage;
 class SourceLocation;
 class StackFrame;
 class Statement;
@@ -49,6 +50,9 @@ public:
 									const SourceLocation& sourceLocation,
 									Statement*& _statement) = 0;
 										// returns reference
+
+	virtual	status_t			GetSourceLanguage(FunctionDebugInfo* function,
+									SourceLanguage*& _language) = 0;
 
 	virtual	ssize_t				ReadCode(target_addr_t address, void* buffer,
 									size_t size) = 0;
