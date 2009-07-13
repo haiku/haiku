@@ -6,6 +6,8 @@
 #define DATA_READER_H
 
 
+#include <string.h>
+
 #include "Types.h"
 
 
