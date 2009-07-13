@@ -292,10 +292,15 @@ printf("  %ld compilation units\n", fFile->CountCompilationUnits());
 
 
 status_t
-DwarfImageDebugInfo::CreateFrame(Image* image, FunctionDebugInfo* function,
+DwarfImageDebugInfo::CreateFrame(Image* image, FunctionDebugInfo* _function,
 	CpuState* cpuState, StackFrame*& _previousFrame,
 	CpuState*& _previousCpuState)
 {
+	DwarfFunctionDebugInfo* function
+		= dynamic_cast<DwarfFunctionDebugInfo*>(_function);
+	if (function == NULL)
+		return B_BAD_VALUE;
+
 	int32 registerCount = fArchitecture->CountRegisters();
 	const Register* registers = fArchitecture->Registers();
 
@@ -324,7 +329,7 @@ DwarfImageDebugInfo::CreateFrame(Image* image, FunctionDebugInfo* function,
 
 	// do the unwinding
 	target_addr_t framePointer;
-	error = fFile->UnwindCallFrame(
+	error = fFile->UnwindCallFrame(function->GetCompilationUnit(),
 		cpuState->InstructionPointer() - fRelocationDelta,
 		&inputInterface, &outputInterface, framePointer);
 	if (error != B_OK)
@@ -610,7 +615,7 @@ DwarfImageDebugInfo::_AddSourceCodeInfo(CompilationUnit* unit,
 	int32 statementLine = -1;
 	int32 statementColumn = -1;
 	while (program.GetNextRow(state)) {
-printf("  %#lx  (%ld, %ld, %ld)  %d\n", state.address, state.file, state.line, state.column, state.isStatement);
+printf("  %#llx  (%ld, %ld, %ld)  %d\n", state.address, state.file, state.line, state.column, state.isStatement);
 		bool isOurFile = state.file == fileIndex;
 
 		if (statementAddress != 0

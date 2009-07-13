@@ -154,11 +154,11 @@ public:
 			TargetAddressRangeList* AddressRanges() const
 										{ return fAddressRanges; }
 
-			dwarf_addr_t		LowPC() const	{ return fLowPC; }
-			dwarf_addr_t		HighPC() const	{ return fHighPC; }
-			dwarf_addr_t		AddressRangeBase() const;
+			target_addr_t		LowPC() const	{ return fLowPC; }
+			target_addr_t		HighPC() const	{ return fHighPC; }
+			target_addr_t		AddressRangeBase() const;
 
-			dwarf_off_t			StatementListOffset() const
+			off_t				StatementListOffset() const
 									{ return fStatementListOffset; }
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
@@ -198,10 +198,10 @@ public:
 protected:
 			const char*			fName;
 			const char*			fCompilationDir;
-			dwarf_addr_t		fLowPC;
-			dwarf_addr_t		fHighPC;
-			dwarf_off_t			fStatementListOffset;
-			dwarf_off_t			fMacroInfoOffset;
+			target_addr_t		fLowPC;
+			target_addr_t		fHighPC;
+			off_t				fStatementListOffset;
+			off_t				fMacroInfoOffset;
 			TargetAddressRangeList*	fAddressRanges;
 			DIECompileUnitBase*	fBaseTypesUnit;
 			DebugInfoEntryList	fTypes;
@@ -1028,8 +1028,8 @@ public:
 			TargetAddressRangeList* AddressRanges() const
 										{ return fAddressRanges; }
 
-			dwarf_addr_t		LowPC() const	{ return fLowPC; }
-			dwarf_addr_t		HighPC() const	{ return fHighPC; }
+			target_addr_t		LowPC() const	{ return fLowPC; }
+			target_addr_t		HighPC() const	{ return fHighPC; }
 
 			bool				IsPrototyped() const	{ return fPrototyped; }
 			uint8				Inline() const			{ return fInline; }
@@ -1055,8 +1055,8 @@ public:
 									const AttributeValue& value);
 
 protected:
-			dwarf_addr_t		fLowPC;
-			dwarf_addr_t		fHighPC;
+			target_addr_t		fLowPC;
+			target_addr_t		fHighPC;
 			TargetAddressRangeList*	fAddressRanges;
 			DIESubprogram*		fSpecification;
 			DIESubprogram*		fAbstractOrigin;

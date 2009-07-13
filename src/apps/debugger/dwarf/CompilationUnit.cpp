@@ -22,9 +22,9 @@ struct CompilationUnit::File {
 };
 
 
-CompilationUnit::CompilationUnit(dwarf_off_t headerOffset,
-	dwarf_off_t contentOffset, dwarf_off_t totalSize,
-	dwarf_off_t abbreviationOffset)
+CompilationUnit::CompilationUnit(off_t headerOffset, off_t contentOffset,
+	off_t totalSize, off_t abbreviationOffset, uint8 addressSize,
+	bool isDwarf64)
 	:
 	fHeaderOffset(headerOffset),
 	fContentOffset(contentOffset),
@@ -33,7 +33,10 @@ CompilationUnit::CompilationUnit(dwarf_off_t headerOffset,
 	fAbbreviationTable(NULL),
 	fUnitEntry(NULL),
 	fDirectories(10, true),
-	fFiles(10, true)
+	fFiles(10, true),
+	fLineNumberProgram(addressSize),
+	fAddressSize(addressSize),
+	fIsDwarf64(isDwarf64)
 {
 }
 
@@ -51,7 +54,7 @@ CompilationUnit::SetAbbreviationTable(AbbreviationTable* abbreviationTable)
 
 
 status_t
-CompilationUnit::AddDebugInfoEntry(DebugInfoEntry* entry, dwarf_off_t offset)
+CompilationUnit::AddDebugInfoEntry(DebugInfoEntry* entry, off_t offset)
 {
 	if (!fEntries.Add(entry))
 		return B_NO_MEMORY;
@@ -80,7 +83,7 @@ CompilationUnit::CountEntries() const
 
 void
 CompilationUnit::GetEntryAt(int index, DebugInfoEntry*& entry,
-	dwarf_off_t& offset) const
+	off_t& offset) const
 {
 	entry = fEntries[index];
 	offset = fEntryOffsets[index];
@@ -88,7 +91,7 @@ CompilationUnit::GetEntryAt(int index, DebugInfoEntry*& entry,
 
 
 DebugInfoEntry*
-CompilationUnit::EntryForOffset(dwarf_off_t offset) const
+CompilationUnit::EntryForOffset(off_t offset) const
 {
 	if (fEntries.IsEmpty())
 		return NULL;

@@ -5,7 +5,8 @@
 #ifndef DATA_READER_H
 #define DATA_READER_H
 
-#include <SupportDefs.h>
+
+#include "Types.h"
 
 
 class DataReader {
@@ -15,25 +16,37 @@ public:
 		fData(NULL),
 		fSize(0),
 		fInitialSize(0),
+		fAddressSize(4),
 		fOverflow(false)
 	{
 	}
 
-	DataReader(const void* data, off_t size)
+	DataReader(const void* data, off_t size, uint8 addressSize)
 	{
-		SetTo(data, size);
+		SetTo(data, size, addressSize);
 	}
 
-	void SetTo(const void* data, off_t size)
+	void SetTo(const void* data, off_t size, uint8 addressSize)
 	{
 		fData = (const uint8*)data;
 		fInitialSize = fSize = size;
+		fAddressSize = addressSize;
 		fOverflow = false;
 	}
 
 	bool HasData() const
 	{
 		return fSize > 0;
+	}
+
+	uint32 AddressSize() const
+	{
+		return fAddressSize;
+	}
+
+	void SetAddressSize(uint8 addressSize)
+	{
+		fAddressSize = addressSize;
 	}
 
 	bool HasOverflow() const
@@ -83,6 +96,13 @@ public:
 		fSize -= sizeof(Type);
 
 		return data;
+	}
+
+	target_addr_t ReadAddress(target_addr_t defaultValue)
+	{
+		return fAddressSize == 4
+			? (target_addr_t)Read<uint32>(defaultValue)
+			: (target_addr_t)Read<uint64>(defaultValue);
 	}
 
 	uint64 ReadUnsignedLEB128(uint64 defaultValue)
@@ -165,6 +185,7 @@ private:
 	const uint8*	fData;
 	off_t			fSize;
 	off_t			fInitialSize;
+	uint8			fAddressSize;
 	bool			fOverflow;
 };
 

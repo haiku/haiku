@@ -39,7 +39,8 @@ public:
 			CompilationUnit*	CompilationUnitForDIE(
 									const DebugInfoEntry* entry) const;
 
-			status_t			UnwindCallFrame(target_addr_t location,
+			status_t			UnwindCallFrame(CompilationUnit* unit,
+									target_addr_t location,
 									const DwarfTargetInterface* inputInterface,
 									DwarfTargetInterface* outputInterface,
 									target_addr_t& _framePointer);
@@ -61,11 +62,12 @@ private:
 
 			status_t			_ParseLineInfo(CompilationUnit* unit);
 
-			status_t			_ParseCIE(CfaContext& context,
-									dwarf_off_t cieOffset);
-			status_t			_ParseFrameInfoInstructions(CfaContext& context,
-									dwarf_off_t instructionOffset,
-									dwarf_off_t instructionSize);
+			status_t			_ParseCIE(CompilationUnit* unit,
+									CfaContext& context, off_t cieOffset);
+			status_t			_ParseFrameInfoInstructions(
+									CompilationUnit* unit, CfaContext& context,
+									off_t instructionOffset,
+									off_t instructionSize);
 
 			status_t			_GetAbbreviationTable(off_t offset,
 									AbbreviationTable*& _table);

@@ -9,7 +9,7 @@
 
 #include <util/DoublyLinkedList.h>
 
-#include "DwarfTypes.h"
+#include "Types.h"
 
 
 #define DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(name)	\

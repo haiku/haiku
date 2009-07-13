@@ -73,7 +73,7 @@ DIECompileUnitBase::Name() const
 }
 
 
-dwarf_addr_t
+target_addr_t
 DIECompileUnitBase::AddressRangeBase() const
 {
 	if (fAddressRanges != NULL)
@@ -1991,7 +1991,7 @@ DIECondition::Tag() const
 
 DIESharedType::DIESharedType()
 {
-	fBlockSize.SetTo(DWARF_ADDRESS_MAX);
+	fBlockSize.SetTo(~(uint64)0);
 }
 
 

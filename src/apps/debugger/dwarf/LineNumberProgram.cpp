@@ -18,7 +18,7 @@ static const uint8 kLineNumberStandardOpcodeOperands[]
 static const uint32 kLineNumberStandardOpcodeCount = 12;
 
 
-LineNumberProgram::LineNumberProgram()
+LineNumberProgram::LineNumberProgram(uint8 addressSize)
 	:
 	fProgram(NULL),
 	fProgramSize(0),
@@ -27,6 +27,7 @@ LineNumberProgram::LineNumberProgram()
 	fLineBase(0),
 	fLineRange(0),
 	fOpcodeBase(0),
+	fAddressSize(addressSize),
 	fStandardOpcodeLengths(NULL)
 {
 }
@@ -72,7 +73,7 @@ LineNumberProgram::GetInitialState(State& state) const
 		return;
 
 	_SetToInitial(state);
-	state.dataReader.SetTo(fProgram, fProgramSize);
+	state.dataReader.SetTo(fProgram, fProgramSize, fAddressSize);
 }
 
 
@@ -160,7 +161,7 @@ printf("unsupported standard opcode %u\n", opcode);
 					appendRow = true;
 					break;
 				case DW_LNE_set_address:
-					state.address = dataReader.Read<dwarf_addr_t>(0);
+					state.address = dataReader.ReadAddress(0);
 					break;
 				case DW_LNE_define_file:
 				{

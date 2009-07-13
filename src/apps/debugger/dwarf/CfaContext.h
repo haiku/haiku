@@ -9,12 +9,13 @@
 #include <ObjectList.h>
 
 #include "CfaRuleSet.h"
+#include "Types.h"
 
 
 class CfaContext {
 public:
-								CfaContext(dwarf_addr_t targetLocation,
-									dwarf_addr_t initialLocation);
+								CfaContext(target_addr_t targetLocation,
+									target_addr_t initialLocation);
 								~CfaContext();
 
 			status_t			Init(uint32 registerCount);
@@ -23,12 +24,12 @@ public:
 			status_t			PushRuleSet();
 			status_t			PopRuleSet();
 
-			dwarf_addr_t		TargetLocation() const
+			target_addr_t		TargetLocation() const
 									{ return fTargetLocation; }
 
-			dwarf_addr_t		Location() const
+			target_addr_t		Location() const
 									{ return fLocation; }
-			void				SetLocation(dwarf_addr_t location);
+			void				SetLocation(target_addr_t location);
 
 			uint32				CodeAlignment() const
 									{ return fCodeAlignment; }
@@ -53,8 +54,8 @@ private:
 			typedef BObjectList<CfaRuleSet> RuleSetList;
 
 private:
-			dwarf_addr_t		fTargetLocation;
-			dwarf_addr_t		fLocation;
+			target_addr_t		fTargetLocation;
+			target_addr_t		fLocation;
 			uint32				fCodeAlignment;
 			int32				fDataAlignment;
 			uint32				fReturnAddressRegister;

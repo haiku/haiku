@@ -6,8 +6,8 @@
 #define ATTRIBUTE_VALUE_H
 
 #include "AttributeClasses.h"
-#include "DwarfTypes.h"
 #include "TargetAddressRangeList.h"
+#include "Types.h"
 
 
 class DebugInfoEntry;
@@ -15,15 +15,15 @@ class DebugInfoEntry;
 
 struct AttributeValue {
 	union {
-		dwarf_addr_t		address;
+		target_addr_t		address;
 		struct {
 			const void*		data;
-			dwarf_size_t	length;
+			off_t			length;
 		}					block;
 		uint64				constant;
 		bool				flag;
 		TargetAddressRangeList*	rangeList;
-		dwarf_off_t			pointer;
+		off_t				pointer;
 		DebugInfoEntry*		reference;
 		const char*			string;
 	};
@@ -43,14 +43,14 @@ struct AttributeValue {
 		Unset();
 	}
 
-	void SetToAddress(dwarf_addr_t address)
+	void SetToAddress(target_addr_t address)
 	{
 		Unset();
 		attributeClass = ATTRIBUTE_CLASS_ADDRESS;
 		this->address = address;
 	}
 
-	void SetToBlock(const void* data, dwarf_size_t length)
+	void SetToBlock(const void* data, off_t length)
 	{
 		Unset();
 		attributeClass = ATTRIBUTE_CLASS_BLOCK;
@@ -73,21 +73,21 @@ struct AttributeValue {
 		this->flag = value;
 	}
 
-	void SetToLinePointer(dwarf_off_t value)
+	void SetToLinePointer(off_t value)
 	{
 		Unset();
 		attributeClass = ATTRIBUTE_CLASS_LINEPTR;
 		this->pointer = value;
 	}
 
-	void SetToLocationListPointer(dwarf_off_t value)
+	void SetToLocationListPointer(off_t value)
 	{
 		Unset();
 		attributeClass = ATTRIBUTE_CLASS_LOCLISTPTR;
 		this->pointer = value;
 	}
 
-	void SetToMacroPointer(dwarf_off_t value)
+	void SetToMacroPointer(off_t value)
 	{
 		Unset();
 		attributeClass = ATTRIBUTE_CLASS_MACPTR;
@@ -136,7 +136,7 @@ struct DynamicAttributeValue {
 		DebugInfoEntry*		reference;
 		struct {
 			const void*		data;
-			dwarf_size_t	length;
+			off_t			length;
 		}					block;
 	};
 	uint8				attributeClass;
@@ -160,7 +160,7 @@ struct DynamicAttributeValue {
 		attributeClass = ATTRIBUTE_CLASS_REFERENCE;
 	}
 
-	void SetTo(const void* data, dwarf_size_t length)
+	void SetTo(const void* data, off_t length)
 	{
 		block.data = data;
 		block.length = length;
@@ -175,7 +175,7 @@ struct ConstantAttributeValue {
 		const char*			string;
 		struct {
 			const void*		data;
-			dwarf_size_t	length;
+			off_t			length;
 		}					block;
 	};
 	uint8				attributeClass;
@@ -199,7 +199,7 @@ struct ConstantAttributeValue {
 		attributeClass = ATTRIBUTE_CLASS_STRING;
 	}
 
-	void SetTo(const void* data, dwarf_size_t length)
+	void SetTo(const void* data, off_t length)
 	{
 		block.data = data;
 		block.length = length;

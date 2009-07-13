@@ -9,8 +9,8 @@
 #include "CfaContext.h"
 
 
-CfaContext::CfaContext(dwarf_addr_t targetLocation,
-	dwarf_addr_t initialLocation)
+CfaContext::CfaContext(target_addr_t targetLocation,
+	target_addr_t initialLocation)
 	:
 	fTargetLocation(targetLocation),
 	fLocation(initialLocation),
@@ -80,7 +80,7 @@ CfaContext::PopRuleSet()
 
 
 void
-CfaContext::SetLocation(dwarf_addr_t location)
+CfaContext::SetLocation(target_addr_t location)
 {
 	fLocation = location;
 }

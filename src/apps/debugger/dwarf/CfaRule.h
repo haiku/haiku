@@ -6,7 +6,7 @@
 #define CFA_RULE_H
 
 
-#include "DwarfTypes.h"
+#include "Types.h"
 
 
 enum cfa_rule_type {

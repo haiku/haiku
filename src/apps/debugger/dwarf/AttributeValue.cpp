@@ -15,10 +15,10 @@ AttributeValue::ToString(char* buffer, size_t size)
 {
 	switch (attributeClass) {
 		case ATTRIBUTE_CLASS_ADDRESS:
-			snprintf(buffer, size, "%#lx", address);
+			snprintf(buffer, size, "%#llx", address);
 			return buffer;
 		case ATTRIBUTE_CLASS_BLOCK:
-			snprintf(buffer, size, "(%p, %#lx)", block.data, block.length);
+			snprintf(buffer, size, "(%p, %#llx)", block.data, block.length);
 			return buffer;
 		case ATTRIBUTE_CLASS_CONSTANT:
 			snprintf(buffer, size, "%#llx", constant);
@@ -30,7 +30,7 @@ AttributeValue::ToString(char* buffer, size_t size)
 		case ATTRIBUTE_CLASS_LOCLISTPTR:
 		case ATTRIBUTE_CLASS_MACPTR:
 		case ATTRIBUTE_CLASS_RANGELISTPTR:
-			snprintf(buffer, size, "%#lx", pointer);
+			snprintf(buffer, size, "%#llx", pointer);
 			return buffer;
 		case ATTRIBUTE_CLASS_REFERENCE:
 			snprintf(buffer, size, "%p", reference);

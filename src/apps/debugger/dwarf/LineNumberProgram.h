@@ -6,7 +6,7 @@
 #define LINE_NUMBER_PROGRAM_H
 
 #include "DataReader.h"
-#include "DwarfTypes.h"
+#include "Types.h"
 
 
 class LineNumberProgram {
@@ -14,7 +14,7 @@ public:
 	struct State;
 
 public:
-								LineNumberProgram();
+								LineNumberProgram(uint8 addressSize);
 								~LineNumberProgram();
 
 			status_t			Init(const void* program, size_t programSize,
@@ -38,12 +38,13 @@ private:
 			int8				fLineBase;
 			uint8				fLineRange;
 			uint8				fOpcodeBase;
+			uint8				fAddressSize;
 			const uint8*		fStandardOpcodeLengths;
 };
 
 
 struct LineNumberProgram::State {
-	dwarf_addr_t	address;
+	target_addr_t	address;
 	int32			file;
 	int32			line;
 	int32			column;

@@ -10,8 +10,8 @@
 #include <ObjectList.h>
 
 #include "Array.h"
-#include "DwarfTypes.h"
 #include "LineNumberProgram.h"
+#include "Types.h"
 
 
 class AbbreviationTable;
@@ -21,22 +21,27 @@ class DIECompileUnitBase;
 
 class CompilationUnit {
 public:
-								CompilationUnit(dwarf_off_t headerOffset,
-									dwarf_off_t contentOffset,
-									dwarf_off_t totalSize,
-									dwarf_off_t abbreviationOffset);
+								CompilationUnit(off_t headerOffset,
+									off_t contentOffset,
+									off_t totalSize,
+									off_t abbreviationOffset,
+									uint8 addressSize, bool isDwarf64);
 								~CompilationUnit();
 
-			dwarf_off_t			HeaderOffset() const { return fHeaderOffset; }
-			dwarf_off_t			ContentOffset() const { return fContentOffset; }
-			dwarf_off_t 		RelativeContentOffset() const
+			off_t				HeaderOffset() const { return fHeaderOffset; }
+			off_t				ContentOffset() const { return fContentOffset; }
+			off_t 				RelativeContentOffset() const
 									{ return fContentOffset - fHeaderOffset; }
-			dwarf_off_t			TotalSize() const	{ return fTotalSize; }
-			dwarf_off_t			ContentSize() const
+			off_t				TotalSize() const	{ return fTotalSize; }
+			off_t				ContentSize() const
 									{ return fTotalSize
 										- RelativeContentOffset(); }
-			dwarf_off_t			AbbreviationOffset() const
+			off_t				AbbreviationOffset() const
 									{ return fAbbreviationOffset; }
+
+			uint8				AddressSize() const	{ return fAddressSize; }
+	inline	target_addr_t		MaxAddress() const;
+			bool				IsDwarf64() const	{ return fIsDwarf64; }
 
 			AbbreviationTable*	GetAbbreviationTable() const
 									{ return fAbbreviationTable; }
@@ -50,11 +55,11 @@ public:
 									{ return fLineNumberProgram; }
 
 			status_t			AddDebugInfoEntry(DebugInfoEntry* entry,
-									dwarf_off_t offset);
+									off_t offset);
 			int					CountEntries() const;
 			void				GetEntryAt(int index, DebugInfoEntry*& entry,
-									dwarf_off_t& offset) const;
-			DebugInfoEntry*		EntryForOffset(dwarf_off_t offset) const;
+									off_t& offset) const;
+			DebugInfoEntry*		EntryForOffset(off_t offset) const;
 
 			bool				AddDirectory(const char* directory);
 			int32				CountDirectories() const;
@@ -71,18 +76,27 @@ private:
 			typedef BObjectList<File> FileList;
 
 private:
-			dwarf_off_t			fHeaderOffset;
-			dwarf_off_t			fContentOffset;
-			dwarf_off_t			fTotalSize;
-			dwarf_off_t			fAbbreviationOffset;
+			off_t				fHeaderOffset;
+			off_t				fContentOffset;
+			off_t				fTotalSize;
+			off_t				fAbbreviationOffset;
 			AbbreviationTable*	fAbbreviationTable;
 			DIECompileUnitBase*	fUnitEntry;
 			Array<DebugInfoEntry*> fEntries;
-			Array<dwarf_off_t>	fEntryOffsets;
+			Array<off_t>		fEntryOffsets;
 			DirectoryList		fDirectories;
 			FileList			fFiles;
 			LineNumberProgram	fLineNumberProgram;
+			uint8				fAddressSize;
+			bool				fIsDwarf64;
 };
+
+
+target_addr_t
+CompilationUnit::MaxAddress() const
+{
+	return fAddressSize == 4 ? 0xffffffffULL : 0xffffffffffffffffULL;
+}
 
 
 #endif	// COMPILATION_UNIT_H

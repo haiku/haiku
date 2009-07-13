@@ -94,13 +94,14 @@ DwarfFile::Load(const char* fileName)
 
 	// iterate through the debug info section
 	DataReader dataReader(fDebugInfoSection->Data(),
-		fDebugInfoSection->Size());
+		fDebugInfoSection->Size(), 4);
+			// address size doesn't matter here
 	while (dataReader.HasData()) {
-		dwarf_off_t unitHeaderOffset = dataReader.Offset();
+		off_t unitHeaderOffset = dataReader.Offset();
 		bool dwarf64;
 		uint64 unitLength = dataReader.ReadInitialLength(dwarf64);
 
-		dwarf_off_t unitLengthOffset = dataReader.Offset();
+		off_t unitLengthOffset = dataReader.Offset();
 			// the unitLength starts here
 
 		if (unitLengthOffset + unitLength
@@ -131,19 +132,20 @@ DwarfFile::Load(const char* fileName)
 			break;
 		}
 
-		if (addressSize != 4) {
+		if (addressSize != 4 && addressSize != 8) {
 			printf("\"%s\": Unsupported address size: %d\n", fileName,
 				addressSize);
 			break;
 		}
+		dataReader.SetAddressSize(addressSize);
 
-		dwarf_off_t unitContentOffset = dataReader.Offset();
+		off_t unitContentOffset = dataReader.Offset();
 
 		// create a compilation unit object
 		CompilationUnit* unit = new(std::nothrow) CompilationUnit(
 			unitHeaderOffset, unitContentOffset,
 			unitLength + (unitLengthOffset - unitHeaderOffset),
-			abbrevOffset);
+			abbrevOffset, addressSize, dwarf64);
 		if (unit == NULL || !fCompilationUnits.AddItem(unit)) {
 			delete unit;
 			return B_NO_MEMORY;
@@ -222,7 +224,7 @@ DwarfFile::CompilationUnitForDIE(const DebugInfoEntry* entry) const
 
 
 status_t
-DwarfFile::UnwindCallFrame(target_addr_t location,
+DwarfFile::UnwindCallFrame(CompilationUnit* unit, target_addr_t location,
 	const DwarfTargetInterface* inputInterface,
 	DwarfTargetInterface* outputInterface, target_addr_t& _framePointer)
 {
@@ -232,7 +234,7 @@ DwarfFile::UnwindCallFrame(target_addr_t location,
 printf("DwarfFile::UnwindCallFrame(%#llx)\n", location);
 
 	DataReader dataReader((uint8*)fDebugFrameSection->Data(),
-		fDebugFrameSection->Size());
+		fDebugFrameSection->Size(), unit->AddressSize());
 
 	while (dataReader.BytesRemaining() > 0) {
 		// length
@@ -249,8 +251,8 @@ printf("DwarfFile::UnwindCallFrame(%#llx)\n", location);
 			// this is a CIE -- skip it
 		} else {
 			// this is a FDE
-			dwarf_addr_t initialLocation = dataReader.Read<dwarf_addr_t>(0);
-			dwarf_size_t addressRange = dataReader.Read<dwarf_addr_t>(0);
+			target_addr_t initialLocation = dataReader.ReadAddress(0);
+			target_size_t addressRange = dataReader.ReadAddress(0);
 
 			if (dataReader.HasOverflow())
 				return B_BAD_DATA;
@@ -262,7 +264,7 @@ printf("DwarfFile::UnwindCallFrame(%#llx)\n", location);
 					- (dataReader.Offset() - lengthOffset);
 				if (remaining < 0)
 					return B_BAD_DATA;
-printf("  found fde: length: %llu (%lld), CIE offset: %llu, location: %#lx, range: %#lx\n", length, remaining, cieID,
+printf("  found fde: length: %llu (%lld), CIE offset: %llu, location: %#llx, range: %#llx\n", length, remaining, cieID,
 initialLocation, addressRange);
 
 				CfaContext context(location, initialLocation);
@@ -285,7 +287,7 @@ initialLocation, addressRange);
 				}
 
 				// process the CIE
-				error = _ParseCIE(context, cieID);
+				error = _ParseCIE(unit, context, cieID);
 				if (error != B_OK)
 					return error;
 
@@ -293,7 +295,7 @@ initialLocation, addressRange);
 				if (error != B_OK)
 					return error;
 
-				error = _ParseFrameInfoInstructions(context,
+				error = _ParseFrameInfoInstructions(unit, context,
 					dataReader.Offset(), remaining);
 				if (error != B_OK)
 					return error;
@@ -302,7 +304,7 @@ printf("  found row!\n");
 
 				// apply the rules of the final row
 				// get the frameAddress first
-				dwarf_addr_t frameAddress;
+				target_addr_t frameAddress;
 				CfaCfaRule* cfaCfaRule = context.GetCfaCfaRule();
 				switch (cfaCfaRule->Type()) {
 					case CFA_CFA_RULE_REGISTER_OFFSET:
@@ -323,7 +325,7 @@ printf("  found row!\n");
 					default:
 						return B_BAD_VALUE;
 				}
-printf("  frame address: %#lx\n", frameAddress);
+printf("  frame address: %#llx\n", frameAddress);
 
 				// apply the register rules
 				for (uint32 i = 0; i < registerCount; i++) {
@@ -412,7 +414,7 @@ DwarfFile::_ParseCompilationUnit(CompilationUnit* unit)
 
 	DataReader dataReader(
 		(const uint8*)fDebugInfoSection->Data() + unit->ContentOffset(),
-		unit->ContentSize());
+		unit->ContentSize(), unit->AddressSize());
 
 	DebugInfoEntry* entry;
 	bool endOfEntryList;
@@ -447,7 +449,7 @@ DwarfFile::_ParseDebugInfoEntry(DataReader& dataReader,
 	AbbreviationTable* abbreviationTable, DebugInfoEntry*& _entry,
 	bool& _endOfEntryList, int level)
 {
-	dwarf_off_t entryOffset = dataReader.Offset()
+	off_t entryOffset = dataReader.Offset()
 		+ fCurrentCompilationUnit->RelativeContentOffset();
 
 	uint32 code = dataReader.ReadUnsignedLEB128(0);
@@ -467,7 +469,7 @@ DwarfFile::_ParseDebugInfoEntry(DataReader& dataReader,
 		fprintf(stderr, "No abbreviation entry for code %lu\n", code);
 		return B_BAD_DATA;
 	}
-printf("%*sentry at %lu: %lu, tag: %s (%lu), children: %d\n", level * 2, "",
+printf("%*sentry at %lld: %lu, tag: %s (%lu), children: %d\n", level * 2, "",
 entryOffset, abbreviationEntry.Code(), get_entry_tag_name(abbreviationEntry.Tag()),
 abbreviationEntry.Tag(), abbreviationEntry.HasChildren());
 
@@ -536,10 +538,7 @@ printf("\nfinishing compilation unit %p\n", unit);
 
 	DataReader dataReader(
 		(const uint8*)fDebugInfoSection->Data() + unit->HeaderOffset(),
-		unit->TotalSize());
-//	DataReader dataReader(
-//		(const uint8*)fDebugInfoSection->Data() + unit->ContentOffset(),
-//		unit->ContentSize());
+		unit->TotalSize(), unit->AddressSize());
 
 	DebugInfoEntryInitInfo entryInitInfo;
 
@@ -547,9 +546,9 @@ printf("\nfinishing compilation unit %p\n", unit);
 	for (int i = 0; i < entryCount; i++) {
 		// get the entry
 		DebugInfoEntry* entry;
-		dwarf_off_t offset;
+		off_t offset;
 		unit->GetEntryAt(i, entry, offset);
-printf("entry %p at %lu\n", entry, offset);
+printf("entry %p at %lld\n", entry, offset);
 
 		// seek the reader to the entry
 		dataReader.SeekAbsolute(offset);
@@ -617,12 +616,12 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 		// those that need additional processing, we read a temporary value
 		// first.
 		uint64 value = 0;
-		dwarf_size_t blockLength = 0;
+		off_t blockLength = 0;
 		bool localReference = true;
 
 		switch (attributeForm) {
 			case DW_FORM_addr:
-				value = dataReader.Read<dwarf_addr_t>(0);
+				value = dataReader.ReadAddress(0);
 				break;
 			case DW_FORM_block2:
 				blockLength = dataReader.Read<uint16>(0);
@@ -661,9 +660,11 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			case DW_FORM_strp:
 			{
 				if (fDebugStringSection != NULL) {
-					dwarf_off_t offset = dataReader.Read<dwarf_off_t>(0);
+					off_t offset = fCurrentCompilationUnit->IsDwarf64()
+						? (off_t)dataReader.Read<uint64>(0)
+						: (off_t)dataReader.Read<uint32>(0);
 					if (offset >= fDebugStringSection->Size()) {
-						fprintf(stderr, "Invalid DW_FORM_strp offset: %lu\n",
+						fprintf(stderr, "Invalid DW_FORM_strp offset: %lld\n",
 							offset);
 						return B_BAD_DATA;
 					}
@@ -680,7 +681,9 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				value = dataReader.ReadUnsignedLEB128(0);
 				break;
 			case DW_FORM_ref_addr:
-				value = dataReader.Read<dwarf_off_t>(0);
+				value = fCurrentCompilationUnit->IsDwarf64()
+					? dataReader.Read<uint64>(0)
+					: (uint64)dataReader.Read<uint32>(0);
 				localReference = false;
 				break;
 			case DW_FORM_ref1:
@@ -818,11 +821,11 @@ printf("    -> no attribute setter!\n");
 status_t
 DwarfFile::_ParseLineInfo(CompilationUnit* unit)
 {
-	dwarf_off_t offset = unit->UnitEntry()->StatementListOffset();
-printf("DwarfFile::_ParseLineInfo(%p), offset: %lu\n", unit, offset);
+	off_t offset = unit->UnitEntry()->StatementListOffset();
+printf("DwarfFile::_ParseLineInfo(%p), offset: %lld\n", unit, offset);
 
 	DataReader dataReader((uint8*)fDebugLineSection->Data() + offset,
-		fDebugLineSection->Size() - offset);
+		fDebugLineSection->Size() - offset, unit->AddressSize());
 
 	// unit length
 	bool dwarf64;
@@ -921,13 +924,14 @@ printf("DwarfFile::_ParseLineInfo(%p), offset: %lu\n", unit, offset);
 
 
 status_t
-DwarfFile::_ParseCIE(CfaContext& context, dwarf_off_t cieOffset)
+DwarfFile::_ParseCIE(CompilationUnit* unit, CfaContext& context,
+	off_t cieOffset)
 {
 	if (cieOffset < 0 || cieOffset >= fDebugFrameSection->Size())
 		return B_BAD_DATA;
 
 	DataReader dataReader((uint8*)fDebugFrameSection->Data() + cieOffset,
-		fDebugFrameSection->Size() - cieOffset);
+		fDebugFrameSection->Size() - cieOffset, unit->AddressSize());
 
 	// length
 	bool dwarf64;
@@ -962,20 +966,21 @@ context.ReturnAddressRegister());
 	if (remaining < 0)
 		return B_BAD_DATA;
 
-	return _ParseFrameInfoInstructions(context, dataReader.Offset(), remaining);
+	return _ParseFrameInfoInstructions(unit, context, dataReader.Offset(),
+		remaining);
 }
 
 
 status_t
-DwarfFile::_ParseFrameInfoInstructions(CfaContext& context,
-	dwarf_off_t instructionOffset, dwarf_off_t instructionSize)
+DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
+	CfaContext& context, off_t instructionOffset, off_t instructionSize)
 {
 	if (instructionSize <= 0)
 		return B_OK;
 
 	DataReader dataReader(
 		(uint8*)fDebugFrameSection->Data() + instructionOffset,
-		instructionSize);
+		instructionSize, unit->AddressSize());
 
 	while (dataReader.BytesRemaining() > 0) {
 printf("    [%2lld]", dataReader.BytesRemaining());
@@ -987,7 +992,7 @@ printf("    [%2lld]", dataReader.BytesRemaining());
 				case DW_CFA_advance_loc:
 				{
 printf("    DW_CFA_advance_loc: %#lx\n", operand);
-					dwarf_addr_t location = context.Location()
+					target_addr_t location = context.Location()
 						+ operand * context.CodeAlignment();
 					if (location > context.TargetLocation())
 						return B_OK;
@@ -1020,8 +1025,8 @@ printf("    DW_CFA_restore: %#lx\n", operand);
 				}
 				case DW_CFA_set_loc:
 				{
-					dwarf_addr_t location = dataReader.Read<dwarf_addr_t>(0);
-printf("    DW_CFA_set_loc: %#lx\n", location);
+					target_addr_t location = dataReader.ReadAddress(0);
+printf("    DW_CFA_set_loc: %#llx\n", location);
 					if (location < context.Location())
 						return B_BAD_VALUE;
 					if (location > context.TargetLocation())
@@ -1033,7 +1038,7 @@ printf("    DW_CFA_set_loc: %#lx\n", location);
 				{
 					uint32 delta = dataReader.Read<uint8>(0);
 printf("    DW_CFA_advance_loc1: %#lx\n", delta);
-					dwarf_addr_t location = context.Location()
+					target_addr_t location = context.Location()
 						+ delta * context.CodeAlignment();
 					if (location > context.TargetLocation())
 						return B_OK;
@@ -1044,7 +1049,7 @@ printf("    DW_CFA_advance_loc1: %#lx\n", delta);
 				{
 					uint32 delta = dataReader.Read<uint16>(0);
 printf("    DW_CFA_advance_loc2: %#lx\n", delta);
-					dwarf_addr_t location = context.Location()
+					target_addr_t location = context.Location()
 						+ delta * context.CodeAlignment();
 					if (location > context.TargetLocation())
 						return B_OK;
@@ -1055,7 +1060,7 @@ printf("    DW_CFA_advance_loc2: %#lx\n", delta);
 				{
 					uint32 delta = dataReader.Read<uint32>(0);
 printf("    DW_CFA_advance_loc4: %#lx\n", delta);
-					dwarf_addr_t location = context.Location()
+					target_addr_t location = context.Location()
 						+ delta * context.CodeAlignment();
 					if (location > context.TargetLocation())
 						return B_OK;
@@ -1243,7 +1248,7 @@ printf("    DW_CFA_val_expression: reg: %lu, block: %p, %llu\n", reg, block, blo
 				{
 					uint64 delta = dataReader.Read<uint64>(0);
 printf("    DW_CFA_MIPS_advance_loc8: %#llx\n", delta);
-					dwarf_addr_t location = context.Location()
+					target_addr_t location = context.Location()
 						+ delta * context.CodeAlignment();
 					if (location > context.TargetLocation())
 						return B_OK;
@@ -1347,20 +1352,22 @@ DwarfFile::_ResolveRangeList(uint64 offset)
 	}
 	Reference<TargetAddressRangeList> rangesReference(ranges);
 
-	dwarf_addr_t baseAddress
+	target_addr_t baseAddress
 		= fCurrentCompilationUnit->UnitEntry()->AddressRangeBase();
+	target_addr_t maxAddress = fCurrentCompilationUnit->MaxAddress();
 
 	DataReader dataReader((uint8*)fDebugRangesSection->Data() + offset,
-		fDebugRangesSection->Size() - offset);
+		fDebugRangesSection->Size() - offset,
+		fCurrentCompilationUnit->AddressSize());
 	while (true) {
-		dwarf_addr_t start = dataReader.Read<dwarf_addr_t>(0);
-		dwarf_addr_t end = dataReader.Read<dwarf_addr_t>(0);
+		target_addr_t start = dataReader.ReadAddress(0);
+		target_addr_t end = dataReader.ReadAddress(0);
 		if (dataReader.HasOverflow())
 			return NULL;
 
 		if (start == 0 && end == 0)
 			break;
-		if (start == DWARF_ADDRESS_MAX) {
+		if (start == maxAddress) {
 			baseAddress = end;
 			continue;
 		}
