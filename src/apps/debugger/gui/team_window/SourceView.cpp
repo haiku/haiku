@@ -14,6 +14,7 @@
 #include <Looper.h>
 #include <Message.h>
 #include <Polygon.h>
+#include <Region.h>
 #include <ScrollBar.h>
 
 #include <AutoLocker.h>
@@ -230,7 +231,8 @@ private:
 			void				_FormatLine(const char* line,
 									BString& formattedLine);
 			SelectionPoint		_SelectionPointAt(BPoint where) const;
-
+			void				_GetSelectionRegion(BRegion& region) const;
+			
 private:
 			
 			float				fMaxLineWidth;
@@ -880,6 +882,15 @@ SourceView::TextView::Draw(BRect updateRect)
 		_FormatLine(fSourceCode->LineAt(i), lineString);
 		DrawString(lineString, BPoint(kLeftTextMargin, y));
 	}
+	
+	if (fSelectionStart.line != -1 && fSelectionEnd.line != -1) {
+		PushState();
+		BRegion selectionRegion;
+		_GetSelectionRegion(selectionRegion);
+		SetDrawingMode(B_OP_INVERT);
+		FillRegion(&selectionRegion, B_SOLID_HIGH);
+		PopState();
+	}
 }
 
 
@@ -978,6 +989,9 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 			// TODO: handle scrolling when mouse is moved outside
 			// view bounds
 		}
+		BRegion region;
+		_GetSelectionRegion(region);
+		Invalidate(region.Frame());
 	}
 }
 
@@ -1031,6 +1045,49 @@ SourceView::TextView::_SelectionPointAt(BPoint where) const
 	int32 line = LineAtOffset(where.y);
 	int32 offset = (int32)max_c(where.x / fCharacterWidth, 0);
 	return SelectionPoint(line, offset);
+}
+
+
+void
+SourceView::TextView::_GetSelectionRegion(BRegion &region) const
+{
+	if (fSelectionStart.line == -1 && fSelectionEnd.line == -1)
+		return;
+
+	BRect selectionRect;
+	
+	if (fSelectionStart.line == fSelectionEnd.line) {
+		selectionRect.left = fSelectionStart.offset * fCharacterWidth;
+		selectionRect.top = fSelectionStart.line * fFontInfo->lineHeight;
+		selectionRect.right = fSelectionEnd.offset * fCharacterWidth;
+		selectionRect.bottom = selectionRect.top + fFontInfo->lineHeight;
+		region.Include(selectionRect);
+	} else {
+		// add rect for starting line
+		selectionRect.left = selectionRect.left = fSelectionStart.offset 
+			* fCharacterWidth;
+		selectionRect.top = fSelectionStart.line * fFontInfo->lineHeight;
+		selectionRect.right = Bounds().right;
+		selectionRect.bottom = selectionRect.top + fFontInfo->lineHeight;
+		region.Include(selectionRect);
+		// compute rect for all lines in middle of selection
+		if (fSelectionEnd.line - fSelectionStart.line > 1) {
+			selectionRect.left = 0.0;
+			selectionRect.top = (fSelectionStart.line + 1) 
+				* fFontInfo->lineHeight;
+			selectionRect.right = Bounds().right;
+			selectionRect.bottom = fSelectionEnd.line * fFontInfo->lineHeight;
+			region.Include(selectionRect);
+		}
+		// add rect for last line (if needed)
+		if (fSelectionEnd.offset > 0) {
+			selectionRect.left = 0.0;
+			selectionRect.top = fSelectionEnd.line * fFontInfo->lineHeight;
+			selectionRect.right = fSelectionEnd.offset * fCharacterWidth;
+			selectionRect.bottom = selectionRect.top + fFontInfo->lineHeight;
+			region.Include(selectionRect);
+		}
+	}
 }
 
 // #pragma mark - SourceView
