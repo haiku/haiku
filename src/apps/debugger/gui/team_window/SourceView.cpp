@@ -211,15 +211,35 @@ public:
 	virtual void				MouseDown(BPoint where);
 	virtual void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
-
+	virtual void				MouseUp(BPoint where);
+	
 private:
+			struct SelectionPoint
+			{
+				SelectionPoint(int32 _line, int32 _offset)
+				{
+					line = _line;
+					offset = _offset;
+				}
+				
+				int32 line;
+				int32 offset;
+			};
+
 			float				_MaxLineWidth();
 			void				_FormatLine(const char* line,
 									BString& formattedLine);
+			SelectionPoint		_SelectionPointAt(BPoint where) const;
 
 private:
+			
 			float				fMaxLineWidth;
+			float				fCharacterWidth;
+			SelectionPoint		fSelectionStart;
+			SelectionPoint		fSelectionEnd;
+			SelectionPoint		fSelectionBase;
 			rgb_color			fTextColor;
+			bool				fSelectionMode;
 };
 
 
@@ -805,7 +825,12 @@ SourceView::MarkerView::_CompareLineBreakpointMarker(const uint32* line,
 SourceView::TextView::TextView(SourceView* sourceView, FontInfo* fontInfo)
 	:
 	BaseView("source text view", sourceView, fontInfo),
-	fMaxLineWidth(-1)
+	fMaxLineWidth(-1),
+	fCharacterWidth(fontInfo->font.StringWidth("Q")),
+	fSelectionStart(-1, -1),
+	fSelectionEnd(-1, -1),
+	fSelectionBase(-1, -1),
+	fSelectionMode(false)
 {
 	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 	fTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
@@ -901,8 +926,28 @@ SourceView::TextView::KeyDown(const char* bytes, int32 numBytes)
 void
 SourceView::TextView::MouseDown(BPoint where)
 {
-	MakeFocus(true);
-	SourceView::BaseView::MouseDown(where);
+	if (fSourceCode != NULL) {
+		if (!IsFocus()) {
+			MakeFocus(true);
+			Invalidate();
+		}
+		
+		SelectionPoint point = _SelectionPointAt(where);
+		if (point.line >= 0) {
+			// don't reset the selection if the user clicks within the
+			// current selection range
+			
+			if (fSelectionStart.line < 0 || fSelectionEnd.line < 0
+				|| (fSelectionStart.line >= 0 
+					&& point.line < fSelectionStart.line)
+				|| (fSelectionEnd.line >= 0 
+					&& point.line > fSelectionEnd.line)) {
+				fSelectionBase = point;
+				fSelectionMode = true;
+				SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+			}
+		}
+	}
 }
 
 
@@ -911,7 +956,36 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 	const BMessage* dragMessage)
 
 {
-	SourceView::BaseView::MouseMoved(where, transit, dragMessage);
+	if (fSelectionMode) {
+		SelectionPoint point = _SelectionPointAt(where);
+		switch (transit) {
+			case B_INSIDE_VIEW:
+				if (point.line > fSelectionBase.line) {
+					fSelectionStart = fSelectionBase;
+					fSelectionEnd = point;
+				} else if (point.line < fSelectionBase.line) {
+					fSelectionEnd = fSelectionBase;
+					fSelectionStart = point;
+				} else if (point.offset > fSelectionBase.offset) {
+					fSelectionStart = fSelectionBase;
+					fSelectionEnd = point;
+				} else {
+					fSelectionEnd = fSelectionBase;
+					fSelectionStart = point;
+				}
+				break;
+
+			// TODO: handle scrolling when mouse is moved outside
+			// view bounds
+		}
+	}
+}
+
+
+void
+SourceView::TextView::MouseUp(BPoint where)
+{
+	fSelectionMode = false;
 }
 
 
@@ -950,6 +1024,14 @@ SourceView::TextView::_FormatLine(const char* line, BString& formattedLine)
 	}
 }
 
+
+SourceView::TextView::SelectionPoint
+SourceView::TextView::_SelectionPointAt(BPoint where) const
+{
+	int32 line = LineAtOffset(where.y);
+	int32 offset = (int32)max_c(where.x / fCharacterWidth, 0);
+	return SelectionPoint(line, offset);
+}
 
 // #pragma mark - SourceView
 
