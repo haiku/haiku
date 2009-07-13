@@ -444,7 +444,7 @@ MesaSoftwareRenderer::SwapBuffers(bool VSync)
 
 	if (!fDirectModeEnabled || fInfo == NULL) {
 		if (GLView()->LockLooperWithTimeout(1000) == B_OK) {
-			GLView()->DrawBitmap(fBitmap);
+			GLView()->DrawBitmap(fBitmap, B_ORIGIN);
 			GLView()->UnlockLooper();
 		}
 		return;
