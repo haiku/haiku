@@ -597,8 +597,7 @@ MainWin::MessageReceived(BMessage *msg)
 				int heightAspect;
 				fController->GetSize(&width, &height,
 					&widthAspect, &heightAspect);
-				VideoFormatChange(width, fSourceHeight,
-					widthAspect, heightAspect);
+				VideoFormatChange(width, height, widthAspect, heightAspect);
 			}
 			break;
 
