@@ -14,6 +14,7 @@
 #include <AutoLocker.h>
 
 #include "Architecture.h"
+#include "DebuggerInterface.h"
 #include "DebuggerTeamDebugInfo.h"
 #include "DisassembledCode.h"
 #include "DwarfTeamDebugInfo.h"
@@ -298,7 +299,7 @@ TeamDebugInfo::Init()
 
 	// DWARF
 	DwarfTeamDebugInfo* dwarfInfo = new(std::nothrow) DwarfTeamDebugInfo(
-		fArchitecture, fFileManager);
+		fArchitecture, fDebuggerInterface, fFileManager);
 	if (dwarfInfo == NULL || !fSpecificInfos.AddItem(dwarfInfo)) {
 		delete dwarfInfo;
 		return B_NO_MEMORY;

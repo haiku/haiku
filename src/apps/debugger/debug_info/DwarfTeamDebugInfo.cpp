@@ -15,9 +15,10 @@
 
 
 DwarfTeamDebugInfo::DwarfTeamDebugInfo(Architecture* architecture,
-	FileManager* fileManager)
+	TeamMemory* teamMemory, FileManager* fileManager)
 	:
 	fArchitecture(architecture),
+	fTeamMemory(teamMemory),
 	fFileManager(fileManager),
 	fManager(NULL)
 {
@@ -64,7 +65,7 @@ DwarfTeamDebugInfo::CreateImageDebugInfo(const ImageInfo& imageInfo,
 
 	// create the image debug info
 	DwarfImageDebugInfo* debuggerInfo = new(std::nothrow) DwarfImageDebugInfo(
-		imageInfo, fArchitecture, fFileManager, file);
+		imageInfo, fArchitecture, fTeamMemory, fFileManager, file);
 	if (debuggerInfo == NULL)
 		return B_NO_MEMORY;
 

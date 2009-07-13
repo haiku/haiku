@@ -450,7 +450,13 @@ enum {
 	DW_CFA_val_offset_sf		= 0x15,
 	DW_CFA_val_expression		= 0x16,
 	DW_CFA_lo_user				= 0x1c,
-	DW_CFA_hi_user				= 0x3f
+	DW_CFA_hi_user				= 0x3f,
+
+	// extensions
+    DW_CFA_MIPS_advance_loc8	= 0x1d,
+    DW_CFA_GNU_window_save		= 0x2d,
+    DW_CFA_GNU_args_size		= 0x2e,
+    DW_CFA_GNU_negative_offset_extended	= 0x2f
 };
 
 

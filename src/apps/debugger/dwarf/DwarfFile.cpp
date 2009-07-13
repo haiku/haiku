@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "DwarfFile.h"
 
 #include <algorithm>
@@ -13,8 +14,10 @@
 #include "AttributeClasses.h"
 #include "AttributeValue.h"
 #include "AbbreviationTable.h"
+#include "CfaContext.h"
 #include "CompilationUnit.h"
 #include "DataReader.h"
+#include "DwarfTargetInterface.h"
 #include "ElfFile.h"
 #include "TagNames.h"
 #include "TargetAddressRangeList.h"
@@ -29,6 +32,7 @@ DwarfFile::DwarfFile()
 	fDebugStringSection(NULL),
 	fDebugRangesSection(NULL),
 	fDebugLineSection(NULL),
+	fDebugFrameSection(NULL),
 	fCompilationUnits(20, true),
 	fCurrentCompilationUnit(NULL),
 	fFinished(false),
@@ -48,6 +52,7 @@ DwarfFile::~DwarfFile()
 		fElfFile->PutSection(fDebugStringSection);
 		fElfFile->PutSection(fDebugRangesSection);
 		fElfFile->PutSection(fDebugLineSection);
+		fElfFile->PutSection(fDebugFrameSection);
 		delete fElfFile;
 	}
 
@@ -81,10 +86,11 @@ DwarfFile::Load(const char* fileName)
 		return B_ERROR;
 	}
 
-	// not mandatory sections
+	// non mandatory sections
 	fDebugStringSection = fElfFile->GetSection(".debug_str");
 	fDebugRangesSection = fElfFile->GetSection(".debug_ranges");
 	fDebugLineSection = fElfFile->GetSection(".debug_line");
+	fDebugFrameSection = fElfFile->GetSection(".debug_frame");
 
 	// iterate through the debug info section
 	DataReader dataReader(fDebugInfoSection->Data(),
@@ -212,6 +218,184 @@ DwarfFile::CompilationUnitForDIE(const DebugInfoEntry* entry) const
 	}
 
 	return NULL;
+}
+
+
+status_t
+DwarfFile::UnwindCallFrame(target_addr_t location,
+	const DwarfTargetInterface* inputInterface,
+	DwarfTargetInterface* outputInterface, target_addr_t& _framePointer)
+{
+	if (fDebugFrameSection == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+printf("DwarfFile::UnwindCallFrame(%#llx)\n", location);
+
+	DataReader dataReader((uint8*)fDebugFrameSection->Data(),
+		fDebugFrameSection->Size());
+
+	while (dataReader.BytesRemaining() > 0) {
+		// length
+		bool dwarf64;
+		uint64 length = dataReader.ReadInitialLength(dwarf64);
+		if (length > (uint64)dataReader.BytesRemaining())
+			return B_BAD_DATA;
+		off_t lengthOffset = dataReader.Offset();
+
+		// CIE ID/CIE pointer
+		uint64 cieID = dwarf64
+			? dataReader.Read<uint64>(0) : dataReader.Read<uint32>(0);
+		if (dwarf64 ? cieID == 0xffffffffffffffffULL : cieID == 0xffffffff) {
+			// this is a CIE -- skip it
+		} else {
+			// this is a FDE
+			dwarf_addr_t initialLocation = dataReader.Read<dwarf_addr_t>(0);
+			dwarf_size_t addressRange = dataReader.Read<dwarf_addr_t>(0);
+
+			if (dataReader.HasOverflow())
+				return B_BAD_DATA;
+
+			if (location >= initialLocation
+				&& location < initialLocation + addressRange) {
+				// This is the FDE we're looking for.
+				off_t remaining = (off_t)length
+					- (dataReader.Offset() - lengthOffset);
+				if (remaining < 0)
+					return B_BAD_DATA;
+printf("  found fde: length: %llu (%lld), CIE offset: %llu, location: %#lx, range: %#lx\n", length, remaining, cieID,
+initialLocation, addressRange);
+
+				CfaContext context(location, initialLocation);
+				uint32 registerCount = outputInterface->CountRegisters();
+				status_t error = context.Init(registerCount);
+				if (error != B_OK)
+					return error;
+
+				// Init the initial register rules. The DWARF 3 specs on the
+				// matter: "The default rule for all columns before
+				// interpretation of the initial instructions is the undefined
+				// rule. However, an ABI authoring body or a compilation system
+				// authoring body may specify an alternate default value for any
+				// or all columns."
+				// GCC's assumes the "same value" rule for all callee preserved
+				// registers. We set them respectively.
+				for (uint32 i = 0; i < registerCount; i++) {
+					if (outputInterface->IsCalleePreservedRegister(i))
+						context.RegisterRule(i)->SetToSameValue();
+				}
+
+				// process the CIE
+				error = _ParseCIE(context, cieID);
+				if (error != B_OK)
+					return error;
+
+				error = context.SaveInitialRuleSet();
+				if (error != B_OK)
+					return error;
+
+				error = _ParseFrameInfoInstructions(context,
+					dataReader.Offset(), remaining);
+				if (error != B_OK)
+					return error;
+
+printf("  found row!\n");
+
+				// apply the rules of the final row
+				// get the frameAddress first
+				dwarf_addr_t frameAddress;
+				CfaCfaRule* cfaCfaRule = context.GetCfaCfaRule();
+				switch (cfaCfaRule->Type()) {
+					case CFA_CFA_RULE_REGISTER_OFFSET:
+					{
+						BVariant value;
+						if (!inputInterface->GetRegisterValue(
+								cfaCfaRule->Register(), value)
+							|| !value.IsNumber()) {
+							return B_UNSUPPORTED;
+						}
+						frameAddress = value.ToUInt64() + cfaCfaRule->Offset();
+						break;
+					}
+					case CFA_CFA_RULE_EXPRESSION:
+// TODO: Implement!
+						return B_UNSUPPORTED;
+					case CFA_CFA_RULE_UNDEFINED:
+					default:
+						return B_BAD_VALUE;
+				}
+printf("  frame address: %#lx\n", frameAddress);
+
+				// apply the register rules
+				for (uint32 i = 0; i < registerCount; i++) {
+printf("  reg %lu\n", i);
+					uint32 valueType = outputInterface->RegisterValueType(i);
+					if (valueType == 0)
+						continue;
+
+					CfaRule* rule = context.RegisterRule(i);
+					if (rule == NULL)
+						continue;
+
+					// apply the rule
+					switch (rule->Type()) {
+						case CFA_RULE_SAME_VALUE:
+						{
+printf("  -> CFA_RULE_SAME_VALUE\n");
+							BVariant value;
+							if (inputInterface->GetRegisterValue(i, value))
+								outputInterface->SetRegisterValue(i, value);
+							break;
+						}
+						case CFA_RULE_LOCATION_OFFSET:
+						{
+printf("  -> CFA_RULE_LOCATION_OFFSET: %lld\n", rule->Offset());
+							BVariant value;
+							if (inputInterface->ReadValueFromMemory(
+									frameAddress + rule->Offset(), valueType,
+									value)) {
+								outputInterface->SetRegisterValue(i, value);
+							}
+							break;
+						}
+						case CFA_RULE_VALUE_OFFSET:
+printf("  -> CFA_RULE_VALUE_OFFSET\n");
+							outputInterface->SetRegisterValue(i,
+								frameAddress + rule->Offset());
+							break;
+						case CFA_RULE_REGISTER:
+						{
+printf("  -> CFA_RULE_REGISTER\n");
+							BVariant value;
+							if (inputInterface->GetRegisterValue(
+									rule->Register(), value)) {
+								outputInterface->SetRegisterValue(i, value);
+							}
+							break;
+						}
+						case CFA_RULE_LOCATION_EXPRESSION:
+printf("  -> CFA_RULE_LOCATION_EXPRESSION\n");
+// TODO:...
+							break;
+						case CFA_RULE_VALUE_EXPRESSION:
+printf("  -> CFA_RULE_VALUE_EXPRESSION\n");
+// TODO:...
+							break;
+						case CFA_RULE_UNDEFINED:
+printf("  -> CFA_RULE_UNDEFINED\n");
+						default:
+							break;
+					}
+				}
+
+				_framePointer = frameAddress;
+				return B_OK;
+			}
+		}
+
+		dataReader.SeekAbsolute(lengthOffset + length);
+	}
+
+	return B_ENTRY_NOT_FOUND;
 }
 
 
@@ -733,6 +917,375 @@ printf("DwarfFile::_ParseLineInfo(%p), offset: %lu\n", unit, offset);
 	return unit->GetLineNumberProgram().Init(program, programSize,
 		minInstructionLength, defaultIsStatement, lineBase, lineRange,
 			opcodeBase, standardOpcodeLengths);
+}
+
+
+status_t
+DwarfFile::_ParseCIE(CfaContext& context, dwarf_off_t cieOffset)
+{
+	if (cieOffset < 0 || cieOffset >= fDebugFrameSection->Size())
+		return B_BAD_DATA;
+
+	DataReader dataReader((uint8*)fDebugFrameSection->Data() + cieOffset,
+		fDebugFrameSection->Size() - cieOffset);
+
+	// length
+	bool dwarf64;
+	uint64 length = dataReader.ReadInitialLength(dwarf64);
+	if (length > (uint64)dataReader.BytesRemaining())
+		return B_BAD_DATA;
+	off_t lengthOffset = dataReader.Offset();
+
+	// CIE ID/CIE pointer
+	uint64 cieID = dwarf64
+		? dataReader.Read<uint64>(0) : dataReader.Read<uint32>(0);
+	if (dwarf64 ? cieID != 0xffffffffffffffffULL : cieID != 0xffffffff)
+		return B_BAD_DATA;
+
+	uint8 version = dataReader.Read<uint8>(0);
+	const char* augmentation = dataReader.ReadString();
+	if (version != 1 || augmentation == NULL || *augmentation != '\0')
+		return B_UNSUPPORTED;
+
+	context.SetCodeAlignment(dataReader.ReadUnsignedLEB128(0));
+	context.SetDataAlignment(dataReader.ReadSignedLEB128(0));
+	context.SetReturnAddressRegister(dataReader.ReadUnsignedLEB128(0));
+printf("  cie: length: %llu, version: %u, augmentation: \"%s\", "
+"aligment: code: %lu, data: %ld, return address reg: %lu\n",
+length, version, augmentation, context.CodeAlignment(), context.DataAlignment(),
+context.ReturnAddressRegister());
+
+	if (dataReader.HasOverflow())
+		return B_BAD_DATA;
+	off_t remaining = (off_t)length
+		- (dataReader.Offset() - lengthOffset);
+	if (remaining < 0)
+		return B_BAD_DATA;
+
+	return _ParseFrameInfoInstructions(context, dataReader.Offset(), remaining);
+}
+
+
+status_t
+DwarfFile::_ParseFrameInfoInstructions(CfaContext& context,
+	dwarf_off_t instructionOffset, dwarf_off_t instructionSize)
+{
+	if (instructionSize <= 0)
+		return B_OK;
+
+	DataReader dataReader(
+		(uint8*)fDebugFrameSection->Data() + instructionOffset,
+		instructionSize);
+
+	while (dataReader.BytesRemaining() > 0) {
+printf("    [%2lld]", dataReader.BytesRemaining());
+		uint8 opcode = dataReader.Read<uint8>(0);
+		if ((opcode >> 6) != 0) {
+			uint32 operand = opcode & 0x3f;
+
+			switch (opcode >> 6) {
+				case DW_CFA_advance_loc:
+				{
+printf("    DW_CFA_advance_loc: %#lx\n", operand);
+					dwarf_addr_t location = context.Location()
+						+ operand * context.CodeAlignment();
+					if (location > context.TargetLocation())
+						return B_OK;
+					context.SetLocation(location);
+					break;
+				}
+				case DW_CFA_offset:
+				{
+					uint64 offset = dataReader.ReadUnsignedLEB128(0);
+printf("    DW_CFA_offset: reg: %lu, offset: %llu\n", operand, offset);
+					if (CfaRule* rule = context.RegisterRule(operand)) {
+						rule->SetToLocationOffset(
+							offset * context.DataAlignment());
+					}
+					break;
+				}
+				case DW_CFA_restore:
+				{
+printf("    DW_CFA_restore: %#lx\n", operand);
+					context.RestoreRegisterRule(operand);
+					break;
+				}
+			}
+		} else {
+			switch (opcode) {
+				case DW_CFA_nop:
+				{
+					printf("    DW_CFA_nop\n");
+					break;
+				}
+				case DW_CFA_set_loc:
+				{
+					dwarf_addr_t location = dataReader.Read<dwarf_addr_t>(0);
+printf("    DW_CFA_set_loc: %#lx\n", location);
+					if (location < context.Location())
+						return B_BAD_VALUE;
+					if (location > context.TargetLocation())
+						return B_OK;
+					context.SetLocation(location);
+					break;
+				}
+				case DW_CFA_advance_loc1:
+				{
+					uint32 delta = dataReader.Read<uint8>(0);
+printf("    DW_CFA_advance_loc1: %#lx\n", delta);
+					dwarf_addr_t location = context.Location()
+						+ delta * context.CodeAlignment();
+					if (location > context.TargetLocation())
+						return B_OK;
+					context.SetLocation(location);
+					break;
+				}
+				case DW_CFA_advance_loc2:
+				{
+					uint32 delta = dataReader.Read<uint16>(0);
+printf("    DW_CFA_advance_loc2: %#lx\n", delta);
+					dwarf_addr_t location = context.Location()
+						+ delta * context.CodeAlignment();
+					if (location > context.TargetLocation())
+						return B_OK;
+					context.SetLocation(location);
+					break;
+				}
+				case DW_CFA_advance_loc4:
+				{
+					uint32 delta = dataReader.Read<uint32>(0);
+printf("    DW_CFA_advance_loc4: %#lx\n", delta);
+					dwarf_addr_t location = context.Location()
+						+ delta * context.CodeAlignment();
+					if (location > context.TargetLocation())
+						return B_OK;
+					context.SetLocation(location);
+					break;
+				}
+				case DW_CFA_offset_extended:
+				{
+					uint32 reg = dataReader.ReadUnsignedLEB128(0);
+					uint64 offset = dataReader.ReadUnsignedLEB128(0);
+printf("    DW_CFA_offset_extended: reg: %lu, offset: %llu\n", reg, offset);
+					if (CfaRule* rule = context.RegisterRule(reg)) {
+						rule->SetToLocationOffset(
+							offset * context.DataAlignment());
+					}
+					break;
+				}
+				case DW_CFA_restore_extended:
+				{
+					uint32 reg = dataReader.ReadUnsignedLEB128(0);
+printf("    DW_CFA_restore_extended: %#lx\n", reg);
+					context.RestoreRegisterRule(reg);
+					break;
+				}
+				case DW_CFA_undefined:
+				{
+					uint32 reg = dataReader.ReadUnsignedLEB128(0);
+printf("    DW_CFA_undefined: %lu\n", reg);
+					if (CfaRule* rule = context.RegisterRule(reg))
+						rule->SetToUndefined();
+					break;
+				}
+				case DW_CFA_same_value:
+				{
+					uint32 reg = dataReader.ReadUnsignedLEB128(0);
+printf("    DW_CFA_same_value: %lu\n", reg);
+					if (CfaRule* rule = context.RegisterRule(reg))
+						rule->SetToSameValue();
+					break;
+				}
+				case DW_CFA_register:
+				{
+					uint32 reg1 = dataReader.ReadUnsignedLEB128(0);
+					uint32 reg2 = dataReader.ReadUnsignedLEB128(0);
+printf("    DW_CFA_register: reg1: %lu, reg2: %lu\n", reg1, reg2);
+					if (CfaRule* rule = context.RegisterRule(reg1))
+						rule->SetToValueOffset(reg2);
+					break;
+				}
+				case DW_CFA_remember_state:
+				{
+printf("    DW_CFA_remember_state\n");
+					status_t error = context.PushRuleSet();
+					if (error != B_OK)
+						return error;
+					break;
+				}
+				case DW_CFA_restore_state:
+				{
+printf("    DW_CFA_restore_state\n");
+					status_t error = context.PopRuleSet();
+					if (error != B_OK)
+						return error;
+					break;
+				}
+				case DW_CFA_def_cfa:
+				{
+					uint32 reg = dataReader.ReadUnsignedLEB128(0);
+					uint64 offset = dataReader.ReadUnsignedLEB128(0);
+printf("    DW_CFA_def_cfa: reg: %lu, offset: %llu\n", reg, offset);
+					context.GetCfaCfaRule()->SetToRegisterOffset(reg, offset);
+					break;
+				}
+				case DW_CFA_def_cfa_register:
+				{
+					uint32 reg = dataReader.ReadUnsignedLEB128(0);
+printf("    DW_CFA_def_cfa_register: %lu\n", reg);
+					if (context.GetCfaCfaRule()->Type()
+							!= CFA_CFA_RULE_REGISTER_OFFSET) {
+						return B_BAD_DATA;
+					}
+					context.GetCfaCfaRule()->SetRegister(reg);
+					break;
+				}
+				case DW_CFA_def_cfa_offset:
+				{
+					uint64 offset = dataReader.ReadUnsignedLEB128(0);
+printf("    DW_CFA_def_cfa_offset: %llu\n", offset);
+					if (context.GetCfaCfaRule()->Type()
+							!= CFA_CFA_RULE_REGISTER_OFFSET) {
+						return B_BAD_DATA;
+					}
+					context.GetCfaCfaRule()->SetOffset(offset);
+					break;
+				}
+				case DW_CFA_def_cfa_expression:
+				{
+					uint8* block = (uint8*)dataReader.Data();
+					uint64 blockLength = dataReader.ReadUnsignedLEB128(0);
+					dataReader.Skip(blockLength);
+printf("    DW_CFA_def_cfa_expression: %p, %llu\n", block, blockLength);
+					context.GetCfaCfaRule()->SetToExpression(block,
+						blockLength);
+					break;
+				}
+				case DW_CFA_expression:
+				{
+					uint32 reg = dataReader.ReadUnsignedLEB128(0);
+					uint8* block = (uint8*)dataReader.Data();
+					uint64 blockLength = dataReader.ReadUnsignedLEB128(0);
+					dataReader.Skip(blockLength);
+printf("    DW_CFA_expression: reg: %lu, block: %p, %llu\n", reg, block, blockLength);
+					if (CfaRule* rule = context.RegisterRule(reg))
+						rule->SetToLocationExpression(block, blockLength);
+					break;
+				}
+				case DW_CFA_offset_extended_sf:
+				{
+					uint32 reg = dataReader.ReadUnsignedLEB128(0);
+					int64 offset = dataReader.ReadSignedLEB128(0);
+printf("    DW_CFA_offset_extended: reg: %lu, offset: %lld\n", reg, offset);
+					if (CfaRule* rule = context.RegisterRule(reg)) {
+						rule->SetToLocationOffset(
+							offset * (int32)context.DataAlignment());
+					}
+					break;
+				}
+				case DW_CFA_def_cfa_sf:
+				{
+					uint32 reg = dataReader.ReadUnsignedLEB128(0);
+					int64 offset = dataReader.ReadSignedLEB128(0);
+printf("    DW_CFA_def_cfa_sf: reg: %lu, offset: %lld\n", reg, offset);
+					context.GetCfaCfaRule()->SetToRegisterOffset(reg,
+						offset * (int32)context.DataAlignment());
+					break;
+				}
+				case DW_CFA_def_cfa_offset_sf:
+				{
+					int64 offset = dataReader.ReadSignedLEB128(0);
+printf("    DW_CFA_def_cfa_offset: %lld\n", offset);
+					if (context.GetCfaCfaRule()->Type()
+							!= CFA_CFA_RULE_REGISTER_OFFSET) {
+						return B_BAD_DATA;
+					}
+					context.GetCfaCfaRule()->SetOffset(
+						offset * (int32)context.DataAlignment());
+					break;
+				}
+				case DW_CFA_val_offset:
+				{
+					uint32 reg = dataReader.ReadUnsignedLEB128(0);
+					uint64 offset = dataReader.ReadUnsignedLEB128(0);
+printf("    DW_CFA_val_offset: reg: %lu, offset: %llu\n", reg, offset);
+					if (CfaRule* rule = context.RegisterRule(reg)) {
+						rule->SetToValueOffset(
+							offset * context.DataAlignment());
+					}
+					break;
+				}
+				case DW_CFA_val_offset_sf:
+				{
+					uint32 reg = dataReader.ReadUnsignedLEB128(0);
+					int64 offset = dataReader.ReadSignedLEB128(0);
+printf("    DW_CFA_val_offset_sf: reg: %lu, offset: %lld\n", reg, offset);
+					if (CfaRule* rule = context.RegisterRule(reg)) {
+						rule->SetToValueOffset(
+							offset * (int32)context.DataAlignment());
+					}
+					break;
+				}
+				case DW_CFA_val_expression:
+				{
+					uint32 reg = dataReader.ReadUnsignedLEB128(0);
+					uint8* block = (uint8*)dataReader.Data();
+					uint64 blockLength = dataReader.ReadUnsignedLEB128(0);
+					dataReader.Skip(blockLength);
+printf("    DW_CFA_val_expression: reg: %lu, block: %p, %llu\n", reg, block, blockLength);
+					if (CfaRule* rule = context.RegisterRule(reg))
+						rule->SetToValueExpression(block, blockLength);
+					break;
+				}
+
+				// extensions
+				case DW_CFA_MIPS_advance_loc8:
+				{
+					uint64 delta = dataReader.Read<uint64>(0);
+printf("    DW_CFA_MIPS_advance_loc8: %#llx\n", delta);
+					dwarf_addr_t location = context.Location()
+						+ delta * context.CodeAlignment();
+					if (location > context.TargetLocation())
+						return B_OK;
+					context.SetLocation(location);
+					break;
+				}
+				case DW_CFA_GNU_window_save:
+				{
+					// SPARC specific, no args
+					printf("    DW_CFA_GNU_window_save\n");
+					// TODO: Implement once we have SPARC support!
+					break;
+				}
+				case DW_CFA_GNU_args_size:
+				{
+					// Updates the total size of arguments on the stack.
+					uint64 size = dataReader.ReadUnsignedLEB128(0);
+					printf("    DW_CFA_GNU_args_size: %llu\n", size);
+// TODO: Implement!
+					break;
+				}
+				case DW_CFA_GNU_negative_offset_extended:
+				{
+					// obsolete
+					uint32 reg = dataReader.ReadUnsignedLEB128(0);
+					int64 offset = dataReader.ReadSignedLEB128(0);
+printf("    DW_CFA_GNU_negative_offset_extended: reg: %lu, offset: %lld\n", reg, offset);
+					if (CfaRule* rule = context.RegisterRule(reg)) {
+						rule->SetToLocationOffset(
+							offset * (int32)context.DataAlignment());
+					}
+					break;
+				}
+
+				default:
+					printf("    unknown opcode %u!\n", opcode);
+					return B_BAD_DATA;
+			}
+		}
+	}
+
+	return B_OK;
 }
 
 

@@ -22,12 +22,14 @@ class FileManager;
 class FileSourceCode;
 class LocatableFile;
 class SourceCode;
+class TeamMemory;
 
 
 class DwarfImageDebugInfo : public SpecificImageDebugInfo {
 public:
 								DwarfImageDebugInfo(const ImageInfo& imageInfo,
 									Architecture* architecture,
+									TeamMemory* teamMemory,
 									FileManager* fileManager, DwarfFile* file);
 	virtual						~DwarfImageDebugInfo();
 
@@ -58,6 +60,9 @@ public:
 									FileSourceCode* sourceCode);
 
 private:
+			struct UnwindTargetInterface;
+
+private:
 			status_t 			_AddSourceCodeInfo(CompilationUnit* unit,
 									FileSourceCode* sourceCode,
 									int32 fileIndex);
@@ -68,6 +73,7 @@ private:
 			BLocker				fLock;
 			ImageInfo			fImageInfo;
 			Architecture*		fArchitecture;
+			TeamMemory*			fTeamMemory;
 			FileManager*		fFileManager;
 			DwarfFile*			fFile;
 			ElfSegment*			fTextSegment;

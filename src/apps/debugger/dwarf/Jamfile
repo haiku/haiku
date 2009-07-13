@@ -17,11 +17,14 @@ MergeObject Debugger_dwarf.o
 	AbbreviationTable.cpp
 	AttributeClasses.cpp
 	AttributeValue.cpp
+	CfaContext.cpp
+	CfaRuleSet.cpp
 	CompilationUnit.cpp
 	DebugInfoEntries.cpp
 	DebugInfoEntry.cpp
 	DwarfFile.cpp
 	DwarfManager.cpp
+	DwarfTargetInterface.cpp
 	DwarfUtils.cpp
 	LineNumberProgram.cpp
 	SourceLanguageInfo.cpp

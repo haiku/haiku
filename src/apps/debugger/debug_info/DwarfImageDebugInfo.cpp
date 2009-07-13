@@ -18,26 +18,131 @@
 
 #include "Architecture.h"
 #include "CompilationUnit.h"
+#include "CpuState.h"
 #include "DebugInfoEntries.h"
 #include "Dwarf.h"
 #include "DwarfFile.h"
 #include "DwarfFunctionDebugInfo.h"
+#include "DwarfTargetInterface.h"
 #include "DwarfUtils.h"
 #include "ElfFile.h"
 #include "FileManager.h"
 #include "FileSourceCode.h"
 #include "LocatableFile.h"
+#include "Register.h"
+#include "RegisterMap.h"
 #include "SourceFile.h"
+#include "StackFrame.h"
 #include "Statement.h"
 #include "StringUtils.h"
+#include "TeamMemory.h"
+
+
+// #pragma mark - UnwindTargetInterface
+
+
+struct DwarfImageDebugInfo::UnwindTargetInterface : DwarfTargetInterface {
+	UnwindTargetInterface(const Register* registers, int32 registerCount,
+		RegisterMap* fromDwarfMap, RegisterMap* toDwarfMap, CpuState* cpuState,
+		Architecture* architecture, TeamMemory* teamMemory)
+		:
+		fRegisters(registers),
+		fRegisterCount(registerCount),
+		fFromDwarfMap(fromDwarfMap),
+		fToDwarfMap(toDwarfMap),
+		fCpuState(cpuState),
+		fArchitecture(architecture),
+		fTeamMemory(teamMemory)
+	{
+		fFromDwarfMap->AcquireReference();
+		fToDwarfMap->AcquireReference();
+		fCpuState->AcquireReference();
+	}
+
+	~UnwindTargetInterface()
+	{
+		fFromDwarfMap->ReleaseReference();
+		fToDwarfMap->ReleaseReference();
+		fCpuState->ReleaseReference();
+	}
+
+	virtual uint32 CountRegisters() const
+	{
+		return fRegisterCount;
+	}
+
+	virtual uint32 RegisterValueType(uint32 index) const
+	{
+		const Register* reg = _RegisterAt(index);
+		return reg != NULL ? reg->ValueType() : 0;
+	}
+
+	virtual bool GetRegisterValue(uint32 index, BVariant& _value) const
+	{
+		const Register* reg = _RegisterAt(index);
+		if (reg == NULL)
+			return false;
+		return fCpuState->GetRegisterValue(reg, _value);
+	}
+
+	virtual bool SetRegisterValue(uint32 index, const BVariant& value)
+	{
+		const Register* reg = _RegisterAt(index);
+		if (reg == NULL)
+			return false;
+		return fCpuState->SetRegisterValue(reg, value);
+	}
+
+	virtual bool IsCalleePreservedRegister(uint32 index) const
+	{
+		const Register* reg = _RegisterAt(index);
+		return reg != NULL && reg->IsCalleePreserved();
+	}
+
+	virtual bool ReadMemory(target_addr_t address, void* buffer,
+		size_t size) const
+	{
+		ssize_t bytesRead = fTeamMemory->ReadMemory(address, buffer, size);
+		return bytesRead >= 0 && (size_t)bytesRead == size;
+	}
+
+	virtual bool ReadValueFromMemory(target_addr_t address,
+		uint32 valueType, BVariant& _value) const
+	{
+		return fArchitecture->ReadValueFromMemory(address, valueType, _value)
+			== B_OK;
+	}
+
+private:
+	const Register* _RegisterAt(uint32 dwarfIndex) const
+	{
+		int32 index = fFromDwarfMap->MapRegisterIndex(dwarfIndex);
+		return index >= 0 && index < fRegisterCount ? fRegisters + index : NULL;
+	}
+
+private:
+	const Register*	fRegisters;
+	int32			fRegisterCount;
+	RegisterMap*	fFromDwarfMap;
+	RegisterMap*	fToDwarfMap;
+	CpuState*		fCpuState;
+	Architecture*	fArchitecture;
+	TeamMemory*		fTeamMemory;
+};
+
+
+
+// #pragma mark - DwarfImageDebugInfo
 
 
 DwarfImageDebugInfo::DwarfImageDebugInfo(const ImageInfo& imageInfo,
-	Architecture* architecture, FileManager* fileManager, DwarfFile* file)
+	Architecture* architecture, TeamMemory* teamMemory,
+	FileManager* fileManager, DwarfFile* file)
 	:
 	fLock("dwarf image debug info"),
 	fImageInfo(imageInfo),
 	fArchitecture(architecture),
+	fTeamMemory(teamMemory),
 	fFileManager(fileManager),
 	fFile(file),
 	fTextSegment(NULL),
@@ -188,8 +293,64 @@ DwarfImageDebugInfo::CreateFrame(Image* image, FunctionDebugInfo* function,
 	CpuState* cpuState, StackFrame*& _previousFrame,
 	CpuState*& _previousCpuState)
 {
-	// TODO:...
-	return B_UNSUPPORTED;
+	int32 registerCount = fArchitecture->CountRegisters();
+	const Register* registers = fArchitecture->Registers();
+
+	// get the DWARF <-> architecture register maps
+	RegisterMap* toDwarfMap;
+	RegisterMap* fromDwarfMap;
+	status_t error = fArchitecture->GetDwarfRegisterMaps(&toDwarfMap,
+		&fromDwarfMap);
+	if (error != B_OK)
+		return error;
+	Reference<RegisterMap> toDwarfMapReference(toDwarfMap, true);
+	Reference<RegisterMap> fromDwarfMapReference(fromDwarfMap, true);
+
+	// create a clean CPU state for the previous frame
+	CpuState* previousCpuState;
+	error = fArchitecture->CreateCpuState(previousCpuState);
+	if (error != B_OK)
+		return error;
+	Reference<CpuState> previousCpuStateReference(previousCpuState, true);
+
+	// create the target interfaces
+	UnwindTargetInterface inputInterface(registers, registerCount,
+		fromDwarfMap, toDwarfMap, cpuState, fArchitecture, fTeamMemory);
+	UnwindTargetInterface outputInterface(registers, registerCount,
+		fromDwarfMap, toDwarfMap, previousCpuState, fArchitecture, fTeamMemory);
+
+	// do the unwinding
+	target_addr_t framePointer;
+	error = fFile->UnwindCallFrame(
+		cpuState->InstructionPointer() - fRelocationDelta,
+		&inputInterface, &outputInterface, framePointer);
+	if (error != B_OK)
+		return B_UNSUPPORTED;
+
+printf("unwound registers:\n");
+for (int32 i = 0; i < registerCount; i++) {
+const Register* reg = registers + i;
+BVariant value;
+if (previousCpuState->GetRegisterValue(reg, value)) {
+	printf("  %3s: %#lx\n", reg->Name(), value.ToUInt32());
+} else
+	printf("  %3s: undefined\n", reg->Name());
+}
+
+	// create the stack frame
+	StackFrame* frame = new(std::nothrow) StackFrame(STACK_FRAME_TYPE_STANDARD,
+		cpuState, framePointer, cpuState->InstructionPointer());
+	if (frame == NULL)
+		return B_NO_MEMORY;
+
+	frame->SetReturnAddress(previousCpuState->InstructionPointer());
+		// Note, this is correct, since we actually retrieved the return
+		// address. Our caller will fix the IP for us.
+
+	_previousFrame = frame;
+	_previousCpuState = previousCpuStateReference.Detach();
+
+	return B_OK;
 }
 
 

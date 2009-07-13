@@ -5,6 +5,7 @@
 #ifndef DWARF_FILE_H
 #define DWARF_FILE_H
 
+
 #include <ObjectList.h>
 #include <util/DoublyLinkedList.h>
 
@@ -13,8 +14,10 @@
 
 class AbbreviationEntry;
 class AbbreviationTable;
+class CfaContext;
 class CompilationUnit;
 class DataReader;
+class DwarfTargetInterface;
 class ElfFile;
 class ElfSection;
 class TargetAddressRangeList;
@@ -36,6 +39,11 @@ public:
 			CompilationUnit*	CompilationUnitForDIE(
 									const DebugInfoEntry* entry) const;
 
+			status_t			UnwindCallFrame(target_addr_t location,
+									const DwarfTargetInterface* inputInterface,
+									DwarfTargetInterface* outputInterface,
+									target_addr_t& _framePointer);
+
 private:
 			typedef DoublyLinkedList<AbbreviationTable> AbbreviationTableList;
 			typedef BObjectList<CompilationUnit> CompilationUnitList;
@@ -53,6 +61,12 @@ private:
 
 			status_t			_ParseLineInfo(CompilationUnit* unit);
 
+			status_t			_ParseCIE(CfaContext& context,
+									dwarf_off_t cieOffset);
+			status_t			_ParseFrameInfoInstructions(CfaContext& context,
+									dwarf_off_t instructionOffset,
+									dwarf_off_t instructionSize);
+
 			status_t			_GetAbbreviationTable(off_t offset,
 									AbbreviationTable*& _table);
 
@@ -69,6 +83,7 @@ private:
 			ElfSection*			fDebugStringSection;
 			ElfSection*			fDebugRangesSection;
 			ElfSection*			fDebugLineSection;
+			ElfSection*			fDebugFrameSection;
 			AbbreviationTableList fAbbreviationTables;
 			DebugInfoEntryFactory fDebugInfoFactory;
 			CompilationUnitList	fCompilationUnits;
