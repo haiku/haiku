@@ -82,7 +82,8 @@ private:
 			void				_GetUnscaledVideoSize(int& videoWidth,
 									int& videoHeight) const;
 			int					_CurrentVideoSizeInPercent() const;
-			void				_ResizeWindow(int percent);
+			void				_ResizeWindow(int percent,
+									bool stayOnScreen = false);
 			void				_ResizeVideoView(int x, int y, int width,
 									int height);
 

@@ -888,13 +888,21 @@ MainWin::_SetupWindow()
 	}
 	_UpdateControlsEnabledStatus();
 
-	// adopt the size and window layout if necessary
-	if (!fIsFullscreen && (previousSourceWidth != fSourceWidth
-			|| previousSourceHeight != fSourceHeight
-			|| previousWidthAspect != fWidthAspect
-			|| previousHeightAspect != fHeightAspect)) {
+	// Adopt the size and window layout if necessary
+	if (previousSourceWidth != fSourceWidth
+		|| previousSourceHeight != fSourceHeight
+		|| previousWidthAspect != fWidthAspect
+		|| previousHeightAspect != fHeightAspect) {
+
 		_SetWindowSizeLimits();
-		_ResizeWindow(100);
+		
+		if (!fIsFullscreen) {
+			// Resize to 100% but stay on screen
+			_ResizeWindow(100, true);
+		} else {
+			// Make sure we relayout the video view when in full screen mode
+			FrameResized(Frame().Width(), Frame().Height());
+		}
 	}
 
 	fVideoView->MakeFocus();
@@ -1154,7 +1162,7 @@ MainWin::_CurrentVideoSizeInPercent() const
 
 
 void
-MainWin::_ResizeWindow(int percent)
+MainWin::_ResizeWindow(int percent, bool stayOnScreen)
 {
 	// Get required window size
 	int videoWidth;
@@ -1169,9 +1177,60 @@ MainWin::_ResizeWindow(int percent)
 	int height;
 	_GetMinimumWindowSize(width, height);
 
-	width = max_c(width, videoWidth);
-	height = height + videoHeight;
-	ResizeTo(width - 1, height - 1);
+	width = max_c(width, videoWidth) - 1;
+	height = height + videoHeight - 1;
+
+	if (stayOnScreen) {
+		BRect screenFrame(BScreen(this).Frame());
+		BRect frame(Frame());
+		BRect decoratorFrame(DecoratorFrame());
+
+		// Shrink the screen frame by the window border size
+		screenFrame.top += frame.top - decoratorFrame.top;
+		screenFrame.left += frame.left - decoratorFrame.left;
+		screenFrame.right += frame.right - decoratorFrame.right;
+		screenFrame.bottom += frame.bottom - decoratorFrame.bottom;
+
+		// Update frame to what the new size would be
+		frame.right = frame.left + width;
+		frame.bottom = frame.top + height;
+
+		if (!screenFrame.Contains(frame)) {
+			// Resize the window so it doesn't extend outside the current
+			// screen frame.
+			if (frame.Width() > screenFrame.Width()
+				|| frame.Height() > screenFrame.Height()) {
+				// too large
+				int widthDiff = frame.Width() - screenFrame.Width();
+				int heightDiff = frame.Height() - screenFrame.Height();
+				float shrinkScale;
+				if (widthDiff > heightDiff)
+					shrinkScale = (float)(width - widthDiff) / width;
+				else
+					shrinkScale = (float)(height - heightDiff) / height;
+				// Resize width/height and center window
+				width = lround(width * shrinkScale);
+				height = lround(height * shrinkScale);
+				MoveTo((screenFrame.left + screenFrame.right - width) / 2,
+					(screenFrame.top + screenFrame.bottom - height) / 2);
+			} else {
+				// just off-screen on one or more sides
+				int offsetX = 0;
+				int offsetY = 0;
+				if (frame.left < screenFrame.left)
+					offsetX = screenFrame.left - frame.left;
+				else if (frame.right > screenFrame.right)
+					offsetX = screenFrame.right - frame.right;
+				if (frame.top < screenFrame.top)
+					offsetX = screenFrame.top - frame.top;
+				else if (frame.bottom > screenFrame.bottom)
+					offsetX = screenFrame.bottom - frame.bottom;
+				MoveBy(offsetX, offsetY);
+			}
+		}
+	}
+
+	ResizeTo(width, height);
 }
 
 
