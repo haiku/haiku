@@ -201,6 +201,8 @@ class SourceView::TextView : public BaseView {
 public:
 								TextView(SourceView* sourceView,
 									FontInfo* fontInfo);
+									
+			void				CopySelectionToClipboard() const;
 
 	virtual	void				SetSourceCode(SourceCode* sourceCode);
 
@@ -234,7 +236,6 @@ private:
 									BString& formattedLine);
 			SelectionPoint		_SelectionPointAt(BPoint where) const;
 			void				_GetSelectionRegion(BRegion& region) const;
-			void				_CopySelectionToClipboard() const;
 			
 private:
 			
@@ -1053,6 +1054,9 @@ SourceView::TextView::_SelectionPointAt(BPoint where) const
 {
 	int32 line = LineAtOffset(where.y);
 	int32 offset = (int32)max_c((where.x - kLeftTextMargin) / fCharacterWidth, 0);
+	int32 lineLength = strlen(fSourceCode->LineAt(line));
+	if (offset > lineLength)
+		offset = (lineLength > 0) ? lineLength - 1 : 0;
 	return SelectionPoint(line, offset);
 }
 
@@ -1104,29 +1108,31 @@ SourceView::TextView::_GetSelectionRegion(BRegion &region) const
 
 
 void
-SourceView::TextView::_CopySelectionToClipboard(void) const
+SourceView::TextView::CopySelectionToClipboard(void) const
 {
 	if (fSelectionStart.line == -1 || fSelectionEnd.line == -1)
 		return;
 		
 	BString text;
-	if (fSelectionStart.line == fSelectionEnd.line)
+	if (fSelectionStart.line == fSelectionEnd.line) 
 		text.SetTo(fSourceCode->LineAt(fSelectionStart.line) 
 			+ fSelectionStart.offset, fSelectionEnd.offset 
 			- fSelectionStart.offset);
 	else {
-		text << (fSourceCode->LineAt(fSelectionStart.line) 
+		text.SetTo(fSourceCode->LineAt(fSelectionStart.line) 
 			+ fSelectionStart.offset);
-		for (int32 i = fSelectionStart.line + 1; i < fSelectionEnd.line; i++)
-			text += fSourceCode->LineAt(i);
+		text << "\n";
+		for (int32 i = fSelectionStart.line + 1; i < fSelectionEnd.line; i++) 
+			text << fSourceCode->LineAt(i) << "\n";
 		text.Append(fSourceCode->LineAt(fSelectionEnd.line),
 			fSelectionEnd.offset);
 	}
 
 	be_clipboard->Lock();
-	be_clipboard->Clear();
+	be_clipboard->Data()->RemoveData("text/plain");
 	be_clipboard->Data()->AddData ("text/plain", 
 		B_MIME_TYPE, text.String(), text.Length());
+	be_clipboard->Commit();
 	be_clipboard->Unlock();
 	
 }
@@ -1329,6 +1335,21 @@ SourceView::TargetedByScrollView(BScrollView* scrollView)
 	_UpdateScrollBars();
 }
 
+
+void
+SourceView::MessageReceived(BMessage *message)
+{
+	switch (message->what)
+	{
+		case B_COPY:
+			fTextView->CopySelectionToClipboard();
+			break;
+			
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
+}
 
 BSize
 SourceView::MinSize()

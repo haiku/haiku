@@ -45,7 +45,8 @@ public:
 
 			void				HighlightBorder(bool state);
 	virtual	void				TargetedByScrollView(BScrollView* scrollView);
-
+	virtual void				MessageReceived(BMessage *message);
+	
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
