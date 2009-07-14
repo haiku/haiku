@@ -212,7 +212,8 @@ VideoConsumer::CreateBuffers(const media_format& format)
 	uint32 width = format.u.raw_video.display.line_width;
 	uint32 height = format.u.raw_video.display.line_count;	
 	color_space colorSpace = format.u.raw_video.display.format;
-	PROGRESS("VideoConsumer::CreateBuffers - Colorspace = %d\n", colorSpace);
+	PROGRESS("VideoConsumer::CreateBuffers - Width = %ld - Height = %ld - "
+		"Colorspace = %d\n", width, height, colorSpace);
 
 	fBuffers = new BBufferGroup();
 	status = fBuffers->InitCheck();

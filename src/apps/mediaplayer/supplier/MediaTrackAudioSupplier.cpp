@@ -127,14 +127,14 @@ MediaTrackAudioSupplier::Read(void* buffer, int64 pos, int64 frames)
 
 	status_t error = InitCheck();
 	if (error != B_OK) {
-		TRACE("Read() done\n");
+		TRACE("Read() InitCheck failed\n");
 		return error;
 	}
 
 	// convert pos according to our offset
 	pos += fOutOffset;
 	// Fill the frames after the end of the track with silence.
-	if (pos + frames > fCountFrames) {
+	if (fCountFrames > 0 && pos + frames > fCountFrames) {
 		int64 size = max(0LL, fCountFrames - pos);
 		ReadSilence(SkipFrames(buffer, size), frames - size);
 		frames = size;
@@ -528,6 +528,7 @@ status_t
 MediaTrackAudioSupplier::_ReadUncachedFrames(void* buffer, int64 position,
 									  int64 frames, bigtime_t time)
 {
+	TRACE("_ReadUncachedFrames()\n");
 	status_t error = B_OK;
 	// seek to the position
 	int64 currentPos = position;

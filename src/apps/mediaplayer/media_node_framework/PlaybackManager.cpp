@@ -224,6 +224,7 @@ PlaybackManager::MessageReceived(BMessage* message)
 void
 PlaybackManager::StartPlaying(bool atBeginning)
 {
+	TRACE("PlaybackManager::StartPlaying()\n");
 	int32 playMode = PlayMode();
 	if (playMode == MODE_PLAYING_PAUSED_FORWARD)
 		SetPlayMode(MODE_PLAYING_FORWARD, !atBeginning);
@@ -235,6 +236,7 @@ PlaybackManager::StartPlaying(bool atBeginning)
 void
 PlaybackManager::StopPlaying()
 {
+	TRACE("PlaybackManager::StopPlaying()\n");
 	int32 playMode = PlayMode();
 	if (playMode == MODE_PLAYING_FORWARD)
 		SetPlayMode(MODE_PLAYING_PAUSED_FORWARD, true);
@@ -729,7 +731,7 @@ PlaybackManager::GetPlaylistTimeInterval(bigtime_t startTime,
 	bigtime_t endTimeForFrame = TimeForFrame(endFrame);
 	endTime = min(endTime, endTimeForFrame);
 	bigtime_t intervalLength = endTime - startTime;
-
+	
 	// Finally determine the time bounds for the Playlist interval (depending
 	// on the playing direction).
 	switch (playingDirection) {
@@ -1418,10 +1420,9 @@ TRACE("PlaybackManager::_FrameForRangeFrame(%lld)\n", index);
 TRACE("  frame range: %lld - %lld, count: %lld\n", startFrame, endFrame,
 frameCount);
 	// map the index into the index interval of the playing range
-	if (frameCount > 0)
+	if (frameCount > 1)
 		index = (index % frameCount + frameCount) % frameCount;
-	else
-		index = 0;
+
 	// get the frame for the index
 	int32 frame = startFrame;
 	switch (state->loop_mode) {
@@ -1576,7 +1577,7 @@ void
 PlaybackManager::_CheckStopPlaying()
 {
 //printf("_CheckStopPlaying() - %lld, next: %lld\n", fStopPlayingFrame, NextFrame());
-	if (fStopPlayingFrame >= 0 && fStopPlayingFrame <= NextFrame()) {
+	if (fStopPlayingFrame > 0 && fStopPlayingFrame <= NextFrame()) {
 		StopPlaying();
 		NotifyStopFrameReached();
 	}

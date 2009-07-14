@@ -255,9 +255,7 @@ Controller::SetTo(const PlaylistItemRef& item)
 		}
 
 		if (t->Duration() <= 0) {
-			printf("Controller::SetTo: track index %d has no duration\n",i);
-			mf->ReleaseTrack(t);
-			continue;
+			printf("Controller::SetTo: warning! track index %d has no duration\n", i);
 		}
 
 		if (f.IsAudio()) {
