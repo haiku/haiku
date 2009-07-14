@@ -213,6 +213,7 @@ public:
 
 	virtual void				KeyDown(const char* bytes, int32 numBytes);
 	virtual void				MakeFocus(bool isFocused);
+	virtual void				MessageReceived(BMessage* message);
 	virtual void				MouseDown(BPoint where);
 	virtual void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
@@ -948,6 +949,22 @@ SourceView::TextView::MakeFocus(bool isFocused)
 
 
 void
+SourceView::TextView::MessageReceived(BMessage* message)
+{
+	switch (message->what)
+	{
+		case B_COPY:
+			CopySelectionToClipboard();
+			break;
+
+		default:
+			SourceView::BaseView::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
 SourceView::TextView::MouseDown(BPoint where)
 {
 	if (fSourceCode != NULL) {
@@ -1336,21 +1353,6 @@ SourceView::TargetedByScrollView(BScrollView* scrollView)
 	_UpdateScrollBars();
 }
 
-
-void
-SourceView::MessageReceived(BMessage* message)
-{
-	switch (message->what)
-	{
-		case B_COPY:
-			fTextView->CopySelectionToClipboard();
-			break;
-
-		default:
-			BView::MessageReceived(message);
-			break;
-	}
-}
 
 BSize
 SourceView::MinSize()

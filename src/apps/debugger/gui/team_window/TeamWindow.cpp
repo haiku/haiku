@@ -117,29 +117,40 @@ void
 TeamWindow::DispatchMessage(BMessage* message, BHandler* handler)
 {
 	// Handle function key shortcuts for stepping
-	if (fActiveThread != NULL && message->what == B_KEY_DOWN) {
-		int32 key;
-		uint32 modifiers;
-		if (message->FindInt32("key", &key) == B_OK
-			&& message->FindInt32("modifiers", (int32*)&modifiers) == B_OK) {
-			switch (key) {
-				case B_F10_KEY:
-					fListener->ThreadActionRequested(this, fActiveThread->ID(),
-						MSG_THREAD_STEP_OVER);
-					break;
-				case B_F11_KEY:
-					if ((modifiers & B_SHIFT_KEY) != 0) {
-						fListener->ThreadActionRequested(this,
-							fActiveThread->ID(), MSG_THREAD_STEP_OUT);
-					} else {
-						fListener->ThreadActionRequested(this,
-							fActiveThread->ID(), MSG_THREAD_STEP_INTO);
+	switch (message->what) {
+		case B_KEY_DOWN:
+			if (fActiveThread != NULL) {
+				int32 key;
+				uint32 modifiers;
+				if (message->FindInt32("key", &key) == B_OK
+					&& message->FindInt32("modifiers", (int32*)&modifiers)
+					== B_OK) {
+					switch (key) {
+						case B_F10_KEY:
+							fListener->ThreadActionRequested(this,
+								fActiveThread->ID(), MSG_THREAD_STEP_OVER);
+							break;
+						case B_F11_KEY:
+							if ((modifiers & B_SHIFT_KEY) != 0) {
+								fListener->ThreadActionRequested(this,
+									fActiveThread->ID(), MSG_THREAD_STEP_OUT);
+							} else {
+								fListener->ThreadActionRequested(this,
+									fActiveThread->ID(), MSG_THREAD_STEP_INTO);
+							}
+							break;
+						default:
+							break;
 					}
-					break;
-				default:
-					break;
+				}
 			}
-		}
+			break;
+
+		case B_COPY:
+			BView* focusView = CurrentFocus();
+			if (focusView != NULL)
+				focusView->MessageReceived(message);
+			break;
 	}
 	BWindow::DispatchMessage(message, handler);
 }
@@ -401,7 +412,7 @@ TeamWindow::_Init()
 	fMenuBar->AddItem(menu);
 	item = new BMenuItem("Copy", new BMessage(B_COPY), 'C');
 	menu->AddItem(item);
-	item->SetTarget(fSourceView);
+	item->SetTarget(this);
 
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 	_UpdateRunButtons();
