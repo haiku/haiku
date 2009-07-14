@@ -43,6 +43,8 @@ public:
 									Listener* listener);
 									// throws
 
+	virtual	void				DispatchMessage(BMessage* message,
+									BHandler* handler);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
