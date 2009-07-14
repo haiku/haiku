@@ -283,7 +283,7 @@ AVCodecDecoder::NegotiateOutputFormat(media_format* inOutFormat)
 	TRACE("AVCodecDecoder::NegotiateOutputFormat()\n",
 		fIsAudio?('a'):('v'));
 
-#if TRACE_AV_CODEC
+#ifdef TRACE_AV_CODEC
 	char buffer[1024];
 	string_for_format(*inOutFormat, buffer, sizeof(buffer));
 	TRACE("  [%c]  requested format = %s\n", fIsAudio?('a'):('v'), buffer);
@@ -470,7 +470,7 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	inOutFormat->require_flags = 0;
 	inOutFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
 
-#if TRACE_AV_CODEC		
+#ifdef TRACE_AV_CODEC		
 	char buffer[1024];
 	string_for_format(*inOutFormat, buffer, sizeof(buffer));
 	TRACE("[v]  outFormat = %s\n", buffer);
