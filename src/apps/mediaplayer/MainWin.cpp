@@ -893,6 +893,7 @@ MainWin::_SetupWindow()
 			|| previousSourceHeight != fSourceHeight
 			|| previousWidthAspect != fWidthAspect
 			|| previousHeightAspect != fHeightAspect)) {
+		_SetWindowSizeLimits();
 		_ResizeWindow(100);
 	}
 
@@ -1170,7 +1171,6 @@ MainWin::_ResizeWindow(int percent)
 
 	width = max_c(width, videoWidth);
 	height = height + videoHeight;
-//	_SetWindowSizeLimits();
 	ResizeTo(width - 1, height - 1);
 }
 
