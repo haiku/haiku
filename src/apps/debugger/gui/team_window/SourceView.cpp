@@ -201,7 +201,7 @@ class SourceView::TextView : public BaseView {
 public:
 								TextView(SourceView* sourceView,
 									FontInfo* fontInfo);
-									
+
 			void				CopySelectionToClipboard() const;
 
 	virtual	void				SetSourceCode(SourceCode* sourceCode);
@@ -210,14 +210,14 @@ public:
 	virtual	BSize				MaxSize();
 
 	virtual	void				Draw(BRect updateRect);
-	
+
 	virtual void				KeyDown(const char* bytes, int32 numBytes);
-	virtual void				MakeFocus(bool isFocused);	
+	virtual void				MakeFocus(bool isFocused);
 	virtual void				MouseDown(BPoint where);
 	virtual void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
 	virtual void				MouseUp(BPoint where);
-	
+
 private:
 			struct SelectionPoint
 			{
@@ -226,7 +226,7 @@ private:
 					line = _line;
 					offset = _offset;
 				}
-				
+
 				int32 line;
 				int32 offset;
 			};
@@ -236,9 +236,9 @@ private:
 									BString& formattedLine);
 			SelectionPoint		_SelectionPointAt(BPoint where) const;
 			void				_GetSelectionRegion(BRegion& region) const;
-			
+
 private:
-			
+
 			float				fMaxLineWidth;
 			float				fCharacterWidth;
 			SelectionPoint		fSelectionStart;
@@ -886,7 +886,7 @@ SourceView::TextView::Draw(BRect updateRect)
 		_FormatLine(fSourceCode->LineAt(i), lineString);
 		DrawString(lineString, BPoint(kLeftTextMargin, y));
 	}
-	
+
 	if (fSelectionStart.line != -1 && fSelectionEnd.line != -1) {
 		PushState();
 		BRegion selectionRegion;
@@ -910,30 +910,30 @@ SourceView::TextView::KeyDown(const char* bytes, int32 numBytes)
 		case B_UP_ARROW:
 			vertical->SetValue(value - fFontInfo->lineHeight);
 			break;
-			
+
 		case B_DOWN_ARROW:
 			vertical->SetValue(value + fFontInfo->lineHeight);
 			break;
-		
+
 		case B_PAGE_UP:
 			vertical->SetValue(value - fSourceView->Frame().Size().height);
 			break;
-			
+
 		case B_PAGE_DOWN:
 			vertical->SetValue(value + fSourceView->Frame().Size().height);
 			break;
-		
+
 		case B_HOME:
 			vertical->SetValue(0.0);
 			break;
-			
+
 		case B_END:
 			float min, max;
 			vertical->GetRange(&min, &max);
 			vertical->SetValue(max);
 			break;
 	}
-	
+
 	SourceView::BaseView::KeyDown(bytes, numBytes);
 }
 
@@ -951,9 +951,9 @@ void
 SourceView::TextView::MouseDown(BPoint where)
 {
 	if (fSourceCode != NULL) {
-		if (!IsFocus()) 
+		if (!IsFocus())
 			MakeFocus(true);
-		
+
 		// don't reset the selection if the user clicks within the
 		// current selection range
 		BRegion region;
@@ -970,9 +970,8 @@ SourceView::TextView::MouseDown(BPoint where)
 
 
 void
-SourceView::TextView::MouseMoved(BPoint where, uint32 transit, 
+SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 	const BMessage* dragMessage)
-
 {
 	if (fSelectionMode) {
 		BRegion oldRegion;
@@ -1053,7 +1052,8 @@ SourceView::TextView::SelectionPoint
 SourceView::TextView::_SelectionPointAt(BPoint where) const
 {
 	int32 line = LineAtOffset(where.y);
-	int32 offset = (int32)max_c((where.x - kLeftTextMargin) / fCharacterWidth, 0);
+	int32 offset = (int32)max_c((where.x - kLeftTextMargin)
+		/ fCharacterWidth, 0);
 	int32 lineLength = strlen(fSourceCode->LineAt(line));
 	if (offset > lineLength)
 		offset = (lineLength > 0) ? lineLength - 1 : 0;
@@ -1068,7 +1068,7 @@ SourceView::TextView::_GetSelectionRegion(BRegion &region) const
 		return;
 
 	BRect selectionRect;
-	
+
 	if (fSelectionStart.line == fSelectionEnd.line) {
 		if (fSelectionStart.offset != fSelectionEnd.offset) {
 			selectionRect.left = fSelectionStart.offset * fCharacterWidth;
@@ -1079,21 +1079,23 @@ SourceView::TextView::_GetSelectionRegion(BRegion &region) const
 		}
 	} else {
 		// add rect for starting line
-		selectionRect.left = selectionRect.left = fSelectionStart.offset 
+		selectionRect.left = selectionRect.left = fSelectionStart.offset
 			* fCharacterWidth;
 		selectionRect.top = fSelectionStart.line * fFontInfo->lineHeight;
 		selectionRect.right = Bounds().right;
 		selectionRect.bottom = selectionRect.top + fFontInfo->lineHeight;
 		region.Include(selectionRect);
+
 		// compute rect for all lines in middle of selection
 		if (fSelectionEnd.line - fSelectionStart.line > 1) {
 			selectionRect.left = 0.0;
-			selectionRect.top = (fSelectionStart.line + 1) 
+			selectionRect.top = (fSelectionStart.line + 1)
 				* fFontInfo->lineHeight;
 			selectionRect.right = Bounds().right;
 			selectionRect.bottom = fSelectionEnd.line * fFontInfo->lineHeight;
 			region.Include(selectionRect);
 		}
+
 		// add rect for last line (if needed)
 		if (fSelectionEnd.offset > 0) {
 			selectionRect.left = 0.0;
@@ -1112,17 +1114,17 @@ SourceView::TextView::CopySelectionToClipboard(void) const
 {
 	if (fSelectionStart.line == -1 || fSelectionEnd.line == -1)
 		return;
-		
+
 	BString text;
-	if (fSelectionStart.line == fSelectionEnd.line) 
-		text.SetTo(fSourceCode->LineAt(fSelectionStart.line) 
-			+ fSelectionStart.offset, fSelectionEnd.offset 
+	if (fSelectionStart.line == fSelectionEnd.line) {
+		text.SetTo(fSourceCode->LineAt(fSelectionStart.line)
+			+ fSelectionStart.offset, fSelectionEnd.offset
 			- fSelectionStart.offset);
-	else {
-		text.SetTo(fSourceCode->LineAt(fSelectionStart.line) 
+	} else {
+		text.SetTo(fSourceCode->LineAt(fSelectionStart.line)
 			+ fSelectionStart.offset);
 		text << "\n";
-		for (int32 i = fSelectionStart.line + 1; i < fSelectionEnd.line; i++) 
+		for (int32 i = fSelectionStart.line + 1; i < fSelectionEnd.line; i++)
 			text << fSourceCode->LineAt(i) << "\n";
 		text.Append(fSourceCode->LineAt(fSelectionEnd.line),
 			fSelectionEnd.offset);
@@ -1130,11 +1132,10 @@ SourceView::TextView::CopySelectionToClipboard(void) const
 
 	be_clipboard->Lock();
 	be_clipboard->Data()->RemoveData("text/plain");
-	be_clipboard->Data()->AddData ("text/plain", 
+	be_clipboard->Data()->AddData ("text/plain",
 		B_MIME_TYPE, text.String(), text.Length());
 	be_clipboard->Commit();
 	be_clipboard->Unlock();
-	
 }
 
 
@@ -1323,8 +1324,8 @@ printf("  -> scrolling to (%f, %f)\n", visible.left, top - (visible.Height() + 1
 void
 SourceView::HighlightBorder(bool state)
 {
-	BScrollView *parent = dynamic_cast<BScrollView *>(Parent());
-	if (parent)
+	BScrollView* parent = dynamic_cast<BScrollView*>(Parent());
+	if (parent != NULL)
 		parent->SetBorderHighlighted(state);
 }
 
@@ -1337,14 +1338,14 @@ SourceView::TargetedByScrollView(BScrollView* scrollView)
 
 
 void
-SourceView::MessageReceived(BMessage *message)
+SourceView::MessageReceived(BMessage* message)
 {
 	switch (message->what)
 	{
 		case B_COPY:
 			fTextView->CopySelectionToClipboard();
 			break;
-			
+
 		default:
 			BView::MessageReceived(message);
 			break;

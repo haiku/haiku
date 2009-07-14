@@ -391,9 +391,9 @@ TeamWindow::_Init()
 	fStepOutButton->SetTarget(this);
 
 	// add menus and menu items
-	BMenu *menu = new BMenu("File");
+	BMenu* menu = new BMenu("File");
 	fMenuBar->AddItem(menu);
-	BMenuItem *item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 
+	BMenuItem* item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED),
 		'Q');
 	menu->AddItem(item);
 	item->SetTarget(this);
