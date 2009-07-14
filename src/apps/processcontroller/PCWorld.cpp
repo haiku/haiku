@@ -83,20 +83,21 @@ PCApplication::ReadyToRun()
 	BDeskbar deskbar;
 	bool hasOne = deskbar.HasItem(kDeskbarItemName);
 	
-	BAlert* alert = NULL;
+	BAlert*  alertInstall = NULL;
 	if (!hasOne || (hasOne && version != kCurrentVersion)) {
-		alert = new BAlert("", 
+		alertInstall = new BAlert("", 
 			"Do you want ProcessController to live in the Deskbar?", "Don't", 
 			"Install", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
+		alertInstall->SetShortcut(0, B_ESCAPE);
 	} else {
-		BAlert alertTemp("", 
-			"ProcessController are already installed in Deskbar.","Ok", NULL, 
+		BAlert* alert = new BAlert("", 
+			"ProcessController are already installed in Deskbar.", "OK", NULL, 
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alertTemp.Go();
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->Go();
 	}
 			
-	if (alert != NULL && alert->Go()) {
+	if (alertInstall != NULL && alertInstall->Go()) {
 		// Restart deskbar to make sure the new version is picked up
 		team_id deskbarTeam = be_roster->TeamFor(kDeskbarSig);
 		if (deskbarTeam >= 0) {
@@ -117,9 +118,10 @@ PCApplication::ReadyToRun()
 			move_to_deskbar(deskbar);
 		Quit();
 		return;
-	}
+	} 
+	
 	new PCWindow();
-
+	
 	// quit other eventually running instances
 	BList list;
 	be_roster->GetAppList(kSignature, &list);
