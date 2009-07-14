@@ -347,9 +347,10 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 				case CODEC_ID_DVVIDEO:
 					codecTag = 'pcvd';
 					break;
-//				case CODEC_ID_AC3:
-//					codecTag = 0x2000;
-//					break;
+				case CODEC_ID_AC3:
+					description.family = B_WAV_FORMAT_FAMILY;
+					codecTag = 0x2000;
+					break;
 				default:
 					fprintf(stderr, "ffmpeg codecTag is null, codec_id "
 						"unknown 0x%x\n", codecContext->codec_id);
