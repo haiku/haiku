@@ -2467,11 +2467,13 @@ TAttrView::RestoreState(const BMessage &message, int32 index)
 
 	int32 logicMenuSelectedIndex;
 	BMenuField *field = dynamic_cast<BMenuField *>(FindView("Logic"));
-	if (message.FindInt32("logicalRelation", index, &logicMenuSelectedIndex) == B_OK)
+	if (message.FindInt32("logicalRelation", index,
+		&logicMenuSelectedIndex) == B_OK) {
 		if (field)
 			field->Menu()->ItemAt(logicMenuSelectedIndex)->SetMarked(true);
 		else
 			AddLogicMenu(logicMenuSelectedIndex == 0);
+	}
 }
 
 

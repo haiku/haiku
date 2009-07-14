@@ -1108,14 +1108,15 @@ AttributeView::ModelChanged(Model *model, BMessage *message)
 				// device, while the model is set to the device of the volume
 				// directly - this hack works for volumes that are mounted in
 				// the root directory
-				|| model->IsVolume()
+				|| (model->IsVolume()
 					&& itemNode.device == 1
-					&& itemNode.node == model->NodeRef()->node) {
+					&& itemNode.node == model->NodeRef()->node)) {
 				model->UpdateEntryRef(&dirNode, name);
 				BString title;
 				title << name << " info";
 				Window()->SetTitle(title.String());
-				WidgetAttributeText::AttrAsString(model, &fPathStr, kAttrPath, B_STRING_TYPE, 0, this);
+				WidgetAttributeText::AttrAsString(model, &fPathStr, kAttrPath,
+					B_STRING_TYPE, 0, this);
 			}
 			break;
 		}
@@ -1123,9 +1124,11 @@ AttributeView::ModelChanged(Model *model, BMessage *message)
 		case B_STAT_CHANGED:
 			if (model->OpenNode() == B_OK) {
 				WidgetAttributeText::AttrAsString(model, &fCreatedStr,
-					kAttrStatCreated, B_TIME_TYPE, drawBounds.Width() - kBorderMargin, this);
+					kAttrStatCreated, B_TIME_TYPE, drawBounds.Width()
+					- kBorderMargin, this);
 				WidgetAttributeText::AttrAsString(model, &fModifiedStr,
-					kAttrStatModified, B_TIME_TYPE, drawBounds.Width() - kBorderMargin, this);
+					kAttrStatModified, B_TIME_TYPE, drawBounds.Width()
+					- kBorderMargin, this);
 
 				// don't change the size if it's a directory
 				if (!model->IsDirectory()) {
@@ -1144,7 +1147,8 @@ AttributeView::ModelChanged(Model *model, BMessage *message)
 			if (message->FindString("attr", &attrName) == B_OK) {
 				if (strcmp(attrName, kAttrLargeIcon) == 0
 					|| strcmp(attrName, kAttrIcon) == 0) {
-					Invalidate(BRect(10, 10, 10 + B_LARGE_ICON, 10 + B_LARGE_ICON));
+					Invalidate(BRect(10, 10, 10 + B_LARGE_ICON, 10
+						+ B_LARGE_ICON));
 
 				} else if (strcmp(attrName, kAttrMIMEType) == 0) {
 

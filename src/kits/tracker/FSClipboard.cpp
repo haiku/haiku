@@ -236,17 +236,19 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 			MakeModeNameFromRefName(modeName, refName);
 
 			if (clearClipboard) {
-				if (clip->AddInt32(modeName, (int32)moveMode) == B_OK)
+				if (clip->AddInt32(modeName, (int32)moveMode) == B_OK) {
 					if (clip->AddRef(refName, model->EntryRef()) == B_OK) {
 						pose->SetClipboardMode(moveMode);
 
 						clipNode.node = *node;
-						updateMessage.AddData("tcnode", T_CLIPBOARD_NODE, &clipNode,
-							sizeof(TClipboardNodeRef), true, listCount);
+						updateMessage.AddData("tcnode", T_CLIPBOARD_NODE,
+							&clipNode, sizeof(TClipboardNodeRef), true,
+							listCount);
 
 						refsAdded++;
 					} else
 						clip->RemoveName(modeName);
+				}
 			} else {
 				if (clip->ReplaceInt32(modeName, (int32)moveMode) == B_OK) {
 					// replace old mode if entry already exists in clipboard
@@ -254,8 +256,9 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 						pose->SetClipboardMode(moveMode);
 
 						clipNode.node = *node;
-						updateMessage.AddData("tcnode", T_CLIPBOARD_NODE, &clipNode,
-							sizeof(TClipboardNodeRef), true, listCount);
+						updateMessage.AddData("tcnode", T_CLIPBOARD_NODE,
+							&clipNode, sizeof(TClipboardNodeRef), true,
+							listCount);
 
 						refsAdded++;
 					} else {
@@ -263,9 +266,11 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 						
 						clipNode.node = *node;
 						clipNode.moveMode = kDelete;	// note removing node
-						updateMessage.AddData("tcnode", T_CLIPBOARD_NODE, &clipNode,
-							sizeof(TClipboardNodeRef), true, listCount);
-						clipNode.moveMode = moveMode; // set it back to current value
+						updateMessage.AddData("tcnode", T_CLIPBOARD_NODE,
+							&clipNode, sizeof(TClipboardNodeRef), true,
+							listCount);
+						clipNode.moveMode = moveMode;
+							// set it back to current value
 					}
 				} else {
 					// add it if it doesn't exist
@@ -274,8 +279,9 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 						pose->SetClipboardMode(moveMode);
 						
 						clipNode.node = *node;
-						updateMessage.AddData("tcnode", T_CLIPBOARD_NODE, &clipNode,
-							sizeof(TClipboardNodeRef), true, listCount);
+						updateMessage.AddData("tcnode", T_CLIPBOARD_NODE,
+							&clipNode, sizeof(TClipboardNodeRef), true,
+							listCount);
 
 						refsAdded++;
 					} else {

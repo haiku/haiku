@@ -1681,7 +1681,8 @@ NodeCacheEntry::Hash() const
 uint32
 NodeCacheEntry::Hash(const node_ref *node)
 {
-	return node->device ^ ((uint32 *)&node->node)[0] ^ ((uint32 *)&node->node)[1];
+	return node->device ^ ((uint32 *)&node->node)[0]
+		^ ((uint32 *)&node->node)[1];
 }
 
 

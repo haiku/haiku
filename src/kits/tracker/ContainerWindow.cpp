@@ -3132,22 +3132,26 @@ BContainerWindow::MarkAttributeMenu(BMenu *menu)
 	for (int32 index = 0; index < count; index++) {
 		BMenuItem *item = menu->ItemAt(index);
 		int32 attrHash;
-		if (item->Message())
+		if (item->Message()) {
 			if (item->Message()->FindInt32("attr_hash", &attrHash) == B_OK)
 				item->SetMarked(PoseView()->ColumnFor((uint32)attrHash) != 0);
 			else
 				item->SetMarked(false);
+		}
 
 		BMenu *submenu = item->Submenu();
 		if (submenu) {
 			int32 count2 = submenu->CountItems();
 			for (int32 subindex = 0; subindex < count2; subindex++) {
 				item = submenu->ItemAt(subindex);
-				if (item->Message())
-					if (item->Message()->FindInt32("attr_hash", &attrHash) == B_OK)
-						item->SetMarked(PoseView()->ColumnFor((uint32)attrHash) != 0);
-					else
+				if (item->Message()) {
+					if (item->Message()->FindInt32("attr_hash", &attrHash)
+						== B_OK) {
+						item->SetMarked(PoseView()->ColumnFor((uint32)attrHash)
+							!= 0);
+					} else
 						item->SetMarked(false);
+				}
 			}
 		}
 	}
