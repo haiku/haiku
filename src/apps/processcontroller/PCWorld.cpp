@@ -91,7 +91,7 @@ PCApplication::ReadyToRun()
 		alertInstall->SetShortcut(0, B_ESCAPE);
 	} else {
 		BAlert* alert = new BAlert("", 
-			"ProcessController are already installed in Deskbar.", "OK", NULL, 
+			"ProcessController is already installed in Deskbar.", "OK", NULL, 
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
