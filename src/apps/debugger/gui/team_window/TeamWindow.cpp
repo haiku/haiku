@@ -9,6 +9,9 @@
 
 #include <Button.h>
 #include <LayoutBuilder.h>
+#include <Menu.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
 #include <Message.h>
 #include <TabView.h>
 #include <ScrollView.h>
@@ -298,6 +301,7 @@ TeamWindow::_Init()
 	BScrollView* sourceScrollView;
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.Add(fMenuBar = new BMenuBar("Menu"))
 		.AddSplit(B_VERTICAL, 3.0f)
 			.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
 			.Add(fTabView = new BTabView("tab view"), 0.4f)
@@ -353,6 +357,19 @@ TeamWindow::_Init()
 	fStepOverButton->SetTarget(this);
 	fRunButton->SetTarget(this);
 	fStepOutButton->SetTarget(this);
+
+	// add menus and menu items
+	BMenu *menu = new BMenu("File");
+	fMenuBar->AddItem(menu);
+	BMenuItem *item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 
+		'Q');
+	menu->AddItem(item);
+	item->SetTarget(this);
+	menu = new BMenu("Edit");
+	fMenuBar->AddItem(menu);
+	item = new BMenuItem("Copy", new BMessage(B_COPY), 'C');
+	menu->AddItem(item);
+	item->SetTarget(fSourceView);
 
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 	_UpdateRunButtons();

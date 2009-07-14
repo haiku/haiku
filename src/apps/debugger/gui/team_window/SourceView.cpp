@@ -10,12 +10,14 @@
 
 #include <stdio.h>
 
+#include <Clipboard.h>
 #include <LayoutUtils.h>
 #include <Looper.h>
 #include <Message.h>
 #include <Polygon.h>
 #include <Region.h>
 #include <ScrollBar.h>
+#include <ScrollView.h>
 
 #include <AutoLocker.h>
 #include <ObjectList.h>
@@ -208,7 +210,7 @@ public:
 	virtual	void				Draw(BRect updateRect);
 	
 	virtual void				KeyDown(const char* bytes, int32 numBytes);
-	
+	virtual void				MakeFocus(bool isFocused);	
 	virtual void				MouseDown(BPoint where);
 	virtual void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
@@ -232,6 +234,7 @@ private:
 									BString& formattedLine);
 			SelectionPoint		_SelectionPointAt(BPoint where) const;
 			void				_GetSelectionRegion(BRegion& region) const;
+			void				_CopySelectionToClipboard() const;
 			
 private:
 			
@@ -935,28 +938,31 @@ SourceView::TextView::KeyDown(const char* bytes, int32 numBytes)
 
 
 void
+SourceView::TextView::MakeFocus(bool isFocused)
+{
+	fSourceView->HighlightBorder(isFocused);
+
+	SourceView::BaseView::MakeFocus(isFocused);
+}
+
+
+void
 SourceView::TextView::MouseDown(BPoint where)
 {
 	if (fSourceCode != NULL) {
-		if (!IsFocus()) {
+		if (!IsFocus()) 
 			MakeFocus(true);
-			Invalidate();
-		}
 		
-		SelectionPoint point = _SelectionPointAt(where);
-		if (point.line >= 0) {
-			// don't reset the selection if the user clicks within the
-			// current selection range
-			
-			if (fSelectionStart.line < 0 || fSelectionEnd.line < 0
-				|| (fSelectionStart.line >= 0 
-					&& point.line < fSelectionStart.line)
-				|| (fSelectionEnd.line >= 0 
-					&& point.line > fSelectionEnd.line)) {
-				fSelectionBase = point;
-				fSelectionMode = true;
-				SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
-			}
+		// don't reset the selection if the user clicks within the
+		// current selection range
+		BRegion region;
+		_GetSelectionRegion(region);
+		if (!region.Contains(where)) {
+			SelectionPoint point = _SelectionPointAt(where);
+			fSelectionBase = fSelectionStart = fSelectionEnd = point;
+			fSelectionMode = true;
+			Invalidate();
+			SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 		}
 	}
 }
@@ -968,6 +974,8 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 
 {
 	if (fSelectionMode) {
+		BRegion oldRegion;
+		_GetSelectionRegion(oldRegion);
 		SelectionPoint point = _SelectionPointAt(where);
 		switch (transit) {
 			case B_INSIDE_VIEW:
@@ -991,7 +999,8 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 		}
 		BRegion region;
 		_GetSelectionRegion(region);
-		Invalidate(region.Frame());
+		region.Include(&oldRegion);
+		Invalidate(&region);
 	}
 }
 
@@ -1043,7 +1052,7 @@ SourceView::TextView::SelectionPoint
 SourceView::TextView::_SelectionPointAt(BPoint where) const
 {
 	int32 line = LineAtOffset(where.y);
-	int32 offset = (int32)max_c(where.x / fCharacterWidth, 0);
+	int32 offset = (int32)max_c((where.x - kLeftTextMargin) / fCharacterWidth, 0);
 	return SelectionPoint(line, offset);
 }
 
@@ -1057,11 +1066,13 @@ SourceView::TextView::_GetSelectionRegion(BRegion &region) const
 	BRect selectionRect;
 	
 	if (fSelectionStart.line == fSelectionEnd.line) {
-		selectionRect.left = fSelectionStart.offset * fCharacterWidth;
-		selectionRect.top = fSelectionStart.line * fFontInfo->lineHeight;
-		selectionRect.right = fSelectionEnd.offset * fCharacterWidth;
-		selectionRect.bottom = selectionRect.top + fFontInfo->lineHeight;
-		region.Include(selectionRect);
+		if (fSelectionStart.offset != fSelectionEnd.offset) {
+			selectionRect.left = fSelectionStart.offset * fCharacterWidth;
+			selectionRect.top = fSelectionStart.line * fFontInfo->lineHeight;
+			selectionRect.right = fSelectionEnd.offset * fCharacterWidth;
+			selectionRect.bottom = selectionRect.top + fFontInfo->lineHeight;
+			region.Include(selectionRect);
+		}
 	} else {
 		// add rect for starting line
 		selectionRect.left = selectionRect.left = fSelectionStart.offset 
@@ -1088,7 +1099,38 @@ SourceView::TextView::_GetSelectionRegion(BRegion &region) const
 			region.Include(selectionRect);
 		}
 	}
+	region.OffsetBy(kLeftTextMargin, 0.0);
 }
+
+
+void
+SourceView::TextView::_CopySelectionToClipboard(void) const
+{
+	if (fSelectionStart.line == -1 || fSelectionEnd.line == -1)
+		return;
+		
+	BString text;
+	if (fSelectionStart.line == fSelectionEnd.line)
+		text.SetTo(fSourceCode->LineAt(fSelectionStart.line) 
+			+ fSelectionStart.offset, fSelectionEnd.offset 
+			- fSelectionStart.offset);
+	else {
+		text << (fSourceCode->LineAt(fSelectionStart.line) 
+			+ fSelectionStart.offset);
+		for (int32 i = fSelectionStart.line + 1; i < fSelectionEnd.line; i++)
+			text += fSourceCode->LineAt(i);
+		text.Append(fSourceCode->LineAt(fSelectionEnd.line),
+			fSelectionEnd.offset);
+	}
+
+	be_clipboard->Lock();
+	be_clipboard->Clear();
+	be_clipboard->Data()->AddData ("text/plain", 
+		B_MIME_TYPE, text.String(), text.Length());
+	be_clipboard->Unlock();
+	
+}
+
 
 // #pragma mark - SourceView
 
@@ -1269,6 +1311,15 @@ printf("  -> scrolling to (%f, %f)\n", visible.left, top - (visible.Height() + 1
 		ScrollBy(0, bottom + fFontInfo.lineHeight - visible.bottom);
 
 	return true;
+}
+
+
+void
+SourceView::HighlightBorder(bool state)
+{
+	BScrollView *parent = dynamic_cast<BScrollView *>(Parent());
+	if (parent)
+		parent->SetBorderHighlighted(state);
 }
 
 

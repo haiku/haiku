@@ -19,6 +19,7 @@
 
 
 class BButton;
+class BMenuBar;
 class BTabView;
 class Image;
 class RegisterView;
@@ -123,6 +124,7 @@ private:
 			BButton*			fStepOverButton;
 			BButton*			fStepIntoButton;
 			BButton*			fStepOutButton;
+			BMenuBar*			fMenuBar;
 };
 
 

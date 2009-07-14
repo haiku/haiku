@@ -43,6 +43,7 @@ public:
 			bool				ScrollToAddress(target_addr_t address);
 			bool				ScrollToLine(uint32 line);
 
+			void				HighlightBorder(bool state);
 	virtual	void				TargetedByScrollView(BScrollView* scrollView);
 
 	virtual	BSize				MinSize();
@@ -61,6 +62,7 @@ private:
 				font_height	fontHeight;
 				float		lineHeight;
 			};
+
 
 private:
 			void				_Init();
