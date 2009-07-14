@@ -14,7 +14,7 @@
 
 /* Synthesizer things */
 
-#define B_SYNTH_DIRECTORY    B_BEOS_ETC_DIRECTORY
+#define B_SYNTH_DIRECTORY    B_BEOS_DATA_DIRECTORY
 #define B_BIG_SYNTH_FILE     "synth/big_synth.sy"
 #define B_LITTLE_SYNTH_FILE  "synth/little_synth.sy"
 

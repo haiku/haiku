@@ -346,7 +346,6 @@ SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;
 AddFilesToHaikuImage system data artwork : $(logoArtwork) ;
 
 AddDirectoryToHaikuImage system data sounds ;
-AddDirectoryToHaikuImage system etc synth ;
 
 # Add mail provider infos.
 AddFilesToHaikuImage home config settings Mail ProviderInfo : $(HAIKU_PROVIDER_INFOS) ;
