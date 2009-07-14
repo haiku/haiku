@@ -958,6 +958,10 @@ SourceView::TextView::MessageReceived(BMessage* message)
 			_CopySelectionToClipboard();
 			break;
 
+		case B_MOUSE_WHEEL_CHANGED:
+			fSourceView->MessageReceived(message);
+			break;
+
 		default:
 			SourceView::BaseView::MessageReceived(message);
 			break;
