@@ -26,6 +26,7 @@
 #include "DisassembledCode.h"
 #include "Function.h"
 #include "FileSourceCode.h"
+#include "LocatableFile.h"
 #include "StackTrace.h"
 #include "Statement.h"
 #include "TeamDebugModel.h"
@@ -202,8 +203,6 @@ public:
 								TextView(SourceView* sourceView,
 									FontInfo* fontInfo);
 
-			void				CopySelectionToClipboard() const;
-
 	virtual	void				SetSourceCode(SourceCode* sourceCode);
 
 	virtual	BSize				MinSize();
@@ -237,6 +236,8 @@ private:
 									BString& formattedLine);
 			SelectionPoint		_SelectionPointAt(BPoint where) const;
 			void				_GetSelectionRegion(BRegion& region) const;
+			void				_GetSelectionText(BString& text) const;
+			void				_CopySelectionToClipboard() const;
 
 private:
 
@@ -954,7 +955,7 @@ SourceView::TextView::MessageReceived(BMessage* message)
 	switch (message->what)
 	{
 		case B_COPY:
-			CopySelectionToClipboard();
+			_CopySelectionToClipboard();
 			break;
 
 		default:
@@ -990,6 +991,7 @@ void
 SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 	const BMessage* dragMessage)
 {
+	BRegion region;
 	if (fSelectionMode) {
 		BRegion oldRegion;
 		_GetSelectionRegion(oldRegion);
@@ -1014,10 +1016,23 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 			// TODO: handle scrolling when mouse is moved outside
 			// view bounds
 		}
-		BRegion region;
 		_GetSelectionRegion(region);
 		region.Include(&oldRegion);
 		Invalidate(&region);
+	} else {
+		_GetSelectionRegion(region);
+		if (region.CountRects() > 0) {
+			BString text;
+			_GetSelectionText(text);
+			BMessage message;
+			message.AddData ("text/plain", B_MIME_TYPE, text.String(),
+				text.Length());
+			BString clipName = fSourceCode->GetSourceFile()->Name();
+			clipName << " clipping";
+			message.AddString ("be:clip_name", clipName.String());
+			message.AddInt32 ("be:actions", B_COPY_TARGET);
+			DragMessage(&message, region.Frame());
+		}
 	}
 }
 
@@ -1127,12 +1142,11 @@ SourceView::TextView::_GetSelectionRegion(BRegion &region) const
 
 
 void
-SourceView::TextView::CopySelectionToClipboard(void) const
+SourceView::TextView::_GetSelectionText(BString& text) const
 {
 	if (fSelectionStart.line == -1 || fSelectionEnd.line == -1)
 		return;
 
-	BString text;
 	if (fSelectionStart.line == fSelectionEnd.line) {
 		text.SetTo(fSourceCode->LineAt(fSelectionStart.line)
 			+ fSelectionStart.offset, fSelectionEnd.offset
@@ -1146,13 +1160,23 @@ SourceView::TextView::CopySelectionToClipboard(void) const
 		text.Append(fSourceCode->LineAt(fSelectionEnd.line),
 			fSelectionEnd.offset);
 	}
+}
 
-	be_clipboard->Lock();
-	be_clipboard->Data()->RemoveData("text/plain");
-	be_clipboard->Data()->AddData ("text/plain",
-		B_MIME_TYPE, text.String(), text.Length());
-	be_clipboard->Commit();
-	be_clipboard->Unlock();
+
+void
+SourceView::TextView::_CopySelectionToClipboard(void) const
+{
+	BString text;
+	_GetSelectionText(text);
+
+	if (text.Length() > 0) {
+		be_clipboard->Lock();
+		be_clipboard->Data()->RemoveData("text/plain");
+		be_clipboard->Data()->AddData ("text/plain",
+			B_MIME_TYPE, text.String(), text.Length());
+		be_clipboard->Commit();
+		be_clipboard->Unlock();
+	}
 }
 
 
