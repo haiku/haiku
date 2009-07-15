@@ -455,6 +455,15 @@ ArchitectureX86::ReadValueFromMemory(target_addr_t address, uint32 valueType,
 
 
 status_t
+ArchitectureX86::ReadValueFromMemory(target_addr_t addressSpace,
+	target_addr_t address, uint32 valueType, BVariant& _value) const
+{
+	// n/a on this architecture
+	return B_BAD_VALUE;
+}
+
+
+status_t
 ArchitectureX86::DisassembleCode(FunctionDebugInfo* function,
 	const void* buffer, size_t bufferSize, DisassembledCode*& _sourceCode)
 {

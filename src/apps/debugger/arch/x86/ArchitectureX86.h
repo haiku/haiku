@@ -43,6 +43,9 @@ public:
 
 	virtual	status_t			ReadValueFromMemory(target_addr_t address,
 									uint32 valueType, BVariant& _value) const;
+	virtual	status_t			ReadValueFromMemory(target_addr_t addressSpace,
+									target_addr_t address, uint32 valueType,
+									BVariant& _value) const;
 
 	virtual	status_t			DisassembleCode(FunctionDebugInfo* function,
 									const void* buffer, size_t bufferSize,
