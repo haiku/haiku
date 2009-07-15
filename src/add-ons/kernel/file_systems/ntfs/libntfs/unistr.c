@@ -707,7 +707,7 @@ fail:
  * Returns the number of bytes consumed, or 0 on error.
  */
 static int
-ntfs_wc_to_utf8(wchar_t c,unsigned char* buf)
+ntfs_utf16_to_utf8(ntfschar c, unsigned char* buf)
 {
 	if(c==0)
 		return 0; /* No support for embedded 0 runes */
@@ -740,7 +740,7 @@ ntfs_wc_to_utf8(wchar_t c,unsigned char* buf)
  * Returns the number of bytes consumed, or 0 on error.
  */
 static int
-ntfs_wc_from_utf8(const unsigned char* str, ntfschar* c)
+ntfs_utf16_from_utf8(const unsigned char* str, ntfschar* c)
 {
 	int l=0,i;
 
@@ -787,7 +787,7 @@ static inline int ntfs_dupuni2utf8(const ntfschar* in, int in_len,char **out,int
 
 	/* count the length of the resulting UTF-8 */
 	for(i=len8=0;i<in_len;i++) {
-		tmp=ntfs_wc_to_utf8(le16_to_cpu( *(in+i) ),0);
+		tmp=ntfs_utf16_to_utf8(le16_to_cpu( *(in+i) ),0);
 		if(!tmp)
 			/* invalid character */
 			return EILSEQ;
@@ -800,7 +800,7 @@ static inline int ntfs_dupuni2utf8(const ntfschar* in, int in_len,char **out,int
 	result[len8]='\0';
 	*out_len=len8;
 	for(i=len8=0;i<in_len;i++)
-		len8+=ntfs_wc_to_utf8(le16_to_cpu( *(in+i) ),result+len8);
+		len8+=ntfs_utf16_to_utf8(le16_to_cpu( *(in+i) ),result+len8);
 	return 0;
 }
 
@@ -815,7 +815,7 @@ static inline int ntfs_duputf82uni(unsigned char* in, int in_len,ntfschar** out,
 	ntfschar* result;
 	ntfschar wtmp;
 	for(i=len16=0;i<in_len;i+=tmp,len16++) {
-		tmp=ntfs_wc_from_utf8(in+i,&wtmp);
+		tmp=ntfs_utf16_from_utf8(in+i,&wtmp);
 		if(!tmp)
 			return EILSEQ;
 	}
@@ -826,7 +826,7 @@ static inline int ntfs_duputf82uni(unsigned char* in, int in_len,ntfschar** out,
 	*out_len=len16;
 	for(i=len16=0;i<in_len;i+=tmp,len16++)
 	{
-		tmp=ntfs_wc_from_utf8(in+i, &wtmp);
+		tmp=ntfs_utf16_from_utf8(in+i, &wtmp);
 		*(result+len16) = cpu_to_le16(wtmp);
 	}
 	return 0;
