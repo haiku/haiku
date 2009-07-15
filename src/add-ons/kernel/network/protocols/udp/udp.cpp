@@ -1146,6 +1146,15 @@ udp_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 }
 
 
+ssize_t
+udp_process_ancillary_data_no_container(net_protocol *protocol,
+	net_buffer* buffer, void *data, size_t dataSize)
+{
+	return protocol->next->module->process_ancillary_data_no_container(
+		protocol, buffer, data, dataSize);
+}
+
+
 //	#pragma mark - module interface
 
 
@@ -1256,6 +1265,7 @@ net_protocol_module_info sUDPModule = {
 	udp_error_reply,
 	NULL,		// add_ancillary_data()
 	NULL,		// process_ancillary_data()
+	udp_process_ancillary_data_no_container,
 	NULL,		// send_data_no_buffer()
 	NULL		// read_data_no_buffer()
 };

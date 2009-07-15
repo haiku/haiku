@@ -79,6 +79,8 @@ struct net_protocol_module_info {
 	ssize_t		(*process_ancillary_data)(net_protocol *self,
 					const ancillary_data_header *header, const void *data,
 					void *buffer, size_t bufferSize);
+	ssize_t		(*process_ancillary_data_no_container)(net_protocol *self,
+					net_buffer *buffer, void *buffer, size_t bufferSize);
 
 	ssize_t		(*send_data_no_buffer)(net_protocol *self, const iovec *vecs,
 					size_t vecCount, ancillary_data_container *ancillaryData,

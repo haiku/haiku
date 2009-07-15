@@ -166,12 +166,14 @@ struct ipv4_protocol : net_protocol {
 	uint8		time_to_live;
 	uint8		multicast_time_to_live;
 	uint32		flags;
+	struct sockaddr* interface_address; // for IP_MULTICAST_IF
 
 	IPv4MulticastFilter multicast_filter;
 };
 
 // protocol flags
-#define IP_FLAG_HEADER_INCLUDED	0x01
+#define IP_FLAG_HEADER_INCLUDED		0x01
+#define IP_FLAG_RECEIVE_DEST_ADDR	0x02
 
 
 static const int kDefaultTTL = 254;
@@ -214,7 +216,8 @@ print_address(const in_addr* address, char* buf, size_t bufLen)
 
 
 RawSocket::RawSocket(net_socket* socket)
-	: DatagramSocket<>("ipv4 raw socket", socket)
+	:
+	DatagramSocket<>("ipv4 raw socket", socket)
 {
 }
 
@@ -1013,6 +1016,7 @@ ipv4_init_protocol(net_socket* socket)
 	protocol->time_to_live = kDefaultTTL;
 	protocol->multicast_time_to_live = kDefaultMulticastTTL;
 	protocol->flags = 0;
+	protocol->interface_address = NULL;
 	return protocol;
 }
 
@@ -1023,6 +1027,7 @@ ipv4_uninit_protocol(net_protocol* _protocol)
 	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
 
 	delete protocol->raw;
+	delete protocol->interface_address;
 	delete protocol;
 	return B_OK;
 }
@@ -1118,6 +1123,10 @@ ipv4_getsockopt(net_protocol* _protocol, int level, int option, void* value,
 			return get_int_option(value, *_length,
 				(protocol->flags & IP_FLAG_HEADER_INCLUDED) != 0);
 		}
+		if (option == IP_RECVDSTADDR) {
+			return get_int_option(value, *_length,
+				(protocol->flags & IP_FLAG_RECEIVE_DEST_ADDR) != 0);
+		}
 		if (option == IP_TTL)
 			return get_int_option(value, *_length, protocol->time_to_live);
 		if (option == IP_TOS)
@@ -1175,10 +1184,59 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 
 			return B_OK;
 		}
+		if (option == IP_RECVDSTADDR) {
+			int getAddress;
+			if (length != sizeof(int))
+				return B_BAD_VALUE;
+			if (user_memcpy(&getAddress, value, sizeof(int)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			if (getAddress && (protocol->socket->type == SOCK_DGRAM
+					|| protocol->socket->type == SOCK_RAW))
+				protocol->flags |= IP_FLAG_RECEIVE_DEST_ADDR;
+			else
+				protocol->flags &= ~IP_FLAG_RECEIVE_DEST_ADDR;
+
+			return B_OK;
+		}
 		if (option == IP_TTL)
 			return set_int_option(protocol->time_to_live, value, length);
 		if (option == IP_TOS)
 			return set_int_option(protocol->service_type, value, length);
+		if (option == IP_MULTICAST_IF) {
+			if (length != sizeof(struct in_addr))
+				return B_BAD_VALUE;
+
+			struct sockaddr_in* address = new (std::nothrow) sockaddr_in;
+			if (address == NULL)
+				return B_NO_MEMORY;
+
+			if (user_memcpy(&address->sin_addr, value, sizeof(struct in_addr))
+					!= B_OK) {
+				delete address;
+				return B_BAD_ADDRESS;
+			}
+
+			// Using INADDR_ANY to remove the previous setting.
+			if (address->sin_addr.s_addr == htonl(INADDR_ANY)) {
+				delete address;
+				delete protocol->interface_address;
+				protocol->interface_address = NULL;
+				return B_OK;
+			}
+
+			struct net_interface* interface
+				= sDatalinkModule->get_interface_with_address(sDomain,
+					(struct sockaddr*)address);
+			if (interface == NULL) {
+				delete address;
+				return EADDRNOTAVAIL;
+			}
+
+			delete protocol->interface_address;
+			protocol->interface_address = (struct sockaddr*)address;
+			return B_OK;
+		}
 		if (option == IP_MULTICAST_TTL) {
 			return set_int_option(protocol->multicast_time_to_live, value,
 				length);
@@ -1405,6 +1463,25 @@ ipv4_send_data(net_protocol* _protocol, net_buffer* buffer)
 			offsetof(ipv4_header, destination)>(buffer));
 	}
 
+	// handle IP_MULTICAST_IF
+	if (IN_MULTICAST(ntohl(((sockaddr_in*)buffer->destination)->
+			sin_addr.s_addr)) && protocol->interface_address != NULL) {
+		net_interface* interface
+			= sDatalinkModule->get_interface_with_address(sDomain,
+				protocol->interface_address);
+		if (interface == NULL || (interface->flags & IFF_UP) == 0)
+			return EADDRNOTAVAIL;
+
+		buffer->interface = interface;
+
+		net_route* route = sDatalinkModule->get_route(sDomain,
+			interface->address);
+		if (route == NULL)
+			return ENETUNREACH;
+
+		return sDatalinkModule->send_data(route, buffer);
+	}
+
 	return sDatalinkModule->send_datagram(protocol, sDomain, buffer);
 }
 
@@ -1600,6 +1677,32 @@ ipv4_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
 }
 
 
+ssize_t
+ipv4_process_ancillary_data_no_container(net_protocol* protocol,
+	net_buffer* buffer, void* msgControl, size_t msgControlLen)
+{
+	ssize_t bytesWritten = 0;
+
+	if ((((ipv4_protocol*)protocol)->flags & IP_FLAG_RECEIVE_DEST_ADDR) != 0) {
+		if (msgControlLen < CMSG_SPACE(sizeof(struct in_addr)))
+			return B_NO_MEMORY;
+
+		cmsghdr* messageHeader = (cmsghdr*)msgControl;
+		messageHeader->cmsg_len = CMSG_LEN(sizeof(struct in_addr));
+		messageHeader->cmsg_level = IPPROTO_IP;
+		messageHeader->cmsg_type = IP_RECVDSTADDR;
+
+		memcpy(CMSG_DATA(messageHeader),
+		 	&((struct sockaddr_in*)buffer->destination)->sin_addr,
+		 	sizeof(struct in_addr));
+
+		bytesWritten += CMSG_SPACE(sizeof(struct in_addr));
+	}
+
+	return bytesWritten;
+}
+
+
 //	#pragma mark -
 
 
@@ -1741,6 +1844,7 @@ net_protocol_module_info gIPv4Module = {
 	ipv4_error_reply,
 	NULL,		// add_ancillary_data()
 	NULL,		// process_ancillary_data()
+	ipv4_process_ancillary_data_no_container,
 	NULL,		// send_data_no_buffer()
 	NULL		// read_data_no_buffer()
 };

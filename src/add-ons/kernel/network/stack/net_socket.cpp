@@ -255,6 +255,32 @@ process_ancillary_data(net_socket* socket, ancillary_data_container* container,
 }
 
 
+static status_t
+process_ancillary_data(net_socket* socket,
+	net_buffer* buffer, msghdr* messageHeader)
+{
+	void *dataBuffer = messageHeader->msg_control;
+	ssize_t bytesWritten;
+
+	if (dataBuffer == NULL) {
+		messageHeader->msg_controllen = 0;
+		return B_OK;
+	}
+	
+	if (socket->first_info->process_ancillary_data_no_container == NULL)
+		return EOPNOTSUPP;
+	
+	bytesWritten = socket->first_info->process_ancillary_data_no_container(
+		socket->first_protocol, buffer, dataBuffer,
+		messageHeader->msg_controllen);
+	if (bytesWritten < 0)
+		return bytesWritten;
+	messageHeader->msg_controllen = bytesWritten;
+	
+	return B_OK;
+}
+
+
 static ssize_t
 socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 	size_t length, int flags)
@@ -1171,8 +1197,12 @@ socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 	// process ancillary data
 	if (header != NULL) {
 		if (buffer != NULL && header->msg_control != NULL) {
-			status = process_ancillary_data(socket,
-				gNetBufferModule.get_ancillary_data(buffer), header);
+			ancillary_data_container* container
+				= gNetBufferModule.get_ancillary_data(buffer);
+			if (container != NULL)
+				status = process_ancillary_data(socket, container, header);
+			else 
+				status = process_ancillary_data(socket, buffer, header);
 			if (status != B_OK) {
 				gNetBufferModule.free(buffer);
 				return status;

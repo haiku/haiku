@@ -508,6 +508,7 @@ net_protocol_module_info gUnixModule = {
 	unix_error_reply,
 	unix_add_ancillary_data,
 	unix_process_ancillary_data,
+	NULL,
 	unix_send_data_no_buffer,
 	unix_read_data_no_buffer
 };

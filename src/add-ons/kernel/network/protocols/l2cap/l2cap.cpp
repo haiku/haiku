@@ -383,6 +383,7 @@ net_protocol_module_info gL2CAPModule = {
 	l2cap_error_reply,
 	NULL,		// add_ancillary_data()
 	NULL,		// process_ancillary_data()
+	NULL,		// process_ancillary_data_no_container()
 	NULL,		// send_data_no_buffer()
 	NULL		// read_data_no_buffer()
 };
