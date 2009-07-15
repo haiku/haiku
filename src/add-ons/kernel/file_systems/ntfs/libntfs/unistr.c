@@ -740,7 +740,7 @@ ntfs_wc_to_utf8(wchar_t c,unsigned char* buf)
  * Returns the number of bytes consumed, or 0 on error.
  */
 static int
-ntfs_wc_from_utf8(const unsigned char* str,wchar_t *c)
+ntfs_wc_from_utf8(const unsigned char* str, ntfschar* c)
 {
 	int l=0,i;
 
@@ -779,7 +779,7 @@ ntfs_wc_from_utf8(const unsigned char* str,wchar_t *c)
  * The caller has to free the result string.
  * There is no support for UTF-16, yet
  */
-static inline int ntfs_dupuni2utf8(wchar_t* in, int in_len,char **out,int *out_len)
+static inline int ntfs_dupuni2utf8(const ntfschar* in, int in_len,char **out,int *out_len)
 {
 	int i,tmp;
 	int len8;
@@ -807,13 +807,13 @@ static inline int ntfs_dupuni2utf8(wchar_t* in, int in_len,char **out,int *out_l
 /* Converts an UTF-8 sequence to a wide string. Same conventions as the
  * previous function
  */
-static inline int ntfs_duputf82uni(unsigned char* in, int in_len,wchar_t** out,int *out_len)
+static inline int ntfs_duputf82uni(unsigned char* in, int in_len,ntfschar** out,int *out_len)
 {
 	int i,tmp;
 	int len16;
 
-	wchar_t* result;
-	wchar_t wtmp;
+	ntfschar* result;
+	ntfschar wtmp;
 	for(i=len16=0;i<in_len;i+=tmp,len16++) {
 		tmp=ntfs_wc_from_utf8(in+i,&wtmp);
 		if(!tmp)
@@ -861,7 +861,7 @@ static inline int ntfs_duputf82uni(unsigned char* in, int in_len,wchar_t** out,i
 int ntfs_ucstombs(const ntfschar *ins, const int ins_len, char **outs,	int outs_len)
 {
 	int out_len = outs_len;
-	if(ntfs_dupuni2utf8((wchar_t*)ins,ins_len,outs,&out_len)==0)
+	if(ntfs_dupuni2utf8(ins,ins_len,outs,&out_len)==0)
 	  	return out_len;
 	else
 		return EINVAL;
