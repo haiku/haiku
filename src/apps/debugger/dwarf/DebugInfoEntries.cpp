@@ -21,10 +21,9 @@ DIECompileUnitBase::DIECompileUnitBase()
 	fCompilationDir(NULL),
 	fLowPC(0),
 	fHighPC(0),
-	fStatementListOffset(0),
-	fMacroInfoOffset(0),
-		// TODO: Is 0 a good invalid offset?
-	fAddressRanges(NULL),
+	fStatementListOffset(-1),
+	fMacroInfoOffset(-1),
+	fAddressRangesOffset(-1),
 	fBaseTypesUnit(NULL),
 	fLanguage(0),
 	fIdentifierCase(0),
@@ -35,8 +34,6 @@ DIECompileUnitBase::DIECompileUnitBase()
 
 DIECompileUnitBase::~DIECompileUnitBase()
 {
-	if (fAddressRanges != NULL)
-		fAddressRanges->RemoveReference();
 }
 
 
@@ -70,16 +67,6 @@ const char*
 DIECompileUnitBase::Name() const
 {
 	return fName;
-}
-
-
-target_addr_t
-DIECompileUnitBase::AddressRangeBase() const
-{
-	if (fAddressRanges != NULL)
-		return fAddressRanges->LowestAddress();
-
-	return fLowPC;
 }
 
 
@@ -197,14 +184,7 @@ status_t
 DIECompileUnitBase::AddAttribute_ranges(uint16 attributeName,
 	const AttributeValue& value)
 {
-	if (fAddressRanges != NULL)
-		fAddressRanges->RemoveReference();
-
-	fAddressRanges = value.rangeList;
-
-	if (fAddressRanges != NULL)
-		fAddressRanges->AddReference();
-
+	fAddressRangesOffset = value.pointer;
 	return B_OK;
 }
 
@@ -1547,7 +1527,7 @@ DIESubprogram::DIESubprogram()
 	:
 	fLowPC(0),
 	fHighPC(0),
-	fAddressRanges(NULL),
+	fAddressRangesOffset(-1),
 	fSpecification(NULL),
 	fAbstractOrigin(NULL),
 	fReturnType(NULL),
@@ -1560,8 +1540,6 @@ DIESubprogram::DIESubprogram()
 
 DIESubprogram::~DIESubprogram()
 {
-	if (fAddressRanges != NULL)
-		fAddressRanges->RemoveReference();
 }
 
 
@@ -1609,14 +1587,7 @@ status_t
 DIESubprogram::AddAttribute_ranges(uint16 attributeName,
 	const AttributeValue& value)
 {
-	if (fAddressRanges != NULL)
-		fAddressRanges->RemoveReference();
-
-	fAddressRanges = value.rangeList;
-
-	if (fAddressRanges != NULL)
-		fAddressRanges->AddReference();
-
+	fAddressRangesOffset = value.pointer;
 	return B_OK;
 }
 

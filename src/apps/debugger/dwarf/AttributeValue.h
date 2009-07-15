@@ -6,7 +6,6 @@
 #define ATTRIBUTE_VALUE_H
 
 #include "AttributeClasses.h"
-#include "TargetAddressRangeList.h"
 #include "Types.h"
 
 
@@ -22,7 +21,6 @@ struct AttributeValue {
 		}					block;
 		uint64				constant;
 		bool				flag;
-		TargetAddressRangeList*	rangeList;
 		off_t				pointer;
 		DebugInfoEntry*		reference;
 		const char*			string;
@@ -94,13 +92,11 @@ struct AttributeValue {
 		this->pointer = value;
 	}
 
-	void SetToRangeList(TargetAddressRangeList* rangeList)
+	void SetToRangeListPointer(off_t value)
 	{
 		Unset();
 		attributeClass = ATTRIBUTE_CLASS_RANGELISTPTR;
-		this->rangeList = rangeList;
-		if (rangeList != NULL)
-			rangeList->AddReference();
+		this->pointer = value;
 	}
 
 	void SetToReference(DebugInfoEntry* entry)
@@ -119,10 +115,6 @@ struct AttributeValue {
 
 	void Unset()
 	{
-		if (attributeClass == ATTRIBUTE_CLASS_RANGELISTPTR
-			&& rangeList != NULL) {
-			rangeList->RemoveReference();
-		}
 		attributeClass = ATTRIBUTE_CLASS_UNKNOWN;
 	}
 

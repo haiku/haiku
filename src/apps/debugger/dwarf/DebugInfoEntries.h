@@ -151,12 +151,11 @@ public:
 			const DebugInfoEntryList& Types() const	{ return fTypes; }
 			const DebugInfoEntryList& OtherChildren() const
 										{ return fOtherChildren; }
-			TargetAddressRangeList* AddressRanges() const
-										{ return fAddressRanges; }
+			off_t				AddressRangesOffset() const
+										{ return fAddressRangesOffset; }
 
 			target_addr_t		LowPC() const	{ return fLowPC; }
 			target_addr_t		HighPC() const	{ return fHighPC; }
-			target_addr_t		AddressRangeBase() const;
 
 			off_t				StatementListOffset() const
 									{ return fStatementListOffset; }
@@ -202,7 +201,7 @@ protected:
 			target_addr_t		fHighPC;
 			off_t				fStatementListOffset;
 			off_t				fMacroInfoOffset;
-			TargetAddressRangeList*	fAddressRanges;
+			off_t				fAddressRangesOffset;
 			DIECompileUnitBase*	fBaseTypesUnit;
 			DebugInfoEntryList	fTypes;
 			DebugInfoEntryList	fOtherChildren;
@@ -1025,8 +1024,8 @@ public:
 	virtual	DebugInfoEntry*		Specification() const;
 	virtual	DebugInfoEntry*		AbstractOrigin() const;
 
-			TargetAddressRangeList* AddressRanges() const
-										{ return fAddressRanges; }
+			off_t				AddressRangesOffset() const
+										{ return fAddressRangesOffset; }
 
 			target_addr_t		LowPC() const	{ return fLowPC; }
 			target_addr_t		HighPC() const	{ return fHighPC; }
@@ -1057,7 +1056,7 @@ public:
 protected:
 			target_addr_t		fLowPC;
 			target_addr_t		fHighPC;
-			TargetAddressRangeList*	fAddressRanges;
+			off_t				fAddressRangesOffset;
 			DIESubprogram*		fSpecification;
 			DIESubprogram*		fAbstractOrigin;
 			DIEType*			fReturnType;

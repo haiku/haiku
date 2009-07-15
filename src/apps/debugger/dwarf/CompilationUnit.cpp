@@ -3,9 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "CompilationUnit.h"
 
 #include <new>
+
+#include "DebugInfoEntries.h"
+#include "TargetAddressRangeList.h"
 
 
 struct CompilationUnit::File {
@@ -32,6 +36,7 @@ CompilationUnit::CompilationUnit(off_t headerOffset, off_t contentOffset,
 	fAbbreviationOffset(abbreviationOffset),
 	fAbbreviationTable(NULL),
 	fUnitEntry(NULL),
+	fAddressRanges(NULL),
 	fDirectories(10, true),
 	fFiles(10, true),
 	fLineNumberProgram(addressSize),
@@ -43,6 +48,7 @@ CompilationUnit::CompilationUnit(off_t headerOffset, off_t contentOffset,
 
 CompilationUnit::~CompilationUnit()
 {
+	SetAddressRanges(NULL);
 }
 
 
@@ -71,6 +77,29 @@ void
 CompilationUnit::SetUnitEntry(DIECompileUnitBase* entry)
 {
 	fUnitEntry = entry;
+}
+
+
+void
+CompilationUnit::SetAddressRanges(TargetAddressRangeList* ranges)
+{
+	if (fAddressRanges != NULL)
+		fAddressRanges->ReleaseReference();
+
+	fAddressRanges = ranges;
+
+	if (fAddressRanges != NULL)
+		fAddressRanges->AcquireReference();
+}
+
+
+target_addr_t
+CompilationUnit::AddressRangeBase() const
+{
+	if (fAddressRanges != NULL)
+		return fAddressRanges->LowestAddress();
+
+	return fUnitEntry != NULL ? fUnitEntry->LowPC() : 0;
 }
 
 

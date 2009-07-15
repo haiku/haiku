@@ -223,6 +223,52 @@ DwarfFile::CompilationUnitForDIE(const DebugInfoEntry* entry) const
 }
 
 
+TargetAddressRangeList*
+DwarfFile::ResolveRangeList(CompilationUnit* unit, uint64 offset) const
+{
+	if (unit == NULL || fDebugRangesSection == NULL)
+		return NULL;
+
+	if (offset < 0 || offset >= (uint64)fDebugRangesSection->Size())
+		return NULL;
+
+	TargetAddressRangeList* ranges = new(std::nothrow) TargetAddressRangeList;
+	if (ranges == NULL) {
+		fprintf(stderr, "Out of memory.\n");
+		return NULL;
+	}
+	Reference<TargetAddressRangeList> rangesReference(ranges, true);
+
+	target_addr_t baseAddress = unit->AddressRangeBase();
+	target_addr_t maxAddress = unit->MaxAddress();
+
+	DataReader dataReader((uint8*)fDebugRangesSection->Data() + offset,
+		fDebugRangesSection->Size() - offset, unit->AddressSize());
+	while (true) {
+		target_addr_t start = dataReader.ReadAddress(0);
+		target_addr_t end = dataReader.ReadAddress(0);
+		if (dataReader.HasOverflow())
+			return NULL;
+
+		if (start == 0 && end == 0)
+			break;
+		if (start == maxAddress) {
+			baseAddress = end;
+			continue;
+		}
+		if (start == end)
+			continue;
+
+		if (!ranges->AddRange(baseAddress + start, end - start)) {
+			fprintf(stderr, "Out of memory.\n");
+			return NULL;
+		}
+	}
+
+	return rangesReference.Detach();
+}
+
+
 status_t
 DwarfFile::UnwindCallFrame(CompilationUnit* unit, target_addr_t location,
 	const DwarfTargetInterface* inputInterface,
@@ -581,6 +627,13 @@ printf("entry %p at %lld\n", entry, offset);
 		}
 	}
 
+	// resolve the compilation unit's address range list
+	if (TargetAddressRangeList* ranges = ResolveRangeList(unit,
+			unit->UnitEntry()->AddressRangesOffset())) {
+		unit->SetAddressRanges(ranges);
+		ranges->ReleaseReference();
+	}
+
 	// add compilation dir to directory list
 	const char* compilationDir = unit->UnitEntry()->CompilationDir();
 	if (!unit->AddDirectory(compilationDir != NULL ? compilationDir : "."))
@@ -743,15 +796,8 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				attributeValue.SetToMacroPointer(value);
 				break;
 			case ATTRIBUTE_CLASS_RANGELISTPTR:
-			{
-				if (entry != NULL) {
-					TargetAddressRangeList* rangeList
-						= _ResolveRangeList(value);
-					Reference<TargetAddressRangeList> reference(rangeList);
-					attributeValue.SetToRangeList(rangeList);
-				}
+				attributeValue.SetToRangeListPointer(value);
 				break;
-			}
 			case ATTRIBUTE_CLASS_REFERENCE:
 				if (entry != NULL) {
 					attributeValue.SetToReference(_ResolveReference(value,
@@ -1333,52 +1379,4 @@ DwarfFile::_ResolveReference(uint64 offset, bool localReference) const
 
 	// TODO: Implement program-global references!
 	return NULL;
-}
-
-
-TargetAddressRangeList*
-DwarfFile::_ResolveRangeList(uint64 offset)
-{
-	if (fDebugRangesSection == NULL)
-		return NULL;
-
-	if (offset >= (uint64)fDebugRangesSection->Size())
-		return NULL;
-
-	TargetAddressRangeList* ranges = new(std::nothrow) TargetAddressRangeList;
-	if (ranges == NULL) {
-		fprintf(stderr, "Out of memory.\n");
-		return NULL;
-	}
-	Reference<TargetAddressRangeList> rangesReference(ranges);
-
-	target_addr_t baseAddress
-		= fCurrentCompilationUnit->UnitEntry()->AddressRangeBase();
-	target_addr_t maxAddress = fCurrentCompilationUnit->MaxAddress();
-
-	DataReader dataReader((uint8*)fDebugRangesSection->Data() + offset,
-		fDebugRangesSection->Size() - offset,
-		fCurrentCompilationUnit->AddressSize());
-	while (true) {
-		target_addr_t start = dataReader.ReadAddress(0);
-		target_addr_t end = dataReader.ReadAddress(0);
-		if (dataReader.HasOverflow())
-			return NULL;
-
-		if (start == 0 && end == 0)
-			break;
-		if (start == maxAddress) {
-			baseAddress = end;
-			continue;
-		}
-		if (start == end)
-			continue;
-
-		if (!ranges->AddRange(baseAddress + start, end - start)) {
-			fprintf(stderr, "Out of memory.\n");
-			return NULL;
-		}
-	}
-
-	return rangesReference.Detach();
 }

@@ -5,6 +5,7 @@
 #ifndef COMPILATION_UNIT_H
 #define COMPILATION_UNIT_H
 
+
 #include <String.h>
 
 #include <ObjectList.h>
@@ -17,6 +18,7 @@
 class AbbreviationTable;
 class DebugInfoEntry;
 class DIECompileUnitBase;
+class TargetAddressRangeList;
 
 
 class CompilationUnit {
@@ -51,6 +53,13 @@ public:
 			DIECompileUnitBase*	UnitEntry() const	{ return fUnitEntry; }
 			void				SetUnitEntry(DIECompileUnitBase* entry);
 
+			TargetAddressRangeList* AddressRanges() const
+									{ return fAddressRanges; }
+			void				SetAddressRanges(
+									TargetAddressRangeList* ranges);
+
+			target_addr_t		AddressRangeBase() const;
+
 			LineNumberProgram&	GetLineNumberProgram()
 									{ return fLineNumberProgram; }
 
@@ -82,6 +91,7 @@ private:
 			off_t				fAbbreviationOffset;
 			AbbreviationTable*	fAbbreviationTable;
 			DIECompileUnitBase*	fUnitEntry;
+			TargetAddressRangeList* fAddressRanges;
 			Array<DebugInfoEntry*> fEntries;
 			Array<off_t>		fEntryOffsets;
 			DirectoryList		fDirectories;

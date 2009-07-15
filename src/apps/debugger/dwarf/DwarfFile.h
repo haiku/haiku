@@ -39,6 +39,9 @@ public:
 			CompilationUnit*	CompilationUnitForDIE(
 									const DebugInfoEntry* entry) const;
 
+			TargetAddressRangeList* ResolveRangeList(CompilationUnit* unit,
+									uint64 offset) const;
+
 			status_t			UnwindCallFrame(CompilationUnit* unit,
 									target_addr_t location,
 									const DwarfTargetInterface* inputInterface,

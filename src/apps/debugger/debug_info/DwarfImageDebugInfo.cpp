@@ -37,6 +37,7 @@
 #include "StackFrame.h"
 #include "Statement.h"
 #include "StringUtils.h"
+#include "TargetAddressRangeList.h"
 #include "TeamMemory.h"
 #include "UnsupportedLanguage.h"
 
@@ -230,9 +231,8 @@ printf("  %ld compilation units\n", fFile->CountCompilationUnits());
 				continue;
 
 			// get the address ranges
-			TargetAddressRangeList* rangeList
-				= subprogramEntry->AddressRanges();
-			Reference<TargetAddressRangeList> rangeListReference(rangeList);
+			TargetAddressRangeList* rangeList = fFile->ResolveRangeList(unit,
+				subprogramEntry->AddressRangesOffset());
 			if (rangeList == NULL) {
 				target_addr_t lowPC = subprogramEntry->LowPC();
 				target_addr_t highPC = subprogramEntry->HighPC();
@@ -244,8 +244,9 @@ printf("  %ld compilation units\n", fFile->CountCompilationUnits());
 				if (rangeList == NULL)
 					return B_NO_MEMORY;
 						// TODO: Clean up already added functions!
-				rangeListReference.SetTo(rangeList, true);
 			}
+			Reference<TargetAddressRangeList> rangeListReference(rangeList,
+				true);
 
 			// get the source location
 			const char* directoryPath = NULL;
