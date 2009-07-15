@@ -47,7 +47,7 @@ static const char* kSettingsFile = "x-vnd.Haiku-desklink";
 class MediaReplicant : public BView {
 public:
 							MediaReplicant(BRect frame, const char* name,
-								uint32 resizeMask = B_FOLLOW_ALL, 
+								uint32 resizeMask = B_FOLLOW_ALL,
 								uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 							MediaReplicant(BMessage* archive);
 
@@ -84,7 +84,8 @@ private:
 
 MediaReplicant::MediaReplicant(BRect frame, const char* name,
 		uint32 resizeMask, uint32 flags)
-	: BView(frame, name, resizeMask, flags),
+	:
+	BView(frame, name, resizeMask, flags),
 	fVolumeSlider(NULL)
 {
 	_Init();
@@ -92,7 +93,8 @@ MediaReplicant::MediaReplicant(BRect frame, const char* name,
 
 
 MediaReplicant::MediaReplicant(BMessage* message)
-	: BView(message),
+	:
+	BView(message),
 	fVolumeSlider(NULL)
 {
 	_Init();
@@ -116,7 +118,7 @@ MediaReplicant::Instantiate(BMessage* data)
 }
 
 
-status_t 
+status_t
 MediaReplicant::Archive(BMessage* data, bool deep) const
 {
 	status_t status = BView::Archive(data, deep);
@@ -130,7 +132,7 @@ MediaReplicant::Archive(BMessage* data, bool deep) const
 void
 MediaReplicant::AttachedToWindow()
 {
-	BView *parent = Parent();
+	BView* parent = Parent();
 	if (parent)
 		SetViewColor(parent->ViewColor());
 
@@ -138,11 +140,11 @@ MediaReplicant::AttachedToWindow()
 }
 
 
-void 
+void
 MediaReplicant::Draw(BRect rect)
 {
 	BView::Draw(rect);
-	
+
 	SetDrawingMode(B_OP_OVER);
 	DrawBitmap(fIcon);
 }
@@ -193,7 +195,7 @@ MediaReplicant::MouseDown(BPoint point)
 		menu->SetTargetForItems(this);
 		subMenu->SetTargetForItems(this);
 
-		menu->Go(where, true, true, BRect(where - BPoint(4, 4), 
+		menu->Go(where, true, true, BRect(where - BPoint(4, 4),
 			where + BPoint(4, 4)));
 	} else {
 		// Show VolumeWindow
@@ -205,7 +207,7 @@ MediaReplicant::MouseDown(BPoint point)
 
 
 void
-MediaReplicant::MessageReceived(BMessage *message)
+MediaReplicant::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_ABOUT_REQUESTED:
@@ -258,7 +260,8 @@ MediaReplicant::MessageReceived(BMessage *message)
 			float deltaY;
 			if (message->FindFloat("be:wheel_delta_y", &deltaY) == B_OK
 				&& deltaY != 0.0) {
-				MixerControl mixerControl(fVolumeWhich);
+				MixerControl mixerControl;
+				mixerControl.Connect(fVolumeWhich);
 				mixerControl.ChangeVolumeBy(deltaY < 0 ? 6 : -6);
 			}
 			break;
@@ -266,7 +269,7 @@ MediaReplicant::MessageReceived(BMessage *message)
 
 		default:
 			BView::MessageReceived(message);
-			break;		
+			break;
 	}
 }
 
@@ -379,7 +382,7 @@ MediaReplicant::_SaveSettings()
 }
 
 
-void 
+void
 MediaReplicant::_Init()
 {
 	fIcon = new BBitmap(BRect(0, 0, kSpeakerWidth - 1, kSpeakerHeight - 1),

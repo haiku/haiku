@@ -36,7 +36,8 @@ static const uint32 kMsgReconnectVolume = 'rcms';
 
 
 VolumeControl::VolumeControl(int32 volumeWhich, bool beep, BMessage* message)
-	: BSlider("VolumeControl", "Volume", message, 0, 1, B_HORIZONTAL),
+	:
+	BSlider("VolumeControl", "Volume", message, 0, 1, B_HORIZONTAL),
 	fMixerControl(new MixerControl(volumeWhich)),
 	fBeep(beep),
 	fSnapping(false),
@@ -56,7 +57,8 @@ VolumeControl::VolumeControl(int32 volumeWhich, bool beep, BMessage* message)
 
 
 VolumeControl::VolumeControl(BMessage* archive)
-	: BSlider(archive),
+	:
+	BSlider(archive),
 	fMixerControl(NULL),
 	fSnapping(false),
 	fConnectRetries(0)
@@ -245,7 +247,7 @@ VolumeControl::MessageReceived(BMessage* msg)
 	switch (msg->what) {
 		case B_MOUSE_WHEEL_CHANGED:
 		{
-			if (Value() == -1)
+			if (!fMixerControl->Connected())
 				return;
 
 			// Even though the volume bar is horizontal, we use the more common

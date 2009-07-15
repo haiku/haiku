@@ -23,7 +23,7 @@ class BContinuousParameter;
 
 class MixerControl {
 public:
-							MixerControl(int32 volumeWhich);
+							MixerControl(int32 volumeWhich = VOLUME_USE_MIXER);
 							~MixerControl();
 
 			bool			Connect(int32 volumeWhich, float* _value = NULL,
