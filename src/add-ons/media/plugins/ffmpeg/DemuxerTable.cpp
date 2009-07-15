@@ -70,8 +70,12 @@ static const DemuxerFormat gDemuxerTable[] = {
 		B_MPEG_FORMAT_FAMILY, B_MPEG_FORMAT_FAMILY
 	},
 	{
-		"dv", "DV Movie", "video/x-dv",
+		"dv", "DV Movie", "video/dv",
 		B_WAV_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
+	},
+	{
+		"flac", "FLAC", "audio/x-flac",
+		B_WAV_FORMAT_FAMILY, B_ANY_FORMAT_FAMILY
 	},
 };
 

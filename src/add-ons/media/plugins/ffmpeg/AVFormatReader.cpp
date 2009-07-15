@@ -46,6 +46,21 @@ extern "C" {
 static const size_t kIOBufferSize = 64 * 1024;
 	// TODO: This could depend on the BMediaFile creation flags, IIRC,
 	// the allow to specify a buffering mode.
+	
+uint32
+avformat_to_beos_format(SampleFormat format)
+{
+	switch (format) {
+		case SAMPLE_FMT_U8: return media_raw_audio_format::B_AUDIO_UCHAR;
+		case SAMPLE_FMT_S16: return media_raw_audio_format::B_AUDIO_SHORT;
+		case SAMPLE_FMT_S32: return media_raw_audio_format::B_AUDIO_INT;
+		case SAMPLE_FMT_FLT: return media_raw_audio_format::B_AUDIO_FLOAT;
+		case SAMPLE_FMT_DBL: return media_raw_audio_format::B_AUDIO_DOUBLE;
+		default:
+			break;
+	}
+	return 0;
+}
 
 
 // #pragma mark - AVFormatReader::StreamCookie
@@ -351,6 +366,10 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 					description.family = B_WAV_FORMAT_FAMILY;
 					codecTag = 0x2000;
 					break;
+				case CODEC_ID_FLAC:
+					description.family = B_WAV_FORMAT_FAMILY;
+					codecTag = 'flac';
+					break;	
 				default:
 					fprintf(stderr, "ffmpeg codecTag is null, codec_id "
 						"unknown 0x%x\n", codecContext->codec_id);
@@ -427,6 +446,8 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 		case B_MEDIA_RAW_AUDIO:
 			format->u.raw_audio.frame_rate = (float)codecContext->sample_rate;
 			format->u.raw_audio.channel_count = codecContext->channels;
+			format->u.encoded_audio.output.format 
+				= avformat_to_beos_format(codecContext->sample_fmt);
 			format->u.raw_audio.buffer_size = 0;
 
 			// Read one packet and mark it for later re-use. (So our first
@@ -448,6 +469,8 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 				= (float)codecContext->sample_rate;
 			format->u.encoded_audio.output.channel_count
 				= codecContext->channels;
+			format->u.encoded_audio.output.format 
+				= avformat_to_beos_format(codecContext->sample_fmt);
 			break;
 
 		case B_MEDIA_ENCODED_VIDEO:
