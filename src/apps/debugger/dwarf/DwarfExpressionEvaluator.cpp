@@ -12,12 +12,22 @@
 #include <algorithm>
 #include <new>
 
+#include <Variant.h>
+
 #include "DataReader.h"
 #include "Dwarf.h"
+#include "DwarfTargetInterface.h"
 
 
-static const size_t kMaxStackCapacityIncrement	= 64;
+// number of elements to increase the stack capacity when the stack is full
+static const size_t kStackCapacityIncrement = 64;
+
+// maximum number of elements we allow to be pushed on the stack
 static const size_t kMaxStackCapacity			= 1024;
+
+// maximum number of operations we allow to be performed for a single expression
+// (to avoid running infinite loops forever)
+static const uint32 kMaxOperationCount			= 10000;
 
 
 // #pragma mark - EvaluationException
@@ -46,7 +56,7 @@ DwarfExpressionEvaluator::_Push(target_addr_t value)
 		if (fStackCapacity >= kMaxStackCapacity)
 			throw EvaluationException();
 
-		size_t newCapacity = fStackCapacity + kMaxStackCapacityIncrement;
+		size_t newCapacity = fStackCapacity + kStackCapacityIncrement;
 		target_addr_t* newStack = (target_addr_t*)realloc(fStack,
 			newCapacity * sizeof(target_addr_t));
 		if (newStack == NULL)
@@ -68,12 +78,18 @@ DwarfExpressionEvaluator::_Pop()
 }
 
 
-DwarfExpressionEvaluator::DwarfExpressionEvaluator(uint8 addressSize)
+DwarfExpressionEvaluator::DwarfExpressionEvaluator(
+	DwarfTargetInterface* targetInterface, uint8 addressSize)
 	:
+	fTargetInterface(targetInterface),
 	fStack(NULL),
 	fStackSize(0),
 	fStackCapacity(0),
-	fAddressSize(addressSize)
+	fObjectAddress(0),
+	fFrameAddress(0),
+	fAddressSize(addressSize),
+	fObjectAddressValid(false),
+	fFrameAddressValid(false)
 {
 }
 
@@ -81,6 +97,22 @@ DwarfExpressionEvaluator::DwarfExpressionEvaluator(uint8 addressSize)
 DwarfExpressionEvaluator::~DwarfExpressionEvaluator()
 {
 	free(fStack);
+}
+
+
+void
+DwarfExpressionEvaluator::SetObjectAddress(target_addr_t address)
+{
+	fObjectAddress = address;
+	fObjectAddressValid = true;
+}
+
+
+void
+DwarfExpressionEvaluator::SetFrameAddress(target_addr_t address)
+{
+	fFrameAddress = address;
+	fFrameAddressValid = true;
 }
 
 
@@ -102,6 +134,8 @@ DwarfExpressionEvaluator::Evaluate(const void* expression, size_t size)
 status_t
 DwarfExpressionEvaluator::_Evaluate()
 {
+	uint32 operationsExecuted = 0;
+
 	while (fDataReader.BytesRemaining() > 0) {
 		uint8 opcode = fDataReader.Read<uint8>(0);
 
@@ -172,67 +206,293 @@ DwarfExpressionEvaluator::_Evaluate()
 				fStack[fStackSize - 3] = tmp;
 				break;
 			}
+
 			case DW_OP_deref:
-// TODO:...
+				_DereferenceAddress(fAddressSize);
+				break;
+			case DW_OP_deref_size:
+				_DereferenceAddress(fDataReader.Read<uint8>(0));
 				break;
 			case DW_OP_xderef:
-// TODO:...
+				_DereferenceAddressSpaceAddress(fAddressSize);
 				break;
+			case DW_OP_xderef_size:
+				_DereferenceAddressSpaceAddress(fDataReader.Read<uint8>(0));
+				break;
+
 			case DW_OP_abs:
+			{
+				target_addr_t value = _Pop();
+				if (fAddressSize == 4) {
+					int32 signedValue = (int32)value;
+					_Push(signedValue >= 0 ? signedValue : -signedValue);
+				} else {
+					int64 signedValue = (int64)value;
+					_Push(signedValue >= 0 ? signedValue : -signedValue);
+				}
+				break;
+			}
 			case DW_OP_and:
+				_Push(_Pop() & _Pop());
+				break;
 			case DW_OP_div:
+			{
+				int64 top = (int64)_Pop();
+				int64 second = (int64)_Pop();
+				_Push(top != 0 ? second / top : 0);
+				break;
+			}
 			case DW_OP_minus:
+			{
+				target_addr_t top = _Pop();
+				_Push(_Pop() - top);
+				break;
+			}
 			case DW_OP_mod:
+			{
+				// While the specs explicitly speak of signed integer division
+				// for "div", nothing is mentioned for "mod".
+				target_addr_t top = _Pop();
+				target_addr_t second = _Pop();
+				_Push(top != 0 ? second % top : 0);
+				break;
+			}
 			case DW_OP_mul:
+				_Push(_Pop() * _Pop());
+				break;
 			case DW_OP_neg:
+			{
+				if (fAddressSize == 4)
+					_Push(-(int32)_Pop());
+				else
+					_Push(-(int64)_Pop());
+				break;
+			}
 			case DW_OP_not:
+				_Push(~_Pop());
+				break;
 			case DW_OP_or:
+				_Push(_Pop() | _Pop());
+				break;
 			case DW_OP_plus:
+				_Push(_Pop() + _Pop());
+				break;
 			case DW_OP_plus_uconst:
+				_Push(_Pop() + fDataReader.ReadUnsignedLEB128(0));
+				break;
 			case DW_OP_shl:
+			{
+				target_addr_t top = _Pop();
+				_Push(_Pop() << top);
+				break;
+			}
 			case DW_OP_shr:
+			{
+				target_addr_t top = _Pop();
+				_Push(_Pop() >> top);
+				break;
+			}
 			case DW_OP_shra:
+			{
+				target_addr_t top = _Pop();
+				int64 second = (int64)_Pop();
+				_Push(second >= 0 ? second >> top : -(-second >> top));
+					// right shift on negative values is implementation defined
+				break;
+			}
 			case DW_OP_xor:
-			case DW_OP_skip:
+				_Push(_Pop() ^ _Pop());
+				break;
+
 			case DW_OP_bra:
+				if (_Pop() == 0)
+					break;
+				// fall through
+			case DW_OP_skip:
+			{
+				int16 offset = fDataReader.Read<int16>(0);
+				if (offset >= 0 ? offset > fDataReader.BytesRemaining()
+						: -offset > fDataReader.Offset()) {
+					throw EvaluationException();
+				}
+				fDataReader.SeekAbsolute(fDataReader.Offset() + offset);
+				break;
+			}
 
 			case DW_OP_eq:
+				_Push(_Pop() == _Pop() ? 1 : 0);
+				break;
 			case DW_OP_ge:
+			{
+				int64 top = (int64)_Pop();
+				_Push((int64)_Pop() >= top ? 1 : 0);
+				break;
+			}
 			case DW_OP_gt:
+			{
+				int64 top = (int64)_Pop();
+				_Push((int64)_Pop() > top ? 1 : 0);
+				break;
+			}
 			case DW_OP_le:
+			{
+				int64 top = (int64)_Pop();
+				_Push((int64)_Pop() <= top ? 1 : 0);
+				break;
+			}
 			case DW_OP_lt:
+			{
+				int64 top = (int64)_Pop();
+				_Push((int64)_Pop() < top ? 1 : 0);
+				break;
+			}
 			case DW_OP_ne:
+				_Push(_Pop() == _Pop() ? 1 : 0);
+				break;
+
+			case DW_OP_push_object_address:
+				if (!fObjectAddressValid)
+					throw EvaluationException();
+				_Push(fObjectAddress);
+				break;
+			case DW_OP_call_frame_cfa:
+				if (!fFrameAddressValid)
+					throw EvaluationException();
+				_Push(fFrameAddress);
+				break;
 
 			case DW_OP_regx:
-			case DW_OP_fbreg:
+				_PushRegister(fDataReader.ReadUnsignedLEB128(0), 0);
+				break;
 			case DW_OP_bregx:
-			case DW_OP_piece:
-			case DW_OP_deref_size:
-			case DW_OP_xderef_size:
-			case DW_OP_nop:
-			case DW_OP_push_object_address:
+			{
+				uint32 reg = fDataReader.ReadUnsignedLEB128(0);
+				_PushRegister(reg, fDataReader.ReadSignedLEB128(0));
+				break;
+			}
+
+			case DW_OP_form_tls_address:
+// TODO:...
+				break;
+
+			case DW_OP_fbreg:
+// TODO:...
+				break;
+
 			case DW_OP_call2:
 			case DW_OP_call4:
 			case DW_OP_call_ref:
-			case DW_OP_form_tls_address:
-			case DW_OP_call_frame_cfa:
+// TODO:...
+				break;
+
+			case DW_OP_piece:
 			case DW_OP_bit_piece:
+// TODO:...
+				break;
+
+			case DW_OP_nop:
 				break;
 
 			default:
 				if (opcode >= DW_OP_lit0 && opcode <= DW_OP_lit31) {
 					_Push(opcode - DW_OP_lit0);
 				} else if (opcode >= DW_OP_reg0 && opcode <= DW_OP_reg31) {
-// TODO:...
+					_PushRegister(opcode - DW_OP_reg0, 0);
 				} else if (opcode >= DW_OP_breg0 && opcode <= DW_OP_breg31) {
-// TODO:...
+					_PushRegister(opcode - DW_OP_reg0,
+						fDataReader.ReadSignedLEB128(0));
 				} else {
 					printf("DwarfExpressionEvaluator::_Evaluate(): unsupported "
 						"opcode: %u\n", opcode);
 					return B_BAD_DATA;
 				}
+				break;
 		}
+
+		if (++operationsExecuted >= kMaxOperationCount)
+			return B_BAD_DATA;
 	}
 
 	return fDataReader.HasOverflow() ? B_BAD_DATA : B_OK;
+}
+
+
+void
+DwarfExpressionEvaluator::_DereferenceAddress(uint8 addressSize)
+{
+	uint32 valueType;
+	switch (addressSize) {
+		case 1:
+			valueType = B_UINT8_TYPE;
+			break;
+		case 2:
+			valueType = B_UINT16_TYPE;
+			break;
+		case 4:
+			valueType = B_UINT32_TYPE;
+			break;
+		case 8:
+			if (fAddressSize == 8) {
+				valueType = B_UINT64_TYPE;
+				break;
+			}
+			// fall through
+		default:
+			throw EvaluationException();
+	}
+
+	target_addr_t address = _Pop();
+	BVariant value;
+	if (!fTargetInterface->ReadValueFromMemory(address, valueType, value)) {
+		throw EvaluationException();
+	}
+
+	_Push(value.ToUInt64());
+}
+
+
+void
+DwarfExpressionEvaluator::_DereferenceAddressSpaceAddress(uint8 addressSize)
+{
+	uint32 valueType;
+	switch (addressSize) {
+		case 1:
+			valueType = B_UINT8_TYPE;
+			break;
+		case 2:
+			valueType = B_UINT16_TYPE;
+			break;
+		case 4:
+			valueType = B_UINT32_TYPE;
+			break;
+		case 8:
+			if (fAddressSize == 8) {
+				valueType = B_UINT64_TYPE;
+				break;
+			}
+			// fall through
+		default:
+			throw EvaluationException();
+	}
+
+	target_addr_t address = _Pop();
+	target_addr_t addressSpace = _Pop();
+	BVariant value;
+	if (!fTargetInterface->ReadValueFromMemory(addressSpace, address, valueType,
+			value)) {
+		throw EvaluationException();
+	}
+
+	_Push(value.ToUInt64());
+}
+
+
+void
+DwarfExpressionEvaluator::_PushRegister(uint32 reg, target_addr_t offset)
+{
+	BVariant value;
+	if (!fTargetInterface->GetRegisterValue(reg, value))
+		throw EvaluationException();
+
+	_Push(value.ToUInt64());
 }
