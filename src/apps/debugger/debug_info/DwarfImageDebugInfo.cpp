@@ -116,6 +116,13 @@ struct DwarfImageDebugInfo::UnwindTargetInterface : DwarfTargetInterface {
 			== B_OK;
 	}
 
+	virtual bool ReadValueFromMemory(target_addr_t addressSpace,
+		target_addr_t address, uint32 valueType, BVariant& _value) const
+	{
+		return fArchitecture->ReadValueFromMemory(addressSpace, address,
+			valueType, _value) == B_OK;
+	}
+
 private:
 	const Register* _RegisterAt(uint32 dwarfIndex) const
 	{
