@@ -13,11 +13,41 @@
 class DwarfTargetInterface;
 
 
+class DwarfExpressionEvaluationContext {
+public:
+								DwarfExpressionEvaluationContext(
+									DwarfTargetInterface* targetInterface,
+									uint8 addressSize);
+	virtual						~DwarfExpressionEvaluationContext();
+
+			DwarfTargetInterface* TargetInterface() const
+									{ return fTargetInterface; }
+			uint8				AddressSize() const	{ return fAddressSize; }
+
+	virtual	bool				GetObjectAddress(target_addr_t& _address) = 0;
+	virtual	bool				GetFrameAddress(target_addr_t& _address) = 0;
+	virtual	bool				GetFrameBaseAddress(target_addr_t& _address)
+									= 0;
+	virtual	bool				GetTLSAddress(target_addr_t localAddress,
+									target_addr_t& _address) = 0;
+
+	virtual	status_t			GetCallTarget(uint64 offset, bool local,
+									const void*& _block, off_t& _size) = 0;
+									// returns error, when an error resolving
+									// the entry occurs; returns B_OK and a NULL
+									// block, when the entry doesn't have a
+									// location attribute
+
+private:
+			DwarfTargetInterface* fTargetInterface;
+			uint8				fAddressSize;
+};
+
+
 class DwarfExpressionEvaluator {
 public:
 								DwarfExpressionEvaluator(
-									DwarfTargetInterface* targetInterface,
-									uint8 addressSize);
+									DwarfExpressionEvaluationContext* context);
 								~DwarfExpressionEvaluator();
 
 			void				SetObjectAddress(target_addr_t address);
@@ -39,16 +69,16 @@ private:
 			void				_DereferenceAddressSpaceAddress(
 									uint8 addressSize);
 			void				_PushRegister(uint32 reg, target_addr_t offset);
+			void				_Call(uint64 offset, bool local);
 
 private:
-			DwarfTargetInterface* fTargetInterface;
+			DwarfExpressionEvaluationContext* fContext;
 			target_addr_t*		fStack;
 			size_t				fStackSize;
 			size_t				fStackCapacity;
 			DataReader			fDataReader;
 			target_addr_t		fObjectAddress;
 			target_addr_t		fFrameAddress;
-			uint8				fAddressSize;
 			bool				fObjectAddressValid;
 			bool				fFrameAddressValid;
 };

@@ -30,6 +30,23 @@ static const size_t kMaxStackCapacity			= 1024;
 static const uint32 kMaxOperationCount			= 10000;
 
 
+// #pragma mark - DwarfExpressionEvaluationContext
+
+
+DwarfExpressionEvaluationContext::DwarfExpressionEvaluationContext(
+	DwarfTargetInterface* targetInterface, uint8 addressSize)
+	:
+	fTargetInterface(targetInterface),
+	fAddressSize(addressSize)
+{
+}
+
+
+DwarfExpressionEvaluationContext::~DwarfExpressionEvaluationContext()
+{
+}
+
+
 // #pragma mark - EvaluationException
 
 
@@ -79,17 +96,12 @@ DwarfExpressionEvaluator::_Pop()
 
 
 DwarfExpressionEvaluator::DwarfExpressionEvaluator(
-	DwarfTargetInterface* targetInterface, uint8 addressSize)
+	DwarfExpressionEvaluationContext* context)
 	:
-	fTargetInterface(targetInterface),
+	fContext(context),
 	fStack(NULL),
 	fStackSize(0),
-	fStackCapacity(0),
-	fObjectAddress(0),
-	fFrameAddress(0),
-	fAddressSize(addressSize),
-	fObjectAddressValid(false),
-	fFrameAddressValid(false)
+	fStackCapacity(0)
 {
 }
 
@@ -100,26 +112,10 @@ DwarfExpressionEvaluator::~DwarfExpressionEvaluator()
 }
 
 
-void
-DwarfExpressionEvaluator::SetObjectAddress(target_addr_t address)
-{
-	fObjectAddress = address;
-	fObjectAddressValid = true;
-}
-
-
-void
-DwarfExpressionEvaluator::SetFrameAddress(target_addr_t address)
-{
-	fFrameAddress = address;
-	fFrameAddressValid = true;
-}
-
-
 status_t
 DwarfExpressionEvaluator::Evaluate(const void* expression, size_t size)
 {
-	fDataReader.SetTo(expression, size, fAddressSize);
+	fDataReader.SetTo(expression, size, fContext->AddressSize());
 
 	try {
 		return _Evaluate();
@@ -208,13 +204,13 @@ DwarfExpressionEvaluator::_Evaluate()
 			}
 
 			case DW_OP_deref:
-				_DereferenceAddress(fAddressSize);
+				_DereferenceAddress(fContext->AddressSize());
 				break;
 			case DW_OP_deref_size:
 				_DereferenceAddress(fDataReader.Read<uint8>(0));
 				break;
 			case DW_OP_xderef:
-				_DereferenceAddressSpaceAddress(fAddressSize);
+				_DereferenceAddressSpaceAddress(fContext->AddressSize());
 				break;
 			case DW_OP_xderef_size:
 				_DereferenceAddressSpaceAddress(fDataReader.Read<uint8>(0));
@@ -223,7 +219,7 @@ DwarfExpressionEvaluator::_Evaluate()
 			case DW_OP_abs:
 			{
 				target_addr_t value = _Pop();
-				if (fAddressSize == 4) {
+				if (fContext->AddressSize() == 4) {
 					int32 signedValue = (int32)value;
 					_Push(signedValue >= 0 ? signedValue : -signedValue);
 				} else {
@@ -262,7 +258,7 @@ DwarfExpressionEvaluator::_Evaluate()
 				break;
 			case DW_OP_neg:
 			{
-				if (fAddressSize == 4)
+				if (fContext->AddressSize() == 4)
 					_Push(-(int32)_Pop());
 				else
 					_Push(-(int64)_Pop());
@@ -351,15 +347,37 @@ DwarfExpressionEvaluator::_Evaluate()
 				break;
 
 			case DW_OP_push_object_address:
-				if (!fObjectAddressValid)
+			{
+				target_addr_t address;
+				if (!fContext->GetObjectAddress(address))
 					throw EvaluationException();
-				_Push(fObjectAddress);
+				_Push(address);
 				break;
+			}
 			case DW_OP_call_frame_cfa:
-				if (!fFrameAddressValid)
+			{
+				target_addr_t address;
+				if (!fContext->GetFrameAddress(address))
 					throw EvaluationException();
-				_Push(fFrameAddress);
+				_Push(address);
 				break;
+			}
+			case DW_OP_fbreg:
+			{
+				target_addr_t address;
+				if (!fContext->GetFrameBaseAddress(address))
+					throw EvaluationException();
+				_Push(address + fDataReader.ReadSignedLEB128(0));
+				break;
+			}
+			case DW_OP_form_tls_address:
+			{
+				target_addr_t address;
+				if (!fContext->GetTLSAddress(_Pop(), address))
+					throw EvaluationException();
+				_Push(address);
+				break;
+			}
 
 			case DW_OP_regx:
 				_PushRegister(fDataReader.ReadUnsignedLEB128(0), 0);
@@ -371,18 +389,17 @@ DwarfExpressionEvaluator::_Evaluate()
 				break;
 			}
 
-			case DW_OP_form_tls_address:
-// TODO:...
-				break;
-
-			case DW_OP_fbreg:
-// TODO:...
-				break;
-
 			case DW_OP_call2:
+				_Call(fDataReader.Read<uint16>(0), true);
+				break;
 			case DW_OP_call4:
+				_Call(fDataReader.Read<uint32>(0), true);
+				break;
 			case DW_OP_call_ref:
-// TODO:...
+				if (fContext->AddressSize() == 4)
+					_Call(fDataReader.Read<uint32>(0), false);
+				else
+					_Call(fDataReader.Read<uint64>(0), false);
 				break;
 
 			case DW_OP_piece:
@@ -432,7 +449,7 @@ DwarfExpressionEvaluator::_DereferenceAddress(uint8 addressSize)
 			valueType = B_UINT32_TYPE;
 			break;
 		case 8:
-			if (fAddressSize == 8) {
+			if (fContext->AddressSize() == 8) {
 				valueType = B_UINT64_TYPE;
 				break;
 			}
@@ -443,7 +460,8 @@ DwarfExpressionEvaluator::_DereferenceAddress(uint8 addressSize)
 
 	target_addr_t address = _Pop();
 	BVariant value;
-	if (!fTargetInterface->ReadValueFromMemory(address, valueType, value)) {
+	if (!fContext->TargetInterface()->ReadValueFromMemory(address, valueType,
+			value)) {
 		throw EvaluationException();
 	}
 
@@ -466,7 +484,7 @@ DwarfExpressionEvaluator::_DereferenceAddressSpaceAddress(uint8 addressSize)
 			valueType = B_UINT32_TYPE;
 			break;
 		case 8:
-			if (fAddressSize == 8) {
+			if (fContext->AddressSize() == 8) {
 				valueType = B_UINT64_TYPE;
 				break;
 			}
@@ -478,8 +496,8 @@ DwarfExpressionEvaluator::_DereferenceAddressSpaceAddress(uint8 addressSize)
 	target_addr_t address = _Pop();
 	target_addr_t addressSpace = _Pop();
 	BVariant value;
-	if (!fTargetInterface->ReadValueFromMemory(addressSpace, address, valueType,
-			value)) {
+	if (!fContext->TargetInterface()->ReadValueFromMemory(addressSpace, address,
+			valueType, value)) {
 		throw EvaluationException();
 	}
 
@@ -491,8 +509,42 @@ void
 DwarfExpressionEvaluator::_PushRegister(uint32 reg, target_addr_t offset)
 {
 	BVariant value;
-	if (!fTargetInterface->GetRegisterValue(reg, value))
+	if (!fContext->TargetInterface()->GetRegisterValue(reg, value))
 		throw EvaluationException();
 
 	_Push(value.ToUInt64());
+}
+
+
+void
+DwarfExpressionEvaluator::_Call(uint64 offset, bool local)
+{
+	if (fDataReader.HasOverflow())
+		throw EvaluationException();
+
+	// get the expression to "call"
+	const void* block;
+	off_t size;
+	if (fContext->GetCallTarget(offset, local, block, size) != B_OK)
+		throw EvaluationException();
+
+	// no expression is OK, then this is just a no-op
+	if (block == NULL)
+		return;
+
+	// save the current data reader state
+	DataReader savedReader = fDataReader;
+
+	// set the reader to the target expression
+	fDataReader.SetTo(block, size, savedReader.AddressSize());
+
+	// and evaluate it
+	try {
+		_Evaluate();
+	} catch (...) {
+		fDataReader = savedReader;
+		throw;
+	}
+
+	fDataReader = savedReader;
 }
