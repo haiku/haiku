@@ -65,5 +65,7 @@ extern ntfschar *ntfs_str2ucs(const char *s, int *len);
 
 extern void ntfs_ucsfree(ntfschar *ucs);
 
+extern int ntfs_set_char_encoding(const char *locale);
+
 #endif /* defined _NTFS_UNISTR_H */
 

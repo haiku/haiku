@@ -55,6 +55,15 @@
 
 #define NOREVBOM 0  /* JPA rejecting U+FFFE and U+FFFF, open to debate */
 
+// no wchar support in the Haiku kernel
+#if defined(__HAIKU__) && defined(_KERNEL_MODE)
+#	include <KernelExport.h>
+#	define mbstowcs(a, b, c)	(panic("mbstowcs"), 0)
+#	define wctomb(a, b)			(panic("wctomb"), 0)
+#	define mbtowc(a, b, c)		(panic("mbtowc"), 0)
+#	define setlocale(a, b)		(panic("setlocale"), 0)
+#endif
+
 /*
  * IMPORTANT
  * =========
@@ -62,9 +71,8 @@
  * All these routines assume that the Unicode characters are in little endian
  * encoding inside the strings!!!
  */
-#ifndef __HAIKU__
 static int use_utf8 = 1; /* use UTF-8 encoding for file names */
-#endif
+
 /*
  * This is used by the name collation functions to quickly determine what
  * characters are (in)valid.
@@ -383,7 +391,6 @@ int ntfs_file_values_compare(const FILE_NAME_ATTR *file_name_attr1,
 			err_val, ic, upcase, upcase_len);
 }
 
-#ifndef __HAIKU__
 /*
    NTFS uses Unicode (UTF-16LE [NTFS-3G uses UCS-2LE, which is enough
    for now]) for path names, but the Unicode code points need to be
@@ -700,208 +707,6 @@ static int ntfs_utf8_to_utf16(const char *ins, ntfschar **outs)
 fail:
 	return ret;
 }
-#endif
-
-#ifdef __HAIKU__
-/* Encode a single wide character into a sequence of utf8 bytes.
- * Returns the number of bytes consumed, or 0 on error.
- */
-static int
-ntfs_utf16_to_utf8(ntfschar c, unsigned char* buf)
-{
-	if(c==0)
-		return 0; /* No support for embedded 0 runes */
-	if(c<0x80) {
-		if(buf)buf[0]=(unsigned char)c;
-		return 1;
-	}
-	if(c<0x800) {
-		if(buf) {
-			buf[0] = 0xc0 | (c>>6);
-			buf[1] = 0x80 | (c & 0x3f);
-		}
-		return 2;
-	}
-	if(c<0x10000) {
-		if(buf) {
-			buf[0] = 0xe0 | (c>>12);
-			buf[1] = 0x80 | ((c>>6) & 0x3f);
-			buf[2] = 0x80 | (c & 0x3f);
-		}
-		return 3;
-	}
-	/* We don't support characters above 0xFFFF in NTFS */
-	return 0;
-}
-
-
-/* Decodes a sequence of utf8 bytes into a single wide character.
- * The character is returned in host byte order.
- * Returns the number of bytes consumed, or 0 on error.
- */
-static int
-ntfs_utf16_from_utf8(const unsigned char* str, ntfschar* c)
-{
-	int l=0,i;
-
-	if(*str<0x80) {
-		*c = *str;
-		return 1;
-	}
-	if(*str<0xc0) /* lead byte must not be 10xxxxxx */
-		return 0;   /* is c0 a possible lead byte? */
-	if(*str<0xe0) {         /* 110xxxxx */
-		*c = *str & 0x1f;
-		l=2;
-	} else if(*str<0xf0) {   /* 1110xxxx */
-		*c = *str & 0xf;
-		l=3;
-	} else if(*str<0xf8) {   /* 11110xxx */
-		*c = *str & 7;
-		l=4;
-	} else /* We don't support characters above 0xFFFF in NTFS */
-		return 0;
-	 
-
-	for(i=1;i<l;i++) {
-		/* all other bytes must be 10xxxxxx */
-		if((str[i] & 0xc0) != 0x80)
-			return 0;
-		*c <<= 6;
-		*c |= str[i] & 0x3f;
-	}
-	return l;
-}
-
-
-/* Converts wide string to UTF-8. Expects two in- and two out-parameters.
- * Returns 0 on success, or error code. 
- * The caller has to free the result string.
- * There is no support for UTF-16, yet
- */
-static inline int ntfs_dupuni2utf8(const ntfschar* in, int in_len,char **out,int *out_len)
-{
-	int i,tmp;
-	int len8;
-	unsigned char *result;
-
-	/* count the length of the resulting UTF-8 */
-	for(i=len8=0;i<in_len;i++) {
-		tmp=ntfs_utf16_to_utf8(le16_to_cpu( *(in+i) ),0);
-		if(!tmp)
-			/* invalid character */
-			return EILSEQ;
-		len8+=tmp;
-	}
-	*out=result=ntfs_malloc(len8+1); /* allow for zero-termination */
-
-	if(!result)
-		return ENOMEM;
-	result[len8]='\0';
-	*out_len=len8;
-	for(i=len8=0;i<in_len;i++)
-		len8+=ntfs_utf16_to_utf8(le16_to_cpu( *(in+i) ),result+len8);
-	return 0;
-}
-
-/* Converts an UTF-8 sequence to a wide string. Same conventions as the
- * previous function
- */
-static inline int ntfs_duputf82uni(unsigned char* in, int in_len,ntfschar** out,int *out_len)
-{
-	int i,tmp;
-	int len16;
-
-	ntfschar* result;
-	ntfschar wtmp;
-	for(i=len16=0;i<in_len;i+=tmp,len16++) {
-		tmp=ntfs_utf16_from_utf8(in+i,&wtmp);
-		if(!tmp)
-			return EILSEQ;
-	}
-	*out=result=ntfs_malloc(2*(len16+1));
-	if(!result)
-		return ENOMEM;
-	result[len16]=0;
-	*out_len=len16;
-	for(i=len16=0;i<in_len;i+=tmp,len16++)
-	{
-		tmp=ntfs_utf16_from_utf8(in+i, &wtmp);
-		*(result+len16) = cpu_to_le16(wtmp);
-	}
-	return 0;
-}
-
-
-/**
- * ntfs_ucstombs - convert a little endian Unicode string to a multibyte string
- * @ins:	input Unicode string buffer
- * @ins_len:	length of input string in Unicode characters
- * @outs:	on return contains the (allocated) output multibyte string
- * @outs_len:	length of output buffer in bytes
- *
- * Convert the input little endian, 2-byte Unicode string @ins, of length
- * @ins_len into the multibyte string format dictated by the current locale.
- *
- * If *@outs is NULL, the function allocates the string and the caller is
- * responsible for calling free(*@outs); when finished with it.
- *
- * On success the function returns the number of bytes written to the output
- * string *@outs (>= 0), not counting the terminating NULL byte. If the output
- * string buffer was allocated, *@outs is set to it.
- *
- * On error, -1 is returned, and errno is set to the error code. The following
- * error codes can be expected:
- *	EINVAL		Invalid arguments (e.g. @ins or @outs is NULL).
- *	EILSEQ		The input string cannot be represented as a multibyte
- *			sequence according to the current locale.
- *	ENAMETOOLONG	Destination buffer is too small for input string.
- *	ENOMEM		Not enough memory to allocate destination buffer.
- */
-int ntfs_ucstombs(const ntfschar *ins, const int ins_len, char **outs,	int outs_len)
-{
-	int out_len = outs_len;
-	if(ntfs_dupuni2utf8(ins,ins_len,outs,&out_len)==0)
-	  	return out_len;
-	else
-		return EINVAL;
-}
-
-/**
- * ntfs_mbstoucs - convert a multibyte string to a little endian Unicode string
- * @ins:	input multibyte string buffer
- * @outs:	on return contains the (allocated) output Unicode string
- * @outs_len:	length of output buffer in Unicode characters
- *
- * Convert the input multibyte string @ins, from the current locale into the
- * corresponding little endian, 2-byte Unicode string.
- *
- * If *@outs is NULL, the function allocates the string and the caller is
- * responsible for calling free(*@outs); when finished with it.
- *
- * On success the function returns the number of Unicode characters written to
- * the output string *@outs (>= 0), not counting the terminating Unicode NULL
- * character. If the output string buffer was allocated, *@outs is set to it.
- *
- * On error, -1 is returned, and errno is set to the error code. The following
- * error codes can be expected:
- *	EINVAL		Invalid arguments (e.g. @ins or @outs is NULL).
- *	EILSEQ		The input string cannot be represented as a Unicode
- *			string according to the current locale.
- *	ENAMETOOLONG	Destination buffer is too small for input string.
- *	ENOMEM		Not enough memory to allocate destination buffer.
- */
-int ntfs_mbstoucs(const char *ins, ntfschar **outs)
-{
-	int in_len = strlen(ins);
-	int out_len = 0;	
-	if(ntfs_duputf82uni((unsigned char*)ins,in_len,outs,&out_len)==0)
-		return out_len;
-	else
-		return EILSEQ;
-}
-
-#else
 
 /**
  * ntfs_ucstombs - convert a little endian Unicode string to a multibyte string
@@ -1152,8 +957,6 @@ err_out:
 	return -1;
 }
 
-#endif //__HAIKU__
-
 /**
  * ntfs_upcase_table_build - build the default upcase table for NTFS
  * @uc:		destination buffer where to store the built table
@@ -1275,8 +1078,6 @@ void ntfs_ucsfree(ntfschar *ucs)
  * Define the character encoding to be used.
  * Use UTF-8 unless specified otherwise.
  */
-#ifndef __HAIKU__
-
 int ntfs_set_char_encoding(const char *locale)
 {
 	use_utf8 = 0;
@@ -1292,5 +1093,3 @@ int ntfs_set_char_encoding(const char *locale)
 	 	}
 	return 0; /* always successful */
 }
-#endif
-

@@ -1,8 +1,10 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems ntfs libntfs ;
 
-SubDirCcFlags -Wall -Wno-multichar -DHAVE_CONFIG_H=1 ;
+SubDirCcFlags -Wall -Wno-multichar ;
 
-StaticLibrary libntfs.a :
+DEFINES += HAVE_CONFIG_H=1 ;
+
+KernelStaticLibrary libntfs.a :
 	attrib.c
 	attrlist.c
 	bitmap.c
@@ -27,4 +29,3 @@ StaticLibrary libntfs.a :
 	unistr.c
 	volume.c
 ;
-
