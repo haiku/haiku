@@ -4167,18 +4167,22 @@ BView::MessageReceived(BMessage* msg)
 
 			case B_MOUSE_WHEEL_CHANGED:
 			{
-				float deltaX = 0.0f, deltaY = 0.0f;
-
 				BScrollBar* horizontal = ScrollBar(B_HORIZONTAL);
+				BScrollBar* vertical = ScrollBar(B_VERTICAL);
+				if (horizontal == NULL && vertical == NULL) {
+					// Pass the message to the next handler
+					BHandler::MessageReceived(msg);
+					break;
+				}
+
+				float deltaX = 0.0f, deltaY = 0.0f;
 				if (horizontal != NULL)
 					msg->FindFloat("be:wheel_delta_x", &deltaX);
-
-				BScrollBar* vertical = ScrollBar(B_VERTICAL);
 				if (vertical != NULL)
 					msg->FindFloat("be:wheel_delta_y", &deltaY);
 
 				if (deltaX == 0.0f && deltaY == 0.0f)
-					return;
+					break;
 
 				float smallStep, largeStep;
 				if (horizontal != NULL) {
@@ -4210,7 +4214,8 @@ BView::MessageReceived(BMessage* msg)
 			}
 
 			default:
-				return BHandler::MessageReceived(msg);
+				BHandler::MessageReceived(msg);
+				break;
 		}
 
 		return;
