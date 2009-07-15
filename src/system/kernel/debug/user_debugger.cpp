@@ -820,7 +820,7 @@ thread_hit_serious_debug_event(debug_debugger_message event,
 		struct thread *thread = thread_get_current_thread();
 		dprintf("thread_hit_serious_debug_event(): Failed to install debugger: "
 			"thread: %ld: %s\n", thread->id, strerror(error));
-		return true;
+		return error;
 	}
 
 	// enter the debug loop
