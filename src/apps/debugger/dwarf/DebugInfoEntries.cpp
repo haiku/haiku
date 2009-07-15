@@ -788,6 +788,13 @@ DIEFormalParameter::Tag() const
 }
 
 
+LocationDescription*
+DIEFormalParameter::GetLocationDescription()
+{
+	return &fLocationDescription;
+}
+
+
 // #pragma mark - DIEImportedDeclaration
 
 
@@ -1085,6 +1092,13 @@ DIECommonBlock::Tag() const
 }
 
 
+LocationDescription*
+DIECommonBlock::GetLocationDescription()
+{
+	return &fLocationDescription;
+}
+
+
 // #pragma mark - DIECommonInclusion
 
 
@@ -1291,6 +1305,13 @@ uint16
 DIEWithStatement::Tag() const
 {
 	return DW_TAG_with_stmt;
+}
+
+
+LocationDescription*
+DIEWithStatement::GetLocationDescription()
+{
+	return &fLocationDescription;
 }
 
 
@@ -1738,6 +1759,13 @@ DIEVariable::Tag() const
 }
 
 
+LocationDescription*
+DIEVariable::GetLocationDescription()
+{
+	return &fLocationDescription;
+}
+
+
 // #pragma mark - DIEVolatileType
 
 
@@ -1792,6 +1820,13 @@ uint16
 DIEDwarfProcedure::Tag() const
 {
 	return DW_TAG_dwarf_procedure;
+}
+
+
+LocationDescription*
+DIEDwarfProcedure::GetLocationDescription()
+{
+	return &fLocationDescription;
 }
 
 

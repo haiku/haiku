@@ -200,6 +200,55 @@ struct ConstantAttributeValue {
 };
 
 
+struct LocationDescription {
+	union {
+		off_t			listOffset;	// location list
+		struct {
+			const void*	data;
+			off_t		length;
+		}				expression;	// location expression
+	};
+	uint8				attributeClass;
+
+	LocationDescription()
+		:
+		attributeClass(ATTRIBUTE_CLASS_BLOCK)
+	{
+		expression.data = NULL;
+		expression.length = 0;
+	}
+
+	bool IsExpression() const
+	{
+		return attributeClass == ATTRIBUTE_CLASS_BLOCK
+			&& expression.data != NULL;
+	}
+
+	bool IsLocationList() const
+	{
+		return attributeClass == ATTRIBUTE_CLASS_LOCLISTPTR;
+	}
+
+	bool IsValid() const
+	{
+		return IsExpression() || IsLocationList();
+	}
+
+	void SetToLocationList(off_t offset)
+	{
+		listOffset = offset;
+		attributeClass = ATTRIBUTE_CLASS_LOCLISTPTR;
+	}
+
+	void SetToExpression(const void* data, off_t length)
+	{
+		expression.data = data;
+		expression.length = length;
+		attributeClass = ATTRIBUTE_CLASS_BLOCK;
+	}
+};
+
+
 struct DeclarationLocation {
 	uint32	file;
 	uint32	line;

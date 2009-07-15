@@ -94,6 +94,13 @@ DebugInfoEntry::AbstractOrigin() const
 }
 
 
+LocationDescription*
+DebugInfoEntry::GetLocationDescription()
+{
+	return NULL;
+}
+
+
 bool
 DebugInfoEntry::GetDeclarationFile(uint32& _file) const
 {
@@ -181,6 +188,28 @@ DebugInfoEntry::AddAttribute_decl_column(uint16 attributeName,
 
 
 status_t
+DebugInfoEntry::AddAttribute_location(uint16 attributeName,
+	const AttributeValue& value)
+{
+	if (LocationDescription* location = GetLocationDescription()) {
+		if (value.attributeClass == ATTRIBUTE_CLASS_LOCLISTPTR) {
+			location->SetToLocationList(value.pointer);
+			return B_OK;
+		}
+
+		if (value.attributeClass == ATTRIBUTE_CLASS_BLOCK) {
+			location->SetToExpression(value.block.data, value.block.length);
+			return B_OK;
+		}
+		return B_BAD_DATA;
+
+	}
+
+	return ATTRIBUTE_NOT_HANDLED;
+}
+
+
+status_t
 DebugInfoEntry::AddAttribute_sibling(uint16 attributeName,
 	const AttributeValue& value)
 {
@@ -190,7 +219,6 @@ DebugInfoEntry::AddAttribute_sibling(uint16 attributeName,
 }
 
 
-DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(location)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(name)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(ordering)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(byte_size)

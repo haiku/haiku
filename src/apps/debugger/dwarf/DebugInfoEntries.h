@@ -504,6 +504,8 @@ public:
 
 	virtual	uint16				Tag() const;
 
+	virtual	LocationDescription* GetLocationDescription();
+
 // TODO:
 // DW_AT_abstract_origin
 // DW_AT_artificial
@@ -511,10 +513,12 @@ public:
 // DW_AT_default_value
 // DW_AT_endianity
 // DW_AT_is_optional
-// DW_AT_location
 // DW_AT_segment
 // DW_AT_type
 // DW_AT_variable_parameter
+
+private:
+			LocationDescription	fLocationDescription;
 };
 
 
@@ -704,9 +708,13 @@ public:
 
 	virtual	uint16				Tag() const;
 
+	virtual	LocationDescription* GetLocationDescription();
+
 // TODO:
-// DW_AT_location
 // DW_AT_segment
+
+private:
+			LocationDescription	fLocationDescription;
 };
 
 
@@ -849,17 +857,21 @@ public:
 
 	virtual	uint16				Tag() const;
 
+	virtual	LocationDescription* GetLocationDescription();
+
 // TODO:
 // DW_AT_accessibility
 // DW_AT_address_class
 // DW_AT_declaration
 // DW_AT_high_pc
-// DW_AT_location
 // DW_AT_low_pc
 // DW_AT_ranges
 // DW_AT_segment
 // DW_AT_type
 // DW_AT_visibility
+
+private:
+			LocationDescription	fLocationDescription;
 };
 
 
@@ -1160,16 +1172,20 @@ public:
 
 	virtual	uint16				Tag() const;
 
+	virtual	LocationDescription* GetLocationDescription();
+
 // TODO:
 // DW_AT_abstract_origin
 // DW_AT_const_value
 // DW_AT_endianity
 // DW_AT_external
-// DW_AT_location
 // DW_AT_segment
 // DW_AT_specification
 // DW_AT_start_scope
 // DW_AT_type
+
+private:
+			LocationDescription	fLocationDescription;
 };
 
 
@@ -1197,8 +1213,10 @@ public:
 
 	virtual	uint16				Tag() const;
 
-// TODO:
-// DW_AT_location
+	virtual	LocationDescription* GetLocationDescription();
+
+private:
+			LocationDescription	fLocationDescription;
 };
 
 

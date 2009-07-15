@@ -22,10 +22,11 @@ enum {
 };
 
 
-class AttributeValue;
-class ConstantAttributeValue;
-class DeclarationLocation;
-class DynamicAttributeValue;
+struct AttributeValue;
+struct ConstantAttributeValue;
+struct DeclarationLocation;
+struct DynamicAttributeValue;
+struct LocationDescription;
 struct SourceLanguageInfo;
 
 
@@ -58,6 +59,7 @@ public:
 	virtual	const char*			Description() const;
 	virtual	DebugInfoEntry*		Specification() const;
 	virtual	DebugInfoEntry*		AbstractOrigin() const;
+	virtual	LocationDescription* GetLocationDescription();
 
 			bool				GetDeclarationFile(uint32& _file) const;
 			bool				GetDeclarationLine(uint32& _line) const;
@@ -71,12 +73,13 @@ public:
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_decl_column(uint16 attributeName,
 									const AttributeValue& value);
+	virtual	status_t			AddAttribute_location(uint16 attributeName,
+									const AttributeValue& value);
 	virtual	status_t			AddAttribute_sibling(uint16 attributeName,
 									const AttributeValue& value);
 
 // TODO: Handle (ignore?) DW_AT_description here?
 
-	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(location)
 	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(name)
 	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(ordering)
 	DECLARE_DEBUG_INFO_ENTRY_ATTR_SETTER(byte_size)
