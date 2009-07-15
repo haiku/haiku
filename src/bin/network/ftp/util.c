@@ -834,8 +834,30 @@ fileindir(const char *file, const char *dir)
 	size_t	dirlen;
 
 	if (realpath(file, realfile) == NULL) {
-		warn("Unable to determine real path of `%s'", file);
-		return 0;
+		int error = 1;
+
+		if (errno == ENOENT) {
+			/* Check if the parent directory exist which is all we need */
+			const char* last = strrchr(file, '/');
+			if (last != NULL) {
+				char parent[PATH_MAX+1];
+				strlcpy(parent, file, last - file);
+
+				if (realpath(parent, realfile) != NULL) {
+					strlcat(realfile, last, sizeof(realfile));
+					error = 0;
+				}
+			} else {
+				/* This already is the last component */
+				strlcpy(realfile, file, sizeof(realfile));
+				error = 0;
+			}
+		}
+
+		if (error) {
+			warn("Unable to determine real path of `%s'", file);
+			return 0;
+		}
 	}
 	if (realfile[0] != '/')		/* relative result */
 		return 1;
