@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <new>
 
+#include <ctype.h>
 #include <stdio.h>
 
 #include <Clipboard.h>
@@ -227,8 +228,20 @@ private:
 					offset = _offset;
 				}
 
+				bool operator==(const SelectionPoint& other)
+				{
+					return line == other.line && offset == other.offset;
+				}
+
 				int32 line;
 				int32 offset;
+			};
+
+			enum TrackingState
+			{
+				kNotTracking = 0,
+				kTracking = 1,
+				kDragging = 2
 			};
 
 			float				_MaxLineWidth();
@@ -238,6 +251,8 @@ private:
 			void				_GetSelectionRegion(BRegion& region) const;
 			void				_GetSelectionText(BString& text) const;
 			void				_CopySelectionToClipboard() const;
+			void				_SelectWordAt(const SelectionPoint& point);
+			void				_SelectLineAt(const SelectionPoint& point);
 
 private:
 
@@ -246,8 +261,11 @@ private:
 			SelectionPoint		fSelectionStart;
 			SelectionPoint		fSelectionEnd;
 			SelectionPoint		fSelectionBase;
+			bigtime_t			fLastClickTime;
+			int16				fClickCount;
 			rgb_color			fTextColor;
 			bool				fSelectionMode;
+			TrackingState		fTrackState;
 };
 
 
@@ -838,7 +856,10 @@ SourceView::TextView::TextView(SourceView* sourceView, FontInfo* fontInfo)
 	fSelectionStart(-1, -1),
 	fSelectionEnd(-1, -1),
 	fSelectionBase(-1, -1),
-	fSelectionMode(false)
+	fLastClickTime(0),
+	fClickCount(0),
+	fSelectionMode(false),
+	fTrackState(kNotTracking)
 {
 	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 	fTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
@@ -958,8 +979,13 @@ SourceView::TextView::MessageReceived(BMessage* message)
 			_CopySelectionToClipboard();
 			break;
 
-		case B_MOUSE_WHEEL_CHANGED:
-			fSourceView->MessageReceived(message);
+		case B_SELECT_ALL:
+			fSelectionStart.line = 0;
+			fSelectionStart.offset = 0;
+			fSelectionEnd.line = fSourceCode->CountLines() - 1;
+			fSelectionEnd.offset = fSourceCode->LineLengthAt(
+				fSelectionEnd.line);
+			Invalidate();
 			break;
 
 		default:
@@ -975,13 +1001,35 @@ SourceView::TextView::MouseDown(BPoint where)
 	if (fSourceCode != NULL) {
 		if (!IsFocus())
 			MakeFocus(true);
+		fTrackState = kTracking;
 
 		// don't reset the selection if the user clicks within the
 		// current selection range
 		BRegion region;
 		_GetSelectionRegion(region);
-		if (!region.Contains(where)) {
-			SelectionPoint point = _SelectionPointAt(where);
+		bigtime_t clickTime = system_time();
+		SelectionPoint point = _SelectionPointAt(where);
+		bigtime_t clickSpeed = 0;
+		get_click_speed(&clickSpeed);
+		if (clickTime - fLastClickTime < clickSpeed
+				&& fSelectionBase == point) {
+			if (fClickCount > 3) {
+				fClickCount = 0;
+				fLastClickTime = 0;
+			} else {
+				fClickCount++;
+				fLastClickTime = clickTime;
+			}
+		} else {
+			fClickCount = 1;
+			fLastClickTime = clickTime;
+		}
+
+		if (fClickCount == 2)
+			_SelectWordAt(point);
+		else if (fClickCount == 3) {
+			_SelectLineAt(point);
+		} else if (!region.Contains(where)) {
 			fSelectionBase = fSelectionStart = fSelectionEnd = point;
 			fSelectionMode = true;
 			Invalidate();
@@ -1023,7 +1071,7 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 		_GetSelectionRegion(region);
 		region.Include(&oldRegion);
 		Invalidate(&region);
-	} else {
+	} else if (fTrackState == kTracking) {
 		_GetSelectionRegion(region);
 		if (region.CountRects() > 0) {
 			BString text;
@@ -1035,7 +1083,18 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 			clipName << " clipping";
 			message.AddString ("be:clip_name", clipName.String());
 			message.AddInt32 ("be:actions", B_COPY_TARGET);
-			DragMessage(&message, region.Frame());
+			BRect dragRect = region.Frame();
+			BRect visibleRect = fSourceView->Bounds();
+			if (dragRect.Height() > visibleRect.Height()) {
+				dragRect.top = 0;
+				dragRect.bottom = visibleRect.Height();
+			}
+			if (dragRect.Width() > visibleRect.Width()) {
+				dragRect.left = 0;
+				dragRect.right = visibleRect.Width();
+			}
+			DragMessage(&message, dragRect);
+			fTrackState = kDragging;
 		}
 	}
 }
@@ -1045,6 +1104,7 @@ void
 SourceView::TextView::MouseUp(BPoint where)
 {
 	fSelectionMode = false;
+	fTrackState = kNotTracking;
 }
 
 
@@ -1090,7 +1150,7 @@ SourceView::TextView::_SelectionPointAt(BPoint where) const
 	int32 line = LineAtOffset(where.y);
 	int32 offset = (int32)max_c((where.x - kLeftTextMargin)
 		/ fCharacterWidth, 0);
-	int32 lineLength = strlen(fSourceCode->LineAt(line));
+	int32 lineLength = fSourceCode->LineLengthAt(line);
 	if (offset > lineLength)
 		offset = (lineLength > 0) ? lineLength - 1 : 0;
 	return SelectionPoint(line, offset);
@@ -1181,6 +1241,48 @@ SourceView::TextView::_CopySelectionToClipboard(void) const
 		be_clipboard->Commit();
 		be_clipboard->Unlock();
 	}
+}
+
+
+void
+SourceView::TextView::_SelectWordAt(const SelectionPoint& point)
+{
+	const char* line = fSourceCode->LineAt(point.line);
+	if (isalpha(line[point.offset]) || isdigit(line[point.offset])) {
+		int32 length = fSourceCode->LineLengthAt(point.line);
+		int32 start = point.offset - 1;
+		int32 end = point.offset + 1;
+		while ((end) < length) {
+			if (!isalpha(line[end]) && !isdigit(line[end]))
+				break;
+			++end;
+		}
+		while ((start - 1) >= 0) {
+			if (!isalpha(line[start - 1]) && !isdigit(line[start - 1]))
+				break;
+			--start;
+		}
+
+		fSelectionStart.line = point.line;
+		fSelectionStart.offset = start;
+		fSelectionEnd.line = point.line;
+		fSelectionEnd.offset = end;
+		BRegion region;
+		_GetSelectionRegion(region);
+		Invalidate(&region);
+	}
+}
+
+
+void
+SourceView::TextView::_SelectLineAt(const SelectionPoint& point)
+{
+	fSelectionStart.line = fSelectionEnd.line = point.line;
+	fSelectionStart.offset = 0;
+	fSelectionEnd.offset = fSourceCode->LineLengthAt(point.line);
+	BRegion region;
+	_GetSelectionRegion(region);
+	Invalidate(&region);
 }
 
 

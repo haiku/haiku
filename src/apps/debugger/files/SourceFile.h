@@ -30,6 +30,7 @@ public:
 
 			int32				CountLines() const;
 			const char*			LineAt(int32 index) const;
+			int32				LineLengthAt(int32 index) const;
 
 protected:
 	virtual	void				LastReferenceReleased();

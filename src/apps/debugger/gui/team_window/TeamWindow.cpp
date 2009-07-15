@@ -147,6 +147,7 @@ TeamWindow::DispatchMessage(BMessage* message, BHandler* handler)
 			break;
 
 		case B_COPY:
+		case B_SELECT_ALL:
 			BView* focusView = CurrentFocus();
 			if (focusView != NULL)
 				focusView->MessageReceived(message);
@@ -411,6 +412,9 @@ TeamWindow::_Init()
 	menu = new BMenu("Edit");
 	fMenuBar->AddItem(menu);
 	item = new BMenuItem("Copy", new BMessage(B_COPY), 'C');
+	menu->AddItem(item);
+	item->SetTarget(this);
+	item = new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A');
 	menu->AddItem(item);
 	item->SetTarget(this);
 

@@ -35,6 +35,7 @@ public:
 
 	virtual	int32				CountLines() const;
 	virtual	const char*			LineAt(int32 index) const;
+	virtual int32				LineLengthAt(int32 index) const;
 
 	virtual	bool				GetStatementLocationRange(
 									const SourceLocation& location,

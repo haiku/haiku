@@ -98,7 +98,7 @@ SourceFile::Init(const char* path)
 		fLineCount++;
 
 	// allocate line offset array
-	fLineOffsets = new(std::nothrow) int32[fLineCount];
+	fLineOffsets = new(std::nothrow) int32[fLineCount + 1];
 	if (fLineOffsets == NULL)
 		return B_NO_MEMORY;
 
@@ -111,6 +111,7 @@ SourceFile::Init(const char* path)
 			fLineOffsets[lineIndex++] = i + 1;
 		}
 	}
+	fLineOffsets[fLineCount] = fileSize - 1;
 
 	return B_OK;
 }
@@ -130,6 +131,13 @@ SourceFile::LineAt(int32 index) const
 		? fFileContent + fLineOffsets[index] : NULL;
 }
 
+
+int32
+SourceFile::LineLengthAt(int32 index) const
+{
+	return index >= 0 && index < fLineCount
+		? fLineOffsets[index + 1] - fLineOffsets[index] - 1: 0;
+}
 
 void
 SourceFile::LastReferenceReleased()

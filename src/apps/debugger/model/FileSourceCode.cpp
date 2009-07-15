@@ -91,6 +91,13 @@ FileSourceCode::LineAt(int32 index) const
 }
 
 
+int32
+FileSourceCode::LineLengthAt(int32 index) const
+{
+	return fSourceFile->LineLengthAt(index);
+}
+
+
 bool
 FileSourceCode::GetStatementLocationRange(const SourceLocation& location,
 	SourceLocation& _start, SourceLocation& _end) const

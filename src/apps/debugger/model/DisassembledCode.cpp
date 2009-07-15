@@ -84,6 +84,14 @@ DisassembledCode::LineAt(int32 index) const
 }
 
 
+int32
+DisassembledCode::LineLengthAt(int32 index) const
+{
+	Line* line = fLines.ItemAt(index);
+	return line != NULL ? line->line.Length() : 0;
+}
+
+
 bool
 DisassembledCode::GetStatementLocationRange(const SourceLocation& location,
 	SourceLocation& _start, SourceLocation& _end) const
