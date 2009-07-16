@@ -27,6 +27,18 @@ static const DemuxerFormat gDemuxerTable[] = {
 //		"avi", "AVI (Audio Video Interleaved)", "video/x-msvideo",
 //		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
 //	},
+	{
+		"dv", "DV Movie", "video/dv",
+		B_WAV_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
+	},
+	{
+		"flac", "FLAC", "audio/x-flac",
+		B_WAV_FORMAT_FAMILY, B_ANY_FORMAT_FAMILY
+	},
+	{
+		"flv", "Flash Video", "video/x-flv",
+		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
+	},
 //	{
 //		TODO: untested!
 //		"mov", "MOV (Quicktime Movie)", "video/x-mov",
@@ -68,14 +80,6 @@ static const DemuxerFormat gDemuxerTable[] = {
 		// TODO: untested!
 		"vob", "VOB Movie", "video/x-vob",
 		B_MPEG_FORMAT_FAMILY, B_MPEG_FORMAT_FAMILY
-	},
-	{
-		"dv", "DV Movie", "video/dv",
-		B_WAV_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
-	},
-	{
-		"flac", "FLAC", "audio/x-flac",
-		B_WAV_FORMAT_FAMILY, B_ANY_FORMAT_FAMILY
 	},
 };
 

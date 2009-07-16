@@ -46,7 +46,7 @@ extern "C" {
 static const size_t kIOBufferSize = 64 * 1024;
 	// TODO: This could depend on the BMediaFile creation flags, IIRC,
 	// the allow to specify a buffering mode.
-	
+
 uint32
 avformat_to_beos_format(SampleFormat format)
 {
@@ -369,7 +369,15 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 				case CODEC_ID_FLAC:
 					description.family = B_WAV_FORMAT_FAMILY;
 					codecTag = 'flac';
-					break;	
+					break;
+				case CODEC_ID_VP6F:
+					description.family = B_QUICKTIME_FORMAT_FAMILY;
+					codecTag = B_BENDIAN_TO_HOST_INT32('VP6F');
+					break;
+				case CODEC_ID_MP3:
+					description.family = B_QUICKTIME_FORMAT_FAMILY;
+					codecTag = B_BENDIAN_TO_HOST_INT32('.mp3');
+					break;
 				default:
 					fprintf(stderr, "ffmpeg codecTag is null, codec_id "
 						"unknown 0x%x\n", codecContext->codec_id);
@@ -446,7 +454,7 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 		case B_MEDIA_RAW_AUDIO:
 			format->u.raw_audio.frame_rate = (float)codecContext->sample_rate;
 			format->u.raw_audio.channel_count = codecContext->channels;
-			format->u.encoded_audio.output.format 
+			format->u.encoded_audio.output.format
 				= avformat_to_beos_format(codecContext->sample_fmt);
 			format->u.raw_audio.buffer_size = 0;
 
@@ -469,24 +477,24 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 				= (float)codecContext->sample_rate;
 			format->u.encoded_audio.output.channel_count
 				= codecContext->channels;
-			format->u.encoded_audio.output.format 
+			format->u.encoded_audio.output.format
 				= avformat_to_beos_format(codecContext->sample_fmt);
 			break;
 
 		case B_MEDIA_ENCODED_VIDEO:
 // TODO: Specifying any of these seems to throw off the format matching
 // later on.
-//			format->u.encoded_video.avg_bit_rate = codecContext->bit_rate; 
+//			format->u.encoded_video.avg_bit_rate = codecContext->bit_rate;
 //			format->u.encoded_video.max_bit_rate = codecContext->bit_rate
 //				+ codecContext->bit_rate_tolerance;
-	
+
 //			format->u.encoded_video.encoding
 //				= media_encoded_video_format::B_ANY;
-	
+
 //			format->u.encoded_video.frame_size = 1;
 //			format->u.encoded_video.forward_history = 0;
 //			format->u.encoded_video.backward_history = 0;
-	
+
 			format->u.encoded_video.output.field_rate
 				= av_q2d(stream->r_frame_rate);
 			format->u.encoded_video.output.interlace = 1;
@@ -720,7 +728,7 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	av_free_packet(&fPacket);
 	fReusePacket = false;
 
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -978,7 +986,7 @@ AVFormatReader::Copyright()
 	return "Copyright 2009, Stephan Aßmus";
 }
 
-	
+
 status_t
 AVFormatReader::Sniff(int32* _streamCount)
 {
