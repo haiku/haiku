@@ -211,7 +211,7 @@ FUNCTION(("dir: (%Ld: %lu, %lu), entry: `%s'\n", dir->GetID(), dir->GetDirID(),
 		// hide non-file/dir/symlink entries, if the user desires that, and
 		// those entries explicitly set to hidden
 		if (error == B_OK
-			&& (foundNode.IsEsoteric() && volume->GetHideEsoteric()
+			&& ((foundNode.IsEsoteric() && volume->GetHideEsoteric())
 				|| volume->IsNegativeEntry(foundNode.GetID()))) {
 			error = B_ENTRY_NOT_FOUND;
 		}
@@ -602,7 +602,7 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 			if (volume->GetTree()->FindStatItem(dirID, objectID, &statItem)
 					!= B_OK
 				|| statItem.GetStatData(&statData) != B_OK
-				|| statData.IsEsoteric() && volume->GetHideEsoteric()) {
+				|| (statData.IsEsoteric() && volume->GetHideEsoteric())) {
 				continue;
 			}
 			if (error == B_OK) {

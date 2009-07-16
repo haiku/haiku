@@ -315,9 +315,9 @@ HeyInterpreterThreadHook(void* arg)
 		return 1;
 
 	BMessage environment(*(BMessage*) arg);
-	char* prompt = "Hey";
+	const char* prompt = "Hey";
 	if (environment.HasString("prompt"))
-		environment.FindString("prompt", (const char **)&prompt);
+		environment.FindString("prompt", &prompt);
 	printf("%s> ", prompt);
 
 	BMessenger target;

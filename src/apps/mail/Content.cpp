@@ -160,7 +160,7 @@ FilterHTMLTag(int32 &first, char **t, char *end)
 			return false;
 		}
 
-		const struct { char *name; int32 code; } entities[] = {
+		const struct { const char *name; int32 code; } entities[] = {
 			// this list is sorted alphabetically to be binary searchable
 			// the current implementation doesn't do this, though
 
@@ -400,7 +400,7 @@ CopyQuotes(const char *text, size_t length, char *outText, size_t &outLength)
 {
 	// count qoute level (to be able to wrap quotes correctly)
 
-	char *quote = QUOTE;
+	const char *quote = QUOTE;
 	int32 level = 0;
 	for (size_t i = 0; i < length; i++) {
 		if (text[i] == quote[0])
@@ -539,7 +539,7 @@ FillInQuoteTextRuns(BTextView* view, quote_context* context, const char* line,
 
 				bool search = true;
 				for (next = pos + 1; next < length; next++) {
-					if (search && is_quote_char(line[next])
+					if ((search && is_quote_char(line[next]))
 						|| line[next] == '\n')
 						break;
 					else if (search && line[next] != ' ' && line[next] != '\t')
@@ -2290,7 +2290,7 @@ TTextView::Reader::ParseMail(BMailContainer *container,
 
 			enclosure->type = TYPE_ENCLOSURE;
 
-			char *name = "\n<Enclosure: could not handle>\n";
+			const char *name = "\n<Enclosure: could not handle>\n";
 
 			fView->GetSelection(&enclosure->text_start, &enclosure->text_end);
 			enclosure->text_start++;

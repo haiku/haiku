@@ -84,7 +84,7 @@ CDDBDaemon::_Lookup(const dev_t device)
 	uint32 cddbId;
 	if (!_CanLookup(device, &cddbId, toc)) {
 		free(toc);
-		printf("Skipping device with id %d.\n", device);
+		printf("Skipping device with id %ld.\n", device);
 		return B_BAD_TYPE;
 	}
 		

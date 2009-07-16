@@ -20,7 +20,7 @@
 
 
 void
-PrintFlag(uint32 deviceFlags, uint32 testFlag, char *yes, char *no)
+PrintFlag(uint32 deviceFlags, uint32 testFlag, const char *yes, const char *no)
 {
 	printf(deviceFlags & testFlag ? yes : no);
 }
@@ -71,7 +71,7 @@ ByteString(int64 numBlocks, int64 blockSize)
 	if (blocks < 1024)
 		sprintf(string, "%Ld", numBlocks * blockSize);
 	else {
-		char *units[] = {"K", "M", "G", NULL};
+		const char *units[] = {"K", "M", "G", NULL};
 		int32 i = -1;
 
 		do {

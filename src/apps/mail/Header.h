@@ -123,7 +123,8 @@ class THeaderView : public BBox {
 
 class TTextControl : public BComboBox {
 	public:
-		TTextControl(BRect, char*, BMessage*, bool, bool, int32 resizingMode = B_FOLLOW_NONE);
+		TTextControl(BRect, const char*, BMessage*, bool, bool,
+			int32 resizingMode = B_FOLLOW_NONE);
 
 		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage*);

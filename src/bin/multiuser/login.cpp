@@ -38,7 +38,7 @@ set_tty_echo(bool enabled)
 		return errno;
 
 	// do we have to change the current setting at all?
-	if (enabled == (termios.c_lflag & ECHO) != 0)
+	if (enabled == ((termios.c_lflag & ECHO) != 0))
 		return B_OK;
 
 	if (enabled)

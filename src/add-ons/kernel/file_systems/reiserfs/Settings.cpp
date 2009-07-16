@@ -31,7 +31,7 @@ using std::nothrow;
 	\brief Manages the ReiserFS settings.
 */
 
-static char *kFSName = "reiserfs";
+static const char *kFSName = "reiserfs";
 
 // defaults
 static const char *kDefaultDefaultVolumeName = "ReiserFS untitled";

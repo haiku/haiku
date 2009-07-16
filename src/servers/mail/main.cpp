@@ -626,7 +626,7 @@ makeIndices()
 
 
 void
-addAttribute(BMessage &msg,char *name,char *publicName,int32 type = B_STRING_TYPE,bool viewable = true,bool editable = false,int32 width = 200)
+addAttribute(BMessage &msg,const char *name,const char *publicName,int32 type = B_STRING_TYPE,bool viewable = true,bool editable = false,int32 width = 200)
 {
 	msg.AddString("attr:name",name);
 	msg.AddString("attr:public_name",publicName);

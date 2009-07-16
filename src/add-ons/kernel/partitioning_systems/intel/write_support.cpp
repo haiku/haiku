@@ -219,7 +219,7 @@ get_sibling_partitions_pm(partition_data *partition,
 	partition_data *nextSibling = NULL;
 	for (int32 i = 0; i < partition->child_count; i++) {
 		partition_data *sibling = get_child_partition(partition->id, i);
-		if (sibling && sibling != child)
+		if (sibling && sibling != child) {
 			if (sibling->offset <= childOffset) {
 				if (!previousSibling || previousSibling->offset < sibling->offset)
 					previousSibling = sibling;
@@ -228,6 +228,7 @@ get_sibling_partitions_pm(partition_data *partition,
 				if (!nextSibling || nextSibling->offset > sibling->offset)
 					nextSibling = sibling;
 			}
+		}
 	}
 	*previous = previousSibling;
 	*next = nextSibling;
@@ -259,7 +260,7 @@ get_sibling_partitions_ep(partition_data *partition,
 	partition_data *nextSibling = NULL;
 	for (int32 i = 0; i < partition->child_count; i++) {
 		partition_data *sibling = get_child_partition(partition->id, i);
-		if (sibling && sibling != child)
+		if (sibling && sibling != child) {
 			if (get_offset_ep(sibling) <= childOffset) {
 				if (!previousSibling || previousSibling->offset < sibling->offset)
 					previousSibling = sibling;
@@ -268,6 +269,7 @@ get_sibling_partitions_ep(partition_data *partition,
 				if (!nextSibling || nextSibling->offset > sibling->offset)
 					nextSibling = sibling;
 			}
+		}
 	}
 	*previous = previousSibling;
 	*next = nextSibling;

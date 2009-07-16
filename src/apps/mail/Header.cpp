@@ -734,7 +734,7 @@ THeaderView::LoadMessage(BEmailMessage *mail)
 //	#pragma mark - TTextControl
 
 
-TTextControl::TTextControl(BRect rect, char *label, BMessage *msg, 
+TTextControl::TTextControl(BRect rect, const char *label, BMessage *msg, 
 		bool incoming, bool resending, int32 resizingMode)
 	: BComboBox(rect, "happy", label, msg, resizingMode),
 	fRefDropMenu(NULL)

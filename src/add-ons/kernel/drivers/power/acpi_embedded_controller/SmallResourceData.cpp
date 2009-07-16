@@ -32,7 +32,7 @@ io_port::Print()
 
 
 SmallResourceData::SmallResourceData(acpi_device_module_info* acpi,
-	acpi_device acpiCookie, char* method)
+	acpi_device acpiCookie, const char* method)
 {
 	acpi_data buffer;
 	buffer.pointer = NULL;

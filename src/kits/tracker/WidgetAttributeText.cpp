@@ -1740,7 +1740,7 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView *textView)
 		BAlert *alert = new BAlert("", 
 			"There was an error writing the attribute.", 
 			"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_CANCEL);
+		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 
 		fValueIsDefined = false;

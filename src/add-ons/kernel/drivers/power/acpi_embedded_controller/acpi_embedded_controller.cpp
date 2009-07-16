@@ -74,7 +74,7 @@ bus_space_write_1(int address, uint8 v)
 
 status_t
 acpi_GetInteger(acpi_device_module_info* acpi, acpi_device& acpiCookie,
-	char* path, int* number)
+	const char* path, int* number)
 {
 	status_t status;
  	acpi_data buf;
@@ -227,7 +227,7 @@ acpi_get_type(device_node* dev)
 static float
 embedded_controller_support(device_node *dev)
 {
-    static char *ec_ids[] = { "PNP0C09", NULL };
+    static const char *ec_ids[] = { "PNP0C09", NULL };
 
 	/* Check that this is a device. */
     if (acpi_get_type(dev) != ACPI_TYPE_DEVICE)

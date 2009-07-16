@@ -102,7 +102,7 @@ Block::GetData() const
 void
 Block::SetKind(uint32 kind)
 {
-	fFlags = fFlags & ~(uint32)KIND_MASK | kind & KIND_MASK;
+	fFlags = (fFlags & ~(uint32)KIND_MASK) | (kind & KIND_MASK);
 }
 
 // SetChecked

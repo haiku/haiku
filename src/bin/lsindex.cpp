@@ -46,7 +46,7 @@ print_index_type(const index_info &info, bool mkindexOutput)
 			return mkindexOutput ? "double" : "Double";
 
 		default:
-			sprintf(buffer, mkindexOutput ? "0x%08lx" : "Unknown type (0x%x)", info.type);
+			sprintf(buffer, mkindexOutput ? "0x%08lx" : "Unknown type (0x%lx)", info.type);
 			return buffer;
 	}
 }

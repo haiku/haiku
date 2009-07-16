@@ -77,7 +77,7 @@ RosterSettingsCharStream::GetString(char *result)
 	if (error)
 		return error;
 	
-	typedef enum RosterSettingsScannerState {
+	enum RosterSettingsScannerState {
 		rsssStart,
 		rsssUnquoted,
 		rsssQuoted,

@@ -580,14 +580,14 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 				| AMP_SET_LEFT_CHANNEL
 				| AMP_SET_INPUT_INDEX(control->index)
 				| control->mute
-				| resp[0] & AMP_GAIN_MASK);
+				| (resp[0] & AMP_GAIN_MASK));
 			TRACE("set_mix: sending verb to %ld: %lx %lx %x %lx\n", control->nid, 
 				control->mute, resp[0] & AMP_GAIN_MASK, control->input,
 				(control->input ? AMP_SET_INPUT : AMP_SET_OUTPUT)
 				| AMP_SET_LEFT_CHANNEL
 				| AMP_SET_INPUT_INDEX(control->index)
 				| control->mute
-				| resp[0] & AMP_GAIN_MASK);
+				| (resp[0] & AMP_GAIN_MASK));
 			verb[1] = MAKE_VERB(audioGroup->codec->addr,
 				control->nid,
 				VID_SET_AMPLIFIER_GAIN_MUTE,
@@ -595,7 +595,7 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 				| AMP_SET_RIGHT_CHANNEL
 				| AMP_SET_INPUT_INDEX(control->index)
 				| control->mute
-				| resp[1] & AMP_GAIN_MASK);
+				| (resp[1] & AMP_GAIN_MASK));
 			TRACE("set_mix: ctrl2 sending verb to %ld: %lx %lx %x\n", control->nid,
 				control->mute, resp[1] & AMP_GAIN_MASK, control->input);
 			hda_send_verbs(audioGroup->codec, verb, NULL, 2);

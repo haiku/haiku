@@ -461,7 +461,8 @@ WorkspacesView::MouseDown(BMessage* message, BPoint where)
 	// If this window is movable, we keep it selected
 	// (we prevent our own window from being moved, too)
 
-	if (fSelectedWindow != NULL && (fSelectedWindow->Flags() & B_NOT_MOVABLE) != 0
+	if ((fSelectedWindow != NULL
+			&& (fSelectedWindow->Flags() & B_NOT_MOVABLE) != 0)
 		|| fSelectedWindow == Window()) {
 		fSelectedWindow = NULL;
 	}
@@ -528,8 +529,8 @@ WorkspacesView::MouseMoved(BMessage* message, BPoint where)
 	if (index != fSelectedWorkspace) {
 		if (fSelectedWindow->IsNormal() && !fSelectedWindow->InWorkspace(index)) {
 			// move window to this new workspace
-			uint32 newWorkspaces = fSelectedWindow->Workspaces()
-				& ~(1UL << fSelectedWorkspace) | (1UL << index);
+			uint32 newWorkspaces = (fSelectedWindow->Workspaces()
+				& ~(1UL << fSelectedWorkspace)) | (1UL << index);
 
 			Window()->Desktop()->SetWindowWorkspaces(fSelectedWindow,
 				newWorkspaces);

@@ -740,6 +740,7 @@ struct RGB24Reader : public BaseReader<_PixelType> {
 		color.red = pixel.red;
 		color.green = pixel.green;
 		color.blue = pixel.blue;
+		color.alpha = 255;
 		BaseReader<_PixelType>::pixels++;
 	}
 
@@ -770,6 +771,7 @@ struct RGB16Reader : public BaseReader<_PixelType> {
 		color.red |= color.red >> 5;
 		color.green |= color.green >> 6;
 		color.blue |= color.blue >> 5;
+		color.alpha = 255;
 		BaseReader<_PixelType>::pixels++;
 	}
 
@@ -800,6 +802,7 @@ struct RGB15Reader : public BaseReader<_PixelType> {
 		color.red |= color.red >> 5;
 		color.green |= color.green >> 5;
 		color.blue |= color.blue >> 5;
+		color.alpha = 255;
 		BaseReader<_PixelType>::pixels++;
 	}
 
@@ -843,6 +846,7 @@ struct Gray8Reader : public BaseReader<uint8> {
 	inline void Read(rgb_color_value &color)
 	{
 		color.red = color.green = color.blue = *BaseReader<uint8>::pixels;
+		color.alpha = 255;
 		BaseReader<uint8>::pixels++;
 	}
 
@@ -881,6 +885,7 @@ struct Gray1Reader : public BaseReader<uint8> {
 			color.red = color.green = color.blue = 255;
 		else
 			color.red = color.green = color.blue = 0;
+		color.alpha = 255;
 		bit--;
 		if (bit == -1) {
 			pixels++;
@@ -935,8 +940,7 @@ struct RGB32Writer : public BaseWriter<_PixelType> {
 		pixel.red = color.red;
 		pixel.green = color.green;
 		pixel.blue = color.blue;
-//		pixel.alpha = 255;
-pixel.alpha = color.alpha;
+		pixel.alpha = color.alpha;
 		BaseWriter<_PixelType>::pixels++;
 	}
 

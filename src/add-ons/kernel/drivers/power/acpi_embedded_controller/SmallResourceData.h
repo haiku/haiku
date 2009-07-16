@@ -38,7 +38,7 @@ class SmallResourceData
 {
 public:
 						SmallResourceData(acpi_device_module_info* acpi,
-							acpi_device acpiCookie, char* method);
+							acpi_device acpiCookie, const char* method);
 						~SmallResourceData();
 
 	status_t			InitCheck();

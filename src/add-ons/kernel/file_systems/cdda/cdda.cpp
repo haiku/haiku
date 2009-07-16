@@ -114,7 +114,7 @@ find_string(const char *string, const char *find)
 
 
 static void
-cut_string(char *string, char *cut)
+cut_string(char *string, const char *cut)
 {
 	if (string == NULL || cut == NULL)
 		return;

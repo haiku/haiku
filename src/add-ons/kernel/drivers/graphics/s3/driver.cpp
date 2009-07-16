@@ -39,9 +39,10 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;	// revision of driver API we suppo
 
 
 struct ChipInfo {
-	uint16	chipID;			// PCI device id of the chip
-	uint16	chipType;		// assigned chip type identifier
-	char*	chipName;		// user recognizable name for chip (must be < 32 chars)
+	uint16		chipID;			// PCI device id of the chip
+	uint16		chipType;		// assigned chip type identifier
+	const char*	chipName;		// user recognizable name for chip (must be < 32
+								// chars)
 };
 
 // This table maps a PCI device ID to a chip type identifier and the chip name.

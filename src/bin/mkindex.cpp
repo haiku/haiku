@@ -96,7 +96,7 @@ usage(int status)
 int
 main(int argc, char **argv)
 {
-	char *indexTypeName = "string";
+	const char *indexTypeName = "string";
 	int indexType = B_STRING_TYPE;
 	char *indexName = NULL;
 	bool verbose = false;

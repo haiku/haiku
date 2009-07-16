@@ -304,8 +304,8 @@ new_chrand(const unsigned int inittimes)
 	prandgen->rndptrX = prandgen->ira;
 	prandgen->rndptrA = prandgen->ira;
 	prandgen->rndptrB = prandgen->ira;
-	prandgen->rndLeft.Q[0] = 0x1A4B385C72D69E0FUL;
-	prandgen->rndRite.Q[0] = 0x9C805FE7361A42DBUL;
+	prandgen->rndLeft.Q[0] = 0x1A4B385C72D69E0FULL;
+	prandgen->rndRite.Q[0] = 0x9C805FE7361A42DBULL;
 	reseed (prandgen, inittimes);
 
 	prandgen->seedptr = prandgen->ira + chrand (prandgen) % NK;

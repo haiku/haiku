@@ -1578,8 +1578,8 @@ Window::HasInSubset(const Window* window) const
 			return false;
 	}
 
-	if (fFeel == B_FLOATING_APP_WINDOW_FEEL
-			&& window->Feel() != B_MODAL_APP_WINDOW_FEEL
+	if ((fFeel == B_FLOATING_APP_WINDOW_FEEL
+			&& window->Feel() != B_MODAL_APP_WINDOW_FEEL)
 		|| fFeel == B_MODAL_APP_WINDOW_FEEL)
 		return window->ServerWindow()->App() == ServerWindow()->App();
 
