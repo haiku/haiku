@@ -87,6 +87,19 @@
 // * _NOTHREADS: if defined, don't use any multithreading support.
 
 
+#  define __USE_MALLOC
+	// BeOS used to trick the STL allocator (in stl_alloc.h) into falling back
+	// to malloc/free-allocation by setting MAX_BYTES to 0.
+	// By requesting to use those directly, we should get the same allocator,
+	// but will avoid the '... creates array of size 0'-warnings that are
+	// produced by 'gcc -strict' (for instance when building ICU).
+	// Alternatively, we could define _PTHREADS here and use the real STL
+	// allocator with posix threads enabled (however, this would have to be
+	// tested first, and most probably requires a rebuild of gcc2, too,
+	// in order to make sure that no code existing in libstdc++.r4.so is
+	// still using the old allocator).
+
+
 // Other macros defined by this file:
 
 // * bool, true, and false, if __STL_NO_BOOL is defined.

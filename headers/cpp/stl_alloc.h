@@ -30,7 +30,6 @@
 #  define __USE_MALLOC
 #endif
 
-
 // This implements some standard node allocators.  These are
 // NOT the same as the allocators in the C++ draft standard or in
 // in the original STL.  They do not encapsulate different pointer
@@ -329,11 +328,7 @@ private:
   // instead of enum { x = N }, but few compilers accept the former.
 # ifndef __SUNPRO_CC
     enum {_ALIGN = 8};
-#  if (defined(__BEOS__) || defined(__HAIKU__))
-    enum {_MAX_BYTES = 0};
-#  else
     enum {_MAX_BYTES = 128};
-#  endif
     enum {_NFREELISTS = _MAX_BYTES/_ALIGN};
 # endif
   static size_t
@@ -710,11 +705,7 @@ template <bool __threads, int __inst>
 __default_alloc_template<__threads, __inst>::_Obj* __VOLATILE
 __default_alloc_template<__threads, __inst> ::_S_free_list[
     _NFREELISTS
-#if (defined(__BEOS__) || defined(__HAIKU__))
-] = { };
-#else
 ] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
-#endif
 // The 16 zeros are necessary to make version 4.1 of the SunPro
 // compiler happy.  Otherwise it appears to allocate too little
 // space for the array.
