@@ -213,7 +213,9 @@ WorkerThread::_LaunchInitScript(BPath &path)
 	BString command("/bin/sh ");
 	command += bootPath.Path();
 	command += "/InstallerInitScript ";
+	command += "\"";
 	command += path.Path();
+	command += "\"";
 	_SetStatusMessage("Starting Installation.");
 	system(command.String());
 }
@@ -227,7 +229,9 @@ WorkerThread::_LaunchFinishScript(BPath &path)
 	BString command("/bin/sh ");
 	command += bootPath.Path();
 	command += "/InstallerFinishScript ";
+	command += "\"";
 	command += path.Path();
+	command += "\"";
 	_SetStatusMessage("Finishing Installation.");
 	system(command.String());
 }
