@@ -155,7 +155,7 @@ BUSBInterface::CountEndpoints() const
 const BUSBEndpoint *
 BUSBInterface::EndpointAt(uint32 index) const
 {
-	if (index >= fDescriptor.num_endpoints && fEndpoints != NULL)
+	if (index >= fDescriptor.num_endpoints || fEndpoints == NULL)
 		return NULL;
 
 	return fEndpoints[index];
