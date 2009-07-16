@@ -90,7 +90,7 @@ VideoProducer::AddOn(int32* _internalId) const
 }
 
 
-status_t 
+status_t
 VideoProducer::HandleMessage(int32 message, const void* data, size_t size)
 {
 	return B_ERROR;
@@ -112,7 +112,7 @@ VideoProducer::RequestCompleted(const media_request_info& info)
 }
 
 
-void 
+void
 VideoProducer::NodeRegistered()
 {
 	if (fInitStatus != B_OK) {
@@ -124,7 +124,7 @@ VideoProducer::NodeRegistered()
 	fOutput.source.port = ControlPort();
 	fOutput.source.id = 0;
 	fOutput.destination = media_destination::null;
-	strcpy(fOutput.name, Name());	
+	strcpy(fOutput.name, Name());
 
 	// fill with wild cards at this point in time
 	fOutput.format.type = B_MEDIA_RAW_VIDEO;
@@ -190,7 +190,7 @@ printf("VideoProducer::SetRunMode(%d)\n", mode);
 }
 
 
-void 
+void
 VideoProducer::HandleEvent(const media_timed_event* event,
 		bigtime_t lateness, bool realTimeEvent)
 {
@@ -219,7 +219,7 @@ VideoProducer::HandleEvent(const media_timed_event* event,
 }
 
 
-void 
+void
 VideoProducer::CleanUpEvent(const media_timed_event *event)
 {
 	BMediaEventLooper::CleanUpEvent(event);
@@ -247,7 +247,7 @@ VideoProducer::DeleteHook(BMediaNode* node)
 }
 
 
-status_t 
+status_t
 VideoProducer::FormatSuggestionRequested(media_type type, int32 quality,
 	media_format* _format)
 {
@@ -263,11 +263,11 @@ VideoProducer::FormatSuggestionRequested(media_type type, int32 quality,
 }
 
 
-status_t 
+status_t
 VideoProducer::FormatProposal(const media_source& output, media_format* format)
 {
 	#ifdef TRACE_VIDEO_PRODUCER
-		char string[256];		
+		char string[256];
 		string_for_format(*format, string, 256);
 		FUNCTION("FormatProposal(%s)\n", string);
 	#endif
@@ -292,11 +292,11 @@ VideoProducer::FormatProposal(const media_source& output, media_format* format)
 	// change any wild cards to specific values
 
 	return ret;
-		
+
 }
 
 
-status_t 
+status_t
 VideoProducer::FormatChangeRequested(const media_source& source,
 	const media_destination& destination, media_format* ioFormat,
 	int32 *_deprecated_)
@@ -305,12 +305,12 @@ VideoProducer::FormatChangeRequested(const media_source& source,
 
 	if (source != fOutput.source)
 		return B_MEDIA_BAD_SOURCE;
-		
-	return B_ERROR;	
+
+	return B_ERROR;
 }
 
 
-status_t 
+status_t
 VideoProducer::GetNextOutput(int32* cookie, media_output* outOutput)
 {
 	if (!outOutput)
@@ -318,7 +318,7 @@ VideoProducer::GetNextOutput(int32* cookie, media_output* outOutput)
 
 	if ((*cookie) != 0)
 		return B_BAD_INDEX;
-	
+
 	*outOutput = fOutput;
 	(*cookie)++;
 
@@ -326,7 +326,7 @@ VideoProducer::GetNextOutput(int32* cookie, media_output* outOutput)
 }
 
 
-status_t 
+status_t
 VideoProducer::DisposeOutputCookie(int32 cookie)
 {
 	TOUCH(cookie);
@@ -335,7 +335,7 @@ VideoProducer::DisposeOutputCookie(int32 cookie)
 }
 
 
-status_t 
+status_t
 VideoProducer::SetBufferGroup(const media_source& forSource,
 	BBufferGroup *group)
 {
@@ -350,7 +350,7 @@ VideoProducer::SetBufferGroup(const media_source& forSource,
 }
 
 
-status_t 
+status_t
 VideoProducer::VideoClippingChanged(const media_source& forSource,
 	int16 numShorts, int16* clipData, const media_video_display_info& display,
 	int32* _deprecated_)
@@ -362,7 +362,7 @@ VideoProducer::VideoClippingChanged(const media_source& forSource,
 }
 
 
-status_t 
+status_t
 VideoProducer::GetLatency(bigtime_t* _latency)
 {
 	if (!_latency)
@@ -374,7 +374,7 @@ VideoProducer::GetLatency(bigtime_t* _latency)
 }
 
 
-status_t 
+status_t
 VideoProducer::PrepareToConnect(const media_source& source,
 	const media_destination& destination, media_format* format,
 	media_source* outSource, char* outName)
@@ -390,7 +390,7 @@ VideoProducer::PrepareToConnect(const media_source& source,
 
 	if (source != fOutput.source)
 		return B_MEDIA_BAD_SOURCE;
-	
+
 	if (fOutput.destination != media_destination::null) {
 		ERROR("PrepareToConnect() - destination != null.\n");
 		return B_MEDIA_ALREADY_CONNECTED;
@@ -423,7 +423,7 @@ VideoProducer::PrepareToConnect(const media_source& source,
 #define NODE_LATENCY 20000
 
 
-void 
+void
 VideoProducer::Connect(status_t error, const media_source& source,
 	const media_destination& destination, const media_format& format,
 	char* _name)
@@ -459,7 +459,7 @@ VideoProducer::Connect(status_t error, const media_source& source,
 				* 1000000 / fOutput.format.u.raw_video.field_rate);
 		fFrameBase = fFrame;
 	}
-	
+
 	fConnectedFormat = format.u.raw_video;
 	if (fConnectedFormat.display.bytes_per_row == 0) {
 		ERROR("Connect() - connected format still has BPR wildcard!\n");
@@ -495,7 +495,7 @@ VideoProducer::Connect(status_t error, const media_source& source,
 }
 
 
-void 
+void
 VideoProducer::Disconnect(const media_source& source,
 	const media_destination& destination)
 {
@@ -528,7 +528,7 @@ VideoProducer::Disconnect(const media_source& source,
 }
 
 
-void 
+void
 VideoProducer::LateNoticeReceived(const media_source &source,
 		bigtime_t how_much, bigtime_t performanceTime)
 {
@@ -537,7 +537,7 @@ VideoProducer::LateNoticeReceived(const media_source &source,
 }
 
 
-void 
+void
 VideoProducer::EnableOutput(const media_source& source, bool enabled,
 	int32* _deprecated_)
 {
@@ -550,7 +550,7 @@ VideoProducer::EnableOutput(const media_source& source, bool enabled,
 }
 
 
-status_t 
+status_t
 VideoProducer::SetPlayRate(int32 numer, int32 denom)
 {
 	TOUCH(numer); TOUCH(denom);
@@ -559,7 +559,7 @@ VideoProducer::SetPlayRate(int32 numer, int32 denom)
 }
 
 
-void 
+void
 VideoProducer::AdditionalBufferRequested(const media_source& source,
 	media_buffer_id prevBuffer, bigtime_t prevTime,
 	const media_seek_tag* prevTag)
@@ -568,7 +568,7 @@ VideoProducer::AdditionalBufferRequested(const media_source& source,
 }
 
 
-void 
+void
 VideoProducer::LatencyChanged(const media_source& source,
 	const media_destination& destination,
 	bigtime_t newLatency, uint32 flags)
@@ -659,12 +659,14 @@ VideoProducer::_FrameGeneratorThreadEntry(void* data)
 }
 
 
-int32 
+int32
 VideoProducer::_FrameGeneratorThread()
 {
 	bool forceSendingBuffer = true;
 	bigtime_t lastFrameSentAt = 0;
 	int64 lastPlaylistFrame = 0;
+	int32 droppedFrames = 0;
+	const int32 kMaxDroppedFrames = 15;
 	bool running = true;
 	while (running) {
 		TRACE("_FrameGeneratorThread: loop: %Ld\n", fFrame);
@@ -744,7 +746,8 @@ VideoProducer::_FrameGeneratorThread()
 				if (ignoreEvent || !fRunning || !fEnabled) {
 					TRACE("_FrameGeneratorThread: ignore event\n");
 					// nothing to do
-				} else if (nextWaitUntil < system_time()) {
+				} else if (nextWaitUntil < system_time()
+					&& droppedFrames < kMaxDroppedFrames) {
 					// Drop frame if it's at least a frame late.
 					printf("VideoProducer: dropped frame (%Ld)\n", fFrame);
 					if (fManager->LockWithTimeout(10000) == B_OK) {
@@ -752,6 +755,7 @@ VideoProducer::_FrameGeneratorThread()
 						fManager->Unlock();
 					}
 					// next frame
+					droppedFrames++;
 					fFrame++;
 				} else if (playingDirection != 0 || forceSendingBuffer) {
 					// Send buffers only, if playing, the node is running and
@@ -759,16 +763,16 @@ VideoProducer::_FrameGeneratorThread()
 					TRACE("_FrameGeneratorThread: produce frame\n");
 					BAutolock _(fLock);
 					// Fetch a buffer from the buffer group
-					BBuffer *buffer = fUsedBufferGroup->RequestBuffer(
+					BBuffer* buffer = fUsedBufferGroup->RequestBuffer(
 						fConnectedFormat.display.bytes_per_row
 						* fConnectedFormat.display.line_count, 0LL);
-					if (buffer) {
+					if (buffer != NULL) {
 						// Fill out the details about this buffer.
-						media_header *h = buffer->Header();
+						media_header* h = buffer->Header();
 						h->type = B_MEDIA_RAW_VIDEO;
 						h->time_source = TimeSource()->ID();
 						h->size_used = fConnectedFormat.display.bytes_per_row
-									   * fConnectedFormat.display.line_count;
+							* fConnectedFormat.display.line_count;
 						// For a buffer originating from a device, you might
 						// want to calculate this based on the
 						// PerformanceTimeFor the time your buffer arrived at
@@ -777,7 +781,7 @@ VideoProducer::_FrameGeneratorThread()
 // TODO: Fix the runmode stuff! Setting the consumer to B_OFFLINE does
 // not do the trick. I made the VideoConsumer check the performance
 // time of the buffer and if it is 0, it plays it regardless.
-if (playingMode < 0) {
+if (playingMode < 0 || droppedFrames >= kMaxDroppedFrames) {
 h->start_time = 0;
 }
 						h->file_pos = 0;
@@ -797,7 +801,7 @@ h->start_time = 0;
 						TRACE("_FrameGeneratorThread: frame: %Ld, "
 							"playlistFrame: %Ld\n", fFrame, playlistFrame);
 						bool forceOrWasCached = forceSendingBuffer;
-	
+
 						err = fSupplier->FillBuffer(playlistFrame,
 							buffer->Data(), &mf, forceOrWasCached);
 						// clean the buffer if something went wrong
@@ -834,6 +838,7 @@ h->start_time = 0;
 					}
 					// next frame
 					fFrame++;
+					droppedFrames = 0;
 				} else {
 					TRACE("_FrameGeneratorThread: not playing\n");
 					// next frame
