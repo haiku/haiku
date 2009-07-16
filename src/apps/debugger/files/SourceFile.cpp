@@ -88,14 +88,11 @@ SourceFile::Init(const char* path)
 	fFileContent[fileSize] = '\0';
 
 	// count lines
-	fLineCount = 0;
+	fLineCount = 1;
 	for (size_t i = 0; i < fileSize; i++) {
 		if (fFileContent[i] == '\n')
 			fLineCount++;
 	}
-
-	if (fFileContent[fileSize - 1] != '\n')
-		fLineCount++;
 
 	// allocate line offset array
 	fLineOffsets = new(std::nothrow) int32[fLineCount + 1];
@@ -111,7 +108,7 @@ SourceFile::Init(const char* path)
 			fLineOffsets[lineIndex++] = i + 1;
 		}
 	}
-	fLineOffsets[fLineCount] = fileSize - 1;
+	fLineOffsets[fLineCount] = fileSize + 1;
 
 	return B_OK;
 }

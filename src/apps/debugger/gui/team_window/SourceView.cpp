@@ -261,6 +261,7 @@ private:
 			SelectionPoint		fSelectionStart;
 			SelectionPoint		fSelectionEnd;
 			SelectionPoint		fSelectionBase;
+			SelectionPoint		fLastClickPoint;
 			bigtime_t			fLastClickTime;
 			int16				fClickCount;
 			rgb_color			fTextColor;
@@ -856,6 +857,7 @@ SourceView::TextView::TextView(SourceView* sourceView, FontInfo* fontInfo)
 	fSelectionStart(-1, -1),
 	fSelectionEnd(-1, -1),
 	fSelectionBase(-1, -1),
+	fLastClickPoint(-1, -1),
 	fLastClickTime(0),
 	fClickCount(0),
 	fSelectionMode(false),
@@ -1009,6 +1011,7 @@ SourceView::TextView::MouseDown(BPoint where)
 		_GetSelectionRegion(region);
 		bigtime_t clickTime = system_time();
 		SelectionPoint point = _SelectionPointAt(where);
+		fLastClickPoint = point;
 		bigtime_t clickSpeed = 0;
 		get_click_speed(&clickSpeed);
 		if (clickTime - fLastClickTime < clickSpeed
@@ -1104,6 +1107,16 @@ void
 SourceView::TextView::MouseUp(BPoint where)
 {
 	fSelectionMode = false;
+	if (fTrackState == kTracking && fClickCount < 2) {
+		
+		// if we clicked without dragging or double/triple clicking,
+		// clear the current selection (if any)
+		SelectionPoint point = _SelectionPointAt(where);
+		if (fLastClickPoint == point) {
+			fSelectionBase = fSelectionStart = fSelectionEnd;
+			Invalidate();
+		}
+	}
 	fTrackState = kNotTracking;
 }
 
