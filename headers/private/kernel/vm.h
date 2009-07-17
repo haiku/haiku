@@ -56,6 +56,8 @@ void forbid_page_faults(void);
 area_id create_area_etc(team_id team, const char *name, void **address,
 			uint32 addressSpec, uint32 size, uint32 lock, uint32 protection,
 			uint32 flags);
+area_id transfer_area(area_id id, void** _address, uint32 addressSpec,
+			team_id target, bool kernel);
 
 status_t vm_unreserve_address_range(team_id team, void *address, addr_t size);
 status_t vm_reserve_address_range(team_id team, void **_address,

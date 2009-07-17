@@ -436,6 +436,8 @@ extern status_t		_kern_system_profiler_start(
 extern status_t		_kern_system_profiler_next_buffer(size_t bytesRead,
 						uint64* _droppedEvents);
 extern status_t		_kern_system_profiler_stop();
+extern status_t		_kern_system_profiler_recorded(
+						struct system_profiler_parameters* parameters);
 
 /* atomic_* ops (needed for CPUs that don't support them directly) */
 #ifdef ATOMIC_FUNCS_ARE_SYSCALLS

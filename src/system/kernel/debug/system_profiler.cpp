@@ -22,6 +22,7 @@
 #include <team.h>
 #include <thread.h>
 #include <user_debugger.h>
+#include <vm.h>
 
 #include <arch/debug.h>
 
@@ -42,6 +43,7 @@ class SystemProfiler;
 
 static spinlock sProfilerLock = B_SPINLOCK_INITIALIZER;
 static SystemProfiler* sProfiler = NULL;
+static struct system_profiler_parameters* sRecordedParameters = NULL;
 
 
 class SystemProfiler : public Referenceable, private NotificationListener,
@@ -1135,6 +1137,103 @@ SystemProfiler::_ProfilingEvent(struct timer* timer)
 }
 
 
+// #pragma mark - private kernel API
+
+
+status_t
+start_system_profiler(size_t areaSize, uint32 flags)
+{
+	struct ParameterDeleter {
+		ParameterDeleter(area_id area)
+			:
+			fArea(area),
+			fDetached(false)
+		{
+		}
+
+		~ParameterDeleter()
+		{
+			if (!fDetached) {
+				delete_area(fArea);
+				delete sRecordedParameters;
+				sRecordedParameters = NULL;
+			}
+		}
+
+		void Detach()
+		{
+			fDetached = true;
+		}
+
+	private:
+		area_id	fArea;
+		bool	fDetached;
+	};
+
+	void* address;
+	area_id area = create_area("kernel profile data", &address,
+		B_ANY_KERNEL_ADDRESS, areaSize, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (area < 0)
+		return area;
+
+	ParameterDeleter parameterDeleter(area);
+
+	sRecordedParameters = new(std::nothrow) system_profiler_parameters;
+	if (sRecordedParameters == NULL)
+		return B_NO_MEMORY;
+
+	sRecordedParameters->buffer_area = area;
+	sRecordedParameters->flags
+		= flags | B_SYSTEM_PROFILER_SAMPLING_EVENTS;
+	sRecordedParameters->locking_lookup_size = 4096;
+	sRecordedParameters->interval = 1000;
+	sRecordedParameters->stack_depth = 5;
+
+	area_info areaInfo;
+	get_area_info(area, &areaInfo);
+
+	// initialize the profiler
+	SystemProfiler* profiler = new(std::nothrow) SystemProfiler(B_SYSTEM_TEAM,
+		areaInfo, *sRecordedParameters);
+	if (profiler == NULL)
+		return B_NO_MEMORY;
+
+	ObjectDeleter<SystemProfiler> profilerDeleter(profiler);
+
+	status_t error = profiler->Init();
+	if (error != B_OK)
+		return error;
+
+	// set the new profiler
+	InterruptsSpinLocker locker(sProfilerLock);
+	if (sProfiler != NULL)
+		return B_BUSY;
+
+	parameterDeleter.Detach();
+	profilerDeleter.Detach();
+	sProfiler = profiler;
+	locker.Unlock();
+
+	return B_OK;
+}
+
+
+void
+stop_system_profiler()
+{
+	InterruptsSpinLocker locker(sProfilerLock);
+	if (sProfiler == NULL)
+		return;
+
+	SystemProfiler* profiler = sProfiler;
+	sProfiler = NULL;
+	locker.Unlock();
+
+	profiler->RemoveReference();
+}
+
+
 // #pragma mark - syscalls
 
 
@@ -1244,4 +1343,34 @@ _user_system_profiler_stop()
 	profiler->RemoveReference();
 
 	return B_OK;
+}
+
+
+status_t
+_user_system_profiler_recorded(struct system_profiler_parameters* userParameters)
+{
+	if (userParameters == NULL || !IS_USER_ADDRESS(userParameters))
+		return B_BAD_ADDRESS;
+	if (sRecordedParameters == NULL)
+		return B_ERROR;
+
+	// Transfer the area to the userland process
+
+	void* address;
+	area_id newArea = transfer_area(sRecordedParameters->buffer_area, &address,
+		B_ANY_ADDRESS, team_get_current_team_id(), true);
+	if (newArea < 0)
+		return newArea;
+
+	sRecordedParameters->buffer_area = newArea;
+
+	status_t status = user_memcpy(userParameters, sRecordedParameters,
+		sizeof(system_profiler_parameters));
+	if (status != B_OK)
+		delete_area(newArea);
+
+	delete sRecordedParameters;
+	sRecordedParameters = NULL;
+
+	return status;
 }

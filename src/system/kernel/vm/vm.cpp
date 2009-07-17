@@ -2621,7 +2621,7 @@ vm_delete_area(team_id team, area_id id, bool kernel)
 	AddressSpaceWriteLocker locker;
 	vm_area* area;
 	status_t status = locker.SetFromArea(team, id, area);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	if (!kernel && (area->protection & B_KERNEL_AREA) != 0)
@@ -5817,25 +5817,23 @@ resize_area(area_id areaID, size_t newSize)
 
 /*!	Transfers the specified area to a new team. The caller must be the owner
 	of the area (not yet enforced but probably should be).
-	This function is currently not exported to the kernel namespace, but is
-	only accessible using the _kern_transfer_area() syscall.
 */
-static area_id
+area_id
 transfer_area(area_id id, void** _address, uint32 addressSpec, team_id target,
 	bool kernel)
 {
 	area_info info;
 	status_t status = get_area_info(id, &info);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	area_id clonedArea = vm_clone_area(target, info.name, _address,
 		addressSpec, info.protection, REGION_NO_PRIVATE_MAP, id, kernel);
-	if (clonedArea < B_OK)
+	if (clonedArea < 0)
 		return clonedArea;
 
 	status = vm_delete_area(info.team, id, kernel);
-	if (status < B_OK) {
+	if (status != B_OK) {
 		vm_delete_area(target, clonedArea, kernel);
 		return status;
 	}
