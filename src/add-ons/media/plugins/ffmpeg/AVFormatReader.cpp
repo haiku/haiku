@@ -656,12 +656,24 @@ AVFormatReader::StreamCookie::GetStreamInfo(int64* frameCount,
 	// for a couple of streams and are in line with the documentation, but
 	// unfortunately, libavformat itself seems to set the time_base and
 	// duration wrongly sometimes. :-(
-	TRACE("  stream duration: %lld, time_base %.4f (%d/%d)\n",
-		fStream->duration,
-		av_q2d(fStream->time_base),
-		fStream->time_base.num, fStream->time_base.den);
-	*duration = (bigtime_t)(1000000LL * fStream->duration
-		* av_q2d(fStream->time_base));
+	static const int64 kNoPTSValue = 0x8000000000000000LL;
+		// NOTE: For some reasons, I have trouble with the avcodec.h define:
+		// #define AV_NOPTS_VALUE          INT64_C(0x8000000000000000)
+		// INT64_C is not defined here.
+	if ((int64)fStream->duration != kNoPTSValue) {
+		*duration = (bigtime_t)(1000000LL * fStream->duration
+			* fStream->time_base.num / fStream->time_base.den);
+		TRACE("  stream duration: %lld, time_base %.4f (%d/%d)\n",
+			*duration, av_q2d(fStream->time_base),
+			fStream->time_base.num, fStream->time_base.den);
+	} else if ((int64)fContext->duration != kNoPTSValue) {
+		*duration = (bigtime_t)(1000000LL * fContext->duration / AV_TIME_BASE);
+		TRACE("  stream duration: %lld (from AVFormatContext)\n",
+			*duration);
+	} else {
+		*duration = 0;
+		TRACE("  stream duration: N/A\n");
+	}
 
 	TRACE("  duration: %lld or %.2fs\n", *duration, *duration / 1000000.0);
 
