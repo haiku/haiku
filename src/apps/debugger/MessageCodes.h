@@ -24,6 +24,8 @@ enum {
 	MSG_USER_BREAKPOINT_CHANGED			= 'ubrc',
 	MSG_DEBUGGER_EVENT					= 'dbge',
 
+	MSG_TEXTVIEW_AUTOSCROLL				= 'tvas',
+
 	MSG_TEAM_DEBUGGER_QUIT				= 'dbqt'
 };
 

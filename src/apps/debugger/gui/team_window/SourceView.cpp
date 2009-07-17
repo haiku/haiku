@@ -15,6 +15,7 @@
 #include <LayoutUtils.h>
 #include <Looper.h>
 #include <Message.h>
+#include <MessageRunner.h>
 #include <Polygon.h>
 #include <Region.h>
 #include <ScrollBar.h>
@@ -28,6 +29,7 @@
 #include "Function.h"
 #include "FileSourceCode.h"
 #include "LocatableFile.h"
+#include "MessageCodes.h"
 #include "StackTrace.h"
 #include "Statement.h"
 #include "TeamDebugModel.h"
@@ -36,6 +38,8 @@
 static const int32 kLeftTextMargin = 3;
 static const float kMinViewHeight = 80.0f;
 static const int32 kSpacesPerTab = 4;
+static const bigtime_t kScrollTimer = 10000LL;
+
 	// TODO: Should be settable!
 
 
@@ -253,7 +257,12 @@ private:
 			void				_CopySelectionToClipboard() const;
 			void				_SelectWordAt(const SelectionPoint& point);
 			void				_SelectLineAt(const SelectionPoint& point);
-
+			void				_HandleAutoScroll();
+			void				_ScrollByLines(int32 lineCount);
+			void				_ScrollByPages(int32 pageCount);
+			void				_ScrollToTop();
+			void				_ScrollToBottom();
+						
 private:
 
 			float				fMaxLineWidth;
@@ -267,6 +276,7 @@ private:
 			rgb_color			fTextColor;
 			bool				fSelectionMode;
 			TrackingState		fTrackState;
+			BMessageRunner*		fScrollRunner;
 };
 
 
@@ -861,7 +871,8 @@ SourceView::TextView::TextView(SourceView* sourceView, FontInfo* fontInfo)
 	fLastClickTime(0),
 	fClickCount(0),
 	fSelectionMode(false),
-	fTrackState(kNotTracking)
+	fTrackState(kNotTracking),
+	fScrollRunner(NULL)
 {
 	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 	fTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
@@ -926,36 +937,29 @@ SourceView::TextView::Draw(BRect updateRect)
 void
 SourceView::TextView::KeyDown(const char* bytes, int32 numBytes)
 {
-	BScrollBar* vertical = fSourceView->ScrollBar(B_VERTICAL);
-	if (!vertical)
-		return;
-
-	float value = vertical->Value();
 	switch(bytes[0]) {
 		case B_UP_ARROW:
-			vertical->SetValue(value - fFontInfo->lineHeight);
+			_ScrollByLines(-1);
 			break;
 
 		case B_DOWN_ARROW:
-			vertical->SetValue(value + fFontInfo->lineHeight);
+			_ScrollByLines(1);
 			break;
 
 		case B_PAGE_UP:
-			vertical->SetValue(value - fSourceView->Frame().Size().height);
+			_ScrollByPages(-1);
 			break;
 
 		case B_PAGE_DOWN:
-			vertical->SetValue(value + fSourceView->Frame().Size().height);
+			_ScrollByPages(1);
 			break;
 
 		case B_HOME:
-			vertical->SetValue(0.0);
+			_ScrollToTop();
 			break;
 
 		case B_END:
-			float min, max;
-			vertical->GetRange(&min, &max);
-			vertical->SetValue(max);
+			_ScrollToBottom();
 			break;
 	}
 
@@ -988,6 +992,10 @@ SourceView::TextView::MessageReceived(BMessage* message)
 			fSelectionEnd.offset = fSourceCode->LineLengthAt(
 				fSelectionEnd.line);
 			Invalidate();
+			break;
+
+		case MSG_TEXTVIEW_AUTOSCROLL:
+			_HandleAutoScroll();
 			break;
 
 		default:
@@ -1053,6 +1061,7 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 		SelectionPoint point = _SelectionPointAt(where);
 		switch (transit) {
 			case B_INSIDE_VIEW:
+			case B_OUTSIDE_VIEW:
 				if (point.line > fSelectionBase.line) {
 					fSelectionStart = fSelectionBase;
 					fSelectionEnd = point;
@@ -1067,9 +1076,16 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 					fSelectionStart = point;
 				}
 				break;
-
-			// TODO: handle scrolling when mouse is moved outside
-			// view bounds
+				
+			case B_EXITED_VIEW:
+				fScrollRunner = new BMessageRunner(BMessenger(this),
+					new BMessage(MSG_TEXTVIEW_AUTOSCROLL), kScrollTimer);
+				break;
+				
+			case B_ENTERED_VIEW:
+				delete fScrollRunner;
+				fScrollRunner = NULL;
+				break;
 		}
 		_GetSelectionRegion(region);
 		region.Include(&oldRegion);
@@ -1117,6 +1133,8 @@ SourceView::TextView::MouseUp(BPoint where)
 			Invalidate();
 		}
 	}
+	delete fScrollRunner;
+	fScrollRunner = NULL;
 	fTrackState = kNotTracking;
 }
 
@@ -1296,6 +1314,70 @@ SourceView::TextView::_SelectLineAt(const SelectionPoint& point)
 	BRegion region;
 	_GetSelectionRegion(region);
 	Invalidate(&region);
+}
+
+
+void
+SourceView::TextView::_HandleAutoScroll(void)
+{
+	BPoint point;
+	uint32 buttons;
+	GetMouse(&point, &buttons);
+	// TODO: investigate if the observed Bounds() behavior for child views
+	// (returning the entire view rect) is correct, and if not, fix
+	// and remove the workaround here of asking the parent bounds to do the 
+	// comparison
+	_ScrollByLines(point.y < fSourceView->Bounds().top ? -1 : 1);
+	MouseMoved(point, B_OUTSIDE_VIEW, NULL);
+}
+
+
+void
+SourceView::TextView::_ScrollByLines(int32 lineCount)
+{
+	BScrollBar* vertical = fSourceView->ScrollBar(B_VERTICAL);
+	if (vertical == NULL)
+		return;
+
+	float value = vertical->Value();
+	vertical->SetValue(value + (fFontInfo->lineHeight * lineCount));
+}
+
+
+void
+SourceView::TextView::_ScrollByPages(int32 pageCount)
+{
+	BScrollBar* vertical = fSourceView->ScrollBar(B_VERTICAL);
+	if (vertical == NULL)
+		return;
+
+	float value = vertical->Value();
+	vertical->SetValue(value + 
+		(fSourceView->Frame().Size().height * pageCount));
+}
+
+
+void
+SourceView::TextView::_ScrollToTop(void)
+{
+	BScrollBar* vertical = fSourceView->ScrollBar(B_VERTICAL);
+	if (vertical == NULL)
+		return;
+
+	vertical->SetValue(0.0);
+}
+
+
+void
+SourceView::TextView::_ScrollToBottom(void)
+{
+	BScrollBar* vertical = fSourceView->ScrollBar(B_VERTICAL);
+	if (vertical == NULL)
+		return;
+
+	float min, max;
+	vertical->GetRange(&min, &max);
+	vertical->SetValue(max);
 }
 
 
