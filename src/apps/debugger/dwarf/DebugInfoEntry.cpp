@@ -202,7 +202,6 @@ DebugInfoEntry::AddAttribute_location(uint16 attributeName,
 			return B_OK;
 		}
 		return B_BAD_DATA;
-
 	}
 
 	return ATTRIBUTE_NOT_HANDLED;

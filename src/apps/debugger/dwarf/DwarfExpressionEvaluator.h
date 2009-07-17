@@ -11,16 +11,18 @@
 
 
 class DwarfTargetInterface;
+class ValueLocation;
+struct ValuePieceLocation;
 
 
 class DwarfExpressionEvaluationContext {
 public:
 								DwarfExpressionEvaluationContext(
-									DwarfTargetInterface* targetInterface,
+									const DwarfTargetInterface* targetInterface,
 									uint8 addressSize);
 	virtual						~DwarfExpressionEvaluationContext();
 
-			DwarfTargetInterface* TargetInterface() const
+			const DwarfTargetInterface* TargetInterface() const
 									{ return fTargetInterface; }
 			uint8				AddressSize() const	{ return fAddressSize; }
 
@@ -38,8 +40,8 @@ public:
 									// block, when the entry doesn't have a
 									// location attribute
 
-private:
-			DwarfTargetInterface* fTargetInterface;
+protected:
+			const DwarfTargetInterface* fTargetInterface;
 			uint8				fAddressSize;
 };
 
@@ -50,10 +52,12 @@ public:
 									DwarfExpressionEvaluationContext* context);
 								~DwarfExpressionEvaluator();
 
-			void				SetObjectAddress(target_addr_t address);
-			void				SetFrameAddress(target_addr_t address);
+			status_t			Push(target_addr_t value);
 
-			status_t			Evaluate(const void* expression, size_t size);
+			status_t			Evaluate(const void* expression, size_t size,
+									target_addr_t& _result);
+			status_t			EvaluateLocation(const void* expression,
+									size_t size, ValueLocation& _location);
 
 private:
 			struct EvaluationException;
@@ -64,7 +68,7 @@ private:
 	inline	void				_Push(target_addr_t value);
 	inline	target_addr_t		_Pop();
 
-			status_t			_Evaluate();
+			status_t			_Evaluate(ValuePieceLocation* _piece);
 			void				_DereferenceAddress(uint8 addressSize);
 			void				_DereferenceAddressSpaceAddress(
 									uint8 addressSize);

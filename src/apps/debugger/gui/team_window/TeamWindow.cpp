@@ -26,9 +26,10 @@
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "MessageCodes.h"
-#include "RegisterView.h"
+#include "RegistersView.h"
 #include "StackTrace.h"
 #include "StackTraceView.h"
+#include "VariablesView.h"
 
 
 enum {
@@ -57,7 +58,8 @@ TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 	fThreadListView(NULL),
 	fImageListView(NULL),
 	fImageFunctionsView(NULL),
-	fRegisterView(NULL),
+	fVariablesView(NULL),
+	fRegistersView(NULL),
 	fStackTraceView(NULL),
 	fSourceView(NULL),
 	fRunButton(NULL),
@@ -386,11 +388,12 @@ TeamWindow::_Init()
 		.Add(fImageFunctionsView = ImageFunctionsView::Create(this));
 
 	// add local variables tab
-	BView* tab = new BTextView("Variables");
+	BView* tab = fVariablesView = VariablesView::Create();
 	fLocalsTabView->AddTab(tab);
 
 	// add registers tab
-	tab = fRegisterView = RegisterView::Create(fDebugModel->GetArchitecture());
+	tab = fRegistersView = RegistersView::Create(
+		fDebugModel->GetArchitecture());
 	fLocalsTabView->AddTab(tab);
 
 	fRunButton->SetMessage(new BMessage(MSG_THREAD_RUN));
@@ -529,6 +532,7 @@ TeamWindow::_SetActiveStackFrame(StackFrame* frame)
 	_UpdateCpuState();
 
 	fStackTraceView->SetStackFrame(fActiveStackFrame);
+	fVariablesView->SetStackFrame(fActiveStackFrame);
 	fSourceView->SetStackFrame(fActiveStackFrame);
 }
 
@@ -627,7 +631,7 @@ TeamWindow::_UpdateCpuState()
 			cpuState = fActiveStackFrame->GetCpuState();
 	}
 
-	fRegisterView->SetCpuState(cpuState);
+	fRegistersView->SetCpuState(cpuState);
 }
 
 

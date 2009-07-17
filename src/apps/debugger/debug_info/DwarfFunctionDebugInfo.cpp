@@ -19,6 +19,7 @@ DwarfFunctionDebugInfo::DwarfFunctionDebugInfo(
 	:
 	fImageDebugInfo(imageDebugInfo),
 	fCompilationUnit(compilationUnit),
+	fSubprogramEntry(subprogramEntry),
 	fAddressRanges(addressRanges),
 	fName(name),
 	fSourceFile(sourceFile),

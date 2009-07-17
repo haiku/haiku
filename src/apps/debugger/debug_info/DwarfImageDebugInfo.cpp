@@ -25,6 +25,7 @@
 #include "Dwarf.h"
 #include "DwarfFile.h"
 #include "DwarfFunctionDebugInfo.h"
+#include "DwarfInterfaceFactory.h"
 #include "DwarfTargetInterface.h"
 #include "DwarfUtils.h"
 #include "ElfFile.h"
@@ -40,6 +41,8 @@
 #include "TargetAddressRangeList.h"
 #include "TeamMemory.h"
 #include "UnsupportedLanguage.h"
+#include "ValueLocation.h"
+#include "Variable.h"
 
 
 // #pragma mark - UnwindTargetInterface
@@ -336,10 +339,12 @@ DwarfImageDebugInfo::CreateFrame(Image* image, FunctionDebugInfo* _function,
 		fromDwarfMap, toDwarfMap, previousCpuState, fArchitecture, fTeamMemory);
 
 	// do the unwinding
+	target_addr_t instructionPointer
+		= cpuState->InstructionPointer() - fRelocationDelta;
 	target_addr_t framePointer;
 	error = fFile->UnwindCallFrame(function->GetCompilationUnit(),
-		cpuState->InstructionPointer() - fRelocationDelta,
-		&inputInterface, &outputInterface, framePointer);
+		function->SubprogramEntry(), instructionPointer, &inputInterface,
+		&outputInterface, framePointer);
 	if (error != B_OK)
 		return B_UNSUPPORTED;
 
@@ -358,12 +363,40 @@ if (previousCpuState->GetRegisterValue(reg, value)) {
 		cpuState, framePointer, cpuState->InstructionPointer());
 	if (frame == NULL)
 		return B_NO_MEMORY;
+	Reference<StackFrame> frameReference(frame, true);
 
 	frame->SetReturnAddress(previousCpuState->InstructionPointer());
 		// Note, this is correct, since we actually retrieved the return
 		// address. Our caller will fix the IP for us.
 
-	_previousFrame = frame;
+	// create function parameter objects
+	DIESubprogram* subprogramEntry = function->SubprogramEntry();
+	DwarfInterfaceFactory factory(fFile, function->GetCompilationUnit(),
+		subprogramEntry, instructionPointer, framePointer, &inputInterface);
+	error = factory.Init();
+	if (error != B_OK)
+		return error;
+
+	for (DebugInfoEntryList::ConstIterator it = subprogramEntry->Parameters()
+			.GetIterator(); DebugInfoEntry* entry = it.Next();) {
+		BString parameterName;
+		DwarfUtils::GetDIEName(entry, parameterName);
+		if (entry->Tag() != DW_TAG_formal_parameter)
+			continue;
+
+		DIEFormalParameter* parameterEntry
+			= dynamic_cast<DIEFormalParameter*>(entry);
+		Variable* parameter;
+		if (factory.CreateParameter(parameterEntry, parameter) != B_OK)
+			continue;
+
+		if (!frame->AddParameter(parameter)) {
+			parameter->ReleaseReference();
+			return B_NO_MEMORY;
+		}
+	}
+
+	_previousFrame = frameReference.Detach();
 	_previousCpuState = previousCpuStateReference.Detach();
 
 	return B_OK;

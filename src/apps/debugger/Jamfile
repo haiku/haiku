@@ -29,6 +29,7 @@ SourceHdrs
 	DwarfFunctionDebugInfo.cpp
 	DwarfImageDebugInfo.cpp
 	DwarfTeamDebugInfo.cpp
+	DwarfInterfaceFactory.cpp
 	: [ FDirName $(SUBDIR) dwarf ]
 ;
 
@@ -58,6 +59,7 @@ Application Debugger :
 	DwarfFunctionDebugInfo.cpp
 	DwarfImageDebugInfo.cpp
 	DwarfTeamDebugInfo.cpp
+	DwarfInterfaceFactory.cpp
 	Function.cpp
 	FunctionDebugInfo.cpp
 	FunctionInstance.cpp
@@ -84,11 +86,12 @@ Application Debugger :
 	# gui/team_window
 	ImageFunctionsView.cpp
 	ImageListView.cpp
-	RegisterView.cpp
+	RegistersView.cpp
 	SourceView.cpp
 	StackTraceView.cpp
 	TeamWindow.cpp
 	ThreadListView.cpp
+	VariablesView.cpp
 
 	# model
 	Breakpoint.cpp
@@ -107,6 +110,8 @@ Application Debugger :
 	TeamMemory.cpp
 	Thread.cpp
 	ThreadInfo.cpp
+	Type.cpp
+	Variable.cpp
 
 	# source_language
 	CLanguage.cpp
@@ -119,6 +124,7 @@ Application Debugger :
 
 	# types
 	TargetAddressRangeList.cpp
+	ValueLocation.cpp
 
 	# util
 	StringUtils.cpp

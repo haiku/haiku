@@ -17,6 +17,7 @@
 #include "DataReader.h"
 #include "Dwarf.h"
 #include "DwarfTargetInterface.h"
+#include "ValueLocation.h"
 
 
 // number of elements to increase the stack capacity when the stack is full
@@ -34,7 +35,7 @@ static const uint32 kMaxOperationCount			= 10000;
 
 
 DwarfExpressionEvaluationContext::DwarfExpressionEvaluationContext(
-	DwarfTargetInterface* targetInterface, uint8 addressSize)
+	const DwarfTargetInterface* targetInterface, uint8 addressSize)
 	:
 	fTargetInterface(targetInterface),
 	fAddressSize(addressSize)
@@ -51,6 +52,13 @@ DwarfExpressionEvaluationContext::~DwarfExpressionEvaluationContext()
 
 
 struct DwarfExpressionEvaluator::EvaluationException {
+	const char* message;
+
+	EvaluationException(const char* message)
+		:
+		message(message)
+	{
+	}
 };
 
 
@@ -61,7 +69,7 @@ void
 DwarfExpressionEvaluator::_AssertMinStackSize(size_t size) const
 {
 	if (fStackSize < size)
-		throw EvaluationException();
+		throw EvaluationException("pop from empty stack");
 }
 
 
@@ -71,7 +79,7 @@ DwarfExpressionEvaluator::_Push(target_addr_t value)
 	// resize the stack, if we hit the capacity
 	if (fStackSize == fStackCapacity) {
 		if (fStackCapacity >= kMaxStackCapacity)
-			throw EvaluationException();
+			throw EvaluationException("stack overflow");
 
 		size_t newCapacity = fStackCapacity + kStackCapacityIncrement;
 		target_addr_t* newStack = (target_addr_t*)realloc(fStack,
@@ -113,12 +121,11 @@ DwarfExpressionEvaluator::~DwarfExpressionEvaluator()
 
 
 status_t
-DwarfExpressionEvaluator::Evaluate(const void* expression, size_t size)
+DwarfExpressionEvaluator::Push(target_addr_t value)
 {
-	fDataReader.SetTo(expression, size, fContext->AddressSize());
-
 	try {
-		return _Evaluate();
+		_Push(value);
+		return B_OK;
 	} catch (const EvaluationException& exception) {
 		return B_BAD_VALUE;
 	} catch (const std::bad_alloc& exception) {
@@ -128,8 +135,122 @@ DwarfExpressionEvaluator::Evaluate(const void* expression, size_t size)
 
 
 status_t
-DwarfExpressionEvaluator::_Evaluate()
+DwarfExpressionEvaluator::Evaluate(const void* expression, size_t size,
+	target_addr_t& _result)
 {
+	fDataReader.SetTo(expression, size, fContext->AddressSize());
+
+	try {
+		status_t error = _Evaluate(NULL);
+		if (error != B_OK)
+			return error;
+		_result = _Pop();
+		return B_OK;
+	} catch (const EvaluationException& exception) {
+printf("DwarfExpressionEvaluator::Evaluate(): %s\n", exception.message);
+		return B_BAD_VALUE;
+	} catch (const std::bad_alloc& exception) {
+		return B_NO_MEMORY;
+	}
+}
+
+
+status_t
+DwarfExpressionEvaluator::EvaluateLocation(const void* expression, size_t size,
+	ValueLocation& _location)
+{
+	_location.Clear();
+
+	// the empty expression is a valid one
+	if (size == 0) {
+		ValuePieceLocation piece;
+		piece.SetToUnknown();
+		piece.SetSize(0);
+		return _location.AddPiece(piece) ? B_OK : B_NO_MEMORY;
+	}
+
+	fDataReader.SetTo(expression, size, fContext->AddressSize());
+
+	// parse the first (and maybe only) expression
+	try {
+		ValuePieceLocation piece;
+		status_t error = _Evaluate(&piece);
+		if (error != B_OK)
+			return error;
+
+		// if that's all, it's only a simple expression without composition
+		if (fDataReader.BytesRemaining() == 0) {
+			if (!piece.IsValid())
+				piece.SetToMemory(_Pop());
+			piece.SetSize(0);
+			return _location.AddPiece(piece) ? B_OK : B_NO_MEMORY;
+		}
+
+		// there's more, so it must be a composition operator
+		uint8 opcode = fDataReader.Read<uint8>(0);
+		if (opcode == DW_OP_piece) {
+			piece.SetSize(fDataReader.ReadUnsignedLEB128(0));
+		} else if (opcode == DW_OP_bit_piece) {
+			uint64 bitSize = fDataReader.ReadUnsignedLEB128(0);
+			piece.SetSize(bitSize, fDataReader.ReadUnsignedLEB128(0));
+		} else
+			return B_BAD_DATA;
+
+		// If there's a composition operator, there must be at least two
+		// simple expressions, so this must not be the end.
+		if (fDataReader.BytesRemaining() == 0)
+			return B_BAD_DATA;
+	} catch (const EvaluationException& exception) {
+printf("DwarfExpressionEvaluator::EvaluateLocation(): %s\n", exception.message);
+		return B_BAD_VALUE;
+	} catch (const std::bad_alloc& exception) {
+		return B_NO_MEMORY;
+	}
+
+	// parse subsequent expressions (at least one)
+	while (fDataReader.BytesRemaining() > 0) {
+		// Restrict the data reader to the remaining bytes to prevent jumping
+		// back.
+		fDataReader.SetTo(fDataReader.Data(), fDataReader.BytesRemaining(),
+			fDataReader.AddressSize());
+
+		try {
+			ValuePieceLocation piece;
+			status_t error = _Evaluate(&piece);
+			if (error != B_OK)
+				return error;
+
+			if (!piece.IsValid())
+				piece.SetToMemory(_Pop());
+
+			// each expression must be followed by a composition operator
+			if (fDataReader.BytesRemaining() == 0)
+				return B_BAD_DATA;
+
+			uint8 opcode = fDataReader.Read<uint8>(0);
+			if (opcode == DW_OP_piece) {
+				piece.SetSize(fDataReader.ReadUnsignedLEB128(0));
+			} else if (opcode == DW_OP_bit_piece) {
+				uint64 bitSize = fDataReader.ReadUnsignedLEB128(0);
+				piece.SetSize(bitSize, fDataReader.ReadUnsignedLEB128(0));
+			} else
+				return B_BAD_DATA;
+		} catch (const EvaluationException& exception) {
+printf("DwarfExpressionEvaluator::EvaluateLocation(): %s\n", exception.message);
+			return B_BAD_VALUE;
+		} catch (const std::bad_alloc& exception) {
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
+{
+printf("DwarfExpressionEvaluator::_Evaluate()\n");
 	uint32 operationsExecuted = 0;
 
 	while (fDataReader.BytesRemaining() > 0) {
@@ -137,51 +258,66 @@ DwarfExpressionEvaluator::_Evaluate()
 
 		switch (opcode) {
 			case DW_OP_addr:
+printf("  DW_OP_addr\n");
 				_Push(fDataReader.ReadAddress(0));
 				break;
 			case DW_OP_const1u:
+printf("  DW_OP_const1u\n");
 				_Push(fDataReader.Read<uint8>(0));
 				break;
 			case DW_OP_const1s:
+printf("  DW_OP_const1s\n");
 				_Push(fDataReader.Read<int8>(0));
 				break;
 			case DW_OP_const2u:
+printf("  DW_OP_const2u\n");
 				_Push(fDataReader.Read<uint16>(0));
 				break;
 			case DW_OP_const2s:
+printf("  DW_OP_const2s\n");
 				_Push(fDataReader.Read<int16>(0));
 				break;
 			case DW_OP_const4u:
+printf("  DW_OP_const4u\n");
 				_Push(fDataReader.Read<uint32>(0));
 				break;
 			case DW_OP_const4s:
+printf("  DW_OP_const4s\n");
 				_Push(fDataReader.Read<int32>(0));
 				break;
 			case DW_OP_const8u:
+printf("  DW_OP_const8u\n");
 				_Push(fDataReader.Read<uint64>(0));
 				break;
 			case DW_OP_const8s:
+printf("  DW_OP_const8s\n");
 				_Push(fDataReader.Read<int64>(0));
 				break;
 			case DW_OP_constu:
+printf("  DW_OP_constu\n");
 				_Push(fDataReader.ReadUnsignedLEB128(0));
 				break;
 			case DW_OP_consts:
+printf("  DW_OP_consts\n");
 				_Push(fDataReader.ReadSignedLEB128(0));
 				break;
 			case DW_OP_dup:
+printf("  DW_OP_dup\n");
 				_AssertMinStackSize(1);
 				_Push(fStack[fStackSize - 1]);
 				break;
 			case DW_OP_drop:
+printf("  DW_OP_drop\n");
 				_Pop();
 				break;
 			case DW_OP_over:
+printf("  DW_OP_over\n");
 				_AssertMinStackSize(1);
 				_Push(fStack[fStackSize - 2]);
 				break;
 			case DW_OP_pick:
 			{
+printf("  DW_OP_pick\n");
 				uint8 index = fDataReader.Read<uint8>(0);
 				_AssertMinStackSize(index + 1);
 				_Push(fStack[fStackSize - index - 1]);
@@ -189,12 +325,14 @@ DwarfExpressionEvaluator::_Evaluate()
 			}
 			case DW_OP_swap:
 			{
+printf("  DW_OP_swap\n");
 				_AssertMinStackSize(2);
 				std::swap(fStack[fStackSize - 1], fStack[fStackSize - 2]);
 				break;
 			}
 			case DW_OP_rot:
 			{
+printf("  DW_OP_rot\n");
 				_AssertMinStackSize(3);
 				target_addr_t tmp = fStack[fStackSize - 1];
 				fStack[fStackSize - 1] = fStack[fStackSize - 2];
@@ -204,20 +342,25 @@ DwarfExpressionEvaluator::_Evaluate()
 			}
 
 			case DW_OP_deref:
+printf("  DW_OP_deref\n");
 				_DereferenceAddress(fContext->AddressSize());
 				break;
 			case DW_OP_deref_size:
+printf("  DW_OP_deref_size\n");
 				_DereferenceAddress(fDataReader.Read<uint8>(0));
 				break;
 			case DW_OP_xderef:
+printf("  DW_OP_xderef\n");
 				_DereferenceAddressSpaceAddress(fContext->AddressSize());
 				break;
 			case DW_OP_xderef_size:
+printf("  DW_OP_xderef_size\n");
 				_DereferenceAddressSpaceAddress(fDataReader.Read<uint8>(0));
 				break;
 
 			case DW_OP_abs:
 			{
+printf("  DW_OP_abs\n");
 				target_addr_t value = _Pop();
 				if (fContext->AddressSize() == 4) {
 					int32 signedValue = (int32)value;
@@ -229,10 +372,12 @@ DwarfExpressionEvaluator::_Evaluate()
 				break;
 			}
 			case DW_OP_and:
+printf("  DW_OP_and\n");
 				_Push(_Pop() & _Pop());
 				break;
 			case DW_OP_div:
 			{
+printf("  DW_OP_div\n");
 				int64 top = (int64)_Pop();
 				int64 second = (int64)_Pop();
 				_Push(top != 0 ? second / top : 0);
@@ -240,12 +385,14 @@ DwarfExpressionEvaluator::_Evaluate()
 			}
 			case DW_OP_minus:
 			{
+printf("  DW_OP_minus\n");
 				target_addr_t top = _Pop();
 				_Push(_Pop() - top);
 				break;
 			}
 			case DW_OP_mod:
 			{
+printf("  DW_OP_mod\n");
 				// While the specs explicitly speak of signed integer division
 				// for "div", nothing is mentioned for "mod".
 				target_addr_t top = _Pop();
@@ -254,10 +401,12 @@ DwarfExpressionEvaluator::_Evaluate()
 				break;
 			}
 			case DW_OP_mul:
+printf("  DW_OP_mul\n");
 				_Push(_Pop() * _Pop());
 				break;
 			case DW_OP_neg:
 			{
+printf("  DW_OP_neg\n");
 				if (fContext->AddressSize() == 4)
 					_Push(-(int32)_Pop());
 				else
@@ -265,31 +414,38 @@ DwarfExpressionEvaluator::_Evaluate()
 				break;
 			}
 			case DW_OP_not:
+printf("  DW_OP_not\n");
 				_Push(~_Pop());
 				break;
 			case DW_OP_or:
+printf("  DW_OP_or\n");
 				_Push(_Pop() | _Pop());
 				break;
 			case DW_OP_plus:
+printf("  DW_OP_plus\n");
 				_Push(_Pop() + _Pop());
 				break;
 			case DW_OP_plus_uconst:
+printf("  DW_OP_plus_uconst\n");
 				_Push(_Pop() + fDataReader.ReadUnsignedLEB128(0));
 				break;
 			case DW_OP_shl:
 			{
+printf("  DW_OP_shl\n");
 				target_addr_t top = _Pop();
 				_Push(_Pop() << top);
 				break;
 			}
 			case DW_OP_shr:
 			{
+printf("  DW_OP_shr\n");
 				target_addr_t top = _Pop();
 				_Push(_Pop() >> top);
 				break;
 			}
 			case DW_OP_shra:
 			{
+printf("  DW_OP_shra\n");
 				target_addr_t top = _Pop();
 				int64 second = (int64)_Pop();
 				_Push(second >= 0 ? second >> top : -(-second >> top));
@@ -297,105 +453,135 @@ DwarfExpressionEvaluator::_Evaluate()
 				break;
 			}
 			case DW_OP_xor:
+printf("  DW_OP_xor\n");
 				_Push(_Pop() ^ _Pop());
 				break;
 
 			case DW_OP_bra:
+printf("  DW_OP_bra\n");
 				if (_Pop() == 0)
 					break;
 				// fall through
 			case DW_OP_skip:
 			{
+printf("  DW_OP_skip\n");
 				int16 offset = fDataReader.Read<int16>(0);
 				if (offset >= 0 ? offset > fDataReader.BytesRemaining()
 						: -offset > fDataReader.Offset()) {
-					throw EvaluationException();
+					throw EvaluationException("bra/skip: invalid offset");
 				}
 				fDataReader.SeekAbsolute(fDataReader.Offset() + offset);
 				break;
 			}
 
 			case DW_OP_eq:
+printf("  DW_OP_eq\n");
 				_Push(_Pop() == _Pop() ? 1 : 0);
 				break;
 			case DW_OP_ge:
 			{
+printf("  DW_OP_ge\n");
 				int64 top = (int64)_Pop();
 				_Push((int64)_Pop() >= top ? 1 : 0);
 				break;
 			}
 			case DW_OP_gt:
 			{
+printf("  DW_OP_gt\n");
 				int64 top = (int64)_Pop();
 				_Push((int64)_Pop() > top ? 1 : 0);
 				break;
 			}
 			case DW_OP_le:
 			{
+printf("  DW_OP_le\n");
 				int64 top = (int64)_Pop();
 				_Push((int64)_Pop() <= top ? 1 : 0);
 				break;
 			}
 			case DW_OP_lt:
 			{
+printf("  DW_OP_lt\n");
 				int64 top = (int64)_Pop();
 				_Push((int64)_Pop() < top ? 1 : 0);
 				break;
 			}
 			case DW_OP_ne:
+printf("  DW_OP_ne\n");
 				_Push(_Pop() == _Pop() ? 1 : 0);
 				break;
 
 			case DW_OP_push_object_address:
 			{
+printf("  DW_OP_push_object_address\n");
 				target_addr_t address;
 				if (!fContext->GetObjectAddress(address))
-					throw EvaluationException();
+					throw EvaluationException("failed to get object address");
 				_Push(address);
 				break;
 			}
 			case DW_OP_call_frame_cfa:
 			{
+printf("  DW_OP_call_frame_cfa\n");
 				target_addr_t address;
 				if (!fContext->GetFrameAddress(address))
-					throw EvaluationException();
+					throw EvaluationException("failed to get frame address");
 				_Push(address);
 				break;
 			}
 			case DW_OP_fbreg:
 			{
+printf("  DW_OP_fbreg\n");
 				target_addr_t address;
-				if (!fContext->GetFrameBaseAddress(address))
-					throw EvaluationException();
+				if (!fContext->GetFrameBaseAddress(address)) {
+					throw EvaluationException(
+						"failed to get frame base address");
+				}
 				_Push(address + fDataReader.ReadSignedLEB128(0));
 				break;
 			}
 			case DW_OP_form_tls_address:
 			{
+printf("  DW_OP_form_tls_address\n");
 				target_addr_t address;
 				if (!fContext->GetTLSAddress(_Pop(), address))
-					throw EvaluationException();
+					throw EvaluationException("failed to get tls address");
 				_Push(address);
 				break;
 			}
 
 			case DW_OP_regx:
-				_PushRegister(fDataReader.ReadUnsignedLEB128(0), 0);
-				break;
+			{
+printf("  DW_OP_regx\n");
+				if (_piece == NULL) {
+					throw EvaluationException(
+						"DW_OP_regx in non-location expression");
+				}
+				uint32 reg = fDataReader.ReadUnsignedLEB128(0);
+				if (fDataReader.HasOverflow())
+					throw EvaluationException("unexpected end of expression");
+				_piece->SetToRegister(reg);
+				return B_OK;
+			}
+
 			case DW_OP_bregx:
 			{
+printf("  DW_OP_bregx\n");
 				uint32 reg = fDataReader.ReadUnsignedLEB128(0);
 				_PushRegister(reg, fDataReader.ReadSignedLEB128(0));
 				break;
 			}
 
 			case DW_OP_call2:
+printf("  DW_OP_call2\n");
 				_Call(fDataReader.Read<uint16>(0), true);
 				break;
 			case DW_OP_call4:
+printf("  DW_OP_call4\n");
 				_Call(fDataReader.Read<uint32>(0), true);
 				break;
 			case DW_OP_call_ref:
+printf("  DW_OP_call_ref\n");
 				if (fContext->AddressSize() == 4)
 					_Call(fDataReader.Read<uint32>(0), false);
 				else
@@ -404,19 +590,33 @@ DwarfExpressionEvaluator::_Evaluate()
 
 			case DW_OP_piece:
 			case DW_OP_bit_piece:
-// TODO:...
-				break;
+				// are handled in EvaluateLocation()
+				if (_piece == NULL)
+					return B_BAD_DATA;
+
+				fDataReader.SeekAbsolute(fDataReader.Offset() - 1);
+					// put back the operation
+				return B_OK;
 
 			case DW_OP_nop:
+printf("  DW_OP_nop\n");
 				break;
 
 			default:
 				if (opcode >= DW_OP_lit0 && opcode <= DW_OP_lit31) {
+printf("  DW_OP_lit%u\n", opcode - DW_OP_lit0);
 					_Push(opcode - DW_OP_lit0);
 				} else if (opcode >= DW_OP_reg0 && opcode <= DW_OP_reg31) {
-					_PushRegister(opcode - DW_OP_reg0, 0);
+printf("  DW_OP_reg%u\n", opcode - DW_OP_reg0);
+					if (_piece == NULL) {
+						throw EvaluationException(
+							"DW_OP_reg* in non-location expression");
+					}
+					_piece->SetToRegister(opcode - DW_OP_reg0);
+					return B_OK;
 				} else if (opcode >= DW_OP_breg0 && opcode <= DW_OP_breg31) {
-					_PushRegister(opcode - DW_OP_reg0,
+printf("  DW_OP_breg%u\n", opcode - DW_OP_breg0);
+					_PushRegister(opcode - DW_OP_breg0,
 						fDataReader.ReadSignedLEB128(0));
 				} else {
 					printf("DwarfExpressionEvaluator::_Evaluate(): unsupported "
@@ -455,14 +655,14 @@ DwarfExpressionEvaluator::_DereferenceAddress(uint8 addressSize)
 			}
 			// fall through
 		default:
-			throw EvaluationException();
+			throw EvaluationException("invalid dereference size");
 	}
 
 	target_addr_t address = _Pop();
 	BVariant value;
 	if (!fContext->TargetInterface()->ReadValueFromMemory(address, valueType,
 			value)) {
-		throw EvaluationException();
+		throw EvaluationException("failed to read memory");
 	}
 
 	_Push(value.ToUInt64());
@@ -490,7 +690,7 @@ DwarfExpressionEvaluator::_DereferenceAddressSpaceAddress(uint8 addressSize)
 			}
 			// fall through
 		default:
-			throw EvaluationException();
+			throw EvaluationException("invalid dereference size");
 	}
 
 	target_addr_t address = _Pop();
@@ -498,7 +698,7 @@ DwarfExpressionEvaluator::_DereferenceAddressSpaceAddress(uint8 addressSize)
 	BVariant value;
 	if (!fContext->TargetInterface()->ReadValueFromMemory(addressSpace, address,
 			valueType, value)) {
-		throw EvaluationException();
+		throw EvaluationException("failed to read memory");
 	}
 
 	_Push(value.ToUInt64());
@@ -510,7 +710,7 @@ DwarfExpressionEvaluator::_PushRegister(uint32 reg, target_addr_t offset)
 {
 	BVariant value;
 	if (!fContext->TargetInterface()->GetRegisterValue(reg, value))
-		throw EvaluationException();
+		throw EvaluationException("failed to get register");
 
 	_Push(value.ToUInt64());
 }
@@ -520,13 +720,13 @@ void
 DwarfExpressionEvaluator::_Call(uint64 offset, bool local)
 {
 	if (fDataReader.HasOverflow())
-		throw EvaluationException();
+		throw EvaluationException("unexpected end of expression");
 
 	// get the expression to "call"
 	const void* block;
 	off_t size;
 	if (fContext->GetCallTarget(offset, local, block, size) != B_OK)
-		throw EvaluationException();
+		throw EvaluationException("failed to get call target");
 
 	// no expression is OK, then this is just a no-op
 	if (block == NULL)
@@ -540,7 +740,8 @@ DwarfExpressionEvaluator::_Call(uint64 offset, bool local)
 
 	// and evaluate it
 	try {
-		_Evaluate();
+		if (_Evaluate(NULL) != B_OK)
+			throw EvaluationException("call failed");
 	} catch (...) {
 		fDataReader = savedReader;
 		throw;

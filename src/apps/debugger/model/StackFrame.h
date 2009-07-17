@@ -7,6 +7,7 @@
 
 #include <OS.h>
 
+#include <ObjectList.h>
 #include <Referenceable.h>
 
 #include "Types.h"
@@ -23,6 +24,7 @@ enum stack_frame_type {
 class CpuState;
 class Image;
 class FunctionInstance;
+class Variable;
 
 
 class StackFrame : public Referenceable {
@@ -49,6 +51,17 @@ public:
 			FunctionInstance*	Function() const		{ return fFunction; }
 			void				SetFunction(FunctionInstance* function);
 
+			int32				CountParameters() const;
+			Variable*			ParameterAt(int32 index) const;
+			bool				AddParameter(Variable* parameter);
+
+			int32				CountLocalVariables() const;
+			Variable*			LocalVariableAt(int32 index) const;
+			bool				AddLocalVariable(Variable* variable);
+
+private:
+			typedef BObjectList<Variable> VariableList;
+
 private:
 			stack_frame_type	fType;
 			CpuState*			fCpuState;
@@ -57,6 +70,8 @@ private:
 			target_addr_t		fReturnAddress;
 			Image*				fImage;
 			FunctionInstance*	fFunction;
+			VariableList		fParameters;
+			VariableList		fLocalVariables;
 };
 
 

@@ -437,7 +437,7 @@ DIEClassBaseType::AddChild(DebugInfoEntry* child)
 {
 	switch (child->Tag()) {
 		case DW_TAG_inheritance:
-			fDataMembers.Add(child);
+			fBaseTypes.Add(child);
 			return B_OK;
 		case DW_TAG_friend:
 			fFriends.Add(child);
@@ -777,6 +777,9 @@ DIEEnumerationType::AddAttribute_specification(uint16 attributeName,
 
 
 DIEFormalParameter::DIEFormalParameter()
+	:
+	fAbstractOrigin(NULL),
+	fType(NULL)
 {
 }
 
@@ -788,10 +791,43 @@ DIEFormalParameter::Tag() const
 }
 
 
+DebugInfoEntry*
+DIEFormalParameter::AbstractOrigin() const
+{
+	return fAbstractOrigin;
+}
+
+
 LocationDescription*
 DIEFormalParameter::GetLocationDescription()
 {
 	return &fLocationDescription;
+}
+
+
+status_t
+DIEFormalParameter::AddAttribute_abstract_origin(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fAbstractOrigin = value.reference;
+	return B_OK;
+}
+
+
+status_t
+DIEFormalParameter::AddAttribute_const_value(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetConstantAttributeValue(fValue, value);
+}
+
+
+status_t
+DIEFormalParameter::AddAttribute_type(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fType = dynamic_cast<DIEType*>(value.reference);
+	return fType != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -844,6 +880,8 @@ DIELexicalBlock::Tag() const
 
 
 DIEMember::DIEMember()
+	:
+	fType(NULL)
 {
 }
 
@@ -852,6 +890,15 @@ uint16
 DIEMember::Tag() const
 {
 	return DW_TAG_member;
+}
+
+
+status_t
+DIEMember::AddAttribute_type(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fType = dynamic_cast<DIEType*>(value.reference);
+	return fType != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -1118,6 +1165,8 @@ DIECommonInclusion::Tag() const
 
 
 DIEInheritance::DIEInheritance()
+	:
+	fType(NULL)
 {
 }
 
@@ -1126,6 +1175,15 @@ uint16
 DIEInheritance::Tag() const
 {
 	return DW_TAG_inheritance;
+}
+
+
+status_t
+DIEInheritance::AddAttribute_type(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fType = dynamic_cast<DIEType*>(value.reference);
+	return fType != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -1297,6 +1355,8 @@ DIESubrangeType::AddAttribute_threads_scaled(uint16 attributeName,
 
 
 DIEWithStatement::DIEWithStatement()
+	:
+	fType(NULL)
 {
 }
 
@@ -1312,6 +1372,15 @@ LocationDescription*
 DIEWithStatement::GetLocationDescription()
 {
 	return &fLocationDescription;
+}
+
+
+status_t
+DIEWithStatement::AddAttribute_type(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fType = dynamic_cast<DIEType*>(value.reference);
+	return fType != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -1424,6 +1493,8 @@ DIEConstType::Tag() const
 
 
 DIEConstant::DIEConstant()
+	:
+	fType(NULL)
 {
 }
 
@@ -1432,6 +1503,23 @@ uint16
 DIEConstant::Tag() const
 {
 	return DW_TAG_constant;
+}
+
+
+status_t
+DIEConstant::AddAttribute_const_value(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetConstantAttributeValue(fValue, value);
+}
+
+
+status_t
+DIEConstant::AddAttribute_type(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fType = dynamic_cast<DIEType*>(value.reference);
+	return fType != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -1587,6 +1675,20 @@ DIESubprogram::AbstractOrigin() const
 
 
 status_t
+DIESubprogram::AddChild(DebugInfoEntry* child)
+{
+	switch (child->Tag()) {
+		case DW_TAG_formal_parameter:
+		case DW_TAG_unspecified_parameters:
+			fParameters.Add(child);
+			return B_OK;
+		default:
+			return DIEDeclaredNamedBase::AddChild(child);
+	}
+}
+
+
+status_t
 DIESubprogram::AddAttribute_low_pc(uint16 attributeName,
 	const AttributeValue& value)
 {
@@ -1669,10 +1771,30 @@ DIESubprogram::AddAttribute_abstract_origin(uint16 attributeName,
 }
 
 
+status_t
+DIESubprogram::AddAttribute_frame_base(uint16 attributeName,
+	const AttributeValue& value)
+{
+	if (value.attributeClass == ATTRIBUTE_CLASS_LOCLISTPTR) {
+		fFrameBase.SetToLocationList(value.pointer);
+		return B_OK;
+	}
+
+	if (value.attributeClass == ATTRIBUTE_CLASS_BLOCK) {
+		fFrameBase.SetToExpression(value.block.data, value.block.length);
+		return B_OK;
+	}
+
+	return B_BAD_DATA;
+}
+
+
 // #pragma mark - DIETemplateTypeParameter
 
 
 DIETemplateTypeParameter::DIETemplateTypeParameter()
+	:
+	fType(NULL)
 {
 }
 
@@ -1684,10 +1806,21 @@ DIETemplateTypeParameter::Tag() const
 }
 
 
+status_t
+DIETemplateTypeParameter::AddAttribute_type(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fType = dynamic_cast<DIEType*>(value.reference);
+	return fType != NULL ? B_OK : B_BAD_DATA;
+}
+
+
 // #pragma mark - DIETemplateValueParameter
 
 
 DIETemplateValueParameter::DIETemplateValueParameter()
+	:
+	fType(NULL)
 {
 }
 
@@ -1699,10 +1832,29 @@ DIETemplateValueParameter::Tag() const
 }
 
 
+status_t
+DIETemplateValueParameter::AddAttribute_const_value(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetConstantAttributeValue(fValue, value);
+}
+
+
+status_t
+DIETemplateValueParameter::AddAttribute_type(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fType = dynamic_cast<DIEType*>(value.reference);
+	return fType != NULL ? B_OK : B_BAD_DATA;
+}
+
+
 // #pragma mark - DIEThrownType
 
 
 DIEThrownType::DIEThrownType()
+	:
+	fType(NULL)
 {
 }
 
@@ -1711,6 +1863,15 @@ uint16
 DIEThrownType::Tag() const
 {
 	return DW_TAG_thrown_type;
+}
+
+
+status_t
+DIEThrownType::AddAttribute_type(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fType = dynamic_cast<DIEType*>(value.reference);
+	return fType != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -1733,6 +1894,8 @@ DIETryBlock::Tag() const
 
 
 DIEVariantPart::DIEVariantPart()
+	:
+	fType(NULL)
 {
 }
 
@@ -1744,10 +1907,21 @@ DIEVariantPart::Tag() const
 }
 
 
+status_t
+DIEVariantPart::AddAttribute_type(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fType = dynamic_cast<DIEType*>(value.reference);
+	return fType != NULL ? B_OK : B_BAD_DATA;
+}
+
+
 // #pragma mark - DIEVariable
 
 
 DIEVariable::DIEVariable()
+	:
+	fType(NULL)
 {
 }
 
@@ -1763,6 +1937,23 @@ LocationDescription*
 DIEVariable::GetLocationDescription()
 {
 	return &fLocationDescription;
+}
+
+
+status_t
+DIEVariable::AddAttribute_const_value(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetConstantAttributeValue(fValue, value);
+}
+
+
+status_t
+DIEVariable::AddAttribute_type(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fType = dynamic_cast<DIEType*>(value.reference);
+	return fType != NULL ? B_OK : B_BAD_DATA;
 }
 
 

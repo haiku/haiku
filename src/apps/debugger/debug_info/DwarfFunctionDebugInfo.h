@@ -41,10 +41,13 @@ public:
 
 			CompilationUnit*	GetCompilationUnit() const
 									{ return fCompilationUnit; }
+			DIESubprogram*		SubprogramEntry() const
+									{ return fSubprogramEntry; }
 
 private:
 			DwarfImageDebugInfo* fImageDebugInfo;
 			CompilationUnit*	fCompilationUnit;
+			DIESubprogram*		fSubprogramEntry;
 			TargetAddressRangeList* fAddressRanges;
 			BString				fName;
 			LocatableFile*		fSourceFile;

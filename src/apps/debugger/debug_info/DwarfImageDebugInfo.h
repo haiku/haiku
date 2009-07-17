@@ -12,6 +12,7 @@
 
 #include "ImageInfo.h"
 #include "SpecificImageDebugInfo.h"
+#include "Type.h"
 
 
 class Architecture;

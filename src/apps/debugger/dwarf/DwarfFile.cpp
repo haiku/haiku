@@ -17,10 +17,12 @@
 #include "CfaContext.h"
 #include "CompilationUnit.h"
 #include "DataReader.h"
+#include "DwarfExpressionEvaluator.h"
 #include "DwarfTargetInterface.h"
 #include "ElfFile.h"
 #include "TagNames.h"
 #include "TargetAddressRangeList.h"
+#include "Variant.h"
 
 
 DwarfFile::DwarfFile()
@@ -33,6 +35,7 @@ DwarfFile::DwarfFile()
 	fDebugRangesSection(NULL),
 	fDebugLineSection(NULL),
 	fDebugFrameSection(NULL),
+	fDebugLocationSection(NULL),
 	fCompilationUnits(20, true),
 	fCurrentCompilationUnit(NULL),
 	fFinished(false),
@@ -53,6 +56,7 @@ DwarfFile::~DwarfFile()
 		fElfFile->PutSection(fDebugRangesSection);
 		fElfFile->PutSection(fDebugLineSection);
 		fElfFile->PutSection(fDebugFrameSection);
+		fElfFile->PutSection(fDebugLocationSection);
 		delete fElfFile;
 	}
 
@@ -91,6 +95,7 @@ DwarfFile::Load(const char* fileName)
 	fDebugRangesSection = fElfFile->GetSection(".debug_ranges");
 	fDebugLineSection = fElfFile->GetSection(".debug_line");
 	fDebugFrameSection = fElfFile->GetSection(".debug_frame");
+	fDebugLocationSection = fElfFile->GetSection(".debug_loc");
 
 	// iterate through the debug info section
 	DataReader dataReader(fDebugInfoSection->Data(),
@@ -270,7 +275,8 @@ DwarfFile::ResolveRangeList(CompilationUnit* unit, uint64 offset) const
 
 
 status_t
-DwarfFile::UnwindCallFrame(CompilationUnit* unit, target_addr_t location,
+DwarfFile::UnwindCallFrame(CompilationUnit* unit,
+	DIESubprogram* subprogramEntry, target_addr_t location,
 	const DwarfTargetInterface* inputInterface,
 	DwarfTargetInterface* outputInterface, target_addr_t& _framePointer)
 {
@@ -365,8 +371,16 @@ printf("  found row!\n");
 						break;
 					}
 					case CFA_CFA_RULE_EXPRESSION:
-// TODO: Implement!
-						return B_UNSUPPORTED;
+					{
+						error = EvaluateExpression(unit, subprogramEntry,
+							cfaCfaRule->Expression().block,
+							cfaCfaRule->Expression().size,
+							inputInterface, location, 0, 0, false,
+							frameAddress);
+						if (error != B_OK)
+							return error;
+						break;
+					}
 					case CFA_CFA_RULE_UNDEFINED:
 					default:
 						return B_BAD_VALUE;
@@ -421,13 +435,35 @@ printf("  -> CFA_RULE_REGISTER\n");
 							break;
 						}
 						case CFA_RULE_LOCATION_EXPRESSION:
+						{
 printf("  -> CFA_RULE_LOCATION_EXPRESSION\n");
-// TODO:...
+							target_addr_t address;
+							error = EvaluateExpression(unit, subprogramEntry,
+								rule->Expression().block,
+								rule->Expression().size,
+								inputInterface, location, frameAddress,
+								frameAddress, true, address);
+							BVariant value;
+							if (error == B_OK
+								&& inputInterface->ReadValueFromMemory(address,
+									valueType, value)) {
+								outputInterface->SetRegisterValue(i, value);
+							}
 							break;
+						}
 						case CFA_RULE_VALUE_EXPRESSION:
+						{
 printf("  -> CFA_RULE_VALUE_EXPRESSION\n");
-// TODO:...
+							target_addr_t value;
+							error = EvaluateExpression(unit, subprogramEntry,
+								rule->Expression().block,
+								rule->Expression().size,
+								inputInterface, location, frameAddress,
+								frameAddress, true, value);
+							if (error == B_OK)
+								outputInterface->SetRegisterValue(i, value);
 							break;
+						}
 						case CFA_RULE_UNDEFINED:
 printf("  -> CFA_RULE_UNDEFINED\n");
 						default:
@@ -444,6 +480,275 @@ printf("  -> CFA_RULE_UNDEFINED\n");
 	}
 
 	return B_ENTRY_NOT_FOUND;
+}
+
+
+struct DwarfFile::ExpressionEvaluationContext
+	: DwarfExpressionEvaluationContext {
+public:
+	ExpressionEvaluationContext(DwarfFile* file, CompilationUnit* unit,
+		DIESubprogram* subprogramEntry,
+		const DwarfTargetInterface* targetInterface,
+		target_addr_t instructionPointer, target_addr_t objectPointer,
+		target_addr_t framePointer)
+		:
+		DwarfExpressionEvaluationContext(targetInterface, unit->AddressSize()),
+		fFile(file),
+		fUnit(unit),
+		fSubprogramEntry(subprogramEntry),
+		fInstructionPointer(instructionPointer),
+		fObjectPointer(objectPointer),
+		fFramePointer(framePointer),
+		fFrameBasePointer(0),
+		fFrameBaseEvaluated(false)
+	{
+	}
+
+	virtual bool GetObjectAddress(target_addr_t& _address)
+	{
+		if (fObjectPointer == 0)
+			return false;
+
+		_address = fObjectPointer;
+		return true;
+	}
+
+	virtual bool GetFrameAddress(target_addr_t& _address)
+	{
+		_address = fFramePointer;
+		return true;
+	}
+
+	virtual bool GetFrameBaseAddress(target_addr_t& _address)
+	{
+		if (fFrameBaseEvaluated) {
+			if (fFrameBasePointer == 0)
+				return false;
+
+			_address = fFrameBasePointer;
+			return true;
+		}
+
+		// set flag already to prevent recursion for a buggy expression
+		fFrameBaseEvaluated = true;
+
+		// get the subprogram's frame base location
+		const LocationDescription* location = fSubprogramEntry->FrameBase();
+		if (!location->IsValid())
+			return B_BAD_VALUE;
+
+		// get the expression
+		const void* expression;
+		off_t expressionLength;
+		status_t error = fFile->_GetLocationExpression(fUnit, location,
+			fInstructionPointer, expression, expressionLength);
+		if (error != B_OK)
+			return error;
+
+		// evaluate the expression
+		DwarfExpressionEvaluator evaluator(this);
+		error = evaluator.Evaluate(expression, expressionLength,
+			fFrameBasePointer);
+		if (error != B_OK)
+			return false;
+printf("  -> frame base: %llx\n", fFrameBasePointer);
+		_address = fFrameBasePointer;
+		return true;
+	}
+
+	virtual bool GetTLSAddress(target_addr_t localAddress,
+		target_addr_t& _address)
+	{
+		// TODO:...
+		return false;
+	}
+
+	virtual status_t GetCallTarget(uint64 offset, bool local,
+		const void*& _block, off_t& _size)
+	{
+		// resolve the entry
+		DebugInfoEntry* entry = fFile->_ResolveReference(fUnit, offset, local);
+		if (entry == NULL)
+			return B_ENTRY_NOT_FOUND;
+
+		// get the location description
+		LocationDescription* location = entry->GetLocationDescription();
+		if (location == NULL || !location->IsValid()) {
+			_block = NULL;
+			_size = 0;
+			return B_OK;
+		}
+
+		// get the expression
+		return fFile->_GetLocationExpression(fUnit, location,
+			fInstructionPointer, _block, _size);
+	}
+
+private:
+	DwarfFile*			fFile;
+	CompilationUnit*	fUnit;
+	DIESubprogram*		fSubprogramEntry;
+	target_addr_t		fInstructionPointer;
+	target_addr_t		fObjectPointer;
+	target_addr_t		fFramePointer;
+	target_addr_t		fFrameBasePointer;
+	bool				fFrameBaseEvaluated;
+};
+
+
+status_t
+DwarfFile::EvaluateExpression(CompilationUnit* unit,
+	DIESubprogram* subprogramEntry, const void* expression,
+	off_t expressionLength, const DwarfTargetInterface* targetInterface,
+	target_addr_t instructionPointer, target_addr_t framePointer,
+	target_addr_t valueToPush, bool pushValue, target_addr_t& _result)
+{
+	ExpressionEvaluationContext context(this, unit, subprogramEntry,
+		targetInterface, instructionPointer, 0, framePointer);
+	DwarfExpressionEvaluator evaluator(&context);
+
+	if (pushValue && evaluator.Push(valueToPush) != B_OK)
+		return B_NO_MEMORY;
+
+	return evaluator.Evaluate(expression, expressionLength, _result);
+}
+
+
+status_t
+DwarfFile::ResolveLocation(CompilationUnit* unit,
+	DIESubprogram* subprogramEntry, const LocationDescription* location,
+	const DwarfTargetInterface* targetInterface,
+	target_addr_t instructionPointer, target_addr_t objectPointer,
+	target_addr_t framePointer, ValueLocation& _result)
+{
+	// get the expression
+	const void* expression;
+	off_t expressionLength;
+	status_t error = _GetLocationExpression(unit, location, instructionPointer,
+		expression, expressionLength);
+	if (error != B_OK)
+		return error;
+
+	// evaluate it
+	ExpressionEvaluationContext context(this, unit, subprogramEntry,
+		targetInterface, instructionPointer, objectPointer, framePointer);
+	DwarfExpressionEvaluator evaluator(&context);
+	return evaluator.EvaluateLocation(expression, expressionLength, _result);
+}
+
+
+status_t
+DwarfFile::EvaluateConstantValue(CompilationUnit* unit,
+	DIESubprogram* subprogramEntry, const ConstantAttributeValue* value,
+	const DwarfTargetInterface* targetInterface,
+	target_addr_t instructionPointer, target_addr_t framePointer,
+	BVariant& _result)
+{
+	if (!value->IsValid())
+		return B_BAD_VALUE;
+
+	switch (value->attributeClass) {
+		case ATTRIBUTE_CLASS_CONSTANT:
+			_result.SetTo(value->constant);
+			return B_OK;
+		case ATTRIBUTE_CLASS_STRING:
+			_result.SetTo(value->string);
+			return B_OK;
+		case ATTRIBUTE_CLASS_BLOCK:
+		{
+			target_addr_t result;
+			status_t error = EvaluateExpression(unit, subprogramEntry,
+				value->block.data, value->block.length, targetInterface,
+				instructionPointer, framePointer, 0, false, result);
+			if (error != B_OK)
+				return error;
+
+			_result.SetTo(result);
+			return B_OK;
+		}
+		default:
+			return B_BAD_VALUE;
+	}
+}
+
+
+status_t
+DwarfFile::EvaluateDynamicValue(CompilationUnit* unit,
+	DIESubprogram* subprogramEntry, const DynamicAttributeValue* value,
+	const DwarfTargetInterface* targetInterface,
+	target_addr_t instructionPointer, target_addr_t framePointer,
+	BVariant& _result)
+{
+	if (!value->IsValid())
+		return B_BAD_VALUE;
+
+	switch (value->attributeClass) {
+		case ATTRIBUTE_CLASS_CONSTANT:
+			_result.SetTo(value->constant);
+			return B_OK;
+
+		case ATTRIBUTE_CLASS_REFERENCE:
+		{
+			// TODO: The specs are a bit fuzzy on this one: "the value is a
+			// reference to another entity whose value is the value of the
+			// attribute". Supposedly that also means e.g. if the referenced
+			// entity is a variable, we should read the value of that variable.
+			// ATM we only check for the types that can have a DW_AT_const_value
+			// attribute and evaluate it, if present.
+			DebugInfoEntry* entry = value->reference;
+			if (entry == NULL)
+				return B_BAD_VALUE;
+
+			const ConstantAttributeValue* constantValue = NULL;
+
+			switch (entry->Tag()) {
+				case DW_TAG_constant:
+					constantValue = dynamic_cast<DIEConstant*>(entry)
+						->ConstValue();
+					break;
+				case DW_TAG_enumerator:
+					constantValue = dynamic_cast<DIEEnumerator*>(entry)
+						->ConstValue();
+					break;
+				case DW_TAG_formal_parameter:
+					constantValue = dynamic_cast<DIEFormalParameter*>(entry)
+						->ConstValue();
+					break;
+				case DW_TAG_template_value_parameter:
+					constantValue = dynamic_cast<DIETemplateValueParameter*>(
+						entry)->ConstValue();
+					break;
+				case DW_TAG_variable:
+					constantValue = dynamic_cast<DIEVariable*>(entry)
+						->ConstValue();
+					break;
+				default:
+					return B_BAD_VALUE;
+			}
+
+			if (constantValue == NULL || !constantValue->IsValid())
+				return B_BAD_VALUE;
+
+			return EvaluateConstantValue(unit, subprogramEntry, constantValue,
+				targetInterface, instructionPointer, framePointer, _result);
+		}
+
+		case ATTRIBUTE_CLASS_BLOCK:
+		{
+			target_addr_t result;
+			status_t error = EvaluateExpression(unit, subprogramEntry,
+				value->block.data, value->block.length, targetInterface,
+				instructionPointer, framePointer, 0, false, result);
+			if (error != B_OK)
+				return error;
+
+			_result.SetTo(result);
+			return B_OK;
+		}
+
+		default:
+			return B_BAD_VALUE;
+	}
 }
 
 
@@ -800,8 +1105,8 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				break;
 			case ATTRIBUTE_CLASS_REFERENCE:
 				if (entry != NULL) {
-					attributeValue.SetToReference(_ResolveReference(value,
-						localReference));
+					attributeValue.SetToReference(_ResolveReference(
+						fCurrentCompilationUnit, value, localReference));
 					if (attributeValue.reference == NULL) {
 						// gcc 2 apparently somtimes produces DW_AT_sibling
 						// attributes pointing to the end of the sibling list.
@@ -1372,11 +1677,84 @@ DwarfFile::_GetAbbreviationTable(off_t offset, AbbreviationTable*& _table)
 
 
 DebugInfoEntry*
-DwarfFile::_ResolveReference(uint64 offset, bool localReference) const
+DwarfFile::_ResolveReference(CompilationUnit* unit, uint64 offset,
+	bool localReference) const
 {
 	if (localReference)
-		return fCurrentCompilationUnit->EntryForOffset(offset);
+		return unit->EntryForOffset(offset);
 
 	// TODO: Implement program-global references!
 	return NULL;
+}
+
+
+status_t
+DwarfFile::_GetLocationExpression(CompilationUnit* unit,
+	const LocationDescription* location, target_addr_t instructionPointer,
+	const void*& _expression, off_t& _length) const
+{
+	if (!location->IsValid())
+		return B_BAD_VALUE;
+
+	if (location->IsExpression()) {
+		_expression = location->expression.data;
+		_length = location->expression.length;
+		return B_OK;
+	}
+
+	if (location->IsLocationList()) {
+		return _FindLocationExpression(unit, location->listOffset,
+			instructionPointer, _expression, _length);
+	}
+
+	return B_BAD_VALUE;
+}
+
+
+status_t
+DwarfFile::_FindLocationExpression(CompilationUnit* unit, uint64 offset,
+	target_addr_t address, const void*& _expression, off_t& _length) const
+{
+	if (unit == NULL)
+		return B_BAD_VALUE;
+
+	if (fDebugLocationSection == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	if (offset < 0 || offset >= (uint64)fDebugLocationSection->Size())
+		return B_BAD_DATA;
+
+	target_addr_t baseAddress = unit->AddressRangeBase();
+	target_addr_t maxAddress = unit->MaxAddress();
+
+	DataReader dataReader((uint8*)fDebugLocationSection->Data() + offset,
+		fDebugLocationSection->Size() - offset, unit->AddressSize());
+	while (true) {
+		target_addr_t start = dataReader.ReadAddress(0);
+		target_addr_t end = dataReader.ReadAddress(0);
+		if (dataReader.HasOverflow())
+			return B_BAD_DATA;
+
+		if (start == 0 && end == 0)
+			return B_ENTRY_NOT_FOUND;
+
+		if (start == maxAddress) {
+			baseAddress = end;
+			continue;
+		}
+
+		uint16 expressionLength = dataReader.Read<uint16>(0);
+		const void* expression = dataReader.Data();
+		if (!dataReader.Skip(expressionLength))
+			return B_BAD_DATA;
+
+		if (start == end)
+			continue;
+
+		if (address >= start && address < end) {
+			_expression = expression;
+			_length = expressionLength;
+			return B_OK;
+		}
+	}
 }

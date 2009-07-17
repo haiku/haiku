@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef REGISTER_VIEW_H
-#define REGISTER_VIEW_H
+#ifndef REGISTERS_VIEW_H
+#define REGISTERS_VIEW_H
 
 #include <GroupView.h>
 
@@ -14,12 +14,12 @@
 class Architecture;
 
 
-class RegisterView : public BGroupView, private TableListener {
+class RegistersView : public BGroupView, private TableListener {
 public:
-								RegisterView(Architecture* architecture);
-								~RegisterView();
+								RegistersView(Architecture* architecture);
+								~RegistersView();
 
-	static	RegisterView*		Create(Architecture* architecture);
+	static	RegistersView*		Create(Architecture* architecture);
 									// throws
 
 			void				SetCpuState(CpuState* cpuState);
@@ -42,4 +42,4 @@ private:
 };
 
 
-#endif	// REGISTER_VIEW_H
+#endif	// REGISTERS_VIEW_H

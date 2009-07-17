@@ -14,6 +14,7 @@
 
 class AbbreviationEntry;
 class AbbreviationTable;
+class BVariant;
 class CfaContext;
 class CompilationUnit;
 class DataReader;
@@ -21,6 +22,7 @@ class DwarfTargetInterface;
 class ElfFile;
 class ElfSection;
 class TargetAddressRangeList;
+class ValueLocation;
 
 
 class DwarfFile : public DoublyLinkedListLinkImpl<DwarfFile> {
@@ -43,12 +45,48 @@ public:
 									uint64 offset) const;
 
 			status_t			UnwindCallFrame(CompilationUnit* unit,
+									DIESubprogram* subprogramEntry,
 									target_addr_t location,
 									const DwarfTargetInterface* inputInterface,
 									DwarfTargetInterface* outputInterface,
 									target_addr_t& _framePointer);
 
+			status_t			EvaluateExpression(CompilationUnit* unit,
+									DIESubprogram* subprogramEntry,
+									const void* expression,
+									off_t expressionLength,
+									const DwarfTargetInterface* targetInterface,
+									target_addr_t instructionPointer,
+									target_addr_t framePointer,
+									target_addr_t valueToPush, bool pushValue,
+									target_addr_t& _result);
+			status_t			ResolveLocation(CompilationUnit* unit,
+									DIESubprogram* subprogramEntry,
+									const LocationDescription* location,
+									const DwarfTargetInterface* targetInterface,
+									target_addr_t instructionPointer,
+									target_addr_t objectPointer,
+									target_addr_t framePointer,
+									ValueLocation& _result);
+
+			status_t			EvaluateConstantValue(CompilationUnit* unit,
+									DIESubprogram* subprogramEntry,
+									const ConstantAttributeValue* value,
+									const DwarfTargetInterface* targetInterface,
+									target_addr_t instructionPointer,
+									target_addr_t framePointer,
+									BVariant& _result);
+			status_t			EvaluateDynamicValue(CompilationUnit* unit,
+									DIESubprogram* subprogramEntry,
+									const DynamicAttributeValue* value,
+									const DwarfTargetInterface* targetInterface,
+									target_addr_t instructionPointer,
+									target_addr_t framePointer,
+									BVariant& _result);
+
 private:
+			struct ExpressionEvaluationContext;
+
 			typedef DoublyLinkedList<AbbreviationTable> AbbreviationTableList;
 			typedef BObjectList<CompilationUnit> CompilationUnitList;
 
@@ -75,10 +113,18 @@ private:
 			status_t			_GetAbbreviationTable(off_t offset,
 									AbbreviationTable*& _table);
 
-			DebugInfoEntry*		_ResolveReference(uint64 offset,
-									bool localReference) const;
-			TargetAddressRangeList* _ResolveRangeList(uint64 offset);
-									// returns reference
+			DebugInfoEntry*		_ResolveReference(CompilationUnit* unit,
+									uint64 offset, bool localReference) const;
+
+			status_t			_GetLocationExpression(CompilationUnit* unit,
+									const LocationDescription* location,
+									target_addr_t instructionPointer,
+									const void*& _expression,
+									off_t& _length) const;
+			status_t			_FindLocationExpression(CompilationUnit* unit,
+									uint64 offset, target_addr_t address,
+									const void*& _expression,
+									off_t& _length) const;
 
 private:
 			char*				fName;
@@ -89,6 +135,7 @@ private:
 			ElfSection*			fDebugRangesSection;
 			ElfSection*			fDebugLineSection;
 			ElfSection*			fDebugFrameSection;
+			ElfSection*			fDebugLocationSection;
 			AbbreviationTableList fAbbreviationTables;
 			DebugInfoEntryFactory fDebugInfoFactory;
 			CompilationUnitList	fCompilationUnits;

@@ -241,6 +241,8 @@ class DIEModifiedType : public DIEType {
 public:
 								DIEModifiedType();
 
+			DIEType*			GetType() const	{ return fType; }
+
 	virtual	status_t			AddAttribute_type(uint16 attributeName,
 									const AttributeValue& value);
 
@@ -301,6 +303,8 @@ class DIEDerivedType : public DIEDeclaredType {
 public:
 								DIEDerivedType();
 
+			DIEType*			GetType() const	{ return fType; }
+
 	virtual	status_t			AddAttribute_type(uint16 attributeName,
 									const AttributeValue& value);
 
@@ -316,6 +320,9 @@ public:
 	virtual	bool				IsNamespace() const;
 
 	virtual	DebugInfoEntry*		Specification() const;
+
+			const DebugInfoEntryList& DataMembers() const
+									{ return fDataMembers; }
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
@@ -453,6 +460,8 @@ public:
 
 class DIEEntryPoint : public DebugInfoEntry {
 public:
+// TODO: Maybe introduce a common base class for DIEEntryPoint and
+// DIESubprogram.
 								DIEEntryPoint();
 
 	virtual	uint16				Tag() const;
@@ -504,21 +513,35 @@ public:
 
 	virtual	uint16				Tag() const;
 
+	virtual	DebugInfoEntry*		AbstractOrigin() const;
 	virtual	LocationDescription* GetLocationDescription();
 
+			DIEType*			GetType() const	{ return fType; }
+
+			const ConstantAttributeValue* ConstValue() const
+									{ return &fValue; }
+
+	virtual	status_t			AddAttribute_abstract_origin(
+									uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_const_value(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_type(uint16 attributeName,
+									const AttributeValue& value);
+
 // TODO:
-// DW_AT_abstract_origin
 // DW_AT_artificial
-// DW_AT_const_value
 // DW_AT_default_value
 // DW_AT_endianity
 // DW_AT_is_optional
 // DW_AT_segment
-// DW_AT_type
 // DW_AT_variable_parameter
 
 private:
 			LocationDescription	fLocationDescription;
+			DebugInfoEntry*		fAbstractOrigin;
+			DIEType*			fType;
+			ConstantAttributeValue fValue;
 };
 
 
@@ -569,14 +592,20 @@ public:
 
 	virtual	uint16				Tag() const;
 
+			DIEType*			GetType() const	{ return fType; }
+
+	virtual	status_t			AddAttribute_type(uint16 attributeName,
+									const AttributeValue& value);
+
 // TODO:
 // DW_AT_bit_offset
 // DW_AT_bit_size
 // DW_AT_byte_size
 // DW_AT_data_member_location
 // DW_AT_mutable
-// DW_AT_type
 
+private:
+			DIEType*			fType;
 };
 
 
@@ -738,11 +767,18 @@ public:
 
 	virtual	uint16				Tag() const;
 
+			DIEType*			GetType() const	{ return fType; }
+
+	virtual	status_t			AddAttribute_type(uint16 attributeName,
+									const AttributeValue& value);
+
 // TODO:
 // DW_AT_accessibility
 // DW_AT_data_member_location
-// DW_AT_type
 // DW_AT_virtuality
+
+private:
+			DIEType*			fType;
 };
 
 
@@ -857,7 +893,12 @@ public:
 
 	virtual	uint16				Tag() const;
 
+			DIEType*			GetType() const	{ return fType; }
+
 	virtual	LocationDescription* GetLocationDescription();
+
+	virtual	status_t			AddAttribute_type(uint16 attributeName,
+									const AttributeValue& value);
 
 // TODO:
 // DW_AT_accessibility
@@ -867,10 +908,10 @@ public:
 // DW_AT_low_pc
 // DW_AT_ranges
 // DW_AT_segment
-// DW_AT_type
 // DW_AT_visibility
 
 private:
+			DIEType*			fType;
 			LocationDescription	fLocationDescription;
 };
 
@@ -888,6 +929,15 @@ public:
 								DIEBaseType();
 
 	virtual	uint16				Tag() const;
+
+			const DynamicAttributeValue* ByteSize() const
+									{ return &fByteSize; }
+			const DynamicAttributeValue* BitOffset() const
+									{ return &fBitOffset; }
+			const DynamicAttributeValue* BitSize() const
+									{ return &fBitSize; }
+			uint8				Encoding() const	{ return fEncoding; }
+			uint8				Endianity() const	{ return fEndianity; }
 
 	virtual	status_t			AddAttribute_encoding(uint16 attributeName,
 									const AttributeValue& value);
@@ -947,12 +997,24 @@ public:
 
 	virtual	uint16				Tag() const;
 
+			DIEType*			GetType() const	{ return fType; }
+
+			const ConstantAttributeValue* ConstValue() const
+									{ return &fValue; }
+
+	virtual	status_t			AddAttribute_const_value(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_type(uint16 attributeName,
+									const AttributeValue& value);
+
 // TODO:
-// DW_AT_const_value
 // DW_AT_endianity
 // DW_AT_external
 // DW_AT_start_scope
-// DW_AT_type
+
+private:
+			DIEType*			fType;
+			ConstantAttributeValue fValue;
 };
 
 
@@ -961,6 +1023,9 @@ public:
 								DIEEnumerator();
 
 	virtual	uint16				Tag() const;
+
+			const ConstantAttributeValue* ConstValue() const
+									{ return &fValue; }
 
 	virtual	status_t			AddAttribute_const_value(uint16 attributeName,
 									const AttributeValue& value);
@@ -1042,8 +1107,14 @@ public:
 			target_addr_t		LowPC() const	{ return fLowPC; }
 			target_addr_t		HighPC() const	{ return fHighPC; }
 
+			const LocationDescription* FrameBase() const { return &fFrameBase; }
+
+			const DebugInfoEntryList Parameters() const	{ return fParameters; }
+
 			bool				IsPrototyped() const	{ return fPrototyped; }
 			uint8				Inline() const			{ return fInline; }
+
+	virtual	status_t			AddChild(DebugInfoEntry* child);
 
 	virtual	status_t			AddAttribute_low_pc(uint16 attributeName,
 									const AttributeValue& value);
@@ -1064,33 +1135,35 @@ public:
 	virtual	status_t			AddAttribute_abstract_origin(
 									uint16 attributeName,
 									const AttributeValue& value);
+	virtual	status_t			AddAttribute_frame_base(
+									uint16 attributeName,
+									const AttributeValue& value);
 
 protected:
+			DebugInfoEntryList	fParameters;
 			target_addr_t		fLowPC;
 			target_addr_t		fHighPC;
 			off_t				fAddressRangesOffset;
 			DIESubprogram*		fSpecification;
 			DIESubprogram*		fAbstractOrigin;
 			DIEType*			fReturnType;
+			LocationDescription	fFrameBase;
 			uint8				fAddressClass;
 			bool				fPrototyped;
 			uint8				fInline;
 
 // TODO:
-// DW_AT_abstract_origin
 // DW_AT_artificial
 // DW_AT_calling_convention
 // DW_AT_elemental
 // DW_AT_entry_pc
 // DW_AT_explicit
 // DW_AT_external
-// DW_AT_frame_base
 // DW_AT_object_pointer
 // DW_AT_pure
 // DW_AT_recursive
 // DW_AT_return_addr
 // DW_AT_segment
-// DW_AT_specification
 // DW_AT_start_scope
 // DW_AT_static_link
 // DW_AT_trampoline
@@ -1105,8 +1178,13 @@ public:
 
 	virtual	uint16				Tag() const;
 
-// TODO:
-// DW_AT_type
+			DIEType*			GetType() const	{ return fType; }
+
+	virtual	status_t			AddAttribute_type(uint16 attributeName,
+									const AttributeValue& value);
+
+private:
+			DIEType*			fType;
 };
 
 
@@ -1116,9 +1194,19 @@ public:
 
 	virtual	uint16				Tag() const;
 
-// TODO:
-// DW_AT_const_value
-// DW_AT_type
+			DIEType*			GetType() const	{ return fType; }
+
+			const ConstantAttributeValue* ConstValue() const
+									{ return &fValue; }
+
+	virtual	status_t			AddAttribute_const_value(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_type(uint16 attributeName,
+									const AttributeValue& value);
+
+private:
+			DIEType*			fType;
+			ConstantAttributeValue fValue;
 };
 
 
@@ -1128,11 +1216,18 @@ public:
 
 	virtual	uint16				Tag() const;
 
+			DIEType*			GetType() const	{ return fType; }
+
+	virtual	status_t			AddAttribute_type(uint16 attributeName,
+									const AttributeValue& value);
+
 // TODO:
 // DW_AT_allocated
 // DW_AT_associated
 // DW_AT_data_location
-// DW_AT_type
+
+private:
+			DIEType*			fType;
 };
 
 
@@ -1157,12 +1252,19 @@ public:
 
 	virtual	uint16				Tag() const;
 
+			DIEType*			GetType() const	{ return fType; }
+
+	virtual	status_t			AddAttribute_type(uint16 attributeName,
+									const AttributeValue& value);
+
 // TODO:
 // DW_AT_abstract_origin
 // DW_AT_accessibility
 // DW_AT_declaration
 // DW_AT_discr
-// DW_AT_type
+
+private:
+			DIEType*			fType;
 };
 
 
@@ -1174,18 +1276,28 @@ public:
 
 	virtual	LocationDescription* GetLocationDescription();
 
+			DIEType*			GetType() const	{ return fType; }
+
+			const ConstantAttributeValue* ConstValue() const
+									{ return &fValue; }
+
+	virtual	status_t			AddAttribute_const_value(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_type(uint16 attributeName,
+									const AttributeValue& value);
+
 // TODO:
 // DW_AT_abstract_origin
-// DW_AT_const_value
 // DW_AT_endianity
 // DW_AT_external
 // DW_AT_segment
 // DW_AT_specification
 // DW_AT_start_scope
-// DW_AT_type
 
 private:
 			LocationDescription	fLocationDescription;
+			ConstantAttributeValue fValue;
+			DIEType*			fType;
 };
 
 

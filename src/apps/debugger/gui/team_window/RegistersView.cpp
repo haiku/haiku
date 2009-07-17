@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "RegisterView.h"
+#include "RegistersView.h"
 
 #include <stdio.h>
 
@@ -19,7 +19,7 @@
 // #pragma mark - RegisterValueColumn
 
 
-class RegisterView::RegisterValueColumn : public StringTableColumn {
+class RegistersView::RegisterValueColumn : public StringTableColumn {
 public:
 	RegisterValueColumn(int32 modelIndex, const char* title, float width,
 		float minWidth, float maxWidth, uint32 truncate = B_TRUNCATE_MIDDLE,
@@ -109,7 +109,7 @@ private:
 // #pragma mark - RegisterTableModel
 
 
-class RegisterView::RegisterTableModel : public TableModel {
+class RegistersView::RegisterTableModel : public TableModel {
 public:
 	RegisterTableModel(Architecture* architecture)
 		:
@@ -167,13 +167,14 @@ private:
 };
 
 
-// #pragma mark - RegisterView
+// #pragma mark - RegistersView
 
 
-RegisterView::RegisterView(Architecture* architecture)
+RegistersView::RegistersView(Architecture* architecture)
 	:
 	BGroupView(B_VERTICAL),
 	fArchitecture(architecture),
+	fCpuState(NULL),
 	fRegisterTable(NULL),
 	fRegisterTableModel(NULL)
 {
@@ -181,7 +182,7 @@ RegisterView::RegisterView(Architecture* architecture)
 }
 
 
-RegisterView::~RegisterView()
+RegistersView::~RegistersView()
 {
 	SetCpuState(NULL);
 	fRegisterTable->SetTableModel(NULL);
@@ -189,10 +190,10 @@ RegisterView::~RegisterView()
 }
 
 
-/*static*/ RegisterView*
-RegisterView::Create(Architecture* architecture)
+/*static*/ RegistersView*
+RegistersView::Create(Architecture* architecture)
 {
-	RegisterView* self = new RegisterView(architecture);
+	RegistersView* self = new RegistersView(architecture);
 
 	try {
 		self->_Init();
@@ -206,7 +207,7 @@ RegisterView::Create(Architecture* architecture)
 
 
 void
-RegisterView::SetCpuState(CpuState* cpuState)
+RegistersView::SetCpuState(CpuState* cpuState)
 {
 	if (cpuState == fCpuState)
 		return;
@@ -224,13 +225,13 @@ RegisterView::SetCpuState(CpuState* cpuState)
 
 
 void
-RegisterView::TableRowInvoked(Table* table, int32 rowIndex)
+RegistersView::TableRowInvoked(Table* table, int32 rowIndex)
 {
 }
 
 
 void
-RegisterView::_Init()
+RegistersView::_Init()
 {
 	fRegisterTable = new Table("register list", 0, B_FANCY_BORDER);
 	AddChild(fRegisterTable->ToView());

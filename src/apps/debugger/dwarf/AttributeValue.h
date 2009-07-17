@@ -135,9 +135,14 @@ struct DynamicAttributeValue {
 
 	DynamicAttributeValue()
 		:
-		attributeClass(ATTRIBUTE_CLASS_CONSTANT)
+		attributeClass(ATTRIBUTE_CLASS_UNKNOWN)
 	{
 		this->constant = 0;
+	}
+
+	bool IsValid() const
+	{
+		return attributeClass != ATTRIBUTE_CLASS_UNKNOWN;
 	}
 
 	void SetTo(uint64 constant)
@@ -174,9 +179,13 @@ struct ConstantAttributeValue {
 
 	ConstantAttributeValue()
 		:
-		attributeClass(ATTRIBUTE_CLASS_CONSTANT)
+		attributeClass(ATTRIBUTE_CLASS_UNKNOWN)
 	{
-		this->constant = 0;
+	}
+
+	bool IsValid() const
+	{
+		return attributeClass != ATTRIBUTE_CLASS_UNKNOWN;
 	}
 
 	void SetTo(uint64 constant)

@@ -22,9 +22,10 @@ class BButton;
 class BMenuBar;
 class BTabView;
 class Image;
-class RegisterView;
+class RegistersView;
 class SourceCode;
 class StackFrame;
+class VariablesView;
 
 
 class TeamWindow : public BWindow, ThreadListView::Listener,
@@ -119,7 +120,8 @@ private:
 			ThreadListView*		fThreadListView;
 			ImageListView*		fImageListView;
 			ImageFunctionsView*	fImageFunctionsView;
-			RegisterView*		fRegisterView;
+			VariablesView*		fVariablesView;
+			RegistersView*		fRegistersView;
 			StackTraceView*		fStackTraceView;
 			SourceView*			fSourceView;
 			BButton*			fRunButton;
