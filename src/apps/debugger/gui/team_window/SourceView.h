@@ -67,7 +67,6 @@ private:
 			void				_Init();
 			void				_UpdateScrollBars();
 			BSize				_DataRectSize() const;
-			BRect				_VisibleRect() const;
 
 private:
 			TeamDebugModel*		fDebugModel;

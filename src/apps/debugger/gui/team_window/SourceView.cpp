@@ -1327,7 +1327,14 @@ SourceView::TextView::_HandleAutoScroll(void)
 	// (returning the entire view rect) is correct, and if not, fix
 	// and remove the workaround here of asking the parent bounds to do the 
 	// comparison
-	_ScrollByLines(point.y < fSourceView->Bounds().top ? -1 : 1);
+	float difference = 0.0;
+	BRect sourceBounds = fSourceView->Bounds();
+	if (point.y < sourceBounds.top)
+		difference = point.y - sourceBounds.top;
+	else
+		difference = point.y - sourceBounds.bottom;
+	int factor = (int)(difference / fFontInfo->lineHeight);
+	_ScrollByLines(factor);
 	MouseMoved(point, B_OUTSIDE_VIEW, NULL);
 }
 
@@ -1543,7 +1550,7 @@ printf("SourceView::ScrollToLine(%lu)\n", line);
 	float top = (float)line * fFontInfo.lineHeight;
 	float bottom = top + fFontInfo.lineHeight - 1;
 
-	BRect visible = _VisibleRect();
+	BRect visible = Bounds();
 printf("SourceView::ScrollToLine(%ld)\n", line);
 printf("  visible: (%f, %f) - (%f, %f), line: %f - %f\n", visible.left, visible.top, visible.right, visible.bottom, top, bottom);
 
@@ -1680,13 +1687,6 @@ SourceView::_DataRectSize() const
 
 	BSize size = Frame().Size();
 	return BSize(std::max(size.width, width), std::max(size.height, height));
-}
-
-
-BRect
-SourceView::_VisibleRect() const
-{
-	return BRect(Bounds().LeftTop(), Frame().Size());
 }
 
 
