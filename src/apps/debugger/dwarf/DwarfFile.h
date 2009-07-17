@@ -127,6 +127,9 @@ private:
 									off_t& _length) const;
 
 private:
+			friend class 		DwarfFile::ExpressionEvaluationContext;
+
+private:
 			char*				fName;
 			ElfFile*			fElfFile;
 			ElfSection*			fDebugInfoSection;
