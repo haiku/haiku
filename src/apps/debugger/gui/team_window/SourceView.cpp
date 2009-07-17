@@ -1059,6 +1059,9 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 		BRegion oldRegion;
 		_GetSelectionRegion(oldRegion);
 		SelectionPoint point = _SelectionPointAt(where);
+		if (point.line < 0)
+			return;
+			
 		switch (transit) {
 			case B_INSIDE_VIEW:
 			case B_OUTSIDE_VIEW:
