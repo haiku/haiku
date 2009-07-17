@@ -24,7 +24,6 @@ extern "C" {
 
 #include "DemuxerTable.h"
 #include "gfx_util.h"
-//#include "RawFormats.h"
 
 
 #define TRACE_AVFORMAT_READER
@@ -45,7 +44,7 @@ extern "C" {
 
 static const size_t kIOBufferSize = 64 * 1024;
 	// TODO: This could depend on the BMediaFile creation flags, IIRC,
-	// the allow to specify a buffering mode.
+	// they allow to specify a buffering mode.
 
 uint32
 avformat_to_beos_format(SampleFormat format)
@@ -92,7 +91,7 @@ public:
 
 			double				FrameRate() const;
 
-	// Support for AVFormatContext
+	// Support for AVFormatReader
 			status_t			GetStreamInfo(int64* frameCount,
 									bigtime_t* duration, media_format* format,
 									const void** infoBuffer,
@@ -112,6 +111,14 @@ private:
 	// Since multiple StreamCookies use the same BPositionIO source, they
 	// maintain the position individually, and may need to seek the source
 	// if it does not match anymore in _Read().
+	// TODO: This concept prevents the use of a plain BDataIO that is not
+	// seekable. There is a version of AVFormatReader in the SVN history
+	// which implements packet buffering for other streams when reading
+	// packets. To support non-seekable network streams for example, this
+	// code should be resurrected. It will make handling seekable streams,
+	// especially from different threads that read from totally independent
+	// positions in the stream (aggressive pre-buffering perhaps), a lot
+	// more difficult with potentially large memory overhead.
 	static	int					_Read(void* cookie, uint8* buffer,
 									int bufferSize);
 	static	off_t				_Seek(void* cookie, off_t offset, int whence);
