@@ -115,7 +115,7 @@ width="128" height="128" /></td>
 For example, by re-using a path, several objects can be modified together by manipulating this one path. Think of an object and its shadow. Modifying their shared path will change the object itself and automatically its (maybe slightly distorted/translated) shadow.</p>
 
 <p>Here's a quick overview of Icon-O-Matic's window:</p>
-<img src="../../images/apps-images/i-o-m-overview.png" alt="i-o-m-overview.png" width="610" height="379" />
+<img src="../images/apps-images/i-o-m-overview.png" alt="i-o-m-overview.png" />
 
 <p>To create any visible object on the canvas, you need a shape with a path and a style. Conveniently, you can create one, two or all three of those together from the <span class="menu">Shape</span> menu. Every kind of object (Paths, Shapes, Transformers, and Styles) has a menu above its list of elements, offering various commands. Every element has certain options that are set in the <span class="menu">Property</span> view.</p>
 
@@ -127,7 +127,7 @@ For example, by re-using a path, several objects can be modified together by man
 
 <p>Simply clicking in the canvas will set the first point. While setting a point, you decide if the resulting line will be straight or curved: a simple click and release produces a straight line, holding down the mouse button and moving the mouse will drag out the handles for a Bezier curve. Of course, you can also change it all later on.</p>
 
-<img src="../../images/apps-images/i-o-m-path-ab.png" alt="i-o-m-path-ab" width="400" height="129" />
+<img src="../../images/apps-images/i-o-m-path-ab.png" alt="i-o-m-path-ab" />
 
 <p>To get from "A" to "B", you have to transform some points from corner-points to curve-points. That's done by holding <span class="key">ALT</span> while clicking on a point and dragging out the handles. This results in a symmetrical Bezier: the second handle follows the movement of the other. If you need to move the handles independently, again click&drag on a Bezier handle while holding <span class="key">ALT</span>.<br />
 Vice versa, to go from Bezier to a corner-point, hold <span class="key">ALT</span> and click on a point.</p>
@@ -189,8 +189,7 @@ width="16" height="16" /></td>
 <p>A shape groups together one or more paths with a style. Practically, it's the object that you'll actually see on the canvas. The grouping is done with the checkboxes in front of the paths and styles: Just select your shape and tick off the desired path(s) and a style.</p>
 <p>A shape defines how a path and style is applied, e.g. if the object is filled or only stroked (which is done by using Transformers on the shape, we'll get to that later). Also, a shape can be moved, rotated or resized without touching the used path. That way, you can re-use a single path and get different, but related, shapes.</p>
 
-<img src="../../images/apps-images/i-o-m-shape.png" alt="i-o-m-shape"
-width="177" height="145" />
+<img src="../../images/apps-images/i-o-m-shape.png" alt="i-o-m-shape" />
 
 <p>When a shape is selected from the list, a rectangle is drawn around it. Depending on where exactly you grab it, the shape is moved, resized or rotated around a point in its center, which itself can be moved. Holding <span class="key">SHIFT</span> will lock direction when moving, limit resizing to 45° angles and restrict the aspect ratio while resizing. The mouse pointer again indicates the current mode:</p>
 <table summary="Mouse pointer states, Shape" border="0" cellpadding="10">
@@ -264,8 +263,7 @@ For example, if Shape 1 were to be shown below 48px and Shape 2 from 48px upward
 <a id="i-o-m-style" name="i-o-m-style">Style</a></h2>
 <p>A style can either be a solid color or some type of gradient.<br />
 Besides the predefined colors under <span class="menu">Swatches</span>, you can mix your own by clicking on the current color. Also, note the slider under the color spectrum which sets the alpha-channel (transparency).</p>
-<img src="../../images/apps-images/i-o-m-gradients.png" alt="i-o-m-gradients"
-width="654" height="127" />
+<img src="../images/apps-images/i-o-m-gradients.png" alt="i-o-m-gradients" />
 <p>You quickly create a new style by mixing your color and simply drag&dropping it into the list of styles.</p>
 <p>If you go for a gradient, you set the type (<span class="menu">Linear</span>, <span class="menu">Radial</span>, <span class="menu">Diamond</span>, <span class="menu">Cone</span>) and then define the start and end colors. This is done with a drag&drop from a color bucket into the respective color indicator under the gradient.<br />
 Of course you can move these indicators to change the gradient to your liking. You can also insert more indicators to add more colors by double-clicking into the gradient. Pressing <span class="key">DEL</span> removes the selected indicator.</p>
