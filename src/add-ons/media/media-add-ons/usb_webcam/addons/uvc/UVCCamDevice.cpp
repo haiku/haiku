@@ -313,6 +313,14 @@ UVCCamDeviceAddon::~UVCCamDeviceAddon()
 {
 }
 
+
+const char *
+UVCCamDeviceAddon::BrandName()
+{
+	return "USB Video Class";
+}
+
+
 UVCCamDevice *
 UVCCamDeviceAddon::Instantiate(CamRoster &roster, BUSBDevice *from)
 {

@@ -28,6 +28,7 @@ class UVCCamDeviceAddon : public CamDeviceAddon
 				UVCCamDeviceAddon(WebCamMediaAddOn* webcam);
 	virtual 		~UVCCamDeviceAddon();
 						
+	virtual const char		*BrandName();
 	virtual UVCCamDevice	*Instantiate(CamRoster &roster, BUSBDevice *from);
 };
 
