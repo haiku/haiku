@@ -23,6 +23,7 @@ public:
 	inline	Element*			Elements() const	{ return fElements; }
 
 	inline	bool				Add(const Element& element);
+	inline	bool				AddUninitialized(int elementCount);
 	inline	bool				Insert(const Element& element, int index);
 	inline	bool				Remove(int index);
 
@@ -88,6 +89,23 @@ Array<Element>::Add(const Element& element)
 
 	fElements[fSize] = element;
 	fSize++;
+	return true;
+}
+
+
+template<typename Element>
+bool
+Array<Element>::AddUninitialized(int elementCount)
+{
+	if (elementCount < 0)
+		return false;
+
+	if (fSize + elementCount > fCapacity) {
+		if (!_Resize(fSize, elementCount))
+			return false;
+	}
+
+	fSize += elementCount;
 	return true;
 }
 
