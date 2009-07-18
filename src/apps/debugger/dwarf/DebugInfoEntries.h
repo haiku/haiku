@@ -219,6 +219,8 @@ public:
 
 	virtual	const char*			Name() const;
 
+	virtual	const DynamicAttributeValue* ByteSize() const;
+
 	virtual	status_t			AddAttribute_name(uint16 attributeName,
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_allocated(uint16 attributeName,
@@ -320,6 +322,8 @@ public:
 	virtual	bool				IsNamespace() const;
 
 	virtual	DebugInfoEntry*		Specification() const;
+
+	virtual	const DynamicAttributeValue* ByteSize() const;
 
 			const DebugInfoEntryList& DataMembers() const
 									{ return fDataMembers; }
@@ -428,6 +432,8 @@ public:
 
 	virtual	DebugInfoEntry*		Specification() const;
 
+	virtual	const DynamicAttributeValue* ByteSize() const;
+
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
 	virtual	status_t			AddAttribute_ordering(uint16 attributeName,
@@ -486,6 +492,8 @@ public:
 	virtual	uint16				Tag() const;
 
 	virtual	DebugInfoEntry*		Specification() const;
+
+	virtual	const DynamicAttributeValue* ByteSize() const;
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
@@ -646,6 +654,8 @@ public:
 								DIEStringType();
 
 	virtual	uint16				Tag() const;
+
+	virtual	const DynamicAttributeValue* ByteSize() const;
 
 	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
 									const AttributeValue& value);
@@ -847,6 +857,8 @@ public:
 
 	virtual	uint16				Tag() const;
 
+	virtual	const DynamicAttributeValue* ByteSize() const;
+
 	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
 									const AttributeValue& value);
 
@@ -860,6 +872,8 @@ public:
 								DIESubrangeType();
 
 	virtual	uint16				Tag() const;
+
+	virtual	const DynamicAttributeValue* ByteSize() const;
 
 	virtual	status_t			AddAttribute_bit_stride(uint16 attributeName,
 									const AttributeValue& value);
@@ -930,8 +944,7 @@ public:
 
 	virtual	uint16				Tag() const;
 
-			const DynamicAttributeValue* ByteSize() const
-									{ return &fByteSize; }
+	virtual	const DynamicAttributeValue* ByteSize() const;
 			const DynamicAttributeValue* BitOffset() const
 									{ return &fBitOffset; }
 			const DynamicAttributeValue* BitSize() const
@@ -1040,6 +1053,8 @@ public:
 								DIEFileType();
 
 	virtual	uint16				Tag() const;
+
+	virtual	const DynamicAttributeValue* ByteSize() const;
 
 	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
 									const AttributeValue& value);

@@ -215,6 +215,13 @@ DIEType::Name() const
 }
 
 
+const DynamicAttributeValue*
+DIEType::ByteSize() const
+{
+	return NULL;
+}
+
+
 status_t
 DIEType::AddAttribute_name(uint16 attributeName,
 	const AttributeValue& value)
@@ -391,6 +398,13 @@ DebugInfoEntry*
 DIECompoundType::Specification() const
 {
 	return fSpecification;
+}
+
+
+const DynamicAttributeValue*
+DIECompoundType::ByteSize() const
+{
+	return &fByteSize;
 }
 
 
@@ -618,6 +632,13 @@ DIEArrayType::Specification() const
 }
 
 
+const DynamicAttributeValue*
+DIEArrayType::ByteSize() const
+{
+	return &fByteSize;
+}
+
+
 status_t
 DIEArrayType::AddChild(DebugInfoEntry* child)
 {
@@ -725,6 +746,13 @@ DebugInfoEntry*
 DIEEnumerationType::Specification() const
 {
 	return fSpecification;
+}
+
+
+const DynamicAttributeValue*
+DIEEnumerationType::ByteSize() const
+{
+	return &fByteSize;
 }
 
 
@@ -977,6 +1005,13 @@ uint16
 DIEStringType::Tag() const
 {
 	return DW_TAG_string_type;
+}
+
+
+const DynamicAttributeValue*
+DIEStringType::ByteSize() const
+{
+	return &fByteSize;
 }
 
 
@@ -1269,6 +1304,13 @@ DIESetType::Tag() const
 }
 
 
+const DynamicAttributeValue*
+DIESetType::ByteSize() const
+{
+	return &fByteSize;
+}
+
+
 status_t
 DIESetType::AddAttribute_byte_size(uint16 attributeName,
 	const AttributeValue& value)
@@ -1291,6 +1333,13 @@ uint16
 DIESubrangeType::Tag() const
 {
 	return DW_TAG_subrange_type;
+}
+
+
+const DynamicAttributeValue*
+DIESubrangeType::ByteSize() const
+{
+	return &fByteSize;
 }
 
 
@@ -1414,6 +1463,13 @@ uint16
 DIEBaseType::Tag() const
 {
 	return DW_TAG_base_type;
+}
+
+
+const DynamicAttributeValue*
+DIEBaseType::ByteSize() const
+{
+	return &fByteSize;
 }
 
 
@@ -1558,6 +1614,13 @@ uint16
 DIEFileType::Tag() const
 {
 	return DW_TAG_file_type;
+}
+
+
+const DynamicAttributeValue*
+DIEFileType::ByteSize() const
+{
+	return &fByteSize;
 }
 
 
