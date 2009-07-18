@@ -3,10 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <Variant.h>
 
 #include <stdlib.h>
 #include <string.h>
+
+#include <ByteOrder.h>
 
 
 template<typename NumberType>
@@ -14,6 +17,8 @@ inline NumberType
 BVariant::_ToNumber() const
 {
 	switch (fType) {
+		case B_BOOL_TYPE:
+			return fBool ? 1 : 0;
 		case B_INT8_TYPE:
 			return (NumberType)fInt8;
 		case B_UINT8_TYPE:
@@ -46,6 +51,59 @@ BVariant::~BVariant()
 }
 
 
+status_t
+BVariant::SetToTypedData(const void* data, type_code type)
+{
+	Unset();
+
+	switch (type) {
+		case B_BOOL_TYPE:
+			fBool = *(bool*)data;
+			break;
+		case B_INT8_TYPE:
+			fInt8 = *(int8*)data;
+			break;
+		case B_UINT8_TYPE:
+			fUInt8 = *(uint8*)data;
+			break;
+		case B_INT16_TYPE:
+			fInt16 = *(int16*)data;
+			break;
+		case B_UINT16_TYPE:
+			fUInt16 = *(uint16*)data;
+			break;
+		case B_INT32_TYPE:
+			fInt32 = *(int32*)data;
+			break;
+		case B_UINT32_TYPE:
+			fUInt32 = *(uint32*)data;
+			break;
+		case B_INT64_TYPE:
+			fInt64 = *(int64*)data;
+			break;
+		case B_UINT64_TYPE:
+			fUInt64 = *(uint64*)data;
+			break;
+		case B_FLOAT_TYPE:
+			fFloat = *(float*)data;
+			break;
+		case B_DOUBLE_TYPE:
+			fDouble = *(double*)data;
+			break;
+		case B_POINTER_TYPE:
+			fPointer = *(void**)data;
+			break;
+		case B_STRING_TYPE:
+			return _SetTo((const char*)data, 0) ? B_OK : B_NO_MEMORY;
+		default:
+			return B_BAD_TYPE;
+	}
+
+	fType = type;
+	return B_OK;
+}
+
+
 void
 BVariant::Unset()
 {
@@ -61,6 +119,24 @@ BVariant::Unset()
 
 	fType = 0;
 	fFlags = 0;
+}
+
+
+size_t
+BVariant::Size() const
+{
+	if (fType == B_STRING_TYPE)
+		return fString != NULL ? strlen(fString) + 1 : 0;
+	return SizeOfType(fType);
+}
+
+
+const uint8*
+BVariant::Bytes() const
+{
+	if (fType == B_STRING_TYPE)
+		return (const uint8*)fString;
+	return fBytes;
 }
 
 
@@ -111,6 +187,45 @@ BVariant::IsFloat() const
 		case B_FLOAT_TYPE:
 		case B_DOUBLE_TYPE:
 			return true;
+		default:
+			return false;
+	}
+}
+
+
+
+bool
+BVariant::ToBool() const
+{
+	switch (fType) {
+		case B_BOOL_TYPE:
+			return fBool;
+		case B_INT8_TYPE:
+			return fInt8 != 0;
+		case B_UINT8_TYPE:
+			return fUInt8 != 0;
+		case B_INT16_TYPE:
+			return fInt16 != 0;
+		case B_UINT16_TYPE:
+			return fUInt16 != 0;
+		case B_INT32_TYPE:
+			return fInt32 != 0;
+		case B_UINT32_TYPE:
+			return fUInt32 != 0;
+		case B_INT64_TYPE:
+			return fInt64 != 0;
+		case B_UINT64_TYPE:
+			return fUInt64 != 0;
+		case B_FLOAT_TYPE:
+			return fFloat != 0;
+		case B_DOUBLE_TYPE:
+			return fDouble != 0;
+		case B_POINTER_TYPE:
+			return fPointer != NULL;
+		case B_STRING_TYPE:
+			return fString != NULL;
+				// TODO: We should probably check for actual values like "true",
+				// "false", "on", "off", etc.
 		default:
 			return false;
 	}
@@ -220,10 +335,22 @@ BVariant::_SetTo(const BVariant& other)
 }
 
 
+void
+BVariant::SwapEndianess()
+{
+	if (!IsNumber() || fType == B_POINTER_TYPE)
+		return;
+
+	swap_data(fType, fBytes, Size(), B_SWAP_ALWAYS);
+}
+
+
 /*static*/ size_t
-BVariant::SizeOfType(uint32 type)
+BVariant::SizeOfType(type_code type)
 {
 	switch (type) {
+		case B_BOOL_TYPE:
+			return 1;
 		case B_INT8_TYPE:
 			return 1;
 		case B_UINT8_TYPE:
@@ -249,6 +376,15 @@ BVariant::SizeOfType(uint32 type)
 		default:
 			return 0;
 	}
+}
+
+
+void
+BVariant::_SetTo(bool value)
+{
+	fType = B_BOOL_TYPE;
+	fFlags = 0;
+	fBool = value;
 }
 
 
@@ -351,7 +487,7 @@ BVariant::_SetTo(const void* value)
 }
 
 
-void
+bool
 BVariant::_SetTo(const char* value, uint32 flags)
 {
 	fType = B_STRING_TYPE;
@@ -361,11 +497,15 @@ BVariant::_SetTo(const char* value, uint32 flags)
 		if ((flags & B_VARIANT_DONT_COPY_DATA) == 0) {
 			fString = strdup(value);
 			fFlags |= B_VARIANT_OWNS_DATA;
+			if (fString == NULL)
+				return false;
 		} else {
 			fString = (char*)value;
 			fFlags |= flags & B_VARIANT_OWNS_DATA;
 		}
 	} else
 		fString = NULL;
+
+	return true;
 }
 

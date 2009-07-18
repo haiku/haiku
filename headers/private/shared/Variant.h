@@ -19,6 +19,7 @@ enum {
 class BVariant {
 public:
 	inline						BVariant();
+	inline						BVariant(bool value);
 	inline						BVariant(int8 value);
 	inline						BVariant(uint8 value);
 	inline						BVariant(int16 value);
@@ -36,6 +37,7 @@ public:
 								~BVariant();
 
 	inline	void				SetTo(const BVariant& other);
+	inline	void				SetTo(bool value);
 	inline	void				SetTo(int8 value);
 	inline	void				SetTo(uint8 value);
 	inline	void				SetTo(int16 value);
@@ -49,17 +51,22 @@ public:
 	inline	void				SetTo(const void* value);
 	inline	void				SetTo(const char* value,
 									uint32 flags = 0);
+			status_t			SetToTypedData(const void* data,
+									type_code type);
 			void				Unset();
 
 	inline	BVariant&			operator=(const BVariant& other);
 
-			type_code			Type() const		{ return fType; }
+	inline	type_code			Type() const		{ return fType; }
+			size_t				Size() const;
+			const uint8*		Bytes() const;
 
 			bool				IsNumber() const;
 			bool				IsInteger() const;
 			bool				IsFloat() const;
 									// floating point, not just float
 
+			bool				ToBool() const;
 			int8				ToInt8() const;
 			uint8				ToUInt8() const;
 			int16				ToInt16() const;
@@ -73,10 +80,15 @@ public:
 			void*				ToPointer() const;
 			const char*			ToString() const;
 
-	static	size_t				SizeOfType(uint32 type);
+			void				SwapEndianess();
+									// has effect only on scalar types (pointer
+									// counting as scalar, not string, though)
+
+	static	size_t				SizeOfType(type_code type);
 
 private:
 			void				_SetTo(const BVariant& other);
+			void				_SetTo(bool value);
 			void				_SetTo(int8 value);
 			void				_SetTo(uint8 value);
 			void				_SetTo(int16 value);
@@ -88,7 +100,7 @@ private:
 			void				_SetTo(float value);
 			void				_SetTo(double value);
 			void				_SetTo(const void* value);
-			void				_SetTo(const char* value,
+			bool				_SetTo(const char* value,
 									uint32 flags);
 
 	template<typename NumberType>
@@ -98,6 +110,7 @@ private:
 			type_code			fType;
 			uint32				fFlags;
 			union {
+				bool			fBool;
 				int8			fInt8;
 				uint8			fUInt8;
 				int16			fInt16;
@@ -110,6 +123,7 @@ private:
 				double			fDouble;
 				void*			fPointer;
 				char*			fString;
+				uint8			fBytes[8];
 			};
 };
 
@@ -119,6 +133,12 @@ BVariant::BVariant()
 	fType(0),
 	fFlags(0)
 {
+}
+
+
+BVariant::BVariant(bool value)
+{
+	_SetTo(value);
 }
 
 
@@ -214,6 +234,14 @@ BVariant::SetTo(const BVariant& other)
 {
 	Unset();
 	_SetTo(other);
+}
+
+
+void
+BVariant::SetTo(bool value)
+{
+	Unset();
+	_SetTo(value);
 }
 
 
