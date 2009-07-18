@@ -25,6 +25,125 @@
 #include "Variant.h"
 
 
+// #pragma mark - ExpressionEvaluationContext
+
+
+struct DwarfFile::ExpressionEvaluationContext
+	: DwarfExpressionEvaluationContext {
+public:
+	ExpressionEvaluationContext(DwarfFile* file, CompilationUnit* unit,
+		DIESubprogram* subprogramEntry,
+		const DwarfTargetInterface* targetInterface,
+		target_addr_t instructionPointer, target_addr_t objectPointer,
+		target_addr_t framePointer)
+		:
+		DwarfExpressionEvaluationContext(targetInterface, unit->AddressSize()),
+		fFile(file),
+		fUnit(unit),
+		fSubprogramEntry(subprogramEntry),
+		fInstructionPointer(instructionPointer),
+		fObjectPointer(objectPointer),
+		fFramePointer(framePointer),
+		fFrameBasePointer(0),
+		fFrameBaseEvaluated(false)
+	{
+	}
+
+	virtual bool GetObjectAddress(target_addr_t& _address)
+	{
+		if (fObjectPointer == 0)
+			return false;
+
+		_address = fObjectPointer;
+		return true;
+	}
+
+	virtual bool GetFrameAddress(target_addr_t& _address)
+	{
+		_address = fFramePointer;
+		return true;
+	}
+
+	virtual bool GetFrameBaseAddress(target_addr_t& _address)
+	{
+		if (fFrameBaseEvaluated) {
+			if (fFrameBasePointer == 0)
+				return false;
+
+			_address = fFrameBasePointer;
+			return true;
+		}
+
+		// set flag already to prevent recursion for a buggy expression
+		fFrameBaseEvaluated = true;
+
+		// get the subprogram's frame base location
+		const LocationDescription* location = fSubprogramEntry->FrameBase();
+		if (!location->IsValid())
+			return B_BAD_VALUE;
+
+		// get the expression
+		const void* expression;
+		off_t expressionLength;
+		status_t error = fFile->_GetLocationExpression(fUnit, location,
+			fInstructionPointer, expression, expressionLength);
+		if (error != B_OK)
+			return error;
+
+		// evaluate the expression
+		DwarfExpressionEvaluator evaluator(this);
+		error = evaluator.Evaluate(expression, expressionLength,
+			fFrameBasePointer);
+		if (error != B_OK)
+			return false;
+printf("  -> frame base: %llx\n", fFrameBasePointer);
+		_address = fFrameBasePointer;
+		return true;
+	}
+
+	virtual bool GetTLSAddress(target_addr_t localAddress,
+		target_addr_t& _address)
+	{
+		// TODO:...
+		return false;
+	}
+
+	virtual status_t GetCallTarget(uint64 offset, bool local,
+		const void*& _block, off_t& _size)
+	{
+		// resolve the entry
+		DebugInfoEntry* entry = fFile->_ResolveReference(fUnit, offset, local);
+		if (entry == NULL)
+			return B_ENTRY_NOT_FOUND;
+
+		// get the location description
+		LocationDescription* location = entry->GetLocationDescription();
+		if (location == NULL || !location->IsValid()) {
+			_block = NULL;
+			_size = 0;
+			return B_OK;
+		}
+
+		// get the expression
+		return fFile->_GetLocationExpression(fUnit, location,
+			fInstructionPointer, _block, _size);
+	}
+
+private:
+	DwarfFile*			fFile;
+	CompilationUnit*	fUnit;
+	DIESubprogram*		fSubprogramEntry;
+	target_addr_t		fInstructionPointer;
+	target_addr_t		fObjectPointer;
+	target_addr_t		fFramePointer;
+	target_addr_t		fFrameBasePointer;
+	bool				fFrameBaseEvaluated;
+};
+
+
+// #pragma mark - DwarfFile
+
+
 DwarfFile::DwarfFile()
 	:
 	fName(NULL),
@@ -481,119 +600,6 @@ printf("  -> CFA_RULE_UNDEFINED\n");
 
 	return B_ENTRY_NOT_FOUND;
 }
-
-
-struct DwarfFile::ExpressionEvaluationContext
-	: DwarfExpressionEvaluationContext {
-public:
-	ExpressionEvaluationContext(DwarfFile* file, CompilationUnit* unit,
-		DIESubprogram* subprogramEntry,
-		const DwarfTargetInterface* targetInterface,
-		target_addr_t instructionPointer, target_addr_t objectPointer,
-		target_addr_t framePointer)
-		:
-		DwarfExpressionEvaluationContext(targetInterface, unit->AddressSize()),
-		fFile(file),
-		fUnit(unit),
-		fSubprogramEntry(subprogramEntry),
-		fInstructionPointer(instructionPointer),
-		fObjectPointer(objectPointer),
-		fFramePointer(framePointer),
-		fFrameBasePointer(0),
-		fFrameBaseEvaluated(false)
-	{
-	}
-
-	virtual bool GetObjectAddress(target_addr_t& _address)
-	{
-		if (fObjectPointer == 0)
-			return false;
-
-		_address = fObjectPointer;
-		return true;
-	}
-
-	virtual bool GetFrameAddress(target_addr_t& _address)
-	{
-		_address = fFramePointer;
-		return true;
-	}
-
-	virtual bool GetFrameBaseAddress(target_addr_t& _address)
-	{
-		if (fFrameBaseEvaluated) {
-			if (fFrameBasePointer == 0)
-				return false;
-
-			_address = fFrameBasePointer;
-			return true;
-		}
-
-		// set flag already to prevent recursion for a buggy expression
-		fFrameBaseEvaluated = true;
-
-		// get the subprogram's frame base location
-		const LocationDescription* location = fSubprogramEntry->FrameBase();
-		if (!location->IsValid())
-			return B_BAD_VALUE;
-
-		// get the expression
-		const void* expression;
-		off_t expressionLength;
-		status_t error = fFile->_GetLocationExpression(fUnit, location,
-			fInstructionPointer, expression, expressionLength);
-		if (error != B_OK)
-			return error;
-
-		// evaluate the expression
-		DwarfExpressionEvaluator evaluator(this);
-		error = evaluator.Evaluate(expression, expressionLength,
-			fFrameBasePointer);
-		if (error != B_OK)
-			return false;
-printf("  -> frame base: %llx\n", fFrameBasePointer);
-		_address = fFrameBasePointer;
-		return true;
-	}
-
-	virtual bool GetTLSAddress(target_addr_t localAddress,
-		target_addr_t& _address)
-	{
-		// TODO:...
-		return false;
-	}
-
-	virtual status_t GetCallTarget(uint64 offset, bool local,
-		const void*& _block, off_t& _size)
-	{
-		// resolve the entry
-		DebugInfoEntry* entry = fFile->_ResolveReference(fUnit, offset, local);
-		if (entry == NULL)
-			return B_ENTRY_NOT_FOUND;
-
-		// get the location description
-		LocationDescription* location = entry->GetLocationDescription();
-		if (location == NULL || !location->IsValid()) {
-			_block = NULL;
-			_size = 0;
-			return B_OK;
-		}
-
-		// get the expression
-		return fFile->_GetLocationExpression(fUnit, location,
-			fInstructionPointer, _block, _size);
-	}
-
-private:
-	DwarfFile*			fFile;
-	CompilationUnit*	fUnit;
-	DIESubprogram*		fSubprogramEntry;
-	target_addr_t		fInstructionPointer;
-	target_addr_t		fObjectPointer;
-	target_addr_t		fFramePointer;
-	target_addr_t		fFrameBasePointer;
-	bool				fFrameBaseEvaluated;
-};
 
 
 status_t
