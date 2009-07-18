@@ -124,3 +124,23 @@ CamSensor::Device()
 {
 	return fCamDevice;
 }
+
+
+status_t
+CamSensor::ProbeByIICSignature(const uint8 *regList, const uint8 *matchList,
+	size_t count)
+{
+	int i;
+
+	for (i = 0; i < count; i++) {
+		uint8 value = 0;
+		ssize_t len;
+		len = Device()->ReadIIC8(regList[i], &value);
+		PRINT((CH ": ReadIIC8 = %d val = %d" CT, len, value));
+		if (len < 1)
+			return ENODEV;
+		if (value != matchList[i])
+			return ENODEV;
+	}
+	return B_OK;
+}

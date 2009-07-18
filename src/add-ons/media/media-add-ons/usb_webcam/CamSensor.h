@@ -59,6 +59,11 @@ class CamSensor
 	virtual status_t	ReadIIC(uint8 address, uint8 *data);
 #endif
 	protected:
+
+	status_t			ProbeByIICSignature(const uint8 *regList,
+											const uint8 *matchList,
+											size_t count);
+
 		status_t		fInitStatus;
 		bool			fIsBigEndian;
 		bool			fTransferEnabled;
