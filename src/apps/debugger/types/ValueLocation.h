@@ -85,8 +85,12 @@ public:
 
 			int32				CountPieces() const;
 			ValuePieceLocation	PieceAt(int32 index) const;
+			void				SetPieceAt(int32 index,
+									const ValuePieceLocation& piece);
 
 			ValueLocation&		operator=(const ValueLocation& other);
+
+			void				Dump() const;
 
 private:
 	typedef Array<ValuePieceLocation> PieceArray;
