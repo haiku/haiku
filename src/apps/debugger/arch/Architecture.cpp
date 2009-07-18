@@ -20,9 +20,12 @@
 #include "Team.h"
 
 
-Architecture::Architecture(TeamMemory* teamMemory)
+Architecture::Architecture(TeamMemory* teamMemory, uint8 addressSize,
+	bool bigEndian)
 	:
-	fTeamMemory(teamMemory)
+	fTeamMemory(teamMemory),
+	fAddressSize(addressSize),
+	fBigEndian(bigEndian)
 {
 }
 
@@ -97,7 +100,7 @@ Architecture::CreateStackTrace(Team* team,
 		CpuState* previousCpuState = NULL;
 		if (function != NULL) {
 			status_t error = functionDebugInfo->GetSpecificImageDebugInfo()
-				->CreateFrame(image, functionDebugInfo, cpuState, previousFrame,
+				->CreateFrame(image, function, cpuState, previousFrame,
 					previousCpuState);
 			if (error != B_OK && error != B_UNSUPPORTED)
 				break;

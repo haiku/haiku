@@ -6,6 +6,7 @@
 #define ARCHITECTURE_H
 
 
+#include <ByteOrder.h>
 #include <OS.h>
 
 #include <Referenceable.h>
@@ -31,10 +32,16 @@ class TeamMemory;
 
 class Architecture : public Referenceable {
 public:
-								Architecture(TeamMemory* teamMemory);
+								Architecture(TeamMemory* teamMemory,
+									uint8 addressSize, bool bigEndian);
 	virtual						~Architecture();
 
 	virtual	status_t			Init();
+
+	inline	uint8				AddressSize() const		{ return fAddressSize; }
+
+	inline	bool				IsBigEndian() const		{ return fBigEndian; }
+	inline	bool				IsHostEndian() const;
 
 	virtual	int32				CountRegisters() const = 0;
 	virtual	const Register*		Registers() const = 0;
@@ -87,7 +94,16 @@ public:
 
 protected:
 			TeamMemory*			fTeamMemory;
+			uint8				fAddressSize;
+			bool				fBigEndian;
 };
+
+
+bool
+Architecture::IsHostEndian() const
+{
+	return fBigEndian == (B_HOST_IS_BENDIAN != 0);
+}
 
 
 #endif	// ARCHITECTURE_H

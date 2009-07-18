@@ -104,7 +104,7 @@ struct ArchitectureX86::FromDwarfRegisterMap : RegisterMap {
 
 ArchitectureX86::ArchitectureX86(TeamMemory* teamMemory)
 	:
-	Architecture(teamMemory),
+	Architecture(teamMemory, 4, false),
 	fAssemblyLanguage(NULL),
 	fToDwarfRegisterMap(NULL),
 	fFromDwarfRegisterMap(NULL)
@@ -325,6 +325,10 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 	if (frame == NULL)
 		return B_NO_MEMORY;
 	Reference<StackFrame> frameReference(frame, true);
+
+	status_t error = frame->Init();
+	if (error != B_OK)
+		return error;
 
 	// read the previous frame and return address, if this is a standard frame
 	if (readStandardFrame) {
