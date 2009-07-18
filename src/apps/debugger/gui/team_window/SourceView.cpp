@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1326,18 +1327,16 @@ SourceView::TextView::_HandleAutoScroll(void)
 	BPoint point;
 	uint32 buttons;
 	GetMouse(&point, &buttons);
-	// TODO: investigate if the observed Bounds() behavior for child views
-	// (returning the entire view rect) is correct, and if not, fix
-	// and remove the workaround here of asking the parent bounds to do the 
-	// comparison
 	float difference = 0.0;
-	BRect sourceBounds = fSourceView->Bounds();
-	if (point.y < sourceBounds.top)
-		difference = point.y - sourceBounds.top;
-	else
-		difference = point.y - sourceBounds.bottom;
-	int factor = (int)(difference / fFontInfo->lineHeight);
-	_ScrollByLines(factor);
+	BRect visibleRect = Frame() & fSourceView->Bounds();
+	if (point.y < visibleRect.top)
+		difference = point.y - visibleRect.top;
+	else if (point.y > visibleRect.bottom)
+		difference = point.y - visibleRect.bottom;
+	if (difference != 0.0) {
+		int factor = (int)(difference / fFontInfo->lineHeight);
+		_ScrollByLines(factor);
+	}
 	MouseMoved(point, B_OUTSIDE_VIEW, NULL);
 }
 
