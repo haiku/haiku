@@ -305,6 +305,13 @@ CamDevice::Lock()
 }
 
 
+status_t
+CamDevice::PowerOnSensor(bool on)
+{
+	return B_OK;
+}
+
+
 ssize_t
 CamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
 {
@@ -334,6 +341,29 @@ ssize_t
 CamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
 {
 	return ENOSYS;
+}
+
+
+ssize_t
+CamDevice::OrReg8(uint16 address, uint8 data, uint8 mask)
+{
+	uint8 value;
+	if (ReadReg(address, &value, 1, true) < 1)
+		return EIO;
+	value &= mask;
+	value |= data;
+	return WriteReg8(address, value);
+}
+
+
+ssize_t
+CamDevice::AndReg8(uint16 address, uint8 data)
+{
+	uint8 value;
+	if (ReadReg(address, &value, 1, true) < 1)
+		return EIO;
+	value &= data;
+	return WriteReg8(address, value);
 }
 
 

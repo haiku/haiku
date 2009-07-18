@@ -91,11 +91,16 @@ class CamDevice {
 	// sensor chip handling
 	CamSensor*			Sensor() const { return fSensor; };
 
+	virtual status_t	PowerOnSensor(bool on);
+
 	// generic register-like access
 	virtual ssize_t		WriteReg(uint16 address, uint8 *data, size_t count=1);
 	virtual ssize_t		WriteReg8(uint16 address, uint8 data);
 	virtual ssize_t		WriteReg16(uint16 address, uint16 data);
 	virtual ssize_t		ReadReg(uint16 address, uint8 *data, size_t count=1, bool cached=false);
+
+	ssize_t				OrReg8(uint16 address, uint8 data, uint8 mask=0xff);
+	ssize_t				AndReg8(uint16 address, uint8 data);
 	
 	// I2C-like access
 	//virtual status_t	GetStatusIIC();
