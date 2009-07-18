@@ -250,7 +250,15 @@ printf("DwarfExpressionEvaluator::EvaluateLocation(): %s\n", exception.message);
 status_t
 DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 {
-printf("DwarfExpressionEvaluator::_Evaluate()\n");
+{
+printf("DwarfExpressionEvaluator::_Evaluate(%p, %lld)\n", fDataReader.Data(),
+fDataReader.BytesRemaining());
+const uint8* data = (const uint8*)fDataReader.Data();
+int32 count = fDataReader.BytesRemaining();
+for (int32 i = 0; i < count; i++)
+printf(" %02x", data[i]);
+printf("\n");
+}
 	uint32 operationsExecuted = 0;
 
 	while (fDataReader.BytesRemaining() > 0) {
@@ -531,13 +539,14 @@ printf("  DW_OP_call_frame_cfa\n");
 			}
 			case DW_OP_fbreg:
 			{
-printf("  DW_OP_fbreg\n");
+				int64 offset = fDataReader.ReadSignedLEB128(0);
+printf("  DW_OP_fbreg(%lld)\n", offset);
 				target_addr_t address;
 				if (!fContext->GetFrameBaseAddress(address)) {
 					throw EvaluationException(
 						"failed to get frame base address");
 				}
-				_Push(address + fDataReader.ReadSignedLEB128(0));
+				_Push(address + offset);
 				break;
 			}
 			case DW_OP_form_tls_address:
@@ -615,9 +624,9 @@ printf("  DW_OP_reg%u\n", opcode - DW_OP_reg0);
 					_piece->SetToRegister(opcode - DW_OP_reg0);
 					return B_OK;
 				} else if (opcode >= DW_OP_breg0 && opcode <= DW_OP_breg31) {
-printf("  DW_OP_breg%u\n", opcode - DW_OP_breg0);
-					_PushRegister(opcode - DW_OP_breg0,
-						fDataReader.ReadSignedLEB128(0));
+					int64 offset = fDataReader.ReadSignedLEB128(0);
+printf("  DW_OP_breg%u(%lld)\n", opcode - DW_OP_breg0, offset);
+					_PushRegister(opcode - DW_OP_breg0, offset);
 				} else {
 					printf("DwarfExpressionEvaluator::_Evaluate(): unsupported "
 						"opcode: %u\n", opcode);
@@ -712,7 +721,7 @@ DwarfExpressionEvaluator::_PushRegister(uint32 reg, target_addr_t offset)
 	if (!fContext->TargetInterface()->GetRegisterValue(reg, value))
 		throw EvaluationException("failed to get register");
 
-	_Push(value.ToUInt64());
+	_Push(value.ToUInt64() + offset);
 }
 
 
