@@ -79,9 +79,9 @@ DebuggerImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 
 
 status_t
-DebuggerImageDebugInfo::CreateFrame(Image* image, FunctionDebugInfo* function,
-	CpuState* cpuState, StackFrame*& _previousFrame,
-	CpuState*& _previousCpuState)
+DebuggerImageDebugInfo::CreateFrame(Image* image,
+	FunctionInstance* functionInstance, CpuState* cpuState,
+	StackFrame*& _previousFrame, CpuState*& _previousCpuState)
 {
 	return B_UNSUPPORTED;
 }

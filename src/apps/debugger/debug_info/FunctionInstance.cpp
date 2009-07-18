@@ -5,8 +5,13 @@
 
 #include "FunctionInstance.h"
 
+#include <new>
+
 #include "DisassembledCode.h"
 #include "Function.h"
+#include "FunctionID.h"
+#include "ImageDebugInfo.h"
+#include "LocatableFile.h"
 
 
 FunctionInstance::FunctionInstance(ImageDebugInfo* imageDebugInfo,
@@ -28,6 +33,25 @@ FunctionInstance::~FunctionInstance()
 {
 	SetFunction(NULL);
 	fFunctionDebugInfo->ReleaseReference();
+}
+
+
+FunctionID*
+FunctionInstance::GetFunctionID() const
+{
+	BString idString;
+	BString path;
+	if (LocatableFile* file = SourceFile()) {
+		idString << "s:";
+		file->GetPath(path);
+	} else {
+		idString << "i:";
+		path << GetImageDebugInfo()->GetImageInfo().Name();
+	}
+
+	idString << path << "//" << Name();
+
+	return new(std::nothrow) FunctionID(idString);
 }
 
 

@@ -21,6 +21,7 @@ enum function_source_state {
 class DisassembledCode;
 class Function;
 class FunctionDebugInfo;
+class FunctionID;
 class ImageDebugInfo;
 
 
@@ -51,6 +52,9 @@ public:
 			SourceLocation		GetSourceLocation() const
 									{ return fFunctionDebugInfo
 										->SourceStartLocation(); }
+
+			FunctionID*			GetFunctionID() const;
+									// returns a reference
 
 			void				SetFunction(Function* function);
 									// package private

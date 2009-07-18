@@ -16,6 +16,7 @@ class CpuState;
 class DebuggerInterface;
 class FileSourceCode;
 class FunctionDebugInfo;
+class FunctionInstance;
 class Image;
 class LocatableFile;
 class SourceLanguage;
@@ -34,7 +35,7 @@ public:
 									// returns references
 
 	virtual	status_t			CreateFrame(Image* image,
-									FunctionDebugInfo* function,
+									FunctionInstance* functionInstance,
 									CpuState* cpuState,
 									StackFrame*& _previousFrame,
 									CpuState*& _previousCpuState) = 0;

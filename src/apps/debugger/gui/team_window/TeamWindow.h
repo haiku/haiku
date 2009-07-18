@@ -5,6 +5,7 @@
 #ifndef TEAM_WINDOW_H
 #define TEAM_WINDOW_H
 
+
 #include <String.h>
 #include <Window.h>
 
@@ -12,10 +13,12 @@
 #include "Function.h"
 #include "ImageFunctionsView.h"
 #include "ImageListView.h"
+#include "StackFrame.h"
 #include "StackTraceView.h"
 #include "Team.h"
 #include "TeamDebugModel.h"
 #include "ThreadListView.h"
+#include "VariablesView.h"
 
 
 class BButton;
@@ -30,8 +33,9 @@ class VariablesView;
 
 class TeamWindow : public BWindow, ThreadListView::Listener,
 	ImageListView::Listener, StackTraceView::Listener,
-	ImageFunctionsView::Listener, SourceView::Listener, Team::Listener,
-	TeamDebugModel::Listener, Function::Listener {
+	ImageFunctionsView::Listener, SourceView::Listener, VariablesView::Listener,
+	Team::Listener, TeamDebugModel::Listener, Function::Listener,
+	StackFrame::Listener {
 public:
 	class Listener;
 
@@ -68,6 +72,11 @@ private:
 									bool enabled);
 	virtual	void				ClearBreakpointRequested(target_addr_t address);
 
+	// VariablesView::Listener
+	virtual	void				StackFrameValueRequested(::Thread* thread,
+									StackFrame* stackFrame, Variable* variable,
+									TypeComponentPath* path);
+
 	// Team::Listener
 	virtual	void				ThreadStateChanged(
 									const Team::ThreadEvent& event);
@@ -86,6 +95,11 @@ private:
 	// Function::Listener
 	virtual	void				FunctionSourceCodeChanged(Function* function);
 
+	// StackFrame::Listener
+	virtual	void				StackFrameValueRetrieved(StackFrame* stackFrame,
+									Variable* variable,
+									TypeComponentPath* path);
+
 			void				_Init();
 
 			void				_SetActiveThread(::Thread* thread);
@@ -101,6 +115,9 @@ private:
 			void				_HandleThreadStateChanged(thread_id threadID);
 			void				_HandleCpuStateChanged(thread_id threadID);
 			void				_HandleStackTraceChanged(thread_id threadID);
+			void				_HandleStackFrameValueRetrieved(
+									StackFrame* stackFrame, Variable* variable,
+									TypeComponentPath* path);
 			void				_HandleImageDebugInfoChanged(image_id imageID);
 			void				_HandleSourceCodeChanged();
 			void				_HandleUserBreakpointChanged(
@@ -136,17 +153,20 @@ class TeamWindow::Listener {
 public:
 	virtual						~Listener();
 
-	virtual	void				FunctionSourceCodeRequested(TeamWindow* window,
+	virtual	void				FunctionSourceCodeRequested(
 									FunctionInstance* function) = 0;
-	virtual	void				ImageDebugInfoRequested(TeamWindow* window,
-									Image* image) = 0;
-	virtual	void				ThreadActionRequested(TeamWindow* window,
-									thread_id threadID, uint32 action) = 0;
+	virtual	void				ImageDebugInfoRequested(Image* image) = 0;
+	virtual	void				StackFrameValueRequested(::Thread* thread,
+									StackFrame* stackFrame, Variable* variable,
+									TypeComponentPath* path) = 0;
+									// called with team locked
+	virtual	void				ThreadActionRequested(thread_id threadID,
+									uint32 action) = 0;
 	virtual	void				SetBreakpointRequested(target_addr_t address,
 									bool enabled) = 0;
 	virtual	void				ClearBreakpointRequested(
 									target_addr_t address) = 0;
-	virtual	bool				TeamWindowQuitRequested(TeamWindow* window) = 0;
+	virtual	bool				TeamWindowQuitRequested() = 0;
 };
 
 

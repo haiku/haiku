@@ -22,6 +22,7 @@ enum {
 
 class Architecture;
 class Breakpoint;
+class FunctionID;
 class SourceCode;
 class TeamMemory;
 class UserBreakpoint;

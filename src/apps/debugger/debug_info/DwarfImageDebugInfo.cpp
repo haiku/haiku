@@ -31,6 +31,8 @@
 #include "ElfFile.h"
 #include "FileManager.h"
 #include "FileSourceCode.h"
+#include "FunctionID.h"
+#include "FunctionInstance.h"
 #include "LocatableFile.h"
 #include "Register.h"
 #include "RegisterMap.h"
@@ -303,12 +305,12 @@ printf("  %ld compilation units\n", fFile->CountCompilationUnits());
 
 
 status_t
-DwarfImageDebugInfo::CreateFrame(Image* image, FunctionDebugInfo* _function,
-	CpuState* cpuState, StackFrame*& _previousFrame,
-	CpuState*& _previousCpuState)
+DwarfImageDebugInfo::CreateFrame(Image* image,
+	FunctionInstance* functionInstance, CpuState* cpuState,
+	StackFrame*& _previousFrame, CpuState*& _previousCpuState)
 {
-	DwarfFunctionDebugInfo* function
-		= dynamic_cast<DwarfFunctionDebugInfo*>(_function);
+	DwarfFunctionDebugInfo* function = dynamic_cast<DwarfFunctionDebugInfo*>(
+		functionInstance->GetFunctionDebugInfo());
 	if (function == NULL)
 		return B_BAD_VALUE;
 
@@ -365,14 +367,24 @@ if (previousCpuState->GetRegisterValue(reg, value)) {
 		return B_NO_MEMORY;
 	Reference<StackFrame> frameReference(frame, true);
 
+	error = frame->Init();
+	if (error != B_OK)
+		return error;
+
 	frame->SetReturnAddress(previousCpuState->InstructionPointer());
 		// Note, this is correct, since we actually retrieved the return
 		// address. Our caller will fix the IP for us.
 
+	FunctionID* functionID = functionInstance->GetFunctionID();
+	if (functionID == NULL)
+		return B_NO_MEMORY;
+	Reference<FunctionID> functionIDReference(functionID, true);
+
 	// create function parameter objects
 	DIESubprogram* subprogramEntry = function->SubprogramEntry();
 	DwarfInterfaceFactory factory(fFile, function->GetCompilationUnit(),
-		subprogramEntry, instructionPointer, framePointer, &inputInterface);
+		subprogramEntry, instructionPointer, framePointer, &inputInterface,
+		fromDwarfMap);
 	error = factory.Init();
 	if (error != B_OK)
 		return error;
@@ -387,8 +399,10 @@ if (previousCpuState->GetRegisterValue(reg, value)) {
 		DIEFormalParameter* parameterEntry
 			= dynamic_cast<DIEFormalParameter*>(entry);
 		Variable* parameter;
-		if (factory.CreateParameter(parameterEntry, parameter) != B_OK)
+		if (factory.CreateParameter(functionID, parameterEntry, parameter)
+				!= B_OK) {
 			continue;
+		}
 
 		if (!frame->AddParameter(parameter)) {
 			parameter->ReleaseReference();

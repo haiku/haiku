@@ -28,6 +28,8 @@ public:
 								ImageDebugInfo(const ImageInfo& imageInfo);
 								~ImageDebugInfo();
 
+			const ImageInfo&	GetImageInfo() const	{ return fImageInfo; }
+
 			bool				AddSpecificInfo(SpecificImageDebugInfo* info);
 			status_t			FinishInit();
 

@@ -10,12 +10,57 @@
 
 #include <Variant.h>
 
+#include "CompilationUnit.h"
 #include "DebugInfoEntries.h"
 #include "Dwarf.h"
 #include "DwarfFile.h"
 #include "DwarfUtils.h"
+#include "FunctionID.h"
+#include "FunctionParameterID.h"
+#include "RegisterMap.h"
+#include "StringUtils.h"
 #include "ValueLocation.h"
 #include "Variable.h"
+
+
+// #pragma mark - DwarfFunctionParameterID
+
+
+struct DwarfInterfaceFactory::DwarfFunctionParameterID
+	: public FunctionParameterID {
+
+	DwarfFunctionParameterID(FunctionID* functionID, const BString& name)
+		:
+		fFunctionID(functionID),
+		fName(name)
+	{
+		fFunctionID->AcquireReference();
+	}
+
+	virtual ~DwarfFunctionParameterID()
+	{
+		fFunctionID->ReleaseReference();
+	}
+
+	virtual bool operator==(const ObjectID& other) const
+	{
+		const DwarfFunctionParameterID* parameterID
+			= dynamic_cast<const DwarfFunctionParameterID*>(&other);
+		return parameterID != NULL && *fFunctionID == *parameterID->fFunctionID
+			&& fName == parameterID->fName;
+	}
+
+protected:
+	virtual uint32 ComputeHashValue() const
+	{
+		uint32 hash = fFunctionID->HashValue();
+		return hash * 19 + StringUtils::HashValue(fName);
+	}
+
+private:
+	FunctionID*		fFunctionID;
+	const BString	fName;
+};
 
 
 // #pragma mark - DwarfType
@@ -26,7 +71,8 @@ struct DwarfInterfaceFactory::DwarfType : virtual Type,
 public:
 	DwarfType(const BString& name)
 		:
-		fName(name)
+		fName(name),
+		fByteSize(0)
 	{
 	}
 
@@ -35,10 +81,21 @@ public:
 		return fName.Length() > 0 ? fName.String() : NULL;
 	}
 
+	uint64 ByteSize() const
+	{
+		return fByteSize;
+	}
+
+	void SetByteSize(uint64 size)
+	{
+		fByteSize = size;
+	}
+
 	virtual DIEType* GetDIEType() const = 0;
 
 private:
 	BString	fName;
+	uint64	fByteSize;
 };
 
 
@@ -394,7 +451,7 @@ struct DwarfInterfaceFactory::DwarfTypeHashDefinition {
 DwarfInterfaceFactory::DwarfInterfaceFactory(DwarfFile* file,
 	CompilationUnit* compilationUnit, DIESubprogram* subprogramEntry,
 	target_addr_t instructionPointer, target_addr_t framePointer,
-	DwarfTargetInterface* targetInterface)
+	DwarfTargetInterface* targetInterface, RegisterMap* fromDwarfRegisterMap)
 	:
 	fFile(file),
 	fCompilationUnit(compilationUnit),
@@ -402,6 +459,7 @@ DwarfInterfaceFactory::DwarfInterfaceFactory(DwarfFile* file,
 	fInstructionPointer(instructionPointer),
 	fFramePointer(framePointer),
 	fTargetInterface(targetInterface),
+	fFromDwarfRegisterMap(fromDwarfRegisterMap),
 	fTypes(NULL)
 {
 }
@@ -447,12 +505,21 @@ DwarfInterfaceFactory::CreateType(DIEType* typeEntry, Type*& _type)
 
 
 status_t
-DwarfInterfaceFactory::CreateParameter(DIEFormalParameter* parameterEntry,
-	Variable*& _parameter)
+DwarfInterfaceFactory::CreateParameter(FunctionID* functionID,
+	DIEFormalParameter* parameterEntry, Variable*& _parameter)
 {
 	// get the name
 	BString name;
-	DwarfUtils::GetFullyQualifiedDIEName(parameterEntry, name);
+	DwarfUtils::GetDIEName(parameterEntry, name);
+printf("DwarfInterfaceFactory::CreateParameter(DIE: %p): name: \"%s\"\n",
+parameterEntry, name.String());
+
+	// create the ID
+	DwarfFunctionParameterID* id = new(std::nothrow) DwarfFunctionParameterID(
+		functionID, name);
+	if (id == NULL)
+		return B_NO_MEMORY;
+	Reference<DwarfFunctionParameterID> idReference(id, true);
 
 	// get the type entry
 	DIEFormalParameter* typeOwnerEntry = parameterEntry;
@@ -490,6 +557,7 @@ DwarfInterfaceFactory::CreateParameter(DIEFormalParameter* parameterEntry,
 		fFile->ResolveLocation(fCompilationUnit,
 			fSubprogramEntry, locationDescription, fTargetInterface,
 			fInstructionPointer, 0, fFramePointer, *location);
+location->Dump();
 	}
 
 	// create the type
@@ -499,8 +567,10 @@ DwarfInterfaceFactory::CreateParameter(DIEFormalParameter* parameterEntry,
 		return error;
 	Reference<DwarfType> typeReference(type, true);
 
+	_FixLocation(location, type);
+
 	// create the variable
-	Variable* variable = new(std::nothrow) Variable(name, type, location);
+	Variable* variable = new(std::nothrow) Variable(id, name, type, location);
 	if (variable == NULL)
 		return B_NO_MEMORY;
 
@@ -521,6 +591,11 @@ DwarfInterfaceFactory::_CreateType(DIEType* typeEntry, DwarfType*& _type)
 			return error;
 
 		fTypes->Insert(type);
+
+		// try to get the type's size
+		uint64 size;
+		if (_ResolveTypeByteSize(typeEntry, size) == B_OK)
+			type->SetByteSize(size);
 	}
 
 	type->AcquireReference();
@@ -1011,3 +1086,121 @@ DwarfInterfaceFactory::_ResolveTypedef(DIETypedef* entry,
 	}
 }
 
+
+status_t
+DwarfInterfaceFactory::_ResolveTypeByteSize(DIEType* typeEntry, uint64& _size)
+{
+printf("DwarfInterfaceFactory::_ResolveTypeByteSize(%p)\n", typeEntry);
+	// get the size attribute
+	const DynamicAttributeValue* sizeValue;
+
+	while (true) {
+		// resolve a typedef
+		if (typeEntry->Tag() == DW_TAG_typedef) {
+printf("  resolving typedef...\n");
+			status_t error = _ResolveTypedef(
+				dynamic_cast<DIETypedef*>(typeEntry), typeEntry);
+			if (error != B_OK)
+				return error;
+		}
+
+		sizeValue = typeEntry->ByteSize();
+		if (sizeValue != NULL && sizeValue->IsValid())
+			break;
+
+		// resolve abstract origin
+		if (DIEType* abstractOrigin = dynamic_cast<DIEType*>(
+				typeEntry->AbstractOrigin())) {
+printf("  resolving abstract origin (%p)...\n", abstractOrigin);
+			typeEntry = abstractOrigin;
+			sizeValue = typeEntry->ByteSize();
+			if (sizeValue != NULL && sizeValue->IsValid())
+				break;
+		}
+
+		// resolve specification
+		if (DIEType* specification = dynamic_cast<DIEType*>(
+				typeEntry->Specification())) {
+printf("  resolving specification (%p)...\n", specification);
+			typeEntry = specification;
+			sizeValue = typeEntry->ByteSize();
+			if (sizeValue != NULL && sizeValue->IsValid())
+				break;
+		}
+
+		// For some types we have a special handling. For modified types we
+		// follow the base type, for address types we know the size anyway.
+printf("  nothing yet, special type handling\n");
+		switch (typeEntry->Tag()) {
+			case DW_TAG_const_type:
+			case DW_TAG_packed_type:
+			case DW_TAG_volatile_type:
+			case DW_TAG_restrict_type:
+			case DW_TAG_shared_type:
+				typeEntry = dynamic_cast<DIEModifiedType*>(typeEntry)
+					->GetType();
+printf("  following modified type -> %p\n", typeEntry);
+				if (typeEntry == NULL)
+					return B_ENTRY_NOT_FOUND;
+				break;
+			case DW_TAG_pointer_type:
+			case DW_TAG_reference_type:
+				_size = fCompilationUnit->AddressSize();
+printf("  pointer/reference type: size: %llu\n", _size);
+				return B_OK;
+			default:
+				return B_ENTRY_NOT_FOUND;
+		}
+	}
+
+printf("  found attribute\n");
+
+	// get the actual value
+	BVariant size;
+	status_t error = fFile->EvaluateDynamicValue(fCompilationUnit,
+		fSubprogramEntry, sizeValue, fTargetInterface, fInstructionPointer,
+		fFramePointer, size);
+	if (error != B_OK)
+{
+printf("  failed to resolve attribute: %s\n", strerror(error));
+		return error;
+}
+
+	_size = size.ToUInt64();
+printf("  -> size: %llu\n", _size);
+	return B_OK;
+}
+
+
+void
+DwarfInterfaceFactory::_FixLocation(ValueLocation* location, DwarfType* type)
+{
+printf("DwarfInterfaceFactory::_FixLocation(%p, %p), type entry: %p\n",
+location, type, type->GetDIEType());
+	// translate the DWARF register indices
+	int32 count = location->CountPieces();
+	for (int32 i = 0; i < count; i++) {
+		ValuePieceLocation piece = location->PieceAt(i);
+		if (piece.type == VALUE_PIECE_LOCATION_REGISTER) {
+			int32 reg = fFromDwarfRegisterMap->MapRegisterIndex(piece.reg);
+			if (reg >= 0)
+				piece.reg = reg;
+			else
+				piece.SetToUnknown();
+
+			location->SetPieceAt(i, piece);
+		}
+	}
+
+	// If we only have one piece and that doesn't have a size, try to retrieve
+	// the size of the type.
+	if (count == 1) {
+		ValuePieceLocation piece = location->PieceAt(0);
+		if (piece.IsValid() && piece.size == 0 && piece.bitSize == 0)
+{
+			piece.SetSize(type->ByteSize());
+			location->SetPieceAt(0, piece);
+printf("  set single piece size to %llu\n", type->ByteSize());
+}
+	}
+}

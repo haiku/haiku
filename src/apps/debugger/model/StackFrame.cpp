@@ -5,9 +5,12 @@
 
 #include "StackFrame.h"
 
+#include <new>
+
 #include "CpuState.h"
 #include "FunctionInstance.h"
 #include "Image.h"
+#include "StackFrameValues.h"
 #include "Variable.h"
 
 
@@ -23,7 +26,8 @@ StackFrame::StackFrame(stack_frame_type type, CpuState* cpuState,
 	fInstructionPointer(instructionPointer),
 	fReturnAddress(0),
 	fImage(NULL),
-	fFunction(NULL)
+	fFunction(NULL),
+	fValues(NULL)
 {
 	fCpuState->AcquireReference();
 }
@@ -40,6 +44,17 @@ StackFrame::~StackFrame()
 	SetImage(NULL);
 	SetFunction(NULL);
 	fCpuState->ReleaseReference();
+}
+
+
+status_t
+StackFrame::Init()
+{
+	fValues = new(std::nothrow) StackFrameValues;
+	if (fValues == NULL)
+		return B_NO_MEMORY;
+
+	return fValues->Init();
 }
 
 
@@ -123,4 +138,43 @@ StackFrame::AddLocalVariable(Variable* variable)
 
 	variable->AcquireReference();
 	return true;
+}
+
+
+void
+StackFrame::AddListener(Listener* listener)
+{
+	fListeners.Add(listener);
+}
+
+
+void
+StackFrame::RemoveListener(Listener* listener)
+{
+	fListeners.Remove(listener);
+}
+
+
+void
+StackFrame::NotifyValueRetrieved(Variable* variable, TypeComponentPath* path)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->StackFrameValueRetrieved(this, variable, path);
+	}
+}
+
+
+// #pragma mark - StackFrame
+
+
+StackFrame::Listener::~Listener()
+{
+}
+
+
+void
+StackFrame::Listener::StackFrameValueRetrieved(StackFrame* stackFrame,
+	Variable* variable, TypeComponentPath* path)
+{
 }

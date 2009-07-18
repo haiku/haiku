@@ -8,6 +8,7 @@
 #include <Locker.h>
 
 #include <ObjectList.h>
+#include <Referenceable.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
@@ -35,40 +36,29 @@ enum job_wait_status {
 };
 
 
-struct JobKey {
-	void*	object;
-	uint32	type;
+class JobKey {
+public:
+	virtual						~JobKey();
 
-	JobKey(void* object, uint32 type)
-		:
-		object(object),
-		type(type)
-	{
-	}
+	virtual	uint32				HashValue() const = 0;
 
-	JobKey(const JobKey& other)
-		:
-		object(other.object),
-		type(other.type)
-	{
-	}
+	virtual	bool				operator==(const JobKey& other) const = 0;
+};
 
-	JobKey& operator=(const JobKey& other)
-	{
-		object = other.object;
-		type = other.type;
-		return *this;
-	}
 
-	bool operator==(const JobKey& other) const
-	{
-		return object == other.object && type == other.type;
-	}
+struct SimpleJobKey : public JobKey {
+			void*				object;
+			uint32				type;
 
-	size_t HashValue() const
-	{
-		return (size_t)(addr_t)object ^ (size_t)type;
-	}
+public:
+								SimpleJobKey(void* object, uint32 type);
+								SimpleJobKey(const SimpleJobKey& other);
+
+	virtual	uint32				HashValue() const;
+
+	virtual	bool				operator==(const JobKey& other) const;
+
+			SimpleJobKey&		operator=(const SimpleJobKey& other);
 };
 
 
@@ -85,12 +75,13 @@ public:
 typedef DoublyLinkedList<Job> JobList;
 
 
-class Job : public DoublyLinkedListLinkImpl<Job>, public HashTableLink<Job> {
+class Job : public Referenceable, public DoublyLinkedListLinkImpl<Job>,
+	public HashTableLink<Job> {
 public:
 								Job();
 	virtual						~Job();
 
-	virtual	JobKey				Key() const = 0;
+	virtual	const JobKey&		Key() const = 0;
 	virtual	status_t			Do() = 0;
 
 			Worker*				GetWorker() const	{ return fWorker; }
@@ -144,7 +135,7 @@ public:
 
 			status_t			ScheduleJob(Job* job,
 									JobListener* listener = NULL);
-										// always takes over ownership
+										// always takes over reference
 			void				AbortJob(const JobKey& key);
 			Job*				GetJob(const JobKey& key);
 

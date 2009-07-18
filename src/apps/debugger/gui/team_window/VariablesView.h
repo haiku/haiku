@@ -12,29 +12,54 @@
 
 
 class StackFrame;
+class Thread;
+class TypeComponentPath;
 class Variable;
 
 
 class VariablesView : public BGroupView, private TableListener {
 public:
-								VariablesView();
+	class Listener;
+
+public:
+								VariablesView(Listener* listener);
 								~VariablesView();
 
-	static	VariablesView*		Create();
+	static	VariablesView*		Create(Listener* listener);
 									// throws
 
-			void				SetStackFrame(StackFrame* stackFrame);
+			void				SetStackFrame(Thread* thread,
+									StackFrame* stackFrame);
+			void				StackFrameValueRetrieved(StackFrame* stackFrame,
+									Variable* variable,
+									TypeComponentPath* path);
 
 private:
+			class VariableValueColumn;
 			class VariableTableModel;
 
 private:
 			void				_Init();
 
+			void				_RequestVariableValue(Variable* variable);
+
 private:
+			Thread*				fThread;
 			StackFrame*			fStackFrame;
 			Table*				fVariableTable;
 			VariableTableModel*	fVariableTableModel;
+			Listener*			fListener;
+};
+
+
+class VariablesView::Listener {
+public:
+	virtual						~Listener();
+
+	virtual	void				StackFrameValueRequested(Thread* thread,
+									StackFrame* stackFrame, Variable* variable,
+									TypeComponentPath* path) = 0;
+									// called with team locked
 };
 
 

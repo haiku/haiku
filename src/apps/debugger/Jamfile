@@ -13,6 +13,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) files ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) ids ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
@@ -93,6 +94,12 @@ Application Debugger :
 	ThreadListView.cpp
 	VariablesView.cpp
 
+	# ids
+	FunctionID.cpp
+	LocalVariableID.cpp
+	ObjectID.cpp
+	FunctionParameterID.cpp
+
 	# model
 	Breakpoint.cpp
 	DisassembledCode.cpp
@@ -101,6 +108,7 @@ Application Debugger :
 	ImageInfo.cpp
 	SourceCode.cpp
 	StackFrame.cpp
+	StackFrameValues.cpp
 	StackTrace.cpp
 	Statement.cpp
 	SymbolInfo.cpp
@@ -111,6 +119,7 @@ Application Debugger :
 	Thread.cpp
 	ThreadInfo.cpp
 	Type.cpp
+	TypeComponentPath.cpp
 	Variable.cpp
 
 	# source_language
@@ -127,6 +136,7 @@ Application Debugger :
 	ValueLocation.cpp
 
 	# util
+	BitBuffer.cpp
 	StringUtils.cpp
 
 	:

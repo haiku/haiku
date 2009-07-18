@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "TeamWindow.h"
 
 #include <stdio.h>
@@ -29,7 +30,8 @@
 #include "RegistersView.h"
 #include "StackTrace.h"
 #include "StackTraceView.h"
-#include "VariablesView.h"
+#include "TypeComponentPath.h"
+#include "Variable.h"
 
 
 enum {
@@ -129,15 +131,15 @@ TeamWindow::DispatchMessage(BMessage* message, BHandler* handler)
 					== B_OK) {
 					switch (key) {
 						case B_F10_KEY:
-							fListener->ThreadActionRequested(this,
+							fListener->ThreadActionRequested(
 								fActiveThread->ID(), MSG_THREAD_STEP_OVER);
 							break;
 						case B_F11_KEY:
 							if ((modifiers & B_SHIFT_KEY) != 0) {
-								fListener->ThreadActionRequested(this,
+								fListener->ThreadActionRequested(
 									fActiveThread->ID(), MSG_THREAD_STEP_OUT);
 							} else {
-								fListener->ThreadActionRequested(this,
+								fListener->ThreadActionRequested(
 									fActiveThread->ID(), MSG_THREAD_STEP_INTO);
 							}
 							break;
@@ -169,7 +171,7 @@ TeamWindow::MessageReceived(BMessage* message)
 		case MSG_THREAD_STEP_INTO:
 		case MSG_THREAD_STEP_OUT:
 			if (fActiveThread != NULL) {
-				fListener->ThreadActionRequested(this, fActiveThread->ID(),
+				fListener->ThreadActionRequested(fActiveThread->ID(),
 					message->what);
 			}
 			break;
@@ -201,6 +203,24 @@ TeamWindow::MessageReceived(BMessage* message)
 
 			_HandleStackTraceChanged(threadID);
 			break;
+		}
+
+		case MSG_STACK_FRAME_VALUE_RETRIEVED:
+		{
+			void* _stackFrame;
+			void* _variable;
+			void* _path;
+			if (message->FindPointer("stackFrame", &_stackFrame) == B_OK
+				&& message->FindPointer("variable", &_variable) == B_OK
+				&& message->FindPointer("path", &_path) == B_OK) {
+				StackFrame* stackFrame = (StackFrame*)_stackFrame;
+				Variable* variable = (Variable*)_variable;
+				TypeComponentPath* path = (TypeComponentPath*)_path;
+				_HandleStackFrameValueRetrieved(stackFrame, variable, path);
+				path->ReleaseReference();
+				variable->ReleaseReference();
+				stackFrame->ReleaseReference();
+			}
 		}
 
 		case MSG_IMAGE_DEBUG_INFO_CHANGED:
@@ -239,7 +259,7 @@ TeamWindow::MessageReceived(BMessage* message)
 bool
 TeamWindow::QuitRequested()
 {
-	return fListener->TeamWindowQuitRequested(this);
+	return fListener->TeamWindowQuitRequested();
 }
 
 
@@ -282,6 +302,14 @@ void
 TeamWindow::ClearBreakpointRequested(target_addr_t address)
 {
 	fListener->ClearBreakpointRequested(address);
+}
+
+
+void
+TeamWindow::StackFrameValueRequested(::Thread* thread, StackFrame* stackFrame,
+	Variable* variable, TypeComponentPath* path)
+{
+	fListener->StackFrameValueRequested(thread, stackFrame, variable, path);
 }
 
 
@@ -340,6 +368,22 @@ function, function->GetSourceCode(), function->SourceCodeState());
 
 
 void
+TeamWindow::StackFrameValueRetrieved(StackFrame* stackFrame, Variable* variable,
+	TypeComponentPath* path)
+{
+	BMessage message(MSG_STACK_FRAME_VALUE_RETRIEVED);
+	if (message.AddPointer("stackFrame", stackFrame) == B_OK
+		&& message.AddPointer("variable", variable) == B_OK
+		&& message.AddPointer("path", path) == B_OK
+		&& PostMessage(&message) == B_OK) {
+		stackFrame->AcquireReference();
+		variable->AcquireReference();
+		path->AcquireReference();
+	}
+}
+
+
+void
 TeamWindow::_Init()
 {
 	::Team* team = fDebugModel->GetTeam();
@@ -388,7 +432,7 @@ TeamWindow::_Init()
 		.Add(fImageFunctionsView = ImageFunctionsView::Create(this));
 
 	// add local variables tab
-	BView* tab = fVariablesView = VariablesView::Create();
+	BView* tab = fVariablesView = VariablesView::Create(this);
 	fLocalsTabView->AddTab(tab);
 
 	// add registers tab
@@ -481,7 +525,7 @@ TeamWindow::_SetActiveImage(Image* image)
 
 		// If the debug info is not loaded yet, request it.
 		if (fActiveImage->ImageDebugInfoState() == IMAGE_DEBUG_INFO_NOT_LOADED)
-			fListener->ImageDebugInfoRequested(this, fActiveImage);
+			fListener->ImageDebugInfoRequested(fActiveImage);
 	}
 
 	locker.Unlock();
@@ -519,20 +563,33 @@ TeamWindow::_SetActiveStackFrame(StackFrame* frame)
 	if (frame == fActiveStackFrame)
 		return;
 
-	if (fActiveStackFrame != NULL)
+	if (fActiveStackFrame != NULL) {
+		AutoLocker<TeamDebugModel> locker(fDebugModel);
+		fActiveStackFrame->RemoveListener(this);
+		locker.Unlock();
+
 		fActiveStackFrame->RemoveReference();
+	}
 
 	fActiveStackFrame = frame;
 
 	if (fActiveStackFrame != NULL) {
 		fActiveStackFrame->AddReference();
+
+		AutoLocker<TeamDebugModel> locker(fDebugModel);
+		fActiveStackFrame->AddListener(this);
+		locker.Unlock();
+
 		_SetActiveFunction(fActiveStackFrame->Function());
 	}
 
 	_UpdateCpuState();
 
 	fStackTraceView->SetStackFrame(fActiveStackFrame);
-	fVariablesView->SetStackFrame(fActiveStackFrame);
+	if (fActiveStackFrame != NULL)
+		fVariablesView->SetStackFrame(fActiveThread, fActiveStackFrame);
+	else
+		fVariablesView->SetStackFrame(NULL, NULL);
 	fSourceView->SetStackFrame(fActiveStackFrame);
 }
 
@@ -580,7 +637,7 @@ TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 
 		// If the source code is not loaded yet, request it.
 		if (function->SourceCodeState() == FUNCTION_SOURCE_NOT_LOADED)
-			fListener->FunctionSourceCodeRequested(this, fActiveFunction);
+			fListener->FunctionSourceCodeRequested(fActiveFunction);
 	}
 
 	locker.Unlock();
@@ -738,6 +795,17 @@ TeamWindow::_HandleStackTraceChanged(thread_id threadID)
 	locker.Unlock();
 
 	_SetActiveStackTrace(stackTrace);
+}
+
+
+void
+TeamWindow::_HandleStackFrameValueRetrieved(StackFrame* stackFrame,
+	Variable* variable, TypeComponentPath* path)
+{
+	if (stackFrame != fActiveStackFrame)
+		return;
+
+	fVariablesView->StackFrameValueRetrieved(stackFrame, variable, path);
 }
 
 

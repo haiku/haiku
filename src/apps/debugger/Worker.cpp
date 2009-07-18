@@ -9,6 +9,58 @@
 #include <AutoLocker.h>
 
 
+// pragma mark - JobKey
+
+
+JobKey::~JobKey()
+{
+}
+
+
+// pragma mark - SimpleJobKey
+
+
+SimpleJobKey::SimpleJobKey(void* object, uint32 type)
+	:
+	object(object),
+	type(type)
+{
+}
+
+
+SimpleJobKey::SimpleJobKey(const SimpleJobKey& other)
+	:
+	object(other.object),
+	type(other.type)
+{
+}
+
+
+size_t
+SimpleJobKey::HashValue() const
+{
+	return (size_t)(addr_t)object ^ (size_t)type;
+}
+
+
+bool
+SimpleJobKey::operator==(const JobKey& other) const
+{
+	const SimpleJobKey* otherKey = dynamic_cast<const SimpleJobKey*>(&other);
+	return otherKey != NULL && object == otherKey->object
+		&& type == otherKey->type;
+}
+
+
+SimpleJobKey&
+SimpleJobKey::operator=(const SimpleJobKey& other)
+{
+	object = other.object;
+	type = other.type;
+	return *this;
+}
+
+
 // #pragma mark - JobListener
 
 
@@ -207,7 +259,7 @@ Worker::ScheduleJob(Job* job, JobListener* listener)
 	if (job == NULL)
 		return B_NO_MEMORY;
 
-	ObjectDeleter<Job> jobDeleter(job);
+	Reference<Job> jobReference(job, true);
 	AutoLocker<Worker> locker(this);
 
 	if (fTerminating)
@@ -224,8 +276,7 @@ Worker::ScheduleJob(Job* job, JobListener* listener)
 	job->SetWorker(this);
 	job->SetState(JOB_STATE_UNSCHEDULED);
 	fJobs.Insert(job);
-	fUnscheduledJobs.Add(job);
-	jobDeleter.Detach();
+	fUnscheduledJobs.Add(jobReference.Detach());
 
 	if (notify)
 		release_sem(fWorkToDoSem);
@@ -447,5 +498,5 @@ Worker::_FinishJob(Job* job)
 	if (job->State() != JOB_STATE_ABORTED)
 		fJobs.Remove(job);
 	job->NotifyListeners();
-	delete job;
+	job->ReleaseReference();
 }

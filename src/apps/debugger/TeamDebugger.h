@@ -41,16 +41,18 @@ public:
 
 private:
 	// TeamWindow::Listener
-	virtual	void				FunctionSourceCodeRequested(TeamWindow* window,
+	virtual	void				FunctionSourceCodeRequested(
 									FunctionInstance* function);
-	virtual	void				ImageDebugInfoRequested(TeamWindow* window,
-									Image* image);
-	virtual	void				ThreadActionRequested(TeamWindow* window,
-									thread_id threadID, uint32 action);
+	virtual	void				ImageDebugInfoRequested(Image* image);
+	virtual	void				StackFrameValueRequested(::Thread* thread,
+									StackFrame* stackFrame, Variable* variable,
+									TypeComponentPath* path);
+	virtual	void				ThreadActionRequested(thread_id threadID,
+									uint32 action);
 	virtual	void				SetBreakpointRequested(target_addr_t address,
 									bool enabled);
 	virtual	void				ClearBreakpointRequested(target_addr_t address);
-	virtual	bool				TeamWindowQuitRequested(TeamWindow* window);
+	virtual	bool				TeamWindowQuitRequested();
 
 	// JobListener
 	virtual	void				JobDone(Job* job);

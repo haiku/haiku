@@ -25,7 +25,10 @@ class DIEType;
 class DIETypedef;
 class DwarfFile;
 class DwarfTargetInterface;
+class FunctionID;
+class RegisterMap;
 class Type;
+class ValueLocation;
 class Variable;
 
 
@@ -36,19 +39,21 @@ public:
 									DIESubprogram* subprogramEntry,
 									target_addr_t instructionPointer,
 									target_addr_t framePointer,
-									DwarfTargetInterface* targetInterface);
+									DwarfTargetInterface* targetInterface,
+									RegisterMap* fromDwarfRegisterMap);
 								~DwarfInterfaceFactory();
 
 			status_t			Init();
 
 			status_t			CreateType(DIEType* typeEntry, Type*& _type);
 									// returns reference
-			status_t			CreateParameter(
+			status_t			CreateParameter(FunctionID* functionID,
 									DIEFormalParameter* parameterEntry,
 									Variable*& _parameter);
 									// returns reference
 
 private:
+			struct DwarfFunctionParameterID;
 			struct DwarfType;
 			struct DwarfDataMember;
 			struct DwarfPrimitiveType;
@@ -88,6 +93,11 @@ private:
 
 			status_t			_ResolveTypedef(DIETypedef* entry,
 									DIEType*& _baseTypeEntry);
+			status_t			_ResolveTypeByteSize(DIEType* typeEntry,
+									uint64& _size);
+
+			void				_FixLocation(ValueLocation* location,
+									DwarfType* type);
 
 private:
 			DwarfFile*			fFile;
@@ -96,6 +106,7 @@ private:
 			target_addr_t		fInstructionPointer;
 			target_addr_t		fFramePointer;
 			DwarfTargetInterface* fTargetInterface;
+			RegisterMap*		fFromDwarfRegisterMap;
 			TypeTable*			fTypes;
 };
 

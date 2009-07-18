@@ -42,7 +42,7 @@ public:
 	virtual	status_t			GetFunctions(
 									BObjectList<FunctionDebugInfo>& functions);
 	virtual	status_t			CreateFrame(Image* image,
-									FunctionDebugInfo* function,
+									FunctionInstance* functionInstance,
 									CpuState* cpuState,
 									StackFrame*& _previousFrame,
 									CpuState*& _previousCpuState);

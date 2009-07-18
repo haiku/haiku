@@ -28,10 +28,13 @@
 #include "MessageCodes.h"
 #include "SourceCode.h"
 #include "SpecificImageDebugInfo.h"
+#include "StackFrame.h"
+#include "StackFrameValues.h"
 #include "Statement.h"
 #include "SymbolInfo.h"
 #include "TeamDebugInfo.h"
 #include "TeamDebugModel.h"
+#include "Variable.h"
 
 // #pragma mark - ImageHandler
 
@@ -482,8 +485,7 @@ TeamDebugger::MessageReceived(BMessage* message)
 
 
 void
-TeamDebugger::FunctionSourceCodeRequested(TeamWindow* window,
-	FunctionInstance* functionInstance)
+TeamDebugger::FunctionSourceCodeRequested(FunctionInstance* functionInstance)
 {
 	Function* function = functionInstance->GetFunction();
 
@@ -520,14 +522,39 @@ TeamDebugger::FunctionSourceCodeRequested(TeamWindow* window,
 
 
 void
-TeamDebugger::ImageDebugInfoRequested(TeamWindow* window, Image* image)
+TeamDebugger::ImageDebugInfoRequested(Image* image)
 {
 	LoadImageDebugInfoJob::ScheduleIfNecessary(fWorker, image);
 }
 
 
 void
-TeamDebugger::ThreadActionRequested(TeamWindow* window, thread_id threadID,
+TeamDebugger::StackFrameValueRequested(::Thread* thread, StackFrame* stackFrame,
+	Variable* variable, TypeComponentPath* path)
+{
+	// the team is already locked
+
+	// check whether a job is already in progress
+	AutoLocker<Worker> workerLocker(fWorker);
+	GetStackFrameValueJobKey jobKey(stackFrame, variable, path);
+	if (fWorker->GetJob(jobKey) != NULL)
+		return;
+	workerLocker.Unlock();
+
+	// schedule the job
+	if (fWorker->ScheduleJob(
+			new(std::nothrow) GetStackFrameValueJob(fDebuggerInterface,
+				fDebuggerInterface->GetArchitecture(), fDebugModel, thread,
+					stackFrame, variable, path),
+			this) != B_OK) {
+		// scheduling failed -- set the value to invalid
+		stackFrame->Values()->SetValue(variable->ID(), path, BVariant());
+	}
+}
+
+
+void
+TeamDebugger::ThreadActionRequested(thread_id threadID,
 	uint32 action)
 {
 	BMessage message(action);
@@ -556,7 +583,7 @@ TeamDebugger::ClearBreakpointRequested(target_addr_t address)
 
 
 bool
-TeamDebugger::TeamWindowQuitRequested(TeamWindow* window)
+TeamDebugger::TeamWindowQuitRequested()
 {
 	AutoLocker< ::Team> locker(fTeam);
 	BString name(fTeam->Name());

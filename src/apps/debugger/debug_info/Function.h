@@ -22,7 +22,7 @@ public:
 								Function();
 								~Function();
 
-			// team must be locked ot access the instances
+			// team must be locked to access the instances
 			FunctionInstance*	FirstInstance() const
 									{ return fInstances.Head(); }
 			FunctionInstance*	LastInstance() const
@@ -39,6 +39,10 @@ public:
 			SourceLocation		GetSourceLocation() const
 									{ return FirstInstance()
 										->GetSourceLocation(); }
+
+			FunctionID*			GetFunctionID() const
+									{ return FirstInstance()->GetFunctionID(); }
+									// returns a reference
 
 			// mutable attributes follow (locking required)
 			FileSourceCode*		GetSourceCode() const	{ return fSourceCode; }

@@ -5,10 +5,12 @@
 #ifndef STACK_FRAME_H
 #define STACK_FRAME_H
 
+
 #include <OS.h>
 
 #include <ObjectList.h>
 #include <Referenceable.h>
+#include <util/DoublyLinkedList.h>
 
 #include "Types.h"
 
@@ -24,16 +26,23 @@ enum stack_frame_type {
 class CpuState;
 class Image;
 class FunctionInstance;
+class StackFrameValues;
+class TypeComponentPath;
 class Variable;
 
 
 class StackFrame : public Referenceable {
+public:
+	class Listener;
+
 public:
 								StackFrame(stack_frame_type type,
 									CpuState* cpuState,
 									target_addr_t frameAddress,
 									target_addr_t instructionPointer);
 								~StackFrame();
+
+			status_t			Init();
 
 			stack_frame_type	Type() const			{ return fType; }
 			CpuState*			GetCpuState() const		{ return fCpuState; }
@@ -59,8 +68,18 @@ public:
 			Variable*			LocalVariableAt(int32 index) const;
 			bool				AddLocalVariable(Variable* variable);
 
+			StackFrameValues*	Values() const	{ return fValues; }
+
+			// team lock must be held
+			void				AddListener(Listener* listener);
+			void				RemoveListener(Listener* listener);
+
+			void				NotifyValueRetrieved(Variable* variable,
+									TypeComponentPath* path);
+
 private:
 			typedef BObjectList<Variable> VariableList;
+			typedef DoublyLinkedList<Listener> ListenerList;
 
 private:
 			stack_frame_type	fType;
@@ -72,6 +91,19 @@ private:
 			FunctionInstance*	fFunction;
 			VariableList		fParameters;
 			VariableList		fLocalVariables;
+			StackFrameValues*	fValues;
+			ListenerList		fListeners;
+};
+
+
+class StackFrame::Listener : public DoublyLinkedListLinkImpl<Listener> {
+public:
+	virtual						~Listener();
+
+	virtual	void				StackFrameValueRetrieved(StackFrame* stackFrame,
+									Variable* variable,
+									TypeComponentPath* path);
+									// called with lock held
 };
 
 

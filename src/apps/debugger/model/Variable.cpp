@@ -6,16 +6,20 @@
 
 #include "Variable.h"
 
+#include "ObjectID.h"
 #include "Type.h"
 #include "ValueLocation.h"
 
 
-Variable::Variable(const BString& name, Type* type, ValueLocation* location)
+Variable::Variable(ObjectID* id, const BString& name, Type* type,
+	ValueLocation* location)
 	:
+	fID(id),
 	fName(name),
 	fType(type),
 	fLocation(location)
 {
+	fID->AcquireReference();
 	fType->AcquireReference();
 	fLocation->AcquireReference();
 }
@@ -23,6 +27,7 @@ Variable::Variable(const BString& name, Type* type, ValueLocation* location)
 
 Variable::~Variable()
 {
+	fID->ReleaseReference();
 	fType->ReleaseReference();
 	fLocation->ReleaseReference();
 }

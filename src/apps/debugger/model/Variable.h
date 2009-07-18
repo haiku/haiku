@@ -11,21 +11,24 @@
 #include <Referenceable.h>
 
 
+class ObjectID;
 class Type;
 class ValueLocation;
 
 
 class Variable : public Referenceable {
 public:
-								Variable(const BString& name, Type* type,
-									ValueLocation* location);
+								Variable(ObjectID* id, const BString& name,
+									Type* type, ValueLocation* location);
 								~Variable();
 
+			ObjectID*			ID() const			{ return fID; }
 			const BString&		Name() const		{ return fName; }
 			Type*				GetType() const		{ return fType; }
 			ValueLocation*		Location() const	{ return fLocation; }
 
 private:
+			ObjectID*			fID;
 			BString				fName;
 			Type*				fType;
 			ValueLocation*		fLocation;

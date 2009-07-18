@@ -304,8 +304,8 @@ ThreadHandler::HandleThreadStateChanged()
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 
 	// cancel jobs for this thread
-	fWorker->AbortJob(JobKey(fThread, JOB_TYPE_GET_CPU_STATE));
-	fWorker->AbortJob(JobKey(fThread, JOB_TYPE_GET_STACK_TRACE));
+	fWorker->AbortJob(SimpleJobKey(fThread, JOB_TYPE_GET_CPU_STATE));
+	fWorker->AbortJob(SimpleJobKey(fThread, JOB_TYPE_GET_STACK_TRACE));
 
 	// If the thread is stopped and has no CPU state yet, schedule a job.
 	if (fThread->State() == THREAD_STATE_STOPPED
@@ -322,7 +322,7 @@ ThreadHandler::HandleCpuStateChanged()
 	AutoLocker<TeamDebugModel> locker(fDebugModel);
 
 	// cancel stack trace job for this thread
-	fWorker->AbortJob(JobKey(fThread, JOB_TYPE_GET_STACK_TRACE));
+	fWorker->AbortJob(SimpleJobKey(fThread, JOB_TYPE_GET_STACK_TRACE));
 
 	// If the thread has a CPU state, but no stack trace yet, schedule a job.
 	if (fThread->GetCpuState() != NULL && fThread->GetStackTrace() == NULL) {

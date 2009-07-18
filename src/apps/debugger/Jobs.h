@@ -5,6 +5,7 @@
 #ifndef JOBS_H
 #define JOBS_H
 
+
 #include "ImageDebugInfoProvider.h"
 #include "Worker.h"
 
@@ -16,8 +17,12 @@ class Function;
 class FunctionInstance;
 class Image;
 class StackFrame;
+class StackFrameValues;
 class Team;
+class TeamDebugModel;
 class Thread;
+class TypeComponentPath;
+class Variable;
 
 
 // job types
@@ -26,7 +31,8 @@ enum {
 	JOB_TYPE_GET_CPU_STATE,
 	JOB_TYPE_GET_STACK_TRACE,
 	JOB_TYPE_LOAD_IMAGE_DEBUG_INFO,
-	JOB_TYPE_LOAD_SOURCE_CODE
+	JOB_TYPE_LOAD_SOURCE_CODE,
+	JOB_TYPE_GET_STACK_FRAME_VALUE
 };
 
 
@@ -37,10 +43,11 @@ public:
 									Thread* thread);
 	virtual						~GetThreadStateJob();
 
-	virtual	JobKey				Key() const;
+	virtual	const JobKey&		Key() const;
 	virtual	status_t			Do();
 
 private:
+			SimpleJobKey		fKey;
 			DebuggerInterface*	fDebuggerInterface;
 			Thread*				fThread;
 };
@@ -53,10 +60,11 @@ public:
 									Thread* thread);
 	virtual						~GetCpuStateJob();
 
-	virtual	JobKey				Key() const;
+	virtual	const JobKey&		Key() const;
 	virtual	status_t			Do();
 
 private:
+			SimpleJobKey		fKey;
 			DebuggerInterface*	fDebuggerInterface;
 			Thread*				fThread;
 };
@@ -69,7 +77,7 @@ public:
 									Architecture* architecture, Thread* thread);
 	virtual						~GetStackTraceJob();
 
-	virtual	JobKey				Key() const;
+	virtual	const JobKey&		Key() const;
 	virtual	status_t			Do();
 
 private:
@@ -78,6 +86,7 @@ private:
 									ImageDebugInfo*& _info);
 
 private:
+			SimpleJobKey		fKey;
 			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;
 			Thread*				fThread;
@@ -90,7 +99,7 @@ public:
 								LoadImageDebugInfoJob(Image* image);
 	virtual						~LoadImageDebugInfoJob();
 
-	virtual	JobKey				Key() const;
+	virtual	const JobKey&		Key() const;
 	virtual	status_t			Do();
 
 	static	status_t			ScheduleIfNecessary(Worker* worker,
@@ -105,6 +114,7 @@ public:
 										// earlier.
 
 private:
+			SimpleJobKey		fKey;
 			Image*				fImage;
 };
 
@@ -118,15 +128,66 @@ public:
 									bool loadForFunction);
 	virtual						~LoadSourceCodeJob();
 
-	virtual	JobKey				Key() const;
+	virtual	const JobKey&		Key() const;
 	virtual	status_t			Do();
 
 private:
+			SimpleJobKey		fKey;
 			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;
 			Team*				fTeam;
 			FunctionInstance*	fFunctionInstance;
 			bool				fLoadForFunction;
+};
+
+
+
+struct GetStackFrameValueJobKey : JobKey {
+	StackFrame*			stackFrame;
+	Variable*			variable;
+	TypeComponentPath*	path;
+
+public:
+								GetStackFrameValueJobKey(
+									StackFrame* stackFrame,
+									Variable* variable,
+									TypeComponentPath* path);
+
+	virtual	uint32				HashValue() const;
+
+	virtual	bool				operator==(const JobKey& other) const;
+};
+
+
+class GetStackFrameValueJob : public Job {
+public:
+								GetStackFrameValueJob(
+									DebuggerInterface* debuggerInterface,
+									Architecture* architecture,
+									TeamDebugModel* debugModel,
+									Thread* thread, StackFrame* stackFrame,
+									Variable* variable,
+									TypeComponentPath* path);
+	virtual						~GetStackFrameValueJob();
+
+	virtual	const JobKey&		Key() const;
+	virtual	status_t			Do();
+
+private:
+			struct ValueJobKey;
+
+private:
+			status_t			_GetValue();
+
+private:
+			GetStackFrameValueJobKey fKey;
+			DebuggerInterface*	fDebuggerInterface;
+			Architecture*		fArchitecture;
+			TeamDebugModel*		fDebugModel;
+			Thread*				fThread;
+			StackFrame*			fStackFrame;
+			Variable*			fVariable;
+			TypeComponentPath*	fPath;
 };
 
 
