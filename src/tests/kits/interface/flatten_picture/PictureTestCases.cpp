@@ -682,6 +682,25 @@ static void testSetFontSize(BView *view, BRect frame)
 	view->DrawString("Haiku");	
 }
 
+static void testSetFontFamilyAndStyle(BView *view, BRect frame)
+{
+	view->DrawString("This is a test", BPoint(2, 6));
+	
+	BFont font;
+	view->GetFont(&font);
+	
+	int32 families = count_font_families();
+	font_family familyName;
+	get_font_family(families - 1, &familyName);
+	
+	int32 styles = count_font_styles(familyName);
+	font_style styleName;
+	get_font_style(familyName, styles - 1, &styleName);
+	font.SetFamilyAndStyle(familyName, styleName);
+	view->SetFont(&font);
+	view->DrawString( "This is a test", BPoint(2, 19));
+}
+
 static void testSetDrawingMode(BView *view, BRect frame)
 {
 	frame.InsetBy(2, 2);
@@ -768,8 +787,10 @@ TestCase gTestCases[] = {
 	{ "Test SetOriginAndScale4", testSetOriginAndScale4 },
 	{ "Test SetOriginAndScale5", testSetOriginAndScale5 },
 	{ "Test SetFontSize", testSetFontSize },
+	{ "Test SetFontFamilyAndStyle", testSetFontFamilyAndStyle },
 	{ "Test SetDrawingMode", testSetDrawingMode },
 	{ "Test PushPopState", testPushPopState },
 	{ NULL, NULL }
 };
+
 
