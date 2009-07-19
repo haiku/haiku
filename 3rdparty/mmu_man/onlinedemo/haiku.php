@@ -77,6 +77,10 @@ define("QEMU_ARGS", ""
 define("QEMU_IMAGE_PATH", "/home/revol/haiku.image");
 // BAD: let's one download the image
 //define("QEMU_IMAGE_PATH", dirname($_SERVER['SCRIPT_FILENAME']) . "/haiku.image");
+
+// max number of cpus for the VM, not more than 8
+define("QEMU_MAX_CPUS", 1);
+
 // qemu 0.8.2 needs "", qemu 0.9.1 needs ":"
 define("QEMU_VNC_PREFIX", ":");
 
@@ -291,9 +295,8 @@ function probe_options_form()
 	$cpucount = 1;
 	if (isset($_GET['cpucount']))
 		$cpucount = (int)$_GET['cpucount'];
-	$cpucount = max(min($cpucount, 8), 1);
+	$cpucount = max(min($cpucount, QEMU_MAX_CPUS), 1);
 	//dbg("cpucount $cpucount");
-	$cpucount = 1; // force for now
 }
 
 
@@ -344,19 +347,18 @@ function output_options_form()
 	echo "</td>\n</tr>\n";
 
 
-	$maxcpus = 8;
 	echo "<tr ";
-	if (!$enable_cpus)
+	if (QEMU_MAX_CPUS < 2)
 		echo "class=\"haiku_online_disabled\"";
 	echo ">\n";
 	echo "<td align=\"right\">\n";
 	echo "Select cpu count:";
 	echo "</td>\n<td>\n";
 	echo "<select name=\"cpucount\" ";
-	if (!$enable_cpus)
+	if (QEMU_MAX_CPUS < 2)
 		echo "disabled=\"disabled\"";
 	echo ">";
-	for ($ncpu = 1; $ncpu <= $maxcpus; $ncpu++) {
+	for ($ncpu = 1; $ncpu <= QEMU_MAX_CPUS; $ncpu++) {
 		echo "<option value=\"$ncpu\" ";
 		if ($ncpu == 1)
 			echo "selected=\"selected\" ";
