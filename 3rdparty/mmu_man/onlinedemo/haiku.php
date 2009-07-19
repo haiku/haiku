@@ -8,6 +8,12 @@
 // parts inspired by the Free Live OS Zoo
 // http://www.oszoo.org/wiki/index.php/Free_Live_OS_Zoo
 
+
+// include local configuration that possibly overrides defines below.
+if (file_exists('haiku.conf.php'))
+	include('haiku.conf.php');
+
+
 // name of the page
 define("PAGE_TITLE", "Haiku Online Demo");
 
@@ -58,17 +64,19 @@ define("QEMU_KEYMAPS", QEMU_BASE . "/share/qemu/keymaps");
 define("QEMU_ARGS", ""
 	."-daemonize " /* detach from stdin */
 	."-localtime " /* not UTC */
-	."-name '" . PAGE_TITLE . "' "
+	."-name '" . addslashes(PAGE_TITLE) . "' "
 	."-monitor /dev/null "
 	."-serial none "
 	."-parallel none "
-	." -net none "
+	."-net none "
 	."-usbdevice wacom-tablet "
 	."-vga vmware "
-	."-snapshot");
+	."-snapshot ");
 
 // absolute path to the image.
-define("QEMU_IMAGE_PATH","/home/revol/haiku/trunk/generated.x86/haiku.image");
+define("QEMU_IMAGE_PATH", "/home/revol/haiku.image");
+// BAD: let's one download the image
+//define("QEMU_IMAGE_PATH", dirname($_SERVER['SCRIPT_FILENAME']) . "/haiku.image");
 // qemu 0.8.2 needs "", qemu 0.9.1 needs ":"
 define("QEMU_VNC_PREFIX", ":");
 
@@ -81,10 +89,13 @@ define("QEMU_IDX_VAR", "QEMU_HAIKU_SESSION_VAR");
 
 // uncomment if you want to pass your Sonix webcam device through
 // migth need to update VID:PID
+// doesnt really work yet
 //define("QEMU_USB_PASSTHROUGH", "-usbdevice host:0c45:6005");
 
 
 define("BGCOLOR", "#336698");
+
+
 
 
 $vnckeymap = "en-us";
@@ -643,7 +654,7 @@ function output_applet_code($external_only=false)
 	// scroll to the top of the applet
 	echo "<script>\n";
 	echo "<!--\n";
-	echo "window.location.hash = \"haiku_online_applet\";";
+	echo "scrollToAnchor(\"haiku_online_applet\");";
 	echo "//--></script>\n";
 	ob_flush();
 	flush();
@@ -728,6 +739,17 @@ a:hover { color:pink; }
 <script type="text/javascript">
 function onPageUnload() {
 	//window.open("<?php echo $_SERVER["SCRIPT_NAME"] . "?close"; ?>", "closing", "width=100,height=30,location=no,menubar=no,toolbar=no,scrollbars=no");
+}
+
+function scrollToAnchor(anchor) {
+  var a = document.anchors[anchor];
+  if (a) {
+    if (a.scrollIntoView)
+      a.scrollIntoView(true);
+    else if (a.focus)
+      a.focus();
+  } else
+    window.location.hash = anchor;
 }
 </script>
 </head>
