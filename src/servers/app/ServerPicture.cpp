@@ -610,16 +610,22 @@ set_scale(View *view, float scale)
 static void
 set_font_family(View *view, const char *family)
 {
-	// TODO: Implement
-	// Can we have a ServerFont::SetFamily() which accepts a string ?
+	FontStyle *fontStyle = gFontManager->GetStyle(family, NULL,
+					0, 0, 0);
+	ServerFont font;
+	font.SetStyle(fontStyle);
+	view->CurrentState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);	
 }
 
 
 static void
 set_font_style(View *view, const char *style)
 {
-	// TODO: Implement
-	// Can we have a ServerFont::SetStyle() which accepts a string ?
+	FontStyle *fontStyle = gFontManager->GetStyle(NULL, style,
+					0, 0, 0);
+	ServerFont font;
+	font.SetStyle(fontStyle);
+	view->CurrentState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
 }
 
 
