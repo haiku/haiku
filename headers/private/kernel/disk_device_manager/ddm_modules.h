@@ -57,8 +57,8 @@ typedef struct partition_module_info {
 	bool (*validate_initialize)(partition_data* partition, char* name,
 				const char* parameters);
 	bool (*validate_create_child)(partition_data* partition, off_t* start,
-				off_t* size, const char* type, const char* parameters,
-				int32* index);
+				off_t* size, const char* type, const char* name,
+				const char* parameters, int32* index);
 	status_t (*get_partitionable_spaces)(partition_data* partition,
 				partitionable_space_data* buffer, int32 count,
 				int32* actualCount);
@@ -100,8 +100,9 @@ typedef struct partition_module_info {
 	status_t (*initialize)(int fd, partition_id partition, const char* name,
 				const char *parameters, off_t partitionSize, disk_job_id job);
 	status_t (*create_child)(int fd, partition_id partition, off_t offset,
-				off_t size, const char* type, const char* parameters,
-				disk_job_id job, partition_id* childID);
+				off_t size, const char* type, const char* name, 
+				const char* parameters, disk_job_id job, 
+				partition_id* childID);
 		// childID is used for the return value, but is also an optional input
 		// parameter -- -1 to be ignored
 	status_t (*delete_child)(int fd, partition_id partition, partition_id child,

@@ -6,6 +6,7 @@
 #ifndef _PARTITION_H
 #define _PARTITION_H
 
+
 #include <DiskDeviceDefs.h>
 #include <Messenger.h>
 #include <Mime.h>
@@ -14,7 +15,7 @@
 
 class BBitmap;
 class BDiskDevice;
-class BDiskDeviceParameterEditor;
+class BPartitionParameterEditor;
 class BDiskDeviceVisitor;
 class BDiskSystem;
 class BMutablePartition;
@@ -128,13 +129,13 @@ public:
 
 			bool				CanEditParameters() const;
 			status_t			GetParameterEditor(
-									BDiskDeviceParameterEditor** editor);
+									BPartitionParameterEditor** editor);
 			status_t			SetParameters(const char* parameters);
 
 			bool				CanEditContentParameters(
 									bool* whileMounted = NULL) const;
 			status_t			GetContentParameterEditor(
-									BDiskDeviceParameterEditor** editor);
+									BPartitionParameterEditor** editor);
 			status_t			SetContentParameters(const char* parameters);
 
 			status_t			GetNextSupportedType(int32 *cookie,
@@ -152,7 +153,7 @@ public:
 			bool				CanInitialize(const char* diskSystem) const;
 			status_t			GetInitializationParameterEditor(
 									const char* system,
-									BDiskDeviceParameterEditor** editor) const;
+									BPartitionParameterEditor** editor) const;
 			status_t			ValidateInitialize(const char* diskSystem,
 									BString* name, const char* parameters);
 			status_t			Initialize(const char* diskSystem,
@@ -164,7 +165,7 @@ public:
 			bool				CanCreateChild() const;
 			status_t			GetChildCreationParameterEditor(
 									const char* type,
-									BDiskDeviceParameterEditor** editor) const;
+									BPartitionParameterEditor** editor) const;
 			status_t			ValidateCreateChild(off_t* start, off_t* size,
 									const char* type, BString* name,
 									const char* parameters) const;
@@ -175,6 +176,8 @@ public:
 
 			bool				CanDeleteChild(int32 index) const;
 			status_t			DeleteChild(int32 index);
+
+			bool				SupportsChildName() const;
 
 private:
 			class Delegate;
@@ -229,5 +232,6 @@ private:
 			user_partition_data* fPartitionData;
 			Delegate*			fDelegate;
 };
+
 
 #endif	// _PARTITION_H

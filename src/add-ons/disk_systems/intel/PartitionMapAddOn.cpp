@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "CreationParameterEditor.h"
 #include "PartitionMapAddOn.h"
 
 #include <new>
@@ -99,7 +100,7 @@ PartitionMapAddOn::CanInitialize(const BMutablePartition* partition)
 // GetInitializationParameterEditor
 status_t
 PartitionMapAddOn::GetInitializationParameterEditor(
-	const BMutablePartition* partition, BDiskDeviceParameterEditor** editor)
+	const BMutablePartition* partition, BPartitionParameterEditor** editor)
 {
 	// Nothing to edit, really.
 	*editor = NULL;
@@ -263,58 +264,25 @@ PartitionMapHandle::GetNextSupportedType(const BMutablePartition* child,
 {
 	TRACE("%p->PartitionMapHandle::GetNextSupportedType(child: %p, "
 		"cookie: %ld)\n", this, child, *cookie);
-	// TODO: What are we supposed to do with the child?
 
-	// we support creating two types, primary and extended
-	if (*cookie < 0 || *cookie > 1)
-		return B_ENTRY_NOT_FOUND;
-
-	// check if there are any spaces at all
-	// TODO: check if the spaces have enough size at all
-	BPartitioningInfo info;
-	status_t ret = GetPartitioningInfo(&info);
-	if (ret < B_OK)
-		return ret;
-
-	if (info.CountPartitionableSpaces() == 0)
-		return B_ENTRY_NOT_FOUND;
-
-	// adjust the cookie here already so that we don't have
-	// to worry about it when returning early below
-	*cookie = *cookie + 1;
-
-	if (*cookie == 1) {
-		// On first iteration, check if we can create more primary
-		// partitions. If this is not possible, we cannot create
-		// any extended partitions either.
-		for (int32 i = 0; i < 4; i++) {
-			PrimaryPartition* primary = fPartitionMap.PrimaryPartitionAt(i);
-			if (primary->IsEmpty()) {
-				*type = kPartitionTypeIntelPrimary;
-				return B_OK;
-			}
-		}
-	} else if (*cookie == 2) {
-		// On second iteration, check if we can create more primary
-		// partitions. Also check if there already is an extended
-		// partition, only if there is at least one empty and no
-		// extended partition, we can create an extended partition.
-		bool foundExtended = false;
-		bool foundEmpty = false;
-		for (int32 i = 0; i < 4; i++) {
-			PrimaryPartition* primary = fPartitionMap.PrimaryPartitionAt(i);
-			if (primary->IsEmpty())
-				foundEmpty = true;
-			else if (primary->IsExtended())
-				foundExtended = true;
-		}
-		if (foundEmpty && !foundExtended) {
-			*type = kPartitionTypeIntelExtended;
-			return B_OK;
-		}
+	int32 index = *cookie;
+	const partition_type* nextType;
+	while (true) {
+		nextType = fPartitionMap.GetNextSupportedPartitionType(index);
+		if (nextType == NULL)
+			return B_ENTRY_NOT_FOUND;
+		index++;
+		if (nextType->used)
+			break;
 	}
 
-	return B_ENTRY_NOT_FOUND;
+	if (!nextType)
+		return B_ENTRY_NOT_FOUND;
+
+	type->SetTo(nextType->name);
+	*cookie = index;
+
+	return B_OK;
 }
 
 
@@ -347,10 +315,15 @@ PartitionMapHandle::GetPartitioningInfo(BPartitioningInfo* info)
 // GetChildCreationParameterEditor
 status_t
 PartitionMapHandle::GetChildCreationParameterEditor(const char* type,
-	BDiskDeviceParameterEditor** editor)
+	BPartitionParameterEditor** editor)
 {
-	// TODO: We actually need an editor here.
 	*editor = NULL;
+
+	try {
+		*editor = new PrimaryPartitionEditor();
+	} catch (std::bad_alloc) {
+		return B_NO_MEMORY;
+	}
 	return B_OK;
 }
 
@@ -373,7 +346,11 @@ PartitionMapHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 		name->Truncate(0);
 
 	// check parameters
-	// TODO:...
+	void* handle = parse_driver_settings_string(parameters);
+	if (handle == NULL)
+		return B_ERROR;
+
+	bool active = get_driver_boolean_parameter(handle, "active", false, true);
 
 	// do we have a spare primary partition?
 	if (fPartitionMap.CountNonEmptyPrimaryPartitions() == 4)
@@ -481,11 +458,15 @@ PartitionMapHandle::CreateChild(off_t offset, off_t size,
 		return B_BAD_VALUE;
 
 	// check name
-	if (name && strlen(name) > 0)
+	if (name && *name != '\0')
 		return B_BAD_VALUE;
 
 	// check parameters
-	// TODO:...
+	void* handle = parse_driver_settings_string(parameters);
+	if (handle == NULL)
+		return B_ERROR;
+
+	bool active = get_driver_boolean_parameter(handle, "active", false, true);
 
 	// get a spare primary partition
 	PrimaryPartition* primary = NULL;
@@ -533,7 +514,7 @@ PartitionMapHandle::CreateChild(off_t offset, off_t size,
 	// we picked the first empty primary partition.)
 	BMutablePartition* partition = Partition();
 	BMutablePartition* child;
-	error = partition->CreateChild(primary->Index(), typeString, NULL,
+	error = partition->CreateChild(primary->Index(), typeString, name,
 		parameters, &child);
 	if (error != B_OK)
 		return error;
@@ -546,8 +527,6 @@ PartitionMapHandle::CreateChild(off_t offset, off_t size,
 	child->SetChildCookie(primary);
 
 	// init the primary partition
-	bool active = false;
-		// TODO: Get from parameters!
 	primary->SetTo(offset, size, type.Type(), active, partition->BlockSize());
 
 	// TODO: If the child is an extended partition, we should trigger its

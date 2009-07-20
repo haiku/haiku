@@ -212,6 +212,14 @@ BPartition::IsBusy() const
 }
 
 
+// SupportsChildName
+bool
+BPartition::SupportsChildName() const
+{
+	return _SupportsChildOperation(NULL, B_DISK_SYSTEM_SUPPORTS_NAME);
+}
+
+
 // Flags
 /*!	\brief Returns the flags for this partitions.
 
@@ -557,11 +565,11 @@ BPartition::Mount(const char* mountPoint, uint32 mountFlags,
 		mountPoint = mountPointPath.Path();
 		markerPath = mountPointPath;
 		markerPath.Append(skAutoCreatePrefix);
-		
+
 		// create the directory
 		if (mkdir(mountPoint, S_IRWXU | S_IRWXG | S_IRWXO) < 0)
 			return errno;
-			
+
 		if (mkdir(markerPath.Path(), S_IRWXU | S_IRWXG | S_IRWXO) < 0) {
 			rmdir(mountPoint);
 			return errno;
@@ -1075,7 +1083,7 @@ BPartition::CanEditParameters() const
 
 // GetParameterEditor
 status_t
-BPartition::GetParameterEditor(BDiskDeviceParameterEditor** editor)
+BPartition::GetParameterEditor(BPartitionParameterEditor** editor)
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
@@ -1109,7 +1117,7 @@ BPartition::CanEditContentParameters(bool* whileMounted) const
 
 // GetContentParameterEditor
 status_t
-BPartition::GetContentParameterEditor(BDiskDeviceParameterEditor** editor)
+BPartition::GetContentParameterEditor(BPartitionParameterEditor** editor)
 {
 	if (!fDelegate)
 		return B_NO_INIT;
@@ -1131,7 +1139,7 @@ BPartition::SetContentParameters(const char* parameters)
 
 // GetNextSupportedType
 status_t
-BPartition::GetNextSupportedType(int32 *cookie, BString* type) const
+BPartition::GetNextSupportedType(int32* cookie, BString* type) const
 {
 	TRACE("%p->BPartition::GetNextSupportedType(%ld)\n", this, *cookie);
 
@@ -1149,7 +1157,7 @@ BPartition::GetNextSupportedType(int32 *cookie, BString* type) const
 
 // GetNextSupportedChildType
 status_t
-BPartition::GetNextSupportedChildType(int32 *cookie, BString* type) const
+BPartition::GetNextSupportedChildType(int32* cookie, BString* type) const
 {
 	TRACE("%p->BPartition::GetNextSupportedChildType(%ld)\n", this, *cookie);
 
@@ -1185,7 +1193,7 @@ BPartition::CanInitialize(const char* diskSystem) const
 // GetInitializationParameterEditor
 status_t
 BPartition::GetInitializationParameterEditor(const char* diskSystem,
-	BDiskDeviceParameterEditor** editor) const
+	BPartitionParameterEditor** editor) const
 {
 	if (!fDelegate)
 		return B_NO_INIT;
@@ -1238,7 +1246,7 @@ BPartition::CanCreateChild() const
 // GetChildCreationParameterEditor
 status_t
 BPartition::GetChildCreationParameterEditor(const char* type,
-	BDiskDeviceParameterEditor** editor) const
+	BPartitionParameterEditor** editor) const
 {
 	if (!fDelegate)
 		return B_NO_INIT;

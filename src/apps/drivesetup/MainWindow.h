@@ -67,8 +67,7 @@ private:
 									partition_id selectedPartition,
 									const BString& diskSystemName);
 			void				_Create(BDiskDevice* disk,
-									partition_id selectedPartition,
-									const BString& partitionType);
+									partition_id selectedPartition);
 			void				_Delete(BDiskDevice* disk, 
 									partition_id selectedPartition);
 
@@ -85,13 +84,13 @@ private:
 			BMenu*				fDiskMenu;
 			BMenu*				fPartitionMenu;
 			BMenu*				fInitMenu;
-			BMenu*				fCreateMenu;
 
 			BMenuItem*			fFormatMI;
 			BMenuItem*			fEjectMI;
 			BMenuItem*			fSurfaceTestMI;
 			BMenuItem*			fRescanMI;
 
+			BMenuItem*			fCreateMI;
 			BMenuItem*			fDeleteMI;
 			BMenuItem*			fMountMI;
 			BMenuItem*			fUnmountMI;

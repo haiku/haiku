@@ -7,6 +7,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;
 
 Addon <disk_system>bfs :
 	BFSAddOn.cpp
+	InitializeParameterEditor.cpp
 
 	bfs_disk_system.cpp
 

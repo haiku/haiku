@@ -434,8 +434,7 @@ KPartitioningSystem::CreateChild(KPartition* partition, off_t offset,
 
 	// let the module do its job
 	result = fModule->create_child(fd, partition->ID(), offset, size,
-		type, parameters, job, &childID);
-// TODO: Added name parameter to create_child() hook.
+		type, name, parameters, job, &childID);
 
 	// find and return the child
 	*child = KDiskDeviceManager::Default()->FindPartition(childID);

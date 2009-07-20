@@ -23,7 +23,7 @@ public:
 									const BMutablePartition* partition);
 	virtual	status_t			GetInitializationParameterEditor(
 									const BMutablePartition* partition,
-									BDiskDeviceParameterEditor** editor);
+									BPartitionParameterEditor** editor);
 	virtual	status_t			ValidateInitialize(
 									const BMutablePartition* partition,
 									BString* name, const char* parameters);
@@ -54,7 +54,7 @@ public:
 
 	virtual	status_t			GetChildCreationParameterEditor(
 									const char* type,
-									BDiskDeviceParameterEditor** editor);
+									BPartitionParameterEditor** editor);
 	virtual	status_t			ValidateCreateChild(off_t* offset,
 									off_t* size, const char* type,
 									BString* name, const char* parameters);

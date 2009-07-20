@@ -9,7 +9,7 @@
 #include <SupportDefs.h>
 
 
-class BDiskDeviceParameterEditor;
+class BPartitionParameterEditor;
 class BList;
 class BMutablePartition;
 class BPartitionHandle;
@@ -33,7 +33,7 @@ public:
 									const BMutablePartition* partition);
 	virtual	status_t			GetInitializationParameterEditor(
 									const BMutablePartition* partition,
-									BDiskDeviceParameterEditor** editor);
+									BPartitionParameterEditor** editor);
 	virtual	status_t			ValidateInitialize(
 									const BMutablePartition* partition,
 									BString* name, const char* parameters);
@@ -107,10 +107,10 @@ public:
 									const char* type);
 
 	virtual	status_t			GetContentParameterEditor(
-									BDiskDeviceParameterEditor** editor);
+									BPartitionParameterEditor** editor);
 	virtual	status_t			GetParameterEditor(
 									const BMutablePartition* child,
-									BDiskDeviceParameterEditor** editor);
+									BPartitionParameterEditor** editor);
 	virtual	status_t			ValidateSetContentParameters(
 									const char* parameters);
 	virtual	status_t			ValidateSetParameters(
@@ -122,7 +122,7 @@ public:
 
 	virtual	status_t			GetChildCreationParameterEditor(
 									const char* type,
-									BDiskDeviceParameterEditor** editor);
+									BPartitionParameterEditor** editor);
 	virtual	status_t			ValidateCreateChild(off_t* offset,
 									off_t* size, const char* type,
 									BString* name, const char* parameters);

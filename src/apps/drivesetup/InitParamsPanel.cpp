@@ -8,6 +8,7 @@
 
 #include "InitParamsPanel.h"
 
+#include <driver_settings.h>
 #include <stdio.h>
 
 #include <Button.h>
@@ -31,9 +32,11 @@ public:
 		fPanel(target)
 	{
 	}
+
 	virtual	~EscapeFilter()
 	{
 	}
+
 	virtual filter_result Filter(BMessage* message, BHandler** target)
 	{
 		filter_result result = B_DISPATCH_MESSAGE;
@@ -54,6 +57,7 @@ public:
 		}
 		return result;
 	}
+
 private:
  	InitParamsPanel*		fPanel;
 };
@@ -69,7 +73,8 @@ enum {
 };
 
 
-InitParamsPanel::InitParamsPanel(BWindow* window)
+InitParamsPanel::InitParamsPanel(BWindow* window, const BString& diskSystem,
+	BPartition* partition)
 	: BWindow(BRect(300.0, 200.0, 600.0, 300.0), 0, B_MODAL_WINDOW_LOOK,
 		B_MODAL_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
@@ -80,53 +85,17 @@ InitParamsPanel::InitParamsPanel(BWindow* window)
 {
 	AddCommonFilter(fEscapeFilter);
 
-	fNameTC = new BTextControl("Name", NULL, NULL);
-	// TODO find out what is the max length for this specific FS partition name
-	fNameTC->TextView()->SetMaxBytes(31);
-
-	BPopUpMenu* blocksizeMenu = new BPopUpMenu("Blocksize");
-	BMessage* message = new BMessage(MSG_BLOCK_SIZE);
-	message->AddString("size", "1024");
-	blocksizeMenu->AddItem(new BMenuItem("1024 (Mostly small files)", message));
-	message = new BMessage(MSG_BLOCK_SIZE);
-	message->AddString("size", "2048");
-	BMenuItem* defaultItem = new BMenuItem("2048 (Recommended)", message);
-	blocksizeMenu->AddItem(defaultItem);
-	message = new BMessage(MSG_BLOCK_SIZE);
-	message->AddString("size", "4096");
-	blocksizeMenu->AddItem(new BMenuItem("4096", message));
-	message = new BMessage(MSG_BLOCK_SIZE);
-	message->AddString("size", "8192");
-	blocksizeMenu->AddItem(new BMenuItem("8192 (Mostly large files)", message));
-
-	fBlockSizeMF = new BMenuField("Blocksize", blocksizeMenu, NULL);
-	defaultItem->SetMarked(true);
-
 	BButton* okButton = new BButton("Initialize", new BMessage(MSG_OK));
 	BButton* cancelButton = new BButton("Cancel", new BMessage(MSG_CANCEL));
 
-	BView* rootView = BGroupLayoutBuilder(B_VERTICAL, 5)
+	partition->GetInitializationParameterEditor(diskSystem.String(),
+		&fEditor);
 
+	BView* rootView = BGroupLayoutBuilder(B_VERTICAL, 5)
 		.Add(BSpaceLayoutItem::CreateVerticalStrut(10))
 
 		// test views
-		.Add(BGridLayoutBuilder(10, 10)
-			// row 1
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5), 0, 0)
-
-			.Add(fNameTC->CreateLabelLayoutItem(), 1, 0)
-			.Add(fNameTC->CreateTextViewLayoutItem(), 2, 0)
-
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(10), 3, 0)
-
-			// row 2
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(10), 0, 1)
-
-			.Add(fBlockSizeMF->CreateLabelLayoutItem(), 1, 1)
-			.Add(fBlockSizeMF->CreateMenuBarLayoutItem(), 2, 1)
-
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5), 3, 1)
-		)
+		.Add(fEditor->View())
 
 		// controls
 		.AddGroup(B_HORIZONTAL, 10)
@@ -143,6 +112,11 @@ InitParamsPanel::InitParamsPanel(BWindow* window)
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(rootView);
 	SetDefaultButton(okButton);
+
+	// If the partition had a previous name, set to that name.
+	BString name = partition->ContentName();
+	if (name.Length() > 0)
+		fEditor->PartitionNameChanged(name.String());
 
 	AddToSubset(fWindow);
 }
@@ -199,9 +173,6 @@ InitParamsPanel::Go(BString& name, BString& parameters)
 	MoveTo((parentFrame.left + parentFrame.right - frame.Width()) / 2.0,
 		(parentFrame.top + parentFrame.bottom - frame.Height()) / 2.0);
 
-	fNameTC->SetText(name.String());
-	fNameTC->MakeFocus(true);
-
 	Show();
 	Unlock();
 
@@ -218,15 +189,18 @@ InitParamsPanel::Go(BString& name, BString& parameters)
 		return GO_CANCELED;
 
 	if (fReturnValue == GO_SUCCESS) {
-		name = fNameTC->Text();
-		parameters = "";
-		if (BMenuItem* item = fBlockSizeMF->Menu()->FindMarked()) {
-			const char* size;
-			BMessage* message = item->Message();
-			if (!message || message->FindString("size", &size) < B_OK)
-				size = "2048";
-			// TODO: use libroot driver settings API
-			parameters << "block_size " << size << ";\n";
+		if (fEditor->FinishedEditing()) {
+			status_t err = fEditor->GetParameters(&parameters);
+			if (err == B_OK) {
+				void* handle = parse_driver_settings_string(
+					parameters.String());
+				if (handle != NULL) {
+					const char* string = get_driver_parameter(handle, "name",
+						NULL, NULL);
+					name.SetTo(string);
+				}
+			} else
+				fReturnValue = err;
 		}
 	}
 

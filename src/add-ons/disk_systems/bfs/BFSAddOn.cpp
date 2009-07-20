@@ -5,7 +5,9 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "BFSAddOn.h"
+#include "InitializeParameterEditor.h"
 
 #include <new>
 
@@ -100,10 +102,15 @@ BFSAddOn::CanInitialize(const BMutablePartition* partition)
 // GetInitializationParameterEditor
 status_t
 BFSAddOn::GetInitializationParameterEditor(const BMutablePartition* partition,
-	BDiskDeviceParameterEditor** editor)
+	BPartitionParameterEditor** editor)
 {
-	// TODO: Implement!
 	*editor = NULL;
+
+	try {
+		*editor = new InitializeBFSEditor();
+	} catch (std::bad_alloc) {
+		return B_NO_MEMORY;
+	}
 	return B_OK;
 }
 

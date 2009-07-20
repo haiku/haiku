@@ -13,6 +13,7 @@
 
 #include <Window.h>
 #include <InterfaceKit.h>
+#include <PartitionParameterEditor.h>
 #include <Partition.h>
 
 class BMenuField;
@@ -22,28 +23,33 @@ class SizeSlider;
 class CreateParamsPanel : public BWindow {
 public:
 								CreateParamsPanel(BWindow* window, 
-									off_t offset, off_t size);
+									BPartition* parent, off_t offset,
+									off_t size);
 	virtual						~CreateParamsPanel();
 
 	virtual	bool				QuitRequested();
 	virtual	void				MessageReceived(BMessage* message);
 
-			int32				Go(off_t& offset, off_t& size,
-									BString& parameters);
+			int32				Go(off_t& offset, off_t& size, BString& name,
+									BString& type, BString& parameters);
 			void				Cancel();
 
 
 private:
-			void 				_CreateViewControls(off_t offset, off_t size);
+			void 				_CreateViewControls(BPartition* parent,
+									off_t offset, off_t size);
 			
 	class EscapeFilter;
 			EscapeFilter*		fEscapeFilter;
 			sem_id				fExitSemaphore;
 			BWindow*			fWindow;
 			int32				fReturnValue;
-		
+
+			BPartitionParameterEditor*	fEditor;
+			
 			BPopUpMenu*			fTypePopUpMenu;
 			BMenuField*			fTypeMenuField;
+			BTextControl*		fNameTextControl;
 			SizeSlider*			fSizeSlider;
 			BButton*			fOKButton;
 			BButton*			fCancelButton;

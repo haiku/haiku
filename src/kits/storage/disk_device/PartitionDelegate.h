@@ -67,9 +67,9 @@ public:
 			status_t			SetType(Delegate* child, const char* type);
 
 			status_t			GetContentParameterEditor(
-									BDiskDeviceParameterEditor** editor) const;
+									BPartitionParameterEditor** editor) const;
 			status_t			GetParameterEditor(Delegate* child,
-									BDiskDeviceParameterEditor** editor) const;
+									BPartitionParameterEditor** editor) const;
 			status_t			SetContentParameters(const char* parameters);
 			status_t			SetParameters(Delegate* child,
 									const char* parameters);
@@ -82,7 +82,7 @@ public:
 			bool				CanInitialize(const char* diskSystem) const;
 			status_t			GetInitializationParameterEditor(
 									const char* system,
-									BDiskDeviceParameterEditor** editor) const;
+									BPartitionParameterEditor** editor) const;
 			status_t			ValidateInitialize(const char* diskSystem,
 									BString* name, const char* parameters);
 			status_t			Initialize(const char* diskSystem,
@@ -96,7 +96,7 @@ public:
 
 			status_t			GetChildCreationParameterEditor(
 									const char* system,
-									BDiskDeviceParameterEditor** editor) const;
+									BPartitionParameterEditor** editor) const;
 			status_t			ValidateCreateChild(off_t* start, off_t* size,
 									const char* type, BString* name,
 									const char* parameters) const;

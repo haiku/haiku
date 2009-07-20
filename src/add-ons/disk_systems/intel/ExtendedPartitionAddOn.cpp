@@ -99,7 +99,7 @@ ExtendedPartitionAddOn::CanInitialize(const BMutablePartition* partition)
 // GetInitializationParameterEditor
 status_t
 ExtendedPartitionAddOn::GetInitializationParameterEditor(
-	const BMutablePartition* partition, BDiskDeviceParameterEditor** editor)
+	const BMutablePartition* partition, BPartitionParameterEditor** editor)
 {
 	// Nothing to edit, really.
 	*editor = NULL;
@@ -307,7 +307,7 @@ info->PrintToStream();
 // GetChildCreationParameterEditor
 status_t
 ExtendedPartitionHandle::GetChildCreationParameterEditor(const char* type,
-	BDiskDeviceParameterEditor** editor)
+	BPartitionParameterEditor** editor)
 {
 	// TODO: We actually need an editor here.
 	*editor = NULL;

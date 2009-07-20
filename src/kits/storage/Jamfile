@@ -76,6 +76,7 @@ MergeObject <libbe>storage_kit.o :
 	Partition.cpp
 	PartitionDelegate.cpp
 	PartitioningInfo.cpp 
+	PartitionParameterEditor.cpp
 	PartitionReference.cpp
 
 	CreateChildJob.cpp

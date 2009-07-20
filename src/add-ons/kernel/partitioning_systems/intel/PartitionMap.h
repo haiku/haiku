@@ -14,6 +14,7 @@
 // NOTE: <http://www.win.tue.nl/~aeb/partitions/partition_tables-2.html>
 
 #include <SupportDefs.h>
+#include <driver_settings.h>
 
 #ifndef _USER_MODE
 #	include <util/kernel_cpp.h>
@@ -25,6 +26,14 @@
 #define INTEL_PARTITION_NAME "Intel Partition Map"
 #define INTEL_EXTENDED_PARTITION_NAME "Intel Extended Partition"
 #define BFS_NAME "BFS Filesystem"
+
+
+// partition_type
+struct partition_type {
+	uint8		type;
+	const char	*name;
+	bool		used;
+};
 
 
 // is_empty_type
@@ -287,6 +296,7 @@ public:
 			const Partition*	PartitionAt(int32 index) const;
 
 			bool				Check(off_t sessionSize) const;
+			const partition_type* GetNextSupportedPartitionType(uint32 cookie);
 
 private:
 			PrimaryPartition	fPrimaries[4];

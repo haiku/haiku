@@ -25,8 +25,8 @@ bool		pm_validate_set_type(partition_data *partition, const char *type);
 bool		pm_validate_initialize(partition_data *partition, char *name,
 				const char *parameters);
 bool		pm_validate_create_child(partition_data *partition, off_t *start,
-				off_t *size, const char *type, const char *parameters,
-				int32 *index);
+				off_t *size, const char *type, const char *name,
+				const char *parameters, int32 *index);
 
 status_t	pm_get_partitionable_spaces(partition_data *partition,
 				partitionable_space_data *buffer, int32 count,
@@ -49,8 +49,9 @@ status_t	pm_set_type(int fd, partition_id partitionID, const char *type,
 status_t	pm_initialize(int fd, partition_id partitionID, const char *name,
 				const char *parameters, off_t partitionSize, disk_job_id job);
 status_t	pm_create_child(int fd, partition_id partitionID, off_t offset,
-				off_t size, const char *type, const char *parameters,
-				disk_job_id job, partition_id *childID);
+				off_t size, const char *type, const char *name,
+				const char *parameters, disk_job_id job, 
+				partition_id *childID);
 status_t	pm_delete_child(int fd, partition_id partitionID,
 				partition_id childID, disk_job_id job);
 
@@ -71,8 +72,8 @@ bool		ep_validate_set_type(partition_data *partition, const char *type);
 bool		ep_validate_initialize(partition_data *partition, char *name,
 				const char *parameters);
 bool		ep_validate_create_child(partition_data *partition, off_t *_start,
-				off_t *_size, const char *type, const char *parameters,
-				int32 *index);
+				off_t *_size, const char *type, const char* name,
+				const char *parameters, int32 *index);
 status_t	ep_get_partitionable_spaces(partition_data *partition,
 				partitionable_space_data *buffer, int32 count,
 				int32 *actualCount);
@@ -94,8 +95,9 @@ status_t	ep_set_type(int fd, partition_id partitionID, const char *type,
 status_t	ep_initialize(int fd, partition_id partitionID, const char *name,
 				const char *parameters, off_t partitionSize, disk_job_id job);
 status_t	ep_create_child(int fd, partition_id partitionID, off_t offset,
-				off_t size, const char *type, const char *parameters,
-				disk_job_id job, partition_id *childID);
+				off_t size, const char *type, const char *name,
+				const char *parameters, disk_job_id job,
+				partition_id *childID);
 status_t	ep_delete_child(int fd, partition_id partitionID,
 				partition_id childID, disk_job_id job);
 

@@ -530,7 +530,7 @@ validate_create_child_partition(partition_data *partition, off_t *start,
 */
 bool
 pm_validate_create_child(partition_data *partition, off_t *start, off_t *size,
-	const char *type, const char *parameters, int32 *index)
+	const char *type, const char *name, const char *parameters, int32 *index)
 {
 	TRACE(("intel: pm_validate_create_child\n"));
 
@@ -540,6 +540,7 @@ pm_validate_create_child(partition_data *partition, off_t *start, off_t *size,
 		return false;
 	}
 
+	// TODO: check name
 	// TODO: check parameters
 	// type check
 	if (!is_type_valid_pm(type, partition))
@@ -1291,8 +1292,8 @@ pm_initialize(int fd, partition_id partitionID, const char *name,
 */
 status_t
 pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
-	const char *type, const char *parameters, disk_job_id job,
-	partition_id *childID)
+	const char *type, const char *name, const char *parameters,
+	disk_job_id job, partition_id *childID)
 {
 	TRACE(("intel: pm_create_child\n"));
 
@@ -1318,7 +1319,7 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	int32 index = 0;
 
 	if (!pm_validate_create_child(partition, &validatedOffset, &validatedSize,
-			type, parameters, &index)) {
+			type, name, parameters, &index)) {
 		return B_BAD_VALUE;
 	}
 
@@ -1338,12 +1339,26 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	PartitionType ptype;
 	ptype.SetType(type);
 
+	// check parameters
+	void *handle = parse_driver_settings_string(parameters);
+	if (handle == NULL)
+		return B_ERROR;
+
+	bool active = get_driver_boolean_parameter(handle, "active", false, true);
+
+	// set the active flags to false
+	if (active) {
+		for (int i = 0; i < 4; i++) {
+			PrimaryPartition *partition = map->PrimaryPartitionAt(i);
+			partition->SetActive(false);
+		}
+	}
+
 	primary->SetPartitionTableOffset(0);
 	primary->SetOffset(validatedOffset);
 	primary->SetSize(validatedSize);
 	primary->SetType(ptype.Type());
-	// TODO: correctly fill active parameter
-	primary->SetActive(false);
+	primary->SetActive(active);
 
 	// write changes to disk
 	PartitionMapWriter writer(fd, 0, partition->size);
@@ -1602,7 +1617,7 @@ ep_validate_initialize(partition_data *partition, char *name,
 // ep_validate_create_child
 bool
 ep_validate_create_child(partition_data *partition, off_t *_start, off_t *_size,
-	const char *type, const char *parameters, int32 *index)
+	const char *type, const char *name, const char *parameters, int32 *index)
 	// index - returns position of the new partition (the last one)
 {
 	TRACE(("intel: ep_validate_create_child\n"));
@@ -2049,7 +2064,7 @@ ep_initialize(int fd, partition_id partitionID, const char *name,
 */
 status_t
 ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
-	const char *type, const char *parameters, disk_job_id job,
+	const char *type, const char *name, const char *parameters, disk_job_id job,
 	partition_id *childID)
 {
 	TRACE(("intel: ep_create_child\n"));
@@ -2077,7 +2092,7 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	int32 index = 0;
 
 	if (!ep_validate_create_child(partition, &validatedOffset, &validatedSize,
-			type, parameters, &index)) {
+			type, name, parameters, &index)) {
 		return B_BAD_VALUE;
 	}
 

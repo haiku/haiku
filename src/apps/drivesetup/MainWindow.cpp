@@ -168,6 +168,8 @@ MainWindow::MainWindow(BRect frame)
 		new BMessage(MSG_SURFACE_TEST));
 	fRescanMI = new BMenuItem("Rescan", new BMessage(MSG_RESCAN));
 
+	fCreateMI = new BMenuItem("Create" B_UTF8_ELLIPSIS,
+		new BMessage(MSG_CREATE), 'C');
 	fDeleteMI = new BMenuItem("Delete",	new BMessage(MSG_DELETE), 'D');
 
 	fMountMI = new BMenuItem("Mount", new BMessage(MSG_MOUNT), 'M');
@@ -188,8 +190,7 @@ MainWindow::MainWindow(BRect frame)
 
 	// Parition menu
 	fPartitionMenu = new BMenu("Partition");
-	fCreateMenu = new BMenu("Create");
-	fPartitionMenu->AddItem(fCreateMenu);
+	fPartitionMenu->AddItem(fCreateMI);
 
 	fInitMenu = new BMenu("Initialize");
 	fPartitionMenu->AddItem(fInitMenu);
@@ -263,10 +264,7 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_CREATE: {
-			BString diskSystemName;
-			//if (message->FindString("disk system", &diskSystemName) != B_OK)
-			//	break;
-			_Create(fCurrentDisk, fCurrentPartitionID, diskSystemName);
+			_Create(fCurrentDisk, fCurrentPartitionID);
 			break;
 		}
 
@@ -469,10 +467,6 @@ void
 MainWindow::_UpdateMenus(BDiskDevice* disk,
 	partition_id selectedPartition, partition_id parentID)
 {
-	// clean out Create and Init menu
-	while (BMenuItem* item = fCreateMenu->RemoveItem(0L))
-		delete item;
-
 	while (BMenuItem* item = fInitMenu->RemoveItem(0L))
 		delete item;
 
@@ -488,6 +482,7 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		fEjectMI->SetEnabled(disk->IsRemovableMedia());
 //		fSurfaceTestMI->SetEnabled(true);
 		fSurfaceTestMI->SetEnabled(false);
+		fCreateMI->SetEnabled(false);
 
 		// Create menu and items
 		fPartitionMenu->SetEnabled(true);
@@ -496,12 +491,14 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		if (selectedPartition <= -2)
 			parentPartition = disk->FindDescendant(parentID);
 
+		if (parentPartition && parentPartition->ContainsPartitioningSystem())
+			fCreateMI->SetEnabled(true);
+
 		BPartition* partition = disk->FindDescendant(selectedPartition);
 		if (partition == NULL)
 			partition = disk;
 
 		bool prepared = disk->PrepareModifications() == B_OK;
-		fCreateMenu->SetEnabled(prepared);
 		fInitMenu->SetEnabled(prepared);
 		fDeleteMI->SetEnabled(prepared);
 
@@ -530,27 +527,6 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 //			item->SetEnabled(partition->CanInitialize(diskSystem.Name()));
 			item->SetEnabled(partition->CanInitialize(diskSystem.PrettyName()));
 			fInitMenu->AddItem(item);
-		}
-
-		if (parentPartition != NULL) {
-			BString supportedChildType;
-			int32 cookie = 0;
-			status_t ret;
-			while ((ret = parentPartition->GetNextSupportedChildType(&cookie,
-				&supportedChildType)) == B_OK) {
-				BMessage* message = new BMessage(MSG_CREATE);
-				message->AddInt32("parent id", parentID);
-				message->AddInt32("space id", selectedPartition);
-				message->AddString("type", supportedChildType);
-				BMenuItem* item = new BMenuItem(supportedChildType.String(),
-					message);
-				fCreateMenu->AddItem(item);
-			}
-			if (fCreateMenu->CountItems() == 0)
-				fprintf(stderr, "Failed to get supported child types: %s\n",
-					strerror(ret));
-		} else {
-			fCreateMenu->SetEnabled(false);
 		}
 
 		if (prepared)
@@ -804,14 +780,11 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		return;
 	}
 
-	// TODO: use partition initialization editor
-	// (partition->GetInitializationParameterEditor())
-	BString name = partition->ContentName();
+	BString name;
 	BString parameters;
 	if (diskSystemName == "Be File System") {
-		if (name.Length() == 0)
-			name = "Haiku";
-		InitParamsPanel* panel = new InitParamsPanel(this);
+		InitParamsPanel* panel = new InitParamsPanel(this, diskSystemName,
+			partition);
 		if (panel->Go(name, parameters) == GO_CANCELED)
 			return;
 	} else if (diskSystemName == "Intel Partition Map") {
@@ -880,8 +853,7 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 
 
 void
-MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition,
-	const BString& partitionType)
+MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 {
 	if (!disk || selectedPartition > -2) {
 		_DisplayPartitionError("The currently selected partition is not"
@@ -942,12 +914,13 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition,
 	off_t offset = currentSelection->Offset();
 	off_t size = currentSelection->Size();
 
-	CreateParamsPanel* panel = new CreateParamsPanel(this, offset, size);
-	if (panel->Go(offset, size, type) == GO_CANCELED)
+	CreateParamsPanel* panel = new CreateParamsPanel(this, parent, offset,
+		size);
+	if (panel->Go(offset, size, name, type, parameters) == GO_CANCELED)
 		return;
 
 	ret = parent->ValidateCreateChild(&offset, &size, type.String(),
-		NULL, NULL);
+		&name, parameters.String());
 
 	if (ret != B_OK) {
 		_DisplayPartitionError("Validation of the given creation "
@@ -968,7 +941,7 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition,
 		return;
 
 	ret = parent->CreateChild(offset, size, type.String(),
-		NULL, parameters.String());
+		name.String(), parameters.String());
 
 	if (ret != B_OK) {
 		_DisplayPartitionError("Creation of the partition has failed\n");

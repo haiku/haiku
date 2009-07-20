@@ -21,7 +21,7 @@ public:
 									const BMutablePartition* partition);
 	virtual	status_t			GetInitializationParameterEditor(
 									const BMutablePartition* partition,
-									BDiskDeviceParameterEditor** editor);
+									BPartitionParameterEditor** editor);
 	virtual	status_t			ValidateInitialize(
 									const BMutablePartition* partition,
 									BString* name, const char* parameters);

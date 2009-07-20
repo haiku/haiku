@@ -10,8 +10,9 @@
 #include "CreateParamsPanel.h"
 #include "Support.h"
 
+#include <Box.h>
 #include <Button.h>
-#include <GridLayoutBuilder.h>
+#include <DiskDeviceTypes.h>
 #include <GroupLayoutBuilder.h>
 #include <GroupView.h>
 #include <MenuField.h>
@@ -19,6 +20,8 @@
 #include <Message.h>
 #include <MessageFilter.h>
 #include <PopUpMenu.h>
+#include <PartitionParameterEditor.h>
+#include <Partition.h>
 #include <Slider.h>
 #include <SpaceLayoutItem.h>
 #include <String.h>
@@ -31,9 +34,11 @@ public:
 		fPanel(target)
 	{
 	}
+
 	virtual	~EscapeFilter()
 	{
 	}
+
 	virtual filter_result Filter(BMessage* message, BHandler** target)
 	{
 		filter_result result = B_DISPATCH_MESSAGE;
@@ -54,6 +59,7 @@ public:
 		}
 		return result;
 	}
+
 private:
  	CreateParamsPanel*		fPanel;
 };
@@ -64,11 +70,12 @@ private:
 enum {
 	MSG_OK						= 'okok',
 	MSG_CANCEL					= 'cncl',
-	MSG_PARTITION_TYPE			= 'prty'
+	MSG_PARTITION_TYPE			= 'type'
 };
 
 
-CreateParamsPanel::CreateParamsPanel(BWindow* window, off_t offset, off_t size)
+CreateParamsPanel::CreateParamsPanel(BWindow* window, BPartition* partition,
+	off_t offset, off_t size)
 	: BWindow(BRect(300.0, 200.0, 600.0, 300.0), 0, B_MODAL_WINDOW_LOOK,
 		B_MODAL_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
@@ -83,7 +90,7 @@ CreateParamsPanel::CreateParamsPanel(BWindow* window, off_t offset, off_t size)
 	// so that we do not run over a signed int32.
 	offset /= kMegaByte;
 	size /= kMegaByte;
-	_CreateViewControls(offset, size);
+	_CreateViewControls(partition, offset, size);
 }
 
 
@@ -117,6 +124,12 @@ CreateParamsPanel::MessageReceived(BMessage* message)
 			release_sem(fExitSemaphore);
 			break;
 
+		case MSG_PARTITION_TYPE:
+			const char* type;
+			message->FindString("type", &type);
+			fEditor->PartitionTypeChanged(type);
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 	}
@@ -124,7 +137,8 @@ CreateParamsPanel::MessageReceived(BMessage* message)
 
 
 int32
-CreateParamsPanel::Go(off_t& offset, off_t& size, BString& type)
+CreateParamsPanel::Go(off_t& offset, off_t& size, BString& name,
+	BString& type, BString& parameters)
 {
 	// run the window thread, to get an initial layout of the controls
 	Hide();
@@ -154,16 +168,28 @@ CreateParamsPanel::Go(off_t& offset, off_t& size, BString& type)
 		return GO_CANCELED;
 
 	if (fReturnValue == GO_SUCCESS) {
+		// Return the value back as bytes.
+		size = (off_t)fSizeSlider->Size() * kMegaByte;
+		offset = (off_t)fSizeSlider->Offset() * kMegaByte;
+
+		// get name
+		name.SetTo(fNameTextControl->Text());
+
+		// get type
 		if (BMenuItem* item = fTypeMenuField->Menu()->FindMarked()) {
 			const char* _type;
 			BMessage* message = item->Message();
 			if (!message || message->FindString("type", &_type) < B_OK)
-				_type = "BFS Filesystem";
+				_type = kPartitionTypeBFS;
 			type << _type;
 		}
-		// Return the value back as bytes.
-		size = (off_t)fSizeSlider->Size() * kMegaByte;
-		offset = (off_t)fSizeSlider->Offset() * kMegaByte;
+
+		// get editors parameters
+		if (fEditor->FinishedEditing()) {
+			status_t status = fEditor->GetParameters(&parameters);
+			if (status != B_OK)
+				fReturnValue = status;
+		}
 	}
 
 	int32 value = fReturnValue;
@@ -184,38 +210,59 @@ CreateParamsPanel::Cancel()
 
 
 void
-CreateParamsPanel::_CreateViewControls(off_t offset, off_t size)
+CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
+	off_t size)
 {
 	// Setup the controls
-	//TODO Add all the partition types that we want/can use
-	fTypePopUpMenu = new BPopUpMenu("Partition Type");
-	BMessage* message = new BMessage(MSG_PARTITION_TYPE);
-	message->AddString("type", "BFS Filesystem");
-	BMenuItem *item = new BMenuItem("BFS Filesystem", message);
-	fTypePopUpMenu->AddItem(item);
-	item->SetMarked(true);
-	fTypeMenuField = new BMenuField("Partition Type", fTypePopUpMenu, NULL);
-
 	fSizeSlider = new SizeSlider("Slider", "Partition Size", NULL, offset,
 		offset + size);
 	fSizeSlider->SetPosition(1.0);
 
+	fNameTextControl = new BTextControl("Name Control", "Partition Name",
+		"", NULL);
+	if (!parent->SupportsChildName())
+		fNameTextControl->SetEnabled(false);
+
+	fTypePopUpMenu = new BPopUpMenu("Partition Type");
+
+	int32 cookie = 0;
+	BString supportedType;
+	while (parent->GetNextSupportedChildType(&cookie, &supportedType)
+		== B_OK) {
+		BMessage* message = new BMessage(MSG_PARTITION_TYPE);
+		message->AddString("type", supportedType);
+		BMenuItem* item = new BMenuItem(supportedType, message);
+		fTypePopUpMenu->AddItem(item);
+
+		if (strcmp(supportedType, kPartitionTypeBFS) == 0)
+			item->SetMarked(true);
+	}
+
+	fTypeMenuField = new BMenuField("Partition Type", fTypePopUpMenu, NULL);
+
 	fOKButton = new BButton("Create", new BMessage(MSG_OK));
 	fCancelButton = new BButton("Cancel", new BMessage(MSG_CANCEL));
 
+	BView* infoView = BGroupLayoutBuilder(B_VERTICAL, 3)
+		.Add(fSizeSlider)
+		.Add(fNameTextControl)
+		.Add(fTypeMenuField)
+	;
+	BBox* infoBox = new BBox(B_FANCY_BORDER, infoView);
+
+	parent->GetChildCreationParameterEditor(NULL, &fEditor);
+	BBox* parameterBox = new BBox(B_FANCY_BORDER, fEditor->View());
+
 	BView* rootView = BGroupLayoutBuilder(B_VERTICAL, 4)
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
+
+		// slider and types
+		.Add(infoBox)
 
 		.Add(BSpaceLayoutItem::CreateVerticalStrut(10))
 
-		// test views
-		.Add(BGridLayoutBuilder(10, 10)
-			// row 1
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5), 0, 0)
-
-			.Add(fSizeSlider, 1, 0)
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(5), 1, 0)
-			.Add(fTypeMenuField, 1, 1)
-		)
+		// editor's view
+		.Add(parameterBox)
 
 		// controls
 		.AddGroup(B_HORIZONTAL, 10)

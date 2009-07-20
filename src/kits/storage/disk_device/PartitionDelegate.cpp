@@ -339,7 +339,7 @@ BPartition::Delegate::SetType(Delegate* child, const char* type)
 // GetContentParameterEditor
 status_t
 BPartition::Delegate::GetContentParameterEditor(
-	BDiskDeviceParameterEditor** editor) const
+	BPartitionParameterEditor** editor) const
 {
 	if (!fPartitionHandle)
 		return B_NO_INIT;
@@ -351,7 +351,7 @@ BPartition::Delegate::GetContentParameterEditor(
 // GetParameterEditor
 status_t
 BPartition::Delegate::GetParameterEditor(Delegate* child,
-	BDiskDeviceParameterEditor** editor) const
+	BPartitionParameterEditor** editor) const
 {
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
@@ -443,7 +443,7 @@ BPartition::Delegate::CanInitialize(const char* diskSystem) const
 // GetInitializationParameterEditor
 status_t
 BPartition::Delegate::GetInitializationParameterEditor(
-	const char* diskSystem, BDiskDeviceParameterEditor** editor) const
+	const char* diskSystem, BPartitionParameterEditor** editor) const
 {
 	// get the disk system add-on
 	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
@@ -540,7 +540,7 @@ BPartition::Delegate::GetPartitioningInfo(BPartitioningInfo* info)
 // GetChildCreationParameterEditor
 status_t
 BPartition::Delegate::GetChildCreationParameterEditor(const char* type,
-	BDiskDeviceParameterEditor** editor) const
+	BPartitionParameterEditor** editor) const
 {
 	if (!fPartitionHandle)
 		return B_NO_INIT;

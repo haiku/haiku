@@ -16,6 +16,7 @@ Addon <disk_system>intel :
 	IntelDiskSystem.cpp
 	ExtendedPartitionAddOn.cpp
 	PartitionMapAddOn.cpp
+	CreationParameterEditor.cpp
 
 	# kernel sources
 	PartitionMap.cpp

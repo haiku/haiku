@@ -52,7 +52,7 @@ BDiskSystemAddOn::CanInitialize(const BMutablePartition* partition)
 // GetInitializationParameterEditor
 status_t
 BDiskSystemAddOn::GetInitializationParameterEditor(
-	const BMutablePartition* partition, BDiskDeviceParameterEditor** editor)
+	const BMutablePartition* partition, BPartitionParameterEditor** editor)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -297,7 +297,7 @@ BPartitionHandle::SetType(BMutablePartition* child, const char* type)
 
 // GetContentParameterEditor
 status_t
-BPartitionHandle::GetContentParameterEditor(BDiskDeviceParameterEditor** editor)
+BPartitionHandle::GetContentParameterEditor(BPartitionParameterEditor** editor)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -306,7 +306,7 @@ BPartitionHandle::GetContentParameterEditor(BDiskDeviceParameterEditor** editor)
 // GetParameterEditor
 status_t
 BPartitionHandle::GetParameterEditor(const BMutablePartition* child,
-	BDiskDeviceParameterEditor** editor)
+	BPartitionParameterEditor** editor)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -349,7 +349,7 @@ BPartitionHandle::SetParameters(BMutablePartition* child,
 // GetChildCreationParameterEditor
 status_t
 BPartitionHandle::GetChildCreationParameterEditor(const char* type,
-	BDiskDeviceParameterEditor** editor)
+	BPartitionParameterEditor** editor)
 {
 	return B_NOT_SUPPORTED;
 }
