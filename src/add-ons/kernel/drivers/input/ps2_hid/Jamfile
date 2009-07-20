@@ -1,7 +1,8 @@
 SubDir HAIKU_TOP src add-ons kernel drivers input ps2_hid ;
 
-UsePrivateHeaders input ;
-UsePrivateHeaders kernel ;
+UsePrivateHeaders input kernel ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers ps2 ] ;
 
 KernelAddon ps2_hid :
 	ps2_hid.c

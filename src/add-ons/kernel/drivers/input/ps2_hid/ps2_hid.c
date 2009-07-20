@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 Haiku, Inc.
+ * Copyright 2005-2009 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * PS/2 hid device driver
@@ -8,15 +8,19 @@
  *		Marcus Overhagen (marcus@overhagen.de)
  */
 
+
 #include <KernelExport.h>
 #include <Drivers.h>
-#include "../../../bus_managers/ps2/PS2.h"
+
+#include "PS2.h"
 
 #define TRACE(x) dprintf x
+
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 ps2_module_info *gPs2 = NULL;
+
 
 status_t
 init_hardware(void)
