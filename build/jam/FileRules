@@ -91,22 +91,22 @@ actions AbsSymLink
 	$(RM) "$(1)" && $(LN) -s "$target" "$(1)"
 }
 
-rule HaikuInstall
+rule HaikuInstall installAndUninstall : dir : sources : installgrist
+	: installRule : targets
 {
 	# Usage: HaikuInstall <[ install [ and uninstall ] pseudotarget ]>
-	#					 : <directory> : <sources to install>
-	#					 : [ <installgrist> ] : [ <install rule> ] ;
-	local install = $(1[1]) ;
+	#	: <directory> : <sources to install> : [ <installgrist> ]
+	#	: [ <install rule> ] : [ <targets> ] ;
+
+	local install = $(installAndUninstall[1]) ;
 	install ?= install ;
-	local uninstall = $(1[2]) ;
+	local uninstall = $(installAndUninstall[2]) ;
 	uninstall ?= un$(install) ;
-	local dir = $(2) ;
-	local sources = $(3) ;
-	local installgrist = $(4) ;
 	installgrist ?= $(INSTALLGRIST) ;
-	local installRule = $(5) ;
 	installRule ?= Install ;
-	local targets = $(sources:G=$(installgrist)) ;
+
+	targets ?= $(sources) ;
+	targets = $(targets:G=$(installgrist)) ;
 
 	NotFile $(install) ;
 	NotFile $(uninstall) ;
@@ -118,7 +118,8 @@ rule HaikuInstall
 
 	local source ;
 	for source in $(sources) {
-		local target = $(source:G=$(installgrist)) ;
+		local target = $(targets[1]) ;
+		targets = $(targets[2-]) ;
 
 		Depends $(target) : $(source) ;
 		$(installRule) $(target) : $(source) ;
