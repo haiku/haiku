@@ -50,5 +50,8 @@
 	# (system shutdown, battery info, ...)
 	# default is off
 
+#emergency_keys false
+	# Disables emergency keys (ie. Alt-SysReq+*), enabled by default
+
 #acpi true
 	# ACPI support, off by default

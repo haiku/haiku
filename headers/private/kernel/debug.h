@@ -28,7 +28,11 @@
 #endif
 
 #define ASSERT_ALWAYS(x) \
-	do { if (!(x)) { panic("ASSERT FAILED (%s:%d): %s\n", __FILE__, __LINE__, #x); } } while (0)
+	do {																	\
+		if (!(x)) {															\
+			panic("ASSERT FAILED (%s:%d): %s\n", __FILE__, __LINE__, #x);	\
+		}																	\
+	} while (0)
 
 #define ASSERT_ALWAYS_PRINT(x, format...) \
 	do {																	\
@@ -66,10 +70,13 @@ struct debugger_module_info {
 	void (*enter_debugger)(void);
 	void (*exit_debugger)(void);
 
-	// io hooks
+	// I/O hooks
 	int (*debugger_puts)(const char *str, int32 length);
 	int (*debugger_getchar)(void);
 	// TODO: add hooks for tunnelling gdb ?
+
+	// Misc. hooks
+	bool (*emergency_key_pressed)(char key);
 };
 
 struct debugger_demangle_module_info {
@@ -113,7 +120,8 @@ extern void		debug_stop_screen_debug_output(void);
 extern void		debug_set_page_fault_info(addr_t faultAddress, addr_t pc,
 					uint32 flags);
 extern debug_page_fault_info* debug_get_page_fault_info();
-extern void debug_trap_cpu_in_kdl(bool returnIfHandedOver);
+extern void		debug_trap_cpu_in_kdl(bool returnIfHandedOver);
+extern bool		debug_emergency_key_pressed(char key);
 
 extern char		kgetc(void);
 extern void		kputs(const char *string);

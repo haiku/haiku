@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007 Haiku, Inc.
+ * Copyright 2004-2009 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors (in chronological order):
@@ -9,6 +9,7 @@
  */
 
 /*! PS/2 bus manager */
+
 
 #include <string.h>
 
@@ -277,32 +278,33 @@ ps2_interrupt(void* cookie)
 		return B_UNHANDLED_INTERRUPT;
 
 	if (atomic_get(&sIgnoreInterrupts)) {
-		TRACE("ps2: ps2_interrupt ignoring, ctrl 0x%02x (%s)\n", ctrl, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb");
+		TRACE("ps2: ps2_interrupt ignoring, ctrl 0x%02x (%s)\n", ctrl,
+			(ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb");
 		return B_HANDLED_INTERRUPT;
 	}
 
 	data = ps2_read_data();
 
-	if (ctrl & PS2_STATUS_AUX_DATA) {
+	if ((ctrl & PS2_STATUS_AUX_DATA) != 0) {
 		uint8 idx;
 		if (gActiveMultiplexingEnabled) {
 			idx = ctrl >> 6;
 			error = (ctrl & 0x04) != 0;
-			TRACE("ps2: ps2_interrupt ctrl 0x%02x, data 0x%02x (mouse %d)\n", ctrl, data, idx);
+			TRACE("ps2: ps2_interrupt ctrl 0x%02x, data 0x%02x (mouse %d)\n",
+				ctrl, data, idx);
 		} else {
 			idx = 0;
 			error = (ctrl & 0xC0) != 0;
-			TRACE("ps2: ps2_interrupt ctrl 0x%02x, data 0x%02x (aux)\n", ctrl, data);
+			TRACE("ps2: ps2_interrupt ctrl 0x%02x, data 0x%02x (aux)\n", ctrl,
+				data);
 		}
 		dev = &ps2_device[PS2_DEVICE_MOUSE + idx];
 	} else {
-		TRACE("ps2: ps2_interrupt ctrl 0x%02x, data 0x%02x (keyb)\n", ctrl, data);
+		TRACE("ps2: ps2_interrupt ctrl 0x%02x, data 0x%02x (keyb)\n", ctrl,
+			data);
+
 		dev = &ps2_device[PS2_DEVICE_KEYB];
 		error = (ctrl & 0xC0) != 0;
-
-		// TODO: remove me again; let us drop into the kernel debugger with F12
-		if (data == 88)
-			panic("keyboard requested halt.\n");
 	}
 
 	dev->history[1] = dev->history[0];

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007 Haiku, Inc.
+ * Copyright 2004-2009 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors (in chronological order):
@@ -10,11 +10,16 @@
 
 /*! PS/2 keyboard device driver */
 
+
+#include <string.h>
+
+#include <debug.h>
+#include <debugger_keymaps.h>
+
 #include "ps2_service.h"
 #include "kb_mouse_driver.h"
 #include "packet_buffer.h"
 
-#include <string.h>
 
 #define KEY_BUFFER_SIZE 100
 	// we will buffer 100 key strokes before we start dropping them
@@ -26,7 +31,11 @@ enum {
 } leds_status;
 
 enum {
-	EXTENDED_KEY = 0xe0,
+	EXTENDED_KEY	= 0xe0,
+
+	LEFT_ALT_KEY	= 0x38,
+	RIGHT_ALT_KEY	= 0xb8,
+	SYS_REQ_KEY		= 0x54
 };
 
 
@@ -35,8 +44,9 @@ static sem_id sKeyboardSem;
 static struct packet_buffer *sKeyBuffer;
 static bool sIsExtended = false;
 
-static int32		sKeyboardRepeatRate;
-static bigtime_t	sKeyboardRepeatDelay;
+static int32 sKeyboardRepeatRate;
+static bigtime_t sKeyboardRepeatDelay;
+
 
 static status_t
 set_leds(led_info *ledInfo)
@@ -52,7 +62,8 @@ set_leds(led_info *ledInfo)
 	if (ledInfo->caps_lock)
 		leds |= LED_CAPS;
 
-	return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_KEYBOARD_SET_LEDS, &leds, 1, NULL, 0);
+	return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB],
+		PS2_CMD_KEYBOARD_SET_LEDS, &leds, 1, NULL, 0);
 }
 
 
@@ -84,13 +95,20 @@ set_typematic(int32 rate, bigtime_t delay)
 	else
 		value |= 0 << 5;
 
-	return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_KEYBOARD_SET_TYPEMATIC, &value, 1, NULL, 0);
+	return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB],
+		PS2_CMD_KEYBOARD_SET_TYPEMATIC, &value, 1, NULL, 0);
 }
 
 
 static int32
 keyboard_handle_int(ps2_dev *dev)
 {
+	enum emergency_keys {
+		EMERGENCY_LEFT_ALT	= 0x01,
+		EMERGENCY_RIGHT_ALT	= 0x02,
+		EMERGENCY_SYS_REQ	= 0x04,
+	};
+	static int emergencyKeyStatus = 0;
 	at_kbd_io keyInfo;
 	uint8 scancode = dev->history[0].data;
 
@@ -107,7 +125,7 @@ keyboard_handle_int(ps2_dev *dev)
 
 //	TRACE("scancode: %x\n", scancode);
 
-	if (scancode & 0x80) {
+	if ((scancode & 0x80) != 0) {
 		keyInfo.is_keydown = false;
 		scancode &= 0x7f;
 	} else
@@ -118,12 +136,33 @@ keyboard_handle_int(ps2_dev *dev)
 		sIsExtended = false;
 	}
 
+	// Handle emergency keys
+	if (scancode == LEFT_ALT_KEY || scancode == RIGHT_ALT_KEY) {
+		// left or right alt-key pressed
+		if (keyInfo.is_keydown) {
+			emergencyKeyStatus |= scancode == LEFT_ALT_KEY
+				? EMERGENCY_LEFT_ALT : EMERGENCY_RIGHT_ALT;
+		} else {
+			emergencyKeyStatus &= ~(scancode == LEFT_ALT_KEY
+				? EMERGENCY_LEFT_ALT : EMERGENCY_RIGHT_ALT);
+		}
+	} else if (scancode == SYS_REQ_KEY) {
+		if (keyInfo.is_keydown)
+			emergencyKeyStatus |= EMERGENCY_SYS_REQ;
+		else
+			emergencyKeyStatus &= EMERGENCY_SYS_REQ;
+	} else if (emergencyKeyStatus > EMERGENCY_SYS_REQ
+		&& debug_emergency_key_pressed(kUnshiftedKeymap[scancode]))
+		return B_HANDLED_INTERRUPT;
+
 	keyInfo.timestamp = dev->history[0].time;
 	keyInfo.scancode = scancode;
 
-	if (packet_buffer_write(sKeyBuffer, (uint8 *)&keyInfo, sizeof(keyInfo)) == 0) {
-		// If there is no space left in the buffer, we drop this key stroke. We avoid
-		// dropping old key strokes, to not destroy what already was typed.
+	if (packet_buffer_write(sKeyBuffer, (uint8 *)&keyInfo,
+			sizeof(keyInfo)) == 0) {
+		// If there is no space left in the buffer, we drop this key stroke. We
+		// avoid dropping old key strokes, to not destroy what already was
+		// typed.
 		return B_HANDLED_INTERRUPT;
 	}
 
@@ -150,11 +189,14 @@ read_keyboard_packet(at_kbd_io *packet)
 	}
 
 	if (packet_buffer_read(sKeyBuffer, (uint8 *)packet, sizeof(*packet)) == 0) {
-		TRACE("ps2: read_keyboard_packet, Error reading packet: %s\n", strerror(status));
+		TRACE("ps2: read_keyboard_packet, Error reading packet: %s\n",
+			strerror(status));
 		return B_ERROR;
 	}
 
-	TRACE("ps2: read_keyboard_packet: scancode: %x, keydown: %s\n", packet->scancode, packet->is_keydown ? "true" : "false");
+	TRACE("ps2: read_keyboard_packet: scancode: %x, keydown: %s\n",
+		packet->scancode, packet->is_keydown ? "true" : "false");
+
 	return B_OK;
 }
 
@@ -184,13 +226,16 @@ probe_keyboard(void)
 //		return B_ERROR;
 //	}
 
-	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_RESET, NULL, 0, &data, 1);
+	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_RESET, NULL,
+		0, &data, 1);
 	if (status != B_OK || data != 0xaa) {
-		INFO("ps2: keyboard reset failed, status 0x%08lx, data 0x%02x\n", status, data);
+		INFO("ps2: keyboard reset failed, status 0x%08lx, data 0x%02x\n",
+			status, data);
 		return B_ERROR;
 	}
 
-	// default settings after keyboard reset: delay = 0x01 (500 ms), rate = 0x0b (10.9 chr/sec)
+	// default settings after keyboard reset: delay = 0x01 (500 ms),
+	// rate = 0x0b (10.9 chr/sec)
 	sKeyboardRepeatRate = ((31 - 0x0b) * 280) / 31 + 20;
 	sKeyboardRepeatDelay = 500000;
 
@@ -328,24 +373,29 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case KB_SET_KEY_REPEATING:
 		{
 			TRACE("ps2: ioctl KB_SET_KEY_REPEATING\n");
-			// 0xFA (Set All Keys Typematic/Make/Break) - Keyboard responds with "ack" (0xFA).
-			return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], 0xfa, NULL, 0, NULL, 0);
+			// 0xFA (Set All Keys Typematic/Make/Break) - Keyboard responds
+			// with "ack" (0xFA).
+			return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], 0xfa, NULL, 0,
+				NULL, 0);
 		}
 
 		case KB_SET_KEY_NONREPEATING:
 		{
 			TRACE("ps2: ioctl KB_SET_KEY_NONREPEATING\n");
-			// 0xF8 (Set All Keys Make/Break) - Keyboard responds with "ack" (0xFA).
-			return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], 0xf8, NULL, 0, NULL, 0);
+			// 0xF8 (Set All Keys Make/Break) - Keyboard responds with "ack"
+			// (0xFA).
+			return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], 0xf8, NULL, 0,
+				NULL, 0);
 		}
 
 		case KB_SET_KEY_REPEAT_RATE:
 		{
 			int32 key_repeat_rate;
 			TRACE("ps2: ioctl KB_SET_KEY_REPEAT_RATE\n");
-			if (user_memcpy(&key_repeat_rate, buffer, sizeof(key_repeat_rate)) < B_OK)
+			if (user_memcpy(&key_repeat_rate, buffer, sizeof(key_repeat_rate))
+					!= B_OK)
 				return B_BAD_ADDRESS;
-			if (set_typematic(key_repeat_rate, sKeyboardRepeatDelay) < B_OK)
+			if (set_typematic(key_repeat_rate, sKeyboardRepeatDelay) != B_OK)
 				return B_ERROR;
 			sKeyboardRepeatRate = key_repeat_rate;
 			return B_OK;
@@ -354,16 +404,18 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case KB_GET_KEY_REPEAT_RATE:
 		{
 			TRACE("ps2: ioctl KB_GET_KEY_REPEAT_RATE\n");
-			return user_memcpy(buffer, &sKeyboardRepeatRate, sizeof(sKeyboardRepeatRate));
+			return user_memcpy(buffer, &sKeyboardRepeatRate,
+				sizeof(sKeyboardRepeatRate));
 		}
 
 		case KB_SET_KEY_REPEAT_DELAY:
 		{
 			bigtime_t key_repeat_delay;
 			TRACE("ps2: ioctl KB_SET_KEY_REPEAT_DELAY\n");
-			if (user_memcpy(&key_repeat_delay, buffer, sizeof(key_repeat_delay)) < B_OK)
+			if (user_memcpy(&key_repeat_delay, buffer, sizeof(key_repeat_delay))
+					!= B_OK)
 				return B_BAD_ADDRESS;
-			if (set_typematic(sKeyboardRepeatRate, key_repeat_delay) < B_OK)
+			if (set_typematic(sKeyboardRepeatRate, key_repeat_delay) != B_OK)
 				return B_ERROR;
 			sKeyboardRepeatDelay = key_repeat_delay;
 			return B_OK;
@@ -373,7 +425,8 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case KB_GET_KEY_REPEAT_DELAY:
 		{
 			TRACE("ps2: ioctl KB_GET_KEY_REPEAT_DELAY\n");
-			return user_memcpy(buffer, &sKeyboardRepeatDelay, sizeof(sKeyboardRepeatDelay));
+			return user_memcpy(buffer, &sKeyboardRepeatDelay,
+				sizeof(sKeyboardRepeatDelay));
 		}
 
 		case KB_GET_KEYBOARD_ID:
@@ -388,6 +441,7 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			return EINVAL;
 	}
 }
+
 
 device_hooks gKeyboardDeviceHooks = {
 	keyboard_open,

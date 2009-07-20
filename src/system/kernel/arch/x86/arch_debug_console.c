@@ -1,8 +1,8 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de
  * Copyright 2001, Rob Judd <judd@ob-wan.com>
  * Copyright 2002, Marcus Overhagen <marcus@overhagen.de>
- * Distributed under the terms of the Haiku License.
+ * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
@@ -52,6 +52,7 @@ enum keycodes {
 	LEFT_CONTROL	= 29,
 
 	LEFT_ALT		= 56,
+	RIGHT_ALT		= 58,
 
 	CURSOR_LEFT		= 75,
 	CURSOR_RIGHT	= 77,
@@ -62,8 +63,8 @@ enum keycodes {
 	PAGE_UP			= 73,
 	PAGE_DOWN		= 81,
 
-	BREAK			= 198,	// TODO: >= 128 can't be valid
 	DELETE			= 83,
+	SYS_REQ			= 84,
 	F12				= 88,
 };
 
@@ -108,7 +109,8 @@ static int32
 debug_keyboard_interrupt(void *data)
 {
 	static bool controlPressed = false;
-	static bool altPressed;
+	static bool altPressed = false;
+	static bool sysReqPressed = false;
 	uint8 key;
 
 	key = in8(PS2_PORT_DATA);
@@ -117,8 +119,10 @@ debug_keyboard_interrupt(void *data)
 	if (key & 0x80) {
 		if (key == LEFT_CONTROL)
 			controlPressed = false;
-		if (key == LEFT_ALT)
+		else if (key == LEFT_ALT)
 			altPressed = false;
+		else if (key == SYS_REQ)
+			sysReqPressed = false;
 
 		return B_HANDLED_INTERRUPT;
 	}
@@ -129,7 +133,12 @@ debug_keyboard_interrupt(void *data)
 			break;
 
 		case LEFT_ALT:
+		case RIGHT_ALT:
 			altPressed = true;
+			break;
+
+		case SYS_REQ:
+			sysReqPressed = true;
 			break;
 
 		case DELETE:
@@ -137,14 +146,9 @@ debug_keyboard_interrupt(void *data)
 				arch_cpu_shutdown(true);
 			break;
 
-		/* the following code has two possibilities because of issues
-		 * with BeBochs & BeOS (all special keys don't map to anything
-		 * useful, and SYS_REQ does a screen dump in BeOS).
-		 * ToDo: remove these key functions some day...
-		 */
-		case F12:
-		case BREAK:
-			panic("Keyboard Requested Halt\n");
+		default:
+			if (altPressed && sysReqPressed)
+				debug_emergency_key_pressed(kUnshiftedKeymap[key]);
 			break;
 	}
 

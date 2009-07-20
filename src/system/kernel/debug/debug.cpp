@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -63,6 +63,7 @@ static bool sBlueScreenEnabled = false;
 	// must always be false on startup
 static bool sDebugScreenEnabled = false;
 static bool sBlueScreenOutput = true;
+static bool sEmergencyKeysEnabled = true;
 static spinlock sSpinlock = B_SPINLOCK_INITIALIZER;
 static int32 sDebuggerOnCPU = -1;
 
@@ -1239,6 +1240,8 @@ debug_init_post_vm(kernel_args* args)
 			"syslog_debug_output", sSyslogOutputEnabled, sSyslogOutputEnabled);
 		sBlueScreenOutput = get_driver_boolean_parameter(handle,
 			"bluescreen", true, true);
+		sEmergencyKeysEnabled = get_driver_boolean_parameter(handle,
+			"emergency_keys", sEmergencyKeysEnabled, sEmergencyKeysEnabled);
 
 		unload_driver_settings(handle);
 	}
@@ -1347,6 +1350,30 @@ debug_trap_cpu_in_kdl(bool returnIfHandedOver)
 	}
 
 	sCPUTrapped[cpu] = false;
+}
+
+
+bool
+debug_emergency_key_pressed(char key)
+{
+	if (!sEmergencyKeysEnabled)
+		return false;
+
+	if (key == 'd') {
+		kernel_debugger("Keyboard Requested Halt.");
+		return true;
+	}
+
+	// Broadcast to the kernel debugger modules
+
+	for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
+		if (sDebuggerModules[i] && sDebuggerModules[i]->emergency_key_pressed) {
+			if (sDebuggerModules[i]->emergency_key_pressed(key))
+				return true;
+		}
+	}
+
+	return false;
 }
 
 
