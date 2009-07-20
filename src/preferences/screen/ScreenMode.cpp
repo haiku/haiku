@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Haiku.
+ * Copyright 2005-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
 
 
 #include "ScreenMode.h"
+#include "gtf.h"
 
 #include <InterfaceDefs.h>
 
@@ -49,8 +50,8 @@ get_refresh_rate(display_mode& mode)
 {
 	// we have to be catious as refresh rate cannot be controlled directly,
 	// so it suffers under rounding errors and hardware restrictions
-	return rint(10 * float(mode.timing.pixel_clock * 1000) / 
-		float(mode.timing.h_total * mode.timing.v_total)) / 10.0;
+	return rint(10 * float(mode.timing.pixel_clock * 1000)
+		/ float(mode.timing.h_total * mode.timing.v_total)) / 10.0;
 }
 
 
@@ -189,10 +190,10 @@ ScreenMode::Set(const screen_mode& mode, int32 workspace)
 		UpdateOriginalModes();
 
 	BScreen screen(fWindow);
-	
+
 	if (workspace == ~0)
 		workspace = current_workspace();
-	
+
 	// TODO: our app_server doesn't fully support workspaces, yet
 	SetSwapDisplays(&screen, mode.swap_displays);
 	SetUseLaptopPanel(&screen, mode.use_laptop_panel);
@@ -211,15 +212,15 @@ ScreenMode::Get(screen_mode& mode, int32 workspace) const
 {
 	display_mode displayMode;
 	BScreen screen(fWindow);
-	
+
 	if (workspace == ~0)
 		workspace = current_workspace();
-	
+
 	if (screen.GetMode(workspace, &displayMode) != B_OK)
 		return B_ERROR;
-	
+
 	mode.SetTo(displayMode);
-	
+
 	// TODO: our app_server doesn't fully support workspaces, yet
 	if (GetSwapDisplays(&screen, &mode.swap_displays) != B_OK)
 		mode.swap_displays = false;
@@ -239,9 +240,9 @@ ScreenMode::GetOriginalMode(screen_mode& mode, int32 workspace) const
 		workspace = current_workspace();
 	else if(workspace > 31)
 		return B_BAD_INDEX;
-	
+
 	mode = fOriginal[workspace];
-	
+
 	return B_OK;
 }
 
@@ -275,7 +276,7 @@ ScreenMode::Revert()
 		if (result != B_OK)
 			break;
 	}
-	
+
 	return result;
 }
 
@@ -350,10 +351,10 @@ ScreenMode::GetDisplayMode(const screen_mode& mode, display_mode& displayMode)
 	int32 bestIndex = -1;
 	float bestDiff = 999;
 
-	virtualWidth = mode.combine == kCombineHorizontally ? 
-		mode.width * 2 : mode.width;
-	virtualHeight = mode.combine == kCombineVertically ? 
-		mode.height * 2 : mode.height;
+	virtualWidth = mode.combine == kCombineHorizontally
+		? mode.width * 2 : mode.width;
+	virtualHeight = mode.combine == kCombineVertically
+		? mode.height * 2 : mode.height;
 
 	// try to find mode in list provided by driver
 	for (uint32 i = 0; i < fModeCount; i++) {
@@ -362,18 +363,34 @@ ScreenMode::GetDisplayMode(const screen_mode& mode, display_mode& displayMode)
 			|| (color_space)fModeList[i].space != mode.space)
 			continue;
 
-		float refresh = get_refresh_rate(fModeList[i]);
-		if (refresh == mode.refresh) {
-			// we have luck - we can use this mode directly
+		// Accept the mode if the computed refresh rate of the mode is within
+		// 0.6 percent of the refresh rate specified by the caller.  Note that
+		// refresh rates computed from mode parameters is not exact; especially
+		// some of the older modes such as 640x480, 800x600, and 1024x768.
+		// The tolerance of 0.6% was obtained by examining the various possible
+		// modes.
+
+		float refreshDiff = fabs(get_refresh_rate(fModeList[i]) - mode.refresh);
+		if (refreshDiff < 0.006 * mode.refresh) {
+			// Accept this mode.
 			displayMode = fModeList[i];
 			displayMode.h_display_start = 0;
 			displayMode.v_display_start = 0;
+
+			// Since the computed refresh rate of the selected mode might differ
+			// from selected refresh rate by a few tenths (e.g. 60.2 instead of
+			// 60.0), tweak the pixel clock so the the refresh rate of the mode
+			// matches the selected refresh rate.
+
+			displayMode.timing.pixel_clock = uint32(((displayMode.timing.h_total
+				* displayMode.timing.v_total * mode.refresh) / 1000.0) + 0.5);
 			return true;
 		}
 
-		float diff = fabs(refresh - mode.refresh);
-		if (diff < bestDiff) {
-			bestDiff = diff;
+		// Mode not acceptable.
+
+		if (refreshDiff < bestDiff) {
+			bestDiff = refreshDiff;
 			bestIndex = i;
 		}
 	}
@@ -382,20 +399,16 @@ ScreenMode::GetDisplayMode(const screen_mode& mode, display_mode& displayMode)
 	if (bestIndex == -1)
 		return false;
 
-	// now, we are better of using GMT formula, but
-	// as we don't have it, we just tune the pixel
-	// clock of the best mode.
-
 	displayMode = fModeList[bestIndex];
 	displayMode.h_display_start = 0;
 	displayMode.v_display_start = 0;
 
-	// after some fiddling, it looks like this is the formula
-	// used by the original panel (notice that / 10 happens before
-	// multiplying with refresh rate - this leads to different
-	// rounding)
-	displayMode.timing.pixel_clock = ((uint32)displayMode.timing.h_total
-		* displayMode.timing.v_total / 10 * int32(mode.refresh * 10)) / 1000;
+	// For the mode selected by the width, height, and refresh rate, compute
+	// the video timing parameters for the mode by using the VESA Generalized
+	// Timing Formula (GTF).
+
+	ComputeGTFVideoTiming(displayMode.timing.h_display,
+		displayMode.timing.v_display, mode.refresh, displayMode.timing);
 
 	return true;
 }

@@ -9,6 +9,7 @@ UsePrivateHeaders [ FDirName graphics radeon ] ;
 Preference Screen : 
 	AlertView.cpp
 	AlertWindow.cpp
+	gtf.cpp
 	MonitorView.cpp
 	multimon.cpp
 	RefreshSlider.cpp
