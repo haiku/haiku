@@ -83,6 +83,19 @@ TargetAddressRangeList::CoveringRange() const
 }
 
 
+bool
+TargetAddressRangeList::Contains(target_addr_t address) const
+{
+	int32 count = fRanges.Size();
+	for (int32 i = 0; i < count; i++) {
+		if (fRanges[i].Contains(address))
+			return true;
+	}
+
+	return false;
+}
+
+
 TargetAddressRangeList&
 TargetAddressRangeList::operator=(const TargetAddressRangeList& other)
 {

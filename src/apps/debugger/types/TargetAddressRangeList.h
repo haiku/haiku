@@ -30,6 +30,8 @@ public:
 			target_addr_t		LowestAddress() const;
 			TargetAddressRange	CoveringRange() const;
 
+			bool				Contains(target_addr_t address) const;
+
 			TargetAddressRangeList& operator=(
 									const TargetAddressRangeList& other);
 
