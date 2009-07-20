@@ -96,9 +96,6 @@ CompilationUnit::SetAddressRanges(TargetAddressRangeList* ranges)
 target_addr_t
 CompilationUnit::AddressRangeBase() const
 {
-	if (fAddressRanges != NULL)
-		return fAddressRanges->LowestAddress();
-
 	return fUnitEntry != NULL ? fUnitEntry->LowPC() : 0;
 }
 
