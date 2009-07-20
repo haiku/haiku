@@ -55,8 +55,9 @@ SharedImage::Init(team_id owner, image_id imageID)
 	error = debug_create_image_symbol_iterator(lookupContext, imageID,
 		&iterator);
 	if (error != B_OK) {
-		fprintf(stderr, "Failed to init symbol iterator: %s\n",
-			strerror(error));
+		fprintf(stderr, "Failed to init symbol iterator for image %ld: %s\n",
+			imageID, strerror(error));
+		debug_delete_symbol_lookup_context(lookupContext);
 		return error;
 	}
 
@@ -78,8 +79,8 @@ SharedImage::Init(const char* path)
 	debug_symbol_iterator* iterator;
 	status_t error = debug_create_file_symbol_iterator(path, &iterator);
 	if (error != B_OK) {
-		fprintf(stderr, "Failed to init symbol iterator: %s\n",
-			strerror(error));
+		fprintf(stderr, "Failed to init symbol iterator for \"%s\": %s\n",
+			path, strerror(error));
 		return error;
 	}
 

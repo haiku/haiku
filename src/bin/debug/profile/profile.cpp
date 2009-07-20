@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <ctype.h>
 #include <errno.h>
 #include <getopt.h>
@@ -77,6 +78,8 @@ static const char* kUsage =
 	"  -k             - Don't check kernel images for hits.\n"
 	"  -l             - Also profile loading the executable.\n"
 	"  -o <output>    - Print the results to file <output>.\n"
+	"  -r, --recorded - Don't profile, but evaluate a recorded kernel profile\n"
+	"                   data.\n"
 	"  -s <depth>     - Number of return address samples to take from the\n"
 	"                   caller stack per tick. If the topmost address doesn't\n"
 	"                   hit a known image, the next address will be matched\n"
@@ -370,9 +373,22 @@ private:
 		ObjectDeleter<SharedImage> imageDeleter(sharedImage);
 
 		// load the symbols
-		status_t error = teamID == B_SYSTEM_TEAM
-			? sharedImage->Init(teamID, imageInfo.id)
-			: sharedImage->Init(imageInfo.name);
+		status_t error;
+		if (teamID == B_SYSTEM_TEAM) {
+			error = sharedImage->Init(teamID, imageInfo.id);
+			if (error != B_OK) {
+				// The image has obviously been unloaded already, try to get
+				// it by path.
+				BString name = imageInfo.name;
+				if (name.FindFirst('/') == -1) {
+					// modules without a path are likely to be boot modules
+					name.Prepend("/system/add-ons/kernel/boot/");
+				}
+
+				error = sharedImage->Init(name.String());
+			}
+		} else
+			error = sharedImage->Init(imageInfo.name);
 		if (error != B_OK)
 			return error;
 
@@ -665,118 +681,85 @@ profile_all(const char* const* programArgs, int programArgCount)
 }
 
 
-int
-main(int argc, const char* const* argv)
+static void
+dump_recorded()
 {
-	int32 stackDepth = 0;
-	const char* outputFile = NULL;
+	// retrieve recorded samples and parameters
+	system_profiler_parameters profilerParameters;
+	status_t status = _kern_system_profiler_recorded(&profilerParameters);
+	if (status != B_OK) {
+		fprintf(stderr, "%s: Failed to get recorded profiling buffer: %s\n",
+			kCommandName, strerror(status));
+		exit(1);
+	}
 
-	while (true) {
-		static struct option sLongOptions[] = {
-			{ "all", no_argument, 0, 'a' },
-			{ "help", no_argument, 0, 'h' },
-			{ 0, 0, 0, 0 }
-		};
+	// set global options to those of the profiler parameters
+	gOptions.interval = profilerParameters.interval;
+	gOptions.stack_depth = profilerParameters.stack_depth;
 
-		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+acCfhi:klo:s:v:",
-			sLongOptions, NULL);
-		if (c == -1)
-			break;
+	// create an area for the sample buffer
+	area_info info;
+	status = get_area_info(profilerParameters.buffer_area, &info);
+	if (status != B_OK) {
+		fprintf(stderr, "%s: Recorded profiling buffer invalid: %s\n",
+			kCommandName, strerror(status));
+		exit(1);
+	}
 
-		switch (c) {
-			case 'a':
-				gOptions.profile_all = true;
-				break;
-			case 'c':
-				gOptions.profile_threads = false;
-				break;
-			case 'C':
-				gOptions.profile_teams = false;
-				break;
-			case 'f':
-				gOptions.stack_depth = 64;
-				gOptions.analyze_full_stack = true;
-				break;
-			case 'h':
-				print_usage_and_exit(false);
-				break;
-			case 'i':
-				gOptions.interval = atol(optarg);
-				break;
-			case 'k':
-				gOptions.profile_kernel = false;
-				break;
-			case 'l':
-				gOptions.profile_loading = true;
-				break;
-			case 'o':
-				outputFile = optarg;
-				break;
-			case 's':
-				stackDepth = atol(optarg);
-				break;
-			case 'v':
-				gOptions.callgrind_directory = optarg;
-				gOptions.analyze_full_stack = true;
-				gOptions.stack_depth = 64;
-				break;
-			default:
-				print_usage_and_exit(true);
-				break;
+	system_profiler_buffer_header* bufferHeader
+		= (system_profiler_buffer_header*)info.address;
+
+	uint8* bufferBase = (uint8*)(bufferHeader + 1);
+	size_t totalBufferSize = info.size - (bufferBase - (uint8*)bufferHeader);
+
+	// create a thread manager
+	ThreadManager threadManager(-1);	// TODO: We don't need a debugger port!
+
+	// get the current buffer
+	size_t bufferStart = bufferHeader->start;
+	size_t bufferSize = bufferHeader->size;
+	uint8* buffer = bufferBase + bufferStart;
+
+	if (bufferStart + bufferSize <= totalBufferSize) {
+		process_event_buffer(threadManager, buffer, bufferSize, -1);
+	} else {
+		size_t remainingSize = bufferStart + bufferSize - totalBufferSize;
+		if (!process_event_buffer(threadManager, buffer,
+				bufferSize - remainingSize, -1)) {
+			process_event_buffer(threadManager, bufferBase, remainingSize, -1);
 		}
 	}
 
-	if (!gOptions.profile_all && optind >= argc)
-		print_usage_and_exit(true);
-
-	if (stackDepth != 0)
-		gOptions.stack_depth = stackDepth;
-
-	if (outputFile != NULL) {
-		gOptions.output = fopen(outputFile, "w+");
-		if (gOptions.output == NULL) {
-			fprintf(stderr, "%s: Failed to open output file \"%s\": %s\n",
-				kCommandName, outputFile, strerror(errno));
-			exit(1);
-		}
-	} else
-		gOptions.output = stdout;
-
-	const char* const* programArgs = argv + optind;
-	int programArgCount = argc - optind;
-
-	if (gOptions.profile_all) {
-		profile_all(programArgs, programArgCount);
-		return 0;
+	// print results
+	int32 threadCount = threadManager.CountThreads();
+	for (int32 i = 0; i < threadCount; i++) {
+		Thread* thread = threadManager.ThreadAt(i);
+		thread->PrintResults();
 	}
+}
 
+
+static void
+profile_single(const char* const* programArgs, int programArgCount)
+{
 	// get thread/team to be debugged
-	thread_id threadID = -1;
-	team_id teamID = -1;
-//	if (programArgCount > 1
-//		|| !get_id(*programArgs, (traceTeam ? teamID : thread))) {
-		// we've been given an executable and need to load it
-		threadID = load_program(programArgs, programArgCount,
-			gOptions.profile_loading);
-		if (threadID < 0) {
-			fprintf(stderr, "%s: Failed to start `%s': %s\n", kCommandName,
-				programArgs[0], strerror(threadID));
-			exit(1);
-		}
-//	}
-
-	// get the team ID, if we have none yet
-	if (teamID < 0) {
-		thread_info threadInfo;
-		status_t error = get_thread_info(threadID, &threadInfo);
-		if (error != B_OK) {
-			fprintf(stderr, "%s: Failed to get info for thread %ld: %s\n",
-				kCommandName, threadID, strerror(error));
-			exit(1);
-		}
-		teamID = threadInfo.team;
+	thread_id threadID = load_program(programArgs, programArgCount,
+		gOptions.profile_loading);
+	if (threadID < 0) {
+		fprintf(stderr, "%s: Failed to start `%s': %s\n", kCommandName,
+			programArgs[0], strerror(threadID));
+		exit(1);
 	}
+
+	// get the team ID
+	thread_info threadInfo;
+	status_t error = get_thread_info(threadID, &threadInfo);
+	if (error != B_OK) {
+		fprintf(stderr, "%s: Failed to get info for thread %ld: %s\n",
+			kCommandName, threadID, strerror(error));
+		exit(1);
+	}
+	team_id teamID = threadInfo.team;
 
 	// create a debugger port
 	port_id debuggerPort = create_port(10, "debugger port");
@@ -899,6 +882,106 @@ main(int argc, const char* const* argv)
 		if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
 			continue_thread(message.origin.nub_port, message.origin.thread);
 	}
+}
 
+
+int
+main(int argc, const char* const* argv)
+{
+	int32 stackDepth = 0;
+	bool dumpRecorded = false;
+	const char* outputFile = NULL;
+
+	while (true) {
+		static struct option sLongOptions[] = {
+			{ "all", no_argument, 0, 'a' },
+			{ "help", no_argument, 0, 'h' },
+			{ "recorded", no_argument, 0, 'r' },
+			{ 0, 0, 0, 0 }
+		};
+
+		opterr = 0; // don't print errors
+		int c = getopt_long(argc, (char**)argv, "+acCfhi:klo:rs:v:",
+			sLongOptions, NULL);
+		if (c == -1)
+			break;
+
+		switch (c) {
+			case 'a':
+				gOptions.profile_all = true;
+				break;
+			case 'c':
+				gOptions.profile_threads = false;
+				break;
+			case 'C':
+				gOptions.profile_teams = false;
+				break;
+			case 'f':
+				gOptions.stack_depth = 64;
+				gOptions.analyze_full_stack = true;
+				break;
+			case 'h':
+				print_usage_and_exit(false);
+				break;
+			case 'i':
+				gOptions.interval = atol(optarg);
+				break;
+			case 'k':
+				gOptions.profile_kernel = false;
+				break;
+			case 'l':
+				gOptions.profile_loading = true;
+				break;
+			case 'o':
+				outputFile = optarg;
+				break;
+			case 'r':
+				dumpRecorded = true;
+				break;
+			case 's':
+				stackDepth = atol(optarg);
+				break;
+			case 'v':
+				gOptions.callgrind_directory = optarg;
+				gOptions.analyze_full_stack = true;
+				gOptions.stack_depth = 64;
+				break;
+			default:
+				print_usage_and_exit(true);
+				break;
+		}
+	}
+
+	if ((!gOptions.profile_all && !dumpRecorded && optind >= argc)
+		|| (dumpRecorded && optind != argc))
+		print_usage_and_exit(true);
+
+	if (stackDepth != 0)
+		gOptions.stack_depth = stackDepth;
+
+	if (outputFile != NULL) {
+		gOptions.output = fopen(outputFile, "w+");
+		if (gOptions.output == NULL) {
+			fprintf(stderr, "%s: Failed to open output file \"%s\": %s\n",
+				kCommandName, outputFile, strerror(errno));
+			exit(1);
+		}
+	} else
+		gOptions.output = stdout;
+
+	if (dumpRecorded) {
+		dump_recorded();
+		return 0;
+	}
+
+	const char* const* programArgs = argv + optind;
+	int programArgCount = argc - optind;
+
+	if (gOptions.profile_all) {
+		profile_all(programArgs, programArgCount);
+		return 0;
+	}
+
+	profile_single(programArgs, programArgCount);
 	return 0;
 }

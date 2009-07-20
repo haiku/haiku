@@ -1362,10 +1362,13 @@ _user_system_profiler_recorded(struct system_profiler_parameters* userParameters
 	if (newArea < 0)
 		return newArea;
 
-	sRecordedParameters->buffer_area = newArea;
+	status_t status = set_area_protection(newArea, B_READ_AREA);
+	if (status == B_OK) {
+		sRecordedParameters->buffer_area = newArea;
 
-	status_t status = user_memcpy(userParameters, sRecordedParameters,
-		sizeof(system_profiler_parameters));
+		status = user_memcpy(userParameters, sRecordedParameters,
+			sizeof(system_profiler_parameters));
+	}
 	if (status != B_OK)
 		delete_area(newArea);
 

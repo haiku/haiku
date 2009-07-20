@@ -5,6 +5,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+
 #include <stdio.h>
 
 #include <OS.h>
@@ -41,7 +42,6 @@ struct Options {
 
 extern Options gOptions;
 extern const char* kCommandName;
-
 
 
 #endif	// OPTIONS_H
