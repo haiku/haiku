@@ -171,6 +171,10 @@ BMailProtocol::BMailProtocol(BMessage *settings, BMailChainRunner *run)
 		if (runner->Chain()->MetaData()->HasString("path")) {
 			BNode node(runner->Chain()->MetaData()->FindString("path"));
 			if (node.InitCheck() >= B_OK) {
+				// We already have a directory so we can try to read metadata
+				// from it. Note that it is normal for this directory not to
+				// be founf on the first run as it will be later created by
+				// the INBOX system filter.
 				attr_info info;
 				if (node.GetAttrInfo(attr_name.String(),&info) < B_OK) {
 					if (runner->Chain()->MetaData()->FindFlat("manifest", manifest) == B_OK) {
@@ -183,7 +187,7 @@ BMailProtocol::BMailProtocol(BMessage *settings, BMailChainRunner *run)
 					manifest->Unflatten(manifest->TypeCode(),flatmanifest,info.size);
 					free(flatmanifest);
 				}
-			} else runner->ShowError("Error while reading account manifest: cannot use destination directory.");
+			}
 		} else runner->ShowError("Error while reading account manifest: no destination directory exists.");
 	}
 	
