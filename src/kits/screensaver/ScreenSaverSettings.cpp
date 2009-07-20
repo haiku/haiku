@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,8 +7,14 @@
  *		Jérôme Duval, jerome.duval@free.fr
  */
 
+/*!	This is the class that wraps the screensaver settings, as well as the
+	settings of the screensaver preference application.
+*/
+
 
 #include "ScreenSaverSettings.h"
+
+#include <string.h>
 
 #include <Debug.h>
 #include <File.h>
@@ -17,18 +23,14 @@
 #include <StorageDefs.h>
 #include <String.h>
 
-#include <string.h>
 
-
-ScreenSaverSettings::ScreenSaverSettings() 
+ScreenSaverSettings::ScreenSaverSettings()
 {
 	BPath path;
   	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 
 	fSettingsPath = path;
 	fSettingsPath.Append("ScreenSaver_settings", true);
-	fNetworkPath = path;
-  	fNetworkPath.Append("network", true);
 
 	Defaults();
 }
@@ -36,7 +38,7 @@ ScreenSaverSettings::ScreenSaverSettings()
 
 //! Load the flattened settings BMessage from disk and parse it.
 bool
-ScreenSaverSettings::Load() 
+ScreenSaverSettings::Load()
 {
 	BFile file(fSettingsPath.Path(), B_READ_ONLY);
 	if (file.InitCheck() != B_OK)
@@ -86,20 +88,7 @@ ScreenSaverSettings::Load()
 		fModuleName = string;
 
 	if (IsNetworkPassword()) {
-		FILE *networkFile = NULL;
-		char buffer[512], *start;
-		// TODO: this only works under R5 net_server!
-		// This ugly piece opens the networking file and reads the password, if it exists.
-		if ((networkFile = fopen(fNetworkPath.Path(),"r")))
-		while (fgets(buffer, 512, networkFile) != NULL) {
-			if ((start = strstr(buffer,"PASSWORD = ")) != NULL) {
-				char password[14];
-				strncpy(password, start+11,strlen(start+11)-1);
-				password[strlen(start+11)-1] = 0;
-				fPassword = password;
-				break;
-			}
-		}
+		// TODO: this does not work yet
 	}
 
 	return true;
@@ -111,16 +100,19 @@ ScreenSaverSettings::Defaults()
 {
 	fWindowFrame = BRect(96.5, 77.0, 542.5, 402);
 	fWindowTab = 0;
-	fTimeFlags = ENABLE_SAVER;
 
-	// Times are in microseconds = seconds * 1000000LL
-	fBlankTime = 900*1000000LL; // 15 minutes
-	
-	// All these times are referenced from after the above, i.e. when the screen
-	// saver is running. So standby will start 5 minutes after the screen saver.
-	fStandByTime = 300*1000000LL; // 5 minutes
-	fSuspendTime = 300*1000000LL; // 5 minutes
-	fOffTime = 300*1000000LL; // 5 minutes
+	// Enable blanker + turning off the screen
+	fTimeFlags = ENABLE_SAVER | ENABLE_DPMS_STAND_BY | ENABLE_DPMS_SUSPEND
+		| ENABLE_DPMS_OFF;
+
+	// Times are in microseconds
+	fBlankTime = 900 * 1000000LL;	// 15 minutes
+
+	// All these times are relative to fBlankTime; standby will start 5 minutes
+	// after the screen saver.
+	fStandByTime = 300 * 1000000LL;	// 5 minutes
+	fSuspendTime = 300 * 1000000LL;
+	fOffTime = 300 * 1000000LL;
 
 	fBlankCorner = NO_CORNER;
 	fNeverBlankCorner = NO_CORNER;
@@ -129,7 +121,7 @@ ScreenSaverSettings::Defaults()
 	// This time is NOT referenced to when the screen saver starts, but to when
 	// idle time starts, like fBlankTime. By default it is the same as
 	// fBlankTime.
-	fPasswordTime = 900*1000000LL; // 15 minutes
+	fPasswordTime = 900 * 1000000LL;
 	fPassword = "";
 	fLockMethod = "custom";
 
@@ -137,7 +129,7 @@ ScreenSaverSettings::Defaults()
 }
 
 
-BMessage &
+BMessage&
 ScreenSaverSettings::Message()
 {
 	// We can't just empty the message, because the module states are stored
@@ -180,16 +172,16 @@ ScreenSaverSettings::Message()
 
 
 status_t
-ScreenSaverSettings::GetModuleState(const char *name, BMessage *stateMsg) 
+ScreenSaverSettings::GetModuleState(const char* name, BMessage* stateMsg)
 {
 	BString stateName("modulesettings_");
 	stateName += name;
-	return fSettings.FindMessage(stateName.String(), stateMsg);	
+	return fSettings.FindMessage(stateName.String(), stateMsg);
 }
 
 
 void
-ScreenSaverSettings::SetModuleState(const char *name, BMessage *stateMsg) 
+ScreenSaverSettings::SetModuleState(const char* name, BMessage* stateMsg)
 {
 	BString stateName("modulesettings_");
 	stateName += name;
@@ -198,12 +190,13 @@ ScreenSaverSettings::SetModuleState(const char *name, BMessage *stateMsg)
 }
 
 
-void 
-ScreenSaverSettings::Save() 
+void
+ScreenSaverSettings::Save()
 {
   	BMessage &settings = Message();
 	PRINT_OBJECT(settings);
-	BFile file(fSettingsPath.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	BFile file(fSettingsPath.Path(),
+		B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 	if (file.InitCheck() != B_OK || settings.Flatten(&file) != B_OK)
 		fprintf(stderr, "Problem while saving screensaver preferences file!\n");
 }
