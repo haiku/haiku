@@ -17,6 +17,7 @@
 #include "DwarfUtils.h"
 #include "FunctionID.h"
 #include "FunctionParameterID.h"
+#include "LocalVariableID.h"
 #include "RegisterMap.h"
 #include "StringUtils.h"
 #include "ValueLocation.h"
@@ -60,6 +61,54 @@ protected:
 private:
 	FunctionID*		fFunctionID;
 	const BString	fName;
+};
+
+
+// #pragma mark - DwarfLocalVariableID
+
+
+struct DwarfInterfaceFactory::DwarfLocalVariableID : public LocalVariableID {
+
+	DwarfLocalVariableID(FunctionID* functionID, const BString& name,
+		int32 line, int32 column)
+		:
+		fFunctionID(functionID),
+		fName(name),
+		fLine(line),
+		fColumn(column)
+	{
+		fFunctionID->AcquireReference();
+	}
+
+	virtual ~DwarfLocalVariableID()
+	{
+		fFunctionID->ReleaseReference();
+	}
+
+	virtual bool operator==(const ObjectID& other) const
+	{
+		const DwarfLocalVariableID* otherID
+			= dynamic_cast<const DwarfLocalVariableID*>(&other);
+		return otherID != NULL && *fFunctionID == *otherID->fFunctionID
+			&& fName == otherID->fName && fLine == otherID->fLine
+			&& fColumn == otherID->fColumn;
+	}
+
+protected:
+	virtual uint32 ComputeHashValue() const
+	{
+		uint32 hash = fFunctionID->HashValue();
+		hash = hash * 19 + StringUtils::HashValue(fName);
+		hash = hash * 19 + fLine;
+		hash = hash * 19 + fColumn;
+		return hash;
+	}
+
+private:
+	FunctionID*		fFunctionID;
+	const BString	fName;
+	int32			fLine;
+	int32			fColumn;
 };
 
 
@@ -521,61 +570,43 @@ parameterEntry, name.String());
 		return B_NO_MEMORY;
 	Reference<DwarfFunctionParameterID> idReference(id, true);
 
-	// get the type entry
-	DIEFormalParameter* typeOwnerEntry = parameterEntry;
-	DIEType* typeEntry = typeOwnerEntry->GetType();
-	if (typeEntry == NULL) {
-		if (DIEFormalParameter* abstractOrigin
-				= dynamic_cast<DIEFormalParameter*>(
-					typeOwnerEntry->AbstractOrigin())) {
-			typeOwnerEntry = abstractOrigin;
-			typeEntry = typeOwnerEntry->GetType();
-		}
-	}
+	// create the variable
+	return _CreateVariable(id, name, _GetDIEType(parameterEntry),
+		parameterEntry->GetLocationDescription(), _parameter);
+}
 
-	if (typeEntry == NULL) {
-		if (DIEFormalParameter* specification
-				= dynamic_cast<DIEFormalParameter*>(
-					typeOwnerEntry->Specification())) {
-			typeOwnerEntry = specification;
-			typeEntry = typeOwnerEntry->GetType();
-		}
-	}
 
-	if (typeEntry == NULL)
-		return B_BAD_VALUE;
+status_t
+DwarfInterfaceFactory::CreateLocalVariable(FunctionID* functionID,
+	DIEVariable* variableEntry, Variable*& _variable)
+{
+	// get the name
+	BString name;
+	DwarfUtils::GetDIEName(variableEntry, name);
+printf("DwarfInterfaceFactory::CreateLocalVariable(DIE: %p): name: \"%s\"\n",
+variableEntry, name.String());
 
-	// get the location, if possible
-	ValueLocation* location = new(std::nothrow) ValueLocation;
-	if (location == NULL)
+	// get the declaration location
+	int32 line = -1;
+	int32 column = -1;
+	const char* file;
+	const char* directory;
+	DwarfUtils::GetDeclarationLocation(fFile, variableEntry, directory, file,
+		line, column);
+		// TODO: If the declaration location is unavailable, we should probably
+		// add a component to the ID to make it unique nonetheless (the name
+		// might not suffice).
+
+	// create the ID
+	DwarfLocalVariableID* id = new(std::nothrow) DwarfLocalVariableID(
+		functionID, name, line, column);
+	if (id == NULL)
 		return B_NO_MEMORY;
-	Reference<ValueLocation> locationReference(location, true);
-
-	LocationDescription* locationDescription
-		= parameterEntry->GetLocationDescription();
-	if (locationDescription->IsValid()) {
-		fFile->ResolveLocation(fCompilationUnit,
-			fSubprogramEntry, locationDescription, fTargetInterface,
-			fInstructionPointer, 0, fFramePointer, *location);
-location->Dump();
-	}
-
-	// create the type
-	DwarfType* type;
-	status_t error = _CreateType(typeEntry, type);
-	if (error != B_OK)
-		return error;
-	Reference<DwarfType> typeReference(type, true);
-
-	_FixLocation(location, type);
+	Reference<DwarfLocalVariableID> idReference(id, true);
 
 	// create the variable
-	Variable* variable = new(std::nothrow) Variable(id, name, type, location);
-	if (variable == NULL)
-		return B_NO_MEMORY;
-
-	_parameter = variable;
-	return B_OK;
+	return _CreateVariable(id, name, _GetDIEType(variableEntry),
+		variableEntry->GetLocationDescription(), _variable);
 }
 
 
@@ -1050,6 +1081,46 @@ DwarfInterfaceFactory::_CreateArrayType(const BString& name,
 
 
 status_t
+DwarfInterfaceFactory::_CreateVariable(ObjectID* id, const BString& name,
+	DIEType* typeEntry, LocationDescription* locationDescription,
+	Variable*& _variable)
+{
+	if (typeEntry == NULL)
+		return B_BAD_VALUE;
+
+	// get the location, if possible
+	ValueLocation* location = new(std::nothrow) ValueLocation;
+	if (location == NULL)
+		return B_NO_MEMORY;
+	Reference<ValueLocation> locationReference(location, true);
+
+	if (locationDescription->IsValid()) {
+		fFile->ResolveLocation(fCompilationUnit,
+			fSubprogramEntry, locationDescription, fTargetInterface,
+			fInstructionPointer, 0, fFramePointer, *location);
+location->Dump();
+	}
+
+	// create the type
+	DwarfType* type;
+	status_t error = _CreateType(typeEntry, type);
+	if (error != B_OK)
+		return error;
+	Reference<DwarfType> typeReference(type, true);
+
+	_FixLocation(location, type);
+
+	// create the variable
+	Variable* variable = new(std::nothrow) Variable(id, name, type, location);
+	if (variable == NULL)
+		return B_NO_MEMORY;
+
+	_variable = variable;
+	return B_OK;
+}
+
+
+status_t
 DwarfInterfaceFactory::_ResolveTypedef(DIETypedef* entry,
 	DIEType*& _baseTypeEntry)
 {
@@ -1203,4 +1274,29 @@ location, type, type->GetDIEType());
 printf("  set single piece size to %llu\n", type->ByteSize());
 }
 	}
+}
+
+
+template<typename EntryType>
+/*static*/ DIEType*
+DwarfInterfaceFactory::_GetDIEType(EntryType* entry)
+{
+	if (DIEType* typeEntry = entry->GetType())
+		return typeEntry;
+
+	if (EntryType* abstractOrigin = dynamic_cast<EntryType*>(
+			entry->AbstractOrigin())) {
+		entry = abstractOrigin;
+		if (DIEType* typeEntry = entry->GetType())
+			return typeEntry;
+	}
+
+	if (EntryType* specification = dynamic_cast<EntryType*>(
+			entry->Specification())) {
+		entry = specification;
+		if (DIEType* typeEntry = entry->GetType())
+			return typeEntry;
+	}
+
+	return NULL;
 }

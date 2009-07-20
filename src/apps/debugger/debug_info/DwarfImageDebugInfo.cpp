@@ -147,6 +147,22 @@ private:
 };
 
 
+// #pragma mark - EntryListWrapper
+
+
+/*!	Wraps a DebugInfoEntryList, which is a typedef and thus cannot appear in
+	the header, since our policy disallows us to include DWARF headers there.
+*/
+struct DwarfImageDebugInfo::EntryListWrapper {
+	const DebugInfoEntryList&	list;
+
+	EntryListWrapper(const DebugInfoEntryList& list)
+		:
+		list(list)
+	{
+	}
+};
+
 
 // #pragma mark - DwarfImageDebugInfo
 
@@ -313,6 +329,7 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 		functionInstance->GetFunctionDebugInfo());
 	if (function == NULL)
 		return B_BAD_VALUE;
+printf("DwarfImageDebugInfo::CreateFrame(): subprogram DIE: %p\n", function->SubprogramEntry());
 
 	int32 registerCount = fArchitecture->CountRegisters();
 	const Register* registers = fArchitecture->Registers();
@@ -344,9 +361,9 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	target_addr_t instructionPointer
 		= cpuState->InstructionPointer() - fRelocationDelta;
 	target_addr_t framePointer;
-	error = fFile->UnwindCallFrame(function->GetCompilationUnit(),
-		function->SubprogramEntry(), instructionPointer, &inputInterface,
-		&outputInterface, framePointer);
+	CompilationUnit* unit = function->GetCompilationUnit();
+	error = fFile->UnwindCallFrame(unit, function->SubprogramEntry(),
+		instructionPointer, &inputInterface, &outputInterface, framePointer);
 	if (error != B_OK)
 		return B_UNSUPPORTED;
 
@@ -382,9 +399,8 @@ if (previousCpuState->GetRegisterValue(reg, value)) {
 
 	// create function parameter objects
 	DIESubprogram* subprogramEntry = function->SubprogramEntry();
-	DwarfInterfaceFactory factory(fFile, function->GetCompilationUnit(),
-		subprogramEntry, instructionPointer, framePointer, &inputInterface,
-		fromDwarfMap);
+	DwarfInterfaceFactory factory(fFile, unit, subprogramEntry,
+		instructionPointer, framePointer, &inputInterface, fromDwarfMap);
 	error = factory.Init();
 	if (error != B_OK)
 		return error;
@@ -403,12 +419,16 @@ if (previousCpuState->GetRegisterValue(reg, value)) {
 				!= B_OK) {
 			continue;
 		}
+		Reference<Variable> parameterReference(parameter, true);
 
-		if (!frame->AddParameter(parameter)) {
-			parameter->ReleaseReference();
+		if (!frame->AddParameter(parameter))
 			return B_NO_MEMORY;
-		}
 	}
+
+	// create objects for the local variables
+	_CreateLocalVariables(unit, frame, functionID, factory, instructionPointer,
+		functionInstance->Address() - fRelocationDelta,
+		subprogramEntry->Variables(), subprogramEntry->Blocks());
 
 	_previousFrame = frameReference.Detach();
 	_previousCpuState = previousCpuStateReference.Detach();
@@ -722,4 +742,76 @@ DwarfImageDebugInfo::_GetSourceFileIndex(CompilationUnit* unit,
 	}
 
 	return -1;
+}
+
+
+status_t
+DwarfImageDebugInfo::_CreateLocalVariables(CompilationUnit* unit,
+	StackFrame* frame, FunctionID* functionID, DwarfInterfaceFactory& factory,
+	target_addr_t instructionPointer, target_addr_t lowPC,
+	const EntryListWrapper& variableEntries,
+	const EntryListWrapper& blockEntries)
+{
+printf("DwarfImageDebugInfo::_CreateLocalVariables(): ip: %#llx, low PC: %#llx\n",
+instructionPointer, lowPC);
+	// iterate through the variables and add the ones in scope
+	for (DebugInfoEntryList::ConstIterator it
+			= variableEntries.list.GetIterator();
+		DIEVariable* variableEntry = dynamic_cast<DIEVariable*>(it.Next());) {
+printf("  variableEntry %p, scope start: %llu\n", variableEntry, variableEntry->StartScope());
+		// check the variable's scope
+		if (instructionPointer < lowPC + variableEntry->StartScope())
+			continue;
+
+		// add the variable
+		Variable* variable;
+		if (factory.CreateLocalVariable(functionID, variableEntry, variable)
+				!= B_OK) {
+			continue;
+		}
+		Reference<Variable> variableReference(variable, true);
+
+		if (!frame->AddLocalVariable(variable))
+			return B_NO_MEMORY;
+	}
+
+	// iterate through the blocks and find the one we're currently in (if any)
+	for (DebugInfoEntryList::ConstIterator it = blockEntries.list.GetIterator();
+		DIELexicalBlock* block = dynamic_cast<DIELexicalBlock*>(it.Next());) {
+printf("  lexical block: %p\n", block);
+
+		// check whether the block has low/high PC attributes
+		if (block->LowPC() != 0) {
+printf("    has lowPC\n");
+			// yep, compare with the instruction pointer
+			if (instructionPointer < block->LowPC()
+				|| instructionPointer >= block->HighPC()) {
+				continue;
+			}
+		} else {
+printf("    no lowPC\n");
+			// check the address ranges instead
+			TargetAddressRangeList* rangeList = fFile->ResolveRangeList(unit,
+				block->AddressRangesOffset());
+			if (rangeList == NULL)
+{
+printf("    failed to get ranges\n");
+				continue;
+}
+			Reference<TargetAddressRangeList> rangeListReference(rangeList,
+				true);
+
+			if (!rangeList->Contains(instructionPointer))
+{
+printf("    ranges don't contain IP\n");
+				continue;
+}
+		}
+
+		// found a block -- recurse
+		return _CreateLocalVariables(unit, frame, functionID, factory,
+			instructionPointer, lowPC, block->Variables(), block->Blocks());
+	}
+
+	return B_OK;
 }

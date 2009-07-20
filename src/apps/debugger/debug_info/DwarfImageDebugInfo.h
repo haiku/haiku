@@ -17,10 +17,12 @@
 
 class Architecture;
 class CompilationUnit;
+class DwarfInterfaceFactory;
 class DwarfFile;
 class ElfSegment;
 class FileManager;
 class FileSourceCode;
+class FunctionID;
 class LocatableFile;
 class SourceCode;
 class TeamMemory;
@@ -65,6 +67,7 @@ public:
 
 private:
 			struct UnwindTargetInterface;
+			struct EntryListWrapper;
 
 private:
 			status_t 			_AddSourceCodeInfo(CompilationUnit* unit,
@@ -72,6 +75,14 @@ private:
 									int32 fileIndex);
 			int32				_GetSourceFileIndex(CompilationUnit* unit,
 									LocatableFile* sourceFile) const;
+
+			status_t			_CreateLocalVariables(CompilationUnit* unit,
+									StackFrame* frame, FunctionID* functionID,
+									DwarfInterfaceFactory& factory,
+									target_addr_t instructionPointer,
+									target_addr_t lowPC,
+									const EntryListWrapper& variableEntries,
+									const EntryListWrapper& blockEntries);
 
 private:
 			BLocker				fLock;

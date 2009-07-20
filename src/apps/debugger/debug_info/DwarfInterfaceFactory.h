@@ -23,9 +23,12 @@ class DIEModifiedType;
 class DIESubprogram;
 class DIEType;
 class DIETypedef;
+class DIEVariable;
 class DwarfFile;
 class DwarfTargetInterface;
 class FunctionID;
+class LocationDescription;
+class ObjectID;
 class RegisterMap;
 class Type;
 class ValueLocation;
@@ -51,9 +54,14 @@ public:
 									DIEFormalParameter* parameterEntry,
 									Variable*& _parameter);
 									// returns reference
+			status_t			CreateLocalVariable(FunctionID* functionID,
+									DIEVariable* variableEntry,
+									Variable*& _variable);
+									// returns reference
 
 private:
 			struct DwarfFunctionParameterID;
+			struct DwarfLocalVariableID;
 			struct DwarfType;
 			struct DwarfDataMember;
 			struct DwarfPrimitiveType;
@@ -91,6 +99,11 @@ private:
 									DIEArrayType* typeEntry,
 									DwarfType*& _type);
 
+			status_t			_CreateVariable(ObjectID* id,
+									const BString& name, DIEType* typeEntry,
+									LocationDescription* locationDescription,
+									Variable*& _variable);
+
 			status_t			_ResolveTypedef(DIETypedef* entry,
 									DIEType*& _baseTypeEntry);
 			status_t			_ResolveTypeByteSize(DIEType* typeEntry,
@@ -98,6 +111,9 @@ private:
 
 			void				_FixLocation(ValueLocation* location,
 									DwarfType* type);
+
+	template<typename EntryType>
+	static	DIEType*			_GetDIEType(EntryType* entry);
 
 private:
 			DwarfFile*			fFile;
