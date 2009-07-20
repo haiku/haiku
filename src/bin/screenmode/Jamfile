@@ -11,8 +11,9 @@ BinCommand screenmode :
 	screenmode.cpp
 
 	# from Screen preferences
-	ScreenMode.cpp
+	gtf.cpp
 	multimon.cpp
+	ScreenMode.cpp
 
 	: be $(TARGET_LIBSUPC++)
 ;
