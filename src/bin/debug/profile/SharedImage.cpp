@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "SharedImage.h"
 
 #include <stdio.h>
@@ -45,6 +46,7 @@ SharedImage::Init(team_id owner, image_id imageID)
 			"for team %ld: %s\n", kCommandName, owner, strerror(error));
 		return error;
 	}
+
 	// TODO: Creating a symbol lookup just for loading the symbols of a single
 	// image is unnecessarily expensive.
 
@@ -55,7 +57,6 @@ SharedImage::Init(team_id owner, image_id imageID)
 	if (error != B_OK) {
 		fprintf(stderr, "Failed to init symbol iterator: %s\n",
 			strerror(error));
-		debug_delete_symbol_iterator(iterator);
 		return error;
 	}
 
