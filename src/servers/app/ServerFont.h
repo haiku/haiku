@@ -112,10 +112,6 @@ class ServerFont {
 									{ return fStyle->CharMapCount(); }
 	inline	bool				Hinting() const;
 
-			FT_Face				GetTransformedFace(bool rotate,
-									bool shear) const;
-			void				PutTransformedFace(FT_Face face) const;
-
 			status_t			GetGlyphShapes(const char charArray[],
 									int32 numChars, BShape *shapeArray[]) const;
 
@@ -169,7 +165,10 @@ class ServerFont {
 
 protected:
 	friend class FontStyle;
-
+			FT_Face				GetTransformedFace(bool rotate,
+									bool shear) const;
+			void				PutTransformedFace(FT_Face face) const;
+			
 			FontStyle*			fStyle;
 			float				fSize;
 			float				fRotation;
