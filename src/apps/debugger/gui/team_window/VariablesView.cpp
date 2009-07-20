@@ -118,7 +118,6 @@ private:
 // #pragma mark - VariableTableModel
 
 
-#include "ObjectID.h"
 class VariablesView::VariableTableModel : public TableModel {
 public:
 	VariableTableModel()
@@ -200,9 +199,6 @@ public:
 			: fStackFrame->LocalVariableAt(rowIndex - parameterCount);
 		if (variable == NULL)
 			return false;
-printf("VariablesView::VariableTableModel::GetValueAt(%ld, %ld): "
-"variable id: %p, hash: %lu\n", rowIndex, columnIndex, variable->ID(),
-variable->ID()->HashValue());
 
 		switch (columnIndex) {
 			case 0:
@@ -211,15 +207,8 @@ variable->ID()->HashValue());
 			case 1:
 				if (fValues == NULL)
 					return false;
-//				return fValues->GetValue(variable->ID(), TypeComponentPath(),
-//					_value);
-{
-bool success = fValues->GetValue(variable->ID(), TypeComponentPath(), _value);
-if (!success)
-	return false;
-printf("  -> %llx\n", _value.ToUInt64());
-return true;
-}
+				return fValues->GetValue(variable->ID(), TypeComponentPath(),
+					_value);
 			default:
 				return false;
 		}
