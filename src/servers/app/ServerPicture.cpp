@@ -38,22 +38,22 @@
 using std::stack;
 
 class ShapePainter : public BShapeIterator {
-	public:
-		ShapePainter();
-		virtual ~ShapePainter();
+public:
+	ShapePainter();
+	virtual ~ShapePainter();
 
-		status_t Iterate(const BShape *shape);
+	status_t Iterate(const BShape *shape);
 
-		virtual status_t IterateMoveTo(BPoint *point);
-		virtual status_t IterateLineTo(int32 lineCount, BPoint *linePts);
-		virtual status_t IterateBezierTo(int32 bezierCount, BPoint *bezierPts);
-		virtual status_t IterateClose();
+	virtual status_t IterateMoveTo(BPoint *point);
+	virtual status_t IterateLineTo(int32 lineCount, BPoint *linePts);
+	virtual status_t IterateBezierTo(int32 bezierCount, BPoint *bezierPts);
+	virtual status_t IterateClose();
 
-		void Draw(View *view, BRect frame, bool filled);
+	void Draw(View *view, BRect frame, bool filled);
 
-	private:
-		stack<uint32> fOpStack;
-		stack<BPoint> fPtStack;
+private:
+	stack<uint32> fOpStack;
+	stack<BPoint> fPtStack;
 };
 
 
@@ -148,8 +148,8 @@ ShapePainter::Draw(View *view, BRect frame, bool filled)
 			view->ConvertToScreenForDrawing(&ptList[i]);
 		}
 
-		view->Window()->GetDrawingEngine()->DrawShape(frame, opCount, opList, ptCount, ptList,
-				filled);
+		view->Window()->GetDrawingEngine()->DrawShape(frame, opCount,
+			opList, ptCount, ptList, filled);
 
 		delete[] opList;
 		delete[] ptList;
@@ -161,29 +161,29 @@ ShapePainter::Draw(View *view, BRect frame, bool filled)
 static void
 get_polygon_frame(const BPoint *points, int32 numPoints, BRect *_frame)
 {
-	float l, t, r, b;
-
 	ASSERT(numPoints > 0);
-
-	l = r = points->x;
-	t = b = points->y;
+	
+	float left = points->x;
+	float top = points->y;
+	float right = left;
+	float bottom = top;
 
 	points++;
 	numPoints--;
 
 	while (numPoints--) {
-		if (points->x < l)
-			l = points->x;
-		if (points->x > r)
-			r = points->x;
-		if (points->y < t)
-			t = points->y;
-		if (points->y > b)
-			b = points->y;
+		if (points->x < left)
+			left = points->x;
+		if (points->x > right)
+			right = points->x;
+		if (points->y < top)
+			top = points->y;
+		if (points->y > bottom)
+			bottom = points->y;
 		points++;
 	}
 
-	_frame->Set(l, t, r, b);
+	_frame->Set(left, top, right, bottom);
 }
 
 
@@ -196,7 +196,8 @@ nop()
 static void
 move_pen_by(View *view, BPoint delta)
 {
-	view->CurrentState()->SetPenLocation(view->CurrentState()->PenLocation() + delta);
+	view->CurrentState()->SetPenLocation(
+		view->CurrentState()->PenLocation() + delta);
 }
 
 
@@ -236,8 +237,8 @@ static void
 stroke_round_rect(View *view, BRect rect, BPoint radii)
 {
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y,
-		false);
+	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x,
+		radii.y, false);
 }
 
 
@@ -245,8 +246,8 @@ static void
 fill_round_rect(View *view, BRect rect, BPoint radii)
 {
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y,
-		true);
+	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x,
+		radii.y, true);
 }
 
 
@@ -274,10 +275,11 @@ static void
 stroke_arc(View *view, BPoint center, BPoint radii, float startTheta,
 	float arcTheta)
 {
-	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x - 1,
-			center.y + radii.y - 1);
+	BRect rect(center.x - radii.x, center.y - radii.y,
+		center.x + radii.x - 1, center.y + radii.y - 1);
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, false);
+	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta,
+		arcTheta, false);
 }
 
 
@@ -285,18 +287,19 @@ static void
 fill_arc(View *view, BPoint center, BPoint radii, float startTheta,
 	float arcTheta)
 {
-	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x - 1,
-			center.y + radii.y - 1);
+	BRect rect(center.x - radii.x, center.y - radii.y,
+		center.x + radii.x - 1, center.y + radii.y - 1);
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, true);
+	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta,
+		arcTheta, true);
 }
 
 
 static void
 stroke_ellipse(View *view, BPoint center, BPoint radii)
 {
-	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x - 1,
-			center.y + radii.y - 1);
+	BRect rect(center.x - radii.x, center.y - radii.y,
+		center.x + radii.x - 1, center.y + radii.y - 1);
 	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->DrawEllipse(rect, false);
 }
@@ -305,8 +308,8 @@ stroke_ellipse(View *view, BPoint center, BPoint radii)
 static void
 fill_ellipse(View *view, BPoint center, BPoint radii)
 {
-	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x - 1,
-			center.y + radii.y - 1);
+	BRect rect(center.x - radii.x, center.y - radii.y,
+		center.x + radii.x - 1, center.y + radii.y - 1);
 	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->DrawEllipse(rect, true);
 }
@@ -320,7 +323,8 @@ stroke_polygon(View *view, int32 numPoints, const BPoint *viewPoints,
 		return;
 
 	if (numPoints <= 200) {
-		// fast path: no malloc/free, also avoid constructor/destructor calls
+		// fast path: no malloc/free, also avoid
+		// constructor/destructor calls
 		char data[200 * sizeof(BPoint)];
 		BPoint *points = (BPoint *)data;
 
@@ -329,10 +333,11 @@ stroke_polygon(View *view, int32 numPoints, const BPoint *viewPoints,
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
-		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
-			false, isClosed && numPoints > 2);
+		view->Window()->GetDrawingEngine()->DrawPolygon(points,
+			numPoints, polyFrame, false, isClosed && numPoints > 2);
 	} else {
-		 // avoid constructor/destructor calls by using malloc instead of new []
+		 // avoid constructor/destructor calls by
+		 // using malloc instead of new []
 		BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint));
 		if (!points)
 			return;
@@ -342,8 +347,8 @@ stroke_polygon(View *view, int32 numPoints, const BPoint *viewPoints,
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
-		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
-			false, isClosed && numPoints > 2);
+		view->Window()->GetDrawingEngine()->DrawPolygon(points,
+			numPoints, polyFrame, false, isClosed && numPoints > 2);
 		free(points);
 	}
 }
@@ -356,7 +361,8 @@ fill_polygon(View *view, int32 numPoints, const BPoint *viewPoints)
 		return;
 
 	if (numPoints <= 200) {
-		// fast path: no malloc/free, also avoid constructor/destructor calls
+		// fast path: no malloc/free, also avoid
+		// constructor/destructor calls
 		char data[200 * sizeof(BPoint)];
 		BPoint *points = (BPoint *)data;
 
@@ -365,10 +371,11 @@ fill_polygon(View *view, int32 numPoints, const BPoint *viewPoints)
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
-		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
-			true, true);
+		view->Window()->GetDrawingEngine()->DrawPolygon(points,
+			numPoints, polyFrame, true, true);
 	} else {
-		 // avoid constructor/destructor calls by using malloc instead of new []
+		 // avoid constructor/destructor calls by
+		 // using malloc instead of new []
 		BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint));
 		if (!points)
 			return;
@@ -378,8 +385,8 @@ fill_polygon(View *view, int32 numPoints, const BPoint *viewPoints)
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
-		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
-			true, true);
+		view->Window()->GetDrawingEngine()->DrawPolygon(points,
+			numPoints, polyFrame, true, true);
 		free(points);
 	}
 }
@@ -409,14 +416,15 @@ static void
 draw_string(View *view, const char *string, float deltaSpace,
 	float deltaNonSpace)
 {
-	// NOTE: the picture data was recorded with a "set pen location" command
-	// inserted before the "draw string" command, so we can use PenLocation()
+	// NOTE: the picture data was recorded with a "set pen location"
+	// command inserted before the "draw string" command, so we can
+	// use PenLocation()
 	BPoint location = view->CurrentState()->PenLocation();
 
 	escapement_delta delta = {deltaSpace, deltaNonSpace };
 	view->ConvertToScreenForDrawing(&location);
-	view->Window()->GetDrawingEngine()->DrawString(string, strlen(string),
-		location, &delta);
+	view->Window()->GetDrawingEngine()->DrawString(string,
+		strlen(string), location, &delta);
 
 	view->ConvertFromScreenForDrawing(&location);
 	view->CurrentState()->SetPenLocation(location);
@@ -427,8 +435,9 @@ draw_string(View *view, const char *string, float deltaSpace,
 
 
 static void
-draw_pixels(View *view, BRect src, BRect dest, int32 width, int32 height,
-	int32 bytesPerRow, int32 pixelFormat, int32 options, const void *data)
+draw_pixels(View *view, BRect src, BRect dest, int32 width,
+	int32 height, int32 bytesPerRow, int32 pixelFormat, int32 options,
+	const void *data)
 {
 	UtilityBitmap bitmap(BRect(0, 0, width - 1, height - 1),
 		(color_space)pixelFormat, 0, bytesPerRow);
@@ -448,7 +457,8 @@ draw_pixels(View *view, BRect src, BRect dest, int32 width, int32 height,
 static void
 draw_picture(View *view, BPoint where, int32 token)
 {
-	ServerPicture *picture = view->Window()->ServerWindow()->App()->FindPicture(token);
+	ServerPicture *picture =
+		view->Window()->ServerWindow()->App()->FindPicture(token);
 	if (picture != NULL) {
 		view->SetDrawingOrigin(where);
 		view->PushState();
@@ -474,8 +484,8 @@ static void
 clip_to_picture(View *view, BPicture *picture, BPoint pt,
 	bool clip_to_inverse_picture)
 {
-	printf("ClipToPicture(picture, BPoint(%.2f, %.2f), %s)\n", pt.x, pt.y,
-		clip_to_inverse_picture ? "inverse" : "");
+	printf("ClipToPicture(picture, BPoint(%.2f, %.2f), %s)\n",
+		pt.x, pt.y, clip_to_inverse_picture ? "inverse" : "");
 }
 
 
@@ -522,7 +532,8 @@ enter_font_state(View *view)
 static void
 exit_font_state(View *view)
 {
-	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
+	view->Window()->GetDrawingEngine()->SetFont(
+		view->CurrentState()->Font());
 }
 
 
@@ -552,13 +563,15 @@ set_drawing_mode(View *view, drawing_mode mode)
 
 
 static void
-set_line_mode(View *view, cap_mode capMode, join_mode joinMode, float miterLimit)
+set_line_mode(View *view, cap_mode capMode, join_mode joinMode,
+	float miterLimit)
 {
 	DrawState *state = view->CurrentState();
 	state->SetLineCapMode(capMode);
 	state->SetLineJoinMode(joinMode);
 	state->SetMiterLimit(miterLimit);
-	view->Window()->GetDrawingEngine()->SetStrokeMode(capMode, joinMode, miterLimit);
+	view->Window()->GetDrawingEngine()->SetStrokeMode(capMode, joinMode,
+		miterLimit);
 }
 
 
@@ -566,9 +579,10 @@ static void
 set_pen_size(View *view, float size)
 {
 	view->CurrentState()->SetPenSize(size);
-	view->Window()->GetDrawingEngine()->SetPenSize(view->CurrentState()->PenSize());
-		// DrawState::PenSize() returns the scaled pen size, so we need to
-		// use that value to set the drawing engine pen size.
+	view->Window()->GetDrawingEngine()->SetPenSize(
+		view->CurrentState()->PenSize());
+		// DrawState::PenSize() returns the scaled pen size, so we
+		// need to use that value to set the drawing engine pen size.
 }
 
 
@@ -602,8 +616,8 @@ set_scale(View *view, float scale)
 	view->CurrentState()->SetScale(scale);
 	view->Window()->ServerWindow()->ResyncDrawState();
 
-	// Update the drawing engine draw state, since some stuff (for example
-	// the pen size) needs to be recalculated.
+	// Update the drawing engine draw state, since some stuff
+	// (for example the pen size) needs to be recalculated.
 }
 
 
@@ -611,7 +625,7 @@ static void
 set_font_family(View *view, const char *family)
 {
 	FontStyle *fontStyle = gFontManager->GetStyle(family, NULL,
-					0, 0, 0);
+		0, 0, 0);
 	ServerFont font;
 	font.SetStyle(fontStyle);
 	view->CurrentState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);	
@@ -622,7 +636,7 @@ static void
 set_font_style(View *view, const char *style)
 {
 	FontStyle *fontStyle = gFontManager->GetStyle(NULL, style,
-					0, 0, 0);
+		0, 0, 0);
 	ServerFont font;
 	font.SetStyle(fontStyle);
 	view->CurrentState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
@@ -695,7 +709,8 @@ set_font_face(View *view, int32 face)
 static void
 set_blending_mode(View *view, int16 alphaSrcMode, int16 alphaFncMode)
 {
-	view->CurrentState()->SetBlendingMode((source_alpha)alphaSrcMode, (alpha_function)alphaFncMode);
+	view->CurrentState()->SetBlendingMode((source_alpha)alphaSrcMode,
+		(alpha_function)alphaFncMode);
 }
 
 
@@ -751,7 +766,7 @@ const static void *kTableEntries[] = {
 	(const void *)set_font_encoding,
 	(const void *)set_font_flags,
 	(const void *)set_font_shear,
-	(const void *)reserved,		// TODO: Marc Flerackers calls this "set_font_bpp". Investigate
+	(const void *)reserved,
 	(const void *)set_font_face,
 	(const void *)set_blending_mode
 };
@@ -793,7 +808,8 @@ ServerPicture::ServerPicture(const ServerPicture &picture)
 	if (mallocIO->SetSize(size) < B_OK)
 		return;
 
-	picture.fData->ReadAt(0, const_cast<void *>(mallocIO->Buffer()), size);
+	picture.fData->ReadAt(0, const_cast<void *>(mallocIO->Buffer()),
+		size);
 
 	PictureDataWriter::SetTo(fData);
 }
@@ -814,7 +830,8 @@ ServerPicture::ServerPicture(const char *fileName, const int32 &offset)
 		return;
 
 	BPrivate::Storage::OffsetFile *offsetFile =
-		new (std::nothrow) BPrivate::Storage::OffsetFile(fFile, (off_t)offset);
+		new (std::nothrow) BPrivate::Storage::OffsetFile(fFile,
+			(off_t)offset);
 	if (offsetFile == NULL || offsetFile->InitCheck() != B_OK) {
 		delete offsetFile;
 		return;
@@ -832,8 +849,9 @@ ServerPicture::~ServerPicture()
 	delete fFile;
 	gTokenSpace.RemoveToken(fToken);
 
-	// We only delete the subpictures list, not the subpictures themselves,
-	// since the ServerApp keeps them in a list and will delete them on quit.
+	// We only delete the subpictures list, not the subpictures
+	// themselves, since the ServerApp keeps them in a list and
+	// will delete them on quit.
 	delete fPictures;
 }
 
@@ -862,7 +880,8 @@ ServerPicture::SyncState(View *view)
 	WriteSetPenLocation(view->CurrentState()->PenLocation());
 	WriteSetPenSize(view->CurrentState()->PenSize());
 	WriteSetScale(view->CurrentState()->Scale());
-	WriteSetLineMode(view->CurrentState()->LineCapMode(), view->CurrentState()->LineJoinMode(),
+	WriteSetLineMode(view->CurrentState()->LineCapMode(),
+			view->CurrentState()->LineJoinMode(),
 			view->CurrentState()->MiterLimit());
 	//WriteSetPattern(*view->CurrentState()->GetPattern().GetInt8());
 	WriteSetDrawingMode(view->CurrentState()->GetDrawingMode());
@@ -945,13 +964,17 @@ ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
 void
 ServerPicture::Play(View *view)
 {
-	// TODO: for now: then change PicturePlayer to accept a BPositionIO object
+	// TODO: for now: then change PicturePlayer
+	// to accept a BPositionIO object
 	BMallocIO *mallocIO = dynamic_cast<BMallocIO *>(fData);
-	if (mallocIO == NULL)
+	if (mallocIO == NULL) {
 		return;
+	}
 
-	BPrivate::PicturePlayer player(mallocIO->Buffer(), mallocIO->BufferLength(), fPictures);
-	player.Play(const_cast<void **>(kTableEntries), sizeof(kTableEntries) / sizeof(void *), view);
+	BPrivate::PicturePlayer player(mallocIO->Buffer(),
+		mallocIO->BufferLength(), fPictures);
+	player.Play(const_cast<void **>(kTableEntries),
+		sizeof(kTableEntries) / sizeof(void *), view);
 }
 
 
@@ -1034,7 +1057,8 @@ ServerPicture::ExportData(BPrivate::PortLink &link)
 	link.Attach<int32>(subPicturesCount);
 	if (subPicturesCount > 0) {
 		for (int32 i = 0; i < subPicturesCount; i++) {
-			ServerPicture *subPic = static_cast<ServerPicture *>(fPictures->ItemAtFast(i));
+			ServerPicture *subPic =
+				static_cast<ServerPicture *>(fPictures->ItemAtFast(i));
 			link.Attach<int32>(subPic->Token());
 		}
 	}
