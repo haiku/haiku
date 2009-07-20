@@ -585,11 +585,38 @@ public:
 
 	virtual	uint16				Tag() const;
 
+	virtual	DebugInfoEntry*		AbstractOrigin() const;
+
+			off_t				AddressRangesOffset() const
+										{ return fAddressRangesOffset; }
+
+			target_addr_t		LowPC() const	{ return fLowPC; }
+			target_addr_t		HighPC() const	{ return fHighPC; }
+
+			const DebugInfoEntryList Variables() const	{ return fVariables; }
+			const DebugInfoEntryList Blocks() const		{ return fBlocks; }
+
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
+	virtual	status_t			AddAttribute_low_pc(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_high_pc(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_ranges(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_abstract_origin(
+									uint16 attributeName,
+									const AttributeValue& value);
+
+protected:
+			DebugInfoEntryList	fVariables;
+			DebugInfoEntryList	fBlocks;
+			target_addr_t		fLowPC;
+			target_addr_t		fHighPC;
+			off_t				fAddressRangesOffset;
+			DIELexicalBlock*	fAbstractOrigin;
+
 // TODO:
-// DW_AT_abstract_origin
-// DW_AT_high_pc
-// DW_AT_low_pc
-// DW_AT_ranges
 // DW_AT_segment
 };
 
@@ -1125,6 +1152,8 @@ public:
 			const LocationDescription* FrameBase() const { return &fFrameBase; }
 
 			const DebugInfoEntryList Parameters() const	{ return fParameters; }
+			const DebugInfoEntryList Variables() const	{ return fVariables; }
+			const DebugInfoEntryList Blocks() const		{ return fBlocks; }
 
 			bool				IsPrototyped() const	{ return fPrototyped; }
 			uint8				Inline() const			{ return fInline; }
@@ -1156,6 +1185,8 @@ public:
 
 protected:
 			DebugInfoEntryList	fParameters;
+			DebugInfoEntryList	fVariables;
+			DebugInfoEntryList	fBlocks;
 			target_addr_t		fLowPC;
 			target_addr_t		fHighPC;
 			off_t				fAddressRangesOffset;
@@ -1289,6 +1320,9 @@ public:
 
 	virtual	uint16				Tag() const;
 
+	virtual	DebugInfoEntry*		Specification() const;
+	virtual	DebugInfoEntry*		AbstractOrigin() const;
+
 	virtual	LocationDescription* GetLocationDescription();
 
 			DIEType*			GetType() const	{ return fType; }
@@ -1296,23 +1330,33 @@ public:
 			const ConstantAttributeValue* ConstValue() const
 									{ return &fValue; }
 
+			uint64				StartScope() const	{ return fStartScope; }
+
 	virtual	status_t			AddAttribute_const_value(uint16 attributeName,
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_type(uint16 attributeName,
 									const AttributeValue& value);
+	virtual	status_t			AddAttribute_specification(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_abstract_origin(
+									uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_start_scope(
+									uint16 attributeName,
+									const AttributeValue& value);
 
 // TODO:
-// DW_AT_abstract_origin
 // DW_AT_endianity
 // DW_AT_external
 // DW_AT_segment
-// DW_AT_specification
-// DW_AT_start_scope
 
 private:
 			LocationDescription	fLocationDescription;
 			ConstantAttributeValue fValue;
 			DIEType*			fType;
+			DIEVariable*		fSpecification;
+			DIEVariable*		fAbstractOrigin;
+			uint64				fStartScope;
 };
 
 

@@ -893,6 +893,11 @@ DIELabel::Tag() const
 
 
 DIELexicalBlock::DIELexicalBlock()
+	:
+	fLowPC(0),
+	fHighPC(0),
+	fAddressRangesOffset(-1),
+	fAbstractOrigin(NULL)
 {
 }
 
@@ -901,6 +906,65 @@ uint16
 DIELexicalBlock::Tag() const
 {
 	return DW_TAG_lexical_block;
+}
+
+
+DebugInfoEntry*
+DIELexicalBlock::AbstractOrigin() const
+{
+	return fAbstractOrigin;
+}
+
+
+status_t
+DIELexicalBlock::AddChild(DebugInfoEntry* child)
+{
+	switch (child->Tag()) {
+		case DW_TAG_variable:
+			fVariables.Add(child);
+			return B_OK;
+		case DW_TAG_lexical_block:
+			fBlocks.Add(child);
+			return B_OK;
+		default:
+			return DIENamedBase::AddChild(child);
+	}
+}
+
+
+status_t
+DIELexicalBlock::AddAttribute_low_pc(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fLowPC = value.address;
+	return B_OK;
+}
+
+
+status_t
+DIELexicalBlock::AddAttribute_high_pc(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fHighPC = value.address;
+	return B_OK;
+}
+
+
+status_t
+DIELexicalBlock::AddAttribute_ranges(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fAddressRangesOffset = value.pointer;
+	return B_OK;
+}
+
+
+status_t
+DIELexicalBlock::AddAttribute_abstract_origin(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fAbstractOrigin = dynamic_cast<DIELexicalBlock*>(value.reference);
+	return fAbstractOrigin != NULL ? B_OK : B_BAD_DATA;
 }
 
 
@@ -1745,6 +1809,12 @@ DIESubprogram::AddChild(DebugInfoEntry* child)
 		case DW_TAG_unspecified_parameters:
 			fParameters.Add(child);
 			return B_OK;
+		case DW_TAG_variable:
+			fVariables.Add(child);
+			return B_OK;
+		case DW_TAG_lexical_block:
+			fBlocks.Add(child);
+			return B_OK;
 		default:
 			return DIEDeclaredNamedBase::AddChild(child);
 	}
@@ -1984,7 +2054,10 @@ DIEVariantPart::AddAttribute_type(uint16 attributeName,
 
 DIEVariable::DIEVariable()
 	:
-	fType(NULL)
+	fType(NULL),
+	fSpecification(NULL),
+	fAbstractOrigin(NULL),
+	fStartScope(0)
 {
 }
 
@@ -1993,6 +2066,21 @@ uint16
 DIEVariable::Tag() const
 {
 	return DW_TAG_variable;
+}
+
+
+DebugInfoEntry*
+DIEVariable::Specification() const
+{
+	return fSpecification;
+}
+
+
+
+DebugInfoEntry*
+DIEVariable::AbstractOrigin() const
+{
+	return fAbstractOrigin;
 }
 
 
@@ -2017,6 +2105,33 @@ DIEVariable::AddAttribute_type(uint16 attributeName,
 {
 	fType = dynamic_cast<DIEType*>(value.reference);
 	return fType != NULL ? B_OK : B_BAD_DATA;
+}
+
+
+status_t
+DIEVariable::AddAttribute_specification(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fSpecification = dynamic_cast<DIEVariable*>(value.reference);
+	return fSpecification != NULL ? B_OK : B_BAD_DATA;
+}
+
+
+status_t
+DIEVariable::AddAttribute_abstract_origin(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fAbstractOrigin = dynamic_cast<DIEVariable*>(value.reference);
+	return fAbstractOrigin != NULL ? B_OK : B_BAD_DATA;
+}
+
+
+status_t
+DIEVariable::AddAttribute_start_scope(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fStartScope = value.constant;
+	return B_OK;
 }
 
 
