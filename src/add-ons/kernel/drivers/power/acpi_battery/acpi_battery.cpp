@@ -33,21 +33,8 @@ static device_manager_info *sDeviceManager;
 static ConditionVariable sBatteryCondition;
 
 
-status_t ReadBatteryStatus(acpi_battery_cookie* cookie,
-	acpi_battery_info* status);
-
-int32 acpi_battery_handler(void *data);
-
-int32
-acpi_battery_handler(void *data)
-{
-	
-	return B_HANDLED_INTERRUPT;
-}
-
-
 status_t
-ReadBatteryStatus(acpi_battery_cookie* cookie, acpi_battery_info* batteryStatus)
+ReadBatteryStatus(battery_driver_cookie* cookie, acpi_battery_info* batteryStatus)
 {
 	status_t status = B_ERROR;
 	
@@ -81,7 +68,7 @@ exit:
 }
 
 status_t
-ReadBatteryInfo(acpi_battery_cookie* cookie,
+ReadBatteryInfo(battery_driver_cookie* cookie,
 	acpi_extended_battery_info* batteryInfo)
 {
 	status_t status = B_ERROR;
@@ -138,7 +125,7 @@ exit:
 
 
 int
-EstimatedRuntime(acpi_battery_cookie* cookie, acpi_battery_info* info)
+EstimatedRuntime(battery_driver_cookie* cookie, acpi_battery_info* info)
 {
 	status_t status = B_ERROR;
 	
@@ -177,7 +164,7 @@ EstimatedRuntime(acpi_battery_cookie* cookie, acpi_battery_info* info)
 void
 battery_notify_handler(acpi_handle device, uint32 value, void *context)
 {
-	TRACE("battery_notify_handler\n");
+	TRACE("battery_notify_handler event 0x%x\n", int(value));
 	sBatteryCondition.NotifyAll();
 }
 
@@ -204,7 +191,14 @@ TraceBatteryInfo(acpi_extended_battery_info* batteryInfo)
 static status_t
 acpi_battery_open(void *initCookie, const char *path, int flags, void** cookie)
 {
-	acpi_battery_cookie *device = (acpi_battery_cookie*)initCookie;
+	battery_device_cookie *device;
+	device = (battery_device_cookie*)calloc(1, sizeof(battery_device_cookie));
+	if (device == NULL)
+		return B_NO_MEMORY;
+	
+	device->driver_cookie = (battery_driver_cookie*)initCookie;
+	device->stop_watching = 0;
+
 	*cookie = device;
 	
 	return B_OK;
@@ -214,6 +208,9 @@ acpi_battery_open(void *initCookie, const char *path, int flags, void** cookie)
 static status_t
 acpi_battery_close(void* cookie)
 {
+	battery_device_cookie* device = (battery_device_cookie*)cookie;
+	free(device);
+
 	return B_OK;
 }
 
@@ -224,13 +221,13 @@ acpi_battery_read(void* _cookie, off_t position, void *buffer, size_t* numBytes)
 	if (*numBytes < 1)
 		return B_IO_ERROR;
 
-	acpi_battery_cookie *device = (acpi_battery_cookie *)_cookie;
+	battery_device_cookie *device = (battery_device_cookie*)_cookie;
 
 	acpi_battery_info batteryStatus;
-	ReadBatteryStatus(device, &batteryStatus);
+	ReadBatteryStatus(device->driver_cookie, &batteryStatus);
 	
 	acpi_extended_battery_info batteryInfo;
-	ReadBatteryInfo(device, &batteryInfo);
+	ReadBatteryInfo(device->driver_cookie, &batteryInfo);
 	
 	if (position == 0) {
 		size_t max_len = *numBytes;
@@ -288,7 +285,7 @@ status_t
 acpi_battery_control(void* _cookie, uint32 op, void* arg, size_t len)
 {
 	TRACE("acpi_battery: acpi_battery_control op %u\n", int(op));
-	acpi_battery_cookie* device = (acpi_battery_cookie*)_cookie;
+	battery_device_cookie* device = (battery_device_cookie*)_cookie;
 	status_t err = B_ERROR;
 
 	uint32* magicId;
@@ -307,14 +304,14 @@ acpi_battery_control(void* _cookie, uint32 op, void* arg, size_t len)
 			if (len < sizeof(acpi_battery_info))
 				return B_IO_ERROR;
 			batteryInfo = (acpi_battery_info*)arg;
-			err = ReadBatteryStatus(device, batteryInfo);
+			err = ReadBatteryStatus(device->driver_cookie, batteryInfo);
 			break;
 
 		case GET_EXTENDED_BATTERY_INFO:
 			if (len < sizeof(acpi_extended_battery_info))
 				return B_IO_ERROR;
 			extBatteryInfo = (acpi_extended_battery_info*)arg;
-			err = ReadBatteryInfo(device, extBatteryInfo);
+			err = ReadBatteryInfo(device->driver_cookie, extBatteryInfo);
 			break;
 		
 		case WATCH_BATTERY:
@@ -393,16 +390,15 @@ acpi_battery_register_device(device_node *node)
 static status_t
 acpi_battery_init_driver(device_node *node, void **driverCookie)
 {
-	acpi_battery_cookie *device;
-	device = (acpi_battery_cookie *)calloc(1, sizeof(acpi_battery_cookie));
+	battery_driver_cookie *device;
+	device = (battery_driver_cookie *)calloc(1, sizeof(battery_driver_cookie));
 	if (device == NULL)
 		return B_NO_MEMORY;
 
 	*driverCookie = device;
 
 	device->node = node;
-	device->stop_watching = 0;
-
+	
 	device_node *parent;
 	parent = sDeviceManager->get_parent_node(node);
 	sDeviceManager->get_driver(parent, (driver_module_info **)&device->acpi,
@@ -411,7 +407,7 @@ acpi_battery_init_driver(device_node *node, void **driverCookie)
 
 	// install notify handler
 	device->acpi->install_notify_handler(device->acpi_cookie,
-    	ACPI_ALL_NOTIFY, battery_notify_handler, NULL);
+    	ACPI_ALL_NOTIFY, battery_notify_handler, device);
 
 	return B_OK;
 }
@@ -421,7 +417,7 @@ static void
 acpi_battery_uninit_driver(void *driverCookie)
 {
 	TRACE("acpi_battery_uninit_driver\n");
-	acpi_battery_cookie *device = (acpi_battery_cookie*)driverCookie;
+	battery_driver_cookie *device = (battery_driver_cookie*)driverCookie;
 	
 	device->acpi->remove_notify_handler(device->acpi_cookie,
     	ACPI_ALL_NOTIFY, battery_notify_handler);
@@ -433,7 +429,7 @@ acpi_battery_uninit_driver(void *driverCookie)
 static status_t
 acpi_battery_register_child_devices(void *cookie)
 {
-	acpi_battery_cookie *device = (acpi_battery_cookie*)cookie;
+	battery_driver_cookie *device = (battery_driver_cookie*)cookie;
 
 	int pathID = sDeviceManager->create_id(ACPI_BATTERY_PATHID_GENERATOR);
 	if (pathID < 0) {
@@ -460,7 +456,7 @@ acpi_battery_init_device(void *driverCookie, void **cookie)
 static void
 acpi_battery_uninit_device(void *_cookie)
 {
-	
+
 }
 
 

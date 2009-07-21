@@ -24,16 +24,18 @@
 
 #define ACPI_NAME_BATTERY "PNP0C0A"
 
-
-struct acpi_battery_cookie {
-	// this three variables are not needed yet but helpfull when extend this
-	// driver to use acpi
-	device_node				*node;
-	acpi_device_module_info	*acpi;
-	acpi_device				acpi_cookie;
-
-	vint32					stop_watching;
+struct battery_driver_cookie {
+	device_node*				node;
+	acpi_device_module_info*	acpi;
+	acpi_device					acpi_cookie;
 };
+
+
+struct battery_device_cookie {
+	battery_driver_cookie*		driver_cookie;
+	vint32						stop_watching;
+};
+
 
 /* Notify types */
 
