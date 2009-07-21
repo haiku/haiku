@@ -158,7 +158,12 @@ BatteryInfoView::_FillStringList()
 		
 	fontString = new FontString;
 	fontString->string = "Technology: ";
-	fontString->string << fBatteryExtendedInfo.technology;
+	if (fBatteryExtendedInfo.technology == 0)
+		fontString->string << "non-rechargeable";
+	else if (fBatteryExtendedInfo.technology == 1)
+		fontString->string << "rechargeable";
+	else
+		fontString->string << "?";
 	_AddToStringList(fontString);
 	
 	fontString = new FontString;
@@ -182,11 +187,13 @@ BatteryInfoView::_FillStringList()
 	fontString = new FontString;
 	fontString->string = "Capacity Granularity 1: ";
 	fontString->string << fBatteryExtendedInfo.capacity_granularity_1;
+	fontString->string << powerUnit;
 	_AddToStringList(fontString);
 		
 	fontString = new FontString;
 	fontString->string = "Capacity Granularity 2: ";
 	fontString->string << fBatteryExtendedInfo.capacity_granularity_2;
+	fontString->string << powerUnit;
 	_AddToStringList(fontString);
 		
 	fontString = new FontString;
