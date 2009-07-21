@@ -15,7 +15,8 @@ struct system_profiler_parameters;
 
 __BEGIN_DECLS
 
-status_t start_system_profiler(size_t areaSize, uint32 flags);
+status_t start_system_profiler(size_t areaSize, uint32 stackDepth,
+			bigtime_t interval);
 void stop_system_profiler();
 
 status_t _user_system_profiler_start(

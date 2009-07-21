@@ -1141,7 +1141,7 @@ SystemProfiler::_ProfilingEvent(struct timer* timer)
 
 
 status_t
-start_system_profiler(size_t areaSize, uint32 flags)
+start_system_profiler(size_t areaSize, uint32 stackDepth, bigtime_t interval)
 {
 	struct ParameterDeleter {
 		ParameterDeleter(area_id area)
@@ -1184,11 +1184,12 @@ start_system_profiler(size_t areaSize, uint32 flags)
 		return B_NO_MEMORY;
 
 	sRecordedParameters->buffer_area = area;
-	sRecordedParameters->flags
-		= flags | B_SYSTEM_PROFILER_SAMPLING_EVENTS;
+	sRecordedParameters->flags = B_SYSTEM_PROFILER_TEAM_EVENTS
+		| B_SYSTEM_PROFILER_THREAD_EVENTS | B_SYSTEM_PROFILER_IMAGE_EVENTS
+		| B_SYSTEM_PROFILER_SAMPLING_EVENTS;
 	sRecordedParameters->locking_lookup_size = 4096;
-	sRecordedParameters->interval = 1000;
-	sRecordedParameters->stack_depth = 5;
+	sRecordedParameters->interval = interval;
+	sRecordedParameters->stack_depth = stackDepth;
 
 	area_info areaInfo;
 	get_area_info(area, &areaInfo);
