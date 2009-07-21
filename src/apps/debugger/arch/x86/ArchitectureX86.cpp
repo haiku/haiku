@@ -558,7 +558,7 @@ ArchitectureX86::GetInstructionInfo(target_addr_t address,
 		return error;
 
 	instruction_type instructionType = INSTRUCTION_TYPE_OTHER;
-	if (buffer[0] == 0xff) {
+	if (buffer[0] == 0xff && (buffer[1] & 0x34) == 0x10) {
 		// absolute call with r/m32
 		instructionType = INSTRUCTION_TYPE_SUBROUTINE_CALL;
 	} else if (buffer[0] == 0xe8 && instructionSize == 5) {
