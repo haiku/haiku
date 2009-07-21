@@ -50,8 +50,7 @@ class ServerBitmap {
 
 	inline	int32			BytesPerRow() const
 								{ return fBytesPerRow; }
-	inline	uint8			BitsPerPixel() const
-								{ return fBitsPerPixel; } 
+	
 	inline	color_space		ColorSpace() const
 								{ return fSpace; }
 	inline	uint32			Flags() const
@@ -87,7 +86,6 @@ class ServerBitmap {
 
 protected:
 	friend class BitmapManager;
-	friend class PicturePlayer;
 
 							ServerBitmap(BRect rect, color_space space,
 								uint32 flags, int32 bytesPerRow = -1,
@@ -95,9 +93,6 @@ protected:
 							ServerBitmap(const ServerBitmap* bmp);
 	virtual					~ServerBitmap();
 
-	//! used by the BitmapManager
-//	inline	void			_SetBuffer(void *ptr)
-//								{ fBuffer = (uint8*)ptr; }
 
 			bool			_Release();
 
@@ -117,8 +112,7 @@ protected:
 			int32			fBytesPerRow;
 			color_space		fSpace;
 			uint32			fFlags;
-			int				fBitsPerPixel;
-
+			
 			ServerApp*		fOwner;
 			int32			fToken;
 };
@@ -148,10 +142,9 @@ ServerBitmap::ShallowCopy(const ServerBitmap* from)
 	fBuffer			= from->fBuffer;
 	fWidth			= from->fWidth;
 	fHeight			= from->fHeight;
-	fBytesPerRow	= from->fBytesPerRow;
+	fBytesPerRow		= from->fBytesPerRow;
 	fSpace			= from->fSpace;
 	fFlags			= from->fFlags;
-	fBitsPerPixel	= from->fBitsPerPixel;
 	fToken			= from->fToken;
 }
 

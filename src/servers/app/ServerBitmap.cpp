@@ -68,7 +68,6 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space, uint32 flags,
 	fBytesPerRow(0),
 	fSpace(space),
 	fFlags(flags),
-	fBitsPerPixel(0),
 	fOwner(NULL)
 	// fToken is initialized (if used) by the BitmapManager
 {
@@ -91,7 +90,6 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bitmap)
 		fBytesPerRow	= bitmap->fBytesPerRow;
 		fSpace			= bitmap->fSpace;
 		fFlags			= bitmap->fFlags;
-		fBitsPerPixel	= bitmap->fBitsPerPixel;
 		fOwner			= bitmap->fOwner;
 	} else {
 		fWidth			= 0;
@@ -99,7 +97,6 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bitmap)
 		fBytesPerRow	= 0;
 		fSpace			= B_NO_COLOR_SPACE;
 		fFlags			= 0;
-		fBitsPerPixel	= 0;
 		fOwner			= NULL;
 	}
 }
@@ -161,7 +158,6 @@ void
 ServerBitmap::_HandleSpace(color_space space, int32 bytesPerRow)
 {
 	// calculate the minimum bytes per row
-	// set fBitsPerPixel
 	int32 minBPR = 0;
 	switch(space) {
 		// 32-bit
@@ -183,7 +179,6 @@ ServerBitmap::_HandleSpace(color_space space, int32 bytesPerRow)
 		case B_CMYA32:
 		case B_CMYK32:
 			minBPR = fWidth * 4;
-			fBitsPerPixel = 32;
 			break;
 
 		// 24-bit
@@ -201,7 +196,6 @@ ServerBitmap::_HandleSpace(color_space space, int32 bytesPerRow)
 		case B_YCbCr444:
 		case B_YUV444:
 			minBPR = fWidth * 3;
-			fBitsPerPixel = 24;
 			break;
 
 		// 16-bit
@@ -214,27 +208,23 @@ ServerBitmap::_HandleSpace(color_space space, int32 bytesPerRow)
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
 			minBPR = fWidth * 2;
-			fBitsPerPixel = 16;
 			break;
 
 		case B_YCbCr422:
 		case B_YUV422:
 			minBPR = (fWidth + 3) / 4 * 8;
 				// TODO: huh? why not simply fWidth * 2 ?!?
-			fBitsPerPixel = 16;
 			break;
 
 		// 8-bit
 		case B_CMAP8:
 		case B_GRAY8:
 			minBPR = fWidth;
-			fBitsPerPixel = 8;
 			break;
 
 		// 1-bit
 		case B_GRAY1:
 			minBPR = (fWidth + 7) / 8;
-			fBitsPerPixel = 1;
 			break;
 
 		// TODO: ??? get a clue what these mean
@@ -243,12 +233,10 @@ ServerBitmap::_HandleSpace(color_space space, int32 bytesPerRow)
 		case B_YUV420:
 		case B_YCbCr420:
 			minBPR = (fWidth + 3) / 4 * 6;
-			fBitsPerPixel = 0;
 			break;
 
 		case B_NO_COLOR_SPACE:
 		default:
-			fBitsPerPixel = 0;
 			break;
 	}
 	if (minBPR > 0 || bytesPerRow > 0) {
