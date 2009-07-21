@@ -252,6 +252,10 @@ ThreadHandler::HandleThreadAction(uint32 action)
 	if (frame->Type() == STACK_FRAME_TYPE_SYSCALL) {
 		// set a breakpoint at the CPU state's instruction pointer (points to
 		// the return address, unlike the stack frame's instruction pointer)
+// TODO: That's OK in principle, but needs additional work with recursive
+// functions. We need to store some information that allows us to determine
+// whether we've actually stepped out of the current frame when we have hit
+// the breakpoint.
 		status_t error = _InstallTemporaryBreakpoint(
 			frame->GetCpuState()->InstructionPointer());
 		if (error != B_OK) {
