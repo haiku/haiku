@@ -273,17 +273,10 @@ got_one:
 	if ((my_dev = create_device (dev, intf, ifno)) == NULL) {
 		return B_ERROR;
 	}
-	
-	st = usb->queue_request(dev, 
-		USB_REQTYPE_ENDPOINT_OUT | USB_REQTYPE_STANDARD,
-		USB_REQUEST_CLEAR_FEATURE,
-		USB_FEATURE_ENDPOINT_HALT, 1, my_dev->total_report_size, 
-		my_dev->buffer, my_dev->total_report_size, midi_usb_callback, my_dev);
-	if (st != B_OK) {
-		DPRINTF_ERR ((MY_ID "queue_request() error %d\n", (int)st));
-		return B_ERROR;
-	}
-	
+
+	usb->clear_feature(intf->endpoint[0].handle, USB_FEATURE_ENDPOINT_HALT);
+		// TODO: verify if this is necessary at all
+
 	my_dev->timestamp = system_time ();
 
 	/* issue bulk transfer */
