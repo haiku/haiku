@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <arch/user_debugger.h>
 
 #include <string.h>
@@ -12,6 +13,7 @@
 #include <int.h>
 #include <team.h>
 #include <thread.h>
+#include <util/AutoLock.h>
 
 
 //#define TRACE_ARCH_USER_DEBUGGER
@@ -28,7 +30,10 @@
 #define B_WATCHPOINT_LENGTH_NOT_SUPPORTED	B_NOT_SUPPORTED
 #define B_BREAKPOINT_NOT_FOUND				B_NAME_NOT_FOUND
 #define B_WATCHPOINT_NOT_FOUND				B_NAME_NOT_FOUND
-	// ToDo: Make those real error codes.
+	// TODO: Make those real error codes.
+
+
+extern bool gHasSSE;
 
 // The software breakpoint instruction (int3).
 const uint8 kX86SoftwareBreakpoint[1] = { 0xcc };
@@ -64,7 +69,7 @@ static bool sQEmuSingleStepHack = false;
 
 
 static void
-get_iframe_registers(struct iframe *frame, struct debug_cpu_state *cpuState)
+get_iframe_registers(struct iframe *frame, debug_cpu_state *cpuState)
 {
 	cpuState->gs = frame->gs;
 	cpuState->fs = frame->fs;
@@ -576,12 +581,25 @@ arch_update_thread_single_step()
 
 
 void
-arch_set_debug_cpu_state(const struct debug_cpu_state *cpuState)
+arch_set_debug_cpu_state(const debug_cpu_state *cpuState)
 {
 	if (struct iframe *frame = i386_get_user_iframe()) {
-		i386_frstor(cpuState->extended_regs);
-			// For this to be correct the calling function must not use these
-			// registers (not even indirectly).
+		// For the floating point state to be correct the calling function must
+		// not use these registers (not even indirectly).
+		if (gHasSSE) {
+			// Since fxrstor requires 16-byte alignment and this isn't
+			// guaranteed passed buffer, we use our thread's fpu_state field as
+			// temporary buffer. We need to disable interrupts to make use of
+			// it.
+			struct thread* thread = thread_get_current_thread();
+			InterruptsLocker locker;
+			memcpy(thread->arch_info.fpu_state, &cpuState->extended_registers,
+				sizeof(&cpuState->extended_registers));
+			i386_fxrstor(thread->arch_info.fpu_state);
+		} else {
+			// TODO: Implement! We need to convert the format first.
+//			i386_frstor(&cpuState->extended_registers);
+		}
 
 //		frame->gs = cpuState->gs;
 //		frame->fs = cpuState->fs;
@@ -608,33 +626,30 @@ arch_set_debug_cpu_state(const struct debug_cpu_state *cpuState)
 
 
 void
-arch_get_debug_cpu_state(struct debug_cpu_state *cpuState)
+arch_get_debug_cpu_state(debug_cpu_state *cpuState)
 {
 	if (struct iframe *frame = i386_get_user_iframe()) {
-		i386_fnsave(cpuState->extended_regs);
-			// For this to be correct the calling function must not use these
-			// registers (not even indirectly).
+		// For the floating point state to be correct the calling function must
+		// not use these registers (not even indirectly).
+		if (gHasSSE) {
+			// Since fxsave requires 16-byte alignment and this isn't guaranteed
+			// passed buffer, we use our thread's fpu_state field as temporary
+			// buffer. We need to disable interrupts to make use of it.
+			struct thread* thread = thread_get_current_thread();
+			InterruptsLocker locker;
+			i386_fxsave(thread->arch_info.fpu_state);
+				// unlike fnsave, fxsave doesn't reinit the FPU state
+			memcpy(&cpuState->extended_registers, thread->arch_info.fpu_state,
+				sizeof(&cpuState->extended_registers));
+		} else {
+			i386_fnsave(&cpuState->extended_registers);
+			i386_frstor(&cpuState->extended_registers);
+				// fnsave reinits the FPU state after saving, so we need to
+				// load it again
+			// TODO: Convert to fxsave format!
+		}
 		get_iframe_registers(frame, cpuState);
 	}
-}
-
-
-/*!	\brief Returns the CPU state for the given thread.
-	The thread must not be running and the threads spinlock must be held.
-*/
-status_t
-arch_get_thread_debug_cpu_state(struct thread *thread,
-	struct debug_cpu_state *cpuState)
-{
-	struct iframe *frame = i386_get_thread_user_iframe(thread);
-	if (frame == NULL)
-		return B_BAD_VALUE;
-
-	get_iframe_registers(frame, cpuState);
-	memcpy(cpuState->extended_regs, thread->arch_info.fpu_state,
-		sizeof(cpuState->extended_regs));
-
-	return B_OK;
 }
 
 

@@ -65,22 +65,14 @@ arch_update_thread_single_step()
 
 
 void
-arch_set_debug_cpu_state(const struct debug_cpu_state *cpuState)
+arch_set_debug_cpu_state(const debug_cpu_state *cpuState)
 {
 }
 
 
 void
-arch_get_debug_cpu_state(struct debug_cpu_state *cpuState)
+arch_get_debug_cpu_state(debug_cpu_state *cpuState)
 {
-}
-
-
-status_t
-arch_get_thread_debug_cpu_state(struct thread *thread,
-	struct debug_cpu_state *cpuState)
-{
-	return B_UNSUPPORTED;
 }
 
 

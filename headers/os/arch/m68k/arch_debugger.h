@@ -1,11 +1,11 @@
 /*
- * Copyright 2005, Haiku Inc.
+ * Copyright 2005-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ARCH_M68K_DEBUGGER_H
 #define _ARCH_M68K_DEBUGGER_H
 
-struct debug_cpu_state {
+struct m68k_debug_cpu_state {
 	uint32	d0;
 	uint32	d1;
 	uint32	d2;
@@ -24,7 +24,7 @@ struct debug_cpu_state {
 	uint32	a7;
 	uint32	pc;
 	uint16	sr;
-#warning M68K: missing members!
+//#warning M68K: missing members!
 	uint32	dummy;
 } __attribute__((aligned(8)));
 

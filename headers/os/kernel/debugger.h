@@ -11,19 +11,23 @@
 #include <OS.h>
 
 // include architecture specific definitions
+#include <arch/x86/arch_debugger.h>
+#include <arch/ppc/arch_debugger.h>
+#include <arch/m68k/arch_debugger.h>
+#include <arch/mipsel/arch_debugger.h>
+
 #ifdef __INTEL__
-	#include <arch/x86/arch_debugger.h>
+	typedef struct x86_debug_cpu_state debug_cpu_state;
 #elif __POWERPC__
-	#include <arch/ppc/arch_debugger.h>
+	typedef struct ppc_debug_cpu_state debug_cpu_state;
 #elif __M68K__
-	#include <arch/m68k/arch_debugger.h>
+	typedef struct m68k_debug_cpu_state debug_cpu_state;
 #elif __MIPSEL__
-	#include <arch/mipsel/arch_debugger.h>
+	typedef struct mipsel_debug_cpu_state debug_cpu_state;
 #else
-	#error you need to write a <arch/<cpu>/arch_debugger.h>
+	#error unsupported architecture
 #endif
 
-typedef struct debug_cpu_state debug_cpu_state;
 
 #ifdef __cplusplus
 extern "C" {

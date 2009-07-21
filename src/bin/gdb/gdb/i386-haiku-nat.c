@@ -28,7 +28,7 @@
 #include "target.h"
 
 /* Offset in `struct debug_cpu_state' where MEMBER is stored.  */
-#define REG_OFFSET(member) offsetof (struct debug_cpu_state, member)
+#define REG_OFFSET(member) offsetof (struct x86_debug_cpu_state, member)
 
 /* At kHaikuI386RegOffset[REGNUM] you'll find the offset in `struct
    debug_cpu_state' where the GDB register REGNUM is stored. */
@@ -63,7 +63,8 @@ haiku_supply_registers(int reg, const debug_cpu_state *cpuState)
 		int offset = kHaikuI386RegOffset[reg];
 		regcache_raw_supply (current_regcache, reg, (char*)cpuState + offset);
 	} else {
-		i387_supply_fxsave (current_regcache, -1, cpuState->extended_regs);
+		i387_supply_fxsave (current_regcache, -1,
+			&cpuState->extended_registers);
 	}
 }
 
@@ -79,7 +80,8 @@ haiku_collect_registers(int reg, debug_cpu_state *cpuState)
 		int offset = kHaikuI386RegOffset[reg];
 		regcache_raw_collect (current_regcache, reg, (char*)cpuState + offset);
 	} else {
-		i387_collect_fsave (current_regcache, -1, cpuState->extended_regs);
+		i387_collect_fxsave (current_regcache, -1,
+			&cpuState->extended_registers);
 	}
 }
 

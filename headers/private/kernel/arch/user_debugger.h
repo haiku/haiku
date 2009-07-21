@@ -26,10 +26,8 @@ void arch_destroy_thread_debug_info(struct arch_thread_debug_info *info);
 
 void arch_update_thread_single_step();
 
-void arch_set_debug_cpu_state(const struct debug_cpu_state *cpuState);
-void arch_get_debug_cpu_state(struct debug_cpu_state *cpuState);
-status_t arch_get_thread_debug_cpu_state(struct thread *thread,
-		struct debug_cpu_state *cpuState);
+void arch_set_debug_cpu_state(const debug_cpu_state *cpuState);
+void arch_get_debug_cpu_state(debug_cpu_state *cpuState);
 
 status_t arch_set_breakpoint(void *address);
 status_t arch_clear_breakpoint(void *address);

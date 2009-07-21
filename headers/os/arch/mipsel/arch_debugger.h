@@ -5,9 +5,11 @@
 #ifndef _ARCH_MIPSEL_DEBUGGER_H
 #define _ARCH_MIPSEL_DEBUGGER_H
 
-#warning MIPSEL: fixme
-struct debug_cpu_state {
+
+//#warning MIPSEL: fixme
+struct mipsel_debug_cpu_state {
 	uint32	dummy;
 } __attribute__((aligned(8)));
+
 
 #endif	// _ARCH_MIPSEL_DEBUGGER_H

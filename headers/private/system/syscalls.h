@@ -7,9 +7,9 @@
 
 
 #include <arch_config.h>
+#include <DiskDeviceDefs.h>
 #include <image.h>
 #include <OS.h>
-#include <DiskDeviceDefs.h>
 
 #include <signal.h>
 #include <sys/socket.h>
@@ -19,7 +19,6 @@
 extern "C" {
 #endif
 
-struct debug_cpu_state;
 struct dirent;
 struct Elf32_Sym;
 struct fd_info;
@@ -422,8 +421,6 @@ extern port_id		_kern_install_team_debugger(team_id team,
 						port_id debuggerPort);
 extern status_t		_kern_remove_team_debugger(team_id team);
 extern status_t		_kern_debug_thread(thread_id thread);
-extern status_t		_kern_get_thread_cpu_state(thread_id threadID,
-						struct debug_cpu_state *userCPUState);
 extern void			_kern_wait_for_debugger(void);
 
 extern status_t		_kern_set_debugger_breakpoint(void *address, uint32 type,

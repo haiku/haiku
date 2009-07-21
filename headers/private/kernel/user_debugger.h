@@ -252,8 +252,6 @@ status_t	_user_install_default_debugger(port_id debuggerPort);
 port_id		_user_install_team_debugger(team_id team, port_id debuggerPort);
 status_t	_user_remove_team_debugger(team_id team);
 status_t	_user_debug_thread(thread_id thread);
-status_t	_user_get_thread_cpu_state(thread_id thread,
-				struct debug_cpu_state *cpuState);
 void		_user_wait_for_debugger(void);
 
 status_t	_user_set_debugger_breakpoint(void *address, uint32 type,

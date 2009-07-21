@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -2900,49 +2901,6 @@ _user_debug_thread(thread_id threadID)
 	restore_interrupts(state);
 
 	return error;
-}
-
-
-status_t
-_user_get_thread_cpu_state(thread_id threadID,
-	struct debug_cpu_state *userCPUState)
-{
-	TRACE(("[%ld] _user_get_thread_cpu_state(%ld, %p)\n", find_thread(NULL),
-		threadID, userCPUState));
-
-	if (userCPUState == NULL || !IS_USER_ADDRESS(userCPUState))
-		return B_BAD_ADDRESS;
-
-	InterruptsSpinLocker locker(gThreadSpinlock);
-
-	// get and check the thread
-	struct thread *thread = thread_get_thread_struct_locked(threadID);
-	if (thread == NULL) {
-		// thread doesn't exist any longer
-		return B_BAD_THREAD_ID;
-	} else if (thread->team == team_get_kernel_team()) {
-		// we can't debug the kernel team
-		return B_NOT_ALLOWED;
-	} else if (thread->debug_info.flags & B_THREAD_DEBUG_DYING) {
-		// the thread is already dying
-		return B_BAD_THREAD_ID;
-	} else if (thread->debug_info.flags & B_THREAD_DEBUG_NUB_THREAD) {
-		// don't play with the nub thread
-		return B_NOT_ALLOWED;
-	} else if (thread->state == B_THREAD_RUNNING) {
-		// thread is running -- no way to get its CPU state
-		return B_BAD_THREAD_STATE;
-	}
-
-	// get the CPU state
-	debug_cpu_state cpuState;
-	status_t error = arch_get_thread_debug_cpu_state(thread, &cpuState);
-	if (error != B_OK)
-		return error;
-
-	locker.Unlock();
-
-	return user_memcpy(userCPUState, &cpuState, sizeof(cpuState));
 }
 
 
