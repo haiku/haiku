@@ -336,6 +336,7 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	uint32 vecCount = 0;
 
 	size_t numBytes = PAGE_ALIGN(pageOffset + bufferSize);
+	size_t bytesUntouched = numBytes;
 	vm_page *pages[MAX_IO_VECS];
 	ConditionVariable busyConditions[MAX_IO_VECS];
 	int32 pageIndex = 0;
@@ -363,7 +364,7 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	// read file into reserved pages
 	status_t status = vfs_read_pages(ref->vnode, cookie, offset, vecs,
 		vecCount, B_PHYSICAL_IO_REQUEST, &numBytes);
-	if (status < B_OK) {
+	if (status != B_OK) {
 		// reading failed, free allocated pages
 
 		dprintf("file_cache: read pages failed: %s\n", strerror(status));
@@ -377,6 +378,20 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 		}
 
 		return status;
+	}
+
+	// Clear out any leftovers that were not touched by the above read - we're
+	// doing this here so that not every file system/device has to implement
+	// this
+	bytesUntouched -= numBytes;
+
+	for (int32 i = vecCount; i-- > 0 && bytesUntouched != 0; ) {
+		size_t length = min_c(bytesUntouched, vecs[i].iov_len);
+
+		addr_t address = (addr_t)vecs[i].iov_base + vecs[i].iov_len - length;
+		vm_memset_physical(address, 0, length);
+
+		bytesUntouched -= length;
 	}
 
 	// copy the pages if needed and unmap them again
