@@ -19,6 +19,7 @@
 #include <unistd.h>
 
 #include <fs_attr.h>
+#include <fs_volume.h>
 #include <OS.h>
 #include <TypeConstants.h>
 
@@ -103,9 +104,10 @@ size_to_string(off_t size)
 {
 	char buffer[256];
 
-	if (size > 10LL * 1024 * 1024 * 1024)
-		snprintf(buffer, sizeof(buffer), "%g GB", size / (1024.0 * 1024 * 1024));
-	else if (size > 10 * 1024 * 1024)
+	if (size > 10LL * 1024 * 1024 * 1024) {
+		snprintf(buffer, sizeof(buffer), "%g GB",
+			size / (1024.0 * 1024 * 1024));
+	} else if (size > 10 * 1024 * 1024)
 		snprintf(buffer, sizeof(buffer), "%g MB", size / (1024.0 * 1024));
 	else if (size > 10 * 1024)
 		snprintf(buffer, sizeof(buffer), "%g KB", size / (1024.0));
@@ -169,6 +171,9 @@ usage(int status)
 		"\t\t\t\ta file.\n"
 		"  -a, --always-check\t\tAlways check contents before removing data.\n"
 		"  -k, --keep-dirty\t\tDo not remove the working files on quit.\n"
+		"  -i, --mount-image=<image>\tMounts an image for the actions, and "
+			"remounts\n"
+		"\t\t\t\tit before checking (each time).\n"
 		"  -v, --verbose\t\t\tShow the actions as being performed\n",
 		kProgramName, kDefaultRunCount, kDefaultFileCount, kDefaultDirCount,
 		kDefaultMaxFileSize, kDefaultBaseDir);
@@ -477,6 +482,24 @@ remove_dirs(const std::string& path)
 }
 
 
+static void
+mount_image(const char* image, const char* mountPoint)
+{
+	dev_t volume = fs_mount_volume(mountPoint, image, NULL, 0, NULL);
+	if (volume < 0)
+		error("mounting failed: %s", strerror(volume));
+}
+
+
+static void
+unmount_image(const char* mountPoint)
+{
+	status_t status = fs_unmount_volume(mountPoint, 0);
+	if (status != B_OK)
+		error("unmounting failed: %s", strerror(status));
+}
+
+
 //	#pragma mark - Actions
 
 
@@ -691,6 +714,7 @@ main(int argc, char** argv)
 		{"no-cache", no_argument, 0, 'n'},
 		{"always-check", no_argument, 0, 'a'},
 		{"keep-dirty", no_argument, 0, 'k'},
+		{"mount-image", required_argument, 0, 'i'},
 		{"verbose", no_argument, 0, 'v'},
 		{"help", no_argument, 0, 'h'},
 		{NULL}
@@ -702,6 +726,7 @@ main(int argc, char** argv)
 	uint32 checkInterval = 0;
 	uint32 seed = 0;
 	bool keepDirty = false;
+	const char* mountImage = NULL;
 
 	struct entry base;
 	base.name = kDefaultBaseDir;
@@ -709,7 +734,7 @@ main(int argc, char** argv)
 	base.size = 0;
 
 	int c;
-	while ((c = getopt_long(argc, argv, "r:s:f:d:c:m:b:nakvh", kOptions,
+	while ((c = getopt_long(argc, argv, "r:s:f:d:c:m:b:naki:vh", kOptions,
 			NULL)) != -1) {
 		switch (c) {
 			case 0:
@@ -761,6 +786,9 @@ main(int argc, char** argv)
 			case 'k':
 				keepDirty = true;
 				break;
+			case 'i':
+				mountImage = optarg;
+				break;
 			case 'v':
 				sVerbose = true;
 				break;
@@ -773,14 +801,16 @@ main(int argc, char** argv)
 		}
 	}
 
-	EntryVector dirs;
-	EntryVector files;
-
 	if (mkdir(base.name.c_str(), 0777) != 0 && errno != EEXIST) {
 		fprintf(stderr, "%s: cannot create base directory: %s\n",
 			kProgramName, strerror(errno));
 		return 1;
 	}
+	if (mountImage != NULL)
+		mount_image(mountImage, base.name.c_str());
+
+	EntryVector dirs;
+	EntryVector files;
 
 	dirs.push_back(base);
 
@@ -845,8 +875,19 @@ main(int argc, char** argv)
 		}
 
 		if (checkInterval != 0 && sRun > 0 && (sRun % checkInterval) == 0
-			&& sRun + 1 < runs)
+			&& sRun + 1 < runs) {
+			if (mountImage != NULL) {
+				// Always remount image before checking its contents
+				unmount_image(base.name.c_str());
+				mount_image(mountImage, base.name.c_str());
+			}
 			check_files(files);
+		}
+	}
+
+	if (mountImage != NULL) {
+		unmount_image(base.name.c_str());
+		mount_image(mountImage, base.name.c_str());
 	}
 
 	check_files(files);
@@ -856,6 +897,12 @@ main(int argc, char** argv)
 			remove_file(files);
 		}
 		remove_dirs(base.name);
+	}
+
+	if (mountImage != NULL) {
+		unmount_image(base.name.c_str());
+		if (!keepDirty)
+			remove_dirs(base.name);
 	}
 
 	printf("%s written in %s, %s/s\n", size_to_string(sWriteTotal).c_str(),
