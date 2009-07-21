@@ -956,6 +956,9 @@ nextPath:
 	}
 
 nextModuleImage:
+	// TODO: remember which directories were already scanned, and don't search
+	// through them again, unless they change (use DirectoryWatcher)
+
 	if (iterator->current_header == NULL) {
 		// get next entry from the current directory
 
@@ -989,9 +992,13 @@ nextModuleImage:
 				goto nextModuleImage;
 		}
 
-		// we're not interested in traversing these again
+		// we're not interested in traversing these (again)
 		if (!strcmp(dirent->d_name, ".")
-			|| !strcmp(dirent->d_name, ".."))
+			|| !strcmp(dirent->d_name, "..")
+			// TODO: this is a bit unclean, as we actually only want to prevent
+			// drivers/bin and drivers/dev to be scanned
+			|| !strcmp(dirent->d_name, "bin")
+			|| !strcmp(dirent->d_name, "dev"))
 			goto nextModuleImage;
 
 		// build absolute path to current file
@@ -1014,7 +1021,7 @@ nextModuleImage:
 		if (S_ISDIR(stat.st_mode)) {
 			status = iterator_push_path_on_stack(iterator,
 				iterator->current_module_path, iterator->path_base_length);
-			if (status < B_OK)
+			if (status != B_OK)
 				return status;
 
 			iterator->current_module_path = NULL;
