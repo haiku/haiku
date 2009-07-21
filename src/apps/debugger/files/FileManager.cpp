@@ -203,8 +203,10 @@ private:
 		BString locatedDirectory;
 		BString locatedName;
 		_SplitNormalizedPath(locatedPath, locatedDirectory, locatedName);
-		if (locatedName != directory->Name()
-			|| !_LocateDirectory(directory->Parent(), locatedDirectory)) {
+		if (locatedName != directory->Name())
+			return false;
+
+		if (_LocateDirectory(directory->Parent(), locatedDirectory)) {
 			directory->SetLocatedPath(locatedPath, true);
 			_LocateEntries(directory, locatedPath);
 		}
@@ -277,7 +279,7 @@ private:
 					if (subDir->GetLocatedPath(locatedEntryPath))
 						_LocateEntries(subDir, locatedEntryPath);
 				}
-			 }
+			}
 		}
 	}
 
