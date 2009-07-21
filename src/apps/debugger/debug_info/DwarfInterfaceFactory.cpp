@@ -621,7 +621,10 @@ DwarfInterfaceFactory::_CreateType(DIEType* typeEntry, DwarfType*& _type)
 		if (error != B_OK)
 			return error;
 
-		fTypes->Insert(type);
+		// Insert the type into the hash table. Recheck, as the type may already
+		// have been inserted (e.g. in the compound type case).
+		if (fTypes->Lookup(typeEntry) == NULL)
+			fTypes->Insert(type);
 
 		// try to get the type's size
 		uint64 size;
@@ -641,6 +644,7 @@ DwarfInterfaceFactory::_CreateTypeInternal(DIEType* typeEntry,
 {
 	BString name;
 	DwarfUtils::GetFullyQualifiedDIEName(typeEntry, name);
+// TODO: The DIE may not have a name (e.g. pointer and reference types don't).
 
 	switch (typeEntry->Tag()) {
 		case DW_TAG_class_type:
@@ -722,6 +726,11 @@ DwarfInterfaceFactory::_CreateCompoundType(const BString& name,
 		return B_NO_MEMORY;
 	Reference<DwarfCompoundType> typeReference(type, true);
 
+	// Already add the type at this pointer to the hash table, since otherwise
+	// we could run into an infinite recursion when trying to create the types
+	// for the data members.
+	fTypes->Insert(type);
+
 	// find the abstract origin or specification that defines the data members
 	if (typeEntry->DataMembers().IsEmpty()) {
 		if (DIECompoundType* abstractOrigin = dynamic_cast<DIECompoundType*>(
@@ -757,8 +766,10 @@ DwarfInterfaceFactory::_CreateCompoundType(const BString& name,
 		DwarfDataMember* member = new(std::nothrow) DwarfDataMember(memberEntry,
 			memberName, memberType);
 		Reference<DwarfDataMember> memberReference(member, true);
-		if (member == NULL || !type->AddDataMember(member))
+		if (member == NULL || !type->AddDataMember(member)) {
+			fTypes->Remove(type);
 			return B_NO_MEMORY;
+		}
 	}
 
 	_type = typeReference.Detach();
