@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
+ * Copyright 2008 Michael Lotz <mmlr@mlotz.ch>
  * Distributed under the terms of the MIT license.
  */
 
@@ -21,6 +21,10 @@
 // input server private for raw_key_info, KB_READ, etc...
 #include "kb_mouse_driver.h"
 
+
+#define LEFT_ALT_KEY	0x04
+#define RIGHT_ALT_KEY	0x40
+#define ALT_KEYS		(LEFT_ALT_KEY | RIGHT_ALT_KEY)
 
 static usb_id sDebugKeyboardPipe = 0;
 static size_t sDebugKeyboardReportSize = 0;
@@ -242,7 +246,7 @@ KeyboardDevice::_InterpretBuffer()
 		return B_OK;
 	}
 
-	const static uint32 sModifierTable[] = {
+	const static uint32 kModifierTable[] = {
 		KEY_ControlL,
 		KEY_ShiftL,
 		KEY_AltL,
@@ -253,7 +257,7 @@ KeyboardDevice::_InterpretBuffer()
 		KEY_WinR
 	};
 
-	const static uint32 sKeyTable[] = {
+	const static uint32 kKeyTable[] = {
 		0x00,	// ERROR
 		0x00,	// ERROR
 		0x00,	// ERROR
@@ -396,12 +400,13 @@ KeyboardDevice::_InterpretBuffer()
 		0x6c,	// Muhenkan, key left to spacebar, japanese
 	};
 
-	static size_t sKeyTableSize = sizeof(sKeyTable) / sizeof(sKeyTable[0]);
+	const static size_t kKeyTableSize
+		= sizeof(kKeyTable) / sizeof(kKeyTable[0]);
 
 	uint8 modifierChange = fLastTransferBuffer[0] ^ fTransferBuffer[0];
 	for (uint8 i = 0; modifierChange; i++, modifierChange >>= 1) {
 		if (modifierChange & 1)
-			_WriteKey(sModifierTable[i], (fTransferBuffer[0] >> i) & 1);
+			_WriteKey(kModifierTable[i], (fTransferBuffer[0] >> i) & 1);
 	}
 
 	bool phantomState = true;
@@ -443,16 +448,17 @@ KeyboardDevice::_InterpretBuffer()
 
 			// a change occured
 			uint32 key = 0;
-			if (current[i] < sKeyTableSize)
-				key = sKeyTable[current[i]];
+			if (current[i] < kKeyTableSize)
+				key = kKeyTable[current[i]];
 
-			if (key == KEY_Pause && (current[0] & 1))
+			if (key == KEY_Pause && (current[0] & ALT_KEYS) != 0)
 				key = KEY_Break;
-			else if (key == 0xe && (current[0] & 1)) {
+			else if (key == 0xe && (current[0] & ALT_KEYS) != 0) {
 				key = KEY_SysRq;
 				sysReqPressed = keyDown;
-			} else if (sysReqPressed && keyDown && current[i] >= 4
-				&& current[i] <= 30 && (fLastTransferBuffer[0] & 0x44) != 0) {
+			} else if (sysReqPressed && keyDown
+				&& current[i] >= 4 && current[i] <= 30
+				&& (fLastTransferBuffer[0] & ALT_KEYS) != 0) {
 				// Alt-SysReq+letter was pressed
 				sDebugKeyboardPipe = fInterruptPipe;
 				sDebugKeyboardReportSize = fTotalReportSize;
