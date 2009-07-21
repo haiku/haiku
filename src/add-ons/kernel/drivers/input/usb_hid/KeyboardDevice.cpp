@@ -1,16 +1,22 @@
 /*
-	Driver for USB Human Interface Devices.
-	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
-	Distributed under the terms of the MIT license.
+ * Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
+ * Distributed under the terms of the MIT license.
+ */
 
-	Interpretation code based on the previous usb_hid driver which was written
-	by  Jérôme Duval.
+/*!	Driver for USB Human Interface Devices.
+ 	Interpretation code based on the previous usb_hid driver which was written
+	by Jérôme Duval.
 */
+
+
+#include <string.h>
+
+#include <usb/USB_hid.h>
+
+#include <debug.h>
+
 #include "Driver.h"
 #include "KeyboardDevice.h"
-#include <string.h>
-#include <usb/USB_hid.h>
-#include <debug.h>
 
 // input server private for raw_key_info, KB_READ, etc...
 #include "kb_mouse_driver.h"
@@ -30,14 +36,18 @@ debug_get_keyboard_config(int argc, char **argv)
 }
 
 
+//	#pragma mark -
+
+
 KeyboardDevice::KeyboardDevice(usb_device device, usb_pipe interruptPipe,
 	size_t interfaceIndex, report_insn *instructions, size_t instructionCount,
 	size_t totalReportSize)
-	:	HIDDevice(device, interruptPipe, interfaceIndex, instructions,
-			instructionCount, totalReportSize, 512),
-		fRepeatDelay(300000),
-		fRepeatRate(35000),
-		fLastTransferBuffer(NULL)
+	:
+	HIDDevice(device, interruptPipe, interfaceIndex, instructions,
+		instructionCount, totalReportSize, 512),
+	fRepeatDelay(300000),
+	fRepeatRate(35000),
+	fLastTransferBuffer(NULL)
 {
 	fCurrentRepeatDelay = B_INFINITE_TIMEOUT;
 	fCurrentRepeatKey = 0;
@@ -165,12 +175,14 @@ KeyboardDevice::Control(uint32 op, void *buffer, size_t length)
 		}
 
 		case KB_SET_KEY_REPEAT_DELAY:
-			if (user_memcpy(&fRepeatDelay, buffer, sizeof(fRepeatDelay)) != B_OK)
+			if (user_memcpy(&fRepeatDelay, buffer, sizeof(fRepeatDelay))
+					!= B_OK)
 				return B_BAD_ADDRESS;
 			return B_OK;
 
 		case KB_GET_KEY_REPEAT_DELAY:
-			if (user_memcpy(buffer, &fRepeatDelay, sizeof(fRepeatDelay)) != B_OK)
+			if (user_memcpy(buffer, &fRepeatDelay, sizeof(fRepeatDelay))
+					!= B_OK)
 				return B_BAD_ADDRESS;
 			return B_OK;
 	}
@@ -230,7 +242,7 @@ KeyboardDevice::_InterpretBuffer()
 		return B_OK;
 	}
 
-	static uint32 sModifierTable[] = {
+	const static uint32 sModifierTable[] = {
 		KEY_ControlL,
 		KEY_ShiftL,
 		KEY_AltL,
@@ -241,7 +253,7 @@ KeyboardDevice::_InterpretBuffer()
 		KEY_WinR
 	};
 
-	static uint32 sKeyTable[] = {
+	const static uint32 sKeyTable[] = {
 		0x00,	// ERROR
 		0x00,	// ERROR
 		0x00,	// ERROR
@@ -408,6 +420,8 @@ KeyboardDevice::_InterpretBuffer()
 		return B_OK;
 	}
 
+	static bool sysReqPressed = false;
+
 	bool keyDown = false;
 	uint8 *current = fLastTransferBuffer;
 	uint8 *compare = fTransferBuffer;
@@ -434,17 +448,20 @@ KeyboardDevice::_InterpretBuffer()
 
 			if (key == KEY_Pause && (current[0] & 1))
 				key = KEY_Break;
-			else if (key == 0xe && (current[0] & 1))
+			else if (key == 0xe && (current[0] & 1)) {
 				key = KEY_SysRq;
-#if 1
-			else if (keyDown && key == 0x0d) {
-				// ToDo: remove again
+				sysReqPressed = keyDown;
+			} else if (sysReqPressed && keyDown && current[i] >= 4
+				&& current[i] <= 30 && (fLastTransferBuffer[0] & 0x44) != 0) {
+				// Alt-SysReq+letter was pressed
 				sDebugKeyboardPipe = fInterruptPipe;
 				sDebugKeyboardReportSize = fTotalReportSize;
-				panic("keyboard requested halt.\n");
-			}
-#endif
-			else if (key == 0) {
+
+				char letter = current[i] - 4 + 'a';
+
+				if (debug_emergency_key_pressed(letter))
+					continue;
+			} else if (key == 0) {
 				// unmapped key
 				key = 0x200000 + current[i];
 			}
