@@ -246,7 +246,7 @@ private:
 			// Management
 			status_t		_MakeWritable();
 			status_t		_MakeWritable(int32 length, bool copy);
-			char*			_Allocate(int32 length);
+	static	char*			_Allocate(int32 length);
 			char*			_Resize(int32 length);
 			void			_Init(const char* src, int32 length);
 			char*			_Clone(const char* data, int32 length);

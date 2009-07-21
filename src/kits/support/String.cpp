@@ -196,6 +196,27 @@ BStringRef::operator&()
 //	#pragma mark - BString
 
 
+inline vint32&
+BString::_ReferenceCount()
+{
+	return data_reference_count(fPrivateData);
+}
+
+
+inline const vint32&
+BString::_ReferenceCount() const
+{
+	return data_reference_count(fPrivateData);
+}
+
+
+inline bool
+BString::_IsShareable() const
+{
+	return fPrivateData != NULL && _ReferenceCount() >= 0;
+}
+
+
 BString::BString()
 	:
 	fPrivateData(NULL)
@@ -1466,12 +1487,10 @@ BString::LockBuffer(int32 maxLength)
 BString&
 BString::UnlockBuffer(int32 length)
 {
-	if (length > 0) {
-		if (length)
-			length = min_clamp0(length, Length());
-	} else {
+	if (length > 0)
+		length = min_clamp0(length, Length());
+	else
 		length = fPrivateData == NULL ? 0 : strlen(fPrivateData);
-	}
 
 	if (_Resize(length) != NULL) {
 		fPrivateData[length] = '\0';
@@ -1712,10 +1731,10 @@ BString::operator<<(float f)
 status_t
 BString::_MakeWritable()
 {
-	if (atomic_add(&_ReferenceCount(), 1) > 1) {
+	if (atomic_get(&_ReferenceCount()) > 1) {
 		// It might be shared, and this requires special treatment
 		char* newData = _Clone(fPrivateData, Length());
-		if (atomic_add(&_ReferenceCount(), -2) == 1) {
+		if (atomic_add(&_ReferenceCount(), -1) == 1) {
 			// someone else left, we were the last owner
 			_FreePrivateData();
 		}
@@ -1723,14 +1742,14 @@ BString::_MakeWritable()
 			return B_NO_MEMORY;
 
 		fPrivateData = newData;
-	} else
-		atomic_add(&_ReferenceCount(), -1);
+	}
 
 	return B_OK;
 }
 
 
-/*!	Makes this string writable, and resizes the buffer to \a length bytes.
+/*!	Makes this string writable, and resizes the buffer to \a length bytes (not
+	including the terminating null).
 
 	@param length The length of the new buffer in bytes.
 	@param copy If true, the current string will be copied into the new string.
@@ -1740,35 +1759,37 @@ BString::_MakeWritable(int32 length, bool copy)
 {
 	char* newData = NULL;
 
-	if (atomic_add(&_ReferenceCount(), 1) > 1) {
+	if (atomic_get(&_ReferenceCount()) > 1) {
 		// we might share our data with someone else
 		if (copy)
 			newData = _Clone(fPrivateData, length);
 		else
 			newData = _Allocate(length);
 
-		if (atomic_add(&_ReferenceCount(), -2) == 1) {
+		if (newData == NULL)
+			return B_NO_MEMORY;
+
+		if (atomic_add(&_ReferenceCount(), -1) == 1) {
 			// someone else left, we were the last owner
 			_FreePrivateData();
 		}
 	} else {
 		// we don't share our data with someone else
-		atomic_add(&_ReferenceCount(), -1);
 		newData = _Resize(length);
-	}
 
-	if (newData == NULL)
-		return B_NO_MEMORY;
+		if (newData == NULL)
+			return B_NO_MEMORY;
+	}
 
 	fPrivateData = newData;
 	return B_OK;
 }
 
 
-/*!	Allocates a new private data buffer with the space to store \a length bytes,
-	but does not change the current one.
+/*!	Allocates a new private data buffer with the space to store \a length bytes
+	(not including the terminating null).
 */
-char*
+/*static*/ char*
 BString::_Allocate(int32 length)
 {
 	if (length < 0)
@@ -1795,7 +1816,7 @@ BString::_Allocate(int32 length)
 char*
 BString::_Resize(int32 length)
 {
-	ASSERT(_ReferenceCount() == 1);
+	ASSERT(_ReferenceCount() == 1 || _ReferenceCount() == -1);
 
 	if (length == Length())
 		return fPrivateData;
@@ -1876,27 +1897,6 @@ void
 BString::_SetLength(int32 length)
 {
 	data_length(fPrivateData) = length & 0x7fffffff;
-}
-
-
-inline vint32&
-BString::_ReferenceCount()
-{
-	return data_reference_count(fPrivateData);
-}
-
-
-inline const vint32&
-BString::_ReferenceCount() const
-{
-	return data_reference_count(fPrivateData);
-}
-
-
-inline bool
-BString::_IsShareable() const
-{
-	return fPrivateData != NULL && _ReferenceCount() >= 0;
 }
 
 
