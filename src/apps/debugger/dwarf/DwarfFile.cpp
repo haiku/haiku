@@ -80,7 +80,7 @@ public:
 		// get the subprogram's frame base location
 		const LocationDescription* location = fSubprogramEntry->FrameBase();
 		if (!location->IsValid())
-			return B_BAD_VALUE;
+			return false;
 
 		// get the expression
 		const void* expression;
@@ -88,7 +88,7 @@ public:
 		status_t error = fFile->_GetLocationExpression(fUnit, location,
 			fInstructionPointer, expression, expressionLength);
 		if (error != B_OK)
-			return error;
+			return false;
 
 		// evaluate the expression
 		DwarfExpressionEvaluator evaluator(this);
@@ -1756,6 +1756,9 @@ DwarfFile::_FindLocationExpression(CompilationUnit* unit, uint64 offset,
 
 		if (start == end)
 			continue;
+
+		start += baseAddress;
+		end += baseAddress;
 
 		if (address >= start && address < end) {
 			_expression = expression;
