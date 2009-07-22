@@ -15,6 +15,7 @@
 #include <arch/ppc/arch_debugger.h>
 #include <arch/m68k/arch_debugger.h>
 #include <arch/mipsel/arch_debugger.h>
+#include <arch/arm/arch_debugger.h>
 
 #ifdef __INTEL__
 	typedef struct x86_debug_cpu_state debug_cpu_state;
@@ -24,6 +25,8 @@
 	typedef struct m68k_debug_cpu_state debug_cpu_state;
 #elif __MIPSEL__
 	typedef struct mipsel_debug_cpu_state debug_cpu_state;
+#elif __ARM__
+	typedef struct arm_debug_cpu_state debug_cpu_state;
 #else
 	#error unsupported architecture
 #endif
