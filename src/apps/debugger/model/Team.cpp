@@ -242,12 +242,13 @@ printf("  -> no function instance\n");
 	// statement directly.
 	if (DisassembledCode* code = functionInstance->GetSourceCode()) {
 		Statement* statement = code->StatementAtAddress(address);
-		if (statement != NULL) {
-			statement->AcquireReference();
-			_statement = statement;
-			_function = functionInstance;
-			return B_OK;
-		}
+		if (statement == NULL)
+			return B_ENTRY_NOT_FOUND;
+
+		statement->AcquireReference();
+		_statement = statement;
+		_function = functionInstance;
+		return B_OK;
 	}
 
 	// get the statement from the image debug info
