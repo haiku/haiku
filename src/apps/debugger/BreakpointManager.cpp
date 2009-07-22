@@ -12,14 +12,14 @@
 #include <AutoLocker.h>
 
 #include "DebuggerInterface.h"
-#include "TeamDebugModel.h"
+#include "Team.h"
 
 
-BreakpointManager::BreakpointManager(TeamDebugModel* debugModel,
+BreakpointManager::BreakpointManager(Team* team,
 	DebuggerInterface* debuggerInterface)
 	:
 	fLock("breakpoint manager"),
-	fDebugModel(debugModel),
+	fTeam(team),
 	fDebuggerInterface(debuggerInterface)
 {
 }
@@ -43,7 +43,7 @@ BreakpointManager::InstallUserBreakpoint(UserBreakpoint* userBreakpoint,
 {
 printf("BreakpointManager::InstallUserBreakpoint(%p, %d)\n", userBreakpoint, enabled);
 	AutoLocker<BLocker> installLocker(fLock);
-	AutoLocker<TeamDebugModel> modelLocker(fDebugModel);
+	AutoLocker<Team> teamLocker(fTeam);
 
 	bool oldEnabled = userBreakpoint->IsEnabled();
 	if (userBreakpoint->IsValid() && enabled == oldEnabled)
@@ -65,10 +65,10 @@ printf("    -> already has breakpoint\n");
 }
 
 		target_addr_t address = instance->Address();
-		Breakpoint* breakpoint = fDebugModel->BreakpointAtAddress(address);
+		Breakpoint* breakpoint = fTeam->BreakpointAtAddress(address);
 		if (breakpoint == NULL) {
 printf("    -> no breakpoint at that address yet\n");
-			Image* image = fDebugModel->GetTeam()->ImageByAddress(address);
+			Image* image = fTeam->ImageByAddress(address);
 			if (image == NULL) {
 printf("    -> no image at that address\n");
 				error = B_BAD_ADDRESS;
@@ -81,7 +81,7 @@ printf("    -> no image at that address\n");
 				break;
 			}
 
-			if (!fDebugModel->AddBreakpoint(breakpoint)) {
+			if (!fTeam->AddBreakpoint(breakpoint)) {
 				error = B_NO_MEMORY;
 				break;
 			}
@@ -102,11 +102,11 @@ printf("    -> adding instance to breakpoint %p\n", breakpoint);
 		for (int32 i = 0;
 			UserBreakpointInstance* instance = userBreakpoint->InstanceAt(i);
 			i++) {
-			fDebugModel->NotifyUserBreakpointChanged(instance->GetBreakpoint());
+			fTeam->NotifyUserBreakpointChanged(instance->GetBreakpoint());
 		}
 	}
 
-	modelLocker.Unlock();
+	teamLocker.Unlock();
 
 	// install/uninstall the breakpoints as needed
 printf("  updating breakpoints\n");
@@ -125,18 +125,18 @@ printf("    breakpoint instance %p\n", instance);
 printf("  success, marking user breakpoint valid\n");
 		// everything went fine -- mark the user breakpoint valid
 		if (!userBreakpoint->IsValid()) {
-			modelLocker.Lock();
+			teamLocker.Lock();
 			userBreakpoint->SetValid(true);
 			userBreakpoint->AcquireReference();
 				// TODO: Put the user breakpoint some place?
-			modelLocker.Unlock();
+			teamLocker.Unlock();
 		}
 	} else {
 		// something went wrong -- revert the situation
 printf("  error, reverting\n");
-		modelLocker.Lock();
+		teamLocker.Lock();
 		userBreakpoint->SetEnabled(oldEnabled);
-		modelLocker.Unlock();
+		teamLocker.Unlock();
 
 		if (!oldEnabled || !userBreakpoint->IsValid()) {
 			for (int32 i = 0;  UserBreakpointInstance* instance
@@ -153,12 +153,12 @@ printf("  error, reverting\n");
 
 				_UpdateBreakpointInstallation(breakpoint);
 
-				modelLocker.Lock();
-				fDebugModel->NotifyUserBreakpointChanged(breakpoint);
+				teamLocker.Lock();
+				fTeam->NotifyUserBreakpointChanged(breakpoint);
 
 				if (breakpoint->IsUnused())
-					fDebugModel->RemoveBreakpoint(breakpoint);
-				modelLocker.Unlock();
+					fTeam->RemoveBreakpoint(breakpoint);
+				teamLocker.Unlock();
 			}
 		}
 	}
@@ -173,7 +173,7 @@ void
 BreakpointManager::UninstallUserBreakpoint(UserBreakpoint* userBreakpoint)
 {
 	AutoLocker<BLocker> installLocker(fLock);
-	AutoLocker<TeamDebugModel> modelLocker(fDebugModel);
+	AutoLocker<Team> teamLocker(fTeam);
 
 	if (!userBreakpoint->IsValid())
 		return;
@@ -181,7 +181,7 @@ BreakpointManager::UninstallUserBreakpoint(UserBreakpoint* userBreakpoint)
 	userBreakpoint->SetValid(false);
 	userBreakpoint->SetEnabled(false);
 
-	modelLocker.Unlock();
+	teamLocker.Unlock();
 
 	// uninstall the breakpoints as needed
 	for (int32 i = 0;
@@ -190,7 +190,7 @@ BreakpointManager::UninstallUserBreakpoint(UserBreakpoint* userBreakpoint)
 			_UpdateBreakpointInstallation(breakpoint);
 	}
 
-	modelLocker.Lock();
+	teamLocker.Lock();
 
 	// detach the breakpoints from the user breakpoint instances
 	for (int32 i = 0;
@@ -199,14 +199,14 @@ BreakpointManager::UninstallUserBreakpoint(UserBreakpoint* userBreakpoint)
 			instance->SetBreakpoint(NULL);
 			breakpoint->RemoveUserBreakpoint(instance);
 
-			fDebugModel->NotifyUserBreakpointChanged(breakpoint);
+			fTeam->NotifyUserBreakpointChanged(breakpoint);
 
 			if (breakpoint->IsUnused())
-				fDebugModel->RemoveBreakpoint(breakpoint);
+				fTeam->RemoveBreakpoint(breakpoint);
 		}
 	}
 
-	modelLocker.Unlock();
+	teamLocker.Unlock();
 	installLocker.Unlock();
 
 	// release the reference from InstallUserBreakpoint()
@@ -219,12 +219,12 @@ BreakpointManager::InstallTemporaryBreakpoint(target_addr_t address,
 	BreakpointClient* client)
 {
 	AutoLocker<BLocker> installLocker(fLock);
-	AutoLocker<TeamDebugModel> modelLocker(fDebugModel);
+	AutoLocker<Team> teamLocker(fTeam);
 
 	// create a breakpoint, if it doesn't exist yet
-	Breakpoint* breakpoint = fDebugModel->BreakpointAtAddress(address);
+	Breakpoint* breakpoint = fTeam->BreakpointAtAddress(address);
 	if (breakpoint == NULL) {
-		Image* image = fDebugModel->GetTeam()->ImageByAddress(address);
+		Image* image = fTeam->ImageByAddress(address);
 		if (image == NULL)
 			return B_BAD_ADDRESS;
 
@@ -232,7 +232,7 @@ BreakpointManager::InstallTemporaryBreakpoint(target_addr_t address,
 		if (breakpoint == NULL)
 			return B_NO_MEMORY;
 
-		if (!fDebugModel->AddBreakpoint(breakpoint))
+		if (!fTeam->AddBreakpoint(breakpoint))
 			return B_NO_MEMORY;
 	}
 
@@ -245,7 +245,7 @@ BreakpointManager::InstallTemporaryBreakpoint(target_addr_t address,
 			return B_OK;
 
 		// install
-		modelLocker.Unlock();
+		teamLocker.Unlock();
 
 		error = fDebuggerInterface->InstallBreakpoint(address);
 		if (error == B_OK) {
@@ -253,7 +253,7 @@ BreakpointManager::InstallTemporaryBreakpoint(target_addr_t address,
 			return B_OK;
 		}
 
-		modelLocker.Lock();
+		teamLocker.Lock();
 
 		breakpoint->RemoveClient(client);
 	} else
@@ -261,7 +261,7 @@ BreakpointManager::InstallTemporaryBreakpoint(target_addr_t address,
 
 	// clean up on error
 	if (breakpoint->IsUnused())
-		fDebugModel->RemoveBreakpoint(breakpoint);
+		fTeam->RemoveBreakpoint(breakpoint);
 
 	return error;
 }
@@ -272,9 +272,9 @@ BreakpointManager::UninstallTemporaryBreakpoint(target_addr_t address,
 	BreakpointClient* client)
 {
 	AutoLocker<BLocker> installLocker(fLock);
-	AutoLocker<TeamDebugModel> modelLocker(fDebugModel);
+	AutoLocker<Team> teamLocker(fTeam);
 
-	Breakpoint* breakpoint = fDebugModel->BreakpointAtAddress(address);
+	Breakpoint* breakpoint = fTeam->BreakpointAtAddress(address);
 	if (breakpoint == NULL)
 		return;
 
@@ -288,9 +288,9 @@ BreakpointManager::UninstallTemporaryBreakpoint(target_addr_t address,
 	// if unused remove it
 	Reference<Breakpoint> breakpointReference(breakpoint);
 	if (breakpoint->IsUnused())
-		fDebugModel->RemoveBreakpoint(breakpoint);
+		fTeam->RemoveBreakpoint(breakpoint);
 
-	modelLocker.Unlock();
+	teamLocker.Unlock();
 
 	if (uninstall) {
 		fDebuggerInterface->UninstallBreakpoint(address);

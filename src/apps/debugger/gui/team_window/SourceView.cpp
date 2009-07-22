@@ -34,7 +34,7 @@
 #include "MessageCodes.h"
 #include "StackTrace.h"
 #include "Statement.h"
-#include "TeamDebugModel.h"
+#include "Team.h"
 
 
 static const int32 kLeftTextMargin = 3;
@@ -73,8 +73,7 @@ protected:
 
 class SourceView::MarkerView : public BaseView {
 public:
-								MarkerView(SourceView* sourceView,
-									TeamDebugModel* debugModel,
+								MarkerView(SourceView* sourceView, Team* team,
 									Listener* listener, FontInfo* fontInfo);
 								~MarkerView();
 
@@ -129,7 +128,7 @@ public:
 									const BreakpointMarker* marker);
 
 private:
-			TeamDebugModel*		fDebugModel;
+			Team*				fTeam;
 			Listener*			fListener;
 			StackTrace*			fStackTrace;
 			StackFrame*			fStackFrame;
@@ -477,11 +476,11 @@ SourceView::MarkerView::BreakpointMarker::Draw(MarkerView* view, BRect rect)
 // #pragma mark - MarkerView
 
 
-SourceView::MarkerView::MarkerView(SourceView* sourceView,
-	TeamDebugModel* debugModel, Listener* listener, FontInfo* fontInfo)
+SourceView::MarkerView::MarkerView(SourceView* sourceView, Team* team,
+	Listener* listener, FontInfo* fontInfo)
 	:
 	BaseView("source marker view", sourceView, fontInfo),
-	fDebugModel(debugModel),
+	fTeam(team),
 	fListener(listener),
 	fStackTrace(NULL),
 	fStackFrame(NULL),
@@ -610,9 +609,9 @@ SourceView::MarkerView::MouseDown(BPoint where)
 	if (line < 0)
 		return;
 
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker<Team> locker(fTeam);
 	Statement* statement;
-	if (fDebugModel->GetTeam()->GetStatementAtSourceLocation(fSourceCode,
+	if (fTeam->GetStatementAtSourceLocation(fSourceCode,
 			SourceLocation(line), statement) != B_OK) {
 		return;
 	}
@@ -669,14 +668,14 @@ SourceView::MarkerView::_UpdateIPMarkers()
 	if (fSourceCode != NULL && fStackTrace != NULL) {
 		LocatableFile* sourceFile = fSourceCode->GetSourceFile();
 
-		AutoLocker<TeamDebugModel> locker(fDebugModel);
+		AutoLocker<Team> locker(fTeam);
 
 		for (int32 i = 0; StackFrame* frame = fStackTrace->FrameAt(i);
 				i++) {
 			target_addr_t ip = frame->InstructionPointer();
 			FunctionInstance* functionInstance;
 			Statement* statement;
-			if (fDebugModel->GetTeam()->GetStatementAtAddress(ip,
+			if (fTeam->GetStatementAtAddress(ip,
 					functionInstance, statement) != B_OK) {
 				continue;
 			}
@@ -726,11 +725,11 @@ SourceView::MarkerView::_UpdateBreakpointMarkers()
 	if (fSourceCode != NULL) {
 		LocatableFile* sourceFile = fSourceCode->GetSourceFile();
 
-		AutoLocker<TeamDebugModel> locker(fDebugModel);
+		AutoLocker<Team> locker(fTeam);
 
 		// get the breakpoints in our source code range
 		BObjectList<UserBreakpoint> breakpoints;
-		fDebugModel->GetBreakpointsForSourceCode(fSourceCode, breakpoints);
+		fTeam->GetBreakpointsForSourceCode(fSourceCode, breakpoints);
 
 		for (int32 i = 0; UserBreakpoint* breakpoint = breakpoints.ItemAt(i);
 				i++) {
@@ -738,7 +737,7 @@ SourceView::MarkerView::_UpdateBreakpointMarkers()
 				= breakpoint->InstanceAt(0);
 			FunctionInstance* functionInstance;
 			Statement* statement;
-			if (fDebugModel->GetTeam()->GetStatementAtAddress(
+			if (fTeam->GetStatementAtAddress(
 					breakpointInstance->Address(), functionInstance,
 					statement) != B_OK) {
 				continue;
@@ -1402,10 +1401,10 @@ SourceView::TextView::_ScrollToBottom(void)
 // #pragma mark - SourceView
 
 
-SourceView::SourceView(TeamDebugModel* debugModel, Listener* listener)
+SourceView::SourceView(Team* team, Listener* listener)
 	:
 	BView("source view", 0),
-	fDebugModel(debugModel),
+	fTeam(team),
 	fStackTrace(NULL),
 	fStackFrame(NULL),
 	fSourceCode(NULL),
@@ -1430,9 +1429,9 @@ SourceView::~SourceView()
 
 
 /*static*/ SourceView*
-SourceView::Create(TeamDebugModel* debugModel, Listener* listener)
+SourceView::Create(Team* team, Listener* listener)
 {
-	SourceView* self = new SourceView(debugModel, listener);
+	SourceView* self = new SourceView(team, listener);
 
 	try {
 		self->_Init();
@@ -1537,11 +1536,11 @@ printf("SourceView::ScrollToAddress(%#llx)\n", address);
 	if (fSourceCode == NULL)
 		return false;
 
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker<Team> locker(fTeam);
 
 	FunctionInstance* functionInstance;
 	Statement* statement;
-	if (fDebugModel->GetTeam()->GetStatementAtAddress(address, functionInstance,
+	if (fTeam->GetStatementAtAddress(address, functionInstance,
 			statement) != B_OK) {
 		return false;
 	}
@@ -1649,8 +1648,7 @@ SourceView::DoLayout()
 void
 SourceView::_Init()
 {
-	AddChild(fMarkerView = new MarkerView(this, fDebugModel, fListener,
-		&fFontInfo));
+	AddChild(fMarkerView = new MarkerView(this, fTeam, fListener, &fFontInfo));
 	AddChild(fTextView = new TextView(this, &fFontInfo));
 }
 

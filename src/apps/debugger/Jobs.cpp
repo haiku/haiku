@@ -25,7 +25,6 @@
 #include "StackTrace.h"
 #include "Team.h"
 #include "TeamDebugInfo.h"
-#include "TeamDebugModel.h"
 #include "Thread.h"
 #include "Type.h"
 #include "TypeComponentPath.h"
@@ -443,13 +442,12 @@ GetStackFrameValueJobKey::operator==(const JobKey& other) const
 
 GetStackFrameValueJob::GetStackFrameValueJob(
 	DebuggerInterface* debuggerInterface, Architecture* architecture,
-	TeamDebugModel* debugModel, Thread* thread, StackFrame* stackFrame,
-	Variable* variable, TypeComponentPath* path)
+	Thread* thread, StackFrame* stackFrame, Variable* variable,
+	TypeComponentPath* path)
 	:
 	fKey(stackFrame, variable, path),
 	fDebuggerInterface(debuggerInterface),
 	fArchitecture(architecture),
-	fDebugModel(debugModel),
 	fThread(thread),
 	fStackFrame(stackFrame),
 	fVariable(variable),
@@ -487,7 +485,7 @@ GetStackFrameValueJob::Do()
 
 	// in case of error, set the value to invalid to avoid triggering this job
 	// again
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker<Team> locker(fThread->GetTeam());
 	fStackFrame->Values()->SetValue(fVariable->ID(), fPath, BVariant());
 
 	return error;
@@ -688,7 +686,7 @@ printf("  -> failed to set typed data: %s\n", strerror(error));
 		value.SwapEndianess();
 
 	// set the value
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker<Team> locker(fThread->GetTeam());
 
 	StackFrameValues* values = fStackFrame->Values();
 

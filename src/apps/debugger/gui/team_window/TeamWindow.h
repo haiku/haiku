@@ -16,7 +16,6 @@
 #include "StackFrame.h"
 #include "StackTraceView.h"
 #include "Team.h"
-#include "TeamDebugModel.h"
 #include "ThreadListView.h"
 #include "VariablesView.h"
 
@@ -34,18 +33,15 @@ class VariablesView;
 class TeamWindow : public BWindow, ThreadListView::Listener,
 	ImageListView::Listener, StackTraceView::Listener,
 	ImageFunctionsView::Listener, SourceView::Listener, VariablesView::Listener,
-	Team::Listener, TeamDebugModel::Listener, Function::Listener,
-	StackFrame::Listener {
+	Team::Listener, Function::Listener, StackFrame::Listener {
 public:
 	class Listener;
 
 public:
-								TeamWindow(TeamDebugModel* debugModel,
-									Listener* listener);
+								TeamWindow(::Team* team, Listener* listener);
 								~TeamWindow();
 
-	static	TeamWindow*			Create(TeamDebugModel* debugModel,
-									Listener* listener);
+	static	TeamWindow*			Create(::Team* team, Listener* listener);
 									// throws
 
 	virtual	void				DispatchMessage(BMessage* message,
@@ -86,11 +82,8 @@ private:
 									const Team::ThreadEvent& event);
 	virtual	void				ImageDebugInfoChanged(
 									const Team::ImageEvent& event);
-
-	// TeamDebugModel::Listener
 	virtual	void				UserBreakpointChanged(
-									const TeamDebugModel::BreakpointEvent&
-										event);
+									const Team::BreakpointEvent& event);
 
 	// Function::Listener
 	virtual	void				FunctionSourceCodeChanged(Function* function);
@@ -124,7 +117,7 @@ private:
 									target_addr_t address);
 
 private:
-			TeamDebugModel*		fDebugModel;
+			::Team*				fTeam;
 			::Thread*			fActiveThread;
 			Image*				fActiveImage;
 			StackTrace*			fActiveStackTrace;

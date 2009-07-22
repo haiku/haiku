@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "ThreadHandler.h"
 
 #include <stdio.h>
@@ -25,7 +26,6 @@
 #include "StackTrace.h"
 #include "Statement.h"
 #include "Team.h"
-#include "TeamDebugModel.h"
 #include "Worker.h"
 
 
@@ -38,11 +38,10 @@ enum {
 };
 
 
-ThreadHandler::ThreadHandler(TeamDebugModel* debugModel, Thread* thread,
-	Worker* worker, DebuggerInterface* debuggerInterface,
+ThreadHandler::ThreadHandler(Thread* thread, Worker* worker,
+	DebuggerInterface* debuggerInterface,
 	BreakpointManager* breakpointManager)
 	:
-	fDebugModel(debugModel),
 	fThread(thread),
 	fWorker(worker),
 	fDebuggerInterface(debuggerInterface),
@@ -119,8 +118,8 @@ printf("ThreadHandler::HandleBreakpointHit(): ip: %llx\n", instructionPointer);
 	} else {
 		// Might be a user breakpoint, but could as well be a temporary
 		// breakpoint of another thread.
-		AutoLocker<TeamDebugModel> locker(fDebugModel);
-		Breakpoint* breakpoint = fDebugModel->BreakpointAtAddress(
+		AutoLocker<Team> locker(fThread->GetTeam());
+		Breakpoint* breakpoint = fThread->GetTeam()->BreakpointAtAddress(
 			cpuState->InstructionPointer());
 		bool continueThread = false;
 		if (breakpoint == NULL) {
@@ -187,7 +186,7 @@ ThreadHandler::HandleExceptionOccurred(ExceptionOccurredEvent* event)
 void
 ThreadHandler::HandleThreadAction(uint32 action)
 {
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker<Team> locker(fThread->GetTeam());
 
 	if (fThread->State() == THREAD_STATE_UNKNOWN)
 		return;
@@ -310,7 +309,7 @@ fStepStatement->CoveringAddressRange().End());
 void
 ThreadHandler::HandleThreadStateChanged()
 {
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker<Team> locker(fThread->GetTeam());
 
 	// cancel jobs for this thread
 	fWorker->AbortJob(SimpleJobKey(fThread, JOB_TYPE_GET_CPU_STATE));
@@ -328,7 +327,7 @@ ThreadHandler::HandleThreadStateChanged()
 void
 ThreadHandler::HandleCpuStateChanged()
 {
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker<Team> locker(fThread->GetTeam());
 
 	// cancel stack trace job for this thread
 	fWorker->AbortJob(SimpleJobKey(fThread, JOB_TYPE_GET_STACK_TRACE));
@@ -370,7 +369,7 @@ ThreadHandler::_HandleThreadStopped(CpuState* cpuState)
 {
 	_ClearContinuationState();
 
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker<Team> locker(fThread->GetTeam());
 
 	_SetThreadState(THREAD_STATE_STOPPED, cpuState);
 
@@ -389,7 +388,7 @@ ThreadHandler::_SetThreadState(uint32 state, CpuState* cpuState)
 Statement*
 ThreadHandler::_GetStatementAtInstructionPointer(StackFrame* frame)
 {
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker<Team> locker(fThread->GetTeam());
 
 	FunctionInstance* functionInstance = frame->Function();
 	if (functionInstance == NULL)

@@ -11,12 +11,12 @@
 
 
 class DebuggerInterface;
-class TeamDebugModel;
+class Team;
 
 
 class BreakpointManager {
 public:
-								BreakpointManager(TeamDebugModel* debugModel,
+								BreakpointManager(Team* team,
 									DebuggerInterface* debuggerInterface);
 								~BreakpointManager();
 
@@ -46,7 +46,7 @@ private:
 
 private:
 			BLocker				fLock;	// used to synchronize un-/installing
-			TeamDebugModel*		fDebugModel;
+			Team*				fTeam;
 			DebuggerInterface*	fDebuggerInterface;
 };
 

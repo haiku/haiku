@@ -114,7 +114,6 @@ Application Debugger :
 	SymbolInfo.cpp
 	UserBreakpoint.cpp
 	Team.cpp
-	TeamDebugModel.cpp
 	TeamMemory.cpp
 	Thread.cpp
 	ThreadInfo.cpp

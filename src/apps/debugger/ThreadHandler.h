@@ -5,6 +5,7 @@
 #ifndef THREAD_HANDLER_H
 #define THREAD_HANDLER_H
 
+
 #include <Referenceable.h>
 #include <util/OpenHashTable.h>
 
@@ -18,7 +19,6 @@ class BreakpointManager;
 class DebuggerInterface;
 class StackFrame;
 class Statement;
-class TeamDebugModel;
 class Worker;
 
 
@@ -26,8 +26,7 @@ class ThreadHandler : public Referenceable,
 	public HashTableLink<ThreadHandler>, private ImageDebugInfoProvider,
 	private BreakpointClient {
 public:
-								ThreadHandler(TeamDebugModel* debugModel,
-									Thread* thread, Worker* worker,
+								ThreadHandler(Thread* thread, Worker* worker,
 									DebuggerInterface* debuggerInterface,
 									BreakpointManager* breakpointManager);
 								~ThreadHandler();
@@ -90,7 +89,6 @@ private:
 			bool				_HandleSingleStepStep(CpuState* cpuState);
 
 private:
-			TeamDebugModel*		fDebugModel;
 			Thread*				fThread;
 			Worker*				fWorker;
 			DebuggerInterface*	fDebuggerInterface;

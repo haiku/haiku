@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "Team.h"
 
 #include <stdio.h>
@@ -11,21 +12,50 @@
 
 #include <AutoLocker.h>
 
+#include "Breakpoint.h"
 #include "DisassembledCode.h"
+#include "FileSourceCode.h"
 #include "Function.h"
 #include "ImageDebugInfo.h"
 #include "SourceCode.h"
 #include "SpecificImageDebugInfo.h"
 #include "Statement.h"
 #include "TeamDebugInfo.h"
+#include "UserBreakpoint.h"
+
+
+// #pragma mark - BreakpointByAddressPredicate
+
+
+struct Team::BreakpointByAddressPredicate
+	: UnaryPredicate<Breakpoint> {
+	BreakpointByAddressPredicate(target_addr_t address)
+		:
+		fAddress(address)
+	{
+	}
+
+	virtual int operator()(const Breakpoint* breakpoint) const
+	{
+		return -Breakpoint::CompareAddressBreakpoint(&fAddress, breakpoint);
+	}
+
+private:
+	target_addr_t	fAddress;
+};
+
 
 
 // #pragma mark - Team
 
 
-Team::Team(team_id teamID, TeamDebugInfo* debugInfo)
+Team::Team(team_id teamID, TeamMemory* teamMemory, Architecture* architecture,
+	TeamDebugInfo* debugInfo)
 	:
+	fLock("team lock"),
 	fID(teamID),
+	fTeamMemory(teamMemory),
+	fArchitecture(architecture),
 	fDebugInfo(debugInfo)
 {
 	fDebugInfo->AddReference();
@@ -34,6 +64,9 @@ Team::Team(team_id teamID, TeamDebugInfo* debugInfo)
 
 Team::~Team()
 {
+	for (int32 i = 0; Breakpoint* breakpoint = fBreakpoints.ItemAt(i); i++)
+		breakpoint->RemoveReference();
+
 	while (Image* image = fImages.RemoveHead())
 		image->RemoveReference();
 
@@ -47,7 +80,7 @@ Team::~Team()
 status_t
 Team::Init()
 {
-	return BLocker::InitCheck();
+	return fLock.InitCheck();
 }
 
 
@@ -206,6 +239,104 @@ const ImageList&
 Team::Images() const
 {
 	return fImages;
+}
+
+
+bool
+Team::AddBreakpoint(Breakpoint* breakpoint)
+{
+	if (fBreakpoints.BinaryInsert(breakpoint, &Breakpoint::CompareBreakpoints))
+		return true;
+
+	breakpoint->RemoveReference();
+	return false;
+}
+
+
+void
+Team::RemoveBreakpoint(Breakpoint* breakpoint)
+{
+	int32 index = fBreakpoints.BinarySearchIndex(*breakpoint,
+		&Breakpoint::CompareBreakpoints);
+	if (index < 0)
+		return;
+
+	fBreakpoints.RemoveItemAt(index);
+	breakpoint->RemoveReference();
+}
+
+
+int32
+Team::CountBreakpoints() const
+{
+	return fBreakpoints.CountItems();
+}
+
+
+Breakpoint*
+Team::BreakpointAt(int32 index) const
+{
+	return fBreakpoints.ItemAt(index);
+}
+
+
+Breakpoint*
+Team::BreakpointAtAddress(target_addr_t address) const
+{
+	return fBreakpoints.BinarySearchByKey(address,
+		&Breakpoint::CompareAddressBreakpoint);
+}
+
+
+void
+Team::GetBreakpointsInAddressRange(TargetAddressRange range,
+	BObjectList<UserBreakpoint>& breakpoints) const
+{
+	int32 index = fBreakpoints.FindBinaryInsertionIndex(
+		BreakpointByAddressPredicate(range.Start()));
+	for (; Breakpoint* breakpoint = fBreakpoints.ItemAt(index); index++) {
+		if (breakpoint->Address() > range.End())
+			break;
+
+		for (UserBreakpointInstanceList::ConstIterator it
+				= breakpoint->UserBreakpoints().GetIterator();
+			UserBreakpointInstance* instance = it.Next();) {
+			breakpoints.AddItem(instance->GetUserBreakpoint());
+		}
+	}
+
+	// TODO: Avoid duplicates!
+}
+
+
+void
+Team::GetBreakpointsForSourceCode(SourceCode* sourceCode,
+	BObjectList<UserBreakpoint>& breakpoints) const
+{
+	if (DisassembledCode* disassembledCode
+			= dynamic_cast<DisassembledCode*>(sourceCode)) {
+		GetBreakpointsInAddressRange(disassembledCode->StatementAddressRange(),
+			breakpoints);
+		return;
+	}
+
+	LocatableFile* sourceFile = sourceCode->GetSourceFile();
+	if (sourceFile == NULL)
+		return;
+
+	// TODO: This can probably be optimized. Maybe by registering the user
+	// breakpoints with the team and sorting them by source code.
+	for (int32 i = 0; Breakpoint* breakpoint = fBreakpoints.ItemAt(i); i++) {
+		UserBreakpointInstance* userBreakpointInstance
+			= breakpoint->FirstUserBreakpoint();
+		if (userBreakpointInstance == NULL)
+			continue;
+
+		UserBreakpoint* userBreakpoint
+			= userBreakpointInstance->GetUserBreakpoint();
+		if (userBreakpoint->GetFunction()->SourceFile() == sourceFile)
+			breakpoints.AddItem(userBreakpoint);
+	}
 }
 
 
@@ -370,6 +501,17 @@ Team::NotifyImageDebugInfoChanged(Image* image)
 
 
 void
+Team::NotifyUserBreakpointChanged(Breakpoint* breakpoint)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->UserBreakpointChanged(BreakpointEvent(
+			TEAM_EVENT_USER_BREAKPOINT_CHANGED, this, breakpoint));
+	}
+}
+
+
+void
 Team::_NotifyThreadAdded(Thread* thread)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
@@ -409,6 +551,28 @@ Team::_NotifyImageRemoved(Image* image)
 }
 
 
+void
+Team::_NotifyBreakpointAdded(Breakpoint* breakpoint)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->BreakpointAdded(BreakpointEvent(
+			TEAM_EVENT_BREAKPOINT_ADDED, this, breakpoint));
+	}
+}
+
+
+void
+Team::_NotifyBreakpointRemoved(Breakpoint* breakpoint)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->BreakpointRemoved(BreakpointEvent(
+			TEAM_EVENT_BREAKPOINT_REMOVED, this, breakpoint));
+	}
+}
+
+
 // #pragma mark - Event
 
 
@@ -438,6 +602,18 @@ Team::ImageEvent::ImageEvent(uint32 type, Image* image)
 	:
 	Event(type, image->GetTeam()),
 	fImage(image)
+{
+}
+
+
+// #pragma mark - BreakpointEvent
+
+
+Team::BreakpointEvent::BreakpointEvent(uint32 type, Team* team,
+	Breakpoint* breakpoint)
+	:
+	Event(type, team),
+	fBreakpoint(breakpoint)
 {
 }
 
@@ -494,5 +670,23 @@ Team::Listener::ThreadStackTraceChanged(const Team::ThreadEvent& event)
 
 void
 Team::Listener::ImageDebugInfoChanged(const Team::ImageEvent& event)
+{
+}
+
+
+void
+Team::Listener::BreakpointAdded(const Team::BreakpointEvent& event)
+{
+}
+
+
+void
+Team::Listener::BreakpointRemoved(const Team::BreakpointEvent& event)
+{
+}
+
+
+void
+Team::Listener::UserBreakpointChanged(const Team::BreakpointEvent& event)
 {
 }

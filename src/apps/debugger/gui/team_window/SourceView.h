@@ -5,6 +5,7 @@
 #ifndef SOURCE_VIEW_H
 #define SOURCE_VIEW_H
 
+
 #include <Font.h>
 #include <View.h>
 
@@ -16,7 +17,7 @@ class SourceCode;
 class StackFrame;
 class StackTrace;
 class Statement;
-class TeamDebugModel;
+class Team;
 
 
 class SourceView : public BView {
@@ -24,12 +25,10 @@ public:
 	class Listener;
 
 public:
-								SourceView(TeamDebugModel* debugModel,
-									Listener* listener);
+								SourceView(Team* team, Listener* listener);
 								~SourceView();
 
-	static	SourceView*			Create(TeamDebugModel* debugModel,
-									Listener* listener);
+	static	SourceView*			Create(Team* team, Listener* listener);
 									// throws
 
 			void				UnsetListener();
@@ -69,7 +68,7 @@ private:
 			BSize				_DataRectSize() const;
 
 private:
-			TeamDebugModel*		fDebugModel;
+			Team*				fTeam;
 			StackTrace*			fStackTrace;
 			StackFrame*			fStackFrame;
 			SourceCode*			fSourceCode;

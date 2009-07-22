@@ -21,6 +21,7 @@
 
 #include <AutoLocker.h>
 
+#include "Breakpoint.h"
 #include "CpuState.h"
 #include "DisassembledCode.h"
 #include "FileSourceCode.h"
@@ -43,11 +44,11 @@ enum {
 // #pragma mark - TeamWindow
 
 
-TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
+TeamWindow::TeamWindow(::Team* team, Listener* listener)
 	:
 	BWindow(BRect(100, 100, 899, 699), "Team", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
-	fDebugModel(debugModel),
+	fTeam(team),
 	fActiveThread(NULL),
 	fActiveImage(NULL),
 	fActiveStackTrace(NULL),
@@ -69,14 +70,12 @@ TeamWindow::TeamWindow(TeamDebugModel* debugModel, Listener* listener)
 	fStepIntoButton(NULL),
 	fStepOutButton(NULL)
 {
-	::Team* team = debugModel->GetTeam();
-	BString name = team->Name();
-	if (team->ID() >= 0)
-		name << " (" << team->ID() << ")";
+	BString name = fTeam->Name();
+	if (fTeam->ID() >= 0)
+		name << " (" << fTeam->ID() << ")";
 	SetTitle(name.String());
 
-	fDebugModel->AddListener(this);
-	team->AddListener(this);
+	fTeam->AddListener(this);
 }
 
 
@@ -89,8 +88,7 @@ TeamWindow::~TeamWindow()
 	if (fSourceView != NULL)
 		fSourceView->UnsetListener();
 
-	fDebugModel->GetTeam()->RemoveListener(this);
-	fDebugModel->RemoveListener(this);
+	fTeam->RemoveListener(this);
 
 	_SetActiveSourceCode(NULL);
 	_SetActiveFunction(NULL);
@@ -102,9 +100,9 @@ TeamWindow::~TeamWindow()
 
 
 /*static*/ TeamWindow*
-TeamWindow::Create(TeamDebugModel* debugModel, Listener* listener)
+TeamWindow::Create(::Team* team, Listener* listener)
 {
-	TeamWindow* self = new TeamWindow(debugModel, listener);
+	TeamWindow* self = new TeamWindow(team, listener);
 
 	try {
 		self->_Init();
@@ -350,7 +348,7 @@ TeamWindow::ImageDebugInfoChanged(const Team::ImageEvent& event)
 
 
 void
-TeamWindow::UserBreakpointChanged(const TeamDebugModel::BreakpointEvent& event)
+TeamWindow::UserBreakpointChanged(const Team::BreakpointEvent& event)
 {
 	BMessage message(MSG_USER_BREAKPOINT_CHANGED);
 	message.AddUInt64("address", event.GetBreakpoint()->Address());
@@ -386,8 +384,6 @@ TeamWindow::StackFrameValueRetrieved(StackFrame* stackFrame, Variable* variable,
 void
 TeamWindow::_Init()
 {
-	::Team* team = fDebugModel->GetTeam();
-
 	BScrollView* sourceScrollView;
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
@@ -412,15 +408,14 @@ TeamWindow::_Init()
 		.End();
 
 	// add source view
-	sourceScrollView->SetTarget(fSourceView = SourceView::Create(fDebugModel,
-		this));
+	sourceScrollView->SetTarget(fSourceView = SourceView::Create(fTeam, this));
 
 	// add threads tab
 	BSplitView* threadGroup = new BSplitView(B_HORIZONTAL);
 	threadGroup->SetName("Threads");
 	fTabView->AddTab(threadGroup);
 	BLayoutBuilder::Split<>(threadGroup)
-		.Add(fThreadListView = ThreadListView::Create(team, this))
+		.Add(fThreadListView = ThreadListView::Create(fTeam, this))
 		.Add(fStackTraceView = StackTraceView::Create(this));
 
 	// add images tab
@@ -428,7 +423,7 @@ TeamWindow::_Init()
 	imagesGroup->SetName("Images");
 	fTabView->AddTab(imagesGroup);
 	BLayoutBuilder::Split<>(imagesGroup)
-		.Add(fImageListView = ImageListView::Create(team, this))
+		.Add(fImageListView = ImageListView::Create(fTeam, this))
 		.Add(fImageFunctionsView = ImageFunctionsView::Create(this));
 
 	// add local variables tab
@@ -436,8 +431,7 @@ TeamWindow::_Init()
 	fLocalsTabView->AddTab(tab);
 
 	// add registers tab
-	tab = fRegistersView = RegistersView::Create(
-		fDebugModel->GetArchitecture());
+	tab = fRegistersView = RegistersView::Create(fTeam->GetArchitecture());
 	fLocalsTabView->AddTab(tab);
 
 	fRunButton->SetMessage(new BMessage(MSG_THREAD_RUN));
@@ -465,7 +459,7 @@ TeamWindow::_Init()
 	menu->AddItem(item);
 	item->SetTarget(this);
 
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker< ::Team> locker(fTeam);
 	_UpdateRunButtons();
 }
 
@@ -484,7 +478,7 @@ TeamWindow::_SetActiveThread(::Thread* thread)
 	if (fActiveThread != NULL)
 		fActiveThread->AddReference();
 
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker< ::Team> locker(fTeam);
 	_UpdateRunButtons();
 
 	StackTrace* stackTrace = fActiveThread != NULL
@@ -512,7 +506,7 @@ TeamWindow::_SetActiveImage(Image* image)
 
 	fActiveImage = image;
 
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker< ::Team> locker(fTeam);
 
 	ImageDebugInfo* imageDebugInfo = NULL;
 	Reference<ImageDebugInfo> imageDebugInfoReference;
@@ -564,7 +558,7 @@ TeamWindow::_SetActiveStackFrame(StackFrame* frame)
 		return;
 
 	if (fActiveStackFrame != NULL) {
-		AutoLocker<TeamDebugModel> locker(fDebugModel);
+		AutoLocker< ::Team> locker(fTeam);
 		fActiveStackFrame->RemoveListener(this);
 		locker.Unlock();
 
@@ -576,7 +570,7 @@ TeamWindow::_SetActiveStackFrame(StackFrame* frame)
 	if (fActiveStackFrame != NULL) {
 		fActiveStackFrame->AddReference();
 
-		AutoLocker<TeamDebugModel> locker(fDebugModel);
+		AutoLocker< ::Team> locker(fTeam);
 		fActiveStackFrame->AddListener(this);
 		locker.Unlock();
 
@@ -600,7 +594,7 @@ TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 	if (functionInstance == fActiveFunction)
 		return;
 
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker< ::Team> locker(fTeam);
 
 	if (fActiveFunction != NULL) {
 		fActiveFunction->GetFunction()->RemoveListener(this);
@@ -614,8 +608,7 @@ TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 	fActiveFunction = NULL;
 
 	if (functionInstance != NULL) {
-		_SetActiveImage(fDebugModel->GetTeam()->ImageByAddress(
-			functionInstance->Address()));
+		_SetActiveImage(fTeam->ImageByAddress(functionInstance->Address()));
 	}
 
 	fActiveFunction = functionInstance;
@@ -680,7 +673,7 @@ TeamWindow::_UpdateCpuState()
 	if (fActiveThread != NULL) {
 		// Get the CPU state from the active stack frame or the thread directly.
 		if (fActiveStackFrame == NULL) {
-			AutoLocker<TeamDebugModel> locker(fDebugModel);
+			AutoLocker< ::Team> locker(fTeam);
 			cpuState = fActiveThread->GetCpuState();
 			cpuStateReference.SetTo(cpuState);
 			locker.Unlock();
@@ -741,9 +734,9 @@ TeamWindow::_ScrollToActiveFunction()
 void
 TeamWindow::_HandleThreadStateChanged(thread_id threadID)
 {
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker< ::Team> locker(fTeam);
 
-	::Thread* thread = fDebugModel->GetTeam()->ThreadByID(threadID);
+	::Thread* thread = fTeam->ThreadByID(threadID);
 	if (thread == NULL)
 		return;
 
@@ -785,7 +778,7 @@ TeamWindow::_HandleStackTraceChanged(thread_id threadID)
 	if (fActiveThread == NULL || threadID != fActiveThread->ID())
 		return;
 
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker< ::Team> locker(fTeam);
 
 	StackTrace* stackTrace = fActiveThread != NULL
 		? fActiveThread->GetStackTrace() : NULL;
@@ -817,7 +810,7 @@ printf("TeamWindow::_HandleImageDebugInfoChanged(%ld)\n", imageID);
 	if (fActiveImage == NULL || imageID != fActiveImage->ID())
 		return;
 
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker< ::Team> locker(fTeam);
 
 	ImageDebugInfo* imageDebugInfo = fActiveImage != NULL
 		? fActiveImage->GetImageDebugInfo() : NULL;
@@ -839,7 +832,7 @@ TeamWindow::_HandleSourceCodeChanged()
 		return;
 
 	// get a reference to the source code
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker< ::Team> locker(fTeam);
 
 	SourceCode* sourceCode = fActiveFunction->GetFunction()->GetSourceCode();
 	if (sourceCode == NULL)

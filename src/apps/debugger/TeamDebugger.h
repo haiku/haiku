@@ -5,6 +5,7 @@
 #ifndef TEAM_DEBUGGER_H
 #define TEAM_DEBUGGER_H
 
+
 #include <debugger.h>
 #include <Looper.h>
 
@@ -20,7 +21,6 @@
 class DebuggerInterface;
 class FileManager;
 class TeamDebugInfo;
-class TeamDebugModel;
 
 
 class TeamDebugger : public BLooper, private TeamWindow::Listener,
@@ -105,7 +105,6 @@ private:
 private:
 			Listener*			fListener;
 			::Team*				fTeam;
-			TeamDebugModel*		fDebugModel;
 			team_id				fTeamID;
 			ThreadHandlerTable	fThreadHandlers;
 									// protected by the team lock

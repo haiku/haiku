@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "TeamDebugger.h"
 
 #include <stdarg.h>
@@ -33,7 +34,6 @@
 #include "Statement.h"
 #include "SymbolInfo.h"
 #include "TeamDebugInfo.h"
-#include "TeamDebugModel.h"
 #include "Variable.h"
 
 // #pragma mark - ImageHandler
@@ -121,7 +121,6 @@ TeamDebugger::TeamDebugger(Listener* listener)
 	BLooper("team debugger"),
 	fListener(listener),
 	fTeam(NULL),
-	fDebugModel(NULL),
 	fTeamID(-1),
 	fImageHandlers(NULL),
 	fDebuggerInterface(NULL),
@@ -180,7 +179,6 @@ TeamDebugger::~TeamDebugger()
 	delete fBreakpointManager;
 	delete fDebuggerInterface;
 	delete fWorker;
-	delete fDebugModel;
 	delete fTeam;
 	delete fFileManager;
 
@@ -234,7 +232,8 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return error;
 
 	// create a team object
-	fTeam = new(std::nothrow) ::Team(fTeamID, teamDebugInfo);
+	fTeam = new(std::nothrow) ::Team(fTeamID, fDebuggerInterface,
+		fDebuggerInterface->GetArchitecture(), teamDebugInfo);
 	if (fTeam == NULL)
 		return B_NO_MEMORY;
 
@@ -269,18 +268,8 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 	if (error != B_OK)
 		return error;
 
-	// create the team debug model
-	fDebugModel = new(std::nothrow) TeamDebugModel(fTeam, fDebuggerInterface,
-		fDebuggerInterface->GetArchitecture());
-	if (fDebugModel == NULL)
-		return B_NO_MEMORY;
-
-	error = fDebugModel->Init();
-	if (error != B_OK)
-		return error;
-
 	// create the breakpoint manager
-	fBreakpointManager = new(std::nothrow) BreakpointManager(fDebugModel,
+	fBreakpointManager = new(std::nothrow) BreakpointManager(fTeam,
 		fDebuggerInterface);
 	if (fBreakpointManager == NULL)
 		return B_NO_MEMORY;
@@ -306,8 +295,8 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 			if (error != B_OK)
 				return error;
 
-			ThreadHandler* handler = new(std::nothrow) ThreadHandler(
-				fDebugModel, thread, fWorker, fDebuggerInterface,
+			ThreadHandler* handler = new(std::nothrow) ThreadHandler(thread,
+				fWorker, fDebuggerInterface,
 				fBreakpointManager);
 			if (handler == NULL)
 				return B_NO_MEMORY;
@@ -352,7 +341,7 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 
 	// create the team window
 	try {
-		fTeamWindow = TeamWindow::Create(fDebugModel, this);
+		fTeamWindow = TeamWindow::Create(fTeam, this);
 	} catch (...) {
 		// TODO: Notify the user!
 		fprintf(stderr, "Error: Failed to create team window!\n");
@@ -544,8 +533,8 @@ TeamDebugger::StackFrameValueRequested(::Thread* thread, StackFrame* stackFrame,
 	// schedule the job
 	if (fWorker->ScheduleJob(
 			new(std::nothrow) GetStackFrameValueJob(fDebuggerInterface,
-				fDebuggerInterface->GetArchitecture(), fDebugModel, thread,
-					stackFrame, variable, path),
+				fDebuggerInterface->GetArchitecture(), thread, stackFrame,
+				variable, path),
 			this) != B_OK) {
 		// scheduling failed -- set the value to invalid
 		stackFrame->Values()->SetValue(variable->ID(), path, BVariant());
@@ -818,8 +807,8 @@ TeamDebugger::_HandleThreadCreated(ThreadCreatedEvent* event)
 		::Thread* thread;
 		fTeam->AddThread(info, &thread);
 
-		ThreadHandler* handler = new(std::nothrow) ThreadHandler(
-			fDebugModel, thread, fWorker, fDebuggerInterface,
+		ThreadHandler* handler = new(std::nothrow) ThreadHandler(thread,
+			fWorker, fDebuggerInterface,
 			fBreakpointManager);
 		if (handler != NULL) {
 			fThreadHandlers.Insert(handler);
@@ -887,7 +876,7 @@ printf("TeamDebugger::_HandleSetUserBreakpoint(%#llx, %d)\n", address, enabled);
 	// check whether there already is a breakpoint
 	AutoLocker< ::Team> locker(fTeam);
 
-	Breakpoint* breakpoint = fDebugModel->BreakpointAtAddress(address);
+	Breakpoint* breakpoint = fTeam->BreakpointAtAddress(address);
 	UserBreakpoint* userBreakpoint = NULL;
 	if (breakpoint != NULL && breakpoint->FirstUserBreakpoint() != NULL)
 		userBreakpoint = breakpoint->FirstUserBreakpoint()->GetUserBreakpoint();
@@ -1000,7 +989,7 @@ printf("TeamDebugger::_HandleClearUserBreakpoint(%#llx)\n", address);
 
 	AutoLocker< ::Team> locker(fTeam);
 
-	Breakpoint* breakpoint = fDebugModel->BreakpointAtAddress(address);
+	Breakpoint* breakpoint = fTeam->BreakpointAtAddress(address);
 	if (breakpoint == NULL || breakpoint->FirstUserBreakpoint() == NULL)
 		return;
 	UserBreakpoint* userBreakpoint
@@ -1016,7 +1005,7 @@ printf("TeamDebugger::_HandleClearUserBreakpoint(%#llx)\n", address);
 ThreadHandler*
 TeamDebugger::_GetThreadHandler(thread_id threadID)
 {
-	AutoLocker<TeamDebugModel> locker(fDebugModel);
+	AutoLocker< ::Team> locker(fTeam);
 
 	ThreadHandler* handler = fThreadHandlers.Lookup(threadID);
 	if (handler != NULL)

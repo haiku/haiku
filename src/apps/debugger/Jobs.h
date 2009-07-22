@@ -19,7 +19,6 @@ class Image;
 class StackFrame;
 class StackFrameValues;
 class Team;
-class TeamDebugModel;
 class Thread;
 class TypeComponentPath;
 class Variable;
@@ -164,7 +163,6 @@ public:
 								GetStackFrameValueJob(
 									DebuggerInterface* debuggerInterface,
 									Architecture* architecture,
-									TeamDebugModel* debugModel,
 									Thread* thread, StackFrame* stackFrame,
 									Variable* variable,
 									TypeComponentPath* path);
@@ -183,7 +181,6 @@ private:
 			GetStackFrameValueJobKey fKey;
 			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;
-			TeamDebugModel*		fDebugModel;
 			Thread*				fThread;
 			StackFrame*			fStackFrame;
 			Variable*			fVariable;
