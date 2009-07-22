@@ -520,7 +520,7 @@ ArchitectureX86::GetStatement(FunctionDebugInfo* function,
 
 	// create a statement
 	ContiguousStatement* statement = new(std::nothrow) ContiguousStatement(
-		SourceLocation(0), TargetAddressRange(info.Address(), info.Size()));
+		SourceLocation(-1), TargetAddressRange(info.Address(), info.Size()));
 	if (statement == NULL)
 		return B_NO_MEMORY;
 
