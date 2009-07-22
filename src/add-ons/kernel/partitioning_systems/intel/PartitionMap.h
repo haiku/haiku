@@ -25,7 +25,7 @@
 // These match those in DiskDeviceTypes.cpp and *must* be kept in sync.
 #define INTEL_PARTITION_NAME "Intel Partition Map"
 #define INTEL_EXTENDED_PARTITION_NAME "Intel Extended Partition"
-#define BFS_NAME "BFS Filesystem"
+#define BFS_NAME "Be File System"
 
 
 // partition_type
