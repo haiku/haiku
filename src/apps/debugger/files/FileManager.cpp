@@ -199,17 +199,10 @@ private:
 			return false;
 		}
 
-		// locate the parent, if possible, otherwise this directory
-		BString locatedDirectory;
-		BString locatedName;
-		_SplitNormalizedPath(locatedPath, locatedDirectory, locatedName);
-		if (locatedName != directory->Name())
+		if (!_LocateEntry(directory, locatedPath, true, true))
 			return false;
 
-		if (_LocateDirectory(directory->Parent(), locatedDirectory)) {
-			directory->SetLocatedPath(locatedPath, true);
-			_LocateEntries(directory, locatedPath);
-		}
+		_LocateEntries(directory, locatedPath);
 
 		return true;
 	}
