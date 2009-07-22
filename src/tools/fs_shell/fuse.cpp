@@ -228,7 +228,7 @@ static int
 fuse_symlink(const char* from, const char* to)
 {
 	PRINTD("##symlink\n");
-	return _ERR(_kern_create_symlink(-1, from, to,
+	return _ERR(_kern_create_symlink(-1, to, from,
 		FSSH_S_IRWXU | FSSH_S_IRWXG | FSSH_S_IRWXO));
 }
 
@@ -261,7 +261,7 @@ static int
 fuse_link(const char* from, const char* to)
 {
 	PRINTD("##link\n");
-	return _ERR(_kern_create_link(from, to));
+	return _ERR(_kern_create_link(to, from));
 }
 
 
