@@ -160,6 +160,7 @@ HAIKU_C++FLAGS = $(HAIKU_GCC_BASE_FLAGS) -nostdinc ;
 HAIKU_KERNEL_CCFLAGS = $(HAIKU_GCC_BASE_FLAGS) ;
 HAIKU_KERNEL_C++FLAGS = $(HAIKU_GCC_BASE_FLAGS) ;
 HAIKU_DEFINES = __HAIKU__ ;
+HAIKU_NO_WERROR ?= 0 ;
 
 # distro compatibility level defines
 HAIKU_DISTRO_COMPATIBILITY ?= "default" ;
@@ -200,7 +201,7 @@ switch $(HAIKU_CPU) {
 		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB (there is not realy a floppy on the gumstix ;) )
 		# offset in floppy image (>= sizeof(haiku_loader))
 		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
-				
+		HAIKU_NO_WERROR = 1 ; # we use #warning as placeholders for things to write...
 	}
 	case x86 :
 	{
@@ -222,6 +223,7 @@ switch $(HAIKU_CPU) {
 		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
 		# offset in floppy image (>= sizeof(haiku_loader))
 		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 150 ; # in kB
+		HAIKU_NO_WERROR = 1 ; # we use #warning as placeholders for things to write...
 	}
 	case mipsel :
 	{
@@ -230,6 +232,7 @@ switch $(HAIKU_CPU) {
 		HAIKU_BOOT_PLATFORM = routerboot_mipsel ;
 		# offset in floppy image (>= sizeof(haiku_loader))
 		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - todo/fixme
+		HAIKU_NO_WERROR = 1 ; # we use #warning as placeholders for things to write...
 	}
 	case * :
 		Exit "Currently unsupported target CPU:" $(HAIKU_CPU) ;
@@ -1061,11 +1064,14 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 	CCFLAGS on $(file) = [ on $(file) return $(CCFLAGS) ] ;
 }
 
-EnableWerror src kits app ;
-EnableWerror src kits interface ;
-EnableWerror src kits storage ;
-EnableWerror src kits support ;
-EnableWerror src system kernel ;
-EnableWerror src system runtime_loader ;
-EnableWerror src add-ons kernel file_systems bfs ;
-EnableWerror src add-ons kernel file_systems userlandfs ;
+if $(HAIKU_NO_WERROR) != 1 {
+	EnableWerror src kits app ;
+	EnableWerror src kits interface ;
+	EnableWerror src kits storage ;
+	EnableWerror src kits support ;
+	EnableWerror src system kernel ;
+	EnableWerror src system runtime_loader ;
+	EnableWerror src add-ons kernel file_systems bfs ;
+	EnableWerror src add-ons kernel file_systems userlandfs ;
+}
+
