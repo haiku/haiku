@@ -4,6 +4,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "SourceView.h"
 
 #include <algorithm>
@@ -263,7 +264,7 @@ private:
 			void				_ScrollByPages(int32 pageCount);
 			void				_ScrollToTop();
 			void				_ScrollToBottom();
-						
+
 private:
 
 			float				fMaxLineWidth;
@@ -681,12 +682,16 @@ SourceView::MarkerView::_UpdateIPMarkers()
 			}
 			Reference<Statement> statementReference(statement, true);
 
-			uint32 line = statement->StartSourceLocation().Line();
-			if ((functionInstance->GetSourceCode() != fSourceCode
-					&& functionInstance->GetFunction()->SourceFile()
-						!= sourceFile)
-				|| line < 0 || line >= (uint32)LineCount()) {
+			int32 line = statement->StartSourceLocation().Line();
+			if (line < 0 || line >= LineCount())
 				continue;
+
+			if (sourceFile != NULL) {
+				if (functionInstance->GetFunction()->SourceFile() != sourceFile)
+					continue;
+			} else {
+				if (functionInstance->GetSourceCode() != fSourceCode)
+					continue;
 			}
 
 			bool isTopFrame = i == 0
@@ -740,12 +745,16 @@ SourceView::MarkerView::_UpdateBreakpointMarkers()
 			}
 			Reference<Statement> statementReference(statement, true);
 
-			uint32 line = statement->StartSourceLocation().Line();
-			if ((functionInstance->GetSourceCode() != fSourceCode
-					&& functionInstance->GetFunction()->SourceFile()
-						!= sourceFile)
-				|| line < 0 || line >= (uint32)LineCount()) {
+			int32 line = statement->StartSourceLocation().Line();
+			if (line < 0 || line >= LineCount())
 				continue;
+
+			if (sourceFile != NULL) {
+				if (functionInstance->GetFunction()->SourceFile() != sourceFile)
+					continue;
+			} else {
+				if (functionInstance->GetSourceCode() != fSourceCode)
+					continue;
 			}
 
 			BreakpointMarker* marker = new(std::nothrow) BreakpointMarker(
@@ -1062,7 +1071,7 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 		SelectionPoint point = _SelectionPointAt(where);
 		if (point.line < 0)
 			return;
-			
+
 		switch (transit) {
 			case B_INSIDE_VIEW:
 			case B_OUTSIDE_VIEW:
@@ -1080,12 +1089,12 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 					fSelectionStart = point;
 				}
 				break;
-				
+
 			case B_EXITED_VIEW:
 				fScrollRunner = new BMessageRunner(BMessenger(this),
 					new BMessage(MSG_TEXTVIEW_AUTOSCROLL), kScrollTimer);
 				break;
-				
+
 			case B_ENTERED_VIEW:
 				delete fScrollRunner;
 				fScrollRunner = NULL;
@@ -1128,7 +1137,7 @@ SourceView::TextView::MouseUp(BPoint where)
 {
 	fSelectionMode = false;
 	if (fTrackState == kTracking && fClickCount < 2) {
-		
+
 		// if we clicked without dragging or double/triple clicking,
 		// clear the current selection (if any)
 		SelectionPoint point = _SelectionPointAt(where);
@@ -1361,7 +1370,7 @@ SourceView::TextView::_ScrollByPages(int32 pageCount)
 		return;
 
 	float value = vertical->Value();
-	vertical->SetValue(value + 
+	vertical->SetValue(value +
 		(fSourceView->Frame().Size().height * pageCount));
 }
 
