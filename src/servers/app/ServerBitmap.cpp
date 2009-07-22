@@ -157,6 +157,9 @@ ServerBitmap::_AllocateBuffer(void)
 void
 ServerBitmap::_HandleSpace(color_space space, int32 bytesPerRow)
 {
+	// TODO: Code duplication here, reuse functions in Bitmap.cpp
+	// and GraphicsDefs.cpp
+	
 	// calculate the minimum bytes per row
 	int32 minBPR = 0;
 	switch(space) {

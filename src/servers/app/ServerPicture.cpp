@@ -624,8 +624,7 @@ set_scale(View *view, float scale)
 static void
 set_font_family(View *view, const char *family)
 {
-	FontStyle *fontStyle = gFontManager->GetStyle(family, NULL,
-		0, 0, 0);
+	FontStyle *fontStyle = gFontManager->GetStyleByIndex(family, 0);
 	ServerFont font;
 	font.SetStyle(fontStyle);
 	view->CurrentState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);	
@@ -635,9 +634,10 @@ set_font_family(View *view, const char *family)
 static void
 set_font_style(View *view, const char *style)
 {
-	FontStyle *fontStyle = gFontManager->GetStyle(NULL, style,
-		0, 0, 0);
-	ServerFont font;
+	ServerFont font(view->CurrentState()->Font());
+	
+	FontStyle *fontStyle = gFontManager->GetStyle(font.Family(), style);
+	
 	font.SetStyle(fontStyle);
 	view->CurrentState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
 }
@@ -721,54 +721,54 @@ reserved()
 
 
 const static void *kTableEntries[] = {
-	(const void *)nop,
-	(const void *)move_pen_by,
+	(const void *)nop,					//	0
+	(const void *)move_pen_by,			
 	(const void *)stroke_line,
 	(const void *)stroke_rect,
 	(const void *)fill_rect,
-	(const void *)stroke_round_rect,
+	(const void *)stroke_round_rect,	//	5
 	(const void *)fill_round_rect,
 	(const void *)stroke_bezier,
 	(const void *)fill_bezier,
 	(const void *)stroke_arc,
-	(const void *)fill_arc,
+	(const void *)fill_arc,				//	10
 	(const void *)stroke_ellipse,
 	(const void *)fill_ellipse,
 	(const void *)stroke_polygon,
 	(const void *)fill_polygon,
-	(const void *)stroke_shape,
+	(const void *)stroke_shape,			//	15
 	(const void *)fill_shape,
 	(const void *)draw_string,
 	(const void *)draw_pixels,
 	(const void *)draw_picture,
-	(const void *)set_clipping_rects,
+	(const void *)set_clipping_rects,	//	20
 	(const void *)clip_to_picture,
 	(const void *)push_state,
 	(const void *)pop_state,
 	(const void *)enter_state_change,
-	(const void *)exit_state_change,
+	(const void *)exit_state_change,	//	25
 	(const void *)enter_font_state,
 	(const void *)exit_font_state,
 	(const void *)set_origin,
 	(const void *)set_pen_location,
-	(const void *)set_drawing_mode,
+	(const void *)set_drawing_mode,		//	30
 	(const void *)set_line_mode,
 	(const void *)set_pen_size,
 	(const void *)set_fore_color,
 	(const void *)set_back_color,
-	(const void *)set_stipple_pattern,
+	(const void *)set_stipple_pattern,	//	35
 	(const void *)set_scale,
 	(const void *)set_font_family,
 	(const void *)set_font_style,
 	(const void *)set_font_spacing,
-	(const void *)set_font_size,
+	(const void *)set_font_size,		//	40
 	(const void *)set_font_rotate,
 	(const void *)set_font_encoding,
 	(const void *)set_font_flags,
 	(const void *)set_font_shear,
-	(const void *)reserved,
+	(const void *)reserved,				//	45
 	(const void *)set_font_face,
-	(const void *)set_blending_mode
+	(const void *)set_blending_mode		//	47
 };
 
 
