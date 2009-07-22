@@ -259,6 +259,8 @@ typedef struct vregs vregs;
         #include <arch/m68k/signal.h>
 #elif __MIPSEL__
         #include <arch/mipsel/signal.h>
+#elif __ARM__
+        #include <arch/arm/signal.h>
 #else
         #error #include <arch/<cpu>/signal.h>
 #endif

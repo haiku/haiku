@@ -16,6 +16,8 @@
 	#include <arch/m68k/arch_setjmp.h>
 #elif __MIPSEL__
 	#include <arch/mipsel/arch_setjmp.h>
+#elif __ARM__
+	#include <arch/arm/arch_setjmp.h>
 #else
 	#error #include <arch/<cpu>/arch_setjmp.h>
 #endif
