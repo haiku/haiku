@@ -1358,7 +1358,7 @@ SourceView::TextView::_ScrollByLines(int32 lineCount)
 		return;
 
 	float value = vertical->Value();
-	vertical->SetValue(value + (fFontInfo->lineHeight * lineCount));
+	vertical->SetValue(value + fFontInfo->lineHeight * lineCount);
 }
 
 
@@ -1370,8 +1370,8 @@ SourceView::TextView::_ScrollByPages(int32 pageCount)
 		return;
 
 	float value = vertical->Value();
-	vertical->SetValue(value +
-		(fSourceView->Frame().Size().height * pageCount));
+	vertical->SetValue(value
+		+ fSourceView->Frame().Size().height * pageCount);
 }
 
 
