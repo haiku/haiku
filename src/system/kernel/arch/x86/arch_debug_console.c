@@ -147,8 +147,14 @@ debug_keyboard_interrupt(void *data)
 			break;
 
 		default:
-			if (altPressed && sysReqPressed)
-				debug_emergency_key_pressed(kUnshiftedKeymap[key]);
+			if (altPressed && sysReqPressed) {
+				if (debug_emergency_key_pressed(kUnshiftedKeymap[key])) {
+					// we probably have lost some keys, so reset our key states
+					controlPressed = false;
+					sysReqPressed = false;
+					altPressed = false;
+				}
+			}
 			break;
 	}
 

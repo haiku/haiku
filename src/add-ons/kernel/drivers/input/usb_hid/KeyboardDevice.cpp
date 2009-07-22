@@ -465,8 +465,11 @@ KeyboardDevice::_InterpretBuffer()
 
 				char letter = current[i] - 4 + 'a';
 
-				if (debug_emergency_key_pressed(letter))
+				if (debug_emergency_key_pressed(letter)) {
+					// we probably have lost some keys, so reset our key state
+					sysReqPressed = false;
 					continue;
+				}
 			} else if (key == 0) {
 				// unmapped key
 				key = 0x200000 + current[i];

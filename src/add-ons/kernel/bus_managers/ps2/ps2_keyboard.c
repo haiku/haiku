@@ -152,8 +152,11 @@ keyboard_handle_int(ps2_dev *dev)
 		else
 			emergencyKeyStatus &= EMERGENCY_SYS_REQ;
 	} else if (emergencyKeyStatus > EMERGENCY_SYS_REQ
-		&& debug_emergency_key_pressed(kUnshiftedKeymap[scancode]))
+		&& debug_emergency_key_pressed(kUnshiftedKeymap[scancode])) {
+		// we probably have lost some keys, so reset our key states
+		emergencyKeyStatus = 0;
 		return B_HANDLED_INTERRUPT;
+	}
 
 	keyInfo.timestamp = dev->history[0].time;
 	keyInfo.scancode = scancode;
