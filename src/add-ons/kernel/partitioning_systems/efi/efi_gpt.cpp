@@ -1,8 +1,10 @@
 /*
  * Copyright 2009, Michael Lotz, mmlr@mlotz.ch. All rights reserved.
- * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
+ *
  * Distributed under the terms of the MIT License.
  */
+
 
 #include "efi_gpt.h"
 
@@ -13,6 +15,7 @@
 #else
 #	include <DiskDeviceTypes.h>
 #	include "PartitionLocker.h"
+#	include <utf8_functions.h>
 #endif
 #include <util/kernel_cpp.h>
 
@@ -161,7 +164,13 @@ to_utf8(const uint16 *from, size_t maxFromLength, char *to, size_t toSize)
 static void
 to_ucs2(const char *from, size_t fromLength, uint16 *to, size_t maxToLength)
 {
-	// TODO: implement
+	size_t index = 0;
+	while (from[0] && index < maxToLength) {
+		to[index++] = UTF8ToCharCode(&from);
+	}
+
+	if (index < maxToLength)
+		to[index] = '\0';
 }
 #endif // !_BOOT_MODE
 
@@ -449,7 +458,9 @@ efi_gpt_identify_partition(int fd, partition_data *partition, void **_cookie)
 	}
 
 	*_cookie = header;
-	return 0.7;
+	return 0.96;
+		// This must be higher as Intel partitioning, as EFI can contain this
+		// partitioning for compatibility
 }
 
 
@@ -712,10 +723,11 @@ efi_gpt_validate_initialize(partition_data *partition, char *name,
 
 static bool
 efi_gpt_validate_create_child(partition_data *partition, off_t *start,
-	off_t *size, const char *type, const char *parameters, int32 *index)
+	off_t *size, const char *type, const char *name, const char *parameters,
+	int32 *index)
 {
 	if ((efi_gpt_get_supported_operations(partition, ~0)
-		& B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD) == 0)
+			& B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD) == 0)
 		return false;
 
 	if (guid_for_partition_type(type) == NULL)
@@ -733,6 +745,7 @@ efi_gpt_validate_create_child(partition_data *partition, off_t *start,
 
 	if (entryIndex < 0)
 		return false;
+
 	*index = entryIndex;
 
 	// ensure that child lies between first and last usable block
@@ -1083,8 +1096,8 @@ efi_gpt_initialize(int fd, partition_id partitionID, const char *name,
 
 static status_t
 efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
-	off_t size, const char *type, const char *parameters, disk_job_id job,
-	partition_id *childID)
+	off_t size, const char *type, const char *name, const char *parameters,
+	disk_job_id job, partition_id *childID)
 {
 	if (fd < 0)
 		return B_ERROR;
@@ -1106,7 +1119,7 @@ efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
 	uint32 entryIndex = 0;
 
 	if (!efi_gpt_validate_create_child(partition, &validatedOffset,
-			&validatedSize, type, parameters, (int32 *)&entryIndex))
+			&validatedSize, type, name, parameters, (int32 *)&entryIndex))
 		return B_BAD_VALUE;
 
 	const static_guid *newType = guid_for_partition_type(type);
@@ -1122,6 +1135,7 @@ efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
 
 	efi_partition_entry &entry = header->EntryAt(entryIndex);
 	memcpy(&entry.partition_type, newType, sizeof(entry.partition_type));
+	to_ucs2(name, strlen(name), entry.name, EFI_PARTITION_NAME_LENGTH);
 	entry.SetStartBlock((validatedOffset - partition->offset)
 		/ partition->block_size);
 	entry.SetBlockCount(validatedSize / partition->block_size);
@@ -1135,6 +1149,7 @@ efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
 
 	*childID = child->id;
 	child->block_size = partition->block_size;
+	child->name = strdup(name);
 	child->type = strdup(type);
 	child->parameters = strdup(parameters);
 	child->cookie = (void *)entryIndex;
