@@ -72,6 +72,10 @@ SimpleTest mbtest
 	: mbtest.c
 ;
 
+SimpleTest testmb
+	: testmb.c
+;
+
 SimpleTest tst-btowc
 	: tst-btowc.c
 ;
