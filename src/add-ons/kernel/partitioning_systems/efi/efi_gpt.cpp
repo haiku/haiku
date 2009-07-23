@@ -166,6 +166,7 @@ to_ucs2(const char *from, size_t fromLength, uint16 *to, size_t maxToLength)
 {
 	size_t index = 0;
 	while (from[0] && index < maxToLength) {
+		// TODO: handle characters that are not representable in UCS-2 better
 		to[index++] = UTF8ToCharCode(&from);
 	}
 
