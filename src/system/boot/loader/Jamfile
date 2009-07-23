@@ -13,19 +13,35 @@ UsePrivateHeaders shared storage ;
 	local defines =
 		_BOOT_MODE
 		BOOT_ARCH=\\\"$(TARGET_ARCH)\\\"
+		KMESSAGE_CONTAINER_ONLY
 
-		BOOT_SUPPORT_PARTITION_AMIGA
-		BOOT_SUPPORT_PARTITION_APPLE
-		BOOT_SUPPORT_PARTITION_EFI
 		BOOT_SUPPORT_PARTITION_INTEL
 
 		BOOT_SUPPORT_FILE_SYSTEM_BFS
-		BOOT_SUPPORT_FILE_SYSTEM_FAT
-		BOOT_SUPPORT_FILE_SYSTEM_AMIGA_FFS
 		BOOT_SUPPORT_FILE_SYSTEM_TARFS
-
-		KMESSAGE_CONTAINER_ONLY
 	;
+
+	# Add architecture specific partition/file system modules
+
+	switch $(TARGET_ARCH) {
+		case "ppc" :
+		{
+			defines +=
+				BOOT_SUPPORT_PARTITION_AMIGA
+				BOOT_SUPPORT_PARTITION_APPLE
+
+				BOOT_SUPPORT_FILE_SYSTEM_AMIGA_FFS
+			;
+		}
+		case "x86" :
+		{
+			defines +=
+				BOOT_SUPPORT_PARTITION_EFI
+
+				BOOT_SUPPORT_FILE_SYSTEM_FAT
+			;
+		}
+	}
 
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) -Wall -Wno-multichar ;

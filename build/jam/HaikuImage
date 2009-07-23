@@ -193,7 +193,7 @@ AddFilesToHaikuImage system add-ons kernel generic
 	: $(ATA_ONLY)ata_adapter dpc $(IDE_ONLY)ide_adapter locked_pool mpu401
 		scsi_periph ;
 AddFilesToHaikuImage system add-ons kernel partitioning_systems
-	: intel session ;
+	: amiga_rdb apple efi_gpt intel session ;
 AddFilesToHaikuImage system add-ons kernel interrupt_controllers
 	: $(PPC_ONLY)openpic ;
 
@@ -369,7 +369,7 @@ SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
 etcFiles += <etc>termcap <etc>sysless <etc>sysless.in ;
 AddFilesToHaikuImage system etc : $(etcFiles) ;
 
-SEARCH on <bash_completion>subversion = 
+SEARCH on <bash_completion>subversion =
 	[ FDirName $(HAIKU_TOP) data etc bash_completion.d ] ;
 AddFilesToHaikuImage system etc bash_completion.d : <bash_completion>subversion ;
 
