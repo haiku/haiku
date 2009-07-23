@@ -125,13 +125,10 @@ fromFsshStatToStat(struct fssh_stat* f_stbuf, struct stat* stbuf)
 	stbuf->st_ctime = f_stbuf->fssh_st_ctime;
 }
 
-#define _ERR(x) (-1*fssh_to_host_error(x))
+#define _ERR(x) (-1 * fssh_to_host_error(x))
 
 
 // pragma mark - FUSE functions
-
-
-//extern "C" {
 
 
 int
@@ -347,56 +344,109 @@ fuse_destroy(void* priv_data)
 }
 
 
-//} // extern "C" {
+static fssh_dev_t
+get_volume_id()
+{
+	struct fssh_stat st;
+	fssh_status_t error = _kern_read_stat(-1, kMountPoint, false, &st,
+		sizeof(st));
+	if (error != FSSH_B_OK) {
+		fprintf(stderr, "get_volume_id(): Failed to stat() mount point: %s\n",
+			fssh_strerror(error));
+		return error;
+	}
+
+	return st.fssh_st_dev;
+}
 
 
-struct fuse_operations fuse_cmds;
+static int
+fuse_statfs(const char *path __attribute__((unused)),
+                            struct statvfs *sfs)
+{
+	PRINTD("##statfs\n");
+
+	fssh_dev_t volumeID = get_volume_id();
+	if (volumeID < 0)
+		return _ERR(volumeID);
+
+    fssh_fs_info info;
+    fssh_status_t status = _kern_read_fs_info(volumeID, &info);
+    if (status != FSSH_B_OK)
+		return _ERR(status);
+
+	sfs->f_bsize = sfs->f_frsize = info.block_size;
+	sfs->f_blocks = info.total_blocks;
+	sfs->f_bavail = sfs->f_bfree = info.free_blocks;
+
+	return 0;
+}
+
+
+struct fuse_operations gFUSEOperations;
 
 
 static void
-initialiseFuseOps(struct fuse_operations* fuse_cmds)
+initialiseFuseOps(struct fuse_operations* fuseOps)
 {
-	fuse_cmds->getattr	= fuse_getattr;
-	fuse_cmds->access	= fuse_access;
-	fuse_cmds->readlink	= fuse_readlink;
-	fuse_cmds->readdir	= fuse_readdir;
-	fuse_cmds->mknod	= fuse_mknod;
-	fuse_cmds->mkdir	= fuse_mkdir;
-	fuse_cmds->symlink	= fuse_symlink;
-	fuse_cmds->unlink	= fuse_unlink;
-	fuse_cmds->rmdir	= fuse_rmdir;
-	fuse_cmds->rename	= fuse_rename;
-	fuse_cmds->link		= fuse_link;
-	fuse_cmds->chmod	= fuse_chmod;
-	fuse_cmds->chown	= fuse_chown;
-	fuse_cmds->truncate	= NULL;
-	fuse_cmds->utimens	= NULL;
-	fuse_cmds->open		= fuse_open;
-	fuse_cmds->read		= fuse_read;
-	fuse_cmds->write	= fuse_write;
-	fuse_cmds->statfs	= NULL;
-	fuse_cmds->release	= NULL;
-	fuse_cmds->fsync	= NULL;
-	fuse_cmds->destroy	= fuse_destroy;
+	fuseOps->getattr	= fuse_getattr;
+	fuseOps->access		= fuse_access;
+	fuseOps->readlink	= fuse_readlink;
+	fuseOps->readdir	= fuse_readdir;
+	fuseOps->mknod		= fuse_mknod;
+	fuseOps->mkdir		= fuse_mkdir;
+	fuseOps->symlink	= fuse_symlink;
+	fuseOps->unlink		= fuse_unlink;
+	fuseOps->rmdir		= fuse_rmdir;
+	fuseOps->rename		= fuse_rename;
+	fuseOps->link		= fuse_link;
+	fuseOps->chmod		= fuse_chmod;
+	fuseOps->chown		= fuse_chown;
+	fuseOps->truncate	= NULL;
+	fuseOps->utimens	= NULL;
+	fuseOps->open		= fuse_open;
+	fuseOps->read		= fuse_read;
+	fuseOps->write		= fuse_write;
+	fuseOps->statfs		= fuse_statfs;
+	fuseOps->release	= NULL;
+	fuseOps->fsync		= NULL;
+	fuseOps->destroy	= fuse_destroy;
 }
 
 
 static int
 fssh_fuse_session(const char* device, const char* mntPoint, const char* fsName)
 {
+	// Mount the volume in the root FS.
 	fssh_dev_t fsDev = _kern_mount(kMountPoint, device, fsName, 0, NULL, 0);
 	if (fsDev < 0) {
 		fprintf(stderr, "Error: Mounting FS failed: %s\n",
 			fssh_strerror(fsDev));
 		return 1;
 	}
+
+	// Run the fuse_main() loop.
 	const char* argv[5];
 	argv[0] = (const char*)"bfs_shell";
 	argv[1] = mntPoint;
 	argv[2] = (const char*)"-d";
 	argv[3] = (const char*)"-s";
-	initialiseFuseOps(&fuse_cmds);
-	return fuse_main(4, (char**)argv, &fuse_cmds, NULL);
+
+	initialiseFuseOps(&gFUSEOperations);
+
+	int ret =  fuse_main(4, (char**)argv, &gFUSEOperations, NULL);
+
+	// Unmount the volume again.
+	_kern_setcwd(-1, "/");
+		// Avoid a "busy" vnode.
+	fssh_status_t error = _kern_unmount(kMountPoint, 0);
+	if (error != FSSH_B_OK) {
+		fprintf(stderr, "Error: Unmounting FS failed: %s\n",
+			fssh_strerror(error));
+		return 1;
+	}
+
+	return ret;
 }
 
 
