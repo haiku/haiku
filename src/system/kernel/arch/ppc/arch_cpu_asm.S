@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel D�fler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003, Axel Döfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #define FUNCTION(x) .global x; .type x,@function; x
 
@@ -175,4 +175,3 @@ FUNCTION(reset_dbats):
 FUNCTION(__eieio):
 	eieio
 	blr
-

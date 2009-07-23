@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,7 +24,7 @@
 #define PAGE_READ_ONLY	0x01
 #define PAGE_READ_WRITE	0x02
 
-// NULL is actually a possible physical address... 
+// NULL is actually a possible physical address...
 //#define PHYSINVAL ((void *)-1)
 #define PHYSINVAL NULL
 
@@ -47,7 +47,8 @@ remove_range_index(addr_range *ranges, uint32 &numRanges, uint32 index)
 		return;
 	}
 
-	memmove(&ranges[index], &ranges[index + 1], sizeof(addr_range) * (numRanges - 1 - index));
+	memmove(&ranges[index], &ranges[index + 1],
+		sizeof(addr_range) * (numRanges - 1 - index));
 	numRanges--;
 }
 
@@ -116,7 +117,7 @@ insert_memory_range(addr_range *ranges, uint32 &numRanges, uint32 maxRanges,
 	}
 
 	// no range matched, we need to create a new one
-	
+
 	if (numRanges >= maxRanges)
 		return B_ENTRY_NOT_FOUND;
 
@@ -174,27 +175,27 @@ remove_memory_range(addr_range *ranges, uint32 &numRanges, uint32 maxRanges,
 static status_t
 insert_physical_memory_range(void *start, uint32 size)
 {
-	return insert_memory_range(gKernelArgs.physical_memory_range, 
-				gKernelArgs.num_physical_memory_ranges, MAX_PHYSICAL_MEMORY_RANGE,
-				start, size);
+	return insert_memory_range(gKernelArgs.physical_memory_range,
+		gKernelArgs.num_physical_memory_ranges, MAX_PHYSICAL_MEMORY_RANGE,
+		start, size);
 }
 
 
 static status_t
 insert_physical_allocated_range(void *start, uint32 size)
 {
-	return insert_memory_range(gKernelArgs.physical_allocated_range, 
-				gKernelArgs.num_physical_allocated_ranges, MAX_PHYSICAL_ALLOCATED_RANGE,
-				start, size);
+	return insert_memory_range(gKernelArgs.physical_allocated_range,
+		gKernelArgs.num_physical_allocated_ranges, MAX_PHYSICAL_ALLOCATED_RANGE,
+		start, size);
 }
 
 
 static status_t
 insert_virtual_allocated_range(void *start, uint32 size)
 {
-	return insert_memory_range(gKernelArgs.virtual_allocated_range, 
-				gKernelArgs.num_virtual_allocated_ranges, MAX_VIRTUAL_ALLOCATED_RANGE,
-				start, size);
+	return insert_memory_range(gKernelArgs.virtual_allocated_range,
+		gKernelArgs.num_virtual_allocated_ranges, MAX_VIRTUAL_ALLOCATED_RANGE,
+		start, size);
 }
 
 
@@ -241,12 +242,15 @@ find_physical_memory_ranges(size_t &total)
 			printf("%ld: empty region\n", i);
 			continue;
 		}
-		printf("%ld: base = %p, size = %lu\n", i, regions[i].base, regions[i].size);
+		printf("%ld: base = %p, size = %lu\n", i, regions[i].base,
+			regions[i].size);
 
 		total += regions[i].size;
 
-		if (insert_physical_memory_range(regions[i].base, regions[i].size) < B_OK) {
-			printf("cannot map physical memory range (num ranges = %lu)!\n", gKernelArgs.num_physical_memory_ranges);
+		if (insert_physical_memory_range(regions[i].base, regions[i].size)
+				!= B_OK) {
+			printf("cannot map physical memory range (num ranges = %lu)!\n",
+				gKernelArgs.num_physical_memory_ranges);
 			return B_ERROR;
 		}
 	}
@@ -301,27 +305,24 @@ intersects_ranges(addr_range *ranges, uint32 numRanges, void *address,
 static bool
 is_virtual_allocated(void *address, size_t size)
 {
-	return intersects_ranges(gKernelArgs.virtual_allocated_range, 
-				gKernelArgs.num_virtual_allocated_ranges, 
-				address, size);
+	return intersects_ranges(gKernelArgs.virtual_allocated_range,
+		gKernelArgs.num_virtual_allocated_ranges, address, size);
 }
 
 
 static bool
 is_physical_allocated(void *address, size_t size)
 {
-	return intersects_ranges(gKernelArgs.physical_allocated_range, 
-				gKernelArgs.num_physical_allocated_ranges, 
-				address, size);
+	return intersects_ranges(gKernelArgs.physical_allocated_range,
+		gKernelArgs.num_physical_allocated_ranges, address, size);
 }
 
 
 static bool
 is_physical_memory(void *address, size_t size)
 {
-	return is_in_range(gKernelArgs.physical_memory_range, 
-				gKernelArgs.num_physical_memory_ranges, 
-				address, size);
+	return is_in_range(gKernelArgs.physical_memory_range,
+		gKernelArgs.num_physical_memory_ranges, address, size);
 }
 
 
@@ -333,10 +334,12 @@ is_physical_memory(void *address)
 
 
 static void
-fill_page_table_entry(page_table_entry *entry, uint32 virtualSegmentID, void *virtualAddress, void *physicalAddress, uint8 mode, bool secondaryHash)
+fill_page_table_entry(page_table_entry *entry, uint32 virtualSegmentID,
+	void *virtualAddress, void *physicalAddress, uint8 mode, bool secondaryHash)
 {
 	// lower 32 bit - set at once
-	((uint32 *)entry)[1] = (((uint32)physicalAddress / B_PAGE_SIZE) << 12) | mode;
+	((uint32 *)entry)[1]
+		= (((uint32)physicalAddress / B_PAGE_SIZE) << 12) | mode;
 	/*entry->physical_page_number = (uint32)physicalAddress / B_PAGE_SIZE;
 	entry->_reserved0 = 0;
 	entry->referenced = false;
@@ -362,9 +365,11 @@ fill_page_table_entry(page_table_entry *entry, uint32 virtualSegmentID, void *vi
 static void
 map_page(void *virtualAddress, void *physicalAddress, uint8 mode)
 {
-	uint32 virtualSegmentID = sSegments[addr_t(virtualAddress) >> 28].virtual_segment_id;
+	uint32 virtualSegmentID
+		= sSegments[addr_t(virtualAddress) >> 28].virtual_segment_id;
 
-	uint32 hash = page_table_entry::PrimaryHash(virtualSegmentID, (uint32)virtualAddress);
+	uint32 hash = page_table_entry::PrimaryHash(virtualSegmentID,
+		(uint32)virtualAddress);
 	page_table_entry_group *group = &sPageTable[hash & sPageTableHashMask];
 
 	for (int32 i = 0; i < 8; i++) {
@@ -372,7 +377,8 @@ map_page(void *virtualAddress, void *physicalAddress, uint8 mode)
 		if (group->entry[i].valid)
 			continue;
 
-		fill_page_table_entry(&group->entry[i], virtualSegmentID, virtualAddress, physicalAddress, mode, false);
+		fill_page_table_entry(&group->entry[i], virtualSegmentID,
+			virtualAddress, physicalAddress, mode, false);
 		//printf("map: va = %p -> %p, mode = %d, hash = %lu\n", virtualAddress, physicalAddress, mode, hash);
 		return;
 	}
@@ -384,12 +390,14 @@ map_page(void *virtualAddress, void *physicalAddress, uint8 mode)
 		if (group->entry[i].valid)
 			continue;
 
-		fill_page_table_entry(&group->entry[i], virtualSegmentID, virtualAddress, physicalAddress, mode, true);
+		fill_page_table_entry(&group->entry[i], virtualSegmentID,
+			virtualAddress, physicalAddress, mode, true);
 		//printf("map: va = %p -> %p, mode = %d, second hash = %lu\n", virtualAddress, physicalAddress, mode, hash);
 		return;
 	}
 
-	panic("out of page table entries! (you would think this could not happen in a boot loader...)\n");
+	panic("out of page table entries! (you would think this could not happen "
+		"in a boot loader...)\n");
 }
 
 
@@ -397,7 +405,7 @@ static void
 map_range(void *virtualAddress, void *physicalAddress, size_t size, uint8 mode)
 {
 	for (uint32 offset = 0; offset < size; offset += B_PAGE_SIZE) {
-		map_page((void *)(uint32(virtualAddress) + offset), 
+		map_page((void *)(uint32(virtualAddress) + offset),
 			(void *)(uint32(physicalAddress) + offset), mode);
 	}
 }
@@ -424,7 +432,9 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 		void	*physical_address;
 		int		mode;
 	} translations[64];
-	int length = of_getprop(mmu, "translations", &translations, sizeof(translations));
+
+	int length = of_getprop(mmu, "translations", &translations,
+		sizeof(translations));
 	if (length == OF_FAILED) {
 		puts("no OF translations");
 		return B_ERROR;
@@ -442,17 +452,19 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 
 		if (is_physical_memory(map->physical_address)
 			&& insert_physical_allocated_range(map->physical_address,
-					map->length) < B_OK) {
-			printf("cannot map physical allocated range (num ranges = %lu)!\n", gKernelArgs.num_physical_allocated_ranges);
+					map->length) != B_OK) {
+			printf("cannot map physical allocated range (num ranges = %lu)!\n",
+				gKernelArgs.num_physical_allocated_ranges);
 			return B_ERROR;
 		}
 
 		if (map->virtual_address == pageTable) {
 			puts("found page table!");
-			*_physicalPageTable = (page_table_entry_group *)map->physical_address;
+			*_physicalPageTable
+				= (page_table_entry_group *)map->physical_address;
 			keepRange = false;	// we keep it explicitely anyway
 		}
-		if ((addr_t)map->physical_address <= 0x100 
+		if ((addr_t)map->physical_address <= 0x100
 			&& (addr_t)map->physical_address + map->length >= 0x1000) {
 			puts("found exception handlers!");
 			*_exceptionHandlers = map->virtual_address;
@@ -464,19 +476,21 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 		// insert range in virtual allocated
 
 		if (insert_virtual_allocated_range(map->virtual_address,
-				map->length) < B_OK) {
-			printf("cannot map virtual allocated range (num ranges = %lu)!\n", gKernelArgs.num_virtual_allocated_ranges);
+				map->length) != B_OK) {
+			printf("cannot map virtual allocated range (num ranges = %lu)!\n",
+				gKernelArgs.num_virtual_allocated_ranges);
 		}
 
 		// map range into the page table
 
-		map_range(map->virtual_address, map->physical_address, map->length, map->mode);
+		map_range(map->virtual_address, map->physical_address, map->length,
+			map->mode);
 
 		// insert range in virtual ranges to keep
 
 		if (keepRange) {
 			if (insert_virtual_range_to_keep(map->virtual_address,
-					map->length) < B_OK) {
+					map->length) != B_OK) {
 				printf("cannot map virtual range to keep (num ranges = %lu)!\n",
 					gKernelArgs.num_virtual_allocated_ranges);
 			}
@@ -498,17 +512,16 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 }
 
 
-/** Computes the recommended minimal page table size as
- *	described in table 7-22 of the PowerPC "Programming
- *	Environment for 32-Bit Microprocessors".
- *	The page table size ranges from 64 kB (for 8 MB RAM)
- *	to 32 MB (for 4 GB RAM).
- */
-
+/*!	Computes the recommended minimal page table size as
+	described in table 7-22 of the PowerPC "Programming
+	Environment for 32-Bit Microprocessors".
+	The page table size ranges from 64 kB (for 8 MB RAM)
+	to 32 MB (for 4 GB RAM).
+*/
 static size_t
 suggested_page_table_size(size_t total)
 {
-	uint32 max = 23;	
+	uint32 max = 23;
 		// 2^23 == 8 MB
 
 	while (max < 32) {
@@ -547,8 +560,10 @@ find_free_physical_range(size_t size)
 	}
 
 	for (uint32 i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
-		void *address = (void *)(gKernelArgs.physical_allocated_range[i].start + gKernelArgs.physical_allocated_range[i].size);
-		if (!is_physical_allocated(address, size) && is_physical_memory(address, size))
+		void *address = (void *)(gKernelArgs.physical_allocated_range[i].start
+			+ gKernelArgs.physical_allocated_range[i].size);
+		if (!is_physical_allocated(address, size)
+			&& is_physical_memory(address, size))
 			return address;
 	}
 	return PHYSINVAL;
@@ -564,7 +579,8 @@ find_free_virtual_range(void *base, size_t size)
 	void *firstFound = NULL;
 	void *firstBaseFound = NULL;
 	for (uint32 i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
-		void *address = (void *)(gKernelArgs.virtual_allocated_range[i].start + gKernelArgs.virtual_allocated_range[i].size);
+		void *address = (void *)(gKernelArgs.virtual_allocated_range[i].start
+			+ gKernelArgs.virtual_allocated_range[i].size);
 		if (!is_virtual_allocated(address, size)) {
 			if (!base)
 				return address;
@@ -617,7 +633,7 @@ arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 	// have a look for free physical memory as well (we assume
 	// that a) there is enough memory, and b) failing is fatal
 	// so that we don't have to optimize for these cases :)
-	
+
 	void *physicalAddress = find_free_physical_range(size);
 	if (physicalAddress == PHYSINVAL) {
 		dprintf("arch_mmu_allocate(base: %p, size: %lu) no free physical "
@@ -627,7 +643,8 @@ arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 
 	// everything went fine, so lets mark the space as used.
 
-	printf("mmu_alloc: va %p, pa %p, size %u\n", virtualAddress, physicalAddress, size);
+	printf("mmu_alloc: va %p, pa %p, size %u\n", virtualAddress,
+		physicalAddress, size);
 	insert_virtual_allocated_range(virtualAddress, size);
 	insert_physical_allocated_range(physicalAddress, size);
 
@@ -640,7 +657,7 @@ arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 extern "C" status_t
 arch_mmu_free(void *address, size_t size)
 {
-	// ToDo: implement freeing a region!
+	// TODO: implement freeing a region!
 	return B_OK;
 }
 
@@ -663,8 +680,7 @@ invalidate_tlb(void)
 }
 
 
-//	#pragma mark -
-//	OpenFirmware callbacks and public API
+//	#pragma mark - OpenFirmware callbacks and public API
 
 
 static int
@@ -679,14 +695,14 @@ map_callback(struct of_arguments *args)
 	// insert range in physical allocated if needed
 
 	if (is_physical_memory(physicalAddress)
-		&& insert_physical_allocated_range(physicalAddress, length) < B_OK) {
+		&& insert_physical_allocated_range(physicalAddress, length) != B_OK) {
 		error = -1;
 		return OF_FAILED;
 	}
 
 	// insert range in virtual allocated
 
-	if (insert_virtual_allocated_range(virtualAddress, length) < B_OK) {
+	if (insert_virtual_allocated_range(virtualAddress, length) != B_OK) {
 		error = -2;
 		return OF_FAILED;
 	}
@@ -706,7 +722,7 @@ unmap_callback(struct of_arguments *args)
 	int length = args->Argument(1);
 	int &error = args->ReturnValue(0);
 */
-	// ToDo: to be implemented
+	// TODO: to be implemented
 
 	return OF_FAILED;
 }
@@ -721,10 +737,12 @@ translate_callback(struct of_arguments *args)
 	int &mode = args->ReturnValue(2);
 
 	// Find page table entry for this address
-	
-	uint32 virtualSegmentID = sSegments[addr_t(virtualAddress) >> 28].virtual_segment_id;
 
-	uint32 hash = page_table_entry::PrimaryHash(virtualSegmentID, (uint32)virtualAddress);
+	uint32 virtualSegmentID
+		= sSegments[addr_t(virtualAddress) >> 28].virtual_segment_id;
+
+	uint32 hash = page_table_entry::PrimaryHash(virtualSegmentID,
+		(uint32)virtualAddress);
 	page_table_entry_group *group = &sPageTable[hash & sPageTableHashMask];
 	page_table_entry *entry = NULL;
 
@@ -759,10 +777,10 @@ success:
 	// we found the entry in question
 	physicalAddress = (int)(entry->physical_page_number * B_PAGE_SIZE);
 	mode = (entry->write_through << 6)		// WIMGxPP
-			| (entry->caching_inhibited << 5)
-			| (entry->memory_coherent << 4)
-			| (entry->guarded << 3)
-			| entry->page_protection;
+		| (entry->caching_inhibited << 5)
+		| (entry->memory_coherent << 4)
+		| (entry->guarded << 3)
+		| entry->page_protection;
 	error = B_OK;
 
 	return B_OK;
@@ -830,7 +848,7 @@ arch_mmu_init(void)
 	// get map of physical memory (fill in kernel_args structure)
 
 	size_t total;
-	if (find_physical_memory_ranges(total) < B_OK) {
+	if (find_physical_memory_ranges(total) != B_OK) {
 		puts("could not find physical memory ranges!");
 		return B_ERROR;
 	}
@@ -856,12 +874,14 @@ arch_mmu_init(void)
 	if (tableSize < suggestedTableSize) {
 		// nah, we need a new one!
 		printf("need new page table, size = %u!\n", suggestedTableSize);
-		table = (page_table_entry_group *)of_claim(NULL, suggestedTableSize, suggestedTableSize);
+		table = (page_table_entry_group *)of_claim(NULL, suggestedTableSize,
+			suggestedTableSize);
 			// KERNEL_BASE would be better as virtual address, but
 			// at least with Apple's OpenFirmware, it makes no
 			// difference - we will have to remap it later
 		if (table == (void *)OF_FAILED) {
-			panic("Could not allocate new page table (size = %ld)!!\n", suggestedTableSize);
+			panic("Could not allocate new page table (size = %ld)!!\n",
+				suggestedTableSize);
 			return B_NO_MEMORY;
 		}
 		if (table == NULL) {
@@ -882,7 +902,7 @@ arch_mmu_init(void)
 		tableSize = suggestedTableSize;
 	} else {
 		// ToDo: we could check if the page table is much too large
-		//	and create a smaller one in this case (in order to save 
+		//	and create a smaller one in this case (in order to save
 		//	memory).
 		sPageTable = table;
 	}
@@ -907,7 +927,6 @@ arch_mmu_init(void)
 	set_ibat0(&bat);
 	set_dbat0(&bat);
 	isync();
-puts("2");
 #endif
 
 	// initialize segment descriptors, but don't set the registers
@@ -923,7 +942,7 @@ puts("2");
 	page_table_entry_group *physicalTable = NULL;
 	void *exceptionHandlers = (void *)-1;
 	if (find_allocated_ranges(oldTable, table, &physicalTable,
-			&exceptionHandlers) < B_OK) {
+			&exceptionHandlers) != B_OK) {
 		puts("find_allocated_ranges() failed!");
 		//return B_ERROR;
 	}
@@ -931,8 +950,10 @@ puts("2");
 #if 0
 	block_address_translation bats[8];
 	getibats(bats);
-	for (int32 i = 0; i < 8; i++)
-		printf("page index %u, length %u, ppn %u\n", bats[i].page_index, bats[i].length, bats[i].physical_block_number);
+	for (int32 i = 0; i < 8; i++) {
+		printf("page index %u, length %u, ppn %u\n", bats[i].page_index,
+			bats[i].length, bats[i].physical_block_number);
+	}
 #endif
 
 	if (physicalTable == NULL) {
@@ -959,7 +980,7 @@ puts("2");
 	}
 
 	if (exceptionHandlers == (void *)-1) {
-		// ToDo: create mapping for the exception handlers
+		// TODO: create mapping for the exception handlers
 		puts("no mapping for the exception handlers!");
 	}
 
@@ -970,8 +991,12 @@ puts("2");
 	// set up new page table and turn on translation again
 
 	for (int32 i = 0; i < 16; i++) {
+		isync();
+
 		ppc_set_segment_register((void *)(i * 0x10000000), sSegments[i]);
 			// one segment describes 256 MB of memory
+
+		ppc_sync();
 	}
 
 	ppc_set_page_table(physicalTable, tableSize);
@@ -981,11 +1006,12 @@ puts("2");
 		// clear BATs
 		reset_ibats();
 		reset_dbats();
+		ppc_sync();
+		isync();
 	}
 
-	set_msr(MSR_MACHINE_CHECK_ENABLED | MSR_FP_AVAILABLE 
-			| MSR_INST_ADDRESS_TRANSLATION 
-			| MSR_DATA_ADDRESS_TRANSLATION);
+	set_msr(MSR_MACHINE_CHECK_ENABLED | MSR_FP_AVAILABLE
+		| MSR_INST_ADDRESS_TRANSLATION | MSR_DATA_ADDRESS_TRANSLATION);
 
 	// set kernel args
 
