@@ -252,6 +252,9 @@ private:
 			float				_MaxLineWidth();
 			void				_FormatLine(const char* line,
 									BString& formattedLine);
+			int32				_NextTabStop(int32 column) const;
+			float				_FormattedPosition(int32 line, 
+									int32 offset) const;
 			SelectionPoint		_SelectionPointAt(BPoint where) const;
 			void				_GetSelectionRegion(BRegion& region) const;
 			void				_GetSelectionText(BString& text) const;
@@ -1102,6 +1105,7 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 		_GetSelectionRegion(region);
 		region.Include(&oldRegion);
 		Invalidate(&region);
+		Sync();
 	} else if (fTrackState == kTracking) {
 		_GetSelectionRegion(region);
 		if (region.CountRects() > 0) {
@@ -1176,7 +1180,7 @@ SourceView::TextView::_FormatLine(const char* line, BString& formattedLine)
 	for (; *line != '\0'; line++) {
 		// TODO: That's probably not very efficient!
 		if (*line == '\t') {
-			int32 nextTabStop = (column / kSpacesPerTab + 1) * kSpacesPerTab;
+			int32 nextTabStop = _NextTabStop(column);
 			for (; column < nextTabStop; column++)
 				formattedLine << ' ';
 		} else {
@@ -1187,15 +1191,54 @@ SourceView::TextView::_FormatLine(const char* line, BString& formattedLine)
 }
 
 
+int32 
+SourceView::TextView::_NextTabStop(int32 column) const
+{
+	return (column / kSpacesPerTab + 1) * kSpacesPerTab;
+}
+
+
+float
+SourceView::TextView::_FormattedPosition(int32 line, int32 offset) const
+{
+	int32 column = 0;
+	for (int32 i = 0; i < offset; i++) {
+		if (fSourceCode->LineAt(line)[i] == '\t') 
+			column = _NextTabStop(column);
+		else
+			++column;
+	}
+	
+	return column * fCharacterWidth;
+}
+
+
 SourceView::TextView::SelectionPoint
 SourceView::TextView::_SelectionPointAt(BPoint where) const
 {
 	int32 line = LineAtOffset(where.y);
-	int32 offset = (int32)max_c((where.x - kLeftTextMargin)
-		/ fCharacterWidth, 0);
-	int32 lineLength = fSourceCode->LineLengthAt(line);
-	if (offset > lineLength)
-		offset = (lineLength > 0) ? lineLength - 1 : 0;
+	int32 offset = -1;
+	if (line >= 0) {
+		int32 column = 0;
+		int32 lineLength = fSourceCode->LineLengthAt(line);
+		const char* sourceLine = fSourceCode->LineAt(line);
+		
+		for (int32 i = 0; i < lineLength; i++) {
+			if (sourceLine[i] == '\t') 
+				column = _NextTabStop(column);
+			else
+				++column;
+
+			if (column * fCharacterWidth > where.x) {
+				offset = i;
+				break;
+			}
+		}
+		
+		if (offset < 0) 
+			offset = lineLength;
+	}
+
 	return SelectionPoint(line, offset);
 }
 
@@ -1210,16 +1253,18 @@ SourceView::TextView::_GetSelectionRegion(BRegion &region) const
 
 	if (fSelectionStart.line == fSelectionEnd.line) {
 		if (fSelectionStart.offset != fSelectionEnd.offset) {
-			selectionRect.left = fSelectionStart.offset * fCharacterWidth;
+			selectionRect.left = _FormattedPosition(fSelectionStart.line,
+				fSelectionStart.offset);
 			selectionRect.top = fSelectionStart.line * fFontInfo->lineHeight;
-			selectionRect.right = fSelectionEnd.offset * fCharacterWidth;
+			selectionRect.right = _FormattedPosition(fSelectionEnd.line,
+				fSelectionEnd.offset);
 			selectionRect.bottom = selectionRect.top + fFontInfo->lineHeight;
 			region.Include(selectionRect);
 		}
 	} else {
 		// add rect for starting line
-		selectionRect.left = selectionRect.left = fSelectionStart.offset
-			* fCharacterWidth;
+		selectionRect.left = _FormattedPosition(fSelectionStart.line,
+			fSelectionStart.offset);
 		selectionRect.top = fSelectionStart.line * fFontInfo->lineHeight;
 		selectionRect.right = Bounds().right;
 		selectionRect.bottom = selectionRect.top + fFontInfo->lineHeight;
@@ -1239,7 +1284,8 @@ SourceView::TextView::_GetSelectionRegion(BRegion &region) const
 		if (fSelectionEnd.offset > 0) {
 			selectionRect.left = 0.0;
 			selectionRect.top = fSelectionEnd.line * fFontInfo->lineHeight;
-			selectionRect.right = fSelectionEnd.offset * fCharacterWidth;
+			selectionRect.right = _FormattedPosition(fSelectionEnd.line,
+				fSelectionEnd.offset);
 			selectionRect.bottom = selectionRect.top + fFontInfo->lineHeight;
 			region.Include(selectionRect);
 		}
