@@ -278,7 +278,7 @@ private:
 
 	LocatableFile* _GetFile(const BString& directoryPath, const BString& name)
 	{
-		// if already know return the file
+		// if already known return the file
 		LocatableEntry* entry = _LookupEntry(EntryPath(directoryPath, name));
 		if (entry != NULL) {
 			LocatableFile* file = dynamic_cast<LocatableFile*>(entry);
