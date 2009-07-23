@@ -99,6 +99,7 @@ private:
 								bool deleteOnError);
 			status_t		_SetPredicate(const char* expression);
 			status_t		_EvaluateStack();
+			void			_ParseDates(BString& parsedPredicate);
 
 	// FBC
 	virtual	void			_QwertyQuery1();

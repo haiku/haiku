@@ -518,8 +518,11 @@ BQuery::Fetch()
 	if (!fPredicate || fDevice < 0)
 		return B_NO_INIT;
 
-	fQueryFd = _kern_open_query(fDevice, fPredicate, strlen(fPredicate),
-		fLive ? B_LIVE_QUERY : 0, fPort, fToken);
+	BString parsedPredicate;
+	_ParseDates(parsedPredicate);
+
+	fQueryFd = _kern_open_query(fDevice, parsedPredicate.String(),
+		parsedPredicate.Length(), fLive ? B_LIVE_QUERY : 0, fPort, fToken);
 	if (fQueryFd < 0)
 		return fQueryFd;
 
@@ -758,6 +761,41 @@ BQuery::_EvaluateStack()
 		fStack = NULL;
 	}
 	return error;
+}
+
+
+void
+BQuery::_ParseDates(BString& parsedPredicate)
+{
+	const char* start = fPredicate;
+	const char* pos = start;
+	bool quotes = false;
+
+	while (pos[0]) {
+		if (pos[0] == '\\') {
+			pos++;
+			continue;
+		}
+		if (pos[0] == '"')
+			quotes = !quotes;
+		else if (!quotes && pos[0] == '%') {
+			const char* end = strchr(pos + 1, '%');
+			if (end == NULL)
+				continue;
+
+			parsedPredicate.Append(start, pos - start);
+			start = end + 1;
+
+			// We have a date string
+			BString date(pos + 1, start - 1 - pos);
+			parsedPredicate << parsedate(date.String(), time(NULL));
+
+			pos = end;
+		}
+		pos++;
+	}
+
+	parsedPredicate.Append(start, pos - start);
 }
 
 
