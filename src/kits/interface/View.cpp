@@ -3707,8 +3707,9 @@ BView::Invalidate(BRect invalRect)
 		fOwner->fLink->Flush();
 		fOwner->fUpdateRequested = true;
 	}
-#endif
+#else
 	fOwner->fLink->Flush();
+#endif
 }
 
 
@@ -3723,10 +3724,15 @@ BView::Invalidate(const BRegion* region)
 	fOwner->fLink->StartMessage(AS_VIEW_INVALIDATE_REGION);
 	fOwner->fLink->AttachRegion(*region);
 
+// TODO: See above.
+#if 0
 	if (!fOwner->fUpdateRequested) {
 		fOwner->fLink->Flush();
 		fOwner->fUpdateRequested = true;
 	}
+#else
+	fOwner->fLink->Flush();
+#endif
 }
 
 
