@@ -21,6 +21,7 @@ class DisassembledCode;
 class FileManager;
 class FileSourceCode;
 class Function;
+class FunctionID;
 class FunctionInstance;
 class ImageDebugInfo;
 class ImageInfo;
@@ -52,15 +53,16 @@ public:
 									DisassembledCode*& _sourceCode);
 										// returns reference
 
-
 			// team is locked
 			status_t			AddImageDebugInfo(
 									ImageDebugInfo* imageDebugInfo);
 			void				RemoveImageDebugInfo(
 									ImageDebugInfo* imageDebugInfo);
+			ImageDebugInfo*		ImageDebugInfoByName(const char* name) const;
 
 			Function*			FunctionAtSourceLocation(LocatableFile* file,
-									const SourceLocation& location);
+									const SourceLocation& location) const;
+			Function*			FunctionByID(FunctionID* functionID) const;
 
 private:
 			struct FunctionHashDefinition;

@@ -15,6 +15,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) files ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) ids ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) settings ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
@@ -121,6 +122,11 @@ Application Debugger :
 	TypeComponentPath.cpp
 	Variable.cpp
 
+	# settings
+	BreakpointSetting.cpp
+	TeamSettings.cpp
+	SettingsManager.cpp
+
 	# source_language
 	CLanguage.cpp
 	CLanguageFamily.cpp
@@ -135,6 +141,7 @@ Application Debugger :
 	ValueLocation.cpp
 
 	# util
+	ArchivingUtils.cpp
 	BitBuffer.cpp
 	StringUtils.cpp
 

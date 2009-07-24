@@ -31,7 +31,7 @@ public:
 
 			team_id				TeamID() const	{ return fTeam; }
 			image_id			ImageID() const	{ return fImage; }
-			const char*			Name() const	{ return fName.String(); }
+			const BString&		Name() const	{ return fName; }
 			image_type			Type() const	{ return fType; }
 
 			target_addr_t		TextBase() const	{ return fTextBase; }

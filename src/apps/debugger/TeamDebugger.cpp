@@ -19,14 +19,17 @@
 #include "debug_utils.h"
 
 #include "BreakpointManager.h"
+#include "BreakpointSetting.h"
 #include "CpuState.h"
 #include "DebuggerInterface.h"
 #include "FileManager.h"
 #include "Function.h"
+#include "FunctionID.h"
 #include "ImageDebugInfo.h"
 #include "Jobs.h"
 #include "LocatableFile.h"
 #include "MessageCodes.h"
+#include "SettingsManager.h"
 #include "SourceCode.h"
 #include "SpecificImageDebugInfo.h"
 #include "StackFrame.h"
@@ -34,6 +37,7 @@
 #include "Statement.h"
 #include "SymbolInfo.h"
 #include "TeamDebugInfo.h"
+#include "TeamSettings.h"
 #include "Variable.h"
 
 // #pragma mark - ImageHandler
@@ -116,10 +120,11 @@ struct TeamDebugger::ImageHandlerHashDefinition {
 // #pragma mark - TeamDebugger
 
 
-TeamDebugger::TeamDebugger(Listener* listener)
+TeamDebugger::TeamDebugger(Listener* listener, SettingsManager* settingsManager)
 	:
 	BLooper("team debugger"),
 	fListener(listener),
+	fSettingsManager(settingsManager),
 	fTeam(NULL),
 	fTeamID(-1),
 	fImageHandlers(NULL),
@@ -137,6 +142,9 @@ TeamDebugger::TeamDebugger(Listener* listener)
 
 TeamDebugger::~TeamDebugger()
 {
+	if (fTeam != NULL)
+		_SaveSettings();
+
 	AutoLocker<BLooper> locker(this);
 
 	fTerminating = true;
@@ -191,6 +199,9 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 {
 	bool targetIsLocal = true;
 		// TODO: Support non-local targets!
+
+	// the first thing we want to do when running
+	PostMessage(MSG_LOAD_SETTINGS);
 
 	fTeamID = teamID;
 
@@ -321,6 +332,8 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 				return error;
 			if (image->Type() == B_APP_IMAGE)
 				appImage = image;
+
+			ImageDebugInfoRequested(image);
 		}
 	}
 
@@ -446,6 +459,16 @@ TeamDebugger::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_IMAGE_DEBUG_INFO_CHANGED:
+		{
+			int32 imageID;
+			if (message->FindInt32("image", &imageID) != B_OK)
+				break;
+
+			_HandleImageDebugInfoChanged(imageID);
+			break;
+		}
+
 		case MSG_IMAGE_FILE_CHANGED:
 		{
 			int32 imageID;
@@ -464,7 +487,12 @@ TeamDebugger::MessageReceived(BMessage* message)
 
 			_HandleDebuggerMessage(event);
 			delete event;
+			break;
 		}
+
+		case MSG_LOAD_SETTINGS:
+			_LoadSettings();
+			break;
 
 		default:
 			BLooper::MessageReceived(message);
@@ -661,6 +689,15 @@ TeamDebugger::ThreadStackTraceChanged(const ::Team::ThreadEvent& event)
 }
 
 
+void
+TeamDebugger::ImageDebugInfoChanged(const ::Team::ImageEvent& event)
+{
+	BMessage message(MSG_IMAGE_DEBUG_INFO_CHANGED);
+	message.AddInt32("image", event.GetImage()->ID());
+	PostMessage(&message);
+}
+
+
 /*static*/ status_t
 TeamDebugger::_DebugEventListenerEntry(void* data)
 {
@@ -850,14 +887,36 @@ TeamDebugger::_HandleImageDeleted(ImageDeletedEvent* event)
 
 	ImageHandler* imageHandler = fImageHandlers->Lookup(
 		event->GetImageInfo().ImageID());
-	if (imageHandler != NULL) {
-		fImageHandlers->Remove(imageHandler);
-		imageHandler->ReleaseReference();
-	}
+	if (imageHandler == NULL)
+		return false;
 
-// TODO: Remove breakpoints in the image!
+	fImageHandlers->Remove(imageHandler);
+	Reference<ImageHandler> imageHandlerReference(imageHandler, true);
+	locker.Unlock();
+
+	// remove breakpoints in the image
+	fBreakpointManager->RemoveImageBreakpoints(imageHandler->GetImage());
 
 	return false;
+}
+
+
+void
+TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
+{
+	// get the image (via the image handler)
+	AutoLocker< ::Team> locker(fTeam);
+	ImageHandler* imageHandler = fImageHandlers->Lookup(imageID);
+	if (imageHandler == NULL)
+		return;
+
+	Image* image = imageHandler->GetImage();
+	Reference<Image> imageReference(image);
+
+	locker.Unlock();
+
+	// update breakpoints in the image
+	fBreakpointManager->UpdateImageBreakpoints(image);
 }
 
 
@@ -918,8 +977,16 @@ printf("  function: %p\n", function);
 		target_addr_t relativeAddress = address - functionInstance->Address();
 printf("  relative address: %#llx, source location: (%ld, %ld)\n", relativeAddress, sourceLocation.Line(), sourceLocation.Column());
 
+		// get function id
+		FunctionID* functionID = functionInstance->GetFunctionID();
+		if (functionID == NULL)
+			return;
+		Reference<FunctionID> functionIDReference(functionID, true);
+
 		// create the user breakpoint
-		userBreakpoint = new(std::nothrow) UserBreakpoint(function);
+		userBreakpoint = new(std::nothrow) UserBreakpoint(
+			UserBreakpointLocation(functionID, function->SourceFile(),
+				sourceLocation, relativeAddress));
 		if (userBreakpoint == NULL)
 			return;
 		userBreakpointReference.SetTo(userBreakpoint, true);
@@ -1027,6 +1094,8 @@ TeamDebugger::_AddImage(const ImageInfo& imageInfo, Image** _image)
 	if (error != B_OK)
 		return error;
 
+	ImageDebugInfoRequested(image);
+
 	ImageHandler* imageHandler = new(std::nothrow) ImageHandler(this, image);
 	if (imageHandler != NULL)
 		fImageHandlers->Insert(imageHandler);
@@ -1035,6 +1104,67 @@ TeamDebugger::_AddImage(const ImageInfo& imageInfo, Image** _image)
 		*_image = image;
 
 	return B_OK;
+}
+
+
+void
+TeamDebugger::_LoadSettings()
+{
+	// get the team name
+	AutoLocker< ::Team> locker(fTeam);
+	BString teamName = fTeam->Name();
+	locker.Unlock();
+
+	// load the settings
+	TeamSettings settings;
+	if (fSettingsManager->LoadTeamSettings(teamName, settings) != B_OK)
+		return;
+
+	// create the saved breakpoints
+	for (int32 i = 0; const BreakpointSetting* breakpointSetting
+			= settings.BreakpointAt(i); i++) {
+		if (breakpointSetting->GetFunctionID() == NULL)
+			continue;
+
+		// get the source file, if any
+		LocatableFile* sourceFile = NULL;
+		if (breakpointSetting->SourceFile().Length() > 0) {
+			sourceFile = fFileManager->GetSourceFile(
+				breakpointSetting->SourceFile());
+			if (sourceFile == NULL)
+				continue;
+		}
+		Reference<LocatableFile> sourceFileReference(sourceFile, true);
+
+		// create the breakpoint
+		UserBreakpointLocation location(breakpointSetting->GetFunctionID(),
+			sourceFile, breakpointSetting->GetSourceLocation(),
+			breakpointSetting->RelativeAddress());
+
+		UserBreakpoint* breakpoint = new(std::nothrow) UserBreakpoint(location);
+		if (breakpoint == NULL)
+			return;
+		Reference<UserBreakpoint> breakpointReference(breakpoint, true);
+
+		// install it
+		fBreakpointManager->InstallUserBreakpoint(breakpoint,
+			breakpointSetting->IsEnabled());
+	}
+}
+
+
+void
+TeamDebugger::_SaveSettings()
+{
+	// get the settings
+	AutoLocker< ::Team> locker(fTeam);
+	TeamSettings settings;
+	if (settings.SetTo(fTeam) != B_OK)
+		return;
+	locker.Unlock();
+
+	// save the settings
+	fSettingsManager->SaveTeamSettings(settings);
 }
 
 

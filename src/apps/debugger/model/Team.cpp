@@ -21,7 +21,6 @@
 #include "SpecificImageDebugInfo.h"
 #include "Statement.h"
 #include "TeamDebugInfo.h"
-#include "UserBreakpoint.h"
 
 
 // #pragma mark - BreakpointByAddressPredicate
@@ -58,22 +57,25 @@ Team::Team(team_id teamID, TeamMemory* teamMemory, Architecture* architecture,
 	fArchitecture(architecture),
 	fDebugInfo(debugInfo)
 {
-	fDebugInfo->AddReference();
+	fDebugInfo->AcquireReference();
 }
 
 
 Team::~Team()
 {
+	while (UserBreakpoint* userBreakpoint = fUserBreakpoints.RemoveHead())
+		userBreakpoint->ReleaseReference();
+
 	for (int32 i = 0; Breakpoint* breakpoint = fBreakpoints.ItemAt(i); i++)
-		breakpoint->RemoveReference();
+		breakpoint->ReleaseReference();
 
 	while (Image* image = fImages.RemoveHead())
-		image->RemoveReference();
+		image->ReleaseReference();
 
 	while (Thread* thread = fThreads.RemoveHead())
-		thread->RemoveReference();
+		thread->ReleaseReference();
 
-	fDebugInfo->RemoveReference();
+	fDebugInfo->ReleaseReference();
 }
 
 
@@ -139,7 +141,7 @@ Team::RemoveThread(thread_id threadID)
 		return false;
 
 	RemoveThread(thread);
-	thread->RemoveReference();
+	thread->ReleaseReference();
 	return true;
 }
 
@@ -178,6 +180,9 @@ Team::AddImage(const ImageInfo& imageInfo, LocatableFile* imageFile,
 		return error;
 	}
 
+	if (image->Type() == B_APP_IMAGE)
+		SetName(image->Name());
+
 	fImages.Add(image);
 	_NotifyImageAdded(image);
 
@@ -204,7 +209,7 @@ Team::RemoveImage(image_id imageID)
 		return false;
 
 	RemoveImage(image);
-	image->RemoveReference();
+	image->ReleaseReference();
 	return true;
 }
 
@@ -248,7 +253,7 @@ Team::AddBreakpoint(Breakpoint* breakpoint)
 	if (fBreakpoints.BinaryInsert(breakpoint, &Breakpoint::CompareBreakpoints))
 		return true;
 
-	breakpoint->RemoveReference();
+	breakpoint->ReleaseReference();
 	return false;
 }
 
@@ -262,7 +267,7 @@ Team::RemoveBreakpoint(Breakpoint* breakpoint)
 		return;
 
 	fBreakpoints.RemoveItemAt(index);
-	breakpoint->RemoveReference();
+	breakpoint->ReleaseReference();
 }
 
 
@@ -334,9 +339,25 @@ Team::GetBreakpointsForSourceCode(SourceCode* sourceCode,
 
 		UserBreakpoint* userBreakpoint
 			= userBreakpointInstance->GetUserBreakpoint();
-		if (userBreakpoint->GetFunction()->SourceFile() == sourceFile)
+		if (userBreakpoint->Location().SourceFile() == sourceFile)
 			breakpoints.AddItem(userBreakpoint);
 	}
+}
+
+
+void
+Team::AddUserBreakpoint(UserBreakpoint* userBreakpoint)
+{
+	fUserBreakpoints.Add(userBreakpoint);
+	userBreakpoint->AcquireReference();
+}
+
+
+void
+Team::RemoveUserBreakpoint(UserBreakpoint* userBreakpoint)
+{
+	fUserBreakpoints.Remove(userBreakpoint);
+	userBreakpoint->ReleaseReference();
 }
 
 
@@ -436,7 +457,13 @@ printf("Team::GetStatementAtSourceLocation(%p, (%ld, %ld))\n", sourceCode, locat
 		= functionInstance->GetFunctionDebugInfo();
 	return functionDebugInfo->GetSpecificImageDebugInfo()
 		->GetStatementAtSourceLocation(functionDebugInfo, location, _statement);
+}
 
+
+Function*
+Team::FunctionByID(FunctionID* functionID) const
+{
+	return fDebugInfo->FunctionByID(functionID);
 }
 
 

@@ -22,10 +22,6 @@ public:
 
 			status_t			Init();
 
-//			status_t			InstallUserBreakpoint(target_addr_t address,
-//									bool enabled);
-//			void				UninstallUserBreakpoint(target_addr_t address);
-
 			status_t			InstallUserBreakpoint(
 									UserBreakpoint* userBreakpoint,
 									bool enabled);
@@ -39,7 +35,12 @@ public:
 									target_addr_t address,
 									BreakpointClient* client);
 
+			void				UpdateImageBreakpoints(Image* image);
+			void				RemoveImageBreakpoints(Image* image);
+
 private:
+			void				_UpdateImageBreakpoints(Image* image,
+									bool removeOnly);
 			status_t			_UpdateBreakpointInstallation(
 									Breakpoint* breakpoint);
 										// fLock must be held

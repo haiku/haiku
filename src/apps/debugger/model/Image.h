@@ -36,7 +36,7 @@ public:
 
 			Team*				GetTeam() const		{ return fTeam; }
 			image_id			ID() const			{ return fInfo.ImageID(); }
-			const char*			Name() const		{ return fInfo.Name(); }
+			const BString&		Name() const		{ return fInfo.Name(); }
 			const ImageInfo&	Info() const		{ return fInfo; }
 			image_type			Type() const		{ return fInfo.Type(); }
 			LocatableFile*		ImageFile() const	{ return fImageFile; }

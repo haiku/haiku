@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +20,7 @@
 #include "debug_utils.h"
 
 #include "MessageCodes.h"
+#include "SettingsManager.h"
 #include "TeamDebugger.h"
 
 
@@ -177,6 +179,11 @@ public:
 	{
 	}
 
+	status_t Init()
+	{
+		return fSettingsManager.Init();
+	}
+
 	virtual void MessageReceived(BMessage* message)
 	{
 		switch (message->what) {
@@ -254,7 +261,7 @@ printf("There's already a debugger for team: %ld\n", team);
 			return;
 		}
 
-		debugger = new(std::nothrow) TeamDebugger(this);
+		debugger = new(std::nothrow) TeamDebugger(this, &fSettingsManager);
 		if (debugger == NULL) {
 			// TODO: Notify the user!
 			fprintf(stderr, "Error: Out of memory!\n");
@@ -326,6 +333,7 @@ private:
 	}
 
 private:
+	SettingsManager		fSettingsManager;
 	TeamDebuggerList	fTeamDebuggers;
 	int32				fRunningTeamDebuggers;
 };
@@ -343,6 +351,13 @@ main(int argc, const char* const* argv)
 	}
 
 	Debugger app;
+	status_t error = app.Init();
+	if (error != B_OK) {
+		fprintf(stderr, "Error: Failed to init application: %s\n",
+			strerror(error));
+		return 1;
+	}
+
 	app.Run();
 	return 0;
 }

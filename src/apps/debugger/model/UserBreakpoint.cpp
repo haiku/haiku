@@ -3,9 +3,73 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "UserBreakpoint.h"
 
 #include "Function.h"
+#include "FunctionID.h"
+#include "LocatableFile.h"
+
+
+// #pragma mark - UserBreakpointLocation
+
+
+UserBreakpointLocation::UserBreakpointLocation(FunctionID* functionID,
+	LocatableFile* sourceFile, const SourceLocation& sourceLocation,
+	target_addr_t relativeAddress)
+	:
+	fFunctionID(functionID),
+	fSourceFile(sourceFile),
+	fSourceLocation(sourceLocation),
+	fRelativeAddress(relativeAddress)
+{
+	fFunctionID->AcquireReference();
+	if (fSourceFile != NULL)
+		fSourceFile->AcquireReference();
+}
+
+
+UserBreakpointLocation::UserBreakpointLocation(
+	const UserBreakpointLocation& other)
+	:
+	fFunctionID(other.fFunctionID),
+	fSourceFile(other.fSourceFile),
+	fSourceLocation(other.fSourceLocation),
+	fRelativeAddress(other.fRelativeAddress)
+{
+	fFunctionID->AcquireReference();
+	if (fSourceFile != NULL)
+		fSourceFile->AcquireReference();
+}
+
+
+UserBreakpointLocation::~UserBreakpointLocation()
+{
+	fFunctionID->ReleaseReference();
+	if (fSourceFile != NULL)
+		fSourceFile->ReleaseReference();
+}
+
+
+UserBreakpointLocation&
+UserBreakpointLocation::operator=(
+	const UserBreakpointLocation& other)
+{
+	other.fFunctionID->AcquireReference();
+	if (other.fSourceFile != NULL)
+		other.fSourceFile->AcquireReference();
+
+	fFunctionID->ReleaseReference();
+	if (fSourceFile != NULL)
+		fSourceFile->ReleaseReference();
+
+	fFunctionID = other.fFunctionID;
+	fSourceFile = other.fSourceFile;
+	fSourceLocation = other.fSourceLocation;
+	fRelativeAddress = other.fRelativeAddress;
+
+	return *this;
+}
 
 
 // #pragma mark - UserBreakpointInstance
@@ -31,13 +95,12 @@ UserBreakpointInstance::SetBreakpoint(Breakpoint* breakpoint)
 // #pragma mark - UserBreakpoint
 
 
-UserBreakpoint::UserBreakpoint(Function* function)
+UserBreakpoint::UserBreakpoint(const UserBreakpointLocation& location)
 	:
-	fFunction(function),
+	fLocation(location),
 	fValid(false),
 	fEnabled(false)
 {
-	fFunction->AcquireReference();
 }
 
 
@@ -47,8 +110,6 @@ UserBreakpoint::~UserBreakpoint()
 			i++) {
 		delete instance;
 	}
-
-	fFunction->ReleaseReference();
 }
 
 
@@ -77,6 +138,13 @@ void
 UserBreakpoint::RemoveInstance(UserBreakpointInstance* instance)
 {
 	fInstances.RemoveItem(instance);
+}
+
+
+UserBreakpointInstance*
+UserBreakpoint::RemoveInstanceAt(int32 index)
+{
+	return fInstances.RemoveItemAt(index);
 }
 
 

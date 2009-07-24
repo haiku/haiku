@@ -12,6 +12,9 @@
 #include <AutoLocker.h>
 
 #include "DebuggerInterface.h"
+#include "Function.h"
+#include "SpecificImageDebugInfo.h"
+#include "Statement.h"
 #include "Team.h"
 
 
@@ -76,12 +79,8 @@ printf("    -> no image at that address\n");
 			}
 
 			breakpoint = new(std::nothrow) Breakpoint(image, address);
-			if (breakpoint == NULL) {
-				error = B_NO_MEMORY;
-				break;
-			}
-
-			if (!fTeam->AddBreakpoint(breakpoint)) {
+			if (breakpoint == NULL || !fTeam->AddBreakpoint(breakpoint)) {
+				delete breakpoint;
 				error = B_NO_MEMORY;
 				break;
 			}
@@ -128,7 +127,7 @@ printf("  success, marking user breakpoint valid\n");
 			teamLocker.Lock();
 			userBreakpoint->SetValid(true);
 			userBreakpoint->AcquireReference();
-				// TODO: Put the user breakpoint some place?
+			fTeam->AddUserBreakpoint(userBreakpoint);
 			teamLocker.Unlock();
 		}
 	} else {
@@ -177,6 +176,8 @@ BreakpointManager::UninstallUserBreakpoint(UserBreakpoint* userBreakpoint)
 
 	if (!userBreakpoint->IsValid())
 		return;
+
+	fTeam->RemoveUserBreakpoint(userBreakpoint);
 
 	userBreakpoint->SetValid(false);
 	userBreakpoint->SetEnabled(false);
@@ -295,6 +296,173 @@ BreakpointManager::UninstallTemporaryBreakpoint(target_addr_t address,
 	if (uninstall) {
 		fDebuggerInterface->UninstallBreakpoint(address);
 		breakpoint->SetInstalled(false);
+	}
+}
+
+
+void
+BreakpointManager::UpdateImageBreakpoints(Image* image)
+{
+	_UpdateImageBreakpoints(image, false);
+}
+
+
+void
+BreakpointManager::RemoveImageBreakpoints(Image* image)
+{
+	_UpdateImageBreakpoints(image, true);
+}
+
+
+void
+BreakpointManager::_UpdateImageBreakpoints(Image* image, bool removeOnly)
+{
+	AutoLocker<BLocker> installLocker(fLock);
+	AutoLocker<Team> teamLocker(fTeam);
+
+	// remove obsolete user breakpoint instances
+	BObjectList<Breakpoint> breakpointsToUpdate;
+	for (UserBreakpointList::ConstIterator it
+			= fTeam->UserBreakpoints().GetIterator();
+		UserBreakpoint* userBreakpoint = it.Next();) {
+		int32 instanceCount = userBreakpoint->CountInstances();
+		for (int32 i = instanceCount - 1; i >= 0; i--) {
+			UserBreakpointInstance* instance = userBreakpoint->InstanceAt(i);
+			Breakpoint* breakpoint = instance->GetBreakpoint();
+			if (breakpoint == NULL || breakpoint->GetImage() != image)
+				continue;
+
+			userBreakpoint->RemoveInstanceAt(i);
+			breakpoint->RemoveUserBreakpoint(instance);
+
+			if (!breakpointsToUpdate.AddItem(breakpoint)) {
+				_UpdateBreakpointInstallation(breakpoint);
+				if (breakpoint->IsUnused())
+					fTeam->RemoveBreakpoint(breakpoint);
+			}
+
+			delete instance;
+		}
+	}
+
+	// update breakpoints
+	teamLocker.Unlock();
+	for (int32 i = 0; Breakpoint* breakpoint = breakpointsToUpdate.ItemAt(i);
+			i++) {
+		_UpdateBreakpointInstallation(breakpoint);
+	}
+
+	teamLocker.Lock();
+	for (int32 i = 0; Breakpoint* breakpoint = breakpointsToUpdate.ItemAt(i);
+			i++) {
+		if (breakpoint->IsUnused())
+			fTeam->RemoveBreakpoint(breakpoint);
+	}
+
+	// add breakpoint instances for function instances in the image (if we have
+	// an image debug info)
+	BObjectList<UserBreakpointInstance> newInstances;
+	ImageDebugInfo* imageDebugInfo = image->GetImageDebugInfo();
+	if (imageDebugInfo == NULL)
+		return;
+
+	for (UserBreakpointList::ConstIterator it
+			= fTeam->UserBreakpoints().GetIterator();
+		UserBreakpoint* userBreakpoint = it.Next();) {
+		// get the function
+		Function* function = fTeam->FunctionByID(
+			userBreakpoint->Location().GetFunctionID());
+		if (function == NULL)
+			continue;
+
+		const SourceLocation& sourceLocation
+			= userBreakpoint->Location().GetSourceLocation();
+		target_addr_t relativeAddress
+			= userBreakpoint->Location().RelativeAddress();
+
+		// iterate through the function instances
+		for (FunctionInstanceList::ConstIterator it
+				= function->Instances().GetIterator();
+			FunctionInstance* functionInstance = it.Next();) {
+			if (functionInstance->GetImageDebugInfo() != imageDebugInfo)
+				continue;
+
+			// get the breakpoint address for the instance
+			target_addr_t instanceAddress = 0;
+			if (functionInstance->SourceFile() != NULL) {
+				// We have a source file, so get the address for the source
+				// location.
+				Statement* statement = NULL;
+				FunctionDebugInfo* functionDebugInfo
+					= functionInstance->GetFunctionDebugInfo();
+				functionDebugInfo->GetSpecificImageDebugInfo()
+					->GetStatementAtSourceLocation(functionDebugInfo,
+						sourceLocation, statement);
+				if (statement != NULL) {
+					instanceAddress = statement->CoveringAddressRange().Start();
+						// TODO: What about BreakpointAllowed()?
+					statement->ReleaseReference();
+					// TODO: Make sure we do hit the function in question!
+				}
+			}
+
+			if (instanceAddress == 0) {
+				// No source file (or we failed getting the statement), so try
+				// to use the same relative address.
+				if (relativeAddress > functionInstance->Size())
+					continue;
+				instanceAddress = functionInstance->Address() + relativeAddress;
+					// TODO: Make sure it does at least hit an instruction!
+			}
+
+			// create the user breakpoint instance
+			UserBreakpointInstance* instance = new(std::nothrow)
+				UserBreakpointInstance(userBreakpoint, instanceAddress);
+			if (instance == NULL || !newInstances.AddItem(instance)) {
+				delete instance;
+				continue;
+			}
+
+			if (!userBreakpoint->AddInstance(instance)) {
+				newInstances.RemoveItemAt(newInstances.CountItems() - 1);
+				delete instance;
+			}
+
+			// get/create the breakpoint for the address
+			target_addr_t address = instance->Address();
+			Breakpoint* breakpoint = fTeam->BreakpointAtAddress(address);
+			if (breakpoint == NULL) {
+				breakpoint = new(std::nothrow) Breakpoint(image, address);
+				if (breakpoint == NULL || !fTeam->AddBreakpoint(breakpoint)) {
+					delete breakpoint;
+					break;
+				}
+			}
+
+			breakpoint->AddUserBreakpoint(instance);
+			instance->SetBreakpoint(breakpoint);
+		}
+	}
+
+	// install the breakpoints for the new user breakpoint instances
+	teamLocker.Unlock();
+	for (int32 i = 0; UserBreakpointInstance* instance = newInstances.ItemAt(i);
+			i++) {
+		Breakpoint* breakpoint = instance->GetBreakpoint();
+		if (breakpoint == NULL
+			|| _UpdateBreakpointInstallation(breakpoint) != B_OK) {
+			// something went wrong -- remove the instance
+			teamLocker.Lock();
+
+			instance->GetUserBreakpoint()->RemoveInstance(instance);
+			if (breakpoint != NULL) {
+				breakpoint->AddUserBreakpoint(instance);
+				if (breakpoint->IsUnused())
+					fTeam->RemoveBreakpoint(breakpoint);
+			}
+
+			teamLocker.Unlock();
+		}
 	}
 }
 

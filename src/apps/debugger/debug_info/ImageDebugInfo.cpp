@@ -96,6 +96,19 @@ ImageDebugInfo::FunctionAtAddress(target_addr_t address) const
 }
 
 
+FunctionInstance*
+ImageDebugInfo::FunctionByName(const char* name) const
+{
+	// TODO: Not really optimal.
+	for (int32 i = 0; FunctionInstance* function = fFunctions.ItemAt(i); i++) {
+		if (function->Name() == name)
+			return function;
+	}
+
+	return NULL;
+}
+
+
 status_t
 ImageDebugInfo::AddSourceCodeInfo(LocatableFile* file,
 	FileSourceCode* sourceCode) const

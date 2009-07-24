@@ -15,6 +15,7 @@
 #include "TargetAddressRange.h"
 #include "Thread.h"
 #include "ThreadInfo.h"
+#include "UserBreakpoint.h"
 
 
 // team event types
@@ -38,6 +39,7 @@ enum {
 
 class Architecture;
 class Breakpoint;
+class Function;
 class FunctionID;
 class FunctionInstance;
 class LocatableFile;
@@ -46,7 +48,6 @@ class SourceLocation;
 class Statement;
 class TeamDebugInfo;
 class TeamMemory;
-class UserBreakpoint;
 
 
 class Team {
@@ -112,6 +113,13 @@ public:
 									BObjectList<UserBreakpoint>& breakpoints)
 										const;
 
+			void				AddUserBreakpoint(
+									UserBreakpoint* userBreakpoint);
+			void				RemoveUserBreakpoint(
+									UserBreakpoint* userBreakpoint);
+			const UserBreakpointList& UserBreakpoints() const
+									{ return fUserBreakpoints; }
+
 			status_t			GetStatementAtAddress(target_addr_t address,
 									FunctionInstance*& _function,
 									Statement*& _statement);
@@ -125,6 +133,8 @@ public:
 									// returns a reference to the statement
 									// (any matching statement!),
 									// caller must lock,
+
+			Function*			FunctionByID(FunctionID* functionID) const;
 
 			void				AddListener(Listener* listener);
 			void				RemoveListener(Listener* listener);
@@ -166,6 +176,7 @@ private:
 			ThreadList			fThreads;
 			ImageList			fImages;
 			BreakpointList		fBreakpoints;
+			UserBreakpointList	fUserBreakpoints;
 			ListenerList		fListeners;
 };
 

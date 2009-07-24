@@ -21,6 +21,7 @@
 #include "FileManager.h"
 #include "FileSourceCode.h"
 #include "Function.h"
+#include "FunctionID.h"
 #include "ImageDebugInfo.h"
 #include "LocatableFile.h"
 #include "SourceFile.h"
@@ -167,6 +168,16 @@ struct TeamDebugInfo::SourceFileEntry : public HashTableLink<SourceFileEntry> {
 	Function* FunctionAt(int32 index) const
 	{
 		return fFunctions.ItemAt(index);
+	}
+
+	Function* FunctionByName(const BString& name) const
+	{
+		// TODO: That's not exactly optimal.
+		for (int32 i = 0; Function* function = fFunctions.ItemAt(i); i++) {
+			if (name == function->Name())
+				return function;
+		}
+		return NULL;
 	}
 
 private:
@@ -568,13 +579,58 @@ TeamDebugInfo::RemoveImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 }
 
 
+ImageDebugInfo*
+TeamDebugInfo::ImageDebugInfoByName(const char* name) const
+{
+	for (int32 i = 0; ImageDebugInfo* imageDebugInfo = fImages.ItemAt(i); i++) {
+		if (imageDebugInfo->GetImageInfo().Name() == name)
+			return imageDebugInfo;
+	}
+
+	return NULL;
+}
+
+
 Function*
 TeamDebugInfo::FunctionAtSourceLocation(LocatableFile* file,
-	const SourceLocation& location)
+	const SourceLocation& location) const
 {
 	if (SourceFileEntry* entry = fSourceFiles->Lookup(file))
 		return entry->FunctionAtLocation(location);
 	return NULL;
+}
+
+
+Function*
+TeamDebugInfo::FunctionByID(FunctionID* functionID) const
+{
+	if (SourceFunctionID* sourceFunctionID
+			= dynamic_cast<SourceFunctionID*>(functionID)) {
+		// get the source file
+		LocatableFile* file = fFileManager->GetSourceFile(
+			sourceFunctionID->SourceFilePath());
+		if (file == NULL)
+			return NULL;
+		Reference<LocatableFile> fileReference(file, true);
+
+		if (SourceFileEntry* entry = fSourceFiles->Lookup(file))
+			return entry->FunctionByName(functionID->FunctionName());
+		return NULL;
+	}
+
+	ImageFunctionID* imageFunctionID
+		= dynamic_cast<ImageFunctionID*>(functionID);
+	if (imageFunctionID == NULL)
+		return NULL;
+
+	ImageDebugInfo* imageDebugInfo
+		= ImageDebugInfoByName(imageFunctionID->ImageName());
+	if (imageDebugInfo == NULL)
+		return NULL;
+
+	FunctionInstance* functionInstance = imageDebugInfo->FunctionByName(
+		functionID->FunctionName());
+	return functionInstance != NULL ? functionInstance->GetFunction() : NULL;
 }
 
 

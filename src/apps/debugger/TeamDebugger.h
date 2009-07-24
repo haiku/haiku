@@ -20,6 +20,7 @@
 
 class DebuggerInterface;
 class FileManager;
+class SettingsManager;
 class TeamDebugInfo;
 
 
@@ -29,7 +30,8 @@ public:
 	class Listener;
 
 public:
-								TeamDebugger(Listener* listener);
+								TeamDebugger(Listener* listener,
+									SettingsManager* settingsManager);
 								~TeamDebugger();
 
 			status_t			Init(team_id teamID, thread_id threadID,
@@ -66,6 +68,8 @@ private:
 									const ::Team::ThreadEvent& event);
 	virtual	void				ThreadStackTraceChanged(
 									const ::Team::ThreadEvent& event);
+	virtual	void				ImageDebugInfoChanged(
+									const ::Team::ImageEvent& event);
 
 private:
 	struct ImageHandler;
@@ -87,6 +91,7 @@ private:
 			bool				_HandleImageDeleted(
 									ImageDeletedEvent* event);
 
+			void				_HandleImageDebugInfoChanged(image_id imageID);
 			void				_HandleImageFileChanged(image_id imageID);
 
 			void				_HandleSetUserBreakpoint(target_addr_t address,
@@ -99,11 +104,15 @@ private:
 			status_t			_AddImage(const ImageInfo& imageInfo,
 									Image** _image = NULL);
 
+			void				_LoadSettings();
+			void				_SaveSettings();
+
 			void				_NotifyUser(const char* title,
 									const char* text,...);
 
 private:
 			Listener*			fListener;
+			SettingsManager*	fSettingsManager;
 			::Team*				fTeam;
 			team_id				fTeamID;
 			ThreadHandlerTable	fThreadHandlers;

@@ -70,7 +70,9 @@ TeamWindow::TeamWindow(::Team* team, Listener* listener)
 	fStepIntoButton(NULL),
 	fStepOutButton(NULL)
 {
+	fTeam->Lock();
 	BString name = fTeam->Name();
+	fTeam->Unlock();
 	if (fTeam->ID() >= 0)
 		name << " (" << fTeam->ID() << ")";
 	SetTitle(name.String());

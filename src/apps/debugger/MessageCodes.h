@@ -24,6 +24,7 @@ enum {
 	MSG_FUNCTION_SOURCE_CODE_CHANGED	= 'fnsc',
 	MSG_USER_BREAKPOINT_CHANGED			= 'ubrc',
 	MSG_DEBUGGER_EVENT					= 'dbge',
+	MSG_LOAD_SETTINGS					= 'ldst',
 
 	MSG_TEXTVIEW_AUTOSCROLL				= 'tvas',
 

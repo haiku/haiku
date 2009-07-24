@@ -39,19 +39,14 @@ FunctionInstance::~FunctionInstance()
 FunctionID*
 FunctionInstance::GetFunctionID() const
 {
-	BString idString;
-	BString path;
 	if (LocatableFile* file = SourceFile()) {
-		idString << "s:";
+		BString path;
 		file->GetPath(path);
-	} else {
-		idString << "i:";
-		path << GetImageDebugInfo()->GetImageInfo().Name();
+		return new(std::nothrow) SourceFunctionID(path, Name());
 	}
 
-	idString << path << "//" << Name();
-
-	return new(std::nothrow) FunctionID(idString);
+	return new(std::nothrow) ImageFunctionID(
+		GetImageDebugInfo()->GetImageInfo().Name(), Name());
 }
 
 
