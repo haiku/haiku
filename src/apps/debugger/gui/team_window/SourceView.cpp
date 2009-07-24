@@ -1106,7 +1106,6 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 		_GetSelectionRegion(region);
 		region.Include(&oldRegion);
 		Invalidate(&region);
-		Sync();
 	} else if (fTrackState == kTracking) {
 		_GetSelectionRegion(region);
 		if (region.CountRects() > 0) {
