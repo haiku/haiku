@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1197,17 +1197,25 @@ file_cache_set_size(void *_cacheRef, off_t newSize)
 	if (ref == NULL)
 		return B_OK;
 
-	AutoLocker<VMCache> _(ref->cache);
+	VMCache* cache = ref->cache;
+	AutoLocker<VMCache> _(cache);
 
-	off_t offset = ref->cache->virtual_end;
-	off_t size = newSize;
-	if (offset > newSize) {
-		size = offset - newSize;
-		offset = newSize;
-	} else
-		size = newSize - offset;
+	off_t oldSize = cache->virtual_end;
+	status_t status = cache->Resize(newSize);
+	if (status == B_OK && newSize < oldSize) {
+		// We may have a new partial page at the end of the cache that must be
+		// cleared.
+		uint32 partialBytes = newSize % B_PAGE_SIZE;
+		if (partialBytes != 0) {
+			vm_page *page = cache->LookupPage(newSize - partialBytes);
+			if (page != NULL) {
+				vm_memset_physical(page->physical_page_number * B_PAGE_SIZE
+					+ partialBytes, 0, B_PAGE_SIZE - partialBytes);
+			}
+		}
+	}
 
-	return ref->cache->Resize(newSize);
+	return status;
 }
 
 
