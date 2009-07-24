@@ -252,7 +252,7 @@ private:
 			float				_MaxLineWidth();
 			void				_FormatLine(const char* line,
 									BString& formattedLine);
-			int32				_NextTabStop(int32 column) const;
+	inline 	int32				_NextTabStop(int32 column) const;
 			float				_FormattedPosition(int32 line, 
 									int32 offset) const;
 			SelectionPoint		_SelectionPointAt(BPoint where) const;
