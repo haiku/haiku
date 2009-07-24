@@ -262,6 +262,7 @@ private:
 			void				_SelectWordAt(const SelectionPoint& point);
 			void				_SelectLineAt(const SelectionPoint& point);
 			void				_HandleAutoScroll();
+			void				_ScrollHorizontal(int32 charCount);
 			void				_ScrollByLines(int32 lineCount);
 			void				_ScrollByPages(int32 pageCount);
 			void				_ScrollToTop();
@@ -1382,16 +1383,39 @@ SourceView::TextView::_HandleAutoScroll(void)
 	uint32 buttons;
 	GetMouse(&point, &buttons);
 	float difference = 0.0;
+	int factor = 0;
 	BRect visibleRect = Frame() & fSourceView->Bounds();
 	if (point.y < visibleRect.top)
 		difference = point.y - visibleRect.top;
 	else if (point.y > visibleRect.bottom)
 		difference = point.y - visibleRect.bottom;
 	if (difference != 0.0) {
-		int factor = (int)(difference / fFontInfo->lineHeight);
+		factor = (int)(ceilf(difference / fFontInfo->lineHeight));
 		_ScrollByLines(factor);
 	}
+	difference = 0.0;
+	if (point.x < visibleRect.left)
+		difference = point.x - visibleRect.left;
+	else if (point.x > visibleRect.right)
+		difference = point.x - visibleRect.right;
+	if (difference != 0.0) {
+		factor = (int)(ceilf(difference / fCharacterWidth));
+		_ScrollHorizontal(factor);
+	}
+	
 	MouseMoved(point, B_OUTSIDE_VIEW, NULL);
+}
+
+
+void
+SourceView::TextView::_ScrollHorizontal(int32 charCount)
+{
+	BScrollBar* horizontal = fSourceView->ScrollBar(B_HORIZONTAL);
+	if (horizontal == NULL)
+		return;
+
+	float value = horizontal->Value();
+	horizontal->SetValue(value + fCharacterWidth * charCount);
 }
 
 
