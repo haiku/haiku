@@ -107,7 +107,7 @@ ServerBitmap::~ServerBitmap()
 	if (fAllocator != NULL)
 		fAllocator->Free(AllocationCookie());
 	else
-		free(fBuffer);
+		delete[] fBuffer;
 
 	delete fOverlay;
 		// deleting the overlay will also free the overlay buffer
