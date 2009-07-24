@@ -48,7 +48,7 @@ detect_simd()
 #if __INTEL__
 	// Only scan CPUs for which we are certain the SIMD flags are properly
 	// defined.
-	char* vendorNames[] = {
+	const char* vendorNames[] = {
 		"GenuineIntel",
 		"AuthenticAMD",
 		"CentaurHauls", // Via CPUs, MMX and SSE support
