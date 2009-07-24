@@ -895,7 +895,7 @@ MainWin::_SetupWindow()
 		|| previousHeightAspect != fHeightAspect) {
 
 		_SetWindowSizeLimits();
-		
+
 		if (!fIsFullscreen) {
 			// Resize to 100% but stay on screen
 			_ResizeWindow(100, true);
@@ -1112,8 +1112,8 @@ void
 MainWin::_GetUnscaledVideoSize(int& videoWidth, int& videoHeight) const
 {
 	if (fWidthAspect != 0 && fHeightAspect != 0) {
-		videoWidth = fSourceHeight / fHeightAspect * fWidthAspect;
-		videoHeight = fSourceWidth / fWidthAspect * fHeightAspect;
+		videoWidth = fSourceHeight * fWidthAspect / fHeightAspect;
+		videoHeight = fSourceWidth * fHeightAspect / fWidthAspect;
 		// Use the scaling which produces an enlarged view.
 		if (videoWidth > fSourceWidth) {
 			// Enlarge width
