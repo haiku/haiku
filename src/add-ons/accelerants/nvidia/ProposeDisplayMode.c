@@ -4,7 +4,7 @@
 
 	Other authors for NV driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-6/2009
+	Rudolf Cornelissen 9/2002-7/2009
 */
 
 #define MODULE_BIT 0x00400000
@@ -88,7 +88,9 @@ static const display_mode mode_list[] = {
 //{ { 160000, 1920, 2010, 2060, 2110, 1200, 1202, 1208, 1235, T_POSITIVE_SYNC}, B_CMAP8, 1920, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1200) */
 /* 16:9 panel mode; 1280x720 (HDTV 1280x720p) */
 { { 74520, 1280, 1368, 1424, 1656, 720, 724, 730, 750, T_POSITIVE_SYNC}, B_CMAP8, 1280, 720, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X720) */
-/* fixme, add: 16:9 panel mode; 1366x768 (HDTV '1280x720p') */
+/* 16:9 panel mode; 1366x768 (HDTV '1280x720p')
+   note: horizontal CRTC timing must be a multiple of 8! (hardware restriction) */
+{ { 85500, 1368, 1440, 1576, 1792, 768, 771, 774, 798, T_POSITIVE_SYNC}, B_CMAP8, 1368, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1366X768) */
 /* fixme, add: 16:9 panel mode; 1920x1080 (HDTV 1920x1080p) */
 };
 
@@ -186,16 +188,19 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 		}
 	}
 
-	/* check if screen(s) can display the requested resolution (if we have it's EDID info) */
+	/* check if screen(s) can display the requested resolution (if we have it's EDID info)
+	   note:
+	   allowing 2 pixels more for horizontal display for the 1366 mode, since multiples of 8
+	   are required for the CRTCs horizontal timing programming) */
 	if (si->ps.crtc1_screen.have_edid) {
-		if (target->timing.h_display > si->ps.crtc1_screen.timing.h_display
+		if ((target->timing.h_display - 2) > si->ps.crtc1_screen.timing.h_display
 			|| target->timing.v_display > si->ps.crtc1_screen.timing.v_display) {
 			LOG(4, ("PROPOSEMODE: screen at crtc1 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
 		}
 	}
 	if (si->ps.crtc2_screen.have_edid) {
-		if (target->timing.h_display > si->ps.crtc2_screen.timing.h_display
+		if ((target->timing.h_display - 2) > si->ps.crtc2_screen.timing.h_display
 			|| target->timing.v_display > si->ps.crtc2_screen.timing.v_display) {
 			LOG(4, ("PROPOSEMODE: screen at crtc2 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
