@@ -806,7 +806,7 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	BString previousName = partition->ContentName();
 
 	ret = partition->Initialize(diskSystem.PrettyName(),
-		supportsName ? name.String() : NULL, parameters.String());
+		supportsName ? validatedName.String() : NULL, parameters.String());
 	if (ret != B_OK) {
 		_DisplayPartitionError("Initialization of the partition %s "
 			"failed. (Nothing has been written to disk.)", partition, ret);
