@@ -897,6 +897,8 @@ void
 SourceView::TextView::SetSourceCode(SourceCode* sourceCode)
 {
 	fMaxLineWidth = -1;
+	fSelectionStart = fSelectionBase = fSelectionEnd = SelectionPoint(-1, -1);
+	fClickCount = 0;
 	BaseView::SetSourceCode(sourceCode);
 }
 
