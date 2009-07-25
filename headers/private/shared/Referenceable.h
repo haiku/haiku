@@ -144,4 +144,7 @@ private:
 using BPrivate::Referenceable;
 using BPrivate::Reference;
 
+typedef BPrivate::Referenceable BReferenceable;
+
+
 #endif	// _REFERENCEABLE_H
