@@ -66,6 +66,18 @@ TreeTablePath::AddComponent(int32 childIndex)
 	}
 }
 
+
+int32
+TreeTablePath::RemoveLastComponent()
+{
+	if (fComponents.empty())
+		return -1;
+
+	int32 index = fComponents.back();
+	fComponents.pop_back();
+	return index;
+}
+
 void
 TreeTablePath::Clear()
 {

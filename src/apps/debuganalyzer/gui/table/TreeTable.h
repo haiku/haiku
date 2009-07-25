@@ -29,6 +29,7 @@ public:
 								~TreeTablePath();
 
 		bool					AddComponent(int32 childIndex);
+		int32					RemoveLastComponent();
 		void					Clear();
 
 		int32					CountComponents() const;
