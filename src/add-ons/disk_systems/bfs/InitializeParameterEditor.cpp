@@ -59,7 +59,7 @@ InitializeBFSEditor::FinishedEditing()
 		// TODO: use libroot driver settings API
 		fParameters << "block_size " << size << ";\n";
 	}
-	fParameters << "name " << fNameTC->Text() << ";\n";
+	fParameters << "name \"" << fNameTC->Text() << "\";\n";
 
 	return true;
 }
