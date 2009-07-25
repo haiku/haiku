@@ -115,6 +115,9 @@ BVariant::Unset()
 			default:
 				break;
 		}
+	} else if ((fFlags & B_VARIANT_REFERENCEABLE_DATA) != 0) {
+		if (fReferenceable != NULL)
+			fReferenceable->ReleaseReference();
 	}
 
 	fType = 0;
@@ -127,6 +130,8 @@ BVariant::Size() const
 {
 	if (fType == B_STRING_TYPE)
 		return fString != NULL ? strlen(fString) + 1 : 0;
+	if ((fFlags & B_VARIANT_REFERENCEABLE_DATA) != 0)
+		return sizeof(this->fReferenceable);
 	return SizeOfType(fType);
 }
 
@@ -329,6 +334,9 @@ BVariant::_SetTo(const BVariant& other)
 			default:
 				break;
 		}
+	} else if ((other.fFlags & B_VARIANT_REFERENCEABLE_DATA) != 0) {
+		if (other.fReferenceable != NULL)
+			fReferenceable->AcquireReference();
 	}
 
 	memcpy(this, &other, sizeof(BVariant));
@@ -509,3 +517,14 @@ BVariant::_SetTo(const char* value, uint32 flags)
 	return true;
 }
 
+
+void
+BVariant::_SetTo(BReferenceable* value, type_code type)
+{
+	fType = type;
+	fFlags = B_VARIANT_REFERENCEABLE_DATA;
+	fReferenceable = value;
+
+	if (fReferenceable != NULL)
+		fReferenceable->AcquireReference();
+}

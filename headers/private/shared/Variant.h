@@ -9,10 +9,13 @@
 #include <SupportDefs.h>
 #include <TypeConstants.h>
 
+#include <Referenceable.h>
+
 
 enum {
-	B_VARIANT_DONT_COPY_DATA	= 0x01,
-	B_VARIANT_OWNS_DATA			= 0x02
+	B_VARIANT_DONT_COPY_DATA		= 0x01,
+	B_VARIANT_OWNS_DATA				= 0x02,
+	B_VARIANT_REFERENCEABLE_DATA	= 0x04
 };
 
 
@@ -33,6 +36,8 @@ public:
 	inline						BVariant(const void* value);
 	inline						BVariant(const char* value,
 									uint32 flags = 0);
+	inline						BVariant(BReferenceable* value, type_code type);
+									// type must be a custom type
 	inline						BVariant(const BVariant& other);
 								~BVariant();
 
@@ -51,6 +56,8 @@ public:
 	inline	void				SetTo(const void* value);
 	inline	void				SetTo(const char* value,
 									uint32 flags = 0);
+	inline	void				SetTo(BReferenceable* value, type_code type);
+									// type must be a custom type
 			status_t			SetToTypedData(const void* data,
 									type_code type);
 			void				Unset();
@@ -102,6 +109,7 @@ private:
 			void				_SetTo(const void* value);
 			bool				_SetTo(const char* value,
 									uint32 flags);
+			void				_SetTo(BReferenceable* value, type_code type);
 
 	template<typename NumberType>
 	inline	NumberType			_ToNumber() const;
@@ -123,6 +131,7 @@ private:
 				double			fDouble;
 				void*			fPointer;
 				char*			fString;
+				BReferenceable*	fReferenceable;
 				uint8			fBytes[8];
 			};
 };
@@ -211,6 +220,12 @@ BVariant::BVariant(const void* value)
 BVariant::BVariant(const char* value, uint32 flags)
 {
 	_SetTo(value, flags);
+}
+
+
+BVariant::BVariant(BReferenceable* value, type_code type)
+{
+	_SetTo(value, type);
 }
 
 
@@ -338,6 +353,14 @@ BVariant::SetTo(const char* value, uint32 flags)
 {
 	Unset();
 	_SetTo(value, flags);
+}
+
+
+void
+BVariant::SetTo(BReferenceable* value, type_code type)
+{
+	Unset();
+	_SetTo(value, type);
 }
 
 
