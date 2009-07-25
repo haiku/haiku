@@ -23,6 +23,105 @@
 #include "Variable.h"
 
 
+class VariablesView::ValueNode : Referenceable {
+public:
+	ValueNode(ValueNode* parent, Variable* variable, TypeComponentPath* path,
+		const BString& name, Type* type)
+		:
+		fParent(parent),
+		fVariable(variable),
+		fPath(path),
+		fName(name),
+		fType(type)
+	{
+		fVariable->AcquireReference();
+		fPath->AcquireReference();
+		fType->AcquireReference();
+	}
+
+	~ValueNode()
+	{
+		for (int32 i = 0; ValueNode* child = fChildren.ItemAt(i); i++)
+			child->ReleaseReference();
+
+		fVariable->ReleaseReference();
+		fPath->ReleaseReference();
+		fType->ReleaseReference();
+	}
+
+	ValueNode* Parent() const
+	{
+		return fParent;
+	}
+
+	Variable* GetVariable() const
+	{
+		return fVariable;
+	}
+
+	TypeComponentPath* Path() const
+	{
+		return fPath;
+	}
+
+	const BString& Name() const
+	{
+		return fName;
+	}
+
+	Type* GetType() const
+	{
+		return fType;
+	}
+
+	const BVariant& Value() const
+	{
+		return fValue;
+	}
+
+	void SetValue(const BVariant& value)
+	{
+		fValue = value;
+	}
+
+	int32 CountChildren() const
+	{
+		return fChildren.CountItems();
+	}
+
+	ValueNode* ChildAt(int32 index) const
+	{
+		return fChildren.ItemAt(index);
+	}
+
+	int32 IndexOf(ValueNode* child) const
+	{
+		return fChildren.IndexOf(child);
+	}
+
+	bool AddChild(ValueNode* child)
+	{
+		if (!fChildren.AddItem(child))
+			return false;
+
+		child->AcquireReference();
+		return true;
+	}
+
+private:
+	typedef BObjectList<ValueNode> ChildList;
+
+private:
+	ValueNode*			fParent;
+	Variable*			fVariable;
+	TypeComponentPath*	fPath;
+	BString				fName;
+	Type*				fType;
+	BVariant			fValue;
+	ChildList			fChildren;
+};
+
+
 // #pragma mark - VariableValueColumn
 
 
@@ -118,12 +217,12 @@ private:
 // #pragma mark - VariableTableModel
 
 
-class VariablesView::VariableTableModel : public TableModel {
+class VariablesView::VariableTableModel : public TreeTableModel {
 public:
 	VariableTableModel()
 		:
 		fStackFrame(NULL),
-		fValues(NULL)
+		fNodes(20, true)
 	{
 	}
 
@@ -134,44 +233,48 @@ public:
 
 	void SetStackFrame(Thread* thread, StackFrame* stackFrame)
 	{
-		if (fValues != NULL) {
-			fValues->ReleaseReference();
-			fValues = NULL;
-		}
-
-		if (fStackFrame != NULL) {
-			int32 rowCount = CountRows();
-			fStackFrame = NULL;
-			NotifyRowsRemoved(0, rowCount);
+		if (!fNodes.IsEmpty()) {
+			int32 count = fNodes.CountItems();
+			fNodes.MakeEmpty();
+			NotifyNodesRemoved(TreeTablePath(), 0, count);
 		}
 
 		fStackFrame = stackFrame;
 		fThread = thread;
 
 		if (fStackFrame != NULL) {
-			try {
-				AutoLocker<Team> locker(fThread->GetTeam());
-				fValues = new StackFrameValues(*fStackFrame->Values());
-			} catch (std::bad_alloc) {
+			for (int32 i = 0; Variable* variable = fStackFrame->ParameterAt(i);
+					i++) {
+				_AddNode(variable);
 			}
 
-			NotifyRowsAdded(0, CountRows());
+			for (int32 i = 0; Variable* variable
+					= fStackFrame->LocalVariableAt(i); i++) {
+				_AddNode(variable);
+			}
+
+			if (!fNodes.IsEmpty())
+				NotifyNodesAdded(TreeTablePath(), 0, fNodes.CountItems());
 		}
 	}
 
 	void StackFrameValueRetrieved(StackFrame* stackFrame, Variable* variable,
 		TypeComponentPath* path)
 	{
-		if (stackFrame != fStackFrame || fValues == NULL)
+		if (stackFrame != fStackFrame)
 			return;
 
-		// update the respective value
+		// update the respective node's value
 		AutoLocker<Team> locker(fThread->GetTeam());
 		BVariant value;
 		if (fStackFrame->Values()->GetValue(variable->ID(), path, value)) {
-			fValues->SetValue(variable->ID(), path, value);
-			NotifyRowsChanged(0, CountRows());
-				// TODO: Only notify for the respective node.
+			ValueNode* node = _GetNode(variable, path);
+			TreeTablePath treePath;
+			if (node != NULL && _GetTreePath(node, treePath)) {
+				node->SetValue(value);
+				int32 index = treePath.RemoveLastComponent();
+				NotifyNodesChanged(treePath, index, 1);
+			}
 		}
 	}
 
@@ -180,44 +283,115 @@ public:
 		return 2;
 	}
 
-	virtual int32 CountRows() const
+	virtual void* Root() const
 	{
-		return fStackFrame != NULL
-			? fStackFrame->CountParameters()
-				+ fStackFrame->CountLocalVariables()
-			: 0;
+		return (void*)this;
 	}
 
-	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, BVariant& _value)
+	virtual int32 CountChildren(void* parent) const
 	{
-		if (fStackFrame == NULL)
-			return false;
+		if (parent == this)
+			return fNodes.CountItems();
 
-		int32 parameterCount = fStackFrame->CountParameters();
-		const Variable* variable = rowIndex < parameterCount
-			? fStackFrame->ParameterAt(rowIndex)
-			: fStackFrame->LocalVariableAt(rowIndex - parameterCount);
-		if (variable == NULL)
-			return false;
+		return ((ValueNode*)parent)->CountChildren();
+	}
+
+	virtual void* ChildAt(void* parent, int32 index) const
+	{
+		if (parent == this)
+			return fNodes.ItemAt(index);
+
+		return ((ValueNode*)parent)->ChildAt(index);
+	}
+
+	virtual bool GetValueAt(void* object, int32 columnIndex, BVariant& _value)
+	{
+		ValueNode* node = (ValueNode*)object;
 
 		switch (columnIndex) {
 			case 0:
-				_value.SetTo(variable->Name(), B_VARIANT_DONT_COPY_DATA);
+				_value.SetTo(node->Name(), B_VARIANT_DONT_COPY_DATA);
 				return true;
 			case 1:
-				if (fValues == NULL)
+				if (node->Value().Type() == 0)
 					return false;
-				return fValues->GetValue(variable->ID(), TypeComponentPath(),
-					_value);
+
+				_value = node->Value();
+				return true;
 			default:
 				return false;
 		}
 	}
 
 private:
+	typedef BObjectList<ValueNode> ValueList;
+
+private:
+	void _AddNode(Variable* variable)
+	{
+		TypeComponentPath* path = new(std::nothrow) TypeComponentPath;
+		if (path == NULL)
+			return;
+		Reference<TypeComponentPath> pathReference(path, true);
+
+		ValueNode* node = new(std::nothrow) ValueNode(NULL, variable, path,
+			variable->Name(), variable->GetType());
+		if (node == NULL || !fNodes.AddItem(node)) {
+			delete node;
+			return;
+		}
+	}
+
+	ValueNode* _GetNode(Variable* variable, TypeComponentPath* path) const
+	{
+		// find the variable node
+		ValueNode* node;
+		for (int32 i = 0; (node = fNodes.ItemAt(i)) != NULL; i++) {
+			if (node->GetVariable() == variable)
+				break;
+		}
+		if (node == NULL)
+			return NULL;
+
+		// now walk along the path, finding the respective child node for each
+		// component
+		int32 componentCount = path->CountComponents();
+		for (int32 i = 0; i < componentCount; i++) {
+			ValueNode* childNode = NULL;
+			TypeComponent typeComponent = path->ComponentAt(i);
+			for (int32 k = 0; (childNode = node->ChildAt(k)) != NULL; k++) {
+				if (childNode->Path()->ComponentAt(i) == typeComponent)
+					break;
+			}
+
+			if (childNode == NULL)
+				return NULL;
+
+			node = childNode;
+		}
+
+		return node;
+	}
+
+	bool _GetTreePath(ValueNode* node, TreeTablePath& _path) const
+	{
+		// recurse, if the node has a parent
+		if (ValueNode* parent = node->Parent()) {
+			if (!_GetTreePath(parent, _path))
+				return false;
+			return _path.AddComponent(parent->IndexOf(node));
+		}
+
+		// no parent -- get the index and start the path
+		int32 index = fNodes.IndexOf(node);
+		_path.Clear();
+		return index >= 0 && _path.AddComponent(index);
+	}
+
+private:
 	Thread*				fThread;
 	StackFrame*			fStackFrame;
-	StackFrameValues*	fValues;
+	ValueList			fNodes;
 };
 
 
@@ -240,7 +414,7 @@ VariablesView::VariablesView(Listener* listener)
 VariablesView::~VariablesView()
 {
 	SetStackFrame(NULL, NULL);
-	fVariableTable->SetTableModel(NULL);
+	fVariableTable->SetTreeTableModel(NULL);
 	delete fVariableTableModel;
 }
 
@@ -308,7 +482,7 @@ VariablesView::StackFrameValueRetrieved(StackFrame* stackFrame,
 void
 VariablesView::_Init()
 {
-	fVariableTable = new Table("variable list", 0, B_FANCY_BORDER);
+	fVariableTable = new TreeTable("variable list", 0, B_FANCY_BORDER);
 	AddChild(fVariableTable->ToView());
 
 	// columns
@@ -318,9 +492,9 @@ VariablesView::_Init()
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
 
 	fVariableTableModel = new VariableTableModel;
-	fVariableTable->SetTableModel(fVariableTableModel);
+	fVariableTable->SetTreeTableModel(fVariableTableModel);
 
-	fVariableTable->AddTableListener(this);
+	fVariableTable->AddTreeTableListener(this);
 }
 
 

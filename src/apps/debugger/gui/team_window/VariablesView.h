@@ -8,7 +8,7 @@
 
 #include <GroupView.h>
 
-#include "table/Table.h"
+#include "table/TreeTable.h"
 
 
 class StackFrame;
@@ -17,7 +17,7 @@ class TypeComponentPath;
 class Variable;
 
 
-class VariablesView : public BGroupView, private TableListener {
+class VariablesView : public BGroupView, private TreeTableListener {
 public:
 	class Listener;
 
@@ -35,6 +35,7 @@ public:
 									TypeComponentPath* path);
 
 private:
+			class ValueNode;
 			class VariableValueColumn;
 			class VariableTableModel;
 
@@ -46,7 +47,7 @@ private:
 private:
 			Thread*				fThread;
 			StackFrame*			fStackFrame;
-			Table*				fVariableTable;
+			TreeTable*			fVariableTable;
 			VariableTableModel*	fVariableTableModel;
 			Listener*			fListener;
 };
