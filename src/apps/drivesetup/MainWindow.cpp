@@ -573,7 +573,7 @@ MainWindow::_DisplayPartitionError(BString _message,
 
 	if (partition && _message.FindFirst("%s") >= 0) {
 		BString name;
-		name << " \"" << partition->ContentName() << "\"";
+		name << "\"" << partition->ContentName() << "\"";
 		sprintf(message, _message.String(), name.String());
 	} else {
 		_message.ReplaceAll("%s", "");
