@@ -157,7 +157,7 @@ Screen::SetBestMode(uint16 width, uint16 height, uint32 colorSpace,
 		frequency);
 	if (index < 0) {
 		if (strict) {
-			debug_printf("Finding best mode failed");
+			debug_printf("Finding best mode failed\n");
 			delete[] modes;
 			return B_ERROR;
 		} else {
