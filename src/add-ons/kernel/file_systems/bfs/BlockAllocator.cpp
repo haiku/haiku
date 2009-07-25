@@ -1236,7 +1236,7 @@ BlockAllocator::StopChecking(check_control* control)
 	// fix any damages of the bitmap
 	if (control != NULL && control->status == B_ENTRY_NOT_FOUND) {
 		// calculate the number of used blocks in the check bitmap
-		size_t size = fVolume->BlockSize() * fNumGroups * fBlocksPerGroup;
+		size_t size = BitmapSize();
 		off_t usedBlocks = 0LL;
 
 		// TODO: update the allocation groups used blocks info
