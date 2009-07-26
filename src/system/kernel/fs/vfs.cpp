@@ -5572,20 +5572,16 @@ fix_dirent(struct vnode* parent, struct dirent* userEntry,
 		}
 	} else {
 		// resolve mount points
-		struct vnode* vnode = NULL;
-		status_t status = get_vnode(entry->d_dev, entry->d_ino, &vnode, true,
-			false);
-		if (status != B_OK)
-			return status;
+		MutexLocker _(&sVnodeMutex);
 
-		mutex_lock(&sVnodeCoveredByMutex);
-		if (vnode->covered_by) {
-			entry->d_dev = vnode->covered_by->device;
-			entry->d_ino = vnode->covered_by->id;
+		struct vnode* vnode = lookup_vnode(entry->d_dev, entry->d_ino);
+		if (vnode != NULL) {
+			MutexLocker _(&sVnodeCoveredByMutex);
+			if (vnode->covered_by != NULL) {
+				entry->d_dev = vnode->covered_by->device;
+				entry->d_ino = vnode->covered_by->id;
+			}
 		}
-		mutex_unlock(&sVnodeCoveredByMutex);
-
-		put_vnode(vnode);
 	}
 
 	// copy back from userland buffer if needed
