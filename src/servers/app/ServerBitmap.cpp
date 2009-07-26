@@ -18,9 +18,11 @@
 #include "ClientMemoryAllocator.h"
 #include "ColorConversion.h"
 #include "HWInterface.h"
+#include "InterfacePrivate.h"
 #include "Overlay.h"
 
 using std::nothrow;
+using namespace BPrivate;
 
 /*!
 	A word about memory housekeeping and why it's implemented this way:
@@ -71,7 +73,9 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space, uint32 flags,
 	fOwner(NULL)
 	// fToken is initialized (if used) by the BitmapManager
 {
-	_HandleSpace(space, bytesPerRow);
+	int32 minBytesPerRow = get_bytes_per_row(space, fWidth);
+	
+	fBytesPerRow = max_c(bytesPerRow, minBytesPerRow);
 }
 
 
@@ -144,110 +148,6 @@ ServerBitmap::_AllocateBuffer(void)
 	if (length > 0) {
 		delete[] fBuffer;
 		fBuffer = new(nothrow) uint8[length];
-	}
-}
-
-
-/*!
-	\brief Internal function used to translate color space values to appropriate internal
-	values. 
-	\param space Color space for the bitmap.
-	\param bytesPerRow Number of bytes per row to be used as an override.
-*/
-void
-ServerBitmap::_HandleSpace(color_space space, int32 bytesPerRow)
-{
-	// TODO: Code duplication here, reuse functions in Bitmap.cpp
-	// and GraphicsDefs.cpp
-	
-	// calculate the minimum bytes per row
-	int32 minBPR = 0;
-	switch(space) {
-		// 32-bit
-		case B_RGB32:
-		case B_RGBA32:
-		case B_RGB32_BIG:
-		case B_RGBA32_BIG:
-		case B_UVL32:
-		case B_UVLA32:
-		case B_LAB32:
-		case B_LABA32:
-		case B_HSI32:
-		case B_HSIA32:
-		case B_HSV32:
-		case B_HSVA32:
-		case B_HLS32:
-		case B_HLSA32:
-		case B_CMY32:
-		case B_CMYA32:
-		case B_CMYK32:
-			minBPR = fWidth * 4;
-			break;
-
-		// 24-bit
-		case B_RGB24_BIG:
-		case B_RGB24:
-		case B_LAB24:
-		case B_UVL24:
-		case B_HSI24:
-		case B_HSV24:
-		case B_HLS24:
-		case B_CMY24:
-		// TODO: These last two are calculated
-		// (width + 3) / 4 * 12
-		// in Bitmap.cpp, I don't understand why though.
-		case B_YCbCr444:
-		case B_YUV444:
-			minBPR = fWidth * 3;
-			break;
-
-		// 16-bit
-		case B_YUV9:
-		case B_YUV12:
-		case B_RGB15:
-		case B_RGBA15:
-		case B_RGB16:
-		case B_RGB16_BIG:
-		case B_RGB15_BIG:
-		case B_RGBA15_BIG:
-			minBPR = fWidth * 2;
-			break;
-
-		case B_YCbCr422:
-		case B_YUV422:
-			minBPR = (fWidth + 3) / 4 * 8;
-				// TODO: huh? why not simply fWidth * 2 ?!?
-			break;
-
-		// 8-bit
-		case B_CMAP8:
-		case B_GRAY8:
-			minBPR = fWidth;
-			break;
-
-		// 1-bit
-		case B_GRAY1:
-			minBPR = (fWidth + 7) / 8;
-			break;
-
-		// TODO: ??? get a clue what these mean
-		case B_YCbCr411:
-		case B_YUV411:
-		case B_YUV420:
-		case B_YCbCr420:
-			minBPR = (fWidth + 3) / 4 * 6;
-			break;
-
-		case B_NO_COLOR_SPACE:
-		default:
-			break;
-	}
-	if (minBPR > 0 || bytesPerRow > 0) {
-		// add the padding or use the provided bytesPerRow if sufficient
-		if (bytesPerRow >= minBPR)
-			fBytesPerRow = bytesPerRow;
-		else
-			fBytesPerRow = ((minBPR + 3) / 4) * 4;
 	}
 }
 

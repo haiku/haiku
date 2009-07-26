@@ -98,8 +98,6 @@ protected:
 
 			void			_AllocateBuffer();
 
-			void			_HandleSpace(color_space space,
-								int32 bytesperline = -1);
 
 			ClientMemoryAllocator* fAllocator;
 			void*			fAllocationCookie;

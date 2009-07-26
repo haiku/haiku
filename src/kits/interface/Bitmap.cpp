@@ -106,7 +106,6 @@ get_raw_bytes_per_row(color_space colorSpace, int32 width)
 	\return The number of bytes per row needed to store data for a row, or
 			0, if the color space is not supported.
 */
-static inline
 int32
 get_bytes_per_row(color_space colorSpace, int32 width)
 {
@@ -361,7 +360,7 @@ BBitmap::Archive(BMessage *data, bool deep) const
 					break;
 			}
 		}
-		// Note: R5 does not archive the data if B_BITMAP_IS_CONTIGNUOUS is
+		// Note: R5 does not archive the data if B_BITMAP_IS_CONTIGUOUS is
 		// true and it does save all formats as B_RAW_TYPE and it does save
 		// the data even if B_BITMAP_ACCEPTS_VIEWS is set (as opposed to
 		// the BeBook)

@@ -9,6 +9,7 @@
 #define _INTERFACE_PRIVATE_H
 
 
+#include <GraphicsDefs.h>
 #include <SupportDefs.h>
 
 
@@ -16,6 +17,11 @@ namespace BPrivate {
 
 bool		get_mode_parameter(uint32 mode, int32& width, int32& height,
 				uint32& colorSpace);
+
+
+int32		get_bytes_per_row(color_space colorSpace, int32 width);
+
+
 
 }	// namespace BPrivate
 
