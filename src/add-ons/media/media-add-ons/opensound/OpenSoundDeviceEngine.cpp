@@ -99,7 +99,7 @@ status_t OpenSoundDeviceEngine::Open(int mode)
 	// set driver buffer size by using the "fragments" API
 	// TODO: export this setting as a BParameter?
 	uint32 bufferCount = 4;
-	uint32 bufferSize = 0x000a; // 512 bytes
+	uint32 bufferSize = 0x000b; // 1024 bytes
 	v = (bufferCount << 16) | bufferSize;
 	if (ioctl(fFD, SNDCTL_DSP_SETFRAGMENT, &v, sizeof(int)) < 0) {
 		fInitCheckStatus = errno;
