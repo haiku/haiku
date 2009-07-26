@@ -2909,9 +2909,9 @@ Painter::_MakeGradient(const BGradient& gradient, int32 colorCount,
 		int32 startIndex = max_c(index, 0);
 		uint8* c = (uint8*)&colors[startIndex];
 		for (int32 i = startIndex; i < arraySize; i++) {
-			c[0] = from->color.red;
+			c[0] = from->color.blue;
 			c[1] = from->color.green;
-			c[2] = from->color.blue;
+			c[2] = from->color.red;
 			c[3] = from->color.alpha;
 			c += 4;
 		}
