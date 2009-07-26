@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright (C) 1993 Free Software Foundation
 
 This file is part of the GNU IO Library.  This library is free
@@ -39,7 +39,7 @@ typedef _IO_FILE FILE;
 #define EOF (-1)
 #endif
 #ifndef BUFSIZ
-#define BUFSIZ 1024
+#define BUFSIZ 8192
 #endif
 
 /* #define size_t, fpos_t L_tmpname TMP_MAX */

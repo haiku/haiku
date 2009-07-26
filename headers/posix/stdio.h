@@ -14,7 +14,7 @@
  * __gnuc_va_list */
 
 
-#define BUFSIZ			1024
+#define BUFSIZ			8192
 #define _IOFBF			0		/* fully buffered */
 #define _IOLBF			1		/* line buffered */
 #define _IONBF			2		/* not buffered */
