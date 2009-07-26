@@ -169,10 +169,10 @@ struct check_cookie {
 	check_cookie() {}
 
 	block_run			current;
-	Inode				*parent;
+	Inode*				parent;
 	mode_t				parent_mode;
 	Stack<block_run>	stack;
-	TreeIterator		*iterator;
+	TreeIterator*		iterator;
 };
 
 
@@ -1427,9 +1427,10 @@ BlockAllocator::CheckNextNode(check_control* control)
 				FATAL(("Could not open inode ID %Ld!\n", id));
 				control->errors |= BFS_COULD_NOT_OPEN;
 
-				if ((control->flags & BFS_REMOVE_INVALID) != 0)
-					status = _RemoveInvalidNode(cookie->parent, NULL, name);
-				else
+				if ((control->flags & BFS_REMOVE_INVALID) != 0) {
+					status = _RemoveInvalidNode(cookie->parent,
+						cookie->iterator->Tree(), NULL, name);
+				} else
 					status = B_ERROR;
 
 				control->status = B_ERROR;
@@ -1465,9 +1466,10 @@ BlockAllocator::CheckNextNode(check_control* control)
 
 				// if we are allowed to fix errors, we should remove the file
 				if ((control->flags & BFS_REMOVE_WRONG_TYPES) != 0
-					&& (control->flags & BFS_FIX_BITMAP_ERRORS) != 0)
-					status = _RemoveInvalidNode(cookie->parent, inode, name);
-				else
+					&& (control->flags & BFS_FIX_BITMAP_ERRORS) != 0) {
+					status = _RemoveInvalidNode(cookie->parent, NULL, inode,
+						name);
+				} else
 					status = B_ERROR;
 
 				control->errors |= BFS_WRONG_TYPE;
@@ -1491,7 +1493,7 @@ BlockAllocator::CheckNextNode(check_control* control)
 
 
 status_t
-BlockAllocator::_RemoveInvalidNode(Inode* parent, Inode* inode,
+BlockAllocator::_RemoveInvalidNode(Inode* parent, BPlusTree* tree, Inode* inode,
 	const char* name)
 {
 	// it's safe to start a transaction, because Inode::Remove()
@@ -1499,11 +1501,22 @@ BlockAllocator::_RemoveInvalidNode(Inode* parent, Inode* inode,
 	// if we set the INODE_DONT_FREE_SPACE flag - since we fix
 	// the bitmap anyway
 	Transaction transaction(fVolume, parent->BlockNumber());
+	status_t status;
 
-	if (inode != NULL)
+	if (inode != NULL) {
 		inode->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_DONT_FREE_SPACE);
 
-	status_t status = parent->Remove(transaction, name, NULL, false, true);
+		status = parent->Remove(transaction, name, NULL, false, true);
+	} else {
+		parent->WriteLockInTransaction(transaction);
+
+		// does the file even exist?
+		off_t id;
+		status = tree->Find((uint8*)name, (uint16)strlen(name), &id);
+		if (status == B_OK)
+			status = tree->Remove(transaction, name, id);
+	}
+
 	if (status == B_OK)
 		transaction.Done();
 

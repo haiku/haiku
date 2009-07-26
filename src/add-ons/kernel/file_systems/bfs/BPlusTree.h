@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef B_PLUS_TREE_H
@@ -307,6 +307,8 @@ public:
 							uint16 maxLength, off_t* value,
 							uint16* duplicate = NULL);
 			void		SkipDuplicates();
+
+			BPlusTree*	Tree() const { return fTree; }
 
 #ifdef DEBUG
 			void		Dump();

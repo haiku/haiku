@@ -10,9 +10,10 @@
 
 
 class AllocationGroup;
+class BPlusTree;
+class Inode;
 class Transaction;
 class Volume;
-class Inode;
 struct disk_super_block;
 struct block_run;
 struct check_control;
@@ -64,8 +65,8 @@ public:
 #endif
 
 private:
-			status_t		_RemoveInvalidNode(Inode* parent, Inode* inode,
-								const char* name);
+			status_t		_RemoveInvalidNode(Inode* parent, BPlusTree* tree,
+								Inode* inode, const char* name);
 #ifdef DEBUG_ALLOCATION_GROUPS
 			void			_CheckGroup(int32 group) const;
 #endif
