@@ -37,6 +37,9 @@
 #include <string.h>
 
 
+using namespace BPrivate;
+
+
 // get_raw_bytes_per_row
 /*!	\brief Returns the number of bytes per row needed to store the actual
 		   bitmap data (not including any padding) given a color space and a
@@ -106,6 +109,8 @@ get_raw_bytes_per_row(color_space colorSpace, int32 width)
 	\return The number of bytes per row needed to store data for a row, or
 			0, if the color space is not supported.
 */
+namespace BPrivate {
+	
 int32
 get_bytes_per_row(color_space colorSpace, int32 width)
 {
@@ -115,6 +120,7 @@ get_bytes_per_row(color_space colorSpace, int32 width)
 	return bpr;
 }
 
+}
 
 //	#pragma mark -
 
