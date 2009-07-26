@@ -304,9 +304,9 @@ Volume::IsValidSuperBlock()
 void
 Volume::Panic()
 {
-	FATAL(("we have to panic... switch to read-only mode!\n"));
+	FATAL(("Disk corrupted... switch to read-only mode!\n"));
 	fFlags |= VOLUME_READ_ONLY;
-#ifdef DEBUG
+#if KDEBUG
 	kernel_debugger("BFS panics!");
 #endif
 }
