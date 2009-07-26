@@ -724,6 +724,13 @@ BlockAllocator::Uninitialize()
 }
 
 
+/*!	Tries to allocate between \a minimum, and \a maximum blocks starting
+	at group \a groupIndex with offset \a start. The resulting allocation
+	is put into \a run.
+
+	The number of allocated blocks is always a multiple of \a minimum which
+	has to be a power of two value.
+*/
 status_t
 BlockAllocator::AllocateBlocks(Transaction& transaction, int32 groupIndex,
 	uint16 start, uint16 maximum, uint16 minimum, block_run& run)
@@ -877,11 +884,15 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 groupIndex,
 	// write the updated block bitmap back to disk
 	if (bestLength < minimum)
 		return B_DEVICE_FULL;
+
 	if (bestLength > maximum)
 		bestLength = maximum;
+	else if (minimum > 1) {
+		// make sure bestLength is a multiple of minimum
+		bestLength = round_down(bestLength, minimum);
+	}
 
-	if (fGroups[bestGroup].Allocate(transaction, bestStart, bestLength)
-			< B_OK)
+	if (fGroups[bestGroup].Allocate(transaction, bestStart, bestLength) != B_OK)
 		RETURN_ERROR(B_IO_ERROR);
 
 	CHECK_ALLOCATION_GROUP(bestGroup);
@@ -890,8 +901,8 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 groupIndex,
 	run.start = HOST_ENDIAN_TO_BFS_INT16(bestStart);
 	run.length = HOST_ENDIAN_TO_BFS_INT16(bestLength);
 
-	fVolume->SuperBlock().used_blocks =
-		HOST_ENDIAN_TO_BFS_INT64(fVolume->UsedBlocks() + bestLength);
+	fVolume->SuperBlock().used_blocks
+		= HOST_ENDIAN_TO_BFS_INT64(fVolume->UsedBlocks() + bestLength);
 		// We are not writing back the disk's super block - it's
 		// either done by the journaling code, or when the disk
 		// is unmounted.

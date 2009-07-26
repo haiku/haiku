@@ -56,6 +56,16 @@ round_up(const IntType& value, const RoundType& to)
 }
 
 
+/*!	\a to must be a power of 2.
+*/
+template<typename IntType, typename RoundType>
+inline IntType
+round_down(const IntType& value, const RoundType& to)
+{
+	return value & ~((IntType)to - 1);
+}
+
+
 inline bool
 is_index(int mode)
 {
