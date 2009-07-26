@@ -88,6 +88,7 @@ private:
 									const char* fallbackStyle,
 									uint16 fallbackFace);
 			status_t			_SetDefaultFonts();
+			void				_PrecacheFontFile(const ServerFont* font);
 			void				_AddSystemPaths();
 			font_directory*		_FindDirectory(node_ref& nodeRef);
 			void				_RemoveDirectory(font_directory* directory);

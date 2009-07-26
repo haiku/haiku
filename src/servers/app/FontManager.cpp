@@ -27,8 +27,6 @@
 
 #include <new>
 
-using std::nothrow;
-
 //#define TRACE_FONT_MANAGER
 #ifdef TRACE_FONT_MANAGER
 #	define FTRACE(x) printf x
@@ -115,6 +113,12 @@ FontManager::FontManager()
 		_LoadRecentFontMappings();
 
 		fInitStatus = _SetDefaultFonts();
+
+		if (fInitStatus == B_OK) {
+			// Precache the plain and bold fonts
+			_PrecacheFontFile(fDefaultPlainFont);
+			_PrecacheFontFile(fDefaultBoldFont);
+		}
 	}
 }
 
@@ -332,6 +336,8 @@ FontManager::_LoadRecentFontMappings()
 		veraFontPath.SetTo(ttfontsPath.Path());
 		veraFontPath.Append("DejaVuSansMono.ttf");
 		_AddDefaultMapping("DejaVu Sans Mono", "Book", veraFontPath.Path());
+
+		return true;
 	}
 
 	return false;
@@ -483,6 +489,37 @@ FontManager::_SetDefaultFonts()
 
 
 void
+FontManager::_PrecacheFontFile(const ServerFont* font)
+{
+	if (font == NULL)
+		return;
+
+	size_t bufferSize = 32768;
+	uint8* buffer = new (std::nothrow) uint8[bufferSize];
+	if (buffer == NULL) {
+		// We don't care. Pre-caching doesn't make sense anyways when there
+		// is not enough RAM...
+		return;
+	}
+
+	BFile file(font->Path(), B_READ_ONLY);
+	if (file.InitCheck() != B_OK) {
+		delete[] buffer;
+		return;
+	}
+
+	while (true) {
+		// We just want the file in the kernel file cache...
+		ssize_t read = file.Read(buffer, bufferSize);
+		if (read < bufferSize)
+			break;
+	}
+
+	delete[] buffer;
+}
+
+
+void
 FontManager::_AddSystemPaths()
 {
 	BPath path;
@@ -570,7 +607,7 @@ FontManager::_AddFont(font_directory& directory, BEntry& entry)
 	if (!family->AddStyle(style)) {
 		delete style;
 		delete family;
-		return B_NO_MEMORY;	
+		return B_NO_MEMORY;
 	}
 
 	directory.styles.AddItem(style);
