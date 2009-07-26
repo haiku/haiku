@@ -1428,7 +1428,7 @@ BlockAllocator::CheckNextNode(check_control* control)
 				control->errors |= BFS_COULD_NOT_OPEN;
 
 				if ((control->flags & BFS_REMOVE_INVALID) != 0)
-					status = _RemoveInvalidNode(cookie->parent, inode, name);
+					status = _RemoveInvalidNode(cookie->parent, NULL, name);
 				else
 					status = B_ERROR;
 
@@ -1500,9 +1500,10 @@ BlockAllocator::_RemoveInvalidNode(Inode* parent, Inode* inode,
 	// the bitmap anyway
 	Transaction transaction(fVolume, parent->BlockNumber());
 
-	inode->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_DONT_FREE_SPACE);
-	status_t status
-		= parent->Remove(transaction, name, NULL, inode->IsContainer());
+	if (inode != NULL)
+		inode->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_DONT_FREE_SPACE);
+
+	status_t status = parent->Remove(transaction, name, NULL, false, true);
 	if (status == B_OK)
 		transaction.Done();
 

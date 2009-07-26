@@ -2333,7 +2333,7 @@ Inode::Sync()
 
 status_t
 Inode::Remove(Transaction& transaction, const char* name, ino_t* _id,
-	bool isDirectory)
+	bool isDirectory, bool force)
 {
 	BPlusTree* tree;
 	if (GetTree(&tree) != B_OK)
@@ -2364,7 +2364,7 @@ Inode::Remove(Transaction& transaction, const char* name, ino_t* _id,
 	// bit is set for indices in BFS, not for attribute directories) - but you
 	// should really be able to do whatever you want with your indices
 	// without having to remove all files first :)
-	if (!inode->IsIndex()) {
+	if (!inode->IsIndex() && !force) {
 		// if it's not of the correct type, don't delete it!
 		if (inode->IsContainer() != isDirectory)
 			return isDirectory ? B_NOT_A_DIRECTORY : B_IS_A_DIRECTORY;
@@ -2379,7 +2379,7 @@ Inode::Remove(Transaction& transaction, const char* name, ino_t* _id,
 	if (status != B_OK)
 		return status;
 
-	if (tree->Remove(transaction, name, id) < B_OK) {
+	if (tree->Remove(transaction, name, id) != B_OK && !force) {
 		unremove_vnode(fVolume->FSVolume(), id);
 		RETURN_ERROR(B_ERROR);
 	}

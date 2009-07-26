@@ -142,7 +142,8 @@ public:
 
 			// create/remove inodes
 			status_t		Remove(Transaction& transaction, const char* name,
-								ino_t* _id = NULL, bool isDirectory = false);
+								ino_t* _id = NULL, bool isDirectory = false,
+								bool force = false);
 	static	status_t		Create(Transaction& transaction, Inode* parent,
 								const char* name, int32 mode, int openMode,
 								uint32 type, bool* _created = NULL,
