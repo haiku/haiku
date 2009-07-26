@@ -2,7 +2,8 @@
  * Copyright 2005, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Inspired by SoundCapture from Be newsletter (Media Kit Basics: Consumers and Producers)
+ * Inspired by SoundCapture from Be newsletter (Media Kit Basics: 
+ * 	Consumers and Producers)
  */
 
 #include <stdio.h>
@@ -13,6 +14,8 @@
 #include <Window.h>
 #include "DrawingTidbits.h"
 #include "ScopeView.h"
+
+#define SAMPLES_COUNT 20000
 
 //#define TRACE 1
 #ifdef TRACE
@@ -28,13 +31,11 @@ ScopeView::ScopeView(BRect rect, uint32 resizeFlags)
 	fBitmapView(NULL),
 	fIsRendering(false),
 	fMediaTrack(NULL),
-	fQuitting(false),
 	fMainTime(0),
 	fRightTime(1000000),
 	fLeftTime(0),
 	fTotalTime(1000000)
 {
-	fRenderSem = create_sem(0, "scope rendering");
 	fHeight = Bounds().Height();
 }
 
@@ -75,7 +76,8 @@ ScopeView::Draw(BRect updateRect)
 	
 	float x = 2;
 	if (fTotalTime !=0)
-		x = 2 + (fMainTime - fLeftTime) * (bounds.right - 2) / (fRightTime - fLeftTime);
+		x += (fMainTime - fLeftTime) * (bounds.right - 2)
+			/ (fRightTime - fLeftTime);
 	SetHighColor(60,255,40);
 	StrokeLine(BPoint(x, bounds.top), BPoint(x, bounds.bottom));
 	
@@ -86,7 +88,9 @@ ScopeView::Draw(BRect updateRect)
 void
 ScopeView::Run()
 {
-	fThreadId = spawn_thread(&RenderLaunch, "Scope view", B_NORMAL_PRIORITY, this);
+	fRenderSem = create_sem(0, "scope rendering");
+	fThreadId = spawn_thread(&RenderLaunch, "Scope view", B_NORMAL_PRIORITY, 
+		this);
 	if (fThreadId < 0)
 		return;
 	resume_thread(fThreadId);
@@ -96,7 +100,6 @@ void
 ScopeView::Quit()
 {
 	delete_sem(fRenderSem);
-	fQuitting = true;
 	snooze(10000);
 	kill_thread(fThreadId);
 }
@@ -112,51 +115,80 @@ ScopeView::RenderLaunch(void *data)
 }
 
 
+template<typename T, typename U>
+void
+ScopeView::ComputeRendering()
+{
+	int64 framesCount = fMediaTrack->CountFrames() / SAMPLES_COUNT;
+	T samples[fPlayFormat.u.raw_audio.buffer_size / (fPlayFormat.u.raw_audio.format 
+		& media_raw_audio_format::B_AUDIO_SIZE_MASK)];
+	int64 frames = 0;
+	U sum = 0;
+	int64 sumCount = 0;
+	float middle = fHeight / 2;
+	int32 previewMax = 0;
+	//fMediaTrack->SeekToFrame(&frames);
+
+	TRACE("begin computing\n");
+
+	int32 previewIndex = 0;
+
+	while (fIsRendering && fMediaTrack->ReadFrames(samples, &frames) == B_OK) {
+		//TRACE("reading block\n");
+		int64 framesIndex = 0;
+
+		while (framesIndex < frames) {
+			for (; framesIndex < frames && sumCount < framesCount; 
+				framesIndex++, sumCount++) {
+				sum += samples[2 * framesIndex];
+				sum += samples[2 * framesIndex + 1];
+			}
+			
+			if (previewIndex >= SAMPLES_COUNT)
+				break;
+			
+			if (sumCount >= framesCount) {
+				//TRACE("computing block %ld, sumCount %ld\n", previewIndex, sumCount);
+				fPreview[previewIndex] = (int32)(sum 
+					/ fPlayFormat.u.raw_audio.channel_count / framesCount);
+				if (previewMax < fPreview[previewIndex])
+					previewMax = fPreview[previewIndex];
+				sumCount = 0;
+				sum = 0;
+				previewIndex++;
+			}
+		}
+	}
+	
+	for (int i = 0; i < SAMPLES_COUNT; i++)
+		fPreview[i] = (int32)(fPreview[i] * 1.0 / previewMax * middle + middle);
+}
+
+
 void
 ScopeView::RenderLoop()
 {
-	while (!fQuitting) {
-		if (acquire_sem(fRenderSem)!=B_OK)
-			continue;
-
+	while (acquire_sem(fRenderSem) == B_OK) {
 		fIsRendering = true;
-
-		//int32 frameSize = (fPlayFormat.u.raw_audio.format & 0xf) * fPlayFormat.u.raw_audio.channel_count;
-		int64 totalFrames = fMediaTrack->CountFrames();
-		int16 samples[fPlayFormat.u.raw_audio.buffer_size / (fPlayFormat.u.raw_audio.format & 0xf)];
-		int64 frames = 0;
-		int64 sum = 0;
-		int64 framesIndex = 0;
-		int32 sumCount = 0;
-		fMediaTrack->SeekToFrame(&frames);
-
-		TRACE("begin computing\n");
-
-		int32 previewIndex = 0;
-
-		while (fIsRendering && fMediaTrack->ReadFrames(samples, &frames) == B_OK) {
-			//TRACE("reading block\n");
-			framesIndex = 0;
-
-			while (framesIndex < frames) {
-				for (; framesIndex < frames && sumCount < totalFrames/20000; framesIndex++, sumCount++) {
-					sum += samples[2*framesIndex];
-					sum += samples[2*framesIndex+1];
-				}
-				
-				if (previewIndex >= 20000) {
-					break;
-				}
-				
-				if (sumCount >= totalFrames/20000) {
-					//TRACE("computing block %ld, sumCount %ld\n", previewIndex, sumCount);
-					fPreview[previewIndex++] = (int32)(sum / 2 /(totalFrames/20000) / 32767.0 * fHeight / 2 + fHeight / 2);
-					sumCount = 0;
-					sum = 0;
-				}
-			}
-		}
 		
+		switch (fPlayFormat.u.raw_audio.format) {
+			case media_raw_audio_format::B_AUDIO_FLOAT:
+				ComputeRendering<float, float>();
+				break;
+			case media_raw_audio_format::B_AUDIO_INT:
+				ComputeRendering<int32, int64>();
+				break;
+			case media_raw_audio_format::B_AUDIO_SHORT:
+				ComputeRendering<int16, int64>();
+				break;
+			case media_raw_audio_format::B_AUDIO_UCHAR:
+				ComputeRendering<uchar, uint32>();
+				break;
+			case media_raw_audio_format::B_AUDIO_CHAR:
+				ComputeRendering<char, int32>();
+				break;
+		}
+				
 		TRACE("finished computing, rendering\n");
 		
 		/* rendering */
@@ -223,7 +255,7 @@ ScopeView::RenderTrack(BMediaTrack *track, media_format format)
 {
 	fMediaTrack = track;
 	fPlayFormat = format;
-	release_sem(fRenderSem);	
+	release_sem(fRenderSem);
 }
 
 
@@ -304,7 +336,8 @@ ScopeView::InitBitmap()
 	
 	rect.OffsetToSelf(B_ORIGIN);
 	rect.right -= 2;
-	fBitmapView = new BView(rect.OffsetToSelf(B_ORIGIN), "bitmapView", B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW);
+	fBitmapView = new BView(rect.OffsetToSelf(B_ORIGIN), "bitmapView", 
+		B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW);
 	fBitmap->AddChild(fBitmapView);
 }
 
@@ -322,11 +355,14 @@ ScopeView::RenderBitmap()
 	
 	fBitmapView->SetDrawingMode(B_OP_ADD);
 	fBitmapView->SetHighColor(15,60,15);
-	int32 leftIndex = (fTotalTime != 0) ? fLeftTime * 20000 / fTotalTime : 0;
-	int32 rightIndex = (fTotalTime != 0) ? fRightTime * 20000 / fTotalTime : 20000;
+	int32 leftIndex = 
+		(fTotalTime != 0) ? fLeftTime * 20000 / fTotalTime : 0;
+	int32 rightIndex = 
+		(fTotalTime != 0) ? fRightTime * 20000 / fTotalTime : 20000;
 	
 	for (int32 i = leftIndex; i<rightIndex; i++) {
-		BPoint point((i - leftIndex) * width / (rightIndex - leftIndex), fPreview[i]);
+		BPoint point((i - leftIndex) * width / (rightIndex - leftIndex), 
+			fPreview[i]);
 		//TRACE("point x %f y %f\n", point.x, point.y);
 		fBitmapView->StrokeLine(point, point);
 	}

@@ -99,7 +99,7 @@ VolumeSlider::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 	if (!fSoundPlayer || !Bounds().InsetBySelf(2,2).Contains(point))
 		return;
 
-	UpdateVolume(point);
+	_UpdateVolume(point);
 }
 
 
@@ -109,7 +109,7 @@ VolumeSlider::MouseDown(BPoint point)
 	if (!fSoundPlayer || !Bounds().InsetBySelf(2,2).Contains(point))
 		return;
 
-	UpdateVolume(point);
+	_UpdateVolume(point);
 	SetTracking(true);
 	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
 }
@@ -121,7 +121,7 @@ VolumeSlider::MouseUp(BPoint point)
 	if (!IsTracking())
 		return;
 	if (fSoundPlayer && Bounds().InsetBySelf(2,2).Contains(point)) {
-		UpdateVolume(point);
+		_UpdateVolume(point);
 	}
 	
 	Invoke();
@@ -132,7 +132,7 @@ VolumeSlider::MouseUp(BPoint point)
 
 
 void
-VolumeSlider::UpdateVolume(BPoint point)
+VolumeSlider::_UpdateVolume(BPoint point)
 {
 	fVolume = MIN(MAX(point.x, 11), fRight);
 	fVolume = (fVolume - 11) / (fRight - 11);

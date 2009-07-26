@@ -46,13 +46,13 @@ TrackSlider::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
 	SetViewColor(B_TRANSPARENT_COLOR);
-	InitBitmap();
-	RenderBitmap();
+	_InitBitmap();
+	_RenderBitmap();
 }
 
 
 void
-TrackSlider::InitBitmap()
+TrackSlider::_InitBitmap()
 {
 	if (fBitmapView) {
 		fBitmap->RemoveChild(fBitmapView);
@@ -83,7 +83,7 @@ TrackSlider::InitBitmap()
 #define SLIDER_BASE 10
 
 void
-TrackSlider::RenderBitmap()
+TrackSlider::_RenderBitmap()
 {
 	/* rendering */
 	if (fBitmap->Lock()) {
@@ -98,20 +98,20 @@ TrackSlider::Draw(BRect updateRect)
 {	
 	DrawBitmapAsync(fBitmap, BPoint(0,0));
 		
-	DrawCounter(fMainTime, fBitmapView->fPositionX, fMainTracking);
+	_DrawCounter(fMainTime, fBitmapView->fPositionX, fMainTracking);
 	if (fLeftTracking)
-		DrawCounter(fLeftTime, fBitmapView->fLeftX, fLeftTracking);
+		_DrawCounter(fLeftTime, fBitmapView->fLeftX, fLeftTracking);
 	else if (fRightTracking)
-		DrawCounter(fRightTime, fBitmapView->fRightX, fRightTracking);
+		_DrawCounter(fRightTime, fBitmapView->fRightX, fRightTracking);
 	
-	DrawMarker(fBitmapView->fPositionX);	
+	_DrawMarker(fBitmapView->fPositionX);	
 	
 	Sync();
 }
 
 
 void
-TrackSlider::DrawCounter(bigtime_t timestamp, float position, bool isTracking)
+TrackSlider::_DrawCounter(bigtime_t timestamp, float position, bool isTracking)
 {
 	// timecounter
 	
@@ -121,7 +121,7 @@ TrackSlider::DrawCounter(bigtime_t timestamp, float position, bool isTracking)
 	rgb_color white = {255,255,255};
 	
 	char string[12];
-	TimeToString(timestamp, string);
+	_TimeToString(timestamp, string);
 	int32 halfwidth = ((int32)fFont.StringWidth(string)) / 2;
 	
 	float counterX = position;
@@ -161,7 +161,7 @@ TrackSlider::DrawCounter(bigtime_t timestamp, float position, bool isTracking)
 
 
 void
-TrackSlider::DrawMarker(float position)
+TrackSlider::_DrawMarker(float position)
 {
 	rgb_color black = {0,0,0};
 	rgb_color rose = {255,152,152};
@@ -221,7 +221,7 @@ TrackSlider::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 		SetTracking(false);
 	}
 	
-	UpdatePosition(point);
+	_UpdatePosition(point);
 }
 
 
@@ -231,7 +231,7 @@ TrackSlider::MouseDown(BPoint point)
 	if (!Bounds().InsetBySelf(2,2).Contains(point))
 		return;
 
-	UpdatePosition(point);
+	_UpdatePosition(point);
 	SetTracking(true);
 	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY | B_LOCK_WINDOW_FOCUS);
 }
@@ -243,7 +243,7 @@ TrackSlider::MouseUp(BPoint point)
 	if (!IsTracking())
 		return;
 	if (Bounds().InsetBySelf(2,2).Contains(point)) {
-		UpdatePosition(point);
+		_UpdatePosition(point);
 	}
 	
 	fLeftTracking = fRightTracking = fMainTracking = false;
@@ -256,7 +256,7 @@ TrackSlider::MouseUp(BPoint point)
 
 
 void
-TrackSlider::UpdatePosition(BPoint point)
+TrackSlider::_UpdatePosition(BPoint point)
 {
 	BRect leftRect(fBitmapView->fLeftX-9, SLIDER_BASE+3, fBitmapView->fLeftX, SLIDER_BASE+16);
 	BRect rightRect(fBitmapView->fRightX, SLIDER_BASE+3, fBitmapView->fRightX+9, SLIDER_BASE+16);
@@ -283,7 +283,7 @@ TrackSlider::UpdatePosition(BPoint point)
 		}
 		
 		Invoke(&msg);
-		RenderBitmap();
+		_RenderBitmap();
 		
 		//printf("fLeftPos : %Ld\n", fLeftTime);
 	} else if (!fMainTracking && (fRightTracking || ((point.x > fBitmapView->fPositionX+4) && rightRect.Contains(point)))) {
@@ -308,7 +308,7 @@ TrackSlider::UpdatePosition(BPoint point)
 		}
 		
 		Invoke(&msg);
-		RenderBitmap();
+		_RenderBitmap();
 		
 		//printf("fRightPos : %Ld\n", fRightTime);
 	} else {
@@ -323,12 +323,12 @@ TrackSlider::UpdatePosition(BPoint point)
 			fBitmapView->fRightX = fBitmapView->fPositionX;
 			fRightTime = fMainTime;
 			msg.AddInt64("right", fRightTime);
-			RenderBitmap();
+			_RenderBitmap();
 		} else if (fBitmapView->fLeftX > fBitmapView->fPositionX) {
 			fBitmapView->fLeftX = fBitmapView->fPositionX - 1;
 			fLeftTime = fMainTime;
 			msg.AddInt64("left", fLeftTime);
-			RenderBitmap();
+			_RenderBitmap();
 		}
 		
 		Invoke(&msg);
@@ -340,7 +340,7 @@ TrackSlider::UpdatePosition(BPoint point)
 
 
 void 
-TrackSlider::TimeToString(bigtime_t timestamp, char *string)
+TrackSlider::_TimeToString(bigtime_t timestamp, char *string)
 {
 	uint32 hours = timestamp / 3600000000LL;
 	timestamp -= hours * 3600000000LL;
@@ -364,7 +364,7 @@ TrackSlider::SetMainTime(bigtime_t timestamp, bool reset)
 		fLeftTime = 0;
 		fBitmapView->fLeftX = 14 + (fBitmapView->fRight - 15) * ((double)fLeftTime / fTotalTime);
 		fBitmapView->fRightX = 15 + (fBitmapView->fRight - 16) * ((double)fRightTime / fTotalTime);
-		RenderBitmap();
+		_RenderBitmap();
 	}
 	Invalidate();
 }
@@ -381,7 +381,7 @@ TrackSlider::SetTotalTime(bigtime_t timestamp, bool reset)
 	fBitmapView->fPositionX = 15 + (fBitmapView->fRight - 14) * ((double)fMainTime / fTotalTime);
 	fBitmapView->fLeftX = 14 + (fBitmapView->fRight - 15) * ((double)fLeftTime / fTotalTime);
 	fBitmapView->fRightX = 15 + (fBitmapView->fRight - 16) * ((double)fRightTime / fTotalTime);
-	RenderBitmap();
+	_RenderBitmap();
 	Invalidate();
 }
 
@@ -400,10 +400,10 @@ TrackSlider::FrameResized(float width, float height)
 {
 	fBitmapView->fRight = Bounds().right - kLeftRightTrackSliderWidth;
 	fBitmapView->fPositionX = 15 + (fBitmapView->fRight - 14) * ((double)fMainTime / fTotalTime);
-	InitBitmap();
+	_InitBitmap();
 	fBitmapView->fLeftX = 14 + (fBitmapView->fRight - 15) * ((double)fLeftTime / fTotalTime);
 	fBitmapView->fRightX = 15 + (fBitmapView->fRight - 16) * ((double)fRightTime / fTotalTime);
-	RenderBitmap();
+	_RenderBitmap();
 	Invalidate();
 }
 

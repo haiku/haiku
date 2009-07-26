@@ -34,6 +34,7 @@ private:
 	void Quit();
 	static int32 RenderLaunch(void *data);
 	void RenderLoop();
+	template<typename T, typename U> void ComputeRendering();
 	void RenderBitmap();
 	void InitBitmap();
 	
@@ -45,7 +46,6 @@ private:
 	BMediaTrack *fMediaTrack;
 	media_format fPlayFormat;
 	
-	bool fQuitting;
 	bigtime_t fMainTime;
 	bigtime_t fRightTime;
 	bigtime_t fLeftTime;

@@ -2,13 +2,17 @@
  * Copyright 2005, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Inspired by SoundCapture from Be newsletter (Media Kit Basics: Consumers and Producers)
+ * Inspired by SoundCapture from Be newsletter (Media Kit Basics: 
+ * 	Consumers and Producers)
  */
 
 #include <stdio.h>
 #include <string.h>
+
+#include <MediaDefs.h>
 #include <Screen.h>
 #include <Window.h>
+
 #include "DrawingTidbits.h"
 #include "VUView.h"
 
@@ -26,21 +30,22 @@ VUView::VUView(BRect rect, uint32 resizeFlags)
 	fLevelCount = int(rect.Height()) / 2;
 	fChannels = 2;
 	fCurrentLevels = new int32[fChannels];
-	for (int channel=0; channel < fChannels; channel++)
+	for (int channel = 0; channel < fChannels; channel++)
 		fCurrentLevels[channel] = 0;
 	fBitmap = new BBitmap(rect, BScreen().ColorSpace(), true);
 	
 	
 	memset(fBitmap->Bits(), 0, fBitmap->BitsLength());
 	
-	fBitmapView = new BView(rect, "bitmapView", B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW);
+	fBitmapView = new BView(rect, "bitmapView", B_FOLLOW_LEFT|B_FOLLOW_TOP, 
+		B_WILL_DRAW);
 	fBitmap->AddChild(fBitmapView);
 }
 
 
 VUView::~VUView()
 {
-	
+	delete fBitmap;
 }
 
 
@@ -48,14 +53,14 @@ void
 VUView::AttachedToWindow()
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-	Run();
+	_Run();
 }
 
 
 void
 VUView::DetachedFromWindow()
 {
-	Quit();
+	_Quit();
 }
 
 
@@ -69,16 +74,16 @@ VUView::Draw(BRect updateRect)
 
 
 void
-VUView::Run()
+VUView::_Run()
 {
-	fThreadId = spawn_thread(&RenderLaunch, "VU view", B_NORMAL_PRIORITY, this);
+	fThreadId = spawn_thread(_RenderLaunch, "VU view", B_NORMAL_PRIORITY, this);
 	if (fThreadId < 0)
 		return;
 	resume_thread(fThreadId);
 }
 
 void
-VUView::Quit()
+VUView::_Quit()
 {
 	fQuitting = true;
 	snooze(10000);
@@ -88,18 +93,19 @@ VUView::Quit()
 
 
 int32
-VUView::RenderLaunch(void *data)
+VUView::_RenderLaunch(void *data)
 {
 	VUView *vu = (VUView*) data;
-	vu->RenderLoop();
+	vu->_RenderLoop();
 	return B_OK;
 }
 
 
-#define SHIFT_UNTIL(value,shift,min) value = (value - shift > min) ? (value - shift) : min
+#define SHIFT_UNTIL(value,shift,min) \
+	value = (value - shift > min) ? (value - shift) : min
 
 void
-VUView::RenderLoop()
+VUView::_RenderLoop()
 {
 	rgb_color levels[fLevelCount][2];
 	
@@ -167,29 +173,72 @@ VUView::RenderLoop()
 }
 
 
-void 
-VUView::ComputeNextLevel(void *data, size_t size)
+template<typename T>
+T 
+VUView::_ComputeNextLevel(void *data, size_t size, uint32 format, int32 channel)
 {
-	int16* samp = (int16*)data;
+	T* samp = (T*)data;
 	
+	// get the min and max values in the nibbling interval
+	// and set max to be the greater of the absolute value
+	// of these.
+	
+	T min = 0, max = 0;
+	for (uint32 i = channel; i < size/sizeof(T); i += fChannels) {
+		if (min > samp[i])
+			min = samp[i];
+		else if (max < samp[i])
+			max = samp[i];
+	}
+	if (-max > (min + 1))
+		max = -min;
+		
+	return max;
+}
+
+
+void
+VUView::ComputeLevels(void* data, size_t size, uint32 format)
+{
 	for (int32 channel = 0; channel < fChannels; channel++) {
-	
-		// get the min and max values in the nibbling interval
-		// and set max to be the greater of the absolute value
-		// of these.
-		
-		int mi = 0, ma = 0;
-		for (uint32 ix=channel; ix<size/sizeof(uint16); ix += fChannels) {
-			if (mi > samp[ix]) mi = samp[ix];
-			else if (ma < samp[ix]) ma = samp[ix];
+		switch (format) {
+			case media_raw_audio_format::B_AUDIO_FLOAT:
+			{
+				float max = _ComputeNextLevel<float>(data, size, format, 
+					channel);
+				fCurrentLevels[channel] = (uint8)(max * 127);
+				break;
+			}
+			case media_raw_audio_format::B_AUDIO_INT:
+			{
+				int32 max = _ComputeNextLevel<int32>(data, size, format, 
+					channel);
+				fCurrentLevels[channel] = max / (2 << (32-8));
+				break;
+			}
+			case media_raw_audio_format::B_AUDIO_SHORT:
+			{
+				int16 max = _ComputeNextLevel<int16>(data, size, format, 
+					channel);
+				fCurrentLevels[channel] = max / (2 << (16-7));
+				break;
+			}
+			case media_raw_audio_format::B_AUDIO_UCHAR:
+			{
+				uchar max = _ComputeNextLevel<uchar>(data, size, format, 
+					channel);
+				fCurrentLevels[channel] = max / 2 - 127;
+				break;
+			}
+			case media_raw_audio_format::B_AUDIO_CHAR:
+			{
+				char max = _ComputeNextLevel<char>(data, size, format, 
+					channel);
+				fCurrentLevels[channel] = max / 2;
+				break;
+			}
 		}
-		if (-ma > mi) ma = (mi == -32768) ? 32767 : -mi;
-		
-		uint8 n = ma / (2 << (16-7));
-		
-		fCurrentLevels[channel] = n;
 		if (fCurrentLevels[channel] < 0)
 			fCurrentLevels[channel] = 0;
 	}
-
 }

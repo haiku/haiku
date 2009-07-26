@@ -23,7 +23,8 @@ public:
 	virtual void MouseDown(BPoint point);
 	void SetSoundPlayer(BSoundPlayer *player);
 private:
-	void UpdateVolume(BPoint point);
+	void _UpdateVolume(BPoint point);
+	
 	BBitmap fLeftBitmap, fRightBitmap, fButtonBitmap;
 	float fRight;
 	float fVolume;

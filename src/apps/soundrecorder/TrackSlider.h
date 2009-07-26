@@ -46,12 +46,12 @@ public:
 	void ResetMainTime();
 	virtual void FrameResized(float width, float height);
 private:
-	void DrawCounter(bigtime_t timestamp, float position, bool isTracking);
-	void DrawMarker(float position);
-	void TimeToString(bigtime_t timestamp, char *string);
-	void UpdatePosition(BPoint point);
-	void InitBitmap();
-	void RenderBitmap();
+	void _DrawCounter(bigtime_t timestamp, float position, bool isTracking);
+	void _DrawMarker(float position);
+	void _TimeToString(bigtime_t timestamp, char *string);
+	void _UpdatePosition(BPoint point);
+	void _InitBitmap();
+	void _RenderBitmap();
 	
 	
 	bigtime_t fLeftTime;

@@ -9,11 +9,12 @@
 #include "RecorderWindow.h"
 
 
-RecorderApp::RecorderApp(const char * signature) :
-	BApplication(signature), fRecorderWin(NULL)
+RecorderApp::RecorderApp(const char* signature)
+	: BApplication(signature), fRecorderWin(NULL)
 {
 	fRecorderWin = new RecorderWindow();
 }
+
 
 RecorderApp::~RecorderApp()
 {

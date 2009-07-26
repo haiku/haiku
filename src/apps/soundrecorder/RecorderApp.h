@@ -13,12 +13,12 @@
 class RecorderWindow;
 
 class RecorderApp : public BApplication {
-public:
-	RecorderApp(const char * signature);
-	virtual	~RecorderApp();
-	status_t InitCheck(); 
-private:	
-	RecorderWindow* fRecorderWin;
+	public:
+				RecorderApp(const char * signature);
+		virtual	~RecorderApp();
+				status_t InitCheck(); 
+	private:	
+		RecorderWindow* fRecorderWin;
 };
 
 #endif	/* RECORDERAPP_H */

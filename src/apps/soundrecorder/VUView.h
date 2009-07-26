@@ -2,7 +2,8 @@
  * Copyright 2005, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Inspired by SoundCapture from Be newsletter (Media Kit Basics: Consumers and Producers)
+ * Inspired by SoundCapture from Be newsletter (Media Kit Basics: 
+ *	Consumers and Producers)
  */
 
 #ifndef VUVIEW_H
@@ -20,13 +21,15 @@ public:
 	void AttachedToWindow();
 	void DetachedFromWindow();
 	void Draw(BRect updateRect);
-	void ComputeNextLevel(void *data, size_t size);
-		
+	void ComputeLevels(void* data, size_t size, uint32 format);
+			
 private:
-	void Run();
-	void Quit();
-	static int32 RenderLaunch(void *data);
-	void RenderLoop();
+	void _Run();
+	void _Quit();
+	static int32 _RenderLaunch(void *data);
+	void _RenderLoop();
+	template<typename T> T _ComputeNextLevel(void *data, 
+		size_t size, uint32 format, int32 channel);
 	
 	thread_id fThreadId;
 	BBitmap *fBitmap;
