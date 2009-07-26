@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -31,7 +31,8 @@ usage(int status)
 	printf("options:\n");
 	printf("  -f  --files  Number of files to be created. Defaults to as "
 		"many as fit.\n");
-	printf("  -h  --size   Size of each file. Defaults to 4KB.\n");
+	printf("  -s  --size   Size of each file. Defaults to %lldKB.\n",
+		kDefaultFileSize / 1024);
 
 	exit(status);
 }
