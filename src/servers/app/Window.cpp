@@ -108,7 +108,8 @@ Window::Window(const BRect& frame, const char *name,
 	fDrawingEngine(drawingEngine),
 	fDesktop(window->Desktop()),
 
-	fLastMousePosition(0.0, 0.0),
+	fLastMousePosition(0.0f, 0.0f),
+	fMouseMoveDistance(0.0f),
 	fLastMoveTime(0),
 
 	fCurrentUpdateSession(&fUpdateSessions[0]),
@@ -761,14 +762,19 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 	if (!fBorderRegionValid)
 		GetBorderRegion(&fBorderRegion);
 
+	int32 modifiers = _ExtractModifiers(message);
+	bool inBorderRegion = fBorderRegion.Contains(where);
+	bool windowModifier = (fFlags & B_NO_SERVER_SIDE_WINDOW_MODIFIERS) == 0
+		&& (~modifiers & (B_COMMAND_KEY | B_CONTROL_KEY)) == 0;
+
 	// default action is to drag the Window
-	if (fBorderRegion.Contains(where)) {
+	if (windowModifier || inBorderRegion) {
 		// clicking Window visible area
 
 		click_type action = DEC_DRAG;
 
-		if (fDecorator)
-			action = _ActionFor(message);
+		if (inBorderRegion && fDecorator != NULL)
+			action = _ActionFor(message, modifiers);
 
 		// ignore clicks on decorator buttons if the
 		// non-floating window doesn't have focus
@@ -853,6 +859,7 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 				fDesktop->SetFocusWindow(this);
 				if (action == DEC_DRAG) {
 					fActivateOnMouseUp = true;
+					fMouseMoveDistance = 0.0f;
 					fLastMoveTime = system_time();
 				}
 			}
@@ -1072,9 +1079,13 @@ Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 	// used for window moving/resizing/sliding the tab
 	fLastMousePosition += delta;
 
-	// the window was moved, it doesn't come to
-	// the front in FFM mode when the mouse is released
-	fActivateOnMouseUp = false;
+	// If the window was moved enough, it doesn't come to
+	// the front in FFM mode when the mouse is released.
+	if (fActivateOnMouseUp) {
+		fMouseMoveDistance += sqrtf(delta.x * delta.x + delta.y * delta.y);
+		if (fMouseMoveDistance > 4.0f)
+			fActivateOnMouseUp = false;
+	}
 
 	// change focus in FFM mode
 	DesktopSettings desktopSettings(fDesktop);
@@ -2055,23 +2066,40 @@ Window::_UpdateContentRegion()
 }
 
 
+int32
+Window::_ExtractModifiers(const BMessage* message) const
+{
+	int32 modifiers;
+	if (message->FindInt32("modifiers", &modifiers) != B_OK)
+		modifiers = 0;
+	return modifiers;
+}
+
+
 click_type
-Window::_ActionFor(const BMessage* msg) const
+Window::_ActionFor(const BMessage* message) const
+{
+	if (fDecorator == NULL)
+		return DEC_NONE;
+
+	int32 modifiers = _ExtractModifiers(message);
+	return _ActionFor(message, modifiers);
+}
+
+
+click_type
+Window::_ActionFor(const BMessage* message, int32 modifiers) const
 {
 	if (fDecorator == NULL)
 		return DEC_NONE;
 
 	BPoint where;
-	if (msg->FindPoint("where", &where) != B_OK)
+	if (message->FindPoint("where", &where) != B_OK)
 		return DEC_NONE;
 
 	int32 buttons;
-	if (msg->FindInt32("buttons", &buttons) != B_OK)
+	if (message->FindInt32("buttons", &buttons) != B_OK)
 		buttons = 0;
-
-	int32 modifiers;
-	if (msg->FindInt32("modifiers", &modifiers) != B_OK)
-		modifiers = 0;
 
 	return fDecorator->Clicked(where, buttons, modifiers);
 }
