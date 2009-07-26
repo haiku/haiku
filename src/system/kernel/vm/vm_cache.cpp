@@ -743,7 +743,7 @@ VMCache::SetMinimalCommitment(off_t commitment)
 	Since removed pages don't belong to the cache any longer, they are not
 	written back before they will be removed.
 
-	Note, this function way temporarily release the cache lock in case it
+	Note, this function may temporarily release the cache lock in case it
 	has to wait for busy pages.
 */
 status_t
