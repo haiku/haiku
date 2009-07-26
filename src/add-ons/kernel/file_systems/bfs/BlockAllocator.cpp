@@ -1347,7 +1347,7 @@ BlockAllocator::CheckNextNode(check_control* control)
 
 			Vnode vnode(fVolume, cookie->current);
 			Inode* inode;
-			if (vnode.Get(&inode) < B_OK) {
+			if (vnode.Get(&inode) != B_OK) {
 				FATAL(("check: Could not open inode at %Ld\n",
 					fVolume->ToBlock(cookie->current)));
 				continue;
@@ -1423,9 +1423,15 @@ BlockAllocator::CheckNextNode(check_control* control)
 
 			Vnode vnode(fVolume, id);
 			Inode* inode;
-			if (vnode.Get(&inode) < B_OK) {
+			if (vnode.Get(&inode) != B_OK) {
 				FATAL(("Could not open inode ID %Ld!\n", id));
 				control->errors |= BFS_COULD_NOT_OPEN;
+
+				if ((control->flags & BFS_REMOVE_INVALID) != 0)
+					status = _RemoveInvalidNode(cookie->parent, inode, name);
+				else
+					status = B_ERROR;
+
 				control->status = B_ERROR;
 				return B_OK;
 			}
@@ -1459,21 +1465,9 @@ BlockAllocator::CheckNextNode(check_control* control)
 
 				// if we are allowed to fix errors, we should remove the file
 				if ((control->flags & BFS_REMOVE_WRONG_TYPES) != 0
-					&& (control->flags & BFS_FIX_BITMAP_ERRORS) != 0) {
-					// it's safe to start a transaction, because Inode::Remove()
-					// won't touch the block bitmap (which we hold the lock for)
-					// if we set the INODE_DONT_FREE_SPACE flag - since we fix
-					// the bitmap anyway
-					Transaction transaction(fVolume,
-						cookie->parent->BlockNumber());
-
-					inode->Node().flags
-						|= HOST_ENDIAN_TO_BFS_INT32(INODE_DONT_FREE_SPACE);
-					status = cookie->parent->Remove(transaction, name, NULL,
-						inode->IsContainer());
-					if (status == B_OK)
-						transaction.Done();
-				} else
+					&& (control->flags & BFS_FIX_BITMAP_ERRORS) != 0)
+					status = _RemoveInvalidNode(cookie->parent, inode, name);
+				else
 					status = B_ERROR;
 
 				control->errors |= BFS_WRONG_TYPE;
@@ -1493,6 +1487,26 @@ BlockAllocator::CheckNextNode(check_control* control)
 		}
 	}
 	// is never reached
+}
+
+
+status_t
+BlockAllocator::_RemoveInvalidNode(Inode* parent, Inode* inode,
+	const char* name)
+{
+	// it's safe to start a transaction, because Inode::Remove()
+	// won't touch the block bitmap (which we hold the lock for)
+	// if we set the INODE_DONT_FREE_SPACE flag - since we fix
+	// the bitmap anyway
+	Transaction transaction(fVolume, parent->BlockNumber());
+
+	inode->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_DONT_FREE_SPACE);
+	status_t status
+		= parent->Remove(transaction, name, NULL, inode->IsContainer());
+	if (status == B_OK)
+		transaction.Done();
+
+	return status;
 }
 
 

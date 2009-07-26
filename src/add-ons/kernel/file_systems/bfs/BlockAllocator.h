@@ -64,6 +64,8 @@ public:
 #endif
 
 private:
+			status_t		_RemoveInvalidNode(Inode* parent, Inode* inode,
+								const char* name);
 #ifdef DEBUG_ALLOCATION_GROUPS
 			void			_CheckGroup(int32 group) const;
 #endif
