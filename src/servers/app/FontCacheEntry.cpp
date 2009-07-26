@@ -27,6 +27,9 @@
 #include "FontCacheEntry.h"
 
 #include <string.h>
+
+#include <new>
+
 #include <agg_array.h>
 
 #include <Autolock.h>
@@ -40,88 +43,114 @@ BLocker
 FontCacheEntry::sUsageUpdateLock("FontCacheEntry usage lock");
 
 class FontCacheEntry::GlyphCachePool {
- public:
-	enum block_size_e { block_size = 16384-16 };
-
+public:
 	GlyphCachePool()
-		: fAllocator(block_size)
 	{
-		memset(fGlyphs, 0, sizeof(fGlyphs));
 	}
 
-	const GlyphCache* FindGlyph(uint16 glyphCode) const
+	~GlyphCachePool()
 	{
-		unsigned msb = (glyphCode >> 8) & 0xFF;
-		if (fGlyphs[msb])
-			return fGlyphs[msb][glyphCode & 0xFF];
-		return 0;
+		GlyphCache* glyph = fGlyphTable.Clear(true);
+		while (glyph != NULL) {
+			GlyphCache* next = glyph->fNext;
+			delete glyph;
+			glyph = next;
+		}
 	}
 
-	GlyphCache* CacheGlyph(uint16 glyphCode, unsigned glyphIndex,
-		unsigned dataSize, glyph_data_type dataType, const agg::rect_i& bounds,
+	status_t Init()
+	{
+		return fGlyphTable.Init();
+	}
+
+	const GlyphCache* FindGlyph(uint32 glyphIndex) const
+	{
+		return fGlyphTable.Lookup(glyphIndex);
+	}
+
+	GlyphCache* CacheGlyph(uint32 glyphIndex,
+		uint32 dataSize, glyph_data_type dataType, const agg::rect_i& bounds,
 		float advanceX, float advanceY, float insetLeft, float insetRight)
 	{
-		unsigned msb = (glyphCode >> 8) & 0xFF;
-		if (fGlyphs[msb] == 0) {
-			fGlyphs[msb]
-				= (GlyphCache**)fAllocator.allocate(sizeof(GlyphCache*) * 256,
-						sizeof(GlyphCache*));
-			memset(fGlyphs[msb], 0, sizeof(GlyphCache*) * 256);
-		}
-
-		unsigned lsb = glyphCode & 0xFF;
-		if (fGlyphs[msb][lsb])
-			return NULL; // already exists, do not overwrite
-
-		GlyphCache* glyph
-			= (GlyphCache*)fAllocator.allocate(sizeof(GlyphCache),
-					sizeof(double));
-
-		if (glyph == NULL)
+		GlyphCache* glyph = fGlyphTable.Lookup(glyphIndex);
+		if (glyph != NULL)
 			return NULL;
 
-		glyph->glyph_index = glyphIndex;
-		glyph->data = fAllocator.allocate(dataSize);
-		glyph->data_size = dataSize;
-		glyph->data_type = dataType;
-		glyph->bounds = bounds;
-		glyph->advance_x = advanceX;
-		glyph->advance_y = advanceY;
-		glyph->inset_left = insetLeft;
-		glyph->inset_right = insetRight;
+		glyph = new(std::nothrow) GlyphCache(glyphIndex, dataSize, dataType,
+			bounds, advanceX, advanceY, insetLeft, insetRight);
+		if (glyph == NULL || glyph->data == NULL) {
+			delete glyph;
+			return NULL;
+		}
 
-		return fGlyphs[msb][lsb] = glyph;
+		// TODO: The HashTable grows without bounds. We should cleanup
+		// older entries from time to time.
+
+		fGlyphTable.Insert(glyph);
+
+		return glyph;
 	}
 
- private:
-	agg::block_allocator	fAllocator;
-	GlyphCache**			fGlyphs[256];
+private:
+	struct GlyphHashTableDefinition {
+		typedef uint32		KeyType;
+		typedef	GlyphCache	ValueType;
+
+		size_t HashKey(uint32 key) const
+		{
+			return key;
+		}
+
+		size_t Hash(GlyphCache* value) const
+		{
+			return value->glyph_index;
+		}
+
+		bool Compare(uint32 key, GlyphCache* value) const
+		{
+			return value->glyph_index == key;
+		}
+
+		HashTableLink<GlyphCache>* GetLink(GlyphCache* value) const
+		{
+			return value;
+		}
+	};
+
+	typedef OpenHashTable<GlyphHashTableDefinition> GlyphTable;
+
+	GlyphTable	fGlyphTable;
 };
+
 
 // #pragma mark -
 
-// constructor
+
 FontCacheEntry::FontCacheEntry()
-	: MultiLocker("FontCacheEntry lock")
-	, Referenceable()
-	, fGlyphCache(new GlyphCachePool())
-	, fEngine()
-	, fLastUsedTime(LONGLONG_MIN)
-	, fUseCounter(0)
+	:
+	MultiLocker("FontCacheEntry lock"),
+	Referenceable(),
+	fGlyphCache(new(std::nothrow) GlyphCachePool()),
+	fEngine(),
+	fLastUsedTime(LONGLONG_MIN),
+	fUseCounter(0)
 {
 }
 
-// destructor
+
 FontCacheEntry::~FontCacheEntry()
 {
 //printf("~FontCacheEntry()\n");
 	delete fGlyphCache;
 }
 
-// Init
+
 bool
 FontCacheEntry::Init(const ServerFont& font)
 {
+	if (fGlyphCache == NULL)
+		return false;
+
 	glyph_rendering renderingType = _RenderTypeFor(font);
 
 	// TODO: encoding from font
@@ -134,17 +163,24 @@ FontCacheEntry::Init(const ServerFont& font)
 			"file %s\n", font.Path());
 		return false;
 	}
+	if (fGlyphCache->Init() != B_OK) {
+		fprintf(stderr, "FontCacheEntry::Init() - failed to allocate "
+			"GlyphCache table for font file %s\n", font.Path());
+		return false;
+	}
+
 	return true;
 }
 
-// HasGlyphs
+
 bool
 FontCacheEntry::HasGlyphs(const char* utf8String, ssize_t length) const
 {
 	uint32 charCode;
 	const char* start = utf8String;
 	while ((charCode = UTF8ToCharCode(&utf8String))) {
-		if (!fGlyphCache->FindGlyph(charCode))
+		uint32 glyphIndex = fEngine.GlyphIndexForGlyphCode(charCode);
+		if (!fGlyphCache->FindGlyph(glyphIndex))
 			return false;
 		if (utf8String - start + 1 > length)
 			break;
@@ -152,30 +188,31 @@ FontCacheEntry::HasGlyphs(const char* utf8String, ssize_t length) const
 	return true;
 }
 
-// Glyph
+
 const GlyphCache*
-FontCacheEntry::Glyph(uint16 glyphCode)
+FontCacheEntry::Glyph(uint32 glyphCode)
 {
-	const GlyphCache* glyph = fGlyphCache->FindGlyph(glyphCode);
+	uint32 glyphIndex = fEngine.GlyphIndexForGlyphCode(glyphCode);
+	const GlyphCache* glyph = fGlyphCache->FindGlyph(glyphIndex);
 	if (glyph) {
 		return glyph;
 	} else {
-		if (fEngine.PrepareGlyph(glyphCode)) {
-			glyph = fGlyphCache->CacheGlyph(glyphCode,
-				fEngine.GlyphIndex(), fEngine.DataSize(),
-				fEngine.DataType(), fEngine.Bounds(),
+		if (fEngine.PrepareGlyph(glyphIndex)) {
+			glyph = fGlyphCache->CacheGlyph(glyphIndex,
+				fEngine.DataSize(), fEngine.DataType(), fEngine.Bounds(),
 				fEngine.AdvanceX(), fEngine.AdvanceY(),
 				fEngine.InsetLeft(), fEngine.InsetRight());
 
-			fEngine.WriteGlyphTo(glyph->data);
+			if (glyph != NULL)
+				fEngine.WriteGlyphTo(glyph->data);
 
 			return glyph;
 		}
 	}
-	return 0;
+	return NULL;
 }
 
-// InitAdaptors
+
 void
 FontCacheEntry::InitAdaptors(const GlyphCache* glyph,
 	double x, double y, GlyphMonoAdapter& monoAdapter,
@@ -207,15 +244,15 @@ FontCacheEntry::InitAdaptors(const GlyphCache* glyph,
 	}
 }
 
-// GetKerning
+
 bool
-FontCacheEntry::GetKerning(uint16 glyphCode1, uint16 glyphCode2,
+FontCacheEntry::GetKerning(uint32 glyphCode1, uint32 glyphCode2,
 	double* x, double* y)
 {
 	return fEngine.GetKerning(glyphCode1, glyphCode2, x, y);
 }
 
-// GenerateSignature
+
 /*static*/ void
 FontCacheEntry::GenerateSignature(char* signature, size_t signatureSize,
 	const ServerFont& font)
@@ -232,7 +269,7 @@ FontCacheEntry::GenerateSignature(char* signature, size_t signatureSize,
 		font.Face(), int(renderingType), font.Size(), hinting, averageWeight);
 }
 
-// UpdateUsage
+
 void
 FontCacheEntry::UpdateUsage()
 {
@@ -248,7 +285,6 @@ FontCacheEntry::UpdateUsage()
 }
 
 
-// _RenderTypeFor
 /*static*/ glyph_rendering
 FontCacheEntry::_RenderTypeFor(const ServerFont& font)
 {

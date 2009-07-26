@@ -12,8 +12,8 @@
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
-// Permission to copy, use, modify, sell and distribute this software 
-// is granted provided this copyright notice appears in all copies. 
+// Permission to copy, use, modify, sell and distribute this software
+// is granted provided this copyright notice appears in all copies.
 // This software is provided "as is" without express or implied
 // warranty, and with no claim as to its suitability for any purpose.
 //
@@ -33,6 +33,8 @@
 #include <agg_conv_contour.h>
 #include <agg_conv_transform.h>
 
+#include <util/OpenHashTable.h>
+
 #include "ServerFont.h"
 #include "FontEngine.h"
 #include "MultiLocker.h"
@@ -40,10 +42,31 @@
 #include "Transformable.h"
 
 
-struct GlyphCache {
-	unsigned		glyph_index;
+struct GlyphCache : public HashTableLink<GlyphCache> {
+	GlyphCache(uint32 glyphIndex, uint32 dataSize, glyph_data_type dataType,
+			const agg::rect_i& bounds, float advanceX, float advanceY,
+			float insetLeft, float insetRight)
+		:
+		glyph_index(glyphIndex),
+		data((uint8*)malloc(dataSize)),
+		data_size(dataSize),
+		data_type(dataType),
+		bounds(bounds),
+		advance_x(advanceX),
+		advance_y(advanceY),
+		inset_left(insetLeft),
+		inset_right(insetRight)
+	{
+	}
+
+	~GlyphCache()
+	{
+		free(data);
+	}
+
+	uint32			glyph_index;
 	uint8*			data;
-	unsigned		data_size;
+	uint32			data_size;
 	glyph_data_type	data_type;
 	agg::rect_i		bounds;
 	float			advance_x;
@@ -80,7 +103,7 @@ class FontCacheEntry : public MultiLocker, public Referenceable {
 			bool				HasGlyphs(const char* utf8String,
 									ssize_t glyphCount) const;
 
-			const GlyphCache*	Glyph(uint16 glyphCode);
+			const GlyphCache*	Glyph(uint32 glyphCode);
 
 			void				InitAdaptors(const GlyphCache* glyph,
 									double x, double y,
@@ -89,8 +112,8 @@ class FontCacheEntry : public MultiLocker, public Referenceable {
 									GlyphPathAdapter& pathAdapter,
 									double scale = 1.0);
 
-			bool				GetKerning(uint16 glyphCode1,
-									uint16 glyphCode2, double* x, double* y);
+			bool				GetKerning(uint32 glyphCode1,
+									uint32 glyphCode2, double* x, double* y);
 
 	static	void				GenerateSignature(char* signature,
 									size_t signatureSize,

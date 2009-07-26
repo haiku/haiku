@@ -42,14 +42,13 @@
 static const bool kFlipY = true;
 
 
-// int26p6_to_dbl
 static inline double
 int26p6_to_dbl(int p)
 {
 	return double(p) / 64.0;
 }
 
-// dbl_to_int26p6
+
 static inline int
 dbl_to_int26p6(double p)
 {
@@ -57,7 +56,6 @@ dbl_to_int26p6(double p)
 }
 
 
-// decompose_ft_outline
 template<class PathStorage>
 bool
 decompose_ft_outline(const FT_Outline& outline, bool flip_y, PathStorage& path)
@@ -289,7 +287,6 @@ decompose_ft_outline(const FT_Outline& outline, bool flip_y, PathStorage& path)
 }
 
 
-// decompose_ft_bitmap_mono
 template<class Scanline, class ScanlineStorage>
 void
 decompose_ft_bitmap_mono(const FT_Bitmap& bitmap, int x, int y,
@@ -321,7 +318,6 @@ decompose_ft_bitmap_mono(const FT_Bitmap& bitmap, int x, int y,
 }
 
 
-// decompose_ft_bitmap_gray8
 template<class Scanline, class ScanlineStorage>
 void
 decompose_ft_bitmap_gray8(const FT_Bitmap& bitmap, int x, int y,
@@ -365,7 +361,6 @@ decompose_ft_bitmap_gray8(const FT_Bitmap& bitmap, int x, int y,
 }
 
 
-// decompose_ft_bitmap_subpix
 template<class Scanline, class ScanlineStorage>
 void
 decompose_ft_bitmap_subpix(const FT_Bitmap& bitmap, int x, int y,
@@ -557,36 +552,36 @@ decompose_ft_bitmap_subpix(const FT_Bitmap& bitmap, int x, int y,
 #endif
 }
 
+
 // #pragma mark -
 
 
-// constructor
 FontEngine::FontEngine()
-	: fLastError(0)
-	, fLibraryInitialized(false)
-	, fLibrary(0)
-	, fFace(NULL)
+	:
+	fLastError(0),
+	fLibraryInitialized(false),
+	fLibrary(0),
+	fFace(NULL),
 
-	, fGlyphRendering(glyph_ren_native_gray8)
-	, fHinting(true)
+	fGlyphRendering(glyph_ren_native_gray8),
+	fHinting(true),
 
-	, fGlyphIndex(0)
-	, fDataSize(0)
-	, fDataType(glyph_data_invalid)
-	, fBounds(1, 1, 0, 0)
-	, fAdvanceX(0.0)
-	, fAdvanceY(0.0)
-	, fInsetLeft(0.0)
-	, fInsetRight(0.0)
+	fDataSize(0),
+	fDataType(glyph_data_invalid),
+	fBounds(1, 1, 0, 0),
+	fAdvanceX(0.0),
+	fAdvanceY(0.0),
+	fInsetLeft(0.0),
+	fInsetRight(0.0),
 
-	, fPath()
-	, fCurves(fPath)
-	, fScanlineAA()
-	, fScanlineBin()
-	, fScanlineSubpix()
-	, fScanlineStorageAA()
-	, fScanlineStorageBin()
-	, fScanlineStorageSubpix()
+	fPath(),
+	fCurves(fPath),
+	fScanlineAA(),
+	fScanlineBin(),
+	fScanlineSubpix(),
+	fScanlineStorageAA(),
+	fScanlineStorageBin(),
+	fScanlineStorageSubpix()
 {
 	fCurves.approximation_scale(4.0);
 
@@ -596,7 +591,6 @@ FontEngine::FontEngine()
 }
 
 
-// destructor
 FontEngine::~FontEngine()
 {
 	FT_Done_Face(fFace);
@@ -606,7 +600,6 @@ FontEngine::~FontEngine()
 }
 
 
-// CountFaces
 unsigned
 FontEngine::CountFaces() const
 {
@@ -617,13 +610,19 @@ FontEngine::CountFaces() const
 }
 
 
-// PrepareGlyph
-bool
-FontEngine::PrepareGlyph(unsigned glyphCode)
+uint32
+FontEngine::GlyphIndexForGlyphCode(uint32 glyphCode) const
 {
-	fGlyphIndex = FT_Get_Char_Index(fFace, glyphCode);
-	fLastError = FT_Load_Glyph(fFace, fGlyphIndex,
-		(fHinting ? (FT_LOAD_DEFAULT | FT_LOAD_TARGET_LCD) : FT_LOAD_NO_HINTING));
+	FT_Get_Char_Index(fFace, glyphCode);
+}
+
+
+bool
+FontEngine::PrepareGlyph(uint32 glyphIndex)
+{
+	fLastError = FT_Load_Glyph(fFace, glyphIndex,
+		(fHinting ? (FT_LOAD_DEFAULT | FT_LOAD_TARGET_LCD)
+			: FT_LOAD_NO_HINTING));
 
 	if (fLastError != 0)
 		return false;
@@ -740,8 +739,7 @@ FontEngine::WriteGlyphTo(uint8* data) const
 
 // GetKerning
 bool
-FontEngine::GetKerning(unsigned first, unsigned second,
-									   double* x, double* y)
+FontEngine::GetKerning(uint32 first, uint32 second, double* x, double* y)
 {
 	if (fFace && first && second && FT_HAS_KERNING(fFace)) {
 		FT_Vector delta;

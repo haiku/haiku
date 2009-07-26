@@ -92,11 +92,10 @@ class FontEngine {
 									{ return fHinting; }
 
 
-			bool				PrepareGlyph(unsigned glyphCode);
+			uint32				GlyphIndexForGlyphCode(uint32 glyphCode) const;
+			bool				PrepareGlyph(uint32 glyphIndex);
 
-			unsigned			GlyphIndex() const
-									{ return fGlyphIndex; }
-			unsigned			DataSize() const
+			uint32				DataSize() const
 									{ return fDataSize; }
 			glyph_data_type		DataType() const
 									{ return fDataType; }
@@ -114,7 +113,7 @@ class FontEngine {
 			void				WriteGlyphTo(uint8* data) const;
 
 
-			bool				GetKerning(unsigned first, unsigned second,
+			bool				GetKerning(uint32 first, uint32 second,
 									double* x, double* y);
 
  private:
@@ -132,8 +131,7 @@ class FontEngine {
 
 			// members needed to generate individual glyphs according
 			// to glyph rendering type
-			unsigned			fGlyphIndex;
-			unsigned			fDataSize;
+			uint32				fDataSize;
 			glyph_data_type		fDataType;
 			agg::rect_i			fBounds;
 			double				fAdvanceX;
