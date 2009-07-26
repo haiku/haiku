@@ -1,18 +1,15 @@
+/*
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef B_PLUS_TREE_H
 #define B_PLUS_TREE_H
-/* BPlusTree - BFS B+Tree implementation
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** Roughly based on 'btlib' written by Marcus J. Ranum
-**
-** Copyright (c) 2001-2002 pinc Software. All Rights Reserved.
-** This file may be used under the terms of the OpenBeOS License.
-*/
 
-
-#include "Stream.h"
 
 #include <stdlib.h>
+
+#include "Stream.h"
+#include "Utility.h"
 
 
 template<class T> class Stack;

@@ -1,21 +1,22 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
-#include "Volume.h"
-#include "Directory.h"
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdio.h>
 
 #include <boot/partitions.h>
 #include <boot/platform.h>
 #include <boot/vfs.h>
 #include <util/kernel_cpp.h>
 
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
+#include "Volume.h"
+#include "Directory.h"
+#include "Utility.h"
 
 
 #define TRACE_BFS 0
@@ -45,7 +46,7 @@ Volume::Volume(boot::Partition *partition)
 		// try block 0 again (can only happen on the big endian BFS)
 		if (read_pos(fDevice, 0, &fSuperBlock, sizeof(disk_super_block)) < B_OK)
 			return;
-	
+
 		if (!IsValidSuperBlock())
 			return;
 #else
@@ -74,7 +75,7 @@ Volume::~Volume()
 }
 
 
-status_t 
+status_t
 Volume::InitCheck()
 {
 	if (fDevice < B_OK)
@@ -118,7 +119,7 @@ Volume::ValidateBlockRun(block_run run)
 }
 
 
-block_run 
+block_run
 Volume::ToBlockRun(off_t block) const
 {
 	block_run run;

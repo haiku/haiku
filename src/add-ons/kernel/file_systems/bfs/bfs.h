@@ -271,8 +271,6 @@ struct file_cookie {
 // notify every second if the file size has changed
 #define INODE_NOTIFICATION_INTERVAL	1000000LL
 
-//**************************************
-
 
 /*!	Converts the nano seconds given to the internal 16 bit resolution that
 	BFS uses. If \a time is zero, 12 bits will get a monotonically increasing
@@ -292,40 +290,7 @@ unique_from_nsec(uint32 time)
 }
 
 
-inline int32
-divide_roundup(int32 num,int32 divisor)
-{
-	return (num + divisor - 1) / divisor;
-}
-
-inline int64
-divide_roundup(int64 num,int32 divisor)
-{
-	return (num + divisor - 1) / divisor;
-}
-
-inline int
-get_shift(uint64 i)
-{
-	int c;
-	c = 0;
-	while (i > 1) {
-		i >>= 1;
-		c++;
-	}
-	return c;
-}
-
-inline uint32
-key_align(uint32 data)
-{
-	// rounds up to the next off_t boundary
-	return (data + sizeof(off_t) - 1) & ~(sizeof(off_t) - 1);
-}
-
-
-/************************ block_run inline functions ************************/
-//	#pragma mark -
+//	#pragma mark - block_run inline functions
 
 
 inline bool
@@ -383,21 +348,20 @@ block_run::Run(int32 group, uint16 start, uint16 length)
 }
 
 
-/************************ small_data inline functions ************************/
-//	#pragma mark -
+//	#pragma mark - small_data inline functions
 
 
-inline char *
+inline char*
 small_data::Name() const
 {
-	return const_cast<char *>(name);
+	return const_cast<char*>(name);
 }
 
 
-inline uint8 *
+inline uint8*
 small_data::Data() const
 {
-	return (uint8 *)Name() + NameSize() + 3;
+	return (uint8*)Name() + NameSize() + 3;
 }
 
 
@@ -408,20 +372,21 @@ small_data::Size() const
 }
 
 
-inline small_data *
+inline small_data*
 small_data::Next() const
 {
-	return (small_data *)((uint8 *)this + Size());
+	return (small_data*)((uint8*)this + Size());
 }
 
 
 inline bool
-small_data::IsLast(const bfs_inode *inode) const
+small_data::IsLast(const bfs_inode* inode) const
 {
 	// we need to check the location first, because if name_size is already beyond
 	// the block, we would touch invalid memory (although that can't cause wrong
 	// results)
-	return (addr_t)this > (addr_t)inode + inode->InodeSize() - sizeof(small_data) || name_size == 0;
+	return (addr_t)this > (addr_t)inode
+		+ inode->InodeSize() - sizeof(small_data) || name_size == 0;
 }
 
 #ifdef _BOOT_MODE

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef UTILITY_H
@@ -63,6 +63,41 @@ inline IntType
 round_down(const IntType& value, const RoundType& to)
 {
 	return value & ~((IntType)to - 1);
+}
+
+
+inline int32
+divide_roundup(int32 num, int32 divisor)
+{
+	return (num + divisor - 1) / divisor;
+}
+
+
+inline int64
+divide_roundup(int64 num, int32 divisor)
+{
+	return (num + divisor - 1) / divisor;
+}
+
+
+inline int
+get_shift(uint64 i)
+{
+	int c;
+	c = 0;
+	while (i > 1) {
+		i >>= 1;
+		c++;
+	}
+	return c;
+}
+
+
+inline uint32
+key_align(uint32 data)
+{
+	// rounds up to the next off_t boundary
+	return (data + sizeof(off_t) - 1) & ~(sizeof(off_t) - 1);
 }
 
 
