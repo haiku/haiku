@@ -541,22 +541,20 @@ extern status_t		_kern_set_partition_type(partition_id partitionID,
 						int32* childChangeCounter, const char* type);
 extern status_t		_kern_set_partition_parameters(partition_id partitionID,
 						int32* changeCounter, partition_id childID,
-						int32* childChangeCounter, const char* parameters,
-						size_t parametersSize);
+						int32* childChangeCounter, const char* parameters);
 extern status_t		_kern_set_partition_content_parameters(
 						partition_id partitionID, int32* changeCounter,
-						const char* parameters, size_t parametersSize);
+						const char* parameters);
 extern status_t		_kern_initialize_partition(partition_id partitionID,
 						int32* changeCounter, const char* diskSystemName,
-						const char* name, const char* parameters,
-						size_t parametersSize);
+						const char* name, const char* parameters);
 extern status_t		_kern_uninitialize_partition(partition_id partitionID,
 						int32* changeCounter);
 extern status_t		_kern_create_child_partition(partition_id partitionID,
 						int32* changeCounter, off_t offset, off_t size,
 						const char* type, const char* name,
-						const char* parameters, size_t parametersSize,
-						partition_id* childID, int32* childChangeCounter);
+						const char* parameters, partition_id* childID,
+						int32* childChangeCounter);
 extern status_t		_kern_delete_child_partition(partition_id partitionID,
 						int32* changeCounter, partition_id childID,
 						int32 childChangeCounter);

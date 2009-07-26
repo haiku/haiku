@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "InitializeJob.h"
 
 #include <syscalls.h>
@@ -13,10 +14,11 @@
 
 // constructor
 InitializeJob::InitializeJob(PartitionReference* partition)
-	: DiskDeviceJob(partition),
-	  fDiskSystem(NULL),
-	  fName(NULL),
-	  fParameters(NULL)
+	:
+	DiskDeviceJob(partition),
+	fDiskSystem(NULL),
+	fName(NULL),
+	fParameters(NULL)
 {
 }
 
@@ -48,10 +50,9 @@ status_t
 InitializeJob::Do()
 {
 	int32 changeCounter = fPartition->ChangeCounter();
-	status_t error = _kern_initialize_partition(fPartition->PartitionID(),
-		&changeCounter, fDiskSystem, fName, fParameters,
-		fParameters ? strlen(fParameters) : 0);
 
+	status_t error = _kern_initialize_partition(fPartition->PartitionID(),
+		&changeCounter, fDiskSystem, fName, fParameters);
 	if (error != B_OK)
 		return error;
 

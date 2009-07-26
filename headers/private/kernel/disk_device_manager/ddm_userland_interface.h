@@ -8,6 +8,7 @@
 #ifndef _DISK_DEVICE_MANAGER_USERLAND_INTERFACE_H
 #define _DISK_DEVICE_MANAGER_USERLAND_INTERFACE_H
 
+
 #include <OS.h>
 
 #include <DiskDeviceDefs.h>
@@ -69,29 +70,26 @@ status_t _user_set_partition_type(partition_id partitionID,
 				int32* childChangeCounter, const char* type);
 status_t _user_set_partition_parameters(partition_id partitionID,
 				int32* changeCounter, partition_id childID,
-				int32* childChangeCounter, const char* parameters,
-				size_t parametersSize);
+				int32* childChangeCounter, const char* parameters);
 status_t _user_set_partition_content_parameters(partition_id partitionID,
-				int32* changeCounter, const char* parameters,
-				size_t parametersSize);
+				int32* changeCounter, const char* parameters);
 status_t _user_initialize_partition(partition_id partitionID,
 				int32* changeCounter, const char* diskSystemName,
-				const char* name, const char* parameters,
-				size_t parametersSize);
+				const char* name, const char* parameters);
 status_t _user_uninitialize_partition(partition_id partitionID,
 				int32* changeCounter);
 
 status_t _user_create_child_partition(partition_id partitionID,
 				int32* changeCounter, off_t offset, off_t size,
 				const char* type, const char* name, const char* parameters,
-				size_t parametersSize, partition_id* childID,
-				int32* childChangeCounter);
+				partition_id* childID, int32* childChangeCounter);
 status_t _user_delete_child_partition(partition_id partitionID,
 				int32* changeCounter, partition_id childID,
 				int32 childChangeCounter);
 
 // change notification
-status_t _user_start_watching_disks(uint32 eventMask, port_id port, int32 token);
+status_t _user_start_watching_disks(uint32 eventMask, port_id port,
+				int32 token);
 status_t _user_stop_watching_disks(port_id port, int32 token);
 
 #ifdef __cplusplus

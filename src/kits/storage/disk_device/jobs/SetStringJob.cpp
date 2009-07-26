@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "SetStringJob.h"
 
 #include <syscalls.h>
@@ -14,8 +15,9 @@
 // constructor
 SetStringJob::SetStringJob(PartitionReference* partition,
 		PartitionReference* child)
-	: DiskDeviceJob(partition, child),
-	  fString(NULL)
+	:
+	DiskDeviceJob(partition, child),
+	fString(NULL)
 {
 }
 
@@ -78,13 +80,12 @@ SetStringJob::Do()
 		case B_DISK_DEVICE_JOB_SET_PARAMETERS:
 			error = _kern_set_partition_parameters(fPartition->PartitionID(),
 				&changeCounter, fChild->PartitionID(), &childChangeCounter,
-				fString, fString ? strlen(fString) : 0);
+				fString);
 			updateChildChangeCounter = true;
 			break;
 		case B_DISK_DEVICE_JOB_SET_CONTENT_PARAMETERS:
 			error = _kern_set_partition_content_parameters(
-				fPartition->PartitionID(), &changeCounter, fString,
-				fString ? strlen(fString) : 0);
+				fPartition->PartitionID(), &changeCounter, fString);
 			break;
 		default:
 			return B_BAD_VALUE;

@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "CreateChildJob.h"
 
 #include <syscalls.h>
@@ -14,12 +15,13 @@
 // constructor
 CreateChildJob::CreateChildJob(PartitionReference* partition,
 		PartitionReference* child)
-	: DiskDeviceJob(partition, child),
-	  fOffset(0),
-	  fSize(0),
-	  fType(NULL),
-	  fName(NULL),
-	  fParameters(NULL)
+	:
+	DiskDeviceJob(partition, child),
+	fOffset(0),
+	fSize(0),
+	fType(NULL),
+	fName(NULL),
+	fParameters(NULL)
 {
 }
 
@@ -57,8 +59,8 @@ CreateChildJob::Do()
 	partition_id childID;
 	int32 childChangeCounter;
 	status_t error = _kern_create_child_partition(fPartition->PartitionID(),
-		&changeCounter, fOffset, fSize, fType, fName, fParameters,
-		fParameters ? strlen(fParameters) : 0, &childID, &childChangeCounter);
+		&changeCounter, fOffset, fSize, fType, fName, fParameters, &childID,
+		&childChangeCounter);
 	if (error != B_OK)
 		return error;
 

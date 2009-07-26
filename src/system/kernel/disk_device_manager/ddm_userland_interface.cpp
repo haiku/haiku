@@ -141,50 +141,6 @@ struct UserStringParameter {
 };
 
 
-template<typename Type, bool kAllowsNull>
-struct UserMemoryParameter {
-	Type*	value;
-
-	inline UserMemoryParameter()
-		: value(NULL)
-	{
-	}
-
-	inline ~UserMemoryParameter()
-	{
-		free(value);
-	}
-
-	inline status_t Init(const Type* userValue, size_t size)
-	{
-		if (userValue == NULL) {
-			if (!kAllowsNull)
-				return B_BAD_VALUE;
-
-			value = NULL;
-			return B_OK;
-		}
-
-		if (!IS_USER_ADDRESS(userValue))
-			return B_BAD_ADDRESS;
-
-		value = (Type*)malloc(size);
-		if (value == NULL)
-			return B_NO_MEMORY;
-
-		return user_memcpy(value, userValue, size);
-	}
-
-	inline status_t Init(const Type* userValue, size_t size, size_t maxSize)
-	{
-		if (size > maxSize)
-			return B_BAD_VALUE;
-
-		return Init(userValue, size);
-	}
-};
-
-
 #if 0
 static void
 move_descendants(KPartition *partition, off_t moveBy)
@@ -1036,17 +992,16 @@ _user_set_partition_type(partition_id partitionID, int32* _changeCounter,
 
 status_t
 _user_set_partition_parameters(partition_id partitionID, int32* _changeCounter,
-	partition_id childID, int32* _childChangeCounter, const char* _parameters,
-	size_t parametersSize)
+	partition_id childID, int32* _childChangeCounter, const char* _parameters)
 {
 	// copy parameters in
-	UserMemoryParameter<char, true> parameters;
+	UserStringParameter<true> parameters;
 	int32 changeCounter;
 	int32 childChangeCounter;
 
 	status_t error;
-	if ((error = parameters.Init(_parameters, parametersSize,
-			B_DISK_DEVICE_MAX_PARAMETER_SIZE)) != B_OK
+	if ((error = parameters.Init(_parameters, B_DISK_DEVICE_MAX_PARAMETER_SIZE))
+			!= B_OK
 		|| (error = copy_from_user_value(changeCounter, _changeCounter))
 			!= B_OK
 		|| (error = copy_from_user_value(childChangeCounter,
@@ -1118,17 +1073,16 @@ _user_set_partition_parameters(partition_id partitionID, int32* _changeCounter,
 
 status_t
 _user_set_partition_content_parameters(partition_id partitionID,
-	int32* _changeCounter, const char* _parameters, size_t parametersSize)
+	int32* _changeCounter, const char* _parameters)
 {
 	// copy parameters in
-	UserMemoryParameter<char, true> parameters;
+	UserStringParameter<true> parameters;
 	int32 changeCounter;
 
-	status_t error;
-	if ((error = parameters.Init(_parameters, parametersSize,
-			B_DISK_DEVICE_MAX_PARAMETER_SIZE)) != B_OK
-		|| (error = copy_from_user_value(changeCounter, _changeCounter))
-			!= B_OK) {
+	status_t error
+		= parameters.Init(_parameters, B_DISK_DEVICE_MAX_PARAMETER_SIZE);
+	if (error != B_OK || (error = copy_from_user_value(changeCounter,
+			_changeCounter)) != B_OK) {
 		return error;
 	}
 
@@ -1179,26 +1133,26 @@ _user_set_partition_content_parameters(partition_id partitionID,
 
 status_t
 _user_initialize_partition(partition_id partitionID, int32* _changeCounter,
-	const char* _diskSystemName, const char* _name, const char* _parameters,
-	size_t parametersSize)
+	const char* _diskSystemName, const char* _name, const char* _parameters)
 {
 	// copy parameters in
 	UserStringParameter<false> diskSystemName;
 	UserStringParameter<true> name;
-	UserMemoryParameter<char, true> parameters;
+	UserStringParameter<true> parameters;
 	int32 changeCounter;
 
 	status_t error;
 	if ((error = diskSystemName.Init(_diskSystemName,
 			B_DISK_SYSTEM_NAME_LENGTH)) != B_OK
 		|| (error = name.Init(_name, B_DISK_DEVICE_NAME_LENGTH)) != B_OK
-		|| (error = parameters.Init(_parameters, parametersSize,
-			B_DISK_DEVICE_MAX_PARAMETER_SIZE)) != B_OK
+		|| (error = parameters.Init(_parameters,
+				B_DISK_DEVICE_MAX_PARAMETER_SIZE)) != B_OK
 		|| (error = copy_from_user_value(changeCounter, _changeCounter))
-			!= B_OK) {
+				!= B_OK) {
 		return error;
 	}
 
+dprintf("_parameters");
 	// get the partition
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition* partition = manager->WriteLockPartition(partitionID);
@@ -1305,22 +1259,21 @@ _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter)
 status_t
 _user_create_child_partition(partition_id partitionID, int32* _changeCounter,
 	off_t offset, off_t size, const char* _type, const char* _name,
-	const char* _parameters, size_t parametersSize, partition_id* childID,
-	int32* childChangeCounter)
+	const char* _parameters, partition_id* childID, int32* childChangeCounter)
 {
 	// copy parameters in
 	UserStringParameter<false> type;
 	UserStringParameter<true> name;
-	UserMemoryParameter<char, true> parameters;
+	UserStringParameter<true> parameters;
 	int32 changeCounter;
 
 	status_t error;
 	if ((error = type.Init(_type, B_DISK_DEVICE_TYPE_LENGTH)) != B_OK
 		|| (error = name.Init(_name, B_DISK_DEVICE_NAME_LENGTH)) != B_OK
-		|| (error = parameters.Init(_parameters, parametersSize,
-			B_DISK_DEVICE_MAX_PARAMETER_SIZE)) != B_OK
+		|| (error = parameters.Init(_parameters,
+				B_DISK_DEVICE_MAX_PARAMETER_SIZE)) != B_OK
 		|| (error = copy_from_user_value(changeCounter, _changeCounter))
-			!= B_OK) {
+				!= B_OK) {
 		return error;
 	}
 
