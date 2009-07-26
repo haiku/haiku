@@ -1633,8 +1633,12 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 		bytes = size - data->MaxIndirectRange();
 	else if (data->Size() < data->MaxDirectRange())
 		bytes = size - data->MaxDirectRange();
-	else
+	else {
+		// no preallocation left to be used
 		bytes = size - data->Size();
+		if (data->MaxDoubleIndirectRange() > 0)
+			minimum = NUM_ARRAY_BLOCKS;
+	}
 
 	// do we have enough free blocks on the disk?
 	off_t blocksNeeded = (bytes + fVolume->BlockSize() - 1)
@@ -1687,10 +1691,15 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 		// the requested blocks do not need to be returned with a
 		// single allocation, so we need to iterate until we have
 		// enough blocks allocated
+		if (minimum > 1) {
+			// make sure that "blocks" is a multiple of minimum
+			blocksRequested = round_up(blocksRequested, minimum);
+		}
+
 		block_run run;
 		status_t status = fVolume->Allocate(transaction, this, blocksRequested,
 			run, minimum);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 
 		// okay, we have the needed blocks, so just distribute them to the
@@ -1702,10 +1711,6 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 		blocksNeeded -= run.Length();
 		// don't preallocate if the first allocation was already too small
 		blocksRequested = blocksNeeded;
-		if (minimum > 1) {
-			// make sure that "blocks" is a multiple of minimum
-			blocksRequested = round_up(blocksRequested, minimum);
-		}
 
 		// Direct block range
 
@@ -1746,7 +1751,7 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 			// if there is no indirect block yet, create one
 			if (data->indirect.IsZero()) {
 				status = _AllocateBlockArray(transaction, data->indirect);
-				if (status < B_OK)
+				if (status != B_OK)
 					return status;
 
 				data->max_indirect_range = HOST_ENDIAN_TO_BFS_INT64(
@@ -1800,7 +1805,7 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 
 		if (data->Size() <= data->MaxDoubleIndirectRange()
 			|| !data->max_double_indirect_range) {
-			while ((run.Length() % NUM_ARRAY_BLOCKS) != 0) {
+			if ((run.Length() % NUM_ARRAY_BLOCKS) != 0) {
 				// The number of allocated blocks isn't a multiple of
 				// NUM_ARRAY_BLOCKS, so we have to change this. This can happen
 				// the first time the stream grows into the double
@@ -1813,7 +1818,7 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 				status = fVolume->Free(transaction,
 					block_run::Run(run.AllocationGroup(),
 					run.Start() + run.Length(), rest));
-				if (status < B_OK)
+				if (status != B_OK)
 					return status;
 
 				blocksNeeded += rest;
@@ -1833,7 +1838,7 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 			if (data->double_indirect.IsZero()) {
 				status = _AllocateBlockArray(transaction,
 					data->double_indirect);
-				if (status < B_OK)
+				if (status != B_OK)
 					return status;
 
 				data->max_double_indirect_range = data->max_indirect_range;
@@ -1876,7 +1881,7 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 
 						status = _AllocateBlockArray(transaction,
 							array[indirectIndex % runsPerBlock]);
-						if (status < B_OK)
+						if (status != B_OK)
 							return status;
 					}
 
@@ -1900,6 +1905,8 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 					} while ((++index % runsPerBlock) != 0 && run.length);
 				} while ((index % runsPerArray) != 0 && run.length);
 
+				if (index == runsPerArray)
+					index = 0;
 				if (++indirectIndex % runsPerBlock == 0) {
 					array = NULL;
 					index = 0;
