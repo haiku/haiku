@@ -72,7 +72,6 @@ MainWindow::TeamsPage::TeamsPage(MainWindow* parent)
 	fTeamsTable(NULL),
 	fTeamsTableModel(NULL),
 	fModel(NULL)
-
 {
 	SetName("Teams");
 

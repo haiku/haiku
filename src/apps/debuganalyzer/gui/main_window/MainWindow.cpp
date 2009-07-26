@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "MainWindow.h"
 
 #include <stdio.h>
@@ -22,6 +23,7 @@
 #include "SubWindowManager.h"
 
 #include "main_window/GeneralPage.h"
+#include "main_window/SchedulingPage.h"
 #include "main_window/TeamsPage.h"
 #include "main_window/ThreadsPage.h"
 
@@ -36,6 +38,7 @@ MainWindow::MainWindow(DataSource* dataSource)
 	fGeneralPage(NULL),
 	fTeamsPage(NULL),
 	fThreadsPage(NULL),
+	fSchedulingPage(NULL),
 	fModel(NULL),
 	fModelLoader(NULL),
 	fSubWindowManager(NULL)
@@ -53,6 +56,7 @@ MainWindow::MainWindow(DataSource* dataSource)
 	fMainTabView->AddTab(fGeneralPage = new GeneralPage);
 	fMainTabView->AddTab(fTeamsPage = new TeamsPage(this));
 	fMainTabView->AddTab(fThreadsPage = new ThreadsPage(this));
+	fMainTabView->AddTab(fSchedulingPage = new SchedulingPage(this));
 
 	// create a model loader, if we have a data source
 	if (dataSource != NULL)
@@ -199,4 +203,5 @@ MainWindow::_SetModel(Model* model)
 	fGeneralPage->SetModel(fModel);
 	fTeamsPage->SetModel(fModel);
 	fThreadsPage->SetModel(fModel);
+	fSchedulingPage->SetModel(fModel);
 }

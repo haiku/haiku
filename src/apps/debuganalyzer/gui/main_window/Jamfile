@@ -10,6 +10,7 @@ MergeObject DebugAnalyzer_gui_main_window.o
 	:
 	GeneralPage.cpp
 	MainWindow.cpp
+	SchedulingPage.cpp
 	TeamsPage.cpp
 	ThreadsPage.cpp
 ;

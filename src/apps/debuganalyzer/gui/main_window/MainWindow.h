@@ -34,6 +34,7 @@ private:
 			class GeneralPage;
 			class TeamsPage;
 			class ThreadsPage;
+			class SchedulingPage;
 
 private:
 			void				_SetModel(Model* model);
@@ -43,6 +44,7 @@ private:
 			GeneralPage*		fGeneralPage;
 			TeamsPage*			fTeamsPage;
 			ThreadsPage*		fThreadsPage;
+			SchedulingPage*		fSchedulingPage;
 			Model*				fModel;
 			ModelLoader*		fModelLoader;
 			SubWindowManager*	fSubWindowManager;

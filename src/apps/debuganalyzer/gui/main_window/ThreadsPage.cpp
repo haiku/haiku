@@ -108,7 +108,6 @@ MainWindow::ThreadsPage::ThreadsPage(MainWindow* parent)
 	fThreadsTable(NULL),
 	fThreadsTableModel(NULL),
 	fModel(NULL)
-
 {
 	SetName("Threads");
 
