@@ -312,6 +312,11 @@ public:
 		_Allocate(fParent, block->parent_data);
 		_Allocate(fOriginal, block->original_data);
 
+#if KTRACE_PRINTF_STACK_TRACE
+		fStackTrace = capture_tracing_stack_trace(KTRACE_PRINTF_STACK_TRACE, 1,
+			false);
+#endif
+
 		Initialized();
 	}
 
@@ -322,6 +327,13 @@ public:
 			fParent != NULL ? 'p' : '-', fOriginal != NULL ? 'o' : '-',
 			fMessage);
 	}
+
+#if KTRACE_PRINTF_STACK_TRACE
+	virtual void DumpStackTrace(TraceOutput& out)
+	{
+		out.PrintStackTrace(fStackTrace);
+	}
+#endif
 
 	void DumpBlocks(uint32 which, uint32 offset, uint32 size)
 	{
@@ -369,7 +381,7 @@ public:
 			for (; i < start + kBlockSize; i++) {
 				if (!(i % 4))
 					kprintf(" ");
-	
+
 				if (i >= size)
 					kprintf("  ");
 				else
@@ -398,6 +410,9 @@ private:
 	uint8*			fCurrent;
 	uint8*			fParent;
 	uint8*			fOriginal;
+#if KTRACE_PRINTF_STACK_TRACE
+	tracing_stack_trace* fStackTrace;
+#endif
 };
 #endif	// BLOCK_CACHE_BLOCK_TRACING >= 2
 
@@ -1747,16 +1762,12 @@ dump_block_data(int argc, char** argv)
 {
 	using namespace BlockTracing;
 
-	if (argc < 3) {
-		print_debugger_command_usage(argv[0]);
-		return 0;
-	}
-
 	// Determine which blocks to show
 
+	bool printStackTrace = true;
 	uint32 which = 0;
 	int32 i = 1;
-	while (argv[i][0] == '-') {
+	while (i < argc && argv[i][0] == '-') {
 		char* arg = &argv[i][1];
 		while (arg[0]) {
 			switch (arg[0]) {
@@ -1777,11 +1788,16 @@ dump_block_data(int argc, char** argv)
 			}
 			arg++;
 		}
-	
+
 		i++;
 	}
 	if (which == 0)
 		which = BlockData::kCurrent | BlockData::kParent | BlockData::kOriginal;
+
+	if (i == argc) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
 
 	// Get the range of blocks to print
 
@@ -1800,13 +1816,14 @@ dump_block_data(int argc, char** argv)
 		size = parse_expression(argv[i + 3]);
 
 	TraceEntryIterator iterator;
-	iterator.MoveTo(from);
+	iterator.MoveTo(from - 1);
 
 	static char sBuffer[1024];
 	LazyTraceOutput out(sBuffer, sizeof(sBuffer), TRACE_OUTPUT_TEAM_ID);
 
 	while (TraceEntry* entry = iterator.Next()) {
-		if (iterator.Index() > to)
+		int32 index = iterator.Index();
+		if (index > to)
 			break;
 
 		Action* action = dynamic_cast<Action*>(entry);
@@ -1821,7 +1838,20 @@ dump_block_data(int argc, char** argv)
 			continue;
 
 		out.Clear();
-		out.DumpEntry(blockData);
+
+		const char* dump = out.DumpEntry(entry);
+		int length = strlen(dump);
+		if (length > 0 && dump[length - 1] == '\n')
+			length--;
+
+		kprintf("%5ld. %.*s\n", index, length, dump);
+
+		if (printStackTrace) {
+			out.Clear();
+			entry->DumpStackTrace(out);
+			if (out.Size() > 0)
+				kputs(out.Buffer());
+		}
 
 		blockData->DumpBlocks(which, offset, size);
 	}
