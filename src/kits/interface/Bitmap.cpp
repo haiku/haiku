@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku Inc.
+ * Copyright 2001-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,11 +14,16 @@
 	contain bitmap data.
 */
 
-#include "ColorConversion.h"
-#include "BitmapPrivate.h"
+#include <Bitmap.h>
+
+#include <algorithm>
+#include <limits.h>
+#include <new>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Application.h>
-#include <Bitmap.h>
 #include <GraphicsDefs.h>
 #include <Locker.h>
 #include <View.h>
@@ -29,18 +34,13 @@
 #include <ServerMemoryAllocator.h>
 #include <ServerProtocol.h>
 
-#include <algorithm>
-#include <limits.h>
-#include <new>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "ColorConversion.h"
+#include "BitmapPrivate.h"
 
 
 using namespace BPrivate;
 
 
-// get_raw_bytes_per_row
 /*!	\brief Returns the number of bytes per row needed to store the actual
 		   bitmap data (not including any padding) given a color space and a
 		   row width.
@@ -49,8 +49,7 @@ using namespace BPrivate;
 	\return The number of bytes per row needed to store data for a row, or
 			0, if the color space is not supported.
 */
-static inline
-int32
+static inline int32
 get_raw_bytes_per_row(color_space colorSpace, int32 width)
 {
 	int32 bpr = 0;
@@ -101,7 +100,9 @@ get_raw_bytes_per_row(color_space colorSpace, int32 width)
 	return bpr;
 }
 
-// get_bytes_per_row
+
+namespace BPrivate {
+
 /*!	\brief Returns the number of bytes per row needed to store the bitmap
 		   data (including any padding) given a color space and a row width.
 	\param colorSpace The color space.
@@ -109,8 +110,6 @@ get_raw_bytes_per_row(color_space colorSpace, int32 width)
 	\return The number of bytes per row needed to store data for a row, or
 			0, if the color space is not supported.
 */
-namespace BPrivate {
-	
 int32
 get_bytes_per_row(color_space colorSpace, int32 width)
 {
@@ -120,7 +119,8 @@ get_bytes_per_row(color_space colorSpace, int32 width)
 	return bpr;
 }
 
-}
+}	// namespace BPrivate
+
 
 //	#pragma mark -
 
@@ -135,24 +135,25 @@ get_bytes_per_row(color_space colorSpace, int32 width)
 	\param screenID ???
 */
 BBitmap::BBitmap(BRect bounds, uint32 flags, color_space colorSpace,
-				 int32 bytesPerRow, screen_id screenID)
-	: fBasePointer(NULL),
-	  fSize(0),
-	  fColorSpace(B_NO_COLOR_SPACE),
-	  fBounds(0, 0, -1, -1),
-	  fBytesPerRow(0),
-	  fWindow(NULL),
-	  fServerToken(-1),
-	  fAreaOffset(-1),
-	  fArea(-1),
-	  fServerArea(-1),
-	  fFlags(0),
-	  fInitError(B_NO_INIT)
+		int32 bytesPerRow, screen_id screenID)
+	:
+	fBasePointer(NULL),
+	fSize(0),
+	fColorSpace(B_NO_COLOR_SPACE),
+	fBounds(0, 0, -1, -1),
+	fBytesPerRow(0),
+	fWindow(NULL),
+	fServerToken(-1),
+	fAreaOffset(-1),
+	fArea(-1),
+	fServerArea(-1),
+	fFlags(0),
+	fInitError(B_NO_INIT)
 {
 	_InitObject(bounds, colorSpace, flags, bytesPerRow, screenID);
 }
 
-// constructor
+
 /*!	\brief Creates and initializes a BBitmap.
 	\param bounds The bitmap dimensions.
 	\param colorSpace The bitmap's color space.
@@ -163,28 +164,28 @@ BBitmap::BBitmap(BRect bounds, uint32 flags, color_space colorSpace,
 		   will be allocated.
 */
 BBitmap::BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews,
-				 bool needsContiguous)
-	: fBasePointer(NULL),
-	  fSize(0),
-	  fColorSpace(B_NO_COLOR_SPACE),
-	  fBounds(0, 0, -1, -1),
-	  fBytesPerRow(0),
-	  fWindow(NULL),
-	  fServerToken(-1),
-	  fAreaOffset(-1),
-	  fArea(-1),
-	  fServerArea(-1),
-	  fFlags(0),
-	  fInitError(B_NO_INIT)
+		bool needsContiguous)
+	:
+	fBasePointer(NULL),
+	fSize(0),
+	fColorSpace(B_NO_COLOR_SPACE),
+	fBounds(0, 0, -1, -1),
+	fBytesPerRow(0),
+	fWindow(NULL),
+	fServerToken(-1),
+	fAreaOffset(-1),
+	fArea(-1),
+	fServerArea(-1),
+	fFlags(0),
+	fInitError(B_NO_INIT)
 {
 	int32 flags = (acceptsViews ? B_BITMAP_ACCEPTS_VIEWS : 0)
-				| (needsContiguous ? B_BITMAP_IS_CONTIGUOUS : 0);
+		| (needsContiguous ? B_BITMAP_IS_CONTIGUOUS : 0);
 	_InitObject(bounds, colorSpace, flags, B_ANY_BYTES_PER_ROW,
-			   B_MAIN_SCREEN_ID);
-
+		B_MAIN_SCREEN_ID);
 }
 
-// constructor
+
 /*!	\brief Creates a BBitmap as a clone of another bitmap.
 	\param source The source bitmap.
 	\param acceptsViews \c true, if the bitmap shall accept BViews, i.e. if
@@ -193,28 +194,30 @@ BBitmap::BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews,
 	\param needsContiguous If \c true a physically contiguous chunk of memory
 		   will be allocated.
 */
-BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
-				 bool needsContiguous)
-	: fBasePointer(NULL),
-	  fSize(0),
-	  fColorSpace(B_NO_COLOR_SPACE),
-	  fBounds(0, 0, -1, -1),
-	  fBytesPerRow(0),
-	  fWindow(NULL),
-	  fServerToken(-1),
-	  fAreaOffset(-1),
-	  fArea(-1),
-	  fServerArea(-1),
-	  fFlags(0),
-	  fInitError(B_NO_INIT)
+BBitmap::BBitmap(const BBitmap* source, bool acceptsViews, bool needsContiguous)
+	:
+	fBasePointer(NULL),
+	fSize(0),
+	fColorSpace(B_NO_COLOR_SPACE),
+	fBounds(0, 0, -1, -1),
+	fBytesPerRow(0),
+	fWindow(NULL),
+	fServerToken(-1),
+	fAreaOffset(-1),
+	fArea(-1),
+	fServerArea(-1),
+	fFlags(0),
+	fInitError(B_NO_INIT)
 {
 	if (source && source->IsValid()) {
 		int32 flags = (acceptsViews ? B_BITMAP_ACCEPTS_VIEWS : 0)
-					| (needsContiguous ? B_BITMAP_IS_CONTIGUOUS : 0);
+			| (needsContiguous ? B_BITMAP_IS_CONTIGUOUS : 0);
 		_InitObject(source->Bounds(), source->ColorSpace(), flags,
-				   source->BytesPerRow(), B_MAIN_SCREEN_ID);
-		if (InitCheck() == B_OK)
-			memcpy(Bits(), source->Bits(), min_c(BitsLength(), source->BitsLength()));
+			source->BytesPerRow(), B_MAIN_SCREEN_ID);
+		if (InitCheck() == B_OK) {
+			memcpy(Bits(), source->Bits(), min_c(BitsLength(),
+				source->BitsLength()));
+		}
 	}
 }
 
@@ -248,24 +251,25 @@ BBitmap::~BBitmap()
 	_CleanUp();
 }
 
-// unarchiving constructor
+
 /*!	\brief Unarchives a bitmap from a BMessage.
 	\param data The archive.
 */
-BBitmap::BBitmap(BMessage *data)
-	: BArchivable(data),
-	  fBasePointer(NULL),
-	  fSize(0),
-	  fColorSpace(B_NO_COLOR_SPACE),
-	  fBounds(0, 0, -1, -1),
-	  fBytesPerRow(0),
-	  fWindow(NULL),
-	  fServerToken(-1),
-	  fAreaOffset(-1),
-	  fArea(-1),
-	  fServerArea(-1),
-	  fFlags(0),
-	  fInitError(B_NO_INIT)
+BBitmap::BBitmap(BMessage* data)
+	:
+	BArchivable(data),
+	fBasePointer(NULL),
+	fSize(0),
+	fColorSpace(B_NO_COLOR_SPACE),
+	fBounds(0, 0, -1, -1),
+	fBytesPerRow(0),
+	fWindow(NULL),
+	fServerToken(-1),
+	fAreaOffset(-1),
+	fArea(-1),
+	fServerArea(-1),
+	fFlags(0),
+	fInitError(B_NO_INIT)
 {
 	int32 flags;
 	if (data->FindInt32("_bmflags", &flags) != B_OK) {
@@ -296,7 +300,7 @@ BBitmap::BBitmap(BMessage *data)
 
 	if (InitCheck() == B_OK) {
 		ssize_t size;
-		const void *buffer;
+		const void* buffer;
 		if (data->FindData("_data", B_RAW_TYPE, &buffer, &size) == B_OK) {
 			if (size == BitsLength()) {
 				_AssertPointer();
@@ -305,25 +309,26 @@ BBitmap::BBitmap(BMessage *data)
 		}
 	}
 
-	if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
+	if ((fFlags & B_BITMAP_ACCEPTS_VIEWS) != 0) {
 		BMessage message;
 		int32 i = 0;
 
 		while (data->FindMessage("_views", i++, &message) == B_OK) {
-			if (BView *view = dynamic_cast<BView *>(instantiate_object(&message)))
+			if (BView* view
+					= dynamic_cast<BView*>(instantiate_object(&message)))
 				AddChild(view);
 		}
 	}
 }
 
-// Instantiate
+
 /*!	\brief Instantiates a BBitmap from an archive.
 	\param data The archive.
 	\return A bitmap reconstructed from the archive or \c NULL, if an error
 			occured.
 */
-BArchivable *
-BBitmap::Instantiate(BMessage *data)
+BArchivable*
+BBitmap::Instantiate(BMessage* data)
 {
 	if (validate_instantiation(data, "BBitmap"))
 		return new BBitmap(data);
@@ -331,7 +336,7 @@ BBitmap::Instantiate(BMessage *data)
 	return NULL;
 }
 
-// Archive
+
 /*!	\brief Archives the BBitmap object.
 	\param data The archive.
 	\param deep \c true, if child object shall be archived as well, \c false
@@ -339,7 +344,7 @@ BBitmap::Instantiate(BMessage *data)
 	\return \c B_OK, if everything went fine, an error code otherwise.
 */
 status_t
-BBitmap::Archive(BMessage *data, bool deep) const
+BBitmap::Archive(BMessage* data, bool deep) const
 {
 	status_t ret = BArchivable::Archive(data, deep);
 
@@ -356,7 +361,7 @@ BBitmap::Archive(BMessage *data, bool deep) const
 		ret = data->AddInt32("_rowbytes", fBytesPerRow);
 
 	if (ret == B_OK && deep) {
-		if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
+		if ((fFlags & B_BITMAP_ACCEPTS_VIEWS) != 0) {
 			BMessage views;
 			for (int32 i = 0; i < CountChildren(); i++) {
 				if (ChildAt(i)->Archive(&views, deep))
@@ -371,7 +376,7 @@ BBitmap::Archive(BMessage *data, bool deep) const
 		// the data even if B_BITMAP_ACCEPTS_VIEWS is set (as opposed to
 		// the BeBook)
 		if (ret == B_OK) {
-			const_cast<BBitmap *>(this)->_AssertPointer();
+			const_cast<BBitmap*>(this)->_AssertPointer();
 			ret = data->AddData("_data", B_RAW_TYPE, fBasePointer, fSize);
 		}
 	}
@@ -379,7 +384,7 @@ BBitmap::Archive(BMessage *data, bool deep) const
 	return ret;
 }
 
-// InitCheck
+
 /*!	\brief Returns the result from the construction.
 	\return \c B_OK, if the object is properly initialized, an error code
 			otherwise.
@@ -390,7 +395,7 @@ BBitmap::InitCheck() const
 	return fInitError;
 }
 
-// IsValid
+
 /*!	\brief Returns whether or not the BBitmap object is valid.
 	\return \c true, if the object is properly initialized, \c false otherwise.
 */
@@ -401,8 +406,7 @@ BBitmap::IsValid() const
 }
 
 
-/*!
-	\brief Locks the bitmap bits so that they cannot be relocated.
+/*!	\brief Locks the bitmap bits so that they cannot be relocated.
 
 	This is currently only used for overlay bitmaps - whenever you
 	need to access their Bits(), you have to lock them first.
@@ -411,12 +415,12 @@ BBitmap::IsValid() const
 	and clobbering memory that doesn't belong you.
 */
 status_t
-BBitmap::LockBits(uint32 *state)
+BBitmap::LockBits(uint32* state)
 {
 	// TODO: how do we fill the "state"?
 	//	It would be more or less useful to report what kind of bitmap
 	//	we got (ie. overlay, placeholder, or non-overlay)
-	if (fFlags & B_BITMAP_WILL_OVERLAY) {
+	if ((fFlags & B_BITMAP_WILL_OVERLAY) != 0) {
 		overlay_client_data* data = (overlay_client_data*)fBasePointer;
 
 		status_t status;
@@ -441,8 +445,7 @@ BBitmap::LockBits(uint32 *state)
 }
 
 
-/*!
-	\brief Unlocks the bitmap's buffer again.
+/*!	\brief Unlocks the bitmap's buffer again.
 	Counterpart to LockBits(), see there for comments.
 */
 void
@@ -462,7 +465,7 @@ BBitmap::UnlockBits()
 area_id
 BBitmap::Area() const
 {
-	const_cast<BBitmap *>(this)->_AssertPointer();
+	const_cast<BBitmap*>(this)->_AssertPointer();
 	return fArea;
 }
 
@@ -470,12 +473,12 @@ BBitmap::Area() const
 /*!	\brief Returns the pointer to the bitmap data.
 	\return The pointer to the bitmap data.
 */
-void *
+void*
 BBitmap::Bits() const
 {
-	const_cast<BBitmap *>(this)->_AssertPointer();
+	const_cast<BBitmap*>(this)->_AssertPointer();
 
-	if (fFlags & B_BITMAP_WILL_OVERLAY) {
+	if ((fFlags & B_BITMAP_WILL_OVERLAY) != 0) {
 		overlay_client_data* data = (overlay_client_data*)fBasePointer;
 		return data->buffer;
 	}
@@ -483,7 +486,7 @@ BBitmap::Bits() const
 	return (void*)fBasePointer;
 }
 
-// BitsLength
+
 /*!	\brief Returns the size of the bitmap data.
 	\return The size of the bitmap data.
 */
@@ -493,7 +496,7 @@ BBitmap::BitsLength() const
 	return fSize;
 }
 
-// BytesPerRow
+
 /*!	\brief Returns the number of bytes used to store a row of bitmap data.
 	\return The number of bytes used to store a row of bitmap data.
 */
@@ -503,7 +506,7 @@ BBitmap::BytesPerRow() const
 	return fBytesPerRow;
 }
 
-// ColorSpace
+
 /*!	\brief Returns the bitmap's color space.
 	\return The bitmap's color space.
 */
@@ -513,7 +516,7 @@ BBitmap::ColorSpace() const
 	return fColorSpace;
 }
 
-// Bounds
+
 /*!	\brief Returns the bitmap's dimensions.
 	\return The bitmap's dimensions.
 */
@@ -523,7 +526,7 @@ BBitmap::Bounds() const
 	return fBounds;
 }
 
-// Flags
+
 /*!	\brief Returns the bitmap's creating flags.
 
 	This method informs about which flags have been used to create the
@@ -539,7 +542,6 @@ BBitmap::Flags() const
 }
 
 
-// SetBits
 /*!	\brief Assigns data to the bitmap.
 
 	Data are directly written into the bitmap's data buffer, being converted
@@ -565,8 +567,8 @@ BBitmap::Flags() const
 	\param colorSpace Color space of the source data.
 */
 void
-BBitmap::SetBits(const void *data, int32 length, int32 offset,
-				 color_space colorSpace)
+BBitmap::SetBits(const void* data, int32 length, int32 offset,
+	color_space colorSpace)
 {
 	status_t error = (InitCheck() == B_OK ? B_OK : B_NO_INIT);
 	// check params
@@ -578,21 +580,22 @@ BBitmap::SetBits(const void *data, int32 length, int32 offset,
 	int32 inBPR = -1;
 	// tweaks to mimic R5 behavior
 	if (error == B_OK) {
-		// B_RGB32 means actually unpadded B_RGB24_BIG
 		if (colorSpace == B_RGB32) {
+			// B_RGB32 means actually unpadded B_RGB24_BIG
 			colorSpace = B_RGB24_BIG;
 			inBPR = width * 3;
-		// If in color space is B_CMAP8, but the bitmap's is another one,
-		// ignore source data row padding.
-		} else if (colorSpace == B_CMAP8 && fColorSpace != B_CMAP8)
+		} else if (colorSpace == B_CMAP8 && fColorSpace != B_CMAP8) {
+			// If in color space is B_CMAP8, but the bitmap's is another one,
+			// ignore source data row padding.
 			inBPR = width;
+		}
 	}
 	// call the sane method, which does the actual work
 	if (error == B_OK)
 		error = ImportBits(data, length, inBPR, offset, colorSpace);
 }
 
-// ImportBits
+
 /*!	\brief Assigns data to the bitmap.
 
 	Data are directly written into the bitmap's data buffer, being converted
@@ -618,7 +621,7 @@ BBitmap::SetBits(const void *data, int32 length, int32 offset,
 	  unsupported \a colorSpace.
 */
 status_t
-BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
+BBitmap::ImportBits(const void* data, int32 length, int32 bpr, int32 offset,
 	color_space colorSpace)
 {
 	_AssertPointer();
@@ -666,7 +669,7 @@ BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
 	  \a colorSpace or invalid width/height.
 */
 status_t
-BBitmap::ImportBits(const void *data, int32 length, int32 bpr,
+BBitmap::ImportBits(const void* data, int32 length, int32 bpr,
 	color_space colorSpace, BPoint from, BPoint to, int32 width, int32 height)
 {
 	_AssertPointer();
@@ -704,7 +707,7 @@ BBitmap::ImportBits(const void *data, int32 length, int32 bpr,
 	  or the conversion from or to one of the color spaces is not supported.
 */
 status_t
-BBitmap::ImportBits(const BBitmap *bitmap)
+BBitmap::ImportBits(const BBitmap* bitmap)
 {
 	if (InitCheck() != B_OK)
 		return B_NO_INIT;
@@ -737,7 +740,7 @@ BBitmap::ImportBits(const BBitmap *bitmap)
 	  the color spaces is not supported, or invalid width/height.
 */
 status_t
-BBitmap::ImportBits(const BBitmap *bitmap, BPoint from, BPoint to, int32 width,
+BBitmap::ImportBits(const BBitmap* bitmap, BPoint from, BPoint to, int32 width,
 	int32 height)
 {
 	if (InitCheck() != B_OK)
@@ -754,7 +757,7 @@ BBitmap::ImportBits(const BBitmap *bitmap, BPoint from, BPoint to, int32 width,
 /*!	\brief Returns the overlay_restrictions structure for this bitmap
 */
 status_t
-BBitmap::GetOverlayRestrictions(overlay_restrictions *restrictions) const
+BBitmap::GetOverlayRestrictions(overlay_restrictions* restrictions) const
 {
 	if ((fFlags & B_BITMAP_WILL_OVERLAY) == 0)
 		return B_BAD_TYPE;
@@ -781,23 +784,23 @@ BBitmap::GetOverlayRestrictions(overlay_restrictions *restrictions) const
 	\param view The view to be added.
 */
 void
-BBitmap::AddChild(BView *view)
+BBitmap::AddChild(BView* view)
 {
 	if (fWindow != NULL)
 		fWindow->AddChild(view);
 }
 
-// RemoveChild
+
 /*!	\brief Removes a BView from the bitmap's view hierarchy.
 	\param view The view to be removed.
 */
 bool
-BBitmap::RemoveChild(BView *view)
+BBitmap::RemoveChild(BView* view)
 {
 	return fWindow != NULL ? fWindow->RemoveChild(view) : false;
 }
 
-// CountChildren
+
 /*!	\brief Returns the number of BViews currently belonging to the bitmap.
 	\return The number of BViews currently belonging to the bitmap.
 */
@@ -807,7 +810,7 @@ BBitmap::CountChildren() const
 	return fWindow != NULL ? fWindow->CountChildren() : 0;
 }
 
-// ChildAt
+
 /*!	\brief Returns the BView at a certain index in the bitmap's list of views.
 	\param index The index of the BView to be returned.
 	\return The BView at index \a index or \c NULL, if the index is out of
@@ -819,31 +822,31 @@ BBitmap::ChildAt(int32 index) const
 	return fWindow != NULL ? fWindow->ChildAt(index) : NULL;
 }
 
-// FindView
+
 /*!	\brief Returns a bitmap's BView with a certain name.
 	\param name The name of the BView to be returned.
 	\return The BView with the name \a name or \c NULL, if the bitmap doesn't
 	know a view with that name.
 */
 BView*
-BBitmap::FindView(const char *viewName) const
+BBitmap::FindView(const char* viewName) const
 {
 	return fWindow != NULL ? fWindow->FindView(viewName) : NULL;
 }
 
-// FindView
+
 /*!	\brief Returns a bitmap's BView at a certain location.
 	\param point The location.
 	\return The BView with located at \a point or \c NULL, if the bitmap
 	doesn't know a view at this location.
 */
-BView *
+BView*
 BBitmap::FindView(BPoint point) const
 {
 	return fWindow != NULL ? fWindow->FindView(point) : NULL;
 }
 
-// Lock
+
 /*!	\brief Locks the off-screen window that belongs to the bitmap.
 
 	The bitmap must accept views, if locking should work.
@@ -857,7 +860,7 @@ BBitmap::Lock()
 	return fWindow != NULL ? fWindow->Lock() : false;
 }
 
-// Unlock
+
 /*!	\brief Unlocks the off-screen window that belongs to the bitmap.
 
 	The bitmap must accept views, if locking should work.
@@ -869,7 +872,7 @@ BBitmap::Unlock()
 		fWindow->Unlock();
 }
 
-// IsLocked
+
 /*!	\brief Returns whether or not the bitmap's off-screen window is locked.
 
 	The bitmap must accept views, if locking should work.
@@ -883,7 +886,7 @@ BBitmap::IsLocked() const
 }
 
 
-BBitmap &
+BBitmap&
 BBitmap::operator=(const BBitmap& source)
 {
 	_CleanUp();
@@ -902,7 +905,7 @@ BBitmap::operator=(const BBitmap& source)
 
 
 status_t
-BBitmap::Perform(perform_code d, void *arg)
+BBitmap::Perform(perform_code d, void* arg)
 {
 	return BArchivable::Perform(d, arg);
 }
@@ -917,7 +920,7 @@ void BBitmap::_ReservedBitmap3() {}
 // get_shared_pointer
 /*!	\brief ???
 */
-char *
+char*
 BBitmap::get_shared_pointer() const
 {
 	return NULL;	// not implemented
@@ -1026,17 +1029,20 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 				BPrivate::ServerMemoryAllocator* allocator
 					= BApplication::Private::ServerAllocator();
 
-				if (allocationFlags & kNewAllocatorArea)
-					error = allocator->AddArea(fServerArea, fArea, fBasePointer);
-				else {
-					error = allocator->AreaAndBaseFor(fServerArea, fArea, fBasePointer);
+				if (allocationFlags & kNewAllocatorArea) {
+					error = allocator->AddArea(fServerArea, fArea,
+						fBasePointer);
+				} else {
+					error = allocator->AreaAndBaseFor(fServerArea, fArea,
+						fBasePointer);
 					if (error == B_OK)
 						fBasePointer += fAreaOffset;
 				}
 
-				if (allocationFlags & kFramebuffer) {
-					// the base pointer will now point to an overlay_client_data structure
-					// bytes per row might be modified to match hardware constraints
+				if ((allocationFlags & kFramebuffer) != 0) {
+					// The base pointer will now point to an overlay_client_data
+					// structure bytes per row might be modified to match
+					// hardware constraints
 					link.Read<int32>(&bytesPerRow);
 					size = bytesPerRow * (bounds.IntegerHeight() + 1);
 				}
@@ -1081,14 +1087,15 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		// TODO: Creating an offscreen window with a non32 bit bitmap
 		// copies the current content of the bitmap to a back buffer.
 		// So at this point the bitmap has to be already cleared to white.
-		// Better move the above code to the server so the problem looks more clear.
+		// Better move the above code to the server so the problem looks more
+		// clear.
 		if (flags & B_BITMAP_ACCEPTS_VIEWS) {
 			fWindow = new(std::nothrow) BWindow(Bounds(), fServerToken);
 				if (fWindow) {
-						// A BWindow starts life locked and is unlocked
-						// in Show(), but this window is never shown and
-						// it's message loop is never started.
-						fWindow->Unlock();
+					// A BWindow starts life locked and is unlocked
+					// in Show(), but this window is never shown and
+					// it's message loop is never started.
+					fWindow->Unlock();
 				} else
 					fInitError = B_NO_MEMORY;
 		}
@@ -1096,8 +1103,7 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 }
 
 
-/*!
-	\brief Cleans up any memory allocated by the bitmap and
+/*!	\brief Cleans up any memory allocated by the bitmap and
 		informs the server to do so as well (if needed).
 */
 void
@@ -1106,7 +1112,7 @@ BBitmap::_CleanUp()
 	if (fBasePointer == NULL)
 		return;
 
-	if (fFlags & B_BITMAP_NO_SERVER_LINK) {
+	if ((fFlags & B_BITMAP_NO_SERVER_LINK) != 0) {
 		free(fBasePointer);
 	} else {
 		BPrivate::AppServerLink link;
@@ -1132,10 +1138,10 @@ BBitmap::_AssertPointer()
 {
 	if (fBasePointer == NULL && fServerArea >= B_OK && fAreaOffset == -1) {
 		// We lazily clone our own areas - if the bitmap is part of the usual
-		// server memory area, or is a B_BITMAP_NO_SERVER_LINK bitmap, it already
-		// has its data.
-		fArea = clone_area("shared bitmap area", (void **)&fBasePointer, B_ANY_ADDRESS,
-			B_READ_AREA | B_WRITE_AREA, fServerArea);
+		// server memory area, or is a B_BITMAP_NO_SERVER_LINK bitmap, it
+		// already has its data.
+		fArea = clone_area("shared bitmap area", (void**)&fBasePointer,
+			B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, fServerArea);
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,14 +24,15 @@
 using std::nothrow;
 using namespace BPrivate;
 
+
 /*!
 	A word about memory housekeeping and why it's implemented this way:
 
 	The reason why this looks so complicated is to optimize the most common
 	path (bitmap creation from the application), and don't cause any further
 	memory allocations for maintaining memory in that case.
-	If a bitmap was allocated this way, both, the fAllocator and fAllocationCookie
-	members are used.
+	If a bitmap was allocated this way, both, the fAllocator and
+	fAllocationCookie members are used.
 
 	For overlays, the allocator only allocates a small piece of client memory
 	for use with the overlay_client_data structure - the actual buffer will be
@@ -48,9 +49,10 @@ using namespace BPrivate;
 	\param rect Size of the bitmap.
 	\param space Color space of the bitmap
 	\param flags Various bitmap flags to tweak the bitmap as defined in Bitmap.h
-	\param bytesperline Number of bytes in each row. -1 implies the default value. Any
-	value less than the the default will less than the default will be overridden, but any value
-	greater than the default will result in the number of bytes specified.
+	\param bytesperline Number of bytes in each row. -1 implies the default
+		value. Any value less than the the default will less than the default
+		will be overridden, but any value greater than the default will result
+		in the number of bytes specified.
 	\param screen Screen assigned to the bitmap.
 */
 ServerBitmap::ServerBitmap(BRect rect, color_space space, uint32 flags,
@@ -74,7 +76,7 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space, uint32 flags,
 	// fToken is initialized (if used) by the BitmapManager
 {
 	int32 minBytesPerRow = get_bytes_per_row(space, fWidth);
-	
+
 	fBytesPerRow = max_c(bytesPerRow, minBytesPerRow);
 }
 
@@ -89,19 +91,19 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bitmap)
 	fReferenceCount(1)
 {
 	if (bitmap) {
-		fWidth			= bitmap->fWidth;
-		fHeight			= bitmap->fHeight;
-		fBytesPerRow	= bitmap->fBytesPerRow;
-		fSpace			= bitmap->fSpace;
-		fFlags			= bitmap->fFlags;
-		fOwner			= bitmap->fOwner;
+		fWidth = bitmap->fWidth;
+		fHeight = bitmap->fHeight;
+		fBytesPerRow = bitmap->fBytesPerRow;
+		fSpace = bitmap->fSpace;
+		fFlags = bitmap->fFlags;
+		fOwner = bitmap->fOwner;
 	} else {
-		fWidth			= 0;
-		fHeight			= 0;
-		fBytesPerRow	= 0;
-		fSpace			= B_NO_COLOR_SPACE;
-		fFlags			= 0;
-		fOwner			= NULL;
+		fWidth = 0;
+		fHeight = 0;
+		fBytesPerRow = 0;
+		fSpace = B_NO_COLOR_SPACE;
+		fFlags = 0;
+		fOwner = NULL;
 	}
 }
 
@@ -135,9 +137,8 @@ ServerBitmap::_Release()
 }
 
 
-/*! 
-	\brief Internal function used by subclasses
-	
+/*!	\brief Internal function used by subclasses
+
 	Subclasses should call this so the buffer can automagically
 	be allocated on the heap.
 */

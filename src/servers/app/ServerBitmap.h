@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,12 +21,11 @@ class Overlay;
 class ServerApp;
 
 
-/*!
-	\class ServerBitmap ServerBitmap.h
+/*!	\class ServerBitmap ServerBitmap.h
 	\brief Bitmap class used inside the server.
-	
-	This class is not directly allocated or freed. Instead, it is 
-	managed by the BitmapManager class. It is also the base class for 
+
+	This class is not directly allocated or freed. Instead, it is
+	managed by the BitmapManager class. It is also the base class for
 	all cursors. Every BBitmap has a shadow ServerBitmap object.
 */
 class ServerBitmap {
@@ -50,7 +49,7 @@ class ServerBitmap {
 
 	inline	int32			BytesPerRow() const
 								{ return fBytesPerRow; }
-	
+
 	inline	color_space		ColorSpace() const
 								{ return fSpace; }
 	inline	uint32			Flags() const
@@ -93,11 +92,9 @@ protected:
 							ServerBitmap(const ServerBitmap* bmp);
 	virtual					~ServerBitmap();
 
-
 			bool			_Release();
 
 			void			_AllocateBuffer();
-
 
 			ClientMemoryAllocator* fAllocator;
 			void*			fAllocationCookie;
@@ -110,7 +107,7 @@ protected:
 			int32			fBytesPerRow;
 			color_space		fSpace;
 			uint32			fFlags;
-			
+
 			ServerApp*		fOwner;
 			int32			fToken;
 };
@@ -126,24 +123,24 @@ class UtilityBitmap : public ServerBitmap {
 								uint32 width, uint32 height,
 								color_space format);
 
-
 	virtual					~UtilityBitmap();
 };
 
-// ShallowCopy (only for server bitmaps)
+
+//! (only for server bitmaps)
 void
 ServerBitmap::ShallowCopy(const ServerBitmap* from)
 {
 	if (!from)
 		return;
 
-	fBuffer			= from->fBuffer;
-	fWidth			= from->fWidth;
-	fHeight			= from->fHeight;
-	fBytesPerRow		= from->fBytesPerRow;
-	fSpace			= from->fSpace;
-	fFlags			= from->fFlags;
-	fToken			= from->fToken;
+	fBuffer = from->fBuffer;
+	fWidth = from->fWidth;
+	fHeight = from->fHeight;
+	fBytesPerRow = from->fBytesPerRow;
+	fSpace = from->fSpace;
+	fFlags = from->fFlags;
+	fToken = from->fToken;
 }
 
 #endif	// SERVER_BITMAP_H
