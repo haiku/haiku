@@ -1107,7 +1107,7 @@ BContainerWindow::FrameResized(float, float)
 
 		if (scroll != B_ORIGIN)
 			PoseView()->ScrollBy(scroll.x, scroll.y);
-		
+
 		PoseView()->UpdateScrollRange();
 		PoseView()->ResetPosePlacementHint();
 	}
@@ -3172,6 +3172,9 @@ BMenu*
 BContainerWindow::AddMimeMenu(const BMimeType& mimeType, bool isSuperType,
 	BMenu* menu, int32 start)
 {
+	if (!mimeType.IsValid())
+		return NULL;
+
 	// Check if we already have an entry for this MIME type in the menu.
 	for (int32 i = start; BMenuItem* item = menu->ItemAt(i); i++) {
 		BMessage* message = item->Message();
