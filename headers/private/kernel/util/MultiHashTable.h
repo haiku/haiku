@@ -21,10 +21,10 @@
 
 template<typename Definition, bool AutoExpand = true,
 	bool CheckDuplicates = false>
-class MultiHashTable : private OpenHashTable<Definition,
+class MultiHashTable : private BOpenHashTable<Definition,
 	AutoExpand, CheckDuplicates> {
 public:
-	typedef OpenHashTable<Definition, AutoExpand, CheckDuplicates> HashTable;
+	typedef BOpenHashTable<Definition, AutoExpand, CheckDuplicates> HashTable;
 	typedef MultiHashTable<Definition, AutoExpand, CheckDuplicates> MultiTable;
 
 	typedef typename HashTable::Iterator Iterator;
@@ -116,7 +116,7 @@ public:
 		while (slot) {
 			if (HashTable::fDefinition.Compare(key, slot))
 				break;
-			slot = HashTable::_Link(slot)->fNext;
+			slot = HashTable::_Link(slot);
 		}
 
 		if (slot == NULL)
@@ -140,18 +140,18 @@ private:
 		// group values with the same key
 		for (previous = table[index]; previous
 				&& !HashTable::fDefinition.CompareValues(previous, value);
-				previous = HashTable::_Link(previous)->fNext);
+				previous = HashTable::_Link(previous));
 
 		if (previous) {
-			_Link(value)->fNext = _Link(previous)->fNext;
-			_Link(previous)->fNext = value;
+			_Link(value) = _Link(previous);
+			_Link(previous) = value;
 		} else {
-			_Link(value)->fNext = table[index];
+			_Link(value) = table[index];
 			table[index] = value;
 		}
 	}
 
-	// TODO use OpenHashTable's _Resize
+	// TODO use BOpenHashTable's _Resize
 	bool _Resize(size_t newSize)
 	{
 		ValueType **newTable = new ValueType *[newSize];
@@ -165,7 +165,7 @@ private:
 			for (size_t i = 0; i < HashTable::fTableSize; i++) {
 				ValueType *bucket = HashTable::fTable[i];
 				while (bucket) {
-					ValueType *next = _Link(bucket)->fNext;
+					ValueType *next = _Link(bucket);
 					_Insert(newTable, newSize, bucket);
 					bucket = next;
 				}

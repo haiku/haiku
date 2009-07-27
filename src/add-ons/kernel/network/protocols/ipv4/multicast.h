@@ -126,11 +126,9 @@ private:
 
 
 template<typename Addressing>
-class MulticastGroupInterface
-	: public HashTableLink< MulticastGroupInterface<Addressing> > {
+class MulticastGroupInterface {
 public:
 	typedef MulticastGroupInterface<Addressing> ThisType;
-	typedef HashTableLink<ThisType> HashLink;
 	typedef typename Addressing::AddressType AddressType;
 	typedef MulticastFilter<Addressing> Filter;
 	typedef ::AddressSet<AddressType> AddressSet;
@@ -176,8 +174,11 @@ public:
 		bool Compare(const KeyType &key, ValueType *value) const
 			{ return value->Interface()->index == key.second
 				&& value->Address().s_addr == key.first->s_addr; }
-		HashLink  *GetLink(ValueType *value) const { return &value->fLink; }
+		MulticastGroupInterface*& GetLink(ValueType *value) const
+			{ return value->HashLink(); }
 	};
+
+	MulticastGroupInterface*& HashLink() { return fLink; }
 
 private:
 	// for g++ 2.95
@@ -188,7 +189,7 @@ private:
 	net_interface *fInterface;
 	FilterMode fFilterMode;
 	AddressSet fAddresses;
-	HashLink fLink;
+	MulticastGroupInterface* fLink;
 };
 
 template<typename Addressing>
@@ -209,7 +210,7 @@ public:
 
 private:
 	typedef typename GroupInterface::HashDefinition HashDefinition;
-	typedef OpenHashTable<HashDefinition> States;
+	typedef BOpenHashTable<HashDefinition> States;
 
 	void _ReturnState(GroupInterface *state);
 

@@ -74,8 +74,9 @@
 #define BIND_APERTURE				0x20000000
 #define APERTURE_PUBLIC_FLAGS_MASK	0x0000ffff
 
-struct aperture_memory : HashTableLink<aperture_memory> {
+struct aperture_memory {
 	aperture_memory *next;
+	aperture_memory *hash_link;
 	addr_t		base;
 	size_t		size;
 	uint32		flags;
@@ -104,21 +105,21 @@ public:
 		{ return (memory->base - fInfo.base) / B_PAGE_SIZE; }
 	bool Compare(const KeyType &base, aperture_memory *memory) const
 		{ return base == memory->base; }
-	HashTableLink<aperture_memory> *GetLink(aperture_memory *memory) const
-		{ return memory; }
+	aperture_memory *&GetLink(aperture_memory *memory) const
+		{ return memory->hash_link; }
 
 private:
 	aperture_info	&fInfo;
 };
 
-typedef OpenHashTable<MemoryHashDefinition> MemoryHashTable;
+typedef BOpenHashTable<MemoryHashDefinition> MemoryHashTable;
 
 struct agp_device_info {
 	uint8		address;	/* location of AGP interface in PCI capabilities */
 	agp_info	info;
 };
 
-class Aperture : public HashTableLink<Aperture> {
+class Aperture {
 public:
 	Aperture(agp_gart_bus_module_info *module, void *aperture);
 	~Aperture();
@@ -156,6 +157,9 @@ private:
 	MemoryHashTable				fHashTable;
 	aperture_memory				*fFirstMemory;
 	void						*fPrivateAperture;
+
+public:
+	Aperture					*fNext;
 };
 
 class ApertureHashDefinition {
@@ -169,11 +173,11 @@ public:
 		{ return aperture->ID(); }
 	bool Compare(const KeyType &id, Aperture *aperture) const
 		{ return id == aperture->ID(); }
-	HashTableLink<Aperture> *GetLink(Aperture *aperture) const
-		{ return aperture; }
+	Aperture *&GetLink(Aperture *aperture) const
+		{ return aperture->fNext; }
 };
 
-typedef OpenHashTable<ApertureHashDefinition> ApertureHashTable;
+typedef BOpenHashTable<ApertureHashDefinition> ApertureHashTable;
 
 
 static agp_device_info sDeviceInfos[MAX_DEVICES];

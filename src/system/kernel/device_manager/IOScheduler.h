@@ -27,14 +27,14 @@ public:
 typedef status_t (*io_callback)(void* data, io_operation* operation);
 
 
-struct IORequestOwner : DoublyLinkedListLinkImpl<IORequestOwner>,
-		HashTableLink<IORequestOwner> {
+struct IORequestOwner : DoublyLinkedListLinkImpl<IORequestOwner> {
 	team_id			team;
 	thread_id		thread;
 	int32			priority;
 	IORequestList	requests;
 	IORequestList	completed_requests;
 	IOOperationList	operations;
+	IORequestOwner*	hash_link;
 
 			bool				IsActive() const
 									{ return !requests.IsEmpty()

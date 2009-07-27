@@ -14,7 +14,7 @@
 class FileSourceCode;
 
 
-class Function : public Referenceable, public HashTableLink<Function> {
+class Function : public Referenceable {
 public:
 	class Listener;
 
@@ -69,6 +69,10 @@ private:
 			function_source_state fSourceCodeState;
 			ListenerList		fListeners;
 			int32				fNotificationsDisabled;
+
+public:
+			// BOpenHashTable support
+			Function*			fNext;
 };
 
 

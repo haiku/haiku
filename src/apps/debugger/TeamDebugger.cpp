@@ -44,7 +44,7 @@
 
 
 struct TeamDebugger::ImageHandler : public Referenceable,
-		public HashTableLink<ImageHandler>, private LocatableFile::Listener {
+	private LocatableFile::Listener {
 public:
 	ImageHandler(TeamDebugger* teamDebugger, Image* image)
 		:
@@ -85,6 +85,9 @@ private:
 private:
 	TeamDebugger*	fTeamDebugger;
 	Image*			fImage;
+
+public:
+	ImageHandler*	fNext;
 };
 
 
@@ -110,9 +113,9 @@ struct TeamDebugger::ImageHandlerHashDefinition {
 		return value->ImageID() == key;
 	}
 
-	HashTableLink<ImageHandler>* GetLink(ImageHandler* value) const
+	ImageHandler*& GetLink(ImageHandler* value) const
 	{
-		return value;
+		return value->fNext;
 	}
 };
 

@@ -133,8 +133,8 @@ private:
 							void* _endpoint);
 
 private:
-	HashTableLink<TCPEndpoint> fConnectionHashLink;
-	HashTableLink<TCPEndpoint> fEndpointHashLink;
+	TCPEndpoint*	fConnectionHashLink;
+	TCPEndpoint*	fEndpointHashLink;
 	friend class EndpointManager;
 	friend class ConnectionHashDefinition;
 	friend class EndpointHashDefinition;

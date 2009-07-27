@@ -241,7 +241,7 @@ Worker::ShutDown()
 	// abort all jobs
 	Job* job = fJobs.Clear(true);
 	while (job != NULL) {
-		Job* nextJob = static_cast<HashTableLink<Job>*>(job)->fNext;
+		Job* nextJob = job->fNext;
 		_AbortJob(job, false);
 		job = nextJob;
 

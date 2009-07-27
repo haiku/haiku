@@ -35,11 +35,11 @@ struct FUSEEntryRef {
 };
 
 
-struct FUSEEntry : public HashTableLink<FUSEEntry>,
-		DoublyLinkedListLinkImpl<FUSEEntry> {
+struct FUSEEntry : DoublyLinkedListLinkImpl<FUSEEntry> {
 	FUSENode*	parent;
 	char*		name;
 	FUSENode*	node;
+	FUSEEntry*	hashLink;
 
 	FUSEEntry()
 		:
@@ -77,12 +77,13 @@ struct FUSEEntry : public HashTableLink<FUSEEntry>,
 typedef DoublyLinkedList<FUSEEntry> FUSEEntryList;
 
 
-struct FUSENode : RWLockable, HashTableLink<FUSENode> {
+struct FUSENode : RWLockable {
 	ino_t			id;
 	FUSEEntryList	entries;
 	int				type;
 	int32			refCount;
 	bool			dirty;
+	FUSENode*		hashLink;
 
 	FUSENode(ino_t id, int type)
 		:
@@ -113,8 +114,8 @@ struct FUSEEntryHashDefinition {
 	bool Compare(const FUSEEntryRef& key, const FUSEEntry* value) const
 		{ return value->parent->id == key.parentID
 			&& strcmp(value->name, key.name) == 0; }
-	HashTableLink<FUSEEntry>* GetLink(FUSEEntry* value) const
-		{ return value; }
+	FUSEEntry*& GetLink(FUSEEntry* value) const
+		{ return value->hashLink; }
 };
 
 
@@ -128,13 +129,13 @@ struct FUSENodeHashDefinition {
 		{ return HashKey(value->id); }
 	bool Compare(ino_t key, const FUSENode* value) const
 		{ return value->id == key; }
-	HashTableLink<FUSENode>* GetLink(FUSENode* value) const
-		{ return value; }
+	FUSENode*& GetLink(FUSENode* value) const
+		{ return value->hashLink; }
 };
 
 
-typedef OpenHashTable<FUSEEntryHashDefinition> FUSEEntryTable;
-typedef OpenHashTable<FUSENodeHashDefinition> FUSENodeTable;
+typedef BOpenHashTable<FUSEEntryHashDefinition> FUSEEntryTable;
+typedef BOpenHashTable<FUSENodeHashDefinition> FUSENodeTable;
 
 
 }	// namespace UserlandFS

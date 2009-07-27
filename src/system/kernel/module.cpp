@@ -154,7 +154,7 @@ struct hash_entry : entry {
 		free((char*)path);
 	}
 
-	HashTableLink<hash_entry> link;
+	hash_entry*			hash_link;
 	const char*			path;
 };
 
@@ -164,8 +164,8 @@ struct NodeHashDefinition {
 
 	size_t Hash(ValueType* entry) const
 		{ return HashKey(entry); }
-	HashTableLink<ValueType>* GetLink(ValueType* entry) const
-		{ return &entry->link; }
+	ValueType*& GetLink(ValueType* entry) const
+		{ return entry->hash_link; }
 
 	size_t HashKey(KeyType key) const
 	{
@@ -179,7 +179,7 @@ struct NodeHashDefinition {
 	}
 };
 
-typedef OpenHashTable<NodeHashDefinition> NodeHash;
+typedef BOpenHashTable<NodeHashDefinition> NodeHash;
 
 struct module_listener : DoublyLinkedListLinkImpl<module_listener> {
 	~module_listener()

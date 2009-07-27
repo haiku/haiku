@@ -80,7 +80,8 @@ struct swap_hash_key {
 
 // Each swap block contains swap address information for
 // SWAP_BLOCK_PAGES continuous pages from the same cache
-struct swap_block : HashTableLink<swap_block> {
+struct swap_block {
+	swap_block*		hash_link;
 	swap_hash_key	key;
 	uint32			used;
 	swap_addr_t		swap_slots[SWAP_BLOCK_PAGES];
@@ -111,13 +112,13 @@ struct SwapHashTableDefinition {
 			&& key.cache == value->key.cache;
 	}
 
-	HashTableLink<swap_block> *GetLink(swap_block *value) const
+	swap_block*& GetLink(swap_block *value) const
 	{
-		return value;
+		return value->hash_link;
 	}
 };
 
-typedef OpenHashTable<SwapHashTableDefinition> SwapHashTable;
+typedef BOpenHashTable<SwapHashTableDefinition> SwapHashTable;
 typedef DoublyLinkedList<swap_file> SwapFileList;
 
 static SwapHashTable sSwapHashTable;

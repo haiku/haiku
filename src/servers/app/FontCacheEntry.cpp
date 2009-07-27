@@ -32,6 +32,8 @@
 
 #include <agg_array.h>
 
+#include <util/OpenHashTable.h>
+
 #include <Autolock.h>
 
 #include "utf8_functions.h"
@@ -52,7 +54,7 @@ public:
 	{
 		GlyphCache* glyph = fGlyphTable.Clear(true);
 		while (glyph != NULL) {
-			GlyphCache* next = glyph->fNext;
+			GlyphCache* next = glyph->hash_link;
 			delete glyph;
 			glyph = next;
 		}
@@ -111,13 +113,13 @@ private:
 			return value->glyph_index == key;
 		}
 
-		HashTableLink<GlyphCache>* GetLink(GlyphCache* value) const
+		GlyphCache*& GetLink(GlyphCache* value) const
 		{
-			return value;
+			return value->hash_link;
 		}
 	};
 
-	typedef OpenHashTable<GlyphHashTableDefinition> GlyphTable;
+	typedef BOpenHashTable<GlyphHashTableDefinition> GlyphTable;
 
 	GlyphTable	fGlyphTable;
 };

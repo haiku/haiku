@@ -35,8 +35,9 @@ struct StackFrameValues::Key {
 };
 
 
-struct StackFrameValues::ValueEntry : Key, HashTableLink<ValueEntry> {
+struct StackFrameValues::ValueEntry : Key {
 	BVariant			value;
+	ValueEntry*			next;
 
 	ValueEntry(ObjectID* variable, TypeComponentPath* path)
 		:
@@ -73,9 +74,9 @@ struct StackFrameValues::ValueEntryHashDefinition {
 		return key == *value;
 	}
 
-	HashTableLink<ValueEntry>* GetLink(ValueEntry* value) const
+	ValueEntry*& GetLink(ValueEntry* value) const
 	{
-		return value;
+		return value->next;
 	}
 };
 
@@ -172,7 +173,7 @@ StackFrameValues::_Cleanup()
 		ValueEntry* entry = fValues->Clear(true);
 
 		while (entry != NULL) {
-			ValueEntry* next = entry->fNext;
+			ValueEntry* next = entry->next;
 			delete entry;
 			entry = next;
 		}

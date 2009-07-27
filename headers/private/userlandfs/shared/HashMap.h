@@ -15,7 +15,7 @@
 
 // HashMapElement
 template<typename Key, typename Value>
-class HashMapElement : public HashTableLink<HashMapElement<Key, Value> > {
+class HashMapElement {
 private:
 	typedef HashMapElement<Key, Value> Element;
 
@@ -34,8 +34,9 @@ public:
 	{
 	}
 
-	Key		fKey;
-	Value	fValue;
+	Key				fKey;
+	Value			fValue;
+	HashMapElement*	fNext;
 };
 
 
@@ -51,8 +52,8 @@ struct HashMapTableDefinition {
 		{ return HashKey(value->fKey); }
 	bool Compare(const KeyType& key, const ValueType* value) const
 		{ return value->fKey == key; }
-	HashTableLink<ValueType>* GetLink(ValueType* value) const
-		{ return value; }
+	ValueType*& GetLink(ValueType* value) const
+		{ return value->fNext; }
 };
 
 
@@ -128,7 +129,8 @@ public:
 
 	private:
 		friend class HashMap<Key, Value>;
-		typedef OpenHashTable<HashMapTableDefinition<Key, Value> > ElementTable;
+		typedef BOpenHashTable<HashMapTableDefinition<Key, Value> >
+			ElementTable;
 
 		HashMap<Key, Value>*			fMap;
 		typename ElementTable::Iterator	fIterator;
@@ -152,7 +154,7 @@ public:
 	Iterator GetIterator();
 
 protected:
-	typedef OpenHashTable<HashMapTableDefinition<Key, Value> > ElementTable;
+	typedef BOpenHashTable<HashMapTableDefinition<Key, Value> > ElementTable;
 	typedef HashMapElement<Key, Value>	Element;
 	friend class Iterator;
 

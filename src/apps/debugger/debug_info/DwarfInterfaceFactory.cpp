@@ -115,8 +115,7 @@ private:
 // #pragma mark - DwarfType
 
 
-struct DwarfInterfaceFactory::DwarfType : virtual Type,
-	HashTableLink<DwarfType> {
+struct DwarfInterfaceFactory::DwarfType : virtual Type {
 public:
 	DwarfType(const BString& name)
 		:
@@ -143,8 +142,11 @@ public:
 	virtual DIEType* GetDIEType() const = 0;
 
 private:
-	BString	fName;
-	uint64	fByteSize;
+	BString		fName;
+	uint64		fByteSize;
+
+public:
+	DwarfType*	fNext;
 };
 
 
@@ -487,9 +489,9 @@ struct DwarfInterfaceFactory::DwarfTypeHashDefinition {
 		return key == value->GetDIEType();
 	}
 
-	HashTableLink<DwarfType>* GetLink(DwarfType* value) const
+	DwarfType*& GetLink(DwarfType* value) const
 	{
-		return value;
+		return value->fNext;
 	}
 };
 

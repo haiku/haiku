@@ -130,7 +130,7 @@ ModelLoader::FinishLoading(bool success)
 {
 	ThreadInfo* threadInfo = fThreads.Clear(true);
 	while (threadInfo != NULL) {
-		ThreadInfo* nextInfo = threadInfo->fNext;
+		ThreadInfo* nextInfo = threadInfo->next;
 		delete threadInfo;
 		threadInfo = nextInfo;
 	}

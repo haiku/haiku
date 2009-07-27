@@ -74,7 +74,7 @@ private:
 private:
 	struct ImageHandler;
 	struct ImageHandlerHashDefinition;
-	typedef OpenHashTable<ImageHandlerHashDefinition> ImageHandlerTable;
+	typedef BOpenHashTable<ImageHandlerHashDefinition> ImageHandlerTable;
 
 private:
 	static	status_t			_DebugEventListenerEntry(void* data);

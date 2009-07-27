@@ -41,11 +41,11 @@ struct ConditionVariableHashDefinition {
 		{ return (size_t)variable->fObject; }
 	bool Compare(const void* key, ConditionVariable* variable) const
 		{ return key == variable->fObject; }
-	HashTableLink<ConditionVariable>* GetLink(ConditionVariable* variable) const
-		{ return variable; }
+	ConditionVariable*& GetLink(ConditionVariable* variable) const
+		{ return variable->fNext; }
 };
 
-typedef OpenHashTable<ConditionVariableHashDefinition> ConditionVariableHash;
+typedef BOpenHashTable<ConditionVariableHashDefinition> ConditionVariableHash;
 static ConditionVariableHash sConditionVariableHash;
 static mutex sConditionVariablesLock = MUTEX_INITIALIZER("condition variables");
 

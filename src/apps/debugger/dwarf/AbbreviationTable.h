@@ -12,10 +12,11 @@
 #include "Dwarf.h"
 
 
-struct AbbreviationTableEntry : HashTableLink<AbbreviationTableEntry> {
-	uint32	code;
-	off_t	offset;
-	off_t	size;
+struct AbbreviationTableEntry {
+	uint32					code;
+	off_t					offset;
+	off_t					size;
+	AbbreviationTableEntry*	next;
 
 	AbbreviationTableEntry(uint32 code, off_t offset, off_t size)
 		:
@@ -88,10 +89,9 @@ struct AbbreviationTableHashDefinition {
 		return value->code == key;
 	}
 
-	HashTableLink<AbbreviationTableEntry>* GetLink(
-		AbbreviationTableEntry* value) const
+	AbbreviationTableEntry*& GetLink(AbbreviationTableEntry* value) const
 	{
-		return value;
+		return value->next;
 	}
 };
 
@@ -109,7 +109,7 @@ public:
 									AbbreviationEntry& entry);
 
 private:
-			typedef OpenHashTable<AbbreviationTableHashDefinition> EntryTable;
+			typedef BOpenHashTable<AbbreviationTableHashDefinition> EntryTable;
 
 private:
 			status_t			_ParseAbbreviationEntry(

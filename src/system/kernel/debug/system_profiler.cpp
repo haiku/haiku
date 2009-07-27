@@ -126,7 +126,8 @@ private:
 			};
 
 			struct WaitObject : DoublyLinkedListLinkImpl<WaitObject>,
-					HashTableLink<WaitObject>, WaitObjectKey {
+					WaitObjectKey {
+				struct WaitObject* hash_link;
 			};
 
 			struct WaitObjectTableDefinition {
@@ -150,14 +151,14 @@ private:
 						&& value->object == key.object;
 				}
 
-				HashTableLink<WaitObject>* GetLink(WaitObject* value) const
+				WaitObject*& GetLink(WaitObject* value) const
 				{
-					return value;
+					return value->hash_link;
 				}
 			};
 
 			typedef DoublyLinkedList<WaitObject> WaitObjectList;
-			typedef OpenHashTable<WaitObjectTableDefinition> WaitObjectTable;
+			typedef BOpenHashTable<WaitObjectTableDefinition> WaitObjectTable;
 
 private:
 			spinlock			fLock;

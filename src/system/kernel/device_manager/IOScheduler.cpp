@@ -87,12 +87,12 @@ struct IOScheduler::RequestOwnerHashDefinition {
 	size_t Hash(const IORequestOwner* value) const	{ return value->thread; }
 	bool Compare(thread_id key, const IORequestOwner* value) const
 		{ return value->thread == key; }
-	HashTableLink<IORequestOwner>* GetLink(IORequestOwner* value) const
-		{ return value; }
+	IORequestOwner*& GetLink(IORequestOwner* value) const
+		{ return value->hash_link; }
 };
 
 struct IOScheduler::RequestOwnerHashTable
-		: OpenHashTable<RequestOwnerHashDefinition, false> {
+		: BOpenHashTable<RequestOwnerHashDefinition, false> {
 };
 
 

@@ -72,9 +72,9 @@ struct TeamDebugInfo::FunctionHashDefinition {
 			&& key->Name() == value->Name();
 	}
 
-	HashTableLink<Function>* GetLink(Function* value) const
+	Function*& GetLink(Function* value) const
 	{
-		return value;
+		return value->fNext;
 	}
 };
 
@@ -82,7 +82,7 @@ struct TeamDebugInfo::FunctionHashDefinition {
 // #pragma mark - SourceFileEntry
 
 
-struct TeamDebugInfo::SourceFileEntry : public HashTableLink<SourceFileEntry> {
+struct TeamDebugInfo::SourceFileEntry {
 	SourceFileEntry(LocatableFile* sourceFile)
 		:
 		fSourceFile(sourceFile),
@@ -207,9 +207,12 @@ private:
 	}
 
 private:
-	LocatableFile*	fSourceFile;
-	FileSourceCode*	fSourceCode;
-	FunctionList	fFunctions;
+	LocatableFile*		fSourceFile;
+	FileSourceCode*		fSourceCode;
+	FunctionList		fFunctions;
+
+public:
+	SourceFileEntry*	fNext;
 };
 
 
@@ -235,9 +238,9 @@ struct TeamDebugInfo::SourceFileHashDefinition {
 		return key == value->SourceFile();
 	}
 
-	HashTableLink<SourceFileEntry>* GetLink(SourceFileEntry* value) const
+	SourceFileEntry*& GetLink(SourceFileEntry* value) const
 	{
-		return value;
+		return value->fNext;
 	}
 };
 

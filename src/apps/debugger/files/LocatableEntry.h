@@ -35,8 +35,7 @@ public:
 
 
 class LocatableEntry : public Referenceable,
-	public DoublyLinkedListLinkImpl<LocatableEntry>,
-	public HashTableLink<LocatableEntry> {
+	public DoublyLinkedListLinkImpl<LocatableEntry> {
 public:
 								LocatableEntry(LocatableEntryOwner* owner,
 									LocatableDirectory* parent);
@@ -58,6 +57,9 @@ protected:
 			LocatableEntryOwner* fOwner;
 			LocatableDirectory*	fParent;
 			locatable_entry_state fState;
+
+public:
+			LocatableEntry* fNext;
 };
 
 

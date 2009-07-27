@@ -92,9 +92,9 @@ struct FileManager::EntryHashDefinition {
 		return EntryPath(value) == key;
 	}
 
-	HashTableLink<LocatableEntry>* GetLink(LocatableEntry* value) const
+	LocatableEntry*& GetLink(LocatableEntry* value) const
 	{
-		return value;
+		return value->fNext;
 	}
 };
 
@@ -459,12 +459,12 @@ private:
 // #pragma mark - SourceFileEntry
 
 
-struct FileManager::SourceFileEntry : public SourceFileOwner,
-	public HashTableLink<SourceFileEntry> {
+struct FileManager::SourceFileEntry : public SourceFileOwner {
 
-	FileManager*	manager;
-	BString			path;
-	SourceFile*		file;
+	FileManager*		manager;
+	BString				path;
+	SourceFile*			file;
+	SourceFileEntry*	next;
 
 	SourceFileEntry(FileManager* manager, const BString& path)
 		:
@@ -509,9 +509,9 @@ struct FileManager::SourceFileHashDefinition {
 		return value->path == key;
 	}
 
-	HashTableLink<SourceFileEntry>* GetLink(SourceFileEntry* value) const
+	SourceFileEntry*& GetLink(SourceFileEntry* value) const
 	{
-		return value;
+		return value->next;
 	}
 };
 

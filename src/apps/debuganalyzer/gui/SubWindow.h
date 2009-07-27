@@ -34,7 +34,7 @@ private:
 };
 
 
-class SubWindow : public BWindow, public HashTableLink<SubWindow> {
+class SubWindow : public BWindow {
 public:
 								SubWindow(SubWindowManager* manager,
 									BRect frame, const char* title,
@@ -50,6 +50,9 @@ public:
 protected:
 			SubWindowManager*	fSubWindowManager;
 			SubWindowKey*		fSubWindowKey;
+
+public:
+			SubWindow*			fNext;
 };
 
 

@@ -31,7 +31,7 @@ struct UnixAddressHashDefinition {
 		return key == endpoint->Address();
 	}
 
-	HashTableLink<UnixEndpoint>* GetLink(UnixEndpoint* endpoint) const
+	UnixEndpoint*& GetLink(UnixEndpoint* endpoint) const
 	{
 		return endpoint->HashTableLink();
 	}
@@ -100,7 +100,7 @@ public:
 	}
 
 private:
-	typedef OpenHashTable<UnixAddressHashDefinition, false> EndpointTable;
+	typedef BOpenHashTable<UnixAddressHashDefinition, false> EndpointTable;
 
 	mutex			fLock;
 	EndpointTable	fBoundEndpoints;

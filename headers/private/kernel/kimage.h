@@ -18,7 +18,7 @@ struct team;
 struct image {
 	struct image*			next;
 	struct image*			prev;
-	HashTableLink<image>	hash_link;
+	struct image*			hash_link;
 	image_info				info;
 	team_id					team;
 };

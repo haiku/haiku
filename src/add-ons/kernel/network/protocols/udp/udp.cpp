@@ -96,15 +96,15 @@ public:
 	bool					IsActive() const { return fActive; }
 	void					SetActive(bool newValue) { fActive = newValue; }
 
-	::HashTableLink<UdpEndpoint> *HashTableLink() { return &fLink; }
+	UdpEndpoint				*&HashTableLink() { return fLink; }
 
 private:
 	UdpDomainSupport		*fManager;
 	bool					fActive;
-								// an active UdpEndpoint is part of the endpoint 
+								// an active UdpEndpoint is part of the endpoint
 								// hash (and it is bound and optionally connected)
 
-	::HashTableLink<UdpEndpoint> fLink;
+	UdpEndpoint				*fLink;
 };
 
 
@@ -143,7 +143,7 @@ struct UdpHashDefinition {
 			&& endpoint->PeerAddress().EqualTo(key.second, true);
 	}
 
-	::HashTableLink<UdpEndpoint> *GetLink(UdpEndpoint *endpoint) const
+	UdpEndpoint *&GetLink(UdpEndpoint *endpoint) const
 	{
 		return endpoint->HashTableLink();
 	}
@@ -189,7 +189,7 @@ private:
 	net_address_module_info *AddressModule() const
 		{ return fDomain->address_module; }
 
-	typedef OpenHashTable<UdpHashDefinition, false> EndpointTable;
+	typedef BOpenHashTable<UdpHashDefinition, false> EndpointTable;
 
 	mutex			fLock;
 	net_domain		*fDomain;

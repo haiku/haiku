@@ -52,8 +52,8 @@ private:
 			struct SourceFileEntry;
 			struct SourceFileHashDefinition;
 
-			typedef OpenHashTable<EntryHashDefinition> LocatableEntryTable;
-			typedef OpenHashTable<SourceFileHashDefinition> SourceFileTable;
+			typedef BOpenHashTable<EntryHashDefinition> LocatableEntryTable;
+			typedef BOpenHashTable<SourceFileHashDefinition> SourceFileTable;
 
 			friend struct SourceFileEntry;
 				// for gcc 2

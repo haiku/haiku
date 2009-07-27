@@ -76,7 +76,7 @@ FileSystem::~FileSystem()
 	int32 count = 0;
 	while (ops != NULL) {
 		count++;
-		VNodeOps* next = ops->fNext;
+		VNodeOps* next = ops->hash_link;
 		free(ops);
 		ops = next;
 	}

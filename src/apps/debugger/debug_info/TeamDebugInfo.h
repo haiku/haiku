@@ -71,8 +71,8 @@ private:
 
 			typedef BObjectList<SpecificTeamDebugInfo> SpecificInfoList;
 			typedef BObjectList<ImageDebugInfo> ImageList;
-			typedef OpenHashTable<FunctionHashDefinition> FunctionTable;
-			typedef OpenHashTable<SourceFileHashDefinition> SourceFileTable;
+			typedef BOpenHashTable<FunctionHashDefinition> FunctionTable;
+			typedef BOpenHashTable<SourceFileHashDefinition> SourceFileTable;
 
 private:
 			status_t			_AddFunction(Function* function);

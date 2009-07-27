@@ -25,10 +25,11 @@ class Settings;
 class Volume;
 
 
-struct VNodeOps : HashTableLink<VNodeOps> {
+struct VNodeOps {
 	int32				refCount;
 	FSVNodeCapabilities	capabilities;
 	fs_vnode_ops*		ops;
+	VNodeOps*			hash_link;
 
 	VNodeOps(const FSVNodeCapabilities& capabilities, fs_vnode_ops* ops)
 		:
@@ -55,8 +56,8 @@ struct VNodeOpsHashDefinition {
 		{ return HashKey(value->capabilities); }
 	bool Compare(const FSVNodeCapabilities& key, const VNodeOps* value) const
 		{ return value->capabilities == key; }
-	HashTableLink<VNodeOps>* GetLink(VNodeOps* value) const
-		{ return value; }
+	VNodeOps*& GetLink(VNodeOps* value) const
+		{ return value->hash_link; }
 };
 
 
@@ -109,7 +110,7 @@ private:
 			friend class KernelDebug;
 			struct SelectSyncEntry;
 			struct SelectSyncMap;
-			typedef OpenHashTable<VNodeOpsHashDefinition> VNodeOpsMap;
+			typedef BOpenHashTable<VNodeOpsHashDefinition> VNodeOpsMap;
 
 			Vector<Volume*>		fVolumes;
 			mutex				fVolumeLock;

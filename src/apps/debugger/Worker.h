@@ -75,8 +75,7 @@ public:
 typedef DoublyLinkedList<Job> JobList;
 
 
-class Job : public Referenceable, public DoublyLinkedListLinkImpl<Job>,
-	public HashTableLink<Job> {
+class Job : public Referenceable, public DoublyLinkedListLinkImpl<Job> {
 public:
 								Job();
 	virtual						~Job();
@@ -119,6 +118,9 @@ private:
 			JobList				fDependentJobs;
 			job_wait_status		fWaitStatus;
 			ListenerList		fListeners;
+
+public:
+			Job*				fNext;
 };
 
 
@@ -161,18 +163,18 @@ private:
 					return HashKey(value->Key());
 				}
 
-				bool Compare(const JobKey& key, Job *value) const
+				bool Compare(const JobKey& key, Job* value) const
 				{
 					return value->Key() == key;
 				}
 
-				HashTableLink<Job>* GetLink(Job* value) const
+				Job*& GetLink(Job* value) const
 				{
-					return value;
+					return value->fNext;
 				}
 			};
 
-			typedef OpenHashTable<JobHashDefinition> JobTable;
+			typedef BOpenHashTable<JobHashDefinition> JobTable;
 
 private:
 			job_wait_status		WaitForJob(Job* waitingJob, const JobKey& key);

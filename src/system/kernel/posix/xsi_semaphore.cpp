@@ -515,9 +515,9 @@ public:
 		return fUndoList;
 	}
 
-	HashTableLink<XsiSemaphoreSet>* Link()
+	XsiSemaphoreSet*& Link()
 	{
-		return &fLink;
+		return fLink;
 	}
 
 private:
@@ -532,7 +532,7 @@ private:
 	uint32						fSequenceNumber;		// used as a second id
 	UndoList					fUndoList;				// undo list requests
 
-	::HashTableLink<XsiSemaphoreSet> fLink;
+	XsiSemaphoreSet*			fLink;
 };
 
 // Xsi semaphore set hash table
@@ -555,7 +555,7 @@ struct SemaphoreHashTableDefinition {
 		return (int)key == (int)variable->ID();
 	}
 
-	HashTableLink<XsiSemaphoreSet>* GetLink(XsiSemaphoreSet *variable) const
+	XsiSemaphoreSet*& GetLink(XsiSemaphoreSet *variable) const
 	{
 		return variable->Link();
 	}
@@ -586,15 +586,15 @@ public:
 		fSemaphoreSetId = semaphoreSet->ID();
 	}
 
-	HashTableLink<Ipc>* Link()
+	Ipc*& Link()
 	{
-		return &fLink;
+		return fLink;
 	}
 
 private:
 	key_t				fKey;
 	int					fSemaphoreSetId;
-	HashTableLink<Ipc>	fLink;
+	Ipc*				fLink;
 };
 
 
@@ -617,7 +617,7 @@ struct IpcHashTableDefinition {
 		return (key_t)key == (key_t)variable->Key();
 	}
 
-	HashTableLink<Ipc>* GetLink(Ipc *variable) const
+	Ipc*& GetLink(Ipc *variable) const
 	{
 		return variable->Link();
 	}
@@ -626,8 +626,8 @@ struct IpcHashTableDefinition {
 // Arbitrary limit
 #define MAX_XSI_SEMAPHORE		4096
 #define MAX_XSI_SEMAPHORE_SET	2048
-static OpenHashTable<IpcHashTableDefinition> sIpcHashTable;
-static OpenHashTable<SemaphoreHashTableDefinition> sSemaphoreHashTable;
+static BOpenHashTable<IpcHashTableDefinition> sIpcHashTable;
+static BOpenHashTable<SemaphoreHashTableDefinition> sSemaphoreHashTable;
 
 static mutex sIpcLock;
 static mutex sXsiSemaphoreSetLock;

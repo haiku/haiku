@@ -54,7 +54,7 @@ typedef DoublyLinkedList<monitor_listener, DoublyLinkedListMemberGetLink<
 	monitor_listener, &monitor_listener::monitor_link> > MonitorListenerList;
 
 struct node_monitor {
-	HashTableLink<node_monitor> link;
+	node_monitor*		hash_link;
 	dev_t				device;
 	ino_t				node;
 	MonitorListenerList	listeners;
@@ -164,9 +164,8 @@ class NodeMonitorService : public NotificationService {
 					&& key->node == monitor->node;
 			}
 
-			HashTableLink<node_monitor>* GetLink(
-					node_monitor* monitor) const
-				{ return &monitor->link; }
+			node_monitor*& GetLink(node_monitor* monitor) const
+				{ return monitor->hash_link; }
 
 			uint32 _Hash(dev_t device, ino_t node) const
 			{
@@ -174,7 +173,7 @@ class NodeMonitorService : public NotificationService {
 			}
 		};
 
-		typedef OpenHashTable<HashDefinition> MonitorHash;
+		typedef BOpenHashTable<HashDefinition> MonitorHash;
 		MonitorHash	fMonitors;
 		recursive_lock fRecursiveLock;
 };

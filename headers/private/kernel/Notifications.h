@@ -108,11 +108,11 @@ public:
 									NotificationListener& listener) = 0;
 
 	virtual const char*			Name() = 0;
-			HashTableLink<NotificationService>&
+			NotificationService*&
 								Link() { return fLink; }
 
 private:
-			HashTableLink<NotificationService> fLink;
+			NotificationService* fLink;
 };
 
 struct default_listener : public DoublyLinkedListLinkImpl<default_listener> {
@@ -226,11 +226,11 @@ private:
 			{ return hash_hash_string(service->Name()); }
 		bool Compare(const char* key, NotificationService* service) const
 			{ return !strcmp(key, service->Name()); }
-		HashTableLink<NotificationService>* GetLink(
+		NotificationService*& GetLink(
 				NotificationService* service) const
-			{ return &service->Link(); }
+			{ return service->Link(); }
 	};
-	typedef OpenHashTable<HashDefinition> ServiceHash;
+	typedef BOpenHashTable<HashDefinition> ServiceHash;
 
 	static	NotificationManager	sManager;
 

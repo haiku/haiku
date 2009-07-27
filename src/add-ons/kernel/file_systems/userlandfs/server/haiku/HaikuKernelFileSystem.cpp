@@ -32,15 +32,14 @@ struct HaikuKernelFileSystem::IORequestHashDefinition {
 		{ return value->id; }
 	bool Compare(int32 key, const HaikuKernelIORequest* value) const
 		{ return value->id == key; }
-	HashTableLink<HaikuKernelIORequest>*
-		GetLink(HaikuKernelIORequest* value) const
-			{ return value; }
+	HaikuKernelIORequest*& GetLink(HaikuKernelIORequest* value) const
+			{ return value->hashLink; }
 };
 
 
 // IORequestTable
 struct HaikuKernelFileSystem::IORequestTable
-	: public OpenHashTable<IORequestHashDefinition> {
+	: public BOpenHashTable<IORequestHashDefinition> {
 	typedef int32					KeyType;
 	typedef	HaikuKernelIORequest	ValueType;
 
@@ -50,9 +49,8 @@ struct HaikuKernelFileSystem::IORequestTable
 		{ return value->id; }
 	bool Compare(int32 key, const HaikuKernelIORequest* value) const
 		{ return value->id == key; }
-	HashTableLink<HaikuKernelIORequest>*
-		GetLink(HaikuKernelIORequest* value) const
-			{ return value; }
+	HaikuKernelIORequest*& GetLink(HaikuKernelIORequest* value) const
+			{ return value->hashLink; }
 };
 
 
@@ -67,14 +65,14 @@ struct HaikuKernelFileSystem::NodeCapabilitiesHashDefinition {
 		{ return HashKey(value->ops); }
 	bool Compare(fs_vnode_ops* key, const ValueType* value) const
 		{ return value->ops == key; }
-	HashTableLink<ValueType>* GetLink(ValueType* value) const
-		{ return value; }
+	ValueType*& GetLink(ValueType* value) const
+		{ return value->hashLink; }
 };
 
 
 // NodeCapabilitiesTable
 struct HaikuKernelFileSystem::NodeCapabilitiesTable
-	: public OpenHashTable<NodeCapabilitiesHashDefinition> {
+	: public BOpenHashTable<NodeCapabilitiesHashDefinition> {
 };
 
 

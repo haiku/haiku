@@ -44,11 +44,12 @@ private:
 				UNKNOWN
 			};
 
-			struct ThreadInfo : HashTableLink<ThreadInfo> {
+			struct ThreadInfo {
 				Model::Thread*	thread;
 				ScheduleState	state;
 				bigtime_t		lastTime;
 				Model::ThreadWaitObject* waitObject;
+				ThreadInfo*		next;
 
 				ThreadInfo(Model::Thread* thread);
 
@@ -68,11 +69,11 @@ private:
 				bool Compare(thread_id key, const ThreadInfo* value) const
 					{ return key == value->ID(); }
 
-				HashTableLink<ThreadInfo>* GetLink(ThreadInfo* value) const
-					{ return value; }
+				ThreadInfo*& GetLink(ThreadInfo* value) const
+					{ return value->next; }
 			};
 
-			typedef OpenHashTable<ThreadTableDefinition> ThreadTable;
+			typedef BOpenHashTable<ThreadTableDefinition> ThreadTable;
 
 			// shorthands for the longish structure names
 			typedef system_profiler_thread_enqueued_in_run_queue

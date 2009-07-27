@@ -49,13 +49,13 @@ private:
 					return key.Equals(value->GetSubWindowKey());
 				}
 
-				HashTableLink<SubWindow>* GetLink(SubWindow* value) const
+				SubWindow*& GetLink(SubWindow* value) const
 				{
-					return value;
+					return value->fNext;
 				}
 			};
 
-			typedef OpenHashTable<HashDefinition> SubWindowTable;
+			typedef BOpenHashTable<HashDefinition> SubWindowTable;
 
 private:
 			BLooper*			fParent;

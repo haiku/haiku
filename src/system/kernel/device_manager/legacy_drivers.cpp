@@ -120,8 +120,8 @@ struct driver_entry : public DoublyLinkedListLinkImpl<driver_entry> {
 typedef DoublyLinkedList<driver_entry> DriverEntryList;
 
 struct directory_node_entry {
-	HashTableLink<directory_node_entry> link;
-	ino_t				node;
+	directory_node_entry*	hash_link;
+	ino_t					node;
 };
 
 struct DirectoryNodeHashDefinition {
@@ -134,15 +134,15 @@ struct DirectoryNodeHashDefinition {
 		{ return _Hash(entry->node); }
 	bool Compare(ino_t* key, directory_node_entry* entry) const
 		{ return *key == entry->node; }
-	HashTableLink<directory_node_entry>*
+	directory_node_entry*&
 		GetLink(directory_node_entry* entry) const
-		{ return &entry->link; }
+		{ return entry->hash_link; }
 
 	uint32 _Hash(ino_t node) const
 		{ return (uint32)(node >> 32) + (uint32)node; }
 };
 
-typedef OpenHashTable<DirectoryNodeHashDefinition> DirectoryNodeHash;
+typedef BOpenHashTable<DirectoryNodeHashDefinition> DirectoryNodeHash;
 
 class DirectoryIterator {
 public:

@@ -21,10 +21,10 @@
 	`Compare' and `GetLink;. It must also define several types as shown in the
 	following example:
 
-	struct Foo : HashTableLink<Foo> {
+	struct Foo {
 		int bar;
 
-		HashTableLink<Foo> otherLink;
+		Foo* fNext;
 	};
 
 	struct HashTableDefinition {
@@ -34,22 +34,18 @@
 		HashTableDefinition(const HashTableDefinition&) {}
 
 		size_t HashKey(int key) const { return key >> 1; }
-		size_t Hash(Foo *value) const { return HashKey(value->bar); }
-		bool Compare(int key, Foo *value) const { return value->bar == key; }
-		HashTableLink<Foo> *GetLink(Foo *value) const { return value; }
+		size_t Hash(Foo* value) const { return HashKey(value->bar); }
+		bool Compare(int key, Foo* value) const { return value->bar == key; }
+		Foo*& GetLink(Foo* value) const { return value->fNext; }
 	};
 */
 
-template<typename Type>
-struct HashTableLink {
-	Type *fNext;
-};
 
 template<typename Definition, bool AutoExpand = true,
 	bool CheckDuplicates = false>
-class OpenHashTable {
+class BOpenHashTable {
 public:
-	typedef OpenHashTable<Definition, AutoExpand, CheckDuplicates> HashTable;
+	typedef BOpenHashTable<Definition, AutoExpand, CheckDuplicates> HashTable;
 	typedef typename Definition::KeyType	KeyType;
 	typedef typename Definition::ValueType	ValueType;
 
@@ -62,7 +58,7 @@ public:
 	// regrowth factor: 200 / 256 = 78.125%
 	//                   50 / 256 = 19.53125%
 
-	OpenHashTable()
+	BOpenHashTable()
 		:
 		fTableSize(0),
 		fItemCount(0),
@@ -70,7 +66,7 @@ public:
 	{
 	}
 
-	OpenHashTable(const Definition& definition)
+	BOpenHashTable(const Definition& definition)
 		:
 		fDefinition(definition),
 		fTableSize(0),
@@ -79,7 +75,7 @@ public:
 	{
 	}
 
-	~OpenHashTable()
+	~BOpenHashTable()
 	{
 		free(fTable);
 	}
@@ -101,24 +97,24 @@ public:
 		return fItemCount;
 	}
 
-	ValueType *Lookup(const KeyType &key) const
+	ValueType* Lookup(const KeyType& key) const
 	{
 		if (fTableSize == 0)
 			return NULL;
 
 		size_t index = fDefinition.HashKey(key) & (fTableSize - 1);
-		ValueType *slot = fTable[index];
+		ValueType* slot = fTable[index];
 
 		while (slot) {
 			if (fDefinition.Compare(key, slot))
 				break;
-			slot = _Link(slot)->fNext;
+			slot = _Link(slot);
 		}
 
 		return slot;
 	}
 
-	status_t Insert(ValueType *value)
+	status_t Insert(ValueType* value)
 	{
 		if (fTableSize == 0) {
 			if (!_Resize(kMinimumSize))
@@ -130,7 +126,7 @@ public:
 		return B_OK;
 	}
 
-	void InsertUnchecked(ValueType *value)
+	void InsertUnchecked(ValueType* value)
 	{
 		if (CheckDuplicates && _ExhaustiveSearch(value)) {
 #ifdef _KERNEL_MODE
@@ -146,7 +142,7 @@ public:
 
 	// TODO: a ValueType* Remove(const KeyType& key) method is missing
 
-	bool Remove(ValueType *value)
+	bool Remove(ValueType* value)
 	{
 		if (!RemoveUnchecked(value))
 			return false;
@@ -158,17 +154,18 @@ public:
 		return true;
 	}
 
-	bool RemoveUnchecked(ValueType *value)
+	bool RemoveUnchecked(ValueType* value)
 	{
 		size_t index = fDefinition.Hash(value) & (fTableSize - 1);
-		ValueType *previous = NULL, *slot = fTable[index];
+		ValueType* previous = NULL;
+		ValueType* slot = fTable[index];
 
 		while (slot) {
-			ValueType *next = _Link(slot)->fNext;
+			ValueType* next = _Link(slot);
 
 			if (value == slot) {
 				if (previous)
-					_Link(previous)->fNext = next;
+					_Link(previous) = next;
 				else
 					fTable[index] = next;
 				break;
@@ -217,7 +214,7 @@ public:
 					// update nextPointer to point to the fNext of the last
 					// element in the bucket
 					while (element != NULL) {
-						nextPointer = &_Link(element)->fNext;
+						nextPointer = &_Link(element);
 						element = *nextPointer;
 					}
 				}
@@ -274,20 +271,20 @@ public:
 
 	class Iterator {
 	public:
-		Iterator(const HashTable *table)
+		Iterator(const HashTable* table)
 			: fTable(table)
 		{
 			Rewind();
 		}
 
-		Iterator(const HashTable *table, size_t index, ValueType *value)
+		Iterator(const HashTable* table, size_t index, ValueType* value)
 			: fTable(table), fIndex(index), fNext(value) {}
 
 		bool HasNext() const { return fNext != NULL; }
 
-		ValueType *Next()
+		ValueType* Next()
 		{
-			ValueType *current = fNext;
+			ValueType* current = fNext;
 			_GetNext();
 			return current;
 		}
@@ -306,15 +303,15 @@ public:
 		void _GetNext()
 		{
 			if (fNext)
-				fNext = fTable->_Link(fNext)->fNext;
+				fNext = fTable->_Link(fNext);
 
 			while (fNext == NULL && fIndex < fTable->fTableSize)
 				fNext = fTable->fTable[fIndex++];
 		}
 
-		const HashTable *fTable;
+		const HashTable* fTable;
 		size_t fIndex;
-		ValueType *fNext;
+		ValueType* fNext;
 	};
 
 	Iterator GetIterator() const { return Iterator(this); }
@@ -323,11 +320,11 @@ protected:
 	// for g++ 2.95
 	friend class Iterator;
 
-	void _Insert(ValueType **table, size_t tableSize, ValueType *value)
+	void _Insert(ValueType** table, size_t tableSize, ValueType* value)
 	{
 		size_t index = fDefinition.Hash(value) & (tableSize - 1);
 
-		_Link(value)->fNext = table[index];
+		_Link(value) = table[index];
 		table[index] = value;
 	}
 
@@ -349,9 +346,9 @@ protected:
 
 		if (fTable) {
 			for (size_t i = 0; i < fTableSize; i++) {
-				ValueType *bucket = fTable[i];
+				ValueType* bucket = fTable[i];
 				while (bucket) {
-					ValueType *next = _Link(bucket)->fNext;
+					ValueType* next = _Link(bucket);
 					_Insert(newTable, newSize, bucket);
 					bucket = next;
 				}
@@ -364,28 +361,29 @@ protected:
 		fTable = newTable;
 	}
 
-	HashTableLink<ValueType> *_Link(ValueType *bucket) const
+	ValueType*& _Link(ValueType* bucket) const
 	{
 		return fDefinition.GetLink(bucket);
 	}
 
-	bool _ExhaustiveSearch(ValueType *value) const
+	bool _ExhaustiveSearch(ValueType* value) const
 	{
 		for (size_t i = 0; i < fTableSize; i++) {
-			ValueType *bucket = fTable[i];
+			ValueType* bucket = fTable[i];
 			while (bucket) {
 				if (bucket == value)
 					return true;
-				bucket = _Link(bucket)->fNext;
+				bucket = _Link(bucket);
 			}
 		}
 
 		return false;
 	}
 
-	Definition fDefinition;
-	size_t fTableSize, fItemCount;
-	ValueType **fTable;
+	Definition		fDefinition;
+	size_t			fTableSize;
+	size_t			fItemCount;
+	ValueType**		fTable;
 };
 
 #endif	// _KERNEL_UTIL_OPEN_HASH_TABLE_H

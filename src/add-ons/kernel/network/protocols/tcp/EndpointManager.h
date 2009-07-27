@@ -45,7 +45,7 @@ public:
 			size_t			Hash(TCPEndpoint* endpoint) const;
 			bool			Compare(const KeyType& key,
 								TCPEndpoint* endpoint) const;
-			HashTableLink<TCPEndpoint>* GetLink(TCPEndpoint* endpoint) const;
+			TCPEndpoint*& GetLink(TCPEndpoint* endpoint) const;
 
 private:
 	EndpointManager*		fManager;
@@ -62,7 +62,7 @@ public:
 			bool			Compare(uint16 port, TCPEndpoint* endpoint) const;
 			bool			CompareValues(TCPEndpoint* first,
 								TCPEndpoint* second) const;
-			HashTableLink<TCPEndpoint>* GetLink(TCPEndpoint* endpoint) const;
+			TCPEndpoint*&	GetLink(TCPEndpoint* endpoint) const;
 };
 
 
@@ -104,7 +104,7 @@ private:
 			status_t		_BindToEphemeral(TCPEndpoint* endpoint,
 								const sockaddr* address);
 
-	typedef OpenHashTable<ConnectionHashDefinition> ConnectionTable;
+	typedef BOpenHashTable<ConnectionHashDefinition> ConnectionTable;
 	typedef MultiHashTable<EndpointHashDefinition> EndpointTable;
 
 	rw_lock					fLock;

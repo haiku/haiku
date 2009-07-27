@@ -134,19 +134,19 @@ public:
 		ReleaseReference();
 	}
 
-	HashTableLink<NamedSem>* HashLink()
+	NamedSem*& HashLink()
 	{
-		return &fHashLink;
+		return fHashLink;
 	}
 
 private:
-	char*	fName;
-	vint32	fRefCount;
-	uid_t	fUID;
-	gid_t	fGID;
-	mode_t	fPermissions;
+	char*		fName;
+	vint32		fRefCount;
+	uid_t		fUID;
+	gid_t		fGID;
+	mode_t		fPermissions;
 
-	::HashTableLink<NamedSem>	fHashLink;
+	NamedSem*	fHashLink;
 };
 
 
@@ -238,13 +238,13 @@ public:
 		delete this;
 	}
 
-	HashTableLink<UnnamedSharedSem>* HashLink()
+	UnnamedSharedSem*& HashLink()
 	{
-		return &fHashLink;
+		return fHashLink;
 	}
 
 private:
-	::HashTableLink<UnnamedSharedSem>	fHashLink;
+	UnnamedSharedSem*	fHashLink;
 };
 
 
@@ -267,7 +267,7 @@ struct NamedSemHashDefinition {
 		return strcmp(key, semaphore->Name()) == 0;
 	}
 
-	HashTableLink<NamedSem>* GetLink(NamedSem* semaphore) const
+	NamedSem*& GetLink(NamedSem* semaphore) const
 	{
 		return semaphore->HashLink();
 	}
@@ -293,7 +293,7 @@ struct UnnamedSemHashDefinition {
 		return key == semaphore->SemaphoreID();
 	}
 
-	HashTableLink<UnnamedSharedSem>* GetLink(UnnamedSharedSem* semaphore) const
+	UnnamedSharedSem*& GetLink(UnnamedSharedSem* semaphore) const
 	{
 		return semaphore->HashLink();
 	}
@@ -442,8 +442,8 @@ public:
 	}
 
 private:
-	typedef OpenHashTable<NamedSemHashDefinition, true> NamedSemTable;
-	typedef OpenHashTable<UnnamedSemHashDefinition, true> UnnamedSemTable;
+	typedef BOpenHashTable<NamedSemHashDefinition, true> NamedSemTable;
+	typedef BOpenHashTable<UnnamedSemHashDefinition, true> UnnamedSemTable;
 
 	mutex			fLock;
 	NamedSemTable	fNamedSemaphores;
@@ -502,17 +502,17 @@ public:
 		return clone;
 	}
 
-	HashTableLink<TeamSemInfo>* HashLink()
+	TeamSemInfo*& HashLink()
 	{
-		return &fHashLink;
+		return fHashLink;
 	}
 
 private:
-	SemInfo*	fSemaphore;
-	sem_t*		fUserSemaphore;
-	int32		fOpenCount;
+	SemInfo*		fSemaphore;
+	sem_t*			fUserSemaphore;
+	int32			fOpenCount;
 
-	::HashTableLink<TeamSemInfo>	fHashLink;
+	TeamSemInfo*	fHashLink;
 };
 
 
@@ -535,7 +535,7 @@ struct TeamSemHashDefinition {
 		return key == semaphore->ID();
 	}
 
-	HashTableLink<TeamSemInfo>* GetLink(TeamSemInfo* semaphore) const
+	TeamSemInfo*& GetLink(TeamSemInfo* semaphore) const
 	{
 		return semaphore->HashLink();
 	}
@@ -799,7 +799,7 @@ private:
 	}
 
 private:
-	typedef OpenHashTable<TeamSemHashDefinition, true> SemTable;
+	typedef BOpenHashTable<TeamSemHashDefinition, true> SemTable;
 
 	mutex		fLock;
 	SemTable	fSemaphores;

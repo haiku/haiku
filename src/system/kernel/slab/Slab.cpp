@@ -122,9 +122,10 @@ struct SmallObjectCache : object_cache {
 
 
 struct HashedObjectCache : object_cache {
-	struct Link : HashTableLink<Link> {
-		const void *buffer;
-		slab *parent;
+	struct Link {
+		const void*	buffer;
+		slab*		parent;
+		Link*		next;
 	};
 
 	struct Definition {
@@ -144,12 +145,12 @@ struct HashedObjectCache : object_cache {
 		size_t Hash(Link *value) const { return HashKey(value->buffer); }
 		bool Compare(const void *key, Link *value) const
 			{ return value->buffer == key; }
-		HashTableLink<Link> *GetLink(Link *value) const { return value; }
+		Link*& GetLink(Link *value) const { return value->next; }
 
 		HashedObjectCache *parent;
 	};
 
-	typedef OpenHashTable<Definition> HashTable;
+	typedef BOpenHashTable<Definition> HashTable;
 
 	HashedObjectCache()
 		: hash_table(this) {}

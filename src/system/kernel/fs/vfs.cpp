@@ -123,11 +123,11 @@ struct EntryCacheKey {
 };
 
 
-struct EntryCacheEntry : HashTableLink<EntryCacheEntry>,
-		DoublyLinkedListLinkImpl<EntryCacheEntry> {
-	ino_t	node_id;
-	ino_t	dir_id;
-	char	name[1];
+struct EntryCacheEntry : DoublyLinkedListLinkImpl<EntryCacheEntry> {
+	EntryCacheEntry*	hash_link;
+	ino_t				node_id;
+	ino_t				dir_id;
+	char				name[1];
 };
 
 
@@ -153,9 +153,9 @@ struct EntryCacheHashDefinition {
 			&& strcmp(value->name, key.name) == 0;
 	}
 
-	HashTableLink<EntryCacheEntry>* GetLink(EntryCacheEntry* value) const
+	EntryCacheEntry*& GetLink(EntryCacheEntry* value) const
 	{
-		return value;
+		return value->hash_link;
 	}
 };
 
@@ -251,7 +251,7 @@ public:
 	}
 
 private:
-	typedef OpenHashTable<EntryCacheHashDefinition> EntryTable;
+	typedef BOpenHashTable<EntryCacheHashDefinition> EntryTable;
 	typedef DoublyLinkedList<EntryCacheEntry> EntryList;
 
 	mutex		fLock;

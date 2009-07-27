@@ -43,7 +43,7 @@ private:
 			struct ValueEntry;
 			struct ValueEntryHashDefinition;
 
-			typedef OpenHashTable<ValueEntryHashDefinition> ValueTable;
+			typedef BOpenHashTable<ValueEntryHashDefinition> ValueTable;
 
 private:
 			StackFrameValues&	operator=(const StackFrameValues& other);

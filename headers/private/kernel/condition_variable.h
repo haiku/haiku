@@ -46,7 +46,7 @@ private:
 };
 
 
-struct ConditionVariable : protected HashTableLink<ConditionVariable> {
+struct ConditionVariable {
 public:
 			void				Init(const void* object,
 									const char* objectType);
@@ -81,6 +81,7 @@ protected:
 			const void*			fObject;
 			const char*			fObjectType;
 			EntryList			fEntries;
+			ConditionVariable*	fNext;
 
 			friend struct ConditionVariableEntry;
 			friend struct ConditionVariableHashDefinition;

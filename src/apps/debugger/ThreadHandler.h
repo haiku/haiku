@@ -22,8 +22,7 @@ class Statement;
 class Worker;
 
 
-class ThreadHandler : public Referenceable,
-	public HashTableLink<ThreadHandler>, private ImageDebugInfoProvider,
+class ThreadHandler : public Referenceable, private ImageDebugInfoProvider,
 	private BreakpointClient {
 public:
 								ThreadHandler(Thread* thread, Worker* worker,
@@ -98,6 +97,9 @@ private:
 			target_addr_t		fBreakpointAddress;
 			target_addr_t		fPreviousInstructionPointer;
 			bool				fSingleStepping;
+
+public:
+			ThreadHandler*		fNext;
 };
 
 
@@ -120,13 +122,13 @@ struct ThreadHandlerHashDefinition {
 		return value->ThreadID() == key;
 	}
 
-	HashTableLink<ThreadHandler>* GetLink(ThreadHandler* value) const
+	ThreadHandler*& GetLink(ThreadHandler* value) const
 	{
-		return value;
+		return value->fNext;
 	}
 };
 
-typedef OpenHashTable<ThreadHandlerHashDefinition> ThreadHandlerTable;
+typedef BOpenHashTable<ThreadHandlerHashDefinition> ThreadHandlerTable;
 
 
 #endif	// THREAD_HANDLER_H

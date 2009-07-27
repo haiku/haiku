@@ -72,7 +72,7 @@ private:
 			struct DwarfArrayType;
 			struct DwarfTypeHashDefinition;
 
-			typedef OpenHashTable<DwarfTypeHashDefinition> TypeTable;
+			typedef BOpenHashTable<DwarfTypeHashDefinition> TypeTable;
 
 private:
 			status_t			_CreateType(DIEType* typeEntry,

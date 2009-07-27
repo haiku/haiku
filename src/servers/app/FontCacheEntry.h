@@ -33,8 +33,6 @@
 #include <agg_conv_contour.h>
 #include <agg_conv_transform.h>
 
-#include <util/OpenHashTable.h>
-
 #include "ServerFont.h"
 #include "FontEngine.h"
 #include "MultiLocker.h"
@@ -42,7 +40,7 @@
 #include "Transformable.h"
 
 
-struct GlyphCache : public HashTableLink<GlyphCache> {
+struct GlyphCache {
 	GlyphCache(uint32 glyphIndex, uint32 dataSize, glyph_data_type dataType,
 			const agg::rect_i& bounds, float advanceX, float advanceY,
 			float insetLeft, float insetRight)
@@ -73,6 +71,8 @@ struct GlyphCache : public HashTableLink<GlyphCache> {
 	float			advance_y;
 	float			inset_left;
 	float			inset_right;
+
+	GlyphCache*		hash_link;
 };
 
 class FontCache;

@@ -165,10 +165,10 @@ ConnectionHashDefinition::Compare(const KeyType& key,
 }
 
 
-HashTableLink<TCPEndpoint>*
+TCPEndpoint*&
 ConnectionHashDefinition::GetLink(TCPEndpoint* endpoint) const
 {
-	return &endpoint->fConnectionHashLink;
+	return endpoint->fConnectionHashLink;
 }
 
 
@@ -204,10 +204,10 @@ EndpointHashDefinition::CompareValues(TCPEndpoint* first,
 }
 
 
-HashTableLink<TCPEndpoint>*
+TCPEndpoint*&
 EndpointHashDefinition::GetLink(TCPEndpoint* endpoint) const
 {
-	return &endpoint->fEndpointHashLink;
+	return endpoint->fEndpointHashLink;
 }
 
 

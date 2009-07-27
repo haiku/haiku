@@ -266,9 +266,9 @@ public:
 		}
 	}
 
-	HashTableLink<XsiMessageQueue>* Link()
+	XsiMessageQueue*& Link()
 	{
-		return &fLink;
+		return fLink;
 	}
 
 private:
@@ -284,7 +284,7 @@ private:
 	ThreadQueue			fWaitingToReceive;
 	ThreadQueue			fWaitingToSend;
 
-	::HashTableLink<XsiMessageQueue> fLink;
+	XsiMessageQueue*	fLink;
 };
 
 
@@ -308,7 +308,7 @@ struct MessageQueueHashTableDefinition {
 		return (int)key == (int)variable->ID();
 	}
 
-	HashTableLink<XsiMessageQueue>* GetLink(XsiMessageQueue *variable) const
+	XsiMessageQueue*& GetLink(XsiMessageQueue *variable) const
 	{
 		return variable->Link();
 	}
@@ -339,15 +339,15 @@ public:
 		fMessageQueueId = messageQueue->ID();
 	}
 
-	HashTableLink<Ipc>* Link()
+	Ipc*& Link()
 	{
-		return &fLink;
+		return fLink;
 	}
 
 private:
 	key_t				fKey;
 	int					fMessageQueueId;
-	HashTableLink<Ipc>	fLink;
+	Ipc*				fLink;
 };
 
 
@@ -370,7 +370,7 @@ struct IpcHashTableDefinition {
 		return (key_t)key == (key_t)variable->Key();
 	}
 
-	HashTableLink<Ipc>* GetLink(Ipc *variable) const
+	Ipc*& GetLink(Ipc *variable) const
 	{
 		return variable->Link();
 	}
@@ -379,8 +379,8 @@ struct IpcHashTableDefinition {
 // Arbitrary limits
 #define MAX_XSI_MESSAGE			4096
 #define MAX_XSI_MESSAGE_QUEUE	1024
-static OpenHashTable<IpcHashTableDefinition> sIpcHashTable;
-static OpenHashTable<MessageQueueHashTableDefinition> sMessageQueueHashTable;
+static BOpenHashTable<IpcHashTableDefinition> sIpcHashTable;
+static BOpenHashTable<MessageQueueHashTableDefinition> sMessageQueueHashTable;
 
 static mutex sIpcLock;
 static mutex sXsiMessageQueueLock;

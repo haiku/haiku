@@ -90,9 +90,9 @@ public:
 		return fAddress;
 	}
 
-	::HashTableLink<UnixEndpoint>* HashTableLink()
+	UnixEndpoint*& HashTableLink()
 	{
-		return &fAddressHashLink;
+		return fAddressHashLink;
 	}
 
 private:
@@ -112,7 +112,7 @@ private:
 private:
 	mutex							fLock;
 	UnixAddress						fAddress;
-	::HashTableLink<UnixEndpoint>	fAddressHashLink;
+	UnixEndpoint*					fAddressHashLink;
 	UnixEndpoint*					fPeerEndpoint;
 	UnixFifo*						fReceiveFifo;
 	unix_endpoint_state				fState;

@@ -41,11 +41,11 @@ struct ImageTableDefinition {
 	size_t Hash(struct image* value) const { return value->info.id; }
 	bool Compare(image_id key, struct image* value) const
 		{ return value->info.id == key; }
-	HashTableLink<struct image>* GetLink(struct image* value) const
-		{ return &value->hash_link; }
+	struct image*& GetLink(struct image* value) const
+		{ return value->hash_link; }
 };
 
-typedef OpenHashTable<ImageTableDefinition> ImageTable;
+typedef BOpenHashTable<ImageTableDefinition> ImageTable;
 
 
 class ImageNotificationService : public DefaultNotificationService {

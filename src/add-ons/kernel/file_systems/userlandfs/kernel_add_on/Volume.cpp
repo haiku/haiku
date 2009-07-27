@@ -47,7 +47,7 @@ static const bigtime_t kUserlandServerlandPortTimeout = 10000000;	// 10s
 
 
 // VNode
-struct Volume::VNode : HashTableLink<VNode> {
+struct Volume::VNode {
 	ino_t		id;
 	void*		clientNode;
 	void*		fileCache;
@@ -55,6 +55,7 @@ struct Volume::VNode : HashTableLink<VNode> {
 	int32		useCount;
 	bool		valid;
 	bool		published;
+	VNode*		hash_link;
 
 	VNode(ino_t id, void* clientNode, VNodeOps* ops)
 		:
@@ -98,14 +99,14 @@ struct Volume::VNodeHashDefinition {
 		{ return HashKey(value->id); }
 	bool Compare(ino_t key, const VNode* value) const
 		{ return value->id == key; }
-	HashTableLink<VNode>* GetLink(VNode* value) const
-		{ return value; }
+	VNode*& GetLink(VNode* value) const
+		{ return value->hash_link; }
 };
 
 
 // VNodeMap
 struct Volume::VNodeMap
-	: public OpenHashTable<VNodeHashDefinition> {
+	: public BOpenHashTable<VNodeHashDefinition> {
 };
 
 
@@ -114,8 +115,8 @@ struct Volume::IORequestInfo {
 	io_request*						request;
 	int32							id;
 
-	HashTableLink<IORequestInfo>	idLink;
-	HashTableLink<IORequestInfo>	structLink;
+	IORequestInfo*					idLink;
+	IORequestInfo*					structLink;
 
 	IORequestInfo(io_request* request, int32 id)
 		:
@@ -137,8 +138,8 @@ struct Volume::IORequestIDHashDefinition {
 		{ return HashKey(value->id); }
 	bool Compare(int32 key, const IORequestInfo* value) const
 		{ return value->id == key; }
-	HashTableLink<IORequestInfo>* GetLink(IORequestInfo* value) const
-		{ return &value->idLink; }
+	IORequestInfo*& GetLink(IORequestInfo* value) const
+		{ return value->idLink; }
 };
 
 
@@ -153,20 +154,20 @@ struct Volume::IORequestStructHashDefinition {
 		{ return HashKey(value->request); }
 	bool Compare(io_request* key, const IORequestInfo* value) const
 		{ return value->request == key; }
-	HashTableLink<IORequestInfo>* GetLink(IORequestInfo* value) const
-		{ return &value->structLink; }
+	IORequestInfo*& GetLink(IORequestInfo* value) const
+		{ return value->structLink; }
 };
 
 
 // IORequestIDMap
 struct Volume::IORequestIDMap
-	: public OpenHashTable<IORequestIDHashDefinition> {
+	: public BOpenHashTable<IORequestIDHashDefinition> {
 };
 
 
 // IORequestStructMap
 struct Volume::IORequestStructMap
-	: public OpenHashTable<IORequestStructHashDefinition> {
+	: public BOpenHashTable<IORequestStructHashDefinition> {
 };
 
 
@@ -802,7 +803,7 @@ Volume::Unmount()
 		if (fVNodes != NULL) {
 			VNode* node = fVNodes->Clear(true);
 			while (node != NULL) {
-				VNode* nextNode = node->fNext;
+				VNode* nextNode = node->hash_link;
 				node->Delete(this);
 				node = nextNode;
 			}
@@ -820,7 +821,7 @@ Volume::Unmount()
 		if (fIORequestInfosByStruct != NULL) {
 			IORequestInfo* info = fIORequestInfosByStruct->Clear(true);
 			while (info != NULL) {
-				IORequestInfo* nextInfo = info->structLink.fNext;
+				IORequestInfo* nextInfo = info->structLink;
 				delete info;
 				info = nextInfo;
 			}

@@ -41,10 +41,11 @@ public:
 };
 
 
-struct HaikuKernelNode::Capabilities : HashTableLink<Capabilities> {
+struct HaikuKernelNode::Capabilities {
 	int32				refCount;
 	fs_vnode_ops*		ops;
 	FSVNodeCapabilities	capabilities;
+	Capabilities*		hashLink;
 
 	Capabilities(fs_vnode_ops* ops, FSVNodeCapabilities	capabilities)
 		:
