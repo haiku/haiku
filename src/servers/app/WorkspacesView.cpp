@@ -13,6 +13,7 @@
 #include "AppServer.h"
 #include "Desktop.h"
 #include "DrawingEngine.h"
+#include "ServerApp.h"
 #include "Window.h"
 #include "Workspace.h"
 
@@ -302,8 +303,11 @@ WorkspacesView::_DrawWorkspace(DrawingEngine* drawingEngine,
 	drawingEngine->ConstrainClippingRegion(&backgroundRegion);
 
 	ServerFont font = fDrawState->Font();
-	font.SetSize(ceilf(max_c(9.0,
-		min_c(Frame().Height(), Frame().Width()) / 15)));
+	font.SetSize(fWindow->ServerWindow()->App()->PlainFont().Size());
+	float reducedSize = ceilf(max_c(8.0f,
+		min_c(Frame().Height(), Frame().Width()) / 15));
+	if (font.Size() > reducedSize)
+		font.SetSize(reducedSize);
 	fDrawState->SetFont(font);
 	drawingEngine->SetFont(font);
 
