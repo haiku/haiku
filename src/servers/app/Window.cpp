@@ -772,9 +772,14 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		// clicking Window visible area
 
 		click_type action = DEC_DRAG;
+		int32 buttons = _ExtractButtons(message);
 
 		if (inBorderRegion && fDecorator != NULL)
-			action = _ActionFor(message, modifiers);
+			action = _ActionFor(message, buttons, modifiers);
+		else {
+			if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
+				action = DEC_MOVETOBACK;
+		}
 
 		// ignore clicks on decorator buttons if the
 		// non-floating window doesn't have focus
@@ -2067,6 +2072,16 @@ Window::_UpdateContentRegion()
 
 
 int32
+Window::_ExtractButtons(const BMessage* message) const
+{
+	int32 buttons;
+	if (message->FindInt32("buttons", &buttons) != B_OK)
+		buttons = 0;
+	return buttons;
+}
+
+
+int32
 Window::_ExtractModifiers(const BMessage* message) const
 {
 	int32 modifiers;
@@ -2082,13 +2097,15 @@ Window::_ActionFor(const BMessage* message) const
 	if (fDecorator == NULL)
 		return DEC_NONE;
 
+	int32 buttons = _ExtractButtons(message);
 	int32 modifiers = _ExtractModifiers(message);
-	return _ActionFor(message, modifiers);
+	return _ActionFor(message, buttons, modifiers);
 }
 
 
 click_type
-Window::_ActionFor(const BMessage* message, int32 modifiers) const
+Window::_ActionFor(const BMessage* message, int32 buttons,
+	int32 modifiers) const
 {
 	if (fDecorator == NULL)
 		return DEC_NONE;
@@ -2096,10 +2113,6 @@ Window::_ActionFor(const BMessage* message, int32 modifiers) const
 	BPoint where;
 	if (message->FindPoint("where", &where) != B_OK)
 		return DEC_NONE;
-
-	int32 buttons;
-	if (message->FindInt32("buttons", &buttons) != B_OK)
-		buttons = 0;
 
 	return fDecorator->Clicked(where, buttons, modifiers);
 }

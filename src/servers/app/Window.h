@@ -256,11 +256,13 @@ protected:
 
 			void				_UpdateContentRegion();
 
+			int32				_ExtractButtons(
+									const BMessage* message) const;
 			int32				_ExtractModifiers(
 									const BMessage* message) const;
 			click_type			_ActionFor(const BMessage* message) const;
 			click_type			_ActionFor(const BMessage* message,
-									int32 modifiers) const;
+									int32 buttons, int32 modifiers) const;
 
 			void				_ObeySizeLimits();
 			void				_PropagatePosition();
