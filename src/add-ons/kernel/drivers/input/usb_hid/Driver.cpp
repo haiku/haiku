@@ -65,9 +65,8 @@ usb_hid_device_added(usb_device device, void **cookie)
 	for (size_t i = 0; i < config->interface_count; i++) {
 		const usb_interface_info *interface = config->interface[i].active;
 		uint8 interfaceClass = interface->descr->interface_class;
-		uint8 interfaceSubclass = interface->descr->interface_subclass;
 		TRACE("interface %lu: class: %u; subclass: %u; protocol: %u\n",
-			i, interfaceClass, interfaceSubclass,
+			i, interfaceClass, interface->descr->interface_subclass,
 			interface->descr->interface_protocol);
 
 		if (interfaceClass == USB_INTERFACE_CLASS_HID) {
