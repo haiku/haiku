@@ -1,8 +1,0 @@
-/* D30V target configuration file.  -*- C -*- */
-
-/* Define this to enable the intrinsic breakpoint mechanism. */
-#define SIM_HAVE_BREAKPOINTS
-
-/* See sim-hload.c.  We properly handle LMA. */
-#define SIM_HANDLES_LMA 1
-

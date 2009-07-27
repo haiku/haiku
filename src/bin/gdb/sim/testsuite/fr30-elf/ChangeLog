@@ -1,8 +1,0 @@
-Thu Nov 26 11:34:46 1998  Dave Brolley  <brolley@cygnus.com>
-
-	* loop.s (_start): Removed direct address hack.
-
-Mon Nov 23 17:02:47 1998  Dave Brolley  <brolley@cygnus.com>
-
-	* Directory created.
-
