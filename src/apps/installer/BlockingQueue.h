@@ -28,12 +28,11 @@
 #ifndef BLOCKING_QUEUE_H
 #define BLOCKING_QUEUE_H
 
-#include <OS.h>
+#include <vector>
 
 #include <Locker.h>
 
 #include "AutoLocker.h"
-#include <vector>
 
 using std::vector;
 
