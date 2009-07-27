@@ -8,6 +8,7 @@
 #include <fuse/fuse.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <syslog.h>
 
 #include "fssh.h"
 
@@ -39,8 +40,9 @@ const char* kMountPoint = "/myfs";
 
 static mode_t sUmask = 0022;
 
-#define PRINTD(x) fprintf(stderr, x)
+#define PRINTD(x) if (gIsDebug) fprintf(stderr, x)
 
+bool gIsDebug = false;
 
 static fssh_status_t
 init_kernel()
@@ -139,7 +141,8 @@ fuse_getattr(const char* path, struct stat* stbuf)
 	fssh_status_t status = _kern_read_stat(-1, path, false, &f_stbuf,
 			sizeof(f_stbuf));
 	fromFsshStatToStat(&f_stbuf, stbuf);
-	printf("GETATTR returned: %d\n", status);
+	if (gIsDebug)
+		printf("GETATTR returned: %d\n", status);
 	return _ERR(status);
 }
 
@@ -350,12 +353,8 @@ get_volume_id()
 	struct fssh_stat st;
 	fssh_status_t error = _kern_read_stat(-1, kMountPoint, false, &st,
 		sizeof(st));
-	if (error != FSSH_B_OK) {
-		fprintf(stderr, "get_volume_id(): Failed to stat() mount point: %s\n",
-			fssh_strerror(error));
+	if (error != FSSH_B_OK)
 		return error;
-	}
-
 	return st.fssh_st_dev;
 }
 
@@ -370,9 +369,9 @@ fuse_statfs(const char *path __attribute__((unused)),
 	if (volumeID < 0)
 		return _ERR(volumeID);
 
-    fssh_fs_info info;
-    fssh_status_t status = _kern_read_fs_info(volumeID, &info);
-    if (status != FSSH_B_OK)
+	fssh_fs_info info;
+	fssh_status_t status = _kern_read_fs_info(volumeID, &info);
+	if (status != FSSH_B_OK)
 		return _ERR(status);
 
 	sfs->f_bsize = sfs->f_frsize = info.block_size;
@@ -424,27 +423,52 @@ fssh_fuse_session(const char* device, const char* mntPoint, const char* fsName)
 			fssh_strerror(fsDev));
 		return 1;
 	}
+	
+	if (!gIsDebug) {
+		bool isErr = false;
+		fssh_dev_t volumeID = get_volume_id();
+		if (volumeID < 0)
+			isErr = true;
+		fssh_fs_info info;
+		if (!isErr) {
+			fssh_status_t status = _kern_read_fs_info(volumeID, &info);
+			if (status != FSSH_B_OK)
+				isErr = true;
+		}
+		syslog(LOG_INFO, "Mounted %s (%s) to %s",
+			device,
+			isErr ? "unknown" : info.volume_name,
+			mntPoint);
+	}
 
 	// Run the fuse_main() loop.
-	const char* argv[5];
-	argv[0] = (const char*)"bfs_shell";
-	argv[1] = mntPoint;
-	argv[2] = (const char*)"-d";
-	argv[3] = (const char*)"-s";
+	const char* argv[13];
+	int fuseArgCount = 0;
 
+	argv[fuseArgCount++] = (const char*)"bfs_fuse";
+	argv[fuseArgCount++] = mntPoint;
+	argv[fuseArgCount++] = (const char*)"-s";
+	if (gIsDebug)
+		argv[fuseArgCount++] = (const char*)"-d";
+	
 	initialiseFuseOps(&gFUSEOperations);
 
-	int ret =  fuse_main(4, (char**)argv, &gFUSEOperations, NULL);
+	int ret = fuse_main(fuseArgCount, (char**)argv, &gFUSEOperations, NULL);
 
 	// Unmount the volume again.
+	// Avoid a "busy" vnode.
 	_kern_setcwd(-1, "/");
-		// Avoid a "busy" vnode.
 	fssh_status_t error = _kern_unmount(kMountPoint, 0);
 	if (error != FSSH_B_OK) {
-		fprintf(stderr, "Error: Unmounting FS failed: %s\n",
-			fssh_strerror(error));
+		if (gIsDebug)
+			fprintf(stderr, "Error: Unmounting FS failed: %s\n", fssh_strerror(error));
+		else
+			syslog(LOG_INFO, "Error: Unmounting FS failed: %s", fssh_strerror(error));
 		return 1;
 	}
+
+	if (!gIsDebug)
+		syslog(LOG_INFO, "UnMounted %s from %s", device, mntPoint);
 
 	return ret;
 }
@@ -459,7 +483,7 @@ using namespace FSShell;
 static void
 print_usage_and_exit(const char* binName)
 {
-	fprintf(stderr,"Usage: %s <device> <mount point>\n", binName);
+	fprintf(stderr,"Usage: %s [-d] <device> <mount point>\n", binName);
 	exit(1);
 }
 
@@ -467,11 +491,30 @@ print_usage_and_exit(const char* binName)
 int
 main(int argc, const char* const* argv)
 {
-	if (argc < 2)
-		print_usage_and_exit(argv[0]);
+	// eat options
+	int argi = 1;
+	while (argi < argc && argv[argi][0] == '-') {
+		const char* arg = argv[argi++];
+		if (strcmp(arg, "--help") == 0) {
+			print_usage_and_exit(argv[0]);
+		} else if (strcmp(arg, "-d") == 0) {
+			gIsDebug = true;
+		} else {
+			print_usage_and_exit(argv[0]);
+		}
+	}
 
-	const char* device = argv[1];
-	const char* mntPoint = argv[2];
+	// get device
+	if (argi >= argc)
+		print_usage_and_exit(argv[0]);
+	const char* device = argv[argi++];
+	// get mountpoint
+	if (argi >= argc)
+		print_usage_and_exit(argv[0]);
+	const char* mntPoint = argv[argi++];
+	// more parameters are excess
+	if (argi < argc)
+		print_usage_and_exit(argv[0]);
 
 	if (!modules[0]) {
 		fprintf(stderr, "Error: Couldn't find FS module!\n");
