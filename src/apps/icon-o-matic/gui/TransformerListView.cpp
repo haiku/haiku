@@ -375,6 +375,11 @@ TransformerListView::SetMenu(BMenu* menu)
 	uint32 type;
 	BString name;
 	while (TransformerFactory::NextType(&cookie, &type, &name)) {
+		// TODO: Disable the "Transformation" and "Perspective" transformers
+		// since they are not very useful or even implemented at all.
+		if (name == "Transformation" || name == "Perspective")
+			continue;
+		// End of TODO.
 		BMessage* message = new BMessage(MSG_ADD_TRANSFORMER);
 		message->AddInt32("type", type);
 		addMenu->AddItem(new BMenuItem(name.String(), message));
