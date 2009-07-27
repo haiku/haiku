@@ -3820,7 +3820,6 @@ BContainerWindow::SetSingleWindowBrowseShortcuts(bool enabled)
 			new BMessage(kNavigatorCommandUp), Navigator());
 
 	} else {
-
 		RemoveShortcut(B_LEFT_ARROW, B_COMMAND_KEY);
 		RemoveShortcut(B_RIGHT_ARROW, B_COMMAND_KEY);
 		RemoveShortcut(B_UP_ARROW, B_COMMAND_KEY);
@@ -3840,10 +3839,7 @@ BContainerWindow::SetSingleWindowBrowseShortcuts(bool enabled)
 			new BMessage(kOpenParentDir), PoseView());
 		AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_OPTION_KEY | B_CONTROL_KEY,
 			new BMessage(kOpenParentDir), PoseView());
-		AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_CONTROL_KEY,
-			new BMessage(kOpenParentDir), PoseView());
 			// the command option results in closing the parent window
-			// the control is a secret backdoor to get at the Disks menu
 	}
 }
 
