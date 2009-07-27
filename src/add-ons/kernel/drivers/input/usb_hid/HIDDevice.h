@@ -3,85 +3,66 @@
 	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
 	Distributed under the terms of the MIT license.
 */
-#ifndef _USB_HID_DEVICE_H_
-#define _USB_HID_DEVICE_H_
+#ifndef USB_HID_DEVICE_H
+#define USB_HID_DEVICE_H
 
-#include "hidparse.h"
-#include "ring_buffer.h"
+#include "HIDParser.h"
+
 #include <USB3.h>
+
+class ProtocolHandler;
 
 class HIDDevice {
 public:
 								HIDDevice(usb_device device,
-									usb_pipe interruptPipe,
-									size_t interfaceIndex,
-									report_insn *instructions,
-									size_t instructionCount,
-									size_t totalReportSize,
-									size_t ringBufferSize);
-virtual							~HIDDevice();
-
-static	HIDDevice *				MakeHIDDevice(usb_device device,
 									const usb_configuration_info *config,
 									size_t interfaceIndex);
-
-		void					SetBaseName(const char *baseName);
-		const char *			Name() { return fName; };
+								~HIDDevice();
 
 		void					SetParentCookie(int32 cookie);
 		int32					ParentCookie() { return fParentCookie; };
 
 		status_t				InitCheck() { return fStatus; };
 
-virtual	status_t				Open(uint32 flags);
-		bool					IsOpen() { return fOpen; };
+		bool					IsOpen() { return fOpenCount > 0; };
+		status_t				Open(ProtocolHandler *handler, uint32 flags);
+		status_t				Close(ProtocolHandler *handler);
 
-virtual	status_t				Close();
-virtual	status_t				Free();
-
-virtual	status_t				Read(uint8 *buffer, size_t *numBytes);
-virtual	status_t				Write(const uint8 *buffer, size_t *numBytes);
-virtual	status_t				Control(uint32 op, void *buffer, size_t length);
-
-virtual	void					Removed();
+		void					Removed();
 		bool					IsRemoved() { return fRemoved; };
 
-protected:
-		void					_SetTransferProcessed();
-		bool					_IsTransferUnprocessed();
-		status_t				_ScheduleTransfer();
+		status_t				MaybeScheduleTransfer();
 
-		int32					_RingBufferReadable();
-		status_t				_RingBufferRead(void *buffer, size_t length);
-		status_t				_RingBufferWrite(const void *buffer,
-									size_t length);
+		status_t				SendReport(HIDReport *report);
 
-		status_t				fStatus;
-		usb_device				fDevice;
-		usb_pipe				fInterruptPipe;
-		size_t					fInterfaceIndex;
-		report_insn *			fInstructions;
-		size_t					fInstructionCount;
-		size_t					fTotalReportSize;
+		HIDParser *				Parser() { return &fParser; };
+		ProtocolHandler *		ProtocolHandlerAt(uint32 index);
 
-		// transfer data
-		bool					fTransferUnprocessed;
-		status_t				fTransferStatus;
-		size_t					fTransferActualLength;
-		uint8 *					fTransferBuffer;
-		sem_id					fTransferNotifySem;
+		// only to be used for the kernel debugger information
+		usb_pipe				InterruptPipe() { return fInterruptPipe; };
 
 private:
 static	void					_TransferCallback(void *cookie,
 									status_t status, void *data,
 									size_t actualLength);
 
-		char *					fName;
+		status_t				fStatus;
+		usb_device				fDevice;
+		usb_pipe				fInterruptPipe;
+		size_t					fInterfaceIndex;
+
+		int32					fTransferScheduled;
+		size_t					fTransferBufferSize;
+		uint8 *					fTransferBuffer;
+
 		int32					fParentCookie;
-volatile bool					fOpen;
+		int32					fOpenCount;
 		bool					fRemoved;
 
-		struct ring_buffer *	fRingBuffer;
+		HIDParser				fParser;
+
+		uint32					fProtocolHandlerCount;
+		ProtocolHandler **		fProtocolHandlers;
 };
 
-#endif // _USB_HID_DEVICE_H_
+#endif // USB_HID_DEVICE_H

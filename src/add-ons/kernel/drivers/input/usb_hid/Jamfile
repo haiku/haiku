@@ -1,17 +1,10 @@
 SubDir HAIKU_TOP src add-ons kernel drivers input usb_hid ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 SubDirC++Flags -fno-rtti ;
 
 SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
-UsePrivateHeaders [ FDirName kernel util ] input ;
-UsePrivateHeaders kernel ;
-
-local buffer_impl = ;
-if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	buffer_impl = ring_buffer.cpp ;
-}
+UsePrivateHeaders [ FDirName kernel util ] input drivers ;
+UsePrivateKernelHeaders ;
 
 KernelAddon usb_hid :
 	DeviceList.cpp
@@ -19,14 +12,10 @@ KernelAddon usb_hid :
 	HIDDevice.cpp
 	KeyboardDevice.cpp
 	MouseDevice.cpp
-	hidparse.c
-	$(buffer_impl)
+	ProtocolHandler.cpp
+
+	HIDCollection.cpp
+	HIDParser.cpp
+	HIDReport.cpp
+	HIDReportItem.cpp
 ;
-
-SEARCH on [ FGristFiles ring_buffer.cpp ] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-
-Package haiku-inputkit-cvs :
-        usb_hid :
-        boot home config add-ons kernel drivers bin ;
-
-PackageDriverSymLink haiku-inputkit-cvs : input usb_hid ;

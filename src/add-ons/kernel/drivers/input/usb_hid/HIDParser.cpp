@@ -438,6 +438,9 @@ HIDParser::MaxReportSize()
 			maxSize = report->ReportSize();
 	}
 
+	if (fUsesReportIDs)
+		maxSize++;
+
 	return maxSize;
 }
 
@@ -459,12 +462,13 @@ HIDParser::SetReport(status_t status, uint8 *report, size_t length)
 		return;
 	}
 
-	HIDReport *target = fReports[0];
+	HIDReport *target = NULL;
 	if (fUsesReportIDs) {
 		target = FindReport(HID_REPORT_TYPE_INPUT, report[0]);
 		report++;
 		length--;
-	}
+	} else
+		target = FindReport(HID_REPORT_TYPE_INPUT, 0);
 
 	if (target == NULL) {
 		TRACE_ALWAYS("got report buffer but found no report to handle it\n");

@@ -1,13 +1,7 @@
 /*
- * Copyright 2008 Michael Lotz <mmlr@mlotz.ch>
+ * Copyright 2008-2009 Michael Lotz <mmlr@mlotz.ch>
  * Distributed under the terms of the MIT license.
  */
-
-/*!	Driver for USB Human Interface Devices.
- 	Interpretation code based on the previous usb_hid driver which was written
-	by Jérôme Duval.
-*/
-
 
 #include <string.h>
 
@@ -17,6 +11,10 @@
 
 #include "Driver.h"
 #include "KeyboardDevice.h"
+
+#include "HIDDevice.h"
+#include "HIDReport.h"
+#include "HIDReportItem.h"
 
 // input server private for raw_key_info, KB_READ, etc...
 #include "kb_mouse_driver.h"
@@ -43,26 +41,81 @@ debug_get_keyboard_config(int argc, char **argv)
 //	#pragma mark -
 
 
-KeyboardDevice::KeyboardDevice(usb_device device, usb_pipe interruptPipe,
-	size_t interfaceIndex, report_insn *instructions, size_t instructionCount,
-	size_t totalReportSize)
+KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 	:
-	HIDDevice(device, interruptPipe, interfaceIndex, instructions,
-		instructionCount, totalReportSize, 512),
+	ProtocolHandler(inputReport->Device(), "input/keyboard/usb/", 512),
+	fInputReport(inputReport),
+	fOutputReport(outputReport),
 	fRepeatDelay(300000),
 	fRepeatRate(35000),
-	fLastTransferBuffer(NULL)
+	fCurrentRepeatDelay(B_INFINITE_TIMEOUT),
+	fCurrentRepeatKey(0),
+	fKeyCount(0),
+	fModifierCount(0),
+	fLastModifiers(0),
+	fCurrentKeys(NULL),
+	fLastKeys(NULL)
 {
-	fCurrentRepeatDelay = B_INFINITE_TIMEOUT;
-	fCurrentRepeatKey = 0;
+	// find modifiers and keys
+	for (uint32 i = 0; i < inputReport->CountItems(); i++) {
+		HIDReportItem *item = inputReport->ItemAt(i);
+		if (!item->HasData())
+			continue;
 
-	fLastTransferBuffer = (uint8 *)malloc(totalReportSize);
-	if (fLastTransferBuffer == NULL) {
+		if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD) {
+			TRACE("keyboard item with usage %lx\n", item->UsageMinimum());
+			item->PrintToStream();
+
+			if (item->Array()) {
+				// normal keys handled as array items
+				if (fKeyCount < MAX_KEYS)
+					fKeys[fKeyCount++] = item;
+			} else {
+				if (item->UsageID() >= HID_USAGE_ID_LEFT_CONTROL
+					&& item->UsageID() <= HID_USAGE_ID_RIGHT_GUI) {
+					// modifiers are generally implemented as bitmaps
+					if (fModifierCount < MAX_MODIFIERS)
+						fModifiers[fModifierCount++] = item;
+				}
+			}
+		}
+	}
+
+	TRACE("keyboard device with %lu keys and %lu modifiers\n", fKeyCount,
+		fModifierCount);
+
+	fLastKeys = (uint8 *)malloc(fKeyCount * 2);
+	fCurrentKeys = fLastKeys + fKeyCount;
+	if (fLastKeys == NULL) {
 		fStatus = B_NO_MEMORY;
 		return;
 	}
 
-	SetBaseName("input/keyboard/usb/");
+	// find leds if we have an output report
+	fLEDs[0] = fLEDs[1] = fLEDs[2] = NULL;
+	if (outputReport != NULL) {
+		for (uint32 i = 0; i < outputReport->CountItems(); i++) {
+			HIDReportItem *item = outputReport->ItemAt(i);
+			if (!item->HasData())
+				continue;
+
+			// the led item array is identity mapped with what we get from
+			// the input_server for the set-leds command
+			if (item->UsagePage() == HID_USAGE_PAGE_LED) {
+				switch (item->UsageID()) {
+					case HID_USAGE_ID_LED_NUM_LOCK:
+						fLEDs[0] = item;
+						break;
+					case HID_USAGE_ID_LED_CAPS_LOCK:
+						fLEDs[1] = item;
+						break;
+					case HID_USAGE_ID_LED_SCROLL_LOCK:
+						fLEDs[2] = item;
+						break;
+				}
+			}
+		}
+	}
 
 	if (atomic_add(&sDebuggerCommandAdded, 1) == 0) {
 		add_debugger_command("get_usb_keyboard_config",
@@ -74,7 +127,7 @@ KeyboardDevice::KeyboardDevice(usb_device device, usb_pipe interruptPipe,
 
 KeyboardDevice::~KeyboardDevice()
 {
-	free(fLastTransferBuffer);
+	free(fLastKeys);
 
 	if (atomic_add(&sDebuggerCommandAdded, -1) == 1) {
 		remove_debugger_command("get_usb_keyboard_config",
@@ -83,10 +136,62 @@ KeyboardDevice::~KeyboardDevice()
 }
 
 
+ProtocolHandler *
+KeyboardDevice::AddHandler(HIDDevice *device)
+{
+	HIDParser *parser = device->Parser();
+
+	// try to find the keyboard usage in any input report
+	HIDReport *input = NULL;
+	bool foundKeyboardUsage = false;
+	uint32 reportCount = parser->CountReports(HID_REPORT_TYPE_INPUT);
+	for (uint32  i = 0; i < reportCount; i++) {
+		input = parser->ReportAt(HID_REPORT_TYPE_INPUT, i);
+
+		for (uint32 j = 0; j < input->CountItems(); j++) {
+			HIDReportItem *item = input->ItemAt(j);
+			if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD) {
+				// found at least one item with a keyboard usage
+				foundKeyboardUsage = true;
+				break;
+			}
+		}
+
+		if (foundKeyboardUsage)
+			break;
+	}
+
+	if (!foundKeyboardUsage)
+		return NULL;
+
+	// try to find the led output report
+	HIDReport *output = NULL;
+	bool foundOutputReport = false;
+	reportCount = parser->CountReports(HID_REPORT_TYPE_OUTPUT);
+	for (uint32  i = 0; i < reportCount; i++) {
+		output = parser->ReportAt(HID_REPORT_TYPE_OUTPUT, i);
+
+		for (uint32 j = 0; j < output->CountItems(); j++) {
+			HIDReportItem *item = output->ItemAt(j);
+			if (item->UsagePage() == HID_USAGE_PAGE_LED) {
+				foundOutputReport = true;
+				break;
+			}
+		}
+
+		if (foundOutputReport)
+			break;
+	}
+
+	return new(std::nothrow) KeyboardDevice(input,
+		foundOutputReport ? output : NULL);
+}
+
+
 status_t
 KeyboardDevice::Open(uint32 flags)
 {
-	status_t status = HIDDevice::Open(flags);
+	status_t status = ProtocolHandler::Open(flags);
 	if (status != B_OK) {
 		TRACE_ALWAYS("keyboard device failed to open: %s\n",
 			strerror(status));
@@ -95,7 +200,6 @@ KeyboardDevice::Open(uint32 flags)
 
 	fCurrentRepeatDelay = B_INFINITE_TIMEOUT;
 	fCurrentRepeatKey = 0;
-
 	return B_OK;
 }
 
@@ -107,30 +211,15 @@ KeyboardDevice::Control(uint32 op, void *buffer, size_t length)
 		case KB_READ:
 		{
 			bigtime_t enterTime = system_time();
-			while (_RingBufferReadable() == 0) {
-				if (!_IsTransferUnprocessed()) {
-					status_t result = _ScheduleTransfer();
-					if (result != B_OK)
-						return result;
-				}
-
-				// NOTE: this thread is now blocking until the semaphore is
-				// released from the callback function or the repeat timeout
-				// expires
-				status_t result = acquire_sem_etc(fTransferNotifySem, 1,
-					B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT, fCurrentRepeatDelay);
-				if (result == B_OK) {
-					result = _InterpretBuffer();
-					_SetTransferProcessed();
-					if (result != B_OK)
-						return result;
-				} else if (result != B_TIMED_OUT)
+			while (RingBufferReadable() == 0) {
+				status_t result = _ReadReport(fCurrentRepeatDelay);
+				if (result != B_OK && result != B_TIMED_OUT)
 					return result;
 
-				if (!IsOpen())
+				if (!Device()->IsOpen())
 					return B_ERROR;
 
-				if (_RingBufferReadable() == 0 && fCurrentRepeatKey != 0
+				if (RingBufferReadable() == 0 && fCurrentRepeatKey != 0
 					&& system_time() - enterTime > fCurrentRepeatDelay) {
 					// this case is for handling key repeats, it means no
 					// interrupt transfer has happened or it didn't produce any
@@ -146,7 +235,7 @@ KeyboardDevice::Control(uint32 op, void *buffer, size_t length)
 			// process what is in the ring_buffer, it could be written
 			// there because we handled an interrupt transfer or because
 			// we wrote the current repeat key
-			return _RingBufferRead(buffer, sizeof(raw_key_info));
+			return RingBufferRead(buffer, sizeof(raw_key_info));
 		}
 
 		case KB_SET_LEDS:
@@ -203,50 +292,72 @@ KeyboardDevice::_WriteKey(uint32 key, bool down)
 	info.be_keycode = key;
 	info.is_keydown = down;
 	info.timestamp = system_time();
-
-	_RingBufferWrite(&info, sizeof(raw_key_info));
+	RingBufferWrite(&info, sizeof(raw_key_info));
 }
 
 
 status_t
 KeyboardDevice::_SetLEDs(uint8 *data)
 {
-	if (IsRemoved())
+	if (fOutputReport == NULL || fOutputReport->Device()->IsRemoved())
 		return B_ERROR;
 
-	uint8 leds = 0;
-	if (data[0] == 1)
-		leds |= (1 << 0);
-	if (data[1] == 1)
-		leds |= (1 << 1);
-	if (data[2] == 1)
-		leds |= (1 << 2);
+	for (uint32 i = 0; i < MAX_LEDS; i++) {
+		if (fLEDs[i] == NULL)
+			continue;
 
-	size_t actualLength;
-	return gUSBModule->send_request(fDevice,
-		USB_REQTYPE_INTERFACE_OUT | USB_REQTYPE_CLASS,
-		USB_REQUEST_HID_SET_REPORT,
-		0x200 | 0 /* TODO: report id */, fInterfaceIndex,
-		sizeof(leds), &leds, &actualLength);
+		fLEDs[i]->SetData(data[i]);
+	}
+
+	return fOutputReport->SendReport();
 }
 
 
 status_t
-KeyboardDevice::_InterpretBuffer()
+KeyboardDevice::_ReadReport(bigtime_t timeout)
 {
-	if (fTransferStatus != B_OK) {
-		if (IsRemoved())
+	status_t result = fInputReport->WaitForReport(timeout);
+	if (result != B_OK) {
+		if (fInputReport->Device()->IsRemoved()) {
+			TRACE("device has been removed\n");
 			return B_ERROR;
+		}
 
-		if (fTransferStatus == B_DEV_STALLED
-			&& gUSBModule->clear_feature(fInterruptPipe,
-				USB_FEATURE_ENDPOINT_HALT) != B_OK)
-			return B_ERROR;
-
+		TRACE_ALWAYS("error waiting for report: %s\n", strerror(result));
+		// signal that we simply want to try again
 		return B_OK;
 	}
 
-	const static uint32 kModifierTable[] = {
+	TRACE("got keyboard input report\n");
+
+	uint8 modifiers = 0;
+	for (uint32 i = 0; i < fModifierCount; i++) {
+		HIDReportItem *modifier = fModifiers[i];
+		if (modifier == NULL)
+			break;
+
+		if (modifier->Extract() == B_OK && modifier->Valid()) {
+			modifiers |= (modifier->Data() & 1)
+				<< (modifier->UsageID() - HID_USAGE_ID_LEFT_CONTROL);
+		}
+	}
+
+	for (uint32 i = 0; i < fKeyCount; i++) {
+		HIDReportItem *key = fKeys[i];
+		if (key == NULL)
+			break;
+
+		if (key->Extract() == B_OK && key->Valid()) {
+			// note that if there are ever more than 8 bit usage ids
+			// we need to change all these key arrays to use bugger sizes
+			fCurrentKeys[i] = key->Data();
+		} else
+			fCurrentKeys[i] = 0;
+	}
+
+	fInputReport->DoneProcessing();
+
+	static const uint32 kModifierTable[] = {
 		KEY_ControlL,
 		KEY_ShiftL,
 		KEY_AltL,
@@ -257,7 +368,16 @@ KeyboardDevice::_InterpretBuffer()
 		KEY_WinR
 	};
 
-	const static uint32 kKeyTable[] = {
+	// find modifier changes and push them into the buffer
+	uint8 modifierChange = fLastModifiers ^ modifiers;
+	for (uint8 i = 0; modifierChange; i++, modifierChange >>= 1) {
+		if (modifierChange & 1)
+			_WriteKey(kModifierTable[i], (modifiers >> i) & 1);
+	}
+
+	fLastModifiers = modifiers;
+
+	static const uint32 kKeyTable[] = {
 		0x00,	// ERROR
 		0x00,	// ERROR
 		0x00,	// ERROR
@@ -400,18 +520,12 @@ KeyboardDevice::_InterpretBuffer()
 		0x6c,	// Muhenkan, key left to spacebar, japanese
 	};
 
-	const static size_t kKeyTableSize
+	static const size_t kKeyTableSize
 		= sizeof(kKeyTable) / sizeof(kKeyTable[0]);
 
-	uint8 modifierChange = fLastTransferBuffer[0] ^ fTransferBuffer[0];
-	for (uint8 i = 0; modifierChange; i++, modifierChange >>= 1) {
-		if (modifierChange & 1)
-			_WriteKey(kModifierTable[i], (fTransferBuffer[0] >> i) & 1);
-	}
-
 	bool phantomState = true;
-	for (size_t i = 2; i < fTotalReportSize; i++) {
-		if (fTransferBuffer[i] != 0x01) {
+	for (size_t i = 0; i < fKeyCount; i++) {
+		if (fCurrentKeys[i] != 0x01) {
 			phantomState = false;
 			break;
 		}
@@ -428,15 +542,15 @@ KeyboardDevice::_InterpretBuffer()
 	static bool sysReqPressed = false;
 
 	bool keyDown = false;
-	uint8 *current = fLastTransferBuffer;
-	uint8 *compare = fTransferBuffer;
+	uint8 *current = fLastKeys;
+	uint8 *compare = fCurrentKeys;
 	for (int32 twice = 0; twice < 2; twice++) {
-		for (size_t i = 2; i < fTotalReportSize; i++) {
+		for (size_t i = 0; i < fKeyCount; i++) {
 			if (current[i] == 0x00 || current[i] == 0x01)
 				continue;
 
 			bool found = false;
-			for (size_t j = 2; j < fTotalReportSize; j++) {
+			for (size_t j = 0; j < fKeyCount; j++) {
 				if (compare[j] == current[i]) {
 					found = true;
 					break;
@@ -451,17 +565,18 @@ KeyboardDevice::_InterpretBuffer()
 			if (current[i] < kKeyTableSize)
 				key = kKeyTable[current[i]];
 
-			if (key == KEY_Pause && (current[0] & ALT_KEYS) != 0)
+			if (key == KEY_Pause && (modifiers & ALT_KEYS) != 0)
 				key = KEY_Break;
-			else if (key == 0xe && (current[0] & ALT_KEYS) != 0) {
+			else if (key == 0xe && (modifiers & ALT_KEYS) != 0) {
 				key = KEY_SysRq;
 				sysReqPressed = keyDown;
 			} else if (sysReqPressed && keyDown
-				&& current[i] >= 4 && current[i] <= 30
-				&& (fLastTransferBuffer[0] & ALT_KEYS) != 0) {
+				&& current[i] >= 4 && current[i] <= 29
+				&& (fLastModifiers & ALT_KEYS) != 0) {
 				// Alt-SysReq+letter was pressed
-				sDebugKeyboardPipe = fInterruptPipe;
-				sDebugKeyboardReportSize = fTotalReportSize;
+				sDebugKeyboardPipe = fInputReport->Device()->InterruptPipe();
+				sDebugKeyboardReportSize
+					= fInputReport->Parser()->MaxReportSize();
 
 				char letter = current[i] - 4 + 'a';
 
@@ -490,11 +605,11 @@ KeyboardDevice::_InterpretBuffer()
 			}
 		}
 
-		current = fTransferBuffer;
-		compare = fLastTransferBuffer;
+		current = fCurrentKeys;
+		compare = fLastKeys;
 		keyDown = true;
 	}
 
-	memcpy(fLastTransferBuffer, fTransferBuffer, fTotalReportSize);
+	memcpy(fLastKeys, fCurrentKeys, fKeyCount);
 	return B_OK;
 }

@@ -1,78 +1,44 @@
 /*
-	Driver for USB Human Interface Devices.
-	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
+	Copyright (C) 2008-2009 Michael Lotz <mmlr@mlotz.ch>
 	Distributed under the terms of the MIT license.
 */
 #include "Driver.h"
 #include "HIDDevice.h"
+#include "HIDReport.h"
+#include "ProtocolHandler.h"
+
 #include <usb/USB_hid.h>
+
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <new>
 
-// includes for the different device types
-#include "KeyboardDevice.h"
-#include "MouseDevice.h"
 
-
-HIDDevice::HIDDevice(usb_device device, usb_pipe interruptPipe,
-	size_t interfaceIndex, report_insn *instructions, size_t instructionCount,
-	size_t totalReportSize, size_t ringBufferSize)
+HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
+	size_t interfaceIndex)
 	:	fStatus(B_NO_INIT),
 		fDevice(device),
-		fInterruptPipe(interruptPipe),
 		fInterfaceIndex(interfaceIndex),
-		fInstructions(instructions),
-		fInstructionCount(instructionCount),
-		fTotalReportSize(totalReportSize),
-		fTransferUnprocessed(false),
-		fTransferStatus(B_ERROR),
-		fTransferActualLength(0),
+		fTransferScheduled(0),
+		fTransferBufferSize(0),
 		fTransferBuffer(NULL),
-		fTransferNotifySem(-1),
-		fName(NULL),
 		fParentCookie(-1),
-		fOpen(false),
+		fOpenCount(0),
 		fRemoved(false),
-		fRingBuffer(NULL)
-{
-	if (ringBufferSize > 0)
-		fRingBuffer = create_ring_buffer(ringBufferSize);
-
-	fTransferBuffer = (uint8 *)malloc(fTotalReportSize);
-	if (fTransferBuffer == NULL) {
-		fStatus = B_NO_MEMORY;
-		return;
-	}
-
-	fStatus = B_OK;
-}
-
-
-HIDDevice::~HIDDevice()
-{
-	if (fRingBuffer) {
-		delete_ring_buffer(fRingBuffer);
-		fRingBuffer = NULL;
-	}
-
-	if (fTransferNotifySem >= 0)
-		delete_sem(fTransferNotifySem);
-
-	free(fTransferBuffer);
-	free(fName);
-}
-
-
-HIDDevice *
-HIDDevice::MakeHIDDevice(usb_device device,
-	const usb_configuration_info *config, size_t interfaceIndex)
+		fParser(this),
+		fProtocolHandlerCount(0),
+		fProtocolHandlers(NULL)
 {
 	// read HID descriptor
 	size_t descriptorLength = sizeof(usb_hid_descriptor);
-	usb_hid_descriptor *hidDescriptor = (usb_hid_descriptor *)malloc(descriptorLength);
-	if (hidDescriptor == NULL)
-		return NULL;
+	usb_hid_descriptor *hidDescriptor
+		= (usb_hid_descriptor *)malloc(descriptorLength);
+	if (hidDescriptor == NULL) {
+		TRACE_ALWAYS("failed to allocate buffer for hid descriptor\n");
+		fStatus = B_NO_MEMORY;
+		return;
+	}
 
 	status_t result = gUSBModule->send_request(device,
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
@@ -80,7 +46,8 @@ HIDDevice::MakeHIDDevice(usb_device device,
 		USB_HID_DESCRIPTOR_HID << 8, interfaceIndex, descriptorLength,
 		hidDescriptor, &descriptorLength);
 
-	TRACE("get_hid_desc: result: 0x%08lx; length: %lu\n", result, descriptorLength);
+	TRACE("get hid descriptor: result: 0x%08lx; length: %lu\n", result,
+		descriptorLength);
 	if (result == B_OK)
 		descriptorLength = hidDescriptor->descriptor_info[0].descriptor_length;
 	else
@@ -88,8 +55,11 @@ HIDDevice::MakeHIDDevice(usb_device device,
 	free(hidDescriptor);
 
 	uint8 *reportDescriptor = (uint8 *)malloc(descriptorLength);
-	if (reportDescriptor == NULL)
-		return NULL;
+	if (reportDescriptor == NULL) {
+		TRACE_ALWAYS("failed to allocate buffer for report descriptor\n");
+		fStatus = B_NO_MEMORY;
+		return;
+	}
 
 	result = gUSBModule->send_request(device,
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
@@ -97,10 +67,12 @@ HIDDevice::MakeHIDDevice(usb_device device,
 		USB_HID_DESCRIPTOR_REPORT << 8, interfaceIndex, descriptorLength,
 		reportDescriptor, &descriptorLength);
 
-	TRACE("get_hid_rep_desc: result: 0x%08lx; length: %lu\n", result, descriptorLength);
+	TRACE("get report descriptor: result: 0x%08lx; length: %lu\n", result,
+		descriptorLength);
 	if (result != B_OK) {
+		TRACE_ALWAYS("failed tot get report descriptor\n");
 		free(reportDescriptor);
-		return NULL;
+		return;
 	}
 
 #if 1
@@ -118,100 +90,57 @@ HIDDevice::MakeHIDDevice(usb_device device,
 	}
 #endif
 
-	// decompose report descriptor
-	size_t itemCount = descriptorLength;
-	decomp_item *items = (decomp_item *)malloc(sizeof(decomp_item) * itemCount);
-	if (items == NULL) {
-		free(reportDescriptor);
-		return NULL;
-	}
-
-	decompose_report_descriptor(reportDescriptor, descriptorLength, items,
-		&itemCount);
-	uint32 deviceType = *(uint32 *)reportDescriptor;
+	result = fParser.ParseReportDescriptor(reportDescriptor, descriptorLength);
 	free(reportDescriptor);
-
-	// parse report descriptor
-	size_t instructionCount = itemCount;
-	report_insn *instructions
-		= (report_insn *)malloc(sizeof(report_insn) * instructionCount);
-	if (instructions == NULL) {
-		free(items);
-		return NULL;
+	if (result != B_OK) {
+		TRACE_ALWAYS("parsing the report descriptor failed\n");
+		fStatus = result;
+		return;
 	}
-
-	int firstReportID = 0;
-	size_t totalReportSize = 0;
-	parse_report_descriptor(items, itemCount, instructions,
-		&instructionCount, &totalReportSize, &firstReportID);
-	free(items);
-
-	report_insn *finalInstructions = (report_insn *)realloc(instructions,
-		sizeof(report_insn) * instructionCount);
-	if (finalInstructions == NULL) {
-		free(instructions);
-		return NULL;
-	}
-
-	TRACE("%lu items, %lu instructions, %lu bytes\n", itemCount,
-		instructionCount, totalReportSize);
 
 	// find the interrupt in pipe
-	usb_pipe interruptPipe = 0;
 	usb_interface_info *interface = config->interface[interfaceIndex].active;
 	for (size_t i = 0; i < interface->endpoint_count; i++) {
 		usb_endpoint_descriptor *descriptor = interface->endpoint[i].descr;
 		if ((descriptor->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)
-			&& (descriptor->attributes & USB_ENDPOINT_ATTR_MASK) == USB_ENDPOINT_ATTR_INTERRUPT) {
-			interruptPipe = interface->endpoint[i].handle;
+			&& (descriptor->attributes & USB_ENDPOINT_ATTR_MASK)
+				== USB_ENDPOINT_ATTR_INTERRUPT) {
+			fInterruptPipe = interface->endpoint[i].handle;
 			break;
 		}
 	}
 
-	if (interruptPipe == 0) {
+	if (fInterruptPipe == 0) {
 		TRACE_ALWAYS("didn't find a suitable interrupt pipe\n");
-		free(finalInstructions);
-		return NULL;
+		return;
 	}
 
-	// determine device type and create the device object
-	HIDDevice *hidDevice = NULL;
-	if (deviceType == USB_HID_DEVICE_TYPE_KEYBOARD) {
-		hidDevice = new(std::nothrow) KeyboardDevice(device, interruptPipe,
-			interfaceIndex, finalInstructions, instructionCount,
-			totalReportSize);
-	} else if (deviceType == USB_HID_DEVICE_TYPE_MOUSE) {
-		hidDevice = new(std::nothrow) MouseDevice(device, interruptPipe,
-			interfaceIndex, finalInstructions, instructionCount,
-			totalReportSize);
-	} else
-		TRACE_ALWAYS("unsupported device type 0x%08lx\n", deviceType);
+	fTransferBufferSize = fParser.MaxReportSize();
+	if (fTransferBufferSize == 0) {
+		TRACE_ALWAYS("report claims a report size of 0\n");
+		return;
+	}
 
-	if (hidDevice == NULL)
-		free(finalInstructions);
-	return hidDevice;
+	fTransferBuffer = (uint8 *)malloc(fTransferBufferSize);
+	if (fTransferBuffer == NULL) {
+		TRACE_ALWAYS("failed to allocate transfer buffer\n");
+		fStatus = B_NO_MEMORY;
+		return;
+	}
+
+	ProtocolHandler::AddHandlers(this, &fProtocolHandlers,
+		&fProtocolHandlerCount);
+	fStatus = B_OK;
 }
 
 
-void
-HIDDevice::SetBaseName(const char *baseName)
+HIDDevice::~HIDDevice()
 {
-	// As devices can be un- and replugged at will, we cannot simply rely on
-	// a device count. If there is just one keyboard, this does not mean that
-	// it uses the 0 name. There might have been two keyboards and the one
-	// using 0 might have been unplugged. So we just generate names until we
-	// find one that is not currently in use.
-	int32 index = 0;
-	char nameBuffer[128];
-	while (true) {
-		sprintf(nameBuffer, "%s%ld", baseName, index++);
-		if (gDeviceList->FindDevice(nameBuffer) == NULL) {
-			// this name is still free, use it
-			free(fName);
-			fName = strdup(nameBuffer);
-			return;
-		}
-	}
+	for (uint32 i = 0; i < fProtocolHandlerCount; i++)
+		delete fProtocolHandlers[i];
+
+	free(fProtocolHandlers);
+	free(fTransferBuffer);
 }
 
 
@@ -223,68 +152,18 @@ HIDDevice::SetParentCookie(int32 cookie)
 
 
 status_t
-HIDDevice::Open(uint32 flags)
+HIDDevice::Open(ProtocolHandler *handler, uint32 flags)
 {
-	if (fOpen)
-		return B_BUSY;
-
-	if (fTransferNotifySem < 0) {
-		fTransferNotifySem = create_sem(0, "hid device transfer notify sem");
-		if (fTransferNotifySem < 0)
-			return (status_t)fTransferNotifySem;
-	}
-
-	fOpen = true;
-
+	atomic_add(&fOpenCount, 1);
 	return B_OK;
 }
 
 
 status_t
-HIDDevice::Close()
+HIDDevice::Close(ProtocolHandler *handler)
 {
-	fOpen = false;
-	// make threads waiting for a transfer bail out
-	if (fTransferNotifySem >= 0) {
-		gUSBModule->cancel_queued_transfers(fInterruptPipe);
-		delete_sem(fTransferNotifySem);
-		fTransferNotifySem = -1;
-		_SetTransferProcessed();
-	}
+	atomic_add(&fOpenCount, -1);
 	return B_OK;
-}
-
-
-status_t
-HIDDevice::Free()
-{
-	return B_OK;
-}
-
-
-status_t
-HIDDevice::Read(uint8 *buffer, size_t *numBytes)
-{
-	TRACE_ALWAYS("read on hid device\n");
-	*numBytes = 0;
-	return B_ERROR;
-}
-
-
-status_t
-HIDDevice::Write(const uint8 *buffer, size_t *numBytes)
-{
-	TRACE_ALWAYS("write on hid device\n");
-	*numBytes = 0;
-	return B_ERROR;
-}
-
-
-status_t
-HIDDevice::Control(uint32 op, void *buffer, size_t length)
-{
-	TRACE_ALWAYS("control on base class\n");
-	return B_ERROR;
 }
 
 
@@ -296,62 +175,46 @@ HIDDevice::Removed()
 }
 
 
-void
-HIDDevice::_SetTransferProcessed()
-{
-	fTransferUnprocessed = false;
-}
-
-
-bool
-HIDDevice::_IsTransferUnprocessed()
-{
-	return fTransferUnprocessed;
-}
-
-
 status_t
-HIDDevice::_ScheduleTransfer()
+HIDDevice::MaybeScheduleTransfer()
 {
-	if (fTransferNotifySem < 0)
-		return B_ERROR;
-	if (fTransferUnprocessed)
-		return B_BUSY;
 	if (fRemoved)
 		return B_ERROR;
 
+	if (atomic_set(&fTransferScheduled, 1) != 0) {
+		// someone else already caused a transfer to be scheduled
+		return B_OK;
+	}
+
+	TRACE("scheduling interrupt transfer of %lu bytes\n", fTransferBufferSize);
 	status_t result = gUSBModule->queue_interrupt(fInterruptPipe,
-		fTransferBuffer, fTotalReportSize, _TransferCallback, this);
-	if (result < B_OK) {
+		fTransferBuffer, fTransferBufferSize, _TransferCallback, this);
+	if (result != B_OK) {
 		TRACE_ALWAYS("failed to schedule interrupt transfer 0x%08lx\n", result);
 		return result;
 	}
 
-	fTransferUnprocessed = true;
-	return B_OK;
-}
-
-
-int32
-HIDDevice::_RingBufferReadable()
-{
-	return ring_buffer_readable(fRingBuffer);
-}
-
-
-status_t
-HIDDevice::_RingBufferRead(void *buffer, size_t length)
-{
-	ring_buffer_user_read(fRingBuffer, (uint8 *)buffer, length);
 	return B_OK;
 }
 
 
 status_t
-HIDDevice::_RingBufferWrite(const void *buffer, size_t length)
+HIDDevice::SendReport(HIDReport *report)
 {
-	ring_buffer_write(fRingBuffer, (const uint8 *)buffer, length);
-	return B_OK;
+	size_t actualLength;
+	return gUSBModule->send_request(fDevice,
+		USB_REQTYPE_INTERFACE_OUT | USB_REQTYPE_CLASS,
+		USB_REQUEST_HID_SET_REPORT, 0x200 | report->ID(), fInterfaceIndex,
+		report->ReportSize(), report->CurrentReport(), &actualLength);
+}
+
+
+ProtocolHandler *
+HIDDevice::ProtocolHandlerAt(uint32 index)
+{
+	if (index >= fProtocolHandlerCount)
+		return NULL;
+	return fProtocolHandlers[index];
 }
 
 
@@ -360,7 +223,12 @@ HIDDevice::_TransferCallback(void *cookie, status_t status, void *data,
 	size_t actualLength)
 {
 	HIDDevice *device = (HIDDevice *)cookie;
-	device->fTransferStatus = status;
-	device->fTransferActualLength = actualLength;
-	release_sem_etc(device->fTransferNotifySem, 1, B_DO_NOT_RESCHEDULE);
+	if (status == B_DEV_STALLED && !device->fRemoved) {
+		// try clearing stalls right away, the report listeners will resubmit
+		gUSBModule->clear_feature(device->fInterruptPipe,
+			USB_FEATURE_ENDPOINT_HALT);
+	}
+
+	atomic_set(&device->fTransferScheduled, 0);
+	device->fParser.SetReport(status, device->fTransferBuffer, actualLength);
 }

@@ -39,6 +39,15 @@ HIDReportItem::UsagePage()
 }
 
 
+uint16
+HIDReportItem::UsageID()
+{
+	usage_value value;
+	value.u.extended = fUsageMinimum;
+	return value.u.s.usage_id;
+}
+
+
 status_t
 HIDReportItem::Extract()
 {
@@ -64,6 +73,40 @@ HIDReportItem::Extract()
 		fValid = fData >= fMinimum && fData <= fMaximum;
 
 	return B_OK;
+}
+
+
+status_t
+HIDReportItem::Insert()
+{
+	uint8 *report = fReport->CurrentReport();
+	if (report == NULL)
+		return B_NO_INIT;
+
+	uint32 value;
+	memcpy(&value, report + fByteOffset, sizeof(uint32));
+	value &= ~(fMask << fShift);
+
+	if (fValid)
+		value |= (fData & fMask) << fShift;
+
+	memcpy(report + fByteOffset, &value, sizeof(uint32));
+	return B_OK;
+}
+
+
+status_t
+HIDReportItem::SetData(uint32 data)
+{
+	fData = data;
+
+	if (Signed()) {
+		fValid = (int32)fData >= (int32)fMinimum
+			&& (int32)fData <= (int32)fMaximum;
+	} else
+		fValid = fData >= fMinimum && fData <= fMaximum;
+
+	return fValid ? B_OK : B_BAD_VALUE;
 }
 
 

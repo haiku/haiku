@@ -21,9 +21,6 @@
 #define USB_DEFAULT_CONFIGURATION		0
 #define USB_VENDOR_WACOM				0x056a
 
-#define USB_HID_DEVICE_TYPE_KEYBOARD	0x06090105
-#define USB_HID_DEVICE_TYPE_MOUSE		0x02090105
-
 extern usb_module_info *gUSBModule;
 extern DeviceList *gDeviceList;
 

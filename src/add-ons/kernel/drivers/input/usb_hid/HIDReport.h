@@ -39,8 +39,11 @@ public:
 									size_t length);
 		uint8 *					CurrentReport() { return fCurrentReport; };
 
+		status_t				SendReport();
+
 		uint32					CountItems() { return fItemsUsed; };
 		HIDReportItem *			ItemAt(uint32 index);
+		HIDReportItem *			FindItem(uint16 usagePage, uint16 usageID);
 
 		status_t				WaitForReport(bigtime_t timeout);
 		void					DoneProcessing();

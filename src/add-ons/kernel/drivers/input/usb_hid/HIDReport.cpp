@@ -158,6 +158,33 @@ HIDReport::SetReport(status_t status, uint8 *report, size_t length)
 }
 
 
+status_t
+HIDReport::SendReport()
+{
+	size_t reportSize = ReportSize();
+	uint8 *report = (uint8 *)malloc(reportSize);
+	if (report == NULL)
+		return B_NO_MEMORY;
+
+	fCurrentReport = report;
+	memset(fCurrentReport, 0, reportSize);
+
+	for (uint32 i = 0; i < fItemsUsed; i++) {
+		HIDReportItem *item = fItems[i];
+		if (item == NULL)
+			continue;
+
+		item->Insert();
+	}
+
+	status_t result = fParser->Device()->SendReport(this);
+
+	fCurrentReport = NULL;
+	free(report);
+	return result;
+}
+
+
 HIDReportItem *
 HIDReport::ItemAt(uint32 index)
 {
@@ -167,13 +194,25 @@ HIDReport::ItemAt(uint32 index)
 }
 
 
+HIDReportItem *
+HIDReport::FindItem(uint16 usagePage, uint16 usageID)
+{
+	for (uint32 i = 0; i < fItemsUsed; i++) {
+		if (fItems[i]->UsagePage() == usagePage
+			&& fItems[i]->UsageID() == usageID)
+			return fItems[i];
+	}
+
+	return NULL;
+}
+
+
 status_t
 HIDReport::WaitForReport(bigtime_t timeout)
 {
-	while (atomic_or(&fBusyCount, 0) != 0)
+	while (atomic_get(&fBusyCount) != 0)
 		snooze(1000);
 
-#ifndef TEST_MODE
 	ConditionVariableEntry conditionVariableEntry;
 	fConditionVariable.Add(&conditionVariableEntry);
 	status_t result = fParser->Device()->MaybeScheduleTransfer();
@@ -182,14 +221,13 @@ HIDReport::WaitForReport(bigtime_t timeout)
 		return result;
 	}
 
-	result = conditionVariableEntry.Wait(B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT,
-		timeout);
+	result = conditionVariableEntry.Wait(B_RELATIVE_TIMEOUT, timeout);
+	TRACE("waiting for report returned with result: %s\n", strerror(result));
 	if (result != B_OK)
 		return result;
 
 	if (fReportStatus != B_OK)
 		return fReportStatus;
-#endif
 
 	atomic_add(&fBusyCount, 1);
 	return B_OK;

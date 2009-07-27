@@ -1,22 +1,18 @@
 /*
 	Driver for USB Human Interface Devices.
-	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
+	Copyright (C) 2008-2009 Michael Lotz <mmlr@mlotz.ch>
 	Distributed under the terms of the MIT license.
-
-	Some parts of the code are based on the previous usb_hid driver which
-	was written by  Jérôme Duval.
  */
+
 #include "DeviceList.h"
 #include "Driver.h"
 #include "HIDDevice.h"
+#include "ProtocolHandler.h"
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#include <lock.h> // for mutex
-#else
-#include "BeOSCompatibility.h" // for pseudo mutex
-#endif
-
+#include <lock.h>
 #include <new>
+#include <stdio.h>
+#include <string.h>
 
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
@@ -74,17 +70,43 @@ usb_hid_device_added(usb_device device, void **cookie)
 			i, interfaceClass, interfaceSubclass,
 			interface->descr->interface_protocol);
 
-		if (interfaceClass == USB_INTERFACE_CLASS_HID
-			&& interfaceSubclass == USB_INTERFACE_SUBCLASS_HID_BOOT) {
+		if (interfaceClass == USB_INTERFACE_CLASS_HID) {
 			mutex_lock(&sDriverLock);
-			HIDDevice *hidDevice = HIDDevice::MakeHIDDevice(device, config, i);
+			HIDDevice *hidDevice
+				= new(std::nothrow) HIDDevice(device, config, i);
 
 			if (hidDevice != NULL && hidDevice->InitCheck() == B_OK) {
 				hidDevice->SetParentCookie(parentCookie);
-				gDeviceList->AddDevice(hidDevice->Name(), hidDevice);
-				devicesFound = true;
+
+				for (uint32 i = 0;; i++) {
+					ProtocolHandler *handler = hidDevice->ProtocolHandlerAt(i);
+					if (handler == NULL)
+						break;
+
+					// As devices can be un- and replugged at will, we cannot
+					// simply rely on a device count. If there is just one
+					// keyboard, this does not mean that it uses the 0 name.
+					// There might have been two keyboards and the one using 0
+					// might have been unplugged. So we just generate names
+					// until we find one that is not currently in use.
+					int32 index = 0;
+					char pathBuffer[128];
+					const char *basePath = handler->BasePath();
+					while (true) {
+						sprintf(pathBuffer, "%s%ld", basePath, index++);
+						if (gDeviceList->FindDevice(pathBuffer) == NULL) {
+							// this name is still free, use it
+							handler->SetPublishPath(strdup(pathBuffer));
+							break;
+						}
+					}
+
+					gDeviceList->AddDevice(handler->PublishPath(), handler);
+					devicesFound = true;
+				}
 			} else
 				delete hidDevice;
+
 			mutex_unlock(&sDriverLock);
 		}
 	}
@@ -105,21 +127,32 @@ usb_hid_device_removed(void *cookie)
 	TRACE("device_removed(%ld)\n", parentCookie);
 
 	for (int32 i = 0; i < gDeviceList->CountDevices(); i++) {
-		HIDDevice *device = (HIDDevice *)gDeviceList->DeviceAt(i);
-		if (!device)
+		ProtocolHandler *handler = (ProtocolHandler *)gDeviceList->DeviceAt(i);
+		if (!handler)
 			continue;
 
-		if (device->ParentCookie() == parentCookie) {
-			// this device belongs to the one removed
-			if (device->IsOpen()) {
-				// the device will be deleted upon being freed
-				device->Removed();
-			} else {
-				// remove the device and start over
-				gDeviceList->RemoveDevice(NULL, device);
-				i = -1;
-			}
+		HIDDevice *device = handler->Device();
+		if (device->ParentCookie() != parentCookie)
+			continue;
+
+		// this handler's device belongs to the one removed
+		if (device->IsOpen()) {
+			// the device and it's handlers will be deleted in the free hook
+			device->Removed();
+			break;
 		}
+
+		// remove all the handlers
+		for (uint32 i = 0;; i++) {
+			handler = device->ProtocolHandlerAt(i);
+			if (handler == NULL)
+				break;
+
+			gDeviceList->RemoveDevice(NULL, handler);
+		}
+
+		delete device;
+		break;
 	}
 
 	mutex_unlock(&sDriverLock);
@@ -136,14 +169,14 @@ usb_hid_open(const char *name, uint32 flags, void **cookie)
 	TRACE("open(%s, %lu, %p)\n", name, flags, cookie);
 	mutex_lock(&sDriverLock);
 
-	HIDDevice *device = (HIDDevice *)gDeviceList->FindDevice(name);
-	if (device == NULL) {
+	ProtocolHandler *handler = (ProtocolHandler *)gDeviceList->FindDevice(name);
+	if (handler == NULL) {
 		mutex_unlock(&sDriverLock);
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	status_t result = device->Open(flags);
-	*cookie = device;
+	status_t result = handler->Open(flags);
+	*cookie = handler;
 	mutex_unlock(&sDriverLock);
 	return result;
 }
@@ -152,9 +185,9 @@ usb_hid_open(const char *name, uint32 flags, void **cookie)
 static status_t
 usb_hid_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 {
-	TRACE("read(%p, %Ld, %p, %lu)\n", cookie, position, buffer, *numBytes);
-	HIDDevice *device = (HIDDevice *)cookie;
-	return device->Read((uint8 *)buffer, numBytes);
+	TRACE_ALWAYS("read on hid device\n");
+	*numBytes = 0;
+	return B_ERROR;
 }
 
 
@@ -162,9 +195,9 @@ static status_t
 usb_hid_write(void *cookie, off_t position, const void *buffer,
 	size_t *numBytes)
 {
-	TRACE("write(%p, %Ld, %p, %lu)\n", cookie, position, buffer, *numBytes);
-	HIDDevice *device = (HIDDevice *)cookie;
-	return device->Write((const uint8 *)buffer, numBytes);
+	TRACE_ALWAYS("write on hid device\n");
+	*numBytes = 0;
+	return B_ERROR;
 }
 
 
@@ -172,8 +205,8 @@ static status_t
 usb_hid_control(void *cookie, uint32 op, void *buffer, size_t length)
 {
 	TRACE("control(%p, %lu, %p, %lu)\n", cookie, op, buffer, length);
-	HIDDevice *device = (HIDDevice *)cookie;
-	return device->Control(op, buffer, length);
+	ProtocolHandler *handler = (ProtocolHandler *)cookie;
+	return handler->Control(op, buffer, length);
 }
 
 
@@ -181,8 +214,8 @@ static status_t
 usb_hid_close(void *cookie)
 {
 	TRACE("close(%p)\n", cookie);
-	HIDDevice *device = (HIDDevice *)cookie;
-	return device->Close();
+	ProtocolHandler *handler = (ProtocolHandler *)cookie;
+	return handler->Close();
 }
 
 
@@ -190,18 +223,27 @@ static status_t
 usb_hid_free(void *cookie)
 {
 	TRACE("free(%p)\n", cookie);
-	HIDDevice *device = (HIDDevice *)cookie;
 	mutex_lock(&sDriverLock);
-	status_t status = device->Free();
-	if (device->IsRemoved() 
-		&& gDeviceList->RemoveDevice(NULL, device) == B_OK) {
-		// the device is removed already but as it was open the removed hook
-		// has not deleted the object
+
+	HIDDevice *device = ((ProtocolHandler *)cookie)->Device();
+	if (device->IsOpen()) {
+		// another handler of this device is still open so we can't free it
+	} else if (device->IsRemoved()) {
+		// the parent device is removed already and none of its handlers are
+		// open anymore so we can free it here
+		for (uint32 i = 0;; i++) {
+			ProtocolHandler *handler = device->ProtocolHandlerAt(i);
+			if (handler == NULL)
+				break;
+
+			gDeviceList->RemoveDevice(NULL, handler);
+		}
+
 		delete device;
 	}
 
 	mutex_unlock(&sDriverLock);
-	return status;
+	return B_OK;
 }
 
 

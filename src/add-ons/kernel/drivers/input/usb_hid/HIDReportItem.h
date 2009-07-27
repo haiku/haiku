@@ -23,12 +23,18 @@ public:
 		bool					Signed() { return fMinimum > fMaximum; };
 
 		uint16					UsagePage();
+		uint16					UsageID();
+
 		uint32					UsageMinimum() { return fUsageMinimum; };
 		uint32					UsageMaximum() { return fUsageMaximum; };
 
 		status_t				Extract();
-		bool					Valid() { return fValid; };
+		status_t				Insert();
+
+		status_t				SetData(uint32 data);
 		uint32					Data() { return fData; };
+
+		bool					Valid() { return fValid; };
 
 		void					PrintToStream(uint32 indentLevel = 0);
 private:

@@ -1,22 +1,25 @@
 /*
-	Driver for USB Human Interface Devices.
-	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
+	Copyright (C) 2008-2009 Michael Lotz <mmlr@mlotz.ch>
 	Distributed under the terms of the MIT license.
 */
-#ifndef _USB_KEYBOARD_DEVICE_H_
-#define _USB_KEYBOARD_DEVICE_H_
+#ifndef USB_KEYBOARD_DEVICE_H
+#define USB_KEYBOARD_DEVICE_H
 
-#include "HIDDevice.h"
+#include "ProtocolHandler.h"
 
-class KeyboardDevice : public HIDDevice {
+#define MAX_MODIFIERS	16
+#define MAX_KEYS		16
+#define MAX_LEDS		3
+
+class HIDReportItem;
+
+class KeyboardDevice : public ProtocolHandler {
 public:
-								KeyboardDevice(usb_device device,
-									usb_pipe interruptPipe,
-									size_t interfaceIndex,
-									report_insn *instructions,
-									size_t instructionCount,
-									size_t totalReportSize);
+								KeyboardDevice(HIDReport *inputReport,
+									HIDReport *outputReport);
 virtual							~KeyboardDevice();
+
+static	ProtocolHandler *		AddHandler(HIDDevice *device);
 
 virtual	status_t				Open(uint32 flags);
 virtual	status_t				Control(uint32 op, void *buffer, size_t length);
@@ -24,14 +27,26 @@ virtual	status_t				Control(uint32 op, void *buffer, size_t length);
 private:
 		void					_WriteKey(uint32 key, bool down);
 		status_t				_SetLEDs(uint8 *data);
-		status_t				_InterpretBuffer();
+		status_t				_ReadReport(bigtime_t timeout);
+
+		HIDReport *				fInputReport;
+		HIDReport *				fOutputReport;
+
+		HIDReportItem *			fModifiers[MAX_MODIFIERS];
+		HIDReportItem *			fKeys[MAX_KEYS];
+		HIDReportItem *			fLEDs[MAX_LEDS];
 
 		bigtime_t				fRepeatDelay;
 		bigtime_t				fRepeatRate;
 		bigtime_t				fCurrentRepeatDelay;
 		uint32					fCurrentRepeatKey;
 
-		uint8 *					fLastTransferBuffer;
+		uint32					fKeyCount;
+		uint32					fModifierCount;
+
+		uint8					fLastModifiers;
+		uint8 *					fCurrentKeys;
+		uint8 *					fLastKeys;
 };
 
-#endif // _USB_KEYBOARD_DEVICE_H_
+#endif // USB_KEYBOARD_DEVICE_H
