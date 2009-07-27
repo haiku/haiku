@@ -62,6 +62,7 @@
 	// handling of this message into BApplication
 
 #define _MINIMIZE_			'_WMZ'
+#define _ZOOM_				'_WZO'
 #define _SWITCH_WORKSPACE_	'_SWS'
 
 
@@ -855,12 +856,16 @@ BWindow::DispatchMessage(BMessage* msg, BHandler* target)
 			break;
 
 		case _MINIMIZE_:
-		{
 			// Used by the minimize shortcut
 			if ((Flags() & B_NOT_MINIMIZABLE) == 0)
 				Minimize(true);
 			break;
-		}
+
+		case _ZOOM_:
+			// Used by the zoom shortcut
+			if ((Flags() & B_NOT_ZOOMABLE) == 0)
+				Zoom();
+			break;
 
 		case _SWITCH_WORKSPACE_:
 		{
@@ -2613,7 +2618,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	AddShortcut('M', B_COMMAND_KEY | B_CONTROL_KEY,
 		new BMessage(_MINIMIZE_), NULL);
 	AddShortcut('Z', B_COMMAND_KEY | B_CONTROL_KEY,
-		new BMessage(B_ZOOM), NULL);
+		new BMessage(_ZOOM_), NULL);
 	AddShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY,
 		new BMessage(B_HIDE_APPLICATION), NULL);
 
