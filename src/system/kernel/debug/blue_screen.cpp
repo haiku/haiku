@@ -49,6 +49,7 @@ struct screen_info {
 	bool	reverse_attr;
 	int32	in_command_rows;
 	bool	paging;
+	bool	paging_timeout;
 	bool	boot_debug_output;
 	bool	ignore_output;
 
@@ -121,37 +122,43 @@ next_line(void)
 	if (sScreen.paging && ((sScreen.in_command_rows > 0
 			&& ((sScreen.in_command_rows + 3) % sScreen.rows) == 0)
 		|| (sScreen.boot_debug_output && sScreen.y == sScreen.rows - 1))) {
-		// Use the paging mechanism: either, we're in the debugger, and a
-		// command is being executed, or we're currently showing boot debug
-		// output
-		const char *text = in_command_invocation()
-			? "Press key to continue, Q to quit, S to skip output"
-			: "Press key to continue, S to skip output, P to disable paging";
-		int32 length = strlen(text);
-		if (sScreen.x + length > sScreen.columns) {
-			// make sure we don't overwrite too much
-			text = "P";
-			length = 1;
+		if (sScreen.paging_timeout)
+			spin(1000 * 1000 * 3);
+		else {
+			// Use the paging mechanism: either, we're in the debugger, and a
+			// command is being executed, or we're currently showing boot debug
+			// output
+			const char *text = in_command_invocation()
+				? "Press key to continue, Q to quit, S to skip output"
+				: "Press key to continue, S to skip output, P to disable paging";
+			int32 length = strlen(text);
+			if (sScreen.x + length > sScreen.columns) {
+				// make sure we don't overwrite too much
+				text = "P";
+				length = 1;
+			}
+
+			for (int32 i = 0; i < length; i++) {
+				// yellow on black (or reverse, during boot)
+				sModule->put_glyph(sScreen.columns - length + i, sScreen.y,
+					text[i], sScreen.boot_debug_output ? 0x6f : 0xf6);
+			}
+
+			char c = kgetc();
+			if (c == 's') {
+				sScreen.ignore_output = true;
+			} else if (c == 'q' && in_command_invocation()) {
+				abortCommand = true;
+				sScreen.ignore_output = true;
+			} else if (c == 'p' && !in_command_invocation())
+				sScreen.paging = false;
+			else if (c == 't' && !in_command_invocation())
+				sScreen.paging_timeout = true;
+
+			// remove on screen text again
+			sModule->fill_glyph(sScreen.columns - length, sScreen.y, length,
+				1, ' ', sScreen.attr);
 		}
-
-		for (int32 i = 0; i < length; i++) {
-			// yellow on black (or reverse, during boot)
-			sModule->put_glyph(sScreen.columns - length + i, sScreen.y,
-				text[i], sScreen.boot_debug_output ? 0x6f : 0xf6);
-		}
-
-		char c = kgetc();
-		if (c == 's') {
-			sScreen.ignore_output = true;
-		} else if (c == 'q' && in_command_invocation()) {
-			abortCommand = true;
-			sScreen.ignore_output = true;
-		} else if (c == 'p' && !in_command_invocation())
-			sScreen.paging = false;
-
-		// remove on screen text again
-		sModule->fill_glyph(sScreen.columns - length, sScreen.y, length,
-			1, ' ', sScreen.attr);
 	}
 	if (sScreen.y == sScreen.rows - 1) {
 		sScreen.y = 0;
@@ -580,6 +587,7 @@ blue_screen_init(void)
 
 	sModule = &gFrameBufferConsoleModule;
 	sScreen.paging = true;
+	sScreen.paging_timeout = false;
 
 	add_debugger_command("paging", set_paging, "Enable or disable paging");
 	return B_OK;
