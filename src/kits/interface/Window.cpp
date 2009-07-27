@@ -61,6 +61,9 @@
 	// if we ever move this to a public namespace, we should also move the
 	// handling of this message into BApplication
 
+#define _MINIMIZE_ '_WMZ'
+
+
 void do_minimize_team(BRect zoomRect, team_id team, bool zoom);
 
 
@@ -289,7 +292,8 @@ BWindow::Shortcut::PrepareKey(uint32 key)
 
 BWindow::BWindow(BRect frame, const char* title, window_type type,
 		uint32 flags, uint32 workspace)
-	: BLooper(title, B_DISPLAY_PRIORITY)
+	:
+	BLooper(title, B_DISPLAY_PRIORITY)
 {
 	window_look look;
 	window_feel feel;
@@ -301,14 +305,16 @@ BWindow::BWindow(BRect frame, const char* title, window_type type,
 
 BWindow::BWindow(BRect frame, const char* title, window_look look,
 		window_feel feel, uint32 flags, uint32 workspace)
-	: BLooper(title, B_DISPLAY_PRIORITY)
+	:
+	BLooper(title, B_DISPLAY_PRIORITY)
 {
 	_InitData(frame, title, look, feel, flags, workspace);
 }
 
 
 BWindow::BWindow(BMessage* data)
-	: BLooper(data)
+	:
+	BLooper(data)
 {
 	data->FindRect("_frame", &fFrame);
 
@@ -359,7 +365,8 @@ BWindow::BWindow(BMessage* data)
 
 
 BWindow::BWindow(BRect frame, int32 bitmapToken)
-	: BLooper("offscreen bitmap")
+	:
+	BLooper("offscreen bitmap")
 {
 	// TODO: Implement for real
 	_DecomposeType(B_UNTYPED_WINDOW, &fLook, &fFeel);
@@ -845,6 +852,14 @@ BWindow::DispatchMessage(BMessage* msg, BHandler* target)
 		case B_ZOOM:
 			Zoom();
 			break;
+
+		case _MINIMIZE_:
+		{
+			// Used by the minimize shortcut
+			if ((Flags() & B_NOT_MINIMIZABLE) == 0)
+				Minimize(true);
+			break;
+		}
 
 		case B_MINIMIZE:
 		{
@@ -2554,7 +2569,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 
 	// Window modifier keys
 	AddShortcut('M', B_COMMAND_KEY | B_CONTROL_KEY,
-		new BMessage(B_MINIMIZE), NULL);
+		new BMessage(_MINIMIZE_), NULL);
 	AddShortcut('Z', B_COMMAND_KEY | B_CONTROL_KEY,
 		new BMessage(B_ZOOM), NULL);
 	AddShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY,
