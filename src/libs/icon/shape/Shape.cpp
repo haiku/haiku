@@ -275,7 +275,7 @@ Shape::MakePropertyObject() const
 	if (!object)
 		return NULL;
 
-	object->AddProperty(new BoolProperty(PROPERTY_HINTING, fHinting));
+//	object->AddProperty(new BoolProperty(PROPERTY_HINTING, fHinting));
 
 	object->AddProperty(new FloatProperty(PROPERTY_MIN_VISIBILITY_SCALE,
 										  fMinVisibilityScale, 0, 4));
@@ -294,7 +294,7 @@ Shape::SetToPropertyObject(const PropertyObject* object)
 	IconObject::SetToPropertyObject(object);
 
 	// hinting
-	SetHinting(object->Value(PROPERTY_HINTING, fHinting));
+//	SetHinting(object->Value(PROPERTY_HINTING, fHinting));
 
 	// min visibility scale
 	SetMinVisibilityScale(object->Value(PROPERTY_MIN_VISIBILITY_SCALE,
