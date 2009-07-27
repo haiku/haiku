@@ -285,7 +285,7 @@ dump_page(heap_page *page)
 	for (addr_t *temp = page->free_list; temp != NULL; temp = (addr_t *)*temp)
 		count++;
 
-	dprintf("\t\tpage %p: bin_index: %u; free_count: %u; empty_index: %u; "
+	kprintf("\t\tpage %p: bin_index: %u; free_count: %u; empty_index: %u; "
 		"free_list %p (%lu entr%s)\n", page, page->bin_index, page->free_count,
 		page->empty_index, page->free_list, count, count == 1 ? "y" : "ies");
 }
@@ -294,7 +294,7 @@ dump_page(heap_page *page)
 static void
 dump_bin(heap_bin *bin)
 {
-	dprintf("\telement_size: %lu; max_free_count: %u; page_list %p;\n",
+	kprintf("\telement_size: %lu; max_free_count: %u; page_list %p;\n",
 		bin->element_size, bin->max_free_count, bin->page_list);
 
 	for (heap_page *temp = bin->page_list; temp != NULL; temp = temp->next)
@@ -307,7 +307,7 @@ dump_bin_list(heap_allocator *heap)
 {
 	for (uint32 i = 0; i < heap->bin_count; i++)
 		dump_bin(&heap->bins[i]);
-	dprintf("\n");
+	kprintf("\n");
 }
 
 
@@ -316,21 +316,21 @@ dump_allocator_areas(heap_allocator *heap)
 {
 	heap_area *area = heap->all_areas;
 	while (area) {
-		dprintf("\tarea %p: area: %ld; base: 0x%08lx; size: %lu; page_count: "
+		kprintf("\tarea %p: area: %ld; base: 0x%08lx; size: %lu; page_count: "
 			"%lu; free_pages: %p (%lu entr%s)\n", area, area->area, area->base,
 			area->size, area->page_count, area->free_pages,
 			area->free_page_count, area->free_page_count == 1 ? "y" : "ies");
 		area = area->all_next;
 	}
 
-	dprintf("\n");
+	kprintf("\n");
 }
 
 
 static void
 dump_allocator(heap_allocator *heap, bool areas, bool bins)
 {
-	dprintf("allocator %p: name: %s; page_size: %lu; bin_count: %lu; pages: "
+	kprintf("allocator %p: name: %s; page_size: %lu; bin_count: %lu; pages: "
 		"%lu; free_pages: %lu; empty_areas: %lu\n", heap, heap->name,
 		heap->page_size, heap->bin_count, heap->total_pages,
 		heap->total_free_pages, heap->empty_areas);
@@ -350,7 +350,7 @@ dump_heap_list(int argc, char **argv)
 
 		if (strcmp(argv[1], "grow") == 0) {
 			// only dump dedicated grow heap info
-			dprintf("dedicated grow heap:\n");
+			kprintf("dedicated grow heap:\n");
 			dump_allocator(sGrowHeap, true, true);
 		} else if (strcmp(argv[1], "stats") == 0) {
 			for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
@@ -370,7 +370,104 @@ dump_heap_list(int argc, char **argv)
 }
 
 
-#if KERNEL_HEAP_LEAK_CHECK
+#if !KERNEL_HEAP_LEAK_CHECK
+
+static int
+dump_allocations(int argc, char **argv)
+{
+	uint64 heapAddress = 0;
+	bool statsOnly = false;
+	for (int32 i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "stats") == 0)
+			statsOnly = true;
+		else if (!evaluate_debug_expression(argv[i], &heapAddress, true)) {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	}
+
+	size_t totalSize = 0;
+	uint32 totalCount = 0;
+	for (uint32 classIndex = 0; classIndex < HEAP_CLASS_COUNT; classIndex++) {
+		heap_allocator *heap = sHeaps[classIndex];
+		if (heapAddress != 0)
+			heap = (heap_allocator *)(addr_t)heapAddress;
+
+		// go through all the pages in all the areas
+		heap_area *area = heap->all_areas;
+		while (area) {
+			for (uint32 i = 0; i < area->page_count; i++) {
+				heap_page *page = &area->page_table[i];
+				if (!page->in_use)
+					continue;
+
+				addr_t base = area->base + i * heap->page_size;
+				if (page->bin_index < heap->bin_count) {
+					// page is used by a small allocation bin
+					uint32 elementCount = page->empty_index;
+					size_t elementSize
+						= heap->bins[page->bin_index].element_size;
+					for (uint32 j = 0; j < elementCount;
+							j++, base += elementSize) {
+						// walk the free list to see if this element is in use
+						bool elementInUse = true;
+						for (addr_t *temp = page->free_list; temp != NULL;
+								temp = (addr_t *)*temp) {
+							if ((addr_t)temp == base) {
+								elementInUse = false;
+								break;
+							}
+						}
+
+						if (!elementInUse)
+							continue;
+
+						if (!statsOnly) {
+							kprintf("address: 0x%08lx; size: %lu bytes\n",
+								base, elementSize);
+						}
+
+						totalSize += elementSize;
+						totalCount++;
+					}
+				} else {
+					// page is used by a big allocation, find the page count
+					uint32 pageCount = 1;
+					while (i + pageCount < area->page_count
+						&& area->page_table[i + pageCount].in_use
+						&& area->page_table[i + pageCount].bin_index
+							== heap->bin_count
+						&& area->page_table[i + pageCount].allocation_id
+							== page->allocation_id)
+						pageCount++;
+
+					size_t size = pageCount * heap->page_size;
+
+					if (!statsOnly) {
+						kprintf("address: 0x%08lx; size: %lu bytes\n", base,
+							size);
+					}
+
+					totalSize += size;
+					totalCount++;
+
+					// skip the allocated pages
+					i += pageCount - 1;
+				}
+			}
+
+			area = area->all_next;
+		}
+
+		if (heapAddress != 0)
+			break;
+	}
+
+	kprintf("total allocations: %lu; total bytes: %lu\n", totalCount, totalSize);
+	return 0;
+}
+
+#else // !KERNEL_HEAP_LEAK_CHECK
 
 static int
 dump_allocations(int argc, char **argv)
@@ -437,7 +534,7 @@ dump_allocations(int argc, char **argv)
 							&& (caller == 0 || info->caller == caller)) {
 							// interesting...
 							if (!statsOnly) {
-								dprintf("team: % 6ld; thread: % 6ld; "
+								kprintf("team: % 6ld; thread: % 6ld; "
 									"address: 0x%08lx; size: %lu bytes; "
 									"caller: %#lx\n", info->team, info->thread,
 									base, info->size, info->caller);
@@ -466,7 +563,7 @@ dump_allocations(int argc, char **argv)
 						&& (caller == 0 || info->caller == caller)) {
 						// interesting...
 						if (!statsOnly) {
-							dprintf("team: % 6ld; thread: % 6ld;"
+							kprintf("team: % 6ld; thread: % 6ld;"
 								" address: 0x%08lx; size: %lu bytes;"
 								" caller: %#lx\n", info->team, info->thread,
 								base, info->size, info->caller);
@@ -485,7 +582,7 @@ dump_allocations(int argc, char **argv)
 		}
 	}
 
-	dprintf("total allocations: %lu; total bytes: %lu\n", totalCount, totalSize);
+	kprintf("total allocations: %lu; total bytes: %lu\n", totalCount, totalSize);
 	return 0;
 }
 
@@ -1738,9 +1835,18 @@ heap_init(addr_t base, size_t size)
 		"given as the argument, currently only the heap count is printed.\n"
 		"If <heap> is given, it is interpreted as the address of the heap to\n"
 		"print infos about.\n", 0);
-#if KERNEL_HEAP_LEAK_CHECK
+#if !KERNEL_HEAP_LEAK_CHECK
 	add_debugger_command_etc("allocations", &dump_allocations,
-		"Dump current allocations",
+		"Dump current heap allocations",
+		"[\"stats\"] [<heap>]\n"
+		"If no parameters are given, all current alloactions are dumped.\n"
+		"If the optional argument \"stats\" is specified, only the allocation\n"
+		"counts and no individual allocations are printed\n"
+		"If a specific heap address is given, only allocations of this\n"
+		"allocator are dumped\n", 0);
+#else // !KERNEL_HEAP_LEAK_CHECK
+	add_debugger_command_etc("allocations", &dump_allocations,
+		"Dump current heap allocations",
 		"[(\"team\" | \"thread\") <id>] [ \"caller\" <address> ] [\"stats\"]\n"
 		"If no parameters are given, all current alloactions are dumped.\n"
 		"If \"team\", \"thread\", and/or \"caller\" is specified as the first\n"
@@ -1750,13 +1856,13 @@ heap_init(addr_t base, size_t size)
 		"counts and no individual allocations are printed\n", 0);
 	add_debugger_command_etc("allocations_per_caller",
 		&dump_allocations_per_caller,
-		"Dump current allocations summed up per caller",
+		"Dump current heap allocations summed up per caller",
 		"[ \"-c\" ] [ -h <heap> ]\n"
 		"The current allocations will by summed up by caller (their count and\n"
 		"size) printed in decreasing order by size or, if \"-c\" is\n"
 		"specified, by allocation count. If given <heap> specifies the\n"
 		"address of the heap for which to print the allocations.\n", 0);
-#endif
+#endif // KERNEL_HEAP_LEAK_CHECK
 	return B_OK;
 }
 
