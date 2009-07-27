@@ -755,6 +755,9 @@ Window::EnableUpdateRequests()
 // #pragma mark -
 
 
+static const bigtime_t kWindowActivationTimeout = 500000LL;
+
+
 void
 Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 {
@@ -957,7 +960,7 @@ Window::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 		fActivateOnMouseUp = false;
 		// on R5, there is a time window for this feature
 		// ie, click and press too long, nothing will happen
-		if (system_time() - fLastMoveTime < 500000)
+		if (system_time() - fLastMoveTime < kWindowActivationTimeout)
 			fDesktop->ActivateWindow(this);
 	}
 
@@ -1007,7 +1010,13 @@ Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 			// the then current mouse position
 			return;
 		}
-		fLastMoveTime = now;
+		if (fActivateOnMouseUp) {
+			if (now - fLastMoveTime >= kWindowActivationTimeout) {
+				// This click is too long already for window activation.
+				fActivateOnMouseUp = false;
+			}
+		} else
+			fLastMoveTime = now;
 	}
 
 	if (fDecorator) {
@@ -1039,6 +1048,20 @@ Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 	// item being changed (border during resizing, tab during
 	// sliding...) stays fixed when the mouse is moved so that
 	// changes are taking effect again.
+
+	// If the window was moved enough, it doesn't come to
+	// the front in FFM mode when the mouse is released.
+	if (fActivateOnMouseUp) {
+		fMouseMoveDistance += delta.x * delta.x + delta.y * delta.y;
+		if (fMouseMoveDistance > 16.0f)
+			fActivateOnMouseUp = false;
+		else
+			delta = B_ORIGIN;
+	}
+
+	// NOTE: fLastMousePosition is currently only
+	// used for window moving/resizing/sliding the tab
+	fLastMousePosition += delta;
 
 	// moving
 	if (fIsDragging) {
@@ -1078,18 +1101,6 @@ Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 			delta.y = 0;
 		else
 			delta = BPoint(0, 0);
-	}
-
-	// NOTE: fLastMousePosition is currently only
-	// used for window moving/resizing/sliding the tab
-	fLastMousePosition += delta;
-
-	// If the window was moved enough, it doesn't come to
-	// the front in FFM mode when the mouse is released.
-	if (fActivateOnMouseUp) {
-		fMouseMoveDistance += sqrtf(delta.x * delta.x + delta.y * delta.y);
-		if (fMouseMoveDistance > 4.0f)
-			fActivateOnMouseUp = false;
 	}
 
 	// change focus in FFM mode
