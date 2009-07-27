@@ -66,9 +66,6 @@ public:
 	virtual bool Visit(BPartition* partition, int32 level);
 
 private:
-	void _MakeLabel(BPartition* partition, char* label, char* menuLabel,
-		bool showContentType);
-
 	BMenu* fMenu;
 };
 
@@ -463,6 +460,32 @@ WorkerThread::_SetStatusMessage(const char *status)
 }
 
 
+static void
+make_partition_label(BPartition* partition, char* label, char* menuLabel,
+	bool showContentType)
+{
+	char size[15];
+	SizeAsString(partition->ContentSize(), size);
+
+	BPath path;
+	partition->GetPath(&path);
+
+	if (showContentType) {
+		const char* type = partition->ContentType();
+		if (type == NULL)
+			type = "Unknown Type";
+
+		sprintf(label, "%s - %s [%s] (%s)", partition->ContentName(), size,
+			path.Path(), type);
+	} else {
+		sprintf(label, "%s - %s [%s]", partition->ContentName(), size,
+			path.Path());
+	}
+
+	sprintf(menuLabel, "%s - %s", partition->ContentName(), size);
+}
+
+
 // #pragma mark - SourceVisitor
 
 
@@ -508,9 +531,11 @@ SourceVisitor::Visit(BPartition *partition, int32 level)
 	// from your BFS volume containing the music collection?
 	// TODO: Then the check for BFS could also be removed above.
 
-	PartitionMenuItem *item = new PartitionMenuItem(NULL,
-		partition->ContentName(), NULL, new BMessage(SRC_PARTITION),
-		partition->ID());
+	char label[255];
+	char menuLabel[255];
+	make_partition_label(partition, label, menuLabel, false);
+	PartitionMenuItem* item = new PartitionMenuItem(partition->ContentName(),
+		label, NULL, new BMessage(SRC_PARTITION), partition->ID());
 	item->SetMarked(isBootPartition);
 	fMenu->AddItem(item);
 	return false;
@@ -541,7 +566,8 @@ TargetVisitor::Visit(BPartition *partition, int32 level)
 	BPath path;
 	if (partition->GetPath(&path) == B_OK)
 		printf("TargetVisitor::Visit(BPartition *) : %s\n", path.Path());
-	printf("TargetVisitor::Visit(BPartition *) : %s\n", partition->ContentName());
+	printf("TargetVisitor::Visit(BPartition *) : %s\n",
+		partition->ContentName());
 
 	if (partition->ContentSize() < 20 * 1024 * 1024) {
 		// reject partitions which are too small anyway
@@ -565,8 +591,9 @@ TargetVisitor::Visit(BPartition *partition, int32 level)
 	bool isValidTarget = partition->ContentType() != NULL
 		&& strcmp(partition->ContentType(), kPartitionTypeBFS) == 0;
 
-	char label[255], menuLabel[255];
-	_MakeLabel(partition, label, menuLabel, !isValidTarget);
+	char label[255];
+	char menuLabel[255];
+	make_partition_label(partition, label, menuLabel, !isValidTarget);
 	PartitionMenuItem* item = new PartitionMenuItem(partition->ContentName(),
 		label, menuLabel, new BMessage(TARGET_PARTITION), partition->ID());
 
@@ -575,31 +602,5 @@ TargetVisitor::Visit(BPartition *partition, int32 level)
 
 	fMenu->AddItem(item);
 	return false;
-}
-
-
-void
-TargetVisitor::_MakeLabel(BPartition* partition, char* label, char* menuLabel,
-	bool showContentType)
-{
-	char size[15];
-	SizeAsString(partition->ContentSize(), size);
-
-	BPath path;
-	partition->GetPath(&path);
-
-	if (showContentType) {
-		const char* type = partition->ContentType();
-		if (type == NULL)
-			type = "Unknown Type";
-
-		sprintf(label, "%s - %s [%s] (%s)", partition->ContentName(), size,
-			path.Path(), type);
-	} else {
-		sprintf(label, "%s - %s [%s]", partition->ContentName(), size,
-			path.Path());
-	}
-
-	sprintf(menuLabel, "%s - %s", partition->ContentName(), size);
 }
 
