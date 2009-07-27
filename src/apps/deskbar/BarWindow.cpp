@@ -72,17 +72,20 @@ TBeMenu *TBarWindow::sBeMenu = NULL;
 
 
 TBarWindow::TBarWindow()
-	: BWindow(BRect(-1000.0f, -1000.0f, -1000.0f, -1000.0f), "Deskbar",
+	:
+	BWindow(BRect(-1000.0f, -1000.0f, -1000.0f, -1000.0f), "Deskbar",
 		B_BORDERED_WINDOW,
 		B_WILL_ACCEPT_FIRST_CLICK | B_NOT_ZOOMABLE | B_NOT_CLOSABLE
-			| B_NOT_MOVABLE | B_AVOID_FRONT | B_ASYNCHRONOUS_CONTROLS,
+			| B_NOT_MINIMIZABLE | B_NOT_MOVABLE | B_AVOID_FRONT
+			| B_ASYNCHRONOUS_CONTROLS,
 		B_ALL_WORKSPACES)
 {
 	desk_settings *settings = ((TBarApp *)be_app)->Settings();
-	if (settings->alwaysOnTop) 
+	if (settings->alwaysOnTop)
 		SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
-	fBarView = new TBarView(Bounds(), settings->vertical,settings->left, settings->top,
-		settings->ampmMode, settings->state, settings->width, settings->showTime);
+	fBarView = new TBarView(Bounds(), settings->vertical, settings->left,
+		settings->top, settings->ampmMode, settings->state, settings->width,
+		settings->showTime);
 	AddChild(fBarView);
 
 	RemoveShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY);
@@ -96,7 +99,7 @@ TBarWindow::DispatchMessage(BMessage *message, BHandler *handler)
 	// Activate the window when you click on it (ie. on the tray area,
 	// the menu part will do this automatically)
 	if (message->what == B_MOUSE_DOWN
-		&& !((TBarApp *)be_app)->Settings()->autoRaise) 
+		&& !((TBarApp *)be_app)->Settings()->autoRaise)
 		Activate(true);
 
 	BWindow::DispatchMessage(message, handler);
@@ -112,7 +115,7 @@ TBarWindow::MenusBeginning()
 	find_directory (B_USER_DESKBAR_DIRECTORY, &path);
 	get_ref_for_path(path.Path(), &ref);
 
-	BEntry entry(&ref, true);	
+	BEntry entry(&ref, true);
 	if (entry.InitCheck() == B_OK && entry.IsDirectory()) {
 		//	need the entry_ref to the actual item
 		entry.GetRef(&ref);
@@ -127,7 +130,7 @@ TBarWindow::MenusBeginning()
 			dir.CreateDirectory("be", &bedir);
 			if (bedir.GetEntry(&entry) == B_OK
 				&& entry.GetRef(&ref) == B_OK)
-				sBeMenu->SetNavDir(&ref);	
+				sBeMenu->SetNavDir(&ref);
 		}
 	} else {
 		//	this really should never happen
@@ -275,7 +278,7 @@ TBarWindow::BeMenu()
 }
 
 
-void 
+void
 TBarWindow::ShowBeMenu()
 {
 	BMenuBar *menuBar = fBarView->BarMenuBar();
@@ -289,7 +292,7 @@ TBarWindow::ShowBeMenu()
 }
 
 
-void 
+void
 TBarWindow::ShowTeamMenu()
 {
 	int32 index = 0;
@@ -449,7 +452,7 @@ TBarWindow::ItemInfo(BMessage *message)
 #if SHELF_AWARE
 			replyMsg.AddInt32("shelf", (int32)shelf);
 #endif
-		}	
+		}
 	} else if (message->FindString("name", &name) == B_OK) {
 		if (fBarView->ItemInfo(name, &id, &shelf) == B_OK) {
 			replyMsg.AddInt32("id", id);
@@ -476,13 +479,13 @@ TBarWindow::ItemExists(BMessage *message)
 #endif
 		shelf = B_DESKBAR_TRAY;
 
-	bool exists = false;	
-	if (message->FindInt32("id", &id) == B_OK) 
+	bool exists = false;
+	if (message->FindInt32("id", &id) == B_OK)
 		exists = fBarView->ItemExists(id, shelf);
-	else if (message->FindString("name", &name) == B_OK) 
+	else if (message->FindString("name", &name) == B_OK)
 		exists = fBarView->ItemExists(name, shelf);
 
-	replyMsg.AddBool("exists", exists);	
+	replyMsg.AddBool("exists", exists);
 	message->SendReply(&replyMsg);
 }
 
