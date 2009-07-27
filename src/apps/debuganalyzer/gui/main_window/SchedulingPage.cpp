@@ -39,3 +39,11 @@ MainWindow::SchedulingPage::SetModel(Model* model)
 	if (fModel != NULL) {
 	}
 }
+
+
+void
+MainWindow::SchedulingPage::TableRowInvoked(Table* table, int32 rowIndex)
+{
+	// TODO: ...
+}
+
