@@ -1,9 +1,6 @@
 /*
- * Copyright 2006-2007, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "PathManipulator.h"
@@ -528,7 +525,7 @@ PathManipulator::MouseDown(BPoint where)
 				_Select(fCurrentPathPoint, appendSelection);
 			}
 			fCanvasView->BeginRectTracking(BRect(where, where),
-										   B_TRACK_RECT_CORNER);
+				B_TRACK_RECT_CORNER);
 			break;
 		}
 	}
@@ -753,20 +750,32 @@ PathManipulator::DoubleClicked(BPoint where)
 bool
 PathManipulator::ShowContextMenu(BPoint where)
 {
+	// Change the selection to the current point if it isn't currently
+	// selected. This could will only be chosen if the user right-clicked
+	// a path point directly. 
+	if (fCurrentPathPoint >= 0 && !fSelection->Contains(fCurrentPathPoint)) {
+		fSelection->MakeEmpty();
+		_UpdateSelection();
+		*fOldSelection = *fSelection;
+		_Select(fCurrentPathPoint, false);
+	}
+
 	BPopUpMenu* menu = new BPopUpMenu("context menu", false, false);
 	BMessage* message;
 	BMenuItem* item;
 
 	bool hasSelection = fSelection->CountItems() > 0;
 
-	message = new BMessage(B_SELECT_ALL);
-	item = new BMenuItem("Select All", message, 'A');
-	menu->AddItem(item);
-
-	menu->AddSeparatorItem();
+	if (fCurrentPathPoint < 0) {
+		message = new BMessage(B_SELECT_ALL);
+		item = new BMenuItem("Select All", message, 'A');
+		menu->AddItem(item);
+	
+		menu->AddSeparatorItem();
+	}
 
 	message = new BMessage(MSG_TRANSFORM);
-	item = new BMenuItem("Transform", message);
+	item = new BMenuItem("Transform", message, 'T');
 	item->SetEnabled(hasSelection);
 	menu->AddItem(item);
 
@@ -781,7 +790,7 @@ PathManipulator::ShowContextMenu(BPoint where)
 	menu->AddItem(item);
 
 	message = new BMessage(MSG_REMOVE_POINTS);
-	item = new BMenuItem("Remove", message, 'A');
+	item = new BMenuItem("Remove", message);
 	item->SetEnabled(hasSelection);
 	menu->AddItem(item);
 
