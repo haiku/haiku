@@ -1,0 +1,45 @@
+SubDir HAIKU_TOP src system boot platform u-boot ;
+
+SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
+
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders [ FDirName graphics vesa ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+
+{
+	local defines = _BOOT_MODE ;
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) -Wall -Wno-multichar -g3 ;
+	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
+}
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
+
+KernelMergeObject boot_platform_u-boot.o :
+	start.S
+	start2.c
+	debug.c
+	console.cpp
+	serial.cpp
+	devices.cpp
+	keyboard.cpp
+	menu.cpp
+	cpu.cpp
+	video.cpp
+	mmu.cpp	
+	uart.c
+	# generic
+	text_menu.cpp
+
+
+	: -fno-pic
+;
+
+SEARCH on [ FGristFiles text_menu.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
+
+# Tell the build system to where stage1.bin can be found, so it can be used
+# elsewhere.
+SEARCH on stage1.bin = $(SUBDIR) ;
