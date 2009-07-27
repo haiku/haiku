@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -842,6 +842,30 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<int32>(&index);
 
 			fDesktop->SetWorkspace(index);
+			break;
+		}
+
+		case AS_GET_WORKSPACE_LAYOUT:
+		{
+			// TODO: this is taken from WorkspacesView::_GetGrid() - this is
+			// only a temporary solution
+			DesktopSettings settings(fDesktop);
+
+			int32 count = settings.WorkspacesCount();
+			int32 squareRoot = (int32)sqrt(count);
+
+			int32 rows = 1;
+			for (int32 i = 2; i <= squareRoot; i++) {
+				if (count % i == 0)
+					rows = i;
+			}
+
+			int32 columns = count / rows;
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<int32>(columns);
+			fLink.Attach<int32>(rows);
+			fLink.Flush();
 			break;
 		}
 

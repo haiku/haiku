@@ -61,7 +61,8 @@
 	// if we ever move this to a public namespace, we should also move the
 	// handling of this message into BApplication
 
-#define _MINIMIZE_ '_WMZ'
+#define _MINIMIZE_			'_WMZ'
+#define _SWITCH_WORKSPACE_	'_SWS'
 
 
 void do_minimize_team(BRect zoomRect, team_id team, bool zoom);
@@ -858,6 +859,47 @@ BWindow::DispatchMessage(BMessage* msg, BHandler* target)
 			// Used by the minimize shortcut
 			if ((Flags() & B_NOT_MINIMIZABLE) == 0)
 				Minimize(true);
+			break;
+		}
+
+		case _SWITCH_WORKSPACE_:
+		{
+			int32 deltaX = 0;
+			msg->FindInt32("delta_x", &deltaX);
+			int32 deltaY = 0;
+			msg->FindInt32("delta_y", &deltaY);
+
+			if (deltaX == 0 && deltaY == 0)
+				break;
+
+			BPrivate::AppServerLink link;
+			link.StartMessage(AS_GET_WORKSPACE_LAYOUT);
+
+			status_t status;
+			int32 columns;
+			int32 rows;
+			if (link.FlushWithReply(status) != B_OK || status != B_OK)
+				break;
+
+			link.Read<int32>(&columns);
+			link.Read<int32>(&rows);
+
+			int32 current = current_workspace();
+
+			int32 nextColumn = current % columns + deltaX;
+			int32 nextRow = current / columns + deltaY;
+			if (nextColumn >= columns)
+				nextColumn = columns - 1;
+			else if (nextColumn < 0)
+				nextColumn = 0;
+			if (nextRow >= rows)
+				nextRow = rows - 1;
+			else if (nextRow < 0)
+				nextRow = 0;
+
+			int32 next = nextColumn + nextRow * columns;
+			if (next != current)
+				activate_workspace(next);
 			break;
 		}
 
@@ -2574,6 +2616,23 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 		new BMessage(B_ZOOM), NULL);
 	AddShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY,
 		new BMessage(B_HIDE_APPLICATION), NULL);
+
+	// Workspace modifier keys
+	BMessage* message = new BMessage(_SWITCH_WORKSPACE_);
+	message->AddInt32("delta_x", -1);
+	AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY, message, NULL);
+
+	message = new BMessage(_SWITCH_WORKSPACE_);
+	message->AddInt32("delta_x", 1);
+	AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY, message, NULL);
+
+	message = new BMessage(_SWITCH_WORKSPACE_);
+	message->AddInt32("delta_y", -1);
+	AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_CONTROL_KEY, message, NULL);
+
+	message = new BMessage(_SWITCH_WORKSPACE_);
+	message->AddInt32("delta_y", 1);
+	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_CONTROL_KEY, message, NULL);
 
 	// We set the default pulse rate, but we don't start the pulse
 	fPulseRate = 500000;

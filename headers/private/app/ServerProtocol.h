@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -181,6 +181,7 @@ enum {
 	AS_SET_WORKSPACE_COUNT,
 	AS_CURRENT_WORKSPACE,
 	AS_ACTIVATE_WORKSPACE,
+	AS_GET_WORKSPACE_LAYOUT,
 	AS_GET_SCROLLBAR_INFO,
 	AS_SET_SCROLLBAR_INFO,
 	AS_GET_MENU_INFO,
