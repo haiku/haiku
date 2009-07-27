@@ -162,6 +162,7 @@ StdBinCommands
 # standard commands that need libbe.so, libdevice.so
 StdBinCommands
 	listusb.cpp
+	setusbconfig.cpp
 	: be libdevice.so : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbluetooth.so, due the Bluetooth Kit
