@@ -37,6 +37,34 @@ KernelMergeObject boot_platform_u-boot.o :
 	: -fno-pic
 ;
 
+# bootable flash image
+rule BuildUBootFlashImage image : haikuLoader : uboot_image {
+	Depends $(image) : $(haikuLoader) ;
+	#Depends $(image) : $(archive) ;
+	Depends $(image) : $(uboot_image) ;
+	LocalClean clean : $(image) ;
+	FLASH_IMAGE_BLOCK_SIZE on $(image) = 128k ;
+	FLASH_IMAGE_BLOCK_COUNT on $(image) = 256 ;
+	#FLASH_IMAGE_UBOOT_OFFSET on $(image) = 0 ;
+	FLASH_IMAGE_LOADER_OFFSET on $(image) = 248 ;
+	BuildUBootFlashImage1 $(image) : $(haikuLoader) $(uboot_image) ;
+}
+
+
+actions BuildUBootFlashImage1 {
+	echo "$(1)"
+	echo "$(2)"
+	$(RM) $(<)
+	# make an empty image
+	dd if=/dev/zero of=$(<) bs=$(FLASH_IMAGE_BLOCK_SIZE) count=$(FLASH_IMAGE_BLOCK_COUNT)
+	# add u-boot
+	dd if=$(>[2]) of=$(<) bs=$(FLASH_IMAGE_BLOCK_SIZE) conv=notrunc
+	# add haiku_loader
+	dd if=$(>[1]) of=$(<) bs=$(FLASH_IMAGE_BLOCK_SIZE) conv=notrunc seek=$(FLASH_IMAGE_LOADER_OFFSET)
+}
+
+BuildUBootFlashImage haiku_flash_image.bin : haiku_loader : $(UBOOT_IMAGE) ;
+
 SEARCH on [ FGristFiles text_menu.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
