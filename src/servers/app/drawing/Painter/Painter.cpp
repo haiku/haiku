@@ -2905,7 +2905,7 @@ Painter::_MakeGradient(const BGradient& gradient, int32 colorCount,
 		from = to;
 	}
 	//  make sure we fill the entire array
-	if (index < arraySize - 1) {
+	if (index < arraySize) {
 		int32 startIndex = max_c(index, 0);
 		uint8* c = (uint8*)&colors[startIndex];
 		for (int32 i = startIndex; i < arraySize; i++) {
