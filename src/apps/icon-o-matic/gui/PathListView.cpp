@@ -26,6 +26,7 @@
 #include "Observer.h"
 #include "RemovePathsCommand.h"
 #include "ReversePathCommand.h"
+#include "RotatePathIndicesCommand.h"
 #include "Shape.h"
 #include "ShapeContainer.h"
 #include "Selection.h"
@@ -231,19 +232,20 @@ class ShapePathListener : public PathContainerListener,
 // #pragma mark -
 
 enum {
-	MSG_ADD				= 'addp',
+	MSG_ADD					= 'addp',
 
-	MSG_ADD_RECT		= 'addr',
-	MSG_ADD_CIRCLE		= 'addc',
-	MSG_ADD_ARC			= 'adda',
+	MSG_ADD_RECT			= 'addr',
+	MSG_ADD_CIRCLE			= 'addc',
+	MSG_ADD_ARC				= 'adda',
 
-	MSG_DUPLICATE		= 'dupp',
+	MSG_DUPLICATE			= 'dupp',
 
-	MSG_REVERSE			= 'rvrs',
-	MSG_CLEAN_UP		= 'clup',
-	MSG_ROTATE_INDICES	= 'roti',
+	MSG_REVERSE				= 'rvrs',
+	MSG_CLEAN_UP			= 'clup',
+	MSG_ROTATE_INDICES_CW	= 'ricw',
+	MSG_ROTATE_INDICES_CCW	= 'ricc',
 
-	MSG_REMOVE			= 'remp',
+	MSG_REMOVE				= 'remp',
 };
 
 // constructor
@@ -347,7 +349,7 @@ PathListView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_ADD:
-			if (fCommandStack) {
+			if (fCommandStack != NULL) {
 				VectorPath* path;
 				AddPathsCommand* command;
 				new_path(fPathContainer, &path, &command);
@@ -356,11 +358,11 @@ PathListView::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_ADD_RECT:
-			if (fCommandStack) {
+			if (fCommandStack != NULL) {
 				VectorPath* path;
 				AddPathsCommand* command;
 				new_path(fPathContainer, &path, &command);
-				if (path) {
+				if (path != NULL) {
 					path->AddPoint(BPoint(16, 16));
 					path->AddPoint(BPoint(16, 48));
 					path->AddPoint(BPoint(48, 48));
@@ -373,11 +375,11 @@ PathListView::MessageReceived(BMessage* message)
 
 		case MSG_ADD_CIRCLE:
 			// TODO: ask for number of secions
-			if (fCommandStack) {
+			if (fCommandStack != NULL) {
 				VectorPath* path;
 				AddPathsCommand* command;
 				new_path(fPathContainer, &path, &command);
-				if (path) {
+				if (path != NULL) {
 					// add four control points defining a circle:
 					//   a 
 					// b   d
@@ -409,10 +411,10 @@ PathListView::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_DUPLICATE:
-			if (fCommandStack) {
+			if (fCommandStack != NULL) {
 				PathListItem* item = dynamic_cast<PathListItem*>(
 					ItemAt(CurrentSelection(0)));
-				if (!item)
+				if (item == NULL)
 					break;
 
 				VectorPath* path;
@@ -423,10 +425,10 @@ PathListView::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_REVERSE:
-			if (fCommandStack) {
+			if (fCommandStack != NULL) {
 				PathListItem* item = dynamic_cast<PathListItem*>(
 					ItemAt(CurrentSelection(0)));
-				if (!item)
+				if (item == NULL)
 					break;
 
 				ReversePathCommand* command
@@ -436,14 +438,29 @@ PathListView::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_CLEAN_UP:
-			if (fCommandStack) {
+			if (fCommandStack != NULL) {
 				PathListItem* item = dynamic_cast<PathListItem*>(
 					ItemAt(CurrentSelection(0)));
-				if (!item)
+				if (item == NULL)
 					break;
 
 				CleanUpPathCommand* command
 					= new (nothrow) CleanUpPathCommand(item->path);
+				fCommandStack->Perform(command);
+			}
+			break;
+
+		case MSG_ROTATE_INDICES_CW:
+		case MSG_ROTATE_INDICES_CCW:
+			if (fCommandStack != NULL) {
+				PathListItem* item = dynamic_cast<PathListItem*>(
+					ItemAt(CurrentSelection(0)));
+				if (item == NULL)
+					break;
+
+				RotatePathIndicesCommand* command
+					= new (nothrow) RotatePathIndicesCommand(item->path,
+					message->what == MSG_ROTATE_INDICES_CW);
 				fCommandStack->Perform(command);
 			}
 			break;
@@ -708,34 +725,39 @@ void
 PathListView::SetMenu(BMenu* menu)
 {
 	fMenu = menu;
-	if (!fMenu)
+	if (fMenu == NULL)
 		return;
 
 	fAddMI = new BMenuItem("Add", new BMessage(MSG_ADD));
 	fAddRectMI = new BMenuItem("Add Rect", new BMessage(MSG_ADD_RECT));
-	fAddCircleMI = new BMenuItem("Add Circle"B_UTF8_ELLIPSIS,
-								new BMessage(MSG_ADD_CIRCLE));
-	fAddArcMI = new BMenuItem("Add Arc"B_UTF8_ELLIPSIS,
-								new BMessage(MSG_ADD_ARC));
+	fAddCircleMI = new BMenuItem("Add Circle"/*B_UTF8_ELLIPSIS*/,
+		new BMessage(MSG_ADD_CIRCLE));
+//	fAddArcMI = new BMenuItem("Add Arc"B_UTF8_ELLIPSIS,
+//		new BMessage(MSG_ADD_ARC));
 	fDuplicateMI = new BMenuItem("Duplicate", new BMessage(MSG_DUPLICATE));
 	fReverseMI = new BMenuItem("Reverse", new BMessage(MSG_REVERSE));
 	fCleanUpMI = new BMenuItem("Clean Up", new BMessage(MSG_CLEAN_UP));
-	fRotateIndicesMI = new BMenuItem("Rotate Indices",
-								new BMessage(MSG_ROTATE_INDICES));
+	fRotateIndicesLeftMI = new BMenuItem("Rotate Indices Left",
+		new BMessage(MSG_ROTATE_INDICES_CW), 'R');
+	fRotateIndicesRightMI = new BMenuItem("Rotate Indices Right",
+		new BMessage(MSG_ROTATE_INDICES_CCW), 'R', B_SHIFT_KEY);
 	fRemoveMI = new BMenuItem("Remove", new BMessage(MSG_REMOVE));
 
 	fMenu->AddItem(fAddMI);
 	fMenu->AddItem(fAddRectMI);
 	fMenu->AddItem(fAddCircleMI);
-	fMenu->AddItem(fAddArcMI);
-fAddArcMI->SetEnabled(false);
+//	fMenu->AddItem(fAddArcMI);
 
 	fMenu->AddSeparatorItem();
 
 	fMenu->AddItem(fDuplicateMI);
 	fMenu->AddItem(fReverseMI);
 	fMenu->AddItem(fCleanUpMI);
-	fMenu->AddItem(fRotateIndicesMI);
+
+	fMenu->AddSeparatorItem();
+
+	fMenu->AddItem(fRotateIndicesLeftMI);
+	fMenu->AddItem(fRotateIndicesRightMI);
 
 	fMenu->AddSeparatorItem();
 

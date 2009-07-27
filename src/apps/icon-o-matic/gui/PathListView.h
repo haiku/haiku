@@ -95,7 +95,8 @@ class PathListView : public SimpleListView,
 			BMenuItem*			fDuplicateMI;
 			BMenuItem*			fReverseMI;
 			BMenuItem*			fCleanUpMI;
-			BMenuItem*			fRotateIndicesMI;
+			BMenuItem*			fRotateIndicesLeftMI;
+			BMenuItem*			fRotateIndicesRightMI;
 			BMenuItem*			fRemoveMI;
 
 			PathContainer*		fPathContainer;

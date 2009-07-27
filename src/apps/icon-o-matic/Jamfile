@@ -267,6 +267,7 @@ Application Icon-O-Matic :
 	RemoveShapesCommand.cpp
 	RemoveTransformersCommand.cpp
 	ReversePathCommand.cpp
+	RotatePathIndicesCommand.cpp
 	SplitPointsCommand.cpp
 	TransformPointsCommand.cpp
 	UnassignPathCommand.cpp
