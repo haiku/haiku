@@ -552,8 +552,12 @@ static status_t write_cached_block(block_cache* cache, cached_block* block,
 
 static DoublyLinkedList<block_cache> sCaches;
 static mutex sCachesLock = MUTEX_INITIALIZER("block caches");
+static mutex sCachesMemoryUseLock
+	= MUTEX_INITIALIZER("block caches memory use");
+static size_t sUsedMemory;
 static sem_id sEventSemaphore;
-static mutex sNotificationsLock = MUTEX_INITIALIZER("block cache notifications");
+static mutex sNotificationsLock
+	= MUTEX_INITIALIZER("block cache notifications");
 static thread_id sNotifierWriterThread;
 static DoublyLinkedListLink<block_cache> sMarkCache;
 	// TODO: this only works if the link is the first entry of block_cache
@@ -1916,12 +1920,17 @@ block_notifier_and_writer(void* /*data*/)
 		// write 64 blocks of each block_cache every two seconds
 		// TODO: change this once we have an I/O scheduler
 		timeout = kTimeout;
+		size_t usedMemory = 0;
 
 		block_cache* cache = NULL;
 		while ((cache = get_next_locked_block_cache(cache)) != NULL) {
 			const uint32 kMaxCount = 64;
 			cached_block* blocks[kMaxCount];
 			uint32 count = 0;
+
+			size_t cacheUsedMemory;
+			object_cache_get_usage(cache->buffer_cache, &cacheUsedMemory);
+			usedMemory += cacheUsedMemory;
 
 			if (cache->num_dirty_blocks) {
 				// This cache is not using transactions, we'll scan the blocks
@@ -1976,6 +1985,9 @@ block_notifier_and_writer(void* /*data*/)
 					break;
 			}
 		}
+
+		MutexLocker _(sCachesMemoryUseLock);
+		sUsedMemory = usedMemory;
 	}
 
 	// never can get here
@@ -2098,23 +2110,10 @@ block_cache_init(void)
 
 
 size_t
-block_cache_used_memory()
+block_cache_used_memory(void)
 {
-	size_t usedMemory = 0;
-
-	MutexLocker _(sCachesLock);
-
-	DoublyLinkedList<block_cache>::Iterator it = sCaches.GetIterator();
-	while (block_cache* cache = it.Next()) {
-		if (cache == (block_cache*)&sMarkCache)
-			continue;
-
-		size_t cacheUsedMemory;
-		object_cache_get_usage(cache->buffer_cache, &cacheUsedMemory);
-		usedMemory += cacheUsedMemory;
-	}
-
-	return usedMemory;
+	MutexLocker _(sCachesMemoryUseLock);
+	return sUsedMemory;
 }
 
 
