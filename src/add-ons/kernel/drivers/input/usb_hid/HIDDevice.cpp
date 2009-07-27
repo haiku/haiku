@@ -98,6 +98,11 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 		return;
 	}
 
+#if 0
+	for (uint32 i = 0; i < fParser.CountReports(HID_REPORT_TYPE_ANY); i++)
+		fParser.ReportAt(HID_REPORT_TYPE_ANY, i)->PrintToStream();
+#endif
+
 	// find the interrupt in pipe
 	usb_interface_info *interface = config->interface[interfaceIndex].active;
 	for (size_t i = 0; i < interface->endpoint_count; i++) {
