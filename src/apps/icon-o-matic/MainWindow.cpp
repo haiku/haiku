@@ -1005,7 +1005,7 @@ MainWindow::_CreateMenuBar(BRect frame)
 	fStyleMenu = new BMenu("Style");
 	fShapeMenu = new BMenu("Shape");
 	fTransformerMenu = new BMenu("Transformer");
-	fPropertyMenu = new BMenu("Property");
+	fPropertyMenu = new BMenu("Properties");
 	fSwatchMenu = new BMenu("Swatches");
 
 	menuBar->AddItem(fileMenu);
@@ -1014,39 +1014,31 @@ MainWindow::_CreateMenuBar(BRect frame)
 
 	// File
 	fileMenu->AddItem(new BMenuItem("New",
-									new BMessage(MSG_NEW),
-									'N'));
-	fileMenu->AddItem(new BMenuItem("Open",
-									new BMessage(MSG_OPEN),
-									'O'));
-	fileMenu->AddItem(new BMenuItem("Append",
-									new BMessage(MSG_APPEND),
-									'O', B_SHIFT_KEY));
+		new BMessage(MSG_NEW), 'N'));
+	fileMenu->AddItem(new BMenuItem("Open"B_UTF8_ELLIPSIS,
+		new BMessage(MSG_OPEN), 'O'));
+	fileMenu->AddItem(new BMenuItem("Append"B_UTF8_ELLIPSIS,
+		new BMessage(MSG_APPEND), 'O', B_SHIFT_KEY));
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem("Save",
-									new BMessage(MSG_SAVE),
-									'S'));
-	fileMenu->AddItem(new BMenuItem("Save As",
-									new BMessage(MSG_SAVE_AS),
-									'S', B_SHIFT_KEY));
+		new BMessage(MSG_SAVE), 'S'));
+	fileMenu->AddItem(new BMenuItem("Save As"B_UTF8_ELLIPSIS,
+		new BMessage(MSG_SAVE_AS), 'S', B_SHIFT_KEY));
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem("Export",
-									new BMessage(MSG_EXPORT),
-									'E'));
-	fileMenu->AddItem(new BMenuItem("Export As",
-									new BMessage(MSG_EXPORT_AS),
-									'E', B_SHIFT_KEY));
+		new BMessage(MSG_EXPORT), 'E'));
+	fileMenu->AddItem(new BMenuItem("Export As"B_UTF8_ELLIPSIS,
+		new BMessage(MSG_EXPORT_AS), 'E', B_SHIFT_KEY));
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem("Quit",
-									new BMessage(B_QUIT_REQUESTED),
-									'Q'));
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	fileMenu->SetTargetForItems(be_app);
 
 	// Edit
 	fUndoMI = new BMenuItem("<nothing to undo>",
-							new BMessage(MSG_UNDO), 'Z');
+		new BMessage(MSG_UNDO), 'Z');
 	fRedoMI = new BMenuItem("<nothing to redo>",
-							new BMessage(MSG_REDO), 'Z', B_SHIFT_KEY);
+		new BMessage(MSG_REDO), 'Z', B_SHIFT_KEY);
 
 	fUndoMI->SetEnabled(false);
 	fRedoMI->SetEnabled(false);
