@@ -690,10 +690,9 @@ Journal::_WriteTransactionToLog()
 				fVolume->BlockCache(), fTransactionID) < (int32)fLogSize) {
 			detached = true;
 		} else {
-			// TODO: what are our options here?
-			// a) abort the transaction - bad, because all changes are lost
-			// b) carry out the changes, but don't use the log - even worse,
-			//    as it potentially creates a corrupted disk.
+			// We created a transaction larger than one we can write back to
+			// disk - the only option we have (besides risking disk corruption
+			// by writing it back anyway), is to let it fail.
 			dprintf("transaction too large (%d blocks, %d main, log size %d)!\n",
 				(int)_TransactionSize(), (int)cache_blocks_in_main_transaction(
 				fVolume->BlockCache(), fTransactionID), (int)fLogSize);
@@ -959,15 +958,18 @@ Journal::Lock(Transaction* owner, bool separateSubTransactions)
 }
 
 
-void
+status_t
 Journal::Unlock(Transaction* owner, bool success)
 {
 	if (fSeparateSubTransactions || recursive_lock_get_recursion(&fLock) == 1) {
 		// we only end the transaction if we would really unlock it
 		// TODO: what about failing transactions that do not unlock?
 		// (they must make the parent fail, too)
-		if (fOwner != NULL)
-			_TransactionDone(success);
+		if (fOwner != NULL) {
+			status_t status = _TransactionDone(success);
+			if (status != B_OK)
+				return status;
+		}
 
 		fTimestamp = system_time();
 		fOwner = NULL;
@@ -978,6 +980,7 @@ Journal::Unlock(Transaction* owner, bool success)
 	}
 
 	recursive_lock_unlock(&fLock);
+	return B_OK;
 }
 
 
@@ -1021,7 +1024,11 @@ Journal::_TransactionDone(bool success)
 		return B_OK;
 	}
 
-	return _WriteTransactionToLog();
+	status_t status = _WriteTransactionToLog();
+	if (status != B_OK)
+		fUnwrittenTransactions++;
+
+	return status;
 }
 
 
@@ -1033,8 +1040,18 @@ Journal::_TransactionDone(bool success)
 void
 Journal::Dump()
 {
-	kprintf("log start: %ld\n", fVolume->LogStart());
-	kprintf("log end:   %ld\n", fVolume->LogEnd());
+	kprintf("Journal %p\n", this);
+	kprintf("  log start:            %ld\n", fVolume->LogStart());
+	kprintf("  log end:              %ld\n", fVolume->LogEnd());
+	kprintf("  owner:                %p\n", fOwner);
+	kprintf("  log size:             %lu\n", fLogSize);
+	kprintf("  max transaction size: %lu\n", fMaxTransactionSize);
+	kprintf("  used:                 %lu\n", fUsed);
+	kprintf("  unwritten:            %ld\n", fUnwrittenTransactions);
+	kprintf("  timestamp:            %lld\n", fTimestamp);
+	kprintf("  transaction ID:       %ld\n", fTransactionID);
+	kprintf("  has subtransaction:   %d\n", fHasSubtransaction);
+	kprintf("  separate sub-trans.:  %d\n", fSeparateSubTransactions);
 	kprintf("entries:\n");
 	kprintf("  address        id  start length\n");
 

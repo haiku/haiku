@@ -359,10 +359,10 @@ bfs_remove_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
 	// transaction which has already deleted the inode.
 	Transaction transaction(volume, volume->ToBlock(inode->Parent()));
 
-	// The "chkbfs" functionality uses this flag to prevent the space used
-	// up by the inode from being freed - this flag is set only in situations
-	// where this is a good idea... (the block bitmap will get fixed anyway
-	// in this case).
+	// The file system check functionality uses this flag to prevent the space
+	// used up by the inode from being freed - this flag is set only in
+	// situations where this does not cause any harm as the block bitmap will
+	// get fixed anyway in this case).
 	if ((inode->Flags() & INODE_DONT_FREE_SPACE) != 0) {
 		delete inode;
 		return B_OK;
@@ -370,13 +370,14 @@ bfs_remove_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
 
 	status_t status = inode->Free(transaction);
 	if (status == B_OK) {
-		transaction.Done();
-
-		delete inode;
+		status = transaction.Done();
 	} else if (transaction.HasParent()) {
 		// TODO: for now, we don't let sub-transactions fail
-		transaction.Done();
+		status = transaction.Done();
 	}
+
+	// TODO: the VFS currently does not allow this to fail
+	delete inode;
 
 	return status;
 }
@@ -777,7 +778,7 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 			off_t oldSize = inode->Size();
 
 			status = inode->SetFileSize(transaction, stat->st_size);
-			if (status < B_OK)
+			if (status != B_OK)
 				return status;
 
 			// fill the new blocks (if any) with zeros
@@ -843,9 +844,9 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 
 	status = inode->WriteBack(transaction);
 	if (status == B_OK)
-		transaction.Done();
-
-	notify_stat_changed(volume->ID(), inode->ID(), mask);
+		status = transaction.Done();
+	if (status == B_OK)
+		notify_stat_changed(volume->ID(), inode->ID(), mask);
 
 	return status;
 }
@@ -891,10 +892,11 @@ bfs_create(fs_volume* _volume, fs_vnode* _directory, const char* name,
 		status = file_cache_disable(inode->FileCache());
 	}
 
-	if (status >= B_OK) {
-		entry_cache_add(volume->ID(), directory->ID(), name, *_vnodeID);
+	if (status == B_OK)
+		status = transaction.Done();
 
-		transaction.Done();
+	if (status == B_OK) {
+		entry_cache_add(volume->ID(), directory->ID(), name, *_vnodeID);
 
 		// register the cookie
 		*_cookie = cookie;
@@ -1017,7 +1019,8 @@ status_t
 bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	fs_vnode* _newDir, const char* newName)
 {
-	FUNCTION_START(("oldDir = %p, oldName = \"%s\", newDir = %p, newName = \"%s\"\n", _oldDir, oldName, _newDir, newName));
+	FUNCTION_START(("oldDir = %p, oldName = \"%s\", newDir = %p, newName = "
+		"\"%s\"\n", _oldDir, oldName, _newDir, newName));
 
 	// there might be some more tests needed?!
 	if (!strcmp(oldName, ".") || !strcmp(oldName, "..")
@@ -1236,14 +1239,12 @@ bfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 		inode->WriteLockInTransaction(transaction);
 
 		status_t status = inode->SetFileSize(transaction, 0);
-		if (status < B_OK)
+		if (status == B_OK)
+			status = inode->WriteBack(transaction);
+		if (status == B_OK)
+			status = transaction.Done();
+		if (status != B_OK)
 			return status;
-
-		status = inode->WriteBack(transaction);
-		if (status < B_OK)
-			return status;
-
-		transaction.Done();
 	}
 
 	fileCacheEnabler.Detach();

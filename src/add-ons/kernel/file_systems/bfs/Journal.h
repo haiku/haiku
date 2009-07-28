@@ -27,7 +27,7 @@ public:
 
 			status_t		Lock(Transaction* owner,
 								bool separateSubTransactions);
-			void			Unlock(Transaction* owner, bool success);
+			status_t		Unlock(Transaction* owner, bool success);
 
 			status_t		ReplayLog();
 
@@ -115,13 +115,16 @@ public:
 	status_t Start(Volume* volume, off_t refBlock);
 	bool IsStarted() const { return fJournal != NULL; }
 
-	void Done()
+	status_t Done()
 	{
+		status_t status = B_OK;
 		if (fJournal != NULL) {
 			_UnlockInodes();
-			fJournal->Unlock(this, true);
+			status = fJournal->Unlock(this, true);
+			if (status == B_OK)
+				fJournal = NULL;
 		}
-		fJournal = NULL;
+		return status;
 	}
 
 	bool HasParent()
