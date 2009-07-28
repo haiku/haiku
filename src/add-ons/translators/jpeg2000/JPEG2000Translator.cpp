@@ -115,25 +115,6 @@ SaveSettings(jpeg_settings *settings)
 }
 
 
-//!	Return true if settings were run, false if not
-bool
-SettingsChangedAlert()
-{
-	// If settings view wasn't already initialized (settings not running)
-	// and user wants to run settings
-	if (!gAreSettingsRunning && (new BAlert("Different settings file", "JPEG2000 settings were set to default because of incompatible settings file.", "Configure settings", "OK", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go() == 0) {
-		// Create settings window (with no quit on close!), launch it and wait until it's closed
-		status_t err;
-		TranslatorWindow *window = new TranslatorWindow(false);
-		window->Show();
-		wait_for_thread(window->Thread(), &err);
-		return true;
-	}
-
-	return false;
-}
-
-
 /*!
 	Load settings from config file
 	If can't find it make them default and try to save
@@ -159,20 +140,12 @@ LoadSettings(jpeg_settings *settings)
 			fclose(file);
 			LoadDefaultSettings(settings);
 			SaveSettings(settings);
-			// Tell user settings were changed to default, and ask to run settings panel or not
-			if (SettingsChangedAlert())
-				// User configured settings, load them again
-				LoadSettings(settings);
 		} else
 			fclose(file);
 	} else if ((file = fopen(path.Path(), "wb+"))) {
 		LoadDefaultSettings(settings);
 		fwrite(settings, sizeof(jpeg_settings), 1, file);
 		fclose(file);
-		// Tell user settings were changed to default, and ask to run settings panel or not
-		if (SettingsChangedAlert())
-			// User configured settings, load them again
-			LoadSettings(settings);
 	}
 }
 
@@ -1300,7 +1273,7 @@ Compress(BPositionIO *in, BPositionIO *out)
 			break;
 
 		default:
-			(new BAlert("Error", "Unknown color space.", "Quit"))->Go();
+			fprintf(stderr, "Unknown color space.\n");
 			return B_ERROR;
 	}
 
@@ -1419,8 +1392,7 @@ Decompress(BPositionIO *in, BPositionIO *out)
 				out_color_space = B_RGBA32;
 				converter = read_rgba32;
 			} else {
-				(new BAlert("Error", "Other than RGB with 3 or 4 color "
-					"components not implemented.", "Quit"))->Go();
+				fprintf(stderr, "Other than RGB with 3 or 4 color components not implemented.\n");
 				return Error(ins, image, NULL, 0, NULL, B_ERROR);
 			}
 			break;
@@ -1436,13 +1408,12 @@ Decompress(BPositionIO *in, BPositionIO *out)
 			}
 			break;
 		case JAS_IMAGE_CS_YCBCR:
-			(new BAlert("Error", "color space YCBCR not implemented yet.",
-				"Quit"))->Go();
+			fprintf(stderr, "Color space YCBCR not implemented yet.\n");
 			return Error(ins, image, NULL, 0, NULL, B_ERROR);
 			break;
 		case JAS_IMAGE_CS_UNKNOWN:
 		default:
-			(new BAlert("Error", "color space unknown.", "Quit"))->Go();
+			fprintf(stderr, "Color space unkown. \n");
 			return Error(ins, image, NULL, 0, NULL, B_ERROR);
 			break;
 	}

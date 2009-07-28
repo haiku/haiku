@@ -131,31 +131,6 @@ SaveSettings(jpeg_settings *settings)
 }
 
 
-//!	Return true if settings were run, false if not
-bool
-SettingsChangedAlert()
-{
-	// If settings view wasn't already initialized (settings not running)
-	// and user wants to run settings
-	if (!gAreSettingsRunning
-		&& (new BAlert("Different settings file",
-				"JPEG settings were set to default because of incompatible settings file.",
-				"Configure settings", "OK", NULL, B_WIDTH_AS_USUAL,
-				B_WARNING_ALERT))->Go() == 0) {
-		// Create settings window (with no quit on close!), launch
-		// it and wait until it's closed
-		TranslatorWindow *window = new TranslatorWindow(false);
-		window->Show();
-
-		status_t err;
-		wait_for_thread(window->Thread(), &err);
-		return true;
-	}
-
-	return false;
-}
-
-
 /*!
 	Load settings from config file
 	If can't find it make them default and try to save
@@ -181,10 +156,6 @@ LoadSettings(jpeg_settings *settings)
 			fclose(file);
 			LoadDefaultSettings(settings);
 			SaveSettings(settings);
-			// Tell user settings were changed to default, and ask to run settings panel or not
-			if (SettingsChangedAlert())
-				// User configured settings, load them again
-				LoadSettings(settings);
 		} else
 			fclose(file);
 	} else if ((file = fopen(path.Path(), "wb+")) != NULL) {
