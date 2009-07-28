@@ -151,6 +151,32 @@ dump_widget_pm_support(hda_widget& widget)
 
 
 static void
+dump_widget_stream_support(hda_widget& widget)
+{
+	dprintf("\tSupported formats: %s%s%s%s%s\n",
+		widget.d.io.formats & B_FMT_8BIT_S ? "8bits " : "",
+		widget.d.io.formats & B_FMT_16BIT ? "16bits " : "",
+		widget.d.io.formats & B_FMT_20BIT ? "20bits " : "",
+		widget.d.io.formats & B_FMT_24BIT ? "24bits " : "",
+		widget.d.io.formats & B_FMT_32BIT ? "32bits " : "");
+	dprintf("\tSupported rates: %s%s%s%s%s%s%s%s%s%s%s%s\n",
+		widget.d.io.rates & B_SR_8000 ? "8khz " : "",
+		widget.d.io.rates & B_SR_11025 ? "11khz " : "",
+		widget.d.io.rates & B_SR_16000 ? "16khz " : "",
+		widget.d.io.rates & B_SR_22050 ? "22khz " : "",
+		widget.d.io.rates & B_SR_32000 ? "32khz " : "",
+		widget.d.io.rates & B_SR_44100 ? "44khz " : "",
+		widget.d.io.rates & B_SR_48000 ? "48khz " : "",
+		widget.d.io.rates & B_SR_88200 ? "88khz " : "",
+		widget.d.io.rates & B_SR_96000 ? "96khz " : "",
+		widget.d.io.rates & B_SR_176400 ? "176khz " : "",
+		widget.d.io.rates & B_SR_192000 ? "192khz " : "",
+		widget.d.io.rates & B_SR_384000 ? "384khz " : "");
+		
+}
+
+
+static void
 dump_audiogroup_widgets(hda_audio_group* audioGroup)
 {
 	dprintf("\tAudiogroup:\n");
@@ -506,6 +532,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 		GPIO_COUNT_NUM_GPIO(resp[1]), GPIO_COUNT_NUM_GPO(resp[1]),
 		GPIO_COUNT_NUM_GPI(resp[1]), GPIO_COUNT_GPIUNSOL(resp[1]) ? "yes" : "no",
 		GPIO_COUNT_GPIWAKE(resp[1]) ? "yes" : "no");
+	dump_widget_stream_support(audioGroup->widget);
 
 	audioGroup->widget_start = SUB_NODE_COUNT_START(resp[2]);
 	audioGroup->widget_count = SUB_NODE_COUNT_TOTAL(resp[2]);
@@ -587,6 +614,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 			case WT_AUDIO_OUTPUT:
 			case WT_AUDIO_INPUT:
 				hda_widget_get_stream_support(audioGroup, &widget);
+				dump_widget_stream_support(widget);
 				break;
 
 			case WT_PIN_COMPLEX:
