@@ -27,6 +27,7 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <ScrollView.h>
+#include <SeparatorView.h>
 #include <SpaceLayoutItem.h>
 #include <StatusBar.h>
 #include <String.h>
@@ -131,70 +132,6 @@ LogoView::_Init()
 // #pragma mark -
 
 
-class SeparatorView : public BView {
-public:
-								SeparatorView(enum orientation orientation);
-	virtual						~SeparatorView();
-
-	virtual	BSize				MinSize();
-	virtual	BSize				PreferredSize();
-	virtual	BSize				MaxSize();
-private:
-			enum orientation	fOrientation;
-};
-
-
-SeparatorView::SeparatorView(enum orientation orientation)
-	:
-	BView("separator", 0),
-	fOrientation(orientation)
-{
-	SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_2_TINT));
-}
-
-
-SeparatorView::~SeparatorView()
-{
-}
-
-
-BSize
-SeparatorView::MinSize()
-{
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(), BSize(0, 0));
-}
-
-
-BSize
-SeparatorView::MaxSize()
-{
-	BSize size(0, 0);
-	if (fOrientation == B_VERTICAL)
-		size.height = B_SIZE_UNLIMITED;
-	else
-		size.width = B_SIZE_UNLIMITED;
-
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
-}
-
-
-BSize
-SeparatorView::PreferredSize()
-{
-	BSize size(0, 0);
-	if (fOrientation == B_VERTICAL)
-		size.height = 10;
-	else
-		size.width = 10;
-
-	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
-}
-
-
-// #pragma mark -
-
-
 static BLayoutItem*
 layout_item_for(BView* view)
 {
@@ -277,7 +214,7 @@ InstallerWindow::InstallerWindow()
 			.Add(logoView)
 			.Add(fStatusView)
 		)
-		.Add(new SeparatorView(B_HORIZONTAL))
+		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
 		.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
 			.Add(BGridLayoutBuilder(0, 10)
 				.Add(fSrcMenuField->CreateLabelLayoutItem(), 0, 0)
