@@ -524,6 +524,12 @@ public:
 			}
 		} else
 			fNumBlocks = 0;
+
+#if KTRACE_PRINTF_STACK_TRACE
+		fStackTrace = capture_tracing_stack_trace(KTRACE_PRINTF_STACK_TRACE, 1,
+			false);
+#endif
+
 		Initialized();
 	}
 
@@ -535,12 +541,22 @@ public:
 			out.Print(" %Ld", fBlocks[i]);
 	}
 
+#if KTRACE_PRINTF_STACK_TRACE
+	virtual void DumpStackTrace(TraceOutput& out)
+	{
+		out.PrintStackTrace(fStackTrace);
+	}
+#endif
+
 private:
 	block_cache*		fCache;
 	cache_transaction*	fTransaction;
 	int32				fID;
 	off_t*				fBlocks;
 	int32				fNumBlocks;
+#if KTRACE_PRINTF_STACK_TRACE
+	tracing_stack_trace* fStackTrace;
+#endif
 };
 
 }	// namespace TransactionTracing
