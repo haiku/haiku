@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "ModelLoader.h"
 
 #include <stdio.h>
@@ -22,6 +23,10 @@
 #include "Model.h"
 
 
+// add a scheduling state snapshot every x events
+static const uint32 kSchedulingSnapshotInterval = 1024;
+
+
 struct SimpleWaitObjectInfo : system_profiler_wait_object_info {
 	SimpleWaitObjectInfo(uint32 type)
 	{
@@ -39,19 +44,6 @@ static const SimpleWaitObjectInfo kSignalWaitObjectInfo(
 	THREAD_BLOCK_TYPE_SIGNAL);
 
 
-// #pragma mark - ThreadInfo
-
-
-ModelLoader::ThreadInfo::ThreadInfo(Model::Thread* thread)
-	:
-	thread(thread),
-	state(UNKNOWN),
-	lastTime(0),
-	waitObject(NULL)
-{
-}
-
-
 // #pragma mark -
 
 
@@ -63,7 +55,7 @@ ModelLoader::_UpdateLastEventTime(bigtime_t time)
 		fModel->SetBaseTime(time);
 	}
 
-	fLastEventTime = time - fBaseTime;
+	fState.SetLastEventTime(time - fBaseTime);
 }
 
 
@@ -105,8 +97,8 @@ ModelLoader::PrepareForLoading()
 	if (fModel != NULL || fDataSource == NULL)
 		return B_BAD_VALUE;
 
-	// init the hash tables
-	status_t error = fThreads.Init();
+	// init the state
+	status_t error = fState.Init();
 	if (error != B_OK)
 		return error;
 
@@ -128,12 +120,7 @@ ModelLoader::Load()
 void
 ModelLoader::FinishLoading(bool success)
 {
-	ThreadInfo* threadInfo = fThreads.Clear(true);
-	while (threadInfo != NULL) {
-		ThreadInfo* nextInfo = threadInfo->next;
-		delete threadInfo;
-		threadInfo = nextInfo;
-	}
+	fState.Clear();
 
 	if (!success) {
 		delete fModel;
@@ -181,16 +168,18 @@ ModelLoader::_Load()
 	}
 
 	// process the events
+	fState.Clear();
 	fBaseTime = -1;
-	fLastEventTime = -1;
-	uint32 count = 0;
+	uint64 count = 0;
 
 	while (true) {
 		// get next event
 		uint32 event;
 		uint32 cpu;
 		const void* buffer;
-		ssize_t bufferSize = input->ReadNextEvent(&event, &cpu, &buffer);
+		off_t offset;
+		ssize_t bufferSize = input->ReadNextEvent(&event, &cpu, &buffer,
+			&offset);
 		if (bufferSize < 0)
 			return bufferSize;
 		if (buffer == NULL)
@@ -207,9 +196,14 @@ ModelLoader::_Load()
 			if (fAborted)
 				return B_ERROR;
 		}
+
+		// periodically add scheduling snapshots
+		if (count % kSchedulingSnapshotInterval == 0)
+			fModel->AddSchedulingStateSnapshot(fState, offset);
 	}
 
-	fModel->SetLastEventTime(fLastEventTime);
+	fModel->SetLastEventTime(fState.LastEventTime());
+	fModel->LoadingFinished();
 
 	return B_OK;
 }
@@ -347,7 +341,7 @@ return B_BAD_DATA;
 void
 ModelLoader::_HandleTeamAdded(system_profiler_team_added* event)
 {
-	if (fModel->AddTeam(event, fLastEventTime) == NULL)
+	if (fModel->AddTeam(event, fState.LastEventTime()) == NULL)
 		throw std::bad_alloc();
 }
 
@@ -356,7 +350,7 @@ void
 ModelLoader::_HandleTeamRemoved(system_profiler_team_removed* event)
 {
 	if (Model::Team* team = fModel->TeamByID(event->team))
-		team->SetDeletionTime(fLastEventTime);
+		team->SetDeletionTime(fState.LastEventTime());
 	else
 		printf("Removed event for unknown team: %ld\n", event->team);
 }
@@ -381,7 +375,7 @@ void
 ModelLoader::_HandleThreadRemoved(system_profiler_thread_removed* event)
 {
 	if (Model::Thread* thread = fModel->ThreadByID(event->thread))
-		thread->SetDeletionTime(fLastEventTime);
+		thread->SetDeletionTime(fState.LastEventTime());
 	else
 		printf("Removed event for unknown team: %ld\n", event->thread);
 }
@@ -392,13 +386,13 @@ ModelLoader::_HandleThreadScheduled(system_profiler_thread_scheduled* event)
 {
 	_UpdateLastEventTime(event->time);
 
-	ThreadInfo* thread = fThreads.Lookup(event->thread);
+	Model::ThreadSchedulingState* thread = fState.LookupThread(event->thread);
 	if (thread == NULL) {
 		printf("Schedule event for unknown thread: %ld\n", event->thread);
 		return;
 	}
 
-	bigtime_t diffTime = fLastEventTime - thread->lastTime;
+	bigtime_t diffTime = fState.LastEventTime() - thread->lastTime;
 
 	if (thread->state == READY) {
 		// thread scheduled after having been woken up
@@ -414,7 +408,7 @@ ModelLoader::_HandleThreadScheduled(system_profiler_thread_scheduled* event)
 	}
 
 	if (thread->state != RUNNING) {
-		thread->lastTime = fLastEventTime;
+		thread->lastTime = fState.LastEventTime();
 		thread->state = RUNNING;
 	}
 
@@ -423,21 +417,21 @@ ModelLoader::_HandleThreadScheduled(system_profiler_thread_scheduled* event)
 	if (event->thread == event->previous_thread)
 		return;
 
-	thread = fThreads.Lookup(event->previous_thread);
+	thread = fState.LookupThread(event->previous_thread);
 	if (thread == NULL) {
 		printf("Schedule event for unknown previous thread: %ld\n",
 			event->previous_thread);
 		return;
 	}
 
-	diffTime = fLastEventTime - thread->lastTime;
+	diffTime = fState.LastEventTime() - thread->lastTime;
 
 	if (thread->state == STILL_RUNNING) {
 		// thread preempted
 		thread->thread->AddPreemption(diffTime);
 		thread->thread->AddRun(diffTime);
 
-		thread->lastTime = fLastEventTime;
+		thread->lastTime = fState.LastEventTime();
 		thread->state = PREEMPTED;
 	} else if (thread->state == RUNNING) {
 		// thread starts waiting (it hadn't been added to the run
@@ -464,16 +458,16 @@ ModelLoader::_HandleThreadScheduled(system_profiler_thread_scheduled* event)
 				event->previous_thread_wait_object_type, waitObject);
 		}
 
-		thread->lastTime = fLastEventTime;
+		thread->lastTime = fState.LastEventTime();
 		thread->state = WAITING;
 	} else if (thread->state == UNKNOWN) {
 		uint32 threadState = event->previous_thread_state;
 		if (threadState == B_THREAD_WAITING
 			|| threadState == B_THREAD_SUSPENDED) {
-			thread->lastTime = fLastEventTime;
+			thread->lastTime = fState.LastEventTime();
 			thread->state = WAITING;
 		} else if (threadState == B_THREAD_READY) {
-			thread->lastTime = fLastEventTime;
+			thread->lastTime = fState.LastEventTime();
 			thread->state = PREEMPTED;
 		}
 	}
@@ -486,7 +480,7 @@ ModelLoader::_HandleThreadEnqueuedInRunQueue(
 {
 	_UpdateLastEventTime(event->time);
 
-	ThreadInfo* thread = fThreads.Lookup(event->thread);
+	Model::ThreadSchedulingState* thread = fState.LookupThread(event->thread);
 	if (thread == NULL) {
 		printf("Enqueued in run queue event for unknown thread: %ld\n",
 			event->thread);
@@ -499,7 +493,7 @@ ModelLoader::_HandleThreadEnqueuedInRunQueue(
 		thread->state = STILL_RUNNING;
 	} else {
 		// Thread was waiting and is ready now.
-		bigtime_t diffTime = fLastEventTime - thread->lastTime;
+		bigtime_t diffTime = fState.LastEventTime() - thread->lastTime;
 		if (thread->waitObject != NULL) {
 			thread->waitObject->AddWait(diffTime);
 			thread->waitObject = NULL;
@@ -507,7 +501,7 @@ ModelLoader::_HandleThreadEnqueuedInRunQueue(
 		} else if (thread->state != UNKNOWN)
 			thread->thread->AddUnspecifiedWait(diffTime);
 
-		thread->lastTime = fLastEventTime;
+		thread->lastTime = fState.LastEventTime();
 		thread->state = READY;
 	}
 }
@@ -519,7 +513,7 @@ ModelLoader::_HandleThreadRemovedFromRunQueue(
 {
 	_UpdateLastEventTime(event->time);
 
-	ThreadInfo* thread = fThreads.Lookup(event->thread);
+	Model::ThreadSchedulingState* thread = fState.LookupThread(event->thread);
 	if (thread == NULL) {
 		printf("Removed from run queue event for unknown thread: %ld\n",
 			event->thread);
@@ -529,7 +523,7 @@ ModelLoader::_HandleThreadRemovedFromRunQueue(
 	// This really only happens when the thread priority is changed
 	// while the thread is ready.
 
-	bigtime_t diffTime = fLastEventTime - thread->lastTime;
+	bigtime_t diffTime = fState.LastEventTime() - thread->lastTime;
 	if (thread->state == RUNNING) {
 		// This should never happen.
 		thread->thread->AddRun(diffTime);
@@ -539,7 +533,7 @@ ModelLoader::_HandleThreadRemovedFromRunQueue(
 		thread->thread->AddUnspecifiedWait(diffTime);
 	}
 
-	thread->lastTime = fLastEventTime;
+	thread->lastTime = fState.LastEventTime();
 	thread->state = WAITING;
 }
 
@@ -552,35 +546,35 @@ ModelLoader::_HandleWaitObjectInfo(system_profiler_wait_object_info* event)
 }
 
 
-ModelLoader::ThreadInfo*
+Model::ThreadSchedulingState*
 ModelLoader::_AddThread(system_profiler_thread_added* event)
 {
 	// do we know the thread already?
-	ThreadInfo* info = fThreads.Lookup(event->thread);
+	Model::ThreadSchedulingState* info = fState.LookupThread(event->thread);
 	if (info != NULL) {
 		// TODO: ?
 		return info;
 	}
 
 	// add the thread to the model
-	Model::Thread* thread = fModel->AddThread(event, fLastEventTime);
+	Model::Thread* thread = fModel->AddThread(event, fState.LastEventTime());
 	if (thread == NULL)
 		return NULL;
 
-	// create and add a ThreadInfo
-	info = new(std::nothrow) ThreadInfo(thread);
+	// create and add a ThreadSchedulingState
+	info = new(std::nothrow) Model::ThreadSchedulingState(thread);
 	if (info == NULL)
 		return NULL;
 
-	fThreads.Insert(info);
+	fState.InsertThread(info);
 
 	return info;
 }
 
 
 void
-ModelLoader::_AddThreadWaitObject(ThreadInfo* thread, uint32 type,
-	addr_t object)
+ModelLoader::_AddThreadWaitObject(Model::ThreadSchedulingState* thread,
+	uint32 type, addr_t object)
 {
 	Model::WaitObjectGroup* waitObjectGroup
 		= fModel->WaitObjectGroupFor(type, object);

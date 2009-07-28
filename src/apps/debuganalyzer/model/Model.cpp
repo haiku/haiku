@@ -147,6 +147,7 @@ Model::Thread::Thread(Team* team, const system_profiler_thread_added* event,
 	fTotalWaitTime(0),
 	fUnspecifiedWaitTime(0),
 	fPreemptions(0),
+	fIndex(-1),
 	fWaitObjectGroups(20, true)
 {
 }
@@ -270,6 +271,121 @@ Model::Thread::AddThreadWaitObject(WaitObject* waitObject,
 }
 
 
+// #pragma mark - SchedulingState
+
+
+Model::SchedulingState::~SchedulingState()
+{
+	Clear();
+}
+
+
+status_t
+Model::SchedulingState::Init()
+{
+	status_t error = fThreadStates.Init();
+	if (error != B_OK)
+		return error;
+
+	return B_OK;
+}
+
+
+status_t
+Model::SchedulingState::Init(const CompactSchedulingState* state)
+{
+	status_t error = Init();
+	if (error != B_OK)
+		return error;
+
+	if (state == NULL)
+		return B_OK;
+
+	fLastEventTime = state->LastEventTime();
+	for (int32 i = 0; const CompactThreadSchedulingState* compactThreadState
+			= state->ThreadStateAt(i); i++) {
+		ThreadSchedulingState* threadState
+			= new(std::nothrow) ThreadSchedulingState(*compactThreadState);
+		if (threadState == NULL)
+			return B_NO_MEMORY;
+
+		fThreadStates.Insert(threadState);
+	}
+
+	return B_OK;
+}
+
+
+void
+Model::SchedulingState::Clear()
+{
+	ThreadSchedulingState* state = fThreadStates.Clear(true);
+	while (state != NULL) {
+		ThreadSchedulingState* next = state->next;
+		delete state;
+		state = next;
+	}
+
+	fLastEventTime = -1;
+}
+
+
+// #pragma mark - CompactSchedulingState
+
+
+/*static*/ Model::CompactSchedulingState*
+Model::CompactSchedulingState::Create(const SchedulingState& state,
+	off_t eventOffset)
+{
+	bigtime_t lastEventTime = state.LastEventTime();
+
+	// count the active threads
+	int32 threadCount = 0;
+	for (ThreadSchedulingStateTable::Iterator it
+				= state.ThreadStates().GetIterator();
+			ThreadSchedulingState* threadState = it.Next();) {
+		Thread* thread = threadState->thread;
+		if (thread->CreationTime() <= lastEventTime
+			&& (thread->DeletionTime() == -1
+				|| thread->DeletionTime() >= lastEventTime)) {
+			threadCount++;
+		}
+	}
+
+	CompactSchedulingState* compactState = (CompactSchedulingState*)malloc(
+		sizeof(CompactSchedulingState)
+			+ threadCount * sizeof(CompactThreadSchedulingState));
+	if (compactState == NULL)
+		return NULL;
+
+	// copy the state info
+	compactState->fEventOffset = eventOffset;
+	compactState->fThreadCount = threadCount;
+	compactState->fLastEventTime = lastEventTime;
+
+	int32 threadIndex = 0;
+	for (ThreadSchedulingStateTable::Iterator it
+				= state.ThreadStates().GetIterator();
+			ThreadSchedulingState* threadState = it.Next();) {
+		Thread* thread = threadState->thread;
+		if (thread->CreationTime() <= lastEventTime
+			&& (thread->DeletionTime() == -1
+				|| thread->DeletionTime() >= lastEventTime)) {
+			compactState->fThreadStates[threadIndex++] = *threadState;
+		}
+	}
+
+	return compactState;
+}
+
+
+void
+Model::CompactSchedulingState::Delete()
+{
+	free(this);
+}
+
+
 // #pragma mark - Model
 
 
@@ -282,14 +398,28 @@ Model::Model(const char* dataSourceName, void* eventData, size_t eventDataSize)
 	fLastEventTime(0),
 	fTeams(20, true),
 	fThreads(20, true),
-	fWaitObjectGroups(20, true)
+	fWaitObjectGroups(20, true),
+	fSchedulingStates(100)
 {
 }
 
 
 Model::~Model()
 {
+	for (int32 i = 0; CompactSchedulingState* state
+		= fSchedulingStates.ItemAt(i); i++) {
+		state->Delete();
+	}
+
 	free(fEventData);
+}
+
+
+void
+Model::LoadingFinished()
+{
+	for (int32 i = 0; Thread* thread = fThreads.ItemAt(i); i++)
+		thread->SetIndex(i);
 }
 
 
@@ -297,7 +427,7 @@ void
 Model::SetBaseTime(bigtime_t time)
 {
 	fBaseTime = time;
-}	
+}
 
 
 void
@@ -480,3 +610,46 @@ Model::ThreadWaitObjectGroupFor(thread_id threadID, uint32 type, addr_t object) 
 
 	return thread->ThreadWaitObjectGroupFor(type, object);
 }
+
+
+bool
+Model::AddSchedulingStateSnapshot(const SchedulingState& state,
+	off_t eventOffset)
+{
+	CompactSchedulingState* compactState = CompactSchedulingState::Create(state,
+		eventOffset);
+	if (compactState == NULL)
+		return false;
+
+	if (!fSchedulingStates.AddItem(compactState)) {
+		compactState->Delete();
+		return false;
+	}
+
+	return true;
+}
+
+
+const Model::CompactSchedulingState*
+Model::ClosestSchedulingState(bigtime_t eventTime) const
+{
+	int32 index = fSchedulingStates.BinarySearchIndexByKey(eventTime,
+		&_CompareEventTimeSchedulingState);
+	if (index >= 0)
+		return fSchedulingStates.ItemAt(index);
+
+	// no exact match
+	index = -index - 1;
+	return index > 0 ? fSchedulingStates.ItemAt(index - 1) : NULL;
+}
+
+
+/*static*/ int
+Model::_CompareEventTimeSchedulingState(const bigtime_t* time,
+	const CompactSchedulingState* state)
+{
+	if (*time < state->LastEventTime())
+		return -1;
+	return *time == state->LastEventTime() ? 0 : 1;
+}
+

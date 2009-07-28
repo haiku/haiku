@@ -129,6 +129,8 @@ public:
 	virtual	void				TreeTableSelectionChanged(TreeTable* table);
 	virtual	void				TreeTableNodeInvoked(TreeTable* table,
 									const TreeTablePath& path);
+	virtual	void				TreeTableNodeExpandedChanged(TreeTable* table,
+									const TreeTablePath& path, bool expanded);
 };
 
 
@@ -189,6 +191,7 @@ private:
 			typedef BObjectList<TreeTableListener>	ListenerList;
 
 private:
+	virtual	void				ExpandOrCollapse(BRow* row, bool expand);
 	virtual	void				ItemInvoked();
 
 			bool				_AddChildRows(TreeTableNode* parentNode,

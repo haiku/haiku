@@ -5,14 +5,28 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+
+#include <stdlib.h>
+
 #include <OS.h>
 #include <String.h>
 
 #include <ObjectList.h>
 #include <Referenceable.h>
+#include <util/OpenHashTable.h>
 
 #include <system_profiler_defs.h>
 #include <util/SinglyLinkedList.h>
+
+
+enum ThreadState {
+	RUNNING,
+	STILL_RUNNING,
+	PREEMPTED,
+	READY,
+	WAITING,
+	UNKNOWN
+};
 
 
 class Model : public Referenceable {
@@ -25,6 +39,13 @@ public:
 			class ThreadWaitObjectGroup;
 			class Team;
 			class Thread;
+			struct CompactThreadSchedulingState;
+			struct ThreadSchedulingState;
+			struct ThreadSchedulingStateDefinition;
+			typedef BOpenHashTable<ThreadSchedulingStateDefinition>
+				ThreadSchedulingStateTable;
+			class SchedulingState;
+			class CompactSchedulingState;
 
 public:
 								Model(const char* dataSourceName,
@@ -34,6 +55,8 @@ public:
 	inline	const char*			DataSourceName() const;
 	inline	void*				EventData() const;
 	inline	size_t				EventDataSize() const;
+
+			void				LoadingFinished();
 
 	inline	bigtime_t			BaseTime() const;
 			void				SetBaseTime(bigtime_t time);
@@ -70,10 +93,23 @@ public:
 									thread_id threadID, uint32 type,
 									addr_t object) const;
 
+			bool				AddSchedulingStateSnapshot(
+									const SchedulingState& state,
+									off_t eventOffset);
+									// must be added in order (of time)
+			const CompactSchedulingState* ClosestSchedulingState(
+									bigtime_t eventTime) const;
+									// returns the closest previous state
+
 private:
 			typedef BObjectList<Team> TeamList;
 			typedef BObjectList<Thread> ThreadList;
 			typedef BObjectList<WaitObjectGroup> WaitObjectGroupList;
+			typedef BObjectList<CompactSchedulingState> SchedulingStateList;
+
+private:
+	static	int			_CompareEventTimeSchedulingState(const bigtime_t* time,
+							const CompactSchedulingState* state);
 
 private:
 			BString				fDataSourceName;
@@ -84,6 +120,7 @@ private:
 			TeamList			fTeams;		// sorted by ID
 			ThreadList			fThreads;	// sorted by ID
 			WaitObjectGroupList	fWaitObjectGroups;
+			SchedulingStateList	fSchedulingStates;
 };
 
 
@@ -246,6 +283,9 @@ public:
 	inline	const char*			Name() const;
 	inline	Team*				GetTeam() const;
 
+	inline	int32				Index() const;
+	inline	void				SetIndex(int32 index);
+
 	inline	bigtime_t			CreationTime() const;
 	inline	bigtime_t			DeletionTime() const;
 
@@ -319,7 +359,103 @@ private:
 
 			int64				fPreemptions;
 
+			int32				fIndex;
+
 			ThreadWaitObjectGroupList fWaitObjectGroups;
+};
+
+
+struct Model::CompactThreadSchedulingState {
+			bigtime_t			lastTime;
+			Model::Thread*		thread;
+			ThreadWaitObject*	waitObject;
+			ThreadState			state;
+
+public:
+			thread_id			ID() const	{ return thread->ID(); }
+
+	inline	CompactThreadSchedulingState& operator=(
+									const CompactThreadSchedulingState& other);
+};
+
+
+struct Model::ThreadSchedulingState : CompactThreadSchedulingState {
+			ThreadSchedulingState* next;
+
+public:
+	inline						ThreadSchedulingState(
+									const CompactThreadSchedulingState& other);
+	inline						ThreadSchedulingState(Thread* thread);
+};
+
+
+struct Model::ThreadSchedulingStateDefinition {
+	typedef thread_id				KeyType;
+	typedef	ThreadSchedulingState	ValueType;
+
+	size_t HashKey(thread_id key) const
+		{ return (size_t)key; }
+
+	size_t Hash(const ThreadSchedulingState* value) const
+		{ return (size_t)value->ID(); }
+
+	bool Compare(thread_id key, const ThreadSchedulingState* value) const
+		{ return key == value->ID(); }
+
+	ThreadSchedulingState*& GetLink(ThreadSchedulingState* value) const
+		{ return value->next; }
+};
+
+
+class Model::SchedulingState {
+public:
+	inline						SchedulingState();
+								~SchedulingState();
+
+			status_t			Init();
+			status_t			Init(const CompactSchedulingState* state);
+			void				Clear();
+
+	inline	bigtime_t			LastEventTime() const { return fLastEventTime; }
+	inline	void				SetLastEventTime(bigtime_t time);
+
+	inline	ThreadSchedulingState* LookupThread(thread_id threadID) const;
+	inline	void				InsertThread(ThreadSchedulingState* thread);
+	inline	void				RemoveThread(ThreadSchedulingState* thread);
+	inline	const ThreadSchedulingStateTable& ThreadStates() const;
+
+private:
+			bigtime_t			fLastEventTime;
+			ThreadSchedulingStateTable fThreadStates;
+};
+
+
+class Model::CompactSchedulingState {
+public:
+	static	CompactSchedulingState* Create(const SchedulingState& state,
+									off_t eventOffset);
+			void				Delete();
+
+	inline	off_t				EventOffset() const;
+	inline	bigtime_t			LastEventTime() const;
+
+	inline	int32				CountThreadsStates() const;
+	inline	const CompactThreadSchedulingState* ThreadStateAt(int32 index)
+									const;
+
+private:
+	friend class BObjectList<CompactSchedulingState>;
+		// work-around for our private destructor
+
+private:
+								CompactSchedulingState();
+	inline						~CompactSchedulingState() {}
+
+private:
+			bigtime_t			fLastEventTime;
+			off_t				fEventOffset;
+			int32				fThreadCount;
+			CompactThreadSchedulingState fThreadStates[0];
 };
 
 
@@ -658,6 +794,20 @@ Model::Thread::DeletionTime() const
 }
 
 
+int32
+Model::Thread::Index() const
+{
+	return fIndex;
+}
+
+
+void
+Model::Thread::SetIndex(int32 index)
+{
+	fIndex = index;
+}
+
+
 int64
 Model::Thread::Runs() const
 {
@@ -781,6 +931,116 @@ Model::Thread::CompareWithCreationTimeID(const creation_time_id* key,
 	if (cmp == 0)
 		return key->id - thread->ID();
 	return cmp < 0 ? -1 : 1;
+}
+
+
+// #pragma mark - CompactThreadSchedulingState
+
+
+Model::CompactThreadSchedulingState&
+Model::CompactThreadSchedulingState::operator=(
+	const CompactThreadSchedulingState& other)
+{
+	lastTime = other.lastTime;
+	thread = other.thread;
+	waitObject = other.waitObject;
+	state = other.state;
+	return *this;
+}
+
+
+// #pragma mark - ThreadSchedulingState
+
+
+Model::ThreadSchedulingState::ThreadSchedulingState(
+	const CompactThreadSchedulingState& other)
+{
+	this->CompactThreadSchedulingState::operator=(other);
+}
+
+
+Model::ThreadSchedulingState::ThreadSchedulingState(Thread* thread)
+{
+	lastTime = 0;
+	this->thread = thread;
+	waitObject = NULL;
+	state = UNKNOWN;
+}
+
+
+// #pragma mark - SchedulingState
+
+
+Model::SchedulingState::SchedulingState()
+	:
+	fLastEventTime(-1)
+{
+}
+
+
+void
+Model::SchedulingState::SetLastEventTime(bigtime_t time)
+{
+	fLastEventTime = time;
+}
+
+
+Model::ThreadSchedulingState*
+Model::SchedulingState::LookupThread(thread_id threadID) const
+{
+	return fThreadStates.Lookup(threadID);
+}
+
+
+void
+Model::SchedulingState::InsertThread(ThreadSchedulingState* thread)
+{
+	fThreadStates.Insert(thread);
+}
+
+
+void
+Model::SchedulingState::RemoveThread(ThreadSchedulingState* thread)
+{
+	fThreadStates.Remove(thread);
+}
+
+
+const Model::ThreadSchedulingStateTable&
+Model::SchedulingState::ThreadStates() const
+{
+	return fThreadStates;
+}
+
+
+// #pragma mark - CompactSchedulingState
+
+
+off_t
+Model::CompactSchedulingState::EventOffset() const
+{
+	return fEventOffset;
+}
+
+
+bigtime_t
+Model::CompactSchedulingState::LastEventTime() const
+{
+	return fLastEventTime;
+}
+
+
+int32
+Model::CompactSchedulingState::CountThreadsStates() const
+{
+	return fThreadCount;
+}
+
+
+const Model::CompactThreadSchedulingState*
+Model::CompactSchedulingState::ThreadStateAt(int32 index) const
+{
+	return index >= 0 && index < fThreadCount ? &fThreadStates[index] : NULL;
 }
 
 

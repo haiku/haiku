@@ -247,6 +247,13 @@ TreeTableListener::TreeTableNodeInvoked(TreeTable* table,
 }
 
 
+void
+TreeTableListener::TreeTableNodeExpandedChanged(TreeTable* table,
+	const TreeTablePath& path, bool expanded)
+{
+}
+
+
 // #pragma mark - Column
 
 
@@ -847,6 +854,27 @@ TreeTable::TableNodesChanged(TreeTableModel* model, const TreeTablePath& path,
 		if (TreeTableNode* child = node->ChildAt(i))
 			UpdateRow(child->Row());
 	}
+}
+
+
+void
+TreeTable::ExpandOrCollapse(BRow* _row, bool expand)
+{
+	TreeTableRow* row = dynamic_cast<TreeTableRow*>(_row);
+	if (row == NULL || row->IsExpanded() == expand)
+		return;
+
+	AbstractTable::ExpandOrCollapse(row, expand);
+
+	if (row->IsExpanded() != expand)
+		return;
+
+	TreeTablePath path;
+	_GetPathForNode(row->Node(), path);
+
+	int32 listenerCount = fListeners.CountItems();
+	for (int32 i = listenerCount - 1; i >= 0; i--)
+		fListeners.ItemAt(i)->TreeTableNodeExpandedChanged(this, path, expand);
 }
 
 
