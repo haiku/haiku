@@ -333,9 +333,7 @@ Inode::Inode(Volume* volume, ino_t id)
 {
 	PRINT(("Inode::Inode(volume = %p, id = %Ld) @ %p\n", volume, id, this));
 
-	NodeGetter node(volume, this);
-	memcpy(&fNode, node.Node(), sizeof(bfs_inode));
-	fNode.flags &= HOST_ENDIAN_TO_BFS_INT32(INODE_PERMANENT_FLAGS);
+	UpdateNodeFromDisk();
 
 	char lockName[B_OS_NAME_LENGTH];
 	snprintf(lockName, sizeof(lockName), "bfs inode %d.%d",
@@ -455,6 +453,15 @@ Inode::WriteBack(Transaction& transaction)
 
 	memcpy(node.WritableNode(), &Node(), sizeof(bfs_inode));
 	return B_OK;
+}
+
+
+void
+Inode::UpdateNodeFromDisk()
+{
+	NodeGetter node(fVolume, this);
+	memcpy(&fNode, node.Node(), sizeof(bfs_inode));
+	fNode.flags &= HOST_ENDIAN_TO_BFS_INT32(INODE_PERMANENT_FLAGS);
 }
 
 

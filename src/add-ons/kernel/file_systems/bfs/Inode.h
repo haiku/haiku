@@ -42,7 +42,9 @@ public:
 								{ transaction.AddInode(this); }
 
 			recursive_lock&	SmallDataLock() { return fSmallDataLock; }
+
 			status_t		WriteBack(Transaction& transaction);
+			void			UpdateNodeFromDisk();
 
 			bool			IsContainer() const
 								{ return S_ISDIR(Mode()); }

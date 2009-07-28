@@ -1151,10 +1151,17 @@ Transaction::RemoveInode(Inode* inode)
 
 
 void
-Transaction::_UnlockInodes()
+Transaction::_UnlockInodes(bool success)
 {
 	while (Inode* inode = fLockedInodes.RemoveHead()) {
-		inode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_TRANSACTION);
+		if (success) {
+			inode->Node().flags
+				&= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_TRANSACTION);
+		} else {
+			// revert any changes made to the cached bfs_inode
+			inode->UpdateNodeFromDisk();
+		}
+
 		rw_lock_write_unlock(&inode->Lock());
 
 		// See AddInode() why we do this here

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef JOURNAL_H
@@ -108,7 +108,7 @@ public:
 	{
 		if (fJournal != NULL) {
 			fJournal->Unlock(this, false);
-			_UnlockInodes();
+			_UnlockInodes(false);
 		}
 	}
 
@@ -119,7 +119,7 @@ public:
 	{
 		status_t status = B_OK;
 		if (fJournal != NULL) {
-			_UnlockInodes();
+			_UnlockInodes(true);
 			status = fJournal->Unlock(this, true);
 			if (status == B_OK)
 				fJournal = NULL;
@@ -172,7 +172,7 @@ private:
 	Transaction& operator=(const Transaction& other);
 		// no implementation
 
-	void _UnlockInodes();
+	void _UnlockInodes(bool success);
 
 	Journal*	fJournal;
 	InodeList	fLockedInodes;
