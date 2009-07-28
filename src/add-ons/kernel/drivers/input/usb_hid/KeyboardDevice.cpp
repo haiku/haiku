@@ -62,21 +62,27 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 		if (!item->HasData())
 			continue;
 
-		if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD) {
+		if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD
+			|| item->UsagePage() == HID_USAGE_PAGE_CONSUMER) {
 			TRACE("keyboard item with usage %lx\n", item->UsageMinimum());
-			item->PrintToStream();
 
 			if (item->Array()) {
-				// normal keys handled as array items
+				// normal or "consumer" keys handled as array items
 				if (fKeyCount < MAX_KEYS)
 					fKeys[fKeyCount++] = item;
 			} else {
-				if (item->UsageID() >= HID_USAGE_ID_LEFT_CONTROL
+				if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD
+					&& item->UsageID() >= HID_USAGE_ID_LEFT_CONTROL
 					&& item->UsageID() <= HID_USAGE_ID_RIGHT_GUI) {
 					// modifiers are generally implemented as bitmaps
 					if (fModifierCount < MAX_MODIFIERS)
 						fModifiers[fModifierCount++] = item;
 				}
+			}
+		} else if (item->UsagePage() == HID_USAGE_PAGE_CONSUMER) {
+			if (item->Array()) {
+				if (fKeyCount < MAX_KEYS)
+					fKeys[fKeyCount++] = item;
 			}
 		}
 	}
@@ -84,8 +90,8 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 	TRACE("keyboard device with %lu keys and %lu modifiers\n", fKeyCount,
 		fModifierCount);
 
-	fLastKeys = (uint8 *)malloc(fKeyCount * 2);
-	fCurrentKeys = fLastKeys + fKeyCount;
+	fLastKeys = (uint32 *)malloc(fKeyCount * 2 * sizeof(uint32));
+	fCurrentKeys = &fLastKeys[fKeyCount];
 	if (fLastKeys == NULL) {
 		fStatus = B_NO_MEMORY;
 		return;
@@ -150,8 +156,11 @@ KeyboardDevice::AddHandler(HIDDevice *device)
 
 		for (uint32 j = 0; j < input->CountItems(); j++) {
 			HIDReportItem *item = input->ItemAt(j);
-			if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD) {
-				// found at least one item with a keyboard usage
+			if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD
+				|| (item->UsagePage() == HID_USAGE_PAGE_CONSUMER
+					&& item->Array())) {
+				// found at least one item with a keyboard usage or with
+				// a consumer usage that is handled like a key
 				foundKeyboardUsage = true;
 				break;
 			}
@@ -347,11 +356,9 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 		if (key == NULL)
 			break;
 
-		if (key->Extract() == B_OK && key->Valid()) {
-			// note that if there are ever more than 8 bit usage ids
-			// we need to change all these key arrays to use bugger sizes
+		if (key->Extract() == B_OK && key->Valid())
 			fCurrentKeys[i] = key->Data();
-		} else
+		else
 			fCurrentKeys[i] = 0;
 	}
 
@@ -525,7 +532,8 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 
 	bool phantomState = true;
 	for (size_t i = 0; i < fKeyCount; i++) {
-		if (fCurrentKeys[i] != 0x01) {
+		if (fCurrentKeys[i] != 1
+			|| fKeys[i]->UsagePage() != HID_USAGE_PAGE_KEYBOARD) {
 			phantomState = false;
 			break;
 		}
@@ -542,11 +550,12 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 	static bool sysReqPressed = false;
 
 	bool keyDown = false;
-	uint8 *current = fLastKeys;
-	uint8 *compare = fCurrentKeys;
+	uint32 *current = fLastKeys;
+	uint32 *compare = fCurrentKeys;
 	for (int32 twice = 0; twice < 2; twice++) {
 		for (size_t i = 0; i < fKeyCount; i++) {
-			if (current[i] == 0x00 || current[i] == 0x01)
+			if (current[i] == 0 || (current[i] == 1 &&
+				fKeys[i]->UsagePage() == HID_USAGE_PAGE_KEYBOARD))
 				continue;
 
 			bool found = false;
@@ -562,32 +571,38 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 
 			// a change occured
 			uint32 key = 0;
-			if (current[i] < kKeyTableSize)
-				key = kKeyTable[current[i]];
+			if (fKeys[i]->UsagePage() == HID_USAGE_PAGE_KEYBOARD) {
+				if (current[i] < kKeyTableSize)
+					key = kKeyTable[current[i]];
 
-			if (key == KEY_Pause && (modifiers & ALT_KEYS) != 0)
-				key = KEY_Break;
-			else if (key == 0xe && (modifiers & ALT_KEYS) != 0) {
-				key = KEY_SysRq;
-				sysReqPressed = keyDown;
-			} else if (sysReqPressed && keyDown
-				&& current[i] >= 4 && current[i] <= 29
-				&& (fLastModifiers & ALT_KEYS) != 0) {
-				// Alt-SysReq+letter was pressed
-				sDebugKeyboardPipe = fInputReport->Device()->InterruptPipe();
-				sDebugKeyboardReportSize
-					= fInputReport->Parser()->MaxReportSize();
+				if (key == KEY_Pause && (modifiers & ALT_KEYS) != 0)
+					key = KEY_Break;
+				else if (key == 0xe && (modifiers & ALT_KEYS) != 0) {
+					key = KEY_SysRq;
+					sysReqPressed = keyDown;
+				} else if (sysReqPressed && keyDown
+					&& current[i] >= 4 && current[i] <= 29
+					&& (fLastModifiers & ALT_KEYS) != 0) {
+					// Alt-SysReq+letter was pressed
+					sDebugKeyboardPipe
+						= fInputReport->Device()->InterruptPipe();
+					sDebugKeyboardReportSize
+						= fInputReport->Parser()->MaxReportSize();
 
-				char letter = current[i] - 4 + 'a';
+					char letter = current[i] - 4 + 'a';
 
-				if (debug_emergency_key_pressed(letter)) {
-					// we probably have lost some keys, so reset our key state
-					sysReqPressed = false;
-					continue;
+					if (debug_emergency_key_pressed(letter)) {
+						// we probably have lost some keys, so reset our key
+						// state
+						sysReqPressed = false;
+						continue;
+					}
 				}
-			} else if (key == 0) {
-				// unmapped key
-				key = 0x200000 + current[i];
+			}
+
+			if (key == 0) {
+				// unmapped normal key or consumer key
+				key = fKeys[i]->UsageMinimum() + current[i];
 			}
 
 			_WriteKey(key, keyDown);
@@ -610,6 +625,6 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 		keyDown = true;
 	}
 
-	memcpy(fLastKeys, fCurrentKeys, fKeyCount);
+	memcpy(fLastKeys, fCurrentKeys, fKeyCount * sizeof(uint32));
 	return B_OK;
 }

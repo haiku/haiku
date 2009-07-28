@@ -45,8 +45,8 @@ private:
 		uint32					fModifierCount;
 
 		uint8					fLastModifiers;
-		uint8 *					fCurrentKeys;
-		uint8 *					fLastKeys;
+		uint32 *				fCurrentKeys;
+		uint32 *				fLastKeys;
 };
 
 #endif // USB_KEYBOARD_DEVICE_H
