@@ -208,7 +208,8 @@ private:
 class Get : public Action {
 public:
 	Get(block_cache* cache, cached_block* block)
-		: Action(cache, block)
+		:
+		Action(cache, block)
 	{
 		Initialized();
 	}
@@ -219,7 +220,8 @@ public:
 class Put : public Action {
 public:
 	Put(block_cache* cache, cached_block* block)
-		: Action(cache, block)
+		:
+		Action(cache, block)
 	{
 		Initialized();
 	}
@@ -230,7 +232,8 @@ public:
 class Read : public Action {
 public:
 	Read(block_cache* cache, cached_block* block)
-		: Action(cache, block)
+		:
+		Action(cache, block)
 	{
 		Initialized();
 	}
@@ -241,7 +244,8 @@ public:
 class Write : public Action {
 public:
 	Write(block_cache* cache, cached_block* block)
-		: Action(cache, block)
+		:
+		Action(cache, block)
 	{
 		Initialized();
 	}
@@ -252,7 +256,8 @@ public:
 class Flush : public Action {
 public:
 	Flush(block_cache* cache, cached_block* block, bool getUnused = false)
-		: Action(cache, block),
+		:
+		Action(cache, block),
 		fGetUnused(getUnused)
 	{
 		Initialized();
@@ -434,108 +439,108 @@ private:
 namespace TransactionTracing {
 
 class Action : public AbstractTraceEntry {
-	public:
-		Action(const char* label, block_cache* cache,
-				cache_transaction* transaction)
-			:
-			fCache(cache),
-			fTransaction(transaction),
-			fID(transaction->id),
-			fSub(transaction->has_sub_transaction),
-			fNumBlocks(transaction->num_blocks),
-			fSubNumBlocks(transaction->sub_num_blocks)
-		{
-			strlcpy(fLabel, label, sizeof(fLabel));
-			Initialized();
-		}
+public:
+	Action(const char* label, block_cache* cache,
+			cache_transaction* transaction)
+		:
+		fCache(cache),
+		fTransaction(transaction),
+		fID(transaction->id),
+		fSub(transaction->has_sub_transaction),
+		fNumBlocks(transaction->num_blocks),
+		fSubNumBlocks(transaction->sub_num_blocks)
+	{
+		strlcpy(fLabel, label, sizeof(fLabel));
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("block cache %p, %s transaction %p (id %ld)%s"
-				", %ld/%ld blocks", fCache, fLabel, fTransaction, fID,
-				fSub ? " sub" : "", fNumBlocks, fSubNumBlocks);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("block cache %p, %s transaction %p (id %ld)%s"
+			", %ld/%ld blocks", fCache, fLabel, fTransaction, fID,
+			fSub ? " sub" : "", fNumBlocks, fSubNumBlocks);
+	}
 
-	private:
-		char				fLabel[12];
-		block_cache			*fCache;
-		cache_transaction	*fTransaction;
-		int32				fID;
-		bool				fSub;
-		int32				fNumBlocks;
-		int32				fSubNumBlocks;
+private:
+	char				fLabel[12];
+	block_cache*		fCache;
+	cache_transaction*	fTransaction;
+	int32				fID;
+	bool				fSub;
+	int32				fNumBlocks;
+	int32				fSubNumBlocks;
 };
 
 class Detach : public AbstractTraceEntry {
-	public:
-		Detach(block_cache* cache, cache_transaction* transaction,
-				cache_transaction* newTransaction)
-			:
-			fCache(cache),
-			fTransaction(transaction),
-			fID(transaction->id),
-			fSub(transaction->has_sub_transaction),
-			fNewTransaction(newTransaction),
-			fNewID(newTransaction->id)
-		{
-			Initialized();
-		}
+public:
+	Detach(block_cache* cache, cache_transaction* transaction,
+			cache_transaction* newTransaction)
+		:
+		fCache(cache),
+		fTransaction(transaction),
+		fID(transaction->id),
+		fSub(transaction->has_sub_transaction),
+		fNewTransaction(newTransaction),
+		fNewID(newTransaction->id)
+	{
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("block cache %p, detach transaction %p (id %ld)"
-				"from transaction %p (id %ld)%s",
-				fCache, fNewTransaction, fNewID, fTransaction, fID,
-				fSub ? " sub" : "");
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("block cache %p, detach transaction %p (id %ld)"
+			"from transaction %p (id %ld)%s",
+			fCache, fNewTransaction, fNewID, fTransaction, fID,
+			fSub ? " sub" : "");
+	}
 
-	private:
-		block_cache			*fCache;
-		cache_transaction	*fTransaction;
-		int32				fID;
-		bool				fSub;
-		cache_transaction	*fNewTransaction;
-		int32				fNewID;
+private:
+	block_cache*		fCache;
+	cache_transaction*	fTransaction;
+	int32				fID;
+	bool				fSub;
+	cache_transaction*	fNewTransaction;
+	int32				fNewID;
 };
 
 class Abort : public AbstractTraceEntry {
-	public:
-		Abort(block_cache* cache, cache_transaction* transaction)
-			:
-			fCache(cache),
-			fTransaction(transaction),
-			fID(transaction->id),
-			fNumBlocks(0)
-		{
-			bool isSub = transaction->has_sub_transaction;
-			fNumBlocks = isSub ? transaction->sub_num_blocks
-				: transaction->num_blocks;
-			fBlocks = (off_t*)alloc_tracing_buffer(fNumBlocks * sizeof(off_t));
-			if (fBlocks != NULL) {
-				cached_block* block = transaction->first_block;
-				for (int32 i = 0; block != NULL && i < fNumBlocks;
-						block = block->transaction_next) {
-					fBlocks[i++] = block->block_number;
-				}
-			} else
-				fNumBlocks = 0;
-			Initialized();
-		}
+public:
+	Abort(block_cache* cache, cache_transaction* transaction)
+		:
+		fCache(cache),
+		fTransaction(transaction),
+		fID(transaction->id),
+		fNumBlocks(0)
+	{
+		bool isSub = transaction->has_sub_transaction;
+		fNumBlocks = isSub ? transaction->sub_num_blocks
+			: transaction->num_blocks;
+		fBlocks = (off_t*)alloc_tracing_buffer(fNumBlocks * sizeof(off_t));
+		if (fBlocks != NULL) {
+			cached_block* block = transaction->first_block;
+			for (int32 i = 0; block != NULL && i < fNumBlocks;
+					block = block->transaction_next) {
+				fBlocks[i++] = block->block_number;
+			}
+		} else
+			fNumBlocks = 0;
+		Initialized();
+	}
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("block cache %p, abort transaction "
-				"%p (id %ld), blocks", fCache, fTransaction, fID);
-			for (int32 i = 0; i < fNumBlocks && !out.IsFull(); i++)
-				out.Print(" %Ld", fBlocks[i]);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("block cache %p, abort transaction "
+			"%p (id %ld), blocks", fCache, fTransaction, fID);
+		for (int32 i = 0; i < fNumBlocks && !out.IsFull(); i++)
+			out.Print(" %Ld", fBlocks[i]);
+	}
 
-	private:
-		block_cache			*fCache;
-		cache_transaction	*fTransaction;
-		int32				fID;
-		off_t				*fBlocks;
-		int32				fNumBlocks;
+private:
+	block_cache*		fCache;
+	cache_transaction*	fTransaction;
+	int32				fID;
+	off_t*				fBlocks;
+	int32				fNumBlocks;
 };
 
 }	// namespace TransactionTracing
