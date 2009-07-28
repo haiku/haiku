@@ -267,6 +267,9 @@ protected:
 			void				_ObeySizeLimits();
 			void				_PropagatePosition();
 
+			void				_AlterDeltaForSnap(BPoint& delta,
+									bigtime_t now);
+
 			BString				fTitle;
 			// TODO: no fp rects anywhere
 			BRect				fFrame;
@@ -319,6 +322,7 @@ protected:
 			BPoint				fLastMousePosition;
 			float				fMouseMoveDistance;
 			bigtime_t			fLastMoveTime;
+			bigtime_t			fLastSnapTime;
 
 			// The synchronization, which client drawing commands
 			// belong to the redraw of which dirty region is handled

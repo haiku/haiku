@@ -111,6 +111,7 @@ Window::Window(const BRect& frame, const char *name,
 	fLastMousePosition(0.0f, 0.0f),
 	fMouseMoveDistance(0.0f),
 	fLastMoveTime(0),
+	fLastSnapTime(0),
 
 	fCurrentUpdateSession(&fUpdateSessions[0]),
 	fPendingUpdateSession(&fUpdateSessions[1]),
@@ -1003,8 +1004,9 @@ Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 
 	// limit the rate at which "mouse moved" events
 	// are handled that move or resize the window
+	bigtime_t now = 0;
 	if (fIsDragging || fIsResizing) {
-		bigtime_t now = system_time();
+		now = system_time();
 		if (now - fLastMoveTime < 13333) {
 			// TODO: add a "timed event" to query for
 			// the then current mouse position
@@ -1059,18 +1061,15 @@ Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 			delta = B_ORIGIN;
 	}
 
-	// NOTE: fLastMousePosition is currently only
-	// used for window moving/resizing/sliding the tab
-	fLastMousePosition += delta;
-
 	// moving
 	if (fIsDragging) {
 		if (!(Flags() & B_NOT_MOVABLE)) {
 			BPoint oldLeftTop = fFrame.LeftTop();
 
+			_AlterDeltaForSnap(delta, now);
 			fDesktop->MoveWindowBy(this, delta.x, delta.y);
 
-			// constrain delta to true change in size
+			// constrain delta to true change in position
 			delta = fFrame.LeftTop() - oldLeftTop;
 		} else
 			delta = BPoint(0, 0);
@@ -1103,6 +1102,10 @@ Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 			delta = BPoint(0, 0);
 	}
 
+	// NOTE: fLastMousePosition is currently only
+	// used for window moving/resizing/sliding the tab
+	fLastMousePosition += delta;
+
 	// change focus in FFM mode
 	DesktopSettings desktopSettings(fDesktop);
 	if (desktopSettings.FocusFollowsMouse()
@@ -1119,6 +1122,77 @@ Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 		//		new app cursor shouldn't override view cursor, ...
 		ServerWindow()->App()->SetCurrentCursor(view->Cursor());
 	}
+}
+
+
+void
+Window::_AlterDeltaForSnap(BPoint& delta, bigtime_t now)
+{
+	// Alter the delta (which is a proposed offset used while dragging a
+	// window) so that the frame of the window 'snaps' to the edges of the
+	// screen.
+
+	const bigtime_t kSnappingDuration = 1500000LL;
+	const bigtime_t kSnappingPause = 3000000LL;
+	const float kSnapDistance = 8.0f;
+
+	if (now - fLastSnapTime > kSnappingDuration
+		&& now - fLastSnapTime < kSnappingPause) {
+		// Maintain a pause between snapping.
+		return;
+	}
+
+	BRect frame = fFrame;
+	BPoint offsetWithinFrame;
+	// TODO: Perhaps obtain the usable area (not covered by the Deskbar)?
+	BRect screenFrame = fDesktop->ActiveScreen()->Frame();
+
+	if (fDecorator) {
+		BRegion reg;
+		fDecorator->GetFootprint(&reg);
+		frame = reg.Frame();
+		offsetWithinFrame.x = fFrame.left - frame.left;
+		offsetWithinFrame.y = fFrame.top - frame.top;
+	}
+
+	frame.OffsetBy(delta);
+
+	float leftDist = fabs(frame.left - screenFrame.left);
+	float topDist = fabs(frame.top - screenFrame.top);
+	float rightDist = fabs(frame.right - screenFrame.right);
+	float bottomDist = fabs(frame.bottom - screenFrame.bottom);
+
+	bool snapped = false;
+	if (leftDist < kSnapDistance || rightDist < kSnapDistance) {
+		snapped = true;
+		if (leftDist < rightDist) {
+			frame.right -= frame.left;
+			frame.left = 0.0f;
+		} else {
+			frame.left -= frame.right - screenFrame.right;
+			frame.right = screenFrame.right;
+		}
+	}
+
+	if (topDist < kSnapDistance || bottomDist < kSnapDistance) {
+		snapped = true;
+		if (topDist < bottomDist) {
+			frame.bottom -= frame.top;
+			frame.top = 0.0f;
+		} else {
+			frame.top -= frame.bottom - screenFrame.bottom;
+			frame.bottom = screenFrame.bottom;
+		}
+	}
+	if (snapped && now - fLastSnapTime > kSnappingPause)
+		fLastSnapTime = now;
+
+
+	frame.top += offsetWithinFrame.y;
+	frame.left += offsetWithinFrame.x;
+
+	delta.y = frame.top - fFrame.top;
+	delta.x = frame.left - fFrame.left;
 }
 
 
