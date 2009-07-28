@@ -9,7 +9,7 @@
 #include <Partition.h>
 
 
-const uint32 SRC_PARTITION = 'iSPT';
+const uint32 SOURCE_PARTITION = 'iSPT';
 const uint32 TARGET_PARTITION = 'iTPT';
 
 

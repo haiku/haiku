@@ -535,7 +535,7 @@ SourceVisitor::Visit(BPartition *partition, int32 level)
 	char menuLabel[255];
 	make_partition_label(partition, label, menuLabel, false);
 	PartitionMenuItem* item = new PartitionMenuItem(partition->ContentName(),
-		label, NULL, new BMessage(SRC_PARTITION), partition->ID());
+		label, menuLabel, new BMessage(SOURCE_PARTITION), partition->ID());
 	item->SetMarked(isBootPartition);
 	fMenu->AddItem(item);
 	return false;

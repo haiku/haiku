@@ -362,7 +362,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		case SHOW_BOTTOM_MESSAGE:
 			_ShowOptionalPackages();
 			break;
-		case SRC_PARTITION:
+		case SOURCE_PARTITION:
 			_PublishPackages();
 			_UpdateControls();
 			break;
