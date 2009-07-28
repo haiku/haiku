@@ -159,6 +159,9 @@ next_line(void)
 			sModule->fill_glyph(sScreen.columns - length, sScreen.y, length,
 				1, ' ', sScreen.attr);
 		}
+
+		if (sScreen.in_command_rows > 0)
+			sScreen.in_command_rows += 2;
 	}
 	if (sScreen.y == sScreen.rows - 1) {
 		sScreen.y = 0;
