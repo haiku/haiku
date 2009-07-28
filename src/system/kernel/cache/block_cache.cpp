@@ -803,6 +803,7 @@ cache_transaction::cache_transaction()
 	sub_num_blocks = 0;
 	first_block = NULL;
 	open = true;
+	has_sub_transaction = false;
 	last_used = system_time();
 }
 
