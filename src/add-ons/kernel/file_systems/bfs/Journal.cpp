@@ -599,6 +599,26 @@ Journal::ReplayLog()
 }
 
 
+size_t
+Journal::CurrentTransactionSize() const
+{
+	if (_HasSubTransaction()) {
+		return cache_blocks_in_sub_transaction(fVolume->BlockCache(),
+			fTransactionID);
+	}
+
+	return cache_blocks_in_main_transaction(fVolume->BlockCache(),
+		fTransactionID);
+}
+
+
+bool
+Journal::CurrentTransactionTooLarge() const
+{
+	return CurrentTransactionSize() > fLogSize;
+}
+
+
 /*!	This is a callback function that is called by the cache, whenever
 	all blocks of a transaction have been flushed to disk.
 	This lets us keep track of completed transactions, and update

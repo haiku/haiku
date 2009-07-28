@@ -32,6 +32,8 @@ public:
 			status_t		ReplayLog();
 
 			Transaction*	CurrentTransaction() const { return fOwner; }
+			size_t			CurrentTransactionSize() const;
+			bool			CurrentTransactionTooLarge() const;
 
 			status_t		FlushLogAndBlocks();
 			Volume*			GetVolume() const { return fVolume; }
@@ -44,7 +46,9 @@ public:
 #endif
 
 private:
-			bool			_HasSubTransaction() { return fHasSubtransaction; }
+			bool			_HasSubTransaction() const
+								{ return fHasSubtransaction; }
+
 			status_t		_FlushLog(bool canWait, bool flushBlocks);
 			uint32			_TransactionSize() const;
 			status_t		_WriteTransactionToLog();
@@ -127,12 +131,17 @@ public:
 		return status;
 	}
 
-	bool HasParent()
+	bool HasParent() const
 	{
 		if (fJournal != NULL)
 			return fJournal->CurrentTransaction() == this;
 
 		return false;
+	}
+
+	bool IsTooLarge() const
+	{
+		return fJournal->CurrentTransactionTooLarge();
 	}
 
 	status_t WriteBlocks(off_t blockNumber, const uint8* buffer,
@@ -159,7 +168,13 @@ public:
 		return B_OK;
 	}
 
-	Volume	*GetVolume()
+	void Split()
+	{
+		cache_start_sub_transaction(fJournal->GetVolume()->BlockCache(),
+			fJournal->TransactionID());
+	}
+
+	Volume* GetVolume() const
 		{ return fJournal != NULL ? fJournal->GetVolume() : NULL; }
 	int32 ID() const
 		{ return fJournal->TransactionID(); }
