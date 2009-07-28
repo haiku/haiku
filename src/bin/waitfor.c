@@ -20,14 +20,23 @@
 int main(int argc, char **argv)
 {
 	status_t ret;
-	
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s thread_name\n", argv[0]);
+
+	if (argc == 2) {
+		while (find_thread(argv[1]) < 0) {
+			if ((ret = snooze(SNOOZE_TIME)) < B_OK)
+				return 1;
+		}
+	} else if (argc == 3 && strcmp(argv[1], "-e") == 0) {
+		while (find_thread(argv[2]) >= 0) {
+			if ((ret = snooze(SNOOZE_TIME)) < B_OK)
+				return 1;
+		}
+	} else {
+		fprintf(stderr, "Usage: %s [-e] thread_name\n"
+			"-e : wait until all threads with that name ended\n", argv[0]);
 		return 1;
 	}
-	while (find_thread(argv[1]) < 0)
-		if ((ret = snooze(SNOOZE_TIME)) < B_OK)
-			return 1;
+
 	return 0;
 }
 
