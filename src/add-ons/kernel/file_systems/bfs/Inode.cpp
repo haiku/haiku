@@ -1488,7 +1488,7 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 	// update the last modification time in memory, it will be written
 	// back to the inode, and the index when the file is closed
 	// TODO: should update the internal last modified time only at this point!
-	Node().last_modified_time
+	Node().last_modified_time = Node().status_change_time
 		= HOST_ENDIAN_TO_BFS_INT64(bfs_inode::ToInode(real_time_clock_usecs()));
 
 	// TODO: support INODE_LOGGED!
