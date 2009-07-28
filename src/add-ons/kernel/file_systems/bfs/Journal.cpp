@@ -1003,10 +1003,13 @@ status_t
 Journal::_TransactionDone(bool success)
 {
 	if (!success) {
-		if (_HasSubTransaction())
+		if (_HasSubTransaction()) {
 			cache_abort_sub_transaction(fVolume->BlockCache(), fTransactionID);
-		else
+			// We can continue to use the parent transaction afterwards
+		} else {
 			cache_abort_transaction(fVolume->BlockCache(), fTransactionID);
+			fUnwrittenTransactions = 0;
+		}
 
 		return B_OK;
 	}
@@ -1024,11 +1027,7 @@ Journal::_TransactionDone(bool success)
 		return B_OK;
 	}
 
-	status_t status = _WriteTransactionToLog();
-	if (status != B_OK)
-		fUnwrittenTransactions++;
-
-	return status;
+	return _WriteTransactionToLog();
 }
 
 
