@@ -27,36 +27,47 @@
 #include <new>
 
 struct _BPictureExtent_ {
-	_BPictureExtent_(const int32 &size = 0);
-	~_BPictureExtent_();
+							_BPictureExtent_(const int32 &size = 0);
+							~_BPictureExtent_();
 
-	const void *Data() const { return fNewData; }
-	status_t ImportData(const void *data, const int32 &size);	
-	status_t ImportData(BDataIO *stream);	
+			const void*		Data() const { return fNewData; }
+			status_t 		ImportData(const void *data,
+											const int32 &size);
+												
+			status_t		Flatten(BDataIO *stream);
+			status_t 		Unflatten(BDataIO *stream);
 
-	int32 Size() const { return fNewSize; }
-	status_t SetSize(const int32 &size);
+			int32			Size() const { return fNewSize; }
+			status_t		SetSize(const int32 &size);
 
-	bool AddPicture(BPicture *picture) { return fPictures.AddItem(picture); }
-	void DeletePicture(const int32 &index)
-			{ delete static_cast<BPicture *>(fPictures.RemoveItem(index)); }
-	BPicture *PictureAt(const int32 &index)
-			{ return static_cast<BPicture *>(fPictures.ItemAt(index)); }
+			bool			AddPicture(BPicture *picture)
+								{ return fPictures.AddItem(picture); }
+			void			DeletePicture(const int32 &index)
+								{ delete static_cast<BPicture *>
+										(fPictures.RemoveItem(index)); }
+			
+			BList*			Pictures() { return &fPictures; }		
+			BPicture*		PictureAt(const int32 &index)
+								{ return static_cast<BPicture *>
+										(fPictures.ItemAt(index)); }
 	
-	int32 CountPictures() const { return fPictures.CountItems(); }
-	BList *Pictures() { return &fPictures; }
+			int32			CountPictures() const
+								{ return fPictures.CountItems(); }
+	
 
 private:
-	void	*fNewData;
-	int32	fNewSize;
+			void*	fNewData;
+			int32	fNewSize;
 
-	BList	fPictures;	// In R5 this is a BArray<BPicture*> which is completely inline.
+			BList	fPictures;
+				// In R5 this is a BArray<BPicture*>
+				// which is completely inline.
 };
 
 
 struct picture_header {
-	int32 magic1; // ?
-	int32 magic2; // ?
+	int32 magic1; // version ?
+	int32 magic2; // endianess ?
 };
 
 
@@ -229,7 +240,10 @@ BPicture::Archive(BMessage *archive, bool deep) const
 	for (int32 i = 0; i < fExtent->CountPictures(); i++) {
 		BMessage picMsg;
 
-		fExtent->PictureAt(i)->Archive(&picMsg, deep);
+		err = fExtent->PictureAt(i)->Archive(&picMsg, deep);
+		if (err != B_OK)
+			break;
+			
 		err = archive->AddMessage("piclib", &picMsg);
 		if (err != B_OK)
 			break;
@@ -273,33 +287,7 @@ BPicture::Flatten(BDataIO *stream)
 	if (bytesWritten != (ssize_t)sizeof(header))
 		return B_IO_ERROR;
 
-	int32 count = fExtent->CountPictures();
-	bytesWritten = stream->Write(&count, sizeof(count));
-	if (bytesWritten < B_OK)
-		return bytesWritten;
-	if (bytesWritten != (ssize_t)sizeof(count))
-		return B_IO_ERROR;
-
-	for (int32 i = 0; i < count; i++) {
-		status_t status = fExtent->PictureAt(i)->Flatten(stream);
-		if (status < B_OK)
-			return status;
-	}
-
-	int32 size = fExtent->Size();
-	bytesWritten = stream->Write(&size, sizeof(size));
-	if (bytesWritten < B_OK)
-		return bytesWritten;
-	if (bytesWritten != (ssize_t)sizeof(size))
-		return B_IO_ERROR;
-
-	bytesWritten = stream->Write(fExtent->Data(), size);
-	if (bytesWritten < B_OK)
-		return bytesWritten;
-	if (bytesWritten != size)
-		return B_IO_ERROR;
-
-	return B_OK;
+	return fExtent->Flatten(stream);
 }
 
 
@@ -315,24 +303,8 @@ BPicture::Unflatten(BDataIO *stream)
 	if (bytesRead != (ssize_t)sizeof(header)
 		|| header.magic1 != 2 || header.magic2 != 0)
 		return B_BAD_TYPE;
-
-	int32 count = 0;
-	bytesRead = stream->Read(&count, sizeof(count));
-	if (bytesRead < B_OK)
-		return bytesRead;
-	if (bytesRead != (ssize_t)sizeof(count))
-		return B_BAD_DATA;
 	
-	for (int32 i = 0; i < count; i++) {
-		BPicture* picture = new BPicture;
-		status_t status = picture->Unflatten(stream);
-		if (status < B_OK)
-			return status;
-
-		fExtent->AddPicture(picture);
-	}
-
-	status_t status = fExtent->ImportData(stream);
+	status_t status = fExtent->Unflatten(stream);
 	if (status < B_OK)
 		return status;
 
@@ -346,33 +318,6 @@ BPicture::Unflatten(BDataIO *stream)
 		fExtent->SetSize(0);
 
 	return status;
-}
-
-
-
-void
-BPicture::_ImportData(const void *data, int32 size, BPicture **subs,
-	int32 subCount)
-{
-	/*
-	if (data == NULL || size == 0)
-		return;
-
-	BPrivate::AppServerLink link;
-	
-	link.StartMessage(AS_CREATE_PICTURE);
-	link.Attach<int32>(subCount);
-
-	for (int32 i = 0; i < subCount; i++)
-		link.Attach<int32>(subs[i]->fToken);
-
-	link.Attach<int32>(size);
-	link.Attach(data, size);
-
-	status_t status = B_ERROR;
-	if (link.FlushWithReply(status) == B_OK
-		&& status == B_OK)
-		link.Read<int32>(&fToken);*/
 }
 
 
@@ -428,8 +373,10 @@ BPicture::_AssertServerCopy()
 	if (fExtent->Data() == NULL)
 		return false;
 
-	for (int32 i = 0; i < fExtent->CountPictures(); i++)
-		fExtent->PictureAt(i)->_AssertServerCopy();
+	for (int32 i = 0; i < fExtent->CountPictures(); i++) {
+		if (!fExtent->PictureAt(i)->_AssertServerCopy())
+			return false;
+	}
 
 	return _Upload() == B_OK;
 }
@@ -438,8 +385,8 @@ BPicture::_AssertServerCopy()
 status_t
 BPicture::_Upload()
 {
-	ASSERT((fToken == -1));
-	ASSERT((fExtent->Data() != NULL));
+	ASSERT(fToken == -1);
+	ASSERT(fExtent->Data() != NULL);
 
 	BPrivate::AppServerLink link;
 
@@ -466,8 +413,8 @@ BPicture::_Upload()
 status_t
 BPicture::_Download()
 {
-	ASSERT((fExtent->Data() == NULL));
-	ASSERT((fToken != -1));
+	ASSERT(fExtent->Data() == NULL);
+	ASSERT(fToken != -1);
 
 	BPrivate::AppServerLink link;
 	
@@ -588,13 +535,29 @@ _BPictureExtent_::ImportData(const void *data, const int32 &size)
 
 
 status_t
-_BPictureExtent_::ImportData(BDataIO *stream)
+_BPictureExtent_::Unflatten(BDataIO *stream)
 {
 	if (stream == NULL)
 		return B_BAD_VALUE;
 	
+	int32 count = 0;
+	ssize_t bytesRead = stream->Read(&count, sizeof(count));
+	if (bytesRead < B_OK)
+		return bytesRead;
+	if (bytesRead != (ssize_t)sizeof(count))
+		return B_BAD_DATA;
+		
+	for (int32 i = 0; i < count; i++) {
+		BPicture* picture = new BPicture;
+		status_t status = picture->Unflatten(stream);
+		if (status < B_OK)
+			return status;
+
+		AddPicture(picture);
+	}
+	
 	int32 size;
-	ssize_t bytesRead = stream->Read(&size, sizeof(size));
+	bytesRead = stream->Read(&size, sizeof(size));
 	if (bytesRead < B_OK)
 		return bytesRead;
 	if (bytesRead != (ssize_t)sizeof(size))
@@ -611,6 +574,38 @@ _BPictureExtent_::ImportData(BDataIO *stream)
 	if (bytesRead < B_OK)
 		return bytesRead;
 	if (bytesRead != (ssize_t)size)
+		return B_IO_ERROR;
+
+	return B_OK;
+}
+
+
+status_t
+_BPictureExtent_::Flatten(BDataIO *stream)
+{
+	int32 count = fPictures.CountItems();
+	ssize_t bytesWritten = stream->Write(&count, sizeof(count));
+	if (bytesWritten < B_OK)
+		return bytesWritten;
+	if (bytesWritten != (ssize_t)sizeof(count))
+		return B_IO_ERROR;
+
+	for (int32 i = 0; i < count; i++) {
+		status_t status = PictureAt(i)->Flatten(stream);
+		if (status < B_OK)
+			return status;
+	}
+
+	bytesWritten = stream->Write(&fNewSize, sizeof(fNewSize));
+	if (bytesWritten < B_OK)
+		return bytesWritten;
+	if (bytesWritten != (ssize_t)sizeof(fNewSize))
+		return B_IO_ERROR;
+
+	bytesWritten = stream->Write(fNewData, fNewSize);
+	if (bytesWritten < B_OK)
+		return bytesWritten;
+	if (bytesWritten != fNewSize)
 		return B_IO_ERROR;
 
 	return B_OK;
