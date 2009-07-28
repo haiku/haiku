@@ -1098,7 +1098,7 @@ syslog_init(struct kernel_args* args)
 	syslog_write(revisionBuffer, length);
 
 	add_debugger_command_etc("syslog", &cmd_dump_syslog,
-		"Dumps the syslog buffer.\n",
+		"Dumps the syslog buffer.",
 		"[-n]\nDumps the whole syslog buffer, or, if -n is specified, only "
 		"the part that hasn't been sent yet.\n", 0);
 
@@ -1215,7 +1215,7 @@ status_t
 debug_init_post_vm(kernel_args* args)
 {
 	add_debugger_command_etc("cpu", &cmd_switch_cpu,
-		"Switches to another CPU.\n",
+		"Switches to another CPU.",
 		"<cpu>\n"
 		"Switches to CPU with the index <cpu>.\n", 0);
 	add_debugger_command_etc("message", &cmd_dump_kdl_message,
