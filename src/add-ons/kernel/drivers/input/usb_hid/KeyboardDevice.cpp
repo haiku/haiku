@@ -90,7 +90,7 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 	TRACE("keyboard device with %lu keys and %lu modifiers\n", fKeyCount,
 		fModifierCount);
 
-	fLastKeys = (uint32 *)malloc(fKeyCount * 2 * sizeof(uint32));
+	fLastKeys = (uint16 *)malloc(fKeyCount * 2 * sizeof(uint16));
 	fCurrentKeys = &fLastKeys[fKeyCount];
 	if (fLastKeys == NULL) {
 		fStatus = B_NO_MEMORY;
@@ -550,8 +550,8 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 	static bool sysReqPressed = false;
 
 	bool keyDown = false;
-	uint32 *current = fLastKeys;
-	uint32 *compare = fCurrentKeys;
+	uint16 *current = fLastKeys;
+	uint16 *compare = fCurrentKeys;
 	for (int32 twice = 0; twice < 2; twice++) {
 		for (size_t i = 0; i < fKeyCount; i++) {
 			if (current[i] == 0 || (current[i] == 1 &&
