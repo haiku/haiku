@@ -2651,6 +2651,10 @@ cache_blocks_in_transaction(void* _cache, int32 id)
 }
 
 
+/*!	Returns the number of blocks that are part of the main transaction. If this
+	transaction does not have a sub transaction yet, this is the same value as
+	cache_blocks_in_transaction() would return.
+*/
 int32
 cache_blocks_in_main_transaction(void* _cache, int32 id)
 {
@@ -2661,7 +2665,10 @@ cache_blocks_in_main_transaction(void* _cache, int32 id)
 	if (transaction == NULL)
 		return B_BAD_VALUE;
 
-	return transaction->main_num_blocks;
+	if (transaction->has_sub_transaction)
+		return transaction->main_num_blocks;
+
+	return transaction->num_blocks;
 }
 
 
