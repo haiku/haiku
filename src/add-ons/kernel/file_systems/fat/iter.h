@@ -8,8 +8,7 @@
 struct _nspace;
 
 /* csi keeps track of current cluster and sector info */
-struct csi
-{
+struct csi {
 	struct _nspace *vol;
 	uint32	cluster;
 	uint32	sector;
@@ -18,23 +17,21 @@ struct csi
 off_t csi_to_block(struct csi *csi);
 int init_csi(struct _nspace *vol, uint32 cluster, uint32 sector, struct csi *csi);
 int iter_csi(struct csi *csi, int sectors);
-uint8 *csi_get_block(struct csi *csi, int32 tid);
+uint8 *csi_get_block(struct csi *csi);
 status_t csi_release_block(struct csi *csi);
-status_t csi_mark_block_dirty(struct csi *csi, int32 tid);
+status_t csi_make_writable(struct csi *csi);
 status_t csi_read_blocks(struct csi *csi, uint8 *buffer, ssize_t len);
 status_t csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len);
 status_t csi_write_block(struct csi *csi, uint8 *buffer);
 
 /* directory entry iterator */
 #define DIRI_MAGIC '!duM'
-struct diri
-{
+struct diri {
 	uint32	magic;
 	struct csi csi;
 	uint32 starting_cluster;
 	uint32 current_index;
 	uint8 *current_block;
-	int32 tid;
 };
 
 uint8 *diri_init(struct _nspace *vol, uint32 cluster, uint32 index, struct diri *diri);
@@ -42,7 +39,7 @@ int diri_free(struct diri *diri);
 uint8 *diri_current_entry(struct diri *diri);
 uint8 *diri_next_entry(struct diri *diri);
 uint8 *diri_rewind(struct diri *diri);
-void diri_mark_dirty(struct diri *diri);
+void diri_make_writable(struct diri *diri);
 
 int check_diri_magic(struct diri *t, char *funcname);
 

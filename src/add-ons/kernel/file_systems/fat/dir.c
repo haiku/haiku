@@ -485,8 +485,8 @@ erase_dir_entry(nspace *vol, vnode *node)
 	buffer = diri_init(vol, VNODE_PARENT_DIR_CLUSTER(node), node->sindex, &diri);
 	for (i = node->sindex; i <= node->eindex && buffer;
 			buffer = diri_next_entry(&diri), i++) {
+		diri_make_writable(&diri);
 		buffer[0] = 0xe5; // mark entry erased
-		diri_mark_dirty(&diri);
 	}
 	diri_free(&diri);
 
@@ -718,6 +718,7 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 	for (i = 1; i < required_entries && buffer; i++) {
 		const char *p = nlong + (required_entries - i - 1) * 26;
 			// go to unicode offset
+		diri_make_writable(&diri);
 		memset(buffer, 0, 0x20);
 		buffer[0] = required_entries - i + ((i == 1) ? 0x40 : 0);
 		buffer[0x0b] = 0x0f;
@@ -725,7 +726,6 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 		memcpy(buffer+1,p,10);
 		memcpy(buffer+0x0e,p+10,12);
 		memcpy(buffer+0x1c,p+22,4);
-		diri_mark_dirty(&diri);
 		buffer = diri_next_entry(&diri);
 	}
 
@@ -737,6 +737,7 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 	}
 
 	// write directory entry
+	diri_make_writable(&diri);
 	memcpy(buffer, nshort, 11);
 	buffer[0x0b] = info->mode;
 	memset(buffer+0xc, 0, 0x16-0xc);
@@ -758,15 +759,14 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 	buffer[0x1d] = (i >> 8) & 0xff;
 	buffer[0x1e] = (i >> 16) & 0xff;
 	buffer[0x1f] = (i >> 24) & 0xff;
-	diri_mark_dirty(&diri);
 
 	if (last_entry) {
 		// add end of directory markers to the rest of the
 		// cluster; need to clear all the other entries or else
 		// scandisk will complain.
 		while ((buffer = diri_next_entry(&diri)) != NULL) {
+			diri_make_writable(&diri);
 			memset(buffer, 0, 0x20);
-			diri_mark_dirty(&diri);
 		}
 	}
 

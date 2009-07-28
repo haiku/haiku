@@ -22,7 +22,7 @@
 #define DPRINTF(a,b) if (debug_fat > (a)) dprintf b
 
 static status_t
-mirror_fats(nspace *vol, uint32 sector, uint8 *buffer, int32 transactionID)
+mirror_fats(nspace *vol, uint32 sector, uint8 *buffer)
 {
 	uint32 i;
 	char *buf = buffer;
@@ -38,7 +38,7 @@ mirror_fats(nspace *vol, uint32 sector, uint8 *buffer, int32 transactionID)
 			continue;
 
 		blockData = block_cache_get_writable_etc(vol->fBlockCache, sector
-			+ i * vol->sectors_per_fat, 0, 1, transactionID);
+			+ i * vol->sectors_per_fat, 0, 1, -1);
 		memcpy(blockData, buf, vol->bytes_per_sector);
 		buf += vol->bytes_per_sector;
 		block_cache_put(vol->fBlockCache, sector + i * vol->sectors_per_fat);
@@ -90,7 +90,7 @@ enum {
 };
 
 static int32
-_fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, int32 _tid)
+_fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 {
 	int32 result = 0;
 	uint32 n = 0, first = 0, last = 0;
@@ -98,7 +98,6 @@ _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, int32 _tid)
 	uint32 sector;
 	uint32 offset, value = 0; /* quiet warning */
 	uint8 *block1, *block2 = NULL; /* quiet warning */
-	int32 transactionID = _tid;
 	bool readOnly
 		= action != _IOCTL_SET_ENTRY_ && action != _IOCTL_ALLOCATE_N_ENTRIES_;
 
@@ -141,11 +140,8 @@ _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, int32 _tid)
 	if (readOnly) {
 		block1 = (uint8 *)block_cache_get(vol->fBlockCache, sector);
 	} else {
-		if (transactionID == -1)
-			transactionID = cache_start_transaction(vol->fBlockCache);
-
 		block1 = (uint8 *)block_cache_get_writable(vol->fBlockCache, sector,
-			transactionID);
+			-1);
 	}
 
 	if (block1 == NULL) {
@@ -165,7 +161,7 @@ _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, int32 _tid)
 						++sector);
 				} else {
 					block2 = (uint8 *)block_cache_get_writable(vol->fBlockCache,
-						++sector, transactionID);
+						++sector, -1);
 				}
 
 				if (block2 == NULL) {
@@ -206,7 +202,7 @@ _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, int32 _tid)
 				block1[offset] &= (andmask & 0xff);
 				block1[offset] |= (ormask & 0xff);
 				if (offset == vol->bytes_per_sector - 1) {
-					mirror_fats(vol, sector - 1, block1, transactionID);
+					mirror_fats(vol, sector - 1, block1);
 					block2[0] &= (andmask >> 8);
 					block2[0] |= (ormask >> 8);
 				} else {
@@ -258,11 +254,11 @@ _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, int32 _tid)
 			result = value;
 			goto bi;
 		} else if (action == _IOCTL_SET_ENTRY_) {
-			mirror_fats(vol, sector, block1, transactionID);
+			mirror_fats(vol, sector, block1);
 			goto bi;
 		} else if (action == _IOCTL_ALLOCATE_N_ENTRIES_ && value == 0) {
 			vol->free_clusters--;
-			mirror_fats(vol, sector, block1, transactionID);
+			mirror_fats(vol, sector, block1);
 
 			if (n == 0) {
 				ASSERT(first == 0);
@@ -272,8 +268,8 @@ _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, int32 _tid)
 				ASSERT(IS_DATA_CLUSTER(last));
 				// set last cluster to point to us
 
-				if ((result = _fat_ioctl_(vol, _IOCTL_SET_ENTRY_, last, cluster,
-					transactionID)) < 0) {
+				result = _fat_ioctl_(vol, _IOCTL_SET_ENTRY_, last, cluster);
+				if (result < 0) {
 					ASSERT(0);
 					goto bi;
 				}
@@ -298,7 +294,7 @@ _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, int32 _tid)
 				block1 = (uint8 *)block_cache_get(vol->fBlockCache, sector);
 			else {
 				block1 = (uint8 *)block_cache_get_writable(vol->fBlockCache,
-					sector, transactionID);
+					sector, -1);
 			}
 		}
 
@@ -314,7 +310,7 @@ _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, int32 _tid)
 				block1 = (uint8 *)block_cache_get(vol->fBlockCache, sector);
 			else {
 				block1 = (uint8 *)block_cache_get_writable(vol->fBlockCache,
-					sector, transactionID);
+					sector, -1);
 			}
 		}
 
@@ -328,9 +324,6 @@ _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, int32 _tid)
 bi:
 	if (block1 != NULL)
 		block_cache_put(vol->fBlockCache, sector);
-
-	if (_tid == -1 && transactionID > 0)
-		cache_end_transaction(vol->fBlockCache, transactionID, NULL, NULL);
 
 	if (action == _IOCTL_ALLOCATE_N_ENTRIES_) {
 		if (result < 0) {
@@ -362,14 +355,14 @@ bi:
 int32
 count_free_clusters(nspace *vol)
 {
-	return _fat_ioctl_(vol, _IOCTL_COUNT_FREE_, 0, 0, -1);
+	return _fat_ioctl_(vol, _IOCTL_COUNT_FREE_, 0, 0);
 }
 
 
 static int32
 get_fat_entry(nspace *vol, uint32 cluster)
 {
-	int32 value = _fat_ioctl_(vol, _IOCTL_GET_ENTRY_, cluster, 0, -1);
+	int32 value = _fat_ioctl_(vol, _IOCTL_GET_ENTRY_, cluster, 0);
 
 	if (value < 0)
 		return value;
@@ -391,7 +384,7 @@ get_fat_entry(nspace *vol, uint32 cluster)
 static status_t
 set_fat_entry(nspace *vol, uint32 cluster, int32 value)
 {
-	return _fat_ioctl_(vol, _IOCTL_SET_ENTRY_, cluster, value, -1);
+	return _fat_ioctl_(vol, _IOCTL_SET_ENTRY_, cluster, value);
 }
 
 
@@ -507,7 +500,7 @@ allocate_n_fat_entries(nspace *vol, int32 n, int32 *start)
 
 	DPRINTF(2, ("allocating %ld fat entries\n", n));
 
-	c = _fat_ioctl_(vol, _IOCTL_ALLOCATE_N_ENTRIES_, 0, n, -1);
+	c = _fat_ioctl_(vol, _IOCTL_ALLOCATE_N_ENTRIES_, 0, n);
 	if (c < 0)
 		return c;
 

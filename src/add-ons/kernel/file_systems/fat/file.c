@@ -95,6 +95,7 @@ status_t write_vnode_entry(nspace *vol, vnode *node)
 	if (buffer == NULL)
 		return ENOENT;
 
+	diri_make_writable(&diri);
 	buffer[0x0b] = node->mode; // file attributes
 
 	memset(buffer+0xc, 0, 0x16-0xc);
@@ -118,7 +119,6 @@ status_t write_vnode_entry(nspace *vol, vnode *node)
 		buffer[0x1f] = (node->st_size >> 24) & 0xff;
 	}
 
-	diri_mark_dirty(&diri);
 	diri_free(&diri);
 
 	// TODO: figure out which stats have actually changed
@@ -1258,6 +1258,9 @@ dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 			result = EIO;
 			goto bi2;
 		}
+
+		diri_make_writable(&diri);
+
 		if (memcmp(buffer, "..         ", 11)) {
 			dprintf("invalid directory :(\n");
 			result = EIO;
@@ -1274,7 +1277,6 @@ dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 				buffer[0x15] = (ndir->cluster >> 24) & 0xff;
 			}
 		}
-		diri_mark_dirty(&diri);
 		diri_free(&diri);
 	}
 

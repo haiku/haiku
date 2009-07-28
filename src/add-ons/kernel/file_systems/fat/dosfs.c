@@ -203,7 +203,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	vol->fs_flags = fs_flags;
 
 	// open read-only for now
-	if ((err = (vol->fd = open(path, O_RDONLY))) < 0) {
+	if ((err = (vol->fd = open(path, O_RDONLY | O_NOCACHE))) < 0) {
 		dprintf("dosfs error: unable to open %s (%s)\n", path, strerror(err));
 		goto error0;
 	}
@@ -243,7 +243,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	} else {
 		// reopen it with read/write permissions
 		close(vol->fd);
-		if ((err = (vol->fd = open(path, O_RDWR))) < 0) {
+		if ((err = (vol->fd = open(path, O_RDWR | O_NOCACHE))) < 0) {
 			dprintf("dosfs error: unable to open %s (%s)\n", path,
 				strerror(err));
 			goto error0;
@@ -825,10 +825,9 @@ update_fsinfo(nspace *vol)
 {
 	if (vol->fat_bits == 32 && vol->fsinfo_sector != 0xffff
 		&& (vol->flags & B_FS_IS_READONLY) == 0) {
-		uchar *buffer;
-		int32 tid = cache_start_transaction(vol->fBlockCache);
-		if ((buffer = (uchar *)block_cache_get_writable_etc(vol->fBlockCache,
-				vol->fsinfo_sector, 0, vol->bytes_per_sector, tid)) != NULL) {
+		uchar *buffer = (uchar *)block_cache_get_writable_etc(vol->fBlockCache,
+				vol->fsinfo_sector, 0, vol->bytes_per_sector, -1);
+		if (buffer != NULL) {
 			if ((read32(buffer,0) == 0x41615252) && (read32(buffer,0x1e4) == 0x61417272) && (read16(buffer,0x1fe) == 0xaa55)) {
 				//number of free clusters
 				buffer[0x1e8] = (vol->free_clusters & 0xff);
@@ -843,12 +842,10 @@ update_fsinfo(nspace *vol)
 			} else {
 				dprintf("update_fsinfo: fsinfo block has invalid magic number\n");
 				block_cache_set_dirty(vol->fBlockCache, vol->fsinfo_sector,
-					false, tid);
+					false, -1);
 			}
 			block_cache_put(vol->fBlockCache, vol->fsinfo_sector);
-			cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
 		} else {
-			cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
 			dprintf("update_fsinfo: error getting fsinfo sector %x\n",
 				vol->fsinfo_sector);
 		}
@@ -1038,10 +1035,9 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 
 		if (vol->vol_entry == -1) {
 			// stored in the bpb
-			uchar *buffer;
-			int32 tid = cache_start_transaction(vol->fBlockCache);
-			if ((buffer = block_cache_get_writable_etc(vol->fBlockCache, 0, 0, vol->bytes_per_sector, tid)) == NULL) {
-				cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
+			uchar *buffer = block_cache_get_writable_etc(vol->fBlockCache, 0, 0,
+				vol->bytes_per_sector, -1);
+			if (buffer == NULL) {
 				result = EIO;
 				goto bi;
 			}
@@ -1050,14 +1046,13 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 				|| (vol->sectors_per_fat != 0 && (buffer[0x26] != 0x29
 				|| strncmp(buffer + 0x2b, vol->vol_label, 11) == 0))) {
 				dprintf("dosfs_wfsstat: label mismatch\n");
-				block_cache_set_dirty(vol->fBlockCache, 0, false, tid);
+				block_cache_set_dirty(vol->fBlockCache, 0, false, -1);
 				result = B_ERROR;
 			} else {
 				memcpy(buffer + 0x2b, name, 11);
 				result = B_OK;
 			}
 			block_cache_put(vol->fBlockCache, 0);
-			cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
 		} else if (vol->vol_entry >= 0) {
 			struct diri diri;
 			uint8 *buffer;
@@ -1070,8 +1065,9 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 				result = B_ERROR;
 				goto bi;
 			}
+
+			diri_make_writable(&diri);
 			memcpy(buffer, name, 11);
-			diri_mark_dirty(&diri);
 			diri_free(&diri);
 			result = B_OK;
 		} else {
