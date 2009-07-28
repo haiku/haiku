@@ -1161,6 +1161,10 @@ Desktop::ScreenChanged(Screen* screen, bool makeDefault)
 status_t
 Desktop::StoreConfiguration(int32 workspace)
 {
+	// TODO: This only works because StoreConfiguration is never called
+	// for an inactive workspace. fVirtualScreen has the screen mode
+	// of the current workspace.
+
 	if (workspace >= 0 && workspace < fSettings->WorkspacesCount()) {
 		// store settings
 		BMessage settings;
