@@ -472,10 +472,6 @@ BNavMenu::AddNextItem()
 		return false;
 	}
 
-	// limit nav menus to 500 items only
-	if (fItemList->CountItems() > 500)
-		return false;
-
 	BEntry entry;
 	if (fContainer->GetNextEntry(&entry) != B_OK) {
 		// we're finished
