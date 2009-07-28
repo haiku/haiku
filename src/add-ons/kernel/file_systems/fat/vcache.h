@@ -5,6 +5,10 @@
 #ifndef _DOSFS_VCACHE_H_
 #define _DOSFS_VCACHE_H_
 
+
+#include "dosfs.h"
+
+
 void dump_vcache(nspace *vol);
 
 status_t init_vcache(nspace *vol);

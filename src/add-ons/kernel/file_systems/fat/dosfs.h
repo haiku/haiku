@@ -5,19 +5,18 @@
 #ifndef _DOSFS_H_
 #define _DOSFS_H_
 
+
 #include <KernelExport.h>
 #include <fs_interface.h>
 #include <lock.h>
 
+
 //#define DEBUG 1
 
-typedef recursive_lock lock;
+
 #define	LOCK(l)		recursive_lock_lock(&l);
 #define	UNLOCK(l)	recursive_lock_unlock(&l);
 
-
-/* for multiple reader/single writer locks */
-#define READERS 100000
 
 /* Unfortunately, ino_t's are defined as signed. This causes problems with
  * programs (notably cp) that use the modulo of a ino_t as a
@@ -154,11 +153,11 @@ typedef struct _nspace
 
 	int		fs_flags;				// flags for this mount
 
-	lock	vlock;					// volume lock
+	recursive_lock	vlock;					// volume lock
 
 	// vcache state
 	struct {
-		sem_id	vc_sem;
+		rw_lock	lock;
 		ino_t	cur_vnid;
 		uint32	cache_size;
 		struct vcache_entry **by_vnid, **by_loc;

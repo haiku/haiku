@@ -36,30 +36,35 @@ mapping table to translate vnode id's to locations. This file serves this
 purpose.
 */
 
-#define DPRINTF(a,b) if (debug_vcache > (a)) dprintf b
 
-#define LOCK_CACHE_R \
-	acquire_sem(vol->vcache.vc_sem)
-
-#define LOCK_CACHE_W \
-	acquire_sem_etc(vol->vcache.vc_sem, READERS, 0, 0)
-
-#define UNLOCK_CACHE_R \
-	release_sem(vol->vcache.vc_sem)
-
-#define UNLOCK_CACHE_W \
-	release_sem_etc(vol->vcache.vc_sem, READERS, 0)
-
-#include <KernelExport.h>
+#include "vcache.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#include "dosfs.h"
-#include "vcache.h"
+#include <KernelExport.h>
 
+#include "dosfs.h"
 #include "util.h"
+
+
+#define DPRINTF(a,b) if (debug_vcache > (a)) dprintf b
+
+#define LOCK_CACHE_R \
+	rw_lock_read_lock(&vol->vcache.lock)
+
+#define LOCK_CACHE_W \
+	rw_lock_write_lock(&vol->vcache.lock)
+
+#define UNLOCK_CACHE_R \
+	rw_lock_read_unlock(&vol->vcache.lock)
+
+#define UNLOCK_CACHE_W \
+	rw_lock_write_unlock(&vol->vcache.lock)
+
+#define hash(v) ((v) & (vol->vcache.cache_size-1))
+
 
 struct vcache_entry {
 	ino_t	vnid;		/* originally reported vnid */
@@ -68,7 +73,9 @@ struct vcache_entry {
 	struct vcache_entry *next_loc;  /* next entry in location hash table */
 };
 
-void dump_vcache(nspace *vol)
+
+void
+dump_vcache(nspace *vol)
 {
 	uint32 i;
 	struct vcache_entry *c;
@@ -80,9 +87,9 @@ void dump_vcache(nspace *vol)
 			dprintf("%16Lx %16Lx\n", c->vnid, c->loc);
 }
 
-#define hash(v) ((v) & (vol->vcache.cache_size-1))
 
-status_t init_vcache(nspace *vol)
+status_t
+init_vcache(nspace *vol)
 {
 	char name[16];
 	DPRINTF(0, ("init_vcache called\n"));
@@ -93,12 +100,16 @@ status_t init_vcache(nspace *vol)
 #else
 	vol->vcache.cache_size = 512; /* must be power of 2 */
 #endif
-	vol->vcache.by_vnid = calloc(sizeof(struct vache_entry *), vol->vcache.cache_size);
+
+	vol->vcache.by_vnid = calloc(sizeof(struct vache_entry *),
+		vol->vcache.cache_size);
 	if (vol->vcache.by_vnid == NULL) {
 		dprintf("init_vcache: out of core\n");
 		return ENOMEM;
 	}
-	vol->vcache.by_loc = calloc(sizeof(struct vache_entry *), vol->vcache.cache_size);
+
+	vol->vcache.by_loc = calloc(sizeof(struct vache_entry *),
+		vol->vcache.cache_size);
 	if (vol->vcache.by_loc == NULL) {
 		dprintf("init_vcache: out of core\n");
 		free(vol->vcache.by_vnid);
@@ -107,13 +118,10 @@ status_t init_vcache(nspace *vol)
 	}
 
 	sprintf(name, "fat cache %lx", vol->id);
-	if ((vol->vcache.vc_sem = create_sem(READERS, name)) < 0) {
-		free(vol->vcache.by_vnid); vol->vcache.by_vnid = NULL;
-		free(vol->vcache.by_loc); vol->vcache.by_loc = NULL;
-		return vol->vcache.vc_sem;
-	}
+	rw_lock_init(&vol->vcache.lock, "fat cache");
 
-	DPRINTF(0, ("init_vcache: initialized vnid cache with %lx entries\n", vol->vcache.cache_size));
+	DPRINTF(0, ("init_vcache: initialized vnid cache with %lx entries\n",
+		vol->vcache.cache_size));
 
 	return 0;
 }
@@ -129,7 +137,7 @@ uninit_vcache(nspace *vol)
 	LOCK_CACHE_W;
 
 	/* free entries */
-	for (i=0;i<vol->vcache.cache_size;i++) {
+	for (i = 0; i < vol->vcache.cache_size; i++) {
 		c = vol->vcache.by_vnid[i];
 		while (c) {
 			count++;
@@ -144,9 +152,8 @@ uninit_vcache(nspace *vol)
 	free(vol->vcache.by_vnid); vol->vcache.by_vnid = NULL;
 	free(vol->vcache.by_loc); vol->vcache.by_loc = NULL;
 
-	delete_sem(vol->vcache.vc_sem);
-
-	return 0;
+	rw_lock_destroy(&vol->vcache.lock);
+	return B_OK;
 }
 
 
