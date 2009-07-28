@@ -105,6 +105,7 @@ MergeObject <libbe>interface_kit.o :
 	ScrollBar.cpp
 	ScrollView.cpp
 	SeparatorItem.cpp
+	SeparatorView.cpp
 	Shape.cpp
 	Shelf.cpp
 	Size.cpp
