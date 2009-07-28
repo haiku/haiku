@@ -44,6 +44,8 @@ public:
 									bool takeOverOwnership);
 			void				Unset();
 
+			status_t			Seek(off_t streamOffset);
+
 			ssize_t				ReadNextEvent(uint32* _event, uint32* _cpu,
 									const void** _buffer,
 									off_t* _streamOffset = NULL);

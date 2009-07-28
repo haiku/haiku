@@ -116,6 +116,24 @@ BDebugEventInputStream::Unset()
 }
 
 
+status_t
+BDebugEventInputStream::Seek(off_t streamOffset)
+{
+	// TODO: Support for streams, at least for BPositionIOs.
+	if (fStream != NULL)
+		return B_UNSUPPORTED;
+
+	if (streamOffset < 0 || streamOffset > fBufferCapacity)
+		return B_BUFFER_OVERFLOW;
+
+	fStreamPosition = 0;
+	fBufferPosition = streamOffset;
+	fBufferSize = fBufferCapacity - streamOffset;
+
+	return B_OK;
+}
+
+
 /*!	\brief Returns the next event in the stream.
 
 	At the end of the stream \c 0 is returned and \c *_buffer is set to \c NULL.
@@ -254,7 +272,7 @@ BDebugEventInputStream::_GetData(size_t size)
 			fBufferCapacity - fBufferSize);
 		if (bytesRead < 0)
 			return bytesRead;
-	
+
 		fBufferSize += bytesRead;
 	}
 
