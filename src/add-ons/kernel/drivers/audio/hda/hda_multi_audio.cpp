@@ -847,7 +847,7 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 #endif
 
 	/* do playback */
-	err = acquire_sem_etc(audioGroup->playback_stream->buffer_ready_sem,
+	err = acquire_sem_etc(audioGroup->codec->controller->buffer_ready_sem,
 		1, B_CAN_INTERRUPT, 0);
 	if (err != B_OK) {
 		dprintf("%s: Error waiting for playback buffer to finish (%s)!\n", __func__,
@@ -858,7 +858,7 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 	status = disable_interrupts();
 	acquire_spinlock(&audioGroup->playback_stream->lock);
 
-	buffer_info.playback_buffer_cycle = audioGroup->playback_stream->buffer_cycle;
+	buffer_info.playback_buffer_cycle = (audioGroup->playback_stream->buffer_cycle) % audioGroup->playback_stream->num_buffers;
 	buffer_info.played_real_time = audioGroup->playback_stream->real_time;
 	buffer_info.played_frames_count = audioGroup->playback_stream->frames_count;
 
@@ -866,7 +866,7 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 
 	if (audioGroup->record_stream) {
 		acquire_spinlock(&audioGroup->record_stream->lock);
-		buffer_info.record_buffer_cycle = audioGroup->record_stream->buffer_cycle;
+		buffer_info.record_buffer_cycle = (audioGroup->record_stream->buffer_cycle - 1) % audioGroup->record_stream->num_buffers;
 		buffer_info.recorded_real_time = audioGroup->record_stream->real_time;
 		buffer_info.recorded_frames_count = audioGroup->record_stream->frames_count;
 		release_spinlock(&audioGroup->record_stream->lock);

@@ -111,11 +111,13 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 
 	stream->real_time = system_time();
 	stream->frames_count += stream->buffer_length;
-	stream->buffer_cycle = ((position / bufferSize) + 1) % stream->num_buffers;
+	stream->buffer_cycle = position / bufferSize;
 
 	release_spinlock(&stream->lock);
 
-	release_sem_etc(stream->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
+	release_sem_etc(controller->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
+	
+	//dprintf("stream_handle_interrupt %d %d %ld\n", stream->id, stream->buffer_cycle, position);
 }
 
 
@@ -389,9 +391,6 @@ init_corb_rirb_pos(hda_controller* controller)
 void
 hda_stream_delete(hda_stream* stream)
 {
-	if (stream->buffer_ready_sem >= B_OK)
-		delete_sem(stream->buffer_ready_sem);
-
 	if (stream->buffer_area >= B_OK)
 		delete_area(stream->buffer_area);
 
@@ -411,7 +410,6 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 	if (stream == NULL)
 		return NULL;
 
-	stream->buffer_ready_sem = B_ERROR;
 	stream->buffer_area = B_ERROR;
 	stream->buffer_descriptors_area = B_ERROR;
 	stream->type = type;
@@ -464,11 +462,7 @@ status_t
 hda_stream_start(hda_controller* controller, hda_stream* stream)
 {
 	dprintf("hda_stream_start() offset %lx\n", stream->offset);
-	stream->buffer_ready_sem = create_sem(0, stream->type == STREAM_PLAYBACK
-		? "hda_playback_sem" : "hda_record_sem");
-	if (stream->buffer_ready_sem < B_OK)
-		return stream->buffer_ready_sem;
-
+	
 	controller->Write32(HDAC_INTR_CONTROL, controller->Read32(HDAC_INTR_CONTROL)
 		| (1 << (stream->offset / HDAC_STREAM_SIZE)));
 	stream->Write8(HDAC_STREAM_CONTROL0, stream->Read8(HDAC_STREAM_CONTROL0)
@@ -494,8 +488,6 @@ hda_stream_stop(hda_controller* controller, hda_stream* stream)
 		& ~(1 << (stream->offset / HDAC_STREAM_SIZE)));
 
 	stream->running = false;
-	delete_sem(stream->buffer_ready_sem);
-	stream->buffer_ready_sem = -1;
 
 	return B_OK;
 }
@@ -547,19 +539,19 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		}
 	}
 
-    // Stream interrupts seem to arrive too early on most HDA
-    // so we adjust buffer descriptors to take this into account
-    uint32 offset;
-    if (format & FORMAT_44_1_BASE_RATE) {
-        offset = (stream->sample_size * stream->num_channels) * stream->rate
-        	/ 44100;
-    } else {
-        offset = (stream->sample_size * stream->num_channels) * stream->rate
-        	/ 48000;
-    }
-	if (stream->controller->pci_info.vendor_id != INTEL_VENDORID)
-		offset *= 32;
-
+	// Stream interrupts seem to arrive too early on most HDA
+	// so we adjust buffer descriptors to take this into account
+	// TODO check on other vendors, uncomment last line in stream_handle_interrupt()
+	// Tested only on Intel ICH8
+	uint32 offset = 0;
+	if (stream->type == STREAM_PLAYBACK) {
+		if (stream->sample_size == 2)
+			offset = 6;
+		else if (stream->sample_size > 2)
+			offset = 8;
+	}
+	offset *= 32;
+	
 	/* Calculate size of buffer (aligned to 128 bytes) */
 	bufferSize = stream->sample_size * stream->num_channels
 		* stream->buffer_length;
@@ -567,8 +559,8 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 
 	dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld, offset %ld **********\n",
 		stream->sample_size, stream->num_channels, stream->buffer_length, offset);
-	dprintf("IRA: %s: setup stream %ld: SR=%ld, SF=%ld F=0x%x\n", __func__, stream->id,
-		stream->rate, stream->bps, format);
+	dprintf("IRA: %s: setup stream %ld: SR=%ld, SF=%ld F=0x%x (0x%lx)\n", __func__, stream->id,
+		stream->rate, stream->bps, format, stream->sample_format);
 
 	/* Calculate total size of all buffers (aligned to size of B_PAGE_SIZE) */
 	alloc = bufferSize * stream->num_buffers;
@@ -854,12 +846,21 @@ hda_hw_init(hda_controller* controller)
 			break;
 		}
 	}
+	
+	controller->buffer_ready_sem = create_sem(0, "hda_buffer_sem");
+	if (controller->buffer_ready_sem < B_OK) {
+		dprintf("hda: failed to create semaphore\n");
+		status = ENODEV;
+		goto corb_rirb_failed;
+	}
 
 	if (controller->active_codec != NULL)
 		return B_OK;
 
 	dprintf("hda: no active codec\n");
 	status = ENODEV;
+	
+	delete_sem(controller->buffer_ready_sem);
 
 corb_rirb_failed:
 	controller->Write32(HDAC_INTR_CONTROL, 0);
@@ -905,6 +906,11 @@ hda_hw_uninit(hda_controller* controller)
 
 	/* Stop all audio streams */
 	hda_hw_stop(controller);
+	
+	if (controller->buffer_ready_sem >= B_OK) {
+		delete_sem(controller->buffer_ready_sem);
+		controller->buffer_ready_sem = B_ERROR;
+	}
 
 	reset_controller(controller);
 

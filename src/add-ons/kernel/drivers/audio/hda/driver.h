@@ -88,7 +88,8 @@ struct hda_controller {
 	uint32			num_codecs;
 
 	hda_stream*		streams[HDA_MAX_STREAMS];
-
+	sem_id			buffer_ready_sem;
+	
 	uint8 Read8(uint32 reg)
 	{
 		return *(regs + reg);
@@ -147,10 +148,10 @@ struct hda_stream {
 					/* Virtual addresses for buffer */
 	uint32		physical_buffers[STREAM_MAX_BUFFERS];
 					/* Physical addresses for buffer */
-	sem_id		buffer_ready_sem;
-	bigtime_t	real_time;
-	uint64		frames_count;
-	int32		buffer_cycle;
+	
+	volatile bigtime_t	real_time;
+	volatile uint64		frames_count;
+	volatile int32		buffer_cycle;
 
 	uint32		rate, bps;			/* Samplerate & bits per sample */
 
