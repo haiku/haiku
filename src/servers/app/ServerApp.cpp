@@ -2313,24 +2313,29 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			if (status == B_OK && fDesktop->LockAllWindows()) {
 				display_mode oldMode;
-				if (workspace == (uint32)fDesktop->CurrentWorkspace()) {
+				// TODO: This is a bit of a mess. The API to set the mode on
+				// a specific workspace was not present in BeOS. It is meant to
+				// be the workspace *index* (not the bitfield). However, the
+				// "~0" is used as kCurrentWorkspace in PrivateScreen.cpp, which
+				// has nothing to do with B_CURRENT_WORKSPACE (== 0, used for the
+				// workspace bit mask of a BWindow).
+				if (workspace == (uint32)~0
+					|| workspace == (uint32)fDesktop->CurrentWorkspace()) {
 					fDesktop->ScreenAt(0)->GetMode(&oldMode);
 					if (memcmp(&oldMode, &mode, sizeof(display_mode))) {
-						status = fDesktop->ScreenAt(0)->SetMode(mode, makeDefault);
+						status = fDesktop->ScreenAt(0)->SetMode(mode,
+							makeDefault);
 						if (status == B_OK) {
-							fDesktop->ScreenChanged(fDesktop->ScreenAt(0), makeDefault);
+							fDesktop->ScreenChanged(fDesktop->ScreenAt(0),
+								makeDefault);
 						}
 					} else
 						status = B_OK;
 				} else {
-					// this is perhaps not ideal - it assumes that if the
-					// workspace is not the active one, then pull the
-					// configuration from active and store it to the specified
-					// workspace. This is safer since it's assumed that the
-					// active workspace has a display mode that's usable,
-					// but at the same time the API implies that you can set
-					// a non-visible workspace to whatever mode you like
-					// TODO: decide what to do here.
+					// If you don't intend to make the screen mode the default
+					// for the given workspace, then you cannot change the
+					// configuration at all. I.e. non-default (not permanent)
+					// screen modes only work for the current workspace.
 					if (makeDefault)
 						fDesktop->StoreConfiguration(workspace);
 				}
