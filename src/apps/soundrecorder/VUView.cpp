@@ -109,18 +109,16 @@ VUView::_RenderLoop()
 {
 	rgb_color levels[fLevelCount][2];
 	
-	for (int32 i=0; i<fLevelCount; i++) {
+	for (int32 i = 0; i < fLevelCount; i++) {
 		levels[i][0] = levels[i][1] = back_color;	
 	}
-	
-	int32 level = 0;
 	
 	while (!fQuitting) {
 		
 		/* computing */
 		for (int32 channel = 0; channel < 2; channel++) {
-			level = fCurrentLevels[channel];
-			for (int32 i=0; i<level; i++) {
+			int32 level = fCurrentLevels[channel];
+			for (int32 i = 0; i < level; i++) {
 				if (levels[i][channel].red >= 90) {
 					SHIFT_UNTIL(levels[i][channel].red, 15, low_color.red);
 					SHIFT_UNTIL(levels[i][channel].blue, 15, low_color.blue);
@@ -133,7 +131,7 @@ VUView::_RenderLoop()
 			
 			levels[level][channel] = high_color;
 			
-			for (int32 i=level+1; i<fLevelCount; i++) {
+			for (int32 i = level + 1; i < fLevelCount; i++) {
 				if (levels[i][channel].red >= 85) {
 					SHIFT_UNTIL(levels[i][channel].red, 15, back_color.red);
 					SHIFT_UNTIL(levels[i][channel].blue, 15, back_color.blue);
@@ -154,7 +152,7 @@ VUView::_RenderLoop()
 		end1.x = 16;
 		end2.x = 35;
 		start1.y = end1.y = start2.y = end2.y = 2;
-		for (int32 i=fLevelCount-1; i>=0; i--) {
+		for (int32 i = fLevelCount - 1; i >= 0; i--) {
 			fBitmapView->AddLine(start1, end1, levels[i][0]);
 			fBitmapView->AddLine(start2, end2, levels[i][1]);
 			start1.y = end1.y = start2.y = end2.y = end2.y + 2;
@@ -213,7 +211,7 @@ VUView::ComputeLevels(void* data, size_t size, uint32 format)
 			{
 				int32 max = _ComputeNextLevel<int32>(data, size, format, 
 					channel);
-				fCurrentLevels[channel] = max / (2 << (32-8));
+				fCurrentLevels[channel] = max / (2 << (32-7));
 				break;
 			}
 			case media_raw_audio_format::B_AUDIO_SHORT:

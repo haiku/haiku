@@ -68,15 +68,14 @@ ScopeView::Draw(BRect updateRect)
 	BRect bounds = Bounds();
 	SetHighColor(0,0,0);
 	
-	if (!fIsRendering) {
-		FillRect(BRect(0,0,2,bounds.bottom));
-		DrawBitmapAsync(fBitmap, BPoint(2,0));
-	} else 
+	if (!fIsRendering)
+		DrawBitmapAsync(fBitmap, BPoint(0, 0));
+	else 
 		FillRect(bounds);
 	
-	float x = 2;
-	if (fTotalTime !=0)
-		x += (fMainTime - fLeftTime) * (bounds.right - 2)
+	float x = 0;
+	if (fTotalTime != 0)
+		x += (fMainTime - fLeftTime) * bounds.right
 			/ (fRightTime - fLeftTime);
 	SetHighColor(60,255,40);
 	StrokeLine(BPoint(x, bounds.top), BPoint(x, bounds.bottom));
@@ -235,6 +234,7 @@ ScopeView::SetTotalTime(bigtime_t timestamp, bool reset)
 	TRACE("invalidate done\n");
 }
 
+
 void 
 ScopeView::SetLeftTime(bigtime_t timestamp)
 {
@@ -339,7 +339,6 @@ ScopeView::InitBitmap()
 	memset(fBitmap->Bits(), 0, fBitmap->BitsLength());
 	
 	rect.OffsetToSelf(B_ORIGIN);
-	rect.right -= 2;
 	fBitmapView = new BView(rect.OffsetToSelf(B_ORIGIN), "bitmapView", 
 		B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW);
 	fBitmap->AddChild(fBitmapView);
@@ -355,7 +354,7 @@ ScopeView::RenderBitmap()
 	/* rendering */
 	fBitmap->Lock();
 	memset(fBitmap->Bits(), 0, fBitmap->BitsLength());
-	float width = fBitmapView->Bounds().Width();
+	float width = fBitmapView->Bounds().Width() + 1;
 	
 	fBitmapView->SetDrawingMode(B_OP_ADD);
 	fBitmapView->SetHighColor(15,60,15);
