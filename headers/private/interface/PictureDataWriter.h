@@ -23,7 +23,8 @@ class PictureDataWriter {
 public:
 	PictureDataWriter();
 	PictureDataWriter(BPositionIO *data);
-	
+	virtual ~PictureDataWriter();	
+
 	status_t SetTo(BPositionIO *data);
 
 	status_t WriteSetHighColor(const rgb_color &color);
@@ -35,7 +36,7 @@ public:
 	status_t WriteSetLineMode(const cap_mode &cap, const join_mode &join, const float &miterLimit);	
 	status_t WriteSetScale(const float &scale);
 	status_t WriteSetPattern(const pattern &pat);
-	status_t WriteSetClipping(/*const */BRegion &region);
+	status_t WriteSetClipping(const BRegion &region);
 	status_t WriteClearClipping();
 
 	status_t WritePushState();

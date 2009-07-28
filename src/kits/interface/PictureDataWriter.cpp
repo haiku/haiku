@@ -1,9 +1,9 @@
 /*
- * Copyright 2006, Haiku Inc.
+ * Copyright 2006-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 #include <PictureDataWriter.h>
@@ -21,8 +21,8 @@
 #define THROW_ERROR(error) throw (status_t)(error)
 
 // TODO: Review writing of strings. AFAIK in the picture data format
-// They are not supposed to be NULL terminated (at least, it's not mandatory)
-// and we should write their size.
+// They are not supposed to be NULL terminated
+// (at least, it's not mandatory) so we should write their size too.
 PictureDataWriter::PictureDataWriter()
 	:
 	fData(NULL)
@@ -33,6 +33,11 @@ PictureDataWriter::PictureDataWriter()
 PictureDataWriter::PictureDataWriter(BPositionIO *data)
 	:
 	fData(data)
+{
+}
+
+
+PictureDataWriter::~PictureDataWriter()
 {
 }
 
@@ -122,7 +127,8 @@ PictureDataWriter::WriteSetPenSize(const float &penSize)
 
 
 status_t
-PictureDataWriter::WriteSetLineMode(const cap_mode &cap, const join_mode &join, const float &miterLimit)
+PictureDataWriter::WriteSetLineMode(const cap_mode &cap,
+	const join_mode &join, const float &miterLimit)
 {
 	try {
 		BeginOp(B_PIC_SET_LINE_MODE);
@@ -166,7 +172,7 @@ PictureDataWriter::WriteSetPattern(const pattern &pat)
 
 
 status_t
-PictureDataWriter::WriteSetClipping(/*const */BRegion &region)
+PictureDataWriter::WriteSetClipping(const BRegion &region)
 {
 	// TODO: I don't know if it's compatible with R5's BPicture version
 	try {
@@ -230,7 +236,8 @@ PictureDataWriter::WriteSetLowColor(const rgb_color &color)
 
 
 status_t
-PictureDataWriter::WriteDrawRect(const BRect &rect, const bool &fill)
+PictureDataWriter::WriteDrawRect(const BRect &rect,
+	const bool &fill)
 {
 	try {
 		BeginOp(fill ? B_PIC_FILL_RECT : B_PIC_STROKE_RECT);
@@ -244,7 +251,8 @@ PictureDataWriter::WriteDrawRect(const BRect &rect, const bool &fill)
 
 
 status_t
-PictureDataWriter::WriteDrawRoundRect(const BRect &rect, const BPoint &radius, const bool &fill)
+PictureDataWriter::WriteDrawRoundRect(const BRect &rect,
+	const BPoint &radius, const bool &fill)
 {
 	try {
 		BeginOp(fill ? B_PIC_FILL_ROUND_RECT : B_PIC_STROKE_ROUND_RECT);
@@ -273,8 +281,9 @@ PictureDataWriter::WriteDrawEllipse(const BRect &rect, const bool &fill)
 
 
 status_t
-PictureDataWriter::WriteDrawArc(const BPoint &center, const BPoint &radius,
-				const float &startTheta, const float &arcTheta, const bool &fill)
+PictureDataWriter::WriteDrawArc(const BPoint &center,
+	const BPoint &radius, const float &startTheta,
+	const float &arcTheta, const bool &fill)
 {
 	try {
 		BeginOp(fill ? B_PIC_FILL_ARC : B_PIC_STROKE_ARC);
@@ -291,8 +300,8 @@ PictureDataWriter::WriteDrawArc(const BPoint &center, const BPoint &radius,
 
 
 status_t
-PictureDataWriter::WriteDrawPolygon(const int32 &numPoints, BPoint *points,
-				const bool &isClosed, const bool &fill)
+PictureDataWriter::WriteDrawPolygon(const int32 &numPoints,
+	BPoint *points, const bool &isClosed, const bool &fill)
 {
 	try {
 		BeginOp(fill ? B_PIC_FILL_POLYGON : B_PIC_STROKE_POLYGON);
@@ -310,7 +319,8 @@ PictureDataWriter::WriteDrawPolygon(const int32 &numPoints, BPoint *points,
 
 
 status_t
-PictureDataWriter::WriteDrawBezier(const BPoint points[4], const bool &fill)
+PictureDataWriter::WriteDrawBezier(const BPoint points[4],
+	const bool &fill)
 {
 	try {
 		BeginOp(fill ? B_PIC_FILL_BEZIER : B_PIC_STROKE_BEZIER);
@@ -325,7 +335,8 @@ PictureDataWriter::WriteDrawBezier(const BPoint points[4], const bool &fill)
 
 
 status_t
-PictureDataWriter::WriteStrokeLine(const BPoint &start, const BPoint &end)
+PictureDataWriter::WriteStrokeLine(const BPoint &start,
+	const BPoint &end)
 {
 	try {
 		BeginOp(B_PIC_STROKE_LINE);
@@ -340,8 +351,9 @@ PictureDataWriter::WriteStrokeLine(const BPoint &start, const BPoint &end)
 
 
 status_t
-PictureDataWriter::WriteDrawString(const BPoint &where, const char *string,
-				   const int32 &length, const escapement_delta &escapement)
+PictureDataWriter::WriteDrawString(const BPoint &where,
+	const char *string, const int32 &length,
+	const escapement_delta &escapement)
 {
 	try {
 		BeginOp(B_PIC_SET_PEN_LOCATION);
@@ -351,7 +363,8 @@ PictureDataWriter::WriteDrawString(const BPoint &where, const char *string,
 		BeginOp(B_PIC_DRAW_STRING);
 		Write<float>(escapement.space);
 		Write<float>(escapement.nonspace);
-		//WriteData(string, length + 1); // TODO: is string 0 terminated? why is length given?
+		//WriteData(string, length + 1);
+			// TODO: is string 0 terminated? why is length given?
 		WriteData(string, length);
 		Write<uint8>(0);
 		EndOp();
@@ -364,8 +377,9 @@ PictureDataWriter::WriteDrawString(const BPoint &where, const char *string,
 
 
 status_t
-PictureDataWriter::WriteDrawShape(const int32 &opCount, const void *opList,
-				const int32 &ptCount, const void *ptList, const bool &fill)
+PictureDataWriter::WriteDrawShape(const int32 &opCount,
+	const void *opList, const int32 &ptCount, const void *ptList,
+	const bool &fill)
 {
 	try {
 		BeginOp(fill ? B_PIC_FILL_SHAPE : B_PIC_STROKE_SHAPE);
@@ -383,9 +397,10 @@ PictureDataWriter::WriteDrawShape(const int32 &opCount, const void *opList,
 
 
 status_t
-PictureDataWriter::WriteDrawBitmap(const BRect &srcRect, const BRect &dstRect, const int32 &width, const int32 &height,
-				const int32 &bytesPerRow, const int32 &colorSpace, const int32 &flags,
-				const void *data, const int32 &length)
+PictureDataWriter::WriteDrawBitmap(const BRect &srcRect,
+	const BRect &dstRect, const int32 &width, const int32 &height,
+	const int32 &bytesPerRow, const int32 &colorSpace,
+	const int32 &flags, const void *data, const int32 &length)
 {
 	if (length != height * bytesPerRow)
 		debugger("PictureDataWriter::WriteDrawBitmap: invalid length");
@@ -408,10 +423,13 @@ PictureDataWriter::WriteDrawBitmap(const BRect &srcRect, const BRect &dstRect, c
 
 
 status_t
-PictureDataWriter::WriteDrawPicture(const BPoint &where, const int32 &token)
+PictureDataWriter::WriteDrawPicture(const BPoint &where,
+	const int32 &token)
 {
-	// TODO: I'm not sure about this function. I think we need to attach the picture
-	// data too. The token won't be sufficient in many cases.
+	// TODO: I'm not sure about this function. I think we need
+	// to attach the picture data too.
+	// The token won't be sufficient in many cases (for example, when
+	// we archive/flatten the picture.
 	try {
 		BeginOp(B_PIC_DRAW_PICTURE);
 		Write<BPoint>(where);
@@ -610,7 +628,8 @@ PictureDataWriter::EndOp()
 	// and the space occupied by the size field (size_t) 
 	size_t size = curPos - stackPos - sizeof(size_t) - sizeof(int16);
 
-	// Size was set to 0 in BeginOp(). Now we overwrite it with the correct value
+	// Size was set to 0 in BeginOp()
+	// Now we overwrite it with the correct value
 	fData->Seek(stackPos + sizeof(int16), SEEK_SET);
 	fData->Write(&size, sizeof(size));
 	fData->Seek(curPos, SEEK_SET);
