@@ -14,7 +14,7 @@
 class BSeparatorView : public BView {
 public:
 								BSeparatorView(enum orientation orientation,
-									border_style border = B_FANCY_BORDER);
+									border_style border = B_PLAIN_BORDER);
 								BSeparatorView(const char* name,
 									const char* label,
 									enum orientation orientation
