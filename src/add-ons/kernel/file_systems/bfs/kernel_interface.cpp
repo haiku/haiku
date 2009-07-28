@@ -892,12 +892,12 @@ bfs_create(fs_volume* _volume, fs_vnode* _directory, const char* name,
 		status = file_cache_disable(inode->FileCache());
 	}
 
+	entry_cache_add(volume->ID(), directory->ID(), name, *_vnodeID);
+
 	if (status == B_OK)
 		status = transaction.Done();
 
 	if (status == B_OK) {
-		entry_cache_add(volume->ID(), directory->ID(), name, *_vnodeID);
-
 		// register the cookie
 		*_cookie = cookie;
 
@@ -905,8 +905,10 @@ bfs_create(fs_volume* _volume, fs_vnode* _directory, const char* name,
 			notify_entry_created(volume->ID(), directory->ID(), name,
 				*_vnodeID);
 		}
-	} else
+	} else {
+		entry_cache_remove(volume->ID(), directory->ID(), name);
 		delete cookie;
+	}
 
 	return status;
 }
@@ -967,9 +969,11 @@ bfs_create_symlink(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	if (status == B_OK) {
 		entry_cache_add(volume->ID(), directory->ID(), name, id);
 
-		transaction.Done();
-
-		notify_entry_created(volume->ID(), directory->ID(), name, id);
+		status = transaction.Done();
+		if (status == B_OK)
+			notify_entry_created(volume->ID(), directory->ID(), name, id);
+		else
+			entry_cache_remove(volume->ID(), directory->ID(), name);
 	}
 
 	return status;
@@ -1004,12 +1008,15 @@ bfs_unlink(fs_volume* _volume, fs_vnode* _directory, const char* name)
 	Transaction transaction(volume, directory->BlockNumber());
 
 	off_t id;
-	if ((status = directory->Remove(transaction, name, &id)) == B_OK) {
+	status = directory->Remove(transaction, name, &id);
+	if (status == B_OK) {
 		entry_cache_remove(volume->ID(), directory->ID(), name);
 
-		transaction.Done();
-
-		notify_entry_removed(volume->ID(), directory->ID(), name, id);
+		status = transaction.Done();
+		if (status == B_OK)
+			notify_entry_removed(volume->ID(), directory->ID(), name, id);
+		else
+			entry_cache_add(volume->ID(), directory->ID(), name, id);
 	}
 	return status;
 }
@@ -1180,11 +1187,15 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 				entry_cache_remove(volume->ID(), oldDirectory->ID(), oldName);
 				entry_cache_add(volume->ID(), newDirectory->ID(), newName, id);
 
-				transaction.Done();
+				status = transaction.Done();
+				if (status == B_OK) {
+					notify_entry_moved(volume->ID(), oldDirectory->ID(),
+						oldName, newDirectory->ID(), newName, id);
+					return B_OK;
+				}
 
-				notify_entry_moved(volume->ID(), oldDirectory->ID(), oldName,
-					newDirectory->ID(), newName, id);
-				return B_OK;
+				entry_cache_remove(volume->ID(), oldDirectory->ID(), newName);
+				entry_cache_add(volume->ID(), newDirectory->ID(), oldName, id);
 			}
 		}
 	}
@@ -1298,9 +1309,9 @@ bfs_write(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 
 	status_t status = inode->WriteAt(transaction, pos, (const uint8*)buffer,
 		_length);
+	if (status == B_OK)
+		status = transaction.Done();
 	if (status == B_OK) {
-		transaction.Done();
-
 		InodeReadLocker locker(inode);
 
 		// periodically notify if the file size has changed
@@ -1496,9 +1507,11 @@ bfs_create_dir(fs_volume* _volume, fs_vnode* _directory, const char* name,
 
 		entry_cache_add(volume->ID(), directory->ID(), name, id);
 
-		transaction.Done();
-
-		notify_entry_created(volume->ID(), directory->ID(), name, id);
+		status = transaction.Done();
+		if (status == B_OK)
+			notify_entry_created(volume->ID(), directory->ID(), name, id);
+		else
+			entry_cache_remove(volume->ID(), directory->ID(), name);
 	}
 
 	return status;
@@ -1523,9 +1536,13 @@ bfs_remove_dir(fs_volume* _volume, fs_vnode* _directory, const char* name)
 		entry_cache_remove(volume->ID(), directory->ID(), name);
 		entry_cache_remove(volume->ID(), id, "..");
 
-		transaction.Done();
-
-		notify_entry_removed(volume->ID(), directory->ID(), name, id);
+		status = transaction.Done();
+		if (status == B_OK)
+			notify_entry_removed(volume->ID(), directory->ID(), name, id);
+		else {
+			entry_cache_add(volume->ID(), directory->ID(), name, id);
+			entry_cache_add(volume->ID(), id, "..", id);
+		}
 	}
 
 	return status;
@@ -1772,12 +1789,13 @@ bfs_write_attr(fs_volume* _volume, fs_vnode* _file, void* _cookie,
 	status_t status = attribute.Write(transaction, cookie, pos,
 		(const uint8*)buffer, _length);
 	if (status == B_OK) {
-		transaction.Done();
-
-		notify_attribute_changed(volume->ID(), inode->ID(), cookie->name,
-			B_ATTR_CHANGED);
-			// TODO: B_ATTR_CREATED is not yet taken into account
-			// (we don't know what Attribute::Write() does exactly)
+		status = transaction.Done();
+		if (status == B_OK) {
+			notify_attribute_changed(volume->ID(), inode->ID(), cookie->name,
+				B_ATTR_CHANGED);
+				// TODO: B_ATTR_CREATED is not yet taken into account
+				// (we don't know what Attribute::Write() does exactly)
+		}
 	}
 
 	return status;
@@ -1837,9 +1855,9 @@ bfs_remove_attr(fs_volume* _volume, fs_vnode* _node, const char* name)
 	Transaction transaction(volume, inode->BlockNumber());
 
 	status = inode->RemoveAttribute(transaction, name);
+	if (status == B_OK)
+		status = transaction.Done();
 	if (status == B_OK) {
-		transaction.Done();
-
 		notify_attribute_changed(volume->ID(), inode->ID(), name,
 			B_ATTR_REMOVED);
 	}
@@ -1889,9 +1907,11 @@ bfs_create_special_node(fs_volume* _volume, fs_vnode* _directory,
 
 		entry_cache_add(volume->ID(), directory->ID(), name, id);
 
-		transaction.Done();
-
-		notify_entry_created(volume->ID(), directory->ID(), name, id);
+		status = transaction.Done();
+		if (status == B_OK)
+			notify_entry_created(volume->ID(), directory->ID(), name, id);
+		else
+			entry_cache_remove(volume->ID(), directory->ID(), name);
 	}
 
 	return status;
@@ -2004,7 +2024,7 @@ bfs_create_index(fs_volume* _volume, const char* name, uint32 type,
 	status_t status = index.Create(transaction, name, type);
 
 	if (status == B_OK)
-		transaction.Done();
+		status = transaction.Done();
 
 	RETURN_ERROR(status);
 }
@@ -2032,7 +2052,7 @@ bfs_remove_index(fs_volume* _volume, const char* name)
 
 	status_t status = indices->Remove(transaction, name);
 	if (status == B_OK)
-		transaction.Done();
+		status = transaction.Done();
 
 	RETURN_ERROR(status);
 }
