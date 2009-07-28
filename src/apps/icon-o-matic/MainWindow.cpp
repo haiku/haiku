@@ -542,6 +542,7 @@ MainWindow::_Init()
 
 	fCanvasView->SetCatchAllEvents(true);
 	fCanvasView->SetCommandStack(fDocument->CommandStack());
+	fCanvasView->SetMouseFilterMode(SNAPPING_64);
 //	fCanvasView->SetSelection(fDocument->Selection());
 
 	fPathListView->SetMenu(fPathMenu);
@@ -1064,7 +1065,7 @@ MainWindow::_CreateMenuBar(BRect frame)
 	message->AddInt32("mode", SNAPPING_16);
 	filterModeMenu->AddItem(new BMenuItem("16 x 16", message, '1'));
 
-	filterModeMenu->ItemAt(0)->SetMarked(true);
+	filterModeMenu->ItemAt(1)->SetMarked(true);
 	filterModeMenu->SetRadioMode(true);
 
 	settingsMenu->AddItem(filterModeMenu);
