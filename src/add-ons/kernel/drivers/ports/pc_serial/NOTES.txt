@@ -5,6 +5,10 @@ http://jamesthornton.com/freebsd/articles/serial-uart/
 http://dugeem.net/david/work/freebsd-serial.html
 http://dugeem.net/david/work/etc/sio.c
 
+Moschip:
+http://lxr.linux.no/linux+v2.6.28.7/drivers/parport/parport_serial.c#L108
+http://lxr.linux.no/linux+v2.6.28.7/drivers/pci/quirks.c#L1462
+
 if you can understand it:
 http://lxr.linux.no/linux+v2.6.28.7/drivers/serial/
 
