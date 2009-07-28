@@ -305,6 +305,9 @@ PackagesView::GetPackagesToInstall(BList *list, int32 *size)
 void
 PackagesView::FrameResized(float width, float height)
 {
+	if (CountChildren() == 0)
+		Invalidate();
+
 	BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
 	if (scrollBar == NULL)
 		return;

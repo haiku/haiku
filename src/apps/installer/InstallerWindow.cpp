@@ -222,6 +222,7 @@ InstallerWindow::InstallerWindow()
 	fStatusView->MakeSelectable(false);
 
 	BSize logoSize = logoView->MinSize();
+	logoView->SetExplicitMaxSize(logoSize);
 	fStatusView->SetExplicitMinSize(BSize(logoSize.width * 0.66, B_SIZE_UNSET));
 
 	fDestMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);
@@ -239,7 +240,7 @@ InstallerWindow::InstallerWindow()
 		"Show Optional Packages");
 	fPackagesSwitch->SetMessage(new BMessage(SHOW_BOTTOM_MESSAGE));
 	fPackagesSwitch->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
-		B_SIZE_UNLIMITED));
+		B_SIZE_UNSET));
 	fPackagesSwitch->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_TOP));
 
