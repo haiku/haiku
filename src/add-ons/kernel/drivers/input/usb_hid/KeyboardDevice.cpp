@@ -98,7 +98,9 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 	}
 
 	// find leds if we have an output report
-	fLEDs[0] = fLEDs[1] = fLEDs[2] = NULL;
+	for (uint32 i = 0; i < MAX_LEDS; i++)
+		fLEDs[i] = NULL;
+
 	if (outputReport != NULL) {
 		for (uint32 i = 0; i < outputReport->CountItems(); i++) {
 			HIDReportItem *item = outputReport->ItemAt(i);
@@ -554,8 +556,8 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 	uint16 *compare = fCurrentKeys;
 	for (int32 twice = 0; twice < 2; twice++) {
 		for (size_t i = 0; i < fKeyCount; i++) {
-			if (current[i] == 0 || (current[i] == 1 &&
-				fKeys[i]->UsagePage() == HID_USAGE_PAGE_KEYBOARD))
+			if (current[i] == 0 || (current[i] == 1
+				&& fKeys[i]->UsagePage() == HID_USAGE_PAGE_KEYBOARD))
 				continue;
 
 			bool found = false;
