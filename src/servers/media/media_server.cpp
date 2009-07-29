@@ -886,6 +886,28 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			break;
 		}
 
+		case SERVER_GET_WRITER_FOR_FORMAT_FAMILY:
+		{
+			const server_get_writer_request *request
+				= reinterpret_cast<const server_get_writer_request *>(data);
+			server_get_writer_reply reply;
+			rv = gAddOnManager->GetWriter(&reply.ref, request->file_format);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+
+		case SERVER_GET_ENCODER_FOR_FORMAT:
+		{
+			const server_get_encoder_for_format_request *request
+				= reinterpret_cast<
+					const server_get_encoder_for_format_request *>(data);
+			server_get_encoder_for_format_reply reply;
+			rv = gAddOnManager->GetEncoderForFormat(&reply.ref,
+				request->format);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+
 		default:
 			printf("media_server: received unknown message code %#08lx\n",
 				code);

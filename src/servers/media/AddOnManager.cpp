@@ -5,6 +5,7 @@
  * Authors:
  *		Marcus Overhagen
  *		Axel Dörfler
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
@@ -13,20 +14,21 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <FindDirectory.h>
-#include <Path.h>
-#include <Entry.h>
-#include <Directory.h>
 #include <Autolock.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <FindDirectory.h>
 #include <image.h>
+#include <Path.h>
 
 #include <safemode_defs.h>
 #include <syscalls.h>
 
+#include "debug.h"
+#include "media_server.h"
+
 #include "FormatManager.h"
 #include "MetaFormat.h"
-#include "media_server.h"
-#include "debug.h"
 
 
 //	#pragma mark - ImageLoader
@@ -60,7 +62,8 @@ private:
 
 AddOnManager::AddOnManager()
 	:
- 	fLock("add-on manager")
+ 	fLock("add-on manager"),
+ 	fNextWriterFormatFamilyID(0)
 {
 }
 
@@ -73,7 +76,7 @@ AddOnManager::~AddOnManager()
 void
 AddOnManager::LoadState()
 {
-	RegisterAddOns();
+	_RegisterAddOns();
 }
 
 
@@ -90,8 +93,9 @@ AddOnManager::GetDecoderForFormat(xfer_entry_ref* _decoderRef,
 	if ((format.type == B_MEDIA_ENCODED_VIDEO
 			|| format.type == B_MEDIA_ENCODED_AUDIO
 			|| format.type == B_MEDIA_MULTISTREAM)
-		&& format.Encoding() == 0)
+		&& format.Encoding() == 0) {
 		return B_MEDIA_BAD_FORMAT;
+	}
 	if (format.type == B_MEDIA_NO_TYPE || format.type == B_MEDIA_UNKNOWN_TYPE)
 		return B_MEDIA_BAD_FORMAT;
 
@@ -137,7 +141,76 @@ AddOnManager::GetReaders(xfer_entry_ref* outRefs, int32* outCount,
 
 
 status_t
-AddOnManager::RegisterAddOn(BEntry& entry)
+AddOnManager::GetEncoderForFormat(xfer_entry_ref* _encoderRef,
+	const media_format& format)
+{
+	if ((format.type == B_MEDIA_ENCODED_VIDEO
+			|| format.type == B_MEDIA_ENCODED_AUDIO
+			|| format.type == B_MEDIA_MULTISTREAM)
+		&& format.Encoding() == 0) {
+		return B_MEDIA_BAD_FORMAT;
+	}
+	if (format.type == B_MEDIA_NO_TYPE || format.type == B_MEDIA_UNKNOWN_TYPE)
+		return B_MEDIA_BAD_FORMAT;
+
+	BAutolock locker(fLock);
+
+	printf("AddOnManager::GetEncoderForFormat: searching encoder for encoding "
+		"%ld\n", format.Encoding());
+
+	encoder_info* info;
+	for (fEncoderList.Rewind(); fEncoderList.GetNext(&info);) {
+		media_format* encoderFormat;
+		for (info->formats.Rewind(); info->formats.GetNext(&encoderFormat);) {
+			// check if the encoder matches the supplied format
+			if (!encoderFormat->Matches(&format))
+				continue;
+
+			printf("AddOnManager::GetEncoderForFormat: found encoder %s for "
+				"encoding %ld\n", info->ref.name, encoderFormat->Encoding());
+
+			*_encoderRef = info->ref;
+			return B_OK;
+		}
+	}
+	return B_ENTRY_NOT_FOUND;	
+}
+									
+
+status_t
+AddOnManager::GetWriter(xfer_entry_ref* _ref, const media_file_format& format)
+{
+	BAutolock locker(fLock);
+
+	writer_info* info;
+	for (fWriterList.Rewind(); fWriterList.GetNext(&info);) {
+		media_file_format* fileFormat;
+		for (info->fileFormats.Rewind();
+				info->fileFormats.GetNext(&fileFormat);) {
+			// Check if the writer matches the supplied file format
+			// TODO: There must be a trick here which makes all this
+			// much simpler and probably lets us create a Writer client
+			// side...
+			if (fileFormat->id.internal_id != format.id.internal_id)
+				continue;
+
+			printf("AddOnManager::GetWriter: found writer %s for "
+				"file format %s\n", info->ref.name, format.pretty_name);
+
+			*_ref = info->ref;
+			return B_OK;
+		}
+	}
+
+	return B_ERROR;
+}
+
+
+// #pragma mark -
+
+
+status_t
+AddOnManager::_RegisterAddOn(BEntry& entry)
 {
 	BPath path(&entry);
 
@@ -146,7 +219,7 @@ AddOnManager::RegisterAddOn(BEntry& entry)
 	if (status < B_OK)
 		return status;
 
-	printf("AddOnManager::RegisterAddOn(): trying to load \"%s\"\n",
+	printf("AddOnManager::_RegisterAddOn(): trying to load \"%s\"\n",
 		path.Path());
 
 	ImageLoader loader(path);
@@ -157,27 +230,35 @@ AddOnManager::RegisterAddOn(BEntry& entry)
 
 	if (get_image_symbol(loader.Image(), "instantiate_plugin",
 			B_SYMBOL_TYPE_TEXT, (void**)&instantiate_plugin_func) < B_OK) {
-		printf("AddOnManager::RegisterAddOn(): can't find instantiate_plugin "
+		printf("AddOnManager::_RegisterAddOn(): can't find instantiate_plugin "
 			"in \"%s\"\n", path.Path());
 		return B_BAD_TYPE;
 	}
 
 	MediaPlugin* plugin = (*instantiate_plugin_func)();
 	if (plugin == NULL) {
-		printf("AddOnManager::RegisterAddOn(): instantiate_plugin in \"%s\" "
+		printf("AddOnManager::_RegisterAddOn(): instantiate_plugin in \"%s\" "
 			"returned NULL\n", path.Path());
 		return B_ERROR;
 	}
 
-	// ToDo: remove any old formats describing this add-on!!
+	// TODO: Remove any old formats describing this add-on!!
 
 	ReaderPlugin* reader = dynamic_cast<ReaderPlugin*>(plugin);
 	if (reader != NULL)
-		RegisterReader(reader, ref);
+		_RegisterReader(reader, ref);
 
 	DecoderPlugin* decoder = dynamic_cast<DecoderPlugin*>(plugin);
 	if (decoder != NULL)
-		RegisterDecoder(decoder, ref);
+		_RegisterDecoder(decoder, ref);
+
+	WriterPlugin* writer = dynamic_cast<WriterPlugin*>(plugin);
+	if (writer != NULL)
+		_RegisterWriter(writer, ref);
+
+	EncoderPlugin* encoder = dynamic_cast<EncoderPlugin*>(plugin);
+	if (encoder != NULL)
+		_RegisterEncoder(encoder, ref);
 
 	delete plugin;
 	
@@ -186,7 +267,7 @@ AddOnManager::RegisterAddOn(BEntry& entry)
 
 
 void
-AddOnManager::RegisterAddOns()
+AddOnManager::_RegisterAddOns()
 {
 	class CodecHandler : public AddOnMonitorHandler {
 	private:
@@ -209,7 +290,7 @@ AddOnManager::RegisterAddOns()
 				entryInfo->dir_nref.node, entryInfo->name, &ref);
 			BEntry entry(&ref, false);
 			if (entry.InitCheck() == B_OK)
-				fManager->RegisterAddOn(entry);
+				fManager->_RegisterAddOn(entry);
 		}
 
 		virtual void AddOnDisabled(const add_on_entry_info* entryInfo)
@@ -261,7 +342,7 @@ AddOnManager::RegisterAddOns()
 
 
 void
-AddOnManager::RegisterReader(ReaderPlugin* reader, const entry_ref& ref)
+AddOnManager::_RegisterReader(ReaderPlugin* reader, const entry_ref& ref)
 {
 	BAutolock locker(fLock);
 
@@ -273,7 +354,7 @@ AddOnManager::RegisterReader(ReaderPlugin* reader, const entry_ref& ref)
 		}
 	}
 
-	printf("AddOnManager::RegisterReader, name %s\n", ref.name);
+	printf("AddOnManager::_RegisterReader, name %s\n", ref.name);
 
 	reader_info info;
 	info.ref = ref;
@@ -283,7 +364,7 @@ AddOnManager::RegisterReader(ReaderPlugin* reader, const entry_ref& ref)
 
 
 void
-AddOnManager::RegisterDecoder(DecoderPlugin* plugin, const entry_ref& ref)
+AddOnManager::_RegisterDecoder(DecoderPlugin* plugin, const entry_ref& ref)
 {
 	BAutolock locker(fLock);
 
@@ -295,22 +376,96 @@ AddOnManager::RegisterDecoder(DecoderPlugin* plugin, const entry_ref& ref)
 		}
 	}
 
-	printf("AddOnManager::RegisterDecoder, name %s\n", ref.name);
+	printf("AddOnManager::_RegisterDecoder, name %s\n", ref.name);
 
 	decoder_info info;
 	info.ref = ref;
 
 	media_format* formats = 0;
 	size_t count = 0;
-	if (plugin->GetSupportedFormats(&formats,&count) != B_OK) {
-		printf("AddOnManager::RegisterDecoder(): plugin->GetSupportedFormats"
+	if (plugin->GetSupportedFormats(&formats, &count) != B_OK) {
+		printf("AddOnManager::_RegisterDecoder(): plugin->GetSupportedFormats"
 			"(...) failed!\n");
 		return;
 	}
-	for (uint i = 0 ; i < count ; i++) {
+	for (uint i = 0 ; i < count ; i++)
 		info.formats.Insert(formats[i]);
-	}
+
 	fDecoderList.Insert(info);
+}
+
+
+void
+AddOnManager::_RegisterWriter(WriterPlugin* writer, const entry_ref& ref)
+{
+	BAutolock locker(fLock);
+
+	writer_info* pinfo;
+	for (fWriterList.Rewind(); fWriterList.GetNext(&pinfo);) {
+		if (!strcmp(pinfo->ref.name, ref.name)) {
+			// we already know this writer
+			return;
+		}
+	}
+
+	printf("AddOnManager::_RegisterWriter, name %s\n", ref.name);
+
+	writer_info info;
+	info.ref = ref;
+
+	// Get list of support media_file_formats...
+	media_file_format* fileFormats = NULL;
+	size_t count = 0;
+	if (writer->GetSupportedFileFormats(&fileFormats, &count) != B_OK) {
+		printf("AddOnManager::_RegisterWriter(): "
+			"plugin->GetSupportedFileFormats(...) failed!\n");
+		return;
+	}
+	for (uint i = 0 ; i < count ; i++) {
+		// Generate a proper ID before inserting this format, this encodes
+		// the specific plugin in the media_file_format.
+		media_file_format fileFormat = fileFormats[i];
+		fileFormat.id.node = ref.directory;
+		fileFormat.id.device = ref.device;
+		fileFormat.id.internal_id = fNextWriterFormatFamilyID++;
+
+		info.fileFormats.Insert(fileFormat);
+	}
+
+	fWriterList.Insert(info);
+}
+
+
+void
+AddOnManager::_RegisterEncoder(EncoderPlugin* plugin, const entry_ref& ref)
+{
+	BAutolock locker(fLock);
+
+	encoder_info* pinfo;
+	for (fEncoderList.Rewind(); fEncoderList.GetNext(&pinfo);) {
+		if (!strcmp(pinfo->ref.name, ref.name)) {
+			// we already know this encoder
+			return;
+		}
+	}
+
+	printf("AddOnManager::_RegisterEncoder, name %s\n", ref.name);
+
+	encoder_info info;
+	info.ref = ref;
+
+	// Get list of support media_formats...
+	media_format* formats = NULL;
+	size_t count = 0;
+	if (plugin->GetSupportedFormats(&formats, &count) != B_OK) {
+		printf("AddOnManager::_RegisterEncoder(): plugin->GetSupportedFormats"
+			"(...) failed!\n");
+		return;
+	}
+	for (uint i = 0 ; i < count ; i++)
+		info.formats.Insert(formats[i]);
+
+	fEncoderList.Insert(info);
 }
 
 

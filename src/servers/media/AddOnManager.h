@@ -5,6 +5,7 @@
  * Authors:
  *		Marcus Overhagen
  *		Axel Dörfler
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 #ifndef _ADD_ON_MANAGER_H
 #define _ADD_ON_MANAGER_H
@@ -15,13 +16,15 @@
 */
 
 
-#include "ReaderPlugin.h"
-#include "DecoderPlugin.h"
 #include "DataExchange.h"
 #include "TList.h"
 
 #include "AddOnMonitor.h"
 #include "AddOnMonitorHandler.h"
+#include "DecoderPlugin.h"
+#include "EncoderPlugin.h"
+#include "ReaderPlugin.h"
+#include "WriterPlugin.h"
 
 
 class AddOnManager {
@@ -38,13 +41,24 @@ public:
 			status_t			GetReaders(xfer_entry_ref* _ref,
 									int32* _count, int32 maxCount);
 
-private:
-			status_t			RegisterAddOn(BEntry& entry);
-			void				RegisterAddOns();
+			status_t			GetEncoderForFormat(xfer_entry_ref* _ref,
+									const media_format& format);
 
-			void				RegisterReader(ReaderPlugin* reader,
+			status_t			GetWriter(xfer_entry_ref* _ref,
+									const media_file_format& format);
+
+private:
+			status_t			_RegisterAddOn(BEntry& entry);
+			void				_RegisterAddOns();
+
+			void				_RegisterReader(ReaderPlugin* reader,
 									const entry_ref& ref);
-			void				RegisterDecoder(DecoderPlugin* decoder,
+			void				_RegisterDecoder(DecoderPlugin* decoder,
+									const entry_ref& ref);
+
+			void				_RegisterWriter(WriterPlugin* writer,
+									const entry_ref& ref);
+			void				_RegisterEncoder(EncoderPlugin* encoder,
 									const entry_ref& ref);
 
 private:
@@ -53,6 +67,7 @@ private:
 			};
 			struct writer_info {
 				entry_ref ref;
+				List<media_file_format> fileFormats;
 			};
 			struct decoder_info {
 				entry_ref ref;
@@ -60,6 +75,7 @@ private:
 			};
 			struct encoder_info {
 				entry_ref ref;
+				List<media_format> formats;
 			};
 
 			BLocker				fLock;
@@ -68,7 +84,7 @@ private:
 			List<decoder_info>	fDecoderList;
 			List<encoder_info>	fEncoderList;
 
-			decoder_info*		fCurrentDecoder;
+			uint32				fNextWriterFormatFamilyID;
 
 			AddOnMonitorHandler* fHandler;
 			AddOnMonitor*		fAddOnMonitor;
