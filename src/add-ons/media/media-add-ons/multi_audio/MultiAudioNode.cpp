@@ -123,19 +123,34 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 	AddNodeKind(B_PHYSICAL_OUTPUT);
 	AddNodeKind(B_PHYSICAL_INPUT);
 
-	// initialize our preferred format object
-	memset(&fPreferredFormat, 0, sizeof(fPreferredFormat)); // set everything to wildcard first
-	fPreferredFormat.type = B_MEDIA_RAW_AUDIO;
-	fPreferredFormat.u.raw_audio.format = MultiAudio::convert_to_media_format(fDevice->FormatInfo().output.format);
-	fPreferredFormat.u.raw_audio.valid_bits = MultiAudio::convert_to_valid_bits(fDevice->FormatInfo().output.format);
-	fPreferredFormat.u.raw_audio.channel_count = 2;
-	fPreferredFormat.u.raw_audio.frame_rate = MultiAudio::convert_to_sample_rate(fDevice->FormatInfo().output.rate);		// measured in Hertz
-	fPreferredFormat.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
+	// initialize our preferred format objects
+	memset(&fOutputPreferredFormat, 0, sizeof(fOutputPreferredFormat)); // set everything to wildcard first
+	fOutputPreferredFormat.type = B_MEDIA_RAW_AUDIO;
+	fOutputPreferredFormat.u.raw_audio.format = MultiAudio::convert_to_media_format(fDevice->FormatInfo().output.format);
+	fOutputPreferredFormat.u.raw_audio.valid_bits = MultiAudio::convert_to_valid_bits(fDevice->FormatInfo().output.format);
+	fOutputPreferredFormat.u.raw_audio.channel_count = 2;
+	fOutputPreferredFormat.u.raw_audio.frame_rate = MultiAudio::convert_to_sample_rate(fDevice->FormatInfo().output.rate);		// measured in Hertz
+	fOutputPreferredFormat.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
 
 	// we'll use the consumer's preferred buffer size, if any
-	fPreferredFormat.u.raw_audio.buffer_size = fDevice->BufferList().return_record_buffer_size 
-		* (fPreferredFormat.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
-		* fPreferredFormat.u.raw_audio.channel_count;
+	fOutputPreferredFormat.u.raw_audio.buffer_size = fDevice->BufferList().return_playback_buffer_size 
+		* (fOutputPreferredFormat.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
+		* fOutputPreferredFormat.u.raw_audio.channel_count;
+
+	// initialize our preferred format objects
+	memset(&fInputPreferredFormat, 0, sizeof(fInputPreferredFormat)); // set everything to wildcard first
+	fInputPreferredFormat.type = B_MEDIA_RAW_AUDIO;
+	fInputPreferredFormat.u.raw_audio.format = MultiAudio::convert_to_media_format(fDevice->FormatInfo().input.format);
+	fInputPreferredFormat.u.raw_audio.valid_bits = MultiAudio::convert_to_valid_bits(fDevice->FormatInfo().input.format);
+	fInputPreferredFormat.u.raw_audio.channel_count = 2;
+	fInputPreferredFormat.u.raw_audio.frame_rate = MultiAudio::convert_to_sample_rate(fDevice->FormatInfo().input.rate);		// measured in Hertz
+	fInputPreferredFormat.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
+
+	// we'll use the consumer's preferred buffer size, if any
+	fInputPreferredFormat.u.raw_audio.buffer_size = fDevice->BufferList().return_record_buffer_size 
+		* (fInputPreferredFormat.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
+		* fInputPreferredFormat.u.raw_audio.channel_count;
+
 
 	if (config) {
 		fConfig = *config;
@@ -234,13 +249,13 @@ MultiAudioNode::NodeRegistered()
 
 			media_input* input = new media_input;
 
-			input->format = fPreferredFormat;
+			input->format = fOutputPreferredFormat;
 			input->destination.port = ControlPort();
 			input->destination.id = fInputs.CountItems();
 			input->node = Node();
 			sprintf(input->name, "output %ld", input->destination.id);
 
-			currentInput = new node_input(*input, fPreferredFormat);
+			currentInput = new node_input(*input, fOutputPreferredFormat);
 			currentInput->fPreferredFormat.u.raw_audio.channel_count = 1;
 			currentInput->fInput.format = currentInput->fPreferredFormat;
 
@@ -279,14 +294,14 @@ MultiAudioNode::NodeRegistered()
 			
 			media_output *output = new media_output;
 
-			output->format = fPreferredFormat;
+			output->format = fInputPreferredFormat;
 			output->destination = media_destination::null;
 			output->source.port = ControlPort();
 			output->source.id = fOutputs.CountItems();
 			output->node = Node();
 			sprintf(output->name, "input %ld", output->source.id);
 
-			currentOutput = new node_output(*output, fPreferredFormat);
+			currentOutput = new node_output(*output, fInputPreferredFormat);
 			currentOutput->fPreferredFormat.u.raw_audio.channel_count = 1;
 			currentOutput->fOutput.format = currentOutput->fPreferredFormat;
 			currentOutput->fChannelId = fDevice->Description().channels[i].channel_id;
@@ -606,7 +621,7 @@ MultiAudioNode::FormatSuggestionRequested(media_type type, int32 /*quality*/,
 	}
 
 	// this is the format we'll be returning (our preferred format)
-	*format = fPreferredFormat;
+	*format = fInputPreferredFormat;
 
 	// a wildcard type is okay; we can specialize it
 	if (type == B_MEDIA_UNKNOWN_TYPE) type = B_MEDIA_RAW_AUDIO;

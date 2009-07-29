@@ -199,7 +199,8 @@ private:
 
 	bigtime_t 			fLatency;
 	BList				fOutputs;
-	media_format 		fPreferredFormat;
+	media_format 		fOutputPreferredFormat;
+	media_format 		fInputPreferredFormat;
 
 	bigtime_t			fInternalLatency;
 		// this is computed from the real (negotiated) chunk size and bit rate,
