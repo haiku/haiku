@@ -28,7 +28,6 @@
 #include <unistd.h>
 
 #include <ByteOrder.h>
-#include <disk_scanner.h>
 #include <KernelExport.h>
 #include <scsi.h>
 
