@@ -180,6 +180,7 @@ public:
 	void RemoveInode(Inode* inode);
 
 	void UnlockInodes(bool success);
+	void MoveInodesTo(Transaction* transaction);
 
 private:
 	Transaction(const Transaction& other);

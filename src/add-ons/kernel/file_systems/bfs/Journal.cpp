@@ -1006,7 +1006,8 @@ Journal::Unlock(Transaction* owner, bool success)
 		if (fSeparateSubTransactions
 			&& recursive_lock_get_recursion(&fLock) == 1)
 			fSeparateSubTransactions = false;
-	}
+	} else
+		owner->MoveInodesTo(fOwner);
 
 	recursive_lock_unlock(&fLock);
 	return B_OK;
@@ -1202,3 +1203,14 @@ Transaction::UnlockInodes(bool success)
 	}
 }
 
+
+/*!	Move the inodes into the parent transaction. This is needed only to make
+	sure they will still be reverted in case the transaction is aborted.
+*/
+void
+Transaction::MoveInodesTo(Transaction* transaction)
+{
+	while (Inode* inode = fLockedInodes.RemoveHead()) {
+		transaction->fLockedInodes.Add(inode);
+	}
+}
