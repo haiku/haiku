@@ -60,7 +60,6 @@ extern void		exit(int);
 /* misc functions */
 extern char		*realpath(const char *path, char *resolved);
 
-extern int		daemon(int nochdir, int noclose);
 extern int		system(const char *command);
 
 extern char		*mktemp(char *name);

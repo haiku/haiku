@@ -10,6 +10,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <Message.h>
 #include <Messenger.h>
@@ -41,7 +42,7 @@ protected:
 private:
 			void			_MakeShellSafe(BString* string);
 
-			thread_id		_PipeCommand(int argc, const char** argv, 
+			thread_id		_PipeCommand(int argc, const char** argv,
 								int& in, int& out, int& err,
 								const char** envp = (const char**)environ);
 

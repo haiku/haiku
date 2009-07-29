@@ -135,8 +135,6 @@ extern int		fgetc(FILE *stream);
 extern char		*gets(char *buffer);
 extern char		*fgets(char *string, int stringLength, FILE *stream);
 
-extern char		*fgetln(FILE *stream, size_t *);
-
 /* formatted I/O */
 extern int		printf(char const *format, ...) __PRINTFLIKE(1,2);
 extern int		fprintf(FILE *stream, char const *format, ...) __PRINTFLIKE(2,3);

@@ -190,7 +190,6 @@ extern unsigned	int	alarm(unsigned int seconds);
 extern useconds_t	ualarm(useconds_t microSeconds, useconds_t interval);
 extern unsigned int	sleep(unsigned int seconds);
 extern int			usleep(unsigned int microSeconds);
-extern clock_t		clock(void);
 extern int 			pause(void);
 
 /* process */
@@ -206,7 +205,7 @@ extern pid_t	setpgrp(void);
 
 extern int		chroot(const char *path);
 
-/* access permissions */				
+/* access permissions */
 extern gid_t	getegid(void);
 extern uid_t	geteuid(void);
 extern gid_t	getgid(void);
@@ -246,9 +245,6 @@ extern void 	swab(const void *src, void *dest, ssize_t nbytes);
 /* getopt() related external variables */
 extern char *optarg;
 extern int optind, opterr, optopt;
-
-/* ToDo: should be moved to stdlib.h */
-extern char **environ;
 
 #ifdef __cplusplus
 }

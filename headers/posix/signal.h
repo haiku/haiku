@@ -174,8 +174,6 @@ int		sighold(int signo);
 int		sigrelse(int signo);
 int		sigpause(int signo);
 
-const char *strsignal(int sig);
-
 void	set_signal_stack(void *ptr, size_t size);
 int		sigaltstack(const stack_t *ss, stack_t *oss);
 
