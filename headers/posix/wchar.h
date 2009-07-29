@@ -74,18 +74,18 @@ extern wint_t	putwc(wchar_t, FILE *);
 extern wint_t	putwchar(wchar_t);
 
 extern int		swprintf(wchar_t *, size_t, const wchar_t *, ...);
-/*extern int		swscanf(const wchar_t *, const wchar_t *, ...);*/
+extern int		swscanf(const wchar_t *, const wchar_t *, ...);
 
 extern wint_t	towlower(wint_t);
 extern wint_t	towupper(wint_t);
 extern wint_t	ungetwc(wint_t, FILE *);
 
 extern int		vfwprintf(FILE *, const wchar_t *, va_list);
-/*extern int		vfwscanf(FILE *, const wchar_t *, va_list);*/
+extern int		vfwscanf(FILE *, const wchar_t *, va_list);
 extern int		vswprintf(wchar_t *, size_t, const wchar_t *, va_list);
-/*extern int		vswscanf(const wchar_t *, const wchar_t *, va_list);*/
+extern int		vswscanf(const wchar_t *, const wchar_t *, va_list);
 extern int		vwprintf(const wchar_t *, va_list);
-/*extern int		vwscanf(const wchar_t *, va_list);*/
+extern int		vwscanf(const wchar_t *, va_list);
 
 extern size_t   wcrtomb(char *, wchar_t, mbstate_t *);
 extern wchar_t	*wcscat(wchar_t *, const wchar_t *);
@@ -126,7 +126,7 @@ extern wchar_t	*wmemcpy(wchar_t *, const wchar_t *, size_t);
 extern wchar_t	*wmemmove(wchar_t *, const wchar_t *, size_t);
 extern wchar_t	*wmemset(wchar_t *, wchar_t, size_t);
 extern int		wprintf(const wchar_t *, ...);
-/*extern int		wscanf(const wchar_t *, ...);*/
+extern int		wscanf(const wchar_t *, ...);
 
 #ifdef __cplusplus
 }
