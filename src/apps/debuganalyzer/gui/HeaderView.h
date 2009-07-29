@@ -25,9 +25,13 @@ public:
 
 	virtual	float				HeaderHeight(BView* view, const Header* header)
 									= 0;
+	virtual	float				PreferredHeaderWidth(BView* view,
+									const Header* header) = 0;
 	virtual	void				DrawHeader(BView* view, BRect frame,
 									BRect updateRect, const Header* header,
 									uint32 flags) = 0;
+	virtual	void				DrawHeaderBackground(BView* view, BRect frame,
+									BRect updateRect, uint32 flags) = 0;
 };
 
 
@@ -37,9 +41,13 @@ public:
 	virtual						~DefaultHeaderRenderer();
 
 	virtual	float				HeaderHeight(BView* view, const Header* header);
+	virtual	float				PreferredHeaderWidth(BView* view,
+									const Header* header);
 	virtual	void				DrawHeader(BView* view, BRect frame,
 									BRect updateRect, const Header* header,
 									uint32 flags);
+	virtual	void				DrawHeaderBackground(BView* view, BRect frame,
+									BRect updateRect, uint32 flags);
 };
 
 
@@ -160,6 +168,11 @@ public:
 
 	virtual	void				Draw(BRect updateRect);
 
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseUp(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 transit,
+									const BMessage* dragMessage);
+
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
@@ -175,6 +188,8 @@ private:
 
 			typedef BObjectList<HeaderEntry> HeaderEntryList;
 			typedef BObjectList<HeaderViewListener> ListenerList;
+
+			class DragState;
 
 private:
 	// HeaderModelListener
@@ -203,6 +218,7 @@ private:
 			float				fPreferredHeight;
 			bool				fLayoutValid;
 			ListenerList		fListeners;
+			DragState*			fDragState;
 };
 
 

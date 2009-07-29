@@ -45,10 +45,30 @@ DefaultHeaderRenderer::HeaderHeight(BView* view, const Header* header)
 		return 0;
 
 	if (value.Type() == B_STRING_TYPE) {
-		return 15;
-			// TODO:...
-	} else
+		font_height fontHeight;
+		view->GetFontHeight(&fontHeight);
+		return ceilf((fontHeight.ascent + fontHeight.descent) * 1.2f) + 2.0f;
+	} else {
+		// TODO: Support more value types.
 		return 0;
+	}
+}
+
+
+float
+DefaultHeaderRenderer::PreferredHeaderWidth(BView* view, const Header* header)
+{
+	BVariant value;
+	if (!header->GetValue(value))
+		return 0;
+
+	if (value.Type() == B_STRING_TYPE) {
+		float width = view->StringWidth(value.ToString());
+		return width + be_control_look->DefaultLabelSpacing() * 2.0f;
+	} else {
+		// TODO: Support more value types.
+		return 0;
+	}
 }
 
 
@@ -56,16 +76,41 @@ void
 DefaultHeaderRenderer::DrawHeader(BView* view, BRect frame, BRect updateRect,
 	const Header* header, uint32 flags)
 {
-printf("DefaultHeaderRenderer::DrawHeader(): frame: (%f, %f) - (%f, %f), header: %p\n",
-frame.left, frame.top, frame.right, frame.bottom, header);
+	DrawHeaderBackground(view, frame, updateRect, flags);
+
 	BVariant value;
 	if (!header->GetValue(value))
 		return;
+
+	frame.InsetBy(be_control_look->DefaultLabelSpacing(), 0);
 
 	if (value.Type() == B_STRING_TYPE) {
 		be_control_look->DrawLabel(view, value.ToString(), frame, updateRect,
 			view->LowColor(), 0);
 	}
+}
+
+
+void
+DefaultHeaderRenderer::DrawHeaderBackground(BView* view, BRect frame,
+	BRect updateRect, uint32 flags)
+{
+	BRect bgRect = frame;
+
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	view->SetHighColor(tint_color(base, B_DARKEN_2_TINT));
+	view->StrokeLine(bgRect.LeftBottom(), bgRect.RightBottom());
+
+	bgRect.bottom--;
+	bgRect.right--;
+
+//	if ((flags & CLICKED) != 0)
+//		base = tint_color(base, B_DARKEN_1_TINT);
+
+	be_control_look->DrawButtonBackground(view, bgRect, updateRect, base, 0,
+		BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
+
+	view->StrokeLine(frame.RightTop(), frame.RightBottom());
 }
 
 
@@ -494,6 +539,22 @@ struct HeaderView::HeaderEntry {
 };
 
 
+// #pragma mark - HeaderEntry
+
+
+class HeaderView::DragState {
+public:
+	virtual ~DragState()
+	{
+	}
+
+	virtual void MouseDown(BPoint where) = 0;
+	virtual	void DragTo(BPoint where) = 0;
+	virtual void MouseUp();
+
+};
+
+
 // #pragma mark - HeaderView
 
 
@@ -526,6 +587,7 @@ HeaderView::Draw(BRect updateRect)
 
 	DefaultHeaderRenderer defaultRenderer;
 	float bottom = Bounds().Height();
+	float left = 0.0f;
 
 	for (int32 i = 0; HeaderEntry* entry = fHeaderEntries.ItemAt(i); i++) {
 		if (Header* header = fModel->HeaderAt(i)) {
@@ -537,8 +599,14 @@ HeaderView::Draw(BRect updateRect)
 				bottom);
 			renderer->DrawHeader(this, frame, updateRect, header, 0);
 				// TODO: flags!
+
+			left = entry->position + entry->width;
 		}
 	}
+
+	// TODO: We are not using any custom renderer here.
+	defaultRenderer.DrawHeaderBackground(this,
+		BRect(left, 0, Bounds().right + 1, bottom), updateRect, 0);
 }
 
 
@@ -579,20 +647,35 @@ HeaderView::Model() const
 }
 
 
+void
+HeaderView::MouseDown(BPoint where)
+{
+}
+
+
+void
+HeaderView::MouseUp(BPoint where)
+{
+}
+
+
+void
+HeaderView::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
+{
+}
+
+
 status_t
 HeaderView::SetModel(HeaderModel* model)
 {
 	if (model == fModel)
 		return B_OK;
-printf("HeaderView::SetModel(%p)\n", model);
 
 	if (fModel != NULL) {
 		// remove all headers
 		for (int32 i = 0; HeaderEntry* entry = fHeaderEntries.ItemAt(i); i++)
-{
-printf("  unsetting entry %p, header: %p\n", entry, entry->header);
 			entry->header->RemoveListener(this);
-}
 		fHeaderEntries.MakeEmpty();
 
 		fModel->RemoveListener(this);
