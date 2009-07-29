@@ -1038,8 +1038,14 @@ FontManager::GetStyle(const char* familyName, const char* styleName,
 			return fontStyle;
 
 		// before we fail, we try the mappings for a match
-		if (_AddMappedFont(family->Name(), styleName) == B_OK)
-			return family->GetStyle(styleName);
+		if (_AddMappedFont(family->Name(), styleName) == B_OK) {
+			fontStyle = family->GetStyle(styleName);
+			if (fontStyle != NULL)
+				return fontStyle;
+		}
+
+		_ScanFonts();
+		return family->GetStyle(styleName);
 	}
 
 	if (styleID != 0xffff)
