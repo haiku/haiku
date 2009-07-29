@@ -73,7 +73,7 @@ public:
 
 	virtual	Decoder*			NewDecoder(uint index) = 0;
 	virtual	status_t			GetSupportedFormats(media_format** formats,
-									size_t * count) = 0;
+									size_t* count) = 0;
 };
 
 } } // namespace BPrivate::media
