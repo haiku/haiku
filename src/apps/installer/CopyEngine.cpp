@@ -26,6 +26,39 @@
 using std::nothrow;
 
 
+// SemaphoreLocking
+class SemaphoreLocking {
+public:
+	inline bool Lock(sem_id* lockable)
+	{
+		return acquire_sem(*lockable) == B_OK;
+	}
+
+	inline void Unlock(sem_id* lockable)
+	{
+		release_sem(*lockable);
+	}
+};
+
+// SemaphoreLocker
+class SemaphoreLocker : public AutoLocker<sem_id, SemaphoreLocking> {
+public:
+	inline SemaphoreLocker(sem_id semaphore, bool alreadyLocked = false,
+			bool lockIfNotLocked = true)
+		:
+		AutoLocker<sem_id, SemaphoreLocking>(),
+		fSem(semaphore)
+	{
+		SetTo(&fSem, alreadyLocked, lockIfNotLocked);
+	}
+
+private:
+	sem_id	fSem;
+};
+
+
+
+
 CopyEngine::CopyEngine(const BMessenger& messenger, BMessage* message)
 	:
 	fBufferQueue(),
@@ -102,16 +135,16 @@ CopyEngine::ResetTargets()
 
 
 status_t
-CopyEngine::CollectTargets(const char* source)
+CopyEngine::CollectTargets(const char* source, sem_id cancelSemaphore)
 {
 	int32 level = 0;
-	return _CollectCopyInfo(source, level);
+	return _CollectCopyInfo(source, level, cancelSemaphore);
 }
 
 
 status_t
 CopyEngine::CopyFolder(const char* source, const char* destination,
-	BLocker* locker)
+	sem_id cancelSemaphore)
 {
 	printf("%lld bytes to read in %lld files\n", fBytesToCopy, fItemsToCopy);
 
@@ -122,16 +155,16 @@ CopyEngine::CopyFolder(const char* source, const char* destination,
 	}
 
 	int32 level = 0;
-	return _CopyFolder(source, destination, level, locker);
+	return _CopyFolder(source, destination, level, cancelSemaphore);
 }
 
 
 status_t
 CopyEngine::CopyFile(const BEntry& _source, const BEntry& _destination,
-	BLocker* locker)
+	sem_id cancelSemaphore)
 {
-	AutoLocker<BLocker> lock(locker);
-	if (locker != NULL && !lock.IsLocked()) {
+	SemaphoreLocker lock(cancelSemaphore);
+	if (cancelSemaphore >= 0 && !lock.IsLocked()) {
 		// We are supposed to quit
 printf("CopyFile - cancled\n");
 		return B_CANCELED;
@@ -210,7 +243,8 @@ printf("CopyFile - cancled\n");
 
 
 status_t
-CopyEngine::_CollectCopyInfo(const char* _source, int32& level)
+CopyEngine::_CollectCopyInfo(const char* _source, int32& level,
+	sem_id cancelSemaphore)
 {
 	level++;
 
@@ -221,6 +255,12 @@ CopyEngine::_CollectCopyInfo(const char* _source, int32& level)
 
 	BEntry entry;
 	while (source.GetNextEntry(&entry) == B_OK) {
+		SemaphoreLocker lock(cancelSemaphore);
+		if (cancelSemaphore >= 0 && !lock.IsLocked()) {
+			// We are supposed to quit
+			return B_CANCELED;
+		}
+
 		struct stat statInfo;
 		entry.GetStat(&statInfo);
 
@@ -239,7 +279,10 @@ CopyEngine::_CollectCopyInfo(const char* _source, int32& level)
 			if (ret < B_OK)
 				return ret;
 
-			ret = _CollectCopyInfo(srcFolder.Path(), level);
+			if (cancelSemaphore >= 0)
+				lock.Unlock();
+
+			ret = _CollectCopyInfo(srcFolder.Path(), level, cancelSemaphore);
 			if (ret < B_OK)
 				return ret;
 		} else if (S_ISLNK(statInfo.st_mode)) {
@@ -259,7 +302,7 @@ CopyEngine::_CollectCopyInfo(const char* _source, int32& level)
 
 status_t
 CopyEngine::_CopyFolder(const char* _source, const char* _destination,
-	int32& level, BLocker* locker)
+	int32& level, sem_id cancelSemaphore)
 {
 	level++;
 	fCurrentTargetFolder = _destination;
@@ -283,8 +326,8 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 
 	BEntry entry;
 	while (source.GetNextEntry(&entry) == B_OK) {
-		AutoLocker<BLocker> lock(locker);
-		if (locker != NULL && !lock.IsLocked()) {
+		SemaphoreLocker lock(cancelSemaphore);
+		if (cancelSemaphore >= 0 && !lock.IsLocked()) {
 			// We are supposed to quit
 			return B_CANCELED;
 		}
@@ -341,15 +384,15 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 			if (ret < B_OK)
 				return ret;
 
-			if (locker != NULL)
+			if (cancelSemaphore >= 0)
 				lock.Unlock();
 
 			ret = _CopyFolder(srcFolder.Path(), dstFolder.Path(), level,
-				locker);
+				cancelSemaphore);
 			if (ret < B_OK)
 				return ret;
 
-			if (locker != NULL && !lock.Lock()) {
+			if (cancelSemaphore >= 0 && !lock.Lock()) {
 				// We are supposed to quit
 				return B_CANCELED;
 			}

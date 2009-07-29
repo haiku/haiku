@@ -77,7 +77,8 @@ WorkerThread::WorkerThread(InstallerWindow *window)
 	: BLooper("copy_engine"),
 	fWindow(window),
 	fPackages(NULL),
-	fSpaceRequired(0)
+	fSpaceRequired(0),
+	fCancelSemaphore(-1)
 {
 	Run();
 }
@@ -398,7 +399,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 
 	// let the engine collect information for the progress bar later on
 	engine.ResetTargets();
-	err = engine.CollectTargets(srcDirectory.Path());
+	err = engine.CollectTargets(srcDirectory.Path(), fCancelSemaphore);
 	if (err != B_OK)
 		goto error;
 
@@ -409,7 +410,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 		for (int32 i = 0; i < count; i++) {
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
 			BPath packageDir(pkgRootDir.Path(), p->Folder());
-			err = engine.CollectTargets(packageDir.Path());
+			err = engine.CollectTargets(packageDir.Path(), fCancelSemaphore);
 			if (err != B_OK)
 				goto error;
 		}
@@ -417,7 +418,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 
 	// copy source volume
 	err = engine.CopyFolder(srcDirectory.Path(), targetDirectory.Path(),
-		fCancelLock);
+		fCancelSemaphore);
 	if (err != B_OK)
 		goto error;
 
@@ -429,7 +430,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
 			BPath packageDir(pkgRootDir.Path(), p->Folder());
 			err = engine.CopyFolder(packageDir.Path(), targetDirectory.Path(),
-				fCancelLock);
+				fCancelSemaphore);
 			if (err != B_OK)
 				goto error;
 		}

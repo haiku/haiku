@@ -15,7 +15,6 @@
 #include "BlockingQueue.h"
 
 class BFile;
-class BLocker;
 class BMessage;
 class BMessenger;
 
@@ -26,23 +25,23 @@ public:
 	virtual						~CopyEngine();
 
 			void				ResetTargets();
-			status_t			CollectTargets(const char* source);
+			status_t			CollectTargets(const char* source,
+									sem_id cancelSemaphore = -1);
 
 			status_t			CopyFolder(const char* source,
 									const char* destination,
-									BLocker* locker = NULL);
+									sem_id cancelSemaphore = -1);
 
 			status_t			CopyFile(const BEntry& entry,
 									const BEntry& destination,
-									BLocker* locker = NULL);
+									sem_id cancelSemaphore = -1);
 
 private:
 			status_t			_CollectCopyInfo(const char* source,
-									int32& level);
+									int32& level, sem_id cancelSemaphore);
 			status_t			_CopyFolder(const char* source,
 									const char* destination,
-									int32& level,
-									BLocker* locker = NULL);
+									int32& level, sem_id cancelSemaphore);
 
 			bool				_ShouldCopyEntry(const char* name,
 									const struct stat& statInfo,

@@ -149,7 +149,7 @@ InstallerWindow::InstallerWindow()
 	fDriveSetupLaunched(false),
 	fInstallStatus(kReadyForInstall),
 	fWorkerThread(new WorkerThread(this)),
-	fCopyEngineLock(NULL)
+	fCopyEngineCancelSemaphore(-1)
 {
 	LogoView* logoView = new LogoView();
 
@@ -271,6 +271,7 @@ InstallerWindow::InstallerWindow()
 
 InstallerWindow::~InstallerWindow()
 {
+	_SetCopyEngineCancelSemaphore(-1);
 	be_roster->StopWatching(this);
 }
 
@@ -299,8 +300,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 	switch (msg->what) {
 		case MSG_RESET:
 		{
-			delete fCopyEngineLock;
-			fCopyEngineLock = NULL;
+			_SetCopyEngineCancelSemaphore(-1);
 
 			status_t error;
 			if (msg->FindInt32("error", &error) == B_OK) {
@@ -326,12 +326,13 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			switch (fInstallStatus) {
 				case kReadyForInstall:
 				{
-					delete fCopyEngineLock;
-					fCopyEngineLock = new BLocker("copy engine lock");
+					_SetCopyEngineCancelSemaphore(create_sem(1,
+						"copy engine cancel"));
+
 					BList* list = new BList();
 					int32 size = 0;
 					fPackagesView->GetPackagesToInstall(list, &size);
-					fWorkerThread->SetLock(fCopyEngineLock);
+					fWorkerThread->SetLock(fCopyEngineCancelSemaphore);
 					fWorkerThread->SetPackagesList(list);
 					fWorkerThread->SetSpaceRequired(size);
 					fInstallStatus = kInstalling;
@@ -415,8 +416,8 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		}
 		case MSG_INSTALL_FINISHED:
 		{
-			delete fCopyEngineLock;
-			fCopyEngineLock = NULL;
+			
+			_SetCopyEngineCancelSemaphore(-1);
 
 			fBeginButton->SetLabel("Quit");
 
@@ -689,13 +690,26 @@ InstallerWindow::_SetStatusMessage(const char *text)
 
 
 void
+InstallerWindow::_SetCopyEngineCancelSemaphore(sem_id id, bool alreadyLocked)
+{
+	if (fCopyEngineCancelSemaphore >= 0) {
+		if (!alreadyLocked)
+			acquire_sem(fCopyEngineCancelSemaphore);
+		delete_sem(fCopyEngineCancelSemaphore);
+	}
+	fCopyEngineCancelSemaphore = id;
+}
+
+
+void
 InstallerWindow::_QuitCopyEngine(bool askUser)
 {
-	if (fCopyEngineLock == NULL)
+	if (fCopyEngineCancelSemaphore < 0)
 		return;
 
-	// first of all block the copy engine
-	fCopyEngineLock->Lock();
+	// First of all block the copy engine, so that it doesn't continue
+	// while the alert is showing, which would be irritating.
+	acquire_sem(fCopyEngineCancelSemaphore);
 	
 	bool quit = true;
 	if (askUser) {
@@ -706,23 +720,10 @@ InstallerWindow::_QuitCopyEngine(bool askUser)
 	}
 
 	if (quit) {
-		int32 tries = 0;
-		// wait until the engine blocks
-		while (fCopyEngineLock->CountLockRequests() < 2) {
-			// TODO: There is a race here, the copy engine
-			// may have finished before we locked the engine
-			// lock. That's why we limit the number of tries
-			// here.
-			tries++;
-			if (tries > 100)
-				break;
-			snooze(3000);
-		}
-		// make it quit by having it's lock fail
-		delete fCopyEngineLock;
-		fCopyEngineLock = NULL;
+		// Make it quit by having it's lock fail...
+		_SetCopyEngineCancelSemaphore(-1, true);
 	} else
-		fCopyEngineLock->Unlock();
+		release_sem(fCopyEngineCancelSemaphore);
 }
 
 

@@ -16,7 +16,6 @@ using namespace BPrivate;
 
 class BButton;
 class BLayoutItem;
-class BLocker;
 class BMenu;
 class BMenuField;
 class BStatusBar;
@@ -61,6 +60,8 @@ private:
 			void				_PublishPackages();
 			void				_SetStatusMessage(const char* text);
 
+			void				_SetCopyEngineCancelSemaphore(sem_id id,
+									bool alreadyLocked = false);
 			void				_QuitCopyEngine(bool askUser);
 
 	static	int					_ComparePackages(const void* firstArg,
@@ -95,7 +96,7 @@ private:
 
 			WorkerThread*		fWorkerThread;
 			BString				fLastStatus;
-			BLocker*			fCopyEngineLock;
+			sem_id				fCopyEngineCancelSemaphore;
 };
 
 #endif // INSTALLER_WINDOW_H

@@ -14,7 +14,6 @@
 #include <Volume.h>
 
 class BList;
-class BLocker;
 class BMenu;
 class InstallerWindow;
 
@@ -32,8 +31,8 @@ public:
 									{ fSpaceRequired = bytes; };
 
 			bool				Cancel();
-			void				SetLock(BLocker* lock)
-									{ fCancelLock = lock; }
+			void				SetLock(sem_id cancelSemaphore)
+									{ fCancelSemaphore = cancelSemaphore; }
 
 			void				StartInstall();
 			void				WriteBootSector(BMenu* dstMenu);
@@ -50,7 +49,7 @@ private:
 			BDiskDeviceRoster	fDDRoster;
 			BList*				fPackages;
 			off_t				fSpaceRequired;
-			BLocker*			fCancelLock;
+			sem_id				fCancelSemaphore;
 };
 
 #endif // WORKER_THREAD_H
