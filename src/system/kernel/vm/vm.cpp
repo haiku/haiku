@@ -4503,7 +4503,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 // fault and someone is already waiting for a write lock on the same address
 // space. This thread will then try to acquire the lock again and will
 // be queued after the writer.
-#if 0
+#	if 0
 			if (area) {
 				struct stack_frame {
 					#if defined(__INTEL__) || defined(__POWERPC__) || defined(__M68K__)
@@ -4514,24 +4514,24 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 					#warning writeme
 					#endif
 				} frame;
-#ifdef __INTEL__
+#		ifdef __INTEL__
 				struct iframe* iframe = i386_get_user_iframe();
 				if (iframe == NULL)
 					panic("iframe is NULL!");
 
 				status_t status = user_memcpy(&frame, (void*)iframe->ebp,
 					sizeof(struct stack_frame));
-#elif defined(__POWERPC__)
+#		elif defined(__POWERPC__)
 				struct iframe* iframe = ppc_get_user_iframe();
 				if (iframe == NULL)
 					panic("iframe is NULL!");
 
 				status_t status = user_memcpy(&frame, (void*)iframe->r1,
 					sizeof(struct stack_frame));
-#else
-#	warning "vm_page_fault() stack trace won't work"
+#		else
+#			warning "vm_page_fault() stack trace won't work"
 				status = B_ERROR;
-#endif
+#		endif
 
 				dprintf("stack trace:\n");
 				int32 maxFrames = 50;
@@ -4550,7 +4550,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 						sizeof(struct stack_frame));
 				}
 			}
-#endif	// 0 (stack trace)
+#	endif	// 0 (stack trace)
 
 			rw_lock_read_unlock(&addressSpace->lock);
 #endif
