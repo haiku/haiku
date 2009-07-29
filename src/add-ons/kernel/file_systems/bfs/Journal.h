@@ -123,10 +123,11 @@ public:
 	{
 		status_t status = B_OK;
 		if (fJournal != NULL) {
-			_UnlockInodes(true);
 			status = fJournal->Unlock(this, true);
-			if (status == B_OK)
+			if (status == B_OK) {
+				_UnlockInodes(true);
 				fJournal = NULL;
+			}
 		}
 		return status;
 	}
