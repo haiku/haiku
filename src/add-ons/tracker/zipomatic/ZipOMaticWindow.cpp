@@ -104,6 +104,7 @@ ZippoWindow::MessageReceived		(BMessage * a_message)
 						{
 							m_zipper_thread = NULL;
 							zippoview->m_activity_view->Stop();
+							zippoview->m_stop_button->SetEnabled(false);
 							zippoview->m_archive_name_view->SetText(" ");
 							if (m_zipping_was_stopped)
 								zippoview->m_zip_output_view->SetText("Stopped");
@@ -119,6 +120,7 @@ ZippoWindow::MessageReceived		(BMessage * a_message)
 						
 						m_zipper_thread = NULL;
 						zippoview->m_activity_view->Stop();
+						zippoview->m_stop_button->SetEnabled(false);
 						zippoview->m_archive_name_view->SetText("");
 						zippoview->m_zip_output_view->SetText("Error creating archive");
 						//CloseWindowOrKeepOpen();

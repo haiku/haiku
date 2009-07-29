@@ -29,7 +29,7 @@ ZippoView::ZippoView (BRect a_rect)
 	AddChild (m_archive_name_view);
 
 	BRect	ouput_rect (a_rect.left+14, a_rect.top+47, a_rect.right-15, a_rect.top+66);
-	m_zip_output_view	= new BStringView (ouput_rect, "output_text", " ", B_FOLLOW_LEFT_RIGHT);
+	m_zip_output_view	= new BStringView (ouput_rect, "output_text", "Drop files to zip.", B_FOLLOW_LEFT_RIGHT);
 	AddChild (m_zip_output_view);
 
 }

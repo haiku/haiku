@@ -8,7 +8,7 @@
 #include <Box.h>
 #include <Bitmap.h>
 
-class Activity : public BBox 
+class Activity : public BView 
 {
 	public:
 		Activity  (BRect a_rect, const char * a_name, uint32 a_resizing_mode, 
@@ -21,13 +21,12 @@ class Activity : public BBox
 					bool	IsRunning	();
 			virtual void 	Pulse		();
 			virtual void 	Draw		(BRect a_draw);
-			virtual void	FrameMoved 	(BPoint a_point);
 			virtual void	FrameResized (float a_width, float a_height);
 				
 	protected:
 					void	CreateBitmap			(void);
 					void	LightenBitmapHighColor	(rgb_color * a_color);
-					void	DrawIntoBitmap			(void);
+					void	DrawIntoBitmap			(bool running);
 
 		bool		m_is_running;
 		pattern		m_pattern;
