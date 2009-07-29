@@ -5,11 +5,14 @@ UsePrivateSystemHeaders ;
 
 UseHeaders $(HAIKU_DEBUG_ANALYZER_HEADERS) ;
 
+CCFLAGS +=  -Werror ;
+C++FLAGS += -Werror ;
 
 MergeObject DebugAnalyzer_gui.o
 	:
 	AbstractGeneralPage.cpp
 	ColorCheckBox.cpp
+	HeaderView.cpp
 	SubWindow.cpp
 	SubWindowManager.cpp
 	:
