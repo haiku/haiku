@@ -50,7 +50,7 @@
   } while (0)
 #endif
 /* End of configuration part.  */
-
+
 #include <ctype.h>
 #include <errno.h>
 #include <float.h>
@@ -129,7 +129,7 @@
 #  define ISDIGIT(Ch) isdigit (Ch)
 #  define ISXDIGIT(Ch) isxdigit (Ch)
 #  define TOLOWER(Ch) tolower (Ch)
-#  define STRNCASECMP(S1, S2, N) __strncasecmp ((S1), (S2), (N))
+#  define STRNCASECMP(S1, S2, N) strncasecmp ((S1), (S2), (N))
 #  define STRTOULL(S, E, B) __strtoull_internal ((S), (E), 0, (B))
 # endif
 #endif
@@ -150,7 +150,7 @@
 /* Function to construct a floating point number from an MP integer
    containing the fraction bits, a base 2 exponent, and a sign flag.  */
 extern FLOAT MPN2FLOAT (mp_srcptr mpn, int exponent, int negative);
-
+
 /* Definitions according to limb size used.  */
 #if	BITS_PER_MP_LIMB == 32
 #  define MAX_DIG_PER_LIMB	9
@@ -179,7 +179,7 @@ static const mp_limb_t _tens_in_limb[MAX_DIG_PER_LIMB + 1] =
   #error "Need to expand tens_in_limb table to" MAX_DIG_PER_LIMB
 #endif
 };
-
+
 #ifndef	howmany
 #define	howmany(x,y)		(((x)+((y)-1))/(y))
 #endif
@@ -1560,7 +1560,7 @@ INTERNAL (STRTOF) (nptr, endptr, group LOCALE_PARAM)
 
   /* NOTREACHED */
 }
-
+
 /* External user entry point.  */
 
 FLOAT
@@ -1574,3 +1574,18 @@ STRTOF (nptr, endptr LOCALE_PARAM)
 {
   return INTERNAL (STRTOF) (nptr, endptr, 0 LOCALE_PARAM);
 }
+
+
+// XXX this is not correct
+
+long double __strtold_internal(const char *number, char **_end, int group);
+
+long double
+#ifdef weak_function
+weak_function
+#endif
+__strtold_internal(const char *number, char **_end, int group)
+{
+	return __strtod_internal(number, _end, group);
+}
+
