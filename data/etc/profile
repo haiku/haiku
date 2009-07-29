@@ -7,6 +7,7 @@ echo -e "\nWelcome to the Haiku shell.\n"
 
 export PS1="\w> "
 export HISTFILESIZE=50
+export HISTCONTROL=ignoredups
 
 alias ls="ls --color"
 alias ll="ls -lA"
