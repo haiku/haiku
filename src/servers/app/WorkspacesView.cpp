@@ -193,21 +193,29 @@ WorkspacesView::_DrawWindow(DrawingEngine* drawingEngine,
 		&& !workspaceFrame.Intersects(tabFrame))
 		return;
 
-	rgb_color yellow = (rgb_color){ 255, 203, 0, 255 };
-	if (decorator != NULL)
-		yellow = decorator->UIColor(B_WINDOW_TAB_COLOR);
+	rgb_color activeTabColor = (rgb_color){ 255, 203, 0, 255 };
+	rgb_color inactiveTabColor = (rgb_color){ 232, 232, 232, 255 };
+	rgb_color navColor = (rgb_color){ 0, 0, 229, 255 };
+	if (decorator != NULL) {
+		activeTabColor = decorator->UIColor(B_WINDOW_TAB_COLOR);
+		inactiveTabColor = decorator->UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
+		navColor = decorator->UIColor(B_NAVIGATION_BASE_COLOR);
+	}
 	// TODO: let decorator do this!
 	rgb_color frameColor = (rgb_color){ 180, 180, 180, 255 };
 	rgb_color white = (rgb_color){ 255, 255, 255, 255 };
 
+	rgb_color tabColor = inactiveTabColor;
+	if (window->IsFocus())
+		tabColor = activeTabColor;
+
 	if (!active) {
-		_DarkenColor(yellow);
+		_DarkenColor(tabColor);
 		_DarkenColor(frameColor);
 		_DarkenColor(white);
 	}
 	if (window == fSelectedWindow) {
-		// TODO: what about standard navigation color here?
-		frameColor = (rgb_color){ 80, 80, 80, 255 };
+		frameColor = navColor;
 	}
 
 	if (tabFrame.left < frame.left)
@@ -220,7 +228,7 @@ WorkspacesView::_DrawWindow(DrawingEngine* drawingEngine,
 	tabFrame = tabFrame & workspaceFrame;
 
 	if (decorator != NULL && tabFrame.IsValid()) {
-		drawingEngine->FillRect(tabFrame, yellow);
+		drawingEngine->FillRect(tabFrame, tabColor);
 		backgroundRegion.Exclude(tabFrame);
 	}
 
