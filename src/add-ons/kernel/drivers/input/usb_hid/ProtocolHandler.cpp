@@ -89,7 +89,7 @@ ProtocolHandler::AddHandlers(HIDDevice *device, ProtocolHandler ***handlerList,
 
 	for (uint32 i = 0; i < count; i++) {
 		if (handlers[i] != NULL)
-			*handlerList[(*handlerCount)++] = handlers[i];
+			(*handlerList)[(*handlerCount)++] = handlers[i];
 	}
 
 	TRACE("added %ld handlers for hid device\n", *handlerCount);
