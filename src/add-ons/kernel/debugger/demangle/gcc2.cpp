@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -240,6 +240,9 @@ argument_length(const char** _arg)
 
 	ignore_qualifiers(_arg);
 
+	if (!**_arg)
+		return 0;
+
 	// See if it's a built-in type
 	if (**_arg != 'Q' && !isdigit(**_arg))
 		return 1;
@@ -254,7 +257,7 @@ argument_length(const char** _arg)
 static const char*
 next_argument(const char* arg)
 {
-	if (arg == NULL)
+	if (arg == NULL || !arg[0])
 		return NULL;
 
 	uint32 length = argument_length(&arg);
@@ -331,7 +334,7 @@ get_next_argument_internal(uint32* _cookie, const char* symbol, char* name,
 	const char* arg = first_argument(mangled);
 
 	// (void) is not an argument
-	if (arg != NULL && arg[0] == 'v')
+	if (arg[0] == 'v')
 		return B_ENTRY_NOT_FOUND;
 
 	uint32 current = *_cookie;
