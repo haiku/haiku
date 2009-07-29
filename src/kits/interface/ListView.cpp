@@ -418,6 +418,7 @@ BListView::KeyDown(const char *bytes, int32 numBytes)
 			if (fFirstSelected == -1) {
 				// if nothing is selected yet, always select the first item
 				Select(0);
+				fAnchorIndex = 0;
 			} else {
 				bool extend = false;
 				if (fListType == B_MULTIPLE_SELECTION_LIST
@@ -441,6 +442,7 @@ BListView::KeyDown(const char *bytes, int32 numBytes)
 			if (fFirstSelected == -1) {
 				// if nothing is selected yet, always select the first item
 				Select(0);
+				fAnchorIndex = 0;
 			} else {
 				bool extend = false;
 				if (fListType == B_MULTIPLE_SELECTION_LIST
