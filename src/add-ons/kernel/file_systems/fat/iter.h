@@ -5,6 +5,10 @@
 #ifndef _DOSFS_ITER_H_
 #define _DOSFS_ITER_H_
 
+
+#include <SupportDefs.h>
+
+
 struct _nspace;
 
 /* csi keeps track of current cluster and sector info */
@@ -25,9 +29,7 @@ status_t csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len);
 status_t csi_write_block(struct csi *csi, uint8 *buffer);
 
 /* directory entry iterator */
-#define DIRI_MAGIC '!duM'
 struct diri {
-	uint32	magic;
 	struct csi csi;
 	uint32 starting_cluster;
 	uint32 current_index;
@@ -40,7 +42,5 @@ uint8 *diri_current_entry(struct diri *diri);
 uint8 *diri_next_entry(struct diri *diri);
 uint8 *diri_rewind(struct diri *diri);
 void diri_make_writable(struct diri *diri);
-
-int check_diri_magic(struct diri *t, char *funcname);
 
 #endif

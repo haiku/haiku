@@ -3,20 +3,21 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
-#include <KernelExport.h>
+
+#include "iter.h"
+
+#include <string.h>
 
 #include <fs_cache.h>
 #include <fs_info.h>
-#include <string.h>
+#include <KernelExport.h>
 
-#include "iter.h"
 #include "dosfs.h"
 #include "fat.h"
 #include "util.h"
 
-#define DPRINTF(a,b) if (debug_iter > (a)) dprintf b
 
-CHECK_MAGIC(diri,struct diri,DIRI_MAGIC)
+#define DPRINTF(a,b) if (debug_iter > (a)) dprintf b
 
 
 static int
@@ -267,7 +268,6 @@ _diri_release_current_block_(struct diri *diri)
 uint8 *
 diri_init(nspace *vol, uint32 cluster, uint32 index, struct diri *diri)
 {
-	diri->magic = ~DIRI_MAGIC; // trash magic number
 	diri->current_block = NULL;
 
 	if (cluster >= vol->total_clusters + 2)
@@ -290,7 +290,6 @@ diri_init(nspace *vol, uint32 cluster, uint32 index, struct diri *diri)
 		return NULL;
 
 	// now the diri is valid
-	diri->magic = DIRI_MAGIC;
 	return diri->current_block
 		+ (diri->current_index % (diri->csi.vol->bytes_per_sector / 0x20))*0x20;
 }
@@ -299,10 +298,6 @@ diri_init(nspace *vol, uint32 cluster, uint32 index, struct diri *diri)
 int
 diri_free(struct diri *diri)
 {
-	if (check_diri_magic(diri, "diri_free")) return EINVAL;
-
-	diri->magic = ~DIRI_MAGIC; // trash magic number
-
 	if (diri->current_block)
 		_diri_release_current_block_(diri);
 
@@ -313,8 +308,6 @@ diri_free(struct diri *diri)
 uint8 *
 diri_current_entry(struct diri *diri)
 {
-	if (check_diri_magic(diri, "diri_current_entry")) return NULL;
-
 	if (diri->current_block == NULL)
 		return NULL;
 
@@ -326,8 +319,6 @@ diri_current_entry(struct diri *diri)
 uint8 *
 diri_next_entry(struct diri *diri)
 {
-	if (check_diri_magic(diri, "diri_next_entry")) return NULL;
-
 	if (diri->current_block == NULL)
 		return NULL;
 
@@ -348,9 +339,6 @@ diri_next_entry(struct diri *diri)
 uint8 *
 diri_rewind(struct diri *diri)
 {
-	if (check_diri_magic(diri, "diri_rewind"))
-		return NULL;
-
 	if (diri->current_index > (diri->csi.vol->bytes_per_sector / 0x20 - 1)) {
 		if (diri->current_block)
 			_diri_release_current_block_(diri);

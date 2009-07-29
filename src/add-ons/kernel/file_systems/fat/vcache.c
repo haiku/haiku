@@ -79,12 +79,13 @@ dump_vcache(nspace *vol)
 {
 	uint32 i;
 	struct vcache_entry *c;
-	dprintf("vnid cache size %lx, cur vnid = %Lx\n"
-			"vnid             loc\n",
-			vol->vcache.cache_size, vol->vcache.cur_vnid);
-	for (i=0;i<vol->vcache.cache_size;i++)
-		for (c = vol->vcache.by_vnid[i];c;c=c->next_vnid)
-			dprintf("%16Lx %16Lx\n", c->vnid, c->loc);
+	kprintf("vnid cache size %lx, cur vnid = %Lx\n"
+		"vnid             loc\n",
+		vol->vcache.cache_size, vol->vcache.cur_vnid);
+	for (i = 0; i < vol->vcache.cache_size; i++) {
+		for (c = vol->vcache.by_vnid[i]; c ; c = c->next_vnid)
+			kprintf("%16Lx %16Lx\n", c->vnid, c->loc);
+	}
 }
 
 
@@ -104,14 +105,14 @@ init_vcache(nspace *vol)
 	vol->vcache.by_vnid = calloc(sizeof(struct vache_entry *),
 		vol->vcache.cache_size);
 	if (vol->vcache.by_vnid == NULL) {
-		dprintf("init_vcache: out of core\n");
+		dprintf("init_vcache: out of memory\n");
 		return ENOMEM;
 	}
 
 	vol->vcache.by_loc = calloc(sizeof(struct vache_entry *),
 		vol->vcache.cache_size);
 	if (vol->vcache.by_loc == NULL) {
-		dprintf("init_vcache: out of core\n");
+		dprintf("init_vcache: out of memory\n");
 		free(vol->vcache.by_vnid);
 		vol->vcache.by_vnid = NULL;
 		return ENOMEM;
@@ -431,7 +432,7 @@ debug_dfvnid(int argc, char **argv)
 	if (vol == NULL)
 		return B_OK;
 
-	for (i=2;i<argc;i++) {
+	for (i = 2; i < argc; i++) {
 		ino_t vnid = strtoull(argv[i], NULL, 0);
 		struct vcache_entry *e;
 		if ((e = _find_vnid_in_vcache_(vol, vnid)) != NULL) {

@@ -3,20 +3,21 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
-#include <KernelExport.h>
+#include "dir.h"
 
-#include <stdlib.h>
 #include <dirent.h>
-#include <fs_cache.h>
-#include <fs_info.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
 
+#include <fs_cache.h>
+#include <fs_info.h>
+#include <KernelExport.h>
+
 #include "iter.h"
 #include "dosfs.h"
 #include "attr.h"
-#include "dir.h"
 #include "dlist.h"
 #include "fat.h"
 #include "util.h"
@@ -31,17 +32,14 @@
 const char acceptable[]="!#$%&'()-0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZ^_`{}~";
 const char illegal[] = "\\/:*?\"<>|";
 
-#define DIRCOOKIE_MAGIC 'AiC '
-
 typedef struct dircookie {
-	uint32		magic;
 	uint32		current_index;
 } dircookie;
 
-static CHECK_MAGIC(dircookie,struct dircookie, DIRCOOKIE_MAGIC)
 static status_t	findfile(nspace *vol, vnode *dir, const char *file,
-				ino_t *vnid, vnode **node, bool check_case,
-				bool check_dups, bool *dups_exist);
+	ino_t *vnid, vnode **node, bool check_case, bool check_dups,
+	bool *dups_exist);
+
 
 // private structure for returning data from _next_dirent_()
 struct _dirent_info_ {
@@ -53,7 +51,8 @@ struct _dirent_info_ {
 	uint32 time;
 };
 
-// scans dir for the next entry, using the state stored in a struct diri.
+
+//!	Scans dir for the next entry, using the state stored in a struct diri.
 static status_t
 _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
 	int len)
@@ -66,9 +65,6 @@ _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
 	// lfn state
 	uint32 start_index = 0xffff, filename_len = 0; /* quiet warning */
 	uint32 lfn_count = 0 /* quiet warning */;
-
-	if (check_diri_magic(iter, "_next_dirent_"))
-		return EINVAL;
 
 	if (iter->current_block == NULL)
 		return ENOENT;
@@ -212,9 +208,6 @@ get_next_dirent(nspace *vol, vnode *dir, struct diri *iter, ino_t *vnid,
 	struct _dirent_info_ info;
 	status_t result;
 
-	if (check_nspace_magic(vol, "get_next_dirent"))
-		return EINVAL;
-
 	do {
 		result = _next_dirent_(iter, &info, filename, len);
 		if (result < 0)
@@ -280,11 +273,6 @@ check_dir_empty(nspace *vol, vnode *dir)
 	uint32 i;
 	struct diri iter;
 	status_t result = B_ERROR; /* quiet warning */
-
-	if (check_nspace_magic(vol, "check_dir_empty"))
-		return EINVAL;
-	if (check_vnode_magic(dir, "check_dir_empty"))
-		return EINVAL;
 
 	if (diri_init(vol, dir->cluster, 0, &iter) == NULL) {
 		dprintf("check_dir_empty: error opening directory\n");
@@ -371,11 +359,6 @@ findfile(nspace *vol, vnode *dir, const char *file, ino_t *vnid,
 	bool found_file = false;
 
 //	dprintf("findfile: %s in %Lx, case %d dups %d\n", file, dir->vnid, check_case, check_dups);
-
-	if (check_nspace_magic(vol, "findfile"))
-		return EINVAL;
-	if (check_vnode_magic(dir, "findfile"))
-		return EINVAL;
 
 	DPRINTF(1, ("findfile: %s in %Lx\n", file, dir->vnid));
 
@@ -676,8 +659,8 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 	*ne = *ns + required_entries - 1;
 
 	for (i = *ns; i <= *ne; i++) {
-		ASSERT(find_loc_in_vcache(vol, \
-					GENERATE_DIR_INDEX_VNID(dir->cluster, i)) == ENOENT);
+		ASSERT(find_loc_in_vcache(vol,
+			GENERATE_DIR_INDEX_VNID(dir->cluster, i)) == ENOENT);
 	}
 
 	DPRINTF(0, ("directory entry runs from %lx to %lx (dirsize = %Lx) (is%s last entry)\n", *ns, *ne, dir->st_size, last_entry ? "" : "n't"));
@@ -934,18 +917,11 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 	struct diri iter;
 	char filename[512]; /* need this for setting mime type */
 
-	if (!reenter) {
-		LOCK_VOL(vol);
-	}
+	LOCK_VOL(vol);
 
 	_node->private_node = NULL;
 	_node->ops = &gFATVnodeOps;
 	_flags = 0;
-
-	if (check_nspace_magic(vol, "dosfs_read_vnode")) {
-		if (!reenter) UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	DPRINTF(0, ("dosfs_read_vnode (vnode id %Lx)\n", vnid));
 
@@ -1008,7 +984,6 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 		goto bi2;
 	}
 
-	entry->magic = VNODE_MAGIC;
 	entry->vnid = vnid;
 	entry->dir_vnid = dir_vnid;
 	entry->disk_image = 0;
@@ -1054,8 +1029,7 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 bi2:
 	diri_free(&iter);
 bi:
-	if (!reenter)
-		UNLOCK_VOL(vol);
+	UNLOCK_VOL(vol);
 
 	if (result != B_OK)
 		DPRINTF(0, ("dosfs_read_vnode (%s)\n", strerror(result)));
@@ -1075,12 +1049,6 @@ dosfs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *_vnid)
 	status_t result = ENOENT;
 
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic(vol, "dosfs_walk") ||
-		check_vnode_magic(dir, "dosfs_walk")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	DPRINTF(0, ("dosfs_walk: find %Lx/%s\n", dir->vnid, file));
 
@@ -1106,23 +1074,17 @@ dosfs_access(fs_volume *_vol, fs_vnode *_node, int mode)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_access")
-		|| check_vnode_magic(node, "dosfs_access")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
 	DPRINTF(0, ("dosfs_access (vnode id %Lx, mode %x)\n", node->vnid, mode));
 
 	if (mode & W_OK) {
 		if (vol->flags & B_FS_IS_READONLY) {
-			dprintf("dosfs_access: can't write on read-only volume\n");
+			DPRINTF(0, ("dosfs_access: can't write on read-only volume\n"));
 			result = EROFS;
 		} else if (node->mode & FAT_READ_ONLY) {
-			dprintf("can't open read-only file for writing\n");
+			DPRINTF(0, ("can't open read-only file for writing\n"));
 			result = EPERM;
 		} else if (node->disk_image != 0) {
-			dprintf("can't open disk image file for writing\n");
+			DPRINTF(0, ("can't open disk image file for writing\n"));
 			result = EPERM;
 		}
 	}
@@ -1153,18 +1115,7 @@ dosfs_opendir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 	dircookie *cookie = NULL;
 	int result;
 
-	if (_cookie == NULL) {
-		dprintf("dosfs_opendir called with null _cookie\n");
-		return EINVAL;
-	}
-
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic(vol, "dosfs_opendir")
-		|| check_vnode_magic(node, "dosfs_opendir")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	DPRINTF(0, ("dosfs_opendir (vnode id %Lx)\n", node->vnid));
 
@@ -1181,12 +1132,11 @@ dosfs_opendir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 	}
 
 	if ((cookie = (dircookie *)malloc(sizeof(dircookie))) == NULL) {
-		dprintf("dosfs_opendir: out of memory error\n");
+		DPRINTF(0, ("dosfs_opendir: out of memory error\n"));
 		result = ENOMEM;
 		goto bi;
 	}
 
-	cookie->magic = DIRCOOKIE_MAGIC;
 	cookie->current_index = 0;
 
 	result = B_NO_ERROR;
@@ -1214,13 +1164,6 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 	struct		diri diri;
 
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic(vol, "dosfs_readdir")
-		|| check_vnode_magic(dir, "dosfs_readdir")
-		|| check_dircookie_magic(cookie, "dosfs_readdir")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	DPRINTF(0, ("dosfs_readdir: vnode id %Lx, index %lx\n",
 		dir->vnid, cookie->current_index));
@@ -1295,13 +1238,6 @@ dosfs_rewinddir(fs_volume *_vol, fs_vnode *_node, void* _cookie)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_rewinddir")
-		|| check_vnode_magic(node, "dosfs_rewinddir")
-		|| check_dircookie_magic(cookie, "dosfs_rewinddir")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
 	DPRINTF(0, ("dosfs_rewinddir (vnode id %Lx)\n", node->vnid));
 
 	cookie->current_index = 0;
@@ -1332,22 +1268,8 @@ dosfs_free_dircookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_free_dircookie")
-		|| check_vnode_magic(node, "dosfs_free_dircookie")
-		|| check_dircookie_magic((dircookie *)cookie, "dosfs_free_dircookie")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
-	if (cookie == NULL) {
-		dprintf("error: dosfs_free_dircookie called with null cookie\n");
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
 	DPRINTF(0, ("dosfs_free_dircookie (vnode id %Lx)\n", node->vnid));
 
-	cookie->magic = ~DIRCOOKIE_MAGIC;
 	free(cookie);
 
 	UNLOCK_VOL(vol);

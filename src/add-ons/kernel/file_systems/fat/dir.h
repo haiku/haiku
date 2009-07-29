@@ -5,6 +5,10 @@
 #ifndef _DOSFS_DIR_H_
 #define _DOSFS_DIR_H_
 
+
+#include "dosfs.h"
+
+
 bool is_filename_legal(const char *name);
 status_t	check_dir_empty(nspace *vol, vnode *dir);
 status_t 	findfile_case(nspace *vol, vnode *dir, const char *file,

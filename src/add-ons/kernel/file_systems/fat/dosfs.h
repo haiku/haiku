@@ -62,10 +62,8 @@
 #define VNODE_PARENT_DIR_CLUSTER(vnode) \
 	CLUSTER_OF_DIR_CLUSTER_VNID((vnode)->dir_vnid)
 
-#define VNODE_MAGIC 'treB'
 
 typedef struct vnode {
-	uint32		magic;
 	ino_t		vnid; 			// self id
 	ino_t	 	dir_vnid;		// parent vnode id (directory containing entry)
 	void		*cache;
@@ -108,13 +106,10 @@ typedef struct vnode {
 #define FAT_SUBDIR		16
 #define FAT_ARCHIVE		32
 
-#define NSPACE_MAGIC 'smaI'
 
 struct vcache_entry;
 
-typedef struct _nspace
-{
-	uint32	magic;
+typedef struct _nspace {
 	fs_volume		*volume;		// fs_volume passed in to fs_mount
 	dev_t			id;
 	int				fd;				// File descriptor
@@ -178,22 +173,6 @@ typedef struct _nspace
 
 #define UNLOCK_VOL(vol) \
 	UNLOCK((vol)->vlock)
-
-#define CHECK_MAGIC(name,struc,magick) \
-	int check_##name##_magic(struc *t, char *funcname) \
-	{ \
-		if (t == NULL) { \
-			dprintf("%s passed null " #name " pointer\n", funcname); \
-			return EINVAL; \
-		} else if (t->magic != magick) { \
-			dprintf(#name " (%x) passed to %s has invalid magic number\n", (int)t, funcname); \
-			return EINVAL; \
-		} else \
-			return 0; \
-	}
-
-int check_vnode_magic(struct vnode *t, char *funcname);
-int check_nspace_magic(struct _nspace *t, char *funcname);
 
 #define TOUCH(x) ((void)(x))
 

@@ -3,6 +3,9 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
+
+#include "dosfs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,7 +23,6 @@
 #include <fs_cache.h>
 #include <fs_volume.h>
 
-#include "dosfs.h"
 #include "attr.h"
 #include "dir.h"
 #include "dlist.h"
@@ -29,6 +31,7 @@
 #include "iter.h"
 #include "util.h"
 #include "vcache.h"
+
 
 extern const char *build_time, *build_date;
 
@@ -39,10 +42,8 @@ int debug_attr = 0, debug_dir = 0, debug_dlist = 0, debug_dosfs = 0,
 
 #define DPRINTF(a,b) if (debug_dosfs > (a)) dprintf b
 
-CHECK_MAGIC(vnode,struct vnode,VNODE_MAGIC)
-CHECK_MAGIC(nspace,struct _nspace, NSPACE_MAGIC)
-
 static status_t get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocated);
+
 
 #if DEBUG
 
@@ -58,7 +59,6 @@ debug_fat_nspace(int argc, char **argv)
 			continue;
 
 		kprintf("fat nspace @ %p\n", vol);
-		kprintf("magic: %lx\n", vol->magic);
 		kprintf("id: %lx, fd: %x, device: %s, flags %lx\n",
 				vol->id, vol->fd, vol->device, vol->flags);
 		kprintf("bytes/sector = %lx, sectors/cluster = %lx, reserved sectors = %lx\n",
@@ -82,6 +82,9 @@ debug_fat_nspace(int argc, char **argv)
 				vol->vcache.by_vnid, vol->vcache.by_loc);
 		kprintf("dlist entries: %lx/%lx @ %p\n",
 				vol->dlist.entries, vol->dlist.allocated, vol->dlist.vnid_list);
+
+		dump_vcache(vol);
+		dlist_dump(vol);
 	}
 	return B_OK;
 }
@@ -97,7 +100,7 @@ debug_dvnode(int argc, char **argv)
 		return B_OK;
 	}
 
-	for (i=1;i<argc;i++) {
+	for (i = 1; i < argc; i++) {
 		vnode *n = (vnode *)strtoul(argv[i], NULL, 0);
 		if (!n) continue;
 
@@ -105,12 +108,11 @@ debug_dvnode(int argc, char **argv)
 #if TRACK_FILENAME
 		kprintf(" (%s)", n->filename);
 #endif
-		kprintf("\nmagic %lx, vnid %Lx, dir vnid %Lx\n",
-				n->magic, n->vnid, n->dir_vnid);
+		kprintf("\nvnid %Lx, dir vnid %Lx\n", n->vnid, n->dir_vnid);
 		kprintf("iteration %lx, si=%lx, ei=%lx, cluster=%lx\n",
-				n->iteration, n->sindex, n->eindex, n->cluster);
+			n->iteration, n->sindex, n->eindex, n->cluster);
 		kprintf("mode %lx, size %Lx, time %lx\n",
-				n->mode, n->st_size, n->st_time);
+			n->mode, n->st_size, n->st_time);
 		kprintf("end cluster = %lx\n", n->end_cluster);
 		if (n->mime) kprintf("mime type %s\n", n->mime);
 	}
@@ -198,7 +200,6 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 		return B_NO_MEMORY;
 	}
 
-	vol->magic = NSPACE_MAGIC;
 	vol->flags = B_FS_IS_PERSISTENT | B_FS_HAS_MIME;
 	vol->fs_flags = fs_flags;
 
@@ -565,9 +566,8 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	}
 
 	// initialize root vnode
-	vol->root_vnode.magic = VNODE_MAGIC;
 	vol->root_vnode.vnid = vol->root_vnode.dir_vnid = GENERATE_DIR_CLUSTER_VNID(
-			vol->root_vnode.cluster, vol->root_vnode.cluster);
+		vol->root_vnode.cluster, vol->root_vnode.cluster);
 	vol->root_vnode.sindex = vol->root_vnode.eindex = 0xffffffff;
 	vol->root_vnode.mode = FAT_SUBDIR;
 	time(&(vol->root_vnode.st_time));
@@ -779,10 +779,8 @@ dosfs_mount(fs_volume *_vol, const char *device, uint32 flags,
 
 	// Try and mount volume as a FAT volume
 	if ((result = mount_fat_disk(device, _vol, flags, &vol, fs_flags,
-		op_sync_mode)) == B_NO_ERROR) {
+			op_sync_mode)) == B_NO_ERROR) {
 		char name[32];
-
-		if (check_nspace_magic(vol, "dosfs_mount")) return EINVAL;
 
 		*_rootID = vol->root_vnode.vnid;
 		_vol->private_volume = (void *)vol;
@@ -890,11 +888,6 @@ dosfs_unmount(fs_volume *_vol)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_unmount")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
 	DPRINTF(0, ("dosfs_unmount volume %lx\n", vol->id));
 
 	update_fsinfo(vol);
@@ -920,7 +913,6 @@ dosfs_unmount(fs_volume *_vol)
 		lock_removable_device(vol->fd, false);
 	result = close(vol->fd);
 	recursive_lock_destroy(&(vol->vlock));
-	vol->magic = ~VNODE_MAGIC;
 	free(vol);
 
 #if USE_DMALLOC
@@ -939,11 +931,6 @@ dosfs_read_fs_stat(fs_volume *_vol, struct fs_info * fss)
 	int i;
 
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic(vol, "dosfs_read_fs_stat")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	DPRINTF(1, ("dosfs_read_fs_stat called\n"));
 
@@ -998,11 +985,6 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 	nspace* vol = (nspace*)_vol->private_volume;
 
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic(vol, "dosfs_write_fs_stat")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	DPRINTF(0, ("dosfs_write_fs_stat called\n"));
 
@@ -1103,12 +1085,6 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, ulong code,
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_ioctl") ||
-	    check_vnode_magic(node, "dosfs_ioctl")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
 	switch (code) {
 		case 10002 : /* return real creation time */
 				if (buf) *(bigtime_t *)buf = node->st_time;
@@ -1117,6 +1093,7 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, ulong code,
 				if (buf) *(bigtime_t *)buf = node->st_time;
 				break;
 
+#if 0
 		/*case 69666 :
 				result = fragment(vol, buf);
 				break;
@@ -1174,9 +1151,11 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, ulong code,
 			dprintf("dumping dlist for %lx\n", vol->id);
 			dlist_dump(vol);
 			break;
+#endif
 
 		default :
-			dprintf("dosfs_ioctl: vol %lx, vnode %Lx code = %ld\n", vol->id, node->vnid, code);
+			DPRINTF(0, ("dosfs_ioctl: vol %lx, vnode %Lx code = %ld\n",
+				vol->id, node->vnid, code));
 			result = EINVAL;
 			break;
 	}
@@ -1190,9 +1169,6 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, ulong code,
 status_t
 _dosfs_sync(nspace *vol)
 {
-	if (check_nspace_magic(vol, "dosfs_sync"))
-		return EINVAL;
-
 	update_fsinfo(vol);
 	block_cache_sync(vol->fBlockCache);
 
@@ -1224,11 +1200,6 @@ dosfs_fsync(fs_volume *_vol, fs_vnode *_node)
 	status_t err = B_OK;
 
 	LOCK_VOL(vol);
-
-	if (check_vnode_magic(node, "dosfs_fsync")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	if (node->cache)
 		err = file_cache_sync(node->cache);

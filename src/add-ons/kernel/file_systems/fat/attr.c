@@ -2,7 +2,8 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-/* attr.c
+
+/*
  * handles mime type information for dosfs
  * gets/sets mime information in vnode
  */
@@ -67,11 +68,6 @@ dosfs_open_attrdir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_open_attrdir")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
 	if ((*_cookie = malloc(sizeof(uint32))) == NULL) {
 		UNLOCK_VOL(vol);
 		return ENOMEM;
@@ -94,11 +90,6 @@ dosfs_close_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 	DPRINTF(0, ("dosfs_close_attrdir called\n"));
 
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic(vol, "dosfs_open_attrdir")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	*(int32 *)_cookie = 1;
 
@@ -159,12 +150,6 @@ dosfs_read_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	*num = 0;
 
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic(vol, "dosfs_read_attrdir") ||
-		check_vnode_magic(node, "dosfs_read_attrdir")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	if ((*cookie == 0) && (node->mime)) {
 		*num = 1;
@@ -235,12 +220,6 @@ dosfs_read_attr_stat(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_read_attr_stat") ||
-		check_vnode_magic(node, "dosfs_read_attr_stat")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
 	if (node->mime == NULL) {
 		UNLOCK_VOL(vol);
 		return ENOENT;
@@ -267,12 +246,6 @@ dosfs_read_attr(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 		return ENOENT;
 
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic(vol, "dosfs_read_attr") ||
-		check_vnode_magic(node, "dosfs_read_attr")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	if (node->mime == NULL) {
 		UNLOCK_VOL(vol);

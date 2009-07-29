@@ -2,24 +2,28 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-#include <KernelExport.h>
 
-#include <fs_cache.h>
+
+#include "fat.h"
+
 #include <stdlib.h>
 #include <string.h>
+
+#include <fs_cache.h>
 #include <ByteOrder.h>
+#include <KernelExport.h>
 
 #include "dosfs.h"
-#include "fat.h"
-#include "util.h"
-
 #include "file.h"
+#include "util.h"
 #include "vcache.h"
+
 
 #define END_FAT_ENTRY 0x0fffffff
 #define BAD_FAT_ENTRY 0x0ffffff1
 
 #define DPRINTF(a,b) if (debug_fat > (a)) dprintf b
+
 
 static status_t
 mirror_fats(nspace *vol, uint32 sector, uint8 *buffer)
@@ -104,11 +108,8 @@ _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
 	// mark end of chain for allocations
 	uint32 endOfChainMarker = (action == _IOCTL_SET_ENTRY_) ? N : 0x0fffffff;
 
-	ASSERT((action >= _IOCTL_COUNT_FREE_)
-		&& (action <= _IOCTL_ALLOCATE_N_ENTRIES_));
-
-	if (check_nspace_magic(vol, "_fat_ioctl_"))
-		return B_BAD_VALUE;
+	ASSERT(action >= _IOCTL_COUNT_FREE_
+		&& action <= _IOCTL_ALLOCATE_N_ENTRIES_);
 
 	DPRINTF(3, ("_fat_ioctl_: action %lx, cluster %ld, N %ld\n", action,
 		cluster, N));
@@ -367,7 +368,7 @@ get_fat_entry(nspace *vol, uint32 cluster)
 	if (value < 0)
 		return value;
 
-	if ((value == 0) || IS_DATA_CLUSTER(value))
+	if (value == 0 || IS_DATA_CLUSTER(value))
 		return value;
 
 	if (value > 0x0ffffff7)
@@ -388,13 +389,10 @@ set_fat_entry(nspace *vol, uint32 cluster, int32 value)
 }
 
 
-// traverse n fat entries
+//! Traverse n fat entries
 int32
 get_nth_fat_entry(nspace *vol, int32 cluster, uint32 n)
 {
-	if (check_nspace_magic(vol, "get_nth_fat_entry"))
-		return B_BAD_VALUE;
-
 	while (n--) {
 		cluster = get_fat_entry(vol, cluster);
 
@@ -416,9 +414,6 @@ count_clusters(nspace *vol, int32 cluster)
 	int32 count = 0;
 
 	DPRINTF(2, ("count_clusters %ld\n", cluster));
-
-	if (check_nspace_magic(vol, "count_clusters"))
-		return 0;
 
 	// not intended for use on root directory
 	if (!IS_DATA_CLUSTER(cluster)) {

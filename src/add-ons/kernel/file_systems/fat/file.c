@@ -29,11 +29,8 @@
 
 #define MAX_FILE_SIZE 0xffffffffLL
 
-#define FILECOOKIE_MAGIC 'looT'
 
-typedef struct filecookie
-{
-	uint32		magic;
+typedef struct filecookie {
 	uint32		mode;		// open mode
 
 	/* simple cluster cache */
@@ -43,8 +40,6 @@ typedef struct filecookie
 		uint32		cluster;
 	} ccache;
 } filecookie;
-
-static CHECK_MAGIC(filecookie,struct filecookie, FILECOOKIE_MAGIC)
 
 
 mode_t
@@ -141,11 +136,6 @@ dosfs_release_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 
 	TOUCH(reenter);
 
-	if (check_nspace_magic(vol, "dosfs_write_vnode")
-		|| check_vnode_magic(node, "dosfs_write_vnode")) {
-		return EINVAL;
-	}
-
 	DPRINTF(0, ("dosfs_write_vnode (ino_t %Lx)\n", node->vnid));
 
 	if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && node->dirty) {
@@ -160,7 +150,6 @@ dosfs_release_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 #endif
 
 		if (node->vnid != vol->root_vnode.vnid) {
-			node->magic = ~VNODE_MAGIC; // munge magic number to be safe
 			file_cache_delete(node->cache);
 			file_map_delete(node->file_map);
 			free(node);
@@ -178,12 +167,6 @@ dosfs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *st)
 	vnode	*node = (vnode*)_node->private_node;
 
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic(vol, "dosfs_rstat")
-		|| check_vnode_magic(node, "dosfs_rstat")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	DPRINTF(1, ("dosfs_rstat (vnode id %Lx)\n", node->vnid));
 
@@ -215,12 +198,6 @@ dosfs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st,
 	bool dirty = false;
 
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic(vol, "dosfs_wstat")
-		|| check_vnode_magic(node, "dosfs_wstat")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	DPRINTF(0, ("dosfs_wstat (vnode id %Lx)\n", node->vnid));
 
@@ -302,12 +279,6 @@ dosfs_open(fs_volume *_vol, fs_vnode *_node, int omode, void **_cookie)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_open")
-		|| check_vnode_magic(node, "dosfs_open")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
 	DPRINTF(0, ("dosfs_open: vnode id %Lx, omode %x\n", node->vnid, omode));
 
 	if (omode & O_CREAT) {
@@ -347,7 +318,6 @@ dosfs_open(fs_volume *_vol, fs_vnode *_node, int omode, void **_cookie)
 		goto error;
 	}
 
-	cookie->magic = FILECOOKIE_MAGIC;
 	cookie->mode = omode;
 	cookie->ccache.iteration = node->iteration;
 	cookie->ccache.index = 0;
@@ -378,15 +348,6 @@ dosfs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	//off_t diff;
 
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic((nspace *)vol, "dosfs_read")
-		|| check_vnode_magic(node, "dosfs_read")
-		|| check_filecookie_magic(cookie, "dosfs_read")) {
-		*len = 0;
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
 
 	if (node->mode & FAT_SUBDIR) {
 		DPRINTF(0, ("dosfs_read called on subdirectory %Lx\n", node->vnid));
@@ -535,14 +496,6 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 
 
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic((nspace *)vol, "dosfs_write")
-		|| check_vnode_magic(node, "dosfs_write")
-		|| check_filecookie_magic(cookie, "dosfs_write")) {
-		*len = 0;
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	if (node->mode & FAT_SUBDIR) {
 		DPRINTF(0, ("dosfs_write called on subdirectory %Lx\n", node->vnid));
@@ -728,13 +681,6 @@ dosfs_close(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_close")
-		|| check_vnode_magic(node, "dosfs_close")
-		|| check_filecookie_magic(_cookie, "dosfs_close")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
 	DPRINTF(0, ("dosfs_close (vnode id %Lx)\n", node->vnid));
 
 	if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && node->dirty) {
@@ -756,16 +702,8 @@ dosfs_free_cookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 	filecookie *cookie = _cookie;
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_free_cookie")
-		|| check_vnode_magic(node, "dosfs_free_cookie")
-		|| check_filecookie_magic(cookie, "dosfs_free_cookie")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
 	DPRINTF(0, ("dosfs_free_cookie (vnode id %Lx)\n", node->vnid));
 
-	cookie->magic = ~FILECOOKIE_MAGIC;
 	free(cookie);
 
 	UNLOCK_VOL(vol);
@@ -785,12 +723,6 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 	bool dups_exist;
 
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic(vol, "dosfs_create")
-		|| check_vnode_magic(dir, "dosfs_create")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	ASSERT(name != NULL);
 	if (name == NULL) {
@@ -863,7 +795,6 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 		// the file doesn't already exist in any case
 		vnode dummy; /* used only to create directory entry */
 
-		dummy.magic = VNODE_MAGIC;
 		dummy.dir_vnid = dir->vnid;
 		dummy.cluster = 0;
 		dummy.end_cluster = 0;
@@ -873,7 +804,6 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 
 		if ((result = create_dir_entry(vol, dir, &dummy, name, &(dummy.sindex), &(dummy.eindex))) != B_OK) {
 			dprintf("dosfs_create: error creating directory entry for %s (%s)\n", name, strerror(result));
-			dummy.magic = ~VNODE_MAGIC;
 			goto bi;
 		}
 		dummy.vnid = GENERATE_DIR_INDEX_VNID(dummy.dir_vnid, dummy.sindex);
@@ -888,7 +818,6 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 			}
 		}
 		*vnid = dummy.vnid;
-		dummy.magic = ~VNODE_MAGIC;
 
 		result = get_vnode(_vol, *vnid, (void **)&file);
 		if (result < B_OK) {
@@ -900,7 +829,6 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 		goto bi;
 	}
 
-	cookie->magic = FILECOOKIE_MAGIC;
 	cookie->mode = omode;
 	cookie->ccache.iteration = file->iteration;
 	cookie->ccache.index = 0;
@@ -936,12 +864,6 @@ dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_mkdir")
-		|| check_vnode_magic(dir, "dosfs_mkdir")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
 	// TODO : is it needed ? vfs job ?
 	/*if (is_vnode_removed(vol->id, dir->vnid) > 0) {
 		dprintf("dosfs_mkdir() called in removed directory. disallowed.\n");
@@ -967,7 +889,6 @@ dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 	}
 
 	/* only used to create directory entry */
-	dummy.magic = VNODE_MAGIC;
 	dummy.dir_vnid = dir->vnid;
 	if ((result = allocate_n_fat_entries(vol, 1, (int32 *)&(dummy.cluster))) < 0) {
 		dprintf("dosfs_mkdir: error allocating space for %s (%s))\n", name, strerror(result));
@@ -1062,14 +983,18 @@ dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 	UNLOCK_VOL(vol);
 	return result;
 
-bi5:free(buffer);
-bi4:dlist_remove(vol, dummy.vnid);
-bi3:if (IS_ARTIFICIAL_VNID(dummy.vnid)) remove_from_vcache(vol, dummy.vnid);
-bi2:clear_fat_chain(vol, dummy.cluster);
+bi5:
+	free(buffer);
+bi4:
+	dlist_remove(vol, dummy.vnid);
+bi3:
+	if (IS_ARTIFICIAL_VNID(dummy.vnid))
+		remove_from_vcache(vol, dummy.vnid);
+bi2:
+	clear_fat_chain(vol, dummy.cluster);
 	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
 		_dosfs_sync(vol);
-bi:	dummy.magic = ~VNODE_MAGIC;
-
+bi:
 	UNLOCK_VOL(vol);
 	if (result != B_OK) DPRINTF(0, ("dosfs_mkdir (%s)\n", strerror(result)));
 	return result;
@@ -1090,13 +1015,6 @@ dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 	bool dirty = false;
 
 	LOCK_VOL(vol);
-
-	if (check_nspace_magic(vol, "dosfs_rename")
-		|| check_vnode_magic(odir, "dosfs_rename")
-		|| check_vnode_magic(ndir, "dosfs_rename")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	DPRINTF(0, ("dosfs_rename called: %Lx/%s->%Lx/%s\n", odir->vnid, oldname, ndir->vnid, newname));
 
@@ -1131,11 +1049,6 @@ dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 	if (file->disk_image) {
 		dprintf("rename called on disk image or disk image directory\n");
 		result = EPERM;
-		goto bi1;
-	}
-
-	if (check_vnode_magic(file, "dosfs_rename")) {
-		result = EINVAL;
 		goto bi1;
 	}
 
@@ -1318,19 +1231,13 @@ dosfs_remove_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
 
-	if (!reenter) { LOCK_VOL(vol); }
-
-	if (check_nspace_magic(vol, "dosfs_remove_vnode")
-		|| check_vnode_magic(node, "dosfs_remove_vnode")) {
-		if (!reenter) UNLOCK_VOL(vol);
-		return EINVAL;
-	}
+	LOCK_VOL(vol);
 
 	DPRINTF(0, ("dosfs_remove_vnode (%Lx)\n", node->vnid));
 
 	if (vol->flags & B_FS_IS_READONLY) {
 		dprintf("dosfs_remove_vnode: read-only volume\n");
-		if (!reenter) UNLOCK_VOL(vol);
+		UNLOCK_VOL(vol);
 		return EROFS;
 	}
 
@@ -1349,18 +1256,16 @@ dosfs_remove_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 	if (node->mode & FAT_SUBDIR)
 		dlist_remove(vol, node->vnid);
 
-	node->magic = ~VNODE_MAGIC; // munge magic number to be safe
 	free(node);
 
-	if (!reenter) {
-		if (vol->fs_flags & FS_FLAGS_OP_SYNC) {
-			// sync the entire filesystem,
-			// but only if we're not reentrant. Presumably the
-			// function that called this will sync.
-			_dosfs_sync(vol);
-		}
-		UNLOCK_VOL(vol);
+	if (!reenter && vol->fs_flags & FS_FLAGS_OP_SYNC) {
+		// sync the entire filesystem,
+		// but only if we're not reentrant. Presumably the
+		// function that called this will sync.
+		_dosfs_sync(vol);
 	}
+
+	UNLOCK_VOL(vol);
 
 	return B_OK;
 }
@@ -1383,12 +1288,6 @@ do_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name, bool is_file)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "do_unlink")
-		|| check_vnode_magic(dir, "do_unlink")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
-
 	DPRINTF(0, ("do_unlink %Lx/%s\n", dir->vnid, name));
 
 	if (vol->flags & B_FS_IS_READONLY) {
@@ -1402,11 +1301,6 @@ do_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name, bool is_file)
 		DPRINTF(0, ("do_unlink: can't find file %s in directory %Lx\n", name, dir->vnid));
 		result = ENOENT;
 		goto bi;
-	}
-
-	if (check_vnode_magic(file, "do_unlink")) {
-		result = EINVAL;
-		goto bi1;
 	}
 
 	if (file->disk_image) {
@@ -1516,10 +1410,6 @@ dosfs_read_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	size_t bytesLeft = *_numBytes;
 	status_t status;
 
-	if (check_nspace_magic(vol, "dosfs_read_pages")
-		|| check_vnode_magic(node, "dosfs_read_pages"))
-		return EINVAL;
-
 	if (node->cache == NULL)
 		return(B_BAD_VALUE);
 
@@ -1563,10 +1453,6 @@ dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	size_t vecOffset = 0;
 	size_t bytesLeft = *_numBytes;
 	status_t status;
-
-	if (check_nspace_magic(vol, "dosfs_write_pages")
-		|| check_vnode_magic(node, "dosfs_write_pages"))
-		return EINVAL;
 
 	if (node->cache == NULL)
 		return B_BAD_VALUE;
@@ -1616,12 +1502,6 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t pos, size_t len,
 
 	LOCK_VOL(vol);
 	*_count = 0;
-
-	if (check_nspace_magic((nspace *)vol, "dosfs_get_file_map")
-		|| check_vnode_magic(node, "dosfs_get_file_map")) {
-		UNLOCK_VOL(vol);
-		return EINVAL;
-	}
 
 	if (node->mode & FAT_SUBDIR) {
 		DPRINTF(0, ("dosfs_get_file_map called on subdirectory %Lx\n", node->vnid));
