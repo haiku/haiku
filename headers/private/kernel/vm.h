@@ -56,7 +56,7 @@ void forbid_page_faults(void);
 // private kernel only extension (should be moved somewhere else):
 area_id create_area_etc(team_id team, const char *name, void **address,
 			uint32 addressSpec, uint32 size, uint32 lock, uint32 protection,
-			uint32 flags);
+			addr_t physicalAddress, uint32 flags);
 area_id transfer_area(area_id id, void** _address, uint32 addressSpec,
 			team_id target, bool kernel);
 
@@ -65,7 +65,7 @@ status_t vm_reserve_address_range(team_id team, void **_address,
 			uint32 addressSpec, addr_t size, uint32 flags);
 area_id vm_create_anonymous_area(team_id team, const char *name, void **address,
 			uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection,
-			uint32 flags, bool kernel);
+			addr_t physicalAddress, uint32 flags, bool kernel);
 area_id vm_map_physical_memory(team_id team, const char *name, void **address,
 			uint32 addressSpec, addr_t size, uint32 protection, addr_t phys_addr);
 area_id vm_map_file(team_id aid, const char *name, void **address,
