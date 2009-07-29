@@ -1202,7 +1202,7 @@ AboutView::_AddCopyrightsFromAttribute()
 	}
 
 	// open the attribute
-	int attrFD = fs_open_attr(appFD, "COPYRIGHTS", B_STRING_TYPE, O_RDONLY);
+	int attrFD = fs_fopen_attr(appFD, "COPYRIGHTS", B_STRING_TYPE, O_RDONLY);
 	close(appFD);
 	if (attrFD < 0)
 		return;

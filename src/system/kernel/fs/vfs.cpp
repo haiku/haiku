@@ -21,6 +21,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <fs_attr.h>
 #include <fs_info.h>
 #include <fs_interface.h>
 #include <fs_volume.h>
@@ -1251,7 +1252,8 @@ static status_t
 get_vnode(dev_t mountID, ino_t vnodeID, struct vnode** _vnode, bool canWait,
 	int reenter)
 {
-	FUNCTION(("get_vnode: mountid %ld vnid 0x%Lx %p\n", mountID, vnodeID, _vnode));
+	FUNCTION(("get_vnode: mountid %ld vnid 0x%Lx %p\n", mountID, vnodeID,
+		_vnode));
 
 	mutex_lock(&sVnodeMutex);
 
@@ -1263,7 +1265,8 @@ restart:
 		mutex_unlock(&sVnodeMutex);
 		if (!canWait || --tries < 0) {
 			// vnode doesn't seem to become unbusy
-			dprintf("vnode %ld:%Ld is not becoming unbusy!\n", mountID, vnodeID);
+			dprintf("vnode %ld:%Ld is not becoming unbusy!\n", mountID,
+				vnodeID);
 			return B_BUSY;
 		}
 		snooze(10000); // 10 ms
@@ -5155,7 +5158,8 @@ file_create(int fd, char* path, int openMode, int perms, bool kernel)
 	struct vnode* directory;
 	int status;
 
-	FUNCTION(("file_create: path '%s', omode %x, perms %d, kernel %d\n", path, openMode, perms, kernel));
+	FUNCTION(("file_create: path '%s', omode %x, perms %d, kernel %d\n", path,
+		openMode, perms, kernel));
 
 	// get directory to put the new file in
 	status = fd_and_path_to_dir_vnode(fd, path, &directory, name, kernel);
@@ -6247,30 +6251,33 @@ attr_dir_rewind(struct file_descriptor* descriptor)
 
 
 static int
-attr_create(int fd, const char* name, uint32 type, int openMode, bool kernel)
+attr_create(int fd, char* path, const char* name, uint32 type,
+	int openMode, bool kernel)
 {
-	struct vnode* vnode;
-	void* cookie;
-	int status;
-
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
-	vnode = get_vnode_from_fd(fd, kernel);
-	if (vnode == NULL)
-		return B_FILE_ERROR;
+	struct vnode* vnode;
+	status_t status = fd_and_path_to_vnode(fd, path,
+		(openMode & O_NOTRAVERSE) != 0, &vnode, NULL, kernel);
+	if (status != B_OK)
+		return status;
 
 	if (!HAS_FS_CALL(vnode, create_attr)) {
 		status = EROFS;
 		goto err;
 	}
 
+	void* cookie;
 	status = FS_CALL(vnode, create_attr, name, type, openMode, &cookie);
-	if (status < B_OK)
+	if (status != B_OK)
 		goto err;
 
-	if ((status = get_new_fd(FDTYPE_ATTR, NULL, vnode, cookie, openMode, kernel)) >= 0)
-		return status;
+	fd = get_new_fd(FDTYPE_ATTR, NULL, vnode, cookie, openMode, kernel);
+	if (fd >= 0)
+		return fd;
+
+	status = fd;
 
 	FS_CALL(vnode, close_attr, cookie);
 	FS_CALL(vnode, free_attr_cookie, cookie);
@@ -6285,31 +6292,33 @@ err:
 
 
 static int
-attr_open(int fd, const char* name, int openMode, bool kernel)
+attr_open(int fd, char* path, const char* name, int openMode, bool kernel)
 {
-	struct vnode* vnode;
-	void* cookie;
-	int status;
-
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
-	vnode = get_vnode_from_fd(fd, kernel);
-	if (vnode == NULL)
-		return B_FILE_ERROR;
+	struct vnode* vnode;
+	status_t status = fd_and_path_to_vnode(fd, path,
+		(openMode & O_NOTRAVERSE) != 0, &vnode, NULL, kernel);
+	if (status != B_OK)
+		return status;
 
 	if (!HAS_FS_CALL(vnode, open_attr)) {
 		status = EOPNOTSUPP;
 		goto err;
 	}
 
+	void* cookie;
 	status = FS_CALL(vnode, open_attr, name, openMode, &cookie);
-	if (status < B_OK)
+	if (status != B_OK)
 		goto err;
 
 	// now we only need a file descriptor for this attribute and we're done
-	if ((status = get_new_fd(FDTYPE_ATTR, NULL, vnode, cookie, openMode, kernel)) >= 0)
-		return status;
+	fd = get_new_fd(FDTYPE_ATTR, NULL, vnode, cookie, openMode, kernel);
+	if (fd >= 0)
+		return fd;
+
+	status = fd;
 
 	FS_CALL(vnode, close_attr, cookie);
 	FS_CALL(vnode, free_attr_cookie, cookie);
@@ -8105,16 +8114,19 @@ _kern_open_attr_dir(int fd, const char* path)
 
 
 int
-_kern_create_attr(int fd, const char* name, uint32 type, int openMode)
+_kern_open_attr(int fd, const char* path, const char* name, uint32 type,
+	int openMode)
 {
-	return attr_create(fd, name, type, openMode, true);
-}
+	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
+	if ((openMode & O_CREAT) != 0) {
+		return attr_create(fd, pathBuffer.LockBuffer(), name, type, openMode,
+			true);
+	}
 
-int
-_kern_open_attr(int fd, const char* name, int openMode)
-{
-	return attr_open(fd, name, openMode, true);
+	return attr_open(fd, pathBuffer.LockBuffer(), name, openMode, true);
 }
 
 
@@ -9069,21 +9081,79 @@ _user_open_attr_dir(int fd, const char* userPath)
 }
 
 
-int
-_user_create_attr(int fd, const char* userName, uint32 type, int openMode)
+ssize_t
+_user_read_attr(int fd, const char* attribute, off_t pos, void* userBuffer,
+	size_t readBytes)
 {
-	char name[B_FILE_NAME_LENGTH];
+	int attr = attr_open(fd, NULL, attribute, O_RDONLY, false);
+	if (attr < 0)
+		return attr;
 
-	if (!IS_USER_ADDRESS(userName)
-		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
-		return B_BAD_ADDRESS;
+	ssize_t bytes = _user_read(attr, pos, userBuffer, readBytes);
+	_user_close(attr);
 
-	return attr_create(fd, name, type, openMode, false);
+	return bytes;
+}
+
+
+ssize_t
+_user_write_attr(int fd, const char* attribute, uint32 type, off_t pos,
+	const void* buffer, size_t writeBytes)
+{
+	// Try to support the BeOS typical truncation as well as the position
+	// argument
+	int attr = attr_create(fd, NULL, attribute, type,
+		O_CREAT | O_WRONLY | (pos != 0 ? 0 : O_TRUNC), false);
+	if (attr < 0)
+		return attr;
+
+	ssize_t bytes = _user_write(attr, pos, buffer, writeBytes);
+	_user_close(attr);
+
+	return bytes;
+}
+
+
+status_t
+_user_stat_attr(int fd, const char* attribute, struct attr_info* userAttrInfo)
+{
+	int attr = attr_open(fd, NULL, attribute, O_RDONLY, false);
+	if (attr < 0)
+		return attr;
+
+	struct file_descriptor* descriptor
+		= get_fd(get_current_io_context(false), attr);
+	if (descriptor == NULL) {
+		_user_close(attr);
+		return B_FILE_ERROR;
+	}
+
+	struct stat stat;
+	status_t status;
+	if (descriptor->ops->fd_read_stat)
+		status = descriptor->ops->fd_read_stat(descriptor, &stat);
+	else
+		status = EOPNOTSUPP;
+
+	put_fd(descriptor);
+	_user_close(attr);
+
+	if (status == B_OK) {
+		attr_info info;
+		info.type = stat.st_type;
+		info.size = stat.st_size;
+
+		if (user_memcpy(userAttrInfo, &info, sizeof(struct attr_info)) != B_OK)
+			return B_BAD_ADDRESS;
+	}
+
+	return status;
 }
 
 
 int
-_user_open_attr(int fd, const char* userName, int openMode)
+_user_open_attr(int fd, const char* userPath, const char* userName,
+	uint32 type, int openMode)
 {
 	char name[B_FILE_NAME_LENGTH];
 
@@ -9091,7 +9161,24 @@ _user_open_attr(int fd, const char* userName, int openMode)
 		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return attr_open(fd, name, openMode, false);
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	char* path = pathBuffer.LockBuffer();
+
+	if (userPath != NULL) {
+		if (!IS_USER_ADDRESS(userPath)
+			|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+			return B_BAD_ADDRESS;
+	}
+
+	if ((openMode & O_CREAT) != 0) {
+		return attr_create(fd, userPath ? path : NULL, name, type, openMode,
+			false);
+	}
+
+	return attr_open(fd, userPath ? path : NULL, name, openMode, false);
 }
 
 

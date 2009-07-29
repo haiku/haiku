@@ -168,7 +168,7 @@ sv_rewind(struct irs_sv *sv)
 		return;
 
 	// open the attribute
-	int attrFD = fs_open_attr(libraryFD, "services", B_STRING_TYPE, O_RDONLY);
+	int attrFD = fs_fopen_attr(libraryFD, "services", B_STRING_TYPE, O_RDONLY);
 	close(libraryFD);
 	if (attrFD < 0)
 		return;

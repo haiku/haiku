@@ -19,6 +19,7 @@
 extern "C" {
 #endif
 
+struct attr_info;
 struct dirent;
 struct Elf32_Sym;
 struct fd_info;
@@ -250,10 +251,16 @@ extern ssize_t		_kern_select(int numfds, struct fd_set *readSet,
 						bigtime_t timeout, const sigset_t *sigMask);
 extern ssize_t		_kern_poll(struct pollfd *fds, int numFDs,
 						bigtime_t timeout);
+
 extern int			_kern_open_attr_dir(int fd, const char *path);
-extern int			_kern_create_attr(int fd, const char *name, uint32 type,
-						int openMode);
-extern int			_kern_open_attr(int fd, const char *name, int openMode);
+extern ssize_t		_kern_read_attr(int fd, const char *attribute, off_t pos,
+						void *buffer, size_t readBytes);
+extern ssize_t		_kern_write_attr(int fd, const char *attribute, uint32 type,
+						off_t pos, const void *buffer, size_t readBytes);
+extern status_t		_kern_stat_attr(int fd, const char *attribute,
+						struct attr_info *attrInfo);
+extern int			_kern_open_attr(int fd, const char* path, const char *name,
+						uint32 type, int openMode);
 extern status_t		_kern_remove_attr(int fd, const char *name);
 extern status_t		_kern_rename_attr(int fromFile, const char *fromName,
 						int toFile, const char *toName);
