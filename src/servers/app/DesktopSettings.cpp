@@ -145,7 +145,7 @@ DesktopSettingsPrivate::_Load()
 			const char* family;
 			const char* style;
 			float size;
-			int32 hinting;
+
 			if (settings.FindString("plain family", &family) == B_OK
 				&& settings.FindString("plain style", &style) == B_OK
 				&& settings.FindFloat("plain size", &size) == B_OK) {
@@ -153,6 +153,7 @@ DesktopSettingsPrivate::_Load()
 				fPlainFont.SetStyle(fontStyle);
 				fPlainFont.SetSize(size);
 			}
+
 			if (settings.FindString("bold family", &family) == B_OK
 				&& settings.FindString("bold style", &style) == B_OK
 				&& settings.FindFloat("bold size", &size) == B_OK) {
@@ -160,6 +161,7 @@ DesktopSettingsPrivate::_Load()
 				fBoldFont.SetStyle(fontStyle);
 				fBoldFont.SetSize(size);
 			}
+
 			if (settings.FindString("fixed family", &family) == B_OK
 				&& settings.FindString("fixed style", &style) == B_OK
 				&& settings.FindFloat("fixed size", &size) == B_OK) {
@@ -168,9 +170,11 @@ DesktopSettingsPrivate::_Load()
 					fFixedFont.SetStyle(fontStyle);
 				fFixedFont.SetSize(size);
 			}
-			if (settings.FindInt32("hinting", &hinting) == B_OK) {
+
+			int32 hinting;
+			if (settings.FindInt32("hinting", &hinting) == B_OK)
 				gDefaultHintingMode = hinting;
-			}
+
 			gFontManager->Unlock();
 		}
 	}
