@@ -374,6 +374,7 @@ BListView::MouseDown(BPoint point)
 			else
 				Select(index);
 		}
+		fAnchorIndex = index;
 	} else {
 		if (!(modifiers & B_COMMAND_KEY))
 			DeselectAll();
@@ -423,7 +424,13 @@ BListView::KeyDown(const char *bytes, int32 numBytes)
 					&& (modifiers() & B_SHIFT_KEY) != 0)
 					extend = true;
 
-				Select(fFirstSelected - 1, extend);
+				if (fAnchorIndex > 0) {
+					if (fAnchorIndex <= fFirstSelected)
+						Select(fAnchorIndex - 1, extend);
+					else
+						Deselect(fAnchorIndex);
+					--fAnchorIndex;
+				}
 			}
 
 			ScrollToSelection();
@@ -439,8 +446,14 @@ BListView::KeyDown(const char *bytes, int32 numBytes)
 				if (fListType == B_MULTIPLE_SELECTION_LIST
 					&& (modifiers() & B_SHIFT_KEY) != 0)
 					extend = true;
-
-				Select(fLastSelected + 1, extend);
+				
+				if (fAnchorIndex < CountItems() - 1) {
+					if (fAnchorIndex >= fLastSelected)
+						Select(fAnchorIndex + 1, extend);
+					else
+						Deselect(fAnchorIndex);
+					++fAnchorIndex;
+				}
 			}
 
 			ScrollToSelection();
