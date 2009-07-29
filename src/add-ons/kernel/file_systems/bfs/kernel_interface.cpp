@@ -485,12 +485,18 @@ bfs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
 	Inode* inode = (Inode*)_node->private_node;
 
 #ifndef BFS_SHELL
-	if (io_request_is_write(request) && volume->IsReadOnly())
+	if (io_request_is_write(request) && volume->IsReadOnly()) {
+		notify_io_request(request, B_READ_ONLY_DEVICE);
 		return B_READ_ONLY_DEVICE;
+	}
 #endif
 
-	if (inode->FileCache() == NULL)
+	if (inode->FileCache() == NULL) {
+#ifndef BFS_SHELL
+		notify_io_request(request, B_BAD_VALUE);
+#endif
 		RETURN_ERROR(B_BAD_VALUE);
+	}
 
 	// We lock the node here and will unlock it in the "finished" hook.
 	rw_lock_read_lock(&inode->Lock());

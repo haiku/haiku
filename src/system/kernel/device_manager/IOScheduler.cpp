@@ -227,8 +227,10 @@ IOScheduler::ScheduleRequest(IORequest* request)
 	if (buffer->IsVirtual()) {
 		status_t status = buffer->LockMemory(request->Team(),
 			request->IsWrite());
-		if (status != B_OK)
+		if (status != B_OK) {
+			request->SetStatusAndNotify(status);
 			return status;
+		}
 	}
 
 	MutexLocker locker(fLock);
@@ -240,6 +242,7 @@ IOScheduler::ScheduleRequest(IORequest* request)
 		locker.Unlock();
 		if (buffer->IsVirtual())
 			buffer->UnlockMemory(request->Team(), request->IsWrite());
+		request->SetStatusAndNotify(B_NO_MEMORY);
 		return B_NO_MEMORY;
 	}
 

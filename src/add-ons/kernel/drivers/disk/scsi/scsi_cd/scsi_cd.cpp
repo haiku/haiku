@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2009, Haiku, Inc. All rights reserved.
  * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -17,6 +17,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+
+#include <io_requests.h>
 
 
 //#define TRACE_CD_DISK
@@ -709,8 +711,10 @@ cd_io(void* cookie, io_request* request)
 {
 	cd_handle* handle = (cd_handle*)cookie;
 
-	if (handle->info->capacity == 0)
+	if (handle->info->capacity == 0) {
+		notify_io_request(request, B_DEV_NO_MEDIA);
 		return B_DEV_NO_MEDIA;
+	}
 
 	return handle->info->io_scheduler->ScheduleRequest(request);
 }

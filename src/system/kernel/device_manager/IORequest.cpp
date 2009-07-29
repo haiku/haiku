@@ -822,7 +822,6 @@ IORequest::NotifyFinished()
 	if (fBuffer->IsMemoryLocked())
 		fBuffer->UnlockMemory(fTeam, fIsWrite);
 
-
 	// Cache the callbacks before we unblock waiters and unlock. Any of the
 	// following could delete this request, so we don't want to touch it
 	// once we have started telling others that it is done.

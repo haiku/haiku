@@ -410,11 +410,6 @@ vfs_vnode_io(struct vnode* vnode, void* cookie, io_request* request)
 		return synchronous_io(request, io);
 	}
 
-	if (result != B_OK && !request->IsFinished()) {
-		// The request failed, but its owner has not been notified yet
-		request->SetStatusAndNotify(result);
-	}
-
 	return result;
 }
 

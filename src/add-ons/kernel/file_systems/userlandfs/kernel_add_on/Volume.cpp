@@ -18,6 +18,7 @@
 #include <util/OpenHashTable.h>
 
 #include <fs/fd.h>	// kernel private
+#include <io_requests.h>
 #include <thread.h>
 
 #include "IORequest.h"	// kernel internal
@@ -1149,28 +1150,34 @@ Volume::DoIO(void* _node, void* cookie, io_request* ioRequest)
 
 	// check capability
 	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_IO))
-		return B_BAD_VALUE;
+		return B_UNSUPPORTED;
 
 	// register the IO request
 	int32 requestID;
 	status_t error = _RegisterIORequest(ioRequest, &requestID);
-	if (error != B_OK)
+	if (error != B_OK) {
+		notify_io_request(ioRequest, error);
 		return error;
+	}
 
 	IORequestRemover requestRemover(this, requestID);
 
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
-	if (!port)
+	if (!port) {
+		notify_io_request(ioRequest, B_ERROR);
 		return B_ERROR;
+	}
 	PortReleaser _(fFileSystem->GetPortPool(), port);
 
 	// prepare the request
 	RequestAllocator allocator(port->GetPort());
 	DoIORequest* request;
 	error = AllocateRequest(allocator, &request);
-	if (error != B_OK)
+	if (error != B_OK) {
+		notify_io_request(ioRequest, error);
 		return error;
+	}
 
 	request->volume = fUserlandVolume;
 	request->node = vnode->clientNode;
@@ -1182,6 +1189,8 @@ Volume::DoIO(void* _node, void* cookie, io_request* ioRequest)
 	// send the request
 	KernelRequestHandler handler(this, DO_IO_REPLY);
 	DoIOReply* reply;
+
+	// TODO: when to notify the io_request?
 	error = _SendRequest(port, &allocator, &handler, (Request**)&reply);
 	if (error != B_OK)
 		return error;

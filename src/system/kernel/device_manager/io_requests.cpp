@@ -13,3 +13,11 @@ io_request_is_write(const io_request* request)
 {
 	return request->IsWrite();
 }
+
+
+void
+notify_io_request(io_request* request, status_t status)
+{
+	request->SetStatusAndNotify(status);
+}
+

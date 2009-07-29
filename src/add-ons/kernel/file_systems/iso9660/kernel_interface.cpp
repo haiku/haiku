@@ -456,11 +456,15 @@ fs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
 	iso9660_volume* volume = (iso9660_volume*)_volume->private_volume;
 	iso9660_inode* node = (iso9660_inode*)_node->private_node;
 
-	if (io_request_is_write(request))
+	if (io_request_is_write(request)) {
+		notify_io_request(request, B_READ_ONLY_DEVICE);
 		return B_READ_ONLY_DEVICE;
+	}
 
-	if ((node->flags & ISO_IS_DIR) != 0)
-		return EISDIR;
+	if ((node->flags & ISO_IS_DIR) != 0) {
+		notify_io_request(request, B_IS_A_DIRECTORY);
+		return B_IS_A_DIRECTORY;
+	}
 
 	return do_iterative_fd_io(volume->fd, request, iterative_io_get_vecs_hook,
 		iterative_io_finished_hook, node);
