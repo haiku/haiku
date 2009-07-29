@@ -613,7 +613,7 @@ FontEngine::CountFaces() const
 uint32
 FontEngine::GlyphIndexForGlyphCode(uint32 glyphCode) const
 {
-	FT_Get_Char_Index(fFace, glyphCode);
+	return FT_Get_Char_Index(fFace, glyphCode);
 }
 
 
