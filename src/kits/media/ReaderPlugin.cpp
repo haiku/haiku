@@ -10,7 +10,7 @@
 
 Reader::Reader()
 	:
-	fSource(0),
+	fSource(NULL),
 	fMediaPlugin(NULL)
 {
 }

@@ -15,6 +15,9 @@
 PluginManager _plugin_manager;
 
 
+// #pragma mark - Readers/Decoders
+
+
 status_t
 PluginManager::CreateReader(Reader** reader, int32* streamCount,
 	media_file_format* mff, BDataIO* source)
@@ -115,13 +118,13 @@ PluginManager::CreateDecoder(Decoder** _decoder, const media_format& format)
 	}
 
 	MediaPlugin* plugin = GetPlugin(reply.ref);
-	if (!plugin) {
+	if (plugin == NULL) {
 		printf("PluginManager::CreateDecoder: GetPlugin failed\n");
 		return B_ERROR;
 	}
 	
 	DecoderPlugin* decoderPlugin = dynamic_cast<DecoderPlugin*>(plugin);
-	if (!decoderPlugin) {
+	if (decoderPlugin == NULL) {
 		printf("PluginManager::CreateDecoder: dynamic_cast failed\n");
 		PutPlugin(plugin);
 		return B_ERROR;
@@ -154,7 +157,7 @@ PluginManager::CreateDecoder(Decoder** decoder, const media_codec_info& mci)
 status_t
 PluginManager::GetDecoderInfo(Decoder* decoder, media_codec_info* _info) const
 {
-	if (!decoder)
+	if (decoder == NULL)
 		return B_BAD_VALUE;
 
 	decoder->GetCodecInfo(_info);
@@ -181,7 +184,165 @@ PluginManager::DestroyDecoder(Decoder* decoder)
 }
 
 
-//	#pragma mark -
+// #pragma mark - Writers/Encoders
+
+
+status_t
+PluginManager::CreateWriter(Writer** reader, const media_file_format& mff,
+	BDataIO* target)
+{
+	TRACE("PluginManager::CreateWriter enter\n");
+
+#if 0
+	// get list of available readers from the server
+	server_get_writer_request request;
+	request.file_format = mff;
+	server_get_writer_reply reply;
+	status_t ret = QueryServer(SERVER_GET_WRITER_FOR_FORMAT_FAMILY, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (ret != B_OK) {
+		printf("PluginManager::CreateWriter: can't get writer for file "
+			"family: %s\n", strerror(ret));
+		return ret;
+	}
+
+	MediaPlugin* plugin = GetPlugin(reply.ref);
+	if (plugin == NULL) {
+		printf("PluginManager::CreateWriter: GetPlugin failed\n");
+		return B_ERROR;
+	}
+
+	WriterPlugin* writerPlugin = dynamic_cast<WriterPlugin*>(plugin);
+	if (writerPlugin == NULL) {
+		printf("PluginManager::CreateWriter: dynamic_cast failed\n");
+		PutPlugin(plugin);
+		return B_ERROR;
+	}
+
+	*writer = writerPlugin->NewWriter();
+	if (*writer == NULL) {
+		printf("PluginManager::CreateWriter: NewWriter failed\n");
+		PutPlugin(plugin);
+		return B_ERROR;
+	}
+
+	(*writer)->Setup(target);
+	(*writer)->fMediaPlugin = plugin;
+
+	TRACE("PluginManager::CreateWriter leave\n");
+	return B_OK;
+#else
+	TRACE("PluginManager::CreateWriter leave\n");
+	return B_MEDIA_NO_HANDLER;
+#endif
+}
+
+
+void
+PluginManager::DestroyWriter(Writer* writer)
+{
+	if (writer != NULL) {
+		TRACE("PluginManager::DestroyWriter(%p (plugin: %p))\n", writer,
+			reader->fMediaPlugin);
+		// NOTE: We have to put the plug-in after deleting the writer,
+		// since otherwise we may actually unload the code for the
+		// destructor...
+		MediaPlugin* plugin = writer->fMediaPlugin;
+		delete writer;
+		PutPlugin(plugin);
+	}
+}
+
+
+status_t
+PluginManager::CreateEncoder(Encoder** _encoder, const media_format& format)
+{
+#if 0
+	TRACE("PluginManager::CreateEncoder enter\n");
+
+	// get decoder for this format from the server
+	server_get_encoder_for_format_request request;
+	server_get_encoder_for_format_reply reply;
+	request.format = format;
+	status_t ret = QueryServer(SERVER_GET_ENCODER_FOR_FORMAT, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (ret != B_OK) {
+		printf("PluginManager::CreateEncoder: can't get encoder for format: "
+			"%s\n", strerror(ret));
+		return ret;
+	}
+
+	MediaPlugin* plugin = GetPlugin(reply.ref);
+	if (!plugin) {
+		printf("PluginManager::CreateEncoder: GetPlugin failed\n");
+		return B_ERROR;
+	}
+	
+	EncoderPlugin* encoderPlugin = dynamic_cast<EncoderPlugin*>(plugin);
+	if (encoderPlugin == NULL) {
+		printf("PluginManager::CreateEncoder: dynamic_cast failed\n");
+		PutPlugin(plugin);
+		return B_ERROR;
+	}
+	
+	*_encoder = encoderPlugin->NewEncoder(0);
+	if (*_decoder == NULL) {
+		printf("PluginManager::CreateEncoder: NewEncoder() failed\n");
+		PutPlugin(plugin);
+		return B_ERROR;
+	}
+	TRACE("  created encoder: %p\n", *_encoder);
+	(*_encoder)->fMediaPlugin = plugin;
+
+	TRACE("PluginManager::CreateEncoder leave\n");
+
+	return B_OK;
+#else
+	return B_NOT_SUPPORTED;
+#endif
+}
+
+
+status_t
+PluginManager::CreateEncoder(Encoder** encoder, const media_codec_info& mci)
+{
+	// TODO
+	debugger("not implemented");
+	return B_ERROR;
+}
+
+
+status_t
+PluginManager::GetEncoderInfo(Encoder* encoder, media_codec_info* _info) const
+{
+	if (encoder == NULL)
+		return B_BAD_VALUE;
+
+	encoder->GetCodecInfo(_info);
+	// TODO:
+	// out_info->id = 
+	// out_info->sub_id = 
+	return B_OK;
+}
+
+
+void
+PluginManager::DestroyEncoder(Encoder* encoder)
+{
+	if (encoder != NULL) {
+		TRACE("PluginManager::DestroyEncoder(%p, plugin: %p)\n", encoder,
+			encoder->fMediaPlugin);
+		// NOTE: We have to put the plug-in after deleting the encoder,
+		// since otherwise we may actually unload the code for the
+		// destructor...
+		MediaPlugin* plugin = encoder->fMediaPlugin;
+		delete encoder;
+		PutPlugin(plugin);
+	}
+}
+
+
+// #pragma mark -
 
 
 PluginManager::PluginManager()

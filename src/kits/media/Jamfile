@@ -77,10 +77,12 @@ SharedLibrary libmedia.so :
 	# Codec Plugin API
 	ChunkCache.cpp
 	DecoderPlugin.cpp
+	EncoderPlugin.cpp
 	MediaExtractor.cpp
 	MediaPlugin.cpp
 	PluginManager.cpp
 	ReaderPlugin.cpp
+	WriterPlugin.cpp
 	:
 	be $(TARGET_LIBSUPC++)
 ;

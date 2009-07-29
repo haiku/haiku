@@ -10,7 +10,9 @@
 
 
 #include "DecoderPlugin.h"
+#include "EncoderPlugin.h"
 #include "ReaderPlugin.h"
+#include "WriterPlugin.h"
 
 #include <TList.h>
 #include <Locker.h>
@@ -26,7 +28,7 @@ public:
 			MediaPlugin*		GetPlugin(const entry_ref& ref);
 			void				PutPlugin(MediaPlugin* plugin);
 
-
+	// Readers and Decoders
 			status_t			CreateReader(Reader** reader,
 									int32* streamCount, media_file_format* mff,
 									BDataIO* source);
@@ -39,6 +41,20 @@ public:
 			status_t			GetDecoderInfo(Decoder* decoder,
 									media_codec_info* _info) const;
 			void				DestroyDecoder(Decoder* decoder);
+
+	// Writers and Encoders	
+			status_t			CreateWriter(Writer** writer,
+									const media_file_format& mff,
+									BDataIO* target);
+			void				DestroyWriter(Writer* writer);
+
+			status_t			CreateEncoder(Encoder** encoder,
+									const media_format& format);
+			status_t			CreateEncoder(Encoder** encoder,
+									const media_codec_info& mci);
+			status_t			GetEncoderInfo(Encoder* encoder,
+									media_codec_info* _info) const;
+			void				DestroyEncoder(Encoder* encoder);
 	
 private:
 			status_t			_LoadPlugin(const entry_ref& ref,
