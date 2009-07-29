@@ -47,8 +47,10 @@ class HeaderListener {
 public:
 	virtual						~HeaderListener();
 
-	virtual	void				HeaderPropertiesChanged(Header* header,
-									bool redrawNeeded, bool relayoutNeeded) = 0;
+	virtual	void				HeaderWidthChanged(Header* header);
+	virtual	void				HeaderWidthRestrictionsChanged(Header* header);
+	virtual	void				HeaderValueChanged(Header* header);
+	virtual	void				HeaderRendererChanged(Header* header);
 };
 
 
@@ -85,8 +87,10 @@ public:
 			void				RemoveListener(HeaderListener* listener);
 
 protected:
-			void				NotifyPropertiesChanged(bool redrawNeeded,
-									bool relayoutNeeded);
+			void				NotifyWidthChanged();
+			void				NotifyWidthRestrictionsChanged();
+			void				NotifyValueChanged();
+			void				NotifyRendererChanged();
 
 private:
 			typedef BObjectList<HeaderListener> ListenerList;
@@ -180,9 +184,13 @@ private:
 									int32 fromIndex, int32 toIndex);
 
 	// HeaderListener
-	virtual	void				HeaderPropertiesChanged(Header* header,
-									bool redrawNeeded, bool relayoutNeeded);
+	virtual	void				HeaderWidthChanged(Header* header);
+	virtual	void				HeaderWidthRestrictionsChanged(Header* header);
+	virtual	void				HeaderValueChanged(Header* header);
+	virtual	void				HeaderRendererChanged(Header* header);
 
+			void				_HeaderPropertiesChanged(Header* header,
+									bool redrawNeeded, bool relayoutNeeded);
 			void				_InvalidateHeadersLayout(int32 firstIndex);
 			void				_InvalidateHeaders(int32 firstIndex,
 									int32 endIndex);

@@ -77,6 +77,30 @@ HeaderListener::~HeaderListener()
 }
 
 
+void
+HeaderListener::HeaderWidthChanged(Header* header)
+{
+}
+
+
+void
+HeaderListener::HeaderWidthRestrictionsChanged(Header* header)
+{
+}
+
+
+void
+HeaderListener::HeaderValueChanged(Header* header)
+{
+}
+
+
+void
+HeaderListener::HeaderRendererChanged(Header* header)
+{
+}
+
+
 // #pragma mark - Header
 
 
@@ -142,7 +166,7 @@ Header::SetWidth(float width)
 {
 	if (width != fWidth) {
 		fWidth = width;
-		NotifyPropertiesChanged(true, true);
+		NotifyWidthChanged();
 	}
 }
 
@@ -152,7 +176,7 @@ Header::SetMinWidth(float width)
 {
 	if (width != fMinWidth) {
 		fMinWidth = width;
-		NotifyPropertiesChanged(false, false);
+		NotifyWidthRestrictionsChanged();
 	}
 }
 
@@ -162,7 +186,7 @@ Header::SetMaxWidth(float width)
 {
 	if (width != fMaxWidth) {
 		fMaxWidth = width;
-		NotifyPropertiesChanged(false, false);
+		NotifyWidthRestrictionsChanged();
 	}
 }
 
@@ -172,7 +196,7 @@ Header::SetPreferredWidth(float width)
 {
 	if (width != fPreferredWidth) {
 		fPreferredWidth = width;
-		NotifyPropertiesChanged(false, false);
+		NotifyWidthRestrictionsChanged();
 	}
 }
 
@@ -189,7 +213,7 @@ Header::SetResizable(bool resizable)
 {
 	if (resizable != fResizable) {
 		fResizable = resizable;
-		NotifyPropertiesChanged(false, false);
+		NotifyWidthRestrictionsChanged();
 	}
 }
 
@@ -206,7 +230,7 @@ void
 Header::SetValue(const BVariant& value)
 {
 	fValue = value;
-	NotifyPropertiesChanged(true, false);
+	NotifyValueChanged();
 }
 
 
@@ -220,10 +244,7 @@ Header::ModelIndex() const
 void
 Header::SetModelIndex(int32 index)
 {
-	if (index != fModelIndex) {
-		fModelIndex = index;
-		NotifyPropertiesChanged(true, false);
-	}
+	fModelIndex = index;
 }
 
 
@@ -239,7 +260,7 @@ Header::SetHeaderRenderer(HeaderRenderer* renderer)
 {
 	if (renderer != fRenderer) {
 		fRenderer = renderer;
-		NotifyPropertiesChanged(true, false);
+		NotifyRendererChanged();
 	}
 }
 
@@ -259,11 +280,41 @@ Header::RemoveListener(HeaderListener* listener)
 
 
 void
-Header::NotifyPropertiesChanged(bool redrawNeeded, bool relayoutNeeded)
+Header::NotifyWidthChanged()
 {
 	for (int32 i = fListeners.CountItems() - 1; i >= 0; i--) {
 		HeaderListener* listener = fListeners.ItemAt(i);
-		listener->HeaderPropertiesChanged(this, redrawNeeded, relayoutNeeded);
+		listener->HeaderWidthChanged(this);
+	}
+}
+
+
+void
+Header::NotifyWidthRestrictionsChanged()
+{
+	for (int32 i = fListeners.CountItems() - 1; i >= 0; i--) {
+		HeaderListener* listener = fListeners.ItemAt(i);
+		listener->HeaderWidthRestrictionsChanged(this);
+	}
+}
+
+
+void
+Header::NotifyValueChanged()
+{
+	for (int32 i = fListeners.CountItems() - 1; i >= 0; i--) {
+		HeaderListener* listener = fListeners.ItemAt(i);
+		listener->HeaderValueChanged(this);
+	}
+}
+
+
+void
+Header::NotifyRendererChanged()
+{
+	for (int32 i = fListeners.CountItems() - 1; i >= 0; i--) {
+		HeaderListener* listener = fListeners.ItemAt(i);
+		listener->HeaderRendererChanged(this);
 	}
 }
 
@@ -625,7 +676,35 @@ HeaderView::HeaderMoved(HeaderModel* model, int32 fromIndex, int32 toIndex)
 
 
 void
-HeaderView::HeaderPropertiesChanged(Header* header, bool redrawNeeded,
+HeaderView::HeaderWidthChanged(Header* header)
+{
+	_HeaderPropertiesChanged(header, true, true);
+}
+
+
+void
+HeaderView::HeaderWidthRestrictionsChanged(Header* header)
+{
+	// TODO:...
+}
+
+
+void
+HeaderView::HeaderValueChanged(Header* header)
+{
+	_HeaderPropertiesChanged(header, true, false);
+}
+
+
+void
+HeaderView::HeaderRendererChanged(Header* header)
+{
+	_HeaderPropertiesChanged(header, true, true);
+}
+
+
+void
+HeaderView::_HeaderPropertiesChanged(Header* header, bool redrawNeeded,
 	bool relayoutNeeded)
 {
 	if (!redrawNeeded && !relayoutNeeded)
