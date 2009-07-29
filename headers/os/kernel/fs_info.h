@@ -1,7 +1,7 @@
-/* General File System informations/capabilities
-**
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2003, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _FS_INFO_H
 #define	_FS_INFO_H
 

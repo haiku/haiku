@@ -1,7 +1,7 @@
-/* File System indices
-**
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2002-2003, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _FS_INDEX_H
 #define	_FS_INDEX_H
 
