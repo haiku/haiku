@@ -8,7 +8,7 @@ OptionalPackageDependencies APR-util : APR ;
 OptionalPackageDependencies BeHappy : BeBook NetSurf ;
 OptionalPackageDependencies Development : DevelopmentBase Perl ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
+OptionalPackageDependencies DevelopmentMin : LibIconv ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
 OptionalPackageDependencies NetSurf : OpenSSL ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
-
