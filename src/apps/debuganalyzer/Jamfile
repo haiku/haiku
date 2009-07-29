@@ -13,6 +13,9 @@ HAIKU_DEBUG_ANALYZER_HEADERS =
 
 UseHeaders $(HAIKU_DEBUG_ANALYZER_HEADERS) ;
 
+CCFLAGS +=  -Werror ;
+C++FLAGS += -Werror ;
+
 
 Application DebugAnalyzer
 	:
