@@ -520,7 +520,7 @@ printf("failed to read event!\n");
 		float scrollOffset = _ScrollOffset();
 		double timeForX = (scrollOffset + x) * fUSecsPerPixel;
 
-		double factor = 4;
+		uint32 factor = 4;
 		if (steps < 0) {
 			steps = -steps;
 			factor = 1;

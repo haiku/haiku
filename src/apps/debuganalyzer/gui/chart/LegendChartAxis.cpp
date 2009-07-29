@@ -403,6 +403,6 @@ LegendChartAxis::_EstimateMaxLegendCount(BView* view, BSize size,
 
 	// estimate the maximum legend count we might need
 	if (fLocation == CHART_AXIS_LEFT || fLocation == CHART_AXIS_RIGHT)
-		return (size.IntegerHeight() + 1) / (10 + *_vSpacing);
-	return (size.IntegerWidth() + 1) / (20 + *_hSpacing);
+		return (int32)((size.IntegerHeight() + 1) / (10 + *_vSpacing));
+	return (int32)((size.IntegerWidth() + 1) / (20 + *_hSpacing));
 }
