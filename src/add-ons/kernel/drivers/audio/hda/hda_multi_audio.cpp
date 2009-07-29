@@ -98,8 +98,8 @@ get_description(hda_audio_group* audioGroup, multi_description* data)
 	}
 
 	/* determine output/input rates */
-	data->output_rates = audioGroup->widget.d.io.rates;
-	data->input_rates = audioGroup->widget.d.io.rates;
+	data->output_rates = audioGroup->playback_stream->sample_rate;
+	data->input_rates = audioGroup->record_stream->sample_rate;
 
 	/* force existance of 48kHz if variable rates are not supported */
 	if (data->output_rates == 0)
@@ -110,8 +110,8 @@ get_description(hda_audio_group* audioGroup, multi_description* data)
 	data->max_cvsr_rate = 0;
 	data->min_cvsr_rate = 0;
 
-	data->output_formats = audioGroup->widget.d.io.formats;
-	data->input_formats = audioGroup->widget.d.io.formats;
+	data->output_formats = audioGroup->playback_stream->sample_format;
+	data->input_formats = audioGroup->record_stream->sample_format;
 	data->lock_sources = B_MULTI_LOCK_INTERNAL;
 	data->timecode_sources = 0;
 	data->interface_flags = B_MULTI_INTERFACE_PLAYBACK | B_MULTI_INTERFACE_RECORD;
@@ -153,7 +153,7 @@ get_global_format(hda_audio_group* audioGroup, multi_format_info* data)
 
 	if (audioGroup->record_stream != NULL) {
 		data->input.format = audioGroup->record_stream->sample_format;
-		data->input.rate = audioGroup->record_stream->sample_format;
+		data->input.rate = audioGroup->record_stream->sample_rate;
 	} else {
 		data->input.format = 0;
 		data->input.rate = 0;
