@@ -330,9 +330,10 @@ vm_address_space_init(void)
 	}
 
 	// create the initial kernel address space
-	if (vm_create_address_space(1, KERNEL_BASE, KERNEL_SIZE,
-			true, &sKernelAddressSpace) != B_OK)
+	if (vm_create_address_space(B_SYSTEM_TEAM, KERNEL_BASE, KERNEL_SIZE,
+			true, &sKernelAddressSpace) != B_OK) {
 		panic("vm_init: error creating kernel address space!\n");
+	}
 
 	add_debugger_command("aspaces", &dump_aspace_list,
 		"Dump a list of all address spaces");
