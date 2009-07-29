@@ -14,8 +14,6 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
 SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
 
-# ToDo: for now, all wide character functions are disabled
-
 MergeObject posix_gnu_wcsmbs.o :
 	btowc.c
 	mbrlen.c
