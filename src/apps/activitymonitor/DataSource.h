@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DATA_SOURCE_H
@@ -112,6 +112,19 @@ public:
 	virtual const char*	Label() const;
 	virtual const char*	ShortLabel() const;
 	virtual bool		Primary() const;
+};
+
+
+class BlockCacheDataSource : public MemoryDataSource {
+public:
+						BlockCacheDataSource();
+	virtual				~BlockCacheDataSource();
+
+	virtual DataSource*	Copy() const;
+
+	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	Label() const;
+	virtual const char*	ShortLabel() const;
 };
 
 

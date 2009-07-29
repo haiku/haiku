@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,6 +24,7 @@ const DataSource* kSources[] = {
 	new CPUCombinedUsageDataSource(),
 	new NetworkUsageDataSource(true),
 	new NetworkUsageDataSource(false),
+	new BlockCacheDataSource(),
 	new SemaphoresDataSource(),
 	new PortsDataSource(),
 	new ThreadsDataSource(),
@@ -444,6 +445,54 @@ bool
 SwapSpaceDataSource::Primary() const
 {
 	return true;
+}
+
+
+//	#pragma mark -
+
+
+BlockCacheDataSource::BlockCacheDataSource()
+{
+	fColor = (rgb_color){0, 120, 0};
+}
+
+
+BlockCacheDataSource::~BlockCacheDataSource()
+{
+}
+
+
+DataSource*
+BlockCacheDataSource::Copy() const
+{
+	return new BlockCacheDataSource(*this);
+}
+
+
+int64
+BlockCacheDataSource::NextValue(SystemInfo& info)
+{
+	system_memory_info memoryInfo;
+	status_t status = get_system_info_etc(B_MEMORY_INFO, &memoryInfo,
+		sizeof(system_memory_info));
+	if (status != B_OK)
+		return 0;
+
+	return memoryInfo.block_cache_memory;
+}
+
+
+const char*
+BlockCacheDataSource::Label() const
+{
+	return "Block Cache Memory Usage";
+}
+
+
+const char*
+BlockCacheDataSource::ShortLabel() const
+{
+	return "Block Cache";
 }
 
 
