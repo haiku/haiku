@@ -120,14 +120,14 @@ media_source media_source::null(-1, -1);
 bool
 operator==(const media_destination& a, const media_destination& b)
 {
-	return (a.port == b.port) && (a.id == b.id);
+	return a.port == b.port && a.id == b.id;
 }
 
 
 bool
 operator!=(const media_destination& a, const media_destination& b)
 {
-	return (a.port != b.port) || (a.id != b.id);
+	return a.port != b.port || a.id != b.id;
 }
 
 
@@ -142,14 +142,14 @@ operator<(const media_destination& a, const media_destination& b)
 bool
 operator==(const media_source& a, const media_source& b)
 {
-	return (a.port == b.port) && (a.id == b.id);
+	return a.port == b.port && a.id == b.id;
 }
 
 
 bool
 operator!=(const media_source& a, const media_source& b)
 {
-	return (a.port != b.port) || (a.id != b.id);
+	return a.port != b.port || a.id != b.id;
 }
 
 
@@ -164,14 +164,14 @@ operator<(const media_source& a, const media_source& b)
 bool
 operator==(const media_node& a, const media_node& b)
 {
-	return (a.node == b.node) && (a.port == b.port) && (a.kind == b.kind);
+	return a.node == b.node && a.port == b.port && a.kind == b.kind;
 }
 
 
 bool
 operator!=(const media_node& a, const media_node& b)
 {
-	return (a.node != b.node) || (a.port != b.port) || (a.kind != b.kind);
+	return a.node != b.node || a.port != b.port || a.kind != b.kind;
 }
 
 
@@ -201,23 +201,7 @@ media_encoded_video_format media_encoded_video_format::wildcard = {{0}};
 media_multistream_format media_multistream_format::wildcard = {0};
 
 
-// #pragma mark - helper functions for media_format::Matches()
-
-
-static bool raw_audio_format_matches(const media_raw_audio_format& a,
-	const media_raw_audio_format& b);
-static bool multi_audio_info_matches(const media_multi_audio_info& a,
-	const media_multi_audio_info& b);
-static bool multi_audio_format_matches(const media_multi_audio_format& a,
-	const media_multi_audio_format& b);
-static bool raw_video_format_matches(const media_raw_video_format& a,
-	const media_raw_video_format& b);
-static bool multistream_format_matches(const media_multistream_format& a,
-	const media_multistream_format& b);
-static bool encoded_audio_format_matches(const media_encoded_audio_format& a,
-	const media_encoded_audio_format& b);
-static bool encoded_video_format_matches(const media_encoded_video_format& a,
-	const media_encoded_video_format& b);
+// #pragma mark - media_format::Matches() support
 
 
 static bool
@@ -513,16 +497,7 @@ encoded_video_format_matches(const media_encoded_video_format& a,
 }
 
 
-// #pragma mark - helper functions for media_format::SpecializeTo()
-
-
-static void raw_audio_format_specialize(media_raw_audio_format* format, const media_raw_audio_format* other);
-static void multi_audio_info_specialize(media_multi_audio_info* format, const media_multi_audio_info* other);
-static void multi_audio_format_specialize(media_multi_audio_format* format, const media_multi_audio_format* other);
-static void raw_video_format_specialize(media_raw_video_format* format, const media_raw_video_format* other);
-static void multistream_format_specialize(media_multistream_format* format, const media_multistream_format* other);
-static void encoded_audio_format_specialize(media_encoded_audio_format* format, const media_encoded_audio_format* other);
-static void encoded_video_format_specialize(media_encoded_video_format* format, const media_encoded_video_format* other);
+// #pragma mark - media_format::SpecializeTo() support
 
 
 static void
@@ -564,6 +539,7 @@ multi_audio_format_specialize(media_multi_audio_format* format,
 	raw_audio_format_specialize(format, other);
 	multi_audio_info_specialize(format, other);
 }
+
 
 static void
 raw_video_format_specialize(media_raw_video_format* format,
