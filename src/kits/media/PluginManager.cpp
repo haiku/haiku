@@ -130,6 +130,8 @@ PluginManager::CreateDecoder(Decoder** _decoder, const media_format& format)
 		return B_ERROR;
 	}
 	
+	// TODO: In theory, one DecoderPlugin could support multiple Decoders,
+	// but this is not yet handled (passing "0" as index/ID).
 	*_decoder = decoderPlugin->NewDecoder(0);
 	if (*_decoder == NULL) {
 		printf("PluginManager::CreateDecoder: NewDecoder() failed\n");
@@ -188,12 +190,11 @@ PluginManager::DestroyDecoder(Decoder* decoder)
 
 
 status_t
-PluginManager::CreateWriter(Writer** reader, const media_file_format& mff,
+PluginManager::CreateWriter(Writer** writer, const media_file_format& mff,
 	BDataIO* target)
 {
 	TRACE("PluginManager::CreateWriter enter\n");
 
-#if 0
 	// get list of available readers from the server
 	server_get_writer_request request;
 	request.file_format = mff;
@@ -231,10 +232,6 @@ PluginManager::CreateWriter(Writer** reader, const media_file_format& mff,
 
 	TRACE("PluginManager::CreateWriter leave\n");
 	return B_OK;
-#else
-	TRACE("PluginManager::CreateWriter leave\n");
-	return B_MEDIA_NO_HANDLER;
-#endif
 }
 
 
@@ -257,7 +254,6 @@ PluginManager::DestroyWriter(Writer* writer)
 status_t
 PluginManager::CreateEncoder(Encoder** _encoder, const media_format& format)
 {
-#if 0
 	TRACE("PluginManager::CreateEncoder enter\n");
 
 	// get decoder for this format from the server
@@ -284,9 +280,11 @@ PluginManager::CreateEncoder(Encoder** _encoder, const media_format& format)
 		PutPlugin(plugin);
 		return B_ERROR;
 	}
-	
+
+	// TODO: In theory, one EncoderPlugin could support multiple Encoders,
+	// but this is not yet handled (passing "0" as index/ID).
 	*_encoder = encoderPlugin->NewEncoder(0);
-	if (*_decoder == NULL) {
+	if (*_encoder == NULL) {
 		printf("PluginManager::CreateEncoder: NewEncoder() failed\n");
 		PutPlugin(plugin);
 		return B_ERROR;
@@ -297,9 +295,6 @@ PluginManager::CreateEncoder(Encoder** _encoder, const media_format& format)
 	TRACE("PluginManager::CreateEncoder leave\n");
 
 	return B_OK;
-#else
-	return B_NOT_SUPPORTED;
-#endif
 }
 
 
