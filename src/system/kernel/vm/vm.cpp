@@ -1768,6 +1768,8 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 	page_num_t guardPages;
 	bool canOvercommit = false;
 	addr_t physicalBase = 0;
+	uint32 newPageState = (flags & CREATE_AREA_DONT_CLEAR) != 0
+		? PAGE_STATE_FREE : PAGE_STATE_CLEAR;
 
 	TRACE(("create_anonymous_area [%d] %s: size 0x%lx\n", team, name, size));
 
@@ -1797,6 +1799,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 		case B_PHYSICAL_BASE_ADDRESS:
 			physicalBase = (addr_t)*address;
 			addressSpec = B_ANY_KERNEL_ADDRESS;
+			wiring = B_CONTIGUOUS;
 			break;
 
 		default:
@@ -1884,7 +1887,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 	if (wiring == B_CONTIGUOUS) {
 		// we try to allocate the page run here upfront as this may easily
 		// fail for obvious reasons
-		page = vm_page_allocate_page_run(PAGE_STATE_CLEAR, physicalBase,
+		page = vm_page_allocate_page_run(newPageState, physicalBase,
 			size / B_PAGE_SIZE);
 		if (page == NULL) {
 			status = B_NO_MEMORY;
@@ -1957,7 +1960,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 #	endif
 					continue;
 #endif
-				vm_page* page = vm_page_allocate_page(PAGE_STATE_CLEAR, true);
+				vm_page* page = vm_page_allocate_page(newPageState, true);
 				cache->InsertPage(page, offset);
 				vm_map_page(area, page, address, protection);
 

@@ -27,6 +27,7 @@ struct vnode;
 // area creation flags
 #define CREATE_AREA_DONT_WAIT			0x01
 #define CREATE_AREA_UNMAP_ADDRESS_RANGE	0x02
+#define CREATE_AREA_DONT_CLEAR			0x04
 
 
 #ifdef __cplusplus
