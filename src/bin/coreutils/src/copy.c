@@ -150,7 +150,7 @@ copy_attributes(int fromFd, int toFd)
 	while ((dirent = fs_read_attr_dir(attributes)) != NULL) {
 		struct stat stat;
 		off_t pos = 0;
-		int attrFromFD = fs_open_attr(fromFd, dirent->d_name, 0, O_RDONLY);
+		int attrFromFD = fs_fopen_attr(fromFd, dirent->d_name, 0, O_RDONLY);
 		int attrToFD;
 
 		if (attrFromFD < 0)
@@ -161,7 +161,7 @@ copy_attributes(int fromFd, int toFd)
 			continue;
 		}
 
-		attrToFD = fs_open_attr(toFd, dirent->d_name, stat.st_type,
+		attrToFD = fs_fopen_attr(toFd, dirent->d_name, stat.st_type,
 			O_WRONLY | O_TRUNC | O_CREAT);
 		if (attrToFD < 0) {
 			close(attrFromFD);
