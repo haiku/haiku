@@ -457,7 +457,7 @@ efi_gpt_identify_partition(int fd, partition_data *partition, void **_cookie)
 	status_t status = header->InitCheck();
 	if (status < B_OK) {
 		delete header;
-		return status;
+		return -1;
 	}
 
 	*_cookie = header;

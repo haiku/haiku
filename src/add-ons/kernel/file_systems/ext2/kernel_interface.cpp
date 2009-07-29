@@ -50,7 +50,7 @@ ext2_identify_partition(int fd, partition_data *partition, void **_cookie)
 	ext2_super_block superBlock;
 	status_t status = Volume::Identify(fd, &superBlock);
 	if (status != B_OK)
-		return status;
+		return -1;
 
 	identify_cookie *cookie = new identify_cookie;
 	memcpy(&cookie->super_block, &superBlock, sizeof(ext2_super_block));
