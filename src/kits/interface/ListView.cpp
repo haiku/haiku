@@ -291,7 +291,8 @@ BListView::MessageReceived(BMessage* msg)
 		}
 
 		case B_SELECT_ALL:
-			Select(0, CountItems() - 1, false);
+			if (fListType == B_MULTIPLE_SELECTION_LIST)
+				Select(0, CountItems() - 1, false);
 			break;
 
 		default:
