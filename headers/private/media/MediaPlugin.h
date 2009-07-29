@@ -1,16 +1,18 @@
+/* 
+ * Copyright 2003, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ */
 #ifndef _MEDIA_PLUGIN_H
 #define _MEDIA_PLUGIN_H
 
-#include <BeBuild.h>
 #include <SupportDefs.h>
 
 namespace BPrivate { namespace media {
 
-class MediaPlugin
-{
+class MediaPlugin {
 public:
-						MediaPlugin();
-	virtual				~MediaPlugin();
+								MediaPlugin();
+	virtual						~MediaPlugin();
 };
 
 class Decoder;
@@ -20,6 +22,6 @@ class Reader;
 
 using namespace BPrivate::media;
 
-extern "C" MediaPlugin *instantiate_plugin();
+extern "C" MediaPlugin* instantiate_plugin();
 
-#endif
+#endif // _MEDIA_PLUGIN_H
