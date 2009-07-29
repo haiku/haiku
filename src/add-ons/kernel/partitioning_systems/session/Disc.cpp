@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
+//  This software is part of the OpenBeOS distribution and is covered
 //  by the OpenBeOS license.
 //
 //  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
@@ -7,14 +7,14 @@
 /*!
 	\file Disc.cpp
 
-	Disc class implementation, used to enumerate the CD/DVD sessions. 
-	
+	Disc class implementation, used to enumerate the CD/DVD sessions.
+
 	The protocols followed in this module are based on information
 	taken from the "SCSI-3 Multimedia Commands" draft, revision 10A.
-	
+
 	The SCSI command of interest is "READ TOC/PMA/ATIP", command
 	number \c 0x43.
-	
+
 	The format of interest for said command is "Full TOC", format
 	number \c 0x2.
 */
@@ -26,7 +26,7 @@
 
 #include "Debug.h"
 
-static const char *kModuleDebugName = "session";
+DBG(static const char *kModuleDebugName = "session");
 
 //------------------------------------------------------------------------------
 // Helper function declarations
@@ -62,15 +62,15 @@ class List {
 public:
 	List();
 	~List();
-	
+
 	list_item* Find(int32 index) const;
 	void Add(list_item *item);
 	void Clear();
 	void SortAndRemoveDuplicates();
-	
+
 	list_item* First() const;
 	list_item* Last() const;
-	
+
 private:
 	list_item *fFirst;
 	list_item *fLast;
@@ -89,7 +89,7 @@ public:
 		, adr(adr)
 	{
 	}
-	
+
 	off_t start_lba;
 	uint8 control;		//!< only used to give what are probably useless warnings
 	uint8 adr;			//!< only used to give what are probably useless warnings
@@ -102,11 +102,11 @@ public:
 struct session : public list_item {
 public:
 	session(uint32 index, session *next = NULL);
-	
+
 	bool first_track_hint_is_set();
 	bool last_track_hint_is_set();
 	bool end_lba_is_set();	// also implies control and adr are set
-	
+
 	bool is_audio();
 
 	int8 first_track_hint;
@@ -114,7 +114,7 @@ public:
 	int8 control;
 	int8 adr;
 	off_t end_lba;
-	
+
 	List track_list;
 };
 
@@ -142,7 +142,7 @@ List::Find(int32 index) const
 {
 //	TRACE(("%s: List::Find(%ld)\n", kModuleDebugName, index));
 	list_item *item = fFirst;
-	while (item && item->index != index) {	
+	while (item && item->index != index) {
 		item = item->next;
 	}
 	return item;
@@ -185,7 +185,7 @@ List::Clear()
 
 /*! \brief Bubble sorts the list by index, removing any duplicates
 	(the first instance is kept).
-	
+
 	\todo I believe duplicate removal is actually unnecessary, but I need to verify that.
 */
 void
@@ -203,23 +203,23 @@ List::SortAndRemoveDuplicates()
 //			dprintf("List::Sort: %ld -> %ld\n", item->index, next->index);
 			if (item->index > next->index) {
 				sorted = false;
-				
+
 				// Keep fLast up to date
 				if (next == fLast)
 					fLast = item;
 
-				// Swap					
+				// Swap
 				if (prev) {
 					// item is not fFirst
 					prev->next = next;
 					item->next = next->next;
-					next->next = item;				
+					next->next = item;
 				} else {
 					// item must be fFirst
 					fFirst = next;
 					item->next = next->next;
 					next->next = item;
-				}			
+				}
 			} else if (item->index == next->index) {
 				// Duplicate indicies
 				TRACE(("%s: List::SortAndRemoveDuplicates: duplicate indicies found (#%ld); "
@@ -227,7 +227,7 @@ List::SortAndRemoveDuplicates()
 				item->next = next->next;
 				delete next;
 				next = item->next;
-				continue;			
+				continue;
 			}
 			prev = item;
 			item = next;
@@ -285,7 +285,7 @@ session::last_track_hint_is_set()
 
 /*! \brief Returns true if the \a end_lba member has not been
 	set to a legal value yet.
-	
+
 	The result of this function also signals that the \a control
 	and \a adr members have or have not been set, since they are
 	set at the same time as \a end_lba.
@@ -314,7 +314,7 @@ session::is_audio()
 /*! \brief Creates a new Disc object by parsing the given table of contents
 	entries and checking the resultant data structure for errors and
 	warnings.
-	
+
 	If successful, subsequent calls to InitCheck() will return \c B_OK,
 	elsewise they will return an error code.
 */
@@ -326,25 +326,25 @@ Disc::Disc(int fd)
 
 	uchar data[kBlockSize];
 /*
-	if (!error) 
+	if (!error)
 		error = sessionInfo && index >= 0 ? B_OK : B_BAD_VALUE;
 	int32 session = index+1;
 		// Check for a valid session index
 		if (session < 1 || session > 99)
 			error = B_ENTRY_NOT_FOUND;
-*/		
+*/
 
 	status_t error = fSessionList ? B_OK : B_NO_MEMORY;
 
 	// Attempt to read the table of contents, first in lba mode, then in msf mode
 	if (!error) {
 		error = read_table_of_contents(fd, 1, data, kBlockSize, false);
-	}	
+	}
 	if (error) {
 		TRACE(("%s: lba read_toc failed, trying msf instead\n", kModuleDebugName));
 		error = read_table_of_contents(fd, 1, data, kBlockSize, true);
 	}
-		
+
 	// Interpret the data returned, if successful
 	if (!error) {
 		cdrom_table_of_contents_header *header;
@@ -354,17 +354,17 @@ Disc::Disc(int fd)
 		header = (cdrom_table_of_contents_header*)data;
 		entries = (cdrom_full_table_of_contents_entry*)(data+4);
 		header->length = B_BENDIAN_TO_HOST_INT16(header->length);
-		
+
 		count = (header->length-2) / sizeof(cdrom_full_table_of_contents_entry);
-		
+
 		error = _ParseTableOfContents(entries, count);
 //		Dump();
 		if (!error) {
 			_SortAndRemoveDuplicates();
 			error = _CheckForErrorsAndWarnings();
-		}			
+		}
 	}
-	
+
 	PRINT(("Setting init status to 0x%lx, `%s'\n", error, strerror(error)));
 	fInitStatus = error;
 }
@@ -386,7 +386,7 @@ Disc::InitCheck()
 
 /*! \brief Stores the info for the given session (using 0 based indicies) in the
 	struct pointed to by \a sessionInfo.
-	
+
 	Returns \c B_ENTRY_NOT_FOUND if no such session exists.
 */
 Session*
@@ -399,7 +399,7 @@ Disc::GetSession(int32 index)
 	         session = (struct session*)session->next)
 	{
 		if (session->is_audio()) {
-			counter++; // only one session per audio session				
+			counter++; // only one session per audio session
 			if (counter == index) {
 				// Found an audio session. Take the start of the first
 				// track with the end of session.
@@ -409,22 +409,22 @@ Disc::GetSession(int32 index)
 
 					off_t start_lba = track->start_lba;
 					off_t end_lba = session->end_lba;
-					
+
 					off_t offset = start_lba * kBlockSize;
 					off_t size = (end_lba - start_lba) * kBlockSize;
-					
+
 					Session *result = new Session(offset, size, kBlockSize,
 					                              index, B_PARTITION_READ_ONLY,
 					                              kPartitionTypeAudioSession);
-					if (!result) 
+					if (!result)
 						PRINT(("Error allocating new Session object; out of memory!\n"));
 					return result;
 				} else {
 					PRINT(("Error: session #%ld is an audio "
 					       "session with no tracks!\n", index));
 					return NULL;
-				}			
-			}			
+				}
+			}
 		} else {
 			for (track *track = (struct track*)session->track_list.First();
 			       track;
@@ -438,21 +438,21 @@ Disc::GetSession(int32 index)
 					off_t end_lba = track->next
 					                  ? ((struct track*)track->next)->start_lba
 					                    : session->end_lba;
-					
+
 					off_t offset = start_lba * kBlockSize;
 					off_t size = (end_lba - start_lba) * kBlockSize;
-					
+
 					Session *result = new Session(offset, size, kBlockSize,
 					                              index, B_PARTITION_READ_ONLY,
 					                              kPartitionTypeDataSession);
-					if (!result) 
+					if (!result)
 						PRINT(("Error allocating new Session object; out of memory!\n"));
 					return result;
-				}			
-			}		
-		}		
+				}
+			}
+		}
 	}
-	
+
 	PRINT(("no session #%ld found!\n", index));
 	return NULL;
 }
@@ -502,11 +502,11 @@ Disc::_ParseTableOfContents(cdrom_full_table_of_contents_entry entries[], uint32
 				fSessionList->Add(session);
 			}
 		}
-		
+
 		uint8 point = entries[i].point;
-		
+
 		switch (point) {
-		
+
 			// first track hint
 			case 0xA0:
 				if (!session->first_track_hint_is_set()) {
@@ -521,10 +521,10 @@ Disc::_ParseTableOfContents(cdrom_full_table_of_contents_entry entries[], uint32
 				} else {
 					WARN(("%s: warning: duplicated first track hint values found for"
 					      "session %d; using first value encountered: %d", kModuleDebugName,
-					      session_index, session->first_track_hint));		     
-				}						      
+					      session_index, session->first_track_hint));
+				}
 				break;
-				
+
 			// last track hint
 			case 0xA1:
 				if (!session->last_track_hint_is_set()) {
@@ -539,10 +539,10 @@ Disc::_ParseTableOfContents(cdrom_full_table_of_contents_entry entries[], uint32
 				} else {
 					WARN(("%s: warning: duplicate last track hint values found for"
 					      "session %d; using first value encountered: %d", kModuleDebugName,
-					      session_index, session->last_track_hint));					     
-				}						      
+					      session_index, session->last_track_hint));
+				}
 				break;
-					
+
 			// end of session address
 			case 0xA2:
 				if (!session->end_lba_is_set()) {
@@ -564,10 +564,10 @@ Disc::_ParseTableOfContents(cdrom_full_table_of_contents_entry entries[], uint32
 				} else {
 					WARN(("%s: warning: duplicate end lba values found for"
 					      "session %d; using first value encountered: %lld",
-					      kModuleDebugName, session_index, session->end_lba));					     
-				}						      
+					      kModuleDebugName, session_index, session->end_lba));
+				}
 				break;
-				
+
 				// Valid, but uninteresting, points
 				case 0xB0:
 				case 0xB1:
@@ -577,7 +577,7 @@ Disc::_ParseTableOfContents(cdrom_full_table_of_contents_entry entries[], uint32
 				case 0xC0:
 				case 0xC1:
 					break;
-				
+
 			default:
 				// Anything else had better be a valid track number,
 				// or it's an invalid point
@@ -590,7 +590,7 @@ Disc::_ParseTableOfContents(cdrom_full_table_of_contents_entry entries[], uint32
 								                          entries[i].pframes));
 					// The control and adr values grabbed here are only used later on
 					// to signal a warning if they don't match the corresponding values
-					// of the parent session. 
+					// of the parent session.
 					track *track = new(nothrow) struct track(track_index, start_lba,
 					               entries[i].control, entries[i].adr);
 					if (!track) {
@@ -602,7 +602,7 @@ Disc::_ParseTableOfContents(cdrom_full_table_of_contents_entry entries[], uint32
 					WARN(("%s: warning: illegal point 0x%2x found in table of contents\n",
 					      kModuleDebugName, entries[i].point));
 				}
-				break;		
+				break;
 		}
 	}
 	return B_OK;
@@ -631,7 +631,7 @@ Disc::_SortAndRemoveDuplicates()
 	Anomalies that result in errors:
 	- Sessions with no end_lba set
 	- Sessions with no tracks
-	
+
 	Anomalies that result in warnings:
 	- Inaccurate first_track_hint and/or last_track_hint values
 	- Sequences of sessions or tracks that do not start at 1,
@@ -640,33 +640,33 @@ Disc::_SortAndRemoveDuplicates()
 	  numbering does not restart with each session).
 	- Tracks with different control and/or adr values than their
 	  parent session
-	  
+
 	Anomalies that are currently *not* checked:
 	- First Track Hint or Last Track Hint control and adr values
 	  that do not match the values for their session; Ingo's copy
 	  of the BeOS R5 CD is like this, but I don't believe it's
 	  a matter we need to worry about. This could certainly be
 	  changed in the future if needed.
-*/	
+*/
 status_t
 Disc::_CheckForErrorsAndWarnings() {
 	int32 lastSessionIndex = 0;
 	int32 lastTrackIndex = 0;
-	
+
 	for (session *session = (struct session*)fSessionList->First();
 	       session;
 	         session = (struct session*)session->next)
 	{
 		// Check for errors
 		//-----------------
-		
+
 		// missing end lba
 		if (!session->end_lba_is_set()) {
 			TRACE(("%s: Disc::_CheckForErrorsAndWarnings: error: no end of session "
 			       "address for session #%ld\n", kModuleDebugName, session->index));
 			return B_ERROR;
 		}
-		
+
 		// empty track list
 		track *track = (struct track*)session->track_list.First();
 		if (!track) {
@@ -674,10 +674,10 @@ Disc::_CheckForErrorsAndWarnings() {
 			       "tracks\n", kModuleDebugName, session->index));
 			return B_ERROR;
 		}
-		
+
 		// Check for warnings
 		//-------------------
-		
+
 		// incorrect first track hint
 		if (session->first_track_hint_is_set()
 		    && session->first_track_hint != track->index)
@@ -696,7 +696,7 @@ Disc::_CheckForErrorsAndWarnings() {
 			       "track hint (%d) doesn't match actual last track (%ld)\n", kModuleDebugName,
 			       session->index, session->last_track_hint, last->index));
 		}
-			
+
 		// invalid session sequence
 		if (lastSessionIndex+1 != session->index) {
 			TRACE(("%s: Disc::_CheckForErrorsAndWarnings: warning: index for session #%ld "
@@ -704,7 +704,7 @@ Disc::_CheckForErrorsAndWarnings() {
 			       session->index, lastSessionIndex));
 		}
 		lastSessionIndex = session->index;
-		
+
 		for ( ; track; track = (struct track*)track->next) {
 			// invalid track sequence
 			if (lastTrackIndex+1 != track->index) {
@@ -732,7 +732,7 @@ Disc::_CheckForErrorsAndWarnings() {
 				       "(adr = %d) does not match adr for parent session #%ld (adr = %d)\n", kModuleDebugName,
 				       track->index, track->adr, session->index, session->adr));
 			}
-		}		
+		}
 	}
 
 	return B_OK;
@@ -750,7 +750,7 @@ Session::Session(off_t offset, off_t size, uint32 blockSize, int32 index,
 	, fIndex(index)
 	, fFlags(flags)
 	, fType(strdup(type))
-{	
+{
 }
 
 Session::~Session() {
@@ -814,15 +814,16 @@ dump_scsi_command(raw_device_command *cmd) {
 }
 */
 
-static
-void
+
+#ifdef DEBUG
+static void
 dump_full_table_of_contents(uchar *data, uint16 data_length)
 {
 	cdrom_table_of_contents_header *header;
 	cdrom_full_table_of_contents_entry *entries;
 	int i, count;
 	int header_length;
-	
+
 	header = (cdrom_table_of_contents_header*)data;
 	entries = (cdrom_full_table_of_contents_entry*)(data+4);
 	header_length = B_BENDIAN_TO_HOST_INT16(header->length);
@@ -831,18 +832,18 @@ dump_full_table_of_contents(uchar *data, uint16 data_length)
 		       data_length, header_length));
 		header_length = data_length;
 	}
-	
+
 	TRACE(("%s: table of contents dump:\n", kModuleDebugName));
 	TRACE(("--------------------------------------------------\n"));
 	TRACE(("header:\n"));
 	TRACE(("  length = %d\n", header_length));
 	TRACE(("  first  = %d\n", header->first));
 	TRACE(("  last   = %d\n", header->last));
-	
+
 	count = (header_length-2) / sizeof(cdrom_full_table_of_contents_entry);
 	TRACE(("\n"));
 	TRACE(("entry count = %d\n", count));
-	
+
 	for (i = 0; i < count; i++) {
 		TRACE(("\n"));
 		TRACE(("entry #%d:\n", i));
@@ -865,25 +866,25 @@ dump_full_table_of_contents(uchar *data, uint16 data_length)
 	}
 	TRACE(("--------------------------------------------------\n"));
 }
+#endif	// DEBUG
 
-// read_table_of_contents
-static
-status_t
+
+static status_t
 read_table_of_contents(int deviceFD, uint32 first_session, uchar *buffer,
-                       uint16 buffer_length, bool msf)
+	uint16 buffer_length, bool msf)
 {
 	scsi_table_of_contents_command scsi_command;
 	raw_device_command raw_command;
 	const uint32 sense_data_length = 1024;
 	uchar sense_data[sense_data_length];
 	status_t error = buffer ? B_OK : B_BAD_VALUE;
-	
-	DEBUG_INIT_ETC(NULL, ("fd: %d, buffer: %p, buffer_length: %d", 
+
+	DEBUG_INIT_ETC(NULL, ("fd: %d, buffer: %p, buffer_length: %d",
 	               deviceFD, buffer, buffer_length));
 
 	if (error)
 		return error;
-		
+
 	// Init the scsi command and copy it into the BeOS "raw scsi command" ioctl struct
 	memset(raw_command.command, 0, 16);
 	scsi_command.command = 0x43;
@@ -891,7 +892,7 @@ read_table_of_contents(int deviceFD, uint32 first_session, uchar *buffer,
 	scsi_command.format = kFullTableOfContentsFormat;
 	scsi_command.number = first_session;
 	scsi_command.length = B_HOST_TO_BENDIAN_INT16(buffer_length);
-	scsi_command.control = 0;	
+	scsi_command.control = 0;
 	scsi_command.reserved0 = scsi_command.reserved1 = scsi_command.reserved2
 	                        = scsi_command.reserved3 = scsi_command.reserved4
 	                        = scsi_command.reserved5 = scsi_command.reserved6 = 0;
@@ -900,7 +901,7 @@ read_table_of_contents(int deviceFD, uint32 first_session, uchar *buffer,
 	// Init the rest of the raw command
 	raw_command.command_length = 10;
 	raw_command.flags = kScsiFlags;
-	raw_command.scsi_status = 0;	
+	raw_command.scsi_status = 0;
 	raw_command.cam_status = 0;
 	raw_command.data = buffer;
 	raw_command.data_length = buffer_length;
@@ -908,8 +909,8 @@ read_table_of_contents(int deviceFD, uint32 first_session, uchar *buffer,
 	raw_command.sense_data = sense_data;
 	raw_command.sense_data_length = sense_data_length;
 	memset(raw_command.sense_data, 0, raw_command.sense_data_length);
-	raw_command.timeout = kScsiTimeout;	
-		
+	raw_command.timeout = kScsiTimeout;
+
 	if (ioctl(deviceFD, B_RAW_DEVICE_COMMAND, &raw_command) == 0) {
 		if (raw_command.scsi_status == 0 && raw_command.cam_status == 1) {
 			// SUCCESS!!!
@@ -926,7 +927,7 @@ read_table_of_contents(int deviceFD, uint32 first_session, uchar *buffer,
 	}
 
 	return error;
-	
+
 }
 
 // cdrom_session_get_nth_info
@@ -941,19 +942,19 @@ cdrom_session_get_nth_info(int deviceFD, int32 index, off_t deviceSize,
 	status_t error = sessionInfo && index >= 0 ? B_OK : B_BAD_VALUE;
 	uchar data[2048];
 	int32 session = index+1;
-	
+
 	TRACE(("%s: get_nth_info(%d, %ld, %lld, %ld, %p)\n", kModuleDebugName,
 		   deviceFD, index, deviceSize, blockSize, sessionInfo));
 
 	// Attempt to read the table of contents, first in lba mode, then in msf mode
 	if (!error) {
 		error = read_table_of_contents(deviceFD, 1, data, 2048, false);
-	}	
+	}
 	if (error) {
 		TRACE(("%s: lba read_toc failed, trying msf instead\n", kModuleDebugName));
 		error = read_table_of_contents(deviceFD, 1, data, 2048, true);
 	}
-		
+
 	// Interpret the data returned, if successful
 	if (!error) {
 		cdrom_table_of_contents_header *header;
@@ -963,25 +964,25 @@ cdrom_session_get_nth_info(int deviceFD, int32 index, off_t deviceSize,
 		header = (cdrom_table_of_contents_header*)data;
 		entries = (cdrom_full_table_of_contents_entry*)(data+4);
 		header->length = B_BENDIAN_TO_HOST_INT16(header->length);
-		
+
 		count = (header->length-2) / sizeof(cdrom_full_table_of_contents_entry);
-		
+
 		// Check for a valid session index
 		if (session < 1 || session > 99)
 			error = B_ENTRY_NOT_FOUND;
-		
+
 		// Extract the data of interest
 		if (!error) {
 			Disc disc(entries, count);
 			error = disc.InitCheck();
-			if (!error) 
+			if (!error)
 				error = disc.GetSessionInfo(index, blockSize, sessionInfo);
 		}
 	}
-	
-	if (error)	
+
+	if (error)
 		TRACE(("%s: get_nth error 0x%lx\n", kModuleDebugName, error));
-		
+
 	return error;
 }
 */

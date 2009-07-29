@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel disk_scanner partition ;
-
-UsePrivateHeaders $(DOT) ;
-
-#KernelAddon intel : kernel disk_scanner partition :
-#	intel.cpp
-#;
-
