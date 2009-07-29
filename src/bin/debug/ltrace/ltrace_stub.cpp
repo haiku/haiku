@@ -24,8 +24,8 @@ static void* function_call_callback(const void* stub, const void* args);
 
 
 struct PatchEntry {
-	HashTableLink<PatchEntry>	originalTableLink;
-	HashTableLink<PatchEntry>	patchedTableLink;
+	PatchEntry*	originalTableLink;
+	PatchEntry*	patchedTableLink;
 
 	void*		originalFunction;
 	void*		patchedFunction;
@@ -71,9 +71,9 @@ struct OriginalTableDefinition {
 		return value->originalFunction == key;
 	}
 
-	HashTableLink<PatchEntry>* GetLink(PatchEntry* value) const
+	PatchEntry*& GetLink(PatchEntry* value) const
 	{
-		return &value->originalTableLink;
+		return value->originalTableLink;
 	}
 };
 
@@ -97,9 +97,9 @@ struct PatchedTableDefinition {
 		return value->patchedFunction == key;
 	}
 
-	HashTableLink<PatchEntry>* GetLink(PatchEntry* value) const
+	PatchEntry*& GetLink(PatchEntry* value) const
 	{
-		return &value->patchedTableLink;
+		return value->patchedTableLink;
 	}
 };
 
@@ -107,8 +107,8 @@ struct PatchedTableDefinition {
 static rld_export* sRuntimeLoaderInterface;
 static runtime_loader_add_on_export* sRuntimeLoaderAddOnInterface;
 
-static OpenHashTable<OriginalTableDefinition> sOriginalTable;
-static OpenHashTable<PatchedTableDefinition> sPatchedTable;
+static BOpenHashTable<OriginalTableDefinition> sOriginalTable;
+static BOpenHashTable<PatchedTableDefinition> sPatchedTable;
 
 
 static void*
