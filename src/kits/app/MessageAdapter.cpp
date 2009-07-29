@@ -469,7 +469,9 @@ MessageAdapter::_FlattenR5Message(uint32 format, const BMessage *from,
 			for (int32 i = 0; i < field->count; i++) {
 				ssize_t itemSize = *(ssize_t *)source + sizeof(ssize_t);
 				memcpy(pointer, source, itemSize);
-				pointer += pad_to_8(itemSize);
+				ssize_t paddedSize = pad_to_8(itemSize);
+				memset(pointer + itemSize, 0, paddedSize - itemSize);
+				pointer += paddedSize;
 				source += itemSize;
 			}
 
