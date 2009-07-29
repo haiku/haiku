@@ -1,42 +1,39 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Jonas Sundström, jonas.sundstrom@kirilla.com
+ *		Jonas Sundström, jonas@kirilla.com
+ *		Peter Folk <pfolk@uni.uiuc.edu>
  */
 
 
 #include "ZipperThread.h"
-#include "ZipOMaticWindow.h"
-#include "ZipOMaticMisc.h"
 
-#include <Debug.h>
+#include <errno.h>
+#include <signal.h>
+#include <unistd.h>
+
 #include <FindDirectory.h> 
 #include <Message.h>
 #include <Path.h>
 #include <Volume.h>
 
-#include <signal.h>
-#include <unistd.h>
-#include <errno.h>
-
-
-const char* kZipperThreadName = "ZipperThread";
+#include "ZipOMaticMisc.h"
+#include "ZipOMaticWindow.h"
 
 
 ZipperThread::ZipperThread (BMessage* refsMessage, BWindow* window)
-	: GenericThread(kZipperThreadName, B_NORMAL_PRIORITY, refsMessage),
+	:
+	GenericThread("ZipperThread", B_NORMAL_PRIORITY, refsMessage),
 	fWindowMessenger(window),
 	fZipProcess(-1),
-	m_std_in(-1),
-	m_std_out(-1),
-	m_std_err(-1),
+	fStdIn(-1),
+	fStdOut(-1),
+	fStdErr(-1),
 	fOutputFile(NULL)
 {
-	PRINT(("ZipperThread()\n"));
-
-	m_thread_data_store = new BMessage(*refsMessage);
+	fThreadDataStore = new BMessage(*refsMessage);
 		// leak?
 		// prevents bug with B_SIMPLE_DATA
 		// (drag&drop messages)
@@ -51,8 +48,6 @@ ZipperThread::~ZipperThread()
 status_t
 ZipperThread::ThreadStartup()
 {
-	PRINT(("ZipperThread::ThreadStartup()\n"));
-
 	BString archiveName = "Archive.zip";
 
 	// do all refs have the same parent dir?
@@ -62,12 +57,12 @@ ZipperThread::ThreadStartup()
 	entry_ref lastRef;
 	bool sameFolder = true;
 
-	status_t status = m_thread_data_store->GetInfo("refs", &type, &refCount);
+	status_t status = fThreadDataStore->GetInfo("refs", &type, &refCount);
 	if (status != B_OK)
 		return status;
 
 	for (int index = 0;	index < refCount; index++) {
-		m_thread_data_store->FindRef("refs", index, &ref);
+		fThreadDataStore->FindRef("refs", index, &ref);
 
 		if (index > 0) {
 			BEntry entry(&ref);
@@ -114,8 +109,8 @@ ZipperThread::ThreadStartup()
 	argv[2] = strdup(archiveName.String());
 
 	// files to zip
-	for (int index = 0;  index < refCount ;  index++) {
-		m_thread_data_store->FindRef("refs", index, &ref);
+	for (int index = 0;  index < refCount;  index++) {
+		fThreadDataStore->FindRef("refs", index, &ref);
 
 		if (sameFolder) {
 			// just the file name
@@ -130,7 +125,7 @@ ZipperThread::ThreadStartup()
 
 	argv[argc] = NULL;
 
-	fZipProcess = _PipeCommand(argc, argv, m_std_in, m_std_out, m_std_err); 
+	fZipProcess = _PipeCommand(argc, argv, fStdIn, fStdOut, fStdErr); 
 
 	delete [] argv;
 
@@ -139,7 +134,7 @@ ZipperThread::ThreadStartup()
 
 	resume_thread(fZipProcess);
 
-	fOutputFile = fdopen(m_std_out, "r");
+	fOutputFile = fdopen(fStdOut, "r");
 	if (fOutputFile == NULL)
 		return errno;
 
@@ -148,8 +143,6 @@ ZipperThread::ThreadStartup()
 	_SendMessageToWindow('strt', "archive_filename", archiveName.String());
 	_SendMessageToWindow('outp', "zip_output", "Preparing to archive"); 
 
-	PRINT(("\n"));
-
 	return B_OK;
 }
 
@@ -157,8 +150,6 @@ ZipperThread::ThreadStartup()
 status_t
 ZipperThread::ExecuteUnit()
 {
-	//PRINT(("ZipperThread::ExecuteUnit()\n"));
-
 	// read output from /bin/zip
 	// send it to window
 	char buffer[4096];
@@ -188,11 +179,9 @@ ZipperThread::ExecuteUnit()
 status_t
 ZipperThread::ThreadShutdown()
 {
-	PRINT(("ZipperThread::ThreadShutdown()\n"));
-
-	close(m_std_in); 
-    close(m_std_out); 
-   	close(m_std_err);
+	close(fStdIn); 
+	close(fStdOut); 
+	close(fStdErr);
 
 	return B_OK;
 }
@@ -239,13 +228,6 @@ ZipperThread::_MakeShellSafe(BString* string)
 }
 
 
-status_t
-ZipperThread::ProcessRefs(BMessage* msg)
-{
-	return B_OK;
-}
-
-
 thread_id
 ZipperThread::_PipeCommand(int argc, const char** argv, int& in, int& out,
 	int& err, const char** envp)
@@ -288,10 +270,9 @@ ZipperThread::_PipeCommand(int argc, const char** argv, int& in, int& out,
 
 		// execute command
 		thread = load_image(argc, argv, envp);
-
-		PRINT(("load_image() thread_id: %ld\n", ret));
-	} else
+	} else {
 		thread = errno;
+	}
 
 	// Restore old FDs
 	dup2(oldIn, STDIN_FILENO);
@@ -317,7 +298,8 @@ err1:
 
 
 void
-ZipperThread::_SendMessageToWindow(uint32 what, const char* name, const char* value)
+ZipperThread::_SendMessageToWindow(uint32 what, const char* name,
+	const char* value)
 {
 	BMessage msg(what);
 	if (name != NULL && value != NULL)
@@ -330,8 +312,6 @@ ZipperThread::_SendMessageToWindow(uint32 what, const char* name, const char* va
 status_t
 ZipperThread::SuspendExternalZip()
 {
-	PRINT(("ZipperThread::SuspendExternalZip()\n"));
-
 	thread_info info;
 	status_t status = get_thread_info(fZipProcess, &info);
 
@@ -345,8 +325,6 @@ ZipperThread::SuspendExternalZip()
 status_t
 ZipperThread::ResumeExternalZip()
 {
-	PRINT(("ZipperThread::ResumeExternalZip()\n"));
-
 	thread_info info;
 	status_t status = get_thread_info(fZipProcess, &info);
 
@@ -360,8 +338,6 @@ ZipperThread::ResumeExternalZip()
 status_t
 ZipperThread::InterruptExternalZip()
 {
-	PRINT(("ZipperThread::InterruptExternalZip()\n"));
-	
 	thread_info info;
 	status_t status = get_thread_info(fZipProcess, &info);
 
@@ -379,8 +355,6 @@ ZipperThread::InterruptExternalZip()
 status_t
 ZipperThread::WaitOnExternalZip()
 {
-	PRINT(("ZipperThread::WaitOnExternalZip()\n"));
-
 	thread_info info;
 	status_t status = get_thread_info(fZipProcess, &info);
 
@@ -389,3 +363,4 @@ ZipperThread::WaitOnExternalZip()
 
 	return status;
 }
+
