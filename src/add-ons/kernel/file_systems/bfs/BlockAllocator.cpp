@@ -1433,7 +1433,7 @@ BlockAllocator::CheckNextNode(check_control* control)
 				} else
 					status = B_ERROR;
 
-				control->status = B_ERROR;
+				control->status = status;
 				return B_OK;
 			}
 
@@ -1447,6 +1447,21 @@ BlockAllocator::CheckNextNode(check_control* control)
 					control->errors |= BFS_NAMES_DONT_MATCH;
 					FATAL(("Names differ: tree \"%s\", inode \"%s\"\n", name,
 						localName));
+
+					if ((control->flags & BFS_FIX_NAME_MISMATCHES) != 0) {
+						// Rename the inode
+						Transaction transaction(fVolume, inode->BlockNumber());
+
+						status = inode->SetName(transaction, name);
+						if (status == B_OK)
+							status = inode->WriteBack(transaction);
+						if (status == B_OK)
+							status = transaction.Done();
+						if (status != B_OK) {
+							control->status = status;
+							return B_OK;
+						}
+					}
 				}
 			}
 

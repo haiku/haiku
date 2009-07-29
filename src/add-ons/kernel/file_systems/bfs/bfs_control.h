@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BFS_CONTROL_H
@@ -51,7 +51,7 @@ struct check_control {
 		uint64	freed;
 	} stats;
 	status_t	status;
-	void		*cookie;
+	void*		cookie;
 };
 
 /* values for the flags field */
@@ -66,6 +66,7 @@ struct check_control {
 	 * directory.
 	 * Also requires the B_FIX_BITMAP_ERRORS to be set.
 	 */
+#define BFS_FIX_NAME_MISMATCHES	8
 
 /* values for the errors field */
 #define BFS_MISSING_BLOCKS		1

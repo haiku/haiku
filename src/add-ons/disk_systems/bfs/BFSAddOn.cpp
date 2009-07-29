@@ -230,7 +230,8 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	result.flags = !checkOnly ? BFS_FIX_BITMAP_ERRORS : 0;
 	if (!checkOnly) {
 		//printf("will fix any severe errors!\n");
-		result.flags |= BFS_REMOVE_WRONG_TYPES | BFS_REMOVE_INVALID;
+		result.flags |= BFS_REMOVE_WRONG_TYPES | BFS_REMOVE_INVALID
+			| BFS_FIX_NAME_MISMATCHES;
 	}
 
 	// start checking
