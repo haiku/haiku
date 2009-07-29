@@ -1,8 +1,7 @@
 /* 
-** Copyright 2004-2007, Marcus Overhagen. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
-
+ * Copyright 2004-2007, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the OpenBeOS License.
+ */
 
 #include <Path.h>
 #include <image.h>
@@ -17,8 +16,8 @@ PluginManager _plugin_manager;
 
 
 status_t
-PluginManager::CreateReader(Reader **reader, int32 *streamCount,
-	media_file_format *mff, BDataIO *source)
+PluginManager::CreateReader(Reader** reader, int32* streamCount,
+	media_file_format* mff, BDataIO* source)
 {
 	TRACE("PluginManager::CreateReader enter\n");
 
@@ -43,14 +42,14 @@ PluginManager::CreateReader(Reader **reader, int32 *streamCount,
 	// try each reader by calling it's Sniff function...
 	for (int32 i = 0; i < reply.count; i++) {
 		entry_ref ref = reply.ref[i];
-		MediaPlugin *plugin = GetPlugin(ref);
-		if (!plugin) {
+		MediaPlugin* plugin = GetPlugin(ref);
+		if (plugin == NULL) {
 			printf("PluginManager::CreateReader: GetPlugin failed\n");
 			return B_ERROR;
 		}
 
-		ReaderPlugin *readerPlugin = dynamic_cast<ReaderPlugin*>(plugin);
-		if (!readerPlugin) {
+		ReaderPlugin* readerPlugin = dynamic_cast<ReaderPlugin*>(plugin);
+		if (readerPlugin == NULL) {
 			printf("PluginManager::CreateReader: dynamic_cast failed\n");
 			PutPlugin(plugin);
 			return B_ERROR;
@@ -99,7 +98,7 @@ PluginManager::DestroyReader(Reader* reader)
 
 
 status_t
-PluginManager::CreateDecoder(Decoder **_decoder, const media_format &format)
+PluginManager::CreateDecoder(Decoder** _decoder, const media_format& format)
 {
 	TRACE("PluginManager::CreateDecoder enter\n");
 
@@ -121,7 +120,7 @@ PluginManager::CreateDecoder(Decoder **_decoder, const media_format &format)
 		return B_ERROR;
 	}
 	
-	DecoderPlugin *decoderPlugin = dynamic_cast<DecoderPlugin *>(plugin);
+	DecoderPlugin* decoderPlugin = dynamic_cast<DecoderPlugin*>(plugin);
 	if (!decoderPlugin) {
 		printf("PluginManager::CreateDecoder: dynamic_cast failed\n");
 		PutPlugin(plugin);
@@ -144,7 +143,7 @@ PluginManager::CreateDecoder(Decoder **_decoder, const media_format &format)
 
 
 status_t
-PluginManager::CreateDecoder(Decoder **decoder, const media_codec_info &mci)
+PluginManager::CreateDecoder(Decoder** decoder, const media_codec_info& mci)
 {
 	// TODO
 	debugger("not implemented");
@@ -153,13 +152,12 @@ PluginManager::CreateDecoder(Decoder **decoder, const media_codec_info &mci)
 
 
 status_t
-PluginManager::GetDecoderInfo(Decoder *decoder,
-	media_codec_info *out_info) const
+PluginManager::GetDecoderInfo(Decoder* decoder, media_codec_info* _info) const
 {
 	if (!decoder)
 		return B_BAD_VALUE;
 
-	decoder->GetCodecInfo(out_info);
+	decoder->GetCodecInfo(_info);
 	// TODO:
 	// out_info->id = 
 	// out_info->sub_id = 
@@ -168,7 +166,7 @@ PluginManager::GetDecoderInfo(Decoder *decoder,
 
 
 void
-PluginManager::DestroyDecoder(Decoder *decoder)
+PluginManager::DestroyDecoder(Decoder* decoder)
 {
 	if (decoder != NULL) {
 		TRACE("PluginManager::DestroyDecoder(%p, plugin: %p)\n", decoder,
@@ -187,64 +185,64 @@ PluginManager::DestroyDecoder(Decoder *decoder)
 
 
 PluginManager::PluginManager()
+	:
+	fPluginList(),
+	fLocker("media plugin manager")
 {
 	CALLED();
-	fLocker = new BLocker;
-	fPluginList = new List<plugin_info>;
 }
 
 
 PluginManager::~PluginManager()
 {
 	CALLED();
-	for (int i = fPluginList->CountItems() - 1; i >= 0; i--) {
-		plugin_info *info = NULL;
-		fPluginList->Get(i, &info);
+	for (int i = fPluginList.CountItems() - 1; i >= 0; i--) {
+		plugin_info* info = NULL;
+		fPluginList.Get(i, &info);
 		printf("PluginManager: Error, unloading PlugIn %s with usecount "
 			"%d\n", info->name, info->usecount);
 		delete info->plugin;
 		unload_add_on(info->image);
 	}
-	delete fLocker;
 }
 
 	
-MediaPlugin *
-PluginManager::GetPlugin(const entry_ref &ref)
+MediaPlugin*
+PluginManager::GetPlugin(const entry_ref& ref)
 {
 	TRACE("PluginManager::GetPlugin(%s)\n", ref.name);
-	fLocker->Lock();
+	fLocker.Lock();
 	
-	MediaPlugin *plugin;
-	plugin_info *pinfo;
+	MediaPlugin* plugin;
+	plugin_info* pinfo;
 	plugin_info info;
 	
-	for (fPluginList->Rewind(); fPluginList->GetNext(&pinfo); ) {
+	for (fPluginList.Rewind(); fPluginList.GetNext(&pinfo); ) {
 		if (0 == strcmp(ref.name, pinfo->name)) {
 			plugin = pinfo->plugin;
 			pinfo->usecount++;
 			TRACE("  found existing plugin: %p\n", pinfo->plugin);
-			fLocker->Unlock();
+			fLocker.Unlock();
 			return plugin;
 		}
 	}
 
-	if (LoadPlugin(ref, &info.plugin, &info.image) < B_OK) {
+	if (_LoadPlugin(ref, &info.plugin, &info.image) < B_OK) {
 		printf("PluginManager: Error, loading PlugIn %s failed\n", ref.name);
-		fLocker->Unlock();
+		fLocker.Unlock();
 		return NULL;
 	}
 
 	strcpy(info.name, ref.name);
 	info.usecount = 1;
-	fPluginList->Insert(info);
+	fPluginList.Insert(info);
 	
 	TRACE("PluginManager: PlugIn %s loaded\n", ref.name);
 
 	plugin = info.plugin;
 	TRACE("  loaded plugin: %p\n", plugin);
 	
-	fLocker->Unlock();
+	fLocker.Unlock();
 	return plugin;
 }
 
@@ -253,11 +251,11 @@ void
 PluginManager::PutPlugin(MediaPlugin* plugin)
 {
 	TRACE("PluginManager::PutPlugin()\n");
-	fLocker->Lock();
+	fLocker.Lock();
 	
-	plugin_info *pinfo;
+	plugin_info* pinfo;
 	
-	for (fPluginList->Rewind(); fPluginList->GetNext(&pinfo); ) {
+	for (fPluginList.Rewind(); fPluginList.GetNext(&pinfo); ) {
 		if (plugin == pinfo->plugin) {
 			pinfo->usecount--;
 			if (pinfo->usecount == 0) {
@@ -265,26 +263,26 @@ PluginManager::PutPlugin(MediaPlugin* plugin)
 				delete pinfo->plugin;
 				TRACE("  unloading add-on: %ld\n\n", pinfo->image);
 				unload_add_on(pinfo->image);
-				fPluginList->RemoveCurrent();
+				fPluginList.RemoveCurrent();
 			}
-			fLocker->Unlock();
+			fLocker.Unlock();
 			return;
 		}
 	}
 	
 	printf("PluginManager: Error, can't put PlugIn %p\n", plugin);
 	
-	fLocker->Unlock();
+	fLocker.Unlock();
 }
 
 
 status_t
-PluginManager::LoadPlugin(const entry_ref &ref, MediaPlugin **plugin,
-	image_id *image)
+PluginManager::_LoadPlugin(const entry_ref& ref, MediaPlugin** plugin,
+	image_id* image)
 {
 	BPath p(&ref);
 
-	TRACE("PluginManager: LoadPlugin trying to load %s\n", p.Path());
+	TRACE("PluginManager: _LoadPlugin trying to load %s\n", p.Path());
 
 	image_id id;
 	id = load_add_on(p.Path());
@@ -292,11 +290,11 @@ PluginManager::LoadPlugin(const entry_ref &ref, MediaPlugin **plugin,
 	if (id < 0)
 		return B_ERROR;
 		
-	MediaPlugin *(*instantiate_plugin_func)();
+	MediaPlugin* (*instantiate_plugin_func)();
 	
 	if (get_image_symbol(id, "instantiate_plugin", B_SYMBOL_TYPE_TEXT,
 			(void**)&instantiate_plugin_func) < B_OK) {
-		printf("PluginManager: Error, LoadPlugin can't find "
+		printf("PluginManager: Error, _LoadPlugin can't find "
 			"instantiate_plugin in %s\n", p.Path());
 		unload_add_on(id);
 		return B_ERROR;
@@ -306,7 +304,7 @@ PluginManager::LoadPlugin(const entry_ref &ref, MediaPlugin **plugin,
 	
 	pl = (*instantiate_plugin_func)();
 	if (pl == NULL) {
-		printf("PluginManager: Error, LoadPlugin instantiate_plugin in %s "
+		printf("PluginManager: Error, _LoadPlugin instantiate_plugin in %s "
 			"returned NULL\n", p.Path());
 		unload_add_on(id);
 		return B_ERROR;
