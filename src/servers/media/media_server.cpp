@@ -891,7 +891,19 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			const server_get_writer_request *request
 				= reinterpret_cast<const server_get_writer_request *>(data);
 			server_get_writer_reply reply;
-			rv = gAddOnManager->GetWriter(&reply.ref, request->file_format);
+			rv = gAddOnManager->GetWriter(&reply.ref, request->internal_id);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+
+		case SERVER_GET_FILE_FORMAT_FOR_COOKIE:
+		{
+			const server_get_file_format_request *request
+				= reinterpret_cast<
+					const server_get_file_format_request *>(data);
+			server_get_file_format_reply reply;
+			rv = gAddOnManager->GetFileFormat(&reply.file_format,
+				request->cookie);
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}

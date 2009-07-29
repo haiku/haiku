@@ -178,24 +178,15 @@ AddOnManager::GetEncoderForFormat(xfer_entry_ref* _encoderRef,
 									
 
 status_t
-AddOnManager::GetWriter(xfer_entry_ref* _ref, const media_file_format& format)
+AddOnManager::GetWriter(xfer_entry_ref* _ref, uint32 internalID)
 {
 	BAutolock locker(fLock);
 
 	writer_info* info;
 	for (fWriterList.Rewind(); fWriterList.GetNext(&info);) {
-		media_file_format* fileFormat;
-		for (info->fileFormats.Rewind();
-				info->fileFormats.GetNext(&fileFormat);) {
-			// Check if the writer matches the supplied file format
-			// TODO: There must be a trick here which makes all this
-			// much simpler and probably lets us create a Writer client
-			// side...
-			if (fileFormat->id.internal_id != format.id.internal_id)
-				continue;
-
+		if (info->internalID == internalID) {
 			printf("AddOnManager::GetWriter: found writer %s for "
-				"file format %s\n", info->ref.name, format.pretty_name);
+				"internal_id %lu\n", info->ref.name, internalID);
 
 			*_ref = info->ref;
 			return B_OK;
@@ -203,6 +194,21 @@ AddOnManager::GetWriter(xfer_entry_ref* _ref, const media_file_format& format)
 	}
 
 	return B_ERROR;
+}
+
+
+status_t
+AddOnManager::GetFileFormat(media_file_format* _fileFormat, int32 cookie)
+{
+	BAutolock locker(fLock);
+
+	media_file_format* fileFormat;
+	if (fFileFormats.Get(cookie, &fileFormat)) {
+		*_fileFormat = *fileFormat;
+		return B_OK;
+	}
+
+	return B_BAD_INDEX;
 }
 
 
@@ -412,6 +418,7 @@ AddOnManager::_RegisterWriter(WriterPlugin* writer, const entry_ref& ref)
 
 	writer_info info;
 	info.ref = ref;
+	info.internalID = fNextWriterFormatFamilyID++;
 
 	// Get list of support media_file_formats...
 	media_file_format* fileFormats = NULL;
@@ -427,9 +434,9 @@ AddOnManager::_RegisterWriter(WriterPlugin* writer, const entry_ref& ref)
 		media_file_format fileFormat = fileFormats[i];
 		fileFormat.id.node = ref.directory;
 		fileFormat.id.device = ref.device;
-		fileFormat.id.internal_id = fNextWriterFormatFamilyID++;
+		fileFormat.id.internal_id = info.internalID;
 
-		info.fileFormats.Insert(fileFormat);
+		fFileFormats.Insert(fileFormat);
 	}
 
 	fWriterList.Insert(info);

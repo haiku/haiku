@@ -45,7 +45,10 @@ public:
 									const media_format& format);
 
 			status_t			GetWriter(xfer_entry_ref* _ref,
-									const media_file_format& format);
+									uint32 internalID);
+
+			status_t			GetFileFormat(media_file_format* _fileFormat,
+									int32 cookie);
 
 private:
 			status_t			_RegisterAddOn(BEntry& entry);
@@ -63,19 +66,19 @@ private:
 
 private:
 			struct reader_info {
-				entry_ref ref;
+				entry_ref			ref;
 			};
 			struct writer_info {
-				entry_ref ref;
-				List<media_file_format> fileFormats;
+				entry_ref			ref;
+				uint32				internalID;
 			};
 			struct decoder_info {
-				entry_ref ref;
-				List<media_format> formats;
+				entry_ref			ref;
+				List<media_format>	formats;
 			};
 			struct encoder_info {
-				entry_ref ref;
-				List<media_format> formats;
+				entry_ref			ref;
+				List<media_format>	formats;
 			};
 
 			BLocker				fLock;
@@ -83,6 +86,8 @@ private:
 			List<writer_info>	fWriterList;
 			List<decoder_info>	fDecoderList;
 			List<encoder_info>	fEncoderList;
+
+			List<media_file_format> fFileFormats;
 
 			uint32				fNextWriterFormatFamilyID;
 

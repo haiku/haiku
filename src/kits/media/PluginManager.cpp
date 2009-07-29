@@ -195,9 +195,9 @@ PluginManager::CreateWriter(Writer** writer, const media_file_format& mff,
 {
 	TRACE("PluginManager::CreateWriter enter\n");
 
-	// get list of available readers from the server
+	// Get the Writer responsible for this media_file_format from the server.
 	server_get_writer_request request;
-	request.file_format = mff;
+	request.internal_id = mff.id.internal_id;
 	server_get_writer_reply reply;
 	status_t ret = QueryServer(SERVER_GET_WRITER_FOR_FORMAT_FAMILY, &request,
 		sizeof(request), &reply, sizeof(reply));

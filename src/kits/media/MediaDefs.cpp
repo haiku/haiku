@@ -1189,8 +1189,22 @@ operator<(const media_file_format_id& a, const media_file_format_id& b)
 status_t
 get_next_file_format(int32* cookie, media_file_format* mff)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	if (cookie == NULL || mff == NULL)
+		return B_BAD_VALUE;
+
+	// get list of available readers from the server
+	server_get_file_format_request request;
+	request.cookie = *cookie;
+	server_get_file_format_reply reply;
+	status_t ret = QueryServer(SERVER_GET_FILE_FORMAT_FOR_COOKIE, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (ret != B_OK)
+		return ret;
+
+	*cookie = *cookie + 1;
+	*mff = reply.file_format;
+
+	return B_OK;
 }
 
 

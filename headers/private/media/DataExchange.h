@@ -132,6 +132,7 @@ enum {
 	SERVER_GET_READERS,
 	SERVER_GET_DECODER_FOR_FORMAT,
 	SERVER_GET_WRITER_FOR_FORMAT_FAMILY,
+	SERVER_GET_FILE_FORMAT_FOR_COOKIE,
 	SERVER_GET_ENCODER_FOR_FORMAT,
 	SERVER_MESSAGE_END,
 	NODE_MESSAGE_START = 0x200,
@@ -826,12 +827,21 @@ struct server_get_readers_reply : reply_data {
 };
 
 struct server_get_writer_request : request_data {
-	media_file_format		file_format;
+	uint32					internal_id;
 };
 
 struct server_get_writer_reply : reply_data {
 	xfer_entry_ref			ref;
 		// a ref to the writer
+};
+
+struct server_get_file_format_request : request_data {
+	int32					cookie;
+};
+
+struct server_get_file_format_reply : reply_data {
+	media_file_format		file_format;
+		// the file format matching the cookie
 };
 
 struct node_request_completed_command : command_data {
