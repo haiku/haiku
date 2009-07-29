@@ -22,6 +22,7 @@
 
 #include "Array.h"
 
+#include "HeaderView.h"
 #include "Model.h"
 
 
@@ -775,11 +776,22 @@ public:
 		FontInfo& fontInfo)
 		:
 		BaseView("viewport", fontInfo),
+		fHeaderView(NULL),
 		fThreadsView(threadsView),
 		fSchedulingView(schedulingView)
 	{
+		AddChild(fHeaderView = new HeaderView);
 		AddChild(threadsView);
 		AddChild(schedulingView);
+
+		Header* header = new Header(100, 100, 10000, 200);
+		header->SetValue("Thread");
+		fHeaderView->Model()->AddHeader(header);
+
+		header = new Header(100, 100, 10000, 200);
+		header->SetValue("Activity");
+		fHeaderView->Model()->AddHeader(header);
+			// TODO: Set header width correctly!
 	}
 
 	void TargetedByScrollView(BScrollView* scrollView)
@@ -789,7 +801,7 @@ public:
 
 	virtual BSize MinSize()
 	{
-		return BSize(10, 10);
+		return BSize(10, fHeaderView->MinSize().Height());
 	}
 
 	virtual BSize MaxSize()
@@ -799,25 +811,33 @@ public:
 
 	BSize PreferredSize()
 	{
+		BSize headerViewSize(fHeaderView->PreferredSize());
 		BSize threadsViewSize(fThreadsView->PreferredSize());
 		BSize schedulingViewSize(fSchedulingView->PreferredSize());
-		return BSize(BLayoutUtils::AddDistances(
+		BSize size(BLayoutUtils::AddDistances(
 				threadsViewSize.width + kViewSeparationMargin,
 				schedulingViewSize.width),
 			std::max(threadsViewSize.height, schedulingViewSize.height));
+
+		return BSize(std::max(size.width, headerViewSize.width),
+			BLayoutUtils::AddDistances(size.height, headerViewSize.height));
 	}
 
 	void DoLayout()
 	{
+		float headerHeight = fHeaderView->MinSize().Height();
 		float width = Bounds().Width();
 		float height = fThreadsView->MinSize().Height();
 		float threadsViewWidth = fThreadsView->MinSize().width;
 		float schedulingViewLeft = threadsViewWidth + 1 + kViewSeparationMargin;
 
-		fThreadsView->MoveTo(0, 0);
+		fHeaderView->MoveTo(0, 0);
+		fHeaderView->ResizeTo(width, headerHeight);
+
+		fThreadsView->MoveTo(0, headerHeight + 1);
 		fThreadsView->ResizeTo(threadsViewWidth, height);
 
-		fSchedulingView->MoveTo(schedulingViewLeft, 0);
+		fSchedulingView->MoveTo(schedulingViewLeft, headerHeight + 1);
 		fSchedulingView->ResizeTo(width - schedulingViewLeft, height);
 
 		_UpdateScrollBars();
@@ -846,6 +866,7 @@ private:
 	}
 
 private:
+	HeaderView*		fHeaderView;
 	ThreadsView*	fThreadsView;
 	SchedulingView*	fSchedulingView;
 };
