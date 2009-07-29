@@ -1,6 +1,6 @@
 /*
- * Copyright 2004-2008, Haiku. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2004-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Marcus Overhagen
@@ -29,29 +29,29 @@
 #include "debug.h"
 
 
-//	#pragma mark ImageLoader
+//	#pragma mark - ImageLoader
 
 /*!	The ImageLoader class is a convenience class to temporarily load
 	an image file, and unload it on deconstruction automatically.
 */
 class ImageLoader {
-	public:
-		ImageLoader(BPath &path)
-		{
-			fImage = load_add_on(path.Path());
-		}
+public:
+	ImageLoader(BPath& path)
+	{
+		fImage = load_add_on(path.Path());
+	}
 
-		~ImageLoader()
-		{
-			if (fImage >= B_OK)
-				unload_add_on(fImage);
-		}
+	~ImageLoader()
+	{
+		if (fImage >= B_OK)
+			unload_add_on(fImage);
+	}
 
-		status_t InitCheck() const { return fImage; }
-		image_id Image() const { return fImage; }
+	status_t InitCheck() const { return fImage; }
+	image_id Image() const { return fImage; }
 
-	private:
-		image_id	fImage;
+private:
+	image_id	fImage;
 };
 
 
@@ -84,8 +84,8 @@ AddOnManager::SaveState()
 
 
 status_t
-AddOnManager::GetDecoderForFormat(xfer_entry_ref *_decoderRef,
-	const media_format &format)
+AddOnManager::GetDecoderForFormat(xfer_entry_ref* _decoderRef,
+	const media_format& format)
 {
 	if ((format.type == B_MEDIA_ENCODED_VIDEO
 			|| format.type == B_MEDIA_ENCODED_AUDIO
@@ -100,9 +100,9 @@ AddOnManager::GetDecoderForFormat(xfer_entry_ref *_decoderRef,
 	printf("AddOnManager::GetDecoderForFormat: searching decoder for encoding "
 		"%ld\n", format.Encoding());
 
-	decoder_info *info;
+	decoder_info* info;
 	for (fDecoderList.Rewind(); fDecoderList.GetNext(&info);) {
-		media_format *decoderFormat;
+		media_format* decoderFormat;
 		for (info->formats.Rewind(); info->formats.GetNext(&decoderFormat);) {
 			// check if the decoder matches the supplied format
 			if (!decoderFormat->Matches(&format))
@@ -120,13 +120,13 @@ AddOnManager::GetDecoderForFormat(xfer_entry_ref *_decoderRef,
 									
 
 status_t
-AddOnManager::GetReaders(xfer_entry_ref *outRefs, int32 *outCount,
+AddOnManager::GetReaders(xfer_entry_ref* outRefs, int32* outCount,
 	int32 maxCount)
 {
 	BAutolock locker(fLock);
 
 	fReaderList.Rewind();
-	reader_info *info;
+	reader_info* info;
 	for (*outCount = 0; fReaderList.GetNext(&info) && *outCount < maxCount;
 			(*outCount)++) {
 		outRefs[*outCount] = info->ref;
@@ -137,7 +137,7 @@ AddOnManager::GetReaders(xfer_entry_ref *outRefs, int32 *outCount,
 
 
 status_t
-AddOnManager::RegisterAddOn(BEntry &entry)
+AddOnManager::RegisterAddOn(BEntry& entry)
 {
 	BPath path(&entry);
 
@@ -153,16 +153,16 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 	if ((status = loader.InitCheck()) < B_OK)
 		return status;
 
-	MediaPlugin *(*instantiate_plugin_func)();
+	MediaPlugin* (*instantiate_plugin_func)();
 
 	if (get_image_symbol(loader.Image(), "instantiate_plugin",
-			B_SYMBOL_TYPE_TEXT, (void **)&instantiate_plugin_func) < B_OK) {
+			B_SYMBOL_TYPE_TEXT, (void**)&instantiate_plugin_func) < B_OK) {
 		printf("AddOnManager::RegisterAddOn(): can't find instantiate_plugin "
 			"in \"%s\"\n", path.Path());
 		return B_BAD_TYPE;
 	}
 
-	MediaPlugin *plugin = (*instantiate_plugin_func)();
+	MediaPlugin* plugin = (*instantiate_plugin_func)();
 	if (plugin == NULL) {
 		printf("AddOnManager::RegisterAddOn(): instantiate_plugin in \"%s\" "
 			"returned NULL\n", path.Path());
@@ -171,11 +171,11 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 
 	// ToDo: remove any old formats describing this add-on!!
 
-	ReaderPlugin *reader = dynamic_cast<ReaderPlugin *>(plugin);
+	ReaderPlugin* reader = dynamic_cast<ReaderPlugin*>(plugin);
 	if (reader != NULL)
 		RegisterReader(reader, ref);
 
-	DecoderPlugin *decoder = dynamic_cast<DecoderPlugin *>(plugin);
+	DecoderPlugin* decoder = dynamic_cast<DecoderPlugin*>(plugin);
 	if (decoder != NULL)
 		RegisterDecoder(decoder, ref);
 
@@ -190,19 +190,19 @@ AddOnManager::RegisterAddOns()
 {
 	class CodecHandler : public AddOnMonitorHandler {
 	private:
-		AddOnManager * fManager;
+		AddOnManager* fManager;
 
 	public:
-		CodecHandler(AddOnManager *manager)
+		CodecHandler(AddOnManager* manager)
 		{
 			fManager = manager;
 		}
 
-		virtual void AddOnCreated(const add_on_entry_info *entryInfo)
+		virtual void AddOnCreated(const add_on_entry_info* entryInfo)
 		{
 		}
 
-		virtual void AddOnEnabled(const add_on_entry_info *entryInfo)
+		virtual void AddOnEnabled(const add_on_entry_info* entryInfo)
 		{
 			entry_ref ref;
 			make_entry_ref(entryInfo->dir_nref.device,
@@ -212,11 +212,11 @@ AddOnManager::RegisterAddOns()
 				fManager->RegisterAddOn(entry);
 		}
 
-		virtual void AddOnDisabled(const add_on_entry_info *entryInfo)
+		virtual void AddOnDisabled(const add_on_entry_info* entryInfo)
 		{
 		}
 
-		virtual void AddOnRemoved(const add_on_entry_info *entryInfo)
+		virtual void AddOnRemoved(const add_on_entry_info* entryInfo)
 		{
 		}
 	};
@@ -261,11 +261,11 @@ AddOnManager::RegisterAddOns()
 
 
 void
-AddOnManager::RegisterReader(ReaderPlugin *reader, const entry_ref &ref)
+AddOnManager::RegisterReader(ReaderPlugin* reader, const entry_ref& ref)
 {
 	BAutolock locker(fLock);
 
-	reader_info *pinfo;
+	reader_info* pinfo;
 	for (fReaderList.Rewind(); fReaderList.GetNext(&pinfo);) {
 		if (!strcmp(pinfo->ref.name, ref.name)) {
 			// we already know this reader
@@ -283,11 +283,11 @@ AddOnManager::RegisterReader(ReaderPlugin *reader, const entry_ref &ref)
 
 
 void
-AddOnManager::RegisterDecoder(DecoderPlugin *plugin, const entry_ref &ref)
+AddOnManager::RegisterDecoder(DecoderPlugin* plugin, const entry_ref& ref)
 {
 	BAutolock locker(fLock);
 
-	decoder_info *pinfo;
+	decoder_info* pinfo;
 	for (fDecoderList.Rewind(); fDecoderList.GetNext(&pinfo);) {
 		if (!strcmp(pinfo->ref.name, ref.name)) {
 			// we already know this decoder
@@ -300,7 +300,7 @@ AddOnManager::RegisterDecoder(DecoderPlugin *plugin, const entry_ref &ref)
 	decoder_info info;
 	info.ref = ref;
 
-	media_format * formats = 0;
+	media_format* formats = 0;
 	size_t count = 0;
 	if (plugin->GetSupportedFormats(&formats,&count) != B_OK) {
 		printf("AddOnManager::RegisterDecoder(): plugin->GetSupportedFormats"
