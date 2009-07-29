@@ -1,168 +1,190 @@
-/***********************************************************************
- * AUTHOR: Marcus Overhagen
- *   FILE: MediaDefs.cpp
- *  DESCR: 
- ***********************************************************************/
-#include <MediaDefs.h>
-#include <MediaNode.h>
-#include <Roster.h>
+/*
+ * Copyright 2004, 2006, Jérôme Duval.
+ * Copyright 2003-2004, Andrew Bachmann.
+ * Copyright 2002-2004, 2006 Marcus Overhagen.
+ * Copyright 2002, Eric Jaessler.
+ * All rights reserved. Distributed under the terms of the MIT license.
+ */
+
+
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include "MediaMisc.h"
+
+#include <MediaDefs.h>
+#include <MediaNode.h>
+#include <Roster.h>
+
 #include "debug.h"
+
+#include "DataExchange.h"
+#include "MediaMisc.h"
+
 
 #define META_DATA_MAX_SIZE			(16 << 20)
 #define META_DATA_AREA_MIN_SIZE		32000
 
-/*************************************************************
- * media_destination
- *************************************************************/
 
-// final
-media_destination::media_destination(port_id port,
-									 int32 id)
-	: port(port),
+// #pragma mark - media_destination
+
+
+media_destination::media_destination(port_id port, int32 id)
+	:
+	port(port),
 	id(id)
 {
 }
 
-// final
-media_destination::media_destination(const media_destination &clone)
-	: port(clone.port),
+
+media_destination::media_destination(const media_destination& clone)
+	:
+	port(clone.port),
 	id(clone.id)
 {
 }
 
-// final
-media_destination &
-media_destination::operator=(const media_destination &clone)
+
+media_destination&
+media_destination::operator=(const media_destination& clone)
 {
 	port = clone.port;
 	id = clone.id;
 	return *this;
 }
 
-// final & verfied
+
 media_destination::media_destination()
-	: port(-1),
+	:
+	port(-1),
 	id(-1)
 {
 }
 
-// final
+
 media_destination::~media_destination()
 {
 }
 
-// final & verfied
-media_destination media_destination::null(-1,-1);
 
-/*************************************************************
- * media_source
- *************************************************************/
+media_destination media_destination::null(-1, -1);
 
-// final
+
+// #pragma mark - media_source
+
+
 media_source::media_source(port_id port,
 						   int32 id)
-	: port(port),
+	:
+	port(port),
 	id(id)
 {
 }
 
-// final
-media_source::media_source(const media_source &clone)
-	: port(clone.port),
+
+media_source::media_source(const media_source& clone)
+	:
+	port(clone.port),
 	id(clone.id)
 {
 }
 
-// final
-media_source &
-media_source::operator=(const media_source &clone)
+
+media_source&
+media_source::operator=(const media_source& clone)
 {
 	port = clone.port;
 	id = clone.id;
 	return *this;
 }
 
-// final & verfied
+
 media_source::media_source()
-	: port(-1),
+	:
+	port(-1),
 	id(-1)
 {
 }
 
-// final
+
 media_source::~media_source()
 {
 }
 
-// final & verfied
-media_source media_source::null(-1,-1);
 
-/*************************************************************
- * 
- *************************************************************/
+media_source media_source::null(-1, -1);
 
-// final
-bool operator==(const media_destination & a, const media_destination & b)
+
+// #pragma mark - 
+
+
+bool
+operator==(const media_destination& a, const media_destination& b)
 {
 	return (a.port == b.port) && (a.id == b.id);
 }
 
-// final
-bool operator!=(const media_destination & a, const media_destination & b)
+
+bool
+operator!=(const media_destination& a, const media_destination& b)
 {
 	return (a.port != b.port) || (a.id != b.id);
 }
 
-bool operator<(const media_destination & a, const media_destination & b)
+
+bool
+operator<(const media_destination& a, const media_destination& b)
 {
 	UNIMPLEMENTED();
 	return false;
 }
 
-// final
-bool operator==(const media_source & a, const media_source & b)
+
+bool
+operator==(const media_source& a, const media_source& b)
 {
 	return (a.port == b.port) && (a.id == b.id);
 }
 
-// final
-bool operator!=(const media_source & a, const media_source & b)
+
+bool
+operator!=(const media_source& a, const media_source& b)
 {
 	return (a.port != b.port) || (a.id != b.id);
 }
 
-bool operator<(const media_source & a, const media_source & b)
+
+bool
+operator<(const media_source& a, const media_source& b)
 {
 	UNIMPLEMENTED();
 	return false;
 }
 
-// final
-bool operator==(const media_node & a, const media_node & b)
+
+bool
+operator==(const media_node& a, const media_node& b)
 {
 	return (a.node == b.node) && (a.port == b.port) && (a.kind == b.kind);
 }
 
-// final
-bool operator!=(const media_node & a, const media_node & b)
+
+bool
+operator!=(const media_node& a, const media_node& b)
 {
 	return (a.node != b.node) || (a.port != b.port) || (a.kind != b.kind);
 }
 
-bool operator<(const media_node & a, const media_node & b)
+
+bool
+operator<(const media_node& a, const media_node& b)
 {
 	UNIMPLEMENTED();
 	return false;
 }
 
 
-/*************************************************************
- * 
- *************************************************************/
+// #pragma mark - 
+
 
 media_multi_audio_format media_raw_audio_format::wildcard;
 
@@ -178,155 +200,255 @@ media_encoded_video_format media_encoded_video_format::wildcard = {{0}};
 
 media_multistream_format media_multistream_format::wildcard = {0};
 
-/*************************************************************
- * helper functions for media_format::Matches()
- *************************************************************/
 
-static bool raw_audio_format_matches(const media_raw_audio_format &a, const media_raw_audio_format &b);
-static bool multi_audio_info_matches(const media_multi_audio_info &a, const media_multi_audio_info &b);
-static bool multi_audio_format_matches(const media_multi_audio_format &a, const media_multi_audio_format &b);
-static bool raw_video_format_matches(const media_raw_video_format &a, const media_raw_video_format &b);
-static bool multistream_format_matches(const media_multistream_format &a, const media_multistream_format &b);
-static bool encoded_audio_format_matches(const media_encoded_audio_format &a, const media_encoded_audio_format &b);
-static bool encoded_video_format_matches(const media_encoded_video_format &a, const media_encoded_video_format &b);
+// #pragma mark - helper functions for media_format::Matches()
+
+
+static bool raw_audio_format_matches(const media_raw_audio_format& a,
+	const media_raw_audio_format& b);
+static bool multi_audio_info_matches(const media_multi_audio_info& a,
+	const media_multi_audio_info& b);
+static bool multi_audio_format_matches(const media_multi_audio_format& a,
+	const media_multi_audio_format& b);
+static bool raw_video_format_matches(const media_raw_video_format& a,
+	const media_raw_video_format& b);
+static bool multistream_format_matches(const media_multistream_format& a,
+	const media_multistream_format& b);
+static bool encoded_audio_format_matches(const media_encoded_audio_format& a,
+	const media_encoded_audio_format& b);
+static bool encoded_video_format_matches(const media_encoded_video_format& a,
+	const media_encoded_video_format& b);
+
 
 static bool
-raw_audio_format_matches(const media_raw_audio_format &a, const media_raw_audio_format &b)
+raw_audio_format_matches(const media_raw_audio_format& a,
+	const media_raw_audio_format& b)
 {
 	if (a.frame_rate != 0 && b.frame_rate != 0 && a.frame_rate != b.frame_rate)
 		return false;
-	if (a.channel_count != 0 && b.channel_count != 0 && a.channel_count != b.channel_count)
+	if (a.channel_count != 0 && b.channel_count != 0
+		&& a.channel_count != b.channel_count) {
 		return false;
+	}
 	if (a.format != 0 && b.format != 0 && a.format != b.format)
 		return false;
 	if (a.byte_order != 0 && b.byte_order != 0 && a.byte_order != b.byte_order)
 		return false;
-	if (a.buffer_size != 0 && b.buffer_size != 0 && a.buffer_size != b.buffer_size)
+	if (a.buffer_size != 0 && b.buffer_size != 0
+		&& a.buffer_size != b.buffer_size) {
 		return false;
+	}
 	if (a.frame_rate != 0 && b.frame_rate != 0 && a.frame_rate != b.frame_rate)
 		return false;
 	return true;
 }
 
+
 static bool
-multi_audio_info_matches(const media_multi_audio_info &a, const media_multi_audio_info &b)
+multi_audio_info_matches(const media_multi_audio_info& a,
+	const media_multi_audio_info& b)
 {
-	if (a.channel_mask != 0 && b.channel_mask != 0 && a.channel_mask != b.channel_mask)
+	if (a.channel_mask != 0 && b.channel_mask != 0
+		&& a.channel_mask != b.channel_mask) {
 		return false;
+	}
 	if (a.valid_bits != 0 && b.valid_bits != 0 && a.valid_bits != b.valid_bits)
 		return false;
-	if (a.matrix_mask != 0 && b.matrix_mask != 0 && a.matrix_mask != b.matrix_mask)
+	if (a.matrix_mask != 0 && b.matrix_mask != 0
+		&& a.matrix_mask != b.matrix_mask) {
 		return false;
+	}
 	return true;
 }
 
+
 static bool
-multi_audio_format_matches(const media_multi_audio_format &a, const media_multi_audio_format &b)
+multi_audio_format_matches(const media_multi_audio_format& a,
+	const media_multi_audio_format& b)
 {
 	return raw_audio_format_matches(a, b) && multi_audio_info_matches(a, b);
 }
 
+
 static bool
-raw_video_format_matches(const media_raw_video_format &a, const media_raw_video_format &b)
+raw_video_format_matches(const media_raw_video_format& a,
+	const media_raw_video_format& b)
 {
-	if (a.field_rate != 0 && b.field_rate != 0 && a.field_rate != b.field_rate)
+	if (a.field_rate != 0 && b.field_rate != 0
+		&& a.field_rate != b.field_rate) {
 		return false;
-	if (a.interlace != 0 && b.interlace != 0 && a.interlace != b.interlace)
+	}
+	if (a.interlace != 0 && b.interlace != 0
+		&& a.interlace != b.interlace) {
 		return false;
-	if (a.first_active != 0 && b.first_active != 0 && a.first_active != b.first_active)
+	}
+	if (a.first_active != 0 && b.first_active != 0
+		&& a.first_active != b.first_active) {
 		return false;
-	if (a.last_active != 0 && b.last_active != 0 && a.last_active != b.last_active)
+	}
+	if (a.last_active != 0 && b.last_active != 0
+		&& a.last_active != b.last_active) {
 		return false;
-	if (a.orientation != 0 && b.orientation != 0 && a.orientation != b.orientation)
+	}
+	if (a.orientation != 0 && b.orientation != 0
+		&& a.orientation != b.orientation) {
 		return false;
-	if (a.pixel_width_aspect != 0 && b.pixel_width_aspect != 0 && a.pixel_width_aspect != b.pixel_width_aspect)
+	}
+	if (a.pixel_width_aspect != 0 && b.pixel_width_aspect != 0
+		&& a.pixel_width_aspect != b.pixel_width_aspect) {
 		return false;
-	if (a.pixel_height_aspect != 0 && b.pixel_height_aspect != 0 && a.pixel_height_aspect != b.pixel_height_aspect)
+	}
+	if (a.pixel_height_aspect != 0 && b.pixel_height_aspect != 0
+		&& a.pixel_height_aspect != b.pixel_height_aspect) {
 		return false;
-	if (a.display.format != 0 && b.display.format != 0 && a.display.format != b.display.format)
+	}
+	if (a.display.format != 0 && b.display.format != 0
+		&& a.display.format != b.display.format) {
 		return false;
-	if (a.display.line_width != 0 && b.display.line_width != 0 && a.display.line_width != b.display.line_width)
+	}
+	if (a.display.line_width != 0 && b.display.line_width != 0
+		&& a.display.line_width != b.display.line_width) {
 		return false;
-	if (a.display.line_count != 0 && b.display.line_count != 0 && a.display.line_count != b.display.line_count)
+	}
+	if (a.display.line_count != 0 && b.display.line_count != 0
+		&& a.display.line_count != b.display.line_count) {
 		return false;
-	if (a.display.bytes_per_row != 0 && b.display.bytes_per_row != 0 && a.display.bytes_per_row != b.display.bytes_per_row)
+	}
+	if (a.display.bytes_per_row != 0 && b.display.bytes_per_row != 0
+		&& a.display.bytes_per_row != b.display.bytes_per_row) {
 		return false;
-	if (a.display.pixel_offset != 0 && b.display.pixel_offset != 0 && a.display.pixel_offset != b.display.pixel_offset)
+	}
+	if (a.display.pixel_offset != 0 && b.display.pixel_offset != 0
+		&& a.display.pixel_offset != b.display.pixel_offset) {
 		return false;
-	if (a.display.line_offset != 0 && b.display.line_offset != 0 && a.display.line_offset != b.display.line_offset)
+	}
+	if (a.display.line_offset != 0 && b.display.line_offset != 0
+		&& a.display.line_offset != b.display.line_offset) {
 		return false;
-	if (a.display.flags != 0 && b.display.flags != 0 && a.display.flags != b.display.flags)
+	}
+	if (a.display.flags != 0 && b.display.flags != 0
+		&& a.display.flags != b.display.flags) {
 		return false;
+	}
+
 	return true;
 }
 
+
 static bool
-multistream_format_matches(const media_multistream_format &a, const media_multistream_format &b)
+multistream_format_matches(const media_multistream_format& a,
+	const media_multistream_format& b)
 {
-	if (a.avg_bit_rate != 0 && b.avg_bit_rate != 0 && a.avg_bit_rate != b.avg_bit_rate)
+	if (a.avg_bit_rate != 0 && b.avg_bit_rate != 0
+		&& a.avg_bit_rate != b.avg_bit_rate) {
 		return false;
-	if (a.max_bit_rate != 0 && b.max_bit_rate != 0 && a.max_bit_rate != b.max_bit_rate)
+	}
+	if (a.max_bit_rate != 0 && b.max_bit_rate != 0
+		&& a.max_bit_rate != b.max_bit_rate) {
 		return false;
-	if (a.avg_chunk_size != 0 && b.avg_chunk_size != 0 && a.avg_chunk_size != b.avg_chunk_size)
+	}
+	if (a.avg_chunk_size != 0 && b.avg_chunk_size != 0
+		&& a.avg_chunk_size != b.avg_chunk_size) {
 		return false;
-	if (a.max_chunk_size != 0 && b.max_chunk_size != 0 && a.max_chunk_size != b.max_chunk_size)
+	}
+	if (a.max_chunk_size != 0 && b.max_chunk_size != 0
+		&& a.max_chunk_size != b.max_chunk_size) {
 		return false;
+	}
 	if (a.flags != 0 && b.flags != 0 && a.flags != b.flags)
 		return false;
 	if (a.format != 0 && b.format != 0 && a.format != b.format)
 		return false;
 
-	if (a.format == 0 && b.format == 0)
-		return true; // XXX how do we compare two formats with no type?
+	if (a.format == 0 && b.format == 0) {
+		// TODO: How do we compare two formats with no type?
+		return true;
+	}
 
 	switch ((a.format != 0) ? a.format : b.format) {
 		default:
-			return true; // XXX really?
+			return true; // TODO: really?
 					
 		case media_multistream_format::B_VID:
-			if (a.u.vid.frame_rate != 0 && b.u.vid.frame_rate != 0 && a.u.vid.frame_rate != b.u.vid.frame_rate)
+			if (a.u.vid.frame_rate != 0 && b.u.vid.frame_rate != 0
+				&& a.u.vid.frame_rate != b.u.vid.frame_rate) {
 				return false;
-			if (a.u.vid.width != 0 && b.u.vid.width != 0 && a.u.vid.width != b.u.vid.width)
+			}
+			if (a.u.vid.width != 0 && b.u.vid.width != 0
+				&& a.u.vid.width != b.u.vid.width) {
 				return false;
-			if (a.u.vid.height != 0 && b.u.vid.height != 0 && a.u.vid.height != b.u.vid.height)
+			}
+			if (a.u.vid.height != 0 && b.u.vid.height != 0
+				&& a.u.vid.height != b.u.vid.height) {
 				return false;
-			if (a.u.vid.space != 0 && b.u.vid.space != 0 && a.u.vid.space != b.u.vid.space)
+			}
+			if (a.u.vid.space != 0 && b.u.vid.space != 0
+				&& a.u.vid.space != b.u.vid.space) {
 				return false;
-			if (a.u.vid.sampling_rate != 0 && b.u.vid.sampling_rate != 0 && a.u.vid.sampling_rate != b.u.vid.sampling_rate)
+			}
+			if (a.u.vid.sampling_rate != 0 && b.u.vid.sampling_rate != 0
+				&& a.u.vid.sampling_rate != b.u.vid.sampling_rate) {
 				return false;
-			if (a.u.vid.sample_format != 0 && b.u.vid.sample_format != 0 && a.u.vid.sample_format != b.u.vid.sample_format)
+			}
+			if (a.u.vid.sample_format != 0 && b.u.vid.sample_format != 0
+				&& a.u.vid.sample_format != b.u.vid.sample_format) {
 				return false;
-			if (a.u.vid.byte_order != 0 && b.u.vid.byte_order != 0 && a.u.vid.byte_order != b.u.vid.byte_order)
+			}
+			if (a.u.vid.byte_order != 0 && b.u.vid.byte_order != 0
+				&& a.u.vid.byte_order != b.u.vid.byte_order) {
 				return false;
-			if (a.u.vid.channel_count != 0 && b.u.vid.channel_count != 0 && a.u.vid.channel_count != b.u.vid.channel_count)
+			}
+			if (a.u.vid.channel_count != 0 && b.u.vid.channel_count != 0
+				&& a.u.vid.channel_count != b.u.vid.channel_count) {
 				return false;
+			}
 			return true;
 					
 		case media_multistream_format::B_AVI:
-			if (a.u.avi.us_per_frame != 0 && b.u.avi.us_per_frame != 0 && a.u.avi.us_per_frame != b.u.avi.us_per_frame)
+			if (a.u.avi.us_per_frame != 0 && b.u.avi.us_per_frame != 0
+				&& a.u.avi.us_per_frame != b.u.avi.us_per_frame) {
 				return false;
-			if (a.u.avi.width != 0 && b.u.avi.width != 0 && a.u.avi.width != b.u.avi.width)
+			}
+			if (a.u.avi.width != 0 && b.u.avi.width != 0
+				&& a.u.avi.width != b.u.avi.width) {
 				return false;
-			if (a.u.avi.height != 0 && b.u.avi.height != 0 && a.u.avi.height != b.u.avi.height)
+			}
+			if (a.u.avi.height != 0 && b.u.avi.height != 0
+				&& a.u.avi.height != b.u.avi.height) {
 				return false;
-			if (a.u.avi.type_count != 0 && b.u.avi.type_count != 0 && a.u.avi.type_count != b.u.avi.type_count)
+			}
+			if (a.u.avi.type_count != 0 && b.u.avi.type_count != 0
+				&& a.u.avi.type_count != b.u.avi.type_count) {
 				return false;
-			if (a.u.avi.types[0] != 0 && b.u.avi.types[0] != 0 && a.u.avi.types[0] != b.u.avi.types[0])
+			}
+			if (a.u.avi.types[0] != 0 && b.u.avi.types[0] != 0
+				&& a.u.avi.types[0] != b.u.avi.types[0]) {
 				return false;
-			if (a.u.avi.types[1] != 0 && b.u.avi.types[1] != 0 && a.u.avi.types[1] != b.u.avi.types[1])
+			}
+			if (a.u.avi.types[1] != 0 && b.u.avi.types[1] != 0
+				&& a.u.avi.types[1] != b.u.avi.types[1]) {
 				return false;
-			if (a.u.avi.types[2] != 0 && b.u.avi.types[2] != 0 && a.u.avi.types[2] != b.u.avi.types[2])
+			}
+			if (a.u.avi.types[2] != 0 && b.u.avi.types[2] != 0
+				&& a.u.avi.types[2] != b.u.avi.types[2]) {
 				return false;
-			if (a.u.avi.types[3] != 0 && b.u.avi.types[3] != 0 && a.u.avi.types[3] != b.u.avi.types[3])
+			}
+			if (a.u.avi.types[3] != 0 && b.u.avi.types[3] != 0
+				&& a.u.avi.types[3] != b.u.avi.types[3]) {
 				return false;
-			if (a.u.avi.types[4] != 0 && b.u.avi.types[4] != 0 && a.u.avi.types[4] != b.u.avi.types[4])
+			}
+			if (a.u.avi.types[4] != 0 && b.u.avi.types[4] != 0
+				&& a.u.avi.types[4] != b.u.avi.types[4]) {
 				return false;
+			}
 			return true;
 	}
 }
 
+
 static bool
-encoded_audio_format_matches(const media_encoded_audio_format &a, const media_encoded_audio_format &b)
+encoded_audio_format_matches(const media_encoded_audio_format& a,
+	const media_encoded_audio_format& b)
 {
 	if (!raw_audio_format_matches(a.output, b.output))
 		return false;
@@ -349,24 +471,36 @@ encoded_audio_format_matches(const media_encoded_audio_format &a, const media_en
 	}
 }
 
+
 static bool
-encoded_video_format_matches(const media_encoded_video_format &a, const media_encoded_video_format &b)
+encoded_video_format_matches(const media_encoded_video_format& a,
+	const media_encoded_video_format& b)
 {
 	if (!raw_video_format_matches(a.output, b.output))
 		return false;
 	if (a.encoding != 0 && b.encoding != 0 && a.encoding != b.encoding)
 		return false;
 
-	if (a.avg_bit_rate != 0 && b.avg_bit_rate != 0 && a.avg_bit_rate != b.avg_bit_rate)
+	if (a.avg_bit_rate != 0 && b.avg_bit_rate != 0
+		&& a.avg_bit_rate != b.avg_bit_rate) {
 		return false;
-	if (a.max_bit_rate != 0 && b.max_bit_rate != 0 && a.max_bit_rate != b.max_bit_rate)
+	}
+	if (a.max_bit_rate != 0 && b.max_bit_rate != 0
+		&& a.max_bit_rate != b.max_bit_rate) {
 		return false;
-	if (a.frame_size != 0 && b.frame_size != 0 && a.frame_size != b.frame_size)
+	}
+	if (a.frame_size != 0 && b.frame_size != 0
+		&& a.frame_size != b.frame_size) {
 		return false;
-	if (a.forward_history != 0 && b.forward_history != 0 && a.forward_history != b.forward_history)
+	}
+	if (a.forward_history != 0 && b.forward_history != 0
+		&& a.forward_history != b.forward_history) {
 		return false;
-	if (a.backward_history != 0 && b.backward_history != 0 && a.backward_history != b.backward_history)
+	}
+	if (a.backward_history != 0 && b.backward_history != 0
+		&& a.backward_history != b.backward_history) {
 		return false;
+	}
 
 	if (a.encoding == 0 && b.encoding == 0)
 		return true; // can't compare
@@ -378,21 +512,22 @@ encoded_video_format_matches(const media_encoded_video_format &a, const media_en
 	}
 }
 
-/*************************************************************
- * helper functions for media_format::SpecializeTo()
- *************************************************************/
 
-static void raw_audio_format_specialize(media_raw_audio_format *format, const media_raw_audio_format *other);
-static void multi_audio_info_specialize(media_multi_audio_info *format, const media_multi_audio_info *other);
-static void multi_audio_format_specialize(media_multi_audio_format *format, const media_multi_audio_format *other);
-static void raw_video_format_specialize(media_raw_video_format *format, const media_raw_video_format *other);
-static void multistream_format_specialize(media_multistream_format *format, const media_multistream_format *other);
-static void encoded_audio_format_specialize(media_encoded_audio_format *format, const media_encoded_audio_format *other);
-static void encoded_video_format_specialize(media_encoded_video_format *format, const media_encoded_video_format *other);
+// #pragma mark - helper functions for media_format::SpecializeTo()
+
+
+static void raw_audio_format_specialize(media_raw_audio_format* format, const media_raw_audio_format* other);
+static void multi_audio_info_specialize(media_multi_audio_info* format, const media_multi_audio_info* other);
+static void multi_audio_format_specialize(media_multi_audio_format* format, const media_multi_audio_format* other);
+static void raw_video_format_specialize(media_raw_video_format* format, const media_raw_video_format* other);
+static void multistream_format_specialize(media_multistream_format* format, const media_multistream_format* other);
+static void encoded_audio_format_specialize(media_encoded_audio_format* format, const media_encoded_audio_format* other);
+static void encoded_video_format_specialize(media_encoded_video_format* format, const media_encoded_video_format* other);
 
 
 static void
-raw_audio_format_specialize(media_raw_audio_format *format, const media_raw_audio_format *other)
+raw_audio_format_specialize(media_raw_audio_format* format,
+	const media_raw_audio_format* other)
 {
 	if (format->frame_rate == 0)
 		format->frame_rate = other->frame_rate;
@@ -408,8 +543,10 @@ raw_audio_format_specialize(media_raw_audio_format *format, const media_raw_audi
 		format->frame_rate = other->frame_rate;
 }
 
+
 static void
-multi_audio_info_specialize(media_multi_audio_info *format, const media_multi_audio_info *other)
+multi_audio_info_specialize(media_multi_audio_info* format,
+	const media_multi_audio_info* other)
 {
 	if (format->channel_mask == 0)
 		format->channel_mask = other->channel_mask;
@@ -419,15 +556,18 @@ multi_audio_info_specialize(media_multi_audio_info *format, const media_multi_au
 		format->matrix_mask = other->matrix_mask;
 }
 
+
 static void
-multi_audio_format_specialize(media_multi_audio_format *format, const media_multi_audio_format *other)
+multi_audio_format_specialize(media_multi_audio_format* format,
+	const media_multi_audio_format* other)
 {
 	raw_audio_format_specialize(format, other);
 	multi_audio_info_specialize(format, other);
 }
 
 static void
-raw_video_format_specialize(media_raw_video_format *format, const media_raw_video_format *other)
+raw_video_format_specialize(media_raw_video_format* format,
+	const media_raw_video_format* other)
 {
 	if (format->field_rate == 0)
 		format->field_rate = other->field_rate;
@@ -459,8 +599,10 @@ raw_video_format_specialize(media_raw_video_format *format, const media_raw_vide
 		format->display.flags = other->display.flags;
 }
 
+
 static void
-multistream_format_specialize(media_multistream_format *format, const media_multistream_format *other)
+multistream_format_specialize(media_multistream_format* format,
+	const media_multistream_format* other)
 {
 	if (format->avg_bit_rate == 0)
 		format->avg_bit_rate = other->avg_bit_rate;
@@ -522,9 +664,10 @@ multistream_format_specialize(media_multistream_format *format, const media_mult
 	}
 }
 
+
 static void
-encoded_audio_format_specialize(media_encoded_audio_format *format,
-	const media_encoded_audio_format *other)
+encoded_audio_format_specialize(media_encoded_audio_format* format,
+	const media_encoded_audio_format* other)
 {
 	raw_audio_format_specialize(&format->output, &other->output);
 	if (format->encoding == 0)
@@ -536,9 +679,10 @@ encoded_audio_format_specialize(media_encoded_audio_format *format,
 	multi_audio_info_specialize(&format->multi_info, &other->multi_info);
 }
 
+
 static void
-encoded_video_format_specialize(media_encoded_video_format *format,
-	const media_encoded_video_format *other)
+encoded_video_format_specialize(media_encoded_video_format* format,
+	const media_encoded_video_format* other)
 {
 	raw_video_format_specialize(&format->output, &other->output);
 	if (format->avg_bit_rate == 0)
@@ -556,16 +700,18 @@ encoded_video_format_specialize(media_encoded_video_format *format,
 }
 
 
-/*************************************************************
- * media_format
- *************************************************************/
+// #pragma mark - media_format
+
 
 bool
-media_format::Matches(const media_format *other) const
+media_format::Matches(const media_format* other) const
 {
 	CALLED();
-	if (type == 0 && other->type == 0)
-		return true; // XXX how do we compare two formats with no type?
+
+	if (type == 0 && other->type == 0) {
+		// TODO: How do we compare two formats with no type?
+		return true;
+	}
 		
 	if (type != 0 && other->type != 0 && type != other->type)
 		return false;
@@ -578,25 +724,31 @@ media_format::Matches(const media_format *other) const
 			return raw_video_format_matches(u.raw_video, other->u.raw_video);
 
 		case B_MEDIA_MULTISTREAM:
-			return multistream_format_matches(u.multistream, other->u.multistream);
+			return multistream_format_matches(u.multistream,
+				other->u.multistream);
 				
 		case B_MEDIA_ENCODED_AUDIO:
-			return encoded_audio_format_matches(u.encoded_audio, other->u.encoded_audio);
+			return encoded_audio_format_matches(u.encoded_audio,
+				other->u.encoded_audio);
 
 		case B_MEDIA_ENCODED_VIDEO:
-			return encoded_video_format_matches(u.encoded_video, other->u.encoded_video);
+			return encoded_video_format_matches(u.encoded_video,
+				other->u.encoded_video);
 		
 		default:
-			return true; // XXX really?
+			return true; // TODO: really?
 	}
 }
 
+
 void
-media_format::SpecializeTo(const media_format *otherFormat)
+media_format::SpecializeTo(const media_format* otherFormat)
 {
 	CALLED();
+
 	if (type == 0 && otherFormat->type == 0) {
-		ERROR("media_format::SpecializeTo can't specialize wildcard to other wildcard format\n");
+		ERROR("media_format::SpecializeTo can't specialize wildcard to other "
+			"wildcard format\n");
 		return;
 	}
 		
@@ -605,39 +757,44 @@ media_format::SpecializeTo(const media_format *otherFormat)
 	
 	switch (type) {
 		case B_MEDIA_RAW_AUDIO:
-			multi_audio_format_specialize(&u.raw_audio, &otherFormat->u.raw_audio);
+			multi_audio_format_specialize(&u.raw_audio,
+				&otherFormat->u.raw_audio);
 			return;
 			
 		case B_MEDIA_RAW_VIDEO:
-			raw_video_format_specialize(&u.raw_video, &otherFormat->u.raw_video);
+			raw_video_format_specialize(&u.raw_video,
+				&otherFormat->u.raw_video);
 			return;
 
 		case B_MEDIA_MULTISTREAM:
-			multistream_format_specialize(&u.multistream, &otherFormat->u.multistream);
+			multistream_format_specialize(&u.multistream,
+				&otherFormat->u.multistream);
 			return;
 	
 		case B_MEDIA_ENCODED_AUDIO:
-			encoded_audio_format_specialize(&u.encoded_audio, &otherFormat->u.encoded_audio);
+			encoded_audio_format_specialize(&u.encoded_audio,
+				&otherFormat->u.encoded_audio);
 			return;
 
 		case B_MEDIA_ENCODED_VIDEO:
-			encoded_video_format_specialize(&u.encoded_video, &otherFormat->u.encoded_video);
+			encoded_video_format_specialize(&u.encoded_video,
+				&otherFormat->u.encoded_video);
 			return;
 		
 		default:
-			ERROR("media_format::SpecializeTo can't specialize format type %d\n", type);
+			ERROR("media_format::SpecializeTo can't specialize format "
+				"type %d\n", type);
 	}
 }
 
 
 status_t
-media_format::SetMetaData(const void *data,
-						  size_t size)
+media_format::SetMetaData(const void* data, size_t size)
 {
 	if (!data || size < 0 || size > META_DATA_MAX_SIZE)
 		return B_BAD_VALUE;
 	
-	void *new_addr;
+	void* new_addr;
 	area_id new_area;
 	if (size < META_DATA_AREA_MIN_SIZE) {
 		new_area = B_BAD_VALUE;
@@ -645,8 +802,8 @@ media_format::SetMetaData(const void *data,
 		if (!new_addr)
 			return B_NO_MEMORY;
 	} else {
-		new_area = create_area("meta_data_area", &new_addr, B_ANY_ADDRESS, ROUND_UP_TO_PAGE(size),
-	                           B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		new_area = create_area("meta_data_area", &new_addr, B_ANY_ADDRESS,
+			ROUND_UP_TO_PAGE(size), B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (new_area < 0)
 			return (status_t)new_area;
 	}
@@ -669,7 +826,7 @@ media_format::SetMetaData(const void *data,
 }
 
 
-const void *
+const void*
 media_format::MetaData() const
 {
 	return meta_data;
@@ -690,7 +847,7 @@ media_format::media_format()
 }
 
 
-media_format::media_format(const media_format &other)
+media_format::media_format(const media_format& other)
 {
 	memset(this, 0x00, sizeof(*this));
 	meta_data_area = B_BAD_VALUE;
@@ -708,11 +865,12 @@ media_format::~media_format()
 
 
 // final
-media_format &
-media_format::operator=(const media_format &clone)
+media_format&
+media_format::operator=(const media_format& clone)
 {
 	// get rid of this format's meta data
-	this->~media_format(); // danger: using only ~media_format() would call the constructor
+	this->~media_format();
+		// danger: using only ~media_format() would call the constructor
 
 	// make a binary copy
 	memcpy(this, &clone, sizeof(*this));
@@ -724,7 +882,7 @@ media_format::operator=(const media_format &clone)
 	if (clone.meta_data) {
 		if (clone.meta_data_area) {
 			meta_data_area = clone_area("meta_data_clone_area", &meta_data, 
-										B_ANY_ADDRESS, B_READ_AREA, clone.meta_data_area);
+				B_ANY_ADDRESS, B_READ_AREA, clone.meta_data_area);
 			if (meta_data_area < 0) {
 				// whoops, we just lost our meta data
 				meta_data = NULL;
@@ -743,110 +901,136 @@ media_format::operator=(const media_format &clone)
 	return *this;
 }
 
-/*************************************************************
- * 
- *************************************************************/
+
+// #pragma mark -
 
 
-bool operator==(const media_raw_audio_format & a, const media_raw_audio_format & b)
+bool
+operator==(const media_raw_audio_format& a, const media_raw_audio_format& b)
 {
-	return (   a.frame_rate == b.frame_rate
-			&& a.channel_count == b.channel_count
-			&& a.format == b.format
-			&& a.byte_order == b.byte_order
-			&& a.buffer_size == b.buffer_size);
+	return a.frame_rate == b.frame_rate
+		&& a.channel_count == b.channel_count
+		&& a.format == b.format
+		&& a.byte_order == b.byte_order
+		&& a.buffer_size == b.buffer_size;
 }
 
-bool operator==(const media_multi_audio_info & a, const media_multi_audio_info & b)
+
+bool
+operator==(const media_multi_audio_info& a, const media_multi_audio_info& b)
 {
-	return (   a.channel_mask == b.channel_mask
-			&& a.valid_bits == b.valid_bits
-			&& a.matrix_mask == b.matrix_mask);
+	return a.channel_mask == b.channel_mask
+		&& a.valid_bits == b.valid_bits
+		&& a.matrix_mask == b.matrix_mask;
 }
 
-bool operator==(const media_multi_audio_format & a, const media_multi_audio_format & b)
+
+bool
+operator==(const media_multi_audio_format& a,
+	const media_multi_audio_format& b)
 {
-	return (   (media_raw_audio_format)a == (media_raw_audio_format)b
-			&& (media_multi_audio_info)a == (media_multi_audio_info)b);
+	return (media_raw_audio_format)a == (media_raw_audio_format)b
+		&& (media_multi_audio_info)a == (media_multi_audio_info)b;
 }
 
-bool operator==(const media_encoded_audio_format & a, const media_encoded_audio_format & b)
+
+bool
+operator==(const media_encoded_audio_format& a,
+	const media_encoded_audio_format& b)
 {
-	return (   a.output == b.output
-			&& a.encoding == b.encoding
-			&& a.bit_rate == b.bit_rate
-			&& a.frame_size == b.frame_size
-			&& a.multi_info == b.multi_info);
+	return a.output == b.output
+		&& a.encoding == b.encoding
+		&& a.bit_rate == b.bit_rate
+		&& a.frame_size == b.frame_size
+		&& a.multi_info == b.multi_info;
 }
 
-bool operator==(const media_video_display_info & a, const media_video_display_info & b)
+
+bool
+operator==(const media_video_display_info& a,
+	const media_video_display_info& b)
 {
-	return (   a.format == b.format
-			&& a.line_width == b.line_width
-			&& a.line_count == b.line_count
-			&& a.bytes_per_row == b.bytes_per_row
-			&& a.pixel_offset == b.pixel_offset
-			&& a.line_offset == b.line_offset
-			&& a.flags == b.flags);
+	return a.format == b.format
+		&& a.line_width == b.line_width
+		&& a.line_count == b.line_count
+		&& a.bytes_per_row == b.bytes_per_row
+		&& a.pixel_offset == b.pixel_offset
+		&& a.line_offset == b.line_offset
+		&& a.flags == b.flags;
 }
 
-bool operator==(const media_raw_video_format & a, const media_raw_video_format & b)
+
+bool
+operator==(const media_raw_video_format& a, const media_raw_video_format& b)
 {
-	return (   a.field_rate == b.field_rate
-			&& a.interlace == b.interlace
-			&& a.first_active == b.first_active
-			&& a.last_active == b.last_active
-			&& a.orientation == b.orientation
-			&& a.pixel_width_aspect == b.pixel_width_aspect
-			&& a.pixel_height_aspect == b.pixel_height_aspect
-			&& a.display == b.display);
+	return a.field_rate == b.field_rate
+		&& a.interlace == b.interlace
+		&& a.first_active == b.first_active
+		&& a.last_active == b.last_active
+		&& a.orientation == b.orientation
+		&& a.pixel_width_aspect == b.pixel_width_aspect
+		&& a.pixel_height_aspect == b.pixel_height_aspect
+		&& a.display == b.display;
 }
 
-bool operator==(const media_encoded_video_format & a, const media_encoded_video_format & b)
+
+bool
+operator==(const media_encoded_video_format& a,
+	const media_encoded_video_format& b)
 {
-	return (   a.output == b.output
-			&& a.avg_bit_rate == b.avg_bit_rate
-			&& a.max_bit_rate == b.max_bit_rate
-			&& a.encoding == b.encoding
-			&& a.frame_size == b.frame_size
-			&& a.forward_history == b.forward_history
-			&& a.backward_history == b.backward_history);
+	return a.output == b.output
+		&& a.avg_bit_rate == b.avg_bit_rate
+		&& a.max_bit_rate == b.max_bit_rate
+		&& a.encoding == b.encoding
+		&& a.frame_size == b.frame_size
+		&& a.forward_history == b.forward_history
+		&& a.backward_history == b.backward_history;
 }
 
-bool operator==(const media_multistream_format::vid_info & a, const media_multistream_format::vid_info & b)
+
+bool
+operator==(const media_multistream_format::vid_info& a,
+	const media_multistream_format::vid_info& b)
 {
-	return (   a.frame_rate == b.frame_rate
-			&& a.width == b.width
-			&& a.height == b.height
-			&& a.space == b.space
-			&& a.sampling_rate == b.sampling_rate
-			&& a.sample_format == b.sample_format
-			&& a.byte_order == b.byte_order
-			&& a.channel_count == b.channel_count);
+	return a.frame_rate == b.frame_rate
+		&& a.width == b.width
+		&& a.height == b.height
+		&& a.space == b.space
+		&& a.sampling_rate == b.sampling_rate
+		&& a.sample_format == b.sample_format
+		&& a.byte_order == b.byte_order
+		&& a.channel_count == b.channel_count;
 }
 
-bool operator==(const media_multistream_format::avi_info & a, const media_multistream_format::avi_info & b)
+
+bool
+operator==(const media_multistream_format::avi_info& a,
+	const media_multistream_format::avi_info& b)
 {
-	return (   a.us_per_frame == b.us_per_frame
-			&& a.width == b.width
-			&& a.height == b.height
-			&& a.type_count == b.type_count
-			&& a.types[0] == b.types[0]
-			&& a.types[1] == b.types[1]
-			&& a.types[2] == b.types[2]
-			&& a.types[3] == b.types[3]
-			&& a.types[4] == b.types[4]);
+	return a.us_per_frame == b.us_per_frame
+		&& a.width == b.width
+		&& a.height == b.height
+		&& a.type_count == b.type_count
+		&& a.types[0] == b.types[0]
+		&& a.types[1] == b.types[1]
+		&& a.types[2] == b.types[2]
+		&& a.types[3] == b.types[3]
+		&& a.types[4] == b.types[4];
 }
 
-bool operator==(const media_multistream_format & a, const media_multistream_format & b)
+
+bool
+operator==(const media_multistream_format& a,
+	const media_multistream_format& b)
 {
 	if (a.avg_bit_rate != b.avg_bit_rate
 		|| a.max_bit_rate != b.max_bit_rate
 		|| a.avg_chunk_size != b.avg_chunk_size
 		|| a.max_chunk_size != b.max_chunk_size
 		|| a.format != b.format
-		|| a.flags != b.flags)
+		|| a.flags != b.flags) {
 		return false;
+	}
 
 	switch (a.format) {
 		case media_multistream_format::B_VID:
@@ -856,18 +1040,21 @@ bool operator==(const media_multistream_format & a, const media_multistream_form
 			return a.u.avi == b.u.avi;
 
 		default:
-			return true; // XXX really?
+			return true; // TODO: really?
 	}
 }
 
-bool operator==(const media_format & a, const media_format & b)
+
+bool
+operator==(const media_format& a, const media_format& b)
 {
 	if (a.type != b.type
 		|| a.user_data_type != b.user_data_type
-		// XXX compare user_data[48] ?
+		// TODO: compare user_data[48] ?
 		|| a.require_flags != b.require_flags
-		|| a.deny_flags != b.deny_flags)
+		|| a.deny_flags != b.deny_flags) {
 		return false;
+	}
 		
 	switch (a.type) {
 		case B_MEDIA_RAW_AUDIO:
@@ -886,102 +1073,108 @@ bool operator==(const media_format & a, const media_format & b)
 			return a.u.encoded_video == b.u.encoded_video;
 			
 		default:
-			return true; // XXX really?
+			return true; // TODO: really?
 	}
 }
 
-/*************************************************************
- * 
- *************************************************************/
 
-/* return true if a and b are compatible (accounting for wildcards) */
-bool format_is_compatible(const media_format & a, const media_format & b)	/* a is the format you want to feed to something accepting b */
+// #pragma mark - 
+
+
+/*! return \c true if a and b are compatible (accounting for wildcards)
+	a is the format you want to feed to something accepting b
+*/
+bool
+format_is_compatible(const media_format& a, const media_format& b)
 {
 	return a.Matches(&b);
 }
 
-bool string_for_format(const media_format & f, char * buf, size_t size)
+
+bool
+string_for_format(const media_format& f, char* buf, size_t size)
 {
 	char encoding[10]; /* maybe Be wanted to use some 4CCs ? */
-	const char *video_orientation = "0"; /* I'd use "NC", R5 uses 0. */
+	const char* videoOrientation = "0"; /* I'd use "NC", R5 uses 0. */
 	
 	if (buf == NULL)
 		return false;
 	switch (f.type) {
 	case B_MEDIA_RAW_AUDIO:
-		snprintf(buf, size, 
-				"raw_audio;%g;%ld;0x%lx;%ld;0x%lx;0x%08lx;%d;0x%04x", 
-				f.u.raw_audio.frame_rate, 
-				f.u.raw_audio.channel_count, 
-				f.u.raw_audio.format, 
-				f.u.raw_audio.byte_order, 
-				f.u.raw_audio.buffer_size,
-				f.u.raw_audio.channel_mask,
-				f.u.raw_audio.valid_bits,
-				f.u.raw_audio.matrix_mask);
+		snprintf(buf, size,
+			"raw_audio;%g;%ld;0x%lx;%ld;0x%lx;0x%08lx;%d;0x%04x", 
+			f.u.raw_audio.frame_rate, 
+			f.u.raw_audio.channel_count, 
+			f.u.raw_audio.format, 
+			f.u.raw_audio.byte_order, 
+			f.u.raw_audio.buffer_size,
+			f.u.raw_audio.channel_mask,
+			f.u.raw_audio.valid_bits,
+			f.u.raw_audio.matrix_mask);
 		return true;
 	case B_MEDIA_RAW_VIDEO:
 		if (f.u.raw_video.orientation == B_VIDEO_TOP_LEFT_RIGHT)
-			video_orientation = "TopLR";
+			videoOrientation = "TopLR";
 		else if (f.u.raw_video.orientation == B_VIDEO_BOTTOM_LEFT_RIGHT)
-			video_orientation = "BotLR";
-		//snprintf(buf, size, "raw_video;%g;%ld;%ld;%ld;%s;%d;%d;%d;%d;%d;%d;%d;%d",
+			videoOrientation = "BotLR";
+//		snprintf(buf, size, "raw_video;%g;%ld;%ld;%ld;%s;%d;%d;%d;%d;%d;%d;"
+//			"%d;%d",
 		snprintf(buf, size, "raw_video;%g;0x%x;%ld;%ld;%ld;%ld;%s;%d;%d",
-				f.u.raw_video.field_rate,
-				f.u.raw_video.display.format,
-				f.u.raw_video.interlace,
-				f.u.raw_video.display.line_width,
-				f.u.raw_video.display.line_count,
-				f.u.raw_video.first_active,
-				video_orientation,
-				f.u.raw_video.pixel_width_aspect,
-				f.u.raw_video.pixel_height_aspect);
+			f.u.raw_video.field_rate,
+			f.u.raw_video.display.format,
+			f.u.raw_video.interlace,
+			f.u.raw_video.display.line_width,
+			f.u.raw_video.display.line_count,
+			f.u.raw_video.first_active,
+			videoOrientation,
+			f.u.raw_video.pixel_width_aspect,
+			f.u.raw_video.pixel_height_aspect);
 		return true;
 	case B_MEDIA_ENCODED_AUDIO:
 		snprintf(encoding, 10, "%d", f.u.encoded_audio.encoding);
 		snprintf(buf, size, 
-				"caudio;%s;%g;%ld;(%g;%ld;0x%lx;%ld;0x%lx;0x%08lx;%d;0x%04x)", 
-				encoding, // f.u.encoded_audio.encoding, 
-				f.u.encoded_audio.bit_rate, 
-				f.u.encoded_audio.frame_size, 
-				// (
-				f.u.encoded_audio.output.frame_rate, 
-				f.u.encoded_audio.output.channel_count, 
-				f.u.encoded_audio.output.format, 
-				f.u.encoded_audio.output.byte_order, 
-				f.u.encoded_audio.output.buffer_size,
-				f.u.encoded_audio.multi_info.channel_mask,
-				f.u.encoded_audio.multi_info.valid_bits,
-				f.u.encoded_audio.multi_info.matrix_mask);
-				// )
+			"caudio;%s;%g;%ld;(%g;%ld;0x%lx;%ld;0x%lx;0x%08lx;%d;0x%04x)", 
+			encoding, // f.u.encoded_audio.encoding, 
+			f.u.encoded_audio.bit_rate, 
+			f.u.encoded_audio.frame_size, 
+			// (
+			f.u.encoded_audio.output.frame_rate, 
+			f.u.encoded_audio.output.channel_count, 
+			f.u.encoded_audio.output.format, 
+			f.u.encoded_audio.output.byte_order, 
+			f.u.encoded_audio.output.buffer_size,
+			f.u.encoded_audio.multi_info.channel_mask,
+			f.u.encoded_audio.multi_info.valid_bits,
+			f.u.encoded_audio.multi_info.matrix_mask);
+			// )
 		return true;
 	case B_MEDIA_ENCODED_VIDEO:
 		snprintf(encoding, 10, "%d", f.u.encoded_video.encoding);
 		if (f.u.encoded_video.output.orientation == B_VIDEO_TOP_LEFT_RIGHT)
-			video_orientation = "TopLR";
+			videoOrientation = "TopLR";
 		else if (f.u.encoded_video.output.orientation == B_VIDEO_BOTTOM_LEFT_RIGHT)
-			video_orientation = "BotLR";
+			videoOrientation = "BotLR";
 		snprintf(buf, size, 
-				"cvideo;%s;%g;%g;%ld;(%g;0x%x;%ld;%ld;%ld;%ld;%s;%d;%d)",
-				encoding, 
-				f.u.encoded_video.avg_bit_rate, 
-				f.u.encoded_video.max_bit_rate, 
-				f.u.encoded_video.frame_size,
-				// (
-				f.u.encoded_video.output.field_rate,
-				f.u.encoded_video.output.display.format,
-				f.u.encoded_video.output.interlace,
-				f.u.encoded_video.output.display.line_width, 
-				f.u.encoded_video.output.display.line_count,
-				f.u.encoded_video.output.first_active,
-				video_orientation,
-				f.u.encoded_video.output.pixel_width_aspect,
-				f.u.encoded_video.output.pixel_height_aspect);
-				// )
+			"cvideo;%s;%g;%g;%ld;(%g;0x%x;%ld;%ld;%ld;%ld;%s;%d;%d)",
+			encoding, 
+			f.u.encoded_video.avg_bit_rate, 
+			f.u.encoded_video.max_bit_rate, 
+			f.u.encoded_video.frame_size,
+			// (
+			f.u.encoded_video.output.field_rate,
+			f.u.encoded_video.output.display.format,
+			f.u.encoded_video.output.interlace,
+			f.u.encoded_video.output.display.line_width, 
+			f.u.encoded_video.output.display.line_count,
+			f.u.encoded_video.output.first_active,
+			videoOrientation,
+			f.u.encoded_video.output.pixel_width_aspect,
+			f.u.encoded_video.output.pixel_height_aspect);
+			// )
 		return true;
 	default:
 		snprintf(buf, size, "%d-", f.type);
-		unsigned char *p = (unsigned char *)&(f.u);
+		unsigned char* p = (unsigned char*)&(f.u);
 		size -= strlen(buf);
 		buf += strlen(buf);
 		for (int i = 0; (size > 2) && (i < 96); i++) {
@@ -994,61 +1187,48 @@ bool string_for_format(const media_format & f, char * buf, size_t size)
 	return false;
 }
 
-/*************************************************************
- * 
- *************************************************************/
 
-bool operator==(const media_file_format_id & a, const media_file_format_id & b)
+// #pragma mark -
+
+
+bool
+operator==(const media_file_format_id& a, const media_file_format_id& b)
 {
-	UNIMPLEMENTED();
-	return false;
+	return a.node == b.node && a.device == b.device
+		&& a.internal_id == b.internal_id;
 }
 
-bool operator<(const media_file_format_id & a, const media_file_format_id & b)
+
+bool
+operator<(const media_file_format_id& a, const media_file_format_id& b)
 {
-	UNIMPLEMENTED();
-	return false;
+	return a.internal_id < b.internal_id;
 }
 
-/*************************************************************
- * 
- *************************************************************/
 
-//
-// Use this function iterate through available file format writers
-//
-status_t get_next_file_format(int32 *cookie, media_file_format *mfi)
+// #pragma mark -
+
+
+//! Use this function iterate through available file format writers
+status_t
+get_next_file_format(int32* cookie, media_file_format* mff)
 {
 	UNIMPLEMENTED();
 	return B_ERROR;
 }
 
 
-/*************************************************************
- * 
- *************************************************************/
+// #pragma mark -
+
 
 // final & verified
-const char * B_MEDIA_SERVER_SIGNATURE = "application/x-vnd.Be.media-server";
-const char * B_MEDIA_ADDON_SERVER_SIGNATURE = "application/x-vnd.Be.addon-host";
+const char* B_MEDIA_SERVER_SIGNATURE = "application/x-vnd.Be.media-server";
+const char* B_MEDIA_ADDON_SERVER_SIGNATURE = "application/x-vnd.Be.addon-host";
 
 const type_code B_CODEC_TYPE_INFO = 0x040807b2;
 
-/*************************************************************
- * 
- *************************************************************/
 
-struct dormant_node_info
-{
-};
-
-struct buffer_clone_info
-{
-};
-
-/*************************************************************
- * 
- *************************************************************/
+// #pragma mark -
 
 
 // shutdown_media_server() and launch_media_server()
@@ -1056,8 +1236,8 @@ struct buffer_clone_info
 
 status_t
 shutdown_media_server(bigtime_t timeout,
-	bool (*progress)(int stage, const char * message, void * cookie),
-	void * cookie)
+	bool (*progress)(int stage, const char* message, void* cookie),
+	void* cookie)
 {
 	BMessage msg(B_QUIT_REQUESTED);
 	BMessage reply;
@@ -1070,7 +1250,8 @@ shutdown_media_server(bigtime_t timeout,
 		BMessenger messenger(B_MEDIA_SERVER_SIGNATURE);
 		progress(10, "Telling media_server to quit.", cookie);
 
-		if ((err = messenger.SendMessage(&msg, &reply, 2000000, 2000000)) != B_OK)
+		err = messenger.SendMessage(&msg, &reply, 2000000, 2000000);
+		if (err != B_OK)
 			return err;
 
 		int32 rv;
@@ -1082,7 +1263,8 @@ shutdown_media_server(bigtime_t timeout,
 		BMessenger messenger(B_MEDIA_ADDON_SERVER_SIGNATURE);
 		progress(20, "Telling media_addon_server to quit.", cookie);
 
-		if ((err = messenger.SendMessage(&msg, &reply, 2000000, 2000000)) != B_OK)
+		err = messenger.SendMessage(&msg, &reply, 2000000, 2000000);
+		if (err != B_OK)
 			return err;
 
 		int32 rv;
@@ -1154,9 +1336,7 @@ launch_media_server(uint32 flags)
 }
 
 
-/*************************************************************
- * 
- *************************************************************/
+// #pragma mark -
 
 
 //	Given an image_id, prepare that image_id for realtime media
@@ -1164,7 +1344,8 @@ launch_media_server(uint32 flags)
 //	B_MEDIA_REALTIME_DISABLED is returned.
 //	If there are not enough system resources to enable real-time performance,
 //	B_MEDIA_REALTIME_UNAVAILABLE is returned.
-status_t media_realtime_init_image(image_id image, uint32 flags)
+status_t
+media_realtime_init_image(image_id image, uint32 flags)
 {
 	UNIMPLEMENTED();
 	return B_OK;
@@ -1177,15 +1358,15 @@ status_t media_realtime_init_image(image_id image, uint32 flags)
 //	256 kB of the stack, so you should pass some smaller value you determine
 //	from profiling the thread; typically in the 32-64kB range.
 //	Return values are the same as for media_prepare_realtime_image().
-status_t media_realtime_init_thread(thread_id thread, size_t stack_used, uint32 flags)
+status_t
+media_realtime_init_thread(thread_id thread, size_t stack_used, uint32 flags)
 {
 	UNIMPLEMENTED();
 	return B_OK;
 }
 
-/*************************************************************
- * media_encode_info
- *************************************************************/
+
+// #pragma mark - media_encode_info
 
 
 media_encode_info::media_encode_info()
