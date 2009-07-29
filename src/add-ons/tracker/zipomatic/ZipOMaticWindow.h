@@ -1,46 +1,48 @@
-#ifndef __ZIPPO_WINDOW_H__
-#define __ZIPPO_WINDOW_H__
+#ifndef _ZIPOMATIC_WINDOW_H
+#define _ZIPOMATIC_WINDOW_H
 
-#include <Window.h>
-#include <MenuBar.h>
+
 #include <Bitmap.h>
 #include <Menu.h>
+#include <MenuBar.h>
 #include <MenuItem.h>
+#include <Window.h>
 
 #include "ZipOMaticSettings.h"
-class ZippoView;
-class ZipperThread;
+#include "ZipOMaticView.h"
+#include "ZipperThread.h"
+
 
 class ZippoWindow : public BWindow
 {
 public:
-					ZippoWindow			(BMessage * a_message = NULL);
-					~ZippoWindow		(void);
-	virtual void	MessageReceived 	(BMessage * a_message);
-	virtual bool	QuitRequested		(void);
-	virtual void	Zoom			 	(BPoint origin, float width, float height);
+							ZippoWindow(BMessage* message = NULL);
+							~ZippoWindow();
+							
+	virtual	void			MessageReceived(BMessage* message);
+	virtual	bool			QuitRequested();
+	virtual	void			Zoom(BPoint origin, float width, float height);
 	
-	bool			IsZipping			(void);
-	
-private:
+			bool			IsZipping();
 			
-	status_t		ReadSettings		(void);
-	status_t		WriteSettings		(void);
+private:
+			status_t		_ReadSettings();
+			status_t		_WriteSettings();
 
-	void			StartZipping		(BMessage * a_message);
-	void			StopZipping			(void);
-	
-	void			CloseWindowOrKeepOpen (void);
+			void			_StartZipping(BMessage* message);
+			void			_StopZipping();
+				
+			void			_CloseWindowOrKeepOpen();
 
-	ZippoView	*	zippoview;
-	ZippoSettings	m_zippo_settings;
-	ZipperThread *	m_zipper_thread;
+			ZippoView*		fView;
+			ZippoSettings	fSettings;
+			ZipperThread*	fThread;
 	
-	bool	m_got_refs_at_window_startup;
-	bool	m_zipping_was_stopped;
-	
-	BMessage	*	m_alert_invoker_message;
-	BInvoker	*	m_alert_window_invoker;
+			bool			fWindowGotRefs;
+			bool			fZippingWasStopped;
+			
+			BInvoker*		fWindowInvoker;
 };
 
-#endif // __ZIPPO_WINDOW_H__
+#endif	// _ZIPOMATIC_WINDOW_H
+

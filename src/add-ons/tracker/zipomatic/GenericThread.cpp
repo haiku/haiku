@@ -11,7 +11,7 @@ GenericThread::GenericThread(const char* thread_name, int32 priority,
 	BMessage* message)	
 	:
 	fThreadDataStore(message),
-	fThreadId(spawn_thread (_ThreadFunction, thread_name, priority, this)),
+	fThreadId(spawn_thread(_ThreadFunction, thread_name, priority, this)),
 	fExecuteUnitSem(create_sem(1, "fExecuteUnitSem")),
 	fQuitRequested(false),
 	fThreadIsPaused(false)
@@ -62,7 +62,7 @@ GenericThread::ThreadFunction()
 			// Subclass and override
 
 		if (status != B_OK)
-			ExecuteUnitFailed (status);
+			ExecuteUnitFailed(status);
 				// Subclass and override
 		
 		EndUnit();	

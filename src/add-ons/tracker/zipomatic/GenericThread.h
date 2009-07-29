@@ -28,7 +28,7 @@ public:
 			status_t		Kill();
 			
 			void			ExitWithReturnValue(status_t returnValue);
-			status_t		SetExitCallback(void (* callback)(void*),
+			status_t		SetExitCallback(void (*callback)(void*),
 								void* data);
 			status_t		WaitForThread(status_t* exitValue);
 			

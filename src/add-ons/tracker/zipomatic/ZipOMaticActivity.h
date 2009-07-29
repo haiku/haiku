@@ -3,39 +3,37 @@
 
 #include <stdlib.h>
 
-#include <Window.h>
-#include <View.h>
 #include <Box.h>
 #include <Bitmap.h>
+#include <View.h>
+#include <Window.h>
+
 
 class Activity : public BView 
 {
-	public:
-		Activity  (BRect a_rect, const char * a_name, uint32 a_resizing_mode, 
-					uint32 a_flags);
-		~Activity	();
+public:
+							Activity(BRect frame, const char* name,
+								uint32 resizing_mode, uint32 flags);
+							~Activity();
 
-					void	Start		();
-					void	Pause		();
-					void	Stop		();
-					bool	IsRunning	();
-			virtual void 	Pulse		();
-			virtual void 	Draw		(BRect a_draw);
-			virtual void	FrameResized (float a_width, float a_height);
+			void			Start();
+			void			Pause();
+			void			Stop();
+			bool			IsRunning();
+	virtual	void			Pulse();
+	virtual	void			Draw(BRect draw);
+	virtual	void			FrameResized(float width, float height);
 				
-	protected:
-					void	CreateBitmap			(void);
-					void	LightenBitmapHighColor	(rgb_color * a_color);
-					void	DrawIntoBitmap			(bool running);
+private:
+			void			_CreateBitmap();
+			void			_LightenBitmapHighColor(rgb_color* color);
+			void			_DrawOnBitmap(bool running);
 
-		bool		m_is_running;
-		pattern		m_pattern;
-		
-		BBitmap	*	m_barberpole_bitmap;
-		BView	*	m_barberpole_bitmap_view;
-
-	private:
-
+			bool			fIsRunning;
+			pattern			fPattern;
+			BBitmap*		fBitmap;
+			BView*			fBitmapView;
 };
 
-#endif
+#endif	// _ACTIVITY_H_
+

@@ -1,336 +1,304 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Jonas Sundström, jonas.sundstrom@kirilla.com
+ *		Jonas Sundström, jonas@kirilla.com
  */
 
 
-#include <Debug.h>
+#include "ZipOMaticWindow.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <Application.h>
-#include <Roster.h>
-#include <InterfaceKit.h>
-#include <String.h>
-#include <FindDirectory.h>
 #include <Directory.h>
-#include <Path.h>
 #include <File.h>
+#include <FindDirectory.h>
+#include <InterfaceKit.h>
+#include <Path.h>
+#include <Roster.h>
+#include <String.h>
 
 #include "ZipOMatic.h"
 #include "ZipOMaticActivity.h"
 #include "ZipOMaticMisc.h"
 #include "ZipOMaticView.h"
-#include "ZipOMaticWindow.h"
 #include "ZipperThread.h"
 
 
-ZippoWindow::ZippoWindow(BMessage * a_message)
-: BWindow(BRect(200,200,430,310), "Zip-O-Matic", B_TITLED_WINDOW, B_NOT_V_RESIZABLE), // | B_NOT_ZOOMABLE),
-	m_zippo_settings				(),
-	m_zipper_thread					(NULL),
-	m_got_refs_at_window_startup	(false),
-	m_zipping_was_stopped			(false),
-	m_alert_invoker_message			(new BMessage ('alrt')),
-	m_alert_window_invoker			(new BInvoker (m_alert_invoker_message, NULL, this))
+ZippoWindow::ZippoWindow(BMessage* message)
+	:
+	BWindow(BRect(200, 200, 430, 310), "Zip-O-Matic", B_TITLED_WINDOW,
+		B_NOT_V_RESIZABLE),
+	fView(NULL),
+	fSettings(),
+	fThread(NULL),
+	fWindowGotRefs(false),
+	fZippingWasStopped(false),
+	fWindowInvoker(new BInvoker(new BMessage('alrt'), NULL, this))
 {
-	PRINT(("ZippoWindow()\n"));
+	status_t status = B_OK;
 
-//	Settings
-	status_t	status	=	B_OK;
-
-	status	=	m_zippo_settings.SetTo("ZipOMatic.msg");
+	status = fSettings.SetTo("ZipOMatic.msg");
 	if (status != B_OK)	
-		error_message("ZippoWindow() - m_zippo_settings.SetTo()", status);
+		ErrorMessage("fSettings.SetTo()", status);
 
-	status	=	m_zippo_settings.InitCheck();
+	status = fSettings.InitCheck();
 	if (status != B_OK)
-		error_message("ZippoWindow() - m_zippo_settings.InitCheck()", status);
+		ErrorMessage("fSettings.InitCheck()", status);
 	
-//	Interface
-	zippoview  =  new ZippoView(Bounds());
-
-	AddChild (zippoview);
+	fView = new ZippoView(Bounds());
+	AddChild(fView);
 	
-	SetSizeLimits(Bounds().Width(), 15000, Bounds().Height(), Bounds().Height());
+	SetSizeLimits(Bounds().Width(), 15000, Bounds().Height(),
+		Bounds().Height());
 
-//	Settings, (on-screen location of window)
-	ReadSettings();
+	_ReadSettings();
 
-//	Start zipper thread
-	if (a_message != NULL)
+	if (message != NULL)
 	{
-		m_got_refs_at_window_startup  =  true;
-		StartZipping (a_message);
+		fWindowGotRefs = true;
+		_StartZipping(message);
 	}
 }
+
 
 ZippoWindow::~ZippoWindow()	
 {
-	PRINT(("ZippoWindow::~ZippoWindow()\n"));
-
-	//delete m_alert_invoker_message;
-	delete m_alert_window_invoker;
-
-	// anything left to clean up?
+	delete fWindowInvoker;
 }
+
 
 void 
-ZippoWindow::MessageReceived		(BMessage * a_message)
+ZippoWindow::MessageReceived(BMessage* message)
 {
-	switch(a_message->what)
-	{
-
+	switch (message->what) {
 		case B_REFS_RECEIVED:
-						StartZipping (a_message);
-						break;
+			_StartZipping(message);
+			break;
 
 		case B_SIMPLE_DATA:
-						if (IsZipping())
-						{	
-							a_message->what = B_REFS_RECEIVED;	
-							be_app_messenger.SendMessage(a_message);
-						}
-						else
-							StartZipping (a_message);
-						break;
+			if (IsZipping()) {	
+				message->what = B_REFS_RECEIVED;	
+				be_app_messenger.SendMessage(message);
+			} else {
+				_StartZipping(message);
+			}
+			break;
 		
-		case 'exit':	// thread has finished		(finished, quit, killed, we don't know)
-						// reset window state
-						{
-							m_zipper_thread = NULL;
-							zippoview->m_activity_view->Stop();
-							zippoview->m_stop_button->SetEnabled(false);
-							zippoview->m_archive_name_view->SetText(" ");
-							if (m_zipping_was_stopped)
-								zippoview->m_zip_output_view->SetText("Stopped");
-							else
-								zippoview->m_zip_output_view->SetText("Archive created OK");
-								
-							CloseWindowOrKeepOpen();
-							break;
-						}
+		case 'exit':
+			// thread has finished - (finished, quit, killed, we don't know)
+			fThread = NULL;
+			fView->fActivityView->Stop();
+			fView->fStopButton->SetEnabled(false);
+			fView->fArchiveNameView->SetText(" ");
+			if (fZippingWasStopped)
+				fView->fZipOutputView->SetText("Stopped");
+			else
+				fView->fZipOutputView->SetText("Archive created OK");
+				
+			_CloseWindowOrKeepOpen();
+			break;
 											
-		case 'exrr':	// thread has finished
-						// reset window state
-						
-						m_zipper_thread = NULL;
-						zippoview->m_activity_view->Stop();
-						zippoview->m_stop_button->SetEnabled(false);
-						zippoview->m_archive_name_view->SetText("");
-						zippoview->m_zip_output_view->SetText("Error creating archive");
-						//CloseWindowOrKeepOpen();
-						break;
+		case 'exrr':	// thread has finished - badly
+			fThread = NULL;
+			fView->fActivityView->Stop();
+			fView->fStopButton->SetEnabled(false);
+			fView->fArchiveNameView->SetText("");
+			fView->fZipOutputView->SetText("Error creating archive");
+			break;
 						
 		case 'strt':
-					{
-						BString archive_filename;
-						if (a_message->FindString("archive_filename", & archive_filename) == B_OK)
-							zippoview->m_archive_name_view->SetText(archive_filename.String());		
-						break;	
-					}		
+		{
+			BString string;
+			if (message->FindString("archive_filename", &string) == B_OK)
+				fView->fArchiveNameView->SetText(string.String());
+			break;
+		}
 
 		case 'outp':
-					{
-						BString zip_output;
-						if (a_message->FindString("zip_output", & zip_output) == B_OK)
-							zippoview->m_zip_output_view->SetText(zip_output.String());		
-						break;	
-					}							
-						
+		{
+			BString string;
+			if (message->FindString("zip_output", &string) == B_OK)
+				fView->fZipOutputView->SetText(string.String());
+			break;
+		}
+
 		case 'alrt':
-					{
-						int32	which_button	=	-1;
-						if (a_message->FindInt32("which", & which_button) == B_OK)
-							if (which_button == 0)
-								StopZipping();
-							else
-							{
-								if (m_zipper_thread != NULL)
-									m_zipper_thread->ResumeExternalZip();
-									
-								zippoview->m_activity_view->Start();
-							}
-						break;	
-					}
-			
-		default:	BWindow::MessageReceived(a_message);	break;			
+		{
+			int32 which_button = -1;
+			if (message->FindInt32("which", &which_button) == B_OK) {
+				if (which_button == 0) {
+					_StopZipping();
+				} else {
+					if (fThread != NULL)
+						fThread->ResumeExternalZip();
+						
+					fView->fActivityView->Start();
+				}
+			}
+			break;
+		}
+		
+		default:
+			BWindow::MessageReceived(message);
+			break;
 	}
 }
 
+
 bool
-ZippoWindow::QuitRequested	(void)
+ZippoWindow::QuitRequested()
 {
-	PRINT(("ZippoWindow::QuitRequested()\n"));
-	
-	if (m_zipper_thread == NULL)
-	{
-		WriteSettings();
+	if (fThread == NULL) {
+		_WriteSettings();
 		be_app_messenger.SendMessage(ZIPPO_WINDOW_QUIT);
 		return true;
-	}
-	else
-	{
-		if (m_zipper_thread != NULL)
-			m_zipper_thread->SuspendExternalZip();
+	} else {
+		if (fThread != NULL)
+			fThread->SuspendExternalZip();
 	
-		zippoview->m_activity_view->Pause();
+		fView->fActivityView->Pause();
 	
-		BAlert * quit_requester = new BAlert ("Stop or Continue", "Are you sure you want to "
-									"stop creating this archive?", "Stop", "Continue",
-									 NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
-		quit_requester->Go(m_alert_window_invoker);
+		BAlert* alert = new BAlert("Stop or Continue",
+			"Are you sure you want to stop creating this archive?", "Stop",
+			"Continue", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->Go(fWindowInvoker);
 		return false;
 	}
 }
 
+
 status_t
-ZippoWindow::ReadSettings	(void)
+ZippoWindow::_ReadSettings()
 {
-	status_t	status	=	B_OK;
+	status_t status = B_OK;
 
-	status	=	m_zippo_settings.InitCheck();
+	status = fSettings.InitCheck();
 	if (status != B_OK)
-		error_message("m_zippo_settings.InitCheck()", status);
+		ErrorMessage("fSettings.InitCheck()", status);
 
-	status	=	m_zippo_settings.ReadSettings();
+	status = fSettings.ReadSettings();
 	if (status != B_OK)
-		error_message("m_zippo_settings.ReadSettings()", status);
+		ErrorMessage("fSettings.ReadSettings()", status);
 
-	BRect	window_rect;
+	BRect windowRect;
 	
-	status	=	m_zippo_settings.FindRect("window_rect", & window_rect);
+	status = fSettings.FindRect("windowRect", &windowRect);
 	if (status != B_OK)
 	{
-		error_message("m_settings_message->FindRect(window_rect)", status);
+		ErrorMessage("fSettings.FindRect(windowRect)", status);
 		return status;
 	}
 	
-	ResizeTo (window_rect.Width(), window_rect.Height());
-	MoveTo (window_rect.LeftTop());
+	ResizeTo(windowRect.Width(), windowRect.Height());
+	MoveTo(windowRect.LeftTop());
 	
 	return B_OK;
 }
 
+
 status_t
-ZippoWindow::WriteSettings	(void)
+ZippoWindow::_WriteSettings()
 {
-	status_t	status	=	B_OK;
+	status_t status = B_OK;
 
-	status	=	m_zippo_settings.InitCheck();
+	status = fSettings.InitCheck();
 	if (status != B_OK)
-		error_message("m_zippo_settings.InitCheck()", status);
+		ErrorMessage("fSettings.InitCheck()", status);
 
-	status	=	m_zippo_settings.MakeEmpty();
+	status = fSettings.MakeEmpty();
 	if (status != B_OK)
-		error_message("m_zippo_settings.MakeEmpty()", status);
+		ErrorMessage("fSettings.MakeEmpty()", status);
 
-	status	=	m_zippo_settings.AddRect("window_rect", Frame());
+	status = fSettings.AddRect("windowRect", Frame());
 	if (status != B_OK)
 	{
-		error_message("m_settings_message->AddRect(window_rect)", status);
+		ErrorMessage("fSettings.AddRect(windowRect)", status);
 		return status;
 	}
 	
-	status	=	m_zippo_settings.WriteSettings();
+	status = fSettings.WriteSettings();
 	if (status != B_OK)
 	{
-		error_message("m_zippo_settings.WriteSettings()", status);
+		ErrorMessage("fSettings.WriteSettings()", status);
 		return status;
 	}
-
 	
 	return B_OK;
 }
 
-void
-ZippoWindow::StartZipping (BMessage * a_message)
-{
-	PRINT(("ZippoWindow::StartZipping()\n"));
-	
-	zippoview->m_stop_button->SetEnabled(true);
-	zippoview->m_activity_view->Start();
-
-	m_zipper_thread	=	new ZipperThread (a_message, this);
-	m_zipper_thread->Start();
-
-	m_zipping_was_stopped  =  false;
-}
 
 void
-ZippoWindow::StopZipping (void)
+ZippoWindow::_StartZipping(BMessage* message)
 {
-	PRINT(("ZippoWindow::StopZipping()\n"));
+	fView->fStopButton->SetEnabled(true);
+	fView->fActivityView->Start();
 
-	m_zipping_was_stopped  =  true;
-
-	zippoview->m_stop_button->SetEnabled(false);
+	fThread = new ZipperThread(message, this);
+	fThread->Start();
 	
-	zippoview->m_activity_view->Stop();
-
-	m_zipper_thread->InterruptExternalZip();
-	m_zipper_thread->Quit();
-	
-	status_t  status  =  B_OK;
-	m_zipper_thread->WaitForThread (& status);
-	m_zipper_thread  =  NULL;
-
-	zippoview->m_archive_name_view->SetText(" ");
-	zippoview->m_zip_output_view->SetText("Stopped");
-
-	CloseWindowOrKeepOpen();
+	fZippingWasStopped = false;
 }
+
+
+void
+ZippoWindow::_StopZipping()
+{
+	fZippingWasStopped = true;
+
+	fView->fStopButton->SetEnabled(false);
+	fView->fActivityView->Stop();
+
+	fThread->InterruptExternalZip();
+	fThread->Quit();
+	
+	status_t status = B_OK;
+	fThread->WaitForThread(&status);
+	fThread = NULL;
+
+	fView->fArchiveNameView->SetText(" ");
+	fView->fZipOutputView->SetText("Stopped");
+
+	_CloseWindowOrKeepOpen();
+}
+
 
 bool
-ZippoWindow::IsZipping (void)
+ZippoWindow::IsZipping()
 {
-	if (m_zipper_thread == NULL)
+	if (fThread == NULL)
 		return false;
 	else
 		return true;
 }
 
+
 void
-ZippoWindow::CloseWindowOrKeepOpen (void)
+ZippoWindow::_CloseWindowOrKeepOpen()
 {
-	if (m_got_refs_at_window_startup)
+	if (fWindowGotRefs)
 		PostMessage(B_QUIT_REQUESTED);
 }
 
+
 void
-ZippoWindow::Zoom (BPoint origin, float width, float height)
+ZippoWindow::Zoom(BPoint origin, float width, float height)
 {
-	/*
-	float archive_name_view_preferred_width;
-	float zip_output_view_preferred_width;
-	float throw_away_height;
-	zippoview->GetPreferredSize(& archive_name_view_preferred_width, & throw_away_height);
-	zippoview->GetPreferredSize(& zip_output_view_preferred_width, & throw_away_height);
-	*/
-
-	//	BStringView::GetPreferredSize appears to be broken,
-	//	so we have to use BView::StringWidth() instead
-
-	if (IsZipping())
-	{
-		float archive_name_view_preferred_width  =  zippoview->StringWidth(zippoview->m_archive_name_view->Text());
-		float zip_output_view_preferred_width  =  zippoview->StringWidth(zippoview->m_zip_output_view->Text());
+	if (IsZipping()) {
+		float archiveNameWidth =
+			fView->StringWidth(fView->fArchiveNameView->Text());
+		float zipOutputWidth  = 
+			fView->StringWidth(fView->fZipOutputView->Text());
 	
-		float the_wide_string;
-	
-		if (zip_output_view_preferred_width > archive_name_view_preferred_width)
-			the_wide_string  =  zip_output_view_preferred_width;
+		if (zipOutputWidth > archiveNameWidth)
+			ResizeTo(zipOutputWidth, Bounds().Height());
 		else
-			the_wide_string  =  archive_name_view_preferred_width;
+			ResizeTo(archiveNameWidth, Bounds().Height());
 		
-		ResizeTo(the_wide_string, Bounds().Height());
-	}
-	else
-	{
+	} else {
 		ResizeTo(230,110);
 	}
 }

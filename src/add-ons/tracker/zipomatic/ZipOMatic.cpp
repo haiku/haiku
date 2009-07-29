@@ -1,176 +1,159 @@
 // license: public domain
 // authors: jonas.sundstrom@kirilla.com
 
-#include <TrackerAddOn.h>
-#include <Roster.h>
-#include <Debug.h>
 
 #include "ZipOMatic.h"
+
+#include <Roster.h>
+#include <TrackerAddOn.h>
+
 #include "ZipOMaticMisc.h"
 #include "ZipOMaticWindow.h"
 
-extern "C" void 
-process_refs(entry_ref dir_ref, BMessage * msg, void *)
-{
-	msg->AddRef("dir_ref", & dir_ref);
 
-	status_t	status		=	B_OK;	
-	type_code	ref_type	=	B_REF_TYPE;
-	int32		ref_count	=	0;
+extern "C" void 
+process_refs(entry_ref dirRef, BMessage* message, void*)
+{
+	status_t status = B_OK;
+	type_code refType = B_REF_TYPE;
+	int32 refCount = 0;
 	
-	status  =  msg->GetInfo("refs", & ref_type, & ref_count);
-	if (status != B_OK || ref_count < 1)
-		be_roster->Launch (ZIPOMATIC_APP_SIG);
+	status = message->GetInfo("refs", &refType, &refCount);
+	if (status != B_OK || refCount < 1)
+		be_roster->Launch(ZIPOMATIC_APP_SIG);
 	else
-		be_roster->Launch (ZIPOMATIC_APP_SIG, msg );
+		be_roster->Launch(ZIPOMATIC_APP_SIG, message);
 }
 
-int main()
+
+int
+main()
 {
 	ZipOMatic app;
 	app.Run();
 
-	return (0);
+	return 0;
 }
 
-ZipOMatic::ZipOMatic  (void)
- :	BApplication			(ZIPOMATIC_APP_SIG),
- 	m_got_refs				(false)
+
+ZipOMatic::ZipOMatic()
+	:
+	BApplication(ZIPOMATIC_APP_SIG),
+	fGotRefs(false)
 {
-	PRINT(("ZipOMatic::ZipOMatic()\n"));
-	
-	// void
+
 }
 
-ZipOMatic::~ZipOMatic  (void)	
+
+ZipOMatic::~ZipOMatic()
 {
-	PRINT(("ZipOMatic::~ZipOMatic()\n"));
-	
-	fflush(stdout);
+
 }
+
 
 void 
-ZipOMatic::RefsReceived  (BMessage * a_message)
+ZipOMatic::RefsReceived(BMessage* message)
 {
-	PRINT(("ZipOMatic::RefsReceived()\n"));
-
 	if (IsLaunching())
-		m_got_refs  =  true;
+		fGotRefs = true;
 	
-	BMessage * msg = new BMessage (* a_message);
+	BMessage* msg = new BMessage(*message);
 
-	UseExistingOrCreateNewWindow(msg);
+	_UseExistingOrCreateNewWindow(msg);
 }
+
 
 void
-ZipOMatic::ReadyToRun  (void)
+ZipOMatic::ReadyToRun()
 {
-	PRINT(("ZipOMatic::ReadyToRun()\n"));
-	
-	if (m_got_refs)
-	{
-		// nothing - wait on window(s) to finish
-	}
-	else
-		UseExistingOrCreateNewWindow();
+	if (!fGotRefs)
+		_UseExistingOrCreateNewWindow();
 }
 
+
 void 
-ZipOMatic::MessageReceived  (BMessage * a_message)
+ZipOMatic::MessageReceived(BMessage* message)
 {
-	PRINT(("ZipOMatic::MessageReceived()\n"));
-	
-	switch(a_message->what)
-	{
+	switch (message->what) {
 		case ZIPPO_WINDOW_QUIT:
-		
-				snooze (200000);
-				if (CountWindows() == 0)
-					Quit();
-				break;
+			snooze(200000);
+			if (CountWindows() == 0)
+				Quit();
+			break;
 					
 		case B_SILENT_RELAUNCH:
-		
-				SilentRelaunch();
-				break;
-				
-		default:	BApplication::MessageReceived(a_message);	break;			
+			_SilentRelaunch();
+			break;
+
+		default:
+			BApplication::MessageReceived(message);
+			break;			
 	}
-	
 }
+
 
 bool
 ZipOMatic::QuitRequested  (void)
 {
-	// intelligent (?) closing of the windows
-	//
-	// overriding BApplication::QuitRequested();
+	// Overriding BApplication's default behaviour on purpose
+	// so we can have multiple zippers pause in unison.
 	
 	if (CountWindows() <= 0)
 		return true;
 	
-	BList	window_list	(5);
-	int32	window_count  =  0;
-	BWindow	*	window;
+	BList list(5);
+	BWindow* window;
 	
-	// build list of windows
-	while (1)
-	{
-		window =  WindowAt(window_count++);
+	for (int32 i = 0;; i++) {
+		window =  WindowAt(i);
 		if (window == NULL)
 			break;
 			
-		window_list.AddItem(window);
+		list.AddItem(window);
 	}
 	
-	// ask windows to quit
-	while (1)
-	{
-		window = (BWindow *) window_list.RemoveItem(int32(0));
+	while (true) {
+		window = (BWindow*) list.RemoveItem(int32(0));
 		if (window == NULL)
 			break;
 		
-		if (window->Lock())
-		{
+		if (window->Lock()) {
 			window->PostMessage(B_QUIT_REQUESTED);
 			window->Unlock();
 		}
 	}
 
-	PRINT(("CountWindows(): %ld\n", CountWindows()));
-
 	if (CountWindows() <= 0)
 		return true;
 	
-	return false; 	// default: stay alive
+	return false;
 }
 
+
 void
-ZipOMatic::SilentRelaunch  (void)
+ZipOMatic::_SilentRelaunch()
 {
-	UseExistingOrCreateNewWindow();
+	_UseExistingOrCreateNewWindow();
 }
 
-void
-ZipOMatic::UseExistingOrCreateNewWindow  (BMessage * a_message)
-{
-	int32      		window_count  =  0;
-	ZippoWindow *	window;
-	bool			found_non_busy_window	=	false;
 
-	while (1)
-	{
-		window = dynamic_cast<ZippoWindow *>(WindowAt(window_count++));
+void
+ZipOMatic::_UseExistingOrCreateNewWindow(BMessage* message)
+{
+	int32 windowCount = 0;
+	ZippoWindow* window;
+	bool foundNonBusyWindow = false;
+
+	while (1) {
+		window = dynamic_cast<ZippoWindow*>(WindowAt(windowCount++));
 		if (window == NULL)
 			break;
 		
-		if (window->Lock())
-		{
-			if (! window->IsZipping())
-			{
-				found_non_busy_window  =  true;
-				if (a_message != NULL)
-					window->PostMessage(a_message);
+		if (window->Lock()) {
+			if (!window->IsZipping()) {
+				foundNonBusyWindow = true;
+				if (message != NULL)
+					window->PostMessage(message);
 				window->Activate();
 				window->Unlock();
 				break;
@@ -179,9 +162,10 @@ ZipOMatic::UseExistingOrCreateNewWindow  (BMessage * a_message)
 		}
 	}
 	
-	if (! found_non_busy_window)
+	if (!foundNonBusyWindow)
 	{
-		ZippoWindow	*	m_window	=	new ZippoWindow(a_message);
-		m_window->Show();
+		ZippoWindow * window = new ZippoWindow(message);
+		window->Show();
 	}
 }
+

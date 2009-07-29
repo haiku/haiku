@@ -1,22 +1,21 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Jonas Sundström, jonas.sundstrom@kirilla.com
+ *		Jonas Sundström, jonas@kirilla.com
  */
 
 
 #include "ZipOMaticMisc.h"
 
-#include <Debug.h>
-#include <Path.h>
-
 #include <string.h>
+
+#include <Debug.h>
 
 
 status_t  
-find_and_create_directory(directory_which which, BVolume* volume,
+FindAndCreateDirectory(directory_which which, BVolume* volume,
 	const char* relativePath, BPath* fullPath)
 {
 	BPath path;
@@ -46,7 +45,7 @@ find_and_create_directory(directory_which which, BVolume* volume,
 
 
 void
-error_message(const char* text, int32 status)
+ErrorMessage(const char* text, int32 status)
 {
 	PRINT(("%s: %s\n", text, strerror(status)));
 }

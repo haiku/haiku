@@ -23,7 +23,7 @@
 #include "ZipOMaticWindow.h"
 
 
-ZipperThread::ZipperThread (BMessage* refsMessage, BWindow* window)
+ZipperThread::ZipperThread(BMessage* refsMessage, BWindow* window)
 	:
 	GenericThread("ZipperThread", B_NORMAL_PRIORITY, refsMessage),
 	fWindowMessenger(window),
@@ -61,7 +61,7 @@ ZipperThread::ThreadStartup()
 	if (status != B_OK)
 		return status;
 
-	for (int index = 0;	index < refCount; index++) {
+	for	(int index = 0; index < refCount; index++) {
 		fThreadDataStore->FindRef("refs", index, &ref);
 
 		if (index > 0) {
@@ -109,7 +109,7 @@ ZipperThread::ThreadStartup()
 	argv[2] = strdup(archiveName.String());
 
 	// files to zip
-	for (int index = 0;  index < refCount;  index++) {
+	for (int index = 0; index < refCount; index++) {
 		fThreadDataStore->FindRef("refs", index, &ref);
 
 		if (sameFolder) {
@@ -190,7 +190,7 @@ ZipperThread::ThreadShutdown()
 void
 ZipperThread::ThreadStartupFailed(status_t status)
 {
-	error_message("ZipperThread::ThreadStartupFailed() \n", status);
+	ErrorMessage("ZipperThread::ThreadStartupFailed() \n", status);
 	Quit();
 }
 
@@ -198,7 +198,7 @@ ZipperThread::ThreadStartupFailed(status_t status)
 void
 ZipperThread::ExecuteUnitFailed(status_t status)
 {
-	error_message("ZipperThread::ExecuteUnitFailed() \n", status);
+	ErrorMessage("ZipperThread::ExecuteUnitFailed() \n", status);
 
 	if (status == EOF) {
 		// thread has finished, been quit or killed, we don't know
@@ -215,7 +215,7 @@ ZipperThread::ExecuteUnitFailed(status_t status)
 void
 ZipperThread::ThreadShutdownFailed(status_t status)
 {
-	error_message("ZipperThread::ThreadShutdownFailed() \n", status);
+	ErrorMessage("ZipperThread::ThreadShutdownFailed() \n", status);
 }
 
 
