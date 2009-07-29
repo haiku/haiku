@@ -1,13 +1,15 @@
 /*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
-/* Mutex and recursive_lock code */
+
+/*! Mutex and recursive_lock code */
+
 
 #include <lock.h>
 
@@ -390,7 +392,7 @@ dump_rw_lock_info(int argc, char** argv)
 		return 0;
 	}
 
-	rw_lock* lock = (rw_lock*)strtoul(argv[1], NULL, 0);
+	rw_lock* lock = (rw_lock*)parse_expression(argv[1]);
 
 	if (!IS_KERNEL_ADDRESS(lock)) {
 		kprintf("invalid address: %p\n", lock);
@@ -402,7 +404,7 @@ dump_rw_lock_info(int argc, char** argv)
 	kprintf("  holder:          %ld\n", lock->holder);
 	kprintf("  reader count:    %ld\n", lock->reader_count);
 	kprintf("  writer count:    %ld\n", lock->writer_count);
-	kprintf("  owner count:	    %ld\n", lock->owner_count);
+	kprintf("  owner count:     %ld\n", lock->owner_count);
 	kprintf("  flags:           %#lx\n", lock->flags);
 
 	kprintf("  waiting threads:");
@@ -626,7 +628,7 @@ dump_mutex_info(int argc, char** argv)
 		return 0;
 	}
 
-	mutex* lock = (mutex*)strtoul(argv[1], NULL, 0);
+	mutex* lock = (mutex*)parse_expression(argv[1]);
 
 	if (!IS_KERNEL_ADDRESS(lock)) {
 		kprintf("invalid address: %p\n", lock);
