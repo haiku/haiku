@@ -27,7 +27,7 @@ public:
 	partition_id PartitionId() const;
 
 protected:
-	const disk_device_data	*fDevice;
+	const disk_device_data*	fDevice;
 
 private:
 	partition_id			fPartitionID;

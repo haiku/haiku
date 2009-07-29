@@ -58,7 +58,7 @@ using std::nothrow;
 #ifdef _BOOT_MODE
 
 inline int32
-atomic_add(int32 *a, int32 num)
+atomic_add(int32* a, int32 num)
 {
 	int32 oldA = *a;
 	*a += num;
@@ -72,7 +72,7 @@ atomic_add(int32 *a, int32 num)
 
 // get_type_for_content_type (for both pm_* and ep_*)
 static status_t
-get_type_for_content_type(const char *contentType, char *type)
+get_type_for_content_type(const char* contentType, char* type)
 {
 	TRACE(("intel: get_type_for_content_type(%s)\n",
 		   contentType));
@@ -111,7 +111,7 @@ pm_std_ops(int32 op, ...)
 
 // pm_identify_partition
 static float
-pm_identify_partition(int fd, partition_data *partition, void **cookie)
+pm_identify_partition(int fd, partition_data* partition, void** cookie)
 {
 	// check parameters
 	if (fd < 0 || !partition || !cookie)
@@ -127,7 +127,7 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 	}
 
 	// allocate a PartitionMap
-	PartitionMapCookie *map = new(nothrow) PartitionMapCookie;
+	PartitionMapCookie* map = new(nothrow) PartitionMapCookie;
 	if (!map)
 		return -1;
 
@@ -176,7 +176,7 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 
 // pm_scan_partition
 static status_t
-pm_scan_partition(int fd, partition_data *partition, void *cookie)
+pm_scan_partition(int fd, partition_data* partition, void* cookie)
 {
 	// check parameters
 	if (fd < 0 || !partition || !cookie)
@@ -186,7 +186,7 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 		   partition->id, partition->offset, partition->size,
 		   partition->block_size));
 
-	PartitionMapCookie *map = (PartitionMapCookie*)cookie;
+	PartitionMapCookie* map = (PartitionMapCookie*)cookie;
 	// fill in the partition_data structure
 	partition->status = B_PARTITION_VALID;
 	partition->flags |= B_PARTITION_PARTITIONING_SYSTEM;
@@ -199,9 +199,9 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 	status_t error = B_OK;
 	int32 index = 0;
 	for (int32 i = 0; i < 4; i++) {
-		PrimaryPartition *primary = map->PrimaryPartitionAt(i);
+		PrimaryPartition* primary = map->PrimaryPartitionAt(i);
 		if (!primary->IsEmpty()) {
-			partition_data *child = create_child_partition(partition->id,
+			partition_data* child = create_child_partition(partition->id,
 				index, partition->offset + primary->Offset(), primary->Size(),
 				-1);
 			index++;
@@ -237,7 +237,7 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 	} else {
 		partition->content_cookie = NULL;
 		for (int32 i = 0; i < partition->child_count; i++) {
-			if (partition_data *child = get_child_partition(partition->id, i))
+			if (partition_data* child = get_child_partition(partition->id, i))
 				child->cookie = NULL;
 		}
 	}
@@ -248,10 +248,10 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 
 // pm_free_identify_partition_cookie
 static void
-pm_free_identify_partition_cookie(partition_data */*partition*/, void *cookie)
+pm_free_identify_partition_cookie(partition_data*/* partition*/, void* cookie)
 {
 	if (cookie) {
-		PartitionMapCookie *map = (PartitionMapCookie*)cookie;
+		PartitionMapCookie* map = (PartitionMapCookie*)cookie;
 		if (atomic_add(&map->ref_count, -1) == 1)
 			delete map;
 	}
@@ -260,7 +260,7 @@ pm_free_identify_partition_cookie(partition_data */*partition*/, void *cookie)
 
 // pm_free_partition_cookie
 static void
-pm_free_partition_cookie(partition_data *partition)
+pm_free_partition_cookie(partition_data* partition)
 {
 	// called for the primary partitions: the PrimaryPartition is allocated
 	// by the partition containing the partition map
@@ -271,7 +271,7 @@ pm_free_partition_cookie(partition_data *partition)
 
 // pm_free_partition_content_cookie
 static void
-pm_free_partition_content_cookie(partition_data *partition)
+pm_free_partition_content_cookie(partition_data* partition)
 {
 	if (partition && partition->content_cookie) {
 		pm_free_identify_partition_cookie(partition, partition->content_cookie);
@@ -299,7 +299,7 @@ ep_std_ops(int32 op, ...)
 
 // ep_identify_partition
 static float
-ep_identify_partition(int fd, partition_data *partition, void **cookie)
+ep_identify_partition(int fd, partition_data* partition, void** cookie)
 {
 	// check parameters
 	if (fd < 0 || !partition || !cookie || !partition->cookie)
@@ -314,7 +314,7 @@ ep_identify_partition(int fd, partition_data *partition, void **cookie)
 		|| strcmp(partition->type, kPartitionTypeIntelExtended)) {
 		return -1;
 	}
-	partition_data *parent = get_parent_partition(partition->id);
+	partition_data* parent = get_parent_partition(partition->id);
 	if (!parent || !parent->content_type
 		|| strcmp(parent->content_type, kPartitionTypeIntel)) {
 		return -1;
@@ -327,7 +327,7 @@ ep_identify_partition(int fd, partition_data *partition, void **cookie)
 
 // ep_scan_partition
 static status_t
-ep_scan_partition(int fd, partition_data *partition, void *cookie)
+ep_scan_partition(int fd, partition_data* partition, void* cookie)
 {
 	// check parameters
 	if (fd < 0 || !partition || !partition->cookie)
@@ -336,10 +336,10 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 	TRACE(("intel: ep_scan_partition(%d, %lld, %lld, %ld)\n", fd,
 		partition->offset, partition->size, partition->block_size));
 
-	partition_data *parent = get_parent_partition(partition->id);
+	partition_data* parent = get_parent_partition(partition->id);
 	if (!parent)
 		return B_ERROR;
-	PrimaryPartition *primary = (PrimaryPartition*)partition->cookie;
+	PrimaryPartition* primary = (PrimaryPartition*)partition->cookie;
 	// fill in the partition_data structure
 	partition->status = B_PARTITION_VALID;
 	partition->flags |= B_PARTITION_PARTITIONING_SYSTEM;
@@ -352,8 +352,8 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 	status_t error = B_OK;
 	int32 index = 0;
 	for (int32 i = 0; i < primary->CountLogicalPartitions(); i++) {
-		LogicalPartition *logical = primary->LogicalPartitionAt(i);
-		partition_data *child = create_child_partition(partition->id, index,
+		LogicalPartition* logical = primary->LogicalPartitionAt(i);
+		partition_data* child = create_child_partition(partition->id, index,
 			parent->offset + logical->Offset(), logical->Size(), -1);
 		index++;
 		if (!child) {
@@ -389,7 +389,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 	if (error != B_OK) {
 		partition->content_cookie = NULL;
 		for (int32 i = 0; i < partition->child_count; i++) {
-			if (partition_data *child = get_child_partition(partition->id, i))
+			if (partition_data* child = get_child_partition(partition->id, i))
 				child->cookie = NULL;
 		}
 	}
@@ -399,7 +399,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 
 // ep_free_identify_partition_cookie
 static void
-ep_free_identify_partition_cookie(partition_data *partition, void *cookie)
+ep_free_identify_partition_cookie(partition_data* partition, void* cookie)
 {
 	// nothing to do
 }
@@ -407,7 +407,7 @@ ep_free_identify_partition_cookie(partition_data *partition, void *cookie)
 
 // ep_free_partition_cookie
 static void
-ep_free_partition_cookie(partition_data *partition)
+ep_free_partition_cookie(partition_data* partition)
 {
 	// the logical partition's cookie belongs to the partition map partition
 	if (partition)
@@ -417,7 +417,7 @@ ep_free_partition_cookie(partition_data *partition)
 
 // ep_free_partition_content_cookie
 static void
-ep_free_partition_content_cookie(partition_data *partition)
+ep_free_partition_content_cookie(partition_data* partition)
 {
 	// the extended partition's cookie belongs to the partition map partition
 	if (partition)
@@ -603,8 +603,8 @@ static partition_module_info intel_extended_partition_module =
 
 
 #ifndef _BOOT_MODE
-extern "C" partition_module_info *modules[];
-_EXPORT partition_module_info *modules[] =
+extern "C" partition_module_info* modules[];
+_EXPORT partition_module_info* modules[] =
 {
 	&intel_partition_map_module,
 	&intel_extended_partition_module,
