@@ -996,6 +996,8 @@ Journal::Unlock(Transaction* owner, bool success)
 			status_t status = _TransactionDone(success);
 			if (status != B_OK)
 				return status;
+
+			fOwner->UnlockInodes(success);
 		}
 
 		fTimestamp = system_time();
@@ -1178,7 +1180,7 @@ Transaction::RemoveInode(Inode* inode)
 
 
 void
-Transaction::_UnlockInodes(bool success)
+Transaction::UnlockInodes(bool success)
 {
 	while (Inode* inode = fLockedInodes.RemoveHead()) {
 		if (success) {

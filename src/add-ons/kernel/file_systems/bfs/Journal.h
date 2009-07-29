@@ -110,10 +110,8 @@ public:
 
 	~Transaction()
 	{
-		if (fJournal != NULL) {
+		if (fJournal != NULL)
 			fJournal->Unlock(this, false);
-			_UnlockInodes(false);
-		}
 	}
 
 	status_t Start(Volume* volume, off_t refBlock);
@@ -124,10 +122,8 @@ public:
 		status_t status = B_OK;
 		if (fJournal != NULL) {
 			status = fJournal->Unlock(this, true);
-			if (status == B_OK) {
-				_UnlockInodes(true);
+			if (status == B_OK)
 				fJournal = NULL;
-			}
 		}
 		return status;
 	}
@@ -183,12 +179,12 @@ public:
 	void AddInode(Inode* inode);
 	void RemoveInode(Inode* inode);
 
+	void UnlockInodes(bool success);
+
 private:
 	Transaction(const Transaction& other);
 	Transaction& operator=(const Transaction& other);
 		// no implementation
-
-	void _UnlockInodes(bool success);
 
 	Journal*	fJournal;
 	InodeList	fLockedInodes;
