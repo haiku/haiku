@@ -713,9 +713,8 @@ Journal::_WriteTransactionToLog()
 			// We created a transaction larger than one we can write back to
 			// disk - the only option we have (besides risking disk corruption
 			// by writing it back anyway), is to let it fail.
-			dprintf("transaction too large (%d blocks, %d main, log size %d)!\n",
-				(int)_TransactionSize(), (int)cache_blocks_in_main_transaction(
-				fVolume->BlockCache(), fTransactionID), (int)fLogSize);
+			dprintf("transaction too large (%d blocks, log size %d)!\n",
+				(int)_TransactionSize(), (int)fLogSize);
 			return B_BUFFER_OVERFLOW;
 		}
 	}
@@ -881,6 +880,14 @@ Journal::_WriteTransactionToLog()
 		fTransactionID = cache_detach_sub_transaction(fVolume->BlockCache(),
 			fTransactionID, _TransactionWritten, logEntry);
 		fUnwrittenTransactions = 1;
+
+		if (status == B_OK && _TransactionSize() > fLogSize) {
+			// If the transaction is too large after writing, there is no way to
+			// recover, so let this transaction fail.
+			dprintf("transaction too large (%d blocks, log size %d)!\n",
+				(int)_TransactionSize(), (int)fLogSize);
+			return B_BUFFER_OVERFLOW;
+		}
 	} else {
 		cache_end_transaction(fVolume->BlockCache(), fTransactionID,
 			_TransactionWritten, logEntry);
