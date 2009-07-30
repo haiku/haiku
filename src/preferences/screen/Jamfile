@@ -5,8 +5,9 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UseLibraryHeaders icon ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
+UsePrivateHeaders interface ;
 
-Preference Screen : 
+Preference Screen :
 	AlertView.cpp
 	AlertWindow.cpp
 	gtf.cpp

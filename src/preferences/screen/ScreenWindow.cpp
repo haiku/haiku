@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,12 +13,40 @@
  */
 
 
+#include "ScreenWindow.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <Alert.h>
+#include <Application.h>
+#include <Box.h>
+#include <Button.h>
+#include <Directory.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <InterfaceDefs.h>
+#include <LayoutBuilder.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
+#include <MenuField.h>
+#include <Messenger.h>
+#include <Path.h>
+#include <PopUpMenu.h>
+#include <Screen.h>
+#include <String.h>
+#include <StringView.h>
+#include <Roster.h>
+#include <Window.h>
+
+#include <InterfacePrivate.h>
+
 #include "AlertWindow.h"
 #include "Constants.h"
 #include "RefreshWindow.h"
 #include "MonitorView.h"
 #include "ScreenSettings.h"
-#include "ScreenWindow.h"
 #include "Utility.h"
 
 /* Note, this headers defines a *private* interface to the Radeon accelerant.
@@ -31,29 +59,6 @@
  * which may even happen before R1 hits the streets.
  */
 #include "multimon.h"	// the usual: DANGER WILL, ROBINSON!
-
-#include <Alert.h>
-#include <Application.h>
-#include <Box.h>
-#include <Button.h>
-#include <Directory.h>
-#include <File.h>
-#include <FindDirectory.h>
-#include <InterfaceDefs.h>
-#include <MenuBar.h>
-#include <MenuItem.h>
-#include <MenuField.h>
-#include <Messenger.h>
-#include <Path.h>
-#include <PopUpMenu.h>
-#include <Screen.h>
-#include <String.h>
-#include <Roster.h>
-#include <Window.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 
 const char* kBackgroundsSignature = "application/x-vnd.haiku-backgrounds";
@@ -69,11 +74,13 @@ static const struct {
 	{ B_RGB16, 16, "16 Bits/Pixel, 65536 Colors" },
 	{ B_RGB32, 32, "32 Bits/Pixel, 16 Million Colors" }
 };
-static const int32 kColorSpaceCount = sizeof(kColorSpaces) / sizeof(kColorSpaces[0]);
+static const int32 kColorSpaceCount
+	= sizeof(kColorSpaces) / sizeof(kColorSpaces[0]);
 
 // list of standard refresh rates
 static const int32 kRefreshRates[] = { 60, 70, 72, 75, 80, 85, 95, 100 };
-static const int32 kRefreshRateCount = sizeof(kRefreshRates) / sizeof(kRefreshRates[0]);
+static const int32 kRefreshRateCount
+	= sizeof(kRefreshRates) / sizeof(kRefreshRates[0]);
 
 // list of combine modes
 static const struct {
@@ -84,14 +91,8 @@ static const struct {
 	{ kCombineHorizontally, "horizontally" },
 	{ kCombineVertically, "vertically" }
 };
-static const int32 kCombineModeCount = sizeof(kCombineModes) / sizeof(kCombineModes[0]);
-
-enum {
-	SHOW_COMBINE_FIELD		= 0x01,
-	SHOW_SWAP_FIELD			= 0x02,
-	SHOW_LAPTOP_PANEL_FIELD	= 0x04,
-	SHOW_TV_STANDARD_FIELD	= 0x08,
-};
+static const int32 kCombineModeCount
+	= sizeof(kCombineModes) / sizeof(kCombineModes[0]);
 
 
 static BString
@@ -152,70 +153,14 @@ screen_errors(status_t status)
 }
 
 
-static float
-max_label_width(BMenuField* control, float widestLabel)
-{
-	float labelWidth = control->StringWidth(control->Label());
-	if (widestLabel < labelWidth)
-		return labelWidth;
-	return widestLabel;
-}
-
-
-static BRect
-stack_and_align_menu_fields(const BList& menuFields)
-{
-	float widestLabel = 0.0;
-	int32 count = menuFields.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		BMenuField* menuField = (BMenuField*)menuFields.ItemAtFast(i);
-		widestLabel = max_label_width(menuField, widestLabel);
-	}
-
-	// add some room (but only if there is text at all)
-	if (widestLabel > 0.0)
-		widestLabel += 5.0;
-
-	// make all controls the same width
-	float widestField = 0.0f;
-	for (int32 i = 0; i < count; i++) {
-		BMenuField* menuField = (BMenuField*)menuFields.ItemAtFast(i);
-		if (widestField == 0.0f) {
-			widestField = menuField->StringWidth("9999 x 9999 WWW")
-				+ widestLabel;
-		}
-		menuField->SetAlignment(B_ALIGN_RIGHT);
-		menuField->SetDivider(widestLabel);
-		menuField->ResizeToPreferred();
-		widestField = max_c(menuField->Bounds().Width(), widestField);
-	}
-
-	// layout controls under each other, resize all to size
-	// of largest of them (they could still have different
-	// heights though)
-	BMenuField* topMenuField = (BMenuField*)menuFields.FirstItem();
-	BPoint leftTop = topMenuField->Frame().LeftTop();
-	BRect frame = topMenuField->Frame();
-
-	for (int32 i = 0; i < count; i++) {
-		BMenuField* menuField = (BMenuField*)menuFields.ItemAtFast(i);
-		menuField->MoveTo(leftTop);
-		float height = menuField->Bounds().Height();
-		menuField->ResizeTo(widestField, height);
-		frame = frame | menuField->Frame();
-		leftTop.y += height + 5.0;
-	}
-
-	return frame;
-}
-
-
 //	#pragma mark -
 
 
-ScreenWindow::ScreenWindow(ScreenSettings *settings)
-	: BWindow(settings->WindowFrame(), "Screen", B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES),
+ScreenWindow::ScreenWindow(ScreenSettings* settings)
+	:
+	BWindow(settings->WindowFrame(), "Screen", B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
+		B_ALL_WORKSPACES),
 	fBootWorkspaceApplied(false),
 	fScreenMode(this),
 	fTempScreenMode(this),
@@ -231,10 +176,6 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	_UpdateOriginal();
 	fActive = fSelected = fOriginal;
 
-	BView *view = new BView(Bounds(), "ScreenView", B_FOLLOW_ALL, B_WILL_DRAW);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(view);
-
 	fSettings = settings;
 
 	// we need the "Current Workspace" first to get its height
@@ -245,51 +186,65 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	popUpMenu->AddItem(fAllWorkspacesItem);
 	BMenuItem *item = new BMenuItem("Current Workspace",
 		new BMessage(WORKSPACE_CHECK_MSG));
-	
+
 	popUpMenu->AddItem(item);
 	fAllWorkspacesItem->SetMarked(true);
 
-	BMenuField* workspaceMenuField = new BMenuField(BRect(0, 0, 100, 15),
-		"WorkspaceMenu", NULL, popUpMenu, true);
+	BMenuField* workspaceMenuField = new BMenuField("WorkspaceMenu", NULL,
+		popUpMenu, NULL);
 	workspaceMenuField->ResizeToPreferred();
 
 	// box on the left with workspace count and monitor view
 
-	popUpMenu = new BPopUpMenu("", true, true);
-	fWorkspaceCountField = new BMenuField(BRect(0.0, 0.0, 50.0, 15.0),
-		"WorkspaceCountMenu", "Workspace count:", popUpMenu, true);
-	float labelWidth = fWorkspaceCountField->StringWidth(
-		fWorkspaceCountField->Label()) + 5.0;
-	fWorkspaceCountField->SetDivider(labelWidth);
-
-	fScreenBox = new BBox(BRect(0.0, 0.0, 100.0, 100.0), "left box");
-	fScreenBox->AddChild(fWorkspaceCountField);
-
-	for (int32 count = 1; count <= 32; count++) {
-		BString workspaceCount;
-		workspaceCount << count;
-
-		BMessage *message = new BMessage(POP_WORKSPACE_CHANGED_MSG);
-		message->AddInt32("workspace count", count);
-
-		popUpMenu->AddItem(new BMenuItem(workspaceCount.String(),
-			message));
-	}
-
-	item = popUpMenu->ItemAt(count_workspaces() - 1);
-	if (item != NULL)
-		item->SetMarked(true);
+	BBox* screenBox = new BBox("screen box");
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 10.0);
+	layout->SetInsets(10, 10, 10, 10);
+	screenBox->SetLayout(layout);
 
 	fMonitorView = new MonitorView(BRect(0.0, 0.0, 80.0, 80.0), "monitor",
 		screen.Frame().IntegerWidth() + 1, screen.Frame().IntegerHeight() + 1);
-	fScreenBox->AddChild(fMonitorView);
+	screenBox->AddChild(fMonitorView);
 
-	view->AddChild(fScreenBox);
+/*
+	BStringView* columnsView = new BStringView("", "Columns:");
+	columnsView->SetExplicitAlignment(
+		BAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_UNSET));
+	BStringView* rowsView = new BStringView("", "Rows:");
+	rowsView->SetExplicitAlignment(
+		BAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_UNSET));
+*/
+
+	fColumnsControl = new BTextControl("Columns:", "0",
+		new BMessage(kMsgWorkspaceColumnsChanged));
+	fRowsControl = new BTextControl("Rows:", "0",
+		new BMessage(kMsgWorkspaceRowsChanged));
+
+	screenBox->AddChild(BLayoutBuilder::Grid<>(5.0, 5.0)
+		.Add(new BStringView("", "Workspaces"), 0, 0, 3)
+		.AddTextControl(fColumnsControl, 0, 1, B_ALIGN_RIGHT)
+		.AddGroup(B_HORIZONTAL, 0, 2, 1)
+			.Add(_CreateColumnRowButton(true, false))
+			.Add(_CreateColumnRowButton(true, true))
+		.End()
+		.AddTextControl(fRowsControl, 0, 2, B_ALIGN_RIGHT)
+		.AddGroup(B_HORIZONTAL, 0, 2, 2)
+			.Add(_CreateColumnRowButton(false, false))
+			.Add(_CreateColumnRowButton(false, true))
+		.End());
+
+	fBackgroundsButton = new BButton("BackgroundsButton",
+		"Set Background" B_UTF8_ELLIPSIS,
+		new BMessage(BUTTON_LAUNCH_BACKGROUNDS_MSG));
+	fBackgroundsButton->SetFontSize(be_plain_font->Size() * 0.9);
+	screenBox->AddChild(fBackgroundsButton);
 
 	// box on the right with screen resolution, etc.
 
-	fControlsBox = new BBox(BRect(0.0, 0.0, 100.0, 100.0));
-	fControlsBox->SetLabel(workspaceMenuField);
+	BBox* controlsBox = new BBox("controls box");
+	controlsBox->SetLabel(workspaceMenuField);
+	BView* outerControlsView = BLayoutBuilder::Group<>(B_VERTICAL, 10.0)
+		.SetInsets(10, 10, 10, 10);
+	controlsBox->AddChild(outerControlsView);
 
 	fResolutionMenu = new BPopUpMenu("resolution", true, true);
 
@@ -317,9 +272,8 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	// fResolutionField needs to be at the correct
 	// left-top offset, because all other menu fields
 	// will be layouted relative to it
-	fResolutionField = new BMenuField(rect.OffsetToCopy(10.0, 30.0),
-		"ResolutionMenu", "Resolution:", fResolutionMenu, false);
-	fControlsBox->AddChild(fResolutionField);
+	fResolutionField = new BMenuField("ResolutionMenu", "Resolution:",
+		fResolutionMenu, NULL);
 
 	fColorsMenu = new BPopUpMenu("colors", true, true);
 
@@ -333,9 +287,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 
 	rect.OffsetTo(B_ORIGIN);
 
-	fColorsField = new BMenuField(rect, "ColorsMenu", "Colors:", fColorsMenu,
-		false);
-	fControlsBox->AddChild(fColorsField);
+	fColorsField = new BMenuField("ColorsMenu", "Colors:", fColorsMenu, NULL);
 
 	fRefreshMenu = new BPopUpMenu("refresh rate", true, true);
 
@@ -370,15 +322,11 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 		fRefreshMenu->AddItem(fOtherRefresh);
 	}
 
-	fRefreshField = new BMenuField(rect, "RefreshMenu", "Refresh Rate:",
-		fRefreshMenu, false);
+	fRefreshField = new BMenuField("RefreshMenu", "Refresh Rate:",
+		fRefreshMenu, NULL);
+
 	if (_IsVesa())
 		fRefreshField->Hide();
-	fControlsBox->AddChild(fRefreshField);
-
-	view->AddChild(fControlsBox);
-
-	uint32 controlsFlags = 0;
 
 	// enlarged area for multi-monitor settings
 	{
@@ -391,12 +339,6 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 		multiMonSupport = TestMultiMonSupport(&screen) == B_OK;
 		useLaptopPanelSupport = GetUseLaptopPanel(&screen, &dummy) == B_OK;
 		tvStandardSupport = GetTVStandard(&screen, &dummy32) == B_OK;
-		if (multiMonSupport) {
-			controlsFlags |= SHOW_COMBINE_FIELD;
-			controlsFlags |= SHOW_SWAP_FIELD;
-		}
-		if (useLaptopPanelSupport)
-			controlsFlags |= SHOW_LAPTOP_PANEL_FIELD;
 
 		// even if there is no support, we still create all controls
 		// to make sure we don't access NULL pointers later on
@@ -411,9 +353,8 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 				message));
 		}
 
-		fCombineField = new BMenuField(rect, "CombineMenu",
-			"Combine Displays:", fCombineMenu, false);
-		fControlsBox->AddChild(fCombineField);
+		fCombineField = new BMenuField("CombineMenu",
+			"Combine Displays:", fCombineMenu, NULL);
 
 		if (!multiMonSupport)
 			fCombineField->Hide();
@@ -429,16 +370,15 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 		message->AddBool("swap", true);
 		fSwapDisplaysMenu->AddItem(new BMenuItem("yes", message));
 
-		fSwapDisplaysField = new BMenuField(rect, "SwapMenu", "Swap Displays:",
-			fSwapDisplaysMenu, false);
+		fSwapDisplaysField = new BMenuField("SwapMenu", "Swap Displays:",
+			fSwapDisplaysMenu, NULL);
 
-		fControlsBox->AddChild(fSwapDisplaysField);
 		if (!multiMonSupport)
 			fSwapDisplaysField->Hide();
 
 		fUseLaptopPanelMenu = new BPopUpMenu("UseLaptopPanel", true, true);
 
-		// !order is important - we rely that boolean value == idx			
+		// !order is important - we rely that boolean value == idx
 		message = new BMessage(POP_USE_LAPTOP_PANEL_MSG);
 		message->AddBool("use", false);
 		fUseLaptopPanelMenu->AddItem(new BMenuItem("if needed", message));
@@ -447,10 +387,9 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 		message->AddBool("use", true);
 		fUseLaptopPanelMenu->AddItem(new BMenuItem("always", message));
 
-		fUseLaptopPanelField = new BMenuField(rect, "UseLaptopPanel",
-			"Use Laptop Panel:", fUseLaptopPanelMenu, false);
+		fUseLaptopPanelField = new BMenuField("UseLaptopPanel",
+			"Use Laptop Panel:", fUseLaptopPanelMenu, NULL);
 
-		fControlsBox->AddChild(fUseLaptopPanelField);
 		if (!useLaptopPanelSupport)
 			fUseLaptopPanelField->Hide();
 
@@ -471,44 +410,60 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 			fTVStandardMenu->AddItem(new BMenuItem(name.String(), message));
 		}
 
-		fTVStandardField = new BMenuField(rect, "tv standard", "Video Format:",
-			fTVStandardMenu, false);
+		fTVStandardField = new BMenuField("tv standard", "Video Format:",
+			fTVStandardMenu, NULL);
 		fTVStandardField->SetAlignment(B_ALIGN_RIGHT);
 
-		if (!tvStandardSupport || i == 0) {
+		if (!tvStandardSupport || i == 0)
 			fTVStandardField->Hide();
-		} else {
-			controlsFlags |= SHOW_TV_STANDARD_FIELD;
-		}
-
-		fControlsBox->AddChild(fTVStandardField);
 	}
 
-	BRect buttonRect(0.0, 0.0, 30.0, 10.0);
-	fBackgroundsButton = new BButton(buttonRect, "BackgroundsButton",
-		"Set Background"B_UTF8_ELLIPSIS,
-		new BMessage(BUTTON_LAUNCH_BACKGROUNDS_MSG));
-	fBackgroundsButton->SetFontSize(be_plain_font->Size() * 0.9);
-	fScreenBox->AddChild(fBackgroundsButton);
+	BView* controlsView = BLayoutBuilder::Grid<>(5.0, 5.0)
+		.AddMenuField(fResolutionField, 0, 0, B_ALIGN_RIGHT)
+		.AddMenuField(fColorsField, 0, 1, B_ALIGN_RIGHT)
+		.AddMenuField(fRefreshField, 0, 2, B_ALIGN_RIGHT)
+		.AddMenuField(fCombineField, 0, 3, B_ALIGN_RIGHT)
+		.AddMenuField(fSwapDisplaysField, 0, 4, B_ALIGN_RIGHT)
+		.AddMenuField(fUseLaptopPanelField, 0, 5, B_ALIGN_RIGHT)
+		.AddMenuField(fTVStandardField, 0, 6, B_ALIGN_RIGHT);
+	outerControlsView->AddChild(controlsView);
 
 	// TODO: we don't support getting the screen's preferred settings
 	/* fDefaultsButton = new BButton(buttonRect, "DefaultsButton", "Defaults",
-		new BMessage(BUTTON_DEFAULTS_MSG));
-	view->AddChild(fDefaultsButton); */
+		new BMessage(BUTTON_DEFAULTS_MSG));*/
 
-	fRevertButton = new BButton(buttonRect, "RevertButton", "Revert",
-		new BMessage(BUTTON_REVERT_MSG));
-	fRevertButton->SetEnabled(false);
-	view->AddChild(fRevertButton);
-
-	fApplyButton = new BButton(buttonRect, "ApplyButton", "Apply", 
+	fApplyButton = new BButton("ApplyButton", "Apply",
 		new BMessage(BUTTON_APPLY_MSG));
 	fApplyButton->SetEnabled(false);
-	fControlsBox->AddChild(fApplyButton);
+	outerControlsView->GetLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
+	outerControlsView->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL)
+		.AddGlue()
+		.Add(fApplyButton));
+
+	fRevertButton = new BButton("RevertButton", "Revert",
+		new BMessage(BUTTON_REVERT_MSG));
+	fRevertButton->SetEnabled(false);
+
+	SetLayout(new BGroupLayout(B_VERTICAL, 10.0));
+	GetLayout()->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	BLayoutBuilder::Group<>(static_cast<BGroupLayout*>(GetLayout()))
+		.SetInsets(10, 10, 10, 10)
+		.AddGroup(B_HORIZONTAL, 10.0)
+			.AddGroup(B_VERTICAL)
+				.Add(screenBox)
+			.End()
+			.Add(controlsBox)
+		.End()
+		.AddGroup(B_HORIZONTAL, 10.0)
+			.Add(fRevertButton)
+			.AddGlue();
+
+	screenBox->Parent()->GetLayout()->AddItem(0,
+		BSpaceLayoutItem::CreateVerticalStrut(
+			controlsBox->TopBorderOffset() - 1));
 
 	_UpdateControls();
-
-	_LayoutControls(controlsFlags);
 }
 
 
@@ -546,7 +501,7 @@ ScreenWindow::QuitRequested()
 */
 void
 ScreenWindow::_CheckResolutionMenu()
-{		
+{
 	for (int32 i = 0; i < fResolutionMenu->CountItems(); i++)
 		fResolutionMenu->ItemAt(i)->SetEnabled(false);
 
@@ -566,13 +521,13 @@ ScreenWindow::_CheckResolutionMenu()
 
 
 /*!	Update color and refresh options according to current mode
-	(a color space is made active if there is any mode with 
-	given resolution and this colour space; same applies for 
+	(a color space is made active if there is any mode with
+	given resolution and this colour space; same applies for
 	refresh rate, though "Other…" is always possible)
 */
 void
 ScreenWindow::_CheckColorMenu()
-{	
+{
 	for (int32 i = 0; i < kColorSpaceCount; i++) {
 		bool supported = false;
 
@@ -659,6 +614,8 @@ ScreenWindow::_UpdateMonitorView()
 void
 ScreenWindow::_UpdateControls()
 {
+	_UpdateWorkspaceButtons();
+
 	BMenuItem* item = fSwapDisplaysMenu->ItemAt((int32)fSelected.swap_displays);
 	if (item && !item->IsMarked())
 		item->SetMarked(true);
@@ -691,12 +648,12 @@ ScreenWindow::_UpdateControls()
 		if (!item->IsMarked())
 			item->SetMarked(true);
 	} else {
-		// this is bad luck - if mode has been set via screen references, 
+		// this is bad luck - if mode has been set via screen references,
 		// this case cannot occur; there are three possible solutions:
 		// 1. add a new resolution to list
 		//    - we had to remove it as soon as a "valid" one is selected
 		//    - we don't know which frequencies/bit depths are supported
-		//    - as long as we haven't the GMT formula to create 
+		//    - as long as we haven't the GMT formula to create
 		//      parameters for any resolution given, we cannot
 		//      really set current mode - it's just not in the list
 		// 2. choose nearest resolution
@@ -758,12 +715,33 @@ ScreenWindow::_UpdateActiveMode()
 {
 	// Usually, this function gets called after a mode
 	// has been set manually; still, as the graphics driver
-	// is free to fiddle with mode passed, we better ask 
+	// is free to fiddle with mode passed, we better ask
 	// what kind of mode we actually got
 	fScreenMode.Get(fActive);
 	fSelected = fActive;
 
 	_UpdateControls();
+}
+
+
+void
+ScreenWindow::_UpdateWorkspaceButtons()
+{
+	uint32 columns;
+	uint32 rows;
+	BPrivate::get_workspaces_layout(&columns, &rows);
+
+	char text[32];
+	snprintf(text, sizeof(text), "%ld", columns);
+	fColumnsControl->SetText(text);
+
+	snprintf(text, sizeof(text), "%ld", rows);
+	fRowsControl->SetText(text);
+
+	_GetColumnRowButton(true, false)->SetEnabled(columns != 1 && rows != 32);
+	_GetColumnRowButton(true, true)->SetEnabled((columns + 1) * rows < 32);
+	_GetColumnRowButton(false, false)->SetEnabled(rows != 1 && columns != 32);
+	_GetColumnRowButton(false, true)->SetEnabled(columns * (rows + 1) < 32);
 }
 
 
@@ -798,14 +776,52 @@ ScreenWindow::MessageReceived(BMessage* message)
 			_CheckApplyEnabled();
 			break;
 
-		case POP_WORKSPACE_CHANGED_MSG:
+		case kMsgWorkspaceLayoutChanged:
 		{
-			// update checkpoint state
-			int32 index;
-			if (message->FindInt32("index", &index) == B_OK) {
-				set_workspace_count(index + 1);
-				_CheckApplyEnabled();
-			}
+			int32 deltaX = 0;
+			int32 deltaY = 0;
+			message->FindInt32("delta_x", &deltaX);
+			message->FindInt32("delta_y", &deltaY);
+
+			if (deltaX == 0 && deltaY == 0)
+				break;
+
+			uint32 newColumns;
+			uint32 newRows;
+			BPrivate::get_workspaces_layout(&newColumns, &newRows);
+
+			newColumns += deltaX;
+			newRows += deltaY;
+			BPrivate::set_workspaces_layout(newColumns, newRows);
+
+			_UpdateWorkspaceButtons();
+			_CheckApplyEnabled();
+			break;
+		}
+
+		case kMsgWorkspaceColumnsChanged:
+		{
+			uint32 newColumns = strtoul(fColumnsControl->Text(), NULL, 10);
+
+			uint32 rows;
+			BPrivate::get_workspaces_layout(NULL, &rows);
+			BPrivate::set_workspaces_layout(newColumns, rows);
+
+			_UpdateWorkspaceButtons();
+			_CheckApplyEnabled();
+			break;
+		}
+
+		case kMsgWorkspaceRowsChanged:
+		{
+			uint32 newRows = strtoul(fRowsControl->Text(), NULL, 10);
+
+			uint32 columns;
+			BPrivate::get_workspaces_layout(&columns, NULL);
+			BPrivate::set_workspaces_layout(columns, newRows);
+
+			_UpdateWorkspaceButtons();
+			_CheckApplyEnabled();
 			break;
 		}
 
@@ -922,10 +938,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 			fSelected.use_laptop_panel = false;
 			fSelected.tv_standard = 0;
 
-			BMenuItem *item;
-			item = fWorkspaceCountField->Menu()->ItemAt(3);
-			if (item != NULL)
-				item->SetMarked(true);
+			// TODO: workspace defaults
 
 			_UpdateControls();
 			break;
@@ -940,14 +953,14 @@ ScreenWindow::MessageReceived(BMessage* message)
 		{
 			fModified = false;
 			fBootWorkspaceApplied = false;
-			BMenuItem *item;
-			item = fWorkspaceCountField->Menu()->ItemAt(fOriginalWorkspaceCount - 1);
-			if (item != NULL)
-				item->SetMarked(true);
 
-			// ScreenMode::Revert() assumes that we first set the correct number
-			// of workspaces
-			set_workspace_count(fOriginalWorkspaceCount);
+			// ScreenMode::Revert() assumes that we first set the correct
+			// number of workspaces
+
+			BPrivate::set_workspaces_layout(fOriginalWorkspacesColumns,
+				fOriginalWorkspacesRows);
+			_UpdateWorkspaceButtons();
+
 			fScreenMode.Revert();
 			_UpdateActiveMode();
 			break;
@@ -964,7 +977,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 			break;
 
 		default:
-			BWindow::MessageReceived(message);		
+			BWindow::MessageReceived(message);
 			break;
 	}
 }
@@ -1001,12 +1014,45 @@ ScreenWindow::_WriteVesaModeFile(const screen_mode& mode) const
 }
 
 
+BButton*
+ScreenWindow::_CreateColumnRowButton(bool columns, bool plus)
+{
+	BMessage* message = new BMessage(kMsgWorkspaceLayoutChanged);
+	message->AddInt32("delta_x", columns ? (plus ? 1 : -1) : 0);
+	message->AddInt32("delta_y", !columns ? (plus ? 1 : -1) : 0);
+
+	BButton* button = new BButton(plus ? "+" : "-", message);
+	button->SetFontSize(be_plain_font->Size() * 0.9);
+
+	BSize size = button->MinSize();
+	size.width = button->StringWidth("+") + 16;
+	button->SetExplicitMinSize(size);
+	button->SetExplicitMaxSize(size);
+
+	fWorkspacesButtons[(columns ? 0 : 2) + (plus ? 1 : 0)] = button;
+	return button;
+}
+
+
+BButton*
+ScreenWindow::_GetColumnRowButton(bool columns, bool plus)
+{
+	return fWorkspacesButtons[(columns ? 0 : 2) + (plus ? 1 : 0)];
+}
+
+
 void
 ScreenWindow::_CheckApplyEnabled()
 {
-	fApplyButton->SetEnabled(fSelected != fActive 
+	fApplyButton->SetEnabled(fSelected != fActive
 		|| fAllWorkspacesItem->IsMarked());
-	fRevertButton->SetEnabled(count_workspaces() != fOriginalWorkspaceCount
+
+	uint32 columns;
+	uint32 rows;
+	BPrivate::get_workspaces_layout(&columns, &rows);
+
+	fRevertButton->SetEnabled(columns != fOriginalWorkspacesColumns
+		|| rows != fOriginalWorkspacesRows
 		|| fSelected != fOriginal);
 }
 
@@ -1014,7 +1060,9 @@ ScreenWindow::_CheckApplyEnabled()
 void
 ScreenWindow::_UpdateOriginal()
 {
-	fOriginalWorkspaceCount = count_workspaces();
+	BPrivate::get_workspaces_layout(&fOriginalWorkspacesColumns,
+		&fOriginalWorkspacesRows);
+
 	fScreenMode.Get(fOriginal);
 	fScreenMode.UpdateOriginalModes();
 }
@@ -1059,124 +1107,5 @@ ScreenWindow::_Apply()
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go();
 	}
-}
-
-
-void
-ScreenWindow::_LayoutControls(uint32 flags)
-{
-	// layout the screen box and its controls
-	fWorkspaceCountField->ResizeToPreferred();
-
-	float monitorViewHeight = fMonitorView->Bounds().Height();
-	float workspaceFieldHeight = fWorkspaceCountField->Bounds().Height();
-	float backgroundsButtonHeight = fBackgroundsButton->Bounds().Height();
-
-	float screenBoxWidth = fWorkspaceCountField->Bounds().Width() + 20.0;
-	float screenBoxHeight = monitorViewHeight + 5.0 + workspaceFieldHeight + 5.0
-		+ backgroundsButtonHeight + 20.0;
-
-#ifdef __HAIKU__
-	fScreenBox->MoveTo(10.0, 10.0 + fControlsBox->TopBorderOffset());
-#else
-	fScreenBox->MoveTo(10.0, 10.0 + 3);
-#endif
-	fScreenBox->ResizeTo(screenBoxWidth, screenBoxHeight);
-
-	float leftOffset = 10.0;
-	float topOffset = 10.0;
-	fMonitorView->MoveTo(leftOffset, topOffset);
-	fMonitorView->ResizeTo(screenBoxWidth - 20.0, monitorViewHeight);
-	fMonitorView->SetResizingMode(B_FOLLOW_ALL);
-	topOffset += monitorViewHeight + 5.0;
-
-	fWorkspaceCountField->MoveTo(leftOffset, topOffset);
-	fWorkspaceCountField->SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
-	topOffset += workspaceFieldHeight + 5.0;
-
-	fBackgroundsButton->MoveTo(leftOffset, topOffset);
-	fBackgroundsButton->ResizeTo(screenBoxWidth - 20.0, backgroundsButtonHeight);
-	fBackgroundsButton->SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
-
-	fControlsBox->MoveTo(fScreenBox->Frame().right + 10.0, 10.0);
-
-	// layout the right side
-	fApplyButton->ResizeToPreferred();
-	BRect controlsRect = _LayoutMenuFields(flags);
-	controlsRect.InsetBy(-10.0, -10.0);
-	controlsRect.bottom += 8 + fApplyButton->Bounds().Height();
-	// adjust size of controls box and move aligned buttons along
-	float xDiff = controlsRect.right - fControlsBox->Bounds().right;
-	float yDiff = controlsRect.bottom - fControlsBox->Bounds().bottom;
-	if (yDiff < 0.0) {
-		// don't shrink vertically
-		yDiff = 0.0;
-	}
-
-	fControlsBox->ResizeBy(xDiff, yDiff);
-
-	// align bottom of boxen
-	float boxBottomDiff = fControlsBox->Frame().bottom - fScreenBox->Frame().bottom;
-	if (boxBottomDiff > 0)
-		fScreenBox->ResizeBy(0.0, boxBottomDiff);
-	else
-		fControlsBox->ResizeBy(0.0, -boxBottomDiff);
-
-	BRect boxFrame = fScreenBox->Frame() | fControlsBox->Frame();
-
-	// layout rest of buttons
-	// TODO: we don't support getting the screen's preferred settings
-//	fDefaultsButton->ResizeToPreferred();
-//	fDefaultsButton->MoveTo(boxFrame.left, boxFrame.bottom + 8);
-
-	fRevertButton->ResizeToPreferred();
-	fRevertButton->MoveTo(boxFrame.left, boxFrame.bottom + 8);
-//	fRevertButton->MoveTo(fDefaultsButton->Frame().right + 10,
-//						  fDefaultsButton->Frame().top);
-
-	// Apply button was already resized above
-	float resolutionFieldRight = fResolutionField->Frame().right;
-	fApplyButton->MoveTo(resolutionFieldRight - fApplyButton->Bounds().Width(),
-		fControlsBox->Bounds().bottom - fApplyButton->Bounds().Height() - 10);
-
-	ResizeTo(boxFrame.right + 10, fRevertButton->Frame().bottom + 10);
-}
-
-
-BRect
-ScreenWindow::_LayoutMenuFields(uint32 flags, bool sideBySide)
-{
-	BList menuFields;
-	menuFields.AddItem((void*)fResolutionField);
-	menuFields.AddItem((void*)fColorsField);
-	menuFields.AddItem((void*)fRefreshField);
-
-	BRect frame;
-
-	if (sideBySide)
-		frame = stack_and_align_menu_fields(menuFields);
-
-	if (sideBySide)
-		menuFields.MakeEmpty();
-
-	if (flags & SHOW_COMBINE_FIELD)
-		menuFields.AddItem((void*)fCombineField);
-	if (flags & SHOW_SWAP_FIELD)
-		menuFields.AddItem((void*)fSwapDisplaysField);
-	if (flags & SHOW_LAPTOP_PANEL_FIELD)
-		menuFields.AddItem((void*)fUseLaptopPanelField);
-	if (flags & SHOW_TV_STANDARD_FIELD)
-		menuFields.AddItem((void*)fTVStandardField);
-
-	if (sideBySide) {
-		if (menuFields.CountItems() > 0) {
-			((BMenuField*)menuFields.FirstItem())->MoveTo(frame.right + 8.0, frame.top);
-			frame = frame | stack_and_align_menu_fields(menuFields);
-		}
-	} else {
-		frame = stack_and_align_menu_fields(menuFields);
-	}
-
-	return frame;
 }
 

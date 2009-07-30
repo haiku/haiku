@@ -22,7 +22,6 @@ static const uint32 BUTTON_APPLY_MSG = 'bapl';
 static const uint32 BUTTON_DONE_MSG = 'bdon';
 static const uint32 BUTTON_KEEP_MSG = 'bkep';
 static const uint32 BUTTON_UNDO_MSG = 'bund';
-static const uint32 POP_WORKSPACE_CHANGED_MSG = 'pwsc';
 static const uint32 POP_RESOLUTION_MSG = 'pres';
 static const uint32 POP_COLORS_MSG = 'pclr';
 static const uint32 POP_REFRESH_MSG = 'prfr';
@@ -38,6 +37,9 @@ static const uint32 SLIDER_INVOKE_MSG = 'sldi';
 static const uint32 SET_CUSTOM_REFRESH_MSG = 'scrf';
 static const uint32 DIM_COUNT_MSG = 'scrf';
 static const uint32 MAKE_INITIAL_MSG = 'mkin';
+static const uint32 kMsgWorkspaceLayoutChanged = 'wslc';
+static const uint32 kMsgWorkspaceColumnsChanged = 'wscc';
+static const uint32 kMsgWorkspaceRowsChanged = 'wsrc';
 
 // Constants
 extern const char* kBackgroundsSignature;

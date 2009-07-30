@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@ ScreenSettings::ScreenSettings()
 	BScreen screen(B_MAIN_SCREEN_ID);
 	BRect screenFrame = screen.Frame();
 
-	fWindowFrame.Set(0, 0, 356, 202);
+	fWindowFrame.Set(0, 0, 450, 250);
 
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
@@ -31,9 +31,7 @@ ScreenSettings::ScreenSettings()
 
 		BFile file(path.Path(), B_READ_ONLY);
 		if (file.InitCheck() == B_OK) {
-			BPoint point;
-			file.Read(&point, sizeof(BPoint));
-			fWindowFrame.OffsetTo(point);
+			file.Read(&fWindowFrame, sizeof(BRect));
 
 			// make sure the window is visible on screen
 			if (screenFrame.right >= fWindowFrame.left + 40
@@ -44,7 +42,9 @@ ScreenSettings::ScreenSettings()
 		}
 	}
 
-	fWindowFrame.OffsetTo(screenFrame.left + (screenFrame.Width() - fWindowFrame.Width()) / 2,
+	// Center on screen
+	fWindowFrame.OffsetTo(
+		screenFrame.left + (screenFrame.Width() - fWindowFrame.Width()) / 2,
 		screenFrame.top + (screenFrame.Height() - fWindowFrame.Height()) /2);
 }
 
@@ -58,10 +58,8 @@ ScreenSettings::~ScreenSettings()
 	path.Append(kSettingsFileName);
 
 	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-	if (file.InitCheck() == B_OK) {
-		BPoint point(fWindowFrame.LeftTop());
-		file.Write(&point, sizeof(BPoint));
-	}
+	if (file.InitCheck() == B_OK)
+		file.Write(&fWindowFrame, sizeof(BRect));
 }
 
 

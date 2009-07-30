@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,10 +16,11 @@
 
 #include "ScreenMode.h"
 
+
 class BBox;
 class BPopUpMenu;
 class BMenuField;
-
+class BTextControl;
 
 class RefreshWindow;
 class MonitorView;
@@ -37,12 +38,16 @@ class ScreenWindow : public BWindow {
 		virtual void ScreenChanged(BRect frame, color_space mode);
 
 	private:
+		BButton* _CreateColumnRowButton(bool columns, bool plus);
+		BButton* _GetColumnRowButton(bool columns, bool plus);
+
 		void _CheckApplyEnabled();
 		void _CheckResolutionMenu();
 		void _CheckColorMenu();
 		void _CheckRefreshMenu();
 
 		void _UpdateActiveMode();
+		void _UpdateWorkspaceButtons();
 		void _UpdateRefreshControl();
 		void _UpdateMonitorView();
 		void _UpdateControls();
@@ -53,20 +58,16 @@ class ScreenWindow : public BWindow {
 		status_t _WriteVesaModeFile(const screen_mode& mode) const;
 		bool _IsVesa() const { return fIsVesa; }
 
-		void _LayoutControls(uint32 flags);
-		BRect _LayoutMenuFields(uint32 flags, bool sideBySide = false);
-
 		ScreenSettings*	fSettings;
 		bool			fIsVesa;
 		bool			fBootWorkspaceApplied;
 
-		BBox*			fScreenBox;
-		BBox*			fControlsBox;
-
 		MonitorView*	fMonitorView;
 		BMenuItem*		fAllWorkspacesItem;
 
-		BMenuField*		fWorkspaceCountField;
+		BTextControl*	fColumnsControl;
+		BTextControl*	fRowsControl;
+		BButton*		fWorkspacesButtons[4];
 
 		BPopUpMenu*		fResolutionMenu;
 		BMenuField*		fResolutionField;
@@ -93,7 +94,8 @@ class ScreenWindow : public BWindow {
 
 		ScreenMode		fScreenMode, fTempScreenMode;
 			// screen modes for all workspaces
-		int32			fOriginalWorkspaceCount;
+		uint32			fOriginalWorkspacesColumns;
+		uint32			fOriginalWorkspacesRows;
 		screen_mode		fActive, fSelected, fOriginal;
 			// screen modes for the current workspace
 		bool			fModified;
