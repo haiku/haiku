@@ -28,7 +28,7 @@ public:
 									const void* data, size_t size,
 									uint32 flags = 0);
 
-	virtual	status_t			WriteNextChunk(void* cookie,
+	virtual	status_t			WriteChunk(void* cookie,
 									const void* chunkBuffer, size_t chunkSize,
 									uint32 flags);
 

@@ -184,11 +184,11 @@ AVFormatWriter::AddTrackInfo(void* cookie, uint32 code,
 
 
 status_t
-AVFormatWriter::WriteNextChunk(void* cookie, const void* chunkBuffer,
+AVFormatWriter::WriteChunk(void* cookie, const void* chunkBuffer,
 	size_t chunkSize, uint32 flags)
 {
-	TRACE("AVFormatWriter::WriteNextChunk(%p, %ld, %lu)\n",
-		chunkBuffer, chunkSize, flags);
+	TRACE("AVFormatWriter::WriteChunk(%p, %ld, %lu)\n", chunkBuffer, chunkSize,
+		flags);
 
 	return B_NOT_SUPPORTED;
 }

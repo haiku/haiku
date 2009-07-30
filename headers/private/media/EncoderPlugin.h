@@ -15,8 +15,7 @@ class ChunkWriter {
 public:
 	virtual						~ChunkWriter() {};
 	virtual	status_t			WriteChunk(const void* chunkBuffer,
-									size_t chunkSize,
-									const media_header* mediaHeader) = 0;
+									size_t chunkSize, uint32 flags) = 0;
 };
 
 class Encoder {
@@ -41,8 +40,7 @@ public:
 									media_encode_info* info) = 0;
 							   
 			status_t			WriteChunk(const void* chunkBuffer,
-									size_t chunkSize,
-									const media_header* mediaHeader);
+									size_t chunkSize, uint32 flags = 0);
 
 			void				SetChunkWriter(ChunkWriter* writer);
 

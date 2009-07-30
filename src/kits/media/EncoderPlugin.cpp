@@ -27,10 +27,9 @@ Encoder::~Encoder()
 
 	
 status_t
-Encoder::WriteChunk(const void* chunkBuffer, size_t chunkSize,
-	const media_header* mediaHeader)
+Encoder::WriteChunk(const void* chunkBuffer, size_t chunkSize, uint32 flags)
 {
-	return fChunkWriter->WriteChunk(chunkBuffer, chunkSize, mediaHeader);
+	return fChunkWriter->WriteChunk(chunkBuffer, chunkSize, flags);
 }
 
 
