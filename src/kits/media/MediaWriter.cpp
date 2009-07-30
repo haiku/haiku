@@ -18,10 +18,6 @@
 #include "PluginManager.h"
 
 
-// should be 0, to disable the chunk cache set it to 1
-#define DISABLE_CHUNK_CACHE 0
-
-
 MediaWriter::MediaWriter(BDataIO* target, const media_file_format& fileFormat)
 	:
 	fTarget(target),
