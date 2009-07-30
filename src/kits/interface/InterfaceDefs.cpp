@@ -42,10 +42,6 @@
 #include <WindowInfo.h>
 
 
-// Private definitions not placed in public headers
-void _init_global_fonts_();
-extern "C" status_t _fini_interface_kit_();
-
 using namespace BPrivate;
 
 // some other weird struct exported by BeOS, it's not initialized, though
