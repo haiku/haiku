@@ -728,7 +728,7 @@ BMediaTrack::BMediaTrack(BPrivate::media::MediaExtractor *extractor,
 }
 
 
-BMediaTrack::BMediaTrack(BPrivate::MediaWriter *writer,
+BMediaTrack::BMediaTrack(BPrivate::media::MediaWriter* writer,
 						 int32 stream_num,
 						 media_format *in_format,
 						 BPrivate::media::Encoder *encoder,
