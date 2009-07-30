@@ -1,9 +1,15 @@
+/*
+ * Copyright 2009, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ */
 #ifndef _ENCODER_PLUGIN_H
 #define _ENCODER_PLUGIN_H
+
 
 #include <MediaTrack.h>
 #include <MediaFormats.h>
 #include "MediaPlugin.h"
+
 
 class AddOnManager;
 
@@ -18,15 +24,14 @@ public:
 									size_t chunkSize, uint32 flags) = 0;
 };
 
+
 class Encoder {
 public:
 								Encoder();
 	virtual						~Encoder();
 
-	virtual	void				GetCodecInfo(media_codec_info* codecInfo) = 0;
-
 	virtual	status_t			SetFormat(const media_file_format& fileFormat,
-									const media_format& encodedFormat) = 0;
+									media_format* _inOutEncodedFormat) = 0;
 
 	virtual	status_t			AddTrackInfo(uint32 code, const void* data,
 									size_t size, uint32 flags = 0) = 0;
@@ -67,8 +72,19 @@ class EncoderPlugin : public virtual MediaPlugin {
 public:
 								EncoderPlugin();
 
-	virtual	Encoder*			NewEncoder(uint index) = 0;
-	virtual	status_t			GetSupportedFormats(media_format** formats,
+	virtual	Encoder*			NewEncoder(
+									const media_codec_info& codecInfo) = 0;
+
+	// TODO: Maybe this also needs to return a media_format with wild cards
+	// so that we can support the respective get_next_encoder() functions
+	// that take media_formats with wild cards and specialize them.
+	// Then this interface could be turned into an iterator like interface:
+	//
+	//		status_t			GetNextSupportedCodec(int32* cookie,
+	//								const media_codec_info* codecInfo,
+	//								const media_format* format) = 0;
+	virtual	status_t			GetSupportedCodecs(
+									const media_codec_info** codecInfos,
 									size_t* count) = 0;
 };
 

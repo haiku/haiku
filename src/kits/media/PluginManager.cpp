@@ -257,16 +257,15 @@ PluginManager::CreateEncoder(Encoder** _encoder,
 {
 	TRACE("PluginManager::CreateEncoder enter\n");
 
-#if 0
-	// get decoder for this format from the server
-	server_get_encoder_for_format_request request;
-	server_get_encoder_for_format_reply reply;
-	request.format = format;
-	status_t ret = QueryServer(SERVER_GET_ENCODER_FOR_FORMAT, &request,
+	// Get encoder for this codec info from the server
+	server_get_encoder_for_codec_info_request request;
+	server_get_encoder_for_codec_info_reply reply;
+	request.id = codecInfo->id;
+	status_t ret = QueryServer(SERVER_GET_ENCODER_FOR_CODEC_INFO, &request,
 		sizeof(request), &reply, sizeof(reply));
 	if (ret != B_OK) {
-		printf("PluginManager::CreateEncoder: can't get encoder for format: "
-			"%s\n", strerror(ret));
+		printf("PluginManager::CreateEncoder: can't get encoder for codec %s: "
+			"%s\n", codecInfo->pretty_name, strerror(ret));
 		return ret;
 	}
 
@@ -283,9 +282,7 @@ PluginManager::CreateEncoder(Encoder** _encoder,
 		return B_ERROR;
 	}
 
-	// TODO: In theory, one EncoderPlugin could support multiple Encoders,
-	// but this is not yet handled (passing "0" as index/ID).
-	*_encoder = encoderPlugin->NewEncoder(0);
+	*_encoder = encoderPlugin->NewEncoder(*codecInfo);
 	if (*_encoder == NULL) {
 		printf("PluginManager::CreateEncoder: NewEncoder() failed\n");
 		PutPlugin(plugin);
@@ -296,24 +293,6 @@ PluginManager::CreateEncoder(Encoder** _encoder,
 
 	TRACE("PluginManager::CreateEncoder leave\n");
 
-	return B_OK;
-#else
-	TRACE("PluginManager::CreateEncoder leave\n");
-	return B_NOT_SUPPORTED;
-#endif
-}
-
-
-status_t
-PluginManager::GetEncoderInfo(Encoder* encoder, media_codec_info* _info) const
-{
-	if (encoder == NULL)
-		return B_BAD_VALUE;
-
-	encoder->GetCodecInfo(_info);
-	// TODO:
-	// out_info->id = 
-	// out_info->sub_id = 
 	return B_OK;
 }
 

@@ -63,7 +63,8 @@ private:
 AddOnManager::AddOnManager()
 	:
  	fLock("add-on manager"),
- 	fNextWriterFormatFamilyID(0)
+ 	fNextWriterFormatFamilyID(0),
+ 	fNextEncoderCodecInfoID(0)
 {
 }
 
@@ -141,38 +142,25 @@ AddOnManager::GetReaders(xfer_entry_ref* outRefs, int32* outCount,
 
 
 status_t
-AddOnManager::GetEncoderForFormat(xfer_entry_ref* _encoderRef,
-	const media_format& format)
+AddOnManager::GetEncoder(xfer_entry_ref* _encoderRef, int32 id)
 {
-	if ((format.type == B_MEDIA_ENCODED_VIDEO
-			|| format.type == B_MEDIA_ENCODED_AUDIO
-			|| format.type == B_MEDIA_MULTISTREAM)
-		&& format.Encoding() == 0) {
-		return B_MEDIA_BAD_FORMAT;
-	}
-	if (format.type == B_MEDIA_NO_TYPE || format.type == B_MEDIA_UNKNOWN_TYPE)
-		return B_MEDIA_BAD_FORMAT;
-
 	BAutolock locker(fLock);
-
-	printf("AddOnManager::GetEncoderForFormat: searching encoder for encoding "
-		"%ld\n", format.Encoding());
 
 	encoder_info* info;
 	for (fEncoderList.Rewind(); fEncoderList.GetNext(&info);) {
-		media_format* encoderFormat;
-		for (info->formats.Rewind(); info->formats.GetNext(&encoderFormat);) {
-			// check if the encoder matches the supplied format
-			if (!encoderFormat->Matches(&format))
-				continue;
-
+		// check if the encoder matches the supplied format
+		if (info->internalID == id) {
 			printf("AddOnManager::GetEncoderForFormat: found encoder %s for "
-				"encoding %ld\n", info->ref.name, encoderFormat->Encoding());
-
+				"id %ld\n", info->ref.name, id);
+	
 			*_encoderRef = info->ref;
 			return B_OK;
 		}
 	}
+
+	printf("AddOnManager::GetEncoderForFormat: failed to find encoder for id "
+		"%ld\n", id);
+
 	return B_ENTRY_NOT_FOUND;	
 }
 									
@@ -203,7 +191,7 @@ AddOnManager::GetFileFormat(media_file_format* _fileFormat, int32 cookie)
 	BAutolock locker(fLock);
 
 	media_file_format* fileFormat;
-	if (fFileFormats.Get(cookie, &fileFormat)) {
+	if (fWriterFileFormats.Get(cookie, &fileFormat)) {
 		*_fileFormat = *fileFormat;
 		return B_OK;
 	}
@@ -436,7 +424,7 @@ AddOnManager::_RegisterWriter(WriterPlugin* writer, const entry_ref& ref)
 		fileFormat.id.device = ref.device;
 		fileFormat.id.internal_id = info.internalID;
 
-		fFileFormats.Insert(fileFormat);
+		fWriterFileFormats.Insert(fileFormat);
 	}
 
 	fWriterList.Insert(info);
@@ -460,17 +448,23 @@ AddOnManager::_RegisterEncoder(EncoderPlugin* plugin, const entry_ref& ref)
 
 	encoder_info info;
 	info.ref = ref;
+	info.internalID = fNextEncoderCodecInfoID++;
 
-	// Get list of support media_formats...
-	media_format* formats = NULL;
+	// Get list of supported codecs...
+	const media_codec_info* codecInfos = NULL;
 	size_t count = 0;
-	if (plugin->GetSupportedFormats(&formats, &count) != B_OK) {
-		printf("AddOnManager::_RegisterEncoder(): plugin->GetSupportedFormats"
+	if (plugin->GetSupportedCodecs(&codecInfos, &count) != B_OK) {
+		printf("AddOnManager::_RegisterEncoder(): plugin->GetSupportedCodecs"
 			"(...) failed!\n");
 		return;
 	}
-	for (uint i = 0 ; i < count ; i++)
-		info.formats.Insert(formats[i]);
+
+	for (uint32 i = 0 ; i < count ; i++) {
+		media_codec_info codecInfo = codecInfos[i];
+		codecInfo.id = info.internalID;
+		codecInfo.sub_id = i;
+		info.codecInfos.Insert(codecInfo);
+	}
 
 	fEncoderList.Insert(info);
 }

@@ -41,8 +41,7 @@ public:
 			status_t			GetReaders(xfer_entry_ref* _ref,
 									int32* _count, int32 maxCount);
 
-			status_t			GetEncoderForFormat(xfer_entry_ref* _ref,
-									const media_format& format);
+			status_t			GetEncoder(xfer_entry_ref* _ref, int32 id);
 
 			status_t			GetWriter(xfer_entry_ref* _ref,
 									uint32 internalID);
@@ -78,7 +77,8 @@ private:
 			};
 			struct encoder_info {
 				entry_ref			ref;
-				List<media_format>	formats;
+				uint32				internalID;
+				List<media_codec_info> codecInfos;
 			};
 
 			BLocker				fLock;
@@ -87,9 +87,10 @@ private:
 			List<decoder_info>	fDecoderList;
 			List<encoder_info>	fEncoderList;
 
-			List<media_file_format> fFileFormats;
+			List<media_file_format> fWriterFileFormats;
 
 			uint32				fNextWriterFormatFamilyID;
+			uint32				fNextEncoderCodecInfoID;
 
 			AddOnMonitorHandler* fHandler;
 			AddOnMonitor*		fAddOnMonitor;

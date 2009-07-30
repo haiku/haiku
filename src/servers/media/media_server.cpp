@@ -908,14 +908,13 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			break;
 		}
 
-		case SERVER_GET_ENCODER_FOR_FORMAT:
+		case SERVER_GET_ENCODER_FOR_CODEC_INFO:
 		{
-			const server_get_encoder_for_format_request *request
+			const server_get_encoder_for_codec_info_request *request
 				= reinterpret_cast<
-					const server_get_encoder_for_format_request *>(data);
-			server_get_encoder_for_format_reply reply;
-			rv = gAddOnManager->GetEncoderForFormat(&reply.ref,
-				request->format);
+					const server_get_encoder_for_codec_info_request *>(data);
+			server_get_encoder_for_codec_info_reply reply;
+			rv = gAddOnManager->GetEncoder(&reply.ref, request->id);
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
