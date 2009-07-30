@@ -14,7 +14,7 @@
 
 #include "device/power_managment.h"
 
-#define TRACE_BATTERY
+//#define TRACE_BATTERY
 #ifdef TRACE_BATTERY
 #	define TRACE(x...) dprintf("acpi_battery: "x)
 #else

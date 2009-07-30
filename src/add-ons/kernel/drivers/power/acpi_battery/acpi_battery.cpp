@@ -284,7 +284,6 @@ acpi_battery_write(void* cookie, off_t position, const void* buffer, size_t* num
 status_t
 acpi_battery_control(void* _cookie, uint32 op, void* arg, size_t len)
 {
-	TRACE("acpi_battery: acpi_battery_control op %u\n", int(op));
 	battery_device_cookie* device = (battery_device_cookie*)_cookie;
 	status_t err = B_ERROR;
 
