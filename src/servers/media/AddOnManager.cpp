@@ -421,7 +421,7 @@ AddOnManager::_RegisterWriter(WriterPlugin* writer, const entry_ref& ref)
 	info.internalID = fNextWriterFormatFamilyID++;
 
 	// Get list of support media_file_formats...
-	media_file_format* fileFormats = NULL;
+	const media_file_format* fileFormats = NULL;
 	size_t count = 0;
 	if (writer->GetSupportedFileFormats(&fileFormats, &count) != B_OK) {
 		printf("AddOnManager::_RegisterWriter(): "

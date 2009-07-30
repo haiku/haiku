@@ -1185,7 +1185,7 @@ operator<(const media_file_format_id& a, const media_file_format_id& b)
 // #pragma mark -
 
 
-//! Use this function iterate through available file format writers
+//! Use this function to iterate through available file format writers.
 status_t
 get_next_file_format(int32* cookie, media_file_format* mff)
 {

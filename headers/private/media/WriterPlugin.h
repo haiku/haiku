@@ -56,12 +56,8 @@ public: // XXX for test programs only
 class WriterPlugin : public virtual MediaPlugin {
 public:
 	virtual	Writer*				NewWriter() = 0;
-	// TODO: Perhaps change this interface to make it clear if we
-	// want the _fileFormats to be allocated! This is used in
-	// src/servers/media/AddOnManager.cpp:_RegisterWriter() and the
-	// objects are not freed by that method!
 	virtual	status_t			GetSupportedFileFormats(
-									media_file_format** _fileFormats,
+									const media_file_format** _fileFormats,
 									size_t* _count) = 0;
 
 };
