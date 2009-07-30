@@ -5,18 +5,17 @@
 #ifndef _MEDIA_TYPES_H
 #define _MEDIA_TYPES_H
 
-#ifdef __cplusplus
-#	include <MediaDefs.h>
 
-#	include <Messenger.h>
-#	include <List.h>
-#	include <Locker.h>
-#endif
+#include <MediaDefs.h>
+
+#include <Messenger.h>
+#include <List.h>
+#include <Locker.h>
 
 
 struct media_codec_info {
 	char	pretty_name[96];   /* eg: "SuperSqueeze Encoder by Foo Inc" */
-	char	short_name[32];    /* eg: "supersqueeze" */
+	char	short_name[32];    /* eg: "SuperSqueeze" */
 
 	int32	id;                /* opaque id passed to
 								  BMediaFile::CreateTrack() */
@@ -177,14 +176,13 @@ typedef struct {
 
 
 typedef struct _media_format_description {
-#ifdef __cplusplus
 								_media_format_description();
 								~_media_format_description();
 								_media_format_description(
 									const _media_format_description& other);
 	_media_format_description&	operator=(
 									const _media_format_description& other);
-#endif
+
 	media_format_family family;
 	uint32 _reserved_[3];
 	union {
@@ -200,9 +198,6 @@ typedef struct _media_format_description {
 		uint32 _reserved_[12];
 	} u;
 } media_format_description;
-
-
-#ifdef __cplusplus
 
 
 class BMediaFormats {
@@ -284,6 +279,4 @@ bool operator==(const GUID& a, const GUID& b);
 bool operator<(const GUID& a, const GUID& b);
 
 
-#endif	/* __cplusplus */
-
-#endif	/* _MEDIA_TYPES_H */
+#endif	// _MEDIA_TYPES_H
