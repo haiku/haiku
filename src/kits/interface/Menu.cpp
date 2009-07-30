@@ -2267,7 +2267,6 @@ BMenu::_DrawItems(BRect updateRect)
 		if (item->Frame().Intersects(updateRect))
 			item->Draw();
 	}
-	printf("BMenu::_DrawItems() took %lld usecs\n", system_time() - start);
 }
 
 
