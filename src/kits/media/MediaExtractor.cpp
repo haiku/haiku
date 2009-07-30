@@ -1,8 +1,10 @@
 /*
-** Copyright 2004-2007, Marcus Overhagen. All rights reserved.
-** Copyright 2008, Maurice Kalinowski. All rights reserved.
-** Distributed under the terms of the MIT License.
-*/
+ * Copyright 2004-2007, Marcus Overhagen. All rights reserved.
+ * Copyright 2008, Maurice Kalinowski. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include "MediaExtractor.h"
 #include "PluginManager.h"
 #include "ChunkCache.h"
@@ -14,8 +16,10 @@
 #include <string.h>
 #include <new>
 
+
 // should be 0, to disable the chunk cache set it to 1
 #define DISABLE_CHUNK_CACHE 0
+
 
 MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 {
