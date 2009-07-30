@@ -51,12 +51,17 @@ VMVnodeCache::Read(off_t offset, const iovec *vecs, size_t count,
 	status_t status = vfs_read_pages(fVnode, NULL, offset, vecs, count,
 		flags, _numBytes);
 
-	bytesUntouched -= *_numBytes;
+	size_t bytesEnd = *_numBytes;
+
+	if (offset + bytesEnd > virtual_end)
+		bytesEnd = virtual_end - offset;
 
 	// If the request could be filled completely, or an error occured,
 	// we're done here
-	if (status < B_OK || bytesUntouched == 0)
+	if (status != B_OK || bytesUntouched == bytesEnd)
 		return status;
+
+	bytesUntouched -= bytesEnd;
 
 	// Clear out any leftovers that were not touched by the above read - we're
 	// doing this here so that not every file system/device has to implement

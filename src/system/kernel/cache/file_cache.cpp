@@ -199,8 +199,21 @@ PrecacheIO::IOFinished(status_t status, bool partialTransfer,
 
 	// Make successfully loaded pages accessible again (partially
 	// transferred pages are considered failed)
-	size_t pagesTransferred = bytesTransferred >> PAGE_SHIFT;
+	size_t pagesTransferred
+		= (bytesTransferred + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+
+	if (fOffset + bytesTransferred > fCache->virtual_end)
+		bytesTransferred = fCache->virtual_end - fOffset;
+
 	for (uint32 i = 0; i < pagesTransferred; i++) {
+		if (i == pagesTransferred - 1
+			&& (bytesTransferred % B_PAGE_SIZE) != 0) {
+			// clear partial page
+			size_t bytesTouched = bytesTransferred % B_PAGE_SIZE;
+			vm_memset_physical((fPages[i]->physical_page_number << PAGE_SHIFT)
+				+ bytesTouched, 0, B_PAGE_SIZE - bytesTouched);
+		}
+
 		fPages[i]->state = PAGE_STATE_ACTIVE;
 		fBusyConditions[i].Unpublish();
 	}
@@ -313,6 +326,39 @@ reserve_pages(file_cache_ref *ref, size_t reservePages, bool isWrite)
 }
 
 
+static inline status_t
+read_pages_and_clear_partial(file_cache_ref* ref, void* cookie, off_t offset,
+	const iovec* vecs, size_t count, uint32 flags, size_t* _numBytes)
+{
+	size_t bytesUntouched = *_numBytes;
+
+	status_t status = vfs_read_pages(ref->vnode, cookie, offset, vecs, count,
+		flags, _numBytes);
+
+	size_t bytesEnd = *_numBytes;
+
+	if (offset + bytesEnd > ref->cache->virtual_end)
+		bytesEnd = ref->cache->virtual_end - offset;
+
+	if (status == B_OK && bytesEnd < bytesUntouched) {
+		// Clear out any leftovers that were not touched by the above read.
+		// We're doing this here so that not every file system/device has to
+		// implement this.
+		bytesUntouched -= bytesEnd;
+
+		for (int32 i = count; i-- > 0 && bytesUntouched != 0; ) {
+			size_t length = min_c(bytesUntouched, vecs[i].iov_len);
+			vm_memset_physical((addr_t)vecs[i].iov_base + vecs[i].iov_len
+				- length, 0, length);
+
+			bytesUntouched -= length;
+		}
+	}
+
+	return status;
+}
+
+
 /*!	Reads the requested amount of data into the cache, and allocates
 	pages needed to fulfill that request. This function is called by cache_io().
 	It can only handle a certain amount of bytes, and the caller must make
@@ -336,7 +382,6 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	uint32 vecCount = 0;
 
 	size_t numBytes = PAGE_ALIGN(pageOffset + bufferSize);
-	size_t bytesUntouched = numBytes;
 	vm_page *pages[MAX_IO_VECS];
 	ConditionVariable busyConditions[MAX_IO_VECS];
 	int32 pageIndex = 0;
@@ -362,7 +407,7 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	vm_page_unreserve_pages(lastReservedPages);
 
 	// read file into reserved pages
-	status_t status = vfs_read_pages(ref->vnode, cookie, offset, vecs,
+	status_t status = read_pages_and_clear_partial(ref, cookie, offset, vecs,
 		vecCount, B_PHYSICAL_IO_REQUEST, &numBytes);
 	if (status != B_OK) {
 		// reading failed, free allocated pages
@@ -378,20 +423,6 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 		}
 
 		return status;
-	}
-
-	// Clear out any leftovers that were not touched by the above read - we're
-	// doing this here so that not every file system/device has to implement
-	// this
-	bytesUntouched -= numBytes;
-
-	for (int32 i = vecCount; i-- > 0 && bytesUntouched != 0; ) {
-		size_t length = min_c(bytesUntouched, vecs[i].iov_len);
-
-		addr_t address = (addr_t)vecs[i].iov_base + vecs[i].iov_len - length;
-		vm_memset_physical(address, 0, length);
-
-		bytesUntouched -= length;
 	}
 
 	// copy the pages if needed and unmap them again
