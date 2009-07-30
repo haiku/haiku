@@ -6,20 +6,20 @@
  *
  * Distributed under the terms of the MIT License.
  */
-
-//! libavcodec based decoder for Haiku
-
 #ifndef FFMPEG_PLUGIN_H
 #define FFMPEG_PLUGIN_H
+
 
 #include <MediaFormats.h>
 
 #include "DecoderPlugin.h"
+#include "EncoderPlugin.h"
 #include "ReaderPlugin.h"
 #include "WriterPlugin.h"
 
+
 class FFmpegPlugin : public ReaderPlugin, public DecoderPlugin,
-	public WriterPlugin {
+	public WriterPlugin, public EncoderPlugin {
 public:
 	virtual	Reader*				NewReader();
 
@@ -31,6 +31,12 @@ public:
 	virtual	status_t			GetSupportedFileFormats(
 									const media_file_format** _fileFormats,
 									size_t* _count);
+
+	virtual	Encoder*			NewEncoder(
+									const media_codec_info& codecInfo);
+	virtual	status_t			GetSupportedCodecs(
+									const media_codec_info** codecInfos,
+									size_t* count);
 
 private:
 	class GlobalInitilizer {

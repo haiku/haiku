@@ -21,9 +21,11 @@ extern "C" {
 }
 
 #include "AVCodecDecoder.h"
+#include "AVCodecEncoder.h"
 #include "AVFormatReader.h"
 #include "AVFormatWriter.h"
 #include "CodecTable.h"
+#include "EncoderTable.h"
 #include "MuxerTable.h"
 
 
@@ -127,6 +129,26 @@ FFmpegPlugin::GetSupportedFileFormats(const media_file_format** _fileFormats,
 	*_count = gMuxerCount;
 	return B_OK;
 }
+
+
+Encoder*
+FFmpegPlugin::NewEncoder(const media_codec_info& codecInfo)
+{
+	return new(std::nothrow)AVCodecEncoder(codecInfo.short_name);
+}
+
+
+status_t
+FFmpegPlugin::GetSupportedCodecs(const media_codec_info** _codecInfos,
+	size_t* _count)
+{
+	*_codecInfos = gEncoderTable;
+	*_count = gEncoderCount;
+	return B_OK;
+}
+
+
+// #pragma mark -
 
 
 MediaPlugin*
