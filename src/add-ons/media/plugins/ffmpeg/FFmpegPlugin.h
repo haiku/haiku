@@ -16,14 +16,21 @@
 
 #include "DecoderPlugin.h"
 #include "ReaderPlugin.h"
+#include "WriterPlugin.h"
 
-class FFmpegPlugin : public ReaderPlugin, public DecoderPlugin {
+class FFmpegPlugin : public ReaderPlugin, public DecoderPlugin,
+	public WriterPlugin {
 public:
 	virtual	Reader*				NewReader();
 
 	virtual	Decoder*			NewDecoder(uint index);
-	virtual	status_t			GetSupportedFormats(media_format** formats,
-									size_t* count);
+	virtual	status_t			GetSupportedFormats(media_format** _formats,
+									size_t* _count);
+
+	virtual	Writer*				NewWriter();
+	virtual	status_t			GetSupportedFileFormats(
+									const media_file_format** _fileFormats,
+									size_t* _count);
 
 private:
 	class GlobalInitilizer {

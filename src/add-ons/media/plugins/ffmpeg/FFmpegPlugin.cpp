@@ -22,7 +22,9 @@ extern "C" {
 
 #include "AVCodecDecoder.h"
 #include "AVFormatReader.h"
+#include "AVFormatWriter.h"
 #include "CodecTable.h"
+#include "MuxerTable.h"
 
 
 FFmpegPlugin::GlobalInitilizer::GlobalInitilizer()
@@ -62,7 +64,7 @@ FFmpegPlugin::NewReader()
 
 
 status_t
-FFmpegPlugin::GetSupportedFormats(media_format** formats, size_t* count)
+FFmpegPlugin::GetSupportedFormats(media_format** _formats, size_t* _count)
 {
 	BMediaFormats mediaFormats;
 	if (mediaFormats.InitCheck() != B_OK)
@@ -104,8 +106,25 @@ FFmpegPlugin::GetSupportedFormats(media_format** formats, size_t* count)
 		gAVCodecFormats[i] = format;
 	}
 
-	*formats = gAVCodecFormats;
-	*count = gCodecCount;
+	*_formats = gAVCodecFormats;
+	*_count = gCodecCount;
+	return B_OK;
+}
+
+
+Writer*
+FFmpegPlugin::NewWriter()
+{
+	return new(std::nothrow) AVFormatWriter();
+}
+
+
+status_t
+FFmpegPlugin::GetSupportedFileFormats(const media_file_format** _fileFormats,
+	size_t* _count)
+{
+	*_fileFormats = gMuxerTable;
+	*_count = gMuxerCount;
 	return B_OK;
 }
 

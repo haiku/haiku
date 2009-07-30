@@ -12,9 +12,11 @@ SubDirHdrs [ FDirName $(SUBDIR) libswscale ] ;
 Addon ffmpeg :
  	AVCodecDecoder.cpp
  	AVFormatReader.cpp
+ 	AVFormatWriter.cpp
  	CodecTable.cpp
 	DemuxerTable.cpp
 	FFmpegPlugin.cpp
+	MuxerTable.cpp
 
 	gfx_conv_c.cpp
 	gfx_conv_c_lookup.cpp
