@@ -420,6 +420,7 @@ extern status_t		_kern_get_port_message_info_etc(port_id port,
 						bigtime_t timeout);
 
 // debug support functions
+extern status_t		_kern_kernel_debugger(const char *message);
 extern void			_kern_debugger(const char *message);
 extern int			_kern_disable_debugger(int state);
 

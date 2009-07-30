@@ -161,6 +161,7 @@ extern status_t	debug_get_next_demangled_argument(uint32* _cookie,
 extern struct thread* debug_set_debugged_thread(struct thread* thread);
 extern struct thread* debug_get_debugged_thread();
 
+extern status_t	_user_kernel_debugger(const char *message);
 extern void		_user_debug_output(const char *userString);
 
 #ifdef __cplusplus

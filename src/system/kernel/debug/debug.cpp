@@ -1660,6 +1660,27 @@ debug_get_debugged_thread()
 //	userland syscalls
 
 
+status_t
+_user_kernel_debugger(const char *userMessage)
+{
+	if (geteuid() != 0)
+		return B_NOT_ALLOWED;
+
+	char message[512];
+	strcpy(message, "USER: ");
+	size_t len = strlen(message);
+
+	if (userMessage == NULL || !IS_USER_ADDRESS(userMessage)
+		|| 	user_strlcpy(message + len, userMessage, sizeof(message) - len)
+			< 0) {
+		return B_BAD_ADDRESS;
+	}
+
+	kernel_debugger(message);
+	return B_OK;
+}
+
+
 void
 _user_debug_output(const char* userString)
 {
