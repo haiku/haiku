@@ -5,12 +5,15 @@
 #ifndef	_LAYOUT_BUILDER_H
 #define	_LAYOUT_BUILDER_H
 
+
 #include <GridLayout.h>
 #include <GridView.h>
 #include <GroupLayout.h>
 #include <GroupView.h>
+#include <MenuField.h>
 #include <SpaceLayoutItem.h>
 #include <SplitView.h>
+#include <TextControl.h>
 #include <Window.h>
 
 
@@ -113,6 +116,16 @@ public:
 	inline	ThisBuilder&		Add(BView* view, int32 column, int32 row,
 									int32 columnCount = 1, int32 rowCount = 1);
 	inline	ThisBuilder&		Add(BLayoutItem* item, int32 column, int32 row,
+									int32 columnCount = 1, int32 rowCount = 1);
+	inline	ThisBuilder&		AddMenuField(BMenuField* menuField,
+									int32 column, int32 row,
+									alignment labelAlignment
+										= B_ALIGN_HORIZONTAL_UNSET,
+									int32 columnCount = 1, int32 rowCount = 1);
+	inline	ThisBuilder&		AddTextControl(BTextControl* textControl,
+									int32 column, int32 row,
+									alignment labelAlignment
+										= B_ALIGN_HORIZONTAL_UNSET,
 									int32 columnCount = 1, int32 rowCount = 1);
 
 	inline	GroupBuilder		AddGroup(enum orientation orientation,
@@ -488,6 +501,36 @@ Grid<ParentBuilder>::Add(BLayoutItem* item, int32 column, int32 row,
 	int32 columnCount, int32 rowCount)
 {
 	fLayout->AddItem(item, column, row, columnCount, rowCount);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::ThisBuilder&
+Grid<ParentBuilder>::AddMenuField(BMenuField* menuField, int32 column,
+	int32 row, alignment labelAlignment, int32 columnCount, int32 rowCount)
+{
+	BLayoutItem* item = menuField->CreateLabelLayoutItem();
+	item->SetExplicitAlignment(
+		BAlignment(labelAlignment, B_ALIGN_VERTICAL_UNSET));
+	fLayout->AddItem(item, column, row, columnCount, rowCount);
+	fLayout->AddItem(menuField->CreateMenuBarLayoutItem(), column + columnCount,
+		row, columnCount, rowCount);
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::ThisBuilder&
+Grid<ParentBuilder>::AddTextControl(BTextControl* textControl, int32 column,
+	int32 row, alignment labelAlignment, int32 columnCount, int32 rowCount)
+{
+	BLayoutItem* item = textControl->CreateLabelLayoutItem();
+	item->SetExplicitAlignment(
+		BAlignment(labelAlignment, B_ALIGN_VERTICAL_UNSET));
+	fLayout->AddItem(item, column, row, columnCount, rowCount);
+	fLayout->AddItem(textControl->CreateTextViewLayoutItem(),
+		column + columnCount, row, columnCount, rowCount);
 	return *this;
 }
 
