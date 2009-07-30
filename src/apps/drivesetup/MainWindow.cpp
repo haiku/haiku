@@ -225,6 +225,7 @@ MainWindow::MainWindow(BRect frame)
 	AddChild(fListView);
 
 	// configure PartitionListView
+	fListView->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 	fListView->SetSelectionMessage(new BMessage(MSG_PARTITION_ROW_SELECTED));
 	fListView->SetTarget(this);
 
