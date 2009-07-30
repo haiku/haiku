@@ -9,6 +9,7 @@
 #ifndef __MENU_PRIVATE_H
 #define __MENU_PRIVATE_H
 
+#include <Menu.h>
 
 enum menu_states {
 	MENU_STATE_TRACKING = 0,

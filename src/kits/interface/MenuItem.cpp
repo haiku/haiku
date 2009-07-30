@@ -15,8 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ControlLook.h>
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <MenuItem.h>
 #include <Shape.h>
 #include <String.h>
