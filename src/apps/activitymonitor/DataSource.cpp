@@ -485,7 +485,7 @@ BlockCacheDataSource::NextValue(SystemInfo& info)
 const char*
 BlockCacheDataSource::Label() const
 {
-	return "Block Cache Memory Usage";
+	return "Block Cache Memory";
 }
 
 
