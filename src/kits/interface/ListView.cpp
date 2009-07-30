@@ -374,7 +374,6 @@ BListView::MouseDown(BPoint point)
 			else
 				Select(index);
 		}
-		fAnchorIndex = index;
 	} else {
 		if (!(modifiers & B_COMMAND_KEY))
 			DeselectAll();
@@ -412,25 +411,22 @@ BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 void
 BListView::KeyDown(const char *bytes, int32 numBytes)
 {
+	bool extend
+		= fListType == B_MULTIPLE_SELECTION_LIST
+			&& (modifiers() & B_SHIFT_KEY) != 0;
+
 	switch (bytes[0]) {
 		case B_UP_ARROW:
 		{
 			if (fFirstSelected == -1) {
 				// if nothing is selected yet, always select the first item
 				Select(0);
-				fAnchorIndex = 0;
 			} else {
-				bool extend = false;
-				if (fListType == B_MULTIPLE_SELECTION_LIST
-					&& (modifiers() & B_SHIFT_KEY) != 0)
-					extend = true;
-
 				if (fAnchorIndex > 0) {
 					if (fAnchorIndex <= fFirstSelected)
 						Select(fAnchorIndex - 1, extend);
 					else
 						Deselect(fAnchorIndex);
-					--fAnchorIndex;
 				}
 			}
 
@@ -442,19 +438,12 @@ BListView::KeyDown(const char *bytes, int32 numBytes)
 			if (fFirstSelected == -1) {
 				// if nothing is selected yet, always select the first item
 				Select(0);
-				fAnchorIndex = 0;
 			} else {
-				bool extend = false;
-				if (fListType == B_MULTIPLE_SELECTION_LIST
-					&& (modifiers() & B_SHIFT_KEY) != 0)
-					extend = true;
-				
 				if (fAnchorIndex < CountItems() - 1) {
 					if (fAnchorIndex >= fLastSelected)
 						Select(fAnchorIndex + 1, extend);
 					else
 						Deselect(fAnchorIndex);
-					++fAnchorIndex;
 				}
 			}
 
@@ -463,11 +452,11 @@ BListView::KeyDown(const char *bytes, int32 numBytes)
 		}
 
 		case B_HOME:
-			Select(0, fListType == B_MULTIPLE_SELECTION_LIST);
+			Select(0, extend);
 			ScrollToSelection();
 			break;
 		case B_END:
-			Select(CountItems() - 1, fListType == B_MULTIPLE_SELECTION_LIST);
+			Select(CountItems() - 1, extend);
 			ScrollToSelection();
 			break;
 
@@ -1449,6 +1438,9 @@ BListView::_Select(int32 index, bool extend)
 	} else if (index > fLastSelected) {
 		fLastSelected = index;
 	}
+
+	if (!extend)
+		fAnchorIndex = index;
 
 	ItemAt(index)->Select();
 	if (Window())
