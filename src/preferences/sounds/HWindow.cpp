@@ -75,6 +75,7 @@ HWindow::InitGUI()
 	fEventList = new HEventList(rect);
 	listView->AddChild(fEventList);
 	fEventList->SetType(BMediaFiles::B_SOUNDS);
+	fEventList->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 
 	rect = Bounds();
 	rect.top = rect.bottom - 105;
