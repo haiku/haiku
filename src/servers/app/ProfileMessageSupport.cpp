@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku Inc. All rights reserved.
+ * Copyright 2007-2009, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,9 +18,12 @@ string_for_message_code(uint32 code, BString& string)
 	string = "";
 
 	switch (code) {
-		case AS_GET_DESKTOP: string = "AS_GET_DESKTOP"; break;
-		case AS_REGISTER_INPUT_SERVER: string = "AS_REGISTER_INPUT_SERVER"; break;
-		case AS_EVENT_STREAM_CLOSED: string = "AS_EVENT_STREAM_CLOSED"; break;
+		// Return the exact name for each constant
+		#define CODE(x) case x: string = #x; break
+
+		CODE(AS_GET_DESKTOP);
+		CODE(AS_REGISTER_INPUT_SERVER);
+		CODE(AS_EVENT_STREAM_CLOSED);
 
 		// Desktop definitions (through the ServerApp, though)
 		case AS_GET_WINDOW_LIST: string = "AS_GET_WINDOW_LIST"; break;
@@ -160,8 +163,8 @@ string_for_message_code(uint32 code, BString& string)
 		case AS_COUNT_DECORATORS: string = "AS_COUNT_DECORATORS"; break;
 		case AS_GET_DECORATOR_NAME: string = "AS_GET_DECORATOR_NAME"; break;
 
-		case AS_COUNT_WORKSPACES: string = "AS_COUNT_WORKSPACES"; break;
-		case AS_SET_WORKSPACE_COUNT: string = "AS_SET_WORKSPACE_COUNT"; break;
+		CODE(AS_SET_WORKSPACE_LAYOUT);
+		CODE(AS_GET_WORKSPACE_LAYOUT);
 		case AS_CURRENT_WORKSPACE: string = "AS_CURRENT_WORKSPACE"; break;
 		case AS_ACTIVATE_WORKSPACE: string = "AS_ACTIVATE_WORKSPACE"; break;
 		case AS_GET_SCROLLBAR_INFO: string = "AS_GET_SCROLLBAR_INFO"; break;

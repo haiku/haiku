@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Haiku.
+ * Copyright 2005-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -48,8 +48,10 @@ public:
 			void				SetShowAllDraggers(bool show);
 			bool				ShowAllDraggers() const;
 
-			void				SetWorkspacesCount(int32 number);
+			void				SetWorkspacesLayout(int32 columns, int32 rows);
 			int32				WorkspacesCount() const;
+			int32				WorkspacesColumns() const;
+			int32				WorkspacesRows() const;
 
 			void				SetWorkspacesMessage(int32 index,
 									BMessage& message);
@@ -73,6 +75,8 @@ private:
 			void				_SetDefaults();
 			status_t			_Load();
 			status_t			_GetPath(BPath& path);
+			void				_ValidateWorkspacesLayout(int32& columns,
+									int32& rows) const;
 
 			ServerFont			fPlainFont;
 			ServerFont			fBoldFont;
@@ -82,7 +86,8 @@ private:
 			menu_info			fMenuInfo;
 			mode_mouse			fMouseMode;
 			bool				fShowAllDraggers;
-			int32				fWorkspacesCount;
+			int32				fWorkspacesColumns;
+			int32				fWorkspacesRows;
 			BMessage			fWorkspaceMessages[kMaxWorkspaces];
 
 			server_read_only_memory& fShared;

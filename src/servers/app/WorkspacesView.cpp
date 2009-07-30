@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Haiku Inc.
+ * Copyright 2005-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -62,21 +62,12 @@ WorkspacesView::_GetGrid(int32& columns, int32& rows)
 {
 	DesktopSettings settings(Window()->Desktop());
 
-	int32 count = settings.WorkspacesCount();
-	int32 squareRoot = (int32)sqrt(count);
-
-	rows = 1;
-	for (int32 i = 2; i <= squareRoot; i++) {
-		if (count % i == 0)
-			rows = i;
-	}
-
-	columns = count / rows;
+	columns = settings.WorkspacesColumns();
+	rows = settings.WorkspacesRows();
 }
 
 
-/*!
-	\brief Returns the frame of the screen for the specified workspace.
+/*!	\brief Returns the frame of the screen for the specified workspace.
 */
 BRect
 WorkspacesView::_ScreenFrame(int32 i)
@@ -85,8 +76,7 @@ WorkspacesView::_ScreenFrame(int32 i)
 }
 
 
-/*!
-	\brief Returns the frame of the specified workspace within the
+/*!	\brief Returns the frame of the specified workspace within the
 		workspaces view.
 */
 BRect
@@ -119,8 +109,7 @@ WorkspacesView::_WorkspaceAt(int32 i)
 }
 
 
-/*!
-	\brief Returns the workspace frame and index of the workspace
+/*!	\brief Returns the workspace frame and index of the workspace
 		under \a where.
 
 	If, for some reason, there is no workspace located under \where,

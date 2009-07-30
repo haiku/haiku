@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -111,7 +111,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									{ return fCurrentWorkspace; }
 		Workspace::Private&		WorkspaceAt(int32 index)
 									{ return fWorkspaces[index]; }
-		status_t				SetWorkspacesCount(int32 newCount);
+		status_t				SetWorkspacesLayout(int32 columns, int32 rows);
 		BRect					WorkspaceFrame(int32 index) const;
 
 		// Window methods

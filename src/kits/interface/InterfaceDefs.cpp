@@ -717,25 +717,39 @@ keyboard_navigation_color()
 int32
 count_workspaces()
 {
-	int32 count = 1;
+	int32 columns = 1;
+	int32 rows = 1;
 
 	BPrivate::AppServerLink link;
-	link.StartMessage(AS_COUNT_WORKSPACES);
+	link.StartMessage(AS_GET_WORKSPACE_LAYOUT);
 
 	status_t status;
-	if (link.FlushWithReply(status) == B_OK && status == B_OK)
-		link.Read<int32>(&count);
+	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
+		link.Read<int32>(&columns);
+		link.Read<int32>(&rows);
+	}
 
-	return count;
+	return columns * rows;
 }
 
 
 void
 set_workspace_count(int32 count)
 {
+	int32 squareRoot = (int32)sqrt(count);
+
+	int32 rows = 1;
+	for (int32 i = 2; i <= squareRoot; i++) {
+		if (count % i == 0)
+			rows = i;
+	}
+
+	int32 columns = count / rows;
+
 	BPrivate::AppServerLink link;
-	link.StartMessage(AS_SET_WORKSPACE_COUNT);
-	link.Attach<int32>(count);
+	link.StartMessage(AS_SET_WORKSPACE_LAYOUT);
+	link.Attach<int32>(columns);
+	link.Attach<int32>(rows);
 	link.Flush();
 }
 

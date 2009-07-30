@@ -70,9 +70,11 @@ DesktopSettingsPrivate::_SetDefaults()
 	fMenuInfo.click_to_open = true; // always true
 	fMenuInfo.triggers_always_shown = false;
 
-	fWorkspacesCount = 4;
+	fWorkspacesColumns = 2;
+	fWorkspacesRows = 2;
 
-	memcpy(fShared.colors, BPrivate::kDefaultColors, sizeof(rgb_color) * kNumColors);
+	memcpy(fShared.colors, BPrivate::kDefaultColors,
+		sizeof(rgb_color) * kNumColors);
 
 	gSubpixelAntialiasing = false;
 	gDefaultHintingMode = HINTING_MODE_ON;
@@ -117,16 +119,18 @@ DesktopSettingsPrivate::_Load()
 		BMessage settings;
 		status = settings.Unflatten(&file);
 		if (status == B_OK) {
-			int32 count;
-			if (settings.FindInt32("count", &count) == B_OK) {
-				fWorkspacesCount = count;
-				if (fWorkspacesCount < 1 || fWorkspacesCount > 32)
-					fWorkspacesCount = 4;
+			int32 columns;
+			int32 rows;
+			if (settings.FindInt32("columns", &columns) == B_OK
+				&& settings.FindInt32("rows", &rows) == B_OK) {
+				_ValidateWorkspacesLayout(columns, rows);
+				fWorkspacesColumns = columns;
+				fWorkspacesRows = rows;
 			}
 
 			int32 i = 0;
-			while (i < kMaxWorkspaces
-				&& settings.FindMessage("workspace", i, &fWorkspaceMessages[i]) == B_OK) {
+			while (i < kMaxWorkspaces && settings.FindMessage("workspace",
+					i, &fWorkspaceMessages[i]) == B_OK) {
 				i++;
 			}
 		}
@@ -293,7 +297,8 @@ DesktopSettingsPrivate::Save(uint32 mask)
 		BPath path(basePath);
 		if (path.Append("workspaces") == B_OK) {
 			BMessage settings('asws');
-			settings.AddInt32("count", fWorkspacesCount);
+			settings.AddInt32("columns", fWorkspacesColumns);
+			settings.AddInt32("rows", fWorkspacesRows);
 
 			for (int32 i = 0; i < kMaxWorkspaces; i++) {
 				settings.AddMessage("workspace", &fWorkspaceMessages[i]);
@@ -519,14 +524,12 @@ DesktopSettingsPrivate::ShowAllDraggers() const
 
 
 void
-DesktopSettingsPrivate::SetWorkspacesCount(int32 number)
+DesktopSettingsPrivate::SetWorkspacesLayout(int32 columns, int32 rows)
 {
-	if (number < 1)
-		number = 1;
-	else if (number > kMaxWorkspaces)
-		number = kMaxWorkspaces;
+	_ValidateWorkspacesLayout(columns, rows);
+	fWorkspacesColumns = columns;
+	fWorkspacesRows = rows;
 
-	fWorkspacesCount = number;
 	Save(kWorkspacesSettings);
 }
 
@@ -534,7 +537,21 @@ DesktopSettingsPrivate::SetWorkspacesCount(int32 number)
 int32
 DesktopSettingsPrivate::WorkspacesCount() const
 {
-	return fWorkspacesCount;
+	return fWorkspacesColumns * fWorkspacesRows;
+}
+
+
+int32
+DesktopSettingsPrivate::WorkspacesColumns() const
+{
+	return fWorkspacesColumns;
+}
+
+
+int32
+DesktopSettingsPrivate::WorkspacesRows() const
+{
+	return fWorkspacesRows;
 }
 
 
@@ -644,6 +661,24 @@ DesktopSettingsPrivate::IsSubpixelOrderingRegular() const
 	return gSubpixelOrderingRGB;
 }
 
+
+void
+DesktopSettingsPrivate::_ValidateWorkspacesLayout(int32& columns,
+	int32& rows) const
+{
+	if (columns < 1)
+		columns = 1;
+	if (rows < 1)
+		rows = 1;
+
+	if (columns * rows > kMaxWorkspaces) {
+		// Revert to defaults in case of invalid settings
+		columns = 2;
+		rows = 2;
+	}
+}
+
+
 //	#pragma mark - read access
 
 
@@ -719,6 +754,20 @@ int32
 DesktopSettings::WorkspacesCount() const
 {
 	return fSettings->WorkspacesCount();
+}
+
+
+int32
+DesktopSettings::WorkspacesColumns() const
+{
+	return fSettings->WorkspacesColumns();
+}
+
+
+int32
+DesktopSettings::WorkspacesRows() const
+{
+	return fSettings->WorkspacesRows();
 }
 
 

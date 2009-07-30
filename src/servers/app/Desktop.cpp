@@ -147,7 +147,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 		&& message->FindInt32("key", &key) == B_OK
 		&& message->FindInt32("modifiers", &modifiers) == B_OK) {
 		// Check for safe video mode (cmd + ctrl + escape)
-		if (key == 0x01 && (modifiers & B_COMMAND_KEY) != 0 
+		if (key == 0x01 && (modifiers & B_COMMAND_KEY) != 0
 			&& (modifiers & B_CONTROL_KEY) != 0) {
 			system("screenmode --fall-back &");
 			return B_SKIP_MESSAGE;
@@ -844,15 +844,16 @@ Desktop::StoreWorkspaceConfiguration(int32 index)
 
 
 status_t
-Desktop::SetWorkspacesCount(int32 newCount)
+Desktop::SetWorkspacesLayout(int32 newColumns, int32 newRows)
 {
+	int32 newCount = newColumns * newRows;
 	if (newCount < 1 || newCount > kMaxWorkspaces)
 		return B_BAD_VALUE;
 
 	if (!LockAllWindows())
 		return B_ERROR;
 
-	fSettings->SetWorkspacesCount(newCount);
+	fSettings->SetWorkspacesLayout(newColumns, newRows);
 
 	// either update the workspaces window, or switch to
 	// the last available workspace - which will update
@@ -895,8 +896,7 @@ Desktop::WorkspaceFrame(int32 index) const
 }
 
 
-/*!
-	Changes the current workspace to the one specified by \a index.
+/*!	Changes the current workspace to the one specified by \a index.
 */
 void
 Desktop::SetWorkspaceAsync(int32 index)
@@ -908,8 +908,7 @@ Desktop::SetWorkspaceAsync(int32 index)
 }
 
 
-/*!
-	Changes the current workspace to the one specified by \a index.
+/*!	Changes the current workspace to the one specified by \a index.
 	You must not hold any window lock when calling this method.
 */
 void

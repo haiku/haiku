@@ -49,6 +49,8 @@ class DesktopSettings {
 		bool			ShowAllDraggers() const;
 
 		int32			WorkspacesCount() const;
+		int32			WorkspacesColumns() const;
+		int32			WorkspacesRows() const;
 		const BMessage*	WorkspacesMessage(int32 index) const;
 
 		rgb_color		UIColor(color_which which) const;

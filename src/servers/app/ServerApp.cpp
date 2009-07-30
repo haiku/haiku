@@ -797,29 +797,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
-		case AS_COUNT_WORKSPACES:
-		{
-			if (fDesktop->LockSingleWindow()) {
-				DesktopSettings settings(fDesktop);
-
-				fLink.StartMessage(B_OK);
-				fLink.Attach<int32>(settings.WorkspacesCount());
-				fDesktop->UnlockSingleWindow();
-			} else
-				fLink.StartMessage(B_ERROR);
-
-			fLink.Flush();
-			break;
-		}
-
-		case AS_SET_WORKSPACE_COUNT:
-		{
-			int32 newCount;
-			if (link.Read<int32>(&newCount) == B_OK)
-				fDesktop->SetWorkspacesCount(newCount);
-			break;
-		}
-
 		case AS_CURRENT_WORKSPACE:
 			STRACE(("ServerApp %s: get current workspace\n", Signature()));
 
@@ -845,26 +822,29 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_SET_WORKSPACE_LAYOUT:
+		{
+			int32 newColumns;
+			int32 newRows;
+			if (link.Read<int32>(&newColumns) == B_OK
+				&& link.Read<int32>(&newRows) == B_OK)
+				fDesktop->SetWorkspacesLayout(newColumns, newRows);
+			break;
+		}
+
 		case AS_GET_WORKSPACE_LAYOUT:
 		{
-			// TODO: this is taken from WorkspacesView::_GetGrid() - this is
-			// only a temporary solution
-			DesktopSettings settings(fDesktop);
+			if (fDesktop->LockSingleWindow()) {
+				DesktopSettings settings(fDesktop);
 
-			int32 count = settings.WorkspacesCount();
-			int32 squareRoot = (int32)sqrt(count);
+				fLink.StartMessage(B_OK);
+				fLink.Attach<int32>(settings.WorkspacesColumns());
+				fLink.Attach<int32>(settings.WorkspacesRows());
 
-			int32 rows = 1;
-			for (int32 i = 2; i <= squareRoot; i++) {
-				if (count % i == 0)
-					rows = i;
-			}
+				fDesktop->UnlockSingleWindow();
+			} else
+				fLink.StartMessage(B_ERROR);
 
-			int32 columns = count / rows;
-
-			fLink.StartMessage(B_OK);
-			fLink.Attach<int32>(columns);
-			fLink.Attach<int32>(rows);
 			fLink.Flush();
 			break;
 		}
