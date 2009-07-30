@@ -24,6 +24,29 @@ HeaderRenderer::~HeaderRenderer()
 }
 
 
+void
+HeaderRenderer::DrawHeaderBackground(BView* view, BRect frame, BRect updateRect,
+	uint32 flags)
+{
+	BRect bgRect = frame;
+
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	view->SetHighColor(tint_color(base, B_DARKEN_2_TINT));
+	view->StrokeLine(bgRect.LeftBottom(), bgRect.RightBottom());
+
+	bgRect.bottom--;
+	bgRect.right--;
+
+//	if ((flags & CLICKED) != 0)
+//		base = tint_color(base, B_DARKEN_1_TINT);
+
+	be_control_look->DrawButtonBackground(view, bgRect, updateRect, base, 0,
+		BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
+
+	view->StrokeLine(frame.RightTop(), frame.RightBottom());
+}
+
+
 // #pragma mark - DefaultHeaderRenderer
 
 
@@ -88,29 +111,6 @@ DefaultHeaderRenderer::DrawHeader(BView* view, BRect frame, BRect updateRect,
 		be_control_look->DrawLabel(view, value.ToString(), frame, updateRect,
 			view->LowColor(), 0);
 	}
-}
-
-
-void
-DefaultHeaderRenderer::DrawHeaderBackground(BView* view, BRect frame,
-	BRect updateRect, uint32 flags)
-{
-	BRect bgRect = frame;
-
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-	view->SetHighColor(tint_color(base, B_DARKEN_2_TINT));
-	view->StrokeLine(bgRect.LeftBottom(), bgRect.RightBottom());
-
-	bgRect.bottom--;
-	bgRect.right--;
-
-//	if ((flags & CLICKED) != 0)
-//		base = tint_color(base, B_DARKEN_1_TINT);
-
-	be_control_look->DrawButtonBackground(view, bgRect, updateRect, base, 0,
-		BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
-
-	view->StrokeLine(frame.RightTop(), frame.RightBottom());
 }
 
 

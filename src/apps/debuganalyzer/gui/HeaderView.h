@@ -31,7 +31,7 @@ public:
 									BRect updateRect, const Header* header,
 									uint32 flags) = 0;
 	virtual	void				DrawHeaderBackground(BView* view, BRect frame,
-									BRect updateRect, uint32 flags) = 0;
+									BRect updateRect, uint32 flags);
 };
 
 
@@ -46,8 +46,6 @@ public:
 	virtual	void				DrawHeader(BView* view, BRect frame,
 									BRect updateRect, const Header* header,
 									uint32 flags);
-	virtual	void				DrawHeaderBackground(BView* view, BRect frame,
-									BRect updateRect, uint32 flags);
 };
 
 
