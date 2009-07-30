@@ -38,7 +38,8 @@ class BatteryInfoView : public BView
 							acpi_extended_battery_info& extInfo);
 		virtual	void	Draw(BRect updateRect);
 		virtual void	GetPreferredSize(float *width, float *height);
-		
+		virtual void	AttachedToWindow();
+
 	private:
 		BSize			_MeasureString(const BString& string);
 		void			_FillStringList();

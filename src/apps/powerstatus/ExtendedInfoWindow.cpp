@@ -12,6 +12,7 @@
 #include <GroupLayout.h>
 #include <GroupView.h>
 #include <SpaceLayoutItem.h>
+#include <Screen.h>
 #include <String.h>
 
 
@@ -74,6 +75,19 @@ BatteryInfoView::GetPreferredSize(float *width, float *height)
 {
 	*width = fPreferredSize.width;
 	*height = fPreferredSize.height;
+}
+
+
+void
+BatteryInfoView::AttachedToWindow()
+{
+	BRect rect = BScreen().Frame();
+	BRect windowFrame = Window()->Frame();
+	BPoint position;
+	// center window on screen
+	position.x = (rect.Width() - windowFrame.Width()) / 2;
+	position.y = (rect.Height() - windowFrame.Height()) / 2;
+	Window()->MoveTo(position);
 }
 
 
