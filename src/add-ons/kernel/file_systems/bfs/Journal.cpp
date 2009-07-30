@@ -997,7 +997,12 @@ Journal::Unlock(Transaction* owner, bool success)
 			if (status != B_OK)
 				return status;
 
+			// Unlocking the inodes might trigger new transactions, but we
+			// cannot reuse the current one anymore, as this one is already
+			// closed.
+			fSeparateSubTransactions = true;
 			fOwner->UnlockInodes(success);
+			fSeparateSubTransactions = false;
 		}
 
 		fTimestamp = system_time();
