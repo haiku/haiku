@@ -423,7 +423,7 @@ BListView::KeyDown(const char *bytes, int32 numBytes)
 				Select(0);
 			} else {
 				if (fAnchorIndex > 0) {
-					if (fAnchorIndex <= fFirstSelected)
+					if (!extend || fAnchorIndex <= fFirstSelected)
 						Select(fAnchorIndex - 1, extend);
 					else
 						Deselect(fAnchorIndex);
@@ -440,7 +440,7 @@ BListView::KeyDown(const char *bytes, int32 numBytes)
 				Select(0);
 			} else {
 				if (fAnchorIndex < CountItems() - 1) {
-					if (fAnchorIndex >= fLastSelected)
+					if (!extend || fAnchorIndex >= fLastSelected)
 						Select(fAnchorIndex + 1, extend);
 					else
 						Deselect(fAnchorIndex);
@@ -452,11 +452,17 @@ BListView::KeyDown(const char *bytes, int32 numBytes)
 		}
 
 		case B_HOME:
-			Select(0, extend);
+			if (extend)
+				Select(0, fAnchorIndex, true);
+			else
+				Select(0, false);
 			ScrollToSelection();
 			break;
 		case B_END:
-			Select(CountItems() - 1, extend);
+			if (extend)
+				Select(fAnchorIndex, CountItems() - 1, true);
+			else
+				Select(CountItems() - 1, false);
 			ScrollToSelection();
 			break;
 
@@ -1418,8 +1424,11 @@ BListView::_Select(int32 index, bool extend)
 
 	bool changed = false;
 
-	if (fFirstSelected != -1 && !extend)
-		changed = _DeselectAll(index, index);
+	if (!extend) {
+		fAnchorIndex = index;
+		if (fFirstSelected != -1)
+			changed = _DeselectAll(index, index);
+	}
 
 	BListItem* item = ItemAt(index);
 	if (!item->IsEnabled() || item->IsSelected()) {
@@ -1438,9 +1447,6 @@ BListView::_Select(int32 index, bool extend)
 	} else if (index > fLastSelected) {
 		fLastSelected = index;
 	}
-
-	if (!extend)
-		fAnchorIndex = index;
 
 	ItemAt(index)->Select();
 	if (Window())
