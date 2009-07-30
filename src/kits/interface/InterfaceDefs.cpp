@@ -10,7 +10,7 @@
 
 /*!	Global functions and variables for the Interface Kit */
 
-#include <InterfacePrivate.h>
+#include <InterfaceDefs.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,7 +18,6 @@
 
 #include <ControlLook.h>
 #include <Font.h>
-#include <InterfaceDefs.h>
 #include <Menu.h>
 #include <Roster.h>
 #include <ScrollBar.h>
@@ -32,6 +31,7 @@
 #include <DefaultColors.h>
 #include <InputServerTypes.h>
 #include <input_globals.h>
+#include <InterfacePrivate.h>
 #include <MenuPrivate.h>
 #include <pr_server.h>
 #include <ServerProtocol.h>
@@ -193,6 +193,43 @@ get_mode_parameter(uint32 mode, int32& width, int32& height, uint32& colorSpace)
 
 	return true;
 }
+
+
+void
+get_workspaces_layout(uint32* _columns, uint32* _rows)
+{
+	int32 columns = 1;
+	int32 rows = 1;
+
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_WORKSPACE_LAYOUT);
+
+	status_t status;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
+		link.Read<int32>(&columns);
+		link.Read<int32>(&rows);
+	}
+
+	if (_columns != NULL)
+		*_columns = columns;
+	if (_rows != NULL)
+		*_rows = rows;
+}
+
+
+void
+set_workspaces_layout(uint32 columns, uint32 rows)
+{
+	if (columns < 1 || rows < 1)
+		return;
+
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_SET_WORKSPACE_LAYOUT);
+	link.Attach<int32>(columns);
+	link.Attach<int32>(rows);
+	link.Flush();
+}
+
 
 }	// namespace BPrivate
 
@@ -718,17 +755,9 @@ keyboard_navigation_color()
 int32
 count_workspaces()
 {
-	int32 columns = 1;
-	int32 rows = 1;
-
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_GET_WORKSPACE_LAYOUT);
-
-	status_t status;
-	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
-		link.Read<int32>(&columns);
-		link.Read<int32>(&rows);
-	}
+	uint32 columns;
+	uint32 rows;
+	BPrivate::get_workspaces_layout(&columns, &rows);
 
 	return columns * rows;
 }
@@ -747,11 +776,7 @@ set_workspace_count(int32 count)
 
 	int32 columns = count / rows;
 
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_SET_WORKSPACE_LAYOUT);
-	link.Attach<int32>(columns);
-	link.Attach<int32>(rows);
-	link.Flush();
+	BPrivate::set_workspaces_layout(columns, rows);
 }
 
 
@@ -952,7 +977,7 @@ _init_interface_kit_()
 	be_control_look = new BControlLook();
 
 	_init_global_fonts_();
-	
+
 	BPrivate::gWidthBuffer = new BPrivate::WidthBuffer;
 	status = BPrivate::MenuPrivate::CreateBitmaps();
 	if (status != B_OK)
@@ -980,7 +1005,7 @@ extern "C" status_t
 _fini_interface_kit_()
 {
 	BPrivate::MenuPrivate::DeleteBitmaps();
-	
+
 	delete BPrivate::gWidthBuffer;
 	BPrivate::gWidthBuffer = NULL;
 
