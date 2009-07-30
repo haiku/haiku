@@ -35,16 +35,38 @@
 <div class="content">
 
 <p>The following will show you step by step how to get Haiku's source code and build tools, how to compile it all and how to generate either a VMWare image or directly install onto a partition or USB drive. You'll also learn how to exchange data with an image or an installation on it's partition.</p>
-<p><b>Note:</b> <i>This guide is based on Ubuntu 8.10, but should generally work the same way on all other Linux distributions. Some changes may apply.</i></p>
+<p><b>Note:</b> <i>This guide is based on Ubuntu 8.10, but should generally work the same way on all other Linux distributions. Some known differences for other distributions are mentionned. Some changes may apply.</i></p>
 
 <h1>Downloading the tools and the Haiku source</h1>
 <ol>
 <li><p>Install all needed packages:</p>
+<dl>
+<dt class="collapsable_dt">Debian & Ubuntu</dt>
+<dd>
 <p>On Ubuntu you can do so by clicking <a href="apt:subversion,autoconf,automake,texinfo,flex,bison,gawk,build-essential,yasm,wget">here</a>, or use the command line:</p>
-<pre class="terminal">sudo apt-get install subversion autoconf automake texinfo flex bison gawk build-essential yasm wget</pre></li>
+<pre class="terminal">sudo apt-get install subversion autoconf automake texinfo flex bison gawk build-essential yasm wget</pre>
 
 <p>On 64-bit systems, you will also need the <a href="apt:libc6-dev-i386,gcc-multilib,g++-multilib">libc6-dev-i386, gcc-multilib, and g++-multilib</a> packages:</p>
-<pre class="terminal">sudo apt-get install libc6-dev-i386 gcc-multilib g++-multilib</pre></li>
+<pre class="terminal">sudo apt-get install libc6-dev-i386 gcc-multilib g++-multilib</pre>
+</dd>
+
+<dt class="collapsable_dt">Puppy Linux</dt>
+<dd>
+<p>You'll need the following packages:</p>
+<ul>
+<li><a href="http://haiku-user.info/files/cdrtools-2.01.01-i486.pet">cdrtools 2.01.01.pet</a></li>
+<li><a href="http://haiku-user.info/files/devx_421.sfs">devx421.sfs</a></li>
+<li><a href="http://haiku-user.info/files/less-418-i486.pet">less-418-i486.pet</a></li>
+<li><a href="http://haiku-user.info/files/yasm-0.8.0.pet">yasm-0.8.0.pet</a></li>
+</ul>
+<p>
+<a href="http://haiku-user.info/files/custom-puppy-421.iso">Here</a> is a premade Puppy iso containing all of the necessary tools - just burn it.
+</p>
+<dd>
+
+</dl>
+
+</li>
 
 <li><p>Create the Haiku development directories and get the Haiku build tools source:</p>
 <pre class="terminal">mkdir develop
