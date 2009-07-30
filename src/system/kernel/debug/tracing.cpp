@@ -208,8 +208,8 @@ private:
 	}
 };
 
-static TracingMetaData* sTracingMetaData;
 static TracingMetaData sDummyTracingMetaData;
+static TracingMetaData* sTracingMetaData = &sDummyTracingMetaData;
 
 
 static inline trace_entry*
