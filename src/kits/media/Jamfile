@@ -80,6 +80,7 @@ SharedLibrary libmedia.so :
 	EncoderPlugin.cpp
 	MediaExtractor.cpp
 	MediaPlugin.cpp
+	MediaWriter.cpp
 	PluginManager.cpp
 	ReaderPlugin.cpp
 	WriterPlugin.cpp
