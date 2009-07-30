@@ -1,9 +1,11 @@
 /*
-** Copyright 2004, the OpenBeOS project. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-**
-** Authors: Axel Dörfler, Marcus Overhagen
-*/
+ * Copyright 2004-2009, The Haiku Project. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Axel Dörfler
+ *		Marcus Overhagen
+ */
 
 
 #include "DataExchange.h"
@@ -26,9 +28,9 @@ static bigtime_t sLastFormatsUpdate;
 
 
 status_t
-get_next_encoder(int32 *cookie, const media_file_format *_fileFormat,
-	const media_format *inFormat, media_format *_outFormat,
-	media_codec_info *_codecInfo)
+get_next_encoder(int32* cookie, const media_file_format* _fileFormat,
+	const media_format* inFormat, media_format* _outFormat,
+	media_codec_info* _codecInfo)
 {
 	UNIMPLEMENTED();
 	return B_ERROR;
@@ -36,10 +38,10 @@ get_next_encoder(int32 *cookie, const media_file_format *_fileFormat,
 
 
 status_t
-get_next_encoder(int32 *cookie, const media_file_format *_fileFormat,
-	const media_format *inFormat, const media_format *_outFormat,
-	media_codec_info *_codecInfo, media_format *_acceptedInputFormat,
-	media_format *_acceptedOutputFormat)
+get_next_encoder(int32* cookie, const media_file_format* _fileFormat,
+	const media_format* inFormat, const media_format* _outFormat,
+	media_codec_info* _codecInfo, media_format* _acceptedInputFormat,
+	media_format* _acceptedOutputFormat)
 {
 	UNIMPLEMENTED();
 	return B_ERROR;
@@ -47,7 +49,7 @@ get_next_encoder(int32 *cookie, const media_file_format *_fileFormat,
 
 
 status_t
-get_next_encoder(int32 *cookie, media_codec_info *_codecInfo)
+get_next_encoder(int32* cookie, media_codec_info* _codecInfo)
 {
 	UNIMPLEMENTED();
 	return B_ERROR;
@@ -55,8 +57,8 @@ get_next_encoder(int32 *cookie, media_codec_info *_codecInfo)
 
 
 bool
-does_file_accept_format(const media_file_format *_fileFormat,
-	media_format *format, uint32 flags)
+does_file_accept_format(const media_file_format* _fileFormat,
+	media_format* format, uint32 flags)
 {
 	UNIMPLEMENTED();
 	return false;
@@ -77,14 +79,15 @@ _media_format_description::~_media_format_description()
 }
 
 
-_media_format_description::_media_format_description(const _media_format_description & other)
+_media_format_description::_media_format_description(
+	const _media_format_description& other)
 {
 	memcpy(this, &other, sizeof(*this));
 }
 
 
-_media_format_description & 
-_media_format_description::operator=(const _media_format_description & other)
+_media_format_description& 
+_media_format_description::operator=(const _media_format_description& other)
 {
 	memcpy(this, &other, sizeof(*this));
 	return *this;
@@ -92,7 +95,8 @@ _media_format_description::operator=(const _media_format_description & other)
 
 
 bool
-operator==(const media_format_description & a, const media_format_description & b)
+operator==(const media_format_description& a,
+	const media_format_description& b)
 {
 	if (a.family != b.family)
 		return false;
@@ -101,7 +105,8 @@ operator==(const media_format_description & a, const media_format_description & 
 		case B_BEOS_FORMAT_FAMILY:
 			return a.u.beos.format == b.u.beos.format;
 		case B_QUICKTIME_FORMAT_FAMILY:
-			return a.u.quicktime.codec == b.u.quicktime.codec && a.u.quicktime.vendor == b.u.quicktime.vendor;
+			return a.u.quicktime.codec == b.u.quicktime.codec
+				&& a.u.quicktime.vendor == b.u.quicktime.vendor;
 		case B_AVI_FORMAT_FAMILY:
 			return a.u.avi.codec == b.u.avi.codec;
 		case B_ASF_FORMAT_FAMILY:
@@ -115,7 +120,8 @@ operator==(const media_format_description & a, const media_format_description & 
 		case B_AVR_FORMAT_FAMILY:
 			return a.u.avr.id == b.u.avr.id;
 		case B_MISC_FORMAT_FAMILY:
-			return a.u.misc.file_format == b.u.misc.file_format && a.u.misc.codec == b.u.misc.codec;
+			return a.u.misc.file_format == b.u.misc.file_format
+				&& a.u.misc.codec == b.u.misc.codec;
 
 		default:
 			return false;
@@ -124,7 +130,7 @@ operator==(const media_format_description & a, const media_format_description & 
 
 
 bool
-operator<(const media_format_description & a, const media_format_description & b)
+operator<(const media_format_description& a, const media_format_description& b)
 {
 	if (a.family != b.family)
 		return a.family < b.family;
@@ -160,14 +166,14 @@ operator<(const media_format_description & a, const media_format_description & b
 
 
 bool
-operator==(const GUID & a, const GUID & b)
+operator==(const GUID& a, const GUID& b)
 {
 	return memcmp(&a, &b, sizeof(a)) == 0;
 }
 
 
 bool
-operator<(const GUID & a, const GUID & b)
+operator<(const GUID& a, const GUID& b)
 {
 	return memcmp(&a, &b, sizeof(a)) < 0;
 }
@@ -186,8 +192,8 @@ meta_format::meta_format()
 
 
 
-meta_format::meta_format(const media_format_description &description,
-	const media_format &format, int32 id)
+meta_format::meta_format(const media_format_description& description,
+	const media_format& format, int32 id)
 	:
 	description(description),
 	format(format),
@@ -195,7 +201,8 @@ meta_format::meta_format(const media_format_description &description,
 {
 }
 
-meta_format::meta_format(const media_format_description &description)
+
+meta_format::meta_format(const media_format_description& description)
 	:
 	description(description),
 	id(0)
@@ -203,7 +210,7 @@ meta_format::meta_format(const media_format_description &description)
 }
 
 
-meta_format::meta_format(const meta_format &other)
+meta_format::meta_format(const meta_format& other)
 	:
 	description(other.description),
 	format(other.format)
@@ -212,7 +219,8 @@ meta_format::meta_format(const meta_format &other)
 
 
 bool 
-meta_format::Matches(const media_format &otherFormat, media_format_family family)
+meta_format::Matches(const media_format& otherFormat,
+	media_format_family family)
 {
 	if (family != description.family)
 		return false;
@@ -222,7 +230,7 @@ meta_format::Matches(const media_format &otherFormat, media_format_family family
 
 
 int 
-meta_format::CompareDescriptions(const meta_format *a, const meta_format *b)
+meta_format::CompareDescriptions(const meta_format* a, const meta_format* b)
 {
 	if (a->description == b->description)
 		return 0;
@@ -235,7 +243,7 @@ meta_format::CompareDescriptions(const meta_format *a, const meta_format *b)
 
 
 int 
-meta_format::Compare(const meta_format *a, const meta_format *b)
+meta_format::Compare(const meta_format* a, const meta_format* b)
 {
 	int compare = CompareDescriptions(a, b);
 	if (compare != 0)
@@ -264,7 +272,8 @@ update_media_formats()
 	BMessage reply;
 	status_t status = QueryServer(request, reply);
 	if (status < B_OK) {
-		ERROR("BMediaFormats: Could not update formats: %s\n", strerror(status));
+		ERROR("BMediaFormats: Could not update formats: %s\n",
+			strerror(status));
 		return status;
 	}
 
@@ -286,22 +295,22 @@ update_media_formats()
 
 	int32 index = 0;
 	for (; index < sFormats.CountItems() && index < count; index++) {
-		meta_format *item = sFormats.ItemAt(index);
+		meta_format* item = sFormats.ItemAt(index);
 
-		const meta_format *newItem;
+		const meta_format* newItem;
 		ssize_t size;
 		if (reply.FindData("formats", MEDIA_META_FORMAT_TYPE, index,
-				(const void **)&newItem, &size) == B_OK)
+				(const void**)&newItem, &size) == B_OK)
 			*item = *newItem;
 	}
 
 	// allocate additional formats
 
 	for (; index < count; index++) {
-		const meta_format *newItem;
+		const meta_format* newItem;
 		ssize_t size;
 		if (reply.FindData("formats", MEDIA_META_FORMAT_TYPE, index,
-				(const void **)&newItem, &size) == B_OK)
+				(const void**)&newItem, &size) == B_OK)
 			sFormats.AddItem(new meta_format(*newItem));
 	}
 
@@ -337,9 +346,9 @@ BMediaFormats::InitCheck()
 
 
 status_t 
-BMediaFormats::GetCodeFor(const media_format &format,
+BMediaFormats::GetCodeFor(const media_format& format,
 	media_format_family family,
-	media_format_description *_description)
+	media_format_description* _description)
 {
 	BAutolock locker(sLock);
 
@@ -350,7 +359,7 @@ BMediaFormats::GetCodeFor(const media_format &format,
 	// search for a matching format
 
 	for (int32 index = sFormats.CountItems(); index-- > 0;) {
-		meta_format *metaFormat = sFormats.ItemAt(index);
+		meta_format* metaFormat = sFormats.ItemAt(index);
 
 		if (metaFormat->Matches(format, family)) {
 			*_description = metaFormat->description;
@@ -363,8 +372,8 @@ BMediaFormats::GetCodeFor(const media_format &format,
 
 
 status_t 
-BMediaFormats::GetFormatFor(const media_format_description &description,
-	media_format *_format)
+BMediaFormats::GetFormatFor(const media_format_description& description,
+	media_format* _format)
 {
 	BAutolock locker(sLock);
 
@@ -381,7 +390,7 @@ BMediaFormats::GetFormatFor(const media_format_description &description,
 	// search for a matching format description
 
 	meta_format other(description);
-	const meta_format *metaFormat = sFormats.BinarySearch(other,
+	const meta_format* metaFormat = sFormats.BinarySearch(other,
 		meta_format::CompareDescriptions);
 	TRACE("meta format == %p\n", metaFormat);
 	if (metaFormat == NULL) {
@@ -397,7 +406,7 @@ BMediaFormats::GetFormatFor(const media_format_description &description,
 
 status_t 
 BMediaFormats::GetBeOSFormatFor(uint32 format, 
-	media_format *_format, media_type type)
+	media_format* _format, media_type type)
 {
 	BMediaFormats formats;
 
@@ -418,7 +427,7 @@ BMediaFormats::GetBeOSFormatFor(uint32 format,
 
 status_t 
 BMediaFormats::GetAVIFormatFor(uint32 codec,
-	media_format *_format, media_type type)
+	media_format* _format, media_type type)
 {
 	UNIMPLEMENTED();
 	BMediaFormats formats;
@@ -440,7 +449,7 @@ BMediaFormats::GetAVIFormatFor(uint32 codec,
 
 status_t 
 BMediaFormats::GetQuicktimeFormatFor(uint32 vendor, uint32 codec, 
-	media_format *_format, media_type type)
+	media_format* _format, media_type type)
 {
 	BMediaFormats formats;
 
@@ -464,7 +473,7 @@ status_t
 BMediaFormats::RewindFormats()
 {
 	if (!sLock.IsLocked() || sLock.LockingThread() != find_thread(NULL)) {
-		// ToDo: shouldn't we simply drop into the debugger in this case?
+		// TODO: Shouldn't we simply drop into the debugger in this case?
 		return B_NOT_ALLOWED;
 	}
 
@@ -474,23 +483,23 @@ BMediaFormats::RewindFormats()
 
 
 status_t 
-BMediaFormats::GetNextFormat(media_format *_format,
-	media_format_description *_description)
+BMediaFormats::GetNextFormat(media_format* _format,
+	media_format_description* _description)
 {
 	if (!sLock.IsLocked() || sLock.LockingThread() != find_thread(NULL)) {
-		// ToDo: shouldn't we simply drop into the debugger in this case?
+		// TODO: Shouldn't we simply drop into the debugger in this case?
 		return B_NOT_ALLOWED;
 	}
 
 	if (fIteratorIndex == 0) {
-		// this is the first call, so let's make sure we have
-		// current data to operate on
+		// This is the first call, so let's make sure we have current data to
+		// operate on.
 		status_t status = update_media_formats();
 		if (status < B_OK)
 			return status;
 	}
 
-	meta_format *format = sFormats.ItemAt(fIteratorIndex++);
+	meta_format* format = sFormats.ItemAt(fIteratorIndex++);
 	if (format == NULL)
 		return B_BAD_INDEX;
 
@@ -513,12 +522,14 @@ BMediaFormats::Unlock()
 
 
 status_t 
-BMediaFormats::MakeFormatFor(const media_format_description *descriptions,
-	int32 descriptionCount, media_format *format, uint32 flags, void * _reserved)
+BMediaFormats::MakeFormatFor(const media_format_description* descriptions,
+	int32 descriptionCount, media_format* format, uint32 flags,
+	void* _reserved)
 {
 	BMessage request(MEDIA_SERVER_MAKE_FORMAT_FOR);
 	for (int32 i = 0 ; i < descriptionCount ; i++) {
-		request.AddData("description", B_RAW_TYPE, &descriptions[i], sizeof(descriptions[i]));
+		request.AddData("description", B_RAW_TYPE, &descriptions[i],
+			sizeof(descriptions[i]));
 	}
 	request.AddData("format", B_RAW_TYPE, format, sizeof(*format));
 	request.AddData("flags", B_UINT32_TYPE, &flags, sizeof(flags));
@@ -532,34 +543,32 @@ BMediaFormats::MakeFormatFor(const media_format_description *descriptions,
 	}
 
 	// check the status
-	if (reply.FindInt32("result", &status) < B_OK) {
+	if (reply.FindInt32("result", &status) < B_OK)
 		return B_ERROR;
-	}
-	if (status != B_OK) {
+	if (status != B_OK)
 		return status;
-	}
 
 	// get the format
-	const void * data;
+	const void* data;
 	ssize_t size;
-	if (reply.FindData("format", B_RAW_TYPE, 0, &data, &size) != B_OK) {
+	if (reply.FindData("format", B_RAW_TYPE, 0, &data, &size) != B_OK)
 		return B_ERROR;
-	}
-	if (size != sizeof(*format)) {
+	if (size != sizeof(*format))
 		return B_ERROR;
-	}
 
 	// copy the BMessage's data into our format
-	*format = *(media_format *)data;
+	*format = *(media_format*)data;
 
 	return B_OK;
 }
 
-/* --- begin deprecated API --- */
+
+// #pragma mark - deprecated API
+
 
 status_t 
-BMediaFormats::MakeFormatFor(const media_format_description &description,
-	const media_format &inFormat, media_format *_outFormat)
+BMediaFormats::MakeFormatFor(const media_format_description& description,
+	const media_format& inFormat, media_format* _outFormat)
 {
 	*_outFormat = inFormat;
 	return MakeFormatFor(&description, 1, _outFormat);
