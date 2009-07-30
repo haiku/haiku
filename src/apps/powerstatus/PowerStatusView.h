@@ -86,6 +86,7 @@ class PowerStatusReplicant : public PowerStatusView
 		void			_OpenExtendedWindow();
 
 		BWindow*		fExtendedWindow;
+		bool			fMessengerExist;
 		BMessenger*		fExtWindowMessenger;		
 };
 

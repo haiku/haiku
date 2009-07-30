@@ -400,7 +400,7 @@ PowerStatusReplicant::PowerStatusReplicant(BMessage* archive)
 
 PowerStatusReplicant::~PowerStatusReplicant()
 {
-	if (fExtWindowMessenger)
+	if (fMessengerExist)
 		delete fExtWindowMessenger;
 
 	fDriverInterface->StopWatching(this);
@@ -536,6 +536,7 @@ PowerStatusReplicant::_Init()
 	}
 	
 	fExtendedWindow = NULL;
+	fMessengerExist = false;
 	fExtWindowMessenger = NULL;
 
 	fDriverInterface->StartWatching(this);
@@ -566,7 +567,10 @@ PowerStatusReplicant::_OpenExtendedWindow()
 	msg.AddSpecifier("Hidden", int32(0));
 	if (fExtWindowMessenger->SendMessage(&msg) == B_BAD_PORT_ID) {
 		fExtendedWindow = new ExtendedInfoWindow(fDriverInterface);
+		if (fMessengerExist)
+			delete fExtWindowMessenger;
 		fExtWindowMessenger = new BMessenger(NULL, fExtendedWindow);
+		fMessengerExist = true;
 		fExtendedWindow->Show();
 	}
 	else

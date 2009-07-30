@@ -21,6 +21,7 @@ Monitor::~Monitor()
 status_t
 Monitor::StartWatching(BHandler* target)
 {
+	BAutolock autolock(fListLocker);
 	if (fWatcherList.HasItem(target))
 		return B_ERROR;
 
@@ -32,6 +33,7 @@ Monitor::StartWatching(BHandler* target)
 status_t
 Monitor::StopWatching(BHandler* target)
 {
+	BAutolock autolock(fListLocker);
 	return fWatcherList.RemoveItem(target);
 }
 
@@ -64,8 +66,6 @@ PowerStatusDriverInterface::~PowerStatusDriverInterface()
 status_t
 PowerStatusDriverInterface::StartWatching(BHandler* target)
 {
-	BAutolock autolock(fListLocker);
-
 	status_t status = Monitor::StartWatching(target);
 	
 	if (status != B_OK)
@@ -95,8 +95,6 @@ PowerStatusDriverInterface::StartWatching(BHandler* target)
 status_t
 PowerStatusDriverInterface::StopWatching(BHandler* target)
 {
-	BAutolock autolock(fListLocker);
-
 	if (fThreadId < 0)
 		return B_BAD_VALUE;
 

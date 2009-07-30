@@ -42,6 +42,7 @@ public:
 	virtual void		Broadcast(uint32 message);
 
 protected:
+	BLocker				fListLocker;
 	WatcherList			fWatcherList;
 	
 };
@@ -72,8 +73,6 @@ private:
 	static int32		_ThreadWatchPowerFunction(void* data);
 
 	thread_id			fThreadId;
-	
-	BLocker				fListLocker;
 };
 
 
