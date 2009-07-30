@@ -643,6 +643,32 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 //	fContext->frame_rate);
 
 		if (gotPicture) {
+			int width = fOutputVideoFormat.display.line_width;
+			int height = fOutputVideoFormat.display.line_count;
+			AVPicture deinterlacedPicture;
+			bool useDeinterlacedPicture = false;
+
+			if (fInputPicture->interlaced_frame) {
+				AVPicture source;
+				source.data[0] = fInputPicture->data[0];
+				source.data[1] = fInputPicture->data[1];
+				source.data[2] = fInputPicture->data[2];
+				source.data[3] = fInputPicture->data[3];
+				source.linesize[0] = fInputPicture->linesize[0];
+				source.linesize[1] = fInputPicture->linesize[1];
+				source.linesize[2] = fInputPicture->linesize[2];
+				source.linesize[3] = fInputPicture->linesize[3];
+
+				avpicture_alloc(&deinterlacedPicture,
+					fContext->pix_fmt, width, height);
+
+				if (avpicture_deinterlace(&deinterlacedPicture, &source,
+						fContext->pix_fmt, width, height) < 0) {
+					TRACE("[v] avpicture_deinterlace() - error\n");
+				} else
+					useDeinterlacedPicture = true;
+			}
+
 #if DO_PROFILING
 			bigtime_t formatConversionStart = system_time();
 #endif
@@ -659,17 +685,33 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 				= fOutputVideoFormat.display.bytes_per_row;
 			
 			if (fFormatConversionFunc != NULL) {
-				(*fFormatConversionFunc)(fInputPicture, fOutputPicture,
-					fOutputVideoFormat.display.line_width,
-					fOutputVideoFormat.display.line_count);
+				if (useDeinterlacedPicture) {
+					AVFrame inputFrame;
+					inputFrame.data[0] = deinterlacedPicture.data[0];
+					inputFrame.data[1] = deinterlacedPicture.data[1];
+					inputFrame.data[2] = deinterlacedPicture.data[2];
+					inputFrame.data[3] = deinterlacedPicture.data[3];
+					inputFrame.linesize[0] = deinterlacedPicture.linesize[0];
+					inputFrame.linesize[1] = deinterlacedPicture.linesize[1];
+					inputFrame.linesize[2] = deinterlacedPicture.linesize[2];
+					inputFrame.linesize[3] = deinterlacedPicture.linesize[3];
+					
+					(*fFormatConversionFunc)(&inputFrame,
+						fOutputPicture, width, height);
+				} else {
+					(*fFormatConversionFunc)(fInputPicture, fOutputPicture,
+						width, height);
+				}
 			}
+			if (fInputPicture->interlaced_frame)
+				avpicture_free(&deinterlacedPicture);
 #ifdef DEBUG
 			dump_ffframe(fInputPicture, "ffpict");
 //			dump_ffframe(fOutputPicture, "opict");
 #endif
 			*outFrameCount = 1;				
 			fFrame++;
-	
+
 #if DO_PROFILING
 			bigtime_t doneTime = system_time();
 			decodingTime += formatConversionStart - startTime;
