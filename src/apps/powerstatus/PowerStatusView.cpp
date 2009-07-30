@@ -400,12 +400,13 @@ PowerStatusReplicant::PowerStatusReplicant(BMessage* archive)
 
 PowerStatusReplicant::~PowerStatusReplicant()
 {
-	if (fMessengerExist)
+	if (fMessengerExist) {
 		delete fExtWindowMessenger;
+	}
 
 	fDriverInterface->StopWatching(this);
 	fDriverInterface->Disconnect();
-	delete fDriverInterface;
+	fDriverInterface->ReleaseReference();
 }
 
 

@@ -338,6 +338,8 @@ ExtendedInfoWindow::ExtendedInfoWindow(PowerStatusDriverInterface* interface)
 	fDriverInterface(interface),
 	fSelectedView(NULL)
 {
+	fDriverInterface->AcquireReference();
+
 	BView *view = new BView(Bounds(), "view", B_FOLLOW_ALL, 0);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(view);
@@ -394,9 +396,10 @@ ExtendedInfoWindow::ExtendedInfoWindow(PowerStatusDriverInterface* interface)
 
 ExtendedInfoWindow::~ExtendedInfoWindow()
 {
-	for (int i = 0; i < fBatteryViewList.CountItems(); i++) {
+	for (int i = 0; i < fBatteryViewList.CountItems(); i++)
 		fDriverInterface->StopWatching(fBatteryViewList.ItemAt(i));
-	}
+		
+	fDriverInterface->ReleaseReference();
 }
 
 

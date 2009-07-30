@@ -21,7 +21,6 @@ Monitor::~Monitor()
 status_t
 Monitor::StartWatching(BHandler* target)
 {
-	BAutolock autolock(fListLocker);
 	if (fWatcherList.HasItem(target))
 		return B_ERROR;
 
@@ -33,7 +32,6 @@ Monitor::StartWatching(BHandler* target)
 status_t
 Monitor::StopWatching(BHandler* target)
 {
-	BAutolock autolock(fListLocker);
 	return fWatcherList.RemoveItem(target);
 }
 
@@ -57,15 +55,17 @@ PowerStatusDriverInterface::PowerStatusDriverInterface()
 	
 }
 
+
 PowerStatusDriverInterface::~PowerStatusDriverInterface()
 {
-	
+
 }
 
-#include <stdio.h>
+
 status_t
 PowerStatusDriverInterface::StartWatching(BHandler* target)
 {
+	BAutolock autolock(fListLocker);
 	status_t status = Monitor::StartWatching(target);
 	
 	if (status != B_OK)
@@ -73,8 +73,7 @@ PowerStatusDriverInterface::StartWatching(BHandler* target)
 
 	if (fThreadId > 0)
 		return B_OK;
-
-	printf("spawn\n");
+	
 	fThreadId = spawn_thread(&_ThreadWatchPowerFunction, "PowerStatusThread",
 								B_LOW_PRIORITY, this);
 	if (fThreadId >= 0) {
@@ -95,6 +94,7 @@ PowerStatusDriverInterface::StartWatching(BHandler* target)
 status_t
 PowerStatusDriverInterface::StopWatching(BHandler* target)
 {
+	BAutolock autolock(fListLocker);
 	if (fThreadId < 0)
 		return B_BAD_VALUE;
 
@@ -107,6 +107,14 @@ PowerStatusDriverInterface::StopWatching(BHandler* target)
 	}
 	
 	return Monitor::StopWatching(target);
+}
+
+
+void
+PowerStatusDriverInterface::Broadcast(uint32 message)
+{
+	BAutolock autolock(fListLocker);
+	Monitor::Broadcast(message);
 }
 
 

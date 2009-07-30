@@ -9,9 +9,10 @@
 #ifndef DRIVER_INTERFACE_H
 #define DRIVER_INTERFACE_H
 
+#include <Handler.h>
 #include <Locker.h>
 #include <ObjectList.h>
-#include <Handler.h>
+#include <Referenceable.h>
 
 #include "device/power_managment.h"
 
@@ -42,19 +43,20 @@ public:
 	virtual void		Broadcast(uint32 message);
 
 protected:
-	BLocker				fListLocker;
 	WatcherList			fWatcherList;
 	
 };
 
 
-class PowerStatusDriverInterface : public Monitor
+class PowerStatusDriverInterface : public Monitor, public Referenceable
 {
 public:
 						PowerStatusDriverInterface();
 						~PowerStatusDriverInterface();
+
 	virtual status_t	StartWatching(BHandler* target);
 	virtual status_t	StopWatching(BHandler* target);
+	virtual void		Broadcast(uint32 message);
 	
 	virtual status_t	Connect() = 0;
 	virtual void		Disconnect();
@@ -73,6 +75,7 @@ private:
 	static int32		_ThreadWatchPowerFunction(void* data);
 
 	thread_id			fThreadId;
+	BLocker				fListLocker;
 };
 
 
