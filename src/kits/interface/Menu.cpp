@@ -2260,7 +2260,6 @@ BMenu::_CalcFrame(BPoint where, bool *scrollOn)
 void
 BMenu::_DrawItems(BRect updateRect)
 {
-	bigtime_t start = system_time();
 	int32 itemCount = fItems.CountItems();
 	for (int32 i = 0; i < itemCount; i++) {
 		BMenuItem *item = ItemAt(i);
