@@ -26,6 +26,8 @@ public:
 private:
 			struct SchedulingEvent;
 			class SchedulingData;
+			struct TimeRange;
+			class TimelineHeaderRenderer;
 			class BaseView;
 			class ThreadsView;
 			class SchedulingView;

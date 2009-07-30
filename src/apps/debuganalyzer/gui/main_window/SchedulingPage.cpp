@@ -22,6 +22,9 @@
 
 #include "Array.h"
 
+#include "chart/BigtimeChartAxisLegendSource.h"
+#include "chart/LegendChartAxis.h"
+#include "chart/StringChartLegend.h"
 #include "HeaderView.h"
 #include "Model.h"
 
@@ -150,6 +153,74 @@ private:
 };
 
 
+struct MainWindow::SchedulingPage::TimeRange : BReferenceable {
+	bigtime_t	startTime;
+	bigtime_t	endTime;
+
+	TimeRange(bigtime_t startTime, bigtime_t endTime)
+		:
+		startTime(startTime),
+		endTime(endTime)
+	{
+	}
+};
+
+
+class MainWindow::SchedulingPage::TimelineHeaderRenderer
+	: public HeaderRenderer {
+public:
+	TimelineHeaderRenderer()
+		:
+		fAxis(new BigtimeChartAxisLegendSource, new StringChartLegendRenderer)
+	{
+		fAxis.SetLocation(CHART_AXIS_TOP);
+	}
+
+	virtual float HeaderHeight(BView* view, const Header* header)
+	{
+		_SetupAxis(view, header);
+		return fAxis.PreferredSize(view, view->Frame().Size()).height;
+	}
+
+	virtual float PreferredHeaderWidth(BView* view, const Header* header)
+	{
+		_SetupAxis(view, header);
+		return fAxis.PreferredSize(view, view->Frame().Size()).width;
+	}
+
+	virtual void DrawHeader(BView* view, BRect frame, BRect updateRect,
+		const Header* header, uint32 flags)
+	{
+		_SetupAxis(view, header);
+		fAxis.SetFrame(frame);
+		DrawHeaderBackground(view, frame, updateRect, flags);
+		fAxis.Render(view, updateRect);
+	}
+
+private:
+	void _SetupAxis(BView* view, const Header* header)
+	{
+		BVariant value;
+		if (header->GetValue(value)) {
+			TimeRange* timeRange = dynamic_cast<TimeRange*>(
+				value.ToReferenceable());
+			if (timeRange != NULL) {
+				ChartDataRange range = ChartDataRange(timeRange->startTime,
+					timeRange->endTime);
+				if (range != fRange) {
+					fAxis.SetRange(range);
+					fRange = range;
+				}
+			}
+		}
+	}
+
+private:
+	LegendChartAxis		fAxis;
+	ChartDataRange		fRange;
+};
+
+
 class MainWindow::SchedulingPage::BaseView : public BView {
 public:
 	BaseView(const char* name, FontInfo& fontInfo)
@@ -237,13 +308,24 @@ public:
 
 class MainWindow::SchedulingPage::SchedulingView : public BaseView {
 public:
+	struct Listener {
+		virtual ~Listener()
+		{
+		}
+
+		virtual void DataWidthChanged() = 0;
+		virtual void DataRangeChanged() = 0;
+	};
+
+public:
 	SchedulingView(FontInfo& fontInfo)
 		:
 		BaseView("scheduling", fontInfo),
 		fStartTime(0),
 		fEndTime(0),
 		fUSecsPerPixel(1000),
-		fLastMousePos(-1, -1)
+		fLastMousePos(-1, -1),
+		fListener(NULL)
 	{
 	}
 
@@ -253,6 +335,17 @@ public:
 		fSchedulingData.SetModel(model);
 		fStartTime = 0;
 		fEndTime = 0;
+
+		if (fListener != NULL) {
+			fListener->DataWidthChanged();
+			fListener->DataRangeChanged();
+		}
+
+	}
+
+	void SetListener(Listener* listener)
+	{
+		fListener = listener;
 	}
 
 	void UpdateScrollBar()
@@ -273,6 +366,11 @@ public:
 		}
 	}
 
+	void GetDataRange(bigtime_t& _startTime, bigtime_t& _endTime)
+	{
+		_GetEventTimeRange(_startTime, _endTime);
+	}
+
 	virtual BSize MinSize()
 	{
 		bigtime_t timeSpan = fModel != NULL ? fModel->LastEventTime() : 0;
@@ -290,6 +388,9 @@ public:
 		BaseView::ScrollTo(where);
 		fStartTime = 0;
 		fEndTime = 0;
+
+		if (fListener != NULL)
+			fListener->DataRangeChanged();
 	}
 
 	void MessageReceived(BMessage* message)
@@ -543,6 +644,11 @@ printf("failed to read event!\n");
 		UpdateScrollBar();
 		if (BScrollBar* scrollBar = ScrollBar(B_HORIZONTAL))
 			scrollBar->SetValue(timeForX / fUSecsPerPixel - x);
+
+		if (fListener != NULL) {
+			fListener->DataWidthChanged();
+			fListener->DataRangeChanged();
+		}
 	}
 
 	inline void _UpdateLastEventTime(bigtime_t time)
@@ -767,10 +873,12 @@ private:
 	bigtime_t				fEndTime;
 	uint32					fUSecsPerPixel;
 	BPoint					fLastMousePos;
+	Listener*				fListener;
 };
 
 
-class MainWindow::SchedulingPage::ViewPort : public BaseView {
+class MainWindow::SchedulingPage::ViewPort : public BaseView,
+	private HeaderListener, private SchedulingView::Listener {
 public:
 	ViewPort(ThreadsView* threadsView, SchedulingView* schedulingView,
 		FontInfo& fontInfo)
@@ -784,14 +892,27 @@ public:
 		AddChild(threadsView);
 		AddChild(schedulingView);
 
-		Header* header = new Header(100, 100, 10000, 200);
-		header->SetValue("Thread");
-		fHeaderView->Model()->AddHeader(header);
+		fSchedulingView->SetListener(this);
 
-		header = new Header(100, 100, 10000, 200);
-		header->SetValue("Activity");
-		fHeaderView->Model()->AddHeader(header);
+		HeaderModel* headerModel = fHeaderView->Model();
+
+		Header* header = new Header(100, 100, 10000, 200, 0);
+		header->SetValue("Thread");
+		headerModel->AddHeader(header);
+		header->AddListener(this);
+
+		header = new Header(100, 100, 10000, 200, 1);
 			// TODO: Set header width correctly!
+		header->SetValue("Activity");
+		header->SetHeaderRenderer(new TimelineHeaderRenderer);
+		headerModel->AddHeader(header);
+//		header->AddListener(this);
+	}
+
+	~ViewPort()
+	{
+		fHeaderView->Model()->HeaderAt(0)->RemoveListener(this);
+//		fHeaderView->Model()->HeaderAt(1)->RemoveListener(this);
 	}
 
 	void TargetedByScrollView(BScrollView* scrollView)
@@ -830,6 +951,7 @@ public:
 		float height = fThreadsView->MinSize().Height();
 		float threadsViewWidth = fThreadsView->MinSize().width;
 		float schedulingViewLeft = threadsViewWidth + 1 + kViewSeparationMargin;
+		float schedulingViewWidth = width - schedulingViewLeft;
 
 		fHeaderView->MoveTo(0, 0);
 		fHeaderView->ResizeTo(width, headerHeight);
@@ -838,12 +960,51 @@ public:
 		fThreadsView->ResizeTo(threadsViewWidth, height);
 
 		fSchedulingView->MoveTo(schedulingViewLeft, headerHeight + 1);
-		fSchedulingView->ResizeTo(width - schedulingViewLeft, height);
+		fSchedulingView->ResizeTo(schedulingViewWidth, height);
+
+//		if (Header* header = fHeaderView->Model()->HeaderAt(0)) {
+//		}
+
+		if (Header* header = fHeaderView->Model()->HeaderAt(1)) {
+			float headerWidth = schedulingViewWidth + 1 + kViewSeparationMargin;
+			header->SetMinWidth(headerWidth);
+			header->SetMaxWidth(headerWidth);
+			header->SetPreferredWidth(headerWidth);
+			header->SetWidth(headerWidth);
+		}
 
 		_UpdateScrollBars();
 	}
 
 private:
+	virtual void HeaderWidthChanged(Header* header)
+	{
+		if (header->ModelIndex() != 0)
+			return;
+
+		// first column changed
+	}
+
+	virtual void DataWidthChanged()
+	{
+	}
+
+	virtual void DataRangeChanged()
+	{
+		Header* header = fHeaderView->Model()->HeaderAt(1);
+		if (header == NULL)
+			return;
+
+		bigtime_t startTime;
+		bigtime_t endTime;
+		fSchedulingView->GetDataRange(startTime, endTime);
+		TimeRange* range = new(std::nothrow) TimeRange(startTime, endTime);
+		if (range != NULL) {
+			header->SetValue(BVariant(range, 'time'));
+			range->ReleaseReference();
+		}
+	}
+
 	void _UpdateScrollBars()
 	{
 		float height = Frame().Height();
