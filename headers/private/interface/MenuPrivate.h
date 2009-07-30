@@ -16,6 +16,7 @@ enum menu_states {
 	MENU_STATE_CLOSED = 5
 };
 
+class BBitmap;
 class BMenu;
 class BWindow;
 
@@ -45,9 +46,21 @@ public:
 	void InvokeItem(BMenuItem *item, bool now = false);	
 	void QuitTracking(bool thisMenuOnly = true);
 	
+	static	status_t	CreateBitmaps();
+	static	void		DeleteBitmaps();
+
+	static const BBitmap *MenuItemCommand();
+	static const BBitmap *MenuItemControl();
+	static const BBitmap *MenuItemOption();
+	static const BBitmap *MenuItemShift();
 private:
 	BMenu *fMenu;	
 };
+
+extern BBitmap *gMenuItemAlt;
+extern BBitmap *gMenuItemControl;
+extern BBitmap *gMenuItemOption;
+extern BBitmap *gMenuItemShift;
 
 };
 

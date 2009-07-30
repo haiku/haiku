@@ -32,6 +32,7 @@
 #include <DefaultColors.h>
 #include <InputServerTypes.h>
 #include <input_globals.h>
+#include <MenuPrivate.h>
 #include <pr_server.h>
 #include <ServerProtocol.h>
 #include <ServerReadOnlyMemory.h>
@@ -951,8 +952,9 @@ _init_interface_kit_()
 	be_control_look = new BControlLook();
 
 	_init_global_fonts_();
-
+	
 	BPrivate::gWidthBuffer = new BPrivate::WidthBuffer;
+	BPrivate::MenuPrivate::CreateBitmaps();
 
 	_menu_info_ptr_ = &BMenu::sMenuInfo;
 
@@ -973,6 +975,8 @@ _init_interface_kit_()
 extern "C" status_t
 _fini_interface_kit_()
 {
+	BPrivate::MenuPrivate::DeleteBitmaps();
+	
 	delete BPrivate::gWidthBuffer;
 	BPrivate::gWidthBuffer = NULL;
 
