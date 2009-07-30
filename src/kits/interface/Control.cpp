@@ -144,16 +144,19 @@ BControl::WindowActivated(bool active)
 void
 BControl::AttachedToWindow()
 {
+	rgb_color color;
+
 	BView* parent = Parent();
 	if (parent != NULL) {
 		// inherit the color from parent
-		rgb_color color = parent->ViewColor();
+		color = parent->ViewColor();
 		if (color == B_TRANSPARENT_COLOR)
 			color = ui_color(B_PANEL_BACKGROUND_COLOR);
+	} else
+		color = ui_color(B_PANEL_BACKGROUND_COLOR);
 
-		SetViewColor(color);
-		SetLowColor(color);
-	}
+	SetViewColor(color);
+	SetLowColor(color);
 
 	if (!Messenger().IsValid())
 		SetTarget(Window());
