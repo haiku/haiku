@@ -336,10 +336,18 @@ BVariant::_SetTo(const BVariant& other)
 		}
 	} else if ((other.fFlags & B_VARIANT_REFERENCEABLE_DATA) != 0) {
 		if (other.fReferenceable != NULL)
-			fReferenceable->AcquireReference();
+			other.fReferenceable->AcquireReference();
 	}
 
 	memcpy(this, &other, sizeof(BVariant));
+}
+
+
+BReferenceable*
+BVariant::ToReferenceable() const
+{
+	return (fFlags & B_VARIANT_REFERENCEABLE_DATA) != 0
+		? fReferenceable : NULL;
 }
 
 

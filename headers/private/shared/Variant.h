@@ -86,6 +86,7 @@ public:
 			double				ToDouble() const;
 			void*				ToPointer() const;
 			const char*			ToString() const;
+			BReferenceable*		ToReferenceable() const;
 
 			void				SwapEndianess();
 									// has effect only on scalar types (pointer
