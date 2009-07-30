@@ -41,12 +41,14 @@ enum {
 	WRAP_ENTRY			= 0x01,
 	ENTRY_INITIALIZED	= 0x02,
 	BUFFER_ENTRY		= 0x04,
-	FILTER_MATCH		= 0x08
+	FILTER_MATCH		= 0x08,
+	INVALID_ENTRY		= 0x10,
+	CHECK_ENTRY			= 0x20,
 };
 
 
 static const size_t kTraceOutputBufferSize = 10240;
-static const size_t kBufferSize = MAX_TRACE_SIZE / 4;
+static const size_t kBufferSize = MAX_TRACE_SIZE / sizeof(trace_entry);
 
 static const addr_t kMetaDataBaseAddress		= 32 * 1024 * 1024;
 static const addr_t kMetaDataBaseEndAddress		= 128 * 1024 * 1024;
@@ -55,247 +57,203 @@ static const uint32 kMetaDataMagic1 = 'Vali';
 static const uint32 kMetaDataMagic2 = 'dTra';
 static const uint32 kMetaDataMagic3 = 'cing';
 
+// the maximum we can address with the trace_entry::[previous_]size fields
+static const size_t kMaxTracingEntrySize
+	= ((1 << 13) - 1) * sizeof(trace_entry);
+
 
 class TracingMetaData {
 public:
-	uint32			magic1;
-	trace_entry*	buffer;
-	trace_entry*	firstEntry;
-	trace_entry*	afterLastEntry;
-	uint32			entries;
-	uint32			magic2;
-	uint32			written;
-	spinlock		lock;
-	char*			traceOutputBuffer;
-	addr_t			physicalAddress;
-	uint32			magic3;
+	static	status_t			Create(TracingMetaData*& _metaData);
 
-	static status_t Create(TracingMetaData*& _metaData)
-	{
-		// search meta data in memory (from previous session)
-		area_id area;
-		TracingMetaData* metaData;
-		status_t error = _CreateMetaDataArea(true, area, metaData);
-		if (error == B_OK) {
-			if (_InitPreviousTracingData(metaData)) {
-				_metaData = metaData;
-				return B_OK;
-			}
+	inline	bool				Lock();
+	inline	void				Unlock();
 
-			dprintf("Found previous tracing meta data, but failed to init.\n");
+	inline	trace_entry*		FirstEntry() const;
+	inline	trace_entry*		AfterLastEntry() const;
 
-			// invalidate the meta data
-			metaData->magic1 = 0;
-			metaData->magic2 = 0;
-			metaData->magic3 = 0;
-			delete_area(area);
-		} else
-			dprintf("No previous tracing meta data found.\n");
+	inline	uint32				Entries() const;
+	inline	uint32				EntriesEver() const;
 
-		// no previous tracng data found -- create new one
-		error = _CreateMetaDataArea(false, area, metaData);
-		if (error != B_OK)
-			return error;
+	inline	void				IncrementEntriesEver();
 
-		area = create_area("tracing log",
-			(void**)&metaData->traceOutputBuffer, B_ANY_KERNEL_ADDRESS,
-			kTraceOutputBufferSize + MAX_TRACE_SIZE, B_CONTIGUOUS,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		if (area < 0)
-			return area;
+	inline	char*				TraceOutputBuffer() const;
 
-		// get the physical address
-		physical_entry physicalEntry;
-		if (get_memory_map(metaData->traceOutputBuffer, B_PAGE_SIZE,
-				&physicalEntry, 1) == B_OK) {
-			metaData->physicalAddress = (addr_t)physicalEntry.address;
-		} else {
-			dprintf("TracingMetaData::Create(): failed to get physical address "
-				"of tracing buffer\n");
-			metaData->physicalAddress = 0;
-		}
+			trace_entry*		NextEntry(trace_entry* entry);
+			trace_entry*		PreviousEntry(trace_entry* entry);
 
-		metaData->buffer = (trace_entry*)(metaData->traceOutputBuffer
-			+ kTraceOutputBufferSize);
-		metaData->firstEntry = metaData->buffer;
-		metaData->afterLastEntry = metaData->buffer;
-
-		metaData->entries = 0;
-		metaData->written = 0;
-		B_INITIALIZE_SPINLOCK(&metaData->lock);
-
-		metaData->magic1 = kMetaDataMagic1;
-		metaData->magic2 = kMetaDataMagic2;
-		metaData->magic3 = kMetaDataMagic3;
-
-		_metaData = metaData;
-		return B_OK;
-	}
+			trace_entry*		AllocateEntry(size_t size, uint16 flags);
 
 private:
-	static status_t _CreateMetaDataArea(bool findPrevious,
-		area_id& _area, TracingMetaData*& _metaData)
-	{
-		// search meta data in memory (from previous session)
-		TracingMetaData* metaData;
-		addr_t metaDataAddress = kMetaDataBaseAddress;
-		for (; metaDataAddress <= kMetaDataBaseEndAddress;
-				metaDataAddress += kMetaDataAddressIncrement) {
-			area_id area = create_area_etc(B_SYSTEM_TEAM, "tracing metadata",
-				(void**)&metaData, B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE,
-				B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-				metaDataAddress, CREATE_AREA_DONT_CLEAR);
-			if (area < 0)
-				continue;
+			bool				_FreeFirstEntry();
+			bool				_MakeSpace(size_t needed);
 
-			if (!findPrevious) {
-				_area = area;
-				_metaData = metaData;
-				return B_OK;
-			}
+	static	status_t			_CreateMetaDataArea(bool findPrevious,
+									area_id& _area,
+									TracingMetaData*& _metaData);
+	static	bool				_InitPreviousTracingData(
+									TracingMetaData* metaData);
 
-			if (metaData->magic1 == kMetaDataMagic1
-				&& metaData->magic2 == kMetaDataMagic2
-				&& metaData->magic3 == kMetaDataMagic3) {
-				_area = area;
-				_metaData = metaData;
-				return B_OK;
-			}
-
-			delete_area(area);
-		}
-
-		return B_ENTRY_NOT_FOUND;
-	}
-
-	static bool _InitPreviousTracingData(TracingMetaData* metaData)
-	{
-		addr_t bufferStart
-			= (addr_t)metaData->traceOutputBuffer + kTraceOutputBufferSize;
-		addr_t bufferEnd = bufferStart + MAX_TRACE_SIZE;
-
-		if (bufferStart > bufferEnd || (addr_t)metaData->buffer != bufferStart
-			|| (addr_t)metaData->firstEntry < bufferStart
-			|| (addr_t)metaData->firstEntry + sizeof(trace_entry) >= bufferEnd
-			|| (addr_t)metaData->afterLastEntry < bufferStart
-			|| (addr_t)metaData->afterLastEntry > bufferEnd
-			|| metaData->physicalAddress == 0) {
-			dprintf("Failed to init tracing meta data: Sanity checks "
-				"failed.\n");
-			return false;
-		}
-
-		// re-map the previous tracing buffer
-		void* buffer = metaData->traceOutputBuffer;
-		area_id area = create_area_etc(B_SYSTEM_TEAM, "tracing log",
-			&buffer, B_EXACT_ADDRESS, kTraceOutputBufferSize + MAX_TRACE_SIZE,
-			B_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-			metaData->physicalAddress, CREATE_AREA_DONT_CLEAR);
-		if (area < 0) {
-			dprintf("Failed to init tracing meta data: Mapping tracing log "
-				"buffer failed: %s\n", strerror(area));
-			return false;
-		}
-
-		// TODO: More checks:
-		// * tracing entry counts
-		// * tracing entries (linked list)
-		// * tracing entries objects (vtables)
-
-		B_INITIALIZE_SPINLOCK(&metaData->lock);
-
-		return true;
-	}
+private:
+			uint32				fMagic1;
+			trace_entry*		fBuffer;
+			trace_entry*		fFirstEntry;
+			trace_entry*		fAfterLastEntry;
+			uint32				fEntries;
+			uint32				fMagic2;
+			uint32				fEntriesEver;
+			spinlock			fLock;
+			char*				fTraceOutputBuffer;
+			addr_t				fPhysicalAddress;
+			uint32				fMagic3;
 };
 
 static TracingMetaData sDummyTracingMetaData;
 static TracingMetaData* sTracingMetaData = &sDummyTracingMetaData;
+static bool sTracingDataRecovered = false;
 
 
-static inline trace_entry*
-Buffer()
+// #pragma mark -
+
+
+// #pragma mark - TracingMetaData
+
+
+bool
+TracingMetaData::Lock()
 {
-	return sTracingMetaData->buffer;
+	acquire_spinlock(&fLock);
+	return true;
 }
 
 
-static inline trace_entry*&
-FirstEntry()
+void
+TracingMetaData::Unlock()
 {
-	return sTracingMetaData->firstEntry;
+	release_spinlock(&fLock);
 }
 
 
-static inline trace_entry*&
-AfterLastEntry()
+trace_entry*
+TracingMetaData::FirstEntry() const
 {
-	return sTracingMetaData->afterLastEntry;
+	return fFirstEntry;
 }
 
 
-static inline uint32&
-Entries()
+trace_entry*
+TracingMetaData::AfterLastEntry() const
 {
-	return sTracingMetaData->entries;
+	return fAfterLastEntry;
 }
 
 
-static inline uint32&
-Written()
+uint32
+TracingMetaData::Entries() const
 {
-	return sTracingMetaData->written;
+	return fEntries;
 }
 
 
-static inline spinlock&
-Lock()
+uint32
+TracingMetaData::EntriesEver() const
 {
-	return sTracingMetaData->lock;
+	return fEntriesEver;
 }
 
 
-static trace_entry*
-next_entry(trace_entry* entry)
+void
+TracingMetaData::IncrementEntriesEver()
+{
+	fEntriesEver++;
+		// TODO: Race condition on SMP machines! We should use atomic_add(),
+		// but that doesn't seem to fix the issue (entries ever < total entries)
+		// either. It's not critical, anyway.
+}
+
+
+char*
+TracingMetaData::TraceOutputBuffer() const
+{
+	return fTraceOutputBuffer;
+}
+
+
+trace_entry*
+TracingMetaData::NextEntry(trace_entry* entry)
 {
 	entry += entry->size;
 	if ((entry->flags & WRAP_ENTRY) != 0)
-		entry = Buffer();
+		entry = fBuffer;
 
-	if (entry == AfterLastEntry())
+	if (entry == fAfterLastEntry)
 		return NULL;
 
 	return entry;
 }
 
 
-static trace_entry*
-previous_entry(trace_entry* entry)
+trace_entry*
+TracingMetaData::PreviousEntry(trace_entry* entry)
 {
-	if (entry == FirstEntry())
+	if (entry == fFirstEntry)
 		return NULL;
 
-	if (entry == Buffer()) {
+	if (entry == fBuffer) {
 		// beginning of buffer -- previous entry is a wrap entry
-		entry = Buffer() + kBufferSize - entry->previous_size;
+		entry = fBuffer + kBufferSize - entry->previous_size;
 	}
 
 	return entry - entry->previous_size;
 }
 
 
-static bool
-free_first_entry()
+trace_entry*
+TracingMetaData::AllocateEntry(size_t size, uint16 flags)
 {
-	TRACE(("  skip start %p, %lu*4 bytes\n", FirstEntry(), FirstEntry()->size));
+	if (fAfterLastEntry == NULL || size == 0 || size >= kMaxTracingEntrySize)
+		return NULL;
 
-	trace_entry* newFirst = next_entry(FirstEntry());
+	InterruptsSpinLocker _(fLock);
 
-	if (FirstEntry()->flags & BUFFER_ENTRY) {
+	size = (size + 3) >> 2;
+		// 4 byte aligned, don't store the lower 2 bits
+
+	TRACE(("AllocateEntry(%lu), start %p, end %p, buffer %p\n", size * 4,
+		fFirstEntry, fAfterLastEntry, fBuffer));
+
+	if (!_MakeSpace(size))
+		return NULL;
+
+	trace_entry* entry = fAfterLastEntry;
+	entry->size = size;
+	entry->flags = flags;
+	fAfterLastEntry += size;
+	fAfterLastEntry->previous_size = size;
+
+	if (!(flags & BUFFER_ENTRY))
+		fEntries++;
+
+	TRACE(("  entry: %p, end %p, start %p, entries %ld\n", entry,
+		fAfterLastEntry, fFirstEntry, fEntries));
+
+	return entry;
+}
+
+
+bool
+TracingMetaData::_FreeFirstEntry()
+{
+	TRACE(("  skip start %p, %lu*4 bytes\n", fFirstEntry, fFirstEntry->size));
+
+	trace_entry* newFirst = NextEntry(fFirstEntry);
+
+	if (fFirstEntry->flags & BUFFER_ENTRY) {
 		// a buffer entry -- just skip it
-	} else if (FirstEntry()->flags & ENTRY_INITIALIZED) {
+	} else if (fFirstEntry->flags & ENTRY_INITIALIZED) {
 		// fully initialized TraceEntry -- destroy it
-		TraceEntry::FromTraceEntry(FirstEntry())->~TraceEntry();
-		Entries()--;
+		TraceEntry::FromTraceEntry(fFirstEntry)->~TraceEntry();
+		fEntries--;
 	} else {
 		// Not fully initialized TraceEntry. We can't free it, since
 		// then it's constructor might still write into the memory and
@@ -307,107 +265,257 @@ free_first_entry()
 	if (newFirst == NULL) {
 		// everything is freed -- practically this can't happen, if
 		// the buffer is large enough to hold three max-sized entries
-		FirstEntry() = AfterLastEntry() = Buffer();
-		TRACE(("free_first_entry(): all entries freed!\n"));
+		fFirstEntry = fAfterLastEntry = fBuffer;
+		TRACE(("_FreeFirstEntry(): all entries freed!\n"));
 	} else
-		FirstEntry() = newFirst;
+		fFirstEntry = newFirst;
 
 	return true;
 }
 
 
-/*!	Makes sure we have needed * 4 bytes of memory at AfterLastEntry().
+/*!	Makes sure we have needed * 4 bytes of memory at fAfterLastEntry.
 	Returns \c false, if unable to free that much.
 */
-static bool
-make_space(size_t needed)
+bool
+TracingMetaData::_MakeSpace(size_t needed)
 {
-	// we need space for AfterLastEntry(), too (in case we need to wrap around
+	// we need space for fAfterLastEntry, too (in case we need to wrap around
 	// later)
 	needed++;
 
-	// If there's not enough space (free or occupied) after AfterLastEntry(),
+	// If there's not enough space (free or occupied) after fAfterLastEntry,
 	// we free all entries in that region and wrap around.
-	if (AfterLastEntry() + needed > Buffer() + kBufferSize) {
-		TRACE(("make_space(%lu), wrapping around: after last: %p\n", needed,
-			AfterLastEntry()));
+	if (fAfterLastEntry + needed > fBuffer + kBufferSize) {
+		TRACE(("_MakeSpace(%lu), wrapping around: after last: %p\n", needed,
+			fAfterLastEntry));
 
-		// Free all entries after AfterLastEntry() and one more at the beginning
+		// Free all entries after fAfterLastEntry and one more at the beginning
 		// of the buffer.
-		while (FirstEntry() > AfterLastEntry()) {
-			if (!free_first_entry())
+		while (fFirstEntry > fAfterLastEntry) {
+			if (!_FreeFirstEntry())
 				return false;
 		}
-		if (AfterLastEntry() != Buffer() && !free_first_entry())
+		if (fAfterLastEntry != fBuffer && !_FreeFirstEntry())
 			return false;
 
-		// just in case free_first_entry() freed the very last existing entry
-		if (AfterLastEntry() == Buffer())
+		// just in case _FreeFirstEntry() freed the very last existing entry
+		if (fAfterLastEntry == fBuffer)
 			return true;
 
 		// mark as wrap entry and actually wrap around
-		trace_entry* wrapEntry = AfterLastEntry();
+		trace_entry* wrapEntry = fAfterLastEntry;
 		wrapEntry->size = 0;
 		wrapEntry->flags = WRAP_ENTRY;
-		AfterLastEntry() = Buffer();
-		AfterLastEntry()->previous_size = Buffer() + kBufferSize - wrapEntry;
+		fAfterLastEntry = fBuffer;
+		fAfterLastEntry->previous_size = fBuffer + kBufferSize - wrapEntry;
 	}
 
-	if (FirstEntry() <= AfterLastEntry()) {
-		// buffer is empty or the space after AfterLastEntry() is unoccupied
+	if (fFirstEntry <= fAfterLastEntry) {
+		// buffer is empty or the space after fAfterLastEntry is unoccupied
 		return true;
 	}
 
 	// free the first entries, until there's enough space
-	size_t space = FirstEntry() - AfterLastEntry();
+	size_t space = fFirstEntry - fAfterLastEntry;
 
 	if (space < needed) {
-		TRACE(("make_space(%lu), left %ld\n", needed, space));
+		TRACE(("_MakeSpace(%lu), left %ld\n", needed, space));
 	}
 
 	while (space < needed) {
-		space += FirstEntry()->size;
+		space += fFirstEntry->size;
 
-		if (!free_first_entry())
+		if (!_FreeFirstEntry())
 			return false;
 	}
 
-	TRACE(("  out: start %p, entries %ld\n", FirstEntry(), Entries()));
+	TRACE(("  out: start %p, entries %ld\n", fFirstEntry, fEntries));
 
 	return true;
 }
 
 
-static trace_entry*
-allocate_entry(size_t size, uint16 flags)
+/*static*/ status_t
+TracingMetaData::Create(TracingMetaData*& _metaData)
 {
-	if (AfterLastEntry() == NULL || size == 0 || size >= 65532)
+	// search meta data in memory (from previous session)
+	area_id area;
+	TracingMetaData* metaData;
+	status_t error = _CreateMetaDataArea(true, area, metaData);
+	if (error == B_OK) {
+		if (_InitPreviousTracingData(metaData)) {
+			_metaData = metaData;
+			return B_OK;
+		}
+
+		dprintf("Found previous tracing meta data, but failed to init.\n");
+
+		// invalidate the meta data
+		metaData->fMagic1 = 0;
+		metaData->fMagic2 = 0;
+		metaData->fMagic3 = 0;
+		delete_area(area);
+	} else
+		dprintf("No previous tracing meta data found.\n");
+
+	// no previous tracng data found -- create new one
+	error = _CreateMetaDataArea(false, area, metaData);
+	if (error != B_OK)
+		return error;
+
+	area = create_area("tracing log",
+		(void**)&metaData->fTraceOutputBuffer, B_ANY_KERNEL_ADDRESS,
+		kTraceOutputBufferSize + MAX_TRACE_SIZE, B_CONTIGUOUS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (area < 0)
+		return area;
+
+	// get the physical address
+	physical_entry physicalEntry;
+	if (get_memory_map(metaData->fTraceOutputBuffer, B_PAGE_SIZE,
+			&physicalEntry, 1) == B_OK) {
+		metaData->fPhysicalAddress = (addr_t)physicalEntry.address;
+	} else {
+		dprintf("TracingMetaData::Create(): failed to get physical address "
+			"of tracing buffer\n");
+		metaData->fPhysicalAddress = 0;
+	}
+
+	metaData->fBuffer = (trace_entry*)(metaData->fTraceOutputBuffer
+		+ kTraceOutputBufferSize);
+	metaData->fFirstEntry = metaData->fBuffer;
+	metaData->fAfterLastEntry = metaData->fBuffer;
+
+	metaData->fEntries = 0;
+	metaData->fEntriesEver = 0;
+	B_INITIALIZE_SPINLOCK(&metaData->fLock);
+
+	metaData->fMagic1 = kMetaDataMagic1;
+	metaData->fMagic2 = kMetaDataMagic2;
+	metaData->fMagic3 = kMetaDataMagic3;
+
+	_metaData = metaData;
+	return B_OK;
+}
+
+
+/*static*/ status_t
+TracingMetaData::_CreateMetaDataArea(bool findPrevious, area_id& _area,
+	TracingMetaData*& _metaData)
+{
+	// search meta data in memory (from previous session)
+	TracingMetaData* metaData;
+	addr_t metaDataAddress = kMetaDataBaseAddress;
+	for (; metaDataAddress <= kMetaDataBaseEndAddress;
+			metaDataAddress += kMetaDataAddressIncrement) {
+		area_id area = create_area_etc(B_SYSTEM_TEAM, "tracing metadata",
+			(void**)&metaData, B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE,
+			B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+			metaDataAddress, CREATE_AREA_DONT_CLEAR);
+		if (area < 0)
+			continue;
+
+		if (!findPrevious) {
+			_area = area;
+			_metaData = metaData;
+			return B_OK;
+		}
+
+		if (metaData->fMagic1 == kMetaDataMagic1
+			&& metaData->fMagic2 == kMetaDataMagic2
+			&& metaData->fMagic3 == kMetaDataMagic3) {
+			_area = area;
+			_metaData = metaData;
+			return B_OK;
+		}
+
+		delete_area(area);
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+/*static*/ bool
+TracingMetaData::_InitPreviousTracingData(TracingMetaData* metaData)
+{
+	addr_t bufferStart
+		= (addr_t)metaData->fTraceOutputBuffer + kTraceOutputBufferSize;
+	addr_t bufferEnd = bufferStart + MAX_TRACE_SIZE;
+
+	if (bufferStart > bufferEnd || (addr_t)metaData->fBuffer != bufferStart
+		|| (addr_t)metaData->fFirstEntry % sizeof(trace_entry) != 0
+		|| (addr_t)metaData->fFirstEntry < bufferStart
+		|| (addr_t)metaData->fFirstEntry + sizeof(trace_entry) >= bufferEnd
+		|| (addr_t)metaData->fAfterLastEntry % sizeof(trace_entry) != 0
+		|| (addr_t)metaData->fAfterLastEntry < bufferStart
+		|| (addr_t)metaData->fAfterLastEntry > bufferEnd
+		|| metaData->fPhysicalAddress == 0) {
+		dprintf("Failed to init tracing meta data: Sanity checks "
+			"failed.\n");
+		return false;
+	}
+
+	// re-map the previous tracing buffer
+	void* buffer = metaData->fTraceOutputBuffer;
+	area_id area = create_area_etc(B_SYSTEM_TEAM, "tracing log",
+		&buffer, B_EXACT_ADDRESS, kTraceOutputBufferSize + MAX_TRACE_SIZE,
+		B_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		metaData->fPhysicalAddress, CREATE_AREA_DONT_CLEAR);
+	if (area < 0) {
+		dprintf("Failed to init tracing meta data: Mapping tracing log "
+			"buffer failed: %s\n", strerror(area));
+		return false;
+	}
+
+#if 0
+	// verify/repair the tracing entry list
+	uint32 entry
+	trace_entry* entry = metaData->fFirstEntry;
+	while (true) {
+
+	}
+
+
+static trace_entry*
+next_entry(trace_entry* entry)
+{
+	entry += entry->size;
+	if ((entry->flags & WRAP_ENTRY) != 0)
+		entry = fBuffer;
+
+	if (entry == fAfterLastEntry)
 		return NULL;
-
-	InterruptsSpinLocker _(Lock());
-
-	size = (size + 3) >> 2;
-		// 4 byte aligned, don't store the lower 2 bits
-
-	TRACE(("allocate_entry(%lu), start %p, end %p, buffer %p\n", size * 4,
-		FirstEntry(), AfterLastEntry(), Buffer()));
-
-	if (!make_space(size))
-		return NULL;
-
-	trace_entry* entry = AfterLastEntry();
-	entry->size = size;
-	entry->flags = flags;
-	AfterLastEntry() += size;
-	AfterLastEntry()->previous_size = size;
-
-	if (!(flags & BUFFER_ENTRY))
-		Entries()++;
-
-	TRACE(("  entry: %p, end %p, start %p, entries %ld\n", entry,
-		AfterLastEntry(), FirstEntry(), Entries()));
 
 	return entry;
+}
+
+
+static trace_entry*
+previous_entry(trace_entry* entry)
+{
+	if (entry == fFirstEntry)
+		return NULL;
+
+	if (entry == fBuffer) {
+		// beginning of buffer -- previous entry is a wrap entry
+		entry = fBuffer + kBufferSize - entry->previous_size;
+	}
+
+	return entry - entry->previous_size;
+}
+#endif
+
+	// TODO: More checks:
+	// * tracing entry counts
+	// * tracing entries (linked list)
+	// * tracing entries objects (vtables)
+
+	B_INITIALIZE_SPINLOCK(&metaData->fLock);
+
+	sTracingDataRecovered = true;
+	return true;
 }
 
 
@@ -525,7 +633,7 @@ TraceEntry::Initialized()
 {
 #if ENABLE_TRACING
 	ToTraceEntry()->flags |= ENTRY_INITIALIZED;
-	Written()++;
+	sTracingMetaData->IncrementEntriesEver();
 #endif
 }
 
@@ -534,7 +642,8 @@ void*
 TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
 {
 #if ENABLE_TRACING
-	trace_entry* entry = allocate_entry(size + sizeof(trace_entry), 0);
+	trace_entry* entry = sTracingMetaData->AllocateEntry(
+		size + sizeof(trace_entry), 0);
 	return entry != NULL ? entry + 1 : NULL;
 #endif
 	return NULL;
@@ -927,10 +1036,10 @@ TraceEntry*
 TraceEntryIterator::Next()
 {
 	if (fIndex == 0) {
-		fEntry = _NextNonBufferEntry(FirstEntry());
+		fEntry = _NextNonBufferEntry(sTracingMetaData->FirstEntry());
 		fIndex = 1;
 	} else if (fEntry != NULL) {
-		fEntry = _NextNonBufferEntry(next_entry(fEntry));
+		fEntry = _NextNonBufferEntry(sTracingMetaData->NextEntry(fEntry));
 		fIndex++;
 	}
 
@@ -941,11 +1050,12 @@ TraceEntryIterator::Next()
 TraceEntry*
 TraceEntryIterator::Previous()
 {
-	if (fIndex == (int32)Entries() + 1)
-		fEntry = AfterLastEntry();
+	if (fIndex == (int32)sTracingMetaData->Entries() + 1)
+		fEntry = sTracingMetaData->AfterLastEntry();
 
 	if (fEntry != NULL) {
-		fEntry = _PreviousNonBufferEntry(previous_entry(fEntry));
+		fEntry = _PreviousNonBufferEntry(
+			sTracingMetaData->PreviousEntry(fEntry));
 		fIndex--;
 	}
 
@@ -959,8 +1069,8 @@ TraceEntryIterator::MoveTo(int32 index)
 	if (index == fIndex)
 		return Current();
 
-	if (index <= 0 || index > (int32)Entries()) {
-		fIndex = (index <= 0 ? 0 : Entries() + 1);
+	if (index <= 0 || index > (int32)sTracingMetaData->Entries()) {
+		fIndex = (index <= 0 ? 0 : sTracingMetaData->Entries() + 1);
 		fEntry = NULL;
 		return NULL;
 	}
@@ -976,11 +1086,11 @@ TraceEntryIterator::MoveTo(int32 index)
 		fEntry = NULL;
 		fIndex = 0;
 	}
-	if ((int32)Entries() + 1 - fIndex < distance) {
-		distance = Entries() + 1 - fIndex;
+	if ((int32)sTracingMetaData->Entries() + 1 - fIndex < distance) {
+		distance = sTracingMetaData->Entries() + 1 - fIndex;
 		direction = -1;
 		fEntry = NULL;
-		fIndex = Entries() + 1;
+		fIndex = sTracingMetaData->Entries() + 1;
 	}
 
 	// iterate to the index
@@ -1000,7 +1110,7 @@ trace_entry*
 TraceEntryIterator::_NextNonBufferEntry(trace_entry* entry)
 {
 	while (entry != NULL && (entry->flags & BUFFER_ENTRY) != 0)
-		entry = next_entry(entry);
+		entry = sTracingMetaData->NextEntry(entry);
 
 	return entry;
 }
@@ -1010,7 +1120,7 @@ trace_entry*
 TraceEntryIterator::_PreviousNonBufferEntry(trace_entry* entry)
 {
 	while (entry != NULL && (entry->flags & BUFFER_ENTRY) != 0)
-		entry = previous_entry(entry);
+		entry = sTracingMetaData->PreviousEntry(entry);
 
 	return entry;
 }
@@ -1029,10 +1139,12 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 	static int32 _previousFirstChecked = 1;
 	static int32 _previousLastChecked = -1;
 	static int32 _previousDirection = 1;
-	static uint32 _previousWritten = 0;
+	static uint32 _previousEntriesEver = 0;
 	static uint32 _previousEntries = 0;
 	static uint32 _previousOutputFlags = 0;
 	static TraceEntryIterator iterator;
+
+	uint32 entriesEver = sTracingMetaData->EntriesEver();
 
 	// Note: start and index are Pascal-like indices (i.e. in [1, Entries()]).
 	int32 start = 0;	// special index: print the last count entries
@@ -1074,8 +1186,8 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 			print_debugger_command_usage(argv[0]);
 			return 0;
 		}
-		if (Written() == 0 || Written() != _previousWritten
-			|| Entries() != _previousEntries) {
+		if (entriesEver == 0 || entriesEver != _previousEntriesEver
+			|| sTracingMetaData->Entries() != _previousEntries) {
 			kprintf("Can't continue iteration. \"%s\" has not been invoked "
 				"before, or there were new entries written since the last "
 				"invocation.\n", argv[0]);
@@ -1133,7 +1245,7 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 		if (maxToCheck == 0 || !hasFilter)
 			maxToCheck = count;
 		else if (maxToCheck < 0)
-			maxToCheck = Entries();
+			maxToCheck = sTracingMetaData->Entries();
 
 		// determine iteration direction
 		direction = (start <= 0 || count < 0 ? -1 : 1);
@@ -1143,14 +1255,14 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 			count = -count;
 		if (maxToCheck < 0)
 			maxToCheck = -maxToCheck;
-		if (maxToCheck > (int32)Entries())
-			maxToCheck = Entries();
+		if (maxToCheck > (int32)sTracingMetaData->Entries())
+			maxToCheck = sTracingMetaData->Entries();
 		if (count > maxToCheck)
 			count = maxToCheck;
 
 		// validate start
-		if (start <= 0 || start > (int32)Entries())
-			start = max_c(1, Entries());
+		if (start <= 0 || start > (int32)sTracingMetaData->Entries())
+			start = max_c(1, sTracingMetaData->Entries());
 	}
 
 	if (direction < 0) {
@@ -1158,16 +1270,17 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 		lastToCheck = start;
 	} else {
 		firstToCheck = start;
-		lastToCheck = min_c((int32)Entries(), start + maxToCheck - 1);
+		lastToCheck = min_c((int32)sTracingMetaData->Entries(),
+			start + maxToCheck - 1);
 	}
 
 	// reset the iterator, if something changed in the meantime
-	if (Written() == 0 || Written() != _previousWritten
-		|| Entries() != _previousEntries) {
+	if (entriesEver == 0 || entriesEver != _previousEntriesEver
+		|| sTracingMetaData->Entries() != _previousEntries) {
 		iterator.Reset();
 	}
 
-	LazyTraceOutput out(sTracingMetaData->traceOutputBuffer,
+	LazyTraceOutput out(sTracingMetaData->TraceOutputBuffer(),
 		kTraceOutputBufferSize, outputFlags);
 
 	bool markedMatching = false;
@@ -1271,7 +1384,8 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 
 	kprintf("printed %ld entries within range %ld to %ld (%ld of %ld total, "
 		"%ld ever)\n", dumped, firstToCheck, lastToCheck,
-		lastToCheck - firstToCheck + 1, Entries(), Written());
+		lastToCheck - firstToCheck + 1, sTracingMetaData->Entries(),
+		entriesEver);
 
 	// store iteration state
 	_previousCount = count;
@@ -1281,8 +1395,8 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 	_previousFirstChecked = firstToCheck;
 	_previousLastChecked = lastToCheck;
 	_previousDirection = direction;
-	_previousWritten = Written();
-	_previousEntries = Entries();
+	_previousEntriesEver = entriesEver;
+	_previousEntries = sTracingMetaData->Entries();
 	_previousOutputFlags = outputFlags;
 
 	return cont != 0 ? B_KDEBUG_CONT : 0;
@@ -1303,8 +1417,8 @@ extern "C" uint8*
 alloc_tracing_buffer(size_t size)
 {
 #if	ENABLE_TRACING
-	trace_entry* entry = allocate_entry(size + sizeof(trace_entry),
-		BUFFER_ENTRY);
+	trace_entry* entry = sTracingMetaData->AllocateEntry(
+		size + sizeof(trace_entry), BUFFER_ENTRY);
 	if (entry == NULL)
 		return NULL;
 
@@ -1409,7 +1523,7 @@ void
 lock_tracing_buffer()
 {
 #if ENABLE_TRACING
-	acquire_spinlock(&Lock());
+	sTracingMetaData->Lock();
 #endif
 }
 
@@ -1418,7 +1532,7 @@ void
 unlock_tracing_buffer()
 {
 #if ENABLE_TRACING
-	release_spinlock(&Lock());
+	sTracingMetaData->Unlock();
 #endif
 }
 

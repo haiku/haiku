@@ -16,9 +16,9 @@
 
 
 struct trace_entry {
-	uint32	size			: 14;		// actual size is *4
-	uint32	previous_size	: 14;		// actual size is *4
-	uint32	flags			: 4;
+	uint32	size			: 13;		// actual size is *4
+	uint32	previous_size	: 13;		// actual size is *4
+	uint32	flags			: 6;
 };
 
 struct tracing_stack_trace;
