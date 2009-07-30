@@ -196,16 +196,19 @@ MenuPrivate::CreateBitmaps()
 {
 	BRect smallRect(0, 0, 16, 10);
 	BRect largeRect(0, 0, 21, 10);
-	
-	gMenuItemAlt = new BBitmap(smallRect, B_CMAP8);
-	gMenuItemControl = new BBitmap(smallRect, B_CMAP8);
-	gMenuItemOption = new BBitmap(smallRect, B_CMAP8);	
-	gMenuItemShift = new BBitmap(largeRect, B_CMAP8);
+	try {
+		gMenuItemAlt = new BBitmap(smallRect, B_CMAP8);
+		gMenuItemControl = new BBitmap(smallRect, B_CMAP8);
+		gMenuItemOption = new BBitmap(smallRect, B_CMAP8);	
+		gMenuItemShift = new BBitmap(largeRect, B_CMAP8);
+	} catch (...) {
+		return B_NO_MEMORY;
+	}
 	
 	gMenuItemAlt->ImportBits(kAltBits, sizeof(kAltBits),
 		17, 0, B_CMAP8);
 	gMenuItemControl->ImportBits(kCtrlBits, sizeof(kCtrlBits),
-		17, 0, B_CMAP8);				
+		17, 0, B_CMAP8);
 	gMenuItemOption->ImportBits(kOptBits, sizeof(kOptBits),
 		17, 0, B_CMAP8);
 	gMenuItemShift->ImportBits(kShiftBits, sizeof(kShiftBits),

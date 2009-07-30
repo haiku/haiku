@@ -954,12 +954,16 @@ _init_interface_kit_()
 	_init_global_fonts_();
 	
 	BPrivate::gWidthBuffer = new BPrivate::WidthBuffer;
-	BPrivate::MenuPrivate::CreateBitmaps();
+	status = BPrivate::MenuPrivate::CreateBitmaps();
+	if (status != B_OK)
+		return status;
 
 	_menu_info_ptr_ = &BMenu::sMenuInfo;
 
 	status = get_menu_info(&BMenu::sMenuInfo);
-
+	if (status != B_OK)
+		return status;
+		
 	general_info.background_color = ui_color(B_PANEL_BACKGROUND_COLOR);
 	general_info.mark_color.set_to(0, 0, 0);
 	general_info.highlight_color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
