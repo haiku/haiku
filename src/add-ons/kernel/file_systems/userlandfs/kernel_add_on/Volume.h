@@ -75,6 +75,8 @@ public:
 			status_t			DoIterativeFDIO(int fd, int32 requestID,
 									void* cookie, const file_io_vec* vecs,
 									uint32 vecCount);
+			status_t			NotifyIORequest(int32 requestID,
+									status_t status);
 
 			// FS
 			status_t			Mount(const char* device, uint32 flags,

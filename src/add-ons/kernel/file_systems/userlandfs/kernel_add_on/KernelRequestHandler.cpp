@@ -106,6 +106,8 @@ KernelRequestHandler::HandleRequest(Request* request)
 		// I/O
 		case DO_ITERATIVE_FD_IO_REQUEST:
 			return _HandleRequest((DoIterativeFDIORequest*)request);
+		case NOTIFY_IO_REQUEST_REQUEST:
+			return _HandleRequest((NotifyIORequestRequest*)request);
 	}
 PRINT(("KernelRequestHandler::HandleRequest(): unexpected request: %lu\n",
 request->GetType()));
@@ -735,6 +737,31 @@ KernelRequestHandler::_HandleRequest(DoIterativeFDIORequest* request)
 	// prepare the reply
 	RequestAllocator allocator(fPort->GetPort());
 	DoIterativeFDIOReply* reply;
+	status_t error = AllocateRequest(allocator, &reply);
+	if (error != B_OK)
+		return error;
+	reply->error = result;
+
+	// send the reply
+	return fPort->SendRequest(&allocator);
+}
+
+
+// _HandleRequest
+status_t
+KernelRequestHandler::_HandleRequest(NotifyIORequestRequest* request)
+{
+	// check and execute the request
+	Volume* volume = NULL;
+	status_t result = _GetVolume(request->nsid, &volume);
+	VolumePutter _(volume);
+
+	if (result == B_OK)
+		result = volume->NotifyIORequest(request->request, request->status);
+
+	// prepare the reply
+	RequestAllocator allocator(fPort->GetPort());
+	NotifyIORequestReply* reply;
 	status_t error = AllocateRequest(allocator, &reply);
 	if (error != B_OK)
 		return error;

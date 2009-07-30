@@ -734,6 +734,20 @@ Volume::DoIterativeFDIO(int fd, int32 requestID, void* clientCookie,
 }
 
 
+status_t
+Volume::NotifyIORequest(int32 requestID, status_t status)
+{
+	// get the request
+	io_request* request;
+	status_t error = _FindIORequest(requestID, &request);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	notify_io_request(request, status);
+	return B_OK;
+}
+
+
 // #pragma mark - FS
 
 

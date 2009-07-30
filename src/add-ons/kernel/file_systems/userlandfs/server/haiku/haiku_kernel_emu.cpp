@@ -319,6 +319,17 @@ io_request_is_write(const io_request* request)
 }
 
 
+void
+notify_io_request(io_request* _request, status_t status)
+{
+	HaikuKernelIORequest* request = (HaikuKernelIORequest*)request;
+
+	// send the request
+	UserlandFS::KernelEmu::notify_io_request(request->volume->GetID(),
+		request->id, status);
+}
+
+
 // #pragma mark - Disk Device Manager
 
 

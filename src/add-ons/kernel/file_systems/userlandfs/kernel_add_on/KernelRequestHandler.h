@@ -75,6 +75,7 @@ private:
 			status_t			_HandleRequest(FileCacheWriteRequest* request);
 			// I/O
 			status_t			_HandleRequest(DoIterativeFDIORequest* request);
+			status_t			_HandleRequest(NotifyIORequestRequest* request);
 
 			status_t			_GetVolume(dev_t id, Volume** volume);
 

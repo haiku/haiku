@@ -890,6 +890,41 @@ UserlandFS::KernelEmu::do_iterative_fd_io(dev_t volumeID, int fd,
 }
 
 
+status_t
+UserlandFS::KernelEmu::notify_io_request(dev_t volumeID, int32 requestID,
+	status_t status)
+{
+	// get the request port and the file system
+	RequestPort* port;
+	FileSystem* fileSystem;
+	status_t error = get_port_and_fs(&port, &fileSystem);
+	if (error != B_OK)
+		return error;
+
+	// prepare the request
+	RequestAllocator allocator(port->GetPort());
+	NotifyIORequestRequest* request;
+	error = AllocateRequest(allocator, &request);
+	if (error != B_OK)
+		return error;
+
+	request->nsid = volumeID;
+	request->request = requestID;
+	request->status = status;
+
+	// send the request
+	UserlandRequestHandler handler(fileSystem, NOTIFY_IO_REQUEST_REPLY);
+	NotifyIORequestReply* reply;
+	error = port->SendRequest(&allocator, &handler, (Request**)&reply);
+	if (error != B_OK)
+		return error;
+	RequestReleaser requestReleaser(port, reply);
+
+	// process the reply
+	return reply->error;
+}
+
+
 // #pragma mark -
 
 

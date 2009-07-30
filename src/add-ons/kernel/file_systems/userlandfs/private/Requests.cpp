@@ -720,8 +720,10 @@ UserlandFSUtil::is_kernel_request(uint32 type)
 			return true;
 		// I/O
 		case DO_ITERATIVE_FD_IO_REQUEST:
+		case NOTIFY_IO_REQUEST_REQUEST:
 			return false;
 		case DO_ITERATIVE_FD_IO_REPLY:
+		case NOTIFY_IO_REQUEST_REPLY:
 			return true;
 
 		// general reply
@@ -961,8 +963,10 @@ UserlandFSUtil::is_userland_request(uint32 type)
 			return false;
 		// I/O
 		case DO_ITERATIVE_FD_IO_REQUEST:
+		case NOTIFY_IO_REQUEST_REQUEST:
 			return true;
 		case DO_ITERATIVE_FD_IO_REPLY:
+		case NOTIFY_IO_REQUEST_REPLY:
 			return false;
 
 		// general reply

@@ -234,6 +234,8 @@ enum {
 	// I/O
 	DO_ITERATIVE_FD_IO_REQUEST,
 	DO_ITERATIVE_FD_IO_REPLY,
+	NOTIFY_IO_REQUEST_REQUEST,
+	NOTIFY_IO_REQUEST_REPLY,
 
 	// general reply
 	RECEIPT_ACK_REPLY,
@@ -1829,6 +1831,24 @@ public:
 	DoIterativeFDIOReply() : ReplyRequest(DO_ITERATIVE_FD_IO_REPLY) {}
 };
 
+// NotifyIORequestRequest
+class NotifyIORequestRequest : public Request {
+public:
+	NotifyIORequestRequest() : Request(NOTIFY_IO_REQUEST_REQUEST) {}
+
+	enum { MAX_VECS = 8 };
+
+	dev_t		nsid;
+	int32		request;
+	status_t	status;
+};
+
+// NotifyIORequestReply
+class NotifyIORequestReply : public ReplyRequest {
+public:
+	NotifyIORequestReply() : ReplyRequest(NOTIFY_IO_REQUEST_REPLY) {}
+};
+
 
 //////////////////
 // General Reply
@@ -2228,6 +2248,10 @@ do_for_request(Request* request, Task& task)
 			return task((DoIterativeFDIORequest*)request);
 		case DO_ITERATIVE_FD_IO_REPLY:
 			return task((DoIterativeFDIOReply*)request);
+		case NOTIFY_IO_REQUEST_REQUEST:
+			return task((NotifyIORequestRequest*)request);
+		case NOTIFY_IO_REQUEST_REPLY:
+			return task((NotifyIORequestReply*)request);
 		// general reply
 		case RECEIPT_ACK_REPLY:
 			return task((ReceiptAckReply*)request);
@@ -2451,6 +2475,8 @@ using UserlandFSUtil::FileCacheWriteReply;
 // I/O
 using UserlandFSUtil::DoIterativeFDIORequest;
 using UserlandFSUtil::DoIterativeFDIOReply;
+using UserlandFSUtil::NotifyIORequestRequest;
+using UserlandFSUtil::NotifyIORequestReply;
 // general reply
 using UserlandFSUtil::ReceiptAckReply;
 
