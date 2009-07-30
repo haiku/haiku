@@ -7,6 +7,12 @@ UsePrivateSystemHeaders ;
 
 StaticLibrary <bin>debug_utils.a : debug_utils.cpp ;
 
+BinCommand kernel_debugger : kernel_debugger.cpp
+	:
+	$(TARGET_LIBSUPC++)
+;
+
+
 HaikuSubInclude ltrace ;
 HaikuSubInclude profile ;
 HaikuSubInclude scheduling_recorder ;
