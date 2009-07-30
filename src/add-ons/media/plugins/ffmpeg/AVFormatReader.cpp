@@ -502,10 +502,13 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 //			format->u.encoded_video.forward_history = 0;
 //			format->u.encoded_video.backward_history = 0;
 
+			// TODO: Fix up for interlaced video
 			format->u.encoded_video.output.field_rate
 				= av_q2d(stream->r_frame_rate);
+if (format->u.encoded_video.output.field_rate == 50.0f)
+	format->u.encoded_video.output.field_rate = 25.0f;
 			format->u.encoded_video.output.interlace = 1;
-				// TODO: Fix up for interlaced video
+
 			format->u.encoded_video.output.first_active = 0;
 			format->u.encoded_video.output.last_active
 				= codecContext->height - 1;
@@ -724,7 +727,7 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 		*frame, *time);
 
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
-		*time = *frame * 1000000LL / FrameRate();
+		*time = (bigtime_t)(*frame * 1000000LL / FrameRate());
 
 	double timeBase = av_q2d(fStream->time_base);
 	int64_t timeStamp;
@@ -768,7 +771,7 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 
 	double frameRate = FrameRate();
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
-		*time = *frame * 1000000LL / frameRate;
+		*time = (bigtime_t)(*frame * 1000000LL / frameRate);
 
 	double timeBase = av_q2d(fStream->time_base);
 	int64_t timeStamp;
@@ -822,6 +825,12 @@ AVFormatReader::StreamCookie::GetNextChunk(const void** chunkBuffer,
 		*chunkSize = 0;
 		return ret;
 	}
+
+	// NOTE: AVPacket has a field called "convergence_duration", for which
+	// the documentation is quite interesting. It sounds like it could be
+	// used to know the time until the next I-Frame in streams that don't
+	// let you know the position of keyframes in another way (like through
+	// the index).
 
 	// According to libavformat documentation, fPacket is valid until the
 	// next call to av_read_frame(). This is what we want and we can share
