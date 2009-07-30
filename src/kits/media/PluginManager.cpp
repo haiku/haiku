@@ -252,10 +252,12 @@ PluginManager::DestroyWriter(Writer* writer)
 
 
 status_t
-PluginManager::CreateEncoder(Encoder** _encoder, const media_format& format)
+PluginManager::CreateEncoder(Encoder** _encoder,
+	const media_codec_info* codecInfo, uint32 flags)
 {
 	TRACE("PluginManager::CreateEncoder enter\n");
 
+#if 0
 	// get decoder for this format from the server
 	server_get_encoder_for_format_request request;
 	server_get_encoder_for_format_reply reply;
@@ -295,15 +297,10 @@ PluginManager::CreateEncoder(Encoder** _encoder, const media_format& format)
 	TRACE("PluginManager::CreateEncoder leave\n");
 
 	return B_OK;
-}
-
-
-status_t
-PluginManager::CreateEncoder(Encoder** encoder, const media_codec_info& mci)
-{
-	// TODO
-	debugger("not implemented");
-	return B_ERROR;
+#else
+	TRACE("PluginManager::CreateEncoder leave\n");
+	return B_NOT_SUPPORTED;
+#endif
 }
 
 

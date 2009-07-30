@@ -49,9 +49,8 @@ public:
 			void				DestroyWriter(Writer* writer);
 
 			status_t			CreateEncoder(Encoder** encoder,
-									const media_format& format);
-			status_t			CreateEncoder(Encoder** encoder,
-									const media_codec_info& mci);
+									const media_codec_info* codecInfo,
+									uint32 flags);
 			status_t			GetEncoderInfo(Encoder* encoder,
 									media_codec_info* _info) const;
 			void				DestroyEncoder(Encoder* encoder);
