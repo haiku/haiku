@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku Inc. All rights reserved.
+ * Copyright 2005-2009, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,10 +14,9 @@
 #include <TokenSpace.h>
 
 
-#define MESSAGE_BODY_HASH_TABLE_SIZE	10
+#define MESSAGE_BODY_HASH_TABLE_SIZE	5
 #define MAX_DATA_PREALLOCATION			B_PAGE_SIZE * 10
 #define MAX_FIELD_PREALLOCATION			50
-#define MAX_ITEM_PREALLOCATION			B_PAGE_SIZE
 
 
 static const int32 kPortMessageCode = 'pjpp';
@@ -30,8 +29,8 @@ enum {
 	MESSAGE_FLAG_IS_REPLY = 0x0008,
 	MESSAGE_FLAG_WAS_DELIVERED = 0x0010,
 	MESSAGE_FLAG_HAS_SPECIFIERS = 0x0020,
-	MESSAGE_FLAG_WAS_DROPPED = 0x0080,
-	MESSAGE_FLAG_PASS_BY_AREA = 0x0100
+	MESSAGE_FLAG_WAS_DROPPED = 0x0040,
+	MESSAGE_FLAG_PASS_BY_AREA = 0x0080
 };
 
 
@@ -42,29 +41,20 @@ enum {
 
 
 struct BMessage::field_header {
-	uint32		flags;
+	uint16		flags;
+	uint16		name_length;
 	type_code	type;
-	int32		name_length;
-	int32		count;
-	ssize_t		data_size;
-	ssize_t		allocated;
-	int32		offset;
+	uint32		count;
+	uint32		data_size;
+	uint32		offset;
 	int32		next_field;
-};
+} _PACKED;
 
 
 struct BMessage::message_header {
 	uint32		format;
 	uint32		what;
 	uint32		flags;
-
-	ssize_t		fields_size;
-	ssize_t		data_size;
-	ssize_t		fields_available;
-	ssize_t		data_available;
-
-	uint32		fields_checksum;
-	uint32		data_checksum;
 
 	int32		target;
 	int32		current_specifier;
@@ -76,8 +66,9 @@ struct BMessage::message_header {
 	team_id		reply_team;
 
 	// body info
-	int32		field_count;
-	int32		hash_table_size;
+	uint32		data_size;
+	uint32		field_count;
+	uint32		hash_table_size;
 	int32		hash_table[MESSAGE_BODY_HASH_TABLE_SIZE];
 
 	/*	The hash table does contain indexes into the field list and
@@ -86,18 +77,20 @@ struct BMessage::message_header {
 		The hash table must be reevaluated when we remove a field
 		though.
 	*/
-};
+} _PACKED;
 
 
 class BMessage::Private {
 	public:
 		Private(BMessage *msg)
-			: fMessage(msg)
+			:
+			fMessage(msg)
 		{
 		}
 
 		Private(BMessage &msg)
-			: fMessage(&msg)
+			:
+			fMessage(&msg)
 		{
 		}
 
@@ -173,24 +166,6 @@ class BMessage::Private {
 		GetMessageData()
 		{
 			return fMessage->fData;
-		}
-
-		ssize_t
-		NativeFlattenedSize() const
-		{
-			return fMessage->_NativeFlattenedSize();
-		}
-
-		status_t
-		NativeFlatten(char *buffer, ssize_t size) const
-		{
-			return fMessage->_NativeFlatten(buffer, size);
-		}
-
-		status_t
-		NativeFlatten(BDataIO *stream, ssize_t *size) const
-		{
-			return fMessage->_NativeFlatten(stream, size);
 		}
 
 		status_t

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -291,10 +291,12 @@ class BMessage {
 
 		status_t		_FlattenToArea(message_header **_header) const;
 		status_t		_CopyForWrite();
-		status_t		_Reference(message_header *header);
+		status_t		_Reference();
 		status_t		_Dereference();
 
-		status_t		_ResizeData(int32 offset, int32 change);
+		status_t		_ValidateMessage();
+
+		status_t		_ResizeData(uint32 offset, int32 change);
 
 		uint32			_HashName(const char* name) const;
 		status_t		_FindField(const char* name, type_code type,
@@ -303,9 +305,6 @@ class BMessage {
 							bool isFixedSize, field_header** _result);
 		status_t		_RemoveField(field_header* field);
 
-		ssize_t			_NativeFlattenedSize() const;
-		status_t		_NativeFlatten(char *buffer, ssize_t size) const;
-		status_t		_NativeFlatten(BDataIO *stream, ssize_t *size = NULL) const;
 		void			_PrintToStream(const char* indent) const;
 
 	private:
@@ -313,12 +312,15 @@ class BMessage {
 		field_header*	fFields;
 		uint8*			fData;
 
+		uint32			fFieldsAvailable;
+		size_t			fDataAvailable;
+
 		mutable	BMessage* fOriginal;
 
 		BMessage*		fQueueLink;
 			// fQueueLink is used by BMessageQueue to build a linked list
 
-		uint32			fReserved[11];
+		uint32			fReserved[9];
 
 						// deprecated
 						BMessage(BMessage *message);

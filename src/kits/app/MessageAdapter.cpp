@@ -316,7 +316,7 @@ MessageAdapter::_R5FlattenedSize(const BMessage *from)
 
 	uint8 *data = messagePrivate.GetMessageData();
 	BMessage::field_header *field = messagePrivate.GetMessageFields();
-	for (int32 i = 0; i < header->field_count; i++, field++) {
+	for (uint32 i = 0; i < header->field_count; i++, field++) {
 		// flags and type
 		flattenedSize += 1 + sizeof(type_code);
 
@@ -343,7 +343,7 @@ MessageAdapter::_R5FlattenedSize(const BMessage *from)
 		else {
 			uint8 *source = data + field->offset + field->name_length;
 
-			for (int32 i = 0; i < field->count; i++) {
+			for (uint32 i = 0; i < field->count; i++) {
 				ssize_t itemSize = *(ssize_t *)source + sizeof(ssize_t);
 				flattenedSize += pad_to_8(itemSize);
 				source += itemSize;
@@ -414,7 +414,7 @@ MessageAdapter::_FlattenR5Message(uint32 format, const BMessage *from,
 
 	// collect and add the data
 	BMessage::field_header *field = messagePrivate.GetMessageFields();
-	for (int32 i = 0; i < header->field_count; i++, field++) {
+	for (uint32 i = 0; i < header->field_count; i++, field++) {
 		flags = R5_FIELD_FLAG_VALID;
 
 		if (field->count == 1)
@@ -466,7 +466,7 @@ MessageAdapter::_FlattenR5Message(uint32 format, const BMessage *from,
 			pointer += field->data_size;
 		} else {
 			uint8 *previous = pointer;
-			for (int32 i = 0; i < field->count; i++) {
+			for (uint32 i = 0; i < field->count; i++) {
 				ssize_t itemSize = *(ssize_t *)source + sizeof(ssize_t);
 				memcpy(pointer, source, itemSize);
 				ssize_t paddedSize = pad_to_8(itemSize);

@@ -1335,10 +1335,10 @@ BView::DragMessage(BMessage* message, BBitmap* image,
 
 	// TODO: create area and flatten message into that area!
 	// send area info over port, not the actual message!
-	int32 bufferSize = privateMessage.NativeFlattenedSize();
+	int32 bufferSize = message->FlattenedSize();
 	char* buffer = new(std::nothrow) char[bufferSize];
 	if (buffer != NULL) {
-		privateMessage.NativeFlatten(buffer, bufferSize);
+		message->Flatten(buffer, bufferSize);
 
 		fOwner->fLink->StartMessage(AS_VIEW_DRAG_IMAGE);
 		fOwner->fLink->Attach<int32>(image->_ServerToken());

@@ -44,14 +44,21 @@ CalculateChecksum(const uint8 *buffer, int32 size)
 status_t
 entry_ref_flatten(char *buffer, size_t *size, const entry_ref *ref)
 {
+	if (*size < sizeof(ref->device) + sizeof(ref->directory))
+		return B_BUFFER_OVERFLOW;
+
 	memcpy((void *)buffer, (const void *)&ref->device, sizeof(ref->device));
 	buffer += sizeof(ref->device);
 	memcpy((void *)buffer, (const void *)&ref->directory, sizeof(ref->directory));
 	buffer += sizeof (ref->directory);
+	*size -= sizeof(ref->device) + sizeof(ref->directory);
 
 	size_t nameLength = 0;
 	if (ref->name) {
 		nameLength = strlen(ref->name) + 1;
+		if (*size < nameLength)
+			return B_BUFFER_OVERFLOW;
+
 		memcpy((void *)buffer, (const void *)ref->name, nameLength);
 	}
 
@@ -74,7 +81,7 @@ entry_ref_unflatten(entry_ref *ref, const char *buffer, size_t size)
 	buffer += sizeof(ref->directory);
 
 	if (ref->device != -1 && size > sizeof(ref->device)
-		+ sizeof(ref->directory)) {
+			+ sizeof(ref->directory)) {
 		ref->set_name(buffer);
 		if (ref->name == NULL) {
 			*ref = entry_ref();

@@ -608,7 +608,7 @@ MessageDeliverer::DeliverMessage(BMessage *message, MessagingTargetSet &targets,
 
 	// flatten the message
 	BMallocIO mallocIO;
-	status_t error = BMessage::Private(message).NativeFlatten(&mallocIO, NULL);
+	status_t error = message->Flatten(&mallocIO, NULL);
 	if (error < B_OK)
 		return error;
 
