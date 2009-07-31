@@ -17,7 +17,7 @@ App::App()
 	BApplication("application/x-vnd.Haiku3d")
 {
 	BRect frame(50, 50, 640 + 50, 480 + 50);
-	const char *title = "Hauku3d";
+	const char *title = "Haiku3d";
 	fMainWindow = new MainWindow(frame, title);
 }
 
