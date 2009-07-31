@@ -5939,16 +5939,19 @@ common_create_symlink(int fd, char* path, const char* toPath, int mode,
 	struct vnode* vnode;
 	status_t status;
 
-	FUNCTION(("common_create_symlink(fd = %d, path = %s, toPath = %s, mode = %d, kernel = %d)\n", fd, path, toPath, mode, kernel));
+	FUNCTION(("common_create_symlink(fd = %d, path = %s, toPath = %s, "
+		"mode = %d, kernel = %d)\n", fd, path, toPath, mode, kernel));
 
 	status = fd_and_path_to_dir_vnode(fd, path, &vnode, name, kernel);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	if (HAS_FS_CALL(vnode, create_symlink))
 		status = FS_CALL(vnode, create_symlink, name, toPath, mode);
-	else
-		status = EROFS;
+	else {
+		status = HAS_FS_CALL(vnode, write)
+			? B_NOT_SUPPORTED : B_READ_ONLY_DEVICE;
+	}
 
 	put_vnode(vnode);
 
