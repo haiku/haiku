@@ -236,7 +236,8 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 
 			case B_MOUSE_MOVED:
 				window->MouseMoved(message, where, &viewToken,
-					latestMouseMoved == NULL || latestMouseMoved == message);
+					latestMouseMoved == NULL || latestMouseMoved == message,
+					false);
 				break;
 		}
 
@@ -1394,8 +1395,7 @@ Desktop::RemoveWorkspacesView(WorkspacesView* view)
 }
 
 
-/*!
-	\brief Sends a fake B_MOUSE_MOVED event to the window under the mouse,
+/*!	\brief Sends a fake B_MOUSE_MOVED event to the window under the mouse,
 		and also updates the current view under the mouse.
 
 	This has only to be done in case the view changed without user interaction,
@@ -1416,7 +1416,8 @@ Desktop::_SendFakeMouseMoved(Window* window)
 
 	if (window != NULL) {
 		BMessage message;
-		window->MouseMoved(&message, fLastMousePosition, &viewToken, true);
+		window->MouseMoved(&message, fLastMousePosition, &viewToken, true,
+			true);
 
 		if (viewToken != B_NULL_TOKEN)
 			target = &window->EventTarget();

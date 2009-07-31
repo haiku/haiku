@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2009, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -981,7 +981,7 @@ Window::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 
 void
 Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
-	bool isLatestMouseMoved)
+	bool isLatestMouseMoved, bool isFake)
 {
 #if 0
 	if (fDecorator != NULL && fTopView != NULL) {
@@ -1110,7 +1110,10 @@ Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 	DesktopSettings desktopSettings(fDesktop);
 	if (desktopSettings.FocusFollowsMouse()
 		&& !IsFocus() && !(Flags() & B_AVOID_FOCUS)) {
-		fDesktop->SetFocusWindow(this);
+		// If the mouse move is a fake one, we set the focus to NULL, which
+		// will cause the window that had focus last to retrieve it again - this
+		// makes FFM much nicer to use with the keyboard.
+		fDesktop->SetFocusWindow(isFake ? NULL : this);
 	}
 
 	// mouse cursor

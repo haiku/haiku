@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2009, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -139,7 +139,8 @@ public:
 			void				MouseUp(BMessage* message, BPoint where,
 									int32* _viewToken);
 			void				MouseMoved(BMessage* message, BPoint where,
-									int32* _viewToken, bool isLatestMouseMoved);
+									int32* _viewToken, bool isLatestMouseMoved,
+									bool isFake);
 
 			// some hooks to inform the client window
 			// TODO: move this to ServerWindow maybe?
