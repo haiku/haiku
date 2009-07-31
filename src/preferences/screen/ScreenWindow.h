@@ -20,6 +20,7 @@
 class BBox;
 class BPopUpMenu;
 class BMenuField;
+class BStringView;
 class BTextControl;
 
 class RefreshWindow;
@@ -52,6 +53,7 @@ class ScreenWindow : public BWindow {
 		void _UpdateMonitorView();
 		void _UpdateControls();
 		void _UpdateOriginal();
+		void _UpdateMonitor();
 
 		void _Apply();
 
@@ -62,6 +64,7 @@ class ScreenWindow : public BWindow {
 		bool			fIsVesa;
 		bool			fBootWorkspaceApplied;
 
+		BStringView*	fMonitorInfo;
 		MonitorView*	fMonitorView;
 		BMenuItem*		fAllWorkspacesItem;
 

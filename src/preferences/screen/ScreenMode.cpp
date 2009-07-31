@@ -331,13 +331,33 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		return status;
 
 	if (_diagonalInches != NULL) {
-		*_diagonalInches = sqrt(info.width * info.width
-			+ info.height * info.height) / 2.54;
+		*_diagonalInches = round(sqrt(info.width * info.width
+			+ info.height * info.height) / 0.254) / 10.0;
 	}
 
-	if (!strcmp(info.vendor, "LEN"))
-		strcpy(info.vendor, "Lenovo");
+	// TODO: If the names aren't sound, we could see if we find/create a
+	// database for the entries with user presentable names; they are fine
+	// for the models I could test with so far.
+
+	uint32 id = (info.vendor[0] << 24) | (info.vendor[1] << 16)
+		| (info.vendor[2] << 8) | (info.vendor[3]);
+
 	// TODO: replace more vendor strings with something readable
+	switch (id) {
+		case 'BNQ\0':
+			strcpy(info.vendor, "BenQ");
+			break;
+		case 'LEN\0':
+			strcpy(info.vendor, "Lenovo");
+			break;
+		case 'SAM\0':
+			strcpy(info.vendor, "Samsung");
+			break;
+		case 'VSC\0':
+			strcpy(info.vendor, "ViewSonic");
+			break;
+	}
+
 	return B_OK;
 }
 

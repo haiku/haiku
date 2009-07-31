@@ -201,6 +201,9 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	layout->SetInsets(10, 10, 10, 10);
 	screenBox->SetLayout(layout);
 
+	fMonitorInfo = new BStringView("monitor info", "");
+	screenBox->AddChild(fMonitorInfo);
+
 	fMonitorView = new MonitorView(BRect(0.0, 0.0, 80.0, 80.0), "monitor",
 		screen.Frame().IntegerWidth() + 1, screen.Frame().IntegerHeight() + 1);
 	screenBox->AddChild(fMonitorView);
@@ -464,6 +467,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			controlsBox->TopBorderOffset() - 1));
 
 	_UpdateControls();
+	_UpdateMonitor();
 }
 
 
@@ -720,6 +724,7 @@ ScreenWindow::_UpdateActiveMode()
 	fScreenMode.Get(fActive);
 	fSelected = fActive;
 
+	_UpdateMonitor();
 	_UpdateControls();
 }
 
@@ -1065,6 +1070,30 @@ ScreenWindow::_UpdateOriginal()
 
 	fScreenMode.Get(fOriginal);
 	fScreenMode.UpdateOriginalModes();
+}
+
+
+void
+ScreenWindow::_UpdateMonitor()
+{
+	monitor_info info;
+	float diagonalInches;
+	status_t status = fScreenMode.GetMonitorInfo(info, &diagonalInches);
+
+	if (status != B_OK) {
+		if (!fMonitorInfo->IsHidden())
+			fMonitorInfo->Hide();
+		return;
+	}
+
+	char text[256];
+	snprintf(text, sizeof(text), "%s %s %g\"", info.vendor, info.name,
+		diagonalInches);
+
+	fMonitorInfo->SetText(text);
+
+	if (fMonitorInfo->IsHidden())
+		fMonitorInfo->Show();
 }
 
 
