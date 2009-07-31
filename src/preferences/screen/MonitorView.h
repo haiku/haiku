@@ -32,8 +32,10 @@ class MonitorView : public BView {
 	private:
 		BRect MonitorBounds();
 
+		rgb_color	fBackgroundColor;
 		rgb_color	fDesktopColor;
-		int32		fMaxSize;
+		int32		fMaxWidth;
+		int32		fMaxHeight;
 		int32		fWidth;
 		int32		fHeight;
 };

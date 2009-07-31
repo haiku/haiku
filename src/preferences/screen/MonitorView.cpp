@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Copyright 2002, Thomas Kurschel.
  * Distributed under the terms of the MIT License.
  *
@@ -27,8 +27,9 @@ operator!=(const rgb_color& x, const rgb_color& y)
 
 
 MonitorView::MonitorView(BRect rect, char *name, int32 width, int32 height)
-	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW),
-	fMaxSize(1600),
+	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+	fMaxWidth(1920),
+	fMaxHeight(1200),
 	fWidth(width),
 	fHeight(height)
 {
@@ -45,10 +46,11 @@ MonitorView::~MonitorView()
 void
 MonitorView::AttachedToWindow()
 {
+	SetViewColor(B_TRANSPARENT_COLOR);
 	if (Parent())
-		SetViewColor(Parent()->ViewColor());
+		fBackgroundColor = Parent()->ViewColor();
 	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		fBackgroundColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -62,26 +64,30 @@ MonitorView::MouseDown(BPoint point)
 BRect
 MonitorView::MonitorBounds()
 {
-	float picWidth, picHeight;
+	float maxWidth = Bounds().Width();
+	float maxHeight = Bounds().Height();
+	if (maxWidth / maxHeight > (float)fMaxWidth / fMaxHeight)
+		maxWidth = maxHeight / fMaxHeight * fMaxWidth;
+	else
+		maxHeight = maxWidth / fMaxWidth * fMaxHeight;
 
-	float maxSize = min_c(Bounds().Width(), Bounds().Height());
+	float factorX = (float)fWidth / fMaxWidth;
+	float factorY = (float)fHeight / fMaxHeight;
 
-	picWidth = maxSize * fWidth / fMaxSize;
-	picHeight = maxSize * fHeight / fMaxSize;
-
-	if (picWidth > maxSize) {
-		picHeight = picHeight * maxSize / picWidth;
-		picWidth = maxSize;
+	if (factorX > factorY && factorX > 1) {
+		factorY /= factorX;
+		factorX = 1;
+	} else if (factorY > factorX && factorY > 1) {
+		factorX /= factorY;
+		factorY = 1;
 	}
 
-	if (picHeight > maxSize) {
-		picWidth = picWidth * maxSize / picHeight;
-		picHeight = maxSize;
-	}
+	float width = maxWidth * factorX;
+	float height = maxHeight * factorY;
 
-	BPoint size = BPoint(Bounds().Width(), Bounds().Height());
-	return BRect((size.x - picWidth) / 2, (size.y - picHeight) / 2,
-		(size.x + picWidth) / 2, (size.y + picHeight) / 2);
+	BSize size = Bounds().Size();
+	return BRect((size.width - width) / 2, (size.height - height) / 2,
+		(size.width + width) / 2, (size.height + height) / 2);
 }
 
 
@@ -92,6 +98,9 @@ MonitorView::Draw(BRect updateRect)
 	rgb_color blackColor = {0, 0, 0, 255};
 	rgb_color redColor = {228, 0, 0, 255};
 	BRect outerRect = MonitorBounds();
+
+	SetHighColor(fBackgroundColor);
+	FillRect(updateRect);
 
 	SetDrawingMode(B_OP_OVER);
 
@@ -137,11 +146,11 @@ MonitorView::SetResolution(int32 width, int32 height)
 void
 MonitorView::SetMaxResolution(int32 width, int32 height)
 {
-	int32 maxSize = max_c(width, height);
-	if (fMaxSize == maxSize)
+	if (fMaxWidth == width && fMaxHeight == height)
 		return;
 
-	fMaxSize = maxSize;
+	fMaxWidth = width;
+	fMaxHeight = height;
 
 	Invalidate();
 }

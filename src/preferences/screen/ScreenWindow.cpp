@@ -131,7 +131,8 @@ static void
 refresh_rate_to_string(float refresh, BString &string,
 	bool appendUnit = true, bool alwaysWithFraction = false)
 {
-	snprintf(string.LockBuffer(32), 32, "%.*g", refresh >= 100.0 ? 4 : 3, refresh);
+	snprintf(string.LockBuffer(32), 32, "%.*g", refresh >= 100.0 ? 4 : 3,
+		refresh);
 	string.UnlockBuffer();
 
 	if (appendUnit)
@@ -197,7 +198,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	// box on the left with workspace count and monitor view
 
 	BBox* screenBox = new BBox("screen box");
-	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 10.0);
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 5.0);
 	layout->SetInsets(10, 10, 10, 10);
 	screenBox->SetLayout(layout);
 
