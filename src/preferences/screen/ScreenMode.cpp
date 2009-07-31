@@ -358,6 +358,9 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'EMA\0':
 			strcpy(info.vendor, "eMachines");
 			break;
+		case 'ENC\0':
+			strcpy(info.vendor, "Eizo");
+			break;
 		case 'FUS\0':
 			strcpy(info.vendor, "Fujitsu-Siemens");
 			break;

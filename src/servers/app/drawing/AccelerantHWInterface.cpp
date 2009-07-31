@@ -944,6 +944,8 @@ AccelerantHWInterface::GetMonitorInfo(monitor_info* info)
 				break;
 
 			case EDID1_MONITOR_NAME:
+				// There can be several of these; in this case we'll just
+				// overwrite the previous entries
 				strlcpy(info->name, monitor->data.monitor_name,
 					sizeof(info->name));
 				break;
