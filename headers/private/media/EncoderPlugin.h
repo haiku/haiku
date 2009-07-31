@@ -21,7 +21,8 @@ class ChunkWriter {
 public:
 	virtual						~ChunkWriter() {};
 	virtual	status_t			WriteChunk(const void* chunkBuffer,
-									size_t chunkSize, uint32 flags) = 0;
+									size_t chunkSize,
+									media_encode_info* encodeInfo) = 0;
 };
 
 
@@ -30,29 +31,42 @@ public:
 								Encoder();
 	virtual						~Encoder();
 
-	// TODO: I think we may actually need a method to specialize a
-	// media_format. For example, some codecs may only support certain
-	// input color spaces, or output color spaces, or multiple of 16
-	// width/height... This support is technically even needed for
-	// MediaFormats.h functionality, although there probably isn't
-	// an application out there which uses it like that. 
+	// Some codecs may only support certain input color spaces, or output
+	// color spaces, or multiple of 16 width/height... This method is needed
+	// for get_next_encoder() functionality. If _acceptedInputFormat is NULL,
+	// you simply return a status indicating if proposed format is acceptable.
+	// If it contains wildcards for fields that you have restrictions on,
+	// return an error. In that case, the user should be using the form of
+	// get_next_encoder() that allows to specify the accepted format. If
+	// _acceptedInputFormat is not NULL, copy the proposedFormat into
+	// _acceptedInputFormat and specialize any wildcards. You must (!) also
+	// change non-wildcard fields, like the video width if you want to round to
+	// the nearest multiple of 16 for example. Only if the format is completely
+	// unacceptable, return an error.
+	virtual	status_t			AcceptedFormat(
+									const media_format* proposedInputFormat,
+									media_format* _acceptedInputFormat = NULL)
+										= 0;
 
-	virtual	status_t			SetFormat(const media_file_format& fileFormat,
-									media_format* _inOutEncodedFormat) = 0;
+	// The passed media_format may not contain wildcards and must be the same
+	// format that was passed to get_next_encoder() (or it must be the format
+	// returned in _acceptedInputFormat).
+	virtual	status_t			SetUp(const media_format* inputFormat) = 0;
 
 	virtual	status_t			AddTrackInfo(uint32 code, const void* data,
-									size_t size, uint32 flags = 0) = 0;
+									size_t size, uint32 flags = 0);
 
 	virtual status_t			GetEncodeParameters(
-									encode_parameters* parameters) const = 0;
+									encode_parameters* parameters) const;
 	virtual status_t			SetEncodeParameters(
-									encode_parameters* parameters) const = 0;
-							   
+									encode_parameters* parameters) const;
+
 	virtual status_t			Encode(const void* buffer, int64 frameCount,
 									media_encode_info* info) = 0;
-							   
+
 			status_t			WriteChunk(const void* chunkBuffer,
-									size_t chunkSize, uint32 flags = 0);
+									size_t chunkSize,
+									media_encode_info* encodeInfo);
 
 			void				SetChunkWriter(ChunkWriter* writer);
 

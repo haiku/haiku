@@ -20,14 +20,17 @@ public:
 
 	virtual	status_t			AllocateCookie(void** cookie) = 0;
 	virtual	status_t			FreeCookie(void* cookie) = 0;
-	
+
+	virtual	status_t			SetCopyright(void* cookie,
+									const char* copyright) = 0;
+
 	virtual	status_t			AddTrackInfo(void* cookie, uint32 code,
 									const void* data, size_t size,
 									uint32 flags = 0) = 0;
 
 	virtual	status_t			WriteChunk(void* cookie,
 									const void* chunkBuffer, size_t chunkSize,
-									uint32 flags) = 0;
+									media_encode_info* encodeInfo) = 0;
 
 			BDataIO*			Target() const;
 

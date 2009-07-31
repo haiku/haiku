@@ -15,7 +15,7 @@ class AVFormatWriter : public Writer {
 public:
 								AVFormatWriter();
 								~AVFormatWriter();
-	
+
 	virtual	status_t			SetCopyright(const char* copyright);
 	virtual	status_t			CommitHeader();
 	virtual	status_t			Flush();
@@ -23,14 +23,17 @@ public:
 
 	virtual	status_t			AllocateCookie(void** cookie);
 	virtual	status_t			FreeCookie(void* cookie);
-	
+
+	virtual	status_t			SetCopyright(void* cookie,
+									const char* copyright);
+
 	virtual	status_t			AddTrackInfo(void* cookie, uint32 code,
 									const void* data, size_t size,
 									uint32 flags = 0);
 
 	virtual	status_t			WriteChunk(void* cookie,
 									const void* chunkBuffer, size_t chunkSize,
-									uint32 flags);
+									media_encode_info* encodeInfo);
 
 private:
 	class StreamCookie;

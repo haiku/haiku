@@ -14,23 +14,23 @@
 class AVCodecEncoder : public Encoder {
 public:
 								AVCodecEncoder(const char* shortName);
-		
-	virtual						~AVCodecEncoder();
-		
-	virtual	status_t			SetFormat(const media_file_format& fileFormat,
-									media_format* _inOutEncodedFormat);
 
-	virtual	status_t			AddTrackInfo(uint32 code, const void* data,
-									size_t size, uint32 flags = 0);
+	virtual						~AVCodecEncoder();
+
+	virtual	status_t			AcceptedFormat(
+									const media_format* proposedInputFormat,
+									media_format* _acceptedInputFormat = NULL);
+
+	virtual	status_t			SetUp(const media_format* inputFormat);
 
 	virtual status_t			GetEncodeParameters(
 									encode_parameters* parameters) const;
 	virtual status_t			SetEncodeParameters(
 									encode_parameters* parameters) const;
-							   
+
 	virtual status_t			Encode(const void* buffer, int64 frameCount,
 									media_encode_info* info);
-							   
+
 private:
 };
 

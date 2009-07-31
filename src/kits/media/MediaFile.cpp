@@ -1,18 +1,23 @@
 /*
- * Copyright (c) 2002-2004, Marcus Overhagen <marcus@overhagen.de>
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2002-2004, Marcus Overhagen <marcus@overhagen.de>
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 
 #include <MediaFile.h>
 
 #include <new>
+
+#include <stdlib.h>
 #include <string.h>
 
-#include <MediaTrack.h>
 #include <File.h>
+#include <MediaTrack.h>
+
+#include "debug.h"
 
 #include "MediaExtractor.h"
-#include "debug.h"
+#include "MediaWriter.h"
 
 
 BMediaFile::BMediaFile(const entry_ref* ref)
@@ -20,7 +25,7 @@ BMediaFile::BMediaFile(const entry_ref* ref)
 	CALLED();
 	_Init();
 	fDeleteSource = true;
-	_InitReader(new (std::nothrow) BFile(ref, O_RDONLY));
+	_InitReader(new(std::nothrow) BFile(ref, O_RDONLY));
 }
 
 
@@ -37,7 +42,7 @@ BMediaFile::BMediaFile(const entry_ref* ref, int32 flags)
 	CALLED();
 	_Init();
 	fDeleteSource = true;
-	_InitReader(new (std::nothrow) BFile(ref, O_RDONLY), flags);
+	_InitReader(new(std::nothrow) BFile(ref, O_RDONLY), flags);
 }
 
 
@@ -55,7 +60,7 @@ BMediaFile::BMediaFile(const entry_ref* ref, const media_file_format* mfi,
 	CALLED();
 	_Init();
 	fDeleteSource = true;
-	_InitWriter(new (std::nothrow) BFile(ref, O_WRONLY), mfi, flags);
+	_InitWriter(new(std::nothrow) BFile(ref, O_WRONLY), mfi, flags);
 }
 
 
@@ -85,7 +90,7 @@ BMediaFile::SetTo(const entry_ref* ref)
 
 	_UnInit();
 	fDeleteSource = true;
-	_InitReader(new (std::nothrow) BFile(ref, O_RDONLY));
+	_InitReader(new(std::nothrow) BFile(ref, O_RDONLY));
 
 	return fErr;
 }
@@ -162,7 +167,7 @@ BMediaFile::TrackAt(int32 index)
 	}
 	if (fTrackList[index] == NULL) {
 		TRACE("BMediaFile::TrackAt, creating new track for index %ld\n", index);
-		fTrackList[index] = new (std::nothrow) BMediaTrack(fExtractor, index);
+		fTrackList[index] = new(std::nothrow) BMediaTrack(fExtractor, index);
 		TRACE("BMediaFile::TrackAt, new track is %p\n", fTrackList[index]);
 	}
 	return fTrackList[index];
@@ -213,11 +218,32 @@ BMediaFile::ReleaseAllTracks()
 
 // Create and add a track to the media file
 BMediaTrack*
-BMediaFile::CreateTrack(media_format* mf, const media_codec_info* mci,
-	uint32 flags)
+BMediaFile::CreateTrack(media_format* mediaFormat,
+	const media_codec_info* codecInfo, uint32 flags)
 {
-	UNIMPLEMENTED();
-	return 0;
+	if (mediaFormat == NULL)
+		return NULL;
+
+	// NOTE: It is allowed to pass NULL for codecInfo. In that case, the
+	// track won't have an Encoder and you can only use WriteChunk() with
+	// already encoded data.
+
+	// Make room for the new track.
+	BMediaTrack** trackList = (BMediaTrack**)realloc(fTrackList,
+		(fTrackNum + 1) * sizeof(BMediaTrack*));
+	if (trackList == NULL)
+		return NULL;
+
+	int32 streamIndex = fTrackNum;
+	fTrackList = trackList;
+	fTrackNum += 1;
+
+	BMediaTrack* track = new(std::nothrow) BMediaTrack(fWriter, streamIndex,
+		mediaFormat, codecInfo);
+
+	fTrackList[streamIndex] = track;
+
+	return track;
 }
 
 
@@ -253,10 +279,12 @@ CreateTrack__10BMediaFileP12media_format(BMediaFile* self, media_format* mf)
 
 // Lets you set the copyright info for the entire file
 status_t
-BMediaFile::AddCopyright(const char* data)
+BMediaFile::AddCopyright(const char* copyright)
 {
-	UNIMPLEMENTED();
-	return B_OK;
+	if (fWriter == NULL)
+		return B_NO_INIT;
+
+	return fWriter->SetCopyright(copyright);
 }
 
 
@@ -273,8 +301,10 @@ BMediaFile::AddChunk(int32 type, const void* data, size_t size)
 status_t
 BMediaFile::CommitHeader()
 {
-	UNIMPLEMENTED();
-	return B_OK;
+	if (fWriter == NULL)
+		return B_NO_INIT;
+
+	return fWriter->CommitHeader();
 }
 
 
@@ -282,8 +312,10 @@ BMediaFile::CommitHeader()
 status_t
 BMediaFile::CloseFile()
 {
-	UNIMPLEMENTED();
-	return B_OK;
+	if (fWriter == NULL)
+		return B_NO_INIT;
+
+	return fWriter->Close();
 }
 
 // This is for controlling file format parameters
@@ -374,7 +406,7 @@ void
 BMediaFile::_UnInit()
 {
 	ReleaseAllTracks();
-	delete[] fTrackList;
+	free(fTrackList);
 	fTrackList = NULL;
 	fTrackNum = 0;
 	delete fExtractor;
@@ -399,7 +431,7 @@ BMediaFile::_InitReader(BDataIO* source, int32 flags)
 
 	fSource = source;
 
-	fExtractor = new (std::nothrow) MediaExtractor(source, flags);
+	fExtractor = new(std::nothrow) MediaExtractor(source, flags);
 	if (fExtractor == NULL)
 		fErr = B_NO_MEMORY;
 	else
@@ -409,7 +441,7 @@ BMediaFile::_InitReader(BDataIO* source, int32 flags)
 
 	fExtractor->GetFileFormatInfo(&fMFI);
 	fTrackNum = fExtractor->StreamCount();
-	fTrackList = new (std::nothrow) BMediaTrack*[fTrackNum];
+	fTrackList = (BMediaTrack**)malloc(fTrackNum * sizeof(BMediaTrack*));
 	if (fTrackList == NULL) {
 		fErr = B_NO_MEMORY;
 		return;
@@ -419,12 +451,33 @@ BMediaFile::_InitReader(BDataIO* source, int32 flags)
 
 
 void
-BMediaFile::_InitWriter(BDataIO* source, const media_file_format* mfi,
+BMediaFile::_InitWriter(BDataIO* target, const media_file_format* fileFormat,
 	int32 flags)
 {
-	UNIMPLEMENTED();
-	fSource = source;
-	fErr = B_NOT_ALLOWED;
+	CALLED();
+
+	if (fileFormat == NULL) {
+		fErr = B_BAD_VALUE;
+		return;
+	}
+
+	if (target == NULL) {
+		fErr = B_NO_MEMORY;
+		return;
+	}
+
+	fMFI = *fileFormat;
+	fSource = target;
+
+	fWriter = new(std::nothrow) MediaWriter(fSource, fMFI);
+	if (fWriter == NULL)
+		fErr = B_NO_MEMORY;
+	else
+		fErr = fWriter->InitCheck();
+	if (fErr != B_OK)
+		return;
+
+	fTrackNum = 0;
 }
 
 

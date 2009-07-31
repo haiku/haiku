@@ -18,6 +18,32 @@
 #include "PluginManager.h"
 
 
+
+class MediaExtractorChunkWriter : public ChunkWriter {
+public:
+	MediaExtractorChunkWriter(MediaWriter* writer, int32 streamIndex)
+		:
+		fWriter(writer),
+		fStreamIndex(streamIndex)
+	{
+	}
+
+	virtual status_t WriteChunk(const void* chunkBuffer, size_t chunkSize,
+		media_encode_info* encodeInfo)
+	{
+		return fWriter->WriteChunk(fStreamIndex, chunkBuffer, chunkSize,
+			encodeInfo);
+	}
+
+private:
+	MediaWriter*	fWriter;
+	int32			fStreamIndex;
+};
+
+
+// #pragma mark -
+
+
 MediaWriter::MediaWriter(BDataIO* target, const media_file_format& fileFormat)
 	:
 	fTarget(target),
@@ -67,43 +93,6 @@ MediaWriter::GetFileFormatInfo(media_file_format* _fileFormat) const
 
 
 status_t
-MediaWriter::WriteChunk(int32 streamIndex, const void* chunkBuffer,
-	size_t chunkSize, uint32 flags)
-{
-	if (fWriter == NULL)
-		return B_NO_INIT;
-
-	StreamInfo* info;
-	if (!fStreamInfos.Get(streamIndex, &info))
-		return B_BAD_INDEX;
-
-	return fWriter->WriteChunk(info->cookie, chunkBuffer, chunkSize, flags);
-}
-
-
-class MediaExtractorChunkWriter : public ChunkWriter {
-public:
-	MediaExtractorChunkWriter(MediaWriter* writer, int32 streamIndex)
-		:
-		fWriter(writer),
-		fStreamIndex(streamIndex)
-	{
-	}
-
-	virtual status_t WriteChunk(const void* chunkBuffer, size_t chunkSize,
-		uint32 flags)
-	{
-		return fWriter->WriteChunk(fStreamIndex, chunkBuffer, chunkSize,
-			flags);
-	}
-
-private:
-	MediaWriter*	fWriter;
-	int32			fStreamIndex;
-};
-
-
-status_t
 MediaWriter::CreateEncoder(Encoder** _encoder,
 	const media_codec_info* codecInfo, uint32 flags)
 {
@@ -149,3 +138,89 @@ MediaWriter::CreateEncoder(Encoder** _encoder,
 
 	return B_OK;
 }
+
+
+status_t
+MediaWriter::SetCopyright(const char* copyright)
+{
+	if (fWriter == NULL)
+		return B_NO_INIT;
+
+	return fWriter->SetCopyright(copyright);
+}
+
+
+status_t
+MediaWriter::SetCopyright(int32 streamIndex, const char* copyright)
+{
+	if (fWriter == NULL)
+		return B_NO_INIT;
+
+	StreamInfo* info;
+	if (!fStreamInfos.Get(streamIndex, &info))
+		return B_BAD_INDEX;
+
+	return fWriter->SetCopyright(info->cookie, copyright);
+}
+
+
+status_t
+MediaWriter::CommitHeader()
+{
+	if (fWriter == NULL)
+		return B_NO_INIT;
+
+	return fWriter->CommitHeader();
+}
+
+
+status_t
+MediaWriter::Flush()
+{
+	if (fWriter == NULL)
+		return B_NO_INIT;
+
+	return fWriter->Flush();
+}
+
+
+status_t
+MediaWriter::Close()
+{
+	if (fWriter == NULL)
+		return B_NO_INIT;
+
+	return fWriter->Close();
+}
+
+
+status_t
+MediaWriter::AddTrackInfo(int32 streamIndex, uint32 code,
+	const void* data, size_t size, uint32 flags)
+{
+	if (fWriter == NULL)
+		return B_NO_INIT;
+
+	StreamInfo* info;
+	if (!fStreamInfos.Get(streamIndex, &info))
+		return B_BAD_INDEX;
+
+	return fWriter->AddTrackInfo(info->cookie, code, data, size, flags);
+}
+
+
+status_t
+MediaWriter::WriteChunk(int32 streamIndex, const void* chunkBuffer,
+	size_t chunkSize, media_encode_info* encodeInfo)
+{
+	if (fWriter == NULL)
+		return B_NO_INIT;
+
+	StreamInfo* info;
+	if (!fStreamInfos.Get(streamIndex, &info))
+		return B_BAD_INDEX;
+
+	return fWriter->WriteChunk(info->cookie, chunkBuffer, chunkSize,
+		encodeInfo);
+}
+

@@ -173,6 +173,15 @@ AVFormatWriter::FreeCookie(void* _cookie)
 
 
 status_t
+AVFormatWriter::SetCopyright(void* cookie, const char* copyright)
+{
+	TRACE("AVFormatWriter::SetCopyright(%p, %s)\n", cookie, copyright);
+
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
 AVFormatWriter::AddTrackInfo(void* cookie, uint32 code,
 	const void* data, size_t size, uint32 flags)
 {
@@ -185,10 +194,10 @@ AVFormatWriter::AddTrackInfo(void* cookie, uint32 code,
 
 status_t
 AVFormatWriter::WriteChunk(void* cookie, const void* chunkBuffer,
-	size_t chunkSize, uint32 flags)
+	size_t chunkSize, media_encode_info* encodeInfo)
 {
-	TRACE("AVFormatWriter::WriteChunk(%p, %ld, %lu)\n", chunkBuffer, chunkSize,
-		flags);
+	TRACE("AVFormatWriter::WriteChunk(%p, %ld, %p)\n", chunkBuffer, chunkSize,
+		encodeInfo);
 
 	return B_NOT_SUPPORTED;
 }

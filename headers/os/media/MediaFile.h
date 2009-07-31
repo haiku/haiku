@@ -1,9 +1,10 @@
 /*
  * Copyright 2002-2009, Haiku, Inc. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Distributed under the terms of the MIT license.
  */
 #ifndef _MEDIA_FILE_H
 #define	_MEDIA_FILE_H
+
 
 #include <image.h>
 #include <List.h>
@@ -15,13 +16,13 @@
 namespace BPrivate {
 	namespace media {
 		class MediaExtractor;
+		class MediaWriter;
 	}
-	class MediaWriter;
 	class _AddonManager;
 }
 
 
-// forward declarations 
+// forward declarations
 class BMediaTrack;
 class BParameterWeb;
 class BView;
@@ -50,7 +51,7 @@ enum {
 class BMediaFile {
 public:
 	//	these four constructors are used for read-only access
-								BMediaFile(const entry_ref* ref); 
+								BMediaFile(const entry_ref* ref);
 								BMediaFile(BDataIO* source);
 									// BFile is a BDataIO
 								BMediaFile(const entry_ref* ref, int32 flags);
@@ -71,14 +72,14 @@ public:
 
 			status_t			SetTo(const entry_ref* ref);
 			status_t			SetTo(BDataIO* destination);
-							   
+
 			status_t			InitCheck() const;
 
 	// Get info about the underlying file format.
 			status_t			GetFileFormatInfo(media_file_format* mfi) const;
 
 	//
-	// These functions are for read-only access to a media file.  
+	// These functions are for read-only access to a media file.
 	// The data is read using the BMediaTrack object.
 	//
 			const char*			Copyright() const;
@@ -136,7 +137,7 @@ private:
 	// deprecated, but for R5 compatibility
 			BParameterWeb*		Web();
 
-	// Does nothing, returns B_ERROR, for Zeta compatiblity only	
+	// Does nothing, returns B_ERROR, for Zeta compatiblity only
 			status_t			ControlFile(int32 selector, void* ioData,
 									size_t size);
 
@@ -147,7 +148,7 @@ private:
 
 			BPrivate::_AddonManager* fEncoderMgr;
 			BPrivate::_AddonManager* fWriterMgr;
-			BPrivate::MediaWriter* fWriter;
+			BPrivate::media::MediaWriter* fWriter;
 			int32				fWriterID;
 			media_file_format	fMFI;
 
@@ -159,8 +160,9 @@ private:
 			void				_Init();
 			void				_UnInit();
 			void				_InitReader(BDataIO* source, int32 flags = 0);
-			void				_InitWriter(BDataIO* source,
-									const media_file_format* mfi, int32 flags);
+			void				_InitWriter(BDataIO* target,
+									const media_file_format* fileFormat,
+									int32 flags);
 
 								BMediaFile();
 								BMediaFile(const BMediaFile&);

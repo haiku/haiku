@@ -33,21 +33,31 @@ AVCodecEncoder::~AVCodecEncoder()
 
 
 status_t
-AVCodecEncoder::SetFormat(const media_file_format& fileFormat,
-	media_format* _inOutEncodedFormat)
+AVCodecEncoder::AcceptedFormat(const media_format* proposedInputFormat,
+	media_format* _acceptedInputFormat)
 {
-	TRACE("AVCodecEncoder::SetFormat()\n");
+	TRACE("AVCodecEncoder::AcceptedFormat(%p, %p)\n", proposedInputFormat,
+		_acceptedInputFormat);
 
-	return B_NOT_SUPPORTED;
+	if (proposedInputFormat == NULL)
+		return B_BAD_VALUE;
+
+	if (_acceptedInputFormat != NULL) {
+		memcpy(_acceptedInputFormat, proposedInputFormat,
+			sizeof(media_format));
+	}
+
+	return B_OK;
 }
 
 
 status_t
-AVCodecEncoder::AddTrackInfo(uint32 code, const void* data, size_t size,
-	uint32 flags)
+AVCodecEncoder::SetUp(const media_format* inputFormat)
 {
-	TRACE("AVCodecEncoder::AddTrackInfo(%lu, %p, %ld, %lu)\n", code, data,
-		size, flags);
+	TRACE("AVCodecEncoder::SetUp()\n");
+
+	if (inputFormat == NULL)
+		return B_BAD_VALUE;
 
 	return B_NOT_SUPPORTED;
 }
@@ -70,7 +80,7 @@ AVCodecEncoder::SetEncodeParameters(encode_parameters* parameters) const
 	return B_NOT_SUPPORTED;
 }
 
-			   
+
 status_t
 AVCodecEncoder::Encode(const void* buffer, int64 frameCount,
 	media_encode_info* info)

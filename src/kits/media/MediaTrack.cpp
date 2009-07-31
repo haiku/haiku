@@ -1,36 +1,25 @@
 /*
- * Copyright (c) 2002-2007, Marcus Overhagen <marcus@overhagen.de>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- *  * Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2002-2007, Marcus Overhagen <marcus@overhagen.de>
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 
+
 #include <MediaTrack.h>
-#include <Roster.h>
+
+#include <new>
+
 #include <string.h>
 #include <stdlib.h>
-#include <new>
-#include "MediaExtractor.h"
-#include "PluginManager.h"
+
+#include <Roster.h>
+
 #include "debug.h"
+
+#include "MediaExtractor.h"
+#include "MediaWriter.h"
+#include "PluginManager.h"
+
 
 //#define TRACE_MEDIA_TRACK
 #ifdef TRACE_MEDIA_TRACK
@@ -67,7 +56,7 @@ class RawDecoderChunkProvider : public ChunkProvider
 public:
 				RawDecoderChunkProvider(Decoder *decoder, int buffer_size, int frame_size);
 	virtual 	~RawDecoderChunkProvider();
-	
+
 	status_t	GetNextChunk(const void **chunkBuffer, size_t *chunkSize, media_header *mediaHeader);
 
 private:
@@ -138,7 +127,7 @@ BMediaTrack::EncodedFormat(media_format *out_format) const
 
 // for BeOS R5 compatibilitly
 extern "C" status_t DecodedFormat__11BMediaTrackP12media_format(BMediaTrack *self, media_format *inout_format);
-status_t DecodedFormat__11BMediaTrackP12media_format(BMediaTrack *self, 
+status_t DecodedFormat__11BMediaTrackP12media_format(BMediaTrack *self,
 													 media_format *inout_format)
 {
 	return self->DecodedFormat(inout_format, 0);
@@ -153,16 +142,16 @@ BMediaTrack::DecodedFormat(media_format *inout_format, uint32 flags)
 		return B_BAD_VALUE;
 	if (!fExtractor || !fDecoder)
 		return B_NO_INIT;
-		
+
 	_plugin_manager.DestroyDecoder(fRawDecoder);
 	fRawDecoder = 0;
 
 #ifdef TRACE_MEDIA_TRACK
 	char s[200];
 	string_for_format(*inout_format, s, sizeof(s));
-	printf("BMediaTrack::DecodedFormat: req1: %s\n", s);  
+	printf("BMediaTrack::DecodedFormat: req1: %s\n", s);
 #endif
-	
+
 	if ((fWorkaroundFlags & FORCE_RAW_AUDIO) || ((fWorkaroundFlags & IGNORE_ENCODED_AUDIO) && inout_format->type == B_MEDIA_ENCODED_AUDIO)) {
 		inout_format->type = B_MEDIA_RAW_AUDIO;
 		inout_format->u.raw_audio = media_multi_audio_format::wildcard;
@@ -195,9 +184,9 @@ BMediaTrack::DecodedFormat(media_format *inout_format, uint32 flags)
 
 #ifdef TRACE_MEDIA_TRACK
 	string_for_format(*inout_format, s, sizeof(s));
-	printf("BMediaTrack::DecodedFormat: nego: %s\n", s);  
+	printf("BMediaTrack::DecodedFormat: nego: %s\n", s);
 #endif
-	
+
 	if (inout_format->type == 0)
 		debugger("Decoder didn't set output format type");
 	if (inout_format->type == B_MEDIA_RAW_AUDIO) {
@@ -231,8 +220,8 @@ BMediaTrack::DecodedFormat(media_format *inout_format, uint32 flags)
 	}
 
 //	string_for_format(*inout_format, s, sizeof(s));
-//	printf("BMediaTrack::DecodedFormat: res: %s\n", s);  
-			
+//	printf("BMediaTrack::DecodedFormat: res: %s\n", s);
+
 	return res;
 }
 
@@ -305,15 +294,15 @@ BMediaTrack::ReadFrames(void *out_buffer,
 		return B_NO_INIT;
 	if (!out_buffer || !out_frameCount)
 		return B_BAD_VALUE;
-	
-	status_t result;	
+
+	status_t result;
 	media_header header;
 
 	memset(&header, 0, sizeof(header)); // always clear it first, as the decoder doesn't set all fields
 
 	if (fRawDecoder)
 		result = fRawDecoder->Decode(out_buffer, out_frameCount, &header, info);
-	else	
+	else
 		result = fDecoder->Decode(out_buffer, out_frameCount, &header, info);
 	if (result == B_OK) {
 		fCurFrame += *out_frameCount;
@@ -324,7 +313,7 @@ BMediaTrack::ReadFrames(void *out_buffer,
 	}
 	if (mh)
 		*mh = header;
-		
+
 //	PRINT(1, "BMediaTrack::ReadFrames: stream %ld, start-time %5Ld.%06Ld, %Ld frames\n", fStream,  header.start_time / 1000000, header.start_time % 1000000, *out_frameCount);
 
 	return result;
@@ -354,7 +343,7 @@ BMediaTrack::SeekToTime(bigtime_t *inout_time, int32 flags)
 	uint32 seekTo = (flags & B_MEDIA_SEEK_DIRECTION_MASK)
 		| B_MEDIA_SEEK_TO_TIME;
 	bigtime_t seekTime = *inout_time;
-	
+
 	int64 frame = 0;
 	bigtime_t time = seekTime;
 	status_t result = fExtractor->Seek(fStream, seekTo, &frame, &time);
@@ -380,11 +369,11 @@ BMediaTrack::SeekToTime(bigtime_t *inout_time, int32 flags)
 			return result;
 		}
 	}
-		
+
 	*inout_time = time;
 	fCurFrame = frame;
 	fCurTime = time;
-	
+
 	PRINT(1, "BMediaTrack::SeekToTime finished, requested %.6f, result %.6f\n", seekTime / 1000000.0, *inout_time / 1000000.0);
 
 	return B_OK;
@@ -403,7 +392,7 @@ BMediaTrack::SeekToFrame(int64 *inout_frame, int32 flags)
 	uint32 seekTo = (flags & B_MEDIA_SEEK_DIRECTION_MASK)
 		| B_MEDIA_SEEK_TO_FRAME;
 	int64 seekFrame = *inout_frame;
-	
+
 	int64 frame = seekFrame;
 	bigtime_t time = 0;
 	status_t result = fExtractor->Seek(fStream, seekTo, &frame, &time);
@@ -420,7 +409,7 @@ BMediaTrack::SeekToFrame(int64 *inout_frame, int32 flags)
 	if (result != B_OK) {
 		ERROR("BMediaTrack::SeekToFrame: decoder seek failed\n");
 		return result;
-	}		
+	}
 
 	if (fRawDecoder) {
 		result = fRawDecoder->Seek(seekTo, seekFrame, &frame, 0, &time);
@@ -429,7 +418,7 @@ BMediaTrack::SeekToFrame(int64 *inout_frame, int32 flags)
 			return result;
 		}
 	}
-		
+
 	*inout_frame = frame;
 	fCurFrame = frame;
 	fCurTime = time;
@@ -451,7 +440,7 @@ BMediaTrack::FindKeyFrameForTime(bigtime_t *inoutTime, int32 flags) const
 
 	uint32 seekTo = (flags & B_MEDIA_SEEK_DIRECTION_MASK)
 		| B_MEDIA_SEEK_TO_TIME;
-	
+
 	int64 frame = 0;
 		// dummy frame, will be ignored because of flags
 	status_t result = fExtractor->FindKeyFrame(fStream, seekTo, &frame,
@@ -478,7 +467,7 @@ BMediaTrack::FindKeyFrameForFrame(int64 *inoutFrame,
 
 	uint32 seekTo = (flags & B_MEDIA_SEEK_DIRECTION_MASK)
 		| B_MEDIA_SEEK_TO_FRAME;
-	
+
 	bigtime_t time = 0;
 		// dummy time, will be ignored because of flags
 	status_t result = fExtractor->FindKeyFrame(fStream, seekTo, inoutFrame,
@@ -525,81 +514,79 @@ BMediaTrack::ReadChunk(char **out_buffer,
 
 
 status_t
-BMediaTrack::AddCopyright(const char *data)
+BMediaTrack::AddCopyright(const char* copyright)
 {
-	UNIMPLEMENTED();
+	if (fWriter == NULL)
+		return B_NO_INIT;
 
-	return B_OK;
+	return fWriter->SetCopyright(fStream, copyright);
 }
 
 
 status_t
-BMediaTrack::AddTrackInfo(uint32 code,
-						  const void *data,
-						  size_t size,
-						  uint32 flags)
+BMediaTrack::AddTrackInfo(uint32 code, const void* data, size_t size,
+	uint32 flags)
 {
-	UNIMPLEMENTED();
+	if (fWriter == NULL)
+		return B_NO_INIT;
 
-	return B_OK;
+	return fWriter->AddTrackInfo(fStream, code, data, size, flags);
 }
 
 
 status_t
-BMediaTrack::WriteFrames(const void *data,
-						 int32 num_frames,
-						 int32 flags)
+BMediaTrack::WriteFrames(const void* data, int32 frameCount, int32 flags)
 {
-	UNIMPLEMENTED();
+	media_encode_info encodeInfo;
+	encodeInfo.flags = flags;
 
-	return B_OK;
+	return WriteFrames(data, frameCount, &encodeInfo);
 }
 
 
 status_t
-BMediaTrack::WriteFrames(const void *data,
-						 int64 num_frames,
-						 media_encode_info *info)
+BMediaTrack::WriteFrames(const void* data, int64 frameCount,
+	media_encode_info* info)
 {
-	UNIMPLEMENTED();
+	if (fEncoder == NULL)
+		return B_NO_INIT;
 
-	return B_OK;
+	return fEncoder->Encode(data, frameCount, info);
 }
 
 
 status_t
-BMediaTrack::WriteChunk(const void *data,
-						size_t size,
-						uint32 flags)
+BMediaTrack::WriteChunk(const void* data, size_t size, uint32 flags)
 {
-	UNIMPLEMENTED();
+	media_encode_info encodeInfo;
+	encodeInfo.flags = flags;
 
-	return B_OK;
+	return WriteChunk(data, size, &encodeInfo);
 }
 
 
 status_t
-BMediaTrack::WriteChunk(const void *data,
-						size_t size,
-						media_encode_info *info)
+BMediaTrack::WriteChunk(const void* data, size_t size, media_encode_info* info)
 {
-	UNIMPLEMENTED();
+	if (fWriter == NULL)
+		return B_NO_INIT;
 
-	return B_OK;
+	return fWriter->WriteChunk(fStream, data, size, info);
 }
 
 
 status_t
 BMediaTrack::Flush()
 {
-	UNIMPLEMENTED();
+	if (fWriter == NULL)
+		return B_NO_INIT;
 
-	return B_OK;
+	return fWriter->Flush();
 }
 
 
 // deprecated BeOS R5 API
-BParameterWeb *
+BParameterWeb*
 BMediaTrack::Web()
 {
 	UNIMPLEMENTED();
@@ -706,21 +693,20 @@ BMediaTrack::BMediaTrack(BPrivate::media::MediaExtractor *extractor,
 	fExtractor = extractor;
 	fStream = stream;
 	fErr = B_OK;
-	
+
 	SetupWorkaround();
 
 	status_t ret = fExtractor->CreateDecoder(fStream, &fDecoder, &fMCI);
 	if (ret != B_OK) {
 		TRACE("BMediaTrack::BMediaTrack: Error: creating decoder failed: "
 			"%s\n", strerror(ret));
-		// we do not set fErr here, because ReadChunk should still work
+		// We do not set fErr here, because ReadChunk should still work.
 		fDecoder = NULL;
-		return;
 	}
 
 	fCurFrame = 0;
 	fCurTime = 0;
-	
+
 	// not used:
 	fEncoder = NULL;
 	fEncoderID = 0;
@@ -729,16 +715,45 @@ BMediaTrack::BMediaTrack(BPrivate::media::MediaExtractor *extractor,
 
 
 BMediaTrack::BMediaTrack(BPrivate::media::MediaWriter* writer,
-						 int32 stream_num,
-						 media_format *in_format,
-						 BPrivate::media::Encoder *encoder,
-						 media_codec_info *mci)
+	int32 streamIndex, const media_format* format,
+	const media_codec_info* codecInfo)
 {
-	UNIMPLEMENTED();
+	CALLED();
+
+	fWorkaroundFlags = 0;
+	fEncoder = NULL;
+	fEncoderID = -1;
+		// TODO: Not yet sure what this was needed for...
+	fWriter = writer;
+	fWriterFormat = *format;
+	fStream = streamIndex;
+	fErr = B_OK;
+
+	SetupWorkaround();
+
+	if (codecInfo != NULL) {
+		status_t ret = fWriter->CreateEncoder(&fEncoder, codecInfo);
+		if (ret != B_OK) {
+			TRACE("BMediaTrack::BMediaTrack: Error: creating decoder failed: "
+				"%s\n", strerror(ret));
+			// We do not set fErr here, because WriteChunk should still work.
+			fEncoder = NULL;
+		} else {
+			fMCI = *codecInfo;
+			fErr = fEncoder->SetUp(&fWriterFormat);
+		}
+	}
+
+	// not used:
+	fCurFrame = 0;
+	fCurTime = 0;
+	fDecoder = NULL;
+	fRawDecoder = NULL;
+	fExtractor = NULL;
 }
 
 
-// Does nothing, returns B_ERROR, for Zeta compatiblity only	
+// Does nothing, returns B_ERROR, for Zeta compatiblity only
 status_t
 BMediaTrack::ControlCodec(int32 selector, void *io_data, size_t size)
 {
@@ -751,24 +766,26 @@ BMediaTrack::SetupWorkaround()
 {
 	app_info	ainfo;
 	thread_info	tinfo;
-	
+
 	get_thread_info(find_thread(0), &tinfo);
 	be_roster->GetRunningAppInfo(tinfo.team, &ainfo);
-	
+
 	if (strcmp(ainfo.signature, "application/x-vnd.marcone-soundplay") == 0) {
-		fWorkaroundFlags = FORCE_RAW_AUDIO | FORCE_RAW_AUDIO_INT16_FORMAT | FORCE_RAW_AUDIO_HOST_ENDIAN;
-		printf("BMediaTrack::SetupWorkaround: SoundPlay workaround active\n"); 
+		fWorkaroundFlags = FORCE_RAW_AUDIO | FORCE_RAW_AUDIO_INT16_FORMAT
+			| FORCE_RAW_AUDIO_HOST_ENDIAN;
+		printf("BMediaTrack::SetupWorkaround: SoundPlay workaround active\n");
 	}
 	if (strcmp(ainfo.signature, "application/x-vnd.Be.MediaPlayer") == 0) {
 		fWorkaroundFlags = IGNORE_ENCODED_AUDIO | IGNORE_ENCODED_VIDEO;
-		printf("BMediaTrack::SetupWorkaround: MediaPlayer workaround active\n"); 
+		printf("BMediaTrack::SetupWorkaround: MediaPlayer workaround active\n");
 	}
-	
+
 #if CONVERT_TO_INT32 // XXX test
 	if (!(fWorkaroundFlags & FORCE_RAW_AUDIO_INT16_FORMAT))
 		fWorkaroundFlags |= FORCE_RAW_AUDIO_INT32_FORMAT;
 #endif
 }
+
 
 bool
 BMediaTrack::SetupFormatTranslation(const media_format &from, media_format *to)
@@ -776,10 +793,10 @@ BMediaTrack::SetupFormatTranslation(const media_format &from, media_format *to)
 	_plugin_manager.DestroyDecoder(fRawDecoder);
 	fRawDecoder = NULL;
 
-#ifdef TRACE_MEDIA_TRACK	
+#ifdef TRACE_MEDIA_TRACK
 	char s[200];
 	string_for_format(from, s, sizeof(s));
-	printf("BMediaTrack::SetupFormatTranslation: from: %s\n", s);  
+	printf("BMediaTrack::SetupFormatTranslation: from: %s\n", s);
 #endif
 
 	status_t res = _plugin_manager.CreateDecoder(&fRawDecoder, from);
@@ -790,12 +807,16 @@ BMediaTrack::SetupFormatTranslation(const media_format &from, media_format *to)
 
 	// XXX video?
 	int buffer_size = from.u.raw_audio.buffer_size;
-	int frame_size = (from.u.raw_audio.format & 15) * from.u.raw_audio.channel_count;
+	int frame_size = (from.u.raw_audio.format & 15)
+		* from.u.raw_audio.channel_count;
 	media_format notconstFrom = from;
 
-	ChunkProvider *chunkProvider = new(std::nothrow) RawDecoderChunkProvider(fDecoder, buffer_size, frame_size);
+	ChunkProvider *chunkProvider
+		= new(std::nothrow) RawDecoderChunkProvider(fDecoder, buffer_size,
+			frame_size);
 	if (!chunkProvider) {
-		ERROR("BMediaTrack::SetupFormatTranslation: can't create chunk provider\n");
+		ERROR("BMediaTrack::SetupFormatTranslation: can't create chunk "
+			"provider\n");
 		goto error;
 	}
 	fRawDecoder->SetChunkProvider(chunkProvider);
@@ -806,20 +827,21 @@ BMediaTrack::SetupFormatTranslation(const media_format &from, media_format *to)
 		goto error;
 	}
 
-#ifdef TRACE_MEDIA_TRACK	
+#ifdef TRACE_MEDIA_TRACK
 	string_for_format(*to, s, sizeof(s));
-	printf("BMediaTrack::SetupFormatTranslation:   to: %s\n", s);  
+	printf("BMediaTrack::SetupFormatTranslation:   to: %s\n", s);
 #endif
 
 	res = fRawDecoder->NegotiateOutputFormat(to);
 	if (res != B_OK) {
-		ERROR("BMediaTrack::SetupFormatTranslation: NegotiateOutputFormat failed\n");
+		ERROR("BMediaTrack::SetupFormatTranslation: NegotiateOutputFormat "
+			"failed\n");
 		goto error;
 	}
 
-#ifdef TRACE_MEDIA_TRACK	
+#ifdef TRACE_MEDIA_TRACK
 	string_for_format(*to, s, sizeof(s));
-	printf("BMediaTrack::SetupFormatTranslation:  res: %s\n", s);  
+	printf("BMediaTrack::SetupFormatTranslation:  res: %s\n", s);
 #endif
 
 	return true;

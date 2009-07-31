@@ -217,9 +217,9 @@ private:
 
 	// For write-only access to a BMediaTrack
 							BMediaTrack(BPrivate::media::MediaWriter* writer,
-								int32 streamIndex, media_format* format,
-								BPrivate::media::Encoder* encoder,
-								media_codec_info* codecInfo);
+								int32 streamIndex,
+								const media_format* format,
+								const media_codec_info* codecInfo);
 
 			void			SetupWorkaround();
 			bool			SetupFormatTranslation(const media_format& from,
@@ -241,7 +241,7 @@ private:
 			int32			fEncoderID;
 			BPrivate::media::MediaWriter* fWriter;
 			media_format	fWriterFormat;
-	
+
 			uint32			fWorkaroundFlags;
 
 protected:

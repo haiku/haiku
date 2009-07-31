@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
  * Copyright 2004, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
@@ -25,11 +25,33 @@ Encoder::~Encoder()
 	delete fChunkWriter;
 }
 
-	
+
 status_t
-Encoder::WriteChunk(const void* chunkBuffer, size_t chunkSize, uint32 flags)
+Encoder::AddTrackInfo(uint32 code, const void* data, size_t size, uint32 flags)
 {
-	return fChunkWriter->WriteChunk(chunkBuffer, chunkSize, flags);
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+Encoder::GetEncodeParameters(encode_parameters* parameters) const
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+Encoder::SetEncodeParameters(encode_parameters* parameters) const
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+Encoder::WriteChunk(const void* chunkBuffer, size_t chunkSize,
+	media_encode_info* encodeInfo)
+{
+	return fChunkWriter->WriteChunk(chunkBuffer, chunkSize, encodeInfo);
 }
 
 
