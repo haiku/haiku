@@ -14,6 +14,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 
 /* Note, this headers defines a *private* interface to the Radeon accelerant.
