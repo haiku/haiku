@@ -50,8 +50,11 @@ get_next_encoder(int32* cookie, const media_file_format* fileFormat,
 
 		*cookie = *cookie + 1;
 
-		if (fileFormat != NULL && fileFormat->family != reply.format_family)
+		if (fileFormat != NULL && reply.format_family != B_ANY_FORMAT_FAMILY
+			&& fileFormat->family != B_ANY_FORMAT_FAMILY
+			&& fileFormat->family != reply.format_family) {
 			continue;
+		}
 
 		if (!reply.input_format.Matches(inputFormat))
 			continue;
@@ -93,8 +96,11 @@ get_next_encoder(int32* cookie, const media_file_format* fileFormat,
 
 		*cookie = *cookie + 1;
 
-		if (fileFormat != NULL && fileFormat->family != reply.format_family)
+		if (fileFormat != NULL && reply.format_family != B_ANY_FORMAT_FAMILY
+			&& fileFormat->family != B_ANY_FORMAT_FAMILY
+			&& fileFormat->family != reply.format_family) {
 			continue;
+		}
 
 		if (!reply.input_format.Matches(inputFormat)
 			|| !reply.output_format.Matches(outputFormat)) {
