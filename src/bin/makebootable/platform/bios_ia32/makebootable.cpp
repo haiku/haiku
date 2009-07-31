@@ -163,12 +163,12 @@ read_boot_code_data(const char* programPath)
 			0, bootCodeData, kBootCodeSize);
 		if (bytesRead < 0) {
 			fprintf(stderr, "Error: Failed to read boot code from resources "
-				"or attribute.");
+				"or attribute.\n");
 			exit(1);
 		}
 		if (bytesRead != kBootCodeSize) {
 			fprintf(stderr, "Error: Failed to read boot code from resources, "
-				"and the boot code in the attribute has the wrong size!");
+				"and the boot code in the attribute has the wrong size!\n");
 			exit(1);
 		}
 	}
@@ -270,7 +270,7 @@ main(int argc, const char *const *argv)
 		bootCodeData = read_boot_code_data(info.name);
 #endif
 	if (!bootCodeData) {
-		fprintf(stderr, "Error: Failed to read ");
+		fprintf(stderr, "Error: Failed to read \n");
 		exit(1);
 	}
 
@@ -299,7 +299,7 @@ main(int argc, const char *const *argv)
 		int64 partitionOffset = 0;
 		fs_info info;	// needs to be here (we use the device name later)
 		if (S_ISDIR(st.st_mode)) {
-			#ifdef __HAIKU__
+			#if defined(__BEOS__) || defined(__HAIKU__) 
 
 				// a directory: get the device
 				error = fs_stat_dev(st.st_dev, &info);
@@ -654,7 +654,7 @@ main(int argc, const char *const *argv)
 				close(mountFD);
 			} else {
 				fprintf(stderr, "Could not update BFS boot code while the "
-					"partition is mounted!");
+					"partition is mounted!\n");
 			}
 		}
 #endif	// __HAIKU__
