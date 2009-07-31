@@ -74,8 +74,9 @@ create_mode_list(void)
 	const color_space kVesaSpaces[] = {B_RGB32_LITTLE, B_RGB24_LITTLE,
 		B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
 
-	gInfo->mode_list_area = create_display_modes("vesa modes", NULL, NULL, 0,
-		kVesaSpaces, sizeof(kVesaSpaces) / sizeof(kVesaSpaces[0]),
+	gInfo->mode_list_area = create_display_modes("vesa modes",
+		gInfo->shared_info->has_edid ? &gInfo->shared_info->edid_info : NULL,
+		NULL, 0, kVesaSpaces, sizeof(kVesaSpaces) / sizeof(kVesaSpaces[0]),
 		is_mode_supported, &gInfo->mode_list, &gInfo->shared_info->mode_count);
 	if (gInfo->mode_list_area < B_OK)
 		return gInfo->mode_list_area;
