@@ -10,6 +10,7 @@
  *		Julun <host.haiku@gmx.de>
  */
 
+
 /*! String class supporting common string operations. */
 
 
@@ -1609,6 +1610,42 @@ BString::CharacterDeescape(char escapeChar)
 {
 	if (Length() > 0)
 		_DoCharacterDeescape(fPrivateData, escapeChar);
+	return *this;
+}
+
+
+//	#pragma mark - Trimming
+
+
+BString&
+BString::Trim()
+{
+	const char* string = String();
+
+	int32 startCount = 0;
+	while (isspace(string[startCount])) {
+		startCount++;
+	}
+
+	int32 endCount = 0;
+	while (isspace(string[Length() - endCount - 1])) {
+		endCount++;
+	}
+
+	if (startCount == 0 && endCount == 0)
+		return *this;
+
+	// We actually need to trim
+
+	size_t length = Length() - startCount - endCount;
+	if (startCount == 0) {
+		_MakeWritable(length, true);
+	} else if (_MakeWritable() == B_OK) {
+		memmove(fPrivateData, fPrivateData + startCount, length);
+		fPrivateData[length] = '\0';
+		_SetLength(length);
+	}
+
 	return *this;
 }
 

@@ -1,7 +1,7 @@
 /*
-* Copyright 2001-2009, Haiku Inc. All Rights Reserved.
-* Distributed under the terms of the MIT License.
-*/
+ * Copyright 2001-2009, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef __BSTRING__
 #define __BSTRING__
 
@@ -219,12 +219,16 @@ public:
 
 			// Escaping and De-escaping
 			BString&		CharacterEscape(const char* original,
-								const char* setOfCharsToEscape, char escapeWith);
+								const char* setOfCharsToEscape,
+								char escapeWith);
 			BString&		CharacterEscape(const char* setOfCharsToEscape,
 								char escapeWith);
 			BString&		CharacterDeescape(const char* original,
 								char escapeChar);
 			BString&		CharacterDeescape(char escapeChar);
+
+			// Trimming
+			BString&		Trim();
 
 			// Insert
 			BString&		operator<<(const char* string);
