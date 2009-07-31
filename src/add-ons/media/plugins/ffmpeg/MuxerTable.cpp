@@ -20,7 +20,7 @@ const media_file_format gMuxerTable[] = {
 		{ 0 },
 		"video/x-msvideo",
 		"AVI (Audio Video Interleaved)",
-		"AVI",
+		"avi",
 		"avi",
 		{ 0 }
 	},

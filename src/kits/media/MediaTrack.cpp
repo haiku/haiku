@@ -732,7 +732,7 @@ BMediaTrack::BMediaTrack(BPrivate::media::MediaWriter* writer,
 	SetupWorkaround();
 
 	if (codecInfo != NULL) {
-		status_t ret = fWriter->CreateEncoder(&fEncoder, codecInfo);
+		status_t ret = fWriter->CreateEncoder(&fEncoder, codecInfo, format);
 		if (ret != B_OK) {
 			TRACE("BMediaTrack::BMediaTrack: Error: creating decoder failed: "
 				"%s\n", strerror(ret));

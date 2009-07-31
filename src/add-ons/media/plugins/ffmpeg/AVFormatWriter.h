@@ -20,12 +20,15 @@ public:
 								AVFormatWriter();
 								~AVFormatWriter();
 
+	virtual	status_t			Init(const media_file_format* fileFormat);
+
 	virtual	status_t			SetCopyright(const char* copyright);
 	virtual	status_t			CommitHeader();
 	virtual	status_t			Flush();
 	virtual	status_t			Close();
 
-	virtual	status_t			AllocateCookie(void** cookie);
+	virtual	status_t			AllocateCookie(void** cookie,
+									const media_format* format);
 	virtual	status_t			FreeCookie(void* cookie);
 
 	virtual	status_t			SetCopyright(void* cookie,
@@ -49,6 +52,10 @@ private:
 	class StreamCookie;
 
 			AVFormatContext*	fContext;
+			bool				fHeaderWritten;
+
+			ByteIOContext		fIOContext;
+			uint8*				fIOBuffer;
 
 			StreamCookie**		fStreams;
 			BLocker				fStreamLock;

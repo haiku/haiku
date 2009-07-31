@@ -27,6 +27,7 @@ public:
 
 			status_t			CreateEncoder(Encoder** _encoder,
 									const media_codec_info* codecInfo,
+									const media_format* format,
 									uint32 flags = 0);
 
 			status_t			SetCopyright(int32 streamIndex,

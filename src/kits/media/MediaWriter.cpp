@@ -78,7 +78,7 @@ MediaWriter::InitCheck()
 {
 	CALLED();
 
-	return fWriter != NULL ? B_OK : B_NO_INIT;
+	return fWriter != NULL ? fWriter->Init(&fFileFormat) : B_NO_INIT;
 }
 
 
@@ -94,7 +94,8 @@ MediaWriter::GetFileFormatInfo(media_file_format* _fileFormat) const
 
 status_t
 MediaWriter::CreateEncoder(Encoder** _encoder,
-	const media_codec_info* codecInfo, uint32 flags)
+	const media_codec_info* codecInfo, const media_format* format,
+	uint32 flags)
 {
 	CALLED();
 
@@ -109,7 +110,7 @@ MediaWriter::CreateEncoder(Encoder** _encoder,
 	}
 
 	StreamInfo info;
-	ret = fWriter->AllocateCookie(&info.cookie);
+	ret = fWriter->AllocateCookie(&info.cookie, format);
 	if (ret != B_OK) {
 		_plugin_manager.DestroyEncoder(encoder);
 		return ret;

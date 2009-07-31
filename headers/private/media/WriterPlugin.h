@@ -13,12 +13,15 @@ public:
 								Writer();
 	virtual						~Writer();
 
+	virtual	status_t			Init(const media_file_format* fileFormat) = 0;
+
 	virtual	status_t			SetCopyright(const char* copyright) = 0;
 	virtual	status_t			CommitHeader() = 0;
 	virtual	status_t			Flush() = 0;
 	virtual	status_t			Close() = 0;
 
-	virtual	status_t			AllocateCookie(void** cookie) = 0;
+	virtual	status_t			AllocateCookie(void** cookie,
+									const media_format* format) = 0;
 	virtual	status_t			FreeCookie(void* cookie) = 0;
 
 	virtual	status_t			SetCopyright(void* cookie,
