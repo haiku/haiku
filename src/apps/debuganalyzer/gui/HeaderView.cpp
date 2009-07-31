@@ -560,7 +560,7 @@ public:
 
 HeaderView::HeaderView()
  	:
- 	BView("header view", B_WILL_DRAW),
+ 	BView("header view", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
  	fModel(NULL),
  	fHeaderEntries(10, true),
  	fLayoutValid(false)
