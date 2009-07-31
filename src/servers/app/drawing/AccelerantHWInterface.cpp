@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -127,7 +127,7 @@ AccelerantHWInterface::AccelerantHWInterface()
 	// dpms hooks
 	fAccDPMSCapabilities(NULL),
 	fAccDPMSMode(NULL),
-	fAccSetDPMSMode(NULL),		
+	fAccSetDPMSMode(NULL),
 
 	fModeCount(0),
 	fModeList(NULL),
@@ -203,7 +203,7 @@ AccelerantHWInterface::Initialize()
 	\brief Opens a graphics device for read-write access
 	\param deviceNumber Number identifying which graphics card to open (1 for first card)
 	\return The file descriptor for the opened graphics device
-	
+
 	The deviceNumber is relative to the number of graphics devices that can be successfully
 	opened.  One represents the first card that can be successfully opened (not necessarily
 	the first one listed in the directory).
@@ -263,7 +263,7 @@ status_t
 AccelerantHWInterface::_OpenAccelerant(int device)
 {
 	char signature[1024];
-	if (ioctl(device, B_GET_ACCELERANT_SIGNATURE, 
+	if (ioctl(device, B_GET_ACCELERANT_SIGNATURE,
 			&signature, sizeof(signature)) != B_OK)
 		return B_ERROR;
 
@@ -392,13 +392,13 @@ AccelerantHWInterface::Shutdown()
 		if (UninitAccelerant)
 			UninitAccelerant();
 	}
-	
+
 	if (fAccelerantImage >= 0)
 		unload_add_on(fAccelerantImage);
-	
+
 	if (fCardFD >= 0)
 		close(fCardFD);
-	
+
 	return B_OK;
 }
 
@@ -731,7 +731,7 @@ AccelerantHWInterface::GetDeviceInfo(accelerant_device_info *info)
 		ATRACE(("No B_GET_ACCELERANT_DEVICE_INFO hook found\n"));
 		return B_UNSUPPORTED;
 	}
-	
+
 	return GetAccelerantDeviceInfo(info);
 }
 
@@ -934,7 +934,6 @@ AccelerantHWInterface::GetMonitorInfo(monitor_info* info)
 	info->width = edid.display.h_size;
 	info->height = edid.display.v_size;
 
-	uint32 found = 0;
 	for (uint32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
 		edid1_detailed_monitor *monitor = &edid.detailed_monitor[i];
 
@@ -942,13 +941,11 @@ AccelerantHWInterface::GetMonitorInfo(monitor_info* info)
 			case EDID1_SERIAL_NUMBER:
 				strlcpy(info->serial_number, monitor->data.serial_number,
 					sizeof(info->serial_number));
-				found++;
 				break;
 
 			case EDID1_MONITOR_NAME:
 				strlcpy(info->name, monitor->data.monitor_name,
 					sizeof(info->name));
-				found++;
 				break;
 
 			case EDID1_MONITOR_RANGES:
@@ -975,7 +972,7 @@ AccelerantHWInterface::GetMonitorInfo(monitor_info* info)
 		}
 	}
 
-	return found > 0 ? B_OK : B_NAME_NOT_FOUND;
+	return B_OK;
 }
 
 
@@ -987,7 +984,7 @@ AccelerantHWInterface::RetraceSemaphore()
 			B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
 	if (!AccelerantRetraceSemaphore)
 		return B_UNSUPPORTED;
-		
+
 	return AccelerantRetraceSemaphore();
 }
 
@@ -1002,11 +999,11 @@ AccelerantHWInterface::WaitForRetrace(bigtime_t timeout)
 			B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
 	if (!AccelerantRetraceSemaphore)
 		return B_UNSUPPORTED;
-	
+
 	sem_id sem = AccelerantRetraceSemaphore();
 	if (sem < 0)
 		return B_ERROR;
-	
+
 	return acquire_sem_etc(sem, 1, B_RELATIVE_TIMEOUT, timeout);
 }
 
@@ -1018,7 +1015,7 @@ AccelerantHWInterface::SetDPMSMode(const uint32 &state)
 
 	if (!fAccSetDPMSMode)
 		return B_UNSUPPORTED;
-	
+
 	return fAccSetDPMSMode(state);
 }
 
@@ -1030,7 +1027,7 @@ AccelerantHWInterface::DPMSMode()
 
 	if (!fAccDPMSMode)
 		return B_UNSUPPORTED;
-	
+
 	return fAccDPMSMode();
 }
 
@@ -1042,7 +1039,7 @@ AccelerantHWInterface::DPMSCapabilities()
 
 	if (!fAccDPMSCapabilities)
 		return B_UNSUPPORTED;
-	
+
 	return fAccDPMSCapabilities();
 }
 
