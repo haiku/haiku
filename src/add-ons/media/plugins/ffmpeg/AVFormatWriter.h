@@ -43,7 +43,7 @@ public:
 									media_encode_info* encodeInfo);
 
 private:
-	static	int					_Write(void* cookie, const uint8* buffer,
+	static	int					_Write(void* cookie, uint8* buffer,
 									int bufferSize);
 
 	static	off_t				_Seek(void* cookie, off_t offset, int whence);

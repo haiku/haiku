@@ -331,7 +331,7 @@ AVFormatWriter::WriteChunk(void* _cookie, const void* chunkBuffer,
 
 
 /*static*/ int
-AVFormatWriter::_Write(void* cookie, const uint8* buffer, int bufferSize)
+AVFormatWriter::_Write(void* cookie, uint8* buffer, int bufferSize)
 {
 	TRACE_IO("AVFormatWriter::_Write(%p, %p, %d)\n",
 		cookie, buffer, bufferSize);
