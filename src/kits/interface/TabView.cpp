@@ -8,6 +8,8 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Artur Wyszynski
  */
+
+
 #include <TabView.h>
 
 #include <new>
@@ -599,6 +601,7 @@ BTabView::MessageReceived(BMessage *message)
 			break;
 		}
 
+#if 0
 		case B_MOUSE_WHEEL_CHANGED:
 		{
 			float deltaX = 0.0f;
@@ -615,13 +618,16 @@ BTabView::MessageReceived(BMessage *message)
 			int32 selection = Selection();
 			int32 numTabs = CountTabs();
 			if (deltaY > 0  && selection < numTabs - 1) {
-				//move to the right tab.
+				// move to the right tab.
 				Select(Selection() + 1);
 			} else if (deltaY < 0 && selection > 0 && numTabs > 1) {
-				//move to the left tab.
+				// move to the left tab.
 				Select(selection - 1);
 			}
+			break;
 		}
+#endif
+
 		default:
 			BView::MessageReceived(message);
 			break;
