@@ -203,3 +203,52 @@ AVFormatWriter::WriteChunk(void* cookie, const void* chunkBuffer,
 }
 
 
+// #pragma mark -
+
+
+/*static*/ int
+AVFormatWriter::_Write(void* cookie, const uint8* buffer, int bufferSize)
+{
+	TRACE_IO("AVFormatWriter::_Write(%p, %p, %d)\n",
+		cookie, buffer, bufferSize);
+
+	AVFormatWriter* writer = reinterpret_cast<AVFormatWriter*>(cookie);
+
+	ssize_t written = writer->fTarget->Write(buffer, bufferSize);
+
+	TRACE_IO("  written: %ld\n", written);
+	return (int)written;
+
+}
+
+
+/*static*/ off_t
+AVFormatWriter::_Seek(void* cookie, off_t offset, int whence)
+{
+	TRACE_IO("AVFormatWriter::_Seek(%p, %lld, %d)\n",
+		cookie, offset, whence);
+
+	AVFormatWriter* writer = reinterpret_cast<AVFormatWriter*>(cookie);
+
+	BPositionIO* positionIO = dynamic_cast<BPositionIO*>(writer->fTarget);
+	if (positionIO == NULL)
+		return -1;
+
+	// Support for special file size retrieval API without seeking
+	// anywhere:
+	if (whence == AVSEEK_SIZE) {
+		off_t size;
+		if (positionIO->GetSize(&size) == B_OK)
+			return size;
+		return -1;
+	}
+
+	off_t position = positionIO->Seek(offset, whence);
+	TRACE_IO("  position: %lld\n", position);
+	if (position < 0)
+		return -1;
+
+	return position;
+}
+
+

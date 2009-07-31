@@ -10,6 +10,10 @@
 
 #include "WriterPlugin.h"
 
+extern "C" {
+	#include "avformat.h"
+}
+
 
 class AVFormatWriter : public Writer {
 public:
@@ -36,7 +40,15 @@ public:
 									media_encode_info* encodeInfo);
 
 private:
+	static	int					_Write(void* cookie, const uint8* buffer,
+									int bufferSize);
+
+	static	off_t				_Seek(void* cookie, off_t offset, int whence);
+
+private:
 	class StreamCookie;
+
+			AVFormatContext*	fContext;
 
 			StreamCookie**		fStreams;
 			BLocker				fStreamLock;
