@@ -120,9 +120,9 @@ AddOnManager::GetDecoderForFormat(xfer_entry_ref* _decoderRef,
 			return B_OK;
 		}
 	}
-	return B_ENTRY_NOT_FOUND;	
+	return B_ENTRY_NOT_FOUND;
 }
-									
+
 
 status_t
 AddOnManager::GetReaders(xfer_entry_ref* outRefs, int32* outCount,
@@ -152,7 +152,7 @@ AddOnManager::GetEncoder(xfer_entry_ref* _encoderRef, int32 id)
 		if (info->internalID == (uint32)id) {
 			printf("AddOnManager::GetEncoderForFormat: found encoder %s for "
 				"id %ld\n", info->ref.name, id);
-	
+
 			*_encoderRef = info->ref;
 			return B_OK;
 		}
@@ -161,9 +161,9 @@ AddOnManager::GetEncoder(xfer_entry_ref* _encoderRef, int32 id)
 	printf("AddOnManager::GetEncoderForFormat: failed to find encoder for id "
 		"%ld\n", id);
 
-	return B_ENTRY_NOT_FOUND;	
+	return B_ENTRY_NOT_FOUND;
 }
-									
+
 
 status_t
 AddOnManager::GetWriter(xfer_entry_ref* _ref, uint32 internalID)
@@ -275,7 +275,7 @@ AddOnManager::_RegisterAddOn(BEntry& entry)
 		_RegisterEncoder(encoder, ref);
 
 	delete plugin;
-	
+
 	return B_OK;
 }
 
@@ -347,7 +347,7 @@ AddOnManager::_RegisterAddOns()
 
 		if (find_directory(directories[i], &path) == B_OK
 			&& path.Append("media/plugins") == B_OK
-			&& directory.SetTo(path.Path()) == B_OK 
+			&& directory.SetTo(path.Path()) == B_OK
 			&& directory.GetNodeRef(&nref) == B_OK) {
 			fHandler->AddDirectory(&nref);
 		}
@@ -475,7 +475,6 @@ AddOnManager::_RegisterEncoder(EncoderPlugin* plugin, const entry_ref& ref)
 	info.internalID = fNextEncoderCodecInfoID++;
 
 	int32 cookie = 0;
-	int32 subID = 0;
 
 	while (true) {
 		memset(&info.codecInfo, 0, sizeof(media_codec_info));
@@ -487,7 +486,9 @@ AddOnManager::_RegisterEncoder(EncoderPlugin* plugin, const entry_ref& ref)
 			break;
 		}
 		info.codecInfo.id = info.internalID;
-		info.codecInfo.sub_id = subID++;
+		// NOTE: info.codecInfo.sub_id is for private use by the Encoder,
+		// we don't touch it, but it is maintained and passed back to the
+		// EncoderPlugin in NewEncoder(media_codec_info).
 
 		if (!fEncoderList.Insert(info))
 			break;

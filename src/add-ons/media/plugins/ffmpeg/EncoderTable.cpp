@@ -6,14 +6,18 @@
 
 #include "EncoderTable.h"
 
+extern "C" {
+	#include "avcodec.h"
+}
+
 
 const EncoderDescription gEncoderTable[] = {
 	{
 		{
-			"MPEG2 Video",
-			"mpeg2video",
+			"MPEG4 Video",
+			"mpeg4",
 			0,
-			0,
+			CODEC_ID_MPEG4,
 			{ 0 }
 		},
 		B_ANY_FORMAT_FAMILY,
@@ -22,10 +26,10 @@ const EncoderDescription gEncoderTable[] = {
 	},
 	{
 		{
-			"WAV",
-			"wav",
+			"MP3 Audio",
+			"mp3",
 			0,
-			0,
+			CODEC_ID_MP3,
 			{ 0 }
 		},
 		B_ANY_FORMAT_FAMILY,

@@ -8,12 +8,16 @@
 
 #include <MediaFormats.h>
 
+extern "C" {
+	#include "avcodec.h"
+}
+
 #include "EncoderPlugin.h"
 
 
 class AVCodecEncoder : public Encoder {
 public:
-								AVCodecEncoder(const char* shortName);
+								AVCodecEncoder(uint32 codecID);
 
 	virtual						~AVCodecEncoder();
 
@@ -32,6 +36,29 @@ public:
 									media_encode_info* info);
 
 private:
+			status_t			_EncodeAudio(const void* buffer,
+									int64 frameCount,
+									media_encode_info* info);
+
+			status_t			_EncodeVideo(const void* buffer,
+									int64 frameCount,
+									media_encode_info* info);
+
+private:
+			media_format		fInputFormat;
+
+			// FFmpeg related members
+			// TODO: Refactor common base class from AVCodec[De|En]Coder!
+			AVCodec*			fCodec;
+			AVCodecContext*		fContext;
+			AVFrame*			fInputPicture;
+//			AVFrame*			fOutputPicture;
+
+			uint32				fAVCodecID;
+
+			bool				fCodecInitDone;
+
+			uint8*				fChunkBuffer;
 };
 
 #endif // AVCODEC_ENCODER_H
