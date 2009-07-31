@@ -28,6 +28,7 @@ operator!=(const rgb_color& x, const rgb_color& y)
 
 MonitorView::MonitorView(BRect rect, char *name, int32 width, int32 height)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW),
+	fMaxSize(1600),
 	fWidth(width),
 	fHeight(height)
 {
@@ -65,8 +66,8 @@ MonitorView::MonitorBounds()
 
 	float maxSize = min_c(Bounds().Width(), Bounds().Height());
 
-	picWidth = maxSize * fWidth / 1600;
-	picHeight = maxSize * fHeight / 1600;
+	picWidth = maxSize * fWidth / fMaxSize;
+	picHeight = maxSize * fHeight / fMaxSize;
 
 	if (picWidth > maxSize) {
 		picHeight = picHeight * maxSize / picWidth;
@@ -79,7 +80,7 @@ MonitorView::MonitorBounds()
 	}
 
 	BPoint size = BPoint(Bounds().Width(), Bounds().Height());
-	return BRect((size.x - picWidth) / 2, (size.y - picHeight) / 2, 
+	return BRect((size.x - picWidth) / 2, (size.y - picHeight) / 2,
 		(size.x + picWidth) / 2, (size.y + picHeight) / 2);
 }
 
@@ -134,6 +135,19 @@ MonitorView::SetResolution(int32 width, int32 height)
 
 
 void
+MonitorView::SetMaxResolution(int32 width, int32 height)
+{
+	int32 maxSize = max_c(width, height);
+	if (fMaxSize == maxSize)
+		return;
+
+	fMaxSize = maxSize;
+
+	Invalidate();
+}
+
+
+void
 MonitorView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -157,7 +171,7 @@ MonitorView::MessageReceived(BMessage* message)
 		}
 
 		default:
-			BView::MessageReceived(message);	
+			BView::MessageReceived(message);
 			break;
 	}
 }

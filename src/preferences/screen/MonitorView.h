@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Copyright 2002, Thomas Kurschel.
  * Distributed under the terms of the MIT License.
  *
@@ -17,7 +17,8 @@
 
 class MonitorView : public BView {
 	public:
-		MonitorView(BRect frame, char *name, int32 screenWidth, int32 screenHeight);
+		MonitorView(BRect frame, char *name, int32 screenWidth,
+			int32 screenHeight);
 		~MonitorView();
 
 		virtual void AttachedToWindow();
@@ -26,11 +27,13 @@ class MonitorView : public BView {
 		virtual void MouseDown(BPoint point);
 
 		void SetResolution(int32 width, int32 height);
+		void SetMaxResolution(int32 width, int32 height);
 
 	private:
 		BRect MonitorBounds();
 
 		rgb_color	fDesktopColor;
+		int32		fMaxSize;
 		int32		fWidth;
 		int32		fHeight;
 };

@@ -208,15 +208,6 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		screen.Frame().IntegerWidth() + 1, screen.Frame().IntegerHeight() + 1);
 	screenBox->AddChild(fMonitorView);
 
-/*
-	BStringView* columnsView = new BStringView("", "Columns:");
-	columnsView->SetExplicitAlignment(
-		BAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_UNSET));
-	BStringView* rowsView = new BStringView("", "Rows:");
-	rowsView->SetExplicitAlignment(
-		BAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_UNSET));
-*/
-
 	fColumnsControl = new BTextControl("Columns:", "0",
 		new BMessage(kMsgWorkspaceColumnsChanged));
 	fRowsControl = new BTextControl("Rows:", "0",
@@ -251,7 +242,10 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 	fResolutionMenu = new BPopUpMenu("resolution", true, true);
 
-	uint16 previousWidth = 0, previousHeight = 0;
+	uint16 maxWidth = 0;
+	uint16 maxHeight = 0;
+	uint16 previousWidth = 0;
+	uint16 previousHeight = 0;
 	for (int32 i = 0; i < fScreenMode.CountModes(); i++) {
 		screen_mode mode = fScreenMode.ModeAt(i);
 
@@ -260,6 +254,10 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 		previousWidth = mode.width;
 		previousHeight = mode.height;
+		if (maxWidth < mode.width)
+			maxWidth = mode.width;
+		if (maxHeight < mode.height)
+			maxHeight = mode.height;
 
 		BMessage *message = new BMessage(POP_RESOLUTION_MSG);
 		message->AddInt32("width", mode.width);
@@ -270,6 +268,8 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 		fResolutionMenu->AddItem(new BMenuItem(name.String(), message));
 	}
+
+	fMonitorView->SetMaxResolution(maxWidth, maxHeight);
 
 	BRect rect(0.0, 0.0, 200.0, 15.0);
 	// fResolutionField needs to be at the correct
@@ -1087,8 +1087,8 @@ ScreenWindow::_UpdateMonitor()
 	}
 
 	char text[256];
-	snprintf(text, sizeof(text), "%s %s %g\"", info.vendor, info.name,
-		diagonalInches);
+	snprintf(text, sizeof(text), "%s%s%s %g\"", info.vendor,
+		info.name[0] ? " " : "", info.name, diagonalInches);
 
 	fMonitorInfo->SetText(text);
 
