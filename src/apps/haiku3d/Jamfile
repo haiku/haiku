@@ -1,0 +1,27 @@
+SubDir HAIKU_TOP src apps haiku3d ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) mesh ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) texture ] ;
+
+UsePrivateHeaders shared ;
+
+Application Haiku3d :
+	App.cpp
+	Camera.cpp
+	MainWindow.cpp
+	MathUtils.cpp
+	Mesh.cpp
+	MeshInstance.cpp
+	RenderView.cpp
+	Texture.cpp
+
+	# mesh
+	StaticMesh.cpp
+
+	# texture
+	BitmapTexture.cpp
+	VideoFileTexture.cpp
+
+	: be game GL media translation
+	: Haiku3d.rdef
+;

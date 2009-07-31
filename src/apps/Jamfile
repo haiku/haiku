@@ -22,6 +22,7 @@ HaikuSubInclude expander ;
 HaikuSubInclude fontdemo ;
 HaikuSubInclude glteapot ;
 HaikuSubInclude gradients ;
+HaikuSubInclude haiku3d ;
 HaikuSubInclude icon-o-matic ;
 HaikuSubInclude installedpackages ;
 HaikuSubInclude installer ;
