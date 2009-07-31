@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -98,6 +98,7 @@ private:
 	bool _AddMode(const display_mode* mode);
 	void _RemoveModeAt(uint32 index);
 	void _AddBaseMode(uint16 width, uint16 height, uint32 refresh);
+	display_mode* _FindMode(uint16 width, uint16 height) const;
 
 	display_mode*	fModes;
 	uint32			fCount;
@@ -112,8 +113,8 @@ using namespace BPrivate;
 static float
 get_refresh_rate(const display_mode& mode)
 {
-	return float(mode.timing.pixel_clock * 1000) / 
-		float(mode.timing.h_total * mode.timing.v_total);
+	return float(mode.timing.pixel_clock * 1000)
+		/ float(mode.timing.h_total * mode.timing.v_total);
 }
 
 
@@ -213,8 +214,27 @@ ModeList::AddModes(edid1_info* info)
 			info->std_timing[i].refresh);
 	}
 
+	bool hasRanges = false;
+	uint32 minHorizontalFrequency = 0;
+	uint32 maxHorizontalFrequency = 0;
+	uint32 minVerticalFrequency = 0;
+	uint32 maxVerticalFrequency = 0;
+	uint32 maxPixelClock = 0;
+
 	for (uint32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
 		if (info->detailed_monitor[i].monitor_desc_type
+				== EDID1_MONITOR_RANGES) {
+			edid1_monitor_range& range
+				= info->detailed_monitor[i].data.monitor_range;
+
+			hasRanges = true;
+			minHorizontalFrequency = range.min_h;
+			maxHorizontalFrequency = range.max_h;
+			minVerticalFrequency = range.min_v;
+			maxVerticalFrequency = range.max_v;
+			maxPixelClock = range.max_clock * 10000;
+			continue;
+		} else if (info->detailed_monitor[i].monitor_desc_type
 				!= EDID1_IS_DETAILED_TIMING)
 			continue;
 
@@ -254,8 +274,35 @@ ModeList::AddModes(edid1_info* info)
 		_AddMode(&mode);
 	}
 
-	// TODO: add other modes from the base list that satisfy the display's
-	//	requirements!
+	// Add other modes from the base list that satisfy the display's
+	// requirements
+
+	for (uint32 i = 0; i < kNumBaseModes; i++) {
+		const display_mode& mode = kBaseModeList[i];
+
+		// Check if a mode with this resolution already exists
+
+		if (_FindMode(mode.timing.h_display, mode.timing.v_display) != NULL)
+			continue;
+
+		// Check monitor limits
+
+		if (hasRanges) {
+			uint32 verticalFrequency = 1000 * mode.timing.pixel_clock
+				/ (mode.timing.h_total * mode.timing.v_total);
+			uint32 horizontalFrequency = mode.timing.h_total * verticalFrequency
+				/ 1000;
+
+			if (minHorizontalFrequency > horizontalFrequency
+				|| maxHorizontalFrequency < horizontalFrequency
+				|| minVerticalFrequency > verticalFrequency
+				|| maxVerticalFrequency < verticalFrequency
+				|| maxPixelClock < mode.timing.pixel_clock)
+				continue;
+		}
+
+		_AddMode(&mode);
+	}
 
 	return true;
 }
@@ -337,6 +384,20 @@ ModeList::_AddBaseMode(uint16 width, uint16 height, uint32 refresh)
 			_AddMode(&mode);
 		}
 	}
+}
+
+
+display_mode*
+ModeList::_FindMode(uint16 width, uint16 height) const
+{
+	for (uint32 i = 0; i < fCount; i++) {
+		const display_mode& mode = fModes[i];
+
+		if (mode.timing.h_display == width && mode.timing.v_display == height)
+			return &fModes[i];
+	}
+
+	return NULL;
 }
 
 
