@@ -150,6 +150,7 @@ StaticLibrary libavcodec.a :
 	mjpega_dump_header_bsf.c
 	mjpegbdec.c
 	mjpegdec.c
+	mjpegenc.c
 	mlp.c
 	mlp_parser.c
 	mlpdec.c
@@ -162,17 +163,21 @@ StaticLibrary libavcodec.a :
 	mpc.c
 	mpc7.c
 	mpc8.c
-	mpeg12.c
-	mpeg12data.c
 	mpeg4audio.c
 	mpeg4video_parser.c
+	mpeg12.c
+	mpeg12data.c
+	mpeg12enc.c
 	mpegaudio.c
 	mpegaudio_parser.c
 	mpegaudiodata.c
 	mpegaudiodec.c
 	mpegaudiodecheader.c
+	mpegaudioenc.c
 	mpegvideo.c
+	mpegvideo_enc.c
 	mpegvideo_parser.c
+#	mpegvideo_xvmc.c
 	msmpeg4.c
 	msmpeg4data.c
 	msrle.c
@@ -206,6 +211,7 @@ StaticLibrary libavcodec.a :
 	ratecontrol.c
 	raw.c
 	rawdec.c
+	rawenc.c
 	rdft.c
 	remove_extradata_bsf.c
 	resample.c
