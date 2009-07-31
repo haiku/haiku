@@ -60,7 +60,6 @@ static long profileCounter = 0;
 AVCodecDecoder::AVCodecDecoder()
 	:
 	fHeader(),
-	fInfo(),
 	fInputFormat(),
 	fOutputVideoFormat(),
 	fFrame(0),
@@ -110,7 +109,7 @@ AVCodecDecoder::~AVCodecDecoder()
 	free(fOutputPicture);
 	free(fInputPicture);
 	free(fContext);
-	
+
 	delete[] fExtraData;
 	delete[] fOutputBuffer;
 }
@@ -132,7 +131,7 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 	if (ioEncodedFormat->type != B_MEDIA_ENCODED_AUDIO
 		&& ioEncodedFormat->type != B_MEDIA_ENCODED_VIDEO)
 		return B_ERROR;
-		
+
 	fIsAudio = (ioEncodedFormat->type == B_MEDIA_ENCODED_AUDIO);
 	TRACE("[%c] AVCodecDecoder::Setup()\n", fIsAudio?('a'):('v'));
 
@@ -155,7 +154,7 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 	for (int32 i = 0; gCodecTable[i].id; i++) {
 		fCodecIndexInTable = i;
 		uint64 cid;
-		
+
 		if (BMediaFormats().GetCodeFor(*ioEncodedFormat,
 				gCodecTable[i].family, &descr) == B_OK
 		    && gCodecTable[i].type == ioEncodedFormat->type) {
@@ -204,7 +203,7 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 					// Special case extra data in B_WAV_FORMAT_FAMILY
 					const wave_format_ex* waveFormatData
 						= (const wave_format_ex*)infoBuffer;
-					
+
 					size_t waveFormatSize = infoSize;
 					if (waveFormatData != NULL && waveFormatSize > 0) {
 						fBlockAlign = waveFormatData->block_align;
@@ -376,7 +375,7 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	fChunkBufferSize = 0;
 	fOutputBufferOffset = 0;
 	fOutputBufferSize = 0;
-	
+
 	inOutFormat->require_flags = 0;
 	inOutFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
 
@@ -400,9 +399,9 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	fContext->height = fOutputVideoFormat.display.line_count;
 //	fContext->frame_rate = (int)(fOutputVideoFormat.field_rate
 //		* fContext->frame_rate_base);
-	
+
 	fOutputFrameRate = fOutputVideoFormat.field_rate;
-	
+
 	fContext->extradata = (uint8_t*)fExtraData;
 	fContext->extradata_size = fExtraDataSize;
 
@@ -470,7 +469,7 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	inOutFormat->require_flags = 0;
 	inOutFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
 
-#ifdef TRACE_AV_CODEC		
+#ifdef TRACE_AV_CODEC
 	char buffer[1024];
 	string_for_format(*inOutFormat, buffer, sizeof(buffer));
 	TRACE("[v]  outFormat = %s\n", buffer);
@@ -501,7 +500,7 @@ AVCodecDecoder::_DecodeAudio(void* outBuffer, int64* outFrameCount,
 				fChunkBufferSize);
 			fChunkBufferSize = 0;
 		}
-	
+
 		if (fOutputBufferSize > 0) {
 			int32 frames = min_c(fOutputFrameCount - *outFrameCount,
 				fOutputBufferSize / fOutputFrameSize);
@@ -554,7 +553,7 @@ AVCodecDecoder::_DecodeAudio(void* outBuffer, int64* outFrameCount,
 			fChunkBufferOffset += len;
 			fChunkBufferSize -= len;
 			fOutputBufferOffset = 0;
-			fOutputBufferSize = out_size;			
+			fOutputBufferSize = out_size;
 		}
 	}
 	fFrame += *outFrameCount;
@@ -602,7 +601,7 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 			mediaHeader->u.raw_video.first_active_line = 1;
 			mediaHeader->u.raw_video.line_count
 				= fOutputVideoFormat.display.line_count;
-		
+
 			TRACE("[v] start_time=%02d:%02d.%02d field_sequence=%lu\n",
 				int((mediaHeader->start_time / 60000000) % 60),
 				int((mediaHeader->start_time / 1000000) % 60),
@@ -613,7 +612,7 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 #if DO_PROFILING
 		bigtime_t startTime = system_time();
 #endif
-	
+
 		// NOTE: In the FFmpeg code example I've read, the length returned by
 		// avcodec_decode_video() is completely ignored. Furthermore, the
 		// packet buffers are supposed to contain complete frames only so we
@@ -625,10 +624,12 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 		if (len < 0) {
 			TRACE("[v] AVCodecDecoder: error in decoding frame %lld: %d\n",
 				fFrame, len);
+			// NOTE: An error from avcodec_decode_video() seems to be ignored
+			// in the ffplay sample code.
 //			return B_ERROR;
 		}
-	
-	
+
+
 //TRACE("FFDEC: PTS = %d:%d:%d.%d - fContext->frame_number = %ld "
 //	"fContext->frame_rate = %ld\n", (int)(fContext->pts / (60*60*1000000)),
 //	(int)(fContext->pts / (60*1000000)), (int)(fContext->pts / (1000000)),
@@ -674,7 +675,7 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 #endif
 //			TRACE("ONE FRAME OUT !! len=%d size=%ld (%s)\n", len, size,
 //				pixfmt_to_string(fContext->pix_fmt));
-	
+
 			// Some decoders do not set pix_fmt until they have decoded 1 frame
 			if (fFormatConversionFunc == NULL) {
 				fFormatConversionFunc = resolve_colorspace(
@@ -683,7 +684,7 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 			fOutputPicture->data[0] = (uint8_t*)outBuffer;
 			fOutputPicture->linesize[0]
 				= fOutputVideoFormat.display.bytes_per_row;
-			
+
 			if (fFormatConversionFunc != NULL) {
 				if (useDeinterlacedPicture) {
 					AVFrame inputFrame;
@@ -695,7 +696,7 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 					inputFrame.linesize[1] = deinterlacedPicture.linesize[1];
 					inputFrame.linesize[2] = deinterlacedPicture.linesize[2];
 					inputFrame.linesize[3] = deinterlacedPicture.linesize[3];
-					
+
 					(*fFormatConversionFunc)(&inputFrame,
 						fOutputPicture, width, height);
 				} else {
@@ -709,7 +710,7 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 			dump_ffframe(fInputPicture, "ffpict");
 //			dump_ffframe(fOutputPicture, "opict");
 #endif
-			*outFrameCount = 1;				
+			*outFrameCount = 1;
 			fFrame++;
 
 #if DO_PROFILING
