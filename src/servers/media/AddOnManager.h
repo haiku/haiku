@@ -48,6 +48,10 @@ public:
 
 			status_t			GetFileFormat(media_file_format* _fileFormat,
 									int32 cookie);
+			status_t			GetCodecInfo(media_codec_info* _codecInfo,
+									media_format_family* _formatFamily,
+									media_format* _inputFormat,
+									media_format* _outputFormat, int32 cookie);
 
 private:
 			status_t			_RegisterAddOn(BEntry& entry);
@@ -78,7 +82,10 @@ private:
 			struct encoder_info {
 				entry_ref			ref;
 				uint32				internalID;
-				List<media_codec_info> codecInfos;
+				media_codec_info	codecInfo;
+				media_format_family	formatFamily;
+				media_format		intputFormat;
+				media_format		outputFormat;
 			};
 
 			BLocker				fLock;

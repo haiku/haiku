@@ -7,22 +7,32 @@
 #include "EncoderTable.h"
 
 
-const media_codec_info gEncoderTable[] = {
+const EncoderDescription gEncoderTable[] = {
 	{
-		"MPEG2 Video",
-		"mpeg2video",
-		0,
-		0,
-		{ 0 }
+		{
+			"MPEG2 Video",
+			"mpeg2video",
+			0,
+			0,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_VIDEO,
+		B_MEDIA_ENCODED_VIDEO
 	},
 	{
-		"WAV",
-		"wav",
-		0,
-		0,
-		{ 0 }
-	},
+		{
+			"WAV",
+			"wav",
+			0,
+			0,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO
+	}
 };
 
-const size_t gEncoderCount = sizeof(gEncoderTable) / sizeof(media_codec_info);
+const size_t gEncoderCount = sizeof(gEncoderTable) / sizeof(EncoderDescription);
 

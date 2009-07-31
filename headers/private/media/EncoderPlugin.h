@@ -30,6 +30,13 @@ public:
 								Encoder();
 	virtual						~Encoder();
 
+	// TODO: I think we may actually need a method to specialize a
+	// media_format. For example, some codecs may only support certain
+	// input color spaces, or output color spaces, or multiple of 16
+	// width/height... This support is technically even needed for
+	// MediaFormats.h functionality, although there probably isn't
+	// an application out there which uses it like that. 
+
 	virtual	status_t			SetFormat(const media_file_format& fileFormat,
 									media_format* _inOutEncodedFormat) = 0;
 
@@ -75,17 +82,11 @@ public:
 	virtual	Encoder*			NewEncoder(
 									const media_codec_info& codecInfo) = 0;
 
-	// TODO: Maybe this also needs to return a media_format with wild cards
-	// so that we can support the respective get_next_encoder() functions
-	// that take media_formats with wild cards and specialize them.
-	// Then this interface could be turned into an iterator like interface:
-	//
-	//		status_t			GetNextSupportedCodec(int32* cookie,
-	//								const media_codec_info* codecInfo,
-	//								const media_format* format) = 0;
-	virtual	status_t			GetSupportedCodecs(
-									const media_codec_info** codecInfos,
-									size_t* count) = 0;
+	virtual	status_t			RegisterNextEncoder(int32* cookie,
+									media_codec_info* codecInfo,
+									media_format_family* formatFamily,
+									media_format* inputFormat,
+									media_format* outputFormat) = 0;
 };
 
 } } // namespace BPrivate::media

@@ -28,31 +28,115 @@ static bigtime_t sLastFormatsUpdate;
 
 
 status_t
-get_next_encoder(int32* cookie, const media_file_format* _fileFormat,
-	const media_format* inFormat, media_format* _outFormat,
+get_next_encoder(int32* cookie, const media_file_format* fileFormat,
+	const media_format* inputFormat, media_format* _outputFormat,
 	media_codec_info* _codecInfo)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	// TODO: If fileFormat is provided (existing apps also pass NULL),
+	// we could at least check fileFormat->capabilities against
+	// outputFormat->type without even contacting the server.
+
+	if (cookie == NULL || inputFormat == NULL || _codecInfo == NULL)
+		return B_BAD_VALUE;
+
+	while (true) {
+		server_get_codec_info_request request;
+		request.cookie = *cookie;
+		server_get_codec_info_reply reply;
+		status_t ret = QueryServer(SERVER_GET_CODEC_INFO_FOR_COOKIE, &request,
+			sizeof(request), &reply, sizeof(reply));
+		if (ret != B_OK)
+			return ret;
+
+		*cookie = *cookie + 1;
+
+		if (fileFormat != NULL && fileFormat->family != reply.format_family)
+			continue;
+
+		if (!reply.input_format.Matches(inputFormat))
+			continue;
+
+		if (_outputFormat != NULL)
+			*_outputFormat = reply.output_format;
+
+		*_codecInfo = reply.codec_info;
+		break;
+	}
+
+	return B_OK;
 }
 
 
 status_t
-get_next_encoder(int32* cookie, const media_file_format* _fileFormat,
-	const media_format* inFormat, const media_format* _outFormat,
+get_next_encoder(int32* cookie, const media_file_format* fileFormat,
+	const media_format* inputFormat, const media_format* outputFormat,
 	media_codec_info* _codecInfo, media_format* _acceptedInputFormat,
 	media_format* _acceptedOutputFormat)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	// TODO: If fileFormat is provided (existing apps also pass NULL),
+	// we could at least check fileFormat->capabilities against
+	// outputFormat->type without even contacting the server.
+
+	if (cookie == NULL || inputFormat == NULL || outputFormat == NULL
+		|| _codecInfo == NULL) {
+		return B_BAD_VALUE;
+	}
+
+	while (true) {
+		server_get_codec_info_request request;
+		request.cookie = *cookie;
+		server_get_codec_info_reply reply;
+		status_t ret = QueryServer(SERVER_GET_CODEC_INFO_FOR_COOKIE, &request,
+			sizeof(request), &reply, sizeof(reply));
+		if (ret != B_OK)
+			return ret;
+
+		*cookie = *cookie + 1;
+
+		if (fileFormat != NULL && fileFormat->family != reply.format_family)
+			continue;
+
+		if (!reply.input_format.Matches(inputFormat)
+			|| !reply.output_format.Matches(outputFormat)) {
+			continue;
+		}
+
+		// TODO: These formats are currently way too generic. For example,
+		// an encoder may want to adjust video width to a multiple of 16,
+		// or overwrite the intput and or output color space. To make this
+		// possible, we actually have to instantiate an Encoder here and
+		// ask it to specifiy the format.
+		if (_acceptedInputFormat != NULL)
+			*_acceptedInputFormat = reply.input_format;
+		if (_acceptedOutputFormat != NULL)
+			*_acceptedOutputFormat = reply.output_format;
+
+		*_codecInfo = reply.codec_info;
+		break;
+	}
+
+	return B_OK;
 }
 
 
 status_t
 get_next_encoder(int32* cookie, media_codec_info* _codecInfo)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	if (cookie == NULL || _codecInfo == NULL)
+		return B_BAD_VALUE;
+
+	server_get_codec_info_request request;
+	request.cookie = *cookie;
+	server_get_codec_info_reply reply;
+	status_t ret = QueryServer(SERVER_GET_CODEC_INFO_FOR_COOKIE, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (ret != B_OK)
+		return ret;
+
+	*cookie = *cookie + 1;
+	*_codecInfo = reply.codec_info;
+
+	return B_OK;
 }
 
 

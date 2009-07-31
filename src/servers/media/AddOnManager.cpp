@@ -149,7 +149,7 @@ AddOnManager::GetEncoder(xfer_entry_ref* _encoderRef, int32 id)
 	encoder_info* info;
 	for (fEncoderList.Rewind(); fEncoderList.GetNext(&info);) {
 		// check if the encoder matches the supplied format
-		if (info->internalID == id) {
+		if (info->internalID == (uint32)id) {
 			printf("AddOnManager::GetEncoderForFormat: found encoder %s for "
 				"id %ld\n", info->ref.name, id);
 	
@@ -193,6 +193,26 @@ AddOnManager::GetFileFormat(media_file_format* _fileFormat, int32 cookie)
 	media_file_format* fileFormat;
 	if (fWriterFileFormats.Get(cookie, &fileFormat)) {
 		*_fileFormat = *fileFormat;
+		return B_OK;
+	}
+
+	return B_BAD_INDEX;
+}
+
+
+status_t
+AddOnManager::GetCodecInfo(media_codec_info* _codecInfo,
+	media_format_family* _formatFamily,
+	media_format* _inputFormat, media_format* _outputFormat, int32 cookie)
+{
+	BAutolock locker(fLock);
+
+	encoder_info* info;
+	if (fEncoderList.Get(cookie, &info)) {
+		*_codecInfo = info->codecInfo;
+		*_formatFamily = info->formatFamily;
+		*_inputFormat = info->intputFormat;
+		*_outputFormat = info->outputFormat;
 		return B_OK;
 	}
 
@@ -439,34 +459,39 @@ AddOnManager::_RegisterEncoder(EncoderPlugin* plugin, const entry_ref& ref)
 	encoder_info* pinfo;
 	for (fEncoderList.Rewind(); fEncoderList.GetNext(&pinfo);) {
 		if (!strcmp(pinfo->ref.name, ref.name)) {
-			// we already know this encoder
+			// We already know this encoder. When we reject encoders with
+			// the same name, we allow the user to overwrite system encoders
+			// in her home folder.
 			return;
 		}
 	}
 
 	printf("AddOnManager::_RegisterEncoder, name %s\n", ref.name);
 
+	// Get list of supported encoders...
+
 	encoder_info info;
 	info.ref = ref;
 	info.internalID = fNextEncoderCodecInfoID++;
 
-	// Get list of supported codecs...
-	const media_codec_info* codecInfos = NULL;
-	size_t count = 0;
-	if (plugin->GetSupportedCodecs(&codecInfos, &count) != B_OK) {
-		printf("AddOnManager::_RegisterEncoder(): plugin->GetSupportedCodecs"
-			"(...) failed!\n");
-		return;
-	}
+	int32 cookie = 0;
+	int32 subID = 0;
 
-	for (uint32 i = 0 ; i < count ; i++) {
-		media_codec_info codecInfo = codecInfos[i];
-		codecInfo.id = info.internalID;
-		codecInfo.sub_id = i;
-		info.codecInfos.Insert(codecInfo);
-	}
+	while (true) {
+		memset(&info.codecInfo, 0, sizeof(media_codec_info));
+		memset(&info.intputFormat, 0, sizeof(media_format));
+		memset(&info.outputFormat, 0, sizeof(media_format));
+		if (plugin->RegisterNextEncoder(&cookie,
+			&info.codecInfo, &info.formatFamily, &info.intputFormat,
+			&info.outputFormat) != B_OK) {
+			break;
+		}
+		info.codecInfo.id = info.internalID;
+		info.codecInfo.sub_id = subID++;
 
-	fEncoderList.Insert(info);
+		if (!fEncoderList.Insert(info))
+			break;
+	}
 }
 
 

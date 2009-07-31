@@ -34,9 +34,11 @@ public:
 
 	virtual	Encoder*			NewEncoder(
 									const media_codec_info& codecInfo);
-	virtual	status_t			GetSupportedCodecs(
-									const media_codec_info** codecInfos,
-									size_t* count);
+	virtual	status_t			RegisterNextEncoder(int32* cookie,
+									media_codec_info* codecInfo,
+									media_format_family* formatFamily,
+									media_format* inputFormat,
+									media_format* outputFormat);
 
 private:
 	class GlobalInitilizer {

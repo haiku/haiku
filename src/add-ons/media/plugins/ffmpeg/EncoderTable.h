@@ -9,7 +9,15 @@
 #include <MediaFormats.h>
 
 
-extern const media_codec_info gEncoderTable[];
+struct EncoderDescription {
+	media_codec_info		codec_info;
+	media_format_family		format_family;
+	media_type				input_type;
+	media_type				output_type;
+};
+
+
+extern const EncoderDescription gEncoderTable[];
 extern const size_t gEncoderCount;
 
 

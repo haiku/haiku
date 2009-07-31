@@ -139,11 +139,20 @@ FFmpegPlugin::NewEncoder(const media_codec_info& codecInfo)
 
 
 status_t
-FFmpegPlugin::GetSupportedCodecs(const media_codec_info** _codecInfos,
-	size_t* _count)
+FFmpegPlugin::RegisterNextEncoder(int32* cookie, media_codec_info* _codecInfo,
+	media_format_family* _formatFamily, media_format* _inputFormat,
+	media_format* _outputFormat)
 {
-	*_codecInfos = gEncoderTable;
-	*_count = gEncoderCount;
+	if (*cookie < 0 || *cookie >= (int32)gEncoderCount)
+		return B_BAD_INDEX;
+
+	*_codecInfo = gEncoderTable[*cookie].codec_info;
+	*_formatFamily = gEncoderTable[*cookie].format_family;
+	_inputFormat->type = gEncoderTable[*cookie].input_type;
+	_outputFormat->type = gEncoderTable[*cookie].output_type;;
+
+	*cookie = *cookie + 1;
+
 	return B_OK;
 }
 

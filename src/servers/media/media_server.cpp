@@ -908,6 +908,19 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			break;
 		}
 
+		case SERVER_GET_CODEC_INFO_FOR_COOKIE:
+		{
+			const server_get_codec_info_request *request
+				= reinterpret_cast<
+					const server_get_codec_info_request *>(data);
+			server_get_codec_info_reply reply;
+			rv = gAddOnManager->GetCodecInfo(&reply.codec_info,
+				&reply.format_family, &reply.input_format,
+				&reply.output_format, request->cookie);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+
 		case SERVER_GET_ENCODER_FOR_CODEC_INFO:
 		{
 			const server_get_encoder_for_codec_info_request *request

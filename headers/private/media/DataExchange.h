@@ -133,6 +133,7 @@ enum {
 	SERVER_GET_DECODER_FOR_FORMAT,
 	SERVER_GET_WRITER_FOR_FORMAT_FAMILY,
 	SERVER_GET_FILE_FORMAT_FOR_COOKIE,
+	SERVER_GET_CODEC_INFO_FOR_COOKIE,
 	SERVER_GET_ENCODER_FOR_CODEC_INFO,
 	SERVER_MESSAGE_END,
 	NODE_MESSAGE_START = 0x200,
@@ -842,6 +843,18 @@ struct server_get_file_format_request : request_data {
 struct server_get_file_format_reply : reply_data {
 	media_file_format		file_format;
 		// the file format matching the cookie
+};
+
+struct server_get_codec_info_request : request_data {
+	int32					cookie;
+};
+
+struct server_get_codec_info_reply : reply_data {
+	media_codec_info		codec_info;
+	media_format_family		format_family;
+	media_format			input_format;
+	media_format			output_format;
+		// the codec info matching the cookie
 };
 
 struct node_request_completed_command : command_data {
