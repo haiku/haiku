@@ -83,8 +83,8 @@ static vint32 sTSCSyncRendezvous;
 segment_descriptor *gGDT = NULL;
 
 /* Some specials for the double fault handler */
-//static struct tss sDoubleFaultTSS;
-static uint32 sDoubleFaultStack[10240];
+static uint8* sDoubleFaultStacks;
+static const size_t kDoubleFaultStackSize = 4096;	// size per CPU
 
 static x86_cpu_module_info *sCpuModule;
 
@@ -251,7 +251,9 @@ init_double_fault(int cpuNum)
 	struct tss *tss = &gCPU[cpuNum].arch.double_fault_tss;
 
 	memset(tss, 0, sizeof(struct tss));
-	tss->sp0 = (uint32)sDoubleFaultStack + sizeof(sDoubleFaultStack);
+	size_t stackSize;
+	tss->sp0 = (uint32)x86_get_double_fault_stack(cpuNum, &stackSize);
+	tss->sp0 += stackSize;
 	tss->ss0 = KERNEL_DATA_SEG;
 	read_cr3(tss->cr3);
 		// copy the current cr3 to the double fault cr3
@@ -501,8 +503,19 @@ x86_check_feature(uint32 feature, enum x86_feature_type type)
 void*
 x86_get_double_fault_stack(int32 cpu, size_t* _size)
 {
-	*_size = sizeof(sDoubleFaultStack);
-	return sDoubleFaultStack;
+	*_size = kDoubleFaultStackSize;
+	return sDoubleFaultStacks + kDoubleFaultStackSize * cpu;
+}
+
+
+/*!	Returns the index of the current CPU. Can only be called from the double
+	fault handler.
+*/
+int
+x86_double_fault_get_cpu()
+{
+	uint32 stack = x86_read_ebp();
+	return (stack - (uint32)sDoubleFaultStacks) / kDoubleFaultStackSize;
 }
 
 
@@ -569,7 +582,6 @@ arch_cpu_init_post_vm(kernel_args *args)
 	uint32 i;
 
 	// account for the segment descriptors
-
 	gGDT = (segment_descriptor *)args->arch_args.vir_gdt;
 	create_area("gdt", (void **)&gGDT, B_EXACT_ADDRESS, B_PAGE_SIZE,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -578,6 +590,10 @@ arch_cpu_init_post_vm(kernel_args *args)
 	// (a fixed number of used GDT entries)
 	//i386_selector_init(gGDT);  // pass the new gdt
 
+	// allocate an area for the double fault stacks
+	create_area("double fault stacks", (void**)&sDoubleFaultStacks,
+		B_ANY_KERNEL_ADDRESS, kDoubleFaultStackSize * smp_get_num_cpus(),
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	vm_translation_map_arch_info* kernelArchTranslationMap
 		= vm_kernel_address_space()->translation_map.arch_data;
