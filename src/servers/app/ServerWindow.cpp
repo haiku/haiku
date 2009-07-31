@@ -669,7 +669,12 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 				if (showLevel <= 0) {
 					// window is currently hidden - ignore the minimize request
-					fWindow->SetMinimized(minimize);
+					//fWindow->SetMinimized(minimize);
+						// TODO: commenting this out makes BWindow::fMinimized
+						// and Window::fMinimized go out of sync. However, this
+						// seems to be what BeOS implies here; the TrackerStatus
+						// window increases its hide level, but does not report
+						// to be minimized.
 					break;
 				}
 
