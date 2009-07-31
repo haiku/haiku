@@ -105,6 +105,7 @@ extern wchar_t	*wcsrchr(const wchar_t *, wchar_t);
 extern size_t   wcsrtombs(char *dst, const wchar_t **src, size_t len,
 					mbstate_t *ps);
 extern size_t	wcsspn(const wchar_t *, const wchar_t *);
+extern wchar_t	*wcsstr(const wchar_t *, const wchar_t *);
 extern double	wcstod(const wchar_t *, wchar_t **);
 extern float	wcstof(const wchar_t *, wchar_t **);
 extern wchar_t	*wcstok(wchar_t *, const wchar_t *, wchar_t **);
