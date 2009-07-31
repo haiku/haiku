@@ -94,15 +94,15 @@ private:
 			size_t				fSize;
 };
 
-typedef status_t (*cache_func)(file_cache_ref *ref, void *cookie, off_t offset,
+typedef status_t (*cache_func)(file_cache_ref* ref, void* cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
 	size_t lastReservedPages, size_t reservePages);
 
-static void add_to_iovec(iovec *vecs, uint32 &index, uint32 max, addr_t address,
+static void add_to_iovec(iovec* vecs, uint32 &index, uint32 max, addr_t address,
 	size_t size);
 
 
-static struct cache_module_info *sCacheModule;
+static struct cache_module_info* sCacheModule;
 static const uint8 kZeroBuffer[4096] = {};
 
 
@@ -233,7 +233,7 @@ PrecacheIO::IOFinished(status_t status, bool partialTransfer,
 
 
 static void
-add_to_iovec(iovec *vecs, uint32 &index, uint32 max, addr_t address,
+add_to_iovec(iovec* vecs, uint32 &index, uint32 max, addr_t address,
 	size_t size)
 {
 	if (index > 0 && (addr_t)vecs[index - 1].iov_base
@@ -247,21 +247,21 @@ add_to_iovec(iovec *vecs, uint32 &index, uint32 max, addr_t address,
 		panic("no more space for iovecs!");
 
 	// we need to start a new iovec
-	vecs[index].iov_base = (void *)address;
+	vecs[index].iov_base = (void*)address;
 	vecs[index].iov_len = size;
 	index++;
 }
 
 
 static inline bool
-access_is_sequential(file_cache_ref *ref)
+access_is_sequential(file_cache_ref* ref)
 {
 	return ref->last_access[ref->last_access_index] != 0;
 }
 
 
 static inline void
-push_access(file_cache_ref *ref, off_t offset, size_t bytes, bool isWrite)
+push_access(file_cache_ref* ref, off_t offset, size_t bytes, bool isWrite)
 {
 	TRACE(("%p: push %Ld, %ld, %s\n", ref, offset, bytes,
 		isWrite ? "write" : "read"));
@@ -283,10 +283,10 @@ push_access(file_cache_ref *ref, off_t offset, size_t bytes, bool isWrite)
 
 
 static void
-reserve_pages(file_cache_ref *ref, size_t reservePages, bool isWrite)
+reserve_pages(file_cache_ref* ref, size_t reservePages, bool isWrite)
 {
 	if (low_resource_state(B_KERNEL_RESOURCE_PAGES) != B_NO_LOW_RESOURCE) {
-		vm_cache *cache = ref->cache;
+		vm_cache* cache = ref->cache;
 		cache->Lock();
 
 		if (list_is_empty(&cache->consumers) && cache->areas == NULL
@@ -307,7 +307,7 @@ reserve_pages(file_cache_ref *ref, size_t reservePages, bool isWrite)
 				// free some pages from our cache
 				// TODO: start with oldest
 				uint32 left = reservePages;
-				vm_page *page;
+				vm_page* page;
 				for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
 						(page = it.Next()) != NULL && left > 0;) {
 					if (page->state != PAGE_STATE_MODIFIED
@@ -367,14 +367,14 @@ read_pages_and_clear_partial(file_cache_ref* ref, void* cookie, off_t offset,
 	operation it will unlock the cache, though.
 */
 static status_t
-read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
+read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
 	size_t lastReservedPages, size_t reservePages)
 {
 	TRACE(("read_into_cache(offset = %Ld, pageOffset = %ld, buffer = %#lx, "
 		"bufferSize = %lu\n", offset, pageOffset, buffer, bufferSize));
 
-	vm_cache *cache = ref->cache;
+	vm_cache* cache = ref->cache;
 
 	// TODO: We're using way too much stack! Rather allocate a sufficiently
 	// large chunk on the heap.
@@ -382,13 +382,13 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	uint32 vecCount = 0;
 
 	size_t numBytes = PAGE_ALIGN(pageOffset + bufferSize);
-	vm_page *pages[MAX_IO_VECS];
+	vm_page* pages[MAX_IO_VECS];
 	ConditionVariable busyConditions[MAX_IO_VECS];
 	int32 pageIndex = 0;
 
 	// allocate pages for the cache and mark them busy
 	for (size_t pos = 0; pos < numBytes; pos += B_PAGE_SIZE) {
-		vm_page *page = pages[pageIndex++] = vm_page_allocate_page(
+		vm_page* page = pages[pageIndex++] = vm_page_allocate_page(
 			PAGE_STATE_FREE, true);
 		if (page == NULL)
 			panic("no more pages!");
@@ -456,7 +456,7 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 
 static status_t
-read_from_file(file_cache_ref *ref, void *cookie, off_t offset,
+read_from_file(file_cache_ref* ref, void* cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
 	size_t lastReservedPages, size_t reservePages)
 {
@@ -467,7 +467,7 @@ read_from_file(file_cache_ref *ref, void *cookie, off_t offset,
 		return B_OK;
 
 	iovec vec;
-	vec.iov_base = (void *)buffer;
+	vec.iov_base = (void*)buffer;
 	vec.iov_len = bufferSize;
 
 	push_access(ref, offset, bufferSize, false);
@@ -492,7 +492,7 @@ read_from_file(file_cache_ref *ref, void *cookie, off_t offset,
 	The same restrictions apply.
 */
 static status_t
-write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
+write_to_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
 	size_t lastReservedPages, size_t reservePages)
 {
@@ -501,7 +501,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	iovec vecs[MAX_IO_VECS];
 	uint32 vecCount = 0;
 	size_t numBytes = PAGE_ALIGN(pageOffset + bufferSize);
-	vm_page *pages[MAX_IO_VECS];
+	vm_page* pages[MAX_IO_VECS];
 	int32 pageIndex = 0;
 	status_t status = B_OK;
 	ConditionVariable busyConditions[MAX_IO_VECS];
@@ -516,7 +516,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 		//	(a working set like approach for the file cache)
 		// TODO: the pages we allocate here should have been reserved upfront
 		//	in cache_io()
-		vm_page *page = pages[pageIndex++] = vm_page_allocate_page(
+		vm_page* page = pages[pageIndex++] = vm_page_allocate_page(
 			PAGE_STATE_FREE, true);
 		busyConditions[pageIndex - 1].Publish(page, "page");
 
@@ -558,7 +558,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 		} else {
 			// the end of this write does not happen on a page boundary, so we
 			// need to fetch the last page before we can update it
-			iovec readVec = { (void *)last, B_PAGE_SIZE };
+			iovec readVec = { (void*)last, B_PAGE_SIZE };
 			size_t bytesRead = B_PAGE_SIZE;
 
 			status = vfs_read_pages(ref->vnode, cookie,
@@ -583,7 +583,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 		if (useBuffer) {
 			// copy data from user buffer
-			vm_memcpy_to_physical(base + pageOffset, (void *)buffer, bytes,
+			vm_memcpy_to_physical(base + pageOffset, (void*)buffer, bytes,
 				true);
 		} else {
 			// clear buffer instead
@@ -629,7 +629,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 
 static status_t
-write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
+write_to_file(file_cache_ref* ref, void* cookie, off_t offset, int32 pageOffset,
 	addr_t buffer, size_t bufferSize, bool useBuffer, size_t lastReservedPages,
 	size_t reservePages)
 {
@@ -642,11 +642,11 @@ write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
 		if (buffer == 0)
 			return B_NO_MEMORY;
 
-		memset((void *)buffer, 0, chunkSize);
+		memset((void*)buffer, 0, chunkSize);
 	}
 
 	iovec vec;
-	vec.iov_base = (void *)buffer;
+	vec.iov_base = (void*)buffer;
 	vec.iov_len = bufferSize;
 
 	push_access(ref, offset, bufferSize, true);
@@ -685,7 +685,7 @@ write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
 
 
 static inline status_t
-satisfy_cache_io(file_cache_ref *ref, void *cookie, cache_func function,
+satisfy_cache_io(file_cache_ref* ref, void* cookie, cache_func function,
 	off_t offset, addr_t buffer, bool useBuffer, int32 &pageOffset,
 	size_t bytesLeft, size_t &reservePages, off_t &lastOffset,
 	addr_t &lastBuffer, int32 &lastPageOffset, size_t &lastLeft,
@@ -713,19 +713,19 @@ satisfy_cache_io(file_cache_ref *ref, void *cookie, cache_func function,
 
 
 static status_t
-cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
-	size_t *_size, bool doWrite)
+cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
+	size_t* _size, bool doWrite)
 {
 	if (_cacheRef == NULL)
 		panic("cache_io() called with NULL ref!\n");
 
-	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
-	vm_cache *cache = ref->cache;
+	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
+	vm_cache* cache = ref->cache;
 	off_t fileSize = cache->virtual_end;
 	bool useBuffer = buffer != 0;
 
 	TRACE(("cache_io(ref = %p, offset = %Ld, buffer = %p, size = %lu, %s)\n",
-		ref, offset, (void *)buffer, *_size, doWrite ? "write" : "read"));
+		ref, offset, (void*)buffer, *_size, doWrite ? "write" : "read"));
 
 	// out of bounds access?
 	if (offset >= fileSize || offset < 0) {
@@ -782,7 +782,7 @@ cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
 
 	while (bytesLeft > 0) {
 		// check if this page is already in memory
-		vm_page *page = cache->LookupPage(offset);
+		vm_page* page = cache->LookupPage(offset);
 		if (page != NULL) {
 			// The page may be busy - since we need to unlock the cache sometime
 			// in the near future, we need to satisfy the request of the pages
@@ -887,7 +887,7 @@ cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
 
 
 static status_t
-file_cache_control(const char *subsystem, uint32 function, void *buffer,
+file_cache_control(const char* subsystem, uint32 function, void* buffer,
 	size_t bufferSize)
 {
 	switch (function) {
@@ -898,7 +898,7 @@ file_cache_control(const char *subsystem, uint32 function, void *buffer,
 
 		case CACHE_SET_MODULE:
 		{
-			cache_module_info *module = sCacheModule;
+			cache_module_info* module = sCacheModule;
 
 			// unset previous module
 
@@ -915,7 +915,7 @@ file_cache_control(const char *subsystem, uint32 function, void *buffer,
 
 			char name[B_FILE_NAME_LENGTH];
 			if (!IS_USER_ADDRESS(buffer)
-				|| user_strlcpy(name, (char *)buffer,
+				|| user_strlcpy(name, (char*)buffer,
 						B_FILE_NAME_LENGTH) < B_OK)
 				return B_BAD_ADDRESS;
 
@@ -924,7 +924,7 @@ file_cache_control(const char *subsystem, uint32 function, void *buffer,
 
 			dprintf("cache_control: set module %s!\n", name);
 
-			status_t status = get_module(name, (module_info **)&module);
+			status_t status = get_module(name, (module_info**)&module);
 			if (status == B_OK)
 				sCacheModule = module;
 
@@ -940,16 +940,16 @@ file_cache_control(const char *subsystem, uint32 function, void *buffer,
 
 
 extern "C" void
-cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
+cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 {
 	if (size == 0)
 		return;
 
-	vm_cache *cache;
+	vm_cache* cache;
 	if (vfs_get_vnode_cache(vnode, &cache, false) != B_OK)
 		return;
 
-	file_cache_ref *ref = ((VMVnodeCache*)cache)->FileCacheRef();
+	file_cache_ref* ref = ((VMVnodeCache*)cache)->FileCacheRef();
 	off_t fileSize = cache->virtual_end;
 
 	if (offset + size > fileSize)
@@ -1026,7 +1026,7 @@ cache_prefetch(dev_t mountID, ino_t vnodeID, off_t offset, size_t size)
 	TRACE(("cache_prefetch(vnode %ld:%Ld)\n", mountID, vnodeID));
 
 	// get the vnode for the object, this also grabs a ref to it
-	struct vnode *vnode;
+	struct vnode* vnode;
 	if (vfs_get_vnode(mountID, vnodeID, true, &vnode) != B_OK)
 		return;
 
@@ -1036,15 +1036,15 @@ cache_prefetch(dev_t mountID, ino_t vnodeID, off_t offset, size_t size)
 
 
 extern "C" void
-cache_node_opened(struct vnode *vnode, int32 fdType, vm_cache *cache,
-	dev_t mountID, ino_t parentID, ino_t vnodeID, const char *name)
+cache_node_opened(struct vnode* vnode, int32 fdType, vm_cache* cache,
+	dev_t mountID, ino_t parentID, ino_t vnodeID, const char* name)
 {
 	if (sCacheModule == NULL || sCacheModule->node_opened == NULL)
 		return;
 
 	off_t size = -1;
 	if (cache != NULL) {
-		file_cache_ref *ref = ((VMVnodeCache*)cache)->FileCacheRef();
+		file_cache_ref* ref = ((VMVnodeCache*)cache)->FileCacheRef();
 		if (ref != NULL)
 			size = cache->virtual_end;
 	}
@@ -1055,7 +1055,7 @@ cache_node_opened(struct vnode *vnode, int32 fdType, vm_cache *cache,
 
 
 extern "C" void
-cache_node_closed(struct vnode *vnode, int32 fdType, vm_cache *cache,
+cache_node_closed(struct vnode* vnode, int32 fdType, vm_cache* cache,
 	dev_t mountID, ino_t vnodeID)
 {
 	if (sCacheModule == NULL || sCacheModule->node_closed == NULL)
@@ -1071,7 +1071,7 @@ cache_node_closed(struct vnode *vnode, int32 fdType, vm_cache *cache,
 
 
 extern "C" void
-cache_node_launched(size_t argCount, char * const *args)
+cache_node_launched(size_t argCount, char*  const* args)
 {
 	if (sCacheModule == NULL || sCacheModule->node_launched == NULL)
 		return;
@@ -1086,7 +1086,7 @@ file_cache_init_post_boot_device(void)
 	// ToDo: get cache module out of driver settings
 
 	if (get_module("file_cache/launch_speedup/v1",
-			(module_info **)&sCacheModule) == B_OK) {
+			(module_info**)&sCacheModule) == B_OK) {
 		dprintf("** opened launch speedup: %Ld\n", system_time());
 	}
 	return B_OK;
@@ -1104,13 +1104,13 @@ file_cache_init(void)
 //	#pragma mark - public FS API
 
 
-extern "C" void *
+extern "C" void*
 file_cache_create(dev_t mountID, ino_t vnodeID, off_t size)
 {
 	TRACE(("file_cache_create(mountID = %ld, vnodeID = %Ld, size = %Ld)\n",
 		mountID, vnodeID, size));
 
-	file_cache_ref *ref = new file_cache_ref;
+	file_cache_ref* ref = new file_cache_ref;
 	if (ref == NULL)
 		return NULL;
 
@@ -1148,9 +1148,9 @@ err1:
 
 
 extern "C" void
-file_cache_delete(void *_cacheRef)
+file_cache_delete(void* _cacheRef)
 {
-	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
+	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
 
 	if (ref == NULL)
 		return;
@@ -1163,9 +1163,9 @@ file_cache_delete(void *_cacheRef)
 
 
 extern "C" void
-file_cache_enable(void *_cacheRef)
+file_cache_enable(void* _cacheRef)
 {
-	file_cache_ref *ref = (file_cache_ref*)_cacheRef;
+	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
 
 	AutoLocker<VMCache> _(ref->cache);
 
@@ -1179,7 +1179,7 @@ file_cache_enable(void *_cacheRef)
 
 
 extern "C" status_t
-file_cache_disable(void *_cacheRef)
+file_cache_disable(void* _cacheRef)
 {
 	// TODO: This function only removes all pages from the cache and prevents
 	// that the file cache functions add any new ones until re-enabled. The
@@ -1188,7 +1188,7 @@ file_cache_disable(void *_cacheRef)
 	// the page fault code to deal correctly with private mappings (i.e. only
 	// insert pages in consumer caches).
 
-	file_cache_ref *ref = (file_cache_ref*)_cacheRef;
+	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
 
 	AutoLocker<VMCache> _(ref->cache);
 
@@ -1209,9 +1209,9 @@ file_cache_disable(void *_cacheRef)
 
 
 extern "C" bool
-file_cache_is_enabled(void *_cacheRef)
+file_cache_is_enabled(void* _cacheRef)
 {
-	file_cache_ref *ref = (file_cache_ref*)_cacheRef;
+	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
 	AutoLocker<VMCache> _(ref->cache);
 
 	return ref->disabled_count == 0;
@@ -1219,9 +1219,9 @@ file_cache_is_enabled(void *_cacheRef)
 
 
 extern "C" status_t
-file_cache_set_size(void *_cacheRef, off_t newSize)
+file_cache_set_size(void* _cacheRef, off_t newSize)
 {
-	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
+	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
 
 	TRACE(("file_cache_set_size(ref = %p, size = %Ld)\n", ref, newSize));
 
@@ -1238,7 +1238,7 @@ file_cache_set_size(void *_cacheRef, off_t newSize)
 		// cleared.
 		uint32 partialBytes = newSize % B_PAGE_SIZE;
 		if (partialBytes != 0) {
-			vm_page *page = cache->LookupPage(newSize - partialBytes);
+			vm_page* page = cache->LookupPage(newSize - partialBytes);
 			if (page != NULL) {
 				vm_memset_physical(page->physical_page_number * B_PAGE_SIZE
 					+ partialBytes, 0, B_PAGE_SIZE - partialBytes);
@@ -1251,9 +1251,9 @@ file_cache_set_size(void *_cacheRef, off_t newSize)
 
 
 extern "C" status_t
-file_cache_sync(void *_cacheRef)
+file_cache_sync(void* _cacheRef)
 {
-	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
+	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
 	if (ref == NULL)
 		return B_BAD_VALUE;
 
@@ -1262,10 +1262,10 @@ file_cache_sync(void *_cacheRef)
 
 
 extern "C" status_t
-file_cache_read(void *_cacheRef, void *cookie, off_t offset, void *buffer,
-	size_t *_size)
+file_cache_read(void* _cacheRef, void* cookie, off_t offset, void* buffer,
+	size_t* _size)
 {
-	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
+	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
 
 	TRACE(("file_cache_read(ref = %p, offset = %Ld, buffer = %p, size = %lu)\n",
 		ref, offset, buffer, *_size));
@@ -1283,10 +1283,10 @@ file_cache_read(void *_cacheRef, void *cookie, off_t offset, void *buffer,
 
 
 extern "C" status_t
-file_cache_write(void *_cacheRef, void *cookie, off_t offset,
-	const void *buffer, size_t *_size)
+file_cache_write(void* _cacheRef, void* cookie, off_t offset,
+	const void* buffer, size_t* _size)
 {
-	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
+	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
 
 	if (ref->disabled_count > 0) {
 		// Caching is disabled -- write directly to the file.
@@ -1324,7 +1324,7 @@ file_cache_write(void *_cacheRef, void *cookie, off_t offset,
 	}
 
 	status_t status = cache_io(ref, cookie, offset,
-		(addr_t)const_cast<void *>(buffer), _size, true);
+		(addr_t)const_cast<void*>(buffer), _size, true);
 
 	TRACE(("file_cache_write(ref = %p, offset = %Ld, buffer = %p, size = %lu)"
 		" = %ld\n", ref, offset, buffer, *_size, status));
