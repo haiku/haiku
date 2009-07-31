@@ -11,6 +11,7 @@
 #include "gtf.h"
 
 #include <InterfaceDefs.h>
+#include <String.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -345,19 +346,54 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 
 	// TODO: replace more vendor strings with something readable
 	switch (id) {
+		case 'ADI\0':
+			strcpy(info.vendor, "ADI MicroScan");
+			break;
+		case 'AUO\0':
+			strcpy(info.vendor, "AU Optronics");
+			break;
 		case 'BNQ\0':
 			strcpy(info.vendor, "BenQ");
+			break;
+		case 'EMA\0':
+			strcpy(info.vendor, "eMachines");
+			break;
+		case 'FUS\0':
+			strcpy(info.vendor, "Fujitsu-Siemens");
+			break;
+		case 'GSM\0':
+			strcpy(info.vendor, "LG");
 			break;
 		case 'LEN\0':
 			strcpy(info.vendor, "Lenovo");
 			break;
+		case 'PHL\0':
+			strcpy(info.vendor, "Philips");
+			break;
+		case 'QDS\0':
+			strcpy(info.vendor, "Quanta Display");
+			break;
 		case 'SAM\0':
 			strcpy(info.vendor, "Samsung");
+			break;
+		case 'SHP\0':
+			strcpy(info.vendor, "Sharp");
+			break;
+		case 'VIZ\0':
+			strcpy(info.vendor, "Vizio");
 			break;
 		case 'VSC\0':
 			strcpy(info.vendor, "ViewSonic");
 			break;
 	}
+
+	// Remove extraneous vendor strings and whitespace
+
+	BString name(info.name);
+	name.IReplaceAll(info.vendor, "");
+	name.Trim();
+
+	strcpy(info.name, name.String());
 
 	return B_OK;
 }
