@@ -756,9 +756,10 @@ FindPanel::FindPanel(BRect frame, BFile *node, FindWindow *parent,
 	rect.bottom = rect.top + 16;
 	rect.right = rect.left + 100;
 	fSearchTrashCheck = new BCheckBox(rect, "searchTrash", "Include trash", 0);
+	fSearchTrashCheck->ResizeToPreferred();
 	fMoreOptionsPane->AddItem(fSearchTrashCheck, 1);
 
-	rect.OffsetBy(120, 0);
+	rect.OffsetBy(fSearchTrashCheck->Bounds().Width() + 8, 0);
 	fTemporaryCheck = new BCheckBox(rect, "temporary", "Temporary", 0);
 	fMoreOptionsPane->AddItem(fTemporaryCheck, 1);
 	fTemporaryCheck->SetValue(1);
@@ -1839,15 +1840,15 @@ FindPanel::SetUpAddRemoveButtons(BBox *box)
 		BRect rect = box->Bounds();
 		rect.InsetBy(5, 10);
 		rect.top = rect.bottom - 20;
-		rect.right = rect.left + 40;
+		rect.right = rect.left + 22 + be_plain_font->StringWidth("Add");
 
 		button = new BButton(rect, "add", "Add", new BMessage(kAddItem),
 			B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
 		button->SetTarget(this);
 		box->AddChild(button);
 
-		rect.OffsetBy(50, 0);
-		rect.right = rect.left + 55;
+		rect.OffsetBy(rect.Width() + 6, 0);
+		rect.right = rect.left + 22 + be_plain_font->StringWidth("Remove");
 		button = new BButton(rect, "remove", "Remove", new BMessage(kRemoveItem),
 			B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
 
