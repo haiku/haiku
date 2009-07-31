@@ -34,6 +34,11 @@ ScreenSettings::ScreenSettings()
 			file.Read(&fWindowFrame, sizeof(BRect));
 
 			// make sure the window is visible on screen
+			if (fWindowFrame.Width() > screenFrame.Width())
+				fWindowFrame.right = fWindowFrame.left + 450;
+			if (fWindowFrame.Height() > screenFrame.Height())
+				fWindowFrame.bottom = fWindowFrame.top + 250;
+
 			if (screenFrame.right >= fWindowFrame.left + 40
 				&& screenFrame.bottom >= fWindowFrame.top + 40
 				&& screenFrame.left <= fWindowFrame.right - 40

@@ -322,6 +322,26 @@ ScreenMode::GetRefreshLimits(const screen_mode& mode, float& min, float& max)
 }
 
 
+status_t
+ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
+{
+	BScreen screen(fWindow);
+	status_t status = screen.GetMonitorInfo(&info);
+	if (status != B_OK)
+		return status;
+
+	if (_diagonalInches != NULL) {
+		*_diagonalInches = sqrt(info.width * info.width
+			+ info.height * info.height) / 2.54;
+	}
+
+	if (!strcmp(info.vendor, "LEN"))
+		strcpy(info.vendor, "Lenovo");
+	// TODO: replace more vendor strings with something readable
+	return B_OK;
+}
+
+
 screen_mode
 ScreenMode::ModeAt(int32 index)
 {

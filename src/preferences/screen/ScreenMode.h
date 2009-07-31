@@ -49,7 +49,9 @@ class ScreenMode {
 		void UpdateOriginalModes();
 
 		bool SupportsColorSpace(const screen_mode& mode, color_space space);
-		status_t GetRefreshLimits(const screen_mode& mode, float& min, float& max);
+		status_t GetRefreshLimits(const screen_mode& mode, float& min,
+			float& max);
+		status_t GetMonitorInfo(monitor_info& info, float* _diagonalInches);
 
 		screen_mode ModeAt(int32 index);
 		int32 CountModes();
