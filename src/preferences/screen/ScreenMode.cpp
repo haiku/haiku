@@ -395,6 +395,9 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'GSM\0':
 			strcpy(info.vendor, "LG");
 			break;
+		case 'GWY\0':
+			strcpy(info.vendor, "Gateway");
+			break;
 		case 'HIQ\0':
 		case 'HEI\0':
 			strcpy(info.vendor, "Hyundai");
