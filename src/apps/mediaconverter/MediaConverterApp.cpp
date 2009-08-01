@@ -67,7 +67,7 @@ MediaConverterApp::MessageReceived(BMessage *msg)
 
 		case START_CONVERSION_MESSAGE:
 			if (!fConverting)
-				StartConverting();			
+				StartConverting();
 			break;
 
 		case CANCEL_CONVERSION_MESSAGE:
@@ -80,21 +80,21 @@ MediaConverterApp::MessageReceived(BMessage *msg)
 			DetachCurrentMessage();
 			BMessenger(fWin).SendMessage(msg);
 			break;
-	
+
 		default:
 			BApplication::MessageReceived(msg);
 	}
 }
 
 
-void 
+void
 MediaConverterApp::ReadyToRun()
 {
 	fWin->Show();
 	fWin->PostMessage(INIT_FORMAT_MENUS);
 }
 
-void 
+void
 MediaConverterApp::RefsReceived(BMessage *msg)
 {
 	entry_ref ref;
@@ -134,14 +134,14 @@ MediaConverterApp::RefsReceived(BMessage *msg)
 // #pragma mark -
 
 
-bool 
+bool
 MediaConverterApp::IsConverting() const
 {
 	return fConverting;
 }
 
 
-void 
+void
 MediaConverterApp::StartConverting()
 {
 	bool locked = fWin->Lock();
@@ -152,7 +152,7 @@ MediaConverterApp::StartConverting()
 		if (fConvertThreadID >= 0) {
 			fConverting = true;
 			fCancel = false;
-			resume_thread(fConvertThreadID);			
+			resume_thread(fConvertThreadID);
 		}
 	}
 
@@ -162,7 +162,7 @@ MediaConverterApp::StartConverting()
 }
 
 
-void 
+void
 MediaConverterApp::SetStatusMessage(const char *message)
 {
 	if (fWin != NULL && fWin->Lock()) {
@@ -186,7 +186,7 @@ MediaConverterApp::_CreateOutputFile(BDirectory directory,
 		name.Truncate(extIndex + 1);
 	else
 		name.Append(".");
-	
+
 	name.Append(outputFormat->file_extension);
 
 	BEntry inEntry(ref);
@@ -298,8 +298,8 @@ MediaConverterApp::_RunConvert()
 					}
 					fWin->Unlock();
 				}
-				
-				
+
+
 			} else {
 				fWin->Unlock();
 				break;
@@ -316,7 +316,7 @@ MediaConverterApp::_RunConvert()
 // #pragma mark -
 
 
-status_t 
+status_t
 MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 	media_codec_info* audioCodec, media_codec_info* videoCodec,
 	int32 audioQuality, int32 videoQuality,
@@ -359,7 +359,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 			outAudFormat.type = B_MEDIA_RAW_AUDIO;
 			raf = &(outAudFormat.u.raw_audio);
 			inTrack->DecodedFormat(&outAudFormat);
-			
+
 			audioBuffer = new uint8[raf->buffer_size];
 //			audioFrameSize = (raf->format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
 			audioFrameSize = (raf->format & 0xf) * raf->channel_count;
@@ -377,15 +377,13 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 			inVidTrack = inTrack;
 			width = (int32)inFormat.Width();
 			height = (int32)inFormat.Height();
-			
+
 			// construct desired decoded video format
-//			memset(&outVidFormat, 0, sizeof(outVidFormat));
+			memset(&outVidFormat, 0, sizeof(outVidFormat));
 			outVidFormat.type = B_MEDIA_RAW_VIDEO;
 			rvf = &(outVidFormat.u.raw_video);
 			rvf->last_active = (uint32)(height - 1);
 			rvf->orientation = B_VIDEO_TOP_LEFT_RIGHT;
-			rvf->pixel_width_aspect = 1;
-			rvf->pixel_height_aspect = 1;
 			rvf->display.format = B_RGB32;
 			rvf->display.bytes_per_row = 4 * width;
 			rvf->display.line_width = width;
@@ -410,7 +408,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 						= new MediaEncoderWindow(BRect(50, 50, 520, 555), encoderView);
 					encoderWin->Go();
 						// blocks until the window is quit
-					
+
 					// The quality setting is ignored by the 3ivx encoder if the
 					// view was displayed, but this method is the trigger to read
 					// all the parameter settings
@@ -594,6 +592,6 @@ main(int, char **)
 {
 	MediaConverterApp app;
 	app.Run();
-	
+
 	return 0;
 }
