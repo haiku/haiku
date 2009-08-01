@@ -18,9 +18,11 @@ extern "C" {
 #undef TRACE
 #define TRACE_AV_CODEC_ENCODER
 #ifdef TRACE_AV_CODEC_ENCODER
-#	define TRACE(x...)	printf(x)
+#	define TRACE	printf
+#	define TRACE_IO(a...)
 #else
-#	define TRACE(x...)
+#	define TRACE(a...)
+#	define TRACE_IO(a...)
 #endif
 
 
@@ -233,7 +235,7 @@ status_t
 AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 	media_encode_info* info)
 {
-	TRACE("AVCodecEncoder::_EncodeVideo(%p, %lld, %p)\n", buffer, frameCount,
+	TRACE_IO("AVCodecEncoder::_EncodeVideo(%p, %lld, %p)\n", buffer, frameCount,
 		info);
 
 	if (fChunkBuffer == NULL)
@@ -244,7 +246,6 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 	while (frameCount > 0) {
 		size_t bpr = fInputFormat.u.raw_video.display.bytes_per_row;
 		size_t bufferSize = fInputFormat.u.raw_video.display.line_count * bpr;
-		TRACE("  bytes per row: %ld, buffer size: %ld\n", bpr, bufferSize);
 
 		// We should always get chunky bitmaps, so this code should be safe.
 		fSrcFrame.data[0] = (uint8_t*)buffer;
