@@ -11,6 +11,8 @@
 
 #include "MathUtils.h"
 
+#include <math.h>
+
 
 float
 MathUtils::EaseInOutCubic(float t /*time*/, float b /*begin*/, float c /*distance*/, float d /*duration*/)

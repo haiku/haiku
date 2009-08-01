@@ -20,6 +20,8 @@
 #include <TranslationKit.h>
 #include <TranslationUtils.h>
 
+#include <stdio.h>
+
 RenderView::RenderView(BRect frame)
 	:
 	BGLView(frame, "renderView", B_FOLLOW_ALL, B_WILL_DRAW,
