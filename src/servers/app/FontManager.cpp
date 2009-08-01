@@ -511,7 +511,7 @@ FontManager::_PrecacheFontFile(const ServerFont* font)
 	while (true) {
 		// We just want the file in the kernel file cache...
 		ssize_t read = file.Read(buffer, bufferSize);
-		if (read < bufferSize)
+		if (read < (ssize_t) bufferSize)
 			break;
 	}
 
