@@ -253,14 +253,16 @@ private:
 			void				_FormatLine(const char* line,
 									BString& formattedLine);
 	inline 	int32				_NextTabStop(int32 column) const;
-			float				_FormattedPosition(int32 line, 
+			float				_FormattedPosition(int32 line,
 									int32 offset) const;
 			SelectionPoint		_SelectionPointAt(BPoint where) const;
 			void				_GetSelectionRegion(BRegion& region) const;
 			void				_GetSelectionText(BString& text) const;
 			void				_CopySelectionToClipboard() const;
-			void				_SelectWordAt(const SelectionPoint& point);
-			void				_SelectLineAt(const SelectionPoint& point);
+			void				_SelectWordAt(const SelectionPoint& point,
+									bool extend = false);
+			void				_SelectLineAt(const SelectionPoint& point,
+									bool extend = false);
 			void				_HandleAutoScroll();
 			void				_ScrollHorizontal(int32 charCount);
 			void				_ScrollByLines(int32 lineCount);
@@ -1051,10 +1053,12 @@ SourceView::TextView::MouseDown(BPoint where)
 			fLastClickTime = clickTime;
 		}
 
-		if (fClickCount == 2)
+		if (fClickCount == 2) {
 			_SelectWordAt(point);
-		else if (fClickCount == 3) {
+			fSelectionMode = true;
+		} else if (fClickCount == 3) {
 			_SelectLineAt(point);
+			fSelectionMode = true;
 		} else if (!region.Contains(where)) {
 			fSelectionBase = fSelectionStart = fSelectionEnd = point;
 			fSelectionMode = true;
@@ -1080,18 +1084,24 @@ SourceView::TextView::MouseMoved(BPoint where, uint32 transit,
 		switch (transit) {
 			case B_INSIDE_VIEW:
 			case B_OUTSIDE_VIEW:
-				if (point.line > fSelectionBase.line) {
-					fSelectionStart = fSelectionBase;
-					fSelectionEnd = point;
-				} else if (point.line < fSelectionBase.line) {
-					fSelectionEnd = fSelectionBase;
-					fSelectionStart = point;
-				} else if (point.offset > fSelectionBase.offset) {
-					fSelectionStart = fSelectionBase;
-					fSelectionEnd = point;
-				} else {
-					fSelectionEnd = fSelectionBase;
-					fSelectionStart = point;
+				if (fClickCount == 2)
+					_SelectWordAt(point, true);
+				else if (fClickCount == 3)
+					_SelectLineAt(point, true);
+				else {
+					if (point.line > fSelectionBase.line) {
+						fSelectionStart = fSelectionBase;
+						fSelectionEnd = point;
+					} else if (point.line < fSelectionBase.line) {
+						fSelectionEnd = fSelectionBase;
+						fSelectionStart = point;
+					} else if (point.offset > fSelectionBase.offset) {
+						fSelectionStart = fSelectionBase;
+						fSelectionEnd = point;
+					} else {
+						fSelectionEnd = fSelectionBase;
+						fSelectionStart = point;
+					}
 				}
 				break;
 
@@ -1193,7 +1203,7 @@ SourceView::TextView::_FormatLine(const char* line, BString& formattedLine)
 }
 
 
-int32 
+int32
 SourceView::TextView::_NextTabStop(int32 column) const
 {
 	return (column / kSpacesPerTab + 1) * kSpacesPerTab;
@@ -1205,12 +1215,12 @@ SourceView::TextView::_FormattedPosition(int32 line, int32 offset) const
 {
 	int32 column = 0;
 	for (int32 i = 0; i < offset; i++) {
-		if (fSourceCode->LineAt(line)[i] == '\t') 
+		if (fSourceCode->LineAt(line)[i] == '\t')
 			column = _NextTabStop(column);
 		else
 			++column;
 	}
-	
+
 	return column * fCharacterWidth;
 }
 
@@ -1224,9 +1234,9 @@ SourceView::TextView::_SelectionPointAt(BPoint where) const
 		int32 column = 0;
 		int32 lineLength = fSourceCode->LineLengthAt(line);
 		const char* sourceLine = fSourceCode->LineAt(line);
-		
+
 		for (int32 i = 0; i < lineLength; i++) {
-			if (sourceLine[i] == '\t') 
+			if (sourceLine[i] == '\t')
 				column = _NextTabStop(column);
 			else
 				++column;
@@ -1236,8 +1246,8 @@ SourceView::TextView::_SelectionPointAt(BPoint where) const
 				break;
 			}
 		}
-		
-		if (offset < 0) 
+
+		if (offset < 0)
 			offset = lineLength;
 	}
 
@@ -1336,41 +1346,76 @@ SourceView::TextView::_CopySelectionToClipboard(void) const
 
 
 void
-SourceView::TextView::_SelectWordAt(const SelectionPoint& point)
+SourceView::TextView::_SelectWordAt(const SelectionPoint& point, bool extend)
 {
 	const char* line = fSourceCode->LineAt(point.line);
-	if (isalpha(line[point.offset]) || isdigit(line[point.offset])) {
-		int32 length = fSourceCode->LineLengthAt(point.line);
-		int32 start = point.offset - 1;
-		int32 end = point.offset + 1;
-		while ((end) < length) {
-			if (!isalpha(line[end]) && !isdigit(line[end]))
-				break;
-			++end;
-		}
-		while ((start - 1) >= 0) {
-			if (!isalpha(line[start - 1]) && !isdigit(line[start - 1]))
-				break;
-			--start;
-		}
+	int32 length = fSourceCode->LineLengthAt(point.line);
+	int32 start = point.offset - 1;
+	int32 end = point.offset + 1;
+	while ((end) < length) {
+		if (!isalpha(line[end]) && !isdigit(line[end]))
+			break;
+		++end;
+	}
+	while ((start - 1) >= 0) {
+		if (!isalpha(line[start - 1]) && !isdigit(line[start - 1]))
+			break;
+		--start;
+	}
 
-		fSelectionStart.line = point.line;
-		fSelectionStart.offset = start;
+	if (extend) {
+		if (point.line >= fSelectionBase.line
+			|| (point.line == fSelectionBase.line
+				&& point.offset > fSelectionBase.offset)) {
+			fSelectionStart.line = fSelectionBase.line;
+			fSelectionStart.offset = fSelectionBase.offset;
+			fSelectionEnd.line = point.line;
+			fSelectionEnd.offset = end;
+		} else if (point.line < fSelectionBase.line) {
+			fSelectionStart.line = point.line;
+			fSelectionStart.offset = start;
+			fSelectionEnd.line = fSelectionBase.line;
+			fSelectionEnd.offset = fSelectionBase.offset;
+		} else if (point.line == fSelectionBase.line) {
+			// if we hit here, our offset is before the actual start.
+			fSelectionStart.line = point.line;
+			fSelectionStart.offset = start;
+			fSelectionEnd.line = point.line;
+			fSelectionEnd.offset = fSelectionBase.offset;
+		}
+	} else {
+		fSelectionBase.line = fSelectionStart.line = point.line;
+		fSelectionBase.offset = fSelectionStart.offset = start;
 		fSelectionEnd.line = point.line;
 		fSelectionEnd.offset = end;
-		BRegion region;
-		_GetSelectionRegion(region);
-		Invalidate(&region);
 	}
+	BRegion region;
+	_GetSelectionRegion(region);
+	Invalidate(&region);
 }
 
 
 void
-SourceView::TextView::_SelectLineAt(const SelectionPoint& point)
+SourceView::TextView::_SelectLineAt(const SelectionPoint& point, bool extend)
 {
-	fSelectionStart.line = fSelectionEnd.line = point.line;
-	fSelectionStart.offset = 0;
-	fSelectionEnd.offset = fSourceCode->LineLengthAt(point.line);
+	if (extend) {
+		if (point.line >= fSelectionBase.line) {
+			fSelectionStart.line = fSelectionBase.line;
+			fSelectionStart.offset = 0;
+			fSelectionEnd.line = point.line;
+			fSelectionEnd.offset = fSourceCode->LineLengthAt(point.line);
+		} else {
+			fSelectionStart.line = point.line;
+			fSelectionStart.offset = 0;
+			fSelectionEnd.line = fSelectionBase.line;
+			fSelectionEnd.offset = fSourceCode->LineLengthAt(
+				fSelectionBase.line);
+		}
+	} else {
+		fSelectionStart.line = fSelectionEnd.line = point.line;
+		fSelectionStart.offset = 0;
+		fSelectionEnd.offset = fSourceCode->LineLengthAt(point.line);
+	}
 	BRegion region;
 	_GetSelectionRegion(region);
 	Invalidate(&region);
@@ -1403,7 +1448,7 @@ SourceView::TextView::_HandleAutoScroll(void)
 		factor = (int)(ceilf(difference / fCharacterWidth));
 		_ScrollHorizontal(factor);
 	}
-	
+
 	MouseMoved(point, B_OUTSIDE_VIEW, NULL);
 }
 
