@@ -375,7 +375,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Firefox available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage 
 			BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01
 			: $(baseURL)/BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01.zip
@@ -400,7 +400,7 @@ if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package KeymapSwitcher available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage 
 			KeymapSwitcher-1.2.3-x86-gcc4-2009-05-31
 			:  $(baseURL)/KeymapSwitcher-1.2.3-x86-gcc4-2009-05-31.zip
@@ -437,7 +437,7 @@ if [ IsOptionalHaikuImagePackageAdded LibIconv ] {
 if [ IsOptionalHaikuImagePackageAdded LibLayout ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package LibLayout available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package LibLayout available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage liblayout-1.4.0-gcc2-2009-03-08
@@ -752,7 +752,7 @@ if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 if [ IsOptionalHaikuImagePackageAdded Vim ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Vim available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage vim-7.2-x86-gcc4-2009-05-31
 			:  $(baseURL)/vim-7.2-x86-gcc4-2009-05-31.zip
 			:
