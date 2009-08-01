@@ -35,16 +35,14 @@
 // #pragma mark - DirectoryFilter
 
 
-class DirectoryFilter : public BRefFilter
-{
+class DirectoryFilter : public BRefFilter {
 public:
-		DirectoryFilter(){};
-		virtual bool Filter(const entry_ref *ref,
-				BNode *node, struct stat *st, const char *filetype)
-		{
-			return node->IsDirectory();
-		}
-private:
+	DirectoryFilter() {};
+	virtual bool Filter(const entry_ref* ref,
+		BNode* node, struct stat_beos* st, const char* filetype)
+	{
+		return node->IsDirectory();
+	}
 };
 
 
@@ -52,9 +50,9 @@ private:
 
 
 class FileFormatMenuItem : public BMenuItem {
-	public:
-				FileFormatMenuItem(media_file_format* format);
-	virtual		~FileFormatMenuItem();
+public:
+	FileFormatMenuItem(media_file_format* format);
+	virtual ~FileFormatMenuItem();
 
 	media_file_format fFileFormat;
 };
