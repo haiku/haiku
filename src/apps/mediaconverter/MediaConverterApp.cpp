@@ -395,6 +395,18 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 				printf("fixing color space (B_RGBA32 -> B_RGB32)");
 				rvf->display.format = B_RGB32;
 			}
+			// Transfer the display aspect ratio.
+			if (inFormat.type == B_MEDIA_ENCODED_VIDEO) {
+				rvf->pixel_width_aspect
+					= inFormat.u.encoded_video.output.pixel_width_aspect;
+				rvf->pixel_height_aspect
+					= inFormat.u.encoded_video.output.pixel_height_aspect;
+			} else {
+				rvf->pixel_width_aspect
+					= inFormat.u.raw_video.pixel_width_aspect;
+				rvf->pixel_height_aspect
+					= inFormat.u.raw_video.pixel_height_aspect;
+			}
 
 			videoBuffer = new (nothrow) uint8[height * rvf->display.bytes_per_row];
 			outVidTrack = outFile->CreateTrack(&outVidFormat, videoCodec);
