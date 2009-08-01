@@ -645,8 +645,8 @@ BMessage::_PrintToStream(const char* indent) const
 					entry_ref ref;
 					BPrivate::entry_ref_unflatten(&ref, (char *)pointer, size);
 
-					printf("entry_ref(device=%ld, directory=%lld,
-						name=\"%s\", ", ref.device, ref.directory, ref.name);
+					printf("entry_ref(device=%ld, directory=%lld,"
+						"name=\"%s\", ", ref.device, ref.directory, ref.name);
 
 					BPath path(&ref);
 					printf("path=\"%s\")\n", path.Path());
