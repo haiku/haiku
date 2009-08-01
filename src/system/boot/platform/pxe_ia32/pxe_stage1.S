@@ -60,7 +60,7 @@ _start:
 
 			cld
 
-			// print start banner	
+			// print start banner
 			movw	$startmsg, %si
 			call	puts
 
@@ -77,7 +77,7 @@ _start:
 			call	puts
 
 			// switch to unreal mode
-			cli	
+			cli
 			call	enable_a20
 			call	go_unreal
 			sti
@@ -161,7 +161,7 @@ _start:
 			movw	$crlf, %si
 			call	puts
 
-			// handle DHCP options.....		
+			// handle DHCP options.....
 			movw	$PXENV_GET_CACHED_INFO, %bx
 			movw	$s_PXENV_GET_CACHED_INFO_2, %di
 			lcall *	pxenv_api
@@ -198,7 +198,7 @@ _start:
 			call	puts
 			movw	$crlf, %si
 			call	puts
-		
+
 			// get file size
 			movl	server_ip, %eax
 			movl	%eax, s_PXENV_TFTP_GET_FSIZE_ServerIPAddress
@@ -244,7 +244,7 @@ _start:
 			movw	s_PXENV_TFTP_OPEN_PacketSize, %ax
 			imull	$65535, %eax
 			movl	%eax, max_fsize
-			
+
 			// print max TFTP file size
 			movw	$maxfsize, %si
 			call	puts
@@ -382,7 +382,7 @@ err_fsize:
 			movw	$sizefailed, %si
 			call	puts
 			jmp		stop
-		
+
 err_load:
 			movw	$loadfailed, %si
 			call	puts
@@ -401,7 +401,7 @@ _puts2:		lodsb
 			ret
 putc:		movw	$0x7, %bx
 			movb	$0xe, %ah
-			int		$0x10	
+			int		$0x10
 			jmp		_puts2
 
 puthex32:

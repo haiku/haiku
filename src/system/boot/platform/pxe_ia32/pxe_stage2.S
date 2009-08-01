@@ -39,12 +39,12 @@ pxe_start:
 
 			cld
 
-			// print start banner	
+			// print start banner
 			mov		$kStartMessage + INITIAL_LOAD_OFFSET, %esi
 			call	puts
 
 			// switch to unreal mode
-			cli	
+			cli
 			call	enable_a20
 			call	go_unreal
 			sti

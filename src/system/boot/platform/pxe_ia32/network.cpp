@@ -168,7 +168,7 @@ status_t
 UNDI::Init()
 {
 	TRACE("UNDI::Init\n");
-	
+
 	PXENV_UNDI_GET_INFORMATION get_info;
 	PXENV_UNDI_GET_STATE get_state;
 	PXENV_UNDI_OPEN undi_open;
@@ -177,8 +177,8 @@ UNDI::Init()
 	status_t error = PXEService::Init();
 	if (error != B_OK)
 		return error;
-	
-	dprintf("client-ip: %lu.%lu.%lu.%lu, server-ip: %lu.%lu.%lu.%lu\n", 
+
+	dprintf("client-ip: %lu.%lu.%lu.%lu, server-ip: %lu.%lu.%lu.%lu\n",
 		(fClientIP >> 24) & 0xff, (fClientIP >> 16) & 0xff, (fClientIP >> 8) & 0xff, fClientIP & 0xff,
 		(fServerIP >> 24) & 0xff, (fServerIP >> 16) & 0xff, (fServerIP >> 8) & 0xff, fServerIP & 0xff);
 
@@ -198,16 +198,16 @@ UNDI::Init()
 		dprintf("PXENV_UNDI_GET_STATE failed, res %x, status %x, ignoring\n", res, get_state.Status);
 	} else {
 		switch (get_state.UNDIstate) {
-			case PXE_UNDI_GET_STATE_STARTED: 
+			case PXE_UNDI_GET_STATE_STARTED:
 				TRACE("PXE_UNDI_GET_STATE_STARTED\n");
 				break;
-			case PXE_UNDI_GET_STATE_INITIALIZED: 
+			case PXE_UNDI_GET_STATE_INITIALIZED:
 				TRACE("PXE_UNDI_GET_STATE_INITIALIZED\n");
 				break;
-			case PXE_UNDI_GET_STATE_OPENED: 
+			case PXE_UNDI_GET_STATE_OPENED:
 				TRACE("PXE_UNDI_GET_STATE_OPENED\n");
 				break;
-			default: 
+			default:
 				TRACE("unknown undi state 0x%02x\n", get_state.UNDIstate);
 				break;
 		}
@@ -229,7 +229,7 @@ UNDI::Init()
 	TRACE("TxBufCt = %x\n", get_info.TxBufCt);
 
 	fMACAddress = get_info.CurrentNodeAddress;
-	
+
 	TRACE("MAC: %02x:%02x:%02x:%02x:%02x:%02x\n", fMACAddress[0], fMACAddress[1], fMACAddress[2], fMACAddress[3], fMACAddress[4], fMACAddress[5]);
 
 	return B_OK;
@@ -313,7 +313,7 @@ UNDI::Receive(void *buffer, size_t size)
 			fRxFinished = true;
 			return 0;
 		}
-	
+
 	} else {
 
 		undi_isr.FuncFlag = PXENV_UNDI_ISR_IN_START;
@@ -332,7 +332,7 @@ UNDI::Receive(void *buffer, size_t size)
 		// send EOI to pic ?
 
 //		TRACE("PXENV_UNDI_ISR_OUT_OURS\n");
-	
+
 		undi_isr.FuncFlag = PXENV_UNDI_ISR_IN_PROCESS;
 		res = call_pxe_bios(fPxeData, UNDI_ISR, &undi_isr);
 		if (res != 0 || undi_isr.Status != 0) {
