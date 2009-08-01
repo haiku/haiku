@@ -10,6 +10,7 @@
 
 extern "C" {
 	#include "avcodec.h"
+	#include "swscale.h"
 }
 
 #include "EncoderPlugin.h"
@@ -51,8 +52,10 @@ private:
 			// TODO: Refactor common base class from AVCodec[De|En]Coder!
 			AVCodec*			fCodec;
 			AVCodecContext*		fContext;
-			AVFrame*			fInputPicture;
-//			AVFrame*			fOutputPicture;
+			AVPicture			fSrcFrame;
+			AVPicture			fDstFrame;
+			AVFrame*			fFrame;
+			SwsContext*			fSwsContext;
 
 			uint32				fAVCodecID;
 

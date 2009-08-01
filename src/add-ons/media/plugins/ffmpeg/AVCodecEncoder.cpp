@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 
-static const size_t kDefaultChunkBufferSize = FF_MIN_BUFFER_SIZE;
+static const size_t kDefaultChunkBufferSize = 2 * 1024 * 1024;
 
 
 AVCodecEncoder::AVCodecEncoder(uint32 codecID)
@@ -32,8 +32,8 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID)
 	Encoder(),
 	fCodec(NULL),
 	fContext(avcodec_alloc_context()),
-	fInputPicture(avcodec_alloc_frame()),
-//	fOutputPicture(avcodec_alloc_frame()),
+	fFrame(avcodec_alloc_frame()),
+	fSwsContext(NULL),
 	fCodecInitDone(false),
 	fChunkBuffer(new(std::nothrow) uint8[kDefaultChunkBufferSize])
 {
@@ -53,8 +53,25 @@ AVCodecEncoder::~AVCodecEncoder()
 	if (fCodecInitDone)
 		avcodec_close(fContext);
 
-//	free(fOutputPicture);
-	free(fInputPicture);
+	sws_freeContext(fSwsContext);
+
+	avpicture_free(&fDstFrame);
+	// NOTE: Do not use avpicture_free() on fSrcFrame!! We fill the picture
+	// data on the file with the media buffer data passed to Encode().
+
+	if (fFrame != NULL) {
+		fFrame->data[0] = NULL;
+		fFrame->data[1] = NULL;
+		fFrame->data[2] = NULL;
+		fFrame->data[3] = NULL;
+
+		fFrame->linesize[0] = 0;
+		fFrame->linesize[1] = 0;
+		fFrame->linesize[2] = 0;
+		fFrame->linesize[3] = 0;
+		free(fFrame);
+	}
+
 	free(fContext);
 
 	delete[] fChunkBuffer;
@@ -94,10 +111,15 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 	fInputFormat = *inputFormat;
 
 	if (fInputFormat.type == B_MEDIA_RAW_VIDEO) {
+		// frame rate
+		fContext->time_base.den = (int)fInputFormat.u.raw_video.field_rate;
+		fContext->time_base.num = 1;
+		// video size
 		fContext->width = fInputFormat.u.raw_video.display.line_width;
 		fContext->height = fInputFormat.u.raw_video.display.line_count;
 //		fContext->gop_size = 12;
-		fContext->pix_fmt = PIX_FMT_BGR32;
+		// TODO: Fix pixel format or setup conversion method...
+		fContext->pix_fmt = PIX_FMT_YUV420P;
 //		fContext->rate_emu = 0;
 		// TODO: Setup rate control:
 //		fContext->rc_eq = NULL;
@@ -111,11 +133,38 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 			|| fContext->sample_aspect_ratio.den == 0) {
 			av_reduce(&fContext->sample_aspect_ratio.num,
 				&fContext->sample_aspect_ratio.den, fContext->width,
-				fContext->height, 256);
+				fContext->height, 255);
 		}
 
 		// TODO: This should already happen in AcceptFormat()
-		fInputFormat.u.raw_video.display.bytes_per_row = fContext->width * 4;
+		if (fInputFormat.u.raw_video.display.bytes_per_row == 0) {
+			fInputFormat.u.raw_video.display.bytes_per_row
+				= fContext->width * 4;
+		}
+
+		fFrame->pts = 0;
+
+		// Allocate space for colorspace converted AVPicture
+		// TODO: Check allocations...
+		avpicture_alloc(&fDstFrame, fContext->pix_fmt, fContext->width,
+			fContext->height);
+
+		// Make the frame point to the data in the converted AVPicture
+		fFrame->data[0] = fDstFrame.data[0];
+		fFrame->data[1] = fDstFrame.data[1];
+		fFrame->data[2] = fDstFrame.data[2];
+		fFrame->data[3] = fDstFrame.data[3];
+
+		fFrame->linesize[0] = fDstFrame.linesize[0];
+		fFrame->linesize[1] = fDstFrame.linesize[1];
+		fFrame->linesize[2] = fDstFrame.linesize[2];
+		fFrame->linesize[3] = fDstFrame.linesize[3];
+
+		// TODO: Use actual pixel format from media_format!
+		fSwsContext = sws_getContext(fContext->width, fContext->height,
+			PIX_FMT_RGB32, fContext->width, fContext->height,
+			fContext->pix_fmt, SWS_BICUBIC, NULL, NULL, NULL);
+
 	} else {
 		return B_NOT_SUPPORTED;
 	}
@@ -153,6 +202,9 @@ AVCodecEncoder::Encode(const void* buffer, int64 frameCount,
 	media_encode_info* info)
 {
 	TRACE("AVCodecEncoder::Encode(%p, %lld, %p)\n", buffer, frameCount, info);
+
+	if (!fCodecInitDone)
+		return B_NO_INIT;
 
 	if (fInputFormat.type == B_MEDIA_RAW_AUDIO)
 		return _EncodeAudio(buffer, frameCount, info);
@@ -192,12 +244,23 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 	while (frameCount > 0) {
 		size_t bpr = fInputFormat.u.raw_video.display.bytes_per_row;
 		size_t bufferSize = fInputFormat.u.raw_video.display.line_count * bpr;
+		TRACE("  bytes per row: %ld, buffer size: %ld\n", bpr, bufferSize);
 
-		fInputPicture->data[0] = (uint8_t*)buffer;
-		fInputPicture->linesize[0] = bpr;
+		// We should always get chunky bitmaps, so this code should be safe.
+		fSrcFrame.data[0] = (uint8_t*)buffer;
+		fSrcFrame.linesize[0] = bpr;
 
+		// Run the pixel format conversion
+		sws_scale(fSwsContext, fSrcFrame.data, fSrcFrame.linesize, 0,
+			fInputFormat.u.raw_video.display.line_count, fDstFrame.data,
+			fDstFrame.linesize);
+
+		// TODO: Look into this... avcodec.h says we need to set it.
+		fFrame->pts++;
+
+		// Encode one video chunk/frame.
 		int usedBytes = avcodec_encode_video(fContext, fChunkBuffer,
-			kDefaultChunkBufferSize, fInputPicture);
+			kDefaultChunkBufferSize, fFrame);
 
 		if (usedBytes < 0) {
 			TRACE("  avcodec_encode_video() failed: %d\n", usedBytes);

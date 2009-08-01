@@ -58,7 +58,8 @@ public:
 									BLocker* streamLock);
 	virtual						~StreamCookie();
 
-			status_t			Init(const media_format* format);
+			status_t			Init(const media_format* format,
+									const media_codec_info* codecInfo);
 
 			status_t			WriteChunk(const void* chunkBuffer,
 									size_t chunkSize,
@@ -70,7 +71,8 @@ public:
 private:
 			AVFormatContext*	fContext;
 			AVStream*			fStream;
-			// Since different threads may read from the source,
+			AVPacket			fPacket;
+			// Since different threads may write to the target,
 			// we need to protect the file position and I/O by a lock.
 			BLocker*			fStreamLock;
 };
@@ -84,29 +86,64 @@ AVFormatWriter::StreamCookie::StreamCookie(AVFormatContext* context,
 	fStream(NULL),
 	fStreamLock(streamLock)
 {
+	av_new_packet(&fPacket, 0);
 }
 
 
 AVFormatWriter::StreamCookie::~StreamCookie()
 {
+	av_free_packet(&fPacket);
 }
 
 
 status_t
-AVFormatWriter::StreamCookie::Init(const media_format* format)
+AVFormatWriter::StreamCookie::Init(const media_format* format,
+	const media_codec_info* codecInfo)
 {
 	TRACE("AVFormatWriter::StreamCookie::Init()\n");
 
 	BAutolock _(fStreamLock);
 
-	fStream = av_new_stream(fContext, fContext->nb_streams);
+	fPacket.stream_index = fContext->nb_streams;
+	fStream = av_new_stream(fContext, fPacket.stream_index);
 
 	if (fStream == NULL) {
 		TRACE("  failed to add new stream\n");
 		return B_ERROR;
 	}
 
-	// TODO: Setup the stream according to the media format...
+	// Setup the stream according to the media format...
+	if (format->type == B_MEDIA_RAW_VIDEO) {
+		avcodec_get_context_defaults2(fStream->codec, CODEC_TYPE_VIDEO);
+		// frame rate
+		fStream->codec->time_base.den = (int)format->u.raw_video.field_rate;
+		fStream->codec->time_base.num = 1;
+		// video size
+		fStream->codec->width = format->u.raw_video.display.line_width;
+		fStream->codec->height = format->u.raw_video.display.line_count;
+		// pixel aspect ratio
+		fStream->sample_aspect_ratio.num
+			= format->u.raw_video.pixel_width_aspect;
+		fStream->sample_aspect_ratio.den
+			= format->u.raw_video.pixel_height_aspect;
+		if (fStream->sample_aspect_ratio.num == 0
+			|| fStream->sample_aspect_ratio.den == 0) {
+			av_reduce(&fStream->sample_aspect_ratio.num,
+				&fStream->sample_aspect_ratio.den, fStream->codec->width,
+				fStream->codec->height, 255);
+		}
+
+		fStream->codec->sample_aspect_ratio = fStream->sample_aspect_ratio;
+		// TODO: Don't hard code this...
+		fStream->codec->pix_fmt = PIX_FMT_YUV420P;
+	} else if (format->type == B_MEDIA_RAW_AUDIO) {
+		avcodec_get_context_defaults2(fStream->codec, CODEC_TYPE_AUDIO);
+		// TODO: ...
+	}
+
+	// TODO: This is a hack for now! Use avcodec_find_encoder_by_name()
+	// or something similar...
+	fStream->codec->codec_id = (CodecID)codecInfo->sub_id;
 
 	return B_OK;
 }
@@ -116,12 +153,33 @@ status_t
 AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 	size_t chunkSize, media_encode_info* encodeInfo)
 {
-	TRACE("AVFormatWriter::StreamCookie::WriteChunk(%p, %ld)\n",
+	TRACE_PACKET("AVFormatWriter::StreamCookie::WriteChunk(%p, %ld)\n",
 		chunkBuffer, chunkSize);
 
 	BAutolock _(fStreamLock);
 
-	return B_ERROR;
+	// TODO: Probably the AVCodecEncoder needs to pass packet data
+	// in encodeInfo...
+
+	fPacket.data = const_cast<uint8_t*>((const uint8_t*)chunkBuffer);
+	fPacket.size = chunkSize;
+
+#if 0
+	// TODO: Eventually, we need to write interleaved packets, but
+	// maybe we are only supposed to use this if we have actually
+	// more than one stream. For the moment, this crashes in AVPacket
+	// shuffling inside libavformat. Maybe if we want to use this, we
+	// need to allocate a separate AVPacket and copy the chunk buffer.
+	int result = av_interleaved_write_frame(fContext, &fPacket);
+	if (result < 0)
+		TRACE("  av_interleaved_write_frame(): %d\n", result);
+#else
+	int result = av_write_frame(fContext, &fPacket);
+	if (result < 0)
+		TRACE("  av_write_frame(): %d\n", result);
+#endif
+
+	return result == 0 ? B_OK : B_ERROR;
 }
 
 
@@ -183,12 +241,10 @@ AVFormatWriter::Init(const media_file_format* fileFormat)
 		return B_ERROR;
 	}
 
-	// TODO: Is this how it works?
-	// TODO: Is the cookie stored in ByteIOContext? Or does it need to be
-	// stored in fContext->priv_data?
+	// Setup I/O hooks. This seems to be enough.
 	fContext->pb = &fIOContext;
 
-	// TODO: Set the AVOutputFormat according to fileFormat...
+	// Set the AVOutputFormat according to fileFormat...
 	fContext->oformat = guess_format(fileFormat->short_name,
 		fileFormat->file_extension, fileFormat->mime_type);
 	if (fContext->oformat == NULL) {
@@ -263,7 +319,8 @@ AVFormatWriter::Close()
 
 
 status_t
-AVFormatWriter::AllocateCookie(void** _cookie, const media_format* format)
+AVFormatWriter::AllocateCookie(void** _cookie, const media_format* format,
+	const media_codec_info* codecInfo)
 {
 	TRACE("AVFormatWriter::AllocateCookie()\n");
 
@@ -275,7 +332,14 @@ AVFormatWriter::AllocateCookie(void** _cookie, const media_format* format)
 	StreamCookie* cookie = new(std::nothrow) StreamCookie(fContext,
 		&fStreamLock);
 
-	return cookie->Init(format);
+	status_t ret = cookie->Init(format, codecInfo);
+	if (ret != B_OK) {
+		delete cookie;
+		return ret;
+	}
+
+	*_cookie = cookie;
+	return B_OK;
 }
 
 
@@ -327,7 +391,7 @@ AVFormatWriter::WriteChunk(void* _cookie, const void* chunkBuffer,
 }
 
 
-// #pragma mark -
+// #pragma mark - I/O hooks
 
 
 /*static*/ int

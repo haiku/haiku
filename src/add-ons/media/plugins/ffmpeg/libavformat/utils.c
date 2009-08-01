@@ -2723,7 +2723,10 @@ int av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt){
         AVPacket opkt;
         int ret= av_interleave_packet(s, &opkt, pkt, 0);
         if(ret<=0) //FIXME cleanup needed for ret<0 ?
+{
+av_log(NULL, AV_LOG_ERROR, "av_interleaved_write_frame() - av_interleave_packet() failed.\n");
             return ret;
+}
 
         ret= s->oformat->write_packet(s, &opkt);
 
@@ -2731,9 +2734,15 @@ int av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt){
         pkt= NULL;
 
         if(ret<0)
+{
+av_log(NULL, AV_LOG_ERROR, "av_interleaved_write_frame() - write_packet() failed.\n");
             return ret;
+}
         if(url_ferror(s->pb))
+{
+av_log(NULL, AV_LOG_ERROR, "av_interleaved_write_frame() - url_ferror() failed.\n");
             return url_ferror(s->pb);
+}
     }
 }
 

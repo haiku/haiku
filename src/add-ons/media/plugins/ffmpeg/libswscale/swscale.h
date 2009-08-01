@@ -28,7 +28,6 @@
  */
 
 #include "libavutil/avutil.h"
-#include "libavutil/internal.h"
 
 #define LIBSWSCALE_VERSION_MAJOR 0
 #define LIBSWSCALE_VERSION_MINOR 7

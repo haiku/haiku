@@ -21,7 +21,8 @@ public:
 	virtual	status_t			Close() = 0;
 
 	virtual	status_t			AllocateCookie(void** cookie,
-									const media_format* format) = 0;
+									const media_format* format,
+									const media_codec_info* codecInfo) = 0;
 	virtual	status_t			FreeCookie(void* cookie) = 0;
 
 	virtual	status_t			SetCopyright(void* cookie,

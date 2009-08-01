@@ -60,7 +60,8 @@ BMediaFile::BMediaFile(const entry_ref* ref, const media_file_format* mfi,
 	CALLED();
 	_Init();
 	fDeleteSource = true;
-	_InitWriter(new(std::nothrow) BFile(ref, O_WRONLY), mfi, flags);
+	_InitWriter(new(std::nothrow) BFile(ref, B_CREATE_FILE | B_ERASE_FILE
+		| B_WRITE_ONLY), mfi, flags);
 }
 
 

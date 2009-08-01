@@ -20,22 +20,46 @@ const EncoderDescription gEncoderTable[] = {
 			CODEC_ID_MPEG4,
 			{ 0 }
 		},
-		B_ANY_FORMAT_FAMILY,
+		B_ANY_FORMAT_FAMILY, // TODO: Hm, actually not really /any/ family...
 		B_MEDIA_RAW_VIDEO,
 		B_MEDIA_ENCODED_VIDEO
 	},
 	{
 		{
-			"MP3 Audio",
-			"mp3",
+			"MPEG1 Video",
+			"mpeg1video",
 			0,
-			CODEC_ID_MP3,
+			CODEC_ID_MPEG1VIDEO,
 			{ 0 }
 		},
-		B_ANY_FORMAT_FAMILY,
-		B_MEDIA_RAW_AUDIO,
-		B_MEDIA_ENCODED_AUDIO
-	}
+		B_MPEG_FORMAT_FAMILY,
+		B_MEDIA_RAW_VIDEO,
+		B_MEDIA_ENCODED_VIDEO
+	},
+	{
+		{
+			"MPEG2 Video",
+			"mpeg2video",
+			0,
+			CODEC_ID_MPEG2VIDEO,
+			{ 0 }
+		},
+		B_MPEG_FORMAT_FAMILY,
+		B_MEDIA_RAW_VIDEO,
+		B_MEDIA_ENCODED_VIDEO
+	},
+//	{
+//		{
+//			"MP3 Audio",
+//			"mp3",
+//			0,
+//			CODEC_ID_MP3,
+//			{ 0 }
+//		},
+//		B_ANY_FORMAT_FAMILY,
+//		B_MEDIA_RAW_AUDIO,
+//		B_MEDIA_ENCODED_AUDIO
+//	}
 };
 
 const size_t gEncoderCount = sizeof(gEncoderTable) / sizeof(EncoderDescription);

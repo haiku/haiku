@@ -110,7 +110,7 @@ MediaWriter::CreateEncoder(Encoder** _encoder,
 	}
 
 	StreamInfo info;
-	ret = fWriter->AllocateCookie(&info.cookie, format);
+	ret = fWriter->AllocateCookie(&info.cookie, format, codecInfo);
 	if (ret != B_OK) {
 		_plugin_manager.DestroyEncoder(encoder);
 		return ret;

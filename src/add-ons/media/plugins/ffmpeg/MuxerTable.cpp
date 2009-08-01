@@ -24,6 +24,20 @@ const media_file_format gMuxerTable[] = {
 		"avi",
 		{ 0 }
 	},
+	{
+		media_file_format::B_WRITABLE
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_MPEG_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"video/mpeg",
+		"MPEG (Motion Picture Experts Group)",
+		"mpg",
+		"mpg",
+		{ 0 }
+	},
 };
 
 const size_t gMuxerCount = sizeof(gMuxerTable) / sizeof(media_file_format);
