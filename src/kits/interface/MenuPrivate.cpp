@@ -72,10 +72,12 @@ const unsigned char kShiftBits[] = {
 
 namespace BPrivate {
 
-BBitmap *gMenuItemAlt;
-BBitmap *gMenuItemControl;
-BBitmap *gMenuItemOption;
-BBitmap *gMenuItemShift;
+
+BBitmap* MenuPrivate::sMenuItemAlt;
+BBitmap* MenuPrivate::sMenuItemControl;
+BBitmap* MenuPrivate::sMenuItemOption;
+BBitmap* MenuPrivate::sMenuItemShift;
+
 
 MenuPrivate::MenuPrivate(BMenu *menu)
 	:
@@ -134,10 +136,11 @@ MenuPrivate::GetItemMargins(float *left, float *top,
 }
 
 
+/* static */
 bool
-MenuPrivate::IsAltCommandKey() const
+MenuPrivate::IsAltCommandKey()
 {
-	return fMenu->sAltAsCommandKey;
+	return BMenu::sAltAsCommandKey;
 }
 
 
@@ -197,21 +200,21 @@ MenuPrivate::CreateBitmaps()
 	BRect smallRect(0, 0, 16, 10);
 	BRect largeRect(0, 0, 21, 10);
 	try {
-		gMenuItemAlt = new BBitmap(smallRect, B_CMAP8);
-		gMenuItemControl = new BBitmap(smallRect, B_CMAP8);
-		gMenuItemOption = new BBitmap(smallRect, B_CMAP8);	
-		gMenuItemShift = new BBitmap(largeRect, B_CMAP8);
+		sMenuItemAlt = new BBitmap(smallRect, B_CMAP8);
+		sMenuItemControl = new BBitmap(smallRect, B_CMAP8);
+		sMenuItemOption = new BBitmap(smallRect, B_CMAP8);	
+		sMenuItemShift = new BBitmap(largeRect, B_CMAP8);
 	} catch (...) {
 		return B_NO_MEMORY;
 	}
 	
-	gMenuItemAlt->ImportBits(kAltBits, sizeof(kAltBits),
+	sMenuItemAlt->ImportBits(kAltBits, sizeof(kAltBits),
 		17, 0, B_CMAP8);
-	gMenuItemControl->ImportBits(kCtrlBits, sizeof(kCtrlBits),
+	sMenuItemControl->ImportBits(kCtrlBits, sizeof(kCtrlBits),
 		17, 0, B_CMAP8);
-	gMenuItemOption->ImportBits(kOptBits, sizeof(kOptBits),
+	sMenuItemOption->ImportBits(kOptBits, sizeof(kOptBits),
 		17, 0, B_CMAP8);
-	gMenuItemShift->ImportBits(kShiftBits, sizeof(kShiftBits),
+	sMenuItemShift->ImportBits(kShiftBits, sizeof(kShiftBits),
 		22, 0, B_CMAP8);
 	
 	return B_OK;
@@ -222,10 +225,10 @@ MenuPrivate::CreateBitmaps()
 void
 MenuPrivate::DeleteBitmaps()
 {
-	delete gMenuItemAlt;
-	delete gMenuItemControl;
-	delete gMenuItemOption;
-	delete gMenuItemShift;
+	delete sMenuItemAlt;
+	delete sMenuItemControl;
+	delete sMenuItemOption;
+	delete sMenuItemShift;
 }
 
 
@@ -234,9 +237,9 @@ const BBitmap *
 MenuPrivate::MenuItemCommand()
 {
 	if (BMenu::sAltAsCommandKey)
-		return gMenuItemAlt;
+		return sMenuItemAlt;
 	
-	return gMenuItemControl;
+	return sMenuItemControl;
 }
 
 
@@ -245,9 +248,9 @@ const BBitmap *
 MenuPrivate::MenuItemControl()
 {
 	if (BMenu::sAltAsCommandKey)
-		return gMenuItemControl;
+		return sMenuItemControl;
 	
-	return gMenuItemAlt;
+	return sMenuItemAlt;
 }
 
 
@@ -255,7 +258,7 @@ MenuPrivate::MenuItemControl()
 const BBitmap *
 MenuPrivate::MenuItemOption()
 {
-	return gMenuItemOption;
+	return sMenuItemOption;
 }
 
 
@@ -263,7 +266,7 @@ MenuPrivate::MenuItemOption()
 const BBitmap *
 MenuPrivate::MenuItemShift()
 {
-	return gMenuItemShift;
+	return sMenuItemShift;
 }
 
 

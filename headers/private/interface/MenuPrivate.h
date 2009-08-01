@@ -17,11 +17,14 @@ enum menu_states {
 	MENU_STATE_CLOSED = 5
 };
 
+
 class BBitmap;
 class BMenu;
 class BWindow;
 
 namespace BPrivate {
+
+extern const char *kEmptyMenuLabel;
 	
 class MenuPrivate {
 public:
@@ -37,7 +40,8 @@ public:
 	BRect Padding() const;
 	void GetItemMargins(float *, float *, float *, float *) const;
 
-	bool IsAltCommandKey() const;
+	static bool IsAltCommandKey();
+
 	int State(BMenuItem **item = NULL) const;
 	
 	void Install(BWindow *window);
@@ -56,16 +60,16 @@ public:
 	static const BBitmap *MenuItemShift();
 private:
 	BMenu *fMenu;	
+
+	static BBitmap *sMenuItemAlt;
+	static BBitmap *sMenuItemControl;
+	static BBitmap *sMenuItemOption;
+	static BBitmap *sMenuItemShift;
+
 };
 
-extern BBitmap *gMenuItemAlt;
-extern BBitmap *gMenuItemControl;
-extern BBitmap *gMenuItemOption;
-extern BBitmap *gMenuItemShift;
 
 };
-
-extern const char *kEmptyMenuLabel;
 
 
 // Note: since sqrt is slow, we don't use it and return the square of the distance

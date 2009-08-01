@@ -173,7 +173,7 @@ static property_info sPropList[] = {
 };
 
 
-const char *kEmptyMenuLabel = "<empty>";
+const char *BPrivate::kEmptyMenuLabel = "<empty>";
 
 
 struct BMenu::LayoutData {
@@ -2667,7 +2667,8 @@ BMenu::_UpdateWindowViewSize(bool updatePosition)
 		}
 	} else {
 		_CacheFontInfo();
-		window->ResizeTo(StringWidth(kEmptyMenuLabel) + fPad.left + fPad.right,
+		window->ResizeTo(StringWidth(BPrivate::kEmptyMenuLabel)
+			+ fPad.left + fPad.right,
 			fFontHeight + fPad.top + fPad.bottom);
 	}
 
