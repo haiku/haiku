@@ -37,35 +37,39 @@ struct screen_mode {
 
 
 class ScreenMode {
-	public:
-		ScreenMode(BWindow* window);
-		~ScreenMode();
+public:
+							ScreenMode(BWindow* window);
+							~ScreenMode();
 
-		status_t Set(const screen_mode& mode, int32 workspace = ~0);
-		status_t Get(screen_mode& mode, int32 workspace = ~0) const;
-		status_t GetOriginalMode(screen_mode &mode, int32 workspace = ~0) const;
+			status_t		Set(const screen_mode& mode, int32 workspace = ~0);
+			status_t		Get(screen_mode& mode, int32 workspace = ~0) const;
+			status_t		GetOriginalMode(screen_mode &mode,
+								int32 workspace = ~0) const;
 
-		status_t Revert();
-		void UpdateOriginalModes();
+			status_t		Revert();
+			void			UpdateOriginalModes();
 
-		bool SupportsColorSpace(const screen_mode& mode, color_space space);
-		status_t GetRefreshLimits(const screen_mode& mode, float& min,
-			float& max);
-		status_t GetMonitorInfo(monitor_info& info, float* _diagonalInches);
+			bool			SupportsColorSpace(const screen_mode& mode,
+								color_space space);
+			status_t		GetRefreshLimits(const screen_mode& mode,
+								float& min, float& max);
+			status_t		GetMonitorInfo(monitor_info& info,
+								float* _diagonalInches = NULL);
 
-		screen_mode ModeAt(int32 index);
-		int32 CountModes();
+			screen_mode		ModeAt(int32 index);
+			int32			CountModes();
 
-	private:
-		bool GetDisplayMode(const screen_mode& mode, display_mode& displayMode);
+private:
+			bool			_GetDisplayMode(const screen_mode& mode,
+								display_mode& displayMode);
 
-		BWindow*		fWindow;
-		display_mode*	fModeList;
-		uint32			fModeCount;
+			BWindow*		fWindow;
+			display_mode*	fModeList;
+			uint32			fModeCount;
 
-		bool			fUpdatedModes;
-		display_mode	fOriginalDisplayMode[32];
-		screen_mode		fOriginal[32];
+			bool			fUpdatedModes;
+			display_mode	fOriginalDisplayMode[32];
+			screen_mode		fOriginal[32];
 };
 
 #endif	/* SCREEN_MODE_H */

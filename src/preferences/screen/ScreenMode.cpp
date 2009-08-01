@@ -202,7 +202,7 @@ ScreenMode::Set(const screen_mode& mode, int32 workspace)
 	SetTVStandard(&screen, mode.tv_standard);
 
 	display_mode displayMode;
-	if (!GetDisplayMode(mode, displayMode))
+	if (!_GetDisplayMode(mode, displayMode))
 		return B_ENTRY_NOT_FOUND;
 
 	return screen.SetMode(workspace, &displayMode, true);
@@ -309,7 +309,7 @@ ScreenMode::GetRefreshLimits(const screen_mode& mode, float& min, float& max)
 {
 	uint32 minClock, maxClock;
 	display_mode displayMode;
-	if (!GetDisplayMode(mode, displayMode))
+	if (!_GetDisplayMode(mode, displayMode))
 		return B_ERROR;
 
 	BScreen screen(fWindow);
@@ -344,10 +344,15 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 	uint32 id = (info.vendor[0] << 24) | (info.vendor[1] << 16)
 		| (info.vendor[2] << 8) | (info.vendor[3]);
 
-	// TODO: replace more vendor strings with something readable
 	switch (id) {
 		case 'ADI\0':
 			strcpy(info.vendor, "ADI MicroScan");
+			break;
+		case 'API\0':
+			strcpy(info.vendor, "Acer");
+			break;
+		case 'APP\0':
+			strcpy(info.vendor, "Apple");
 			break;
 		case 'AUO\0':
 			strcpy(info.vendor, "AU Optronics");
@@ -355,9 +360,25 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'BNQ\0':
 			strcpy(info.vendor, "BenQ");
 			break;
+		case 'CPL\0':
+			strcpy(info.vendor, "ALFA");
+			break;
+		case 'CPQ\0':
+			strcpy(info.vendor, "Compaq");
+			break;
+		case 'DEL\0':
+			strcpy(info.vendor, "Dell");
+			break;
+		case 'DPC\0':
+			strcpy(info.vendor, "Delta Electronics");
+			break;
+		case 'DWE\0':
+			strcpy(info.vendor, "Daewoo");
+			break;
 		case 'EMA\0':
 			strcpy(info.vendor, "eMachines");
 			break;
+		case 'EIZ\0':
 		case 'ENC\0':
 			strcpy(info.vendor, "Eizo");
 			break;
@@ -367,14 +388,51 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'GSM\0':
 			strcpy(info.vendor, "LG");
 			break;
+		case 'HEI\0':
+			strcpy(info.vendor, "Hyundai");
+			break;
+		case 'HIT\0':
+		case 'HTC\0':
+			strcpy(info.vendor, "Hitachi");
+			break;
+		case 'HSL\0':
+			strcpy(info.vendor, "Hansol");
+			break;
 		case 'HWP\0':
 			strcpy(info.vendor, "Hewlett Packard");
+			break;
+		case 'ICL\0':
+			strcpy(info.vendor, "Fujitsu");
+			break;
+		case 'IVM\0':
+			strcpy(info.vendor, "Iiyama");
 			break;
 		case 'LEN\0':
 			strcpy(info.vendor, "Lenovo");
 			break;
+		case 'MAX\0':
+			strcpy(info.vendor, "Maxdata");
+			break;
 		case 'MED\0':
 			strcpy(info.vendor, "Medion");
+			break;
+		case 'MEI\0':
+			strcpy(info.vendor, "Panasonic");
+			break;
+		case 'MEL\0':
+			strcpy(info.vendor, "Mitsubishi");
+			break;
+		case 'MIR\0':
+			strcpy(info.vendor, "miro");
+			break;
+		case 'MTC\0':
+			strcpy(info.vendor, "Mitac");
+			break;
+		case 'NAN\0':
+			strcpy(info.vendor, "Nanao");
+			break;
+		case 'NOK\0':
+			strcpy(info.vendor, "Nokia");
 			break;
 		case 'PHL\0':
 			strcpy(info.vendor, "Philips");
@@ -385,8 +443,20 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'SAM\0':
 			strcpy(info.vendor, "Samsung");
 			break;
+		case 'SDI\0':
+			strcpy(info.vendor, "Samtron");
+			break;
 		case 'SHP\0':
 			strcpy(info.vendor, "Sharp");
+			break;
+		case 'SNI\0':
+			strcpy(info.vendor, "Siemens");
+			break;
+		case 'SNY\0':
+			strcpy(info.vendor, "Sony");
+			break;
+		case 'UNM\0':
+			strcpy(info.vendor, "Unisys");
 			break;
 		case 'VIZ\0':
 			strcpy(info.vendor, "Vizio");
@@ -431,7 +501,7 @@ ScreenMode::CountModes()
 
 
 bool
-ScreenMode::GetDisplayMode(const screen_mode& mode, display_mode& displayMode)
+ScreenMode::_GetDisplayMode(const screen_mode& mode, display_mode& displayMode)
 {
 	uint16 virtualWidth, virtualHeight;
 	int32 bestIndex = -1;
