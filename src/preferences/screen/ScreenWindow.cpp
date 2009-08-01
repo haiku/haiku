@@ -310,7 +310,16 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		fRefreshMenu->AddItem(item = new BMenuItem(name.String(), message));
 		item->SetEnabled(false);
 	} else {
+		monitor_info info;
+		if (fScreenMode.GetMonitorInfo(info) == B_OK) {
+			min = max_c(info.min_vertical_frequency, min);
+			max = min_c(info.max_vertical_frequency, max);
+		}
+
 		for (int32 i = 0; i < kRefreshRateCount; ++i) {
+			if (kRefreshRates[i] < min || kRefreshRates[i] > max)
+				continue;
+
 			BString name;
 			name << kRefreshRates[i] << " Hz";
 
@@ -880,8 +889,15 @@ ScreenWindow::MessageReceived(BMessage* message)
 			if (max > gMaxRefresh)
 				max = gMaxRefresh;
 
+			monitor_info info;
+			if (fScreenMode.GetMonitorInfo(info) == B_OK) {
+				min = max_c(info.min_vertical_frequency, min);
+				max = min_c(info.max_vertical_frequency, max);
+			}
+
 			RefreshWindow *fRefreshWindow = new RefreshWindow(
-				fRefreshField->ConvertToScreen(B_ORIGIN), fSelected.refresh, min, max);
+				fRefreshField->ConvertToScreen(B_ORIGIN), fSelected.refresh,
+				min, max);
 			fRefreshWindow->Show();
 			break;
 		}
