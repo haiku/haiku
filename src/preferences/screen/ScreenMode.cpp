@@ -348,6 +348,7 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'ADI\0':
 			strcpy(info.vendor, "ADI MicroScan");
 			break;
+		case 'ACR\0':
 		case 'API\0':
 			strcpy(info.vendor, "Acer");
 			break;
@@ -382,12 +383,19 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'ENC\0':
 			strcpy(info.vendor, "Eizo");
 			break;
+		case 'EPI\0':
+			strcpy(info.vendor, "Envision Peripherals");
+			break;
+		case 'FCM\0':
+			strcpy(info.vendor, "Funai Electronics");
+			break;
 		case 'FUS\0':
 			strcpy(info.vendor, "Fujitsu-Siemens");
 			break;
 		case 'GSM\0':
 			strcpy(info.vendor, "LG");
 			break;
+		case 'HIQ\0':
 		case 'HEI\0':
 			strcpy(info.vendor, "Hyundai");
 			break;
@@ -409,6 +417,9 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 			break;
 		case 'LEN\0':
 			strcpy(info.vendor, "Lenovo");
+			break;
+		case 'LPL\0':
+			strcpy(info.vendor, "LG Phillips");
 			break;
 		case 'MAX\0':
 			strcpy(info.vendor, "Maxdata");
@@ -436,6 +447,9 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 			break;
 		case 'PHL\0':
 			strcpy(info.vendor, "Philips");
+			break;
+		case 'PTS\0':
+			strcpy(info.vendor, "Proview");
 			break;
 		case 'QDS\0':
 			strcpy(info.vendor, "Quanta Display");
