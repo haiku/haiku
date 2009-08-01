@@ -16,6 +16,32 @@
 
 #define GLOBAL(x) .globl x ; x
 
+// GRUB-compatible MultiBoot info
+// we use the official names
+#define MULTIBOOT_MAGIC 0x1badb002
+#define MULTIBOOT_MAGIC2 0x2badb002
+// header flags
+#define MULTIBOOT_PAGE_ALIGN 0x00000001
+#define MULTIBOOT_MEMORY_INFO 0x00000002
+#define MULTIBOOT_VIDEO_MODE 0x00000004
+#define MULTIBOOT_AOUT_KLUDGE 0x00010000
+// info flags
+#define MULTIBOOT_INFO_BOOTDEV 0x00000002
+
+#define OUR_MB_FLAGS (MULTIBOOT_PAGE_ALIGN \
+	| MULTIBOOT_MEMORY_INFO \
+	/*| MULTIBOOT_VIDEO_MODE*/ \
+	| MULTIBOOT_AOUT_KLUDGE)
+
+// load address
+#define LOAD_SEGMENT 0x1000
+#define LOAD_ADDRESS 0x10000
+
+// MultiBoot load address
+#define MB_LOAD_ADDRESS 0x100000
+//#define MB_LOAD_ADDRESS LOAD_ADDRESS
+#define MB_LOAD_OFFSET (MB_LOAD_ADDRESS - LOAD_ADDRESS)
+
 // this saves us some trouble with relocation (I didn't manage GAS to
 // create 32 bit references to labels)
 #define FAILURE_STRING 0x1d0
@@ -283,6 +309,36 @@ _protected_code_segment:
 
 //--------------------------------------------------------------
 
+/** MultiBoot entry point
+ */
+
+multiboot_start:
+	//subl		$MULTIBOOT_MAGIC2, %eax
+	//jnz		load_failed		// rts to grub ?
+	movl		%ebx, gMultiBootInfo + MB_LOAD_OFFSET
+	// load the GDT
+	lgdt		gdt_descriptor + MB_LOAD_OFFSET
+
+#if MB_LOAD_ADDRESS != LOAD_ADDRESS
+	// QEMU does not like the real load address...
+	// copy ourselves to the expected location
+	cld
+	mov		$(_end - LOAD_ADDRESS), %ecx
+	add		$3, %ecx
+	shr		$2, %ecx
+	mov		$LOAD_ADDRESS, %edi
+	mov		$MB_LOAD_ADDRESS, %esi
+	rep movsl
+
+	// reload the GDT just in case
+	lgdt		gdt_descriptor
+#endif
+
+relocated_mb_start:
+	ljmp		$0x8, $_protected_code_segment
+
+//--------------------------------------------------------------
+
 /** Enables the a20 gate. It will first try to enable it through
  *	the BIOS, and, if that fails, will use the old style AT mechanism
  *	using the keyboard port.
@@ -331,10 +387,27 @@ _a20_done:
 
 //--------------------------------------------------------------
 
-.org 896
+.org 856
 	// since we don't need the above space when the boot loader is
 	// running, it is used as a real mode scratch buffer (as our
 	// boot loader spans over the whole real mode 0x1000 segment)
+
+.align 4
+multiboot_header:
+	.long	MULTIBOOT_MAGIC
+	.long	OUR_MB_FLAGS
+	.long	(0 - MULTIBOOT_MAGIC - OUR_MB_FLAGS)		// checksum (8 bytes)
+	.long	multiboot_header + MB_LOAD_OFFSET
+	.long	.text + MB_LOAD_OFFSET
+	.long	.bss + (MB_LOAD_OFFSET - 24)
+	.long	_end + (MB_LOAD_OFFSET - 24)
+	.long	multiboot_start + MB_LOAD_OFFSET
+#if (OUR_MB_FLAGS & MULTIBOOT_VIDEO_MODE)
+	.long	0	// non text mode
+	.long	1024
+	.long	786
+	.long	24
+#endif
 
 /* global data table */
 
@@ -371,6 +444,9 @@ GLOBAL(gBootDriveID):
 	.byte	0
 
 GLOBAL(gBootPartitionOffset):
+	.long	0
+
+GLOBAL(gMultiBootInfo):
 	.long	0
 
 .org 1024
