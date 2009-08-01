@@ -131,6 +131,7 @@ private:
 
 			bool				_MessageNeedsAllWindowsLocked(uint32 code) const;
 
+			void				_DirectWindowSetFullScreen(bool set);
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,
 									BRegion& region, bool inverse,

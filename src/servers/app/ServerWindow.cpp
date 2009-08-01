@@ -126,8 +126,9 @@ struct direct_window_data {
 	sem_id	sem;
 	sem_id	sem_ack;
 	area_id	area;
-	bool	started;
+	BRect	old_window_frame;
 	direct_buffer_info *buffer_info;
+	bool	started;
 };
 
 
@@ -136,8 +137,8 @@ direct_window_data::direct_window_data()
 	sem(-1),
 	sem_ack(-1),
 	area(-1),
-	started(false),
-	buffer_info(NULL)
+	buffer_info(NULL),
+	started(false)
 {
 	area = create_area("direct area", (void **)&buffer_info,
 		B_ANY_ADDRESS, B_PAGE_SIZE, B_NO_LOCK, B_READ_WRITE);
@@ -1164,19 +1165,13 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_DIRECT_WINDOW_SET_FULLSCREEN:
 		{
-			// TODO: maybe there is more to do than this?
-			// (like resizing it to screen size?)
 			bool enable;
 			link.Read<bool>(&enable);
 
 			status_t status = B_OK;
 			if (!fWindow->IsOffscreenWindow()) {
 //fDesktop->UnlockSingleWindow();
-				if (enable)
-					fDirectWindowFeel = fWindow->Feel();
-
-				fDesktop->SetWindowFeel(fWindow,
-					enable ? kWindowScreenFeel : fDirectWindowFeel);
+				_DirectWindowSetFullScreen(enable);	
 //fDesktop->LockSingleWindow();
 			} else
 				status = B_BAD_TYPE;
@@ -3717,6 +3712,36 @@ ServerWindow::_MessageNeedsAllWindowsLocked(uint32 code) const
 		default:
 			return false;
 	}
+}
+
+
+void
+ServerWindow::_DirectWindowSetFullScreen(bool enable)
+{
+	if (enable) {
+		fDirectWindowData->old_window_frame = fWindow->Frame();
+		BRect screenFrame =
+			fDesktop->ActiveScreen()->Frame();
+		fDirectWindowFeel = fWindow->Feel();
+		fDesktop->MoveWindowBy(fWindow,
+			- fWindow->Frame().left,
+			- fWindow->Frame().top);
+		fDesktop->ResizeWindowBy(fWindow,
+			screenFrame.Width() - fWindow->Frame().Width(),
+			screenFrame.Height() 
+				- fWindow->Frame().Height());
+	} else {
+		const BRect &oldFrame = fDirectWindowData->old_window_frame;
+		fDesktop->MoveWindowBy(fWindow,
+			oldFrame.left - fWindow->Frame().left,
+			oldFrame.top - fWindow->Frame().top);
+		fDesktop->ResizeWindowBy(fWindow,
+			oldFrame.Width() - fWindow->Frame().Width(),
+			oldFrame.Height() - fWindow->Frame().Height());			
+	}
+
+	fDesktop->SetWindowFeel(fWindow,
+		enable ? kWindowScreenFeel : fDirectWindowFeel);
 }
 
 
