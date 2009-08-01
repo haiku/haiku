@@ -120,7 +120,8 @@ extern void		debug_stop_screen_debug_output(void);
 extern void		debug_set_page_fault_info(addr_t faultAddress, addr_t pc,
 					uint32 flags);
 extern debug_page_fault_info* debug_get_page_fault_info();
-extern void		debug_trap_cpu_in_kdl(bool returnIfHandedOver);
+extern void		debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver);
+extern void		debug_double_fault(int32 cpu);
 extern bool		debug_emergency_key_pressed(char key);
 
 extern char		kgetc(void);

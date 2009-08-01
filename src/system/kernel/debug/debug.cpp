@@ -7,7 +7,9 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 /*! This file contains the debugger and debug output facilities */
+
 
 #include "blue_screen.h"
 
@@ -662,12 +664,17 @@ kgets(char* buffer, int length)
 
 
 static void
-kernel_debugger_loop(void)
+kernel_debugger_loop(const char* message, int32 cpu)
 {
 	int32 previousCPU = sDebuggerOnCPU;
-	sDebuggerOnCPU = smp_get_current_cpu();
+	sDebuggerOnCPU = cpu;
 
 	DebugAllocPool* allocPool = create_debug_alloc_pool();
+
+	sCurrentKernelDebuggerMessage = message;
+
+	if (message)
+		kprintf("PANIC: %s\n", message);
 
 	kprintf("Welcome to Kernel Debugging Land...\n");
 
@@ -741,11 +748,11 @@ kernel_debugger_loop(void)
 
 
 static void
-enter_kernel_debugger(const char* message)
+enter_kernel_debugger(int32 cpu)
 {
 	while (atomic_add(&sInDebugger, 1) > 0) {
 		// The debugger is already running, find out where...
-		if (sDebuggerOnCPU == smp_get_current_cpu()) {
+		if (sDebuggerOnCPU == cpu) {
 			// We are re-entering the debugger on the same CPU.
 			break;
 		}
@@ -755,19 +762,18 @@ enter_kernel_debugger(const char* message)
 		// blocking there until everyone leaves the debugger and we can
 		// try to enter it again.
 		atomic_add(&sInDebugger, -1);
-		smp_intercpu_int_handler();
+		smp_intercpu_int_handler(cpu);
 	}
 
-	arch_debug_save_registers(&dbg_register_file[smp_get_current_cpu()][0]);
+	arch_debug_save_registers(&dbg_register_file[cpu][0]);
 	sPreviousDprintfState = set_dprintf_enabled(true);
 
-	if (!gKernelStartup && sDebuggerOnCPU != smp_get_current_cpu()
-		&& smp_get_num_cpus() > 1) {
+	if (!gKernelStartup && sDebuggerOnCPU != cpu && smp_get_num_cpus() > 1) {
 		// First entry on a MP system, send a halt request to all of the other
 		// CPUs. Should they try to enter the debugger they will be cought in
 		// the loop above.
-		smp_send_broadcast_ici(SMP_MSG_CPU_HALT, 0, 0, 0, NULL,
-			SMP_MSG_FLAG_SYNC);
+		smp_send_broadcast_ici_interrupts_disabled(cpu, SMP_MSG_CPU_HALT, 0, 0,
+			0, NULL, SMP_MSG_FLAG_SYNC);
 	}
 
 	if (sBlueScreenOutput) {
@@ -778,11 +784,6 @@ enter_kernel_debugger(const char* message)
 	sDebugOutputFilter = &gDefaultDebugOutputFilter;
 
 	sDebuggedThread = NULL;
-
-	if (message)
-		kprintf("PANIC: %s\n", message);
-
-	sCurrentKernelDebuggerMessage = message;
 
 	// sort the commands
 	sort_debugger_commands();
@@ -818,6 +819,33 @@ hand_over_kernel_debugger()
 	sHandOverKDL = true;
 	while (sHandOverKDLToCPU >= 0)
 		PAUSE();
+}
+
+
+static void
+kernel_debugger_internal(const char* message, int32 cpu)
+{
+	while (true) {
+		if (sHandOverKDLToCPU == cpu) {
+			sHandOverKDLToCPU = -1;
+			sHandOverKDL = false;
+		} else
+			enter_kernel_debugger(cpu);
+
+		kernel_debugger_loop(message, cpu);
+
+		if (sHandOverKDLToCPU < 0) {
+			exit_kernel_debugger();
+			break;
+		}
+
+		hand_over_kernel_debugger();
+
+		debug_trap_cpu_in_kdl(cpu, true);
+
+		if (sHandOverKDLToCPU != cpu)
+			break;
+	}
 }
 
 
@@ -1326,11 +1354,9 @@ debug_get_page_fault_info()
 
 
 void
-debug_trap_cpu_in_kdl(bool returnIfHandedOver)
+debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver)
 {
 	InterruptsLocker locker;
-
-	int cpu = smp_get_current_cpu();
 
 	// return, if we've been called recursively (we call
 	// smp_intercpu_int_handler() below)
@@ -1344,12 +1370,19 @@ debug_trap_cpu_in_kdl(bool returnIfHandedOver)
 			if (returnIfHandedOver)
 				break;
 
-			kernel_debugger(NULL);
+			kernel_debugger_internal(NULL, cpu);
 		} else
-			smp_intercpu_int_handler();
+			smp_intercpu_int_handler(cpu);
 	}
 
 	sCPUTrapped[cpu] = false;
+}
+
+
+void
+debug_double_fault(int32 cpu)
+{
+	kernel_debugger_internal("Double Fault!\n", cpu);
 }
 
 
@@ -1407,27 +1440,7 @@ kernel_debugger(const char* message)
 {
 	cpu_status state = disable_interrupts();
 
-	while (true) {
-		if (sHandOverKDLToCPU == smp_get_current_cpu()) {
-			sHandOverKDLToCPU = -1;
-			sHandOverKDL = false;
-		} else
-			enter_kernel_debugger(message);
-
-		kernel_debugger_loop();
-
-		if (sHandOverKDLToCPU < 0) {
-			exit_kernel_debugger();
-			break;
-		}
-
-		hand_over_kernel_debugger();
-
-		debug_trap_cpu_in_kdl(true);
-
-		if (sHandOverKDLToCPU != smp_get_current_cpu())
-			break;
-	}
+	kernel_debugger_internal(message, smp_get_current_cpu());
 
 	restore_interrupts(state);
 }

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -174,7 +175,7 @@ static const int kInterruptNameCount = 20;
 typedef struct {
 	uint32 a, b;
 } desc_table;
-static desc_table *sIDT = NULL;
+static desc_table* sIDTs[B_MAX_CPU_COUNT];
 
 static uint32 sLevelTriggeredInterrupts = 0;
 	// binary mask: 1 level, 0 edge
@@ -186,6 +187,8 @@ interrupt_handler_function* gInterruptHandlerTable[
 	INTERRUPT_HANDLER_TABLE_SIZE];
 
 
+/*!	Initializes a descriptor in an IDT.
+*/
 static void
 set_gate(desc_table *gate_addr, addr_t addr, int type, int dpl)
 {
@@ -200,25 +203,45 @@ set_gate(desc_table *gate_addr, addr_t addr, int type, int dpl)
 }
 
 
+/*!	Initializes the descriptor for interrupt vector \a n in the IDT of the
+	boot CPU to an interrupt-gate descriptor with the given procedure address.
+*/
 static void
-set_intr_gate(int n, void *addr)
+set_interrupt_gate(int n, void (*addr)())
 {
-	set_gate(&sIDT[n], (addr_t)addr, 14, DPL_KERNEL);
+	set_gate(&sIDTs[0][n], (addr_t)addr, 14, DPL_KERNEL);
 }
 
 
+/*!	Initializes the descriptor for interrupt vector \a n in the IDT of the
+	boot CPU to an trap-gate descriptor with the given procedure address.
+*/
 static void
-set_system_gate(int n, void *addr)
+set_trap_gate(int n, void (*addr)())
 {
-	set_gate(&sIDT[n], (unsigned int)addr, 15, DPL_USER);
+	set_gate(&sIDTs[0][n], (unsigned int)addr, 15, DPL_USER);
 }
 
 
+/*!	Initializes the descriptor for interrupt vector \a n in the IDT of CPU
+	\a cpu to a task-gate descripter referring to the TSS segment identified
+	by TSS segment selector \a segment.
+	For CPUs other than the boot CPU it must not be called before
+	arch_int_init_post_vm() (arch_cpu_init_post_vm() is fine).
+*/
 void
-x86_set_task_gate(int32 n, int32 segment)
+x86_set_task_gate(int32 cpu, int32 n, int32 segment)
 {
-	sIDT[n].a = (segment << 16);
-	sIDT[n].b = 0x8000 | (0 << 13) | (0x5 << 8); // present, dpl 0, type 5
+	sIDTs[cpu][n].a = (segment << 16);
+	sIDTs[cpu][n].b = 0x8000 | (0 << 13) | (0x5 << 8); // present, dpl 0, type 5
+}
+
+
+/*!	Returns the virtual IDT address for CPU \a cpu. */
+void*
+x86_get_idt(int32 cpu)
+{
+	return sIDTs[cpu];
 }
 
 
@@ -446,7 +469,7 @@ ioapic_enable_io_interrupt(int32 num)
 {
 	uint64 entry;
 	int32 pin = sIRQToIOAPICPin[num];
-	if (pin < 0 || pin > sIOAPICMaxRedirectionEntry)
+	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
 		return;
 
 	TRACE(("ioapic_enable_io_interrupt: IRQ %ld -> pin %ld\n", num, pin));
@@ -463,7 +486,7 @@ ioapic_disable_io_interrupt(int32 num)
 {
 	uint64 entry;
 	int32 pin = sIRQToIOAPICPin[num];
-	if (pin < 0 || pin > sIOAPICMaxRedirectionEntry)
+	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
 		return;
 
 	TRACE(("ioapic_disable_io_interrupt: IRQ %ld -> pin %ld\n", num, pin));
@@ -480,7 +503,7 @@ ioapic_configure_io_interrupt(int32 num, uint32 config)
 {
 	uint64 entry;
 	int32 pin = sIRQToIOAPICPin[num];
-	if (pin < 0 || pin > sIOAPICMaxRedirectionEntry)
+	if (pin < 0 || pin > (int32)sIOAPICMaxRedirectionEntry)
 		return;
 
 	TRACE(("ioapic_configure_io_interrupt: IRQ %ld -> pin %ld; config 0x%08lx\n",
@@ -799,16 +822,18 @@ unexpected_exception(struct iframe* frame)
 }
 
 
-static void
-double_fault_exception(struct iframe* frame)
+void
+x86_double_fault_exception(struct iframe* frame)
 {
+	int cpu = x86_double_fault_get_cpu();
+
 	// The double fault iframe contains no useful information (as
 	// per Intel's architecture spec). Thus we simply save the
-	// information from the (unhandable) exception which caused the
+	// information from the (unhandlable) exception which caused the
 	// double in our iframe. This will result even in useful stack
 	// traces. Only problem is that we trust that at least the
 	// TSS is still accessible.
-	struct tss *tss = &gCPU[smp_get_current_cpu()].arch.tss;
+	struct tss *tss = &gCPU[cpu].arch.tss;
 
 	frame->cs = tss->cs;
 	frame->es = tss->es;
@@ -826,7 +851,7 @@ double_fault_exception(struct iframe* frame)
 	frame->edi = tss->edi;
 	frame->flags = tss->eflags;
 
-	panic("double fault!\n");
+	debug_double_fault(cpu);
 }
 
 
@@ -941,65 +966,65 @@ arch_int_init(struct kernel_args *args)
 	interrupt_handler_function** table;
 
 	// set the global sIDT variable
-	sIDT = (desc_table *)args->arch_args.vir_idt;
+	sIDTs[0] = (desc_table *)args->arch_args.vir_idt;
 
 	// setup the standard programmable interrupt controller
 	pic_init();
 
-	set_intr_gate(0,  &trap0);
-	set_intr_gate(1,  &trap1);
-	set_intr_gate(2,  &trap2);
-	set_system_gate(3,  &trap3);
-	set_intr_gate(4,  &trap4);
-	set_intr_gate(5,  &trap5);
-	set_intr_gate(6,  &trap6);
-	set_intr_gate(7,  &trap7);
+	set_interrupt_gate(0,  &trap0);
+	set_interrupt_gate(1,  &trap1);
+	set_interrupt_gate(2,  &trap2);
+	set_trap_gate(3,  &trap3);
+	set_interrupt_gate(4,  &trap4);
+	set_interrupt_gate(5,  &trap5);
+	set_interrupt_gate(6,  &trap6);
+	set_interrupt_gate(7,  &trap7);
 	// trap8 (double fault) is set in arch_cpu.c
-	set_intr_gate(9,  &trap9);
-	set_intr_gate(10,  &trap10);
-	set_intr_gate(11,  &trap11);
-	set_intr_gate(12,  &trap12);
-	set_intr_gate(13,  &trap13);
-	set_intr_gate(14,  &trap14);
-//	set_intr_gate(15,  &trap15);
-	set_intr_gate(16,  &trap16);
-	set_intr_gate(17,  &trap17);
-	set_intr_gate(18,  &trap18);
-	set_intr_gate(19,  &trap19);
+	set_interrupt_gate(9,  &trap9);
+	set_interrupt_gate(10,  &trap10);
+	set_interrupt_gate(11,  &trap11);
+	set_interrupt_gate(12,  &trap12);
+	set_interrupt_gate(13,  &trap13);
+	set_interrupt_gate(14,  &trap14);
+//	set_interrupt_gate(15,  &trap15);
+	set_interrupt_gate(16,  &trap16);
+	set_interrupt_gate(17,  &trap17);
+	set_interrupt_gate(18,  &trap18);
+	set_interrupt_gate(19,  &trap19);
 
-	set_intr_gate(32,  &trap32);
-	set_intr_gate(33,  &trap33);
-	set_intr_gate(34,  &trap34);
-	set_intr_gate(35,  &trap35);
-	set_intr_gate(36,  &trap36);
-	set_intr_gate(37,  &trap37);
-	set_intr_gate(38,  &trap38);
-	set_intr_gate(39,  &trap39);
-	set_intr_gate(40,  &trap40);
-	set_intr_gate(41,  &trap41);
-	set_intr_gate(42,  &trap42);
-	set_intr_gate(43,  &trap43);
-	set_intr_gate(44,  &trap44);
-	set_intr_gate(45,  &trap45);
-	set_intr_gate(46,  &trap46);
-	set_intr_gate(47,  &trap47);
-	set_intr_gate(48,  &trap48);
-	set_intr_gate(49,  &trap49);
-	set_intr_gate(50,  &trap50);
-	set_intr_gate(51,  &trap51);
-	set_intr_gate(52,  &trap52);
-	set_intr_gate(53,  &trap53);
-	set_intr_gate(54,  &trap54);
-	set_intr_gate(55,  &trap55);
+	set_interrupt_gate(32,  &trap32);
+	set_interrupt_gate(33,  &trap33);
+	set_interrupt_gate(34,  &trap34);
+	set_interrupt_gate(35,  &trap35);
+	set_interrupt_gate(36,  &trap36);
+	set_interrupt_gate(37,  &trap37);
+	set_interrupt_gate(38,  &trap38);
+	set_interrupt_gate(39,  &trap39);
+	set_interrupt_gate(40,  &trap40);
+	set_interrupt_gate(41,  &trap41);
+	set_interrupt_gate(42,  &trap42);
+	set_interrupt_gate(43,  &trap43);
+	set_interrupt_gate(44,  &trap44);
+	set_interrupt_gate(45,  &trap45);
+	set_interrupt_gate(46,  &trap46);
+	set_interrupt_gate(47,  &trap47);
+	set_interrupt_gate(48,  &trap48);
+	set_interrupt_gate(49,  &trap49);
+	set_interrupt_gate(50,  &trap50);
+	set_interrupt_gate(51,  &trap51);
+	set_interrupt_gate(52,  &trap52);
+	set_interrupt_gate(53,  &trap53);
+	set_interrupt_gate(54,  &trap54);
+	set_interrupt_gate(55,  &trap55);
 
-	set_system_gate(98, &trap98);	// for performance testing only
-	set_system_gate(99, &trap99);
+	set_trap_gate(98, &trap98);	// for performance testing only
+	set_trap_gate(99, &trap99);
 
-	set_intr_gate(251, &trap251);
-	set_intr_gate(252, &trap252);
-	set_intr_gate(253, &trap253);
-	set_intr_gate(254, &trap254);
-	set_intr_gate(255, &trap255);
+	set_interrupt_gate(251, &trap251);
+	set_interrupt_gate(252, &trap252);
+	set_interrupt_gate(253, &trap253);
+	set_interrupt_gate(254, &trap254);
+	set_interrupt_gate(255, &trap255);
 
 	// init interrupt handler table
 	table = gInterruptHandlerTable;
@@ -1018,7 +1043,7 @@ arch_int_init(struct kernel_args *args)
 	table[5] = unexpected_exception;	// BOUND Range Exceeded Exception (#BR)
 	table[6] = unexpected_exception;	// Invalid Opcode Exception (#UD)
 	table[7] = fatal_exception;			// Device Not Available Exception (#NM)
-	table[8] = double_fault_exception;	// Double Fault Exception (#DF)
+	table[8] = x86_double_fault_exception; // Double Fault Exception (#DF)
 	table[9] = fatal_exception;			// Coprocessor Segment Overrun
 	table[10] = fatal_exception;		// Invalid TSS Exception (#TS)
 	table[11] = fatal_exception;		// Segment Not Present (#NP)
@@ -1037,13 +1062,33 @@ arch_int_init(struct kernel_args *args)
 status_t
 arch_int_init_post_vm(struct kernel_args *args)
 {
-	area_id area;
-
 	ioapic_init(args);
 
-	sIDT = (desc_table *)args->arch_args.vir_idt;
-	area = create_area("idt", (void *)&sIDT, B_EXACT_ADDRESS, B_PAGE_SIZE, B_ALREADY_WIRED,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	// create IDT area for the boot CPU
+	area_id area = create_area("idt", (void**)&sIDTs[0], B_EXACT_ADDRESS,
+		B_PAGE_SIZE, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (area < 0)
+		return area;
+
+	// create IDTs for the off-boot CPU
+	size_t idtSize = 256 * 8;
+		// 256 8 bytes-sized descriptors
+	int32 cpuCount = smp_get_num_cpus();
+	if (cpuCount > 0) {
+		size_t areaSize = ROUNDUP(cpuCount * idtSize, B_PAGE_SIZE);
+		desc_table* idt;
+		area = create_area("idt", (void**)&idt, B_ANY_KERNEL_ADDRESS,
+			areaSize, B_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		if (area < 0)
+			return area;
+
+		for (int32 i = 1; i < cpuCount; i++) {
+			sIDTs[i] = idt;
+			memcpy(idt, sIDTs[0], idtSize);
+			idt += 256;
+			// The CPU's IDTR will be set in arch_cpu_init_percpu().
+		}
+	}
 
 	return area >= B_OK ? B_OK : area;
 }

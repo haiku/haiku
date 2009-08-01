@@ -122,14 +122,15 @@ static int32
 i386_ici_interrupt(void *data)
 {
 	// genuine inter-cpu interrupt
-	TRACE(("inter-cpu interrupt on cpu %ld\n", smp_get_current_cpu()));
+	int cpu = smp_get_current_cpu();
+	TRACE(("inter-cpu interrupt on cpu %ld\n", cpu));
 
 	// if we are not using the IO APIC we need to acknowledge the
 	// interrupt ourselfs
 	if (!gUsingIOAPIC)
 		apic_write(APIC_EOI, 0);
 
-	return smp_intercpu_int_handler();
+	return smp_intercpu_int_handler(cpu);
 }
 
 

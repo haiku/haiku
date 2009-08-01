@@ -275,13 +275,15 @@ uint32 x86_read_cr4();
 void x86_write_cr4(uint32 value);
 uint64 x86_read_msr(uint32 registerNumber);
 void x86_write_msr(uint32 registerNumber, uint64 value);
-void x86_set_task_gate(int32 n, int32 segment);
+void x86_set_task_gate(int32 cpu, int32 n, int32 segment);
+void* x86_get_idt(int32 cpu);
 uint32 x86_count_mtrrs(void);
 void x86_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type);
 status_t x86_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type);
 bool x86_check_feature(uint32 feature, enum x86_feature_type type);
 void* x86_get_double_fault_stack(int32 cpu, size_t* _size);
-int x86_double_fault_get_cpu();
+int32 x86_double_fault_get_cpu(void);
+void x86_double_fault_exception(struct iframe* frame);
 
 
 #define read_cr3(value) \

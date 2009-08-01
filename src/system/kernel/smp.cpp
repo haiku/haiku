@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -315,6 +315,58 @@ acquire_spinlock_nocheck(spinlock *lock)
 }
 
 
+/*!	Equivalent to acquire_spinlock(), save for currentCPU parameter. */
+static void
+acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
+{
+#if DEBUG_SPINLOCKS
+	if (are_interrupts_enabled()) {
+		panic("acquire_spinlock_cpu: attempt to acquire lock %p with "
+			"interrupts enabled", lock);
+	}
+#endif
+
+	if (sNumCPUs > 1) {
+#if B_DEBUG_SPINLOCK_CONTENTION
+		while (atomic_add(&lock->lock, 1) != 0)
+			process_all_pending_ici(currentCPU);
+#else
+		while (1) {
+			uint32 count = 0;
+			while (*lock != 0) {
+				if (++count == SPINLOCK_DEADLOCK_COUNT) {
+					panic("acquire_spinlock_cpu(): Failed to acquire spinlock "
+						"%p for a long time!", lock);
+					count = 0;
+				}
+
+				process_all_pending_ici(currentCPU);
+				PAUSE();
+			}
+			if (atomic_set((int32 *)lock, 1) == 0)
+				break;
+		}
+
+#if DEBUG_SPINLOCKS
+		push_lock_caller(arch_debug_get_caller(), lock);
+#endif
+#endif
+	} else {
+#if DEBUG_SPINLOCKS
+		int32 oldValue;
+		oldValue = atomic_set((int32 *)lock, 1);
+		if (oldValue != 0) {
+			panic("acquire_spinlock_cpu(): attempt to acquire lock %p twice on "
+				"non-SMP system (last caller: %p, value %ld)", lock,
+				find_lock_caller(lock), oldValue);
+		}
+
+		push_lock_caller(arch_debug_get_caller(), lock);
+#endif
+	}
+}
+
+
 void
 release_spinlock(spinlock *lock)
 {
@@ -388,6 +440,34 @@ retry:
 	TRACE(("find_free_message: returning msg %p\n", *msg));
 
 	return state;
+}
+
+
+/*!	Similar to find_free_message(), but expects the interrupts to be disabled
+	already.
+*/
+static void
+find_free_message_interrupts_disabled(int32 currentCPU,
+	struct smp_msg** _message)
+{
+	TRACE(("find_free_message_interrupts_disabled: entry\n"));
+
+	acquire_spinlock_cpu(currentCPU, &sFreeMessageSpinlock);
+	while (sFreeMessageCount <= 0) {
+		release_spinlock(&sFreeMessageSpinlock);
+		process_all_pending_ici(currentCPU);
+		PAUSE();
+		acquire_spinlock_cpu(currentCPU, &sFreeMessageSpinlock);
+	}
+
+	*_message = sFreeMessages;
+	sFreeMessages = (*_message)->next;
+	sFreeMessageCount--;
+
+	release_spinlock(&sFreeMessageSpinlock);
+
+	TRACE(("find_free_message_interrupts_disabled: returning msg %p\n",
+		*_message));
 }
 
 
@@ -553,6 +633,8 @@ process_pending_ici(int32 currentCPU)
 		}
 		case SMP_MSG_RESCHEDULE_IF_IDLE:
 		{
+			// TODO: We must not dereference the thread when entering the kernel
+			// debugger from a double fault.
 			struct thread* thread = thread_get_current_thread();
 			if (thread->priority == B_IDLE_PRIORITY)
 				thread->cpu->invoke_scheduler = true;
@@ -568,7 +650,7 @@ process_pending_ici(int32 currentCPU)
 
 	// special case for the halt message
 	if (haltCPU)
-		debug_trap_cpu_in_kdl(false);
+		debug_trap_cpu_in_kdl(currentCPU, false);
 
 	return retval;
 }
@@ -620,13 +702,11 @@ spinlock_contention_syscall(const char* subsystem, uint32 function,
 
 
 int
-smp_intercpu_int_handler(void)
+smp_intercpu_int_handler(int32 cpu)
 {
-	int currentCPU = smp_get_current_cpu();
+	TRACE(("smp_intercpu_int_handler: entry on cpu %d\n", cpu));
 
-	TRACE(("smp_intercpu_int_handler: entry on cpu %d\n", currentCPU));
-
-	process_all_pending_ici(currentCPU);
+	process_all_pending_ici(cpu);
 
 	TRACE(("smp_intercpu_int_handler: done\n"));
 
@@ -819,6 +899,68 @@ smp_send_broadcast_ici(int32 message, uint32 data, uint32 data2, uint32 data3,
 	}
 
 	TRACE(("smp_send_broadcast_ici: done\n"));
+}
+
+
+void
+smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
+	uint32 data, uint32 data2, uint32 data3, void *data_ptr, uint32 flags)
+{
+	if (!sICIEnabled)
+		return;
+
+	TRACE(("smp_send_broadcast_ici_interrupts_disabled: cpu %ld mess 0x%lx, "
+		"data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%lx\n",
+		currentCPU, message, data, data2, data3, data_ptr, flags));
+
+	struct smp_msg *msg;
+	find_free_message_interrupts_disabled(currentCPU, &msg);
+
+	msg->message = message;
+	msg->data = data;
+	msg->data2 = data2;
+	msg->data3 = data3;
+	msg->data_ptr = data_ptr;
+	msg->ref_count = sNumCPUs - 1;
+	msg->flags = flags;
+	msg->proc_bitmap = SET_BIT(0, currentCPU);
+	msg->done = false;
+
+	TRACE(("smp_send_broadcast_ici_interrupts_disabled %ld: inserting msg %p "
+		"into broadcast mbox\n", currentCPU, msg));
+
+	// stick it in the appropriate cpu's mailbox
+	acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
+	msg->next = sBroadcastMessages;
+	sBroadcastMessages = msg;
+	release_spinlock(&sBroadcastMessageSpinlock);
+
+	arch_smp_send_broadcast_ici();
+
+	TRACE(("smp_send_broadcast_ici_interrupts_disabled %ld: sent interrupt\n",
+		currentCPU));
+
+	if (flags & SMP_MSG_FLAG_SYNC) {
+		// wait for the other cpus to finish processing it
+		// the interrupt handler will ref count it to <0
+		// if the message is sync after it has removed it from the mailbox
+		TRACE(("smp_send_broadcast_ici_interrupts_disabled %ld: waiting for "
+			"ack\n", currentCPU));
+
+		while (msg->done == false) {
+			process_all_pending_ici(currentCPU);
+			PAUSE();
+		}
+
+		TRACE(("smp_send_broadcast_ici_interrupts_disabled %ld: returning "
+			"message to free list\n", currentCPU));
+
+		// for SYNC messages, it's our responsibility to put it
+		// back into the free list
+		return_free_message(msg);
+	}
+
+	TRACE(("smp_send_broadcast_ici_interrupts_disabled: done\n"));
 }
 
 

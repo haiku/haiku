@@ -52,12 +52,14 @@ void smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, uint32 data,
 		uint32 data2, uint32 data3, void *data_ptr, uint32 flags);
 void smp_send_broadcast_ici(int32 message, uint32 data, uint32 data2, uint32 data3,
 		void *data_ptr, uint32 flags);
+void smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
+		uint32 data, uint32 data2, uint32 data3, void *data_ptr, uint32 flags);
 
 int32 smp_get_num_cpus(void);
 void smp_set_num_cpus(int32 numCPUs);
 int32 smp_get_current_cpu(void);
 
-int smp_intercpu_int_handler(void);
+int smp_intercpu_int_handler(int32 cpu);
 
 #ifdef __cplusplus
 }

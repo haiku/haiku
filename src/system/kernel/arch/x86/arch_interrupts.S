@@ -200,7 +200,17 @@ FUNCTION(double_fault):
 	pushl	$8;
 	pushl	$-1;
 	pushl	$-1;
-	jmp		int_bottom
+
+	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_OTHER)
+
+	movl	%esp, %ebp		// frame pointer is the iframe
+
+	pushl	%ebp
+	call	x86_double_fault_exception
+
+	// Well, there's no returning from a double fault, but maybe a real hacker
+	// can repair things in KDL.
+	POP_IFRAME_AND_RETURN()
 FUNCTION_END(double_fault)
 
 TRAP(trap9, 9)

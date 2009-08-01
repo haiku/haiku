@@ -269,8 +269,11 @@ init_double_fault(int cpuNum)
 	tss->io_map_base = sizeof(struct tss);
 
 	// add TSS descriptor for this new TSS
-	set_tss_descriptor(&gGDT[DOUBLE_FAULT_TSS_BASE_SEGMENT + cpuNum],
+	uint16 tssSegmentDescriptorIndex = DOUBLE_FAULT_TSS_BASE_SEGMENT + cpuNum;
+	set_tss_descriptor(&gGDT[tssSegmentDescriptorIndex],
 		(addr_t)tss, sizeof(struct tss));
+
+	x86_set_task_gate(cpuNum, 8, tssSegmentDescriptorIndex << 3);
 }
 
 
@@ -511,8 +514,8 @@ x86_get_double_fault_stack(int32 cpu, size_t* _size)
 /*!	Returns the index of the current CPU. Can only be called from the double
 	fault handler.
 */
-int
-x86_double_fault_get_cpu()
+int32
+x86_double_fault_get_cpu(void)
 {
 	uint32 stack = x86_read_ebp();
 	return (stack - (uint32)sDoubleFaultStacks) / kDoubleFaultStackSize;
@@ -561,8 +564,20 @@ arch_cpu_init_percpu(kernel_args *args, int cpu)
 
 	// load the TSS for this cpu
 	// note the main cpu gets initialized in arch_cpu_init_post_vm()
-	if (cpu != 0)
+	if (cpu != 0) {
 		load_tss(cpu);
+
+		// set the IDT
+		struct {
+			uint16	limit;
+			void*	address;
+		} _PACKED descriptor = {
+			256 * 8 - 1,	// 256 descriptors, 8 bytes each (-1 for "limit")
+			x86_get_idt(cpu)
+		};
+
+		asm volatile("lidt	%0" : : "m"(descriptor));
+	}
 
 	return 0;
 }
@@ -620,8 +635,6 @@ arch_cpu_init_post_vm(kernel_args *args)
 
 	// set the current hardware task on cpu 0
 	load_tss(0);
-
-	x86_set_task_gate(8, DOUBLE_FAULT_TSS_BASE_SEGMENT << 3);
 
 	// setup TLS descriptors (one for every CPU)
 
