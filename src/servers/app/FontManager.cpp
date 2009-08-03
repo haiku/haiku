@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -511,7 +511,7 @@ FontManager::_PrecacheFontFile(const ServerFont* font)
 	while (true) {
 		// We just want the file in the kernel file cache...
 		ssize_t read = file.Read(buffer, bufferSize);
-		if (read < (ssize_t) bufferSize)
+		if (read < (ssize_t)bufferSize)
 			break;
 	}
 
