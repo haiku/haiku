@@ -1534,6 +1534,7 @@ BControlLook::DrawSplitter(BView* view, BRect& rect, const BRect& updateRect,
 					col2 = background;
 					break;
 				case 3:
+				default:
 					col1 = background;
 					col2 = light;
 					num = 0;
