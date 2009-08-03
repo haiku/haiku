@@ -105,50 +105,50 @@ MeshInstance::Render()
 
 		// draw face
 		glNormal3f(normal.x(), normal.y(),  normal.z());
-   		glTexCoord2f(face.v[0].u, face.v[0].v);
-   		glVertex3f(face.v[0].p.x(), face.v[0].p.y(),  face.v[0].p.z());
+		glTexCoord2f(face.v[0].u, face.v[0].v);
+		glVertex3f(face.v[0].p.x(), face.v[0].p.y(), face.v[0].p.z());
 
-   		glNormal3f(normal.x(), normal.y(),  normal.z());
-   		glTexCoord2f(face.v[1].u, face.v[1].v);
-   		glVertex3f(face.v[1].p.x(), face.v[1].p.y(),  face.v[1].p.z());
+		glNormal3f(normal.x(), normal.y(),  normal.z());
+		glTexCoord2f(face.v[1].u, face.v[1].v);
+		glVertex3f(face.v[1].p.x(), face.v[1].p.y(), face.v[1].p.z());
 
-   		glNormal3f(normal.x(), normal.y(),  normal.z());
-   		glTexCoord2f(face.v[2].u, face.v[2].v);
-   		glVertex3f(face.v[2].p.x(), face.v[2].p.y(),  face.v[2].p.z());
+		glNormal3f(normal.x(), normal.y(),  normal.z());
+		glTexCoord2f(face.v[2].u, face.v[2].v);
+		glVertex3f(face.v[2].p.x(), face.v[2].p.y(), face.v[2].p.z());
 
-   		if (face.vertexCount == 4) {
-   			glNormal3f(normal.x(), normal.y(),  normal.z());
-   			glTexCoord2f(face.v[3].u, face.v[3].v);
-   			glVertex3f(face.v[3].p.x(), face.v[3].p.y(),  face.v[3].p.z());
-   		}
+		if (face.vertexCount == 4) {
+			glNormal3f(normal.x(), normal.y(), normal.z());
+			glTexCoord2f(face.v[3].u, face.v[3].v);
+			glVertex3f(face.v[3].p.x(), face.v[3].p.y(), face.v[3].p.z());
+		}
 
-   		if (fDoubleSided) {
-	   		if (face.vertexCount == 4) {
-		   		glNormal3f(-normal.x(), -normal.y(),  -normal.z());
-		   		glTexCoord2f(face.v[3].u, face.v[3].v);
-		   		glVertex3f(face.v[3].p.x(), face.v[3].p.y(),  face.v[3].p.z());
-	   		}
+		if (fDoubleSided) {
+			if (face.vertexCount == 4) {
+				glNormal3f(-normal.x(), -normal.y(), -normal.z());
+				glTexCoord2f(face.v[3].u, face.v[3].v);
+				glVertex3f(face.v[3].p.x(), face.v[3].p.y(), face.v[3].p.z());
+			}
 
-	   		glNormal3f(-normal.x(), -normal.y(),  -normal.z());
-	   		glTexCoord2f(face.v[2].u, face.v[2].v);
-	   		glVertex3f(face.v[2].p.x(), face.v[2].p.y(),  face.v[2].p.z());
+			glNormal3f(-normal.x(), -normal.y(), -normal.z());
+			glTexCoord2f(face.v[2].u, face.v[2].v);
+			glVertex3f(face.v[2].p.x(), face.v[2].p.y(), face.v[2].p.z());
 
-	   		glNormal3f(-normal.x(), -normal.y(),  -normal.z());
-	   		glTexCoord2f(face.v[1].u, face.v[1].v);
-	   		glVertex3f(face.v[1].p.x(), face.v[1].p.y(),  face.v[1].p.z());
+			glNormal3f(-normal.x(), -normal.y(), -normal.z());
+			glTexCoord2f(face.v[1].u, face.v[1].v);
+			glVertex3f(face.v[1].p.x(), face.v[1].p.y(), face.v[1].p.z());
 
-	   		glNormal3f(-normal.x(), -normal.y(),  -normal.z());
-	   		glTexCoord2f(face.v[0].u, face.v[0].v);
-	   		glVertex3f(face.v[0].p.x(), face.v[0].p.y(),  face.v[0].p.z());
-   		}
-   		lastVertexCount = face.vertexCount;
+			glNormal3f(-normal.x(), -normal.y(), -normal.z());
+			glTexCoord2f(face.v[0].u, face.v[0].v);
+			glVertex3f(face.v[0].p.x(), face.v[0].p.y(), face.v[0].p.z());
+		}
+		lastVertexCount = face.vertexCount;
 	}
 	glEnd();
 	//printf("batchCount %d\n", batchCount);
 
-   	if (fDrawNormals) {
-   		glBegin(GL_LINES);
-	   	for(uint32 i = 0; i < fMeshReference->FaceCount(); i++) {
+	if (fDrawNormals) {
+		glBegin(GL_LINES);
+		for(uint32 i = 0; i < fMeshReference->FaceCount(); i++) {
 
 			const Face& face = fMeshReference->GetFace(i);
 

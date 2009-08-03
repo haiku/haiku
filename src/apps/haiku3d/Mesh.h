@@ -29,7 +29,7 @@ struct Face {
 
 class Mesh : public Referenceable {
 public:
-	virtual	~Mesh();
+	virtual			~Mesh();
 
 	virtual Face&	GetFace(uint32 index) const = 0;
 	virtual uint32	FaceCount() const = 0;

@@ -20,7 +20,7 @@ public:
 
 	GLuint		 	Id();
 
-	virtual	void	Update(float dt) {};
+	virtual	void	Update(float dt);
 
 protected:
 	GLuint			fId;

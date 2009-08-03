@@ -32,3 +32,9 @@ Texture::Id()
 {
 	return fId;
 }
+
+
+void
+Texture::Update(float dt)
+{
+}

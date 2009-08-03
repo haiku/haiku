@@ -39,10 +39,6 @@ RenderView::RenderView(BRect frame)
 RenderView::~RenderView()
 {
 	_StopRenderThread();
-
-	if (fRenderThread >= 0)
-		wait_for_thread(fRenderThread, NULL);
-
 	_DeleteScene();
 }
 
@@ -62,10 +58,9 @@ RenderView::AttachedToWindow()
 uint32
 RenderView::_CreateRenderThread()
 {
-	fRenderThread = spawn_thread(RenderView::_RenderThreadEntry,
-								"renderThread",
-								B_NORMAL_PRIORITY,
-								this);
+	fRenderThread = spawn_thread(RenderView::_RenderThreadEntry, "renderThread",
+		B_NORMAL_PRIORITY, this);
+
 	if (fRenderThread < 0)
 		return fRenderThread;
 
@@ -79,6 +74,9 @@ RenderView::_StopRenderThread()
 	LockGL();
 	fStopRendering = true;
 	UnlockGL();
+
+	if (fRenderThread >= 0)
+		wait_for_thread(fRenderThread, NULL);
 }
 
 
@@ -178,10 +176,9 @@ RenderView::_CreateScene()
 		Quaternion(0, 0, 0, 1), 4.0f * timeSpacing);
 	fMeshInstances.push_back(instance);
 	mesh->ReleaseReference();
+	texture->ReleaseReference();
 
 	fMainCamera = new Camera(Vector3(0, 0, 0), Quaternion(0, 0, 0, 1), 50);
-
-	texture->ReleaseReference();
 }
 
 
@@ -200,7 +197,7 @@ void
 RenderView::_UpdateViewport()
 {
 	if (fNextRes != fRes && fNextRes.x >= 1.0 && fNextRes.y >= 1.0) {
-		glViewport(0, 0, (GLint)fNextRes.x + 1, (GLint)fNextRes.y + 1);
+		glViewport(0, 0, (GLint) fNextRes.x + 1, (GLint) fNextRes.y + 1);
 		fRes = fNextRes;
 		_UpdateCamera();
 	}
@@ -227,10 +224,10 @@ RenderView::_Render()
 	_UpdateViewport();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
+	glLoadIdentity();
 
-    bigtime_t time = system_time();
-    float deltaTime = 0.000001 * (float)(time - fLastFrameTime);
+	bigtime_t time = system_time();
+	float deltaTime = 0.000001 * (float)(time - fLastFrameTime);
 	fLastFrameTime = time;
 
 	MeshInstanceList::iterator it = fMeshInstances.begin();
@@ -243,7 +240,7 @@ RenderView::_Render()
 		UnlockGL();
 		return false;
 	}
-    UnlockGL();
+	UnlockGL();
 	SwapBuffers(false); // true = vsync
 	return true;
 }
