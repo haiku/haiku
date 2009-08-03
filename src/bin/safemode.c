@@ -14,11 +14,25 @@
 int
 main(int argc, char **argv)
 {
+	const char *optionName = B_SAFEMODE_SAFE_MODE;
+	bool realString = false;
 	char buffer[B_FILE_NAME_LENGTH];
 	size_t size = sizeof(buffer);
+	int i;
 
-	status_t status = _kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, buffer, &size);
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "-s"))
+			realString = true;
+		else
+			optionName = argv[i];
+	}
+
+	status_t status = _kern_get_safemode_option(optionName, buffer, &size);
 	if (status == B_OK) {
+		if (realString) {
+			puts(buffer);
+			return 0;
+		}
 		if (!strncasecmp(buffer, "true", size)
 			|| !strncasecmp(buffer, "yes", size)
 			|| !strncasecmp(buffer, "on", size)
