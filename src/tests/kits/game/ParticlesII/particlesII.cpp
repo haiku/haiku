@@ -74,9 +74,11 @@ private:
 							// 	app from ScreenConnected()
 };
 
+int
 main()
 {
 	NApplication app;
+	return 0;
 }
 
 NApplication::NApplication()
@@ -215,7 +217,7 @@ void NWindowScreen::ScreenConnected(bool connected)
 			}
 			if((i>=192) && (i<256))
 			{
-				c1.red = 0i; // blues
+				c1.red = 0; // blues
 				c1.green = 0;
 				c1.blue = j*4;
 				c1.alpha = 255;
