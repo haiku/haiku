@@ -344,13 +344,18 @@ _arch_debug_serial_putchar(const char c)
 void
 arch_debug_serial_putchar(const char c)
 {
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sSerialOutputSpinlock);
+	cpu_status state = 0;
+	if (!debug_debugger_running()) {
+		state = disable_interrupts();
+		acquire_spinlock(&sSerialOutputSpinlock);
+	}
 
 	_arch_debug_serial_putchar(c);
 
-	release_spinlock(&sSerialOutputSpinlock);
-	restore_interrupts(state);
+	if (!debug_debugger_running()) {
+		release_spinlock(&sSerialOutputSpinlock);
+		restore_interrupts(state);
+	}
 }
 
 
