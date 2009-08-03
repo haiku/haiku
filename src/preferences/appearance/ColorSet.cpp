@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,7 +18,7 @@
 #include "ColorSet.h"
 
 
-static ColorDescription sColorDescriptionTable[] = 
+static ColorDescription sColorDescriptionTable[] =
 {
 	{ B_PANEL_BACKGROUND_COLOR, "Panel Background" },
 	{ B_PANEL_TEXT_COLOR, "Panel Text" },
@@ -37,8 +37,8 @@ static ColorDescription sColorDescriptionTable[] =
 	{ B_MENU_ITEM_TEXT_COLOR, "Menu Item Text" },
 	{ B_MENU_SELECTED_ITEM_TEXT_COLOR, "Selected Menu Item Text" },
 	{ B_MENU_SELECTED_BORDER_COLOR, "Selected Menu Item Border" },
-	{ B_TOOLTIP_BACKGROUND_COLOR, "Tooltip Background" },
-	{ B_TOOLTIP_TEXT_COLOR, "Tooltip Text" },
+	{ B_TOOL_TIP_BACKGROUND_COLOR, "Tooltip Background" },
+	{ B_TOOL_TIP_TEXT_COLOR, "Tooltip Text" },
 	{ B_SUCCESS_COLOR, "Success" },
 	{ B_FAILURE_COLOR, "Failure" },
 	{ B_WINDOW_TAB_COLOR, "Window Tab" },
@@ -49,7 +49,7 @@ static ColorDescription sColorDescriptionTable[] =
 
 const int32 sColorDescriptionCount = sizeof(sColorDescriptionTable) / sizeof(ColorDescription);
 
-const ColorDescription* 
+const ColorDescription*
 get_color_description(int32 index)
 {
 	if (index < 0 || index >= sColorDescriptionCount)
@@ -117,8 +117,8 @@ ColorSet::DefaultColorSet(void)
 	set.fColors[B_MENU_ITEM_TEXT_COLOR] = make_color(0, 0, 0);
 	set.fColors[B_MENU_SELECTED_ITEM_TEXT_COLOR] = make_color(255, 255, 255);
 	set.fColors[B_MENU_SELECTED_BORDER_COLOR] = make_color(0, 0, 0);
-	set.fColors[B_TOOLTIP_BACKGROUND_COLOR] = make_color(255, 255, 0);
-	set.fColors[B_TOOLTIP_TEXT_COLOR] = make_color(0, 0, 0);
+	set.fColors[B_TOOL_TIP_BACKGROUND_COLOR] = make_color(255, 255, 0);
+	set.fColors[B_TOOL_TIP_TEXT_COLOR] = make_color(0, 0, 0);
 	set.fColors[B_SUCCESS_COLOR] = make_color(0, 255, 0);
 	set.fColors[B_FAILURE_COLOR] = make_color(255, 0, 0);
 	set.fColors[B_WINDOW_TAB_COLOR] = make_color(255, 203, 0);
@@ -129,7 +129,7 @@ ColorSet::DefaultColorSet(void)
 	return set;
 }
 
-	
+
 /*!
 	\brief Assigns a value to a named color member
 	\param string name of the color to receive the value
