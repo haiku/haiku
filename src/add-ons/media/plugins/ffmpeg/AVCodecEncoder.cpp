@@ -64,6 +64,8 @@ AVCodecEncoder::~AVCodecEncoder()
 
 	sws_freeContext(fSwsContext);
 
+	av_fifo_free(&fAudioFifo);
+
 	avpicture_free(&fDstFrame);
 	// NOTE: Do not use avpicture_free() on fSrcFrame!! We fill the picture
 	// data on the file with the media buffer data passed to Encode().
