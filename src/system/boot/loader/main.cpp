@@ -38,6 +38,8 @@ main(stage2_args *args)
 	// construct boot_volume KMessage explicitely
 	new(&gKernelArgs.boot_volume) KMessage;
 
+	add_stage2_driver_settings(args);
+
 	platform_init_video();
 
 	// the main platform dependent initialisation

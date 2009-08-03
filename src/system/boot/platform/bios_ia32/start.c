@@ -13,6 +13,7 @@
 #include "acpi.h"
 #include "keyboard.h"
 #include "bios.h"
+#include "multiboot.h"
 
 #include <KernelExport.h>
 #include <boot/platform.h>
@@ -120,11 +121,13 @@ _start(void)
 		// call C++ constructors before doing anything else
 
 	args.heap_size = HEAP_SIZE;
+	args.arguments = NULL;
 
 	serial_init();
 	console_init();
 	cpu_init();
 	mmu_init();
+	parse_multiboot_commandline(&args);
 
 	// wait a bit to give the user the opportunity to press a key
 	spin(750000);
@@ -139,6 +142,7 @@ _start(void)
 	acpi_init();
 	smp_init();
 	//hpet_init(); // TODO: Not yet
+	dump_multiboot_info();
 	main(&args);
 }
 

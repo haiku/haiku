@@ -132,6 +132,7 @@ _start(void)
 	Bconout(DEV_CON, 'I');
 
 	args.heap_size = HEAP_SIZE;
+	args.arguments = NULL;
 	
 	// so we can dprintf
 	init_nat_features();

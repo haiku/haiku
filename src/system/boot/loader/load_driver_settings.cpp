@@ -135,6 +135,19 @@ load_driver_settings(stage2_args */*args*/, Directory *volume)
 
 
 status_t
+add_stage2_driver_settings(stage2_args *args)
+{
+	const char **p = args->arguments;
+	//TODO: split more intelligently
+	for (; p && *p; p++) {
+		dprintf("adding args: '%s'\n", *p);
+		add_safe_mode_settings((char *)*p);
+	}
+	return B_OK;
+}
+
+
+status_t
 add_safe_mode_settings(char *settings)
 {
 	if (settings == NULL || settings[0] == '\0')

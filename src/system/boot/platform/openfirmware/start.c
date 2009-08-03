@@ -135,6 +135,7 @@ start(void *openFirmwareEntry)
 	// stage2 args - might be set via the command line one day
 	stage2_args args;
 	args.heap_size = HEAP_SIZE;
+	args.arguments = NULL;
 
 	of_init(openFirmwareEntry);
 

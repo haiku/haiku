@@ -1,9 +1,13 @@
 /*
- * Copyright 2003-2006, François Revol, revol@free.fr.
+ * Copyright 2009, François Revol, revol@free.fr.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MULTIBOOT_H
 #define _MULTIBOOT_H
+
+
+#include <SupportDefs.h>
+
 
 /* minimal part of the MultiBoot API */
 
@@ -48,5 +52,18 @@ struct multiboot_info {
 	uint16 vbe_interface_off;
 	uint16 vbe_interface_len;
 };
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern void dump_multiboot_info(void);
+extern status_t parse_multiboot_commandline(struct stage2_args *args);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* _MULTIBOOT_H */
