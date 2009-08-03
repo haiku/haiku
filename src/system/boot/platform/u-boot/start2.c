@@ -102,6 +102,7 @@ start2(void)
 		// call C++ constructors before doing anything else
 	call_ctors();
 	args.heap_size = HEAP_SIZE;
+	args.arguments = NULL;
 
 
 	serial_init();
