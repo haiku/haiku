@@ -1512,8 +1512,8 @@ m68k_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 }
 
 
-bool
-arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
+static bool
+m68k_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 	uint32 protection)
 {
 	// TODO: Implement!

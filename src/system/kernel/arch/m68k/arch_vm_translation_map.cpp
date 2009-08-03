@@ -159,3 +159,13 @@ m68k_remap_address_range(addr_t *_virtualAddress, size_t size, bool unmap)
 }
 
 #endif
+
+bool
+arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
+	uint32 protection)
+{
+	return get_vm_ops()-arch_vm_translation_map_is_kernel_page_accessible(virtualAddress,
+		protection);
+}
+
+

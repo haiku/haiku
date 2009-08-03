@@ -45,4 +45,5 @@ struct m68k_vm_ops m68030_vm_ops = {
 	m68k_unmap_address_range,
 	m68k_remap_address_range
 #endif
+	m68k_vm_translation_map_is_kernel_page_accessible
 };

@@ -32,6 +32,8 @@ struct m68k_vm_ops {
 	void (*m68k_unmap_address_range)(addr_t virtualAddress, size_t size);
 	status_t (*m68k_remap_address_range)(addr_t *_virtualAddress, size_t size, bool unmap);
 #endif
+	bool (*arch_vm_translation_map_is_kernel_page_accessible)(addr_t virtualAddress, uint32 protection);
+
 };
 
 #ifdef __cplusplus
