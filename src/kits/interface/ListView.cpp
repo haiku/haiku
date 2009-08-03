@@ -671,6 +671,9 @@ BListView::RemoveItem(int32 index)
 	if (fLastSelected != -1 && index < fLastSelected)
 		fLastSelected--;
 
+	if (fAnchorIndex != -1 && index < fAnchorIndex)
+		fAnchorIndex--;
+
 	_RecalcItemTops(index);
 
 	_InvalidateFrom(index);
@@ -695,6 +698,9 @@ BListView::RemoveItems(int32 index, int32 count)
 
 	if (index < 0)
 		return false;
+
+	if (fAnchorIndex != -1 && index < fAnchorIndex)
+		fAnchorIndex = index;
 
 	fList.RemoveItems(index, count);
 	if (index < fList.CountItems())
@@ -1479,10 +1485,12 @@ BListView::_Select(int32 from, int32 to, bool extend)
 	if (fFirstSelected == -1) {
 		fFirstSelected = from;
 		fLastSelected = to;
-	} else if (from < fFirstSelected)
-		fFirstSelected = from;
-	else if (to > fLastSelected)
-		fLastSelected = to;
+	} else {
+		if (from < fFirstSelected)
+			fFirstSelected = from;
+		if (to > fLastSelected)
+			fLastSelected = to;
+	}
 
 	for (int32 i = from; i <= to; ++i) {
 		BListItem *item = ItemAt(i);
