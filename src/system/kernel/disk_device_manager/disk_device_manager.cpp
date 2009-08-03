@@ -22,7 +22,7 @@ disk_device_data *
 write_lock_disk_device(partition_id partitionID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	if (KDiskDevice *device = manager->RegisterDevice(partitionID)) {
+	if (KDiskDevice *device = manager->RegisterDevice(partitionID, false)) {
 		if (device->WriteLock())
 			return device->DeviceData();
 		// Only unregister, when the locking fails. The guarantees, that the
@@ -38,7 +38,7 @@ void
 write_unlock_disk_device(partition_id partitionID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	if (KDiskDevice *device = manager->RegisterDevice(partitionID)) {
+	if (KDiskDevice *device = manager->RegisterDevice(partitionID, false)) {
 		bool isLocked = device->IsWriteLocked();
 		if (isLocked) {
 			device->WriteUnlock();
@@ -54,7 +54,7 @@ disk_device_data *
 read_lock_disk_device(partition_id partitionID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	if (KDiskDevice *device = manager->RegisterDevice(partitionID)) {
+	if (KDiskDevice *device = manager->RegisterDevice(partitionID, false)) {
 		if (device->ReadLock())
 			return device->DeviceData();
 		// Only unregister, when the locking fails. The guarantees, that the
@@ -70,7 +70,7 @@ void
 read_unlock_disk_device(partition_id partitionID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	if (KDiskDevice *device = manager->RegisterDevice(partitionID)) {
+	if (KDiskDevice *device = manager->RegisterDevice(partitionID, false)) {
 		bool isLocked = device->IsReadLocked(false);
 		if (isLocked) {
 			device->ReadUnlock();
