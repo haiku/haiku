@@ -349,8 +349,8 @@ PartitionMapHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 	void* handle = parse_driver_settings_string(parameters);
 	if (handle == NULL)
 		return B_ERROR;
-
-	bool active = get_driver_boolean_parameter(handle, "active", false, true);
+	get_driver_boolean_parameter(handle, "active", false, true);
+	delete_driver_settings(handle);
 
 	// do we have a spare primary partition?
 	if (fPartitionMap.CountNonEmptyPrimaryPartitions() == 4)
@@ -467,6 +467,7 @@ PartitionMapHandle::CreateChild(off_t offset, off_t size,
 		return B_ERROR;
 
 	bool active = get_driver_boolean_parameter(handle, "active", false, true);
+	delete_driver_settings(handle);
 
 	// get a spare primary partition
 	PrimaryPartition* primary = NULL;
@@ -507,8 +508,6 @@ PartitionMapHandle::CreateChild(off_t offset, off_t size,
 	if (!foundSpace)
 		return B_BAD_VALUE;
 
-	// everything looks good, do it
-
 	// create the child
 	// (Note: the primary partition index is indeed the child index, since
 	// we picked the first empty primary partition.)
@@ -528,9 +527,6 @@ PartitionMapHandle::CreateChild(off_t offset, off_t size,
 
 	// init the primary partition
 	primary->SetTo(offset, size, type.Type(), active, partition->BlockSize());
-
-	// TODO: If the child is an extended partition, we should trigger its
-	// initialization.
 
 	*_child = child;
 	return B_OK;
