@@ -104,6 +104,9 @@ public:
 
 			void				ResyncDrawState();
 
+						// TODO: Change this
+	inline	void				UpdateCurrentDrawingRegion() { _UpdateCurrentDrawingRegion(); };
+
 private:
 			View*				_CreateView(BPrivate::LinkReceiver &link,
 									View **_parent);
@@ -127,8 +130,9 @@ private:
 
 			void				_SetCurrentView(View* view);
 			void				_UpdateDrawState(View* view);
+public:
 			void				_UpdateCurrentDrawingRegion();
-
+private:
 			bool				_MessageNeedsAllWindowsLocked(uint32 code) const;
 
 			void				_DirectWindowSetFullScreen(bool set);

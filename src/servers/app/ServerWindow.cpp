@@ -1169,7 +1169,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<bool>(&enable);
 
 			status_t status = B_OK;
-			if (!fWindow->IsOffscreenWindow()) {
+			if (fDirectWindowData != NULL) {
 //fDesktop->UnlockSingleWindow();
 				_DirectWindowSetFullScreen(enable);	
 //fDesktop->LockSingleWindow();
@@ -3719,6 +3719,8 @@ void
 ServerWindow::_DirectWindowSetFullScreen(bool enable)
 {
 	if (enable) {
+		fDesktop->HWInterface()->SetCursorVisible(false);
+		
 		fDirectWindowData->old_window_frame = fWindow->Frame();
 		BRect screenFrame =
 			fDesktop->ActiveScreen()->Frame();
@@ -3737,7 +3739,9 @@ ServerWindow::_DirectWindowSetFullScreen(bool enable)
 			oldFrame.top - fWindow->Frame().top);
 		fDesktop->ResizeWindowBy(fWindow,
 			oldFrame.Width() - fWindow->Frame().Width(),
-			oldFrame.Height() - fWindow->Frame().Height());			
+			oldFrame.Height() - fWindow->Frame().Height());
+			
+		fDesktop->HWInterface()->SetCursorVisible(true);			
 	}
 
 	fDesktop->SetWindowFeel(fWindow,

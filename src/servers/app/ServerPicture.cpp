@@ -477,6 +477,7 @@ set_clipping_rects(View *view, const BRect *rects, uint32 numRects)
 	for (uint32 c = 0; c < numRects; c++)
 		region.Include(rects[c]);
 	view->SetUserClipping(&region);
+	view->Window()->ServerWindow()->UpdateCurrentDrawingRegion();
 }
 
 
