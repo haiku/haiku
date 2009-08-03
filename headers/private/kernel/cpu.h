@@ -9,6 +9,8 @@
 #define _KERNEL_CPU_H
 
 
+#include <setjmp.h>
+
 #include <smp.h>
 #include <timer.h>
 #include <boot/kernel_args.h>
@@ -24,19 +26,24 @@
 /* CPU local data structure */
 
 typedef struct cpu_ent {
-	int cpu_num;
+	int			cpu_num;
 
 	// thread.c: used to force a reschedule at quantum expiration time
-	int preempted;
-	timer quantum_timer;
+	int			preempted;
+	timer		quantum_timer;
 
 	// keeping track of CPU activity
-	bigtime_t active_time;
-	bigtime_t last_kernel_time;
-	bigtime_t last_user_time;
+	bigtime_t	active_time;
+	bigtime_t	last_kernel_time;
+	bigtime_t	last_user_time;
 
-	bool invoke_scheduler;
-	bool disabled;
+	// used in the kernel debugger
+	addr_t		fault_handler;
+	addr_t		fault_handler_stack_pointer;
+	jmp_buf		fault_jump_buffer;
+
+	bool		invoke_scheduler;
+	bool		disabled;
 
 	// arch-specific stuff
 	arch_cpu_info arch;

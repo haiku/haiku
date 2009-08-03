@@ -26,6 +26,7 @@
 #include <thread.h>
 #include <tracing.h>
 #include <vm.h>
+#include <vm_translation_map.h>
 
 #include <arch/debug_console.h>
 #include <arch/debug.h>
@@ -45,6 +46,13 @@
 #include "debug_commands.h"
 #include "debug_output_filter.h"
 #include "debug_variables.h"
+
+
+struct debug_memcpy_parameters {
+	void*		to;
+	const void*	from;
+	size_t		size;
+};
 
 
 static const char* const kKDLPrompt = "kdebug> ";
@@ -678,19 +686,42 @@ kernel_debugger_loop(const char* message, int32 cpu)
 
 	kprintf("Welcome to Kernel Debugging Land...\n");
 
-	if (struct thread* thread = thread_get_current_thread()) {
-		// set a few temporary debug variables
+	// Set a few temporary debug variables and print on which CPU and in which
+	// thread we are running.
+	set_debug_variable("_cpu", sDebuggerOnCPU);
+
+	struct thread* thread = thread_get_current_thread();
+	if (thread == NULL) {
+		kprintf("Running on CPU %ld\n", sDebuggerOnCPU);
+	} else if (!debug_is_kernel_memory_accessible((addr_t)thread,
+			sizeof(struct thread), B_KERNEL_READ_AREA)) {
+		kprintf("Running on CPU %ld\n", sDebuggerOnCPU);
+		kprintf("Current thread pointer is %p, which is an address we "
+			"can't read from.\n", thread);
+		arch_debug_unset_current_thread();
+	} else {
 		set_debug_variable("_thread", (uint64)(addr_t)thread);
 		set_debug_variable("_threadID", thread->id);
-		set_debug_variable("_team", (uint64)(addr_t)thread->team);
-		if (thread->team != NULL)
-			set_debug_variable("_teamID", thread->team->id);
-		set_debug_variable("_cpu", sDebuggerOnCPU);
 
-		kprintf("Thread %ld \"%s\" running on CPU %ld\n", thread->id,
+		kprintf("Thread %ld \"%.64s\" running on CPU %ld\n", thread->id,
 			thread->name, sDebuggerOnCPU);
-	} else
-		kprintf("Running on CPU %ld\n", sDebuggerOnCPU);
+
+		if (thread->cpu != gCPU + cpu) {
+			kprintf("The thread's CPU pointer is %p, but should be %p.\n",
+				thread->cpu, gCPU + cpu);
+			arch_debug_unset_current_thread();
+		} else if (thread->team != NULL) {
+			if (debug_is_kernel_memory_accessible((addr_t)thread->team,
+					sizeof(struct team), B_KERNEL_READ_AREA)) {
+				set_debug_variable("_team", (uint64)(addr_t)thread->team);
+				set_debug_variable("_teamID", thread->team->id);
+			} else {
+				kprintf("The thread's team pointer is %p, which is an "
+					"address we can't read from.\n", thread->team);
+				arch_debug_unset_current_thread();
+			}
+		}
+	}
 
 	int32 continuableLine = -1;
 		// Index of the previous command line, if the command returned
@@ -1140,6 +1171,14 @@ err1:
 }
 
 
+static void
+debug_memcpy_trampoline(void* _parameters)
+{
+	debug_memcpy_parameters* parameters = (debug_memcpy_parameters*)_parameters;
+	memcpy(parameters->to, parameters->from, parameters->size);
+}
+
+
 void
 call_modules_hook(bool enter)
 {
@@ -1407,6 +1446,90 @@ debug_emergency_key_pressed(char key)
 	}
 
 	return false;
+}
+
+
+/*!	Verifies that the complete given memory range is accessible in the current
+	context.
+
+	Invoked in the kernel debugger only.
+
+	\param address The start address of the memory range to be checked.
+	\param size The size of the memory range to be checked.
+	\param protection The area protection for which to check. Valid is a bitwise
+		or of one or more of \c B_KERNEL_READ_AREA or \c B_KERNEL_WRITE_AREA.
+	\return \c true, if the complete memory range can be accessed in all ways
+		specified by \a protection, \c false otherwise.
+*/
+bool
+debug_is_kernel_memory_accessible(addr_t address, size_t size,
+	uint32 protection)
+{
+	addr_t endAddress = ROUNDUP(address + size, B_PAGE_SIZE);
+	address = ROUNDDOWN(address, B_PAGE_SIZE);
+
+	if (!IS_KERNEL_ADDRESS(address) || endAddress < address)
+		return false;
+
+	for (; address < endAddress; address += B_PAGE_SIZE) {
+		if (!arch_vm_translation_map_is_kernel_page_accessible(address,
+				protection)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/*!	Calls a function in a setjmp() + fault handler context.
+	May only be used in the kernel debugger.
+
+	\param jumpBuffer Buffer to be used for setjmp()/longjmp().
+	\param function The function to be called.
+	\param parameter The parameter to be passed to the function to be called.
+	\return
+		- \c 0, when the function executed without causing a page fault or
+		  calling longjmp().
+		- \c 1, when the function caused a page fault.
+		- Any other value the function passes to longjmp().
+*/
+int
+debug_call_with_fault_handler(jmp_buf jumpBuffer, void (*function)(void*),
+	void* parameter)
+{
+	// save current fault handler
+	cpu_ent* cpu = gCPU + sDebuggerOnCPU;
+	addr_t oldFaultHandler = cpu->fault_handler;
+	addr_t oldFaultHandlerStackPointer = cpu->fault_handler_stack_pointer;
+
+	int result = setjmp(jumpBuffer);
+	if (result == 0) {
+		arch_debug_call_with_fault_handler(cpu, jumpBuffer, function,
+			parameter);
+	}
+
+	// restore old fault handler
+	cpu->fault_handler = oldFaultHandler;
+	cpu->fault_handler_stack_pointer = oldFaultHandlerStackPointer;
+
+	return result;
+}
+
+
+/*!	Similar to user_memcpy(), but can only be invoked from within the kernel
+	debugger (and must not be used outside).
+*/
+status_t
+debug_memcpy(void* to, const void* from, size_t size)
+{
+	debug_memcpy_parameters parameters = {to, from, size};
+
+	if (debug_call_with_fault_handler(gCPU[sDebuggerOnCPU].fault_jump_buffer,
+			&debug_memcpy_trampoline, &parameters) != 0) {
+		return B_BAD_ADDRESS;
+	}
+	return B_OK;
 }
 
 

@@ -290,8 +290,8 @@ gdb_parse_command(void)
 			// We cannot directly access the requested memory
 			// for gdb may be trying to access an stray pointer
 			// We copy the memory to a safe buffer using
-			// the bulletproof user_memcpy().
-			if (user_memcpy(sSafeMemory, (char*)address, len) < 0)
+			// the bulletproof debug_memcpy().
+			if (debug_memcpy(sSafeMemory, (char*)address, len) < 0)
 				gdb_reply("E02");
 			else
 				gdb_memreply(sSafeMemory, len);

@@ -29,6 +29,14 @@
 #define INVOKE_COMMAND_ERROR	2
 
 
+struct invoke_command_parameters {
+	debugger_command*	command;
+	int					argc;
+	char**				argv;
+	int					result;
+};
+
+
 static const int32 kMaxInvokeCommandDepth = 5;
 static const int32 kOutputBufferSize = 1024;
 
@@ -153,6 +161,16 @@ static PipeDebugOutputFilter sPipeOutputFilters[
 	MAX_DEBUGGER_COMMAND_PIPE_LENGTH - 1];
 
 
+static void
+invoke_command_trampoline(void* _parameters)
+{
+	invoke_command_parameters* parameters
+		= (invoke_command_parameters*)_parameters;
+	parameters->result = parameters->command->func(parameters->argc,
+		parameters->argv);
+}
+
+
 static int
 invoke_pipe_segment(debugger_command_pipe* pipe, int32 index, char* argument)
 {
@@ -268,9 +286,6 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 		return 0;
 	}
 
-	struct thread* thread = thread_get_current_thread();
-	addr_t oldFaultHandler = thread->fault_handler;
-
 	// replace argv[0] with the actual command name
 	argv[0] = (char *)command->name;
 
@@ -284,26 +299,18 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 
 	sInCommand = true;
 
-	switch (setjmp(sInvokeCommandEnv[sInvokeCommandLevel++])) {
+	invoke_command_parameters parameters;
+	parameters.command = command;
+	parameters.argc = argc;
+	parameters.argv = argv;
+
+	switch (debug_call_with_fault_handler(
+			sInvokeCommandEnv[sInvokeCommandLevel++],
+			&invoke_command_trampoline, &parameters)) {
 		case 0:
-			int result;
-			thread->fault_handler = (addr_t)&&error;
-			// Fake goto to trick the compiler not to optimize the code at the
-			// label away.
-			if (!thread)
-				goto error;
-
-			result = command->func(argc, argv);
-
-			thread->fault_handler = oldFaultHandler;
 			sInvokeCommandLevel--;
 			sInCommand = false;
-			return result;
-
-		error:
-			// jump to INVOKE_COMMAND_FAULT case, cleaning up the stack
-			longjmp(sInvokeCommandEnv[--sInvokeCommandLevel],
-				INVOKE_COMMAND_FAULT);
+			return parameters.result;
 
 		case INVOKE_COMMAND_FAULT:
 		{
@@ -324,7 +331,6 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 			break;
 	}
 
-	thread->fault_handler = oldFaultHandler;
 	sInCommand = false;
 	return B_KDEBUG_ERROR;
 }

@@ -1786,7 +1786,7 @@ elf_load_user_image(const char *path, struct team *team, int flags,
 		if (programHeaders[i].p_type != PT_LOAD)
 			continue;
 
-		regionAddress = (char *)ROUNDOWN(programHeaders[i].p_vaddr,
+		regionAddress = (char *)ROUNDDOWN(programHeaders[i].p_vaddr,
 			B_PAGE_SIZE);
 		if (programHeaders[i].p_flags & PF_WRITE) {
 			// rw/data segment
@@ -1803,7 +1803,7 @@ elf_load_user_image(const char *path, struct team *team, int flags,
 			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
 				B_EXACT_ADDRESS, fileUpperBound,
 				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP, false,
-				fd, ROUNDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
+				fd, ROUNDDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
 				dprintf("error mapping file data: %s!\n", strerror(id));
 				status = B_NOT_AN_EXECUTABLE;
@@ -1851,7 +1851,7 @@ elf_load_user_image(const char *path, struct team *team, int flags,
 			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
 				B_EXACT_ADDRESS, segmentSize,
 				B_READ_AREA | B_EXECUTE_AREA, REGION_PRIVATE_MAP, false,
-				fd, ROUNDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
+				fd, ROUNDDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
 				dprintf("error mapping file text: %s!\n", strerror(id));
 				status = B_NOT_AN_EXECUTABLE;
@@ -2070,7 +2070,7 @@ load_kernel_add_on(const char *path)
 			continue;
 		}
 
-		region->start = (addr_t)reservedAddress + ROUNDOWN(
+		region->start = (addr_t)reservedAddress + ROUNDDOWN(
 			programHeaders[i].p_vaddr, B_PAGE_SIZE);
 		region->size = ROUNDUP(programHeaders[i].p_memsz
 			+ (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
@@ -2083,7 +2083,7 @@ load_kernel_add_on(const char *path)
 			status = B_NOT_AN_EXECUTABLE;
 			goto error4;
 		}
-		region->delta = -ROUNDOWN(programHeaders[i].p_vaddr, B_PAGE_SIZE);
+		region->delta = -ROUNDDOWN(programHeaders[i].p_vaddr, B_PAGE_SIZE);
 
 		TRACE(("elf_load_kspace: created area \"%s\" at %p\n",
 			regionName, (void *)region->start));

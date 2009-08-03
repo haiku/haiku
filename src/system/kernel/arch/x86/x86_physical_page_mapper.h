@@ -36,6 +36,12 @@ public:
 
 	virtual	page_table_entry*	InterruptGetPageTableAt(
 									addr_t physicalAddress) = 0;
+
+	virtual	status_t			GetPageDebug(addr_t physicalAddress,
+									addr_t* _virtualAddress,
+									void** _handle) = 0;
+	virtual	status_t			PutPageDebug(addr_t virtualAddress,
+									void* _handle) = 0;
 };
 
 extern PhysicalPageMapper* gPhysicalPageMapper;

@@ -62,7 +62,7 @@ insert_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
 {
 	uint32 numRanges = *_numRanges;
 
-	start = ROUNDOWN(start, B_PAGE_SIZE);
+	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	size = ROUNDUP(size, B_PAGE_SIZE);
 	addr_t end = start + size;
 
@@ -141,7 +141,7 @@ remove_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
 	uint32 numRanges = *_numRanges;
 
 	addr_t end = ROUNDUP(start + size, B_PAGE_SIZE);
-	start = ROUNDOWN(start, B_PAGE_SIZE);
+	start = ROUNDDOWN(start, B_PAGE_SIZE);
 
 	for (uint32 i = 0; i < numRanges; i++) {
 		addr_t rangeStart = ranges[i].start;

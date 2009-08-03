@@ -57,7 +57,7 @@ static status_t
 insert_memory_range(addr_range *ranges, uint32 &numRanges, uint32 maxRanges,
 	const void *_start, uint32 _size)
 {
-	addr_t start = ROUNDOWN(addr_t(_start), B_PAGE_SIZE);
+	addr_t start = ROUNDDOWN(addr_t(_start), B_PAGE_SIZE);
 	addr_t end = ROUNDUP(addr_t(_start) + _size, B_PAGE_SIZE);
 	addr_t size = end - start;
 	if (size == 0)
@@ -133,7 +133,7 @@ static status_t
 remove_memory_range(addr_range *ranges, uint32 &numRanges, uint32 maxRanges,
 	const void *_start, uint32 _size)
 {
-	addr_t start = ROUNDOWN(addr_t(_start), B_PAGE_SIZE);
+	addr_t start = ROUNDDOWN(addr_t(_start), B_PAGE_SIZE);
 	addr_t end = ROUNDUP(addr_t(_start) + _size, B_PAGE_SIZE);
 
 	for (uint32 i = 0; i < numRanges; i++) {

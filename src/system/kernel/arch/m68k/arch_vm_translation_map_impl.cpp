@@ -651,7 +651,7 @@ unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 	status_t status;
 	int index;
 
-	start = ROUNDOWN(start, B_PAGE_SIZE);
+	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
 
 	TRACE(("unmap_tmap: asked to free pages 0x%lx to 0x%lx\n", start, end));
@@ -873,7 +873,7 @@ protect_tmap(vm_translation_map *map, addr_t start, addr_t end, uint32 attribute
 	status_t status;
 	int index;
 
-	start = ROUNDOWN(start, B_PAGE_SIZE);
+	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
 
 	TRACE(("protect_tmap: pages 0x%lx to 0x%lx, attributes %lx\n", start, end, attributes));
@@ -1511,3 +1511,11 @@ m68k_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 	return B_OK;
 }
 
+
+bool
+arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
+	uint32 protection)
+{
+	// TODO: Implement!
+	return false;
+}

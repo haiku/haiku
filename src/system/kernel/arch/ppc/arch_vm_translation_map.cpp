@@ -330,7 +330,7 @@ unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 {
 	page_table_entry *entry;
 
-	start = ROUNDOWN(start, B_PAGE_SIZE);
+	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
 
 //	dprintf("vm_translation_map.unmap_tmap: start 0x%lx, end 0x%lx\n", start, end);
@@ -678,8 +678,8 @@ ppc_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
 	size_t size)
 {
 	addr_t virtualEnd = ROUNDUP(virtualAddress + size, B_PAGE_SIZE);
-	virtualAddress = ROUNDOWN(virtualAddress, B_PAGE_SIZE);
-	physicalAddress = ROUNDOWN(physicalAddress, B_PAGE_SIZE);
+	virtualAddress = ROUNDDOWN(virtualAddress, B_PAGE_SIZE);
+	physicalAddress = ROUNDDOWN(physicalAddress, B_PAGE_SIZE);
 
 	vm_address_space *addressSpace = vm_kernel_address_space();
 
@@ -701,7 +701,7 @@ void
 ppc_unmap_address_range(addr_t virtualAddress, size_t size)
 {
 	addr_t virtualEnd = ROUNDUP(virtualAddress + size, B_PAGE_SIZE);
-	virtualAddress = ROUNDOWN(virtualAddress, B_PAGE_SIZE);
+	virtualAddress = ROUNDDOWN(virtualAddress, B_PAGE_SIZE);
 
 	vm_address_space *addressSpace = vm_kernel_address_space();
 
@@ -713,7 +713,7 @@ ppc_unmap_address_range(addr_t virtualAddress, size_t size)
 status_t
 ppc_remap_address_range(addr_t *_virtualAddress, size_t size, bool unmap)
 {
-	addr_t virtualAddress = ROUNDOWN(*_virtualAddress, B_PAGE_SIZE);
+	addr_t virtualAddress = ROUNDDOWN(*_virtualAddress, B_PAGE_SIZE);
 	size = ROUNDUP(*_virtualAddress + size - virtualAddress, B_PAGE_SIZE);
 
 	vm_address_space *addressSpace = vm_kernel_address_space();
@@ -746,3 +746,11 @@ ppc_remap_address_range(addr_t *_virtualAddress, size_t size, bool unmap)
 	return B_OK;
 }
 
+
+bool
+arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
+	uint32 protection)
+{
+	// TODO: Implement!
+	return false;
+}

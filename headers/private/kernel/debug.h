@@ -8,10 +8,13 @@
 #ifndef _KERNEL_DEBUG_H
 #define _KERNEL_DEBUG_H
 
-#include "kernel_debug_config.h"
+
+#include <setjmp.h>
 
 #include <KernelExport.h>
 #include <module.h>
+
+#include "kernel_debug_config.h"
 
 
 /*	KDEBUG
@@ -123,6 +126,11 @@ extern debug_page_fault_info* debug_get_page_fault_info();
 extern void		debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver);
 extern void		debug_double_fault(int32 cpu);
 extern bool		debug_emergency_key_pressed(char key);
+extern bool		debug_is_kernel_memory_accessible(addr_t address, size_t size,
+					uint32 protection);
+extern int		debug_call_with_fault_handler(jmp_buf jumpBuffer,
+					void (*function)(void*), void* parameter);
+extern status_t	debug_memcpy(void* to, const void* from, size_t size);
 
 extern char		kgetc(void);
 extern void		kputs(const char *string);

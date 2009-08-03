@@ -16,7 +16,7 @@
 
 static bool sHasTlbia;
 
-status_t 
+status_t
 arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 {
 	// enable FPU
@@ -65,7 +65,7 @@ arch_cpu_init_post_modules(kernel_args *args)
 
 #define CACHELINE 32
 
-void 
+void
 arch_cpu_sync_icache(void *address, size_t len)
 {
 	int l, off;
@@ -109,7 +109,7 @@ arch_cpu_memory_write_barrier(void)
 }
 
 
-void 
+void
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
 	asm volatile("sync");
@@ -124,7 +124,7 @@ arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 }
 
 
-void 
+void
 arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 {
 	int i;
@@ -140,7 +140,7 @@ arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 }
 
 
-void 
+void
 arch_cpu_global_TLB_invalidate(void)
 {
 	if (sHasTlbia) {
@@ -156,7 +156,7 @@ arch_cpu_global_TLB_invalidate(void)
 			tlbie(address);
 			eieio();
 			ppc_sync();
-	
+
 			address += B_PAGE_SIZE;
 		}
 		tlbsync();
@@ -165,7 +165,7 @@ arch_cpu_global_TLB_invalidate(void)
 }
 
 
-void 
+void
 arch_cpu_user_TLB_invalidate(void)
 {
 	arch_cpu_global_TLB_invalidate();
@@ -180,6 +180,7 @@ arch_cpu_user_memcpy(void *to, const void *from, size_t size,
 	char *s = (char *)from;
 	addr_t oldFaultHandler = *faultHandler;
 
+// TODO: This doesn't work correctly with gcc 4 anymore!
 	if (ppc_set_fault_handler(faultHandler, (addr_t)&&error))
 		goto error;
 
@@ -201,7 +202,7 @@ error:
  *	\param to Pointer to the destination C-string.
  *	\param from Pointer to the source C-string.
  *	\param size Size in bytes of the string buffer pointed to by \a to.
- *	
+ *
  *	\return strlen(\a from).
  */
 
@@ -211,12 +212,13 @@ arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHand
 	int from_length = 0;
 	addr_t oldFaultHandler = *faultHandler;
 
+// TODO: This doesn't work correctly with gcc 4 anymore!
 	if (ppc_set_fault_handler(faultHandler, (addr_t)&&error))
 		goto error;
 
 	if (size > 0) {
 		to[--size] = '\0';
-		// copy 
+		// copy
 		for ( ; size; size--, from_length++, to++, from++) {
 			if ((*to = *from) == '\0')
 				break;
@@ -241,6 +243,7 @@ arch_cpu_user_memset(void *s, char c, size_t count, addr_t *faultHandler)
 	char *xs = (char *)s;
 	addr_t oldFaultHandler = *faultHandler;
 
+// TODO: This doesn't work correctly with gcc 4 anymore!
 	if (ppc_set_fault_handler(faultHandler, (addr_t)&&error))
 		goto error;
 
@@ -286,6 +289,7 @@ arch_cpu_idle(void)
 bool
 ppc_set_fault_handler(addr_t *handlerLocation, addr_t handler)
 {
+// TODO: This doesn't work correctly with gcc 4 anymore!
 	*handlerLocation = handler;
 	return false;
 }

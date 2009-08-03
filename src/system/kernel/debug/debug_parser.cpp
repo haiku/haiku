@@ -4,6 +4,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <debug.h>
 
 #include <ctype.h>
@@ -695,7 +696,7 @@ ExpressionParser::_ParseExpression(bool expectAssignment)
 					break;
 			}
 
-			if (user_memcpy(address, &buffer, size) != B_OK) {
+			if (debug_memcpy(address, &buffer, size) != B_OK) {
 				snprintf(sTempBuffer, sizeof(sTempBuffer),
 					"failed to write to address %p", address);
 				parse_exception(sTempBuffer, position);
@@ -1032,7 +1033,7 @@ ExpressionParser::_ParseDereference(void** _address, uint32* _size)
 
 	// read bytes from address into a tempory buffer
 	uint64 buffer;
-	if (user_memcpy(&buffer, address, size) != B_OK) {
+	if (debug_memcpy(&buffer, address, size) != B_OK) {
 		snprintf(sTempBuffer, sizeof(sTempBuffer),
 			"failed to dereference address %p", address);
 		parse_exception(sTempBuffer, starPosition);

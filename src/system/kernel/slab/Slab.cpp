@@ -686,7 +686,7 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 static void
 object_cache_commit_slab(object_cache *cache, slab *slab)
 {
-	void *pages = (void *)ROUNDOWN((addr_t)slab->pages, B_PAGE_SIZE);
+	void *pages = (void *)ROUNDDOWN((addr_t)slab->pages, B_PAGE_SIZE);
 	if (create_area(cache->name, &pages, B_EXACT_ADDRESS, cache->slab_size,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA) < B_OK)
 		panic("failed to create_area()");

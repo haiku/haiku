@@ -375,7 +375,7 @@ unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 	page_directory_entry *pd = map->arch_data->pgdir_virt;
 	int index;
 
-	start = ROUNDOWN(start, B_PAGE_SIZE);
+	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
 
 	TRACE(("unmap_tmap: asked to free pages 0x%lx to 0x%lx\n", start, end));
@@ -515,7 +515,7 @@ protect_tmap(vm_translation_map *map, addr_t start, addr_t end,
 	page_directory_entry *pd = map->arch_data->pgdir_virt;
 	int index;
 
-	start = ROUNDOWN(start, B_PAGE_SIZE);
+	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
 
 	TRACE(("protect_tmap: pages 0x%lx to 0x%lx, attributes %lx\n", start, end,
@@ -934,3 +934,75 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 	return B_OK;
 }
 
+
+/*!	Verifies that the page at the given virtual address can be accessed in the
+	current context.
+
+	This function is invoked in the kernel debugger. Paranoid checking is in
+	order.
+
+	\param virtualAddress The virtual address to be checked.
+	\param protection The area protection for which to check. Valid is a bitwise
+		or of one or more of \c B_KERNEL_READ_AREA or \c B_KERNEL_WRITE_AREA.
+	\return \c true, if the address can be accessed in all ways specified by
+		\a protection, \c false otherwise.
+*/
+bool
+arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
+	uint32 protection)
+{
+	// We only trust the kernel team's page directory. So switch to it first.
+	// Always set it to make sure the TLBs don't contain obsolete data.
+	addr_t physicalPageDirectory;
+	read_cr3(physicalPageDirectory);
+	write_cr3(sKernelPhysicalPageDirectory);
+
+	// get the page directory entry for the address
+	page_directory_entry pageDirectoryEntry;
+	uint32 index = VADDR_TO_PDENT(virtualAddress);
+
+	if (physicalPageDirectory == (addr_t)sKernelPhysicalPageDirectory) {
+		pageDirectoryEntry = sKernelVirtualPageDirectory[index];
+	} else {
+		// map the original page directory and get the entry
+		void* handle;
+		addr_t virtualPageDirectory;
+		status_t error = gPhysicalPageMapper->GetPageDebug(
+			physicalPageDirectory, &virtualPageDirectory, &handle);
+		if (error == B_OK) {
+			pageDirectoryEntry
+				= ((page_directory_entry*)virtualPageDirectory)[index];
+			gPhysicalPageMapper->PutPageDebug(virtualPageDirectory,
+				handle);
+		} else
+			pageDirectoryEntry.present = 0;
+	}
+
+	// map the page table and get the entry
+	page_table_entry pageTableEntry;
+	index = VADDR_TO_PTENT(virtualAddress);
+
+	if (pageDirectoryEntry.present != 0) {
+		void* handle;
+		addr_t virtualPageTable;
+		status_t error = gPhysicalPageMapper->GetPageDebug(
+			ADDR_REVERSE_SHIFT(pageDirectoryEntry.addr), &virtualPageTable,
+			&handle);
+		if (error == B_OK) {
+			pageTableEntry = ((page_table_entry*)virtualPageTable)[index];
+			gPhysicalPageMapper->PutPageDebug(virtualPageTable, handle);
+		} else
+			pageTableEntry.present = 0;
+	} else
+		pageTableEntry.present = 0;
+
+	// switch back to the original page directory
+	if (physicalPageDirectory != (addr_t)sKernelPhysicalPageDirectory)
+		write_cr3(physicalPageDirectory);
+
+	if (pageTableEntry.present == 0)
+		return false;
+
+	// present means kernel-readable, so check for writable
+	return (protection & B_KERNEL_WRITE_AREA) == 0 || pageTableEntry.rw != 0;
+}

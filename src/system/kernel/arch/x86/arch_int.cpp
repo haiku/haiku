@@ -204,22 +204,27 @@ set_gate(desc_table *gate_addr, addr_t addr, int type, int dpl)
 
 
 /*!	Initializes the descriptor for interrupt vector \a n in the IDT of the
-	boot CPU to an interrupt-gate descriptor with the given procedure address.
+	specified CPU to an interrupt-gate descriptor with the given procedure
+	address.
+	For CPUs other than the boot CPU it must not be called before
+	arch_int_init_post_vm().
 */
 static void
-set_interrupt_gate(int n, void (*addr)())
+set_interrupt_gate(int32 cpu, int n, void (*addr)())
 {
-	set_gate(&sIDTs[0][n], (addr_t)addr, 14, DPL_KERNEL);
+	set_gate(&sIDTs[cpu][n], (addr_t)addr, 14, DPL_KERNEL);
 }
 
 
 /*!	Initializes the descriptor for interrupt vector \a n in the IDT of the
-	boot CPU to an trap-gate descriptor with the given procedure address.
+	specified CPU to an trap-gate descriptor with the given procedure address.
+	For CPUs other than the boot CPU it must not be called before
+	arch_int_init_post_vm().
 */
 static void
-set_trap_gate(int n, void (*addr)())
+set_trap_gate(int32 cpu, int n, void (*addr)())
 {
-	set_gate(&sIDTs[0][n], (unsigned int)addr, 15, DPL_USER);
+	set_gate(&sIDTs[cpu][n], (unsigned int)addr, 15, DPL_USER);
 }
 
 
@@ -851,7 +856,39 @@ x86_double_fault_exception(struct iframe* frame)
 	frame->edi = tss->edi;
 	frame->flags = tss->eflags;
 
+	// Use a special handler for page faults which avoids the triple fault
+	// pitfalls.
+	set_interrupt_gate(cpu, 14, &trap14_double_fault);
+
 	debug_double_fault(cpu);
+}
+
+
+void
+x86_page_fault_exception_double_fault(struct iframe* frame)
+{
+	uint32 cr2;
+	asm("movl %%cr2, %0" : "=r" (cr2));
+
+	// Only if this CPU has a fault handler, we're allowed to be here.
+	cpu_ent& cpu = gCPU[x86_double_fault_get_cpu()];
+	addr_t faultHandler = cpu.fault_handler;
+	if (faultHandler != 0) {
+		debug_set_page_fault_info(cr2, frame->eip,
+			(frame->error_code & 0x2) != 0 ? DEBUG_PAGE_FAULT_WRITE : 0);
+		frame->eip = faultHandler;
+		frame->ebp = cpu.fault_handler_stack_pointer;
+		return;
+	}
+
+	// No fault handler. This is bad. Since we originally came from a double
+	// fault, we don't try to reenter the kernel debugger. Instead we just
+	// print the info we've got and enter an infinite loop.
+	kprintf("Page fault in double fault debugger without fault handler! "
+		"Touching address %p from eip %p. Entering infinite loop...\n",
+		(void*)cr2, (void*)frame->eip);
+
+	while (true);
 }
 
 
@@ -859,19 +896,34 @@ static void
 page_fault_exception(struct iframe* frame)
 {
 	struct thread *thread = thread_get_current_thread();
-	bool kernelDebugger = debug_debugger_running();
-	unsigned int cr2;
+	uint32 cr2;
 	addr_t newip;
 
 	asm("movl %%cr2, %0" : "=r" (cr2));
 
-	if (kernelDebugger) {
-		// if this thread has a fault handler, we're allowed to be here
-		if (thread && thread->fault_handler != 0) {
-			debug_set_page_fault_info(cr2, frame->eip,
-				(frame->error_code & 0x2) != 0 ? DEBUG_PAGE_FAULT_WRITE : 0);
-			frame->eip = thread->fault_handler;
-			return;
+	if (debug_debugger_running()) {
+		// If this CPU or this thread has a fault handler, we're allowed to be
+		// here.
+		if (thread != NULL) {
+			cpu_ent* cpu = &gCPU[smp_get_current_cpu()];
+			if (cpu->fault_handler != 0) {
+				debug_set_page_fault_info(cr2, frame->eip,
+					(frame->error_code & 0x2) != 0
+						? DEBUG_PAGE_FAULT_WRITE : 0);
+				frame->eip = cpu->fault_handler;
+				frame->ebp = cpu->fault_handler_stack_pointer;
+				return;
+			}
+
+			if (thread->fault_handler != 0) {
+				kprintf("ERROR: thread::fault_handler used in kernel "
+					"debugger!\n");
+				debug_set_page_fault_info(cr2, frame->eip,
+					(frame->error_code & 0x2) != 0
+						? DEBUG_PAGE_FAULT_WRITE : 0);
+				frame->eip = thread->fault_handler;
+				return;
+			}
 		}
 
 		// otherwise, not really
@@ -886,8 +938,16 @@ page_fault_exception(struct iframe* frame)
 		// disabled, which in most cases is a bug. We should add some thread
 		// flag allowing to explicitly indicate that this handling is desired.
 		if (thread && thread->fault_handler != 0) {
-			frame->eip = thread->fault_handler;
-			return;
+			if (frame->eip != thread->fault_handler) {
+				frame->eip = thread->fault_handler;
+				return;
+			}
+
+			// The fault happened at the fault handler address. This is a
+			// certain infinite loop.
+			panic("page fault, interrupts disabled, fault handler loop. "
+				"Touching address %p from eip %p\n", (void*)cr2,
+				(void*)frame->eip);
 		}
 
 		// If we are not running the kernel startup the page fault was not
@@ -971,60 +1031,60 @@ arch_int_init(struct kernel_args *args)
 	// setup the standard programmable interrupt controller
 	pic_init();
 
-	set_interrupt_gate(0,  &trap0);
-	set_interrupt_gate(1,  &trap1);
-	set_interrupt_gate(2,  &trap2);
-	set_trap_gate(3,  &trap3);
-	set_interrupt_gate(4,  &trap4);
-	set_interrupt_gate(5,  &trap5);
-	set_interrupt_gate(6,  &trap6);
-	set_interrupt_gate(7,  &trap7);
+	set_interrupt_gate(0, 0,  &trap0);
+	set_interrupt_gate(0, 1,  &trap1);
+	set_interrupt_gate(0, 2,  &trap2);
+	set_trap_gate(0, 3,  &trap3);
+	set_interrupt_gate(0, 4,  &trap4);
+	set_interrupt_gate(0, 5,  &trap5);
+	set_interrupt_gate(0, 6,  &trap6);
+	set_interrupt_gate(0, 7,  &trap7);
 	// trap8 (double fault) is set in arch_cpu.c
-	set_interrupt_gate(9,  &trap9);
-	set_interrupt_gate(10,  &trap10);
-	set_interrupt_gate(11,  &trap11);
-	set_interrupt_gate(12,  &trap12);
-	set_interrupt_gate(13,  &trap13);
-	set_interrupt_gate(14,  &trap14);
-//	set_interrupt_gate(15,  &trap15);
-	set_interrupt_gate(16,  &trap16);
-	set_interrupt_gate(17,  &trap17);
-	set_interrupt_gate(18,  &trap18);
-	set_interrupt_gate(19,  &trap19);
+	set_interrupt_gate(0, 9,  &trap9);
+	set_interrupt_gate(0, 10,  &trap10);
+	set_interrupt_gate(0, 11,  &trap11);
+	set_interrupt_gate(0, 12,  &trap12);
+	set_interrupt_gate(0, 13,  &trap13);
+	set_interrupt_gate(0, 14,  &trap14);
+//	set_interrupt_gate(0, 15,  &trap15);
+	set_interrupt_gate(0, 16,  &trap16);
+	set_interrupt_gate(0, 17,  &trap17);
+	set_interrupt_gate(0, 18,  &trap18);
+	set_interrupt_gate(0, 19,  &trap19);
 
-	set_interrupt_gate(32,  &trap32);
-	set_interrupt_gate(33,  &trap33);
-	set_interrupt_gate(34,  &trap34);
-	set_interrupt_gate(35,  &trap35);
-	set_interrupt_gate(36,  &trap36);
-	set_interrupt_gate(37,  &trap37);
-	set_interrupt_gate(38,  &trap38);
-	set_interrupt_gate(39,  &trap39);
-	set_interrupt_gate(40,  &trap40);
-	set_interrupt_gate(41,  &trap41);
-	set_interrupt_gate(42,  &trap42);
-	set_interrupt_gate(43,  &trap43);
-	set_interrupt_gate(44,  &trap44);
-	set_interrupt_gate(45,  &trap45);
-	set_interrupt_gate(46,  &trap46);
-	set_interrupt_gate(47,  &trap47);
-	set_interrupt_gate(48,  &trap48);
-	set_interrupt_gate(49,  &trap49);
-	set_interrupt_gate(50,  &trap50);
-	set_interrupt_gate(51,  &trap51);
-	set_interrupt_gate(52,  &trap52);
-	set_interrupt_gate(53,  &trap53);
-	set_interrupt_gate(54,  &trap54);
-	set_interrupt_gate(55,  &trap55);
+	set_interrupt_gate(0, 32,  &trap32);
+	set_interrupt_gate(0, 33,  &trap33);
+	set_interrupt_gate(0, 34,  &trap34);
+	set_interrupt_gate(0, 35,  &trap35);
+	set_interrupt_gate(0, 36,  &trap36);
+	set_interrupt_gate(0, 37,  &trap37);
+	set_interrupt_gate(0, 38,  &trap38);
+	set_interrupt_gate(0, 39,  &trap39);
+	set_interrupt_gate(0, 40,  &trap40);
+	set_interrupt_gate(0, 41,  &trap41);
+	set_interrupt_gate(0, 42,  &trap42);
+	set_interrupt_gate(0, 43,  &trap43);
+	set_interrupt_gate(0, 44,  &trap44);
+	set_interrupt_gate(0, 45,  &trap45);
+	set_interrupt_gate(0, 46,  &trap46);
+	set_interrupt_gate(0, 47,  &trap47);
+	set_interrupt_gate(0, 48,  &trap48);
+	set_interrupt_gate(0, 49,  &trap49);
+	set_interrupt_gate(0, 50,  &trap50);
+	set_interrupt_gate(0, 51,  &trap51);
+	set_interrupt_gate(0, 52,  &trap52);
+	set_interrupt_gate(0, 53,  &trap53);
+	set_interrupt_gate(0, 54,  &trap54);
+	set_interrupt_gate(0, 55,  &trap55);
 
-	set_trap_gate(98, &trap98);	// for performance testing only
-	set_trap_gate(99, &trap99);
+	set_trap_gate(0, 98, &trap98);	// for performance testing only
+	set_trap_gate(0, 99, &trap99);
 
-	set_interrupt_gate(251, &trap251);
-	set_interrupt_gate(252, &trap252);
-	set_interrupt_gate(253, &trap253);
-	set_interrupt_gate(254, &trap254);
-	set_interrupt_gate(255, &trap255);
+	set_interrupt_gate(0, 251, &trap251);
+	set_interrupt_gate(0, 252, &trap252);
+	set_interrupt_gate(0, 253, &trap253);
+	set_interrupt_gate(0, 254, &trap254);
+	set_interrupt_gate(0, 255, &trap255);
 
 	// init interrupt handler table
 	table = gInterruptHandlerTable;

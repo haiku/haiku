@@ -284,6 +284,7 @@ bool x86_check_feature(uint32 feature, enum x86_feature_type type);
 void* x86_get_double_fault_stack(int32 cpu, size_t* _size);
 int32 x86_double_fault_get_cpu(void);
 void x86_double_fault_exception(struct iframe* frame);
+void x86_page_fault_exception_double_fault(struct iframe* frame);
 
 
 #define read_cr3(value) \

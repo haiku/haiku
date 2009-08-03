@@ -31,6 +31,7 @@
 #include <file_cache.h>
 #include <fs/fd.h>
 #include <heap.h>
+#include <kernel.h>
 #include <int.h>
 #include <lock.h>
 #include <low_resource_manager.h>
@@ -62,9 +63,6 @@
 #else
 #	define FTRACE(x) ;
 #endif
-
-#define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
-#define ROUNDOWN(a, b) (((a) / (b)) * (b))
 
 
 class AddressSpaceReadLocker {
@@ -2266,7 +2264,7 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	TRACE(("_vm_map_file(fd = %d, offset = %Ld, size = %lu, mapping %ld)\n",
 		fd, offset, size, mapping));
 
-	offset = ROUNDOWN(offset, B_PAGE_SIZE);
+	offset = ROUNDDOWN(offset, B_PAGE_SIZE);
 	size = PAGE_ALIGN(size);
 
 	if (mapping == REGION_NO_PRIVATE_MAP)
@@ -3332,7 +3330,7 @@ display_mem(int argc, char** argv)
 			kprintf("NOTE: number of bytes has been cut to page size\n");
 		}
 
-		address = ROUNDOWN(address, B_PAGE_SIZE);
+		address = ROUNDDOWN(address, B_PAGE_SIZE);
 
 		if (vm_get_physical_page_debug(address, &copyAddress,
 				&physicalPageHandle) != B_OK) {
@@ -3351,7 +3349,7 @@ display_mem(int argc, char** argv)
 		// string mode
 		for (i = 0; true; i++) {
 			char c;
-			if (user_memcpy(&c, (char*)copyAddress + i, 1) != B_OK
+			if (debug_memcpy(&c, (char*)copyAddress + i, 1) != B_OK
 				|| c == '\0')
 				break;
 
@@ -3382,7 +3380,7 @@ display_mem(int argc, char** argv)
 
 				for (j = 0; j < displayed; j++) {
 					char c;
-					if (user_memcpy(&c, (char*)copyAddress + i * itemSize + j,
+					if (debug_memcpy(&c, (char*)copyAddress + i * itemSize + j,
 							1) != B_OK) {
 						displayed = j;
 						break;
@@ -3400,7 +3398,7 @@ display_mem(int argc, char** argv)
 				kprintf("  ");
 			}
 
-			if (user_memcpy(&value, (uint8*)copyAddress + i * itemSize,
+			if (debug_memcpy(&value, (uint8*)copyAddress + i * itemSize,
 					itemSize) != B_OK) {
 				kprintf("read fault");
 				break;
@@ -3426,7 +3424,7 @@ display_mem(int argc, char** argv)
 	}
 
 	if (physical) {
-		copyAddress = ROUNDOWN(copyAddress, B_PAGE_SIZE);
+		copyAddress = ROUNDDOWN(copyAddress, B_PAGE_SIZE);
 		vm_put_physical_page_debug(copyAddress, physicalPageHandle);
 	}
 	return 0;
@@ -4033,7 +4031,7 @@ create_preloaded_image_areas(struct preloaded_image* image)
 
 	memcpy(name, fileName, length);
 	strcpy(name + length, "_text");
-	address = (void*)ROUNDOWN(image->text_region.start, B_PAGE_SIZE);
+	address = (void*)ROUNDDOWN(image->text_region.start, B_PAGE_SIZE);
 	image->text_region.id = create_area(name, &address, B_EXACT_ADDRESS,
 		PAGE_ALIGN(image->text_region.size), B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -4041,7 +4039,7 @@ create_preloaded_image_areas(struct preloaded_image* image)
 		// ELF initialization code
 
 	strcpy(name + length, "_data");
-	address = (void*)ROUNDOWN(image->data_region.start, B_PAGE_SIZE);
+	address = (void*)ROUNDDOWN(image->data_region.start, B_PAGE_SIZE);
 	image->data_region.id = create_area(name, &address, B_EXACT_ADDRESS,
 		PAGE_ALIGN(image->data_region.size), B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -4304,11 +4302,11 @@ vm_init(kernel_args* args)
 
 	// allocate areas to represent stuff that already exists
 
-	address = (void*)ROUNDOWN(heapBase, B_PAGE_SIZE);
+	address = (void*)ROUNDDOWN(heapBase, B_PAGE_SIZE);
 	create_area("kernel heap", &address, B_EXACT_ADDRESS, heapSize,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
-	address = (void*)ROUNDOWN(slabInitialBase, B_PAGE_SIZE);
+	address = (void*)ROUNDDOWN(slabInitialBase, B_PAGE_SIZE);
 	create_area("initial slab space", &address, B_EXACT_ADDRESS,
 		slabInitialSize, B_ALREADY_WIRED, B_KERNEL_READ_AREA
 		| B_KERNEL_WRITE_AREA);
@@ -4431,7 +4429,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 
 	TPF(PageFaultStart(address, isWrite, isUser, faultAddress));
 
-	addr_t pageAddress = ROUNDOWN(address, B_PAGE_SIZE);
+	addr_t pageAddress = ROUNDDOWN(address, B_PAGE_SIZE);
 	vm_address_space* addressSpace = NULL;
 
 	status_t status = B_OK;
@@ -4829,7 +4827,7 @@ vm_soft_fault(vm_address_space* addressSpace, addr_t originalAddress,
 
 	PageFaultContext context(addressSpace, isWrite);
 
-	addr_t address = ROUNDOWN(originalAddress, B_PAGE_SIZE);
+	addr_t address = ROUNDDOWN(originalAddress, B_PAGE_SIZE);
 	status_t status = B_OK;
 
 	atomic_add(&addressSpace->fault_count, 1);
@@ -5407,7 +5405,7 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 	struct vm_translation_map* map;
 	addr_t unalignedBase = (addr_t)address;
 	addr_t end = unalignedBase + numBytes;
-	addr_t base = ROUNDOWN(unalignedBase, B_PAGE_SIZE);
+	addr_t base = ROUNDDOWN(unalignedBase, B_PAGE_SIZE);
 	bool isUser = IS_USER_ADDRESS(address);
 	bool needsLocking = true;
 
@@ -5513,7 +5511,7 @@ unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 	struct vm_translation_map* map;
 	addr_t unalignedBase = (addr_t)address;
 	addr_t end = unalignedBase + numBytes;
-	addr_t base = ROUNDOWN(unalignedBase, B_PAGE_SIZE);
+	addr_t base = ROUNDDOWN(unalignedBase, B_PAGE_SIZE);
 	bool needsLocking = true;
 
 	if (IS_USER_ADDRESS(address)) {

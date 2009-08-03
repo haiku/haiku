@@ -23,6 +23,7 @@ void trap44();void trap45();void trap46();void trap47();void trap48();void trap4
 void trap50();void trap51();void trap52();void trap53();void trap54();void trap55();
 
 void double_fault();	// int 8
+void trap14_double_fault();
 
 void trap98();
 void trap99();

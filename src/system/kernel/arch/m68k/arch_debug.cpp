@@ -65,25 +65,14 @@ get_current_stack_frame()
 static status_t
 get_next_frame(addr_t framePointer, addr_t *next, addr_t *ip)
 {
-	struct thread *thread = thread_get_current_thread();
-	addr_t oldFaultHandler = thread->fault_handler;
+	stack_frame frame;
+	if (debug_memcpy(&frame, (void*)framePointer, sizeof(frame)) != B_OK)
+		return B_BAD_ADDRESS;
 
-	// set fault handler, so that we can safely access user stacks
-	if (thread) {
-		if (m68k_set_fault_handler(&thread->fault_handler, (addr_t)&&error))
-			goto error;
-	}
+	*ip = frame.return_address;
+	*next = (addr_t)frame.previous;
 
-	*ip = ((struct stack_frame *)framePointer)->return_address;
-	*next = (addr_t)((struct stack_frame *)framePointer)->previous;
-
-	if (thread)
-		thread->fault_handler = oldFaultHandler;
 	return B_OK;
-
-error:
-	thread->fault_handler = oldFaultHandler;
-	return B_BAD_ADDRESS;
 }
 
 
@@ -364,6 +353,22 @@ arch_debug_get_interrupt_pc(bool* _isSyscall)
 {
 	// TODO: Implement!
 	return NULL;
+}
+
+
+void
+arch_debug_unset_current_thread(void)
+{
+	// TODO: Implement!
+}
+
+
+void
+arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
+	void (*function)(void*), void* parameter)
+{
+	// TODO: Implement! Most likely in assembly.
+	longjmp(jumpBuffer, 1);
 }
 
 

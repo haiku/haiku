@@ -213,6 +213,7 @@ FUNCTION(double_fault):
 	POP_IFRAME_AND_RETURN()
 FUNCTION_END(double_fault)
 
+
 TRAP(trap9, 9)
 TRAP_ERRC(trap10, 10)
 TRAP_ERRC(trap11, 11)
@@ -255,6 +256,23 @@ TRAP(trap252, 252)
 TRAP(trap253, 253)
 TRAP(trap254, 254)
 TRAP(trap255, 255)
+
+
+.align 8;
+FUNCTION(trap14_double_fault):
+	pushl	$14
+	pushl	$-1
+	pushl	$-1
+
+	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_OTHER)
+
+	movl	%esp, %ebp		// frame pointer is the iframe
+
+	pushl	%ebp
+	call	x86_page_fault_exception_double_fault
+
+	POP_IFRAME_AND_RETURN()
+FUNCTION_END(trap14_double_fault)
 
 
 .align 16

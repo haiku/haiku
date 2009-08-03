@@ -166,9 +166,9 @@ public:
 	inline	status_t			PutPageCurrentCPU(addr_t virtualAddress,
 									void* handle);
 
-	inline	status_t			GetPageDebug(addr_t physicalAddress,
+	virtual	status_t			GetPageDebug(addr_t physicalAddress,
 									addr_t* virtualAddress, void** handle);
-	inline	status_t			PutPageDebug(addr_t virtualAddress,
+	virtual	status_t			PutPageDebug(addr_t virtualAddress,
 									void* handle);
 
 			status_t			GetSlot(bool canWait,

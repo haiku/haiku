@@ -126,9 +126,9 @@ load_elf_symbol_table(int fd, preloaded_image *image)
 		status = B_ERROR;
 		goto error1;
 	}
-	
+
 	// find symbol table in section headers
-	
+
 	for (int32 i = 0; i < elfHeader.e_shnum; i++) {
 		if (sectionHeaders[i].sh_type == SHT_SYMTAB) {
 			stringHeader = &sectionHeaders[sectionHeaders[i].sh_link];
@@ -275,7 +275,7 @@ elf_load_image(int fd, preloaded_image *image)
 		} else
 			continue;
 
-		region->start = ROUNDOWN(header.p_vaddr, B_PAGE_SIZE);
+		region->start = ROUNDDOWN(header.p_vaddr, B_PAGE_SIZE);
 		region->size = ROUNDUP(header.p_memsz + (header.p_vaddr % B_PAGE_SIZE),
 			B_PAGE_SIZE);
 		region->delta = -region->start;

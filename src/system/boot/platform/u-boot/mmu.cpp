@@ -618,7 +618,7 @@ mmu_init(void)
 				extMemoryBlock[i].base_addr
 					= ROUNDUP(extMemoryBlock[i].base_addr, B_PAGE_SIZE);
 				extMemoryBlock[i].length
-					= ROUNDOWN(extMemoryBlock[i].length, B_PAGE_SIZE);
+					= ROUNDDOWN(extMemoryBlock[i].length, B_PAGE_SIZE);
 
 				// we ignore all memory beyond 4 GB
 				if (extMemoryBlock[i].base_addr > 0xffffffffULL)

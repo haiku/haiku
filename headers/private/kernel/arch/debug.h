@@ -11,6 +11,9 @@
 
 #include <SupportDefs.h>
 
+#include <cpu.h>
+
+
 struct kernel_args;
 struct thread;
 
@@ -27,6 +30,9 @@ void* arch_debug_get_interrupt_pc(bool* _isSyscall);
 bool arch_debug_contains_call(struct thread *thread, const char *symbol,
 		addr_t start, addr_t end);
 void arch_debug_save_registers(int *);
+void arch_debug_unset_current_thread(void);
+void arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
+		void (*function)(void*), void* parameter);
 
 bool arch_is_debug_variable_defined(const char* variableName);
 status_t arch_set_debug_variable(const char* variableName, uint64 value);

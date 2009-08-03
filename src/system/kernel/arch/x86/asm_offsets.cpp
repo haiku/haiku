@@ -8,7 +8,9 @@
 // a header file with macro definitions, that can be included from assembler
 // code.
 
+
 #include <arch_cpu.h>
+#include <cpu.h>
 #include <ksyscalls.h>
 #include <thread_types.h>
 
@@ -26,6 +28,10 @@
 void
 dummy()
 {
+	// struct cpu_ent
+	DEFINE_OFFSET_MACRO(CPU_ENT, cpu_ent, fault_handler);
+	DEFINE_OFFSET_MACRO(CPU_ENT, cpu_ent, fault_handler_stack_pointer);
+
 	// struct thread
 	DEFINE_OFFSET_MACRO(THREAD, thread, kernel_time);
 	DEFINE_OFFSET_MACRO(THREAD, thread, user_time);

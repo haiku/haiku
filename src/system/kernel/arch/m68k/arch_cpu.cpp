@@ -30,7 +30,7 @@ int arch_fpu_type;
 int arch_mmu_type;
 int arch_platform;
 
-status_t 
+status_t
 arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 {
 	// enable FPU
@@ -44,7 +44,7 @@ arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 }
 
 
-status_t 
+status_t
 arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
 {
 	//detect_cpu(curr_cpu);
@@ -102,7 +102,7 @@ arch_cpu_init_post_modules(kernel_args *args)
 }
 
 
-void 
+void
 arch_cpu_sync_icache(void *address, size_t len)
 {
 	cpu_ops.flush_icache((addr_t)address, len);
@@ -125,7 +125,7 @@ arch_cpu_memory_write_barrier(void)
 }
 
 
-void 
+void
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
 	int32 num_pages = end / B_PAGE_SIZE - start / B_PAGE_SIZE;
@@ -139,11 +139,11 @@ arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 }
 
 
-void 
+void
 arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 {
 	int i;
-	
+
 	cpu_ops.flush_insn_pipeline();
 	for (i = 0; i < num_pages; i++) {
 		cpu_ops.flush_atc_addr(pages[i]);
@@ -153,7 +153,7 @@ arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 }
 
 
-void 
+void
 arch_cpu_global_TLB_invalidate(void)
 {
 	cpu_ops.flush_insn_pipeline();
@@ -162,7 +162,7 @@ arch_cpu_global_TLB_invalidate(void)
 }
 
 
-void 
+void
 arch_cpu_user_TLB_invalidate(void)
 {
 	cpu_ops.flush_insn_pipeline();
@@ -179,6 +179,7 @@ arch_cpu_user_memcpy(void *to, const void *from, size_t size,
 	char *s = (char *)from;
 	addr_t oldFaultHandler = *faultHandler;
 
+// TODO: This doesn't work correctly with gcc 4 anymore!
 	if (m68k_set_fault_handler(faultHandler, (addr_t)&&error))
 		goto error;
 
@@ -200,7 +201,7 @@ error:
  *	\param to Pointer to the destination C-string.
  *	\param from Pointer to the source C-string.
  *	\param size Size in bytes of the string buffer pointed to by \a to.
- *	
+ *
  *	\return strlen(\a from).
  */
 
@@ -210,12 +211,13 @@ arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHand
 	int from_length = 0;
 	addr_t oldFaultHandler = *faultHandler;
 
+// TODO: This doesn't work correctly with gcc 4 anymore!
 	if (m68k_set_fault_handler(faultHandler, (addr_t)&&error))
 		goto error;
 
 	if (size > 0) {
 		to[--size] = '\0';
-		// copy 
+		// copy
 		for ( ; size; size--, from_length++, to++, from++) {
 			if ((*to = *from) == '\0')
 				break;
@@ -240,6 +242,7 @@ arch_cpu_user_memset(void *s, char c, size_t count, addr_t *faultHandler)
 	char *xs = (char *)s;
 	addr_t oldFaultHandler = *faultHandler;
 
+// TODO: This doesn't work correctly with gcc 4 anymore!
 	if (m68k_set_fault_handler(faultHandler, (addr_t)&&error))
 		goto error;
 
@@ -289,6 +292,7 @@ arch_cpu_idle(void)
 bool
 m68k_set_fault_handler(addr_t *handlerLocation, addr_t handler)
 {
+// TODO: This doesn't work correctly with gcc 4 anymore!
 	*handlerLocation = handler;
 	return false;
 }

@@ -56,26 +56,36 @@ already_visited(uint32 *visited, int32 *_last, int32 *_num, uint32 ebp)
 }
 
 
+/*!	Safe to be called only from outside the debugger.
+*/
 static status_t
-get_next_frame(addr_t ebp, addr_t *_next, addr_t *_eip)
+get_next_frame_no_debugger(addr_t ebp, addr_t *_next, addr_t *_eip)
 {
-	// set fault handler, so that we can safely access user stacks
-	addr_t oldFaultHandler = thread_get_current_thread()->fault_handler;
-	thread_get_current_thread()->fault_handler = (addr_t)&&error;
-	// Fake goto to trick the compiler not to optimize the code at the label
-	// away.
-	if (ebp == 0)
-		goto error;
+	// TODO: Do this more efficiently in assembly.
+	stack_frame frame;
+	if (user_memcpy(&frame, (void*)ebp, sizeof(frame)) != B_OK)
+		return B_BAD_ADDRESS;
 
-	*_eip = ((struct stack_frame *)ebp)->return_address;
-	*_next = (addr_t)((struct stack_frame *)ebp)->previous;
+	*_eip = frame.return_address;
+	*_next = (addr_t)frame.previous;
 
-	thread_get_current_thread()->fault_handler = oldFaultHandler;
 	return B_OK;
+}
 
-error:
-	thread_get_current_thread()->fault_handler = oldFaultHandler;
-	return B_BAD_ADDRESS;
+
+/*!	Safe to be called only from inside the debugger.
+*/
+static status_t
+get_next_frame_debugger(addr_t ebp, addr_t *_next, addr_t *_eip)
+{
+	stack_frame frame;
+	if (debug_memcpy(&frame, (void*)ebp, sizeof(frame)) != B_OK)
+		return B_BAD_ADDRESS;
+
+	*_eip = frame.return_address;
+	*_next = (addr_t)frame.previous;
+
+	return B_OK;
 }
 
 
@@ -285,8 +295,10 @@ print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 		kprintf(" + 0x%04lx\n", eip - baseAddress);
 	} else {
 		vm_area *area = NULL;
-		if (thread->team->address_space != NULL)
+		if (thread != NULL && thread->team != NULL
+			&& thread->team->address_space != NULL) {
 			area = vm_area_lookup(thread->team->address_space, eip);
+		}
 		if (area != NULL) {
 			kprintf("%ld:%s@%p + %#lx\n", area->id, area->name,
 				(void*)area->base, eip - area->base);
@@ -357,6 +369,7 @@ setup_for_thread(char *arg, struct thread **_thread, uint32 *_ebp,
 
 	*_thread = thread;
 }
+
 
 static bool
 is_double_fault_stack_address(int32 cpu, addr_t address)
@@ -564,7 +577,7 @@ stack_trace(int argc, char **argv)
 		} else {
 			addr_t eip, nextEbp;
 
-			if (get_next_frame(ebp, &nextEbp, &eip) != B_OK) {
+			if (get_next_frame_debugger(ebp, &nextEbp, &eip) != B_OK) {
 				kprintf("%08lx -- read fault\n", ebp);
 				break;
 			}
@@ -723,7 +736,7 @@ show_call(int argc, char **argv)
 		} else {
 			addr_t eip, nextEbp;
 
-			if (get_next_frame(ebp, &nextEbp, &eip) != B_OK) {
+			if (get_next_frame_debugger(ebp, &nextEbp, &eip) != B_OK) {
 				kprintf("%08lx -- read fault\n", ebp);
 				break;
 			}
@@ -894,7 +907,7 @@ arch_debug_contains_call(struct thread *thread, const char *symbol,
 		} else {
 			addr_t eip, nextEbp;
 
-			if (get_next_frame(ebp, &nextEbp, &eip) != B_OK
+			if (get_next_frame_no_debugger(ebp, &nextEbp, &eip) != B_OK
 				|| eip == 0 || ebp == 0)
 				break;
 
@@ -964,7 +977,7 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 					skipFrames = 0;
 			}
 		} else {
-			if (get_next_frame(ebp, &nextEbp, &eip) != B_OK)
+			if (get_next_frame_no_debugger(ebp, &nextEbp, &eip) != B_OK)
 				break;
 		}
 
@@ -997,6 +1010,16 @@ arch_debug_get_interrupt_pc(bool* _isSyscall)
 		*_isSyscall = frame->vector == 99;
 
 	return (void*)(addr_t)frame->eip;
+}
+
+
+/*!	Sets the current thread to \c NULL.
+	Invoked in the kernel debugger only.
+*/
+void
+arch_debug_unset_current_thread(void)
+{
+	write_dr3(NULL);
 }
 
 
