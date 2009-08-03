@@ -125,9 +125,11 @@ CreateParamsPanel::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_PARTITION_TYPE:
-			const char* type;
-			message->FindString("type", &type);
-			fEditor->PartitionTypeChanged(type);
+			if (fEditor != NULL) {
+				const char* type;
+				message->FindString("type", &type);
+				fEditor->PartitionTypeChanged(type);
+			}
 			break;
 
 		default:
@@ -185,10 +187,12 @@ CreateParamsPanel::Go(off_t& offset, off_t& size, BString& name,
 		}
 
 		// get editors parameters
-		if (fEditor->FinishedEditing()) {
-			status_t status = fEditor->GetParameters(&parameters);
-			if (status != B_OK)
-				fReturnValue = status;
+		if (fEditor != NULL) {
+			if (fEditor->FinishedEditing()) {
+				status_t status = fEditor->GetParameters(&parameters);
+				if (status != B_OK)
+					fReturnValue = status;
+			}
 		}
 	}
 
@@ -249,32 +253,55 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 		.Add(fTypeMenuField)
 	;
 	BBox* infoBox = new BBox(B_FANCY_BORDER, infoView);
+	BView* rootView;
 
 	parent->GetChildCreationParameterEditor(NULL, &fEditor);
-	BBox* parameterBox = new BBox(B_FANCY_BORDER, fEditor->View());
+	if (fEditor != NULL) {
+		BBox* parameterBox = new BBox(B_FANCY_BORDER, fEditor->View());
 
-	BView* rootView = BGroupLayoutBuilder(B_VERTICAL, 4)
-		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
+		rootView = BGroupLayoutBuilder(B_VERTICAL, 4)
+			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
 
-		// slider and types
-		.Add(infoBox)
+			// slider and types
+			.Add(infoBox)
 
-		.Add(BSpaceLayoutItem::CreateVerticalStrut(10))
+			.Add(BSpaceLayoutItem::CreateVerticalStrut(10))
 
-		// editor's view
-		.Add(parameterBox)
+			// editor's view
+			.Add(parameterBox)
 
-		// controls
-		.AddGroup(B_HORIZONTAL, 10)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
-			.AddGlue()
-			.Add(fCancelButton)
-			.Add(fOKButton)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
-		.End()
+			// controls
+			.AddGroup(B_HORIZONTAL, 10)
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
+				.AddGlue()
+				.Add(fCancelButton)
+				.Add(fOKButton)
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
+			.End()
 
-		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
-	;
+			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
+		;
+	} else {
+		rootView = BGroupLayoutBuilder(B_VERTICAL, 4)
+			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
+
+			// slider and types
+			.Add(infoBox)
+
+			.Add(BSpaceLayoutItem::CreateVerticalStrut(10))
+
+			// controls
+			.AddGroup(B_HORIZONTAL, 10)
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
+				.AddGlue()
+				.Add(fCancelButton)
+				.Add(fOKButton)
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
+			.End()
+
+			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
+		;
+	}
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(rootView);
