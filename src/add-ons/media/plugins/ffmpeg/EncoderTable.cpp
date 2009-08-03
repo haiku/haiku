@@ -48,18 +48,18 @@ const EncoderDescription gEncoderTable[] = {
 		B_MEDIA_RAW_VIDEO,
 		B_MEDIA_ENCODED_VIDEO
 	},
-//	{
-//		{
-//			"MP3 Audio",
-//			"mp3",
-//			0,
-//			CODEC_ID_MP3,
-//			{ 0 }
-//		},
-//		B_ANY_FORMAT_FAMILY,
-//		B_MEDIA_RAW_AUDIO,
-//		B_MEDIA_ENCODED_AUDIO
-//	}
+	{
+		{
+			"Raw Audio",
+			"pcm",
+			0,
+			CODEC_ID_PCM_S16LE,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO
+	}
 };
 
 const size_t gEncoderCount = sizeof(gEncoderTable) / sizeof(EncoderDescription);

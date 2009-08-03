@@ -26,7 +26,7 @@ extern "C" {
 #include "gfx_util.h"
 
 
-//#define TRACE_AVFORMAT_READER
+#define TRACE_AVFORMAT_READER
 #ifdef TRACE_AVFORMAT_READER
 #	define TRACE printf
 #	define TRACE_IO(a...)
@@ -674,7 +674,7 @@ AVFormatReader::StreamCookie::GetStreamInfo(int64* frameCount,
 		*duration = (bigtime_t)(1000000LL * fStream->duration
 			* fStream->time_base.num / fStream->time_base.den);
 		TRACE("  stream duration: %lld, time_base %.4f (%d/%d)\n",
-			*duration, av_q2d(fStream->time_base),
+			fStream->duration, av_q2d(fStream->time_base),
 			fStream->time_base.num, fStream->time_base.den);
 	} else if ((int64)fContext->duration != kNoPTSValue) {
 		*duration = (bigtime_t)(1000000LL * fContext->duration / AV_TIME_BASE);
@@ -844,6 +844,8 @@ AVFormatReader::StreamCookie::GetNextChunk(const void** chunkBuffer,
 		mediaHeader->destination = -1;
 		mediaHeader->time_source = -1;
 		mediaHeader->size_used = fPacket.size;
+//TRACE("  PTS: %lld (time_base.num: %d, .den: %d)\n",
+//fPacket.pts, fStream->time_base.num, fStream->time_base.den);
 		mediaHeader->start_time = (bigtime_t)(1000000.0 * fPacket.pts
 			/ av_q2d(fStream->time_base));
 		mediaHeader->file_pos = fPacket.pos;

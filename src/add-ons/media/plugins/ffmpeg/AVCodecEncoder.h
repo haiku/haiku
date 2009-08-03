@@ -52,14 +52,14 @@ private:
 			// TODO: Refactor common base class from AVCodec[De|En]Coder!
 			AVCodec*			fCodec;
 			AVCodecContext*		fContext;
+			bool				fCodecInitDone;
+
 			AVPicture			fSrcFrame;
 			AVPicture			fDstFrame;
 			AVFrame*			fFrame;
 			SwsContext*			fSwsContext;
 
-			uint32				fAVCodecID;
-
-			bool				fCodecInitDone;
+			int64				fFramesWritten;
 
 			uint8*				fChunkBuffer;
 };

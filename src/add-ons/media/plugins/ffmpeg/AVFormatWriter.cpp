@@ -30,7 +30,7 @@ extern "C" {
 #ifdef TRACE_AVFORMAT_WRITER
 #	define TRACE printf
 #	define TRACE_IO(a...)
-#	define TRACE_PACKET(a...)
+#	define TRACE_PACKET printf
 #else
 #	define TRACE(a...)
 #	define TRACE_IO(a...)
@@ -75,6 +75,7 @@ private:
 			// Since different threads may write to the target,
 			// we need to protect the file position and I/O by a lock.
 			BLocker*			fStreamLock;
+			int64				fChunksWritten;
 };
 
 
@@ -84,7 +85,8 @@ AVFormatWriter::StreamCookie::StreamCookie(AVFormatContext* context,
 	:
 	fContext(context),
 	fStream(NULL),
-	fStreamLock(streamLock)
+	fStreamLock(streamLock),
+	fChunksWritten(0)
 {
 	av_new_packet(&fPacket, 0);
 }
@@ -118,6 +120,10 @@ AVFormatWriter::StreamCookie::Init(const media_format* format,
 		// frame rate
 		fStream->codec->time_base.den = (int)format->u.raw_video.field_rate;
 		fStream->codec->time_base.num = 1;
+		fStream->r_frame_rate.den = (int)format->u.raw_video.field_rate;
+		fStream->r_frame_rate.num = 1;
+		fStream->time_base.den = (int)format->u.raw_video.field_rate;
+		fStream->time_base.num = 1;
 		// video size
 		fStream->codec->width = format->u.raw_video.display.line_width;
 		fStream->codec->height = format->u.raw_video.display.line_count;
@@ -138,8 +144,74 @@ AVFormatWriter::StreamCookie::Init(const media_format* format,
 		fStream->codec->pix_fmt = PIX_FMT_YUV420P;
 	} else if (format->type == B_MEDIA_RAW_AUDIO) {
 		avcodec_get_context_defaults2(fStream->codec, CODEC_TYPE_AUDIO);
-		// TODO: ...
+		// channels
+		fStream->codec->channels = format->u.raw_audio.channel_count;
+		switch (format->u.raw_audio.format) {
+			case media_raw_audio_format::B_AUDIO_FLOAT:
+				fStream->codec->sample_fmt = SAMPLE_FMT_FLT;
+				break;
+			case media_raw_audio_format::B_AUDIO_DOUBLE:
+				fStream->codec->sample_fmt = SAMPLE_FMT_DBL;
+				break;
+			case media_raw_audio_format::B_AUDIO_INT:
+				fStream->codec->sample_fmt = SAMPLE_FMT_S32;
+				break;
+			case media_raw_audio_format::B_AUDIO_SHORT:
+				fStream->codec->sample_fmt = SAMPLE_FMT_S16;
+				break;
+			case media_raw_audio_format::B_AUDIO_UCHAR:
+				fStream->codec->sample_fmt = SAMPLE_FMT_U8;
+				break;
+
+			case media_raw_audio_format::B_AUDIO_CHAR:
+			default:
+				return B_MEDIA_BAD_FORMAT;
+				break;
+		}
+		if (format->u.raw_audio.channel_mask == 0) {
+			// guess the channel mask...
+			switch (format->u.raw_audio.channel_count) {
+				default:
+				case 2:
+					fStream->codec->channel_layout = CH_LAYOUT_STEREO;
+					break;
+				case 1:
+					fStream->codec->channel_layout = CH_LAYOUT_MONO;
+					break;
+				case 3:
+					fStream->codec->channel_layout = CH_LAYOUT_SURROUND;
+					break;
+				case 4:
+					fStream->codec->channel_layout = CH_LAYOUT_QUAD;
+					break;
+				case 5:
+					fStream->codec->channel_layout = CH_LAYOUT_5POINT0;
+					break;
+				case 6:
+					fStream->codec->channel_layout = CH_LAYOUT_5POINT1;
+					break;
+				case 8:
+					fStream->codec->channel_layout = CH_LAYOUT_7POINT1;
+					break;
+				case 10:
+					fStream->codec->channel_layout = CH_LAYOUT_7POINT1_WIDE;
+					break;
+			}
+		} else {
+			// The bits match 1:1 for media_multi_channels and FFmpeg defines.
+			fStream->codec->channel_layout = format->u.raw_audio.channel_mask;
+		}
+		// frame rate
+		fStream->codec->sample_rate = (int)format->u.raw_audio.frame_rate;
+		fStream->codec->time_base.den = (int)format->u.raw_audio.frame_rate;
+		fStream->codec->time_base.num = 1;
+		fStream->time_base.den = (int)format->u.raw_audio.frame_rate;
+		fStream->time_base.num = 1;
 	}
+
+	TRACE("  stream->time_base: (%d/%d), codec->time_base: (%d/%d))\n",
+		fStream->time_base.num, fStream->time_base.den,
+		fStream->codec->time_base.num, fStream->codec->time_base.den);
 
 	// TODO: This is a hack for now! Use avcodec_find_encoder_by_name()
 	// or something similar...
@@ -153,8 +225,8 @@ status_t
 AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 	size_t chunkSize, media_encode_info* encodeInfo)
 {
-	TRACE_PACKET("AVFormatWriter::StreamCookie::WriteChunk(%p, %ld)\n",
-		chunkBuffer, chunkSize);
+	TRACE_PACKET("AVFormatWriter::StreamCookie::WriteChunk(%p, %ld, "
+		"start_time: %lld)\n", chunkBuffer, chunkSize, encodeInfo->start_time);
 
 	BAutolock _(fStreamLock);
 
@@ -163,6 +235,19 @@ AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 
 	fPacket.data = const_cast<uint8_t*>((const uint8_t*)chunkBuffer);
 	fPacket.size = chunkSize;
+
+	fPacket.pts = (encodeInfo->start_time
+		* fStream->time_base.den / fStream->time_base.num) / 1000000;
+	TRACE_PACKET("  PTS: %lld  (stream->time_base: (%d/%d), "
+		"codec->time_base: (%d/%d))\n", fPacket.pts,
+		fStream->time_base.num, fStream->time_base.den,
+		fStream->codec->time_base.num, fStream->codec->time_base.den);
+
+// From ffmpeg.c::do_audio_out():
+//	if (enc->coded_frame && enc->coded_frame->pts != AV_NOPTS_VALUE)
+//		fPacket.pts = av_rescale_q(enc->coded_frame->pts,
+//		enc->time_base, ost->st->time_base);
+
 
 #if 0
 	// TODO: Eventually, we need to write interleaved packets, but
@@ -280,11 +365,26 @@ AVFormatWriter::CommitHeader()
 	if (fHeaderWritten)
 		return B_NOT_ALLOWED;
 
+	for (unsigned i = 0; i < fContext->nb_streams; i++) {
+		AVStream* stream = fContext->streams[i];
+		TRACE("  stream[%u] time_base: (%d/%d), codec->time_base: (%d/%d)\n",
+			i, stream->time_base.num, stream->time_base.den,
+			stream->codec->time_base.num, stream->codec->time_base.den);
+	}
+
 	int result = av_write_header(fContext);
 	if (result < 0)
 		TRACE("  av_write_header(): %d\n", result);
 	else
 		fHeaderWritten = true;
+
+	TRACE("  wrote header\n");
+	for (unsigned i = 0; i < fContext->nb_streams; i++) {
+		AVStream* stream = fContext->streams[i];
+		TRACE("  stream[%u] time_base: (%d/%d), codec->time_base: (%d/%d)\n",
+			i, stream->time_base.num, stream->time_base.den,
+			stream->codec->time_base.num, stream->codec->time_base.den);
+	}
 
 	return result == 0 ? B_OK : B_ERROR;
 }
@@ -383,8 +483,8 @@ status_t
 AVFormatWriter::WriteChunk(void* _cookie, const void* chunkBuffer,
 	size_t chunkSize, media_encode_info* encodeInfo)
 {
-	TRACE("AVFormatWriter::WriteChunk(%p, %ld, %p)\n", chunkBuffer, chunkSize,
-		encodeInfo);
+	TRACE_PACKET("AVFormatWriter::WriteChunk(%p, %ld, %p)\n", chunkBuffer,
+		chunkSize, encodeInfo);
 
 	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
 	return cookie->WriteChunk(chunkBuffer, chunkSize, encodeInfo);

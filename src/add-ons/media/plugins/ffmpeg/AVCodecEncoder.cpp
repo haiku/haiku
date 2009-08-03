@@ -34,9 +34,13 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID)
 	Encoder(),
 	fCodec(NULL),
 	fContext(avcodec_alloc_context()),
+	fCodecInitDone(false),
+
 	fFrame(avcodec_alloc_frame()),
 	fSwsContext(NULL),
-	fCodecInitDone(false),
+
+	fFramesWritten(0),
+
 	fChunkBuffer(new(std::nothrow) uint8[kDefaultChunkBufferSize])
 {
 	TRACE("AVCodecEncoder::AVCodecEncoder()\n");
@@ -110,7 +114,13 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 	if (inputFormat == NULL)
 		return B_BAD_VALUE;
 
+	if (fCodecInitDone) {
+		fCodecInitDone = false;
+		avcodec_close(fContext);
+	}
+
 	fInputFormat = *inputFormat;
+	fFramesWritten = 0;
 
 	if (fInputFormat.type == B_MEDIA_RAW_VIDEO) {
 		// frame rate
@@ -167,6 +177,68 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 			PIX_FMT_RGB32, fContext->width, fContext->height,
 			fContext->pix_fmt, SWS_BICUBIC, NULL, NULL, NULL);
 
+	} else if (fInputFormat.type == B_MEDIA_RAW_AUDIO) {
+		// frame rate
+		fContext->sample_rate = (int)fInputFormat.u.raw_audio.frame_rate;
+		fContext->time_base.den = (int)fInputFormat.u.raw_audio.frame_rate;
+		fContext->time_base.num = 1;
+		// channels
+		fContext->channels = fInputFormat.u.raw_audio.channel_count;
+		switch (fInputFormat.u.raw_audio.format) {
+			case media_raw_audio_format::B_AUDIO_FLOAT:
+				fContext->sample_fmt = SAMPLE_FMT_FLT;
+				break;
+			case media_raw_audio_format::B_AUDIO_DOUBLE:
+				fContext->sample_fmt = SAMPLE_FMT_DBL;
+				break;
+			case media_raw_audio_format::B_AUDIO_INT:
+				fContext->sample_fmt = SAMPLE_FMT_S32;
+				break;
+			case media_raw_audio_format::B_AUDIO_SHORT:
+				fContext->sample_fmt = SAMPLE_FMT_S16;
+				break;
+			case media_raw_audio_format::B_AUDIO_UCHAR:
+				fContext->sample_fmt = SAMPLE_FMT_U8;
+				break;
+
+			case media_raw_audio_format::B_AUDIO_CHAR:
+			default:
+				return B_MEDIA_BAD_FORMAT;
+				break;
+		}
+		if (fInputFormat.u.raw_audio.channel_mask == 0) {
+			// guess the channel mask...
+			switch (fInputFormat.u.raw_audio.channel_count) {
+				default:
+				case 2:
+					fContext->channel_layout = CH_LAYOUT_STEREO;
+					break;
+				case 1:
+					fContext->channel_layout = CH_LAYOUT_MONO;
+					break;
+				case 3:
+					fContext->channel_layout = CH_LAYOUT_SURROUND;
+					break;
+				case 4:
+					fContext->channel_layout = CH_LAYOUT_QUAD;
+					break;
+				case 5:
+					fContext->channel_layout = CH_LAYOUT_5POINT0;
+					break;
+				case 6:
+					fContext->channel_layout = CH_LAYOUT_5POINT1;
+					break;
+				case 8:
+					fContext->channel_layout = CH_LAYOUT_7POINT1;
+					break;
+				case 10:
+					fContext->channel_layout = CH_LAYOUT_7POINT1_WIDE;
+					break;
+			}
+		} else {
+			// The bits match 1:1 for media_multi_channels and FFmpeg defines.
+			fContext->channel_layout = fInputFormat.u.raw_audio.channel_mask;
+		}
 	} else {
 		return B_NOT_SUPPORTED;
 	}
@@ -221,13 +293,80 @@ AVCodecEncoder::Encode(const void* buffer, int64 frameCount,
 
 
 status_t
-AVCodecEncoder::_EncodeAudio(const void* buffer, int64 frameCount,
+AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
 	media_encode_info* info)
 {
-	TRACE("AVCodecEncoder::_EncodeAudio(%p, %lld, %p)\n", buffer, frameCount,
+	TRACE("AVCodecEncoder::_EncodeAudio(%p, %lld, %p)\n", _buffer, frameCount,
 		info);
 
-	return B_NOT_SUPPORTED;
+	if (fChunkBuffer == NULL)
+		return B_NO_MEMORY;
+
+	status_t ret = B_OK;
+
+	const uint8* buffer = reinterpret_cast<const uint8*>(_buffer);
+
+	size_t inputSampleSize = fInputFormat.u.raw_audio.format
+		& media_raw_audio_format::B_AUDIO_SIZE_MASK;
+	size_t inputFrameSize = inputSampleSize
+		* fInputFormat.u.raw_audio.channel_count;
+
+	size_t outSampleSize = av_get_bits_per_sample_format(
+		fContext->sample_fmt) / 8;
+	size_t outSize = outSampleSize * fContext->channels;
+	TRACE("  sampleSize: %ld/%ld, frameSize: %ld/%ld\n",
+		inputSampleSize, inputFrameSize, outSampleSize, outSize);
+
+	size_t bufferSize = frameCount * inputFrameSize;
+	bufferSize = min_c(bufferSize, kDefaultChunkBufferSize);
+
+	while (frameCount > 0) {
+		if (frameCount < fContext->frame_size) {
+			TRACE("  ERROR: too few frames left! (left: %lld, needed: %d)\n",
+				frameCount, fContext->frame_size);
+			// TODO: Handle this some way. Maybe use an av_fifo to buffer data?
+			return B_ERROR;
+		}
+
+		int chunkFrames = fContext->frame_size;
+
+		TRACE("  frames left: %lld, chunk frames: %d\n",
+			frameCount, chunkFrames);
+
+		// Encode one audio chunk/frame.
+		int usedBytes = avcodec_encode_audio(fContext, fChunkBuffer,
+			bufferSize, reinterpret_cast<const short*>(buffer));
+
+		if (usedBytes < 0) {
+			TRACE("  avcodec_encode_video() failed: %d\n", usedBytes);
+			return B_ERROR;
+		}
+
+		// Setup media_encode_info, most important is the time stamp.
+		info->start_time = (bigtime_t)(fFramesWritten * 1000000LL
+			/ fInputFormat.u.raw_audio.frame_rate);
+
+		// Write the chunk
+		ret = WriteChunk(fChunkBuffer, usedBytes, info);
+		if (ret != B_OK)
+			break;
+
+		size_t framesWritten = usedBytes / inputFrameSize;
+		if (chunkFrames == 1) {
+			// For PCM data:
+			framesWritten = usedBytes / inputFrameSize;
+		} else {
+			// For encoded audio:
+			framesWritten = chunkFrames * inputFrameSize;
+		}
+
+		// Skip to next chunk of buffer.
+		fFramesWritten += framesWritten;
+		frameCount -= framesWritten;
+		buffer += usedBytes;
+	}
+
+	return ret;
 }
 
 
@@ -268,6 +407,10 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 			return B_ERROR;
 		}
 
+		// Setup media_encode_info, most important is the time stamp.
+		info->start_time = (bigtime_t)(fFramesWritten * 1000000LL
+			/ fInputFormat.u.raw_video.field_rate);
+
 		// Write the chunk
 		ret = WriteChunk(fChunkBuffer, usedBytes, info);
 		if (ret != B_OK)
@@ -276,6 +419,7 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 		// Skip to the next frame (but usually, there is only one to encode
 		// for video).
 		frameCount--;
+		fFramesWritten++;
 		buffer = (const void*)((const uint8*)buffer + bufferSize);
 	}
 
