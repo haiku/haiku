@@ -41,8 +41,9 @@ typedef struct heap_allocator_s heap_allocator;
 extern "C" {
 #endif
 
-// malloc_nogrow disallows waiting for a grow to happen - only to be used by
-// vm functions that may deadlock on a triggered area creation
+// malloc- and memalign_nogrow disallow waiting for a grow to happen - only to
+// be used by vm functions that may deadlock on a triggered area creation.
+void *memalign_nogrow(size_t alignment, size_t size);
 void *malloc_nogrow(size_t size);
 
 void *memalign(size_t alignment, size_t size);

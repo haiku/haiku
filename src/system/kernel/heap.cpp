@@ -88,13 +88,15 @@ typedef struct heap_page_s {
 } heap_page;
 
 typedef struct heap_bin_s {
+	mutex		lock;
 	uint32		element_size;
 	uint16		max_free_count;
 	heap_page *	page_list; // sorted so that the desired page is always first
 } heap_bin;
 
 struct heap_allocator_s {
-	mutex		lock;
+	rw_lock		area_lock;
+	mutex		page_lock;
 
 	const char *name;
 	uint32		bin_count;
@@ -628,7 +630,7 @@ caller_info_compare_count(const void* _a, const void* _b)
 
 
 static bool
-analyze_allocation_callers(heap_allocator* heap)
+analyze_allocation_callers(heap_allocator *heap)
 {
 	// go through all the pages in all the areas
 	heap_area *area = heap->all_areas;
@@ -661,7 +663,7 @@ analyze_allocation_callers(heap_allocator* heap)
 					info = (heap_leak_check_info *)(base + elementSize
 						- sizeof(heap_leak_check_info));
 
-					caller_info* callerInfo = get_caller_info(info->caller);
+					caller_info *callerInfo = get_caller_info(info->caller);
 					if (callerInfo == NULL) {
 						kprintf("out of space for caller infos\n");
 						return 0;
@@ -685,7 +687,7 @@ analyze_allocation_callers(heap_allocator* heap)
 				info = (heap_leak_check_info *)(base + pageCount
 					* heap->page_size - sizeof(heap_leak_check_info));
 
-				caller_info* callerInfo = get_caller_info(info->caller);
+				caller_info *callerInfo = get_caller_info(info->caller);
 				if (callerInfo == NULL) {
 					kprintf("out of space for caller infos\n");
 					return false;
@@ -710,7 +712,7 @@ static int
 dump_allocations_per_caller(int argc, char **argv)
 {
 	bool sortBySize = true;
-	heap_allocator* heap = NULL;
+	heap_allocator *heap = NULL;
 
 	for (int32 i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-c") == 0) {
@@ -756,8 +758,8 @@ dump_allocations_per_caller(int argc, char **argv)
 		caller_info& info = sCallerInfoTable[i];
 		kprintf("%10ld  %10ld  %#08lx", info.count, info.size, info.caller);
 
-		const char* symbol;
-		const char* imageName;
+		const char *symbol;
+		const char *imageName;
 		bool exactMatch;
 		addr_t baseAddress;
 
@@ -780,7 +782,10 @@ dump_allocations_per_caller(int argc, char **argv)
 static void
 heap_validate_heap(heap_allocator *heap)
 {
-	mutex_lock(&heap->lock);
+	ReadLocker areaReadLocker(heap->area_lock);
+	for (uint32 i = 0; i < heap->bin_count; i++)
+		mutex_lock(&heap->bins[i].lock);
+	MutexLocker pageLocker(heap->page_lock);
 
 	uint32 totalPageCount = 0;
 	uint32 totalFreePageCount = 0;
@@ -862,7 +867,6 @@ heap_validate_heap(heap_allocator *heap)
 	// validate the bins
 	for (uint32 i = 0; i < heap->bin_count; i++) {
 		heap_bin *bin = &heap->bins[i];
-
 		heap_page *lastPage = NULL;
 		heap_page *page = bin->page_list;
 		lastFreeCount = 0;
@@ -938,7 +942,10 @@ heap_validate_heap(heap_allocator *heap)
 		}
 	}
 
-	mutex_unlock(&heap->lock);
+	pageLocker.Unlock();
+	for (uint32 i = 0; i < heap->bin_count; i++)
+		mutex_unlock(&heap->bins[i].lock);
+	areaReadLocker.Unlock();
 }
 #endif // PARANOID_HEAP_VALIDATION
 
@@ -949,8 +956,6 @@ heap_validate_heap(heap_allocator *heap)
 static void
 heap_add_area(heap_allocator *heap, area_id areaID, addr_t base, size_t size)
 {
-	mutex_lock(&heap->lock);
-
 	heap_area *area = (heap_area *)base;
 	area->area = areaID;
 
@@ -986,8 +991,10 @@ heap_add_area(heap_allocator *heap, area_id areaID, addr_t base, size_t size)
 	area->free_pages = &area->page_table[0];
 	area->free_page_count = pageCount;
 	area->page_table[0].prev = NULL;
-
 	area->next = NULL;
+
+	WriteLocker areaWriteLocker(heap->area_lock);
+	MutexLocker pageLocker(heap->page_lock);
 	if (heap->areas == NULL) {
 		// it's the only (empty) area in that heap
 		area->prev = NULL;
@@ -1018,13 +1025,14 @@ heap_add_area(heap_allocator *heap, area_id areaID, addr_t base, size_t size)
 	heap->total_pages += area->page_count;
 	heap->total_free_pages += area->free_page_count;
 
-	if (areaID >= B_OK) {
+	if (areaID >= 0) {
 		// this later on deletable area is yet empty - the empty count will be
 		// decremented as soon as this area is used for the first time
 		heap->empty_areas++;
 	}
 
-	mutex_unlock(&heap->lock);
+	pageLocker.Unlock();
+	areaWriteLocker.Unlock();
 
 	dprintf("heap_add_area: area %ld added to %s heap %p - usable range 0x%08lx "
 		"- 0x%08lx\n", area->area, heap->name, heap, area->base,
@@ -1033,11 +1041,8 @@ heap_add_area(heap_allocator *heap, area_id areaID, addr_t base, size_t size)
 
 
 static status_t
-heap_remove_area(heap_allocator *heap, heap_area *area, bool locked)
+heap_remove_area(heap_allocator *heap, heap_area *area)
 {
-	if (!locked)
-		mutex_lock(&heap->lock);
-
 	if (area->free_page_count != area->page_count) {
 		panic("tried removing heap area that has still pages in use");
 		return B_ERROR;
@@ -1075,12 +1080,10 @@ heap_remove_area(heap_allocator *heap, heap_area *area, bool locked)
 	heap->total_pages -= area->page_count;
 	heap->total_free_pages -= area->free_page_count;
 
-	if (!locked)
-		mutex_unlock(&heap->lock);
-
 	dprintf("heap_remove_area: area %ld with range 0x%08lx - 0x%08lx removed "
 		"from %s heap %p\n", area->area, area->base, area->base + area->size,
 		heap->name, heap);
+
 	return B_OK;
 }
 
@@ -1114,6 +1117,7 @@ heap_create_allocator(const char *name, addr_t base, size_t size,
 			continue;
 
 		heap_bin *bin = &heap->bins[heap->bin_count];
+		mutex_init(&bin->lock, "heap bin lock");
 		bin->element_size = binSize;
 		bin->max_free_count = heap->page_size / binSize;
 		bin->page_list = NULL;
@@ -1126,14 +1130,15 @@ heap_create_allocator(const char *name, addr_t base, size_t size,
 	base += heap->bin_count * sizeof(heap_bin);
 	size -= heap->bin_count * sizeof(heap_bin);
 
-	mutex_init(&heap->lock, "heap_mutex");
+	rw_lock_init(&heap->area_lock, "heap area rw lock");
+	mutex_init(&heap->page_lock, "heap page lock");
 
 	heap_add_area(heap, -1, base, size);
 	return heap;
 }
 
 
-static inline area_id
+static inline void
 heap_free_pages_added(heap_allocator *heap, heap_area *area, uint32 pageCount)
 {
 	area->free_page_count += pageCount;
@@ -1170,29 +1175,15 @@ heap_free_pages_added(heap_allocator *heap, heap_area *area, uint32 pageCount)
 		}
 	}
 
-	// can and should we free this area?
-	if (area->free_page_count == area->page_count && area->area >= B_OK) {
-		if (heap->empty_areas > 0) {
-			// we already have at least another empty area, just free this one
-			if (heap_remove_area(heap, area, true) == B_OK) {
-				// we cannot delete the area here, because it would result
-				// in calls to free, which would necessarily deadlock as we
-				// are locked at this point
-				return area->area;
-			}
-		}
-
+	if (area->free_page_count == area->page_count && area->area >= 0)
 		heap->empty_areas++;
-	}
-
-	return -1;
 }
 
 
 static inline void
 heap_free_pages_removed(heap_allocator *heap, heap_area *area, uint32 pageCount)
 {
-	if (area->free_page_count == area->page_count && area->area >= B_OK) {
+	if (area->free_page_count == area->page_count && area->area >= 0) {
 		// this area was completely empty
 		heap->empty_areas--;
 	}
@@ -1239,6 +1230,7 @@ heap_unlink_page(heap_page *page, heap_page **list)
 static heap_page *
 heap_allocate_contiguous_pages(heap_allocator *heap, uint32 pageCount)
 {
+	MutexLocker pageLocker(heap->page_lock);
 	heap_area *area = heap->areas;
 	while (area) {
 		bool found = false;
@@ -1286,10 +1278,14 @@ heap_allocate_contiguous_pages(heap_allocator *heap, uint32 pageCount)
 static void *
 heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 {
+	TRACE(("raw_alloc: heap %p; size %lu; bin %lu\n", heap, size, binIndex));
 	if (binIndex < heap->bin_count) {
 		heap_bin *bin = &heap->bins[binIndex];
+		MutexLocker binLocker(bin->lock);
+
 		heap_page *page = bin->page_list;
 		if (page == NULL) {
+			MutexLocker pageLocker(heap->page_lock);
 			heap_area *area = heap->areas;
 			if (area == NULL) {
 				TRACE(("heap %p: no free pages to allocate %lu bytes\n", heap,
@@ -1305,7 +1301,13 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 				page->next->prev = NULL;
 
 			heap_free_pages_removed(heap, area, 1);
+
+			if (page->in_use)
+				panic("got an in use page from the free pages list\n");
 			page->in_use = 1;
+
+			pageLocker.Unlock();
+
 			page->bin_index = binIndex;
 			page->free_count = bin->max_free_count;
 			page->empty_index = 0;
@@ -1335,6 +1337,8 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 				page->next->prev = NULL;
 			page->next = page->prev = NULL;
 		}
+
+		binLocker.Unlock();
 
 #if KERNEL_HEAP_LEAK_CHECK
 		heap_leak_check_info *info = (heap_leak_check_info *)((addr_t)address
@@ -1396,8 +1400,6 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 		panic("memalign() with an alignment which is not a power of 2\n");
 #endif
 
-	mutex_lock(&heap->lock);
-
 #if KERNEL_HEAP_LEAK_CHECK
 	size += sizeof(heap_leak_check_info);
 #endif
@@ -1420,15 +1422,14 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 
 	void *address = heap_raw_alloc(heap, size, binIndex);
 
-	TRACE(("memalign(): asked to allocate %lu bytes, returning pointer %p\n",
-		size, address));
-
 #if KERNEL_HEAP_LEAK_CHECK
 	size -= sizeof(heap_leak_check_info);
 #endif
 
+	TRACE(("memalign(): asked to allocate %lu bytes, returning pointer %p\n",
+		size, address));
+
 	T(Allocate((addr_t)address, size));
-	mutex_unlock(&heap->lock);
 	if (address == NULL)
 		return address;
 
@@ -1453,8 +1454,7 @@ heap_free(heap_allocator *heap, void *address)
 	if (address == NULL)
 		return B_OK;
 
-	mutex_lock(&heap->lock);
-
+	ReadLocker areaReadLocker(heap->area_lock);
 	heap_area *area = heap->all_areas;
 	while (area) {
 		// since the all_areas list is ordered by base with the biggest
@@ -1476,7 +1476,6 @@ heap_free(heap_allocator *heap, void *address)
 
 	if (area == NULL) {
 		// this address does not belong to us
-		mutex_unlock(&heap->lock);
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -1490,19 +1489,18 @@ heap_free(heap_allocator *heap, void *address)
 
 	if (page->bin_index > heap->bin_count) {
 		panic("free(): page %p: invalid bin_index %d\n", page, page->bin_index);
-		mutex_unlock(&heap->lock);
 		return B_ERROR;
 	}
 
-	area_id areaToDelete = -1;
 	if (page->bin_index < heap->bin_count) {
 		// small allocation
 		heap_bin *bin = &heap->bins[page->bin_index];
+		MutexLocker binLocker(bin->lock);
+
 		if (((addr_t)address - area->base - page->index
 			* heap->page_size) % bin->element_size != 0) {
 			panic("free(): passed invalid pointer %p supposed to be in bin for "
 				"element size %ld\n", address, bin->element_size);
-			mutex_unlock(&heap->lock);
 			return B_ERROR;
 		}
 
@@ -1515,7 +1513,6 @@ heap_free(heap_allocator *heap, void *address)
 				if (temp == address) {
 					panic("free(): address %p already exists in page free "
 						"list\n", address);
-					mutex_unlock(&heap->lock);
 					return B_ERROR;
 				}
 			}
@@ -1525,7 +1522,6 @@ heap_free(heap_allocator *heap, void *address)
 		if (bin->element_size % 4 != 0) {
 			panic("free(): didn't expect a bin element size that is not a "
 				"multiple of 4\n");
-			mutex_unlock(&heap->lock);
 			return B_ERROR;
 		}
 
@@ -1542,10 +1538,11 @@ heap_free(heap_allocator *heap, void *address)
 
 		if (page->free_count == bin->max_free_count) {
 			// we are now empty, remove the page from the bin list
+			MutexLocker pageLocker(heap->page_lock);
 			heap_unlink_page(page, &bin->page_list);
 			page->in_use = 0;
 			heap_link_page(page, &area->free_pages);
-			areaToDelete = heap_free_pages_added(heap, area, 1);
+			heap_free_pages_added(heap, area, 1);
 		} else if (page->free_count == 1) {
 			// we need to add ourselfs to the page list of the bin
 			heap_link_page(page, &bin->page_list);
@@ -1572,6 +1569,8 @@ heap_free(heap_allocator *heap, void *address)
 		uint32 allocationID = page->allocation_id;
 		uint32 maxPages = area->page_count - page->index;
 		uint32 pageCount = 0;
+
+		MutexLocker pageLocker(heap->page_lock);
 		for (uint32 i = 0; i < maxPages; i++) {
 			// loop until we find the end of this allocation
 			if (!page[i].in_use || page[i].bin_index != heap->bin_count
@@ -1587,16 +1586,27 @@ heap_free(heap_allocator *heap, void *address)
 			pageCount++;
 		}
 
-		areaToDelete = heap_free_pages_added(heap, area, pageCount);
+		heap_free_pages_added(heap, area, pageCount);
 	}
 
 	T(Free((addr_t)address));
-	mutex_unlock(&heap->lock);
+	areaReadLocker.Unlock();
 
-	if (areaToDelete >= B_OK) {
-		// adding free pages caused an area to become empty and freeable that
-		// we can now delete as we don't hold the heap lock anymore
-		delete_area(areaToDelete);
+	if (heap->empty_areas > 1) {
+		WriteLocker areaWriteLocker(heap->area_lock);
+		MutexLocker pageLocker(heap->page_lock);
+
+		area = heap->areas;
+		while (area != NULL && heap->empty_areas > 1) {
+			if (area->area >= 0
+				&& area->free_page_count == area->page_count
+				&& heap_remove_area(heap, area) == B_OK) {
+				delete_area(area->area);
+				heap->empty_areas--;
+			}
+
+			area = area->next;
+		}
 	}
 
 	return B_OK;
@@ -1616,19 +1626,29 @@ static status_t
 heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	size_t newSize)
 {
-	mutex_lock(&heap->lock);
+	ReadLocker heapReadLocker(heap->area_lock);
 	heap_area *area = heap->all_areas;
 	while (area) {
-		if ((addr_t)address >= area->base
-			&& (addr_t)address < area->base + area->size)
+		// since the all_areas list is ordered by base with the biggest
+		// base at the top, we need only find the first area with a base
+		// smaller than our address to become our only candidate for
+		// reallocating
+		if (area->base <= (addr_t)address) {
+			if ((addr_t)address >= area->base + area->size) {
+				// the only candidate area doesn't contain the address,
+				// set it to NULL so we return below (none of the other areas
+				// can contain the address as the list is ordered)
+				area = NULL;
+			}
+
 			break;
+		}
 
 		area = area->all_next;
 	}
 
 	if (area == NULL) {
 		// this address does not belong to us
-		mutex_unlock(&heap->lock);
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -1639,7 +1659,6 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	if (page->bin_index > heap->bin_count) {
 		panic("realloc(): page %p: invalid bin_index %d\n", page,
 			page->bin_index);
-		mutex_unlock(&heap->lock);
 		return B_ERROR;
 	}
 
@@ -1657,6 +1676,8 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 		uint32 allocationID = page->allocation_id;
 		uint32 maxPages = area->page_count - page->index;
 		maxSize = heap->page_size;
+
+		MutexLocker pageLocker(heap->page_lock);
 		for (uint32 i = 1; i < maxPages; i++) {
 			if (!page[i].in_use || page[i].bin_index != heap->bin_count
 				|| page[i].allocation_id != allocationID)
@@ -1667,7 +1688,7 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 		}
 	}
 
-	mutex_unlock(&heap->lock);
+	heapReadLocker.Unlock();
 
 #if KERNEL_HEAP_LEAK_CHECK
 	newSize += sizeof(heap_leak_check_info);
@@ -2001,11 +2022,11 @@ memalign(size_t alignment, size_t size)
 
 
 void *
-malloc_nogrow(size_t size)
+memalign_nogrow(size_t alignment, size_t size)
 {
 	// use dedicated memory in the grow thread by default
 	if (thread_get_current_thread_id() == sHeapGrowThread) {
-		void *result = heap_memalign(sGrowHeap, 0, size);
+		void *result = heap_memalign(sGrowHeap, alignment, size);
 		if (!sAddGrowHeap && heap_should_grow(sGrowHeap)) {
 			// hopefully the heap grower will manage to create a new heap
 			// before running out of private memory...
@@ -2020,7 +2041,7 @@ malloc_nogrow(size_t size)
 
 	// try public memory, there might be something available
 	heap_allocator *heap = sHeaps[heap_class_for(size)];
-	void *result = heap_memalign(heap, 0, size);
+	void *result = heap_memalign(heap, alignment, size);
 	if (result != NULL)
 		return result;
 
@@ -2031,6 +2052,13 @@ malloc_nogrow(size_t size)
 		dprintf("heap: all heaps have run out of memory\n");
 
 	return NULL;
+}
+
+
+void *
+malloc_nogrow(size_t size)
+{
+	return memalign_nogrow(0, size);
 }
 
 
@@ -2169,36 +2197,35 @@ calloc(size_t numElements, size_t size)
 
 
 void
-deferred_free(void* block)
+deferred_free(void *block)
 {
 	if (block == NULL)
 		return;
 
-	DeferredFreeListEntry* entry = new(block) DeferredFreeListEntry;
+	DeferredFreeListEntry *entry = new(block) DeferredFreeListEntry;
 
 	InterruptsSpinLocker _(sDeferredFreeListLock);
 	sDeferredFreeList.Add(entry);
 }
 
 
-void*
+void *
 malloc_referenced(size_t size)
 {
-	int32* referencedData = (int32*)malloc(size + 4);
+	int32 *referencedData = (int32 *)malloc(size + 4);
 	if (referencedData == NULL)
 		return NULL;
 
 	*referencedData = 1;
-
 	return referencedData + 1;
 }
 
 
-void*
-malloc_referenced_acquire(void* data)
+void *
+malloc_referenced_acquire(void *data)
 {
 	if (data != NULL) {
-		int32* referencedData = (int32*)data - 1;
+		int32 *referencedData = (int32 *)data - 1;
 		atomic_add(referencedData, 1);
 	}
 
@@ -2207,12 +2234,12 @@ malloc_referenced_acquire(void* data)
 
 
 void
-malloc_referenced_release(void* data)
+malloc_referenced_release(void *data)
 {
 	if (data == NULL)
 		return;
 
-	int32* referencedData = (int32*)data - 1;
+	int32 *referencedData = (int32 *)data - 1;
 	if (atomic_add(referencedData, -1) < 1)
 		free(referencedData);
 }
@@ -2224,7 +2251,7 @@ DeferredDeletable::~DeferredDeletable()
 
 
 void
-deferred_delete(DeferredDeletable* deletable)
+deferred_delete(DeferredDeletable *deletable)
 {
 	if (deletable == NULL)
 		return;
