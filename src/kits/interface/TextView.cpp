@@ -2797,9 +2797,19 @@ BTextView::_ValidateLayoutData()
 	fLayoutData->min = min;
 
 	// compute our preferred size
-	fLayoutData->preferred = min;
-	fLayoutData->preferred.width += lineHeight * 6;
-	fLayoutData->preferred.height += lineHeight * 2;
+	fLayoutData->preferred.height = fTextRect.Height()
+		+ fLayoutData->topInset + fLayoutData->bottomInset;
+	float maxWidth = 0;
+	for (int i = 0; i < fLines->NumLines(); i++) {
+		float width = LineWidth(0);
+		if (maxWidth < width)
+			maxWidth = width;
+	}
+	if (maxWidth < min.width)
+		maxWidth = min.width;
+
+	fLayoutData->preferred.width
+		= maxWidth + fLayoutData->leftInset + fLayoutData->rightInset;
 
 	fLayoutData->valid = true;
 
