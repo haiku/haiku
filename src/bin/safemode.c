@@ -18,6 +18,7 @@ main(int argc, char **argv)
 	bool realString = false;
 	char buffer[B_FILE_NAME_LENGTH];
 	size_t size = sizeof(buffer);
+	status_t status;
 	int i;
 
 	for (i = 1; i < argc; i++) {
@@ -27,7 +28,7 @@ main(int argc, char **argv)
 			optionName = argv[i];
 	}
 
-	status_t status = _kern_get_safemode_option(optionName, buffer, &size);
+	status = _kern_get_safemode_option(optionName, buffer, &size);
 	if (status == B_OK) {
 		if (realString) {
 			puts(buffer);
