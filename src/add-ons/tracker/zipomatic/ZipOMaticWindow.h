@@ -8,7 +8,6 @@
 #include <MenuItem.h>
 #include <Window.h>
 
-#include "ZipOMaticSettings.h"
 #include "ZipOMaticView.h"
 #include "ZipperThread.h"
 
@@ -16,7 +15,7 @@
 class ZippoWindow : public BWindow
 {
 public:
-							ZippoWindow(BMessage* message = NULL);
+							ZippoWindow(BRect frame, BMessage* refs = NULL);
 							~ZippoWindow();
 							
 	virtual	void			MessageReceived(BMessage* message);
@@ -24,18 +23,14 @@ public:
 	virtual	void			Zoom(BPoint origin, float width, float height);
 	
 			bool			IsZipping();
+			void			StopZipping();
 			
 private:
-			status_t		_ReadSettings();
-			status_t		_WriteSettings();
 
 			void			_StartZipping(BMessage* message);
-			void			_StopZipping();
-				
 			void			_CloseWindowOrKeepOpen();
 
 			ZippoView*		fView;
-			ZippoSettings	fSettings;
 			ZipperThread*	fThread;
 	
 			bool			fWindowGotRefs;

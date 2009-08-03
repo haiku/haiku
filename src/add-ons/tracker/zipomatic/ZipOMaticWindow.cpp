@@ -28,39 +28,26 @@
 #include "ZipperThread.h"
 
 
-ZippoWindow::ZippoWindow(BMessage* message)
+ZippoWindow::ZippoWindow(BRect frame, BMessage* refs)
 	:
-	BWindow(BRect(200, 200, 430, 310), "Zip-O-Matic", B_TITLED_WINDOW,
-		B_NOT_V_RESIZABLE),
+	BWindow(frame, "Zip-O-Matic", B_TITLED_WINDOW, B_NOT_V_RESIZABLE),
 	fView(NULL),
-	fSettings(),
 	fThread(NULL),
 	fWindowGotRefs(false),
 	fZippingWasStopped(false),
-	fWindowInvoker(new BInvoker(new BMessage('alrt'), NULL, this))
+	fWindowInvoker(new BInvoker(new BMessage(ZIPPO_QUIT_OR_CONTINUE), NULL,
+		this))
 {
-	status_t status = B_OK;
-
-	status = fSettings.SetTo("ZipOMatic.msg");
-	if (status != B_OK)	
-		ErrorMessage("fSettings.SetTo()", status);
-
-	status = fSettings.InitCheck();
-	if (status != B_OK)
-		ErrorMessage("fSettings.InitCheck()", status);
-	
 	fView = new ZippoView(Bounds());
 	AddChild(fView);
 	
 	SetSizeLimits(Bounds().Width(), 15000, Bounds().Height(),
 		Bounds().Height());
 
-	_ReadSettings();
-
-	if (message != NULL)
+	if (refs != NULL)
 	{
 		fWindowGotRefs = true;
-		_StartZipping(message);
+		_StartZipping(refs);
 	}
 }
 
@@ -88,8 +75,7 @@ ZippoWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		
-		case 'exit':
-			// thread has finished - (finished, quit, killed, we don't know)
+		case ZIPPO_THREAD_EXIT:
 			fThread = NULL;
 			fView->fActivityView->Stop();
 			fView->fStopButton->SetEnabled(false);
@@ -102,7 +88,8 @@ ZippoWindow::MessageReceived(BMessage* message)
 			_CloseWindowOrKeepOpen();
 			break;
 											
-		case 'exrr':	// thread has finished - badly
+		case ZIPPO_THREAD_EXIT_ERROR:
+			// TODO: figure out why this case does not happen when it should
 			fThread = NULL;
 			fView->fActivityView->Stop();
 			fView->fStopButton->SetEnabled(false);
@@ -110,7 +97,7 @@ ZippoWindow::MessageReceived(BMessage* message)
 			fView->fZipOutputView->SetText("Error creating archive");
 			break;
 						
-		case 'strt':
+		case ZIPPO_TASK_DESCRIPTION:
 		{
 			BString string;
 			if (message->FindString("archive_filename", &string) == B_OK)
@@ -118,7 +105,7 @@ ZippoWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case 'outp':
+		case ZIPPO_LINE_OF_STDOUT:
 		{
 			BString string;
 			if (message->FindString("zip_output", &string) == B_OK)
@@ -126,12 +113,12 @@ ZippoWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case 'alrt':
+		case ZIPPO_QUIT_OR_CONTINUE:
 		{
 			int32 which_button = -1;
 			if (message->FindInt32("which", &which_button) == B_OK) {
 				if (which_button == 0) {
-					_StopZipping();
+					StopZipping();
 				} else {
 					if (fThread != NULL)
 						fThread->ResumeExternalZip();
@@ -152,82 +139,22 @@ ZippoWindow::MessageReceived(BMessage* message)
 bool
 ZippoWindow::QuitRequested()
 {
-	if (fThread == NULL) {
-		_WriteSettings();
-		be_app_messenger.SendMessage(ZIPPO_WINDOW_QUIT);
+	if (!IsZipping()) {
+		BMessage message(ZIPPO_WINDOW_QUIT);
+		message.AddRect("frame", Frame());
+		be_app_messenger.SendMessage(&message);
 		return true;
 	} else {
-		if (fThread != NULL)
-			fThread->SuspendExternalZip();
-	
+		fThread->SuspendExternalZip();
 		fView->fActivityView->Pause();
-	
+
 		BAlert* alert = new BAlert("Stop or Continue",
 			"Are you sure you want to stop creating this archive?", "Stop",
 			"Continue", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go(fWindowInvoker);
+		
 		return false;
 	}
-}
-
-
-status_t
-ZippoWindow::_ReadSettings()
-{
-	status_t status = B_OK;
-
-	status = fSettings.InitCheck();
-	if (status != B_OK)
-		ErrorMessage("fSettings.InitCheck()", status);
-
-	status = fSettings.ReadSettings();
-	if (status != B_OK)
-		ErrorMessage("fSettings.ReadSettings()", status);
-
-	BRect windowRect;
-	
-	status = fSettings.FindRect("windowRect", &windowRect);
-	if (status != B_OK)
-	{
-		ErrorMessage("fSettings.FindRect(windowRect)", status);
-		return status;
-	}
-	
-	ResizeTo(windowRect.Width(), windowRect.Height());
-	MoveTo(windowRect.LeftTop());
-	
-	return B_OK;
-}
-
-
-status_t
-ZippoWindow::_WriteSettings()
-{
-	status_t status = B_OK;
-
-	status = fSettings.InitCheck();
-	if (status != B_OK)
-		ErrorMessage("fSettings.InitCheck()", status);
-
-	status = fSettings.MakeEmpty();
-	if (status != B_OK)
-		ErrorMessage("fSettings.MakeEmpty()", status);
-
-	status = fSettings.AddRect("windowRect", Frame());
-	if (status != B_OK)
-	{
-		ErrorMessage("fSettings.AddRect(windowRect)", status);
-		return status;
-	}
-	
-	status = fSettings.WriteSettings();
-	if (status != B_OK)
-	{
-		ErrorMessage("fSettings.WriteSettings()", status);
-		return status;
-	}
-	
-	return B_OK;
 }
 
 
@@ -245,7 +172,7 @@ ZippoWindow::_StartZipping(BMessage* message)
 
 
 void
-ZippoWindow::_StopZipping()
+ZippoWindow::StopZipping()
 {
 	fZippingWasStopped = true;
 

@@ -18,6 +18,11 @@
 #define ZIPOMATIC_APP_SIG		"application/x-vnd.haiku.zip-o-matic"
 
 #define ZIPPO_WINDOW_QUIT		'winq'
+#define ZIPPO_QUIT_OR_CONTINUE	'alrt'
+#define ZIPPO_THREAD_EXIT		'exit'
+#define ZIPPO_THREAD_EXIT_ERROR	'exrr'
+#define ZIPPO_TASK_DESCRIPTION	'strt'
+#define ZIPPO_LINE_OF_STDOUT	'outp'
 
 status_t	FindAndCreateDirectory(directory_which which,
 				BVolume* volume = NULL, const char* relativePath = NULL,

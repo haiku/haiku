@@ -140,8 +140,10 @@ ZipperThread::ThreadStartup()
 
 	archiveName.Prepend("Creating archive: ");
 
-	_SendMessageToWindow('strt', "archive_filename", archiveName.String());
-	_SendMessageToWindow('outp', "zip_output", "Preparing to archive"); 
+	_SendMessageToWindow(ZIPPO_TASK_DESCRIPTION, "archive_filename",
+		archiveName.String());
+	_SendMessageToWindow(ZIPPO_LINE_OF_STDOUT, "zip_output",
+		"Preparing to archive");
 
 	return B_OK;
 }
@@ -164,12 +166,12 @@ ZipperThread::ExecuteUnit()
 
 	if (!strncmp("  a", output, 3)) {
 		output[2] = 'A';
-		_SendMessageToWindow('outp', "zip_output", output + 2);
+		_SendMessageToWindow(ZIPPO_LINE_OF_STDOUT, "zip_output", output + 2);
 	} else if (!strncmp("up", output, 2)) {
 		output[0] = 'U';
-		_SendMessageToWindow('outp', "zip_output", output);
+		_SendMessageToWindow(ZIPPO_LINE_OF_STDOUT, "zip_output", output);
 	} else {
-		_SendMessageToWindow('outp', "zip_output", output);
+		_SendMessageToWindow(ZIPPO_LINE_OF_STDOUT, "zip_output", output);
 	}
 
 	return B_OK;
@@ -202,10 +204,10 @@ ZipperThread::ExecuteUnitFailed(status_t status)
 
 	if (status == EOF) {
 		// thread has finished, been quit or killed, we don't know
-		_SendMessageToWindow('exit');
+		_SendMessageToWindow(ZIPPO_THREAD_EXIT);
 	} else {
 		// explicit error - communicate error to Window
-		_SendMessageToWindow('exrr');
+		_SendMessageToWindow(ZIPPO_THREAD_EXIT_ERROR);
 	}
 
 	Quit();

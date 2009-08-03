@@ -14,6 +14,7 @@
 
 #include <Message.h>
 #include <Messenger.h>
+#include <String.h>
 #include <Window.h>
 
 #include "GenericThread.h"
