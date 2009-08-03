@@ -15,7 +15,7 @@ struct entry_ref;
 
 
 class MediaFileListItem : public BStringItem {
-	public:
+public:
 				MediaFileListItem(BMediaFile* file, const entry_ref& ref);
 	virtual		~MediaFileListItem();
 
@@ -25,22 +25,23 @@ class MediaFileListItem : public BStringItem {
 
 
 class MediaFileListView : public BListView {
-	public:
+public:
 								MediaFileListView(BRect frame,
 									uint32 resizingMode);
 	virtual						~MediaFileListView();
 
-	protected:
+protected:
 	virtual void				KeyDown(const char *bytes, int32 numBytes);
 	virtual void				SelectionChanged();
 
-	public:
-			void				AddItem(BMediaFile* file, const entry_ref& ref);
+public:
+			bool				AddMediaItem(BMediaFile* file,
+									const entry_ref& ref);
 
 			void				SetEnabled(bool enabled);
 			bool				IsEnabled() const;
 
-	private:
+private:
 			bool				fEnabled;
 };
 

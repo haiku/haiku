@@ -343,11 +343,12 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 
 	BString string, string2;
 
-    // TODO: for preview, launch the default file app instead of hardcoded MediaPlayer
+    // TODO: For preview, launch the default file app instead of hardcoded
+    // MediaPlayer
 	BEntry entry("/boot/system/apps/MediaPlayer", true);
 	char buffer[40];
 	char buffer2[B_PATH_NAME_LENGTH];
-	char *argv[3];
+	const char* argv[3];
 	argv[0] = "-pos";
 	BMediaFile *inFile(NULL);
 	int32 srcIndex = 0;
@@ -501,7 +502,7 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 			string << fStartDurationTC->Text();
 			string << "000";
 
-			strcpy(buffer,string.String());
+			strcpy(buffer, string.String());
 			argv[1] = buffer;
 			srcIndex = fListView->CurrentSelection();
 			status = GetSourceFileAt(srcIndex, &inFile, &inRef);
@@ -512,7 +513,7 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 				strcpy(buffer, string.String());
 
 				strcpy(buffer2, name.Path());
-				argv[2]= buffer2;
+				argv[2] = buffer2;
 			}
 
 			status = be_roster->Launch(&ref, 3, argv);
@@ -752,16 +753,19 @@ MediaConverterWindow::SetStatusMessage(const char *message)
 // #pragma mark -
 
 
-void
+bool
 MediaConverterWindow::AddSourceFile(BMediaFile* file, const entry_ref& ref)
 {
-	fListView->AddItem(file, ref);
+	if (!fListView->AddMediaItem(file, ref))
+		return false;
 
 	if (!fOutputDirSpecified) {
 		BEntry entry(&ref);
 		entry.GetParent(&entry);
 		_SetOutputFolder(entry);
 	}
+
+	return true;
 }
 
 

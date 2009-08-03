@@ -10,6 +10,6 @@ Application MediaConverter :
 	MediaFileListView.cpp
 	StatusView.cpp
 
-	: be media tracker
+	: be media tracker $(TARGET_LIBSTDC++)
 	: MediaConverter.rdef
 ;

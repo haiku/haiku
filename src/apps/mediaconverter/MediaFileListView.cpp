@@ -1,8 +1,12 @@
 // Copyright 1999, Be Incorporated. All Rights Reserved.
 // Copyright 2000-2004, Jun Suzuki. All Rights Reserved.
-// Copyright 2007, Stephan Aßmus. All Rights Reserved.
+// Copyright 2007, 2009 Stephan Aßmus. All Rights Reserved.
 // This file may be used under the terms of the Be Sample Code License.
+
+
 #include "MediaFileListView.h"
+
+#include <new>
 
 #include <Application.h>
 #include <MediaFile.h>
@@ -16,9 +20,10 @@
 
 
 MediaFileListItem::MediaFileListItem(BMediaFile* file, const entry_ref& ref)
-	: BStringItem(ref.name),
-	  fRef(ref),
-	  fMediaFile(file)
+	:
+	BStringItem(ref.name),
+	fRef(ref),
+	fMediaFile(file)
 {
 }
 
@@ -49,7 +54,7 @@ MediaFileListView::~MediaFileListView()
 }
 
 
-void 
+void
 MediaFileListView::SetEnabled(bool enabled)
 {
 	if (enabled == fEnabled)
@@ -60,22 +65,27 @@ MediaFileListView::SetEnabled(bool enabled)
 }
 
 
-bool 
+bool
 MediaFileListView::IsEnabled() const
 {
 	return fEnabled;
 }
 
 
-void
-MediaFileListView::AddItem(BMediaFile* file, const entry_ref& ref)
+bool
+MediaFileListView::AddMediaItem(BMediaFile* file, const entry_ref& ref)
 {
-	BListView::AddItem(new MediaFileListItem(file, ref));
+	MediaFileListItem* item = new(std::nothrow) MediaFileListItem(file, ref);
+	if (item == NULL || !AddItem(item)) {
+		delete item;
+		return false;
+	}
 	be_app_messenger.SendMessage(FILE_LIST_CHANGE_MESSAGE);
+	return true;
 }
 
 
-void 
+void
 MediaFileListView::KeyDown(const char *bytes, int32 numBytes)
 {
 	switch (bytes[0]) {
@@ -90,7 +100,7 @@ MediaFileListView::KeyDown(const char *bytes, int32 numBytes)
 						selection = count - 1;
 					Select(selection);
 					be_app_messenger.SendMessage(FILE_LIST_CHANGE_MESSAGE);
-				}		
+				}
 			}
 			break;
 		default:
@@ -99,10 +109,10 @@ MediaFileListView::KeyDown(const char *bytes, int32 numBytes)
 }
 
 
-void 
+void
 MediaFileListView::SelectionChanged()
 {
-	MediaConverterWindow* win = dynamic_cast<MediaConverterWindow *>(Window());
+	MediaConverterWindow* win = dynamic_cast<MediaConverterWindow*>(Window());
 	if (win != NULL)
 		win->SourceFileSelectionChanged();
 }

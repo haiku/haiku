@@ -23,17 +23,16 @@
 #include "Strings.h"
 
 
-using std::nothrow;
-
 const char APP_SIGNATURE[] = "application/x-vnd.Haiku-MediaConverter";
 
 
 MediaConverterApp::MediaConverterApp()
-	: BApplication(APP_SIGNATURE)
-	, fWin(NULL)
-	, fConvertThreadID(-1)
-	, fConverting(false)
-	, fCancel(false)
+	:
+	BApplication(APP_SIGNATURE),
+	fWin(NULL),
+	fConvertThreadID(-1),
+	fConverting(false),
+	fCancel(false)
 {
 	// TODO: implement settings for window pos
 	fWin = new MediaConverterWindow(BRect(50, 50, 520, 555));
@@ -99,22 +98,23 @@ MediaConverterApp::RefsReceived(BMessage *msg)
 {
 	entry_ref ref;
 	int32 i = 0;
-	BMediaFile *f;
 	BString errorFiles;
 	int32 errors = 0;
 
 	// from Open dialog or drag & drop
 
 	while (msg->FindRef("refs", i++, &ref) == B_OK) {
-		f = new BMediaFile(&ref/*, B_MEDIA_FILE_NO_READ_AHEAD*/);
-		if (f->InitCheck() != B_OK) {
+		uint32 flags = 0; // B_MEDIA_FILE_NO_READ_AHEAD
+		BMediaFile* file = new(std::nothrow) BMediaFile(&ref, flags);
+		if (file == NULL || file->InitCheck() != B_OK) {
 			errorFiles << ref.name << "\n";
 			errors++;
-			delete f;
+			delete file;
 			continue;
 		}
 		if (fWin->Lock()) {
-			fWin->AddSourceFile(f, ref);
+			if (!fWin->AddSourceFile(file, ref))
+				delete file;
 			fWin->Unlock();
 		}
 	}
@@ -408,7 +408,8 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 					= inFormat.u.raw_video.pixel_height_aspect;
 			}
 
-			videoBuffer = new (nothrow) uint8[height * rvf->display.bytes_per_row];
+			videoBuffer = new (std::nothrow) uint8[height
+				* rvf->display.bytes_per_row];
 			outVidTrack = outFile->CreateTrack(&outVidFormat, videoCodec);
 
 			if (outVidTrack != NULL) {
@@ -417,7 +418,8 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 				BView* encoderView = outVidTrack->GetParameterView();
 				if (encoderView) {
 					MediaEncoderWindow* encoderWin
-						= new MediaEncoderWindow(BRect(50, 50, 520, 555), encoderView);
+						= new MediaEncoderWindow(BRect(50, 50, 520, 555),
+							encoderView);
 					encoderWin->Go();
 						// blocks until the window is quit
 

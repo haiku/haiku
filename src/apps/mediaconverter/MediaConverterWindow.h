@@ -44,11 +44,11 @@ class MediaConverterWindow : public BWindow {
 									media_file_format** _format,
 									media_codec_info** _audio,
 									media_codec_info** _video);
-	
+
 			void				SetStatusMessage(const char *message);
 			void				SetFileMessage(const char *message);
-	
-			void				AddSourceFile(BMediaFile* file,
+
+			bool				AddSourceFile(BMediaFile* file,
 									const entry_ref& ref);
 			void				RemoveSourceFile(int32 index);
 			int32				CountSourceFiles();
