@@ -209,10 +209,10 @@ Window::Window()
 	BView* changing = new BStringView("3", "Changing Tool Tip");
 	changing->SetToolTip(new ChangingToolTip());
 
-	BView* mouse = new BStringView("3", "Mouse Tool Tip");
+	BView* mouse = new BStringView("3", "Mouse Tool Tip (sticky)");
 	mouse->SetToolTip(new MouseToolTip());
 
-	BView* immediate = new ImmediateView("3", "Immediate Tool Tip");
+	BView* immediate = new ImmediateView("3", "Immediate Tool Tip (sticky)");
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(simple)
