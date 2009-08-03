@@ -198,6 +198,7 @@ InitParamsPanel::Go(BString& name, BString& parameters)
 					const char* string = get_driver_parameter(handle, "name",
 						NULL, NULL);
 					name.SetTo(string);
+					delete_driver_settings(handle);
 				}
 			} else
 				fReturnValue = err;
