@@ -48,6 +48,16 @@ arch_cpu_init_post_vm(kernel_args *args)
 }
 
 status_t
+arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
+{
+        //detect_cpu(curr_cpu);
+
+        // we only support one on ppc anyway at the moment...
+	//XXX: WRITEME
+        return 0;
+}
+
+status_t
 arch_cpu_init_post_modules(kernel_args *args)
 {
 	return B_OK;

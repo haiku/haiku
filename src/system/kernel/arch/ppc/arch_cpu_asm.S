@@ -31,7 +31,9 @@ FUNCTION(get_sr):
  *			   r3					 r4
  */
 FUNCTION(set_sr):
+	isync
 	mtsrin	%r4, %r3
+	isync
 	blr
 
 /* uint32 get_msr(void);
@@ -45,6 +47,7 @@ FUNCTION(get_msr):
  */
 FUNCTION(set_msr):
 	mtmsr	%r3
+	isync
 	blr
 
 /* uint32 get_pvr(void);

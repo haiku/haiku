@@ -991,12 +991,8 @@ arch_mmu_init(void)
 	// set up new page table and turn on translation again
 
 	for (int32 i = 0; i < 16; i++) {
-		isync();
-
 		ppc_set_segment_register((void *)(i * 0x10000000), sSegments[i]);
 			// one segment describes 256 MB of memory
-
-		ppc_sync();
 	}
 
 	ppc_set_page_table(physicalTable, tableSize);

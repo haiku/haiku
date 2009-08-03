@@ -26,6 +26,7 @@ FUNCTION(arch_int_enable_interrupts):
 		// sets bit 15, EE
 
 	mtmsr	%r3							// put it back into the msr
+	isync
 	blr
 
 
@@ -40,6 +41,7 @@ FUNCTION(arch_int_disable_interrupts):
 		// clears bit 15, EE
 
 	mtmsr	%r4							// put it back into the msr
+	isync
 	blr
 
 
@@ -53,6 +55,7 @@ FUNCTION(arch_int_restore_interrupts):
 		// clear or set bit 15, EE to the same state as in r3, oldState
 
 	mtmsr	%r4
+	isync
 	blr
 
 /* bool arch_int_are_interrupts_enabled(void) */
@@ -175,7 +178,9 @@ FUNCTION(gethid0):
 
 // void sethid0(unsigned int val);
 FUNCTION(sethid0):
+	isync
 	mtspr		1008, %r3
+	isync
 	blr
 
 // unsigned int getl2cr();
@@ -185,7 +190,9 @@ FUNCTION(getl2cr):
 
 // void setl2cr(unsigned int val);
 FUNCTION(setl2cr):
+	isync
 	mtspr		1017, %r3
+	isync
 	blr
 
 	
