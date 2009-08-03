@@ -124,6 +124,7 @@ class BScrollView;
 class BShape;
 class BShelf;
 class BString;
+class BToolTip;
 class BWindow;
 struct _array_data_;
 struct _array_hdr_;
@@ -503,7 +504,6 @@ public:
 
 	virtual	void			DrawAfterChildren(BRect r);
 
-
 			// layout related
 
 	virtual	BSize			MinSize();
@@ -542,6 +542,19 @@ public:
 protected:
 	virtual	void			DoLayout();
 
+public:
+			// tool tip support
+
+			void			SetToolTip(const char* text);
+			void			SetToolTip(BToolTip* tip);
+			BToolTip*		ToolTip() const;
+
+			void			ShowToolTip(BToolTip* tip = NULL);
+			void			HideToolTip();
+
+protected:
+	virtual bool			GetToolTipAt(BPoint point, BToolTip** _tip);
+
 private:
 			void			_Layout(bool force, BLayoutContext* context);
 
@@ -556,7 +569,6 @@ private:
 	friend class BTabView;
 	friend class BWindow;
 
-	virtual	void			_ReservedView11();
 	virtual	void			_ReservedView12();
 	virtual	void			_ReservedView13();
 	virtual	void			_ReservedView14();
@@ -653,8 +665,10 @@ private:
 			uint32			fMouseEventOptions;
 
 			LayoutData*		fLayoutData;
+			BToolTip*		fToolTip;
+			BToolTip*		fVisibleToolTip;
 
-			uint32			_reserved[7];
+			uint32			_reserved[5];
 };
 
 

@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src tests kits interface ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
-UsePrivateHeaders interface ;
+UsePrivateHeaders interface shared ;
 
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) balert ] ;
@@ -87,6 +87,11 @@ SimpleTest ScreenTest :
 
 SimpleTest StatusBarTest :
 	StatusBarTest.cpp
+	: be $(TARGET_LIBSUPC++)
+	;
+
+SimpleTest ToolTipTest :
+	ToolTipTest.cpp
 	: be $(TARGET_LIBSUPC++)
 	;
 

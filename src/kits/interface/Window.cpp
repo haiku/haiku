@@ -43,6 +43,8 @@
 #include <PortLink.h>
 #include <ServerProtocol.h>
 #include <TokenSpace.h>
+#include <ToolTipManager.h>
+#include <ToolTipWindow.h>
 #include <tracker_private.h>
 #include <WindowPrivate.h>
 
@@ -1208,6 +1210,21 @@ FrameMoved(origin);
 				uint32 buttons;
 				msg->FindPoint("be:view_where", &where);
 				msg->FindInt32("buttons", (int32*)&buttons);
+
+				delete fIdleMouseRunner;
+
+				if (transit != B_EXITED_VIEW && transit != B_OUTSIDE_VIEW) {
+					// Start new idle runner
+					BMessage idle(B_MOUSE_IDLE);
+					idle.AddPoint("be:view_where", where);
+					fIdleMouseRunner = new BMessageRunner(
+						BMessenger(NULL, this), &idle,
+						BToolTipManager::Manager()->ShowDelay(), 1);
+				} else {
+					fIdleMouseRunner = NULL;
+					if (dynamic_cast<BPrivate::ToolTipWindow*>(this) == NULL)
+						BToolTipManager::Manager()->HideTip();
+				}
 
 				BMessage* dragMessage = NULL;
 				if (msg->HasMessage("be:drag_message")) {
@@ -2595,6 +2612,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	fTopView = NULL;
 	fFocus = NULL;
 	fLastMouseMovedView	= NULL;
+	fIdleMouseRunner = NULL;
 	fKeyMenuBar = NULL;
 	fDefaultButton = NULL;
 
@@ -3089,6 +3107,7 @@ BWindow::_DetermineTarget(BMessage* message, BHandler* target)
 		case B_MOUSE_UP:
 		case B_MOUSE_MOVED:
 		case B_MOUSE_WHEEL_CHANGED:
+		case B_MOUSE_IDLE:
 			// is there a token of the view that is currently under the mouse?
 			int32 token;
 			if (message->FindInt32("_view_token", &token) == B_OK) {
@@ -3183,7 +3202,8 @@ BWindow::_UnpackMessage(unpack_cookie& cookie, BMessage** _message,
 	// message directly (but not to the focus view)
 
 	for (int32 token; !cookie.tokens_scanned
-			&& cookie.message->FindInt32("_token", cookie.index, &token) == B_OK;
+			&& cookie.message->FindInt32("_token", cookie.index, &token)
+				== B_OK;
 			cookie.index++) {
 		// focus view is preferred and should get its message directly
 		if (token == cookie.focus_token) {
@@ -3294,7 +3314,8 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 						viewUnderMouse = _FindView(token);
 
 					// add transit information
-					uint32 transit = _TransitForMouseMoved(view, viewUnderMouse);;
+					uint32 transit
+						= _TransitForMouseMoved(view, viewUnderMouse);
 					message->AddInt32("be:transit", transit);
 
 					if (usePreferred)

@@ -44,6 +44,7 @@ enum {
 	B_MOUSE_DOWN 				= '_MDN',
 	B_MOUSE_MOVED 				= '_MMV',
 	B_MOUSE_ENTER_EXIT			= '_MEX',
+	B_MOUSE_IDLE				= '_MSI',
 	B_MOUSE_UP 					= '_MUP',
 	B_MOUSE_WHEEL_CHANGED		= '_MWC',
 	B_OPEN_IN_WORKSPACE			= '_OWS',

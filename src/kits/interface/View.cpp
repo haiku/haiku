@@ -54,6 +54,8 @@
 #include <ServerProtocol.h>
 #include <ServerProtocolStructs.h>
 #include <ShapePrivate.h>
+#include <ToolTip.h>
+#include <ToolTipManager.h>
 #include <TokenSpace.h>
 #include <ViewPrivate.h>
 
@@ -578,6 +580,9 @@ BView::~BView()
 	}
 
 	RemoveSelf();
+
+	if (fToolTip != NULL)
+		fToolTip->ReleaseReference();
 
 	// TODO: see about BShelf! must I delete it here? is it deleted by
 	// the window?
@@ -4171,6 +4176,18 @@ BView::MessageReceived(BMessage* msg)
 				FrameMoved(fParentOffset);
 				break;
 
+			case B_MOUSE_IDLE:
+			{
+				BPoint where;
+				if (msg->FindPoint("be:view_where", &where) != B_OK)
+					break;
+
+				BToolTip* tip;
+				if (GetToolTipAt(where, &tip))
+					ShowToolTip(tip);
+				break;
+			}
+
 			case B_MOUSE_WHEEL_CHANGED:
 			{
 				BScrollBar* horizontal = ScrollBar(B_HORIZONTAL);
@@ -4337,6 +4354,14 @@ BView::Perform(perform_code code, void* _data)
 		case PERFORM_CODE_DO_LAYOUT:
 		{
 			BView::DoLayout();
+			return B_OK;
+		}
+		case PERFORM_CODE_GET_TOOL_TIP_AT:
+		{
+			perform_data_get_tool_tip_at* data
+				= (perform_data_get_tool_tip_at*)_data;
+			data->return_value
+				= BView::GetToolTipAt(data->point, data->tool_tip);
 			return B_OK;
 		}
 	}
@@ -4613,6 +4638,74 @@ BView::DoLayout()
 
 
 void
+BView::SetToolTip(const char* text)
+{
+	SetToolTip(new BTextToolTip(text));
+}
+
+
+void
+BView::SetToolTip(BToolTip* tip)
+{
+	if (fToolTip == tip)
+		return;
+
+	if (fToolTip != NULL)
+		fToolTip->ReleaseReference();
+	fToolTip = tip;
+	if (fToolTip != NULL)
+		fToolTip->AcquireReference();
+}
+
+
+BToolTip*
+BView::ToolTip() const
+{
+	return fToolTip;
+}
+
+
+void
+BView::ShowToolTip(BToolTip* tip)
+{
+	if (tip == NULL)
+		return;
+
+	fVisibleToolTip = tip;
+
+	BPoint where;
+	GetMouse(&where, NULL, false);
+
+	BToolTipManager::Manager()->ShowTip(tip, ConvertToScreen(where));
+}
+
+
+void
+BView::HideToolTip()
+{
+	BToolTipManager::Manager()->HideTip();
+	fVisibleToolTip = NULL;
+}
+
+
+bool
+BView::GetToolTipAt(BPoint point, BToolTip** _tip)
+{
+	if (fVisibleToolTip != NULL) {
+		*_tip = fVisibleToolTip;
+		return true;
+	}
+	if (fToolTip != NULL) {
+		*_tip = fToolTip;
+		return true;
+	}
+
+	*_tip = NULL;
+	return false;
+}
+
+
+void
 BView::_Layout(bool force, BLayoutContext* context)
 {
 //printf("%p->BView::_Layout(%d, %p)\n", this, force, context);
@@ -4715,6 +4808,9 @@ BView::_InitData(BRect frame, const char* name, uint32 resizingMode,
 	fMouseEventOptions = 0;
 
 	fLayoutData = new LayoutData;
+
+	fToolTip = NULL;
+	fVisibleToolTip = NULL;
 }
 
 
@@ -5494,12 +5590,23 @@ _ReservedView10__5BView(BView* view)
 }
 
 
-void BView::_ReservedView11(){}
-void BView::_ReservedView12(){}
-void BView::_ReservedView13(){}
-void BView::_ReservedView14(){}
-void BView::_ReservedView15(){}
-void BView::_ReservedView16(){}
+extern "C" bool
+_ReservedView11__5BView(BView* view, BPoint point, BToolTip** _toolTip)
+{
+	// GetToolTipAt()
+	perform_data_get_tool_tip_at data;
+	data.point = point;
+	data.tool_tip = _toolTip;
+	view->Perform(PERFORM_CODE_GET_TOOL_TIP_AT, &data);
+	return data.return_value;
+}
+
+
+void BView::_ReservedView12() {}
+void BView::_ReservedView13() {}
+void BView::_ReservedView14() {}
+void BView::_ReservedView15() {}
+void BView::_ReservedView16() {}
 
 
 BView::BView(const BView& other)

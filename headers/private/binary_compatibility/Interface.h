@@ -45,5 +45,10 @@ struct perform_data_invalidate_layout {
 	bool	descendants;
 };
 
+struct perform_data_get_tool_tip_at {
+	BPoint		point;
+	BToolTip**	tool_tip;
+	bool		return_value;
+};
 
 #endif /* _BINARY_COMPATIBILITY_INTERFACE_H_ */

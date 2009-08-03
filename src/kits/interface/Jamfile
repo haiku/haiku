@@ -122,6 +122,8 @@ MergeObject <libbe>interface_kit.o :
 	TextControl.cpp
 	TextInput.cpp
 	TextView.cpp
+	ToolTip.cpp
+	ToolTipManager.cpp
 	TwoDimensionalLayout.cpp
 	View.cpp
 	ViewLayoutItem.cpp
