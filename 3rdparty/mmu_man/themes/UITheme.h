@@ -112,5 +112,9 @@ inline rgb_color make_color(uint8 red, uint8 green, uint8 blue, uint8 alpha=255)
 #endif
 #endif
 
+#ifdef __HAIKU__
+#define B_TOOLTIP_BACKGROUND_COLOR B_TOOL_TIP_BACKGROUND_COLOR
+#define B_TOOLTIP_TEXT_COLOR B_TOOL_TIP_TEXT_COLOR
+#endif
 
 #endif /* _Z_UI_THEME_H */
