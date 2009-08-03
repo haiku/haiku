@@ -132,11 +132,16 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 //		fContext->gop_size = 12;
 		// TODO: Fix pixel format or setup conversion method...
 		fContext->pix_fmt = PIX_FMT_YUV420P;
-//		fContext->rate_emu = 0;
+
 		// TODO: Setup rate control:
+//		fContext->rate_emu = 0;
 //		fContext->rc_eq = NULL;
 //		fContext->rc_max_rate = 0;
 //		fContext->rc_min_rate = 0;
+		// TODO: Try to calculate a good bit rate...
+		fContext->bit_rate = 800000;
+
+		// Pixel aspect ratio
 		fContext->sample_aspect_ratio.num
 			= fInputFormat.u.raw_video.pixel_width_aspect;
 		fContext->sample_aspect_ratio.den
@@ -180,6 +185,8 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 	} else if (fInputFormat.type == B_MEDIA_RAW_AUDIO) {
 		// frame rate
 		fContext->sample_rate = (int)fInputFormat.u.raw_audio.frame_rate;
+		// NOTE: From the output_example.c, it looks like we are not supposed
+		// to set this.
 		fContext->time_base.den = (int)fInputFormat.u.raw_audio.frame_rate;
 		fContext->time_base.num = 1;
 		// channels
@@ -243,6 +250,17 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 		return B_NOT_SUPPORTED;
 	}
 
+	// Add some known fixes from the FFmpeg API example:
+	if (fContext->codec_id == CODEC_ID_MPEG2VIDEO) {
+		// Just for testing, we also add B frames */
+		fContext->max_b_frames = 2;
+    } else if (fContext->codec_id == CODEC_ID_MPEG1VIDEO){
+		// Needed to avoid using macroblocks in which some coeffs overflow.
+		// This does not happen with normal video, it just happens here as
+		// the motion of the chroma plane does not match the luma plane.
+		fContext->mb_decision = 2;
+    }
+
 	// Open the codec
 	int result = avcodec_open(fContext, fCodec);
 	fCodecInitDone = (result >= 0);
@@ -292,6 +310,11 @@ AVCodecEncoder::Encode(const void* buffer, int64 frameCount,
 // #pragma mark -
 
 
+static const int64 kNoPTSValue = 0x8000000000000000LL;
+	// NOTE: For some reasons, I have trouble with the avcodec.h define:
+	// #define AV_NOPTS_VALUE          INT64_C(0x8000000000000000)
+	// INT64_C is not defined here.
+
 status_t
 AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
 	media_encode_info* info)
@@ -310,12 +333,6 @@ AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
 		& media_raw_audio_format::B_AUDIO_SIZE_MASK;
 	size_t inputFrameSize = inputSampleSize
 		* fInputFormat.u.raw_audio.channel_count;
-
-	size_t outSampleSize = av_get_bits_per_sample_format(
-		fContext->sample_fmt) / 8;
-	size_t outSize = outSampleSize * fContext->channels;
-	TRACE("  sampleSize: %ld/%ld, frameSize: %ld/%ld\n",
-		inputSampleSize, inputFrameSize, outSampleSize, outSize);
 
 	size_t bufferSize = frameCount * inputFrameSize;
 	bufferSize = min_c(bufferSize, kDefaultChunkBufferSize);
@@ -340,6 +357,16 @@ AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
 		if (usedBytes < 0) {
 			TRACE("  avcodec_encode_video() failed: %d\n", usedBytes);
 			return B_ERROR;
+		}
+
+		// Maybe we need to use this PTS to calculate start_time:
+		if (fContext->coded_frame->pts != kNoPTSValue) {
+			TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
+				fContext->coded_frame->pts, fContext->time_base.num,
+				fContext->time_base.den);
+		} else {
+			TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
+				fContext->time_base.num, fContext->time_base.den);
 		}
 
 		// Setup media_encode_info, most important is the time stamp.
@@ -405,6 +432,16 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 		if (usedBytes < 0) {
 			TRACE("  avcodec_encode_video() failed: %d\n", usedBytes);
 			return B_ERROR;
+		}
+
+		// Maybe we need to use this PTS to calculate start_time:
+		if (fContext->coded_frame->pts != kNoPTSValue) {
+			TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
+				fContext->coded_frame->pts, fContext->time_base.num,
+				fContext->time_base.den);
+		} else {
+			TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
+				fContext->time_base.num, fContext->time_base.den);
 		}
 
 		// Setup media_encode_info, most important is the time stamp.
