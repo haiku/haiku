@@ -1116,7 +1116,7 @@ ScreenWindow::_UpdateMonitor()
 		&& info.min_vertical_frequency != 0
 		&& info.max_pixel_clock != 0) {
 		snprintf(text, sizeof(text), "Horizonal Frequency:\t%lu - %lu kHz\n"
-			"VerticalFrequency:\t%lu - %lu Hz\n\n"
+			"Vertical Frequency:\t%lu - %lu Hz\n\n"
 			"Maximum Pixel Clock:\t%g MHz", info.min_horizontal_frequency,
 			info.max_horizontal_frequency, info.min_vertical_frequency,
 			info.max_vertical_frequency, info.max_pixel_clock / 1000.0);
