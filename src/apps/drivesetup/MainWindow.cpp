@@ -1024,7 +1024,13 @@ MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 		return;
 	}
 
-	modificationPreparer.CommitModifications();
+	ret = modificationPreparer.CommitModifications();
+
+	if (ret != B_OK) {
+		_DisplayPartitionError("Failed to delete the partition. "
+			"This operation is exiting.\nNo changes have been made!\n");
+		return;
+	}
 
 	_ScanDrives();
 	fDiskView->ForceUpdate();
