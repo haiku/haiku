@@ -132,12 +132,21 @@ _start(uint32 _unused1, uint32 _unused3, void *openFirmwareEntry)
 void
 start(void *openFirmwareEntry)
 {
+	char bootargs[512];
+
 	// stage2 args - might be set via the command line one day
 	stage2_args args;
 	args.heap_size = HEAP_SIZE;
 	args.arguments = NULL;
 
 	of_init(openFirmwareEntry);
+
+	// check for arguments
+	if (of_getprop(gChosen, "bootargs", bootargs, sizeof(bootargs)) != OF_FAILED) {
+		static const char *sArgs[] = { NULL, NULL };
+		sArgs[0] = (const char *)bootargs;
+		args.arguments = sArgs;
+	}
 
 	determine_machine();
 	console_init();
