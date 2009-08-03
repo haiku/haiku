@@ -59,6 +59,18 @@ const EncoderDescription gEncoderTable[] = {
 		B_ANY_FORMAT_FAMILY,
 		B_MEDIA_RAW_AUDIO,
 		B_MEDIA_ENCODED_AUDIO
+	},
+	{
+		{
+			"Dolby Digital (AC-3)",
+			"ac3",
+			0,
+			CODEC_ID_AC3,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO
 	}
 };
 

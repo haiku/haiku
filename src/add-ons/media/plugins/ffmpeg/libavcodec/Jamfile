@@ -29,6 +29,7 @@ StaticLibrary libavcodec.a :
 	ac3_parser.c
 	ac3dec.c
 	ac3dec_data.c
+	ac3enc.c
 	ac3tab.c
 	acelp_filters.c
 	acelp_pitch_delay.c

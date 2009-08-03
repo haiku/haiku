@@ -11,6 +11,7 @@
 extern "C" {
 	#include "avcodec.h"
 	#include "swscale.h"
+	#include "libavutil/fifo.h"
 }
 
 #include "EncoderPlugin.h"
@@ -36,9 +37,16 @@ public:
 	virtual status_t			Encode(const void* buffer, int64 frameCount,
 									media_encode_info* info);
 
+	// TODO: Turns out we need Flush() after all. We buffer encoded audio
+	// in a FIFO, since the user suggested buffer size may not fit the
+	// codec buffer size.
+
 private:
 			status_t			_EncodeAudio(const void* buffer,
 									int64 frameCount,
+									media_encode_info* info);
+			status_t			_EncodeAudio(const uint8* buffer,
+									size_t bufferSize, int64 frameCount,
 									media_encode_info* info);
 
 			status_t			_EncodeVideo(const void* buffer,
@@ -54,10 +62,14 @@ private:
 			AVCodecContext*		fContext;
 			bool				fCodecInitDone;
 
+			// For video (color space conversion):
 			AVPicture			fSrcFrame;
 			AVPicture			fDstFrame;
 			AVFrame*			fFrame;
 			SwsContext*			fSwsContext;
+
+			// For encoded audio:
+			AVFifoBuffer		fAudioFifo;
 
 			int64				fFramesWritten;
 

@@ -9,6 +9,7 @@
 #include <new>
 
 #include <stdio.h>
+#include <string.h>
 
 extern "C" {
 	#include "rational.h"
@@ -46,9 +47,11 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID)
 	TRACE("AVCodecEncoder::AVCodecEncoder()\n");
 
 	fCodec = avcodec_find_encoder((enum CodecID)codecID);
-	TRACE("  found AVCodec: %p\n", fCodec);
+	TRACE("  found AVCodec for %lu: %p\n", codecID, fCodec);
 
 	memset(&fInputFormat, 0, sizeof(media_format));
+
+	av_fifo_init(&fAudioFifo, 0);
 }
 
 
@@ -337,63 +340,81 @@ AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
 	size_t bufferSize = frameCount * inputFrameSize;
 	bufferSize = min_c(bufferSize, kDefaultChunkBufferSize);
 
-	while (frameCount > 0) {
-		if (frameCount < fContext->frame_size) {
-			TRACE("  ERROR: too few frames left! (left: %lld, needed: %d)\n",
-				frameCount, fContext->frame_size);
-			// TODO: Handle this some way. Maybe use an av_fifo to buffer data?
-			return B_ERROR;
+	if (fContext->frame_size > 1) {
+		// Encoded audio. Things work differently from raw audio. We need
+		// the fAudioFifo to pipe data.
+		if (av_fifo_realloc2(&fAudioFifo,
+				av_fifo_size(&fAudioFifo) + bufferSize) < 0) {
+			TRACE("  av_fifo_realloc2() failed\n");
+            return B_NO_MEMORY;
+        }
+        av_fifo_generic_write(&fAudioFifo, const_cast<uint8*>(buffer),
+        	bufferSize, NULL);
+
+		int frameBytes = fContext->frame_size * inputFrameSize;
+		uint8* tempBuffer = new(std::nothrow) uint8[frameBytes];
+		if (tempBuffer == NULL)
+			return B_NO_MEMORY;
+
+		// Encode as many chunks as can be read from the FIFO.
+		while (av_fifo_size(&fAudioFifo) >= frameBytes) {
+			av_fifo_read(&fAudioFifo, tempBuffer, frameBytes);
+
+			ret = _EncodeAudio(tempBuffer, frameBytes, fContext->frame_size,
+				info);
+			if (ret != B_OK)
+				break;
 		}
-
-		int chunkFrames = fContext->frame_size;
-
-		TRACE("  frames left: %lld, chunk frames: %d\n",
-			frameCount, chunkFrames);
-
-		// Encode one audio chunk/frame.
-		int usedBytes = avcodec_encode_audio(fContext, fChunkBuffer,
-			bufferSize, reinterpret_cast<const short*>(buffer));
-
-		if (usedBytes < 0) {
-			TRACE("  avcodec_encode_video() failed: %d\n", usedBytes);
-			return B_ERROR;
-		}
-
-		// Maybe we need to use this PTS to calculate start_time:
-		if (fContext->coded_frame->pts != kNoPTSValue) {
-			TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
-				fContext->coded_frame->pts, fContext->time_base.num,
-				fContext->time_base.den);
-		} else {
-			TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
-				fContext->time_base.num, fContext->time_base.den);
-		}
-
-		// Setup media_encode_info, most important is the time stamp.
-		info->start_time = (bigtime_t)(fFramesWritten * 1000000LL
-			/ fInputFormat.u.raw_audio.frame_rate);
-
-		// Write the chunk
-		ret = WriteChunk(fChunkBuffer, usedBytes, info);
-		if (ret != B_OK)
-			break;
-
-		size_t framesWritten = usedBytes / inputFrameSize;
-		if (chunkFrames == 1) {
-			// For PCM data:
-			framesWritten = usedBytes / inputFrameSize;
-		} else {
-			// For encoded audio:
-			framesWritten = chunkFrames * inputFrameSize;
-		}
-
-		// Skip to next chunk of buffer.
-		fFramesWritten += framesWritten;
-		frameCount -= framesWritten;
-		buffer += usedBytes;
+	} else {
+		// Raw audio. The number of bytes returned from avcodec_encode_audio()
+		// is always the same as the number of input bytes.
+		return _EncodeAudio(buffer, bufferSize, frameCount,
+			info);
 	}
 
 	return ret;
+}
+
+
+status_t
+AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
+	int64 frameCount, media_encode_info* info)
+{
+	// Encode one audio chunk/frame. The bufferSize has already been adapted
+	// to the needed size for fContext->frame_size, or we are writing raw
+	// audio.
+	int usedBytes = avcodec_encode_audio(fContext, fChunkBuffer,
+		bufferSize, reinterpret_cast<const short*>(buffer));
+
+	if (usedBytes < 0) {
+		TRACE("  avcodec_encode_video() failed: %d\n", usedBytes);
+		return B_ERROR;
+	}
+
+	// Maybe we need to use this PTS to calculate start_time:
+	if (fContext->coded_frame->pts != kNoPTSValue) {
+		TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
+			fContext->coded_frame->pts, fContext->time_base.num,
+			fContext->time_base.den);
+	} else {
+		TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
+			fContext->time_base.num, fContext->time_base.den);
+	}
+
+	// Setup media_encode_info, most important is the time stamp.
+	info->start_time = (bigtime_t)(fFramesWritten * 1000000LL
+		/ fInputFormat.u.raw_audio.frame_rate);
+
+	// Write the chunk
+	status_t ret = WriteChunk(fChunkBuffer, usedBytes, info);
+	if (ret != B_OK) {
+		TRACE("  error writing chunk: %s\n", strerror(ret));
+		return ret;
+	}
+
+	fFramesWritten += frameCount;
+
+	return B_OK;
 }
 
 
@@ -450,8 +471,10 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 
 		// Write the chunk
 		ret = WriteChunk(fChunkBuffer, usedBytes, info);
-		if (ret != B_OK)
+		if (ret != B_OK) {
+			TRACE("  error writing chunk: %s\n", strerror(ret));
 			break;
+		}
 
 		// Skip to the next frame (but usually, there is only one to encode
 		// for video).

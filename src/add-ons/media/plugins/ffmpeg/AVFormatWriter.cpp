@@ -103,7 +103,7 @@ status_t
 AVFormatWriter::StreamCookie::Init(const media_format* format,
 	const media_codec_info* codecInfo)
 {
-	TRACE("AVFormatWriter::StreamCookie::Init() (Yes, New)\n");
+	TRACE("AVFormatWriter::StreamCookie::Init()\n");
 
 	BAutolock _(fStreamLock);
 
