@@ -12,47 +12,48 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 
 
 # Available Optional Packages:
-#	APR
+#	APR					- support libraries used for example by SVN
 #	APR-util
-#	Beam
-#	BeBook
-#	BeHappy
-#	BeOSCompatibility
-#	BePDF
-#	Bluetooth
-#	CDRecord
-#	CLucene
-#	CVS
+#	Beam				- powerful native e-mail client
+#	BeBook				- the classic BeOS API documentation
+#	BeHappy				- special documentation (i.e. BeBook) browser
+#	BeOSCompatibility	- creates links within the system to support old apps
+#	BePDF				- native PDF reader
+#	Bluetooth			- experimental Haiku components for Bluetooth
+#	CDRecord			- the command line CD writing tools
+#	Clockwerk			- native audio/video compositing
+#	CLucene				- indexed file search
+#	CVS					- the version control system
 #	Development			- more complete dev environment (including autotools)
 #	DevelopmentBase		- basic development environment (gcc, headers, libs,...)
 #	DevelopmentMin		- development headers, libs, tools, from sources only
-#	Firefox
-#	KeymapSwitcher
-#	LibIconv
-#	LibLayout
-#	LibXML2
-#	Links
-#	Nano
-#	Neon
-#	NetSurf
-#	OpenSound
-#	OpenSSH
-#	OpenSSL
-#	P7zip
-#	Pe
-#	Perl
-#	Python
-#	Rsync
-#	SQLite
-#	Subversion
-#	Tar
-#	UserlandFS
-#	Vim
-#	Vision
-#	VLC
-#	Welcome
-#	WonderBrush
-#	Yasm
+#	Firefox				- the webbrowser
+#	KeymapSwitcher		- Desktop utility
+#	LibIconv			- text encoding conversion library
+#	LibLayout			- GCC2 package needed by some BeOS apps to compile
+#	LibXML2				- the XML support libary
+#	Links				- the web browser
+#	Nano				- the command line text editor
+#	Neon				- support libraries used for example by SVN
+#	NetSurf				- the web browser
+#	OpenSound			- additional audio driver package
+#	OpenSSH				- the secure shell
+#	OpenSSL				- secure sockets library
+#	P7zip				- file archiving utility
+#	Pe					- the powerful native Programmer's Editor
+#	Perl				- the scripting language
+#	Python				- the scripting language
+#	Rsync				- remote directory synchronization
+#	SQLite				- the database implementation
+#	Subversion			- the version control system
+#	Tar					- archiving utility
+#	UserlandFS			- aids native file system development (like FUSE)
+#	Vim					- the command line text editor
+#	Vision				- powerful native IRC client
+#	VLC					- the multi media player with native interface
+#	Welcome				- introductory documentation to Haiku
+#	WonderBrush			- native graphics application
+#	Yasm				- the assembler utility
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
 
@@ -198,6 +199,28 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 }
 
 
+# Clockwerk
+if [ IsOptionalHaikuImagePackageAdded Clockwerk ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Clockwerk available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage Clockwerk-0.0.1-2009-08-04
+			: $(baseURL)/Clockwerk-0.0.1-x86-gcc4-2009-08-04.zip
+			:
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/Clockwerk/Clockwerk ;
+	} else {
+		InstallOptionalHaikuImagePackage Clockwerk-0.0.1-2009-08-04
+			: $(baseURL)/Clockwerk-0.0.1-x86-gcc2-2009-08-04.zip
+			:
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/Clockwerk/Clockwerk ;
+	}
+}
+
+
 # CLucene
 if [ IsOptionalHaikuImagePackageAdded CLucene ] {
 	if $(TARGET_ARCH) != x86 {
@@ -205,7 +228,7 @@ if [ IsOptionalHaikuImagePackageAdded CLucene ] {
 	} else if $(HAIKU_GCC_VERSION[1]) < 4 && ! $(isHybridBuild) {
 		Echo "No optional package CLucene available for GCC2" ;
 	} else {
-		InstallOptionalHaikuImagePackage 
+		InstallOptionalHaikuImagePackage
 			clucene-0.9.21svn-x86-gcc4-haiku-2009-06-11
 			: $(baseURL)/clucene-0.9.21svn-x86-gcc4-haiku-2009-06-11.zip
 			:
@@ -375,16 +398,19 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Firefox available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage 
-			BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01
-			: $(baseURL)/BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01.zip
- 			: apps
- 		;
- 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
-
-
+# TODO: Update BeZilla GCC4 build, this one is currently broken, because of
+# the BToolTip addition. At least the GCC2 build will work just fine on hybrid
+# installations.
+#	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+#		InstallOptionalHaikuImagePackage
+#			BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01
+#			: $(baseURL)/BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01.zip
+# 			: apps
+# 		;
+# 		AddSymlinkToHaikuImage home config be Applications
+#			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+		Echo "No optional package Firefox available for GCC4" ;
 	} else {
 		InstallOptionalHaikuImagePackage BeZillaBrowser-gcc2-20090218
 			: http://bezilla.beuser.de/builds/BeZillaBrowser-gcc2-20090218.zip
@@ -401,7 +427,7 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package KeymapSwitcher available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage 
+		InstallOptionalHaikuImagePackage
 			KeymapSwitcher-1.2.3-x86-gcc4-2009-05-31
 			:  $(baseURL)/KeymapSwitcher-1.2.3-x86-gcc4-2009-05-31.zip
 			:
@@ -409,7 +435,7 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 		AddSymlinkToHaikuImage home config be Desktop\ Applets
 			: /boot/common/bin/KeymapSwitcher ;
 	} else {
-		InstallOptionalHaikuImagePackage 
+		InstallOptionalHaikuImagePackage
 			KeymapSwitcher-1.2.3-x86-gcc2-2009-05-31
 			:  $(baseURL)/KeymapSwitcher-1.2.3-x86-gcc2-2009-05-31.zip
 			:
@@ -600,8 +626,8 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 		Echo "No optional package Pe available for $(TARGET_ARCH)" ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-			InstallOptionalHaikuImagePackage Pe-2.4.2-x86-gcc4-2009-07-05
-				: $(baseURL)/Pe-2.4.2-x86-gcc4-2009-07-05.zip
+			InstallOptionalHaikuImagePackage Pe-2.4.2-x86-gcc4-2009-08-04
+				: $(baseURL)/Pe-2.4.2-x86-gcc4-2009-08-04.zip
 			;
 		} else {
 			InstallOptionalHaikuImagePackage Pe-2.4.2-x86-gcc2-2009-07-05
@@ -774,13 +800,18 @@ if [ IsOptionalHaikuImagePackageAdded Vim ] {
 if [ IsOptionalHaikuImagePackageAdded Vision ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Vision available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage Vision-0.9.7-H-090423
-			: $(baseURL)/Vision-0.9.7-H-x86-gcc4-2009-04-23.zip
-			: apps
-		;
-		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/Vision-0.9.7-H-090423/Vision ;
+# TODO: Update Vision GCC4 build, this one is currently broken, because of
+# the BToolTip addition. At least the GCC2 build will work just fine on hybrid
+# installations.
+#	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+#		InstallOptionalHaikuImagePackage Vision-0.9.7-H-090423
+#			: $(baseURL)/Vision-0.9.7-H-x86-gcc4-2009-04-23.zip
+#			: apps
+#		;
+#		AddSymlinkToHaikuImage home config be Applications
+#			: /boot/apps/Vision-0.9.7-H-090423/Vision ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+		Echo "No optional package Vision available for GCC4" ;
 	} else {
 		InstallOptionalHaikuImagePackage Vision-0.9.7-H-090423
 			: $(baseURL)/Vision-0.9.7-H-x86-gcc2-2009-04-23.zip
