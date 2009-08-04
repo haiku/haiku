@@ -348,9 +348,13 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'ADI\0':
 			strcpy(info.vendor, "ADI MicroScan");
 			break;
+		case 'AAC\0':
 		case 'ACR\0':
 		case 'API\0':
 			strcpy(info.vendor, "Acer");
+			break;
+		case 'ACT\0':
+			strcpy(info.vendor, "Targa");
 			break;
 		case 'APP\0':
 			strcpy(info.vendor, "Apple");
@@ -376,6 +380,12 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'DWE\0':
 			strcpy(info.vendor, "Daewoo");
 			break;
+		case 'ECS\0':
+			strcpy(info.vendor, "Elitegroup");
+			break;
+		case 'ELS\0':
+			strcpy(info.vendor, "ELSA");
+			break;
 		case 'EMA\0':
 			strcpy(info.vendor, "eMachines");
 			break;
@@ -384,7 +394,7 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 			strcpy(info.vendor, "Eizo");
 			break;
 		case 'EPI\0':
-			strcpy(info.vendor, "Envision Peripherals");
+			strcpy(info.vendor, "Envision");
 			break;
 		case 'FCM\0':
 			strcpy(info.vendor, "Funai Electronics");
@@ -424,6 +434,9 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'LPL\0':
 			strcpy(info.vendor, "LG Phillips");
 			break;
+		case 'LTN\0':
+			strcpy(info.vendor, "Lite-On");
+			break;
 		case 'MAX\0':
 			strcpy(info.vendor, "Maxdata");
 			break;
@@ -448,6 +461,9 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'NOK\0':
 			strcpy(info.vendor, "Nokia");
 			break;
+		case 'OQI\0':
+			strcpy(info.vendor, "Optiquest");
+			break;
 		case 'PHL\0':
 			strcpy(info.vendor, "Philips");
 			break;
@@ -456,6 +472,9 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 			break;
 		case 'QDS\0':
 			strcpy(info.vendor, "Quanta Display");
+			break;
+		case 'REL\0':
+			strcpy(info.vendor, "Relisys");
 			break;
 		case 'SAM\0':
 			strcpy(info.vendor, "Samsung");
@@ -472,6 +491,22 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'SNY\0':
 			strcpy(info.vendor, "Sony");
 			break;
+		case 'SPT\0':
+			strcpy(info.vendor, "Sceptre");
+			break;
+		case 'SRC\0':
+			strcpy(info.vendor, "Shamrock");
+			break;
+		case 'SUN\0':
+			strcpy(info.vendor, "Sun Microsystems");
+			break;
+		case 'TAT\0':
+			strcpy(info.vendor, "Tatung");
+			break;
+		case 'TOS\0':
+		case 'TSB\0':
+			strcpy(info.vendor, "Toshiba");
+			break;
 		case 'UNM\0':
 			strcpy(info.vendor, "Unisys");
 			break;
@@ -480,6 +515,9 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 			break;
 		case 'VSC\0':
 			strcpy(info.vendor, "ViewSonic");
+			break;
+		case 'ZCM\0':
+			strcpy(info.vendor, "Zenith");
 			break;
 	}
 
