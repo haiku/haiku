@@ -91,7 +91,7 @@ endif
 	endif
 
 #	set the linker and linker flags
-	LD			= gcc
+	LD			:= gcc
 	LDFLAGS		+= $(DEBUG)
 
 #	SETTING: set linker flags for each binary type
@@ -280,19 +280,27 @@ FORCE:
 
 #	The generic clean command. Delete everything in the object folder.
 clean :: FORCE
-	-rm -rf $(OBJ_DIR)
+	-rm -rf "$(OBJ_DIR)"
 
 #	remove just the application from the object folder
 rmapp ::
-	-rm -f $(TARGET)
+	-rm -f "$(TARGET)"
 
 # make it easy to install drivers for testing
 USER_BIN_PATH = /boot/home/config/add-ons/kernel/drivers/bin
 USER_DEV_PATH = /boot/home/config/add-ons/kernel/drivers/dev
 
-driverinstall ::
+driverinstall :: default
 ifeq ($(TYPE), DRIVER)
 	copyattr --data $(OBJ_DIR)/$(NAME) $(USER_BIN_PATH)/$(NAME)
 	mkdir -p $(USER_DEV_PATH)/$(DRIVER_PATH)
 	ln -sf $(USER_BIN_PATH)/$(NAME) $(USER_DEV_PATH)/$(DRIVER_PATH)/$(NAME)
+endif
+
+install :: default
+ifeq ($(INSTALL_DIR), )
+	@echo "No install directory specified for \"$(NAME)\" (INSTALL_DIR is empty)" >&2
+else
+	mkdir -p "$(INSTALL_DIR)"
+	cp "$(TARGET)" "$(INSTALL_DIR)/$(NAME)"
 endif
