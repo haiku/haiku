@@ -632,7 +632,9 @@ flush_tmap(vm_translation_map *map)
 			smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVALIDATE_PAGES, 0, 0, 0,
 				NULL, SMP_MSG_FLAG_SYNC);
 		} else {
+			cpu_status state = disable_interrupts();
 			arch_cpu_user_TLB_invalidate();
+			restore_interrupts(state);
 
 			int cpu = smp_get_current_cpu();
 			uint32 cpuMask = map->arch_data->active_on_cpus

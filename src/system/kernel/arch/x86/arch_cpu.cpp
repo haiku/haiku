@@ -731,8 +731,11 @@ arch_cpu_global_TLB_invalidate(void)
 		// of the global page bit
 		x86_write_cr4(flags & ~IA32_CR4_GLOBAL_PAGES);
 		x86_write_cr4(flags | IA32_CR4_GLOBAL_PAGES);
-	} else
+	} else {
+		cpu_status state = disable_interrupts();
 		arch_cpu_user_TLB_invalidate();
+		restore_interrupts(state);
+	}
 }
 
 
