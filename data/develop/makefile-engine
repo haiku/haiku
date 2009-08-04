@@ -9,7 +9,7 @@ MACHINE=$(shell uname -m)
 ifeq ($(MACHINE), BePC)
 	CPU = x86
 else
-	CPU = ppc
+	CPU = $(MACHINE)
 endif
 
 #	set the directory where object files and binaries will be created
@@ -28,27 +28,27 @@ ifeq ($(DRIVER_PATH), )
 	DRIVER_PATH = misc
 endif
 
-# 	specify that the binary should be created in the object directory
+# 	specify the directory the binary should be created in by default
+ifeq ($(TARGET_DIR), )
+	TARGET_DIR	:= $(OBJ_DIR)
+endif
+
 # NOTE: make doesn't find the target if its name is enclosed in
 #       quotation marks
-#	TARGET		:= "$(OBJ_DIR)/$(NAME)"
-	TARGET		:= $(OBJ_DIR)/$(NAME)
+	TARGET		:= $(TARGET_DIR)/$(NAME)
 
 #	specify the mimeset tool
 	MIMESET		:= mimeset
 
 #	specify the tools for adding and removing resources
-	XRES		= xres
+	XRES		:= xres
 
 #	specify the tools for compiling resource definition files
-	RESCOMP		= rc
+	RESCOMP		:= rc
 
-# 	platform specific settings
-
-#	x86 Settings
-ifeq ($(CPU), x86)
 #	set the compiler and compiler flags
-	CC		=	gcc
+	CC			:=	gcc
+	C++			:=	g++
 
 #	SETTING: set the CFLAGS for each binary type
 	ifeq ($(TYPE), DRIVER)
@@ -72,8 +72,6 @@ ifeq ($(CPU), x86)
 	endif
 	endif
 	endif
-
-
 
 #	SETTING: set proper debugger flags
 	ifeq ($(DEBUGGER), TRUE)
@@ -109,93 +107,6 @@ ifeq ($(CPU), x86)
 	endif
 	endif
 	endif
-
-
-else
-
-#	ppc Settings
-ifeq ($(CPU), ppc)
-#	set the compiler and compiler flags
-	CC		=	mwcc
-	CFLAGS	+=
-
-#	SETTING: set the proper optimization level
-	ifeq ($(OPTIMIZE), FULL)
-		OPTIMIZER	= -O7
-	else
-	ifeq ($(OPTIMIZE), SOME)
-		OPTIMIZER	= -O3
-	else
-	ifeq ($(OPTIMIZE), NONE)
-		OPTIMIZER	= -O0
-	else
-#		OPTIMIZE not set so set to full
-		OPTIMIZER	= -O7
-	endif
-	endif
-	endif
-
-	#set the proper debugger settings
-	ifeq ($(DEBUGGER), TRUE)
-		DEBUG += -g
-	endif
-
-	CFLAGS += $(OPTIMIZER) $(DEBUG)
-
-#	SETTING: set warning level
-	ifeq ($(WARNINGS), ALL)
-		CFLAGS += -w on -requireprotos
-	else
-	ifeq ($(WARNINGS), NONE)
-		CFLAGS += -w off
-	endif
-	endif
-
-	# clear the standard environment variable
-	# now there are no standard libraries to link against
-	BELIBFILES=
-
-#	set the linker and linker flags
-	LD			= mwldppc
-
-#	SETTING: set linker flags for each binary type
-	ifeq ($(TYPE), APP)
-		LDFLAGS +=
-	else
-	ifeq ($(TYPE), SHARED)
-		LDFLAGS += 	-xms
-	endif
-	endif
-
-	ifeq ($(TYPE), DRIVER)
-		LDFLAGS += -nodefaults \
-					-export all \
-					-G \
-					/boot/develop/lib/ppc/glue-noinit.a \
-					/boot/develop/lib/ppc/_KERNEL_
-	else
-		LDFLAGS +=	-export pragma \
-					-init _init_routine_ \
-					-term _term_routine_ \
-					-lroot \
-					/boot/develop/lib/ppc/glue-noinit.a \
-					/boot/develop/lib/ppc/init_term_dyn.o \
-					/boot/develop/lib/ppc/start_dyn.o
-	endif
-
-
-#	SETTING: output symbols in an xMAP file
-	ifeq ($(SYMBOLS), TRUE)
-		LDFLAGS += -map $(TARGET).xMAP
-	endif
-
-#	SETTING: output debugging info to a .SYM file
-	ifeq ($(DEBUGGER), TRUE)
-		LDFLAGS += -g -osym $(TARGET).SYM
-	endif
-
-endif
-endif
 
 
 # psuedo-function for converting a list of source files in SRCS variable
@@ -337,17 +248,17 @@ $(OBJ_DIR)/%.d : %.CPP
 $(OBJ_DIR)/%.o : %.c
 	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
 $(OBJ_DIR)/%.o : %.cpp
-	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
+	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o $@
 $(OBJ_DIR)/%.o : %.cp
 	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
 $(OBJ_DIR)/%.o : %.cc
-	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
+	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o $@
 $(OBJ_DIR)/%.o : %.C
 	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
 $(OBJ_DIR)/%.o : %.CC
-	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
+	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o $@
 $(OBJ_DIR)/%.o : %.CPP
-	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
+	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o $@
 
 # rules to compile resource definition files
 $(OBJ_DIR)/%.rsrc : %.rdef
