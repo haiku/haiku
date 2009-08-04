@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -79,7 +79,7 @@ static const rgb_color _kDefaultColors[kNumColors] = {
 	{0, 0, 0, 255},			// B_NAVIGATION_PULSE_COLOR
 	{255, 255, 255, 255},	// B_SHINE_COLOR
 	{0, 0, 0, 255},			// B_SHADOW_COLOR
-	{255, 255, 0, 255},		// B_TOOLTIP_BACKGROUND_COLOR
+	{255, 255, 216, 255},	// B_TOOLTIP_BACKGROUND_COLOR
 	{0, 0, 0, 255},			// B_TOOLTIP_TEXT_COLOR
 	{0, 0, 0, 255},			// B_WINDOW_TEXT_COLOR
 	{232, 232, 232, 255},	// B_WINDOW_INACTIVE_TAB_COLOR
