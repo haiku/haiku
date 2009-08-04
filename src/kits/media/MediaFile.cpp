@@ -391,14 +391,14 @@ BMediaFile::_Init()
 	fTrackNum = 0;
 	fTrackList = NULL;
 	fExtractor = NULL;
+	fWriter = NULL;
+	fWriterID = 0;
 	fErr = B_OK;
 	fDeleteSource = false;
 
 	// not used so far:
 	fEncoderMgr = NULL;
 	fWriterMgr = NULL;
-	fWriter = NULL;
-	fWriterID = 0;
 	fFileClosed = false;
 }
 
@@ -412,6 +412,8 @@ BMediaFile::_UnInit()
 	fTrackNum = 0;
 	delete fExtractor;
 	fExtractor = NULL;
+	delete fWriter;
+	fWriter = NULL;
 	if (fDeleteSource) {
 		delete fSource;
 		fSource = NULL;
