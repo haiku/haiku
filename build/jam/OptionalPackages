@@ -800,16 +800,13 @@ if [ IsOptionalHaikuImagePackageAdded Vim ] {
 if [ IsOptionalHaikuImagePackageAdded Vision ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Vision available for $(TARGET_ARCH)" ;
-# TODO: Update Vision GCC4 build, this one is currently broken, because of
-# the BToolTip addition. At least the GCC2 build will work just fine on hybrid
-# installations.
-#	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-#		InstallOptionalHaikuImagePackage Vision-0.9.7-H-090423
-#			: $(baseURL)/Vision-0.9.7-H-x86-gcc4-2009-04-23.zip
-#			: apps
-#		;
-#		AddSymlinkToHaikuImage home config be Applications
-#			: /boot/apps/Vision-0.9.7-H-090423/Vision ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage Vision-0.9.7-H-090423-1
+			: $(baseURL)/Vision-0.9.7-H-x86-gcc4-2009-04-23.zip
+			: apps
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/Vision-0.9.7-H-090423/Vision ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package Vision available for GCC4" ;
 	} else {
