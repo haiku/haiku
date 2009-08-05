@@ -95,7 +95,7 @@ void NApplication::ReadyToRun()
 	NWindowScreen *ws = new NWindowScreen(&ret);
 	PRINT(("WindowScreen ctor returned. ret = %s\n", strerror(ret)));
 	// exit if constructing the WindowScreen failed.
-	if((ws == NULL) || (ret < B_OK))
+	if((ws == NULL) || (ret < B_OK) || !ws->CanControlFrameBuffer())
 	{
 		//printf("the window screen was NULL, or there was an error\n");
 		PostMessage(B_QUIT_REQUESTED);
