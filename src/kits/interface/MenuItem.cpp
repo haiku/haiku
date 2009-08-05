@@ -754,7 +754,7 @@ BMenuItem::_DrawShortcutSymbol()
 	}
 	
 	if (fModifiers & B_SHIFT_KEY) {
-		const BBitmap *shift = MenuPrivate::MenuItemOption();		
+		const BBitmap *shift = MenuPrivate::MenuItemShift();		
 		const BRect &rect = shift->Bounds();
 		where.x -= rect.Width() + 1;
 		fSuper->DrawBitmap(shift, where);
