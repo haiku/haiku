@@ -103,6 +103,11 @@ FontManager::FontManager()
 	fDirectories(10, true),
 	fMappings(10, true),
 	fFamilies(20),
+
+	fDefaultPlainFont(NULL),
+	fDefaultBoldFont(NULL),
+	fDefaultFixedFont(NULL),
+
 	fScanned(false),
 	fNextID(0)
 {
