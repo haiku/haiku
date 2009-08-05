@@ -5490,6 +5490,9 @@ BView::_SwitchServerCurrentView() const
 }
 
 
+#if __GNUC__ == 2
+
+
 extern "C" void
 _ReservedView1__5BView(BView* view, BRect rect)
 {
@@ -5601,6 +5604,23 @@ _ReservedView11__5BView(BView* view, BPoint point, BToolTip** _toolTip)
 	return data.return_value;
 }
 
+
+#elif __GNUC__ > 2
+
+
+extern "C" bool
+_ZN5BView15_ReservedView11Ev(BView* view, BPoint point, BToolTip** _toolTip)
+{
+	// GetToolTipAt()
+	perform_data_get_tool_tip_at data;
+	data.point = point;
+	data.tool_tip = _toolTip;
+	view->Perform(PERFORM_CODE_GET_TOOL_TIP_AT, &data);
+	return data.return_value;
+}
+
+
+#endif	// __GNUC__ > 2
 
 void BView::_ReservedView12() {}
 void BView::_ReservedView13() {}
