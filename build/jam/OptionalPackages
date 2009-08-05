@@ -406,8 +406,6 @@ if [ IsOptionalHaikuImagePackageAdded Firefox ] {
  		;
  		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
-		Echo "No optional package Firefox available for GCC4" ;
 	} else {
 		InstallOptionalHaikuImagePackage BeZillaBrowser-gcc2-20090218
 			: http://bezilla.beuser.de/builds/BeZillaBrowser-gcc2-20090218.zip
