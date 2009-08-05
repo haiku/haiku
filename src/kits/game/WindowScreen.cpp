@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku. All Rights Reserved.
+ * Copyright 2002-2009, Haiku. All Rights Reserved.
  * Copyright 2002-2005,
  *		Marcus Overhagen,
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com),
@@ -32,7 +32,7 @@
 using BPrivate::AppServerLink;
 
 
-//#define TRACE_WINDOWSCREEN 1
+#define TRACE_WINDOWSCREEN 1
 #if TRACE_WINDOWSCREEN
 #	define CALLED() printf("%s\n", __PRETTY_FUNCTION__);
 #else
@@ -321,44 +321,45 @@ BWindowScreen::SetColorList(rgb_color *list, int32 firstIndex, int32 lastIndex)
 	if (firstIndex < 0 || lastIndex > 255 || firstIndex > lastIndex)
 		return;
 
-	if (Lock()) {
-		if (!fActivateState) {
-			// If we aren't active, we just change our local palette
-			for (int32 x = firstIndex; x <= lastIndex; x++) {
-				fPalette[x] = list[x];
-			}
-		} else {
-			uint8 colors[3 * 256];
-				// the color table has 3 bytes per color
-			int32 j = 0;
+	if (!Lock())
+		return;
+		
+	if (!fActivateState) {
+		// If we aren't active, we just change our local palette
+		for (int32 x = firstIndex; x <= lastIndex; x++) {
+			fPalette[x] = list[x];
+		}
+	} else {
+		uint8 colors[3 * 256];
+			// the color table has 3 bytes per color
+		int32 j = 0;
 
-			for (int32 x = firstIndex; x <= lastIndex; x++) {
-				fPalette[x] = list[x];
-					// update our local palette as well
+		for (int32 x = firstIndex; x <= lastIndex; x++) {
+			fPalette[x] = list[x];
+				// update our local palette as well
 
-				colors[j++] = list[x].red;
-				colors[j++] = list[x].green;
-				colors[j++] = list[x].blue;
-			}
-
-			if (fAddonImage >= 0) {
-				set_indexed_colors setIndexedColors =
-					(set_indexed_colors)fGetAccelerantHook(B_SET_INDEXED_COLORS,
-						NULL);
-				if (setIndexedColors != NULL) {
-					setIndexedColors(lastIndex - firstIndex + 1, firstIndex,
-						colors, 0);
-				}
-			}
-
-			// TODO: Tell the app_server about our changes
-
-			BScreen screen(this);
-			screen.WaitForRetrace();
+			colors[j++] = list[x].red;
+			colors[j++] = list[x].green;
+			colors[j++] = list[x].blue;
 		}
 
-		Unlock();
+		if (fAddonImage >= 0) {
+			set_indexed_colors setIndexedColors =
+				(set_indexed_colors)fGetAccelerantHook(B_SET_INDEXED_COLORS,
+					NULL);
+			if (setIndexedColors != NULL) {
+				setIndexedColors(lastIndex - firstIndex + 1, firstIndex,
+					colors, 0);
+			}
+		}
+
+		// TODO: Tell the app_server about our changes
+
+		BScreen screen(this);
+		screen.WaitForRetrace();
 	}
+
+	Unlock();
 }
 
 
@@ -683,11 +684,12 @@ BWindowScreen::_DisposeData()
 status_t
 BWindowScreen::_Activate()
 {
+	CALLED();
 	status_t status = _AssertDisplayMode(fDisplayMode);
 	if (status < B_OK)
 		return status;
 
-	status = _SetupAccelerantHooks(true);
+	status = _SetupAccelerantHooks();
 	if (status < B_OK)
 		return status;
 
@@ -716,6 +718,7 @@ BWindowScreen::_Activate()
 status_t
 BWindowScreen::_Deactivate()
 {
+	CALLED();
 	_AssertDisplayMode(fOriginalDisplayMode);
 
 	if (fDebugState && !fDebugFirst) {
@@ -724,73 +727,69 @@ BWindowScreen::_Deactivate()
 	} else
 		ScreenConnected(false);
 
-	status_t status = _SetupAccelerantHooks(false);
-	if (status == B_OK) {
-		be_app->ShowCursor();
-		if (fActivateState) {
-			// TODO: reset palette
-		}
+	_ResetAccelerantHooks();
+	
+	be_app->ShowCursor();
+	if (fActivateState) {
+		BScreen screen(this);
+		SetColorList((rgb_color *)screen.ColorMap()->color_list);
 	}
 
-	return status;
+	return B_OK;
 }
 
 
 status_t
-BWindowScreen::_SetupAccelerantHooks(bool enable)
+BWindowScreen::_SetupAccelerantHooks()
 {
 	CALLED();
-	if (fAddonImage >= 0) {
-		fWaitEngineIdle();
-		sFillRectHook = NULL;
-		sBlitRectHook = NULL;
-		sTransparentBlitHook = NULL;
-		sScaledFilteredBlitHook = NULL;
-		sWaitIdleHook = NULL;
-		sEngineToken = NULL;
-		sAcquireEngineHook = NULL;
-		sReleaseEngineHook = NULL;
-	}
-
-	fLockState = enable ? 1 : 0;
-
+	
 	status_t status = B_OK;
-	if (enable) {
-		acquire_engine aquireEngine = NULL;
-		release_engine releaseEngine = NULL;
-		fill_rectangle fillRectangle = NULL;
-		screen_to_screen_blit blit = NULL;
-		screen_to_screen_transparent_blit transparentBlit = NULL;
-		screen_to_screen_scaled_filtered_blit scaledFilteredBlit = NULL;
-
-		if (fAddonImage < 0) {
-			status = _InitClone();
-			if (status == B_OK) {
-				fWaitEngineIdle = (wait_engine_idle)fGetAccelerantHook(B_WAIT_ENGINE_IDLE, NULL);
-
-				releaseEngine = (release_engine)fGetAccelerantHook(B_RELEASE_ENGINE, NULL);
-				aquireEngine = (acquire_engine)fGetAccelerantHook(B_ACQUIRE_ENGINE, NULL);
-				fillRectangle = (fill_rectangle)fGetAccelerantHook(B_FILL_RECTANGLE, NULL);
-				blit = (screen_to_screen_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_BLIT, NULL);
-				transparentBlit = (screen_to_screen_transparent_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT, NULL);
-				scaledFilteredBlit = (screen_to_screen_scaled_filtered_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT, NULL);
-			}
-		}
-
-		if (status == B_OK) {
-			sFillRectHook = fillRectangle;
-			sBlitRectHook = blit;
-			sTransparentBlitHook = transparentBlit;
-			sScaledFilteredBlitHook = scaledFilteredBlit;
-			sWaitIdleHook = fWaitEngineIdle;
-			sAcquireEngineHook = aquireEngine;
-			sReleaseEngineHook = releaseEngine;
-
+	if (fAddonImage < 0)
+		status = _InitClone();
+	else {
+		if (fWaitEngineIdle)
 			fWaitEngineIdle();
-		}
+		
+		_ResetAccelerantHooks();
 	}
-
+			
+	if (status == B_OK) {
+		sWaitIdleHook = fWaitEngineIdle = (wait_engine_idle)fGetAccelerantHook(B_WAIT_ENGINE_IDLE, NULL);
+		sReleaseEngineHook = (release_engine)fGetAccelerantHook(B_RELEASE_ENGINE, NULL);
+		sAcquireEngineHook = (acquire_engine)fGetAccelerantHook(B_ACQUIRE_ENGINE, NULL);
+		sFillRectHook = (fill_rectangle)fGetAccelerantHook(B_FILL_RECTANGLE, NULL);
+		sBlitRectHook = (screen_to_screen_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_BLIT, NULL);
+		sTransparentBlitHook = (screen_to_screen_transparent_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT, NULL);
+		sScaledFilteredBlitHook = (screen_to_screen_scaled_filtered_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT, NULL);
+	
+		if (fWaitEngineIdle)
+			fWaitEngineIdle();
+		
+		fLockState = 1;
+	}
+	
 	return status;
+}
+
+
+void
+BWindowScreen::_ResetAccelerantHooks()
+{
+	CALLED();
+	
+	sFillRectHook = NULL;
+	sBlitRectHook = NULL;
+	sTransparentBlitHook = NULL;
+	sScaledFilteredBlitHook = NULL;
+	sWaitIdleHook = NULL;
+	sEngineToken = NULL;
+	sAcquireEngineHook = NULL;
+	sReleaseEngineHook = NULL;
+	
+	fWaitEngineIdle = NULL;
+	
+	fLockState = 0;
 }
 
 

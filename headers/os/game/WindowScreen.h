@@ -83,7 +83,9 @@ class BWindowScreen : public BWindow {
 		status_t			_Activate();
 		status_t			_Deactivate();
 
-		status_t			_SetupAccelerantHooks(bool enable);
+		status_t			_SetupAccelerantHooks();
+		void				_ResetAccelerantHooks();
+
 		status_t			_GetCardInfo();
 		void				_Suspend();
 		void				_Resume();
