@@ -807,8 +807,6 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/Vision-0.9.7-H-090423/Vision ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
-		Echo "No optional package Vision available for GCC4" ;
 	} else {
 		InstallOptionalHaikuImagePackage Vision-0.9.7-H-090423
 			: $(baseURL)/Vision-0.9.7-H-x86-gcc2-2009-04-23.zip
