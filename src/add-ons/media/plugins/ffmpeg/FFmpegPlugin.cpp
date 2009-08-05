@@ -134,7 +134,13 @@ FFmpegPlugin::GetSupportedFileFormats(const media_file_format** _fileFormats,
 Encoder*
 FFmpegPlugin::NewEncoder(const media_codec_info& codecInfo)
 {
-	return new(std::nothrow)AVCodecEncoder(codecInfo.sub_id);
+	for (size_t i = 0; i < gEncoderCount; i++) {
+		if (codecInfo.sub_id == gEncoderTable[i].codec_info.sub_id) {
+			return new(std::nothrow)AVCodecEncoder(codecInfo.sub_id,
+				gEncoderTable[i].bit_rate_scale);
+		}
+	}
+	return NULL;
 }
 
 

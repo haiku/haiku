@@ -76,6 +76,7 @@ BMediaTrack::~BMediaTrack()
 	CALLED();
 	_plugin_manager.DestroyDecoder(fRawDecoder);
 	_plugin_manager.DestroyDecoder(fDecoder);
+	_plugin_manager.DestroyDecoder(fEncoder);
 }
 
 /*************************************************************
@@ -321,28 +322,31 @@ BMediaTrack::ReadFrames(void *out_buffer,
 
 
 status_t
-BMediaTrack::ReplaceFrames(const void *in_buffer,
-						   int64 *io_frameCount,
-						   const media_header *mh)
+BMediaTrack::ReplaceFrames(const void* inBuffer, int64* inOutFrameCount,
+	const media_header* mediaHeader)
 {
 	UNIMPLEMENTED();
 
-	return B_OK;
+	// TODO: Actually, a file is either open for reading or writing at the
+	// moment. Since the chunk size of encoded media data will change,
+	// implementing this call will only be possible for raw media tracks.
+
+	return B_NOT_SUPPORTED;
 }
 
 
 status_t
-BMediaTrack::SeekToTime(bigtime_t *inout_time, int32 flags)
+BMediaTrack::SeekToTime(bigtime_t* inOutTime, int32 flags)
 {
 	CALLED();
 	if (!fDecoder || !fExtractor)
 		return B_NO_INIT;
-	if (!inout_time)
+	if (!inOutTime)
 		return B_BAD_VALUE;
 
 	uint32 seekTo = (flags & B_MEDIA_SEEK_DIRECTION_MASK)
 		| B_MEDIA_SEEK_TO_TIME;
-	bigtime_t seekTime = *inout_time;
+	bigtime_t seekTime = *inOutTime;
 
 	int64 frame = 0;
 	bigtime_t time = seekTime;
@@ -355,7 +359,7 @@ BMediaTrack::SeekToTime(bigtime_t *inout_time, int32 flags)
 	// TODO: Codecs cannot actually "seek" in the stream, all they
 	// can do is "reset" their decoder state, since they are made
 	// aware of the fact that there will be a jump in the data. Maybe
-	// rename the codec method?
+	// rename the Decoder method?
 	result = fDecoder->Seek(seekTo, 0, &frame, seekTime, &time);
 	if (result != B_OK) {
 		ERROR("BMediaTrack::SeekToTime: decoder seek failed\n");
@@ -370,11 +374,12 @@ BMediaTrack::SeekToTime(bigtime_t *inout_time, int32 flags)
 		}
 	}
 
-	*inout_time = time;
+	*inOutTime = time;
 	fCurFrame = frame;
 	fCurTime = time;
 
-	PRINT(1, "BMediaTrack::SeekToTime finished, requested %.6f, result %.6f\n", seekTime / 1000000.0, *inout_time / 1000000.0);
+	PRINT(1, "BMediaTrack::SeekToTime finished, requested %.6f, result %.6f\n",
+		seekTime / 1000000.0, *inOutTime / 1000000.0);
 
 	return B_OK;
 }
@@ -589,102 +594,142 @@ BMediaTrack::Flush()
 BParameterWeb*
 BMediaTrack::Web()
 {
-	UNIMPLEMENTED();
+	BParameterWeb* web;
+	if (GetParameterWeb(&web) == B_OK)
+		return web;
 	return NULL;
 }
 
 
-// returns a copy of the parameter web
 status_t
 BMediaTrack::GetParameterWeb(BParameterWeb** outWeb)
 {
-	UNIMPLEMENTED();
+	if (outWeb == NULL)
+		return B_BAD_VALUE;
+
+	if (fEncoder == NULL)
+		return B_NO_INIT;
+
+	// TODO: This method is new in Haiku. The header mentions it returns a
+	// copy. But how could it even do that? How can one clone a web and make
+	// it point to the same BControllable?
+	*outWeb = fEncoder->ParameterWeb();
+	if (*outWeb != NULL)
+		return B_OK;
+
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+BMediaTrack::GetParameterValue(int32 id, void* value, size_t* size)
+{
+	if (value == NULL || size == NULL)
+		return B_BAD_VALUE;
+
+	if (fEncoder == NULL)
+		return B_NO_INIT;
+
+	return fEncoder->GetParameterValue(id, value, size);
+}
+
+
+status_t
+BMediaTrack::SetParameterValue(int32 id, const void* value, size_t size)
+{
+	if (value == NULL || size == 0)
+		return B_BAD_VALUE;
+
+	if (fEncoder == NULL)
+		return B_NO_INIT;
+
+	return fEncoder->SetParameterValue(id, value, size);
+}
+
+
+BView*
+BMediaTrack::GetParameterView()
+{
+	if (fEncoder == NULL)
+		return NULL;
+
+	return fEncoder->ParameterView();
+}
+
+
+status_t
+BMediaTrack::GetQuality(float* quality)
+{
+	if (quality == NULL)
+		return B_BAD_VALUE;
+
+	encode_parameters parameters;
+	status_t ret = GetEncodeParameters(&parameters);
+	if (ret != B_OK)
+		return ret;
+
+	*quality = parameters.quality;
 
 	return B_OK;
 }
 
 
 status_t
-BMediaTrack::GetParameterValue(int32 id,
-							   void *valu,
-							   size_t *size)
-{
-	UNIMPLEMENTED();
-
-	return B_ERROR;
-}
-
-
-status_t
-BMediaTrack::SetParameterValue(int32 id,
-							   const void *valu,
-							   size_t size)
-{
-	UNIMPLEMENTED();
-
-	return B_ERROR;
-}
-
-
-BView *
-BMediaTrack::GetParameterView()
-{
-	UNIMPLEMENTED();
-	return NULL;
-}
-
-
-status_t
-BMediaTrack::GetQuality(float *quality)
-{
-	UNIMPLEMENTED();
-
-	return B_ERROR;
-}
-
-
-status_t
 BMediaTrack::SetQuality(float quality)
 {
-	UNIMPLEMENTED();
+	encode_parameters parameters;
+	status_t ret = GetEncodeParameters(&parameters);
+	if (ret != B_OK)
+		return ret;
 
-	return B_ERROR;
+	if (quality < 0.0f)
+		quality = 0.0f;
+	if (quality > 1.0f)
+		quality = 1.0f;
+
+	parameters.quality = quality;
+
+	return SetEncodeParameters(&parameters);
 }
 
 
 status_t
-BMediaTrack::GetEncodeParameters(encode_parameters *parameters) const
+BMediaTrack::GetEncodeParameters(encode_parameters* parameters) const
 {
-	UNIMPLEMENTED();
+	if (parameters == NULL)
+		return B_BAD_VALUE;
 
-	return B_ERROR;
+	if (fEncoder == NULL)
+		return B_NO_INIT;
+
+	return fEncoder->GetEncodeParameters(parameters);
 }
 
 
 status_t
 BMediaTrack::SetEncodeParameters(encode_parameters *parameters)
 {
-	UNIMPLEMENTED();
+	if (parameters == NULL)
+		return B_BAD_VALUE;
 
-	return B_ERROR;
+	if (fEncoder == NULL)
+		return B_NO_INIT;
+
+	return fEncoder->SetEncodeParameters(parameters);
 }
 
 
 status_t
-BMediaTrack::Perform(int32 selector,
-					 void *data)
+BMediaTrack::Perform(int32 selector, void* data)
 {
-	UNIMPLEMENTED();
-
-	return B_ERROR;
+	return B_OK;
 }
 
-/*************************************************************
- * private BMediaTrack
- *************************************************************/
+// #pragma mark - private
 
-BMediaTrack::BMediaTrack(BPrivate::media::MediaExtractor *extractor,
-						 int32 stream)
+
+BMediaTrack::BMediaTrack(BPrivate::media::MediaExtractor* extractor,
+	int32 stream)
 {
 	CALLED();
 	fWorkaroundFlags = 0;

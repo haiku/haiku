@@ -14,6 +14,7 @@ struct EncoderDescription {
 	media_format_family		format_family;
 	media_type				input_type;
 	media_type				output_type;
+	int						bit_rate_scale;
 };
 
 

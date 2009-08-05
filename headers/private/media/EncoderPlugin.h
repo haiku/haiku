@@ -8,10 +8,9 @@
 
 #include <MediaTrack.h>
 #include <MediaFormats.h>
+#include <View.h>
 #include "MediaPlugin.h"
 
-
-class AddOnManager;
 
 namespace BPrivate { namespace media {
 
@@ -56,10 +55,20 @@ public:
 	virtual	status_t			AddTrackInfo(uint32 code, const void* data,
 									size_t size, uint32 flags = 0);
 
+	// Ownership of the BView and BParameterWeb remain with the Encoder.
+	// A window embedding the view must remove it before it is destroyed.
+	virtual	BView*				ParameterView();
+
+	virtual	BParameterWeb*		ParameterWeb();
+	virtual	status_t			GetParameterValue(int32 id, void* value,
+									size_t* size) const;
+	virtual	status_t			SetParameterValue(int32 id, const void* value,
+									size_t size);
+
 	virtual status_t			GetEncodeParameters(
 									encode_parameters* parameters) const;
 	virtual status_t			SetEncodeParameters(
-									encode_parameters* parameters) const;
+									encode_parameters* parameters);
 
 	virtual status_t			Encode(const void* buffer, int64 frameCount,
 									media_encode_info* info) = 0;
@@ -73,19 +82,36 @@ public:
 	virtual status_t			Perform(perform_code code, void* data);
 
 private:
-	virtual void				_ReservedEncoder1();
-	virtual void				_ReservedEncoder2();
-	virtual void				_ReservedEncoder3();
-	virtual void				_ReservedEncoder4();
-	virtual void				_ReservedEncoder5();
-
 			ChunkWriter*		fChunkWriter;
 
 	// needed for plug-in reference count management
 	friend class PluginManager;
 			MediaPlugin*		fMediaPlugin;
 
-			uint32				fReserved[5];
+private:
+	// FBC padding
+			uint32				fReserved[20];
+
+	virtual void				_ReservedEncoder1();
+	virtual void				_ReservedEncoder2();
+	virtual void				_ReservedEncoder3();
+	virtual void				_ReservedEncoder4();
+	virtual void				_ReservedEncoder5();
+	virtual void				_ReservedEncoder6();
+	virtual void				_ReservedEncoder7();
+	virtual void				_ReservedEncoder8();
+	virtual void				_ReservedEncoder9();
+	virtual void				_ReservedEncoder10();
+	virtual void				_ReservedEncoder11();
+	virtual void				_ReservedEncoder12();
+	virtual void				_ReservedEncoder13();
+	virtual void				_ReservedEncoder14();
+	virtual void				_ReservedEncoder15();
+	virtual void				_ReservedEncoder16();
+	virtual void				_ReservedEncoder17();
+	virtual void				_ReservedEncoder18();
+	virtual void				_ReservedEncoder19();
+	virtual void				_ReservedEncoder20();
 };
 
 

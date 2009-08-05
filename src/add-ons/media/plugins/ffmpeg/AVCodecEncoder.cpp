@@ -30,12 +30,13 @@ extern "C" {
 static const size_t kDefaultChunkBufferSize = 2 * 1024 * 1024;
 
 
-AVCodecEncoder::AVCodecEncoder(uint32 codecID)
+AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	:
 	Encoder(),
+	fBitRateScale(bitRateScale),
 	fCodec(NULL),
 	fContext(avcodec_alloc_context()),
-	fCodecInitDone(false),
+	fCodecInitStatus(CODEC_INIT_NEEDED),
 
 	fFrame(avcodec_alloc_frame()),
 	fSwsContext(NULL),
@@ -52,6 +53,11 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID)
 	memset(&fInputFormat, 0, sizeof(media_format));
 
 	av_fifo_init(&fAudioFifo, 0);
+
+	// Initial parameters, so we know if the user changed them
+	fEncodeParameters.avg_field_size = 0;
+	fEncodeParameters.max_field_size = 0;
+	fEncodeParameters.quality = 1.0f;
 }
 
 
@@ -59,8 +65,7 @@ AVCodecEncoder::~AVCodecEncoder()
 {
 	TRACE("AVCodecEncoder::~AVCodecEncoder()\n");
 
-	if (fCodecInitDone)
-		avcodec_close(fContext);
+	_CloseCodecIfNeeded();
 
 	sws_freeContext(fSwsContext);
 
@@ -119,15 +124,118 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 	if (inputFormat == NULL)
 		return B_BAD_VALUE;
 
-	if (fCodecInitDone) {
-		fCodecInitDone = false;
-		avcodec_close(fContext);
-	}
+	_CloseCodecIfNeeded();
 
 	fInputFormat = *inputFormat;
 	fFramesWritten = 0;
 
+	return _Setup();
+}
+
+
+status_t
+AVCodecEncoder::GetEncodeParameters(encode_parameters* parameters) const
+{
+	TRACE("AVCodecEncoder::GetEncodeParameters(%p)\n", parameters);
+
+// TODO: Implement maintaining an automatically calculated bit_rate versus
+// a user specified (via SetEncodeParameters()) bit_rate. At this point, the
+// fContext->bit_rate may not yet have been specified (_Setup() was never
+// called yet). So it cannot work like the code below, but in any case, it's
+// showing how to convert between the values (Albeit untested).
+//	int avgBytesPerSecond = fContext->bit_rate / 8;
+//	int maxBytesPerSecond = (fContext->bit_rate
+//		+ fContext->bit_rate_tolerance) / 8;
+//
+//	if (fInputFormat.type == B_MEDIA_RAW_AUDIO) {
+//		fEncodeParameters.avg_field_size = (int32)(avgBytesPerSecond
+//			/ fInputFormat.u.raw_audio.frame_rate);
+//		fEncodeParameters.max_field_size = (int32)(maxBytesPerSecond
+//			/ fInputFormat.u.raw_audio.frame_rate);
+//	} else if (fInputFormat.type == B_MEDIA_RAW_VIDEO) {
+//		fEncodeParameters.avg_field_size = (int32)(avgBytesPerSecond
+//			/ fInputFormat.u.raw_video.field_rate);
+//		fEncodeParameters.max_field_size = (int32)(maxBytesPerSecond
+//			/ fInputFormat.u.raw_video.field_rate);
+//	}
+
+	parameters->quality = fEncodeParameters.quality;
+
+	return B_OK;
+}
+
+
+status_t
+AVCodecEncoder::SetEncodeParameters(encode_parameters* parameters)
+{
+	TRACE("AVCodecEncoder::SetEncodeParameters(%p)\n", parameters);
+
+	if (fFramesWritten > 0)
+		return B_NOT_SUPPORTED;
+
+	fEncodeParameters.quality = parameters->quality;
+	TRACE("  quality: %.1f\n", parameters->quality);
+
+// TODO: Auto-bit_rate versus user supplied. See above.
+//	int avgBytesPerSecond = 0;
+//	int maxBytesPerSecond = 0;
+//
+//	if (fInputFormat.type == B_MEDIA_RAW_AUDIO) {
+//		avgBytesPerSecond = (int)(parameters->avg_field_size
+//			* fInputFormat.u.raw_audio.frame_rate);
+//		maxBytesPerSecond = (int)(parameters->max_field_size
+//			* fInputFormat.u.raw_audio.frame_rate);
+//	} else if (fInputFormat.type == B_MEDIA_RAW_VIDEO) {
+//		avgBytesPerSecond = (int)(parameters->avg_field_size
+//			* fInputFormat.u.raw_video.field_rate);
+//		maxBytesPerSecond = (int)(parameters->max_field_size
+//			* fInputFormat.u.raw_video.field_rate);
+//	}
+//
+//	if (maxBytesPerSecond < avgBytesPerSecond)
+//		maxBytesPerSecond = avgBytesPerSecond;
+//
+//	// Reset these, so we can tell the difference between uninitialized
+//	// and initialized...
+//	if (avgBytesPerSecond > 0) {
+//		fContext->bit_rate = avgBytesPerSecond * 8;
+//		fContext->bit_rate_tolerance = (maxBytesPerSecond
+//			- avgBytesPerSecond) * 8;
+//		fBitRateControlledByUser = true;
+//	}
+
+	return _Setup();
+}
+
+
+status_t
+AVCodecEncoder::Encode(const void* buffer, int64 frameCount,
+	media_encode_info* info)
+{
+	TRACE("AVCodecEncoder::Encode(%p, %lld, %p)\n", buffer, frameCount, info);
+
+	if (!_OpenCodecIfNeeded())
+		return B_NO_INIT;
+
+	if (fInputFormat.type == B_MEDIA_RAW_AUDIO)
+		return _EncodeAudio(buffer, frameCount, info);
+	else if (fInputFormat.type == B_MEDIA_RAW_VIDEO)
+		return _EncodeVideo(buffer, frameCount, info);
+	else
+		return B_NO_INIT;
+}
+
+
+// #pragma mark -
+
+
+status_t
+AVCodecEncoder::_Setup()
+{
+	TRACE("AVCodecEncoder::_Setup\n");
+
 	if (fInputFormat.type == B_MEDIA_RAW_VIDEO) {
+		TRACE("  B_MEDIA_RAW_VIDEO\n");
 		// frame rate
 		fContext->time_base.den = (int)fInputFormat.u.raw_video.field_rate;
 		fContext->time_base.num = 1;
@@ -144,7 +252,15 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 //		fContext->rc_max_rate = 0;
 //		fContext->rc_min_rate = 0;
 		// TODO: Try to calculate a good bit rate...
-		fContext->bit_rate = 800000;
+		int rawBitRate = (int)(fContext->width * fContext->height * 2
+			* fInputFormat.u.raw_video.field_rate) * 8;
+		int wantedBitRate = (int)(rawBitRate / fBitRateScale
+			* fEncodeParameters.quality);
+		TRACE("  rawBitRate: %d, wantedBitRate: %d (%.1f)\n", rawBitRate,
+			wantedBitRate, fEncodeParameters.quality);
+		// TODO: Support letting the user overwrite this via
+		// SetEncodeParameters(). See comments there...
+		fContext->bit_rate = wantedBitRate;
 
 		// Pixel aspect ratio
 		fContext->sample_aspect_ratio.num
@@ -188,6 +304,7 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 			fContext->pix_fmt, SWS_BICUBIC, NULL, NULL, NULL);
 
 	} else if (fInputFormat.type == B_MEDIA_RAW_AUDIO) {
+		TRACE("  B_MEDIA_RAW_AUDIO\n");
 		// frame rate
 		fContext->sample_rate = (int)fInputFormat.u.raw_audio.frame_rate;
 		// NOTE: From the output_example.c, it looks like we are not supposed
@@ -252,6 +369,7 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 			fContext->channel_layout = fInputFormat.u.raw_audio.channel_mask;
 		}
 	} else {
+		TRACE("  UNSUPPORTED MEDIA TYPE!\n");
 		return B_NOT_SUPPORTED;
 	}
 
@@ -266,53 +384,44 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 		fContext->mb_decision = 2;
     }
 
+	// Unfortunately, we may fail later, when we try to open the codec
+	// for real... but we need to delay this because we still allow
+	// parameter/quality changes.
+	return B_OK;
+}
+
+
+bool
+AVCodecEncoder::_OpenCodecIfNeeded()
+{
+	if (fCodecInitStatus == CODEC_INIT_DONE)
+		return true;
+
+	if (fCodecInitStatus == CODEC_INIT_FAILED)
+		return false;
+
 	// Open the codec
 	int result = avcodec_open(fContext, fCodec);
-	fCodecInitDone = (result >= 0);
+	if (result >= 0)
+		fCodecInitStatus = CODEC_INIT_DONE;
+	else
+		fCodecInitStatus = CODEC_INIT_FAILED;
 
 	TRACE("  avcodec_open(): %d\n", result);
 
-	return fCodecInitDone ? B_OK : B_ERROR;
+	return fCodecInitStatus == CODEC_INIT_DONE;
+
 }
 
 
-status_t
-AVCodecEncoder::GetEncodeParameters(encode_parameters* parameters) const
+void
+AVCodecEncoder::_CloseCodecIfNeeded()
 {
-	TRACE("AVCodecEncoder::GetEncodeParameters(%p)\n", parameters);
-
-	return B_NOT_SUPPORTED;
+	if (fCodecInitStatus == CODEC_INIT_DONE) {
+		avcodec_close(fContext);
+		fCodecInitStatus = CODEC_INIT_NEEDED;
+	}
 }
-
-
-status_t
-AVCodecEncoder::SetEncodeParameters(encode_parameters* parameters) const
-{
-	TRACE("AVCodecEncoder::SetEncodeParameters(%p)\n", parameters);
-
-	return B_NOT_SUPPORTED;
-}
-
-
-status_t
-AVCodecEncoder::Encode(const void* buffer, int64 frameCount,
-	media_encode_info* info)
-{
-	TRACE("AVCodecEncoder::Encode(%p, %lld, %p)\n", buffer, frameCount, info);
-
-	if (!fCodecInitDone)
-		return B_NO_INIT;
-
-	if (fInputFormat.type == B_MEDIA_RAW_AUDIO)
-		return _EncodeAudio(buffer, frameCount, info);
-	else if (fInputFormat.type == B_MEDIA_RAW_VIDEO)
-		return _EncodeVideo(buffer, frameCount, info);
-	else
-		return B_NO_INIT;
-}
-
-
-// #pragma mark -
 
 
 static const int64 kNoPTSValue = 0x8000000000000000LL;

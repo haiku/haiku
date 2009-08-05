@@ -26,8 +26,39 @@ Encoder::~Encoder()
 }
 
 
+// #pragma mark - Convenience stubs
+
+
 status_t
 Encoder::AddTrackInfo(uint32 code, const void* data, size_t size, uint32 flags)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+BView*
+Encoder::ParameterView()
+{
+	return NULL;
+}
+
+
+BParameterWeb*
+Encoder::ParameterWeb()
+{
+	return NULL;
+}
+
+
+status_t
+Encoder::GetParameterValue(int32 id, void* value, size_t* size) const
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+Encoder::SetParameterValue(int32 id, const void* value, size_t size)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -41,10 +72,13 @@ Encoder::GetEncodeParameters(encode_parameters* parameters) const
 
 
 status_t
-Encoder::SetEncodeParameters(encode_parameters* parameters) const
+Encoder::SetEncodeParameters(encode_parameters* parameters)
 {
 	return B_NOT_SUPPORTED;
 }
+
+
+// #pragma mark -
 
 
 status_t
@@ -63,6 +97,9 @@ Encoder::SetChunkWriter(ChunkWriter* writer)
 }
 
 
+// #pragma mark - FBC padding
+
+
 status_t
 Encoder::Perform(perform_code code, void* data)
 {
@@ -75,9 +112,24 @@ void Encoder::_ReservedEncoder2() {}
 void Encoder::_ReservedEncoder3() {}
 void Encoder::_ReservedEncoder4() {}
 void Encoder::_ReservedEncoder5() {}
+void Encoder::_ReservedEncoder6() {}
+void Encoder::_ReservedEncoder7() {}
+void Encoder::_ReservedEncoder8() {}
+void Encoder::_ReservedEncoder9() {}
+void Encoder::_ReservedEncoder10() {}
+void Encoder::_ReservedEncoder11() {}
+void Encoder::_ReservedEncoder12() {}
+void Encoder::_ReservedEncoder13() {}
+void Encoder::_ReservedEncoder14() {}
+void Encoder::_ReservedEncoder15() {}
+void Encoder::_ReservedEncoder16() {}
+void Encoder::_ReservedEncoder17() {}
+void Encoder::_ReservedEncoder18() {}
+void Encoder::_ReservedEncoder19() {}
+void Encoder::_ReservedEncoder20() {}
 
 
-//	#pragma mark -
+//	#pragma mark - EncoderPlugin
 
 
 EncoderPlugin::EncoderPlugin()

@@ -22,7 +22,8 @@ const EncoderDescription gEncoderTable[] = {
 		},
 		B_ANY_FORMAT_FAMILY, // TODO: Hm, actually not really /any/ family...
 		B_MEDIA_RAW_VIDEO,
-		B_MEDIA_ENCODED_VIDEO
+		B_MEDIA_ENCODED_VIDEO,
+		23
 	},
 	{
 		{
@@ -34,7 +35,8 @@ const EncoderDescription gEncoderTable[] = {
 		},
 		B_MPEG_FORMAT_FAMILY,
 		B_MEDIA_RAW_VIDEO,
-		B_MEDIA_ENCODED_VIDEO
+		B_MEDIA_ENCODED_VIDEO,
+		10
 	},
 	{
 		{
@@ -46,7 +48,8 @@ const EncoderDescription gEncoderTable[] = {
 		},
 		B_MPEG_FORMAT_FAMILY,
 		B_MEDIA_RAW_VIDEO,
-		B_MEDIA_ENCODED_VIDEO
+		B_MEDIA_ENCODED_VIDEO,
+		15
 	},
 	{
 		{
@@ -58,7 +61,8 @@ const EncoderDescription gEncoderTable[] = {
 		},
 		B_ANY_FORMAT_FAMILY,
 		B_MEDIA_RAW_AUDIO,
-		B_MEDIA_ENCODED_AUDIO
+		B_MEDIA_ENCODED_AUDIO,
+		1
 	},
 	{
 		{
@@ -70,7 +74,8 @@ const EncoderDescription gEncoderTable[] = {
 		},
 		B_ANY_FORMAT_FAMILY,
 		B_MEDIA_RAW_AUDIO,
-		B_MEDIA_ENCODED_AUDIO
+		B_MEDIA_ENCODED_AUDIO,
+		10
 	}
 };
 

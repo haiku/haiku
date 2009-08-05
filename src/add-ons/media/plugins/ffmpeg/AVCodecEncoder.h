@@ -19,7 +19,8 @@ extern "C" {
 
 class AVCodecEncoder : public Encoder {
 public:
-								AVCodecEncoder(uint32 codecID);
+								AVCodecEncoder(uint32 codecID,
+									int bitRateScale);
 
 	virtual						~AVCodecEncoder();
 
@@ -32,7 +33,7 @@ public:
 	virtual status_t			GetEncodeParameters(
 									encode_parameters* parameters) const;
 	virtual status_t			SetEncodeParameters(
-									encode_parameters* parameters) const;
+									encode_parameters* parameters);
 
 	virtual status_t			Encode(const void* buffer, int64 frameCount,
 									media_encode_info* info);
@@ -42,6 +43,11 @@ public:
 	// codec buffer size.
 
 private:
+			status_t			_Setup();
+
+			bool				_OpenCodecIfNeeded();
+			void				_CloseCodecIfNeeded();
+
 			status_t			_EncodeAudio(const void* buffer,
 									int64 frameCount,
 									media_encode_info* info);
@@ -55,12 +61,20 @@ private:
 
 private:
 			media_format		fInputFormat;
+			encode_parameters	fEncodeParameters;
+			int					fBitRateScale;
 
 			// FFmpeg related members
 			// TODO: Refactor common base class from AVCodec[De|En]Coder!
 			AVCodec*			fCodec;
 			AVCodecContext*		fContext;
-			bool				fCodecInitDone;
+
+			enum {
+				CODEC_INIT_NEEDED = 0,
+				CODEC_INIT_DONE,
+				CODEC_INIT_FAILED
+			};
+			uint32				fCodecInitStatus;
 
 			// For video (color space conversion):
 			AVPicture			fSrcFrame;
