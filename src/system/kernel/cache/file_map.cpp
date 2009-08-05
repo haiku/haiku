@@ -393,6 +393,9 @@ status_t
 FileMap::Translate(off_t offset, size_t size, file_io_vec* vecs, size_t* _count,
 	size_t align)
 {
+	if (offset < 0)
+		return B_BAD_VALUE;
+
 	MutexLocker _(fLock);
 
 	size_t maxVecs = *_count;
