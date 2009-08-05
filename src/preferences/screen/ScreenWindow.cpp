@@ -1103,7 +1103,7 @@ ScreenWindow::_UpdateMonitor()
 		return;
 	}
 
-	char text[256];
+	char text[512];
 	snprintf(text, sizeof(text), "%s%s%s %g\"", info.vendor,
 		info.name[0] ? " " : "", info.name, diagonalInches);
 
@@ -1112,16 +1112,32 @@ ScreenWindow::_UpdateMonitor()
 	if (fMonitorInfo->IsHidden())
 		fMonitorInfo->Show();
 
+	size_t length = 0;
+	text[0] = 0;
+
 	if (info.min_horizontal_frequency != 0
 		&& info.min_vertical_frequency != 0
 		&& info.max_pixel_clock != 0) {
-		snprintf(text, sizeof(text), "Horizonal Frequency:\t%lu - %lu kHz\n"
+		length = snprintf(text, sizeof(text),
+			"Horizonal Frequency:\t%lu - %lu kHz\n"
 			"Vertical Frequency:\t%lu - %lu Hz\n\n"
-			"Maximum Pixel Clock:\t%g MHz", info.min_horizontal_frequency,
-			info.max_horizontal_frequency, info.min_vertical_frequency,
-			info.max_vertical_frequency, info.max_pixel_clock / 1000.0);
-		fMonitorView->SetToolTip(text);
+			"Maximum Pixel Clock:\t%g MHz", 
+			info.min_horizontal_frequency, info.max_horizontal_frequency,
+			info.min_vertical_frequency, info.max_vertical_frequency,
+			info.max_pixel_clock / 1000.0);
 	}
+	if (info.serial_number[0] && length < sizeof(text)) {
+		length += snprintf(text + length, sizeof(text) - length,
+			"%sSerial no.: %s", length ? "\n\n" : "",
+			info.serial_number);
+		if (info.produced.week != 0 && info.produced.year != 0 
+			&& length < sizeof(text)) {
+			length += snprintf(text + length, sizeof(text) - length,
+				"(%u/%u)", info.produced.week, info.produced.year);
+ 		}
+	}
+	if (text[0])
+		fMonitorView->SetToolTip(text);
 }
 
 
