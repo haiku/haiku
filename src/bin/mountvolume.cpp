@@ -368,16 +368,25 @@ main(int argc, char** argv)
 		if (entry.GetPath(&path) != B_OK)
 			continue;
 
-		// a file with this name exists, so try to mount it
-		partition_id id = roster.RegisterFileDevice(path.Path());
-		if (id < B_OK)
-			continue;
-
+		partition_id id = -1;
 		BDiskDevice device;
 		BPartition* partition;
-		if (roster.GetPartitionWithID(id, &device, &partition) != B_OK) {
-			roster.UnregisterFileDevice(id);
-			continue;
+
+		if (!strncmp(path.Path(), "/dev/", 5)) {
+			// seems to be a device path
+			if (roster.GetPartitionForPath(path.Path(), &device, &partition)
+					!= B_OK)
+				continue;
+		} else {
+			// a file with this name exists, so try to mount it
+			id = roster.RegisterFileDevice(path.Path());
+			if (id < 0)
+				continue;
+
+			if (roster.GetPartitionWithID(id, &device, &partition) != B_OK) {
+				roster.UnregisterFileDevice(id);
+				continue;
+			}
 		}
 
 		status_t status = partition->Mount(NULL,
@@ -386,14 +395,14 @@ main(int argc, char** argv)
 			if (status >= B_OK) {
 				BPath mountPoint;
 				partition->GetMountPoint(&mountPoint);
-				printf("Image \"%s\" mounted successfully at \"%s\".\n", name,
-					mountPoint.Path());
+				printf("%s \"%s\" mounted successfully at \"%s\".\n",
+					id < 0 ? "Device" : "Image", name, mountPoint.Path());
 			}
 		}
 		if (status >= B_OK) {
 			// remove from list
 			mountVisitor.toMount.erase(name);
-		} else
+		} else if (id >= 0)
 			roster.UnregisterFileDevice(id);
 	}
 
