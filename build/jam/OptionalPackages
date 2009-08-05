@@ -398,17 +398,14 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Firefox available for $(TARGET_ARCH)" ;
-# TODO: Update BeZilla GCC4 build, this one is currently broken, because of
-# the BToolTip addition. At least the GCC2 build will work just fine on hybrid
-# installations.
-#	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-#		InstallOptionalHaikuImagePackage
-#			BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01
-#			: $(baseURL)/BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01.zip
-# 			: apps
-# 		;
-# 		AddSymlinkToHaikuImage home config be Applications
-#			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01
+			: $(baseURL)/BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01.zip
+ 			: apps
+ 		;
+ 		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package Firefox available for GCC4" ;
 	} else {
