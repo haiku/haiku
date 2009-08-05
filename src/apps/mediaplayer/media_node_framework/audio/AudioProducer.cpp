@@ -595,7 +595,7 @@ AudioProducer::NodeRegistered()
 	fOutput.source.port = ControlPort();
 	fOutput.source.id = 0;
 	fOutput.node = Node();
-	::strcpy(fOutput.name, "MediaPlayer Sound Output");
+	::strcpy(fOutput.name, Name());
 }
 
 
