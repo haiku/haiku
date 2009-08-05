@@ -928,9 +928,13 @@ AccelerantHWInterface::GetMonitorInfo(monitor_info* info)
 
 	memset(info, 0, sizeof(monitor_info));
 	strlcpy(info->vendor, edid.vendor.manufacturer, sizeof(info->vendor));
-	snprintf(info->serial_number, sizeof(info->serial_number), "%lu",
-		edid.vendor.serial);
+	if (edid.vendor.serial != 0) {
+		snprintf(info->serial_number, sizeof(info->serial_number), "%lu",
+			edid.vendor.serial);
+	}
 	info->product_id = edid.vendor.prod_id;
+	info->produced.week = edid.vendor.week;
+	info->produced.year = edid.vendor.year;
 	info->width = edid.display.h_size;
 	info->height = edid.display.v_size;
 
@@ -946,6 +950,7 @@ AccelerantHWInterface::GetMonitorInfo(monitor_info* info)
 			case EDID1_MONITOR_NAME:
 				// There can be several of these; in this case we'll just
 				// overwrite the previous entries
+				// TODO: we could append them as well
 				strlcpy(info->name, monitor->data.monitor_name,
 					sizeof(info->name));
 				break;
