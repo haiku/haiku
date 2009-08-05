@@ -198,6 +198,7 @@ switch $(HAIKU_CPU) {
 	{
 		HAIKU_DEFINES += __ARM__ ;
 		HAIKU_BOOT_PLATFORM = u-boot ;
+		HAIKU_BOOT_BOARD ?= verdex ;
 		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB (there is not realy a floppy on the gumstix ;) )
 		# offset in floppy image (>= sizeof(haiku_loader))
 		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
@@ -850,6 +851,7 @@ if $(TARGET_PLATFORM) = haiku {
 	TARGET_GCC_LIBGCC_OBJECTS	= $(HAIKU_GCC_LIBGCC_OBJECTS) ;
 
 	TARGET_BOOT_PLATFORM		?= $(HAIKU_BOOT_PLATFORM) ;
+	TARGET_BOOT_BOARD		?= $(HAIKU_BOOT_BOARD) ;
 
 	TARGET_LIBRARY_NAME_MAP		= HAIKU_LIBRARY_NAME_MAP ;
 
