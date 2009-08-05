@@ -44,7 +44,7 @@ struct vbe_mode_info {
 	uint16		attributes;
 	uint8		window_a_attributes;
 	uint8		window_b_attributes;
-	uint16		window_granulatiry;
+	uint16		window_granularity;
 	uint16		window_size;
 	uint16		window_a_segment;
 	uint16		window_b_segment;

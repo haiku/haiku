@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -142,8 +142,8 @@ render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 	} else {
 		// monochrome mode
 
-		uint8 *base = (uint8 *)(sConsole.frame_buffer + sConsole.bytes_per_row * y * CHAR_HEIGHT
-			+ x * CHAR_WIDTH / 8);
+		uint8 *base = (uint8 *)(sConsole.frame_buffer
+			+ sConsole.bytes_per_row * y * CHAR_HEIGHT + x * CHAR_WIDTH / 8);
 		uint8 baseOffset =  (x * CHAR_WIDTH) & 0x7;
 
 		for (y = 0; y < CHAR_HEIGHT; y++) {
@@ -415,7 +415,8 @@ frame_buffer_console_init(kernel_args *args)
 
 	if (args->frame_buffer.depth == 4) {
 		// VGA mode will be treated as monochrome
-		args->frame_buffer.bytes_per_row /= 8;
+		// (ie. only the first plane will be used)
+		args->frame_buffer.depth = 1;
 	}
 
 	frame_buffer_update((addr_t)frameBuffer, args->frame_buffer.width,

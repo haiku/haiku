@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2008, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2008, Philippe Saint-Pierre <stpere@gmail.com>
  * Distributed under the terms of the MIT License.
@@ -1007,7 +1007,7 @@ fallback:
 
 		gKernelArgs.frame_buffer.width = 640;
 		gKernelArgs.frame_buffer.height = 480;
-		gKernelArgs.frame_buffer.bytes_per_row = 640 / 2;
+		gKernelArgs.frame_buffer.bytes_per_row = 80;
 		gKernelArgs.frame_buffer.depth = 4;
 		gKernelArgs.frame_buffer.physical_buffer.size
 			= gKernelArgs.frame_buffer.width
