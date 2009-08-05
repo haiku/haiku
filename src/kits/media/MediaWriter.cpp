@@ -61,13 +61,15 @@ MediaWriter::~MediaWriter()
 {
 	CALLED();
 
-	// free all stream cookies
-	// and chunk caches
-	StreamInfo* info;
-	for (fStreamInfos.Rewind(); fStreamInfos.GetNext(&info);)
-		fWriter->FreeCookie(info->cookie);
+	if (fWriter != NULL) {
+		// free all stream cookies
+		// and chunk caches
+		StreamInfo* info;
+		for (fStreamInfos.Rewind(); fStreamInfos.GetNext(&info);)
+			fWriter->FreeCookie(info->cookie);
 
-	_plugin_manager.DestroyWriter(fWriter);
+		_plugin_manager.DestroyWriter(fWriter);
+	}
 
 	// fTarget is owned by the BMediaFile
 }
@@ -98,6 +100,9 @@ MediaWriter::CreateEncoder(Encoder** _encoder,
 	uint32 flags)
 {
 	CALLED();
+
+	if (fWriter == NULL)
+		return B_NO_INIT;
 
 	// TODO: Here we should work out a way so that if there is a setup
 	// failure we can try the next encoder.
