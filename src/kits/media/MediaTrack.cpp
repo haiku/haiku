@@ -76,7 +76,7 @@ BMediaTrack::~BMediaTrack()
 	CALLED();
 	_plugin_manager.DestroyDecoder(fRawDecoder);
 	_plugin_manager.DestroyDecoder(fDecoder);
-	_plugin_manager.DestroyDecoder(fEncoder);
+	_plugin_manager.DestroyEncoder(fEncoder);
 }
 
 /*************************************************************
