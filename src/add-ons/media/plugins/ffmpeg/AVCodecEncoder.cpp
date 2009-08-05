@@ -54,6 +54,16 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 
 	av_fifo_init(&fAudioFifo, 0);
 
+	fDstFrame.data[0] = NULL;
+	fDstFrame.data[1] = NULL;
+	fDstFrame.data[2] = NULL;
+	fDstFrame.data[3] = NULL;
+
+	fDstFrame.linesize[0] = 0;
+	fDstFrame.linesize[1] = 0;
+	fDstFrame.linesize[2] = 0;
+	fDstFrame.linesize[3] = 0;
+
 	// Initial parameters, so we know if the user changed them
 	fEncodeParameters.avg_field_size = 0;
 	fEncodeParameters.max_field_size = 0;
@@ -67,7 +77,8 @@ AVCodecEncoder::~AVCodecEncoder()
 
 	_CloseCodecIfNeeded();
 
-	sws_freeContext(fSwsContext);
+	if (fSwsContext != NULL)
+		sws_freeContext(fSwsContext);
 
 	av_fifo_free(&fAudioFifo);
 
