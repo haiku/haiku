@@ -32,7 +32,7 @@
 using BPrivate::AppServerLink;
 
 
-#define TRACE_WINDOWSCREEN 1
+//#define TRACE_WINDOWSCREEN 1
 #if TRACE_WINDOWSCREEN
 #	define CALLED() printf("%s\n", __PRETTY_FUNCTION__);
 #else
