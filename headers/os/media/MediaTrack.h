@@ -53,7 +53,7 @@ protected:
 	// Use BMediaFile::ReleaseTrack() instead -- or it will go away
 	// on its own when the MediaFile is deleted.
 	virtual						~BMediaTrack();
-	
+
 public:
 
 	// for read-only access the BMediaTrack should be instantiated
@@ -66,18 +66,18 @@ public:
 
 	// Get information about the codec being used.
 			status_t		GetCodecInfo(media_codec_info* _codecInfo) const;
-	
 
-	// EncodedFormat returns information about the track's 
-	// "native" encoded format.  
+
+	// EncodedFormat returns information about the track's
+	// "native" encoded format.
 
 			status_t		EncodedFormat(media_format* _format) const;
 
 	// DecodedFormat is used to negotiate the format that the codec will
 	// use when decoding the track's data.  You pass in the format that
 	// that you want; the codec will find and return its "best fit"
-	// format.  (inout_format is used as both the input and the returned 
-	// format.)  The format is typically of the B_MEDIA_RAW_AUDIO or 	
+	// format.  (inout_format is used as both the input and the returned
+	// format.)  The format is typically of the B_MEDIA_RAW_AUDIO or
 	// B_MEDIA_RAW_VIDEO flavor.
 	// The data returned through ReadFrames() will be in the format that's
  	// returned by this function.
@@ -103,7 +103,7 @@ public:
 	// negotiated by DecodedFormat().  However, if it reaches the end of the
 	// file and was not able to fill the whole  buffer, it returns a partial
 	// buffer.  Upon return, out_frameCount contains the actual number of
-	// frame/samples returned, and the start time for the frame, expressed 
+	// frame/samples returned, and the start time for the frame, expressed
 	// in microseconds, is in the media_header structure.
 
 			status_t		ReadFrames(void* _buffer, int64* _frameCount,
@@ -182,9 +182,9 @@ public:
 	// These are for controlling the underlying encoder and track parameters
 	// returns a copy of the parameter web
 			status_t		GetParameterWeb(BParameterWeb** _web);
-			status_t 		GetParameterValue(int32 id, void* _value,
+			status_t 		GetParameterValue(int32 id, void* value,
 								size_t* size);
-			status_t		SetParameterValue(int32 id, const void* _value,
+			status_t		SetParameterValue(int32 id, const void* value,
 								size_t size);
 			BView*			GetParameterView();
 
@@ -202,11 +202,11 @@ public:
 
 private:
 	friend class BMediaFile;
-	
+
 	// deprecated, but for BeOS R5 compatibility
 			BParameterWeb*	Web();
 
-	// Does nothing, returns B_ERROR, for Zeta compatiblity only	
+	// Does nothing, returns B_ERROR, for Zeta compatiblity only
 			status_t		ControlCodec(int32 selector, void* _inOutData,
 								size_t size);
 
