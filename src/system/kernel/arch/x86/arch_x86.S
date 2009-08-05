@@ -17,10 +17,12 @@
 
 .text
 
-/* void arch_cpu_user_TLB_invalidate(); */
+/*! \fn void arch_cpu_user_TLB_invalidate()
+	Invalidates the TLB. Must be called with interrupts disabled.
+*/
 FUNCTION(arch_cpu_user_TLB_invalidate):
-	movl	%cr3,%eax
-	movl	%eax,%cr3
+	movl	%cr3, %eax
+	movl	%eax, %cr3
 	ret
 FUNCTION_END(arch_cpu_user_TLB_invalidate)
 
