@@ -3921,15 +3921,28 @@ vm_delete_areas(struct vm_address_space* addressSpace)
 
 
 static area_id
-vm_area_for(team_id team, addr_t address)
+vm_area_for(addr_t address, bool kernel)
 {
+	team_id team;
+	if (IS_USER_ADDRESS(address)) {
+		// we try the user team address space, if any
+		team = vm_current_user_address_space_id();
+		if (team < 0)
+			return team;
+	} else
+		team = vm_kernel_address_space_id();
+
 	AddressSpaceReadLocker locker(team);
 	if (!locker.IsLocked())
 		return B_BAD_TEAM_ID;
 
 	vm_area* area = vm_area_lookup(locker.AddressSpace(), address);
-	if (area != NULL)
+	if (area != NULL) {
+		if (!kernel && (area->protection & (B_READ_AREA | B_WRITE_AREA)) == 0)
+			return B_ERROR;
+
 		return area->id;
+	}
 
 	return B_ERROR;
 }
@@ -5705,17 +5718,7 @@ get_memory_map(const void* address, ulong numBytes, physical_entry* table,
 area_id
 area_for(void* address)
 {
-	team_id space;
-
-	if (IS_USER_ADDRESS(address)) {
-		// we try the user team address space, if any
-		space = vm_current_user_address_space_id();
-		if (space < B_OK)
-			return space;
-	} else
-		space = vm_kernel_address_space_id();
-
-	return vm_area_for(space, (addr_t)address);
+	return vm_area_for((addr_t)address, true);
 }
 
 
@@ -5949,7 +5952,7 @@ _user_unreserve_address_range(addr_t address, addr_t size)
 area_id
 _user_area_for(void* address)
 {
-	return vm_area_for(vm_current_user_address_space_id(), (addr_t)address);
+	return vm_area_for((addr_t)address, false);
 }
 
 
