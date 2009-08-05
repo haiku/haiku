@@ -110,6 +110,9 @@ Inode::FindBlock(off_t offset, uint32& block)
 	if (offset >= Size())
 		return B_ENTRY_NOT_FOUND;
 
+	// TODO: we could return the size of the sparse range, as this might be more
+	// than just a block
+
 	if (index < EXT2_DIRECT_BLOCKS) {
 		// direct blocks
 		block = B_LENDIAN_TO_HOST_INT32(Node().stream.direct[index]);
@@ -130,12 +133,19 @@ Inode::FindBlock(off_t offset, uint32& block)
 		if (indirectBlocks == NULL)
 			return B_IO_ERROR;
 
-		indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
-			indirectBlocks[index / perBlock]));
-		if (indirectBlocks == NULL)
-			return B_IO_ERROR;
+		uint32 indirectIndex
+			= B_LENDIAN_TO_HOST_INT32(indirectBlocks[index / perBlock]);
+		if (indirectIndex == 0) {
+			// a sparse indirect block
+			block = 0;
+		} else {
+			indirectBlocks = (uint32*)cached.SetTo(indirectIndex);
+			if (indirectBlocks == NULL)
+				return B_IO_ERROR;
 
-		block = B_LENDIAN_TO_HOST_INT32(indirectBlocks[index & (perBlock - 1)]);
+			block = B_LENDIAN_TO_HOST_INT32(
+				indirectBlocks[index & (perBlock - 1)]);
+		}
 	} else if ((index -= perIndirectBlock) / perBlock < perIndirectBlock) {
 		// triple indirect blocks
 		CachedBlock cached(fVolume);
@@ -144,17 +154,30 @@ Inode::FindBlock(off_t offset, uint32& block)
 		if (indirectBlocks == NULL)
 			return B_IO_ERROR;
 
-		indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
-			indirectBlocks[index / perIndirectBlock]));
-		if (indirectBlocks == NULL)
-			return B_IO_ERROR;
+		uint32 indirectIndex
+			= B_LENDIAN_TO_HOST_INT32(indirectBlocks[index / perIndirectBlock]);
+		if (indirectIndex == 0) {
+			// a sparse indirect block
+			block = 0;
+		} else {
+			indirectBlocks = (uint32*)cached.SetTo(indirectIndex);
+			if (indirectBlocks == NULL)
+				return B_IO_ERROR;
 
-		indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
-			indirectBlocks[(index / perBlock) & (perBlock - 1)]));
-		if (indirectBlocks == NULL)
-			return B_IO_ERROR;
+			indirectIndex = B_LENDIAN_TO_HOST_INT32(
+				indirectBlocks[(index / perBlock) & (perBlock - 1)]);
+			if (indirectIndex == 0) {
+				// a sparse indirect block
+				block = 0;
+			} else {
+				indirectBlocks = (uint32*)cached.SetTo(indirectIndex);
+				if (indirectBlocks == NULL)
+					return B_IO_ERROR;
 
-		block = B_LENDIAN_TO_HOST_INT32(indirectBlocks[index & (perBlock - 1)]);
+				block = B_LENDIAN_TO_HOST_INT32(
+					indirectBlocks[index & (perBlock - 1)]);
+			}
+		}
 	} else {
 		// outside of the possible data stream
 		dprintf("ext2: block outside datastream!\n");
