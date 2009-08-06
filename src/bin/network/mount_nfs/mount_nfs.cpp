@@ -105,7 +105,7 @@ int main (int argc, char **argv)
 		params.gid,
 		params.hostname);
 		
-	int result=mount ("nfs",argv[2],NULL,0,buf,sizeof(params));
+	int result=mount ("nfs",argv[2],NULL,0,buf,strlen(buf));
 	//int result=mount ("nfs",argv[2],NULL,0,&params,sizeof(params));
 
 	delete[] server;
