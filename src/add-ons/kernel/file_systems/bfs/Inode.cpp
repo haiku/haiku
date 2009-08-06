@@ -1206,25 +1206,26 @@ Inode::GetAttribute(const char* name, Inode** _attribute)
 		return B_ERROR;
 	}
 
-	BPlusTree* tree;
-	status_t status = attributes->GetTree(&tree);
+	BPlusTree* tree = attributes->Tree();
+	if (tree == NULL)
+		return B_BAD_VALUE;
+
+	InodeReadLocker locker(attributes);
+
+	ino_t id;
+	status_t status = tree->Find((uint8*)name, (uint16)strlen(name), &id);
 	if (status == B_OK) {
-		InodeReadLocker locker(attributes);
+		Vnode vnode(fVolume, id);
+		Inode* inode;
+		// Check if the attribute is really an attribute
+		if (vnode.Get(&inode) != B_OK || !inode->IsAttribute())
+			return B_ERROR;
 
-		ino_t id;
-		status = tree->Find((uint8*)name, (uint16)strlen(name), &id);
-		if (status == B_OK) {
-			Vnode vnode(fVolume, id);
-			Inode* inode;
-			// Check if the attribute is really an attribute
-			if (vnode.Get(&inode) < B_OK || !inode->IsAttribute())
-				return B_ERROR;
-
-			*_attribute = inode;
-			vnode.Keep();
-			return B_OK;
-		}
+		*_attribute = inode;
+		vnode.Keep();
+		return B_OK;
 	}
+
 	return status;
 }
 
@@ -1264,32 +1265,10 @@ Inode::CreateAttribute(Transaction& transaction, const char* name, uint32 type,
 //	#pragma mark - directory tree
 
 
-/*!	Gives the caller direct access to the b+tree for a given directory.
-	The tree is no longer created on demand, but when the inode is first
-	created. That will report any potential errors upfront, saves locking,
-	and should work as good (though a bit slower).
-*/
-status_t
-Inode::GetTree(BPlusTree** tree)
-{
-	if (fTree) {
-		*tree = fTree;
-		return B_OK;
-	}
-
-	RETURN_ERROR(B_BAD_VALUE);
-}
-
-
 bool
 Inode::IsEmpty()
 {
-	BPlusTree* tree;
-	status_t status = GetTree(&tree);
-	if (status < B_OK)
-		return status;
-
-	TreeIterator iterator(tree);
+	TreeIterator iterator(fTree);
 
 	// index and attribute directories are really empty when they are
 	// empty - directories for standard files always contain ".", and
@@ -2354,15 +2333,14 @@ status_t
 Inode::Remove(Transaction& transaction, const char* name, ino_t* _id,
 	bool isDirectory, bool force)
 {
-	BPlusTree* tree;
-	if (GetTree(&tree) != B_OK)
+	if (fTree == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	WriteLockInTransaction(transaction);
 
 	// does the file even exist?
 	off_t id;
-	if (tree->Find((uint8*)name, (uint16)strlen(name), &id) < B_OK)
+	if (fTree->Find((uint8*)name, (uint16)strlen(name), &id) < B_OK)
 		return B_ENTRY_NOT_FOUND;
 
 	if (_id)
@@ -2398,13 +2376,13 @@ Inode::Remove(Transaction& transaction, const char* name, ino_t* _id,
 	if (status != B_OK)
 		return status;
 
-	if (tree->Remove(transaction, name, id) != B_OK && !force) {
+	if (fTree->Remove(transaction, name, id) != B_OK && !force) {
 		unremove_vnode(fVolume->FSVolume(), id);
 		RETURN_ERROR(B_ERROR);
 	}
 
 #ifdef DEBUG
-	if (tree->Find((uint8*)name, (uint16)strlen(name), &id) == B_OK) {
+	if (fTree->Find((uint8*)name, (uint16)strlen(name), &id) == B_OK) {
 		DIE(("deleted entry still there"));
 	}
 #endif
@@ -2463,8 +2441,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 
 	if (parent != NULL && (mode & S_ATTR_DIR) == 0 && parent->IsContainer()) {
 		// check if the file already exists in the directory
-		if (parent->GetTree(&tree) != B_OK)
-			RETURN_ERROR(B_BAD_VALUE);
+		tree = parent->Tree();
 	}
 
 	if (parent != NULL) {
@@ -2759,8 +2736,8 @@ AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
 			return B_ENTRY_NOT_FOUND;
 		}
 
-		BPlusTree* tree;
-		if (fAttributes->GetTree(&tree) < B_OK
+		BPlusTree* tree = fAttributes->Tree();
+		if (tree == NULL
 			|| (fIterator = new TreeIterator(tree)) == NULL) {
 			FATAL(("could not get tree in AttributeIterator::GetNext(ino_t"
 				" = %Ld,name = \"%s\")\n", fInode->ID(), name));

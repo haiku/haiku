@@ -293,9 +293,7 @@ dump_inode(int argc, char** argv)
 
 		kprintf("INODE %p\n", inode);
 		kprintf("  rw lock:           %p\n", &inode->Lock());
-		BPlusTree* tree = NULL;
-		inode->GetTree(&tree);
-		kprintf("  tree:              %p\n", tree);
+		kprintf("  tree:              %p\n", inode->Tree());
 		kprintf("  file cache:        %p\n", inode->FileCache());
 		kprintf("  file map:          %p\n", inode->Map());
 		kprintf("  old size:          %Ld\n", inode->OldSize());

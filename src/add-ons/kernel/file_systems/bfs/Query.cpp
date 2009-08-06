@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -931,20 +931,20 @@ Equation::PrepareQuery(Volume* /*volume*/, Index& index,
 	status_t status = index.SetTo(fAttribute);
 
 	// if we should query attributes without an index, we can just proceed here
-	if (status < B_OK && !queryNonIndexed)
+	if (status != B_OK && !queryNonIndexed)
 		return B_ENTRY_NOT_FOUND;
 
 	type_code type;
 
 	// Special case for OP_UNEQUAL - it will always operate through the whole
 	// index but we need the call to the original index to get the correct type
-	if (status < B_OK || fOp == OP_UNEQUAL) {
+	if (status != B_OK || fOp == OP_UNEQUAL) {
 		// Try to get an index that holds all files (name)
 		// Also sets the default type for all attributes without index
 		// to string.
 		type = status < B_OK ? B_STRING_TYPE : index.Type();
 
-		if (index.SetTo("name") < B_OK)
+		if (index.SetTo("name") != B_OK)
 			return B_ENTRY_NOT_FOUND;
 
 		fHasIndex = false;
@@ -956,8 +956,8 @@ Equation::PrepareQuery(Volume* /*volume*/, Index& index,
 	if (ConvertValue(type) < B_OK)
 		return B_BAD_VALUE;
 
-	BPlusTree* tree;
-	if (index.Node()->GetTree(&tree) < B_OK)
+	BPlusTree* tree = index.Node()->Tree();
+	if (tree == NULL)
 		return B_ERROR;
 
 	*iterator = new TreeIterator(tree);
@@ -1033,7 +1033,7 @@ Equation::GetNextMatching(Volume* volume, TreeIterator* iterator,
 
 		status_t status = iterator->GetNextEntry(&indexValue, &keyLength,
 			(uint16)sizeof(indexValue), &offset, &duplicate);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 
 		// only compare against the index entry when this is the correct

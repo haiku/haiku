@@ -119,7 +119,7 @@ public:
 								Inode** attribute);
 
 			// for directories only:
-			status_t		GetTree(BPlusTree** _tree);
+			BPlusTree*		Tree() const { return fTree; }
 			bool			IsEmpty();
 			status_t		ContainerContentsChanged(Transaction& transaction);
 

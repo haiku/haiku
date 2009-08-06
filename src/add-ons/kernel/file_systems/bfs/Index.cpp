@@ -76,8 +76,8 @@ Index::SetTo(const char* name)
 
 	InodeReadLocker locker(indices);
 
-	BPlusTree* tree;
-	if (indices->GetTree(&tree) != B_OK)
+	BPlusTree* tree = indices->Tree();
+	if (tree == NULL)
 		return B_BAD_VALUE;
 
 	ino_t id;
@@ -261,14 +261,15 @@ Index::Update(Transaction &transaction, const char* name, int32 type,
 			newKey, newLength);
 	}
 
-	BPlusTree* tree;
-	status_t status = Node()->GetTree(&tree);
-	if (status < B_OK)
-		return status;
+	BPlusTree* tree = Node()->Tree();
+	if (tree == NULL)
+		return B_BAD_VALUE;
 
 	// remove the old key from the tree
 
 	Node()->WriteLockInTransaction(transaction);
+
+	status_t status = B_OK;
 
 	if (oldKey != NULL) {
 		status = tree->Remove(transaction, (const uint8*)oldKey, oldLength,

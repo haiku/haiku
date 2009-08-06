@@ -571,15 +571,15 @@ bfs_lookup(fs_volume* _volume, fs_vnode* _directory, const char* file,
 
 	// check access permissions
 	status_t status = directory->CheckPermissions(X_OK);
-	if (status < B_OK)
+	if (status != B_OK)
 		RETURN_ERROR(status);
 
-	BPlusTree* tree;
-	if (directory->GetTree(&tree) != B_OK)
+	BPlusTree* tree = directory->Tree();
+	if (tree == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	status = tree->Find((uint8*)file, (uint16)strlen(file), _vnodeID);
-	if (status < B_OK) {
+	if (status != B_OK) {
 		//PRINT(("bfs_walk() could not find %Ld:\"%s\": %s\n", directory->BlockNumber(), file, strerror(status)));
 		return status;
 	}
@@ -1059,24 +1059,23 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	status_t status = oldDirectory->CheckPermissions(W_OK);
 	if (status == B_OK)
 		status = newDirectory->CheckPermissions(W_OK);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	// Get the directory's tree, and a pointer to the inode which should be
 	// changed
-	BPlusTree* tree;
-	status = oldDirectory->GetTree(&tree);
-	if (status < B_OK)
-		RETURN_ERROR(status);
+	BPlusTree* tree = oldDirectory->Tree();
+	if (tree == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
 
 	off_t id;
 	status = tree->Find((const uint8*)oldName, strlen(oldName), &id);
-	if (status < B_OK)
+	if (status != B_OK)
 		RETURN_ERROR(status);
 
 	Vnode vnode(volume, id);
 	Inode* inode;
-	if (vnode.Get(&inode) < B_OK)
+	if (vnode.Get(&inode) != B_OK)
 		return B_IO_ERROR;
 
 	// Don't move a directory into one of its children - we soar up
@@ -1096,7 +1095,7 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 
 			Vnode vnode(volume, parent);
 			Inode* parentNode;
-			if (vnode.Get(&parentNode) < B_OK)
+			if (vnode.Get(&parentNode) != B_OK)
 				return B_ERROR;
 
 			parent = volume->ToVnode(parentNode->Parent());
@@ -1110,9 +1109,9 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	// failure, we will test this case first
 	BPlusTree* newTree = tree;
 	if (newDirectory != oldDirectory) {
-		status = newDirectory->GetTree(&newTree);
-		if (status < B_OK)
-			RETURN_ERROR(status);
+		newTree = newDirectory->Tree();
+		if (newTree == NULL)
+			RETURN_ERROR(B_BAD_VALUE);
 	}
 
 	status = newTree->Insert(transaction, (const uint8*)newName,
@@ -1173,10 +1172,10 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 
 			// if it's a directory, update the parent directory pointer
 			// in its tree if necessary
-			BPlusTree* movedTree = NULL;
+			BPlusTree* movedTree = inode->Tree();
 			if (oldDirectory != newDirectory
 				&& inode->IsDirectory()
-				&& (status = inode->GetTree(&movedTree)) == B_OK) {
+				&& movedTree != NULL) {
 				status = movedTree->Replace(transaction, (const uint8*)"..",
 					2, newDirectory->ID());
 
@@ -1579,8 +1578,8 @@ bfs_open_dir(fs_volume* _volume, fs_vnode* _node, void** _cookie)
 	if (!inode->IsContainer())
 		RETURN_ERROR(B_BAD_VALUE);
 
-	BPlusTree* tree;
-	if (inode->GetTree(&tree) != B_OK)
+	BPlusTree* tree = inode->Tree();
+	if (tree == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	TreeIterator* iterator = new(std::nothrow) TreeIterator(tree);

@@ -1369,8 +1369,8 @@ BlockAllocator::CheckNextNode(check_control* control)
 
 			// get iterator for the next directory
 
-			BPlusTree* tree;
-			if (inode->GetTree(&tree) != B_OK) {
+			BPlusTree* tree = inode->Tree();
+			if (tree == NULL) {
 				FATAL(("check: could not open b+tree from inode at %Ld\n",
 					fVolume->ToBlock(cookie->current)));
 				continue;
