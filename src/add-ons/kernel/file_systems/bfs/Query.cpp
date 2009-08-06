@@ -1272,7 +1272,7 @@ Operator::PrintToStream()
 	if (fLeft != NULL)
 		fLeft->PrintToStream();
 
-	char* op;
+	const char* op;
 	switch (fOp) {
 		case OP_OR: op = "OR"; break;
 		case OP_AND: op = "AND"; break;
@@ -1290,7 +1290,7 @@ Operator::PrintToStream()
 void
 Equation::PrintToStream()
 {
-	char* symbol = "???";
+	const char* symbol = "???";
 	switch (fOp) {
 		case OP_EQUAL: symbol = "=="; break;
 		case OP_UNEQUAL: symbol = "!="; break;
