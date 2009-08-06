@@ -402,6 +402,9 @@ BGLView::_UnlockDraw()
 void
 BGLView::_CallDirectConnected()
 {
+	if (!fClipInfo)
+		return;
+	
 	glview_direct_info *glviewDirectInfo = (glview_direct_info *)fClipInfo;
 	direct_buffer_info *localInfo = glviewDirectInfo->direct_info;
 	direct_buffer_info *info = (direct_buffer_info *)calloc(1, DIRECT_BUFFER_INFO_AREA_SIZE);
