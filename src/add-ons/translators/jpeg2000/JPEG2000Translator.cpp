@@ -81,8 +81,6 @@ translation_format outputFormats[] = {
 	{},
 };
 
-bool gAreSettingsRunning = false;
-
 
 //!	Make settings to defaults
 void
@@ -569,12 +567,9 @@ jas_stream_positionIOopen(BPositionIO *positionIO)
 //	#pragma mark - SView
 
 
-SView::SView(const char *name, float x, float y)
-	: BView(BRect(x, y, x, y), name, B_FOLLOW_NONE, B_WILL_DRAW)
+SView::SView(BRect frame, const char *name)
+	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW)
 {
-	fPreferredWidth = 0;
-	fPreferredHeight = 0;
-
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
 
@@ -583,41 +578,10 @@ SView::SView(const char *name, float x, float y)
 
 
 void
-SView::GetPreferredSize(float* _width, float* _height)
+SView::AttachedToWindow()
 {
-	if (_width)
-		*_width = fPreferredWidth;
-	if (_height)
-		*_height = fPreferredHeight;
-}
-
-
-void
-SView::ResizeToPreferred()
-{
-	ResizeTo(fPreferredWidth, fPreferredHeight);
-}
-
-
-void
-SView::ResizePreferredBy(float width, float height)
-{
-	fPreferredWidth += width;
-	fPreferredHeight += height;
-}
-
-
-void
-SView::AddChild(BView *child, BView *before)
-{
-	BView::AddChild(child, before);
-	child->ResizeToPreferred();
-	BRect frame = child->Frame();
-
-	if (frame.right > fPreferredWidth)
-		fPreferredWidth = frame.right;
-	if (frame.bottom > fPreferredHeight)
-		fPreferredHeight = frame.bottom;
+	BView::AttachedToWindow();
+	ResizeTo(Parent()->Bounds().Width(), Parent()->Bounds().Height());
 }
 
 
@@ -662,27 +626,26 @@ SSlider::ResizeToPreferred()
 //	#pragma mark -
 
 
-TranslatorReadView::TranslatorReadView(const char *name, jpeg_settings *settings,
-		float x, float y)
-	: SView(name, x, y),
+TranslatorReadView::TranslatorReadView(BRect frame, const char *name,
+	jpeg_settings *settings)
+	: SView(frame, name),
 	fSettings(settings)
 {
-	fGrayAsRGB32 = new BCheckBox(BRect(10, GetPreferredHeight(), 10,
-		GetPreferredHeight()), "grayasrgb32", VIEW_LABEL_GRAYASRGB32,
-		new BMessage(VIEW_MSG_SET_GRAYASRGB32));
+	fGrayAsRGB32 = new BCheckBox(BRect(10, 10, 40, 40), "grayasrgb32",
+		VIEW_LABEL_GRAYASRGB32, new BMessage(VIEW_MSG_SET_GRAYASRGB32));
 	fGrayAsRGB32->SetFont(be_plain_font);
 	if (fSettings->B_GRAY8_as_B_RGB32)
 		fGrayAsRGB32->SetValue(1);
 
 	AddChild(fGrayAsRGB32);
-
-	ResizeToPreferred();
+	fGrayAsRGB32->ResizeToPreferred();
 }
 
 
 void
 TranslatorReadView::AttachedToWindow()
 {
+	SView::AttachedToWindow();
 	fGrayAsRGB32->SetTarget(this);
 }
 
@@ -710,46 +673,53 @@ TranslatorReadView::MessageReceived(BMessage *message)
 //	#pragma mark - TranslatorWriteView
 
 
-TranslatorWriteView::TranslatorWriteView(const char *name, jpeg_settings *settings,
-		float x, float y)
-	: SView(name, x, y),
+TranslatorWriteView::TranslatorWriteView(BRect frame, const char *name,
+	jpeg_settings *settings)
+	: SView(frame, name),
 	fSettings(settings)
 {
-	fQualitySlider = new SSlider(BRect(10, GetPreferredHeight(), 10,
-		GetPreferredHeight()), "quality", VIEW_LABEL_QUALITY,
-		new BMessage(VIEW_MSG_SET_QUALITY), 0, 100);
+	BRect rect(10, 10, 10, 40);
+	fQualitySlider = new SSlider(rect, "quality",
+		VIEW_LABEL_QUALITY, new BMessage(VIEW_MSG_SET_QUALITY), 0, 100);
 	fQualitySlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fQualitySlider->SetHashMarkCount(10);
 	fQualitySlider->SetLimitLabels("Low", "High");
 	fQualitySlider->SetFont(be_plain_font);
 	fQualitySlider->SetValue(fSettings->Quality);
 	AddChild(fQualitySlider);
+	fQualitySlider->ResizeToPreferred();
 
-	fGrayAsRGB24 = new BCheckBox(BRect(10, GetPreferredHeight() + 5, 25,
-		GetPreferredHeight() + 5), "gray1asrgb24", VIEW_LABEL_GRAY1ASRGB24,
+	rect.OffsetBy(0, fQualitySlider->Bounds().Height() + 10);
+
+	fGrayAsRGB24 = new BCheckBox(rect, "gray1asrgb24",
+		VIEW_LABEL_GRAY1ASRGB24,
 		new BMessage(VIEW_MSG_SET_GRAY1ASRGB24));
 	fGrayAsRGB24->SetFont(be_plain_font);
 	if (fSettings->B_GRAY1_as_B_RGB24)
 		fGrayAsRGB24->SetValue(1);
 
 	AddChild(fGrayAsRGB24);
+	fGrayAsRGB24->ResizeToPreferred();
 
-	fCodeStreamOnly = new BCheckBox(BRect(10, GetPreferredHeight() + 5, 10,
-		GetPreferredHeight()), "codestreamonly", VIEW_LABEL_JPC,
-		new BMessage(VIEW_MSG_SET_JPC));
+	rect.OffsetBy(0, fGrayAsRGB24->Bounds().Height() + 10);
+	
+	fCodeStreamOnly = new BCheckBox(rect, "codestreamonly",
+		VIEW_LABEL_JPC, new BMessage(VIEW_MSG_SET_JPC));
 	fCodeStreamOnly->SetFont(be_plain_font);
 	if (fSettings->JPC)
 		fCodeStreamOnly->SetValue(1);
 
 	AddChild(fCodeStreamOnly);
-
-	ResizeToPreferred();
+	
+	fCodeStreamOnly->ResizeToPreferred();
 }
 
 
 void
 TranslatorWriteView::AttachedToWindow()
 {
+	SView::AttachedToWindow();
+	
 	fQualitySlider->SetTarget(this);
 	fGrayAsRGB24->SetTarget(this);
 	fCodeStreamOnly->SetTarget(this);
@@ -797,14 +767,15 @@ TranslatorWriteView::MessageReceived(BMessage *message)
 //	#pragma mark -
 
 
-TranslatorAboutView::TranslatorAboutView(const char *name, float x, float y)
-	: SView(name, x, y)
+TranslatorAboutView::TranslatorAboutView(BRect frame, const char *name)
+	: SView(frame, name)
 {
 	BStringView *title = new BStringView(BRect(10, 0, 10, 0), "Title",
 		translatorName);
 	title->SetFont(be_bold_font);
 
 	AddChild(title);
+	title->ResizeToPreferred();
 
 	BRect rect = title->Bounds();
 	float space = title->StringWidth("    ");
@@ -822,7 +793,10 @@ TranslatorAboutView::TranslatorAboutView(const char *name, float x, float y)
 	version->MoveBy(0, rect.bottom-version->Frame().bottom);
 
 	AddChild(version);
-
+	
+	version->ResizeToPreferred();
+	
+	BRect stringFrame = title->Frame();
 	// Now for each line in translatorInfo add a BStringView
 	char* current = translatorInfo;
 	int32 index = 1;
@@ -837,71 +811,40 @@ TranslatorAboutView::TranslatorAboutView(const char *name, float x, float y)
 				newLine + 1 - current));
 			current = newLine + 1;
 		}
-
-		BStringView* string = new BStringView(BRect(10, GetPreferredHeight(),
-			10, GetPreferredHeight()), "copyright", text);
+		
+		stringFrame.OffsetBy(0, stringFrame.Height() + 2);
+		BStringView* string = new BStringView(stringFrame, "copyright",
+			text);
 		if (index > 3)
 			string->SetFontSize(9);
 		AddChild(string);
+		string->ResizeToPreferred();
 
 		index++;
 	}
-
-	ResizeToPreferred();
 }
 
 
 //	#pragma mark -
 
 
-TranslatorView::TranslatorView(const char *name)
-	: SView(name),
-	fTabWidth(30),
-	fActiveChild(0)
+TranslatorView::TranslatorView(BRect frame, const char *name)
+	: BTabView(frame, name)
 {
-	// Set global var to true
-	gAreSettingsRunning = true;
-
 	// Load settings to global settings struct
 	LoadSettings(&fSettings);
-
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
-	fTabHeight = (int32)ceilf(fontHeight.ascent + fontHeight.descent
-		+ fontHeight.leading) + 7;
-	// Add left and top margins
-	float top = fTabHeight + 20;
-	float left = 0;
-
-	// This will remember longest string width
-	int32 nameWidth = 0;
-
-	SView *view = new TranslatorWriteView("Write", &fSettings, left, top);
-	AddChild(view);
-	nameWidth = (int32)StringWidth(view->Name());
-	fTabs.AddItem(new BTab(view));
-
-	view = new TranslatorReadView("Read", &fSettings, left, top);
-	AddChild(view);
-	if (nameWidth < StringWidth(view->Name()))
-		nameWidth = (int32)StringWidth(view->Name());
-	fTabs.AddItem(new BTab(view));
-
-	view = new TranslatorAboutView("About", left, top);
-	AddChild(view);
-	if (nameWidth < StringWidth(view->Name()))
-		nameWidth = (int32)StringWidth(view->Name());
-	fTabs.AddItem(new BTab(view));
-
-	fTabWidth += nameWidth;
-	if (fTabWidth * CountChildren() > GetPreferredWidth())
-		ResizePreferredBy((fTabWidth * CountChildren()) - GetPreferredWidth(), 0);
-
-	// Add right and bottom margins
-	ResizePreferredBy(10, 15);
-
+	
+	BRect contentSize = ContainerView()->Bounds();
+	SView *view = new TranslatorWriteView(contentSize, "Write",
+		&fSettings);
+	AddTab(view);
+	view = new TranslatorReadView(contentSize, "Read", &fSettings);
+	AddTab(view);
+	view = new TranslatorAboutView(contentSize, "About");
+	AddTab(view);
+	
 	ResizeToPreferred();
-
+	
 	// Make TranslatorView resize itself with parent
 	SetFlags(Flags() | B_FOLLOW_ALL);
 }
@@ -909,109 +852,6 @@ TranslatorView::TranslatorView(const char *name)
 
 TranslatorView::~TranslatorView()
 {
-	gAreSettingsRunning = false;
-
-	BTab* tab;
-	while ((tab = (BTab*)fTabs.RemoveItem((int32)0)) != NULL) {
-		delete tab;
-	}
-}
-
-
-//!	Attached to window - resize parent to preferred
-void
-TranslatorView::AttachedToWindow()
-{
-	// Hide all children except first one
-	BView *child;
-	int32 index = 1;
-	while ((child = ChildAt(index++)) != NULL)
-		child->Hide();
-
-}
-
-
-BRect
-TranslatorView::_TabFrame(int32 index) const
-{
-	return BRect(index * fTabWidth, 10, (index + 1) * fTabWidth, 10 + fTabHeight);
-}
-
-
-void
-TranslatorView::Draw(BRect updateRect)
-{
-	// This is needed because DataTranslations app hides children
-	// after user changes translator
-	if (ChildAt(fActiveChild)->IsHidden())
-		ChildAt(fActiveChild)->Show();
-
-	// Clear
-	SetHighColor(ViewColor());
-	BRect frame = _TabFrame(0);
-	FillRect(BRect(frame.left, frame.top, Bounds().right, frame.bottom - 1));
-
-	int32 index = 0;
-	BTab* tab;
-	while ((tab = (BTab*)fTabs.ItemAt(index)) != NULL) {
-		tab_position position;
-		if (fActiveChild == index)
-			position = B_TAB_FRONT;
-		else if (index == 0)
-			position = B_TAB_FIRST;
-		else
-			position = B_TAB_ANY;
-
-		tab->DrawTab(this, _TabFrame(index), position, index + 1 != fActiveChild);
-		index++;
-	}
-
-	// Draw bottom edge
-	SetHighColor(tint_color(ViewColor(), B_LIGHTEN_MAX_TINT));
-
-	BRect selectedFrame = _TabFrame(fActiveChild);
-	float offset = ceilf(frame.Height() / 2.0);
-
-	if (selectedFrame.left > frame.left) {
-		StrokeLine(BPoint(frame.left, frame.bottom),
-			BPoint(selectedFrame.left, frame.bottom));
-	}
-	if (selectedFrame.right + offset < Bounds().right) {
-		StrokeLine(BPoint(selectedFrame.right + offset, frame.bottom),
-			BPoint(Bounds().right, frame.bottom));
-	}
-}
-
-
-//!	MouseDown, check if on tab, if so change tab if needed
-void
-TranslatorView::MouseDown(BPoint where)
-{
-	BRect frame = _TabFrame(fTabs.CountItems() - 1);
-	frame.left = 0;
-	if (!frame.Contains(where))
-		return;
-
-	for (int32 index = fTabs.CountItems(); index-- > 0;) {
-		if (!_TabFrame(index).Contains(where))
-			continue;
-
-		if (fActiveChild != index) {
-			// Hide current visible child
-			ChildAt(fActiveChild)->Hide();
-
-			// This loop is needed because it looks like in DataTranslations
-			// view gets hidden more than one time when user changes translator
-			while (ChildAt(index)->IsHidden()) {
-				ChildAt(index)->Show();
-			}
-
-			// Remember which one is currently visible
-			fActiveChild = index;
-			Invalidate(frame);
-			break;
-		}
-	}
 }
 
 
@@ -1042,7 +882,7 @@ TranslatorWindow::TranslatorWindow(bool quitOnClose)
 status_t
 MakeConfig(BMessage *ioExtension, BView **outView, BRect *outExtent)
 {
-	*outView = new TranslatorView("TranslatorView");
+	*outView = new TranslatorView(BRect(0, 0, 300, 250), "TranslatorView");
 	*outExtent = (*outView)->Frame();
 	return B_OK;
 }

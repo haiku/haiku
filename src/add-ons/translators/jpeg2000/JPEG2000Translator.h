@@ -40,6 +40,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Path.h>
 #include <Slider.h>
 #include <StringView.h>
+#include <TabView.h>
 #include <TranslationKit.h>
 #include <TranslatorAddOn.h>
 
@@ -99,29 +100,14 @@ class SSlider : public BSlider {
 //!	Basic view class with resizing to needed size
 class SView : public BView {
 	public:
-		SView(const char* name, float x = 0, float y = 0);
-
-		virtual void	GetPreferredSize(float* _width, float* _height);
-		virtual void	ResizeToPreferred();
-
-		void			AddChild(BView* child, BView* before = NULL);
-
-		float			GetPreferredWidth()
-							{ return fPreferredWidth; }
-		float			GetPreferredHeight()
-							{ return fPreferredHeight; }
-		void			ResizePreferredBy(float width, float height);
-
-	private:
-		float			fPreferredWidth;
-		float			fPreferredHeight;
+		SView(BRect rect, const char* name);
+		virtual void AttachedToWindow();
 };
 
 //!	Configuration view for reading settings
 class TranslatorReadView : public SView {
 	public:
-		TranslatorReadView(const char* name, jpeg_settings* settings,
-			float x = 0, float y = 0);
+		TranslatorReadView(BRect rect, const char* name, jpeg_settings* settings);
 
 		virtual void	AttachedToWindow();
 		virtual void	MessageReceived(BMessage* message);
@@ -134,8 +120,7 @@ class TranslatorReadView : public SView {
 //! Configuration view for writing settings
 class TranslatorWriteView : public SView {
 	public:
-		TranslatorWriteView(const char* name, jpeg_settings* settings,
-			float x = 0, float y = 0);
+		TranslatorWriteView(BRect rect, const char* name, jpeg_settings* settings);
 
 		virtual void	AttachedToWindow();
 		virtual void	MessageReceived(BMessage* message);
@@ -149,27 +134,17 @@ class TranslatorWriteView : public SView {
 
 class TranslatorAboutView : public SView {
 	public:
-		TranslatorAboutView(const char* name, float x = 0, float y = 0);
+		TranslatorAboutView(BRect rect, const char* name);
 };
 
 //!	Configuration view
-class TranslatorView : public SView {
+class TranslatorView : public BTabView {
 	public:
-		TranslatorView(const char *name);
+		TranslatorView(BRect rect, const char *name);
 		virtual ~TranslatorView();
 
-		virtual void	AttachedToWindow();
-		virtual void	Draw(BRect updateRect);
-		virtual void	MouseDown(BPoint where);
-
 	private:
-		BRect			_TabFrame(int32 index) const;
-
 		jpeg_settings	fSettings;
-		BList			fTabs;
-		int32			fTabWidth;
-		int32			fTabHeight;
-		int32			fActiveChild;
 };
 
 //!	Window used for configuration
