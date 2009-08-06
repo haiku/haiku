@@ -1,5 +1,6 @@
 /* 
  * Copyright 2002, Marcus Overhagen. All rights reserved.
+ * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -34,6 +35,7 @@ BufferManager::SharedBufferListID()
 	return fSharedBufferListID;
 }
 
+
 status_t	
 BufferManager::RegisterBuffer(team_id team, media_buffer_id bufferID,
 	size_t* _size, int32* _flags, size_t* _offset, area_id* _area)
@@ -43,13 +45,13 @@ BufferManager::RegisterBuffer(team_id team, media_buffer_id bufferID,
 	TRACE("RegisterBuffer team = %ld, bufferid = %ld\n", team, bufferID);
 
 	buffer_info* info;
-	if (!fBufferInfoMap.Get(bufferID, &info)) {
+	if (!fBufferInfoMap.Get(bufferID, info)) {
 		ERROR("failed to register buffer! team = %ld, bufferid = %ld\n", team,
 			bufferID);
 		return B_ERROR;
 	}
 
-	info->teams.Insert(team);
+	info->teams.insert(team);
 
 	*_area = info->area;
 	*_offset = info->offset;
@@ -68,14 +70,12 @@ BufferManager::RegisterBuffer(team_id team, size_t size, int32 flags,
 	TRACE("RegisterBuffer team = %ld, area = %ld, offset = %ld, size = %ld\n",
 		team, area, offset, size);
 	
-	void* address;
-	area_id clonedArea = clone_area("media_server cloned buffer", &address,
-		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
+	area_id clonedArea = _CloneArea(area);
 	if (clonedArea < 0) {
 		ERROR("RegisterBuffer: failed to clone buffer! error = %#lx, team = "
-			"%ld, areaid = %ld, offset = %ld, size = %ld\n", clonedArea, team,
+			"%ld, area = %ld, offset = %ld, size = %ld\n", clonedArea, team,
 			area, offset, size);
-		return B_ERROR;
+		return clonedArea;
 	}
 
 	buffer_info info;
@@ -84,11 +84,11 @@ BufferManager::RegisterBuffer(team_id team, size_t size, int32 flags,
 	info.offset = offset;
 	info.size = size;
 	info.flags = flags;
-	info.teams.Insert(team);
+	info.teams.insert(team);
 
 	*_bufferID = info.id;
 
-	fBufferInfoMap.Insert(info.id, info);
+	fBufferInfoMap.Put(info.id, info);
 
 	TRACE("RegisterBuffer: done, bufferID = %ld\n", info.id);
 
@@ -103,34 +103,26 @@ BufferManager::UnregisterBuffer(team_id team, media_buffer_id bufferID)
 	TRACE("UnregisterBuffer: team = %ld, bufferid = %ld\n", team, bufferID);
 
 	buffer_info* info;
-	if (!fBufferInfoMap.Get(bufferID, &info)) {
+	if (!fBufferInfoMap.Get(bufferID, info)) {
 		ERROR("UnregisterBuffer: failed to unregister buffer! team = %ld, "
 			"bufferid = %ld\n", team, bufferID);
 		return B_ERROR;
 	}
 
-	int index = info->teams.Find(team);
-	if (index < 0) {
+	if (info->teams.find(team) == info->teams.end()) {
 		ERROR("UnregisterBuffer: failed to find team = %ld belonging to "
 			"bufferID = %ld\n", team, bufferID);
 		return B_ERROR;
 	}
 	
-	if (!info->teams.Remove(index)) {
-		ERROR("UnregisterBuffer: failed to remove team = %ld from bufferID "
-			"= %ld\n", team, bufferID);
-		return B_ERROR;
-	}
+	info->teams.erase(team);
 
 	TRACE("UnregisterBuffer: team = %ld removed from bufferID = %ld\n", team,
 		bufferID);
 
-	if (info->teams.IsEmpty()) {
-		if (!fBufferInfoMap.Remove(bufferID)) {
-			ERROR("UnregisterBuffer: failed to remove bufferID = %ld\n",
-				bufferID);
-			return B_ERROR;
-		}
+	if (info->teams.empty()) {
+		_ReleaseClonedArea(info->area);
+		fBufferInfoMap.Remove(bufferID);
 
 		TRACE("UnregisterBuffer: bufferID = %ld removed\n", bufferID);
 	}
@@ -146,20 +138,17 @@ BufferManager::CleanupTeam(team_id team)
 
 	TRACE("BufferManager::CleanupTeam: team %ld\n", team);
 
-	buffer_info* info;
-	for (fBufferInfoMap.Rewind(); fBufferInfoMap.GetNext(&info); ) {
-		team_id* currentTeam;
-		for (info->teams.Rewind(); info->teams.GetNext(&currentTeam); ) {
-			if (team == *currentTeam) {
-				PRINT(1, "BufferManager::CleanupTeam: removing team %ld from "
-					"buffer id %ld\n", team, info->id);
-				info->teams.RemoveCurrent();
-			}
-		}
-		if (info->teams.IsEmpty()) {
+	BufferInfoMap::Iterator iterator = fBufferInfoMap.GetIterator();
+	while (iterator.HasNext()) {
+		BufferInfoMap::Entry entry = iterator.Next();
+
+		entry.value.teams.erase(team);
+
+		if (entry.value.teams.empty()) {
 			PRINT(1, "BufferManager::CleanupTeam: removing buffer id %ld that "
-				"has no teams\n", info->id);
-			fBufferInfoMap.RemoveCurrent(); 
+				"has no teams\n", entry.key);
+			_ReleaseClonedArea(entry.value.area);
+			iterator.Remove();
 		}
 	}
 }
@@ -173,18 +162,36 @@ BufferManager::Dump()
 	printf("\n");
 	printf("BufferManager: list of buffers follows:\n");
 
-	buffer_info *info;
-	for (fBufferInfoMap.Rewind(); fBufferInfoMap.GetNext(&info); ) {
+	BufferInfoMap::Iterator iterator = fBufferInfoMap.GetIterator();
+	while (iterator.HasNext()) {
+		buffer_info& info = *iterator.NextValue();
 		printf(" buffer-id %ld, area-id %ld, offset %ld, size %ld, flags "
-			"%#08lx\n", info->id, info->area, info->offset, info->size,
-			info->flags);
+			"%#08lx\n", info.id, info.area, info.offset, info.size, info.flags);
 		printf("   assigned teams: ");
 
-		team_id* team;
-		for (info->teams.Rewind(); info->teams.GetNext(&team); ) {
-			printf("%ld, ", *team);
+		std::set<team_id>::iterator teamIterator = info.teams.begin();
+		for (; teamIterator != info.teams.end(); teamIterator++) {
+			printf("%ld, ", *teamIterator);
 		}
 		printf("\n");
 	}
 	printf("BufferManager: list end\n");
+}
+
+
+area_id
+BufferManager::_CloneArea(area_id area)
+{
+	void* address;
+	area_id clonedArea = clone_area("media_server cloned buffer", &address,
+		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
+	
+	return clonedArea;
+}
+
+
+void
+BufferManager::_ReleaseClonedArea(area_id clone)
+{
+	delete_area(clone);
 }
