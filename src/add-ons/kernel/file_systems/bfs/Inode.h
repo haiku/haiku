@@ -121,6 +121,7 @@ public:
 			// for directories only:
 			status_t		GetTree(BPlusTree** _tree);
 			bool			IsEmpty();
+			status_t		ContainerContentsChanged(Transaction& transaction);
 
 			// manipulating the data stream
 			status_t		FindBlockRun(off_t pos, block_run& run,
@@ -241,6 +242,31 @@ private:
 			SinglyLinkedList<AttributeIterator> fIterators;
 };
 
+
+/*!	Checks whether or not this node should be part of the name index */
+inline bool
+Inode::InNameIndex() const
+{
+	return IsRegularNode();
+}
+
+
+/*!	Checks whether or not this node should be part of the size index */
+inline bool
+Inode::InSizeIndex() const
+{
+	return IsFile();
+}
+
+
+/*!	Checks whether or not this node should be part of the last modified index */
+inline bool
+Inode::InLastModifiedIndex() const
+{
+	return IsFile() || IsSymLink();
+}
+
+
 #if _KERNEL_MODE && KDEBUG
 #	define ASSERT_READ_LOCKED_INODE(inode) inode->AssertReadLocked()
 #	define ASSERT_WRITE_LOCKED_INODE(inode) inode->AssertWriteLocked()
@@ -248,6 +274,7 @@ private:
 #	define ASSERT_READ_LOCKED_INODE(inode)
 #	define ASSERT_WRITE_LOCKED_INODE(inode)
 #endif
+
 
 class InodeReadLocker {
 public:

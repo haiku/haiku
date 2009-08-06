@@ -1149,7 +1149,7 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 		status = newTree->Insert(transaction, (const uint8*)newName,
 			strlen(newName), id);
 	}
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	inode->WriteLockInTransaction(transaction);
@@ -1185,6 +1185,12 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 					entry_cache_add(volume->ID(), id, "..", newDirectory->ID());
 				}
 			}
+
+			if (newDirectory != oldDirectory) {
+				oldDirectory->ContainerContentsChanged(transaction);
+				newDirectory->ContainerContentsChanged(transaction);
+			} else
+				newDirectory->ContainerContentsChanged(transaction);
 
 			if (status == B_OK)
 				status = inode->WriteBack(transaction);

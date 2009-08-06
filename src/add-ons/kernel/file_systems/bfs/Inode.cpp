@@ -1311,6 +1311,18 @@ Inode::IsEmpty()
 }
 
 
+status_t
+Inode::ContainerContentsChanged(Transaction& transaction)
+{
+	ASSERT(!InLastModifiedIndex());
+
+	Node().last_modified_time = Node().status_change_time
+		= HOST_ENDIAN_TO_BFS_INT64(bfs_inode::ToInode(real_time_clock_usecs()));
+
+	return WriteBack(transaction);
+}
+
+
 //	#pragma mark - data stream
 
 
@@ -2397,6 +2409,8 @@ Inode::Remove(Transaction& transaction, const char* name, ino_t* _id,
 	}
 #endif
 
+	ContainerContentsChanged(transaction);
+
 	// update the inode, so that no one will ever doubt it's deleted :-)
 	inode->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_DELETED);
 	inode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE);
@@ -2447,7 +2461,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	Volume* volume = transaction.GetVolume();
 	BPlusTree* tree = NULL;
 
-	if (parent && (mode & S_ATTR_DIR) == 0 && parent->IsContainer()) {
+	if (parent != NULL && (mode & S_ATTR_DIR) == 0 && parent->IsContainer()) {
 		// check if the file already exists in the directory
 		if (parent->GetTree(&tree) != B_OK)
 			RETURN_ERROR(B_BAD_VALUE);
@@ -2479,7 +2493,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 			Vnode vnode(volume, offset);
 			Inode* inode;
 			status_t status = vnode.Get(&inode);
-			if (status < B_OK) {
+			if (status != B_OK) {
 				REPORT_ERROR(status);
 				return B_ENTRY_NOT_FOUND;
 			}
@@ -2492,7 +2506,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 			if (inode->CheckPermissions(open_mode_to_access(openMode)) != B_OK)
 				return B_NOT_ALLOWED;
 
-			if (openMode & O_TRUNC) {
+			if ((openMode & O_TRUNC) != 0) {
 				// we need write access in order to truncate the file
 				status = inode->CheckPermissions(W_OK);
 				if (status != B_OK)
@@ -2523,7 +2537,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 
 			return B_OK;
 		}
-	} else if (parent && (mode & S_ATTR_DIR) == 0)
+	} else if (parent != NULL && (mode & S_ATTR_DIR) == 0)
 		return B_BAD_VALUE;
 
 	status_t status;
@@ -2567,23 +2581,23 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	// only add the name to regular files, directories, or symlinks
 	// don't add it to attributes, or indices
 	if (tree && inode->IsRegularNode()
-		&& inode->SetName(transaction, name) < B_OK)
+		&& inode->SetName(transaction, name) != B_OK)
 		return B_ERROR;
 
 	// Initialize b+tree if it's a directory (and add "." & ".." if it's
 	// a standard directory for files - not for attributes or indices)
 	if (inode->IsContainer()) {
 		status = allocator.CreateTree();
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 	}
 
 	// Add a link to the inode from the parent, depending on its type
 	// (the vnode is not published yet, so it is safe to make the inode
 	// accessable to the file system here)
-	if (tree) {
+	if (tree != NULL) {
 		status = tree->Insert(transaction, name, inode->ID());
-	} else if (parent && (mode & S_ATTR_DIR) != 0) {
+	} else if (parent != NULL && (mode & S_ATTR_DIR) != 0) {
 		parent->Attributes() = run;
 		status = parent->WriteBack(transaction);
 	}
@@ -2592,7 +2606,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	// two cases above; the root node or the indices root node must
 	// handle this case on their own (or other cases where "parent" is
 	// NULL)
-	if (status < B_OK)
+	if (status != B_OK)
 		RETURN_ERROR(status);
 
 	// Update the main indices (name, size & last_modified)
@@ -2603,7 +2617,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 		// the name index only contains regular files
 		// (but not the root node where name == NULL)
 		status = index.InsertName(transaction, name, inode);
-		if (status < B_OK && status != B_BAD_INDEX) {
+		if (status != B_OK && status != B_BAD_INDEX) {
 			// We have to remove the node from the parent at this point,
 			// because the InodeAllocator destructor can't handle this
 			// case (and if it fails, we can't do anything about it...)
@@ -2615,6 +2629,9 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 			RETURN_ERROR(status);
 		}
 	}
+
+	if (parent != NULL && parent->IsContainer())
+		parent->ContainerContentsChanged(transaction);
 
 	inode->UpdateOldLastModified();
 
@@ -2649,30 +2666,6 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 		put_vnode(volume->FSVolume(), inode->ID());
 
 	return B_OK;
-}
-
-
-/*!	Checks whether or not this node should be part of the name index */
-bool
-Inode::InNameIndex() const
-{
-	return IsRegularNode();
-}
-
-
-/*!	Checks whether or not this node should be part of the size index */
-bool
-Inode::InSizeIndex() const
-{
-	return IsFile();
-}
-
-
-/*!	Checks whether or not this node should be part of the last modified index */
-bool
-Inode::InLastModifiedIndex() const
-{
-	return IsFile() || IsSymLink();
 }
 
 
