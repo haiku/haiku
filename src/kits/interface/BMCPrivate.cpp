@@ -372,6 +372,7 @@ _BMCMenuBar_::MinSize()
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
 
+
 BSize
 _BMCMenuBar_::MaxSize()
 {
