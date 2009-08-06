@@ -708,7 +708,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 					request->info.offset, request->info.area,
 					&reply.info.buffer);
 			} else {
-				reply.info = request->info; //buffer id is kept
+				reply.info = request->info; // buffer id is kept
 				status = gBufferManager->RegisterBuffer(request->team,
 					request->info.buffer, &reply.info.size, &reply.info.flags,
 					&reply.info.offset, &reply.info.area);
@@ -720,7 +720,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		case SERVER_UNREGISTER_BUFFER:
 		{
 			const server_unregister_buffer_command *cmd = reinterpret_cast<
-					const server_unregister_buffer_command *>(data);
+				const server_unregister_buffer_command *>(data);
 
 			gBufferManager->UnregisterBuffer(cmd->team, cmd->bufferid);
 			break;
@@ -736,7 +736,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 
 			rv = gMMediaFilesManager->RewindTypes(
 					&types, &reply.count);
-			if(reply.count>0) {
+			if (reply.count > 0) {
 				// we create an area here, and pass it to the library,
 				// where it will be deleted.
 				char *start_addr;
@@ -780,7 +780,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 					&items, &reply.count);
 			// we create an area here, and pass it to the library,
 			// where it will be deleted.
-			if(reply.count>0) {
+			if (reply.count > 0) {
 				char *start_addr;
 				size_t size = ((reply.count * B_MEDIA_NAME_LENGTH)
 					+ B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);

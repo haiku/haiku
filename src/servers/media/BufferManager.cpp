@@ -2,167 +2,185 @@
  * Copyright 2002, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#include <MediaDefs.h>
-#include <Autolock.h>
+
+
 #include "BufferManager.h"
-#include "SharedBufferList.h"
+
+#include <Autolock.h>
+
 #include "debug.h"
+#include "SharedBufferList.h"
+
 
 BufferManager::BufferManager()
- :	fSharedBufferList(_shared_buffer_list::Clone()),
-	fNextBufferId(1),
-	fLocker(new BLocker("buffer manager locker")),
-	fBufferInfoMap(new Map<media_buffer_id, buffer_info>)
+	:
+	fSharedBufferList(_shared_buffer_list::Clone()),
+	fNextBufferID(1),
+	fLocker("buffer manager locker")
 {
-	fSharedBufferListId = area_for(fSharedBufferList);
-	ASSERT(fSharedBufferList!=NULL);
-	ASSERT(fSharedBufferListId > 0);
+	fSharedBufferListID = area_for(fSharedBufferList);
 }
+
 
 BufferManager::~BufferManager()
 {
 	fSharedBufferList->Unmap();
-	delete fLocker;
-	delete fBufferInfoMap;
 }
+
 
 area_id
 BufferManager::SharedBufferListID()
 {
-	return fSharedBufferListId;
+	return fSharedBufferListID;
 }
 
 status_t	
-BufferManager::RegisterBuffer(team_id teamid, media_buffer_id bufferid,
-							  size_t *size, int32 *flags, size_t *offset, area_id *area)
+BufferManager::RegisterBuffer(team_id team, media_buffer_id bufferID,
+	size_t* _size, int32* _flags, size_t* _offset, area_id* _area)
 {
 	BAutolock lock(fLocker);
 
-	TRACE("RegisterBuffer team = %ld, bufferid = %ld\n", teamid, bufferid);
-	
-	buffer_info *info;
-	if (!fBufferInfoMap->Get(bufferid, &info)) {
-		ERROR("failed to register buffer! team = %ld, bufferid = %ld\n", teamid, bufferid);
+	TRACE("RegisterBuffer team = %ld, bufferid = %ld\n", team, bufferID);
+
+	buffer_info* info;
+	if (!fBufferInfoMap.Get(bufferID, &info)) {
+		ERROR("failed to register buffer! team = %ld, bufferid = %ld\n", team,
+			bufferID);
 		return B_ERROR;
 	}
-	
-	info->teams.Insert(teamid);
-	
-	*area 	= info->area;
-	*offset	= info->offset;
-	*size 	= info->size, 
-	*flags 	= info->flags;
+
+	info->teams.Insert(team);
+
+	*_area = info->area;
+	*_offset = info->offset;
+	*_size = info->size, 
+	*_flags = info->flags;
+
 	return B_OK;
 }
 
+
 status_t
-BufferManager::RegisterBuffer(team_id teamid, size_t size, int32 flags, size_t offset, area_id area,
-							  media_buffer_id *bufferid)
+BufferManager::RegisterBuffer(team_id team, size_t size, int32 flags,
+	size_t offset, area_id area, media_buffer_id* _bufferID)
 {
 	BAutolock lock(fLocker);
-	TRACE("RegisterBuffer team = %ld, areaid = %ld, offset = %ld, size = %ld\n", teamid, area, offset, size);
+	TRACE("RegisterBuffer team = %ld, area = %ld, offset = %ld, size = %ld\n",
+		team, area, offset, size);
 	
-	void *adr;
-	area_id newarea;
-
-	newarea = clone_area("media_server cloned buffer", &adr, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
-	if (newarea <= B_OK) {
-		ERROR("RegisterBuffer: failed to clone buffer! error = %#lx, team = %ld, areaid = %ld, offset = %ld, size = %ld\n", newarea, teamid, area, offset, size);
+	void* address;
+	area_id clonedArea = clone_area("media_server cloned buffer", &address,
+		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
+	if (clonedArea < 0) {
+		ERROR("RegisterBuffer: failed to clone buffer! error = %#lx, team = "
+			"%ld, areaid = %ld, offset = %ld, size = %ld\n", clonedArea, team,
+			area, offset, size);
 		return B_ERROR;
 	}
 
 	buffer_info info;
-
-	*bufferid	= fNextBufferId;
-	info.id 	= fNextBufferId;
-	info.area 	= newarea;
+	info.id = fNextBufferID++;
+	info.area = clonedArea;
 	info.offset = offset;
-	info.size 	= size;
-	info.flags	= flags;
-	info.teams.Insert(teamid);
-	fBufferInfoMap->Insert(fNextBufferId, info);
+	info.size = size;
+	info.flags = flags;
+	info.teams.Insert(team);
 
-	TRACE("RegisterBuffer: done, bufferid = %ld\n", fNextBufferId);
+	*_bufferID = info.id;
 
-	fNextBufferId += 1;
-	
+	fBufferInfoMap.Insert(info.id, info);
+
+	TRACE("RegisterBuffer: done, bufferID = %ld\n", info.id);
+
 	return B_OK;
 }
 
+
 status_t
-BufferManager::UnregisterBuffer(team_id teamid, media_buffer_id bufferid)
+BufferManager::UnregisterBuffer(team_id team, media_buffer_id bufferID)
 {
 	BAutolock lock(fLocker);
-	TRACE("UnregisterBuffer: team = %ld, bufferid = %ld\n", teamid, bufferid);
+	TRACE("UnregisterBuffer: team = %ld, bufferid = %ld\n", team, bufferID);
 
-	buffer_info *info;
-	int index;
-	
-	if (!fBufferInfoMap->Get(bufferid, &info)) {
-		ERROR("UnregisterBuffer: failed to unregister buffer! team = %ld, bufferid = %ld\n", teamid, bufferid);
+	buffer_info* info;
+	if (!fBufferInfoMap.Get(bufferID, &info)) {
+		ERROR("UnregisterBuffer: failed to unregister buffer! team = %ld, "
+			"bufferid = %ld\n", team, bufferID);
 		return B_ERROR;
 	}
 
-	index = info->teams.Find(teamid);
+	int index = info->teams.Find(team);
 	if (index < 0) {
-		ERROR("UnregisterBuffer: failed to find team = %ld belonging to bufferid = %ld\n", teamid, bufferid);
+		ERROR("UnregisterBuffer: failed to find team = %ld belonging to "
+			"bufferID = %ld\n", team, bufferID);
 		return B_ERROR;
 	}
 	
 	if (!info->teams.Remove(index)) {
-		ERROR("UnregisterBuffer: failed to remove team = %ld from bufferid = %ld\n", teamid, bufferid);
+		ERROR("UnregisterBuffer: failed to remove team = %ld from bufferID "
+			"= %ld\n", team, bufferID);
 		return B_ERROR;
 	}
-	TRACE("UnregisterBuffer: team = %ld removed from bufferid = %ld\n", teamid, bufferid);
+
+	TRACE("UnregisterBuffer: team = %ld removed from bufferID = %ld\n", team,
+		bufferID);
 
 	if (info->teams.IsEmpty()) {
-	
-		if (!fBufferInfoMap->Remove(bufferid)) {
-			ERROR("UnregisterBuffer: failed to remove bufferid = %ld\n", bufferid);
+		if (!fBufferInfoMap.Remove(bufferID)) {
+			ERROR("UnregisterBuffer: failed to remove bufferID = %ld\n",
+				bufferID);
 			return B_ERROR;
 		}
-	
-		TRACE("UnregisterBuffer: bufferid = %ld removed\n", bufferid);
+
+		TRACE("UnregisterBuffer: bufferID = %ld removed\n", bufferID);
 	}
 
 	return B_OK;
 }
+
 
 void
 BufferManager::CleanupTeam(team_id team)
 {
 	BAutolock lock(fLocker);
-	buffer_info *info;
-	
+
 	TRACE("BufferManager::CleanupTeam: team %ld\n", team);
-	
-	for (fBufferInfoMap->Rewind(); fBufferInfoMap->GetNext(&info); ) {
-		team_id *otherteam;
-		for (info->teams.Rewind(); info->teams.GetNext(&otherteam); ) {
-			if (team == *otherteam) {
-				PRINT(1, "BufferManager::CleanupTeam: removing team %ld from buffer id %ld\n", team, info->id);
+
+	buffer_info* info;
+	for (fBufferInfoMap.Rewind(); fBufferInfoMap.GetNext(&info); ) {
+		team_id* currentTeam;
+		for (info->teams.Rewind(); info->teams.GetNext(&currentTeam); ) {
+			if (team == *currentTeam) {
+				PRINT(1, "BufferManager::CleanupTeam: removing team %ld from "
+					"buffer id %ld\n", team, info->id);
 				info->teams.RemoveCurrent();
 			}
 		}
 		if (info->teams.IsEmpty()) {
-			PRINT(1, "BufferManager::CleanupTeam: removing buffer id %ld that has no teams\n", info->id);
-			fBufferInfoMap->RemoveCurrent(); 
+			PRINT(1, "BufferManager::CleanupTeam: removing buffer id %ld that "
+				"has no teams\n", info->id);
+			fBufferInfoMap.RemoveCurrent(); 
 		}
 	}
 }
+
 
 void
 BufferManager::Dump()
 {
 	BAutolock lock(fLocker);
-	buffer_info *info;
+
 	printf("\n");
 	printf("BufferManager: list of buffers follows:\n");
-	for (fBufferInfoMap->Rewind(); fBufferInfoMap->GetNext(&info); ) {
-		printf(" buffer-id %ld, area-id %ld, offset %ld, size %ld, flags %#08lx\n",
-			 info->id, info->area, info->offset, info->size, info->flags);
+
+	buffer_info *info;
+	for (fBufferInfoMap.Rewind(); fBufferInfoMap.GetNext(&info); ) {
+		printf(" buffer-id %ld, area-id %ld, offset %ld, size %ld, flags "
+			"%#08lx\n", info->id, info->area, info->offset, info->size,
+			info->flags);
 		printf("   assigned teams: ");
-		team_id *team;
+
+		team_id* team;
 		for (info->teams.Rewind(); info->teams.GetNext(&team); ) {
 			printf("%ld, ", *team);
 		}
