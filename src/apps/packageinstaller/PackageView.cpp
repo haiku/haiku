@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Haiku, Inc.
+ * Copyright 2007-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -69,7 +69,7 @@ PackageView::PackageView(BRect frame, const entry_ref *ref)
 
 	// Check whether the package has been successfuly parsed
 	status_t ret = fInfo.InitCheck();
-	if (ret == B_OK) 
+	if (ret == B_OK)
 		_InitProfiles();
 
 	ResizeTo(Bounds().Width(), fInstall->Frame().bottom + 4);
@@ -129,7 +129,7 @@ PackageView::AttachedToWindow()
 			PackageImageViewer *imageViewer = new PackageImageViewer(image);
 			imageViewer->Go();
 		}
-	
+
 		// Show the disclaimer/info text popup, if present
 		BString disclaimer = fInfo.GetDisclaimer();
 		if (disclaimer.Length() != 0) {
@@ -175,14 +175,14 @@ PackageView::MessageReceived(BMessage *msg)
 				notify = new BAlert("installation_failed", // TODO: Review this
 					T("The requested package failed to install on your system. This "
 						"might be a problem with the target package file. Please consult "
-						"this issue with the package distributor."), T("OK"), NULL, 
+						"this issue with the package distributor."), T("OK"), NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 				fprintf(stderr, "Error while installing the package : %s\n", strerror(ret));
 			}
 			notify->Go();
 			fStatusWindow->Hide();
 			fInstall->SetEnabled(true);
-			
+
 			break;
 		}
 		case P_MSG_PATH_CHANGED:
@@ -196,7 +196,7 @@ PackageView::MessageReceived(BMessage *msg)
 		case P_MSG_OPEN_PANEL:
 			fOpenPanel->Show();
 			break;
-		case P_MSG_GROUP_CHANGED: 
+		case P_MSG_GROUP_CHANGED:
 		{
 			int32 index;
 			if (msg->FindInt32("index", &index) == B_OK) {
@@ -267,7 +267,7 @@ PackageView::Install()
 			T("The given package seems to be already installed on your system. "
 				"Would you like to uninstall the existing one and continue the "
 				"installation?"), T("Yes"), T("No"));
-		
+
 		if (reinstall->Go() == 0) {
 			// Uninstall the package
 			err = packageInfo.Uninstall();
@@ -305,10 +305,11 @@ PackageView::Install()
 
 	// Install files and directories
 	PackageItem *iter;
-	BPath installedTo;
+	ItemState state;
 	uint32 i;
+	int32 choice;
 	BString label;
-	
+
 	packageInfo.SetName(fInfo.GetName());
 	// TODO: Here's a small problem, since right now it's not quite sure
 	//		which description is really used as such. The one displayed on
@@ -322,20 +323,35 @@ PackageView::Install()
 	packageInfo.SetDescription(description.String());
 	packageInfo.SetSpaceNeeded(type->space_needed);
 
+	fItemExistsPolicy = P_EXISTS_NONE;
+
 	for (i = 0; i < n; i++) {
+		state.Reset(fItemExistsPolicy); // Reset the current item state
 		iter = static_cast<PackageItem *>(type->items.ItemAt(i));
-		err = iter->WriteToPath(fCurrentPath.Path(), &installedTo);
+
+		err = iter->WriteToPath(fCurrentPath.Path(), &state);
+		if (err == B_FILE_EXISTS) {
+			// Writing to path failed because path already exists - ask the user
+			// what to do and retry the writing process
+			choice = _ItemExists(*iter, state.destination);
+			if (choice != P_EXISTS_ABORT) {
+				state.policy = choice;
+				err = iter->WriteToPath(fCurrentPath.Path(), &state);
+			}
+		}
+
 		if (err != B_OK) {
 			fprintf(stderr, "Error while writing path %s\n", fCurrentPath.Path());
 			return err;
 		}
+
 		if (fStatusWindow->Stopped())
 			return B_FILE_EXISTS;
 		label = "";
 		label << (uint32)(i + 1) << " of " << (uint32)n;
 		fStatusWindow->StageStep(1, NULL, label.String());
 
-		packageInfo.AddItem(installedTo.Path());
+		packageInfo.AddItem(state.destination.Path());
 	}
 
 	fStatusWindow->StageStep(1, "Finishing installation", "");
@@ -355,7 +371,7 @@ void
 PackageView::_InitView()
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	BTextView *description = new BTextView(BRect(0, 0, 20, 20), "description",
 		BRect(4, 4, 16, 16), B_FOLLOW_NONE, B_WILL_DRAW);
 	description->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -370,15 +386,15 @@ PackageView::_InitView()
 	installType->SetAlignment(B_ALIGN_RIGHT);
 	installType->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
 
-	fInstallDesc = new BTextView(BRect(0, 0, 10, 10), "install_desc", 
+	fInstallDesc = new BTextView(BRect(0, 0, 10, 10), "install_desc",
 		BRect(2, 2, 8, 8), B_FOLLOW_NONE, B_WILL_DRAW);
 	fInstallDesc->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fInstallDesc->MakeEditable(false);
 	fInstallDesc->MakeSelectable(false);
 	fInstallDesc->SetText(T("No installation type selected"));
 	fInstallDesc->TextHeight(0, fInstallDesc->TextLength());
-	
-	fInstall = new BButton("install_button", T("Install"), 
+
+	fInstall = new BButton("install_button", T("Install"),
 			new BMessage(P_MSG_INSTALL));
 
 	BView *installField = BGroupLayoutBuilder(B_VERTICAL, 5.0f)
@@ -400,7 +416,7 @@ PackageView::_InitView()
 		.End();
 
 	AddChild(root);
-	
+
 	fInstall->MakeDefault(true);
 }*/
 
@@ -409,7 +425,7 @@ void
 PackageView::_InitView()
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	BRect rect = Bounds();
 	BTextView *description = new BTextView(rect, "description",
 		rect.InsetByCopy(5, 5), B_FOLLOW_NONE, B_WILL_DRAW);
@@ -424,7 +440,7 @@ PackageView::_InitView()
 		description->ResizeTo(rect.Width() - B_V_SCROLL_BAR_WIDTH, kMaxDescHeight);
 		BScrollView *scroller = new BScrollView("desciption_view", description,
 				B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_NO_BORDER);
-		
+
 		AddChild(scroller);
 		rect = scroller->Frame();
 	}
@@ -433,24 +449,24 @@ PackageView::_InitView()
 		AddChild(description);
 		rect = description->Frame();
 	}
-	
+
 	rect.top = rect.bottom + 2;
 	rect.bottom += 100;
 	BBox *installBox = new BBox(rect.InsetByCopy(2, 2), "install_box");
 
 	fInstallTypes = new BPopUpMenu("none");
-	
+
 	BMenuField *installType = new BMenuField(BRect(2, 2, 100, 50), "install_type",
 		T("Installation type:"), fInstallTypes, false);
 	installType->SetDivider(installType->StringWidth(installType->Label()) + 8);
 	installType->SetAlignment(B_ALIGN_RIGHT);
 	installType->ResizeToPreferred();
-	
+
 	installBox->AddChild(installType);
-	
+
 	rect = installBox->Bounds().InsetBySelf(4, 4);
 	rect.top = installType->Frame().bottom;
-	fInstallDesc = new BTextView(rect, "install_desc", 
+	fInstallDesc = new BTextView(rect, "install_desc",
 		BRect(2, 2, rect.Width() - 2, rect.Height() - 2), B_FOLLOW_NONE,
 		B_WILL_DRAW);
 	fInstallDesc->MakeEditable(false);
@@ -461,28 +477,28 @@ PackageView::_InitView()
 	fInstallDesc->ResizeTo(rect.Width() - B_V_SCROLL_BAR_WIDTH, 60);
 	BScrollView *scroller = new BScrollView("desciption_view", fInstallDesc,
 				B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_NO_BORDER);
-	
+
 	installBox->ResizeTo(installBox->Bounds().Width(),
 		scroller->Frame().bottom + 10);
 
 	installBox->AddChild(scroller);
-	
+
 	AddChild(installBox);
-	
+
 	fDestination = new BPopUpMenu("none");
-	
+
 	rect = installBox->Frame();
 	rect.top = rect.bottom + 5;
 	rect.bottom += 35;
-	fDestField = new BMenuField(rect, "install_to", T("Install to:"), 
+	fDestField = new BMenuField(rect, "install_to", T("Install to:"),
 			fDestination, false);
 	fDestField->SetDivider(fDestField->StringWidth(fDestField->Label()) + 8);
 	fDestField->SetAlignment(B_ALIGN_RIGHT);
 	fDestField->ResizeToPreferred();
-	
+
 	AddChild(fDestField);
-	
-	fInstall = new BButton(rect, "install_button", T("Install"), 
+
+	fInstall = new BButton(rect, "install_button", T("Install"),
 			new BMessage(P_MSG_INSTALL));
 	fInstall->ResizeToPreferred();
 	AddChild(fInstall);
@@ -506,7 +522,7 @@ PackageView::_InitProfiles()
 		prof = fInfo.GetProfile(0);
 		convert_size(prof->space_needed, sizeString, 32);
 		name << prof->name << " (" << sizeString << ")";
-		
+
 		message = new BMessage(P_MSG_GROUP_CHANGED);
 		message->AddInt32("index", 0);
 		item = new BMenuItem(name.String(), message);
@@ -517,12 +533,12 @@ PackageView::_InitProfiles()
 
 	for (i = 1; i < num; i++) {
 		prof = fInfo.GetProfile(i);
-		
+
 		if (prof) {
 			convert_size(prof->space_needed, sizeString, 32);
 			name = prof->name;
 			name << " (" << sizeString << ")";
-		
+
 			message = new BMessage(P_MSG_GROUP_CHANGED);
 			message->AddInt32("index", i);
 			item = new BMenuItem(name.String(), message);
@@ -531,6 +547,68 @@ PackageView::_InitProfiles()
 		else
 			fInstallTypes->AddSeparatorItem();
 	}
+}
+
+
+int32
+PackageView::_ItemExists(PackageItem &item, BPath &path)
+{
+	int32 choice = P_EXISTS_NONE;
+
+	switch (fItemExistsPolicy) {
+		case P_EXISTS_OVERWRITE:
+			choice = P_EXISTS_OVERWRITE;
+			break;
+
+		case P_EXISTS_SKIP:
+			choice = P_EXISTS_SKIP;
+			break;
+
+		case P_EXISTS_ASK:
+		case P_EXISTS_NONE:
+		{
+			BString alertString = T("The ");
+
+			alertString << item.ItemKind() << T(" named \'") << path.Leaf() << "\' ";
+			alertString << T("already exists in the given path. Should the "
+				"existing file be replaced with the one from this package?");
+
+			BAlert *alert = new BAlert(T("file_exists"), alertString.String(),
+				T("Yes"), T("No"), T("Abort"));
+
+			choice = alert->Go();
+			switch (choice) {
+				case 0:
+					choice = P_EXISTS_OVERWRITE;
+					break;
+				case 1:
+					choice = P_EXISTS_SKIP;
+					break;
+				default:
+					return P_EXISTS_ABORT;
+			}
+
+			if (fItemExistsPolicy == P_EXISTS_NONE) {
+				// TODO: Maybe add 'No, but ask again' type of choice as well?
+				alertString = T("Should this decision be remembered and all "
+					"existing files encountered in the future be ");
+				alertString << ((choice == P_EXISTS_OVERWRITE)
+					? T("replaced?") : T("skipped?"));
+
+				alert = new BAlert(T("policy_decision"), alertString.String(),
+					T("Yes"), T("No"));
+
+				int32 decision = alert->Go();
+				if (decision == 0)
+					fItemExistsPolicy = choice;
+				else
+					fItemExistsPolicy = P_EXISTS_ASK;
+			}
+			break;
+		}
+	}
+
+	return choice;
 }
 
 
@@ -559,7 +637,7 @@ PackageView::_GroupChanged(int32 index)
 		BPath path;
 		BMessage *temp;
 		BVolume volume;
-			
+
 		if (prof->path_type == P_INSTALL_PATH) {
 			dev_t device;
 			BString name;
@@ -570,7 +648,7 @@ PackageView::_GroupChanged(int32 index)
 				if (volume.SetTo(device) == B_OK && !volume.IsReadOnly()) {
 					temp = new BMessage(P_MSG_PATH_CHANGED);
 					temp->AddString("path", BString(path.Path()));
-				
+
 					convert_size(volume.FreeBytes(), sizeString, 32);
 					name = path.Path();
 					name << " (" << sizeString << " free)";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Haiku, Inc.
+ * Copyright 2007-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -36,12 +36,13 @@ class PackageView : public BView {
 
 		void AttachedToWindow();
 		void MessageReceived(BMessage *msg);
-		
+
 		status_t Install();
 
 	private:
 		void _InitView();
 		void _InitProfiles();
+		int32 _ItemExists(PackageItem &item, BPath &path);
 
 		status_t _GroupChanged(int32 index);
 
@@ -54,6 +55,7 @@ class PackageView : public BView {
 		BFilePanel *fOpenPanel;
 		BPath fCurrentPath;
 		uint32 fCurrentType;
+		int32 fItemExistsPolicy;
 
 		PackageInfo fInfo;
 		PackageStatus *fStatusWindow;

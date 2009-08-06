@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Haiku, Inc.
+ * Copyright 2007-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 
+#include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <Path.h>
@@ -32,8 +33,36 @@ enum {
 	P_USER_PATH
 };
 
+// Existing item overwriting policy of a single file
+enum {
+	P_EXISTS_ASK = 0,
+	P_EXISTS_OVERWRITE,
+	P_EXISTS_SKIP,
+	P_EXISTS_ABORT,
+	P_EXISTS_NONE
+};
+
 extern status_t inflate_data(uint8* in, uint32 inSize, uint8* out,
 	uint32 outSize);
+
+
+struct ItemState {
+	ItemState() : policy(P_EXISTS_NONE), status(B_NO_INIT) {}
+	~ItemState() {}
+
+	inline void Reset(int32 currentPolicy)
+	{
+		destination.Unset();
+		parent.Unset();
+		status = B_NO_INIT;
+		policy = currentPolicy;
+	}
+
+	BPath		destination;
+	BDirectory	parent;
+	uint8		policy;
+	status_t	status;
+};
 
 
 class PackageItem {
@@ -44,16 +73,15 @@ public:
 	virtual					~PackageItem();
 
 	virtual	status_t		WriteToPath(const char* path = NULL,
-								BPath* final = NULL) = 0;
+								ItemState *state = NULL) = 0;
 	virtual	void			SetTo(BFile* parent, const BString& path,
 								uint8 type, uint32 ctime, uint32 mtime,
 								uint64 offset = 0, uint64 size = 0);
+	virtual	const char*		ItemKind() = 0;
 
 protected:
-	virtual	const char*		ItemKind() = 0;
-			int32			ItemExists(const char* name);
 			status_t		InitPath(const char* path, BPath* destination);
-			status_t		HandleAttributes(BPath* destination, BNode* node, 
+			status_t		HandleAttributes(BPath* destination, BNode* node,
 								const char* header);
 
 			status_t		ParseAttribute(uint8* buffer, BNode* node,
@@ -84,9 +112,7 @@ public:
 								uint64 offset = 0, uint64 size = 0);
 
 	virtual	status_t		WriteToPath(const char* path = NULL,
-								BPath* final = NULL);
-
-protected:
+								ItemState *state = NULL);
 	virtual	const char*		ItemKind();
 };
 
@@ -100,16 +126,14 @@ public:
 								const BString& signature, uint32 mode);
 
 	virtual	status_t		WriteToPath(const char* path = NULL,
-								BPath* final = NULL);
-
-protected:
+								ItemState *state = NULL);
 	virtual	const char*		ItemKind();
 
 private:
 			uint64			fOriginalSize;
 			uint32			fPlatform;
 			uint32			fMode;
-		
+
 			BString			fMimeType;
 			BString			fSignature;
 };
@@ -119,13 +143,11 @@ class PackageLink : public PackageItem {
 public:
 							PackageLink(BFile* parent, const BString& path,
 								const BString& link, uint8 type,  uint32 ctime,
-								uint32 mtime, uint32 mode, uint64 offset = 0, 
+								uint32 mtime, uint32 mode, uint64 offset = 0,
 								uint64 size = 0);
 
 	virtual	status_t		WriteToPath(const char* path = NULL,
-								BPath* final = NULL);
-
-protected:
+								ItemState *state = NULL);
 	virtual	const char*		ItemKind();
 
 private:
