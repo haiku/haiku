@@ -28,11 +28,12 @@
 #ifndef HASH_MAP_H
 #define HASH_MAP_H
 
-//#include <Debug.h>
+
 #include <Locker.h>
 
 #include "AutoLocker.h"
 #include "OpenHashTable.h"
+
 
 namespace BPrivate {
 
@@ -107,7 +108,17 @@ public:
 			_FindNext();
 			return result;
 		}
-	
+
+		Value* NextValue()
+		{
+			if (fElement == NULL)
+				return NULL;
+			
+			Value* value = &fElement->fValue;
+			_FindNext();
+			return value;
+		}
+
 		Entry Remove()
 		{
 			if (!fLastElement)
@@ -169,6 +180,7 @@ public:
 	Value Remove(const Key& key);
 	void Clear();
 	Value Get(const Key& key) const;
+	bool Get(const Key& key, Value*& _value) const;
 
 	bool ContainsKey(const Key& key) const;
 
@@ -402,6 +414,19 @@ HashMap<Key, Value>::Get(const Key& key) const
 	if (Element* element = _FindElement(key))
 		return element->fValue;
 	return Value();
+}
+
+// Get
+template<typename Key, typename Value>
+bool
+HashMap<Key, Value>::Get(const Key& key, Value*& _value) const
+{
+	if (Element* element = _FindElement(key)) {
+		_value = &element->fValue;
+		return true;
+	}
+
+	return false;
 }
 
 // ContainsKey
