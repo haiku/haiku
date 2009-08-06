@@ -363,6 +363,16 @@ _BMCMenuBar_::MakeFocus(bool focused)
 
 
 BSize
+_BMCMenuBar_::MinSize()
+{
+	BSize size;
+	BMenuBar::GetPreferredSize(&size.width, &size.height);
+	// account for popup indicator + a few pixels margin
+	size.width += 13.0;
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+
+BSize
 _BMCMenuBar_::MaxSize()
 {
 	// The maximum width of a normal BMenuBar is unlimited, but we want it

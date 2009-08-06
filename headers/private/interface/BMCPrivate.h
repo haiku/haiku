@@ -54,6 +54,7 @@ public:
 			bool				IsPopUpMarkerShown() const
 									{ return fShowPopUpMarker; }
 
+	virtual BSize				MinSize();
 	virtual	BSize				MaxSize();
 
 private:
