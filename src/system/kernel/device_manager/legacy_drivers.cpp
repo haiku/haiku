@@ -196,6 +196,7 @@ static int32 sDriverEvents;
 static EntryList sDriversToAdd;
 static EntryList sDriversToRemove;
 static mutex sDriversListLock = MUTEX_INITIALIZER("driversList");
+	// inner lock, protects the sDriversToAdd/sDriversToRemove lists only
 static DirectoryWatcher sDirectoryWatcher;
 static DirectoryNodeHash sDirectoryNodeHash;
 static recursive_lock sLock;
@@ -641,13 +642,18 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 
 	// something happened, let's see what it was
 
-	RecursiveLocker locker(sLock);
-	MutexLocker _(sDriversListLock);
+	RecursiveLocker _(sLock);
+
+	// Add new drivers
 
 	while (true) {
+		MutexLocker listLocker(sDriversListLock);
+
 		path_entry* path = sDriversToAdd.RemoveHead();
 		if (path == NULL)
 			break;
+
+		listLocker.Unlock();
 
 		legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
 			get_leaf(path->path));
@@ -657,10 +663,17 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 			driver->binary_updated = true;
 		delete path;
 	}
+
+	// Mark removed drivers as updated
+
 	while (true) {
+		MutexLocker listLocker(sDriversListLock);
+
 		path_entry* path = sDriversToRemove.RemoveHead();
 		if (path == NULL)
 			break;
+
+		listLocker.Unlock();
 
 		legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
 			get_leaf(path->path));
@@ -668,6 +681,8 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 			driver->binary_updated = true;
 		delete path;
 	}
+
+	// Reload updated drivers
 
 	hash_iterator iterator;
 	hash_open(sDriverHash, &iterator);
