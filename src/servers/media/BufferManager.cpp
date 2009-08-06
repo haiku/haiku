@@ -182,10 +182,32 @@ BufferManager::Dump()
 area_id
 BufferManager::_CloneArea(area_id area)
 {
+	clone_info* info;
+	if (fCloneInfoMap.Get(area, info)) {
+		// we have already cloned this particular area
+		TRACE("BufferManager::_CloneArea() area %ld has already been cloned "
+			"(id %ld)\n", area, info->clone);
+
+		info->ref_count++;
+		return info->clone;
+	}
+
 	void* address;
 	area_id clonedArea = clone_area("media_server cloned buffer", &address,
 		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
-	
+
+	TRACE("BufferManager::_CloneArea() cloned area %ld, clone id %ld\n",
+		area, clonedArea);
+
+	if (clonedArea >= 0) {
+		clone_info info;
+		info.clone = clonedArea;
+		info.ref_count = 1;
+
+		fCloneInfoMap.Put(area, info);
+		fSourceInfoMap.Put(clonedArea, area);
+	}
+
 	return clonedArea;
 }
 
@@ -193,5 +215,24 @@ BufferManager::_CloneArea(area_id area)
 void
 BufferManager::_ReleaseClonedArea(area_id clone)
 {
-	delete_area(clone);
+	area_id source = fSourceInfoMap.Get(clone);
+
+	clone_info* info;
+	if (!fCloneInfoMap.Get(source, info)) {
+		ERROR("BufferManager::_ReleaseClonedArea(): could not find clone info "
+			"for id %ld (clone %ld)\n", source, clone);
+		return;
+	}
+
+	if (--info->ref_count == 0) {
+		TRACE("BufferManager::_ReleaseClonedArea(): delete cloned area %ld "
+			"(source %ld)\n", clone, source);
+
+		fSourceInfoMap.Remove(clone);
+		fCloneInfoMap.Remove(source);
+		delete_area(clone);
+	} else {
+		TRACE("BufferManager::_ReleaseClonedArea(): released cloned area %ld "
+			"(source %ld)\n", clone, source);
+	}
 }

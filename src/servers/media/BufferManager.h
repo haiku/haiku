@@ -44,7 +44,6 @@ private:
 
 private:
 	struct clone_info {
-		area_id				source;
 		area_id				clone;
 		vint32				ref_count;
 	};
@@ -98,6 +97,7 @@ private:
 
 	typedef HashMap<id_hash<media_buffer_id>, buffer_info> BufferInfoMap;
 	typedef HashMap<id_hash<area_id>, clone_info> CloneInfoMap;
+	typedef HashMap<id_hash<area_id>, area_id> SourceInfoMap;
 
 			_shared_buffer_list* fSharedBufferList;
 			area_id			fSharedBufferListID;
@@ -105,5 +105,6 @@ private:
 			BLocker			fLocker;
 			BufferInfoMap	fBufferInfoMap;
 			CloneInfoMap	fCloneInfoMap;
+			SourceInfoMap	fSourceInfoMap;
 };
 
