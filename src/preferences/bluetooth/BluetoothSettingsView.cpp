@@ -28,7 +28,7 @@ static const int32 kMsgSetAntialiasing = 'anti';
 static const int32 kMsgSetDeviceClassDesktop = 'sDCd';
 static const int32 kMsgSetDeviceClassServer = 'sDCs';
 static const int32 kMsgSetDeviceClassLaptop = 'sDCl';
-static const int32 kMsgSetDeviceClassNetbook = 'sDCn';
+static const int32 kMsgSetDeviceClassHandheld = 'sDCn';
 static const int32 kMsgSetDeviceClassSmartPhone = 'sDCp';
 
 static const int32 kMsgSetAverageWeight = 'afEa';
@@ -41,7 +41,7 @@ static const char* kAlwaysLabel = "Always ask";
 static const char* kDesktopLabel = "Desktop";
 static const char* kServerLabel = "Server";
 static const char* kLaptopLabel = "Laptop";
-static const char* kNetBookLabel = "NetBook";
+static const char* kHandheldLabel = "Handheld";
 static const char* kPhoneLabel = "Smart Phone";
 
 
@@ -163,7 +163,7 @@ BluetoothSettingsView::MessageReceived(BMessage *msg)
 			break;
 		}
 
-		case kMsgSetDeviceClassNetbook:
+		case kMsgSetDeviceClassHandheld:
 		{	
 			devClass.SetRecord(1, 4, 0x72);
 			ActiveLocalDevice->SetDeviceClass(devClass);
@@ -232,8 +232,8 @@ BluetoothSettingsView::_BuildHintingMenu()
 	item = new BMenuItem(kLaptopLabel, message);
 	fHintingMenu->AddItem(item);
 
-	message = new BMessage(kMsgSetDeviceClassNetbook);
-	item = new BMenuItem(kNetBookLabel, message);
+	message = new BMessage(kMsgSetDeviceClassHandheld);
+	item = new BMenuItem(kHandheldLabel, message);
 	fHintingMenu->AddItem(item);
 	
 	message = new BMessage(kMsgSetDeviceClassSmartPhone);
