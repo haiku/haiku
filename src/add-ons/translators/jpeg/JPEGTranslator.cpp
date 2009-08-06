@@ -92,8 +92,6 @@ static status_t Decompress(BPositionIO *in, BPositionIO *out,
 static status_t Error(j_common_ptr cinfo, status_t error = B_ERROR);
 
 
-bool gAreSettingsRunning = false;
-
 
 //!	Make settings to defaults
 void
@@ -805,14 +803,12 @@ TranslatorAboutView::TranslatorAboutView(BRect frame, const char *name)
 TranslatorView::TranslatorView(BRect frame, const char *name)
 	: BTabView(frame, name)
 {
-	// Set global var to true
-	gAreSettingsRunning = true;
-
 	// Load settings to global settings struct
 	LoadSettings(&fSettings);
 
 	BRect contentSize = ContainerView()->Bounds();
-	SView *view = new TranslatorWriteView(contentSize, "Write", &fSettings);
+	SView *view = new TranslatorWriteView(contentSize, "Write",
+		&fSettings);
 	AddTab(view);
 	view = new TranslatorReadView(contentSize, "Read", &fSettings);
 	AddTab(view);
@@ -828,22 +824,6 @@ TranslatorView::TranslatorView(BRect frame, const char *name)
 
 TranslatorView::~TranslatorView()
 {
-	gAreSettingsRunning = false;
-}
-
-
-//!	Attached to window - resize parent to preferred
-void
-TranslatorView::AttachedToWindow()
-{
-	BTabView::AttachedToWindow();
-}
-
-
-void
-TranslatorView::Select(int32 index)
-{
-	BTabView::Select(index);
 }
 
 

@@ -164,9 +164,6 @@ class TranslatorView : public BTabView {
 		TranslatorView(BRect frame, const char *name);
 		virtual ~TranslatorView();
 
-		virtual void	AttachedToWindow();
-		virtual void	Select(int32 index);
-
 	private:
 		jpeg_settings	fSettings;
 };
