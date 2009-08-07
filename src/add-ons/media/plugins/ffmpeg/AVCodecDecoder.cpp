@@ -334,7 +334,11 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 		= fInputFormat.u.encoded_audio.output.frame_rate;
 	outputAudioFormat.channel_count
 		= fInputFormat.u.encoded_audio.output.channel_count;
-	outputAudioFormat.format = media_raw_audio_format::B_AUDIO_SHORT;
+	outputAudioFormat.format = fInputFormat.u.encoded_audio.output.format;
+	// Check that format is not still a wild card!
+	if (outputAudioFormat.format == 0)
+		outputAudioFormat.format = media_raw_audio_format::B_AUDIO_SHORT;
+
 	outputAudioFormat.buffer_size
 		= 1024 * fInputFormat.u.encoded_audio.output.channel_count;
 	inOutFormat->type = B_MEDIA_RAW_AUDIO;
@@ -367,7 +371,9 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 		result);
 
 	fStartTime = 0;
-	fOutputFrameSize = 2 * outputAudioFormat.channel_count;
+	size_t sampleSize = outputAudioFormat.format
+		& media_raw_audio_format::B_AUDIO_SIZE_MASK;
+	fOutputFrameSize = sampleSize * outputAudioFormat.channel_count;
 	fOutputFrameCount = outputAudioFormat.buffer_size / fOutputFrameSize;
 	fOutputFrameRate = outputAudioFormat.frame_rate;
 	fChunkBuffer = 0;
