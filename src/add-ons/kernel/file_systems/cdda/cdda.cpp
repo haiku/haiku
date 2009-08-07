@@ -562,6 +562,14 @@ read_cdtext(int fd, struct cdtext &cdtext)
 
 	free(buffer);
 
+	if (cdtext.artist == NULL || cdtext.album == NULL)
+		return B_ERROR;
+
+	for (int i = 0; i < cdtext.track_count; i++) {
+		if (cdtext.titles[i] == NULL)
+			return B_ERROR;
+	}
+
 	sanitize_string(cdtext.artist);
 	sanitize_album(cdtext);
 	sanitize_titles(cdtext);
