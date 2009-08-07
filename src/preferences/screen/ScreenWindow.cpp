@@ -279,7 +279,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	fResolutionField = new BMenuField("ResolutionMenu", "Resolution:",
 		fResolutionMenu, NULL);
 
-	fColorsMenu = new BPopUpMenu("colors", true, true);
+	fColorsMenu = new BPopUpMenu("colors", true, false);
 
 	for (int32 i = 0; i < kColorSpaceCount; i++) {
 		BMessage *message = new BMessage(POP_COLORS_MSG);
@@ -1121,7 +1121,7 @@ ScreenWindow::_UpdateMonitor()
 		length = snprintf(text, sizeof(text),
 			"Horizonal Frequency:\t%lu - %lu kHz\n"
 			"Vertical Frequency:\t%lu - %lu Hz\n\n"
-			"Maximum Pixel Clock:\t%g MHz", 
+			"Maximum Pixel Clock:\t%g MHz",
 			info.min_horizontal_frequency, info.max_horizontal_frequency,
 			info.min_vertical_frequency, info.max_vertical_frequency,
 			info.max_pixel_clock / 1000.0);
@@ -1130,7 +1130,7 @@ ScreenWindow::_UpdateMonitor()
 		length += snprintf(text + length, sizeof(text) - length,
 			"%sSerial no.: %s", length ? "\n\n" : "",
 			info.serial_number);
-		if (info.produced.week != 0 && info.produced.year != 0 
+		if (info.produced.week != 0 && info.produced.year != 0
 			&& length < sizeof(text)) {
 			length += snprintf(text + length, sizeof(text) - length,
 				"(%u/%u)", info.produced.week, info.produced.year);
