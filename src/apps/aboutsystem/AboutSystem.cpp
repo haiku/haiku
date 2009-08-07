@@ -713,6 +713,7 @@ AboutView::_CreateCreditsView()
 		"Axel Dörfler\n"
 		"Jérôme Duval\n"
 		"René Gollent\n"
+		"Bryce Groff\n"
 		"Karsten Heimrich\n"
 		"Philippe Houdoin\n"
 		"Maurice Kalinowski\n"
@@ -724,10 +725,14 @@ AboutView::_CreateCreditsView()
 		"Marcus Overhagen\n"
 		"Michael Pfeiffer\n"
 		"François Revol\n"
+		"Philippe Saint-Pierre\n"
 		"Andrej Spielmann\n"
+		"Jonas Sundström\n"
 		"Oliver Tappe\n"
 		"Gerasim Troeglazov\n"
 		"Ingo Weinhold\n"
+		"Artur Wyszynski\n"
+		"Clemens Zeidler\n"
 		"Siarzhuk Zharski\n"
 		"\n");
 
@@ -751,7 +756,6 @@ AboutView::_CreateCreditsView()
 		"David Reid\n"
 		"Hugo Santos\n"
 		"Alexander G. M. Smith\n"
-		"Jonas Sundström\n"
 		"Bryan Varner\n"
 		"Nathan Whitehorn\n"
 		"Michael Wilber\n"
@@ -766,8 +770,11 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(
 		"Phil Greenway\n"
 		"Gavin James\n"
+		"Matt Madia\n"
+		"Jorge G. Mare (aka Koki)\n"
 		"Urias McCullough\n"
 		"Niels Sascha Reedijk\n"
+		"Joachim Seemer (Humdinger)\n"
 		"Jonathan Yoder\n"
 		"\n");
 
@@ -788,7 +795,6 @@ AboutView::_CreateCreditsView()
 		"Andreas Färber\n"
 		"Marc Flerackers\n"
 		"Michele Frau (zuMi)\n"
-		"Bryce Groff\n"
 		"Matthijs Hollemans\n"
 		"Mathew Hounsell\n"
 		"Morgan Howe\n"
@@ -809,6 +815,7 @@ AboutView::_CreateCreditsView()
 		"Jerome Leveque\n"
 		"Christof Lutteroth\n"
 		"Graham MacDonald\n"
+		"Brecht Machiels\n"
 		"Jan Matějek\n"
 		"Brian Matzon\n"
 		"Christopher ML Zumwalt May\n"
@@ -832,7 +839,6 @@ AboutView::_CreateCreditsView()
 		"Samuel Rodriguez Perez\n"
 		"Thomas Roell\n"
 		"Rafael Romo\n"
-		"Philippe Saint-Pierre\n"
 		"Ralf Schülke\n"
 		"Reznikov Sergei\n"
 		"Zousar Shaker\n"
@@ -845,9 +851,7 @@ AboutView::_CreateCreditsView()
 		"Ulrich Wimboeck\n"
 		"Johannes Wischert\n"
 		"James Woodcock\n"
-		"Artur Wyszynski\n"
 		"Gerald Zajac\n"
-		"Clemens Zeidler\n"
 		"Łukasz Zemczak\n"
 		"JiSheng Zhang\n"
 		"Zhao Shuai\n"
@@ -861,6 +865,11 @@ AboutView::_CreateCreditsView()
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert("Travis Geiselbrecht (and his NewOS kernel)\n");
 	fCreditsView->Insert("Michael Phipps (project founder)\n\n");
+	fCreditsView->Insert("The Haiku-Ports Team\n");
+	fCreditsView->Insert("The Haikuware Team and their Bounty Program\n");
+	fCreditsView->Insert("The BeGeistert Team\n\n");
+	fCreditsView->Insert("... and the many community members making "
+		"donations!\n\n");
 
 	// copyrights for various projects we use
 
