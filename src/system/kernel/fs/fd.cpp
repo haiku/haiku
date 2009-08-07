@@ -1,9 +1,11 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
+
 //! Operations on file descriptors
+
 
 #include <fd.h>
 
@@ -31,7 +33,7 @@
 
 static struct file_descriptor* get_fd_locked(struct io_context* context,
 	int fd);
-static struct file_descriptor *remove_fd(struct io_context *context, int fd);
+static struct file_descriptor* remove_fd(struct io_context* context, int fd);
 static void deselect_select_infos(file_descriptor* descriptor,
 	select_info* infos);
 
@@ -83,28 +85,30 @@ public:
 };
 
 
-/*** General fd routines ***/
+//	#pragma mark - General fd routines
 
 
 #ifdef DEBUG
-void dump_fd(int fd, struct file_descriptor *descriptor);
+void dump_fd(int fd, struct file_descriptor* descriptor);
 
 void
-dump_fd(int fd,struct file_descriptor *descriptor)
+dump_fd(int fd,struct file_descriptor* descriptor)
 {
-	dprintf("fd[%d] = %p: type = %ld, ref_count = %ld, ops = %p, u.vnode = %p, u.mount = %p, cookie = %p, open_mode = %lx, pos = %Ld\n",
-		fd, descriptor, descriptor->type, descriptor->ref_count, descriptor->ops,
-		descriptor->u.vnode, descriptor->u.mount, descriptor->cookie, descriptor->open_mode, descriptor->pos);
+	dprintf("fd[%d] = %p: type = %ld, ref_count = %ld, ops = %p, u.vnode = %p, "
+		"u.mount = %p, cookie = %p, open_mode = %lx, pos = %Ld\n",
+		fd, descriptor, descriptor->type, descriptor->ref_count,
+		descriptor->ops, descriptor->u.vnode, descriptor->u.mount,
+		descriptor->cookie, descriptor->open_mode, descriptor->pos);
 }
 #endif
 
 
-/** Allocates and initializes a new file_descriptor */
-
-struct file_descriptor *
+/*! Allocates and initializes a new file_descriptor.
+*/
+struct file_descriptor*
 alloc_fd(void)
 {
-	file_descriptor *descriptor
+	file_descriptor* descriptor
 		= (file_descriptor*)malloc(sizeof(struct file_descriptor));
 	if (descriptor == NULL)
 		return NULL;
@@ -121,14 +125,14 @@ alloc_fd(void)
 
 
 bool
-fd_close_on_exec(struct io_context *context, int fd)
+fd_close_on_exec(struct io_context* context, int fd)
 {
 	return CHECK_BIT(context->fds_close_on_exec[fd / 8], fd & 7) ? true : false;
 }
 
 
 void
-fd_set_close_on_exec(struct io_context *context, int fd, bool closeFD)
+fd_set_close_on_exec(struct io_context* context, int fd, bool closeFD)
 {
 	if (closeFD)
 		context->fds_close_on_exec[fd / 8] |= (1 << (fd & 7));
@@ -137,12 +141,12 @@ fd_set_close_on_exec(struct io_context *context, int fd, bool closeFD)
 }
 
 
-/** Searches a free slot in the FD table of the provided I/O context, and inserts
- *	the specified descriptor into it.
- */
-
+/*!	Searches a free slot in the FD table of the provided I/O context, and
+	inserts the specified descriptor into it.
+*/
 int
-new_fd_etc(struct io_context *context, struct file_descriptor *descriptor, int firstIndex)
+new_fd_etc(struct io_context* context, struct file_descriptor* descriptor,
+	int firstIndex)
 {
 	int fd = -1;
 	uint32 i;
@@ -172,18 +176,17 @@ err:
 
 
 int
-new_fd(struct io_context *context, struct file_descriptor *descriptor)
+new_fd(struct io_context* context, struct file_descriptor* descriptor)
 {
 	return new_fd_etc(context, descriptor, 0);
 }
 
 
-/**	Reduces the descriptor's reference counter, and frees all resources
- *	when it's no longer used.
- */
-
+/*!	Reduces the descriptor's reference counter, and frees all resources
+	when it's no longer used.
+*/
 void
-put_fd(struct file_descriptor *descriptor)
+put_fd(struct file_descriptor* descriptor)
 {
 	int32 previous = atomic_add(&descriptor->ref_count, -1);
 
@@ -221,12 +224,11 @@ put_fd(struct file_descriptor *descriptor)
 }
 
 
-/**	Decrements the open counter of the file descriptor and invokes
- *	its close hook when appropriate.
- */
-
+/*!	Decrements the open counter of the file descriptor and invokes
+	its close hook when appropriate.
+*/
 void
-close_fd(struct file_descriptor *descriptor)
+close_fd(struct file_descriptor* descriptor)
 {
 	if (atomic_add(&descriptor->open_count, -1) == 1) {
 		vfs_unlock_vnode_if_locked(descriptor);
@@ -238,9 +240,9 @@ close_fd(struct file_descriptor *descriptor)
 
 
 status_t
-close_fd_index(struct io_context *context, int fd)
+close_fd_index(struct io_context* context, int fd)
 {
-	struct file_descriptor *descriptor = remove_fd(context, fd);
+	struct file_descriptor* descriptor = remove_fd(context, fd);
 
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
@@ -253,34 +255,33 @@ close_fd_index(struct io_context *context, int fd)
 }
 
 
-/**	This descriptor's underlying object will be closed and freed
- *	as soon as possible (in one of the next calls to put_fd() -
- *	get_fd() will no longer succeed on this descriptor).
- *	This is useful if the underlying object is gone, for instance
- *	when a (mounted) volume got removed unexpectedly.
- */
-
+/*!	This descriptor's underlying object will be closed and freed as soon as
+	possible (in one of the next calls to put_fd() - get_fd() will no longer
+	succeed on this descriptor).
+	This is useful if the underlying object is gone, for instance when a
+	(mounted) volume got removed unexpectedly.
+*/
 void
-disconnect_fd(struct file_descriptor *descriptor)
+disconnect_fd(struct file_descriptor* descriptor)
 {
 	descriptor->open_mode |= O_DISCONNECTED;
 }
 
 
 void
-inc_fd_ref_count(struct file_descriptor *descriptor)
+inc_fd_ref_count(struct file_descriptor* descriptor)
 {
 	atomic_add(&descriptor->ref_count, 1);
 }
 
 
-static struct file_descriptor *
-get_fd_locked(struct io_context *context, int fd)
+static struct file_descriptor*
+get_fd_locked(struct io_context* context, int fd)
 {
 	if (fd < 0 || (uint32)fd >= context->table_size)
 		return NULL;
 
-	struct file_descriptor *descriptor = context->fds[fd];
+	struct file_descriptor* descriptor = context->fds[fd];
 
 	if (descriptor != NULL) {
 		// Disconnected descriptors cannot be accessed anymore
@@ -294,8 +295,8 @@ get_fd_locked(struct io_context *context, int fd)
 }
 
 
-struct file_descriptor *
-get_fd(struct io_context *context, int fd)
+struct file_descriptor*
+get_fd(struct io_context* context, int fd)
 {
 	MutexLocker _(context->io_mutex);
 
@@ -303,12 +304,12 @@ get_fd(struct io_context *context, int fd)
 }
 
 
-struct file_descriptor *
-get_open_fd(struct io_context *context, int fd)
+struct file_descriptor*
+get_open_fd(struct io_context* context, int fd)
 {
 	MutexLocker _(context->io_mutex);
 
-	file_descriptor *descriptor = get_fd_locked(context, fd);
+	file_descriptor* descriptor = get_fd_locked(context, fd);
 	if (descriptor == NULL)
 		return NULL;
 
@@ -318,13 +319,12 @@ get_open_fd(struct io_context *context, int fd)
 }
 
 
-/**	Removes the file descriptor from the specified slot.
- */
-
-static struct file_descriptor *
-remove_fd(struct io_context *context, int fd)
+/*!	Removes the file descriptor from the specified slot.
+*/
+static struct file_descriptor*
+remove_fd(struct io_context* context, int fd)
 {
-	struct file_descriptor *descriptor = NULL;
+	struct file_descriptor* descriptor = NULL;
 
 	if (fd < 0)
 		return NULL;
@@ -361,8 +361,8 @@ remove_fd(struct io_context *context, int fd)
 static int
 dup_fd(int fd, bool kernel)
 {
-	struct io_context *context = get_current_io_context(kernel);
-	struct file_descriptor *descriptor;
+	struct io_context* context = get_current_io_context(kernel);
+	struct file_descriptor* descriptor;
 	int status;
 
 	TRACE(("dup_fd: fd = %d\n", fd));
@@ -395,8 +395,8 @@ dup_fd(int fd, bool kernel)
 static int
 dup2_fd(int oldfd, int newfd, bool kernel)
 {
-	struct file_descriptor *evicted = NULL;
-	struct io_context *context;
+	struct file_descriptor* evicted = NULL;
+	struct io_context* context;
 
 	TRACE(("dup2_fd: ofd = %d, nfd = %d\n", oldfd, newfd));
 
@@ -490,9 +490,9 @@ dup_foreign_fd(team_id fromTeam, int fd, bool kernel)
 
 
 static status_t
-fd_ioctl(bool kernelFD, int fd, ulong op, void *buffer, size_t length)
+fd_ioctl(bool kernelFD, int fd, ulong op, void* buffer, size_t length)
 {
-	struct file_descriptor *descriptor;
+	struct file_descriptor* descriptor;
 	int status;
 
 	descriptor = get_fd(get_current_io_context(kernelFD), fd);
@@ -663,15 +663,15 @@ deselect_fd(int32 fd, struct select_info* info, bool kernel)
 }
 
 
-/** This function checks if the specified fd is valid in the current
- *	context. It can be used for a quick check; the fd is not locked
- *	so it could become invalid immediately after this check.
- */
-
+/*!	This function checks if the specified fd is valid in the current
+	context. It can be used for a quick check; the fd is not locked
+	so it could become invalid immediately after this check.
+*/
 bool
 fd_is_valid(int fd, bool kernel)
 {
-	struct file_descriptor *descriptor = get_fd(get_current_io_context(kernel), fd);
+	struct file_descriptor* descriptor
+		= get_fd(get_current_io_context(kernel), fd);
 	if (descriptor == NULL)
 		return false;
 
@@ -680,8 +680,8 @@ fd_is_valid(int fd, bool kernel)
 }
 
 
-struct vnode *
-fd_vnode(struct file_descriptor *descriptor)
+struct vnode*
+fd_vnode(struct file_descriptor* descriptor)
 {
 	switch (descriptor->type) {
 		case FDTYPE_FILE:
@@ -703,7 +703,7 @@ common_close(int fd, bool kernel)
 
 
 static ssize_t
-common_user_io(int fd, off_t pos, void *buffer, size_t length, bool write)
+common_user_io(int fd, off_t pos, void* buffer, size_t length, bool write)
 {
 	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
@@ -739,7 +739,7 @@ common_user_io(int fd, off_t pos, void *buffer, size_t length, bool write)
 	else
 		status = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
 
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	if (movePosition)
@@ -750,7 +750,7 @@ common_user_io(int fd, off_t pos, void *buffer, size_t length, bool write)
 
 
 static ssize_t
-common_user_vector_io(int fd, off_t pos, const iovec *userVecs, size_t count,
+common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 	bool write)
 {
 	if (!IS_USER_ADDRESS(userVecs))
@@ -759,7 +759,7 @@ common_user_vector_io(int fd, off_t pos, const iovec *userVecs, size_t count,
 	if (pos < -1)
 		return B_BAD_VALUE;
 
-	/* prevent integer overflow exploit in malloc() */
+	// prevent integer overflow exploit in malloc()
 	if (count > IOV_MAX)
 		return B_BAD_VALUE;
 
@@ -778,7 +778,7 @@ common_user_vector_io(int fd, off_t pos, const iovec *userVecs, size_t count,
 		return B_NO_MEMORY;
 	MemoryDeleter _(vecs);
 
-	if (user_memcpy(vecs, userVecs, sizeof(iovec) * count) < B_OK)
+	if (user_memcpy(vecs, userVecs, sizeof(iovec) * count) != B_OK)
 		return B_BAD_ADDRESS;
 
 	bool movePosition = false;
@@ -805,7 +805,7 @@ common_user_vector_io(int fd, off_t pos, const iovec *userVecs, size_t count,
 				&length);
 		}
 
-		if (status < B_OK) {
+		if (status != B_OK) {
 			if (bytesTransferred == 0)
 				return status;
 			status = B_OK;
@@ -831,7 +831,7 @@ common_user_vector_io(int fd, off_t pos, const iovec *userVecs, size_t count,
 
 
 status_t
-user_fd_kernel_ioctl(int fd, ulong op, void *buffer, size_t length)
+user_fd_kernel_ioctl(int fd, ulong op, void* buffer, size_t length)
 {
 	TRACE(("user_fd_kernel_ioctl: fd %d\n", fd));
 
@@ -843,28 +843,28 @@ user_fd_kernel_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 
 ssize_t
-_user_read(int fd, off_t pos, void *buffer, size_t length)
+_user_read(int fd, off_t pos, void* buffer, size_t length)
 {
 	return common_user_io(fd, pos, buffer, length, false);
 }
 
 
 ssize_t
-_user_readv(int fd, off_t pos, const iovec *userVecs, size_t count)
+_user_readv(int fd, off_t pos, const iovec* userVecs, size_t count)
 {
 	return common_user_vector_io(fd, pos, userVecs, count, false);
 }
 
 
 ssize_t
-_user_write(int fd, off_t pos, const void *buffer, size_t length)
+_user_write(int fd, off_t pos, const void* buffer, size_t length)
 {
 	return common_user_io(fd, pos, (void*)buffer, length, true);
 }
 
 
 ssize_t
-_user_writev(int fd, off_t pos, const iovec *userVecs, size_t count)
+_user_writev(int fd, off_t pos, const iovec* userVecs, size_t count)
 {
 	return common_user_vector_io(fd, pos, userVecs, count, true);
 }
@@ -875,7 +875,7 @@ _user_seek(int fd, off_t pos, int seekType)
 {
 	syscall_64_bit_return_value();
 
-	struct file_descriptor *descriptor;
+	struct file_descriptor* descriptor;
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
@@ -894,7 +894,7 @@ _user_seek(int fd, off_t pos, int seekType)
 
 
 status_t
-_user_ioctl(int fd, ulong op, void *buffer, size_t length)
+_user_ioctl(int fd, ulong op, void* buffer, size_t length)
 {
 	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
@@ -908,15 +908,17 @@ _user_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 
 ssize_t
-_user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount)
+_user_read_dir(int fd, struct dirent* buffer, size_t bufferSize,
+	uint32 maxCount)
 {
-	struct file_descriptor *descriptor;
+	struct file_descriptor* descriptor;
 	ssize_t retval;
 
 	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
-	TRACE(("user_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %lu)\n", fd, buffer, bufferSize, maxCount));
+	TRACE(("user_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = "
+		"%lu)\n", fd, buffer, bufferSize, maxCount));
 
 	struct io_context* ioContext = get_current_io_context(false);
 	descriptor = get_fd(ioContext, fd);
@@ -940,7 +942,7 @@ _user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount
 status_t
 _user_rewind_dir(int fd)
 {
-	struct file_descriptor *descriptor;
+	struct file_descriptor* descriptor;
 	status_t status;
 
 	TRACE(("user_rewind_dir(fd = %d)\n", fd));
@@ -984,13 +986,13 @@ _user_dup2(int ofd, int nfd)
 
 
 ssize_t
-_kern_read(int fd, off_t pos, void *buffer, size_t length)
+_kern_read(int fd, off_t pos, void* buffer, size_t length)
 {
 	if (pos < -1)
 		return B_BAD_VALUE;
 
 	FDGetter fdGetter;
-	struct file_descriptor *descriptor = fdGetter.SetTo(fd, true);
+	struct file_descriptor* descriptor = fdGetter.SetTo(fd, true);
 
 	if (!descriptor)
 		return B_FILE_ERROR;
@@ -1025,7 +1027,7 @@ _kern_read(int fd, off_t pos, void *buffer, size_t length)
 
 
 ssize_t
-_kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
+_kern_readv(int fd, off_t pos, const iovec* vecs, size_t count)
 {
 	bool movePosition = false;
 	status_t status;
@@ -1035,7 +1037,7 @@ _kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
 		return B_BAD_VALUE;
 
 	FDGetter fdGetter;
-	struct file_descriptor *descriptor = fdGetter.SetTo(fd, true);
+	struct file_descriptor* descriptor = fdGetter.SetTo(fd, true);
 
 	if (!descriptor)
 		return B_FILE_ERROR;
@@ -1058,7 +1060,7 @@ _kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
 		size_t length = vecs[i].iov_len;
 		status = descriptor->ops->fd_read(descriptor, pos, vecs[i].iov_base,
 			&length);
-		if (status < B_OK) {
+		if (status != B_OK) {
 			bytesRead = status;
 			break;
 		}
@@ -1079,13 +1081,13 @@ _kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
 
 
 ssize_t
-_kern_write(int fd, off_t pos, const void *buffer, size_t length)
+_kern_write(int fd, off_t pos, const void* buffer, size_t length)
 {
 	if (pos < -1)
 		return B_BAD_VALUE;
 
 	FDGetter fdGetter;
-	struct file_descriptor *descriptor = fdGetter.SetTo(fd, true);
+	struct file_descriptor* descriptor = fdGetter.SetTo(fd, true);
 
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
@@ -1120,7 +1122,7 @@ _kern_write(int fd, off_t pos, const void *buffer, size_t length)
 
 
 ssize_t
-_kern_writev(int fd, off_t pos, const iovec *vecs, size_t count)
+_kern_writev(int fd, off_t pos, const iovec* vecs, size_t count)
 {
 	bool movePosition = false;
 	status_t status;
@@ -1130,7 +1132,7 @@ _kern_writev(int fd, off_t pos, const iovec *vecs, size_t count)
 		return B_BAD_VALUE;
 
 	FDGetter fdGetter;
-	struct file_descriptor *descriptor = fdGetter.SetTo(fd, true);
+	struct file_descriptor* descriptor = fdGetter.SetTo(fd, true);
 
 	if (!descriptor)
 		return B_FILE_ERROR;
@@ -1153,7 +1155,7 @@ _kern_writev(int fd, off_t pos, const iovec *vecs, size_t count)
 		size_t length = vecs[i].iov_len;
 		status = descriptor->ops->fd_write(descriptor, pos,
 			vecs[i].iov_base, &length);
-		if (status < B_OK) {
+		if (status != B_OK) {
 			bytesWritten = status;
 			break;
 		}
@@ -1176,7 +1178,7 @@ _kern_writev(int fd, off_t pos, const iovec *vecs, size_t count)
 off_t
 _kern_seek(int fd, off_t pos, int seekType)
 {
-	struct file_descriptor *descriptor;
+	struct file_descriptor* descriptor;
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (!descriptor)
@@ -1193,7 +1195,7 @@ _kern_seek(int fd, off_t pos, int seekType)
 
 
 status_t
-_kern_ioctl(int fd, ulong op, void *buffer, size_t length)
+_kern_ioctl(int fd, ulong op, void* buffer, size_t length)
 {
 	TRACE(("kern_ioctl: fd %d\n", fd));
 
@@ -1204,12 +1206,14 @@ _kern_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 
 ssize_t
-_kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount)
+_kern_read_dir(int fd, struct dirent* buffer, size_t bufferSize,
+	uint32 maxCount)
 {
-	struct file_descriptor *descriptor;
+	struct file_descriptor* descriptor;
 	ssize_t retval;
 
-	TRACE(("sys_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %lu)\n",fd, buffer, bufferSize, maxCount));
+	TRACE(("sys_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = "
+		"%lu)\n",fd, buffer, bufferSize, maxCount));
 
 	struct io_context* ioContext = get_current_io_context(true);
 	descriptor = get_fd(ioContext, fd);
@@ -1233,7 +1237,7 @@ _kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount
 status_t
 _kern_rewind_dir(int fd)
 {
-	struct file_descriptor *descriptor;
+	struct file_descriptor* descriptor;
 	status_t status;
 
 	TRACE(("sys_rewind_dir(fd = %d)\n",fd));
