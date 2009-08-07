@@ -977,21 +977,21 @@ BMessage::Flatten(BDataIO *stream, ssize_t *size) const
 
 	ssize_t result1 = stream->Write(fHeader, sizeof(message_header));
 	if (result1 != sizeof(message_header))
-		return (result1 >= 0 ? B_ERROR : result1);
+		return result1 < 0 ? result1 : B_ERROR;
 
 	ssize_t result2 = 0;
 	if (fHeader->field_count > 0) {
 		ssize_t fieldsSize = fHeader->field_count * sizeof(field_header);
 		result2 = stream->Write(fFields, fieldsSize);
 		if (result2 != fieldsSize)
-			return (result2 >= 0 ? B_ERROR : result2);
+			return result2 < 0 ? result2 : B_ERROR;
 	}
 
 	ssize_t result3 = 0;
 	if (fHeader->data_size > 0) {
 		result3 = stream->Write(fData, fHeader->data_size);
 		if (result3 != (ssize_t)fHeader->data_size)
-			return (result3 >= 0 ? B_ERROR : result3);
+			return result3 < 0 ? result3 : B_ERROR;
 	}
 
 	if (size)
@@ -1273,12 +1273,10 @@ BMessage::Unflatten(BDataIO *stream)
 	uint8 *header = (uint8 *)fHeader;
 	ssize_t result = stream->Read(header + sizeof(uint32),
 		sizeof(message_header) - sizeof(uint32));
-	result -= sizeof(message_header) - sizeof(uint32);
-
-	if (result != B_OK || fHeader->format != MESSAGE_FORMAT_HAIKU
+	if (result != sizeof(message_header) - sizeof(uint32)
 		|| (fHeader->flags & MESSAGE_FLAG_VALID) == 0) {
 		_InitHeader();
-		return B_BAD_VALUE;
+		return result < 0 ? result : B_BAD_VALUE;
 	}
 
 	what = fHeader->what;
