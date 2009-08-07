@@ -55,6 +55,19 @@ const media_file_format gMuxerTable[] = {
 //		"ogg",
 //		{ 0 }
 //	},
+	{
+		media_file_format::B_WRITABLE
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_WAV_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"audio/x-wav",
+		"WAV Format",
+		"wav",
+		"wav",
+		{ 0 }
+	},
 };
 
 const size_t gMuxerCount = sizeof(gMuxerTable) / sizeof(media_file_format);

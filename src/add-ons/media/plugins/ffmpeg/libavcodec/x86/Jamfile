@@ -44,8 +44,8 @@ if $(HAIKU_FFMPEG_USE_SSSE3) = 1 {
 		idct_sse2_xvid.c
 		vp3dsp_sse2.c
 		vp6dsp_sse2.c
-		h264_idct_sse2.nasm
-		h264_deblock_sse2.nasm
+#		h264_idct_sse2.nasm # GPL
+#		h264_deblock_sse2.nasm # GPL
 	;
 }
 
