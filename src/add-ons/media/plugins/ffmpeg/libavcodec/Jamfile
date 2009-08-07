@@ -27,8 +27,8 @@ StaticLibrary libavcodec.a :
 	aasc.c
 	ac3.c
 	ac3_parser.c
-	ac3dec.c
-	ac3dec_data.c
+#	ac3dec.c # GPL
+#	ac3dec_data.c # GPL
 	ac3enc.c
 	ac3tab.c
 	acelp_filters.c
@@ -92,7 +92,7 @@ StaticLibrary libavcodec.a :
 	faandct.c
 	faanidct.c
 	faxcompr.c
-#	fdctref.c
+#	fdctref.c # GPL, only used for DCT test program
 	fft.c
 	ffv1.c
 	flacdec.c
