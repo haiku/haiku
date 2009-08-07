@@ -75,8 +75,7 @@ SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations E-mail
 	Screen ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
 ;
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
-	GLDirectMode GLTeapot Mandelbrot Pairs
-	Playground Pulse Sudoku Gradients
+	GLTeapot Haiku3d Mandelbrot Pairs Playground Pulse Sudoku Gradients
 ;
 SYSTEM_LIBS = libbe.so $(HAIKU_SHARED_LIBSTDC++) libmedia.so libtracker.so
 	libtranslation.so libbnetapi.so libnetwork.so libdebug.so libbsd.so
