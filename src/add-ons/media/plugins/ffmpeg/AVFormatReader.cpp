@@ -479,7 +479,7 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 			format->u.encoded_audio.frame_size = codecContext->frame_size;
 			// Fill in some info about possible output format
 			format->u.encoded_audio.output
-				= avformat_to_beos_format(codecContext->sample_fmt);
+				= media_multi_audio_format::wildcard;
 			format->u.encoded_audio.output.frame_rate
 				= (float)codecContext->sample_rate;
 			format->u.encoded_audio.output.channel_count
