@@ -2372,7 +2372,7 @@ void ff_x264_deblock_v_luma_sse2(uint8_t *pix, int stride, int alpha, int beta, 
 void ff_x264_deblock_h_luma_sse2(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0);
 void ff_x264_deblock_v8_luma_intra_mmxext(uint8_t *pix, int stride, int alpha, int beta);
 void ff_x264_deblock_h_luma_intra_mmxext(uint8_t *pix, int stride, int alpha, int beta);
-#if ARCH_X86_32
+#if CONFIG_GPL && ARCH_X86_32
 static void ff_x264_deblock_v_luma_intra_mmxext(uint8_t *pix, int stride, int alpha, int beta)
 {
     ff_x264_deblock_v8_luma_intra_mmxext(pix+0, stride, alpha, beta);
