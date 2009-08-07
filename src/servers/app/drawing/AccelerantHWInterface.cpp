@@ -96,7 +96,8 @@ use_fail_safe_video_mode()
 
 
 AccelerantHWInterface::AccelerantHWInterface()
-	:  HWInterface(),
+	:
+	HWInterface(),
 	fCardFD(-1),
 	fAccelerantImage(-1),
 	fAccelerantHook(NULL),
@@ -220,15 +221,14 @@ AccelerantHWInterface::_OpenGraphicsDevice(int deviceNumber)
 	int device = -1;
 	int count = 0;
 	if (!use_fail_safe_video_mode()) {
-		// ToDo: the former R5 "stub" driver is called "vesa" under Haiku; however,
-		//	we do not need to avoid this driver this way when is has been ported
-		//	to the new driver architecture - the special case here can then be
-		//	removed.
+		// TODO: We do not need to avoid the "vesa" driver this way once it has
+		// been ported to the new driver architecture - the special case here
+		// can then be removed.
 		struct dirent *entry;
 		char path[PATH_MAX];
 		while (count < deviceNumber && (entry = readdir(directory)) != NULL) {
-			if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..") ||
-				!strcmp(entry->d_name, "stub") || !strcmp(entry->d_name, "vesa"))
+			if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")
+				|| !strcmp(entry->d_name, "vesa"))
 				continue;
 
 			if (device >= 0) {
@@ -518,7 +518,9 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 	}
 #endif
 
-	status_t status = fAccSetDisplayMode(&newMode);
+	status_t status = B_ERROR;
+	if (!use_fail_safe_video_mode() || !fInitialModeSwitch)
+		status = fAccSetDisplayMode(&newMode);
 	if (status != B_OK) {
 		ATRACE(("setting display mode failed\n"));
 		if (!fInitialModeSwitch)
@@ -534,14 +536,15 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 
 		if (fModeList == NULL) {
 			status = _UpdateModeList();
-			if (status < B_OK)
+			if (status != B_OK)
 				return status;
 		}
 
 		// If this is the initial mode switch, we try a number of fallback
 		// modes first, before we have to fail
 
-		status = _SetFallbackMode(newMode);
+		status = use_fail_safe_video_mode()
+			? B_ERROR : _SetFallbackMode(newMode);
 		if (status != B_OK) {
 			// The driver doesn't allow us the mode switch - this usually
 			// means we have a driver that doesn't allow mode switches at
