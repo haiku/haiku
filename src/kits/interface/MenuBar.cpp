@@ -8,6 +8,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+
 #include <MenuBar.h>
 
 #include <math.h>
@@ -31,20 +32,21 @@ using BPrivate::gDefaultTokens;
 
 
 struct menubar_data {
-	BMenuBar *menuBar;
-	int32 menuIndex;
+	BMenuBar*	menuBar;
+	int32		menuIndex;
 
-	bool sticky;
-	bool showMenu;
+	bool		sticky;
+	bool		showMenu;
 
-	bool useRect;
-	BRect rect;
+	bool		useRect;
+	BRect		rect;
 };
 
 
-BMenuBar::BMenuBar(BRect frame, const char *title, uint32 resizeMask,
+BMenuBar::BMenuBar(BRect frame, const char* title, uint32 resizeMask,
 		menu_layout layout, bool resizeToFit)
-	: BMenu(frame, title, resizeMask, B_WILL_DRAW | B_FRAME_EVENTS, layout,
+	:
+	BMenu(frame, title, resizeMask, B_WILL_DRAW | B_FRAME_EVENTS, layout,
 		resizeToFit),
 	fBorder(B_BORDER_FRAME),
 	fTrackingPID(-1),
@@ -57,8 +59,9 @@ BMenuBar::BMenuBar(BRect frame, const char *title, uint32 resizeMask,
 }
 
 
-BMenuBar::BMenuBar(const char *title, menu_layout layout, uint32 flags)
-	: BMenu(BRect(), title, B_FOLLOW_NONE,
+BMenuBar::BMenuBar(const char* title, menu_layout layout, uint32 flags)
+	:
+	BMenu(BRect(), title, B_FOLLOW_NONE,
 		flags | B_WILL_DRAW | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT,
 		layout, false),
 	fBorder(B_BORDER_FRAME),
@@ -72,8 +75,9 @@ BMenuBar::BMenuBar(const char *title, menu_layout layout, uint32 flags)
 }
 
 
-BMenuBar::BMenuBar(BMessage *data)
-	: BMenu(data),
+BMenuBar::BMenuBar(BMessage* data)
+	:
+	BMenu(data),
 	fBorder(B_BORDER_FRAME),
 	fTrackingPID(-1),
 	fPrevFocusToken(-1),
@@ -87,7 +91,7 @@ BMenuBar::BMenuBar(BMessage *data)
 		SetBorder((menu_bar_border)border);
 
 	menu_layout layout = B_ITEMS_IN_COLUMN;
-	data->FindInt32("_layout", (int32 *)&layout);
+	data->FindInt32("_layout", (int32*)&layout);
 
 	_InitData(layout);
 }
@@ -104,8 +108,8 @@ BMenuBar::~BMenuBar()
 }
 
 
-BArchivable *
-BMenuBar::Instantiate(BMessage *data)
+BArchivable*
+BMenuBar::Instantiate(BMessage* data)
 {
 	if (validate_instantiation(data, "BMenuBar"))
 		return new BMenuBar(data);
@@ -115,7 +119,7 @@ BMenuBar::Instantiate(BMessage *data)
 
 
 status_t
-BMenuBar::Archive(BMessage *data, bool deep) const
+BMenuBar::Archive(BMessage* data, bool deep) const
 {
 	status_t err = BMenu::Archive(data, deep);
 
@@ -183,7 +187,8 @@ BMenuBar::Draw(BRect updateRect)
 		BPoint(bounds.right, bounds.bottom - 1.0f));
 
 	SetHighColor(tint_color(noTint, B_DARKEN_2_TINT));
-	StrokeLine(BPoint(0.0f, bounds.bottom), BPoint(bounds.right, bounds.bottom));
+	StrokeLine(BPoint(0.0f, bounds.bottom),
+		BPoint(bounds.right, bounds.bottom));
 	StrokeLine(BPoint(bounds.right, 0.0f), BPoint(bounds.right, bounds.bottom));
 
 	SetHighColor(color);
@@ -213,7 +218,7 @@ BMenuBar::DetachedFromWindow()
 
 
 void
-BMenuBar::MessageReceived(BMessage *msg)
+BMenuBar::MessageReceived(BMessage* msg)
 {
 	BMenu::MessageReceived(msg);
 }
@@ -225,7 +230,7 @@ BMenuBar::MouseDown(BPoint where)
 	if (fTracking)
 		return;
 
-	BWindow *window = Window();
+	BWindow* window = Window();
 	if (!window->IsActive() || !window->IsFront()) {
 		window->Activate();
 		window->UpdateIfNeeded();
@@ -293,15 +298,16 @@ BMenuBar::Hide()
 }
 
 
-BHandler *
-BMenuBar::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier, int32 form, const char *property)
+BHandler*
+BMenuBar::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
+	int32 form, const char* property)
 {
 	return BMenu::ResolveSpecifier(msg, index, specifier, form, property);
 }
 
 
 status_t
-BMenuBar::GetSupportedSuites(BMessage *data)
+BMenuBar::GetSupportedSuites(BMessage* data)
 {
 	return BMenu::GetSupportedSuites(data);
 }
@@ -315,7 +321,7 @@ BMenuBar::ResizeToPreferred()
 
 
 void
-BMenuBar::GetPreferredSize(float *width, float *height)
+BMenuBar::GetPreferredSize(float* width, float* height)
 {
 	BMenu::GetPreferredSize(width, height);
 }
@@ -373,7 +379,7 @@ BMenuBar::Perform(perform_code code, void* _data)
 			BMenuBar::GetHeightForWidth(data->width, &data->min, &data->max,
 				&data->preferred);
 			return B_OK;
-}
+		}
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
@@ -438,12 +444,13 @@ BMenuBar::operator=(const BMenuBar &)
 
 
 void
-BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu, BRect *specialRect)
+BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu,
+	BRect* specialRect)
 {
 	if (fTracking)
 		return;
 
-	BWindow *window = Window();
+	BWindow* window = Window();
 	if (window == NULL)
 		debugger("MenuBar must be added to a window before it can be used.");
 
@@ -461,7 +468,8 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu, BRect *speci
 	fMenuSem = create_sem(0, "window close sem");
 	_set_menu_sem_(window, fMenuSem);
 
-	fTrackingPID = spawn_thread(_TrackTask, "menu_tracking", B_DISPLAY_PRIORITY, NULL);
+	fTrackingPID = spawn_thread(_TrackTask, "menu_tracking", B_DISPLAY_PRIORITY,
+		NULL);
 	if (fTrackingPID >= 0) {
 		menubar_data data;
 		data.menuBar = this;
@@ -482,15 +490,14 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu, BRect *speci
 }
 
 
-/* static */
-int32
-BMenuBar::_TrackTask(void *arg)
+/*static*/ int32
+BMenuBar::_TrackTask(void* arg)
 {
 	menubar_data data;
 	thread_id id;
 	receive_data(&id, &data, sizeof(data));
 
-	BMenuBar *menuBar = data.menuBar;
+	BMenuBar* menuBar = data.menuBar;
 	if (data.useRect)
 		menuBar->fExtraRect = &data.rect;
 	menuBar->_SetStickyMode(data.sticky);
@@ -502,7 +509,7 @@ BMenuBar::_TrackTask(void *arg)
 	menuBar->fExtraRect = NULL;
 
 	// We aren't the BWindow thread, so don't call MenusEnded() directly
-	BWindow *window = menuBar->Window();
+	BWindow* window = menuBar->Window();
 	window->PostMessage(_MENUS_DONE_);
 
 	_set_menu_sem_(window, B_BAD_SEM_ID);
@@ -513,13 +520,13 @@ BMenuBar::_TrackTask(void *arg)
 }
 
 
-BMenuItem *
-BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
+BMenuItem*
+BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 {
 	// TODO: Cleanup, merge some "if" blocks if possible
 	fChosenItem = NULL;
 
-	BWindow *window = Window();
+	BWindow* window = Window();
 	fState = MENU_STATE_TRACKING;
 
 	BPoint where;
@@ -546,7 +553,7 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 		if (_OverSubmenu(fSelected, ConvertToScreen(where))) {
 			// call _Track() from the selected sub-menu when the mouse cursor
 			// is over its window
-			BMenu *menu = fSelected->Submenu();
+			BMenu* menu = fSelected->Submenu();
 			window->Unlock();
 			snoozeAmount = 30000;
 			bool wasSticky = _IsStickyMode();
@@ -571,7 +578,8 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 			// that are children of BMenuFields "sticky" (see ticket #953)
 			if (localAction == MENU_STATE_CLOSED) {
 				if (fExtraRect != NULL && fExtraRect->Contains(where)
-					// 9 = 3 pixels ^ 2 (since point_distance() returns the square of the distance)
+					// 9 = 3 pixels ^ 2 (since point_distance() returns the
+					// square of the distance)
 					&& point_distance(newWhere, where) < 9) {
 					_SetStickyMode(true);
 					fExtraRect = NULL;
@@ -669,9 +677,9 @@ BMenuBar::_StealFocus()
 	if (fPrevFocusToken != -1)
 		return;
 
-	BWindow *window = Window();
+	BWindow* window = Window();
 	if (window != NULL && window->Lock()) {
-		BView *focus = window->CurrentFocus();
+		BView* focus = window->CurrentFocus();
 		if (focus != NULL && focus != this)
 			fPrevFocusToken = _get_object_token_(focus);
 		MakeFocus();
@@ -683,12 +691,13 @@ BMenuBar::_StealFocus()
 void
 BMenuBar::_RestoreFocus()
 {
-	BWindow *window = Window();
+	BWindow* window = Window();
 	if (window != NULL && window->Lock()) {
-		BHandler *handler = NULL;
+		BHandler* handler = NULL;
 		if (fPrevFocusToken != -1
-			&& gDefaultTokens.GetToken(fPrevFocusToken, B_HANDLER_TOKEN, (void **)&handler) == B_OK) {
-			BView *view = dynamic_cast<BView *>(handler);
+			&& gDefaultTokens.GetToken(fPrevFocusToken, B_HANDLER_TOKEN,
+				(void**)&handler) == B_OK) {
+			BView* view = dynamic_cast<BView*>(handler);
 			if (view != NULL && view->Window() == window)
 				view->MakeFocus();
 

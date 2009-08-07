@@ -23,42 +23,45 @@
 namespace BPrivate {
 
 class BMenuScroller : public BView {
-	public:
-		BMenuScroller(BRect frame);
+public:
+							BMenuScroller(BRect frame);
 
-		bool IsEnabled() const;
-		void SetEnabled(const bool &enabled);
-	private:
-		bool fEnabled;
+			bool			IsEnabled() const;
+			void			SetEnabled(bool enabled);
+
+private:
+			bool			fEnabled;
 };
 
 
 class BMenuFrame : public BView {
-	public:
-		BMenuFrame(BMenu *menu);
+public:
+							BMenuFrame(BMenu* menu);
 
-		virtual void AttachedToWindow();
-		virtual void DetachedFromWindow();
-		virtual void Draw(BRect updateRect);
+	virtual	void			AttachedToWindow();
+	virtual	void			DetachedFromWindow();
+	virtual	void			Draw(BRect updateRect);
 
-	private:
-		friend class BMenuWindow;
+private:
+	friend class BMenuWindow;
 
-		BMenu *fMenu;
+			BMenu*			fMenu;
 };
 
 
 class UpperScroller : public BMenuScroller {
 public:
-	UpperScroller(BRect frame);
-	virtual void Draw(BRect updateRect);
+							UpperScroller(BRect frame);
+
+	virtual	void			Draw(BRect updateRect);
 };
 
 
 class LowerScroller : public BMenuScroller {
 public:
-	LowerScroller(BRect frame);
-	virtual void Draw(BRect updateRect);
+							LowerScroller(BRect frame);
+
+	virtual	void			Draw(BRect updateRect);
 };
 
 
@@ -72,7 +75,8 @@ const int kScrollerHeight = 10;
 
 
 BMenuScroller::BMenuScroller(BRect frame)
-	: BView(frame, "menu scroller", 0, B_WILL_DRAW | B_FRAME_EVENTS),
+	:
+	BView(frame, "menu scroller", 0, B_WILL_DRAW | B_FRAME_EVENTS),
 	fEnabled(false)
 {
 	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
@@ -87,7 +91,7 @@ BMenuScroller::IsEnabled() const
 
 
 void
-BMenuScroller::SetEnabled(const bool &enabled)
+BMenuScroller::SetEnabled(bool enabled)
 {
 	fEnabled = enabled;
 }
@@ -112,15 +116,16 @@ UpperScroller::Draw(BRect updateRect)
 	// Draw the upper arrow.
 	if (IsEnabled())
 		SetHighColor(0, 0, 0);
-	else
+	else {
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-					B_DARKEN_2_TINT));
+			B_DARKEN_2_TINT));
+	}
 
 	FillRect(Bounds(), B_SOLID_LOW);
 
 	FillTriangle(BPoint(middle, (kScrollerHeight / 2) - 3),
-			BPoint(middle + 5, (kScrollerHeight / 2) + 2),
-			BPoint(middle - 5, (kScrollerHeight / 2) + 2));
+		BPoint(middle + 5, (kScrollerHeight / 2) + 2),
+		BPoint(middle - 5, (kScrollerHeight / 2) + 2));
 }
 
 
@@ -143,17 +148,18 @@ LowerScroller::Draw(BRect updateRect)
 	// Draw the lower arrow.
 	if (IsEnabled())
 		SetHighColor(0, 0, 0);
-	else
+	else {
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
 			B_DARKEN_2_TINT));
+	}
 
 	FillRect(frame, B_SOLID_LOW);
 
 	float middle = Bounds().right / 2;
 
 	FillTriangle(BPoint(middle, frame.bottom - (kScrollerHeight / 2) + 3),
-			BPoint(middle + 5, frame.bottom - (kScrollerHeight / 2) - 2),
-			BPoint(middle - 5, frame.bottom - (kScrollerHeight / 2) - 2));
+		BPoint(middle + 5, frame.bottom - (kScrollerHeight / 2) - 2),
+		BPoint(middle - 5, frame.bottom - (kScrollerHeight / 2) - 2));
 }
 
 
@@ -161,7 +167,8 @@ LowerScroller::Draw(BRect updateRect)
 
 
 BMenuFrame::BMenuFrame(BMenu *menu)
-	: BView(BRect(0, 0, 1, 1), "menu frame", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+	:
+	BView(BRect(0, 0, 1, 1), "menu frame", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
 	fMenu(menu)
 {
 }
@@ -205,8 +212,8 @@ BMenuFrame::Draw(BRect updateRect)
 			// TODO: Review this as it's a bit hacky.
 			// Menu has a size of 0, 0, since there are no items in it.
 			// So the BMenuFrame class has to fake it and draw an empty item.
-			// Note that we can't add a real "empty" item because then we couldn't
-			// tell if the item was added by us or not.
+			// Note that we can't add a real "empty" item because then we
+			// couldn't tell if the item was added by us or not.
 			// See also BMenu::UpdateWindowViewSize()
 			SetHighColor(ui_color(B_MENU_BACKGROUND_COLOR));
 			SetLowColor(HighColor());
@@ -215,8 +222,11 @@ BMenuFrame::Draw(BRect updateRect)
 
 		font_height height;
 		GetFontHeight(&height);
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
-		BPoint where((Bounds().Width() - fMenu->StringWidth(kEmptyMenuLabel)) / 2, ceilf(height.ascent + 1));
+		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+			B_DISABLED_LABEL_TINT));
+		BPoint where(
+			(Bounds().Width() - fMenu->StringWidth(kEmptyMenuLabel)) / 2,
+			ceilf(height.ascent + 1));
 		DrawString(kEmptyMenuLabel, where);
 	}
 

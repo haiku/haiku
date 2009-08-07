@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
+
 
 #include <MenuField.h>
 
@@ -87,10 +88,11 @@ private:
 
 struct BMenuField::LayoutData {
 	LayoutData()
-		: label_layout_item(NULL),
-		  menu_bar_layout_item(NULL),
-		  previous_height(-1),
-		  valid(false)
+		:
+		label_layout_item(NULL),
+		menu_bar_layout_item(NULL),
+		previous_height(-1),
+		valid(false)
 	{
 	}
 
@@ -113,9 +115,10 @@ struct BMenuField::LayoutData {
 static float kVMargin = 2.0f;
 
 
-BMenuField::BMenuField(BRect frame, const char *name, const char *label,
-	BMenu *menu, uint32 resize, uint32 flags)
-	: BView(frame, name, resize, flags)
+BMenuField::BMenuField(BRect frame, const char* name, const char* label,
+		BMenu* menu, uint32 resize, uint32 flags)
+	:
+	BView(frame, name, resize, flags)
 {
 	CALLED();
 
@@ -130,9 +133,10 @@ BMenuField::BMenuField(BRect frame, const char *name, const char *label,
 }
 
 
-BMenuField::BMenuField(BRect frame, const char *name, const char *label,
-	BMenu *menu, bool fixedSize, uint32 resize, uint32 flags)
-	: BView(frame, name, resize, flags)
+BMenuField::BMenuField(BRect frame, const char* name, const char* label,
+		BMenu* menu, bool fixedSize, uint32 resize, uint32 flags)
+	:
+	BView(frame, name, resize, flags)
 {
 	InitObject(label);
 
@@ -146,8 +150,9 @@ BMenuField::BMenuField(BRect frame, const char *name, const char *label,
 
 
 BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
-					   BMessage* message, uint32 flags)
-	: BView(name, flags | B_FRAME_EVENTS)
+		BMessage* message, uint32 flags)
+	:
+	BView(name, flags | B_FRAME_EVENTS)
 {
 	InitObject(label);
 
@@ -157,9 +162,9 @@ BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
 }
 
 
-BMenuField::BMenuField(const char* label,
-					   BMenu* menu, BMessage* message)
-	: BView(NULL, B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS)
+BMenuField::BMenuField(const char* label, BMenu* menu, BMessage* message)
+	:
+	BView(NULL, B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS)
 {
 	InitObject(label);
 
@@ -169,10 +174,11 @@ BMenuField::BMenuField(const char* label,
 }
 
 
-BMenuField::BMenuField(BMessage *data)
-	: BView(data)
+BMenuField::BMenuField(BMessage* data)
+	:
+	BView(data)
 {
-	const char *label = NULL;
+	const char* label = NULL;
 	data->FindString("_label", &label);
 
 	InitObject(label);
@@ -200,9 +206,8 @@ BMenuField::BMenuField(BMessage *data)
 
 	bool dmark = false;
 	data->FindBool("be:dmark", &dmark);
-	if (_BMCMenuBar_ *menuBar = dynamic_cast<_BMCMenuBar_ *>(fMenuBar)) {
+	if (_BMCMenuBar_* menuBar = dynamic_cast<_BMCMenuBar_*>(fMenuBar))
 		menuBar->TogglePopUpMarker(dmark);
-	}
 }
 
 
@@ -218,8 +223,8 @@ BMenuField::~BMenuField()
 }
 
 
-BArchivable *
-BMenuField::Instantiate(BMessage *data)
+BArchivable*
+BMenuField::Instantiate(BMessage* data)
 {
 	if (validate_instantiation(data, "BMenuField"))
 		return new BMenuField(data);
@@ -229,7 +234,7 @@ BMenuField::Instantiate(BMessage *data)
 
 
 status_t
-BMenuField::Archive(BMessage *data, bool deep) const
+BMenuField::Archive(BMessage* data, bool deep) const
 {
 	status_t ret = BView::Archive(data, deep);
 
@@ -248,9 +253,9 @@ BMenuField::Archive(BMessage *data, bool deep) const
 		ret = data->AddBool("be:fixeds", true);
 
 	bool dmark = false;
-	if (_BMCMenuBar_ *menuBar = dynamic_cast<_BMCMenuBar_ *>(fMenuBar)) {
+	if (_BMCMenuBar_* menuBar = dynamic_cast<_BMCMenuBar_*>(fMenuBar))
 		dmark = menuBar->IsPopUpMarkerShown();
-	}
+
 	data->AddBool("be:dmark", dmark);
 
 	return ret;
@@ -362,7 +367,7 @@ BMenuField::MouseDown(BPoint where)
 
 
 void
-BMenuField::KeyDown(const char *bytes, int32 numBytes)
+BMenuField::KeyDown(const char* bytes, int32 numBytes)
 {
 	switch (bytes[0]) {
 		case B_SPACE:
@@ -405,7 +410,7 @@ BMenuField::MakeFocus(bool state)
 
 
 void
-BMenuField::MessageReceived(BMessage *msg)
+BMenuField::MessageReceived(BMessage* msg)
 {
 	BView::MessageReceived(msg);
 }
@@ -429,7 +434,7 @@ BMenuField::MouseUp(BPoint point)
 
 
 void
-BMenuField::MouseMoved(BPoint point, uint32 code, const BMessage *message)
+BMenuField::MouseMoved(BPoint point, uint32 code, const BMessage* message)
 {
 	BView::MouseMoved(point, code, message);
 }
@@ -472,21 +477,21 @@ BMenuField::FrameResized(float newWidth, float newHeight)
 }
 
 
-BMenu *
+BMenu*
 BMenuField::Menu() const
 {
 	return fMenu;
 }
 
 
-BMenuBar *
+BMenuBar*
 BMenuField::MenuBar() const
 {
 	return fMenuBar;
 }
 
 
-BMenuItem *
+BMenuItem*
 BMenuField::MenuItem() const
 {
 	return fMenuBar->ItemAt(0);
@@ -494,7 +499,7 @@ BMenuField::MenuItem() const
 
 
 void
-BMenuField::SetLabel(const char *label)
+BMenuField::SetLabel(const char* label)
 {
 	if (fLabel) {
 		if (label && strcmp(fLabel, label) == 0)
@@ -512,7 +517,7 @@ BMenuField::SetLabel(const char *label)
 }
 
 
-const char *
+const char*
 BMenuField::Label() const
 {
 	return fLabel;
@@ -598,7 +603,7 @@ BMenuField::Divider() const
 void
 BMenuField::ShowPopUpMarker()
 {
-	if (_BMCMenuBar_ *menuBar = dynamic_cast<_BMCMenuBar_ *>(fMenuBar)) {
+	if (_BMCMenuBar_* menuBar = dynamic_cast<_BMCMenuBar_*>(fMenuBar)) {
 		menuBar->TogglePopUpMarker(true);
 		menuBar->Invalidate();
 	}
@@ -608,23 +613,23 @@ BMenuField::ShowPopUpMarker()
 void
 BMenuField::HidePopUpMarker()
 {
-	if (_BMCMenuBar_ *menuBar = dynamic_cast<_BMCMenuBar_ *>(fMenuBar)) {
+	if (_BMCMenuBar_* menuBar = dynamic_cast<_BMCMenuBar_*>(fMenuBar)) {
 		menuBar->TogglePopUpMarker(false);
 		menuBar->Invalidate();
 	}
 }
 
 
-BHandler *
-BMenuField::ResolveSpecifier(BMessage *message, int32 index,
-	BMessage *specifier, int32 form, const char *property)
+BHandler*
+BMenuField::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 form, const char* property)
 {
 	return BView::ResolveSpecifier(message, index, specifier, form, property);
 }
 
 
 status_t
-BMenuField::GetSupportedSuites(BMessage *data)
+BMenuField::GetSupportedSuites(BMessage* data)
 {
 	return BView::GetSupportedSuites(data);
 }
@@ -658,7 +663,7 @@ BMenuField::ResizeToPreferred()
 
 
 void
-BMenuField::GetPreferredSize(float *_width, float *_height)
+BMenuField::GetPreferredSize(float* _width, float* _height)
 {
 	CALLED();
 
@@ -854,15 +859,8 @@ void BMenuField::_ReservedMenuField2() {}
 void BMenuField::_ReservedMenuField3() {}
 
 
-BMenuField &
-BMenuField::operator=(const BMenuField &)
-{
-	return *this;
-}
-
-
 void
-BMenuField::InitObject(const char *label)
+BMenuField::InitObject(const char* label)
 {
 	CALLED();
 
@@ -945,23 +943,22 @@ BMenuField::DrawLabel(BRect bounds, BRect update)
 
 
 void
-BMenuField::InitMenu(BMenu *menu)
+BMenuField::InitMenu(BMenu* menu)
 {
 	menu->SetFont(be_plain_font);
 
 	int32 index = 0;
-	BMenu *subMenu;
+	BMenu* subMenu;
 
 	while ((subMenu = menu->SubmenuAt(index++)) != NULL)
 		InitMenu(subMenu);
 }
 
 
-/* static */
-int32
-BMenuField::_thread_entry(void *arg)
+/*static*/ int32
+BMenuField::_thread_entry(void* arg)
 {
-	return static_cast<BMenuField *>(arg)->_MenuTask();
+	return static_cast<BMenuField*>(arg)->_MenuTask();
 }
 
 
@@ -970,12 +967,12 @@ BMenuField::_MenuTask()
 {
 	if (!LockLooper())
 		return 0;
-	
+
 	fSelected = true;
 	fTransition = true;
 	Invalidate();
 	UnlockLooper();
-	
+
 	bool tracking;
 	do {
 		snooze(20000);
@@ -990,7 +987,7 @@ BMenuField::_MenuTask()
 	if (LockLooper()) {
 		fSelected = false;
 		fTransition = true;
-		Invalidate();	
+		Invalidate();
 		UnlockLooper();
 	}
 
@@ -1040,11 +1037,11 @@ BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
 		frame.top = kVMargin;
 		frame.right -= kVMargin;
 		frame.bottom -= kVMargin;
-	
+
 		TRACE("frame(%.1f, %.1f, %.1f, %.1f) (%.2f, %.2f)\n",
 			frame.left, frame.top, frame.right, frame.bottom,
 			frame.Width(), frame.Height());
-	
+
 		fMenuBar = new _BMCMenuBar_(frame, fixedSize, this);
 	}
 
@@ -1098,7 +1095,7 @@ BMenuField::_ValidateLayoutData()
 	// TODO: BMenu::MinSize() is using the ResizeMode() to decide the
 	// minimum width. If the mode is B_FOLLOW_LEFT_RIGHT, it will use the
 	// parent's frame width or window's frame width. So at least the returned
-	// size is wrong, but appearantly it doesn't have much bad effect.
+	// size is wrong, but apparantly it doesn't have much bad effect.
 	fLayoutData->menu_bar_min = fMenuBar->MinSize();
 
 	TRACE("menu bar min width: %.2f\n", fLayoutData->menu_bar_min.width);
@@ -1116,7 +1113,6 @@ BMenuField::_ValidateLayoutData()
 	fLayoutData->min = min;
 
 	fLayoutData->valid = true;
-
 
 	TRACE("width: %.2f, height: %.2f\n", min.width, min.height);
 }

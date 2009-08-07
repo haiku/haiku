@@ -22,7 +22,7 @@
 #include <Window.h>
 
 
-_BMCFilter_::_BMCFilter_(BMenuField *menuField, uint32 what)
+_BMCFilter_::_BMCFilter_(BMenuField* menuField, uint32 what)
 	:
 	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, what),
 	fMenuField(menuField)
@@ -36,10 +36,10 @@ _BMCFilter_::~_BMCFilter_()
 
 
 filter_result
-_BMCFilter_::Filter(BMessage *message, BHandler **handler)
+_BMCFilter_::Filter(BMessage* message, BHandler** handler)
 {
 	if (message->what == B_MOUSE_DOWN) {
-		if (BView *view = dynamic_cast<BView *>(*handler)) {
+		if (BView* view = dynamic_cast<BView*>(*handler)) {
 			BPoint point;
 			message->FindPoint("be:view_where", &point);
 			view->ConvertToParent(&point);
@@ -49,13 +49,6 @@ _BMCFilter_::Filter(BMessage *message, BHandler **handler)
 	}
 
 	return B_DISPATCH_MESSAGE;
-}
-
-
-_BMCFilter_ &
-_BMCFilter_::operator=(const _BMCFilter_ &)
-{
-	return *this;
 }
 
 
@@ -87,7 +80,7 @@ _BMCMenuBar_::_BMCMenuBar_(bool fixedSize, BMenuField* menuField)
 }
 
 
-_BMCMenuBar_::_BMCMenuBar_(BMessage *data)
+_BMCMenuBar_::_BMCMenuBar_(BMessage* data)
 	:	BMenuBar(data),
 	fMenuField(NULL),
 	fFixedSize(true),
@@ -108,8 +101,8 @@ _BMCMenuBar_::~_BMCMenuBar_()
 }
 
 
-BArchivable *
-_BMCMenuBar_::Instantiate(BMessage *data)
+BArchivable*
+_BMCMenuBar_::Instantiate(BMessage* data)
 {
 	if (validate_instantiation(data, "_BMCMenuBar_"))
 		return new _BMCMenuBar_(data);
@@ -121,10 +114,10 @@ _BMCMenuBar_::Instantiate(BMessage *data)
 void
 _BMCMenuBar_::AttachedToWindow()
 {
-	fMenuField = static_cast<BMenuField *>(Parent());
+	fMenuField = static_cast<BMenuField*>(Parent());
 
 	// Don't cause the KeyMenuBar to change by being attached
-	BMenuBar *menuBar = Window()->KeyMenuBar();
+	BMenuBar* menuBar = Window()->KeyMenuBar();
 	BMenuBar::AttachedToWindow();
 	Window()->SetKeyMenuBar(menuBar);
 
@@ -307,12 +300,12 @@ _BMCMenuBar_::FrameResized(float width, float height)
 
 
 void
-_BMCMenuBar_::MessageReceived(BMessage *msg)
+_BMCMenuBar_::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case 'TICK':
 		{
-			BMenuItem *item = ItemAt(0);
+			BMenuItem* item = ItemAt(0);
 
 			if (item && item->Submenu() &&  item->Submenu()->Window()) {
 				BMessage message(B_KEY_DOWN);
@@ -386,13 +379,6 @@ _BMCMenuBar_::MaxSize()
 	BSize size;
 	BMenuBar::GetPreferredSize(&size.width, &size.height);
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
-}
-
-
-_BMCMenuBar_
-&_BMCMenuBar_::operator=(const _BMCMenuBar_ &)
-{
-	return *this;
 }
 
 

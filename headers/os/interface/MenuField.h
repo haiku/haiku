@@ -1,34 +1,36 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef _MENU_FIELD_H
 #define _MENU_FIELD_H
 
+
 #include <BeBuild.h>
-#include <Menu.h>		/* For convenience */
+#include <Menu.h>
 #include <View.h>
+
 
 class BMenuBar;
 
+
 class BMenuField : public BView {
- public:
+public:
 							BMenuField(BRect frame, const char* name,
 								const char* label, BMenu* menu,
 								uint32 resize = B_FOLLOW_LEFT|B_FOLLOW_TOP,
-								uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+								uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 							BMenuField(BRect frame, const char* name,
 								const char* label, BMenu* menu,
 								bool fixed_size,
 								uint32 resize = B_FOLLOW_LEFT|B_FOLLOW_TOP,
-								uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+								uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 							BMenuField(const char* name,
 								const char* label, BMenu* menu,
 								BMessage* message,
-								uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+								uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 							BMenuField(const char* label,
-								BMenu* menu, BMessage* message = NULL); 
+								BMenu* menu, BMessage* message = NULL);
 							BMenuField(BMessage* data);
 	virtual					~BMenuField();
 
@@ -57,7 +59,7 @@ class BMenuField : public BView {
 
 	virtual	void			SetLabel(const char* label);
 			const char*		Label() const;
-		
+
 	virtual void			SetEnabled(bool on);
 			bool			IsEnabled() const;
 
@@ -86,7 +88,7 @@ class BMenuField : public BView {
 			BLayoutItem*	CreateLabelLayoutItem();
 			BLayoutItem*	CreateMenuBarLayoutItem();
 
-	
+
 	/*----- Private or reserved -----------------------------------------*/
 	virtual status_t		Perform(perform_code d, void* arg);
 
@@ -107,17 +109,16 @@ private:
 	virtual	void			_ReservedMenuField2();
 	virtual	void			_ReservedMenuField3();
 
-			BMenuField		&operator=(const BMenuField&);
-
+			BMenuField&		operator=(const BMenuField& other);
 
 			void			InitObject(const char* label);
 			void			InitObject2();
 			void			DrawLabel(BRect bounds, BRect update);
 	static	void			InitMenu(BMenu* menu);
-	
+
 			int32			_MenuTask();
 	static	int32			_thread_entry(void *arg);
-	
+
 			void			_UpdateFrame();
 			void			_InitMenuBar(BMenu* menu,
 								BRect frame, bool fixedSize);
