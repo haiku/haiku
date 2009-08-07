@@ -24,6 +24,8 @@ static uint32
 get_color_space_for_depth(uint32 depth)
 {
 	switch (depth) {
+		case 1:
+			return B_GRAY1;
 		case 4:
 			return B_GRAY8;
 				// the app_server is smart enough to translate this to VGA mode

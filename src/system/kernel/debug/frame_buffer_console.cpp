@@ -51,7 +51,8 @@ struct console_info {
 };
 
 // Palette is (white and black are exchanged):
-//	0 - white, 1 - blue, 2 - green, 3 - cyan, 4 - red, 5 - magenta, 6 - yellow, 7 - black
+//	0 - white, 1 - blue, 2 - green, 3 - cyan, 4 - red, 5 - magenta, 6 - yellow,
+//  7 - black
 //  8-15 - same but bright (we're ignoring those)
 
 static uint8 sPalette8[] = {
@@ -79,7 +80,7 @@ static uint32 sPalette32[] = {
 
 static struct console_info sConsole;
 static struct frame_buffer_boot_info sBootInfo;
-static struct vesa_mode *sVesaModes;
+static struct vesa_mode* sVesaModes;
 
 
 static inline uint8
@@ -96,18 +97,18 @@ background_color(uint8 attr)
 }
 
 
-static uint8 *
+static uint8*
 get_palette_entry(uint8 index)
 {
 	switch (sConsole.depth) {
 		case 8:
 			return &sPalette8[index];
 		case 15:
-			return (uint8 *)&sPalette15[index];
+			return (uint8*)&sPalette15[index];
 		case 16:
-			return (uint8 *)&sPalette16[index];
+			return (uint8*)&sPalette16[index];
 		default:
-			return (uint8 *)&sPalette32[index];
+			return (uint8*)&sPalette32[index];
 	}
 }
 
@@ -120,10 +121,11 @@ render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 		glyph = 127;
 
 	if (sConsole.depth >= 8) {
-		uint8 *base = (uint8 *)(sConsole.frame_buffer + sConsole.bytes_per_row * y * CHAR_HEIGHT
+		uint8* base = (uint8*)(sConsole.frame_buffer
+			+ sConsole.bytes_per_row * y * CHAR_HEIGHT
 			+ x * CHAR_WIDTH * sConsole.bytes_per_pixel);
-		uint8 *color = get_palette_entry(foreground_color(attr));
-		uint8 *backgroundColor = get_palette_entry(background_color(attr));
+		uint8* color = get_palette_entry(foreground_color(attr));
+		uint8* backgroundColor = get_palette_entry(background_color(attr));
 
 		for (y = 0; y < CHAR_HEIGHT; y++) {
 			uint8 bits = FONT[CHAR_HEIGHT * glyph + y];
@@ -131,8 +133,10 @@ render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 				for (int32 i = 0; i < sConsole.bytes_per_pixel; i++) {
 					if (bits & 1)
 						base[x * sConsole.bytes_per_pixel + i] = color[i];
-					else
-						base[x * sConsole.bytes_per_pixel + i] = backgroundColor[i];
+					else {
+						base[x * sConsole.bytes_per_pixel + i]
+							= backgroundColor[i];
+					}
 				}
 				bits >>= 1;
 			}
@@ -140,9 +144,10 @@ render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 			base += sConsole.bytes_per_row;
 		}
 	} else {
-		// monochrome mode
+		// VGA mode will be treated as monochrome
+		// (ie. only the first plane will be used)
 
-		uint8 *base = (uint8 *)(sConsole.frame_buffer
+		uint8* base = (uint8*)(sConsole.frame_buffer
 			+ sConsole.bytes_per_row * y * CHAR_HEIGHT + x * CHAR_WIDTH / 8);
 		uint8 baseOffset =  (x * CHAR_WIDTH) & 0x7;
 
@@ -182,7 +187,7 @@ draw_cursor(int32 x, int32 y)
 	y *= CHAR_HEIGHT;
 	int32 endX = x + CHAR_WIDTH * sConsole.bytes_per_pixel;
 	int32 endY = y + CHAR_HEIGHT;
-	uint8 *base = (uint8 *)(sConsole.frame_buffer + y * sConsole.bytes_per_row);
+	uint8* base = (uint8*)(sConsole.frame_buffer + y * sConsole.bytes_per_row);
 
 	if (sConsole.depth < 8) {
 		x /= 8;
@@ -199,7 +204,7 @@ draw_cursor(int32 x, int32 y)
 
 
 static status_t
-console_get_size(int32 *_width, int32 *_height)
+console_get_size(int32* _width, int32* _height)
 {
 	*_width = sConsole.columns;
 	*_height = sConsole.rows;
@@ -280,9 +285,9 @@ console_blit(int32 srcx, int32 srcy, int32 width, int32 height, int32 destx,
 	}
 
 	for (int32 y = 0; y < height; y++) {
-		memmove((void *)(sConsole.frame_buffer + (desty + y)
+		memmove((void*)(sConsole.frame_buffer + (desty + y)
 				* sConsole.bytes_per_row + destx),
-			(void *)(sConsole.frame_buffer + (srcy + y) * sConsole.bytes_per_row
+			(void*)(sConsole.frame_buffer + (srcy + y) * sConsole.bytes_per_row
 				+ srcx), width);
 	}
 }
@@ -297,19 +302,19 @@ console_clear(uint8 attr)
 	switch (sConsole.bytes_per_pixel) {
 		case 1:
 			if (sConsole.depth >= 8) {
-				memset((void *)sConsole.frame_buffer,
+				memset((void*)sConsole.frame_buffer,
 					sPalette8[background_color(attr)],
 					sConsole.height * sConsole.bytes_per_row);
 			} else {
 				// special case for VGA mode
-				memset((void *)sConsole.frame_buffer, 0xff,
+				memset((void*)sConsole.frame_buffer, 0xff,
 					sConsole.height * sConsole.bytes_per_row);
 			}
 			break;
 		default:
 		{
-			uint8 *base = (uint8 *)sConsole.frame_buffer;
-			uint8 *color = get_palette_entry(background_color(attr));
+			uint8* base = (uint8*)sConsole.frame_buffer;
+			uint8* color = get_palette_entry(background_color(attr));
 
 			for (int32 y = 0; y < sConsole.height; y++) {
 				for (int32 x = 0; x < sConsole.width; x++) {
@@ -359,10 +364,12 @@ console_module_info gFrameBufferConsoleModule = {
 
 
 static status_t
-frame_buffer_update(addr_t baseAddress, int32 width, int32 height, int32 depth, int32 bytesPerRow)
+frame_buffer_update(addr_t baseAddress, int32 width, int32 height, int32 depth,
+	int32 bytesPerRow)
 {
-	TRACE(("frame_buffer_update(buffer = %p, width = %ld, height = %ld, depth = %ld, bytesPerRow = %ld)\n",
-		(void *)baseAddress, width, height, depth, bytesPerRow));
+	TRACE(("frame_buffer_update(buffer = %p, width = %ld, height = %ld, "
+		"depth = %ld, bytesPerRow = %ld)\n", (void*)baseAddress, width, height,
+		depth, bytesPerRow));
 
 	mutex_lock(&sConsole.lock);
 
@@ -380,7 +387,7 @@ frame_buffer_update(addr_t baseAddress, int32 width, int32 height, int32 depth, 
 	sConsole.cursor_y = -1;
 
 	TRACE(("framebuffer mapped at %p, %ld columns, %ld rows\n",
-		(void *)sConsole.frame_buffer, sConsole.columns, sConsole.rows));
+		(void*)sConsole.frame_buffer, sConsole.columns, sConsole.rows));
 
 	mutex_unlock(&sConsole.lock);
 	return B_OK;
@@ -398,26 +405,20 @@ frame_buffer_console_available(void)
 
 
 status_t
-frame_buffer_console_init(kernel_args *args)
+frame_buffer_console_init(kernel_args* args)
 {
 	if (!args->frame_buffer.enabled)
 		return B_OK;
 
 	mutex_init(&sConsole.lock, "console_lock");
 
-	void *frameBuffer;
+	void* frameBuffer;
 	sConsole.area = map_physical_memory("vesa_fb",
-		(void *)args->frame_buffer.physical_buffer.start,
+		(void*)args->frame_buffer.physical_buffer.start,
 		args->frame_buffer.physical_buffer.size, B_ANY_KERNEL_ADDRESS,
 		B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA, &frameBuffer);
 	if (sConsole.area < B_OK)
 		return sConsole.area;
-
-	if (args->frame_buffer.depth == 4) {
-		// VGA mode will be treated as monochrome
-		// (ie. only the first plane will be used)
-		args->frame_buffer.depth = 1;
-	}
 
 	frame_buffer_update((addr_t)frameBuffer, args->frame_buffer.width,
 		args->frame_buffer.height, args->frame_buffer.depth,
@@ -432,14 +433,14 @@ frame_buffer_console_init(kernel_args *args)
 	add_boot_item(FRAME_BUFFER_BOOT_INFO, &sBootInfo,
 		sizeof(frame_buffer_boot_info));
 
-	sVesaModes = (vesa_mode *)malloc(args->vesa_modes_size);
+	sVesaModes = (vesa_mode*)malloc(args->vesa_modes_size);
 	if (sVesaModes != NULL) {
 		memcpy(sVesaModes, args->vesa_modes, args->vesa_modes_size);
 		add_boot_item(VESA_MODES_BOOT_INFO, sVesaModes, args->vesa_modes_size);
 	}
 
 	if (args->edid_info != NULL) {
-		edid1_info *info = (edid1_info *)malloc(sizeof(edid1_info));
+		edid1_info* info = (edid1_info*)malloc(sizeof(edid1_info));
 		if (info != NULL) {
 			memcpy(info, args->edid_info, sizeof(edid1_info));
 			add_boot_item(VESA_EDID_BOOT_INFO, info, sizeof(edid1_info));
@@ -451,7 +452,7 @@ frame_buffer_console_init(kernel_args *args)
 
 
 status_t
-frame_buffer_console_init_post_modules(kernel_args *args)
+frame_buffer_console_init_post_modules(kernel_args* args)
 {
 	if (sConsole.frame_buffer == 0)
 		return B_OK;
