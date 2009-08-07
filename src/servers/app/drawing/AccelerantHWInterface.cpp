@@ -52,6 +52,9 @@ using std::nothrow;
 #	define ATRACE(x) ;
 #endif
 
+#define USE_ACCELERATION		0
+#define OFFSCREEN_BACK_BUFFER	0
+
 
 // This call updates the frame buffer used by the on-screen KDL
 extern "C" status_t _kern_frame_buffer_update(void *baseAddress,
@@ -508,7 +511,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 
 	bool tryOffscreenBackBuffer = false;
 	fOffscreenBackBuffer = false;
-#if 0
+#if USE_ACCELERATION && OFFSCREEN_BACK_BUFFER
 	if (fVGADevice < 0 && (color_space)newMode.space == B_RGB32) {
 		// we should have an accelerated graphics driver, try
 		// to allocate a frame buffer large enough to contain
@@ -597,7 +600,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 #endif
 
 	// update acceleration hooks
-#if 0
+#if USE_ACCELERATION
 	fAccFillRect = (fill_rectangle)fAccelerantHook(B_FILL_RECTANGLE,
 		(void *)&fDisplayMode);
 	fAccInvertRect = (invert_rectangle)fAccelerantHook(B_INVERT_RECTANGLE,
@@ -636,7 +639,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 			&& fFrontBuffer->ColorSpace() != B_RGBA32)
 			|| fVGADevice >= 0 || fOffscreenBackBuffer)
 			doubleBuffered = true;
-#if 1
+#if !USE_ACCELERATION
 		doubleBuffered = true;
 #endif
 
