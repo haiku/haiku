@@ -72,6 +72,7 @@ static const struct {
 	{ B_CMAP8, 8, "8 Bits/Pixel, 256 Colors" },
 	{ B_RGB15, 15, "15 Bits/Pixel, 32768 Colors" },
 	{ B_RGB16, 16, "16 Bits/Pixel, 65536 Colors" },
+	{ B_RGB24, 24, "24 Bits/Pixel, 16 Million Colors" },
 	{ B_RGB32, 32, "32 Bits/Pixel, 16 Million Colors" }
 };
 static const int32 kColorSpaceCount
@@ -175,6 +176,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		fIsVesa = true;
 
 	_UpdateOriginal();
+	_BuildSupportedColorSpaces();
 	fActive = fSelected = fOriginal;
 
 	fSettings = settings;
@@ -282,11 +284,18 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	fColorsMenu = new BPopUpMenu("colors", true, false);
 
 	for (int32 i = 0; i < kColorSpaceCount; i++) {
+		if ((fSupportedColorSpaces & (1 << i)) == 0)
+			continue;
+
 		BMessage *message = new BMessage(POP_COLORS_MSG);
 		message->AddInt32("bits_per_pixel", kColorSpaces[i].bits_per_pixel);
 		message->AddInt32("space", kColorSpaces[i].space);
 
-		fColorsMenu->AddItem(new BMenuItem(kColorSpaces[i].label, message));
+		BMenuItem* item = new BMenuItem(kColorSpaces[i].label, message);
+		if (kColorSpaces[i].space == screen.ColorSpace())
+			fUserSelectedColorSpace = item;
+
+		fColorsMenu->AddItem(item);
 	}
 
 	rect.OffsetTo(B_ORIGIN);
@@ -511,7 +520,7 @@ ScreenWindow::QuitRequested()
 
 
 /*!	Update resolution list according to combine mode
-	(some resolution may not be combinable due to memory restrictions)
+	(some resolutions may not be combinable due to memory restrictions).
 */
 void
 ScreenWindow::_CheckResolutionMenu()
@@ -542,7 +551,13 @@ ScreenWindow::_CheckResolutionMenu()
 void
 ScreenWindow::_CheckColorMenu()
 {
+	int32 supportsAnything = false;
+	int32 index = 0;
+
 	for (int32 i = 0; i < kColorSpaceCount; i++) {
+		if ((fSupportedColorSpaces & (1 << i)) == 0)
+			continue;
+
 		bool supported = false;
 
 		for (int32 j = 0; j < fScreenMode.CountModes(); j++) {
@@ -550,19 +565,71 @@ ScreenWindow::_CheckColorMenu()
 
 			if (fSelected.width == mode.width
 				&& fSelected.height == mode.height
-				&& (kColorSpaces[i].space == mode.space
-					// advertize 24 bit mode as 32 bit to avoid confusion
-					|| (kColorSpaces[i].space == B_RGB32
-						&& mode.space == B_RGB24))
+				&& kColorSpaces[i].space == mode.space
 				&& fSelected.combine == mode.combine) {
+				supportsAnything = true;
 				supported = true;
 				break;
 			}
 		}
 
-		BMenuItem* item = fColorsMenu->ItemAt(i);
+		BMenuItem* item = fColorsMenu->ItemAt(index++);
 		if (item)
 			item->SetEnabled(supported);
+	}
+
+	fColorsField->SetEnabled(supportsAnything);
+
+	if (!supportsAnything)
+		return;
+
+	// Make sure a valid item is selected
+
+	BMenuItem* item = fColorsMenu->FindMarked();
+	bool changed = false;
+
+	if (item != fUserSelectedColorSpace) {
+		if (fUserSelectedColorSpace != NULL
+			&& fUserSelectedColorSpace->IsEnabled()) {
+			fUserSelectedColorSpace->SetMarked(true);
+			item = fUserSelectedColorSpace;
+			changed = true;
+		}
+	}
+	if (item != NULL && !item->IsEnabled()) {
+		// find the next best item
+		int32 index = fColorsMenu->IndexOf(item);
+		bool found = false;
+
+		for (int32 i = index + 1; i < fColorsMenu->CountItems(); i++) {
+			item = fColorsMenu->ItemAt(i);
+			if (item->IsEnabled()) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			// search backwards as well
+			for (int32 i = index - 1; i >= 0; i--) {
+				item = fColorsMenu->ItemAt(i);
+				if (item->IsEnabled())
+					break;
+			}
+		}
+
+		item->SetMarked(true);
+		changed = true;
+	}
+
+	if (changed) {
+		// Update selected space
+
+		BMessage* message = item->Message();
+		int32 space;
+		if (message->FindInt32("space", &space) == B_OK) {
+			fSelected.space = (color_space)space;
+			_UpdateColorLabel();
+		}
 	}
 }
 
@@ -694,28 +761,22 @@ ScreenWindow::_UpdateControls()
 
 	item = fColorsMenu->ItemAt(0);
 
-	for (int32 i = kColorSpaceCount; i-- > 0;) {
-		if (kColorSpaces[i].space == fSelected.space
-			|| (kColorSpaces[i].space == B_RGB32
-				&& fSelected.space == B_RGB24)) {
-			item = fColorsMenu->ItemAt(i);
+	for (int32 i = 0, index = 0; i <  kColorSpaceCount; i++) {
+		if ((fSupportedColorSpaces & (1 << i)) == 0)
+			continue;
+
+		if (kColorSpaces[i].space == fSelected.space) {
+			item = fColorsMenu->ItemAt(index);
 			break;
 		}
+
+		index++;
 	}
 
 	if (item && !item->IsMarked())
 		item->SetMarked(true);
 
-	string.Truncate(0);
-	uint32 bitsPerPixel = fSelected.BitsPerPixel();
-	// advertize 24 bit mode as 32 bit to avoid confusion
-	if (bitsPerPixel == 24)
-		bitsPerPixel = 32;
-
-	string << bitsPerPixel << " Bits/Pixel";
-	if (string != fColorsMenu->Superitem()->Label())
-		fColorsMenu->Superitem()->SetLabel(string.String());
-
+	_UpdateColorLabel();
 	_UpdateMonitorView();
 	_UpdateRefreshControl();
 
@@ -857,11 +918,17 @@ ScreenWindow::MessageReceived(BMessage* message)
 
 		case POP_COLORS_MSG:
 		{
-			message->FindInt32("space", (int32 *)&fSelected.space);
+			int32 space;
+			if (message->FindInt32("space", &space) != B_OK)
+				break;
 
-			BString string;
-			string << fSelected.BitsPerPixel() << " Bits/Pixel";
-			fColorsMenu->Superitem()->SetLabel(string.String());
+			int32 index;
+			if (message->FindInt32("index", &index) == B_OK
+				&& fColorsMenu->ItemAt(index) != NULL)
+				fUserSelectedColorSpace = fColorsMenu->ItemAt(index);
+
+			fSelected.space = (color_space)space;
+			_UpdateColorLabel();
 
 			_CheckApplyEnabled();
 			break;
@@ -871,7 +938,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 		{
 			message->FindFloat("refresh", &fSelected.refresh);
 			fOtherRefresh->SetLabel("Other" B_UTF8_ELLIPSIS);
-				// revert "Other…" label - it might have had a refresh rate prefix
+				// revert "Other…" label - it might have a refresh rate prefix
 
 			_CheckApplyEnabled();
 			break;
@@ -1064,6 +1131,22 @@ ScreenWindow::_GetColumnRowButton(bool columns, bool plus)
 
 
 void
+ScreenWindow::_BuildSupportedColorSpaces()
+{
+	fSupportedColorSpaces = 0;
+
+	for (int32 i = 0; i < kColorSpaceCount; i++) {
+		for (int32 j = 0; j < fScreenMode.CountModes(); j++) {
+			if (fScreenMode.ModeAt(j).space == kColorSpaces[i].space) {
+				fSupportedColorSpaces |= 1 << i;
+				break;
+			}
+		}
+	}
+}
+
+
+void
 ScreenWindow::_CheckApplyEnabled()
 {
 	fApplyButton->SetEnabled(fSelected != fActive
@@ -1138,6 +1221,15 @@ ScreenWindow::_UpdateMonitor()
 	}
 	if (text[0])
 		fMonitorView->SetToolTip(text);
+}
+
+
+void
+ScreenWindow::_UpdateColorLabel()
+{
+	BString string;
+	string << fSelected.BitsPerPixel() << " Bits/Pixel";
+	fColorsMenu->Superitem()->SetLabel(string.String());
 }
 
 

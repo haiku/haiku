@@ -121,17 +121,8 @@ screen_mode::operator==(const screen_mode &other) const
 bool
 screen_mode::operator!=(const screen_mode &other) const
 {
-	// make no difference between 24 and 32 bit modes
-	color_space thisSpace = space;
-	if (thisSpace == B_RGB24)
-		thisSpace = B_RGB32;
-
-	color_space otherSpace = other.space;
-	if (otherSpace == B_RGB24)
-		otherSpace = B_RGB32;
-
 	return width != other.width || height != other.height
-		|| thisSpace != otherSpace || refresh != other.refresh
+		|| space != other.space || refresh != other.refresh
 		|| combine != other.combine
 		|| swap_displays != other.swap_displays
 		|| use_laptop_panel != other.use_laptop_panel

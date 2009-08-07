@@ -29,79 +29,86 @@ class ScreenSettings;
 
 
 class ScreenWindow : public BWindow {
-	public:
-		ScreenWindow(ScreenSettings *settings);
-		virtual ~ScreenWindow();
+public:
+							ScreenWindow(ScreenSettings *settings);
+	virtual					~ScreenWindow();
 
-		virtual	bool QuitRequested();
-		virtual void MessageReceived(BMessage *message);
-		virtual void WorkspaceActivated(int32 ws, bool state);
-		virtual void ScreenChanged(BRect frame, color_space mode);
+	virtual	bool			QuitRequested();
+	virtual	void			MessageReceived(BMessage *message);
+	virtual	void			WorkspaceActivated(int32 ws, bool state);
+	virtual	void			ScreenChanged(BRect frame, color_space mode);
 
-	private:
-		BButton* _CreateColumnRowButton(bool columns, bool plus);
-		BButton* _GetColumnRowButton(bool columns, bool plus);
+private:
+			BButton*		_CreateColumnRowButton(bool columns, bool plus);
+			BButton*		_GetColumnRowButton(bool columns, bool plus);
 
-		void _CheckApplyEnabled();
-		void _CheckResolutionMenu();
-		void _CheckColorMenu();
-		void _CheckRefreshMenu();
+			void			_BuildSupportedColorSpaces();
 
-		void _UpdateActiveMode();
-		void _UpdateWorkspaceButtons();
-		void _UpdateRefreshControl();
-		void _UpdateMonitorView();
-		void _UpdateControls();
-		void _UpdateOriginal();
-		void _UpdateMonitor();
+			void			_CheckApplyEnabled();
+			void			_CheckResolutionMenu();
+			void			_CheckColorMenu();
+			void			_CheckRefreshMenu();
 
-		void _Apply();
+			void			_UpdateActiveMode();
+			void			_UpdateWorkspaceButtons();
+			void			_UpdateRefreshControl();
+			void			_UpdateMonitorView();
+			void			_UpdateControls();
+			void			_UpdateOriginal();
+			void			_UpdateMonitor();
+			void			_UpdateColorLabel();
 
-		status_t _WriteVesaModeFile(const screen_mode& mode) const;
-		bool _IsVesa() const { return fIsVesa; }
+			void			_Apply();
 
-		ScreenSettings*	fSettings;
-		bool			fIsVesa;
-		bool			fBootWorkspaceApplied;
+			status_t		_WriteVesaModeFile(const screen_mode& mode) const;
+			bool			_IsVesa() const { return fIsVesa; }
 
-		BStringView*	fMonitorInfo;
-		MonitorView*	fMonitorView;
-		BMenuItem*		fAllWorkspacesItem;
+private:
+			ScreenSettings*	fSettings;
+			bool			fIsVesa;
+			bool			fBootWorkspaceApplied;
 
-		BTextControl*	fColumnsControl;
-		BTextControl*	fRowsControl;
-		BButton*		fWorkspacesButtons[4];
+			BStringView*	fMonitorInfo;
+			MonitorView*	fMonitorView;
+			BMenuItem*		fAllWorkspacesItem;
 
-		BPopUpMenu*		fResolutionMenu;
-		BMenuField*		fResolutionField;
-		BPopUpMenu*		fColorsMenu;
-		BMenuField*		fColorsField;
-		BPopUpMenu*		fRefreshMenu;
-		BMenuField*		fRefreshField;
-		BMenuItem*		fOtherRefresh;
+			BTextControl*	fColumnsControl;
+			BTextControl*	fRowsControl;
+			BButton*		fWorkspacesButtons[4];
 
-		BPopUpMenu*		fCombineMenu;
-		BMenuField*		fCombineField;
-		BPopUpMenu*		fSwapDisplaysMenu;
-		BMenuField*		fSwapDisplaysField;
-		BPopUpMenu*		fUseLaptopPanelMenu;
-		BMenuField*		fUseLaptopPanelField;
-		BPopUpMenu*		fTVStandardMenu;
-		BMenuField*		fTVStandardField;
+			uint32			fSupportedColorSpaces;
+			BMenuItem*		fUserSelectedColorSpace;
 
-		BButton*		fDefaultsButton;
-		BButton*		fApplyButton;
-		BButton*		fRevertButton;
+			BPopUpMenu*		fResolutionMenu;
+			BMenuField*		fResolutionField;
+			BPopUpMenu*		fColorsMenu;
+			BMenuField*		fColorsField;
+			BPopUpMenu*		fRefreshMenu;
+			BMenuField*		fRefreshField;
+			BMenuItem*		fOtherRefresh;
 
-		BButton*		fBackgroundsButton;
+			BPopUpMenu*		fCombineMenu;
+			BMenuField*		fCombineField;
+			BPopUpMenu*		fSwapDisplaysMenu;
+			BMenuField*		fSwapDisplaysField;
+			BPopUpMenu*		fUseLaptopPanelMenu;
+			BMenuField*		fUseLaptopPanelField;
+			BPopUpMenu*		fTVStandardMenu;
+			BMenuField*		fTVStandardField;
 
-		ScreenMode		fScreenMode, fTempScreenMode;
-			// screen modes for all workspaces
-		uint32			fOriginalWorkspacesColumns;
-		uint32			fOriginalWorkspacesRows;
-		screen_mode		fActive, fSelected, fOriginal;
-			// screen modes for the current workspace
-		bool			fModified;
+			BButton*		fDefaultsButton;
+			BButton*		fApplyButton;
+			BButton*		fRevertButton;
+
+			BButton*		fBackgroundsButton;
+
+			ScreenMode		fScreenMode, fTempScreenMode;
+				// screen modes for all workspaces
+			uint32			fOriginalWorkspacesColumns;
+			uint32			fOriginalWorkspacesRows;
+			screen_mode		fActive, fSelected, fOriginal;
+				// screen modes for the current workspace
+			bool			fModified;
 };
 
 #endif	/* SCREEN_WINDOW_H */
