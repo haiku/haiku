@@ -123,7 +123,7 @@
 #define CONFIG_FFSERVER 0
 #define CONFIG_FFT 1
 #define CONFIG_GOLOMB 1
-#define CONFIG_GPL 0
+//#define CONFIG_GPL 0 // defined in Jamfile depending on build config
 #define CONFIG_GPROF 0
 #define CONFIG_GRAY 0
 #define CONFIG_HARDCODED_TABLES 1
