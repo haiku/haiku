@@ -7,6 +7,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+
 #include <BMCPrivate.h>
 
 #include <stdio.h>
@@ -151,7 +152,7 @@ _BMCMenuBar_::Draw(BRect updateRect)
 		be_control_look->DrawMenuFieldBackground(this, rect,
 			updateRect, base, fShowPopUpMarker, flags);
 
-		_DrawItems(updateRect);		
+		_DrawItems(updateRect);
 
 		return;
 	}
@@ -203,7 +204,7 @@ _BMCMenuBar_::Draw(BRect updateRect)
 	}
 
 	BRect r(bounds);
-	r.left = r.right - 10.0;	
+	r.left = r.right - 10.0;
 
 	BeginLineArray(6);
 		// bottom below item text, darker then BMenuBar
@@ -272,7 +273,7 @@ _BMCMenuBar_::FrameResized(float width, float height)
 			dirty.right = Frame().right + 2;
 			dirty.left = dirty.left - diff - 4;
 			fMenuField->Invalidate(dirty);
-			
+
 			// clean up the arrow part
 			dirty = Bounds();
 			dirty.left = dirty.right - diff - 12;
@@ -285,7 +286,7 @@ _BMCMenuBar_::FrameResized(float width, float height)
 			dirty.left = Frame().right - 2;
 			dirty.right = dirty.left - diff + 4;
 			fMenuField->Invalidate(dirty);
-			
+
 			// clean up the arrow part
 			dirty = Bounds();
 			dirty.left = dirty.right - 12;
@@ -315,16 +316,16 @@ _BMCMenuBar_::MessageReceived(BMessage *msg)
 
 			if (item && item->Submenu() &&  item->Submenu()->Window()) {
 				BMessage message(B_KEY_DOWN);
-	
+
 				message.AddInt8("byte", B_ESCAPE);
 				message.AddInt8("key", B_ESCAPE);
 				message.AddInt32("modifiers", 0);
 				message.AddInt8("raw_char", B_ESCAPE);
-	
+
 				Window()->PostMessage(&message, this, NULL);
 			}
 		}
-		// fall through	
+		// fall through
 		default:
 			BMenuBar::MessageReceived(msg);
 			break;
@@ -367,8 +368,12 @@ _BMCMenuBar_::MinSize()
 {
 	BSize size;
 	BMenuBar::GetPreferredSize(&size.width, &size.height);
-	// account for popup indicator + a few pixels margin
-	size.width += 13.0;
+
+	if (fShowPopUpMarker) {
+		// account for popup indicator + a few pixels margin
+		size.width += 13.0;
+	}
+
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
 
@@ -384,7 +389,7 @@ _BMCMenuBar_::MaxSize()
 }
 
 
-_BMCMenuBar_ 
+_BMCMenuBar_
 &_BMCMenuBar_::operator=(const _BMCMenuBar_ &)
 {
 	return *this;
