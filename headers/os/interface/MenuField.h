@@ -27,7 +27,7 @@ public:
 								uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 							BMenuField(const char* name,
 								const char* label, BMenu* menu,
-								BMessage* message,
+								BMessage* message = NULL,
 								uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 							BMenuField(const char* label,
 								BMenu* menu, BMessage* message = NULL);

@@ -1136,8 +1136,9 @@ BMenuField::_MenuBarWidth() const
 
 
 BMenuField::LabelLayoutItem::LabelLayoutItem(BMenuField* parent)
-	: fParent(parent),
-	  fFrame()
+	:
+	fParent(parent),
+	fFrame()
 {
 }
 
@@ -1216,8 +1217,9 @@ BMenuField::LabelLayoutItem::BaseAlignment()
 
 
 BMenuField::MenuBarLayoutItem::MenuBarLayoutItem(BMenuField* parent)
-	: fParent(parent),
-	  fFrame()
+	:
+	fParent(parent),
+	fFrame()
 {
 	// by default the part right of the divider shall have an unlimited maximum
 	// width
@@ -1286,10 +1288,7 @@ BMenuField::MenuBarLayoutItem::BaseMaxSize()
 BSize
 BMenuField::MenuBarLayoutItem::BasePreferredSize()
 {
-	BSize size(BaseMinSize());
-	// puh, no idea...
-	size.width = 100;
-	return size;
+	return BaseMinSize();
 }
 
 

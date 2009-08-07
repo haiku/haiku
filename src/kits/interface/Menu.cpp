@@ -184,7 +184,8 @@ struct BMenu::LayoutData {
 
 
 BMenu::BMenu(const char* name, menu_layout layout)
-	: BView(BRect(0, 0, 0, 0), name, 0, B_WILL_DRAW),
+	:
+	BView(BRect(0, 0, 0, 0), name, 0, B_WILL_DRAW),
 	fChosenItem(NULL),
 	fPad(14.0f, 2.0f, 20.0f, 0.0f),
 	fSelected(NULL),
@@ -218,7 +219,8 @@ BMenu::BMenu(const char* name, menu_layout layout)
 
 
 BMenu::BMenu(const char* name, float width, float height)
-	: BView(BRect(0.0f, width, 0.0f, height), name, 0, B_WILL_DRAW),
+	:
+	BView(BRect(0.0f, width, 0.0f, height), name, 0, B_WILL_DRAW),
 	fChosenItem(NULL),
 	fSelected(NULL),
 	fCachedMenuWindow(NULL),
@@ -263,7 +265,8 @@ BMenu::~BMenu()
 
 
 BMenu::BMenu(BMessage* archive)
-	: BView(archive),
+	:
+	BView(archive),
 	fChosenItem(NULL),
 	fPad(14.0f, 2.0f, 20.0f, 0.0f),
 	fSelected(NULL),
