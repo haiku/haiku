@@ -22,6 +22,11 @@ local librootFunctions =
 	strtol.o
 ;
 
+local extraLinkerArgs = ;
+if $(TARGET_BOOT_BOARD) {
+	extraLinkerArgs += -L$(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/board/$(TARGET_BOOT_BOARD) ;
+}
+
 AddResources haiku_loader : boot_loader.rdef ;
 
 KernelLd boot_loader_$(TARGET_BOOT_PLATFORM) :
@@ -45,7 +50,7 @@ KernelLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	$(librootFunctions:G=src!system!kernel!lib)
 
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_loader_$(TARGET_BOOT_PLATFORM).ld
-	: -Bstatic
+	: -Bstatic $(extraLinkerArgs)
 ;
 
 rule BuildCoffLoader {

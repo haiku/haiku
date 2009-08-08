@@ -1,11 +1,13 @@
 OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 
+/* include board-specific definitions */
+INCLUDE board.ld
+
 ENTRY(_start)
 SECTIONS
 {
-/*	. = 0x80008000; */
-	. = 0xa2000000;
+	. = BOARD_LOADER_BASE;
 
 	/* text/read-only data */
 	.text :	{ *(.text .gnu.linkonce.t.*) }
