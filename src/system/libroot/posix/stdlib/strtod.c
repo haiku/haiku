@@ -125,7 +125,7 @@
 
 #if defined(__i386__) || defined(__ia64__) || defined(__alpha__) || \
     defined(__sparc64__) || defined(__powerpc__) || defined(__POWERPC__) || \
-    defined(__m68k__) || defined(__M68K__)
+    defined(__m68k__) || defined(__M68K__) || defined(__arm__) || defined(__ARM__)
 #	include <sys/types.h>
 #	if BYTE_ORDER == BIG_ENDIAN
 #		define IEEE_BIG_ENDIAN
