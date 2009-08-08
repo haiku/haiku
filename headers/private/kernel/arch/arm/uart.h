@@ -31,6 +31,7 @@ extern "C" {
 
 void uart_init(void);
 void uart_init_early(void);
+int uart_debug_port(void);
 
 int uart_putc(int port, char c);
 int uart_getc(int port, bool wait);
