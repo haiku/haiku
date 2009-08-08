@@ -8926,6 +8926,10 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 	if (targetModel == NULL)
 		targetModel = TargetModel();
 
+	// if this is an OpenWith window, we'll have no target model
+	if (targetModel == NULL)
+		return false;
+
 	entry_ref srcRef;
 	if (targetModel->IsDirectory() && dragMessage->HasRef("refs")
 			&& dragMessage->FindRef("refs", &srcRef) == B_OK) {
