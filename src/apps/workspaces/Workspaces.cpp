@@ -521,11 +521,11 @@ WorkspacesView::MouseDown(BPoint where)
 		BMenuItem* item;
 
 		menu->AddSeparatorItem();
-		menu->AddItem(item = new BMenuItem("No title",
+		menu->AddItem(item = new BMenuItem("No Window Title",
 			new BMessage(kMsgToggleTitle)));
 		if (window->Look() == B_MODAL_WINDOW_LOOK)
 			item->SetMarked(true);
-		menu->AddItem(item = new BMenuItem("No Border",
+		menu->AddItem(item = new BMenuItem("No Window Border",
 			new BMessage(kMsgToggleBorder)));
 		if (window->Look() == B_NO_BORDER_WINDOW_LOOK)
 			item->SetMarked(true);
@@ -535,7 +535,7 @@ WorkspacesView::MouseDown(BPoint where)
 			new BMessage(kMsgToggleAlwaysOnTop)));
 		if (window->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
 			item->SetMarked(true);
-		menu->AddItem(item = new BMenuItem("Auto-Raise",
+		menu->AddItem(item = new BMenuItem("Auto Raise",
 			new BMessage(kMsgToggleAutoRaise)));
 		if (window->IsAutoRaising())
 			item->SetMarked(true);
