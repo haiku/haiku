@@ -98,7 +98,7 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 	AddChild(fFontSize);
 
 	r.OffsetBy(-r.Width() - 10,r.Height() + 25);
-	fColorField = new BMenuField(r, "color", "Change:",
+	fColorField = new BMenuField(r, "color", "Color:",
 		MakeMenu(MSG_COLOR_FIELD_CHANGED, color_tbl, color_tbl[0]));
 	fColorField->SetDivider(StringWidth(fColorField->Label()) + 8.0);
 	AddChild(fColorField);

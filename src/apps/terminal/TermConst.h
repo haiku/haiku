@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
@@ -98,12 +98,12 @@ const char* const PREF_HALF_FONT_FAMILY = "Half Font Family";
 const char* const PREF_HALF_FONT_STYLE = "Half Font Style";
 const char* const PREF_HALF_FONT_SIZE = "Half Font Size";
 
-const char* const PREF_TEXT_FORE_COLOR = "Text Foreground Color";
-const char* const PREF_TEXT_BACK_COLOR = "Text Background Color";
-const char* const PREF_SELECT_FORE_COLOR = "Selection Foreground Color";
-const char* const PREF_SELECT_BACK_COLOR = "Selection Background Color";
-const char* const PREF_CURSOR_FORE_COLOR = "Cursor Foreground Color";
-const char* const PREF_CURSOR_BACK_COLOR = "Cursor Background Color";
+const char* const PREF_TEXT_FORE_COLOR = "Text";
+const char* const PREF_TEXT_BACK_COLOR = "Background";
+const char* const PREF_SELECT_FORE_COLOR = "Selected Text";
+const char* const PREF_SELECT_BACK_COLOR = "Selected Background";
+const char* const PREF_CURSOR_FORE_COLOR = "Cursor Text";
+const char* const PREF_CURSOR_BACK_COLOR = "Cursor Background";
 
 const char* const PREF_IM_FORE_COLOR = "IM Foreground Color";
 const char* const PREF_IM_BACK_COLOR = "IM Background Color";
@@ -119,7 +119,7 @@ const char* const PREF_ANSI_CYAN_COLOR = "ANSI Cyan Color";
 const char* const PREF_ANSI_WHITE_COLOR = "ANSI White Color";
 
 const char* const PREF_HISTORY_SIZE = "History Size";
-const char* const PREF_CURSOR_BLINKING = "Cursor Blinking rate";
+const char* const PREF_CURSOR_BLINKING = "Cursor Blinking Rate";
 
 const char* const PREF_IM_AWARE = "Input Method Aware";
 
@@ -127,7 +127,7 @@ const char* const PREF_COLS = "Cols";
 const char* const PREF_ROWS = "Rows";
 const char* const PREF_SHELL = "Shell";
 
-const char* const PREF_TEXT_ENCODING = "Text encoding";
+const char* const PREF_TEXT_ENCODING = "Text Encoding";
 const char* const PREF_GUI_LANGUAGE = "Language";
 
 // Color type
