@@ -1587,9 +1587,20 @@ BContainerWindow::MessageReceived(BMessage *message)
 							entry.GetRef(&targetref);
 
 							//	if they don't match, move/copy
-							if (targetref != parentref)
+							if (targetref != parentref) {
+								uint32 moveMode = kMoveSelectionTo;
+								node_ref targetNode;
+								node_ref parentNode;
+								if (entry.GetNodeRef(&targetNode) == B_OK
+									&& itemparent.GetNodeRef(&parentNode)
+										== B_OK) {
+									if (targetNode.device == parentNode.device)
+										moveMode = kCopySelectionTo;
+								}
 								//	copy drag contents to target ref in message
-								FSMoveToFolder(list, new BEntry(entry), kMoveSelectionTo);
+								FSMoveToFolder(list, new BEntry(entry),
+									moveMode);
+							}
 
 						} else {
 							// 	current message sent to apps is only B_REFS_RECEIVED
