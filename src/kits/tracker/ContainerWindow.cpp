@@ -1594,7 +1594,7 @@ BContainerWindow::MessageReceived(BMessage *message)
 								if (entry.GetNodeRef(&targetNode) == B_OK
 									&& itemparent.GetNodeRef(&parentNode)
 										== B_OK) {
-									if (targetNode.device == parentNode.device)
+									if (targetNode.device != parentNode.device)
 										moveMode = kCopySelectionTo;
 								}
 								//	copy drag contents to target ref in message
