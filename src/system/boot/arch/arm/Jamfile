@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src system boot arch arm ;
 
 DEFINES += _BOOT_MODE ;
 
+UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) board $(TARGET_BOOT_BOARD) ] ;
+
 # TODO: Is there any reason to recompile arch_string.S here?
 local librootArchObjects =
 #	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>arch_string.o
@@ -14,6 +16,7 @@ local kernelLibArchObjects =
 ;
 
 KernelMergeObject boot_arch_$(TARGET_ARCH).o :
+	uart.c
 	arch_elf.cpp
 	$(librootArchObjects)
 	: -fno-pic

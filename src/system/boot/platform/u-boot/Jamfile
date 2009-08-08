@@ -2,8 +2,6 @@ SubDir HAIKU_TOP src system boot platform u-boot ;
 
 SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
 
-#XXX:move to arch/arm
-UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) board $(TARGET_BOOT_BOARD) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics vesa ] ;
@@ -31,7 +29,6 @@ KernelMergeObject boot_platform_u-boot.o :
 	cpu.cpp
 	video.cpp
 	mmu.cpp	
-	uart.c
 	# generic
 	text_menu.cpp
 
