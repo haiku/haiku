@@ -25,7 +25,7 @@ static uint32 sBufferPosition;
 static void
 serial_putc(char c)
 {
-	uart_putc(0,c);
+	uart_putc(uart_debug_port(),c);
 }
 
 
@@ -68,12 +68,12 @@ serial_disable(void)
 extern "C" void 
 serial_enable(void)
 {
+	/* should already be initialized by U-Boot */
+	/*
 	uart_init_early();
 	uart_init();//todo
-	uart_init_port(0,9600);
-	//uart_init_port(1,9600);
-	//uart_init_port(2,9600);
-
+	uart_init_port(uart_debug_port(),9600);
+	*/
 	sSerialEnabled++;
 }
 

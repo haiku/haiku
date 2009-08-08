@@ -23,13 +23,10 @@
 #include <debug.h>
 #include <arch/arm/reg.h>
 #include <arch/arm/uart.h>
-#include <arch/arm/pxa270.h>
+#include <board_config.h>
 //#include <target/debugconfig.h>
 
-//TODO: beaglespecific ?...
-#define DEBUG_UART 2
-
-
+#define DEBUG_UART BOARD_DEBUG_UART
 
 struct uart_stat {
 	addr_t base;
@@ -37,9 +34,9 @@ struct uart_stat {
 };
 
 static struct uart_stat uart[3] = {
-	{ FFUART_BASE, 2 },
-	{ BTUART_BASE, 2 },
-	{ STUART_BASE, 2 },
+	{ BOARD_UART1_BASE, 2 },
+	{ BOARD_UART2_BASE, 2 },
+	{ BOARD_UART3_BASE, 2 },
 };
 
 static inline void write_uart_reg(int port, uint reg, unsigned char data)
@@ -89,6 +86,11 @@ static inline unsigned char read_uart_reg(int port, uint reg)
 #define FCRVAL (FCR_FIFO_EN | FCR_RXSR | FCR_TXSR)	/* Clear & enable FIFOs */
 
 #define V_NS16550_CLK            (48000000)  /* 48MHz (APLL96/2) */
+
+int uart_debug_port(void)
+{
+	return DEBUG_UART;
+}
 
 void uart_init_port(int port, uint baud)
 {
