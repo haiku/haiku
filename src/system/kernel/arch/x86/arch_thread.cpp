@@ -384,17 +384,21 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 		atomic_or(&toMap->active_on_cpus, (uint32)1 << cpu);
 
 		// assign the new map to the CPU
-		activeMap->RemoveReference();
 		toMap->AddReference();
 		cpuData->arch.active_translation_map = toMap;
 
 		// get the new page directory
 		newPageDirectory = (addr_t)toMap->pgdir_phys;
-	} else
+	} else {
+		activeMap = NULL;
 		newPageDirectory = 0;
+	}
 
 	gX86SwapFPUFunc(from->arch_info.fpu_state, to->arch_info.fpu_state);
 	i386_context_switch(&from->arch_info, &to->arch_info, newPageDirectory);
+
+	if (activeMap != NULL)
+		activeMap->RemoveReference();
 }
 
 
