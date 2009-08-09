@@ -71,27 +71,18 @@ protected:
 };
 
 
-class SourceView::MarkerView : public BaseView {
+class SourceView::MarkerManager {
 public:
-								MarkerView(SourceView* sourceView, Team* team,
-									Listener* listener, FontInfo* fontInfo);
-								~MarkerView();
+								MarkerManager(SourceView* sourceView,
+									Team* team, Listener* listener);
 
-	virtual	void				SetSourceCode(SourceCode* sourceCode);
+			void				SetSourceCode(SourceCode* sourceCode);
 
 			void				SetStackTrace(StackTrace* stackTrace);
 			void				SetStackFrame(StackFrame* stackFrame);
 
 			void				UserBreakpointChanged(target_addr_t address);
 
-	virtual	BSize				MinSize();
-	virtual	BSize				MaxSize();
-
-	virtual	void				Draw(BRect updateRect);
-
-	virtual	void				MouseDown(BPoint where);
-
-private:
 			struct Marker;
 			struct InstructionPointerMarker;
 			struct BreakpointMarker;
@@ -101,14 +92,15 @@ private:
 			typedef BObjectList<Marker>	MarkerList;
 			typedef BObjectList<BreakpointMarker> BreakpointMarkerList;
 
+			void				GetMarkers(uint32 minLine, uint32 maxLine,
+									MarkerList& markers);
+			BreakpointMarker*	BreakpointMarkerAtLine(uint32 line);
+
 private:
 			void				_InvalidateIPMarkers();
 			void				_InvalidateBreakpointMarkers();
 			void				_UpdateIPMarkers();
 			void				_UpdateBreakpointMarkers();
-			void				_GetMarkers(uint32 minLine, uint32 maxLine,
-									MarkerList& markers);
-			BreakpointMarker*	_BreakpointMarkerAtLine(uint32 line);
 
 // TODO: "public" to workaround a GCC2 problem:
 public:
@@ -130,34 +122,67 @@ public:
 private:
 			Team*				fTeam;
 			Listener*			fListener;
+			SourceCode*			fSourceCode;
 			StackTrace*			fStackTrace;
 			StackFrame*			fStackFrame;
 			MarkerList			fIPMarkers;
 			BreakpointMarkerList fBreakpointMarkers;
 			bool				fIPMarkersValid;
 			bool				fBreakpointMarkersValid;
+
+};
+
+
+class SourceView::MarkerView : public BaseView {
+public:
+								MarkerView(SourceView* sourceView, Team* team,
+									Listener* listener, MarkerManager *manager,
+									FontInfo* fontInfo);
+								~MarkerView();
+
+	virtual	void				SetSourceCode(SourceCode* sourceCode);
+
+			void				SetStackTrace(StackTrace* stackTrace);
+			void				SetStackFrame(StackFrame* stackFrame);
+
+			void				UserBreakpointChanged(target_addr_t address);
+
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
+
+	virtual	void				Draw(BRect updateRect);
+
+	virtual	void				MouseDown(BPoint where);
+
+
+private:
+			Team*				fTeam;
+			Listener*			fListener;
+			MarkerManager*		fMarkerManager;
+			StackTrace*			fStackTrace;
+			StackFrame*			fStackFrame;
 			rgb_color			fBreakpointOptionMarker;
 };
 
 
-struct SourceView::MarkerView::Marker {
+struct SourceView::MarkerManager::Marker {
 								Marker(uint32 line);
 	virtual						~Marker();
 
 	inline	uint32				Line() const;
 
-	virtual	void				Draw(MarkerView* view, BRect rect) = 0;
+	virtual	void				Draw(BView* view, BRect rect) = 0;
 
 private:
 	uint32	fLine;
 };
 
 
-struct SourceView::MarkerView::InstructionPointerMarker : Marker {
+struct SourceView::MarkerManager::InstructionPointerMarker : Marker {
 								InstructionPointerMarker(uint32 line,
 									bool topIP, bool currentIP);
 
-	virtual	void				Draw(MarkerView* view, BRect rect);
+	virtual	void				Draw(BView* view, BRect rect);
 
 private:
 			void				_DrawArrow(BView* view, BPoint tip, BSize size,
@@ -170,14 +195,14 @@ private:
 };
 
 
-struct SourceView::MarkerView::BreakpointMarker : Marker {
+struct SourceView::MarkerManager::BreakpointMarker : Marker {
 								BreakpointMarker(uint32 line,
 									target_addr_t address, bool enabled);
 
 			target_addr_t		Address() const		{ return fAddress; }
 			bool				IsEnabled() const	{ return fEnabled; }
 
-	virtual	void				Draw(MarkerView* view, BRect rect);
+	virtual	void				Draw(BView* view, BRect rect);
 
 private:
 			target_addr_t		fAddress;
@@ -186,7 +211,7 @@ private:
 
 
 template<typename MarkerType>
-struct SourceView::MarkerView::MarkerByLinePredicate
+struct SourceView::MarkerManager::MarkerByLinePredicate
 	: UnaryPredicate<MarkerType> {
 	MarkerByLinePredicate(uint32 line)
 		:
@@ -207,9 +232,11 @@ private:
 class SourceView::TextView : public BaseView {
 public:
 								TextView(SourceView* sourceView,
+									MarkerManager* manager,
 									FontInfo* fontInfo);
 
 	virtual	void				SetSourceCode(SourceCode* sourceCode);
+			void				UserBreakpointChanged(target_addr_t address);
 
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
@@ -284,6 +311,7 @@ private:
 			bool				fSelectionMode;
 			TrackingState		fTrackState;
 			BMessageRunner*		fScrollRunner;
+			MarkerManager*		fMarkerManager;
 };
 
 
@@ -299,6 +327,7 @@ SourceView::BaseView::BaseView(const char* name, SourceView* sourceView,
 	fSourceCode(NULL)
 {
 }
+
 
 void
 SourceView::BaseView::SetSourceCode(SourceCode* sourceCode)
@@ -367,29 +396,29 @@ SourceView::BaseView::LineRect(uint32 line) const
 // #pragma mark - MarkerView::Marker
 
 
-SourceView::MarkerView::Marker::Marker(uint32 line)
+SourceView::MarkerManager::Marker::Marker(uint32 line)
 	:
 	fLine(line)
 {
 }
 
 
-SourceView::MarkerView::Marker::~Marker()
+SourceView::MarkerManager::Marker::~Marker()
 {
 }
 
 
 uint32
-SourceView::MarkerView::Marker::Line() const
+SourceView::MarkerManager::Marker::Line() const
 {
 	return fLine;
 }
 
 
-// #pragma mark - MarkerView::InstructionPointerMarker
+// #pragma mark - MarkerManager::InstructionPointerMarker
 
 
-SourceView::MarkerView::InstructionPointerMarker::InstructionPointerMarker(
+SourceView::MarkerManager::InstructionPointerMarker::InstructionPointerMarker(
 	uint32 line, bool topIP, bool currentIP)
 	:
 	Marker(line),
@@ -400,7 +429,7 @@ SourceView::MarkerView::InstructionPointerMarker::InstructionPointerMarker(
 
 
 void
-SourceView::MarkerView::InstructionPointerMarker::Draw(MarkerView* view,
+SourceView::MarkerManager::InstructionPointerMarker::Draw(BView* view,
 	BRect rect)
 {
 	// Get the arrow color -- for the top IP, if current, we use blue,
@@ -426,7 +455,7 @@ SourceView::MarkerView::InstructionPointerMarker::Draw(MarkerView* view,
 
 
 void
-SourceView::MarkerView::InstructionPointerMarker::_DrawArrow(BView* view,
+SourceView::MarkerManager::InstructionPointerMarker::_DrawArrow(BView* view,
 	BPoint tip, BSize size, BSize base, const rgb_color& color, bool fill)
 {
 	view->SetHighColor(color);
@@ -454,10 +483,10 @@ SourceView::MarkerView::InstructionPointerMarker::_DrawArrow(BView* view,
 }
 
 
-// #pragma mark - MarkerView::BreakpointMarker
+// #pragma mark - MarkerManager::BreakpointMarker
 
 
-SourceView::MarkerView::BreakpointMarker::BreakpointMarker(uint32 line,
+SourceView::MarkerManager::BreakpointMarker::BreakpointMarker(uint32 line,
 	target_addr_t address, bool enabled)
 	:
 	Marker(line),
@@ -468,7 +497,7 @@ SourceView::MarkerView::BreakpointMarker::BreakpointMarker(uint32 line,
 
 
 void
-SourceView::MarkerView::BreakpointMarker::Draw(MarkerView* view, BRect rect)
+SourceView::MarkerManager::BreakpointMarker::Draw(BView* view, BRect rect)
 {
 	float y = (rect.top + rect.bottom) / 2;
 	view->SetHighColor((rgb_color){255, 0, 0, 255});
@@ -479,13 +508,12 @@ SourceView::MarkerView::BreakpointMarker::Draw(MarkerView* view, BRect rect)
 }
 
 
-// #pragma mark - MarkerView
+// #pragma mark - MarkerManager
 
 
-SourceView::MarkerView::MarkerView(SourceView* sourceView, Team* team,
-	Listener* listener, FontInfo* fontInfo)
+SourceView::MarkerManager::MarkerManager(SourceView* sourceView, Team* team,
+	Listener* listener)
 	:
-	BaseView("source marker view", sourceView, fontInfo),
 	fTeam(team),
 	fListener(listener),
 	fStackTrace(NULL),
@@ -494,7 +522,276 @@ SourceView::MarkerView::MarkerView(SourceView* sourceView, Team* team,
 	fBreakpointMarkers(20, true),
 	fIPMarkersValid(false),
 	fBreakpointMarkersValid(false)
+{
+}
 
+
+void
+SourceView::MarkerManager::SetSourceCode(SourceCode* sourceCode)
+{
+	fSourceCode = sourceCode;
+}
+
+
+void
+SourceView::MarkerManager::SetStackTrace(StackTrace* stackTrace)
+{
+	fStackTrace = stackTrace;
+	_InvalidateIPMarkers();
+}
+
+
+void
+SourceView::MarkerManager::SetStackFrame(StackFrame* stackFrame)
+{
+	fStackFrame = stackFrame;
+	_InvalidateIPMarkers();
+}
+
+
+void
+SourceView::MarkerManager::UserBreakpointChanged(target_addr_t address)
+{
+	_InvalidateBreakpointMarkers();
+}
+
+
+void
+SourceView::MarkerManager::_InvalidateIPMarkers()
+{
+	fIPMarkersValid = false;
+	fIPMarkers.MakeEmpty();
+}
+
+
+void
+SourceView::MarkerManager::_InvalidateBreakpointMarkers()
+{
+	fBreakpointMarkersValid = false;
+	fBreakpointMarkers.MakeEmpty();
+}
+
+
+void
+SourceView::MarkerManager::_UpdateIPMarkers()
+{
+	if (fIPMarkersValid)
+		return;
+
+	fIPMarkers.MakeEmpty();
+
+	if (fSourceCode != NULL && fStackTrace != NULL) {
+		LocatableFile* sourceFile = fSourceCode->GetSourceFile();
+
+		AutoLocker<Team> locker(fTeam);
+
+		for (int32 i = 0; StackFrame* frame = fStackTrace->FrameAt(i);
+				i++) {
+			target_addr_t ip = frame->InstructionPointer();
+			FunctionInstance* functionInstance;
+			Statement* statement;
+			if (fTeam->GetStatementAtAddress(ip,
+					functionInstance, statement) != B_OK) {
+				continue;
+			}
+			Reference<Statement> statementReference(statement, true);
+
+			int32 line = statement->StartSourceLocation().Line();
+			if (line < 0 || line >= fSourceCode->CountLines())
+				continue;
+
+			if (sourceFile != NULL) {
+				if (functionInstance->GetFunction()->SourceFile() != sourceFile)
+					continue;
+			} else {
+				if (functionInstance->GetSourceCode() != fSourceCode)
+					continue;
+			}
+
+			bool isTopFrame = i == 0
+				&& frame->Type() != STACK_FRAME_TYPE_SYSCALL;
+
+			Marker* marker = new(std::nothrow) InstructionPointerMarker(
+				line, isTopFrame, frame == fStackFrame);
+			if (marker == NULL || !fIPMarkers.AddItem(marker)) {
+				delete marker;
+				break;
+			}
+		}
+
+		// sort by line
+		fIPMarkers.SortItems(&_CompareMarkers);
+
+		// TODO: Filter duplicate IP markers (recursive functions)!
+	}
+
+	fIPMarkersValid = true;
+}
+
+
+void
+SourceView::MarkerManager::_UpdateBreakpointMarkers()
+{
+	if (fBreakpointMarkersValid)
+		return;
+
+	fBreakpointMarkers.MakeEmpty();
+
+	if (fSourceCode != NULL) {
+		LocatableFile* sourceFile = fSourceCode->GetSourceFile();
+
+		AutoLocker<Team> locker(fTeam);
+
+		// get the breakpoints in our source code range
+		BObjectList<UserBreakpoint> breakpoints;
+		fTeam->GetBreakpointsForSourceCode(fSourceCode, breakpoints);
+
+		for (int32 i = 0; UserBreakpoint* breakpoint = breakpoints.ItemAt(i);
+				i++) {
+			UserBreakpointInstance* breakpointInstance
+				= breakpoint->InstanceAt(0);
+			FunctionInstance* functionInstance;
+			Statement* statement;
+			if (fTeam->GetStatementAtAddress(
+					breakpointInstance->Address(), functionInstance,
+					statement) != B_OK) {
+				continue;
+			}
+			Reference<Statement> statementReference(statement, true);
+
+			int32 line = statement->StartSourceLocation().Line();
+			if (line < 0 || line >= fSourceCode->CountLines())
+				continue;
+
+			if (sourceFile != NULL) {
+				if (functionInstance->GetFunction()->SourceFile() != sourceFile)
+					continue;
+			} else {
+				if (functionInstance->GetSourceCode() != fSourceCode)
+					continue;
+			}
+
+			BreakpointMarker* marker = new(std::nothrow) BreakpointMarker(
+				line, breakpointInstance->Address(), breakpoint->IsEnabled());
+			if (marker == NULL || !fBreakpointMarkers.AddItem(marker)) {
+				delete marker;
+				break;
+			}
+		}
+
+		// sort by line
+		fBreakpointMarkers.SortItems(&_CompareBreakpointMarkers);
+	}
+
+	fBreakpointMarkersValid = true;
+}
+
+
+void
+SourceView::MarkerManager::GetMarkers(uint32 minLine, uint32 maxLine,
+	MarkerList& markers)
+{
+	_UpdateIPMarkers();
+	_UpdateBreakpointMarkers();
+
+	int32 ipIndex = fIPMarkers.FindBinaryInsertionIndex(
+		MarkerByLinePredicate<Marker>(minLine));
+	int32 breakpointIndex = fBreakpointMarkers.FindBinaryInsertionIndex(
+		MarkerByLinePredicate<BreakpointMarker>(minLine));
+
+	Marker* ipMarker = fIPMarkers.ItemAt(ipIndex);
+	Marker* breakpointMarker = fBreakpointMarkers.ItemAt(breakpointIndex);
+
+	while (ipMarker != NULL && breakpointMarker != NULL
+		&& ipMarker->Line() <= maxLine && breakpointMarker->Line() <= maxLine) {
+		if (breakpointMarker->Line() <= ipMarker->Line()) {
+			markers.AddItem(breakpointMarker);
+			breakpointMarker = fBreakpointMarkers.ItemAt(++breakpointIndex);
+		} else {
+			markers.AddItem(ipMarker);
+			ipMarker = fIPMarkers.ItemAt(++ipIndex);
+		}
+	}
+
+	while (breakpointMarker != NULL && breakpointMarker->Line() <= maxLine) {
+		markers.AddItem(breakpointMarker);
+		breakpointMarker = fBreakpointMarkers.ItemAt(++breakpointIndex);
+	}
+
+	while (ipMarker != NULL && ipMarker->Line() <= maxLine) {
+		markers.AddItem(ipMarker);
+		ipMarker = fIPMarkers.ItemAt(++ipIndex);
+	}
+}
+
+
+SourceView::MarkerManager::BreakpointMarker*
+SourceView::MarkerManager::BreakpointMarkerAtLine(uint32 line)
+{
+	return fBreakpointMarkers.BinarySearchByKey(line,
+		&_CompareLineBreakpointMarker);
+}
+
+
+/*static*/ int
+SourceView::MarkerManager::_CompareMarkers(const Marker* a,
+	const Marker* b)
+{
+	if (a->Line() < b->Line())
+		return -1;
+	return a->Line() == b->Line() ? 0 : 1;
+}
+
+
+/*static*/ int
+SourceView::MarkerManager::_CompareBreakpointMarkers(const BreakpointMarker* a,
+	const BreakpointMarker* b)
+{
+	if (a->Line() < b->Line())
+		return -1;
+	return a->Line() == b->Line() ? 0 : 1;
+}
+
+
+template<typename MarkerType>
+/*static*/ int
+SourceView::MarkerManager::_CompareLineMarkerTemplate(const uint32* line,
+	const MarkerType* marker)
+{
+	if (*line < marker->Line())
+		return -1;
+	return *line == marker->Line() ? 0 : 1;
+}
+
+
+/*static*/ int
+SourceView::MarkerManager::_CompareLineMarker(const uint32* line,
+	const Marker* marker)
+{
+	return _CompareLineMarkerTemplate<Marker>(line, marker);
+}
+
+
+/*static*/ int
+SourceView::MarkerManager::_CompareLineBreakpointMarker(const uint32* line,
+	const BreakpointMarker* marker)
+{
+	return _CompareLineMarkerTemplate<BreakpointMarker>(line, marker);
+}
+
+
+// #pragma mark - MarkerView
+
+
+SourceView::MarkerView::MarkerView(SourceView* sourceView, Team* team,
+	Listener* listener, MarkerManager* manager, FontInfo* fontInfo)
+	:
+	BaseView("source marker view", sourceView, fontInfo),
+	fTeam(team),
+	fListener(listener),
+	fMarkerManager(manager),
+	fStackTrace(NULL),
+	fStackFrame(NULL)
 {
 	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
 	fBreakpointOptionMarker = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
@@ -511,8 +808,6 @@ SourceView::MarkerView::~MarkerView()
 void
 SourceView::MarkerView::SetSourceCode(SourceCode* sourceCode)
 {
-	_InvalidateIPMarkers();
-	_InvalidateBreakpointMarkers();
 	BaseView::SetSourceCode(sourceCode);
 }
 
@@ -520,8 +815,6 @@ SourceView::MarkerView::SetSourceCode(SourceCode* sourceCode)
 void
 SourceView::MarkerView::SetStackTrace(StackTrace* stackTrace)
 {
-	fStackTrace = stackTrace;
-	_InvalidateIPMarkers();
 	Invalidate();
 }
 
@@ -529,8 +822,6 @@ SourceView::MarkerView::SetStackTrace(StackTrace* stackTrace)
 void
 SourceView::MarkerView::SetStackFrame(StackFrame* stackFrame)
 {
-	fStackFrame = stackFrame;
-	_InvalidateIPMarkers();
 	Invalidate();
 }
 
@@ -538,7 +829,6 @@ SourceView::MarkerView::SetStackFrame(StackFrame* stackFrame)
 void
 SourceView::MarkerView::UserBreakpointChanged(target_addr_t address)
 {
-	_InvalidateBreakpointMarkers();
 	Invalidate();
 }
 
@@ -569,8 +859,8 @@ SourceView::MarkerView::Draw(BRect updateRect)
 		return;
 
 	// get the markers in that range
-	MarkerList markers;
-	_GetMarkers(minLine, maxLine, markers);
+	SourceView::MarkerManager::MarkerList markers;
+	fMarkerManager->GetMarkers(minLine, maxLine, markers);
 
 	float width = Bounds().Width();
 
@@ -580,7 +870,7 @@ SourceView::MarkerView::Draw(BRect updateRect)
 	for (int32 line = minLine; line <= maxLine; line++) {
 		bool drawBreakpointOptionMarker = true;
 
-		Marker* marker;
+		SourceView::MarkerManager::Marker* marker;
 		while ((marker = markers.ItemAt(markerIndex)) != NULL
 				&& marker->Line() == (uint32)line) {
 			marker->Draw(this, LineRect(line));
@@ -629,7 +919,8 @@ SourceView::MarkerView::MouseDown(BPoint where)
 	if (Looper()->CurrentMessage()->FindInt32("modifiers", &modifiers) != B_OK)
 		modifiers = 0;
 
-	BreakpointMarker* marker = _BreakpointMarkerAtLine(line);
+	SourceView::MarkerManager::BreakpointMarker* marker =
+		fMarkerManager->BreakpointMarkerAtLine(line);
 	target_addr_t address = marker != NULL
 		? marker->Address() : statement->CoveringAddressRange().Start();
 
@@ -647,234 +938,11 @@ SourceView::MarkerView::MouseDown(BPoint where)
 }
 
 
-void
-SourceView::MarkerView::_InvalidateIPMarkers()
-{
-	fIPMarkersValid = false;
-	fIPMarkers.MakeEmpty();
-}
-
-
-void
-SourceView::MarkerView::_InvalidateBreakpointMarkers()
-{
-	fBreakpointMarkersValid = false;
-	fBreakpointMarkers.MakeEmpty();
-}
-
-
-void
-SourceView::MarkerView::_UpdateIPMarkers()
-{
-	if (fIPMarkersValid)
-		return;
-
-	fIPMarkers.MakeEmpty();
-
-	if (fSourceCode != NULL && fStackTrace != NULL) {
-		LocatableFile* sourceFile = fSourceCode->GetSourceFile();
-
-		AutoLocker<Team> locker(fTeam);
-
-		for (int32 i = 0; StackFrame* frame = fStackTrace->FrameAt(i);
-				i++) {
-			target_addr_t ip = frame->InstructionPointer();
-			FunctionInstance* functionInstance;
-			Statement* statement;
-			if (fTeam->GetStatementAtAddress(ip,
-					functionInstance, statement) != B_OK) {
-				continue;
-			}
-			Reference<Statement> statementReference(statement, true);
-
-			int32 line = statement->StartSourceLocation().Line();
-			if (line < 0 || line >= LineCount())
-				continue;
-
-			if (sourceFile != NULL) {
-				if (functionInstance->GetFunction()->SourceFile() != sourceFile)
-					continue;
-			} else {
-				if (functionInstance->GetSourceCode() != fSourceCode)
-					continue;
-			}
-
-			bool isTopFrame = i == 0
-				&& frame->Type() != STACK_FRAME_TYPE_SYSCALL;
-
-			Marker* marker = new(std::nothrow) InstructionPointerMarker(
-				line, isTopFrame, frame == fStackFrame);
-			if (marker == NULL || !fIPMarkers.AddItem(marker)) {
-				delete marker;
-				break;
-			}
-		}
-
-		// sort by line
-		fIPMarkers.SortItems(&_CompareMarkers);
-
-		// TODO: Filter duplicate IP markers (recursive functions)!
-	}
-
-	fIPMarkersValid = true;
-}
-
-
-void
-SourceView::MarkerView::_UpdateBreakpointMarkers()
-{
-	if (fBreakpointMarkersValid)
-		return;
-
-	fBreakpointMarkers.MakeEmpty();
-
-	if (fSourceCode != NULL) {
-		LocatableFile* sourceFile = fSourceCode->GetSourceFile();
-
-		AutoLocker<Team> locker(fTeam);
-
-		// get the breakpoints in our source code range
-		BObjectList<UserBreakpoint> breakpoints;
-		fTeam->GetBreakpointsForSourceCode(fSourceCode, breakpoints);
-
-		for (int32 i = 0; UserBreakpoint* breakpoint = breakpoints.ItemAt(i);
-				i++) {
-			UserBreakpointInstance* breakpointInstance
-				= breakpoint->InstanceAt(0);
-			FunctionInstance* functionInstance;
-			Statement* statement;
-			if (fTeam->GetStatementAtAddress(
-					breakpointInstance->Address(), functionInstance,
-					statement) != B_OK) {
-				continue;
-			}
-			Reference<Statement> statementReference(statement, true);
-
-			int32 line = statement->StartSourceLocation().Line();
-			if (line < 0 || line >= LineCount())
-				continue;
-
-			if (sourceFile != NULL) {
-				if (functionInstance->GetFunction()->SourceFile() != sourceFile)
-					continue;
-			} else {
-				if (functionInstance->GetSourceCode() != fSourceCode)
-					continue;
-			}
-
-			BreakpointMarker* marker = new(std::nothrow) BreakpointMarker(
-				line, breakpointInstance->Address(), breakpoint->IsEnabled());
-			if (marker == NULL || !fBreakpointMarkers.AddItem(marker)) {
-				delete marker;
-				break;
-			}
-		}
-
-		// sort by line
-		fBreakpointMarkers.SortItems(&_CompareBreakpointMarkers);
-	}
-
-	fBreakpointMarkersValid = true;
-}
-
-
-void
-SourceView::MarkerView::_GetMarkers(uint32 minLine, uint32 maxLine,
-	MarkerList& markers)
-{
-	_UpdateIPMarkers();
-	_UpdateBreakpointMarkers();
-
-	int32 ipIndex = fIPMarkers.FindBinaryInsertionIndex(
-		MarkerByLinePredicate<Marker>(minLine));
-	int32 breakpointIndex = fBreakpointMarkers.FindBinaryInsertionIndex(
-		MarkerByLinePredicate<BreakpointMarker>(minLine));
-
-	Marker* ipMarker = fIPMarkers.ItemAt(ipIndex);
-	Marker* breakpointMarker = fBreakpointMarkers.ItemAt(breakpointIndex);
-
-	while (ipMarker != NULL && breakpointMarker != NULL
-		&& ipMarker->Line() <= maxLine && breakpointMarker->Line() <= maxLine) {
-		if (breakpointMarker->Line() <= ipMarker->Line()) {
-			markers.AddItem(breakpointMarker);
-			breakpointMarker = fBreakpointMarkers.ItemAt(++breakpointIndex);
-		} else {
-			markers.AddItem(ipMarker);
-			ipMarker = fIPMarkers.ItemAt(++ipIndex);
-		}
-	}
-
-	while (breakpointMarker != NULL && breakpointMarker->Line() <= maxLine) {
-		markers.AddItem(breakpointMarker);
-		breakpointMarker = fBreakpointMarkers.ItemAt(++breakpointIndex);
-	}
-
-	while (ipMarker != NULL && ipMarker->Line() <= maxLine) {
-		markers.AddItem(ipMarker);
-		ipMarker = fIPMarkers.ItemAt(++ipIndex);
-	}
-}
-
-
-SourceView::MarkerView::BreakpointMarker*
-SourceView::MarkerView::_BreakpointMarkerAtLine(uint32 line)
-{
-	return fBreakpointMarkers.BinarySearchByKey(line,
-		&_CompareLineBreakpointMarker);
-}
-
-
-/*static*/ int
-SourceView::MarkerView::_CompareMarkers(const Marker* a,
-	const Marker* b)
-{
-	if (a->Line() < b->Line())
-		return -1;
-	return a->Line() == b->Line() ? 0 : 1;
-}
-
-
-/*static*/ int
-SourceView::MarkerView::_CompareBreakpointMarkers(const BreakpointMarker* a,
-	const BreakpointMarker* b)
-{
-	if (a->Line() < b->Line())
-		return -1;
-	return a->Line() == b->Line() ? 0 : 1;
-}
-
-
-template<typename MarkerType>
-/*static*/ int
-SourceView::MarkerView::_CompareLineMarkerTemplate(const uint32* line,
-	const MarkerType* marker)
-{
-	if (*line < marker->Line())
-		return -1;
-	return *line == marker->Line() ? 0 : 1;
-}
-
-
-/*static*/ int
-SourceView::MarkerView::_CompareLineMarker(const uint32* line,
-	const Marker* marker)
-{
-	return _CompareLineMarkerTemplate<Marker>(line, marker);
-}
-
-
-/*static*/ int
-SourceView::MarkerView::_CompareLineBreakpointMarker(const uint32* line,
-	const BreakpointMarker* marker)
-{
-	return _CompareLineMarkerTemplate<BreakpointMarker>(line, marker);
-}
-
-
 // #pragma mark - TextView
 
 
-SourceView::TextView::TextView(SourceView* sourceView, FontInfo* fontInfo)
+SourceView::TextView::TextView(SourceView* sourceView, MarkerManager* manager,
+	FontInfo* fontInfo)
 	:
 	BaseView("source text view", sourceView, fontInfo),
 	fMaxLineWidth(-1),
@@ -887,7 +955,8 @@ SourceView::TextView::TextView(SourceView* sourceView, FontInfo* fontInfo)
 	fClickCount(0),
 	fSelectionMode(false),
 	fTrackState(kNotTracking),
-	fScrollRunner(NULL)
+	fScrollRunner(NULL),
+	fMarkerManager(manager)
 {
 	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 	fTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
@@ -902,6 +971,13 @@ SourceView::TextView::SetSourceCode(SourceCode* sourceCode)
 	fSelectionStart = fSelectionBase = fSelectionEnd = SelectionPoint(-1, -1);
 	fClickCount = 0;
 	BaseView::SetSourceCode(sourceCode);
+}
+
+
+void
+SourceView::TextView::UserBreakpointChanged(target_addr_t)
+{
+	Invalidate();
 }
 
 
@@ -928,15 +1004,39 @@ SourceView::TextView::Draw(BRect updateRect)
 	// get the lines intersecting with the update rect
 	int32 minLine, maxLine;
 	GetLineRange(updateRect, minLine, maxLine);
+	SourceView::MarkerManager::MarkerList markers;
+	fMarkerManager->GetMarkers(minLine, maxLine, markers);
 
 	// draw the affected lines
 	SetHighColor(fTextColor);
 	SetFont(&fFontInfo->font);
+	SourceView::MarkerManager::Marker* marker;
+	int32 markerIndex = 0;
 	for (int32 i = minLine; i <= maxLine; i++) {
+		SetLowColor(ViewColor());
 		float y = (float)(i + 1) * fFontInfo->lineHeight
 			- fFontInfo->fontHeight.descent;
 		BString lineString;
 		_FormatLine(fSourceCode->LineAt(i), lineString);
+
+		for (int32 j = markerIndex; j < markers.CountItems(); j++) {
+			marker = markers.ItemAt(j);
+			 if (marker->Line() < (uint32)i) {
+				++markerIndex;
+			 	continue;
+			 } else if (marker->Line() == (uint32)i) {
+			 	++markerIndex;
+			 	if (dynamic_cast<SourceView::MarkerManager
+			 		::InstructionPointerMarker*>(marker) != NULL)
+			 		SetLowColor(96, 216, 216, 255);
+			 	else
+					SetLowColor(255, 255, 0, 255);
+				FillRect(BRect(kLeftTextMargin, y - fFontInfo->lineHeight,
+					Bounds().right,	y), B_SOLID_LOW);
+				break;
+			 } else
+			 	break;
+		}
 		DrawString(lineString, BPoint(kLeftTextMargin, y));
 	}
 
@@ -1575,6 +1675,7 @@ printf("SourceView::SetStackTrace(%p)\n", stackTrace);
 		return;
 
 	if (fStackTrace != NULL) {
+		fMarkerManager->SetStackTrace(NULL);
 		fMarkerView->SetStackTrace(NULL);
 		fStackTrace->RemoveReference();
 	}
@@ -1584,7 +1685,9 @@ printf("SourceView::SetStackTrace(%p)\n", stackTrace);
 	if (fStackTrace != NULL)
 		fStackTrace->AddReference();
 
+	fMarkerManager->SetStackTrace(fStackTrace);
 	fMarkerView->SetStackTrace(fStackTrace);
+	fTextView->Invalidate();
 }
 
 
@@ -1595,6 +1698,7 @@ SourceView::SetStackFrame(StackFrame* stackFrame)
 		return;
 
 	if (fStackFrame != NULL) {
+		fMarkerManager->SetStackFrame(NULL);
 		fMarkerView->SetStackFrame(NULL);
 		fStackFrame->RemoveReference();
 	}
@@ -1604,7 +1708,9 @@ SourceView::SetStackFrame(StackFrame* stackFrame)
 	if (fStackFrame != NULL)
 		fStackFrame->AddReference();
 
+	fMarkerManager->SetStackFrame(fStackFrame);
 	fMarkerView->SetStackFrame(fStackFrame);
+	fTextView->Invalidate();
 
 	if (fStackFrame != NULL)
 		ScrollToAddress(fStackFrame->InstructionPointer());
@@ -1619,6 +1725,7 @@ SourceView::SetSourceCode(SourceCode* sourceCode)
 		return;
 
 	if (fSourceCode != NULL) {
+		fMarkerManager->SetSourceCode(NULL);
 		fTextView->SetSourceCode(NULL);
 		fMarkerView->SetSourceCode(NULL);
 		fSourceCode->RemoveReference();
@@ -1629,6 +1736,7 @@ SourceView::SetSourceCode(SourceCode* sourceCode)
 	if (fSourceCode != NULL)
 		fSourceCode->AddReference();
 
+	fMarkerManager->SetSourceCode(fSourceCode);
 	fTextView->SetSourceCode(fSourceCode);
 	fMarkerView->SetSourceCode(fSourceCode);
 	_UpdateScrollBars();
@@ -1641,7 +1749,9 @@ SourceView::SetSourceCode(SourceCode* sourceCode)
 void
 SourceView::UserBreakpointChanged(target_addr_t address)
 {
+	fMarkerManager->UserBreakpointChanged(address);
 	fMarkerView->UserBreakpointChanged(address);
+	fTextView->UserBreakpointChanged(address);
 }
 
 
@@ -1764,8 +1874,10 @@ SourceView::DoLayout()
 void
 SourceView::_Init()
 {
-	AddChild(fMarkerView = new MarkerView(this, fTeam, fListener, &fFontInfo));
-	AddChild(fTextView = new TextView(this, &fFontInfo));
+	fMarkerManager = new MarkerManager(this, fTeam, fListener);
+	AddChild(fMarkerView = new MarkerView(this, fTeam, fListener,
+		fMarkerManager, &fFontInfo));
+	AddChild(fTextView = new TextView(this, fMarkerManager, &fFontInfo));
 }
 
 

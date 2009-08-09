@@ -53,6 +53,7 @@ public:
 
 private:
 			class BaseView;
+			class MarkerManager;
 			class MarkerView;
 			class TextView;
 
@@ -72,6 +73,7 @@ private:
 			StackTrace*			fStackTrace;
 			StackFrame*			fStackFrame;
 			SourceCode*			fSourceCode;
+			MarkerManager*		fMarkerManager;
 			MarkerView*			fMarkerView;
 			TextView*			fTextView;
 			FontInfo			fFontInfo;
