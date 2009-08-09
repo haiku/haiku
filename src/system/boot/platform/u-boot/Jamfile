@@ -36,6 +36,11 @@ KernelMergeObject boot_platform_u-boot.o :
 	: -fno-pic
 ;
 
+# include board-specific defs
+SubInclude HAIKU_TOP src system boot platform $(TARGET_BOOT_PLATFORM) board ;
+# reset SubDir
+SubDir HAIKU_TOP src system boot platform u-boot ;
+
 # bootable flash image
 rule BuildUBootFlashImage image : haikuLoader : uboot_image {
 	Depends $(image) : $(haikuLoader) ;
@@ -51,8 +56,6 @@ rule BuildUBootFlashImage image : haikuLoader : uboot_image {
 
 
 actions BuildUBootFlashImage1 {
-	echo "$(1)"
-	echo "$(2)"
 	$(RM) $(<)
 	# make an empty image
 	dd if=/dev/zero of=$(<) bs=$(FLASH_IMAGE_BLOCK_SIZE) count=$(FLASH_IMAGE_BLOCK_COUNT)
@@ -64,9 +67,23 @@ actions BuildUBootFlashImage1 {
 	dd if=$(>[1]) of=$(<) bs=$(FLASH_IMAGE_BLOCK_SIZE) conv=notrunc seek=$(FLASH_IMAGE_LOADER_OFFSET)
 }
 
+# uImage
+rule BuildUImage image : data : args {
+	Depends $(image) : $(data) ;
+	LocalClean clean : $(image) ;
+	MKIMAGE_ARGS on $(image) = $(args) ;
+	BuildUImage1 $(image) : $(data) ;
+}
+
+actions BuildUImage1 {
+	mkimage $(MKIMAGE_ARGS) -d $(>) $(<)
+}
+
+BuildUImage haiku_loader.ub : haiku_loader : "-A arm -O netbsd -T kernel -C none -a $(BOARD_UBOOT_LOADER_ADDRESS) -e $(BOARD_UBOOT_LOADER_ADDRESS) -n 'haiku_loader'" ;
+
 BuildUBootFlashImage haiku_flash_image_raw.img : haiku_loader : $(UBOOT_IMAGE) ;
 #BuildUBootFlashImage haiku_flash_image_elf.img : boot_loader_u-boot : $(UBOOT_IMAGE) ;
-#BuildUBootFlashImage haiku_flash_image_uimage.img : boot_loader_u-boot_uimage : $(UBOOT_IMAGE) ;
+BuildUBootFlashImage haiku_flash_image_uimage.img : haiku_loader.ub : $(UBOOT_IMAGE) ;
 
 SEARCH on [ FGristFiles text_menu.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
