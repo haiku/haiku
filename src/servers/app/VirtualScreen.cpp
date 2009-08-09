@@ -108,11 +108,8 @@ VirtualScreen::StoreConfiguration(BMessage& settings)
 		display_mode mode;
 		screen->GetMode(&mode);
 
-		screenSettings.AddInt32("width", mode.virtual_width);
-		screenSettings.AddInt32("height", mode.virtual_height);
-		screenSettings.AddInt32("color space", mode.space);
-		screenSettings.AddData("timing", B_RAW_TYPE, &mode.timing,
-			sizeof(display_timing));
+		screenSettings.AddData("mode", B_RAW_TYPE, &mode,
+			sizeof(display_mode));
 
 		settings.AddMessage("screen", &screenSettings);
 	}
@@ -142,16 +139,12 @@ VirtualScreen::AddScreen(Screen* screen)
 	BMessage settings;
 	if (_GetConfiguration(screen, settings) == B_OK) {
 		// we found settings for this screen, and try to apply them now
-		int32 width, height, colorSpace;
-		const display_timing* timing;
+		const display_mode* mode;
 		ssize_t size;
-		if (settings.FindInt32("width", &width) == B_OK
-			&& settings.FindInt32("height", &height) == B_OK
-			&& settings.FindInt32("color space", &colorSpace) == B_OK
-			&& settings.FindData("timing", B_RAW_TYPE, (const void**)&timing,
+		if (settings.FindData("mode", B_RAW_TYPE, (const void**)&mode,
 					&size) == B_OK
-			&& size == sizeof(display_timing))
-			status = screen->SetMode(width, height, colorSpace, *timing, true);
+			&& size == sizeof(display_mode))
+			status = screen->SetMode(*mode, true);
 		// TODO: named settings will get lost if setting the mode failed!
 	}
 	if (status < B_OK) {
