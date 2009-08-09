@@ -192,6 +192,15 @@ vm_translation_map_arch_info::Delete()
 	sTMapList.Remove(this);
 	locker.Unlock();
 
+#if 0
+	// this sanity check can be enabled when corruption due to
+	// overwriting an active page directory is suspected
+	addr_t activePageDirectory;
+	read_cr3(activePageDirectory);
+	if (activePageDirectory == (addr_t)pgdir_phys)
+		panic("deleting a still active page directory\n");
+#endif
+
 	if (are_interrupts_enabled())
 		delete this;
 	else
