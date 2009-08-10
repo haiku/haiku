@@ -18,8 +18,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
- *
  */
+
 
 #include "MainWin.h"
 
@@ -99,29 +99,30 @@ enum {
 
 
 MainWin::MainWin()
-	: BWindow(BRect(100,100,400,300), NAME, B_TITLED_WINDOW,
+	:
+	BWindow(BRect(100,100,400,300), NAME, B_TITLED_WINDOW,
  		B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */),
-	  fInfoWin(NULL),
-	  fPlaylistWindow(NULL),
-	  fHasFile(false),
-	  fHasVideo(false),
-	  fHasAudio(false),
-	  fPlaylist(new Playlist),
-	  fPlaylistObserver(new PlaylistObserver(this)),
-	  fController(new Controller),
-	  fControllerObserver(new ControllerObserver(this,
+	fInfoWin(NULL),
+	fPlaylistWindow(NULL),
+	fHasFile(false),
+	fHasVideo(false),
+	fHasAudio(false),
+	fPlaylist(new Playlist),
+	fPlaylistObserver(new PlaylistObserver(this)),
+	fController(new Controller),
+	fControllerObserver(new ControllerObserver(this,
 		OBSERVE_FILE_CHANGES | OBSERVE_TRACK_CHANGES
 			| OBSERVE_PLAYBACK_STATE_CHANGES | OBSERVE_POSITION_CHANGES
 			| OBSERVE_VOLUME_CHANGES)),
-	  fIsFullscreen(false),
-	  fAlwaysOnTop(false),
-	  fNoInterface(false),
-	  fSourceWidth(-1),
-	  fSourceHeight(-1),
-	  fWidthAspect(0),
-	  fHeightAspect(0),
-	  fMouseDownTracking(false),
-	  fGlobalSettingsListener(this)
+	fIsFullscreen(false),
+	fAlwaysOnTop(false),
+	fNoInterface(false),
+	fSourceWidth(-1),
+	fSourceHeight(-1),
+	fWidthAspect(0),
+	fHeightAspect(0),
+	fMouseDownTracking(false),
+	fGlobalSettingsListener(this)
 {
 	static int pos = 0;
 	MoveBy(pos * 25, pos * 25);
@@ -325,7 +326,7 @@ MainWin::DispatchMessage(BMessage *msg, BHandler *handler)
 		}
 
 		// every other key gets dispatched to our _KeyDown first
-		if (_KeyDown(msg) == B_OK) {
+		if (_KeyDown(msg)) {
 			// it got handled, don't pass it on
 			return;
 		}
@@ -1201,13 +1202,17 @@ MainWin::_ResizeWindow(int percent, bool stayOnScreen)
 			if (frame.Width() > screenFrame.Width()
 				|| frame.Height() > screenFrame.Height()) {
 				// too large
-				int widthDiff = frame.Width() - screenFrame.Width();
-				int heightDiff = frame.Height() - screenFrame.Height();
+				int widthDiff
+					= frame.IntegerWidth() - screenFrame.IntegerWidth();
+				int heightDiff
+					= frame.IntegerHeight() - screenFrame.IntegerHeight();
+
 				float shrinkScale;
 				if (widthDiff > heightDiff)
 					shrinkScale = (float)(width - widthDiff) / width;
 				else
 					shrinkScale = (float)(height - heightDiff) / height;
+
 				// Resize width/height and center window
 				width = lround(width * shrinkScale);
 				height = lround(height * shrinkScale);
@@ -1218,13 +1223,13 @@ MainWin::_ResizeWindow(int percent, bool stayOnScreen)
 				int offsetX = 0;
 				int offsetY = 0;
 				if (frame.left < screenFrame.left)
-					offsetX = screenFrame.left - frame.left;
+					offsetX = (int)(screenFrame.left - frame.left);
 				else if (frame.right > screenFrame.right)
-					offsetX = screenFrame.right - frame.right;
+					offsetX = (int)(screenFrame.right - frame.right);
 				if (frame.top < screenFrame.top)
-					offsetX = screenFrame.top - frame.top;
+					offsetX = (int)(screenFrame.top - frame.top);
 				else if (frame.bottom > screenFrame.bottom)
-					offsetX = screenFrame.bottom - frame.bottom;
+					offsetX = (int)(screenFrame.bottom - frame.bottom);
 				MoveBy(offsetX, offsetY);
 			}
 		}
@@ -1431,37 +1436,42 @@ MainWin::_ShowContextMenu(const BPoint &screen_point)
 }
 
 
-/* Trap keys that are about to be send to background or renderer view.
- * Return B_OK if it shouldn't be passed to the view
- */
-status_t
+/*!	Trap keys that are about to be send to background or renderer view.
+	Return true if it shouldn't be passed to the view.
+*/
+bool
 MainWin::_KeyDown(BMessage *msg)
 {
-//	msg->PrintToStream();
+	// TODO: use the shortcut mechanism instead!
 
-	uint32 key		 = msg->FindInt32("key");
-	uint32 raw_char  = msg->FindInt32("raw_char");
+	uint32 key = msg->FindInt32("key");
+	uint32 rawChar = msg->FindInt32("raw_char");
 	uint32 modifier = msg->FindInt32("modifiers");
 
-	printf("key 0x%lx, raw_char 0x%lx, modifiers 0x%lx\n", key, raw_char,
+	printf("key 0x%lx, rawChar 0x%lx, modifiers 0x%lx\n", key, rawChar,
 		modifier);
 
-	switch (raw_char) {
+	// ignore the system modifier namespace
+	if ((modifier & (B_CONTROL_KEY | B_COMMAND_KEY))
+			== (B_CONTROL_KEY | B_COMMAND_KEY))
+		return false;
+
+	switch (rawChar) {
 		case B_SPACE:
 			fController->TogglePlaying();
-			return B_OK;
+			return true;
 
 		case B_ESCAPE:
-			if (fIsFullscreen) {
-				PostMessage(M_TOGGLE_FULLSCREEN);
-				return B_OK;
-			} else
+			if (!fIsFullscreen)
 				break;
+
+			PostMessage(M_TOGGLE_FULLSCREEN);
+			return true;
 
 		case B_ENTER:		// Enter / Return
 			if (modifier & B_COMMAND_KEY) {
 				PostMessage(M_TOGGLE_FULLSCREEN);
-				return B_OK;
+				return true;
 			} else
 				break;
 
@@ -1469,56 +1479,52 @@ MainWin::_KeyDown(BMessage *msg)
 			if ((modifier & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
 					| B_MENU_KEY)) == 0) {
 				PostMessage(M_TOGGLE_FULLSCREEN);
-				return B_OK;
+				return true;
 			} else
 				break;
 
 		case B_UP_ARROW:
-			if (modifier & B_COMMAND_KEY) {
+			if ((modifier & B_COMMAND_KEY) != 0)
 				PostMessage(M_SKIP_NEXT);
-			} else {
+			else
 				PostMessage(M_VOLUME_UP);
-			}
-			return B_OK;
+			return true;
 
 		case B_DOWN_ARROW:
-			if (modifier & B_COMMAND_KEY) {
+			if ((modifier & B_COMMAND_KEY) != 0)
 				PostMessage(M_SKIP_PREV);
-			} else {
+			else
 				PostMessage(M_VOLUME_DOWN);
-			}
-			return B_OK;
+			return true;
 
 		case B_RIGHT_ARROW:
-			if (modifier & B_COMMAND_KEY) {
+			if ((modifier & B_COMMAND_KEY) != 0)
 				PostMessage(M_VOLUME_UP);
-			} else {
+			else
 				PostMessage(M_SKIP_NEXT);
-			}
-			return B_OK;
+			return true;
 
 		case B_LEFT_ARROW:
-			if (modifier & B_COMMAND_KEY) {
+			if ((modifier & B_COMMAND_KEY) != 0)
 				PostMessage(M_VOLUME_DOWN);
-			} else {
+			else
 				PostMessage(M_SKIP_PREV);
-			}
-			return B_OK;
+			return true;
 
 		case B_PAGE_UP:
 			PostMessage(M_SKIP_NEXT);
-			return B_OK;
+			return true;
 
 		case B_PAGE_DOWN:
 			PostMessage(M_SKIP_PREV);
-			return B_OK;
+			return true;
 	}
 
 	switch (key) {
 		case 0x3a:  		// numeric keypad +
 			if ((modifier & B_COMMAND_KEY) == 0) {
 				PostMessage(M_VOLUME_UP);
-				return B_OK;
+				return true;
 			} else {
 				break;
 			}
@@ -1526,44 +1532,44 @@ MainWin::_KeyDown(BMessage *msg)
 		case 0x25:  		// numeric keypad -
 			if ((modifier & B_COMMAND_KEY) == 0) {
 				PostMessage(M_VOLUME_DOWN);
-				return B_OK;
+				return true;
 			} else {
 				break;
 			}
 
 		case 0x38:			// numeric keypad up arrow
 			PostMessage(M_VOLUME_UP);
-			return B_OK;
+			return true;
 
 		case 0x59:			// numeric keypad down arrow
 			PostMessage(M_VOLUME_DOWN);
-			return B_OK;
+			return true;
 
 		case 0x39:			// numeric keypad page up
 		case 0x4a:			// numeric keypad right arrow
 			PostMessage(M_SKIP_NEXT);
-			return B_OK;
+			return true;
 
 		case 0x5a:			// numeric keypad page down
 		case 0x48:			// numeric keypad left arrow
 			PostMessage(M_SKIP_PREV);
-			return B_OK;
+			return true;
 
-		case 0x34:			//delete button
-		case 0x3e: 			//d for delete
-		case 0x2b:			//t for Trash
-			if (modifiers() & B_COMMAND_KEY) {
+		case 0x34:			// delete button
+		case 0x3e: 			// d for delete
+		case 0x2b:			// t for Trash
+			if ((modifiers() & B_COMMAND_KEY) != 0) {
 				BAutolock _(fPlaylist);
 				BMessage removeMessage(M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH);
 				removeMessage.AddInt32("playlist index",
 					fPlaylist->CurrentItemIndex());
 				fPlaylistWindow->PostMessage(&removeMessage);
-				return B_OK;
+				return true;
 			}
 			break;
 	}
 
-	return B_ERROR;
+	return false;
 }
 
 

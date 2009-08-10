@@ -21,6 +21,7 @@
 #ifndef __MAIN_WIN_H
 #define __MAIN_WIN_H
 
+
 #include <Window.h>
 #include <Menu.h>
 #include <Button.h>
@@ -34,9 +35,11 @@
 #include "PlaylistItem.h"
 #include "VideoView.h"
 
+
 class ControllerObserver;
 class PlaylistObserver;
 class PlaylistWindow;
+
 
 class MainWin : public BWindow {
 public:
@@ -93,7 +96,7 @@ private:
 									BView* originalHandler);
 			void				_MouseUp(BMessage* message);
 			void				_ShowContextMenu(const BPoint& screenPoint);
-			status_t			_KeyDown(BMessage* message);
+			bool				_KeyDown(BMessage* message);
 
 			void				_ToggleFullscreen();
 			void				_ToggleAlwaysOnTop();
