@@ -172,6 +172,11 @@ static property_info sWindowPropInfo[] = {
 		"Minimize", { B_GET_PROPERTY, B_SET_PROPERTY },
 		{ B_DIRECT_SPECIFIER }, NULL, 0, { B_BOOL_TYPE }
 	},
+	
+	{
+		"TabFrame", { B_GET_PROPERTY },
+		{ B_DIRECT_SPECIFIER }, NULL, 0, { B_RECT_TYPE }
+	},
 
 	{}
 };
@@ -827,6 +832,18 @@ BWindow::MessageReceived(BMessage* msg)
 				if (msg->FindBool("data", &minimize) == B_OK) {
 					Minimize(minimize);
 					handled = true;
+				}
+			}
+			break;
+		case 12:
+			if (msg->what == B_GET_PROPERTY) {
+				BMessage settings;
+				if (GetDecoratorSettings(&settings) == B_OK) {
+					BRect frame;
+					if(settings.FindRect("tab frame", &frame) == B_OK) {
+						replyMsg.AddRect("result", frame);
+						handled = true;
+					}
 				}
 			}
 			break;
