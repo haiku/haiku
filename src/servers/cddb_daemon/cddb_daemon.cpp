@@ -214,7 +214,11 @@ CDDBDaemon::_WriteCDData(dev_t device, QueryResponseData* diskData,
 	BVolume volume(device);
 	
 	status_t result;
+	status_t error = B_OK;
+	
 	BString name = diskData->artist << " - " << diskData->title;
+	name.ReplaceSet("/", " ");
+	
 	if ((result = volume.SetName(name.String())) != B_OK) {
 		printf("Can't set volume name.\n");
 		return result;
@@ -225,15 +229,20 @@ CDDBDaemon::_WriteCDData(dev_t device, QueryResponseData* diskData,
 	volume.GetRootDirectory(&cddaRoot);
 	
 	BEntry entry;
-	int cnt = 0;
+	int index = 0;
 	while (cddaRoot.GetNextEntry(&entry) == B_OK) {
-		TrackData* data = (TrackData*)((readResponse->tracks).ItemAt(cnt));
+		TrackData* data = (TrackData*)((readResponse->tracks).ItemAt(index));
 		
 		// Update name.
-		if ((result = entry.Rename((data->title).String())) != B_OK) {
-			// Failed renaming one entry. Abort processing.
-			printf("Failed renaming entry at index %d. Aborting.\n", cnt);
-			return result;
+		name = data->title;
+		name.ReplaceSet("/", " ");
+		
+		if ((result = entry.Rename(name.String())) != B_OK) {
+			printf("Failed renaming entry at index %d to \"%s\".\n", index,
+				name.String());
+			error = result;
+				// User can benefit from continuing through all tracks.
+				// Report error later.
 		}
 		
 		// Add relevant attributes. We consider an error here as non-fatal.
@@ -258,10 +267,10 @@ CDDBDaemon::_WriteCDData(dev_t device, QueryResponseData* diskData,
 				(data->artist).String(), (data->artist).Length());			
 		}
 			
-		cnt++;
+		index++;
 	}
 	
-	return B_OK;
+	return error;
 }	
 
 
