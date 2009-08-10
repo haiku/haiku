@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src servers print ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared print ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
@@ -30,8 +28,3 @@ LinkAgainst print_server :
 	libprintutils.a
 	$(TARGET_LIBSUPC++)
 ;
-
-Package haiku-printingkit-cvs :
-	print_server :
-#	boot beos system servers ;
-	boot home Desktop haiku-printingkit ;
