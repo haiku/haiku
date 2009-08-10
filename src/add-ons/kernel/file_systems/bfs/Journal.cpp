@@ -1000,9 +1000,10 @@ Journal::Unlock(Transaction* owner, bool success)
 			// Unlocking the inodes might trigger new transactions, but we
 			// cannot reuse the current one anymore, as this one is already
 			// closed.
+			bool separateSubTransactions = fSeparateSubTransactions;
 			fSeparateSubTransactions = true;
 			fOwner->UnlockInodes(success);
-			fSeparateSubTransactions = false;
+			fSeparateSubTransactions = separateSubTransactions;
 		}
 
 		fTimestamp = system_time();
