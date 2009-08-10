@@ -260,7 +260,7 @@ TBeMenu::AddStandardBeMenuItems()
 	subMenu->SetEnabled(!dragging);
 
 #ifdef __HAIKU__
-	item = new BMenuItem("Configure Leaf Menu"B_UTF8_ELLIPSIS, new BMessage(msg_config_db));
+	item = new BMenuItem("Configure Deskbar Menu"B_UTF8_ELLIPSIS, new BMessage(msg_config_db));
 #else
 	item = new BMenuItem("Configure Be Menu"B_UTF8_ELLIPSIS, new BMessage(msg_config_db));
 #endif
