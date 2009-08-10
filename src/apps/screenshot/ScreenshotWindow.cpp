@@ -88,6 +88,7 @@ ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	fOutputPathPanel(NULL),
 	fLastSelectedPath(NULL),
 	fDelay(delay),
+	fTabHeight(0),
 	fIncludeBorder(includeBorder),
 	fIncludeMouse(includeMouse),
 	fGrabActiveWindow(grabActiveWindow),
@@ -639,8 +640,10 @@ ScreenshotWindow::_TakeScreenshot()
 	BRect frame;
 	delete fScreenshot;
 	if (_GetActiveWindowFrame(&frame) == B_OK) {
-		fScreenshot = new BBitmap(frame.OffsetToCopy(B_ORIGIN), B_RGBA32);
+		fScreenshot = new BBitmap(frame.OffsetToCopy(B_ORIGIN), B_RGBA32, true);
 		BScreen(this).ReadBitmap(fScreenshot, fIncludeMouse, &frame);
+		if (fIncludeBorder)
+			_MakeTabSpaceTransparent();
 	} else {
 		BScreen(this).GetBitmap(&fScreenshot, fIncludeMouse);
 	}
@@ -674,6 +677,7 @@ ScreenshotWindow::_GetActiveWindowFrame(BRect* frame)
 				float border = (windowInfo->border_size);
 				frame->InsetBy(-(border), -(border));
 				frame->top -= windowInfo->tab_height;
+				fTabHeight = windowInfo->tab_height;
 			}
 			free(windowInfo);
 
@@ -784,3 +788,102 @@ ScreenshotWindow::_SaveScreenshotSilent() const
 		fScreenshot->Bits(), fScreenshot->BitsLength(),
 		fScreenshot->BytesPerRow());
 }
+
+
+void
+ScreenshotWindow::_MakeTabSpaceTransparent()
+{
+	if (fScreenshot->ColorSpace() != B_RGBA32)
+		return;
+		
+	if (fTabHeight == 0)
+		return;
+	
+	// This method is fragile since it relies on the color scheme of the current
+	// window decorator. The code could be simplified a lot if there was a way
+	// to ask for, or to easily compute, the tab width of the target window.
+	
+	uint8* component = static_cast<uint8*>(fScreenshot->Bits());
+	int32 bytesPerRow = fScreenshot->BytesPerRow();
+	int32 pixelsPerRow = bytesPerRow / 4;
+
+	int32 tabHeight = static_cast<int32>(fTabHeight);
+	int32 tabStart = 0;
+	int32 tabEnd = 0;
+	bool foundTabStart = false;
+	bool foundTabEnd = false;
+	
+	// Find the top-left corner of the window tab, by color, and support
+	// this guess by following a one tab high column of pixels downwards.
+	for (int32 x = 0; x < pixelsPerRow; x++) {
+		if (component[0] == 152 && component[1] == 152 && component[2] == 152) {
+			foundTabStart = true;
+	
+			for (int32 y = 0; y < tabHeight; y++) {
+				component += bytesPerRow;
+				
+				if (!(component[0] == 152 && component[1] == 152
+					&& component[2] == 152)) {
+					foundTabStart = false;
+				}			
+			}			
+			component -= bytesPerRow * tabHeight;
+			
+			if (foundTabStart) {
+				tabStart = x;
+				break;
+			}
+		}
+		component += 4;
+	}
+	
+	component = static_cast<uint8*>(fScreenshot->Bits());
+
+	// Find the top-right corner of the window tab.
+	for (int32 x = 0; x < pixelsPerRow; x++) {
+		if (component[0] == 108 && component[1] == 108 && component[2] == 108) {
+			foundTabEnd = true;
+	
+			for (int32 y = 0; y < tabHeight; y++) {
+				component += bytesPerRow;
+			
+				if (!(component[0] == 108 && component[1] == 108
+					&& component[2] == 108)) {
+					foundTabEnd = false;
+				}			
+			}			
+			component -= bytesPerRow * tabHeight;
+			
+			if (foundTabEnd) {
+				tabEnd = x;
+				break;
+			}
+		}
+		component += 4;
+	}
+	
+	if (!foundTabEnd || !foundTabStart)
+		return;
+	
+	if (tabStart > tabEnd)
+		return;
+
+	BView view(fScreenshot->Bounds(), "bitmapView", B_FOLLOW_ALL_SIDES, 0);
+	fScreenshot->AddChild(&view);
+	if(view.Looper() && view.Looper()->Lock()) {
+		view.SetDrawingMode(B_OP_COPY);
+		view.SetHighColor(B_TRANSPARENT_32_BIT);
+
+		if (tabStart > 0)
+			view.FillRect(BRect(0, 0, tabStart - 1, tabHeight - 1));
+
+		if (tabEnd < pixelsPerRow - 1) {
+			view.FillRect(BRect(tabEnd + 1, 0, pixelsPerRow - 1,
+				tabHeight - 1));
+		}
+		view.Sync();
+		view.Looper()->Unlock();
+	}
+	fScreenshot->RemoveChild(&view);
+}
+

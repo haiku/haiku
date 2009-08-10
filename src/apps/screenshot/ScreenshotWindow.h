@@ -53,6 +53,7 @@ private:
 
 			void			_TakeScreenshot();
 			status_t		_GetActiveWindowFrame(BRect* frame);
+			void			_MakeTabSpaceTransparent();
 
 			status_t		_SaveScreenshot();
 			void			_SaveScreenshotSilent() const;
@@ -74,6 +75,7 @@ private:
 			BMenuItem*		fLastSelectedPath;
 
 			bigtime_t		fDelay;
+			float			fTabHeight;
 
 			bool			fIncludeBorder;
 			bool			fIncludeMouse;
