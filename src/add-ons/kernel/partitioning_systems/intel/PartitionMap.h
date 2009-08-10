@@ -31,7 +31,7 @@
 // partition_type
 struct partition_type {
 	uint8		type;
-	const char	*name;
+	const char*	name;
 	bool		used;
 };
 
@@ -54,13 +54,13 @@ is_extended_type(uint8 type)
 
 // fill_buffer
 static inline void
-fill_buffer(char *buffer, uint32 length, char ch)
+fill_buffer(char* buffer, uint32 length, char ch)
 {
 	for (uint32 i = 0; i < length; i++)
 		buffer[i] = ch;
 }
 
-void get_partition_type_string(uint8 type, char *buffer);
+void get_partition_type_string(uint8 type, char* buffer);
 
 // chs
 // NOTE: The CHS cannot express locations within larger disks and is therefor
@@ -113,8 +113,8 @@ public:
 	PartitionType();
 
 	bool SetType(uint8 type);
-	bool SetType(const char *typeName);
-	bool SetContentType(const char *contentType);
+	bool SetType(const char* typeName);
+	bool SetContentType(const char* contentType);
 
 	bool IsValid() const	{ return fValid; }
 	bool IsEmpty() const	{ return is_empty_type(fType); }
@@ -122,7 +122,7 @@ public:
 
 	uint8 Type() const		{ return fType; }
 	bool FindNext();
-	void GetTypeString(char *buffer) const
+	void GetTypeString(char* buffer) const
 		{ get_partition_type_string(fType, buffer); }
 private:
 	uint8	fType;
@@ -167,11 +167,8 @@ public:
 			uint8				Type() const		{ return fType; }
 			bool				Active() const		{ return fActive; }
 			uint32				BlockSize() const	{ return fBlockSize; }
-			void				GetTypeString(char *buffer) const
+			void				GetTypeString(char* buffer) const
 									{ get_partition_type_string(fType, buffer); }
-			void				GetPartitionDescriptor(
-									partition_descriptor* descriptor,
-									off_t baseOffset) const;
 
 			void				SetPartitionTableOffset(off_t offset)
 									{ fPartitionTableOffset = offset; }
@@ -183,6 +180,8 @@ public:
 									{ fType = type; }
 			void				SetActive(bool active)
 									{ fActive = active; }
+			void				SetBlockSize(uint32 blockSize)
+									{ fBlockSize = blockSize; }
 
 			bool				CheckLocation(off_t sessionSize) const;
 #ifdef _BOOT_MODE
@@ -215,6 +214,9 @@ public:
 
 			int32				Index() const			{ return fIndex; }
 			void				SetIndex(int32 index)	{ fIndex = index; }
+			void				GetPartitionDescriptor(
+									partition_descriptor* descriptor) const;
+
 				// private
 
 			// only if extended
@@ -240,7 +242,7 @@ public:
 								LogicalPartition(
 									const partition_descriptor* descriptor,
 									off_t tableOffset,
-									PrimaryPartition *primary);
+									PrimaryPartition* primary);
 
 			void				SetTo(const partition_descriptor* descriptor,
 									off_t tableOffset,
@@ -249,6 +251,10 @@ public:
 									bool active, off_t tableOffset,
 									PrimaryPartition* primary);
 			void				Unset();
+			void				GetPartitionDescriptor(
+									partition_descriptor* descriptor,
+									bool inner = false) const;
+
 
 			void				SetPrimaryPartition(PrimaryPartition* primary)
 									{ fPrimary = primary; }

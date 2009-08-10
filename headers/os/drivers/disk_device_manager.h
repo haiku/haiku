@@ -101,6 +101,8 @@ partition_data *get_partition(partition_id partitionID);
 partition_data *get_parent_partition(partition_id partitionID);
 partition_data *get_child_partition(partition_id partitionID, int32 index);
 
+int open_partition(partition_id partitionID, int openMode);
+
 // partition write access
 // (write lock required)
 partition_data *create_child_partition(partition_id partitionID, int32 index,

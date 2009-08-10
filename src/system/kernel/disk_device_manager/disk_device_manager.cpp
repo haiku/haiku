@@ -154,6 +154,22 @@ get_child_partition(partition_id partitionID, int32 index)
 }
 
 
+int
+open_partition(partition_id partitionID, int openMode)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *partition = manager->FindPartition(partitionID);
+	if (partition == NULL)
+		return B_BAD_VALUE;
+
+	int fd = -1;
+	status_t result = partition->Open(openMode, &fd);
+	if (result != B_OK)
+		return -1;
+
+	return fd;
+}
+
 // create_child_partition
 partition_data *
 create_child_partition(partition_id partitionID, int32 index, off_t offset,

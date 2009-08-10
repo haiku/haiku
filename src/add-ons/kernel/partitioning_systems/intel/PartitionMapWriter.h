@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Tomas Kucera, kucerat@centrum.cz
+ *		Bryce Groff, brycegroff@gmail.com
  */
 
 /*!
@@ -26,7 +27,11 @@
 
 class PartitionMap;
 class LogicalPartition;
+class PrimaryPartition;
 struct partition_table;
+
+bool check_logical_location(const LogicalPartition* logical,
+	const PrimaryPartition* primary);
 
 /*!
   \brief Writer for "Intel" style partitions.
@@ -36,33 +41,32 @@ struct partition_table;
 class PartitionMapWriter {
 public:
 								PartitionMapWriter(int deviceFD,
-									off_t sessionOffset, off_t sessionSize);
+									uint32 blockSize);
 								~PartitionMapWriter();
 
 			status_t			WriteMBR(const PartitionMap* map,
-									bool clearSectors);
-			status_t			WriteLogical(partition_table* pts,
-									const LogicalPartition* partition);
-			status_t			WriteExtendedHead(partition_table* pts,
-									const LogicalPartition* firstPartition);
+									bool clearCode);
+			status_t			WriteLogical(const LogicalPartition* logical,
+									const PrimaryPartition* primary,
+									bool clearCode);
+			status_t			WriteExtendedHead(
+									const LogicalPartition* logical,
+									const PrimaryPartition* primary,
+									bool clearCode);
+
+			status_t			ClearExtendedHead(
+									const PrimaryPartition* primary);
 
 private:
-			status_t			_WritePrimary(partition_table* pts);
-			status_t			_WriteExtended(partition_table* pts,
-									const LogicalPartition* partition,
-									const LogicalPartition* next);
-
-			status_t			_ReadSector(off_t offset,
-									partition_table* pts);
-			status_t			_WriteSector(off_t offset,
-									const partition_table* pts);
+			status_t			_ReadBlock(off_t offset,
+									partition_table& partitionTable);
+			status_t			_WriteBlock(off_t offset,
+									const partition_table& partitionTable);
 
 private:
 			int					fDeviceFD;
-			off_t				fSessionOffset;
-			off_t				fSessionSize;
+			int32				fBlockSize;
 
-			const PartitionMap* fMap; // while writing
 };
 
 #endif	// PARTITION_MAP_WRITER_H

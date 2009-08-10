@@ -130,7 +130,7 @@ PartitionMapParser::_ParsePrimary(const partition_table* table)
 	// parse extended partitions
 	status_t error = B_OK;
 	for (int32 i = 0; error == B_OK && i < 4; i++) {
-		PrimaryPartition *primary = fMap->PrimaryPartitionAt(i);
+		PrimaryPartition* primary = fMap->PrimaryPartitionAt(i);
 		if (primary->IsExtended())
 			error = _ParseExtended(primary, primary->Offset());
 	}
@@ -145,7 +145,7 @@ PartitionMapParser::_ParsePrimary(const partition_table* table)
 
 // _ParseExtended
 status_t
-PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
+PartitionMapParser::_ParseExtended(PrimaryPartition* primary, off_t offset)
 {
 	status_t error = B_OK;
 	int32 partitionCount = 0;
@@ -188,11 +188,11 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 		LogicalPartition extended;
 		LogicalPartition nonExtended;
 		for (int32 i = 0; error == B_OK && i < 4; i++) {
-			const partition_descriptor *descriptor = &fPartitionTable->table[i];
+			const partition_descriptor* descriptor = &fPartitionTable->table[i];
 			if (descriptor->is_empty())
 				continue;
 
-			LogicalPartition *partition = NULL;
+			LogicalPartition* partition = NULL;
 			if (descriptor->is_extended()) {
 				if (extended.IsEmpty()) {
 					extended.SetTo(descriptor, offset, primary);
@@ -232,7 +232,7 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 
 		// add non-extended partition to list
 		if (error == B_OK && !nonExtended.IsEmpty()) {
-			LogicalPartition *partition
+			LogicalPartition* partition
 				= new(nothrow) LogicalPartition(nonExtended);
 			if (partition)
 				primary->AddLogicalPartition(partition);

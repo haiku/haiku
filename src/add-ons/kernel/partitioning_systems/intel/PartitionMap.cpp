@@ -166,13 +166,13 @@ is_inside_partitions(off_t location, const Partition** partitions, int32 count)
 		int32 upper = count - 1;
 		while (lower < upper) {
 			int32 mid = (lower + upper) / 2;
-			const Partition *midPartition = partitions[mid];
+			const Partition* midPartition = partitions[mid];
 			if (location >= midPartition->Offset() + midPartition->Size())
 				lower = mid + 1;
 			else
 				upper = mid;
 		}
-		const Partition *partition = partitions[lower];
+		const Partition* partition = partitions[lower];
 		result = (location >= partition->Offset() &&
 				  location < partition->Offset() + partition->Size());
 	}
@@ -207,7 +207,7 @@ PartitionType::SetType(uint8 type)
 	\param typeName Name of the partition type.
 */
 bool
-PartitionType::SetType(const char *typeName)
+PartitionType::SetType(const char* typeName)
 {
 	for (int32 i = 0; kPartitionTypes[i].name ; i++) {
 		if (!strcmp(typeName, kPartitionTypes[i].name)) {
@@ -237,7 +237,7 @@ PartitionType::SetType(const char *typeName)
 	\param content_type Name of the content type, it is standardized by system.
 */
 bool
-PartitionType::SetContentType(const char *contentType)
+PartitionType::SetContentType(const char* contentType)
 {
 	for (int32 i = 0; kPartitionContentTypes[i].name ; i++) {
 		if (!strcmp(contentType, kPartitionContentTypes[i].name)) {
@@ -319,7 +319,7 @@ Partition::Partition(const partition_descriptor* descriptor, off_t tableOffset,
 
 
 void
-Partition::SetTo(const partition_descriptor *descriptor, off_t tableOffset,
+Partition::SetTo(const partition_descriptor* descriptor, off_t tableOffset,
 	off_t baseOffset, uint32 blockSize)
 {
 	TRACE(("Partition::SetTo(): active: %x\n", descriptor->active));
@@ -356,19 +356,6 @@ Partition::Unset()
 }
 
 
-void
-Partition::GetPartitionDescriptor(partition_descriptor *descriptor,
-	off_t baseOffset) const
-{
-	descriptor->start = (fOffset - baseOffset) / fBlockSize;
-	descriptor->size = fSize / fBlockSize;
-	descriptor->type = fType;
-	descriptor->active = fActive ? 0x80 : 0x00;
-	descriptor->begin.Unset();
-	descriptor->end.Unset();
-}
-
-
 #ifdef _BOOT_MODE
 void
 Partition::AdjustSize(off_t sessionSize)
@@ -389,7 +376,8 @@ Partition::CheckLocation(off_t sessionSize) const
 	// lie within the session
 	if (fPartitionTableOffset % fBlockSize != 0) {
 		TRACE(("Partition::CheckLocation() - bad partition table offset: %lld "
-			"(session: %lld)\n", fPartitionTableOffset, sessionSize));
+			"(session: %lld), (fBlockSize: %ld)\n", fPartitionTableOffset,
+			sessionSize, fBlockSize));
 		return false;
 	}
 	if (fOffset % fBlockSize != 0) {
@@ -426,7 +414,8 @@ Partition::CheckLocation(off_t sessionSize) const
 
 
 PrimaryPartition::PrimaryPartition()
-	: Partition(),
+	:
+	Partition(),
 	fHead(NULL),
 	fTail(NULL),
 	fLogicalPartitionCount(0)
@@ -455,7 +444,7 @@ PrimaryPartition::SetTo(off_t offset, off_t size, uint8 type, bool active,
 void
 PrimaryPartition::Unset()
 {
-	while (LogicalPartition *partition = fHead) {
+	while (LogicalPartition* partition = fHead) {
 		fHead = partition->Next();
 		delete partition;
 	}
@@ -470,13 +459,13 @@ status_t
 PrimaryPartition::Assign(const PrimaryPartition& other)
 {
 	partition_descriptor descriptor;
-	other.GetPartitionDescriptor(&descriptor, 0);
+	other.GetPartitionDescriptor(&descriptor);
 	SetTo(&descriptor, 0, other.BlockSize());
 
 	const LogicalPartition* otherLogical = other.fHead;
 	while (otherLogical) {
 		off_t tableOffset = otherLogical->PartitionTableOffset();
-		otherLogical->GetPartitionDescriptor(&descriptor, tableOffset);
+		otherLogical->GetPartitionDescriptor(&descriptor);
 
 		LogicalPartition* logical = new(nothrow) LogicalPartition(
 			&descriptor, tableOffset, this);
@@ -492,10 +481,26 @@ PrimaryPartition::Assign(const PrimaryPartition& other)
 }
 
 
+void
+PrimaryPartition::GetPartitionDescriptor(partition_descriptor* descriptor) const
+{
+	if (IsEmpty()) {
+		memset(descriptor, 0, sizeof(partition_descriptor));
+	} else {
+		descriptor->start = Offset() / BlockSize();
+		descriptor->size = Size() / BlockSize();
+		descriptor->type = Type();
+		descriptor->active = Active() ? 0x80 : 0x00;
+		descriptor->begin.Unset();
+		descriptor->end.Unset();
+	}
+}
+
+
 LogicalPartition*
 PrimaryPartition::LogicalPartitionAt(int32 index) const
 {
-	LogicalPartition *partition = NULL;
+	LogicalPartition* partition = NULL;
 	if (index >= 0 && index < fLogicalPartitionCount) {
 		for (partition = fHead; index > 0; index--)
 			partition = partition->Next();
@@ -530,8 +535,8 @@ PrimaryPartition::RemoveLogicalPartition(LogicalPartition* partition)
 	if (!partition || partition->GetPrimaryPartition() != this)
 		return;
 
-	LogicalPartition *prev = partition->Previous();
-	LogicalPartition *next = partition->Next();
+	LogicalPartition* prev = partition->Previous();
+	LogicalPartition* next = partition->Next();
 
 	if (prev)
 		prev->SetNext(next);
@@ -554,7 +559,8 @@ PrimaryPartition::RemoveLogicalPartition(LogicalPartition* partition)
 
 
 LogicalPartition::LogicalPartition()
-	: Partition(),
+	:
+	Partition(),
 	fPrimary(NULL),
 	fNext(NULL),
 	fPrevious(NULL)
@@ -564,7 +570,8 @@ LogicalPartition::LogicalPartition()
 
 LogicalPartition::LogicalPartition(const partition_descriptor* descriptor,
 		off_t tableOffset, PrimaryPartition* primary)
-	: Partition(),
+	:
+	Partition(),
 	fPrimary(NULL),
 	fNext(NULL),
 	fPrevious(NULL)
@@ -601,7 +608,7 @@ LogicalPartition::SetTo(const partition_descriptor* descriptor,
 
 void
 LogicalPartition::SetTo(off_t offset, off_t size, uint8 type, bool active,
-	off_t tableOffset, PrimaryPartition *primary)
+	off_t tableOffset, PrimaryPartition* primary)
 {
 	Unset();
 	if (primary) {
@@ -619,6 +626,27 @@ LogicalPartition::Unset()
 	fNext = NULL;
 	fPrevious = NULL;
 	Partition::Unset();
+}
+
+
+void
+LogicalPartition::GetPartitionDescriptor(partition_descriptor* descriptor,
+	bool inner) const
+{
+	PrimaryPartition* primary = GetPrimaryPartition();
+	if (inner) {
+		descriptor->start = (PartitionTableOffset() - primary->Offset())
+			/ BlockSize();
+		descriptor->type = primary->Type();
+	} else {
+		descriptor->start = (Offset() - PartitionTableOffset()) / BlockSize();
+		descriptor->type = Type();
+	}
+
+	descriptor->size = Size() / BlockSize();
+	descriptor->active = 0x00;
+	descriptor->begin.Unset();
+	descriptor->end.Unset();
 }
 
 
@@ -661,7 +689,7 @@ PartitionMap::Assign(const PartitionMap& other)
 PrimaryPartition*
 PartitionMap::PrimaryPartitionAt(int32 index)
 {
-	PrimaryPartition *partition = NULL;
+	PrimaryPartition* partition = NULL;
 	if (index >= 0 && index < 4)
 		partition = fPrimaries + index;
 	return partition;
@@ -671,7 +699,7 @@ PartitionMap::PrimaryPartitionAt(int32 index)
 const PrimaryPartition*
 PartitionMap::PrimaryPartitionAt(int32 index) const
 {
-	const PrimaryPartition *partition = NULL;
+	const PrimaryPartition* partition = NULL;
 	if (index >= 0 && index < 4)
 		partition = fPrimaries + index;
 	return partition;
@@ -729,7 +757,7 @@ PartitionMap::CountNonEmptyPartitions() const
 Partition*
 PartitionMap::PartitionAt(int32 index)
 {
-	Partition *partition = NULL;
+	Partition* partition = NULL;
 	int32 count = CountPartitions();
 	if (index >= 0 && index < count) {
 		if (index < 4)
@@ -776,7 +804,7 @@ PartitionMap::Check(off_t sessionSize) const
 		int32 tableOffsetCount = 1;	// primary partition table
 		tableOffsets[0] = 0;			//
 		for (int32 i = 0; i < partitionCount; i++) {
-			const Partition *partition = PartitionAt(i);
+			const Partition* partition = PartitionAt(i);
 			if (!partition->IsExtended())
 				byOffset[byOffsetCount++] = partition;
 
@@ -795,7 +823,7 @@ PartitionMap::Check(off_t sessionSize) const
 		// check for overlappings
 		off_t nextOffset = 0;
 		for (int32 i = 0; i < byOffsetCount; i++) {
-			const Partition *partition = byOffset[i];
+			const Partition* partition = byOffset[i];
 			if (partition->Offset() < nextOffset) {
 				TRACE(("intel: PartitionMap::Check(): overlapping partitions!"
 					"\n"));

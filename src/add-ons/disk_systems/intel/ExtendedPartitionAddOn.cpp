@@ -36,7 +36,7 @@ static const uint32 kDiskSystemFlags =
 //	| B_DISK_SYSTEM_SUPPORTS_MOVING
 //	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME
 //	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS
-	| B_DISK_SYSTEM_SUPPORTS_INITIALIZING
+//	| B_DISK_SYSTEM_SUPPORTS_INITIALIZING
 //	| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
 
 //	| B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
@@ -92,7 +92,7 @@ bool
 ExtendedPartitionAddOn::CanInitialize(const BMutablePartition* partition)
 {
 	// If it's big enough, we can initialize it.
-	return partition->Size() >= 2 * partition->BlockSize();
+	return false;
 }
 
 
@@ -222,7 +222,7 @@ ExtendedPartitionHandle::Init()
 uint32
 ExtendedPartitionHandle::SupportedOperations(uint32 mask)
 {
-	uint32 flags = B_DISK_SYSTEM_SUPPORTS_INITIALIZING;
+	uint32 flags = 0;//B_DISK_SYSTEM_SUPPORTS_INITIALIZING;
 
 	// creating child
 	if (mask & B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD) {
@@ -254,10 +254,25 @@ ExtendedPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
 	TRACE("%p->ExtendedPartitionHandle::GetNextSupportedType(child: %p, "
 		"cookie: %ld)\n", this, child, *cookie);
 
-	if (*cookie != 0)
+	int32 index = *cookie;
+	const partition_type* nextType;
+	PartitionMap partitionMap;
+	while (true) {
+		nextType = partitionMap.GetNextSupportedPartitionType(index);
+		if (nextType == NULL)
+			return B_ENTRY_NOT_FOUND;
+		index++;
+		if (nextType->used
+			&& strcmp(nextType->name, kPartitionTypeIntelExtended) != 0)
+			break;
+	}
+
+	if (!nextType)
 		return B_ENTRY_NOT_FOUND;
-	*cookie = *cookie + 1;
-	*type = kPartitionTypeIntelLogical;
+
+	type->SetTo(nextType->name);
+	*cookie = index;
+
 	return B_OK;
 }
 
@@ -266,39 +281,22 @@ ExtendedPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
 status_t
 ExtendedPartitionHandle::GetPartitioningInfo(BPartitioningInfo* info)
 {
-	// NOTE stippi: At first I tried to use the fPrimaryPartition
-	// here but it does not return any LogicalPartitions. What
-	// happens now is probably what used to happen before, though
-	// I don't understand *where*, since this handle type never
-	// implemented this virtual function.
-
 	// init to the full size (minus the first sector)
 	BMutablePartition* partition = Partition();
-	off_t offset = partition->Offset();// + SECTOR_SIZE;
-	off_t size = partition->Size();//- SECTOR_SIZE;
+	off_t offset = partition->Offset();
+	off_t size = partition->Size();
 	status_t error = info->SetTo(offset, size);
 	if (error != B_OK)
 		return error;
 
 	// exclude the space of the existing logical partitions
 	int32 count = partition->CountChildren();
-printf("%ld logical partitions\n", count);
 	for (int32 i = 0; i < count; i++) {
 		BMutablePartition* child = partition->ChildAt(i);
-		// TODO: Does this correctly account for the partition table
-		// sectors? Preceeding each logical partition should be a
-		// sector for the partition table entry. Those entries form
-		// the linked list of "inner extended partition" + "real partition"
-		// Following the logic above (copied from PartitionMapAddOn),
-		// the outer size includes the first sector and is therefor
-		// what we need here.
 		error = info->ExcludeOccupiedSpace(child->Offset(), child->Size());
-printf("  %ld: offset = %lld (relative: %lld), size = %lld\n", i,
-child->Offset(), child->Offset() - offset, child->Size());
 		if (error != B_OK)
 			return error;
 	}
-info->PrintToStream();
 
 	return B_OK;
 }
@@ -309,7 +307,6 @@ status_t
 ExtendedPartitionHandle::GetChildCreationParameterEditor(const char* type,
 	BPartitionParameterEditor** editor)
 {
-	// TODO: We actually need an editor here.
 	*editor = NULL;
 	return B_OK;
 }
@@ -321,102 +318,98 @@ ExtendedPartitionHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 	const char* typeString, BString* name, const char* parameters)
 {
 	// check type
-	if (!typeString || strcmp(typeString, kPartitionTypeIntelLogical) != 0)
+	if (!typeString)
 		return B_BAD_VALUE;
 
 	// check name
 	if (name)
 		name->Truncate(0);
 
-	// check parameters
-	// TODO:...
+	// check the free space situation
+	BPartitioningInfo info;
+	status_t error = GetPartitioningInfo(&info);
+	if (error != B_OK)
+		return error;
 
-return B_NOT_SUPPORTED;
-//	// check the free space situation
-//	BPartitioningInfo info;
-//	status_t error = GetPartitioningInfo(&info);
-//	if (error != B_OK)
-//		return error;
-//
-//	// any space in the partition at all?
-//	int32 spacesCount = info.CountPartitionableSpaces();
-//	if (spacesCount == 0)
-//		return B_BAD_VALUE;
-//
-//	// check offset and size
-//	off_t offset = sector_align(*_offset);
-//	off_t size = sector_align(*_size);
-//		// TODO: Rather round size up?
-//	off_t end = offset + size;
-//
-//	// get the first partitionable space the requested interval intersects with
-//	int32 spaceIndex = -1;
-//	int32 closestSpaceIndex = -1;
-//	off_t closestSpaceDistance = 0;
-//	for (int32 i = 0; i < spacesCount; i++) {
-//		off_t spaceOffset, spaceSize;
-//		info.GetPartitionableSpaceAt(i, &spaceOffset, &spaceSize);
-//		off_t spaceEnd = spaceOffset + spaceSize;
-//
-//		if (spaceOffset >= offset && spaceOffset < end
-//			|| offset >= spaceOffset && offset < spaceEnd) {
-//			spaceIndex = i;
-//			break;
-//		}
-//
-//		off_t distance;
-//		if (offset < spaceOffset)
-//			distance = spaceOffset - end;
-//		else
-//			distance = spaceEnd - offset;
-//
-//		if (closestSpaceIndex == -1 || distance < closestSpaceDistance) {
-//			closestSpaceIndex = i;
-//			closestSpaceDistance = distance;
-//		}
-//	}
-//
-//	// get the space we found
-//	off_t spaceOffset, spaceSize;
-//	info.GetPartitionableSpaceAt(
-//		spaceIndex >= 0 ? spaceIndex : closestSpaceIndex, &spaceOffset,
-//		&spaceSize);
-//	off_t spaceEnd = spaceOffset + spaceSize;
-//
-//	// If the requested intervald doesn't intersect with any space yet, move
-//	// it, so that it does.
-//	if (spaceIndex < 0) {
-//		spaceIndex = closestSpaceIndex;
-//		if (offset < spaceOffset) {
-//			offset = spaceOffset;
-//			end = offset + size;
-//		} else {
-//			end = spaceEnd;
-//			offset = end - size;
-//		}
-//	}
-//
-//	// move/shrink the interval, so that it fully lies within the space
-//	if (offset < spaceOffset) {
-//		offset = spaceOffset;
-//		end = offset + size;
-//		if (end > spaceEnd) {
-//			end = spaceEnd;
-//			size = end - offset;
-//		}
-//	} else if (end > spaceEnd) {
-//		end = spaceEnd;
-//		offset = end - size;
-//		if (offset < spaceOffset) {
-//			offset = spaceOffset;
-//			size = end - offset;
-//		}
-//	}
-//
-//	*_offset = offset;
-//	*_size = size;
-//
-//	return B_OK;
+	// any space in the partition at all?
+	int32 spacesCount = info.CountPartitionableSpaces();
+	if (spacesCount == 0)
+		return B_BAD_VALUE;
+
+	// check offset and size
+	off_t offset = sector_align(*_offset, Partition()->BlockSize());
+	off_t size = sector_align(*_size, Partition()->BlockSize());
+		// TODO: Rather round size up?
+	off_t end = offset + size;
+
+	// get the first partitionable space the requested interval intersects with
+	int32 spaceIndex = -1;
+	int32 closestSpaceIndex = -1;
+	off_t closestSpaceDistance = 0;
+	for (int32 i = 0; i < spacesCount; i++) {
+		off_t spaceOffset, spaceSize;
+		info.GetPartitionableSpaceAt(i, &spaceOffset, &spaceSize);
+		off_t spaceEnd = spaceOffset + spaceSize;
+
+		if (spaceOffset >= offset && spaceOffset < end
+			|| offset >= spaceOffset && offset < spaceEnd) {
+			spaceIndex = i;
+			break;
+		}
+
+		off_t distance;
+		if (offset < spaceOffset)
+			distance = spaceOffset - end;
+		else
+			distance = spaceEnd - offset;
+
+		if (closestSpaceIndex == -1 || distance < closestSpaceDistance) {
+			closestSpaceIndex = i;
+			closestSpaceDistance = distance;
+		}
+	}
+
+	// get the space we found
+	off_t spaceOffset, spaceSize;
+	info.GetPartitionableSpaceAt(
+		spaceIndex >= 0 ? spaceIndex : closestSpaceIndex, &spaceOffset,
+		&spaceSize);
+	off_t spaceEnd = spaceOffset + spaceSize;
+
+	// If the requested intervald doesn't intersect with any space yet, move
+	// it, so that it does.
+	if (spaceIndex < 0) {
+		spaceIndex = closestSpaceIndex;
+		if (offset < spaceOffset) {
+			offset = spaceOffset;
+			end = offset + size;
+		} else {
+			end = spaceEnd;
+			offset = end - size;
+		}
+	}
+
+	// move/shrink the interval, so that it fully lies within the space
+	if (offset < spaceOffset) {
+		offset = spaceOffset;
+		end = offset + size;
+		if (end > spaceEnd) {
+			end = spaceEnd;
+			size = end - offset;
+		}
+	} else if (end > spaceEnd) {
+		end = spaceEnd;
+		offset = end - size;
+		if (offset < spaceOffset) {
+			offset = spaceOffset;
+			size = end - offset;
+		}
+	}
+
+	*_offset = offset;
+	*_size = size;
+
+	return B_OK;
 }
 
 
@@ -427,73 +420,69 @@ ExtendedPartitionHandle::CreateChild(off_t offset, off_t size,
 	BMutablePartition** _child)
 {
 	// check type
-	if (!typeString || strcmp(typeString, kPartitionTypeIntelLogical) != 0)
+	PartitionType type;
+	if (!type.SetType(typeString) || type.IsEmpty())
 		return B_BAD_VALUE;
 
 	// check name
 	if (name && strlen(name) > 0)
 		return B_BAD_VALUE;
 
-	// check parameters
-	// TODO:...
+	// offset properly aligned?
+	if (offset != sector_align(offset, Partition()->BlockSize())
+		|| size != sector_align(size, Partition()->BlockSize()))
+		return B_BAD_VALUE;
 
-return B_NOT_SUPPORTED;
-//	// offset properly aligned?
-//	if (offset != sector_align(offset) || size != sector_align(size))
-//		return B_BAD_VALUE;
-//
-//	// check the free space situation
-//	BPartitioningInfo info;
-//	status_t error = GetPartitioningInfo(&info);
-//	if (error != B_OK)
-//		return error;
-//
-//	bool foundSpace = false;
-//	off_t end = offset + size;
-//	int32 spacesCount = info.CountPartitionableSpaces();
-//	for (int32 i = 0; i < spacesCount; i++) {
-//		off_t spaceOffset, spaceSize;
-//		info.GetPartitionableSpaceAt(i, &spaceOffset, &spaceSize);
-//		off_t spaceEnd = spaceOffset + spaceSize;
-//
-//		if (offset >= spaceOffset && end <= spaceEnd) {
-//			foundSpace = true;
-//			break;
-//		}
-//	}
-//
-//	if (!foundSpace)
-//		return B_BAD_VALUE;
-//
-//	// everything looks good, do it
-//
-//	// create the child
-//	// (Note: the primary partition index is indeed the child index, since
-//	// we picked the first empty primary partition.)
-//	BMutablePartition* partition = Partition();
-//	BMutablePartition* child;
-//	error = partition->CreateChild(primary->Index(), typeString, NULL,
-//		parameters, &child);
-//	if (error != B_OK)
-//		return error;
-//
-//	// init the child
-//	child->SetOffset(offset);
-//	child->SetSize(size);
-//	child->SetBlockSize(SECTOR_SIZE);
-//	//child->SetFlags(0);
-//	child->SetChildCookie(primary);
-//
-//	// init the primary partition
-//	bool active = false;
-//		// TODO: Get from parameters!
-//	primary->SetTo(offset, size, type.Type(), active);
-//
-//// TODO: If the child is an extended partition, we should trigger its
-//// initialization.
-//
-//	*_child = child;
-//	return B_OK;
+	// check the free space situation
+	BPartitioningInfo info;
+	status_t error = GetPartitioningInfo(&info);
+	if (error != B_OK)
+		return error;
+
+	bool foundSpace = false;
+	off_t end = offset + size;
+	int32 spacesCount = info.CountPartitionableSpaces();
+	for (int32 i = 0; i < spacesCount; i++) {
+		off_t spaceOffset, spaceSize;
+		info.GetPartitionableSpaceAt(i, &spaceOffset, &spaceSize);
+		off_t spaceEnd = spaceOffset + spaceSize;
+
+		if (offset >= spaceOffset && end <= spaceEnd) {
+			foundSpace = true;
+			break;
+		}
+	}
+
+	if (!foundSpace)
+		return B_BAD_VALUE;
+
+	// everything looks good, do it
+	// create the child
+	BMutablePartition* child;
+	error = Partition()->CreateChild(-1, typeString,
+		NULL, parameters, &child);
+	if (error != B_OK)
+		return error;
+
+	// init the child
+	child->SetOffset(offset);
+	child->SetSize(size);
+	child->SetBlockSize(Partition()->BlockSize());
+	//child->SetFlags(0);
+	child->SetChildCookie(Partition());
+
+	*_child = child;
+	return B_OK;
 }
 
+
+// DeleteChild
+status_t
+ExtendedPartitionHandle::DeleteChild(BMutablePartition* child)
+{
+	BMutablePartition* parent = child->Parent();
+	status_t error = parent->DeleteChild(child);
+
+	return error;
+}
 
