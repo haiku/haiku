@@ -840,7 +840,7 @@ BWindow::MessageReceived(BMessage* msg)
 				BMessage settings;
 				if (GetDecoratorSettings(&settings) == B_OK) {
 					BRect frame;
-					if(settings.FindRect("tab frame", &frame) == B_OK) {
+					if (settings.FindRect("tab frame", &frame) == B_OK) {
 						replyMsg.AddRect("result", frame);
 						handled = true;
 					}
