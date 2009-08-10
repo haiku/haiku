@@ -44,7 +44,6 @@ public:
 private:
 	BPictureButton* AddPictureButton(BView* panel, BRect frame, const char* name,
 		const char* on, const char* off, uint32 what);
-	BStringView* AddStringView(BView* panel, BRect frame, const char* text);
 	void PrinterForMimeType();
 	void SetupPrintersMenu(BMenu* menu);
 	void UpdateAppSettings(const char* mime, const char* printer);

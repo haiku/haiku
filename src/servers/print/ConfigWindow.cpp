@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku. All rights reserved.
+ * Copyright 2002-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,6 +24,10 @@
 #include <Debug.h>
 #include <Window.h>
 
+// Haiku
+#include <Layout.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 
 static const float a0_width = 2380.0;
 static const float a0_height = 3368.0;
@@ -88,10 +92,19 @@ static void GetPageFormat(float w, float h, BString& label)
 }
 
 
+static BGroupLayoutBuilder
+LeftAlign(BView* view)
+{
+	return BGroupLayoutBuilder(B_HORIZONTAL)
+		.Add(view)
+		.AddGlue();
+}
+
+
 ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	BMessage* settings, AutoReply* sender)
 	: BWindow(ConfigWindow::GetWindowFrame(), "Page Setup",
-		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 	, fKind(kind)
 	, fDefaultPrinter(defaultPrinter)
 	, fSettings(settings)
@@ -106,82 +119,91 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	if (kind == kJobSetup)
 		SetTitle("Print Setup");
 
-	BView* panel = new BBox(Bounds(), "top_panel", B_FOLLOW_ALL,
-					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-					B_PLAIN_BORDER);
-
+	BView* panel = new BBox(Bounds(), "temporary", B_FOLLOW_ALL,	B_WILL_DRAW);
 	AddChild(panel);
 
-	float left = 10, top = 10;
-	BRect r(left, top, 160, 20);
+	BRect dummyRect(0, 0, 1, 1);
 
-	// print selection popup menu
+	// print selection pop up menu
 	BPopUpMenu* menu = new BPopUpMenu("Select a Printer");
 	SetupPrintersMenu(menu);
 
-	float width = be_plain_font->StringWidth("Printer:") + 10.0;
-	r.right = r.left + width + menu->MaxContentWidth() + 10;
-	fPrinters = new BMenuField(r, "Printer", "Printer:", menu);
-	fPrinters->SetDivider(width);
-	panel->AddChild(fPrinters);
-	top += fPrinters->Bounds().Height() + 10;
+	fPrinters = new BMenuField("Printer:", menu, NULL);
 
 	// page format button
-	r.OffsetTo(left, top);
-	fPageSetup = AddPictureButton(panel, r, "Page Format", "PAGE_SETUP_ON",
+	fPageSetup = AddPictureButton(panel, dummyRect, "Page Format", "PAGE_SETUP_ON",
 		"PAGE_SETUP_OFF", MSG_PAGE_SETUP);
 
 	// add description to button
-	r.OffsetTo(left + fPageSetup->Bounds().Width() + 5, fPageSetup->Frame().top);
-	BStringView *stringView = AddStringView(panel, r, "Paper Setup:");
-	stringView->ResizeToPreferred();
-	r = stringView->Frame();
-	r.OffsetBy(0, r.Height());
-	fPageFormatText = AddStringView(panel, r, "");
-	fPageFormatText->ResizeToPreferred();
-	top = fPageSetup->Frame().bottom + 15;
+	BStringView *pageFormatTitle = new BStringView("pageFormatTitle", "Paper Setup:");
+	fPageFormatText = new BStringView("pageFormatText", "");
 
 	// page selection button
 	fJobSetup = NULL;
+	BStringView* jobSetupTitle = NULL;
 	if (kind == kJobSetup) {
-		r.OffsetTo(left, top);
-		fJobSetup = AddPictureButton(panel, r, "Page Selection", "JOB_SETUP_ON",
+		fJobSetup = AddPictureButton(panel, dummyRect, "Page Selection", "JOB_SETUP_ON",
 			"JOB_SETUP_OFF", MSG_JOB_SETUP);
 		// add description to button
-		r.OffsetTo(left + fJobSetup->Bounds().Width() + 5, top);
-		stringView = AddStringView(panel, r, "Pages to Print:");
-		stringView->ResizeToPreferred();
-		r.OffsetBy(0, stringView->Frame().Height());
-		fJobSetupText = AddStringView(panel, r, "");
-		fJobSetupText->ResizeToPreferred();
-		top = fJobSetup->Frame().bottom + 15;
+		jobSetupTitle = new BStringView("jobSetupTitle", "Pages to Print:");
+		fJobSetupText = new BStringView("jobSetupText", "");
 	}
-	top += 5;
 
 	// separator line
-	BRect line(Bounds());
-	line.OffsetTo(0, top);
-	line.bottom = line.top+1;
-	AddChild(new BBox(line, "line", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP));
-	top += 10;
+	BBox* separator = new BBox(dummyRect, "line", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
-	// Cancel button
-	r.OffsetTo(left, top);
-	BButton* cancel = new BButton(r, "Cancel", "Cancel",
+	// Cancel & OK button
+	BButton* cancel = new BButton(dummyRect, "Cancel", "Cancel",
 		new BMessage(B_QUIT_REQUESTED));
-	panel->AddChild(cancel);
-	cancel->ResizeToPreferred();
-	left = cancel->Frame().right + 10;
+	fOk = new BButton(dummyRect, "OK", "OK", new BMessage(MSG_OK));
 
-	// OK button
-	r.OffsetTo(left, top);
-	fOk = new BButton(r, "OK", "OK", new BMessage(MSG_OK));
-	panel->AddChild(fOk);
-	fOk->ResizeToPreferred();
-	top += fOk->Bounds().Height() + 10;
+	RemoveChild(panel);
 
-	// resize window
-	ResizeTo(fOk->Frame().right + 10, top);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	BGroupLayoutBuilder builder(B_VERTICAL);
+
+	builder
+		.Add(fPrinters)
+		.AddStrut(5)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+				.Add(fPageSetup)
+				.AddStrut(5)
+				.Add(BGroupLayoutBuilder(B_VERTICAL)
+						.Add(LeftAlign(pageFormatTitle))
+						.Add(LeftAlign(fPageFormatText))
+				)
+				.AddGlue()
+		);
+
+	if (fJobSetup != NULL) {
+		builder
+			.AddStrut(5)
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+					.Add(fJobSetup)
+					.AddStrut(5)
+					.Add(BGroupLayoutBuilder(B_VERTICAL)
+							.Add(LeftAlign(jobSetupTitle))
+							.Add(LeftAlign(fJobSetupText))
+					)
+					.AddGlue()
+			);
+	}
+
+	builder
+		.AddStrut(5)
+		.Add(separator)
+		.AddStrut(5)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+				.AddGlue()
+				.Add(cancel)
+				.AddStrut(5)
+				.Add(fOk)
+				.AddGlue()
+		)
+		.SetInsets(5, 5, 5, 5);
+
+	AddChild(builder);
 
 	AddShortcut('a', 0, new BMessage(B_ABOUT_REQUESTED));
 
@@ -307,6 +329,7 @@ BPictureButton* ConfigWindow::AddPictureButton(BView* panel, BRect frame,
 		onBM->Lock();
 		button->ResizeTo(onBM->Bounds().Width(), onBM->Bounds().Height());
 		onBM->Unlock();
+		panel->RemoveChild(button);
 
 		BPicture* disabled = BitmapToGrayedPicture(panel, offBM);
 		button->SetDisabledOn(disabled);
@@ -321,17 +344,6 @@ BPictureButton* ConfigWindow::AddPictureButton(BView* panel, BRect frame,
 	delete onBM; delete offBM;
 
 	return button;
-}
-
-
-BStringView* ConfigWindow::AddStringView(BView* panel, BRect frame, const char* text)
-{
-	// frame.bottom = frame.top ;
-	BStringView* string = new BStringView(frame, "", text);
-	string->SetViewColor(panel->ViewColor());
-	string->SetLowColor(panel->ViewColor());
- 	panel->AddChild(string);
- 	return string;
 }
 
 
@@ -426,11 +438,9 @@ void ConfigWindow::UpdateUI()
 		if (fJobSetup) {
 			fJobSetup->SetEnabled(false);
 			fJobSetupText->SetText("Undefined job settings");
-			fJobSetupText->ResizeToPreferred();
 		}
 		fOk->SetEnabled(false);
 		fPageFormatText->SetText("Undefined paper format");
-		fPageFormatText->ResizeToPreferred();
 	} else {
 		fPageSetup->SetEnabled(true);
 
@@ -456,7 +466,6 @@ void ConfigWindow::UpdateUI()
 			pageFormat << "Undefined paper format";
 		}
 		fPageFormatText->SetText(pageFormat.String());
-		fPageFormatText->ResizeToPreferred();
 
 			// display information about job
 		if (fKind == kJobSetup) {
@@ -478,16 +487,7 @@ void ConfigWindow::UpdateUI()
 				job << "Undefined job settings";
 			}
 			fJobSetupText->SetText(job.String());
-			fJobSetupText->ResizeToPreferred();
 		}
-	}
-
-	if (fOk->Frame().right < fPageFormatText->Frame().right)
-		ResizeTo(fPageFormatText->Frame().right + 10, Bounds().bottom);
-
-	if (fJobSetupText) {
-		if (fOk->Frame().right < fJobSetupText->Frame().right)
-			ResizeTo(fJobSetupText->Frame().right + 10, Bounds().bottom);
 	}
 }
 
