@@ -53,7 +53,7 @@ private:
 
 			void			_TakeScreenshot();
 			status_t		_GetActiveWindowFrame(BRect* frame);
-			void			_MakeTabSpaceTransparent();
+			void			_MakeTabSpaceTransparent(BRect* frame);
 
 			status_t		_SaveScreenshot();
 			void			_SaveScreenshotSilent() const;
