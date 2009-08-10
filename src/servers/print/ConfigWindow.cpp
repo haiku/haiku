@@ -183,7 +183,7 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	// resize window
 	ResizeTo(fOk->Frame().right + 10, top);
 
-	AddShortcut('i', 0, new BMessage(B_ABOUT_REQUESTED));
+	AddShortcut('a', 0, new BMessage(B_ABOUT_REQUESTED));
 
 	SetDefaultButton(fOk);
 
@@ -248,10 +248,10 @@ void ConfigWindow::MessageReceived(BMessage* m)
 static const char*
 kAbout =
 "Printer Server\n"
-"© 2001-2008 Haiku\n"
+"© 2001-2009 Haiku\n"
 "\n"
-"\tIthamar R. Adema - Initial Implementation\n"
-"\tMichael Pfeiffer - Release 1 and beyond\n"
+"\tIthamar R. Adema\n"
+"\tMichael Pfeiffer\n"
 ;
 
 
