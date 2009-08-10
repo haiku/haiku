@@ -23,7 +23,7 @@
 
 
 PrefWindow::PrefWindow(BMessenger messenger)
-	: BWindow(_CenteredRect(BRect(0, 0, 350, 215)), "Terminal Preferences",
+	: BWindow(_CenteredRect(BRect(0, 0, 375, 185)), "Terminal Preferences",
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
 	fPreviousPref(new PrefHandler(PrefHandler::Default())),

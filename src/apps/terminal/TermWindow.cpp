@@ -232,6 +232,17 @@ TermWindow::MenusBeginning()
 	BMenuItem *item = fEncodingmenu->FindItem(EncodingAsString(_ActiveTermView()->Encoding()));
 	if (item != NULL)
 		item->SetMarked(true);
+
+	TermView *view = _ActiveTermView();
+
+	BFont font;
+	view->GetTermFont(&font);
+
+	float size = font.Size();
+
+	fDecreaseFontSizeMenuItem->SetEnabled(size > 9);
+	fIncreaseFontSizeMenuItem->SetEnabled(size < 18);
+
 	BWindow::MenusBeginning();
 }
 
@@ -299,10 +310,15 @@ TermWindow::_SetupMenu()
 	MakeEncodingMenu(fEncodingmenu, false);
 
 	fSizeMenu = new BMenu("Text Size");
-	fSizeMenu->AddItem(new BMenuItem("Increase",
-		new BMessage(kIncreaseFontSize), '+', B_COMMAND_KEY));
-	fSizeMenu->AddItem(new BMenuItem("Decrease",
-		new BMessage(kDecreaseFontSize), '-', B_COMMAND_KEY));
+	
+	fIncreaseFontSizeMenuItem = new BMenuItem("Increase",
+		new BMessage(kIncreaseFontSize), '+', B_COMMAND_KEY);
+
+	fDecreaseFontSizeMenuItem = new BMenuItem("Decrease",
+		new BMessage(kDecreaseFontSize), '-', B_COMMAND_KEY);
+
+	fSizeMenu->AddItem(fIncreaseFontSizeMenuItem);
+	fSizeMenu->AddItem(fDecreaseFontSizeMenuItem);
 
 	fHelpmenu->AddItem(fWindowSizeMenu);
 	fHelpmenu->AddItem(fEncodingmenu);
@@ -609,11 +625,11 @@ TermWindow::MessageReceived(BMessage *message)
 				size -= 1;
 			
 			// limit the font size
-			if (size < 6)
-				size = 6;
-			else if (size > 20)
-				size = 20;
-				
+			if (size < 9)
+				size = 9;
+			if (size > 18)
+				size = 18;
+			
 			font.SetSize(size);	
 			view->SetTermFont(&font);
 			PrefHandler::Default()->setInt32(PREF_HALF_FONT_SIZE, (int32)size);

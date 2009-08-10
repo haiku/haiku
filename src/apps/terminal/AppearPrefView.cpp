@@ -16,6 +16,7 @@
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+#include <TextControl.h>
 #include <View.h>
 
 #include "MenuUtil.h"
@@ -81,13 +82,25 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 
 	float fontDividerSize = StringWidth("Font:") + 8.0;
 	float sizeDividerSize = StringWidth("Size:") + 8.0;
+	float greenDividerSize = StringWidth("Green:") + 8.0;
+	if (greenDividerSize > sizeDividerSize)
+		sizeDividerSize = greenDividerSize;
+	else
+		greenDividerSize = sizeDividerSize;
+	float colorDividerSize = StringWidth("Color:") + 8.0;
 
-	BRect r(5, 5, 225, 25);
+	if (fontDividerSize < colorDividerSize)
+		fontDividerSize = colorDividerSize;
+	else
+		colorDividerSize = fontDividerSize;
+
+	BRect r(5, 5, 261, 25);
 
 	BMenu *menu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,
 		PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY));
 	fFont = new BMenuField(r, "font", "Font:", menu);
 	fFont->SetDivider(fontDividerSize);
+	fFont->SetAlignment(B_ALIGN_RIGHT);
 	AddChild(fFont);
 
 	r.OffsetBy(r.Width() + 10, 0);
@@ -95,17 +108,31 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 		PrefHandler::Default()->getInt32(PREF_HALF_FONT_SIZE));
 	fFontSize = new BMenuField(r, "size", "Size:", menu);
 	fFontSize->SetDivider(sizeDividerSize);
+	fFontSize->SetAlignment(B_ALIGN_RIGHT);
 	AddChild(fFontSize);
 
-	r.OffsetBy(-r.Width() - 10,r.Height() + 25);
+	r.OffsetBy(-r.Width() - 10,r.Height() + 10);
 	fColorField = new BMenuField(r, "color", "Color:",
 		MakeMenu(MSG_COLOR_FIELD_CHANGED, color_tbl, color_tbl[0]));
-	fColorField->SetDivider(StringWidth(fColorField->Label()) + 8.0);
+	fColorField->SetDivider(colorDividerSize);
+	fColorField->SetAlignment(B_ALIGN_RIGHT);
 	AddChild(fColorField);
 
   	fColorControl = SetupColorControl(BPoint(r.left, r.bottom + 10),
-  		B_CELLS_32x8, 7.0, MSG_COLOR_CHANGED);
+  		B_CELLS_32x8, 8.0, MSG_COLOR_CHANGED);
   	fColorControl->SetValue(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
+
+	BTextControl* redInput = (BTextControl*)fColorControl->FindView("_red");
+	BTextControl* greenInput = (BTextControl*)fColorControl->FindView("_green");
+	BTextControl* blueInput = (BTextControl*)fColorControl->FindView("_blue");
+	
+	redInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
+	greenInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
+	blueInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
+
+	redInput->SetDivider(greenDividerSize);
+	greenInput->SetDivider(greenDividerSize);
+	blueInput->SetDivider(greenDividerSize);
 }
 
 
@@ -217,6 +244,8 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 	BPopUpMenu *menu = new BPopUpMenu("size");
 	int32 sizes[] = {9, 10, 11, 12, 14, 16, 18, 0};
 
+	bool found = false;
+
 	for (uint32 i = 0; sizes[i]; i++) {
 		BString string;
 		string << sizes[i];
@@ -224,8 +253,17 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 		BMenuItem* item = new BMenuItem(string.String(), new BMessage(command));
 		menu->AddItem(item);
 
-		if (sizes[i] == defaultSize)
+		if (sizes[i] == defaultSize) {
 			item->SetMarked(true);
+			found = true;
+		} else if (sizes[i] > defaultSize && !found) {
+			BString string;
+			string << defaultSize;
+			BMenuItem* item = new BMenuItem(string.String(), new BMessage(command));
+			item->SetMarked(true);
+			menu->AddItem(item, i);
+			found = true;
+		}
 	}
 
 	return menu;
