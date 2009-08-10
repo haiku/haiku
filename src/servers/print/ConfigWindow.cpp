@@ -327,7 +327,10 @@ BPictureButton* ConfigWindow::AddPictureButton(BView* panel, BRect frame,
 		button->SetViewColor(B_TRANSPARENT_COLOR);
 		panel->AddChild(button);
 		onBM->Lock();
-		button->ResizeTo(onBM->Bounds().Width(), onBM->Bounds().Height());
+		int32 width = onBM->Bounds().Width();
+		int32 height = onBM->Bounds().Height();
+		button->ResizeTo(width, height);
+		button->SetExplicitMaxSize(BSize(width, height));
 		onBM->Unlock();
 		panel->RemoveChild(button);
 
