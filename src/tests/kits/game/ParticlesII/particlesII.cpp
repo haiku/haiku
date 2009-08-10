@@ -95,7 +95,7 @@ void NApplication::ReadyToRun()
 	NWindowScreen *ws = new NWindowScreen(&ret);
 	PRINT(("WindowScreen ctor returned. ret = %s\n", strerror(ret)));
 	// exit if constructing the WindowScreen failed.
-	if((ws == NULL) || (ret < B_OK) || !ws->CanControlFrameBuffer())
+	if((ws == NULL) || (ret < B_OK))
 	{
 		//printf("the window screen was NULL, or there was an error\n");
 		PostMessage(B_QUIT_REQUESTED);
@@ -114,7 +114,7 @@ bool NApplication::QuitRequested()
 }
 
 NWindowScreen::NWindowScreen(status_t *ret)
-	: BWindowScreen("Example", B_8_BIT_640x480, ret), width(640), height(480), COLORS(256)
+	: BWindowScreen("Example", B_8_BIT_640x480, ret), width(639), height(479), COLORS(256)
 {
 	PRINT(("WindowScreen ctor.\n"));
 	thread_is_locked = true;
@@ -148,7 +148,9 @@ NWindowScreen::NWindowScreen(status_t *ret)
 	set_frame_rate(30.);
 }
 
-void NWindowScreen::ScreenConnected(bool connected)
+
+void
+NWindowScreen::ScreenConnected(bool connected)
 {
 	PRINT(("ScreenConnected()\n"));
 	fflush(stdout);
@@ -156,7 +158,7 @@ void NWindowScreen::ScreenConnected(bool connected)
 	{
 		if(SetSpace(B_8_BIT_640x480) < B_OK)
 		{
-			SetFrameBuffer(640,480);
+			//SetFrameBuffer(640, 480);
 			PRINT(("SetSpace() failed\n"));
 			// properly set the framebuffer. exit if an error occurs.
 			be_app->PostMessage(B_QUIT_REQUESTED);
@@ -268,19 +270,23 @@ void NWindowScreen::ScreenConnected(bool connected)
 	}
 }
 
-long NWindowScreen::Entry(void* p) {
+
+long
+NWindowScreen::Entry(void* p)
+{
    return ((NWindowScreen*)p)->MyCode();
 }
 
-long NWindowScreen::MyCode()
+
+long
+NWindowScreen::MyCode()
 {
 	bigtime_t trgt = system_time() + frame_pause;
 	srandom(system_time());
 	// beforehand stuff
 	particle_count = 1024*2;
 	particle_list = (particle *)malloc(sizeof(particle)*particle_count);
-	for (uint32 i=0; i<particle_count; i++)
-	{
+	for (uint32 i=0; i<particle_count; i++) {
 		uint32 rand_max = 0xffffffff;		
 		particle_list[i].init_velocity = -((double)((rand_max>>1)+(random()%(rand_max>>1)))/rand_max)*3.333; // magic number
 		particle_list[i].gravity = -(((double)((rand_max>>1)+(random()%(rand_max>>1)))/rand_max))*0.599; // more magic
@@ -297,14 +303,12 @@ long NWindowScreen::MyCode()
 	
 	
 	// the loop o' fun
-	while(!(((NApplication*)be_app)->is_quitting))
-	{
+	while (!(((NApplication*)be_app)->is_quitting)) {
 		// try to sync with the vertical retrace
-		if(BScreen(this).WaitForRetrace() != B_OK)
-		{
+		if (BScreen(this).WaitForRetrace() != B_OK) {
 			// snoze for a bit so that other threads can be happy. 
 			// We are realtime priority you know
-			if(system_time() < trgt)
+			if (system_time() < trgt)
 				snooze(trgt - system_time());
 			trgt = system_time() + frame_pause;
 		}
@@ -319,7 +323,6 @@ long NWindowScreen::MyCode()
 	
 		
 		// eye candy VII - particles! - my own cookin
-		particle *s;
 		int32 x, y, cx,cy;
 		set_frame_rate(60.); // woo. ntsc
 		// calculate the center
@@ -332,9 +335,8 @@ long NWindowScreen::MyCode()
 		//	draw_line(i,0,i,height, i);
 		
 		PRINT(("Starting particle drawing loop\n"));
-		s = particle_list;
-		for (uint32 i=0; i<particle_count; i++)
-		{
+		particle *s = particle_list;
+		for (uint32 i=0; i<particle_count; i++) {
 			PRINT(("drawing particle %d\r", i));
 			
 			// save the old position
@@ -427,7 +429,8 @@ void fill_ellipse(int x, int y, int xradius, int yradius, int color);
 
 */
 
-void NWindowScreen::draw_line(int x1, int y1, int x2, int y2, int color)
+void
+NWindowScreen::draw_line(int x1, int y1, int x2, int y2, int color)
 {
 	// Simple Bresenham's line drawing algorithm
 	int d,x,y,ax,ay,sx,sy,dx,dy;
@@ -474,7 +477,9 @@ void NWindowScreen::draw_line(int x1, int y1, int x2, int y2, int color)
 	}
 }
 
-void NWindowScreen::draw_rect(int x, int y, int w, int h, int color)
+
+void
+NWindowScreen::draw_rect(int x, int y, int w, int h, int color)
 {
 	draw_line(x,y,x+w,y,color);
 	draw_line(x,y,x,y+h,color);
@@ -482,14 +487,20 @@ void NWindowScreen::draw_rect(int x, int y, int w, int h, int color)
 	draw_line(x+w,y,x+w,y+h,color);
 }
 
-void NWindowScreen::fill_rect(int x, int y, int w, int h, int color)
+
+void
+NWindowScreen::fill_rect(int x, int y, int w, int h, int color)
 {
-	for(int i=0;i<w;i++)
-		for(int j=0;j<h;j++)
-			set_pixel(i,j,color);
+	for (int i = 0; i < w; i++) {
+		for (int j = 0; j < h; j++) {
+			set_pixel(i, j, color);
+		}
+	}
 }
 
-void NWindowScreen::draw_ellipse(int cx, int cy, int wide, int deep, int color)
+
+void
+NWindowScreen::draw_ellipse(int cx, int cy, int wide, int deep, int color)
 {
 	// if we're asked to draw a really small ellipse, put a single pixel in the buffer
 	// and bail
@@ -540,7 +551,9 @@ void NWindowScreen::draw_ellipse(int cx, int cy, int wide, int deep, int color)
 	}
 }
 
-void NWindowScreen::fill_ellipse(int cx, int cy, int wide, int deep, int color)
+
+void
+NWindowScreen::fill_ellipse(int cx, int cy, int wide, int deep, int color)
 {
 	// if we're asked to draw a really small ellipse, put a single pixel in the buffer
 	// and bail
@@ -591,7 +604,9 @@ void NWindowScreen::fill_ellipse(int cx, int cy, int wide, int deep, int color)
 	}
 }
 
-void NWindowScreen::ellipse_points(int x, int y, int x_offset, int y_offset, int color)
+
+void
+NWindowScreen::ellipse_points(int x, int y, int x_offset, int y_offset, int color)
 {
 	// fill four pixels for every iteration in draw_ellipse
 	
@@ -617,7 +632,9 @@ void NWindowScreen::ellipse_points(int x, int y, int x_offset, int y_offset, int
 		set_pixel(xCoord,yCoord,color);
 }
 
-void NWindowScreen::ellipse_fill_points(int x, int y, int x_offset, int y_offset, int color)
+
+void
+NWindowScreen::ellipse_fill_points(int x, int y, int x_offset, int y_offset, int color)
 {
 	// put lines between two pixels twice. once for y positive, the other for y negative (symmetry)
 	// for every iteration in fill_ellipse
