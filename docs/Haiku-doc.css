@@ -248,7 +248,6 @@ pre.terminal {			/* Terminal output*/
     	font-size: 1.0em;
     	font-family: serif;
     	font-style: italic;
-/* 	color: #5e1c1c; */
 	color: #5e1c1c;
 }
 .cli {				/* Shell command or file */
@@ -302,5 +301,9 @@ pre.terminal {			/* Terminal output*/
 	/* and not have mozilla dotted underline */
 	acronym {
 		border: none;
+	}
+	pre.terminal {			/* Terminal output black on white*/
+		background-color: #ffffff;
+		color: #000000;
 	}
 }

@@ -76,7 +76,7 @@ width="32" height="32" /></td><td><img src="../../images/apps-images/terminal-ic
 width="32" height="32" /></td></tr>
         <tr align="center"><td>1,024 byte<br />+&#160;256 byte</td><td> 7,192 byte </td><td> 768 byte </td></tr>
 </table>
-<p>Note that the BeOS used two versions of an icon, one 16x16 and 32x32, to achieve good visuals in List and Icon View mode.</p>
+<p>Note that the BeOS used two versions of an icon, one 16x16 and one 32x32, to achieve good visuals in List and Icon View mode.</p>
 <p>This trick isn't needed with vector icons. Besides only taking up a few hundred bytes in a file, vector icons also scale much better than bitmaps. (Note: BeOS offered only a 16x16 and 32x32 display.)</p>
 <table border="0" cellpadding="10">
         <tr align="center"><td> </td><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td><td><b>128x128</b></td></tr>
@@ -117,7 +117,7 @@ For example, by re-using a path, several objects can be modified together by man
 <p>Here's a quick overview of Icon-O-Matic's window:</p>
 <img src="../images/apps-images/i-o-m-overview.png" alt="i-o-m-overview.png" />
 
-<p>To create any visible object on the canvas, you need a shape with a path and a style. Conveniently, you can create one, two or all three of those together from the <span class="menu">Shape</span> menu. Every kind of object (Paths, Shapes, Transformers, and Styles) has a menu above its list of elements, offering various commands. Every element has certain options that are set in the <span class="menu">Property</span> view.</p>
+<p>To create any visible object on the canvas, you need a shape with a path and a style. Conveniently, you can create one, two or all three of those together from the <span class="menu">Shape</span> menu. Every kind of object (Paths, Shapes, Transformers, and Styles) has a menu above its list of elements, offering various commands. Every element has certain options that are set in the <span class="menu">Properties</span> view.</p>
 
 
 <h2>
@@ -176,11 +176,12 @@ width="16" height="16" /></td>
 <table summary="Path menu" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">Reverse</span></td><td style="width:15px;"></td><td>If your path isn't "closed" (see Path Properties below), a click into the canvas always creates a new point, connecting it with the last one. "Reverse" will reverse this order and your new point will connect to original start point instead.</td></tr>
 <tr><td><span class="menu">Clean Up</span></td><td></td><td>Most useful with imported SVGs, this function will remove redundant points.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Rotate Indices</span></td><td></td><td>not yet implemented.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Rotate Indices Right</span></td><td><span class="key">ALT</span>&#160;<span class="key">R</span></td><td>Practically, this rotates the opening of a path. It's best seen when using a not-closed path with a style and a shape with a stroke transformer. Now, if your path looks like a &sub; it will rotate like this: &sub; &cap; &sup; &cup;.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Rotate Indices Left</span></td><td><span class="key">ALT</span>&#160;<span class="key">SHIFT</span>&#160;<span class="key">R</span></td><td>Does the same in the other direction.</td></tr>
 </table>
 
 <h3><a id="i-o-m-path-properties" name="i-o-m-path-properties">Path Properties</a></h3>
-<p>The <span class="menu">Property</span> at the bottom left of the window offers all available settings of the currently selected object. A path only has two: a <span class="menu">Name</span> and if it's <span class="menu">Closed</span> or not.</p>
+<p><span class="menu">Properties</span> at the bottom left of the window offers all available settings of the currently selected object. A path only has two: a <span class="menu">Name</span> and if it's <span class="menu">Closed</span> or not.</p>
 
 
 <h2>
@@ -222,10 +223,9 @@ If not, "Freeze Transformation" will apply the current shape transformation to t
 </table>
 
 <h3><a id="i-o-m-shape-properties" name="i-o-m-shape-properties">Shape Properties</a></h3>
-<p>Besides a <span class="menu">Name</span>, the <span class="menu">Property</span> view for a shape has these options:</p>
+<p>Besides a <span class="menu">Name</span>, the <span class="menu">Properties</span> view for a shape has these options:</p>
 
 <table summary="Shape properties" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Rounding</span></td><td style="width:15px;"></td><td><i>Unfinished feature</i>. Once working correctly, it will do a kind of "hinting" for vector paths, rounding their coordinates to the next full pixel, giving it a crisper look.</td></tr>
 <tr><td><span class="menu">Min LOD</span></td><td></td><td>Minimum Level of Detail</td></tr>
 <tr><td><span class="menu">Max LOD</span></td><td></td><td>Maximum Level of Detail</td></tr>
 </table>
@@ -273,7 +273,7 @@ Of course you can move these indicators to change the gradient to your liking. Y
 <p>The <span class="menu">Style</span> menu offers the usual entries to <span class="menu">Add</span>, <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a style and to <span class="menu">Reset Transformation</span>.</p>
 
 <h3><a id="i-o-m-style-properties" name="i-o-m-style-properties">Style Properties</a></h3>
-<p>The <span class="menu">Name</span> is the only <span class="menu">Property</span> of a style.</p>
+<p>The <span class="menu">Name</span> is the only <span class="menu">Properties</span> of a style.</p>
 
 
 <h2>
@@ -283,8 +283,6 @@ Of course you can move these indicators to change the gradient to your liking. Y
 
 <h3><a id="i-o-m-transformer-menu" name="i-o-m-transformer-menu">Transformer Add Menu</a></h3>
 <table summary=" Transformer Add menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Transformation</span></td><td style="width:15px;"></td><td>Offers the same move/resize/rotate options you have by manipulating a shape with your mouse directly.</td></tr>
-<tr><td><span class="menu">Perspective</span></td><td></td><td>not yet implemented</td></tr>
 <tr><td><span class="menu">Contour</span></td><td></td><td>Adds an outline to a shape.</td></tr>
 <tr><td><span class="menu">Stroke</span></td><td></td><td>Strokes the path of a shape instead of filling it with a style.</td></tr>
 </table>
@@ -292,7 +290,7 @@ Of course you can move these indicators to change the gradient to your liking. Y
 <p>Depending on the kind of Transformer, you'll get a different set of properties.</p>
 
 <h3><a id="i-o-m-transformer-properties" name="i-o-m-transformer-properties">Transformer Properties</a></h3>
-<p>Besides a <span class="menu">Name</span> and the actual <span class="menu">Width</span> for the transformer, the <span class="menu">Property</span> view has these (depending on its type slightly differing) options:</p>
+<p>Besides a <span class="menu">Name</span> and the actual <span class="menu">Width</span> for the transformer, the <span class="menu">Properties</span> view has these (depending on its type slightly differing) options:</p>
 <table summary="Transformer properties" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">Caps</span></td><td style="width:15px;"></td><td><i>Stroke only</i>. Defines the end caps of a line: <span class="menu">Butt</span>, <span class="menu">Square</span> or <span class="menu">Round</span>.</td></tr>
 <tr><td><span class="menu">Detect Orient.</span></td><td></td><td><i>Contour only</i>. Makes sure the contour always extends outwards when you have self-intersecting paths.</td></tr>
