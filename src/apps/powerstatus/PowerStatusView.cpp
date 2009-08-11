@@ -547,10 +547,9 @@ PowerStatusReplicant::MouseDown(BPoint point)
 void
 PowerStatusReplicant::_AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "PowerStatus\n"
-		"written by Axel Dörfler,\n"
-		"\tClemens Zeidler\n"
-		"\tCopyright 2006, Haiku, Inc.\n", "Ok");
+	BAlert* alert = new BAlert("about", "PowerStatus\n"
+		"written by Axel Dörfler, Clemens Zeidler\n"
+		"Copyright 2006, Haiku, Inc.\n", "Ok");
 	BTextView *view = alert->TextView();
 	BFont font;
 

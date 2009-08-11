@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,7 +14,7 @@
 
 
 PowerStatusWindow::PowerStatusWindow()
-	: BWindow(BRect(100, 150, 147, 197), "PowerStatus", B_TITLED_WINDOW,
+	: BWindow(BRect(100, 150, 281, 299), "PowerStatus", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	BView* topView = new BView(Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW);
