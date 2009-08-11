@@ -167,7 +167,7 @@ PowerStatusView::_DrawBattery(BRect rect)
 	float left = rect.left;
 	rect.left += rect.Width() / 11;
 
-	SetHighColor(84, 84, 84);
+	SetHighColor(0, 0, 0);
 
 	float gap = 1;
 	if (rect.Height() > 8) {
@@ -201,9 +201,8 @@ PowerStatusView::_DrawBattery(BRect rect)
 				base.set_to(180, 0, 0);
 			else
 				base.set_to(20, 180, 0);
-		} else {
-			base = HighColor();
-		}
+		} else
+			base.set_to(84, 84, 84);
 
 		rect.InsetBy(gap, gap);
 		rect.right = rect.left + rect.Width() * percent / 100.0;
