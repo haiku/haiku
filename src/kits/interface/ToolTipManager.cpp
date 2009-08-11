@@ -11,6 +11,7 @@
 #include <LayoutBuilder.h>
 #include <MessageRunner.h>
 
+#include <WindowPrivate.h>
 #include <ToolTip.h>
 
 
@@ -107,7 +108,7 @@ private:
 ToolTipWindow::ToolTipWindow(BToolTip* tip, BPoint where)
 	:
 	BWindow(BRect(0, 0, 250, 10), "tool tip", B_BORDERED_WINDOW_LOOK,
-		B_FLOATING_APP_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
+		kMenuWindowFeel, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS | B_AVOID_FRONT | B_AVOID_FOCUS)
 {
 	MoveTo(where + tip->MouseRelativeLocation());
