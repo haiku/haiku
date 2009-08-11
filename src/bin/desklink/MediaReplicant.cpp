@@ -10,7 +10,9 @@
  *		Axel Dörfler, axeld@pinc-software.de.
  */
 
+
 //! Volume control, and media shortcuts in Deskbar
+
 
 #include <new>
 #include <stdio.h>
@@ -25,6 +27,10 @@
 #include <PopUpMenu.h>
 #include <Roster.h>
 #include <String.h>
+#include <StringView.h>
+
+#include <ToolTip.h>
+#include <ToolTipManager.h>
 
 #include "desklink.h"
 #include "iconfile.h"
@@ -42,6 +48,56 @@ static const char* kReplicantName = "MediaReplicant";
 	// R5 name needed, Media prefs manel removes by name
 
 static const char* kSettingsFile = "x-vnd.Haiku-desklink";
+
+
+class VolumeToolTip : public BToolTip {
+public:
+	VolumeToolTip(int32 which = VOLUME_USE_MIXER)
+		:
+		fWhich(which)
+	{
+		fView = new BStringView("", "");
+	}
+
+	virtual ~VolumeToolTip()
+	{
+		delete fView;
+	}
+
+	virtual BView* View() const
+	{
+		return fView;
+	}
+
+	virtual void AttachedToWindow()
+	{
+		Update();
+	}
+
+	void SetWhich(int32 which)
+	{
+		fWhich = which;
+	}
+
+	void Update()
+	{
+		if (!Lock())
+			return;
+
+		MixerControl control;
+		control.Connect(fWhich);
+
+		char text[256];
+		snprintf(text, sizeof(text), "%g dB", control.Volume());
+		fView->SetText(text);
+
+		Unlock();
+	}
+
+private:
+	BStringView*	fView;
+	int32			fWhich;
+};
 
 
 class MediaReplicant : public BView {
@@ -263,6 +319,12 @@ MediaReplicant::MessageReceived(BMessage* message)
 				MixerControl mixerControl;
 				mixerControl.Connect(fVolumeWhich);
 				mixerControl.ChangeVolumeBy(deltaY < 0 ? 6 : -6);
+
+				VolumeToolTip* tip = dynamic_cast<VolumeToolTip*>(ToolTip());
+				if (tip != NULL) {
+					tip->Update();
+					ShowToolTip(tip);
+				}
 			}
 			break;
 		}
@@ -387,7 +449,9 @@ MediaReplicant::_Init()
 {
 	fIcon = new BBitmap(BRect(0, 0, kSpeakerWidth - 1, kSpeakerHeight - 1),
 		B_CMAP8);
-	fIcon->SetBits(kSpeakerBits, kSpeakerWidth*kSpeakerHeight, 0, B_CMAP8);
+	fIcon->SetBits(kSpeakerBits, kSpeakerWidth * kSpeakerHeight, 0, B_CMAP8);
+
+	SetToolTip(new VolumeToolTip());
 
 	_LoadSettings();
 }
