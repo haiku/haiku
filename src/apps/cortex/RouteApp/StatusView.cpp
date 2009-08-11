@@ -302,7 +302,8 @@ StatusView::drawInto(BView *v, BRect updateRect)
 	r.left += 10.0;
 	font_height fh;
 	be_plain_font->GetHeight(&fh);
-	r.bottom = Bounds().bottom - fh.descent - 1.0;
+	r.bottom = Bounds().bottom - fh.descent
+		- (Bounds().Height() - fh.ascent - fh.descent) / 2;
 	v->MovePenTo(r.LeftBottom());
 	v->DrawString(Text());
 
