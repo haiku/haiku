@@ -6,6 +6,7 @@
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 
+
 #include "APMDriverInterface.h"
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
@@ -61,7 +62,7 @@ APMDriverInterface::Connect()
 	if (fDevice < 0) {
 		return B_ERROR;
 	}
-	
+
 	return B_OK;
 #endif
 }
@@ -72,7 +73,7 @@ APMDriverInterface::GetBatteryInfo(battery_info* info, int32 index)
 {
 	if (index != 0)
 		return B_BAD_VALUE;
-	
+
 	info->current_rate = -1;
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
@@ -86,7 +87,7 @@ APMDriverInterface::GetBatteryInfo(battery_info* info, int32 index)
 		info->full_capacity = 100;
 		info->time_left = apmInfo.time_left;
 	}
-	
+
 	return status;
 #else
 	if (fDevice < 0)
@@ -108,7 +109,7 @@ APMDriverInterface::GetBatteryInfo(battery_info* info, int32 index)
 		else if (info->time_left & 0x8000)
 			info->time_left = (info->time_left & 0x7fff) * 60;
 	}
-	
+
 	return B_OK;
 #endif
 }
@@ -134,7 +135,7 @@ APMDriverInterface::_WatchPowerStatus()
 {
 	while (atomic_get(&fIsWatching) > 0) {
 		Broadcast(kMsgUpdate);
-		snooze(kUpdateInterval);
+		acquire_sem_etc(fWaitSem, 1, B_RELATIVE_TIMEOUT, kUpdateInterval);
 	}
 }
 

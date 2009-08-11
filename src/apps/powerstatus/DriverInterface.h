@@ -68,6 +68,7 @@ protected:
 	virtual void		_WatchPowerStatus() = 0;
 
 	vint32				fIsWatching;
+	sem_id				fWaitSem;
 
 private:
 	static int32		_ThreadWatchPowerFunction(void* data);

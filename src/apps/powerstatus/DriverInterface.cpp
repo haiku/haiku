@@ -46,18 +46,20 @@ Monitor::Broadcast(uint32 message)
 }
 
 
+//	#pragma mark -
+
+
 PowerStatusDriverInterface::PowerStatusDriverInterface()
 	:
 	fIsWatching(0),
+	fWaitSem(-1),
 	fThread(-1)
 {
-
 }
 
 
 PowerStatusDriverInterface::~PowerStatusDriverInterface()
 {
-
 }
 
 
@@ -65,8 +67,8 @@ status_t
 PowerStatusDriverInterface::StartWatching(BHandler* target)
 {
 	BAutolock autolock(fListLocker);
-	status_t status = Monitor::StartWatching(target);
 
+	status_t status = Monitor::StartWatching(target);
 	if (status != B_OK)
 		return status;
 
@@ -76,13 +78,20 @@ PowerStatusDriverInterface::StartWatching(BHandler* target)
 	fThread = spawn_thread(&_ThreadWatchPowerFunction, "PowerStatusThread",
 		B_LOW_PRIORITY, this);
 	if (fThread >= 0) {
+		fWaitSem = create_sem(0, "power status wait");
+
 		atomic_set(&fIsWatching, 1);
 		status = resume_thread(fThread);
 	} else
 		return fThread;
 
-	if (status != B_OK && fWatcherList.CountItems() == 0)
+	if (status != B_OK && fWatcherList.CountItems() == 0) {
 		atomic_set(&fIsWatching, 0);
+		delete_sem(fWaitSem);
+
+		fThread = -1;
+		fWaitSem = -1;
+	}
 
 	return status;
 }
@@ -95,11 +104,8 @@ PowerStatusDriverInterface::StopWatching(BHandler* target)
 	if (fThread < 0)
 		return B_BAD_VALUE;
 
-	if (fWatcherList.CountItems() == 1) {
-		atomic_set(&fIsWatching, 0);
-		wait_for_thread(fThread, NULL);
-		fThread = -1;
-	}
+	if (fWatcherList.CountItems() == 1)
+		Disconnect();
 
 	return Monitor::StopWatching(target);
 }
@@ -116,9 +122,15 @@ PowerStatusDriverInterface::Broadcast(uint32 message)
 void
 PowerStatusDriverInterface::Disconnect()
 {
+	if (fThread < 0)
+		return;
+
 	atomic_set(&fIsWatching, 0);
+	delete_sem(fWaitSem);
+
 	wait_for_thread(fThread, NULL);
 	fThread = -1;
+	fWaitSem = -1;
 }
 
 
