@@ -39,7 +39,7 @@ namespace BPrivate {
 };
 
 class ServerApp : public MessageLooper {
- public:
+public:
 								ServerApp(Desktop* desktop,
 										  port_id clientAppPort,
 										  port_id clientLooperPort,
@@ -57,7 +57,7 @@ class ServerApp : public MessageLooper {
 		\brief Determines whether the application is the active one
 		\return true if active, false if not.
 	*/
-			bool				IsActive(void) const { return fIsActive; }
+			bool				IsActive() const { return fIsActive; }
 			void				Activate(bool value);
 
 			void				SendMessageToClient(BMessage* message) const;
@@ -66,22 +66,27 @@ class ServerApp : public MessageLooper {
 			ServerCursor*		CurrentCursor() const;
 
 			team_id				ClientTeam() const;
-			const char*			Signature() const { return fSignature.String(); }
-			const char*			SignatureLeaf() const { return fSignature.String() + 12; }
+
+			const char*			Signature() const
+									{ return fSignature.String(); }
+			const char*			SignatureLeaf() const
+									{ return fSignature.String() + 12; }
 
 			bool				AddWindow(ServerWindow* window);
 			void				RemoveWindow(ServerWindow* window);
 			bool				InWorkspace(int32 index) const;
 			uint32				Workspaces() const;
-			int32				InitialWorkspace() const { return fInitialWorkspace; }
+			int32				InitialWorkspace() const
+									{ return fInitialWorkspace; }
 
 			int32				CountBitmaps() const;
 			ServerBitmap*		FindBitmap(int32 token) const;
 
 			int32				CountPictures() const;
-			ServerPicture*		CreatePicture(const ServerPicture* original = NULL);
-			ServerPicture*		FindPicture(const int32& token) const;
-			bool				DeletePicture(const int32& token);
+			ServerPicture*		CreatePicture(
+									const ServerPicture* original = NULL);
+			ServerPicture*		FindPicture(int32 token) const;
+			bool				DeletePicture(int32 token);
 
 			Desktop*			GetDesktop() const { return fDesktop; }
 
@@ -89,14 +94,14 @@ class ServerApp : public MessageLooper {
 
 			BPrivate::BTokenSpace& ViewTokens() { return fViewTokens; }
 
- private:
+private:
 	virtual	void				_DispatchMessage(int32 code,
-												 BPrivate::LinkReceiver& link);
+									BPrivate::LinkReceiver& link);
 	virtual	void				_MessageLooper();
 	virtual	void				_GetLooperName(char* name, size_t size);
 			status_t			_CreateWindow(int32 code,
-											  BPrivate::LinkReceiver& link,
-											  port_id& clientReplyPort);
+									BPrivate::LinkReceiver& link,
+									port_id& clientReplyPort);
 
 			bool				_HasWindowUnderMouse();
 
@@ -124,10 +129,9 @@ class ServerApp : public MessageLooper {
 
 			int32				fInitialWorkspace;
 
-		// NOTE: Bitmaps and Pictures are stored globally, but ServerApps remember
-		// which ones they own so that they can destroy them when they quit.
-		// TODO:
-		// - As we reference these stuff by token, what about putting them in hash tables ?
+			// NOTE: Bitmaps and Pictures are stored globally, but ServerApps
+			// remember which ones they own so that they can destroy them when
+			// they quit.
 			BList				fBitmapList;
 			BList				fPictureList;
 

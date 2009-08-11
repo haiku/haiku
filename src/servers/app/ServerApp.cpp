@@ -13,10 +13,32 @@
  *		Philippe Saint-Pierre, stpere@gmail.com
  */
 
-/*!
-	\class ServerApp ServerApp.h
+
+/*!	\class ServerApp ServerApp.h
 	\brief Counterpart to BApplication within the app_server
 */
+
+
+#include "ServerApp.h"
+
+#include <new>
+#include <stdio.h>
+#include <string.h>
+#include <syslog.h>
+
+#include <AppDefs.h>
+#include <Autolock.h>
+#include <Debug.h>
+#include <List.h>
+#include <ScrollBar.h>
+#include <Shape.h>
+#include <String.h>
+
+#include <FontPrivate.h>
+#include <MessengerPrivate.h>
+#include <RosterPrivate.h>
+#include <ServerProtocol.h>
+#include <WindowPrivate.h>
 
 #include "AppServer.h"
 #include "BitmapManager.h"
@@ -31,7 +53,6 @@
 #include "InputManager.h"
 #include "OffscreenServerWindow.h"
 #include "Screen.h"
-#include "ServerApp.h"
 #include "ServerBitmap.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
@@ -40,25 +61,6 @@
 #include "ServerWindow.h"
 #include "SystemPalette.h"
 #include "Window.h"
-
-#include <FontPrivate.h>
-#include <MessengerPrivate.h>
-#include <RosterPrivate.h>
-#include <ServerProtocol.h>
-#include <WindowPrivate.h>
-
-#include <AppDefs.h>
-#include <Autolock.h>
-#include <Debug.h>
-#include <List.h>
-#include <ScrollBar.h>
-#include <Shape.h>
-#include <String.h>
-
-#include <new>
-#include <stdio.h>
-#include <string.h>
-#include <syslog.h>
 
 
 //#define DEBUG_SERVERAPP
@@ -84,7 +86,8 @@ static const uint32 kMsgAppQuit = 'appQ';
 ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 		port_id clientLooperPort, team_id clientTeam,
 		int32 clientToken, const char* signature)
-	: MessageLooper("application"),
+	:
+	MessageLooper("application"),
 
 	fMessagePort(-1),
 	fClientReplyPort(clientReplyPort),
@@ -160,8 +163,8 @@ ServerApp::~ServerApp()
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
 		ServerWindow* window = fWindowList.ItemAt(i);
 
-		// a window could have been remove in the mean time (if those 20 millisecs
-		// from above weren't enough)
+		// A window could have been removed in the mean time
+		// (if those 20 milli seconds from above weren't enough)
 		if (window == NULL)
 			continue;
 
@@ -183,7 +186,7 @@ ServerApp::~ServerApp()
 	}
 
 	for (int32 i = fBitmapList.CountItems(); i-- > 0;) {
-		gBitmapManager->DeleteBitmap(static_cast<ServerBitmap *>(fBitmapList.ItemAt(i)));
+		gBitmapManager->DeleteBitmap((ServerBitmap*)fBitmapList.ItemAt(i));
 	}
 
 	for (int32 i = fPictureList.CountItems(); i-- > 0;) {
@@ -196,8 +199,7 @@ ServerApp::~ServerApp()
 }
 
 
-/*!
-	\brief Checks if the application was initialized correctly
+/*!	\brief Checks if the application was initialized correctly
 */
 status_t
 ServerApp::InitCheck()
@@ -215,8 +217,7 @@ ServerApp::InitCheck()
 }
 
 
-/*!
-	\brief This quits the application and deletes it. You're not supposed
+/*!	\brief This quits the application and deletes it. You're not supposed
 		to call its destructor directly.
 
 	At the point you're calling this method, the application should already
@@ -239,16 +240,18 @@ ServerApp::Quit(sem_id shutdownSemaphore)
 }
 
 
-/*!
-	\brief Send a message to the ServerApp's BApplication
-	\param msg The message to send
+/*!	\brief Send a message to the ServerApp's BApplication
+	\param message The message to send
 */
 void
-ServerApp::SendMessageToClient(BMessage *msg) const
+ServerApp::SendMessageToClient(BMessage* message) const
 {
-	status_t status = fHandlerMessenger.SendMessage(msg, (BHandler*)NULL, 100000);
-	if (status != B_OK)
-		printf("app %s send to client failed: %s\n", Signature(), strerror(status));
+	status_t status = fHandlerMessenger.SendMessage(message, (BHandler*)NULL,
+		100000);
+	if (status != B_OK) {
+		syslog(LOG_ERR, "app %s send to client failed: %s\n", Signature(),
+			strerror(status));
+	}
 }
 
 
@@ -268,8 +271,7 @@ ServerApp::_HasWindowUnderMouse()
 }
 
 
-/*!
-	\brief Sets the ServerApp's active status
+/*!	\brief Sets the ServerApp's active status
 	\param value The new status of the ServerApp.
 
 	This changes an internal flag and also sets the current cursor to the one
@@ -332,8 +334,7 @@ ServerApp::_GetLooperName(char* name, size_t length)
 }
 
 
-/*!
-	\brief The thread function ServerApps use to monitor messages
+/*!	\brief The thread function ServerApps use to monitor messages
 */
 void
 ServerApp::_MessageLooper()
@@ -352,9 +353,11 @@ ServerApp::_MessageLooper()
 	status_t err = B_OK;
 
 	while (!fQuitting) {
-		STRACE(("info: ServerApp::_MessageLooper() listening on port %ld.\n", fMessagePort));
+		STRACE(("info: ServerApp::_MessageLooper() listening on port %ld.\n",
+			fMessagePort));
+
 		err = receiver.GetNextMessage(code, B_INFINITE_TIMEOUT);
-		if (err < B_OK || code == B_QUIT_REQUESTED) {
+		if (err != B_OK || code == B_QUIT_REQUESTED) {
 			STRACE(("ServerApp: application seems to be gone...\n"));
 
 			// Tell desktop to quit us
@@ -373,12 +376,15 @@ ServerApp::_MessageLooper()
 
 			case AS_QUIT_APP:
 			{
-				// This message is received only when the app_server is asked to shut down in
-				// test/debug mode. Of course, if we are testing while using AccelerantDriver, we do
-				// NOT want to shut down client applications. The server can be quit o in this fashion
-				// through the driver's interface, such as closing the ViewDriver's window.
+				// This message is received only when the app_server is asked to
+				// shut down in test/debug mode. Of course, if we are testing
+				// while using AccelerantDriver, we do NOT want to shut down
+				// client applications. The server can be quit in this fashion
+				// through the driver's interface, such as closing the
+				// ViewDriver's window.
 
-				STRACE(("ServerApp %s:Server shutdown notification received\n", Signature()));
+				STRACE(("ServerApp %s:Server shutdown notification received\n",
+					Signature()));
 
 				// If we are using the real, accelerated version of the
 				// DrawingEngine, we do NOT want the user to be able shut down
@@ -391,7 +397,8 @@ ServerApp::_MessageLooper()
 			}
 
 			default:
-				STRACE(("ServerApp %s: Got a Message to dispatch\n", Signature()));
+				STRACE(("ServerApp %s: Got a Message to dispatch\n",
+					Signature()));
 				_DispatchMessage(code, receiver);
 				break;
 		}
@@ -409,8 +416,7 @@ ServerApp::_MessageLooper()
 }
 
 
-/*!
-	\brief Handler function for BApplication API messages
+/*!	\brief Handler function for BApplication API messages
 	\param code Identifier code for the message. Equivalent to BMessage::what
 	\param buffer Any attachments
 
@@ -424,15 +430,16 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 	switch (code) {
 		case AS_REGISTER_INPUT_SERVER:
 		{
-			EventStream* stream = new (nothrow) InputServerStream(fHandlerMessenger);
+			EventStream* stream
+				= new(std::nothrow) InputServerStream(fHandlerMessenger);
 			if (stream != NULL
 				&& (!stream->IsValid() || !gInputManager->AddStream(stream))) {
 				delete stream;
 				break;
 			}
 
-			// TODO: this should be done using notifications (so that an abandoned
-			//	stream will get noticed directly)
+			// TODO: this should be done using notifications (so that an
+			// abandoned stream will get noticed directly)
 			if (fDesktop->EventDispatcher().InitCheck() != B_OK)
 				fDesktop->EventDispatcher().SetTo(gInputManager->GetStream());
 			break;
@@ -538,9 +545,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_SET_DECORATOR:
 		{
-			// Received from an application when the user wants to set the window
-			// decorator to a new one
-
 			// Attached Data:
 			// int32 the index of the decorator to use
 
@@ -581,8 +585,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 		case AS_R5_SET_DECORATOR:
 		{
-			// Sort of supports Tracker's nifty Easter Egg. It was easy to do and
-			// it's kind of neat, so why not?
+			// Sort of supports Tracker's nifty Easter Egg. It was easy to do
+			// and it's kind of neat, so why not?
 
 			// Attached Data:
 			// int32 value of the decorator to use
@@ -601,7 +605,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 		case AS_CREATE_BITMAP:
 		{
-			STRACE(("ServerApp %s: Received BBitmap creation request\n", Signature()));
+			STRACE(("ServerApp %s: Received BBitmap creation request\n",
+				Signature()));
+
 			// Allocate a bitmap for an application
 
 			// Attached Data:
@@ -617,7 +623,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			//	3) int32 area pointer offset used to calculate fBasePtr
 
 			// First, let's attempt to allocate the bitmap
-			ServerBitmap *bitmap = NULL;
+			ServerBitmap* bitmap = NULL;
 			uint8 allocationFlags = kAllocator;
 
 			BRect frame;
@@ -631,10 +637,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<uint32>(&flags);
 			link.Read<int32>(&bytesPerRow);
 			if (link.Read<screen_id>(&screenID) == B_OK) {
-				// TODO: choose the right HWInterface with regards to the screenID
+				// TODO: choose the right HWInterface with regards to the
+				// screenID
 				bitmap = gBitmapManager->CreateBitmap(&fMemoryAllocator,
-					*fDesktop->HWInterface(), frame, colorSpace, flags, bytesPerRow,
-					screenID, &allocationFlags);
+					*fDesktop->HWInterface(), frame, colorSpace, flags,
+					bytesPerRow, screenID, &allocationFlags);
 			}
 
 			STRACE(("ServerApp %s: Create Bitmap (%.1fx%.1f)\n",
@@ -647,8 +654,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.Attach<int32>(bitmap->Token());
 				fLink.Attach<uint8>(allocationFlags);
 
-				fLink.Attach<area_id>(fMemoryAllocator.Area(bitmap->AllocationCookie()));
-				fLink.Attach<int32>(fMemoryAllocator.AreaOffset(bitmap->AllocationCookie()));
+				fLink.Attach<area_id>(
+					fMemoryAllocator.Area(bitmap->AllocationCookie()));
+				fLink.Attach<int32>(
+					fMemoryAllocator.AreaOffset(bitmap->AllocationCookie()));
 
 				if (allocationFlags & kFramebuffer)
 					fLink.Attach<int32>(bitmap->BytesPerRow());
@@ -664,7 +673,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 		case AS_DELETE_BITMAP:
 		{
-			STRACE(("ServerApp %s: received BBitmap delete request\n", Signature()));
+			STRACE(("ServerApp %s: received BBitmap delete request\n",
+				Signature()));
+
 			// Delete a bitmap's allocated memory
 
 			// Attached Data:
@@ -674,7 +685,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			ServerBitmap *bitmap = FindBitmap(token);
 			if (bitmap && fBitmapList.RemoveItem(bitmap)) {
-				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", Signature(), token));
+				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", Signature(),
+					token));
 
 				gBitmapManager->DeleteBitmap(bitmap);
 			}
@@ -691,8 +703,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			ServerBitmap *bitmap = FindBitmap(token);
 			if (bitmap != NULL) {
-				STRACE(("ServerApp %s: Get overlay restrictions for bitmap %ld\n",
-					Signature(), token));
+				STRACE(("ServerApp %s: Get overlay restrictions for bitmap "
+					"%ld\n", Signature(), token));
 
 				status = fDesktop->HWInterface()->GetOverlayRestrictions(
 					bitmap->Overlay(), &restrictions);
@@ -881,7 +893,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
 		{
-			STRACE(("ServerApp %s: Received IsCursorHidden request\n", Signature()));
+			STRACE(("ServerApp %s: Received IsCursorHidden request\n",
+				Signature()));
+
 			fLink.StartMessage(fCursorHideLevel > 0 ? B_OK : B_ERROR);
 			fLink.Flush();
 			break;
@@ -893,7 +907,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// Attached data:
 			// 1) bool flag to send a reply
 			// 2) int32 token ID of the cursor to set
-			// 3) port_id port to receive a reply. Only exists if the sync flag is true.
+			// 3) port_id port to receive a reply. Only exists if the sync flag
+			//    is true.
 			bool sync;
 			int32 token;
 
@@ -961,10 +976,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					// The cursor might need to be updated now.
 					Window* window = view->Window();
 					if (window != NULL && window->IsFocus()) {
-						if (fDesktop->ViewUnderMouse(window)
-							== view->Token()) {
+						if (fDesktop->ViewUnderMouse(window) == view->Token())
 							SetCurrentCursor(cursor);
-						}
 					}
 				}
 
@@ -1017,7 +1030,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			}
 
 			if (cursor != NULL) {
-				// Synchronous message - BApplication is waiting on the cursor's ID
+				// Synchronous message - BApplication is waiting on the
+				// cursor's ID
 				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(cursor->Token());
 			} else
@@ -1139,7 +1153,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_SET_MOUSE_MODE:
 		{
-			STRACE(("ServerApp %s: Set Focus Follows Mouse mode\n", Signature()));
+			STRACE(("ServerApp %s: Set Focus Follows Mouse mode\n",
+				Signature()));
 			// Attached Data:
 			// 1) enum mode_mouse FFM mouse mode
 			mode_mouse mouseMode;
@@ -1151,7 +1166,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 		case AS_GET_MOUSE_MODE:
 		{
-			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n", Signature()));
+			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n",
+				Signature()));
 
 			if (fDesktop->LockSingleWindow()) {
 				DesktopSettings settings(fDesktop);
@@ -1241,7 +1257,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				&& link.Read<float>(&size) == B_OK) {
 				gFontManager->Lock();
 
-				FontStyle* style = gFontManager->GetStyle(familyName, styleName);
+				FontStyle* style
+					= gFontManager->GetStyle(familyName, styleName);
 				if (style != NULL) {
 					ServerFont font(*style, size);
 					gFontManager->Unlock();
@@ -1361,7 +1378,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: AS_GET_FONT_LIST_REVISION\n", Signature()));
 
 			fLink.StartMessage(B_OK);
-			fLink.Attach<int32>(gFontManager->CheckRevision(fDesktop->UserID()));
+			fLink.Attach<int32>(
+				gFontManager->CheckRevision(fDesktop->UserID()));
 			fLink.Flush();
 			break;
 		}
@@ -1438,7 +1456,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 		case AS_GET_FAMILY_AND_STYLE_IDS:
 		{
-			FTRACE(("ServerApp %s: AS_GET_FAMILY_AND_STYLE_IDS\n", Signature()));
+			FTRACE(("ServerApp %s: AS_GET_FAMILY_AND_STYLE_IDS\n",
+				Signature()));
+
 			// Attached Data:
 			// 1) font_family - name of font family to use
 			// 2) font_style - name of style in family
@@ -1882,11 +1902,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
 
-			char *charArray = new (nothrow) char[numBytes];
-			BPoint *escapements = new (nothrow) BPoint[numChars];
-			BPoint *offsets = NULL;
+			char* charArray = new(std::nothrow) char[numBytes];
+			BPoint* escapements = new(std::nothrow) BPoint[numChars];
+			BPoint* offsets = NULL;
 			if (wantsOffsets)
-				offsets = new (nothrow) BPoint[numChars];
+				offsets = new(std::nothrow) BPoint[numChars];
 
 			if (charArray == NULL || escapements == NULL
 				|| (offsets == NULL && wantsOffsets)) {
@@ -2042,23 +2062,23 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// Returns:
 			// 1) BRect - rects with numChar entries
 
-			uint16 famid, styid;
+			uint16 familyID, styleID;
 			uint32 flags;
-			float ptsize, rotation, shear, falseBoldWidth;
+			float size, rotation, shear, falseBoldWidth;
 			uint8 spacing;
 			font_metric_mode mode;
-			bool string_escapement;
+			bool stringEscapement;
 
-			link.Read<uint16>(&famid);
-			link.Read<uint16>(&styid);
-			link.Read<float>(&ptsize);
+			link.Read<uint16>(&familyID);
+			link.Read<uint16>(&styleID);
+			link.Read<float>(&size);
 			link.Read<float>(&rotation);
 			link.Read<float>(&shear);
 			link.Read<float>(&falseBoldWidth);
 			link.Read<uint8>(&spacing);
 			link.Read<uint32>(&flags);
 			link.Read<font_metric_mode>(&mode);
-			link.Read<bool>(&string_escapement);
+			link.Read<bool>(&stringEscapement);
 
 			escapement_delta delta;
 			link.Read<escapement_delta>(&delta);
@@ -2069,43 +2089,49 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
 
-			// TODO: proper error checking
-			char *charArray = new (nothrow) char[numBytes];
-			link.Read(charArray, numBytes);
-
-			BRect rectArray[numChars];
-			// figure out escapements
-
-			ServerFont font;
 			bool success = false;
-			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
-				font.SetSize(ptsize);
-				font.SetRotation(rotation);
-				font.SetShear(shear);
-				font.SetFalseBoldWidth(falseBoldWidth);
-				font.SetSpacing(spacing);
-				font.SetFlags(flags);
 
-				// TODO implement for real
-				if (font.GetBoundingBoxes(charArray, numBytes,
-					rectArray, string_escapement, mode, delta,
-					code == AS_GET_BOUNDINGBOXES_STRING) == B_OK) {
-					fLink.StartMessage(B_OK);
-					fLink.Attach(rectArray, sizeof(rectArray));
-					success = true;
+			char* charArray = new(std::nothrow) char[numBytes];
+			BRect* rectArray = new(std::nothrow) BRect[numChars];
+			if (charArray != NULL && rectArray != NULL) {
+				link.Read(charArray, numBytes);
+
+				// figure out escapements
+
+				ServerFont font;
+				if (font.SetFamilyAndStyle(familyID, styleID) == B_OK) {
+					font.SetSize(size);
+					font.SetRotation(rotation);
+					font.SetShear(shear);
+					font.SetFalseBoldWidth(falseBoldWidth);
+					font.SetSpacing(spacing);
+					font.SetFlags(flags);
+
+					// TODO: implement for real
+					if (font.GetBoundingBoxes(charArray, numBytes,
+							rectArray, stringEscapement, mode, delta,
+							code == AS_GET_BOUNDINGBOXES_STRING) == B_OK) {
+						fLink.StartMessage(B_OK);
+						fLink.Attach(rectArray, sizeof(rectArray));
+						success = true;
+					}
 				}
 			}
 
 			if (!success)
 				fLink.StartMessage(B_ERROR);
 
-			delete[] charArray;
 			fLink.Flush();
+
+			delete[] charArray;
+			delete[] rectArray;
 			break;
 		}
 		case AS_GET_BOUNDINGBOXES_STRINGS:
 		{
-			FTRACE(("ServerApp %s: AS_GET_BOUNDINGBOXES_STRINGS\n", Signature()));
+			FTRACE(("ServerApp %s: AS_GET_BOUNDINGBOXES_STRINGS\n",
+				Signature()));
+
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -2126,14 +2152,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// Returns:
 			// 1) BRect - rects with numStrings entries
 
-			uint16 famid, styid;
+			uint16 familyID, styleID;
 			uint32 flags;
 			float ptsize, rotation, shear, falseBoldWidth;
 			uint8 spacing;
 			font_metric_mode mode;
 
-			link.Read<uint16>(&famid);
-			link.Read<uint16>(&styid);
+			link.Read<uint16>(&familyID);
+			link.Read<uint16>(&styleID);
 			link.Read<float>(&ptsize);
 			link.Read<float>(&rotation);
 			link.Read<float>(&shear);
@@ -2146,19 +2172,22 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<int32>(&numStrings);
 
 			escapement_delta deltaArray[numStrings];
-			char *stringArray[numStrings];
+			char* stringArray[numStrings];
 			int32 lengthArray[numStrings];
-			for(int32 i=0; i<numStrings; i++) {
-				// This version of ReadString allocates the strings, we free them below
-				link.ReadString(&stringArray[i], (size_t *)&lengthArray[i]);
+			for(int32 i = 0; i < numStrings; i++) {
+				// This version of ReadString allocates the strings, we free
+				// them below
+				// TODO: this does not work on 64-bit (size_t != int32)
+				link.ReadString(&stringArray[i], (size_t*)&lengthArray[i]);
 				link.Read<escapement_delta>(&deltaArray[i]);
 			}
 
+			// TODO: don't do this on the heap! (at least check the size before)
 			BRect rectArray[numStrings];
 
 			ServerFont font;
 			bool success = false;
-			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
+			if (font.SetFamilyAndStyle(familyID, styleID) == B_OK) {
 				font.SetSize(ptsize);
 				font.SetRotation(rotation);
 				font.SetShear(shear);
@@ -2184,7 +2213,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
-		/* screen commands */
+		// Screen commands
 
 		case AS_VALID_SCREEN_ID:
 		{
@@ -2258,8 +2287,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			// TODO: the display_mode can be different between
 			// the various screens.
-			// We have the screen_id and the workspace number, with these
-			// we need to find the corresponding "driver", and call getmode on it
+			// We have the screen_id and the workspace number, with these we
+			// need to find the corresponding "driver", and call getmode on it
 			display_mode mode;
 			fDesktop->ScreenAt(0)->GetMode(&mode);
 			// actually this isn't still enough as different workspaces can
@@ -2829,12 +2858,13 @@ ServerApp::_CreateWindow(int32 code, BPrivate::LinkReceiver& link,
 		ServerBitmap* bitmap = FindBitmap(bitmapToken);
 
 		if (bitmap != NULL) {
-			window = new (nothrow) OffscreenServerWindow(title, this, clientReplyPort,
-				looperPort, token, bitmap);
+			window = new (nothrow) OffscreenServerWindow(title, this,
+				clientReplyPort, looperPort, token, bitmap);
 		} else
 			status = B_ERROR;
 	} else {
-		window = new (nothrow) ServerWindow(title, this, clientReplyPort, looperPort, token);
+		window = new (nothrow) ServerWindow(title, this, clientReplyPort,
+			looperPort, token);
 		STRACE(("\nServerApp %s: New Window %s (%g:%g, %g:%g)\n",
 			Signature(), title, frame.left, frame.top,
 			frame.right, frame.bottom));
@@ -2847,7 +2877,8 @@ ServerApp::_CreateWindow(int32 code, BPrivate::LinkReceiver& link,
 		status = window->Init(frame, (window_look)look, (window_feel)feel,
 			flags, workspaces);
 		if (status == B_OK && !window->Run()) {
-			fprintf(stderr, "ServerApp::_CreateWindow() - failed to run the window thread\n");
+			syslog(LOG_ERR, "ServerApp::_CreateWindow() - failed to run the "
+				"window thread\n");
 			status = B_ERROR;
 		}
 
@@ -2896,7 +2927,8 @@ ServerApp::InWorkspace(int32 index) const
 
 		// only normal and unhidden windows count
 
-		if (window->IsNormal() && !window->IsHidden() && window->InWorkspace(index))
+		if (window->IsNormal() && !window->IsHidden()
+			&& window->InWorkspace(index))
 			return true;
 	}
 
@@ -2939,8 +2971,7 @@ ServerApp::CountBitmaps() const
 }
 
 
-/*!
-	\brief Looks up a ServerApp's ServerBitmap in its list
+/*!	\brief Looks up a ServerApp's ServerBitmap in its list
 	\param token ID token of the bitmap to find
 	\return The bitmap having that ID or NULL if not found
 */
@@ -2963,14 +2994,14 @@ ServerApp::CountPictures() const
 }
 
 
-ServerPicture *
-ServerApp::CreatePicture(const ServerPicture *original)
+ServerPicture*
+ServerApp::CreatePicture(const ServerPicture* original)
 {
-	ServerPicture *picture;
+	ServerPicture* picture;
 	if (original != NULL)
-		picture = new (nothrow) ServerPicture(*original);
+		picture = new(std::nothrow) ServerPicture(*original);
 	else
-		picture = new (nothrow) ServerPicture();
+		picture = new(std::nothrow) ServerPicture();
 
 	if (picture != NULL)
 		fPictureList.AddItem(picture);
@@ -2979,8 +3010,8 @@ ServerApp::CreatePicture(const ServerPicture *original)
 }
 
 
-ServerPicture *
-ServerApp::FindPicture(const int32 &token) const
+ServerPicture*
+ServerApp::FindPicture(int32 token) const
 {
 	// TODO: we need to make sure the picture is ours?!
 	ServerPicture* picture;
@@ -2992,9 +3023,9 @@ ServerApp::FindPicture(const int32 &token) const
 
 
 bool
-ServerApp::DeletePicture(const int32 &token)
+ServerApp::DeletePicture(int32 token)
 {
-	ServerPicture *picture = FindPicture(token);
+	ServerPicture* picture = FindPicture(token);
 	if (picture == NULL)
 		return false;
 
@@ -3012,4 +3043,3 @@ ServerApp::ClientTeam() const
 {
 	return fClientTeam;
 }
-
