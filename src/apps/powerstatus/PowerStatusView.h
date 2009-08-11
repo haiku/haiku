@@ -60,6 +60,7 @@ protected:
 			int32			fPercent;
 			time_t			fTimeLeft;
 			bool			fOnline;
+			bool			fHasBattery;
 
 			BSize			fPreferredSize;
 };

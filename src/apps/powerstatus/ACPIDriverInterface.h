@@ -5,9 +5,9 @@
  * Authors:
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
-
 #ifndef ACPI_DRIVER_INTERFACE_H
 #define ACPI_DRIVER_INTERFACE_H
+
 
 #include "DriverInterface.h"
 
@@ -17,13 +17,12 @@
 
 const int8 kRateBufferSize = 10;
 
-class RateBuffer
-{
+class RateBuffer {
 public:
 							RateBuffer();
 	void					AddRate(int32 rate);
 	int32					GetMeanRate();
-	
+
 private:
 	int32					fRateBuffer[kRateBufferSize];
 	int8					fPosition;
@@ -32,11 +31,10 @@ private:
 };
 
 
-class Battery
-{
+class Battery {
 public:
 								Battery(int driverHandler);
-								~Battery();	
+								~Battery();
 
 	status_t					InitCheck();
 
@@ -49,19 +47,18 @@ public:
 private:
 	void						_Init();
 
-	
+
 	int							fDriverHandler;
 	status_t					fInitStatus;
 
 	acpi_extended_battery_info	fExtendedBatteryInfo;
-	
+
 	RateBuffer					fRateBuffer;
 	acpi_battery_info			fCachedAcpiInfo;
 };
 
 
-class ACPIDriverInterface : public PowerStatusDriverInterface
-{
+class ACPIDriverInterface : public PowerStatusDriverInterface {
 public:
 	virtual					~ACPIDriverInterface();
 
@@ -75,13 +72,13 @@ public:
 protected:
 	// Read the battery info from the hardware.
 	virtual status_t 		_ReadBatteryInfo();
-	
+
 	virtual void			_WatchPowerStatus();
 	virtual status_t		_FindDrivers(const char* path);
 
 	BObjectList<Battery>	fDriverList;
-	
+
 	BLocker					fInterfaceLocker;
 };
 
-#endif
+#endif	// ACPI_DRIVER_INTERFACE_H

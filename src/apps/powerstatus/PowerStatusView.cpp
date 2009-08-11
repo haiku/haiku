@@ -191,30 +191,27 @@ PowerStatusView::_DrawBattery(BRect rect)
 		rect.left - 1, floorf(rect.bottom - rect.Height() / 4)));
 
 	int32 percent = fPercent;
-	if (percent > 100 || percent < 0)
+	if (percent > 100 || percent < 0 || !fHasBattery)
 		percent = 100;
 
 	if (percent > 0) {
 		rgb_color base;
-		if (fOnline) {
+		if (fHasBattery) {
 			if (percent <= 15)
 				base.set_to(180, 0, 0);
 			else
 				base.set_to(20, 180, 0);
 		} else {
 			base = HighColor();
-			percent = 100;
 		}
 
 		rect.InsetBy(gap, gap);
 		rect.right = rect.left + rect.Width() * percent / 100.0;
 
-		if (be_control_look != NULL)
+		if (be_control_look != NULL) {
 			be_control_look->DrawButtonBackground(this, rect, rect, base,
-				fOnline ? 0 : BControlLook::B_DISABLED);
-			//if (!)
-
-		else
+				fHasBattery ? 0 : BControlLook::B_DISABLED);
+		} else
 			FillRect(rect);
 	}
 
@@ -343,10 +340,14 @@ PowerStatusView::Update(bool force)
 
 	fPercent = (100 * fBatteryInfo.capacity) / fBatteryInfo.full_capacity;
 	fTimeLeft = fBatteryInfo.time_left;
-	if (fBatteryInfo.state & BATTERY_CHARGING)
+	if ((fBatteryInfo.state & BATTERY_CHARGING) != 0)
 		fOnline = true;
 	else
 		fOnline = false;
+
+	// TODO: if critical really means that, its name should be changed...
+	fHasBattery = (fBatteryInfo.state & BATTERY_CRITICAL_STATE) == 0
+		&& fPercent >= 0;
 
 	if (fInDeskbar) {
 		// make sure the tray icon is large enough
@@ -358,6 +359,15 @@ PowerStatusView::Update(bool force)
 
 			if (text[0])
 				width += ceilf(StringWidth(text)) + 4;
+		} else {
+			char text[256];
+			if (fHasBattery) {
+				snprintf(text, sizeof(text), "%ld%%\n%ld:%02ld\n%s",
+					fPercent, fTimeLeft / 3600, (fTimeLeft / 60) % 60,
+					fOnline ? "charging" : "discharging");
+			} else
+				strcpy(text, "no battery");
+			SetToolTip(text);
 		}
 		if (width == 0) {
 			// make sure we're not going away completely
