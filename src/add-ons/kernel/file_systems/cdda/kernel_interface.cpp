@@ -152,7 +152,7 @@ public:
 			size_t			Size() const { return fSize; }
 			type_code		Type() const { return fType; }
 			uint8*			Data() const { return fData; }
-		
+
 			bool			IsProtectedNamespace();
 	static	bool			IsProtectedNamespace(const char* name);
 
@@ -682,11 +682,11 @@ Volume::Mount(const char* device)
 		if (read_cdtext(fDevice, text) != B_OK)
 			dprintf("CDDA: no CD-Text found.\n");
 		else
-			doLookup = false;	 
+			doLookup = false;
 	} else {
 		doLookup = false;
 	}
-		
+
 	int32 trackCount = toc->last_track + 1 - toc->first_track;
 	off_t totalFrames = 0;
 	char title[256];
@@ -755,10 +755,10 @@ Volume::Mount(const char* device)
 	// Add CD:do_lookup attribute.
 	fRootNode->AddAttribute(kDoLookupAttribute, B_BOOL_TYPE, true,
 		(const uint8*)&doLookup, sizeof(bool));
-		
+
 	// Add CD:toc attribute.
 	fRootNode->AddAttribute(kTocAttribute, B_RAW_TYPE, true,
-		(const uint8*)toc, B_BENDIAN_TO_HOST_INT16(toc->data_length) + 2); 
+		(const uint8*)toc, B_BENDIAN_TO_HOST_INT16(toc->data_length) + 2);
 
 	_RestoreSharedAttributes();
 	if (fd >= 0)
@@ -883,9 +883,9 @@ Volume::_RestoreAttributes()
 	int fd = _OpenAttributes(O_RDONLY);
 	if (fd < 0)
 		return;
-		
+
 	_RestoreAttributes(fd);
-	
+
 	close(fd);
 }
 
@@ -1123,7 +1123,7 @@ Attribute::IsProtectedNamespace()
 {
 	// Check if the attribute is in the restricted namespace. Attributes in
 	// this namespace should not be edited by the user as they are handled
-	// internally by the add-on. Calls the static version. 
+	// internally by the add-on. Calls the static version.
 	return IsProtectedNamespace(fName);
 }
 
@@ -1134,7 +1134,7 @@ Attribute::IsProtectedNamespace(const char* name)
 	// Convenience static version of the above method. Usually called when we
 	// don't have a constructed Attribute object handy.
 	return strncmp(kProtectedAttrNamespace, name,
-		strlen(kProtectedAttrNamespace)) == 0;	
+		strlen(kProtectedAttrNamespace)) == 0;
 }
 
 
@@ -1865,7 +1865,8 @@ cdda_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 		}
 
 		if (user_memcpy(buffer, &entry, sizeof(struct dirent) - 1) != B_OK
-			|| user_strlcpy(buffer->d_name, name, bufferSize) < B_OK)
+			|| user_strlcpy(buffer->d_name, name,
+					bufferSize + 1 - sizeof(struct dirent)) < B_OK)
 			return B_BAD_ADDRESS;
 
 		buffer = (struct dirent*)((uint8*)buffer + entry.d_reclen);

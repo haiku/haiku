@@ -5564,7 +5564,7 @@ fix_dirent(struct vnode* parent, struct dirent* userEntry,
 		ASSERT(entry->d_reclen >= sizeof(struct dirent));
 
 		if (user_memcpy(entry->d_name, userEntry->d_name,
-				entry->d_reclen - sizeof(struct dirent)) != B_OK)
+				entry->d_reclen + 1 - sizeof(struct dirent)) != B_OK)
 			return B_BAD_ADDRESS;
 	} else
 		entry = userEntry;
