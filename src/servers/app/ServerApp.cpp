@@ -2322,12 +2322,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			if (status == B_OK && fDesktop->LockAllWindows()) {
 				display_mode oldMode;
-				// TODO: This is a bit of a mess. The API to set the mode on
-				// a specific workspace was not present in BeOS. It is meant to
-				// be the workspace *index* (not the bitfield). However, the
-				// "~0" is used as kCurrentWorkspace in PrivateScreen.cpp, which
-				// has nothing to do with B_CURRENT_WORKSPACE (== 0, used for the
-				// workspace bit mask of a BWindow).
+				// ~0 is used as the current workspace in PrivateScreen
+				// TODO: add constant for this
 				if (workspace == (uint32)~0
 					|| workspace == (uint32)fDesktop->CurrentWorkspace()) {
 					fDesktop->ScreenAt(0)->GetMode(&oldMode);
