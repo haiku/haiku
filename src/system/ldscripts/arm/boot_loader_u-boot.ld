@@ -28,6 +28,11 @@ SECTIONS
 	__bss_start = .;
 	.bss : { *(.bss) }
 
+	/* exception unwinding - should really not be needed! */
+	__exidx_start = .;
+	.ARM.exidx   : { *(.ARM.exidx* .gnu.linkonce.armexidx.*) }
+	__exidx_end = .;
+
 	. = ALIGN(0x1000);
 	_end = . ;
   /* Stabs debugging sections.  */
