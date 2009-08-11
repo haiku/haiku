@@ -15,6 +15,9 @@
 #include "DriverInterface.h"
 
 
+class BFile;
+
+
 class PowerStatusView : public BView {
 public:
 							PowerStatusView(
@@ -38,6 +41,9 @@ protected:
 							PowerStatusView(BMessage* archive);
 
 	virtual void			Update(bool force = false);
+
+			void			FromMessage(const BMessage* message);
+			status_t		ToMessage(BMessage* message) const;
 
 private:
 			void			_GetBatteryInfo(battery_info* info, int batteryID);
@@ -83,6 +89,10 @@ private:
 			void			_AboutRequested();
 			void			_Init();
 			void			_Quit();
+
+			status_t		_GetSettings(BFile& file, int mode);
+			void			_LoadSettings();
+			void			_SaveSettings();
 
 			void			_OpenExtendedWindow();
 

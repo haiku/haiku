@@ -9,7 +9,11 @@
 
 
 #include "PowerStatusView.h"
-#include "PowerStatus.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include <Alert.h>
 #include <Application.h>
@@ -17,19 +21,18 @@
 #include <Deskbar.h>
 #include <Dragger.h>
 #include <Drivers.h>
+#include <File.h>
+#include <FindDirectory.h>
 #include <MenuItem.h>
 #include <MessageRunner.h>
+#include <Path.h>
 #include <PopUpMenu.h>
 #include <TextView.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
 #include "ACPIDriverInterface.h"
 #include "APMDriverInterface.h"
 #include "ExtendedInfoWindow.h"
+#include "PowerStatus.h"
 
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
@@ -62,17 +65,7 @@ PowerStatusView::PowerStatusView(BMessage* archive)
 	: BView(archive)
 {
 	_Init();
-
-	bool value;
-	if (archive->FindBool("show label", &value) == B_OK)
-		fShowLabel = value;
-	if (archive->FindBool("show icon", &value) == B_OK)
-		fShowStatusIcon = value;
-	if (archive->FindBool("show time", &value) == B_OK)
-		fShowTime = value;
-	int32 intValue;
-	if (archive->FindInt32("battery id", &intValue) == B_OK)
-		fBatteryID = intValue;
+	FromMessage(archive);
 }
 
 
@@ -86,13 +79,7 @@ PowerStatusView::Archive(BMessage* archive, bool deep) const
 {
 	status_t status = BView::Archive(archive, deep);
 	if (status == B_OK)
-		status = archive->AddBool("show label", fShowLabel);
-	if (status == B_OK)
-		status = archive->AddBool("show icon", fShowStatusIcon);
-	if (status == B_OK)
-		status = archive->AddBool("show time", fShowTime);
-	if (status == B_OK)
-		status = archive->AddInt32("battery id", fBatteryID);
+		status = ToMessage(archive);
 
 	return status;
 }
@@ -129,7 +116,6 @@ PowerStatusView::AttachedToWindow()
 void
 PowerStatusView::DetachedFromWindow()
 {
-
 }
 
 
@@ -385,6 +371,38 @@ PowerStatusView::Update(bool force)
 
 
 void
+PowerStatusView::FromMessage(const BMessage* archive)
+{
+	bool value;
+	if (archive->FindBool("show label", &value) == B_OK)
+		fShowLabel = value;
+	if (archive->FindBool("show icon", &value) == B_OK)
+		fShowStatusIcon = value;
+	if (archive->FindBool("show time", &value) == B_OK)
+		fShowTime = value;
+
+	int32 intValue;
+	if (archive->FindInt32("battery id", &intValue) == B_OK)
+		fBatteryID = intValue;
+}
+
+
+status_t
+PowerStatusView::ToMessage(BMessage* archive) const
+{
+	status_t status = archive->AddBool("show label", fShowLabel);
+	if (status == B_OK)
+		status = archive->AddBool("show icon", fShowStatusIcon);
+	if (status == B_OK)
+		status = archive->AddBool("show time", fShowTime);
+	if (status == B_OK)
+		status = archive->AddInt32("battery id", fBatteryID);
+
+	return status;
+}
+
+
+void
 PowerStatusView::_GetBatteryInfo(battery_info* batteryInfo, int batteryID)
 {
 	if (batteryID >= 0) {
@@ -416,6 +434,7 @@ PowerStatusReplicant::PowerStatusReplicant(BRect frame, int32 resizingMode,
 	PowerStatusView(NULL, frame, resizingMode, -1, inDeskbar)
 {
 	_Init();
+	_LoadSettings();
 
 	if (!inDeskbar) {
 		// we were obviously added to a standard window - let's add a dragger
@@ -435,6 +454,7 @@ PowerStatusReplicant::PowerStatusReplicant(BMessage* archive)
 	PowerStatusView(archive)
 {
 	_Init();
+	_LoadSettings();
 }
 
 
@@ -447,6 +467,8 @@ PowerStatusReplicant::~PowerStatusReplicant()
 	fDriverInterface->StopWatching(this);
 	fDriverInterface->Disconnect();
 	fDriverInterface->ReleaseReference();
+
+	_SaveSettings();
 }
 
 
@@ -595,6 +617,51 @@ PowerStatusReplicant::_Quit()
 }
 
 
+status_t
+PowerStatusReplicant::_GetSettings(BFile& file, int mode)
+{
+	BPath path;
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path,
+		(mode & O_ACCMODE) != O_RDONLY);
+	if (status != B_OK)
+		return status;
+
+	path.Append("PowerStatus settings");
+
+	return file.SetTo(path.Path(), mode);
+}
+
+
+void
+PowerStatusReplicant::_LoadSettings()
+{
+	BFile file;
+	if (_GetSettings(file, B_READ_ONLY) != B_OK)
+		return;
+
+	BMessage settings;
+	if (settings.Unflatten(&file) < B_OK)
+		return;
+
+	FromMessage(&settings);
+}
+
+
+void
+PowerStatusReplicant::_SaveSettings()
+{
+	BFile file;
+	if (_GetSettings(file, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE) != B_OK)
+		return;
+
+	BMessage settings('pwst');
+	ToMessage(&settings);
+
+	ssize_t size = 0;
+	settings.Flatten(&file, &size);
+}
+
+
 void
 PowerStatusReplicant::_OpenExtendedWindow()
 {
@@ -604,6 +671,7 @@ PowerStatusReplicant::_OpenExtendedWindow()
 		fExtendedWindow->Show();
 		return;
 	}
+
 	BMessage msg(B_SET_PROPERTY);
 	msg.AddSpecifier("Hidden", int32(0));
 	if (fExtWindowMessenger->SendMessage(&msg) == B_BAD_PORT_ID) {
@@ -613,8 +681,7 @@ PowerStatusReplicant::_OpenExtendedWindow()
 		fExtWindowMessenger = new BMessenger(NULL, fExtendedWindow);
 		fMessengerExist = true;
 		fExtendedWindow->Show();
-	}
-	else
+	} else
 		fExtendedWindow->Activate();
 
 }
@@ -623,7 +690,7 @@ PowerStatusReplicant::_OpenExtendedWindow()
 //	#pragma mark -
 
 
-extern "C" _EXPORT BView *
+extern "C" _EXPORT BView*
 instantiate_deskbar_item(void)
 {
 	return new PowerStatusReplicant(BRect(0, 0, 15, 15), B_FOLLOW_NONE, true);
