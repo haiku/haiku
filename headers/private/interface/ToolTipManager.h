@@ -6,6 +6,7 @@
 #define _TOOL_TIP_MANAGER_H
 
 
+#include <Locker.h>
 #include <Messenger.h>
 #include <Point.h>
 
@@ -25,6 +26,9 @@ public:
 			void				SetHideDelay(bigtime_t time);
 			bigtime_t			HideDelay() const;
 
+	static	bool				Lock() { return sLock.Lock(); }
+	static	void				Unlock() { sLock.Unlock(); }
+
 private:
 								BToolTipManager();
 	virtual						~BToolTipManager();
@@ -34,6 +38,7 @@ private:
 			bigtime_t			fShowDelay;
 			bigtime_t			fHideDelay;
 
+	static	BLocker				sLock;
 	static	BToolTipManager*	sDefaultInstance;
 };
 

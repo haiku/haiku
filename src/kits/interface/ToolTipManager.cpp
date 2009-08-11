@@ -14,9 +14,8 @@
 #include <ToolTip.h>
 
 
+BLocker BToolTipManager::sLock("tool tip manager");
 BToolTipManager* BToolTipManager::sDefaultInstance;
-
-static BLocker sLock("tool tip manager");
 
 static const uint32 kMsgHideToolTip = 'hide';
 static const uint32 kMsgShowToolTip = 'show';
@@ -56,8 +55,12 @@ public:
 
 	virtual void DetachedFromWindow()
 	{
+		BToolTipManager::Lock();
+
 		RemoveChild(fToolTip->View());
 			// don't delete this one!
+
+		BToolTipManager::Unlock();
 	}
 
 	virtual void MouseMoved(BPoint where, uint32 transit,
@@ -112,7 +115,10 @@ ToolTipWindow::ToolTipWindow(BToolTip* tip, BPoint where)
 	// TODO: take alignment into account!
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
+
+	BToolTipManager::Lock();
 	AddChild(new ToolTipView(tip));
+	BToolTipManager::Unlock();
 
 	BSize size = ChildAt(0)->PreferredSize();
 	ResizeTo(size.width, size.height);

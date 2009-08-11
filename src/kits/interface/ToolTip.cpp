@@ -10,6 +10,7 @@
 
 #include <Message.h>
 #include <TextView.h>
+#include <ToolTipManager.h>
 
 
 BToolTip::BToolTip()
@@ -157,7 +158,26 @@ BTextToolTip::Text() const
 void
 BTextToolTip::SetText(const char* text)
 {
+	bool lockedLooper;
+	while (true) {
+		lockedLooper = fTextView->LockLooper();
+		if (!lockedLooper) {
+			BToolTipManager::Lock();
+
+			if (fTextView->Window() != NULL) {
+				BToolTipManager::Unlock();
+				continue;
+			}
+		}
+		break;
+	}
+
 	fTextView->SetText(text);
+
+	if (lockedLooper)
+		fTextView->UnlockLooper();
+	else
+		BToolTipManager::Unlock();
 }
 
 
