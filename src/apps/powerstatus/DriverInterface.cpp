@@ -100,12 +100,16 @@ PowerStatusDriverInterface::StartWatching(BHandler* target)
 status_t
 PowerStatusDriverInterface::StopWatching(BHandler* target)
 {
-	BAutolock autolock(fListLocker);
 	if (fThread < 0)
 		return B_BAD_VALUE;
 
-	if (fWatcherList.CountItems() == 1)
+	fListLocker.Lock();
+
+	if (fWatcherList.CountItems() == 1) {
+		fListLocker.Unlock();
 		Disconnect();
+	} else
+		fListLocker.Unlock();
 
 	return Monitor::StopWatching(target);
 }
