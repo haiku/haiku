@@ -10,23 +10,35 @@
 /* uint16 __swap_int16(uint16 value)
  */
 FUNCTION(__swap_int16):
+#if __ARM_ARCH__ >= 6
 		rev16 r0,r0;
+#else
+#warning IMPLEMENT_ME
+#endif
 FUNCTION_END(__swap_int16)
 
 /* uint32 __swap_int32(uint32 value)
  */
 FUNCTION(__swap_int32):
+#if __ARM_ARCH__ >= 6
 		rev r0,r0;
+#else
+#warning IMPLEMENT_ME
+#endif
 FUNCTION_END(__swap_int32)
 
 /* uint64 __swap_int64(uint64 value)
  */
 FUNCTION(__swap_int64):
+#if __ARM_ARCH__ >= 6
 		rev r0,r0;
 		rev r1,r1;
 		mov r12,r0;
 		mov r0,r1;
 		mov r1,r12;
+#else
+#warning IMPLEMENT_ME
+#endif
 FUNCTION_END(__swap_int64)
 
 /* TODO: The following functions can surely be optimized. A simple optimization
