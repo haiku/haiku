@@ -337,18 +337,21 @@ BWindowScreen::SetColorList(rgb_color *list, int32 firstIndex, int32 lastIndex)
 		for (int32 x = firstIndex; x <= lastIndex; x++) {
 			fPalette[x] = list[x - firstIndex];
 				// update our local palette as well
-
-			colors[j++] = fPalette[x].red;
-			colors[j++] = fPalette[x].green;
-			colors[j++] = fPalette[x].blue;
 		}
 
+		j = 0;
+		for (int32 i = 0; i < 256; i++) {
+			colors[j++] = fPalette[i].red;
+			colors[j++] = fPalette[i].green;
+			colors[j++] = fPalette[i].blue;
+		}
+		
 		if (fAddonImage >= 0) {
 			set_indexed_colors setIndexedColors =
 				(set_indexed_colors)fGetAccelerantHook(B_SET_INDEXED_COLORS,
 					NULL);
 			if (setIndexedColors != NULL) {
-				setIndexedColors(lastIndex - firstIndex + 1, firstIndex,
+				setIndexedColors(255, 0,
 					colors, 0);
 			}
 		}
@@ -719,13 +722,14 @@ status_t
 BWindowScreen::_Deactivate()
 {
 	CALLED();
-	_AssertDisplayMode(fOriginalDisplayMode);
-
+	
 	if (fDebugState && !fDebugFirst) {
 		_Suspend();
 		SuspensionHook(false);
 	} else
 		ScreenConnected(false);
+
+	_AssertDisplayMode(fOriginalDisplayMode);
 
 	_ResetAccelerantHooks();
 	
@@ -747,12 +751,8 @@ BWindowScreen::_SetupAccelerantHooks()
 	status_t status = B_OK;
 	if (fAddonImage < 0)
 		status = _InitClone();
-	else {
-		if (fWaitEngineIdle)
-			fWaitEngineIdle();
-		
+	else	
 		_ResetAccelerantHooks();
-	}
 			
 	if (status == B_OK) {
 		sWaitIdleHook = fWaitEngineIdle = (wait_engine_idle)fGetAccelerantHook(B_WAIT_ENGINE_IDLE, NULL);
@@ -777,7 +777,9 @@ void
 BWindowScreen::_ResetAccelerantHooks()
 {
 	CALLED();
-	
+	if (fWaitEngineIdle)
+		fWaitEngineIdle();
+			
 	sFillRectHook = NULL;
 	sBlitRectHook = NULL;
 	sTransparentBlitHook = NULL;
