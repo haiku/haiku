@@ -2786,6 +2786,15 @@ BContainerWindow::EachAddon(BPath &path, bool (*eachAddon)(const Model *,
 		for (int32 index = 0; index < count; index++) {
 			BPose *pose = PoseView()->SelectionList()->ItemAt(index);
 			AddMimeTypeString(mimeTypes, pose->TargetModel());
+			// If it's a symlink, resolves it and add the Target's MimeType
+			if (pose->TargetModel()->IsSymLink()) {
+				Model* resolved = new Model(
+					pose->TargetModel()->EntryRef(), true, true);
+				if (resolved->InitCheck() == B_OK) {
+					AddMimeTypeString(mimeTypes, resolved);
+				}
+				delete resolved;
+			}
 		}
 	}
 
