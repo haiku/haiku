@@ -327,7 +327,7 @@ BWindowScreen::SetColorList(rgb_color *list, int32 firstIndex, int32 lastIndex)
 	if (!fActivateState) {
 		// If we aren't active, we just change our local palette
 		for (int32 x = firstIndex; x <= lastIndex; x++) {
-			fPalette[x] = list[x];
+			fPalette[x] = list[x - firstIndex];
 		}
 	} else {
 		uint8 colors[3 * 256];
@@ -335,12 +335,12 @@ BWindowScreen::SetColorList(rgb_color *list, int32 firstIndex, int32 lastIndex)
 		int32 j = 0;
 
 		for (int32 x = firstIndex; x <= lastIndex; x++) {
-			fPalette[x] = list[x];
+			fPalette[x] = list[x - firstIndex];
 				// update our local palette as well
 
-			colors[j++] = list[x].red;
-			colors[j++] = list[x].green;
-			colors[j++] = list[x].blue;
+			colors[j++] = fPalette[x].red;
+			colors[j++] = fPalette[x].green;
+			colors[j++] = fPalette[x].blue;
 		}
 
 		if (fAddonImage >= 0) {
