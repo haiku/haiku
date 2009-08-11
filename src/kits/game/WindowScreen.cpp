@@ -337,13 +337,10 @@ BWindowScreen::SetColorList(rgb_color *list, int32 firstIndex, int32 lastIndex)
 		for (int32 x = firstIndex; x <= lastIndex; x++) {
 			fPalette[x] = list[x - firstIndex];
 				// update our local palette as well
-		}
-
-		j = 0;
-		for (int32 i = 0; i < 256; i++) {
-			colors[j++] = fPalette[i].red;
-			colors[j++] = fPalette[i].green;
-			colors[j++] = fPalette[i].blue;
+		
+			colors[j++] = fPalette[x].red;
+			colors[j++] = fPalette[x].green;
+			colors[j++] = fPalette[x].blue;
 		}
 		
 		if (fAddonImage >= 0) {
