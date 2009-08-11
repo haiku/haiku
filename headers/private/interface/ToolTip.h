@@ -34,6 +34,13 @@ public:
 	virtual void				SetAlignment(BAlignment alignment);
 			BAlignment			Alignment() const;
 
+	virtual	void				AttachedToWindow();
+	virtual void				DetachedFromWindow();
+
+protected:
+			bool				Lock();
+			void				Unlock();
+
 private:
 								BToolTip(const BToolTip& other);
 			BToolTip&			operator=(const BToolTip &other);
@@ -41,6 +48,7 @@ private:
 			void				_InitData();
 
 private:
+			bool				fLockedLooper;
 			bool				fIsSticky;
 			BPoint				fRelativeLocation;
 			BAlignment			fAlignment;

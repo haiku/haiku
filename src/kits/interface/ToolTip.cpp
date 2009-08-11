@@ -92,6 +92,50 @@ BToolTip::Alignment() const
 
 
 void
+BToolTip::AttachedToWindow()
+{
+}
+
+
+void
+BToolTip::DetachedFromWindow()
+{
+}
+
+
+bool
+BToolTip::Lock()
+{
+	bool lockedLooper;
+	while (true) {
+		lockedLooper = View()->LockLooper();
+		if (!lockedLooper) {
+			BToolTipManager::Lock();
+
+			if (View()->Window() != NULL) {
+				BToolTipManager::Unlock();
+				continue;
+			}
+		}
+		break;
+	}
+
+	fLockedLooper = lockedLooper;
+	return true;
+}
+
+
+void
+BToolTip::Unlock()
+{
+	if (fLockedLooper)
+		View()->UnlockLooper();
+	else
+		BToolTipManager::Unlock();
+}
+
+
+void
 BToolTip::_InitData()
 {
 	fIsSticky = false;
@@ -158,26 +202,12 @@ BTextToolTip::Text() const
 void
 BTextToolTip::SetText(const char* text)
 {
-	bool lockedLooper;
-	while (true) {
-		lockedLooper = fTextView->LockLooper();
-		if (!lockedLooper) {
-			BToolTipManager::Lock();
-
-			if (fTextView->Window() != NULL) {
-				BToolTipManager::Unlock();
-				continue;
-			}
-		}
-		break;
-	}
+	if (!Lock())
+		return;
 
 	fTextView->SetText(text);
 
-	if (lockedLooper)
-		fTextView->UnlockLooper();
-	else
-		BToolTipManager::Unlock();
+	Unlock();
 }
 
 

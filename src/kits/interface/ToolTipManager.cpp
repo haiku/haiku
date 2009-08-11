@@ -52,6 +52,7 @@ public:
 	virtual void AttachedToWindow()
 	{
 		SetEventMask(B_POINTER_EVENTS, 0);
+		fToolTip->AttachedToWindow();
 	}
 
 	virtual void DetachedFromWindow()
@@ -60,6 +61,7 @@ public:
 
 		RemoveChild(fToolTip->View());
 			// don't delete this one!
+		fToolTip->DetachedFromWindow();
 
 		BToolTipManager::Unlock();
 	}
