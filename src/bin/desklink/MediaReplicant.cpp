@@ -308,6 +308,9 @@ MediaReplicant::MessageReceived(BMessage* message)
 			item->SetMarked(!item->IsMarked());
 			fVolumeWhich = item->IsMarked()
 				? VOLUME_USE_PHYS_OUTPUT : VOLUME_USE_MIXER;
+
+			if (VolumeToolTip* tip = dynamic_cast<VolumeToolTip*>(ToolTip()))
+				tip->SetWhich(fVolumeWhich);
 			break;
 		}
 
@@ -451,9 +454,9 @@ MediaReplicant::_Init()
 		B_CMAP8);
 	fIcon->SetBits(kSpeakerBits, kSpeakerWidth * kSpeakerHeight, 0, B_CMAP8);
 
-	SetToolTip(new VolumeToolTip());
-
 	_LoadSettings();
+
+	SetToolTip(new VolumeToolTip(fVolumeWhich));
 }
 
 
