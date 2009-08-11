@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,18 +12,43 @@
  *		Philippe Saint-Pierre, stpere@gmail.com
  */
 
-/*!
-	\class ServerWindow
-	\brief Shadow BWindow class
 
-	A ServerWindow handles all the intraserver tasks required of it by its BWindow. There are
-	too many tasks to list as being done by them, but they include handling View transactions,
-	coordinating and linking a window's Window half with its messaging half, dispatching
-	mouse and key events from the server to its window, and other such things.
+/*!	\class ServerWindow
+
+	The ServerWindow class handles all BWindow messaging; it forwards all
+	BWindow requests to the corresponding app_server classes, that is Desktop,
+	Window, and View.
+	Furthermore, it also sends app_server requests/notices to its BWindow. There
+	is one ServerWindow per BWindow.
 */
 
 
 #include "ServerWindow.h"
+
+#include <syslog.h>
+#include <new>
+
+#include <AppDefs.h>
+#include <Autolock.h>
+#include <Debug.h>
+#include <DirectWindow.h>
+#include <TokenSpace.h>
+#include <View.h>
+#include <GradientLinear.h>
+#include <GradientRadial.h>
+#include <GradientRadialFocus.h>
+#include <GradientDiamond.h>
+#include <GradientConic.h>
+
+#include <DirectWindowPrivate.h>
+#include <MessagePrivate.h>
+#include <PortLink.h>
+#include <ServerProtocolStructs.h>
+#include <ViewPrivate.h>
+#include <WindowInfo.h>
+#include <WindowPrivate.h>
+
+#include "clipping.h"
 
 #include "AppServer.h"
 #include "Desktop.h"
@@ -39,31 +64,9 @@
 #include "Window.h"
 #include "WorkspacesView.h"
 
-#include "clipping.h"
-
-#include <DirectWindowPrivate.h>
-#include <MessagePrivate.h>
-#include <PortLink.h>
-#include <ServerProtocolStructs.h>
-#include <ViewPrivate.h>
-#include <WindowInfo.h>
-#include <WindowPrivate.h>
-
-#include <AppDefs.h>
-#include <Autolock.h>
-#include <Debug.h>
-#include <DirectWindow.h>
-#include <TokenSpace.h>
-#include <View.h>
-#include <GradientLinear.h>
-#include <GradientRadial.h>
-#include <GradientRadialFocus.h>
-#include <GradientDiamond.h>
-#include <GradientConic.h>
-
-#include <new>
 
 using std::nothrow;
+
 
 //#define TRACE_SERVER_WINDOW
 #ifdef TRACE_SERVER_WINDOW
@@ -177,8 +180,7 @@ direct_window_data::InitCheck() const
 //	#pragma mark -
 
 
-/*!
-	Sets up the basic BWindow counterpart - you have to call Init() before
+/*!	Sets up the basic BWindow counterpart - you have to call Init() before
 	you can actually use it, though.
 */
 ServerWindow::ServerWindow(const char *title, ServerApp *app,
@@ -236,7 +238,9 @@ compare_message_profiles(const void* _a, const void* _b)
 #endif
 
 
-//! Tears down all connections the main app_server objects, and deletes some internals.
+/*! Tears down all connections the main app_server objects, and deletes some
+	internals.
+*/
 ServerWindow::~ServerWindow()
 {
 	STRACE(("ServerWindow(%s@%p):~ServerWindow()\n", fTitle, this));
@@ -282,8 +286,9 @@ ServerWindow::~ServerWindow()
 			p->time / p->count);
 	}
 	if (sRedrawProcessingTime.count > 0) {
-		printf("average redraw processing time: %g secs, count: %ld (%lld usecs per call)\n",
-			sRedrawProcessingTime.time / 1000000.0, sRedrawProcessingTime.count,
+		printf("average redraw processing time: %g secs, count: %ld (%lld "
+			"usecs per call)\n", sRedrawProcessingTime.time / 1000000.0,
+			sRedrawProcessingTime.count,
 			sRedrawProcessingTime.time / sRedrawProcessingTime.count);
 	}
 //	if (sNextMessageTime.count > 0) {
@@ -354,18 +359,6 @@ ServerWindow::_GetLooperName(char* name, size_t length)
 		title = "Unnamed Window";
 
 	snprintf(name, length, "w:%ld:%s", ClientTeam(), title);
-}
-
-
-//! Forces the window to update its decorator
-void
-ServerWindow::ReplaceDecorator()
-{
-	if (!IsLocked())
-		debugger("you must lock a ServerWindow object before calling ::ReplaceDecorator()\n");
-
-	STRACE(("ServerWindow %s: Replace Decorator\n", fTitle));
-	//fWindow->UpdateDecorator();
 }
 
 
@@ -532,8 +525,7 @@ ServerWindow::ResyncDrawState()
 }
 
 
-/*!
-	Returns the ServerWindow's Window, if it exists and has been
+/*!	Returns the ServerWindow's Window, if it exists and has been
 	added to the Desktop already.
 	In other words, you cannot assume this method will always give you
 	a valid pointer.
@@ -550,7 +542,7 @@ ServerWindow::Window() const
 
 
 View*
-ServerWindow::_CreateView(BPrivate::LinkReceiver &link, View **_parent)
+ServerWindow::_CreateView(BPrivate::LinkReceiver& link, View** _parent)
 {
 	// NOTE: no need to check for a lock. This is a private method.
 
@@ -638,8 +630,7 @@ fDesktop->LockAllWindows();
 }
 
 
-/*!
-	Dispatches all window messages, and those view messages that
+/*!	Dispatches all window messages, and those view messages that
 	don't need a valid fCurrentView (ie. view creation).
 */
 void
@@ -711,6 +702,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SEND_BEHIND:
 		{
+			// Has the all-window lock
 			int32 token;
 			team_id teamID;
 			status_t status = B_ERROR;
@@ -724,11 +716,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					Title(), behindOf ? behindOf->Title() : "NULL"));
 
 				if (behindOf != NULL) {
-//fDesktop->UnlockSingleWindow();
-// TODO: there is a big race condition when we unlock here
-// (window could be gone by now)!
 					fDesktop->SendWindowBehind(fWindow, behindOf);
-//fDesktop->LockSingleWindow();
 					status = B_OK;
 				} else
 					status = B_NAME_NOT_FOUND;
@@ -779,6 +767,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_ADD_TO_SUBSET:
 		{
+			// Has the all-window lock
 			DTRACE(("ServerWindow %s: Message AS_ADD_TO_SUBSET\n", Title()));
 			status_t status = B_ERROR;
 
@@ -789,12 +778,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				if (window == NULL || window->Feel() != B_NORMAL_WINDOW_FEEL) {
 					status = B_BAD_VALUE;
 				} else {
-//fDesktop->UnlockSingleWindow();
-// TODO: there is a big race condition when we unlock here
-// (window could be gone by now)!
 					status = fDesktop->AddWindowToSubset(fWindow, window)
 						? B_OK : B_NO_MEMORY;
-//fDesktop->LockSingleWindow();
 				}
 			}
 
@@ -804,6 +789,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_REMOVE_FROM_SUBSET:
 		{
+			// Has the all-window lock
 			DTRACE(("ServerWindow %s: Message AS_REM_FROM_SUBSET\n", Title()));
 			status_t status = B_ERROR;
 
@@ -812,10 +798,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				::Window* window = fDesktop->FindWindowByClientToken(token,
 					App()->ClientTeam());
 				if (window != NULL) {
-//fDesktop->UnlockSingleWindow();
-// TODO: there is a big race condition when we unlock here (window could be gone by now)!
 					fDesktop->RemoveWindowFromSubset(fWindow, window);
-//fDesktop->LockSingleWindow();
 					status = B_OK;
 				} else
 					status = B_BAD_VALUE;
@@ -828,6 +811,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_SET_LOOK:
 		{
+			// Has the all-window look
 			DTRACE(("ServerWindow %s: Message AS_SET_LOOK\n", Title()));
 
 			status_t status = B_ERROR;
@@ -838,11 +822,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					? B_OK : B_BAD_VALUE;
 			}
 
-			if (status == B_OK && !fWindow->IsOffscreenWindow()) {
-//fDesktop->UnlockSingleWindow();
+			if (status == B_OK && !fWindow->IsOffscreenWindow())
 				fDesktop->SetWindowLook(fWindow, (window_look)look);
-//fDesktop->LockSingleWindow();
-			}
 
 			fLink.StartMessage(status);
 			fLink.Flush();
@@ -850,6 +831,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_FEEL:
 		{
+			// Has the all-window look
 			DTRACE(("ServerWindow %s: Message AS_SET_FEEL\n", Title()));
 
 			status_t status = B_ERROR;
@@ -860,11 +842,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					? B_OK : B_BAD_VALUE;
 			}
 
-			if (status == B_OK && !fWindow->IsOffscreenWindow()) {
-//fDesktop->UnlockSingleWindow();
+			if (status == B_OK && !fWindow->IsOffscreenWindow())
 				fDesktop->SetWindowFeel(fWindow, (window_feel)feel);
-//fDesktop->LockSingleWindow();
-			}
 
 			fLink.StartMessage(status);
 			fLink.Flush();
@@ -872,6 +851,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_FLAGS:
 		{
+			// Has the all-window look
 			DTRACE(("ServerWindow %s: Message AS_SET_FLAGS\n", Title()));
 
 			status_t status = B_ERROR;
@@ -882,11 +862,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					? B_OK : B_BAD_VALUE;
 			}
 
-			if (status == B_OK && !fWindow->IsOffscreenWindow()) {
-//fDesktop->UnlockSingleWindow();
+			if (status == B_OK && !fWindow->IsOffscreenWindow())
 				fDesktop->SetWindowFlags(fWindow, flags);
-//fDesktop->LockSingleWindow();
-			}
 
 			fLink.StartMessage(status);
 			fLink.Flush();
@@ -928,6 +905,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_WORKSPACES:
 		{
+			// Has the all-window lock (but would actually not need to lock at
+			// all)
 			uint32 newWorkspaces;
 			if (link.Read<uint32>(&newWorkspaces) != B_OK)
 				break;
@@ -935,13 +914,12 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			DTRACE(("ServerWindow %s: Message AS_SET_WORKSPACES %lx\n",
 				Title(), newWorkspaces));
 
-//fDesktop->UnlockSingleWindow();
 			fDesktop->SetWindowWorkspaces(fWindow, newWorkspaces);
-//fDesktop->LockSingleWindow();
 			break;
 		}
 		case AS_WINDOW_RESIZE:
 		{
+			// Has the all-window look
 			float xResizeTo;
 			float yResizeTo;
 			link.Read<float>(&xResizeTo);
@@ -958,11 +936,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				// pragmatically set window bounds
 //				fLink.StartMessage(B_BUSY);
 //			} else {
-//fDesktop->UnlockSingleWindow();
 				fDesktop->ResizeWindowBy(fWindow,
 					xResizeTo - fWindow->Frame().Width(),
 					yResizeTo - fWindow->Frame().Height());
-//fDesktop->LockSingleWindow();
 				fLink.StartMessage(B_OK);
 //			}
 			fLink.Flush();
@@ -970,6 +946,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_WINDOW_MOVE:
 		{
+			// Has the all-window look
 			float xMoveTo;
 			float yMoveTo;
 			link.Read<float>(&xMoveTo);
@@ -984,10 +961,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				// pragmatically set window positions
 				fLink.StartMessage(B_BUSY);
 			} else {
-//fDesktop->UnlockSingleWindow();
 				fDesktop->MoveWindowBy(fWindow, xMoveTo - fWindow->Frame().left,
 					yMoveTo - fWindow->Frame().top);
-//fDesktop->LockSingleWindow();
 				fLink.StartMessage(B_OK);
 			}
 			fLink.Flush();
@@ -995,6 +970,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_SIZE_LIMITS:
 		{
+			// Has the all-window look
+
 			// Attached Data:
 			// 1) float minimum width
 			// 2) float maximum width
@@ -1018,15 +995,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				"x: %ld-%ld, y: %ld-%ld\n",
 				Title(), minWidth, maxWidth, minHeight, maxHeight));
 
-//fDesktop->UnlockSingleWindow();
-
-			if (fDesktop->LockAllWindows()) {
-				fWindow->SetSizeLimits(minWidth, maxWidth,
-					minHeight, maxHeight);
-				fDesktop->UnlockAllWindows();
-			}
-
-//fDesktop->LockSingleWindow();
+			fWindow->SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 
 			// and now, sync the client to the limits that we were able to enforce
 			fWindow->GetSizeLimits(&minWidth, &maxWidth,
@@ -1045,6 +1014,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_SET_DECORATOR_SETTINGS:
 		{
+			// Has the all-window look
 			DTRACE(("ServerWindow %s: Message AS_SET_DECORATOR_SETTINGS\n",
 				Title()));
 
@@ -1053,11 +1023,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				char buffer[size];
 				if (link.Read(buffer, size) == B_OK) {
 					BMessage settings;
-					if (settings.Unflatten(buffer) == B_OK) {
-//fDesktop->UnlockSingleWindow();
+					if (settings.Unflatten(buffer) == B_OK)
 						fDesktop->SetWindowDecoratorSettings(fWindow, settings);
-//fDesktop->LockSingleWindow();
-					}
 				}
 			}
 			break;
@@ -1091,6 +1058,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_SYSTEM_FONT_CHANGED:
 		{
+			// Has the all-window look
 			fDesktop->FontsChanged(fWindow);
 			// TODO: tell client about this, too, and relayout...
 			break;
@@ -1124,9 +1092,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_GET_MOUSE:
 		{
+			// Has the all-window look
 			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE\n", fTitle));
 
-//fDesktop->UnlockSingleWindow();
 			// Returns
 			// 1) BPoint mouse location
 			// 2) int32 button state
@@ -1134,7 +1102,6 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			BPoint where;
 			int32 buttons;
 			fDesktop->GetLastMouseState(&where, &buttons);
-//fDesktop->LockSingleWindow();
 
 			fLink.StartMessage(B_OK);
 			fLink.Attach<BPoint>(where);
@@ -1165,15 +1132,14 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_DIRECT_WINDOW_SET_FULLSCREEN:
 		{
+			// Has the all-window look
 			bool enable;
 			link.Read<bool>(&enable);
 
 			status_t status = B_OK;
-			if (fDirectWindowData != NULL) {
-//fDesktop->UnlockSingleWindow();
-				_DirectWindowSetFullScreen(enable);	
-//fDesktop->LockSingleWindow();
-			} else
+			if (fDirectWindowData != NULL)
+				_DirectWindowSetFullScreen(enable);
+			else
 				status = B_BAD_TYPE;
 
 			fLink.StartMessage(status);
@@ -1948,7 +1914,8 @@ fDesktop->LockSingleWindow();
 
 			// search for a picture with the specified token.
 			ServerPicture *picture = fServerApp->FindPicture(pictureToken);
-			// TODO: Increase that picture's reference count.(~ allocate a picture)
+			// TODO: Increase that picture's reference count.
+			// (~ allocate a picture)
 			if (picture == NULL)
 				break;
 
@@ -1967,7 +1934,7 @@ fDesktop->LockSingleWindow();
 			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_CLIP_REGION: "
 				"View: %s\n", Title(), fCurrentView->Name()));
 
-			// if this View is hidden, it is clear that its visible region is void.
+			// if this view is hidden, it has no visible region
 			fLink.StartMessage(B_OK);
 			if (!fWindow->IsVisible() || !fCurrentView->IsVisible()) {
 				BRegion empty;
@@ -2078,7 +2045,8 @@ fDesktop->LockSingleWindow();
 				BMessage dragMessage;
 				if (link.Read(buffer, bufferSize) == B_OK
 					&& dragMessage.Unflatten(buffer) == B_OK) {
-						ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
+						ServerBitmap* bitmap
+							= fServerApp->FindBitmap(bitmapToken);
 						// TODO: possible deadlock
 fDesktop->UnlockSingleWindow();
 						fDesktop->EventDispatcher().SetDragMessage(dragMessage,
@@ -2133,8 +2101,8 @@ fDesktop->LockSingleWindow();
 			link.Read<uint32>(&style);
 
 			// TODO: implement rect tracking (used sometimes for selecting
-			// a group of things, also sometimes used to appear to drag something,
-			// but without real drag message)
+			// a group of things, also sometimes used to appear to drag
+			// something, but without real drag message)
 			break;
 		}
 		case AS_VIEW_END_RECT_TRACK:
@@ -2194,8 +2162,7 @@ fDesktop->LockSingleWindow();
 }
 
 
-/*!
-	Dispatches all view drawing messages.
+/*!	Dispatches all view drawing messages.
 	The desktop clipping must be read locked when entering this method.
 	Requires a valid fCurrentView.
 */
@@ -2266,8 +2233,9 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			// do not update the pen position actually call StrokeLine
 
 			// TODO: Decide where to put this, for example, it cannot be done
-			// for DrawString(), also there needs to be a decision, if penlocation
-			// is in View coordinates (I think it should be) or in screen coordinates.
+			// for DrawString(), also there needs to be a decision, if the pen
+			// location is in View coordinates (I think it should be) or in
+			// screen coordinates.
 			fCurrentView->CurrentState()->SetPenLocation(penPos);
 			break;
 		}
@@ -2324,8 +2292,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			if (link.ReadGradient(&gradient) != B_OK)
 				break;
 
-			GTRACE(("ServerWindow %s: Message AS_FILL_RECT_GRADIENT: View: %s -> "
-				"BRect(%.1f, %.1f, %.1f, %.1f)\n", Title(),
+			GTRACE(("ServerWindow %s: Message AS_FILL_RECT_GRADIENT: View: %s "
+				"-> BRect(%.1f, %.1f, %.1f, %.1f)\n", Title(),
 				fCurrentView->Name(), rect.left, rect.top, rect.right,
 				rect.bottom));
 
@@ -2876,8 +2844,10 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			picture->WriteSetDrawingMode((drawing_mode)drawingMode);
 
-			fCurrentView->CurrentState()->SetDrawingMode((drawing_mode)drawingMode);
-			fWindow->GetDrawingEngine()->SetDrawingMode((drawing_mode)drawingMode);
+			fCurrentView->CurrentState()->SetDrawingMode(
+				(drawing_mode)drawingMode);
+			fWindow->GetDrawingEngine()->SetDrawingMode(
+				(drawing_mode)drawingMode);
 			break;
 		}
 
@@ -3001,7 +2971,8 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			BPoint radii((rect.Width() + 1) / 2, (rect.Height() + 1) / 2);
 			BPoint center = rect.LeftTop() + radii;
 
-			picture->WriteDrawArc(center, radii, startTheta, arcTheta, code == AS_FILL_ARC);
+			picture->WriteDrawArc(center, radii, startTheta, arcTheta,
+				code == AS_FILL_ARC);
 			break;
 		}
 
@@ -3172,7 +3143,8 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 
 				// This might seem a bit weird, but under R5, the shapes
 				// are always offset by the current pen location
-				BPoint penLocation = fCurrentView->CurrentState()->PenLocation();
+				BPoint penLocation
+					= fCurrentView->CurrentState()->PenLocation();
 				for (int32 i = 0; i < ptCount; i++) {
 					ptList[i] += penLocation;
 				}
@@ -3211,8 +3183,8 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 
 				ServerPicture *pictureToDraw = App()->FindPicture(token);
 				if (picture != NULL) {
-					// We need to make a copy of the picture, since it can change
-					// after it has been drawn
+					// We need to make a copy of the picture, since it can
+					// change after it has been drawn
 					ServerPicture *copy = App()->CreatePicture(pictureToDraw);
 					picture->NestPicture(copy);
 					picture->WriteDrawPicture(where, copy->Token());
@@ -3308,8 +3280,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 }
 
 
-/*!
-	\brief Message-dispatching loop for the ServerWindow
+/*!	\brief Message-dispatching loop for the ServerWindow
 
 	Watches the ServerWindow's message port and dispatches as necessary
 */
@@ -3341,7 +3312,7 @@ ServerWindow::_MessageLooper()
 
 		int32 code;
 		status_t status = receiver.GetNextMessage(code);
-		if (status < B_OK) {
+		if (status != B_OK) {
 			// that shouldn't happen, it's our port
 			printf("Someone deleted our message port!\n");
 
@@ -3358,8 +3329,10 @@ ServerWindow::_MessageLooper()
 
 #ifdef PROFILE_MESSAGE_LOOP
 		bigtime_t diff = system_time() - start;
-		if (diff > 10000)
-			printf("ServerWindow %s: lock acquisition took %Ld usecs\n", Title(), diff);
+		if (diff > 10000) {
+			printf("ServerWindow %s: lock acquisition took %Ld usecs\n",
+				Title(), diff);
+		}
 #endif
 
 		int32 messagesProcessed = 0;
@@ -3369,8 +3342,8 @@ ServerWindow::_MessageLooper()
 		while (true) {
 			if (code == AS_DELETE_WINDOW || code == kMsgQuitLooper) {
 				// this means the client has been killed
-				DTRACE(("ServerWindow %s received 'AS_DELETE_WINDOW' message code\n",
-					Title()));
+				DTRACE(("ServerWindow %s received 'AS_DELETE_WINDOW' message "
+					"code\n", Title()));
 
 				if (code == AS_DELETE_WINDOW) {
 					fLink.StartMessage(B_OK);
@@ -3382,7 +3355,8 @@ ServerWindow::_MessageLooper()
 
 				quitLoop = true;
 
-				// ServerWindow's destructor takes care of pulling this object off the desktop.
+				// ServerWindow's destructor takes care of pulling this object
+				// off the desktop.
 				ASSERT(fWindow->IsHidden());
 				break;
 			}
@@ -3435,15 +3409,18 @@ ServerWindow::_MessageLooper()
 #else
 				sMessageProfile[code].time += diff;
 #endif
-				if (diff > 10000)
-					printf("ServerWindow %s: message %ld took %Ld usecs\n", Title(), code, diff);
+				if (diff > 10000) {
+					printf("ServerWindow %s: message %ld took %Ld usecs\n",
+						Title(), code, diff);
+				}
 			}
 #endif
 
 			if (needsAllWindowsLocked)
 				fDesktop->UnlockAllWindows();
 
-			// only process up to 70 waiting messages at once (we have the Desktop locked)
+			// Only process up to 70 waiting messages at once (we have the
+			// Desktop locked)
 			if (!receiver.HasMessages() || ++messagesProcessed > 70) {
 				if (lockedDesktop)
 					fDesktop->UnlockSingleWindow();
@@ -3467,7 +3444,8 @@ ServerWindow::_MessageLooper()
 		Unlock();
 	}
 
-	// we were asked to quit the message loop - either on request or because of an error
+	// We were asked to quit the message loop - either on request or because of
+	// an error.
 	Quit();
 		// does not return
 }
@@ -3510,7 +3488,7 @@ ServerWindow::_EnableDirectWindowMode()
 		return B_NO_MEMORY;
 
 	status_t status = fDirectWindowData->InitCheck();
-	if (status < B_OK) {
+	if (status != B_OK) {
 		delete fDirectWindowData;
 		fDirectWindowData = NULL;
 
@@ -3535,18 +3513,23 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 	// Don't issue a DirectConnected() notification
 	// if the connection is stopped, and we are called
 	// with bufferState == B_DIRECT_MODIFY.
-	if ((fDirectWindowData->buffer_info->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_STOP
+	if ((fDirectWindowData->buffer_info->buffer_state & B_DIRECT_MODE_MASK)
+			== B_DIRECT_STOP
 		&& (bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_START) {
 		return;
 	}
 
 	fDirectWindowData->started = true;
 
-	if (bufferState != -1)
-		fDirectWindowData->buffer_info->buffer_state = (direct_buffer_state)bufferState;
+	if (bufferState != -1) {
+		fDirectWindowData->buffer_info->buffer_state
+			= (direct_buffer_state)bufferState;
+	}
 
-	if (driverState != -1)
-		fDirectWindowData->buffer_info->driver_state = (direct_driver_state)driverState;
+	if (driverState != -1) {
+		fDirectWindowData->buffer_info->driver_state
+			= (direct_driver_state)driverState;
+	}
 
 	if ((bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
 		// TODO: Locking ?
@@ -3554,6 +3537,7 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 		fDirectWindowData->buffer_info->bits = buffer->Bits();
 		fDirectWindowData->buffer_info->pci_bits = NULL; // TODO
 		fDirectWindowData->buffer_info->bytes_per_row = buffer->BytesPerRow();
+
 		switch (buffer->ColorSpace()) {
 			case B_RGB32:
 			case B_RGBA32:
@@ -3576,44 +3560,53 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 				fDirectWindowData->buffer_info->bits_per_pixel = 8;
 				break;
 			default:
-				fprintf(stderr, "unknown colorspace in HandleDirectConnection()!\n");
+				syslog(LOG_ERR,
+					"unknown colorspace in HandleDirectConnection()!\n");
 				fDirectWindowData->buffer_info->bits_per_pixel = 0;
 				break;
 		}
+
 		fDirectWindowData->buffer_info->pixel_format = buffer->ColorSpace();
 		fDirectWindowData->buffer_info->layout = B_BUFFER_NONINTERLEAVED;
-		fDirectWindowData->buffer_info->orientation = B_BUFFER_TOP_TO_BOTTOM; // TODO
-		fDirectWindowData->buffer_info->window_bounds = to_clipping_rect(fWindow->Frame());
+		fDirectWindowData->buffer_info->orientation = B_BUFFER_TOP_TO_BOTTOM;
+			// TODO
+		fDirectWindowData->buffer_info->window_bounds
+			= to_clipping_rect(fWindow->Frame());
 
 		// TODO: Review this
-		const int32 kMaxClipRectsCount = (DIRECT_BUFFER_INFO_AREA_SIZE - sizeof(direct_buffer_info))
-			/ sizeof(clipping_rect);
+		const int32 kMaxClipRectsCount = (DIRECT_BUFFER_INFO_AREA_SIZE
+			- sizeof(direct_buffer_info)) / sizeof(clipping_rect);
 
 		// We just want the region inside the window, border excluded.
 		BRegion clipRegion = fWindow->VisibleContentRegion();
 
-		fDirectWindowData->buffer_info->clip_list_count = min_c(clipRegion.CountRects(),
-			kMaxClipRectsCount);
+		fDirectWindowData->buffer_info->clip_list_count
+			= min_c(clipRegion.CountRects(), kMaxClipRectsCount);
 		fDirectWindowData->buffer_info->clip_bounds = clipRegion.FrameInt();
 
-		for (uint32 i = 0; i < fDirectWindowData->buffer_info->clip_list_count; i++)
-			fDirectWindowData->buffer_info->clip_list[i] = clipRegion.RectAtInt(i);
+		for (uint32 i = 0; i < fDirectWindowData->buffer_info->clip_list_count;
+				i++) {
+			fDirectWindowData->buffer_info->clip_list[i]
+				= clipRegion.RectAtInt(i);
+		}
 	}
 
-	// Releasing this sem causes the client to call BDirectWindow::DirectConnected()
+	// Releasing this semaphore causes the client to call
+	// BDirectWindow::DirectConnected()
 	release_sem(fDirectWindowData->sem);
 
 	// TODO: Waiting half a second in the ServerWindow thread is not a problem,
-	// but since we are called from the Desktop's thread too, very bad things could happen.
-	// Find some way to call this method only within ServerWindow's thread (messaging ?)
+	// but since we are called from the Desktop's thread too, very bad things
+	// could happen.
+	// Find some way to call this method only within ServerWindow's thread
+	// (messaging ?)
 	status_t status;
 	do {
-		// TODO: The timeout is 3000000 usecs (3 seconds) on beos.
-		// Test, but I think half a second is enough.
-		status = acquire_sem_etc(fDirectWindowData->sem_ack, 1, B_TIMEOUT, 500000);
+		status = acquire_sem_etc(fDirectWindowData->sem_ack, 1, B_TIMEOUT,
+			500000);
 	} while (status == B_INTERRUPTED);
 
-	if (status < B_OK) {
+	if (status != B_OK) {
 		// The client application didn't release the semaphore
 		// within the given timeout. Or something else went wrong.
 		// Deleting this member should make it crash.
@@ -3639,8 +3632,8 @@ ServerWindow::_SetCurrentView(View* view)
 		&& fWindow->InUpdate()) {
 		DrawingEngine* drawingEngine = fWindow->GetDrawingEngine();
 		if (drawingEngine->LockParallelAccess()) {
-
-			fWindow->GetEffectiveDrawingRegion(fCurrentView, fCurrentDrawingRegion);
+			fWindow->GetEffectiveDrawingRegion(fCurrentView,
+				fCurrentDrawingRegion);
 			fCurrentDrawingRegionValid = true;
 			BRegion dirty(fCurrentDrawingRegion);
 
@@ -3666,9 +3659,9 @@ ServerWindow::_UpdateDrawState(View* view)
 	// "offsets" passed below would need to be updated again
 	DrawingEngine* drawingEngine = fWindow->GetDrawingEngine();
 	if (view && drawingEngine) {
-		BPoint p(0, 0);
-		view->ConvertToScreenForDrawing(&p);
-		drawingEngine->SetDrawState(view->CurrentState(), p.x, p.y);
+		BPoint leftTop(0, 0);
+		view->ConvertToScreenForDrawing(&leftTop);
+		drawingEngine->SetDrawState(view->CurrentState(), leftTop.x, leftTop.y);
 	}
 }
 
@@ -3678,8 +3671,7 @@ ServerWindow::_UpdateCurrentDrawingRegion()
 {
 	if (!fCurrentDrawingRegionValid
 		|| fWindow->DrawingRegionChanged(fCurrentView)) {
-		fWindow->GetEffectiveDrawingRegion(fCurrentView,
-			fCurrentDrawingRegion);
+		fWindow->GetEffectiveDrawingRegion(fCurrentView, fCurrentDrawingRegion);
 		fCurrentDrawingRegionValid = true;
 	}
 }
@@ -3720,18 +3712,16 @@ ServerWindow::_DirectWindowSetFullScreen(bool enable)
 {
 	if (enable) {
 		fDesktop->HWInterface()->SetCursorVisible(false);
-		
+
 		fDirectWindowData->old_window_frame = fWindow->Frame();
 		BRect screenFrame =
 			fDesktop->ActiveScreen()->Frame();
 		fDirectWindowFeel = fWindow->Feel();
-		fDesktop->MoveWindowBy(fWindow,
-			- fWindow->Frame().left,
-			- fWindow->Frame().top);
+		fDesktop->MoveWindowBy(fWindow, -fWindow->Frame().left,
+			-fWindow->Frame().top);
 		fDesktop->ResizeWindowBy(fWindow,
 			screenFrame.Width() - fWindow->Frame().Width(),
-			screenFrame.Height() 
-				- fWindow->Frame().Height());
+			screenFrame.Height() - fWindow->Frame().Height());
 	} else {
 		const BRect &oldFrame = fDirectWindowData->old_window_frame;
 		fDesktop->MoveWindowBy(fWindow,
@@ -3740,8 +3730,8 @@ ServerWindow::_DirectWindowSetFullScreen(bool enable)
 		fDesktop->ResizeWindowBy(fWindow,
 			oldFrame.Width() - fWindow->Frame().Width(),
 			oldFrame.Height() - fWindow->Frame().Height());
-			
-		fDesktop->HWInterface()->SetCursorVisible(true);			
+
+		fDesktop->HWInterface()->SetCursorVisible(true);
 	}
 
 	fDesktop->SetWindowFeel(fWindow,
@@ -3750,7 +3740,7 @@ ServerWindow::_DirectWindowSetFullScreen(bool enable)
 
 
 status_t
-ServerWindow::PictureToRegion(ServerPicture *picture, BRegion &region,
+ServerWindow::PictureToRegion(ServerPicture* picture, BRegion& region,
 	bool inverse, BPoint where)
 {
 	fprintf(stderr, "ServerWindow::PictureToRegion() not implemented\n");

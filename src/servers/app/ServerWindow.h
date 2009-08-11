@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -61,8 +61,6 @@ public:
 
 			::EventTarget&		EventTarget() { return fEventTarget; }
 
-			void				ReplaceDecorator();
-
 			// methods for sending various messages to client.
 			void				NotifyQuitRequested();
 			void				NotifyMinimize(bool minimize);
@@ -105,7 +103,8 @@ public:
 			void				ResyncDrawState();
 
 						// TODO: Change this
-	inline	void				UpdateCurrentDrawingRegion() { _UpdateCurrentDrawingRegion(); };
+	inline	void				UpdateCurrentDrawingRegion()
+									{ _UpdateCurrentDrawingRegion(); };
 
 private:
 			View*				_CreateView(BPrivate::LinkReceiver &link,
@@ -115,7 +114,8 @@ private:
 			void				_Hide();
 
 			// message handling methods.
-			void				_DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
+			void				_DispatchMessage(int32 code,
+									BPrivate::LinkReceiver &link);
 			void				_DispatchViewMessage(int32 code,
 									BPrivate::LinkReceiver &link);
 			void				_DispatchViewDrawingMessage(int32 code,
@@ -130,12 +130,13 @@ private:
 
 			void				_SetCurrentView(View* view);
 			void				_UpdateDrawState(View* view);
-public:
 			void				_UpdateCurrentDrawingRegion();
-private:
-			bool				_MessageNeedsAllWindowsLocked(uint32 code) const;
+
+			bool				_MessageNeedsAllWindowsLocked(
+									uint32 code) const;
 
 			void				_DirectWindowSetFullScreen(bool set);
+
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,
 									BRegion& region, bool inverse,
