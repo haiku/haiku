@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,6 +13,7 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <ControlLook.h>
 #include <Deskbar.h>
 #include <Dragger.h>
 #include <Drivers.h>
@@ -43,12 +44,12 @@ const uint32 kMinIconHeight = 16;
 
 
 PowerStatusView::PowerStatusView(PowerStatusDriverInterface* interface,
-	BRect frame, int32 resizingMode,  int batteryId, bool inDeskbar)
+		BRect frame, int32 resizingMode,  int batteryID, bool inDeskbar)
 	:
 	BView(frame, kDeskbarItemName, resizingMode,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fDriverInterface(interface),
-	fBatteryId(batteryId),
+	fBatteryID(batteryID),
 	fInDeskbar(inDeskbar)
 {
 	fPreferredSize.width = frame.Width();
@@ -71,14 +72,12 @@ PowerStatusView::PowerStatusView(BMessage* archive)
 		fShowTime = value;
 	int32 intValue;
 	if (archive->FindInt32("battery id", &intValue) == B_OK)
-		fBatteryId = intValue;
-	
+		fBatteryID = intValue;
 }
 
 
 PowerStatusView::~PowerStatusView()
 {
-
 }
 
 
@@ -93,7 +92,7 @@ PowerStatusView::Archive(BMessage* archive, bool deep) const
 	if (status == B_OK)
 		status = archive->AddBool("show time", fShowTime);
 	if (status == B_OK)
-		status = archive->AddInt32("battery id", fBatteryId);
+		status = archive->AddInt32("battery id", fBatteryID);
 
 	return status;
 }
@@ -102,6 +101,8 @@ PowerStatusView::Archive(BMessage* archive, bool deep) const
 void
 PowerStatusView::_Init()
 {
+	SetViewColor(B_TRANSPARENT_COLOR);
+
 	fShowLabel = true;
 	fShowTime = false;
 	fShowStatusIcon = true;
@@ -109,7 +110,6 @@ PowerStatusView::_Init()
 	fPercent = -1;
 	fOnline = true;
 	fTimeLeft = 0;
-
 }
 
 
@@ -118,13 +118,11 @@ PowerStatusView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 	if (Parent())
-		SetViewColor(Parent()->ViewColor());
+		SetLowColor(Parent()->ViewColor());
 	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	SetLowColor(ViewColor());
-
-	_Update();
+	Update();
 }
 
 
@@ -140,7 +138,7 @@ PowerStatusView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgUpdate:
-			_Update();
+			Update();
 			break;
 
 		default:
@@ -169,39 +167,55 @@ PowerStatusView::_DrawBattery(BRect rect)
 	float left = rect.left;
 	rect.left += rect.Width() / 11;
 
+	SetHighColor(84, 84, 84);
+
 	float gap = 1;
 	if (rect.Height() > 8) {
-		rect.InsetBy(1, 1);
-		SetPenSize(2);
-		gap = 2;
-	}
+		gap = ceilf((rect.left - left) / 2);
 
-	SetHighColor(92, 92, 92);
+		// left
+		FillRect(BRect(rect.left, rect.top, rect.left + gap - 1, rect.bottom));
+		// right
+		FillRect(BRect(rect.right - gap + 1, rect.top, rect.right,
+			rect.bottom));
+		// top
+		FillRect(BRect(rect.left + gap, rect.top, rect.right - gap,
+			rect.top + gap - 1));
+		// bottom
+		FillRect(BRect(rect.left + gap, rect.bottom + 1 - gap,
+			rect.right - gap, rect.bottom));
+	} else
+		StrokeRect(rect);
 
-	StrokeRect(rect);
-
-	SetPenSize(1);
 	FillRect(BRect(left, floorf(rect.top + rect.Height() / 4) + 1,
-		rect.left, floorf(rect.bottom - rect.Height() / 4)));
+		rect.left - 1, floorf(rect.bottom - rect.Height() / 4)));
 
 	int32 percent = fPercent;
 	if (percent > 100 || percent < 0)
 		percent = 100;
 
 	if (percent > 0) {
-		if (percent < 16)
-			SetHighColor(180, 0, 0);
-		else
-			SetHighColor(20, 180, 0);
-
-		rect.InsetBy(gap + 1, gap + 1);
-		if (gap > 1) {
-			rect.right++;
-			rect.bottom++;
+		rgb_color base;
+		if (fOnline) {
+			if (percent <= 15)
+				base.set_to(180, 0, 0);
+			else
+				base.set_to(20, 180, 0);
+		} else {
+			base = HighColor();
+			percent = 100;
 		}
 
-		rect.right = rect.left + rect.Width() * min_c(percent, 100) / 100.0;
-		FillRect(rect);
+		rect.InsetBy(gap, gap);
+		rect.right = rect.left + rect.Width() * percent / 100.0;
+
+		if (be_control_look != NULL)
+			be_control_look->DrawButtonBackground(this, rect, rect, base,
+				fOnline ? 0 : BControlLook::B_DISABLED);
+			//if (!)
+
+		else
+			FillRect(rect);
 	}
 
 	SetHighColor(0, 0, 0);
@@ -211,6 +225,11 @@ PowerStatusView::_DrawBattery(BRect rect)
 void
 PowerStatusView::Draw(BRect updateRect)
 {
+	bool drawBackground = Parent() == NULL
+		|| (Parent()->Flags() & B_DRAW_ON_CHILDREN) == 0;
+	if (drawBackground)
+		FillRect(updateRect, B_SOLID_LOW);
+
 	float aspect = Bounds().Width() / Bounds().Height();
 	bool below = aspect <= 1.0f;
 
@@ -269,6 +288,17 @@ PowerStatusView::Draw(BRect updateRect)
 			point.y += (Bounds().Height() - textHeight) / 2;
 		}
 
+		if (drawBackground)
+			SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
+		else {
+			SetDrawingMode(B_OP_OVER);
+			rgb_color c = Parent()->LowColor();
+			if (c.red + c.green + c.blue > 128 * 3)
+				SetHighColor(0, 0, 0);
+			else
+				SetHighColor(255, 255, 255);
+		}
+
 		DrawString(text, point);
 	}
 }
@@ -303,13 +333,13 @@ PowerStatusView::_SetLabel(char* buffer, size_t bufferLength)
 
 
 void
-PowerStatusView::_Update(bool force)
+PowerStatusView::Update(bool force)
 {
 	int32 previousPercent = fPercent;
 	bool previousTimeLeft = fTimeLeft;
 	bool wasOnline = fOnline;
 
-	_GetBatteryInfo(&fBatteryInfo, fBatteryId);
+	_GetBatteryInfo(&fBatteryInfo, fBatteryID);
 
 	fPercent = (100 * fBatteryInfo.capacity) / fBatteryInfo.full_capacity;
 	fTimeLeft = fBatteryInfo.time_left;
@@ -317,7 +347,7 @@ PowerStatusView::_Update(bool force)
 		fOnline = true;
 	else
 		fOnline = false;
-	
+
 	if (fInDeskbar) {
 		// make sure the tray icon is large enough
 		float width = fShowStatusIcon ? kMinIconWidth + 2 : 0;
@@ -346,23 +376,24 @@ PowerStatusView::_Update(bool force)
 
 
 void
-PowerStatusView::_GetBatteryInfo(battery_info* batteryInfo, int batteryId)
+PowerStatusView::_GetBatteryInfo(battery_info* batteryInfo, int batteryID)
 {
-	if (batteryId >= 0) {
-		fDriverInterface->GetBatteryInfo(batteryInfo, batteryId);
-	}
-	else for (int i = 0; i < fDriverInterface->GetBatteryCount(); i++) {
-		battery_info tmpInfo;
-		fDriverInterface->GetBatteryInfo(&tmpInfo, i);
-		
-		if (i == 0)
-			*batteryInfo = tmpInfo;
-		else {
-			batteryInfo->state &= tmpInfo.state;
-			batteryInfo->capacity += tmpInfo.capacity;
-			batteryInfo->full_capacity += tmpInfo.full_capacity;
-			batteryInfo->time_left += tmpInfo.time_left;			
-		}	
+	if (batteryID >= 0) {
+		fDriverInterface->GetBatteryInfo(batteryInfo, batteryID);
+	} else {
+		for (int i = 0; i < fDriverInterface->GetBatteryCount(); i++) {
+			battery_info info;
+			fDriverInterface->GetBatteryInfo(&info, i);
+
+			if (i == 0)
+				*batteryInfo = info;
+			else {
+				batteryInfo->state &= info.state;
+				batteryInfo->capacity += info.capacity;
+				batteryInfo->full_capacity += info.full_capacity;
+				batteryInfo->time_left += info.time_left;
+			}
+		}
 	}
 }
 
@@ -371,7 +402,7 @@ PowerStatusView::_GetBatteryInfo(battery_info* batteryInfo, int batteryId)
 
 
 PowerStatusReplicant::PowerStatusReplicant(BRect frame, int32 resizingMode,
-	bool inDeskbar)
+		bool inDeskbar)
 	:
 	PowerStatusView(NULL, frame, resizingMode, -1, inDeskbar)
 {
@@ -386,7 +417,7 @@ PowerStatusReplicant::PowerStatusReplicant(BRect frame, int32 resizingMode,
 			B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 		AddChild(dragger);
 	} else
-		_Update();
+		Update();
 }
 
 
@@ -439,17 +470,17 @@ PowerStatusReplicant::MessageReceived(BMessage *message)
 	switch (message->what) {
 		case kMsgToggleLabel:
 			fShowLabel = !fShowLabel;
-			_Update(true);
+			Update(true);
 			break;
 
 		case kMsgToggleTime:
 			fShowTime = !fShowTime;
-			_Update(true);
+			Update(true);
 			break;
 
 		case kMsgToggleStatusIcon:
 			fShowStatusIcon = !fShowStatusIcon;
-			_Update(true);
+			Update(true);
 			break;
 
 		case kMsgToggleExtInfo:
@@ -488,9 +519,10 @@ PowerStatusReplicant::MouseDown(BPoint point)
 	menu->AddItem(new BMenuItem(!fShowTime ? "Show Time" : "Show Percent",
 		new BMessage(kMsgToggleTime)));
 
-	menu->AddItem(new BMenuItem("Battery Info",
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem("Battery Info" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgToggleExtInfo)));
-	
+
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("About" B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
@@ -535,7 +567,7 @@ PowerStatusReplicant::_Init()
 			_Quit();
 		}
 	}
-	
+
 	fExtendedWindow = NULL;
 	fMessengerExist = false;
 	fExtWindowMessenger = NULL;

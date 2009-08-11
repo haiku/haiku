@@ -79,6 +79,7 @@ PowerStatus::ReadyToRun()
 		isInstalled = deskbar.HasItem(kDeskbarItemName);
 	}
 
+isInstalled = true;
 	if (isDeskbarRunning && !isInstalled) {
 		BAlert* alert = new BAlert("", "Do you want PowerStatus to live in the Deskbar?",
 			"Don't", "Install", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -87,7 +88,7 @@ PowerStatus::ReadyToRun()
 		if (alert->Go()) {
 			image_info info;
 			entry_ref ref;
-		
+
 			if (our_image(info) == B_OK
 				&& get_ref_for_path(info.name, &ref) == B_OK) {
 				BDeskbar deskbar;

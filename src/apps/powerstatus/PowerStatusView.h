@@ -1,12 +1,11 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Clemens Zeidler, haiku@Clemens-Zeidler.de
  */
-
 #ifndef POWER_STATUS_VIEW_H
 #define POWER_STATUS_VIEW_H
 
@@ -17,77 +16,79 @@
 
 
 class PowerStatusView : public BView {
-	public:
-		PowerStatusView(PowerStatusDriverInterface* interface,
-			BRect frame, int32 resizingMode, int batteryId = -1,
-			bool inDeskbar = false);
-		
-		virtual	~PowerStatusView();
+public:
+							PowerStatusView(
+								PowerStatusDriverInterface* interface,
+								BRect frame, int32 resizingMode,
+								int batteryID = -1, bool inDeskbar = false);
 
-		virtual	status_t Archive(BMessage* archive, bool deep = true) const;
+	virtual					~PowerStatusView();
 
-		virtual	void	AttachedToWindow();
-		virtual	void	DetachedFromWindow();
+	virtual	status_t		Archive(BMessage* archive, bool deep = true) const;
 
-		virtual	void	MessageReceived(BMessage* message);
-		virtual	void	Draw(BRect updateRect);
-		virtual void	GetPreferredSize(float *width, float *height);
-		
-	protected:
-						PowerStatusView(BMessage* archive);
-		
-		virtual void	_Update(bool force = false);
-		virtual void	_GetBatteryInfo(battery_info* info, int batteryId);
+	virtual	void			AttachedToWindow();
+	virtual	void			DetachedFromWindow();
 
-		PowerStatusDriverInterface*	fDriverInterface;
+	virtual	void			MessageReceived(BMessage* message);
+	virtual	void			Draw(BRect updateRect);
+	virtual	void			GetPreferredSize(float *width, float *height);
 
-		bool			fShowLabel;
-		bool			fShowTime;
-		bool			fShowStatusIcon;
-		
-		int				fBatteryId;
-		bool			fInDeskbar;
 
-		battery_info	fBatteryInfo;
+protected:
+							PowerStatusView(BMessage* archive);
 
-	private:
-		void			_Init();
-		void			_SetLabel(char* buffer, size_t bufferLength);
-		void			_DrawBattery(BRect rect);
+	virtual void			Update(bool force = false);
 
-		int32			fPercent;
-		time_t			fTimeLeft;
-		bool			fOnline;
+private:
+			void			_GetBatteryInfo(battery_info* info, int batteryID);
+			void			_Init();
+			void			_SetLabel(char* buffer, size_t bufferLength);
+			void			_DrawBattery(BRect rect);
 
-		BSize			fPreferredSize;
+protected:
+			PowerStatusDriverInterface*	fDriverInterface;
+
+			bool			fShowLabel;
+			bool			fShowTime;
+			bool			fShowStatusIcon;
+
+			int				fBatteryID;
+			bool			fInDeskbar;
+
+			battery_info	fBatteryInfo;
+
+			int32			fPercent;
+			time_t			fTimeLeft;
+			bool			fOnline;
+
+			BSize			fPreferredSize;
 };
 
 
-class PowerStatusReplicant : public PowerStatusView
-{
-	public:
-		PowerStatusReplicant(BRect frame, int32 resizingMode,
-			bool inDeskbar = false);
-		PowerStatusReplicant(BMessage* archive);
+class PowerStatusReplicant : public PowerStatusView {
+public:
+							PowerStatusReplicant(BRect frame,
+								int32 resizingMode, bool inDeskbar = false);
+							PowerStatusReplicant(BMessage* archive);
+	virtual					~PowerStatusReplicant();
 
-		virtual	~PowerStatusReplicant();
+	static	PowerStatusReplicant* Instantiate(BMessage* archive);
+	virtual	status_t		Archive(BMessage* archive, bool deep = true) const;
 
-		static	PowerStatusReplicant* Instantiate(BMessage* archive);
-		virtual	status_t Archive(BMessage* archive, bool deep = true) const;
+	virtual	void			MessageReceived(BMessage* message);
+	virtual	void			MouseDown(BPoint where);
 
-		virtual	void	MessageReceived(BMessage* message);
-		virtual	void	MouseDown(BPoint where);
+private:
+			void			_AboutRequested();
+			void			_Init();
+			void			_Quit();
 
-	private:
-		void			_AboutRequested();
-		void			_Init();
-		void			_Quit();
-		
-		void			_OpenExtendedWindow();
+			void			_OpenExtendedWindow();
 
-		BWindow*		fExtendedWindow;
-		bool			fMessengerExist;
-		BMessenger*		fExtWindowMessenger;		
+private:
+			BWindow*		fExtendedWindow;
+			bool			fMessengerExist;
+			BMessenger*		fExtWindowMessenger;
 };
 
 
