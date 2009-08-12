@@ -26,33 +26,35 @@ if $(HAIKU_ATA_STACK) = 1 {
 }
 
 local NET_BOOT = 0 ;
+local USB_BOOT = 1 ;
+
+local USB_ONLY = ;
+if $(USB_BOOT) = 1 {
+	USB_ONLY = "" ;
+}
 
 local BOOT_ADD_ONS_NET ;
 if $(NET_BOOT) = 1 {
-BOOT_ADD_ONS_NET =
-#	nbd
-#	remote_disk
-#	$(SYSTEM_ADD_ONS_DRIVERS_NET)
-#	stack socket
-#	$(SYSTEM_NETWORK_DEVICES)
-#	$(SYSTEM_NETWORK_DATALINK_PROTOCOLS)
-#	$(SYSTEM_NETWORK_PPP)
-#	$(SYSTEM_NETWORK_PROTOCOLS)
-;
+	BOOT_ADD_ONS_NET =
+		remote_disk
+		$(SYSTEM_ADD_ONS_DRIVERS_NET)
+		stack socket
+		$(SYSTEM_NETWORK_DEVICES)
+		$(SYSTEM_NETWORK_DATALINK_PROTOCOLS)
+		$(SYSTEM_NETWORK_PPP)
+		$(SYSTEM_NETWORK_PROTOCOLS)
+	;
 }
 
-SYSTEM_ADD_ONS_BUS_MANAGERS = agp_gart $(ATA_ONLY)ata config_manager pci
-	$(IDE_ONLY)ide $(X86_ONLY)isa scsi usb
+SYSTEM_ADD_ONS_BUS_MANAGERS = $(ATA_ONLY)ata config_manager pci
+	$(IDE_ONLY)ide $(X86_ONLY)isa scsi $(USB_ONLY)usb
 ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs iso9660 attribute_overlay write_overlay ;
-#cdda fat googlefs nfs ;
 
 
 # modules
 AddFilesToFloppyBootArchive system add-ons kernel bus_managers
 	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
-AddFilesToFloppyBootArchive system add-ons kernel busses agp_gart
-	: $(X86_ONLY)<agp_gart>intel ;
 AddFilesToFloppyBootArchive system add-ons kernel busses ide
 	: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata it8211 ;
 AddFilesToFloppyBootArchive system add-ons kernel busses scsi
@@ -66,20 +68,24 @@ AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
 	: intel session ;
 AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
 	: $(PPC_ONLY)openpic ;
-AddFilesToFloppyBootArchive system add-ons kernel busses usb
-	: <usb>uhci <usb>ohci <usb>ehci ;
+
+if $(USB_BOOT) = 1 {
+	AddFilesToFloppyBootArchive system add-ons kernel busses usb
+		: <usb>uhci <usb>ohci <usb>ehci ;
+}
 
 if $(TARGET_ARCH) = x86 {
 	AddFilesToFloppyBootArchive system add-ons kernel cpu : generic_x86 ;
 }
 
 # drivers
-AddNewDriversToFloppyBootArchive disk scsi	: scsi_cd scsi_disk ;
-AddDriversToFloppyBootArchive disk usb	: usb_disk ;
+AddNewDriversToFloppyBootArchive disk scsi : scsi_cd scsi_disk ;
+if $(USB_BOOT) = 1 {
+	AddDriversToFloppyBootArchive disk usb : usb_disk ;
+}
 if $(NET_BOOT) = 1 {
-#AddDriversToFloppyBootArchive disk virtual	: nbd ;
-AddDriversToFloppyBootArchive disk virtual	: remote_disk ;
-AddDriversToFloppyBootArchive net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
+	AddDriversToFloppyBootArchive disk virtual : remote_disk ;
+	AddDriversToFloppyBootArchive net : $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 }
 
 # kernel
@@ -94,17 +100,17 @@ AddFilesToFloppyBootArchive home config settings kernel drivers
 	: $(driverSettingsFiles) ;
 
 if $(NET_BOOT) = 1 {
-# add-ons
-AddFilesToFloppyBootArchive system add-ons kernel network
-	: stack socket ;
-AddFilesToFloppyBootArchive system add-ons kernel network devices
-	: $(SYSTEM_NETWORK_DEVICES) ;
-AddFilesToFloppyBootArchive system add-ons kernel network datalink_protocols
-	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
-AddFilesToFloppyBootArchive system add-ons kernel network ppp
-	: $(SYSTEM_NETWORK_PPP) ;
-AddFilesToFloppyBootArchive system add-ons kernel network protocols
-	: $(SYSTEM_NETWORK_PROTOCOLS) ;
+	# add-ons
+	AddFilesToFloppyBootArchive system add-ons kernel network
+		: stack socket ;
+	AddFilesToFloppyBootArchive system add-ons kernel network devices
+		: $(SYSTEM_NETWORK_DEVICES) ;
+	AddFilesToFloppyBootArchive system add-ons kernel network datalink_protocols
+		: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
+	AddFilesToFloppyBootArchive system add-ons kernel network ppp
+		: $(SYSTEM_NETWORK_PPP) ;
+	AddFilesToFloppyBootArchive system add-ons kernel network protocols
+		: $(SYSTEM_NETWORK_PROTOCOLS) ;
 }
 
 # boot module links
@@ -115,8 +121,8 @@ AddBootModuleSymlinksToFloppyBootArchive
 	$(X86_ONLY)generic_x86
 	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
 	it8211
-	<usb>uhci <usb>ohci <usb>ehci
-	scsi_cd scsi_disk usb_disk
+	$(USB_ONLY)<usb>uhci $(USB_ONLY)<usb>ohci $(USB_ONLY)<usb>ehci
+	scsi_cd scsi_disk $(USB_ONLY)usb_disk
 	intel session
 	$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
 	$(BOOT_ADD_ONS_NET)
