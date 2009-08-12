@@ -203,7 +203,7 @@ status_t OpenFolder(const char* end)
 	path.Append(end);
 
 	entry_ref ref;
-	if (get_ref_for_path(path.Path(),&ref) != B_OK)
+	if (get_ref_for_path(path.Path(), &ref) != B_OK)
 		return B_NAME_NOT_FOUND;
 
 	if (!BEntry(&ref).Exists())
@@ -238,7 +238,7 @@ DeskbarView::MessageReceived(BMessage* message)
 		case MD_OPEN_NEW:
 		{
 			char* argv[] = {"New Message", "mailto:"};
-			be_roster->Launch("text/x-email",2,argv);
+			be_roster->Launch("text/x-email", 2, argv);
 			break;
 		}
 		case MD_OPEN_PREFS:
@@ -252,7 +252,7 @@ DeskbarView::MessageReceived(BMessage* message)
 		case B_QUERY_UPDATE:
 		{
 			int32 what;
-			message->FindInt32("opcode",&what);
+			message->FindInt32("opcode", &what);
 			switch (what) {
 				case B_ENTRY_CREATED:
 					fNewMessages++;

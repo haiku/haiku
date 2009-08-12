@@ -35,7 +35,7 @@
 #include <status.h>
 #include <StringList.h>
 
-#include "deskbarview.h"
+#include "DeskbarView.h"
 #include "LEDAnimation.h"
 
 #include <MDRLanguage.h>
@@ -53,7 +53,7 @@
 #endif
 
 using std::map;
-	
+
 typedef struct glorbal {
 	size_t bytes;
 	BStringList msgs;
@@ -68,14 +68,14 @@ class MailDaemonApp : public BApplication {
 
 		virtual void MessageReceived(BMessage *msg);
 		virtual	void RefsReceived(BMessage *a_message);
-		
+
 		virtual void Pulse();
 		virtual bool QuitRequested();
 		virtual void ReadyToRun();
 
 		void InstallDeskbarIcon();
 		void RemoveDeskbarIcon();
-		
+
 		void RunChains(BList &list,BMessage *msg);
 		void SendPendingMessages(BMessage *msg);
 		void GetNewMessages(BMessage *msg);
@@ -85,7 +85,7 @@ class MailDaemonApp : public BApplication {
 
 		BMessageRunner *auto_check;
 		BMailSettings settings_file;
-		
+
 		int32 new_messages;
 		bool central_beep;
 			// TRUE to do a beep when the status window closes.  This happens
@@ -94,17 +94,17 @@ class MailDaemonApp : public BApplication {
 			// Set to TRUE by the 'mcbp' message that the mail Notification
 			// filter sends us, cleared when the beep is done.
 		BList fetch_done_respondents;
-		
+
 		BList queries;
 		LEDAnimation *led;
-		
+
 		BString alert_string;
 };
 
 
 MailDaemonApp::MailDaemonApp(void)
 	: BApplication("application/x-vnd.Be-POST")
-{	
+{
 	status = new BMailStatusWindow(BRect(40, 400, 360, 400), "Mail Status",
 					settings_file.ShowStatusWindow());
 	auto_check = NULL;
@@ -174,12 +174,12 @@ MailDaemonApp::ReadyToRun()
 			string << new_messages << " 通の未読メッセージがあります ";
 		else
 			string << "未読メッセージはありません";
-	);	
+	);
 	central_beep = false;
 	status->SetDefaultMessage(string);
 
 	led = new LEDAnimation;
-	SetPulseRate(1000000);	
+	SetPulseRate(1000000);
 }
 
 
@@ -238,7 +238,7 @@ MailDaemonApp::MessageReceived(BMessage *msg)
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
 				int s = socket(AF_INET, SOCK_DGRAM, 0);
 				bsppp_status_t status;
-			
+
 				strcpy(status.if_name, "ppp0");
 				if (ioctl(s, BONE_SERIAL_PPP_GET_STATUS, &status, sizeof(status)) != 0) {
 					close(s);
@@ -287,7 +287,7 @@ MailDaemonApp::MessageReceived(BMessage *msg)
 			{
 			BMessage *msg, reply('mnuc');
 			reply.AddInt32("num_new_messages",new_messages);
-			
+
 			while((msg = (BMessage *)fetch_done_respondents.RemoveItem(0L))) {
 				msg->SendReply(&reply);
 				delete msg;
@@ -317,7 +317,7 @@ MailDaemonApp::MessageReceived(BMessage *msg)
 				fetch_done_respondents.AddItem(DetachCurrentMessage());
 				break;
 			}
-			
+
 			reply.AddInt32("num_new_messages",new_messages);
 			msg->SendReply(&reply);
 			}
@@ -337,13 +337,13 @@ MailDaemonApp::MessageReceived(BMessage *msg)
 				alert_string << num_messages << " new message";
 				if (num_messages > 1)
 					alert_string << 's';
-	
+
 				alert_string << " for " << msg->FindString("chain_name") << '\n';,
 
 				alert_string << msg->FindString("chain_name") << "より\n" << num_messages
 					<< " 通のメッセージが届きました　　";
 			);
-			
+
 			}
 			break;
 		case B_QUERY_UPDATE:
@@ -358,9 +358,9 @@ MailDaemonApp::MessageReceived(BMessage *msg)
 					new_messages--;
 					break;
 			}
-			
+
 			BString string;
-			
+
 			MDR_DIALECT_CHOICE (
 				if (new_messages > 0)
 					string << new_messages;
@@ -375,9 +375,9 @@ MailDaemonApp::MessageReceived(BMessage *msg)
 				else
 					string << "未読メッセージはありません";
 			);
-			
+
 			status->SetDefaultMessage(string.String());
-			
+
 			}
 			break;
 	}
@@ -422,7 +422,7 @@ bool
 MailDaemonApp::QuitRequested()
 {
 	RemoveDeskbarIcon();
-	
+
 	return true;
 }
 
@@ -466,7 +466,7 @@ MailDaemonApp::GetNewMessages(BMessage *msg)
 	BList list;
 	GetInboundMailChains(&list);
 
-	RunChains(list,msg);	
+	RunChains(list,msg);
 }
 
 
@@ -559,7 +559,7 @@ MailDaemonApp::SendPendingMessages(BMessage *msg)
 				BMailChainRunner *runner = GetMailChainRunner(chain_id,status);
 				runner->GetMessages(&ids,bytes);
 				runner->Stop();
-			}	
+			}
 		} else {
 			const char *path;
 			msg->FindString("message_path",&path);
@@ -612,7 +612,7 @@ makeIndices()
 		if (fs_stat_index(device, B_MAIL_ATTR_FLAGS, &indexInfo) == 0
 			&& indexInfo.type == B_STRING_TYPE)
 			fs_remove_index(device, B_MAIL_ATTR_FLAGS);
-			
+
 		for (int32 i = 0;stringIndices[i];i++)
 			fs_create_index(device,stringIndices[i],B_STRING_TYPE,0);
 
@@ -648,7 +648,7 @@ makeMimeType(bool remakeMIMETypes)
 	const char *types[2] = {"text/x-email","text/x-partial-email"};
 	BMimeType mime;
 	BMessage info;
-	
+
 	for (int i = 0; i < 2; i++) {
 		info.MakeEmpty();
 		mime.SetTo(types[i]);
@@ -699,7 +699,7 @@ makeMimeType(bool remakeMIMETypes)
 				if (!strcmp(result,"MAIL:fullsize"))
 					hasSize = true;
 			}
-		
+
 			if (!hasAccount)
 				addAttribute(info,B_MAIL_ATTR_ACCOUNT,"Account",B_STRING_TYPE,true,false,100);
 			if (!hasThread)
