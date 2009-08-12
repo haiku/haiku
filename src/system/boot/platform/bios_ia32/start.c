@@ -127,7 +127,7 @@ _start(void)
 	console_init();
 	cpu_init();
 	mmu_init();
-	parse_multiboot_commandline(&args);
+	//parse_multiboot_commandline(&args);
 
 	// wait a bit to give the user the opportunity to press a key
 	spin(750000);
@@ -142,7 +142,7 @@ _start(void)
 	acpi_init();
 	smp_init();
 	//hpet_init(); // TODO: Not yet
-	dump_multiboot_info();
+	//dump_multiboot_info();
 	main(&args);
 }
 
