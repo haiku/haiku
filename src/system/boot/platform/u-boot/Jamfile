@@ -15,6 +15,10 @@ UsePrivateHeaders [ FDirName storage ] ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti -g3 ;
 }
 
+# we fake NetBSD since we don't have an OS ID yet for uimage,
+# and we also fake a netbsd loader anyway.
+local uImageFakeOS = "netbsd" ;
+
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
 KernelMergeObject boot_platform_u-boot.o :
@@ -42,7 +46,8 @@ SubInclude HAIKU_TOP src system boot platform $(TARGET_BOOT_PLATFORM) board ;
 SubDir HAIKU_TOP src system boot platform u-boot ;
 
 # bootable flash image
-rule BuildUBootFlashImage image : haikuLoader : uboot_image {
+rule BuildUBootFlashImage image : haikuLoader : uboot_image
+{
 	Depends $(image) : $(haikuLoader) ;
 	#Depends $(image) : $(archive) ;
 	Depends $(image) : $(uboot_image) ;
@@ -55,35 +60,132 @@ rule BuildUBootFlashImage image : haikuLoader : uboot_image {
 }
 
 
-actions BuildUBootFlashImage1 {
+actions BuildUBootFlashImage1
+{
 	$(RM) $(<)
+
 	# make an empty image
-	dd if=/dev/zero of=$(<) bs=$(FLASH_IMAGE_BLOCK_SIZE) count=$(FLASH_IMAGE_BLOCK_COUNT)
+	dd of=$(<) \
+		if=/dev/zero \
+		bs=$(FLASH_IMAGE_BLOCK_SIZE) \
+		count=$(FLASH_IMAGE_BLOCK_COUNT)
+
 	# add u-boot
-	dd if=$(>[2]) of=$(<) bs=$(FLASH_IMAGE_BLOCK_SIZE) conv=notrunc
+	dd of=$(<) \
+		if=$(>[2]) \
+		bs=$(FLASH_IMAGE_BLOCK_SIZE) \
+		conv=notrunc
+
 	# add root fs
-	#dd if=$(>[3]) of=$(<) bs=$(FLASH_IMAGE_BLOCK_SIZE) conv=notrunc seek=$(FLASH_IMAGE_ROOTFS_OFFSET)
+#	dd of=$(<) \
+#		if=$(>[3]) \
+#		bs=$(FLASH_IMAGE_BLOCK_SIZE) \
+#		conv=notrunc \
+#		seek=$(FLASH_IMAGE_ROOTFS_OFFSET)
+
 	# add haiku_loader (raw, elf or uimage)
-	dd if=$(>[1]) of=$(<) bs=$(FLASH_IMAGE_BLOCK_SIZE) conv=notrunc seek=$(FLASH_IMAGE_LOADER_OFFSET)
+	dd of=$(<) \
+		if=$(>[1]) \
+		bs=$(FLASH_IMAGE_BLOCK_SIZE) \
+		conv=notrunc seek=$(FLASH_IMAGE_LOADER_OFFSET)
 }
 
 # uImage
-rule BuildUImage image : data : args {
+rule BuildUImage image : data : args
+{
 	Depends $(image) : $(data) ;
 	LocalClean clean : $(image) ;
 	MKIMAGE_ARGS on $(image) = $(args) ;
 	BuildUImage1 $(image) : $(data) ;
 }
 
-actions BuildUImage1 {
+actions BuildUImage1
+{
 	mkimage $(MKIMAGE_ARGS) -d $(>) $(<)
 }
 
-BuildUImage haiku_loader.ub : haiku_loader : "-A arm -O netbsd -T kernel -C none -a $(BOARD_UBOOT_LOADER_ADDRESS) -e $(BOARD_UBOOT_LOADER_ADDRESS) -n 'haiku_loader'" ;
+rule BuildUImageScript script : content
+{
+	LocalClean clean : $(script) ;
+	SCRIPTCONTENT on $(script) = $(content) ;
+	SCRIPTNAME on $(script) = $(script) ;
+	FAKEOS on $(script) = $(uImageFakeOS) ;
+	BuildUImageScript1 $(script) : $(content) ;
+}
 
-BuildUBootFlashImage haiku_flash_image_raw.img : haiku_loader : $(UBOOT_IMAGE) ;
-#BuildUBootFlashImage haiku_flash_image_elf.img : boot_loader_u-boot : $(UBOOT_IMAGE) ;
-BuildUBootFlashImage haiku_flash_image_uimage.img : haiku_loader.ub : $(UBOOT_IMAGE) ;
+actions BuildUImageScript1
+{
+	rm -f $(<) $(<).txt
+	echo '$(SCRIPTCONTENT)' > $(<).txt
+	mkimage -A arm -O $(FAKEOS) -T script -C none -n $(SCRIPTNAME) \
+		-d $(<).txt $(<)
+	rm -f $(<).txt
+}
+
+# SD/mmc image rule
+# requires sfdisk and mtools packages on linux
+rule BuildUBootSDImage image : files 
+{
+	Depends $(image) : $(files) ;
+	SDIMAGE_BLOCK_SIZE on $(image) = 1MB ;
+	SDIMAGE_SIZE on $(image) = $(HAIKU_BOARD_SDIMAGE_SIZE) ;
+	SDIMAGE_FDISK on $(image) = /sbin/sfdisk ;
+	SDIMAGE_FDISK_SCRIPT on $(image) = 
+		"0,$(HAIKU_BOARD_SDIMAGE_FAT_SIZE),0c,-\\\n,,eb\\\n\\\n" ;
+	SDIMAGE_FDISK_H on $(image) = 255 ;
+	SDIMAGE_FDISK_S on $(image) = 63 ;
+	SDIMAGE_FDISK_UNIT on $(image) = M ;
+	BuildUBootSDImage1 $(image) : $(files) ;
+}
+
+actions BuildUBootSDImage1
+{
+	$(RM) $(<)
+	$(RM) $(<).mtools
+
+	# make an empty image
+	dd of=$(<) \
+		if=/dev/zero \
+		bs=$(SDIMAGE_BLOCK_SIZE) \
+		count=$(SDIMAGE_SIZE)
+	# partition it
+	echo -e '$(SDIMAGE_FDISK_SCRIPT)' | $(SDIMAGE_FDISK) -f -D \
+		-H $(SDIMAGE_FDISK_H) -S $(SDIMAGE_FDISK_S) \
+		-u$(SDIMAGE_FDISK_UNIT) $(<)
+	# generate mtools config
+	echo 'drive i: file="$(<)" partition=1' > $(<).mtools
+	# format the image
+	MTOOLSRC=$(<).mtools mformat i:
+	# populate
+	MTOOLSRC=$(<).mtools mcopy $(>) i:
+	# list content
+	MTOOLSRC=$(<).mtools mdir i:
+	# cleanup
+	$(RM) $(<).mtools
+}
+
+# uimage targets
+BuildUImage haiku_loader.ub : haiku_loader : 
+	-A arm -O $(uImageFakeOS) -T kernel -C none
+	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_RAW)
+		-n 'haiku_loader' ;
+
+if $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) {
+	
+	BuildUImageScript $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) : 
+		$(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT) ;
+}
+
+# flash image targets
+BuildUBootFlashImage haiku_flash_image_raw.img : haiku_loader : 
+	$(HAIKU_BOARD_UBOOT_IMAGE) ;
+#BuildUBootFlashImage haiku_flash_image_elf.img : boot_loader_u-boot : 
+#	$(HAIKU_BOARD_UBOOT_IMAGE) ;
+BuildUBootFlashImage haiku_flash_image_uimage.img : haiku_loader.ub : 
+	$(HAIKU_BOARD_UBOOT_IMAGE) ;
+
+# SD/mmc image targets
+BuildUBootSDImage haiku.mmc : $(HAIKU_BOARD_SDIMAGE_FILES) ;
 
 SEARCH on [ FGristFiles text_menu.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;

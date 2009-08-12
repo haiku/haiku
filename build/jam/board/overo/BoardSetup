@@ -1,0 +1,60 @@
+# Gumstix Overo board-specific definitions
+
+HAIKU_BOARD_DESCRIPTION = "Gumstix Overo" ;
+
+
+#
+# Various hardcoded addresses
+#
+
+# load address for haiku_loader
+HAIKU_BOARD_LOADER_BASE = 0x80008000 ;
+# entry points (raw binary, and netbsd loader emulation)
+HAIKU_BOARD_LOADER_ENTRY_RAW = 0x80008000 ;
+HAIKU_BOARD_LOADER_ENTRY_NBSD = 0x80008004 ;
+
+# load address for haiku_loader uimage
+# (must be different than real load address)
+HAIKU_BOARD_LOADER_UIBASE = 0x84000000 ;
+
+HAIKU_BOARD_LOADER_STACK_BASE = 0x84000000 ;
+
+
+#
+# mmc/SD image
+#
+
+# in MB
+HAIKU_BOARD_SDIMAGE_SIZE = 256 ;
+
+# in MB
+HAIKU_BOARD_SDIMAGE_FAT_SIZE = 32 ;
+
+# offset in blocks XXX: FIXME
+# (autodetect from sfdisk or use cylinder count for fat size)
+HAIKU_BOARD_SDIMAGE_BFS_OFFSET = ;
+
+# autoboot script
+HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = gumstix-factory.script ;
+HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT = "if mmcinit; then \
+	fatload mmc 0 $(HAIKU_BOARD_LOADER_UIBASE) haiku_loader.ub; \
+	bootm $(HAIKU_BOARD_LOADER_UIBASE); \
+fi" ;
+
+HAIKU_BOARD_SDIMAGE_FILES =
+	haiku_loader
+	haiku_loader.ub
+	$(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME)
+;
+
+
+#
+# gcc flags for the specific cpu
+#
+
+TARGET_KERNEL_CCFLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
+TARGET_KERNEL_C++FLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
+TARGET_CCFLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
+TARGET_C++FLAGS += -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=soft ;
+
+

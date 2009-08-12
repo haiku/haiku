@@ -23,8 +23,9 @@ local librootFunctions =
 ;
 
 local extraLinkerArgs = ;
-if $(TARGET_BOOT_BOARD) {
-	extraLinkerArgs += -L$(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/board/$(TARGET_BOOT_BOARD) ;
+if $(HAIKU_BOARD_LOADER_BASE) {
+	#extraLinkerArgs += -L$(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/board/$(TARGET_BOOT_BOARD) ;
+	extraLinkerArgs += --defsym BOARD_LOADER_BASE=$(HAIKU_BOARD_LOADER_BASE) ;
 }
 
 AddResources haiku_loader : boot_loader.rdef ;
