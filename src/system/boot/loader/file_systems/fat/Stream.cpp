@@ -108,14 +108,12 @@ Stream::FindBlock(off_t pos, off_t &block, off_t &offset)
 {
 	//TRACE(("FATFS::Stream::%s(%Ld,,)\n", __FUNCTION__, pos));
 	uint32 index = (uint32)(pos / fVolume.ClusterSize());
-	uint32 cluster;
-	if (pos >= fSize)
-		return B_BAD_VALUE;
-	if (index >= fClusterCount)
+	if (pos >= fSize || index >= fClusterCount)
 		return B_BAD_VALUE;
 
+	uint32 cluster = 0;
 	bool found = false;
-	int i;
+	uint32 i;
 	for (i = 0; i < CLUSTER_MAP_CACHE_SIZE; i++) {
 		if (fClusterMapCache[i].block == index) {
 			cluster = fClusterMapCache[i].cluster;
@@ -142,7 +140,8 @@ Stream::FindBlock(off_t pos, off_t &block, off_t &offset)
 #endif
 	}
 	if (!fVolume.IsValidCluster(cluster))
-		return ENOENT;
+		return B_ENTRY_NOT_FOUND;
+
 	fClusterMapCache[fClusterMapCacheLast].block = index;
 	fClusterMapCache[fClusterMapCacheLast].cluster = cluster;
 	fClusterMapCacheLast++;
@@ -164,22 +163,21 @@ status_t
 Stream::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 {
 	TRACE(("FATFS::Stream::%s(%Ld, )\n", __FUNCTION__, pos));
-	status_t err;
-	// set/check boundaries for pos/length
 
+	// set/check boundaries for pos/length
 	if (pos < 0)
 		return B_BAD_VALUE;
 	if (pos >= fSize) {
 		*_length = 0;
-		return B_NO_ERROR;
+		return B_OK;
 	}
 
 #if 0
 	// lazily build the cluster list
 	if (!fClusters) {
-		err = BuildClusterList();
-		if (err < B_OK)
-			return err;
+		status_t status = BuildClusterList();
+		if (status != B_OK)
+			return status;
 	}
 #endif
 
@@ -197,7 +195,6 @@ Stream::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 
 	uint32 bytesRead = 0;
 	uint32 blockSize = fVolume.BlockSize();
-	uint32 blockShift = fVolume.BlockShift();
 	uint8 *block;
 
 	// the first block_run we read could not be aligned to the block_size boundary
@@ -251,7 +248,7 @@ Stream::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 			break;
 		}
 
-		if (read_pos(fVolume.Device(), fVolume.ToOffset(num), 
+		if (read_pos(fVolume.Device(), fVolume.ToOffset(num),
 			buffer + bytesRead, fVolume.BlockSize()) < B_OK) {
 			*_length = bytesRead;
 			return B_BAD_VALUE;
@@ -272,8 +269,9 @@ Stream::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 	}
 
 	*_length = bytesRead;
-	return B_NO_ERROR;
+	return B_OK;
 }
+
 
 status_t
 Stream::BuildClusterList()

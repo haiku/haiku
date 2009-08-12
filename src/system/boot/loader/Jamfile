@@ -39,7 +39,7 @@ UsePrivateHeaders shared storage ;
 			defines +=
 				BOOT_SUPPORT_PARTITION_EFI
 
-				BOOT_SUPPORT_FILE_SYSTEM_FAT
+				#BOOT_SUPPORT_FILE_SYSTEM_FAT
 			;
 		}
 	}
