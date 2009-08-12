@@ -200,6 +200,9 @@ pm_gdt_descriptor:
 /* global data table */
 .balign 8
 
+GLOBAL(gMultiBootInfo):
+	.long	0
+
 GLOBAL(gBootPartitionOffset):
 	.long	0xffffffff
 

@@ -26,6 +26,7 @@ local bios_ia32_src =
 	keyboard.cpp
 	menu.cpp
 	mmu.cpp
+	multiboot.cpp
 	cpu.cpp
 	acpi.cpp
 	smp.cpp
