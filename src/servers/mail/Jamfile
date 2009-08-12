@@ -15,7 +15,7 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 AddResources mail_daemon : mail_daemon.rdef DeskbarViewIcons.rdef ;
 
 Server mail_daemon :
-	deskbarview.cpp
+	DeskbarView.cpp
 	LEDAnimation.cpp
 	main.cpp
 ;

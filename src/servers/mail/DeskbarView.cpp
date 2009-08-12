@@ -36,7 +36,7 @@
 
 #include <MDRLanguage.h>
 
-#include "deskbarview.h"
+#include "DeskbarView.h"
 #include "DeskbarViewIcons.h"
 
 const char *kTrackerSignature = "application/x-vnd.Be-TRAK";
