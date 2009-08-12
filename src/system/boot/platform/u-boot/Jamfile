@@ -155,11 +155,11 @@ actions BuildUBootSDImage1
 	# generate mtools config
 	echo 'drive i: file="$(<)" partition=1' > $(<).mtools
 	# format the image
-	MTOOLSRC=$(<).mtools mformat i:
+	MTOOLSRC=$(<).mtools mformat -v "Haiku" i:
 	# populate
 	MTOOLSRC=$(<).mtools mcopy $(>) i:
 	# list content
-	MTOOLSRC=$(<).mtools mdir i:
+	#MTOOLSRC=$(<).mtools mdir i:
 	# cleanup
 	$(RM) $(<).mtools
 }
