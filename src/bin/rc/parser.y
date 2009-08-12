@@ -1,22 +1,22 @@
 /*
  * Copyright (c) 2003 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
 
@@ -37,39 +37,38 @@ using namespace std;
 
 #define YYERROR_VERBOSE
 
-static void yyerror(char*);
+static void yyerror(const char*);
 
 struct ident_compare_t {  // allows the maps to compare identifier names
 	bool
-	operator()(char* s1, char* s2) const
+	operator()(const char* s1, const char* s2) const
 	{
 		return strcmp(s1, s2) < 0;
 	}
 };
 
-typedef std::map<char*, int32, ident_compare_t> sym_tab_t;
+typedef std::map<const char*, int32, ident_compare_t> sym_tab_t;
 typedef sym_tab_t::iterator sym_iter_t;
+
+typedef std::map<const char*, type_t, ident_compare_t> type_tab_t;
+typedef type_tab_t::iterator type_iter_t;
+
+typedef std::map<const char*, define_t, ident_compare_t> define_tab_t;
+typedef define_tab_t::iterator define_iter_t;
+
 
 static sym_tab_t symbol_table;  // symbol table for enums
 static int32 enum_cnt;          // counter for enum symbols without id
-
-static void add_symbol(char*, int32);
-static int32 get_symbol(char*);
-
-typedef std::map<char*, type_t, ident_compare_t> type_tab_t;
-typedef type_tab_t::iterator type_iter_t;
-
 static type_tab_t type_table;  // symbol table for data types
-
-static void add_user_type(res_id_t, type_code, char*, list_t);
-
-typedef std::map<char*, define_t, ident_compare_t> define_tab_t;
-typedef define_tab_t::iterator define_iter_t;
-
 static define_tab_t define_table;  // symbol table for defines
 
-static bool is_type(char* name);
-static define_t get_define(char* name);
+
+static void add_user_type(res_id_t, type_code, const char*, list_t);
+static void add_symbol(const char*, int32);
+static int32 get_symbol(const char*);
+
+static bool is_type(const char* name);
+static define_t get_define(const char* name);
 
 static data_t make_data(size_t, type_t);
 static data_t make_bool(bool);
@@ -83,7 +82,7 @@ static BMessage* make_msg(list_t);
 static data_t flatten_msg(BMessage*);
 
 static data_t make_default(type_t);
-static data_t make_type(char*, list_t);
+static data_t make_type(char* name, list_t);
 
 static list_t make_field_list(field_t);
 static list_t concat_field_list(list_t, field_t);
@@ -97,6 +96,7 @@ static data_t unary_expr(data_t, char);
 static data_t binary_expr(data_t, data_t, char);
 
 static void add_resource(res_id_t, type_code, data_t);
+
 
 //------------------------------------------------------------------------------
 %}
@@ -130,7 +130,7 @@ static void add_resource(res_id_t, type_code, data_t);
 %type <id> id
 %type <d> archive array arrayfields data expr message msgfield
 %type <d> type typefield type_or_define
-%type <l> msgfields typefields typedeffields 
+%type <l> msgfields typefields typedeffields
 %type <F> typedeffield
 %type <T> datatype typecast
 
@@ -143,11 +143,11 @@ static void add_resource(res_id_t, type_code, data_t);
 
 %%
 
-script 
+script
 	: /* empty */
-	| script enum 
-	| script typedef 
-	| script resource 
+	| script enum
+	| script typedef
+	| script resource
 	;
 
 enum
@@ -204,7 +204,7 @@ typedeffield
 			$$.data   = make_default($1);
 		}
 	| datatype IDENT '=' expr
-		{ 
+		{
 			$$.type   = $1;
 			$$.name   = $2;
 			$$.resize = 0;
@@ -227,17 +227,17 @@ typedeffield
 	;
 
 resource
-	: RESOURCE id expr ';' 
-		{ 
-			add_resource($2, $3.type.code, $3); 
+	: RESOURCE id expr ';'
+		{
+			add_resource($2, $3.type.code, $3);
 		}
-	| RESOURCE id TYPECODE expr ';' 
-		{ 
-			add_resource($2, $3, $4); 
+	| RESOURCE id TYPECODE expr ';'
+		{
+			add_resource($2, $3, $4);
 		}
-	| RESOURCE id '(' TYPECODE ')' expr ';' 
-		{ 
-			add_resource($2, $4, $6); 
+	| RESOURCE id '(' TYPECODE ')' expr ';'
+		{
+			add_resource($2, $4, $6);
 		}
 	;
 
@@ -245,28 +245,28 @@ id
 	: /* empty */
 		{
 			$$.has_id = false; $$.has_name = false; $$.name = NULL;
-		} 
+		}
 	| '(' ')'
 		{
 			$$.has_id = false; $$.has_name = false; $$.name = NULL;
-		} 
+		}
 	| '(' integer ')'
-		{ 
-			$$.has_id = true; $$.id = (int32) $2; 
-			$$.has_name = false; $$.name = NULL; 
+		{
+			$$.has_id = true; $$.id = (int32) $2;
+			$$.has_name = false; $$.name = NULL;
 		}
 	| '(' integer ',' STRING ')'
-		{ 
-			$$.has_id = true; $$.id = (int32) $2; 
-			$$.has_name = true; $$.name = (char*) $4.ptr; 
+		{
+			$$.has_id = true; $$.id = (int32) $2;
+			$$.has_name = true; $$.name = (char*) $4.ptr;
 		}
 	| '(' IDENT ')'
-		{ 
+		{
 			$$.has_id = true; $$.id = get_symbol($2);
 
 			if (flags & RDEF_AUTO_NAMES)
 			{
-				$$.has_name = true; $$.name = $2; 
+				$$.has_name = true; $$.name = $2;
 			}
 			else
 			{
@@ -275,13 +275,13 @@ id
 			}
 		}
 	| '(' IDENT ',' STRING ')'
-		{ 
+		{
 			$$.has_id = true; $$.id = get_symbol($2);
 			$$.has_name = true; $$.name = (char*) $4.ptr;
-			free_mem($2); 
+			free_mem($2);
 		}
 	| '(' STRING ')'
-		{ 
+		{
 			$$.has_id = false;
 			$$.has_name = true; $$.name = (char*) $2.ptr;
 		}
@@ -401,7 +401,7 @@ type
 	| IDENT expr
 		{
 			$$ = make_type($1, make_data_list($2));
-		} 
+		}
 	| type_or_define { $$ = $1; }
 	;
 
@@ -432,7 +432,7 @@ typefield
 	| expr           { $$ = $1; }
 	;
 
-expr 
+expr
 	: expr '+' expr         { $$ = binary_expr($1, $3, '+'); }
 	| expr '-' expr         { $$ = binary_expr($1, $3, '-'); }
 	| expr '*' expr         { $$ = binary_expr($1, $3, '*'); }
@@ -473,7 +473,7 @@ typecast
 	| '(' MESSAGE ')'       { $$ = get_type("message"); }
 	| '(' ARCHIVE IDENT ')' { $$ = get_type("message"); free_mem($3); }
 	| '(' IDENT ')'         { $$ = get_type($2); free_mem($2); }
-	; 
+	;
 
 datatype
 	: ARRAY         { $$ = get_type("raw"); }
@@ -497,10 +497,10 @@ float
 
 
 void
-yyerror(char* msg)
+yyerror(const char* msg)
 {
 	// This function is called by the parser when it encounters
-	// an error, after which it aborts parsing and returns from 
+	// an error, after which it aborts parsing and returns from
 	// yyparse(). We never call yyerror() directly.
 
 	rdef_err = RDEF_COMPILE_ERR;
@@ -511,7 +511,7 @@ yyerror(char* msg)
 
 
 void
-add_symbol(char* name, int32 id)
+add_symbol(const char* name, int32 id)
 {
 	if (symbol_table.find(name) != symbol_table.end())
 		abort_compile(RDEF_COMPILE_ERR, "duplicate symbol %s", name);
@@ -521,7 +521,7 @@ add_symbol(char* name, int32 id)
 
 
 int32
-get_symbol(char* name)
+get_symbol(const char* name)
 {
 	sym_iter_t i = symbol_table.find(name);
 
@@ -533,7 +533,7 @@ get_symbol(char* name)
 
 
 static void
-add_builtin_type(type_code code, char* name)
+add_builtin_type(type_code code, const char* name)
 {
 	type_t type;
 	type.code     = code;
@@ -548,7 +548,7 @@ add_builtin_type(type_code code, char* name)
 
 
 void
-add_user_type(res_id_t id, type_code code, char* name, list_t list)
+add_user_type(res_id_t id, type_code code, const char* name, list_t list)
 {
 	if (type_table.find(name) != type_table.end())
 		abort_compile(RDEF_COMPILE_ERR, "duplicate type %s", name);
@@ -586,7 +586,7 @@ same_type(type_t type1, type_t type2)
 
 
 type_t
-get_type(char* name)
+get_type(const char* name)
 {
 	type_iter_t i = type_table.find(name);
 
@@ -598,14 +598,14 @@ get_type(char* name)
 
 
 bool
-is_type(char* name)
+is_type(const char* name)
 {
 	return type_table.find(name) != type_table.end();
 }
 
 
 define_t
-get_define(char* name)
+get_define(const char* name)
 {
 	define_iter_t i = define_table.find(name);
 
@@ -742,7 +742,7 @@ flatten_msg(BMessage* msg)
 
 data_t
 make_default(type_t type)
-{ 
+{
 	data_t out;
 
 	if (is_builtin_type(type)) {
@@ -1371,7 +1371,7 @@ add_resource(res_id_t id, type_code code, data_t data)
 		id.id = data.type.def_id;
 
 	if (!id.has_name)
-		id.name = data.type.def_name;
+		id.name = (char*)data.type.def_name;
 
 	if (!(flags & RDEF_MERGE_RESOURCES) && rsrc.HasResource(code, id.id))
 		abort_compile(RDEF_COMPILE_ERR, "duplicate resource");
@@ -1681,7 +1681,7 @@ add_file_types()
 
 
 static void
-add_define(char* name, int32 value)
+add_define(const char* name, int32 value)
 {
 	define_t define;
 	define.name  = name;
@@ -1749,7 +1749,7 @@ clean_up_parser()
 	// so we don't need to free them here; compile.cpp already does that
 	// when it cleans up. However, we do need to remove the entries from
 	// the tables, otherwise they will still be around the next time we are
-	// asked to compile something. 
+	// asked to compile something.
 
 #ifdef DEBUG
 	// Note that in DEBUG mode, we _do_ free these items, so they don't show
