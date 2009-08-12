@@ -1,9 +1,6 @@
 OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 
-/* include board-specific definitions */
-INCLUDE board.ld
-
 ENTRY(_start)
 SECTIONS
 {
