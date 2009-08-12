@@ -34,24 +34,24 @@ class BPath;
 class _EXPORT DeskbarView : public BView {
 	public:
 		DeskbarView (BRect frame);
-		DeskbarView (BMessage *data);
+		DeskbarView (BMessage* data);
 
 		virtual ~DeskbarView();
 
 		virtual void		Draw(BRect updateRect);
 		virtual void		AttachedToWindow();
-		static DeskbarView *Instantiate(BMessage *data);
-		virtual	status_t	Archive(BMessage *data, bool deep = true) const;
+		static DeskbarView*	Instantiate(BMessage* data);
+		virtual	status_t	Archive(BMessage* data, bool deep = true) const;
 		virtual void	 	MouseDown(BPoint);
 		virtual void	 	MouseUp(BPoint);
 		virtual void		MessageReceived(BMessage *message);
 		virtual void		Pulse();
 
 	private:
-		void		RefreshMailQuery();
-		bool		CreateMenuLinks(BDirectory &,BPath &);
-		void		CreateNewMailQuery(BEntry &);
-		BPopUpMenu	*BuildMenu();
+		void		_RefreshMailQuery();
+		bool		_CreateMenuLinks(BDirectory&, BPath&);
+		void		_CreateNewMailQuery(BEntry&);
+		BPopUpMenu*	_BuildMenu();
 		void		_InitBitmaps();
 
 		BBitmap*	fBitmaps[kStatusCount];

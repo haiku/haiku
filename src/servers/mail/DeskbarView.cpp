@@ -4,36 +4,35 @@
  */
 
 
-#include <PopUpMenu.h>
 #include <Bitmap.h>
-#include <Rect.h>
-#include <MenuItem.h>
-#include <Window.h>
-#include <Messenger.h>
-#include <Roster.h>
-#include <Resources.h>
-#include <Entry.h>
-#include <Path.h>
-#include <NodeMonitor.h>
-#include <VolumeRoster.h>
+#include <Deskbar.h>
 #include <Directory.h>
+#include <Entry.h>
 #include <FindDirectory.h>
 #include <IconUtils.h>
-#include <Query.h>
-#include <SymLink.h>
-#include <NodeInfo.h>
 #include <kernel/fs_info.h>
 #include <kernel/fs_index.h>
-#include <Deskbar.h>
+#include <MenuItem.h>
+#include <Messenger.h>
+#include <NodeInfo.h>
+#include <NodeMonitor.h>
+#include <Path.h>
+#include <PopUpMenu.h>
+#include <Query.h>
+#include <Rect.h>
+#include <Resources.h>
+#include <Roster.h>
 #include <String.h>
+#include <SymLink.h>
+#include <VolumeRoster.h>
+#include <Window.h>
 
 #include <stdio.h>
 #include <malloc.h>
 
 #include <E-mail.h>
-#include <MailSettings.h>
 #include <MailDaemon.h>
-
+#include <MailSettings.h>
 #include <MDRLanguage.h>
 
 #include "DeskbarView.h"
@@ -86,6 +85,7 @@ DeskbarView::DeskbarView(BRect frame)
 	_InitBitmaps();
 }
 
+
 DeskbarView::DeskbarView(BMessage *message)
 	:
 	BView(message),
@@ -93,6 +93,7 @@ DeskbarView::DeskbarView(BMessage *message)
 {
 	_InitBitmaps();
 }
+
 
 DeskbarView::~DeskbarView()
 {
@@ -102,6 +103,7 @@ DeskbarView::~DeskbarView()
 	for (int32 i = 0; i < fNewMailQueries.CountItems(); i++)
 		delete ((BQuery *)(fNewMailQueries.ItemAt(i)));
 }
+
 
 void DeskbarView::AttachedToWindow()
 {
@@ -114,14 +116,15 @@ void DeskbarView::AttachedToWindow()
 	SetLowColor(ViewColor());
 
 	if (be_roster->IsRunning("application/x-vnd.Be-POST")) {
-		RefreshMailQuery();
+		_RefreshMailQuery();
 	} else {
 		BDeskbar deskbar;
 		deskbar.RemoveItem("mail_daemon");
 	}
 }
 
-void DeskbarView::RefreshMailQuery()
+
+void DeskbarView::_RefreshMailQuery()
 {
 	for (int32 i = 0; i < fNewMailQueries.CountItems(); i++)
 		delete ((BQuery *)(fNewMailQueries.ItemAt(i)));
@@ -150,9 +153,10 @@ void DeskbarView::RefreshMailQuery()
 		newMailQuery->Fetch();
 
 		BEntry entry;
-		while (newMailQuery->GetNextEntry(&entry) == B_OK)
+		while (newMailQuery->GetNextEntry(&entry) == B_OK) {
 			if (entry.InitCheck() == B_OK)
 				fNewMessages++;
+		}
 
 		fNewMailQueries.AddItem(newMailQuery);
 	}
@@ -160,6 +164,7 @@ void DeskbarView::RefreshMailQuery()
 	fStatus = (fNewMessages > 0) ? kStatusNewMail : kStatusNoMail;
 	Invalidate();
 }
+
 
 DeskbarView* DeskbarView::Instantiate(BMessage *data)
 {
@@ -169,6 +174,7 @@ DeskbarView* DeskbarView::Instantiate(BMessage *data)
 	return new DeskbarView(data);
 }
 
+
 status_t DeskbarView::Archive(BMessage *data,bool deep) const
 {
 	BView::Archive(data, deep);
@@ -176,6 +182,7 @@ status_t DeskbarView::Archive(BMessage *data,bool deep) const
 	data->AddString("add_on", "application/x-vnd.Be-POST");
 	return B_NO_ERROR;
 }
+
 
 void DeskbarView::Draw(BRect /*updateRect*/)
 {
@@ -187,6 +194,7 @@ void DeskbarView::Draw(BRect /*updateRect*/)
 	SetDrawingMode(B_OP_COPY);
 }
 
+
 status_t OpenFolder(const char* end)
 {
 	BPath path;
@@ -194,9 +202,11 @@ status_t OpenFolder(const char* end)
 	path.Append(end);
 
 	entry_ref ref;
-	if (get_ref_for_path(path.Path(),&ref) != B_OK) return B_NAME_NOT_FOUND;
-	if (!BEntry(&ref).Exists()) return B_NAME_NOT_FOUND;
+	if (get_ref_for_path(path.Path(),&ref) != B_OK)
+		return B_NAME_NOT_FOUND;
 
+	if (!BEntry(&ref).Exists())
+		return B_NAME_NOT_FOUND;
 
 	BMessage open_mbox(B_REFS_RECEIVED);
 	open_mbox.AddRef("refs",&ref);
@@ -208,7 +218,7 @@ status_t OpenFolder(const char* end)
 
 
 void
-DeskbarView::MessageReceived(BMessage *message)
+DeskbarView::MessageReceived(BMessage* message)
 {
 	switch(message->what)
 	{
@@ -226,7 +236,7 @@ DeskbarView::MessageReceived(BMessage *message)
 
 		case MD_OPEN_NEW:
 		{
-			char *argv[] = {"New Message", "mailto:"};
+			char* argv[] = {"New Message", "mailto:"};
 			be_roster->Launch("text/x-email",2,argv);
 			break;
 		}
@@ -235,7 +245,7 @@ DeskbarView::MessageReceived(BMessage *message)
 			break;
 
 		case MD_REFRESH_QUERY:
-			RefreshMailQuery();
+			_RefreshMailQuery();
 			break;
 
 		case B_QUERY_UPDATE:
@@ -258,7 +268,8 @@ DeskbarView::MessageReceived(BMessage *message)
 			BMailDaemon::Quit();
 			break;
 
-		case B_REFS_RECEIVED:	// open received files in the standard mail application
+		// open received files in the standard mail application
+		case B_REFS_RECEIVED:
 		{
 			BMessage argv(B_ARGV_RECEIVED);
 			argv.AddString("argv", "E-mail");
@@ -267,14 +278,13 @@ DeskbarView::MessageReceived(BMessage *message)
 			BPath path;
 			int i = 0;
 
-			while (message->FindRef("refs",i++,&ref) == B_OK && path.SetTo(&ref) == B_OK)
-			{
+			while (message->FindRef("refs", i++, &ref) == B_OK
+				&& path.SetTo(&ref) == B_OK) {
 				//fprintf(stderr,"got %s\n", path.Path());
 				argv.AddString("argv", path.Path());
 			}
 
-			if (i > 1)
-			{
+			if (i > 1) {
 				argv.AddInt32("argc", i);
 				be_roster->Launch("text/x-email", &argv);
 			}
@@ -333,9 +343,9 @@ void
 DeskbarView::MouseUp(BPoint pos)
 {
 	if (fLastButtons & B_PRIMARY_MOUSE_BUTTON) {
-		if (OpenFolder("mail/mailbox") != B_OK)
-		if (OpenFolder("mail/in") != B_OK)
-		if (OpenFolder("mail/INBOX") != B_OK)
+		if (OpenFolder("mail/mailbox") != B_OK
+			&& OpenFolder("mail/in") != B_OK
+			&& OpenFolder("mail/INBOX") != B_OK)
 			OpenFolder("mail");
 	}
 
@@ -353,7 +363,7 @@ DeskbarView::MouseDown(BPoint pos)
 	if (fLastButtons & B_SECONDARY_MOUSE_BUTTON) {
 		ConvertToScreen(&pos);
 
-		BPopUpMenu *menu = BuildMenu();
+		BPopUpMenu* menu = _BuildMenu();
 		if (menu) {
 			menu->Go(pos, true, true, BRect(pos.x - 2, pos.y - 2,
 				pos.x + 2, pos.y + 2), true);
@@ -363,7 +373,7 @@ DeskbarView::MouseDown(BPoint pos)
 
 
 bool
-DeskbarView::CreateMenuLinks(BDirectory &directory,BPath &path)
+DeskbarView::_CreateMenuLinks(BDirectory& directory, BPath& path)
 {
 	status_t status = directory.SetTo(path.Path());
 	if (status == B_OK)
@@ -406,7 +416,7 @@ DeskbarView::CreateMenuLinks(BDirectory &directory,BPath &path)
 
 
 void
-DeskbarView::CreateNewMailQuery(BEntry &query)
+DeskbarView::_CreateNewMailQuery(BEntry& query)
 {
 	BFile file(&query, B_READ_WRITE | B_CREATE_FILE);
 	if (file.InitCheck() != B_OK)
@@ -421,21 +431,21 @@ DeskbarView::CreateNewMailQuery(BEntry &query)
 }
 
 
-BPopUpMenu *
-DeskbarView::BuildMenu()
+BPopUpMenu*
+DeskbarView::_BuildMenu()
 {
-	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
+	BPopUpMenu* menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	menu->SetFont(be_plain_font);
 
 	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE (
-		"Create New Message","N) 新規メッセージ作成")B_UTF8_ELLIPSIS,
+		"Create New Message", "N) 新規メッセージ作成")B_UTF8_ELLIPSIS,
 		new BMessage(MD_OPEN_NEW)));
 	menu->AddSeparatorItem();
 
 	BMessenger tracker(kTrackerSignature);
-	BNavMenu *navMenu;
-	BMenuItem *item;
-	BMessage *msg;
+	BNavMenu* navMenu;
+	BMenuItem* item;
+	BMessage* msg;
 	entry_ref ref;
 
 	BPath path;
@@ -443,7 +453,7 @@ DeskbarView::BuildMenu()
 	path.Append("Mail/Menu Links");
 
 	BDirectory directory;
-	if (CreateMenuLinks(directory, path)) {
+	if (_CreateMenuLinks(directory, path)) {
 		int32 count = 0;
 
 		while (directory.GetNextRef(&ref) == B_OK) {
@@ -466,11 +476,12 @@ DeskbarView::BuildMenu()
 					BNode node(&entry);
 					BNodeInfo info(&node);
 					if (info.GetType(mimeString) == B_OK
-						&& strcmp(mimeString, "application/x-vnd.Be-query") == 0)
+						&& strcmp(mimeString, "application/x-vnd.Be-query")
+							== 0)
 						useNavMenu = true;
 				}
-				// clobber the existing ref only if the symlink derefernces completely,
-				// otherwise we'll stick with what we have
+				// clobber the existing ref only if the symlink derefernces
+				// completely, otherwise we'll stick with what we have
 				entry.GetRef(&ref);
 			}
 
@@ -514,7 +525,7 @@ DeskbarView::BuildMenu()
 
 		BEntry query(path.Path());
 		if (!query.Exists())
-			CreateNewMailQuery(query);
+			_CreateNewMailQuery(query);
 		query.GetRef(&ref);
 
 		item = new BMenuItem(navMenu = new BNavMenu(string.String(),
@@ -541,9 +552,9 @@ DeskbarView::BuildMenu()
 		chainMenu->SetFont(&font);
 
 		for (int32 i = 0; i < list.CountItems(); i++) {
-			BMailChain *chain = (BMailChain *)list.ItemAt(i);
+			BMailChain* chain = (BMailChain*)list.ItemAt(i);
 
-			BMessage *message = new BMessage(MD_CHECK_FOR_MAILS);
+			BMessage* message = new BMessage(MD_CHECK_FOR_MAILS);
 			message->AddString("account", chain->Name());
 
 			chainMenu->AddItem(new BMenuItem(chain->Name(), message));
@@ -573,12 +584,12 @@ DeskbarView::BuildMenu()
 
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(
-		MDR_DIALECT_CHOICE ("Edit Preferences","P) メール環境設定") B_UTF8_ELLIPSIS,
+		MDR_DIALECT_CHOICE ("Edit Preferences", "P) メール環境設定") B_UTF8_ELLIPSIS,
 		new BMessage(MD_OPEN_PREFS)));
 
 	if (modifiers() & B_SHIFT_KEY) {
 		menu->AddItem(new BMenuItem(
-			MDR_DIALECT_CHOICE ("Shutdown Mail Services","Q) 終了"),
+			MDR_DIALECT_CHOICE ("Shutdown Mail Services", "Q) 終了"),
 			new BMessage(B_QUIT_REQUESTED)));
 	}
 
@@ -595,4 +606,3 @@ DeskbarView::BuildMenu()
 	}
 	return menu;
 }
-
