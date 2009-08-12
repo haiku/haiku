@@ -1,9 +1,10 @@
+/* DeskbarView - mail_daemon's deskbar menu and view
+ *
+ * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+ */
 #ifndef DESKBAR_VIEW_H
 #define DESKBAR_VIEW_H
-/* DeskbarView - main_daemon's deskbar menu and view
-**
-** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+
 
 #include <View.h>
 
@@ -32,35 +33,34 @@ class BEntry;
 class BPath;
 
 class _EXPORT DeskbarView : public BView {
-	public:
-		DeskbarView (BRect frame);
-		DeskbarView (BMessage* data);
+public:
+						DeskbarView(BRect frame);
+						DeskbarView(BMessage* data);
+	virtual				~DeskbarView();
 
-		virtual ~DeskbarView();
+	virtual void		Draw(BRect updateRect);
+	virtual void		AttachedToWindow();
+	static DeskbarView*	Instantiate(BMessage* data);
+	virtual	status_t	Archive(BMessage* data, bool deep = true) const;
+	virtual void	 	MouseDown(BPoint);
+	virtual void	 	MouseUp(BPoint);
+	virtual void		MessageReceived(BMessage* message);
+	virtual void		Pulse();
 
-		virtual void		Draw(BRect updateRect);
-		virtual void		AttachedToWindow();
-		static DeskbarView*	Instantiate(BMessage* data);
-		virtual	status_t	Archive(BMessage* data, bool deep = true) const;
-		virtual void	 	MouseDown(BPoint);
-		virtual void	 	MouseUp(BPoint);
-		virtual void		MessageReceived(BMessage *message);
-		virtual void		Pulse();
+private:
+	void				_RefreshMailQuery();
+	bool				_CreateMenuLinks(BDirectory&, BPath&);
+	void				_CreateNewMailQuery(BEntry&);
+	BPopUpMenu*			_BuildMenu();
+	void				_InitBitmaps();
 
-	private:
-		void		_RefreshMailQuery();
-		bool		_CreateMenuLinks(BDirectory&, BPath&);
-		void		_CreateNewMailQuery(BEntry&);
-		BPopUpMenu*	_BuildMenu();
-		void		_InitBitmaps();
+	BBitmap*			fBitmaps[kStatusCount];
+	int32				fStatus;
 
-		BBitmap*	fBitmaps[kStatusCount];
-		int32		fStatus;
+	BList				fNewMailQueries;
+	int32				fNewMessages;
 
-		BList		fNewMailQueries;
-		int32		fNewMessages;
-
-		int32		fLastButtons;
+	int32				fLastButtons;
 };
 
 #endif	/* DESKBAR_VIEW_H */

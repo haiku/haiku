@@ -1,8 +1,13 @@
-/* DeskbarView - main_daemon's deskbar menu and view
+/* DeskbarView - mail_daemon's deskbar menu and view
  *
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
  */
 
+
+#include "DeskbarView.h"
+
+#include <stdio.h>
+#include <malloc.h>
 
 #include <Bitmap.h>
 #include <Deskbar.h>
@@ -27,18 +32,14 @@
 #include <VolumeRoster.h>
 #include <Window.h>
 
-#include <stdio.h>
-#include <malloc.h>
-
 #include <E-mail.h>
 #include <MailDaemon.h>
 #include <MailSettings.h>
 #include <MDRLanguage.h>
 
-#include "DeskbarView.h"
 #include "DeskbarViewIcons.h"
 
-const char *kTrackerSignature = "application/x-vnd.Be-TRAK";
+const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
 
 
 //-----The following #defines get around a bug in get_image_info on ppc---
