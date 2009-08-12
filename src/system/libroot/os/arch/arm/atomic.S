@@ -11,7 +11,7 @@
 /* int atomic_add(int *value, int increment)
  */
 FUNCTION(atomic_add):
-#if ARM_ISA_ARMV6 || ARM_ISA_ARMV7
+#if __ARM_ARCH__ >= 6
 miss1:	       	ldrex       r12, [r0]
         	add         r2,  r12, r1
         	strex       r3,  r2,  [r0]
@@ -46,7 +46,7 @@ FUNCTION_END(atomic_add)
 /* int atomic_and(int *value, int andValue)
  */
 FUNCTION(atomic_and):
-#if ARM_ISA_ARMV6 || ARM_ISA_ARMV7
+#if __ARM_ARCH__ >= 6
 miss2:	       	ldrex       r12, [r0]
         	and         r2,  r12, r1
         	strex       r3,  r2,  [r0]
@@ -79,7 +79,7 @@ FUNCTION_END(atomic_and)
 /* int atomic_or(int *value, int orValue)
  */
 FUNCTION(atomic_or):
-#if ARM_ISA_ARMV6 || ARM_ISA_ARMV7
+#if __ARM_ARCH__ >= 6
 
 miss3:	       	ldrex       r12, [r0]
         	eor         r2,  r12, r1
@@ -113,16 +113,19 @@ FUNCTION_END(atomic_or)
 /* int atomic_set(int *value, int setTo)
  */
 FUNCTION(atomic_set):
+#if __ARM_ARCH__ >= 6
 miss4:		ldrex   r12, [r0]
        		strex   r3, r1, [r0]
        		teq     r3, #0
        		bne     miss4
 	        mov         pc,  lr
+#endif
 FUNCTION_END(atomic_set)
 
 /* int atomic_test_and_set(int *value, int setTo, int testValue) 
  */
 FUNCTION(atomic_test_and_set):
+#if __ARM_ARCH__ >= 6
 /*miss5:  ldrex       r12, [r0]                       @ load from the address and mark it exclusive
         cmp         r12, r2                         @ compare the value with the comperand(r2)
         strexeq     r3,  r1,  [r0]                  @ if they were equal, attempt to store the new value (r1)
@@ -132,6 +135,7 @@ FUNCTION(atomic_test_and_set):
         bne         same                            @ if it succeeded, jump to (same) and return. there is no need to clrex if strex succeeded
 differ: clrex                           	    @ clrex
 same:   mov         r0,  r12*/
+#endif
 #warning TODO TODO TODO
         mov         pc,  lr
 FUNCTION_END(atomic_test_and_set)
