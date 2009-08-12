@@ -18,6 +18,7 @@
 #include <VolumeRoster.h>
 #include <Directory.h>
 #include <FindDirectory.h>
+#include <IconUtils.h>
 #include <Query.h>
 #include <SymLink.h>
 #include <NodeInfo.h>
@@ -36,6 +37,7 @@
 #include <MDRLanguage.h>
 
 #include "deskbarview.h"
+#include "DeskbarViewIcons.h"
 
 const char *kTrackerSignature = "application/x-vnd.Be-TRAK";
 
@@ -62,7 +64,7 @@ status_t our_image(image_info* image)
 			(char*)our_image <= (char*)image->text_part + image->text_part_size)
 			break;
 	}
-	
+
 	return ret;
 }
 
@@ -76,36 +78,44 @@ BView* instantiate_deskbar_item(void)
 //	#pragma mark -
 
 
-DeskbarView::DeskbarView(BRect frame) 
-	: BView(frame, "mail_daemon", B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED)
-	, fIcon(NULL)
-	, fCurrentIconState(NEW_MAIL)
+DeskbarView::DeskbarView(BRect frame)
+	:
+	BView(frame, "mail_daemon", B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED),
+	fStatus(kStatusNoMail)
 {
+	_InitBitmaps();
 }
 
 DeskbarView::DeskbarView(BMessage *message)
-	: BView(message)
-	, fIcon(NULL)
-	, fCurrentIconState(NEW_MAIL)
+	:
+	BView(message),
+	fStatus(kStatusNoMail)
 {
-	ChangeIcon(NO_MAIL);
+	_InitBitmaps();
 }
 
 DeskbarView::~DeskbarView()
 {
-	delete fIcon;
+	for (int i = 0; i < kStatusCount; i++)
+		delete fBitmaps[i];
+
 	for (int32 i = 0; i < fNewMailQueries.CountItems(); i++)
 		delete ((BQuery *)(fNewMailQueries.ItemAt(i)));
 }
 
 void DeskbarView::AttachedToWindow()
 {
-	if (be_roster->IsRunning("application/x-vnd.Be-POST"))
-	{
-		RefreshMailQuery();
-	}
+	BView::AttachedToWindow();
+	if (Parent())
+		SetViewColor(Parent()->ViewColor());
 	else
-	{
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	SetLowColor(ViewColor());
+
+	if (be_roster->IsRunning("application/x-vnd.Be-POST")) {
+		RefreshMailQuery();
+	} else {
 		BDeskbar deskbar;
 		deskbar.RemoveItem("mail_daemon");
 	}
@@ -120,10 +130,10 @@ void DeskbarView::RefreshMailQuery()
 	BVolumeRoster volumes;
 	BVolume volume;
 	fNewMessages = 0;
-	
+
 	while (volumes.GetNextVolume(&volume) == B_OK) {
 		BQuery *newMailQuery = new BQuery;
-	
+
 		newMailQuery->SetTarget(this);
 		newMailQuery->SetVolume(&volume);
 		newMailQuery->PushAttr(B_MAIL_ATTR_STATUS);
@@ -138,16 +148,17 @@ void DeskbarView::RefreshMailQuery()
 		newMailQuery->PushOp(B_OR);
 		newMailQuery->PushOp(B_AND);
 		newMailQuery->Fetch();
-		
+
 		BEntry entry;
 		while (newMailQuery->GetNextEntry(&entry) == B_OK)
 			if (entry.InitCheck() == B_OK)
 				fNewMessages++;
-		
+
 		fNewMailQueries.AddItem(newMailQuery);
 	}
 
-	ChangeIcon((fNewMessages > 0) ? NEW_MAIL : NO_MAIL);
+	fStatus = (fNewMessages > 0) ? kStatusNewMail : kStatusNoMail;
+	Invalidate();
 }
 
 DeskbarView* DeskbarView::Instantiate(BMessage *data)
@@ -168,18 +179,12 @@ status_t DeskbarView::Archive(BMessage *data,bool deep) const
 
 void DeskbarView::Draw(BRect /*updateRect*/)
 {
-	PushState();
+	if (fBitmaps[fStatus] == NULL)
+		return;
 
-	SetHighColor(Parent()->ViewColor());
-	FillRect(BRect(0.0,0.0,15.0,15.0));
-	if(fIcon)
-	{
-		SetDrawingMode(B_OP_OVER);
-		DrawBitmap(fIcon,BRect(0.0,0.0,15.0,15.0));
-	}
-
-	PopState();
-	Sync();
+	SetDrawingMode(B_OP_ALPHA);
+	DrawBitmap(fBitmaps[fStatus]);
+	SetDrawingMode(B_OP_COPY);
 }
 
 status_t OpenFolder(const char* end)
@@ -187,15 +192,15 @@ status_t OpenFolder(const char* end)
 	BPath path;
 	find_directory(B_USER_DIRECTORY, &path);
 	path.Append(end);
-	
+
 	entry_ref ref;
 	if (get_ref_for_path(path.Path(),&ref) != B_OK) return B_NAME_NOT_FOUND;
 	if (!BEntry(&ref).Exists()) return B_NAME_NOT_FOUND;
-	
-	
+
+
 	BMessage open_mbox(B_REFS_RECEIVED);
 	open_mbox.AddRef("refs",&ref);
-	
+
 	BMessenger tracker("application/x-vnd.Be-TRAK");
 	tracker.SendMessage(&open_mbox);
 	return B_OK;
@@ -244,8 +249,9 @@ DeskbarView::MessageReceived(BMessage *message)
 				case B_ENTRY_REMOVED:
 					fNewMessages--;
 					break;
-			}	
-			ChangeIcon((fNewMessages > 0) ? NEW_MAIL : NO_MAIL);
+			}
+			fStatus = (fNewMessages > 0) ? kStatusNewMail : kStatusNoMail;
+			Invalidate();
 			break;
 		}
 		case B_QUIT_REQUESTED:
@@ -256,17 +262,17 @@ DeskbarView::MessageReceived(BMessage *message)
 		{
 			BMessage argv(B_ARGV_RECEIVED);
 			argv.AddString("argv", "E-mail");
-			
+
 			entry_ref ref;
 			BPath path;
 			int i = 0;
-			
+
 			while (message->FindRef("refs",i++,&ref) == B_OK && path.SetTo(&ref) == B_OK)
 			{
 				//fprintf(stderr,"got %s\n", path.Path());
 				argv.AddString("argv", path.Path());
 			}
-			
+
 			if (i > 1)
 			{
 				argv.AddInt32("argc", i);
@@ -281,40 +287,38 @@ DeskbarView::MessageReceived(BMessage *message)
 
 
 void
-DeskbarView::ChangeIcon(int32 icon)
+DeskbarView::_InitBitmaps()
 {
-	if (fCurrentIconState == icon)
-		return;
-
-	BBitmap *newIcon(NULL);
+	for (int i = 0; i < kStatusCount; i++)
+		fBitmaps[i] = NULL;
 
 	image_info info;
-	if (our_image(&info) == B_OK) {
-		BFile file(info.name, B_READ_ONLY);
-		if (file.InitCheck() < B_OK)
-			goto err;
+	if (our_image(&info) != B_OK)
+		return;
 
-		BResources rsrc(&file);
-		size_t len;
-		const void *data = rsrc.LoadResource('BBMP', icon == NEW_MAIL
-			? "New" : "Read",&len);
-		if (len == 0)
-			goto err;
+	BFile file(info.name, B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return;
 
-		BMemoryIO stream(data, len);
-		stream.Seek(0, SEEK_SET);
-		BMessage archive;
-		if (archive.Unflatten(&stream) != B_OK)
-			goto err;
-		newIcon = new BBitmap(&archive);
-	} else
-		fputs("no image!", stderr);
+	BResources resources(&file);
+	if (resources.InitCheck() != B_OK)
+		return;
 
-err:
-	fCurrentIconState = icon;
-	delete fIcon;
-	fIcon = newIcon;
-	Invalidate();
+	for (int i = 0; i < kStatusCount; i++) {
+		const void* data = NULL;
+		size_t size;
+		data = resources.LoadResource(B_VECTOR_ICON_TYPE,
+			kIconNoMail + i, &size);
+		if (data != NULL) {
+			BBitmap* icon = new BBitmap(Bounds(), B_RGBA32);
+			if (icon->InitCheck() == B_OK
+				&& BIconUtils::GetVectorIcon((const uint8 *)data,
+					size, icon) == B_OK) {
+				fBitmaps[i] = icon;
+			} else
+				delete icon;
+		}
+	}
 }
 
 
@@ -465,7 +469,7 @@ DeskbarView::BuildMenu()
 						&& strcmp(mimeString, "application/x-vnd.Be-query") == 0)
 						useNavMenu = true;
 				}
-				// clobber the existing ref only if the symlink derefernces completely, 
+				// clobber the existing ref only if the symlink derefernces completely,
 				// otherwise we'll stick with what we have
 				entry.GetRef(&ref);
 			}

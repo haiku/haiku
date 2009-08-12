@@ -10,9 +10,10 @@
 #include "NavMenu.h"
 
 
-enum MDDeskbarIcon {
-	NO_MAIL = 0,
-	NEW_MAIL,
+enum {
+	kStatusNoMail = 0,
+	kStatusNewMail,
+	kStatusCount
 };
 
 enum MDDeskbarMessages {
@@ -33,7 +34,7 @@ class BPath;
 class _EXPORT DeskbarView : public BView {
 	public:
 		DeskbarView (BRect frame);
-		DeskbarView (BMessage *data);	
+		DeskbarView (BMessage *data);
 
 		virtual ~DeskbarView();
 
@@ -46,17 +47,16 @@ class _EXPORT DeskbarView : public BView {
 		virtual void		MessageReceived(BMessage *message);
 		virtual void		Pulse();
 
-		void				ChangeIcon(int32 icon);
-
 	private:
 		void		RefreshMailQuery();
 		bool		CreateMenuLinks(BDirectory &,BPath &);
 		void		CreateNewMailQuery(BEntry &);
 		BPopUpMenu	*BuildMenu();
-	
-		BBitmap		*fIcon;
-		int32		fCurrentIconState;
-		
+		void		_InitBitmaps();
+
+		BBitmap*	fBitmaps[kStatusCount];
+		int32		fStatus;
+
 		BList		fNewMailQueries;
 		int32		fNewMessages;
 
