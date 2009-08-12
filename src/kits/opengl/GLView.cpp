@@ -55,7 +55,7 @@ struct glview_direct_info {
 };
 
 
-BGLView::BGLView(BRect rect, char *name, ulong resizingMode, ulong mode,
+BGLView::BGLView(BRect rect, const char *name, ulong resizingMode, ulong mode,
 		ulong options)
    : BView(rect, name, B_FOLLOW_ALL_SIDES, mode | B_WILL_DRAW | B_FRAME_EVENTS), //  | B_FULL_UPDATE_ON_RESIZE)
 	fGc(NULL),
@@ -462,7 +462,7 @@ BGLView &BGLView::operator=(const BGLView &v)
 
 // TODO: implement BGLScreen class...
 
-BGLScreen::BGLScreen(char *name, ulong screenMode, ulong options,
+BGLScreen::BGLScreen(const char *name, ulong screenMode, ulong options,
 			status_t *error, bool debug)
   : BWindowScreen(name, screenMode, error, debug)
 {

@@ -43,7 +43,7 @@ private:
 };
 
 
-void AddItem(BListView *list, int level, char *text, ...)
+void AddItem(BListView *list, int level, const char *text, ...)
 {
 	char buffer[512];
 	va_list arg;

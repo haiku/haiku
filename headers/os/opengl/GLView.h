@@ -34,7 +34,7 @@ class GLRendererRoster;
 
 class BGLView : public BView {
 public:
-					BGLView(BRect rect, char *name,
+					BGLView(BRect rect, const char *name,
 						ulong resizingMode, ulong mode,
 						ulong options);
 	virtual			~BGLView();
@@ -119,7 +119,7 @@ private:
 
 class BGLScreen : public BWindowScreen {
 public:
-				BGLScreen(char *name,
+				BGLScreen(const char *name,
 					ulong screenMode, ulong options,
 					status_t *error, bool debug=false);
 				~BGLScreen();
