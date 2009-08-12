@@ -1,0 +1,10 @@
+resource app_signature "application/x-vnd.haiku-mountvolume";
+
+resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP;
+
+resource(1, "BEOS:FILE_TYPES") message
+{
+	"types" = "application/x-bfs-image",
+	"types" = "application/x-cd-image"
+};
+

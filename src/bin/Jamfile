@@ -14,6 +14,7 @@ ResComp $(haiku-utils_rsrc) : [ FGristFiles haiku-utils.rdef ] ;
 AddResources fortune : fortune.rdef ;
 AddResources hey : hey.rdef ;
 AddResources mimeset : mimeset.rdef ;
+AddResources mountvolume : mountvolume.rdef ;
 AddResources urlwrapper : urlwrapper.rdef ;
 
 # standard commands that don't need any additional library

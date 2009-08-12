@@ -1,8 +1,9 @@
 /*
- * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
- * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2007 Ingo Weinhold, bonefish@users.sf.net
+ * Copyright 2005-2009 Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2009 Jonas Sundström, jonas@kirilla.se
  *
- * Distributed under the terms of the MIT License.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
@@ -14,6 +15,7 @@
 #include <string.h>
 #include <termios.h>
 
+#include <Application.h>
 #include <Path.h>
 #include <String.h>
 #include <fs_volume.h>
@@ -288,8 +290,67 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 //	#pragma mark -
 
 
-int
-main(int argc, char** argv)
+class MountVolume : public BApplication {
+public:
+						MountVolume();
+	virtual				~MountVolume();
+
+	virtual	void		RefsReceived(BMessage* message);
+	virtual	void		ArgvReceived(int32 argc, char** argv);
+	virtual	void		ReadyToRun();
+};
+
+
+MountVolume::MountVolume()
+	:
+	BApplication("application/x-vnd.haiku-mountvolume")
+{
+}
+
+
+MountVolume::~MountVolume()
+{
+}
+
+
+void
+MountVolume::RefsReceived(BMessage* message)
+{
+	status_t status;
+	int32 refCount;
+	type_code typeFound;
+
+	status = message->GetInfo("refs", &typeFound, &refCount);
+	if (status != B_OK || refCount < 1) {
+		fprintf(stderr, "Failed to get info from entry_refs BMessage: %s\n",
+			strerror(status));
+		exit(1);
+	}
+
+	entry_ref ref;
+	BPath path;
+
+	int32 argc = refCount + 1;
+	char** argv = new char*[argc + 1];
+	argv[0] = strdup(kAppName);
+
+	for (int32 i = 0; i < refCount; i++) {
+		message->FindRef("refs", i, &ref);
+		status = path.SetTo(&ref);
+		if (status != B_OK) {
+			fprintf(stderr, "Failed to get a path (%s) from entry (%s): %s\n",
+				path.Path(), ref.name, strerror(status));
+		}
+		argv[1 + i] = strdup(path.Path());
+	}
+	argv[argc] = NULL;
+
+	ArgvReceived(argc, argv);
+}
+
+
+void
+MountVolume::ArgvReceived(int32 argc, char** argv)
 {
 	MountVisitor mountVisitor;
 	PrintPartitionsVisitor printPartitionsVisitor;
@@ -460,5 +521,25 @@ main(int argc, char** argv)
 			deviceList.VisitEachMountablePartition(&printPartitionsVisitor);
 	}
 
+	exit(0);
+}
+
+
+void
+MountVolume::ReadyToRun()
+{
+	Quit();
+}
+
+
+//	#pragma mark -
+
+
+int
+main()
+{
+	MountVolume mountVolume;
+	mountVolume.Run();
 	return 0;
 }
+
