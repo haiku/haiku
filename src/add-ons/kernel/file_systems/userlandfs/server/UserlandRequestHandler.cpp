@@ -284,13 +284,11 @@ status_t
 UserlandRequestHandler::_HandleRequest(UnmountVolumeRequest* request)
 {
 	// check and execute the request
-	status_t result = B_OK;
-	Volume* volume = (Volume*)request->volume;
-	if (!volume)
-		result = B_BAD_VALUE;
-	if (result == B_OK) {
+	status_t result = B_BAD_VALUE;
+	if (Volume* volume = (Volume*)request->volume) {
 		RequestThreadContext context(volume, request);
 		result = volume->Unmount();
+		fFileSystem->DeleteVolume(volume);
 	}
 
 	// prepare the reply
