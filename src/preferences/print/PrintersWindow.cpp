@@ -44,15 +44,20 @@
 #include <Application.h>
 #include <FindDirectory.h>
 
+
 PrintersWindow::PrintersWindow(BRect frame)
-	: Inherited(BRect(78.0, 71.0, 561.0, 409.0), "Printers", B_TITLED_WINDOW, B_NOT_H_RESIZABLE)
-	, fSelectedPrinter(NULL)
-	, fAddingPrinter(false)
+	:
+	Inherited(BRect(78.0, 71.0, 561.0, 409.0), "Printers", B_TITLED_WINDOW,
+			B_NOT_H_RESIZABLE),
+	fSelectedPrinter(NULL),
+	fAddingPrinter(false)
 {
 	BuildGUI();
 }
 
-bool PrintersWindow::QuitRequested()
+
+bool
+PrintersWindow::QuitRequested()
 {
 	bool result = Inherited::QuitRequested();
 	if (result) {
@@ -62,7 +67,9 @@ bool PrintersWindow::QuitRequested()
 	return result;
 }
 
-void PrintersWindow::MessageReceived(BMessage* msg)
+
+void
+PrintersWindow::MessageReceived(BMessage* msg)
 {
 	switch(msg->what)
 	{
@@ -155,7 +162,9 @@ void PrintersWindow::MessageReceived(BMessage* msg)
 	}
 }
 
-void PrintersWindow::BuildGUI()
+
+void
+PrintersWindow::BuildGUI()
 {
 	const float boxInset = 10.0;
 	BRect r(Bounds());
@@ -280,11 +289,15 @@ void PrintersWindow::BuildGUI()
 	SetSizeLimits(Bounds().Width(), Bounds().Width(), Bounds().Height(), 20000);	
 }
 
-bool PrintersWindow::IsSelected(PrinterItem* printer) {
+
+bool
+PrintersWindow::IsSelected(PrinterItem* printer) {
 	return fSelectedPrinter && fSelectedPrinter == printer;
 }
 
-void PrintersWindow::AddJob(SpoolFolder* folder, Job* job) {
+
+void
+PrintersWindow::AddJob(SpoolFolder* folder, Job* job) {
 	if (IsSelected(folder->Item())) {
 		fJobListView->AddJob(job);
 	}
@@ -292,7 +305,9 @@ void PrintersWindow::AddJob(SpoolFolder* folder, Job* job) {
 	UpdatePrinterButtons();
 }
 
-void PrintersWindow::RemoveJob(SpoolFolder* folder, Job* job) {
+
+void
+PrintersWindow::RemoveJob(SpoolFolder* folder, Job* job) {
 	if (IsSelected(folder->Item())) {
 		fJobListView->RemoveJob(job);
 	}
@@ -300,7 +315,9 @@ void PrintersWindow::RemoveJob(SpoolFolder* folder, Job* job) {
 	UpdatePrinterButtons();
 }
 
-void PrintersWindow::UpdateJob(SpoolFolder* folder, Job* job) {
+
+void
+PrintersWindow::UpdateJob(SpoolFolder* folder, Job* job) {
 	if (IsSelected(folder->Item())) {
 		fJobListView->UpdateJob(job);
 		UpdateJobButtons();
@@ -309,13 +326,17 @@ void PrintersWindow::UpdateJob(SpoolFolder* folder, Job* job) {
 	UpdatePrinterButtons();
 }
 
-void PrintersWindow::UpdatePrinterButtons() {
+
+void
+PrintersWindow::UpdatePrinterButtons() {
 	PrinterItem* item = fPrinterListView->SelectedItem();
 	fRemove->SetEnabled(item && !item->HasPendingJobs());
 	fMakeDefault->SetEnabled(item && !item->IsActivePrinter());
 }
-	
-void PrintersWindow::UpdateJobButtons() {
+
+
+void
+PrintersWindow::UpdateJobButtons() {
 	JobItem* item = fJobListView->SelectedItem();
 	if (item != NULL) {
 		Job* job = item->GetJob();
