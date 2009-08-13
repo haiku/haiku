@@ -51,6 +51,12 @@ SECTIONS
 		__rodata_end = . ;		
 	}
 
+	/* exception unwinding - should really not be needed! XXX: find the correct place. */
+	__exidx_start = .;
+	.ARM.exidx   : { *(.ARM.exidx* .gnu.linkonce.armexidx.*) }
+	__exidx_end = .;
+
+
 	/* writable data  */
 	__data_start_rom = .;	/* in one segment binaries, the rom data address is on top of the ram data address */
 	__data_start = .;
