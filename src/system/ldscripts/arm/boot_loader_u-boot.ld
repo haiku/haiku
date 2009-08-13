@@ -21,14 +21,14 @@ SECTIONS
 	__data_start = .;
 	.data : { *(.data .gnu.linkonce.d.*) }
 
-	/* unintialized data (in same segment as writable data) */
-	__bss_start = .;
-	.bss : { *(.bss) }
-
 	/* exception unwinding - should really not be needed! */
 	__exidx_start = .;
 	.ARM.exidx   : { *(.ARM.exidx* .gnu.linkonce.armexidx.*) }
 	__exidx_end = .;
+
+	/* unintialized data (in same segment as writable data) */
+	__bss_start = .;
+	.bss : { *(.bss) }
 
 	. = ALIGN(0x1000);
 	_end = . ;
