@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -26,7 +26,7 @@
 using namespace std;
 
 struct service_address {
-	struct service *owner;
+	struct service* owner;
 	int		socket;
 	int		family;
 	int		type;
@@ -36,15 +36,18 @@ struct service_address {
 	bool operator==(const struct service_address& other) const;
 };
 
-typedef vector<service_address> AddressList;
+typedef std::vector<service_address> AddressList;
+typedef std::vector<std::string> StringList;
 
 struct service {
 	std::string	name;
-	std::string	launch;
+	StringList	arguments;
 	uid_t		user;
 	gid_t		group;
 	AddressList	addresses;
 	uint32		update;
+	bool		stand_alone;
+	pid_t		process;
 
 	~service();
 	bool operator!=(const struct service& other) const;
@@ -128,9 +131,17 @@ bool
 service::operator==(const struct service& other) const
 {
 	if (name != other.name
-		|| launch != other.launch
-		|| addresses.size() != other.addresses.size())
+		|| arguments.size() != other.arguments.size()
+		|| addresses.size() != other.addresses.size()
+		|| stand_alone != other.stand_alone)
 		return false;
+
+	// compare arguments
+
+	for(int i = 0; i < arguments.size(); i++) {
+		if (arguments[i] != other.arguments[i])
+			return false;
+	}
 
 	// compare addresses
 
@@ -244,6 +255,16 @@ Services::_UpdateMinMaxSocket(int socket)
 status_t
 Services::_StartService(struct service& service)
 {
+	if (service.stand_alone && service.process == -1) {
+		status_t status = _LaunchService(service, -1);
+		if (status == B_OK) {
+			// add service
+			fNameMap[service.name] = &service;
+			service.update = fUpdate;
+		}
+		return status;
+	}
+
 	// create socket
 
 	bool failed = false;
@@ -293,13 +314,16 @@ Services::_StartService(struct service& service)
 status_t
 Services::_StopService(struct service& service)
 {
+	printf("Stop service '%s'\n", service.name.c_str());
+
 	// remove service from maps
 	{
 		ServiceNameMap::iterator iterator = fNameMap.find(service.name);
 		if (iterator != fNameMap.end())
 			fNameMap.erase(iterator);
 	}
-	{
+
+	if (!service.stand_alone) {
 		AddressList::const_iterator iterator = service.addresses.begin();
 		for (; iterator != service.addresses.end(); iterator++) {
 			const service_address& address = *iterator;
@@ -314,6 +338,12 @@ Services::_StopService(struct service& service)
 		}
 	}
 
+	// Shutdown the running server, if any
+	if (service.process != -1) {
+		printf("  Sending SIGTERM to process %ld\n", service.process);
+		kill(-service.process, SIGTERM);
+	}
+
 	delete &service;
 	return B_OK;
 }
@@ -324,9 +354,8 @@ Services::_ToService(const BMessage& message, struct service*& service)
 {
 	// get mandatory fields
 	const char* name;
-	const char* launch;
 	if (message.FindString("name", &name) != B_OK
-		|| message.FindString("launch", &launch) != B_OK)
+		|| !message.HasString("launch"))
 		return B_BAD_VALUE;
 
 	service = new (std::nothrow) ::service;
@@ -334,7 +363,14 @@ Services::_ToService(const BMessage& message, struct service*& service)
 		return B_NO_MEMORY;
 
 	service->name = name;
-	service->launch = launch;
+
+	const char* argument;
+	for (int i = 0; message.FindString("launch", i, &argument) == B_OK; i++) {
+		service->arguments.push_back(argument);
+	}
+
+	service->stand_alone = false;
+	service->process = -1;
 
 	// TODO: user/group is currently ignored!
 
@@ -355,7 +391,8 @@ Services::_ToService(const BMessage& message, struct service*& service)
 		serviceProtocol = parse_protocol(string);
 	else {
 		string = "tcp";
-			// we set 'string' here for an eventual call to getservbyname() below
+			// we set 'string' here for an eventual call to getservbyname()
+			// below
 		serviceProtocol = IPPROTO_TCP;
 	}
 
@@ -374,6 +411,10 @@ Services::_ToService(const BMessage& message, struct service*& service)
 	} else {
 		serviceType = type_for_protocol(serviceProtocol);
 	}
+
+	bool standAlone = false;
+	if (message.FindBool("stand_alone", &standAlone) == B_OK)
+		service->stand_alone = standAlone;
 
 	BMessage address;
 	int32 i = 0;
@@ -464,15 +505,17 @@ Services::_Update(const BMessage& services)
 		ServiceNameMap::iterator iterator = fNameMap.find(name);
 		if (iterator == fNameMap.end()) {
 			// this service does not exist yet, start it
+			printf("New service %s\n", service->name.c_str());
 			_StartService(*service);
 		} else {
 			// this service does already exist - check for any changes
 
 			if (*service != *iterator->second) {
+				printf("Restart service %s\n", service->name.c_str());
 				_StopService(*iterator->second);
 				_StartService(*service);
 			} else
-				service->update = fUpdate;
+				iterator->second->update = fUpdate;
 		}
 	}
 
@@ -494,9 +537,9 @@ Services::_Update(const BMessage& services)
 status_t
 Services::_LaunchService(struct service& service, int socket)
 {
-	printf("LAUNCH: %s\n", service.launch.c_str());
+	printf("Launch service: %s\n", service.arguments[0].c_str());
 
-	if (fcntl(socket, F_SETFD, 0) < 0) {
+	if (socket != -1 && fcntl(socket, F_SETFD, 0) < 0) {
 		// could not clear FD_CLOEXEC on socket
 		return errno;
 	}
@@ -507,27 +550,37 @@ Services::_LaunchService(struct service& service, int socket)
 			// make sure we're in our own session, and don't accidently quit
 			// the net_server
 
-		// We're the child, replace standard input/output
-		dup2(socket, STDIN_FILENO);
-		dup2(socket, STDOUT_FILENO);
-		dup2(socket, STDERR_FILENO);
-		close(socket);
+		if (socket != -1) {
+			// We're the child, replace standard input/output
+			dup2(socket, STDIN_FILENO);
+			dup2(socket, STDOUT_FILENO);
+			dup2(socket, STDERR_FILENO);
+			close(socket);
+		}
 
 		// build argument array
 
-		const char** args = (const char**)malloc(2 * sizeof(void *));
+		const char** args = (const char**)malloc(
+			(service.arguments.size() + 1) * sizeof(char*));
 		if (args == NULL)
 			exit(1);
 
-		args[0] = service.launch.c_str();
-		args[1] = NULL;
-		if (execv(service.launch.c_str(), (char* const*)args) < 0)
+		for (int i = 0; i < service.arguments.size(); i++) {
+			args[i] = service.arguments[i].c_str();
+		}
+		args[service.arguments.size()] = NULL;
+
+		if (execv(service.arguments[0].c_str(), (char* const*)args) < 0)
 			exit(1);
 
 		// we'll never trespass here
 	} else {
 		// the server does not need the socket anymore
-		close(socket);
+		if (socket != -1)
+			close(socket);
+
+		if (service.stand_alone)
+			service.process = child;
 	}
 
 	// TODO: make sure child started successfully...

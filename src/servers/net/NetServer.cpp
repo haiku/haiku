@@ -80,6 +80,10 @@ struct address_family {
 	void		(*set_port)(sockaddr* address, int32 port);
 };
 
+
+const char* kNetServerSignature = "application/x-vnd.haiku-net_server";
+
+
 // AF_INET family
 static bool inet_parse_address(const char* string, sockaddr* address);
 static void inet_set_any_address(sockaddr* address);

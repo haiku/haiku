@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -75,6 +75,7 @@ const static settings_template kServiceTemplate[] = {
 	{B_STRING_TYPE, "type", NULL},
 	{B_STRING_TYPE, "protocol", NULL},
 	{B_INT32_TYPE, "port", NULL},
+	{B_BOOL_TYPE, "stand_alone", NULL},
 	{0, NULL, NULL}
 };
 
@@ -176,6 +177,10 @@ Settings::_AddParameter(const driver_parameter& parameter, const char* name,
 					message.AddBool(name, false);
 				break;
 		}
+	}
+	if (type == B_BOOL_TYPE && parameter.value_count == 0) {
+		// boolean parameters are always true
+		message.AddBool(name, true);
 	}
 
 	return B_OK;
