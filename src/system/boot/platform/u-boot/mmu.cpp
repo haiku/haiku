@@ -657,10 +657,10 @@ mmu_init(void)
 	mmu_write_C1(mmu_read_C1() & ~((1<<29)|(1<<28)|(1<<0)));// access flag disabled, TEX remap disabled, mmu disabled
 	//calculate lowest RAM adress from MEMORYMAP
 	for(int i=0;i<ARRAY_SIZE(LOADER_MEMORYMAP);i++){
-		if(strcmp("RAM_free",LOADER_MEMORYMAP[i].name)){
+		if(strcmp("RAM_free",LOADER_MEMORYMAP[i].name)==0){
 			sNextPhysicalAddress=LOADER_MEMORYMAP[i].start;
 		}
-		if(strcmp("RAM_pt",LOADER_MEMORYMAP[i].name)){
+		if(strcmp("RAM_pt",LOADER_MEMORYMAP[i].name)==0){
 			sNextPageTableAddress=LOADER_MEMORYMAP[i].start + MMU_L1_TABLE_SIZE;
 			kPageTableRegionEnd = LOADER_MEMORYMAP[i].end;
 			sPageDirectory = (uint32 *) LOADER_MEMORYMAP[i].start ;
