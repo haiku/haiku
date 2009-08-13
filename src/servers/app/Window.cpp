@@ -231,7 +231,7 @@ Window::GetFullRegion(BRegion* region)
 	region->Include(fFrame);
 }
 
-// GetBorderRegion
+
 void
 Window::GetBorderRegion(BRegion* region)
 {
@@ -577,12 +577,15 @@ Window::GetEffectiveDrawingRegion(View* view, BRegion& region)
 	if (!fEffectiveDrawingRegionValid) {
 		fEffectiveDrawingRegion = VisibleContentRegion();
 		if (fUpdateRequested && !fInUpdate) {
-			// we requested an update, but the client has not started it yet,
-			// so it is only allowed to draw outside the pending update sessions region
-			fEffectiveDrawingRegion.Exclude(&(fPendingUpdateSession->DirtyRegion()));
+			// We requested an update, but the client has not started it yet,
+			// so it is only allowed to draw outside the pending update sessions
+			// region
+			fEffectiveDrawingRegion.Exclude(
+				&fPendingUpdateSession->DirtyRegion());
 		} else if (fInUpdate) {
 			// enforce the dirty region of the update session
-			fEffectiveDrawingRegion.IntersectWith(&fCurrentUpdateSession->DirtyRegion());
+			fEffectiveDrawingRegion.IntersectWith(
+				&fCurrentUpdateSession->DirtyRegion());
 		} else {
 			// not in update, the view can draw everywhere
 //printf("Window(%s)::GetEffectiveDrawingRegion(for %s) - outside update\n", Title(), view->Name());
@@ -1503,6 +1506,18 @@ Window::SetFlags(uint32 flags, BRegion* updateRegion)
 		fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
 		_ObeySizeLimits();
 	}
+
+// TODO: not sure if we want to do this
+#if 0
+	if ((fOriginalFlags & kWindowScreenFlag) != (flags & kWindowScreenFlag)) {
+		// TODO: disabling needs to be nestable (or we might lose the previous
+		// update state)
+		if ((flags & kWindowScreenFlag) != 0)
+			DisableUpdateRequests();
+		else
+			EnableUpdateRequests();
+	}
+#endif
 }
 
 
@@ -1824,8 +1839,7 @@ Window::IsFloatingFeel(window_feel feel)
 }
 
 
-/*static*/
-uint32
+/*static*/ uint32
 Window::ValidWindowFlags()
 {
 	return B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE
@@ -1842,8 +1856,7 @@ Window::ValidWindowFlags()
 }
 
 
-/*static*/
-uint32
+/*static*/ uint32
 Window::ValidWindowFlags(window_feel feel)
 {
 	uint32 flags = ValidWindowFlags();
@@ -1857,7 +1870,6 @@ Window::ValidWindowFlags(window_feel feel)
 // #pragma mark - private
 
 
-// _ShiftPartOfRegion
 void
 Window::_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
 	int32 xOffset, int32 yOffset)
@@ -1881,30 +1893,32 @@ Window::_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
 void
 Window::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 {
-	if (IsVisible() && dirtyContentRegion.CountRects() > 0) {
-		// put this into the pending dirty region
-		// to eventually trigger a client redraw
-		bool wasExpose = fPendingUpdateSession->IsExpose();
-		BRegion* backgroundClearingRegion = &dirtyContentRegion;
+	if (!IsVisible() || dirtyContentRegion.CountRects() == 0
+		|| (fFlags & kWindowScreenFlag) != 0)
+		return;
 
-		_TransferToUpdateSession(&dirtyContentRegion);
+	// put this into the pending dirty region
+	// to eventually trigger a client redraw
+	bool wasExpose = fPendingUpdateSession->IsExpose();
+	BRegion* backgroundClearingRegion = &dirtyContentRegion;
 
-		if (fPendingUpdateSession->IsExpose()) {
-			if (!fContentRegionValid)
-				_UpdateContentRegion();
+	_TransferToUpdateSession(&dirtyContentRegion);
 
-			if (!wasExpose) {
-				// there was suddenly added a dirty region
-				// caused by exposing content, we need to clear
-				// the entire background
-				backgroundClearingRegion
-					= &(fPendingUpdateSession->DirtyRegion());
-			}
+	if (fPendingUpdateSession->IsExpose()) {
+		if (!fContentRegionValid)
+			_UpdateContentRegion();
 
-			if (fDrawingEngine->LockParallelAccess()) {
-				bool copyToFrontEnabled = fDrawingEngine->CopyToFrontEnabled();
-				fDrawingEngine->SetCopyToFrontEnabled(true);
-				fDrawingEngine->SuspendAutoSync();
+		if (!wasExpose) {
+			// there was suddenly added a dirty region
+			// caused by exposing content, we need to clear
+			// the entire background
+			backgroundClearingRegion = &fPendingUpdateSession->DirtyRegion();
+		}
+
+		if (fDrawingEngine->LockParallelAccess()) {
+			bool copyToFrontEnabled = fDrawingEngine->CopyToFrontEnabled();
+			fDrawingEngine->SetCopyToFrontEnabled(true);
+			fDrawingEngine->SuspendAutoSync();
 
 //sCurrentColor.red = rand() % 255;
 //sCurrentColor.green = rand() % 255;
@@ -1915,13 +1929,12 @@ Window::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 //fDrawingEngine->FillRegion(*backgroundClearingRegion, sCurrentColor);
 //snooze(10000);
 
-				fTopView->Draw(fDrawingEngine, backgroundClearingRegion,
-					&fContentRegion, true);
+			fTopView->Draw(fDrawingEngine, backgroundClearingRegion,
+				&fContentRegion, true);
 
-				fDrawingEngine->Sync();
-				fDrawingEngine->SetCopyToFrontEnabled(copyToFrontEnabled);
-				fDrawingEngine->UnlockParallelAccess();
-			}
+			fDrawingEngine->Sync();
+			fDrawingEngine->SetCopyToFrontEnabled(copyToFrontEnabled);
+			fDrawingEngine->UnlockParallelAccess();
 		}
 	}
 }
@@ -1971,8 +1984,7 @@ fWindow->ResyncDrawState();
 }
 
 
-/*!
-	pre: the clipping is readlocked (this function is
+/*!	pre: the clipping is readlocked (this function is
 	only called from _TriggerContentRedraw()), which
 	in turn is only called from MessageReceived() with
 	the clipping lock held
@@ -2001,7 +2013,7 @@ Window::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 	}
 }
 
-// _SendUpdateMessage
+
 void
 Window::_SendUpdateMessage()
 {
@@ -2253,9 +2265,10 @@ Window::_ObeySizeLimits()
 
 
 Window::UpdateSession::UpdateSession()
-	: fDirtyRegion(),
-	  fInUse(false),
-	  fCause(0)
+	:
+	fDirtyRegion(),
+	fInUse(false),
+	fCause(0)
 {
 }
 
