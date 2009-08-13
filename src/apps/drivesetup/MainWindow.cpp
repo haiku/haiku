@@ -541,8 +541,7 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			fDeleteMI->SetEnabled(!partition->IsMounted()
 				&& !partition->IsDevice());
 
-			fMountMI->SetEnabled(!partition->IsMounted()
-				&& !partition->IsDevice());
+			fMountMI->SetEnabled(!partition->IsMounted());
 
 			bool unMountable = false;
 			if (partition->IsMounted()) {
