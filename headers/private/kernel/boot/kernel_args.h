@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -21,7 +21,7 @@
 #include <util/KMessage.h>
 
 #define CURRENT_KERNEL_ARGS_VERSION	1
-#define MAX_KERNEL_ARGS_RANGE		16
+#define MAX_KERNEL_ARGS_RANGE		20
 
 // names of common boot_volume fields
 #define BOOT_METHOD						"boot method"
