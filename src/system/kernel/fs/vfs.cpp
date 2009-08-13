@@ -5561,9 +5561,11 @@ fix_dirent(struct vnode* parent, struct dirent* userEntry,
 		if (user_memcpy(entry, userEntry, sizeof(struct dirent) - 1) != B_OK)
 			return B_BAD_ADDRESS;
 
-		ASSERT(entry->d_reclen >= sizeof(struct dirent));
+		ASSERT(entry->d_reclen >= sizeof(struct dirent)
+			&& entry->d_reclen <= sizeof(buffer));
 
-		// This hints to a problem in the file system implementation
+		// This hints to a problem in the file system implementation, but
+		// could also be caused by a malicious user application
 		if (entry->d_reclen < sizeof(struct dirent)
 			|| entry->d_reclen > sizeof(buffer))
 			return B_BAD_DATA;
