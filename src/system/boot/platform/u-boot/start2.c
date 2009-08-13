@@ -29,7 +29,8 @@ extern uint8 __bss_start;
 extern uint8 _end;
 
 extern int main(stage2_args *args);
-void _start(void);
+extern void _start(void);
+extern int start_raw(int argc, char **argv);
 
 
 uint32 sBootOptions;
@@ -53,6 +54,12 @@ call_ctors(void)
 }
 
 
+/* needed for libgcc unwind XXX */
+void
+abort(void)
+{
+	panic("abort");
+}
 
 
 void
@@ -93,8 +100,40 @@ platform_exit(void)
 }
 
 
-void
-start2(void)
+typedef struct uboot_arm_gd {
+	struct board_data *bd;
+	uint32 flags;
+	uint32 baudrate;
+	uint32 have_console;
+	uint32 reloc_off;
+	uint32 env_addr;
+	uint32 env_valid;
+	uint32 fb_base;
+} uboot_arm_gd;
+
+register volatile uboot_arm_gd *gGD asm ("r8");
+extern uboot_arm_gd *gUBootGlobalData;
+extern uint8 gUBootOS;
+
+int
+start_netbsd(struct board_info *bd, struct uimage *image, const char *consdev,
+	const char *cmdline)
+{
+	const char *argv[] = { "haiku", cmdline };
+	int argc = 1;
+	if (cmdline)
+		argc++;
+	start_raw(argc, argv);
+}
+
+int
+start_linux(int argc, int archnum, void *atags)
+{
+}
+
+
+int
+start_raw(int argc, char **argv)
 {
 	stage2_args args;
 
@@ -108,6 +147,17 @@ start2(void)
 	serial_init();
 	console_init();
 	cpu_init();
+
+	{ //DEBUG:
+		int i;
+		dprintf("argc = %d\n", argc);
+		for (i = 0; i < argc; i++)
+			dprintf("argv[%d] @%lx = '%s'\n", i, (uint32)argv[i], argv[i]);
+		dprintf("os: %d\n", gUBootOS);
+		dprintf("gd @ %p\n", gGD);
+		dprintf("gd->bd @ %p\n", gGD->bd);
+	}
+	
 //	mmu_init();
 
 	// wait a bit to give the user the opportunity to press a key
