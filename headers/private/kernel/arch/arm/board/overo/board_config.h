@@ -7,6 +7,9 @@
 
 #define BOARD_NAME_PRETTY "Gumstix Overo"
 
+#define BOARD_CPU_TYPE_OMAP 1
+#define BOARD_CPU_OMAP3 1
+
 #include <arch/arm/omap3.h>
 
 #define BOARD_UART1_BASE OMAP_UART1_BASE

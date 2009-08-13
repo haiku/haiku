@@ -7,6 +7,9 @@
 
 #define BOARD_NAME_PRETTY "Gumstix Verdex"
 
+#define BOARD_CPU_TYPE_PXA 1
+#define BOARD_CPU_PXA270 1
+
 #include <arch/arm/pxa270.h>
 
 #define BOARD_UART1_BASE FFUART_BASE
