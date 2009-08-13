@@ -2373,7 +2373,7 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 
 	// create a new transaction for the sub transaction
 	cache_transaction* newTransaction = new(std::nothrow) cache_transaction;
-	if (transaction == NULL)
+	if (newTransaction == NULL)
 		return B_NO_MEMORY;
 
 	newTransaction->id = atomic_add(&cache->next_transaction_id, 1);
