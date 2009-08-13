@@ -19,20 +19,20 @@ void dump_uimage(struct image_header *image)
 	if (!image)
 		return;
 	dprintf("magic: %x\n", ntohl(image->ih_magic));
-	dprintf("size: %x\n", ntohl(image->ih_size));
+	dprintf("size: %d\n", ntohl(image->ih_size));
 	dprintf("load: %p\n", (void *)ntohl(image->ih_load));
-	dprintf("ep: %d\n", (void *)ntohl(image->ih_ep));
+	dprintf("ep: %p\n", (void *)ntohl(image->ih_ep));
 	dprintf("os: %d\n", image->ih_os);
 	dprintf("arch: %d\n", image->ih_arch);
 	dprintf("type: %d\n", image->ih_type);
 	dprintf("comp: %d\n", image->ih_comp);
-	dprintf("name: '%32.32s'\n", image->ih_name);
+	dprintf("name: '%-32s'\n", image->ih_name);
 	if (image->ih_type != IH_TYPE_MULTI)
 		return;
 	sizes = (uint32 *)(&image[1]);
 	for (i = 0; sizes[i]; i++) {
 		dprintf("contents[%d] :", i);
-		dprintf("%x bytes\n", (int)ntohl(sizes[i]));
+		dprintf("%d bytes\n", (int)ntohl(sizes[i]));
 	}
 }
 
@@ -49,12 +49,13 @@ image_multi_getimg(struct image_header *image, uint32 idx, uint32 *data, uint32 
 	for (i = 0; sizes[i]; i++)
 		count++;
 	base += (count + 1) * sizeof(uint32);
-	for (i = 0; sizes[i] && idx < i; i++) {
+	for (i = 0; sizes[i] && i < count; i++) {
 		if (idx == i) {
 			*data = base;
 			*size = ntohl(sizes[i]);
 			return true;
 		}
+		base += ntohl(sizes[i]);
 	}
 	return false;
 }
