@@ -173,7 +173,8 @@ BuildUImage haiku_loader.ub : haiku_loader :
 	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_RAW)
 		-n 'haiku_loader' ;
 
-BuildUImage haiku_loader_nbsd.ub : haiku_loader kernel_arm : 
+local tgzArchive = haiku-floppyboot.tgz ;
+BuildUImage haiku_loader_nbsd.ub : haiku_loader $(tgzArchive) : 
 	-A arm -O $(uImageFakeOS) -T multi -C none
 	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_NBSD)
 		-n 'haiku_loader' ;
