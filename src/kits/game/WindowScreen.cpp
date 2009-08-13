@@ -309,7 +309,6 @@ BWindowScreen::Show()
 	if (!fActivateState) {
 		release_sem(fActivateSem);
 		fActivateState = true;
-		be_app->HideCursor();
 	}
 }
 
@@ -701,6 +700,8 @@ BWindowScreen::_Activate()
 		if (status < B_OK)
 			return status;
 	}
+
+	be_app->HideCursor();
 
 	SetColorList(fPalette);
 	if (fDebugState && !fDebugFirst) {
