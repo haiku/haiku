@@ -417,8 +417,10 @@ static void *
 internal_alloc(size_t size, uint32 flags)
 {
 	if (flags & CACHE_DURING_BOOT) {
-		if ((sInitialPointer + size) > sInitialLimit)
+		if ((sInitialPointer + size) > sInitialLimit) {
 			panic("internal_alloc: ran out of initial space");
+			return NULL;
+		}
 
 		uint8 *buffer = sInitialPointer;
 		sInitialPointer += size;
@@ -489,8 +491,10 @@ area_free_pages(object_cache *cache, void *pages)
 
 	TRACE_CACHE(cache, "delete pages %p (%ld)", pages, id);
 
-	if (id < B_OK)
+	if (id < 0) {
 		panic("object cache: freeing unknown area");
+		return;
+	}
 
 	delete_area(id);
 
@@ -688,7 +692,7 @@ object_cache_commit_slab(object_cache *cache, slab *slab)
 {
 	void *pages = (void *)ROUNDDOWN((addr_t)slab->pages, B_PAGE_SIZE);
 	if (create_area(cache->name, &pages, B_EXACT_ADDRESS, cache->slab_size,
-		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA) < B_OK)
+		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA) < 0)
 		panic("failed to create_area()");
 }
 
@@ -994,8 +998,10 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 static void
 object_cache_return_to_slab(object_cache *cache, slab *source, void *object)
 {
-	if (source == NULL)
+	if (source == NULL) {
 		panic("object_cache: free'd object has no slab");
+		return;
+	}
 
 	ParanoiaChecker _(source);
 
@@ -1309,6 +1315,7 @@ HashedObjectCache::ObjectSlab(void *object) const
 	if (link == NULL) {
 		panic("object cache: requested object %p missing from hash table",
 			object);
+		return NULL;
 	}
 	return link->parent;
 }
@@ -1333,10 +1340,15 @@ void
 HashedObjectCache::UnprepareObject(slab *source, void *object)
 {
 	Link *link = hash_table.Lookup(object);
-	if (link == NULL)
+	if (link == NULL) {
 		panic("object cache: requested object missing from hash table");
-	if (link->parent != source)
+		return;
+	}
+
+	if (link->parent != source) {
 		panic("object cache: slab mismatch");
+		return;
+	}
 
 	hash_table.Remove(link);
 	free_link(link);
