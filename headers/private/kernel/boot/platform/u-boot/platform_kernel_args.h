@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef KERNEL_BOOT_PLATFORM_UBOOT_KERNEL_ARGS_H
 #define KERNEL_BOOT_PLATFORM_UBOOT_KERNEL_ARGS_H
 
@@ -20,4 +20,4 @@ typedef struct {
 	char dummy;
 } platform_kernel_args;
 
-#endif	/* KERNEL_BOOT_PLATFORM_OPENFIRMWARE_KERNEL_ARGS_H */
+#endif	/* KERNEL_BOOT_PLATFORM_UBOOT_KERNEL_ARGS_H */
