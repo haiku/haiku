@@ -138,7 +138,7 @@ service::operator==(const struct service& other) const
 
 	// compare arguments
 
-	for(int i = 0; i < arguments.size(); i++) {
+	for(size_t i = 0; i < arguments.size(); i++) {
 		if (arguments[i] != other.arguments[i])
 			return false;
 	}
@@ -565,7 +565,7 @@ Services::_LaunchService(struct service& service, int socket)
 		if (args == NULL)
 			exit(1);
 
-		for (int i = 0; i < service.arguments.size(); i++) {
+		for (size_t i = 0; i < service.arguments.size(); i++) {
 			args[i] = service.arguments[i].c_str();
 		}
 		args[service.arguments.size()] = NULL;
