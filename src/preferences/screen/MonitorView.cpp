@@ -11,19 +11,13 @@
 
 
 #include "MonitorView.h"
-#include "Constants.h"
+
+#include <stdio.h>
 
 #include <Roster.h>
 #include <Screen.h>
 
-
-#ifndef __HAIKU__
-inline bool
-operator!=(const rgb_color& x, const rgb_color& y)
-{
-	return x.red != y.red || x.blue != y.blue || x.green != y.green;
-}
-#endif
+#include "Constants.h"
 
 
 MonitorView::MonitorView(BRect rect, char *name, int32 width, int32 height)
@@ -31,7 +25,8 @@ MonitorView::MonitorView(BRect rect, char *name, int32 width, int32 height)
 	fMaxWidth(1920),
 	fMaxHeight(1200),
 	fWidth(width),
-	fHeight(height)
+	fHeight(height),
+	fDPI(0)
 {
 	BScreen screen(B_MAIN_SCREEN_ID);
 	fDesktopColor = screen.DesktopColor(current_workspace());
@@ -51,6 +46,8 @@ MonitorView::AttachedToWindow()
 		fBackgroundColor = Parent()->ViewColor();
 	else
 		fBackgroundColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+	_UpdateDPI();
 }
 
 
@@ -61,43 +58,14 @@ MonitorView::MouseDown(BPoint point)
 }
 
 
-BRect
-MonitorView::MonitorBounds()
-{
-	float maxWidth = Bounds().Width();
-	float maxHeight = Bounds().Height();
-	if (maxWidth / maxHeight > (float)fMaxWidth / fMaxHeight)
-		maxWidth = maxHeight / fMaxHeight * fMaxWidth;
-	else
-		maxHeight = maxWidth / fMaxWidth * fMaxHeight;
-
-	float factorX = (float)fWidth / fMaxWidth;
-	float factorY = (float)fHeight / fMaxHeight;
-
-	if (factorX > factorY && factorX > 1) {
-		factorY /= factorX;
-		factorX = 1;
-	} else if (factorY > factorX && factorY > 1) {
-		factorX /= factorY;
-		factorY = 1;
-	}
-
-	float width = maxWidth * factorX;
-	float height = maxHeight * factorY;
-
-	BSize size = Bounds().Size();
-	return BRect((size.width - width) / 2, (size.height - height) / 2,
-		(size.width + width) / 2, (size.height + height) / 2);
-}
-
-
 void
 MonitorView::Draw(BRect updateRect)
 {
 	rgb_color darkColor = {160, 160, 160, 255};
 	rgb_color blackColor = {0, 0, 0, 255};
 	rgb_color redColor = {228, 0, 0, 255};
-	BRect outerRect = MonitorBounds();
+	rgb_color whiteColor = {255, 255, 255, 255};
+	BRect outerRect = _MonitorBounds();
 
 	SetHighColor(fBackgroundColor);
 	FillRect(updateRect);
@@ -127,6 +95,28 @@ MonitorView::Draw(BRect updateRect)
 	SetHighColor(redColor);
 	BPoint powerPos(outerRect.left + 5, outerRect.bottom - 2);
 	StrokeLine(powerPos, BPoint(powerPos.x + 2, powerPos.y));
+
+	// DPI
+
+	if (fDPI == 0)
+		return;
+
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	float height = ceilf(fontHeight.ascent + fontHeight.descent);
+
+	char text[64];
+	snprintf(text, sizeof(text), "%ld dpi", fDPI);
+
+	float width = StringWidth(text);
+	if (width > innerRect.Width() || height > innerRect.Height())
+		return;
+
+	SetLowColor(fDesktopColor);
+	SetHighColor(whiteColor);
+
+	DrawString(text, BPoint(innerRect.left + (innerRect.Width() - width) / 2,
+		innerRect.top + fontHeight.ascent + (innerRect.Height() - height) / 2));
 }
 
 
@@ -139,6 +129,7 @@ MonitorView::SetResolution(int32 width, int32 height)
 	fWidth = width;
 	fHeight = height;
 
+	_UpdateDPI();
 	Invalidate();
 }
 
@@ -183,4 +174,51 @@ MonitorView::MessageReceived(BMessage* message)
 			BView::MessageReceived(message);
 			break;
 	}
+}
+
+
+BRect
+MonitorView::_MonitorBounds()
+{
+	float maxWidth = Bounds().Width();
+	float maxHeight = Bounds().Height();
+	if (maxWidth / maxHeight > (float)fMaxWidth / fMaxHeight)
+		maxWidth = maxHeight / fMaxHeight * fMaxWidth;
+	else
+		maxHeight = maxWidth / fMaxWidth * fMaxHeight;
+
+	float factorX = (float)fWidth / fMaxWidth;
+	float factorY = (float)fHeight / fMaxHeight;
+
+	if (factorX > factorY && factorX > 1) {
+		factorY /= factorX;
+		factorX = 1;
+	} else if (factorY > factorX && factorY > 1) {
+		factorX /= factorY;
+		factorY = 1;
+	}
+
+	float width = maxWidth * factorX;
+	float height = maxHeight * factorY;
+
+	BSize size = Bounds().Size();
+	return BRect((size.width - width) / 2, (size.height - height) / 2,
+		(size.width + width) / 2, (size.height + height) / 2);
+}
+
+
+void
+MonitorView::_UpdateDPI()
+{
+	fDPI = 0;
+
+	BScreen screen(Window());
+	monitor_info info;
+	if (screen.GetMonitorInfo(&info) != B_OK)
+		return;
+
+	double x = info.width / 2.54;
+	double y = info.height / 2.54;
+
+	fDPI = (int32)round((fWidth / x + fHeight / y) / 2);
 }

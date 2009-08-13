@@ -262,7 +262,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		if (maxHeight < mode.height)
 			maxHeight = mode.height;
 
-		BMessage *message = new BMessage(POP_RESOLUTION_MSG);
+		BMessage* message = new BMessage(POP_RESOLUTION_MSG);
 		message->AddInt32("width", mode.width);
 		message->AddInt32("height", mode.height);
 
@@ -287,7 +287,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		if ((fSupportedColorSpaces & (1 << i)) == 0)
 			continue;
 
-		BMessage *message = new BMessage(POP_COLORS_MSG);
+		BMessage* message = new BMessage(POP_COLORS_MSG);
 		message->AddInt32("bits_per_pixel", kColorSpaces[i].bits_per_pixel);
 		message->AddInt32("space", kColorSpaces[i].space);
 
