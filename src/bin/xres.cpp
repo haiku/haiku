@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +15,9 @@
 #include <StorageDefs.h>
 #include <TypeConstants.h>
 
+
 using namespace std;
+
 
 static const char *kCommandName = "xres";
 static const char *kDefaultResourceName = NULL;
@@ -80,6 +83,7 @@ const char *kUsage =
 "  <id>   - A positive or negative integer.\n"
 ;
 
+
 // resource_type
 static const char *
 resource_type(type_code type)
@@ -95,6 +99,7 @@ resource_type(type_code type)
 	return typeString;
 }
 
+
 // ResourceID
 struct ResourceID {
 	type_code	type;
@@ -103,9 +108,10 @@ struct ResourceID {
 
 	ResourceID(type_code type = B_ANY_TYPE, int32 id = 0,
 			bool wildcardID = true)
-		: type(type),
-		  id(id),
-		  wildcardID(wildcardID)
+		:
+		type(type),
+		id(id),
+		wildcardID(wildcardID)
 	{
 	}
 
@@ -129,6 +135,7 @@ struct ResourceID {
 	}
 };
 
+
 // ResourceDataSource
 struct ResourceDataSource {
 	ResourceDataSource()
@@ -145,6 +152,7 @@ struct ResourceDataSource {
 	{
 	}
 };
+
 
 // MemoryResourceDataSource
 struct MemoryResourceDataSource : ResourceDataSource {
@@ -191,12 +199,14 @@ private:
 	bool	fOwner;
 };
 
+
 // FileResourceDataSource
 struct FileResourceDataSource : ResourceDataSource {
 	FileResourceDataSource(const char *path)
-		: fPath(path),
-		  fData(NULL),
-		  fSize(0)
+		:
+		fPath(path),
+		fData(NULL),
+		fSize(0)
 	{
 	}
 
@@ -266,6 +276,7 @@ private:
 	size_t	fSize;
 };
 
+
 // State
 struct State {
 	State()
@@ -304,6 +315,7 @@ struct State {
 		(void)dataSource;
 	}
 };
+
 
 // ListState
 struct ListState : State {
@@ -351,22 +363,22 @@ struct ListState : State {
 		const char *name;
 		size_t size;
 		for (int32 i = 0;
-			 resources.GetResourceInfo(i, &type, &id, &name, &size);
-			 i++) {
-
-			printf("'%s' %11ld %11u  %s\n", resource_type(type), id, size,
+				resources.GetResourceInfo(i, &type, &id, &name, &size); i++) {
+			printf("'%s' %11ld %11lu  %s\n", resource_type(type), id, size,
 				(name && strlen(name) > 0 ? name : "(no name)"));
 		}
 	}
 };
 
+
 // WriteFileState
 struct WriteFileState : State {
 	WriteFileState()
-		: fOutputFilePath(kDefaultOutputFile),
-		  fResources(NULL),
-		  fInclusionPattern(NULL),
-		  fExclusionPattern(NULL)
+		:
+		fOutputFilePath(kDefaultOutputFile),
+		fResources(NULL),
+		fInclusionPattern(NULL),
+		fExclusionPattern(NULL)
 	{
 	}
 
@@ -422,7 +434,7 @@ struct WriteFileState : State {
 			if (!data) {
 				fprintf(stderr, "Error: Failed to read resources from input "
 					"file \"%s\".\n", path);
-	
+
 				exit(1);
 			}
 
@@ -457,7 +469,7 @@ struct WriteFileState : State {
 			// not included or explicitly excluded
 			return;
 		}
-		
+
 		// get resource data
 		const void *data;
 		size_t size;
@@ -525,6 +537,7 @@ private:
 	ResourceID	*fExclusionPattern;
 };
 
+
 // Command
 struct Command {
 	Command()
@@ -538,11 +551,13 @@ struct Command {
 	virtual void Do(State *state) = 0;
 };
 
+
 // SetOutputCommand
 struct SetOutputCommand : Command {
 	SetOutputCommand(const char *path)
-		: Command(),
-		  fPath(path)
+		:
+		Command(),
+		fPath(path)
 	{
 	}
 
@@ -555,11 +570,13 @@ private:
 	string	fPath;
 };
 
+
 // ProcessInputCommand
 struct ProcessInputCommand : Command {
 	ProcessInputCommand(const char *path)
-		: Command(),
-		  fPath(path)
+		:
+		Command(),
+		fPath(path)
 	{
 	}
 
@@ -572,12 +589,14 @@ private:
 	string	fPath;
 };
 
+
 // SetResourcePatternCommand
 struct SetResourcePatternCommand : Command {
 	SetResourcePatternCommand(const ResourceID &pattern, bool inclusion)
-		: Command(),
-		  fPattern(pattern),
-		  fInclusion(inclusion)
+		:
+		Command(),
+		fPattern(pattern),
+		fInclusion(inclusion)
 	{
 	}
 
@@ -594,14 +613,16 @@ private:
 	bool		fInclusion;
 };
 
+
 // AddResourceCommand
 struct AddResourceCommand : Command {
 	AddResourceCommand(const ResourceID &id, const char *name,
 			ResourceDataSource *dataSource)
-		: Command(),
-		  fID(id),
-		  fHasName(name),
-		  fDataSource(dataSource)
+		:
+		Command(),
+		fID(id),
+		fHasName(name),
+		fDataSource(dataSource)
 	{
 		if (fHasName)
 			fName = name;
@@ -648,6 +669,7 @@ print_usage(bool error)
 		commandName);
 }
 
+
 // print_usage_and_exit
 static void
 print_usage_and_exit(bool error)
@@ -655,6 +677,7 @@ print_usage_and_exit(bool error)
 	print_usage(error);
 	exit(error ? 1 : 0);
 }
+
 
 // next_arg
 static const char *
@@ -668,6 +691,7 @@ next_arg(int &argi, bool optional = false)
 
 	return kArgv[argi++];
 }
+
 
 // parse_resource_id
 static void
@@ -732,6 +756,7 @@ parse_resource_id(const char *toParse, ResourceID &resourceID,
 	// the remainder is name
 	*name = toParse + 1;
 }
+
 
 // main
 int
