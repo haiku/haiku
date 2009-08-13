@@ -365,12 +365,8 @@ Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	if (x == 0 && y == 0)
 		return;
 
-	fWindow->HandleDirectConnection(B_DIRECT_STOP);
-
 	fFrame.right += x;
 	fFrame.bottom += y;
-
-	fWindow->HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESIZED);
 
 	fBorderRegionValid = false;
 	fContentRegionValid = false;

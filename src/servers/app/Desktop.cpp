@@ -1912,6 +1912,8 @@ Desktop::_ShowWindow(Window* window, bool affectsOtherWindows)
 void
 Desktop::_HideWindow(Window* window)
 {
+	window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
+
 	// after rebuilding the clipping,
 	// this window will not have a visible
 	// region anymore, so we need to remember
@@ -1927,8 +1929,6 @@ Desktop::_HideWindow(Window* window)
 	_WindowChanged(window);
 
 	MarkDirty(dirty);
-
-	window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
 }
 
 
@@ -1981,10 +1981,6 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 
 	GetDrawingEngine()->CopyRegion(&copyRegion, (int32)x, (int32)y);
 
-	// allow DirectWindows to draw again after the visual
-	// content is at the new location
-	window->ServerWindow()->HandleDirectConnection(B_DIRECT_START | B_BUFFER_MOVED);
-
 	// in the dirty region, exclude the parts that we
 	// could move by blitting
 	copyRegion.OffsetBy((int32)x, (int32)y);
@@ -1993,6 +1989,10 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	MarkDirty(newDirtyRegion);
 	_SetBackground(background);
 	_WindowChanged(window);
+
+	// allow DirectWindows to draw again after the visual
+	// content is at the new location
+	window->ServerWindow()->HandleDirectConnection(B_DIRECT_START | B_BUFFER_MOVED);
 
 	UnlockAllWindows();
 }
@@ -2017,6 +2017,8 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 	// it is shrunk in "previouslyOccupiedRegion"
 	BRegion previouslyOccupiedRegion(window->VisibleRegion());
 
+	window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
+
 	window->ResizeBy((int32)x, (int32)y, &newDirtyRegion);
 
 	BRegion background;
@@ -2034,6 +2036,8 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 	MarkDirty(newDirtyRegion);
 	_SetBackground(background);
 	_WindowChanged(window);
+
+	window->ServerWindow()->HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESIZED);
 
 	UnlockAllWindows();
 }
