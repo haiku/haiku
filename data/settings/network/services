@@ -1,7 +1,12 @@
-service telnet {
-	launch	telnetd
-}
+#service telnet {
+#	launch	telnetd
+#}
 
-service ftp {
-	launch	ftpd
+#service ftp {
+#	launch	ftpd
+#}
+
+service ssh {
+	launch	/boot/common/bin/sshd -D
+	stand_alone
 }
