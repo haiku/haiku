@@ -503,7 +503,6 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		fInitMenu->SetEnabled(prepared);
 		fDeleteMI->SetEnabled(prepared);
 
-
 		BDiskSystem diskSystem;
 		fDDRoster.RewindDiskSystems();
 		while (fDDRoster.GetNextDiskSystem(&diskSystem) == B_OK) {
@@ -535,9 +534,15 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 
 		// Mount items
 		if (partition) {
-			fInitMenu->SetEnabled(!partition->IsMounted());
-			fDeleteMI->SetEnabled(!partition->IsMounted());
-			fMountMI->SetEnabled(!partition->IsMounted());
+			fInitMenu->SetEnabled(!partition->IsMounted()
+				&& !partition->IsReadOnly()
+				&& partition->Device()->HasMedia());
+
+			fDeleteMI->SetEnabled(!partition->IsMounted()
+				&& !partition->IsDevice());
+
+			fMountMI->SetEnabled(!partition->IsMounted()
+				&& !partition->IsDevice());
 
 			bool unMountable = false;
 			if (partition->IsMounted()) {
