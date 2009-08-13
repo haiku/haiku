@@ -181,23 +181,36 @@ PowerStatusView::_DrawBattery(BRect rect)
 		percent = 100;
 
 	if (percent > 0) {
-		rgb_color base;
+		rect.InsetBy(gap, gap);
+		rgb_color base = {84, 84, 84, 255};
+		if (be_control_look != NULL) {
+			BRect empty = rect;
+			if (fHasBattery && percent > 0)
+				empty.left += empty.Width() * percent / 100.0;
+
+			be_control_look->DrawButtonBackground(this, empty, empty, base,
+				fHasBattery
+					? BControlLook::B_ACTIVATED : BControlLook::B_DISABLED,
+				fHasBattery && percent > 0
+					? (BControlLook::B_ALL_BORDERS
+						& ~BControlLook::B_LEFT_BORDER)
+					: BControlLook::B_ALL_BORDERS);
+		}
+
 		if (fHasBattery) {
 			if (percent <= 15)
 				base.set_to(180, 0, 0);
 			else
 				base.set_to(20, 180, 0);
-		} else
-			base.set_to(84, 84, 84);
 
-		rect.InsetBy(gap, gap);
-		rect.right = rect.left + rect.Width() * percent / 100.0;
+			rect.right = rect.left + rect.Width() * percent / 100.0;
 
-		if (be_control_look != NULL) {
-			be_control_look->DrawButtonBackground(this, rect, rect, base,
-				fHasBattery ? 0 : BControlLook::B_DISABLED);
-		} else
-			FillRect(rect);
+			if (be_control_look != NULL) {
+				be_control_look->DrawButtonBackground(this, rect, rect, base,
+					fHasBattery ? 0 : BControlLook::B_DISABLED);
+			} else
+				FillRect(rect);
+		}
 	}
 
 	SetHighColor(0, 0, 0);
@@ -243,11 +256,7 @@ PowerStatusView::Draw(BRect updateRect)
 
 		if (iconRect.Width() + 1 >= kMinIconWidth
 			&& iconRect.Height() + 1 >= kMinIconHeight) {
-			// TODO: have real icons
-			//if (!fOnline)
-				_DrawBattery(iconRect);
-			//else
-			//	FillRect(iconRect);
+			_DrawBattery(iconRect);
 		} else {
 			// there is not enough space for the icon
 			iconRect.Set(0, 0, -1, -1);
@@ -346,9 +355,20 @@ PowerStatusView::Update(bool force)
 				width += ceilf(StringWidth(text)) + 4;
 		} else {
 			char text[256];
+			const char* open = "";
+			const char* close = "";
+			if (!fOnline) {
+				open = "(";
+				close = ")";
+			}
 			if (fHasBattery) {
-				snprintf(text, sizeof(text), "%ld%%\n%ld:%02ld\n%s",
-					fPercent, fTimeLeft / 3600, (fTimeLeft / 60) % 60,
+				size_t length = snprintf(text, sizeof(text), "%s%ld%%%s\n",
+					open, fPercent, close);
+				if (fTimeLeft) {
+					length += snprintf(text + length, sizeof(text) - length,
+						"%ld:%02ld\n", fTimeLeft / 3600, (fTimeLeft / 60) % 60);
+				}
+				length += snprintf(text + length, sizeof(text) - length, "%s",
 					fOnline ? "charging" : "discharging");
 			} else
 				strcpy(text, "no battery");
@@ -635,6 +655,8 @@ PowerStatusReplicant::_GetSettings(BFile& file, int mode)
 void
 PowerStatusReplicant::_LoadSettings()
 {
+	fShowLabel = false;
+
 	BFile file;
 	if (_GetSettings(file, B_READ_ONLY) != B_OK)
 		return;
