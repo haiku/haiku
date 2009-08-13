@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Haiku, Inc.
+ * Copyright 2007-2009 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,8 +14,8 @@
 
 class BAboutWindow {
 	public:
-		BAboutWindow(char *appName, int32 firstCopyrightYear,
-			const char **authors, char *extraInfo = NULL);
+		BAboutWindow(const char *appName, int32 firstCopyrightYear,
+			const char **authors, const char *extraInfo = NULL);
 		virtual ~BAboutWindow();
 
 		void Show();

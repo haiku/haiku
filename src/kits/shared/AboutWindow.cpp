@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Haiku, Inc.
+ * Copyright 2007-2009 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,8 +16,8 @@
 #include <time.h>
 
 
-BAboutWindow::BAboutWindow(char *appName, int32 firstCopyrightYear,
-	const char **authors, char *extraInfo)
+BAboutWindow::BAboutWindow(const char *appName, int32 firstCopyrightYear,
+	const char **authors, const char *extraInfo)
 {
 	fAppName = new BString(appName);
 
