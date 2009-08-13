@@ -356,7 +356,7 @@ StarWindow::SwitchContext(direct_buffer_info *info)
 	row_bytes = info->bytes_per_row / (info->bits_per_pixel / 8);
 	
 	// update the screen bases (only one of the 3 will be really used).
-	draw_ptr8 = (uint8*)info->bits + info->bytes_per_row * info->window_bounds.top + (info->window_bounds.left * info->bits_per_pixel / 8);
+	draw_ptr8 = (uint8*)info->bits + (info->bytes_per_row * info->window_bounds.top) + (info->window_bounds.left * (info->bits_per_pixel / 8));
 	draw_ptr16 = (uint16*)draw_ptr8;
 	draw_ptr32 = (uint32*)draw_ptr8;
 
