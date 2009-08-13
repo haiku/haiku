@@ -149,15 +149,17 @@ start_raw(int argc, char **argv)
 	args.platform.boot_tgz_data = NULL;
 	args.platform.boot_tgz_size = 0;
 	
-	// if we get passed a uimage, try to find the second blob
-	if (gUImage)
-		image_multi_getimg(gUImage, 1, &args.platform.boot_tgz_data,
-			&args.platform.boot_tgz_size);
 
 
 	serial_init();
 	console_init();
 	cpu_init();
+
+	// if we get passed a uimage, try to find the second blob
+	if (gUImage && image_multi_getimg(gUImage, 1, &args.platform.boot_tgz_data,
+		&args.platform.boot_tgz_size))
+		dprintf("Found boot tgz @ %p, %d bytes\n", args.platform.boot_tgz_data,
+			args.platform.boot_tgz_size);
 
 	{ //DEBUG:
 		int i;
@@ -167,6 +169,7 @@ start_raw(int argc, char **argv)
 		dprintf("os: %d\n", gUBootOS);
 		dprintf("gd @ %p\n", gGD);
 		dprintf("gd->bd @ %p\n", gGD->bd);
+		dprintf("fb_base %p\n", gGD->fb_base);
 		dprintf("uimage @ %p\n", gUImage);
 		if (gUImage)
 			dump_uimage(gUImage);
