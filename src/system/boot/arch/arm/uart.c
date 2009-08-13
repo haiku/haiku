@@ -113,18 +113,22 @@ void uart_init_port(int port, uint baud)
 
 void uart_init_early(void)
 {
-#warning INTITIALIZE UART!!!!!
+#if BOARD_CPU_OMAP3
 	/* UART1 */
-//	RMWREG32(CKEN1, 13, 1, 1),
-//	RMWREG32(CM_ICLKEN1_CORE, 13, 1, 1),
+	RMWREG32(CM_FCLKEN1_CORE, 13, 1, 1);
+	RMWREG32(CM_ICLKEN1_CORE, 13, 1, 1);
 
 	/* UART2 */
-//	RMWREG32(CM_FCLKEN1_CORE, 14, 1, 1),
-//	RMWREG32(CM_ICLKEN1_CORE, 14, 1, 1),
+	RMWREG32(CM_FCLKEN1_CORE, 14, 1, 1);
+	RMWREG32(CM_ICLKEN1_CORE, 14, 1, 1);
 
 	/* UART3 */
-//	RMWREG32(CM_FCLKEN_PER, 11, 1, 1),
-//	RMWREG32(CM_ICLKEN_PER, 11, 1, 1),
+	RMWREG32(CM_FCLKEN_PER, 11, 1, 1);
+	RMWREG32(CM_ICLKEN_PER, 11, 1, 1);
+#else
+#warning INTITIALIZE UART!!!!!
+#endif
+
 
 	uart_init_port(DEBUG_UART, 115200);
 }
@@ -136,21 +140,21 @@ void uart_init(void)
 int uart_putc(int port, char c )
 {
 
-//	while (!(read_uart_reg(port, UART_LSR) & (1<<6))) // wait for the last char to get out
-//		;
+	while (!(read_uart_reg(port, UART_LSR) & (1<<6))) // wait for the last char to get out
+		;
   	write_uart_reg(port, UART_THR, c);
 	return 0;
 }
 
 int uart_getc(int port, bool wait)  /* returns -1 if no data available */
 {
-//	if (wait) {
-//		while (!(read_uart_reg(port, UART_LSR) & (1<<0))) // wait for data to show up in the rx fifo
-//			;
-//	} else {
-//		if (!(read_uart_reg(port, UART_LSR) & (1<<0)))
-//			return -1;
-//	}
+	if (wait) {
+		while (!(read_uart_reg(port, UART_LSR) & (1<<0))) // wait for data to show up in the rx fifo
+			;
+	} else {
+		if (!(read_uart_reg(port, UART_LSR) & (1<<0)))
+			return -1;
+	}
 	return read_uart_reg(port, UART_RHR);
 }
 
