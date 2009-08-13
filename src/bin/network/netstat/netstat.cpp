@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,7 +54,7 @@ static void
 inet_print_address(sockaddr* _address)
 {
 	sockaddr_in& address = *(sockaddr_in *)_address;
-	
+
 	if (address.sin_family != AF_INET || address.sin_len == 0) {
 		printf("%-22s", "-");
 		return;
@@ -65,7 +65,7 @@ inet_print_address(sockaddr* _address)
 	if (sResolveNames) {
 		host = gethostbyaddr((const char*)&address.sin_addr, sizeof(in_addr),
 			AF_INET);
-		service = getservbyport(ntohs(address.sin_port), NULL);
+		service = getservbyport(address.sin_port, NULL);
 	}
 
 	const char *hostName;
