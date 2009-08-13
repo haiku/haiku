@@ -1,42 +1,29 @@
-/*****************************************************************************/
-// PrintOptionsWindow
-// Written by Michael Pfeiffer
-//
-// PrintOptionsWindow.h
-//
-//
-// Copyright (c) 2003 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Pfeiffer, laplace@haiku-os.org
+ */
+#ifndef PRINT_OPTIONS_WINDOW_H
+#define PRINT_OPTIONS_WINDOW_H
 
-#ifndef _PrintOptionsWindow_h
-#define _PrintOptionsWindow_h
 
-#include <Window.h>
-#include <RadioButton.h>
-#include <TextControl.h>
 #include <Messenger.h>
+#include <RadioButton.h>
 #include <Rect.h>
+#include <TextControl.h>
+#include <Window.h>
+
 
 class PrintOptions {
 public:
+					PrintOptions();
+	
+	// bounds of the image
+	BRect 			Bounds() const { return fBounds; }
+	void 			SetBounds(BRect bounds);
+
 	enum Option {
 		kFitToPage,
 		kZoomFactor,
@@ -45,50 +32,60 @@ public:
 		kHeight,
 		kNumberOfOptions
 	};
-
-	PrintOptions();
+	enum Option		Option() const { return fOption; }
+	void 			SetOption(enum Option op) { fOption = op; }
 	
-	// bounds of the image
-	BRect Bounds() const { return fBounds; }
-	void SetBounds(BRect bounds);
-
-	enum Option Option() const { return fOption; }
-	void SetOption(enum Option op) { fOption = op; }
-	// zoomFactor = 72.0 / dpi
-	float ZoomFactor() const { return fZoomFactor; }
-	void SetZoomFactor(float z);
-	float DPI() const { return fDPI; }
-	void SetDPI(float dpi);
-	// setting width/height updates height/width to keep aspect ratio
-	float Width() const { return fWidth; }
-	float Height() const { return fHeight; }
-	void SetWidth(float width);
-	void SetHeight(float height);
+	// ZoomFactor = 72.0 / dpi
+	float 			ZoomFactor() const { return fZoomFactor; }
+	void 			SetZoomFactor(float z);
+	float 			DPI() const { return fDPI; }
+	void 			SetDPI(float dpi);
+	
+	// Setting width/height updates height/width to keep aspect ratio
+	float 			Width() const { return fWidth; }
+	float 			Height() const { return fHeight; }
+	void 			SetWidth(float width);
+	void 			SetHeight(float height);
 	
 private:
-	BRect fBounds;
-	enum Option fOption;
-	float fZoomFactor;
-	float fDPI;
-	float fWidth, fHeight; // 1/72 Inches
+	BRect 			fBounds;
+	enum Option		fOption;
+	float 			fZoomFactor;
+	float 			fDPI;
+	float 			fWidth, fHeight; // 1/72 Inches
 };
 
-class PrintOptionsWindow : public BWindow
-{
+class PrintOptionsWindow : public BWindow {
 public:
-	PrintOptionsWindow(BPoint at, PrintOptions* options, BWindow* listener);
-	~PrintOptionsWindow();
+								PrintOptionsWindow(BPoint at,
+									PrintOptions* options, BWindow* listener);
+								~PrintOptionsWindow();
 
-	void MessageReceived(BMessage* msg);
+	void 			MessageReceived(BMessage* msg);
 
 private:
-	BRadioButton* AddRadioButton(BView* view, BPoint& at, const char* name, const char* label, uint32 what, bool selected);
-	BTextControl* AddTextControl(BView* view, BPoint& at, const char* name, const char* label, float value, float divider, uint32 what);
-	void Setup();
-	enum PrintOptions::Option MsgToOption(uint32 what);
-	bool GetValue(BTextControl* text, float* value);
-	void SetValue(BTextControl* text, float value);
+	BRadioButton* 				AddRadioButton(BView* view, BPoint& at,
+									const char* name, const char* label,
+									uint32 what, bool selected);
+
+	BTextControl* 				AddTextControl(BView* view, BPoint& at, 
+									const char* name, const char* label,
+									float value, float divider, uint32 what);
+
+	void						Setup();
+	enum PrintOptions::Option	MsgToOption(uint32 what);
+	bool						GetValue(BTextControl* text, float* value);
+	void						SetValue(BTextControl* text, float value);
 	
+	PrintOptions* 				fPrintOptions;
+	PrintOptions 				fCurrentOptions;
+	BMessenger 					fListener;
+	status_t 					fStatus;
+	BTextControl* 				fZoomFactor;
+	BTextControl* 				fDPI;
+	BTextControl* 				fWidth;
+	BTextControl* 				fHeight;
+
 	enum {
 		kMsgOK = 'mPOW',
 		kMsgFitToPageSelected,
@@ -106,15 +103,8 @@ private:
 		kIndent = 5,
 		kLineSkip = 5,
 	};
-	
-	PrintOptions* fPrintOptions;
-	PrintOptions fCurrentOptions;
-	BMessenger fListener;
-	status_t fStatus;
-	BTextControl* fZoomFactor;
-	BTextControl* fDPI;
-	BTextControl* fWidth;
-	BTextControl* fHeight;
 };
 
+
 #endif
+

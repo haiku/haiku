@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -7,10 +7,13 @@
  * Authors:
  *		yellowTAB GmbH
  *		Bernd Korz
- *      Michael Pfeiffer
- *      Ryan Leavengood
+ *		Michael Pfeiffer
+ *		Ryan Leavengood
  */
 
+#include "ResizerWindow.h"
+
+#include <stdlib.h>
 
 #include <Box.h>
 #include <Button.h>
@@ -20,9 +23,6 @@
 #include <String.h>
 #include <TextControl.h>
 
-#include <stdlib.h>
-
-#include "ResizerWindow.h"
 #include "ShowImageConstants.h"
 
 
@@ -37,10 +37,12 @@ static const float kVerticalIndent = 10;
 
 
 ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
-	: BWindow(BRect(100, 100, 300, 300), "Resize", B_FLOATING_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
-	, fOriginalWidth(width)
-	, fOriginalHeight(height)
-	, fTarget(target)
+	:
+	BWindow(BRect(100, 100, 300, 300), "Resize", B_FLOATING_WINDOW,
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+	fOriginalWidth(width),
+	fOriginalHeight(height),
+	fTarget(target)
 {
 	BView* back_view = new BView(Bounds(), "", B_FOLLOW_ALL, B_WILL_DRAW);
 	back_view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -51,8 +53,10 @@ ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 	const float column2 = max_c(widthLabelWidth, heightLabelWidth);
 
 	const float textControlWidth = column2 + back_view->StringWidth("999999");
-	const float keepAspectRatioLabelWidth = 20 + back_view->StringWidth(kKeepAspectRatioLabel);
-	const float width2 = 2 * kHorizontalIndent + max_c(textControlWidth, keepAspectRatioLabelWidth);
+	const float keepAspectRatioLabelWidth = 20
+		+ back_view->StringWidth(kKeepAspectRatioLabel);
+	const float width2 = 2 * kHorizontalIndent
+		+ max_c(textControlWidth, keepAspectRatioLabelWidth);
 	
 	ResizeTo(width2+1, Bounds().Height()+1);
 	
@@ -62,17 +66,20 @@ ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 	
 	BString widthValue;
 	widthValue << width;
-	fWidth = new BTextControl(rect, "width", kWidthLabel, widthValue.String(), NULL);
+	fWidth = new BTextControl(rect, "width", kWidthLabel, widthValue.String(),
+		NULL);
 	fWidth->SetModificationMessage(new BMessage(kWidthModifiedMsg));
 	AddControl(back_view, fWidth, column2, rect);
 					
 	BString heightValue;
 	heightValue << height;	
-	fHeight = new BTextControl(rect, "height", kHeightLabel, heightValue.String(), NULL);
+	fHeight = new BTextControl(rect, "height", kHeightLabel,
+		heightValue.String(), NULL);
 	fHeight->SetModificationMessage(new BMessage(kHeightModifiedMsg));
 	AddControl(back_view, fHeight, column2, rect);
 	
-	fAspectRatio = new BCheckBox(rect, "Ratio", kKeepAspectRatioLabel, new BMessage(kWidthModifiedMsg));
+	fAspectRatio = new BCheckBox(rect, "Ratio", kKeepAspectRatioLabel,
+		new BMessage(kWidthModifiedMsg));
 	fAspectRatio->SetValue(B_CONTROL_ON);
 	AddControl(back_view, fAspectRatio, column2, rect);
 	
@@ -87,8 +94,14 @@ ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 }
 
 
+ResizerWindow::~ResizerWindow()
+{
+}
+
+
 void
-ResizerWindow::AddControl(BView* view, BControl* control, float column2, BRect& rect)
+ResizerWindow::AddControl(BView* view, BControl* control, float column2,
+	BRect& rect)
 {
 	float width, height;
 	view->AddChild(control);
@@ -116,7 +129,8 @@ ResizerWindow::AddSeparatorLine(BView* view, BRect& rect)
 	line.right -= 3;
 	line.top = rect.top;
 	line.bottom = line.top + lineWidth - 1;
-	BBox* separatorLine = new BBox(line, "", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
+	BBox* separatorLine = new BBox(line, "", B_FOLLOW_LEFT_RIGHT,
+		B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
 	view->AddChild(separatorLine);
 	rect.OffsetBy(0, kLineDistance + lineWidth);
 }
@@ -177,7 +191,8 @@ ResizerWindow::MessageReceived(BMessage* message)
 		case kWidthModifiedMsg:
 			if (fAspectRatio->Value() == B_CONTROL_ON) {
 				int w = atoi(fWidth->Text());
-				int h = (int)((int64)w * (int64) fOriginalHeight / (int64) fOriginalWidth);
+				int h = (int)((int64)w * (int64) fOriginalHeight
+					/ (int64) fOriginalWidth);
 				BString height;
 				height << h;
 				BMessage* msg = new BMessage(*fHeight->ModificationMessage());
@@ -189,7 +204,8 @@ ResizerWindow::MessageReceived(BMessage* message)
 		case kHeightModifiedMsg:
 			if (fAspectRatio->Value() == B_CONTROL_ON) {
 				int h = atoi(fHeight->Text());
-				int w = (int)((int64)h * (int64) fOriginalWidth / (int64) fOriginalHeight);
+				int w = (int)((int64)h * (int64) fOriginalWidth
+					/ (int64) fOriginalHeight);
 				BString width;
 				width << w;
 				BMessage* msg = new BMessage(*fWidth->ModificationMessage());
@@ -210,11 +226,6 @@ ResizerWindow::MessageReceived(BMessage* message)
 		default:
 			BWindow::MessageReceived(message);
 	}
-}
-
-
-ResizerWindow::~ResizerWindow()
-{
 }
 
 

@@ -3,23 +3,24 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include "ProgressWindow.h"
-#include "ShowImageConstants.h"
+
+#include <stdio.h>
 
 #include <Autolock.h>
 #include <MessageRunner.h>
 #include <Screen.h>
 #include <StatusBar.h>
 
-#include <stdio.h>
+#include "ShowImageConstants.h"
 
 
 static const uint32 kMsgShow = 'show';
 
 
 ProgressWindow::ProgressWindow(BWindow* referenceWindow)
-	: BWindow(BRect(0, 0, 250, 100), "Progress Monitor",
+	:
+	BWindow(BRect(0, 0, 250, 100), "Progress Monitor",
 		B_MODAL_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS),
 	fRunner(NULL)

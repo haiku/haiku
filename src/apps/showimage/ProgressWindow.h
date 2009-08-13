@@ -13,20 +13,21 @@ class BStatusBar;
 
 
 class ProgressWindow : public BWindow {
-	public:
-		ProgressWindow(BWindow* referenceWindow);
-		virtual ~ProgressWindow();
+public:
+					ProgressWindow(BWindow* referenceWindow);
+	virtual			~ProgressWindow();
 
-		virtual void MessageReceived(BMessage *message);
+	virtual void 	MessageReceived(BMessage *message);
 
-		void Start();
-		void Stop();
+			void	Start();
+			void	Stop();
 
-	private:
-		BStatusBar*		fStatusBar;
-		BMessageRunner*	fRunner;
-		bool			fRetrievedUpdate;
-		bool			fRetrievedShow;
+private:
+	BStatusBar*		fStatusBar;
+	BMessageRunner*	fRunner;
+	bool			fRetrievedUpdate;
+	bool			fRetrievedShow;
 };
+
 
 #endif	// PROGRESS_WINDOW_H

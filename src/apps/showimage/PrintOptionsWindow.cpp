@@ -1,54 +1,40 @@
-/*****************************************************************************/
-// PrintOptionsWindow
-// Written by Michael Pfeiffer
-//
-// PrintOptionsWindow.cpp
-//
-//
-// Copyright (c) 2003 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Pfeiffer, laplace@haiku-os.org
+ */
+
+#include "PrintOptionsWindow.h"
+
+#include <stdio.h> // for sprintf
+#include <stdlib.h> // for atof
 
 #include <Box.h>
 #include <Button.h>
 #include <String.h>
-#include <stdio.h> // for sprintf
-#include <stdlib.h> // for atof
 
-#include "PrintOptionsWindow.h"
 #include "ShowImageConstants.h"
 
+
 PrintOptions::PrintOptions()
-	: fOption(kFitToPage)
-	, fZoomFactor(1.0)
-	, fDPI(72.0)
-	, fWidth(1024 / 72.0)
-	, fHeight(768 / 72.0)
+	:
+	fOption(kFitToPage),
+	fZoomFactor(1.0),
+	fDPI(72.0),
+	fWidth(1024/72.0),
+	fHeight(768/72.0)
 {
 }
+
 
 void
 PrintOptions::SetBounds(BRect rect)
 {
 	fBounds = rect;
 }
+
 
 void
 PrintOptions::SetZoomFactor(float f)
@@ -57,6 +43,7 @@ PrintOptions::SetZoomFactor(float f)
 	fDPI = 72.0 / fZoomFactor;
 }
 
+
 void
 PrintOptions::SetDPI(float dpi)
 {
@@ -64,12 +51,14 @@ PrintOptions::SetDPI(float dpi)
 	fZoomFactor = 72.0 / dpi;
 }
 
+
 void
 PrintOptions::SetWidth(float w)
 {
 	fWidth = w;
-	fHeight = (fBounds.Height()+1) * w / (fBounds.Width()+1);
+	fHeight = (fBounds.Height() + 1) * w / (fBounds.Width() + 1);
 }
+
 
 void
 PrintOptions::SetHeight(float h)
@@ -78,19 +67,23 @@ PrintOptions::SetHeight(float h)
 	fHeight = h;
 }
 
-PrintOptionsWindow::PrintOptionsWindow(BPoint at, PrintOptions *options, BWindow* listener)
-	: BWindow(BRect(at.x, at.y, at.x+300, at.y+200), "Print Options", 
-	B_TITLED_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL, 
-	B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
-	, fPrintOptions(options)
-	, fCurrentOptions(*options)
-	, fListener(listener)
-	, fStatus(B_ERROR)
+
+PrintOptionsWindow::PrintOptionsWindow(BPoint at, PrintOptions *options,
+	BWindow* listener)
+	: 
+	BWindow(BRect(at.x, at.y, at.x + 300, at.y + 200), "Print Options", 
+		B_TITLED_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL, 
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+	fPrintOptions(options),
+	fCurrentOptions(*options),
+	fListener(listener),
+	fStatus(B_ERROR)
 {
 	AddToSubset(listener);
 	Setup();
 	Show();
 }
+
 
 PrintOptionsWindow::~PrintOptionsWindow()
 {
@@ -99,8 +92,10 @@ PrintOptionsWindow::~PrintOptionsWindow()
 	fListener.SendMessage(&msg);
 }
 
+
 BRadioButton*
-PrintOptionsWindow::AddRadioButton(BView* view, BPoint& at, const char* name, const char* label, uint32 what, bool selected)
+PrintOptionsWindow::AddRadioButton(BView* view, BPoint& at, const char* name,
+	const char* label, uint32 what, bool selected)
 {
 	BRect rect(0, 0, 100, 20);
 	BRadioButton* button;
@@ -113,8 +108,10 @@ PrintOptionsWindow::AddRadioButton(BView* view, BPoint& at, const char* name, co
 	return button;
 }
 
+
 BTextControl*
-PrintOptionsWindow::AddTextControl(BView* view, BPoint& at, const char* name, const char* label, float value, float divider, uint32 what)
+PrintOptionsWindow::AddTextControl(BView* view, BPoint& at, const char* name,
+	const char* label, float value, float divider, uint32 what)
 {
 	BRect rect(0, 0, divider + 45, 20);
 	BTextControl* text;
@@ -128,6 +125,7 @@ PrintOptionsWindow::AddTextControl(BView* view, BPoint& at, const char* name, co
 	at.y += text->Bounds().Height() + kLineSkip;
 	return text;	
 }
+
 
 void
 PrintOptionsWindow::Setup()
@@ -145,24 +143,33 @@ PrintOptionsWindow::Setup()
 		B_PLAIN_BORDER);
 	AddChild(panel);
 	
-	AddRadioButton(panel, at, "fit_to_page", "Fit Image to Page", kMsgFitToPageSelected, op == PrintOptions::kFitToPage);
+	AddRadioButton(panel, at, "fit_to_page", "Fit Image to Page",
+		kMsgFitToPageSelected, op == PrintOptions::kFitToPage);
 	textAt = at;
-	rb = AddRadioButton(panel, at, "zoom_factor", "Zoom Factor in %: ", kMsgZoomFactorSelected, op == PrintOptions::kZoomFactor);
+	rb = AddRadioButton(panel, at, "zoom_factor", "Zoom Factor in %: ",
+		kMsgZoomFactorSelected, op == PrintOptions::kZoomFactor);
 	textAt.x = rb->Bounds().right + 5;
-	fZoomFactor = AddTextControl(panel, textAt, "zoom_factor_text", "", fCurrentOptions.ZoomFactor()*100, 0, kMsgZoomFactorChanged);
+	fZoomFactor = AddTextControl(panel, textAt, "zoom_factor_text", "",
+		fCurrentOptions.ZoomFactor()*100, 0, kMsgZoomFactorChanged);
 
 	textAt = at;
-	rb = AddRadioButton(panel, at, "dpi", "DPI: ", kMsgDPISelected, op == PrintOptions::kDPI);
+	rb = AddRadioButton(panel, at, "dpi", "DPI: ", kMsgDPISelected,
+		op == PrintOptions::kDPI);
 	textAt.x = rb->Bounds().right + 5;
-	fDPI = AddTextControl(panel, textAt, "dpi_text", "", fCurrentOptions.DPI(), 0, kMsgDPIChanged);
+	fDPI = AddTextControl(panel, textAt, "dpi_text", "", fCurrentOptions.DPI(),
+		0, kMsgDPIChanged);
 
-	rb = AddRadioButton(panel, at, "width_and_height", "Resize To (in 1/72 Inches):", kMsgWidthAndHeightSelected, op == PrintOptions::kWidth || op == PrintOptions::kHeight); 
+	rb = AddRadioButton(panel, at, "width_and_height",
+		"Resize To (in 1/72 Inches):", kMsgWidthAndHeightSelected,
+		op == PrintOptions::kWidth || op == PrintOptions::kHeight); 
 	at.x += 15;
 	textAt = at;	
-	fWidth = AddTextControl(panel, textAt, "width", "Width: ", fCurrentOptions.Width(), 40, kMsgWidthChanged);
+	fWidth = AddTextControl(panel, textAt, "width", "Width: ",
+		fCurrentOptions.Width(), 40, kMsgWidthChanged);
 	textAt = at;
 	textAt.x += fWidth->Bounds().Width() + 5;
-	fHeight = AddTextControl(panel, textAt, "height", "Height: ", fCurrentOptions.Height(), 40, kMsgHeightChanged);
+	fHeight = AddTextControl(panel, textAt, "height", "Height: ",
+		fCurrentOptions.Height(), 40, kMsgHeightChanged);
 
 	at.x = 0;
 	at.y = textAt.y;
@@ -172,7 +179,8 @@ PrintOptionsWindow::Setup()
 	
 	at.y += 10;
 	rect.OffsetBy(at);
-	button = new BButton(rect, "job setup", "Job Setup", new BMessage(kMsgJobSetup));
+	button = new BButton(rect, "job setup", "Job Setup",
+		new BMessage(kMsgJobSetup));
 	panel->AddChild(button);
 	button->ResizeToPreferred();
 
@@ -182,11 +190,14 @@ PrintOptionsWindow::Setup()
 	ResizeTo(fHeight->Frame().right + kIndent, button->Frame().bottom + kIndent);
 
 	// center button 
-	button->MoveTo((Bounds().Width()-button->Bounds().Width())/2, button->Frame().top);
+	button->MoveTo((Bounds().Width()-button->Bounds().Width())/2,
+		button->Frame().top);
 }
 
+
 enum PrintOptions::Option
-PrintOptionsWindow::MsgToOption(uint32 what) {
+PrintOptionsWindow::MsgToOption(uint32 what)
+{
 	switch (what) {
 		case kMsgFitToPageSelected: return PrintOptions::kFitToPage;
 		case kMsgZoomFactorSelected: return PrintOptions::kZoomFactor;
@@ -196,12 +207,14 @@ PrintOptionsWindow::MsgToOption(uint32 what) {
 	return PrintOptions::kFitToPage;
 }
 
+
 bool
 PrintOptionsWindow::GetValue(BTextControl* text, float* value)
 {
 	*value = atof(text->Text());
 	return true;
 }
+
 
 void
 PrintOptionsWindow::SetValue(BTextControl* text, float value)
@@ -216,6 +229,7 @@ PrintOptionsWindow::SetValue(BTextControl* text, float value)
 	text->SetModificationMessage(msg);
 }
 
+
 void
 PrintOptionsWindow::MessageReceived(BMessage* msg)
 {
@@ -229,7 +243,8 @@ PrintOptionsWindow::MessageReceived(BMessage* msg)
 			break;
 		
 		case kMsgZoomFactorChanged:
-			if (GetValue(fZoomFactor, &value) && fCurrentOptions.ZoomFactor() != value) {
+			if (GetValue(fZoomFactor, &value)
+				&& fCurrentOptions.ZoomFactor() != value) {
 				fCurrentOptions.SetZoomFactor(value/100);
 				SetValue(fDPI, fCurrentOptions.DPI());
 			}
@@ -263,3 +278,4 @@ PrintOptionsWindow::MessageReceived(BMessage* msg)
 			BWindow::MessageReceived(msg);
 	}
 }
+

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -7,15 +7,16 @@
  * Authors:
  *		yellowTAB GmbH
  *		Bernd Korz
- *      Michael Pfeiffer
- *      Ryan Leavengood
+ *		Michael Pfeiffer
+ *		Ryan Leavengood
  */
-#ifndef _RESIZER_WINDOW_H
-#define _RESIZER_WINDOW_H
+#ifndef RESIZER_WINDOW_H
+#define RESIZER_WINDOW_H
 
 
-#include <Window.h>
+#include <Messenger.h>
 #include <View.h>
+#include <Window.h>
 
 class BCheckBox;
 class BControl;
@@ -24,7 +25,8 @@ class BTextControl;
 
 class ResizerWindow : public BWindow {
 	public:			
-						ResizerWindow(BMessenger target, int32 width, int32 height );
+						ResizerWindow(BMessenger target, int32 width,
+							int32 height );
 
 		virtual void	MessageReceived(BMessage* msg);
 		virtual	bool	QuitRequested();
@@ -36,7 +38,8 @@ class ResizerWindow : public BWindow {
 			kActivateMsg = 'RSRa',
 				// activates the window
 			kUpdateMsg,
-				// provides the new size of the image in two "int32" fields "width" and "height"
+				// provides the new size of the image in two "int32" fields
+				// "width" and "height"
 		};
 
 	private:
@@ -47,10 +50,10 @@ class ResizerWindow : public BWindow {
 			kApplyMsg,
 		};
 
-		void AddControl(BView* parent, BControl* control, float column2,
-			BRect& rect);
-		void AddSeparatorLine(BView* parent, BRect& rect);
-		void LeftAlign(BControl* control);
+		void			AddControl(BView* parent, BControl* control,
+							float column2, BRect& rect);
+		void			AddSeparatorLine(BView* parent, BRect& rect);
+		void			LeftAlign(BControl* control);
 
 		BTextControl*	fWidth;
 		BTextControl*	fHeight;
@@ -58,9 +61,10 @@ class ResizerWindow : public BWindow {
 		BButton*		fApply;
 		// the original size of the image use for aspect ratio calculation
 		// to avoid rounding errors
-		int32           fOriginalWidth;
-		int32           fOriginalHeight;
+		int32			fOriginalWidth;
+		int32			fOriginalHeight;
 		BMessenger		fTarget;
 };
 
-#endif	// _RESIZER_WINDOW_H
+
+#endif	// RESIZER_WINDOW_H

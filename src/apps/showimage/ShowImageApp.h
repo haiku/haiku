@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,36 +18,37 @@
 
 
 class ShowImageApp : public BApplication {
-	public:
-		ShowImageApp();
-		virtual ~ShowImageApp();
+public:
+								ShowImageApp();
+	virtual						~ShowImageApp();
 
-	public:
-		virtual void AboutRequested();
-		virtual void ArgvReceived(int32 argc, char **argv);
-		virtual void MessageReceived(BMessage *message);
-		virtual void ReadyToRun();
-		virtual void Pulse();
-		virtual void RefsReceived(BMessage *message);
-		virtual bool QuitRequested();
+	virtual	void				AboutRequested();
+	virtual	void				ArgvReceived(int32 argc, char **argv);
+	virtual	void				MessageReceived(BMessage *message);
+	virtual	void				ReadyToRun();
+	virtual	void				Pulse();
+	virtual	void				RefsReceived(BMessage *message);
+	virtual	bool				QuitRequested();
 
-		ShowImageSettings* Settings() { return &fSettings; }
+			ShowImageSettings* 	Settings() { return &fSettings; }
 
-	private:
-		void StartPulse();
-		void Open(const entry_ref *ref);
-		void BroadcastToWindows(BMessage *message);
-		void CheckClipboard();
+private:
+			void				StartPulse();
+			void				Open(const entry_ref *ref);
+			void				BroadcastToWindows(BMessage *message);
+			void				CheckClipboard();
 
-		BMessenger fTrackerMessenger; // of the window this was launched
-		BFilePanel *fOpenPanel;
-		bool fPulseStarted;
-		ShowImageSettings fSettings;
+			BMessenger 			fTrackerMessenger;
+			BFilePanel			*fOpenPanel;
+			bool				fPulseStarted;
+			ShowImageSettings	fSettings;
 };
+
 
 extern const char *kApplicationSignature;
 
 #define my_app dynamic_cast<ShowImageApp*>(be_app)
+
 
 #endif	// SHOW_IMAGE_APP_H
 

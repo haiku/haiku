@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,10 +9,9 @@
  *		Ryan Leavengood
  */
 
-
 #include "ShowImageApp.h"
-#include "ShowImageConstants.h"
-#include "ShowImageWindow.h"
+
+#include <stdio.h>
 
 #include <AboutWindow.h>
 #include <Alert.h>
@@ -21,7 +20,8 @@
 #include <Path.h>
 #include <String.h>
 
-#include <stdio.h>
+#include "ShowImageConstants.h"
+#include "ShowImageWindow.h"
 
 
 #define WINDOWS_TO_IGNORE 1
@@ -30,7 +30,8 @@ extern const char *kApplicationSignature = "application/x-vnd.Haiku-ShowImage";
 
 
 ShowImageApp::ShowImageApp()
-	: BApplication(kApplicationSignature)
+	:
+	BApplication(kApplicationSignature)
 {
 	fPulseStarted = false;
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL);
@@ -109,7 +110,8 @@ ShowImageApp::ArgvReceived(int32 argc, char **argv)
 
 	// get current working directory
 	const char *cwd;
-	if (CurrentMessage() == NULL || CurrentMessage()->FindString("cwd", &cwd) != B_OK)
+	if (CurrentMessage() == NULL
+		|| CurrentMessage()->FindString("cwd", &cwd) != B_OK)
 		cwd = "";
 
 	for (int32 i = 1; i < argc; i++) {

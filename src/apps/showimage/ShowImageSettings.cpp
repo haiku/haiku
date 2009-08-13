@@ -1,41 +1,23 @@
-/*****************************************************************************/
-// ShowImageSettings
-// Written by Michael Pfeiffer
-//
-// ShowImageSettings.cpp
-//
-//
-// Copyright (c) 2003 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Pfeiffer, laplace@haiku-os.org
+ */
+
+#include "ShowImageSettings.h"
 
 #include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
 
-#include "ShowImageSettings.h"
 
 ShowImageSettings::ShowImageSettings()
 {
 	Load();
 }
+
 
 ShowImageSettings::~ShowImageSettings()
 {
@@ -45,17 +27,20 @@ ShowImageSettings::~ShowImageSettings()
 	}
 }
 
+
 bool
 ShowImageSettings::Lock()
 {
 	return fLock.Lock();
 }
 
+
 void
 ShowImageSettings::Unlock()
 {
 	fLock.Unlock();
 }
+
 
 bool
 ShowImageSettings::GetBool(const char* name, bool defaultValue)
@@ -68,6 +53,7 @@ ShowImageSettings::GetBool(const char* name, bool defaultValue)
 	}
 }
 
+
 int32 
 ShowImageSettings::GetInt32(const char* name, int32 defaultValue)
 {
@@ -78,6 +64,7 @@ ShowImageSettings::GetInt32(const char* name, int32 defaultValue)
 		return defaultValue;
 	}
 }
+
 
 float 
 ShowImageSettings::GetFloat(const char* name, float defaultValue)
@@ -90,6 +77,7 @@ ShowImageSettings::GetFloat(const char* name, float defaultValue)
 	}
 }
 
+
 BRect
 ShowImageSettings::GetRect(const char* name, BRect defaultValue)
 {
@@ -100,6 +88,7 @@ ShowImageSettings::GetRect(const char* name, BRect defaultValue)
 		return defaultValue;
 	}
 }
+
 
 const char*
 ShowImageSettings::GetString(const char* name, const char* defaultValue)
@@ -112,6 +101,7 @@ ShowImageSettings::GetString(const char* name, const char* defaultValue)
 	}
 }
 
+
 void
 ShowImageSettings::SetBool(const char* name, bool value)
 {
@@ -121,6 +111,7 @@ ShowImageSettings::SetBool(const char* name, bool value)
 		fSettings.AddBool(name, value);
 	}
 }
+
 
 void
 ShowImageSettings::SetInt32(const char* name, int32 value)
@@ -132,6 +123,7 @@ ShowImageSettings::SetInt32(const char* name, int32 value)
 	}
 }
 
+
 void
 ShowImageSettings::SetFloat(const char* name, float value)
 {
@@ -141,6 +133,7 @@ ShowImageSettings::SetFloat(const char* name, float value)
 		fSettings.AddFloat(name, value);
 	}
 }
+
 
 void
 ShowImageSettings::SetRect(const char* name, BRect value)
@@ -152,6 +145,7 @@ ShowImageSettings::SetRect(const char* name, BRect value)
 	}
 }
 
+
 void
 ShowImageSettings::SetString(const char* name, const char* value)
 {
@@ -161,6 +155,7 @@ ShowImageSettings::SetString(const char* name, const char* value)
 		fSettings.AddString(name, value);
 	}
 }
+
 
 bool
 ShowImageSettings::OpenSettingsFile(BFile* file, bool forReading)
@@ -182,6 +177,7 @@ ShowImageSettings::OpenSettingsFile(BFile* file, bool forReading)
 	return st == B_OK;
 }
 
+
 void
 ShowImageSettings::Load()
 {
@@ -191,6 +187,7 @@ ShowImageSettings::Load()
 	}
 }
 
+
 void
 ShowImageSettings::Save()
 {
@@ -199,3 +196,4 @@ ShowImageSettings::Save()
 		fSettings.Flatten(&file);
 	}
 }
+
