@@ -81,9 +81,6 @@ struct address_family {
 };
 
 
-const char* kNetServerSignature = "application/x-vnd.haiku-net_server";
-
-
 // AF_INET family
 static bool inet_parse_address(const char* string, sockaddr* address);
 static void inet_set_any_address(sockaddr* address);
@@ -559,7 +556,7 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface,
 		// retrieve addresses
 
 		bool autoConfig;
-		if (addressMessage.FindBool("auto config", &autoConfig) != B_OK)
+		if (addressMessage.FindBool("auto_config", &autoConfig) != B_OK)
 			autoConfig = false;
 #if 0
 		if (autoConfig && fromMessage) {
@@ -731,7 +728,7 @@ NetServer::_ConfigureDevice(int socket, const char* path)
 	interface.AddString("device", path);
 	BMessage address;
 	address.AddString("family", "inet");
-	address.AddBool("auto config", true);
+	address.AddBool("auto_config", true);
 	interface.AddMessage("address", &address);
 
 	return _ConfigureInterface(socket, interface);

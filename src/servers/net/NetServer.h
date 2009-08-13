@@ -14,9 +14,10 @@
 #include <net/if.h>
 
 
-extern const char* kNetServerSignature;
-
-static const uint32 kMsgConfigureInterface = 'COif';
+// NOTE: this header is used by other applications (such as ifconfig,
+// and Network) because of these two defines
+#define kNetServerSignature		"application/x-vnd.haiku-net_server"
+#define kMsgConfigureInterface	'COif'
 
 
 extern bool get_family_index(const char* name, int32& familyIndex);

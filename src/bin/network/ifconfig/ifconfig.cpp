@@ -762,7 +762,7 @@ configure_interface(int socket, const char* name, char* const* args,
 		message.AddString("device", name);
 		BMessage address;
 		address.AddString("family", "inet");
-		address.AddBool("auto config", true);
+		address.AddBool("auto_config", true);
 		message.AddMessage("address", &address);
 
 		BMessenger networkServer(kNetServerSignature);

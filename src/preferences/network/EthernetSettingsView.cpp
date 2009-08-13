@@ -449,7 +449,7 @@ EthernetSettingsView::_TriggerAutoConfig(const char* device)
 	message.AddString("device", device);
 	BMessage address;
 	address.AddString("family", "inet");
-	address.AddBool("auto config", true);
+	address.AddBool("auto_config", true);
 	message.AddMessage("address", &address);
 
 	BMessage reply;
