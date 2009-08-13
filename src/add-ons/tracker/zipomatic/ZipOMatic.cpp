@@ -128,7 +128,7 @@ ZipOMatic::QuitRequested  (void)
 	
 	BWindow* window;
 	ZippoWindow* zippo;
-	ZippoWindow* lastFoundZippo;
+	ZippoWindow* lastFoundZippo = NULL;
 	int32 zippoCount = 0;
 	
 	for (int32 i = 0;; i++) {

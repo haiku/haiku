@@ -2,13 +2,11 @@
 #define _ZIPOMATIC_WINDOW_H
 
 
-#include <Bitmap.h>
-#include <Menu.h>
-#include <MenuBar.h>
-#include <MenuItem.h>
+#include <Button.h>
+#include <StringView.h>
 #include <Window.h>
 
-#include "ZipOMaticView.h"
+#include "ZipOMaticActivity.h"
 #include "ZipperThread.h"
 
 
@@ -30,7 +28,11 @@ private:
 			void			_StartZipping(BMessage* message);
 			void			_CloseWindowOrKeepOpen();
 
-			ZippoView*		fView;
+			Activity*		fActivityView;
+			BStringView*	fArchiveNameView;
+			BStringView*	fZipOutputView;
+			BButton*		fStopButton;
+
 			ZipperThread*	fThread;
 	
 			bool			fWindowGotRefs;

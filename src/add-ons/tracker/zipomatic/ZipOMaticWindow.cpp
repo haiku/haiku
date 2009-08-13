@@ -12,37 +12,63 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <Alert.h>
 #include <Application.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
-#include <InterfaceKit.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <Path.h>
 #include <Roster.h>
+#include <SeparatorView.h>
 #include <String.h>
 
 #include "ZipOMatic.h"
 #include "ZipOMaticActivity.h"
 #include "ZipOMaticMisc.h"
-#include "ZipOMaticView.h"
 #include "ZipperThread.h"
 
 
 ZippoWindow::ZippoWindow(BRect frame, BMessage* refs)
 	:
-	BWindow(frame, "Zip-O-Matic", B_TITLED_WINDOW, B_NOT_V_RESIZABLE),
-	fView(NULL),
+	BWindow(frame, "Zip-O-Matic", B_TITLED_WINDOW, B_NOT_V_RESIZABLE
+		| B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE),
 	fThread(NULL),
 	fWindowGotRefs(false),
 	fZippingWasStopped(false),
 	fWindowInvoker(new BInvoker(new BMessage(ZIPPO_QUIT_OR_CONTINUE), NULL,
 		this))
 {
-	fView = new ZippoView(Bounds());
-	AddChild(fView);
-	
-	SetSizeLimits(Bounds().Width(), 15000, Bounds().Height(),
-		Bounds().Height());
+	fActivityView = new Activity(BRect(0, 0, 171, 17), "activity",
+	B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW | B_FRAME_EVENTS);
+	fActivityView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 17));
+	fActivityView->SetExplicitMinSize(BSize(171, 17));
+
+	fArchiveNameView = new BStringView("archive_text", "");
+	fArchiveNameView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+
+	fZipOutputView = new BStringView("output_text", "Drop files to zip.");
+	fZipOutputView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+
+	fStopButton = new BButton("stop", "Stop", new BMessage(B_QUIT_REQUESTED));
+	fStopButton->SetEnabled(false);
+	fStopButton->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
+		B_ALIGN_VERTICAL_UNSET));
+
+	BSeparatorView* separator = new BSeparatorView(B_HORIZONTAL);
+
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+		.Add(fActivityView)		
+		.Add(fArchiveNameView)
+		.Add(fZipOutputView)
+		.Add(separator)
+		.Add(fStopButton)
+		.SetInsets(14, 14, 14, 14)
+	);
 
 	if (refs != NULL)
 	{
@@ -77,13 +103,13 @@ ZippoWindow::MessageReceived(BMessage* message)
 		
 		case ZIPPO_THREAD_EXIT:
 			fThread = NULL;
-			fView->fActivityView->Stop();
-			fView->fStopButton->SetEnabled(false);
-			fView->fArchiveNameView->SetText(" ");
+			fActivityView->Stop();
+			fStopButton->SetEnabled(false);
+			fArchiveNameView->SetText(" ");
 			if (fZippingWasStopped)
-				fView->fZipOutputView->SetText("Stopped");
+				fZipOutputView->SetText("Stopped");
 			else
-				fView->fZipOutputView->SetText("Archive created OK");
+				fZipOutputView->SetText("Archive created OK");
 				
 			_CloseWindowOrKeepOpen();
 			break;
@@ -91,17 +117,17 @@ ZippoWindow::MessageReceived(BMessage* message)
 		case ZIPPO_THREAD_EXIT_ERROR:
 			// TODO: figure out why this case does not happen when it should
 			fThread = NULL;
-			fView->fActivityView->Stop();
-			fView->fStopButton->SetEnabled(false);
-			fView->fArchiveNameView->SetText("");
-			fView->fZipOutputView->SetText("Error creating archive");
+			fActivityView->Stop();
+			fStopButton->SetEnabled(false);
+			fArchiveNameView->SetText("");
+			fZipOutputView->SetText("Error creating archive");
 			break;
 						
 		case ZIPPO_TASK_DESCRIPTION:
 		{
 			BString string;
 			if (message->FindString("archive_filename", &string) == B_OK)
-				fView->fArchiveNameView->SetText(string.String());
+				fArchiveNameView->SetText(string.String());
 			break;
 		}
 
@@ -109,7 +135,7 @@ ZippoWindow::MessageReceived(BMessage* message)
 		{
 			BString string;
 			if (message->FindString("zip_output", &string) == B_OK)
-				fView->fZipOutputView->SetText(string.String());
+				fZipOutputView->SetText(string.String());
 			break;
 		}
 
@@ -123,7 +149,7 @@ ZippoWindow::MessageReceived(BMessage* message)
 					if (fThread != NULL)
 						fThread->ResumeExternalZip();
 						
-					fView->fActivityView->Start();
+					fActivityView->Start();
 				}
 			}
 			break;
@@ -146,7 +172,7 @@ ZippoWindow::QuitRequested()
 		return true;
 	} else {
 		fThread->SuspendExternalZip();
-		fView->fActivityView->Pause();
+		fActivityView->Pause();
 
 		BAlert* alert = new BAlert("Stop or Continue",
 			"Are you sure you want to stop creating this archive?", "Stop",
@@ -161,8 +187,8 @@ ZippoWindow::QuitRequested()
 void
 ZippoWindow::_StartZipping(BMessage* message)
 {
-	fView->fStopButton->SetEnabled(true);
-	fView->fActivityView->Start();
+	fStopButton->SetEnabled(true);
+	fActivityView->Start();
 
 	fThread = new ZipperThread(message, this);
 	fThread->Start();
@@ -176,8 +202,8 @@ ZippoWindow::StopZipping()
 {
 	fZippingWasStopped = true;
 
-	fView->fStopButton->SetEnabled(false);
-	fView->fActivityView->Stop();
+	fStopButton->SetEnabled(false);
+	fActivityView->Stop();
 
 	fThread->InterruptExternalZip();
 	fThread->Quit();
@@ -186,8 +212,8 @@ ZippoWindow::StopZipping()
 	fThread->WaitForThread(&status);
 	fThread = NULL;
 
-	fView->fArchiveNameView->SetText(" ");
-	fView->fZipOutputView->SetText("Stopped");
+	fArchiveNameView->SetText(" ");
+	fZipOutputView->SetText("Stopped");
 
 	_CloseWindowOrKeepOpen();
 }
@@ -214,19 +240,7 @@ ZippoWindow::_CloseWindowOrKeepOpen()
 void
 ZippoWindow::Zoom(BPoint origin, float width, float height)
 {
-	if (IsZipping()) {
-		float archiveNameWidth =
-			fView->StringWidth(fView->fArchiveNameView->Text());
-		float zipOutputWidth  = 
-			fView->StringWidth(fView->fZipOutputView->Text());
-	
-		if (zipOutputWidth > archiveNameWidth)
-			ResizeTo(zipOutputWidth, Bounds().Height());
-		else
-			ResizeTo(archiveNameWidth, Bounds().Height());
-		
-	} else {
-		ResizeTo(230,110);
-	}
+	// TODO: Think about removing this method when 
+	// zipomatic's new layout code works right.
 }
 

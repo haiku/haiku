@@ -6,7 +6,6 @@ Application ZipOMatic-Z :
 	ZipOMaticActivity.cpp
 	ZipOMaticMisc.cpp
 	ZipOMaticSettings.cpp
-	ZipOMaticView.cpp
 	ZipOMaticWindow.cpp
 	ZipperThread.cpp
 
