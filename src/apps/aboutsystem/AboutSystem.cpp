@@ -836,6 +836,7 @@ AboutView::_CreateCreditsView()
 		"Jeremy Rand\n"
 		"Hartmut Reh\n"
 		"Daniel Reinhold\n"
+		"Chris Roberts\n"
 		"Samuel Rodriguez Perez\n"
 		"Thomas Roell\n"
 		"Rafael Romo\n"
