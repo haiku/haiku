@@ -145,7 +145,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 			default:
 				dprintf("arch_elf_relocate_rel: unhandled relocation type %d\n",
 					ELF32_R_TYPE(rel[i].r_info));
-				return EPERM;
+				return B_BAD_DATA;
 		}
 
 		resolveAddress = (addr_t *)(image->text_region.delta + rel[i].r_offset);
