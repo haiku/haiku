@@ -8,6 +8,7 @@
 #include "console.h"
 #include "cpu.h"
 #include "smp.h"
+#include "uimage.h"
 #include "keyboard.h"
 
 #include <KernelExport.h>
@@ -31,6 +32,8 @@ extern uint8 _end;
 extern int main(stage2_args *args);
 extern void _start(void);
 extern int start_raw(int argc, char **argv);
+extern void dump_uimage(struct image_header *image);
+extern struct image_header *gUImage;
 
 
 uint32 sBootOptions;
@@ -116,13 +119,14 @@ extern uboot_arm_gd *gUBootGlobalData;
 extern uint8 gUBootOS;
 
 int
-start_netbsd(struct board_info *bd, struct uimage *image, const char *consdev,
+start_netbsd(struct board_info *bd, struct image_header *image, const char *consdev,
 	const char *cmdline)
 {
 	const char *argv[] = { "haiku", cmdline };
 	int argc = 1;
 	if (cmdline)
 		argc++;
+	gUImage = image;
 	start_raw(argc, argv);
 }
 
@@ -142,6 +146,13 @@ start_raw(int argc, char **argv)
 	call_ctors();
 	args.heap_size = HEAP_SIZE;
 	args.arguments = NULL;
+	args.platform.boot_tgz_data = NULL;
+	args.platform.boot_tgz_size = 0;
+	
+	// if we get passed a uimage, try to find the second blob
+	if (gUImage)
+		image_multi_getimg(gUImage, 1, &args.platform.boot_tgz_data,
+			&args.platform.boot_tgz_size);
 
 
 	serial_init();
@@ -156,6 +167,9 @@ start_raw(int argc, char **argv)
 		dprintf("os: %d\n", gUBootOS);
 		dprintf("gd @ %p\n", gGD);
 		dprintf("gd->bd @ %p\n", gGD->bd);
+		dprintf("uimage @ %p\n", gUImage);
+		if (gUImage)
+			dump_uimage(gUImage);
 	}
 	
 //	mmu_init();

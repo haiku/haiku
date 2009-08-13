@@ -18,7 +18,7 @@ SYMBOL(_start_raw):
  * ELF entry
  */
 SYMBOL(_start):
-	mov	r0,#0
+	mov	r4,#0
 	b	_start_common
 SYMBOL_END(_start_raw)
 SYMBOL_END(_start)
@@ -27,20 +27,20 @@ SYMBOL_END(_start)
  * called from bootm with netbsd loader compatible args
  */
 SYMBOL(_start_netbsd):
-	mov	r0,#1
+	mov	r4,#1
 	b	_start_common
 SYMBOL_END(_start_netbsd)
 
 
 
 SYMBOL(_start_common):
-	strb	r0,gUBootOS
+	strb	r4,gUBootOS
 	str	r8,gUBootGlobalData
 	/* ... */
-	ldrb	r0,gUBootOS
-	cmp	r0,#0
+	ldrb	r4,gUBootOS
+	cmp	r4,#0
 	beq	start_raw
-	cmp	r0,#1
+	cmp	r4,#1
 	beq	start_netbsd
 	mov	pc,lr
 SYMBOL_END(_start_common)
@@ -51,6 +51,9 @@ SYMBOL_END(_start_common)
 SYMBOL(gUBootGlobalData):
 	.long   0
 SYMBOL_END(gUBootGlobalData)
+SYMBOL(gUImage):
+	.long   0
+SYMBOL_END(gUImage)
 SYMBOL(gUBootOS):
 	.byte   0
 SYMBOL_END(gUBootOS)

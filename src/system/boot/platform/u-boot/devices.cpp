@@ -23,13 +23,14 @@
 status_t 
 platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 {
-#warning ARM: correct/configurable "initrd" location	
-	uint8* data = (uint8*)0xa5000000;
-	size_t size = 0;
-
 	TRACE("platform_add_boot_device\n");
 
-	MemoryDisk* disk = new(nothrow) MemoryDisk(data, size, "boot.tgz");
+	if (!args->platform.boot_tgz_data || !args->platform.boot_tgz_size)
+		return B_DEVICE_NOT_FOUND;
+
+	MemoryDisk* disk = new(nothrow) MemoryDisk(
+		(const uint8 *)args->platform.boot_tgz_data, 
+		args->platform.boot_tgz_size, "boot.tgz");
 	if (!disk) {
 		dprintf("platform_add_boot_device(): Could not create MemoryDisk !\n");
 		return B_NO_MEMORY;

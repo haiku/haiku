@@ -22,7 +22,7 @@ local uImageFakeOS = "netbsd" ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
 KernelMergeObject boot_platform_u-boot.o :
-	start.S
+	shell.S
 	start2.c
 	debug.c
 	console.cpp
@@ -31,6 +31,7 @@ KernelMergeObject boot_platform_u-boot.o :
 	keyboard.cpp
 	menu.cpp
 	cpu.cpp
+	uimage.cpp
 	video.cpp
 	mmu.cpp	
 	# generic
@@ -96,12 +97,14 @@ rule BuildUImage image : data : args
 	Depends $(image) : $(data) ;
 	LocalClean clean : $(image) ;
 	MKIMAGE_ARGS on $(image) = $(args) ;
+	colon on $(image) = ":" ;
+	local files = $(data:G=) ;
 	BuildUImage1 $(image) : $(data) ;
 }
 
 actions BuildUImage1
 {
-	mkimage $(MKIMAGE_ARGS) -d $(>) $(<)
+	mkimage $(MKIMAGE_ARGS) -d $(>:J=$(colon)) $(<)
 }
 
 rule BuildUImageScript script : content
@@ -170,8 +173,12 @@ BuildUImage haiku_loader.ub : haiku_loader :
 	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_RAW)
 		-n 'haiku_loader' ;
 
+BuildUImage haiku_loader_nbsd.ub : haiku_loader kernel_arm : 
+	-A arm -O $(uImageFakeOS) -T multi -C none
+	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_NBSD)
+		-n 'haiku_loader' ;
+
 if $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) {
-	
 	BuildUImageScript $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) : 
 		$(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT) ;
 }
@@ -187,6 +194,8 @@ BuildUBootFlashImage haiku_flash_image_uimage.img : haiku_loader.ub :
 # SD/mmc image targets
 BuildUBootSDImage haiku.mmc : $(HAIKU_BOARD_SDIMAGE_FILES) ;
 
+SEARCH on [ FGristFiles shell.S ]
+	= [ FDirName $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) arch $(TARGET_ARCH) ] ;
 SEARCH on [ FGristFiles text_menu.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
