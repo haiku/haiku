@@ -2,8 +2,8 @@
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
-#ifndef KERNEL_ARCH_M68K_KERNEL_ARGS_H
-#define KERNEL_ARCH_M68K_KERNEL_ARGS_H
+#ifndef KERNEL_ARCH_ARM_KERNEL_ARGS_H
+#define KERNEL_ARCH_ARM_KERNEL_ARGS_H
 
 #ifndef KERNEL_BOOT_KERNEL_ARGS_H
 #	error This file is included from <boot/kernel_args.h> only
@@ -25,6 +25,12 @@ typedef struct {
 	uint64		cpu_frequency;
 	uint64		bus_frequency;
 	uint64		time_base_frequency;
+        uint32  	phys_pgdir;
+        uint32  	vir_pgdir;
+        uint32  	num_pgtables;
+        uint32  	pgtables[50];
+        uint32  	page_hole;
+
 } arch_kernel_args;
 
-#endif	/* KERNEL_ARCH_M68K_KERNEL_ARGS_H */
+#endif	/* KERNEL_ARCH_ARM_KERNEL_ARGS_H */
