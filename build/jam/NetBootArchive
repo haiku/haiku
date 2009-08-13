@@ -14,21 +14,32 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = "" ;
 }
 
+#HACK: remove when old ide code is removed!
+local ATA_ONLY = ;
+local IDE_ONLY = ;
+if $(HAIKU_ATA_STACK) = 1 {
+	ATA_ONLY = "" ;
+} else {
+	IDE_ONLY = "" ;
+}
+
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;
 SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
 	ipv4_datagram ;
-SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp ;
+SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix ;
 
-SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com etherpci $(X86_ONLY)ipro1000
-	$(X86_ONLY)ipro100 $(X86_ONLY)rtl8139 rtl8169 sis900
-	$(X86_ONLY)marvell_yukon $(X86_ONLY)via_rhine wb840 vlance
-	$(GPL_ONLY)bcm440x $(GPL_ONLY)bcm570x
+SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)broadcom440x
+	$(X86_ONLY)broadcom570x etherpci $(X86_ONLY)ipro1000
+	pegasus $(X86_ONLY)rtl8139 rtl8169 $(X86_ONLY)rtl81xx sis900
+	$(X86_ONLY)via_rhine wb840 $(X86_ONLY)ipro100 $(X86_ONLY)nforce
+	#vlance
+	$(X86_ONLY)marvell_yukon $(X86_ONLY)syskonnect
+	$(X86_ONLY)attansic_l2 $(X86_ONLY)ar81xx usb_ecm
 ;
-SYSTEM_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)isa ide scsi
-	config_manager agp_gart
+SYSTEM_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)isa $(IDE_ONLY)ide $(ATA_ONLY)ata
+	scsi config_manager agp_gart
 ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs fat iso9660 ;
-#cdda googlefs nfs $(GPL_ONLY)ntfs ;
 
 
 # modules
@@ -44,7 +55,7 @@ AddFilesToNetBootArchive system add-ons kernel console : vga_text ;
 AddFilesToNetBootArchive system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToNetBootArchive system add-ons kernel generic
-	: ide_adapter locked_pool scsi_periph ;
+	: $(IDE_ONLY)ide_adapter $(ATA_ONLY)ata_adapter locked_pool scsi_periph ;
 AddFilesToNetBootArchive system add-ons kernel partitioning_systems
 	: intel session ;
 AddFilesToNetBootArchive system add-ons kernel interrupt_controllers
@@ -58,7 +69,7 @@ if $(TARGET_ARCH) = x86 {
 AddNewDriversToNetBootArchive disk scsi	: scsi_cd scsi_disk ;
 #AddDriversToNetBootArchive disk virtual : nbd ;
 AddDriversToNetBootArchive disk virtual	: remote_disk ;
-AddDriversToNetBootArchive net			: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
+AddDriversToNetBootArchive net : $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 
 # kernel
 AddFilesToNetBootArchive system : <revisioned>kernel_$(TARGET_ARCH) ;
@@ -73,7 +84,7 @@ AddFilesToNetBootArchive home config settings kernel drivers
 
 # add-ons
 AddFilesToNetBootArchive system add-ons kernel network
-	: stack ;
+	: <net>notifications stack ;
 AddFilesToNetBootArchive system add-ons kernel network devices
 	: $(SYSTEM_NETWORK_DEVICES) ;
 AddFilesToNetBootArchive system add-ons kernel network datalink_protocols
@@ -88,7 +99,7 @@ AddBootModuleSymlinksToNetBootArchive
 	$(SYSTEM_ADD_ONS_BUS_MANAGERS)
 	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112
 	$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
-	ide_adapter locked_pool scsi_periph
+	$(IDE_ONLY)ide_adapter $(ATA_ONLY)ata_adapter locked_pool scsi_periph
 	intel session
 	$(PPC_ONLY)openpic
 	$(X86_ONLY)generic_x86
