@@ -2,12 +2,20 @@ OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 
 ENTRY(_start)
+
+/* XXX: this shouldn't be needed to make kernel_arm have separate text and data segments!!! */
+PHDRS
+{
+	headers PT_PHDR PHDRS ;
+	text PT_LOAD FILEHDR PHDRS ;
+	data PT_LOAD ;
+	dynamic PT_DYNAMIC ;
+}
 SECTIONS
 {
-	. =  0x80500000;
-/*	. =  0x80000000;*/
+	. =  0x80000000;
 
-	.interp : { *(.interp) }
+	.interp : { *(.interp) } :text
 	.hash : { *(.hash) }
 	.dynsym : { *(.dynsym) }
 	.dynstr : { *(.dynstr) }
@@ -35,7 +43,7 @@ SECTIONS
 	.plt : { *(.plt) }
 
 	/* text/read-only data */
-	.text :	{ *(.text .text.* .glue_7* .gnu.linkonce.t.*) } =0x9090
+	.text :	{ *(.text .text.* .glue_7* .gnu.linkonce.t.*) } :text =0x9090
 
 	.rodata : { 
 		*(.rodata .rodata.* .gnu.linkonce.r.*)
@@ -60,7 +68,7 @@ SECTIONS
 	/* writable data  */
 	__data_start_rom = .;	/* in one segment binaries, the rom data address is on top of the ram data address */
 	__data_start = .;
-	.data : SUBALIGN(4) { *(.data .data.* .gnu.linkonce.d.*) }
+	.data : SUBALIGN(4) { *(.data .data.* .gnu.linkonce.d.*) } :data
 
 	__ctor_list = .;
 	.ctors : { *(.ctors) }
