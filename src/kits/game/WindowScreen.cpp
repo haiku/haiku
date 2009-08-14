@@ -727,15 +727,16 @@ BWindowScreen::_Deactivate()
 	} else
 		ScreenConnected(false);
 
+	if (fActivateState) {
+		BScreen screen(this);
+		SetColorList((rgb_color *)screen.ColorMap()->color_list);
+	}
+	
 	_AssertDisplayMode(fOriginalDisplayMode);
 
 	_ResetAccelerantHooks();
 	
 	be_app->ShowCursor();
-	if (fActivateState) {
-		BScreen screen(this);
-		SetColorList((rgb_color *)screen.ColorMap()->color_list);
-	}
 
 	return B_OK;
 }
