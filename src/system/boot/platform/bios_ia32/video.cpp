@@ -422,7 +422,8 @@ vesa_get_vbe_info_block(vbe_info_block *info)
 	if (info->signature != VESA_SIGNATURE)
 		return B_ERROR;
 
-	dprintf("VESA version = %d.%d\n", info->version.major, info->version.minor);
+	dprintf("VESA version = %d.%d, capabilities %lx\n", info->version.major,
+		info->version.minor, info->capabilities);
 
 	if (info->version.major < 2) {
 		dprintf("VESA support too old\n");
@@ -1159,7 +1160,7 @@ platform_init_video(void)
 	sVesaCompatible = vesa_init(&sInfo, &sDefaultMode) == B_OK;
 	if (!sVesaCompatible) {
 		TRACE(("No VESA compatible graphics!\n"));
-		gKernelArgs.vesa_capabilities = CAPABILITY_VGA_COMPATIBLE;
+		gKernelArgs.vesa_capabilities = 0;
 		return B_ERROR;
 	}
 
