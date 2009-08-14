@@ -7,5 +7,5 @@ AddResources OpenTerminal-T : OpenTerminal.rdef ;
 Addon OpenTerminal-T :
 	OpenTerminal.cpp
 
-	: be tracker
+	: be tracker $(TARGET_LIBSTDC++)
 ;

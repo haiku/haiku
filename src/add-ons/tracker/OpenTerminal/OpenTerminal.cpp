@@ -67,7 +67,7 @@ process_refs(entry_ref base_ref, BMessage* message, void* reserved)
 	BEntry entry;
 	int32 i;
 	entry_ref tracker_ref;
-	vector<BEntry> entries;
+	std::vector<BEntry> entries;
 
 	// Iterate through the refs that Tracker has sent us.
 	for (i = 0; message->FindRef("refs", i, &tracker_ref) == B_OK; i++) {
