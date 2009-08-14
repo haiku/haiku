@@ -169,7 +169,7 @@ TermWindow::~TermWindow()
 		fFindPanel->Quit();
 		fFindPanel = NULL;
 	}
-	
+
 	PrefHandler::DeleteDefault();
 
 	for (int32 i = 0; Session* session = (Session*)fSessions.ItemAt(i); i++)
@@ -212,7 +212,7 @@ TermWindow::_InitWindow()
 		message->AddInt32("index", i);
 		AddShortcut('1' + i, B_COMMAND_KEY, message);
 	}
-	
+
 	BRect textFrame = Bounds();
 	textFrame.top = fMenubar->Bounds().bottom + 1.0;
 
@@ -251,12 +251,12 @@ void
 TermWindow::_SetupMenu()
 {
 	PrefHandler menuText;
-	
+
 	LoadLocaleFile(&menuText);
-	
+
 	// Menu bar object.
 	fMenubar = new BMenuBar(Bounds(), "mbar");
-	
+
 	// Make File Menu.
 	fFilemenu = new BMenu("Terminal");
 	fFilemenu->AddItem(new BMenuItem("Switch Terminals",
@@ -264,7 +264,7 @@ TermWindow::_SetupMenu()
 	fFilemenu->AddItem(new BMenuItem("New Terminal" B_UTF8_ELLIPSIS,
 		new BMessage(MENU_NEW_TERM), 'N'));
 	fFilemenu->AddItem(new BMenuItem("New Tab", new BMessage(kNewTab), 'T'));
-	
+
 	fFilemenu->AddSeparatorItem();
 	fFilemenu->AddItem(new BMenuItem("Page Setup" B_UTF8_ELLIPSIS,
 		new BMessage(MENU_PAGE_SETUP)));
@@ -289,12 +289,12 @@ TermWindow::_SetupMenu()
 	fEditmenu->AddSeparatorItem();
 	fEditmenu->AddItem(new BMenuItem("Find" B_UTF8_ELLIPSIS,
 		new BMessage(MENU_FIND_STRING),'F'));
-	fFindBackwardMenuItem = new BMenuItem("Find Backward",
-		new BMessage(MENU_FIND_BACKWARD), '[');
+	fFindBackwardMenuItem = new BMenuItem("Find Previous",
+		new BMessage(MENU_FIND_PREVIOUS), 'G', B_SHIFT_KEY);
 	fEditmenu->AddItem(fFindBackwardMenuItem);
 	fFindBackwardMenuItem->SetEnabled(false);
-	fFindForwardMenuItem = new BMenuItem("Find Forward",
-		new BMessage(MENU_FIND_FORWARD), ']');
+	fFindForwardMenuItem = new BMenuItem("Find Next",
+		new BMessage(MENU_FIND_NEXT), 'G');
 	fEditmenu->AddItem(fFindForwardMenuItem);
 	fFindForwardMenuItem->SetEnabled(false);
 
@@ -304,13 +304,13 @@ TermWindow::_SetupMenu()
 	fHelpmenu = new BMenu("Settings");
 	fWindowSizeMenu = new BMenu("Window Size");
 	_BuildWindowSizeMenu(fWindowSizeMenu);
-	
+
 	fEncodingmenu = new BMenu("Text Encoding");
 	fEncodingmenu->SetRadioMode(true);
 	MakeEncodingMenu(fEncodingmenu, false);
 
 	fSizeMenu = new BMenu("Text Size");
-	
+
 	fIncreaseFontSizeMenuItem = new BMenuItem("Increase",
 		new BMessage(kIncreaseFontSize), '+', B_COMMAND_KEY);
 
@@ -359,23 +359,23 @@ TermWindow::MessageReceived(BMessage *message)
 		case B_COPY:
 			_ActiveTermView()->Copy(be_clipboard);
 			break;
-		
+
 		case B_PASTE:
 			_ActiveTermView()->Paste(be_clipboard);
 			break;
-		
+
 		case B_SELECT_ALL:
 			_ActiveTermView()->SelectAll();
 			break;
-		
+
 		case B_ABOUT_REQUESTED:
 			be_app->PostMessage(B_ABOUT_REQUESTED);
 			break;
-	
+
 		case MENU_CLEAR_ALL:
 			_ActiveTermView()->Clear();
-			break;	
-			
+			break;
+
 		case MENU_SWITCH_TERM:
 			be_app->PostMessage(MENU_SWITCH_TERM);
 			break;
@@ -384,24 +384,24 @@ TermWindow::MessageReceived(BMessage *message)
 		{
 			app_info info;
 			be_app->GetAppInfo(&info);
-			
+
 			// try launching two different ways to work around possible problems
 			if (be_roster->Launch(&info.ref) != B_OK)
 				be_roster->Launch(TERM_SIGNATURE);
 			break;
 		}
-		
+
 		case MENU_PREF_OPEN:
 			if (!fPrefWindow)
 				fPrefWindow = new PrefWindow(this);
 			else
 				fPrefWindow->Activate();
 			break;
-		
+
 		case MSG_PREF_CLOSED:
 			fPrefWindow = NULL;
 			break;
-	
+
 		case MENU_FIND_STRING:
 			if (!fFindPanel) {
 				BRect r = Frame();
@@ -414,7 +414,7 @@ TermWindow::MessageReceived(BMessage *message)
 			else
 				fFindPanel->Activate();
 			break;
-	
+
 		case MSG_FIND:
 			fFindPanel->PostMessage(B_QUIT_REQUESTED);
 			message->FindBool("findselection", &fFindSelection);
@@ -436,7 +436,7 @@ TermWindow::MessageReceived(BMessage *message)
 			message->FindBool("matchcase", &fMatchCase);
 			message->FindBool("matchword", &fMatchWord);
 			findresult = _ActiveTermView()->Find(fFindString, fForwardSearch, fMatchCase, fMatchWord);
-				
+
 			if (!findresult) {
 				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -450,25 +450,27 @@ TermWindow::MessageReceived(BMessage *message)
 			fFindBackwardMenuItem->SetEnabled(true);
 			fFindForwardMenuItem->SetEnabled(true);
 			break;
-		
-		case MENU_FIND_FORWARD:
-			findresult = _ActiveTermView()->Find(fFindString, true, fMatchCase, fMatchWord);
+
+		case MENU_FIND_NEXT:
+			findresult = _ActiveTermView()->Find(fFindString, fForwardSearch,
+				fMatchCase, fMatchWord);
 			if (!findresult) {
 				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 				alert->Go();
 			}
 			break;
-	
-		case MENU_FIND_BACKWARD:
-			findresult = _ActiveTermView()->Find(fFindString, false, fMatchCase, fMatchWord);
+
+		case MENU_FIND_PREVIOUS:
+			findresult = _ActiveTermView()->Find(fFindString, !fForwardSearch,
+				fMatchCase, fMatchWord);
 			if (!findresult) {
 				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 				alert->Go();
 			}
 			break;
-		
+
 		case MSG_FIND_CLOSED:
 			fFindPanel = NULL;
 			break;
@@ -477,7 +479,7 @@ TermWindow::MessageReceived(BMessage *message)
 			if (message->FindInt32("op", &encodingId) == B_OK)
 				_ActiveTermView()->SetEncoding(encodingId);
 			break;
-		
+
 		case MSG_COLS_CHANGED:
 		{
 			int32 columns, rows;
@@ -501,7 +503,7 @@ TermWindow::MessageReceived(BMessage *message)
 			_ResizeView(_ActiveTermView());
 			break;
 		}
-		
+
 		case FULLSCREEN:
 			if (!fSavedFrame.IsValid()) { // go fullscreen
 				_ActiveTermView()->DisableResizeView();
@@ -533,7 +535,7 @@ TermWindow::MessageReceived(BMessage *message)
 				fSavedFrame = BRect(0,0,-1,-1);
 				fFullScreen = false;
 			}
-			break;	
+			break;
 
 		case MSG_FONT_CHANGED:
 			PostMessage(MSG_HALF_FONT_CHANGED);
@@ -556,7 +558,7 @@ TermWindow::MessageReceived(BMessage *message)
 		case MENU_PAGE_SETUP:
 			_DoPageSetup();
 			break;
-		
+
 		case MENU_PRINT:
 			_DoPrint();
 			break;
@@ -609,7 +611,7 @@ TermWindow::MessageReceived(BMessage *message)
 			}
 			break;
 		}
-		
+
 		case kIncreaseFontSize:
 		case kDecreaseFontSize:
 		{
@@ -617,23 +619,23 @@ TermWindow::MessageReceived(BMessage *message)
 			TermView *view = _ActiveTermView();
 			BFont font;
 			view->GetTermFont(&font);
-			
+
 			float size = font.Size();
 			if (message->what == kIncreaseFontSize)
 				size += 1;
 			else
 				size -= 1;
-			
+
 			// limit the font size
 			if (size < 9)
 				size = 9;
 			if (size > 18)
 				size = 18;
-			
-			font.SetSize(size);	
+
+			font.SetSize(size);
 			view->SetTermFont(&font);
 			PrefHandler::Default()->setInt32(PREF_HALF_FONT_SIZE, (int32)size);
-			
+
 			_ResizeView(view);
 			break;
 		}
@@ -726,7 +728,7 @@ TermWindow::_DoPrint()
 			}
 		}
 	}
-	
+
 	job.CommitJob();
 }
 
@@ -738,7 +740,7 @@ TermWindow::_AddTab(Arguments *args)
 	const char *const *argv = NULL;
 	if (args != NULL)
 		args->GetShellArguments(argc, argv);
-	
+
 	try {
 		// Note: I don't pass the Arguments class directly to the termview,
 		// only to avoid adding it as a dependency: in other words, to keep
@@ -765,11 +767,11 @@ TermWindow::_AddTab(Arguments *args)
 		fTabView->AddTab(scrollView, tab);
 		tab->SetLabel(session->name.String());
 		view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
-		
+
 		view->SetEncoding(EncodingID(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
-		
+
 		BFont font;
-		_GetPreferredFont(font);	
+		_GetPreferredFont(font);
 		view->SetTermFont(&font);
 
 		_SetTermColors(containerView);
@@ -803,7 +805,7 @@ TermWindow::_AddTab(Arguments *args)
 		// most probably out of memory. That's bad.
 		// TODO: Should cleanup, I guess
 	}
-}	
+}
 
 
 void
@@ -903,7 +905,7 @@ TermWindow::_ResizeView(TermView *view)
 	SetSizeLimits(MIN_COLS * fontWidth - 1, MAX_COLS * fontWidth - 1,
 		minimumHeight + MIN_ROWS * fontHeight - 1,
 		minimumHeight + MAX_ROWS * fontHeight - 1);
-	
+
 	float width, height;
 	view->Parent()->GetPreferredSize(&width, &height);
 	width += B_V_SCROLL_BAR_WIDTH;
@@ -924,9 +926,9 @@ TermWindow::_BuildWindowSizeMenu(BMenu *menu)
 		{ 80, 25 },
 		{ 80, 40 },
 		{ 132, 25 },
-		{ 132, 40 }	
+		{ 132, 40 }
 	};
-	
+
 	const int32 sizeNum = sizeof(windowSizes) / sizeof(windowSizes[0]);
 	for (int32 i = 0; i < sizeNum; i++) {
 		char label[32];
@@ -991,7 +993,7 @@ CustomTermView::NotifyQuit(int32 reason)
 	if (window != NULL) {
 		BMessage message(kCloseView);
 		message.AddPointer("termView", this);
-		message.AddInt32("reason", reason);	
+		message.AddInt32("reason", reason);
 		window->PostMessage(&message);
 	}
 }
