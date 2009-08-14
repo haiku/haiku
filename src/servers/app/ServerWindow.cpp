@@ -120,6 +120,24 @@ static profile sRedrawProcessingTime;
 #endif
 
 
+// TODO: Move to another file
+struct BufferState {
+	BufferState(const direct_buffer_state &state)
+		: fState(state)
+	{
+	}
+	direct_buffer_state Action() const
+	{
+		return (direct_buffer_state)(fState & B_DIRECT_MODE_MASK);
+	}
+	direct_buffer_state Reason() const
+	{
+		return (direct_buffer_state)(fState & ~B_DIRECT_MODE_MASK);
+	}	
+	direct_buffer_state fState;
+};
+
+
 class DirectWindowData {
 public:
 	DirectWindowData();
@@ -131,8 +149,8 @@ public:
 	status_t SyncronizeWithClient();
 	
 	bool SetState(const direct_buffer_state &bufferState,
-				const direct_driver_state &driverState);
-	
+					const direct_driver_state &driverState);
+		
 	BRect	old_window_frame;
 	direct_buffer_info *buffer_info;
 
@@ -140,6 +158,7 @@ private:
 	sem_id	fSem;
 	sem_id	fAcknowledgeSem;
 	area_id	fBufferArea;
+	direct_buffer_state fPreviousState;
 };
 
 
@@ -148,7 +167,8 @@ DirectWindowData::DirectWindowData()
 	buffer_info(NULL),
 	fSem(-1),
 	fAcknowledgeSem(-1),
-	fBufferArea(-1)
+	fBufferArea(-1),
+	fPreviousState(B_DIRECT_STOP)
 {
 	fBufferArea = create_area("direct area", (void **)&buffer_info,
 		B_ANY_ADDRESS, B_PAGE_SIZE, B_NO_LOCK, B_READ_WRITE);
@@ -219,22 +239,31 @@ bool
 DirectWindowData::SetState(const direct_buffer_state &bufferState,
 	const direct_driver_state &driverState)
 {
+	BufferState inputState(bufferState);
+	BufferState currentState(buffer_info->buffer_state);
 	// Don't issue a DirectConnected() notification
 	// if the connection is stopped, and we are called
-	// with bufferState == B_DIRECT_MODIFY.
-	if ((buffer_info->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_STOP
-		&& (bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_START)
+	// with bufferState == B_DIRECT_MODIFY, but save the reason
+	// and combine it for next time we are called with B_DIRECT_START	
+	if (currentState.Action() == B_DIRECT_STOP
+			&& inputState.Action() != B_DIRECT_START) {
+		fPreviousState = (direct_buffer_state)(fPreviousState 
+			| inputState.Reason());
 		return false;
-		
-	if (bufferState != -1)
-		buffer_info->buffer_state = bufferState;
+	}	
+	
+	buffer_info->buffer_state = (direct_buffer_state)(bufferState 
+		| BufferState(fPreviousState).Reason());
+	
+	fPreviousState = B_DIRECT_STOP;
+	
 	if (driverState != -1)
 		buffer_info->driver_state = driverState;
 			
 	return true;
 }
 
-
+	
 //	#pragma mark -
 
 

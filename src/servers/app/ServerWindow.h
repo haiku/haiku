@@ -90,7 +90,7 @@ public:
 			// related thread/team_id(s).
 	inline	team_id				ClientTeam() const { return fClientTeam; }
 
-			void				HandleDirectConnection(int32 bufferState = -1,
+			void				HandleDirectConnection(int32 bufferState,
 									int32 driverState = -1);
 
 	inline	int32				ClientToken() const { return fClientToken; }
