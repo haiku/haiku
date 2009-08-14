@@ -18,7 +18,7 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Path.h>
 #include <Roster.h>
 #include <SeparatorView.h>
@@ -61,14 +61,17 @@ ZippoWindow::ZippoWindow(BRect frame, BMessage* refs)
 	BSeparatorView* separator = new BSeparatorView(B_HORIZONTAL);
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(fActivityView)		
+	BLayoutBuilder::Group<> group = BLayoutBuilder::Group<>();
+	group.AddGroup(B_VERTICAL, 10)
+		.Add(fActivityView)
 		.Add(fArchiveNameView)
 		.Add(fZipOutputView)
 		.Add(separator)
 		.Add(fStopButton)
 		.SetInsets(14, 14, 14, 14)
-	);
+		.End()
+	.End();
+	AddChild(group.View());
 
 	if (refs != NULL)
 	{
