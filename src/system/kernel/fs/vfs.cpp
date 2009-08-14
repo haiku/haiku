@@ -5550,34 +5550,9 @@ dir_read(struct io_context* ioContext, struct file_descriptor* descriptor,
 
 
 static status_t
-fix_dirent(struct vnode* parent, struct dirent* userEntry,
-	struct io_context* ioContext, uint32* _length)
+fix_dirent(struct vnode* parent, struct dirent* entry,
+	struct io_context* ioContext)
 {
-	char buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
-	struct dirent* entry;
-
-	if (IS_USER_ADDRESS(userEntry)) {
-		entry = (struct dirent*)buffer;
-		if (user_memcpy(entry, userEntry, sizeof(struct dirent) - 1) != B_OK)
-			return B_BAD_ADDRESS;
-
-		ASSERT(entry->d_reclen >= sizeof(struct dirent)
-			&& entry->d_reclen <= sizeof(buffer));
-
-		// This hints to a problem in the file system implementation, but
-		// could also be caused by a malicious user application
-		if (entry->d_reclen < sizeof(struct dirent)
-			|| entry->d_reclen > sizeof(buffer))
-			return B_BAD_DATA;
-
-		if (user_memcpy(entry->d_name, userEntry->d_name,
-				entry->d_reclen + 1 - sizeof(struct dirent)) != B_OK)
-			return B_BAD_ADDRESS;
-	} else
-		entry = userEntry;
-
-	*_length = entry->d_reclen;
-
 	// set d_pdev and d_pino
 	entry->d_pdev = parent->device;
 	entry->d_pino = parent->id;
@@ -5619,10 +5594,6 @@ fix_dirent(struct vnode* parent, struct dirent* userEntry,
 		}
 	}
 
-	// copy back from userland buffer if needed
-	if (entry != userEntry)
-		return user_memcpy(userEntry, entry, sizeof(struct dirent) - 1);
-
 	return B_OK;
 }
 
@@ -5641,15 +5612,12 @@ dir_read(struct io_context* ioContext, struct vnode* vnode, void* cookie,
 
 	// we need to adjust the read dirents
 	uint32 count = *_count;
-	if (count > 0) {
-		for (uint32 i = 0; i < count; i++) {
-			uint32 length;
-			error = fix_dirent(vnode, buffer, ioContext, &length);
-			if (error != B_OK)
-				return error;
+	for (uint32 i = 0; i < count; i++) {
+		error = fix_dirent(vnode, buffer, ioContext);
+		if (error != B_OK)
+			return error;
 
-			buffer = (struct dirent*)((uint8*)buffer + length);
-		}
+		buffer = (struct dirent*)((uint8*)buffer + buffer->d_reclen);
 	}
 
 	return error;

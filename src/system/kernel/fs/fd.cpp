@@ -31,6 +31,9 @@
 #endif
 
 
+static const size_t kMaxReadDirBufferSize = 64 * 1024;
+
+
 static struct file_descriptor* get_fd_locked(struct io_context* context,
 	int fd);
 static struct file_descriptor* remove_fd(struct io_context* context, int fd);
@@ -908,34 +911,56 @@ _user_ioctl(int fd, ulong op, void* buffer, size_t length)
 
 
 ssize_t
-_user_read_dir(int fd, struct dirent* buffer, size_t bufferSize,
+_user_read_dir(int fd, struct dirent* userBuffer, size_t bufferSize,
 	uint32 maxCount)
 {
-	struct file_descriptor* descriptor;
-	ssize_t retval;
+	TRACE(("user_read_dir(fd = %d, userBuffer = %p, bufferSize = %ld, count = "
+		"%lu)\n", fd, userBuffer, bufferSize, maxCount));
 
-	if (!IS_USER_ADDRESS(buffer))
+	if (maxCount == 0)
+		return 0;
+
+	if (userBuffer == NULL || !IS_USER_ADDRESS(userBuffer))
 		return B_BAD_ADDRESS;
 
-	TRACE(("user_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = "
-		"%lu)\n", fd, buffer, bufferSize, maxCount));
-
-	struct io_context* ioContext = get_current_io_context(false);
-	descriptor = get_fd(ioContext, fd);
+	// get I/O context and FD
+	io_context* ioContext = get_current_io_context(false);
+	FDGetter fdGetter;
+	struct file_descriptor* descriptor = fdGetter.SetTo(ioContext, fd, false);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	if (descriptor->ops->fd_read_dir) {
-		uint32 count = maxCount;
-		retval = descriptor->ops->fd_read_dir(ioContext, descriptor, buffer,
-			bufferSize, &count);
-		if (retval >= 0)
-			retval = count;
-	} else
-		retval = EOPNOTSUPP;
+	if (descriptor->ops->fd_read_dir == NULL)
+		return B_UNSUPPORTED;
 
-	put_fd(descriptor);
-	return retval;
+	// restrict buffer size and allocate a heap buffer
+	if (bufferSize > kMaxReadDirBufferSize)
+		bufferSize = kMaxReadDirBufferSize;
+	struct dirent* buffer = (struct dirent*)malloc(bufferSize);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter bufferDeleter(buffer);
+
+	// read the directory
+	uint32 count = maxCount;
+	status_t status = descriptor->ops->fd_read_dir(ioContext, descriptor,
+		buffer, bufferSize, &count);
+	if (status != B_OK)
+		return status;
+
+	// copy the buffer back -- determine the total buffer size first
+	size_t sizeToCopy = 0;
+	struct dirent* entry = buffer;
+	for (uint32 i = 0; i < count; i++) {
+		size_t length = entry->d_reclen;
+		sizeToCopy += length;
+		entry = (struct dirent*)((uint8*)entry + length);
+	}
+
+	if (user_memcpy(userBuffer, buffer, sizeToCopy) != B_OK)
+		return B_BAD_ADDRESS;
+
+	return count;
 }
 
 
