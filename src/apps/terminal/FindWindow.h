@@ -1,7 +1,7 @@
 /*
  * Copyright 2007, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
- * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
+ * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #ifndef FINDDLG_H_INCLUDED
@@ -23,12 +23,13 @@ class BCheckBox;
 
 class FindWindow : public BWindow {
 	public:
-		FindWindow (BRect frame, BMessenger messenger, BString &str, 
+		FindWindow (BRect frame, BMessenger messenger, BString &str,
 			bool findSelection, bool matchWord, bool matchCase, bool forwardSearch);
 		virtual ~FindWindow();
 
 		virtual void Quit();
 		virtual void MessageReceived(BMessage *msg);
+		virtual void DispatchMessage(BMessage* message, BHandler* handler);
 
 	private:
 		void _SendFindMessage();

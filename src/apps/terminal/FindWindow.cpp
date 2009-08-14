@@ -1,7 +1,7 @@
 /*
  * Copyright 2007, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
- * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
+ * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
@@ -19,7 +19,7 @@
 const uint32 MSG_FIND_HIDE = 'Fhid';
 
 
-FindWindow::FindWindow (BRect frame, BMessenger messenger , BString &str, 
+FindWindow::FindWindow (BRect frame, BMessenger messenger , BString &str,
 	bool findSelection, bool matchWord, bool matchCase, bool forwardSearch)
 	: BWindow(frame, "Find", B_FLOATING_WINDOW, B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
 	fFindDlgMessenger(messenger)
@@ -53,16 +53,16 @@ FindWindow::FindWindow (BRect frame, BMessenger messenger , BString &str,
 
 	//Divider
 	float dividerHeight = (selectionRadioBottom + forwardSearchTop) / 2;
-	
+
 	//Button Coordinates
 	float searchButtonLeft = (frame.Width() - fFindView->StringWidth("Find") - 60) / 2;
-	float searchButtonRight = searchButtonLeft + fFindView->StringWidth("Find") + 60; 
-	
+	float searchButtonRight = searchButtonLeft + fFindView->StringWidth("Find") + 60;
+
 	//Build the Views
 	fTextRadio = new BRadioButton(BRect(14, textRadioTop, textRadioRight, textRadioBottom),
 		"fTextRadio", "Use Text: ", NULL);
 	fFindView->AddChild(fTextRadio);
-	
+
 	fFindLabel = new BTextControl(BRect(textRadioRight + 4, textRadioTop, frame.Width() - 14, textRadioBottom),
 		"fFindLabel", "", "", NULL);
 	fFindLabel->SetDivider(0);
@@ -74,7 +74,7 @@ FindWindow::FindWindow (BRect frame, BMessenger messenger , BString &str,
 	fSelectionRadio = new BRadioButton(BRect(14, selectionRadioTop, frame.Width() - 14, selectionRadioBottom),
 		"fSelectionRadio", "Use Selection", NULL);
 	fFindView->AddChild(fSelectionRadio);
-	
+
 	if (findSelection)
 		fSelectionRadio->SetValue(B_CONTROL_ON);
 	else
@@ -82,30 +82,30 @@ FindWindow::FindWindow (BRect frame, BMessenger messenger , BString &str,
 
 	fSeparator = new BBox(BRect(6, dividerHeight, frame.Width() - 6, dividerHeight + 1));
 	fFindView->AddChild(fSeparator);
-	
+
 	fForwardSearchBox = new BCheckBox(BRect(14, forwardSearchTop, frame.Width() - 14, forwardSearchBottom),
 		"fForwardSearchBox", "Search Forward", NULL);
 	fFindView->AddChild(fForwardSearchBox);
 	if (forwardSearch)
 		fForwardSearchBox->SetValue(B_CONTROL_ON);
-	
+
 	fMatchCaseBox = new BCheckBox(BRect(14, matchCaseTop, frame.Width() - 14, matchCaseBottom),
 		"fMatchCaseBox", "Match Case", NULL);
 	fFindView->AddChild(fMatchCaseBox);
 	if (matchCase)
 		fMatchCaseBox->SetValue(B_CONTROL_ON);
-	
+
 	fMatchWordBox = new BCheckBox(BRect(14, matchWordTop, frame.Width() - 14, matchWordBottom),
 		"fMatchWordBox", "Match Word", NULL);
 	fFindView->AddChild(fMatchWordBox);
 	if (matchWord)
 		fMatchWordBox->SetValue(B_CONTROL_ON);
-	
+
 	fFindButton = new BButton(BRect(searchButtonLeft, buttonsTop, searchButtonRight, frame.Height() - 14),
 		"fFindButton", "Find", new BMessage(MSG_FIND));
 	fFindButton->MakeDefault(true);
 	fFindView->AddChild(fFindButton);
-	
+
 	Show();
 }
 
@@ -139,6 +139,23 @@ FindWindow::MessageReceived(BMessage *msg)
 
 
 void
+FindWindow::DispatchMessage(BMessage *message, BHandler *handler)
+{
+	if (message->what == B_KEY_DOWN) {
+		int8 key;
+		if (message->FindInt8("byte", 0, &key) == B_OK) {
+			if (key == B_ESCAPE) {
+				message->MakeEmpty();
+				message->what = B_QUIT_REQUESTED;
+			}
+		}
+	}
+
+	BWindow::DispatchMessage(message, handler);
+}
+
+
+void
 FindWindow::Quit()
 {
 	fFindDlgMessenger.SendMessage(MSG_FIND_CLOSED);
@@ -156,12 +173,12 @@ FindWindow::_SendFindMessage()
 		message.AddBool("findselection", false);
 	} else
 		message.AddBool("findselection", true);
-	
+
 	//Add the other parameters
 	message.AddBool("usetext", fTextRadio->Value() == B_CONTROL_ON);
 	message.AddBool("forwardsearch", fForwardSearchBox->Value() == B_CONTROL_ON);
 	message.AddBool("matchcase", fMatchCaseBox->Value() == B_CONTROL_ON);
 	message.AddBool("matchword", fMatchWordBox->Value() == B_CONTROL_ON);
-	
+
 	fFindDlgMessenger.SendMessage(&message);
 }
