@@ -227,7 +227,7 @@ static void
 update_overlay(bool updateCoefficients)
 {
 	if (!gInfo->shared_info->overlay_active
-		|| gInfo->shared_info->device_type == INTEL_TYPE_965)
+		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_965))
 		return;
 
 	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
@@ -249,7 +249,7 @@ static void
 show_overlay(void)
 {
 	if (gInfo->shared_info->overlay_active
-		|| gInfo->shared_info->device_type == INTEL_TYPE_965)
+		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_965))
 		return;
 
 	gInfo->shared_info->overlay_active = true;
@@ -269,7 +269,7 @@ static void
 hide_overlay(void)
 {
 	if (!gInfo->shared_info->overlay_active
-		|| gInfo->shared_info->device_type == INTEL_TYPE_965)
+		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_965))
 		return;
 
 	overlay_registers *registers = gInfo->overlay_registers;
@@ -315,7 +315,7 @@ intel_overlay_supported_spaces(const display_mode *mode)
 	static const uint32 kSupportedi965Spaces[] = {B_YCbCr422, 0};
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 
-	if (sharedInfo.device_type == INTEL_TYPE_965)
+	if (sharedInfo.device_type.InGroup(INTEL_TYPE_96x))
 		return kSupportedi965Spaces;
 
 	return kSupportedSpaces;
@@ -368,7 +368,7 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	// alloc graphics mem
 
 	int32 alignment = 0x3f;
-	if (sharedInfo.device_type == INTEL_TYPE_965)
+	if (sharedInfo.device_type.InGroup(INTEL_TYPE_965))
 		alignment = 0xff;
 
 	overlay_buffer *buffer = &overlay->buffer;
@@ -384,7 +384,7 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 		return NULL;
 	}
 
-	if (sharedInfo.device_type == INTEL_TYPE_965) {
+	if (sharedInfo.device_type.InGroup(INTEL_TYPE_965)) {
 		status = intel_allocate_memory(INTEL_i965_OVERLAY_STATE_SIZE,
 			B_APERTURE_NON_RESERVED, overlay->state_base);
 		if (status < B_OK) {
@@ -425,7 +425,7 @@ intel_release_overlay_buffer(const overlay_buffer *buffer)
 		hide_overlay();
 
 	intel_free_memory(overlay->buffer_base);
-	if (gInfo->shared_info->device_type == INTEL_TYPE_965)
+	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_965))
 		intel_free_memory(overlay->state_base);
 	free(overlay);
 
@@ -600,33 +600,42 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 
 		// we need to offset the overlay view to adapt it to the clipping
 		// (in addition to whatever offset is desired already)
-		left = view->h_start - (int32)((window->h_start - left) * (horizontalScale / 4096.0) + 0.5);
-		top = view->v_start - (int32)((window->v_start - top) * (verticalScale / 4096.0) + 0.5);
+		left = view->h_start - (int32)((window->h_start - left)
+			* (horizontalScale / 4096.0) + 0.5);
+		top = view->v_start - (int32)((window->v_start - top)
+			* (verticalScale / 4096.0) + 0.5);
 		right = view->h_start + view->width;
 		bottom = view->v_start + view->height;
 
 		gInfo->overlay_position_buffer_offset = buffer->bytes_per_row * top
 			+ left * bytesPerPixel;
 
-		// Note: in non-planar mode, you *must* not program the source width/height
-		// UV registers - they must stay cleared, or the chip is doing strange stuff.
-		// On the other hand, you have to program the UV scaling registers, or the
-		// result will be wrong, too.
+		// Note: in non-planar mode, you *must* not program the source
+		// width/height UV registers - they must stay cleared, or the chip is
+		// doing strange stuff.
+		// On the other hand, you have to program the UV scaling registers, or
+		// the result will be wrong, too.
 		registers->source_width_rgb = right - left;
 		registers->source_height_rgb = bottom - top;
-		if ((gInfo->shared_info->device_type & INTEL_TYPE_8xx) != 0) {
-			registers->source_bytes_per_row_rgb = (((overlay->buffer_offset + (view->width << 1)
-				+ 0x1f) >> 5) - (overlay->buffer_offset >> 5) - 1) << 2;
+		if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_8xx)) {
+			registers->source_bytes_per_row_rgb = (((overlay->buffer_offset
+				+ (view->width << 1) + 0x1f) >> 5)
+				- (overlay->buffer_offset >> 5) - 1) << 2;
 		} else {
-			registers->source_bytes_per_row_rgb = ((((overlay->buffer_offset + (view->width << 1)
-				+ 0x3f) >> 6) - (overlay->buffer_offset >> 6) << 1) - 1) << 2;
+			registers->source_bytes_per_row_rgb = ((((overlay->buffer_offset
+				+ (view->width << 1) + 0x3f) >> 6)
+				- (overlay->buffer_offset >> 6) << 1) - 1) << 2;
 		}
 
 		// horizontal scaling
-		registers->scale_rgb.horizontal_downscale_factor = horizontalScale >> 12;
-		registers->scale_rgb.horizontal_scale_fraction = horizontalScale & 0xfff;
-		registers->scale_uv.horizontal_downscale_factor = horizontalScaleUV >> 12;
-		registers->scale_uv.horizontal_scale_fraction = horizontalScaleUV & 0xfff;
+		registers->scale_rgb.horizontal_downscale_factor
+			= horizontalScale >> 12;
+		registers->scale_rgb.horizontal_scale_fraction
+			= horizontalScale & 0xfff;
+		registers->scale_uv.horizontal_downscale_factor
+			= horizontalScaleUV >> 12;
+		registers->scale_uv.horizontal_scale_fraction
+			= horizontalScaleUV & 0xfff;
 
 		// vertical scaling
 		registers->scale_rgb.vertical_scale_fraction = verticalScale & 0xfff;
@@ -635,7 +644,8 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 		registers->vertical_scale_uv = verticalScaleUV >> 12;
 
 		TRACE(("scale: h = %ld.%ld, v = %ld.%ld\n", horizontalScale >> 12,
-			horizontalScale & 0xfff, verticalScale >> 12, verticalScale & 0xfff));
+			horizontalScale & 0xfff, verticalScale >> 12,
+			verticalScale & 0xfff));
 
 		if (verticalScale != gInfo->last_vertical_overlay_scale
 			|| horizontalScale != gInfo->last_horizontal_overlay_scale) {
@@ -646,16 +656,18 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 			update_coefficients(NUM_HORIZONTAL_TAPS, horizontalScale / 4096.0,
 				true, true, coefficients);
 
-			phase_coefficient coefficientsUV[NUM_HORIZONTAL_UV_TAPS * NUM_PHASES];
-			update_coefficients(NUM_HORIZONTAL_UV_TAPS, horizontalScaleUV / 4096.0,
-				true, false, coefficientsUV);
+			phase_coefficient coefficientsUV[
+				NUM_HORIZONTAL_UV_TAPS * NUM_PHASES];
+			update_coefficients(NUM_HORIZONTAL_UV_TAPS,
+				horizontalScaleUV / 4096.0, true, false, coefficientsUV);
 
 			int32 pos = 0;
 			for (int32 i = 0; i < NUM_PHASES; i++) {
 				for (int32 j = 0; j < NUM_HORIZONTAL_TAPS; j++) {
-					registers->horizontal_coefficients_rgb[pos] = coefficients[pos].sign << 15
-						| coefficients[pos].exponent << 12
-						| coefficients[pos].mantissa;
+					registers->horizontal_coefficients_rgb[pos]
+						= coefficients[pos].sign << 15
+							| coefficients[pos].exponent << 12
+							| coefficients[pos].mantissa;
 					pos++;
 				}
 			}
@@ -663,9 +675,10 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 			pos = 0;
 			for (int32 i = 0; i < NUM_PHASES; i++) {
 				for (int32 j = 0; j < NUM_HORIZONTAL_UV_TAPS; j++) {
-					registers->horizontal_coefficients_uv[pos] = coefficientsUV[pos].sign << 15
-						| coefficientsUV[pos].exponent << 12
-						| coefficientsUV[pos].mantissa;
+					registers->horizontal_coefficients_uv[pos]
+						= coefficientsUV[pos].sign << 15
+							| coefficientsUV[pos].exponent << 12
+							| coefficientsUV[pos].mantissa;
 					pos++;
 				}
 			}
@@ -683,11 +696,13 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 
 	// program buffer
 
-	registers->buffer_rgb0 = overlay->buffer_offset + gInfo->overlay_position_buffer_offset;
+	registers->buffer_rgb0
+		= overlay->buffer_offset + gInfo->overlay_position_buffer_offset;
 	registers->stride_rgb = buffer->bytes_per_row;
 
-	registers->mirroring_mode = (window->flags & B_OVERLAY_HORIZONTAL_MIRRORING) != 0
-		? OVERLAY_MIRROR_HORIZONTAL : OVERLAY_MIRROR_NORMAL;
+	registers->mirroring_mode
+		= (window->flags & B_OVERLAY_HORIZONTAL_MIRRORING) != 0
+			? OVERLAY_MIRROR_HORIZONTAL : OVERLAY_MIRROR_NORMAL;
 	registers->ycbcr422_order = 0;
 
 	if (!gInfo->shared_info->overlay_active) {

@@ -88,7 +88,7 @@ set_i2c_signals(void* cookie, int clock, int data)
 	uint32 ioRegister = (uint32)cookie;
 	uint32 value;
 
-	if (gInfo->shared_info->device_type == INTEL_TYPE_83x) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_83x)) {
 		// on these chips, the reserved values are fixed
 		value = 0;
 	} else {
@@ -130,7 +130,7 @@ set_frame_buffer_base()
 		surfaceRegister = INTEL_DISPLAY_B_SURFACE;
 	}
 
-	if (sharedInfo.device_type == INTEL_TYPE_965) {
+	if (sharedInfo.device_type.InGroup(INTEL_TYPE_96x)) {
 		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
 			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
 		read32(baseRegister);
@@ -217,7 +217,7 @@ get_pll_limits(pll_limits &limits)
 	// Note, the limits are taken from the X driver; they have not yet been
 	// tested
 
-	if ((gInfo->shared_info->device_type & INTEL_TYPE_9xx) != 0) {
+	if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
 		// TODO: support LVDS output limits as well
 		// (Update: Output limits are adjusted in the computation (post2=7/14))
 		// Should move them here!
@@ -356,7 +356,7 @@ save_lvds_mode(void)
 	pll_limits limits;
 	get_pll_limits(limits);
 
-	if ((gInfo->shared_info->device_type & INTEL_TYPE_9xx) != 0) {
+	if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
 		divisors.post1 = (pll & DISPLAY_PLL_9xx_POST1_DIVISOR_MASK)
 			>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
 
@@ -596,7 +596,7 @@ if (first) {
 	write32(INTEL_VGA_DISPLAY_CONTROL, VGA_DISPLAY_DISABLED);
 	read32(INTEL_VGA_DISPLAY_CONTROL);
 
-	if (gInfo->shared_info->device_type != INTEL_TYPE_85x) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_85x)) {
 	}
 
 	if ((gInfo->head_mode & HEAD_MODE_B_DIGITAL) != 0) {
@@ -604,7 +604,7 @@ if (first) {
 		compute_pll_divisors(target, divisors, true);
 
 		uint32 dpll = DISPLAY_PLL_NO_VGA_CONTROL;
-		if ((gInfo->shared_info->device_type & INTEL_TYPE_9xx) != 0) {
+		if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
 			 dpll |= LVDS_PLL_MODE_LVDS;
 			 	// DPLL mode LVDS for i915+
 		}
@@ -632,9 +632,12 @@ if (first) {
 
 		if ((dpll & DISPLAY_PLL_ENABLED) != 0) {
 			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
-				(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT) & DISPLAY_PLL_N_DIVISOR_MASK)
-				| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT) & DISPLAY_PLL_M1_DIVISOR_MASK)
-				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT) & DISPLAY_PLL_M2_DIVISOR_MASK));
+				(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
+					& DISPLAY_PLL_N_DIVISOR_MASK)
+				| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
+					& DISPLAY_PLL_M1_DIVISOR_MASK)
+				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
+					& DISPLAY_PLL_M2_DIVISOR_MASK));
 			write32(INTEL_DISPLAY_B_PLL, dpll & ~DISPLAY_PLL_ENABLED);
 			read32(INTEL_DISPLAY_B_PLL);
 			spin(150);
@@ -657,9 +660,12 @@ if (first) {
 		read32(INTEL_DISPLAY_LVDS_PORT);
 
 		write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
-			(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT) & DISPLAY_PLL_N_DIVISOR_MASK)
-			| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT) & DISPLAY_PLL_M1_DIVISOR_MASK)
-			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT) & DISPLAY_PLL_M2_DIVISOR_MASK));
+			(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
+				& DISPLAY_PLL_N_DIVISOR_MASK)
+			| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
+				& DISPLAY_PLL_M1_DIVISOR_MASK)
+			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
+				& DISPLAY_PLL_M2_DIVISOR_MASK));
 
 		write32(INTEL_DISPLAY_B_PLL, dpll);
 		read32(INTEL_DISPLAY_B_PLL);
@@ -667,7 +673,7 @@ if (first) {
 		// Wait for the clocks to stabilize
 		spin(150);
 
-		if (gInfo->shared_info->device_type == INTEL_TYPE_965) {
+		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x)) {
 			float adjusted = ((referenceClock * divisors.m) / divisors.n)
 				/ divisors.post;
 			uint32 pixelMultiply = uint32(adjusted
@@ -718,8 +724,9 @@ if (first) {
 			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT) & DISPLAY_PLL_M2_DIVISOR_MASK));
 
 		uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL;
-		if ((gInfo->shared_info->device_type & INTEL_TYPE_9xx) != 0) {
-			pll |= ((1 << (divisors.post1 - 1)) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
+		if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
+			pll |= ((1 << (divisors.post1 - 1))
+					<< DISPLAY_PLL_POST1_DIVISOR_SHIFT)
 				& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
 //			pll |= ((divisors.post1 - 1) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
 //				& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
@@ -728,7 +735,7 @@ if (first) {
 
 			pll |= DISPLAY_PLL_MODE_ANALOG;
 
-			if (gInfo->shared_info->device_type == INTEL_TYPE_965)
+			if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x))
 				pll |= 6 << DISPLAY_PLL_PULSE_PHASE_SHIFT;
 		} else {
 			if (!divisors.post2_high)
@@ -834,7 +841,7 @@ intel_get_display_mode(display_mode *_currentMode)
 	pll_limits limits;
 	get_pll_limits(limits);
 
-	if ((gInfo->shared_info->device_type & INTEL_TYPE_9xx) != 0) {
+	if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
 		divisors.post1 = (pll & DISPLAY_PLL_9xx_POST1_DIVISOR_MASK)
 			>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
 
@@ -856,8 +863,10 @@ intel_get_display_mode(display_mode *_currentMode)
 	divisors.m = 5 * divisors.m1 + divisors.m2;
 	divisors.post = divisors.post1 * divisors.post2;
 
-	float referenceClock = gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
-	float pixelClock = ((referenceClock * divisors.m) / divisors.n) / divisors.post;
+	float referenceClock
+		= gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
+	float pixelClock
+		= ((referenceClock * divisors.m) / divisors.n) / divisors.post;
 
 	// timing
 

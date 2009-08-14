@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,19 +19,60 @@
 #define VENDOR_ID_INTEL			0x8086
 
 #define INTEL_TYPE_FAMILY_MASK	0xf000
-#define INTEL_TYPE_GROUP_MASK	0x0fff
+#define INTEL_TYPE_GROUP_MASK	0xfff0
+#define INTEL_TYPE_MODEL_MASK	0xffff
+// families
 #define INTEL_TYPE_7xx			0x1000
 #define INTEL_TYPE_8xx			0x2000
 #define INTEL_TYPE_9xx			0x4000
-#define INTEL_TYPE_83x			(INTEL_TYPE_8xx | 0x0001)
-#define INTEL_TYPE_85x			(INTEL_TYPE_8xx | 0x0002)
-#define INTEL_TYPE_91x			(INTEL_TYPE_9xx | 0x0010)
-#define INTEL_TYPE_945			(INTEL_TYPE_9xx | 0x0020)
-#define INTEL_TYPE_965			(INTEL_TYPE_9xx | 0x0030)
-#define INTEL_TYPE_G33			(INTEL_TYPE_9xx | 0x0040)
+// groups
+#define INTEL_TYPE_83x			(INTEL_TYPE_8xx | 0x0010)
+#define INTEL_TYPE_85x			(INTEL_TYPE_8xx | 0x0020)
+#define INTEL_TYPE_91x			(INTEL_TYPE_9xx | 0x0040)
+#define INTEL_TYPE_94x			(INTEL_TYPE_9xx | 0x0080)
+#define INTEL_TYPE_96x			(INTEL_TYPE_9xx | 0x0100)
+#define INTEL_TYPE_Gxx			(INTEL_TYPE_9xx | 0x0200)
+// models
+#define INTEL_TYPE_MOBILE		0x0008
+#define INTEL_TYPE_915			(INTEL_TYPE_91x)
+#define INTEL_TYPE_945			(INTEL_TYPE_94x)
+#define INTEL_TYPE_945M			(INTEL_TYPE_94x | INTEL_TYPE_MOBILE)
+#define INTEL_TYPE_965			(INTEL_TYPE_96x)
+#define INTEL_TYPE_965M			(INTEL_TYPE_96x | INTEL_TYPE_MOBILE)
+#define INTEL_TYPE_G33			(INTEL_TYPE_Gxx)
 
 #define DEVICE_NAME				"intel_extreme"
 #define INTEL_ACCELERANT_NAME	"intel_extreme.accelerant"
+
+struct DeviceType {
+	uint32			type;
+
+	DeviceType(int t)
+	{
+		type = t;
+	}
+
+	DeviceType& operator=(int t)
+	{
+		type = t;
+		return *this;
+	}
+
+	bool InFamily(uint32 family) const
+	{
+		return (type & INTEL_TYPE_FAMILY_MASK) == family;
+	}
+
+	bool InGroup(uint32 group) const
+	{
+		return (type & INTEL_TYPE_GROUP_MASK) == group;
+	}
+
+	bool IsModel(uint32 model) const
+	{
+		return (type & INTEL_TYPE_MODEL_MASK) == model;
+	}
+};
 
 // info about PLL on graphics card
 struct pll_info {
@@ -48,7 +89,7 @@ struct ring_buffer {
 	uint32			size;
 	uint32			position;
 	uint32			space_left;
-	uint8			*base;
+	uint8*			base;
 };
 
 struct overlay_registers;
@@ -63,9 +104,9 @@ struct intel_shared_info {
 	uint32			dpms_mode;
 
 	area_id			registers_area;			// area of memory mapped registers
-	uint8			*status_page;
+	uint8*			status_page;
 	addr_t			physical_status_page;
-	uint8			*graphics_memory;
+	uint8*			graphics_memory;
 	addr_t			physical_graphics_memory;
 	uint32			graphics_memory_size;
 
@@ -86,7 +127,7 @@ struct intel_shared_info {
 	bool			hardware_cursor_enabled;
 	sem_id			vblank_sem;
 
-	uint8			*cursor_memory;
+	uint8*			cursor_memory;
 	addr_t			physical_cursor_memory;
 	uint32			cursor_buffer_offset;
 	uint32			cursor_format;
@@ -94,7 +135,7 @@ struct intel_shared_info {
 	uint16			cursor_hot_x;
 	uint16			cursor_hot_y;
 
-	uint32			device_type;
+	DeviceType		device_type;
 	char			device_identifier[32];
 	struct pll_info	pll_info;
 };
@@ -220,7 +261,7 @@ struct intel_free_graphics_memory {
 #define INTEL_DISPLAY_C_DIGITAL			0x61160
 #define INTEL_DISPLAY_LVDS_PORT			0x61180
 #define LVDS_POST2_RATE_SLOW			14 // PLL Divisors
-#define LVDS_POST2_RATE_FAST			7 
+#define LVDS_POST2_RATE_FAST			7
 #define LVDS_CLKB_POWER_MASK			(3 << 4)
 #define LVDS_CLKB_POWER_UP				(3 << 4)
 #define LVDS_PORT_EN					(1 << 31)
@@ -575,19 +616,19 @@ struct overlay_registers {
 inline bool
 intel_uses_physical_overlay(intel_shared_info &info)
 {
-	return info.device_type != INTEL_TYPE_G33;
+	return !info.device_type.InGroup(INTEL_TYPE_Gxx);
 }
 
 
 struct hardware_status {
 	uint32	interrupt_status_register;
 	uint32	_reserved0[3];
-	void	*primary_ring_head_storage;
+	void*	primary_ring_head_storage;
 	uint32	_reserved1[3];
-	void	*secondary_ring_0_head_storage;
-	void	*secondary_ring_1_head_storage;
+	void*	secondary_ring_0_head_storage;
+	void*	secondary_ring_1_head_storage;
 	uint32	_reserved2[2];
-	void	*binning_head_storage;
+	void*	binning_head_storage;
 	uint32	_reserved3[3];
 	uint32	store[1008];
 };

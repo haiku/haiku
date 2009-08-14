@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -34,17 +34,19 @@ struct accelerant_info *gInfo;
 
 
 class AreaCloner {
-	public:
-		AreaCloner();
-		~AreaCloner();
+public:
+							AreaCloner();
+							~AreaCloner();
 
-		area_id Clone(const char *name, void **_address, uint32 spec,
-					uint32 protection, area_id sourceArea);
-		status_t InitCheck() { return fArea < B_OK ? (status_t)fArea : B_OK; }
-		void Keep();
+			area_id			Clone(const char *name, void **_address,
+								uint32 spec, uint32 protection,
+								area_id sourceArea);
+			status_t		InitCheck()
+								{ return fArea < 0 ? (status_t)fArea : B_OK; }
+			void			Keep();
 
-	private:
-		area_id	fArea;
+private:
+			area_id			fArea;
 };
 
 
@@ -57,12 +59,12 @@ AreaCloner::AreaCloner()
 
 AreaCloner::~AreaCloner()
 {
-	if (fArea >= B_OK)
+	if (fArea >= 0)
 		delete_area(fArea);
 }
 
 
-area_id 
+area_id
 AreaCloner::Clone(const char *name, void **_address, uint32 spec,
 	uint32 protection, area_id sourceArea)
 {
@@ -71,7 +73,7 @@ AreaCloner::Clone(const char *name, void **_address, uint32 spec,
 }
 
 
-void 
+void
 AreaCloner::Keep()
 {
 	fArea = -1;
@@ -139,7 +141,7 @@ init_common(int device, bool isClone)
 		(gInfo->shared_info->graphics_memory
 		+ gInfo->shared_info->overlay_offset);
 
-	if (gInfo->shared_info->device_type == INTEL_TYPE_965) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x)) {
 		// allocate some extra memory for the 3D context
 		if (intel_allocate_memory(INTEL_i965_3D_CONTEXT_SIZE,
 				B_APERTURE_NON_RESERVED, gInfo->context_base) == B_OK) {
@@ -181,7 +183,7 @@ intel_init_accelerant(int device)
 	TRACE(("intel_init_accelerant()\n"));
 
 	status_t status = init_common(device, false);
-	if (status != B_OK) 
+	if (status != B_OK)
 		return status;
 
 	intel_shared_info &info = *gInfo->shared_info;
@@ -203,8 +205,10 @@ intel_init_accelerant(int device)
 
 	uint32 lvds = read32(INTEL_DISPLAY_LVDS_PORT);
 
-	// If we have an enabled display pipe we save the passed information and assume it is the valid panel size..
-	// Later we query for proper EDID info if it exists, or figure something else out.  (Default modes, etc.)
+	// If we have an enabled display pipe we save the passed information and
+	// assume it is the valid panel size..
+	// Later we query for proper EDID info if it exists, or figure something
+	// else out. (Default modes, etc.)
 	if ((lvds & DISPLAY_PIPE_ENABLED) != 0) {
 		save_lvds_mode();
 		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
@@ -212,7 +216,8 @@ intel_init_accelerant(int device)
 
 	TRACE(("head detected: %d\n", gInfo->head_mode));
 	TRACE(("adpa: %08lx, dova: %08lx, dovb: %08lx, lvds: %08lx\n",
-		read32(INTEL_DISPLAY_A_ANALOG_PORT), read32(INTEL_DISPLAY_A_DIGITAL_PORT),
+		read32(INTEL_DISPLAY_A_ANALOG_PORT),
+		read32(INTEL_DISPLAY_A_DIGITAL_PORT),
 		read32(INTEL_DISPLAY_B_DIGITAL_PORT), read32(INTEL_DISPLAY_LVDS_PORT)));
 
 	status = create_mode_list();
@@ -268,7 +273,7 @@ intel_clone_accelerant(void *info)
 	status = gInfo->mode_list_area = clone_area(
 		"intel extreme cloned modes", (void **)&gInfo->mode_list,
 		B_ANY_ADDRESS, B_READ_AREA, gInfo->shared_info->mode_list_area);
-	if (status < B_OK) 
+	if (status < B_OK)
 		goto err2;
 
 	return B_OK;
@@ -310,8 +315,7 @@ intel_get_accelerant_device_info(accelerant_device_info *info)
 	TRACE(("intel_get_accelerant_device_info()\n"));
 
 	info->version = B_ACCELERANT_VERSION;
-	strcpy(info->name,
-		(gInfo->shared_info->device_type & INTEL_TYPE_7xx) != 0
+	strcpy(info->name, gInfo->shared_info->device_type.InFamily(INTEL_TYPE_7xx)
 		? "Intel Extreme Graphics 1" : "Intel Extreme Graphics 2");
 	strcpy(info->chipset, gInfo->shared_info->device_identifier);
 	strcpy(info->serial_no, "None");
