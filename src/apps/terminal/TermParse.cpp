@@ -640,8 +640,7 @@ TermParse::EscParse()
 						break;
 
 					case 2:
-						fBuffer->EraseBelow();
-						fBuffer->EraseAbove();
+						fBuffer->EraseAll();
 						break;
 				}
 				parsestate = groundtable;

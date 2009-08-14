@@ -710,6 +710,14 @@ BasicTerminalBuffer::EraseBelow()
 
 
 void
+BasicTerminalBuffer::EraseAll()
+{
+	fSoftWrappedCursor = false;
+	_Scroll(fScrollTop, fScrollBottom, fHeight);
+}
+
+
+void
 BasicTerminalBuffer::DeleteChars(int32 numChars)
 {
 	fSoftWrappedCursor = false;

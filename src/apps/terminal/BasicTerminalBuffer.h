@@ -114,6 +114,7 @@ public:
 			void				EraseChars(int32 numChars);
 			void				EraseAbove();
 			void				EraseBelow();
+			void				EraseAll();
 			void				DeleteChars(int32 numChars);
 			void				DeleteColumns();
 			void				DeleteLines(int32 numLines);
