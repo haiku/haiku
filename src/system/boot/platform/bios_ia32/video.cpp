@@ -1159,8 +1159,11 @@ platform_init_video(void)
 	sVesaCompatible = vesa_init(&sInfo, &sDefaultMode) == B_OK;
 	if (!sVesaCompatible) {
 		TRACE(("No VESA compatible graphics!\n"));
+		gKernelArgs.vesa_capabilities = CAPABILITY_VGA_COMPATIBLE;
 		return B_ERROR;
 	}
+
+	gKernelArgs.vesa_capabilities = sInfo.capabilities;
 
 	TRACE(("VESA compatible graphics!\n"));
 

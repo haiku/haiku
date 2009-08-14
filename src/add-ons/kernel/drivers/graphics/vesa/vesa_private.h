@@ -27,6 +27,8 @@ struct vesa_info {
 	area_id			shared_area;
 	vesa_mode*		modes;
 	uint32			vbe_dpms_capabilities;
+	uint8			vbe_capabilities;
+	uint8			bits_per_gun;
 };
 
 extern status_t vesa_init(vesa_info& info);
@@ -34,5 +36,7 @@ extern void vesa_uninit(vesa_info& info);
 extern status_t vesa_set_display_mode(vesa_info& info, uint32 mode);
 extern status_t vesa_get_dpms_mode(vesa_info& info, uint32& mode);
 extern status_t vesa_set_dpms_mode(vesa_info& info, uint32 mode);
+extern status_t vesa_set_indexed_colors(vesa_info& info, uint8 first,
+	uint8* colors, uint16 count);
 
 #endif	/* VESA_PRIVATE_H */

@@ -17,6 +17,8 @@
 #include <PCI.h>
 #include <SupportDefs.h>
 
+#include <vesa.h>
+
 #include "driver.h"
 #include "utility.h"
 #include "vesa_info.h"
@@ -125,7 +127,7 @@ device_ioctl(void* cookie, uint32 msg, void* buffer, size_t bufferLength)
 				return B_BAD_VALUE;
 
 			uint32 mode;
-			if (user_memcpy(&mode, buffer, sizeof(uint32)) < B_OK)
+			if (user_memcpy(&mode, buffer, sizeof(uint32)) != B_OK)
 				return B_BAD_ADDRESS;
 
 			return vesa_set_display_mode(*info, mode);
@@ -150,25 +152,38 @@ device_ioctl(void* cookie, uint32 msg, void* buffer, size_t bufferLength)
 				return B_BAD_VALUE;
 
 			uint32 mode;
-			if (user_memcpy(&mode, buffer, sizeof(uint32)) < B_OK)
+			if (user_memcpy(&mode, buffer, sizeof(uint32)) != B_OK)
 				return B_BAD_ADDRESS;
 
 			return vesa_set_dpms_mode(*info, mode);
 		}
 
-		case VGA_SET_INDEXED_COLORS:
+		case VESA_SET_INDEXED_COLORS:
 		{
-			vga_set_indexed_colors_args args;
-			if (user_memcpy(&args, buffer, sizeof(args)) < B_OK)
+			vesa_set_indexed_colors_args args;
+			if (user_memcpy(&args, buffer, sizeof(args)) != B_OK)
 				return B_BAD_ADDRESS;
 
-			return vga_set_indexed_colors(args.first, args.colors, args.count);
+			if (info->shared_info->current_mode.space == B_GRAY8) {
+				if ((info->vbe_capabilities & CAPABILITY_VGA_COMPATIBLE) == 0)
+					return B_NOT_SUPPORTED;
+
+				return vga_set_indexed_colors(args.first, args.colors,
+					args.count);
+			}
+
+			return vesa_set_indexed_colors(*info, args.first, args.colors,
+				args.count);
 		}
 
 		case VGA_PLANAR_BLIT:
 		{
+			if (info->shared_info->current_mode.space != B_GRAY8
+				&& (info->vbe_capabilities & CAPABILITY_VGA_COMPATIBLE) == 0)
+				return B_NOT_SUPPORTED;
+
 			vga_planar_blit_args args;
-			if (user_memcpy(&args, buffer, sizeof(args)) < B_OK)
+			if (user_memcpy(&args, buffer, sizeof(args)) != B_OK)
 				return B_BAD_ADDRESS;
 
 			return vga_planar_blit(info->shared_info, args.source,

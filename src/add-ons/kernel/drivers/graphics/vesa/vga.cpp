@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,6 +15,9 @@
 status_t
 vga_set_indexed_colors(uint8 first, uint8 *colors, uint16 count)
 {
+	if (first + count > 256)
+		count = 256 - first;
+
 	gISA->write_io_8(VGA_COLOR_WRITE_MODE, first);
 
 	// write VGA palette

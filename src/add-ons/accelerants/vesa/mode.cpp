@@ -193,7 +193,7 @@ vesa_get_frame_buffer_config(frame_buffer_config* config)
 
 
 status_t
-vesa_get_pixel_clock_limits(display_mode* mode, uint32* low, uint32* high)
+vesa_get_pixel_clock_limits(display_mode* mode, uint32* _low, uint32* _high)
 {
 	TRACE(("vesa_get_pixel_clock_limits()\n"));
 
@@ -203,11 +203,11 @@ vesa_get_pixel_clock_limits(display_mode* mode, uint32* low, uint32* high)
 	uint32 clockLimit = 2000000;
 
 	// lower limit of about 48Hz vertical refresh
-	*low = totalPixel * 48L / 1000L;
-	if (*low > clockLimit)
+	*_low = totalPixel * 48L / 1000L;
+	if (*_low > clockLimit)
 		return B_ERROR;
 
-	*high = clockLimit;
+	*_high = clockLimit;
 	return B_OK;
 }
 
@@ -232,10 +232,11 @@ void
 vesa_set_indexed_colors(uint count, uint8 first, uint8* colors, uint32 flags)
 {
 	TRACE(("vesa_set_indexed_colors()\n"));
-	vga_set_indexed_colors_args args;
+
+	vesa_set_indexed_colors_args args;
 	args.first = first;
 	args.count = count;
 	args.colors = colors;
-	ioctl(gInfo->device, VGA_SET_INDEXED_COLORS, &args, sizeof(args));
+	ioctl(gInfo->device, VESA_SET_INDEXED_COLORS, &args, sizeof(args));
 }
 

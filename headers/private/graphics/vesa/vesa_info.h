@@ -31,9 +31,9 @@ struct vesa_shared_info {
 	uint32			bytes_per_row;
 
 	area_id			frame_buffer_area;	// area of frame buffer
-	uint8			*frame_buffer;
+	uint8*			frame_buffer;
 		// pointer to frame buffer (visible by all apps!)
-	uint8			*physical_frame_buffer;
+	uint8*			physical_frame_buffer;
 
 	uint32			vesa_mode_offset;
 	uint32			vesa_mode_count;
@@ -52,24 +52,24 @@ enum {
 	VESA_SET_DISPLAY_MODE,
 	VESA_GET_DPMS_MODE,
 	VESA_SET_DPMS_MODE,
+	VESA_SET_INDEXED_COLORS,
 
-	VGA_SET_INDEXED_COLORS,
 	VGA_PLANAR_BLIT,
 };
 
-struct vga_set_indexed_colors_args {
-	uint8	first;
-	uint16	count;
-	uint8	*colors;
+struct vesa_set_indexed_colors_args {
+	uint8			first;
+	uint16			count;
+	uint8*			colors;
 };
 
 struct vga_planar_blit_args {
-	uint8	*source;
-	int32	source_bytes_per_row;
-	int32	left;
-	int32	top;
-	int32	right;
-	int32	bottom;
+	uint8*			source;
+	int32			source_bytes_per_row;
+	int32			left;
+	int32			top;
+	int32			right;
+	int32			bottom;
 };
 
 #endif	/* VESA_INFO_H */

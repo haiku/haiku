@@ -417,7 +417,7 @@ frame_buffer_console_init(kernel_args* args)
 		(void*)args->frame_buffer.physical_buffer.start,
 		args->frame_buffer.physical_buffer.size, B_ANY_KERNEL_ADDRESS,
 		B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA, &frameBuffer);
-	if (sConsole.area < B_OK)
+	if (sConsole.area < 0)
 		return sConsole.area;
 
 	frame_buffer_update((addr_t)frameBuffer, args->frame_buffer.width,
@@ -430,6 +430,8 @@ frame_buffer_console_init(kernel_args* args)
 	sBootInfo.height = args->frame_buffer.height;
 	sBootInfo.depth = args->frame_buffer.depth;
 	sBootInfo.bytes_per_row = args->frame_buffer.bytes_per_row;
+	sBootInfo.vesa_capabilities = args->vesa_capabilities;
+
 	add_boot_item(FRAME_BUFFER_BOOT_INFO, &sBootInfo,
 		sizeof(frame_buffer_boot_info));
 

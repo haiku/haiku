@@ -72,7 +72,8 @@ typedef struct kernel_args {
 	} frame_buffer;
 
 	void		*vesa_modes;
-	uint32		vesa_modes_size;
+	uint16		vesa_modes_size;
+	uint8		vesa_capabilities;
 	void		*edid_info;
 
 	void		*debug_output;

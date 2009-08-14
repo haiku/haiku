@@ -37,6 +37,10 @@ struct vbe_info_block {
 	uint8		oem_data[256];
 } _PACKED;
 
+// capabilities
+#define CAPABILITY_DAC_WIDTH		0x01
+#define CAPABILITY_VGA_COMPATIBLE	0x02
+
 
 /* VBE mode info structure */
 

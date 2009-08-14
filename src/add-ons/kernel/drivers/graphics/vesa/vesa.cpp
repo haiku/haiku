@@ -154,6 +154,52 @@ out:
 }
 
 
+static status_t
+vbe_set_bits_per_gun(vm86_state& vmState, vesa_info& info, uint8 bits)
+{
+	info.bits_per_gun = 6;
+
+	vmState.regs.eax = 0x4f08;
+	vmState.regs.ebx = (bits << 8) | 1;
+
+	status_t status = vm86_do_int(&vmState, 0x10);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME ": vbe_set_bits_per_gun(): vm86 failed: %s\n",
+			strerror(status));
+		return status;
+	}
+
+	if ((vmState.regs.eax & 0xffff) != 0x4f) {
+		dprintf(DEVICE_NAME ": vbe_set_bits_per_gun(): BIOS returned 0x%04lx\n",
+			vmState.regs.eax & 0xffff);
+		return B_ERROR;
+	}
+
+	info.bits_per_gun = vmState.regs.ebx >> 8;
+	return B_OK;
+}
+
+
+static status_t
+vbe_set_bits_per_gun(vesa_info& info, uint8 bits)
+{
+	info.bits_per_gun = 6;
+
+	struct vm86_state vmState;
+	status_t status = vm86_prepare(&vmState, 0x20000);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME": vbe_set_bits_per_gun(): vm86_prepare failed: "
+			"%s\n", strerror(status));
+		return status;
+	}
+
+	status = vbe_set_bits_per_gun(vmState, info, bits);
+
+	vm86_cleanup(&vmState);
+	return status;
+}
+
+
 //	#pragma mark -
 
 
@@ -164,6 +210,8 @@ vesa_init(vesa_info& info)
 		= (frame_buffer_boot_info*)get_boot_item(FRAME_BUFFER_BOOT_INFO, NULL);
 	if (bufferInfo == NULL)
 		return B_ERROR;
+
+	info.vbe_capabilities = bufferInfo->vesa_capabilities;
 
 	size_t modesSize = 0;
 	vesa_mode* modes = (vesa_mode*)get_boot_item(VESA_MODES_BOOT_INFO,
@@ -176,7 +224,7 @@ vesa_init(vesa_info& info)
 		(void**)&info.shared_info, B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(sharedSize + modesSize), B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
-	if (info.shared_area < B_OK)
+	if (info.shared_area < 0)
 		return info.shared_area;
 
 	vesa_shared_info &sharedInfo = *info.shared_info;
@@ -199,7 +247,6 @@ vesa_init(vesa_info& info)
 		bufferInfo->depth);
 	sharedInfo.bytes_per_row = bufferInfo->bytes_per_row;
 
-	// TODO: we might want to do this via vm86 instead
 	edid1_info* edidInfo = (edid1_info*)get_boot_item(VESA_EDID_BOOT_INFO,
 		NULL);
 	if (edidInfo != NULL) {
@@ -209,6 +256,8 @@ vesa_init(vesa_info& info)
 
 	vbe_get_dpms_capabilities(info.vbe_dpms_capabilities,
 		sharedInfo.dpms_capabilities);
+	if (bufferInfo->depth <= 8)
+		vbe_set_bits_per_gun(info, 8);
 
 	physical_entry mapping;
 	get_memory_map((void*)sharedInfo.frame_buffer, B_PAGE_SIZE, &mapping, 1);
@@ -260,6 +309,9 @@ vesa_set_display_mode(vesa_info& info, uint32 mode)
 		dprintf(DEVICE_NAME": vesa_set_display_mode(): cannot set mode\n");
 		goto out;
 	}
+
+	if (info.modes[mode].bits_per_pixel <= 8)
+		vbe_set_bits_per_gun(vmState, info, 8);
 
 	// Map new frame buffer
 	void* frameBuffer;
@@ -385,6 +437,65 @@ vesa_set_dpms_mode(vesa_info& info, uint32 mode)
 			vmState.regs.eax & 0xffff);
 		status = B_ERROR;
 		goto out;
+	}
+
+out:
+	vm86_cleanup(&vmState);
+	return status;
+}
+
+
+status_t
+vesa_set_indexed_colors(vesa_info& info, uint8 first, uint8* colors,
+	uint16 count)
+{
+	if (first + count > 256)
+		count = 256 - first;
+
+	// Prepare vm86 mode environment
+	struct vm86_state vmState;
+	status_t status = vm86_prepare(&vmState, 0x20000);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME": vesa_set_indexed_colors(): vm86_prepare failed: "
+			"%s\n", strerror(status));
+		return status;
+	}
+
+	uint8* palette = (uint8*)0x1000;
+	uint32 shift = 8 - info.bits_per_gun;
+
+	// convert colors to VESA palette
+	for (int32 i = first; i < count; i++) {
+		uint8 color[3];
+		if (user_memcpy(color, &colors[i * 3], 3) < B_OK)
+			return B_BAD_ADDRESS;
+
+		// order is BGR-
+		palette[i * 4 + 0] = color[2] >> shift;
+		palette[i * 4 + 1] = color[1] >> shift;
+		palette[i * 4 + 2] = color[0] >> shift;
+		palette[i * 4 + 3] = 0;
+	}
+
+	// set palette
+	vmState.regs.eax = 0x4f09;
+	vmState.regs.ebx = 0;
+	vmState.regs.ecx = count;
+	vmState.regs.edx = first;
+	vmState.regs.es  = 0x1000 >> 4;
+	vmState.regs.edi = 0x0000;
+
+	status = vm86_do_int(&vmState, 0x10);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME ": vesa_set_indexed_colors(): vm86 failed: %s\n",
+			strerror(status));
+		goto out;
+	}
+
+	if ((vmState.regs.eax & 0xffff) != 0x4f) {
+		dprintf(DEVICE_NAME ": vesa_set_indexed_colors(): BIOS returned "
+			"0x%04lx\n", vmState.regs.eax & 0xffff);
+		status = B_ERROR;
 	}
 
 out:
