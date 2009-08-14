@@ -1648,20 +1648,11 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 
 	switch (*bytes) {
 		case B_DOWN_ARROW:
-			_ScrollRestrictedBy(0, 10);
-			break;
-		case B_UP_ARROW:
-			_ScrollRestrictedBy(0, -10);
-			break;
-		case B_LEFT_ARROW:
-			_ScrollRestrictedBy(-10, 0);
-			break;
 		case B_RIGHT_ARROW:
-			_ScrollRestrictedBy(10, 0);
-			break;
-		case B_ENTER:
 			_SendMessageToWindow(MSG_FILE_NEXT);
 			break;
+		case B_UP_ARROW:
+		case B_LEFT_ARROW:
 		case B_BACKSPACE:
 			_SendMessageToWindow(MSG_FILE_PREV);
 			break;
@@ -1725,7 +1716,16 @@ ShowImageView::_MouseWheelChanged(BMessage *msg)
 	if (msg->FindFloat("be:wheel_delta_y", &dy) == B_OK)
 		y = dy * kscrollBy;
 
-	_ScrollRestrictedBy(x, y);
+	if (modifiers() & B_SHIFT_KEY)
+		_ScrollRestrictedBy(x, y);
+	else if (modifiers() & B_COMMAND_KEY)
+		_ScrollRestrictedBy(y, x);
+	else {
+		if (dy < 0)
+			ZoomIn();
+		else if (dy > 0)
+			ZoomOut();
+	}
 }
 
 

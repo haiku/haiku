@@ -272,7 +272,7 @@ ShowImageWindow::_BuildViewMenu(BMenu *menu, bool popupMenu)
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, "Original Size", MSG_ORIGINAL_SIZE, 0, 0, this);
+	_AddItemMenu(menu, "Original Size", MSG_ORIGINAL_SIZE, '1', 0, this);
 	_AddItemMenu(menu, "Zoom In", MSG_ZOOM_IN, '+', 0, this);
 	_AddItemMenu(menu, "Zoom Out", MSG_ZOOM_OUT, '-', 0, this);
 
@@ -287,10 +287,8 @@ ShowImageWindow::_BuildViewMenu(BMenu *menu, bool popupMenu)
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, "Full Screen", MSG_FULL_SCREEN, 'F', 0, this);
+	_AddItemMenu(menu, "Full Screen", MSG_FULL_SCREEN, B_ENTER, 0, this);
 	_MarkMenuItem(menu, MSG_FULL_SCREEN, fFullScreen);
-
-	AddShortcut(B_ENTER, 0, new BMessage(MSG_FULL_SCREEN));
 
 	_AddItemMenu(menu, "Show Caption in Full Screen Mode", MSG_SHOW_CAPTION, 0,
 		0, this);
@@ -337,7 +335,7 @@ ShowImageWindow::AddMenus(BMenuBar *bar)
 	_AddItemMenu(menu, "Close", B_QUIT_REQUESTED, 'W', 0, this);
 	menu->AddSeparatorItem();
 	_AddItemMenu(menu, "Page Setup" B_UTF8_ELLIPSIS, MSG_PAGE_SETUP, 0, 0, this);
-	_AddItemMenu(menu, "_Print" B_UTF8_ELLIPSIS, MSG_PREPARE_PRINT, 'P', 0, this);
+	_AddItemMenu(menu, "Print" B_UTF8_ELLIPSIS, MSG_PREPARE_PRINT, 'P', 0, this);
 	menu->AddSeparatorItem();
 	_AddItemMenu(menu, "About ShowImage" B_UTF8_ELLIPSIS, B_ABOUT_REQUESTED, 0, 0,
 		be_app);
@@ -370,8 +368,8 @@ ShowImageWindow::AddMenus(BMenuBar *bar)
 	bar->AddItem(menu);
 
 	menu = new BMenu("Image");
-	_AddItemMenu(menu, "Rotate Counterclockwise", MSG_ROTATE_270, '[', 0, this);
-	_AddItemMenu(menu, "Rotate Clockwise", MSG_ROTATE_90, ']', 0, this);
+	_AddItemMenu(menu, "Rotate Clockwise", MSG_ROTATE_90, 'R', 0, this);
+	_AddItemMenu(menu, "Rotate Counterclockwise", MSG_ROTATE_270, 'R', B_SHIFT_KEY, this);
 	menu->AddSeparatorItem();
 	_AddItemMenu(menu, "Flip Left to Right", MSG_FLIP_LEFT_TO_RIGHT, 0, 0, this);
 	_AddItemMenu(menu, "Flip Top to Bottom", MSG_FLIP_TOP_TO_BOTTOM, 0, 0, this);
