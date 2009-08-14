@@ -104,10 +104,10 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 					score-=10;
 				pose->Select(false);
 			}
-			BPoint location = pose->Location();
+			BPoint location = pose->Location(view);
 			location.x += ((rand() % 20) - 10);
 			location.y += ((rand() % 20) - 10);
-			pose->SetLocation(location);
+			pose->SetLocation(location, view);
 		}
 
 		view->CheckPoseVisibility();

@@ -5,6 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] : true ;
 	UsePrivateHeaders tracker ;
+	UsePrivateHeaders shared ;
 } else {
 	# private, for testing...
 	SubDirC++Flags -I/work/zeta/src/cebit/os/zeta/system/lib/tracker ;
