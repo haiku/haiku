@@ -20,6 +20,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 local genericPlatformSources = 
 	text_menu.cpp
 	video_blit.cpp
+	video_splash.cpp
 	video_rle.cpp
 ;
 

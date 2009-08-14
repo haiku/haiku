@@ -29,10 +29,11 @@
 
 
 static void
-blit32(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data, uint16 width,
+blit32(addr_t frameBuffer, const uint8 *data, uint16 width,
 	uint16 height, uint16 imageWidth, uint16 left, uint16 top)
 {
-	uint32 *start = (uint32 *)(frameBuffer + bytesPerRow * top + 4 * left);
+	uint32 *start = (uint32 *)(frameBuffer
+		+ gKernelArgs.frame_buffer.bytes_per_row * top + 4 * left);
 
 	for (int32 y = 0; y < height; y++) {
 		const uint8* src = data;
@@ -45,16 +46,17 @@ blit32(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data, uint16 width,
 
 		data += imageWidth * 3;
 		start = (uint32 *)((addr_t)start
-			+ bytesPerRow);
+			+ gKernelArgs.frame_buffer.bytes_per_row);
 	}
 }
 
 
 static void
-blit24(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data, uint16 width,
+blit24(addr_t frameBuffer, const uint8 *data, uint16 width,
 	uint16 height, uint16 imageWidth, uint16 left, uint16 top)
 {
-	uint8 *start = (uint8 *)frameBuffer + bytesPerRow * top + 3 * left;
+	uint8 *start = (uint8 *)frameBuffer
+		+ gKernelArgs.frame_buffer.bytes_per_row * top + 3 * left;
 
 	for (int32 y = 0; y < height; y++) {
 		const uint8* src = data;
@@ -68,16 +70,17 @@ blit24(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data, uint16 width,
 		}
 
 		data += imageWidth * 3;
-		start = start + bytesPerRow;
+		start = start + gKernelArgs.frame_buffer.bytes_per_row;
 	}
 }
 
 
 static void
-blit16(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data, uint16 width,
+blit16(addr_t frameBuffer, const uint8 *data, uint16 width,
 	uint16 height, uint16 imageWidth, uint16 left, uint16 top)
 {
-	uint16 *start = (uint16 *)(frameBuffer + bytesPerRow * top + 2 * left);
+	uint16 *start = (uint16 *)(frameBuffer
+		+ gKernelArgs.frame_buffer.bytes_per_row * top + 2 * left);
 
 	for (int32 y = 0; y < height; y++) {
 		const uint8* src = data;
@@ -92,16 +95,17 @@ blit16(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data, uint16 width,
 
 		data += imageWidth * 3;
 		start = (uint16 *)((addr_t)start
-			+ bytesPerRow);
+			+ gKernelArgs.frame_buffer.bytes_per_row);
 	}
 }
 
 
 static void
-blit15(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data, uint16 width,
+blit15(addr_t frameBuffer, const uint8 *data, uint16 width,
 	uint16 height, uint16 imageWidth, uint16 left, uint16 top)
 {
-	uint16 *start = (uint16 *)(frameBuffer + bytesPerRow * top + 2 * left);
+	uint16 *start = (uint16 *)(frameBuffer
+		+ gKernelArgs.frame_buffer.bytes_per_row * top + 2 * left);
 
 	for (int32 y = 0; y < height; y++) {
 		const uint8* src = data;
@@ -116,62 +120,62 @@ blit15(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data, uint16 width,
 
 		data += imageWidth * 3;
 		start = (uint16 *)((addr_t)start
-			+ bytesPerRow);
+			+ gKernelArgs.frame_buffer.bytes_per_row);
 	}
 }
 
 
 static void
-blit8(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data, uint16 width,
+blit8(addr_t frameBuffer, const uint8 *data, uint16 width,
 	uint16 height, uint16 imageWidth, uint16 left, uint16 top)
 {
 	if (!data)
 		return;
 
-	addr_t start = frameBuffer + bytesPerRow * top
+	addr_t start = frameBuffer + gKernelArgs.frame_buffer.bytes_per_row * top
 		+ left;
 
 	for (int32 i = 0; i < height; i++) {
-		memcpy((void *)(start + bytesPerRow * i),
+		memcpy((void *)(start + gKernelArgs.frame_buffer.bytes_per_row * i),
 			&data[i * imageWidth], width);
 	}
 }
 
 
 static void
-blit4(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data, uint16 width,
+blit4(addr_t frameBuffer, const uint8 *data, uint16 width,
 	uint16 height, uint16 imageWidth, uint16 left, uint16 top)
 {
 	if (!data)
 		return;
 	// call back platform specific code since it's really platform-specific.
-	platform_blit4(frameBuffer, bytesPerRow, data, width, height,
+	platform_blit4(frameBuffer, data, width, height,
 		imageWidth, left, top);
 }
 
 
 void
-video_blit_image(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data,
+video_blit_image(addr_t frameBuffer, const uint8 *data,
 	uint16 width, uint16 height, uint16 imageWidth, uint16 left, uint16 top)
 {
 	switch (gKernelArgs.frame_buffer.depth) {
 		case 4:
-			return blit4(frameBuffer, bytesPerRow, data,
+			return blit4(frameBuffer, data,
 				width, height, imageWidth, left, top);
 		case 8:
-			return blit8(frameBuffer, bytesPerRow, data,
+			return blit8(frameBuffer, data,
 				width, height, imageWidth, left, top);
 		case 15:
-			return blit15(frameBuffer, bytesPerRow, data,
+			return blit15(frameBuffer, data,
 				width, height, imageWidth, left, top);
 		case 16:
-			return blit16(frameBuffer, bytesPerRow, data,
+			return blit16(frameBuffer, data,
 				width, height, imageWidth, left, top);
 		case 24:
-			return blit24(frameBuffer, bytesPerRow, data,
+			return blit24(frameBuffer, data,
 				width, height, imageWidth, left, top);
 		case 32:
-			return blit32(frameBuffer, bytesPerRow, data,
+			return blit32(frameBuffer, data,
 				width, height, imageWidth, left, top);
 	}
 }

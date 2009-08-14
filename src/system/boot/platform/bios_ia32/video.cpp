@@ -20,7 +20,6 @@
 #include <boot/platform.h>
 #include <boot/menu.h>
 #include <boot/kernel_args.h>
-#include <boot/images.h>
 #include <boot/platform/generic/video.h>
 #include <util/list.h>
 #include <drivers/driver_settings.h>
@@ -704,7 +703,7 @@ set_text_mode(void)
 
 
 void
-platform_blit4(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data,
+platform_blit4(addr_t frameBuffer, const uint8 *data,
 	uint16 width, uint16 height, uint16 imageWidth, uint16 left, uint16 top)
 {
 	if (!data)
@@ -712,8 +711,8 @@ platform_blit4(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data,
 	// ToDo: no boot logo yet in VGA mode
 #if 1
 // this draws 16 big rectangles in all the available colors
-	uint8 *bits = (uint8 *)sFrameBuffer;
-	bytesPerRow = 80;
+	uint8 *bits = (uint8 *)frameBuffer;
+	uint32 bytesPerRow = 80;
 	for (int32 i = 0; i < 32; i++) {
 		bits[9 * bytesPerRow + i + 2] = 0x55;
 		bits[30 * bytesPerRow + i + 2] = 0xaa;
@@ -753,9 +752,8 @@ platform_blit4(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data,
 }
 
 
-static void
-blit_image(const uint8 *data, uint16 width, uint16 height, uint16 imageWidth,
-	const uint8 *palette, uint16 left, uint16 top)
+extern "C" void
+platform_set_palette(const uint8 *palette)
 {
 	switch (gKernelArgs.frame_buffer.depth) {
 		case 4:
@@ -769,8 +767,6 @@ blit_image(const uint8 *data, uint16 width, uint16 height, uint16 imageWidth,
 		default:
 			break;
 	}
-	video_blit_image(sFrameBuffer, gKernelArgs.frame_buffer.bytes_per_row,
-		data, width, height, imageWidth, left, top);
 }
 
 
@@ -847,95 +843,7 @@ fallback:
 			gKernelArgs.frame_buffer.physical_buffer.size, kDefaultPageFlags);
 	}
 
-	// clear the video memory
-	memset((void *)sFrameBuffer, 0,
-		gKernelArgs.frame_buffer.physical_buffer.size);
-
-	uint8 *uncompressedLogo = NULL;
-	switch (gKernelArgs.frame_buffer.depth) {
-		case 8:
-			uncompressedLogo = (uint8 *)kernel_args_malloc(kSplashLogoWidth
-				* kSplashLogoHeight);
-			if (uncompressedLogo == NULL)
-				return;
-			uncompress_8bit_RLE(kSplashLogo8BitCompressedImage,
-				uncompressedLogo);
-		break;
-		default:
-			uncompressedLogo = (uint8 *)kernel_args_malloc(kSplashLogoWidth
-				* kSplashLogoHeight * 3);
-			if (uncompressedLogo == NULL)
-				return;
-			uncompress_24bit_RLE(kSplashLogo24BitCompressedImage,
-				uncompressedLogo);
-		break;
-	}
-
-	// TODO: support 4-bit indexed version of the images!
-
-	// render splash logo
-	uint16 iconsHalfHeight = kSplashIconsHeight / 2;
-
-	int width = min_c(kSplashLogoWidth, gKernelArgs.frame_buffer.width);
-	int height = min_c(kSplashLogoHeight + iconsHalfHeight,
-		gKernelArgs.frame_buffer.height);
-	int placementX = max_c(0, min_c(100, kSplashLogoPlacementX));
-	int placementY = max_c(0, min_c(100, kSplashLogoPlacementY));
-
-	int x = (gKernelArgs.frame_buffer.width - width) * placementX / 100;
-	int y = (gKernelArgs.frame_buffer.height - height) * placementY / 100;
-
-	height = min_c(kSplashLogoHeight, gKernelArgs.frame_buffer.height);
-	blit_image(uncompressedLogo, width, height, kSplashLogoWidth,
-		k8BitPalette, x, y);
-
-	kernel_args_free(uncompressedLogo);
-
-	const uint8* lowerHalfIconImage;
-
-	switch (gKernelArgs.frame_buffer.depth) {
-		case 8:
-			// pointer into the lower half of the icons image data
-			gKernelArgs.boot_splash
-				= (uint8 *)kernel_args_malloc(kSplashIconsWidth
-					* kSplashIconsHeight);
-			if (gKernelArgs.boot_splash == NULL)
-				return;
-			uncompress_8bit_RLE(kSplashIcons8BitCompressedImage,
-				gKernelArgs.boot_splash );
-			lowerHalfIconImage = gKernelArgs.boot_splash
-				+ (kSplashIconsWidth * iconsHalfHeight);
-		break;
-		default:
-			// pointer into the lower half of the icons image data
-			gKernelArgs.boot_splash
-				= (uint8 *)kernel_args_malloc(kSplashIconsWidth
-					* kSplashIconsHeight * 3);
-			if (gKernelArgs.boot_splash == NULL)
-				return;
-			uncompress_24bit_RLE(kSplashIcons24BitCompressedImage,
-				gKernelArgs.boot_splash );
-			lowerHalfIconImage = gKernelArgs.boot_splash
-				+ (kSplashIconsWidth * iconsHalfHeight) * 3;
-		break;
-	}
-
-	// render initial (grayed out) icons
-	// the grayed out version is the lower half of the icons image
-
-	width = min_c(kSplashIconsWidth, gKernelArgs.frame_buffer.width);
-	height = min_c(kSplashLogoHeight + iconsHalfHeight,
-		gKernelArgs.frame_buffer.height);
-	placementX = max_c(0, min_c(100, kSplashIconsPlacementX));
-	placementY = max_c(0, min_c(100, kSplashIconsPlacementY));
-
-	x = (gKernelArgs.frame_buffer.width - width) * placementX / 100;
-	y = kSplashLogoHeight + (gKernelArgs.frame_buffer.height - height)
-		* placementY / 100;
-
-	height = min_c(iconsHalfHeight, gKernelArgs.frame_buffer.height);
-	blit_image(lowerHalfIconImage, width, height, kSplashIconsWidth,
-		k8BitPalette, x, y);
+	video_display_splash(sFrameBuffer);
 }
 
 
