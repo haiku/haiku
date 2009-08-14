@@ -65,9 +65,9 @@ HAIKU_BOARD_SDIMAGE_FILES =
 # gcc flags for the specific cpu
 #
 
-TARGET_KERNEL_CCFLAGS += -mcpu=xscale -mfloat-abi=soft ;
-TARGET_KERNEL_C++FLAGS += -mcpu=xscale -mfloat-abi=soft ;
-TARGET_CCFLAGS += -mcpu=xscale -mfloat-abi=soft ;
-TARGET_C++FLAGS += -mcpu=xscale -mfloat-abi=soft ;
+TARGET_KERNEL_CCFLAGS += -mcpu=xscale ;
+TARGET_KERNEL_C++FLAGS += -mcpu=xscale ;
+TARGET_CCFLAGS += -mcpu=xscale ;
+TARGET_C++FLAGS += -mcpu=xscale ;
 
 
