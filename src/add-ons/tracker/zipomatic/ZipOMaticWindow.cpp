@@ -41,7 +41,7 @@ ZippoWindow::ZippoWindow(BRect frame, BMessage* refs)
 		this))
 {
 	fActivityView = new Activity(BRect(0, 0, 171, 17), "activity",
-	B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW | B_FRAME_EVENTS);
+		B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW | B_FRAME_EVENTS);
 	fActivityView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 17));
 	fActivityView->SetExplicitMinSize(BSize(171, 17));
 
