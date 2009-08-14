@@ -440,6 +440,7 @@ TermWindow::MessageReceived(BMessage *message)
 			if (!findresult) {
 				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				alert->SetShortcut(0, B_ESCAPE);
 				alert->Go();
 				fFindPreviousMenuItem->SetEnabled(false);
 				fFindNextMenuItem->SetEnabled(false);
@@ -452,21 +453,14 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 
 		case MENU_FIND_NEXT:
-			findresult = _ActiveTermView()->Find(fFindString, fForwardSearch,
-				fMatchCase, fMatchWord);
-			if (!findresult) {
-				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
-					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-				alert->Go();
-			}
-			break;
-
 		case MENU_FIND_PREVIOUS:
-			findresult = _ActiveTermView()->Find(fFindString, !fForwardSearch,
+			findresult = _ActiveTermView()->Find(fFindString,
+				(message->what == MENU_FIND_NEXT) == fForwardSearch,
 				fMatchCase, fMatchWord);
 			if (!findresult) {
-				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
-					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay",
+					NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				alert->SetShortcut(0, B_ESCAPE);
 				alert->Go();
 			}
 			break;
