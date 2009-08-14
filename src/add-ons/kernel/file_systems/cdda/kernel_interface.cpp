@@ -1852,25 +1852,21 @@ cdda_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 			break;
 		}
 
-		struct dirent entry;
-		entry.d_dev = volume->FSVolume()->id;
-		entry.d_ino = childNode->ID();
-		entry.d_reclen = strlen(name) + sizeof(struct dirent);
+		buffer->d_dev = volume->FSVolume()->id;
+		buffer->d_ino = childNode->ID();
+		buffer->d_reclen = strlen(name) + sizeof(struct dirent);
 
-		if (entry.d_reclen > bufferSize) {
+		if (buffer->d_reclen > bufferSize) {
 			if (count == 0)
 				return ENOBUFS;
 
 			break;
 		}
 
-		if (user_memcpy(buffer, &entry, sizeof(struct dirent) - 1) != B_OK
-			|| user_strlcpy(buffer->d_name, name,
-					bufferSize + 1 - sizeof(struct dirent)) < B_OK)
-			return B_BAD_ADDRESS;
+		strcpy(buffer->d_name, name);
 
-		buffer = (struct dirent*)((uint8*)buffer + entry.d_reclen);
-		bufferSize -= entry.d_reclen;
+		bufferSize -= buffer->d_reclen;
+		buffer = (struct dirent*)((uint8*)buffer + buffer->d_reclen);
 		count++;
 
 		cookie->current = nextChildNode;
