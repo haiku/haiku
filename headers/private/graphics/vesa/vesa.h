@@ -38,8 +38,8 @@ struct vbe_info_block {
 } _PACKED;
 
 // capabilities
-#define CAPABILITY_DAC_WIDTH		0x01
-#define CAPABILITY_VGA_COMPATIBLE	0x02
+#define CAPABILITY_DAC_WIDTH			0x01
+#define CAPABILITY_NOT_VGA_COMPATIBLE	0x02
 
 
 /* VBE mode info structure */

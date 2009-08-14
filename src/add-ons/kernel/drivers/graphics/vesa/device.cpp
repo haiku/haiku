@@ -160,26 +160,36 @@ device_ioctl(void* cookie, uint32 msg, void* buffer, size_t bufferLength)
 
 		case VESA_SET_INDEXED_COLORS:
 		{
+			color_space space
+				= (color_space)info->shared_info->current_mode.space;
+			if (space != B_GRAY8 && space != B_CMAP8)
+				return B_ERROR;
+
 			vesa_set_indexed_colors_args args;
 			if (user_memcpy(&args, buffer, sizeof(args)) != B_OK)
 				return B_BAD_ADDRESS;
 
-			if (info->shared_info->current_mode.space == B_GRAY8) {
-				if ((info->vbe_capabilities & CAPABILITY_VGA_COMPATIBLE) == 0)
-					return B_NOT_SUPPORTED;
+			status_t status = B_NOT_SUPPORTED;
+			if (space != B_GRAY8) {
+				status = vesa_set_indexed_colors(*info, args.first, args.colors,
+					args.count);
+			}
 
+			// Try VGA as a fallback
+			if (status != B_OK && (info->vbe_capabilities
+					& CAPABILITY_NOT_VGA_COMPATIBLE) == 0) {
 				return vga_set_indexed_colors(args.first, args.colors,
 					args.count);
 			}
 
-			return vesa_set_indexed_colors(*info, args.first, args.colors,
-				args.count);
+			return status;
 		}
 
 		case VGA_PLANAR_BLIT:
 		{
 			if (info->shared_info->current_mode.space != B_GRAY8
-				&& (info->vbe_capabilities & CAPABILITY_VGA_COMPATIBLE) == 0)
+				|| (info->vbe_capabilities
+					& CAPABILITY_NOT_VGA_COMPATIBLE) != 0)
 				return B_NOT_SUPPORTED;
 
 			vga_planar_blit_args args;
