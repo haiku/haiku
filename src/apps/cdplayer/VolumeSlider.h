@@ -21,7 +21,7 @@ public:
 								BHandler* target = NULL);
 
 	virtual					~VolumeSlider();
-	virtual	void			SetValue(int32 value);
+	virtual void			SetValue(int32 value);
 
 };
 
