@@ -130,5 +130,6 @@ video_display_splash(addr_t frameBuffer)
 	height = min_c(iconsHalfHeight, gKernelArgs.frame_buffer.height);
 	video_blit_image(frameBuffer, lowerHalfIconImage, width, height,
 		kSplashIconsWidth, x, y);
+	return B_OK;
 }
 
