@@ -16,10 +16,13 @@
 #include <ObjectList.h>
 #include <View.h>
 
+#include <posix/regex.h>
+
 class BButton;
 class BMenuField;
 class BPath;
 class BTextControl;
+class BStringView;
 
 
 class EthernetSettingsView : public BView {
@@ -46,6 +49,8 @@ private:
 				void			_ApplyControlsToConfiguration();
 				status_t		_GetPath(const char* name, BPath& path);
 				status_t		_TriggerAutoConfig(const char* device);
+
+				bool			_ValidateControl(BTextControl* control);
 private:
 		
 				BButton*		fApplyButton;
@@ -60,6 +65,9 @@ private:
 
 				BTextControl*	fPrimaryDNSTextControl;
 				BTextControl*	fSecondaryDNSTextControl;
+
+				BStringView*	fErrorMessage;
+
 					// TODO: DNS settings do not belong here, do they?
 				BObjectList<BString> fInterfaces;
 					// TODO: the view should not know about the interfaces,

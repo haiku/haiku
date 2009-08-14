@@ -7,6 +7,7 @@
  *		Stephan Assmuß
  *		Axel Dörfler
  *		Hugo Santos
+ *		Philippe Saint-Pierre
  */
 
 #include "EthernetSettingsView.h"
@@ -58,6 +59,8 @@
 #include <unistd.h>
 
 #include <NetServer.h>
+
+#include <support/Beep.h>
 
 #include "AutoDeleter.h"
 
@@ -163,6 +166,13 @@ EthernetSettingsView::EthernetSettingsView()
 	SetupTextControl(fSecondaryDNSTextControl);
 	layout->AddItem(fSecondaryDNSTextControl->CreateLabelLayoutItem(), 0, 6);
 	layout->AddItem(fSecondaryDNSTextControl->CreateTextViewLayoutItem(), 1, 6);
+
+	fErrorMessage = new BStringView("error", "");
+	fErrorMessage->SetAlignment(B_ALIGN_LEFT);
+	fErrorMessage->SetFont(be_bold_font);
+	fErrorMessage->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+
+	layout->AddView(fErrorMessage, 1, 7);
 
 	// button group (TODO: move to window, but take care of
 	// enabling/disabling)
@@ -486,6 +496,38 @@ EthernetSettingsView::_GetPath(const char* name, BPath& path)
 }
 
 
+bool
+MatchPattern(const char* string, const char* pattern)
+{
+	regex_t compiled;
+	bool result = regcomp(&compiled, pattern, REG_NOSUB | REG_EXTENDED) == 0
+		&& regexec(&compiled, string, 0, NULL, 0) == 0;
+	regfree(&compiled);
+
+	return result;
+}
+
+
+bool
+EthernetSettingsView::_ValidateControl(BTextControl* control)
+{
+	static const char* pattern = "^(25[0-5]|2[0-4][0-9]|[01][0-9]{2}|[0-9]"
+		"{1,2})(\\.(25[0-5]|2[0-4][0-9]|[01][0-9]{2}|[0-9]{1,2})){3}$";
+
+	if (control->IsEnabled() && !MatchPattern(control->Text(), pattern)) {
+		control->MakeFocus();
+		BString errorMessage;
+		errorMessage << control->Label();
+		errorMessage.RemoveLast(":");
+		errorMessage << " is invalid";
+		fErrorMessage->SetText(errorMessage.String());
+		beep();
+		return false;
+	}
+	return true;
+}
+
+
 void
 EthernetSettingsView::MessageReceived(BMessage* message)
 {
@@ -514,9 +556,16 @@ EthernetSettingsView::MessageReceived(BMessage* message)
 			fRevertButton->SetEnabled(false);
 			break;
 		case kMsgApply:
-			_SaveConfiguration();
+			if (_ValidateControl(fIPTextControl)
+				&& _ValidateControl(fNetMaskTextControl)
+				&& _ValidateControl(fGatewayTextControl)
+				&& _ValidateControl(fPrimaryDNSTextControl)
+				&& (strlen(fSecondaryDNSTextControl->Text()) == 0
+					|| _ValidateControl(fSecondaryDNSTextControl)))
+				_SaveConfiguration();
 			break;
 		case kMsgChange:
+			fErrorMessage->SetText("");
 			fApplyButton->SetEnabled(true);
 			break;
 		default:
