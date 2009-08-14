@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src add-ons tracker OpenTerminal ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+AddResources OpenTerminal-T : OpenTerminal.rdef ;
+
 Addon OpenTerminal-T :
 	OpenTerminal.cpp
 
