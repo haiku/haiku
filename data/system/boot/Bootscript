@@ -93,11 +93,7 @@ if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/net_server				# launch net_server
 fi
 
-if [ "$SAFEMODE" != "yes" ]; then
-	launch $SERVERS/app_server picasso		# launch app_server
-else
-	launch $SERVERS/fake_app_server picasso
-fi
+launch $SERVERS/app_server picasso		# launch app_server
 
 if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/syslog_daemon
@@ -114,22 +110,16 @@ if [ "$isReadOnly" = "yes" ]; then
 fi
 
 
-# Launch Terminal or consoled depending on $SAFEMODE
-if [ "$SAFEMODE" != "yes" ]; then
-	if [ -e /etc/users ]; then
-		launch system/Login
-		# nothing more
-	else
-		cd /boot/home
-		launch system/Tracker
-		launch system/Deskbar
-
-		# install ProcessController in the deskbar
-		(sleep 7; /boot/system/apps/ProcessController -deskbar) &
-	fi
-	launch system/apps/Terminal
+if [ -e /etc/users ]; then
+	launch system/Login
+	# nothing more
 else
-	launch system/bin/consoled
+	cd /boot/home
+	launch system/Tracker
+	launch system/Deskbar
+
+	# install ProcessController in the deskbar
+	(sleep 7; /boot/system/apps/ProcessController -deskbar) &
 fi
 
 if [ "$SAFEMODE" != "yes" ]; then
