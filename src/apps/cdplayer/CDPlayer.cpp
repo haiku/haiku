@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -190,7 +190,7 @@ CDPlayer::BuildGUI()
 		BTranslationUtils::GetBitmap(B_PNG_FORMAT, "prev_down"),
 		new BMessage(M_PREV_TRACK), 0, B_WILL_DRAW);
 	fPrevTrack->ResizeToPreferred();
-	fPrevTrack->MoveTo(fPlay->Frame().right + 20, stopTop);
+	fPrevTrack->MoveTo(fPlay->Frame().right + 40, stopTop);
 	AddChild(fPrevTrack);
 
 	fNextTrack = new DrawButton(BRect(0, 0, 1, 1), "NextTrack",
@@ -206,7 +206,7 @@ CDPlayer::BuildGUI()
 		BTranslationUtils::GetBitmap(B_PNG_FORMAT, "rew_down"),
 		new BMessage(M_REWIND), 0, B_WILL_DRAW);
 	fRewind->ResizeToPreferred();
-	fRewind->MoveTo(fNextTrack->Frame().right + 20, stopTop);
+	fRewind->MoveTo(fNextTrack->Frame().right + 40, stopTop);
 	AddChild(fRewind);
 
 	fFastFwd = new DoubleShotDrawButton(BRect(0, 0, 1, 1), "FastFwd", 
@@ -223,7 +223,6 @@ CDPlayer::BuildGUI()
 	r.bottom = r.top + kVolumeSliderBitmapHeight - 1.0;
 	fVolumeSlider = new VolumeSlider(r, "VolumeSlider",
 		0, 255, new BMessage(M_SET_VOLUME), this);
-	fVolumeSlider->ResizeToPreferred();
 	AddChild(fVolumeSlider);
 
 	fRepeat = new TwoStateDrawButton(BRect(0, 0, 1, 1), "Repeat", 
@@ -662,3 +661,4 @@ main(int, char **argv)
 
 	return 0;
 }
+
