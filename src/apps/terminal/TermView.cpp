@@ -1341,7 +1341,7 @@ void
 TermView::MessageReceived(BMessage *msg)
 {
 	entry_ref ref;
-	char *ctrl_l = "\x0c";
+	const char *ctrl_l = "\x0c";
 
 	// first check for any dropped message
 	if (msg->WasDropped()) {

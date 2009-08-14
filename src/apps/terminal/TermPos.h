@@ -35,7 +35,7 @@ public:
 
 	inline bool operator<=(const TermPos& other) const
 	{
-		return y < other.y || y == other.y && x <= other.x;
+		return y < other.y || (y == other.y && x <= other.x);
 	}
 
 	inline bool operator>=(const TermPos& other) const

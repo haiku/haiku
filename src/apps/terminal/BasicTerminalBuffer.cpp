@@ -510,8 +510,8 @@ BasicTerminalBuffer::Find(const char* _pattern, const TermPos& start,
 				// check word match
 				if (matchWord) {
 					TermPos tempPos(matchStart);
-					if (_PreviousChar(tempPos, c) && !c.IsSpace()
-						|| _NextChar(tempPos = matchEnd, c) && !c.IsSpace()) {
+					if ((_PreviousChar(tempPos, c) && !c.IsSpace())
+						|| (_NextChar(tempPos = matchEnd, c) && !c.IsSpace())) {
 //debug_printf("      but no word match!\n");
 						continue;
 					}
@@ -1079,8 +1079,8 @@ BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
 		if (fCursor.y + historySize == sourceIndex
 			&& fCursor.x >= sourceX
 			&& (fCursor.x < sourceX + toCopy
-				|| destLeft >= sourceLeft
-					&& sourceX + sourceLeft <= fCursor.x)) {
+				|| (destLeft >= sourceLeft
+					&& sourceX + sourceLeft <= fCursor.x))) {
 			cursor.x = destLine->length + fCursor.x - sourceX;
 			cursor.y = destTotalLines;
 
