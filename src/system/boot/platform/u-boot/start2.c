@@ -175,7 +175,7 @@ start_raw(int argc, char **argv)
 			dump_uimage(gUImage);
 	}
 	
-//	mmu_init();
+	mmu_init();
 
 	// wait a bit to give the user the opportunity to press a key
 //	spin(750000);
