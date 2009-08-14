@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -110,6 +110,12 @@ get_accelerant_hook(uint32 feature, void *data)
 		case B_OVERLAY_SUPPORTED_FEATURES:
 			return (void*)intel_overlay_supported_features;
 		case B_ALLOCATE_OVERLAY_BUFFER:
+			// TODO: overlay doesn't seem to work on these chips
+			if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_91x)
+				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_94x)
+				|| gInfo->shared_info->device_type.IsModel(INTEL_TYPE_965M))
+				return NULL;
+
 			return (void*)intel_allocate_overlay_buffer;
 		case B_RELEASE_OVERLAY_BUFFER:
 			return (void*)intel_release_overlay_buffer;
