@@ -135,7 +135,6 @@ public:
 	
 	BRect	old_window_frame;
 	direct_buffer_info *buffer_info;
-	bool	started;
 
 private:
 	sem_id	fSem;
@@ -147,7 +146,6 @@ private:
 DirectWindowData::DirectWindowData()
 	:
 	buffer_info(NULL),
-	started(false),
 	fSem(-1),
 	fAcknowledgeSem(-1),
 	fBufferArea(-1)
@@ -232,9 +230,7 @@ DirectWindowData::SetState(const direct_buffer_state &bufferState,
 		buffer_info->buffer_state = bufferState;
 	if (driverState != -1)
 		buffer_info->driver_state = driverState;
-		
-	started = true;
-	
+			
 	return true;
 }
 
@@ -3564,9 +3560,7 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 	STRACE(("HandleDirectConnection(bufferState = %ld, driverState = %ld)\n",
 		bufferState, driverState));
 
-	if (fDirectWindowData == NULL
-		|| (!fDirectWindowData->started
-			&& (bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_START))
+	if (fDirectWindowData == NULL)
 		return;
 
 	if (!fDirectWindowData->SetState((direct_buffer_state)bufferState,
