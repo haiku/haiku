@@ -53,16 +53,16 @@ static const char* kInfoText =
 "it is recommended that you have already prepared a hard disk partition. The "
 "Installer and the DriveSetup tool offer to initialize existing partitions "
 "with the Haiku native filesystem, but the options to change the actual "
-"partition layout may not have been tested on a sufficiently great variaty of "
+"partition layout may not have been tested on a sufficiently great variety of "
 "computer installations so we do not recommend using it.\n"
 "If you have not created a partition yet, simply reboot, create the partition "
 "using whatever tool you feel most comfortable with, and reboot into Haiku to "
 "continue with the installation. You could for example use the GParted "
 "Live-CD, it can also resize existing partitions to make room.\n\n"
 
-"2)  The Installer will take no steps to integrate Haiku into an existig boot "
+"2)  The Installer will take no steps to integrate Haiku into an existing boot "
 "menu. The Haiku partition itself will be made bootable. If you have GRUB "
-"already installed, edit your /boot/grub/menu.1st by launching your favorite "
+"already installed, edit your /boot/grub/menu.lst by launching your favorite "
 "editor from a Terminal like this:\n\n"
 
 "\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n"
@@ -86,7 +86,7 @@ static const char* kInfoText =
 "\trootnoverify\t\t(hd0,6)\n"
 "\tchainloader\t\t+1\n\n"
 
-"You can see the correct partition in gparted for example.\n\n"
+"You can see the correct partition in GParted for example.\n\n"
 
 "3)  When you successfully boot into Haiku for the first time, make sure to read "
 "our \"Welcome\" documentation, there is a link on the Desktop.\n\n"
