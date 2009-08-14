@@ -40,7 +40,7 @@ class Window;
 class Workspace;
 class View;
 class ServerPicture;
-struct direct_window_data;
+class DirectWindowData;
 struct window_info;
 
 #define AS_UPDATE_DECORATOR 'asud'
@@ -168,7 +168,7 @@ private:
 			BRegion				fCurrentDrawingRegion;
 			bool				fCurrentDrawingRegionValid;
 
-			direct_window_data*	fDirectWindowData;
+			DirectWindowData*	fDirectWindowData;
 			window_feel			fDirectWindowFeel;
 };
 

@@ -6,7 +6,7 @@
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Adrian Oanca <adioanca@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de>
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
  *		Axel Dörfler, axeld@pinc-software.de
  *		Artur Wyszynski <harakash@gmail.com>
  *		Philippe Saint-Pierre, stpere@gmail.com
@@ -120,60 +120,122 @@ static profile sRedrawProcessingTime;
 #endif
 
 
-struct direct_window_data {
-	direct_window_data();
-	~direct_window_data();
+class DirectWindowData {
+public:
+	DirectWindowData();
+	~DirectWindowData();
 
 	status_t InitCheck() const;
-
-	sem_id	sem;
-	sem_id	sem_ack;
-	area_id	area;
+	
+	status_t GetSyncData(direct_window_sync_data &data) const;
+	status_t SyncronizeWithClient();
+	
+	bool SetState(const direct_buffer_state &bufferState,
+				const direct_driver_state &driverState);
+	
 	BRect	old_window_frame;
 	direct_buffer_info *buffer_info;
 	bool	started;
+
+private:
+	sem_id	fSem;
+	sem_id	fAcknowledgeSem;
+	area_id	fBufferArea;
 };
 
 
-direct_window_data::direct_window_data()
+DirectWindowData::DirectWindowData()
 	:
-	sem(-1),
-	sem_ack(-1),
-	area(-1),
 	buffer_info(NULL),
-	started(false)
+	started(false),
+	fSem(-1),
+	fAcknowledgeSem(-1),
+	fBufferArea(-1)
 {
-	area = create_area("direct area", (void **)&buffer_info,
+	fBufferArea = create_area("direct area", (void **)&buffer_info,
 		B_ANY_ADDRESS, B_PAGE_SIZE, B_NO_LOCK, B_READ_WRITE);
 
-	sem = create_sem(0, "direct sem");
-	sem_ack = create_sem(0, "direct sem ack");
+	buffer_info->buffer_state = B_DIRECT_STOP;
+	fSem = create_sem(0, "direct sem");
+	fAcknowledgeSem = create_sem(0, "direct sem ack");
 }
 
 
-direct_window_data::~direct_window_data()
+DirectWindowData::~DirectWindowData()
 {
 	// this should make the client die in case it's still running
 	buffer_info->bits = NULL;
 	buffer_info->bytes_per_row = 0;
 
-	delete_area(area);
-	delete_sem(sem);
-	delete_sem(sem_ack);
+	delete_area(fBufferArea);
+	delete_sem(fSem);
+	delete_sem(fAcknowledgeSem);
 }
 
 
 status_t
-direct_window_data::InitCheck() const
+DirectWindowData::InitCheck() const
 {
-	if (area < B_OK)
-		return area;
-	if (sem < B_OK)
-		return sem;
-	if (sem_ack < B_OK)
-		return sem_ack;
+	if (fBufferArea < B_OK)
+		return fBufferArea;
+	if (fSem < B_OK)
+		return fSem;
+	if (fAcknowledgeSem < B_OK)
+		return fAcknowledgeSem;
 
 	return B_OK;
+}
+
+
+status_t
+DirectWindowData::GetSyncData(direct_window_sync_data &data) const
+{
+	data.area = fBufferArea;
+	data.disable_sem = fSem;
+	data.disable_sem_ack = fAcknowledgeSem;
+	
+	return B_OK;
+}
+
+
+status_t
+DirectWindowData::SyncronizeWithClient()
+{
+	// Releasing this semaphore causes the client to call
+	// BDirectWindow::DirectConnected()
+	status_t status = release_sem(fSem);
+	if (status < B_OK)
+		return status;
+
+	// Wait with a timeout of half a second until the client exits
+	// from its DirectConnected() implementation
+	do {
+		status = acquire_sem_etc(fAcknowledgeSem, 1, B_TIMEOUT, 500000);
+	} while (status == B_INTERRUPTED);
+	
+	return status;
+}
+
+
+bool
+DirectWindowData::SetState(const direct_buffer_state &bufferState,
+	const direct_driver_state &driverState)
+{
+	// Don't issue a DirectConnected() notification
+	// if the connection is stopped, and we are called
+	// with bufferState == B_DIRECT_MODIFY.
+	if ((buffer_info->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_STOP
+		&& (bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_START)
+		return false;
+		
+	if (bufferState != -1)
+		buffer_info->buffer_state = bufferState;
+	if (driverState != -1)
+		buffer_info->driver_state = driverState;
+		
+	started = true;
+	
+	return true;
 }
 
 
@@ -1118,11 +1180,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			fLink.StartMessage(status);
 			if (status == B_OK) {
-				struct direct_window_sync_data syncData = {
-					fDirectWindowData->area,
-					fDirectWindowData->sem,
-					fDirectWindowData->sem_ack
-				};
+				struct direct_window_sync_data syncData;
+				fDirectWindowData->GetSyncData(syncData);
 
 				fLink.Attach(&syncData, sizeof(syncData));
 			}
@@ -3483,7 +3542,7 @@ ServerWindow::_EnableDirectWindowMode()
 		return B_ERROR;
 	}
 
-	fDirectWindowData = new (nothrow) direct_window_data;
+	fDirectWindowData = new (nothrow) DirectWindowData;
 	if (fDirectWindowData == NULL)
 		return B_NO_MEMORY;
 
@@ -3510,26 +3569,9 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 			&& (bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_START))
 		return;
 
-	// Don't issue a DirectConnected() notification
-	// if the connection is stopped, and we are called
-	// with bufferState == B_DIRECT_MODIFY.
-	if ((fDirectWindowData->buffer_info->buffer_state & B_DIRECT_MODE_MASK)
-			== B_DIRECT_STOP
-		&& (bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_START) {
+	if (!fDirectWindowData->SetState((direct_buffer_state)bufferState,
+			(direct_driver_state)driverState))
 		return;
-	}
-
-	fDirectWindowData->started = true;
-
-	if (bufferState != -1) {
-		fDirectWindowData->buffer_info->buffer_state
-			= (direct_buffer_state)bufferState;
-	}
-
-	if (driverState != -1) {
-		fDirectWindowData->buffer_info->driver_state
-			= (direct_driver_state)driverState;
-	}
 
 	if ((bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
 		// TODO: Locking ?
@@ -3591,20 +3633,7 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 		}
 	}
 
-	// Releasing this semaphore causes the client to call
-	// BDirectWindow::DirectConnected()
-	release_sem(fDirectWindowData->sem);
-
-	// TODO: Waiting half a second in the ServerWindow thread is not a problem,
-	// but since we are called from the Desktop's thread too, very bad things
-	// could happen.
-	// Find some way to call this method only within ServerWindow's thread
-	// (messaging ?)
-	status_t status;
-	do {
-		status = acquire_sem_etc(fDirectWindowData->sem_ack, 1, B_TIMEOUT,
-			500000);
-	} while (status == B_INTERRUPTED);
+	status_t status = fDirectWindowData->SyncronizeWithClient();
 
 	if (status != B_OK) {
 		// The client application didn't release the semaphore
