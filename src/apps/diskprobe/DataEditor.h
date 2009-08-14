@@ -44,7 +44,8 @@ class DataEditor : public BLocker {
 
 		status_t InitCheck();
 
-		status_t Replace(off_t offset, const uint8 *data, size_t length);
+		status_t Replace(off_t offset, const uint8 *data, size_t length,
+			bool sendNotices = true);
 		status_t Remove(off_t offset, off_t length);
 		status_t Insert(off_t offset, const uint8 *data, size_t length);
 
@@ -94,7 +95,7 @@ class DataEditor : public BLocker {
 		void SendNotices(uint32 what, BMessage *message = NULL);
 		void SendNotices(DataChange *change);
 		status_t Update();
-		void AddChange(DataChange *change);
+		void AddChange(DataChange *change, bool sendNotices = true);
 		void ApplyChanges();
 		void RemoveRedos();
 

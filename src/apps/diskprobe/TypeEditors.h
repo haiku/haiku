@@ -17,7 +17,7 @@ class TypeEditorView : public BView {
 			uint32 flags, DataEditor& editor);
 		~TypeEditorView();
 
-		virtual void CommitChanges();
+		virtual void CommitChanges(bool sendNotices = true);
 		virtual bool TypeMatches();
 
 	protected:
