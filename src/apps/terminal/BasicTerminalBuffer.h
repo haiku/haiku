@@ -83,7 +83,7 @@ public:
 									uint16& attributes) const;
 			void				GetStringFromRegion(BString& string,
 									const TermPos& start,
-									const TermPos& end) const;  
+									const TermPos& end) const;
 			bool				FindWord(const TermPos& pos,
 									TerminalCharClassifier* classifier,
 									bool findNonWords, TermPos& start,
@@ -96,20 +96,20 @@ public:
 									TermPos& matchEnd) const;
 
 			// insert chars/lines
-		inline  void                            InsertChar(UTF8Char c, uint32 attributes);
-			void                            InsertChar(UTF8Char c, uint32 width,
-									 uint32 attributes);
-		inline  void                            InsertChar(const char* c, int32 length,
-									 uint32 attributes);
-		inline  void                            InsertChar(const char* c, int32 length,
-									 uint32 width, uint32 attributes);
+	inline	void				InsertChar(UTF8Char c, uint32 attributes);
+			void				InsertChar(UTF8Char c, uint32 width,
+									uint32 attributes);
+	inline	void				InsertChar(const char* c, int32 length,
+									uint32 attributes);
+	inline	void				InsertChar(const char* c, int32 length,
+									uint32 width, uint32 attributes);
 
 			void				InsertCR();
 			void				InsertLF();
 			void				SetInsertMode(int flag);
 			void				InsertSpace(int32 num);
 			void				InsertLines(int32 numLines);
-	
+
 			// delete chars/lines
 			void				EraseChars(int32 numChars);
 			void				EraseAbove();
