@@ -147,8 +147,8 @@ TermWindow::TermWindow(BRect frame, const char* title, Arguments *args)
 	fFindPanel(NULL),
 	fSavedFrame(0, 0, -1, -1),
 	fFindString(""),
-	fFindForwardMenuItem(NULL),
-	fFindBackwardMenuItem(NULL),
+	fFindNextMenuItem(NULL),
+	fFindPreviousMenuItem(NULL),
 	fFindSelection(false),
 	fForwardSearch(false),
 	fMatchCase(false),
@@ -289,14 +289,14 @@ TermWindow::_SetupMenu()
 	fEditmenu->AddSeparatorItem();
 	fEditmenu->AddItem(new BMenuItem("Find" B_UTF8_ELLIPSIS,
 		new BMessage(MENU_FIND_STRING),'F'));
-	fFindBackwardMenuItem = new BMenuItem("Find Previous",
+	fFindPreviousMenuItem = new BMenuItem("Find Previous",
 		new BMessage(MENU_FIND_PREVIOUS), 'G', B_SHIFT_KEY);
-	fEditmenu->AddItem(fFindBackwardMenuItem);
-	fFindBackwardMenuItem->SetEnabled(false);
-	fFindForwardMenuItem = new BMenuItem("Find Next",
+	fEditmenu->AddItem(fFindPreviousMenuItem);
+	fFindPreviousMenuItem->SetEnabled(false);
+	fFindNextMenuItem = new BMenuItem("Find Next",
 		new BMessage(MENU_FIND_NEXT), 'G');
-	fEditmenu->AddItem(fFindForwardMenuItem);
-	fFindForwardMenuItem->SetEnabled(false);
+	fEditmenu->AddItem(fFindNextMenuItem);
+	fFindNextMenuItem->SetEnabled(false);
 
 	fMenubar->AddItem(fEditmenu);
 
@@ -427,8 +427,8 @@ TermWindow::MessageReceived(BMessage *message)
 				BAlert *alert = new BAlert("find failed", "No search string.", "Okay", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 				alert->Go();
-				fFindBackwardMenuItem->SetEnabled(false);
-				fFindForwardMenuItem->SetEnabled(false);
+				fFindPreviousMenuItem->SetEnabled(false);
+				fFindNextMenuItem->SetEnabled(false);
 				break;
 			}
 
@@ -441,14 +441,14 @@ TermWindow::MessageReceived(BMessage *message)
 				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 				alert->Go();
-				fFindBackwardMenuItem->SetEnabled(false);
-				fFindForwardMenuItem->SetEnabled(false);
+				fFindPreviousMenuItem->SetEnabled(false);
+				fFindNextMenuItem->SetEnabled(false);
 				break;
 			}
 
-			// Enable the menu items Find Forward and Find Backward
-			fFindBackwardMenuItem->SetEnabled(true);
-			fFindForwardMenuItem->SetEnabled(true);
+			// Enable the menu items Find Next and Find Previous
+			fFindPreviousMenuItem->SetEnabled(true);
+			fFindNextMenuItem->SetEnabled(true);
 			break;
 
 		case MENU_FIND_NEXT:

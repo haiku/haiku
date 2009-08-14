@@ -1,7 +1,7 @@
 /*
  * Copyright 2001-2007, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files or portions
@@ -86,7 +86,7 @@ private:
 
 	BString			fInitialTitle;
 	BList			fSessions;
-	
+
 	TabView			*fTabView;
 	TermView		*fTermView;
 
@@ -106,8 +106,8 @@ private:
 
 	// Saved search parameters
 	BString			fFindString;
-	BMenuItem		*fFindForwardMenuItem;
-	BMenuItem 		*fFindBackwardMenuItem;
+	BMenuItem		*fFindNextMenuItem;
+	BMenuItem 		*fFindPreviousMenuItem;
 	BMenuItem		*fIncreaseFontSizeMenuItem;
 	BMenuItem		*fDecreaseFontSizeMenuItem;
 
