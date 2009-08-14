@@ -32,7 +32,7 @@ protected:
 
 public:
 	inline	void				SetParent(ParentBuilder* parent);
-		// conceptionally private
+		// conceptually private
 
 	inline	ParentBuilder&		End();
 
