@@ -251,12 +251,12 @@ DiskProbe::ReadyToRun()
 status_t
 DiskProbe::Probe(BEntry &entry, const char *attribute)
 {
-	int32 probeWindows = 0;
-
 	entry_ref ref;
 	status_t status = entry.GetRef(&ref);
 	if (status < B_OK)
 		return status;
+
+	ProbeWindow *lastWindow(NULL);
 
 	// Do we already have that window open?
 	for (int32 i = CountWindows(); i-- > 0; ) {
@@ -268,7 +268,8 @@ DiskProbe::Probe(BEntry &entry, const char *attribute)
 			window->Activate(true);
 			return B_OK;
 		}
-		probeWindows++;
+		if (lastWindow == NULL)
+			lastWindow = window;
 	}
 
 	// Does the file really exist?
@@ -278,8 +279,13 @@ DiskProbe::Probe(BEntry &entry, const char *attribute)
 	entry.GetRef(&ref);
 
 	// cascade window
-	BRect rect = fWindowFrame;
-	rect.OffsetBy(probeWindows * kCascadeOffset, probeWindows * kCascadeOffset);
+	BRect rect;
+	if (lastWindow != NULL)
+		rect = lastWindow->Frame();
+	else
+		rect = fWindowFrame;
+
+	rect.OffsetBy(kCascadeOffset, kCascadeOffset);
 
 	BWindow *window;
 	if (attribute != NULL)
@@ -288,6 +294,26 @@ DiskProbe::Probe(BEntry &entry, const char *attribute)
 		window = new FileWindow(rect, &ref, &fSettings.Message());
 
 	window->Show();
+
+	/* adjust the cascading... we can only do this after the window was created
+	 * to adjust to the real size */
+	rect.right = window->Frame().right;
+	rect.bottom = window->Frame().bottom;
+
+	BScreen screen;
+	BRect screenBorder = screen.Frame();
+
+	float left = rect.left;
+	if (left + rect.Width() > screenBorder.right)
+		left = 7;
+
+	float top = rect.top;
+	if (top + rect.Height() > screenBorder.bottom)
+		top = 26;
+
+	rect.OffsetTo(BPoint(left, top));
+	window->MoveTo(BPoint(left, top));
+
 	fWindowCount++;
 
 	return B_OK;
