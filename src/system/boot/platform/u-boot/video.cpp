@@ -5,6 +5,7 @@
 
 
 #include "video.h"
+#include "arch_video.h"
 
 #include <arch/cpu.h>
 #include <boot/stage2.h>
@@ -85,6 +86,8 @@ extern "C" status_t
 platform_init_video(void)
 {
     	#warning ARM:TODO
-	return B_OK;
+dprintf("init_video\n");
+	return arch_init_video();
+	//return B_OK;
 }
 

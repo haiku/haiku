@@ -18,6 +18,7 @@ local kernelLibArchObjects =
 KernelMergeObject boot_arch_$(TARGET_ARCH).o :
 	uart.c
 	arch_elf.cpp
+	arch_video.cpp
 	$(librootArchObjects)
 	: -fno-pic
 	:

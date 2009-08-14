@@ -20,8 +20,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef __PLATFORM_OMAP3_H
-#define __PLATFORM_OMAP3_H
+#ifndef __PLATFORM_PXA270_H
+#define __PLATFORM_PXA270_H
 
 #define SDRAM_BASE 0xa2000000
 
@@ -64,5 +64,47 @@
 #define UART_MVR    19
 #define UART_SYSC   20
 
-#endif
+/* DMA controller */
 
+typedef struct pxa27x_dma_descriptor {
+	uint32 ddadr;
+	uint32 dsadr;
+	uint32 dtadr;
+	uint32 dcmd;
+} pxa27x_dma_descriptor __attribute__ ((aligned(16)));
+
+/* LCD controller */
+
+#define LCC_BASE	0x44000000
+
+#define LCCR0		(LCC_BASE+0x00)
+#define LCCR1		(LCC_BASE+0x04)
+#define LCCR2		(LCC_BASE+0x08)
+#define LCCR3		(LCC_BASE+0x0C)
+#define LCCR4		(LCC_BASE+0x10)
+#define LCCR5		(LCC_BASE+0x14)
+
+#define LCSR1		(LCC_BASE+0x34)
+#define LCSR0		(LCC_BASE+0x38)
+#define LIIDR		(LCC_BASE+0x3C)
+
+#define OVL1C1		(LCC_BASE+0x50)
+#define OVL1C2		(LCC_BASE+0x60)
+#define OVL2C1		(LCC_BASE+0x70)
+#define OVL2C2		(LCC_BASE+0x80)
+
+#define LCC_CCR		(LCC_BASE+0x90)
+#define LCC_CMDCR	(LCC_BASE+0x100)
+
+#define FDADR0		(LCC_BASE+0x200)
+#define FBR0		(LCC_BASE+0x020)
+#define FSADR0		(LCC_BASE+0x204)
+
+typedef struct pxa27x_lcd_dma_descriptor {
+	uint32 fdadr;
+	uint32 fsadr;
+	uint32 fidr;
+	uint32 ldcmd;
+} pxa27x_lcd_dma_descriptor __attribute__ ((aligned(16)));
+
+#endif /* __PLATFORM_PXA270_H */
