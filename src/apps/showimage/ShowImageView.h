@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -130,79 +130,79 @@ class ShowImageView : public BView {
 			k270V, // 7
 			kNumberOfOrientations,
 		};
-		void InitPatterns();
-		void RotatePatterns();
-		void RemoveSelection(bool bToClipboard);
-		bool HasSelection() { return fHasSelection; }
-		void SetHasSelection(bool bHasSelection);
-		void AnimateSelection(bool a);
-		void SendMessageToWindow(BMessage *message);
-		void SendMessageToWindow(uint32 code);
-		void Notify();
-		void UpdateStatusText();
-		void AddToRecentDocuments();
-		void AddWhiteRect(BRect &rect);
-		void GetMergeRects(BBitmap *merge, BRect selection, BRect &srcBits, BRect &destRect);
-		void GetSelMergeRects(BRect &srcBits, BRect &destRect);
-		status_t SetSelection(const entry_ref *pref, BPoint point);
-		status_t PasteBitmap(BBitmap *bitmap, BPoint point);
-		void MergeWithBitmap(BBitmap *merge, BRect selection);
-		void MergeSelection();
-		void DeleteScaler();
-		void DeleteBitmap();
-		void DeleteSelBitmap();
-		int32 BytesPerPixel(color_space cs) const;
-		void CopyPixel(uchar* dest, int32 destX, int32 destY, int32 destBPR,
+		void _InitPatterns();
+		void _RotatePatterns();
+		void _RemoveSelection(bool bToClipboard);
+		bool _HasSelection() { return fHasSelection; }
+		void _SetHasSelection(bool bHasSelection);
+		void _AnimateSelection(bool a);
+		void _SendMessageToWindow(BMessage *message);
+		void _SendMessageToWindow(uint32 code);
+		void _Notify();
+		void _UpdateStatusText();
+		void _AddToRecentDocuments();
+		void _AddWhiteRect(BRect &rect);
+		void _GetMergeRects(BBitmap *merge, BRect selection, BRect &srcBits, BRect &destRect);
+		void _GetSelMergeRects(BRect &srcBits, BRect &destRect);
+		status_t _SetSelection(const entry_ref *pref, BPoint point);
+		status_t _PasteBitmap(BBitmap *bitmap, BPoint point);
+		void _MergeWithBitmap(BBitmap *merge, BRect selection);
+		void _MergeSelection();
+		void _DeleteScaler();
+		void _DeleteBitmap();
+		void _DeleteSelBitmap();
+		int32 _BytesPerPixel(color_space cs) const;
+		void _CopyPixel(uchar* dest, int32 destX, int32 destY, int32 destBPR,
 				uchar* src, int32 x, int32 y, int32 bpr, int32 bpp);
-		void InvertPixel(int32 x, int32 y, uchar* dest, int32 destBPR, uchar* src,
+		void _InvertPixel(int32 x, int32 y, uchar* dest, int32 destBPR, uchar* src,
 				int32 bpr, int32 bpp);
-		void DoImageOperation(enum ImageProcessor::operation op, bool quiet = false);
-		void UserDoImageOperation(enum ImageProcessor::operation op, bool quiet = false);
-		BRect AlignBitmap();
-		void Setup(BRect r);
-		BPoint ImageToView(BPoint p) const;
-		BPoint ViewToImage(BPoint p) const;
-		BRect ImageToView(BRect r) const;
-		bool IsImage(const entry_ref* pref);
-		static int CompareEntries(const void* a, const void* b);
-		void FreeEntries(BList* entries);
-		void SetTrackerSelectionToCurrent();
-		bool FindNextImageByDir(entry_ref *in_current, entry_ref *out_image,
+		void _DoImageOperation(enum ImageProcessor::operation op, bool quiet = false);
+		void _UserDoImageOperation(enum ImageProcessor::operation op, bool quiet = false);
+		BRect _AlignBitmap();
+		void _Setup(BRect r);
+		BPoint _ImageToView(BPoint p) const;
+		BPoint _ViewToImage(BPoint p) const;
+		BRect _ImageToView(BRect r) const;
+		bool _IsImage(const entry_ref* pref);
+		static int _CompareEntries(const void* a, const void* b);
+		void _FreeEntries(BList* entries);
+		void _SetTrackerSelectionToCurrent();
+		bool _FindNextImageByDir(entry_ref *in_current, entry_ref *out_image,
 				bool next, bool rewind);
-		bool FindNextImage(entry_ref *in_current, entry_ref *out_image,
+		bool _FindNextImage(entry_ref *in_current, entry_ref *out_image,
 				bool next, bool rewind);
-		bool ShowNextImage(bool next, bool rewind);
-		bool FirstFile();
-		void ConstrainToImage(BPoint &point);
-		void ConstrainToImage(BRect &rect);
-		BBitmap* CopyFromRect(BRect srcRect);
-		BBitmap* CopySelection(uchar alpha = 255, bool imageSize = true);
-		bool AddSupportedTypes(BMessage* msg, BBitmap* bitmap);
-		void BeginDrag(BPoint sourcePoint);
-		void SendInMessage(BMessage* msg, BBitmap* bitmap, translation_format* format);
-		bool OutputFormatForType(BBitmap* bitmap, const char* type,
+		bool _ShowNextImage(bool next, bool rewind);
+		bool _FirstFile();
+		void _ConstrainToImage(BPoint &point);
+		void _ConstrainToImage(BRect &rect);
+		BBitmap* _CopyFromRect(BRect srcRect);
+		BBitmap* _CopySelection(uchar alpha = 255, bool imageSize = true);
+		bool _AddSupportedTypes(BMessage* msg, BBitmap* bitmap);
+		void _BeginDrag(BPoint sourcePoint);
+		void _SendInMessage(BMessage* msg, BBitmap* bitmap, translation_format* format);
+		bool _OutputFormatForType(BBitmap* bitmap, const char* type,
 				translation_format* format);
-		void HandleDrop(BMessage* msg);
-		void MoveImage();
-		uint32 GetMouseButtons();
-		void UpdateSelectionRect(BPoint point, bool final);
-		void DrawBorder(BRect border);
-		void LayoutCaption(BFont &font, BPoint &textPos, BRect &background);
-		void DrawCaption();
-		void UpdateCaption();
-		void DrawSelectionBox();
-		Scaler* GetScaler(BRect rect);
-		void DrawImage(BRect rect);
-		float LimitToRange(float v, orientation o, bool absolute);
-		void ScrollRestricted(float x, float y, bool absolute);
-		void ScrollRestrictedTo(float x, float y);
-		void ScrollRestrictedBy(float x, float y);
-		void MouseWheelChanged(BMessage* msg);
-		void ShowPopUpMenu(BPoint screen);
-		void SettingsSetBool(const char* name, bool value);
-		void SetIcon(bool clear, icon_size which);
-		void ToggleSlideShow();
-		void ExitFullScreen();
+		void _HandleDrop(BMessage* msg);
+		void _MoveImage();
+		uint32 _GetMouseButtons();
+		void _UpdateSelectionRect(BPoint point, bool final);
+		void _DrawBorder(BRect border);
+		void _LayoutCaption(BFont &font, BPoint &textPos, BRect &background);
+		void _DrawCaption();
+		void _UpdateCaption();
+		void _DrawSelectionBox();
+		Scaler* _GetScaler(BRect rect);
+		void _DrawImage(BRect rect);
+		float _LimitToRange(float v, orientation o, bool absolute);
+		void _ScrollRestricted(float x, float y, bool absolute);
+		void _ScrollRestrictedTo(float x, float y);
+		void _ScrollRestrictedBy(float x, float y);
+		void _MouseWheelChanged(BMessage* msg);
+		void _ShowPopUpMenu(BPoint screen);
+		void _SettingsSetBool(const char* name, bool value);
+		void _SetIcon(bool clear, icon_size which);
+		void _ToggleSlideShow();
+		void _ExitFullScreen();
 
 		BMessenger fTrackerMessenger; // of the window that this was launched from
 		entry_ref fCurrentRef;		// of the image

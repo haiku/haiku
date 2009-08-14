@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -13,12 +13,11 @@
  *		Bernd Korz
  */
 
-
-#include "ProgressWindow.h"
-#include "ShowImageApp.h"
-#include "ShowImageConstants.h"
 #include "ShowImageView.h"
-#include "ShowImageWindow.h"
+
+#include <math.h>
+#include <new>
+#include <stdio.h>
 
 #include <Alert.h>
 #include <Application.h>
@@ -46,9 +45,11 @@
 
 #include <tracker_private.h>
 
-#include <math.h>
-#include <new>
-#include <stdio.h>
+#include "ProgressWindow.h"
+#include "ShowImageApp.h"
+#include "ShowImageConstants.h"
+#include "ShowImageWindow.h"
+
 
 // TODO: Remove this and use Tracker's Command.h once it is moved into the private headers
 namespace BPrivate {
@@ -158,7 +159,8 @@ compose_checker_background(const BBitmap* bitmap)
 
 
 PopUpMenu::PopUpMenu(const char* name, BMessenger target)
-	: BPopUpMenu(name, false, false),
+	:
+	BPopUpMenu(name, false, false),
 	fTarget(target)
 {
 	SetAsyncAutoDestruct(true);
@@ -176,38 +178,45 @@ PopUpMenu::~PopUpMenu()
 
 ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 		uint32 flags)
-	: BView(rect, name, resizingMode, flags),
+	:
+	BView(rect, name, resizingMode, flags),
+	fDither(BScreen().ColorSpace() == B_CMAP8),
+	fDocumentIndex(1),
+	fDocumentCount(1),
+	fBitmap(NULL),
+	fDisplayBitmap(NULL),
+	fSelBitmap(NULL),
+	fZoom(1.0),
+	fScaleBilinear(true),
+	fScaler(NULL),
+	fShrinkToBounds(false),
+	fZoomToBounds(false),
+	fShrinkOrZoomToBounds(false),
+	fFullScreen(false),
+	fLeft(0.0),
+	fTop(0.0),
+	fMovesImage(false),
+	fMakesSelection(false),
+	fFirstPoint(0.0, 0.0),
+	fAnimateSelection(true),
+	fHasSelection(false),
+	fSlideShow(false),
+	fSlideShowDelay(3 * 10), // 3 seconds
+	fSlideShowCountDown(0),
+#if DELAYED_SCALING
+	fScalingCountDown(SCALING_DELAY_TIME),
+#endif
+	fShowCaption(false),
+	fInverted(false),
+	fShowingPopUpMenu(false),
+	fHideCursorCountDown(HIDE_CURSOR_DELAY_TIME),
+	fIsActiveWin(true),
 	fProgressWindow(NULL)
 {
+	_InitPatterns();
+
 	ShowImageSettings* settings;
 	settings = my_app->Settings();
-
-	InitPatterns();
-	fDither = BScreen().ColorSpace() == B_CMAP8;
-	fBitmap = NULL;
-	fDisplayBitmap = NULL;
-	fSelBitmap = NULL;
-	fDocumentIndex = 1;
-	fDocumentCount = 1;
-	fAnimateSelection = true;
-	fHasSelection = false;
-	fShrinkToBounds = false;
-	fZoomToBounds = false;
-	fFullScreen = false;
-	fSlideShow = false;
-	fSlideShowDelay = 3 * 10; // 3 seconds
-	fShowCaption = false;
-	fZoom = 1.0;
-	fMovesImage = false;
-	fScaleBilinear = true;
-	fScaler = NULL;
-#if DELAYED_SCALING
-	fScalingCountDown = SCALING_DELAY_TIME;
-#endif
-	fShowingPopUpMenu = false;
-	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
-	fIsActiveWin = true;
-
 	if (settings->Lock()) {
 		fDither = settings->GetBool("Dither", fDither);
 		fShrinkToBounds = settings->GetBool("ShrinkToBounds", fShrinkToBounds);
@@ -226,13 +235,13 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 
 ShowImageView::~ShowImageView()
 {
-	DeleteBitmap();
+	_DeleteBitmap();
 }
 
 
 //! Use patterns to simulate marching ants for selection
 void
-ShowImageView::InitPatterns()
+ShowImageView::_InitPatterns()
 {
 	uchar p;
 	uchar p1 = 0x33;
@@ -252,7 +261,7 @@ ShowImageView::InitPatterns()
 
 
 void
-ShowImageView::RotatePatterns()
+ShowImageView::_RotatePatterns()
 {
 	int i;
 	uchar p;
@@ -290,7 +299,7 @@ ShowImageView::RotatePatterns()
 
 
 void
-ShowImageView::AnimateSelection(bool enabled)
+ShowImageView::_AnimateSelection(bool enabled)
 {
 	fAnimateSelection = enabled;
 }
@@ -300,22 +309,22 @@ void
 ShowImageView::Pulse()
 {
 	// animate marching ants
-	if (HasSelection() && fAnimateSelection && fIsActiveWin) {
-		RotatePatterns();
-		DrawSelectionBox();
+	if (_HasSelection() && fAnimateSelection && fIsActiveWin) {
+		_RotatePatterns();
+		_DrawSelectionBox();
 	}
 	if (fSlideShow) {
 		fSlideShowCountDown --;
 		if (fSlideShowCountDown <= 0) {
 			fSlideShowCountDown = fSlideShowDelay;
 			if (!NextFile()) {
-				FirstFile();
+				_FirstFile();
 			}
 		}
 	}
 
 	// Hide cursor in full screen mode
-	if (fFullScreen && !HasSelection() && !fShowingPopUpMenu && fIsActiveWin) {
+	if (fFullScreen && !_HasSelection() && !fShowingPopUpMenu && fIsActiveWin) {
 		if (fHideCursorCountDown <= 0)
 			be_app->ObscureCursor();
 		else
@@ -326,7 +335,7 @@ ShowImageView::Pulse()
 	if (fBitmap && (fScaleBilinear || fDither) && fScalingCountDown > 0) {
 		if (fScalingCountDown == 1) {
 			fScalingCountDown = 0;
-			GetScaler(AlignBitmap());
+			_GetScaler(_AlignBitmap());
 		} else {
 			fScalingCountDown --;
 		}
@@ -336,7 +345,7 @@ ShowImageView::Pulse()
 
 
 bool
-ShowImageView::IsImage(const entry_ref *ref)
+ShowImageView::_IsImage(const entry_ref *ref)
 {
 	if (ref == NULL || !entry_ref_is_file(ref))
 		return false;
@@ -371,7 +380,7 @@ ShowImageView::SetTrackerMessenger(const BMessenger& trackerMessenger)
 
 
 void
-ShowImageView::SendMessageToWindow(BMessage *message)
+ShowImageView::_SendMessageToWindow(BMessage *message)
 {
 	BMessenger msgr(Window());
 	msgr.SendMessage(message);
@@ -379,16 +388,16 @@ ShowImageView::SendMessageToWindow(BMessage *message)
 
 
 void
-ShowImageView::SendMessageToWindow(uint32 code)
+ShowImageView::_SendMessageToWindow(uint32 code)
 {
 	BMessage message(code);
-	SendMessageToWindow(&message);
+	_SendMessageToWindow(&message);
 }
 
 
 //! send message to parent about new image
 void
-ShowImageView::Notify()
+ShowImageView::_Notify()
 {
 	BMessage msg(MSG_UPDATE_STATUS);
 
@@ -397,7 +406,7 @@ ShowImageView::Notify()
 	msg.AddInt32("height", fBitmap->Bounds().IntegerHeight() + 1);
 
 	msg.AddInt32("colors", fBitmap->ColorSpace());
-	SendMessageToWindow(&msg);
+	_SendMessageToWindow(&msg);
 
 	FixupScrollBars();
 	Invalidate();
@@ -405,7 +414,7 @@ ShowImageView::Notify()
 
 
 void
-ShowImageView::UpdateStatusText()
+ShowImageView::_UpdateStatusText()
 {
 	BMessage msg(MSG_UPDATE_STATUS_TEXT);
 	BString status_to_send = fImageType;
@@ -419,19 +428,19 @@ ShowImageView::UpdateStatusText()
 	}
 
 	msg.AddString("status", status_to_send.String());
-	SendMessageToWindow(&msg);
+	_SendMessageToWindow(&msg);
 }
 
 
 void
-ShowImageView::AddToRecentDocuments()
+ShowImageView::_AddToRecentDocuments()
 {
 	be_roster->AddToRecentDocuments(&fCurrentRef, kApplicationSignature);
 }
 
 
 void
-ShowImageView::DeleteScaler()
+ShowImageView::_DeleteScaler()
 {
 	if (fScaler) {
 		fScaler->Stop();
@@ -445,10 +454,10 @@ ShowImageView::DeleteScaler()
 
 
 void
-ShowImageView::DeleteBitmap()
+ShowImageView::_DeleteBitmap()
 {
-	DeleteScaler();
-	DeleteSelBitmap();
+	_DeleteScaler();
+	_DeleteSelBitmap();
 
 	if (fDisplayBitmap != fBitmap)
 		delete fDisplayBitmap;
@@ -460,7 +469,7 @@ ShowImageView::DeleteBitmap()
 
 
 void
-ShowImageView::DeleteSelBitmap()
+ShowImageView::_DeleteSelBitmap()
 {
 	delete fSelBitmap;
 	fSelBitmap = NULL;
@@ -523,9 +532,9 @@ ShowImageView::SetImage(const entry_ref *ref)
 	// I can be sure it is safe to delete the old one,
 	// and clear everything
 	fUndo.Clear();
-	SetHasSelection(false);
+	_SetHasSelection(false);
 	fMakesSelection = false;
-	DeleteBitmap();
+	_DeleteBitmap();
 	fBitmap = newBitmap;
 	fDisplayBitmap = NULL;
 	newBitmap = NULL;
@@ -545,35 +554,35 @@ ShowImageView::SetImage(const entry_ref *ref)
 	if (file.ReadAttr(SHOW_IMAGE_ORIENTATION_ATTRIBUTE, B_INT32_TYPE, 0,
 			&orientation, sizeof(orientation)) == sizeof(orientation)) {
 		if (orientation & 256)
-			DoImageOperation(ImageProcessor::ImageProcessor::kInvert, true);
+			_DoImageOperation(ImageProcessor::ImageProcessor::kInvert, true);
 
 		orientation &= 255;
 		switch (orientation) {
 			case k0:
 				break;
 			case k90:
-				DoImageOperation(ImageProcessor::kRotateClockwise, true);
+				_DoImageOperation(ImageProcessor::kRotateClockwise, true);
 				break;
 			case k180:
-				DoImageOperation(ImageProcessor::kRotateClockwise, true);
-				DoImageOperation(ImageProcessor::kRotateClockwise, true);
+				_DoImageOperation(ImageProcessor::kRotateClockwise, true);
+				_DoImageOperation(ImageProcessor::kRotateClockwise, true);
 				break;
 			case k270:
-				DoImageOperation(ImageProcessor::kRotateCounterClockwise, true);
+				_DoImageOperation(ImageProcessor::kRotateCounterClockwise, true);
 				break;
 			case k0V:
-				DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
+				_DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
 				break;
 			case k90V:
-				DoImageOperation(ImageProcessor::kRotateClockwise, true);
-				DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
+				_DoImageOperation(ImageProcessor::kRotateClockwise, true);
+				_DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
 				break;
 			case k0H:
-				DoImageOperation(ImageProcessor::ImageProcessor::kFlipLeftToRight, true);
+				_DoImageOperation(ImageProcessor::ImageProcessor::kFlipLeftToRight, true);
 				break;
 			case k270V:
-				DoImageOperation(ImageProcessor::kRotateCounterClockwise, true);
-				DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
+				_DoImageOperation(ImageProcessor::kRotateCounterClockwise, true);
+				_DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
 				break;
 		}
 	}
@@ -595,15 +604,15 @@ ShowImageView::SetImage(const entry_ref *ref)
 	fCaption << ", " << fImageType;
 	fZoom = 1.0;
 
-	AddToRecentDocuments();
+	_AddToRecentDocuments();
 
-	Notify();
+	_Notify();
 	return B_OK;
 }
 
 
 status_t
-ShowImageView::SetSelection(const entry_ref *ref, BPoint point)
+ShowImageView::_SetSelection(const entry_ref *ref, BPoint point)
 {
 	BTranslatorRoster *roster = BTranslatorRoster::Default();
 	if (!roster)
@@ -626,7 +635,7 @@ ShowImageView::SetSelection(const entry_ref *ref, BPoint point)
 	if (outstream.DetachBitmap(&newBitmap) != B_OK)
 		return B_ERROR;
 
-	return PasteBitmap(newBitmap, point);
+	return _PasteBitmap(newBitmap, point);
 }
 
 
@@ -634,7 +643,7 @@ void
 ShowImageView::SetDither(bool dither)
 {
 	if (fDither != dither) {
-		SettingsSetBool("Dither", dither);
+		_SettingsSetBool("Dither", dither);
 		fDither = dither;
 		Invalidate();
 	}
@@ -646,7 +655,7 @@ ShowImageView::SetShowCaption(bool show)
 {
 	if (fShowCaption != show) {
 		fShowCaption = show;
-		UpdateCaption();
+		_UpdateCaption();
 	}
 }
 
@@ -655,7 +664,7 @@ void
 ShowImageView::SetShrinkToBounds(bool enable)
 {
 	if (fShrinkToBounds != enable) {
-		SettingsSetBool("ShrinkToBounds", enable);
+		_SettingsSetBool("ShrinkToBounds", enable);
 		fShrinkToBounds = enable;
 		FixupScrollBars();
 		Invalidate();
@@ -667,7 +676,7 @@ void
 ShowImageView::SetZoomToBounds(bool enable)
 {
 	if (fZoomToBounds != enable) {
-		SettingsSetBool("ZoomToBounds", enable);
+		_SettingsSetBool("ZoomToBounds", enable);
 		fZoomToBounds = enable;
 		FixupScrollBars();
 		Invalidate();
@@ -723,7 +732,7 @@ void
 ShowImageView::SetScaleBilinear(bool enabled)
 {
 	if (fScaleBilinear != enabled) {
-		SettingsSetBool("ScaleBilinear", enabled);
+		_SettingsSetBool("ScaleBilinear", enabled);
 		fScaleBilinear = enabled;
 		Invalidate();
 	}
@@ -749,7 +758,7 @@ ShowImageView::DetachedFromWindow()
 
 
 BRect
-ShowImageView::AlignBitmap()
+ShowImageView::_AlignBitmap()
 {
 	BRect rect(fBitmap->Bounds());
 
@@ -804,7 +813,7 @@ ShowImageView::AlignBitmap()
 
 
 void
-ShowImageView::Setup(BRect rect)
+ShowImageView::_Setup(BRect rect)
 {
 	fLeft = floorf(rect.left);
 	fTop = floorf(rect.top);
@@ -813,7 +822,7 @@ ShowImageView::Setup(BRect rect)
 
 
 BPoint
-ShowImageView::ImageToView(BPoint p) const
+ShowImageView::_ImageToView(BPoint p) const
 {
 	p.x = floorf(fZoom * p.x + fLeft);
 	p.y = floorf(fZoom * p.y + fTop);
@@ -822,7 +831,7 @@ ShowImageView::ImageToView(BPoint p) const
 
 
 BPoint
-ShowImageView::ViewToImage(BPoint p) const
+ShowImageView::_ViewToImage(BPoint p) const
 {
 	p.x = floorf((p.x - fLeft) / fZoom);
 	p.y = floorf((p.y - fTop) / fZoom);
@@ -831,19 +840,19 @@ ShowImageView::ViewToImage(BPoint p) const
 
 
 BRect
-ShowImageView::ImageToView(BRect r) const
+ShowImageView::_ImageToView(BRect r) const
 {
-	BPoint leftTop(ImageToView(BPoint(r.left, r.top)));
+	BPoint leftTop(_ImageToView(BPoint(r.left, r.top)));
 	BPoint rightBottom(r.right, r.bottom);
 	rightBottom += BPoint(1, 1);
-	rightBottom = ImageToView(rightBottom);
+	rightBottom = _ImageToView(rightBottom);
 	rightBottom -= BPoint(1, 1);
 	return BRect(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y);
 }
 
 
 void
-ShowImageView::DrawBorder(BRect border)
+ShowImageView::_DrawBorder(BRect border)
 {
 	BRect bounds(Bounds());
 	// top
@@ -858,7 +867,7 @@ ShowImageView::DrawBorder(BRect border)
 
 
 void
-ShowImageView::LayoutCaption(BFont &font, BPoint &pos, BRect &rect)
+ShowImageView::_LayoutCaption(BFont &font, BPoint &pos, BRect &rect)
 {
 	font_height fontHeight;
 	float width, height;
@@ -880,12 +889,12 @@ ShowImageView::LayoutCaption(BFont &font, BPoint &pos, BRect &rect)
 
 
 void
-ShowImageView::DrawCaption()
+ShowImageView::_DrawCaption()
 {
 	BFont font;
 	BPoint position;
 	BRect rect;
-	LayoutCaption(font, position, rect);
+	_LayoutCaption(font, position, rect);
 
 	PushState();
 
@@ -906,12 +915,12 @@ ShowImageView::DrawCaption()
 
 
 void
-ShowImageView::UpdateCaption()
+ShowImageView::_UpdateCaption()
 {
 	BFont font;
 	BPoint pos;
 	BRect rect;
-	LayoutCaption(font, pos, rect);
+	_LayoutCaption(font, pos, rect);
 
 	// draw over portion of image where caption is located
 	BRegion clip(rect);
@@ -923,10 +932,10 @@ ShowImageView::UpdateCaption()
 
 
 Scaler*
-ShowImageView::GetScaler(BRect rect)
+ShowImageView::_GetScaler(BRect rect)
 {
 	if (fScaler == NULL || !fScaler->Matches(rect, fDither)) {
-		DeleteScaler();
+		_DeleteScaler();
 		BMessenger msgr(this, Window());
 		fScaler = new Scaler(fDisplayBitmap, rect, msgr, MSG_INVALIDATE, fDither);
 		fScaler->Start();
@@ -936,16 +945,16 @@ ShowImageView::GetScaler(BRect rect)
 
 
 void
-ShowImageView::DrawImage(BRect rect)
+ShowImageView::_DrawImage(BRect rect)
 {
 	if (fScaleBilinear || fDither) {
 #if DELAYED_SCALING
 		Scaler* scaler = fScaler;
 		if (scaler != NULL && !scaler->Matches(rect, fDither)) {
-			DeleteScaler(); scaler = NULL;
+			_DeleteScaler(); scaler = NULL;
 		}
 #else
-		Scaler* scaler = GetScaler(rect);
+		Scaler* scaler = _GetScaler(rect);
 #endif
 		if (scaler != NULL && !scaler->IsRunning()) {
 			BBitmap* bitmap = scaler->GetBitmap();
@@ -976,41 +985,41 @@ ShowImageView::Draw(BRect updateRect)
 		return;
 	}
 
-	BRect rect = AlignBitmap();
-	Setup(rect);
+	BRect rect = _AlignBitmap();
+	_Setup(rect);
 
 	BRect border(rect);
 	border.InsetBy(-PEN_SIZE, -PEN_SIZE);
 
-	DrawBorder(border);
+	_DrawBorder(border);
 
 	// Draw black rectangle around image
 	StrokeRect(border);
 
 	// Draw image
-	DrawImage(rect);
+	_DrawImage(rect);
 
 	if (fShowCaption)
-		DrawCaption();
+		_DrawCaption();
 
-	if (HasSelection()) {
+	if (_HasSelection()) {
 		if (fSelBitmap) {
 			BRect srcBits, destRect;
-			GetSelMergeRects(srcBits, destRect);
-			destRect = ImageToView(destRect);
+			_GetSelMergeRects(srcBits, destRect);
+			destRect = _ImageToView(destRect);
 			DrawBitmap(fSelBitmap, srcBits, destRect);
 		}
-		DrawSelectionBox();
+		_DrawSelectionBox();
 	}
 }
 
 
 void
-ShowImageView::DrawSelectionBox()
+ShowImageView::_DrawSelectionBox()
 {
 	BRect r(fSelectionRect);
-	ConstrainToImage(r);
-	r = ImageToView(r);
+	_ConstrainToImage(r);
+	r = _ImageToView(r);
 	// draw selection box *around* selection
 	r.InsetBy(-1, -1);
 	PushState();
@@ -1032,21 +1041,21 @@ ShowImageView::FrameResized(float /* width */, float /* height */)
 
 
 void
-ShowImageView::ConstrainToImage(BPoint &point)
+ShowImageView::_ConstrainToImage(BPoint &point)
 {
 	point.ConstrainTo(fBitmap->Bounds());
 }
 
 
 void
-ShowImageView::ConstrainToImage(BRect &rect)
+ShowImageView::_ConstrainToImage(BRect &rect)
 {
 	rect = rect & fBitmap->Bounds();
 }
 
 
 BBitmap*
-ShowImageView::CopyFromRect(BRect srcRect)
+ShowImageView::_CopyFromRect(BRect srcRect)
 {
 	BRect rect(0, 0, srcRect.Width(), srcRect.Height());
 	BView view(rect, NULL, B_FOLLOW_NONE, B_WILL_DRAW);
@@ -1069,11 +1078,11 @@ ShowImageView::CopyFromRect(BRect srcRect)
 
 
 BBitmap*
-ShowImageView::CopySelection(uchar alpha, bool imageSize)
+ShowImageView::_CopySelection(uchar alpha, bool imageSize)
 {
 	bool hasAlpha = alpha != 255;
 
-	if (!HasSelection())
+	if (!_HasSelection())
 		return NULL;
 
 	BRect rect(0, 0, fSelectionRect.Width(), fSelectionRect.Height());
@@ -1110,7 +1119,7 @@ ShowImageView::CopySelection(uchar alpha, bool imageSize)
 
 
 bool
-ShowImageView::AddSupportedTypes(BMessage* msg, BBitmap* bitmap)
+ShowImageView::_AddSupportedTypes(BMessage* msg, BBitmap* bitmap)
 {
 	BTranslatorRoster *roster = BTranslatorRoster::Default();
 	if (roster == NULL)
@@ -1145,9 +1154,9 @@ ShowImageView::AddSupportedTypes(BMessage* msg, BBitmap* bitmap)
 
 
 void
-ShowImageView::BeginDrag(BPoint sourcePoint)
+ShowImageView::_BeginDrag(BPoint sourcePoint)
 {
-	BBitmap* bitmap = CopySelection(128, false);
+	BBitmap* bitmap = _CopySelection(128, false);
 	if (bitmap == NULL)
 		return;
 
@@ -1160,11 +1169,11 @@ ShowImageView::BeginDrag(BPoint sourcePoint)
 	// ShowImage specific fields
 	drag.AddPoint("be:_source_point", sourcePoint);
 	drag.AddRect("be:_frame", fSelectionRect);
-	if (AddSupportedTypes(&drag, bitmap)) {
+	if (_AddSupportedTypes(&drag, bitmap)) {
 		// we also support "Passing Data via File" protocol
 		drag.AddString("be:types", B_FILE_MIME_TYPE);
 		// avoid flickering of dragged bitmap caused by drawing into the window
-		AnimateSelection(false);
+		_AnimateSelection(false);
 		// only use a transparent bitmap on selections less than 400x400 (taking into account zooming)
 		if ((fSelectionRect.Width() * fZoom) < 400.0 && (fSelectionRect.Height() * fZoom) < 400.0) {
 			sourcePoint -= fSelectionRect.LeftTop();
@@ -1177,7 +1186,7 @@ ShowImageView::BeginDrag(BPoint sourcePoint)
 			delete bitmap;
 			// Offset and scale the rect
 			BRect rect(fSelectionRect);
-			rect = ImageToView(rect);
+			rect = _ImageToView(rect);
 			rect.InsetBy(-1, -1);
 			DragMessage(&drag, rect);
 		}
@@ -1186,7 +1195,7 @@ ShowImageView::BeginDrag(BPoint sourcePoint)
 
 
 bool
-ShowImageView::OutputFormatForType(BBitmap* bitmap, const char* type,
+ShowImageView::_OutputFormatForType(BBitmap* bitmap, const char* type,
 	translation_format* format)
 {
 	bool found = false;
@@ -1263,7 +1272,7 @@ ShowImageView::SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap,
 
 
 void
-ShowImageView::SendInMessage(BMessage* msg, BBitmap* bitmap, translation_format* format)
+ShowImageView::_SendInMessage(BMessage* msg, BBitmap* bitmap, translation_format* format)
 {
 	BMessage reply(B_MIME_DATA);
 	BBitmapStream stream(bitmap); // destructor deletes bitmap
@@ -1277,7 +1286,7 @@ ShowImageView::SendInMessage(BMessage* msg, BBitmap* bitmap, translation_format*
 
 
 void
-ShowImageView::HandleDrop(BMessage* msg)
+ShowImageView::_HandleDrop(BMessage* msg)
 {
 	BMessage data(B_MIME_DATA);
 	entry_ref dirRef;
@@ -1292,12 +1301,12 @@ ShowImageView::HandleDrop(BMessage* msg)
 
 	sendInMessage = (!saveToFile) && msg->FindString("be:types", &type) == B_OK;
 
-	bitmap = CopySelection();
+	bitmap = _CopySelection();
 	if (bitmap == NULL)
 		return;
 
 	translation_format format;
-	if (!OutputFormatForType(bitmap, type.String(), &format)) {
+	if (!_OutputFormatForType(bitmap, type.String(), &format)) {
 		delete bitmap;
 		return;
 	}
@@ -1307,7 +1316,7 @@ ShowImageView::HandleDrop(BMessage* msg)
 		SaveToFile(&dir, name.String(), bitmap, &format);
 		delete bitmap;
 	} else if (sendInMessage) {
-		SendInMessage(msg, bitmap, &format);
+		_SendInMessage(msg, bitmap, &format);
 	} else {
 		delete bitmap;
 	}
@@ -1315,7 +1324,7 @@ ShowImageView::HandleDrop(BMessage* msg)
 
 
 void
-ShowImageView::MoveImage()
+ShowImageView::_MoveImage()
 {
 	BPoint point, delta;
 	uint32 buttons;
@@ -1324,16 +1333,16 @@ ShowImageView::MoveImage()
 	point = ConvertToScreen(point);
 	delta = fFirstPoint - point;
 	fFirstPoint = point;
-	ScrollRestrictedBy(delta.x, delta.y);
+	_ScrollRestrictedBy(delta.x, delta.y);
 
 	// in case we miss MouseUp
-	if ((GetMouseButtons() & B_TERTIARY_MOUSE_BUTTON) == 0)
+	if ((_GetMouseButtons() & B_TERTIARY_MOUSE_BUTTON) == 0)
 		fMovesImage = false;
 }
 
 
 uint32
-ShowImageView::GetMouseButtons()
+ShowImageView::_GetMouseButtons()
 {
 	uint32 buttons;
 	BPoint point;
@@ -1350,11 +1359,11 @@ ShowImageView::GetMouseButtons()
 
 
 void
-ShowImageView::GetMergeRects(BBitmap *merge, BRect selection, BRect &srcBits,
+ShowImageView::_GetMergeRects(BBitmap *merge, BRect selection, BRect &srcBits,
 	BRect &destRect)
 {
 	destRect = selection;
-	ConstrainToImage(destRect);
+	_ConstrainToImage(destRect);
 
 	srcBits = selection;
 	if (srcBits.left < 0)
@@ -1380,14 +1389,14 @@ ShowImageView::GetMergeRects(BBitmap *merge, BRect selection, BRect &srcBits,
 
 
 void
-ShowImageView::GetSelMergeRects(BRect &srcBits, BRect &destRect)
+ShowImageView::_GetSelMergeRects(BRect &srcBits, BRect &destRect)
 {
-	GetMergeRects(fSelBitmap, fSelectionRect, srcBits, destRect);
+	_GetMergeRects(fSelBitmap, fSelectionRect, srcBits, destRect);
 }
 
 
 void
-ShowImageView::MergeWithBitmap(BBitmap *merge, BRect selection)
+ShowImageView::_MergeWithBitmap(BBitmap *merge, BRect selection)
 {
 	BView view(fBitmap->Bounds(), NULL, B_FOLLOW_NONE, B_WILL_DRAW);
 	BBitmap *bitmap = new(nothrow) BBitmap(fBitmap->Bounds(), fBitmap->ColorSpace(), true);
@@ -1400,39 +1409,39 @@ ShowImageView::MergeWithBitmap(BBitmap *merge, BRect selection)
 		bitmap->AddChild(&view);
 		view.DrawBitmap(fBitmap, fBitmap->Bounds());
 		BRect srcBits, destRect;
-		GetMergeRects(merge, selection, srcBits, destRect);
+		_GetMergeRects(merge, selection, srcBits, destRect);
 		view.DrawBitmap(merge, srcBits, destRect);
 
 		view.Sync();
 		bitmap->RemoveChild(&view);
 		bitmap->Unlock();
 
-		DeleteBitmap();
+		_DeleteBitmap();
 		fBitmap = bitmap;
 
-		SendMessageToWindow(MSG_MODIFIED);
+		_SendMessageToWindow(MSG_MODIFIED);
 	} else
 		delete bitmap;
 }
 
 
 void
-ShowImageView::MergeSelection()
+ShowImageView::_MergeSelection()
 {
-	if (!HasSelection())
+	if (!_HasSelection())
 		return;
 
 	if (!fSelBitmap) {
 		// Even though the merge will not change
 		// the background image, I still need to save
 		// some undo information here
-		fUndo.SetTo(fSelectionRect, NULL, CopySelection());
+		fUndo.SetTo(fSelectionRect, NULL, _CopySelection());
 		return;
 	}
 
 	// Merge selection with background
-	fUndo.SetTo(fSelectionRect, CopyFromRect(fSelectionRect), CopySelection());
-	MergeWithBitmap(fSelBitmap, fSelectionRect);
+	fUndo.SetTo(fSelectionRect, _CopyFromRect(fSelectionRect), _CopySelection());
+	_MergeWithBitmap(fSelBitmap, fSelectionRect);
 }
 
 
@@ -1443,16 +1452,16 @@ ShowImageView::MouseDown(BPoint position)
 	uint32 buttons;
 	MakeFocus(true);
 
-	point = ViewToImage(position);
-	buttons = GetMouseButtons();
+	point = _ViewToImage(position);
+	buttons = _GetMouseButtons();
 
-	if (HasSelection() && fSelectionRect.Contains(point)
+	if (_HasSelection() && fSelectionRect.Contains(point)
 		&& (buttons & (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON))) {
 		if (!fSelBitmap)
-			fSelBitmap = CopySelection();
+			fSelBitmap = _CopySelection();
 
 		BPoint sourcePoint = point;
-		BeginDrag(sourcePoint);
+		_BeginDrag(sourcePoint);
 
 		while (buttons) {
 			// Keep reading mouse movement until
@@ -1466,7 +1475,7 @@ ShowImageView::MouseDown(BPoint position)
 			// If selection stayed inside this view
 			// (Some of the selection may be in the border area, which can be OK)
 			BPoint last, diff;
-			last = ViewToImage(point);
+			last = _ViewToImage(point);
 			diff = last - sourcePoint;
 
 			BRect newSelection = fSelectionRect;
@@ -1480,23 +1489,23 @@ ShowImageView::MouseDown(BPoint position)
 			}
 		}
 
-		AnimateSelection(true);
+		_AnimateSelection(true);
 	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {
-		MergeSelection();
+		_MergeSelection();
 			// If there is an existing selection,
 			// Make it part of the background image
 
 		// begin new selection
-		SetHasSelection(true);
+		_SetHasSelection(true);
 		fMakesSelection = true;
 		SetMouseEventMask(B_POINTER_EVENTS);
-		ConstrainToImage(point);
+		_ConstrainToImage(point);
 		fFirstPoint = point;
 		fCopyFromRect.Set(point.x, point.y, point.x, point.y);
 		fSelectionRect = fCopyFromRect;
 		Invalidate();
 	} else if (buttons == B_SECONDARY_MOUSE_BUTTON) {
-		ShowPopUpMenu(ConvertToScreen(position));
+		_ShowPopUpMenu(ConvertToScreen(position));
 	} else if (buttons == B_TERTIARY_MOUSE_BUTTON) {
 		// move image in window
 		SetMouseEventMask(B_POINTER_EVENTS);
@@ -1507,11 +1516,11 @@ ShowImageView::MouseDown(BPoint position)
 
 
 void
-ShowImageView::UpdateSelectionRect(BPoint point, bool final)
+ShowImageView::_UpdateSelectionRect(BPoint point, bool final)
 {
 	BRect oldSelection = fCopyFromRect;
-	point = ViewToImage(point);
-	ConstrainToImage(point);
+	point = _ViewToImage(point);
+	_ConstrainToImage(point);
 	fCopyFromRect.left = min_c(fFirstPoint.x, point.x);
 	fCopyFromRect.right = max_c(fFirstPoint.x, point.x);
 	fCopyFromRect.top = min_c(fFirstPoint.y, point.y);
@@ -1521,14 +1530,14 @@ ShowImageView::UpdateSelectionRect(BPoint point, bool final)
 	if (final) {
 		// selection must be at least 2 pixels wide or 2 pixels tall
 		if (fCopyFromRect.Width() < 1.0 && fCopyFromRect.Height() < 1.0)
-			SetHasSelection(false);
+			_SetHasSelection(false);
 	} else
-		UpdateStatusText();
+		_UpdateStatusText();
 
-	if (oldSelection != fCopyFromRect || !HasSelection()) {
+	if (oldSelection != fCopyFromRect || !_HasSelection()) {
 		BRect updateRect;
 		updateRect = oldSelection | fCopyFromRect;
-		updateRect = ImageToView(updateRect);
+		updateRect = _ImageToView(updateRect);
 		updateRect.InsetBy(-PEN_SIZE, -PEN_SIZE);
 		Invalidate(updateRect);
 	}
@@ -1540,9 +1549,9 @@ ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage *message)
 {
 	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
 	if (fMakesSelection) {
-		UpdateSelectionRect(point, false);
+		_UpdateSelectionRect(point, false);
 	} else if (fMovesImage) {
-		MoveImage();
+		_MoveImage();
 	}
 }
 
@@ -1551,18 +1560,18 @@ void
 ShowImageView::MouseUp(BPoint point)
 {
 	if (fMakesSelection) {
-		UpdateSelectionRect(point, true);
+		_UpdateSelectionRect(point, true);
 		fMakesSelection = false;
 	} else if (fMovesImage) {
-		MoveImage();
+		_MoveImage();
 		fMovesImage = false;
 	}
-	AnimateSelection(true);
+	_AnimateSelection(true);
 }
 
 
 float
-ShowImageView::LimitToRange(float v, orientation o, bool absolute)
+ShowImageView::_LimitToRange(float v, orientation o, bool absolute)
 {
 	BScrollBar* psb = ScrollBar(o);
 	if (psb) {
@@ -1586,13 +1595,13 @@ ShowImageView::LimitToRange(float v, orientation o, bool absolute)
 
 
 void
-ShowImageView::ScrollRestricted(float x, float y, bool absolute)
+ShowImageView::_ScrollRestricted(float x, float y, bool absolute)
 {
 	if (x != 0)
-		x = LimitToRange(x, B_HORIZONTAL, absolute);
+		x = _LimitToRange(x, B_HORIZONTAL, absolute);
 
 	if (y != 0)
-		y = LimitToRange(y, B_VERTICAL, absolute);
+		y = _LimitToRange(y, B_VERTICAL, absolute);
 
 	// hide the caption when using mouse wheel
 	// in full screen mode
@@ -1601,7 +1610,7 @@ ShowImageView::ScrollRestricted(float x, float y, bool absolute)
 	bool caption = fShowCaption;
 	if (caption) {
 		fShowCaption = false;
-		UpdateCaption();
+		_UpdateCaption();
 	}
 
 	ScrollBy(x, y);
@@ -1609,23 +1618,23 @@ ShowImageView::ScrollRestricted(float x, float y, bool absolute)
 	if (caption) {
 		// show the caption again
 		fShowCaption = true;
-		UpdateCaption();
+		_UpdateCaption();
 	}
 }
 
 
 // XXX method is not unused
 void
-ShowImageView::ScrollRestrictedTo(float x, float y)
+ShowImageView::_ScrollRestrictedTo(float x, float y)
 {
-	ScrollRestricted(x, y, true);
+	_ScrollRestricted(x, y, true);
 }
 
 
 void
-ShowImageView::ScrollRestrictedBy(float x, float y)
+ShowImageView::_ScrollRestrictedBy(float x, float y)
 {
-	ScrollRestricted(x, y, false);
+	_ScrollRestricted(x, y, false);
 }
 
 
@@ -1639,36 +1648,36 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 
 	switch (*bytes) {
 		case B_DOWN_ARROW:
-			ScrollRestrictedBy(0, 10);
+			_ScrollRestrictedBy(0, 10);
 			break;
 		case B_UP_ARROW:
-			ScrollRestrictedBy(0, -10);
+			_ScrollRestrictedBy(0, -10);
 			break;
 		case B_LEFT_ARROW:
-			ScrollRestrictedBy(-10, 0);
+			_ScrollRestrictedBy(-10, 0);
 			break;
 		case B_RIGHT_ARROW:
-			ScrollRestrictedBy(10, 0);
+			_ScrollRestrictedBy(10, 0);
 			break;
 		case B_ENTER:
-			SendMessageToWindow(MSG_FILE_NEXT);
+			_SendMessageToWindow(MSG_FILE_NEXT);
 			break;
 		case B_BACKSPACE:
-			SendMessageToWindow(MSG_FILE_PREV);
+			_SendMessageToWindow(MSG_FILE_PREV);
 			break;
 		case B_HOME:
 			break;
 		case B_END:
 			break;
 		case B_SPACE:
-			ToggleSlideShow();
+			_ToggleSlideShow();
 			break;
 		case B_ESCAPE:
 			// stop slide show
 			if (fSlideShow)
-				ToggleSlideShow();
+				_ToggleSlideShow();
 
-			ExitFullScreen();
+			_ExitFullScreen();
 
 			ClearSelection();
 			break;
@@ -1684,7 +1693,7 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 				if (!NextFile()) {
 					// This is the last (or only file) in this directory,
 					// close the window
-					SendMessageToWindow(B_QUIT_REQUESTED);
+					_SendMessageToWindow(B_QUIT_REQUESTED);
 				}
 			break;
 		}
@@ -1700,7 +1709,7 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 
 
 void
-ShowImageView::MouseWheelChanged(BMessage *msg)
+ShowImageView::_MouseWheelChanged(BMessage *msg)
 {
 	// The BeOS driver does not currently support
 	// X wheel scrolling, therefore, dx is zero.
@@ -1716,12 +1725,12 @@ ShowImageView::MouseWheelChanged(BMessage *msg)
 	if (msg->FindFloat("be:wheel_delta_y", &dy) == B_OK)
 		y = dy * kscrollBy;
 
-	ScrollRestrictedBy(x, y);
+	_ScrollRestrictedBy(x, y);
 }
 
 
 void
-ShowImageView::ShowPopUpMenu(BPoint screen)
+ShowImageView::_ShowPopUpMenu(BPoint screen)
 {
 	BPopUpMenu* menu = new PopUpMenu("PopUpMenu", this);
 
@@ -1736,7 +1745,7 @@ ShowImageView::ShowPopUpMenu(BPoint screen)
 
 
 void
-ShowImageView::SettingsSetBool(const char* name, bool value)
+ShowImageView::_SettingsSetBool(const char* name, bool value)
 {
 	ShowImageSettings* settings;
 	settings = my_app->Settings();
@@ -1759,7 +1768,7 @@ ShowImageView::MessageReceived(BMessage *message)
 			// allocates the BBitmap * sent in the reply, it is only
 			// to be used and deleted by the view that is being replied to.
 			BMessage msg;
-			msg.AddPointer("be:_bitmap_ptr", CopySelection());
+			msg.AddPointer("be:_bitmap_ptr", _CopySelection());
 			message->SendReply(&msg);
 			break;
 		}
@@ -1775,8 +1784,8 @@ ShowImageView::MessageReceived(BMessage *message)
 					if (message->FindRef("refs", 0, &ref) == B_OK) {
 						BPoint point = message->DropPoint();
 						point = ConvertFromScreen(point);
-						point = ViewToImage(point);
-						SetSelection(&ref, point);
+						point = _ViewToImage(point);
+						_SetSelection(&ref, point);
 					}
 				} else {
 					// If a user drags a clip from another ShowImage window,
@@ -1800,9 +1809,9 @@ ShowImageView::MessageReceived(BMessage *message)
 								point.y - (sourcePoint.y - sourceRect.top));
 								// adjust drop point before scaling is factored in
 							point = ConvertFromScreen(point);
-							point = ViewToImage(point);
+							point = _ViewToImage(point);
 
-							PasteBitmap(bitmap, point);
+							_PasteBitmap(bitmap, point);
 						}
 					}
 				}
@@ -1810,10 +1819,10 @@ ShowImageView::MessageReceived(BMessage *message)
 			break;
 
 		case B_COPY_TARGET:
-			HandleDrop(message);
+			_HandleDrop(message);
 			break;
 		case B_MOUSE_WHEEL_CHANGED:
-			MouseWheelChanged(message);
+			_MouseWheelChanged(message);
 			break;
 		case MSG_INVALIDATE:
 			Invalidate();
@@ -1858,7 +1867,7 @@ ShowImageView::FixupScrollBars()
 {
 	BRect rctview = Bounds(), rctbitmap(0, 0, 0, 0);
 	if (fBitmap) {
-		rctbitmap = AlignBitmap();
+		rctbitmap = _AlignBitmap();
 		rctbitmap.OffsetTo(0, 0);
 	}
 
@@ -1892,13 +1901,13 @@ ShowImageView::Undo()
 	BRect undoneSelRect;
 	BBitmap *undoneSelection;
 	undoneSelRect = fSelectionRect;
-	undoneSelection = CopySelection();
+	undoneSelection = _CopySelection();
 
 	if (undoType == UNDO_UNDO) {
 		BBitmap *undoRestore;
 		undoRestore = fUndo.GetRestoreBitmap();
 		if (undoRestore)
-			MergeWithBitmap(undoRestore, fUndo.GetRect());
+			_MergeWithBitmap(undoRestore, fUndo.GetRect());
 	}
 
 	// restore previous image/selection
@@ -1907,11 +1916,11 @@ ShowImageView::Undo()
 		// NOTE: ShowImageView is responsible for deleting this bitmap
 		// (Which it will, as it would with a fSelBitmap that it allocated itself)
 	if (!undoSelection)
-		SetHasSelection(false);
+		_SetHasSelection(false);
 	else {
 		fCopyFromRect = BRect();
 		fSelectionRect = fUndo.GetRect();
-		SetHasSelection(true);
+		_SetHasSelection(true);
 		fSelBitmap = undoSelection;
 	}
 
@@ -1922,7 +1931,7 @@ ShowImageView::Undo()
 
 
 void
-ShowImageView::AddWhiteRect(BRect &rect)
+ShowImageView::_AddWhiteRect(BRect &rect)
 {
 	// Paint white rectangle, using rect, into the background image
 	BView view(fBitmap->Bounds(), NULL, B_FOLLOW_NONE, B_WILL_DRAW);
@@ -1943,36 +1952,36 @@ ShowImageView::AddWhiteRect(BRect &rect)
 		bitmap->RemoveChild(&view);
 		bitmap->Unlock();
 
-		DeleteBitmap();
+		_DeleteBitmap();
 		fBitmap = bitmap;
 
-		SendMessageToWindow(MSG_MODIFIED);
+		_SendMessageToWindow(MSG_MODIFIED);
 	} else
 		delete bitmap;
 }
 
 
 void
-ShowImageView::RemoveSelection(bool toClipboard)
+ShowImageView::_RemoveSelection(bool toClipboard)
 {
-	if (!HasSelection())
+	if (!_HasSelection())
 		return;
 
 	BRect rect = fSelectionRect;
 	bool cutBackground = (fSelBitmap) ? false : true;
 	BBitmap *selection, *restore = NULL;
-	selection = CopySelection();
+	selection = _CopySelection();
 
 	if (toClipboard)
 		CopySelectionToClipboard();
 
-	SetHasSelection(false);
+	_SetHasSelection(false);
 
 	if (cutBackground) {
 		// If the user hasn't dragged the selection,
 		// paint a white rectangle where the selection was
-		restore = CopyFromRect(rect);
-		AddWhiteRect(rect);
+		restore = _CopyFromRect(rect);
+		_AddWhiteRect(rect);
 	}
 
 	fUndo.SetTo(rect, restore, selection);
@@ -1985,19 +1994,19 @@ ShowImageView::Cut()
 {
 	// Copy the selection to the clipboard,
 	// then remove it
-	RemoveSelection(true);
+	_RemoveSelection(true);
 }
 
 
 status_t
-ShowImageView::PasteBitmap(BBitmap *bitmap, BPoint point)
+ShowImageView::_PasteBitmap(BBitmap *bitmap, BPoint point)
 {
 	if (bitmap && bitmap->IsValid()) {
-		MergeSelection();
+		_MergeSelection();
 
 		fCopyFromRect = BRect();
 		fSelectionRect = bitmap->Bounds();
-		SetHasSelection(true);
+		_SetHasSelection(true);
 		fSelBitmap = bitmap;
 
 		BRect offsetRect = fSelectionRect;
@@ -2027,7 +2036,7 @@ ShowImageView::Paste()
 			pclip->FindPoint("be:location", &point);
 			BBitmap *pbits;
 			pbits = dynamic_cast<BBitmap *>(BBitmap::Instantiate(pclip));
-			PasteBitmap(pbits, point);
+			_PasteBitmap(pbits, point);
 		}
 
 		be_clipboard->Unlock();
@@ -2038,7 +2047,7 @@ ShowImageView::Paste()
 void
 ShowImageView::SelectAll()
 {
-	SetHasSelection(true);
+	_SetHasSelection(true);
 	fCopyFromRect.Set(0, 0, fBitmap->Bounds().Width(), fBitmap->Bounds().Height());
 	fSelectionRect = fCopyFromRect;
 	Invalidate();
@@ -2050,33 +2059,33 @@ ShowImageView::ClearSelection()
 {
 	// Remove the selection,
 	// DON'T copy it to the clipboard
-	RemoveSelection(false);
+	_RemoveSelection(false);
 }
 
 
 void
-ShowImageView::SetHasSelection(bool bHasSelection)
+ShowImageView::_SetHasSelection(bool bHasSelection)
 {
-	DeleteSelBitmap();
+	_DeleteSelBitmap();
 	fHasSelection = bHasSelection;
 
-	UpdateStatusText();
+	_UpdateStatusText();
 
 	BMessage msg(MSG_SELECTION);
 	msg.AddBool("has_selection", fHasSelection);
-	SendMessageToWindow(&msg);
+	_SendMessageToWindow(&msg);
 }
 
 
 void
 ShowImageView::CopySelectionToClipboard()
 {
-	if (HasSelection() && be_clipboard->Lock()) {
+	if (_HasSelection() && be_clipboard->Lock()) {
 		be_clipboard->Clear();
 		BMessage *clip = NULL;
 		if ((clip = be_clipboard->Data()) != NULL) {
 			BMessage data;
-			BBitmap* bitmap = CopySelection();
+			BBitmap* bitmap = _CopySelection();
 			if (bitmap != NULL) {
 				#if 0
 				// According to BeBook and Becasso, Gobe Productive do the following.
@@ -2140,7 +2149,7 @@ ShowImageView::PrevPage()
 
 
 int
-ShowImageView::CompareEntries(const void* a, const void* b)
+ShowImageView::_CompareEntries(const void* a, const void* b)
 {
 	entry_ref *r1, *r2;
 	r1 = *(entry_ref**)a;
@@ -2160,7 +2169,7 @@ ShowImageView::GoToPage(int32 page)
 
 
 void
-ShowImageView::FreeEntries(BList* entries)
+ShowImageView::_FreeEntries(BList* entries)
 {
 	const int32 n = entries->CountItems();
 	for (int32 i = 0; i < n; i ++) {
@@ -2172,7 +2181,7 @@ ShowImageView::FreeEntries(BList* entries)
 
 
 void
-ShowImageView::SetTrackerSelectionToCurrent()
+ShowImageView::_SetTrackerSelectionToCurrent()
 {
 	BMessage setsel(B_SET_PROPERTY);
 	setsel.AddSpecifier("Selection");
@@ -2182,7 +2191,7 @@ ShowImageView::SetTrackerSelectionToCurrent()
 
 
 bool
-ShowImageView::FindNextImageByDir(entry_ref *in_current, entry_ref *out_image, bool next, bool rewind)
+ShowImageView::_FindNextImageByDir(entry_ref *in_current, entry_ref *out_image, bool next, bool rewind)
 {
 	ASSERT(next || !rewind);
 	BEntry curImage(in_current);
@@ -2205,19 +2214,19 @@ ShowImageView::FindNextImageByDir(entry_ref *in_current, entry_ref *out_image, b
 		}
 	}
 
-	entries.SortItems(CompareEntries);
+	entries.SortItems(_CompareEntries);
 
 	cur = entries.IndexOf(in_current);
 	ASSERT(cur >= 0);
 
-	// remove it so FreeEntries() does not delete it
+	// remove it so _FreeEntries() does not delete it
 	entries.RemoveItem(in_current);
 
 	if (next) {
 		// find the next image in the list
 		if (rewind) cur = 0; // start with first
 		for (; (ref = (entry_ref*)entries.ItemAt(cur)) != NULL; cur ++) {
-			if (IsImage(ref)) {
+			if (_IsImage(ref)) {
 				found = true;
 				*out_image = (const entry_ref)*ref;
 				break;
@@ -2228,7 +2237,7 @@ ShowImageView::FindNextImageByDir(entry_ref *in_current, entry_ref *out_image, b
 		cur --;
 		for (; cur >= 0; cur --) {
 			ref = (entry_ref*)entries.ItemAt(cur);
-			if (IsImage(ref)) {
+			if (_IsImage(ref)) {
 				found = true;
 				*out_image = (const entry_ref)*ref;
 				break;
@@ -2236,18 +2245,18 @@ ShowImageView::FindNextImageByDir(entry_ref *in_current, entry_ref *out_image, b
 		}
 	}
 
-	FreeEntries(&entries);
+	_FreeEntries(&entries);
 	return found;
 }
 
 bool
-ShowImageView::FindNextImage(entry_ref *in_current, entry_ref *ref, bool next, bool rewind)
+ShowImageView::_FindNextImage(entry_ref *in_current, entry_ref *ref, bool next, bool rewind)
 {
 	// Based on similar function from BeMail!
 	if (!fTrackerMessenger.IsValid())
 		// If tracker scripting is not available,
 		// fall back on directory searching code
-		return FindNextImageByDir(in_current, ref, next, rewind);
+		return _FindNextImageByDir(in_current, ref, next, rewind);
 
 	//
 	//	Ask the Tracker what the next/prev file in the window is.
@@ -2277,11 +2286,11 @@ ShowImageView::FindNextImage(entry_ref *in_current, entry_ref *ref, bool next, b
 
 		BMessage reply;
 		if (fTrackerMessenger.SendMessage(&request, &reply) != B_OK)
-			return FindNextImageByDir(in_current, ref, next, rewind);;
+			return _FindNextImageByDir(in_current, ref, next, rewind);;
 		if (reply.FindRef("result", &nextRef) != B_OK)
-			return FindNextImageByDir(in_current, ref, next, rewind);;
+			return _FindNextImageByDir(in_current, ref, next, rewind);;
 
-		if (IsImage(&nextRef))
+		if (_IsImage(&nextRef))
 			foundRef = true;
 
 		rewind = false;
@@ -2293,24 +2302,24 @@ ShowImageView::FindNextImage(entry_ref *in_current, entry_ref *ref, bool next, b
 }
 
 bool
-ShowImageView::ShowNextImage(bool next, bool rewind)
+ShowImageView::_ShowNextImage(bool next, bool rewind)
 {
 	entry_ref curRef = fCurrentRef;
 	entry_ref imgRef;
-	bool found = FindNextImage(&curRef, &imgRef, next, rewind);
+	bool found = _FindNextImage(&curRef, &imgRef, next, rewind);
 	if (found) {
 		// Keep trying to load images until:
 		// 1. The image loads successfully
 		// 2. The last file in the directory is found (for find next or find first)
 		// 3. The first file in the directory is found (for find prev)
-		// 4. The call to FindNextImage fails for any other reason
+		// 4. The call to _FindNextImage fails for any other reason
 		while (SetImage(&imgRef) != B_OK) {
 			curRef = imgRef;
-			found = FindNextImage(&curRef, &imgRef, next, false);
+			found = _FindNextImage(&curRef, &imgRef, next, false);
 			if (!found)
 				return false;
 		}
-		SetTrackerSelectionToCurrent();
+		_SetTrackerSelectionToCurrent();
 		return true;
 	}
 	return false;
@@ -2320,14 +2329,14 @@ ShowImageView::ShowNextImage(bool next, bool rewind)
 bool
 ShowImageView::NextFile()
 {
-	return ShowNextImage(true, false);
+	return _ShowNextImage(true, false);
 }
 
 
 bool
 ShowImageView::PrevFile()
 {
-	return ShowNextImage(false, false);
+	return _ShowNextImage(false, false);
 }
 
 
@@ -2335,7 +2344,7 @@ bool
 ShowImageView::HasNextFile()
 {
 	entry_ref ref;
-	return FindNextImage(&fCurrentRef, &ref, true, false);
+	return _FindNextImage(&fCurrentRef, &ref, true, false);
 }
 
 
@@ -2343,14 +2352,14 @@ bool
 ShowImageView::HasPrevFile()
 {
 	entry_ref ref;
-	return FindNextImage(&fCurrentRef, &ref, false, false);
+	return _FindNextImage(&fCurrentRef, &ref, false, false);
 }
 
 
 bool
-ShowImageView::FirstFile()
+ShowImageView::_FirstFile()
 {
-	return ShowNextImage(true, true);
+	return _ShowNextImage(true, true);
 }
 
 
@@ -2358,7 +2367,7 @@ void
 ShowImageView::SetZoom(float zoom)
 {
 	if ((fScaleBilinear || fDither) && fZoom != zoom) {
-		DeleteScaler();
+		_DeleteScaler();
 	}
 	fZoom = zoom;
 	FixupScrollBars();
@@ -2419,7 +2428,7 @@ ShowImageView::StopSlideShow()
 
 
 void
-ShowImageView::DoImageOperation(ImageProcessor::operation op, bool quiet)
+ShowImageView::_DoImageOperation(ImageProcessor::operation op, bool quiet)
 {
 	BMessenger msgr;
 	ImageProcessor imageProcessor(op, fBitmap, msgr, 0);
@@ -2455,23 +2464,23 @@ ShowImageView::DoImageOperation(ImageProcessor::operation op, bool quiet)
 	}
 
 	// set new bitmap
-	DeleteBitmap();
+	_DeleteBitmap();
 	fBitmap = bm;
 
 	if (!quiet) {
 		// remove selection
-		SetHasSelection(false);
-		Notify();
+		_SetHasSelection(false);
+		_Notify();
 	}
 }
 
 
 //! image operation initiated by user
 void
-ShowImageView::UserDoImageOperation(ImageProcessor::operation op, bool quiet)
+ShowImageView::_UserDoImageOperation(ImageProcessor::operation op, bool quiet)
 {
 	fUndo.Clear();
-	DoImageOperation(op, quiet);
+	_DoImageOperation(op, quiet);
 }
 
 
@@ -2479,9 +2488,9 @@ void
 ShowImageView::Rotate(int degree)
 {
 	if (degree == 90) {
-		UserDoImageOperation(ImageProcessor::kRotateClockwise);
+		_UserDoImageOperation(ImageProcessor::kRotateClockwise);
 	} else if (degree == 270) {
-		UserDoImageOperation(ImageProcessor::kRotateCounterClockwise);
+		_UserDoImageOperation(ImageProcessor::kRotateCounterClockwise);
 	}
 }
 
@@ -2490,9 +2499,9 @@ void
 ShowImageView::Flip(bool vertical)
 {
 	if (vertical) {
-		UserDoImageOperation(ImageProcessor::kFlipLeftToRight);
+		_UserDoImageOperation(ImageProcessor::kFlipLeftToRight);
 	} else {
-		UserDoImageOperation(ImageProcessor::kFlipTopToBottom);
+		_UserDoImageOperation(ImageProcessor::kFlipTopToBottom);
 	}
 }
 
@@ -2504,7 +2513,7 @@ ShowImageView::Invert()
 		// Only allow an invert operation if the
 		// bitmap color space is supported by the
 		// invert algorithm
-		UserDoImageOperation(ImageProcessor::kInvert);
+		_UserDoImageOperation(ImageProcessor::kInvert);
 	}
 }
 
@@ -2523,18 +2532,18 @@ ShowImageView::ResizeImage(int w, int h)
 	}
 
 	// remove selection
-	SetHasSelection(false);
+	_SetHasSelection(false);
 	fUndo.Clear();
-	DeleteBitmap();
+	_DeleteBitmap();
 	fBitmap = scaled;
 
-	SendMessageToWindow(MSG_MODIFIED);
+	_SendMessageToWindow(MSG_MODIFIED);
 
-	Notify();
+	_Notify();
 }
 
 void
-ShowImageView::SetIcon(bool clear, icon_size which)
+ShowImageView::_SetIcon(bool clear, icon_size which)
 {
 	int32 size;
 	switch (which) {
@@ -2598,23 +2607,23 @@ ShowImageView::SetIcon(bool clear, icon_size which)
 void
 ShowImageView::SetIcon(bool clear)
 {
-	SetIcon(clear, B_MINI_ICON);
-	SetIcon(clear, B_LARGE_ICON);
+	_SetIcon(clear, B_MINI_ICON);
+	_SetIcon(clear, B_LARGE_ICON);
 }
 
 
 void
-ShowImageView::ToggleSlideShow()
+ShowImageView::_ToggleSlideShow()
 {
-	SendMessageToWindow(MSG_SLIDE_SHOW);
+	_SendMessageToWindow(MSG_SLIDE_SHOW);
 }
 
 
 void
-ShowImageView::ExitFullScreen()
+ShowImageView::_ExitFullScreen()
 {
 	be_app->ShowCursor();
-	SendMessageToWindow(MSG_EXIT_FULL_SCREEN);
+	_SendMessageToWindow(MSG_EXIT_FULL_SCREEN);
 }
 
 

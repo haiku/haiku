@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -12,15 +12,10 @@
  *		Bernd Korz
  */
 
-#include "BackgroundImage.h"
-#include "EntryMenuItem.h"
-#include "ResizerWindow.h"
-#include "ShowImageApp.h"
-#include "ShowImageConstants.h"
-#include "ShowImageStatusView.h"
-#include "ShowImageView.h"
 #include "ShowImageWindow.h"
 
+#include <new>
+#include <stdio.h>
 
 #include <Alert.h>
 #include <Application.h>
@@ -44,27 +39,32 @@
 #include <TranslationUtils.h>
 #include <TranslatorRoster.h>
 
-
-#include <new>
-#include <stdio.h>
+#include "BackgroundImage.h"
+#include "EntryMenuItem.h"
+#include "ResizerWindow.h"
+#include "ShowImageApp.h"
+#include "ShowImageConstants.h"
+#include "ShowImageStatusView.h"
+#include "ShowImageView.h"
 
 
 // #pragma mark -- ShowImageWindow::RecentDocumentsMenu
 
 class ShowImageWindow::RecentDocumentsMenu : public BMenu {
 public:
-						RecentDocumentsMenu(const char *title,
-							menu_layout layout = B_ITEMS_IN_COLUMN);
-			bool		AddDynamicItem(add_state addState);
+			RecentDocumentsMenu(const char *title,
+				menu_layout layout = B_ITEMS_IN_COLUMN);
+	bool	AddDynamicItem(add_state addState);
 
-	private:
-			void		UpdateRecentDocumentsMenu();
+private:
+	void	UpdateRecentDocumentsMenu();
 };
 
 
 ShowImageWindow::RecentDocumentsMenu::RecentDocumentsMenu(const char *title,
 	menu_layout layout)
-	: BMenu(title, layout)
+	:
+	BMenu(title, layout)
 {
 }
 
@@ -89,7 +89,7 @@ ShowImageWindow::RecentDocumentsMenu::AddDynamicItem(add_state addState)
 		if (entry.Exists() && entry.GetName(name) == B_OK) {
 			msg = new BMessage(B_REFS_RECEIVED);
 			msg->AddRef("refs", &ref);
-			item =  new EntryMenuItem(&ref, name, msg, 0, 0);
+			item = new EntryMenuItem(&ref, name, msg, 0, 0);
 			AddItem(item);
 			item->SetTarget(be_app, NULL);
 		}
@@ -108,20 +108,27 @@ const char* kTranslatorField = "be:translator";
 
 
 ShowImageWindow::ShowImageWindow(const entry_ref *ref,
-		const BMessenger& trackerMessenger)
-	: BWindow(BRect(5, 24, 250, 100), "", B_DOCUMENT_WINDOW, 0)
+	const BMessenger& trackerMessenger)
+	:
+	BWindow(BRect(5, 24, 250, 100), "", B_DOCUMENT_WINDOW, 0),
+	fSavePanel(NULL),
+	fBar(NULL),
+	fOpenMenu(NULL),
+	fBrowseMenu(NULL),
+	fGoToPageMenu(NULL),
+	fSlideShowDelay(NULL),
+	fImageView(NULL),
+	fStatusView(NULL),
+	fModified(false),
+	fFullScreen(false),
+	fShowCaption(true),
+	fPrintSettings(NULL),
+	fResizerWindowMessenger(NULL),
+	fResizeItem(NULL),
+	fHeight(0),
+	fWidth(0)
 {
-	fSavePanel = NULL;
-	fModified = false;
-	fFullScreen = false;
-	fShowCaption = true;
-	fPrintSettings = NULL;
-	fImageView = NULL;
-	fSlideShowDelay = NULL;
-	fResizerWindowMessenger = NULL;
-	fHeight = fWidth = 0;
-
-	LoadSettings();
+	_LoadSettings();
 
 	// create menu bar
 	fBar = new BMenuBar(BRect(0, 0, Bounds().right, 1), "menu_bar");
@@ -160,8 +167,8 @@ ShowImageWindow::ShowImageWindow(const entry_ref *ref,
 	AddChild(fStatusView);
 
 	rect = Bounds();
-	rect.top    = viewFrame.top - 1;
-	rect.left 	= viewFrame.right + 1;
+	rect.top	= viewFrame.top - 1;
+	rect.left	= viewFrame.right + 1;
 	rect.bottom	= viewFrame.bottom + 1;
 	rect.right	+= 1;
 	BScrollBar *verticalScrollBar = new BScrollBar(rect, "vscroll", fImageView,
@@ -188,9 +195,9 @@ ShowImageWindow::ShowImageWindow(const entry_ref *ref,
 
 	// add View menu here so it can access ShowImageView methods
 	BMenu* menu = new BMenu("View");
-	BuildViewMenu(menu, false);
+	_BuildViewMenu(menu, false);
 	fBar->AddItem(menu);
-	MarkMenuItem(fBar, MSG_DITHER_IMAGE, fImageView->GetDither());
+	_MarkMenuItem(fBar, MSG_DITHER_IMAGE, fImageView->GetDither());
 	UpdateTitle();
 
 	SetPulseRate(100000);
@@ -234,15 +241,15 @@ ShowImageWindow::UpdateTitle()
 void
 ShowImageWindow::BuildContextMenu(BMenu *menu)
 {
-	BuildViewMenu(menu, true);
+	_BuildViewMenu(menu, true);
 }
 
 
 void
-ShowImageWindow::BuildViewMenu(BMenu *menu, bool popupMenu)
+ShowImageWindow::_BuildViewMenu(BMenu *menu, bool popupMenu)
 {
-	AddItemMenu(menu, "Slide Show", MSG_SLIDE_SHOW, 0, 0, this);
-	MarkMenuItem(menu, MSG_SLIDE_SHOW, fImageView->SlideShowStarted());
+	_AddItemMenu(menu, "Slide Show", MSG_SLIDE_SHOW, 0, 0, this);
+	_MarkMenuItem(menu, MSG_SLIDE_SHOW, fImageView->SlideShowStarted());
 	BMenu* delayMenu = new BMenu("Slide Delay");
 	if (fSlideShowDelay == NULL)
 		fSlideShowDelay = delayMenu;
@@ -252,60 +259,60 @@ ShowImageWindow::BuildViewMenu(BMenu *menu, bool popupMenu)
 	//		 if slide show delay is too short! (Especially if loading the image
 	//		 takes as long as or longer than the slide show delay). Should load
 	//		 in background thread!
-	AddDelayItem(delayMenu, "Three Seconds", 3);
-	AddDelayItem(delayMenu, "Four Second", 4);
-	AddDelayItem(delayMenu, "Five Seconds", 5);
-	AddDelayItem(delayMenu, "Six Seconds", 6);
-	AddDelayItem(delayMenu, "Seven Seconds", 7);
-	AddDelayItem(delayMenu, "Eight Seconds", 8);
-	AddDelayItem(delayMenu, "Nine Seconds", 9);
-	AddDelayItem(delayMenu, "Ten Seconds", 10);
-	AddDelayItem(delayMenu, "Twenty Seconds", 20);
+	_AddDelayItem(delayMenu, "Three Seconds", 3);
+	_AddDelayItem(delayMenu, "Four Second", 4);
+	_AddDelayItem(delayMenu, "Five Seconds", 5);
+	_AddDelayItem(delayMenu, "Six Seconds", 6);
+	_AddDelayItem(delayMenu, "Seven Seconds", 7);
+	_AddDelayItem(delayMenu, "Eight Seconds", 8);
+	_AddDelayItem(delayMenu, "Nine Seconds", 9);
+	_AddDelayItem(delayMenu, "Ten Seconds", 10);
+	_AddDelayItem(delayMenu, "Twenty Seconds", 20);
 	menu->AddItem(delayMenu);
 
 	menu->AddSeparatorItem();
 
-	AddItemMenu(menu, "Original Size", MSG_ORIGINAL_SIZE, 0, 0, this);
-	AddItemMenu(menu, "Zoom In", MSG_ZOOM_IN, '+', 0, this);
-	AddItemMenu(menu, "Zoom Out", MSG_ZOOM_OUT, '-', 0, this);
+	_AddItemMenu(menu, "Original Size", MSG_ORIGINAL_SIZE, 0, 0, this);
+	_AddItemMenu(menu, "Zoom In", MSG_ZOOM_IN, '+', 0, this);
+	_AddItemMenu(menu, "Zoom Out", MSG_ZOOM_OUT, '-', 0, this);
 
 	menu->AddSeparatorItem();
 
-	AddItemMenu(menu, "High-Quality Zooming", MSG_SCALE_BILINEAR, 0, 0, this);
+	_AddItemMenu(menu, "High-Quality Zooming", MSG_SCALE_BILINEAR, 0, 0, this);
 
 	menu->AddSeparatorItem();
 
-	AddItemMenu(menu, "Shrink to Window", MSG_SHRINK_TO_WINDOW, 0, 0, this);
-	AddItemMenu(menu, "Zoom to Window", MSG_ZOOM_TO_WINDOW, 0, 0, this);
+	_AddItemMenu(menu, "Shrink to Window", MSG_SHRINK_TO_WINDOW, 0, 0, this);
+	_AddItemMenu(menu, "Zoom to Window", MSG_ZOOM_TO_WINDOW, 0, 0, this);
 
 	menu->AddSeparatorItem();
 
-	AddItemMenu(menu, "Full Screen", MSG_FULL_SCREEN, 'F', 0, this);
-	MarkMenuItem(menu, MSG_FULL_SCREEN, fFullScreen);
+	_AddItemMenu(menu, "Full Screen", MSG_FULL_SCREEN, 'F', 0, this);
+	_MarkMenuItem(menu, MSG_FULL_SCREEN, fFullScreen);
 
 	AddShortcut(B_ENTER, 0, new BMessage(MSG_FULL_SCREEN));
 
-	AddItemMenu(menu, "Show Caption in Full Screen Mode", MSG_SHOW_CAPTION, 0,
+	_AddItemMenu(menu, "Show Caption in Full Screen Mode", MSG_SHOW_CAPTION, 0,
 		0, this);
-	MarkMenuItem(menu, MSG_SHOW_CAPTION, fShowCaption);
+	_MarkMenuItem(menu, MSG_SHOW_CAPTION, fShowCaption);
 
-	MarkMenuItem(menu, MSG_SCALE_BILINEAR, fImageView->GetScaleBilinear());
+	_MarkMenuItem(menu, MSG_SCALE_BILINEAR, fImageView->GetScaleBilinear());
 
 	bool shrink, zoom, enabled;
 
 	shrink = fImageView->GetShrinkToBounds();
 	zoom = fImageView->GetZoomToBounds();
-	MarkMenuItem(menu, MSG_SHRINK_TO_WINDOW, shrink);
-	MarkMenuItem(menu, MSG_ZOOM_TO_WINDOW, zoom);
+	_MarkMenuItem(menu, MSG_SHRINK_TO_WINDOW, shrink);
+	_MarkMenuItem(menu, MSG_ZOOM_TO_WINDOW, zoom);
 
 	enabled = !(shrink || zoom);
-	EnableMenuItem(menu, MSG_ORIGINAL_SIZE, enabled);
-	EnableMenuItem(menu, MSG_ZOOM_IN, enabled);
-	EnableMenuItem(menu, MSG_ZOOM_OUT, enabled);
+	_EnableMenuItem(menu, MSG_ORIGINAL_SIZE, enabled);
+	_EnableMenuItem(menu, MSG_ZOOM_IN, enabled);
+	_EnableMenuItem(menu, MSG_ZOOM_OUT, enabled);
 
 	if (popupMenu) {
 		menu->AddSeparatorItem();
-		AddItemMenu(menu, "As Desktop Background", MSG_DESKTOP_BACKGROUND, 0, 0,
+		_AddItemMenu(menu, "As Desktop Background", MSG_DESKTOP_BACKGROUND, 0, 0,
 			this);
 	}
 }
@@ -327,61 +334,61 @@ ShowImageWindow::AddMenus(BMenuBar *bar)
 		// Fill Save As submenu with all types that can be converted
 		// to from the Be bitmap image format
 	menu->AddItem(pmenuSaveAs);
-	AddItemMenu(menu, "Close", B_QUIT_REQUESTED, 'W', 0, this);
+	_AddItemMenu(menu, "Close", B_QUIT_REQUESTED, 'W', 0, this);
 	menu->AddSeparatorItem();
-	AddItemMenu(menu, "Page Setup" B_UTF8_ELLIPSIS, MSG_PAGE_SETUP, 0, 0, this);
-	AddItemMenu(menu, "Print" B_UTF8_ELLIPSIS, MSG_PREPARE_PRINT, 'P', 0, this);
+	_AddItemMenu(menu, "Page Setup" B_UTF8_ELLIPSIS, MSG_PAGE_SETUP, 0, 0, this);
+	_AddItemMenu(menu, "_Print" B_UTF8_ELLIPSIS, MSG_PREPARE_PRINT, 'P', 0, this);
 	menu->AddSeparatorItem();
-	AddItemMenu(menu, "About ShowImage" B_UTF8_ELLIPSIS, B_ABOUT_REQUESTED, 0, 0,
+	_AddItemMenu(menu, "About ShowImage" B_UTF8_ELLIPSIS, B_ABOUT_REQUESTED, 0, 0,
 		be_app);
 	menu->AddSeparatorItem();
-	AddItemMenu(menu, "Quit", B_QUIT_REQUESTED, 'Q', 0, be_app);
+	_AddItemMenu(menu, "Quit", B_QUIT_REQUESTED, 'Q', 0, be_app);
 	bar->AddItem(menu);
 
 	menu = new BMenu("Edit");
-	AddItemMenu(menu, "Undo", B_UNDO, 'Z', 0, this, false);
+	_AddItemMenu(menu, "Undo", B_UNDO, 'Z', 0, this, false);
 	menu->AddSeparatorItem();
-	AddItemMenu(menu, "Cut", B_CUT, 'X', 0, this, false);
-	AddItemMenu(menu, "Copy", B_COPY, 'C', 0, this, false);
-	AddItemMenu(menu, "Paste", B_PASTE, 'V', 0, this, false);
-	AddItemMenu(menu, "Clear", MSG_CLEAR_SELECT, 0, 0, this, false);
+	_AddItemMenu(menu, "Cut", B_CUT, 'X', 0, this, false);
+	_AddItemMenu(menu, "Copy", B_COPY, 'C', 0, this, false);
+	_AddItemMenu(menu, "Paste", B_PASTE, 'V', 0, this, false);
+	_AddItemMenu(menu, "Clear", MSG_CLEAR_SELECT, 0, 0, this, false);
 	menu->AddSeparatorItem();
-	AddItemMenu(menu, "Select All", MSG_SELECT_ALL, 'A', 0, this);
+	_AddItemMenu(menu, "Select All", MSG_SELECT_ALL, 'A', 0, this);
 	bar->AddItem(menu);
 
 	menu = fBrowseMenu = new BMenu("Browse");
-	AddItemMenu(menu, "First Page", MSG_PAGE_FIRST, B_LEFT_ARROW, B_SHIFT_KEY, this);
-	AddItemMenu(menu, "Last Page", MSG_PAGE_LAST, B_RIGHT_ARROW, B_SHIFT_KEY, this);
-	AddItemMenu(menu, "Previous Page", MSG_PAGE_PREV, B_LEFT_ARROW, 0, this);
-	AddItemMenu(menu, "Next Page", MSG_PAGE_NEXT, B_RIGHT_ARROW, 0, this);
+	_AddItemMenu(menu, "First Page", MSG_PAGE_FIRST, B_LEFT_ARROW, B_SHIFT_KEY, this);
+	_AddItemMenu(menu, "Last Page", MSG_PAGE_LAST, B_RIGHT_ARROW, B_SHIFT_KEY, this);
+	_AddItemMenu(menu, "Previous Page", MSG_PAGE_PREV, B_LEFT_ARROW, 0, this);
+	_AddItemMenu(menu, "Next Page", MSG_PAGE_NEXT, B_RIGHT_ARROW, 0, this);
 	fGoToPageMenu = new BMenu("Go to Page");
 	fGoToPageMenu->SetRadioMode(true);
 	menu->AddItem(fGoToPageMenu);
 	menu->AddSeparatorItem();
-	AddItemMenu(menu, "Previous File", MSG_FILE_PREV, B_UP_ARROW, 0, this);
-	AddItemMenu(menu, "Next File", MSG_FILE_NEXT, B_DOWN_ARROW, 0, this);
+	_AddItemMenu(menu, "Previous File", MSG_FILE_PREV, B_UP_ARROW, 0, this);
+	_AddItemMenu(menu, "Next File", MSG_FILE_NEXT, B_DOWN_ARROW, 0, this);
 	bar->AddItem(menu);
 
 	menu = new BMenu("Image");
-	AddItemMenu(menu, "Rotate Counterclockwise", MSG_ROTATE_270, '[', 0, this);
-	AddItemMenu(menu, "Rotate Clockwise", MSG_ROTATE_90, ']', 0, this);
+	_AddItemMenu(menu, "Rotate Counterclockwise", MSG_ROTATE_270, '[', 0, this);
+	_AddItemMenu(menu, "Rotate Clockwise", MSG_ROTATE_90, ']', 0, this);
 	menu->AddSeparatorItem();
-	AddItemMenu(menu, "Flip Left to Right", MSG_FLIP_LEFT_TO_RIGHT, 0, 0, this);
-	AddItemMenu(menu, "Flip Top to Bottom", MSG_FLIP_TOP_TO_BOTTOM, 0, 0, this);
+	_AddItemMenu(menu, "Flip Left to Right", MSG_FLIP_LEFT_TO_RIGHT, 0, 0, this);
+	_AddItemMenu(menu, "Flip Top to Bottom", MSG_FLIP_TOP_TO_BOTTOM, 0, 0, this);
 	menu->AddSeparatorItem();
-	AddItemMenu(menu, "Invert Colors", MSG_INVERT, 0, 0, this);
+	_AddItemMenu(menu, "Invert Colors", MSG_INVERT, 0, 0, this);
 	menu->AddSeparatorItem();
-	fResizeItem = AddItemMenu(menu, "Resize" B_UTF8_ELLIPSIS,
+	fResizeItem = _AddItemMenu(menu, "Resize" B_UTF8_ELLIPSIS,
 		MSG_OPEN_RESIZER_WINDOW, 0, 0, this);
 	bar->AddItem(menu);
 	menu->AddSeparatorItem();
-	AddItemMenu(menu, "Use as Desktop Background", MSG_DESKTOP_BACKGROUND, 0, 0,
+	_AddItemMenu(menu, "Use as Desktop Background", MSG_DESKTOP_BACKGROUND, 0, 0,
 		this);
 }
 
 
 BMenuItem*
-ShowImageWindow::AddItemMenu(BMenu *menu, const char *label, uint32 what,
+ShowImageWindow::_AddItemMenu(BMenu *menu, const char *label, uint32 what,
 	const char shortcut, uint32 modifier, const BHandler *target, bool enabled)
 {
 	BMenuItem* item = new BMenuItem(label, new BMessage(what), shortcut, modifier);
@@ -395,7 +402,7 @@ ShowImageWindow::AddItemMenu(BMenu *menu, const char *label, uint32 what,
 
 
 BMenuItem*
-ShowImageWindow::AddDelayItem(BMenu *menu, const char *label, float value)
+ShowImageWindow::_AddDelayItem(BMenu *menu, const char *label, float value)
 {
 	BMessage* message = new BMessage(MSG_SLIDE_SHOW_DELAY);
 	message->AddFloat("value", value);
@@ -461,7 +468,7 @@ ShowImageWindow::FrameResized(float width, float height)
 
 
 bool
-ShowImageWindow::ToggleMenuItem(uint32 what)
+ShowImageWindow::_ToggleMenuItem(uint32 what)
 {
 	bool marked = false;
 	BMenuItem *item = fBar->FindItem(what);
@@ -474,7 +481,7 @@ ShowImageWindow::ToggleMenuItem(uint32 what)
 
 
 void
-ShowImageWindow::EnableMenuItem(BMenu *menu, uint32 what, bool enable)
+ShowImageWindow::_EnableMenuItem(BMenu *menu, uint32 what, bool enable)
 {
 	BMenuItem* item = menu->FindItem(what);
 	if (item && item->IsEnabled() != enable)
@@ -483,7 +490,7 @@ ShowImageWindow::EnableMenuItem(BMenu *menu, uint32 what, bool enable)
 
 
 void
-ShowImageWindow::MarkMenuItem(BMenu *menu, uint32 what, bool marked)
+ShowImageWindow::_MarkMenuItem(BMenu *menu, uint32 what, bool marked)
 {
 	BMenuItem* item = menu->FindItem(what);
 	if (item && item->IsMarked() != marked)
@@ -492,7 +499,7 @@ ShowImageWindow::MarkMenuItem(BMenu *menu, uint32 what, bool marked)
 
 
 void
-ShowImageWindow::MarkSlideShowDelay(float value)
+ShowImageWindow::_MarkSlideShowDelay(float value)
 {
 	const int32 n = fSlideShowDelay->CountItems();
 	float v;
@@ -510,18 +517,18 @@ ShowImageWindow::MarkSlideShowDelay(float value)
 
 
 void
-ShowImageWindow::ResizeToWindow(bool shrink, uint32 what)
+ShowImageWindow::_ResizeToWindow(bool shrink, uint32 what)
 {
-	bool enabled = ToggleMenuItem(what);
+	bool enabled = _ToggleMenuItem(what);
 	if (shrink)
 		fImageView->SetShrinkToBounds(enabled);
 	else
 		fImageView->SetZoomToBounds(enabled);
 
 	enabled = !(fImageView->GetShrinkToBounds() || fImageView->GetZoomToBounds());
-	EnableMenuItem(fBar, MSG_ORIGINAL_SIZE, enabled);
-	EnableMenuItem(fBar, MSG_ZOOM_IN, enabled);
-	EnableMenuItem(fBar, MSG_ZOOM_OUT, enabled);
+	_EnableMenuItem(fBar, MSG_ORIGINAL_SIZE, enabled);
+	_EnableMenuItem(fBar, MSG_ZOOM_IN, enabled);
+	_EnableMenuItem(fBar, MSG_ZOOM_OUT, enabled);
 }
 
 
@@ -538,12 +545,12 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			// User clicked Save As then choose an output format
 			if (!fSavePanel)
 				// If user doesn't already have a save panel open
-				SaveAs(message);
+				_SaveAs(message);
 			break;
 
 		case MSG_SAVE_PANEL:
 			// User specified where to save the output image
-			SaveToFile(message);
+			_SaveToFile(message);
 			break;
 
 		case B_CANCEL:
@@ -556,13 +563,13 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			int32 curPage = fImageView->CurrentPage();
 
 			bool benable = (pages > 1) ? true : false;
-			EnableMenuItem(fBar, MSG_PAGE_FIRST, benable);
-			EnableMenuItem(fBar, MSG_PAGE_LAST, benable);
-			EnableMenuItem(fBar, MSG_PAGE_NEXT, benable);
-			EnableMenuItem(fBar, MSG_PAGE_PREV, benable);
+			_EnableMenuItem(fBar, MSG_PAGE_FIRST, benable);
+			_EnableMenuItem(fBar, MSG_PAGE_LAST, benable);
+			_EnableMenuItem(fBar, MSG_PAGE_NEXT, benable);
+			_EnableMenuItem(fBar, MSG_PAGE_PREV, benable);
 
-			EnableMenuItem(fBar, MSG_FILE_NEXT, fImageView->HasNextFile());
-			EnableMenuItem(fBar, MSG_FILE_PREV, fImageView->HasPrevFile());
+			_EnableMenuItem(fBar, MSG_FILE_NEXT, fImageView->HasNextFile());
+			_EnableMenuItem(fBar, MSG_FILE_PREV, fImageView->HasPrevFile());
 
 			if (fGoToPageMenu->CountItems() != pages) {
 				// Only rebuild the submenu if the number of
@@ -607,7 +614,7 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			// invert algorithm)
 			color_space colors = B_NO_COLOR_SPACE;
 			message->FindInt32("colors", reinterpret_cast<int32 *>(&colors));
-			EnableMenuItem(fBar, MSG_INVERT, (colors != B_CMAP8));
+			_EnableMenuItem(fBar, MSG_INVERT, (colors != B_CMAP8));
 
 			BString status;
 			bool messageProvidesSize = false;
@@ -625,7 +632,7 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			}
 
 			if (messageProvidesSize) {
-				UpdateResizerWindow(fWidth, fHeight);
+				_UpdateResizerWindow(fWidth, fHeight);
 			}
 
 			fStatusView->SetText(status);
@@ -649,16 +656,16 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			// can update the state of the appropriate menu items
 			bool benable;
 			if (message->FindBool("has_selection", &benable) == B_OK) {
-				EnableMenuItem(fBar, B_CUT, benable);
-				EnableMenuItem(fBar, B_COPY, benable);
-				EnableMenuItem(fBar, MSG_CLEAR_SELECT, benable);
+				_EnableMenuItem(fBar, B_CUT, benable);
+				_EnableMenuItem(fBar, B_COPY, benable);
+				_EnableMenuItem(fBar, MSG_CLEAR_SELECT, benable);
 			}
 		}	break;
 
 		case MSG_UNDO_STATE: {
 			bool benable;
 			if (message->FindBool("can_undo", &benable) == B_OK)
-				EnableMenuItem(fBar, B_UNDO, benable);
+				_EnableMenuItem(fBar, B_UNDO, benable);
 		}	break;
 
 		case MSG_CLIPBOARD_CHANGED: {
@@ -666,7 +673,7 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			// response to a B_CLIPBOARD_CHANGED message
 			bool bdata;
 			if (message->FindBool("data_available", &bdata) == B_OK)
-				EnableMenuItem(fBar, B_PASTE, bdata);
+				_EnableMenuItem(fBar, B_PASTE, bdata);
 		}	break;
 
 		case B_UNDO:
@@ -694,27 +701,27 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			break;
 
 		case MSG_PAGE_FIRST:
-			if (ClosePrompt())
+			if (_ClosePrompt())
 				fImageView->FirstPage();
 			break;
 
 		case MSG_PAGE_LAST:
-			if (ClosePrompt())
+			if (_ClosePrompt())
 				fImageView->LastPage();
 			break;
 
 		case MSG_PAGE_NEXT:
-			if (ClosePrompt())
+			if (_ClosePrompt())
 				fImageView->NextPage();
 			break;
 
 		case MSG_PAGE_PREV:
-			if (ClosePrompt())
+			if (_ClosePrompt())
 				fImageView->PrevPage();
 			break;
 
 		case MSG_GOTO_PAGE: {
-			if (!ClosePrompt())
+			if (!_ClosePrompt())
 				break;
 
 			int32 newPage;
@@ -736,24 +743,24 @@ ShowImageWindow::MessageReceived(BMessage *message)
 		}	break;
 
 		case MSG_DITHER_IMAGE:
-			fImageView->SetDither(ToggleMenuItem(message->what));
+			fImageView->SetDither(_ToggleMenuItem(message->what));
 			break;
 
 		case MSG_SHRINK_TO_WINDOW:
-			ResizeToWindow(true, message->what);
+			_ResizeToWindow(true, message->what);
 			break;
 
 		case MSG_ZOOM_TO_WINDOW:
-			ResizeToWindow(false, message->what);
+			_ResizeToWindow(false, message->what);
 			break;
 
 		case MSG_FILE_PREV:
-			if (ClosePrompt())
+			if (_ClosePrompt())
 				fImageView->PrevFile();
 			break;
 
 		case MSG_FILE_NEXT:
-			if (ClosePrompt())
+			if (_ClosePrompt())
 				fImageView->NextFile();
 			break;
 
@@ -785,7 +792,7 @@ ShowImageWindow::MessageReceived(BMessage *message)
 				item->SetMarked(false);
 				fResizeItem->SetEnabled(true);
 				fImageView->StopSlideShow();
-			} else if (ClosePrompt()) {
+			} else if (_ClosePrompt()) {
 				item->SetMarked(true);
 				fResizeItem->SetEnabled(false);
 				fImageView->StartSlideShow();
@@ -797,21 +804,21 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			if (message->FindFloat("value", &value) == B_OK) {
 				fImageView->SetSlideShowDelay(value);
 				// in case message is sent from popup menu
-				MarkSlideShowDelay(value);
+				_MarkSlideShowDelay(value);
 			}
 		}	break;
 
 		case MSG_FULL_SCREEN:
-			ToggleFullScreen();
+			_ToggleFullScreen();
 			break;
 
 		case MSG_EXIT_FULL_SCREEN:
 			if (fFullScreen)
-				ToggleFullScreen();
+				_ToggleFullScreen();
 			break;
 
 		case MSG_SHOW_CAPTION: {
-			fShowCaption = ToggleMenuItem(message->what);
+			fShowCaption = _ToggleMenuItem(message->what);
 			ShowImageSettings* settings = my_app->Settings();
 
 			if (settings->Lock()) {
@@ -823,15 +830,15 @@ ShowImageWindow::MessageReceived(BMessage *message)
 		}	break;
 
 		case MSG_PAGE_SETUP:
-			PageSetup();
+			_PageSetup();
 			break;
 
 		case MSG_PREPARE_PRINT:
-			PrepareForPrint();
+			_PrepareForPrint();
 			break;
 
 		case MSG_PRINT:
-			Print(message);
+			_Print(message);
 			break;
 
 		case MSG_ZOOM_IN:
@@ -847,13 +854,13 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			break;
 
 		case MSG_SCALE_BILINEAR:
-			fImageView->SetScaleBilinear(ToggleMenuItem(message->what));
+			fImageView->SetScaleBilinear(_ToggleMenuItem(message->what));
 			break;
 
 		case MSG_OPEN_RESIZER_WINDOW: {
 			if (fImageView->GetBitmap() != NULL) {
 				BRect rect = fImageView->GetBitmap()->Bounds();
-				OpenResizerWindow(rect.IntegerWidth()+1, rect.IntegerHeight()+1);
+				_OpenResizerWindow(rect.IntegerWidth()+1, rect.IntegerHeight()+1);
 			}
 		}	break;
 
@@ -885,7 +892,7 @@ ShowImageWindow::MessageReceived(BMessage *message)
 
 
 void
-ShowImageWindow::SaveAs(BMessage *message)
+ShowImageWindow::_SaveAs(BMessage *message)
 {
 	// Read the translator and output type the user chose
 	translator_id outTranslator;
@@ -915,7 +922,7 @@ ShowImageWindow::SaveAs(BMessage *message)
 
 
 void
-ShowImageWindow::SaveToFile(BMessage *message)
+ShowImageWindow::_SaveToFile(BMessage *message)
 {
 	// Read in where the file should be saved
 	entry_ref dirRef;
@@ -960,7 +967,7 @@ ShowImageWindow::SaveToFile(BMessage *message)
 
 
 bool
-ShowImageWindow::ClosePrompt()
+ShowImageWindow::_ClosePrompt()
 {
 	if (!fModified)
 		return true;
@@ -990,7 +997,7 @@ ShowImageWindow::ClosePrompt()
 
 
 void
-ShowImageWindow::ToggleFullScreen()
+ShowImageWindow::_ToggleFullScreen()
 {
 	BRect frame;
 	fFullScreen = !fFullScreen;
@@ -1021,7 +1028,7 @@ ShowImageWindow::ToggleFullScreen()
 
 
 void
-ShowImageWindow::LoadSettings()
+ShowImageWindow::_LoadSettings()
 {
 	ShowImageSettings* settings = my_app->Settings();
 
@@ -1050,7 +1057,7 @@ ShowImageWindow::LoadSettings()
 
 
 void
-ShowImageWindow::SavePrintOptions()
+ShowImageWindow::_SavePrintOptions()
 {
 	ShowImageSettings* settings = my_app->Settings();
 
@@ -1066,7 +1073,7 @@ ShowImageWindow::SavePrintOptions()
 
 
 bool
-ShowImageWindow::PageSetup()
+ShowImageWindow::_PageSetup()
 {
 	BString name;
 	fImageView->GetName(&name);
@@ -1085,7 +1092,7 @@ ShowImageWindow::PageSetup()
 
 
 void
-ShowImageWindow::PrepareForPrint()
+ShowImageWindow::_PrepareForPrint()
 {
 	if (fPrintSettings == NULL) {
 		BString name;
@@ -1105,13 +1112,13 @@ ShowImageWindow::PrepareForPrint()
 
 
 void
-ShowImageWindow::Print(BMessage *msg)
+ShowImageWindow::_Print(BMessage *msg)
 {
 	status_t st;
 	if (msg->FindInt32("status", &st) != B_OK || st != B_OK)
 		return;
 
-	SavePrintOptions();
+	_SavePrintOptions();
 
 	BString name;
 	fImageView->GetName(&name);
@@ -1178,7 +1185,7 @@ ShowImageWindow::Print(BMessage *msg)
 
 
 void
-ShowImageWindow::OpenResizerWindow(int32 width, int32 height)
+ShowImageWindow::_OpenResizerWindow(int32 width, int32 height)
 {
 	if (fResizerWindowMessenger == NULL) {
 		// open window if it is not already opened
@@ -1192,7 +1199,7 @@ ShowImageWindow::OpenResizerWindow(int32 width, int32 height)
 
 
 void
-ShowImageWindow::UpdateResizerWindow(int32 width, int32 height)
+ShowImageWindow::_UpdateResizerWindow(int32 width, int32 height)
 {
 	if (fResizerWindowMessenger == NULL)
 		return;
@@ -1205,7 +1212,7 @@ ShowImageWindow::UpdateResizerWindow(int32 width, int32 height)
 
 
 void
-ShowImageWindow::CloseResizerWindow()
+ShowImageWindow::_CloseResizerWindow()
 {
 	if (fResizerWindowMessenger == NULL)
 		return;
@@ -1224,10 +1231,10 @@ ShowImageWindow::QuitRequested()
 		return false;
 	}
 
-	bool quit = ClosePrompt();
+	bool quit = _ClosePrompt();
 
 	if (quit) {
-		CloseResizerWindow();
+		_CloseResizerWindow();
 
 		// tell the app to forget about this window
 		be_app->PostMessage(MSG_WINDOW_QUIT);
