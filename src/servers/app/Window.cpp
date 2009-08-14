@@ -1204,7 +1204,7 @@ Window::_AlterDeltaForSnap(BPoint& delta, bigtime_t now)
 void
 Window::WorkspaceActivated(int32 index, bool active)
 {
-	if (!active)
+	if (!active && !IsHidden())
 		fWindow->HandleDirectConnection(B_DIRECT_STOP);
 
 	BMessage activatedMsg(B_WORKSPACE_ACTIVATED);
@@ -1214,7 +1214,7 @@ Window::WorkspaceActivated(int32 index, bool active)
 
 	ServerWindow()->SendMessageToClient(&activatedMsg);
 
-	if (active)
+	if (active && !IsHidden())
 		fWindow->HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
 }
 
