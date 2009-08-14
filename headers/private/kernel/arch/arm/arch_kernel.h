@@ -6,9 +6,8 @@
 #define _KERNEL_ARCH_ARM_KERNEL_H
 
 #include <arch/cpu.h>
-#warning "ARM:todo memory map is wrong"
 // memory layout
-#define KERNEL_BASE 0x80500000
+#define KERNEL_BASE 0x80000000
 #define KERNEL_SIZE 0x80000000
 #define KERNEL_TOP  (KERNEL_BASE + (KERNEL_SIZE - 1))
 
