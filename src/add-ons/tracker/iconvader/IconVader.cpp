@@ -80,7 +80,7 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 
 
 
-	alert = new BAlert("Error", "IconVader:\nClick on the icons to get points. Avoid symlinks!", "Ok");
+	alert = new BAlert("Error", "IconVader:\nClick on the icons to get points.\nAvoid symlinks!", "Ok");
 	alert->Go();
 
 
@@ -104,10 +104,18 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 					score-=10;
 				pose->Select(false);
 			}
+#ifdef __HAIKU__
 			BPoint location = pose->Location(view);
+#else
+			BPoint location = pose->Location();
+#endif
 			location.x += ((rand() % 20) - 10);
 			location.y += ((rand() % 20) - 10);
+#ifdef __HAIKU__
 			pose->SetLocation(location, view);
+#else
+			pose->SetLocation(location);
+#endif
 		}
 
 		view->CheckPoseVisibility();
