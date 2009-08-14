@@ -21,6 +21,7 @@
 #include <boot/menu.h>
 #include <boot/kernel_args.h>
 #include <boot/images.h>
+#include <boot/platform/generic/video.h>
 #include <util/list.h>
 #include <drivers/driver_settings.h>
 
@@ -702,135 +703,17 @@ set_text_mode(void)
 //	#pragma mark - blit
 
 
-static void
-blit32(const uint8 *data, uint16 width, uint16 height, uint16 imageWidth,
-	uint16 left, uint16 top)
+void
+platform_blit4(addr_t frameBuffer, uint32 bytesPerRow, const uint8 *data,
+	uint16 width, uint16 height, uint16 imageWidth, uint16 left, uint16 top)
 {
-	uint32 *start = (uint32 *)(sFrameBuffer
-		+ gKernelArgs.frame_buffer.bytes_per_row * top + 4 * left);
-
-	for (int32 y = 0; y < height; y++) {
-		const uint8* src = data;
-		uint32* dst = start;
-		for (int32 x = 0; x < width; x++) {
-			dst[0] = (src[2] << 16) | (src[1] << 8) | (src[0]);
-			dst++;
-			src += 3;
-		}
-
-		data += imageWidth * 3;
-		start = (uint32 *)((addr_t)start
-			+ gKernelArgs.frame_buffer.bytes_per_row);
-	}
-}
-
-
-static void
-blit24(const uint8 *data, uint16 width, uint16 height, uint16 imageWidth,
-	uint16 left, uint16 top)
-{
-	uint8 *start = (uint8 *)sFrameBuffer
-		+ gKernelArgs.frame_buffer.bytes_per_row * top + 3 * left;
-
-	for (int32 y = 0; y < height; y++) {
-		const uint8* src = data;
-		uint8* dst = start;
-		for (int32 x = 0; x < width; x++) {
-			dst[0] = src[0];
-			dst[1] = src[1];
-			dst[2] = src[2];
-			dst += 3;
-			src += 3;
-		}
-
-		data += imageWidth * 3;
-		start = start + gKernelArgs.frame_buffer.bytes_per_row;
-	}
-}
-
-
-static void
-blit16(const uint8 *data, uint16 width, uint16 height, uint16 imageWidth,
-	uint16 left, uint16 top)
-{
-	uint16 *start = (uint16 *)(sFrameBuffer
-		+ gKernelArgs.frame_buffer.bytes_per_row * top + 2 * left);
-
-	for (int32 y = 0; y < height; y++) {
-		const uint8* src = data;
-		uint16* dst = start;
-		for (int32 x = 0; x < width; x++) {
-			dst[0] = ((src[2] >> 3) << 11)
-				| ((src[1] >> 2) << 5)
-				| ((src[0] >> 3));
-			dst++;
-			src += 3;
-		}
-
-		data += imageWidth * 3;
-		start = (uint16 *)((addr_t)start
-			+ gKernelArgs.frame_buffer.bytes_per_row);
-	}
-}
-
-
-static void
-blit15(const uint8 *data, uint16 width, uint16 height, uint16 imageWidth,
-	uint16 left, uint16 top)
-{
-	uint16 *start = (uint16 *)(sFrameBuffer
-		+ gKernelArgs.frame_buffer.bytes_per_row * top + 2 * left);
-
-	for (int32 y = 0; y < height; y++) {
-		const uint8* src = data;
-		uint16* dst = start;
-		for (int32 x = 0; x < width; x++) {
-			dst[0] = ((src[2] >> 3) << 10)
-				| ((src[1] >> 3) << 5)
-				| ((src[0] >> 3));
-			dst++;
-			src += 3;
-		}
-
-		data += imageWidth * 3;
-		start = (uint16 *)((addr_t)start
-			+ gKernelArgs.frame_buffer.bytes_per_row);
-	}
-}
-
-
-static void
-blit8(const uint8 *data, uint16 width, uint16 height, uint16 imageWidth,
-	const uint8 *palette, uint16 left, uint16 top)
-{
-	if (!data || !palette)
+	if (!data)
 		return;
-
-	if (vesa_set_palette((const uint8 *)palette, 0, 256) != B_OK)
-		dprintf("set palette failed!\n");
-
-	addr_t start = sFrameBuffer + gKernelArgs.frame_buffer.bytes_per_row * top
-		+ left;
-
-	for (int32 i = 0; i < height; i++) {
-		memcpy((void *)(start + gKernelArgs.frame_buffer.bytes_per_row * i),
-			&data[i * imageWidth], width);
-	}
-}
-
-
-static void
-blit4(const uint8 *data, uint16 width, uint16 height, uint16 imageWidth,
-	const uint8 *palette, uint16 left, uint16 top)
-{
-	if (!data || !palette)
-		return;
-	//	vga_set_palette((const uint8 *)kPalette16, 0, 16);
 	// ToDo: no boot logo yet in VGA mode
 #if 1
 // this draws 16 big rectangles in all the available colors
 	uint8 *bits = (uint8 *)sFrameBuffer;
-	uint32 bytesPerRow = 80;
+	bytesPerRow = 80;
 	for (int32 i = 0; i < 32; i++) {
 		bits[9 * bytesPerRow + i + 2] = 0x55;
 		bits[30 * bytesPerRow + i + 2] = 0xaa;
@@ -876,91 +759,18 @@ blit_image(const uint8 *data, uint16 width, uint16 height, uint16 imageWidth,
 {
 	switch (gKernelArgs.frame_buffer.depth) {
 		case 4:
-			return blit4(data, width, height, imageWidth, palette,
-				left, top);
+			//vga_set_palette((const uint8 *)kPalette16, 0, 16);
+			break;
 		case 8:
-			return blit8(data, width, height, imageWidth, palette,
-				left, top);
-		case 15:
-			return blit15(data, width, height, imageWidth, left, top);
-		case 16:
-			return blit16(data, width, height, imageWidth, left, top);
-		case 24:
-			return blit24(data, width, height, imageWidth, left, top);
-		case 32:
-			return blit32(data, width, height, imageWidth, left, top);
+			if (vesa_set_palette((const uint8 *)palette, 0, 256) != B_OK)
+				dprintf("set palette failed!\n");
+
+			break;
+		default:
+			break;
 	}
-}
-
-
-static void
-uncompress_24bit_RLE(const uint8 compressed[], uint8 *uncompressed)
-{
-	uint32 cursorUncompressed = 0;
-	uint32 cursorCompressed = 0;
-	uint8 count = 0;
-	uint8 item = 0;
-	int i = 0;
-	for (uint8 c = 0; c < 3; c++) {
-		// for Red channel, then Green, then finally Blue...
-		cursorUncompressed = c;
-		while (compressed[cursorCompressed]) {
-			// at the end of the channel there is a terminating 0,
-			// so the loop will end... (ref: generate_boot_screen.cpp)
-			count = compressed[cursorCompressed++];
-			if (count < 128) {
-				// regular run, repeat "item" "count" times...
-				item = compressed[cursorCompressed++];
-				for (i = count - 1; i >= 0; --i) {
-					uncompressed[cursorUncompressed] = item;
-					cursorUncompressed += 3;
-				}
-			} else {
-				// enumeration, just write the next "count" items as is...
-				count = count - 128;
-				for (i = count - 1; i >= 0; --i) {
-					uncompressed[cursorUncompressed]
-						= compressed[cursorCompressed++];
-					cursorUncompressed += 3;
-				}
-			}
-		}
-		// the current position of compressed[cursor] is the end of channel,
-		// we skip it...
-		cursorCompressed++;
-	}
-}
-
-static void
-uncompress_8Bit_RLE(const uint8 compressed[], uint8 *uncompressed)
-{
-	uint32 cursorUncompressed = 0;
-	uint32 cursorCompressed = 0;
-	uint8 count = 0;
-	uint8 item = 0;
-	int i = 0;
-
-	while (compressed[cursorCompressed]) {
-		// at the end of the channel there is a terminating 0,
-		// so the loop will end... (ref: generate_boot_screen.cpp)
-		count = compressed[cursorCompressed++];
-		if (count < 128) {
-			// regular run, repeat "item" "count" times...
-			item = compressed[cursorCompressed++];
-			for (i = count - 1; i >= 0; --i) {
-				uncompressed[cursorUncompressed] = item;
-				cursorUncompressed++;
-			}
-		} else {
-			// enumeration, just write the next "count" items as is...
-			count = count - 128;
-			for (i = count - 1; i >= 0; --i) {
-				uncompressed[cursorUncompressed]
-					= compressed[cursorCompressed++];
-				cursorUncompressed++;
-			}
-		}
-	}
+	video_blit_image(sFrameBuffer, gKernelArgs.frame_buffer.bytes_per_row,
+		data, width, height, imageWidth, left, top);
 }
 
 
@@ -1048,7 +858,7 @@ fallback:
 				* kSplashLogoHeight);
 			if (uncompressedLogo == NULL)
 				return;
-			uncompress_8Bit_RLE(kSplashLogo8BitCompressedImage,
+			uncompress_8bit_RLE(kSplashLogo8BitCompressedImage,
 				uncompressedLogo);
 		break;
 		default:
@@ -1091,7 +901,7 @@ fallback:
 					* kSplashIconsHeight);
 			if (gKernelArgs.boot_splash == NULL)
 				return;
-			uncompress_8Bit_RLE(kSplashIcons8BitCompressedImage,
+			uncompress_8bit_RLE(kSplashIcons8BitCompressedImage,
 				gKernelArgs.boot_splash );
 			lowerHalfIconImage = gKernelArgs.boot_splash
 				+ (kSplashIconsWidth * iconsHalfHeight);
