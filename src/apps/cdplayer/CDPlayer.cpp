@@ -220,7 +220,7 @@ CDPlayer::BuildGUI()
 	r.left = 10;
 	r.right = fPlay->Frame().right;
 	r.top = fStop->Frame().bottom + 14;
-	r.bottom = r.top + kVolumeSliderBitmapHeight - 1.0;
+	r.bottom = r.top + 14;
 	fVolumeSlider = new VolumeSlider(r, "VolumeSlider",
 		0, 255, new BMessage(M_SET_VOLUME), this);
 	AddChild(fVolumeSlider);
