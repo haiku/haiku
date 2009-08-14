@@ -153,12 +153,12 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		0x40FFFFFF,
 		MMU_L2_FLAG_B,
         },
-        {
+/*        {
                 "RAM_image\0",//15MB for the initrd should be enough..
 		0xA0000000,
 		0xA1ffffff,
 		MMU_L2_FLAG_C,
-        },
+        },*/
         {
                 "RAM_loader\0",//1MB loader
 		0xA2000000,
@@ -181,6 +181,12 @@ static struct memblock LOADER_MEMORYMAP[] = {
                 "RAM_stack\0",//stack
 		0xA3200000,
 		0xA4000000,
+		MMU_L2_FLAG_C,
+        },
+        {
+                "RAM_initrd\0",//stack
+		0xA4000000,
+		0xA4500000,
 		MMU_L2_FLAG_C,
         },
 
