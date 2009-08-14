@@ -7,19 +7,11 @@
 
 #include <SupportDefs.h>
 
-struct fb_description {
-        uint8 *base;
-        uint32 size;
-        uint32 bytes_per_row;
-        uint16 width;
-        uint16 height;
-        uint8 depth;
-        bool enabled;
-};
-
-extern struct fb_description gFrameBuffer;
-
-extern status_t arch_init_video();
+/* try to detect current video mode and set gFrameBuffer accordingly */
+extern status_t arch_probe_video_mode();
+/* try to set a video mode */
+extern status_t arch_set_video_mode(int width, int height, int depth);
+extern status_t arch_set_default_video_mode();
 
 
 #endif /* _ARCH_VIDEO_H */

@@ -12,7 +12,7 @@
 #include <boot/platform.h>
 #include <boot/menu.h>
 #include <boot/kernel_args.h>
-#include <boot/images.h>
+#include <boot/platform/generic/video.h>
 #include <util/list.h>
 #include <drivers/driver_settings.h>
 
@@ -28,6 +28,7 @@
 #	define TRACE(x) ;
 #endif
 
+void *gFrameBufferBase = NULL;
 
 
 //	#pragma mark -
@@ -65,19 +66,47 @@ video_mode_menu()
 
 //	#pragma mark -
 
+
+extern "C" void
+platform_set_palette(const uint8 *palette)
+{
+}
+
+
+extern "C" void
+platform_blit4(addr_t frameBuffer, const uint8 *data, uint16 width, uint16 height,
+	uint16 imageWidth, uint16 left, uint16 top)
+{
+}
+
 extern "C" void
 platform_switch_to_logo(void)
 {
+	TRACE(("%s()\n", __FUNCTION__));
 	// in debug mode, we'll never show the logo
 	if ((platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT) != 0)
 		return;
-        #warning ARM:TODO
+
+	//XXX: not yet, DISABLED
+	return;
+
+	status_t err;
+
+	err = arch_set_default_video_mode();
+	dprintf("set video mode: 0x%08x\n", err);
+	if (err < B_OK)
+		return;
+
+	err = video_display_splash((addr_t)gFrameBufferBase);
+	dprintf("video_display_splash: 0x%08x\n", err);
+	#warning ARM:TODO
 }
 
 
 extern "C" void
 platform_switch_to_text_mode(void)
 {
+	TRACE(("%s()\n", __FUNCTION__));
 	#warning ARM:TODO
 }
 
@@ -85,9 +114,12 @@ platform_switch_to_text_mode(void)
 extern "C" status_t
 platform_init_video(void)
 {
+	TRACE(("%s()\n", __FUNCTION__));
     	#warning ARM:TODO
-dprintf("init_video\n");
-	return arch_init_video();
+	arch_probe_video_mode();
+	//XXX for testing
+	//platform_switch_to_logo();
+	//return arch_probe_video_mode();
 	//return B_OK;
 }
 

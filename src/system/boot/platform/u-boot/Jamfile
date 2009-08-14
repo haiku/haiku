@@ -23,6 +23,13 @@ local uImageFakeOS = "netbsd" ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
+local genericPlatformSources =
+	text_menu.cpp
+	video_blit.cpp
+	video_splash.cpp
+	video_rle.cpp
+;
+
 KernelMergeObject boot_platform_u-boot.o :
 	shell.S
 	start2.c
@@ -35,9 +42,8 @@ KernelMergeObject boot_platform_u-boot.o :
 	cpu.cpp
 	uimage.cpp
 	video.cpp
-	mmu.cpp	
-	# generic
-	text_menu.cpp
+	mmu.cpp
+	$(genericPlatformSources)
 
 
 	: -fno-pic
@@ -199,7 +205,7 @@ BuildUBootSDImage haiku.mmc : $(HAIKU_BOARD_SDIMAGE_FILES) ;
 
 SEARCH on [ FGristFiles shell.S ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) arch $(TARGET_ARCH) ] ;
-SEARCH on [ FGristFiles text_menu.cpp ]
+SEARCH on [ FGristFiles $(genericPlatformSources) ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
 # Tell the build system to where stage1.bin can be found, so it can be used
