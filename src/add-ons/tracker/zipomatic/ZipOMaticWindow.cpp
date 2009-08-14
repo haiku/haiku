@@ -61,20 +61,16 @@ ZippoWindow::ZippoWindow(BRect frame, BMessage* refs)
 	BSeparatorView* separator = new BSeparatorView(B_HORIZONTAL);
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
-	BLayoutBuilder::Group<> group = BLayoutBuilder::Group<>();
-	group.AddGroup(B_VERTICAL, 10)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 10)
 		.Add(fActivityView)
 		.Add(fArchiveNameView)
 		.Add(fZipOutputView)
 		.Add(separator)
 		.Add(fStopButton)
 		.SetInsets(14, 14, 14, 14)
-		.End()
-	.End();
-	AddChild(group.View());
+		.End();
 
-	if (refs != NULL)
-	{
+	if (refs != NULL) {
 		fWindowGotRefs = true;
 		_StartZipping(refs);
 	}
@@ -136,9 +132,39 @@ ZippoWindow::MessageReceived(BMessage* message)
 
 		case ZIPPO_LINE_OF_STDOUT:
 		{
+			static int32 fileCount = 0;
 			BString string;
-			if (message->FindString("zip_output", &string) == B_OK)
-				fZipOutputView->SetText(string.String());
+			if (message->FindString("zip_output", &string) == B_OK) {
+				if (string.FindFirst("Adding: ") == 0
+					|| string.FindFirst("Updating: ") == 0) {
+
+					// This is a workaround for the current window resizing
+					// behavior as the window resizes for each line of output.
+					// Instead of showing the true output of /bin/zip
+					// we display a file count and whether the archive is
+					// being created (added to) or if we're updating an 
+					// already existing archive.
+
+					fileCount++;
+					BString countString;
+					countString << fileCount;
+
+					if (fileCount == 1)
+						countString << " file ";
+					else
+						countString << " files ";
+
+					if (string.FindFirst("Adding: ") == 0)
+						countString << " added.";
+
+					if (string.FindFirst("Updating: ") == 0)
+						countString << " updated.";
+
+					fZipOutputView->SetText(countString.String());
+				} else {
+					fZipOutputView->SetText(string.String());
+				}
+			}
 			break;
 		}
 
