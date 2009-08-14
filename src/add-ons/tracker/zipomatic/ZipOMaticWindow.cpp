@@ -37,6 +37,7 @@ ZippoWindow::ZippoWindow(BRect frame, BMessage* refs)
 	fThread(NULL),
 	fWindowGotRefs(false),
 	fZippingWasStopped(false),
+	fFileCount(0),
 	fWindowInvoker(new BInvoker(new BMessage(ZIPPO_QUIT_OR_CONTINUE), NULL,
 		this))
 {
@@ -132,7 +133,6 @@ ZippoWindow::MessageReceived(BMessage* message)
 
 		case ZIPPO_LINE_OF_STDOUT:
 		{
-			static int32 fileCount = 0;
 			BString string;
 			if (message->FindString("zip_output", &string) == B_OK) {
 				if (string.FindFirst("Adding: ") == 0
@@ -145,14 +145,14 @@ ZippoWindow::MessageReceived(BMessage* message)
 					// being created (added to) or if we're updating an 
 					// already existing archive.
 
-					fileCount++;
+					fFileCount++;
 					BString countString;
-					countString << fileCount;
+					countString << fFileCount;
 
-					if (fileCount == 1)
-						countString << " file ";
+					if (fFileCount == 1)
+						countString << " file";
 					else
-						countString << " files ";
+						countString << " files";
 
 					if (string.FindFirst("Adding: ") == 0)
 						countString << " added.";
@@ -218,6 +218,7 @@ ZippoWindow::_StartZipping(BMessage* message)
 {
 	fStopButton->SetEnabled(true);
 	fActivityView->Start();
+	fFileCount = 0;
 
 	fThread = new ZipperThread(message, this);
 	fThread->Start();

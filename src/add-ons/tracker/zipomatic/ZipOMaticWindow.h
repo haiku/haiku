@@ -37,6 +37,7 @@ private:
 	
 			bool			fWindowGotRefs;
 			bool			fZippingWasStopped;
+			int32			fFileCount;
 			
 			BInvoker*		fWindowInvoker;
 };
