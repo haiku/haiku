@@ -333,7 +333,7 @@ TermApp::_SanitizeIDs(BMessage* data, uint8* windows, ssize_t length)
 			continue;
 
 		BString id("id-");
-		id << i;
+		id << i + 1;
 
 		team_id team;
 		if (data->FindInt32(id.String(), &team) != B_OK)
