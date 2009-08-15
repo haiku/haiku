@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -495,7 +495,7 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	PRINT(("common_select(): events deselected\n"));
 
-	// collect the events that happened in the meantime
+	// collect the events that have happened in the meantime
 
 	int count = 0;
 
@@ -546,13 +546,9 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 static int
 common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 {
-	status_t status = B_OK;
-	int count = 0;
-	uint32 i;
-
 	// allocate sync object
 	select_sync* sync;
-	status = create_select_sync(numFDs, sync);
+	status_t status = create_select_sync(numFDs, sync);
 	if (status != B_OK)
 		return status;
 
@@ -560,41 +556,43 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 
 	// start polling file descriptors (by selecting them)
 
-	for (i = 0; i < numFDs; i++) {
+	bool invalid = false;
+	for (uint32 i = 0; i < numFDs; i++) {
 		int fd = fds[i].fd;
 
 		// initialize events masks
-		sync->set[i].selected_events = (fds[i].events & ~POLLNVAL)
-			| POLLERR | POLLHUP;
+		sync->set[i].selected_events = fds[i].events
+			| POLLNVAL | POLLERR | POLLHUP;
 		sync->set[i].events = 0;
+		fds[i].revents = 0;
 
-		if (select_fd(fd, sync->set + i, kernel) == B_OK) {
-			fds[i].revents = 0;
-			if (sync->set[i].selected_events != 0)
-				count++;
-		} else
+		if (fd >= 0 && select_fd(fd, sync->set + i, kernel) != B_OK) {
+			sync->set[i].events = POLLNVAL;
 			fds[i].revents = POLLNVAL;
+				// indicates that the FD doesn't need to be deselected
+			invalid = true;
+		}
 	}
 
-	if (numFDs > 0 && count < 1) {
-		count = B_BAD_VALUE;
-		goto err;
+	if (!invalid) {
+		status = acquire_sem_etc(sync->sem, 1,
+			B_CAN_INTERRUPT | (timeout >= 0 ? B_ABSOLUTE_TIMEOUT : 0), timeout);
 	}
-
-	status = acquire_sem_etc(sync->sem, 1,
-		B_CAN_INTERRUPT | (timeout >= 0 ? B_ABSOLUTE_TIMEOUT : 0), timeout);
 
 	// deselect file descriptors
 
-	for (i = 0; i < numFDs; i++)
-		deselect_fd(fds[i].fd, sync->set + i, kernel);
+	for (uint32 i = 0; i < numFDs; i++) {
+		if (fds[i].fd >= 0 && (fds[i].revents & POLLNVAL) == 0)
+			deselect_fd(fds[i].fd, sync->set + i, kernel);
+	}
 
-	// collect the events that are happened in the meantime
+	// collect the events that have happened in the meantime
 
+	int count = 0;
 	switch (status) {
 		case B_OK:
-			for (count = 0, i = 0; i < numFDs; i++) {
-				if (fds[i].revents == POLLNVAL)
+			for (uint32 i = 0; i < numFDs; i++) {
+				if (fds[i].fd < 0)
 					continue;
 
 				// POLLxxx flags and B_SELECT_xxx flags are compatible
@@ -609,10 +607,9 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 			break;
 		default:
 			// B_TIMED_OUT, and B_WOULD_BLOCK
-			count = 0;
+			break;
 	}
 
-err:
 	put_select_sync(sync);
 
 	T(PollDone(fds, numFDs, count));
@@ -635,7 +632,6 @@ common_wait_for_objects(object_wait_info* infos, int numInfos, uint32 flags,
 
 	// start selecting objects
 
-	ssize_t count = 0;
 	bool invalid = false;
 	for (int i = 0; i < numInfos; i++) {
 		uint16 type = infos[i].type;
@@ -645,22 +641,15 @@ common_wait_for_objects(object_wait_info* infos, int numInfos, uint32 flags,
 		sync->set[i].selected_events = infos[i].events
 			| B_EVENT_INVALID | B_EVENT_ERROR | B_EVENT_DISCONNECTED;
 		sync->set[i].events = 0;
+		infos[i].events = 0;
 
-		if (type < kSelectOpsCount
-			&& kSelectOps[type].select(object, sync->set + i, kernel) == B_OK) {
-			infos[i].events = 0;
-			if (sync->set[i].selected_events != 0)
-				count++;
-		} else {
-			sync->set[i].selected_events = B_EVENT_INVALID;
+		if (type >= kSelectOpsCount
+			|| kSelectOps[type].select(object, sync->set + i, kernel) != B_OK) {
+			sync->set[i].events = B_EVENT_INVALID;
 			infos[i].events = B_EVENT_INVALID;
+				// indicates that the object doesn't need to be deselected
 			invalid = true;
 		}
-	}
-
-	if (numInfos > 0 && count < 1) {
-		put_select_sync(sync);
-		return B_BAD_VALUE;
 	}
 
 	if (!invalid) {
@@ -677,22 +666,19 @@ common_wait_for_objects(object_wait_info* infos, int numInfos, uint32 flags,
 			kSelectOps[type].deselect(infos[i].object, sync->set + i, kernel);
 	}
 
-	// collect the events that are happened in the meantime
+	// collect the events that have happened in the meantime
 
-	switch (status) {
-		case B_OK:
-			count = 0;
-			for (int i = 0; i < numInfos; i++) {
-				infos[i].events = sync->set[i].events
-					& sync->set[i].selected_events;
-				if (infos[i].events != 0)
-					count++;
-			}
-			break;
-		default:
-			// B_INTERRUPTED, B_TIMED_OUT, and B_WOULD_BLOCK
-			count = status;
-			break;
+	ssize_t count = 0;
+	if (status == B_OK) {
+		for (int i = 0; i < numInfos; i++) {
+			infos[i].events = sync->set[i].events
+				& sync->set[i].selected_events;
+			if (infos[i].events != 0)
+				count++;
+		}
+	} else {
+		// B_INTERRUPTED, B_TIMED_OUT, and B_WOULD_BLOCK
+		count = status;
 	}
 
 	put_select_sync(sync);
@@ -1040,9 +1026,10 @@ _user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout)
 	result = common_poll(fds, numFDs, timeout, false);
 
 	// copy back results
-	if (result >= 0 && numFDs > 0 && user_memcpy(userfds, fds, bytes) < B_OK)
-		result = B_BAD_ADDRESS;
-	else
+	if (numFDs > 0 && user_memcpy(userfds, fds, bytes) != 0) {
+		if (result >= 0)
+			result = B_BAD_ADDRESS;
+	} else
 		syscall_restart_handle_timeout_post(result, timeout);
 
 err:
@@ -1084,9 +1071,10 @@ _user_wait_for_objects(object_wait_info* userInfos, int numInfos, uint32 flags,
 		result = common_wait_for_objects(infos, numInfos, flags, timeout,
 			false);
 
-		if (result >= 0 && user_memcpy(userInfos, infos, bytes) != B_OK)
-			result = B_BAD_ADDRESS;
-		else
+		if (user_memcpy(userInfos, infos, bytes) != B_OK) {
+			if (result >= 0)
+				result = B_BAD_ADDRESS;
+		} else
 			syscall_restart_handle_timeout_post(result, timeout);
 	} else
 		result = B_BAD_ADDRESS;
