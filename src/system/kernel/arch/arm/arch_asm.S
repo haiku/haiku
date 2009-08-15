@@ -49,7 +49,9 @@ FUNCTION_END(arch_int_restore_interrupts)
 FUNCTION(arch_int_are_interrupts_enabled):
         mrs     r0, cpsr
         and     r0, r0, #(1<<7)		/*read the I bit*/
-	mvn	r0, r0			/*negate it since 1 means disabled interrupts*/
+	cmp 	r0,#0
+	moveq	r0,#1
+	movne	r0,#0
 	bx 	lr
 FUNCTION_END(arch_int_are_interrupts_enabled)
 
