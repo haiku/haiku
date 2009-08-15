@@ -176,21 +176,36 @@ AppearancePrefView::MessageReceived(BMessage *msg)
 
 	switch (msg->what) {
 		case MSG_HALF_FONT_CHANGED:
-			PrefHandler::Default()->setString(PREF_HALF_FONT_FAMILY,
-				fFont->Menu()->FindMarked()->Label());
-			modified = true;
+			if (strcmp(
+					PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY),
+					fFont->Menu()->FindMarked()->Label())) {
+
+				PrefHandler::Default()->setString(PREF_HALF_FONT_FAMILY,
+					fFont->Menu()->FindMarked()->Label());
+				modified = true;
+			}
 			break;
 
 		case MSG_HALF_SIZE_CHANGED:
-			PrefHandler::Default()->setString(PREF_HALF_FONT_SIZE,
-				fFontSize->Menu()->FindMarked()->Label());
-			modified = true;
+			if (strcmp(PrefHandler::Default()->getString(PREF_HALF_FONT_SIZE),
+					fFontSize->Menu()->FindMarked()->Label())) {
+	
+				PrefHandler::Default()->setString(PREF_HALF_FONT_SIZE,
+					fFontSize->Menu()->FindMarked()->Label());
+				modified = true;
+			}
 			break;
 
-		case MSG_COLOR_CHANGED:
-			PrefHandler::Default()->setRGB(fColorField->Menu()->FindMarked()->Label(),
-				fColorControl->ValueAsColor());
-			modified = true;
+		case MSG_COLOR_CHANGED: {
+				rgb_color oldColor = PrefHandler::Default()->getRGB(
+					fColorField->Menu()->FindMarked()->Label());
+				if (oldColor != fColorControl->ValueAsColor()) {
+					PrefHandler::Default()->setRGB(
+						fColorField->Menu()->FindMarked()->Label(),
+						fColorControl->ValueAsColor());
+					modified = true;
+				}
+			}
 			break;
 
 		case MSG_COLOR_FIELD_CHANGED:
