@@ -57,12 +57,22 @@ OpenWindow::OpenWindow()
 		.Add(probeDeviceButton, 2, 1)
 		.SetInsets(8, 8, 8, 8)
 	);
-
-	// TODO: This does not center the window, since with layout management,
-	// the window will still have an invalid size at this point.
 	BScreen screen(this);
-	MoveTo(screen.Frame().left + (screen.Frame().Width() - Frame().Width()) / 2,
-		screen.Frame().top + (screen.Frame().Height() - Frame().Height()) / 2);
+	// move the window offscreen..
+	MoveTo(screen.Frame().right+20, screen.Frame().top);
+	fCentered = true;
+}
+
+
+void
+OpenWindow::FrameResized(float width, float height)
+{
+	if (fCentered) {
+		BScreen screen(this);
+		MoveTo(screen.Frame().left + (screen.Frame().Width() - width) / 2,
+			screen.Frame().top + (screen.Frame().Height() - height) / 2);
+	}
+	fCentered = false;
 }
 
 

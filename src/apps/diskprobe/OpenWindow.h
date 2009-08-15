@@ -20,11 +20,14 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
+	virtual void				FrameResized(float width, float height);
+
 	static	void				CollectDevices(BMenu* menu,
 									BEntry* startEntry = NULL);
 
 private:
 			BMenu*				fDevicesMenu;
+			bool				fCentered;
 };
 
 #endif	/* OPEN_WINDOW_H */
