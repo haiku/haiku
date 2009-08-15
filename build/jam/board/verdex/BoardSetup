@@ -70,4 +70,12 @@ TARGET_KERNEL_C++FLAGS += -mcpu=xscale ;
 TARGET_CCFLAGS += -mcpu=xscale ;
 TARGET_C++FLAGS += -mcpu=xscale ;
 
+# Workaround for ld using 32k for alignment despite forcing it in the config...
+# should definitely not be needed!
+TARGET_KERNEL_LINKFLAGS +=
+	-Wl,-z -Wl,max-page-size=0x1000
+	-Wl,-z -Wl,common-page-size=0x1000 ;
+TARGET_LINKFLAGS +=
+	-Wl,-z -Wl,max-page-size=0x1000
+	-Wl,-z -Wl,common-page-size=0x1000 ;
 
