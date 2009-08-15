@@ -83,6 +83,12 @@ platform_start_kernel(void)
 	dprintf("kernel entry at %lx\n",
 		gKernelArgs.kernel_image.elf_header.e_entry);
 
+	
+        asm( "MOV sp, %[adr]"::[adr] "r" (stackTop)  );
+	asm( "MOV r0, %[args]"::[args] "r" (args) );
+	asm( "MOV r1, #0"::);
+	asm( "MOV pc, %[entry]"::[entry] "r" (gKernelArgs.kernel_image.elf_header.e_entry));
+
 /*	asm("movl	%0, %%eax;	"			// move stack out of way
 		"movl	%%eax, %%esp; "
 		: : "m" (stackTop));
