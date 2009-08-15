@@ -90,14 +90,28 @@ CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc, BList* queryResponse)
 		// Check status code.
 		BString statusCode;
 		output.MoveInto(statusCode, 0, 3);
-		if (statusCode == "210") {
+		if (statusCode == "210" || statusCode == "211") {
+			// TODO(bga): We can get around with returning the first result
+			// in case of multiple matches, but we most definitely needs a
+			// better handling of inexact matches.
+			if (statusCode == "211")
+				printf("Warning : Inexact match found.\n");
+
 			// Multiple results, remove the first line and parse the others.
 			output.Remove(0, output.FindFirst("\r\n") + 2);
 		} else if (statusCode == "200") {
 			// Remove the first char which is a left over space.
 			output.Remove(0, 1);
+		} else if (statusCode == "202") {
+			// No match found.
+			printf("Error : CDDB entry for id %s not found.", hexCddbId);
+			
+			return B_ENTRY_NOT_FOUND;
 		} else {
 			// Something bad happened.
+			printf("Error : CDDB server status code is %s.",
+				statusCode.String());
+
 			return B_ERROR;
 		}
 		
