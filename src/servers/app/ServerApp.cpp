@@ -2285,15 +2285,18 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			uint32 workspace;
 			link.Read<uint32>(&workspace);
 
-			// TODO: the display_mode can be different between
-			// the various screens.
-			// We have the screen_id and the workspace number, with these we
-			// need to find the corresponding "driver", and call getmode on it
 			display_mode mode;
-			fDesktop->ScreenAt(0)->GetMode(&mode);
-			// actually this isn't still enough as different workspaces can
-			// have different display_modes
-
+			if (fDesktop->LockSingleWindow()) {
+				// TODO: the display_mode can be different between
+				// the various screens.
+				// We have the screen_id and the workspace number,
+				// with these we need to find the corresponding
+				// "driver", and call getmode on it
+				fDesktop->ScreenAt(0)->GetMode(&mode);
+				// actually this isn't still enough as different
+				// workspaces can have different display_modes
+				fDesktop->UnlockSingleWindow();
+			}
 			fLink.StartMessage(B_OK);
 			fLink.Attach<display_mode>(mode);
 			fLink.Flush();
@@ -2995,9 +2998,9 @@ ServerApp::CreatePicture(const ServerPicture* original)
 {
 	ServerPicture* picture;
 	if (original != NULL)
-		picture = new(std::nothrow) ServerPicture(*original);
+		picture = new (std::nothrow) ServerPicture(*original);
 	else
-		picture = new(std::nothrow) ServerPicture();
+		picture = new (std::nothrow) ServerPicture();
 
 	if (picture != NULL)
 		fPictureList.AddItem(picture);
