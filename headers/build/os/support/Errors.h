@@ -179,7 +179,7 @@ enum {
 #define HAIKU_ESTALE          (B_POSIX_ERROR_BASE + 40)
 #define HAIKU_EOVERFLOW       (B_POSIX_ERROR_BASE + 41)
 #define HAIKU_EMSGSIZE        (B_POSIX_ERROR_BASE + 42)
-#define HAIKU_EOPNOTSUPP      (B_POSIX_ERROR_BASE + 43)                       
+#define HAIKU_EOPNOTSUPP      (B_POSIX_ERROR_BASE + 43)
 #define HAIKU_ENOTSOCK		(B_POSIX_ERROR_BASE + 44)
 #define HAIKU_EHOSTDOWN		(B_POSIX_ERROR_BASE + 45)
 #define HAIKU_EBADMSG			(B_POSIX_ERROR_BASE + 46)
@@ -196,6 +196,7 @@ enum {
 #define HAIKU_EPROTO			(B_POSIX_ERROR_BASE + 57)
 #define HAIKU_ETIME			(B_POSIX_ERROR_BASE + 58)
 #define HAIKU_ETXTBSY			(B_POSIX_ERROR_BASE + 59)
+#define HAIKU_ENOATTR			(B_POSIX_ERROR_BASE + 60)
 
 
 /*---- POSIX errors that can be mapped to BeOS error codes ----*/
@@ -224,7 +225,6 @@ enum {
 #define HAIKU_ELOOP			B_LINK_LIMIT
 #define HAIKU_ENOEXEC			B_NOT_AN_EXECUTABLE
 #define HAIKU_EPIPE			B_BUSTED_PIPE
-#define HAIKU_ENOATTR		B_ENTRY_NOT_FOUND
 
 #ifndef BUILDING_HAIKU_ERROR_MAPPER
 	#undef E2BIG
@@ -312,7 +312,7 @@ enum {
 	#undef ENOEXEC
 	#undef EPIPE
 	#undef ENOATTR
-	
+
 	#define E2BIG HAIKU_E2BIG
 	#define ECHILD HAIKU_ECHILD
 	#define EDEADLK HAIKU_EDEADLK
