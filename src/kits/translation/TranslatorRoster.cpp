@@ -438,6 +438,9 @@ BTranslatorRoster::Private::AddPath(const char* path, int32* _added)
 
 	entry_ref ref;
 	while (directory.GetNextRef(&ref) == B_OK) {
+		BEntry entry(&ref);
+		if (entry.IsDirectory())
+			continue;
 		if (CreateTranslators(ref, count) == B_OK)
 			count++;
 
