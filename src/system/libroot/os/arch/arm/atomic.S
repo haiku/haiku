@@ -18,7 +18,7 @@ miss1:	       	ldrex       r12, [r0]
         	teq         r3,  #0
         	bne         miss1
         	mov         r0,  r12
-	        mov         pc,  lr
+	        bx          lr
 #else
         /* disable interrupts, do the add, and reenable */
         mrs     r2, cpsr
@@ -53,7 +53,7 @@ miss2:	       	ldrex       r12, [r0]
         	teq         r3,  #0
         	bne         miss2
         	mov         r0,  r12
-	        mov         pc,  lr
+	        bx          lr
 #else
         /* disable interrupts, do the and, and reenable */
         mrs     r2, cpsr
@@ -87,7 +87,7 @@ miss3:	       	ldrex       r12, [r0]
         	teq         r3,  #0
         	bne         miss3
         	mov         r0,  r12
-	        mov         pc,  lr
+	        bx	lr
 #else
         /* disable interrupts, do the or, and reenable */
         mrs     r2, cpsr
@@ -118,7 +118,23 @@ miss4:		ldrex   r12, [r0]
        		strex   r3, r1, [r0]
        		teq     r3, #0
        		bne     miss4
-	        mov         pc,  lr
+	        bx  lr
+#else
+        /* disable interrupts, do the mov, and reenable */
+        mrs     r2, cpsr
+        mov     r12, r2
+        orr     r2, r2, #(3<<6)
+        msr     cpsr_c, r2
+
+        /* ints disabled, old cpsr state in r12 */
+	
+        mov     r3, r0
+        ldr     r0, [r3]
+        str     r1, [r3]
+
+        /* restore interrupts and exit */
+        msr     cpsr_c, r12
+        bx      lr
 #endif
 FUNCTION_END(atomic_set)
 
@@ -137,14 +153,13 @@ differ: clrex                           	    @ clrex
 same:   mov         r0,  r12*/
 #endif
 #warning TODO TODO TODO
-        mov         pc,  lr
+        bx  lr
 FUNCTION_END(atomic_test_and_set)
 
 /* int atomic_get(int *value) 
  */
-#warning ARM:atomic_get ich nix verstehen !!!!!!!!!!!!
 FUNCTION(atomic_get):
-        mov         pc,  lr
+        bx  lr
 FUNCTION_END(atomic_get)
 
 
