@@ -65,6 +65,9 @@ SECTIONS
 	__exidx_end = .;
 
 
+	.dynamic : { *(.dynamic) } :dynamic :data
+
+
 	/* writable data  */
 	__data_start_rom = .;	/* in one segment binaries, the rom data address is on top of the ram data address */
 	__data_start = .;
@@ -77,7 +80,6 @@ SECTIONS
 	.dtors : { *(.dtors) }
 	__dtor_end = .;
 	.got : { *(.got.plt) *(.got) }
-	.dynamic : { *(.dynamic) }
 
 	__data_end = .;
 
