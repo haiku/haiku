@@ -25,7 +25,7 @@
 
 
 
-#define TRACE_MMU
+//#define TRACE_MMU
 #ifdef TRACE_MMU
 #	define TRACE(x) dprintf x
 #else
@@ -150,7 +150,7 @@ static struct memblock LOADER_MEMORYMAP[] = {
         {
                 "devices\0",
 		0x40000000,
-		0x40FFFFFF,
+		0x44FFFFFF,
 		MMU_L2_FLAG_B,
         },
 /*        {
@@ -483,12 +483,11 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 	TRACE(("map_page: pageTable 0x%lx\n", (sPageDirectory[virtualAddress
                 / (1024 * 1024)] & 0xfffffc00) ));
 	if(pageTable == NULL){
-		TRACE(("panic"));
-		panic("map:page no page_directory entry!!!");
-/*		add_page_table(virtualAddress);
+//		TRACE(("panic"));
+//		panic("map:page no page_directory entry!!!");
+		add_page_table(virtualAddress);
 		pageTable = (uint32 *)(sPageDirectory[virtualAddress
                 / (1024 * 1024)] & 0xfffffc00);
-*/
 	}
 
 	uint32 tableEntry = (virtualAddress % (B_PAGE_SIZE * 256)) / B_PAGE_SIZE;
@@ -570,9 +569,11 @@ mmu_allocate(void *virtualAddress, size_t size)
 
 		// is the address within the valid range?
 		if (address < KERNEL_BASE
-			|| address + size >= KERNEL_BASE + kMaxKernelSize)
+			|| address + size >= KERNEL_BASE + kMaxKernelSize){
+			TRACE(("mmu_allocate in illegal range\n address: %lx  KERNELBASE: %lx KERNEL_BASE + kMaxKernelSize: %lx  address + size : %lx \n ",     (uint32)address , KERNEL_BASE,  KERNEL_BASE 
++ kMaxKernelSize,(uint32)(address + size)       ));	
 			return NULL;
-
+		}
 		for (uint32 i = 0; i < size; i++) {
 			map_page(address, get_next_physical_page(B_PAGE_SIZE), kDefaultPageFlags);
 			address += B_PAGE_SIZE;
