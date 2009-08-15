@@ -29,7 +29,6 @@ class FindWindow : public BWindow {
 
 		virtual void Quit();
 		virtual void MessageReceived(BMessage *msg);
-		virtual void DispatchMessage(BMessage* message, BHandler* handler);
 
 	private:
 		void _SendFindMessage();
