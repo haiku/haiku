@@ -5,7 +5,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,11 +44,12 @@ width="64" height="64" />Installer</h1>
 <tr><td>Settings:</td><td></td><td><i>none</i></td></tr>
 </table>
 
-<p>The Installer is used to copy Haiku onto another volume. Upon launch it displays a start window with important information. It's not a mindless EULA you're used to click away in the blink of an eye, it states:</p>
+<p>The Installer is used to copy Haiku onto another volume.<br />
+Upon launch it displays a start window with important information. It's not a mindless EULA you're used to click away in the blink of an eye, it states:</p>
 <ul>
 <li><p>This is alpha-quality software. Make backups or suffer the consequences!</p></li>
 <li><p>The Installer needs a prepared partition. You may have to use a <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> or a similar tool until Haiku's DriveSetup is mature enough to handle this task.</p></li>
-<li><p>Haiku can be added manually to the bootmanager GRUB. In short, you have add an entry to <span class="path">/boot/grub/menu.lst</span> of your Linux installation, similar to this:</p>
+<li><p>Haiku can be added manually to the bootmanager <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a>. In short, you have add an entry to <span class="path">/boot/grub/menu.lst</span> of your Linux installation, similar to this:</p>
 <pre># Haiku on /dev/sda7
 title		Haiku
 rootnoverify	(hd0,6)
@@ -60,9 +61,9 @@ chainloader	+1</pre></li>
 <p>In the first drop-down menu you choose the source for the installation. It can be a currently installed Haiku or can come from an install CD or USB drive, etc.<br />
 The second drop-down menu specifies the target for the installation. This target partition/volume will be completely overwritten and has to be set aside beforehand by a partitioning tool like GParted.</p>
 <p>Clicking the little expander widget will <i>Show Optional Packages</i>, if available, that you can choose to install in addition to the basic Haiku.</p>
-<p>You should do a last check if you really picked the right target before starting the installation process. Click on <span class="button">Setup partitions...</span> to open <a href="drivesetup.html">DriveSetup</a> and have a look at the naming and layout of the available volumes and partitions.</p>
-<p><span class="button">Begin</span> starts the installation procedure, which basically copies everything but the <span class="path">home/</span> and <span class="path">common/</span> folder onto the target volume.</p>
-<p>If you don't use a bootmanager like GRUB, where you can add Haiku (see start window), you can use the button <span class="button">Write Boot Sector</span> to make it bootable directly.</p>
+<p>You should do a last check if you really picked the right target before starting the installation process. Click on <span class="button">Setup partitions...</span> to open <a href="apps-drivesetup.html">DriveSetup</a> and have a look at the naming and layout of the available volumes and partitions.</p>
+<p><span class="button">Begin</span> starts the installation procedure, which basically copies everything but the <span class="path">home/</span> and <span class="path">common/</span> folder onto the target volume and makes it bootable.</p>
+<p>It can happen that some other operating system or partitioning tool (accidentally) overwrites the boot sector of your Haiku volume. The button <span class="button">Write Boot Sector</span> makes it bootable again.</p>
 
 </div>
 
