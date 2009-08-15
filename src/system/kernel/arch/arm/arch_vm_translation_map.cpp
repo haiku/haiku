@@ -117,3 +117,13 @@ arch_vm_translation_map_early_query(addr_t va, addr_t *out_physical)
 }
 
 
+bool
+arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
+        uint32 protection)
+{
+#warning ARM:WRITEME
+        return TRUE;
+//get_vm_ops()-arch_vm_translation_map_is_kernel_page_accessible(virtualAddress,
+  //              protection);
+}
+
