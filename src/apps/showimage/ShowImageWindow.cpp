@@ -39,7 +39,6 @@
 #include <TranslationUtils.h>
 #include <TranslatorRoster.h>
 
-#include "BackgroundImage.h"
 #include "EntryMenuItem.h"
 #include "ResizerWindow.h"
 #include "ShowImageApp.h"
@@ -310,7 +309,7 @@ ShowImageWindow::_BuildViewMenu(BMenu *menu, bool popupMenu)
 
 	if (popupMenu) {
 		menu->AddSeparatorItem();
-		_AddItemMenu(menu, "As Desktop Background", MSG_DESKTOP_BACKGROUND, 0, 0,
+		_AddItemMenu(menu, "Use as Background", MSG_DESKTOP_BACKGROUND, 0, 0,
 			this);
 	}
 }
@@ -380,7 +379,7 @@ ShowImageWindow::AddMenus(BMenuBar *bar)
 		MSG_OPEN_RESIZER_WINDOW, 0, 0, this);
 	bar->AddItem(menu);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, "Use as Desktop Background", MSG_DESKTOP_BACKGROUND, 0, 0,
+	_AddItemMenu(menu, "Use as Background", MSG_DESKTOP_BACKGROUND, 0, 0,
 		this);
 }
 
@@ -874,12 +873,11 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			break;
 
 		case MSG_DESKTOP_BACKGROUND: {
-			BPath path;
-			if (path.SetTo(fImageView->Image()) == B_OK) {
-				BackgroundImage::SetDesktopImage(B_CURRENT_WORKSPACE,
-					path.Path(), BackgroundImage::kScaledToFit,
-					BPoint(0, 0), false);
-			}
+			BMessage message(B_REFS_RECEIVED);
+			message.AddRef("refs", fImageView->Image());
+			// This is used in the Backgrounds code for scaled placement
+			message.AddInt32("placement", 'scpl');
+			be_roster->Launch("application/x-vnd.haiku-backgrounds", &message);
 		}	break;
 
 		default:

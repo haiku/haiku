@@ -21,6 +21,7 @@ static const char *kSignature = "application/x-vnd.haiku-backgrounds";
 class BackgroundsApplication : public BApplication {
 	public:
 		BackgroundsApplication();
+		virtual void RefsReceived(BMessage* message);
 };
 
 class BackgroundsWindow : public BWindow {
@@ -48,6 +49,14 @@ BackgroundsApplication::BackgroundsApplication()
 	window->Show();
 }
 
+
+void
+BackgroundsApplication::RefsReceived(BMessage* message)
+{
+	if (CountWindows() > 0)
+		BMessenger(WindowAt(0)->ChildAt(0)).SendMessage(message);
+
+}
 
 //	#pragma mark -
 

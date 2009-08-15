@@ -1646,13 +1646,33 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 		return;
 	}
 
+	bool shiftKeyDown = (modifiers() & B_SHIFT_KEY) > 0;
+
 	switch (*bytes) {
 		case B_DOWN_ARROW:
+			if (shiftKeyDown)
+				_ScrollRestrictedBy(0, 10);
+			else
+				_SendMessageToWindow(MSG_FILE_NEXT);
+			break;
 		case B_RIGHT_ARROW:
-			_SendMessageToWindow(MSG_FILE_NEXT);
+			if (shiftKeyDown)
+				_ScrollRestrictedBy(10, 0);
+			else
+				_SendMessageToWindow(MSG_FILE_NEXT);
 			break;
 		case B_UP_ARROW:
+			if (shiftKeyDown)
+				_ScrollRestrictedBy(0, -10);
+			else
+				_SendMessageToWindow(MSG_FILE_PREV);
+			break;
 		case B_LEFT_ARROW:
+			if (shiftKeyDown)
+				_ScrollRestrictedBy(-10, 0);
+			else
+				_SendMessageToWindow(MSG_FILE_PREV);
+			break;
 		case B_BACKSPACE:
 			_SendMessageToWindow(MSG_FILE_PREV);
 			break;

@@ -1022,6 +1022,13 @@ BackgroundsView::RefsReceived(BMessage *msg)
 				fLastImageIndex = -index - 1;
 			}
 
+			// An optional placement may have been sent
+			int32 placement = 0;
+			if (msg->FindInt32("placement", &placement) == B_OK) {
+				BMenuItem* item = fPlacementMenu->FindItem(placement);
+				if (item)
+					item->SetMarked(true);
+			}
 			item->SetMarked(true);
 			BMessenger(this).SendMessage(kMsgImageSelected);
 		} else if (node.IsDirectory()) {
