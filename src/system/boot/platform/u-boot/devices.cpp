@@ -27,7 +27,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 
 	if (!args->platform.boot_tgz_data || !args->platform.boot_tgz_size)
 		return B_DEVICE_NOT_FOUND;
-
+	TRACE("Memory Disk at: %lx size: %lx\n",args->platform.boot_tgz_data, args->platform.boot_tgz_size);
 	MemoryDisk* disk = new(nothrow) MemoryDisk(
 		(const uint8 *)args->platform.boot_tgz_data, 
 		args->platform.boot_tgz_size, "boot.tgz");
