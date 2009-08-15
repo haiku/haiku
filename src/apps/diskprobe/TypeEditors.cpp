@@ -36,24 +36,6 @@ static const uint32 kMsgScaleChanged = 'scch';
 static const uint32 kMimeTypeItem = 'miti';
 
 
-class StringEditorTextView : public BTextView {
-	public:
-		StringEditorTextView(BRect rect, TypeEditorView* target);
-		
-		bool	fCommit;
-
-	protected:
-		virtual	void	InsertText(const char* text,
-							int32 length, int32 offset,
-							const text_run_array* runs = NULL);
-
-		virtual	void	DeleteText(int32 start, int32 finish);
-	
-	private:
-		TypeEditorView*		fTarget;
-};
-
-
 class StringEditor : public TypeEditorView {
 	public:
 		StringEditor(BRect rect, DataEditor& editor);
@@ -62,13 +44,13 @@ class StringEditor : public TypeEditorView {
 		virtual void DetachedFromWindow();
 		virtual void MessageReceived(BMessage* message);
 
-		virtual void CommitChanges(bool sendNotices = true);
+		virtual void CommitChanges();
 
 	private:
 		void _UpdateText();
 
-		StringEditorTextView*		fTextView;
-		BString						fPreviousText;
+		BTextView*		fTextView;
+		BString			fPreviousText;
 };
 
 
@@ -80,7 +62,7 @@ class MimeTypeEditor : public TypeEditorView {
 		virtual void DetachedFromWindow();
 		virtual void MessageReceived(BMessage* message);
 
-		virtual void CommitChanges(bool sendNotices = true);
+		virtual void CommitChanges();
 		virtual bool TypeMatches();
 
 	private:
@@ -99,7 +81,7 @@ class NumberEditor : public TypeEditorView {
 		virtual void DetachedFromWindow();
 		virtual void MessageReceived(BMessage* message);
 
-		virtual void CommitChanges(bool sendNotices = true);
+		virtual void CommitChanges();
 		virtual bool TypeMatches();
 
 	private:
@@ -121,7 +103,7 @@ class BooleanEditor : public TypeEditorView {
 		virtual void DetachedFromWindow();
 		virtual void MessageReceived(BMessage* message);
 
-		virtual void CommitChanges(bool sendNotices = true);
+		virtual void CommitChanges();
 		virtual bool TypeMatches();
 
 	private:
@@ -187,7 +169,7 @@ TypeEditorView::~TypeEditorView()
 
 
 void
-TypeEditorView::CommitChanges(bool sendNotices)
+TypeEditorView::CommitChanges()
 {
 	// the default just does nothing here
 }
@@ -215,7 +197,6 @@ StringEditor::StringEditor(BRect rect, DataEditor& editor)
 
 	BStringView *stringView = new BStringView(BRect(5, 5, rect.right, 20),
 		B_EMPTY_STRING, "Contents:");
-
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 
@@ -224,48 +205,13 @@ StringEditor::StringEditor(BRect rect, DataEditor& editor)
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
 
-	fTextView = new StringEditorTextView(rect, this);
+	fTextView = new BTextView(rect, B_EMPTY_STRING,
+		rect.OffsetToCopy(B_ORIGIN).InsetByCopy(5, 5),
+		B_FOLLOW_ALL, B_WILL_DRAW);
 
 	BScrollView* scrollView = new BScrollView("scroller", fTextView,
 		B_FOLLOW_ALL, B_WILL_DRAW, true, true);
 	AddChild(scrollView);
-}
-
-
-/*
- *  fCommit is true if (Insert/Delete)Text is called from interaction with the user
- *  (text typed..)
- *  It's false if it's called from _UpdateText();
- *  This is to avoid a SetText feedback loop 
- *	CommitChanges -> UpdateText -> SetText -> InsertText -> CommitChanges...
- */
-StringEditorTextView::StringEditorTextView(BRect rect, TypeEditorView* target)
-	:
-	BTextView(rect, B_EMPTY_STRING,
-		rect.OffsetToCopy(B_ORIGIN).InsetByCopy(5, 5),
-		B_FOLLOW_ALL, B_WILL_DRAW),
-	fCommit(true),
-	fTarget(target)
-{
-}
-
-
-void
-StringEditorTextView::InsertText(const char* text,
-	int32 length, int32 offset, const text_run_array* runs)
-{
-	BTextView::InsertText(text, length, offset, runs);
-	if (fCommit)
-		fTarget->CommitChanges(false);
-}
-
-
-void
-StringEditorTextView::DeleteText(int32 start, int32 finish)
-{
-	BTextView::DeleteText(start, finish);
-	if (fCommit)
-		fTarget->CommitChanges(false);
 }
 
 
@@ -281,9 +227,7 @@ StringEditor::_UpdateText()
 
 	const char *buffer;
 	if (fEditor.GetViewBuffer((const uint8 **)&buffer) == B_OK) {
-		fTextView->fCommit = false;
 		fTextView->SetText(buffer);
-		fTextView->fCommit = true;
 		fPreviousText.SetTo(buffer);
 	}
 
@@ -293,11 +237,11 @@ StringEditor::_UpdateText()
 
 
 void
-StringEditor::CommitChanges(bool sendNotices)
+StringEditor::CommitChanges()
 {
 	if (fPreviousText != fTextView->Text()) {
 		fEditor.Replace(0, (const uint8 *)fTextView->Text(),
-			fTextView->TextLength() + 1, sendNotices);
+			fTextView->TextLength() + 1);
 	}
 }
 
@@ -323,17 +267,7 @@ StringEditor::DetachedFromWindow()
 void
 StringEditor::MessageReceived(BMessage *message)
 {
-	switch (message->what) {
-		case kMsgValueChanged:
-			CommitChanges();
-			break;
-		case kMsgDataEditorUpdate:
-			_UpdateText();
-			break;
-
-		default:
-			BView::MessageReceived(message);
-	}
+	BView::MessageReceived(message);
 }
 
 
@@ -373,7 +307,7 @@ MimeTypeEditor::_UpdateText()
 
 
 void
-MimeTypeEditor::CommitChanges(bool sendNotices)
+MimeTypeEditor::CommitChanges()
 {
 	if (fPreviousText != fTextControl->Text()) {
 		fEditor.Replace(0, (const uint8*)fTextControl->Text(),
@@ -554,7 +488,7 @@ NumberEditor::TypeMatches()
 
 
 void
-NumberEditor::CommitChanges(bool sendNotices)
+NumberEditor::CommitChanges()
 {
 	if (fPreviousText == fTextControl->Text())
 		return;
@@ -858,7 +792,7 @@ BooleanEditor::_UpdateMenuField()
 
 
 void
-BooleanEditor::CommitChanges(bool sendNotices)
+BooleanEditor::CommitChanges()
 {
 	// we're commiting the changes as they happen
 }

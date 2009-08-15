@@ -526,7 +526,7 @@ DataEditor::InitCheck()
 
 
 void
-DataEditor::AddChange(DataChange *change, bool sendNotices)
+DataEditor::AddChange(DataChange *change)
 {
 	if (change == NULL)
 		return;
@@ -537,8 +537,7 @@ DataEditor::AddChange(DataChange *change, bool sendNotices)
 	RemoveRedos();
 	change->Apply(fRealViewOffset, fView, fRealViewSize);
 
-	if (sendNotices)
-		SendNotices(change);
+	SendNotices(change);
 		// update observers
 
 	// try to join changes
@@ -552,7 +551,7 @@ DataEditor::AddChange(DataChange *change, bool sendNotices)
 
 
 status_t
-DataEditor::Replace(off_t offset, const uint8 *data, size_t length, bool sendNotices)
+DataEditor::Replace(off_t offset, const uint8 *data, size_t length)
 {
 	if (IsReadOnly())
 		return B_NOT_ALLOWED;
@@ -571,7 +570,7 @@ DataEditor::Replace(off_t offset, const uint8 *data, size_t length, bool sendNot
 	}
 
 	ReplaceChange *change = new ReplaceChange(offset, data, length);
-	AddChange(change, sendNotices);
+	AddChange(change);
 
 	return B_OK;
 }
