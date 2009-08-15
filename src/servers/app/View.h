@@ -42,6 +42,7 @@ class View {
 								const char* name, int32 token,
 								uint32 resizeMode, uint32 flags);
 	virtual					~View();
+			status_t		InitCheck() const;
 
 			int32			Token() const
 								{ return fToken; }

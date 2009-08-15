@@ -675,6 +675,11 @@ ServerWindow::_CreateView(BPrivate::LinkReceiver& link, View** _parent)
 	if (newView == NULL)
 		return NULL;
 
+	if (newView->InitCheck() != B_OK) {
+		delete newView;
+		return NULL;
+	}
+	
 	// there is no way of setting this, other than manually :-)
 	newView->SetViewColor(viewColor);
 	newView->SetHidden(hidden);
@@ -1292,10 +1297,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 
 		default:
-			// TODO: when creating a View, check for yet non-existing
-			// View::InitCheck() and take appropriate actions, then checking
-			// for fCurrentView->CurrentState() is unnecessary
-			if (fCurrentView == NULL || fCurrentView->CurrentState() == NULL) {
+			if (fCurrentView == NULL) {
 				BString codeName;
 				string_for_message_code(code, codeName);
 				debug_printf("ServerWindow %s received unexpected code - "
