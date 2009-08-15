@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src libs gnu ;
+
+UsePrivateHeaders shared ;
+
+SharedLibrary libgnu.so :
+	xattr.cpp
+;
