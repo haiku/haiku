@@ -77,7 +77,7 @@ platform_start_kernel(void)
 
 //	smp_init_other_cpus();
 	serial_cleanup();
-//	mmu_init_for_kernel();
+	mmu_init_for_kernel();
 //	smp_boot_other_cpus();
 
 	dprintf("kernel entry at %lx\n",
