@@ -61,14 +61,15 @@ ZippoWindow::ZippoWindow(BRect frame, BMessage* refs)
 
 	BSeparatorView* separator = new BSeparatorView(B_HORIZONTAL);
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 10)
-		.Add(fActivityView)
-		.Add(fArchiveNameView)
-		.Add(fZipOutputView)
-		.Add(separator)
-		.Add(fStopButton)
-		.SetInsets(14, 14, 14, 14)
+	BLayoutBuilder::Group<>(this)
+		.AddGroup(B_VERTICAL, 10)
+			.Add(fActivityView)
+			.Add(fArchiveNameView)
+			.Add(fZipOutputView)
+			.Add(separator)
+			.Add(fStopButton)
+			.SetInsets(14, 14, 14, 14)
+			.End()
 		.End();
 
 	if (refs != NULL) {
@@ -264,13 +265,5 @@ ZippoWindow::_CloseWindowOrKeepOpen()
 {
 	if (fWindowGotRefs)
 		PostMessage(B_QUIT_REQUESTED);
-}
-
-
-void
-ZippoWindow::Zoom(BPoint origin, float width, float height)
-{
-	// TODO: Think about removing this method when 
-	// zipomatic's new layout code works right.
 }
 

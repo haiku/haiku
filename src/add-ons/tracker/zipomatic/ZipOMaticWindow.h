@@ -18,7 +18,6 @@ public:
 							
 	virtual	void			MessageReceived(BMessage* message);
 	virtual	bool			QuitRequested();
-	virtual	void			Zoom(BPoint origin, float width, float height);
 	
 			bool			IsZipping();
 			void			StopZipping();

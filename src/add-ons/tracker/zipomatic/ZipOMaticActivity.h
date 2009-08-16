@@ -20,6 +20,7 @@ public:
 			void			Pause();
 			void			Stop();
 			bool			IsRunning();
+	virtual	void			AllAttached();
 	virtual	void			Pulse();
 	virtual	void			Draw(BRect draw);
 	virtual	void			FrameResized(float width, float height);

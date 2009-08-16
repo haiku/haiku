@@ -5,6 +5,9 @@
 #include "ZipOMaticActivity.h"
 
 
+#include <stdio.h>
+
+
 Activity::Activity(BRect frame, const char* name, uint32 resizingMode,
 	uint32 flags)
 	:
@@ -12,8 +15,6 @@ Activity::Activity(BRect frame, const char* name, uint32 resizingMode,
 	fIsRunning(false),
 	fBitmap(NULL)
 {
-	SetViewColor(B_TRANSPARENT_COLOR);
-	
 	fPattern.data[0] = 0x0f;
 	fPattern.data[1] = 0x1e;
 	fPattern.data[2] = 0x3c;
@@ -22,14 +23,20 @@ Activity::Activity(BRect frame, const char* name, uint32 resizingMode,
 	fPattern.data[5] = 0xe1;
 	fPattern.data[6] = 0xc3;
 	fPattern.data[7] = 0x87;
-	
-	_CreateBitmap();
 };
 
 
 Activity::~Activity()
 {
 	delete fBitmap;
+}
+
+
+void 
+Activity::AllAttached()
+{
+	SetViewColor(B_TRANSPARENT_COLOR);
+	_CreateBitmap();
 }
 
 
@@ -74,8 +81,8 @@ Activity::Pulse()
 {
 	uchar tmp = fPattern.data[7];
 
-	for (int j = 7;  j > 0;  --j)
-		fPattern.data[j]  =  fPattern.data[j-1];
+	for (int j = 7; j > 0; --j)
+		fPattern.data[j] = fPattern.data[j-1];
 	
 	fPattern.data[0] = tmp;
 	
@@ -86,6 +93,18 @@ Activity::Pulse()
 void 
 Activity::Draw(BRect rect)
 {
+	BRect viewRect = Bounds();
+	BRect bitmapRect = fBitmap->Bounds();
+
+	if (bitmapRect != viewRect) {
+		printf("Activity::Draw(): bitmapRect != viewRect\n");
+		bitmapRect.PrintToStream();
+		viewRect.PrintToStream();
+
+		delete fBitmap;
+		_CreateBitmap();
+	}
+
 	_DrawOnBitmap(IsRunning());
 	SetDrawingMode(B_OP_COPY);
 	DrawBitmap(fBitmap);
@@ -97,15 +116,15 @@ Activity::_DrawOnBitmap(bool running)
 {
 	if (fBitmap->Lock())
 	{
-		BRect rect  =  fBitmap->Bounds();
+		BRect rect = fBitmap->Bounds();
 
 		fBitmapView->SetDrawingMode(B_OP_COPY);
 	
-		rgb_color  color;
-		color.red    =  0;
-		color.green  =  0;
-		color.blue   =  0;
-		color.alpha  =  255;
+		rgb_color color;
+		color.red = 0;
+		color.green = 0;
+		color.blue = 0;
+		color.alpha = 255;
 		
 		if (running)
 			color.blue = 200;
@@ -119,13 +138,13 @@ Activity::_DrawOnBitmap(bool running)
 		// draw frame
 
 		// left
-		color.red    =  150;
-		color.green  =  150;
-		color.blue   =  150;
+		color.red = 150;
+		color.green = 150;
+		color.blue = 150;
 		fBitmapView->SetHighColor(color);
 		fBitmapView->SetDrawingMode(B_OP_OVER);
-		BPoint  point_a  =  fBitmap->Bounds().LeftTop();
-		BPoint  point_b  =  fBitmap->Bounds().LeftBottom();
+		BPoint point_a = fBitmap->Bounds().LeftTop();
+		BPoint point_b = fBitmap->Bounds().LeftBottom();
 		point_b.y -= 1;
 		fBitmapView->StrokeLine(point_a, point_b);
 		point_a.x += 1;
@@ -134,8 +153,8 @@ Activity::_DrawOnBitmap(bool running)
 		fBitmapView->StrokeLine(point_a, point_b);
 
 		// top
-		point_a  =  fBitmap->Bounds().LeftTop();
-		point_b  =  fBitmap->Bounds().RightTop();
+		point_a = fBitmap->Bounds().LeftTop();
+		point_b = fBitmap->Bounds().RightTop();
 		point_b.x -= 1;
 		fBitmapView->StrokeLine(point_a, point_b);
 		point_a.y += 1;
@@ -144,12 +163,12 @@ Activity::_DrawOnBitmap(bool running)
 		fBitmapView->StrokeLine(point_a, point_b);
 
 		// right
-		color.red    =  255;
-		color.green  =  255;
-		color.blue   =  255;
+		color.red = 255;
+		color.green = 255;
+		color.blue = 255;
 		fBitmapView->SetHighColor(color);
-		point_a  =  fBitmap->Bounds().RightTop();
-		point_b  =  fBitmap->Bounds().RightBottom();
+		point_a = fBitmap->Bounds().RightTop();
+		point_b = fBitmap->Bounds().RightBottom();
 		fBitmapView->StrokeLine(point_a, point_b);
 		point_a.y += 1;
 		point_a.x -= 1;
@@ -157,8 +176,8 @@ Activity::_DrawOnBitmap(bool running)
 		fBitmapView->StrokeLine(point_a, point_b);
 
 		// bottom
-		point_a  =  fBitmap->Bounds().LeftBottom();
-		point_b  =  fBitmap->Bounds().RightBottom();
+		point_a = fBitmap->Bounds().LeftBottom();
+		point_b = fBitmap->Bounds().RightBottom();
 		fBitmapView->StrokeLine(point_a, point_b);
 		point_a.x += 1;
 		point_a.y -= 1;
@@ -166,9 +185,9 @@ Activity::_DrawOnBitmap(bool running)
 		fBitmapView->StrokeLine(point_a, point_b);		
 		
 		// some blending
-		color.red    =  150;
-		color.green  =  150;
-		color.blue   =  150;
+		color.red = 150;
+		color.green = 150;
+		color.blue = 150;
 		fBitmapView->SetHighColor(color);
 		fBitmapView->SetDrawingMode(B_OP_SUBTRACT);
 		fBitmapView->StrokeRect(rect);
@@ -198,9 +217,9 @@ Activity::_DrawOnBitmap(bool running)
 void
 Activity::_LightenBitmapHighColor(rgb_color* color)
 {
-	color->red    -=  30;
-	color->green  -=  30;
-	color->blue   -=  30;
+	color->red -= 30;
+	color->green -= 30;
+	color->blue -= 30;
 	
 	fBitmapView->SetHighColor(*color);
 }
