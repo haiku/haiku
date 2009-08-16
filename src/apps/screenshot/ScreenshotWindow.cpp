@@ -638,6 +638,8 @@ ScreenshotWindow::_TakeScreenshot()
 {
 	if (fDelayControl)
 		snooze((atoi(fDelayControl->Text()) * 1000000) + 50000);
+	else if (fDelay > 0)
+		snooze(fDelay);
 
 	BRect frame;
 	delete fScreenshot;

@@ -91,10 +91,16 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 		else if (strcmp(argv[i], "-d") == 0
 			|| strncmp(argv[i], "--delay", 7) == 0
 			|| strncmp(argv[i], "--delay=", 8) == 0) {
-			int32 seconds = atoi(argv[i + 1]);
-			if (seconds > 0) {
+			int32 seconds = -1;
+			if (argc > i + 1)
+				seconds = atoi(argv[i + 1]);
+			if (seconds >= 0) {
 				delay = seconds * 1000000;
 				i++;
+			}
+			else {
+				printf("Screenshot: option requires an argument -- %s\n", argv[i]);
+				exit(0);
 			}
 		}
 	}
