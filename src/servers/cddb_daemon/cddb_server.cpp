@@ -83,6 +83,11 @@ CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc, BList* queryResponse)
 	status_t result;
 	result = _SendCddbCommand(cddbCommand, &output);
 	
+	//TODO(bga): Remove this after #4103 is closed.
+	printf("----- CDDB query reply start -----\n");
+	printf("%s\n", output.String());
+	printf("-----  CDDB query reply end  -----\n");
+		
 	if (result == B_OK) {
 		// Remove the header from the reply.
 		output.Remove(0, output.FindFirst("\r\n\r\n") + 4);
@@ -104,13 +109,17 @@ CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc, BList* queryResponse)
 			output.Remove(0, 1);
 		} else if (statusCode == "202") {
 			// No match found.
-			printf("Error : CDDB entry for id %s not found.", hexCddbId);
+			printf("Error : CDDB entry for id %s not found.\n", hexCddbId);
 			
 			return B_ENTRY_NOT_FOUND;
 		} else {
 			// Something bad happened.
-			printf("Error : CDDB server status code is %s.",
-				statusCode.String());
+			if (statusCode.String() != "") {
+				printf("Error : CDDB server status code is %s.\n",
+					statusCode.String());
+			} else {
+				printf("Error. Could not find any status code.\n");
+			}
 
 			return B_ERROR;
 		}
