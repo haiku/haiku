@@ -402,12 +402,11 @@ private:
 			LineBuffer*			fLines;
 			StyleBuffer*		fStyles;
 			BRect				fTextRect;
-			float				fMinTextRectWidth;
 			int32				fSelStart;
 			int32				fSelEnd;
 			bool				fCaretVisible;
 			bigtime_t			fCaretTime;
-			int32				fClickOffset;
+			int32				fCaretOffset;
 			int32				fClickCount;
 			bigtime_t			fClickTime;
 			int32				fDragOffset;
@@ -428,14 +427,16 @@ private:
 			BView*				fContainerView;
 			UndoBuffer*			fUndo;
 			InlineInput*		fInline;
-			BMessageRunner *	fDragRunner;
-			BMessageRunner *	fClickRunner;
+			BMessageRunner*		fDragRunner;
+			BMessageRunner*		fClickRunner;
 			BPoint				fWhere;
 			TextTrackState*		fTrackingMouse;
 
+			float				fMinTextRectWidth;
 			LayoutData*			fLayoutData;
+			int32				fLastClickOffset;
 
-			uint32				_reserved[8];
+			uint32				_reserved[7];
 };
 
 #endif	// _TEXTVIEW_H
