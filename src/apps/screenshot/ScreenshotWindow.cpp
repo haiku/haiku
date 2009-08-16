@@ -94,7 +94,8 @@ ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	fIncludeBorder(includeBorder),
 	fIncludeMouse(includeMouse),
 	fGrabActiveWindow(grabActiveWindow),
-	fShowConfigWindow(showConfigWindow)
+	fShowConfigWindow(showConfigWindow),
+	fExtension("")
 {
 	if (saveScreenshotSilent) {
 		_TakeScreenshot();
@@ -153,6 +154,8 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 		case kImageOutputFormat: {
 			message->FindInt32("be:type", &fImageFileType);
 			message->FindInt32("be:translator", &fTranslator);
+			const char* text = fNameControl->Text();
+			fNameControl->SetText(_FindValidFileName(text).String());
 		}	break;
 
 		case kLocationChanged: {
@@ -332,13 +335,13 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 
 	BMessage settings(_ReadSettings());
 
-	_SetupTranslatorMenu(new BMenu("Please select"), settings);
-	BMenuField* menuField = new BMenuField("Save as:", fTranslatorMenu);
-
 	_SetupOutputPathMenu(new BMenu("Please select"), settings);
 	BMenuField* menuField2 = new BMenuField("Save in:", fOutputPathMenu);
 
 	fNameControl->SetText(_FindValidFileName("screenshot1").String());
+
+	_SetupTranslatorMenu(new BMenu("Please select"), settings);
+	BMenuField* menuField = new BMenuField("Save as:", fTranslatorMenu);
 
 	BBox* divider = new BBox(B_FANCY_BORDER, NULL);
 	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
@@ -410,6 +413,7 @@ ScreenshotWindow::_SetupTranslatorMenu(BMenu* translatorMenu,
 			item->Message()->FindInt32("be:type", &imageFileType);
 			if (fImageFileType == imageFileType) {
 				item->SetMarked(true);
+				MessageReceived(item->Message());
 				break;
 			}
 		}
@@ -530,30 +534,62 @@ ScreenshotWindow::_UpdatePreviewPanel()
 
 
 BString
-ScreenshotWindow::_FindValidFileName(const char* name) const
+ScreenshotWindow::_FindValidFileName(const char* name)
 {
-	BString fileName(name);
+	BString baseName(name);
+
+	if (fExtension.Compare("")) {
+		baseName.RemoveLast(fExtension);
+	}
+
 	if (!fLastSelectedPath)
-		return fileName;
+		return baseName;
 
 	const char* path;
 	BMessage* message = fLastSelectedPath->Message();
 	if (!message || message->FindString("path", &path) != B_OK)
-		return fileName;
+		return baseName;
+
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
+	const translation_format* formats = NULL;
+	int32 numFormats;
+
+	if (roster->GetOutputFormats(fTranslator, &formats, &numFormats) == B_OK) {
+		for (int32 i = 0; i < numFormats; ++i) {
+			if (formats[i].type == uint32(fImageFileType)) {
+				BMimeType mimeType(formats[i].MIME);
+				BMessage msgExtensions;				
+				if (mimeType.GetFileExtensions(&msgExtensions) == B_OK) {
+					const char* extension;
+					if (msgExtensions.FindString("extensions", 0, &extension) == B_OK) {
+						fExtension.SetTo(extension);
+						fExtension.Prepend(".");
+					}
+					else
+						fExtension.SetTo("");
+				}
+				break;
+			}
+		}
+	}
 
 	BPath outputPath(path);
-	outputPath.Append(name);
+	BString fileName;
+	fileName << baseName << fExtension;
+	outputPath.Append(fileName);
+
 	if (!BEntry(outputPath.Path()).Exists())
 		return fileName;
 
-	if (strncmp(name, "screenshot", strlen("screenshot")) == 0)
-		fileName.SetTo("screenshot");
+	if (baseName.FindFirst("screenshot") == 0)
+		baseName.SetTo("screenshot");
 
 	BEntry entry;
 	int32 index = 1;
-	char filename[32];
+	char filename[B_FILE_NAME_LENGTH];
 	do {
-		sprintf(filename, "%s%ld", fileName.String(), index++);
+		sprintf(filename, "%s%ld%s", baseName.String(), index++,
+			fExtension.String());
 		outputPath.SetTo(path);
 		outputPath.Append(filename);
 		entry.SetTo(outputPath.Path());
@@ -723,14 +759,14 @@ ScreenshotWindow::_SaveScreenshot()
 	entry.SetTo(path.Path());
 
 	if (entry.Exists()) {
-		BAlert *myAlert = new BAlert("overwrite", "This file already exists.\n"
+		BAlert *overwriteAlert = new BAlert("overwrite", "This file already exists.\n"
 			"Are you sure would you like to overwrite it?",
     		"Cancel", "Overwrite", NULL,
 			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 
-			myAlert->SetShortcut(0, B_ESCAPE);
-			int32 button_index = myAlert->Go();
-			if (button_index == 0) {
+			overwriteAlert->SetShortcut(0, B_ESCAPE);
+			int32 buttonIndex = overwriteAlert->Go();
+			if (buttonIndex == 0) {
 				return B_CANCELED;
 			}
 	}
@@ -781,7 +817,7 @@ ScreenshotWindow::_SaveScreenshotSilent() const
 	int32 index = 1;
 	do {
 		char filename[32];
-		sprintf(filename, "screenshot%ld", index++);
+		sprintf(filename, "screenshot%ld.png", index++);
 		path = homePath;
 		path.Append(filename);
 		entry.SetTo(path.Path());

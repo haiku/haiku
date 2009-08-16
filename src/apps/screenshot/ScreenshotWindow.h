@@ -45,7 +45,7 @@ private:
 			void			_CenterAndShow();
 
 			void			_UpdatePreviewPanel();
-			BString			_FindValidFileName(const char* name) const;
+			BString			_FindValidFileName(const char* name);
 			int32			_PathIndexInMenu(const BString& path) const;
 
 			BMessage		_ReadSettings() const;
@@ -81,6 +81,7 @@ private:
 			bool			fIncludeMouse;
 			bool			fGrabActiveWindow;
 			bool			fShowConfigWindow;
+			BString			fExtension;
 
 			int32			fTranslator;
 			int32			fImageFileType;
