@@ -149,6 +149,13 @@ main(int argc, char **argv)
 {
 	Application app;
 
+	const int kExpectedTextViewSize = 356;
+	if (sizeof(BTextView) != kExpectedTextViewSize) {
+		fprintf(stderr, "sizeof(BTextView) is %ld instead of %d!\n",
+			sizeof(BTextView), kExpectedTextViewSize);
+		return 1;
+	}
+
 	app.Run();
 	return 0;
 }
