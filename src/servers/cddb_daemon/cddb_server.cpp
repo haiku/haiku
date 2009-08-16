@@ -118,7 +118,7 @@ CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc, BList* queryResponse)
 				printf("Error : CDDB server status code is %s.\n",
 					statusCode.String());
 			} else {
-				printf("Error. Could not find any status code.\n");
+				printf("Error : Could not find any status code.\n");
 			}
 
 			return B_ERROR;
@@ -377,6 +377,8 @@ CDDBServer::_SendCddbCommand(const BString& command, BString* output)
 	// And now add command header and footer. 
 	fullCommand.Prepend("GET /~cddb/cddb.cgi?cmd=");
 	fullCommand << " HTTP 1.0\n\n";
+
+	printf("%s\n", fullCommand.String());
 	
 	int32 result = fConnection.Send((void*)fullCommand.String(),
 		fullCommand.Length());
