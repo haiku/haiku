@@ -55,7 +55,7 @@ All rights reserved.
 #include <MenuField.h>
 #include <Mime.h>
 #include <NodeInfo.h>
-#include <PathMonitor.h>
+#include <NodeMonitor.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Region.h>
@@ -295,7 +295,7 @@ BInfoWindow::BInfoWindow(Model *model, int32 group_index, LockingList<BWindow> *
 {
 	SetPulseRate(1000000);		// we use pulse to check freebytes on volume
 
-	StartWatchingNode();
+	TTracker::WatchNode(model->NodeRef(), B_WATCH_ALL | B_WATCH_MOUNT, this);
 
 	// window list is Locked by Tracker around this constructor
 	if (list)
@@ -388,7 +388,10 @@ BInfoWindow::Show()
 	if (!TargetModel()->IsVolume() && !TargetModel()->IsRoot()) {
 		if (TargetModel()->IsDirectory()) {
 			// if this is a folder then spawn thread to calculate size
-			StartCalcSizeThread();
+			SetSizeStr("calculating" B_UTF8_ELLIPSIS);
+			fCalcThreadID = spawn_thread(BInfoWindow::CalcSize, "CalcSize",
+				B_NORMAL_PRIORITY, this);
+			resume_thread(fCalcThreadID);
 		} else {
 			fAttributeView->SetLastSize(TargetModel()->StatBuf()->st_size);
 
@@ -449,7 +452,18 @@ BInfoWindow::MessageReceived(BMessage *message)
 
 		case kRecalculateSize:
 		{
-			StartCalcSizeThread();
+			fStopCalc = true;
+			// Wait until any current CalcSize thread has terminated before
+			// starting a new one
+			status_t result;
+			wait_for_thread(fCalcThreadID, &result);
+
+			// Start recalculating..
+			fStopCalc = false;
+			SetSizeStr("calculating" B_UTF8_ELLIPSIS);
+			fCalcThreadID = spawn_thread(BInfoWindow::CalcSize, "CalcSize", 
+				B_NORMAL_PRIORITY, this);
+			resume_thread(fCalcThreadID);
 			break;
 		}
 
@@ -523,12 +537,12 @@ BInfoWindow::MessageReceived(BMessage *message)
 				AttributeStreamFileNode newNode(TargetModel()->Node());
 				newNode << memoryNode;
 
+				// Start watching this again
+				TTracker::WatchNode(TargetModel()->NodeRef(), 
+					B_WATCH_ALL | B_WATCH_MOUNT, this);
 
 				// Tell the attribute view about this new model
 				fAttributeView->ReLinkTargetModel(TargetModel());
-
-				// Start watching this again
-				StartWatchingNode();
 			}
 			break;
 		}
@@ -563,14 +577,7 @@ BInfoWindow::MessageReceived(BMessage *message)
 			FSEmptyTrash();
 			break;
 
-		case B_PATH_MONITOR:
-
-			if (!TargetModel()->IsVolume() && !TargetModel()->IsRoot()) {
-				if (TargetModel()->IsDirectory()) {
-					StartCalcSizeThread();
-				}
-			}
-
+		case B_NODE_MONITOR:
 			switch (message->FindInt32("opcode")) {
 				case B_ENTRY_REMOVED:
 					{
@@ -685,34 +692,6 @@ BInfoWindow::GetSizeString(BString &result, off_t size, int32 fileCount)
 
 	if (fileCount)
 		result << " for " << fileCount << " files";
-}
-
-
-void
-BInfoWindow::StartWatchingNode()
-{
-	BPath path;
-	fModel->GetPath(&path);
-	BPrivate::BPathMonitor::StartWatching(path.Path(), 
-		B_WATCH_ALL | B_WATCH_RECURSIVELY | B_WATCH_MOUNT, this);
-}
-
-
-void
-BInfoWindow::StartCalcSizeThread()
-{
-	fStopCalc = true;
-	// Wait until any current CalcSize thread has terminated before
-	// starting a new one
-	status_t result;
-	wait_for_thread(fCalcThreadID, &result);
-
-	// Start recalculating..
-	fStopCalc = false;
-	SetSizeStr("calculating" B_UTF8_ELLIPSIS);
-	fCalcThreadID = spawn_thread(BInfoWindow::CalcSize, "CalcSize",
-		B_NORMAL_PRIORITY, this);
-	resume_thread(fCalcThreadID);
 }
 
 
