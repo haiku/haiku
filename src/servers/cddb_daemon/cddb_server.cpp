@@ -83,11 +83,6 @@ CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc, BList* queryResponse)
 	status_t result;
 	result = _SendCddbCommand(cddbCommand, &output);
 	
-	//TODO(bga): Remove this after #4103 is closed.
-	printf("----- CDDB query reply start -----\n");
-	printf("%s\n", output.String());
-	printf("-----  CDDB query reply end  -----\n");
-		
 	if (result == B_OK) {
 		// Remove the header from the reply.
 		output.Remove(0, output.FindFirst("\r\n\r\n") + 4);
@@ -114,7 +109,7 @@ CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc, BList* queryResponse)
 			return B_ENTRY_NOT_FOUND;
 		} else {
 			// Something bad happened.
-			if (statusCode.String() != "") {
+			if (statusCode.Trim() != "") {
 				printf("Error : CDDB server status code is %s.\n",
 					statusCode.String());
 			} else {
@@ -377,14 +372,12 @@ CDDBServer::_SendCddbCommand(const BString& command, BString* output)
 	// And now add command header and footer. 
 	fullCommand.Prepend("GET /~cddb/cddb.cgi?cmd=");
 	fullCommand << " HTTP 1.0\n\n";
-
-	printf("%s\n", fullCommand.String());
 	
 	int32 result = fConnection.Send((void*)fullCommand.String(),
 		fullCommand.Length());
 	if (result == fullCommand.Length()) {
 		BNetBuffer netBuffer;
-		while (fConnection.Receive(netBuffer, 10) != 0) {
+		while (fConnection.Receive(netBuffer, 1024) != 0) {
 			// Do nothing. Data is automatically appended to the NetBuffer.
 		}
 		
