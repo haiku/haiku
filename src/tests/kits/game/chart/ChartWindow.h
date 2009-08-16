@@ -252,7 +252,7 @@ private:
 		BView		*fTopView;
 
 		/* Find a window by its name if already opened. */
-static	BWindow		*GetAppWindow(char *name);
+static	BWindow		*GetAppWindow(const char *name);
 		/* Used to set the content of PictureButton. */
 		BPicture	*ButtonPicture(bool active, int32 button_type);
 		/* Those function create and handle the other settings

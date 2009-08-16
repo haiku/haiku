@@ -1068,7 +1068,7 @@ ChartWindow::FrameResized(float new_width, float new_height)
 /* loop through the window list of the application, looking for
    a window with a specified name. */
 BWindow	*
-ChartWindow::GetAppWindow(char *name)
+ChartWindow::GetAppWindow(const char *name)
 {
 	int32		index;
 	BWindow		*window;
@@ -1179,19 +1179,15 @@ ChartWindow::OpenColorPalette(BPoint here)
 void
 ChartWindow::OpenStarDensity(BPoint here)
 {
-	BRect		frame;
-	BSlider		*slider;
-	BWindow		*window;
-
-	window = GetAppWindow("Star density");
+	BWindow	*window = GetAppWindow("Star density");
 	if (window == NULL) {
-		frame.Set(here.x, here.y, here.x + STAR_DENSITY_H-1, here.y + STAR_DENSITY_V-1);
+		BRect frame(here.x, here.y, here.x + STAR_DENSITY_H-1, here.y + STAR_DENSITY_V-1);
 		window = new BWindow(frame, "Star density",
 							 B_FLOATING_WINDOW_LOOK,
 							 B_FLOATING_APP_WINDOW_FEEL,
 							 B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK);
 		frame.OffsetTo(0.0, 0.0);
-		slider = new BSlider(frame, "", NULL, new BMessage(STAR_DENSITY_MSG),
+		BSlider	*slider = new BSlider(frame, "", NULL, new BMessage(STAR_DENSITY_MSG),
 							 STAR_DENSITY_MIN, STAR_DENSITY_MAX);
 		slider->SetViewColor(background_color);
 		slider->SetTarget(NULL, this);
