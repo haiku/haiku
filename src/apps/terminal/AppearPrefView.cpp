@@ -221,16 +221,15 @@ AppearancePrefView::_MakeFontMenu(uint32 command, const char *defaultFontName)
 {
 	BPopUpMenu *menu = new BPopUpMenu("");
 	int32 numFamilies = count_font_families();
-	BFont font;
-	BMenuItem *item;
-	font_family family;
 	uint32 flags;
 
 	for (int32 i = 0; i < numFamilies; i++) {
-		if (get_font_family(i, &family, &flags) == B_OK) {		
+		font_family family;
+		if (get_font_family(i, &family, &flags) == B_OK) {
+			BFont font;	
 			font.SetFamilyAndStyle(family, NULL);
 			if (IsFontUsable(font)) {
-				item = new BMenuItem(family, new BMessage(command));
+				BMenuItem *item = new BMenuItem(family, new BMessage(command));
 				menu->AddItem(item);
 				if (!strcmp(defaultFontName, family))
 					item->SetMarked(true);
@@ -249,15 +248,12 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 	int32 sizes[] = {9, 10, 11, 12, 14, 16, 18, 0};
 
 	bool found = false;
-	BString string;
-
-	BMenuItem *item;
 
 	for (uint32 i = 0; sizes[i]; i++) {
-		string.SetTo("");
+		BString string;
 		string << sizes[i];
 
-		item = new BMenuItem(string.String(), new BMessage(command));
+		BMenuItem *item = new BMenuItem(string.String(), new BMessage(command));
 		menu->AddItem(item);
 
 		if (sizes[i] == defaultSize) {
@@ -268,9 +264,9 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 	if (!found) {
 		for (uint32 i = 0; sizes[i]; i++) {
 			if (sizes[i] > defaultSize) {
-				string.SetTo("");
+				BString string;
 				string << defaultSize;
-				item = new BMenuItem(string.String(), new BMessage(command));
+				BMenuItem *item = new BMenuItem(string.String(), new BMessage(command));
 				item->SetMarked(true);
 				menu->AddItem(item, i);
 				break;
