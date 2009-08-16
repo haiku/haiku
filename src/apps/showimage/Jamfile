@@ -14,7 +14,6 @@ Application ShowImage :
 	PrintOptionsWindow.cpp
 	Filter.cpp
 	EntryMenuItem.cpp
-	BackgroundImage.cpp
 	ProgressWindow.cpp
 	ResizerWindow.cpp
 	: libshared.a
