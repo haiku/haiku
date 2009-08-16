@@ -600,7 +600,6 @@ PoorManWindow::DefaultSettings()
 
 	switch (buttonIndex){
 	case 0:
-		serverAlert->Go();
 		SetWebDir("");
 		break;
 	case 1:
@@ -608,7 +607,6 @@ PoorManWindow::DefaultSettings()
 				setwindow_frame,
 				STR_WIN_NAME_PREF
 		);
-		serverAlert->Go();
 		prefWindow->ShowWebDirFilePanel();
 		break;
 	case 2:
@@ -624,6 +622,7 @@ PoorManWindow::DefaultSettings()
 		break;
 	}
 }
+
 
 status_t
 PoorManWindow::ReadSettings()
