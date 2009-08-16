@@ -53,8 +53,10 @@ BackgroundsApplication::BackgroundsApplication()
 void
 BackgroundsApplication::RefsReceived(BMessage* message)
 {
-	if (CountWindows() > 0)
-		BMessenger(WindowAt(0)->ChildAt(0)).SendMessage(message);
+	if (CountWindows() > 0) {
+		BWindow* window = WindowAt(0);
+		BMessenger(window->ChildAt(0)).SendMessage(message);
+	}
 
 }
 
