@@ -81,7 +81,6 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
   	};
 
 	float greenDividerSize = StringWidth("Green:") + 8.0;
-
 	float colorDividerSize = StringWidth("Color:") + 8.0;
 
 	BRect r(5, 5, 261, 25);
@@ -108,13 +107,13 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 	fColorField->SetAlignment(B_ALIGN_RIGHT);
 	AddChild(fColorField);
 
-  	fColorControl = SetupColorControl(BPoint(r.left, r.bottom + 10),
-  		B_CELLS_32x8, 8.0, MSG_COLOR_CHANGED);
-  	fColorControl->SetValue(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
+	fColorControl = SetupColorControl(BPoint(r.left, r.bottom + 10),
+		B_CELLS_32x8, 8.0, MSG_COLOR_CHANGED);
+	fColorControl->SetValue(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
 
-	BTextControl* redInput = (BTextControl*)fColorControl->FindView("_red");
-	BTextControl* greenInput = (BTextControl*)fColorControl->FindView("_green");
-	BTextControl* blueInput = (BTextControl*)fColorControl->FindView("_blue");
+	BTextControl* redInput = (BTextControl*)fColorControl->ChildAt(0);
+	BTextControl* greenInput = (BTextControl*)fColorControl->ChildAt(1);
+	BTextControl* blueInput = (BTextControl*)fColorControl->ChildAt(2);
 	
 	redInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	greenInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
