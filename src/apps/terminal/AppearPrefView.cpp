@@ -80,26 +80,16 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 		NULL
   	};
 
-	float fontDividerSize = StringWidth("Font:") + 8.0;
-	float sizeDividerSize = StringWidth("Size:") + 8.0;
 	float greenDividerSize = StringWidth("Green:") + 8.0;
-	if (greenDividerSize > sizeDividerSize)
-		sizeDividerSize = greenDividerSize;
-	else
-		greenDividerSize = sizeDividerSize;
-	float colorDividerSize = StringWidth("Color:") + 8.0;
 
-	if (fontDividerSize < colorDividerSize)
-		fontDividerSize = colorDividerSize;
-	else
-		colorDividerSize = fontDividerSize;
+	float colorDividerSize = StringWidth("Color:") + 8.0;
 
 	BRect r(5, 5, 261, 25);
 
 	BMenu *menu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,
 		PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY));
 	fFont = new BMenuField(r, "font", "Font:", menu);
-	fFont->SetDivider(fontDividerSize);
+	fFont->SetDivider(colorDividerSize);
 	fFont->SetAlignment(B_ALIGN_RIGHT);
 	AddChild(fFont);
 
@@ -107,7 +97,7 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 	menu = _MakeSizeMenu(MSG_HALF_SIZE_CHANGED,
 		PrefHandler::Default()->getInt32(PREF_HALF_FONT_SIZE));
 	fFontSize = new BMenuField(r, "size", "Size:", menu);
-	fFontSize->SetDivider(sizeDividerSize);
+	fFontSize->SetDivider(greenDividerSize);
 	fFontSize->SetAlignment(B_ALIGN_RIGHT);
 	AddChild(fFontSize);
 
@@ -232,16 +222,16 @@ AppearancePrefView::_MakeFontMenu(uint32 command, const char *defaultFontName)
 {
 	BPopUpMenu *menu = new BPopUpMenu("");
 	int32 numFamilies = count_font_families();
+	BFont font;
+	BMenuItem *item;
+	font_family family;
+	uint32 flags;
 
 	for (int32 i = 0; i < numFamilies; i++) {
-		font_family family;
-		uint32 flags;
-
-		if (get_font_family(i, &family, &flags) == B_OK) {
-			BFont font;
+		if (get_font_family(i, &family, &flags) == B_OK) {		
 			font.SetFamilyAndStyle(family, NULL);
 			if (IsFontUsable(font)) {
-				BMenuItem *item = new BMenuItem(family, new BMessage(command));
+				item = new BMenuItem(family, new BMessage(command));
 				menu->AddItem(item);
 				if (!strcmp(defaultFontName, family))
 					item->SetMarked(true);
@@ -260,24 +250,32 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 	int32 sizes[] = {9, 10, 11, 12, 14, 16, 18, 0};
 
 	bool found = false;
+	BString string;
+
+	BMenuItem *item;
 
 	for (uint32 i = 0; sizes[i]; i++) {
-		BString string;
+		string.SetTo("");
 		string << sizes[i];
 
-		BMenuItem* item = new BMenuItem(string.String(), new BMessage(command));
+		item = new BMenuItem(string.String(), new BMessage(command));
 		menu->AddItem(item);
 
 		if (sizes[i] == defaultSize) {
 			item->SetMarked(true);
 			found = true;
-		} else if (sizes[i] > defaultSize && !found) {
-			BString string;
-			string << defaultSize;
-			BMenuItem* item = new BMenuItem(string.String(), new BMessage(command));
-			item->SetMarked(true);
-			menu->AddItem(item, i);
-			found = true;
+		}
+	}
+	if (!found) {
+		for (uint32 i = 0; sizes[i]; i++) {
+			if (sizes[i] > defaultSize) {
+				string.SetTo("");
+				string << defaultSize;
+				item = new BMenuItem(string.String(), new BMessage(command));
+				item->SetMarked(true);
+				menu->AddItem(item, i);
+				break;
+			}
 		}
 	}
 
