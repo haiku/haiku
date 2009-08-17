@@ -58,19 +58,27 @@ struct scheduler_thread_data {
 
 	void Init()
 	{
-		memset(fLastThreadQuantums, 0, sizeof(fLastThreadQuantums));
 		fLastQuantumSlot = 0;
 		fLastQueue = -1;
 	}
-
-	int32 GetAverageQuantumUsage() const
+	
+	inline void SetQuantum(int32 quantum)
 	{
-		int32 quantumAverage = 0;
-		for (int32 i = 0; i < kMaxTrackingQuantums; i++)
-			quantumAverage += fLastThreadQuantums[i];
-		return quantumAverage / kMaxTrackingQuantums;
+		fQuantumAverage -= fLastThreadQuantums[fLastQuantumSlot];
+		fLastThreadQuantums[fLastQuantumSlot] = quantum;
+		fQuantumAverage += quantum;
+		if (fLastQuantumSlot < kMaxTrackingQuantums - 1)
+			++fLastQuantumSlot;
+		else
+			fLastQuantumSlot = 0;
+	}
+	
+	inline int32 GetAverageQuantumUsage() const
+	{
+		return fQuantumAverage / kMaxTrackingQuantums;
 	}
 
+	int32 fQuantumAverage;
 	int32 fLastThreadQuantums[kMaxTrackingQuantums];
 	int16 fLastQuantumSlot;
 	int32 fLastQueue;
@@ -305,9 +313,6 @@ affine_set_thread_priority(struct thread *thread, int32 priority)
 		thread);
 
 	// search run queues for the thread
-	// TODO: keep track of the queue a thread is in (perhaps in a
-	// data pointer on the thread struct) so we only have to walk
-	// that exact queue to find it.
 	struct thread *item = NULL, *prev = NULL;
 	targetCPU = thread->scheduler_data->fLastQueue;
 
@@ -406,10 +411,6 @@ affine_reschedule(void)
 			if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
 				break;
 
-			// never skip last non-idle normal thread
-			if (nextThread->queue_next && nextThread->queue_next->priority == B_IDLE_PRIORITY)
-				break;
-
 			// skip normal threads sometimes (roughly 20%)
 			if (_rand() > 0x1a00)
 				break;
@@ -465,11 +466,7 @@ affine_reschedule(void)
 			+ (oldThread->user_time - oldThread->cpu->last_user_time);
 		oldThread->cpu->active_time += activeTime;
 		scheduler_thread_data *data = oldThread->scheduler_data;
-		data->fLastThreadQuantums[data->fLastQuantumSlot] = activeTime;
-		if (data->fLastQuantumSlot == kMaxTrackingQuantums - 1)
-			data->fLastQuantumSlot = 0;
-		else
-			data->fLastQuantumSlot++;
+		data->SetQuantum(activeTime);
 	}
 
 	if (!thread_is_idle_thread(nextThread)) {
