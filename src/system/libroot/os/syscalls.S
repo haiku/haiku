@@ -16,6 +16,9 @@
 #ifdef ARCH_mips
 #	include "arch/mips/syscalls.inc"
 #endif
+#ifdef ARCH_mipsel
+#	include "arch/mipsel/syscalls.inc"
+#endif
 #ifdef ARCH_ppc
 #	include "arch/ppc/syscalls.inc"
 #endif
