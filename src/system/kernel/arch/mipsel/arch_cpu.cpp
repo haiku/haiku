@@ -1,7 +1,6 @@
 /*
  * Copyright 2009 Jonas Sundström, jonas@kirilla.com
  * Copyright 2007 François Revol, revol@free.fr
- * Copyright 2003-2005 Axel Dörfler, axeld@pinc-software.de
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.

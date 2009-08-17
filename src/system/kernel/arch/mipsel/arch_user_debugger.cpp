@@ -1,7 +1,6 @@
 /*
  * Copyright 2009 Jonas Sundström, jonas@kirilla.com
  * Copyright 2007 François Revol, revol@free.fr
- * Copyright 2005 Axel Dörfler, axeld@pinc-softare.de
  * Distributed under the terms of the MIT License.
  */
 

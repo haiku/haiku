@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- * 		Axel Dörfler <axeld@pinc-software.de>
  * 		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  * 		François Revol <revol@free.fr>
  *		Jonas Sundström <jonas@kirilla.com

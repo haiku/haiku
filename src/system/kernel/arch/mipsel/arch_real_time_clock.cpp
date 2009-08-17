@@ -2,7 +2,6 @@
  * Copyright 2009 Jonas Sundström, jonas@kirilla.com
  * Copyright 2007 François Revol, revol@free.fr.
  * Copyright 2006 Ingo Weinhold bonefish@cs.tu-berlin.de. All rights reserved.
- * Copyright 2005-2007 Axel Dörfler, axeld@pinc-software.de
  * Copyright 2003 Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
