@@ -46,7 +46,8 @@
 
 
 PrinterListView::PrinterListView(BRect frame)
-	: Inherited(frame, "printers_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL),
+	: Inherited(frame, "printers_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE),
 	fFolder(NULL),
 	fActivePrinter(NULL)
 {

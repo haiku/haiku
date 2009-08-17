@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src preferences print ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared print ;
 
 Preference Printers :
@@ -20,8 +18,3 @@ Preference Printers :
 	: 
 	Printers.rdef
 	;
-
-Package haiku-printingkit-cvs :
-	Printers :
-#	boot beos preferences ;
-	boot home Desktop haiku-printingkit ;

@@ -47,8 +47,7 @@
 
 PrintersWindow::PrintersWindow(BRect frame)
 	:
-	Inherited(BRect(78.0, 71.0, 561.0, 409.0), "Printers", B_TITLED_WINDOW,
-			B_NOT_H_RESIZABLE),
+	Inherited(BRect(78.0, 71.0, 561.0, 409.0), "Printers", B_TITLED_WINDOW, 0),
 	fSelectedPrinter(NULL),
 	fAddingPrinter(false)
 {
@@ -285,8 +284,6 @@ PrintersWindow::BuildGUI()
 		// Resize boxes to the same size
 	jscroller->ResizeTo(width, jscroller->Bounds().Height());
 	pscroller->ResizeTo(width, pscroller->Bounds().Height());
-	
-	SetSizeLimits(Bounds().Width(), Bounds().Width(), Bounds().Height(), 20000);	
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku.
+ * Copyright 2002-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -26,12 +26,19 @@
 #include <Application.h>
 #include <StorageKit.h>
 
+#include <Layout.h>
+#include <GridLayout.h>
+#include <GridLayoutBuilder.h>
+#include <GroupLayoutBuilder.h>
+
 #include <stdio.h>
 
 AddPrinterDialog::AddPrinterDialog(BWindow *parent)
-	: Inherited(BRect(78.0, 71.0, 400, 300), "Add Printer",
-		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL, B_NOT_ZOOMABLE)
-	, fPrintersPrefletMessenger(parent)
+	:
+	Inherited(BRect(78.0, 71.0, 400, 300), "Add Printer",
+		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
+		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+	fPrintersPrefletMessenger(parent)
 {
 	BuildGUI(0);
 
@@ -163,105 +170,54 @@ AddPrinterDialog::HandleChangedTransport(BMessage *msg)
 void
 AddPrinterDialog::BuildGUI(int stage)
 {
-	float w, h;
-		// preferred size of current control
-
-	const int32 kHMargin = 8;
-	const int32 kVMargin = 8;
-
-	#define NAME_LABEL	"Printer Name:"
-	#define KIND_LABEL	"Printer Type:"
-	#define PORT_LABEL	"Connected to:"
-
-
-	BRect r = Bounds();
-
-	BView *panel = new BView(r, "panel", B_FOLLOW_ALL, 0);
-	AddChild(panel);
-	panel->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	r.InsetBy(kHMargin, kVMargin);
-
 	// add a "printer name" input field
-	fName = new BTextControl(r, "printer_name",
-							NAME_LABEL, B_EMPTY_STRING, NULL,
-							B_FOLLOW_LEFT_RIGHT);
+	fName = new BTextControl("printer_name", "Printer Name:", B_EMPTY_STRING,
+		NULL);
 	fName->SetFont(be_bold_font);
 	fName->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	panel->AddChild(fName);
 	fName->SetModificationMessage(new BMessage(kNameChangedMsg));
-	fName->GetPreferredSize(&w, &h);
-	fName->ResizeTo(r.Width(), h);
-
-	r.OffsetBy(0, h + 2 * kVMargin);
 
 	// add a "driver" popup menu field
 	fPrinter = new BPopUpMenu("<pick one>");
-	BMenuField *printerMenuField = new BMenuField(r, "drivers_list", KIND_LABEL, fPrinter, 
-							B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT,
-							B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
-	printerMenuField->SetFont(be_plain_font);
+	BMenuField *printerMenuField = new BMenuField("drivers_list",
+		"Printer Type:", fPrinter);
 	printerMenuField->SetAlignment(B_ALIGN_RIGHT);
-	panel->AddChild(printerMenuField);
-	printerMenuField->GetPreferredSize(&w, &h);
-	printerMenuField->ResizeTo(r.Width(), h);
 	FillMenu(fPrinter, "Print", kPrinterSelectedMsg);
-
-	r.OffsetBy(0, printerMenuField->Bounds().Height() + kVMargin);
 
 	// add a "connected to" (aka transports list) menu field
 	fTransport = new BPopUpMenu("<pick one>");
-	BMenuField *transportMenuField = new BMenuField(r, "transports_list", PORT_LABEL, fTransport, 
-							B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT,
-							B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
-	transportMenuField->SetFont(be_plain_font);
+	BMenuField *transportMenuField = new BMenuField("transports_list",
+		"Connected to:", fTransport);
 	transportMenuField->SetAlignment(B_ALIGN_RIGHT);
-	panel->AddChild(transportMenuField);
-	transportMenuField->GetPreferredSize(&w, &h);
-	transportMenuField->ResizeTo(r.Width(), h);
 	FillTransportMenu(fTransport);
-		
-	r.OffsetBy(0, transportMenuField->Bounds().Height() + kVMargin);
 	
-	// update dividers
-	float divider = be_bold_font->StringWidth(NAME_LABEL "#");
-	divider = max_c(divider, be_plain_font->StringWidth(NAME_LABEL "#"));	
-	divider = max_c(divider, be_plain_font->StringWidth(PORT_LABEL "#"));
-
-	fName->SetDivider(divider);
-	printerMenuField->SetDivider(divider);
-	transportMenuField->SetDivider(divider);
-	
-	// add a "OK" button, and make it default
-	fOk = new BButton(r, NULL, "Add", new BMessage((uint32)B_OK),
+	// add a "OK" button
+	fOk = new BButton(NULL, "Add", new BMessage((uint32)B_OK),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	fOk->ResizeToPreferred();
-	fOk->GetPreferredSize(&w, &h);
-	// put the ok bottom at bottom right corner
-	float x = panel->Bounds().right - w - kHMargin;
-	float y = panel->Bounds().bottom - h - kVMargin;
-	fOk->MoveTo(x, y);
-	panel->AddChild(fOk);
 
 	// add a "Cancel button	
-	BButton *cancel = new BButton(r, NULL, "Cancel", new BMessage(B_CANCEL), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	cancel->ResizeToPreferred();
-	cancel->GetPreferredSize(&w, &h);
-	// put cancel button left next the ok button
-	x = fOk->Frame().left - w - kVMargin;
-	y = fOk->Frame().top;
-	cancel->MoveTo(x, y);	
-	panel->AddChild(cancel);
+	BButton *cancel = new BButton(NULL, "Cancel", new BMessage(B_CANCEL));
+
+	SetLayout(new BGridLayout());
+
+	AddChild(BGridLayoutBuilder(0, 4)
+		.Add(fName->CreateLabelLayoutItem(), 0, 0)
+		.Add(fName->CreateTextViewLayoutItem(), 1, 0)
+		.Add(printerMenuField->CreateLabelLayoutItem(), 0, 1)
+		.Add(printerMenuField->CreateMenuBarLayoutItem(), 1, 1)
+		.Add(transportMenuField->CreateLabelLayoutItem(), 0, 2)
+		.Add(transportMenuField->CreateMenuBarLayoutItem(), 1, 2)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+			.AddGlue()
+			.Add(cancel)
+			.Add(fOk)
+			, 0, 3, 2)
+		.SetInsets(8, 8, 8, 8)
+		);
 
 	SetDefaultButton(fOk);
 	fOk->MakeDefault(true);
 
-	// Auto resize window
-	r.bottom = transportMenuField->Frame().bottom + fOk->Bounds().Height() + 2 * kVMargin;
-	ResizeTo(r.right, r.bottom);
-	
-	SetSizeLimits(r.right, 10e5, r.bottom, 10e5);
-	
 	fName->MakeFocus(true);
 	
 	Update();
