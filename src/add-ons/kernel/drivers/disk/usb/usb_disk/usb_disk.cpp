@@ -748,12 +748,20 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 	}
 
 	mutex_lock(&gDeviceListLock);
+	device->device_number = 0;
+	disk_device *other = gDeviceList;
+	while (other != NULL) {
+		if (other->device_number >= device->device_number)
+			device->device_number = other->device_number + 1;
+
+		other = (disk_device *)other->link;
+	}
+
 	device->link = (void *)gDeviceList;
 	gDeviceList = device;
-	uint32 deviceNumber = gDeviceCount++;
 	gLunCount += device->lun_count;
 	for (uint8 i = 0; i < device->lun_count; i++)
-		sprintf(device->luns[i]->name, DEVICE_NAME, deviceNumber, i);
+		sprintf(device->luns[i]->name, DEVICE_NAME, device->device_number, i);
 	mutex_unlock(&gDeviceListLock);
 
 	TRACE("new device: 0x%08lx\n", (uint32)device);
