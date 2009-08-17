@@ -2,7 +2,7 @@
  * i2c interface.
  * Bus should be run at max. 100kHz: see original Philips I2C specification
  *	
- * Rudolf Cornelissen 12/2002-6/2009
+ * Rudolf Cornelissen 12/2002-8/2009
  */
 
 #define MODULE_BIT 0x00004000
@@ -323,11 +323,13 @@ status_t i2c_init(void)
 		/* check for hardware coupling of SCL and SDA -out and -in lines */
 		snooze(6);
 		OutSCL(bus, false);
+		snooze(3);
 		OutSDA(bus, true);
 		snooze(3);
 		if (InSCL(bus) || !InSDA(bus)) continue;
 		snooze(3);
 		OutSCL(bus, true);
+		snooze(3);
 		OutSDA(bus, false);
 		snooze(3);
 		if (!InSCL(bus) || InSDA(bus)) continue;
@@ -534,6 +536,10 @@ set_signals(void *cookie, int clk, int data)
 		OutSCL(info->port, true);
 	else
 		OutSCL(info->port, false);
+
+	/* waiting for SCL output to become stable before reading it back.
+	 * ('typical' error-prone read-modify-write situation..) */
+	snooze(3);
 
 	if (data)
 		OutSDA(info->port, true);
