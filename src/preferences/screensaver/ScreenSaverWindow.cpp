@@ -113,6 +113,8 @@ class ModulesView : public BView {
 		BView*			fSettingsView;
 
 		PreviewView*	fPreviewView;
+
+		team_id			fScreenSaverTestTeamId;
 };
 
 static const int32 kTimeInUnits[] = {
@@ -362,11 +364,25 @@ ModulesView::MessageReceived(BMessage* message)
 			SaveState();
 			fSettings.Save();
 
-			be_roster->Launch(SCREEN_BLANKER_SIG, &fSettings.Message());
+			_CloseSaver();
+
+			be_roster->StartWatching(BMessenger(this, this->Looper()), B_REQUEST_QUIT);
+			be_roster->Launch(SCREEN_BLANKER_SIG, &fSettings.Message(), &fScreenSaverTestTeamId);
 			break;
 
 		case kMsgAddSaver:
 			fFilePanel->Show();
+			break;
+
+		case B_SOME_APP_QUIT: {
+				team_id team;
+				if (message->FindInt32("be:team", &team) == B_OK) {
+					if (team == fScreenSaverTestTeamId) {
+						be_roster->StopWatching(this);
+						_OpenSaver();
+					}
+				}
+			}
 			break;
 
 		default:
