@@ -10,7 +10,7 @@
  * significant byte, "1" the least significant one.
  */
 
-#if defined(__INTEL__) || defined(__ARM__)
+#if defined(__INTEL__) || defined(__ARM__) || defined(__MIPSEL__)
 #	define LITTLE_ENDIAN	1234
 #	define BIG_ENDIAN		0
 #	define BYTE_ORDER		LITTLE_ENDIAN
