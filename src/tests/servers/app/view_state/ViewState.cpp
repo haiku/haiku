@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku Inc.
+ * Copyright 2005-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,16 +15,34 @@
 
 
 class View : public BView {
-	public:
-		View(BRect rect);
-		virtual ~View();
+public:
+							View(BRect rect);
+	virtual					~View();
 
-		virtual void Draw(BRect updateRect);
+	virtual void			Draw(BRect updateRect);
+};
+
+
+class Window : public BWindow {
+public:
+							Window();
+	virtual					~Window();
+
+	virtual bool			QuitRequested();
+};
+
+
+class Application : public BApplication {
+public:
+							Application();
+
+	virtual void			ReadyToRun();
 };
 
 
 View::View(BRect rect)
-	: BView(rect, "view state", B_FOLLOW_ALL, B_WILL_DRAW)
+	:
+	BView(rect, "view state", B_FOLLOW_ALL, B_WILL_DRAW)
 {
 }
 
@@ -76,20 +94,12 @@ View::Draw(BRect updateRect)
 //	#pragma mark -
 
 
-class Window : public BWindow {
-	public:
-		Window();
-		virtual ~Window();
-		
-		virtual bool QuitRequested();
-};
-
-
 Window::Window()
-	: BWindow(BRect(100, 100, 400, 400), "ViewState-Test",
-			B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	:
+	BWindow(BRect(100, 100, 400, 400), "ViewState-Test", B_TITLED_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS)
 {
-	BView *view = new View(BRect(10, 10, 290, 290));
+	BView* view = new View(BRect(10, 10, 290, 290));
 	AddChild(view);
 }
 
@@ -109,24 +119,17 @@ Window::QuitRequested()
 //	#pragma mark -
 
 
-class Application : public BApplication {
-	public:
-		Application();
-
-		virtual void ReadyToRun(void);
-};
-
-
 Application::Application()
-	: BApplication("application/x-vnd.haiku-view_state")
+	:
+	BApplication("application/x-vnd.haiku-view_state")
 {
 }
 
 
 void
-Application::ReadyToRun(void)
+Application::ReadyToRun()
 {
-	Window *window = new Window();
+	Window* window = new Window();
 	window->Show();
 }
 
@@ -134,11 +137,11 @@ Application::ReadyToRun(void)
 //	#pragma mark -
 
 
-int 
-main(int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-	Application app;// app;
-
+	Application app;
 	app.Run();
+
 	return 0;
 }
