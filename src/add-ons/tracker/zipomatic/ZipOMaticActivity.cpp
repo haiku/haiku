@@ -4,7 +4,6 @@
 
 #include "ZipOMaticActivity.h"
 
-
 #include <stdio.h>
 
 

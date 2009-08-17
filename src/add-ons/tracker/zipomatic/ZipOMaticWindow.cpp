@@ -32,7 +32,7 @@
 
 ZippoWindow::ZippoWindow(BRect frame, BMessage* refs)
 	:
-	BWindow(frame, "Zip-O-Matic", B_TITLED_WINDOW, B_NOT_V_RESIZABLE
+	BWindow(frame, "Zip-O-Matic", B_TITLED_WINDOW, B_NOT_RESIZABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE),
 	fThread(NULL),
 	fWindowGotRefs(false),
