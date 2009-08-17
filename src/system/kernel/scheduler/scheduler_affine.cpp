@@ -18,6 +18,7 @@
 #include <int.h>
 #include <kernel.h>
 #include <kscheduler.h>
+#include <listeners.h>
 #include <scheduler_defs.h>
 #include <smp.h>
 #include <thread.h>
@@ -199,6 +200,10 @@ affine_enqueue_in_run_queue(struct thread *thread)
 		smp_send_ici(idleCPU, SMP_MSG_RESCHEDULE_IF_IDLE, 0, 0,
 			0, NULL, SMP_MSG_FLAG_ASYNC);
 	}
+
+	// notify listeners
+	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
+		thread);
 }
 
 static inline struct thread *
@@ -294,6 +299,10 @@ affine_set_thread_priority(struct thread *thread, int32 priority)
 	// a new position.
 
 	T(RemoveThread(thread));
+
+	// notify listeners
+	NotifySchedulerListeners(&SchedulerListener::ThreadRemovedFromRunQueue,
+		thread);
 
 	// search run queues for the thread
 	// TODO: keep track of the queue a thread is in (perhaps in a
@@ -435,6 +444,10 @@ affine_reschedule(void)
 		panic("reschedule(): run queue is empty!\n");
 
 	T(ScheduleThread(nextThread, oldThread));
+
+	// notify listeners
+	NotifySchedulerListeners(&SchedulerListener::ThreadScheduled,
+		oldThread, nextThread);
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
