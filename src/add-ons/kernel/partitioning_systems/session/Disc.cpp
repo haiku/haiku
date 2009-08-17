@@ -196,7 +196,7 @@ dump_full_table_of_contents(uchar* data, uint16 dataLength)
 	TRACE(("%s: table of contents dump:\n", kModuleDebugName));
 	TRACE(("--------------------------------------------------\n"));
 	TRACE(("header:\n"));
-	TRACE(("  length = %d\n", header_length));
+	TRACE(("  length = %d\n", headerLength));
 	TRACE(("  first  = %d\n", header->first));
 	TRACE(("  last   = %d\n", header->last));
 
