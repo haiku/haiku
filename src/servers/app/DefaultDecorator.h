@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -79,6 +79,7 @@ private:
 									float* offset, float* size,
 									float* inset) const;
 			void				_LayoutTabItems(const BRect& tabRect);
+			void 				_InvalidateBitmaps();
 
 	static	ServerBitmap*		_GetBitmapForButton(int32 item, bool down,
 									bool focus, int32 width, int32 height,
@@ -102,8 +103,8 @@ private:
 			rgb_color			fNonFocusFrameColors[2];
 
 			bool				fButtonFocus;
-			ServerBitmap *		fCloseBitmaps[4];
-			ServerBitmap *		fZoomBitmaps[4];
+			ServerBitmap*		fCloseBitmaps[4];
+			ServerBitmap*		fZoomBitmaps[4];
 
 			// Individual rects for handling window frame
 			// rendering the proper way

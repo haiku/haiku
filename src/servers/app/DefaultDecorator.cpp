@@ -148,6 +148,7 @@ DefaultDecorator::FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
 	}
 
 	_UpdateFont(settings);
+	_InvalidateBitmaps();
 	_DoLayout();
 
 	if (updateRegion != NULL) {
@@ -174,6 +175,7 @@ DefaultDecorator::SetLook(DesktopSettings& settings, window_look look,
 	fLook = look;
 
 	_UpdateFont(settings);
+	_InvalidateBitmaps();
 	_DoLayout();
 
 	if (updateRegion != NULL) {
@@ -887,7 +889,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 				gradient.SetEnd(bg.RightBottom());
 				gradient.AddColor(fFrameColors[1], 0);
 				gradient.AddColor(fFrameColors[2], 255);
-	
+
 				fDrawingEngine->FillRect(bg, gradient);
 
 				fDrawingEngine->StrokeLine(BPoint(x - 15, y - 15),
@@ -1019,7 +1021,7 @@ DefaultDecorator::_DrawClose(BRect rect)
 		rect.bottom));
 
 	int32 index = (fButtonFocus ? 0 : 1) + (GetClose() ? 0 : 2);
-	ServerBitmap *bitmap = fCloseBitmaps[index];
+	ServerBitmap* bitmap = fCloseBitmaps[index];
 	if (bitmap == NULL) {
 		bitmap = _GetBitmapForButton(DEC_CLOSE, GetClose(), fButtonFocus,
 			rect.IntegerWidth(), rect.IntegerHeight(), this);
@@ -1072,7 +1074,7 @@ DefaultDecorator::_DrawZoom(BRect rect)
 		rect.bottom));
 
 	int32 index = (fButtonFocus ? 0 : 1) + (GetZoom() ? 0 : 2);
-	ServerBitmap *bitmap = fZoomBitmaps[index];
+	ServerBitmap* bitmap = fZoomBitmaps[index];
 	if (bitmap == NULL) {
 		bitmap = _GetBitmapForButton(DEC_ZOOM, GetZoom(), fButtonFocus,
 			rect.IntegerWidth(), rect.IntegerHeight(), this);
@@ -1153,8 +1155,7 @@ DefaultDecorator::_DrawButtonBitmap(ServerBitmap* bitmap, BRect rect)
 }
 
 
-/*!
-	\brief Draws a framed rectangle with a gradient.
+/*!	\brief Draws a framed rectangle with a gradient.
 	\param down The rectangle should be drawn recessed or not
 */
 void
@@ -1256,6 +1257,16 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 	fTruncatedTitle = Title();
 	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_MIDDLE, size);
 	fTruncatedTitleLength = fTruncatedTitle.Length();
+}
+
+
+void
+DefaultDecorator::_InvalidateBitmaps()
+{
+	for (int32 index = 0; index < 4; index++) {
+		fCloseBitmaps[index] = NULL;
+		fZoomBitmaps[index] = NULL;
+	}
 }
 
 
