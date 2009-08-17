@@ -1,5 +1,5 @@
 /*
- * Copyright 1007, François Revol, revol@free.fr.
+ * Copyright 2007, François Revol, revol@free.fr.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
