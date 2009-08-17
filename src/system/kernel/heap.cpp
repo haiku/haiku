@@ -1433,15 +1433,15 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 	if (address == NULL)
 		return address;
 
+#if PARANOID_KERNEL_MALLOC
+	memset(address, 0xcc, size);
+#endif
+
 #if PARANOID_KERNEL_FREE
 	// make sure 0xdeadbeef is cleared if we do not overwrite the memory
 	// and the user does not clear it
 	if (((uint32 *)address)[1] == 0xdeadbeef)
 		((uint32 *)address)[1] = 0xcccccccc;
-#endif
-
-#if PARANOID_KERNEL_MALLOC
-	memset(address, 0xcc, size);
 #endif
 
 	return address;
@@ -1495,19 +1495,12 @@ heap_free(heap_allocator *heap, void *address)
 	if (page->bin_index < heap->bin_count) {
 		// small allocation
 		heap_bin *bin = &heap->bins[page->bin_index];
-		MutexLocker binLocker(bin->lock);
-
-		if (((addr_t)address - area->base - page->index
-			* heap->page_size) % bin->element_size != 0) {
-			panic("free(): passed invalid pointer %p supposed to be in bin for "
-				"element size %ld\n", address, bin->element_size);
-			return B_ERROR;
-		}
 
 #if PARANOID_KERNEL_FREE
 		if (((uint32 *)address)[1] == 0xdeadbeef) {
 			// This block looks like it was freed already, walk the free list
 			// on this page to make sure this address doesn't exist.
+			MutexLocker binLocker(bin->lock);
 			for (addr_t *temp = page->free_list; temp != NULL;
 					temp = (addr_t *)*temp) {
 				if (temp == address) {
@@ -1518,18 +1511,20 @@ heap_free(heap_allocator *heap, void *address)
 			}
 		}
 
-		uint32 *dead = (uint32 *)address;
-		if (bin->element_size % 4 != 0) {
-			panic("free(): didn't expect a bin element size that is not a "
-				"multiple of 4\n");
-			return B_ERROR;
-		}
-
 		// the first 4 bytes are overwritten with the next free list pointer
 		// later
+		uint32 *dead = (uint32 *)address;
 		for (uint32 i = 1; i < bin->element_size / sizeof(uint32); i++)
 			dead[i] = 0xdeadbeef;
 #endif
+
+		MutexLocker binLocker(bin->lock);
+		if (((addr_t)address - area->base - page->index
+			* heap->page_size) % bin->element_size != 0) {
+			panic("free(): passed invalid pointer %p supposed to be in bin for "
+				"element size %ld\n", address, bin->element_size);
+			return B_ERROR;
+		}
 
 		// add the address to the page free list
 		*(addr_t *)address = (addr_t)page->free_list;
