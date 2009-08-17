@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc.
+ * Copyright 2006-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,42 +9,49 @@
 
 #include "Overlay.h"
 
+#include <BitmapPrivate.h>
+
 #include "HWInterface.h"
 #include "ServerBitmap.h"
 
-#include <BitmapPrivate.h>
+
+//#define TRACE_OVERLAY
+#ifdef TRACE_OVERLAY
+#	define TRACE(x...) ktrace_printf(x);
+#else
+#	define TRACE(x...) ;
+#endif
 
 
 const static bigtime_t kOverlayTimeout = 1000000LL;
 	// after 1 second, the team holding the lock will be killed
 
 class SemaphoreLocker {
-	public:
-		SemaphoreLocker(sem_id semaphore,
-				bigtime_t timeout = B_INFINITE_TIMEOUT)
-			: fSemaphore(semaphore)
-		{
-			do {
-				fStatus = acquire_sem_etc(fSemaphore, 1, B_RELATIVE_TIMEOUT,
-					timeout);
-			} while (fStatus == B_INTERRUPTED);
-		}
+public:
+	SemaphoreLocker(sem_id semaphore, bigtime_t timeout = B_INFINITE_TIMEOUT)
+		:
+		fSemaphore(semaphore)
+	{
+		do {
+			fStatus = acquire_sem_etc(fSemaphore, 1, B_RELATIVE_TIMEOUT,
+				timeout);
+		} while (fStatus == B_INTERRUPTED);
+	}
 
-		~SemaphoreLocker()
-		{
-			if (fStatus == B_OK)
-				release_sem_etc(fSemaphore, 1, B_DO_NOT_RESCHEDULE);
-		}
+	~SemaphoreLocker()
+	{
+		if (fStatus == B_OK)
+			release_sem_etc(fSemaphore, 1, B_DO_NOT_RESCHEDULE);
+	}
 
-		status_t
-		LockStatus()
-		{
-			return fStatus;
-		}
+	status_t LockStatus()
+	{
+		return fStatus;
+	}
 
-	private:
-		sem_id		fSemaphore;
-		status_t	fStatus;
+private:
+	sem_id		fSemaphore;
+	status_t	fStatus;
 };
 
 
@@ -71,6 +78,8 @@ Overlay::Overlay(HWInterface& interface, ServerBitmap* bitmap,
 	fWindow.flags = B_OVERLAY_COLOR_KEY;
 
 	_AllocateBuffer(bitmap);
+
+	TRACE("overlay: created %p, bitmap %p\n", this, bitmap);
 }
 
 
@@ -80,6 +89,7 @@ Overlay::~Overlay()
 	_FreeBuffer();
 
 	delete_sem(fSemaphore);
+	TRACE("overlay: deleted %p\n", this);
 }
 
 
@@ -104,6 +114,8 @@ Overlay::Resume(ServerBitmap* bitmap)
 		// TODO: kill app!
 	}
 
+	TRACE("overlay: resume %p (lock status %ld)\n", this, locker.LockStatus());
+
 	status_t status = _AllocateBuffer(bitmap);
 	if (status < B_OK)
 		return status;
@@ -120,6 +132,8 @@ Overlay::Suspend(ServerBitmap* bitmap, bool needTemporary)
 	if (locker.LockStatus() == B_TIMED_OUT) {
 		// TODO: kill app!
 	}
+
+	TRACE("overlay: suspend %p (lock status %ld)\n", this, locker.LockStatus());
 
 	_FreeBuffer();
 	fClientData->buffer = NULL;
@@ -209,6 +223,7 @@ Overlay::Hide()
 		return;
 
 	fHWInterface.HideOverlay(this);
+	TRACE("overlay: hide %p\n", this);
 }
 
 
@@ -258,6 +273,8 @@ Overlay::Configure(const BRect& source, const BRect& destination)
 		if (fOverlayToken == NULL)
 			return;
 	}
+
+	TRACE("overlay: configure %p\n", this);
 
 	fView.h_start = (uint16)source.left;
 	fView.v_start = (uint16)source.top;

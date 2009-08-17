@@ -8,8 +8,8 @@
  */
 
 /*!
-	Whenever a ServerBitmap associated with a client-side BBitmap needs to be 
-	created or destroyed, the BitmapManager needs to handle it. It takes care of 
+	Whenever a ServerBitmap associated with a client-side BBitmap needs to be
+	created or destroyed, the BitmapManager needs to handle it. It takes care of
 	all memory management related to them.
 */
 
@@ -209,7 +209,8 @@ void
 BitmapManager::DeleteBitmap(ServerBitmap* bitmap)
 {
 	if (bitmap == NULL || !bitmap->_Release()) {
-		// there are other references to this bitmap, we don't have to delete it yet
+		// there are other references to this bitmap, we don't have to delete
+		// it yet
 		return;
 	}
 
@@ -218,7 +219,7 @@ BitmapManager::DeleteBitmap(ServerBitmap* bitmap)
 		return;
 
 	if (bitmap->Overlay() != NULL)
-		fOverlays.AddItem(bitmap);
+		fOverlays.RemoveItem(bitmap);
 
 	if (fBitmapList.RemoveItem(bitmap))
 		delete bitmap;
@@ -249,7 +250,7 @@ BitmapManager::SuspendOverlays()
 	for (int32 i = 0; i < fOverlays.CountItems(); i++) {
 		ServerBitmap* bitmap = (ServerBitmap*)fOverlays.ItemAt(i);
 		bitmap->Overlay()->Suspend(bitmap, false);
-	}	
+	}
 }
 
 
@@ -279,6 +280,6 @@ BitmapManager::ResumeOverlays()
 		ServerBitmap* bitmap = (ServerBitmap*)fOverlays.ItemAt(i);
 
 		bitmap->Overlay()->Resume(bitmap);
-	}	
+	}
 }
 
