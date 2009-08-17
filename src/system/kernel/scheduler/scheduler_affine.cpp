@@ -58,6 +58,7 @@ struct scheduler_thread_data {
 
 	void Init()
 	{
+		fQuantumAverage = 0;
 		fLastQuantumSlot = 0;
 		fLastQueue = -1;
 	}
