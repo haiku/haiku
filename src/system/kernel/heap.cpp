@@ -1462,12 +1462,12 @@ heap_free(heap_allocator *heap, void *address)
 		// smaller than our address to become our only candidate for freeing
 		if (area->base <= (addr_t)address) {
 			if ((addr_t)address >= area->base + area->size) {
-				// the only candidate area doesn't contain the address,
-				// set it to NULL so we return below (none of the other areas
-				// can contain the address as the list is ordered)
-				area = NULL;
+				// none of the other areas can contain the address as the list
+				// is ordered
+				return B_ENTRY_NOT_FOUND;
 			}
 
+			// this area contains the allocation, we're done searching
 			break;
 		}
 
@@ -1621,7 +1621,7 @@ static status_t
 heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	size_t newSize)
 {
-	ReadLocker heapReadLocker(heap->area_lock);
+	ReadLocker areaReadLocker(heap->area_lock);
 	heap_area *area = heap->all_areas;
 	while (area) {
 		// since the all_areas list is ordered by base with the biggest
@@ -1630,12 +1630,12 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 		// reallocating
 		if (area->base <= (addr_t)address) {
 			if ((addr_t)address >= area->base + area->size) {
-				// the only candidate area doesn't contain the address,
-				// set it to NULL so we return below (none of the other areas
-				// can contain the address as the list is ordered)
-				area = NULL;
+				// none of the other areas can contain the address as the list
+				// is ordered
+				return B_ENTRY_NOT_FOUND;
 			}
 
+			// this area contains the allocation, we're done searching
 			break;
 		}
 
@@ -1683,7 +1683,7 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 		}
 	}
 
-	heapReadLocker.Unlock();
+	areaReadLocker.Unlock();
 
 #if KERNEL_HEAP_LEAK_CHECK
 	newSize += sizeof(heap_leak_check_info);
