@@ -7,13 +7,14 @@
  */
 
 
+#include <stdlib.h>
+
 #include <Application.h>
 #include <MessageRunner.h>
 #include <Window.h>
 #include <View.h>
 
-//#include <stdio.h>
-#include <stdlib.h>
+#include <WindowPrivate.h>
 
 
 class ShowInvalidationView : public BView {
@@ -108,7 +109,7 @@ void
 ChangingWindow::MessageReceived(BMessage* message)
 {
 	if (message->what == 'actn') {
-		switch (rand() % 3) {
+		switch (rand() % 4) {
 			case 0:
 			{
 				// resize window
@@ -145,6 +146,17 @@ ChangingWindow::MessageReceived(BMessage* message)
 					= {"Window", "Invalidation", "Test", "Hooray"};
 
 				SetTitle(kChoices[rand() % (sizeof(kChoices) / sizeof(char*))]);
+				break;
+			}
+
+			case 3:
+			{
+				// change look
+				static const window_look kLooks[]
+					= {B_TITLED_WINDOW_LOOK, B_DOCUMENT_WINDOW_LOOK,
+						B_FLOATING_WINDOW_LOOK, kLeftTitledWindowLook};
+
+				SetLook(kLooks[rand() % (sizeof(kLooks) / sizeof(kLooks[0]))]);
 				break;
 			}
 		}
