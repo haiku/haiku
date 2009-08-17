@@ -6,6 +6,7 @@ UsePrivateHeaders app shared storage support usb ;
 UsePrivateSystemHeaders ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
 UseLibraryHeaders ncurses ;
+UseLibraryHeaders termcap ;
 
 local haiku-utils_rsrc = [ FGristFiles haiku-utils.rsrc ] ;
 

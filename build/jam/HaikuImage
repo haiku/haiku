@@ -77,12 +77,12 @@ SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations E-mail
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 	GLTeapot Haiku3d Mandelbrot Pairs Playground Pulse Sudoku Gradients
 ;
-SYSTEM_LIBS = libbe.so $(HAIKU_SHARED_LIBSTDC++) libmedia.so libtracker.so
-	libtranslation.so libbnetapi.so libnetwork.so libdebug.so libbsd.so
-	libmail.so libtextencoding.so libz.so libfreetype.so libpng.so libmidi.so
-	libmidi2.so libdevice.so libgame.so libscreensaver.so <revisioned>libroot.so
-	libGL.so libfluidsynth.so liblpsolve55.so liblinprog.so libalm.so
-	libilmimf.so $(HAIKU_SHARED_LIBSUPC++)
+SYSTEM_LIBS = libalm.so libbe.so libbsd.so libbnetapi.so libdebug.so
+	libdevice.so libfluidsynth.so libfreetype.so libgame.so libGL.so libgnu.so
+	libilmimf.so liblinprog.so liblpsolve55.so libmail.so libmedia.so libmidi.so
+	libmidi2.so libnetwork.so libpng.so <revisioned>libroot.so libscreensaver.so
+	libtextencoding.so libtracker.so libtranslation.so	libz.so
+	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 ;
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
 	media_addon_server media_server midi_server net_server print_server

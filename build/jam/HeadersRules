@@ -226,7 +226,7 @@ rule UsePrivateHeaders
 	# NOTE: This rule must be invoked *before* the rule that builds the objects.
 
 	local system = $(2) ;
-	system ?= true ;	
+	system ?= true ;
 
 	UseHeaders [ PrivateHeaders $(1) ] : $(system) ;
 }
@@ -243,7 +243,7 @@ rule UsePrivateObjectHeaders
 	# search dirs. Defaults to "true".
 
 	local system = $(4) ;
-	system ?= true ;	
+	system ?= true ;
 
 	if $(system) = true {
 		SourceSysHdrs $(1) : [ PrivateHeaders $(2) ] : $(3) ;
@@ -356,7 +356,7 @@ rule FStandardOSHeaders
 					   add-ons/tracker app device drivers game interface
 					   kernel media mail midi midi2 net opengl storage support
 					   translation ;
-	
+
 	return [ FDirName $(HAIKU_TOP) headers os ]
 		[ PublicHeaders $(osIncludes) ] ;
 }
@@ -388,9 +388,6 @@ rule FStandardHeaders
 
 	# Use posix headers directory
 	headers += [ FDirName $(HAIKU_TOP) headers posix ] ;
-
-	# Use GNU headers directory
-	headers += [ FDirName $(HAIKU_TOP) headers gnu ] ;
 
 	# Use glibc headers
 	headers += [ FDirName $(HAIKU_TOP) headers glibc ] ;

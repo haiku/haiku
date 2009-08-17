@@ -366,7 +366,6 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	AddFilesToHaikuImage develop etc : $(makefileEngineFiles) ;
 
 	# headers
-	AddHeaderDirectoryToHaikuImage gnu : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage glibc ;
 	AddHeaderDirectoryToHaikuImage os ;
 	AddHeaderDirectoryToHaikuImage posix ;
@@ -374,13 +373,15 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	# create be -> os symlink for now
 	AddSymlinkToHaikuImage develop headers : os : be ;
 
-	# BSD compatibility headers
+	# BSD and GNU compatibility headers
 	AddHeaderDirectoryToHaikuImage compatibility bsd : bsd ;
+	AddHeaderDirectoryToHaikuImage compatibility gnu : gnu ;
 
 	# third party libs headers
 	AddHeaderDirectoryToHaikuImage libs freetype2 : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs png : 3rdparty ;
+	AddHeaderDirectoryToHaikuImage libs termcap : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
 
 	# cpp headers
