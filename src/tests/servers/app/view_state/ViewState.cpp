@@ -103,6 +103,7 @@ Window::Window()
 	AddChild(view);
 }
 
+
 Window::~Window()
 {
 }
