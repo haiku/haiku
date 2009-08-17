@@ -2836,15 +2836,34 @@ Desktop::_SetBackground(BRegion& background)
 
 //!	The all window lock must be held when calling this function.
 void
-Desktop::_RebuildAndRedrawAfterWindowChange(Window* window, BRegion& dirty)
+Desktop::_RebuildAndRedrawAfterWindowChange(Window* changedWindow,
+	BRegion& dirty)
 {
-	if (!window->IsVisible() || dirty.CountRects() == 0)
+	if (!changedWindow->IsVisible() || dirty.CountRects() == 0)
 		return;
 
-	BRegion stillAvailableOnScreen;
-	_RebuildClippingForAllWindows(stillAvailableOnScreen);
+	// The following loop is pretty much a copy of
+	// _RebuildClippingForAllWindows(), but will also
+	// take care about restricting our dirty region.
+
+	// figure out what the entire screen area is
+	BRegion stillAvailableOnScreen(fScreenRegion);
+
+	// set clipping of each window
+	for (Window* window = _CurrentWindows().LastWindow(); window != NULL;
+			window = window->PreviousWindow(fCurrentWorkspace)) {
+		if (!window->IsHidden()) {
+			if (window == changedWindow)
+				dirty.IntersectWith(&stillAvailableOnScreen);
+
+			window->SetClipping(&stillAvailableOnScreen);
+			// that windows region is not available on screen anymore
+			stillAvailableOnScreen.Exclude(&window->VisibleRegion());
+		}
+	}
+
 	_SetBackground(stillAvailableOnScreen);
-	_WindowChanged(window);
+	_WindowChanged(changedWindow);
 
 	_TriggerWindowRedrawing(dirty);
 }
