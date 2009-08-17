@@ -366,8 +366,10 @@ ModulesView::MessageReceived(BMessage* message)
 
 			_CloseSaver();
 
-			be_roster->StartWatching(BMessenger(this, this->Looper()), B_REQUEST_QUIT);
-			be_roster->Launch(SCREEN_BLANKER_SIG, &fSettings.Message(), &fScreenSaverTestTeamId);
+			be_roster->StartWatching(BMessenger(this, this->Looper()),
+				B_REQUEST_QUIT);
+			be_roster->Launch(SCREEN_BLANKER_SIG, &fSettings.Message(),
+				&fScreenSaverTestTeamId);
 			break;
 
 		case kMsgAddSaver:
