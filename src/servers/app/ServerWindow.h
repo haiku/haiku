@@ -72,6 +72,7 @@ public:
 			const BMessenger&	HandlerMessenger() const
 									{ return fHandlerMessenger; }
 
+			void			ScreenChanged(const BMessage *screenChangedMessage);
 			status_t			SendMessageToClient(const BMessage* msg,
 									int32 target = B_NULL_TOKEN) const;
 

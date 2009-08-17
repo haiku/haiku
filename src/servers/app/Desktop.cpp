@@ -1147,6 +1147,7 @@ Desktop::ScreenChanged(Screen* screen, bool makeDefault)
 	// TODO: currently ignores the screen argument!
 	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
+		window->ServerWindow()->ScreenChanged(&update);
 		window->ServerWindow()->SendMessageToClient(&update);
 	}
 

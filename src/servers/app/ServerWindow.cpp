@@ -153,7 +153,7 @@ public:
 		
 	BRect	old_window_frame;
 	direct_buffer_info *buffer_info;
-
+	bool full_screen;
 private:
 	sem_id	fSem;
 	sem_id	fAcknowledgeSem;
@@ -165,6 +165,7 @@ private:
 DirectWindowData::DirectWindowData()
 	:
 	buffer_info(NULL),
+	full_screen(false),
 	fSem(-1),
 	fAcknowledgeSem(-1),
 	fBufferArea(-1),
@@ -3537,6 +3538,24 @@ ServerWindow::_MessageLooper()
 }
 
 
+void
+ServerWindow::ScreenChanged(const BMessage *message)
+{
+	// TODO: execute the stop notification earlier
+	//HandleDirectConnection(B_DIRECT_STOP);
+	SendMessageToClient(message);
+	if (fDirectWindowData != NULL && fDirectWindowData->full_screen) {
+		BRect screenFrame = fDesktop->ActiveScreen()->Frame();
+		fDesktop->ResizeWindowBy(fWindow,
+			screenFrame.Width() - fWindow->Frame().Width(),
+			screenFrame.Height() - fWindow->Frame().Height());
+	}
+				
+	//HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET,
+		//B_SCREEN_CHANGED);
+}
+
+
 status_t
 ServerWindow::SendMessageToClient(const BMessage* msg, int32 target) const
 {
@@ -3788,6 +3807,7 @@ ServerWindow::_DirectWindowSetFullScreen(bool enable)
 		fDesktop->HWInterface()->SetCursorVisible(true);
 	}
 
+	fDirectWindowData->full_screen = enable;
 	fDesktop->SetWindowFeel(fWindow,
 		enable ? kWindowScreenFeel : fDirectWindowFeel);
 }
