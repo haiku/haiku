@@ -383,6 +383,7 @@ TBeMenu::AddStandardBeMenuItems()
 	item = new BMenuItem("Power Off", new BMessage(CMD_SHUTDOWN_SYSTEM));
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
+	shutdownMenu->SetFont(be_plain_font);
 
 #ifdef __HAIKU__
 	shutdownMenu->SetTargetForItems(be_app);
