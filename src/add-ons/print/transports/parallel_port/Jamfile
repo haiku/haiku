@@ -3,11 +3,11 @@ SubDir HAIKU_TOP src add-ons print transports parallel_port ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders print ;
-SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 
 Addon Parallel\ Port :
 	ParallelTransport.cpp
-	: be libprintutils.a $(TARGET_LIBSUPC++)
+	PrintTransportAddOn.cpp
+	: be $(TARGET_LIBSUPC++)
 ;
 
 Package haiku-printingkit-cvs :
