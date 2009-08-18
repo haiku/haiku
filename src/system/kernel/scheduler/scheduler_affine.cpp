@@ -331,7 +331,7 @@ affine_set_thread_priority(struct thread *thread, int32 priority)
 	thread = dequeue_from_run_queue(prev, targetCPU);
 
 	// set priority and re-insert
-	thread->priority = priority;
+	thread->priority = thread->next_priority = priority;
 	affine_enqueue_in_run_queue(thread);
 }
 
