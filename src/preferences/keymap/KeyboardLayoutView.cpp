@@ -478,6 +478,7 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 		_InvalidateKey(fDropTarget);
 		fDropTarget = NULL;
 		fDropPoint.x = -1;
+		return;
 	}
 
 	switch (message->what) {
