@@ -4,6 +4,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders print ;
 
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits print ] ;
+
 Addon Serial\ Port :
 	SerialTransport.cpp
 	PrintTransportAddOn.cpp

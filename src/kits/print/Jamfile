@@ -12,5 +12,4 @@ StaticLibrary libprintutils.a :
 	PicturePrinter.cpp
 	PrintTransport.cpp
 	PictureIterator.cpp
-	PrintTransportAddOn.cpp
 ;
