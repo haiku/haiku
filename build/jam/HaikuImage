@@ -71,9 +71,9 @@ SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc DiskProb
 	ShowImage SoundRecorder StyledEdit Terminal TextSearch TV Workspaces
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations E-mail
-	FileTypes Fonts Keyboard Keymap Locale Media Mouse Network Printers
+	FileTypes Fonts Keyboard Keymap  Media Mouse Network Printers
 	Screen ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
-;
+; # Locale
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 	GLTeapot Haiku3d Mandelbrot Pairs Playground Pulse Sudoku Gradients
 ;
