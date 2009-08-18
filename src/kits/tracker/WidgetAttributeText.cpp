@@ -130,7 +130,7 @@ WidgetAttributeText::NewWidgetText(const Model *model,
 	else if (strcmp(attrName, kAttrOriginalPath) == 0)
 		return new OriginalPathAttributeText(model, column);
 
-	return new GenericAttributeText(model, column);	
+	return new GenericAttributeText(model, column);
 }
 
 
@@ -179,7 +179,7 @@ WidgetAttributeText::CheckViewChanged(const BPoseView *view)
 
 bool
 WidgetAttributeText::CheckSettingsChanged()
-{	
+{
 	return false;
 }
 
@@ -485,27 +485,27 @@ WidgetAttributeText::AttrAsString(const Model *model, BString *result,
 					TruncateLeaf(&tmp);
 				} else
 					tmp = "-";
-		
+
 				if (width > 0) {
 					TruncStringBase(result, tmp.String(), tmp.Length(), view,
 						width);
 				} else
 					*result = tmp.String();
-				
+
 				return B_OK;
 			}
 			break;
-	
+
 		case kSizeType:
 //			TruncFileSizeBase(result, model->StatBuf()->st_size, view, width);
 			return B_OK;
 			break;
-		
+
 		default:
 			TRESPASS();
 			// not yet supported
 			return B_ERROR;
-	
+
 	}
 
 	TRESPASS();
@@ -594,7 +594,8 @@ StringAttributeText::Compare(WidgetAttributeText &attr, BPoseView *view)
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
 
-	return NaturalCompare(fFullValueText.String(), compareTo->ValueAsText(view));
+	return NaturalCompare(fFullValueText.String(),
+		compareTo->ValueAsText(view));
 }
 
 
@@ -678,7 +679,8 @@ ScalarAttributeText::Compare(WidgetAttributeText &attr, BPoseView *)
 	if (fValueDirty)
 		fValue = ReadValue();
 
-	return fValue >= compareTo->Value() ? (fValue == compareTo->Value() ? 0 : -1) : 1 ;
+	return fValue >= compareTo->Value()
+		? (fValue == compareTo->Value() ? 0 : 1) : -1;
 }
 
 
@@ -1102,7 +1104,7 @@ TimeAttributeText::FitValue(BString *result, const BPoseView *view)
 
 bool
 TimeAttributeText::CheckSettingsChanged()
-{	
+{
 	bool changed = fLastClockIs24 != fSettings.ClockIs24Hr()
 		|| fLastDateOrder != fSettings.DateOrderFormat()
 		|| fLastTimeFormatSeparator != fSettings.TimeFormatSeparator();
@@ -1333,7 +1335,7 @@ GenericAttributeText::FitValue(BString *result, const BPoseView *view)
 				fFullValueText.Length(), view, fOldWidth);
 			fDirty = false;
 			return;
-		
+
 		case B_OFF_T_TYPE:
 			// as a side effect update the fFullValueText to the string representation
 			// of value
@@ -1474,9 +1476,9 @@ GenericAttributeText::Compare(WidgetAttributeText &attr, BPoseView *)
 
 	// Sort undefined values last, regardless of the other value:
 	if (!fValueIsDefined)
-		return compareTo->fValueIsDefined ? -1 : 0;
+		return compareTo->fValueIsDefined ? 1 : 0;
 	if (!compareTo->fValueIsDefined)
-		return 1;
+		return -1;
 
 	switch (fColumn->AttrType()) {
 		case B_STRING_TYPE:
@@ -1486,61 +1488,61 @@ GenericAttributeText::Compare(WidgetAttributeText &attr, BPoseView *)
 		{
 			char vStr[2] = { static_cast<char>(fValue.uint8t), 0 };
 			char cStr[2] = { static_cast<char>(compareTo->fValue.uint8t), 0};
-		
+
 			BString valueStr(vStr);
 			BString compareToStr(cStr);
-		
+
 			return valueStr.ICompare(compareToStr);
 		}
 
 		case B_FLOAT_TYPE:
 			return fValue.floatt >= compareTo->fValue.floatt ?
-				(fValue.floatt == compareTo->fValue.floatt ? 0 : -1) : 1;
+				(fValue.floatt == compareTo->fValue.floatt ? 0 : 1) : -1;
 
 		case B_DOUBLE_TYPE:
 			return fValue.doublet >= compareTo->fValue.doublet ?
-				(fValue.doublet == compareTo->fValue.doublet ? 0 : -1) : 1;
+				(fValue.doublet == compareTo->fValue.doublet ? 0 : 1) : -1;
 
 		case B_BOOL_TYPE:
 			return fValue.boolt >= compareTo->fValue.boolt ?
-				(fValue.boolt == compareTo->fValue.boolt ? 0 : -1) : 1;
+				(fValue.boolt == compareTo->fValue.boolt ? 0 : 1) : -1;
 
 		case B_UINT8_TYPE:
 			return fValue.uint8t >= compareTo->fValue.uint8t ?
-				(fValue.uint8t == compareTo->fValue.uint8t ? 0 : -1) : 1;
+				(fValue.uint8t == compareTo->fValue.uint8t ? 0 : 1) : -1;
 
 		case B_INT8_TYPE:
 			return fValue.int8t >= compareTo->fValue.int8t ?
-					(fValue.int8t == compareTo->fValue.int8t ? 0 : -1) : 1;
+					(fValue.int8t == compareTo->fValue.int8t ? 0 : 1) : -1;
 
 		case B_UINT16_TYPE:
 			return fValue.uint16t >= compareTo->fValue.uint16t ?
-				(fValue.uint16t == compareTo->fValue.uint16t ? 0 : -1) : 1;
+				(fValue.uint16t == compareTo->fValue.uint16t ? 0 : 1) : -1;
 
 		case B_INT16_TYPE:
 			return fValue.int16t >= compareTo->fValue.int16t ?
-				(fValue.int16t == compareTo->fValue.int16t ? 0 : -1) : 1;
+				(fValue.int16t == compareTo->fValue.int16t ? 0 : 1) : -1;
 
 		case B_UINT32_TYPE:
 			return fValue.uint32t >= compareTo->fValue.uint32t ?
-				(fValue.uint32t == compareTo->fValue.uint32t ? 0 : -1) : 1;
+				(fValue.uint32t == compareTo->fValue.uint32t ? 0 : 1) : -1;
 
 		case B_TIME_TYPE:
 			// time_t typedef'd to a long, i.e. a int32
 		case B_INT32_TYPE:
 			return fValue.int32t >= compareTo->fValue.int32t ?
-				(fValue.int32t == compareTo->fValue.int32t ? 0 : -1) : 1;
+				(fValue.int32t == compareTo->fValue.int32t ? 0 : 1) : -1;
 
 		case B_OFF_T_TYPE:
 			// off_t typedef'd to a long long, i.e. a int64
 		case B_INT64_TYPE:
 			return fValue.int64t >= compareTo->fValue.int64t ?
-				(fValue.int64t == compareTo->fValue.int64t ? 0 : -1) : 1;
+				(fValue.int64t == compareTo->fValue.int64t ? 0 : 1) : -1;
 
 		case B_UINT64_TYPE:
 		default:
 			return fValue.uint64t >= compareTo->fValue.uint64t ?
-				(fValue.uint64t == compareTo->fValue.uint64t ? 0 : -1) : 1;
+				(fValue.uint64t == compareTo->fValue.uint64t ? 0 : 1) : -1;
 	}
 	return 0;
 }
@@ -1643,7 +1645,7 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView *textView)
 					alert->Go();
 					return false;
 				}
-			
+
 				size = fModel->WriteAttr(columnName, type, 0, &ch, sizeof(char));
 				break;
 			}
@@ -1661,7 +1663,7 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView *textView)
 					return fValueIsDefined;
 				break;
 			}
-		
+
 		case B_DOUBLE_TYPE:
 			{
 				double doubleVal;
@@ -1675,7 +1677,7 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView *textView)
 					return fValueIsDefined;
 				break;
 			}
-		
+
 		case B_TIME_TYPE:
 		case B_OFF_T_TYPE:
 		case B_UINT64_TYPE:
@@ -1689,56 +1691,56 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView *textView)
 			{
 				GenericValueStruct tmp;
 				size_t scalarSize = 0;
-			
+
 				switch (type) {
 					case B_TIME_TYPE:
 						tmp.time_tt = parsedate(textView->Text(), time(0));
 						scalarSize = sizeof(time_t);
 						break;
-					
+
 					// do some size independent conversion on builtin types
 					case B_OFF_T_TYPE:
 						tmp.off_tt = StringToScalar(textView->Text());
 						scalarSize = sizeof(off_t);
 						break;
-					
+
 					case B_UINT64_TYPE:
 					case B_INT64_TYPE:
 						tmp.int64t = StringToScalar(textView->Text());
 						scalarSize = sizeof(int64);
 						break;
-					
+
 					case B_UINT32_TYPE:
 					case B_INT32_TYPE:
 						tmp.int32t = (int32)StringToScalar(textView->Text());
 						scalarSize = sizeof(int32);
 						break;
-					
+
 					case B_UINT16_TYPE:
 					case B_INT16_TYPE:
 						tmp.int16t = (int16)StringToScalar(textView->Text());
 						scalarSize = sizeof(int16);
 						break;
-					
+
 					case B_UINT8_TYPE:
 					case B_INT8_TYPE:
 						tmp.int8t = (int8)StringToScalar(textView->Text());
 						scalarSize = sizeof(int8);
 						break;
-					
+
 					default:
 						TRESPASS();
-			
+
 				}
-			
+
 				size = fModel->WriteAttr(columnName, type, 0, &tmp, scalarSize);
 				break;
 			}
 	}
 
 	if (size < 0) {
-		BAlert *alert = new BAlert("", 
-			"There was an error writing the attribute.", 
+		BAlert *alert = new BAlert("",
+			"There was an error writing the attribute.",
 			"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
