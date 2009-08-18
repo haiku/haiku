@@ -6,7 +6,12 @@
 #ifndef __DBGMSG_H
 #define __DBGMSG_H
 
-//#define DBG
+#include <Directory.h>
+#include <File.h>
+#include <Message.h>
+#include <Node.h>
+
+// #define DBG
 
 #ifdef DBG
 	void write_debug_stream(const char *, ...);
