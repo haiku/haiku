@@ -60,6 +60,7 @@ public:
 			status_t		Load(entry_ref& ref);
 
 			void			SetDefault();
+			bool			IsDefault() const { return fIsDefault; }
 
 private:
 	enum parse_mode {
@@ -112,6 +113,7 @@ private:
 			BSize			fDefaultKeySize;
 			int32			fAlternateIndex[3];
 			BObjectList<Indicator> fIndicators;
+			bool			fIsDefault;
 };
 
 #endif	// KEYBOARD_LAYOUT_H

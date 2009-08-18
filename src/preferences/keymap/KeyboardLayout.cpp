@@ -31,7 +31,8 @@ KeyboardLayout::KeyboardLayout()
 	fKeys(NULL),
 	fKeyCount(0),
 	fKeyCapacity(0),
-	fIndicators(5, true)
+	fIndicators(5, true),
+	fIsDefault(true)
 {
 	SetDefault();
 }
@@ -147,6 +148,9 @@ KeyboardLayout::Load(entry_ref& ref)
 	data[size] = '\0';
 
 	status = _InitFrom(data);
+	if (status == B_OK)
+		fIsDefault = false;
+
 	free(data);
 
 	return status;
@@ -278,6 +282,7 @@ KeyboardLayout::SetDefault()
 
 	_InitFrom(kIBMLaptop);
 #endif
+	fIsDefault = true;
 }
 
 
@@ -417,7 +422,7 @@ KeyboardLayout::_GetPair(const parse_state& state, const char*& data,
 	}
 
 	_Trim(name, false);
-	_Trim(value, true);	
+	_Trim(value, true);
 
 	return true;
 }

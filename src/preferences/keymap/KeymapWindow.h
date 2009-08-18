@@ -19,6 +19,7 @@
 
 #include "Keymap.h"
 
+
 class BMenu;
 class BMenuBar;
 class BMenuField;
@@ -39,6 +40,7 @@ protected:
 			BMenuBar*			_CreateMenu();
 			BView*				_CreateMapLists();
 			void				_AddKeyboardLayouts(BMenu* menu);
+			status_t			_SetKeyboardLayout(const char* path);
 
 			void				_UpdateSwitchShortcutButton();
 			void				_UpdateButtons();
@@ -59,6 +61,12 @@ protected:
 			bool				_SelectCurrentMap(BListView *list);
 			void				_SelectCurrentMap();
 
+			status_t			_GetSettings(BFile& file, int mode) const;
+			status_t			_LoadSettings(BRect& frame,
+									BString& keyboardLayout);
+			status_t			_SaveSettings() const;
+
+private:
 			BListView*			fSystemListView;
 			BListView*			fUserListView;
 			BButton*			fRevertButton;
