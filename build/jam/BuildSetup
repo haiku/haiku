@@ -210,9 +210,9 @@ switch $(HAIKU_CPU) {
 	{
 		HAIKU_DEFINES += __INTEL__ ;
 		HAIKU_BOOT_PLATFORM = bios_ia32 ;
-		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
+		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 		# offset in floppy image (>= sizeof(haiku_loader))
-		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 270 ; # in kB
+		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
 
 		# yasm is required for target arch x86
 		if ! $(HAIKU_YASM) {
