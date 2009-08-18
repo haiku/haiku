@@ -9,6 +9,7 @@
  *		Axel Dörfler, axeld@pinc-software.de.
  */
 
+
 #include "KeymapWindow.h"
 
 #include <string.h>
@@ -62,7 +63,8 @@ static const char* kCurrentKeymapName = "(Current)";
 
 
 KeymapWindow::KeymapWindow()
-	: BWindow(BRect(80, 50, 880, 380), "Keymap", B_TITLED_WINDOW,
+	:
+	BWindow(BRect(80, 50, 880, 380), "Keymap", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
@@ -311,7 +313,7 @@ KeymapWindow::MessageReceived(BMessage* message)
 
 		case kMsgDeadKeyAcuteChanged:
 		{
-			BMenuItem *item = fAcuteMenu->FindMarked();
+			BMenuItem* item = fAcuteMenu->FindMarked();
 			if (item != NULL) {
 				const char* trigger = item->Label();
 				if (strcmp(trigger, kDeadKeyTriggerNone) == 0)
@@ -324,7 +326,7 @@ KeymapWindow::MessageReceived(BMessage* message)
 
 		case kMsgDeadKeyCircumflexChanged:
 		{
-			BMenuItem *item = fCircumflexMenu->FindMarked();
+			BMenuItem* item = fCircumflexMenu->FindMarked();
 			if (item != NULL) {
 				const char* trigger = item->Label();
 				if (strcmp(trigger, kDeadKeyTriggerNone) == 0)
@@ -337,7 +339,7 @@ KeymapWindow::MessageReceived(BMessage* message)
 
 		case kMsgDeadKeyDiaeresisChanged:
 		{
-			BMenuItem *item = fDiaeresisMenu->FindMarked();
+			BMenuItem* item = fDiaeresisMenu->FindMarked();
 			if (item != NULL) {
 				const char* trigger = item->Label();
 				if (strcmp(trigger, kDeadKeyTriggerNone) == 0)
@@ -350,7 +352,7 @@ KeymapWindow::MessageReceived(BMessage* message)
 
 		case kMsgDeadKeyGraveChanged:
 		{
-			BMenuItem *item = fGraveMenu->FindMarked();
+			BMenuItem* item = fGraveMenu->FindMarked();
 			if (item != NULL) {
 				const char* trigger = item->Label();
 				if (strcmp(trigger, kDeadKeyTriggerNone) == 0)
@@ -363,7 +365,7 @@ KeymapWindow::MessageReceived(BMessage* message)
 
 		case kMsgDeadKeyTildeChanged:
 		{
-			BMenuItem *item = fTildeMenu->FindMarked();
+			BMenuItem* item = fTildeMenu->FindMarked();
 			if (item != NULL) {
 				const char* trigger = item->Label();
 				if (strcmp(trigger, kDeadKeyTriggerNone) == 0)

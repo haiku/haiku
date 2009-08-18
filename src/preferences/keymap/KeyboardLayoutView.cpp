@@ -27,7 +27,8 @@ static const rgb_color kLitIndicatorColor = {116, 212, 83, 255};
 
 
 KeyboardLayoutView::KeyboardLayoutView(const char* name)
-	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+	:
+	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
 	fOffscreenBitmap(NULL),
 	fKeymap(NULL),
 	fEditable(true),
@@ -236,7 +237,7 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 	if (fKeymap == NULL)
 		return;
 
-	// rule out dragging for tertiary mouse button
+	// prevent dragging for tertiary mouse button
 	if ((fButtons & B_TERTIARY_MOUSE_BUTTON) != 0)
 		return;
 
@@ -470,6 +471,8 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 					fKeymap->Modifier(fDropTarget->code));
 				fKeymap->SetModifier(fDropTarget->code, modifier);
 			}
+
+			_InvalidateKey(fDragKey);
 		}
 
 		_InvalidateKey(fDropTarget);
