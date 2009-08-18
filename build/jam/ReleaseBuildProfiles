@@ -13,7 +13,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 
 		AddOptionalHaikuImagePackages BePDF Clockwerk Firefox Pe Vision VLC
 			WonderBrush ;
-		AddOptionalHaikuImagePackages CVS Development Subversion OpenSSH Yasm ;
+		AddOptionalHaikuImagePackages CVS Development Subversion OpenSSH ;
 		AddOptionalHaikuImagePackages Welcome BeBook ;
 	}
 
