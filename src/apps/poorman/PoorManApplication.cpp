@@ -23,18 +23,19 @@ PoorManApplication::PoorManApplication()
 	mainWindow->Show();
 	
 	BDirectory webDir;
-	if(mainWindow->ReadSettings() != B_OK){
-		if(webDir.SetTo(STR_DEFAULT_WEB_DIRECTORY) != B_OK)
+	if (mainWindow->ReadSettings() != B_OK) {
+		if (webDir.SetTo(STR_DEFAULT_WEB_DIRECTORY) != B_OK)
 			mainWindow->DefaultSettings();
+		else
+			PostMessage(kStartServer);
 	} else {
-		if(webDir.SetTo(mainWindow->WebDir()) != B_OK)
+		if (webDir.SetTo(mainWindow->WebDir()) != B_OK)
 			mainWindow->DefaultSettings();
+		else
+			PostMessage(kStartServer);
 	}
-	
-	mainWindow->StartServer();
-	mainWindow->SetDirLabel(mainWindow->WebDir());
-	mainWindow->Show();
 }
+
 
 void 
 PoorManApplication::AboutRequested()
@@ -43,3 +44,39 @@ PoorManApplication::AboutRequested()
 		STR_ABOUT_DESC, STR_ABOUT_BUTTON);
 	aboutBox->Go(); 
 }
+
+
+void
+PoorManApplication::MessageReceived(BMessage *message)
+{
+	switch (message->what) {
+		case MSG_FILE_PANEL_SELECT_WEB_DIR:
+			mainWindow->MessageReceived(message);
+			break;
+
+		case kStartServer:
+			mainWindow->StartServer();
+			mainWindow->SetDirLabel(mainWindow->WebDir());
+			mainWindow->Show();
+			break;
+
+		case B_CANCEL: {
+			BDirectory webDir;
+			if (mainWindow->ReadSettings() != B_OK) {
+				if (webDir.SetTo(STR_DEFAULT_WEB_DIRECTORY) != B_OK)
+					mainWindow->DefaultSettings();
+				else
+					mainWindow->StartServer();
+			} else {
+				if (webDir.SetTo(mainWindow->WebDir()) != B_OK)
+					mainWindow->DefaultSettings();
+				else
+					mainWindow->StartServer();
+			}
+		}
+			break;
+		default:
+			BApplication::MessageReceived(message);
+	}
+}
+

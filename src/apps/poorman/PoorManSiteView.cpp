@@ -61,7 +61,8 @@ PoorManSiteView::PoorManSiteView(BRect rect, const char *name)
 	webSiteLocationRect.bottom = webSiteLocationRect.top + 19.0;
 	
 	// Web Directory Text Control
-	webDir = new BTextControl(webSiteLocationRect, "Web Dir", STR_TXT_DIRECTORY, NULL, NULL);
+	webDir = new BTextControl(webSiteLocationRect, "Web Dir", 
+		STR_TXT_DIRECTORY, NULL, NULL);
 	webDir->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	webDir->SetDivider(80.0);
 	SetWebDir(win->WebDir());
@@ -69,12 +70,15 @@ PoorManSiteView::PoorManSiteView(BRect rect, const char *name)
 	
 	// Select Web Directory Button
 	BRect selectWebDirRect;
+
 	selectWebDirRect.top = webSiteLocationRect.bottom + 5.0;
 	selectWebDirRect.right = webSiteLocationRect.right + 2.0;
-	selectWebDirRect.left = selectWebDirRect.right - 123.0;
+	selectWebDirRect.left = selectWebDirRect.right
+		- webSiteLocation->StringWidth("Select Web Dir") - 24.0;
 	selectWebDirRect.bottom = selectWebDirRect.top + 19.0;
 	
-	selectWebDir = new BButton(selectWebDirRect, "Select Web Dir", STR_BTN_DIRECTORY, new BMessage(MSG_PREF_SITE_BTN_SELECT));
+	selectWebDir = new BButton(selectWebDirRect, "Select Web Dir", 
+		STR_BTN_DIRECTORY, new BMessage(MSG_PREF_SITE_BTN_SELECT));
 	webSiteLocation->AddChild(selectWebDir);
 	
 	// Index File Name Text Control
@@ -82,7 +86,8 @@ PoorManSiteView::PoorManSiteView(BRect rect, const char *name)
 	webSiteLocationRect.top += 63.0;
 	webSiteLocationRect.bottom = webSiteLocationRect.top + 19.0;
 	
-	indexFileName = new BTextControl(webSiteLocationRect, "Index File Name", STR_TXT_INDEX, NULL, NULL);
+	indexFileName = new BTextControl(webSiteLocationRect,
+		"Index File Name", STR_TXT_INDEX, NULL, NULL);
 	indexFileName->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	indexFileName->SetDivider(80.0);
 	SetIndexFileName(win->IndexFileName());

@@ -35,6 +35,9 @@ const int32 MSG_PREF_ADV_SLD_MAX_CONNECTION = 'PASM';
 // BMessage Preferences File
 const uint32 MSG_PREF_FILE = 'pref';
 
+
+const uint32 kStartServer = 'strt';
+
 //BMessage for Logger
 const int32 MSG_LOG = 'logg';
 // ------------------------------------------------------

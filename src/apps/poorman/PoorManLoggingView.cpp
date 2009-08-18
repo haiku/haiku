@@ -67,7 +67,7 @@ PoorManLoggingView::PoorManLoggingView(BRect rect, const char *name)
 	
 	logFileName = new BTextControl(tempRect, "File Name", STR_TXT_LOG_FILE_NAME, NULL, NULL);
 	logFileName->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	logFileName->SetDivider(73.0);
+	logFileName->SetDivider(fileLogging->StringWidth(STR_TXT_LOG_FILE_NAME) + 8.0f);
 	SetLogFileName(win->LogPath());
 	fileLogging->AddChild(logFileName);
 	
@@ -75,7 +75,8 @@ PoorManLoggingView::PoorManLoggingView(BRect rect, const char *name)
 	BRect createLogFileRect;
 	createLogFileRect.top = tempRect.bottom + 13.0;
 	createLogFileRect.right = tempRect.right + 2.0;
-	createLogFileRect.left = createLogFileRect.right - 87.0;
+	createLogFileRect.left = createLogFileRect.right 
+		- fileLogging->StringWidth("Create Log File") - 24.0;
 	createLogFileRect.bottom = createLogFileRect.top + 19.0;
 	
 	createLogFile = new BButton(createLogFileRect, "Create Log File", STR_BTN_CREATE_LOG_FILE, new BMessage(MSG_PREF_LOG_BTN_CREATE_FILE));

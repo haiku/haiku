@@ -28,11 +28,12 @@
 #include "PoorManWindow.h"
 #include "libhttpd/libhttpd.h"
 
+
 PoorManServer::PoorManServer(const char* webDir,
 	int32 maxConns,	bool listDir,const char* idxName)
 	:fIsRunning(false),
 	 fMaxConns(maxConns),
-	 fIndexName(new char[strlen(idxName)+1]),
+	 fIndexName(new char[strlen(idxName) + 1]),
 	 fCurConns(0)
 {
 	fHttpdServer = httpd_initialize(
@@ -59,7 +60,7 @@ PoorManServer::PoorManServer(const char* webDir,
 	strcpy(fIndexName, idxName);
 	
 	size_t cwdLen = strlen(fHttpdServer->cwd);
-	if(fHttpdServer->cwd[cwdLen-1] == '/'){
+	if (fHttpdServer->cwd[cwdLen-1] == '/') {
 		fHttpdServer->cwd[cwdLen-1] = '\0';
 	}
 	
@@ -70,6 +71,7 @@ PoorManServer::PoorManServer(const char* webDir,
 	pthread_rwlock_init(&fIndexNameLock, NULL);
 }
 
+
 PoorManServer::~PoorManServer()
 {
 	Stop();
@@ -79,20 +81,21 @@ PoorManServer::~PoorManServer()
 	pthread_rwlock_destroy(&fIndexNameLock);
 }
 
+
 status_t PoorManServer::Run()
 {
-	if(chdir(fHttpdServer->cwd) == -1){
+	if (chdir(fHttpdServer->cwd) == -1) {
 		poorman_log("no web directory, can't start up.\n", false, INADDR_NONE, RED);
 		return B_ERROR;
 	}
 	
 	httpd_sockaddr sa4;
-	memset(&sa4,0,sizeof(httpd_sockaddr));
+	memset(&sa4, 0, sizeof(httpd_sockaddr));
 	sa4.sa_in.sin_family = AF_INET;
 	sa4.sa_in.sin_port = htons(80);
 	sa4.sa_in.sin_addr.s_addr = htonl(INADDR_ANY);
 	fHttpdServer->listen4_fd = httpd_initialize_listen_socket(&sa4);
-	if(fHttpdServer->listen4_fd == -1)
+	if (fHttpdServer->listen4_fd == -1)
 		return B_ERROR;
 
 	fListenerTid = spawn_thread(
@@ -101,12 +104,12 @@ status_t PoorManServer::Run()
 		B_NORMAL_PRIORITY,
 		static_cast<void*>(this)
 	);
-	if(fListenerTid < B_OK){
+	if (fListenerTid < B_OK) {
 		poorman_log("can't create listener thread.\n", false, INADDR_NONE, RED);
 		return B_ERROR;
 	}
 	fIsRunning = true;
-	if(resume_thread(fListenerTid) != B_OK){
+	if (resume_thread(fListenerTid) != B_OK) {
 		fIsRunning = false;
 		return B_ERROR;
 	}
@@ -115,33 +118,35 @@ status_t PoorManServer::Run()
 	return B_OK;
 }
 
+
 status_t PoorManServer::Stop()
 {
-	if(fIsRunning){
+	if (fIsRunning) {
 		fIsRunning = false;
 		httpd_unlisten(fHttpdServer);
 	}
 	return B_OK;
 }
 
+
 /*The Web Dir is not changed if an error occured.
  */
 status_t PoorManServer::SetWebDir(const char* webDir)
 {
-	if(chdir(webDir) == -1){
+	if (chdir(webDir) == -1) {
 		//log it
 		return B_ERROR;
 	}
 
 	char* tmp = strdup(webDir);
-	if(tmp == NULL)
+	if (tmp == NULL)
 		return B_ERROR;
-	
-	if(pthread_rwlock_wrlock(&fWebDirLock) == 0){
+
+	if (pthread_rwlock_wrlock(&fWebDirLock) == 0) {
 		free(fHttpdServer->cwd);
 		fHttpdServer->cwd = tmp;
-		if(tmp[strlen(tmp)-1] == '/'){
-			tmp[strlen(tmp)-1] = '\0';
+		if (tmp[strlen(tmp) - 1] == '/') {
+			tmp[strlen(tmp) - 1] = '\0';
 		}
 		pthread_rwlock_unlock(&fWebDirLock);
 	} else {
@@ -152,11 +157,13 @@ status_t PoorManServer::SetWebDir(const char* webDir)
 	return B_OK;
 }
 
+
 status_t PoorManServer::SetMaxConns(int32 count)
 {
 	fMaxConns = count;
 	return B_OK;
 }
+
 
 status_t PoorManServer::SetListDir(bool listDir)
 {
@@ -164,18 +171,19 @@ status_t PoorManServer::SetListDir(bool listDir)
 	return B_OK;
 }
 
+
 status_t PoorManServer::SetIndexName(const char* idxName)
 {
 	size_t length = strlen(idxName);
-	if(length > B_PATH_NAME_LENGTH+1)
+	if (length > B_PATH_NAME_LENGTH + 1)
 		return B_ERROR;
 	
-	char* tmp = new char[length+1];
-	if(tmp == NULL)
+	char* tmp = new char[length + 1];
+	if (tmp == NULL)
 		return B_ERROR;
 	
 	strcpy(tmp, idxName);
-	if(pthread_rwlock_wrlock(&fIndexNameLock) == 0){
+	if (pthread_rwlock_wrlock(&fIndexNameLock) == 0) {
 		delete[] fIndexName;
 		fIndexName = tmp;
 		fHttpdServer->index_name = fIndexName;
@@ -188,6 +196,7 @@ status_t PoorManServer::SetIndexName(const char* idxName)
 	return B_OK;
 }
 
+
 int32 PoorManServer::_Listener(void* data)
 {
 	PRINT(("The listener thread is working.\n"));
@@ -196,30 +205,32 @@ int32 PoorManServer::_Listener(void* data)
 	httpd_conn* hc;
 	PoorManServer* s = static_cast<PoorManServer*>(data);
 	
-	while(s->fIsRunning){
+	while (s->fIsRunning) {
 		hc = new httpd_conn;
 		hc->initialized = 0;
 		PRINT(("calling httpd_get_conn()\n"));
 		retval = //accept(), blocked here
 			httpd_get_conn(s->fHttpdServer, s->fHttpdServer->listen4_fd, hc);
-		switch (retval){
-		case GC_OK:
-			break;
-		case GC_FAIL:
-			httpd_destroy_conn(hc);
-			delete hc;
-			s->fIsRunning = false;
-			return -1;
-		case GC_NO_MORE: //should not happen, since we have a blocking socket
-			httpd_destroy_conn(hc);
-			continue;
-			break;
-		default: //shouldn't happen
-			continue;
-			break;
+		switch (retval) {
+			case GC_OK:
+				break;
+			case GC_FAIL:
+				httpd_destroy_conn(hc);
+				delete hc;
+				s->fIsRunning = false;
+				return -1;
+			case GC_NO_MORE:
+				//should not happen, since we have a blocking socket
+				httpd_destroy_conn(hc);
+				continue;
+				break;
+			default: 
+				//shouldn't happen
+				continue;
+				break;
 		}
 		
-		if(s->fCurConns > s->fMaxConns){
+		if (s->fCurConns > s->fMaxConns) {
 			httpd_send_err(hc, 503,
 				httpd_err503title, "", httpd_err503form, "");
 			httpd_write_response(hc);
@@ -232,7 +243,7 @@ int32 PoorManServer::_Listener(void* data)
 			B_NORMAL_PRIORITY,
 			static_cast<void*>(s)
 		);
-		if(tid < B_OK){
+		if (tid < B_OK) {
 			continue;
 		}
 		/*We don't check the return code here.
@@ -246,6 +257,7 @@ int32 PoorManServer::_Listener(void* data)
 	return 0;
 }
 
+
 int32 PoorManServer::_Worker(void* data)
 {
 	static const struct timeval kTimeVal = {60, 0};
@@ -253,9 +265,9 @@ int32 PoorManServer::_Worker(void* data)
 	httpd_conn* hc;
 	int retval;
 	
-	if(has_data(find_thread(NULL))){
+	if (has_data(find_thread(NULL))) {
 		thread_id sender;
-		if(receive_data(&sender, &hc, sizeof(httpd_conn*)) != 512)
+		if (receive_data(&sender, &hc, sizeof(httpd_conn*)) != 512)
 			goto cleanup;
 	} else {
 		goto cleanup;
@@ -270,29 +282,29 @@ int32 PoorManServer::_Worker(void* data)
 		hc->read_size - hc->read_idx,
 		0
 	);
-	if(retval < 0)
+	if (retval < 0)
 		goto cleanup;
 
 	hc->read_idx += retval;
-	switch(httpd_got_request(hc)){
-	case GR_GOT_REQUEST:
-		break;
-	case GR_BAD_REQUEST:
-		httpd_send_err(hc,400,httpd_err400title,"",httpd_err400form,"");
-		httpd_write_response(hc);//fall through
-	case GR_NO_REQUEST: //fall through
-	default: //won't happen
-		goto cleanup;
-		break;
+	switch(httpd_got_request(hc)) {
+		case GR_GOT_REQUEST:
+			break;
+		case GR_BAD_REQUEST:
+			httpd_send_err(hc,400,httpd_err400title,"",httpd_err400form,"");
+			httpd_write_response(hc);//fall through
+		case GR_NO_REQUEST: //fall through
+		default: //won't happen
+			goto cleanup;
+			break;
 	}
 	
-	if(httpd_parse_request(hc) < 0){
+	if (httpd_parse_request(hc) < 0) {
 		httpd_write_response(hc);
 		goto cleanup;
 	}
 	
 	retval = httpd_start_request(hc,(struct timeval*)0);
-	if(retval < 0){
+	if (retval < 0) {
 		httpd_write_response(hc);
 		goto cleanup;
 	}
@@ -300,7 +312,7 @@ int32 PoorManServer::_Worker(void* data)
 	/*true means the connection is already handled
 	 *by the directory index generator in httpd_start_request().
 	 */
-	if(hc->file_address == (char*) 0){
+	if (hc->file_address == (char*) 0) {
 		static_cast<PoorManApplication*>(be_app)->GetPoorManWindow()->SetHits(
 			static_cast<PoorManApplication*>(be_app)->GetPoorManWindow()->GetHits()+1
 		);
@@ -308,18 +320,16 @@ int32 PoorManServer::_Worker(void* data)
 		goto cleanup;
 	}
 	
-	switch(hc->method){
-	case METHOD_GET:
-		s->_HandleGet(hc);
-		break;
-	case METHOD_HEAD:
-		s->_HandleHead(hc);
-		break;
-	case METHOD_POST:
-		s->_HandlePost(hc);
-		break;
-	default:
-		break;
+	switch (hc->method) {
+		case METHOD_GET:
+			s->_HandleGet(hc);
+			break;
+		case METHOD_HEAD:
+			s->_HandleHead(hc);
+			break;
+		case METHOD_POST:
+			s->_HandlePost(hc);
+			break;
 	}
 	
 cleanup: ;
@@ -331,6 +341,7 @@ cleanup: ;
 	return 0;
 }
 
+
 status_t PoorManServer::_HandleGet(httpd_conn* hc)
 {
 	PRINT(("HandleGet() called\n"));
@@ -341,24 +352,24 @@ status_t PoorManServer::_HandleGet(httpd_conn* hc)
 	BString log;
 	
 	BFile file(hc->expnfilename, B_READ_ONLY);
-	if(file.InitCheck() != B_OK)
+	if (file.InitCheck() != B_OK)
 		return B_ERROR;
 	
 	buf = new uint8[POOR_MAN_BUF_SIZE];
-	if(buf == NULL)
+	if (buf == NULL)
 		return B_ERROR;
 	
-	if(hc->got_range == 1)
+	if (hc->got_range == 1)
 		length = hc->last_byte_index + 1 - hc->first_byte_index;
 	else 
 		length = hc->sb.st_size;
 	
 	static_cast<PoorManApplication*>(be_app)->GetPoorManWindow()->SetHits(
-		static_cast<PoorManApplication*>(be_app)->GetPoorManWindow()->GetHits()+1
-	);
+		static_cast<PoorManApplication*>(be_app)->GetPoorManWindow()->GetHits()
+		+ 1);
 	
 	log.SetTo("Sending file: ");
-	if(pthread_rwlock_rdlock(&fWebDirLock) == 0){
+	if (pthread_rwlock_rdlock(&fWebDirLock) == 0) {
 		log << hc->hs->cwd;
 		pthread_rwlock_unlock(&fWebDirLock);
 	}
@@ -366,23 +377,23 @@ status_t PoorManServer::_HandleGet(httpd_conn* hc)
 	poorman_log(log.String(), true, hc->client_addr.sa_in.sin_addr.s_addr);
 	
 	//send mime headers
-	if(send(hc->conn_fd,hc->response,hc->responselen,0) < 0){
+	if (send(hc->conn_fd,hc->response,hc->responselen,0) < 0) {
 		delete [] buf;
 		return B_ERROR;
 	}
 	
 	file.Seek(hc->first_byte_index, SEEK_SET);
-	while(true){
+	while (true) {
 		bytesRead = file.Read(buf, POOR_MAN_BUF_SIZE);
-		if(bytesRead == 0)
+		if (bytesRead == 0)
 			break;
-		else if(bytesRead < 0){
+		else if (bytesRead < 0) {
 			delete [] buf;
 			return B_ERROR;
 		}
-		if(send(hc->conn_fd, (void*)buf, bytesRead, 0) < 0){
+		if (send(hc->conn_fd, (void*)buf, bytesRead, 0) < 0) {
 			log.SetTo("Error sending file: ");
-			if(pthread_rwlock_rdlock(&fWebDirLock) == 0){
+			if (pthread_rwlock_rdlock(&fWebDirLock) == 0) {
 				log << hc->hs->cwd;
 				pthread_rwlock_unlock(&fWebDirLock);
 			}
@@ -397,13 +408,15 @@ status_t PoorManServer::_HandleGet(httpd_conn* hc)
 	return B_OK;
 }
 
+
 status_t PoorManServer::_HandleHead(httpd_conn* hc)
 {
 	int retval = send(hc->conn_fd,hc->response,hc->responselen,0);
-	if(retval == -1)
+	if (retval == -1)
 		return B_ERROR;
 	return B_OK;
 }
+
 
 status_t PoorManServer::_HandlePost(httpd_conn* hc)
 {
@@ -411,11 +424,13 @@ status_t PoorManServer::_HandlePost(httpd_conn* hc)
 	return B_OK;
 }
 
+
 pthread_rwlock_t* get_web_dir_lock()
 {
 	return static_cast<PoorManApplication*>(be_app)->
 		GetPoorManWindow()->GetServer()->GetWebDirLock();
 }
+
 
 pthread_rwlock_t* get_index_name_lock()
 {

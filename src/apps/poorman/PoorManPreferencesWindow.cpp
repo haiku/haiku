@@ -17,18 +17,17 @@
 #include "PoorManServer.h"
 
 PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
-	: BWindow(frame, name, B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+	: BWindow(frame, name, B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE
+		| B_CLOSE_ON_ESCAPE),
 	webDirFilePanel(NULL),
 	logFilePanel(NULL)
 {
-
 	frame = Bounds();
 
 	prefView = new PoorManView(frame, STR_WIN_NAME_PREF);
 	//prefView->SetViewColor(216,216,216,255);
 	prefView->SetViewColor(BACKGROUND_COLOR);
 	AddChild(prefView);
-
 
 
 	// Button View
@@ -42,25 +41,26 @@ PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 
 	// Buttons
 	float buttonTop = 0.0f;
-	float buttonWidth = 52.0f;
 	float buttonHeight = 26.0f;
-	float buttonLeft = 265.0f;
 
-	BRect button1;
-	button1 = buttonView->Bounds();
-	button1.Set(buttonLeft, buttonTop, buttonLeft + buttonWidth, buttonTop + buttonHeight);
-	cancelButton = new BButton(button1, "Cancel Button", "Cancel", new BMessage(MSG_PREF_BTN_CANCEL));
+	float widthCancel = prefView->StringWidth("Cancel") + 24.0f;
+	float widthDone = prefView->StringWidth("Done") + 24.0f;
 
-	buttonLeft = 325.0f;
-	BRect button2;
-	button2 = buttonView->Bounds();
-	button2.Set(buttonLeft, buttonTop, buttonLeft + buttonWidth, buttonTop + buttonHeight);
-	doneButton = new BButton(button2, "Done Button", "Done", new BMessage(MSG_PREF_BTN_DONE));
+	float gap = 5.0f;
+
+	BRect button1(prefView->Bounds().Width() - 2 * gap - widthCancel
+		- widthDone, buttonTop, prefView->Bounds().Width() - 2 * gap - widthDone, 
+		buttonTop + buttonHeight);
+	cancelButton = new BButton(button1, "Cancel Button", "Cancel", 
+		new BMessage(MSG_PREF_BTN_CANCEL));
+
+	BRect button2(prefView->Bounds().Width() - gap - widthDone, buttonTop, 
+		prefView->Bounds().Width() - gap, buttonTop + buttonHeight);
+	doneButton = new BButton(button2, "Done Button", "Done", 
+		new BMessage(MSG_PREF_BTN_DONE));
 
 	buttonView->AddChild(cancelButton);
 	buttonView->AddChild(doneButton);
-
-
 
 	// Create tabs
 	BRect r;
@@ -115,10 +115,8 @@ PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 	logFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, "Create");
 	change_title = logFilePanel->Window();
 	change_title->SetTitle(STR_FILEPANEL_CREATE_LOG_FILE);
-
-	Show();
-
 }
+
 
 PoorManPreferencesWindow::~PoorManPreferencesWindow()
 {
@@ -126,76 +124,85 @@ PoorManPreferencesWindow::~PoorManPreferencesWindow()
 	delete webDirFilePanel;
 }
 
+
 void
 PoorManPreferencesWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-	case MSG_PREF_BTN_DONE:
-			PoorManWindow		*	win;
+		case MSG_PREF_BTN_DONE:
+			PoorManWindow* win;
 			PoorManServer* server;
 			win = ((PoorManApplication *)be_app)->GetPoorManWindow();
 			server = win->GetServer();
-
-			PRINT(("Pref Window: sendDir CheckBox: %d\n", siteView->SendDirValue()));
+	
+			PRINT(("Pref Window: sendDir CheckBox: %d\n",
+				siteView->SendDirValue()));
 			server->SetListDir(siteView->SendDirValue());
 			win->SetDirListFlag(siteView->SendDirValue());
-			PRINT(("Pref Window: indexFileName TextControl: %s\n", siteView->IndexFileName()));
-			if(server->SetIndexName(siteView->IndexFileName()) == B_OK)
+			PRINT(("Pref Window: indexFileName TextControl: %s\n",
+				siteView->IndexFileName()));
+			if (server->SetIndexName(siteView->IndexFileName()) == B_OK)
 				win->SetIndexFileName(siteView->IndexFileName());
 			PRINT(("Pref Window: webDir: %s\n", siteView->WebDir()));
-			if(server->SetWebDir(siteView->WebDir()) == B_OK){
+			if (server->SetWebDir(siteView->WebDir()) == B_OK) {
 				win->SetWebDir(siteView->WebDir());
 				win->SetDirLabel(siteView->WebDir());
 			}
 
-			PRINT(("Pref Window: logConsole CheckBox: %d\n", loggingView->LogConsoleValue()));
+			PRINT(("Pref Window: logConsole CheckBox: %d\n", 
+				loggingView->LogConsoleValue()));
 			win->SetLogConsoleFlag(loggingView->LogConsoleValue());
-			PRINT(("Pref Window: logFile CheckBox: %d\n", loggingView->LogFileValue()));
+			PRINT(("Pref Window: logFile CheckBox: %d\n",
+				loggingView->LogFileValue()));
 			win->SetLogFileFlag(loggingView->LogFileValue());
-			PRINT(("Pref Window: logFileName: %s\n", loggingView->LogFileName()));
+			PRINT(("Pref Window: logFileName: %s\n",
+				loggingView->LogFileName()));
 			win->SetLogPath(loggingView->LogFileName());
-
-			PRINT(("Pref Window: MaxConnections Slider: %ld\n", advancedView->MaxSimultaneousConnections()));
+	
+			PRINT(("Pref Window: MaxConnections Slider: %ld\n", 
+				advancedView->MaxSimultaneousConnections()));
 			server->SetMaxConns(advancedView->MaxSimultaneousConnections());
-			win->SetMaxConnections((int16)advancedView->MaxSimultaneousConnections());
-
-
+			win->SetMaxConnections(
+				(int16)advancedView->MaxSimultaneousConnections());
+	
 			if (Lock())
 				Quit();
-		break;
-	case MSG_PREF_BTN_CANCEL:
+			break;
+		case MSG_PREF_BTN_CANCEL:
 			if (Lock())
 				Quit();
-		break;
-	case MSG_PREF_SITE_BTN_SELECT:
+			break;
+		case MSG_PREF_SITE_BTN_SELECT:
 			// Select the Web Directory, root directory to look in.
+			webDirFilePanel->SetTarget(this);
+			webDirFilePanel->SetMessage(new BMessage(MSG_FILE_PANEL_SELECT_WEB_DIR));
 			if (!webDirFilePanel->IsShowing())
 				webDirFilePanel->Show();
-		break;
-	case MSG_FILE_PANEL_SELECT_WEB_DIR:
+			break;
+		case MSG_FILE_PANEL_SELECT_WEB_DIR:
 			// handle the open BMessage from the Select Web Directory File Panel
 			PRINT(("Select Web Directory:\n"));
 			SelectWebDir(message);
-		break;
-	case MSG_PREF_LOG_BTN_CREATE_FILE:
+			break;
+		case MSG_PREF_LOG_BTN_CREATE_FILE:
 			// Create the Log File
 			logFilePanel->Show();
-		break;
-	case MSG_FILE_PANEL_CREATE_LOG_FILE:
+			break;
+		case MSG_FILE_PANEL_CREATE_LOG_FILE:
 			// handle the save BMessage from the Create Log File Panel
 			PRINT(("Create Log File:\n"));
 			CreateLogFile(message);
-		break;
-	case MSG_PREF_ADV_SLD_MAX_CONNECTION:
+			break;
+		case MSG_PREF_ADV_SLD_MAX_CONNECTION:
 			max_connections = advancedView->MaxSimultaneousConnections();
 			PRINT(("Max Connections: %ld\n", max_connections));
-		break;
-
-	default:
-		BWindow::MessageReceived(message);
-		break;
+			break;
+		default:
+			BWindow::MessageReceived(message);
+			break;
 	}
 }
+
 
 void
 PoorManPreferencesWindow::SelectWebDir(BMessage * message)
@@ -221,17 +228,20 @@ PoorManPreferencesWindow::SelectWebDir(BMessage * message)
 	siteView->SetWebDir(path.Path());
 	
 	bool temp;
-	if(message->FindBool("Default Dialog", &temp) == B_OK){
+	if (message->FindBool("Default Dialog", &temp) == B_OK) {
 		PoorManWindow* win = ((PoorManApplication *)be_app)->GetPoorManWindow();
-		if(win->GetServer()->SetWebDir(siteView->WebDir()) == B_OK){
+		win->StartServer();
+		if (win->GetServer()->SetWebDir(siteView->WebDir()) == B_OK) {
 			win->SetWebDir(siteView->WebDir());
 			win->SetDirLabel(siteView->WebDir());
+			win->SaveSettings();
+			win->Show();		
 		}
-		win->StartServer();
-		if(Lock())
+		if (Lock())
 			Quit();
 	}
 }
+
 
 void
 PoorManPreferencesWindow::CreateLogFile(BMessage * message)
@@ -255,8 +265,7 @@ PoorManPreferencesWindow::CreateLogFile(BMessage * message)
 	path.Append(name);
 	PRINT(("Log File: %s\n", path.Path()));
 
-	if (err == B_OK)
-	{
+	if (err == B_OK) {
 		loggingView->SetLogFileName(path.Path());
 		loggingView->SetLogFileValue(true);
 	}
@@ -264,14 +273,16 @@ PoorManPreferencesWindow::CreateLogFile(BMessage * message)
 	// mark the checkbox
 }
 
+
 /*A special version for "the default dialog", don't use it in MessageReceived()*/
 void
 PoorManPreferencesWindow::ShowWebDirFilePanel()
 {
 	BMessage message(MSG_FILE_PANEL_SELECT_WEB_DIR);
 	message.AddBool("Default Dialog", true);
-	
+
+	webDirFilePanel->SetTarget(be_app);
 	webDirFilePanel->SetMessage(&message);
-	if(!webDirFilePanel->IsShowing())
+	if (!webDirFilePanel->IsShowing())
 		webDirFilePanel->Show();
 }

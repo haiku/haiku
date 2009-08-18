@@ -18,9 +18,10 @@ class PoorManWindow;
 class PoorManApplication: public BApplication
 {
 public:
-				PoorManApplication();
-		void	AboutRequested();
-PoorManWindow *	GetPoorManWindow() { return mainWindow; }
+					PoorManApplication();
+			void	AboutRequested();
+	virtual void	MessageReceived(BMessage *message);
+	PoorManWindow *	GetPoorManWindow() { return mainWindow; }
 private:
 			PoorManWindow				* mainWindow;
 			//PoorManPreferencesWindow	* prefWindow;
