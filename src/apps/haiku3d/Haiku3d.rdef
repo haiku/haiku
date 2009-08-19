@@ -4,8 +4,6 @@
  *
  * Authors:
  * 		Alexandre Deckner alex@zappotek.com
- *
- * Copyright Be, Inc. (for the temporary icon)
  */
 
 resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-Haiku3d";
