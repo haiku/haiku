@@ -85,7 +85,7 @@ resource(101, "BEOS:M:STD_ICON") #'MICN' array
 
 #endif // HAIKU_TARGET_PLATFORM_HAIKU
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Be.CodyCam";
+resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku.CodyCam";
 
 resource(1, "BEOS:APP_VERSION") #'APPV' array
 {

@@ -2,7 +2,7 @@
  * Icon-O-Matic.rdef
  */
 
-resource app_signature "application/x-vnd.MarcusOverhagen.TV";
+resource app_signature "application/x-vnd.Haiku.TV";
 
 resource app_version {
 	major  = 1,

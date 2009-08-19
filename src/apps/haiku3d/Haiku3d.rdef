@@ -8,7 +8,7 @@
  * Copyright Be, Inc. (for the temporary icon)
  */
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku3d";
+resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-Haiku3d";
 
 resource app_version {
 	major  = 1,

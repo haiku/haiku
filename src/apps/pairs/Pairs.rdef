@@ -2,7 +2,7 @@
  * Pairs.rdef
  */
 
-resource app_signature "application/x-vnd.haiku-Pairs";
+resource app_signature "application/x-vnd.Haiku-Pairs";
 
 resource app_flags B_SINGLE_LAUNCH;
 

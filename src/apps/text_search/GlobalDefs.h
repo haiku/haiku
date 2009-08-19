@@ -6,7 +6,7 @@
 #define GLOBAL_DEFS_H
 
 
-#define APP_SIGNATURE "application/x-vnd.mahlzeit.trackergrep"
+#define APP_SIGNATURE "application/x-vnd.Haiku.TextSearch"
 #define APP_NAME "TextSearch"
 
 #define PREFS_FILE			"TextSearch"

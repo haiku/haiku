@@ -1,5 +1,5 @@
 
-resource app_signature "application/x-vnd.Geb-ProcessController";
+resource app_signature "application/x-vnd.Haiku-ProcessController";
 
 resource app_version {
 	major  = 3,

@@ -195,7 +195,7 @@ TMainWindow::MessageReceived(BMessage* message)
 int
 main(int, char**)
 {
-	BApplication* app = new BApplication("application/x-vnd.Be-MAND");
+	BApplication* app = new BApplication("application/x-vnd.Haiku-Mandelbrot");
 
 	BWindow* window = new TMainWindow(BRect(100, 100, 288, 288), "Mandelbrot",
 		B_DOCUMENT_WINDOW, B_WILL_ACCEPT_FIRST_CLICK);

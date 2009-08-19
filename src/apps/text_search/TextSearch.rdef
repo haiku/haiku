@@ -2,7 +2,7 @@
  * TextSearch.rdef
  */
 
-resource app_signature "application/x-vnd.mahlzeit.trackergrep";
+resource app_signature "application/x-vnd.Haiku.TextSearch";
 
 resource app_version {
 	major  = 5,
@@ -12,8 +12,8 @@ resource app_version {
 	variety = B_APPV_FINAL,
 	internal = 0,
 
-	short_info = "Context search using Grep",
-	long_info = "Context search in Tracker, a GUI wrapper of /bin/grep."
+	short_info = "Text search using Grep",
+	long_info = "Text search in Tracker, a GUI wrapper of /bin/grep."
 };
 
 resource app_flags B_SINGLE_LAUNCH;

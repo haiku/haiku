@@ -13,7 +13,7 @@
 
 
 Screenshot::Screenshot()
-	: BApplication("application/x-vnd.haiku-screenshot"),
+	: BApplication("application/x-vnd.Haiku-Screenshot"),
 	fArgvReceived(false),
 	fRefsReceived(false)
 {

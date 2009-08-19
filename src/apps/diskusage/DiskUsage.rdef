@@ -1,4 +1,4 @@
-resource app_signature "application/x-vnd.haiku-diskusage";
+resource app_signature "application/x-vnd.Haiku-DiskUsage";
 
 resource app_version {
 		major  = 1,

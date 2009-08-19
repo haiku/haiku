@@ -5,7 +5,7 @@
 // ------------------------------------------------------
 // PoorMan Window
 extern const char* STR_APP_SIG
-	= "application/x-vnd.haiku.PoorMan";
+	= "application/x-vnd.Haiku.PoorMan";
 			 char* STR_APP_NAME
 	= "PoorMan";
 extern const char* STR_ERR_WEB_DIR

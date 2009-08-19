@@ -129,7 +129,7 @@ AddTranslationItems(BMenu* intoMenu, uint32 fromType)
 
 
 CodyCam::CodyCam()
-	: BApplication("application/x-vnd.Be.CodyCam"),
+	: BApplication("application/x-vnd.Haiku.CodyCam"),
 	fMediaRoster(NULL),
 	fVideoConsumer(NULL),
 	fWindow(NULL),

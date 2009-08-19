@@ -10,7 +10,7 @@
 #include "Pairs.h"
 #include "PairsWindow.h"
 
-const char* kSignature = "application/x-vnd.haiku-Pairs";
+const char* kSignature = "application/x-vnd.Haiku-Pairs";
 
 
 Pairs::Pairs()

@@ -1,5 +1,5 @@
 
-resource app_signature "application/x-vnd.haiku-screenshot";
+resource app_signature "application/x-vnd.Haiku-Screenshot";
 
 resource app_flags B_MULTIPLE_LAUNCH;
 

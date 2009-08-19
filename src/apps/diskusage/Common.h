@@ -55,7 +55,7 @@ EXTERN int kBasePieColorCount;
 EXTERN rgb_color *kBasePieColor;
 
 // Non-resources :)
-PUBLIC_CONST char*	kAppSignature		EQ("application/x-vnd.haiku-diskusage");
+PUBLIC_CONST char*	kAppSignature		EQ("application/x-vnd.Haiku-DiskUsage");
 PUBLIC_CONST char*	kHelpFileName		EQ("userguide/en/applications/apps-diskusage.html");
 PUBLIC_CONST char*	kPieRectAttrName	EQ("mainrect");
 
