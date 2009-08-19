@@ -1,0 +1,6 @@
+LIBBE_TEST_BASE {
+};
+LIBBE_TEST {
+	global:
+		*;
+};

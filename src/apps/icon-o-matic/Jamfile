@@ -305,12 +305,3 @@ Application Icon-O-Matic :
 
 	: Icon-O-Matic.rdef
 ;
-
-
-
-# also install in app_server test environment
-if ( $(TARGET_PLATFORM) = libbe_test ) {
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Icon-O-Matic
-		: tests!apps ;
-}
-

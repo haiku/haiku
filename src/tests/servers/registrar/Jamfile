@@ -24,8 +24,8 @@ SimpleTest message_deliverer_test : message_deliverer_test.cpp : be ;
 
 SetSubDirSupportedPlatforms libbe_test ;
 
-SimpleTest run_haiku_registrar
-	: run_haiku_registrar.cpp
+SimpleTest run_test_registrar
+	: run_test_registrar.cpp
 	: be
 ;
 
@@ -68,7 +68,7 @@ UsePrivateSystemHeaders ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers registrar ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers registrar mime ] ;
 
-Server haiku_registrar
+Server test_registrar
  	:
 	AppInfoList.cpp
 	AppInfoListMessagingTargetSet.cpp
@@ -120,8 +120,8 @@ Server haiku_registrar
 ;
 
 if $(TARGET_PLATFORM) = libbe_test {
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : haiku_registrar
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : test_registrar
 		: tests!apps ;
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : run_haiku_registrar
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : run_test_registrar
 		: tests!apps ;
 }

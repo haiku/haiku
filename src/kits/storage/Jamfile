@@ -75,7 +75,7 @@ MergeObject <libbe>storage_kit.o :
 	MutablePartition.cpp
 	Partition.cpp
 	PartitionDelegate.cpp
-	PartitioningInfo.cpp 
+	PartitioningInfo.cpp
 	PartitionParameterEditor.cpp
 	PartitionReference.cpp
 
@@ -89,12 +89,3 @@ MergeObject <libbe>storage_kit.o :
 	SetStringJob.cpp
 	UninitializeJob.cpp
 ;
-
-
-# The adapter library we need (Storage Kit).
-#
-
-SharedLibrary libbeadapter.so :
-	LibBeAdapter.cpp
-;
-LinkAgainst libbeadapter.so : be : false ;

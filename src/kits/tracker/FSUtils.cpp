@@ -545,7 +545,7 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 		if (gStatusWindow)
 			gStatusWindow->RemoveStatusItem(thread);
 
-		BAlert *alert = new BAlert("", 
+		BAlert *alert = new BAlert("",
 			"You can't move or copy items to read-only volumes.",
 			"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
@@ -1735,7 +1735,7 @@ PreFlightNameCheck(BObjectList<entry_ref> *srcList, const BDirectory *destDir,
 		const char *verb = (moveMode == kMoveSelectionTo) ? "moving" : "copying";
 		char replaceMsg[256];
 		sprintf(replaceMsg, kReplaceManyStr, verb, verb);
-		
+
 		BAlert *alert = new BAlert("", replaceMsg,
 			"Cancel", "Prompt", "Replace All");
 		alert->SetShortcut(0, B_ESCAPE);
@@ -2950,21 +2950,12 @@ _TrackerLaunchAppWithDocuments(const entry_ref *appRef, const BMessage *refs, bo
 
 extern "C" char** environ;
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 extern "C" status_t _kern_load_image(const char * const *flatArgs,
 	size_t flatArgsSize, int32 argCount, int32 envCount, int32 priority,
 	uint32 flags, port_id errorPort, uint32 errorToken);
 extern "C" status_t __flatten_process_args(const char * const *args,
 	int32 argCount, const char * const *env, int32 envCount, char ***_flatArgs,
 	size_t *_flatSize);
-#else
-extern "C"
-#	if !B_BEOS_VERSION_DANO
-_IMPEXP_ROOT
-#	endif
-status_t _kload_image_etc_(int argc, char **argv, char **envp,
-	char *buf, int bufsize);
-#endif
 
 
 static status_t
@@ -2979,7 +2970,6 @@ LoaderErrorDetails(const entry_ref *app, BString &details)
 
 	char *argv[2] = { const_cast<char *>(path.Path()), 0};
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	port_id errorPort = create_port(1, "Tracker loader error");
 
 	// count environment variables
@@ -3062,11 +3052,6 @@ LoaderErrorDetails(const entry_ref *app, BString &details)
 		details += detail;
 	}
 
-	return B_OK;
-#else
-	result = _kload_image_etc_(1, argv, environ, details.LockBuffer(1024), 1024);
-	details.UnlockBuffer();
-#endif
 	return B_OK;
 }
 

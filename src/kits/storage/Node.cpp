@@ -863,7 +863,12 @@ BNode::_GetStat(struct stat_beos *st) const
 // #pragma mark - symbol versions
 
 
-#if __GNUC__ == 2	// gcc 2
+#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+
+B_DEFINE_SYMBOL_VERSION("_GetStat__C5BNodeP4stat",
+	"GetStat__C5BNodeP4stat@@LIBBE_TEST");
+
+#elif __GNUC__ == 2	// gcc 2
 
 // BeOS compatible GetStat()
 B_DEFINE_SYMBOL_VERSION("_GetStat__C5BNodeP9stat_beos",

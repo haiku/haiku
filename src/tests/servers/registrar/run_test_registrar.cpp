@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -33,10 +33,11 @@ main()
 
 		thread_info threadInfo;
 		int32 threadCookie = 0;
-		while (get_next_thread_info(teamInfo.team, &threadCookie, &threadInfo) == B_OK) {
+		while (get_next_thread_info(teamInfo.team, &threadCookie, &threadInfo)
+				== B_OK) {
 			// search for the roster thread
 			if (!strcmp(threadInfo.name, "_roster_thread_")) {
-				port_id port = find_port("_haiku_roster_port_");
+				port_id port = find_port("haiku-test:roster");
 				port_info portInfo;
 				if (get_port_info(port, &portInfo) == B_OK
 					&& portInfo.team == teamInfo.team) {
@@ -52,7 +53,7 @@ main()
 	BPath currentPath(".");
 
 	BQuery query;
-	query.SetPredicate("name==haiku_registrar");
+	query.SetPredicate("name==test_registrar");
 
 	// search on current volume only
 	dev_t device = dev_for_path(".");

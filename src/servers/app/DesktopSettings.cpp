@@ -288,9 +288,13 @@ DesktopSettingsPrivate::_Load()
 status_t
 DesktopSettingsPrivate::Save(uint32 mask)
 {
+#if TEST_MODE
+	return B_OK;
+#endif
+
 	BPath basePath;
 	status_t status = _GetPath(basePath);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	if (mask & kWorkspacesSettings) {

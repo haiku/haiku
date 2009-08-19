@@ -18,12 +18,7 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 }
 
 UsePrivateHeaders [ FDirName kernel ]   # For KMessage.h
-UsePrivateHeaders syslog_daemon ;		# For syslog.cpp
-
-local pngDump ;
-if $(TARGET_PLATFORM) != haiku {
-	pngDump = libpng.so libz.so ;
-}
+#UsePrivateHeaders syslog_daemon ;		# For syslog.cpp
 
 # Build our libbe.so
 
@@ -42,31 +37,16 @@ SharedLibrary libbe.so :
 	libagg.a
 
 	libroot.so	# make sure it links against our libroot.so
-	$(pngDump) # For dumping the screen to PNG in the Interface Kit on R5
 	$(TARGET_LIBSTDC++)
 ;
 
-# Build libbe_haiku.so
+# Build libbe_test.so
 
-SetSupportedPlatformsForTarget libbe_haiku.so : libbe_test ;
+SetSupportedPlatformsForTarget libbe_test.so : libbe_test ;
 
-if $(TARGET_PLATFORM) = libbe_test {
-	local syslog = [ FGristFiles syslog.o ] ;
-	# Remove _NO_INLINE_ASM from the defines for syslog.cpp. Otherwise we get
-	# references to tls_get/set() etc. that don't exist under BeOS.
-	TARGET_DEFINES on $(syslog)
-		= [ on $(syslog) FFilter $(TARGET_DEFINES) : _NO_INLINE_ASM ] ;
+SetVersionScript libbe_test.so : libbe_test_versions ;
 
-	# We need to use our <syslog.h>, because the syslog() prototype differs
-	# from the BeOS one.
-	TARGET_DEFINES on $(syslog) += _SYS_LOG_H ;
-	TARGET_C++FLAGS on $(syslog) = [ on $(syslog) return $(TARGET_C++FLAGS) ]
-		-include [ FDirName $(HAIKU_TOP) headers posix syslog.h ] ;
-}
-
-SharedLibrary libbe_haiku.so :
-	KMessage.cpp
-	syslog.cpp
+SharedLibrary libbe_test.so :
 	:
 	<libbe>app_kit.o
 	<libbe>interface_kit.o
@@ -76,16 +56,14 @@ SharedLibrary libbe_haiku.so :
 	libicon.a
 	libagg.a
 
-	libbeadapter.so
-	$(TARGET_NETWORK_LIBS)
 	$(TARGET_LIBSTDC++)
 ;
 
-SEARCH on [ FGristFiles KMessage.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
-
-SEARCH on [ FGristFiles syslog.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system libroot posix ] ;
+#SEARCH on [ FGristFiles KMessage.cpp ]
+#	= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
+#
+#SEARCH on [ FGristFiles syslog.cpp ]
+#	= [ FDirName $(HAIKU_TOP) src system libroot posix ] ;
 
 
 SubInclude HAIKU_TOP src kits app ;

@@ -18,13 +18,14 @@
 namespace BPrivate {
 
 // names
-extern const char *kRegistrarSignature;
-extern const char *kRosterThreadName;
-extern const char *kRAppLooperPortName;
+extern const char* kRegistrarSignature;
+extern const char* kRosterThreadName;
+extern const char* kRAppLooperPortName;
 
-extern const char *get_roster_port_name();
+extern const char* get_roster_port_name();
 
-#define REGISTRAR_AUTHENTICATION_PORT_NAME	"registrar: auth manager"
+
+#define REGISTRAR_AUTHENTICATION_PORT_NAME	"system:registrar:auth manager"
 
 
 // message constants
@@ -122,7 +123,7 @@ enum {
 	B_REG_UPDATE_GROUP						= 'rugr',
 };
 
-// B_REG_MIME_SET_PARAM "which" constants 
+// B_REG_MIME_SET_PARAM "which" constants
 enum {
 	B_REG_MIME_APP_HINT				= 'rgmh',
 	B_REG_MIME_ATTR_INFO			= 'rgma',

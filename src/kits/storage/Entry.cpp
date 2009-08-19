@@ -1130,7 +1130,12 @@ operator<(const entry_ref & a, const entry_ref & b)
 // #pragma mark - symbol versions
 
 
-#if __GNUC__ == 2	// gcc 2
+#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+
+B_DEFINE_SYMBOL_VERSION("_GetStat__C6BEntryP4stat",
+	"GetStat__C6BEntryP4stat@@LIBBE_TEST");
+
+#elif __GNUC__ == 2	// gcc 2
 
 // BeOS compatible GetStat()
 B_DEFINE_SYMBOL_VERSION("_GetStat__C6BEntryP9stat_beos",

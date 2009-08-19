@@ -997,7 +997,12 @@ create_directory(const char* path, mode_t mode)
 // #pragma mark - symbol versions
 
 
-#if __GNUC__ == 2	// gcc 2
+#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+
+B_DEFINE_SYMBOL_VERSION("_GetStatFor__C10BDirectoryPCcP4stat",
+	"GetStatFor__C10BDirectoryPCcP4stat@@LIBBE_TEST");
+
+#elif __GNUC__ == 2	// gcc 2
 
 // BeOS compatible GetStatFor()
 B_DEFINE_SYMBOL_VERSION("_GetStatFor__C10BDirectoryPCcP9stat_beos",

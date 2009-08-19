@@ -954,7 +954,7 @@ if $(TARGET_PLATFORM) = libbe_test {
 
 	# library name map
 	TARGET_LIBRARY_NAME_MAP = LIBBE_LIBRARY_NAME_MAP ;
-	LIBBE_LIBRARY_NAME_MAP_be = libbe_haiku.so ;
+	LIBBE_LIBRARY_NAME_MAP_be = libbe_test.so ;
 }
 
 

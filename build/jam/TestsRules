@@ -9,7 +9,7 @@ rule UnitTestLib
 	local lib = $(1) ;
 	local sources = $(2) ;
 	local libraries = $(3) ;
-	
+
 	# if TEST_DEBUG is defined, we turn on debugging
 	if $(TEST_DEBUG) {
 		DEBUG on $(lib) [ FGristFiles $(sources:S=$(SUFOBJ)) ] ?= 1 ;
@@ -21,7 +21,7 @@ rule UnitTestLib
 
 		# make the target depend on the installed libbe libraries
 		Depends $(lib) :
-			 <tests!unittests>libbe_haiku.so <tests!unittests>libbeadapter.so ;
+			 <tests!unittests>libbe_test.so ;
 	} else {
 		ObjectDefines $(2) : TEST_R5 ;
 	}
@@ -49,7 +49,7 @@ rule UnitTest
 
 		# make the target depend on the installed libbe libraries
 		Depends $(target) :
-			 <tests!unittests>libbe_haiku.so <tests!unittests>libbeadapter.so ;
+			 <tests!unittests>libbe_test.so ;
 	} else {
 		ObjectDefines $(2) : TEST_R5 ;
 	}
@@ -106,6 +106,6 @@ rule BuildPlatformTest
 		relPath = $(SUBDIR_TOKENS[2-]) ;
 	}
 	MakeLocate $(target) : [ FDirName $(HAIKU_TEST_DIR) $(relPath) ] ;
-	
+
 	BuildPlatformMain $(target) : $(sources) ;
 }

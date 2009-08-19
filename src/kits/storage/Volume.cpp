@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,9 +25,7 @@
 #include <storage_support.h>
 #include <syscalls.h>
 
-#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-#	include <fs_interface.h>
-#endif
+#include <fs_interface.h>
 
 
 /*!
