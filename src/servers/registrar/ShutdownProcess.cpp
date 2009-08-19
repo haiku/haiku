@@ -267,7 +267,7 @@ public:
 		fTextView->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
 		fTextView->MakeEditable(false);
 		fTextView->MakeSelectable(false);
-		fTextView->SetWordWrap(true);
+		fTextView->SetWordWrap(false);
 		fRootView->AddChild(fTextView);
 
 		// kill app button
@@ -372,6 +372,8 @@ public:
 		fTextView->ResizeTo(rightPartWidth + rightPartX - textX - 1,
 			textHeight - 1);
 		fTextView->SetTextRect(fTextView->Bounds());
+
+		fTextView->SetWordWrap(true);
 
 		// buttons
 		fKillAppButton->MoveTo(rightPartX, nonDefaultButtonsY);
