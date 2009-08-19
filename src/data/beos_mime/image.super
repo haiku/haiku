@@ -7,7 +7,7 @@ resource(2, "META:L:DESC") #'MLDC' "Generic image file";
 
 resource(3, "META:S:DESC") #'MSDC' "Image file";
 
-resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.haiku-showimage";
+resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-ShowImage";
 
 resource(5, "META:ICON") #'VICN' array {
 	$"6E6369660502000603399E0F3D9C0ABF82B23B84A94B88504870C900A5B1FFBC"

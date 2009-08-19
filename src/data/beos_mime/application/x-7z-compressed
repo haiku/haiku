@@ -6,7 +6,7 @@ resource(1, "META:TYPE") "application/x-7z-compressed";
 // TODO: Please add a proper rule here, someone who knows.
 //resource(2, "META:SNIFF_RULE") "0.40 (\"\\037\\213\")";
 
-resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.haiku-Expander";
+resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-Expander";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "7zip",
