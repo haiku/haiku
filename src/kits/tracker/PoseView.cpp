@@ -1639,7 +1639,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 			if (resultingPoses)
 				resultingPoses[modelIndex] = NULL;
 			continue;
-		} else 
+		} else
 			fInsertedNodes.insert(*(model->NodeRef()));
 
 		if ((clipboardMode = FSClipboardFindNodeMode(model, false, true)) != 0
@@ -3270,12 +3270,10 @@ BPoseView::PlacePose(BPose *pose, BRect &viewBounds)
 	bool checkValidLocation = IsDesktopWindow();
 
 	// find an empty slot to put pose into
-	if (fVSPoseList->CountItems() > 0) {
-		while (SlotOccupied(rect, viewBounds)
-			// check good location on the desktop
-			|| (checkValidLocation && !IsValidLocation(rect))) {
-			NextSlot(pose, rect, viewBounds);
-		}
+	while (SlotOccupied(rect, viewBounds)
+		// check good location on the desktop
+		|| (checkValidLocation && !IsValidLocation(rect))) {
+		NextSlot(pose, rect, viewBounds);
 	}
 
 	rect.InsetBy(3, 0);
@@ -5324,7 +5322,7 @@ BPoseView::AttributeChanged(const BMessage *message)
 					PRINT(("converting model %s from a zombie\n", zombie->Name()));
 						ConvertZombieToPose(zombie, index);
 					}
-				} 
+				}
 			} else {
 				zombie->StatChanged();
 			}
