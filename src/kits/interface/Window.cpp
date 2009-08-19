@@ -48,9 +48,6 @@
 #include <tracker_private.h>
 #include <WindowPrivate.h>
 
-#ifndef __HAIKU__
-#	include "PNGDump.h"
-#endif
 
 //#define DEBUG_WIN
 #ifdef DEBUG_WIN
@@ -172,7 +169,7 @@ static property_info sWindowPropInfo[] = {
 		"Minimize", { B_GET_PROPERTY, B_SET_PROPERTY },
 		{ B_DIRECT_SPECIFIER }, NULL, 0, { B_BOOL_TYPE }
 	},
-	
+
 	{
 		"TabFrame", { B_GET_PROPERTY },
 		{ B_DIRECT_SPECIFIER }, NULL, 0, { B_RECT_TYPE }
@@ -3471,8 +3468,9 @@ BWindow::_HandleKeyDown(BMessage* event)
 	}
 
 	// Keyboard navigation through views
-	// (B_OPTION_KEY makes BTextViews and friends navigable, even in editing mode)
-	if (key == B_TAB && (modifiers & (B_COMMAND_KEY | B_OPTION_KEY)) != 0) {
+	// (B_OPTION_KEY makes BTextViews and friends navigable, even in editing
+	// mode)
+	if (key == B_TAB && (modifiers & B_OPTION_KEY) != 0) {
 		_KeyboardNavigation();
 		return true;
 	}
@@ -3596,7 +3594,8 @@ BWindow::_KeyboardNavigation()
 	message->FindInt32("modifiers", (int32*)&modifiers);
 
 	BView* nextFocus;
-	int32 jumpGroups = modifiers & B_CONTROL_KEY ? B_NAVIGABLE_JUMP : B_NAVIGABLE;
+	int32 jumpGroups = (modifiers & B_OPTION_KEY) != 0
+		? B_NAVIGABLE_JUMP : B_NAVIGABLE;
 	if (modifiers & B_SHIFT_KEY)
 		nextFocus = _FindPreviousNavigable(fFocus, jumpGroups);
 	else
