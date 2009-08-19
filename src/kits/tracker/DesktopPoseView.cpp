@@ -101,15 +101,15 @@ DesktopPoseView::InitDesktopDirentIterator(BPoseView *nodeMonitoringTarget,
 		return NULL;
 
 	CachedEntryIteratorList *result = new DesktopEntryListCollection();
-	
+
 	ASSERT(!sourceModel.IsQuery());
 	ASSERT(sourceModel.Node());
 	BDirectory *sourceDirectory = dynamic_cast<BDirectory *>(sourceModel.Node());
 
 	dev_t sourceDevice = sourceModel.NodeRef()->device;
-	
+
 	ASSERT(sourceDirectory);
-	
+
 	// build an iterator list, start with boot
 	EntryListBase *perDesktopIterator = new CachedDirectoryEntryList(
 		*sourceDirectory);
@@ -153,7 +153,7 @@ DesktopPoseView::InitDesktopDirentIterator(BPoseView *nodeMonitoringTarget,
 			}
 		}
 	}
-	
+
 	if (result->Rewind() != B_OK) {
 		delete result;
 		if (nodeMonitoringTarget)
@@ -205,7 +205,7 @@ DesktopPoseView::FSNotification(const BMessage *message)
 				&& otherDesktop.GetEntry(&entry) == B_OK) {
 				// place desktop items from the mounted volume onto the desktop
 				Model model(&entry);
-				if (model.InitCheck() == B_OK) 
+				if (model.InitCheck() == B_OK)
 					AddPoses(&model);
 			}
 		}
@@ -247,7 +247,7 @@ DesktopPoseView::Represents(const node_ref *ref) const
 		deviceDesktop.GetNodeRef(&nref);
 		return nref == *ref;
 	}
-	
+
 	return _inherited::Represents(ref);
 }
 
@@ -266,14 +266,15 @@ void
 DesktopPoseView::ShowVolumes(bool visible, bool showShared)
 {
 	if (LockLooper()) {
+		SavePoseLocations();
 		if (!visible)
 			RemoveRootPoses();
 		else
-			AddRootPoses(true, showShared);	
+			AddRootPoses(true, showShared);
 		UnlockLooper();
 	}
 }
- 
+
 
 void
 DesktopPoseView::RemoveNonBootItems()
@@ -294,7 +295,7 @@ DesktopPoseView::AddNonBootItems()
 		return;
 
 	BVolumeRoster volumeRoster;
- 
+
 	BVolume boot;
 	volumeRoster.GetBootVolume(&boot);
 
@@ -310,9 +311,9 @@ DesktopPoseView::AddNonBootItems()
 			&& otherDesktop.GetEntry(&entry) == B_OK) {
 			// place desktop items from the mounted volume onto the desktop
 			Model model(&entry);
-			if (model.InitCheck() == B_OK) 
+			if (model.InitCheck() == B_OK)
 				AddPoses(&model);
-		}	
+		}
 	}
 }
 
@@ -359,7 +360,7 @@ DesktopPoseView::AdaptToVolumeChange(BMessage *message)
 	if (model.InitCheck() == B_OK) {
 		BMessage entryMessage;
 		entryMessage.what = B_NODE_MONITOR;
-		
+
 		if (showDisksIcon)
 			entryMessage.AddInt32("opcode", B_ENTRY_CREATED);
 		else {
@@ -392,7 +393,7 @@ DesktopPoseView::AdaptToDesktopIntegrationChange(BMessage *message)
 	bool mountVolumesOnDesktop = true;
 	bool mountSharedVolumesOntoDesktop = true;
 	bool integrateNonBootBeOSDesktops = true;
-	
+
 	message->FindBool("MountVolumesOntoDesktop", &mountVolumesOnDesktop);
 	message->FindBool("MountSharedVolumesOntoDesktop", &mountSharedVolumesOntoDesktop);
 	message->FindBool("IntegrateNonBootBeOSDesktops", &integrateNonBootBeOSDesktops);
@@ -442,7 +443,7 @@ DesktopPoseView::UpdateNonBootDesktopPoses(bool integrateNonBootBeOSDesktops)
 					&& volume != bootVolume) {
 					// place desktop items from the volume onto the desktop
 					Model model(&entry);
-					if (model.InitCheck() == B_OK) 
+					if (model.InitCheck() == B_OK)
 						AddPoses(&model);
 				}
 			}
