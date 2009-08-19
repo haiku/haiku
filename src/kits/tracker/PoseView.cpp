@@ -3217,8 +3217,10 @@ BPoseView::Cleanup(bool doAll)
 			BPoint location(pose->Location(this));
 			BPoint newLocation(PinToGrid(location, fGrid, fOffset));
 
+			bool intersectsDesktopElements = !IsValidLocation(pose);
+
 			// do we need to move pose to a grid location?
-			if (newLocation != location) {
+			if (newLocation != location || intersectsDesktopElements) {
 				// remove pose from VSlist so it doesn't "bump" into itself
 				RemoveFromVSList(pose);
 
@@ -3226,7 +3228,8 @@ BPoseView::Cleanup(bool doAll)
 				BRect oldBounds(pose->CalcRect(this));
 				BRect poseBounds(oldBounds);
 				pose->MoveTo(newLocation, this);
-				if (SlotOccupied(oldBounds, viewBounds)) {
+				if (SlotOccupied(oldBounds, viewBounds)
+					|| intersectsDesktopElements) {
 					ResetPosePlacementHint();
 					PlacePose(pose, viewBounds);
 					poseBounds = pose->CalcRect(this);
@@ -4604,6 +4607,8 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 			if (dropOnGrid)
 				location = targetView->PinToGrid(location, targetView->fGrid, targetView->fOffset);
 
+			// TODO: don't drop poses under desktop elements
+			//		 ie: replicants, deskbar
 			pose->MoveTo(location, targetView);
 
 			targetView->RemoveFromExtent(oldBounds);
