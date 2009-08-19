@@ -260,7 +260,7 @@ TermWindow::_SetupMenu()
 	// Make File Menu.
 	fFilemenu = new BMenu("Terminal");
 	fFilemenu->AddItem(new BMenuItem("Switch Terminals",
-		new BMessage(MENU_SWITCH_TERM),'G'));
+		new BMessage(MENU_SWITCH_TERM), B_TAB));
 	fFilemenu->AddItem(new BMenuItem("New Terminal" B_UTF8_ELLIPSIS,
 		new BMessage(MENU_NEW_TERM), 'N'));
 	fFilemenu->AddItem(new BMenuItem("New Tab", new BMessage(kNewTab), 'T'));
