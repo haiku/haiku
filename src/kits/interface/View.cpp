@@ -4640,7 +4640,10 @@ BView::DoLayout()
 void
 BView::SetToolTip(const char* text)
 {
-	SetToolTip(new BTextToolTip(text));
+	if (BTextToolTip* tip = dynamic_cast<BTextToolTip*>(fToolTip))
+		tip->SetText(text);
+	else
+		SetToolTip(new BTextToolTip(text));
 }
 
 
