@@ -101,7 +101,7 @@ static	int32						_FinishThread(void *data);
 		void						_FreeGeneralDescriptor(
 										ohci_general_td *descriptor);
 
-		status_t					_CreateDescriptorChain(
+		status_t					_CreateDescriptorChain(Pipe *pipe,
 										ohci_general_td **firstDescriptor,
 										ohci_general_td **lastDescriptor,
 										uint32 direction,
