@@ -19,7 +19,7 @@
 int
 main(int /*argc*/, char **/*argv*/)
 {
-	BApplication app("application/x-vnd.haiku-rtf-translator");
+	BApplication app("application/x-vnd.Haiku-RTFTranslator");
 
 	status_t result;
 	result = LaunchTranslatorWindow(new RTFTranslator, "RTF Settings", BRect(0, 0, 225, 175));

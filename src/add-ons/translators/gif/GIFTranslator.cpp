@@ -216,7 +216,7 @@ Translate(BPositionIO *inSource, const translator_info *inInfo,
 
 
 GIFTranslator::GIFTranslator()
-	: BApplication("application/x-vnd.Jules-GIFTranslator")
+	: BApplication("application/x-vnd.Haiku-GIFTranslator")
 {
 	BRect rect(100, 100, 339, 339);
 	gifwindow = new GIFWindow(rect, "GIF Settings");

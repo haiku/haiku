@@ -27,7 +27,7 @@
 int
 main(int argc, char **argv)
 {
-	BApplication app("application/x-vnd.haiku-raw-translator");
+	BApplication app("application/x-vnd.Haiku-RAWTranslator");
 
 #if TEST_MODE
 	if (argc > 1) {

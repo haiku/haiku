@@ -14,7 +14,7 @@
 int
 main(int /*argc*/, char **/*argv*/)
 {
-	BApplication app("application/x-vnd.haiku-ico-translator");
+	BApplication app("application/x-vnd.Haiku-ICOTranslator");
 
 	status_t result;
 	result = LaunchTranslatorWindow(new ICOTranslator, "ICO Settings", BRect(0, 0, 225, 175));

@@ -51,7 +51,7 @@
 int
 main()
 {
-	BApplication app("application/x-vnd.obos-bmp-translator");
+	BApplication app("application/x-vnd.Haiku-BMPTranslator");
 	status_t result;
 	result = LaunchTranslatorWindow(new BMPTranslator,
 		"BMP Settings", BRect(0, 0, 225, 175));

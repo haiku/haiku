@@ -47,7 +47,7 @@
 int
 main()
 {
-	BApplication app("application/x-vnd.obos-tga-translator");
+	BApplication app("application/x-vnd.Haiku-TGATranslator");
 	status_t result;
 	result = LaunchTranslatorWindow(new TGATranslator,
 		"TGA Settings", BRect(0, 0, 225, 175));

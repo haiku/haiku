@@ -13,7 +13,7 @@
 int
 main(int argc, char *argv[])
 {
-	BApplication application("application/x-vnd.haiku.hvif-translator");
+	BApplication application("application/x-vnd.Haiku.HVIFTranslator");
 	if (LaunchTranslatorWindow(new HVIFTranslator, "HVIF Settings",
 			BRect(0, 0, 250, 150)) != B_OK)
 		return 1;

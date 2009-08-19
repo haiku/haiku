@@ -14,7 +14,7 @@
 int
 main()
 {
-	BApplication app("application/x-vnd.haiku-wbi-translator");
+	BApplication app("application/x-vnd.Haiku-WonderBrushTranslator");
 	status_t result;
 	result = LaunchTranslatorWindow(new WonderBrushTranslator,
 		"WBI Settings", BRect(0, 0, 225, 175));

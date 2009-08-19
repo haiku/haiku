@@ -15,7 +15,7 @@
 int
 main(int /*argc*/, char **/*argv*/)
 {
-	BApplication app("application/x-vnd.haiku-pcx-translator");
+	BApplication app("application/x-vnd.Haiku-PCXTranslator");
 
 	status_t result;
 	result = LaunchTranslatorWindow(new PCXTranslator, "PCX Settings", BRect(0, 0, 225, 175));

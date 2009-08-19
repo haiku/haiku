@@ -53,7 +53,7 @@
 int
 main()
 {
-	BApplication app("application/x-vnd.obos-png-translator");
+	BApplication app("application/x-vnd.Haiku-PNGTranslator");
 	status_t result;
 	result = LaunchTranslatorWindow(new PNGTranslator,
 		"PNG Settings", BRect(0, 0, PNG_VIEW_WIDTH, PNG_VIEW_HEIGHT));
