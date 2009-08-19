@@ -25,16 +25,8 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
-UseLibraryHeaders agg ;
+UseLibraryHeaders agg icon ;
 UsePrivateHeaders app input print interface shared tracker ;
-
-local pngDump ;
-if $(TARGET_PLATFORM) = haiku {
-	UseLibraryHeaders icon ;
-} else {
-	pngDump = PNGDump.cpp ;
-	UseLibraryHeaders icon png zlib ;
-}
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) textview_support ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) layouter ] ;
@@ -145,8 +137,6 @@ MergeObject <libbe>interface_kit.o :
 	OneElementLayouter.cpp
 	SimpleLayouter.cpp
 
-	# required on R5
-	$(pngDump)
 	: libshared.a
 ;
 
