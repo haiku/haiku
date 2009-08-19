@@ -598,10 +598,12 @@ TSwitchManager::MessageReceived(BMessage* message)
 					// Want to skip TASK msgs posted before the window
 					// was made visible. Better UI feel if we do this.
 					if (time > fSkipUntil) {
-						uint32 modifiers;
+						uint32 modifiers = 0;
 						message->FindInt32("modifiers", (int32*)&modifiers);
-						Process((modifiers & B_SHIFT_KEY) == 0,
-							(modifiers & B_OPTION_KEY) != 0);
+						int32 key = 0;
+						message->FindInt32("key", &key);
+
+						Process((modifiers & B_SHIFT_KEY) == 0, key == 0x11);
 					}
 				}
 			} else
@@ -702,8 +704,7 @@ TSwitchManager::MainEntry(BMessage* message)
 			// Must be a multiple of the delay used above
 	}
 
-	Process((modifierKeys & B_SHIFT_KEY) == 0,
-		(modifierKeys & B_OPTION_KEY) != 0);
+	Process((modifierKeys & B_SHIFT_KEY) == 0, key == 0x11);
 }
 
 
@@ -784,12 +785,14 @@ TSwitchManager::QuickSwitch(BMessage* message)
 {
 	uint32 modifiers = 0;
 	message->FindInt32("modifiers", (int32*)&modifiers);
+	int32 key = 0;
+	message->FindInt32("key", &key);
 
 	team_id team;
 	if (message->FindInt32("team", &team) == B_OK) {
 		bool forward = (modifiers & B_SHIFT_KEY) == 0;
 
-		if ((modifiers & B_OPTION_KEY) != 0) {
+		if (key == 0x11) {
 			// TODO: add the same switch logic we have for apps!
 			SwitchWindow(team, forward, true);
 		} else {

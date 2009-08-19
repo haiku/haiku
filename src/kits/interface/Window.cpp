@@ -1134,6 +1134,13 @@ FrameMoved(origin);
 			break;
 		}
 
+		case B_UNMAPPED_KEY_DOWN:
+		{
+			if (!_HandleUnmappedKeyDown(msg))
+				target->MessageReceived(msg);
+			break;
+		}
+
 		case B_MOUSE_DOWN:
 		{
 			BView* view = dynamic_cast<BView*>(target);
@@ -3434,8 +3441,32 @@ BWindow::_TransitForMouseMoved(BView* view, BView* viewUnderMouse) const
 }
 
 
-/*!
-	Handles keyboard input before it gets forwarded to the target handler.
+/*!	Forwards the key to the switcher
+*/
+void
+BWindow::_Switcher(int32 rawKey, uint32 modifiers, bool repeat)
+{
+	// only send the first key press, no repeats
+	if (repeat)
+		return;
+
+	BMessenger deskbar(kDeskbarSignature);
+	if (!deskbar.IsValid()) {
+		// TODO: have some kind of fallback-handling in case the Deskbar is
+		// not available?
+		return;
+	}
+
+	BMessage message('TASK');
+	message.AddInt32("key", rawKey);
+	message.AddInt32("modifiers", modifiers);
+	message.AddInt64("when", system_time());
+	message.AddInt32("team", Team());
+	deskbar.SendMessage(&message);
+}
+
+
+/*!	Handles keyboard input before it gets forwarded to the target handler.
 	This includes shortcut evaluation, keyboard navigation, etc.
 
 	\return handled if true, the event was already handled, and will not
@@ -3475,21 +3506,12 @@ BWindow::_HandleKeyDown(BMessage* event)
 		return true;
 	}
 
+	int32 rawKey;
+	event->FindInt32("key", &rawKey);
+
 	// Deskbar's Switcher
-	if (key == B_TAB && (modifiers & B_CONTROL_KEY) != 0) {
-		BMessenger deskbar(kDeskbarSignature);
-		int32 rawKey;
-		if (event->FindInt32("key", &rawKey) == B_OK
-			&& !event->HasInt32("be:key_repeat")
-			&& deskbar.IsValid()) {
-			// only send the first key press, no repeats
-			BMessage message('TASK');
-			message.AddInt32("key", rawKey);
-			message.AddInt32("modifiers", modifiers);
-			message.AddInt64("when", system_time());
-			message.AddInt32("team", Team());
-			deskbar.SendMessage(&message);
-		}
+	if ((key == B_TAB || rawKey == 0x11) && (modifiers & B_CONTROL_KEY) != 0) {
+		_Switcher(rawKey, modifiers, event->HasInt32("be:key_repeat"));
 		return true;
 	}
 
@@ -3502,22 +3524,18 @@ BWindow::_HandleKeyDown(BMessage* event)
 		return true;
 	}
 
-	if (key == B_FUNCTION_KEY) {
-		// Check for Print Screen
-		int32 rawKey;
-		if (event->FindInt32("key", &rawKey) == B_OK && rawKey == B_PRINT_KEY) {
-			BMessage message(B_REFS_RECEIVED);
-			message.AddBool("silent", true);
+	if (key == B_FUNCTION_KEY && rawKey == B_PRINT_KEY) {
+		BMessage message(B_REFS_RECEIVED);
+		message.AddBool("silent", true);
 
-			if ((modifiers & B_CONTROL_KEY) != 0)
-				message.AddBool("window", true);
+		if ((modifiers & B_CONTROL_KEY) != 0)
+			message.AddBool("window", true);
 
-			if ((modifiers & B_SHIFT_KEY) != 0 || (modifiers & B_OPTION_KEY) != 0)
-				message.ReplaceBool("silent", false);
+		if ((modifiers & B_SHIFT_KEY) != 0 || (modifiers & B_OPTION_KEY) != 0)
+			message.ReplaceBool("silent", false);
 
-			be_roster->Launch("application/x-vnd.haiku-screenshot", &message);
-			return true;
-		}
+		be_roster->Launch("application/x-vnd.haiku-screenshot", &message);
+		return true;
 	}
 
 	// Handle shortcuts
@@ -3544,10 +3562,8 @@ BWindow::_HandleKeyDown(BMessage* event)
 			//	example)
 			if (shortcut->MenuItem() != NULL) {
 				BMenu* menu = shortcut->MenuItem()->Menu();
-				if (menu != NULL) {
-					MenuPrivate(menu).InvokeItem(shortcut->MenuItem(),
-												true);
-				}
+				if (menu != NULL)
+					MenuPrivate(menu).InvokeItem(shortcut->MenuItem(), true);
 			} else {
 				BHandler* target = shortcut->Target();
 				if (target == NULL)
@@ -3573,6 +3589,30 @@ BWindow::_HandleKeyDown(BMessage* event)
 	}
 
 	// TODO: convert keys to the encoding of the target view
+
+	return false;
+}
+
+
+bool
+BWindow::_HandleUnmappedKeyDown(BMessage* event)
+{
+	// Only handle special functions when the event targeted the active focus
+	// view
+	if (!_IsFocusMessage(event))
+		return false;
+
+	uint32 modifiers;
+	int32 rawKey;
+	if (event->FindInt32("modifiers", (int32*)&modifiers) != B_OK
+		|| event->FindInt32("key", &rawKey))
+		return false;
+
+	// Deskbar's Switcher
+	if (rawKey == 0x11 && (modifiers & B_CONTROL_KEY) != 0) {
+		_Switcher(rawKey, modifiers, event->HasInt32("be:key_repeat"));
+		return true;
+	}
 
 	return false;
 }

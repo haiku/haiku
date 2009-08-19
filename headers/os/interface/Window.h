@@ -330,7 +330,10 @@ private:
 
 			BView*			_FindNextNavigable(BView *focus, uint32 flags);
 			BView*			_FindPreviousNavigable(BView *focus, uint32 flags);
+			void			_Switcher(int32 rawKey, uint32 modifiers,
+								bool repeat);
 			bool			_HandleKeyDown(BMessage* event);
+			bool			_HandleUnmappedKeyDown(BMessage* event);
 			void			_KeyboardNavigation();
 
 			void			_GetDecoratorSize(float* _borderWidth,
