@@ -341,6 +341,9 @@ local userBootScripts = UserBootscript.sample UserSetupEnvironment.sample ;
 SEARCH on $(userBootScripts) = [ FDirName $(HAIKU_TOP) data config boot ] ;
 AddFilesToHaikuImage home config boot : $(userBootScripts) ;
 
+# Add Autostart directory
+AddDirectoryToHaikuImage home config boot Autostart ;
+
 local logoArtwork = "HAIKU logo - white on blue - big.png"
 	"HAIKU logo - white on blue - normal.png" ;
 SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;

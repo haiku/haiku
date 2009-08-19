@@ -152,6 +152,14 @@ if [ "$SAFEMODE" != "yes" ]; then
 	fi
 fi
 
+# Start all programs in the Autostart folder
+if [ "$SAFEMODE" != "yes" ]; then
+	for program in $HOME/config/boot/Autostart/* 
+	do 
+		"$program" & 
+	done
+fi
+
 # Check for fresh install and run post install scripts.
 postInstallDir=/boot/common/boot/post_install
 freshInstallIndicator=/boot/common/settings/fresh_install
