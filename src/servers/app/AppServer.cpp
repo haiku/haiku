@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2009, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -22,6 +22,7 @@
 #include <PortLink.h>
 
 #include <syslog.h>
+
 
 //#define DEBUG_SERVER
 #ifdef DEBUG_SERVER
@@ -168,13 +169,13 @@ void
 AppServer::RunLooper()
 {
 	rename_thread(find_thread(NULL), "picasso");
-	_message_thread((void *)this);
+	_message_thread((void*)this);
 }
 
 
 /*!	\brief Creates a desktop object for an authorized user
 */
-Desktop *
+Desktop*
 AppServer::_CreateDesktop(uid_t userID)
 {
 	BAutolock locker(fDesktopLock);
@@ -190,8 +191,9 @@ AppServer::_CreateDesktop(uid_t userID)
 		if (status == B_OK && !fDesktops.AddItem(desktop))
 			status = B_NO_MEMORY;
 
-		if (status < B_OK) {
-			fprintf(stderr, "Cannot initialize Desktop object: %s\n", strerror(status));
+		if (status != B_OK) {
+			syslog(LOG_ERR, "Cannot initialize Desktop object: %s\n",
+				strerror(status));
 			delete desktop;
 			return NULL;
 		}
@@ -243,8 +245,9 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			Desktop* desktop = _FindDesktop(userID);
 			if (desktop == NULL) {
 				// we need to create a new desktop object for this user
-				// ToDo: test if the user exists on the system
-				// ToDo: maybe have a separate AS_START_DESKTOP_SESSION for authorizing the user
+				// TODO: test if the user exists on the system
+				// TODO: maybe have a separate AS_START_DESKTOP_SESSION for
+				// authorizing the user
 				desktop = _CreateDesktop(userID);
 			}
 
