@@ -19,7 +19,7 @@
 
 #include "DevicesWindows.h"
 
-#define APP_SIGNATURE "application/x-vnd.OBOS.Devices"  // Application Signature and Title
+#define APP_SIGNATURE "application/x-vnd.Haiku.Devices"  // Application Signature and Title
 
 class Devices : public BApplication
 {

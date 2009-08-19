@@ -15,7 +15,7 @@
 #include <Window.h>
 
 
-static const char *kSignature = "application/x-vnd.haiku-backgrounds";
+static const char *kSignature = "application/x-vnd.Haiku-Backgrounds";
 
 
 class BackgroundsApplication : public BApplication {

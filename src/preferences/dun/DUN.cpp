@@ -23,7 +23,7 @@ Authors: Sikosis (beos@gravity24hr.com)
 
 
 // Application Signature and Title
-const char *APP_SIGNATURE = "application/x-vnd.OBOS.Dial-UpNetworking";
+const char *APP_SIGNATURE = "application/x-vnd.Haiku-DialUpNetworking";
 
 // Default Window Size
 float FormTopDefault = 100;

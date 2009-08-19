@@ -1,5 +1,5 @@
 
-resource app_signature "application/x-vnd.OBOS.Devices";
+resource app_signature "application/x-vnd.Haiku.Devices";
 
 resource app_version
 {

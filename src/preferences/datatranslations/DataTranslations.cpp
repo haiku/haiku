@@ -25,7 +25,7 @@
 #include <string.h>
 
 
-const char* kApplicationSignature = "application/x-vnd.haiku-translations";
+const char* kApplicationSignature = "application/x-vnd.Haiku-DataTranslations";
 
 
 DataTranslationsApplication::DataTranslationsApplication()

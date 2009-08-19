@@ -61,7 +61,7 @@
 #include "multimon.h"	// the usual: DANGER WILL, ROBINSON!
 
 
-const char* kBackgroundsSignature = "application/x-vnd.haiku-backgrounds";
+const char* kBackgroundsSignature = "application/x-vnd.Haiku-Backgrounds";
 
 // list of officially supported colour spaces
 static const struct {

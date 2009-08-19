@@ -1,5 +1,5 @@
 
-resource app_signature "application/x-vnd.Haiku-Translations";
+resource app_signature "application/x-vnd.Haiku-DataTranslations";
 
 resource app_version {
 	major  = 1,

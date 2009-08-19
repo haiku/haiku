@@ -17,7 +17,7 @@
 #define COLOR_SETTINGS_NAME "system_colors"
 */
 
-#define APPEARANCE_APP_SIGNATURE "application/x-vnd.haiku-Appearance"
+#define APPEARANCE_APP_SIGNATURE "application/x-vnd.Haiku-Appearance"
 
 #define APPLY_SETTINGS 'aply'
 #define REVERT_SETTINGS 'rvrt'
