@@ -54,6 +54,16 @@ static const char* kFileSystemPrefix = "file_systems";
 KDiskDeviceManager* KDiskDeviceManager::sDefaultManager = NULL;
 
 
+struct device_event {
+	int32					opcode;
+	const char*				name;
+	dev_t					device;
+	ino_t					directory;
+	ino_t					node;
+	NotificationListener*	listener;
+};
+
+
 struct GetPartitionID {
 	inline partition_id operator()(const KPartition* partition) const
 	{
@@ -119,9 +129,7 @@ private:
 
 class KDiskDeviceManager::DeviceWatcher : public NotificationListener {
 public:
-	DeviceWatcher(KDiskDeviceManager* manager)
-		:
-		fManager(manager)
+	DeviceWatcher()
 	{
 	}
 
@@ -132,45 +140,34 @@ public:
 	virtual void EventOccured(NotificationService& service,
 		const KMessage* event)
 	{
-		int32 opCode = event->GetInt32("opcode", -1);
-		switch (opCode) {
+		int32 opcode = event->GetInt32("opcode", -1);
+		switch (opcode) {
 			case B_ENTRY_CREATED:
 			case B_ENTRY_REMOVED:
 			{
-				const char* name = event->GetString("name", "");
-				dev_t device = event->GetInt32("device", -1);
-				ino_t directory = event->GetInt64("directory", -1);
-				ino_t node = event->GetInt64("node", -1);
-
-				struct stat st;
-				if (vfs_stat_node_ref(device, node, &st) != 0)
+				device_event* deviceEvent = new(std::nothrow) device_event;
+				if (deviceEvent == NULL)
 					break;
 
-				if (S_ISDIR(st.st_mode)) {
-					if (opCode == B_ENTRY_CREATED)
-						add_node_listener(device, node, B_WATCH_DIRECTORY,
-							*this);
-					else
-						remove_node_listener(device, node, *this);
-				} else {
-					if (strcmp(name, "raw") == 0) {
-						// a new raw device was added/removed
-						KPath path(B_PATH_NAME_LENGTH + 1);
-						if (path.InitCheck() != B_OK
-							|| vfs_entry_ref_to_path(device, directory,
-							name, path.LockBuffer(),
-							path.BufferSize()) != B_OK) {
-							break;
-						}
-						path.UnlockBuffer();
+				const char* name = event->GetString("name", NULL);
+				if (name != NULL)
+					deviceEvent->name = strdup(name);
+				else
+					deviceEvent->name = NULL;
 
-						if (opCode == B_ENTRY_CREATED)
-							fManager->CreateDevice(path.Path());
-						else
-							fManager->DeleteDevice(path.Path());
-					}
-				}
+				deviceEvent->opcode = opcode;
+				deviceEvent->device = event->GetInt32("device", -1);
+				deviceEvent->directory = event->GetInt64("directory", -1);
+				deviceEvent->node = event->GetInt64("node", -1);
+				deviceEvent->listener = this;
 
+				// TODO: a real in-kernel DPC mechanism would be preferred...
+				thread_id thread = spawn_kernel_thread(_HandleDeviceEvent,
+					"device event", B_NORMAL_PRIORITY, deviceEvent);
+				if (thread < 0)
+					delete deviceEvent;
+				else
+					resume_thread(thread);
 				break;
 			}
 
@@ -179,8 +176,46 @@ public:
 		}
 	}
 
-private:
-	KDiskDeviceManager* fManager;
+	static status_t _HandleDeviceEvent(void* _event)
+	{
+		device_event* event = (device_event*)_event;
+
+		struct stat st;
+		if (vfs_stat_node_ref(event->device, event->node, &st) != 0) {
+			delete event;
+			return B_ERROR;
+		}
+
+		if (S_ISDIR(st.st_mode)) {
+			if (event->opcode == B_ENTRY_CREATED) {
+				add_node_listener(event->device, event->node, B_WATCH_DIRECTORY,
+					*event->listener);
+			} else {
+				remove_node_listener(event->device, event->node,
+					*event->listener);
+			}
+		} else if (strcmp(event->name, "raw") == 0) {
+			// a new raw device was added/removed
+			KPath path(B_PATH_NAME_LENGTH + 1);
+			if (path.InitCheck() != B_OK
+				|| vfs_entry_ref_to_path(event->device, event->directory,
+						event->name, path.LockBuffer(),
+				path.BufferSize()) != B_OK) {
+				delete event;
+				return B_ERROR;
+			}
+
+			path.UnlockBuffer();
+
+			if (event->opcode == B_ENTRY_CREATED)
+				KDiskDeviceManager::Default()->CreateDevice(path.Path());
+			else
+				KDiskDeviceManager::Default()->DeleteDevice(path.Path());
+		}
+
+		delete event;
+		return B_OK;
+	}
 };
 
 
@@ -211,7 +246,7 @@ KDiskDeviceManager::KDiskDeviceManager()
 	fMediaChecker(-1),
 	fTerminating(false),
 	fDiskSystemWatcher(NULL),
-	fDeviceWatcher(new(nothrow) DeviceWatcher(this)),
+	fDeviceWatcher(new(nothrow) DeviceWatcher()),
 	fNotifications(new(nothrow) DiskNotifications)
 {
 	if (InitCheck() != B_OK)
