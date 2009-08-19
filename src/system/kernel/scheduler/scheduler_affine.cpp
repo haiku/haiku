@@ -40,10 +40,10 @@
 // TODO: consolidate this such that HT/SMT entities on the same physical core
 // share a queue, once we have the necessary API for retrieving the topology
 // information
+static struct thread* sRunningThreads[B_MAX_CPU_COUNT];
 static struct thread* sRunQueue[B_MAX_CPU_COUNT];
 static int32 sRunQueueSize[B_MAX_CPU_COUNT];
 static struct thread* sIdleThreads;
-static cpu_mask_t sIdleCPUs = 0;
 
 const int32 kMaxTrackingQuantums = 5;
 const bigtime_t kMinThreadQuantum = 3000;
@@ -61,6 +61,7 @@ struct scheduler_thread_data {
 		fQuantumAverage = 0;
 		fLastQuantumSlot = 0;
 		fLastQueue = -1;
+		memset(fLastThreadQuantums, 0, sizeof(fLastThreadQuantums));
 	}
 	
 	inline void SetQuantum(int32 quantum)
@@ -141,19 +142,6 @@ affine_get_most_idle_cpu()
 }
 
 
-static inline int32
-affine_get_next_idle_cpu(void)
-{
-	for (int32 i = 0; i < smp_get_num_cpus(); i++) {
-		if (gCPU[i].disabled)
-			continue;
-		if (sIdleCPUs & (1 << i))
-			return i;
-	}
-
-	return -1;
-}
-
 /*!	Enqueues the thread into the run queue.
 	Note: thread lock must be held when entering this function
 */
@@ -191,28 +179,27 @@ affine_enqueue_in_run_queue(struct thread *thread)
 			prev->queue_next = thread;
 		else
 			sRunQueue[targetCPU] = thread;
+
 		thread->scheduler_data->fLastQueue = targetCPU;
 	}
 
 	thread->next_priority = thread->priority;
 
-	if (thread->priority != B_IDLE_PRIORITY && targetCPU != smp_get_current_cpu()) {
-		int32 idleCPU = targetCPU;
-		if ((sIdleCPUs & (1 << targetCPU)) == 0) {
-			idleCPU = affine_get_next_idle_cpu();
-			// no idle CPUs are available
-			// to try and grab this task
-			if (idleCPU < 0)
-				return;
-		}
-		sIdleCPUs &= ~(1 << idleCPU);
-		smp_send_ici(idleCPU, SMP_MSG_RESCHEDULE_IF_IDLE, 0, 0,
-			0, NULL, SMP_MSG_FLAG_ASYNC);
-	}
-
 	// notify listeners
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
 		thread);
+
+	if (sRunningThreads[targetCPU] != NULL
+		&& thread->priority > sRunningThreads[targetCPU]->priority) {
+		int32 currentCPU = smp_get_current_cpu();
+		if (targetCPU == currentCPU) {
+			// TODO: we want to inform the caller somehow that it should
+			// trigger a reschedule
+		} else {
+			smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE, 0, 0, 0, NULL,
+				SMP_MSG_FLAG_ASYNC);
+		}
+	}
 }
 
 static inline struct thread *
@@ -235,12 +222,9 @@ dequeue_from_run_queue(struct thread *prevThread, int32 currentCPU)
 /*!	Looks for a possible thread to grab/run from another CPU.
 	Note: thread lock must be held when entering this function
 */
-static struct thread *steal_thread_from_other_cpus(int32 currentCPU)
+static struct thread *
+steal_thread_from_other_cpus(int32 currentCPU)
 {
-	int32 targetCPU = -1;
-	struct thread* nextThread = NULL;
-	struct thread* prevThread = NULL;
-
 	// look through the active CPUs - find the one
 	// that has a) threads available to steal, and
 	// b) out of those, the one that's the most CPU-bound
@@ -248,43 +232,40 @@ static struct thread *steal_thread_from_other_cpus(int32 currentCPU)
 	// - we need to try and maintain a reasonable balance
 	// in run queue sizes across CPUs, and also try to maintain
 	// an even distribution of cpu bound / interactive threads
+	int32 targetCPU = -1;
 	for (int32 i = 0; i < smp_get_num_cpus(); i++) {
 		// skip CPUs that have either no or only one thread
-		if (sRunQueueSize[i] < 2)
+		if (i == currentCPU || sRunQueueSize[i] < 2)
 			continue;
-		if (i == currentCPU)
-			continue;
+
 		// out of the CPUs with threads available to steal,
 		// pick whichever one is generally the most CPU bound.
-		if (targetCPU < 0)
-			targetCPU = i;
-		else if (sRunQueueSize[i] > sRunQueueSize[targetCPU])
+		if (targetCPU < 0
+			|| sRunQueue[i]->priority > sRunQueue[targetCPU]->priority
+			|| (sRunQueue[i]->priority == sRunQueue[targetCPU]->priority
+				&& sRunQueueSize[i] > sRunQueueSize[targetCPU]))
 			targetCPU = i;
 	}
 
-	if (targetCPU >= 0) {
-		nextThread = sRunQueue[targetCPU];
-		do {
-			// grab the highest priority non-pinned thread
-			// out of this CPU's queue, if any.
-			if (nextThread->pinned_to_cpu > 0) {
-				prevThread = nextThread;
-				nextThread = prevThread->queue_next;
-			} else
-				break;
-		} while (nextThread->queue_next != NULL);
+	if (targetCPU < 0)
+		return NULL;
 
-		// we reached the end of the queue without finding an
-		// eligible thread.
-		if (nextThread->pinned_to_cpu > 0)
-			nextThread = NULL;
+	struct thread* nextThread = sRunQueue[targetCPU];
+	struct thread* prevThread = NULL;
 
-		// dequeue the thread we're going to steal
-		if (nextThread != NULL)
+	while (nextThread != NULL) {
+		// grab the highest priority non-pinned thread
+		// out of this CPU's queue, dequeue and return it
+		if (nextThread->pinned_to_cpu <= 0) {
 			dequeue_from_run_queue(prevThread, targetCPU);
+			return nextThread;
+		}
+
+		prevThread = nextThread;
+		nextThread = nextThread->queue_next;
 	}
 
-	return nextThread;
+	return NULL;
 }
 
 
@@ -319,10 +300,10 @@ affine_set_thread_priority(struct thread *thread, int32 priority)
 
 	for (item = sRunQueue[targetCPU], prev = NULL; item && item != thread;
 			item = item->queue_next) {
-			if (prev)
-				prev = prev->queue_next;
-			else
-				prev = item;
+		if (prev)
+			prev = prev->queue_next;
+		else
+			prev = item;
 	}
 
 	ASSERT(item == thread);
@@ -405,7 +386,7 @@ affine_reschedule(void)
 	prevThread = NULL;
 
 	if (sRunQueue[currentCPU] != NULL) {
-		TRACE(("Dequeueing next thread from CPU %ld\n", currentCPU));
+		TRACE(("dequeueing next thread from cpu %ld\n", currentCPU));
 		// select next thread from the run queue
 		while (nextThread->queue_next) {
 			// always extract real time threads
@@ -424,6 +405,9 @@ affine_reschedule(void)
 			} while (nextThread->queue_next != NULL
 				&& priority == nextThread->queue_next->priority);
 		}
+
+		TRACE(("dequeuing thread %ld from cpu %ld\n", nextThread->id,
+			currentCPU));
 		// extract selected thread from the run queue
 		dequeue_from_run_queue(prevThread, currentCPU);
 	} else {
@@ -432,6 +416,7 @@ affine_reschedule(void)
 			nextThread = steal_thread_from_other_cpus(currentCPU);
 		} else
 			nextThread = NULL;
+
 		if (nextThread == NULL) {
 			TRACE(("No threads to steal, grabbing from idle pool\n"));
 			// no other CPU had anything for us to take,
@@ -476,30 +461,31 @@ affine_reschedule(void)
 	}
 
 	if (nextThread != oldThread || oldThread->cpu->preempted) {
+		timer *quantumTimer = &oldThread->cpu->quantum_timer;
+		if (!oldThread->cpu->preempted)
+			cancel_timer(quantumTimer);
+		oldThread->cpu->preempted = 0;
+
+		// we do not adjust the quantum for the idle thread as it is going to be
+		// preempted most of the time and would likely get the longer quantum
+		// over time, indeed we use a smaller quantum to avoid running idle too
+		// long
 		bigtime_t quantum = kMinThreadQuantum;
 		// give CPU-bound background threads a larger quantum size
 		// to minimize unnecessary context switches if the system is idle
-		if (nextThread->scheduler_data->GetAverageQuantumUsage()
+		if (nextThread->priority != B_IDLE_PRIORITY
+			&& nextThread->scheduler_data->GetAverageQuantumUsage()
 			> (kMinThreadQuantum >> 1)
 			&& nextThread->priority < B_NORMAL_PRIORITY)
 			quantum = kMaxThreadQuantum;
-		timer *quantumTimer = &oldThread->cpu->quantum_timer;
 
-		if (!oldThread->cpu->preempted)
-			cancel_timer(quantumTimer);
-
-		oldThread->cpu->preempted = 0;
 		add_timer(quantumTimer, &reschedule_event, quantum,
 			B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_THREAD_LOCK);
 
-		// update the idle bit for this CPU in the CPU mask
-		if (nextThread->priority == B_IDLE_PRIORITY)
-			sIdleCPUs = SET_BIT(sIdleCPUs, currentCPU);
-		else
-			sIdleCPUs = CLEAR_BIT(sIdleCPUs, currentCPU);
-
-		if (nextThread != oldThread)
+		if (nextThread != oldThread) {
+			sRunningThreads[currentCPU] = nextThread;
 			context_switch(oldThread, nextThread);
+		}
 	}
 }
 

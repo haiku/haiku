@@ -631,6 +631,9 @@ process_pending_ici(int32 currentCPU)
 			func(msg->data, currentCPU, msg->data2, msg->data3);
 			break;
 		}
+		case SMP_MSG_RESCHEDULE:
+			thread_get_current_thread()->cpu->invoke_scheduler = true;
+			break;
 		case SMP_MSG_RESCHEDULE_IF_IDLE:
 		{
 			// TODO: We must not dereference the thread when entering the kernel
