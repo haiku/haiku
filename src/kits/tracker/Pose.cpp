@@ -546,11 +546,11 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView *poseView, BView *dra
 	if (poseView->ViewMode() == kListMode) {
 		uint32 size = poseView->IconSizeInt();
 		BRect iconRect(rect);
-		iconRect.OffsetBy(offset);
 		iconRect.left += kListOffset;
 		iconRect.right = iconRect.left + size;
 		iconRect.top = iconRect.bottom - size;
 		if (updateRect.Intersects(iconRect)) {
+			iconRect.OffsetBy(offset);
 			DrawIcon(iconRect.LeftTop(), drawView, poseView->IconSize(), directDraw,
 				!windowActive && !showSelectionWhenInactive);
 		}
