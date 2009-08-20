@@ -813,7 +813,7 @@ OHCI::_AddPendingTransfer(Transfer *transfer,
 	data->canceled = false;
 	data->link = NULL;
 
-	// the current tail will become the fist descriptor
+	// the current tail will become the first descriptor
 	data->first_descriptor = (ohci_general_td *)endpoint->tail_logical_descriptor;
 
 	// the data and first descriptors might be the same
@@ -1231,7 +1231,7 @@ OHCI::_SwitchEndpointTail(ohci_endpoint_descriptor *endpoint,
 	tail->next_logical_descriptor = first->next_logical_descriptor;
 
 	// the first descriptor becomes the new tail
-	first->flags = 0;
+	first->flags = OHCI_TD_SET_CONDITION_CODE(OHCI_TD_CONDITION_NOT_ACCESSED);
 	first->buffer_physical = 0;
 	first->next_physical_descriptor = 0;
 	first->last_physical_byte_address = 0;
@@ -1410,6 +1410,7 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 		return B_ERROR;
 	} else {
 		ohci_general_td *tail = _CreateGeneralDescriptor(0);
+		tail->flags = OHCI_TD_SET_CONDITION_CODE(OHCI_TD_CONDITION_NOT_ACCESSED);
 		endpoint->tail_logical_descriptor = tail;
 		endpoint->head_physical_descriptor = tail->physical_address;
 		endpoint->tail_physical_descriptor = tail->physical_address;
