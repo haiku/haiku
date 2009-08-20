@@ -1292,6 +1292,7 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 	BAutolock locker(sBitmapListLock);
 
 	// search our list for a matching bitmap
+	// TODO: use a hash map instead?
 	decorator_bitmap* current = sBitmapList;
 	while (current) {
 		if (current->item == item && current->down == down

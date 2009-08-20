@@ -1227,7 +1227,8 @@ Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace,
 			if (!_Windows(nextWorkspace).HasWindow(floating)) {
 				// but wasn't before
 				_Windows(nextWorkspace).AddWindow(floating,
-					floating->Frontmost(_Windows(nextWorkspace).FirstWindow(), nextWorkspace));
+					floating->Frontmost(_Windows(nextWorkspace).FirstWindow(),
+					nextWorkspace));
 				floating->SetCurrentWorkspace(nextWorkspace);
 				if (mouseEventWindow != fFront)
 					_ShowWindow(floating);
@@ -1438,6 +1439,15 @@ Desktop::_SendFakeMouseMoved(Window* window)
 }
 
 
+/*!	Tries to set the focus to the specified \a focus window. It will make sure,
+	however, that the window actually can have focus.
+
+	Besides the B_AVOID_FOCUS flag, a modal window, or a BWindowScreen can both
+	prevent it from getting focus.
+
+	In any case, this method makes sure that there is a focus window, if there
+	is any window at all, that is.
+*/
 void
 Desktop::SetFocusWindow(Window* focus)
 {
@@ -1451,9 +1461,24 @@ Desktop::SetFocusWindow(Window* focus)
 	}
 
 	bool hasModal = _WindowHasModal(focus);
+	bool hasWindowScreen = false;
+
+	if (!hasModal && focus != NULL) {
+		// Check whether or not a window screen is in front of the window
+		// (if it has a modal, the right thing is done, anyway)
+		Window* window = focus;
+		while (true) {
+			window = window->NextWindow(fCurrentWorkspace);
+			if (window == NULL || window->Feel() == kWindowScreenFeel)
+				break;
+		}
+		if (window != NULL)
+			hasWindowScreen = true;
+	}
 
 	if (focus == fFocus && focus != NULL && !focus->IsHidden()
-		&& (focus->Flags() & B_AVOID_FOCUS) == 0 && !hasModal) {
+		&& (focus->Flags() & B_AVOID_FOCUS) == 0
+		&& !hasModal && !hasWindowScreen) {
 		// the window that is supposed to get focus already has focus
 		UnlockAllWindows();
 		return;
@@ -1464,7 +1489,7 @@ Desktop::SetFocusWindow(Window* focus)
 	if (fSettings->FocusFollowsMouse())
 		list = kFocusList;
 
-	if (focus == NULL || hasModal) {
+	if (focus == NULL || hasModal || hasWindowScreen) {
 		if (!fSettings->FocusFollowsMouse()) {
 			focus = FrontWindow();
 			if (focus == NULL) {
@@ -1524,7 +1549,7 @@ Desktop::SetFocusWindow(Window* focus)
 	BAutolock locker(fApplicationsLock);
 
 	for (int32 i = 0; i < fApplications.CountItems(); i++) {
-		ServerApp *app = fApplications.ItemAt(i);
+		ServerApp* app = fApplications.ItemAt(i);
 
 		if (oldActiveApp != -1 && app->ClientTeam() == oldActiveApp)
 			app->Activate(false);
