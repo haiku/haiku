@@ -537,10 +537,6 @@ set_signals(void *cookie, int clk, int data)
 	else
 		OutSCL(info->port, false);
 
-	/* waiting for SCL output to become stable before reading it back.
-	 * ('typical' error-prone read-modify-write situation..) */
-	snooze(3);
-
 	if (data)
 		OutSDA(info->port, true);
 	else
