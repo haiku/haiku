@@ -5,11 +5,7 @@
 # Start programs and open files in the boot launch folder
 for file in $HOME/config/boot/launch/* 
 do 
-	if [ -x "$file" ]; then
-		"$file" & 
-	else
-		/bin/open "$file" &
-	fi
+	/bin/open "$file" &
 done
 #=====================================================================
 # FEEL FREE TO EDIT BELOW
