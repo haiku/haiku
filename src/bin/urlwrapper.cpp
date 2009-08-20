@@ -135,7 +135,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	
 	const char* failc = " || read -p 'Press any key'";
 	const char* pausec = " ; read -p 'Press any key'";
-	char* args[] = { "/bin/sh", "-c", NULL, NULL};
+	char* args[] = { (char *)"/bin/sh", (char *)"-c", NULL, NULL};
 
 	BPrivate::Support::BUrl url(argv[1]);
 
