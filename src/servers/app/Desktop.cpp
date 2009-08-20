@@ -930,6 +930,7 @@ Desktop::SetWorkspace(int32 index)
 	_SendFakeMouseMoved();
 }
 
+
 /*!	Changes the current workspace to the one specified by \a index.
 	You must hold the all window lock when calling this method.
 */
@@ -996,18 +997,18 @@ Desktop::_SetWorkspace(int32 index)
 	fPreviousWorkspace = fCurrentWorkspace;
 	fCurrentWorkspace = index;
 
-	// Change the display mode, if needed
-	// TODO: this needs to be done for all screens
-	display_mode previousMode, newMode;
-	fVirtualScreen.ScreenAt(0)->GetMode(&previousMode);
-	fVirtualScreen.RestoreConfiguration(*this,
-		fSettings->WorkspacesMessage(index));
-	fVirtualScreen.ScreenAt(0)->GetMode(&newMode);
-	// We only need to invalidate the entire desktop if we changed display modes
-	if (memcmp(&previousMode, &newMode, sizeof(display_mode)))
-		ScreenChanged(fVirtualScreen.ScreenAt(0), false);
+	// Change the display modes, if needed
 
-	// show windows, and include them in the changed region - but only
+	uint32 changedScreens;
+	fVirtualScreen.RestoreConfiguration(*this,
+		fSettings->WorkspacesMessage(index), &changedScreens);
+
+	for (int32 i = 0; changedScreens != 0; i++, changedScreens /= 2) {
+		if ((changedScreens & (1 << i)) != 0)
+			ScreenChanged(fVirtualScreen.ScreenAt(i), false);
+	}
+
+	// Show windows, and include them in the changed region - but only
 	// those that were not visible before (or whose position changed)
 
 	WindowList windows(kWorkingList);

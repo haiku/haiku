@@ -32,7 +32,8 @@ class VirtualScreen {
 								{ return fHWInterface; }
 
 		status_t			RestoreConfiguration(Desktop& desktop,
-								const BMessage* settings);
+								const BMessage* settings,
+								uint32* _changedScreens = NULL);
 		status_t			StoreConfiguration(BMessage& settings);
 
 		status_t			AddScreen(Screen* screen);

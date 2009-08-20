@@ -53,8 +53,33 @@ VirtualScreen::_Reset()
 
 
 status_t
-VirtualScreen::RestoreConfiguration(Desktop& desktop, const BMessage* settings)
+VirtualScreen::RestoreConfiguration(Desktop& desktop, const BMessage* settings,
+	uint32* _changedScreens)
 {
+	// Remember previous screen modes
+
+	typedef std::map<Screen*, display_mode> ScreenModeMap;
+	ScreenModeMap previousModes;
+	bool previousModesFailed = false;
+
+	if (_changedScreens != NULL) {
+		*_changedScreens = 0;
+
+		try {
+			for (int32 i = 0; i < fScreenList.CountItems(); i++) {
+				Screen* screen = fScreenList.ItemAt(i)->screen;
+
+				display_mode mode;
+				screen->GetMode(&mode);
+
+				previousModes.insert(std::make_pair(screen, mode));
+			}
+		} catch (...) {
+			previousModesFailed = true;
+			*_changedScreens = ~0L;
+		}
+	}
+
 	_Reset();
 
 	// Copy current Desktop workspace settings
@@ -64,7 +89,7 @@ VirtualScreen::RestoreConfiguration(Desktop& desktop, const BMessage* settings)
 	ScreenList list;
 	status_t status = gScreenManager->AcquireScreens(&desktop, NULL, 0, false,
 		list);
-	if (status < B_OK) {
+	if (status != B_OK) {
 		// TODO: we would try again here with force == true
 		return status;
 	}
@@ -73,6 +98,17 @@ VirtualScreen::RestoreConfiguration(Desktop& desktop, const BMessage* settings)
 		Screen* screen = list.ItemAt(i);
 
 		AddScreen(screen);
+
+		if (!previousModesFailed && _changedScreens != NULL) {
+			// Figure out which screens have changed their mode
+			display_mode mode;
+			screen->GetMode(&mode);
+
+			ScreenModeMap::const_iterator found = previousModes.find(screen);
+			if (found != previousModes.end()
+				&& memcmp(&mode, &found->second, sizeof(display_mode)))
+				*_changedScreens |= 1 << i;
+		}
 	}
 
 	return B_OK;
@@ -147,11 +183,12 @@ VirtualScreen::AddScreen(Screen* screen)
 			status = screen->SetMode(*mode, true);
 		// TODO: named settings will get lost if setting the mode failed!
 	}
-	if (status < B_OK) {
-		// TODO: more intelligent standard mode (monitor preference, desktop default, ...)
+	if (status != B_OK) {
 		status_t status = screen->SetPreferredMode();
-		if (status != B_OK)
+		if (status != B_OK) {
+			// TODO: more intelligent standard mode (desktop default, ...)
 			status = screen->SetBestMode(1024, 768, B_RGB32, 60.f);
+		}
 		if (status != B_OK)
 			screen->SetBestMode(800, 600, B_RGB32, 60.f, false);
 	}
