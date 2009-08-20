@@ -1036,7 +1036,7 @@ OHCI::_FinishTransfers()
 					// get the last data toggle and store it for next time
 					transfer->transfer->TransferPipe()->SetDataToggle(
 						(transfer->endpoint->head_physical_descriptor
-							& OHCI_ENDPOINT_TOGGLE_CARRY) == 0);
+							& OHCI_ENDPOINT_TOGGLE_CARRY) != 0);
 
 					if (transfer->transfer->IsFragmented()) {
 						// this transfer may still have data left
