@@ -33,10 +33,10 @@ const static i2c_timing kTiming100k = {
 	.low = 5,
 	.high = 4,
 	.su_sta = 5,
-	.hd_dat = 0,
-	.su_dat = 1,
-	.r = 1,
-	.f = 1,
+	.hd_dat = 1,
+	.su_dat = 2,
+	.r = 2,
+	.f = 2,
 	.su_sto = 4,
 	
 	// as these are unspecified, we use half a clock cycle as a safe guess
