@@ -707,7 +707,7 @@ spinlock_contention_syscall(const char* subsystem, uint32 function,
 int
 smp_intercpu_int_handler(int32 cpu)
 {
-	TRACE(("smp_intercpu_int_handler: entry on cpu %d\n", cpu));
+	TRACE(("smp_intercpu_int_handler: entry on cpu %ld\n", cpu));
 
 	process_all_pending_ici(cpu);
 
