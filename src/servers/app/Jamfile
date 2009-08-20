@@ -44,6 +44,7 @@ Server app_server :
 	RGBColor.cpp
 	RegionPool.cpp
 	Screen.cpp
+	ScreenConfigurations.cpp
 	ScreenManager.cpp
 	ServerApp.cpp
 	ServerBitmap.cpp

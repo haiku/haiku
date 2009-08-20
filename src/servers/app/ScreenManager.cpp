@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Haiku.
+ * Copyright 2005-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,7 +35,8 @@ ScreenManager* gScreenManager;
 
 
 ScreenManager::ScreenManager()
-	: BLooper("screen manager"),
+	:
+	BLooper("screen manager"),
 	fScreenList(4)
 {
 	_ScanDrivers();
@@ -93,7 +94,7 @@ ScreenManager::AcquireScreens(ScreenOwner* owner, int32* wishList,
 	// ToDo: don't ignore the wish list
 
 	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
-		screen_item *item = fScreenList.ItemAt(i);
+		screen_item* item = fScreenList.ItemAt(i);
 
 		if (item->owner == NULL && list.AddItem(item->screen)) {
 			item->owner = owner;
@@ -111,7 +112,7 @@ ScreenManager::ReleaseScreens(ScreenList& list)
 	BAutolock locker(this);
 
 	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
-		screen_item *item = fScreenList.ItemAt(i);
+		screen_item* item = fScreenList.ItemAt(i);
 
 		for (int32 j = 0; j < list.CountItems(); j++) {
 			Screen* screen = list.ItemAt(j);
@@ -126,7 +127,7 @@ ScreenManager::ReleaseScreens(ScreenList& list)
 void
 ScreenManager::_ScanDrivers()
 {
-	HWInterface *interface = NULL;
+	HWInterface* interface = NULL;
 
 	// Eventually we will loop through drivers until
 	// one can't initialize in order to support multiple monitors.
@@ -155,7 +156,7 @@ ScreenManager::_ScanDrivers()
 void
 ScreenManager::_AddHWInterface(HWInterface* interface)
 {
-	Screen* screen = new(nothrow) Screen(interface, fScreenList.CountItems() + 1);
+	Screen* screen = new(nothrow) Screen(interface, fScreenList.CountItems());
 	if (screen == NULL) {
 		delete interface;
 		return;
@@ -184,7 +185,7 @@ ScreenManager::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_NODE_MONITOR:
-			// ToDo: handle notification
+			// TODO: handle notification
 			break;
 
 		default:

@@ -9,6 +9,7 @@
  *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  */
 
+
 /*!	Class used to encapsulate desktop management */
 
 
@@ -363,7 +364,8 @@ Desktop::Init()
 		fWorkspaces[i].RestoreConfiguration(*fSettings->WorkspacesMessage(i));
 	}
 
-	fVirtualScreen.RestoreConfiguration(*this, fSettings->WorkspacesMessage(0));
+	fVirtualScreen.SetConfiguration(*this,
+		fWorkspaces[0].CurrentScreenConfiguration());
 
 	// TODO: temporary workaround, fActiveScreen will be removed
 	fActiveScreen = fVirtualScreen.ScreenAt(0);
@@ -827,18 +829,19 @@ Desktop::RedrawBackground()
 }
 
 
-/*!
-	\brief Store the workspace configuration
+/*!	\brief Stores the workspace configuration.
+	You must hold the window lock when calling this method.
 */
 void
 Desktop::StoreWorkspaceConfiguration(int32 index)
 {
-	const BMessage *oldSettings = fSettings->WorkspacesMessage(index);
-	// store settings
+	// Retrieve settings
+
 	BMessage settings;
-	if (oldSettings)
-		settings = *oldSettings;
 	fWorkspaces[index].StoreConfiguration(settings);
+
+	// and store them
+
 	fSettings->SetWorkspacesMessage(index, settings);
 	fSettings->Save(kWorkspacesSettings);
 }
@@ -874,8 +877,7 @@ Desktop::SetWorkspacesLayout(int32 newColumns, int32 newRows)
 }
 
 
-/*!
-	Returns the virtual screen frame of the workspace specified by \a index.
+/*!	Returns the virtual screen frame of the workspace specified by \a index.
 */
 BRect
 Desktop::WorkspaceFrame(int32 index) const
@@ -888,7 +890,8 @@ Desktop::WorkspaceFrame(int32 index) const
 		int32 width;
 		int32 height;
 		fSettings->WorkspacesMessage(index)->FindMessage("screen", &screenData);
-		if (screenData.FindInt32("width", &width) != B_OK || screenData.FindInt32("height", &height) != B_OK)
+		if (screenData.FindInt32("width", &width) != B_OK
+			|| screenData.FindInt32("height", &height) != B_OK)
 			frame = fVirtualScreen.Frame();
 		else
 			frame.Set(0.0, 0.0, width - 1, height - 1);
@@ -1000,12 +1003,12 @@ Desktop::_SetWorkspace(int32 index)
 	// Change the display modes, if needed
 
 	uint32 changedScreens;
-	fVirtualScreen.RestoreConfiguration(*this,
-		fSettings->WorkspacesMessage(index), &changedScreens);
+	fVirtualScreen.SetConfiguration(*this,
+		fWorkspaces[index].CurrentScreenConfiguration(), &changedScreens);
 
 	for (int32 i = 0; changedScreens != 0; i++, changedScreens /= 2) {
 		if ((changedScreens & (1 << i)) != 0)
-			ScreenChanged(fVirtualScreen.ScreenAt(i), false);
+			ScreenChanged(fVirtualScreen.ScreenAt(i));
 	}
 
 	// Show windows, and include them in the changed region - but only
@@ -1075,8 +1078,10 @@ Desktop::_SetWorkspace(int32 index)
 
 		if (window->InWorkspace(previousIndex) || window->IsHidden()
 			|| (window == fMouseEventWindow && fMouseEventWindow->IsNormal())
-			|| (!window->IsNormal() && window->HasInSubset(fMouseEventWindow))) {
-			// this window was visible before, and is already handled in the above loop
+			|| (!window->IsNormal()
+				&& window->HasInSubset(fMouseEventWindow))) {
+			// This window was visible before, and is already handled in the
+			// above loop
 			continue;
 		}
 
@@ -1095,7 +1100,8 @@ Desktop::_SetWorkspace(int32 index)
 
 	// Set new focus to the front window, but keep focus to a floating
 	// window if still visible
-	if (!_Windows(index).HasWindow(FocusWindow()) || !FocusWindow()->IsFloating())
+	if (!_Windows(index).HasWindow(FocusWindow())
+		|| !FocusWindow()->IsFloating())
 		SetFocusWindow(FrontWindow());
 
 	_WindowChanged(NULL);
@@ -1115,15 +1121,108 @@ Desktop::_SetWorkspace(int32 index)
 }
 
 
-void
-Desktop::ScreenChanged(Screen* screen, bool makeDefault)
+status_t
+Desktop::SetScreenMode(int32 workspace, int32 id, const display_mode& mode,
+	bool makeDefault)
 {
-	// TODO: confirm that everywhere this is used,
-	// the Window WriteLock is held
+	// ~0 is used as the current workspace in PrivateScreen
+	if (workspace == ~0)
+		workspace = fCurrentWorkspace;
+
+	if (workspace < 0 || workspace > kMaxWorkspaces)
+		return B_BAD_VALUE;
+
+	AutoWriteLocker _(fWindowLock);
+
+	Screen* screen = fVirtualScreen.ScreenByID(id);
+	if (screen == NULL)
+		return B_NAME_NOT_FOUND;
+
+	// Check if the mode has actually changed
+
+	if (workspace == fCurrentWorkspace) {
+		// retrieve from current screen
+		display_mode oldMode;
+		screen->GetMode(oldMode);
+
+		if (!memcmp(&oldMode, &mode, sizeof(display_mode)))
+			return B_OK;
+	} else {
+		// retrieve from settings
+		screen_configuration* configuration
+			= fWorkspaces[workspace].CurrentScreenConfiguration().CurrentByID(
+				screen->ID());
+		if (configuration != NULL
+			&& !memcmp(&configuration->mode, &mode, sizeof(display_mode)))
+			return B_OK;
+	}
+
+	// Set the new one
+
+	status_t status = screen->SetMode(mode);
+	if (status != B_OK)
+		return status;
+
+	// Update our configurations
+
+	monitor_info info;
+	bool hasInfo = screen->GetMonitorInfo(info) == B_OK;
+
+	fWorkspaces[workspace].CurrentScreenConfiguration().Set(id,
+		hasInfo ? &info : NULL, screen->Frame(), mode);
+	if (makeDefault) {
+		fWorkspaces[workspace].StoredScreenConfiguration().Set(id,
+			hasInfo ? &info : NULL, screen->Frame(), mode);
+		StoreWorkspaceConfiguration(workspace);
+	}
+
+	ScreenChanged(screen);
+	return B_OK;
+}
+
+
+status_t
+Desktop::GetScreenMode(int32 workspace, int32 id, display_mode& mode)
+{
+	// ~0 is used as the current workspace in PrivateScreen
+	if (workspace == ~0)
+		workspace = fCurrentWorkspace;
+
+	if (workspace < 0 || workspace > kMaxWorkspaces)
+		return B_BAD_VALUE;
+
+	AutoReadLocker _(fWindowLock);
+
+	if (workspace == fCurrentWorkspace) {
+		// retrieve from current screen
+		Screen* screen = fVirtualScreen.ScreenByID(id);
+		if (screen == NULL)
+			return B_NAME_NOT_FOUND;
+
+		screen->GetMode(mode);
+		return B_OK;
+	}
+
+	// retrieve from settings
+	screen_configuration* configuration
+		= fWorkspaces[workspace].CurrentScreenConfiguration().CurrentByID(id);
+	if (configuration == NULL)
+		return B_NAME_NOT_FOUND;
+
+	mode = configuration->mode;
+	return B_OK;
+}
+
+
+void
+Desktop::ScreenChanged(Screen* screen)
+{
+	ASSERT(fWindowLock.IsWriteLocked());
 
 	// the entire screen is dirty, because we're actually
 	// operating on an all new buffer in memory
 	BRegion dirty(screen->Frame());
+
 	// update our cached screen region
 	fScreenRegion.Set(screen->Frame());
 	gInputManager->UpdateScreenBounds(screen->Frame());
@@ -1145,41 +1244,15 @@ Desktop::ScreenChanged(Screen* screen, bool makeDefault)
 	update.AddRect("frame", screen->Frame());
 	update.AddInt32("mode", screen->ColorSpace());
 
+	fVirtualScreen.UpdateFrame();
+
 	// TODO: currently ignores the screen argument!
 	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 		window->ServerWindow()->ScreenChanged(&update);
-		window->ServerWindow()->SendMessageToClient(&update);
-	}
-
-	fVirtualScreen.UpdateFrame();
-
-	if (makeDefault) {
-		StoreConfiguration(fCurrentWorkspace);
 	}
 }
 
-
-status_t
-Desktop::StoreConfiguration(int32 workspace)
-{
-	// TODO: This only works because StoreConfiguration is never called
-	// for an inactive workspace. fVirtualScreen has the screen mode
-	// of the current workspace.
-
-	if (workspace >= 0 && workspace < fSettings->WorkspacesCount()) {
-		// store settings
-		BMessage settings;
-		fVirtualScreen.StoreConfiguration(settings);
-		fWorkspaces[workspace].StoreConfiguration(settings);
-
-		fSettings->SetWorkspacesMessage(workspace, settings);
-		fSettings->Save(kWorkspacesSettings);
-		return B_OK;
-	}
-
-	return B_BAD_VALUE;
-}
 
 //	#pragma mark - Methods for Window manipulation
 

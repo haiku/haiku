@@ -33,6 +33,7 @@
 #include <Region.h>
 #include <Window.h>
 
+
 #define USE_MULTI_LOCKER 1
 
 #if USE_MULTI_LOCKER
@@ -40,6 +41,7 @@
 #else
 #  include <Locker.h>
 #endif
+
 
 class BMessage;
 
@@ -53,6 +55,7 @@ struct server_read_only_memory;
 namespace BPrivate {
 	class LinkSender;
 };
+
 
 class Desktop : public MessageLooper, public ScreenOwner {
 	public:
@@ -71,14 +74,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					BroadcastToAllApps(int32 code);
 		void					BroadcastToAllWindows(int32 code);
 
-		// Screen and drawing related methods
-
-		Screen*					ScreenAt(int32 index) const
-									{ return fActiveScreen; }
-		Screen*					ActiveScreen() const
-									{ return fActiveScreen; }
-
-		CursorManager&			GetCursorManager() { return fCursorManager; }
+		// Mouse and cursor methods
 
 		void					SetCursor(ServerCursor* cursor);
 		ServerCursorReference	Cursor() const;
@@ -91,17 +87,33 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					GetLastMouseState(BPoint* position,
 									int32* buttons) const;
 									// for use by ServerWindow
-		void					ScreenChanged(Screen* screen, bool makeDefault);
-		void					ScreenRemoved(Screen* screen) {}
-		void					ScreenAdded(Screen* screen) {}
-		bool					ReleaseScreen(Screen* screen) { return false; }
-		status_t				StoreConfiguration(int32 workspace);
+
+		// Screen and drawing related methods
+
+		Screen*					ScreenAt(int32 index) const
+									{ return fActiveScreen; }
+		Screen*					ActiveScreen() const
+									{ return fActiveScreen; }
+
+		CursorManager&			GetCursorManager() { return fCursorManager; }
+
+		status_t				SetScreenMode(int32 workspace, int32 id,
+									const display_mode& mode, bool makeDefault);
+		status_t				GetScreenMode(int32 workspace, int32 id,
+									display_mode& mode);
+
+		void					ScreenChanged(Screen* screen);
 
 		const ::VirtualScreen&	VirtualScreen() const { return fVirtualScreen; }
 		DrawingEngine*			GetDrawingEngine() const
 									{ return fVirtualScreen.DrawingEngine(); }
 		::HWInterface*			HWInterface() const
 									{ return fVirtualScreen.HWInterface(); }
+
+		// ScreenOwner implementation
+		void					ScreenRemoved(Screen* screen) {}
+		void					ScreenAdded(Screen* screen) {}
+		bool					ReleaseScreen(Screen* screen) { return false; }
 
 		// Workspace methods
 
@@ -183,6 +195,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									{ return fWindowLock.WriteLock(); }
 		void					UnlockAllWindows()
 									{ fWindowLock.WriteUnlock(); }
+
+		MultiLocker				WindowLocker() { return fWindowLock; }
 #else // USE_MULTI_LOCKER
 		bool					LockSingleWindow()
 									{ return fWindowLock.Lock(); }

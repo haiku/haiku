@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku.
+ * Copyright 2005-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,8 +13,6 @@
 #include "Desktop.h"
 
 #include <new>
-
-using std::nothrow;
 
 
 VirtualScreen::VirtualScreen()
@@ -44,7 +42,6 @@ VirtualScreen::_Reset()
 
 	gScreenManager->ReleaseScreens(list);
 	fScreenList.MakeEmpty();
-	fSettings.MakeEmpty();
 
 	fFrame.Set(0, 0, 0, 0);
 	fDrawingEngine = NULL;
@@ -53,8 +50,8 @@ VirtualScreen::_Reset()
 
 
 status_t
-VirtualScreen::RestoreConfiguration(Desktop& desktop, const BMessage* settings,
-	uint32* _changedScreens)
+VirtualScreen::SetConfiguration(Desktop& desktop,
+	ScreenConfigurations& configurations, uint32* _changedScreens)
 {
 	// Remember previous screen modes
 
@@ -70,7 +67,7 @@ VirtualScreen::RestoreConfiguration(Desktop& desktop, const BMessage* settings,
 				Screen* screen = fScreenList.ItemAt(i)->screen;
 
 				display_mode mode;
-				screen->GetMode(&mode);
+				screen->GetMode(mode);
 
 				previousModes.insert(std::make_pair(screen, mode));
 			}
@@ -81,10 +78,6 @@ VirtualScreen::RestoreConfiguration(Desktop& desktop, const BMessage* settings,
 	}
 
 	_Reset();
-
-	// Copy current Desktop workspace settings
-	if (settings)
-		fSettings = *settings;
 
 	ScreenList list;
 	status_t status = gScreenManager->AcquireScreens(&desktop, NULL, 0, false,
@@ -97,12 +90,12 @@ VirtualScreen::RestoreConfiguration(Desktop& desktop, const BMessage* settings,
 	for (int32 i = 0; i < list.CountItems(); i++) {
 		Screen* screen = list.ItemAt(i);
 
-		AddScreen(screen);
+		AddScreen(screen, configurations);
 
 		if (!previousModesFailed && _changedScreens != NULL) {
 			// Figure out which screens have changed their mode
 			display_mode mode;
-			screen->GetMode(&mode);
+			screen->GetMode(mode);
 
 			ScreenModeMap::const_iterator found = previousModes.find(screen);
 			if (found != previousModes.end()
@@ -111,84 +104,30 @@ VirtualScreen::RestoreConfiguration(Desktop& desktop, const BMessage* settings,
 		}
 	}
 
+	UpdateFrame();
 	return B_OK;
 }
 
 
 status_t
-VirtualScreen::StoreConfiguration(BMessage& settings)
+VirtualScreen::AddScreen(Screen* screen, ScreenConfigurations& configurations)
 {
-	// store the configuration of all current screens
-
-	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
-		screen_item* item = fScreenList.ItemAt(i);
-		Screen* screen = item->screen;
-		if (!screen->IsDefaultMode())
-			continue;
-
-		BMessage screenSettings;
-		screenSettings.AddInt32("id", screen->ID());
-
-		monitor_info info;
-		if (screen->GetMonitorInfo(info) == B_OK) {
-			screenSettings.AddString("vendor", info.vendor);
-			screenSettings.AddString("name", info.name);
-			screenSettings.AddInt32("product id", info.product_id);
-			screenSettings.AddString("serial", info.serial_number);
-			screenSettings.AddInt32("produced week", info.produced.week);
-			screenSettings.AddInt32("produced year", info.produced.year);
-		}
-
-		screenSettings.AddRect("frame", item->frame);
-
-		display_mode mode;
-		screen->GetMode(&mode);
-
-		screenSettings.AddData("mode", B_RAW_TYPE, &mode,
-			sizeof(display_mode));
-
-		settings.AddMessage("screen", &screenSettings);
-	}
-
-	// store the configuration of all monitors currently not attached
-
-	BMessage screenSettings;
-	for (uint32 i = 0; fSettings.FindMessage("screen", i,
-			&screenSettings) == B_OK; i++) {
-		settings.AddMessage("screen", &screenSettings);
-	}
-
-	return B_OK;
-}
-
-
-status_t
-VirtualScreen::AddScreen(Screen* screen)
-{
-	screen_item* item = new(nothrow) screen_item;
+	screen_item* item = new(std::nothrow) screen_item;
 	if (item == NULL)
 		return B_NO_MEMORY;
 
 	item->screen = screen;
 
 	status_t status = B_ERROR;
-	BMessage settings;
-	if (_GetConfiguration(screen, settings) == B_OK) {
+	display_mode mode;
+	if (_GetMode(screen, configurations, mode) == B_OK) {
 		// we found settings for this screen, and try to apply them now
-		const display_mode* mode;
-		ssize_t size;
-		if (settings.FindData("mode", B_RAW_TYPE, (const void**)&mode,
-					&size) == B_OK
-			&& size == sizeof(display_mode))
-			status = screen->SetMode(*mode, true);
-		// TODO: named settings will get lost if setting the mode failed!
+		status = screen->SetMode(mode);
 	}
 	if (status != B_OK) {
 		status_t status = screen->SetPreferredMode();
-		if (status != B_OK) {
-			// TODO: more intelligent standard mode (desktop default, ...)
+		if (status != B_OK)
 			status = screen->SetBestMode(1024, 768, B_RGB32, 60.f);
-		}
 		if (status != B_OK)
 			screen->SetBestMode(800, 600, B_RGB32, 60.f, false);
 	}
@@ -235,8 +174,7 @@ VirtualScreen::UpdateFrame()
 }
 
 
-/*!
-	Returns the smallest frame that spans over all screens
+/*!	Returns the smallest frame that spans over all screens
 */
 BRect
 VirtualScreen::Frame() const
@@ -251,6 +189,20 @@ VirtualScreen::ScreenAt(int32 index) const
 	screen_item* item = fScreenList.ItemAt(index);
 	if (item != NULL)
 		return item->screen;
+
+	return NULL;
+}
+
+
+Screen*
+VirtualScreen::ScreenByID(int32 id) const
+{
+	for (int32 i = fScreenList.CountItems(); i-- > 0;) {
+		screen_item* item = fScreenList.ItemAt(i);
+
+		if (item->screen->ID() == id)
+			return item->screen;
+	}
 
 	return NULL;
 }
@@ -275,82 +227,21 @@ VirtualScreen::CountScreens() const
 
 
 status_t
-VirtualScreen::_GetConfiguration(Screen* screen, BMessage& settings)
+VirtualScreen::_GetMode(Screen* screen, ScreenConfigurations& configurations,
+	display_mode& mode) const
 {
 	monitor_info info;
 	bool hasInfo = screen->GetMonitorInfo(info) == B_OK;
-	if (!hasInfo) {
-		// only look for a matching ID - this is all we have
-		for (uint32 k = 0; k < 2; k++) {
-			for (uint32 i = 0; fSettings.FindMessage("screen", i,
-					&settings) == B_OK; i++) {
-				int32 id;
-				if (k == 0 && settings.HasString("name")
-					|| settings.FindInt32("id", &id) != B_OK
-					|| screen->ID() != id)
-					continue;
 
-				// we found our match, only remove unnamed settings
-				if (k == 0)
-					fSettings.RemoveData("screen", i);
-				return B_OK;
-			}
-		}
+	screen_configuration* configuration = configurations.BestFit(screen->ID(),
+		hasInfo ? &info : NULL);
+	if (configuration == NULL)
 		return B_NAME_NOT_FOUND;
-	}
 
-	// look for a monitor configuration that matches ours
+	mode = configuration->mode;
+debug_printf("found configuration! (%d x %d)\n", mode.virtual_width, mode.virtual_height);
+	configuration->is_current = true;
 
-	bool exactMatch = false;
-	int32 bestScore = 0;
-	int32 bestIndex = -1;
-	BMessage stored;
-	for (uint32 i = 0; fSettings.FindMessage("screen", i, &stored) == B_OK;
-			i++) {
-		// TODO: should we ignore unnamed settings here completely?
-		int32 score = 0;
-		int32 id;
-		if (stored.FindInt32("id", &id) == B_OK && screen->ID() == id)
-			score++;
-
-		const char* vendor;
-		const char* name;
-		uint32 productID;
-		const char* serial;
-		int32 week, year;
-		if (stored.FindString("vendor", &vendor) == B_OK
-			&& stored.FindString("name", &name) == B_OK
-			&& stored.FindInt32("product id", (int32*)&productID) == B_OK
-			&& stored.FindString("serial", &serial) == B_OK
-			&& stored.FindInt32("produced week", &week) == B_OK
-			&& stored.FindInt32("produced year", &year) == B_OK) {
-			if (!strcasecmp(vendor, info.vendor)
-				&& !strcasecmp(name, info.name)
-				&& productID == info.product_id) {
-				score += 2;
-				if (!strcmp(serial, info.serial_number)) {
-					exactMatch = true;
-					score += 2;
-				}
-				if (info.produced.year == year && info.produced.week == week)
-					score++;
-			} else
-				score -= 2;
-		}
-
-		if (score > bestScore) {
-			settings = stored;
-			bestScore = score;
-			bestIndex = i;
-		}
-	}
-
-	if (bestIndex >= 0) {
-		if (exactMatch)
-			fSettings.RemoveData("screen", bestIndex);
-		return B_OK;
-	}
-
-	return B_NAME_NOT_FOUND;
+	return B_OK;
 }
 

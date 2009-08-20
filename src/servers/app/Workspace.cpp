@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Haiku.
+ * Copyright 2005-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -50,16 +50,18 @@ Workspace::Private::RestoreConfiguration(const BMessage& settings)
 	rgb_color color;
 	if (settings.FindInt32("color", (int32 *)&color) == B_OK)
 		fColor = color;
+
+	fStoredScreenConfiguration.Restore(settings);
+	fCurrentScreenConfiguration.Restore(settings);
 }
 
 
-/*!
-        \brief Store the workspace configuration in a message
+/*!	\brief Store the workspace configuration in a message
 */
 void
 Workspace::Private::StoreConfiguration(BMessage& settings)
 {
-	settings.RemoveName("color");
+	fStoredScreenConfiguration.Store(settings);
 	settings.AddInt32("color", *(int32 *)&fColor);
 }
 
@@ -80,18 +82,13 @@ Workspace::Workspace(Desktop& desktop, int32 index)
 	fDesktop(desktop),
 	fCurrentWorkspace(index == desktop.CurrentWorkspace())
 {
-//	fDesktop.LockSingleWindow();
-		// TODO: in which threads is this being used?
-		// from my investigations, it is used in the
-		// WorkspacesView::Draw(), which would have
-		// to hold the read lock already
+	ASSERT_MULTI_LOCKED(desktop.WindowLocker());
 	RewindWindows();
 }
 
 
 Workspace::~Workspace()
 {
-//	fDesktop.UnlockSingleWindow();
 }
 
 

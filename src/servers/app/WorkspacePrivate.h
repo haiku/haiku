@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Haiku.
+ * Copyright 2005-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,6 +9,7 @@
 #define WORKSPACE_PRIVATE_H
 
 
+#include "ScreenConfigurations.h"
 #include "WindowList.h"
 #include "Workspace.h"
 
@@ -23,40 +24,50 @@ struct display_info {
 	display_mode	mode;
 };
 
+
 class Workspace::Private {
-	public:
-		Private();
-		~Private();
+public:
+								Private();
+								~Private();
 
-		int32				Index() const { return fWindows.Index(); }
+			int32				Index() const { return fWindows.Index(); }
 
-		WindowList&			Windows() { return fWindows; }
+			WindowList&			Windows() { return fWindows; }
 
-		// displays
+			// displays
 
-		void				SetDisplaysFromDesktop(Desktop* desktop);
+			void				SetDisplaysFromDesktop(Desktop* desktop);
 
-		int32				CountDisplays() const { return fDisplays.CountItems(); }
-		const display_info*	DisplayAt(int32 index) const { return fDisplays.ItemAt(index); }
+			int32				CountDisplays() const
+									{ return fDisplays.CountItems(); }
+			const display_info*	DisplayAt(int32 index) const
+									{ return fDisplays.ItemAt(index); }
 
-		// configuration
+			// configuration
 
-		const rgb_color&	Color() const { return fColor; }
-		void				SetColor(const rgb_color& color);
+			const rgb_color&	Color() const { return fColor; }
+			void				SetColor(const rgb_color& color);
 
-		void				RestoreConfiguration(const BMessage& settings);
-		void				StoreConfiguration(BMessage& settings);
+			ScreenConfigurations& CurrentScreenConfiguration()
+									{ return fCurrentScreenConfiguration; }
+			ScreenConfigurations& StoredScreenConfiguration()
+									{ return fStoredScreenConfiguration; }
 
-	private:
-		void				_SetDefaults();
+			void				RestoreConfiguration(const BMessage& settings);
+			void				StoreConfiguration(BMessage& settings);
 
-		WindowList			fWindows;
-		Window*				fFront;
-		Window*				fFocus;
+private:
+			void				_SetDefaults();
 
-		BObjectList<display_info> fDisplays;
+			WindowList			fWindows;
+			Window*				fFront;
+			Window*				fFocus;
 
-		rgb_color			fColor;
+			BObjectList<display_info> fDisplays;
+
+			ScreenConfigurations fStoredScreenConfiguration;
+			ScreenConfigurations fCurrentScreenConfiguration;
+			rgb_color			fColor;
 };
 
 #endif	/* WORKSPACE_PRIVATE_H */

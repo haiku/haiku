@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku Inc.
+ * Copyright 2002-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,6 +15,7 @@
 #include <ObjectList.h>
 #include <Rect.h>
 
+
 struct color_map;
 class BBitmap;
 class BApplication;
@@ -24,78 +25,88 @@ class BWindow;
 namespace BPrivate {
 
 class BPrivateScreen {
+public:
 	// Constructor and destructor are private. Use the static methods
-	// CheckOut() and Return() instead.
-	public:
-		static BPrivateScreen* Get(BWindow *window);
-		static BPrivateScreen* Get(screen_id id);
-		static void Put(BPrivateScreen *screen);
+	// Get() and Put() instead.
 
-		static BPrivateScreen* GetNext(BPrivateScreen* screen);
+	static	BPrivateScreen*		Get(BWindow* window);
+	static	BPrivateScreen*		Get(int32 id);
+	static	void				Put(BPrivateScreen* screen);
 
-		bool IsValid() const;
-		color_space ColorSpace();
-		BRect Frame();
-		screen_id ID() const { return fID; }
-		status_t GetNextID(screen_id& id);
+	static	BPrivateScreen*		GetNext(BPrivateScreen* screen);
 
-		status_t WaitForRetrace(bigtime_t timeout);
+			bool				IsValid() const;
+			color_space			ColorSpace();
+			BRect				Frame();
+			int32				ID() const { return fID; }
+			status_t			GetNextID(int32& id);
 
-		uint8 IndexForColor(uint8 red, uint8 green, uint8 blue, uint8 alpha);
-		rgb_color ColorForIndex(const uint8 index);
-		uint8 InvertIndex(uint8 index);
+			status_t			WaitForRetrace(bigtime_t timeout);
 
-		const color_map *ColorMap();
+			uint8				IndexForColor(uint8 red, uint8 green,
+									uint8 blue, uint8 alpha);
+			rgb_color			ColorForIndex(const uint8 index);
+			uint8				InvertIndex(uint8 index);
 
-		status_t GetBitmap(BBitmap **bitmap, bool drawCursor, BRect *bounds);
-		status_t ReadBitmap(BBitmap *bitmap, bool drawCursor, BRect *bounds);
+			const color_map*	ColorMap();
 
-		rgb_color DesktopColor(uint32 index);
-		void SetDesktopColor(rgb_color, uint32, bool);
+			status_t			GetBitmap(BBitmap** bitmap, bool drawCursor,
+									BRect* bounds);
+			status_t			ReadBitmap(BBitmap* bitmap, bool drawCursor,
+									BRect* bounds);
 
-		status_t ProposeMode(display_mode *target, const display_mode *low,
-			const display_mode *high);
+			rgb_color			DesktopColor(uint32 index);
+			void				SetDesktopColor(rgb_color, uint32, bool);
 
-		status_t GetModeList(display_mode **_modeList, uint32 *_count);
-		status_t GetMode(uint32 workspace, display_mode *mode);
-		status_t SetMode(uint32 workspace, display_mode *mode, bool makeDefault);
+			status_t			ProposeMode(display_mode* target,
+									const display_mode* low,
+									const display_mode* high);
 
-		status_t GetDeviceInfo(accelerant_device_info *info);
-		status_t GetMonitorInfo(monitor_info* info);
-		status_t GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high);
-		status_t GetTimingConstraints(display_timing_constraints *constraints);
+			status_t			GetModeList(display_mode** _modeList,
+									uint32* _count);
+			status_t			GetMode(uint32 workspace, display_mode* mode);
+			status_t			SetMode(uint32 workspace, display_mode* mode,
+									bool makeDefault);
 
-		status_t SetDPMS(uint32 dpmsState);
-		uint32 DPMSState();
-		uint32 DPMSCapabilites();
+			status_t			GetDeviceInfo(accelerant_device_info* info);
+			status_t			GetMonitorInfo(monitor_info* info);
+			status_t			GetPixelClockLimits(display_mode* mode,
+									uint32* _low, uint32* _high);
+			status_t			GetTimingConstraints(
+									display_timing_constraints* constraints);
 
-		void* BaseAddress();
-		uint32 BytesPerRow();
+			status_t			SetDPMS(uint32 dpmsState);
+			uint32				DPMSState();
+			uint32				DPMSCapabilites();
 
-	private:
-		friend class BObjectList<BPrivateScreen>;
+			void*				BaseAddress();
+			uint32				BytesPerRow();
 
-		BPrivateScreen(screen_id id);
-		~BPrivateScreen();
+private:
+	friend class BObjectList<BPrivateScreen>;
 
-		void _Acquire() { fRefCount++; }
-		bool _Release() { return --fRefCount == 0; }
+								BPrivateScreen(int32 id);
+								~BPrivateScreen();
 
-		sem_id _RetraceSemaphore();
-		status_t _GetFrameBufferConfig(frame_buffer_config& config);
+			void				_Acquire() { fRefCount++; }
+			bool				_Release() { return --fRefCount == 0; }
 
-		static BPrivateScreen* _Get(screen_id id, bool check);
-		static bool _IsValid(screen_id id);
+			sem_id				_RetraceSemaphore();
+			status_t			_GetFrameBufferConfig(
+									frame_buffer_config& config);
 
-	private:
-		screen_id	fID;
-		int32		fRefCount;
-		color_map*	fColorMap;
-		sem_id		fRetraceSem;
-		bool		fRetraceSemValid;
-		bool		fOwnsColorMap;
-		BRect		fFrame;
-		bigtime_t	fLastUpdate;
+	static	BPrivateScreen*		_Get(int32 id, bool check);
+	static	bool				_IsValid(int32 id);
+
+private:
+			int32				fID;
+			int32				fRefCount;
+			color_map*			fColorMap;
+			sem_id				fRetraceSem;
+			bool				fRetraceSemValid;
+			bool				fOwnsColorMap;
+			BRect				fFrame;
+			bigtime_t			fLastUpdate;
 };
 
 }	// namespace BPrivate

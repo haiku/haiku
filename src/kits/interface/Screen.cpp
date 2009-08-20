@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku Inc.
+ * Copyright 2003-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,7 +20,8 @@ using namespace BPrivate;
 
 static const uint32 kCurrentWorkspaceIndex = ~0;
 
-/*!	\brief Creates a BScreen object which represents the display with the given screen_id
+/*!	\brief Creates a BScreen object which represents the display with the given
+		screen_id
 	\param id The screen_id of the screen to get.
 
 	In the current implementation, there is only one display (B_MAIN_SCREEN_ID).
@@ -28,7 +29,7 @@ static const uint32 kCurrentWorkspaceIndex = ~0;
 */
 BScreen::BScreen(screen_id id)
 {
-	fScreen = BPrivateScreen::Get(id);
+	fScreen = BPrivateScreen::Get(id.id);
 }
 
 
@@ -36,21 +37,22 @@ BScreen::BScreen(screen_id id)
 	the given BWindow.
 	\param window A BWindow.
 */
-BScreen::BScreen(BWindow *window)
+BScreen::BScreen(BWindow* window)
 {
 	fScreen = BPrivateScreen::Get(window);
 }
 
 
 /*!	\brief Releases the resources allocated by the constructor.
-*/ 
+*/
 BScreen::~BScreen()
 {
 	BPrivateScreen::Put(fScreen);
 }
 
 
-/*! \brief Checks if the BScreen object represents a real screen connected to the computer.
+/*! \brief Checks if the BScreen object represents a real screen connected to
+		the computer.
 	\return \c true if the BScreen object is valid, \c false if not.
 */
 bool
@@ -90,7 +92,8 @@ BScreen::ColorSpace()
 }
 
 
-/*!	\brief Returns the rectangle that locates the screen in the screen coordinate system.
+/*!	\brief Returns the rectangle that locates the screen in the screen
+		coordinate system.
 	\return a BRect that locates the screen in the screen coordinate system.
 */
 BRect
@@ -98,21 +101,24 @@ BScreen::Frame()
 {
 	if (fScreen != NULL)
 		return fScreen->Frame();
-	return BRect(0, 0, 0, 0);	
+	return BRect(0, 0, 0, 0);
 }
 
 
 /*!	\brief Returns the identifier for the screen.
 	\return A screen_id struct that identifies the screen.
 
-	In the current implementation, this function always returns \c B_MAIN_SCREEN_ID,
-	even if the object is invalid.
+	In the current implementation, this function always returns
+	\c B_MAIN_SCREEN_ID, even if the object is invalid.
 */
 screen_id
 BScreen::ID()
 {
-	if (fScreen != NULL)
-		return fScreen->ID();
+	if (fScreen != NULL) {
+		screen_id id = { fScreen->ID() };
+		return id;
+	}
+
 	return B_MAIN_SCREEN_ID;
 }
 
@@ -129,7 +135,8 @@ BScreen::WaitForRetrace()
 
 /*!	\brief Blocks until the monitor has finished the current vertical retrace,
 	or until the given timeout has passed.
-	\param timeout A bigtime_t which indicates the time to wait before returning.
+	\param timeout A bigtime_t which indicates the time to wait before
+		returning.
 	\return \c B_OK if the monitor has retraced in the given amount of time,
 		\c B_ERROR otherwise.
 */
@@ -174,7 +181,8 @@ BScreen::ColorForIndex(const uint8 index)
 
 /*!	\brief Returns the "inversion" of the given 8-bit color.
 	\param index An 8-bit color index.
-	\return An 8-bit color index that represents the "inversion" of the given color.
+	\return An 8-bit color index that represents the "inversion" of the given
+		color.
 */
 uint8
 BScreen::InvertIndex(uint8 index)
@@ -198,34 +206,39 @@ BScreen::ColorMap()
 
 
 /*!	\brief Copies the screen's contents into the first argument BBitmap.
-	\param screen_shot A pointer to a BBitmap pointer, where the function will allocate a BBitmap for you.
+	\param screen_shot A pointer to a BBitmap pointer, where the function will
+		allocate a BBitmap for you.
 	\param draw_cursor Specifies if you want the cursor to be drawn.
-	\param bound Let you specify the area you want copied. If it's NULL, the entire screen is copied.
+	\param bound Let you specify the area you want copied. If it's NULL, the
+		entire screen is copied.
 	\return \c B_OK if the operation was succesful, \c B_ERROR on failure.
 */
 status_t
-BScreen::GetBitmap(BBitmap **screen_shot, bool draw_cursor, BRect *bound)
+BScreen::GetBitmap(BBitmap** _bitmap, bool drawCursor, BRect* bounds)
 {
 	if (fScreen != NULL)
-		return fScreen->GetBitmap(screen_shot, draw_cursor, bound);
+		return fScreen->GetBitmap(_bitmap, drawCursor, bounds);
 	return B_ERROR;
 }
 
 
 /*!	\brief Copies the screen's contents into the first argument BBitmap.
-	\param screen_shot A pointer to an allocated BBitmap, where the function will store the screen's content.
+	\param screen_shot A pointer to an allocated BBitmap, where the function
+		will store the screen's content.
 	\param draw_cursor Specifies if you want the cursor to be drawn.
-	\param bound Let you specify the area you want copied. If it's NULL, the entire screen is copied.
+	\param bound Let you specify the area you want copied. If it's NULL, the
+		entire screen is copied.
 	\return \c B_OK if the operation was succesful, \c B_ERROR on failure.
 
-	The only difference between this method and GetBitmap() is that ReadBitmap requires you
-	to allocate a BBitmap, while the latter will allocate a BBitmap for you.
+	The only difference between this method and GetBitmap() is that ReadBitmap
+	requires you to allocate a BBitmap, while the latter will allocate a BBitmap
+	for you.
 */
 status_t
-BScreen::ReadBitmap(BBitmap *buffer, bool draw_cursor, BRect *bound)
+BScreen::ReadBitmap(BBitmap* buffer, bool drawCursor, BRect* bounds)
 {
 	if (fScreen != NULL)
-		return fScreen->ReadBitmap(buffer, draw_cursor, bound);
+		return fScreen->ReadBitmap(buffer, drawCursor, bounds);
 	return B_ERROR;
 }
 
@@ -245,7 +258,8 @@ BScreen::DesktopColor()
 
 /*!	\brief Returns the color of the desktop in the given workspace.
 	\param workspace The workspace of which you want to have the color.
-	\return An rgb_color structure which is the color of the desktop in the given workspace.
+	\return An rgb_color structure which is the color of the desktop in the
+		given workspace.
 */
 rgb_color
 BScreen::DesktopColor(uint32 workspace)
@@ -259,7 +273,8 @@ BScreen::DesktopColor(uint32 workspace)
 
 /*!	\brief Set the color of the desktop.
 	\param rgb The color you want to paint the desktop background.
-	\param stick If you pass \c true here, the color will be maintained across boots.
+	\param stick If you pass \c true here, the color will be maintained across
+		boots.
 */
 void
 BScreen::SetDesktopColor(rgb_color rgb, bool stick)
@@ -272,7 +287,8 @@ BScreen::SetDesktopColor(rgb_color rgb, bool stick)
 /*!	\brief Set the color of the desktop in the given workspace.
 	\param rgb The color you want to paint the desktop background.
 	\param index The workspace you want to change the color.
-	\param stick If you pass \c true here, the color will be maintained across boots.
+	\param stick If you pass \c true here, the color will be maintained across
+		boots.
 */
 void
 BScreen::SetDesktopColor(rgb_color rgb, uint32 index, bool stick)
@@ -287,12 +303,15 @@ BScreen::SetDesktopColor(rgb_color rgb, uint32 index, bool stick)
 	\param low The lower limit you want target to be adjusted.
 	\param high The higher limit you want target to be adjusted.
 	\return
-		- \c B_OK if target (as returned) is supported and falls into the limits.
-		- \c B_BAD_VALUE if target (as returned) is supported but doesn't fall into the limits.
+		- \c B_OK if target (as returned) is supported and falls into the
+			limits.
+		- \c B_BAD_VALUE if target (as returned) is supported but doesn't fall
+			into the limits.
 		- \c B_ERROR if target isn't supported.
 */
 status_t
-BScreen::ProposeMode(display_mode *target, const display_mode *low, const display_mode *high)
+BScreen::ProposeMode(display_mode* target, const display_mode* low,
+	const display_mode* high)
 {
 	if (fScreen != NULL)
 		return fScreen->ProposeMode(target, low, high);
@@ -300,30 +319,30 @@ BScreen::ProposeMode(display_mode *target, const display_mode *low, const displa
 }
 
 
-/*!	\brief allocates and returns a list of the display_modes 
+/*!	\brief allocates and returns a list of the display_modes
 		that the graphics card supports.
 	\param mode_list A pointer to a mode_list pointer, where the function will
 		allocate an array of display_mode structures.
-	\param count A pointer to an integer, where the function will store the amount of
-		available display modes.
+	\param count A pointer to an integer, where the function will store the
+		amount of available display modes.
 	\return \c B_OK.
 */
 status_t
-BScreen::GetModeList(display_mode **mode_list, uint32 *count)
+BScreen::GetModeList(display_mode** _modeList, uint32* _count)
 {
 	if (fScreen != NULL)
-		return fScreen->GetModeList(mode_list, count);
+		return fScreen->GetModeList(_modeList, _count);
 	return B_ERROR;
 }
 
 
 /*!	\brief Copies the current display_mode into mode.
-	\param mode A pointer to a display_mode structure, 
+	\param mode A pointer to a display_mode structure,
 		where the current display_mode will be copied.
 	\return \c B_OK if the operation was succesful.
 */
 status_t
-BScreen::GetMode(display_mode *mode)
+BScreen::GetMode(display_mode* mode)
 {
 	if (fScreen != NULL)
 		return fScreen->GetMode(kCurrentWorkspaceIndex, mode);
@@ -332,12 +351,12 @@ BScreen::GetMode(display_mode *mode)
 
 
 /*!	\brief Copies the current display_mode of the given workspace into mode.
-	\param mode A pointer to a display_mode structure, 
+	\param mode A pointer to a display_mode structure,
 		where the current display_mode will be copied.
 	\return \c B_OK if the operation was succesful.
 */
 status_t
-BScreen::GetMode(uint32 workspace, display_mode *mode)
+BScreen::GetMode(uint32 workspace, display_mode* mode)
 {
 	if (fScreen != NULL)
 		return fScreen->GetMode(workspace, mode);
@@ -351,7 +370,7 @@ BScreen::GetMode(uint32 workspace, display_mode *mode)
 	\return \c B_OK.
 */
 status_t
-BScreen::SetMode(display_mode *mode, bool makeDefault)
+BScreen::SetMode(display_mode* mode, bool makeDefault)
 {
 	if (fScreen != NULL)
 		return fScreen->SetMode(kCurrentWorkspaceIndex, mode, makeDefault);
@@ -366,7 +385,7 @@ BScreen::SetMode(display_mode *mode, bool makeDefault)
 	\return \c B_OK.
 */
 status_t
-BScreen::SetMode(uint32 workspace, display_mode *mode, bool makeDefault)
+BScreen::SetMode(uint32 workspace, display_mode* mode, bool makeDefault)
 {
 	if (fScreen != NULL)
 		return fScreen->SetMode(workspace, mode, makeDefault);
@@ -375,11 +394,12 @@ BScreen::SetMode(uint32 workspace, display_mode *mode, bool makeDefault)
 
 
 /*!	\brief Returns information about the graphics card.
-	\param info An accelerant_device_info struct where to store the retrieved info.
+	\param info An accelerant_device_info struct where to store the retrieved
+		info.
 	\return \c B_OK if the operation went fine, otherwise an error code.
 */
 status_t
-BScreen::GetDeviceInfo(accelerant_device_info *info)
+BScreen::GetDeviceInfo(accelerant_device_info* info)
 {
 	if (fScreen != NULL)
 		return fScreen->GetDeviceInfo(info);
@@ -396,37 +416,41 @@ BScreen::GetMonitorInfo(monitor_info* info)
 }
 
 
-/*!	\brief Returns, in low and high, the minimum and maximum pixel clock rates 
+/*!	\brief Returns, in low and high, the minimum and maximum pixel clock rates
 		that are possible for the given mode.
 	\param mode A pointer to a display_mode.
-	\param low A pointer to an int where the function will store the lowest available pixel clock.
-	\param high A pointer to an int where the function wills tore the highest available pixel clock.
+	\param low A pointer to an int where the function will store the lowest
+		available pixel clock.
+	\param high A pointer to an int where the function wills tore the highest
+		available pixel clock.
 	\return \c B_OK if the operation went fine, otherwise an error code.
 */
 status_t
-BScreen::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
+BScreen::GetPixelClockLimits(display_mode* mode, uint32* _low, uint32* _high)
 {
 	if (fScreen != NULL)
-		return fScreen->GetPixelClockLimits(mode, low, high);
+		return fScreen->GetPixelClockLimits(mode, _low, _high);
 	return B_ERROR;
 }
 
 
-/*!	\brief Fills out the dtc structure with the timing constraints of the current display mode.
-	\param dtc A pointer to a display_timing_constraints structure where the function will store
-		the timing constraints of the current mode.
+/*!	\brief Fills out the dtc structure with the timing constraints of the
+		current display mode.
+	\param dtc A pointer to a display_timing_constraints structure where the
+		function will store the timing constraints of the current mode.
 	\return \c B_OK if the operation went fine, otherwise an error code.
 */
 status_t
-BScreen::GetTimingConstraints(display_timing_constraints *dtc)
+BScreen::GetTimingConstraints(display_timing_constraints* constraints)
 {
 	if (fScreen != NULL)
-		return fScreen->GetTimingConstraints(dtc);
+		return fScreen->GetTimingConstraints(constraints);
 	return B_ERROR;
 }
 
 
-/*!	\brief Lets you set the VESA Display Power Management Signaling state for the screen.
+/*!	\brief Lets you set the VESA Display Power Management Signaling state for
+		the screen.
 	\param dpms_state The DPMS state you want to be set.
 		valid values are:
 		- \c B_DPMS_ON
@@ -436,10 +460,10 @@ BScreen::GetTimingConstraints(display_timing_constraints *dtc)
 	\return \c B_OK if the operation went fine, otherwise an error code.
 */
 status_t
-BScreen::SetDPMS(uint32 dpms_state)
+BScreen::SetDPMS(uint32 dpmsState)
 {
 	if (fScreen != NULL)
-		return fScreen->SetDPMS(dpms_state);
+		return fScreen->SetDPMS(dpmsState);
 	return B_ERROR;
 }
 
@@ -470,7 +494,8 @@ BScreen::DPMSCapabilites()
 
 
 /*!	\brief Returns the BPrivateScreen used by the BScreen object.
-	\return A pointer to the BPrivateScreen class internally used by the BScreen object.
+	\return A pointer to the BPrivateScreen class internally used by the BScreen
+		object.
 */
 BPrivate::BPrivateScreen*
 BScreen::private_screen()
@@ -482,7 +507,8 @@ BScreen::private_screen()
 /*!	\brief Deprecated, use ProposeMode() instead.
 */
 status_t
-BScreen::ProposeDisplayMode(display_mode *target, const display_mode *low, const display_mode *high)
+BScreen::ProposeDisplayMode(display_mode* target, const display_mode* low,
+	const display_mode* high)
 {
 	return ProposeMode(target, low, high);
 }

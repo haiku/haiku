@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,8 +7,8 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/*!
-	Whenever a ServerBitmap associated with a client-side BBitmap needs to be
+
+/*!	Whenever a ServerBitmap associated with a client-side BBitmap needs to be
 	created or destroyed, the BitmapManager needs to handle it. It takes care of
 	all memory management related to them.
 */
@@ -79,8 +79,8 @@ BitmapManager::~BitmapManager()
 }
 
 
-/*!
-	\brief Allocates a new ServerBitmap.
+/*!	\brief Allocates a new ServerBitmap.
+
 	\param bounds Size of the bitmap
 	\param space Color space of the bitmap
 	\param flags Bitmap flags as defined in Bitmap.h
@@ -91,7 +91,7 @@ BitmapManager::~BitmapManager()
 ServerBitmap*
 BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 	HWInterface& hwInterface, BRect bounds, color_space space, uint32 flags,
-	int32 bytesPerRow, screen_id screen, uint8* _allocationFlags)
+	int32 bytesPerRow, int32 screen, uint8* _allocationFlags)
 {
 	BAutolock locker(fLock);
 
@@ -201,8 +201,7 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 }
 
 
-/*!
-	\brief Deletes a ServerBitmap.
+/*!	\brief Deletes a ServerBitmap.
 	\param bitmap The bitmap to delete
 */
 void

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2008, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -40,19 +40,19 @@ get_mode_frequency(const display_mode& mode)
 
 
 Screen::Screen(::HWInterface *interface, int32 id)
-	: fID(id),
-	  fDriver(interface ? new DrawingEngine(interface) : NULL),
-	  fHWInterface(interface),
-	  fIsDefault(true)
+	:
+	fID(id),
+	fDriver(interface ? new DrawingEngine(interface) : NULL),
+	fHWInterface(interface)
 {
 }
 
 
 Screen::Screen()
-	: fID(-1),
-	  fDriver(NULL),
-	  fHWInterface(NULL),
-	  fIsDefault(true)
+	:
+	fID(-1),
+	fDriver(NULL),
+	fHWInterface(NULL)
 {
 }
 
@@ -64,10 +64,10 @@ Screen::~Screen()
 	delete fHWInterface;
 }
 
+
 /*! Finds the mode in the mode list that is closest to the mode specified.
 	As long as the mode list is not empty, this method will always succeed.
 */
-
 status_t
 Screen::Initialize()
 {
@@ -89,13 +89,13 @@ Screen::Shutdown()
 
 
 status_t
-Screen::SetMode(const display_mode& mode, bool makeDefault)
+Screen::SetMode(const display_mode& mode)
 {
 	display_mode current;
-	GetMode(&current);
-	if (!memcmp(&mode, &current, sizeof(display_mode))) 
+	GetMode(current);
+	if (!memcmp(&mode, &current, sizeof(display_mode)))
 		return B_OK;
-	
+
 	gBitmapManager->SuspendOverlays();
 
 	status_t status = fHWInterface->SetMode(mode);
@@ -103,16 +103,13 @@ Screen::SetMode(const display_mode& mode, bool makeDefault)
 
 	gBitmapManager->ResumeOverlays();
 
-	if (status >= B_OK)
-		fIsDefault = makeDefault;
-
 	return status;
 }
 
 
 status_t
 Screen::SetMode(uint16 width, uint16 height, uint32 colorSpace,
-	const display_timing& timing, bool makeDefault)
+	const display_timing& timing)
 {
 	display_mode mode;
 	mode.timing = timing;
@@ -123,7 +120,7 @@ Screen::SetMode(uint16 width, uint16 height, uint32 colorSpace,
 	mode.v_display_start = 0;
 	mode.flags = 0;
 
-	return SetMode(mode, makeDefault);
+	return SetMode(mode);
 }
 
 
@@ -167,10 +164,10 @@ Screen::SetBestMode(uint16 width, uint16 height, uint32 colorSpace,
 			* mode.timing.v_total / 10 * int32(frequency * 10)) / 1000;
 		adjusted = true;
 	}
-	status = SetMode(mode, false);
-	if (status < B_OK && adjusted) {
+	status = SetMode(mode);
+	if (status != B_OK && adjusted) {
 		// try again with the unchanged mode
-		status = SetMode(originalMode, false);
+		status = SetMode(originalMode);
 	}
 
 	return status;
@@ -182,17 +179,17 @@ Screen::SetPreferredMode()
 {
 	display_mode mode;
 	status_t status = fHWInterface->GetPreferredMode(&mode);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
-	return SetMode(mode, false);
+	return SetMode(mode);
 }
 
 
 void
-Screen::GetMode(display_mode* mode) const
+Screen::GetMode(display_mode& mode) const
 {
-	fHWInterface->GetMode(mode);
+	fHWInterface->GetMode(&mode);
 }
 
 
@@ -214,6 +211,13 @@ status_t
 Screen::GetMonitorInfo(monitor_info& info) const
 {
 	return fHWInterface->GetMonitorInfo(&info);
+}
+
+
+void
+Screen::SetFrame(const BRect& rect)
+{
+	// TODO: multi-monitor support...
 }
 
 

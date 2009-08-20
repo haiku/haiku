@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc.
+ * Copyright 2002-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,8 +7,8 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/*!
-	BPrivateScreen is the class which does the real work for
+
+/*!	BPrivateScreen is the class which does the real work for
 	the proxy class BScreen (it interacts with the app_server).
 */
 
@@ -37,10 +37,10 @@ static BObjectList<BPrivateScreen> sScreens(2, true);
 static BLocker sScreenLock("screen lock");
 
 
-BPrivateScreen *
-BPrivateScreen::Get(BWindow *window)
+BPrivateScreen*
+BPrivateScreen::Get(BWindow* window)
 {
-	screen_id id = B_MAIN_SCREEN_ID;
+	int32 id = B_MAIN_SCREEN_ID.id;
 
 	if (window != NULL) {
 		BPrivate::AppServerLink link;
@@ -49,22 +49,22 @@ BPrivateScreen::Get(BWindow *window)
 
 		status_t status;
 		if (link.FlushWithReply(status) == B_OK && status == B_OK)
-			link.Read<screen_id>(&id);
+			link.Read<int32>(&id);
 	}
 
 	return _Get(id, false);
 }
 
 
-BPrivateScreen *
-BPrivateScreen::Get(screen_id id)
+BPrivateScreen*
+BPrivateScreen::Get(int32 id)
 {
 	return _Get(id, true);
 }
 
 
-BPrivateScreen *
-BPrivateScreen::_Get(screen_id id, bool check)
+BPrivateScreen*
+BPrivateScreen::_Get(int32 id, bool check)
 {
 	// Nothing works without an app_server connection
 	if (be_app == NULL)
@@ -77,7 +77,7 @@ BPrivateScreen::_Get(screen_id id, bool check)
 	for (int32 i = sScreens.CountItems(); i-- > 0;) {
 		BPrivateScreen* screen = sScreens.ItemAt(i);
 
-		if (screen->ID().id == id.id) {
+		if (screen->ID() == id) {
 			screen->_Acquire();
 			return screen;
 		}
@@ -109,7 +109,7 @@ BPrivateScreen::Put(BPrivateScreen* screen)
 	BAutolock locker(sScreenLock);
 
 	if (screen->_Release()) {
-		if (screen->ID().id != B_MAIN_SCREEN_ID.id) {
+		if (screen->ID() != B_MAIN_SCREEN_ID.id) {
 			// we always keep the main screen object around - it will
 			// never go away, even if you disconnect all monitors.
 			sScreens.RemoveItem(screen);
@@ -123,9 +123,9 @@ BPrivateScreen::GetNext(BPrivateScreen* screen)
 {
 	BAutolock locker(sScreenLock);
 
-	screen_id id;
+	int32 id;
 	status_t status = screen->GetNextID(id);
-	if (status < B_OK)
+	if (status != B_OK)
 		return NULL;
 
 	BPrivateScreen* nextScreen = Get(id);
@@ -138,11 +138,11 @@ BPrivateScreen::GetNext(BPrivateScreen* screen)
 
 
 bool
-BPrivateScreen::_IsValid(screen_id id)
+BPrivateScreen::_IsValid(int32 id)
 {
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_VALID_SCREEN_ID);
-	link.Attach<screen_id>(id);
+	link.Attach<int32>(id);
 
 	status_t status;
 	if (link.FlushWithReply(status) != B_OK || status < B_OK)
@@ -193,15 +193,15 @@ BPrivateScreen::IsValid() const
 
 
 status_t
-BPrivateScreen::GetNextID(screen_id& id)
+BPrivateScreen::GetNextID(int32& id)
 {
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_NEXT_SCREEN_ID);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 
 	status_t status;
 	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
-		link.Read<screen_id>(&id);
+		link.Read<int32>(&id);
 		return B_OK;
 	}
 
@@ -212,7 +212,7 @@ BPrivateScreen::GetNextID(screen_id& id)
 status_t
 BPrivateScreen::WaitForRetrace(bigtime_t timeout)
 {
-	// Get the retrace semaphore if it's the first time 
+	// Get the retrace semaphore if it's the first time
 	// we are called. Cache the value then.
 	if (!fRetraceSemValid)
 		fRetraceSem = _RetraceSemaphore();
@@ -230,7 +230,7 @@ BPrivateScreen::WaitForRetrace(bigtime_t timeout)
 	return status;
 }
 
-	
+
 uint8
 BPrivateScreen::IndexForColor(uint8 red, uint8 green, uint8 blue, uint8 alpha)
 {
@@ -267,9 +267,9 @@ BPrivateScreen::InvertIndex(uint8 index)
 
 	return 0;
 }
-	
 
-const color_map *
+
+const color_map*
 BPrivateScreen::ColorMap()
 {
 	if (fColorMap == NULL) {
@@ -285,11 +285,11 @@ BPrivateScreen::ColorMap()
 		// which is contained in a shared area created by the server.
 		BPrivate::AppServerLink link;
 		link.StartMessage(AS_SCREEN_GET_COLORMAP);
-		link.Attach<screen_id>(ID());
+		link.Attach<int32>(ID());
 
 		status_t status;
 		if (link.FlushWithReply(status) == B_OK && status == B_OK) {
-			fColorMap = (color_map *)malloc(sizeof(color_map));
+			fColorMap = (color_map*)malloc(sizeof(color_map));
 			fOwnsColorMap = true;
 			link.Read<color_map>(fColorMap);
 		}
@@ -300,7 +300,7 @@ BPrivateScreen::ColorMap()
 
 
 status_t
-BPrivateScreen::GetBitmap(BBitmap **_bitmap, bool drawCursor, BRect *bounds)
+BPrivateScreen::GetBitmap(BBitmap**_bitmap, bool drawCursor, BRect* bounds)
 {
 	if (_bitmap == NULL)
 		return B_BAD_VALUE;
@@ -329,7 +329,7 @@ BPrivateScreen::GetBitmap(BBitmap **_bitmap, bool drawCursor, BRect *bounds)
 
 
 status_t
-BPrivateScreen::ReadBitmap(BBitmap *bitmap, bool drawCursor, BRect *bounds)
+BPrivateScreen::ReadBitmap(BBitmap* bitmap, bool drawCursor, BRect* bounds)
 {
 	if (bitmap == NULL)
 		return B_BAD_VALUE;
@@ -353,7 +353,7 @@ BPrivateScreen::ReadBitmap(BBitmap *bitmap, bool drawCursor, BRect *bounds)
 	return B_OK;
 }
 
-		
+
 rgb_color
 BPrivateScreen::DesktopColor(uint32 workspace)
 {
@@ -387,18 +387,18 @@ BPrivateScreen::SetDesktopColor(rgb_color color, uint32 workspace,
 
 
 status_t
-BPrivateScreen::ProposeMode(display_mode *target,
-	const display_mode *low, const display_mode *high)
+BPrivateScreen::ProposeMode(display_mode* target,
+	const display_mode* low, const display_mode* high)
 {
 	// We can't return B_BAD_VALUE here, because it's used to indicate
 	// that the mode returned is supported, but it doesn't fall
-	// within the limit (see ProposeMode() documentation) 
+	// within the limit (see ProposeMode() documentation)
 	if (target == NULL || low == NULL || high == NULL)
 		return B_ERROR;
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_PROPOSE_MODE);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 	link.Attach<display_mode>(*target);
 	link.Attach<display_mode>(*low);
 	link.Attach<display_mode>(*high);
@@ -415,17 +415,17 @@ BPrivateScreen::ProposeMode(display_mode *target,
 
 	return status;
 }
-		
+
 
 status_t
-BPrivateScreen::GetModeList(display_mode **_modeList, uint32 *_count)
+BPrivateScreen::GetModeList(display_mode** _modeList, uint32* _count)
 {
 	if (_modeList == NULL || _count == NULL)
 		return B_BAD_VALUE;
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_MODE_LIST);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
@@ -460,7 +460,7 @@ BPrivateScreen::GetMode(uint32 workspace, display_mode *mode)
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_SCREEN_GET_MODE);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 	link.Attach<uint32>(workspace);
 
 	status_t status = B_ERROR;
@@ -481,7 +481,7 @@ BPrivateScreen::SetMode(uint32 workspace, display_mode *mode, bool makeDefault)
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_SCREEN_SET_MODE);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 	link.Attach<uint32>(workspace);
 	link.Attach<display_mode>(*mode);
 	link.Attach<bool>(makeDefault);
@@ -501,7 +501,7 @@ BPrivateScreen::GetDeviceInfo(accelerant_device_info *info)
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_ACCELERANT_INFO);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
@@ -521,7 +521,7 @@ BPrivateScreen::GetMonitorInfo(monitor_info* info)
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_MONITOR_INFO);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
@@ -541,7 +541,7 @@ BPrivateScreen::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *hig
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_PIXEL_CLOCK_LIMITS);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 	link.Attach<display_mode>(*mode);
 
 	status_t status;
@@ -563,7 +563,7 @@ BPrivateScreen::GetTimingConstraints(display_timing_constraints *constraints)
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_TIMING_CONSTRAINTS);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
@@ -580,7 +580,7 @@ BPrivateScreen::SetDPMS(uint32 dpmsState)
 {
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_SET_DPMS);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 	link.Attach<uint32>(dpmsState);
 
 	status_t status = B_ERROR;
@@ -597,7 +597,7 @@ BPrivateScreen::DPMSState()
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_DPMS_STATE);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 
 	status_t status;
 	if (link.FlushWithReply(status) == B_OK && status == B_OK)
@@ -614,7 +614,7 @@ BPrivateScreen::DPMSCapabilites()
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_DPMS_CAPABILITIES);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 
 	status_t status;
 	if (link.FlushWithReply(status) == B_OK && status == B_OK)
@@ -645,7 +645,7 @@ BPrivateScreen::BytesPerRow()
 	return config.bytes_per_row;
 }
 
-	
+
 // #pragma mark - private methods
 
 
@@ -654,7 +654,7 @@ BPrivateScreen::_RetraceSemaphore()
 {
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_RETRACE_SEMAPHORE);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 
 	sem_id id = B_BAD_SEM_ID;
 	status_t status = B_ERROR;
@@ -672,7 +672,7 @@ BPrivateScreen::_GetFrameBufferConfig(frame_buffer_config& config)
 {
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_FRAME_BUFFER_CONFIG);
-	link.Attach<screen_id>(ID());
+	link.Attach<int32>(ID());
 
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
@@ -684,7 +684,7 @@ BPrivateScreen::_GetFrameBufferConfig(frame_buffer_config& config)
 }
 
 
-BPrivateScreen::BPrivateScreen(screen_id id)
+BPrivateScreen::BPrivateScreen(int32 id)
 	:
 	fID(id),
 	fColorMap(NULL),

@@ -123,42 +123,48 @@ static profile sRedrawProcessingTime;
 // TODO: Move to another file
 struct BufferState {
 	BufferState(const direct_buffer_state &state)
-		: fState(state)
+		:
+		fState(state)
 	{
 	}
+
 	direct_buffer_state Action() const
 	{
 		return (direct_buffer_state)(fState & B_DIRECT_MODE_MASK);
 	}
+
 	direct_buffer_state Reason() const
 	{
 		return (direct_buffer_state)(fState & ~B_DIRECT_MODE_MASK);
-	}	
+	}
+
 	direct_buffer_state fState;
 };
 
 
 class DirectWindowData {
 public:
-	DirectWindowData();
-	~DirectWindowData();
+								DirectWindowData();
+								~DirectWindowData();
 
-	status_t InitCheck() const;
-	
-	status_t GetSyncData(direct_window_sync_data &data) const;
-	status_t SyncronizeWithClient();
-	
-	bool SetState(const direct_buffer_state &bufferState,
-					const direct_driver_state &driverState);
-		
-	BRect	old_window_frame;
-	direct_buffer_info *buffer_info;
-	bool full_screen;
+			status_t			InitCheck() const;
+
+			status_t			GetSyncData(
+									direct_window_sync_data& data) const;
+			status_t			SyncronizeWithClient();
+
+			bool				SetState(const direct_buffer_state& bufferState,
+									const direct_driver_state& driverState);
+
+			BRect				old_window_frame;
+			direct_buffer_info*	buffer_info;
+			bool				full_screen;
+
 private:
-	sem_id	fSem;
-	sem_id	fAcknowledgeSem;
-	area_id	fBufferArea;
-	direct_buffer_state fPreviousState;
+			sem_id				fSem;
+			sem_id				fAcknowledgeSem;
+			area_id				fBufferArea;
+			direct_buffer_state	fPreviousState;
 };
 
 
@@ -171,7 +177,7 @@ DirectWindowData::DirectWindowData()
 	fBufferArea(-1),
 	fPreviousState(B_DIRECT_STOP)
 {
-	fBufferArea = create_area("direct area", (void **)&buffer_info,
+	fBufferArea = create_area("direct area", (void**)&buffer_info,
 		B_ANY_ADDRESS, B_PAGE_SIZE, B_NO_LOCK, B_READ_WRITE);
 
 	buffer_info->buffer_state = B_DIRECT_STOP;
@@ -207,12 +213,12 @@ DirectWindowData::InitCheck() const
 
 
 status_t
-DirectWindowData::GetSyncData(direct_window_sync_data &data) const
+DirectWindowData::GetSyncData(direct_window_sync_data& data) const
 {
 	data.area = fBufferArea;
 	data.disable_sem = fSem;
 	data.disable_sem_ack = fAcknowledgeSem;
-	
+
 	return B_OK;
 }
 
@@ -223,7 +229,7 @@ DirectWindowData::SyncronizeWithClient()
 	// Releasing this semaphore causes the client to call
 	// BDirectWindow::DirectConnected()
 	status_t status = release_sem(fSem);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	// Wait with a timeout of half a second until the client exits
@@ -231,49 +237,69 @@ DirectWindowData::SyncronizeWithClient()
 	do {
 		status = acquire_sem_etc(fAcknowledgeSem, 1, B_TIMEOUT, 500000);
 	} while (status == B_INTERRUPTED);
-	
+
 	return status;
 }
 
 
 bool
-DirectWindowData::SetState(const direct_buffer_state &bufferState,
-	const direct_driver_state &driverState)
+DirectWindowData::SetState(const direct_buffer_state& bufferState,
+	const direct_driver_state& driverState)
 {
 	BufferState inputState(bufferState);
 	BufferState currentState(buffer_info->buffer_state);
+
 	// Don't issue a DirectConnected() notification
 	// if the connection is stopped, and we are called
 	// with bufferState == B_DIRECT_MODIFY, but save the reason
-	// and combine it for next time we are called with B_DIRECT_START	
+	// and combine it for next time we are called with B_DIRECT_START
 	if (currentState.Action() == B_DIRECT_STOP
-			&& inputState.Action() != B_DIRECT_START) {
-		fPreviousState = (direct_buffer_state)(fPreviousState 
+		&& inputState.Action() != B_DIRECT_START) {
+		fPreviousState = (direct_buffer_state)(fPreviousState
 			| inputState.Reason());
 		return false;
-	}	
-	
-	buffer_info->buffer_state = (direct_buffer_state)(bufferState 
+	}
+
+	buffer_info->buffer_state = (direct_buffer_state)(bufferState
 		| BufferState(fPreviousState).Reason());
-	
+
 	fPreviousState = B_DIRECT_STOP;
-	
+
 	if (driverState != -1)
 		buffer_info->driver_state = driverState;
-			
+
 	return true;
 }
 
-	
+
+//	#pragma mark -
+
+
+#ifdef PROFILE_MESSAGE_LOOP
+static int
+compare_message_profiles(const void* _a, const void* _b)
+{
+	profile* a = (profile*)*(void**)_a;
+	profile* b = (profile*)*(void**)_b;
+	if (a->time < b->time)
+		return 1;
+	if (a->time > b->time)
+		return -1;
+	return 0;
+}
+#endif
+
+
 //	#pragma mark -
 
 
 /*!	Sets up the basic BWindow counterpart - you have to call Init() before
 	you can actually use it, though.
 */
-ServerWindow::ServerWindow(const char *title, ServerApp *app,
-	port_id clientPort, port_id looperPort, int32 clientToken)
-	: MessageLooper(title && *title ? title : "Unnamed Window"),
+ServerWindow::ServerWindow(const char* title, ServerApp* app,
+		port_id clientPort, port_id looperPort, int32 clientToken)
+	:
+	MessageLooper(title && *title ? title : "Unnamed Window"),
 	fTitle(NULL),
 	fDesktop(app->GetDesktop()),
 	fServerApp(app),
@@ -309,21 +335,6 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 
 	fDeathSemaphore = create_sem(0, "window death");
 }
-
-
-#ifdef PROFILE_MESSAGE_LOOP
-static int
-compare_message_profiles(const void* _a, const void* _b)
-{
-	profile* a = (profile*)*(void**)_a;
-	profile* b = (profile*)*(void**)_b;
-	if (a->time < b->time)
-		return 1;
-	if (a->time > b->time)
-		return -1;
-	return 0;
-}
-#endif
 
 
 /*! Tears down all connections the main app_server objects, and deletes some
@@ -680,7 +691,7 @@ ServerWindow::_CreateView(BPrivate::LinkReceiver& link, View** _parent)
 		delete newView;
 		return NULL;
 	}
-	
+
 	// there is no way of setting this, other than manually :-)
 	newView->SetViewColor(viewColor);
 	newView->SetHidden(hidden);
@@ -3544,13 +3555,14 @@ ServerWindow::ScreenChanged(const BMessage *message)
 	// TODO: execute the stop notification earlier
 	//HandleDirectConnection(B_DIRECT_STOP);
 	SendMessageToClient(message);
+
 	if (fDirectWindowData != NULL && fDirectWindowData->full_screen) {
 		BRect screenFrame = fDesktop->ActiveScreen()->Frame();
 		fDesktop->ResizeWindowBy(fWindow,
 			screenFrame.Width() - fWindow->Frame().Width(),
 			screenFrame.Height() - fWindow->Frame().Height());
 	}
-				
+
 	//HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET,
 		//B_SCREEN_CHANGED);
 }

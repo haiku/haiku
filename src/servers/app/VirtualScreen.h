@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku.
+ * Copyright 2005-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,9 +9,11 @@
 #define VIRTUAL_SCREEN_H
 
 
+#include "ScreenConfigurations.h"
 #include "ScreenManager.h"
 
 #include <Message.h>
+
 
 class Desktop;
 class DrawingEngine;
@@ -19,53 +21,55 @@ class HWInterface;
 
 
 class VirtualScreen {
-	public:
-		VirtualScreen();
-		~VirtualScreen();
+public:
+								VirtualScreen();
+								~VirtualScreen();
 
-		::DrawingEngine*	DrawingEngine() const
-								{ return fDrawingEngine; }
-		// TODO: can we have a multiplexing HWInterface as well?
-		//	If not, this would need to be hidden, and only made
-		//	available for the Screen class
-		::HWInterface*		HWInterface() const
-								{ return fHWInterface; }
+			::DrawingEngine*	DrawingEngine() const
+									{ return fDrawingEngine; }
 
-		status_t			RestoreConfiguration(Desktop& desktop,
-								const BMessage* settings,
-								uint32* _changedScreens = NULL);
-		status_t			StoreConfiguration(BMessage& settings);
+			// TODO: can we have a multiplexing HWInterface as well?
+			//	If not, this would need to be hidden, and only made
+			//	available for the Screen class
+			::HWInterface*		HWInterface() const
+									{ return fHWInterface; }
 
-		status_t			AddScreen(Screen* screen);
-		status_t			RemoveScreen(Screen* screen);
+			status_t			SetConfiguration(Desktop& desktop,
+									ScreenConfigurations& configurations,
+									uint32* _changedScreens = NULL);
 
-		void				UpdateFrame();
-		BRect				Frame() const;
+			status_t			AddScreen(Screen* screen,
+									ScreenConfigurations& configurations);
+			status_t			RemoveScreen(Screen* screen);
 
-		// TODO: we need to play with a real multi-screen configuration to
-		//	figure out the specifics here - possibly in the test environment?
-		void				SetScreenFrame(int32 index, BRect frame);
+			void				UpdateFrame();
+			BRect				Frame() const;
 
-		Screen*				ScreenAt(int32 index) const;
-		BRect				ScreenFrameAt(int32 index) const;
-		int32				CountScreens() const;
+			// TODO: we need to play with a real multi-screen configuration to
+			//	figure out the specifics here
+			void				SetScreenFrame(int32 index, BRect frame);
 
-	private:
-		status_t			_GetConfiguration(Screen* screen,
-								BMessage& settings);
-		void				_Reset();
+			Screen*				ScreenAt(int32 index) const;
+			Screen*				ScreenByID(int32 id) const;
+			BRect				ScreenFrameAt(int32 index) const;
+			int32				CountScreens() const;
 
-		struct screen_item {
-			Screen*	screen;
-			BRect	frame;
-			// TODO: do we want to have a different color per screen as well?
-		};
+private:
+			status_t			_GetMode(Screen* screen,
+									ScreenConfigurations& configurations,
+									display_mode& mode) const;
+			void				_Reset();
 
-		BMessage			fSettings;
-		BRect				fFrame;
-		BObjectList<screen_item> fScreenList;
-		::DrawingEngine*	fDrawingEngine;
-		::HWInterface*		fHWInterface;
+	struct screen_item {
+		Screen*	screen;
+		BRect	frame;
+		// TODO: do we want to have a different color per screen as well?
+	};
+
+			BRect				fFrame;
+			BObjectList<screen_item> fScreenList;
+			::DrawingEngine*	fDrawingEngine;
+			::HWInterface*		fHWInterface;
 };
 
 #endif	/* VIRTUAL_SCREEN_H */
