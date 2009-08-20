@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# DO NOT EDIT!
+#=====================================================================
+# Start all programs in the boot launch folder
+for program in $HOME/config/boot/launch/* 
+do 
+	"$program" & 
+done
+#=====================================================================
+
+# Add custom commands to execute at every startup here.
+
+# This file is a standard bash script. For more information regarding shell 
+# scripts, refer to any online documentation for "bash scripting"
+
+# During boot, the commands listed in this script will be executed.
+# Typically, you will want to include a trailing '&' on each line.
+# This will allow the script to execute that command and process the next line.
+
+# To launch certain applications at boot-up, put links to those applications in
+# the above boot launch directory.
+
