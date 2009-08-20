@@ -962,7 +962,7 @@ OHCI::_FinishTransfers()
 					}
 				}
 
-				// the td has complete without an error
+				// the td has completed without an error
 				TRACE("td %p done\n", descriptor);
 
 				if (descriptor == transfer->last_descriptor
@@ -1114,9 +1114,8 @@ OHCI::_SubmitRequest(Transfer *transfer)
 	ohci_general_td *dataDescriptor = NULL;
 	if (transfer->VectorCount() > 0) {
 		ohci_general_td *lastDescriptor = NULL;
-		result = _CreateDescriptorChain(transfer->TransferPipe(),
-			&dataDescriptor, &lastDescriptor, directionIn
-				? OHCI_TD_DIRECTION_PID_IN : OHCI_TD_DIRECTION_PID_OUT,
+		result = _CreateDescriptorChain(&dataDescriptor, &lastDescriptor,
+			directionIn ? OHCI_TD_DIRECTION_PID_IN : OHCI_TD_DIRECTION_PID_OUT,
 			transfer->VectorLength());
 		if (result < B_OK) {
 			_FreeGeneralDescriptor(setupDescriptor);
@@ -1164,13 +1163,17 @@ OHCI::_SubmitTransfer(Transfer *transfer)
 
 	ohci_general_td *firstDescriptor = NULL;
 	ohci_general_td *lastDescriptor = NULL;
-	status_t result = _CreateDescriptorChain(pipe, &firstDescriptor,
-		&lastDescriptor, directionIn
-			? OHCI_TD_DIRECTION_PID_IN : OHCI_TD_DIRECTION_PID_OUT,
+	status_t result = _CreateDescriptorChain(&firstDescriptor, &lastDescriptor,
+		directionIn ? OHCI_TD_DIRECTION_PID_IN : OHCI_TD_DIRECTION_PID_OUT,
 		transfer->VectorLength());
 
 	if (result < B_OK)
 		return result;
+
+	// Apply data toggle to the first descriptor (the others will use the carry)
+	firstDescriptor->flags &= ~OHCI_TD_TOGGLE_CARRY;
+	firstDescriptor->flags |= pipe->DataToggle() ? OHCI_TD_TOGGLE_1
+		: OHCI_TD_TOGGLE_0;
 
 	// Set the last descriptor to generate an interrupt
 	lastDescriptor->flags &= ~OHCI_TD_INTERRUPT_MASK;
@@ -1521,7 +1524,7 @@ OHCI::_FreeGeneralDescriptor(ohci_general_td *descriptor)
 
 
 status_t
-OHCI::_CreateDescriptorChain(Pipe *pipe, ohci_general_td **_firstDescriptor,
+OHCI::_CreateDescriptorChain(ohci_general_td **_firstDescriptor,
 	ohci_general_td **_lastDescriptor, uint32 direction, size_t bufferSize)
 {
 	size_t blockSize = 8192;
@@ -1529,7 +1532,6 @@ OHCI::_CreateDescriptorChain(Pipe *pipe, ohci_general_td **_firstDescriptor,
 	if (descriptorCount == 0)
 		descriptorCount = 1;
 
-	bool dataToggle = pipe->DataToggle();
 	ohci_general_td *firstDescriptor = NULL;
 	ohci_general_td *lastDescriptor = *_firstDescriptor;
 	for (int32 i = 0; i < descriptorCount; i++) {
@@ -1545,13 +1547,12 @@ OHCI::_CreateDescriptorChain(Pipe *pipe, ohci_general_td **_firstDescriptor,
 			| OHCI_TD_BUFFER_ROUNDING
 			| OHCI_TD_SET_CONDITION_CODE(OHCI_TD_CONDITION_NOT_ACCESSED)
 			| OHCI_TD_SET_DELAY_INTERRUPT(OHCI_TD_INTERRUPT_NONE)
-			| (dataToggle ? OHCI_TD_TOGGLE_1 : OHCI_TD_TOGGLE_0);		
+			| OHCI_TD_TOGGLE_CARRY;		
 
 		// link to previous
 		if (lastDescriptor)
 			_LinkDescriptors(lastDescriptor, descriptor);
 
-		dataToggle = !dataToggle;
 		bufferSize -= blockSize;
 		lastDescriptor = descriptor;
 		if (!firstDescriptor)
