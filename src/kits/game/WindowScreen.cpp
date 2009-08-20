@@ -187,9 +187,9 @@ set_mouse_position(int32 x, int32 y)
 
 BWindowScreen::BWindowScreen(const char *title, uint32 space,
 		status_t *error, bool debug_enable)
-	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW,
-		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
-			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
+	: BWindow(BScreen().Frame(), title, B_NO_BORDER_WINDOW_LOOK,
+		kWindowScreenFeel, kWindowScreenFlag | B_NOT_MINIMIZABLE
+			| B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
 		B_CURRENT_WORKSPACE)
 {
 	CALLED();
@@ -205,9 +205,9 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space,
 
 BWindowScreen::BWindowScreen(const char *title, uint32 space,
 		uint32 attributes, status_t *error)
-	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW,
-		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
-			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
+	: BWindow(BScreen().Frame(), title, B_NO_BORDER_WINDOW_LOOK,
+		kWindowScreenFeel, kWindowScreenFlag | B_NOT_MINIMIZABLE
+			| B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
 		B_CURRENT_WORKSPACE)
 {
 	CALLED();
@@ -322,7 +322,7 @@ BWindowScreen::SetColorList(rgb_color *list, int32 firstIndex, int32 lastIndex)
 
 	if (!Lock())
 		return;
-		
+
 	if (!fActivateState) {
 		// If we aren't active, we just change our local palette
 		for (int32 x = firstIndex; x <= lastIndex; x++) {
@@ -336,12 +336,12 @@ BWindowScreen::SetColorList(rgb_color *list, int32 firstIndex, int32 lastIndex)
 		for (int32 x = firstIndex; x <= lastIndex; x++) {
 			fPalette[x] = list[x - firstIndex];
 				// update our local palette as well
-		
+
 			colors[j++] = fPalette[x].red;
 			colors[j++] = fPalette[x].green;
 			colors[j++] = fPalette[x].blue;
 		}
-		
+
 		if (fAddonImage >= 0) {
 			set_indexed_colors setIndexedColors =
 				(set_indexed_colors)fGetAccelerantHook(B_SET_INDEXED_COLORS,
@@ -720,7 +720,7 @@ status_t
 BWindowScreen::_Deactivate()
 {
 	CALLED();
-	
+
 	if (fDebugState && !fDebugFirst) {
 		_Suspend();
 		SuspensionHook(false);
@@ -731,11 +731,11 @@ BWindowScreen::_Deactivate()
 		BScreen screen(this);
 		SetColorList((rgb_color *)screen.ColorMap()->color_list);
 	}
-	
+
 	_AssertDisplayMode(fOriginalDisplayMode);
 
 	_ResetAccelerantHooks();
-	
+
 	be_app->ShowCursor();
 
 	return B_OK;
@@ -746,13 +746,13 @@ status_t
 BWindowScreen::_SetupAccelerantHooks()
 {
 	CALLED();
-	
+
 	status_t status = B_OK;
 	if (fAddonImage < 0)
 		status = _InitClone();
-	else	
+	else
 		_ResetAccelerantHooks();
-			
+
 	if (status == B_OK) {
 		sWaitIdleHook = fWaitEngineIdle = (wait_engine_idle)fGetAccelerantHook(B_WAIT_ENGINE_IDLE, NULL);
 		sReleaseEngineHook = (release_engine)fGetAccelerantHook(B_RELEASE_ENGINE, NULL);
@@ -761,13 +761,13 @@ BWindowScreen::_SetupAccelerantHooks()
 		sBlitRectHook = (screen_to_screen_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_BLIT, NULL);
 		sTransparentBlitHook = (screen_to_screen_transparent_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT, NULL);
 		sScaledFilteredBlitHook = (screen_to_screen_scaled_filtered_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT, NULL);
-	
+
 		if (fWaitEngineIdle)
 			fWaitEngineIdle();
-		
+
 		fLockState = 1;
 	}
-	
+
 	return status;
 }
 
@@ -778,7 +778,7 @@ BWindowScreen::_ResetAccelerantHooks()
 	CALLED();
 	if (fWaitEngineIdle)
 		fWaitEngineIdle();
-			
+
 	sFillRectHook = NULL;
 	sBlitRectHook = NULL;
 	sTransparentBlitHook = NULL;
@@ -787,9 +787,9 @@ BWindowScreen::_ResetAccelerantHooks()
 	sEngineToken = NULL;
 	sAcquireEngineHook = NULL;
 	sReleaseEngineHook = NULL;
-	
+
 	fWaitEngineIdle = NULL;
-	
+
 	fLockState = 0;
 }
 
