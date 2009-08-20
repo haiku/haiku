@@ -236,10 +236,10 @@ ScreenConfigurations::Restore(const BMessage& settings)
 			&& stored.FindInt32("produced year", &year) == B_OK) {
 			// create monitor info
 			strlcpy(configuration->info.vendor, vendor,
-				sizeof(monitor_info::vendor));
-			strlcpy(configuration->info.name, name, sizeof(monitor_info::name));
+				sizeof(configuration->info.vendor));
+			strlcpy(configuration->info.name, name, sizeof(configuration->info.name));
 			strlcpy(configuration->info.serial_number, serial,
-				sizeof(monitor_info::serial_number));
+				sizeof(configuration->info.serial_number));
 			configuration->info.product_id = productID;
 			configuration->info.produced.week = week;
 			configuration->info.produced.year = year;
