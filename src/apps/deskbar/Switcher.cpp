@@ -748,7 +748,7 @@ TSwitchManager::Process(bool forward, bool byWindow)
 		// If hidden we need to get things started by switching to correct app
 		if (hidden)
 			SwitchToApp(fCurrentIndex, fCurrentIndex, forward);
-		CycleWindow(forward, false);
+		CycleWindow(forward, true);
 	} else
 		CycleApp(forward, false);
 
@@ -1617,6 +1617,7 @@ void
 TSwitcherWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_UNMAPPED_KEY_DOWN:
 		case B_KEY_DOWN:
 		{
 			int32 repeats = 0;
@@ -1657,12 +1658,11 @@ TSwitcherWindow::DoKey(uint32 key, uint32 modifiers)
 
 	switch (key) {
 		case B_RIGHT_ARROW:
-		case '`':
 			fManager->CycleApp(true, false);
 			break;
 
 		case B_LEFT_ARROW:
-		case '~':
+		case '1':
 			fManager->CycleApp(false, false);
 			break;
 
