@@ -56,8 +56,8 @@ public:
 		// second call is used for offscreen drawing, where PoseView
 		// and current drawing view are different
 
-	void MouseUp(BRect bounds, BPoseView *, BPose *, BPoint mouseLoc,
-		bool delayedEdit);
+	void MouseUp(BRect bounds, BPoseView *, BPose *, BPoint mouseLoc);
+	
 	BRect CalcRect(BPoint poseLoc, const BColumn *, const BPoseView *);
 		// returns the rect derived from the formatted string width
 		// may force WidgetAttributeText recalculation

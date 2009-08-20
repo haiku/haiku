@@ -71,8 +71,8 @@ BPose::BPose(Model *model, BPoseView *view, uint32 clipboardMode, bool selected)
 		fWidgetList(4, true),
 		fClipboardMode(clipboardMode),
 		fPercent(-1),
+		fSelectionTime(0),
 		fIsSelected(selected),
-		fDelayedEdit(true),
 		fHasLocation(false),
 		fNeedsSaveLocation(false),
 		fListModeInited(false),
@@ -198,7 +198,7 @@ OneMouseUp(BTextWidget *widget, BPose *pose, BPoseView *poseView, BColumn *colum
 		rect = widget->CalcClickRect(pose->Location(poseView), 0, poseView);
 
 	if (rect.Contains(where)) {
-		widget->MouseUp(rect, poseView, pose, where, pose->DelayedEdit());
+		widget->MouseUp(rect, poseView, pose, where);
 		return true;
 	}
 	return false;

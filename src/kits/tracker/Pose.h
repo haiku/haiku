@@ -81,6 +81,7 @@ class BPose {
 		void Select(bool selected);
 		bool IsSelected() const;
 			// Rename to IsHighlighted
+		bigtime_t SelectionTime() const;
 
 		BTextWidget *ActiveWidget() const;
 		BTextWidget *WidgetFor(uint32 hashAttr, int32 *index = 0) const;
@@ -138,9 +139,9 @@ class BPose {
 
 		uint32 fClipboardMode;
 		int32 fPercent;
+		bigtime_t fSelectionTime;
 
 		bool fIsSelected : 1;
-		bool fDelayedEdit : 1;
 		bool fHasLocation : 1;
 		bool fNeedsSaveLocation : 1;
 		bool fListModeInited : 1;
@@ -176,20 +177,15 @@ inline void
 BPose::Select(bool on)
 {
 	fIsSelected = on;
+	if (on)
+		fSelectionTime = system_time();
 }
 
 
-inline bool
-BPose::DelayedEdit() const
+inline bigtime_t
+BPose::SelectionTime()	const
 {
-	return fDelayedEdit;
-}
-
-
-inline void
-BPose::SetDelayedEdit(bool on)
-{
-	fDelayedEdit = on;
+	return fSelectionTime;
 }
 
 

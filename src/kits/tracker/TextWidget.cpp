@@ -211,45 +211,20 @@ BTextWidget::CalcClickRect(BPoint poseLoc, const BColumn *column,
 
 
 void
-BTextWidget::MouseUp(BRect bounds, BPoseView *view, BPose *pose, BPoint,
-	bool delayedEdit)
+BTextWidget::MouseUp(BRect bounds, BPoseView *view, BPose *pose, BPoint)
 {
-	// wait until a double click time to see if we are double clicking
-	// or selecting widget for editing
-	// start editing early if mouse left widget or modifier down
-	
-	if (!IsEditable())
-		return;
-
-	if (delayedEdit) {
-		bigtime_t doubleClickTime;
-		get_click_speed(&doubleClickTime);
-		doubleClickTime += system_time();
-
-		while (system_time() < doubleClickTime) {
-			// loop for double-click time and watch the mouse and keyboard
-
-			BPoint point;
-			uint32 buttons;
-			view->GetMouse(&point, &buttons, false);
-			if (buttons) 
-				// if mouse button goes down then a double click, exit
-				// without editing
-				return;
-
-			if (!bounds.Contains(point))
-				// mouse has moved outside of text widget so go into edit mode
-				break;
-
-			if (modifiers() & (B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY | B_MENU_KEY))
-				// watch the keyboard (ignoring standard locking keys)
-				break;
-
-			snooze(100000);
-		}
+	// start editing if the duration between the pose selection time and
+	// the click on the widget is bigger than the doubleclick threshold. 
+				
+	if (IsEditable() && pose->IsSelected()) {
+		bigtime_t delta = system_time() - pose->SelectionTime();		
+		bigtime_t doubleClickSpeed;
+		get_click_speed(&doubleClickSpeed);
+		
+		// TODO: modifiers	
+		if (delta > doubleClickSpeed)
+			StartEdit(bounds, view, pose);
 	}
-
-	StartEdit(bounds, view, pose);
 }
 
 
