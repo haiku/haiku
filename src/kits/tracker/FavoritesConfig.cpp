@@ -856,8 +856,8 @@ TFavoritesConfigWindow::PromptForAdd()
 			entry_ref ref;
 
 			// get reference to application directory
-		    get_ref_for_path(appPath, &ref);
-						fAddPanel = new BFilePanel(B_OPEN_PANEL, &messenger,
+			get_ref_for_path(appPath, &ref);
+			fAddPanel = new BFilePanel(B_OPEN_PANEL, &messenger,
 				&ref, fFilePanelNodeFlavors, true);
 		} else
 			fAddPanel = new BFilePanel(B_OPEN_PANEL, &messenger,

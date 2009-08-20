@@ -1162,7 +1162,7 @@ TFilePanel::MessageReceived(BMessage *message)
 				
 				fConfigWindow = new TFavoritesConfigWindow(BRect(0, 0, 320, 24),
 					"Configure Favorites", Feel() == B_MODAL_APP_WINDOW_FEEL,
-					fNodeFlavors, BMessenger(this), &startref, -1, docs, folders);
+					B_DIRECTORY_NODE, BMessenger(this), &startref, -1, docs, folders);
 			}
 			break;
 		}
