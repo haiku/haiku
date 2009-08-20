@@ -2,12 +2,17 @@
 
 # DO NOT EDIT!
 #=====================================================================
-# Start all programs in the boot launch folder
-for program in $HOME/config/boot/launch/* 
+# Start programs and open files in the boot launch folder
+for file in $HOME/config/boot/launch/* 
 do 
-	"$program" & 
+	if [ -x "$file" ]; then
+		"$file" & 
+	else
+		/bin/open "$file" &
+	fi
 done
 #=====================================================================
+# FEEL FREE TO EDIT BELOW
 
 # Add custom commands to execute at every startup here.
 
