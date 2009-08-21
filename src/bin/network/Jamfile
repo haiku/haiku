@@ -1,5 +1,9 @@
 SubDir HAIKU_TOP src bin network ;
 
+StdBinCommands
+	wakeonlan.cpp
+	: network : $(haiku-utils_rsrc) ;
+
 SubInclude HAIKU_TOP src bin network arp ;
 SubInclude HAIKU_TOP src bin network atftpd ;
 SubInclude HAIKU_TOP src bin network ftp ;
