@@ -182,8 +182,10 @@ DirectWindowData::DirectWindowData()
 	fTransition(0)
 {
 	fBufferArea = create_area("direct area", (void**)&buffer_info,
-		B_ANY_ADDRESS, B_PAGE_SIZE, B_NO_LOCK, B_READ_WRITE);
+		B_ANY_ADDRESS, DIRECT_BUFFER_INFO_AREA_SIZE,
+		B_NO_LOCK, B_READ_WRITE);
 
+	memset(buffer_info, 0, DIRECT_BUFFER_INFO_AREA_SIZE);
 	buffer_info->buffer_state = B_DIRECT_STOP;
 	fSem = create_sem(0, "direct sem");
 	fAcknowledgeSem = create_sem(0, "direct sem ack");
@@ -282,8 +284,8 @@ DirectWindowData::_HandleStop(const direct_buffer_state& state)
 bool
 DirectWindowData::_HandleStart(const direct_buffer_state& state)
 {
-	buffer_info->buffer_state 
-		= (direct_buffer_state)(BufferState(buffer_info->buffer_state).Reason() | state);
+	buffer_info->buffer_state = (direct_buffer_state)
+		(BufferState(buffer_info->buffer_state).Reason() | state);
 	if (fTransition++ >= 0)
 		return true;
 	
