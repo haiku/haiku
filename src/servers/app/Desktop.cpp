@@ -411,303 +411,6 @@ Desktop::Init()
 }
 
 
-void
-Desktop::_LaunchInputServer()
-{
-	BRoster roster;
-	status_t status = roster.Launch("application/x-vnd.Be-input_server");
-	if (status == B_OK || status == B_ALREADY_RUNNING)
-		return;
-
-	// Could not load input_server by signature, try well-known location
-
-	BEntry entry("/system/servers/input_server");
-	entry_ref ref;
-	status_t entryStatus = entry.GetRef(&ref);
-	if (entryStatus == B_OK)
-		entryStatus = roster.Launch(&ref);
-	if (entryStatus == B_OK || entryStatus == B_ALREADY_RUNNING) {
-		syslog(LOG_ERR, "Failed to launch the input server by signature: %s!\n",
-			strerror(status));
-		return;
-	}
-
-	syslog(LOG_ERR, "Failed to launch the input server: %s!\n",
-		strerror(entryStatus));
-}
-
-
-void
-Desktop::_GetLooperName(char* name, size_t length)
-{
-	snprintf(name, length, "d:%d:%s", /*id*/0, /*name*/"baron");
-}
-
-
-void
-Desktop::_PrepareQuit()
-{
-	// let's kill all remaining applications
-
-	fApplicationsLock.Lock();
-
-	int32 count = fApplications.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		ServerApp *app = fApplications.ItemAt(i);
-		team_id clientTeam = app->ClientTeam();
-
-		app->Quit();
-		kill_team(clientTeam);
-	}
-
-	// wait for the last app to die
-	if (count > 0)
-		acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT, 250000);
-
-	fApplicationsLock.Unlock();
-}
-
-
-void
-Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
-{
-	switch (code) {
-		case AS_CREATE_APP:
-		{
-			// Create the ServerApp to node monitor a new BApplication
-
-			// Attached data:
-			// 1) port_id - receiver port of a regular app
-			// 2) port_id - client looper port - for sending messages to the client
-			// 2) team_id - app's team ID
-			// 3) int32 - handler token of the regular app
-			// 4) char * - signature of the regular app
-
-			// Find the necessary data
-			team_id	clientTeamID = -1;
-			port_id	clientLooperPort = -1;
-			port_id clientReplyPort = -1;
-			int32 htoken = B_NULL_TOKEN;
-			char *appSignature = NULL;
-
-			link.Read<port_id>(&clientReplyPort);
-			link.Read<port_id>(&clientLooperPort);
-			link.Read<team_id>(&clientTeamID);
-			link.Read<int32>(&htoken);
-			if (link.ReadString(&appSignature) != B_OK)
-				break;
-
-			ServerApp *app = new ServerApp(this, clientReplyPort,
-				clientLooperPort, clientTeamID, htoken, appSignature);
-			if (app->InitCheck() == B_OK
-				&& app->Run()) {
-				// add the new ServerApp to the known list of ServerApps
-				fApplicationsLock.Lock();
-				fApplications.AddItem(app);
-				fApplicationsLock.Unlock();
-			} else {
-				delete app;
-
-				// if everything went well, ServerApp::Run() will notify
-				// the client - but since it didn't, we do it here
-				BPrivate::LinkSender reply(clientReplyPort);
-				reply.StartMessage(B_ERROR);
-				reply.Flush();
-			}
-
-			// This is necessary because BPortLink::ReadString allocates memory
-			free(appSignature);
-			break;
-		}
-
-		case AS_DELETE_APP:
-		{
-			// Delete a ServerApp. Received only from the respective ServerApp when a
-			// BApplication asks it to quit.
-
-			// Attached Data:
-			// 1) thread_id - thread ID of the ServerApp to be deleted
-
-			thread_id thread = -1;
-			if (link.Read<thread_id>(&thread) < B_OK)
-				break;
-
-			fApplicationsLock.Lock();
-
-			// Run through the list of apps and nuke the proper one
-
-			int32 count = fApplications.CountItems();
-			ServerApp *removeApp = NULL;
-
-			for (int32 i = 0; i < count; i++) {
-				ServerApp *app = fApplications.ItemAt(i);
-
-				if (app->Thread() == thread) {
-					fApplications.RemoveItemAt(i);
-					removeApp = app;
-					break;
-				}
-			}
-
-			fApplicationsLock.Unlock();
-
-			if (removeApp != NULL)
-				removeApp->Quit(fShutdownSemaphore);
-
-			if (fQuitting && count <= 1) {
-				// wait for the last app to die
-				acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT, 500000);
-				PostMessage(kMsgQuitLooper);
-			}
-			break;
-		}
-
-		case AS_ACTIVATE_APP:
-		{
-			// Someone is requesting to activation of a certain app.
-
-			// Attached data:
-			// 1) port_id reply port
-			// 2) team_id team
-
-			status_t status;
-
-			// get the parameters
-			port_id replyPort;
-			team_id team;
-			if (link.Read(&replyPort) == B_OK
-				&& link.Read(&team) == B_OK)
-				status = _ActivateApp(team);
-			else
-				status = B_ERROR;
-
-			// send the reply
-			BPrivate::PortLink replyLink(replyPort);
-			replyLink.StartMessage(status);
-			replyLink.Flush();
-			break;
-		}
-
-		case AS_APP_CRASHED:
-		{
-			BAutolock locker(fApplicationsLock);
-
-			team_id team;
-			if (link.Read(&team) != B_OK)
-				break;
-
-			for (int32 i = 0; i < fApplications.CountItems(); i++) {
-				ServerApp* app = fApplications.ItemAt(i);
-
-				if (app->ClientTeam() == team)
-					app->PostMessage(AS_APP_CRASHED);
-			}
-			break;
-		}
-
-		case AS_EVENT_STREAM_CLOSED:
-			_LaunchInputServer();
-			break;
-
-		case B_QUIT_REQUESTED:
-			// We've been asked to quit, so (for now) broadcast to all
-			// test apps to quit. This situation will occur only when the server
-			// is compiled as a regular Be application.
-
-			fApplicationsLock.Lock();
-			fShutdownSemaphore = create_sem(0, "desktop shutdown");
-			fShutdownCount = fApplications.CountItems();
-			fApplicationsLock.Unlock();
-
-			fQuitting = true;
-			BroadcastToAllApps(AS_QUIT_APP);
-
-			// We now need to process the remaining AS_DELETE_APP messages and
-			// wait for the kMsgShutdownServer message.
-			// If an application does not quit as asked, the picasso thread
-			// will send us this message in 2-3 seconds.
-
-			// if there are no apps to quit, shutdown directly
-			if (fShutdownCount == 0)
-				PostMessage(kMsgQuitLooper);
-			break;
-
-		case AS_ACTIVATE_WORKSPACE:
-		{
-			int32 index;
-			link.Read<int32>(&index);
-
-			if (index == -1)
-				index = fPreviousWorkspace;
-
-			SetWorkspace(index);
-			break;
-		}
-
-		// ToDo: Remove this again. It is a message sent by the
-		// invalidate_on_exit kernel debugger add-on to trigger a redraw
-		// after exiting a kernel debugger session.
-		case 'KDLE':
-		{
-			BRegion dirty;
-			dirty.Include(fVirtualScreen.Frame());
-			MarkDirty(dirty);
-			break;
-		}
-
-		default:
-			printf("Desktop %d:%s received unexpected code %ld\n", 0, "baron", code);
-
-			if (link.NeedsReply()) {
-				// the client is now blocking and waiting for a reply!
-				fLink.StartMessage(B_ERROR);
-				fLink.Flush();
-			}
-			break;
-	}
-}
-
-
-/*!
-	\brief activate one of the app's windows.
-*/
-status_t
-Desktop::_ActivateApp(team_id team)
-{
-	// search for an unhidden window in the current workspace
-
-	AutoWriteLocker locker(fWindowLock);
-
-	for (Window* window = _CurrentWindows().LastWindow(); window != NULL;
-			window = window->PreviousWindow(fCurrentWorkspace)) {
-		if (!window->IsHidden() && window->IsNormal()
-			&& window->ServerWindow()->ClientTeam() == team) {
-			ActivateWindow(window);
-			return B_OK;
-		}
-	}
-
-	// search for an unhidden window to give focus to
-
-	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
-			window = window->NextWindow(kAllWindowList)) {
-		// if window is a normal window of the team, and not hidden,
-		// we've found our target
-		if (!window->IsHidden() && window->IsNormal()
-			&& window->ServerWindow()->ClientTeam() == team) {
-			ActivateWindow(window);
-			return B_OK;
-		}
-	}
-
-	// TODO: we cannot maximize minimized windows here (with the window lock
-	// write locked). To work-around this, we could forward the request to
-	// the ServerApp of this team - it maintains its own window list, and can
-	// therefore call ActivateWindow() without holding the window lock.
-	return B_BAD_VALUE;
-}
-
-
 /*!	\brief Send a quick (no attachments) message to all applications.
 
 	Quite useful for notification for things like server shutdown, system
@@ -738,7 +441,7 @@ Desktop::BroadcastToAllWindows(int32 code)
 }
 
 
-// #pragma mark -
+// #pragma mark - Mouse and cursor methods
 
 
 void
@@ -786,345 +489,7 @@ Desktop::GetLastMouseState(BPoint* position, int32* buttons) const
 }
 
 
-// #pragma mark -
-
-
-/*!
-	\brief Redraws the background (ie. the desktop window, if any).
-*/
-void
-Desktop::RedrawBackground()
-{
-	LockAllWindows();
-
-	BRegion redraw;
-
-	Window* window = _CurrentWindows().FirstWindow();
-	if (window->Feel() == kDesktopWindowFeel) {
-		redraw = window->VisibleContentRegion();
-
-		// look for desktop background view, and update its background color
-		// TODO: is there a better way to do this?
-		View* view = window->TopView();
-		if (view != NULL)
-			view = view->FirstChild();
-
-		while (view) {
-			if (view->IsDesktopBackground()) {
-				view->SetViewColor(fWorkspaces[fCurrentWorkspace].Color());
-				break;
-			}
-			view = view->NextSibling();
-		}
-
-		window->ProcessDirtyRegion(redraw);
-	} else {
-		redraw = BackgroundRegion();
-		fBackgroundRegion.MakeEmpty();
-		_SetBackground(redraw);
-	}
-
-	_WindowChanged(NULL);
-		// update workspaces view as well
-
-	UnlockAllWindows();
-}
-
-
-/*!	\brief Stores the workspace configuration.
-	You must hold the window lock when calling this method.
-*/
-void
-Desktop::StoreWorkspaceConfiguration(int32 index)
-{
-	// Retrieve settings
-
-	BMessage settings;
-	fWorkspaces[index].StoreConfiguration(settings);
-
-	// and store them
-
-	fSettings->SetWorkspacesMessage(index, settings);
-	fSettings->Save(kWorkspacesSettings);
-}
-
-
-status_t
-Desktop::SetWorkspacesLayout(int32 newColumns, int32 newRows)
-{
-	int32 newCount = newColumns * newRows;
-	if (newCount < 1 || newCount > kMaxWorkspaces)
-		return B_BAD_VALUE;
-
-	if (!LockAllWindows())
-		return B_ERROR;
-
-	fSettings->SetWorkspacesLayout(newColumns, newRows);
-
-	// either update the workspaces window, or switch to
-	// the last available workspace - which will update
-	// the workspaces window automatically
-	bool workspaceChanged = CurrentWorkspace() >= newCount;
-	if (workspaceChanged)
-		_SetWorkspace(newCount - 1);
-	else
-		_WindowChanged(NULL);
-
-	UnlockAllWindows();
-
-	if (workspaceChanged)
-		_SendFakeMouseMoved();
-
-	return B_OK;
-}
-
-
-/*!	Returns the virtual screen frame of the workspace specified by \a index.
-*/
-BRect
-Desktop::WorkspaceFrame(int32 index) const
-{
-	BRect frame;
-	if (index == fCurrentWorkspace)
-		frame = fVirtualScreen.Frame();
-	else if (index >= 0 && index < fSettings->WorkspacesCount()) {
-		BMessage screenData;
-		fSettings->WorkspacesMessage(index)->FindMessage("screen", &screenData);
-		if (screenData.FindRect("frame", &frame) != B_OK)
-			frame = fVirtualScreen.Frame();
-	}
-	return frame;
-}
-
-
-/*!	Changes the current workspace to the one specified by \a index.
-*/
-void
-Desktop::SetWorkspaceAsync(int32 index)
-{
-	BPrivate::LinkSender link(MessagePort());
-	link.StartMessage(AS_ACTIVATE_WORKSPACE);
-	link.Attach<int32>(index);
-	link.Flush();
-}
-
-
-/*!	Changes the current workspace to the one specified by \a index.
-	You must not hold any window lock when calling this method.
-*/
-void
-Desktop::SetWorkspace(int32 index)
-{
-	LockAllWindows();
-	DesktopSettings settings(this);
-
-	if (index < 0 || index >= settings.WorkspacesCount()
-		|| index == fCurrentWorkspace) {
-		UnlockAllWindows();
-		return;
-	}
-
-	_SetWorkspace(index);
-	UnlockAllWindows();
-
-	_SendFakeMouseMoved();
-}
-
-
-void
-Desktop::_SetCurrentWorkspaceConfiguration()
-{
-	ASSERT_MULTI_WRITE_LOCKED(fWindowLock);
-
-	uint32 changedScreens;
-	fVirtualScreen.SetConfiguration(*this,
-		fWorkspaces[fCurrentWorkspace].CurrentScreenConfiguration(),
-		&changedScreens);
-
-	for (int32 i = 0; changedScreens != 0; i++, changedScreens /= 2) {
-		if ((changedScreens & (1 << i)) != 0)
-			ScreenChanged(fVirtualScreen.ScreenAt(i));
-	}
-}
-
-
-/*!	Changes the current workspace to the one specified by \a index.
-	You must hold the all window lock when calling this method.
-*/
-void
-Desktop::_SetWorkspace(int32 index)
-{
-	int32 previousIndex = fCurrentWorkspace;
-	rgb_color previousColor = fWorkspaces[fCurrentWorkspace].Color();
-	bool movedMouseEventWindow = false;
-
-	if (fMouseEventWindow != NULL) {
-		if (fMouseEventWindow->IsNormal()) {
-			if (!fMouseEventWindow->InWorkspace(index)) {
-				// The window currently being dragged will follow us to this
-				// workspace if it's not already on it.
-				// But only normal windows are following
-				uint32 oldWorkspaces = fMouseEventWindow->Workspaces();
-
-				_Windows(index).AddWindow(fMouseEventWindow);
-				_Windows(previousIndex).RemoveWindow(fMouseEventWindow);
-
-				_UpdateSubsetWorkspaces(fMouseEventWindow, previousIndex,
-					index);
-				movedMouseEventWindow = true;
-
-				// send B_WORKSPACES_CHANGED message
-				fMouseEventWindow->WorkspacesChanged(oldWorkspaces,
-					fMouseEventWindow->Workspaces());
-			} else {
-				// make sure it's frontmost
-				_Windows(index).RemoveWindow(fMouseEventWindow);
-				_Windows(index).AddWindow(fMouseEventWindow,
-					fMouseEventWindow->Frontmost(_Windows(index).FirstWindow(),
-					index));
-			}
-		}
-
-		fMouseEventWindow->Anchor(index).position
-			= fMouseEventWindow->Frame().LeftTop();
-	}
-
-	// build region of windows that are no longer visible in the new workspace
-
-	BRegion dirty;
-
-	for (Window* window = _CurrentWindows().FirstWindow();
-			window != NULL; window = window->NextWindow(previousIndex)) {
-		// store current position in Workspace anchor
-		window->Anchor(previousIndex).position = window->Frame().LeftTop();
-
-		window->WorkspaceActivated(previousIndex, false);
-
-		if (window->InWorkspace(index))
-			continue;
-
-		if (!window->IsHidden()) {
-			// this window will no longer be visible
-			dirty.Include(&window->VisibleRegion());
-		}
-
-		window->SetCurrentWorkspace(-1);
-	}
-
-	fPreviousWorkspace = fCurrentWorkspace;
-	fCurrentWorkspace = index;
-
-	// Change the display modes, if needed
-	_SetCurrentWorkspaceConfiguration();
-
-	// Show windows, and include them in the changed region - but only
-	// those that were not visible before (or whose position changed)
-
-	WindowList windows(kWorkingList);
-	BList previousRegions;
-
-	for (Window* window = _Windows(index).FirstWindow();
-			window != NULL; window = window->NextWindow(index)) {
-		BPoint position = window->Anchor(index).position;
-
-		window->SetCurrentWorkspace(index);
-
-		if (window->IsHidden())
-			continue;
-
-		if (position == kInvalidWindowPosition) {
-			// if you enter a workspace for the first time, the position
-			// of the window in the previous workspace is adopted
-			position = window->Frame().LeftTop();
-				// TODO: make sure the window is still on-screen if it
-				//	was before!
-		}
-
-		if (!window->InWorkspace(previousIndex)) {
-			// This window was not visible before, make sure its frame
-			// is up-to-date
-			if (window->Frame().LeftTop() != position) {
-				BPoint offset = position - window->Frame().LeftTop();
-				window->MoveBy((int32)offset.x, (int32)offset.y);
-			}
-			continue;
-		}
-
-		if (window->Frame().LeftTop() != position) {
-			// the window was visible before, but its on-screen location changed
-			BPoint offset = position - window->Frame().LeftTop();
-			MoveWindowBy(window, offset.x, offset.y);
-				// TODO: be a bit smarter than this...
-		} else {
-			// We need to remember the previous visible region of the
-			// window if they changed their order
-			BRegion* region = new (std::nothrow)
-				BRegion(window->VisibleRegion());
-			if (region != NULL) {
-				if (previousRegions.AddItem(region))
-					windows.AddWindow(window);
-				else
-					delete region;
-			}
-		}
-	}
-
-	_UpdateFronts(false);
-	_UpdateFloating(previousIndex, index,
-		movedMouseEventWindow ? fMouseEventWindow : NULL);
-
-	BRegion stillAvailableOnScreen;
-	_RebuildClippingForAllWindows(stillAvailableOnScreen);
-	_SetBackground(stillAvailableOnScreen);
-
-	for (Window* window = _Windows(index).FirstWindow(); window != NULL;
-			window = window->NextWindow(index)) {
-		// send B_WORKSPACE_ACTIVATED message
-		window->WorkspaceActivated(index, true);
-
-		if (window->InWorkspace(previousIndex) || window->IsHidden()
-			|| (window == fMouseEventWindow && fMouseEventWindow->IsNormal())
-			|| (!window->IsNormal()
-				&& window->HasInSubset(fMouseEventWindow))) {
-			// This window was visible before, and is already handled in the
-			// above loop
-			continue;
-		}
-
-		dirty.Include(&window->VisibleRegion());
-	}
-
-	// Catch order changes in the new workspaces window list
-	int32 i = 0;
-	for (Window* window = windows.FirstWindow(); window != NULL;
-			window = window->NextWindow(kWorkingList), i++) {
-		BRegion* region = (BRegion*)previousRegions.ItemAt(i);
-		region->ExclusiveInclude(&window->VisibleRegion());
-		dirty.Include(region);
-		delete region;
-	}
-
-	// Set new focus to the front window, but keep focus to a floating
-	// window if still visible
-	if (!_Windows(index).HasWindow(FocusWindow())
-		|| !FocusWindow()->IsFloating())
-		SetFocusWindow(FrontWindow());
-
-	_WindowChanged(NULL);
-	MarkDirty(dirty);
-
-#if 0
-	// Show the dirty regions of this workspace switch
-	if (GetDrawingEngine()->LockParallelAccess()) {
-		GetDrawingEngine()->FillRegion(dirty, (rgb_color){255, 0, 0});
-		GetDrawingEngine()->UnlockParallelAccess();
-		snooze(100000);
-	}
-#endif
-
-	if (previousColor != fWorkspaces[fCurrentWorkspace].Color())
-		RedrawBackground();
-}
+//	#pragma mark - Screen methods
 
 
 status_t
@@ -1181,7 +546,7 @@ Desktop::SetScreenMode(int32 workspace, int32 id, const display_mode& mode,
 		StoreWorkspaceConfiguration(workspace);
 	}
 
-	ScreenChanged(screen);
+	_ScreenChanged(screen);
 	return B_OK;
 }
 
@@ -1295,239 +660,106 @@ Desktop::RevertScreenModes(uint32 workspaces)
 }
 
 
-void
-Desktop::ScreenChanged(Screen* screen)
-{
-	ASSERT_MULTI_WRITE_LOCKED(fWindowLock);
-
-	// the entire screen is dirty, because we're actually
-	// operating on an all new buffer in memory
-	BRegion dirty(screen->Frame());
-
-	// update our cached screen region
-	fScreenRegion.Set(screen->Frame());
-	gInputManager->UpdateScreenBounds(screen->Frame());
-
-	BRegion background;
-	_RebuildClippingForAllWindows(background);
-
-	fBackgroundRegion.MakeEmpty();
-		// makes sure that the complete background is redrawn
-	_SetBackground(background);
-
-	// figure out dirty region
-	dirty.Exclude(&background);
-	_TriggerWindowRedrawing(dirty);
-
-	// send B_SCREEN_CHANGED to windows on that screen
-	BMessage update(B_SCREEN_CHANGED);
-	update.AddInt64("when", real_time_clock_usecs());
-	update.AddRect("frame", screen->Frame());
-	update.AddInt32("mode", screen->ColorSpace());
-
-	fVirtualScreen.UpdateFrame();
-
-	// TODO: currently ignores the screen argument!
-	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
-			window = window->NextWindow(kAllWindowList)) {
-		window->ServerWindow()->ScreenChanged(&update);
-	}
-}
+// #pragma mark - Workspaces methods
 
 
-//	#pragma mark - Methods for Window manipulation
-
-
-WindowList&
-Desktop::_CurrentWindows()
-{
-	return fWorkspaces[fCurrentWorkspace].Windows();
-}
-
-
-WindowList&
-Desktop::_Windows(int32 index)
-{
-	return fWorkspaces[index].Windows();
-}
-
-
-void
-Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace,
-	Window* mouseEventWindow)
-{
-	if (previousWorkspace == -1)
-		previousWorkspace = fCurrentWorkspace;
-	if (nextWorkspace == -1)
-		nextWorkspace = previousWorkspace;
-
-	for (Window* floating = fSubsetWindows.FirstWindow(); floating != NULL;
-			floating = floating->NextWindow(kSubsetList)) {
-		// we only care about app/subset floating windows
-		if (floating->Feel() != B_FLOATING_SUBSET_WINDOW_FEEL
-			&& floating->Feel() != B_FLOATING_APP_WINDOW_FEEL)
-			continue;
-
-		if (fFront != NULL && fFront->IsNormal()
-			&& floating->HasInSubset(fFront)) {
-			// is now visible
-			if (_Windows(previousWorkspace).HasWindow(floating)
-				&& previousWorkspace != nextWorkspace
-				&& !floating->InSubsetWorkspace(previousWorkspace)) {
-				// but no longer on the previous workspace
-				_Windows(previousWorkspace).RemoveWindow(floating);
-				floating->SetCurrentWorkspace(-1);
-			}
-
-			if (!_Windows(nextWorkspace).HasWindow(floating)) {
-				// but wasn't before
-				_Windows(nextWorkspace).AddWindow(floating,
-					floating->Frontmost(_Windows(nextWorkspace).FirstWindow(),
-					nextWorkspace));
-				floating->SetCurrentWorkspace(nextWorkspace);
-				if (mouseEventWindow != fFront)
-					_ShowWindow(floating);
-
-				// TODO: put the floating last in the floating window list to
-				// preserve the on screen window order
-			}
-		} else if (_Windows(previousWorkspace).HasWindow(floating)
-			&& !floating->InSubsetWorkspace(previousWorkspace)) {
-			// was visible, but is no longer
-
-			_Windows(previousWorkspace).RemoveWindow(floating);
-			floating->SetCurrentWorkspace(-1);
-			_HideWindow(floating);
-
-			if (FocusWindow() == floating)
-				SetFocusWindow();
-		}
-	}
-}
-
-
-/*!	Search the visible windows for a valid back window
-	(only desktop windows can't be back windows)
+/*!	Changes the current workspace to the one specified by \a index.
 */
 void
-Desktop::_UpdateBack()
+Desktop::SetWorkspaceAsync(int32 index)
 {
-	fBack = NULL;
-
-	for (Window* window = _CurrentWindows().FirstWindow();
-			window != NULL; window = window->NextWindow(fCurrentWorkspace)) {
-		if (window->IsHidden() || window->Feel() == kDesktopWindowFeel)
-			continue;
-
-		fBack = window;
-		break;
-	}
+	BPrivate::LinkSender link(MessagePort());
+	link.StartMessage(AS_ACTIVATE_WORKSPACE);
+	link.Attach<int32>(index);
+	link.Flush();
 }
 
 
-/*!	Search the visible windows for a valid front window
-	(only normal and modal windows can be front windows)
-
-	The only place where you don't want to update floating windows is
-	during a workspace change - because then you'll call _UpdateFloating()
-	yourself.
+/*!	Changes the current workspace to the one specified by \a index.
+	You must not hold any window lock when calling this method.
 */
 void
-Desktop::_UpdateFront(bool updateFloating)
+Desktop::SetWorkspace(int32 index)
 {
-	fFront = NULL;
+	LockAllWindows();
+	DesktopSettings settings(this);
 
-	for (Window* window = _CurrentWindows().LastWindow();
-			window != NULL; window = window->PreviousWindow(fCurrentWorkspace)) {
-		if (window->IsHidden() || window->IsFloating() || !window->SupportsFront())
-			continue;
-
-		fFront = window;
-		break;
+	if (index < 0 || index >= settings.WorkspacesCount()
+		|| index == fCurrentWorkspace) {
+		UnlockAllWindows();
+		return;
 	}
 
-	if (updateFloating)
-		_UpdateFloating();
+	_SetWorkspace(index);
+	UnlockAllWindows();
+
+	_SendFakeMouseMoved();
 }
 
 
-void
-Desktop::_UpdateFronts(bool updateFloating)
+status_t
+Desktop::SetWorkspacesLayout(int32 newColumns, int32 newRows)
 {
-	_UpdateBack();
-	_UpdateFront(updateFloating);
+	int32 newCount = newColumns * newRows;
+	if (newCount < 1 || newCount > kMaxWorkspaces)
+		return B_BAD_VALUE;
+
+	if (!LockAllWindows())
+		return B_ERROR;
+
+	fSettings->SetWorkspacesLayout(newColumns, newRows);
+
+	// either update the workspaces window, or switch to
+	// the last available workspace - which will update
+	// the workspaces window automatically
+	bool workspaceChanged = CurrentWorkspace() >= newCount;
+	if (workspaceChanged)
+		_SetWorkspace(newCount - 1);
+	else
+		_WindowChanged(NULL);
+
+	UnlockAllWindows();
+
+	if (workspaceChanged)
+		_SendFakeMouseMoved();
+
+	return B_OK;
 }
 
 
-/*!
-	Returns the current keyboard event target candidate - which is either the
-	top-most window (in case it's a menu), or the one having focus.
-	The window lock must be held when calling this function.
+/*!	Returns the virtual screen frame of the workspace specified by \a index.
 */
-EventTarget*
-Desktop::KeyboardEventTarget()
+BRect
+Desktop::WorkspaceFrame(int32 index) const
 {
-	Window* window = _CurrentWindows().LastWindow();
-	while (window != NULL && window->IsHidden()) {
-		window = window->PreviousWindow(fCurrentWorkspace);
+	BRect frame;
+	if (index == fCurrentWorkspace)
+		frame = fVirtualScreen.Frame();
+	else if (index >= 0 && index < fSettings->WorkspacesCount()) {
+		BMessage screenData;
+		fSettings->WorkspacesMessage(index)->FindMessage("screen", &screenData);
+		if (screenData.FindRect("frame", &frame) != B_OK)
+			frame = fVirtualScreen.Frame();
 	}
-	if (window != NULL && window->Feel() == kMenuWindowFeel)
-		return &window->EventTarget();
-
-	if (FocusWindow() != NULL)
-		return &FocusWindow()->EventTarget();
-
-	return NULL;
+	return frame;
 }
 
 
-bool
-Desktop::_WindowHasModal(Window* window)
-{
-	if (window == NULL)
-		return false;
-
-	for (Window* modal = fSubsetWindows.FirstWindow(); modal != NULL;
-			modal = modal->NextWindow(kSubsetList)) {
-		// only visible modal windows count
-		if (!modal->IsModal() || modal->IsHidden())
-			continue;
-
-		if (modal->HasInSubset(window))
-			return true;
-	}
-
-	return false;
-}
-
-
-/*!
-	You must at least hold a single window lock when calling this method.
+/*!	\brief Stores the workspace configuration.
+	You must hold the window lock when calling this method.
 */
 void
-Desktop::_WindowChanged(Window* window)
+Desktop::StoreWorkspaceConfiguration(int32 index)
 {
-	BAutolock _(fWorkspacesLock);
+	// Retrieve settings
 
-	for (uint32 i = fWorkspacesViews.CountItems(); i-- > 0;) {
-		WorkspacesView* view = fWorkspacesViews.ItemAt(i);
-		view->WindowChanged(window);
-	}
-}
+	BMessage settings;
+	fWorkspaces[index].StoreConfiguration(settings);
 
+	// and store them
 
-/*!
-	You must at least hold a single window lock when calling this method.
-*/
-void
-Desktop::_WindowRemoved(Window* window)
-{
-	BAutolock _(fWorkspacesLock);
-
-	for (uint32 i = fWorkspacesViews.CountItems(); i-- > 0;) {
-		WorkspacesView* view = fWorkspacesViews.ItemAt(i);
-		view->WindowRemoved(window);
-	}
+	fSettings->SetWorkspacesMessage(index, settings);
+	fSettings->Save(kWorkspacesSettings);
 }
 
 
@@ -1552,243 +784,7 @@ Desktop::RemoveWorkspacesView(WorkspacesView* view)
 }
 
 
-/*!	\brief Sends a fake B_MOUSE_MOVED event to the window under the mouse,
-		and also updates the current view under the mouse.
-
-	This has only to be done in case the view changed without user interaction,
-	ie. because of a workspace change or a closing window.
-*/
-void
-Desktop::_SendFakeMouseMoved(Window* window)
-{
-	int32 viewToken = B_NULL_TOKEN;
-	EventTarget* target = NULL;
-
-	LockAllWindows();
-
-	if (window == NULL)
-		window = MouseEventWindow();
-	if (window == NULL)
-		window = WindowAt(fLastMousePosition);
-
-	if (window != NULL) {
-		BMessage message;
-		window->MouseMoved(&message, fLastMousePosition, &viewToken, true,
-			true);
-
-		if (viewToken != B_NULL_TOKEN)
-			target = &window->EventTarget();
-	}
-
-	if (viewToken != B_NULL_TOKEN)
-		SetViewUnderMouse(window, viewToken);
-	else {
-		SetViewUnderMouse(NULL, B_NULL_TOKEN);
-		SetCursor(NULL);
-	}
-
-	UnlockAllWindows();
-
-	if (target != NULL)
-		EventDispatcher().SendFakeMouseMoved(*target, viewToken);
-}
-
-
-/*!	Tries to set the focus to the specified \a focus window. It will make sure,
-	however, that the window actually can have focus.
-
-	Besides the B_AVOID_FOCUS flag, a modal window, or a BWindowScreen can both
-	prevent it from getting focus.
-
-	In any case, this method makes sure that there is a focus window, if there
-	is any window at all, that is.
-*/
-void
-Desktop::SetFocusWindow(Window* focus)
-{
-	if (!LockAllWindows())
-		return;
-
-	// test for B_LOCK_WINDOW_FOCUS
-	if (fLockedFocusWindow && focus != fLockedFocusWindow) {
-		UnlockAllWindows();
-		return;
-	}
-
-	bool hasModal = _WindowHasModal(focus);
-	bool hasWindowScreen = false;
-
-	if (!hasModal && focus != NULL) {
-		// Check whether or not a window screen is in front of the window
-		// (if it has a modal, the right thing is done, anyway)
-		Window* window = focus;
-		while (true) {
-			window = window->NextWindow(fCurrentWorkspace);
-			if (window == NULL || window->Feel() == kWindowScreenFeel)
-				break;
-		}
-		if (window != NULL)
-			hasWindowScreen = true;
-	}
-
-	if (focus == fFocus && focus != NULL && !focus->IsHidden()
-		&& (focus->Flags() & B_AVOID_FOCUS) == 0
-		&& !hasModal && !hasWindowScreen) {
-		// the window that is supposed to get focus already has focus
-		UnlockAllWindows();
-		return;
-	}
-
-	uint32 list = fCurrentWorkspace;
-
-	if (fSettings->FocusFollowsMouse())
-		list = kFocusList;
-
-	if (focus == NULL || hasModal || hasWindowScreen) {
-		if (!fSettings->FocusFollowsMouse()) {
-			focus = FrontWindow();
-			if (focus == NULL) {
-				// there might be no front window in case of only a single
-				// window with B_FLOATING_ALL_WINDOW_FEEL
-				focus = _CurrentWindows().LastWindow();
-			}
-		} else
-			focus = fFocusList.LastWindow();
-	}
-
-	// make sure no window is chosen that doesn't want focus or cannot have it
-	while (focus != NULL
-		&& (!focus->InWorkspace(fCurrentWorkspace)
-			|| (focus->Flags() & B_AVOID_FOCUS) != 0
-			|| _WindowHasModal(focus)
-			|| focus->IsHidden())) {
-		focus = focus->PreviousWindow(list);
-	}
-
-	if (fFocus == focus) {
-		// turns out the window that is supposed to get focus now already has it
-		UnlockAllWindows();
-		return;
-	}
-
-	team_id oldActiveApp = -1;
-	team_id newActiveApp = -1;
-
-	if (fFocus != NULL) {
-		fFocus->SetFocus(false);
-		oldActiveApp = fFocus->ServerWindow()->App()->ClientTeam();
-	}
-
-	fFocus = focus;
-
-	if (fFocus != NULL) {
-		fFocus->SetFocus(true);
-		newActiveApp = fFocus->ServerWindow()->App()->ClientTeam();
-
-		// move current focus to the end of the focus list
-		fFocusList.RemoveWindow(fFocus);
-		fFocusList.AddWindow(fFocus);
-	}
-
-	if (newActiveApp == -1) {
-		// make sure the cursor is visible
-		HWInterface()->SetCursorVisible(true);
-	}
-
-	UnlockAllWindows();
-
-	// change the "active" app if appropriate
-	if (oldActiveApp == newActiveApp)
-		return;
-
-	BAutolock locker(fApplicationsLock);
-
-	for (int32 i = 0; i < fApplications.CountItems(); i++) {
-		ServerApp* app = fApplications.ItemAt(i);
-
-		if (oldActiveApp != -1 && app->ClientTeam() == oldActiveApp)
-			app->Activate(false);
-		else if (newActiveApp != -1 && app->ClientTeam() == newActiveApp)
-			app->Activate(true);
-	}
-}
-
-
-void
-Desktop::SetFocusLocked(const Window* window)
-{
-	AutoWriteLocker _(fWindowLock);
-
-	if (window != NULL) {
-		// Don't allow this to be set when no mouse buttons
-		// are pressed. (BView::SetMouseEventMask() should only be called
-		// from mouse hooks.)
-		if (fLastMouseButtons == 0)
-			return;
-	}
-
-	fLockedFocusWindow = window;
-}
-
-
-void
-Desktop::_BringWindowsToFront(WindowList& windows, int32 list,
-	bool wereVisible)
-{
-	// we don't need to redraw what is currently
-	// visible of the window
-	BRegion clean;
-
-	for (Window* window = windows.FirstWindow(); window != NULL;
-			window = window->NextWindow(list)) {
-		if (wereVisible)
-			clean.Include(&window->VisibleRegion());
-
-		_CurrentWindows().AddWindow(window,
-			window->Frontmost(_CurrentWindows().FirstWindow(),
-				fCurrentWorkspace));
-
-		_WindowChanged(window);
-	}
-
-	BRegion dummy;
-	_RebuildClippingForAllWindows(dummy);
-
-	// redraw what became visible of the window(s)
-
-	BRegion dirty;
-	for (Window* window = windows.FirstWindow(); window != NULL;
-			window = window->NextWindow(list)) {
-		dirty.Include(&window->VisibleRegion());
-	}
-
-	dirty.Exclude(&clean);
-	MarkDirty(dirty);
-
-	_UpdateFront();
-
-	if (windows.FirstWindow() == fBack || fBack == NULL)
-		_UpdateBack();
-}
-
-
-/*!	Returns the last focussed non-hidden subset window belonging to the
-	specified \a window.
-*/
-Window*
-Desktop::_LastFocusSubsetWindow(Window* window)
-{
-	if (window == NULL)
-		return NULL;
-
-	for (Window* front = fFocusList.LastWindow(); front != NULL;
-			front = front->PreviousWindow(kFocusList)) {
-		if (front != window && !front->IsHidden() && window->HasInSubset(front))
-			return front;
-	}
-
-	return NULL;
-}
+//	#pragma mark - Methods for Window manipulation
 
 
 /*!	\brief Tries to move the specified window to the front of the screen,
@@ -2058,61 +1054,6 @@ Desktop::HideWindow(Window* window)
 }
 
 
-/*!
-	Shows the window on the screen - it does this independently of the
-	Window::IsHidden() state.
-*/
-void
-Desktop::_ShowWindow(Window* window, bool affectsOtherWindows)
-{
-	BRegion background;
-	_RebuildClippingForAllWindows(background);
-	_SetBackground(background);
-	_WindowChanged(window);
-
-	BRegion dirty(window->VisibleRegion());
-
-	if (!affectsOtherWindows) {
-		// everything that is now visible in the
-		// window needs a redraw, but other windows
-		// are not affected, we can call ProcessDirtyRegion()
-		// of the window, and don't have to use MarkDirty()
-		window->ProcessDirtyRegion(dirty);
-	} else
-		MarkDirty(dirty);
-
-	window->ServerWindow()->HandleDirectConnection(
-		B_DIRECT_START | B_BUFFER_RESET);
-}
-
-
-/*!
-	Hides the window from the screen - it does this independently of the
-	Window::IsHidden() state.
-*/
-void
-Desktop::_HideWindow(Window* window)
-{
-	window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
-
-	// after rebuilding the clipping,
-	// this window will not have a visible
-	// region anymore, so we need to remember
-	// it now
-	// (actually that's not true, since
-	// hidden windows are excluded from the
-	// clipping calculation, but anyways)
-	BRegion dirty(window->VisibleRegion());
-
-	BRegion background;
-	_RebuildClippingForAllWindows(background);
-	_SetBackground(background);
-	_WindowChanged(window);
-
-	MarkDirty(dirty);
-}
-
-
 void
 Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 {
@@ -2249,120 +1190,6 @@ Desktop::SetWindowDecoratorSettings(Window* window, const BMessage& settings)
 		_RebuildAndRedrawAfterWindowChange(window, dirty);
 
 	return changed;
-}
-
-
-/*!	Updates the workspaces of all subset windows with regard to the
-	specifed window.
-	If newIndex is not -1, it will move all subset windows that belong to
-	the specifed window to the new workspace; this form is only called by
-	SetWorkspace().
-*/
-void
-Desktop::_UpdateSubsetWorkspaces(Window* window, int32 previousIndex,
-	int32 newIndex)
-{
-	STRACE(("_UpdateSubsetWorkspaces(window %p, %s)\n", window, window->Title()));
-
-	// if the window is hidden, the subset windows are up-to-date already
-	if (!window->IsNormal() || window->IsHidden())
-		return;
-
-	for (Window* subset = fSubsetWindows.FirstWindow(); subset != NULL;
-			subset = subset->NextWindow(kSubsetList)) {
-		if (subset->Feel() == B_MODAL_ALL_WINDOW_FEEL
-			|| subset->Feel() == B_FLOATING_ALL_WINDOW_FEEL) {
-			// These windows are always visible on all workspaces,
-			// no need to update them.
-			continue;
-		}
-
-		if (subset->IsFloating()) {
-			// Floating windows are inserted and removed to the current
-			// workspace as the need arises - they are not handled here
-			// but in _UpdateFront()
-			continue;
-		}
-
-		if (subset->HasInSubset(window)) {
-			// adopt the workspace change
-			SetWindowWorkspaces(subset, subset->SubsetWorkspaces());
-		}
-	}
-}
-
-
-/*!
-	\brief Adds or removes the window to or from the workspaces it's on.
-*/
-void
-Desktop::_ChangeWindowWorkspaces(Window* window, uint32 oldWorkspaces,
-	uint32 newWorkspaces)
-{
-	if (oldWorkspaces == newWorkspaces)
-		return;
-
-	// apply changes to the workspaces' window lists
-
-	LockAllWindows();
-
-	// NOTE: we bypass the anchor-mechanism by intention when switching
-	// the workspace programmatically.
-
-	for (int32 i = 0; i < kMaxWorkspaces; i++) {
-		if (workspace_in_workspaces(i, oldWorkspaces)) {
-			// window is on this workspace, is it anymore?
-			if (!workspace_in_workspaces(i, newWorkspaces)) {
-				_Windows(i).RemoveWindow(window);
-
-				if (i == CurrentWorkspace()) {
-					// remove its appearance from the current workspace
-					window->SetCurrentWorkspace(-1);
-
-					if (!window->IsHidden())
-						_HideWindow(window);
-				}
-			}
-		} else {
-			// window was not on this workspace, is it now?
-			if (workspace_in_workspaces(i, newWorkspaces)) {
-				_Windows(i).AddWindow(window,
-					window->Frontmost(_Windows(i).FirstWindow(), i));
-
-				if (i == CurrentWorkspace()) {
-					// make the window visible in current workspace
-					window->SetCurrentWorkspace(fCurrentWorkspace);
-
-					if (!window->IsHidden()) {
-						// this only affects other windows if this windows has floating or
-						// modal windows that need to be shown as well
-						// TODO: take care of this
-						_ShowWindow(window, FrontWindow() == window);
-					}
-				}
-			}
-		}
-	}
-
-	// If the window is visible only on one workspace, we set it's current
-	// position in that workspace (so that WorkspacesView will find us).
-	int32 firstWorkspace = -1;
-	for (int32 i = 0; i < kMaxWorkspaces; i++) {
-		if ((newWorkspaces & (1L << i)) != 0) {
-			if (firstWorkspace != -1) {
-				firstWorkspace = -1;
-				break;
-			}
-			firstWorkspace = i;
-		}
-	}
-	if (firstWorkspace >= 0)
-		window->Anchor(firstWorkspace).position = window->Frame().LeftTop();
-
-	// take care about modals and floating windows
-	_UpdateSubsetWorkspaces(window);
-
-	UnlockAllWindows();
 }
 
 
@@ -2608,8 +1435,7 @@ Desktop::SetWindowTitle(Window *window, const char* title)
 }
 
 
-/*!
-	Returns the window under the mouse cursor.
+/*!	Returns the window under the mouse cursor.
 	You need to have acquired the All Windows lock when calling this method.
 */
 Window*
@@ -2650,6 +1476,164 @@ Desktop::ViewUnderMouse(const Window* window)
 }
 
 
+/*!	Returns the current keyboard event target candidate - which is either the
+	top-most window (in case it's a menu), or the one having focus.
+	The window lock must be held when calling this function.
+*/
+EventTarget*
+Desktop::KeyboardEventTarget()
+{
+	Window* window = _CurrentWindows().LastWindow();
+	while (window != NULL && window->IsHidden()) {
+		window = window->PreviousWindow(fCurrentWorkspace);
+	}
+	if (window != NULL && window->Feel() == kMenuWindowFeel)
+		return &window->EventTarget();
+
+	if (FocusWindow() != NULL)
+		return &FocusWindow()->EventTarget();
+
+	return NULL;
+}
+
+
+/*!	Tries to set the focus to the specified \a focus window. It will make sure,
+	however, that the window actually can have focus.
+
+	Besides the B_AVOID_FOCUS flag, a modal window, or a BWindowScreen can both
+	prevent it from getting focus.
+
+	In any case, this method makes sure that there is a focus window, if there
+	is any window at all, that is.
+*/
+void
+Desktop::SetFocusWindow(Window* focus)
+{
+	if (!LockAllWindows())
+		return;
+
+	// test for B_LOCK_WINDOW_FOCUS
+	if (fLockedFocusWindow && focus != fLockedFocusWindow) {
+		UnlockAllWindows();
+		return;
+	}
+
+	bool hasModal = _WindowHasModal(focus);
+	bool hasWindowScreen = false;
+
+	if (!hasModal && focus != NULL) {
+		// Check whether or not a window screen is in front of the window
+		// (if it has a modal, the right thing is done, anyway)
+		Window* window = focus;
+		while (true) {
+			window = window->NextWindow(fCurrentWorkspace);
+			if (window == NULL || window->Feel() == kWindowScreenFeel)
+				break;
+		}
+		if (window != NULL)
+			hasWindowScreen = true;
+	}
+
+	if (focus == fFocus && focus != NULL && !focus->IsHidden()
+		&& (focus->Flags() & B_AVOID_FOCUS) == 0
+		&& !hasModal && !hasWindowScreen) {
+		// the window that is supposed to get focus already has focus
+		UnlockAllWindows();
+		return;
+	}
+
+	uint32 list = fCurrentWorkspace;
+
+	if (fSettings->FocusFollowsMouse())
+		list = kFocusList;
+
+	if (focus == NULL || hasModal || hasWindowScreen) {
+		if (!fSettings->FocusFollowsMouse()) {
+			focus = FrontWindow();
+			if (focus == NULL) {
+				// there might be no front window in case of only a single
+				// window with B_FLOATING_ALL_WINDOW_FEEL
+				focus = _CurrentWindows().LastWindow();
+			}
+		} else
+			focus = fFocusList.LastWindow();
+	}
+
+	// make sure no window is chosen that doesn't want focus or cannot have it
+	while (focus != NULL
+		&& (!focus->InWorkspace(fCurrentWorkspace)
+			|| (focus->Flags() & B_AVOID_FOCUS) != 0
+			|| _WindowHasModal(focus)
+			|| focus->IsHidden())) {
+		focus = focus->PreviousWindow(list);
+	}
+
+	if (fFocus == focus) {
+		// turns out the window that is supposed to get focus now already has it
+		UnlockAllWindows();
+		return;
+	}
+
+	team_id oldActiveApp = -1;
+	team_id newActiveApp = -1;
+
+	if (fFocus != NULL) {
+		fFocus->SetFocus(false);
+		oldActiveApp = fFocus->ServerWindow()->App()->ClientTeam();
+	}
+
+	fFocus = focus;
+
+	if (fFocus != NULL) {
+		fFocus->SetFocus(true);
+		newActiveApp = fFocus->ServerWindow()->App()->ClientTeam();
+
+		// move current focus to the end of the focus list
+		fFocusList.RemoveWindow(fFocus);
+		fFocusList.AddWindow(fFocus);
+	}
+
+	if (newActiveApp == -1) {
+		// make sure the cursor is visible
+		HWInterface()->SetCursorVisible(true);
+	}
+
+	UnlockAllWindows();
+
+	// change the "active" app if appropriate
+	if (oldActiveApp == newActiveApp)
+		return;
+
+	BAutolock locker(fApplicationsLock);
+
+	for (int32 i = 0; i < fApplications.CountItems(); i++) {
+		ServerApp* app = fApplications.ItemAt(i);
+
+		if (oldActiveApp != -1 && app->ClientTeam() == oldActiveApp)
+			app->Activate(false);
+		else if (newActiveApp != -1 && app->ClientTeam() == newActiveApp)
+			app->Activate(true);
+	}
+}
+
+
+void
+Desktop::SetFocusLocked(const Window* window)
+{
+	AutoWriteLocker _(fWindowLock);
+
+	if (window != NULL) {
+		// Don't allow this to be set when no mouse buttons
+		// are pressed. (BView::SetMouseEventMask() should only be called
+		// from mouse hooks.)
+		if (fLastMouseButtons == 0)
+			return;
+	}
+
+	fLockedFocusWindow = window;
+}
+
+
 Window*
 Desktop::FindWindowByClientToken(int32 token, team_id teamID)
 {
@@ -2675,6 +1659,70 @@ Desktop::FindTarget(BMessenger& messenger)
 	}
 
 	return NULL;
+}
+
+
+void
+Desktop::MarkDirty(BRegion& region)
+{
+	if (region.CountRects() == 0)
+		return;
+
+	if (LockAllWindows()) {
+		// send redraw messages to all windows intersecting the dirty region
+		_TriggerWindowRedrawing(region);
+
+		UnlockAllWindows();
+	}
+}
+
+
+void
+Desktop::Redraw()
+{
+	BRegion dirty(fVirtualScreen.Frame());
+	MarkDirty(dirty);
+}
+
+
+/*!	\brief Redraws the background (ie. the desktop window, if any).
+*/
+void
+Desktop::RedrawBackground()
+{
+	LockAllWindows();
+
+	BRegion redraw;
+
+	Window* window = _CurrentWindows().FirstWindow();
+	if (window->Feel() == kDesktopWindowFeel) {
+		redraw = window->VisibleContentRegion();
+
+		// look for desktop background view, and update its background color
+		// TODO: is there a better way to do this?
+		View* view = window->TopView();
+		if (view != NULL)
+			view = view->FirstChild();
+
+		while (view) {
+			if (view->IsDesktopBackground()) {
+				view->SetViewColor(fWorkspaces[fCurrentWorkspace].Color());
+				break;
+			}
+			view = view->NextSibling();
+		}
+
+		window->ProcessDirtyRegion(redraw);
+	} else {
+		redraw = BackgroundRegion();
+		fBackgroundRegion.MakeEmpty();
+		_SetBackground(redraw);
+	}
+
+	_WindowChanged(NULL);
+		// update workspaces view as well
+
+	UnlockAllWindows();
 }
 
 
@@ -2933,25 +1981,700 @@ Desktop::WriteApplicationOrder(int32 workspace, BPrivate::LinkSender& sender)
 
 
 void
-Desktop::MarkDirty(BRegion& region)
+Desktop::_LaunchInputServer()
 {
-	if (region.CountRects() == 0)
+	BRoster roster;
+	status_t status = roster.Launch("application/x-vnd.Be-input_server");
+	if (status == B_OK || status == B_ALREADY_RUNNING)
 		return;
 
-	if (LockAllWindows()) {
-		// send redraw messages to all windows intersecting the dirty region
-		_TriggerWindowRedrawing(region);
+	// Could not load input_server by signature, try well-known location
 
-		UnlockAllWindows();
+	BEntry entry("/system/servers/input_server");
+	entry_ref ref;
+	status_t entryStatus = entry.GetRef(&ref);
+	if (entryStatus == B_OK)
+		entryStatus = roster.Launch(&ref);
+	if (entryStatus == B_OK || entryStatus == B_ALREADY_RUNNING) {
+		syslog(LOG_ERR, "Failed to launch the input server by signature: %s!\n",
+			strerror(status));
+		return;
 	}
+
+	syslog(LOG_ERR, "Failed to launch the input server: %s!\n",
+		strerror(entryStatus));
 }
 
 
 void
-Desktop::Redraw()
+Desktop::_GetLooperName(char* name, size_t length)
 {
-	BRegion dirty(fVirtualScreen.Frame());
+	snprintf(name, length, "d:%d:%s", /*id*/0, /*name*/"baron");
+}
+
+
+void
+Desktop::_PrepareQuit()
+{
+	// let's kill all remaining applications
+
+	fApplicationsLock.Lock();
+
+	int32 count = fApplications.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		ServerApp *app = fApplications.ItemAt(i);
+		team_id clientTeam = app->ClientTeam();
+
+		app->Quit();
+		kill_team(clientTeam);
+	}
+
+	// wait for the last app to die
+	if (count > 0)
+		acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT, 250000);
+
+	fApplicationsLock.Unlock();
+}
+
+
+void
+Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
+{
+	switch (code) {
+		case AS_CREATE_APP:
+		{
+			// Create the ServerApp to node monitor a new BApplication
+
+			// Attached data:
+			// 1) port_id - receiver port of a regular app
+			// 2) port_id - client looper port - for sending messages to the client
+			// 2) team_id - app's team ID
+			// 3) int32 - handler token of the regular app
+			// 4) char * - signature of the regular app
+
+			// Find the necessary data
+			team_id	clientTeamID = -1;
+			port_id	clientLooperPort = -1;
+			port_id clientReplyPort = -1;
+			int32 htoken = B_NULL_TOKEN;
+			char *appSignature = NULL;
+
+			link.Read<port_id>(&clientReplyPort);
+			link.Read<port_id>(&clientLooperPort);
+			link.Read<team_id>(&clientTeamID);
+			link.Read<int32>(&htoken);
+			if (link.ReadString(&appSignature) != B_OK)
+				break;
+
+			ServerApp *app = new ServerApp(this, clientReplyPort,
+				clientLooperPort, clientTeamID, htoken, appSignature);
+			if (app->InitCheck() == B_OK
+				&& app->Run()) {
+				// add the new ServerApp to the known list of ServerApps
+				fApplicationsLock.Lock();
+				fApplications.AddItem(app);
+				fApplicationsLock.Unlock();
+			} else {
+				delete app;
+
+				// if everything went well, ServerApp::Run() will notify
+				// the client - but since it didn't, we do it here
+				BPrivate::LinkSender reply(clientReplyPort);
+				reply.StartMessage(B_ERROR);
+				reply.Flush();
+			}
+
+			// This is necessary because BPortLink::ReadString allocates memory
+			free(appSignature);
+			break;
+		}
+
+		case AS_DELETE_APP:
+		{
+			// Delete a ServerApp. Received only from the respective ServerApp when a
+			// BApplication asks it to quit.
+
+			// Attached Data:
+			// 1) thread_id - thread ID of the ServerApp to be deleted
+
+			thread_id thread = -1;
+			if (link.Read<thread_id>(&thread) < B_OK)
+				break;
+
+			fApplicationsLock.Lock();
+
+			// Run through the list of apps and nuke the proper one
+
+			int32 count = fApplications.CountItems();
+			ServerApp *removeApp = NULL;
+
+			for (int32 i = 0; i < count; i++) {
+				ServerApp *app = fApplications.ItemAt(i);
+
+				if (app->Thread() == thread) {
+					fApplications.RemoveItemAt(i);
+					removeApp = app;
+					break;
+				}
+			}
+
+			fApplicationsLock.Unlock();
+
+			if (removeApp != NULL)
+				removeApp->Quit(fShutdownSemaphore);
+
+			if (fQuitting && count <= 1) {
+				// wait for the last app to die
+				acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT, 500000);
+				PostMessage(kMsgQuitLooper);
+			}
+			break;
+		}
+
+		case AS_ACTIVATE_APP:
+		{
+			// Someone is requesting to activation of a certain app.
+
+			// Attached data:
+			// 1) port_id reply port
+			// 2) team_id team
+
+			status_t status;
+
+			// get the parameters
+			port_id replyPort;
+			team_id team;
+			if (link.Read(&replyPort) == B_OK
+				&& link.Read(&team) == B_OK)
+				status = _ActivateApp(team);
+			else
+				status = B_ERROR;
+
+			// send the reply
+			BPrivate::PortLink replyLink(replyPort);
+			replyLink.StartMessage(status);
+			replyLink.Flush();
+			break;
+		}
+
+		case AS_APP_CRASHED:
+		{
+			BAutolock locker(fApplicationsLock);
+
+			team_id team;
+			if (link.Read(&team) != B_OK)
+				break;
+
+			for (int32 i = 0; i < fApplications.CountItems(); i++) {
+				ServerApp* app = fApplications.ItemAt(i);
+
+				if (app->ClientTeam() == team)
+					app->PostMessage(AS_APP_CRASHED);
+			}
+			break;
+		}
+
+		case AS_EVENT_STREAM_CLOSED:
+			_LaunchInputServer();
+			break;
+
+		case B_QUIT_REQUESTED:
+			// We've been asked to quit, so (for now) broadcast to all
+			// test apps to quit. This situation will occur only when the server
+			// is compiled as a regular Be application.
+
+			fApplicationsLock.Lock();
+			fShutdownSemaphore = create_sem(0, "desktop shutdown");
+			fShutdownCount = fApplications.CountItems();
+			fApplicationsLock.Unlock();
+
+			fQuitting = true;
+			BroadcastToAllApps(AS_QUIT_APP);
+
+			// We now need to process the remaining AS_DELETE_APP messages and
+			// wait for the kMsgShutdownServer message.
+			// If an application does not quit as asked, the picasso thread
+			// will send us this message in 2-3 seconds.
+
+			// if there are no apps to quit, shutdown directly
+			if (fShutdownCount == 0)
+				PostMessage(kMsgQuitLooper);
+			break;
+
+		case AS_ACTIVATE_WORKSPACE:
+		{
+			int32 index;
+			link.Read<int32>(&index);
+
+			if (index == -1)
+				index = fPreviousWorkspace;
+
+			SetWorkspace(index);
+			break;
+		}
+
+		// ToDo: Remove this again. It is a message sent by the
+		// invalidate_on_exit kernel debugger add-on to trigger a redraw
+		// after exiting a kernel debugger session.
+		case 'KDLE':
+		{
+			BRegion dirty;
+			dirty.Include(fVirtualScreen.Frame());
+			MarkDirty(dirty);
+			break;
+		}
+
+		default:
+			printf("Desktop %d:%s received unexpected code %ld\n", 0, "baron", code);
+
+			if (link.NeedsReply()) {
+				// the client is now blocking and waiting for a reply!
+				fLink.StartMessage(B_ERROR);
+				fLink.Flush();
+			}
+			break;
+	}
+}
+
+
+WindowList&
+Desktop::_CurrentWindows()
+{
+	return fWorkspaces[fCurrentWorkspace].Windows();
+}
+
+
+WindowList&
+Desktop::_Windows(int32 index)
+{
+	return fWorkspaces[index].Windows();
+}
+
+
+void
+Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace,
+	Window* mouseEventWindow)
+{
+	if (previousWorkspace == -1)
+		previousWorkspace = fCurrentWorkspace;
+	if (nextWorkspace == -1)
+		nextWorkspace = previousWorkspace;
+
+	for (Window* floating = fSubsetWindows.FirstWindow(); floating != NULL;
+			floating = floating->NextWindow(kSubsetList)) {
+		// we only care about app/subset floating windows
+		if (floating->Feel() != B_FLOATING_SUBSET_WINDOW_FEEL
+			&& floating->Feel() != B_FLOATING_APP_WINDOW_FEEL)
+			continue;
+
+		if (fFront != NULL && fFront->IsNormal()
+			&& floating->HasInSubset(fFront)) {
+			// is now visible
+			if (_Windows(previousWorkspace).HasWindow(floating)
+				&& previousWorkspace != nextWorkspace
+				&& !floating->InSubsetWorkspace(previousWorkspace)) {
+				// but no longer on the previous workspace
+				_Windows(previousWorkspace).RemoveWindow(floating);
+				floating->SetCurrentWorkspace(-1);
+			}
+
+			if (!_Windows(nextWorkspace).HasWindow(floating)) {
+				// but wasn't before
+				_Windows(nextWorkspace).AddWindow(floating,
+					floating->Frontmost(_Windows(nextWorkspace).FirstWindow(),
+					nextWorkspace));
+				floating->SetCurrentWorkspace(nextWorkspace);
+				if (mouseEventWindow != fFront)
+					_ShowWindow(floating);
+
+				// TODO: put the floating last in the floating window list to
+				// preserve the on screen window order
+			}
+		} else if (_Windows(previousWorkspace).HasWindow(floating)
+			&& !floating->InSubsetWorkspace(previousWorkspace)) {
+			// was visible, but is no longer
+
+			_Windows(previousWorkspace).RemoveWindow(floating);
+			floating->SetCurrentWorkspace(-1);
+			_HideWindow(floating);
+
+			if (FocusWindow() == floating)
+				SetFocusWindow();
+		}
+	}
+}
+
+
+/*!	Search the visible windows for a valid back window
+	(only desktop windows can't be back windows)
+*/
+void
+Desktop::_UpdateBack()
+{
+	fBack = NULL;
+
+	for (Window* window = _CurrentWindows().FirstWindow();
+			window != NULL; window = window->NextWindow(fCurrentWorkspace)) {
+		if (window->IsHidden() || window->Feel() == kDesktopWindowFeel)
+			continue;
+
+		fBack = window;
+		break;
+	}
+}
+
+
+/*!	Search the visible windows for a valid front window
+	(only normal and modal windows can be front windows)
+
+	The only place where you don't want to update floating windows is
+	during a workspace change - because then you'll call _UpdateFloating()
+	yourself.
+*/
+void
+Desktop::_UpdateFront(bool updateFloating)
+{
+	fFront = NULL;
+
+	for (Window* window = _CurrentWindows().LastWindow();
+			window != NULL; window = window->PreviousWindow(fCurrentWorkspace)) {
+		if (window->IsHidden() || window->IsFloating() || !window->SupportsFront())
+			continue;
+
+		fFront = window;
+		break;
+	}
+
+	if (updateFloating)
+		_UpdateFloating();
+}
+
+
+void
+Desktop::_UpdateFronts(bool updateFloating)
+{
+	_UpdateBack();
+	_UpdateFront(updateFloating);
+}
+
+
+bool
+Desktop::_WindowHasModal(Window* window)
+{
+	if (window == NULL)
+		return false;
+
+	for (Window* modal = fSubsetWindows.FirstWindow(); modal != NULL;
+			modal = modal->NextWindow(kSubsetList)) {
+		// only visible modal windows count
+		if (!modal->IsModal() || modal->IsHidden())
+			continue;
+
+		if (modal->HasInSubset(window))
+			return true;
+	}
+
+	return false;
+}
+
+
+/*!	You must at least hold a single window lock when calling this method.
+*/
+void
+Desktop::_WindowChanged(Window* window)
+{
+	ASSERT_MULTI_LOCKED(fWindowLock);
+
+	BAutolock _(fWorkspacesLock);
+
+	for (uint32 i = fWorkspacesViews.CountItems(); i-- > 0;) {
+		WorkspacesView* view = fWorkspacesViews.ItemAt(i);
+		view->WindowChanged(window);
+	}
+}
+
+
+/*!	You must at least hold a single window lock when calling this method.
+*/
+void
+Desktop::_WindowRemoved(Window* window)
+{
+	ASSERT_MULTI_LOCKED(fWindowLock);
+
+	BAutolock _(fWorkspacesLock);
+
+	for (uint32 i = fWorkspacesViews.CountItems(); i-- > 0;) {
+		WorkspacesView* view = fWorkspacesViews.ItemAt(i);
+		view->WindowRemoved(window);
+	}
+}
+
+
+/*!	Shows the window on the screen - it does this independently of the
+	Window::IsHidden() state.
+*/
+void
+Desktop::_ShowWindow(Window* window, bool affectsOtherWindows)
+{
+	BRegion background;
+	_RebuildClippingForAllWindows(background);
+	_SetBackground(background);
+	_WindowChanged(window);
+
+	BRegion dirty(window->VisibleRegion());
+
+	if (!affectsOtherWindows) {
+		// everything that is now visible in the
+		// window needs a redraw, but other windows
+		// are not affected, we can call ProcessDirtyRegion()
+		// of the window, and don't have to use MarkDirty()
+		window->ProcessDirtyRegion(dirty);
+	} else
+		MarkDirty(dirty);
+
+	window->ServerWindow()->HandleDirectConnection(
+		B_DIRECT_START | B_BUFFER_RESET);
+}
+
+
+/*!	Hides the window from the screen - it does this independently of the
+	Window::IsHidden() state.
+*/
+void
+Desktop::_HideWindow(Window* window)
+{
+	window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
+
+	// after rebuilding the clipping,
+	// this window will not have a visible
+	// region anymore, so we need to remember
+	// it now
+	// (actually that's not true, since
+	// hidden windows are excluded from the
+	// clipping calculation, but anyways)
+	BRegion dirty(window->VisibleRegion());
+
+	BRegion background;
+	_RebuildClippingForAllWindows(background);
+	_SetBackground(background);
+	_WindowChanged(window);
+
 	MarkDirty(dirty);
+}
+
+
+/*!	Updates the workspaces of all subset windows with regard to the
+	specifed window.
+	If newIndex is not -1, it will move all subset windows that belong to
+	the specifed window to the new workspace; this form is only called by
+	SetWorkspace().
+*/
+void
+Desktop::_UpdateSubsetWorkspaces(Window* window, int32 previousIndex,
+	int32 newIndex)
+{
+	STRACE(("_UpdateSubsetWorkspaces(window %p, %s)\n", window, window->Title()));
+
+	// if the window is hidden, the subset windows are up-to-date already
+	if (!window->IsNormal() || window->IsHidden())
+		return;
+
+	for (Window* subset = fSubsetWindows.FirstWindow(); subset != NULL;
+			subset = subset->NextWindow(kSubsetList)) {
+		if (subset->Feel() == B_MODAL_ALL_WINDOW_FEEL
+			|| subset->Feel() == B_FLOATING_ALL_WINDOW_FEEL) {
+			// These windows are always visible on all workspaces,
+			// no need to update them.
+			continue;
+		}
+
+		if (subset->IsFloating()) {
+			// Floating windows are inserted and removed to the current
+			// workspace as the need arises - they are not handled here
+			// but in _UpdateFront()
+			continue;
+		}
+
+		if (subset->HasInSubset(window)) {
+			// adopt the workspace change
+			SetWindowWorkspaces(subset, subset->SubsetWorkspaces());
+		}
+	}
+}
+
+
+/*!	\brief Adds or removes the window to or from the workspaces it's on.
+*/
+void
+Desktop::_ChangeWindowWorkspaces(Window* window, uint32 oldWorkspaces,
+	uint32 newWorkspaces)
+{
+	if (oldWorkspaces == newWorkspaces)
+		return;
+
+	// apply changes to the workspaces' window lists
+
+	LockAllWindows();
+
+	// NOTE: we bypass the anchor-mechanism by intention when switching
+	// the workspace programmatically.
+
+	for (int32 i = 0; i < kMaxWorkspaces; i++) {
+		if (workspace_in_workspaces(i, oldWorkspaces)) {
+			// window is on this workspace, is it anymore?
+			if (!workspace_in_workspaces(i, newWorkspaces)) {
+				_Windows(i).RemoveWindow(window);
+
+				if (i == CurrentWorkspace()) {
+					// remove its appearance from the current workspace
+					window->SetCurrentWorkspace(-1);
+
+					if (!window->IsHidden())
+						_HideWindow(window);
+				}
+			}
+		} else {
+			// window was not on this workspace, is it now?
+			if (workspace_in_workspaces(i, newWorkspaces)) {
+				_Windows(i).AddWindow(window,
+					window->Frontmost(_Windows(i).FirstWindow(), i));
+
+				if (i == CurrentWorkspace()) {
+					// make the window visible in current workspace
+					window->SetCurrentWorkspace(fCurrentWorkspace);
+
+					if (!window->IsHidden()) {
+						// this only affects other windows if this windows has floating or
+						// modal windows that need to be shown as well
+						// TODO: take care of this
+						_ShowWindow(window, FrontWindow() == window);
+					}
+				}
+			}
+		}
+	}
+
+	// If the window is visible only on one workspace, we set it's current
+	// position in that workspace (so that WorkspacesView will find us).
+	int32 firstWorkspace = -1;
+	for (int32 i = 0; i < kMaxWorkspaces; i++) {
+		if ((newWorkspaces & (1L << i)) != 0) {
+			if (firstWorkspace != -1) {
+				firstWorkspace = -1;
+				break;
+			}
+			firstWorkspace = i;
+		}
+	}
+	if (firstWorkspace >= 0)
+		window->Anchor(firstWorkspace).position = window->Frame().LeftTop();
+
+	// take care about modals and floating windows
+	_UpdateSubsetWorkspaces(window);
+
+	UnlockAllWindows();
+}
+
+
+void
+Desktop::_BringWindowsToFront(WindowList& windows, int32 list,
+	bool wereVisible)
+{
+	// we don't need to redraw what is currently
+	// visible of the window
+	BRegion clean;
+
+	for (Window* window = windows.FirstWindow(); window != NULL;
+			window = window->NextWindow(list)) {
+		if (wereVisible)
+			clean.Include(&window->VisibleRegion());
+
+		_CurrentWindows().AddWindow(window,
+			window->Frontmost(_CurrentWindows().FirstWindow(),
+				fCurrentWorkspace));
+
+		_WindowChanged(window);
+	}
+
+	BRegion dummy;
+	_RebuildClippingForAllWindows(dummy);
+
+	// redraw what became visible of the window(s)
+
+	BRegion dirty;
+	for (Window* window = windows.FirstWindow(); window != NULL;
+			window = window->NextWindow(list)) {
+		dirty.Include(&window->VisibleRegion());
+	}
+
+	dirty.Exclude(&clean);
+	MarkDirty(dirty);
+
+	_UpdateFront();
+
+	if (windows.FirstWindow() == fBack || fBack == NULL)
+		_UpdateBack();
+}
+
+
+/*!	Returns the last focussed non-hidden subset window belonging to the
+	specified \a window.
+*/
+Window*
+Desktop::_LastFocusSubsetWindow(Window* window)
+{
+	if (window == NULL)
+		return NULL;
+
+	for (Window* front = fFocusList.LastWindow(); front != NULL;
+			front = front->PreviousWindow(kFocusList)) {
+		if (front != window && !front->IsHidden() && window->HasInSubset(front))
+			return front;
+	}
+
+	return NULL;
+}
+
+
+/*!	\brief Sends a fake B_MOUSE_MOVED event to the window under the mouse,
+		and also updates the current view under the mouse.
+
+	This has only to be done in case the view changed without user interaction,
+	ie. because of a workspace change or a closing window.
+*/
+void
+Desktop::_SendFakeMouseMoved(Window* window)
+{
+	int32 viewToken = B_NULL_TOKEN;
+	EventTarget* target = NULL;
+
+	LockAllWindows();
+
+	if (window == NULL)
+		window = MouseEventWindow();
+	if (window == NULL)
+		window = WindowAt(fLastMousePosition);
+
+	if (window != NULL) {
+		BMessage message;
+		window->MouseMoved(&message, fLastMousePosition, &viewToken, true,
+			true);
+
+		if (viewToken != B_NULL_TOKEN)
+			target = &window->EventTarget();
+	}
+
+	if (viewToken != B_NULL_TOKEN)
+		SetViewUnderMouse(window, viewToken);
+	else {
+		SetViewUnderMouse(NULL, B_NULL_TOKEN);
+		SetCursor(NULL);
+	}
+
+	UnlockAllWindows();
+
+	if (target != NULL)
+		EventDispatcher().SendFakeMouseMoved(*target, viewToken);
 }
 
 
@@ -3048,3 +2771,277 @@ Desktop::_RebuildAndRedrawAfterWindowChange(Window* changedWindow,
 	_TriggerWindowRedrawing(dirty);
 }
 
+
+void
+Desktop::_ScreenChanged(Screen* screen)
+{
+	ASSERT_MULTI_WRITE_LOCKED(fWindowLock);
+
+	// the entire screen is dirty, because we're actually
+	// operating on an all new buffer in memory
+	BRegion dirty(screen->Frame());
+
+	// update our cached screen region
+	fScreenRegion.Set(screen->Frame());
+	gInputManager->UpdateScreenBounds(screen->Frame());
+
+	BRegion background;
+	_RebuildClippingForAllWindows(background);
+
+	fBackgroundRegion.MakeEmpty();
+		// makes sure that the complete background is redrawn
+	_SetBackground(background);
+
+	// figure out dirty region
+	dirty.Exclude(&background);
+	_TriggerWindowRedrawing(dirty);
+
+	// send B_SCREEN_CHANGED to windows on that screen
+	BMessage update(B_SCREEN_CHANGED);
+	update.AddInt64("when", real_time_clock_usecs());
+	update.AddRect("frame", screen->Frame());
+	update.AddInt32("mode", screen->ColorSpace());
+
+	fVirtualScreen.UpdateFrame();
+
+	// TODO: currently ignores the screen argument!
+	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		window->ServerWindow()->ScreenChanged(&update);
+	}
+}
+
+
+/*!	\brief activate one of the app's windows.
+*/
+status_t
+Desktop::_ActivateApp(team_id team)
+{
+	// search for an unhidden window in the current workspace
+
+	AutoWriteLocker locker(fWindowLock);
+
+	for (Window* window = _CurrentWindows().LastWindow(); window != NULL;
+			window = window->PreviousWindow(fCurrentWorkspace)) {
+		if (!window->IsHidden() && window->IsNormal()
+			&& window->ServerWindow()->ClientTeam() == team) {
+			ActivateWindow(window);
+			return B_OK;
+		}
+	}
+
+	// search for an unhidden window to give focus to
+
+	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		// if window is a normal window of the team, and not hidden,
+		// we've found our target
+		if (!window->IsHidden() && window->IsNormal()
+			&& window->ServerWindow()->ClientTeam() == team) {
+			ActivateWindow(window);
+			return B_OK;
+		}
+	}
+
+	// TODO: we cannot maximize minimized windows here (with the window lock
+	// write locked). To work-around this, we could forward the request to
+	// the ServerApp of this team - it maintains its own window list, and can
+	// therefore call ActivateWindow() without holding the window lock.
+	return B_BAD_VALUE;
+}
+
+
+void
+Desktop::_SetCurrentWorkspaceConfiguration()
+{
+	ASSERT_MULTI_WRITE_LOCKED(fWindowLock);
+
+	uint32 changedScreens;
+	fVirtualScreen.SetConfiguration(*this,
+		fWorkspaces[fCurrentWorkspace].CurrentScreenConfiguration(),
+		&changedScreens);
+
+	for (int32 i = 0; changedScreens != 0; i++, changedScreens /= 2) {
+		if ((changedScreens & (1 << i)) != 0)
+			_ScreenChanged(fVirtualScreen.ScreenAt(i));
+	}
+}
+
+
+/*!	Changes the current workspace to the one specified by \a index.
+	You must hold the all window lock when calling this method.
+*/
+void
+Desktop::_SetWorkspace(int32 index)
+{
+	int32 previousIndex = fCurrentWorkspace;
+	rgb_color previousColor = fWorkspaces[fCurrentWorkspace].Color();
+	bool movedMouseEventWindow = false;
+
+	if (fMouseEventWindow != NULL) {
+		if (fMouseEventWindow->IsNormal()) {
+			if (!fMouseEventWindow->InWorkspace(index)) {
+				// The window currently being dragged will follow us to this
+				// workspace if it's not already on it.
+				// But only normal windows are following
+				uint32 oldWorkspaces = fMouseEventWindow->Workspaces();
+
+				_Windows(index).AddWindow(fMouseEventWindow);
+				_Windows(previousIndex).RemoveWindow(fMouseEventWindow);
+
+				_UpdateSubsetWorkspaces(fMouseEventWindow, previousIndex,
+					index);
+				movedMouseEventWindow = true;
+
+				// send B_WORKSPACES_CHANGED message
+				fMouseEventWindow->WorkspacesChanged(oldWorkspaces,
+					fMouseEventWindow->Workspaces());
+			} else {
+				// make sure it's frontmost
+				_Windows(index).RemoveWindow(fMouseEventWindow);
+				_Windows(index).AddWindow(fMouseEventWindow,
+					fMouseEventWindow->Frontmost(_Windows(index).FirstWindow(),
+					index));
+			}
+		}
+
+		fMouseEventWindow->Anchor(index).position
+			= fMouseEventWindow->Frame().LeftTop();
+	}
+
+	// build region of windows that are no longer visible in the new workspace
+
+	BRegion dirty;
+
+	for (Window* window = _CurrentWindows().FirstWindow();
+			window != NULL; window = window->NextWindow(previousIndex)) {
+		// store current position in Workspace anchor
+		window->Anchor(previousIndex).position = window->Frame().LeftTop();
+
+		window->WorkspaceActivated(previousIndex, false);
+
+		if (window->InWorkspace(index))
+			continue;
+
+		if (!window->IsHidden()) {
+			// this window will no longer be visible
+			dirty.Include(&window->VisibleRegion());
+		}
+
+		window->SetCurrentWorkspace(-1);
+	}
+
+	fPreviousWorkspace = fCurrentWorkspace;
+	fCurrentWorkspace = index;
+
+	// Change the display modes, if needed
+	_SetCurrentWorkspaceConfiguration();
+
+	// Show windows, and include them in the changed region - but only
+	// those that were not visible before (or whose position changed)
+
+	WindowList windows(kWorkingList);
+	BList previousRegions;
+
+	for (Window* window = _Windows(index).FirstWindow();
+			window != NULL; window = window->NextWindow(index)) {
+		BPoint position = window->Anchor(index).position;
+
+		window->SetCurrentWorkspace(index);
+
+		if (window->IsHidden())
+			continue;
+
+		if (position == kInvalidWindowPosition) {
+			// if you enter a workspace for the first time, the position
+			// of the window in the previous workspace is adopted
+			position = window->Frame().LeftTop();
+				// TODO: make sure the window is still on-screen if it
+				//	was before!
+		}
+
+		if (!window->InWorkspace(previousIndex)) {
+			// This window was not visible before, make sure its frame
+			// is up-to-date
+			if (window->Frame().LeftTop() != position) {
+				BPoint offset = position - window->Frame().LeftTop();
+				window->MoveBy((int32)offset.x, (int32)offset.y);
+			}
+			continue;
+		}
+
+		if (window->Frame().LeftTop() != position) {
+			// the window was visible before, but its on-screen location changed
+			BPoint offset = position - window->Frame().LeftTop();
+			MoveWindowBy(window, offset.x, offset.y);
+				// TODO: be a bit smarter than this...
+		} else {
+			// We need to remember the previous visible region of the
+			// window if they changed their order
+			BRegion* region = new (std::nothrow)
+				BRegion(window->VisibleRegion());
+			if (region != NULL) {
+				if (previousRegions.AddItem(region))
+					windows.AddWindow(window);
+				else
+					delete region;
+			}
+		}
+	}
+
+	_UpdateFronts(false);
+	_UpdateFloating(previousIndex, index,
+		movedMouseEventWindow ? fMouseEventWindow : NULL);
+
+	BRegion stillAvailableOnScreen;
+	_RebuildClippingForAllWindows(stillAvailableOnScreen);
+	_SetBackground(stillAvailableOnScreen);
+
+	for (Window* window = _Windows(index).FirstWindow(); window != NULL;
+			window = window->NextWindow(index)) {
+		// send B_WORKSPACE_ACTIVATED message
+		window->WorkspaceActivated(index, true);
+
+		if (window->InWorkspace(previousIndex) || window->IsHidden()
+			|| (window == fMouseEventWindow && fMouseEventWindow->IsNormal())
+			|| (!window->IsNormal()
+				&& window->HasInSubset(fMouseEventWindow))) {
+			// This window was visible before, and is already handled in the
+			// above loop
+			continue;
+		}
+
+		dirty.Include(&window->VisibleRegion());
+	}
+
+	// Catch order changes in the new workspaces window list
+	int32 i = 0;
+	for (Window* window = windows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kWorkingList), i++) {
+		BRegion* region = (BRegion*)previousRegions.ItemAt(i);
+		region->ExclusiveInclude(&window->VisibleRegion());
+		dirty.Include(region);
+		delete region;
+	}
+
+	// Set new focus to the front window, but keep focus to a floating
+	// window if still visible
+	if (!_Windows(index).HasWindow(FocusWindow())
+		|| !FocusWindow()->IsFloating())
+		SetFocusWindow(FrontWindow());
+
+	_WindowChanged(NULL);
+	MarkDirty(dirty);
+
+#if 0
+	// Show the dirty regions of this workspace switch
+	if (GetDrawingEngine()->LockParallelAccess()) {
+		GetDrawingEngine()->FillRegion(dirty, (rgb_color){255, 0, 0});
+		GetDrawingEngine()->UnlockParallelAccess();
+		snooze(100000);
+	}
+#endif
+
+	if (previousColor != fWorkspaces[fCurrentWorkspace].Color())
+		RedrawBackground();
+}

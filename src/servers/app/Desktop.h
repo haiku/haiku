@@ -74,6 +74,31 @@ public:
 			void				BroadcastToAllApps(int32 code);
 			void				BroadcastToAllWindows(int32 code);
 
+	// Locking
+#if USE_MULTI_LOCKER
+			bool				LockSingleWindow()
+									{ return fWindowLock.ReadLock(); }
+			void				UnlockSingleWindow()
+									{ fWindowLock.ReadUnlock(); }
+
+			bool				LockAllWindows()
+									{ return fWindowLock.WriteLock(); }
+			void				UnlockAllWindows()
+									{ fWindowLock.WriteUnlock(); }
+
+			MultiLocker			WindowLocker() { return fWindowLock; }
+#else // USE_MULTI_LOCKER
+			bool				LockSingleWindow()
+									{ return fWindowLock.Lock(); }
+			void				UnlockSingleWindow()
+									{ fWindowLock.Unlock(); }
+
+			bool				LockAllWindows()
+									{ return fWindowLock.Lock(); }
+			void				UnlockAllWindows()
+									{ fWindowLock.Unlock(); }
+#endif // USE_MULTI_LOCKER
+
 	// Mouse and cursor methods
 
 			void				SetCursor(ServerCursor* cursor);
@@ -105,8 +130,6 @@ public:
 									BRect& frame);
 			void				RevertScreenModes(uint32 workspaces);
 
-			void				ScreenChanged(Screen* screen);
-
 			const ::VirtualScreen& VirtualScreen() const
 									{ return fVirtualScreen; }
 			DrawingEngine*		GetDrawingEngine() const
@@ -129,6 +152,11 @@ public:
 									{ return fWorkspaces[index]; }
 			status_t			SetWorkspacesLayout(int32 columns, int32 rows);
 			BRect				WorkspaceFrame(int32 index) const;
+
+			void				StoreWorkspaceConfiguration(int32 index);
+
+			void				AddWorkspacesView(WorkspacesView* view);
+			void				RemoveWorkspacesView(WorkspacesView* view);
 
 	// Window methods
 
@@ -181,49 +209,21 @@ public:
 									int32 viewToken);
 			int32				ViewUnderMouse(const Window* window);
 
-			void				SetFocusWindow(Window* window = NULL);
 			EventTarget*		KeyboardEventTarget();
+
+			void				SetFocusWindow(Window* window = NULL);
 			void				SetFocusLocked(const Window* window);
 
 			Window*				FindWindowByClientToken(int32 token,
 									team_id teamID);
 			EventTarget*		FindTarget(BMessenger& messenger);
 
-#if USE_MULTI_LOCKER
-			bool				LockSingleWindow()
-									{ return fWindowLock.ReadLock(); }
-			void				UnlockSingleWindow()
-									{ fWindowLock.ReadUnlock(); }
-
-			bool				LockAllWindows()
-									{ return fWindowLock.WriteLock(); }
-			void				UnlockAllWindows()
-									{ fWindowLock.WriteUnlock(); }
-
-			MultiLocker			WindowLocker() { return fWindowLock; }
-#else // USE_MULTI_LOCKER
-			bool				LockSingleWindow()
-									{ return fWindowLock.Lock(); }
-			void				UnlockSingleWindow()
-									{ fWindowLock.Unlock(); }
-
-			bool				LockAllWindows()
-									{ return fWindowLock.Lock(); }
-			void				UnlockAllWindows()
-									{ fWindowLock.Unlock(); }
-#endif // USE_MULTI_LOCKER
-
 			void				MarkDirty(BRegion& region);
 			void				Redraw();
+			void				RedrawBackground();
 
 			BRegion&			BackgroundRegion()
 									{ return fBackgroundRegion; }
-
-			void				RedrawBackground();
-			void				StoreWorkspaceConfiguration(int32 index);
-
-			void				AddWorkspacesView(WorkspacesView* view);
-			void				RemoveWorkspacesView(WorkspacesView* view);
 
 			void				MinimizeApplication(team_id team);
 			void				BringApplicationToFront(team_id team);
@@ -240,30 +240,13 @@ public:
 
 private:
 			void				_LaunchInputServer();
-			void				_SetCurrentWorkspaceConfiguration();
-			void				_SetWorkspace(int32 index);
-			void				_ShowWindow(Window* window,
-									bool affectsOtherWindows = true);
-			void				_HideWindow(Window* window);
+			void				_GetLooperName(char* name, size_t size);
+			void				_PrepareQuit();
+			void				_DispatchMessage(int32 code,
+									BPrivate::LinkReceiver &link);
 
-			void				_UpdateSubsetWorkspaces(Window* window,
-									int32 previousIndex = -1,
-									int32 newIndex = -1);
-			void				_ChangeWindowWorkspaces(Window* window,
-									uint32 oldWorkspaces, uint32 newWorkspaces);
-			void				_BringWindowsToFront(WindowList& windows,
-									int32 list, bool wereVisible);
-			Window*				_LastFocusSubsetWindow(Window* window);
-			status_t			_ActivateApp(team_id team);
-			void				_SendFakeMouseMoved(Window* window = NULL);
-
-			void				_RebuildClippingForAllWindows(
-									BRegion& stillAvailableOnScreen);
-			void				_TriggerWindowRedrawing(
-									BRegion& newDirtyRegion);
-			void				_SetBackground(BRegion& background);
-			void				_RebuildAndRedrawAfterWindowChange(
-									Window* window, BRegion& dirty);
+			WindowList&			_CurrentWindows();
+			WindowList&			_Windows(int32 index);
 
 			void				_UpdateFloating(int32 previousWorkspace = -1,
 									int32 nextWorkspace = -1,
@@ -276,13 +259,33 @@ private:
 			void				_WindowChanged(Window* window);
 			void				_WindowRemoved(Window* window);
 
-			void				_GetLooperName(char* name, size_t size);
-			void				_PrepareQuit();
-			void				_DispatchMessage(int32 code,
-									BPrivate::LinkReceiver &link);
+			void				_ShowWindow(Window* window,
+									bool affectsOtherWindows = true);
+			void				_HideWindow(Window* window);
 
-			WindowList&			_CurrentWindows();
-			WindowList&			_Windows(int32 index);
+			void				_UpdateSubsetWorkspaces(Window* window,
+									int32 previousIndex = -1,
+									int32 newIndex = -1);
+			void				_ChangeWindowWorkspaces(Window* window,
+									uint32 oldWorkspaces, uint32 newWorkspaces);
+			void				_BringWindowsToFront(WindowList& windows,
+									int32 list, bool wereVisible);
+			Window*				_LastFocusSubsetWindow(Window* window);
+			void				_SendFakeMouseMoved(Window* window = NULL);
+
+			void				_RebuildClippingForAllWindows(
+									BRegion& stillAvailableOnScreen);
+			void				_TriggerWindowRedrawing(
+									BRegion& newDirtyRegion);
+			void				_SetBackground(BRegion& background);
+			void				_RebuildAndRedrawAfterWindowChange(
+									Window* window, BRegion& dirty);
+
+			status_t			_ActivateApp(team_id team);
+
+			void				_ScreenChanged(Screen* screen);
+			void				_SetCurrentWorkspaceConfiguration();
+			void				_SetWorkspace(int32 index);
 
 private:
 	friend class DesktopSettings;
