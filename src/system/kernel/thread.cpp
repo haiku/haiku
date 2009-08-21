@@ -2275,14 +2275,10 @@ thread_block_timeout(timer* timer)
 	// easy.
 
 	struct thread* thread = (struct thread*)timer->user_data;
-	if (thread_unblock_locked(thread, B_TIMED_OUT)) {
-		// We actually woke up the thread. If it has a higher priority than the
-		// currently running thread, we invoke the scheduler.
-		// TODO: Is this really such a good idea or should we do that only when
-		// the woken up thread has realtime priority?
-		if (thread->priority > thread_get_current_thread()->priority)
-			return B_INVOKE_SCHEDULER;
-	}
+	// the scheduler will tell us whether to reschedule or not via
+	// thread_unblock_locked's return
+	if (thread_unblock_locked(thread, B_TIMED_OUT)) 
+		return B_INVOKE_SCHEDULER;
 
 	return B_HANDLED_INTERRUPT;
 }

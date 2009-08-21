@@ -16,7 +16,7 @@ struct SchedulerListener;
 
 
 struct scheduler_ops {
-	void (*enqueue_in_run_queue)(struct thread* thread);
+	bool (*enqueue_in_run_queue)(struct thread* thread);
 	void (*reschedule)(void);
 	void (*set_thread_priority)(struct thread* thread, int32 priority);
 	// called when the thread structure is first created -

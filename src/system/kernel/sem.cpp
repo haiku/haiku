@@ -939,7 +939,6 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 		flags |= B_RELEASE_IF_WAITING_ONLY;
 	}
 
-	struct thread* currentThread = thread_get_current_thread();
 	bool reschedule = false;
 
 	SpinLocker threadLocker(gThreadSpinlock);
@@ -963,13 +962,12 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 				break;
 			}
 
-			thread_unblock_locked(entry->thread, B_OK);
+			reschedule |= thread_unblock_locked(entry->thread, B_OK);
 
 			int delta = min_c(count, entry->count);
 			sSems[slot].u.used.count += delta;
 			sSems[slot].u.used.net_count += delta - entry->count;
 			count -= delta;
-			reschedule |= entry->thread->priority > currentThread->priority;
 		} else {
 			// The thread is no longer waiting, but still queued, which
 			// means acquiration failed and we can just remove it.

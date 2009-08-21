@@ -196,9 +196,9 @@ thread_unblock_locked(struct thread* thread, status_t status)
 
 	// wake up the thread, if it is sleeping
 	if (thread->state == B_THREAD_WAITING)
-		scheduler_enqueue_in_run_queue(thread);
-
-	return true;
+		return scheduler_enqueue_in_run_queue(thread);
+		
+	return false;
 }
 
 

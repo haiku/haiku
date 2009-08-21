@@ -145,7 +145,7 @@ affine_get_most_idle_cpu()
 /*!	Enqueues the thread into the run queue.
 	Note: thread lock must be held when entering this function
 */
-static void
+static bool
 affine_enqueue_in_run_queue(struct thread *thread)
 {
 	int32 targetCPU = -1;
@@ -191,15 +191,15 @@ affine_enqueue_in_run_queue(struct thread *thread)
 
 	if (sRunningThreads[targetCPU] != NULL
 		&& thread->priority > sRunningThreads[targetCPU]->priority) {
-		int32 currentCPU = smp_get_current_cpu();
-		if (targetCPU == currentCPU) {
-			// TODO: we want to inform the caller somehow that it should
-			// trigger a reschedule
+		if (targetCPU == smp_get_current_cpu()) {
+			return true;
 		} else {
 			smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE, 0, 0, 0, NULL,
 				SMP_MSG_FLAG_ASYNC);
 		}
 	}
+	
+	return false;
 }
 
 static inline struct thread *

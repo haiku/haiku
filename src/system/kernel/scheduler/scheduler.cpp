@@ -14,7 +14,7 @@
 // 0 - Auto-select scheduler based on detected core count
 // 1 - Always use the simple scheduler
 // 2 - Always use the affine scheduler
-#define SCHEDULER_TYPE 1
+#define SCHEDULER_TYPE 2
 
 struct scheduler_ops* gScheduler;
 SchedulerListenerList gSchedulerListeners;

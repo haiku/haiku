@@ -77,7 +77,7 @@ dump_run_queue(int argc, char **argv)
 /*!	Enqueues the thread into the run queue.
 	Note: thread lock must be held when entering this function
 */
-static void
+static bool
 simple_enqueue_in_run_queue(struct thread *thread)
 {
 	if (thread->state == B_THREAD_RUNNING) {
@@ -85,7 +85,7 @@ simple_enqueue_in_run_queue(struct thread *thread)
 		// insert it into the run queue. Set the next state to ready so the
 		// thread is inserted into the run queue on the next reschedule.
 		thread->next_state = B_THREAD_READY;
-		return;
+		return false;
 	}
 
 	thread->state = thread->next_state = B_THREAD_READY;
@@ -150,6 +150,7 @@ simple_enqueue_in_run_queue(struct thread *thread)
 	// notify listeners
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
 		thread);
+	return false;
 }
 
 
