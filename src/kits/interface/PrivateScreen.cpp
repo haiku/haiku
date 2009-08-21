@@ -13,10 +13,7 @@
 */
 
 
-#include "AppMisc.h"
-#include "AppServerLink.h"
-#include "PrivateScreen.h"
-#include "ServerProtocol.h"
+#include <PrivateScreen.h>
 
 #include <new>
 #include <stdlib.h>
@@ -27,6 +24,10 @@
 #include <Locker.h>
 #include <ObjectList.h>
 #include <Window.h>
+
+#include <AppMisc.h>
+#include <AppServerLink.h>
+#include <ServerProtocol.h>
 
 
 using namespace BPrivate;

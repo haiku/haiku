@@ -11,10 +11,11 @@
 /*!	BScreen lets you retrieve and change the display settings. */
 
 
-#include "PrivateScreen.h"
-
 #include <Screen.h>
+
 #include <Window.h>
+
+#include <PrivateScreen.h>
 
 
 using namespace BPrivate;

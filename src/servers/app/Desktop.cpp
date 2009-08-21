@@ -15,6 +15,23 @@
 
 #include "Desktop.h"
 
+#include <stdio.h>
+#include <string.h>
+#include <syslog.h>
+
+#include <Debug.h>
+#include <DirectWindow.h>
+#include <Entry.h>
+#include <Message.h>
+#include <MessageFilter.h>
+#include <Region.h>
+#include <Roster.h>
+
+#include <PrivateScreen.h>
+#include <ServerProtocol.h>
+#include <ViewPrivate.h>
+#include <WindowInfo.h>
+
 #include "AppServer.h"
 #include "DesktopSettingsPrivate.h"
 #include "DrawingEngine.h"
@@ -31,25 +48,10 @@
 #include "Workspace.h"
 #include "WorkspacesView.h"
 
-#include <ViewPrivate.h>
-#include <WindowInfo.h>
-#include <ServerProtocol.h>
-
-#include <Debug.h>
-#include <DirectWindow.h>
-#include <Entry.h>
-#include <Message.h>
-#include <MessageFilter.h>
-#include <Region.h>
-#include <Roster.h>
-
-#include <stdio.h>
-#include <string.h>
-#include <syslog.h>
-
 #if TEST_MODE
 #	include "EventStream.h"
 #endif
+
 
 //#define DEBUG_DESKTOP
 #ifdef DEBUG_DESKTOP
@@ -1125,8 +1127,7 @@ status_t
 Desktop::SetScreenMode(int32 workspace, int32 id, const display_mode& mode,
 	bool makeDefault)
 {
-	// ~0 is used as the current workspace in PrivateScreen
-	if (workspace == ~0)
+	if (workspace == B_CURRENT_WORKSPACE_INDEX)
 		workspace = fCurrentWorkspace;
 
 	if (workspace < 0 || workspace > kMaxWorkspaces)
@@ -1184,8 +1185,7 @@ Desktop::SetScreenMode(int32 workspace, int32 id, const display_mode& mode,
 status_t
 Desktop::GetScreenMode(int32 workspace, int32 id, display_mode& mode)
 {
-	// ~0 is used as the current workspace in PrivateScreen
-	if (workspace == ~0)
+	if (workspace == B_CURRENT_WORKSPACE_INDEX)
 		workspace = fCurrentWorkspace;
 
 	if (workspace < 0 || workspace > kMaxWorkspaces)
