@@ -35,7 +35,7 @@ using namespace BPrivate;
 
 static BObjectList<BPrivateScreen> sScreens(2, true);
 
-// used to synchronize creation/deletion of the sScreen object
+// used to synchronize creation/deletion of the sScreen objects
 static BLocker sScreenLock("screen lock");
 
 
@@ -171,8 +171,6 @@ BPrivateScreen::ColorSpace()
 BRect
 BPrivateScreen::Frame()
 {
-	// If something goes wrong, we just return this rectangle.
-
 	if (system_time() > fLastUpdate + 10000) {
 		// invalidate the settings after 10 msecs
 		BPrivate::AppServerLink link;
