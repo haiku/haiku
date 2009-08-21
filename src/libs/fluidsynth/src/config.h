@@ -160,11 +160,8 @@
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
-/* Define to use long long type, where appropriate */
-/* #undef USE_LONGLONG */
-
 /* Version number of package */
-#define VERSION "1.0.7"
+#define VERSION "1.0.9"
 
 /* Define to do all DSP in single floating point precision */
 #define WITH_FLOAT 1

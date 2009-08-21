@@ -37,6 +37,15 @@ int delete_fluid_alsa_seq_driver(fluid_midi_driver_t* p);
 void fluid_alsa_seq_driver_settings(fluid_settings_t* settings);
 #endif
 
+/* JACK */
+#if JACK_SUPPORT
+void fluid_jack_midi_driver_settings (fluid_settings_t *settings);
+fluid_midi_driver_t *new_fluid_jack_midi_driver (fluid_settings_t *settings,
+						 handle_midi_event_func_t handler,
+						 void *data);
+int delete_fluid_jack_midi_driver(fluid_midi_driver_t *p);
+#endif
+
 /* OSS */
 #if OSS_SUPPORT
 fluid_midi_driver_t* new_fluid_oss_midi_driver(fluid_settings_t* settings,
@@ -52,6 +61,7 @@ fluid_midi_driver_t* new_fluid_winmidi_driver(fluid_settings_t* settings,
 					    handle_midi_event_func_t handler,
 					    void* event_handler_data);
 int delete_fluid_winmidi_driver(fluid_midi_driver_t* p);
+void fluid_winmidi_midi_driver_settings(fluid_settings_t* settings);
 #endif
 
 /* definitions for the MidiShare driver */
@@ -62,6 +72,14 @@ fluid_midi_driver_t* new_fluid_midishare_midi_driver(fluid_settings_t* settings,
 int delete_fluid_midishare_midi_driver(fluid_midi_driver_t* p);
 #endif
 
+/* definitions for the CoreMidi driver */
+#if COREMIDI_SUPPORT
+fluid_midi_driver_t* new_fluid_coremidi_driver(fluid_settings_t* settings,
+						   void* event_handler_data,
+						   handle_midi_event_func_t handler);
+int delete_fluid_coremidi_driver(fluid_midi_driver_t* p);
+void fluid_coremidi_driver_settings(fluid_settings_t* settings);
+#endif
 
 
 /*
@@ -78,6 +96,12 @@ struct fluid_mdriver_definition_t {
 
 
 struct fluid_mdriver_definition_t fluid_midi_drivers[] = {
+#if JACK_SUPPORT
+  { "jack",
+    new_fluid_jack_midi_driver,
+    delete_fluid_jack_midi_driver,
+    fluid_jack_midi_driver_settings },
+#endif
 #if OSS_SUPPORT
   { "oss",
     new_fluid_oss_midi_driver,
@@ -98,13 +122,19 @@ struct fluid_mdriver_definition_t fluid_midi_drivers[] = {
   { "winmidi",
     new_fluid_winmidi_driver,
     delete_fluid_winmidi_driver,
-    NULL },
+    fluid_winmidi_midi_driver_settings },
 #endif
 #if MIDISHARE_SUPPORT
   { "midishare",
     new_fluid_midishare_midi_driver,
     delete_fluid_midishare_midi_driver,
     NULL },
+#endif
+#if COREMIDI_SUPPORT
+  { "coremidi",
+    new_fluid_coremidi_driver,
+    delete_fluid_coremidi_driver,
+    fluid_coremidi_driver_settings },
 #endif
   { NULL, NULL, NULL, NULL }
 };
@@ -118,12 +148,16 @@ void fluid_midi_driver_settings(fluid_settings_t* settings)
   /* Set the default driver */
 #if ALSA_SUPPORT
   fluid_settings_register_str(settings, "midi.driver", "alsa_seq", 0, NULL, NULL);
+#elif JACK_SUPPORT
+  fluid_settings_register_str(settings, "midi.driver", "jack", 0, NULL, NULL);
 #elif OSS_SUPPORT
   fluid_settings_register_str(settings, "midi.driver", "oss", 0, NULL, NULL);
 #elif WINMIDI_SUPPORT
   fluid_settings_register_str(settings, "midi.driver", "winmidi", 0, NULL, NULL);
 #elif MIDISHARE_SUPPORT
   fluid_settings_register_str(settings, "midi.driver", "midishare", 0, NULL, NULL);
+#elif COREMIDI_SUPPORT
+  fluid_settings_register_str(settings, "midi.driver", "coremidi", 0, NULL, NULL);
 #else
   fluid_settings_register_str(settings, "midi.driver", "", 0, NULL, NULL);
 #endif
@@ -133,6 +167,9 @@ void fluid_midi_driver_settings(fluid_settings_t* settings)
   fluid_settings_add_option(settings, "midi.driver", "alsa_seq");
   fluid_settings_add_option(settings, "midi.driver", "alsa_raw");
 #endif
+#if JACK_SUPPORT
+  fluid_settings_add_option(settings, "midi.driver", "jack");
+#endif
 #if OSS_SUPPORT
   fluid_settings_add_option(settings, "midi.driver", "oss");
 #endif
@@ -141,6 +178,9 @@ void fluid_midi_driver_settings(fluid_settings_t* settings)
 #endif
 #if MIDISHARE_SUPPORT
   fluid_settings_add_option(settings, "midi.driver", "midishare");
+#endif
+#if COREMIDI_SUPPORT
+  fluid_settings_add_option(settings, "midi.driver", "coremidi");
 #endif
 
   for (i = 0; fluid_midi_drivers[i].name != NULL; i++) {
@@ -168,7 +208,7 @@ fluid_midi_driver_t* new_fluid_midi_driver(fluid_settings_t* settings, handle_mi
       FLUID_LOG(FLUID_DBG, "Using '%s' midi driver", fluid_midi_drivers[i].name);
       driver = fluid_midi_drivers[i].new(settings, handler, event_handler_data);
       if (driver) {
-	driver->name = fluid_midi_drivers[i].name;
+        driver->name = fluid_midi_drivers[i].name;
       }
       return driver;
     }

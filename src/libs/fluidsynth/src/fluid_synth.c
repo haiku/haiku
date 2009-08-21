@@ -112,6 +112,7 @@ void fluid_synth_settings(fluid_settings_t* settings)
   fluid_settings_register_str(settings, "synth.reverb.active", "yes", 0, NULL, NULL);
   fluid_settings_register_str(settings, "synth.chorus.active", "yes", 0, NULL, NULL);
   fluid_settings_register_str(settings, "synth.ladspa.active", "no", 0, NULL, NULL);
+  fluid_settings_register_str(settings, "midi.portname", "", 0, NULL, NULL);
 
   fluid_settings_register_int(settings, "synth.polyphony",
 			     256, 16, 4096, 0, NULL, NULL);
@@ -996,8 +997,48 @@ fluid_synth_modulate_voices_all(fluid_synth_t* synth, int chan)
   return FLUID_OK;
 }
 
-/*
- * fluid_synth_pitch_bend
+/**
+ * Set the MIDI channel pressure controller value.
+ * @param synth FluidSynth instance
+ * @param chan MIDI channel number
+ * @param val MIDI channel pressure value (7 bit, 0-127)
+ * @return FLUID_OK on success
+ *
+ * Assign to the MIDI channel pressure controller value on a specific MIDI channel
+ * in real time.
+ */
+int
+fluid_synth_channel_pressure(fluid_synth_t* synth, int chan, int val)
+{
+
+/*   fluid_mutex_lock(synth->busy); /\* Don't interfere with the audio thread *\/ */
+/*   fluid_mutex_unlock(synth->busy); */
+
+  /* check the ranges of the arguments */
+  if ((chan < 0) || (chan >= synth->midi_channels)) {
+    FLUID_LOG(FLUID_WARN, "Channel out of range");
+    return FLUID_FAILED;
+  }
+
+  if (synth->verbose) {
+    FLUID_LOG(FLUID_INFO, "channelpressure\t%d\t%d", chan, val);
+  }
+
+  /* set the channel pressure value in the channel */
+  fluid_channel_pressure(synth->channel[chan], val);
+
+  return FLUID_OK;
+}
+
+/**
+ * Set the MIDI pitch bend controller value.
+ * @param synth FluidSynth instance
+ * @param chan MIDI channel number
+ * @param val MIDI pitch bend value (14 bit, 0-16383 with 8192 being center)
+ * @return FLUID_OK on success
+ *
+ * Assign to the MIDI pitch bend controller value on a specific MIDI channel
+ * in real time.
  */
 int
 fluid_synth_pitch_bend(fluid_synth_t* synth, int chan, int val)
@@ -1169,48 +1210,72 @@ fluid_synth_program_change(fluid_synth_t* synth, int chan, int prognum)
   fluid_channel_t* channel;
   unsigned int banknum;
   unsigned int sfont_id;
+  int subst_bank, subst_prog;
 
-/*   fluid_mutex_lock(synth->busy); /\* Don't interfere with the audio thread *\/ */
-/*   fluid_mutex_unlock(synth->busy); */
-
-  if ((prognum >= 0) && (prognum < FLUID_NUM_PROGRAMS) &&
-      (chan >= 0) && (chan < synth->midi_channels)) {
-
-    channel = synth->channel[chan];
-    banknum = fluid_channel_get_banknum(channel);
-
-    /* inform the channel of the new program number */
-    fluid_channel_set_prognum(channel, prognum);
-
-    if (synth->verbose) {
-      FLUID_LOG(FLUID_INFO, "prog\t%d\t%d\t%d", chan, banknum, prognum);
-    }
-
-    /* special handling of channel 10 (or 9 counting from 0). channel
-       10 is the percussion channel.  */
-    if (channel->channum == 9) {
-
-      /* try to search the drum instrument first */
-      preset = fluid_synth_find_preset(synth, banknum | DRUM_INST_MASK, prognum);
-
-      /* if that fails try to search the melodic instrument */
-      if (preset == NULL) {
-	preset = fluid_synth_find_preset(synth, banknum, prognum);
-      }
-
-    } else {
-      preset = fluid_synth_find_preset(synth, banknum, prognum);
-    }
-
-    sfont_id = preset? fluid_sfont_get_id(preset->sfont) : 0;
-    fluid_channel_set_sfontnum(channel, sfont_id);
-    fluid_channel_set_preset(channel, preset);
-
-    return FLUID_OK;
+  if ((prognum < 0) || (prognum >= FLUID_NUM_PROGRAMS) ||
+      (chan < 0) || (chan >= synth->midi_channels))
+  {
+    FLUID_LOG(FLUID_ERR, "Index out of range (chan=%d, prog=%d)", chan, prognum);
+    return FLUID_FAILED;
   }
 
-  FLUID_LOG(FLUID_ERR, "Index out of range (chan=%d, prog=%d)", chan, prognum);
-  return FLUID_FAILED;
+  channel = synth->channel[chan];
+  banknum = fluid_channel_get_banknum(channel);
+
+  /* inform the channel of the new program number */
+  fluid_channel_set_prognum(channel, prognum);
+
+  if (synth->verbose)
+    FLUID_LOG(FLUID_INFO, "prog\t%d\t%d\t%d", chan, banknum, prognum);
+
+  /* Special handling of channel 10 (or 9 counting from 0). channel
+   * 10 is the percussion channel.
+   *
+   * FIXME - Shouldn't hard code bank selection for channel 10.  I think this
+   * is a hack for MIDI files that do bank changes in GM mode.  Proper way to
+   * handle this would probably be to ignore bank changes when in GM mode.
+   */
+  if (channel->channum == 9)
+    preset = fluid_synth_find_preset(synth, DRUM_INST_BANK, prognum);
+  else preset = fluid_synth_find_preset(synth, banknum, prognum);
+
+  /* Fallback to another preset if not found */
+  if (!preset)
+  {
+    subst_bank = banknum;
+    subst_prog = prognum;
+
+    /* Melodic instrument? */
+    if (channel->channum != 9 && banknum != DRUM_INST_BANK)
+    {
+      subst_bank = 0;
+
+      /* Fallback first to bank 0:prognum */
+      preset = fluid_synth_find_preset(synth, 0, prognum);
+
+      /* Fallback to first preset in bank 0 */
+      if (!preset && prognum != 0)
+      {
+	preset = fluid_synth_find_preset(synth, 0, 0);
+	subst_prog = 0;
+      }
+    }
+    else /* Percussion: Fallback to preset 0 in percussion bank */
+    {
+      preset = fluid_synth_find_preset(synth, DRUM_INST_BANK, 0);
+      subst_prog = 0;
+    }
+
+    if (preset)
+      FLUID_LOG(FLUID_WARN, "Instrument not found on channel %d [bank=%d prog=%d], substituted [bank=%d prog=%d]",
+		chan, banknum, prognum, subst_bank, subst_prog); 
+  }
+
+  sfont_id = preset? fluid_sfont_get_id(preset->sfont) : 0;
+  fluid_channel_set_sfontnum(channel, sfont_id);
+  fluid_channel_set_preset(channel, preset);
+
+  return FLUID_OK;
 }
 
 /*
@@ -1562,13 +1627,11 @@ void fluid_synth_set_chorus(fluid_synth_t* synth, int nr, double level,
  */
 int
 fluid_synth_nwrite_float(fluid_synth_t* synth, int len,
-			float** left, float** right,
-			float** fx_left, float** fx_right)
+			 float** left, float** right,
+       float** fx_left, float** fx_right)
 {
   fluid_real_t** left_in = synth->left_buf;
   fluid_real_t** right_in = synth->right_buf;
-  fluid_real_t** fx_left_in = synth->fx_left_buf;
-  fluid_real_t** fx_right_in = synth->fx_right_buf;
   double time = fluid_utime();
   int i, num, available, count, bytes;
 
@@ -1590,10 +1653,6 @@ fluid_synth_nwrite_float(fluid_synth_t* synth, int len,
       FLUID_MEMCPY(left[i], left_in[i] + synth->cur, bytes);
       FLUID_MEMCPY(right[i], right_in[i] + synth->cur, bytes);
     }
-    for (i = 0; i < synth->effects_channels; i++) {
-      FLUID_MEMCPY(fx_left[i], fx_left_in[i] + synth->cur, bytes);
-      FLUID_MEMCPY(fx_right[i], fx_right_in[i] + synth->cur, bytes);
-    }
     count += num;
     num += synth->cur; /* if we're now done, num becomes the new synth->cur below */
   }
@@ -1608,10 +1667,6 @@ fluid_synth_nwrite_float(fluid_synth_t* synth, int len,
     for (i = 0; i < synth->audio_channels; i++) {
       FLUID_MEMCPY(left[i] + count, left_in[i], bytes);
       FLUID_MEMCPY(right[i] + count, right_in[i], bytes);
-    }
-    for (i = 0; i < synth->effects_channels; i++) {
-      FLUID_MEMCPY(fx_left[i] + count, fx_left_in[i], bytes);
-      FLUID_MEMCPY(fx_right[i] + count, fx_right_in[i], bytes);
     }
 
     count += num;
@@ -1628,11 +1683,28 @@ fluid_synth_nwrite_float(fluid_synth_t* synth, int len,
   return 0;
 }
 
+
 int fluid_synth_process(fluid_synth_t* synth, int len,
 		       int nin, float** in,
 		       int nout, float** out)
 {
-  return fluid_synth_write_float(synth, len, out[0], 0, 1, out[1], 0, 1);
+  if (nout==2) {
+    return fluid_synth_write_float(synth, len, out[0], 0, 1, out[1], 0, 1);
+  }
+  else {
+    float **left, **right;
+    int i;
+    left = FLUID_ARRAY(float*, nout/2);
+    right = FLUID_ARRAY(float*, nout/2);
+    for(i=0; i<nout/2; i++) {
+      left[i] = out[2*i];
+      right[i] = out[2*i+1];
+    }
+    fluid_synth_nwrite_float(synth, len, left, right, NULL, NULL);
+    FLUID_FREE(left);
+    FLUID_FREE(right);
+    return 0;
+  }
 }
 
 
@@ -3027,6 +3099,9 @@ int fluid_synth_handle_midi_event(void* data, fluid_midi_event_t* event)
 
       case PROGRAM_CHANGE:
 	return fluid_synth_program_change(synth, chan, fluid_midi_event_get_program(event));
+
+      case CHANNEL_PRESSURE:
+      return fluid_synth_channel_pressure(synth, chan, fluid_midi_event_get_program(event));
 
       case PITCH_BEND:
 	return fluid_synth_pitch_bend(synth, chan, fluid_midi_event_get_pitch(event));
