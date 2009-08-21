@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src add-ons disk_systems intel ;
 
-UsePrivateHeaders shared ;
-UsePrivateHeaders storage ;
+UsePrivateHeaders shared storage ;
 
 SEARCH_SOURCE
 	+= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ] ;

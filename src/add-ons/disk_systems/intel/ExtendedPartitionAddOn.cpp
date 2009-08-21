@@ -24,6 +24,7 @@
 # define TRACE(x...) do {} while (false)
 #endif
 
+#define PTS_OFFSET (63 * Partition()->BlockSize())
 
 using std::nothrow;
 
@@ -196,13 +197,28 @@ ExtendedPartitionHandle::Init()
 	int32 count = partition->CountChildren();
 	for (int32 i = 0; i < count; i++) {
 		BMutablePartition* child = partition->ChildAt(i);
+
 		PartitionType type;
 		if (!type.SetType(child->Type()))
 			return B_BAD_VALUE;
 
-		// TODO: Get these from the parameters.
-		bool active = false;
+		void* handle = parse_driver_settings_string(child->Parameters());
+		if (handle == NULL)
+			return B_ERROR;
+
+		bool active = get_driver_boolean_parameter(
+			handle, "active", false, true);
+
 		off_t ptsOffset = 0;
+		const char* buffer = get_driver_parameter(handle,
+			"partition_table_offset", NULL, NULL);
+		if (buffer != NULL)
+			ptsOffset = strtoull(buffer, NULL, 10);
+		else {
+			delete_driver_settings(handle);
+			return B_BAD_VALUE;
+		}
+		delete_driver_settings(handle);
 
 		LogicalPartition* logical = new(nothrow) LogicalPartition;
 		if (!logical)
@@ -222,7 +238,7 @@ ExtendedPartitionHandle::Init()
 uint32
 ExtendedPartitionHandle::SupportedOperations(uint32 mask)
 {
-	uint32 flags = 0;//B_DISK_SYSTEM_SUPPORTS_INITIALIZING;
+	uint32 flags = 0;
 
 	// creating child
 	if (mask & B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD) {
@@ -251,9 +267,6 @@ status_t
 ExtendedPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
 	int32* cookie, BString* type)
 {
-	TRACE("%p->ExtendedPartitionHandle::GetNextSupportedType(child: %p, "
-		"cookie: %ld)\n", this, child, *cookie);
-
 	int32 index = *cookie;
 	const partition_type* nextType;
 	PartitionMap partitionMap;
@@ -281,10 +294,10 @@ ExtendedPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
 status_t
 ExtendedPartitionHandle::GetPartitioningInfo(BPartitioningInfo* info)
 {
-	// init to the full size (minus the first sector)
+	// init to the full size (minus the first PTS_OFFSET)
 	BMutablePartition* partition = Partition();
-	off_t offset = partition->Offset();
-	off_t size = partition->Size();
+	off_t offset = partition->Offset() + PTS_OFFSET;
+	off_t size = partition->Size() - PTS_OFFSET;
 	status_t error = info->SetTo(offset, size);
 	if (error != B_OK)
 		return error;
@@ -293,7 +306,17 @@ ExtendedPartitionHandle::GetPartitioningInfo(BPartitioningInfo* info)
 	int32 count = partition->CountChildren();
 	for (int32 i = 0; i < count; i++) {
 		BMutablePartition* child = partition->ChildAt(i);
-		error = info->ExcludeOccupiedSpace(child->Offset(), child->Size());
+		error = info->ExcludeOccupiedSpace(child->Offset(),
+			child->Size() + PTS_OFFSET + Partition()->BlockSize());
+		if (error != B_OK)
+			return error;
+
+		LogicalPartition* logical = (LogicalPartition*)child->ChildCookie();
+		if (logical == NULL)
+			return B_BAD_VALUE;
+		error = info->ExcludeOccupiedSpace(
+			logical->PartitionTableOffset(),
+				PTS_OFFSET + Partition()->BlockSize());
 		if (error != B_OK)
 			return error;
 	}
@@ -416,7 +439,7 @@ ExtendedPartitionHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 // CreateChild
 status_t
 ExtendedPartitionHandle::CreateChild(off_t offset, off_t size,
-	const char* typeString, const char* name, const char* parameters,
+	const char* typeString, const char* name, const char* _parameters,
 	BMutablePartition** _child)
 {
 	// check type
@@ -456,11 +479,12 @@ ExtendedPartitionHandle::CreateChild(off_t offset, off_t size,
 	if (!foundSpace)
 		return B_BAD_VALUE;
 
-	// everything looks good, do it
-	// create the child
+	BString parameters(_parameters);
+	parameters << "partition_table_offset " << offset - PTS_OFFSET << " ;\n";
+	// everything looks good, create the child
 	BMutablePartition* child;
 	error = Partition()->CreateChild(-1, typeString,
-		NULL, parameters, &child);
+		NULL, parameters.String(), &child);
 	if (error != B_OK)
 		return error;
 
