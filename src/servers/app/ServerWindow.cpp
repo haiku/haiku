@@ -183,7 +183,7 @@ DirectWindowData::DirectWindowData()
 {
 	fBufferArea = create_area("direct area", (void**)&buffer_info,
 		B_ANY_ADDRESS, DIRECT_BUFFER_INFO_AREA_SIZE,
-		B_NO_LOCK, B_READ_WRITE);
+		B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 
 	memset(buffer_info, 0, DIRECT_BUFFER_INFO_AREA_SIZE);
 	buffer_info->buffer_state = B_DIRECT_STOP;
