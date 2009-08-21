@@ -51,16 +51,25 @@ ReadBatteryStatus(battery_driver_cookie* cookie, acpi_battery_info* batteryStatu
 		goto exit;
 
 	object = (acpi_object_type*)buffer.pointer;
+	if (object->object_type != ACPI_TYPE_PACKAGE ||
+		object->data.package.count < 4) {
+		status = B_ERROR;
+		goto exit;
+	}
 
 	pointer = object->data.package.objects;
 	
-	batteryStatus->state = pointer->data.integer;
+	batteryStatus->state = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
+		pointer->data.integer : -1;
 	pointer++;
-	batteryStatus->current_rate = pointer->data.integer;
+	batteryStatus->current_rate = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
+		pointer->data.integer : -1;
 	pointer++;
-	batteryStatus->capacity = pointer->data.integer;
+	batteryStatus->capacity = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
+		pointer->data.integer : -1;
 	pointer++;
-	batteryStatus->voltage = pointer->data.integer;
+	batteryStatus->voltage = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
+		pointer->data.integer : -1;
 
 exit:
 	free(buffer.pointer);
@@ -87,36 +96,51 @@ ReadBatteryInfo(battery_driver_cookie* cookie,
 
 	object = (acpi_object_type*)buffer.pointer;
 	if (object->object_type != ACPI_TYPE_PACKAGE ||
-		object->data.package.count < 13)
+		object->data.package.count < 13) {
+		status = B_ERROR;
 		goto exit;
+	}
 
 	pointer = object->data.package.objects;
 	
-	batteryInfo->power_unit = pointer->data.integer;
-	pointer ++;
-	batteryInfo->design_capacity = pointer->data.integer;
-	pointer ++;
-	batteryInfo->last_full_charge = pointer->data.integer;
-	pointer ++;
-	batteryInfo->technology = pointer->data.integer;
-	pointer ++;
-	batteryInfo->design_voltage = pointer->data.integer;
-	pointer ++;
-	batteryInfo->design_capacity_warning = pointer->data.integer;
-	pointer ++;
-	batteryInfo->design_capacity_low = pointer->data.integer;
-	pointer ++;
-	batteryInfo->capacity_granularity_1 = pointer->data.integer;
-	pointer ++;
-	batteryInfo->capacity_granularity_2 = pointer->data.integer;
-	pointer ++;
-	strcpy(batteryInfo->model_number, pointer->data.string.string);
-	pointer ++;
-	strcpy(batteryInfo->serial_number, pointer->data.string.string);
-	pointer ++;
-	strcpy(batteryInfo->type, pointer->data.string.string);
-	pointer ++;
-	strcpy(batteryInfo->oem_info, pointer->data.string.string);
+	batteryInfo->power_unit = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
+		pointer->data.integer : -1;
+	pointer++;
+	batteryInfo->design_capacity = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
+		pointer->data.integer : -1;
+	pointer++;
+	batteryInfo->last_full_charge = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
+		pointer->data.integer : -1;
+	pointer++;
+	batteryInfo->technology = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
+		pointer->data.integer : -1;
+	pointer++;
+	batteryInfo->design_voltage = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
+		pointer->data.integer : -1;
+	pointer++;
+	batteryInfo->design_capacity_warning = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
+		pointer->data.integer : -1;
+	pointer++;
+	batteryInfo->design_capacity_low = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
+		pointer->data.integer : -1;
+	pointer++;
+	batteryInfo->capacity_granularity_1 = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
+		pointer->data.integer : -1;
+	pointer++;
+	batteryInfo->capacity_granularity_2 = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
+		pointer->data.integer : -1;
+	pointer++;
+	strlcpy(batteryInfo->model_number, (pointer->object_type == ACPI_TYPE_STRING) ? 
+		pointer->data.string.string : "", sizeof(batteryInfo->model_number));
+	pointer++;
+	strlcpy(batteryInfo->serial_number, (pointer->object_type == ACPI_TYPE_STRING) ? 
+		pointer->data.string.string : "", sizeof(batteryInfo->serial_number));
+	pointer++;
+	strlcpy(batteryInfo->type, (pointer->object_type == ACPI_TYPE_STRING) ? 
+		pointer->data.string.string : "", sizeof(batteryInfo->type));
+	pointer++;
+	strlcpy(batteryInfo->oem_info, (pointer->object_type == ACPI_TYPE_STRING) ? 
+		pointer->data.string.string : "", sizeof(batteryInfo->oem_info));
 	
 exit:
 	free(buffer.pointer);
@@ -285,50 +309,54 @@ status_t
 acpi_battery_control(void* _cookie, uint32 op, void* arg, size_t len)
 {
 	battery_device_cookie* device = (battery_device_cookie*)_cookie;
-	status_t err = B_ERROR;
+	status_t err;
 
-	uint32* magicId;
-	acpi_battery_info* batteryInfo;
-	acpi_extended_battery_info* extBatteryInfo;
 	switch (op) {
-		case IDENTIFY_DEVICE:
+		case IDENTIFY_DEVICE: {
 			if (len < sizeof(uint32))
-				return B_IO_ERROR;
-			magicId = (uint32*)arg;
-			*magicId = kMagicACPIBatteryID;
-			err = B_OK;
-			break;
+				return B_BAD_VALUE;
 
-		case GET_BATTERY_INFO:
+			uint32 magicId = kMagicACPIBatteryID;
+			return user_memcpy(arg, &magicId, sizeof(magicId));
+		}
+		
+		case GET_BATTERY_INFO: {
 			if (len < sizeof(acpi_battery_info))
-				return B_IO_ERROR;
-			batteryInfo = (acpi_battery_info*)arg;
-			err = ReadBatteryStatus(device->driver_cookie, batteryInfo);
-			break;
+				return B_BAD_VALUE;
 
-		case GET_EXTENDED_BATTERY_INFO:
+			acpi_battery_info batteryInfo;
+			err = ReadBatteryStatus(device->driver_cookie, &batteryInfo);
+			if (err != B_OK)
+				return err;
+			return user_memcpy(arg, &batteryInfo, sizeof(batteryInfo));		
+		}
+		
+		case GET_EXTENDED_BATTERY_INFO: {
 			if (len < sizeof(acpi_extended_battery_info))
-				return B_IO_ERROR;
-			extBatteryInfo = (acpi_extended_battery_info*)arg;
-			err = ReadBatteryInfo(device->driver_cookie, extBatteryInfo);
-			break;
+				return B_BAD_VALUE;
+				
+			acpi_extended_battery_info extBatteryInfo;
+			err = ReadBatteryInfo(device->driver_cookie, &extBatteryInfo);
+			if (err != B_OK)
+				return err;
+			return user_memcpy(arg, &extBatteryInfo, sizeof(extBatteryInfo));
+		}
 		
 		case WATCH_BATTERY:
 			sBatteryCondition.Wait();
 			if (atomic_get(&(device->stop_watching))) {
 				atomic_set(&(device->stop_watching), 0);
-				err = B_ERROR;
-			} else 
-				err = B_OK;
-			break;
+				return B_ERROR;
+			}
+			return B_OK;
 		
 		case STOP_WATCHING_BATTERY:
 			atomic_set(&(device->stop_watching), 1);
 			sBatteryCondition.NotifyAll();
-			err = B_OK;
-			break;
+			return B_OK;
 	}
-	return err;
+
+	return B_DEV_INVALID_IOCTL;
 }
 
 
