@@ -302,9 +302,8 @@ Desktop::Desktop(uid_t userID)
 	fSubsetWindows(kSubsetList),
 	fFocusList(kFocusList),
 	fWorkspacesViews(false),
-	fWorkspacesLock("workspaces list"),
-	fActiveScreen(NULL),
 
+	fWorkspacesLock("workspaces list"),
 	fWindowLock("window lock"),
 
 	fMouseEventWindow(NULL),
@@ -368,9 +367,6 @@ Desktop::Init()
 
 	fVirtualScreen.SetConfiguration(*this,
 		fWorkspaces[0].CurrentScreenConfiguration());
-
-	// TODO: temporary workaround, fActiveScreen will be removed
-	fActiveScreen = fVirtualScreen.ScreenAt(0);
 
 	if (fVirtualScreen.HWInterface() == NULL) {
 		debug_printf("Could not initialize graphics output. Exiting.\n");

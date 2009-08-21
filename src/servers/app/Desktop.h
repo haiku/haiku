@@ -113,14 +113,9 @@ public:
 									int32* buttons) const;
 									// for use by ServerWindow
 
-	// Screen and drawing related methods
-
-			Screen*				ScreenAt(int32 index) const
-									{ return fActiveScreen; }
-			Screen*				ActiveScreen() const
-									{ return fActiveScreen; }
-
 			CursorManager&		GetCursorManager() { return fCursorManager; }
+
+	// Screen and drawing related methods
 
 			status_t			SetScreenMode(int32 workspace, int32 id,
 									const display_mode& mode, bool makeDefault);
@@ -316,8 +311,6 @@ private:
 
 			BObjectList<WorkspacesView> fWorkspacesViews;
 			BLocker				fWorkspacesLock;
-
-			Screen*				fActiveScreen;
 
 			CursorManager		fCursorManager;
 

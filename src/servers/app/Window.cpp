@@ -162,9 +162,8 @@ Window::Window(const BRect& frame, const char *name,
 		uint16 width, height;
 		uint32 colorSpace;
 		float frequency;
-		if (fDesktop->ScreenAt(0)) {
-			fDesktop->ScreenAt(0)->GetMode(width, height,
-				colorSpace, frequency);
+		if (Screen() != NULL) {
+			Screen()->GetMode(width, height, colorSpace, frequency);
 // TODO: MOVE THIS AWAY!!! ResizeBy contains calls to virtual methods!
 // Also, there is no TopView()!
 			fFrame.OffsetTo(B_ORIGIN);
@@ -561,6 +560,16 @@ Window*
 Window::PreviousWindow(int32 index) const
 {
 	return fAnchor[index].previous;
+}
+
+
+::Screen*
+Window::Screen() const
+{
+	ASSERT_MULTI_LOCKED(fDesktop->WindowLocker());
+
+	// TODO: we need to know which screen the window is on
+	return fDesktop->VirtualScreen().ScreenAt(0);
 }
 
 
@@ -1147,7 +1156,7 @@ Window::_AlterDeltaForSnap(BPoint& delta, bigtime_t now)
 	BRect frame = fFrame;
 	BPoint offsetWithinFrame;
 	// TODO: Perhaps obtain the usable area (not covered by the Deskbar)?
-	BRect screenFrame = fDesktop->ActiveScreen()->Frame();
+	BRect screenFrame = Screen()->Frame();
 
 	if (fDecorator) {
 		BRegion reg;

@@ -31,6 +31,7 @@ class Decorator;
 class Desktop;
 class DrawingEngine;
 class EventDispatcher;
+class Screen;
 class WorkspacesView;
 
 // TODO: move this into a proper place
@@ -40,6 +41,7 @@ enum {
 	UPDATE_REQUEST		= 0x01,
 	UPDATE_EXPOSE		= 0x02,
 };
+
 
 class Window {
 public:
@@ -64,6 +66,8 @@ public:
 			::ServerWindow*		ServerWindow() const { return fWindow; }
 			::EventTarget&		EventTarget() const
 									{ return fWindow->EventTarget(); }
+
+			::Screen*			Screen() const;
 
 			// setting and getting the "hard" clipping, you need to have
 			// WriteLock()ed the clipping!

@@ -3550,14 +3550,14 @@ ServerWindow::_MessageLooper()
 
 
 void
-ServerWindow::ScreenChanged(const BMessage *message)
+ServerWindow::ScreenChanged(const BMessage* message)
 {
 	// TODO: execute the stop notification earlier
 	//HandleDirectConnection(B_DIRECT_STOP);
 	SendMessageToClient(message);
 
 	if (fDirectWindowData != NULL && fDirectWindowData->full_screen) {
-		BRect screenFrame = fDesktop->ActiveScreen()->Frame();
+		BRect screenFrame = fWindow->Screen()->Frame();
 		fDesktop->ResizeWindowBy(fWindow,
 			screenFrame.Width() - fWindow->Frame().Width(),
 			screenFrame.Height() - fWindow->Frame().Height());
@@ -3575,7 +3575,7 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target) const
 		target = fClientToken;
 
 	BMessenger reply;
-	BMessage::Private messagePrivate((BMessage *)msg);
+	BMessage::Private messagePrivate((BMessage*)msg);
 	return messagePrivate.SendMessage(fClientLooperPort, fClientTeam, target,
 		0, false, reply);
 }
@@ -3587,7 +3587,7 @@ ServerWindow::MakeWindow(BRect frame, const char* name,
 {
 	// The non-offscreen ServerWindow uses the DrawingEngine instance from
 	// the desktop.
-	return new (nothrow) ::Window(frame, name, look, feel, flags,
+	return new(std::nothrow) ::Window(frame, name, look, feel, flags,
 		workspace, this, new (nothrow) DrawingEngine(fDesktop->HWInterface()));
 }
 
@@ -3799,8 +3799,7 @@ ServerWindow::_DirectWindowSetFullScreen(bool enable)
 		fDesktop->HWInterface()->SetCursorVisible(false);
 
 		fDirectWindowData->old_window_frame = fWindow->Frame();
-		BRect screenFrame =
-			fDesktop->ActiveScreen()->Frame();
+		BRect screenFrame = fWindow->Screen()->Frame();
 		fDirectWindowFeel = fWindow->Feel();
 		fDesktop->MoveWindowBy(fWindow, -fWindow->Frame().left,
 			-fWindow->Frame().top);

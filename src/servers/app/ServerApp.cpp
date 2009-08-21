@@ -2263,11 +2263,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					ServerWindow* window = fWindowList.ItemAt(i);
 
 					if (window->ClientToken() == clientToken) {
-						// got it!
+						// found it!
 						fLink.StartMessage(B_OK);
-						fLink.Attach<int32>(B_MAIN_SCREEN_ID.id);
-							// TODO: for now...
+						fLink.Attach<int32>(window->Window()->Screen()->ID());
 						status = B_OK;
+						break;
 					}
 				}
 			}
