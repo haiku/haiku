@@ -161,10 +161,14 @@ public:
 			bool				full_screen;
 
 private:
-			sem_id				fSem;
-			sem_id				fAcknowledgeSem;
-			area_id				fBufferArea;
-			direct_buffer_state	fPreviousState;
+			bool _HandleStop(const direct_buffer_state &state);
+			bool _HandleStart(const direct_buffer_state &state);
+			bool _HandleModify(const direct_buffer_state &state);
+		
+			sem_id	fSem;
+			sem_id	fAcknowledgeSem;
+			area_id	fBufferArea;
+			int32 fTransition;
 };
 
 
@@ -175,7 +179,7 @@ DirectWindowData::DirectWindowData()
 	fSem(-1),
 	fAcknowledgeSem(-1),
 	fBufferArea(-1),
-	fPreviousState(B_DIRECT_STOP)
+	fTransition(0)
 {
 	fBufferArea = create_area("direct area", (void**)&buffer_info,
 		B_ANY_ADDRESS, B_PAGE_SIZE, B_NO_LOCK, B_READ_WRITE);
@@ -248,29 +252,54 @@ DirectWindowData::SetState(const direct_buffer_state& bufferState,
 {
 	BufferState inputState(bufferState);
 	BufferState currentState(buffer_info->buffer_state);
-
-	// Don't issue a DirectConnected() notification
-	// if the connection is stopped, and we are called
-	// with bufferState == B_DIRECT_MODIFY, but save the reason
-	// and combine it for next time we are called with B_DIRECT_START
-	if (currentState.Action() == B_DIRECT_STOP
-		&& inputState.Action() != B_DIRECT_START) {
-		fPreviousState = (direct_buffer_state)(fPreviousState
-			| inputState.Reason());
-		return false;
-	}
-
-	buffer_info->buffer_state = (direct_buffer_state)(bufferState
-		| BufferState(fPreviousState).Reason());
-
-	fPreviousState = B_DIRECT_STOP;
-
+	
+	bool handle = false;
+		
+	if (inputState.Action() == B_DIRECT_STOP)
+		handle = _HandleStop(bufferState);
+	else if (inputState.Action() == B_DIRECT_START)
+		handle = _HandleStart(bufferState);
+	else if (inputState.Action() == B_DIRECT_MODIFY)
+		handle = _HandleModify(bufferState);
+		
 	if (driverState != -1)
 		buffer_info->driver_state = driverState;
 
-	return true;
+	return handle;
 }
 
+
+bool
+DirectWindowData::_HandleStop(const direct_buffer_state &state)
+{
+	buffer_info->buffer_state = B_DIRECT_STOP;
+	if (fTransition-- >= 1)
+		return true;
+	return false;
+}
+
+
+bool
+DirectWindowData::_HandleStart(const direct_buffer_state &state)
+{
+	buffer_info->buffer_state 
+		= (direct_buffer_state)(BufferState(buffer_info->buffer_state).Reason() | state);
+	if (fTransition++ >= 0)
+		return true;
+	
+	return false;
+}
+
+
+bool
+DirectWindowData::_HandleModify(const direct_buffer_state &state)
+{
+	buffer_info->buffer_state = state;
+	if (fTransition > 0)
+		return true;
+	
+	return false;
+}
 
 //	#pragma mark -
 
@@ -3553,7 +3582,7 @@ void
 ServerWindow::ScreenChanged(const BMessage* message)
 {
 	// TODO: execute the stop notification earlier
-	//HandleDirectConnection(B_DIRECT_STOP);
+	HandleDirectConnection(B_DIRECT_STOP);
 	SendMessageToClient(message);
 
 	if (fDirectWindowData != NULL && fDirectWindowData->full_screen) {
@@ -3563,8 +3592,8 @@ ServerWindow::ScreenChanged(const BMessage* message)
 			screenFrame.Height() - fWindow->Frame().Height());
 	}
 
-	//HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET,
-		//B_SCREEN_CHANGED);
+	HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET,
+		B_SCREEN_CHANGED);
 }
 
 
