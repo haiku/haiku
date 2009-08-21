@@ -334,8 +334,10 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 			return B_ERROR;
 		}
 
-		if (result != B_TIMED_OUT) {
-			// we expect timeouts as we do repeat key handling this way
+		if (result != B_TIMED_OUT && result != B_INTERRUPTED) {
+			// we expect timeouts as we do repeat key handling this way,
+			// interrupts happen when other reports come in on the same
+			// endpoint
 			TRACE_ALWAYS("error waiting for report: %s\n", strerror(result));
 		}
 

@@ -448,34 +448,34 @@ HIDParser::MaxReportSize()
 void
 HIDParser::SetReport(status_t status, uint8 *report, size_t length)
 {
-	if (status != B_OK) {
-		// in case of error we need to notify all input reports, as we don't
-		// know who has waiting listeners.
-		for (uint32 i = 0; i < fReportCount; i++) {
-			if (fReports[i] == NULL
-				|| fReports[i]->Type() != HID_REPORT_TYPE_INPUT)
-				continue;
+	if (status != B_OK || length == 0) {
+		if (status == B_OK)
+			status = B_ERROR;
 
-			fReports[i]->SetReport(status, NULL, 0);
-		}
-
-		return;
+		report = NULL;
+		length = 0;
 	}
 
-	HIDReport *target = NULL;
-	if (fUsesReportIDs) {
-		target = FindReport(HID_REPORT_TYPE_INPUT, report[0]);
+	uint8 targetID = 0;
+	if (fUsesReportIDs && status == B_OK) {
+		targetID = report[0];
 		report++;
 		length--;
-	} else
-		target = FindReport(HID_REPORT_TYPE_INPUT, 0);
-
-	if (target == NULL) {
-		TRACE_ALWAYS("got report buffer but found no report to handle it\n");
-		return;
 	}
 
-	target->SetReport(status, report, length);
+	// We need to notify all input reports, as we don't know who has waiting
+	// listeners. Anyone other than the target report also waiting for a
+	// transfer to happen needs to reschedule one now.
+	for (uint32 i = 0; i < fReportCount; i++) {
+		if (fReports[i] == NULL
+			|| fReports[i]->Type() != HID_REPORT_TYPE_INPUT)
+			continue;
+
+		if (fReports[i]->ID() == targetID)
+			fReports[i]->SetReport(status, report, length);
+		else
+			fReports[i]->SetReport(B_INTERRUPTED, NULL, 0);
+	}
 }
 
 

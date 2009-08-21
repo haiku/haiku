@@ -116,7 +116,12 @@ MouseDevice::_ReadReport()
 			return B_ERROR;
 		}
 
-		TRACE_ALWAYS("error waiting for report: %s\n", strerror(result));
+		if (result != B_INTERRUPTED) {
+			// interrupts happen when other reports come in on the same
+			// input as ours
+			TRACE_ALWAYS("error waiting for report: %s\n", strerror(result));
+		}
+
 		// signal that we simply want to try again
 		return B_OK;
 	}
