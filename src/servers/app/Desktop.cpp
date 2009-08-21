@@ -1214,6 +1214,38 @@ Desktop::GetScreenMode(int32 workspace, int32 id, display_mode& mode)
 }
 
 
+status_t
+Desktop::GetScreenFrame(int32 workspace, int32 id, BRect& frame)
+{
+	if (workspace == B_CURRENT_WORKSPACE_INDEX)
+		workspace = fCurrentWorkspace;
+
+	if (workspace < 0 || workspace > kMaxWorkspaces)
+		return B_BAD_VALUE;
+
+	AutoReadLocker _(fWindowLock);
+
+	if (workspace == fCurrentWorkspace) {
+		// retrieve from current screen
+		Screen* screen = fVirtualScreen.ScreenByID(id);
+		if (screen == NULL)
+			return B_NAME_NOT_FOUND;
+
+		frame = screen->Frame();
+		return B_OK;
+	}
+
+	// retrieve from settings
+	screen_configuration* configuration
+		= fWorkspaces[workspace].CurrentScreenConfiguration().CurrentByID(id);
+	if (configuration == NULL)
+		return B_NAME_NOT_FOUND;
+
+	frame = configuration->frame;
+	return B_OK;
+}
+
+
 void
 Desktop::ScreenChanged(Screen* screen)
 {

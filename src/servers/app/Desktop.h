@@ -101,6 +101,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									const display_mode& mode, bool makeDefault);
 		status_t				GetScreenMode(int32 workspace, int32 id,
 									display_mode& mode);
+		status_t				GetScreenFrame(int32 workspace, int32 id,
+									BRect& frame);
 
 		void					ScreenChanged(Screen* screen);
 

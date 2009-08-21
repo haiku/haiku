@@ -175,10 +175,14 @@ BPrivateScreen::Frame()
 
 	if (system_time() > fLastUpdate + 10000) {
 		// invalidate the settings after 10 msecs
-		display_mode mode;
-		if (GetMode(B_CURRENT_WORKSPACE_INDEX, &mode) == B_OK) {
-			fFrame.Set(0, 0, (float)mode.virtual_width - 1,
-				(float)mode.virtual_height - 1);
+		BPrivate::AppServerLink link;
+		link.StartMessage(AS_GET_SCREEN_FRAME);
+		link.Attach<int32>(ID());
+		link.Attach<uint32>(B_CURRENT_WORKSPACE_INDEX);
+
+		status_t status = B_ERROR;
+		if (link.FlushWithReply(status) == B_OK && status == B_OK) {
+			link.Read<BRect>(&fFrame);
 			fLastUpdate = system_time();
 		}
 	}

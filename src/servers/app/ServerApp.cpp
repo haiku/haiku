@@ -2280,6 +2280,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// Attached data
 			// 1) int32 screen
 			// 2) uint32 workspace index
+
 			int32 id;
 			link.Read<int32>(&id);
 			uint32 workspace;
@@ -2305,7 +2306,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			int32 id;
 			link.Read<int32>(&id);
-
 			uint32 workspace;
 			link.Read<uint32>(&workspace);
 
@@ -2369,6 +2369,29 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				delete[] modeList;
 			} else
 				fLink.StartMessage(status);
+
+			fLink.Flush();
+			break;
+		}
+
+		case AS_GET_SCREEN_FRAME:
+		{
+			STRACE(("ServerApp %s: AS_GET_SCREEN_FRAME\n", Signature()));
+			// Attached data
+			// 1) int32 screen
+			// 2) uint32 workspace index
+
+			int32 id;
+			link.Read<int32>(&id);
+			uint32 workspace;
+			link.Read<uint32>(&workspace);
+
+			BRect frame;
+			status_t status = fDesktop->GetScreenFrame(workspace, id, frame);
+
+			fLink.StartMessage(status);
+			if (status == B_OK)
+				fLink.Attach<BRect>(frame);
 
 			fLink.Flush();
 			break;
