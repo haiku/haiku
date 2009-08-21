@@ -36,6 +36,7 @@
 
 #include <FontPrivate.h>
 #include <MessengerPrivate.h>
+#include <PrivateScreen.h>
 #include <RosterPrivate.h>
 #include <ServerProtocol.h>
 #include <WindowPrivate.h>
@@ -95,6 +96,7 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	fSignature(signature),
 	fClientTeam(clientTeam),
 	fWindowListLock("window list"),
+	fTemporaryDisplayModeChange(0),
 	fAppCursor(NULL),
 	fViewCursor(NULL),
 	fCursorHideLevel(0),
@@ -184,6 +186,8 @@ ServerApp::~ServerApp()
 		}
 		fWindowListLock.Lock();
 	}
+
+	fDesktop->RevertScreenModes(fTemporaryDisplayModeChange);
 
 	for (int32 i = fBitmapList.CountItems(); i-- > 0;) {
 		gBitmapManager->DeleteBitmap((ServerBitmap*)fBitmapList.ItemAt(i));
@@ -2318,6 +2322,20 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (status == B_OK) {
 				status = fDesktop->SetScreenMode(workspace, id, mode,
 					makeDefault);
+			}
+			if (status == B_OK) {
+				if (workspace == (uint32)B_CURRENT_WORKSPACE_INDEX
+					&& fDesktop->LockSingleWindow()) {
+					workspace = fDesktop->CurrentWorkspace();
+					fDesktop->UnlockSingleWindow();
+				}
+
+				if (!makeDefault) {
+					// Memorize the screen change, so that it can be reverted
+					// later
+					fTemporaryDisplayModeChange |= 1 << workspace;
+				} else
+					fTemporaryDisplayModeChange &= ~(1 << workspace);
 			}
 
 			fLink.StartMessage(status);

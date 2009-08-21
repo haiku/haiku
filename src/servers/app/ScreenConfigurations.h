@@ -37,7 +37,7 @@ public:
 			status_t			Set(int32 id, const monitor_info* info,
 									const BRect& frame,
 									const display_mode& mode);
-			status_t			Update(int32 id, const display_mode& mode);
+			void				Remove(screen_configuration* configuration);
 
 			status_t			Store(BMessage& settings) const;
 			status_t			Restore(const BMessage& settings);

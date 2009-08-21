@@ -931,6 +931,23 @@ Desktop::SetWorkspace(int32 index)
 }
 
 
+void
+Desktop::_SetCurrentWorkspaceConfiguration()
+{
+	ASSERT_MULTI_WRITE_LOCKED(fWindowLock);
+
+	uint32 changedScreens;
+	fVirtualScreen.SetConfiguration(*this,
+		fWorkspaces[fCurrentWorkspace].CurrentScreenConfiguration(),
+		&changedScreens);
+
+	for (int32 i = 0; changedScreens != 0; i++, changedScreens /= 2) {
+		if ((changedScreens & (1 << i)) != 0)
+			ScreenChanged(fVirtualScreen.ScreenAt(i));
+	}
+}
+
+
 /*!	Changes the current workspace to the one specified by \a index.
 	You must hold the all window lock when calling this method.
 */
@@ -998,15 +1015,7 @@ Desktop::_SetWorkspace(int32 index)
 	fCurrentWorkspace = index;
 
 	// Change the display modes, if needed
-
-	uint32 changedScreens;
-	fVirtualScreen.SetConfiguration(*this,
-		fWorkspaces[index].CurrentScreenConfiguration(), &changedScreens);
-
-	for (int32 i = 0; changedScreens != 0; i++, changedScreens /= 2) {
-		if ((changedScreens & (1 << i)) != 0)
-			ScreenChanged(fVirtualScreen.ScreenAt(i));
-	}
+	_SetCurrentWorkspaceConfiguration();
 
 	// Show windows, and include them in the changed region - but only
 	// those that were not visible before (or whose position changed)
@@ -1143,6 +1152,12 @@ Desktop::SetScreenMode(int32 workspace, int32 id, const display_mode& mode,
 
 		if (!memcmp(&oldMode, &mode, sizeof(display_mode)))
 			return B_OK;
+
+		// Set the new one
+
+		status_t status = screen->SetMode(mode);
+		if (status != B_OK)
+			return status;
 	} else {
 		// retrieve from settings
 		screen_configuration* configuration
@@ -1152,12 +1167,6 @@ Desktop::SetScreenMode(int32 workspace, int32 id, const display_mode& mode,
 			&& !memcmp(&configuration->mode, &mode, sizeof(display_mode)))
 			return B_OK;
 	}
-
-	// Set the new one
-
-	status_t status = screen->SetMode(mode);
-	if (status != B_OK)
-		return status;
 
 	// Update our configurations
 
@@ -1242,9 +1251,54 @@ Desktop::GetScreenFrame(int32 workspace, int32 id, BRect& frame)
 
 
 void
+Desktop::RevertScreenModes(uint32 workspaces)
+{
+	if (workspaces == 0)
+		return;
+
+	AutoWriteLocker _(fWindowLock);
+
+	for (int32 workspace = 0; workspace < kMaxWorkspaces; workspace++) {
+		if ((workspaces & (1U << workspace)) == 0)
+			continue;
+
+		// Revert all screens on this workspace
+
+		// TODO: ideally, we would know which screens to revert - this way, too
+		// many of them could be reverted
+
+		for (int32 index = 0; index < fVirtualScreen.CountScreens(); index++) {
+			Screen* screen = fVirtualScreen.ScreenAt(index);
+
+			// retrieve configurations
+			screen_configuration* stored = fWorkspaces[workspace]
+				.StoredScreenConfiguration().CurrentByID(screen->ID());
+			screen_configuration* current = fWorkspaces[workspace]
+				.CurrentScreenConfiguration().CurrentByID(screen->ID());
+
+			if ((stored != NULL && current != NULL
+					&& !memcmp(&stored->mode, &current->mode,
+							sizeof(display_mode)))
+				|| (stored == NULL && current == NULL))
+				continue;
+
+			if (stored == NULL) {
+				fWorkspaces[workspace].CurrentScreenConfiguration()
+					.Remove(current);
+
+				if (workspace == fCurrentWorkspace)
+					_SetCurrentWorkspaceConfiguration();
+			} else
+				SetScreenMode(workspace, screen->ID(), stored->mode, false);
+		}
+	}
+}
+
+
+void
 Desktop::ScreenChanged(Screen* screen)
 {
-	ASSERT(fWindowLock.IsWriteLocked());
+	ASSERT_MULTI_WRITE_LOCKED(fWindowLock);
 
 	// the entire screen is dirty, because we're actually
 	// operating on an all new buffer in memory

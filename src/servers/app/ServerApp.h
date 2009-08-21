@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -41,11 +41,10 @@ namespace BPrivate {
 class ServerApp : public MessageLooper {
 public:
 								ServerApp(Desktop* desktop,
-										  port_id clientAppPort,
-										  port_id clientLooperPort,
-										  team_id clientTeamID,
-										  int32 handlerID,
-										  const char* signature);
+									port_id clientAppPort,
+									port_id clientLooperPort,
+									team_id clientTeamID, int32 handlerID,
+									const char* signature);
 	virtual						~ServerApp();
 
 			status_t			InitCheck();
@@ -105,6 +104,7 @@ private:
 
 			bool				_HasWindowUnderMouse();
 
+private:
 			port_id				fMessagePort;
 			port_id				fClientReplyPort;
 									// our BApplication's event port
@@ -128,6 +128,7 @@ private:
 			BPrivate::BTokenSpace fViewTokens;
 
 			int32				fInitialWorkspace;
+			uint32				fTemporaryDisplayModeChange;
 
 			// NOTE: Bitmaps and Pictures are stored globally, but ServerApps
 			// remember which ones they own so that they can destroy them when

@@ -143,18 +143,14 @@ ScreenConfigurations::Set(int32 id, const monitor_info* info,
 }
 
 
-status_t
-ScreenConfigurations::Update(int32 id, const display_mode& mode)
+void
+ScreenConfigurations::Remove(screen_configuration* configuration)
 {
-	screen_configuration* configuration = CurrentByID(id);
 	if (configuration == NULL)
-		return B_BAD_VALUE;
+		return;
 
-	configuration->is_current = true;
-
-	memcpy(&configuration->mode, &mode, sizeof(display_mode));
-
-	return B_OK;
+	fConfigurations.RemoveItem(configuration);
+		// this also deletes the configuration
 }
 
 
