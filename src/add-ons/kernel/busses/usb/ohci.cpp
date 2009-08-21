@@ -888,6 +888,18 @@ OHCI::_FinishTransfers()
 			ohci_general_td *descriptor = transfer->first_descriptor;
 			status_t callbackStatus = B_OK;
 
+			ohci_endpoint_descriptor *endpoint = transfer->endpoint;
+			if ((endpoint->head_physical_descriptor & OHCI_ENDPOINT_HEAD_MASK)
+				!= endpoint->tail_physical_descriptor) {
+				// there are still active transfers on this endpoint, we need
+				// to wait for all of them to complete, otherwise we'd read
+				// a potentially bogus data toggle value below
+				TRACE("endpoint %p still has active tds\n", endpoint);
+				lastTransfer = transfer;
+				transfer = transfer->link;
+				continue;
+			}
+
 			while (descriptor && !transfer->canceled) {
 				uint32 status = OHCI_TD_GET_CONDITION_CODE(descriptor->flags);
 				if (status == OHCI_TD_CONDITION_NOT_ACCESSED) {
@@ -899,7 +911,6 @@ OHCI::_FinishTransfers()
 				if (status != OHCI_TD_CONDITION_NO_ERROR) {
 					// an error occured, but we must ensure that the td
 					// was actually done
-					ohci_endpoint_descriptor *endpoint = transfer->endpoint;
 					if (endpoint->head_physical_descriptor & OHCI_ENDPOINT_HALTED) {
 						// the endpoint is halted, this guaratees us that this
 						// descriptor has passed (we don't know if the endpoint
@@ -1035,7 +1046,7 @@ OHCI::_FinishTransfers()
 
 					// get the last data toggle and store it for next time
 					transfer->transfer->TransferPipe()->SetDataToggle(
-						(transfer->endpoint->head_physical_descriptor
+						(endpoint->head_physical_descriptor
 							& OHCI_ENDPOINT_TOGGLE_CARRY) != 0);
 
 					if (transfer->transfer->IsFragmented()) {
@@ -1078,7 +1089,7 @@ status_t
 OHCI::_SubmitRequest(Transfer *transfer)
 {
 	usb_request_data *requestData = transfer->RequestData();
-	bool directionIn = (requestData->RequestType & USB_REQTYPE_DEVICE_IN) > 0;
+	bool directionIn = (requestData->RequestType & USB_REQTYPE_DEVICE_IN) != 0;
 
 	ohci_general_td *setupDescriptor
 		= _CreateGeneralDescriptor(sizeof(usb_request_data));
@@ -1231,7 +1242,7 @@ OHCI::_SwitchEndpointTail(ohci_endpoint_descriptor *endpoint,
 	tail->next_logical_descriptor = first->next_logical_descriptor;
 
 	// the first descriptor becomes the new tail
-	first->flags = OHCI_TD_SET_CONDITION_CODE(OHCI_TD_CONDITION_NOT_ACCESSED);
+	first->flags = 0;
 	first->buffer_physical = 0;
 	first->next_physical_descriptor = 0;
 	first->last_physical_byte_address = 0;
@@ -1247,6 +1258,7 @@ OHCI::_SwitchEndpointTail(ohci_endpoint_descriptor *endpoint,
 	// update the endpoint tail pointer to reflect the change
 	endpoint->tail_logical_descriptor = first;
 	endpoint->tail_physical_descriptor = (uint32)first->physical_address;
+	TRACE("switched tail from %p to %p\n", tail, first);
 
 #if 0
 	_PrintEndpoint(endpoint);
@@ -1410,7 +1422,7 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 		return B_ERROR;
 	} else {
 		ohci_general_td *tail = _CreateGeneralDescriptor(0);
-		tail->flags = OHCI_TD_SET_CONDITION_CODE(OHCI_TD_CONDITION_NOT_ACCESSED);
+		tail->flags = 0;
 		endpoint->tail_logical_descriptor = tail;
 		endpoint->head_physical_descriptor = tail->physical_address;
 		endpoint->tail_physical_descriptor = tail->physical_address;
