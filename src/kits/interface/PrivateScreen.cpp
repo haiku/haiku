@@ -31,6 +31,7 @@
 
 using namespace BPrivate;
 
+
 static BObjectList<BPrivateScreen> sScreens(2, true);
 
 // used to synchronize creation/deletion of the sScreen object
@@ -159,7 +160,7 @@ color_space
 BPrivateScreen::ColorSpace()
 {
 	display_mode mode;
-	if (GetMode(B_CURRENT_WORKSPACE, &mode) == B_OK)
+	if (GetMode(B_CURRENT_WORKSPACE_INDEX, &mode) == B_OK)
 		return (color_space)mode.space;
 
 	return B_NO_COLOR_SPACE;
@@ -171,10 +172,10 @@ BPrivateScreen::Frame()
 {
 	// If something goes wrong, we just return this rectangle.
 
-	if (system_time() > fLastUpdate + 100000) {
-		// invalidate the settings after 0.1 secs
+	if (system_time() > fLastUpdate + 10000) {
+		// invalidate the settings after 10 msecs
 		display_mode mode;
-		if (GetMode(B_CURRENT_WORKSPACE, &mode) == B_OK) {
+		if (GetMode(B_CURRENT_WORKSPACE_INDEX, &mode) == B_OK) {
 			fFrame.Set(0, 0, (float)mode.virtual_width - 1,
 				(float)mode.virtual_height - 1);
 			fLastUpdate = system_time();
@@ -649,6 +650,23 @@ BPrivateScreen::BytesPerRow()
 // #pragma mark - private methods
 
 
+void
+BPrivateScreen::_Acquire()
+{
+	fReferenceCount++;
+
+	fLastUpdate = 0;
+		// force an update for the new BScreen object
+}
+
+
+bool
+BPrivateScreen::_Release()
+{
+	return --fReferenceCount == 0;
+}
+
+
 sem_id
 BPrivateScreen::_RetraceSemaphore()
 {
@@ -687,6 +705,7 @@ BPrivateScreen::_GetFrameBufferConfig(frame_buffer_config& config)
 BPrivateScreen::BPrivateScreen(int32 id)
 	:
 	fID(id),
+	fReferenceCount(0),
 	fColorMap(NULL),
 	fRetraceSem(-1),
 	fRetraceSemValid(false),

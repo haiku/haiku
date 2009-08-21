@@ -22,6 +22,9 @@ class BApplication;
 class BWindow;
 
 
+#define B_CURRENT_WORKSPACE_INDEX	(~0L)
+
+
 namespace BPrivate {
 
 class BPrivateScreen {
@@ -88,8 +91,8 @@ private:
 								BPrivateScreen(int32 id);
 								~BPrivateScreen();
 
-			void				_Acquire() { fRefCount++; }
-			bool				_Release() { return --fRefCount == 0; }
+			void				_Acquire();
+			bool				_Release();
 
 			sem_id				_RetraceSemaphore();
 			status_t			_GetFrameBufferConfig(
@@ -100,7 +103,7 @@ private:
 
 private:
 			int32				fID;
-			int32				fRefCount;
+			int32				fReferenceCount;
 			color_map*			fColorMap;
 			sem_id				fRetraceSem;
 			bool				fRetraceSemValid;

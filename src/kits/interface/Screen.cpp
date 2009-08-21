@@ -7,6 +7,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+
 /*!	BScreen lets you retrieve and change the display settings. */
 
 
@@ -15,10 +16,9 @@
 #include <Screen.h>
 #include <Window.h>
 
+
 using namespace BPrivate;
 
-
-static const uint32 kCurrentWorkspaceIndex = ~0;
 
 /*!	\brief Creates a BScreen object which represents the display with the given
 		screen_id
@@ -250,7 +250,7 @@ rgb_color
 BScreen::DesktopColor()
 {
 	if (fScreen != NULL)
-		return fScreen->DesktopColor(kCurrentWorkspaceIndex);
+		return fScreen->DesktopColor(B_CURRENT_WORKSPACE_INDEX);
 
 	return rgb_color();
 }
@@ -280,7 +280,7 @@ void
 BScreen::SetDesktopColor(rgb_color rgb, bool stick)
 {
 	if (fScreen != NULL)
-		fScreen->SetDesktopColor(rgb, kCurrentWorkspaceIndex, stick);
+		fScreen->SetDesktopColor(rgb, B_CURRENT_WORKSPACE_INDEX, stick);
 }
 
 
@@ -345,12 +345,13 @@ status_t
 BScreen::GetMode(display_mode* mode)
 {
 	if (fScreen != NULL)
-		return fScreen->GetMode(kCurrentWorkspaceIndex, mode);
+		return fScreen->GetMode(B_CURRENT_WORKSPACE_INDEX, mode);
 	return B_ERROR;
 }
 
 
 /*!	\brief Copies the current display_mode of the given workspace into mode.
+	\param workspace The index of the workspace to query.
 	\param mode A pointer to a display_mode structure,
 		where the current display_mode will be copied.
 	\return \c B_OK if the operation was succesful.
@@ -373,13 +374,13 @@ status_t
 BScreen::SetMode(display_mode* mode, bool makeDefault)
 {
 	if (fScreen != NULL)
-		return fScreen->SetMode(kCurrentWorkspaceIndex, mode, makeDefault);
+		return fScreen->SetMode(B_CURRENT_WORKSPACE_INDEX, mode, makeDefault);
 	return B_ERROR;
 }
 
 
 /*!	\brief Set the given workspace to the given mode.
-	\param workspace The workspace that you want to change.
+	\param workspace The index of the workspace that you want to change.
 	\param mode A pointer to a display_mode.
 	\param makeDefault If true, the mode becomes the default for the workspace.
 	\return \c B_OK.
