@@ -5,6 +5,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) raw ] ;
 	# for TIFF.h and ReadHelper.h
 
+UseLibraryHeaders jpeg ;
+
 Translator JPEGTranslator :
 	be_jdatadst.cpp
 	be_jdatasrc.cpp
