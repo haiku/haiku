@@ -1,11 +1,14 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.36 [June 4, 2009]
- * For conditions of distribution and use, see copyright notice in png.h
+ * Last changed in libpng 1.2.39 [August 13, 2009]
  * Copyright (c) 1998-2009 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
  */
 
 #define PNG_INTERNAL
@@ -785,6 +788,14 @@ png_write_iCCP(png_structp png_ptr, png_charp name, int compression_type,
           ((*( (png_bytep)profile + 2))<< 8) |
           ((*( (png_bytep)profile + 3))    );
 
+   if (embedded_profile_len < 0)
+   {
+      png_warning(png_ptr,
+        "Embedded profile length in iCCP chunk is negative");
+      png_free(png_ptr, new_name);
+      return;
+   }
+
    if (profile_len < embedded_profile_len)
    {
       png_warning(png_ptr,
@@ -988,7 +999,7 @@ png_write_cHRM(png_structp png_ptr, double white_x, double white_y,
 #endif
    {
       /* Each value is saved in 1/100,000ths */
-    
+
       png_save_uint_32(buf, int_white_x);
       png_save_uint_32(buf + 4, int_white_y);
 
@@ -2116,9 +2127,12 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    png_uint_32 mins, bpp;
    png_byte filter_to_do = png_ptr->do_filter;
    png_uint_32 row_bytes = row_info->rowbytes;
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED)
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
    int num_p_filters = (int)png_ptr->num_prev_filters;
-#endif
+#endif 
+
+   png_debug(1, "in png_write_find_filter");
+
 
    png_debug(1, "in png_write_find_filter");
    /* Find out how many bytes offset each pixel is */
