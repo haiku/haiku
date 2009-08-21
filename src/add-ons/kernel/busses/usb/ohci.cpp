@@ -1384,7 +1384,7 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 			break;
 
 		default:
-			TRACE_ERROR("unaccetable speed\n");
+			TRACE_ERROR("unacceptable speed\n");
 			_FreeEndpoint(endpoint);
 			return B_ERROR;
 	}
