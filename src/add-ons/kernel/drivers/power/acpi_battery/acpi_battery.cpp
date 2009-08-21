@@ -51,25 +51,27 @@ ReadBatteryStatus(battery_driver_cookie* cookie, acpi_battery_info* batteryStatu
 		goto exit;
 
 	object = (acpi_object_type*)buffer.pointer;
-	if (object->object_type != ACPI_TYPE_PACKAGE ||
-		object->data.package.count < 4) {
+	if (object->object_type != ACPI_TYPE_PACKAGE 
+		|| object->data.package.count < 4) {
 		status = B_ERROR;
 		goto exit;
 	}
 
 	pointer = object->data.package.objects;
+	batteryStatus->state = (pointer->object_type == ACPI_TYPE_INTEGER) 
+		? pointer->data.integer : -1;
 	
-	batteryStatus->state = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
-		pointer->data.integer : -1;
 	pointer++;
-	batteryStatus->current_rate = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
-		pointer->data.integer : -1;
+	batteryStatus->current_rate = (pointer->object_type == ACPI_TYPE_INTEGER) 
+		? pointer->data.integer : -1;
+
 	pointer++;
-	batteryStatus->capacity = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
-		pointer->data.integer : -1;
+	batteryStatus->capacity = (pointer->object_type == ACPI_TYPE_INTEGER) 
+		? pointer->data.integer : -1;
+
 	pointer++;
-	batteryStatus->voltage = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
-		pointer->data.integer : -1;
+	batteryStatus->voltage = (pointer->object_type == ACPI_TYPE_INTEGER) 
+		? pointer->data.integer : -1;
 
 exit:
 	free(buffer.pointer);
@@ -95,52 +97,69 @@ ReadBatteryInfo(battery_driver_cookie* cookie,
 		goto exit;
 
 	object = (acpi_object_type*)buffer.pointer;
-	if (object->object_type != ACPI_TYPE_PACKAGE ||
-		object->data.package.count < 13) {
+	if (object->object_type != ACPI_TYPE_PACKAGE 
+		|| object->data.package.count < 13) {
 		status = B_ERROR;
 		goto exit;
 	}
 
 	pointer = object->data.package.objects;
+	batteryInfo->power_unit = (pointer->object_type == ACPI_TYPE_INTEGER) 
+		? pointer->data.integer : -1;
 	
-	batteryInfo->power_unit = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
-		pointer->data.integer : -1;
 	pointer++;
-	batteryInfo->design_capacity = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
-		pointer->data.integer : -1;
+	batteryInfo->design_capacity = (pointer->object_type == ACPI_TYPE_INTEGER) 
+		? pointer->data.integer : -1;
+	
 	pointer++;
-	batteryInfo->last_full_charge = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
-		pointer->data.integer : -1;
+	batteryInfo->last_full_charge = (pointer->object_type == ACPI_TYPE_INTEGER)
+		? pointer->data.integer : -1;
+	
 	pointer++;
-	batteryInfo->technology = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
-		pointer->data.integer : -1;
+	batteryInfo->technology = (pointer->object_type == ACPI_TYPE_INTEGER) 
+		? pointer->data.integer : -1;
+	
 	pointer++;
-	batteryInfo->design_voltage = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
-		pointer->data.integer : -1;
+	batteryInfo->design_voltage = (pointer->object_type == ACPI_TYPE_INTEGER) 
+		? pointer->data.integer : -1;
+	
 	pointer++;
-	batteryInfo->design_capacity_warning = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
-		pointer->data.integer : -1;
+	batteryInfo->design_capacity_warning = 
+		(pointer->object_type == ACPI_TYPE_INTEGER) 
+		? pointer->data.integer : -1;
+	
 	pointer++;
-	batteryInfo->design_capacity_low = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
-		pointer->data.integer : -1;
+	batteryInfo->design_capacity_low = 
+		(pointer->object_type == ACPI_TYPE_INTEGER) 
+		? pointer->data.integer : -1;
+	
 	pointer++;
-	batteryInfo->capacity_granularity_1 = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
-		pointer->data.integer : -1;
+	batteryInfo->capacity_granularity_1 = 
+		(pointer->object_type == ACPI_TYPE_INTEGER) 
+		? pointer->data.integer : -1;
+	
 	pointer++;
-	batteryInfo->capacity_granularity_2 = (pointer->object_type == ACPI_TYPE_INTEGER) ? 
-		pointer->data.integer : -1;
+	batteryInfo->capacity_granularity_2 = 
+		(pointer->object_type == ACPI_TYPE_INTEGER) 
+		? pointer->data.integer : -1;
+	
 	pointer++;
-	strlcpy(batteryInfo->model_number, (pointer->object_type == ACPI_TYPE_STRING) ? 
-		pointer->data.string.string : "", sizeof(batteryInfo->model_number));
+	strlcpy(batteryInfo->model_number, 
+		(pointer->object_type == ACPI_TYPE_STRING) 
+		? pointer->data.string.string : "", sizeof(batteryInfo->model_number));
+	
 	pointer++;
-	strlcpy(batteryInfo->serial_number, (pointer->object_type == ACPI_TYPE_STRING) ? 
-		pointer->data.string.string : "", sizeof(batteryInfo->serial_number));
+	strlcpy(batteryInfo->serial_number, 
+		(pointer->object_type == ACPI_TYPE_STRING) 
+		? pointer->data.string.string : "", sizeof(batteryInfo->serial_number));
+	
 	pointer++;
-	strlcpy(batteryInfo->type, (pointer->object_type == ACPI_TYPE_STRING) ? 
-		pointer->data.string.string : "", sizeof(batteryInfo->type));
+	strlcpy(batteryInfo->type, (pointer->object_type == ACPI_TYPE_STRING) 
+		? pointer->data.string.string : "", sizeof(batteryInfo->type));
+	
 	pointer++;
-	strlcpy(batteryInfo->oem_info, (pointer->object_type == ACPI_TYPE_STRING) ? 
-		pointer->data.string.string : "", sizeof(batteryInfo->oem_info));
+	strlcpy(batteryInfo->oem_info, (pointer->object_type == ACPI_TYPE_STRING) 
+		? pointer->data.string.string : "", sizeof(batteryInfo->oem_info));
 	
 exit:
 	free(buffer.pointer);
