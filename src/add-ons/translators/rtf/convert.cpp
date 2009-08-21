@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,7 +13,7 @@
 #include <TextView.h>
 #include <TypeConstants.h>
 #include <ByteOrder.h>
-#include <Node.h>
+#include <File.h>
 #include <Font.h>
 
 #include <AutoDeleter.h>
@@ -588,7 +588,7 @@ convert_to_stxt(RTF::Header &header, BDataIO &target)
 
 	status = swap_data(B_UINT32_TYPE, &styleHeader, sizeof(styleHeader),
 		B_SWAP_HOST_TO_BENDIAN);
-	if (status != B_OK) 
+	if (status != B_OK)
 		return status;
 
 	written = target.Write(&styleHeader, sizeof(styleHeader));
@@ -617,12 +617,12 @@ convert_to_plain_text(RTF::Header &header, BPositionIO &target)
 	void *flattenedRuns = NULL;
 	int32 flattenedSize = 0;
 
-	// ToDo: this is not really nice, we should adopt the BPositionIO class
+	// TODO: this is not really nice, we should adopt the BPositionIO class
 	//	from Dano/Zeta which has meta data support
-	BNode *node = dynamic_cast<BNode *>(&target);
+	BFile *file = dynamic_cast<BFile *>(&target);
 
 	try {
-		TextOutput output(header, &target, node != NULL);
+		TextOutput output(header, &target, file != NULL);
 
 		output.Work();
 		flattenedRuns = output.FlattenedRunArray(flattenedSize);
@@ -630,16 +630,17 @@ convert_to_plain_text(RTF::Header &header, BPositionIO &target)
 		return status;
 	}
 
-	if (node == NULL) {
+	if (file == NULL) {
 		// we can't write the styles
 		return B_OK;
 	}
 
 	// put out styles
 
-	ssize_t written = node->WriteAttr("styles", B_RAW_TYPE, 0, flattenedRuns, flattenedSize);
+	ssize_t written = file->WriteAttr("styles", B_RAW_TYPE, 0, flattenedRuns,
+		flattenedSize);
 	if (written >= B_OK && written != flattenedSize)
-		node->RemoveAttr("styles");
+		file->RemoveAttr("styles");
 
 	free(flattenedRuns);
 	return B_OK;
