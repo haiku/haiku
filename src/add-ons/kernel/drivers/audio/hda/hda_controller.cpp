@@ -104,7 +104,8 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 	}
 
 	position = stream->Read32(HDAC_STREAM_POSITION);
-	bufferSize = ALIGN(stream->sample_size * stream->num_channels * stream->buffer_length, 128);
+	bufferSize = ALIGN(stream->sample_size * stream->num_channels 
+		* stream->buffer_length, 128);
 
 	// Buffer Completed Interrupt
 	acquire_spinlock(&stream->lock);
@@ -117,7 +118,12 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 
 	release_sem_etc(controller->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
 	
-	//dprintf("stream_handle_interrupt %d %d %ld\n", stream->id, stream->buffer_cycle, position);
+	if (stream->warn_count < 20 
+		&& (position - stream->buffer_cycle * bufferSize) > (bufferSize >> 1)) {
+		dprintf("hda: stream incorrect position %ld %ld %ld\n",
+			stream->id, stream->buffer_cycle, position);
+		stream->warn_count++;
+	}
 }
 
 
@@ -414,6 +420,7 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 	stream->buffer_descriptors_area = B_ERROR;
 	stream->type = type;
 	stream->controller = controller;
+	stream->warn_count = 0;
 
 	switch (type) {
 		case STREAM_PLAYBACK:
