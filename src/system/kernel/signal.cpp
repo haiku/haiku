@@ -59,7 +59,7 @@ const char * const sigstr[NSIG] = {
 
 
 static status_t deliver_signal(struct thread *thread, uint signal,
-	uint32 flags);
+	uint32 flags, bool& reschedule);
 
 
 
@@ -377,8 +377,12 @@ handle_signals(struct thread *thread)
 							= thread->team->parent->main_thread;
 						struct sigaction& parentHandler
 							= parentThread->sig_action[SIGCHLD - 1];
-						if ((parentHandler.sa_flags & SA_NOCLDSTOP) == 0)
-							deliver_signal(parentThread, SIGCHLD, 0);
+						// TODO: do we need to worry about rescheduling here?
+						bool unused = false;
+						if ((parentHandler.sa_flags & SA_NOCLDSTOP) == 0) {
+							deliver_signal(parentThread, SIGCHLD, 0,
+								unused);
+						}
 					}
 
 					return true;
@@ -484,7 +488,8 @@ is_signal_blocked(int signal)
 	thread lock held.
 */
 static status_t
-deliver_signal(struct thread *thread, uint signal, uint32 flags)
+deliver_signal(struct thread *thread, uint signal, uint32 flags, 
+	bool& reschedule)
 {
 	if (flags & B_CHECK_PERMISSION) {
 		// ToDo: introduce euid & uid fields to the team and check permission
@@ -496,7 +501,7 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 	if (thread->team == team_get_kernel_team()) {
 		// Signals to kernel threads will only wake them up
 		if (thread->state == B_THREAD_SUSPENDED)
-			scheduler_enqueue_in_run_queue(thread);
+			reschedule |= scheduler_enqueue_in_run_queue(thread);
 		return B_OK;
 	}
 
@@ -511,7 +516,7 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 
 			// Wake up main thread
 			if (mainThread->state == B_THREAD_SUSPENDED)
-				scheduler_enqueue_in_run_queue(mainThread);
+				reschedule |= scheduler_enqueue_in_run_queue(mainThread);
 			else
 				thread_interrupt(mainThread, true);
 
@@ -522,7 +527,7 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 		case SIGKILLTHR:
 			// Wake up suspended threads and interrupt waiting ones
 			if (thread->state == B_THREAD_SUSPENDED)
-				scheduler_enqueue_in_run_queue(thread);
+				reschedule |= scheduler_enqueue_in_run_queue(thread);
 			else
 				thread_interrupt(thread, true);
 			break;
@@ -530,7 +535,7 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 		case SIGCONT:
 			// Wake up thread if it was suspended
 			if (thread->state == B_THREAD_SUSPENDED)
-				scheduler_enqueue_in_run_queue(thread);
+				reschedule |= scheduler_enqueue_in_run_queue(thread);
 
 			if ((flags & SIGNAL_FLAG_DONT_RESTART_SYSCALL) != 0)
 				atomic_or(&thread->flags, THREAD_FLAGS_DONT_RESTART_SYSCALL);
@@ -560,6 +565,7 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 	status_t status = B_BAD_THREAD_ID;
 	struct thread *thread;
 	cpu_status state = 0;
+	bool reschedule = false;
 
 	if (signal < 0 || signal > MAX_SIGNO)
 		return B_BAD_VALUE;
@@ -575,8 +581,10 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 		GRAB_THREAD_LOCK();
 
 		thread = thread_get_thread_struct_locked(id);
-		if (thread != NULL)
-			status = deliver_signal(thread, signal, flags);
+		if (thread != NULL) {
+			status = deliver_signal(thread, signal, flags, 
+				reschedule);
+		}
 	} else {
 		// send a signal to the specified process group
 		// (the absolute value of the id)
@@ -609,7 +617,8 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 				if (thread != NULL) {
 					// we don't stop because of an error sending the signal; we
 					// rather want to send as much signals as possible
-					status = deliver_signal(thread, signal, flags);
+					status = deliver_signal(thread, signal, flags, 
+						reschedule);
 				}
 
 				RELEASE_THREAD_LOCK();
@@ -622,9 +631,8 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 		GRAB_THREAD_LOCK();
 	}
 
-	// TODO: The scheduler should only be invoked if there is reason to do it
-	// (ie. deliver_signal() moved some threads in the running queue)!
-	if ((flags & (B_DO_NOT_RESCHEDULE | SIGNAL_FLAG_TEAMS_LOCKED)) == 0)
+	if ((flags & (B_DO_NOT_RESCHEDULE | SIGNAL_FLAG_TEAMS_LOCKED)) == 0
+		&& reschedule)
 		scheduler_reschedule();
 
 	RELEASE_THREAD_LOCK();
