@@ -122,7 +122,7 @@ static profile sRedrawProcessingTime;
 
 // TODO: Move to another file
 struct BufferState {
-	BufferState(const direct_buffer_state &state)
+	BufferState(const direct_buffer_state& state)
 		:
 		fState(state)
 	{
@@ -161,14 +161,14 @@ public:
 			bool				full_screen;
 
 private:
-			bool _HandleStop(const direct_buffer_state &state);
-			bool _HandleStart(const direct_buffer_state &state);
-			bool _HandleModify(const direct_buffer_state &state);
+			bool 				_HandleStop(const direct_buffer_state& state);
+			bool 				_HandleStart(const direct_buffer_state& state);
+			bool 				_HandleModify(const direct_buffer_state& state);
 		
-			sem_id	fSem;
-			sem_id	fAcknowledgeSem;
-			area_id	fBufferArea;
-			int32 fTransition;
+			sem_id				fSem;
+			sem_id				fAcknowledgeSem;
+			area_id				fBufferArea;
+			int32				fTransition;
 };
 
 
@@ -270,7 +270,7 @@ DirectWindowData::SetState(const direct_buffer_state& bufferState,
 
 
 bool
-DirectWindowData::_HandleStop(const direct_buffer_state &state)
+DirectWindowData::_HandleStop(const direct_buffer_state& state)
 {
 	buffer_info->buffer_state = B_DIRECT_STOP;
 	if (fTransition-- >= 1)
@@ -280,7 +280,7 @@ DirectWindowData::_HandleStop(const direct_buffer_state &state)
 
 
 bool
-DirectWindowData::_HandleStart(const direct_buffer_state &state)
+DirectWindowData::_HandleStart(const direct_buffer_state& state)
 {
 	buffer_info->buffer_state 
 		= (direct_buffer_state)(BufferState(buffer_info->buffer_state).Reason() | state);
@@ -292,7 +292,7 @@ DirectWindowData::_HandleStart(const direct_buffer_state &state)
 
 
 bool
-DirectWindowData::_HandleModify(const direct_buffer_state &state)
+DirectWindowData::_HandleModify(const direct_buffer_state& state)
 {
 	buffer_info->buffer_state = state;
 	if (fTransition > 0)
