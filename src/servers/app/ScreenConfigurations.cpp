@@ -43,7 +43,7 @@ ScreenConfigurations::BestFit(int32 id, const monitor_info* info,
 	bool* _exactMatch) const
 {
 	if (info == NULL) {
-		// only look for a matching ID - this is all we have
+		// Only look for a matching ID - this is all we have
 		for (uint32 pass = 0; pass < 2; pass++) {
 			for (int32 i = fConfigurations.CountItems(); i-- > 0;) {
 				screen_configuration* configuration = fConfigurations.ItemAt(i);
@@ -57,7 +57,7 @@ ScreenConfigurations::BestFit(int32 id, const monitor_info* info,
 		return NULL;
 	}
 
-	// look for a configuration that matches the monitor
+	// Look for a configuration that matches the monitor
 
 	bool exactMatch = false;
 	int32 bestScore = 0;
@@ -66,12 +66,10 @@ ScreenConfigurations::BestFit(int32 id, const monitor_info* info,
 
 	for (int32 i = fConfigurations.CountItems(); i-- > 0;) {
 		screen_configuration* configuration = fConfigurations.ItemAt(i);
+		if (!configuration->has_info)
+			continue;
+
 		int32 score = 0;
-
-		// TODO: should we ignore unnamed settings here completely?
-
-		if (configuration->id == id)
-			score++;
 
 		if (!strcasecmp(configuration->info.vendor, info->vendor)
 			&& !strcasecmp(configuration->info.name, info->name)
@@ -86,8 +84,7 @@ ScreenConfigurations::BestFit(int32 id, const monitor_info* info,
 			if (configuration->info.produced.year == info->produced.year
 				&& configuration->info.produced.week == info->produced.week)
 				score++;
-		} else
-			score -= 2;
+		}
 
 		if (score > bestScore) {
 			bestScore = score;
@@ -212,7 +209,7 @@ ScreenConfigurations::Restore(const BMessage& settings)
 		if (stored.FindInt32("id", &id) != B_OK
 			|| stored.FindData("mode", B_RAW_TYPE, (const void**)&mode,
 					&size) != B_OK
-			|| size == sizeof(display_mode))
+			|| size != sizeof(display_mode))
 			continue;
 
 		screen_configuration* configuration
