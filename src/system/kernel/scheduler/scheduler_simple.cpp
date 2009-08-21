@@ -19,7 +19,6 @@
 #include <kscheduler.h>
 #include <listeners.h>
 #include <scheduler_defs.h>
-#include <smp.h>
 #include <thread.h>
 #include <timer.h>
 #include <user_debugger.h>
@@ -37,7 +36,6 @@
 
 // The run queue. Holds the threads ready to run ordered by priority.
 static struct thread *sRunQueue = NULL;
-static cpu_mask_t sIdleCPUs = 0;
 
 
 static int
@@ -80,14 +78,6 @@ dump_run_queue(int argc, char **argv)
 static bool
 simple_enqueue_in_run_queue(struct thread *thread)
 {
-	if (thread->state == B_THREAD_RUNNING) {
-		// The thread is currently running (on another CPU) and we cannot
-		// insert it into the run queue. Set the next state to ready so the
-		// thread is inserted into the run queue on the next reschedule.
-		thread->next_state = B_THREAD_READY;
-		return false;
-	}
-
 	thread->state = thread->next_state = B_THREAD_READY;
 
 	struct thread *curr, *prev;
@@ -110,47 +100,11 @@ simple_enqueue_in_run_queue(struct thread *thread)
 
 	thread->next_priority = thread->priority;
 
-	if (thread->priority != B_IDLE_PRIORITY) {
-		int32 currentCPU = smp_get_current_cpu();
-		if (sIdleCPUs != 0) {
-			if (thread->pinned_to_cpu > 0) {
-				// thread is pinned to a CPU -- notify it, if it is idle
-				int32 targetCPU = thread->previous_cpu->cpu_num;
-				if ((sIdleCPUs & (1 << targetCPU)) != 0) {
-					sIdleCPUs &= ~(1 << targetCPU);
-					smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE_IF_IDLE, 0, 0,
-						0, NULL, SMP_MSG_FLAG_ASYNC);
-				}
-			} else {
-				// Thread is not pinned to any CPU -- take it ourselves, if we
-				// are idle, otherwise notify the next idle CPU. In either case
-				// we clear the idle bit of the chosen CPU, so that the
-				// simple_enqueue_in_run_queue() won't try to bother the
-				// same CPU again, if invoked before it handled the interrupt.
-				cpu_mask_t idleCPUs = CLEAR_BIT(sIdleCPUs, currentCPU);
-				if ((sIdleCPUs & (1 << currentCPU)) != 0) {
-					sIdleCPUs = idleCPUs;
-				} else {
-					int32 targetCPU = 0;
-					for (; targetCPU < B_MAX_CPU_COUNT; targetCPU++) {
-						cpu_mask_t mask = 1 << targetCPU;
-						if ((idleCPUs & mask) != 0) {
-							sIdleCPUs &= ~mask;
-							break;
-						}
-					}
-
-					smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE_IF_IDLE, 0, 0,
-						0, NULL, SMP_MSG_FLAG_ASYNC);
-				}
-			}
-		}
-	}
-
 	// notify listeners
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
 		thread);
-	return false;
+
+	return thread->priority > thread_get_current_thread()->priority;
 }
 
 
@@ -243,7 +197,7 @@ simple_reschedule(void)
 	struct thread *oldThread = thread_get_current_thread();
 	struct thread *nextThread, *prevThread;
 
-	TRACE(("reschedule(): cpu %d, cur_thread = %ld\n", smp_get_current_cpu(), thread_get_current_thread()->id));
+	TRACE(("reschedule(): current thread = %ld\n", oldThread->id));
 
 	oldThread->cpu->invoke_scheduler = false;
 
@@ -251,7 +205,8 @@ simple_reschedule(void)
 	switch (oldThread->next_state) {
 		case B_THREAD_RUNNING:
 		case B_THREAD_READY:
-			TRACE(("enqueueing thread %ld into run q. pri = %ld\n", oldThread->id, oldThread->priority));
+			TRACE(("enqueueing thread %ld into run queue priority = %ld\n",
+				oldThread->id, oldThread->priority));
 			simple_enqueue_in_run_queue(oldThread);
 			break;
 		case B_THREAD_SUSPENDED:
@@ -260,78 +215,50 @@ simple_reschedule(void)
 		case THREAD_STATE_FREE_ON_RESCHED:
 			break;
 		default:
-			TRACE(("not enqueueing thread %ld into run q. next_state = %ld\n", oldThread->id, oldThread->next_state));
+			TRACE(("not enqueueing thread %ld into run queue next_state = %ld\n",
+				oldThread->id, oldThread->next_state));
 			break;
 	}
 
 	nextThread = sRunQueue;
 	prevThread = NULL;
 
-	if (oldThread->cpu->disabled) {
-		// CPU is disabled - service any threads we may have that are pinned,
-		// otherwise just select the idle thread
+	while (nextThread) {
+		// select next thread from the run queue
 		while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
-			if (nextThread->pinned_to_cpu > 0 &&
-				nextThread->previous_cpu == oldThread->cpu)
-					break;
-			prevThread = nextThread;
-			nextThread = nextThread->queue_next;
-		}
-	} else {
-		while (nextThread) {
-			// select next thread from the run queue
-			while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
 #if 0
-				if (oldThread == nextThread && nextThread->was_yielded) {
-					// ignore threads that called thread_yield() once
-					nextThread->was_yielded = false;
-					prevThread = nextThread;
-					nextThread = nextThread->queue_next;
-				}
-#endif
-
-				// skip thread, if it doesn't want to run on this CPU
-				if (nextThread->pinned_to_cpu > 0
-					&& nextThread->previous_cpu != oldThread->cpu) {
-					prevThread = nextThread;
-					nextThread = nextThread->queue_next;
-					continue;
-				}
-
-				// always extract real time threads
-				if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
-					break;
-
-				// never skip last non-idle normal thread
-				if (nextThread->queue_next && nextThread->queue_next->priority == B_IDLE_PRIORITY)
-					break;
-
-				// skip normal threads sometimes (roughly 20%)
-				if (_rand() > 0x1a00)
-					break;
-
-				// skip until next lower priority
-				int32 priority = nextThread->priority;
-				do {
-					prevThread = nextThread;
-					nextThread = nextThread->queue_next;
-				} while (nextThread->queue_next != NULL
-					&& priority == nextThread->queue_next->priority
-					&& nextThread->queue_next->priority > B_IDLE_PRIORITY);
-			}
-
-			if (nextThread->cpu
-				&& nextThread->cpu->cpu_num != oldThread->cpu->cpu_num) {
-				panic("thread in run queue that's still running on another CPU!\n");
-				// ToDo: remove this check completely when we're sure that this
-				// cannot happen anymore.
+			if (oldThread == nextThread && nextThread->was_yielded) {
+				// ignore threads that called thread_yield() once
+				nextThread->was_yielded = false;
 				prevThread = nextThread;
 				nextThread = nextThread->queue_next;
-				continue;
 			}
+#endif
 
-			break;
+			// always extract real time threads
+			if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
+				break;
+
+			// never skip last non-idle normal thread
+			if (nextThread->queue_next
+				&& nextThread->queue_next->priority == B_IDLE_PRIORITY)
+				break;
+
+			// skip normal threads sometimes (roughly 20%)
+			if (_rand() > 0x1a00)
+				break;
+
+			// skip until next lower priority
+			int32 priority = nextThread->priority;
+			do {
+				prevThread = nextThread;
+				nextThread = nextThread->queue_next;
+			} while (nextThread->queue_next != NULL
+				&& priority == nextThread->queue_next->priority
+				&& nextThread->queue_next->priority > B_IDLE_PRIORITY);
 		}
+
+		break;
 	}
 
 	if (!nextThread)
@@ -380,13 +307,6 @@ simple_reschedule(void)
 		oldThread->cpu->preempted = 0;
 		add_timer(quantumTimer, &reschedule_event, quantum,
 			B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_THREAD_LOCK);
-
-		// update the idle bit for this CPU in the CPU mask
-		int32 cpuNum = smp_get_current_cpu();
-		if (nextThread->priority == B_IDLE_PRIORITY)
-			sIdleCPUs = SET_BIT(sIdleCPUs, cpuNum);
-		else
-			sIdleCPUs = CLEAR_BIT(sIdleCPUs, cpuNum);
 
 		if (nextThread != oldThread)
 			context_switch(oldThread, nextThread);
