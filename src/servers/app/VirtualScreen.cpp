@@ -167,7 +167,7 @@ VirtualScreen::UpdateFrame()
 
 		// TODO: compute virtual size depending on the actual screen position!
 		virtualWidth += width;
-		virtualHeight += height;
+		virtualHeight = max_c(virtualHeight, height);
 	}
 
 	fFrame.Set(0, 0, virtualWidth - 1, virtualHeight - 1);
@@ -239,7 +239,6 @@ VirtualScreen::_GetMode(Screen* screen, ScreenConfigurations& configurations,
 		return B_NAME_NOT_FOUND;
 
 	mode = configuration->mode;
-debug_printf("found configuration! (%d x %d)\n", mode.virtual_width, mode.virtual_height);
 	configuration->is_current = true;
 
 	return B_OK;
