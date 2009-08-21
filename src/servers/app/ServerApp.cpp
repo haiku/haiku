@@ -452,19 +452,22 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_APP_CRASHED:
 			// Allow the debugger to show its window: if needed, remove any
 			// kWindowScreenFeels from the windows of this application
-			if (fWindowListLock.Lock()) {
-				for (int32 i = fWindowList.CountItems(); i-- > 0;) {
-					ServerWindow* serverWindow = fWindowList.ItemAt(i);
+			if (fDesktop->LockAllWindows()) {
+				if (fWindowListLock.Lock()) {
+					for (int32 i = fWindowList.CountItems(); i-- > 0;) {
+						ServerWindow* serverWindow = fWindowList.ItemAt(i);
 
-					Window* window = serverWindow->Window();
-					if (window == NULL || window->IsOffscreenWindow())
-						continue;
+						Window* window = serverWindow->Window();
+						if (window == NULL || window->IsOffscreenWindow())
+							continue;
 
-					if (window->Feel() == kWindowScreenFeel)
-						fDesktop->SetWindowFeel(window, B_NORMAL_WINDOW_FEEL);
+						if (window->Feel() == kWindowScreenFeel)
+							fDesktop->SetWindowFeel(window, B_NORMAL_WINDOW_FEEL);
+					}
+
+					fWindowListLock.Unlock();
 				}
-
-				fWindowListLock.Unlock();
+				fDesktop->UnlockAllWindows();
 			}
 			break;
 
@@ -2256,7 +2259,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 clientToken;
 			if (link.Read<int32>(&clientToken) != B_OK)
 				status = B_BAD_DATA;
-			else {
+			else if (fDesktop->LockAllWindows()) {
 				BAutolock locker(fWindowListLock);
 
 				for (int32 i = fWindowList.CountItems(); i-- > 0;) {
@@ -2270,7 +2273,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 						break;
 					}
 				}
-			}
+				fDesktop->UnlockAllWindows();
+			} else
+				status = B_ERROR;
 
 			if (status != B_OK)
 				fLink.StartMessage(status);
@@ -2894,7 +2899,7 @@ ServerApp::_CreateWindow(int32 code, BPrivate::LinkReceiver& link,
 			status = B_ERROR;
 		}
 
-		if (status < B_OK)
+		if (status != B_OK)
 			delete window;
 	}
 
