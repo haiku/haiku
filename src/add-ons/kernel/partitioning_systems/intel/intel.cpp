@@ -339,6 +339,7 @@ ep_scan_partition(int fd, partition_data* partition, void* cookie)
 	partition_data* parent = get_parent_partition(partition->id);
 	if (!parent)
 		return B_ERROR;
+
 	PrimaryPartition* primary = (PrimaryPartition*)partition->cookie;
 	// fill in the partition_data structure
 	partition->status = B_PARTITION_VALID;
@@ -372,8 +373,9 @@ ep_scan_partition(int fd, partition_data* partition, void* cookie)
 
 		// parameters
 		char buffer[128];
-		sprintf(buffer, "type = %u ; active = %d", logical->Type(),
-			logical->Active());
+		sprintf(buffer, "active %s ;\npartition_table_offset %lld ;\n",
+			logical->Active() ? "true" : "false",
+			logical->PartitionTableOffset());
 		child->parameters = strdup(buffer);
 		child->cookie = logical;
 		// check for allocation problems
