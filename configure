@@ -57,6 +57,12 @@ options:
                               default -- any other distro (default value).
   --help                      Prints out this help.
   --include-gpl-addons        Include GPL licensed add-ons.
+  --include-patented-code     Enable code that is known to implemented patented
+                              ideas and techniques. If this option is not
+                              specified, the resulting distribution may still
+                              implement patented ideas and techniques. This
+                              option only disables code that is currently known
+                              to be problematic.
   --include-3rdparty          Include 3rdparty/ in the build system.
   --enable-multiuser          Enable experimental multiuser support.
   --target=TARGET             Select build target platform. [default=${target}]
@@ -259,6 +265,7 @@ haikuCxxHeadersDir=
 hostGCCVersion=`gcc -dumpversion`
 bochsDebug=0
 includeGPLAddOns=0
+includePatentedCode=0
 include3rdParty=0
 enableMultiuser=0
 distroCompatibility=default
@@ -328,6 +335,7 @@ while [ $# -gt 0 ] ; do
 			;;
 		--help | -h)	usage; exit 0;;
 		--include-gpl-addons)	includeGPLAddOns=1; shift 1;;
+		--include-patented-code)	includePatentedCode=1; shift 1;;
 		--include-3rdparty)	include3rdParty=1; shift 1;;
 		--enable-multiuser)	enableMultiuser=1; shift 1;;
 		--distro-compatibility)
@@ -462,6 +470,7 @@ HOST_PLATFORM				?= "${buildPlatform}" ;
 
 BOCHS_DEBUG_HACK					?= "${bochsDebug}" ;
 INCLUDE_GPL_ADDONS					?= "${includeGPLAddOns}" ;
+HAIKU_INCLUDE_PATENTED_CODE			?= "${includePatentedCode}" ;
 HAIKU_INCLUDE_3RDPARTY				?= "${include3rdParty}" ;
 HAIKU_ENABLE_MULTIUSER				?= "${enableMultiuser}" ;
 HAIKU_DISTRO_COMPATIBILITY			?= "${distroCompatibility}" ;

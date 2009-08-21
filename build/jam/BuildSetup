@@ -322,6 +322,18 @@ if $(DEBUG_PRINTF) {
 	HAIKU_C++FLAGS += [ FDefines DEBUG_PRINTF=$(DEBUG_PRINTF) ] ;
 }
 
+# If the environment variable HAIKU_INCLUDE_PATENTED_CODE is defined, we
+# define an equally named macro to the variable value. Some components use the
+# macro to allow compilation of code known to implemented patented ideas and/or
+# techniques, for example the Freetype bytecode hinter or sub-pixel rendering
+# as well as some problematic media codecs.
+if $(HAIKU_INCLUDE_PATENTED_CODE) {
+	HAIKU_CCFLAGS += [ FDefines
+		HAIKU_INCLUDE_PATENTED_CODE=$(HAIKU_INCLUDE_PATENTED_CODE) ] ;
+	HAIKU_C++FLAGS += [ FDefines
+		HAIKU_INCLUDE_PATENTED_CODE=$(HAIKU_INCLUDE_PATENTED_CODE) ] ;
+}
+
 # warning flags
 HAIKU_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes
 	-Wpointer-arith -Wcast-align -Wsign-compare -Wno-multichar ;

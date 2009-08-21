@@ -92,7 +92,9 @@ FT_BEGIN_HEADER
   /* This is done to allow FreeType clients to run unmodified, forcing     */
   /* them to display normal gray-level anti-aliased glyphs.                */
   /*                                                                       */
-/* #define FT_CONFIG_OPTION_SUBPIXEL_RENDERING */
+#if HAIKU_INCLUDE_PATENTED_CODE
+#	define FT_CONFIG_OPTION_SUBPIXEL_RENDERING
+#endif
 
 
   /*************************************************************************/
@@ -480,7 +482,9 @@ FT_BEGIN_HEADER
   /*   Do not #undef this macro here, since the build system might         */
   /*   define it for certain configurations only.                          */
   /*                                                                       */
-#define TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#if HAIKU_INCLUDE_PATENTED_CODE
+#	define TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+#endif
 
 
   /*************************************************************************/
