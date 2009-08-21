@@ -889,14 +889,9 @@ Desktop::WorkspaceFrame(int32 index) const
 		frame = fVirtualScreen.Frame();
 	else if (index >= 0 && index < fSettings->WorkspacesCount()) {
 		BMessage screenData;
-		int32 width;
-		int32 height;
 		fSettings->WorkspacesMessage(index)->FindMessage("screen", &screenData);
-		if (screenData.FindInt32("width", &width) != B_OK
-			|| screenData.FindInt32("height", &height) != B_OK)
+		if (screenData.FindRect("frame", &frame) != B_OK)
 			frame = fVirtualScreen.Frame();
-		else
-			frame.Set(0.0, 0.0, width - 1, height - 1);
 	}
 	return frame;
 }

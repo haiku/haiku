@@ -22,7 +22,8 @@
 
 WorkspacesView::WorkspacesView(BRect frame, BPoint scrollingOffset,
 		const char* name, int32 token, uint32 resizeMode, uint32 flags)
-	: View(frame, scrollingOffset, name, token, resizeMode, flags),
+	:
+	View(frame, scrollingOffset, name, token, resizeMode, flags),
 	fSelectedWindow(NULL),
 	fSelectedWorkspace(-1),
 	fHasMoved(false)
