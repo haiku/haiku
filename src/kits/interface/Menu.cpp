@@ -842,11 +842,20 @@ BMenu::MessageReceived(BMessage* msg)
 			if (window == NULL)
 				return;
 
+			float largeStep;
 			float smallStep;
-			window->GetSteps(&smallStep, NULL);
-			window->TryScrollBy(deltaY * smallStep);
+			window->GetSteps(&smallStep, &largeStep);
+
+			// pressing the option/command/control key scrolls faster
+			if (modifiers() & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY))
+				deltaY *= largeStep;
+			else
+				deltaY *= smallStep;
+
+			window->TryScrollBy(deltaY);
 			break;
 		}
+
 		default:
 			BView::MessageReceived(msg);
 			break;
