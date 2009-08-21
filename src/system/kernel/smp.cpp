@@ -634,16 +634,6 @@ process_pending_ici(int32 currentCPU)
 		case SMP_MSG_RESCHEDULE:
 			thread_get_current_thread()->cpu->invoke_scheduler = true;
 			break;
-		case SMP_MSG_RESCHEDULE_IF_IDLE:
-		{
-			// TODO: We must not dereference the thread when entering the kernel
-			// debugger from a double fault.
-			struct thread* thread = thread_get_current_thread();
-			if (thread->priority == B_IDLE_PRIORITY)
-				thread->cpu->invoke_scheduler = true;
-			break;
-		}
-
 		default:
 			dprintf("smp_intercpu_int_handler: got unknown message %ld\n", msg->message);
 	}
