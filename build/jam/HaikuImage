@@ -71,7 +71,7 @@ SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc DiskProb
 	ShowImage SoundRecorder StyledEdit Terminal TextSearch TV Workspaces
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations E-mail
-	FileTypes Fonts Keyboard Keymap  Media Mouse Network Printers
+	FileTypes Fonts Keyboard Keymap Media Mouse Network Printers
 	Screen ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
 ; # Locale
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
@@ -79,9 +79,10 @@ SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 ;
 SYSTEM_LIBS = libalm.so libbe.so libbsd.so libbnetapi.so libdebug.so
 	libdevice.so libfluidsynth.so libfreetype.so libgame.so libGL.so libgnu.so
-	libilmimf.so liblinprog.so liblpsolve55.so libmail.so libmedia.so libmidi.so
-	libmidi2.so libnetwork.so libpng.so <revisioned>libroot.so libscreensaver.so
-	libtextencoding.so libtracker.so libtranslation.so	libz.so
+	libilmimf.so libjpeg.so liblinprog.so liblpsolve55.so libmail.so libmedia.so
+	libmidi.so libmidi2.so libnetwork.so libpng.so <revisioned>libroot.so 
+	libscreensaver.so libtextencoding.so libtracker.so libtranslation.so
+	libz.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 ;
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
