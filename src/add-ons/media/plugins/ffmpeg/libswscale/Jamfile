@@ -12,8 +12,14 @@ local archSources ;
 archSources = ;
 
 if $(TARGET_ARCH) = x86 {
+	if $(INCLUDE_GPL_ADDONS) = 1 {
+		archSources += yuv2rgb_mmx.c ;
+		SubDirHdrs [ FDirName $(SUBDIR) $(TARGET_ARCH) ] ;
+	}
 } else if $(TARGET_ARCH) = ppc {
+	archSources += swscale_altivec_template.c  yuv2rgb_altivec.c ;
 } else if $(TARGET_ARCH) = sparc {
+	archSources += yuv2rgb_vis.cyuv2rgb_vis.c ;
 }
 
 SubDirCcFlags $(HAIKU_FFMPEG_GCC_EXTRA_FLAGS) ;
@@ -26,5 +32,7 @@ StaticLibrary libswscale.a :
 	swscale.c
 	yuv2rgb.c
 
-    $(archSources)
+	$(archSources)
 ;
+
+SEARCH on [ FGristFiles $(archSources) ] += [ FDirName $(SUBDIR) $(TARGET_ARCH) ] ;
