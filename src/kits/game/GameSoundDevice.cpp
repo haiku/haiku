@@ -118,7 +118,7 @@ BGameSoundDevice::~BGameSoundDevice()
 		// release our references to the nodes that we're using.  We *are* 
 		// supposed to do that even for global nodes like the Mixer.
 		roster->Disconnect(fConnection->producer.node, fConnection->source,
-						fConnection->consumer.node, fConnection->destination);
+			fConnection->consumer.node, fConnection->destination);
 
 		roster->ReleaseNode(fConnection->producer);
 		roster->ReleaseNode(fConnection->consumer);
@@ -159,7 +159,7 @@ BGameSoundDevice::SetInitError(status_t error)
 
 status_t
 BGameSoundDevice::CreateBuffer(gs_id* sound, const gs_audio_format* format, 
-							const void* data, int64 frames)
+	const void* data, int64 frames)
 {
 	if (frames <= 0 || !sound)
 		return B_BAD_VALUE;
@@ -180,7 +180,7 @@ BGameSoundDevice::CreateBuffer(gs_id* sound, const gs_audio_format* format,
 
 status_t
 BGameSoundDevice::CreateBuffer(gs_id* sound, const void* object, 
-								const gs_audio_format* format)
+	const gs_audio_format* format)
 {
 	if (!object || !sound)
 		return B_BAD_VALUE;
@@ -276,7 +276,7 @@ BGameSoundDevice::IsPlaying(gs_id sound)
 
 status_t
 BGameSoundDevice::GetAttributes(gs_id sound, gs_attribute* attributes,
-								size_t attributeCount)
+	size_t attributeCount)
 {
 	if (!fSounds[sound - 1])
 		return B_ERROR;
@@ -287,7 +287,7 @@ BGameSoundDevice::GetAttributes(gs_id sound, gs_attribute* attributes,
 
 status_t
 BGameSoundDevice::SetAttributes(gs_id sound, gs_attribute* attributes,
-								size_t attributeCount)
+	size_t attributeCount)
 {
 	if (!fSounds[sound - 1])
 		return B_ERROR;
@@ -309,13 +309,13 @@ BGameSoundDevice::Connect()
 	dormant_node_info mixer_dormant_info;
 	int32 mixer_count = 1; // for now, we only care about the first  we find.
 	status_t err = roster->GetDormantNodes(&mixer_dormant_info,
-				 &mixer_count, 0, 0, 0, B_SYSTEM_MIXER, 0);
+		&mixer_count, 0, 0, 0, B_SYSTEM_MIXER, 0);
 	if (err != B_OK)
 		return err;
 
 	//fMixer = new media_node;
 	err = roster->InstantiateDormantNode(mixer_dormant_info, 
-										&fConnection->producer);
+		&fConnection->producer);
 	if (err != B_OK)
 		return err;
 
@@ -327,20 +327,20 @@ BGameSoundDevice::Connect()
 	int32 count = 1;
 	media_input mixerInput;
 	err = roster->GetFreeInputsFor(fConnection->consumer, &mixerInput, 1, 
-									&count);
+		&count);
 	if (err != B_OK)
 		return err;
 
 	count = 1;
 	media_output mixerOutput;
 	err = roster->GetFreeOutputsFor(fConnection->producer, &mixerOutput, 1, 
-									&count);
+		&count);
 	if (err != B_OK)
 		return err;
 
 	media_format format(mixerOutput.format);
 	err = roster->Connect(mixerOutput.source, mixerInput.destination,
-				 &format, &mixerOutput, &mixerInput);
+		&format, &mixerOutput, &mixerInput);
 	if (err != B_OK)
 		return err;
 
@@ -348,18 +348,18 @@ BGameSoundDevice::Connect()
 	// the Mixer uses too.
 	roster->GetTimeSource(&fConnection->timeSource);
 	roster->SetTimeSourceFor(fConnection->producer.node, 
-							fConnection->timeSource.node);
+		fConnection->timeSource.node);
 
 	// Start our mixer's time source if need be. Chances are, it won't need to 
 	// be, but if we forget to do this, our mixer might not do anything at all.
 	BTimeSource* mixerTimeSource = roster->MakeTimeSourceFor(
-														fConnection->producer);
+		fConnection->producer);
 	if (!mixerTimeSource)
 		return B_ERROR;
 
 	if (!mixerTimeSource->IsRunning()) {
 		status_t err = roster->StartNode(mixerTimeSource->Node(), 
-										BTimeSource::RealTime());
+			BTimeSource::RealTime());
 		if (err != B_OK) {
 			mixerTimeSource->Release();
 			return err;
@@ -382,7 +382,7 @@ BGameSoundDevice::Connect()
 
 	// Set an appropriate run mode for the producer
 	roster->SetRunModeNode(fConnection->producer, 
-							BMediaNode::B_INCREASE_LATENCY);
+		BMediaNode::B_INCREASE_LATENCY);
 
 	media_to_gs_format(&fFormat, &format.u.raw_audio);
 	fIsConnected = true;
