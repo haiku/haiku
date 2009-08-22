@@ -428,7 +428,6 @@ QPEL_CAVS(put_,       PUT_OP, 3dnow)
 QPEL_CAVS(avg_, AVG_3DNOW_OP, 3dnow)
 QPEL_CAVS(put_,       PUT_OP, mmx2)
 QPEL_CAVS(avg_,  AVG_MMX2_OP, mmx2)
-#endif
 
 CAVS_MC(put_, 8, 3dnow)
 CAVS_MC(put_, 16,3dnow)
@@ -475,3 +474,5 @@ void ff_cavsdsp_init_3dnow(DSPContext* c, AVCodecContext *avctx) {
 #undef dspfunc
     c->cavs_idct8_add = cavs_idct8_add_mmx;
 }
+
+#endif

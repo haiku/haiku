@@ -28,21 +28,14 @@
  * see http://joe.hotchkiss.com/programming/eval/eval.html
  */
 
-#include "avcodec.h"
-#include "eval.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#ifndef NAN
-  #define NAN 0.0/0.0
-#endif
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
+#include "libavutil/mathematics.h"
+#include "avcodec.h"
+#include "eval.h"
 
 typedef struct Parser{
     int stack_index;
@@ -82,16 +75,12 @@ static const int8_t si_prefixes['z' - 'E' + 1]={
     ['Y'-'E']=  24,
 };
 
-/** strtod() function extended with 'k', 'M', 'G', 'ki', 'Mi', 'Gi' and 'B'
- * postfixes.  This allows using f.e. kB, MiB, G and B as a postfix. This
- * function assumes that the unit of numbers is bits not bytes.
- */
-static double av_strtod(const char *name, char **tail) {
+double av_strtod(const char *numstr, char **tail) {
     double d;
     char *next;
-    d = strtod(name, &next);
+    d = strtod(numstr, &next);
     /* if parsing succeeded, check for and interpret postfixes */
-    if (next!=name) {
+    if (next!=numstr) {
 
         if(*next >= 'E' && *next <= 'z'){
             int e= si_prefixes[*next - 'E'];
@@ -380,8 +369,12 @@ AVEvalExpr * ff_parse(const char *s, const char * const *const_name,
                double (**func2)(void *, double, double), const char **func2_name,
                const char **error){
     Parser p;
-    AVEvalExpr * e;
-    char w[strlen(s) + 1], * wp = w;
+    AVEvalExpr *e = NULL;
+    char *w = av_malloc(strlen(s) + 1);
+    char *wp = w;
+
+    if (!w)
+        goto end;
 
     while (*s)
         if (!isspace(*s++)) *wp++ = s[-1];
@@ -399,8 +392,10 @@ AVEvalExpr * ff_parse(const char *s, const char * const *const_name,
     e = parse_expr(&p);
     if (!verify_expr(e)) {
         ff_eval_free(e);
-        return NULL;
+        e = NULL;
     }
+end:
+    av_free(w);
     return e;
 }
 

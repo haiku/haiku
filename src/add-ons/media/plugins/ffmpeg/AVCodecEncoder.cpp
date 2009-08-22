@@ -52,7 +52,7 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 
 	memset(&fInputFormat, 0, sizeof(media_format));
 
-	av_fifo_init(&fAudioFifo, 0);
+	fAudioFifo = av_fifo_alloc(0);
 
 	fDstFrame.data[0] = NULL;
 	fDstFrame.data[1] = NULL;
@@ -80,7 +80,7 @@ AVCodecEncoder::~AVCodecEncoder()
 	if (fSwsContext != NULL)
 		sws_freeContext(fSwsContext);
 
-	av_fifo_free(&fAudioFifo);
+	av_fifo_free(fAudioFifo);
 
 	avpicture_free(&fDstFrame);
 	// NOTE: Do not use avpicture_free() on fSrcFrame!! We fill the picture
@@ -465,12 +465,12 @@ AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
 	if (fContext->frame_size > 1) {
 		// Encoded audio. Things work differently from raw audio. We need
 		// the fAudioFifo to pipe data.
-		if (av_fifo_realloc2(&fAudioFifo,
-				av_fifo_size(&fAudioFifo) + bufferSize) < 0) {
+		if (av_fifo_realloc2(fAudioFifo,
+				av_fifo_size(fAudioFifo) + bufferSize) < 0) {
 			TRACE("  av_fifo_realloc2() failed\n");
             return B_NO_MEMORY;
         }
-        av_fifo_generic_write(&fAudioFifo, const_cast<uint8*>(buffer),
+        av_fifo_generic_write(fAudioFifo, const_cast<uint8*>(buffer),
         	bufferSize, NULL);
 
 		int frameBytes = fContext->frame_size * inputFrameSize;
@@ -479,8 +479,8 @@ AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
 			return B_NO_MEMORY;
 
 		// Encode as many chunks as can be read from the FIFO.
-		while (av_fifo_size(&fAudioFifo) >= frameBytes) {
-			av_fifo_read(&fAudioFifo, tempBuffer, frameBytes);
+		while (av_fifo_size(fAudioFifo) >= frameBytes) {
+			av_fifo_generic_read(fAudioFifo, tempBuffer, frameBytes, NULL);
 
 			ret = _EncodeAudio(tempBuffer, frameBytes, fContext->frame_size,
 				info);

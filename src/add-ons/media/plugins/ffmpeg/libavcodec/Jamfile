@@ -21,14 +21,15 @@ StaticLibrary libavcodec.a :
 	8svx.c
 	aac.c
 	aac_ac3_parser.c
+	aac_adtstoasc_bsf.c
 	aac_parser.c
 	aactab.c
 	aandcttab.c
 	aasc.c
 	ac3.c
 	ac3_parser.c
-#	ac3dec.c # GPL
-#	ac3dec_data.c # GPL
+	ac3dec.c
+	ac3dec_data.c
 	ac3enc.c
 	ac3tab.c
 	acelp_filters.c
@@ -42,6 +43,7 @@ StaticLibrary libavcodec.a :
 	asv1.c
 	atrac3.c
 	audioconvert.c
+	avpacket.c
 	avs.c
 	beosthread.c
 	bethsoftvideo.c
@@ -80,6 +82,7 @@ StaticLibrary libavcodec.a :
 	dvdsubdec.c
 	dxa.c
 	eac3dec.c
+	eac3dec_data.c
 	eacmv.c
 	eaidct.c
 	eatgq.c
@@ -95,6 +98,8 @@ StaticLibrary libavcodec.a :
 #	fdctref.c # GPL, only used for DCT test program
 	fft.c
 	ffv1.c
+	flac.c
+	flacdata.c
 	flacdec.c
 	flashsv.c
 	flicvideo.c
@@ -121,7 +126,6 @@ StaticLibrary libavcodec.a :
 	idcinvideo.c
 	imc.c
 	imgconvert.c
-	imgresample.c
 	imx_dump_header_bsf.c
 	indeo2.c
 	indeo3.c
@@ -139,7 +143,7 @@ StaticLibrary libavcodec.a :
 #	ljpegenc.c
 	loco.c
 	lpc.c
-#	lsp.c
+	lsp.c
 	lzw.c
 #	lzwenc.c
 	mace.c
@@ -155,6 +159,7 @@ StaticLibrary libavcodec.a :
 	mlp.c
 	mlp_parser.c
 	mlpdec.c
+	mlpdsp.c
 	mmvideo.c
 	motion_est.c
 	motionpixels.c
@@ -200,7 +205,6 @@ StaticLibrary libavcodec.a :
 #	pnmenc.c
 	pthread.c
 	ptx.c
-	qcelp_lsp.c
 	qcelpdec.c
 	qdm2.c
 	qdrw.c
@@ -258,6 +262,7 @@ StaticLibrary libavcodec.a :
 	utils.c
 	vb.c
 	vc1.c
+	vc1dec.c
 	vc1_parser.c
 	vc1data.c
 	vc1dsp.c

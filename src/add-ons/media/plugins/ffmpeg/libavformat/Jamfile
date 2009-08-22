@@ -22,6 +22,7 @@ StaticLibrary libavformat.a :
 	amr.c
 	apc.c
 	ape.c
+	apetag.c
 	asf.c
 	asfcrypt.c
 	asfdec.c
@@ -36,6 +37,7 @@ StaticLibrary libavformat.a :
 	avio.c
 	aviobuf.c
 #	avisynth.c # No AVISynth support.
+	avlanguage.c
 	avs.c
 	bethsoftvid.c
 	bfi.c
@@ -64,6 +66,7 @@ StaticLibrary libavformat.a :
 	gxf.c
 	gxfenc.c
 #	http.c # (I/O protocol)
+	id3v1.c
 	id3v2.c
 	idcin.c
 	idroq.c

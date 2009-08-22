@@ -33,12 +33,10 @@ StaticLibrary libavutil.a :
 	md5.c
 	mem.c
 	pca.c
-	random.c
 	random_seed.c
 	rational.c
 	rc4.c
-	sha1.c
-	string.c
+	sha.c
 	tree.c
 	utils.c
 ;

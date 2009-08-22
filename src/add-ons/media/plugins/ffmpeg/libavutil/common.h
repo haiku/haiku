@@ -35,6 +35,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef HAVE_AV_CONFIG_H
+#include "config.h"
+#endif
+
 #ifdef __GNUC__
 #    define AV_GCC_VERSION_AT_LEAST(x,y) (__GNUC__ > x || __GNUC__ == x && __GNUC_MINOR__ >= y)
 #else
@@ -74,7 +78,7 @@
 #endif
 
 #ifndef av_cold
-#if (!defined(__ICC) || __ICC > 1100) && AV_GCC_VERSION_AT_LEAST(4,3)
+#if (!defined(__ICC) || __ICC > 1110) && AV_GCC_VERSION_AT_LEAST(4,3)
 #    define av_cold __attribute__((cold))
 #else
 #    define av_cold
@@ -82,7 +86,7 @@
 #endif
 
 #ifndef av_flatten
-#if AV_GCC_VERSION_AT_LEAST(4,1)
+#if (!defined(__ICC) || __ICC > 1110) && AV_GCC_VERSION_AT_LEAST(4,1)
 #    define av_flatten __attribute__((flatten))
 #else
 #    define av_flatten
@@ -127,6 +131,7 @@
 
 #define FFSWAP(type,a,b) do{type SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
 #define FF_ARRAY_ELEMS(a) (sizeof(a) / sizeof((a)[0]))
+#define FFALIGN(x, a) (((x)+(a)-1)&~((a)-1))
 
 /* misc math functions */
 extern const uint8_t ff_log2_tab[256];
@@ -182,6 +187,17 @@ static inline av_const uint8_t av_clip_uint8(int a)
 {
     if (a&(~255)) return (-a)>>31;
     else          return a;
+}
+
+/**
+ * Clips a signed integer value into the 0-65535 range.
+ * @param a value to clip
+ * @return clipped value
+ */
+static inline av_const uint16_t av_clip_uint16(int a)
+{
+    if (a&(~65535)) return (-a)>>31;
+    else            return a;
 }
 
 /**
@@ -279,7 +295,6 @@ static inline av_const float av_clipf(float a, float amin, float amax)
 #include "mem.h"
 
 #ifdef HAVE_AV_CONFIG_H
-#    include "config.h"
 #    include "libavutil/internal.h"
 #endif /* HAVE_AV_CONFIG_H */
 

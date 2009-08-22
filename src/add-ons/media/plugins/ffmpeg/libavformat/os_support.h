@@ -29,7 +29,7 @@
 
 #include "config.h"
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(__MINGW32CE__)
 #  include <fcntl.h>
 #  define lseek(f,p,w) _lseeki64((f), (p), (w))
 #endif
@@ -43,7 +43,7 @@ static inline int is_dos_path(const char *path)
     return 0;
 }
 
-#if defined(__BEOS__) || defined(__HAIKU__)
+#ifdef __BEOS__
 #  include <sys/socket.h>
 #  include <netinet/in.h>
    /* not net_server ? */
@@ -60,7 +60,7 @@ static inline int is_dos_path(const char *path)
 #  endif
 #endif
 
-#if 0 //CONFIG_NETWORK
+#if CONFIG_NETWORK
 #if !HAVE_SOCKLEN_T
 typedef int socklen_t;
 #endif

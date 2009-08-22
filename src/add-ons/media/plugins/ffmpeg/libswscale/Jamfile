@@ -13,10 +13,7 @@ archSources = ;
 
 if $(TARGET_ARCH) = x86 {
 } else if $(TARGET_ARCH) = ppc {
-    archSources = yuv2rgb_altivec.c ;
-    SubDirCcFlags -maltivec -mabi=altivec ;
 } else if $(TARGET_ARCH) = sparc {
-    archSources = yuv2rgb_vis.c ;
 }
 
 SubDirCcFlags $(HAIKU_FFMPEG_GCC_EXTRA_FLAGS) ;
@@ -24,9 +21,9 @@ SubDirCcFlags $(HAIKU_FFMPEG_DEFINES) ;
 SubDirC++Flags $(HAIKU_FFMPEG_DEFINES) ;
 
 StaticLibrary libswscale.a :
+	options.c
 	rgb2rgb.c
 	swscale.c
-	swscale_avoption.c
 	yuv2rgb.c
 
     $(archSources)

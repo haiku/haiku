@@ -70,6 +70,7 @@ if $(HAIKU_FFMPEG_USE_AMD3DNOWEXT) = 1 {
 }
 
 StaticLibrary libavcodec_x86.a :
+	mlpdsp.c
 	$(mmxSources)
 	$(sseSources)
 	$(amdSources)

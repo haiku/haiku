@@ -279,7 +279,7 @@ AVCodecDecoder::Seek(uint32 seekTo, int64 seekFrame, int64* frame,
 status_t
 AVCodecDecoder::NegotiateOutputFormat(media_format* inOutFormat)
 {
-	TRACE("AVCodecDecoder::NegotiateOutputFormat()\n",
+	TRACE("AVCodecDecoder::NegotiateOutputFormat() [%c] \n",
 		fIsAudio?('a'):('v'));
 
 #ifdef TRACE_AV_CODEC
@@ -351,6 +351,11 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	fContext->block_align = fBlockAlign;
 	fContext->extradata = (uint8_t*)fExtraData;
 	fContext->extradata_size = fExtraDataSize;
+	
+	if (fInputFormat.MetaDataSize() > 0) {
+		fContext->extradata = (uint8_t*)fInputFormat.MetaData();
+		fContext->extradata_size = fInputFormat.MetaDataSize();
+	}
 
 	TRACE("bit_rate %d, sample_rate %d, channels %d, block_align %d, "
 		"extradata_size %d\n", fContext->bit_rate, fContext->sample_rate,

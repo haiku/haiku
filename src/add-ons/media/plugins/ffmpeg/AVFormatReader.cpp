@@ -564,6 +564,7 @@ if (format->u.encoded_video.output.field_rate == 50.0f)
 	if (codecContext->extradata_size > 0) {
 		format->SetMetaData(codecContext->extradata,
 			codecContext->extradata_size);
+		TRACE("  extradata: %p\n", format->MetaData());
 	}
 
 	TRACE("  extradata_size: %d\n", codecContext->extradata_size);

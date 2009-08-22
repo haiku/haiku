@@ -81,6 +81,10 @@ static const DemuxerFormat gDemuxerTable[] = {
 		"vob", "VOB Movie", "video/x-vob",
 		B_MPEG_FORMAT_FAMILY, B_MPEG_FORMAT_FAMILY
 	},
+	{
+		"ac3", "AC3", "audio/ac3",
+		B_WAV_FORMAT_FAMILY, B_ANY_FORMAT_FAMILY
+	},
 };
 
 

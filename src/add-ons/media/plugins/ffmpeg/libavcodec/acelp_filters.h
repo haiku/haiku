@@ -51,15 +51,9 @@ extern const int16_t ff_acelp_interp_filter[61];
  * See ff_acelp_interp_filter for an example.
  *
  */
-void ff_acelp_interpolate(
-        int16_t* out,
-        const int16_t* in,
-        const int16_t* filter_coeffs,
-        int precision,
-        int frac_pos,
-        int filter_length,
-        int length);
-
+void ff_acelp_interpolate(int16_t* out, const int16_t* in,
+                          const int16_t* filter_coeffs, int precision,
+                          int frac_pos, int filter_length, int length);
 
 /**
  * high-pass filtering and upscaling (4.2.5 of G.729).
@@ -84,10 +78,23 @@ void ff_acelp_interpolate(
  *         fixed-point all coefficients are the same as in G.729. Thus this
  *         routine can be used for the fixed-point AMR decoder, too.
  */
-void ff_acelp_high_pass_filter(
-        int16_t* out,
-        int hpf_f[2],
-        const int16_t* in,
-        int length);
+void ff_acelp_high_pass_filter(int16_t* out, int hpf_f[2],
+                               const int16_t* in, int length);
+
+/**
+ * Apply an order 2 rational transfer function in-place.
+ *
+ * @param samples [in/out]
+ * @param zero_coeffs z^-1 and z^-2 coefficients of the numerator
+ * @param pole_coeffs z^-1 and z^-2 coefficients of the denominator
+ * @param gain scale factor for final output
+ * @param mem intermediate values used by filter (should be 0 initially)
+ * @param n number of samples
+ */
+void ff_acelp_apply_order_2_transfer_function(float *samples,
+                                              const float zero_coeffs[2],
+                                              const float pole_coeffs[2],
+                                              float gain,
+                                              float mem[2], int n);
 
 #endif /* AVCODEC_ACELP_FILTERS_H */
