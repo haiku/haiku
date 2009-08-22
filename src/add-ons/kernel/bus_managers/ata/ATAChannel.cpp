@@ -273,12 +273,13 @@ ATAChannel::SelectDevice(uint8 device)
 
 	_FlushAndWait(1);
 
-#if 0
+#if 1
 	// for debugging only
 	_ReadRegs(&taskFile, ATA_MASK_DEVICE_HEAD);
-	if (taskFile.chs.device != device) {
-		TRACE_ERROR("device %d not selected! head 0x%x, mode 0x%x, device %d\n",
-			device, taskFile.chs.head, taskFile.chs.mode, taskFile.chs.device);
+	if (taskFile.lba.device != device) {
+		TRACE_ERROR("device %d not selected! unused 0x%x, mode 0x%x,"
+			" device %d\n", device, taskFile.lba.lba_24_27, taskFile.lba.mode,
+			taskFile.lba.device);
 		return B_ERROR;
 	}
 #endif
