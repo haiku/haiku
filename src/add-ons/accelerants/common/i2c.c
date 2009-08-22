@@ -163,7 +163,7 @@ send_stop_condition(const i2c_bus *bus)
 
 //!	Send one bit
 static status_t
-send_bit(const i2c_bus *bus, bool bit, int timeout)
+send_bit(const i2c_bus *bus, uint8 bit, int timeout)
 {
 	status_t status;
 
