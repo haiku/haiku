@@ -19,6 +19,7 @@
 	*
 */
 
+
 #include <ShakeTrackingFilter.h>
 
 #include <Message.h>
@@ -26,7 +27,9 @@
 #include <MessageRunner.h>
 #include <View.h>
 
+
 const uint32 kMsgCancel = 'Canc';
+
 
 ShakeTrackingFilter::ShakeTrackingFilter(BView* targetView, uint32 messageWhat,
 	uint32 countThreshold, bigtime_t timeThreshold)
