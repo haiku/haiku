@@ -168,8 +168,7 @@ public:
 			void			ResizeBy(float dx, float dy);
 			void			ResizeTo(float width, float height);
 
-			void 			CenterIn(BRect* rect);
-			void 			CenterIn(BRect rect);
+			void 			CenterIn(const BRect& rect);
 			void 			CenterOnScreen();
 
 	virtual	void			Show();

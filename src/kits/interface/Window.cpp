@@ -2458,7 +2458,7 @@ BWindow::ResizeTo(float width, float height)
 
 
 void
-BWindow::CenterIn(BRect rect)
+BWindow::CenterIn(const BRect& rect)
 {
 	// Force layout resizing if needed
 	if (GetLayout() != NULL) {
@@ -2469,13 +2469,6 @@ BWindow::CenterIn(BRect rect)
 	MoveTo(BLayoutUtils::AlignInFrame(rect, Size(), 
 		BAlignment(B_ALIGN_HORIZONTAL_CENTER,
 			B_ALIGN_VERTICAL_CENTER)).LeftTop());
-}
-
-
-void
-BWindow::CenterIn(BRect* rect)
-{
-	CenterIn(*rect);
 }
 
 
