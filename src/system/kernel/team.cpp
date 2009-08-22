@@ -1282,6 +1282,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	return thread;
 
 err5:
+	sNotificationService.Notify(TEAM_REMOVED, team);
 	delete_team_user_data(team);
 err4:
 	vm_put_address_space(team->address_space);
@@ -1490,7 +1491,6 @@ fork_team(void)
 	struct fork_arg *forkArgs;
 	struct area_info info;
 	thread_id threadID;
-	cpu_status state;
 	status_t status;
 	int32 cookie;
 
@@ -1509,19 +1509,17 @@ fork_team(void)
 
 	strlcpy(team->args, parentTeam->args, sizeof(team->args));
 
-	// Inherit the parent's user/group.
-	inherit_parent_user_and_group(team, parentTeam);
+	InterruptsSpinLocker teamLocker(gTeamSpinlock);
 
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
+	// Inherit the parent's user/group.
+	inherit_parent_user_and_group_locked(team, parentTeam);
 
 	hash_insert(sTeamHash, team);
 	insert_team_into_parent(parentTeam, team);
 	insert_team_into_group(parentTeam->group, team);
 	sUsedTeams++;
 
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
+	teamLocker.Unlock();
 
 	forkArgs = (struct fork_arg *)malloc(sizeof(struct fork_arg));
 	if (forkArgs == NULL) {
@@ -1635,6 +1633,7 @@ fork_team(void)
 	return threadID;
 
 err5:
+	sNotificationService.Notify(TEAM_REMOVED, team);
 	remove_images(team);
 err4:
 	vm_delete_address_space(team->address_space);
@@ -1646,15 +1645,13 @@ err2:
 	free(forkArgs);
 err1:
 	// remove the team structure from the team hash table and delete the team structure
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
+	teamLocker.Lock();
 
 	remove_team_from_group(team);
 	remove_team_from_parent(parentTeam, team);
 	hash_remove(sTeamHash, team);
 
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
+	teamLocker.Unlock();
 
 	delete_team_struct(team);
 
