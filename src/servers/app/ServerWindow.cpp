@@ -671,6 +671,16 @@ ServerWindow::Window() const
 }
 
 
+bool
+ServerWindow::IsOffscreen() const
+{
+	// TODO: ensure desktop is locked!
+	// TODO: ensure the Window has been created!
+	
+	return fWindow->IsOffscreenWindow();
+}
+
+
 View*
 ServerWindow::_CreateView(BPrivate::LinkReceiver& link, View** _parent)
 {

@@ -2264,9 +2264,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 				for (int32 i = fWindowList.CountItems(); i-- > 0;) {
 					ServerWindow* window = fWindowList.ItemAt(i);
-
+					
 					if (window->ClientToken() == clientToken) {
 						// found it!
+						if (window->IsOffscreen())
+							break;
 						fLink.StartMessage(B_OK);
 						fLink.Attach<int32>(window->Window()->Screen()->ID());
 						status = B_OK;

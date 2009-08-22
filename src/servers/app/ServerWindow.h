@@ -84,6 +84,7 @@ public:
 	inline	ServerApp*			App() const { return fServerApp; }
 			::Desktop*			Desktop() const { return fDesktop; }
 			::Window*			Window() const;
+			bool				IsOffscreen() const;
 
 			void				SetTitle(const char* newTitle);
 	inline	const char*			Title() const { return fTitle; }
