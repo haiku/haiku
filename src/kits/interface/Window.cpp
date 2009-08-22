@@ -21,6 +21,8 @@
 #include <Bitmap.h>
 #include <Button.h>
 #include <FindDirectory.h>
+#include <Layout.h>
+#include <LayoutUtils.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <MessageQueue.h>
@@ -2026,6 +2028,13 @@ BWindow::DecoratorFrame() const
 }
 
 
+BSize
+BWindow::Size() const
+{
+	return BSize(fFrame.Width(), fFrame.Height());
+}
+
+
 const char*
 BWindow::Title() const
 {
@@ -2445,6 +2454,36 @@ BWindow::ResizeTo(float width, float height)
 	}
 
 	Unlock();
+}
+
+
+void
+BWindow::CenterIn(BRect rect)
+{
+	// Force layout resizing if needed
+	if (GetLayout() != NULL) {
+		BSize size = GetLayout()->PreferredSize();
+		ResizeTo(size.Width(), size.Height());
+	}
+
+	MoveTo(BLayoutUtils::AlignInFrame(rect, Size(), 
+		BAlignment(B_ALIGN_HORIZONTAL_CENTER,
+			B_ALIGN_VERTICAL_CENTER)).LeftTop());
+}
+
+
+void
+BWindow::CenterIn(BRect* rect)
+{
+	CenterIn(*rect);
+}
+
+
+void
+BWindow::CenterOnScreen()
+{
+	BScreen screen(this);
+	CenterIn(screen.Frame());
 }
 
 

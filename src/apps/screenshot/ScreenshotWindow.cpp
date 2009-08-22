@@ -492,12 +492,7 @@ ScreenshotWindow::_AddItemToPathMenu(const char* path, BString& label,
 void
 ScreenshotWindow::_CenterAndShow()
 {
-	BSize size = GetLayout()->PreferredSize();
-	ResizeTo(size.Width(), size.Height());
-
-	BRect frame(BScreen(this).Frame());
-	MoveTo((frame.Width() - size.Width()) / 2.0,
-		(frame.Height() - size.Height()) / 2.0);
+	CenterOnScreen();
 
 	Show();
 }

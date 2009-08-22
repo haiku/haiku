@@ -14,6 +14,7 @@
 #include <List.h>
 #include <Looper.h>
 #include <Rect.h>
+#include <Size.h>
 #include <StorageDefs.h>
 #include <View.h>
 
@@ -167,6 +168,10 @@ public:
 			void			ResizeBy(float dx, float dy);
 			void			ResizeTo(float width, float height);
 
+			void 			CenterIn(BRect* rect);
+			void 			CenterIn(BRect rect);
+			void 			CenterOnScreen();
+
 	virtual	void			Show();
 	virtual	void			Hide();
 			bool			IsHidden() const;
@@ -188,6 +193,7 @@ public:
 			BRect			Bounds() const;
 			BRect			Frame() const;
 			BRect			DecoratorFrame() const;
+			BSize			Size() const;
 			const char*		Title() const;
 			void			SetTitle(const char* title);
 			bool			IsFront() const;
