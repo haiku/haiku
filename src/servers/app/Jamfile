@@ -23,6 +23,7 @@ Server app_server :
 	DefaultDecorator.cpp
 	Desktop.cpp
 	DesktopSettings.cpp
+	DirectWindowSupport.cpp
 	DrawState.cpp
 	EventDispatcher.cpp
 	EventStream.cpp
