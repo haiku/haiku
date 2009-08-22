@@ -856,7 +856,7 @@ media_format::operator=(const media_format& clone)
 
 	// clone or copy the meta data
 	if (clone.meta_data) {
-		if (clone.meta_data_area) {
+		if (clone.meta_data_area != B_BAD_VALUE) {
 			meta_data_area = clone_area("meta_data_clone_area", &meta_data, 
 				B_ANY_ADDRESS, B_READ_AREA, clone.meta_data_area);
 			if (meta_data_area < 0) {
