@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src tests kits shared shake_filter ;
+
+UsePrivateHeaders shared ;
+
+Application ShakeFilterTest :
+	ShakeFilterTest.cpp	
+	: libshared.a be $(TARGET_LIBSUPC++)
+;
