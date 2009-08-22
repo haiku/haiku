@@ -233,10 +233,11 @@ switch $(HAIKU_CPU) {
 	{
 		HAIKU_DEFINES += __MIPSEL__ ;
 		# RouterBOARD firmware (ELF image over TFTP)
-		HAIKU_BOOT_PLATFORM = routerboot_mipsel ;
+		HAIKU_BOOT_PLATFORM = routerboard_mipsel ;
 		# offset in floppy image (>= sizeof(haiku_loader))
-		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - todo/fixme
-		HAIKU_NO_WERROR = 1 ; # we use #warning as placeholders for things to write...
+		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB
+		HAIKU_NO_WERROR = 1 ;
+			# we use #warning as placeholders for things to write...
 	}
 	case * :
 		Exit "Currently unsupported target CPU:" $(HAIKU_CPU) ;
