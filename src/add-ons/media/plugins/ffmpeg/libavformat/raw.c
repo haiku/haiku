@@ -571,9 +571,13 @@ static int ac3_eac3_probe(AVProbeData *p, enum CodecID expected_codec_id)
     }
     if(codec_id != expected_codec_id) return 0;
     if   (first_frames>=3) return AVPROBE_SCORE_MAX * 3 / 4;
+#ifdef __HAIKU__
+/* for typical buffer size 2048, we can't detect more than 1 full frame sized of 1792 */
+	else if(max_frames>=1) return AVPROBE_SCORE_MAX / 2;
+#else
     else if(max_frames>=3) return AVPROBE_SCORE_MAX / 2;
-    else if(max_frames>=1) return 1;
 #endif
+    else if(max_frames>=1) return 1;
     else                   return 0;
 }
 #endif
