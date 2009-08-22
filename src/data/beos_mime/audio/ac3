@@ -10,3 +10,6 @@ resource(3, "META:EXTENS") message(234) {
 	"type" = "audio/ac3"
 };
 
+resource(4, "META:SNIFF_RULE") "0.50 (0x0b77)";
+
+
