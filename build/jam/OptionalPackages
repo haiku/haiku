@@ -606,7 +606,7 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 
 		actions BuildHaikuImageExpanderRules
 		{
-			echo "\"application/x-7z-compressed\"\t.7z\t\"7za l \0045s\"\t\"7za x -y \0045s\"" > $(1)
+			echo -e "\"application/x-7z-compressed\"\t.7z\t\"7za l \0045s\"\t\"7za x -y \0045s\"" > $(1)
 		}
 
 		Always expander.rules ;
