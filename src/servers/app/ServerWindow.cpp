@@ -3495,6 +3495,12 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 		status_t status = fDirectWindowData->SyncronizeWithClient();
 
 		if (status != B_OK) {
+			char errorString[256];
+			snprintf(errorString, sizeof(errorString),
+				"%s killed for a problem in DirectConnected(): %s",
+				App()->Signature(), strerror(status));
+			syslog(LOG_ERR, errorString);
+			
 			// The client application didn't release the semaphore
 			// within the given timeout. Or something else went wrong.
 			// Deleting this member should make it crash.
