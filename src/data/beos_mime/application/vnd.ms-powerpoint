@@ -1,0 +1,16 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "application/vnd.ms-powerpoint";
+
+resource(2, "META:S:DESC") #'MSDC' "PowerPoint Presentation";
+
+resource(3, "META:L:DESC") #'MLDC' "Microsoft® PowerPoint® Presentation";
+
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "pot",
+	"extensions" = "pps",
+	"extensions" = "ppt",
+	"type" = "application/vnd.ms-powerpoint"
+};
+

@@ -1,0 +1,17 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "application/vnd.ms-works";
+
+resource(2, "META:S:DESC") #'MSDC' "Works Document";
+
+resource(3, "META:L:DESC") #'MLDC' "Microsoft® Works® Document";
+
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "wcm",
+	"extensions" = "wdb",
+	"extensions" = "wks",
+	"extensions" = "wps",
+	"type" = "application/vnd.ms-works"
+};
+

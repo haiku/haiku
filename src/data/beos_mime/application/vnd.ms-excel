@@ -1,0 +1,19 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "application/vnd.ms-excel";
+
+resource(2, "META:S:DESC") #'MSDC' "Excel Spreadsheet";
+
+resource(3, "META:L:DESC") #'MLDC' "Microsoft® Excel® Spreadsheet";
+
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "xla",
+	"extensions" = "xlc",
+	"extensions" = "xlm",
+	"extensions" = "xls",
+	"extensions" = "xlt",
+	"extensions" = "xlw",
+	"type" = "application/vnd.ms-excel"
+};
+
