@@ -87,3 +87,19 @@ arch_int_init_post_device_manager(struct kernel_args* args)
 	return B_ENTRY_NOT_FOUND;
 }
 
+
+void
+mipsel_get_current_cpu_exception_context(
+	struct mipsel_cpu_exception_context *context)
+{
+#warning mipsel_get_current_cpu_exception_context
+}
+
+
+void
+mipsel_set_current_cpu_exception_context(
+	struct mipsel_cpu_exception_context *context)
+{
+#warning mipsel_set_current_cpu_exception_context
+}
+

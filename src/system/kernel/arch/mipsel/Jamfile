@@ -6,16 +6,15 @@ UsePrivateKernelHeaders ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 
-KernelMergeObject kernel_arch_arm.o :
+KernelMergeObject kernel_arch_mipsel.o :
 	arch_asm.S
-#	arch_atomic.c
+	arch_atomic.c
 	arch_commpage.cpp
 	arch_cpu.cpp
-#	arch_cpu_asm.S
 	arch_debug_console.cpp
 	arch_debug.cpp
 	arch_elf.cpp
-#	arch_exceptions.S
+	arch_exceptions.S
 	arch_int.cpp
 	arch_platform.cpp
 	arch_real_time_clock.cpp

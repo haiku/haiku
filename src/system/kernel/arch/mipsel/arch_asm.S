@@ -7,9 +7,9 @@
  * Distributed under the terms of the NewOS License.
  */
 
-#include <arch/mipsel/arch_cpu.h>
 
 #include <asm_defs.h>
+ 
 
 .text
 
@@ -38,4 +38,9 @@ FUNCTION_END(arch_int_restore_interrupts)
 FUNCTION(arch_int_are_interrupts_enabled):
 	nop
 FUNCTION_END(arch_int_are_interrupts_enabled)
+
+/* void mipsel_context_switch(addr_t* old_sp, addr_t new_sp); */
+FUNCTION(mipsel_context_switch):
+	nop
+FUNCTION_END(mipsel_context_switch)
 

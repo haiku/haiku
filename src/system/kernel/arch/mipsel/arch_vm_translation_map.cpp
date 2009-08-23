@@ -7,6 +7,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include <KernelExport.h>
 #include <kernel.h>
 #include <vm.h>
@@ -89,5 +90,32 @@ arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 {
 #warning IMPLEMENT arch_vm_translation_map_is_kernel_page_accessible
 	return TRUE;
+}
+
+
+// #pragma mark -
+
+
+status_t
+mipsel_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
+	size_t size)
+{
+#warning IMPLEMENT mipsel_map_address_range
+	return B_OK;
+}
+
+
+void
+mipsel_unmap_address_range(addr_t virtualAddress, size_t size)
+{
+#warning IMPLEMENT mipsel_unmap_address_range
+}
+
+
+status_t
+mipsel_remap_address_range(addr_t *_virtualAddress, size_t size, bool unmap)
+{
+#warning IMPLEMENT mipsel_remap_address_range
+	return B_OK;
 }
 

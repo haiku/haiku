@@ -7,6 +7,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include <KernelExport.h>
 
 #include <kernel.h>

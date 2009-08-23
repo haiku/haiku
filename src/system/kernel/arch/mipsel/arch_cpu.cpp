@@ -10,7 +10,6 @@
 
 #include <KernelExport.h>
 
-//#include <arch_platform.h>
 #include <arch_thread.h>
 #include <arch/cpu.h>
 #include <boot/kernel_args.h>
@@ -166,5 +165,26 @@ void
 arch_cpu_idle(void)
 {
 #warning IMPLEMENT arch_cpu_idle
+}
+
+// The purpose of this function is to trick the compiler. When setting the
+// page_handler to a label that is obviously (to the compiler) never used,
+// it may reorganize the control flow, so that the labeled part is optimized
+// away.
+// By invoking the function like this
+//
+//	if (mipsel_set_fault_handler(faultHandler, (addr_t)&&error))
+//		goto error;
+//
+// the compiler has to keep the labeled code, since it can't guess the return
+// value of this (non-inlinable) function. At least in my tests it worked that
+// way, and I hope it will continue to work like this in the future.
+//
+bool
+mipsel_set_fault_handler(addr_t *handlerLocation, addr_t handler)
+{
+// TODO: This doesn't work correctly with gcc 4 anymore!
+	*handlerLocation = handler;
+	return false;
 }
 

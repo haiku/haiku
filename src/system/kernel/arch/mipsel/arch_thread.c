@@ -11,6 +11,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include <arch_thread.h>
 
 #include <arch_cpu.h>
@@ -26,6 +27,39 @@
 
 
 static struct arch_thread sInitialState;
+
+
+void
+mipsel_push_iframe(struct iframe_stack *stack, struct iframe *frame)
+{
+#warning IMPLEMENT mipsel_push_iframe
+}
+
+
+void
+mipsel_pop_iframe(struct iframe_stack *stack)
+{
+#warning IMPLEMENT mipsel_pop_iframe
+}
+
+
+static struct iframe *
+mipsel_get_current_iframe(void)
+{
+#warning IMPLEMENT mipsel_get_current_iframe
+	return NULL;
+}
+
+
+struct iframe *
+mipsel_get_user_iframe(void)
+{
+#warning IMPLEMENT mipsel_get_user_iframe
+	return NULL;
+}
+
+
+// #pragma mark -
 
 
 status_t

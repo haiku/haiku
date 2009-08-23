@@ -10,6 +10,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include <OS.h>
 
 #include <arch_cpu.h>
@@ -17,31 +18,18 @@
 #include <boot/kernel_args.h>
 
 
-static uint64 sCPUClockFrequency;
-static uint64 sBusClockFrequency;
-static enum cpu_types sCPUType;
-static uint16 sCPURevision;
-
 status_t
 arch_get_system_info(system_info *info, size_t size)
 {
-	info->cpu_type = sCPUType;
-	info->cpu_revision = sCPURevision;
-
-	info->cpu_clock_speed = sCPUClockFrequency;
-	info->bus_clock_speed = sBusClockFrequency;
-
-	return B_OK;
+#warning IMPLEMENT arch_get_system_info
+	return B_ERROR;
 }
 
 
 status_t
 arch_system_info_init(struct kernel_args *args)
 {
-	sCPUClockFrequency = args->arch_args.cpu_frequency;
-	sBusClockFrequency = args->arch_args.bus_frequency;
-	sCPUType = args->arch_args.cpu_type;
-	sCPURevision = args->arch_args.cpu_revision;
-	
-	return B_OK;
+#warning IMPLEMENT arch_system_info_init
+	return B_ERROR;
 }
+

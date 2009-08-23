@@ -51,7 +51,6 @@ void
 arch_debug_serial_putchar(const char c)
 {
 #warning IMPLEMENT arch_debug_serial_putchar
-	return 0;
 }
 
 
