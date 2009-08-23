@@ -261,6 +261,7 @@ ATAChannel::SelectDevice(uint8 device)
 		return B_BAD_INDEX;
 
 	ata_task_file taskFile;
+	taskFile.lba.lba_24_27 = 0;
 	taskFile.lba.mode = ATA_MODE_LBA;
 	taskFile.lba.device = device;
 
