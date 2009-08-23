@@ -5,11 +5,10 @@ resource(1, "META:TYPE") "application/ogg";
 
 resource(2, "META:SNIFF_RULE") "0.50 (\"OggS\")";
 
-resource(3, "META:S:DESC") #'MSDC' "OGG Movie";
+resource(3, "META:S:DESC") #'MSDC' "Ogg Multiplex";
 
 resource(4, "META:EXTENS") message(234) {
-	"extensions" = "ogg",
-	"extensions" = "ogm",
+	"extensions" = "ogx",
 	"type" = "application/ogg"
 };
 
