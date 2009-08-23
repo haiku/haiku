@@ -344,6 +344,8 @@ private:
 			void			_GetDecoratorSize(float* _borderWidth,
 								float* _tabHeight) const;
 
+			void			_CheckSizeLimits();
+
 private:
 			char*			fTitle;
 			int32			_unused0;

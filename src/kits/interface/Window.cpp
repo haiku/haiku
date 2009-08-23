@@ -1406,14 +1406,7 @@ FrameMoved(origin);
 
 		case B_LAYOUT_WINDOW:
 		{
-			if (fFlags & B_AUTO_UPDATE_SIZE_LIMITS) {
-				// Get min/max constraints of the top view and enforce window
-				// size limits respectively.
-				BSize minSize = fTopView->MinSize();
-				BSize maxSize = fTopView->MaxSize();
-				SetSizeLimits(minSize.width, maxSize.width,
-					minSize.height, maxSize.height);
-			}
+			_CheckSizeLimits();
 
 			// do the actual layout
 			fTopView->Layout(false);
@@ -2460,11 +2453,8 @@ BWindow::ResizeTo(float width, float height)
 void
 BWindow::CenterIn(const BRect& rect)
 {
-	// Force layout resizing if needed
-	if (GetLayout() != NULL) {
-		BSize size = GetLayout()->PreferredSize();
-		ResizeTo(size.Width(), size.Height());
-	}
+	// Set size limits now if needed
+	_CheckSizeLimits();
 
 	MoveTo(BLayoutUtils::AlignInFrame(rect, Size(), 
 		BAlignment(B_ALIGN_HORIZONTAL_CENTER,
@@ -3881,6 +3871,20 @@ BWindow::_GetDecoratorSize(float* _borderWidth, float* _tabHeight) const
 		*_borderWidth = borderWidth;
 	if (_tabHeight != NULL)
 		*_tabHeight = tabHeight;
+}
+
+
+void
+BWindow::_CheckSizeLimits()
+{
+	if (fFlags & B_AUTO_UPDATE_SIZE_LIMITS) {
+		// Get min/max constraints of the top view and enforce window
+		// size limits respectively.
+		BSize minSize = fTopView->MinSize();
+		BSize maxSize = fTopView->MaxSize();
+		SetSizeLimits(minSize.width, maxSize.width,
+			minSize.height, maxSize.height);
+	}
 }
 
 
