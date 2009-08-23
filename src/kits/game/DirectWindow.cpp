@@ -15,13 +15,12 @@
 #include <DirectWindowPrivate.h>
 #include <ServerProtocol.h>
 
-//#define DEBUG 3
+#include <stdio.h>
+#include <string.h>
 
-#if DEBUG
-	#include <string.h>
-	#include <stdio.h>
-#endif
+//#define DEBUG 1
 
+	
 // We don't need this kind of locking, since the directDaemonFunc 
 // doesn't access critical shared data.
 #define DW_NEEDS_LOCKING 0
@@ -456,8 +455,12 @@ BDirectWindow::_DirectDaemon()
 			status = acquire_sem(fDisableSem);
 		} while (status == B_INTERRUPTED);
 
-		if (status < B_OK)
+		if (status < B_OK) {
+			fprintf(stderr,
+				"DirectDaemon: failed to acquire direct sem\n",
+				 strerror(status));
 			return -1;
+		}
 
 #if DEBUG
 		print_direct_buffer_info(*fBufferDesc);
@@ -480,8 +483,12 @@ BDirectWindow::_DirectDaemon()
 		// The app_server then waits (with a timeout) on this sem.
 		// If we aren't quick enough to release this sem, our app
 		// will be terminated by the app_server
-		if (release_sem(fDisableSemAck) != B_OK)
+		if ((status = release_sem(fDisableSemAck)) != B_OK) {
+			fprintf(stderr,
+				"DirectDaemon: failed to release sem: (%s)\n",
+				strerror(status));
 			return -1;
+		}
 	}
 
 	return 0;
