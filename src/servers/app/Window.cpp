@@ -214,7 +214,6 @@ Window::SetClipping(BRegion* stillAvailableOnScreen)
 	fVisibleContentRegionValid = false;
 	fEffectiveDrawingRegionValid = false;
 
-	// TODO: review this!
 	fWindow->HandleDirectConnection(B_DIRECT_MODIFY | B_CLIPPING_MODIFIED);
 }
 

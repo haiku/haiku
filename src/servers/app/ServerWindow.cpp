@@ -3483,78 +3483,25 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 	if (fDirectWindowData == NULL)
 		return;
 
-	if (!fDirectWindowData->SetState((direct_buffer_state)bufferState,
-			(direct_driver_state)driverState))
-		return;
-
-	if ((bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
-		// TODO: Locking ?
-		RenderingBuffer *buffer = fDesktop->HWInterface()->FrontBuffer();
-		fDirectWindowData->buffer_info->bits = buffer->Bits();
-		fDirectWindowData->buffer_info->pci_bits = NULL; // TODO
-		fDirectWindowData->buffer_info->bytes_per_row = buffer->BytesPerRow();
-
-		switch (buffer->ColorSpace()) {
-			case B_RGB32:
-			case B_RGBA32:
-			case B_RGB32_BIG:
-			case B_RGBA32_BIG:
-				fDirectWindowData->buffer_info->bits_per_pixel = 32;
-				break;
-			case B_RGB24:
-			case B_RGB24_BIG:
-				fDirectWindowData->buffer_info->bits_per_pixel = 24;
-				break;
-			case B_RGB16:
-			case B_RGB16_BIG:
-			case B_RGB15:
-			case B_RGB15_BIG:
-				fDirectWindowData->buffer_info->bits_per_pixel = 16;
-				break;
-			case B_CMAP8:
-			case B_GRAY8:
-				fDirectWindowData->buffer_info->bits_per_pixel = 8;
-				break;
-			default:
-				syslog(LOG_ERR,
-					"unknown colorspace in HandleDirectConnection()!\n");
-				fDirectWindowData->buffer_info->bits_per_pixel = 0;
-				break;
+	if (fDesktop->LockSingleWindow()) {
+		if (!fDirectWindowData->SetState((direct_buffer_state)bufferState,
+				(direct_driver_state)driverState,
+				fDesktop->HWInterface()->FrontBuffer(), fWindow->Frame(),
+				fWindow->VisibleContentRegion())) {
+			fDesktop->UnlockSingleWindow();
+			return;
 		}
+	
+		status_t status = fDirectWindowData->SyncronizeWithClient();
 
-		fDirectWindowData->buffer_info->pixel_format = buffer->ColorSpace();
-		fDirectWindowData->buffer_info->layout = B_BUFFER_NONINTERLEAVED;
-		fDirectWindowData->buffer_info->orientation = B_BUFFER_TOP_TO_BOTTOM;
-			// TODO
-		fDirectWindowData->buffer_info->window_bounds
-			= to_clipping_rect(fWindow->Frame());
-
-		// TODO: Review this
-		const int32 kMaxClipRectsCount = (DIRECT_BUFFER_INFO_AREA_SIZE
-			- sizeof(direct_buffer_info)) / sizeof(clipping_rect);
-
-		// We just want the region inside the window, border excluded.
-		BRegion clipRegion = fWindow->VisibleContentRegion();
-
-		fDirectWindowData->buffer_info->clip_list_count
-			= min_c(clipRegion.CountRects(), kMaxClipRectsCount);
-		fDirectWindowData->buffer_info->clip_bounds = clipRegion.FrameInt();
-
-		for (uint32 i = 0; i < fDirectWindowData->buffer_info->clip_list_count;
-				i++) {
-			fDirectWindowData->buffer_info->clip_list[i]
-				= clipRegion.RectAtInt(i);
+		if (status != B_OK) {
+			// The client application didn't release the semaphore
+			// within the given timeout. Or something else went wrong.
+			// Deleting this member should make it crash.
+			delete fDirectWindowData;
+			fDirectWindowData = NULL;
 		}
-	}
-
-	status_t status = fDirectWindowData->SyncronizeWithClient();
-
-	if (status != B_OK) {
-		// The client application didn't release the semaphore
-		// within the given timeout. Or something else went wrong.
-		// Deleting this member should make it crash.
-		delete fDirectWindowData;
-		fDirectWindowData = NULL;
+		fDesktop->UnlockSingleWindow();
 	}
 }
 

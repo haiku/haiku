@@ -4,9 +4,12 @@
  *
  */
 
+#include <Autolock.h>
 #include <DirectWindow.h>
 
 #include <DirectWindowPrivate.h>
+
+class RenderingBuffer;
 
 struct BufferState {
 	BufferState(const direct_buffer_state& state)
@@ -41,8 +44,11 @@ public:
 			status_t			SyncronizeWithClient();
 
 			bool				SetState(const direct_buffer_state& bufferState,
-									const direct_driver_state& driverState);
-
+									const direct_driver_state& driverState,
+									RenderingBuffer *renderingBuffer,
+									const BRect& windowFrame,
+									const BRegion& clipRegion);
+			
 			BRect				old_window_frame;
 			direct_buffer_info*	buffer_info;
 			bool				full_screen;
@@ -50,11 +56,11 @@ public:
 private:
 			bool 				_HandleStop(const direct_buffer_state& state);
 			bool 				_HandleStart(const direct_buffer_state& state);
-			bool 				_HandleModify(const direct_buffer_state& state);
 		
 			sem_id				fSem;
 			sem_id				fAcknowledgeSem;
 			area_id				fBufferArea;
+			direct_buffer_state		fPreviousState;
 			int32				fTransition;
 };
 

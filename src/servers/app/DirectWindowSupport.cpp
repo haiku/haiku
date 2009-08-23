@@ -9,7 +9,14 @@
 
 #include "DirectWindowSupport.h"
 
+#include <Autolock.h>
+
+#include "RenderingBuffer.h"
+#include "clipping.h"
+
 #include <string.h>
+#include <syslog.h>
+
 
 DirectWindowData::DirectWindowData()
 	:
@@ -89,55 +96,76 @@ DirectWindowData::SyncronizeWithClient()
 
 bool
 DirectWindowData::SetState(const direct_buffer_state& bufferState,
-	const direct_driver_state& driverState)
-{
-	BufferState inputState(bufferState);
-	BufferState currentState(buffer_info->buffer_state);
+	const direct_driver_state& driverState, RenderingBuffer *buffer,
+	const BRect& windowFrame, const BRegion& clipRegion)
+{	
+	bool wasStopped = fTransition <= 0;
 	
-	bool handle = false;
+	if ((bufferState & B_DIRECT_MODE_MASK) == B_DIRECT_STOP)
+		fTransition--;
+	else if ((bufferState & B_DIRECT_MODE_MASK) == B_DIRECT_START)
+		fTransition++;
+	
+	bool isStopped = fTransition <= 0;
 		
-	if (inputState.Action() == B_DIRECT_STOP)
-		handle = _HandleStop(bufferState);
-	else if (inputState.Action() == B_DIRECT_START)
-		handle = _HandleStart(bufferState);
-	else if (inputState.Action() == B_DIRECT_MODIFY)
-		handle = _HandleModify(bufferState);
+	if (wasStopped && isStopped)
+		return false;
+						
+	buffer_info->buffer_state = bufferState;
 		
 	if (driverState != -1)
 		buffer_info->driver_state = driverState;
 
-	return handle;
-}
+	if ((bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
+		buffer_info->bits = buffer->Bits();
+		buffer_info->pci_bits = NULL; // TODO
+		buffer_info->bytes_per_row = buffer->BytesPerRow();
 
+		switch (buffer->ColorSpace()) {
+			case B_RGB32:
+			case B_RGBA32:
+			case B_RGB32_BIG:
+			case B_RGBA32_BIG:
+				buffer_info->bits_per_pixel = 32;
+				break;
+			case B_RGB24:
+			case B_RGB24_BIG:
+				buffer_info->bits_per_pixel = 24;
+				break;
+			case B_RGB16:
+			case B_RGB16_BIG:
+			case B_RGB15:
+			case B_RGB15_BIG:
+				buffer_info->bits_per_pixel = 16;
+				break;
+			case B_CMAP8:
+			case B_GRAY8:
+				buffer_info->bits_per_pixel = 8;
+				break;
+			default:
+				syslog(LOG_ERR,
+					"unknown colorspace in DirectWindowData::SetState()!\n");
+				buffer_info->bits_per_pixel = 0;
+				break;
+		}
 
-bool
-DirectWindowData::_HandleStop(const direct_buffer_state& state)
-{
-	buffer_info->buffer_state = B_DIRECT_STOP;
-	if (fTransition-- >= 1)
-		return true;
-	return false;
-}
+		buffer_info->pixel_format = buffer->ColorSpace();
+		buffer_info->layout = B_BUFFER_NONINTERLEAVED;
+		buffer_info->orientation = B_BUFFER_TOP_TO_BOTTOM;
+			// TODO
+		buffer_info->window_bounds = to_clipping_rect(windowFrame);
 
+		// TODO: Review this
+		const int32 kMaxClipRectsCount = (DIRECT_BUFFER_INFO_AREA_SIZE
+			- sizeof(direct_buffer_info)) / sizeof(clipping_rect);
 
-bool
-DirectWindowData::_HandleStart(const direct_buffer_state& state)
-{
-	buffer_info->buffer_state = (direct_buffer_state)
-		(BufferState(buffer_info->buffer_state).Reason() | state);
-	if (fTransition++ >= 0)
-		return true;
+		buffer_info->clip_list_count = min_c(clipRegion.CountRects(),
+			kMaxClipRectsCount);
+		buffer_info->clip_bounds = clipRegion.FrameInt();
+
+		for (uint32 i = 0; i < buffer_info->clip_list_count; i++)
+			buffer_info->clip_list[i] = clipRegion.RectAtInt(i);
+	}
 	
-	return false;
-}
-
-
-bool
-DirectWindowData::_HandleModify(const direct_buffer_state& state)
-{
-	buffer_info->buffer_state = state;
-	if (fTransition > 0)
-		return true;
-	
-	return false;
+	return true;
 }
