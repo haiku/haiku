@@ -45,12 +45,13 @@ Geforce 8xxx and later series cards (NV50, G80, also known as GPGPU, general pur
 	<li>Basic AGP mode support on AGP cards, using the new (seperate) Haiku AGP busmanager;
 	<li>Basic ('legacy') PCIe support;
 	<li>Coldstart support for analog connected screens on most cards except TNT1, GeForce 6xxx and 7xxx series;
-	<li>TVout support on cards with Brooktree BT868/BT869 and Conexant CX25870/CX25871 encoders (use 'Dualhead Setup' <strong>0.04</strong> from BeBits for now).
+	<li>TVout support on cards with Brooktree BT868/BT869 and Conexant CX25870/CX25871 encoders (use 'Dualhead Setup' <strong>0.04</strong> from BeBits for now);
+	<li>DDC/EDID support for monitor capability detection.
 </ul>
 <strong>Known limitations:</strong> 
 <ul>
 	<li>If you want BScreen 'Sync_to_Retrace' capability make sure you enabled 'assign IRQ to VGA card' in your system BIOS (if available);
-	<li>If the driver still seems to create 'random' trouble make sure you have a fully functional VGA BIOS, or system BIOS for embedded cards (check for updates on the manufacturor's site). Make sure you mail me if you still have trouble but also if this version fixed that!
+	<li>If the driver seems to create 'random' trouble make sure you have a fully functional VGA BIOS, or system BIOS for embedded cards (check for updates on the manufacturor's site). Make sure you mail me if you still have trouble but also if this version fixed that!
 	<li>If on a laptop the internal panel doesn't work when you connect an external monitor, make sure you set 'output device selection' to 'internal' (instead of 'auto') in the system BIOS if it has such an option. If you have this symptom on a normal card, or on a laptop without that BIOS option then you are probably out of luck for dualhead support;
 	<li><strong>NV40 architecture cards:</strong> (GeForce 6xxx, but 6800 AGP seems to be OK)<br>
  	Secondary analog monitor load detection doesn't work and we can't control very well to which connector the card's output gets routed (lack of specs). This means you might have to experiment a bit with the way you connect your monitor to the card. A single analog or DVI screen should work OK, and two analog screens should be OK as well.
@@ -93,13 +94,13 @@ You have to reboot in order to apply the original configuration.<br>
 <hr>
 <a name="settings"></a><h2>Settings:</h2><br>
 Please read this information carefully *before* installing and using the Haiku Nvidia TNT/GeForce graphics driver. It might spare you some trouble afterwards..<br>
-<p>The driver uses a file named <strong>nv.settings</strong> to determine how to use your card. After installation this file will be located at <strong>home/config/settings/kernel/drivers/</strong>. How you should setup this file depends on what you want to do with the driver. While it has a 'failsave' default configuration, you might be able to do better than that... Anyway, read the nifty details below.<br>
+<p>The driver uses a file named <strong>nvidia.settings</strong> to determine how to use your card. After installation this file will be located at <strong>home/config/settings/kernel/drivers/</strong>. How you should setup this file depends on what you want to do with the driver. While it has a 'failsave' default configuration, you might be able to do better than that... Anyway, read the nifty details below.<br>
 <br>
 <strong>Note:</strong> The driver only reads this file during it's initialisation. This means that you have to reboot in order to let changes take effect.<br>
 <br>
 <br>
 <br>
-<strong>nv.settings driver configuration:</strong><br>
+<strong>nvidia.settings driver configuration:</strong><br>
 <ul>
 	<li><strong>usebios:</strong><br>
 The name of this item may be somewhat misleading, it might be changed in the future. It actually tells the driver if it should coldstart the card or not. The driver will rely on the VGA BIOS to have coldstarted the card before BeOS booted if you specify 'true'.<br>
@@ -252,7 +253,7 @@ The acceleration engine is disabled.
 </ul>
 <hr>
 <br>
-<a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on June 23, 2009)</p>
+Rudolf Cornelissen.<br>
+<p>(Page last updated on August 23, 2009)</p>
 </body>
 </html>

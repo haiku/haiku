@@ -2,14 +2,14 @@
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 
-	Modified by Rudolf Cornelissen 2/2005.
+	Modified by Rudolf Cornelissen 8/2009.
 */
 
 #if !defined(GENERIC_H)
 #define GENERIC_H
 
 #include <Accelerant.h>
-#include "video_overlay.h"
+#include <video_overlay.h>
 
 #define DEBUG 1
 
@@ -26,6 +26,9 @@ status_t GET_MODE_LIST(display_mode *dm);
 status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const display_mode *high);
 status_t SET_DISPLAY_MODE(display_mode *mode_to_set);
 status_t GET_DISPLAY_MODE(display_mode *current_mode);
+#ifdef __HAIKU__
+status_t GET_EDID_INFO(void* info, size_t size, uint32* _version);
+#endif
 status_t GET_FRAME_BUFFER_CONFIG(frame_buffer_config *a_frame_buffer);
 status_t GET_PIXEL_CLOCK_LIMITS(display_mode *dm, uint32 *low, uint32 *high);
 status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start);

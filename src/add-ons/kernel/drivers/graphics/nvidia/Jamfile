@@ -4,6 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics nvidia ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
 
 KernelAddon nvidia :
 	driver.c

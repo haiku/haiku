@@ -4,7 +4,7 @@
 
 	Other authors for NV driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-7/2009
+	Rudolf Cornelissen 9/2002-8/2009
 */
 
 #define MODULE_BIT 0x00400000
@@ -192,14 +192,14 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 	   note:
 	   allowing 2 pixels more for horizontal display for the 1366 mode, since multiples of 8
 	   are required for the CRTCs horizontal timing programming) */
-	if (si->ps.crtc1_screen.have_edid) {
+	if (si->ps.crtc1_screen.have_native_edid) {
 		if ((target->timing.h_display - 2) > si->ps.crtc1_screen.timing.h_display
 			|| target->timing.v_display > si->ps.crtc1_screen.timing.v_display) {
 			LOG(4, ("PROPOSEMODE: screen at crtc1 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
 		}
 	}
-	if (si->ps.crtc2_screen.have_edid) {
+	if (si->ps.crtc2_screen.have_native_edid) {
 		if ((target->timing.h_display - 2) > si->ps.crtc2_screen.timing.h_display
 			|| target->timing.v_display > si->ps.crtc2_screen.timing.v_display) {
 			LOG(4, ("PROPOSEMODE: screen at crtc2 can't display requested resolution, aborted.\n"));

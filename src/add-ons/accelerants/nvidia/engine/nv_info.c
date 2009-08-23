@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-7/2009
+   Rudolf Cornelissen 7/2003-8/2009
 */
 
 #define MODULE_BIT 0x00002000
@@ -2559,10 +2559,12 @@ static void setup_output_matrix()
 	/* head 1 will be the primary head */
 	si->ps.crtc2_prim = false;
 	/* no screens usable */
-	si->ps.crtc1_screen.have_edid = false;
+	si->ps.crtc1_screen.have_native_edid = false;
+	si->ps.crtc1_screen.have_full_edid = false;
 	si->ps.crtc1_screen.timing.h_display = 0;
 	si->ps.crtc1_screen.timing.v_display = 0;
-	si->ps.crtc2_screen.have_edid = false;
+	si->ps.crtc2_screen.have_native_edid = false;
+	si->ps.crtc2_screen.have_full_edid = false;
 	si->ps.crtc2_screen.timing.h_display = 0;
 	si->ps.crtc2_screen.timing.v_display = 0;
 
@@ -2576,7 +2578,7 @@ static void setup_output_matrix()
 	/* detect analog monitors. First try EDID, else use load sensing. */
 	/* (load sensing is confirmed working OK on NV04, NV05, NV11, NV18, NV28 and NV34.) */
 	/* primary connector: */
-	if (si->ps.con1_screen.have_edid) {
+	if (si->ps.con1_screen.have_native_edid) {
 		if (!si->ps.con1_screen.digital) si->ps.monitors |= CRTC1_VGA;
 	} else {
 		if (nv_dac_crt_connected()) {
@@ -2603,7 +2605,7 @@ static void setup_output_matrix()
 		si->ps.crtc1_screen.timing.v_sync_end = si->ps.p1_timing.v_sync_end;
 		si->ps.crtc1_screen.timing.v_total = si->ps.p1_timing.v_total;
 		si->ps.crtc1_screen.timing.flags = si->ps.p1_timing.flags;
-		si->ps.crtc1_screen.have_edid = true;
+		si->ps.crtc1_screen.have_native_edid = true;
 		si->ps.crtc1_screen.aspect =
 			(si->ps.p1_timing.h_display / ((float)si->ps.p1_timing.v_display));
 		si->ps.crtc1_screen.digital = true;
@@ -2633,7 +2635,7 @@ static void setup_output_matrix()
 			si->ps.crtc2_screen.timing.v_sync_end = si->ps.p2_timing.v_sync_end;
 			si->ps.crtc2_screen.timing.v_total = si->ps.p2_timing.v_total;
 			si->ps.crtc2_screen.timing.flags = si->ps.p2_timing.flags;
-			si->ps.crtc2_screen.have_edid = true;
+			si->ps.crtc2_screen.have_native_edid = true;
 			si->ps.crtc2_screen.aspect =
 				(si->ps.p2_timing.h_display / ((float)si->ps.p2_timing.v_display));
 			si->ps.crtc2_screen.digital = true;
@@ -2648,7 +2650,7 @@ static void setup_output_matrix()
 			/* (load sensing is confirmed working OK on NV18, NV28 and NV34.) */
 
 			/* secondary connector */
-			if (si->ps.con2_screen.have_edid) {
+			if (si->ps.con2_screen.have_native_edid) {
 				if (!si->ps.con2_screen.digital) si->ps.monitors |= CRTC2_VGA;
 			} else {
 				if (nv_dac2_crt_connected()) {

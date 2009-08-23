@@ -597,7 +597,8 @@ i2c_ExtractSpecsEDID(edid1_info* edid, edid_specs* specs)
 	uint32 i;
 	edid1_detailed_timing edid_timing;
 
-	specs->have_edid = false;
+	specs->have_full_edid = false;
+	specs->have_native_edid = false;
 	specs->timing.h_display = 0;
 	specs->timing.v_display = 0;
 
@@ -641,9 +642,6 @@ i2c_ExtractSpecsEDID(edid1_info* edid, edid_specs* specs)
 	/* check if we actually got a modeline */
 	if (!specs->timing.h_display || !specs->timing.v_display) return B_ERROR;
 
-	/* we succesfully fetched the specs we need */
-	specs->have_edid = true;
-
 	/* determine screen aspect ratio */
 	specs->aspect =
 		(specs->timing.h_display / ((float)specs->timing.v_display));
@@ -652,6 +650,14 @@ i2c_ExtractSpecsEDID(edid1_info* edid, edid_specs* specs)
 	specs->digital = false;
 	if (edid->display.input_type) specs->digital = true;
 
+	/* and also copy full edid1_info for reference */
+	memcpy(&(specs->full_edid), edid, sizeof(specs->full_edid));
+
+	/* we succesfully fetched the specs we need */
+	specs->have_native_edid = true;
+	/* we also got full and valid EDID via DDC */
+	specs->have_full_edid = true;
+
 	return B_OK;
 }
 
@@ -659,8 +665,8 @@ i2c_ExtractSpecsEDID(edid1_info* edid, edid_specs* specs)
 static void
 i2c_DumpSpecsEDID(edid_specs* specs)
 {
-	LOG(4,("I2C: specsEDID: have_edid: %s\n", specs->have_edid ? "True" : "False"));
-	if (!specs->have_edid) return;
+	LOG(4,("I2C: specsEDID: have_native_edid: %s\n", specs->have_native_edid ? "True" : "False"));
+	if (!specs->have_native_edid) return;
 	LOG(4,("I2C: specsEDID: timing.pixel_clock %.3f Mhz\n", specs->timing.pixel_clock / 1000.0));
 	LOG(4,("I2C: specsEDID: timing.h_display %d\n", specs->timing.h_display));
 	LOG(4,("I2C: specsEDID: timing.h_sync_start %d\n", specs->timing.h_sync_start));
@@ -690,8 +696,10 @@ void i2c_DetectScreens(void)
 {
 	edid1_info edid;
 
-	si->ps.con1_screen.have_edid = false;
-	si->ps.con2_screen.have_edid = false;
+	si->ps.con1_screen.have_native_edid = false;
+	si->ps.con2_screen.have_native_edid = false;
+	si->ps.con1_screen.have_full_edid = false;
+	si->ps.con2_screen.have_full_edid = false;
 	si->ps.con1_screen.aspect = 0;
 	si->ps.con2_screen.aspect = 0;
 
@@ -734,7 +742,7 @@ void i2c_DetectScreens(void)
 			/* fetch optimum (native) modeline */
 			switch (si->ps.card_arch) {
 			case NV40A:
-				if (!si->ps.con2_screen.have_edid) {
+				if (!si->ps.con2_screen.have_native_edid) {
 					i2c_ExtractSpecsEDID(&edid, &si->ps.con2_screen);
 				} else {
 					LOG(4,("I2C: DetectScreens: WARNING, unexpected behaviour detected!\n"));

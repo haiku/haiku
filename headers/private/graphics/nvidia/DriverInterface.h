@@ -5,18 +5,19 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-6/2009.
+	Rudolf Cornelissen 10/2002-8/2009.
 */
 
 #ifndef DRIVERINTERFACE_H
 #define DRIVERINTERFACE_H
 
 #include <Accelerant.h>
-#include "video_overlay.h"
+#include <video_overlay.h>
 #include <Drivers.h>
 #include <PCI.h>
 #include <OS.h>
-#include "AGP.h"
+#include <edid.h>
+#include <AGP.h>
 
 #define DRIVER_PREFIX "nvidia"
 #define DEVICE_FORMAT "%04x_%04x_%02x%02x%02x"
@@ -237,10 +238,12 @@ typedef struct { // apsed, see comments in nvidia.settings
 
 /* monitor info gathered via EDID */
 typedef struct {
-	bool have_edid;			/* have read useable edid info from screen */
+	bool have_native_edid;	/* gathered 'native' EDID either via DDC or via GPU */
 	bool digital;			/* screen connection type: analog (VGA) or digital (DVI) */
 	display_timing timing;	/* 'native modeline' fetched for screen */
 	float aspect;			/* screen's aspect ratio */
+	bool have_full_edid;	/* EDID read succesfully via DDC  */
+	edid1_info full_edid;	/* complete EDID info as fetched via DDC */
 } edid_specs;
 
 /* shared info */

@@ -4,7 +4,7 @@
 	
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-3/2009
+	Rudolf Cornelissen 10/2002-8/2009
 */
 
 #define MODULE_BIT 0x08000000
@@ -63,6 +63,9 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 		HOOK(PROPOSE_DISPLAY_MODE);
 		HOOK(SET_DISPLAY_MODE);
 		HOOK(GET_DISPLAY_MODE);
+#ifdef __HAIKU__
+		HOOK(GET_EDID_INFO);
+#endif
 		HOOK(GET_FRAME_BUFFER_CONFIG);
 		HOOK(GET_PIXEL_CLOCK_LIMITS);
 		HOOK(MOVE_DISPLAY);
