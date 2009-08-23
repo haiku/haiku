@@ -234,6 +234,7 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	
 	if (dev->subsystem == 0x161f202f
 		|| dev->subsystem == 0x161f203a
+		|| dev->subsystem == 0x161f203e
 		|| dev->subsystem == 0x161f204c
 		|| dev->subsystem == 0x104d8144
 		|| dev->subsystem == 0x104d8197
