@@ -87,7 +87,11 @@ DirectWindowData::_SyncronizeWithClient()
 	// Wait with a timeout of half a second until the client exits
 	// from its DirectConnected() implementation
 	do {
-		status = acquire_sem_etc(fAcknowledgeSem, 1, B_TIMEOUT, 500000);
+#if 0
+		status = acquire_sem(fAcknowledgeSem);
+#else	
+		status = acquire_sem_etc(fAcknowledgeSem, 1, B_TIMEOUT, 3000000);
+#endif
 	} while (status == B_INTERRUPTED);
 
 	return status;
