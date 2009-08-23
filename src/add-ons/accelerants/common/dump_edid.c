@@ -97,7 +97,7 @@ edid_dump(edid1_info *edid)
 				break;
 
 			case EDID1_ASCII_DATA:
-				dprintf(" %s\n", monitor->data.serial_number);
+				dprintf("Ascii Data: %s\n", monitor->data.ascii_data);
 				break;
 
 			case EDID1_MONITOR_RANGES:

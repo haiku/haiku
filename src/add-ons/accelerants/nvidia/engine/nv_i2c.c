@@ -438,7 +438,7 @@ i2c_DumpEDID(edid1_info *edid)
 				break;
 
 			case EDID1_ASCII_DATA:
-				LOG(4,(" %s\n", monitor->data.serial_number));
+				LOG(4,("Ascii Data: %s\n", monitor->data.ascii_data));
 				break;
 
 			case EDID1_MONITOR_RANGES:
