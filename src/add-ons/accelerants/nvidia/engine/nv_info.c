@@ -2590,25 +2590,55 @@ static void setup_output_matrix()
 
 	/* Note: digitally connected panels take precedence over analog connected screens. */
 
-	/* fill-out crtc1_screen from panel info gathered from BIOS programming since
-	 * we don't know which connector connects to crtc1 (so EDID use not possible).
+	/* fill-out crtc1_screen. This is tricky since we don't know which connector connects
+	 * to crtc1.
 	 * Also the BIOS might have programmed for a lower mode than EDID reports:
 	 * which limits our use of the panel (LVDS link setup too slow). */
 	if(si->ps.monitors & CRTC1_TMDS) {
-		si->ps.crtc1_screen.timing.pixel_clock = si->ps.p1_timing.pixel_clock;
-		si->ps.crtc1_screen.timing.h_display = si->ps.p1_timing.h_display;
-		si->ps.crtc1_screen.timing.h_sync_start = si->ps.p1_timing.h_sync_start;
-		si->ps.crtc1_screen.timing.h_sync_end = si->ps.p1_timing.h_sync_end;
-		si->ps.crtc1_screen.timing.h_total = si->ps.p1_timing.h_total;
-		si->ps.crtc1_screen.timing.v_display = si->ps.p1_timing.v_display;
-		si->ps.crtc1_screen.timing.v_sync_start = si->ps.p1_timing.v_sync_start;
-		si->ps.crtc1_screen.timing.v_sync_end = si->ps.p1_timing.v_sync_end;
-		si->ps.crtc1_screen.timing.v_total = si->ps.p1_timing.v_total;
-		si->ps.crtc1_screen.timing.flags = si->ps.p1_timing.flags;
-		si->ps.crtc1_screen.have_native_edid = true;
-		si->ps.crtc1_screen.aspect =
-			(si->ps.p1_timing.h_display / ((float)si->ps.p1_timing.v_display));
-		si->ps.crtc1_screen.digital = true;
+		/* see if we have the full EDID info somewhere (lacking a hardware spec so
+		 * we need to compare: we don't know the location of a digital cross switch.
+		 * Note: don't compare pixelclock and flags as we make them up ourselves!) */
+		if (si->ps.con1_screen.have_full_edid && si->ps.con1_screen.digital &&
+			(si->ps.p1_timing.h_display == si->ps.con1_screen.timing.h_display) &&
+			(si->ps.p1_timing.h_sync_start == si->ps.con1_screen.timing.h_sync_start) &&
+			(si->ps.p1_timing.h_sync_end == si->ps.con1_screen.timing.h_sync_end) &&
+			(si->ps.p1_timing.h_total == si->ps.con1_screen.timing.h_total) &&
+			(si->ps.p1_timing.v_display == si->ps.con1_screen.timing.v_display) &&
+			(si->ps.p1_timing.v_sync_start == si->ps.con1_screen.timing.v_sync_start) &&
+			(si->ps.p1_timing.v_sync_end == si->ps.con1_screen.timing.v_sync_end) &&
+			(si->ps.p1_timing.v_total == si->ps.con1_screen.timing.v_total)) {
+			/* fill-out crtc1_screen from EDID info fetched from connector 1 */
+			memcpy(&(si->ps.crtc1_screen), &(si->ps.con1_screen), sizeof(si->ps.crtc1_screen));
+		} else {
+			if (si->ps.con2_screen.have_full_edid && si->ps.con2_screen.digital &&
+				(si->ps.p1_timing.h_display == si->ps.con2_screen.timing.h_display) &&
+				(si->ps.p1_timing.h_sync_start == si->ps.con2_screen.timing.h_sync_start) &&
+				(si->ps.p1_timing.h_sync_end == si->ps.con2_screen.timing.h_sync_end) &&
+				(si->ps.p1_timing.h_total == si->ps.con2_screen.timing.h_total) &&
+				(si->ps.p1_timing.v_display == si->ps.con2_screen.timing.v_display) &&
+				(si->ps.p1_timing.v_sync_start == si->ps.con2_screen.timing.v_sync_start) &&
+				(si->ps.p1_timing.v_sync_end == si->ps.con2_screen.timing.v_sync_end) &&
+				(si->ps.p1_timing.v_total == si->ps.con2_screen.timing.v_total)) {
+				/* fill-out crtc1_screen from EDID info fetched from connector 2 */
+				memcpy(&(si->ps.crtc1_screen), &(si->ps.con2_screen), sizeof(si->ps.crtc1_screen));
+			} else {
+				/* no match or no full EDID info: use the info fetched from the GPU */
+				si->ps.crtc1_screen.timing.pixel_clock = si->ps.p1_timing.pixel_clock;
+				si->ps.crtc1_screen.timing.h_display = si->ps.p1_timing.h_display;
+				si->ps.crtc1_screen.timing.h_sync_start = si->ps.p1_timing.h_sync_start;
+				si->ps.crtc1_screen.timing.h_sync_end = si->ps.p1_timing.h_sync_end;
+				si->ps.crtc1_screen.timing.h_total = si->ps.p1_timing.h_total;
+				si->ps.crtc1_screen.timing.v_display = si->ps.p1_timing.v_display;
+				si->ps.crtc1_screen.timing.v_sync_start = si->ps.p1_timing.v_sync_start;
+				si->ps.crtc1_screen.timing.v_sync_end = si->ps.p1_timing.v_sync_end;
+				si->ps.crtc1_screen.timing.v_total = si->ps.p1_timing.v_total;
+				si->ps.crtc1_screen.timing.flags = si->ps.p1_timing.flags;
+				si->ps.crtc1_screen.have_native_edid = true;
+				si->ps.crtc1_screen.aspect =
+					(si->ps.p1_timing.h_display / ((float)si->ps.p1_timing.v_display));
+				si->ps.crtc1_screen.digital = true;
+			}
+		}
 	} else if(si->ps.monitors & CRTC1_VGA) {
 		/* fill-out crtc1_screen from EDID info, or faked info if EDID failed. */
 		memcpy(&(si->ps.crtc1_screen), &(si->ps.con1_screen), sizeof(si->ps.crtc1_screen));
@@ -2620,25 +2650,55 @@ static void setup_output_matrix()
 	/* setup output devices and heads */
 	if (si->ps.secondary_head)
 	{
-		/* fill-out crtc2_screen from panel info gathered from BIOS programming since
-		 * we don't know which connector connects to crtc2 (so EDID use not possible).
+		/* fill-out crtc2_screen. This is tricky since we don't know which connector
+		 * connects to crtc2.
 		 * Also the BIOS might have programmed for a lower mode than EDID reports:
 		 * which limits our use of the panel (LVDS link setup too slow). */
 		if(si->ps.monitors & CRTC2_TMDS) {
-			si->ps.crtc2_screen.timing.pixel_clock = si->ps.p2_timing.pixel_clock;
-			si->ps.crtc2_screen.timing.h_display = si->ps.p2_timing.h_display;
-			si->ps.crtc2_screen.timing.h_sync_start = si->ps.p2_timing.h_sync_start;
-			si->ps.crtc2_screen.timing.h_sync_end = si->ps.p2_timing.h_sync_end;
-			si->ps.crtc2_screen.timing.h_total = si->ps.p2_timing.h_total;
-			si->ps.crtc2_screen.timing.v_display = si->ps.p2_timing.v_display;
-			si->ps.crtc2_screen.timing.v_sync_start = si->ps.p2_timing.v_sync_start;
-			si->ps.crtc2_screen.timing.v_sync_end = si->ps.p2_timing.v_sync_end;
-			si->ps.crtc2_screen.timing.v_total = si->ps.p2_timing.v_total;
-			si->ps.crtc2_screen.timing.flags = si->ps.p2_timing.flags;
-			si->ps.crtc2_screen.have_native_edid = true;
-			si->ps.crtc2_screen.aspect =
-				(si->ps.p2_timing.h_display / ((float)si->ps.p2_timing.v_display));
-			si->ps.crtc2_screen.digital = true;
+			/* see if we have the full EDID info somewhere (lacking a hardware spec so
+			 * we need to compare: we don't know the location of a digital cross switch.
+			 * Note: don't compare pixelclock and flags as we make them up ourselves!) */
+			if (si->ps.con1_screen.have_full_edid && si->ps.con1_screen.digital &&
+				(si->ps.p2_timing.h_display == si->ps.con1_screen.timing.h_display) &&
+				(si->ps.p2_timing.h_sync_start == si->ps.con1_screen.timing.h_sync_start) &&
+				(si->ps.p2_timing.h_sync_end == si->ps.con1_screen.timing.h_sync_end) &&
+				(si->ps.p2_timing.h_total == si->ps.con1_screen.timing.h_total) &&
+				(si->ps.p2_timing.v_display == si->ps.con1_screen.timing.v_display) &&
+				(si->ps.p2_timing.v_sync_start == si->ps.con1_screen.timing.v_sync_start) &&
+				(si->ps.p2_timing.v_sync_end == si->ps.con1_screen.timing.v_sync_end) &&
+				(si->ps.p2_timing.v_total == si->ps.con1_screen.timing.v_total)) {
+				/* fill-out crtc2_screen from EDID info fetched from connector 1 */
+				memcpy(&(si->ps.crtc2_screen), &(si->ps.con1_screen), sizeof(si->ps.crtc2_screen));
+			} else {
+				if (si->ps.con2_screen.have_full_edid && si->ps.con2_screen.digital &&
+					(si->ps.p2_timing.h_display == si->ps.con2_screen.timing.h_display) &&
+					(si->ps.p2_timing.h_sync_start == si->ps.con2_screen.timing.h_sync_start) &&
+					(si->ps.p2_timing.h_sync_end == si->ps.con2_screen.timing.h_sync_end) &&
+					(si->ps.p2_timing.h_total == si->ps.con2_screen.timing.h_total) &&
+					(si->ps.p2_timing.v_display == si->ps.con2_screen.timing.v_display) &&
+					(si->ps.p2_timing.v_sync_start == si->ps.con2_screen.timing.v_sync_start) &&
+					(si->ps.p2_timing.v_sync_end == si->ps.con2_screen.timing.v_sync_end) &&
+					(si->ps.p2_timing.v_total == si->ps.con2_screen.timing.v_total)) {
+					/* fill-out crtc2_screen from EDID info fetched from connector 2 */
+					memcpy(&(si->ps.crtc2_screen), &(si->ps.con2_screen), sizeof(si->ps.crtc2_screen));
+				} else {
+					/* no match or no full EDID info: use the info fetched from the GPU */
+					si->ps.crtc2_screen.timing.pixel_clock = si->ps.p2_timing.pixel_clock;
+					si->ps.crtc2_screen.timing.h_display = si->ps.p2_timing.h_display;
+					si->ps.crtc2_screen.timing.h_sync_start = si->ps.p2_timing.h_sync_start;
+					si->ps.crtc2_screen.timing.h_sync_end = si->ps.p2_timing.h_sync_end;
+					si->ps.crtc2_screen.timing.h_total = si->ps.p2_timing.h_total;
+					si->ps.crtc2_screen.timing.v_display = si->ps.p2_timing.v_display;
+					si->ps.crtc2_screen.timing.v_sync_start = si->ps.p2_timing.v_sync_start;
+					si->ps.crtc2_screen.timing.v_sync_end = si->ps.p2_timing.v_sync_end;
+					si->ps.crtc2_screen.timing.v_total = si->ps.p2_timing.v_total;
+					si->ps.crtc2_screen.timing.flags = si->ps.p2_timing.flags;
+					si->ps.crtc2_screen.have_native_edid = true;
+					si->ps.crtc2_screen.aspect =
+						(si->ps.p2_timing.h_display / ((float)si->ps.p2_timing.v_display));
+					si->ps.crtc2_screen.digital = true;
+				}
+			}
 		}
 
 		if (si->ps.card_type != NV11)
