@@ -43,7 +43,7 @@ public:
 									direct_window_sync_data& data) const;
 			status_t			SyncronizeWithClient();
 
-			bool				SetState(const direct_buffer_state& bufferState,
+			status_t			SetState(const direct_buffer_state& bufferState,
 									const direct_driver_state& driverState,
 									RenderingBuffer *renderingBuffer,
 									const BRect& windowFrame,
@@ -54,8 +54,7 @@ public:
 			bool				full_screen;
 
 private:
-			bool 				_HandleStop(const direct_buffer_state& state);
-			bool 				_HandleStart(const direct_buffer_state& state);
+			status_t			_SyncronizeWithClient();
 		
 			sem_id				fSem;
 			sem_id				fAcknowledgeSem;

@@ -76,7 +76,7 @@ DirectWindowData::GetSyncData(direct_window_sync_data& data) const
 
 
 status_t
-DirectWindowData::SyncronizeWithClient()
+DirectWindowData::_SyncronizeWithClient()
 {
 	// Releasing this semaphore causes the client to call
 	// BDirectWindow::DirectConnected()
@@ -94,7 +94,7 @@ DirectWindowData::SyncronizeWithClient()
 }
 
 
-bool
+status_t
 DirectWindowData::SetState(const direct_buffer_state& bufferState,
 	const direct_driver_state& driverState, RenderingBuffer *buffer,
 	const BRect& windowFrame, const BRegion& clipRegion)
@@ -108,8 +108,10 @@ DirectWindowData::SetState(const direct_buffer_state& bufferState,
 	
 	bool isStopped = fTransition <= 0;
 		
-	if (wasStopped && isStopped)
-		return false;
+	if (wasStopped && isStopped) {
+		// Nothing to change
+		return B_OK;
+	}
 						
 	buffer_info->buffer_state = bufferState;
 		
@@ -167,5 +169,5 @@ DirectWindowData::SetState(const direct_buffer_state& bufferState,
 			buffer_info->clip_list[i] = clipRegion.RectAtInt(i);
 	}
 	
-	return true;
+	return _SyncronizeWithClient();
 }

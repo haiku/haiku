@@ -3484,16 +3484,12 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 		return;
 
 	if (fDesktop->LockSingleWindow()) {
-		if (!fDirectWindowData->SetState((direct_buffer_state)bufferState,
-				(direct_driver_state)driverState,
-				fDesktop->HWInterface()->FrontBuffer(), fWindow->Frame(),
-				fWindow->VisibleContentRegion())) {
-			fDesktop->UnlockSingleWindow();
-			return;
-		}
-	
-		status_t status = fDirectWindowData->SyncronizeWithClient();
-
+		status_t status = fDirectWindowData->SetState(
+			(direct_buffer_state)bufferState,
+			(direct_driver_state)driverState,
+			fDesktop->HWInterface()->FrontBuffer(), fWindow->Frame(),
+				fWindow->VisibleContentRegion());
+			
 		if (status != B_OK) {
 			char errorString[256];
 			snprintf(errorString, sizeof(errorString),
