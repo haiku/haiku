@@ -29,7 +29,7 @@
 #include <string.h>
 
 
-TPeopleWindow::TPeopleWindow(BRect frame, char *title, entry_ref *ref)
+TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
 	: BWindow(frame, title, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
 	fPanel(NULL)
 {

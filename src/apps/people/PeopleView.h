@@ -25,7 +25,7 @@ class TTextControl;
 
 class TPeopleView : public BView {
 	public:
-		TPeopleView(BRect rect, char* title, entry_ref* ref);
+		TPeopleView(BRect rect, const char* title, entry_ref* ref);
 		~TPeopleView(void);
 
 		virtual	void	AttachedToWindow(void);
