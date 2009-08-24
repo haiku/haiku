@@ -31,7 +31,7 @@ StatusSlider::StatusSlider   (BRect frame,
 	temp = str; 
 }
 				
-char*
+const char*
 StatusSlider::UpdateText() const
 {
 	

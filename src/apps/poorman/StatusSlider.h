@@ -23,7 +23,7 @@ public:
 					BMessage *message,
 					int32 minValue,
 					int32 maxValue);
-virtual char*	UpdateText() const;
+virtual const char*	UpdateText() const;
 private:
 	char *	StatusPrefix;
 	char *	temp;

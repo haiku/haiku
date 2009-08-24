@@ -9,7 +9,7 @@
 #include "PoorManView.h"
 #endif
 
-PoorManView::PoorManView(BRect rect, char *name)
+PoorManView::PoorManView(BRect rect, const char *name)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW )
 {
 }
