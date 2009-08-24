@@ -90,7 +90,7 @@ DirectWindowData::_SyncronizeWithClient()
 #if 0
 		status = acquire_sem(fAcknowledgeSem);
 #else	
-		status = acquire_sem_etc(fAcknowledgeSem, 1, B_TIMEOUT, 3000000);
+		status = acquire_sem_etc(fAcknowledgeSem, 1, B_TIMEOUT, 500000);
 #endif
 	} while (status == B_INTERRUPTED);
 
