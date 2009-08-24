@@ -521,13 +521,14 @@ WorkspacesView::MouseDown(BPoint where)
 		BMenuItem* item;
 
 		menu->AddSeparatorItem();
-		menu->AddItem(item = new BMenuItem("No Window Title",
+		menu->AddItem(item = new BMenuItem("Show Window Title",
 			new BMessage(kMsgToggleTitle)));
-		if (window->Look() == B_MODAL_WINDOW_LOOK)
+		if (window->Look() == B_TITLED_WINDOW_LOOK)
 			item->SetMarked(true);
-		menu->AddItem(item = new BMenuItem("No Window Border",
+		menu->AddItem(item = new BMenuItem("Show Window Border",
 			new BMessage(kMsgToggleBorder)));
-		if (window->Look() == B_NO_BORDER_WINDOW_LOOK)
+		if (window->Look() == B_TITLED_WINDOW_LOOK
+			|| window->Look() == B_MODAL_WINDOW_LOOK)
 			item->SetMarked(true);
 
 		menu->AddSeparatorItem();
@@ -565,10 +566,10 @@ WorkspacesWindow::WorkspacesWindow(WorkspacesSettings *settings)
 {
 	AddChild(new WorkspacesView(Bounds()));
 
-	if (!fSettings->HasTitle())
-		SetLook(B_MODAL_WINDOW_LOOK);
-	else if (!fSettings->HasBorder())
+	if (!fSettings->HasBorder())
 		SetLook(B_NO_BORDER_WINDOW_LOOK);
+	else if (!fSettings->HasTitle())
+		SetLook(B_MODAL_WINDOW_LOOK);
 
 	if (fSettings->AlwaysOnTop())
 		SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
@@ -641,11 +642,12 @@ WorkspacesWindow::MessageReceived(BMessage *message)
 				enable = true;
 
 			if (enable)
-				SetLook(B_TITLED_WINDOW_LOOK);
-			else {
+				if (fSettings->HasTitle())
+					SetLook(B_TITLED_WINDOW_LOOK);
+				else
+					SetLook(B_MODAL_WINDOW_LOOK);
+			else
 				SetLook(B_NO_BORDER_WINDOW_LOOK);
-				fSettings->SetHasTitle(true);
-			}
 
 			fSettings->SetHasBorder(enable);
 			break;
@@ -654,16 +656,17 @@ WorkspacesWindow::MessageReceived(BMessage *message)
 		case kMsgToggleTitle:
 		{
 			bool enable = false;
-			if (Look() == B_MODAL_WINDOW_LOOK)
+			if (Look() == B_MODAL_WINDOW_LOOK
+				|| Look() == B_NO_BORDER_WINDOW_LOOK)
 				enable = true;
 
 			if (enable)
 				SetLook(B_TITLED_WINDOW_LOOK);
-			else {
+			else
 				SetLook(B_MODAL_WINDOW_LOOK);
-				fSettings->SetHasBorder(true);
-			}
 
+			// No matter what the setting for title, we must force the border on
+			fSettings->SetHasBorder(true);
 			fSettings->SetHasTitle(enable);
 			break;
 		}
