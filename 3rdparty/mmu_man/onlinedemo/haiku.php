@@ -2,7 +2,9 @@
 
 /*
  * haiku.php - an online Haiku demo using qemu and vnc.
- * Copyright 2007, Francois Revol, revol@free.fr.
+ *
+ * Copyright 2007-2009, Francois Revol, revol@free.fr.
+ * Distributed under the terms of the MIT License.
  */
 
 // parts inspired by the Free Live OS Zoo
@@ -33,6 +35,13 @@ define("PAGE_TITLE", "Haiku Online Demo");
 define("VNCJAVA_PATH", "tightvnc-java");
 define("VNCJAR", "VncViewer.jar");
 define("VNCCLASS", "VncViewer.class");
+
+// do not show applet controls
+define("VNC_HIDE_CONTROLS", true);
+
+// generate and use (plain text) passwords
+// NOT IMPLEMENTED
+//define("VNC_USE_PASS", true);
 
 // maximum count of qemu instances.
 define("MAX_QEMUS", 2);
@@ -577,7 +586,8 @@ function output_vnc_info_file()
 	echo "[connection]\n";
 	echo "host=" . vnc_addr() . "\n";
 	echo "port=" . vnc_display() . "\n";
-	//echo "password=XXX\n";
+	if (defined('VNC_USE_PASS') && VNC_USE_PASS)
+		echo "password=" . $_SESSION['VNC_PASS'] . "\n";
 	//echo "[options]\n";
 	// cf. http://www.realvnc.com/pipermail/vnc-list/1999-December/011086.html
 	// cf. http://www.tek-tips.com/viewthread.cfm?qid=1173303&page=1
@@ -638,7 +648,12 @@ function output_applet_code($external_only=false)
 	//not needed
 	//echo "<param name=\"HOST\" value=\"$HTTP_HOST\">\n";
 	echo "<param name=\"PORT\" value=\"$port\">\n";
-	echo "<param name=\"PASSWORD\" value=\"\">\n";
+	$pass = '';
+	if (defined('VNC_USE_PASS') && VNC_USE_PASS)
+		$pass = $_SESSION['VNC_PASS'];
+	echo "<param name=\"PASSWORD\" value=\"" . $pass . "\">\n";
+	if (defined("VNC_HIDE_CONTROLS") && VNC_HIDE_CONTROLS)
+		echo "<param name=\"Show controls\" value=\"No\">\n";
 	//echo "<param name=\"share desktop\" value=\"no\" />";
 	echo "<param name=\"background-color\" value=\"#336698\">\n";
 	echo "<param name=\"foreground-color\" value=\"#ffffff\">\n";
