@@ -109,11 +109,11 @@ div.bottomnav p {
 	text-align: right;
 	font-size: 0.8em;
 }
-/*
+
 a.uplink { 
 	font-weight: normal; 
 }
-*/
+
 
 /* contents box */
 
@@ -136,17 +136,17 @@ table.index tr.index {
 table.index td {
 	padding: 5px 20px;
 }
-/*
-table.index a:link, a:visited { 
+
+table.index a:link, table.index a:visited { 
 	font-weight: normal; 
 	text-decoration: none; 
 	color: #dc3c01;
 }
-table.index a:hover, a:active { 
+table.index a:hover, table.index a:active { 
 	text-decoration: underline; 
 	color: #ff4500;
 }
-*/
+
 
 /* Haiku User Guide styles and layout */
 
