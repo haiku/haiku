@@ -16,6 +16,8 @@ struct __DIR {
 	int				fd;
 	short			next_entry;
 	unsigned short	entries_left;
+	long			seek_position;
+	long			current_position;
 	struct dirent	first_entry;
 };
 
