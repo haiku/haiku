@@ -23,6 +23,7 @@
 // Linux and FreeBSD support
 #ifdef HAIKU_HOST_PLATFORM_LINUX
 #	include <ctype.h>
+#	include <linux/fs.h>
 #	include <linux/hdreg.h>
 #	include <sys/ioctl.h>
 
@@ -489,16 +490,22 @@ main(int argc, const char *const *argv)
 						exit(1);
 					}
 
-					// get device geometry
+					// get device size -- try BLKGETSIZE64, but, if it doesn't
+					// work, fall back to the obsolete HDIO_GETGEO
+					int64 deviceSize;
 					hd_geometry geometry;
-					if (ioctl(baseFD, HDIO_GETGEO, &geometry) < 0) {
+					if (ioctl(baseFD, BLKGETSIZE64, &deviceSize) == 0
+						&& deviceSize > 0) {
+						// looks good
+					} else if (ioctl(baseFD, HDIO_GETGEO, &geometry) == 0) {
+						deviceSize = (int64)geometry.heads * geometry.sectors
+							* geometry.cylinders * 512;
+					} else {
 						fprintf(stderr, "Error: Failed to get device geometry "
 							"for \"%s\": %s\n", baseDeviceName,
 							strerror(errno));
 						exit(1);
 					}
-					int64 deviceSize = (int64)geometry.heads * geometry.sectors
-						* geometry.cylinders * 512;
 
 					// parse the partition map
 					// TODO: block size!
