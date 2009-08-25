@@ -790,6 +790,7 @@ AboutView::_CreateCreditsView()
 		"David Dengg\n"
 		"John Drinkwater\n"
 		"Cian Duffy\n"
+		"Fredrik Ekdahl\n"
 		"Mark Erben\n"
 		"Christian Fasshauer\n"
 		"Andreas Färber\n"

@@ -14,3 +14,5 @@ resource(4, "META:EXTENS") message(234) {
 	"type" = "audio/ogg"
 };
 
+resource(5, "META:SNIFF_RULE") "0.50 (\"OggS\")";
+
