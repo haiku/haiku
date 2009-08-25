@@ -34,8 +34,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	draggers driveinfo dstcheck du dumpcatalog
 	echo eject env error expand expr
 	factor false fdinfo ffm filepanel find finddir fmt fold fortune frcode
-	ftp ftpd
-	funzip fwcontrol
+	ftp ftpd funzip
 	gawk $(X86_ONLY)gdb getlimits grep groups gzip gzexe
 	hd head hey hostname
 	id ident ideinfo idestatus ifconfig <bin>install installsound iroster
@@ -73,14 +72,14 @@ SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc DiskProb
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations E-mail
 	FileTypes Fonts Keyboard Keymap Media Mouse Network Printers
 	Screen ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
-; # Locale
+;
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 	GLTeapot Haiku3d Mandelbrot Pairs Playground Pulse Sudoku Gradients
 ;
 SYSTEM_LIBS = libalm.so libbe.so libbsd.so libbnetapi.so libdebug.so
 	libdevice.so libfluidsynth.so libfreetype.so libgame.so libGL.so libgnu.so
 	libilmimf.so libjpeg.so liblinprog.so liblpsolve55.so libmail.so libmedia.so
-	libmidi.so libmidi2.so libnetwork.so libpng.so <revisioned>libroot.so 
+	libmidi.so libmidi2.so libnetwork.so libpng.so <revisioned>libroot.so
 	libscreensaver.so libtextencoding.so libtracker.so libtranslation.so
 	libz.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
@@ -118,7 +117,6 @@ SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon cortex_flanger.media_addo
 	usb_webcam.media_addon
 	video_producer_demo.media_addon
 	video_window_demo.media_addon
-	firewire_dv.media_addon
 	#legacy.media_addon
 ;
 SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
@@ -156,11 +154,10 @@ SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)broadcom440x
 ;
 #SYSTEM_ADD_ONS_DRIVERS_POWER = $(X86_ONLY)acpi_button ;
 SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci $(X86_ONLY)ps2 $(X86_ONLY)isa
-	$(IDE_ONLY)ide scsi config_manager agp_gart usb firewire $(X86_ONLY)acpi
+	$(IDE_ONLY)ide scsi config_manager agp_gart usb $(X86_ONLY)acpi
 ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs cdda ext2 fat iso9660 nfs attribute_overlay
-	write_overlay $(GPL_ONLY)ntfs $(GPL_ONLY)reiserfs ;
-#googlefs ;
+	write_overlay ntfs reiserfs ;
 
 
 # modules
@@ -213,7 +210,7 @@ AddDriversToHaikuImage				: console dprintf $(X86_ONLY)keyboard null
 AddDriversToHaikuImage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage audio old	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
 AddDriversToHaikuImage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
-AddDriversToHaikuImage bus			: usb_raw fw_raw ;
+AddDriversToHaikuImage bus			: usb_raw ;
 AddDriversToHaikuImage disk floppy	: $(X86_ONLY)pc_floppy ;
 AddDriversToHaikuImage disk usb		: usb_disk ;
 AddDriversToHaikuImage disk virtual	: nbd ;
