@@ -5610,18 +5610,7 @@ _ReservedView11__5BView(BView* view, BPoint point, BToolTip** _toolTip)
 
 #elif __GNUC__ > 2
 
-
-extern "C" bool
-_ZN5BView15_ReservedView11Ev(BView* view, BPoint point, BToolTip** _toolTip)
-{
-	// GetToolTipAt()
-	perform_data_get_tool_tip_at data;
-	data.point = point;
-	data.tool_tip = _toolTip;
-	view->Perform(PERFORM_CODE_GET_TOOL_TIP_AT, &data);
-	return data.return_value;
-}
-
+// no legacy here yet
 
 #endif	// __GNUC__ > 2
 
