@@ -976,7 +976,7 @@ fs_read(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, void *buf,
 	ntfs_attr *na = NULL;
 	size_t  size = *len;
 	int total = 0;
-	status_t result = B_NO_ERROR;
+	status_t result = B_OK;
 
 	LOCK_VOL(ns);
 
@@ -1012,20 +1012,22 @@ fs_read(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, void *buf,
 		size = na->data_size - offset;
 
 	while (size) {
-		result = ntfs_attr_pread(na, offset, size, buf);
-		if (result < (s64)size)
-			ntfs_log_error("ntfs_attr_pread returned less bytes than requested.\n");
-		if (result <= 0) {
+		off_t bytesRead = ntfs_attr_pread(na, offset, size, buf);
+		if (bytesRead < (s64)size) {
+			ntfs_log_error("ntfs_attr_pread returned less bytes than "
+				"requested.\n");
+		}
+		if (bytesRead <= 0) {
 			*len = 0;
 			result = EINVAL;
 			goto exit;
 		}
-		size -= result;
-		offset += result;
-		total += result;
+		size -= bytesRead;
+		offset += bytesRead;
+		total += bytesRead;
 	}
-	result = total;
-	*len = result;
+
+	*len = total;
 
 exit:
 	if (na)
@@ -1054,7 +1056,7 @@ fs_write(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset,
 	ntfs_attr *na = NULL;
 	int total = 0;
 	size_t size = *len;
-	status_t result = B_NO_ERROR;
+	status_t result = B_OK;
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERRPRINT("ntfs is read-only\n");
@@ -1106,22 +1108,22 @@ fs_write(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset,
 	}
 
 	while (size) {
-		result = ntfs_attr_pwrite(na, offset, size, buf);
-		if (result < (s64)size)
+		off_t bytesWritten = ntfs_attr_pwrite(na, offset, size, buf);
+		if (bytesWritten < (s64)size)
 			ERRPRINT("fs_write - ntfs_attr_pwrite returned less bytes than requested.\n");
-		if (result <= 0) {
+		if (bytesWritten <= 0) {
 			ERRPRINT(("fs_write - ntfs_attr_pwrite()<=0\n"));
 			*len = 0;
 			result = EINVAL;
 			goto exit;
 		}
-		size -= result;
-		offset += result;
-		total += result;
+		size -= bytesWritten;
+		offset += bytesWritten;
+		total += bytesWritten;
 	}
+
 	*len = total;
 	ERRPRINT(("fs_write - OK\n"));
-	result = B_NO_ERROR;
 
 exit:
 	if (na)

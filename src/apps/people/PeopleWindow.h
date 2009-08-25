@@ -41,7 +41,7 @@ public:
 
 	entry_ref		*fRef;
 
-					TPeopleWindow(BRect, char*, entry_ref*);
+					TPeopleWindow(BRect, const char*, entry_ref*);
 					~TPeopleWindow(void);
 	virtual void	MenusBeginning(void);
 	virtual void	MessageReceived(BMessage*);

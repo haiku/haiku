@@ -250,7 +250,7 @@ BMenuFrame::Draw(BRect updateRect)
 BMenuWindow::BMenuWindow(const char *name)
 	// The window will be resized by BMenu, so just pass a dummy rect
 	: BWindow(BRect(0, 0, 0, 0), name, B_BORDERED_WINDOW_LOOK, kMenuWindowFeel,
-			B_NOT_ZOOMABLE | B_AVOID_FOCUS),
+			B_NOT_MOVABLE | B_NOT_ZOOMABLE | B_AVOID_FOCUS),
 	fMenu(NULL),
 	fMenuFrame(NULL),
 	fUpperScroller(NULL),

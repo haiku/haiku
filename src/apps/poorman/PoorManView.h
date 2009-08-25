@@ -15,7 +15,7 @@
 class PoorManView: public BView
 {
 public:
-				PoorManView(BRect, char *name);
+				PoorManView(BRect, const char *name);
 virtual	void	AttachedToWindow();
 };
 

@@ -782,7 +782,7 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 	if (windowModifier || inBorderRegion) {
 		// clicking Window visible area
 
-		click_type action = DEC_DRAG;
+		click_type action = DEC_NONE;
 		int32 buttons = _ExtractButtons(message);
 
 		if (inBorderRegion && fDecorator != NULL)
@@ -790,6 +790,8 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		else {
 			if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
 				action = DEC_MOVETOBACK;
+			else if ((fFlags & B_NOT_MOVABLE) == 0 && fDecorator != NULL)
+				action = DEC_DRAG;
 		}
 
 		// ignore clicks on decorator buttons if the
@@ -837,28 +839,29 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 				break;
 		}
 
-		// redraw decorator
-		BRegion* visibleBorder = fRegionPool.GetRegion();
-		GetBorderRegion(visibleBorder);
-		visibleBorder->IntersectWith(&VisibleRegion());
+		if (fDecorator != NULL) {
+			// redraw decorator
+			BRegion* visibleBorder = fRegionPool.GetRegion();
+			GetBorderRegion(visibleBorder);
+			visibleBorder->IntersectWith(&VisibleRegion());
 
-		DrawingEngine* engine = fDecorator->GetDrawingEngine();
-		engine->LockParallelAccess();
-		engine->ConstrainClippingRegion(visibleBorder);
+			DrawingEngine* engine = fDecorator->GetDrawingEngine();
+			engine->LockParallelAccess();
+			engine->ConstrainClippingRegion(visibleBorder);
 
-		if (fIsZooming) {
-			fDecorator->SetZoom(true);
-		} else if (fIsClosing) {
-			fDecorator->SetClose(true);
-		} else if (fIsMinimizing) {
-			fDecorator->SetMinimize(true);
+			if (fIsZooming) {
+				fDecorator->SetZoom(true);
+			} else if (fIsClosing) {
+				fDecorator->SetClose(true);
+			} else if (fIsMinimizing) {
+				fDecorator->SetMinimize(true);
+			}
+
+			engine->UnlockParallelAccess();
+
+			fRegionPool.Recycle(visibleBorder);
 		}
 
-		engine->UnlockParallelAccess();
-
-		fRegionPool.Recycle(visibleBorder);
-
-		// based on what the Decorator returned, properly place this window.
 		if (action == DEC_MOVETOBACK) {
 			fDesktop->SendWindowBehind(this);
 		} else {

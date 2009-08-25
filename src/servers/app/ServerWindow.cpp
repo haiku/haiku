@@ -285,6 +285,23 @@ ServerWindow::Init(BRect frame, window_look look, window_feel feel,
 }
 
 
+/*!	Returns the ServerWindow's Window, if it exists and has been
+	added to the Desktop already.
+	In other words, you cannot assume this method will always give you
+	a valid pointer.
+*/
+Window*
+ServerWindow::Window() const
+{
+	ASSERT_MULTI_LOCKED(fDesktop->WindowLocker());
+
+	if (!fWindowAddedToDesktop)
+		return NULL;
+
+	return fWindow;
+}
+
+
 void
 ServerWindow::_PrepareQuit()
 {
@@ -469,32 +486,6 @@ void
 ServerWindow::ResyncDrawState()
 {
 	_UpdateDrawState(fCurrentView);
-}
-
-
-/*!	Returns the ServerWindow's Window, if it exists and has been
-	added to the Desktop already.
-	In other words, you cannot assume this method will always give you
-	a valid pointer.
-*/
-Window*
-ServerWindow::Window() const
-{
-	// TODO: ensure desktop is locked!
-	if (!fWindowAddedToDesktop)
-		return NULL;
-
-	return fWindow;
-}
-
-
-bool
-ServerWindow::IsOffscreen() const
-{
-	// TODO: ensure desktop is locked!
-	// TODO: ensure the Window has been created!
-	
-	return fWindow->IsOffscreenWindow();
 }
 
 
@@ -3484,15 +3475,11 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 		return;
 
 	if (fDesktop->LockSingleWindow()) {
-		if (!fDirectWindowData->SetState((direct_buffer_state)bufferState,
-				(direct_driver_state)driverState,
-				fDesktop->HWInterface()->FrontBuffer(), fWindow->Frame(),
-				fWindow->VisibleContentRegion())) {
-			fDesktop->UnlockSingleWindow();
-			return;
-		}
-	
-		status_t status = fDirectWindowData->SyncronizeWithClient();
+		status_t status = fDirectWindowData->SetState(
+			(direct_buffer_state)bufferState,
+			(direct_driver_state)driverState,
+			fDesktop->HWInterface()->FrontBuffer(), fWindow->Frame(),
+				fWindow->VisibleContentRegion());
 
 		if (status != B_OK) {
 			char errorString[256];
@@ -3500,7 +3487,7 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 				"%s killed for a problem in DirectConnected(): %s",
 				App()->Signature(), strerror(status));
 			syslog(LOG_ERR, errorString);
-			
+
 			// The client application didn't release the semaphore
 			// within the given timeout. Or something else went wrong.
 			// Deleting this member should make it crash.

@@ -126,7 +126,7 @@ BTextWidget::ColumnRect(BPoint poseLoc, const BColumn *column,
 }
 
 
-BRect 
+BRect
 BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn *column,
 	const BPoseView *view, float textWidth)
 {
@@ -213,17 +213,54 @@ BTextWidget::CalcClickRect(BPoint poseLoc, const BColumn *column,
 void
 BTextWidget::MouseUp(BRect bounds, BPoseView *view, BPose *pose, BPoint)
 {
-	// start editing if the duration between the pose selection time and
-	// the click on the widget is bigger than the doubleclick threshold. 
-				
+	// Start editing without delay if the pose was selected recently and this
+	// click is not the second click of a doubleclick.
+	// If the pose has been selected a long time ago, check again
+	// for a double click (inducing a delay).
+
+	// TODO: re-enable modifiers, one should be enough
+
 	if (IsEditable() && pose->IsSelected()) {
-		bigtime_t delta = system_time() - pose->SelectionTime();		
+		bigtime_t delta = system_time() - pose->SelectionTime();
 		bigtime_t doubleClickSpeed;
 		get_click_speed(&doubleClickSpeed);
-		
-		// TODO: modifiers	
-		if (delta > doubleClickSpeed)
+		bigtime_t oldClickSpeed = 2 * doubleClickSpeed;
+
+		// freshly selected and not a double click
+		if (delta > doubleClickSpeed && delta < oldClickSpeed) {
 			StartEdit(bounds, view, pose);
+			return;
+		}
+
+		// TODO: reimplement asynchronous
+		// selected a longer time ago, redo a double click detection
+		if (delta > oldClickSpeed) {
+			// check for double click
+			bigtime_t doubleClickTime = system_time() + doubleClickSpeed;
+			while (system_time() < doubleClickTime) {
+				// loop for double-click time and watch the mouse and keyboard
+
+				BPoint point;
+				uint32 buttons;
+				view->GetMouse(&point, &buttons, false);
+
+				// double click
+				if (buttons)
+					return;
+
+				// mouse moved too far
+				if (!bounds.Contains(point))
+					return;
+
+				//if (modifiers() & (B_SHIFT_KEY | B_COMMAND_KEY
+				//	| B_CONTROL_KEY | B_MENU_KEY))
+				//	// watch the keyboard (ignoring standard locking keys)
+				//	break;
+
+				snooze(10000);
+			}
+			StartEdit(bounds, view, pose);
+		}
 	}
 }
 
@@ -334,7 +371,7 @@ BTextWidget::StartEdit(BRect bounds, BPoseView *view, BPose *pose)
 
 	BScrollView *scrollView = new BScrollView("BorderView", textView, 0, 0, false,
 		false, B_PLAIN_BORDER);
-	view->AddChild(scrollView);	 
+	view->AddChild(scrollView);
 
 	// configure text view
 	switch (view->ViewMode()) {
@@ -356,7 +393,7 @@ BTextWidget::StartEdit(BRect bounds, BPoseView *view, BPose *pose)
 	SetActive(true);				// for widget
 
 	textView->SelectAll();
-	textView->MakeFocus();	
+	textView->MakeFocus();
 
 	// make this text widget invisible while we edit it
 	SetVisible(false);
@@ -456,7 +493,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView *view,
 //			drawView->FillRect(eraseRect, B_SOLID_LOW);
 			drawView->FillRect(textRect, B_SOLID_LOW);
 		} else
-			drawView->SetDrawingMode(B_OP_OVER);	
+			drawView->SetDrawingMode(B_OP_OVER);
 
 		// set high color
 		rgb_color highColor;
@@ -537,7 +574,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView *view,
 
 			outlineColor.alpha = 200;
 			drawView->SetHighColor(outlineColor);
-	
+
 			drawView->DrawString(fittingText, loc + BPoint(1, 1));
 		}
 

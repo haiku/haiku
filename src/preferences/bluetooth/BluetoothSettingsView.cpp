@@ -28,7 +28,7 @@ static const int32 kMsgSetAntialiasing = 'anti';
 static const int32 kMsgSetDeviceClassDesktop = 'sDCd';
 static const int32 kMsgSetDeviceClassServer = 'sDCs';
 static const int32 kMsgSetDeviceClassLaptop = 'sDCl';
-static const int32 kMsgSetDeviceClassHandheld = 'sDCn';
+static const int32 kMsgSetDeviceClassHandheld = 'sDCh';
 static const int32 kMsgSetDeviceClassSmartPhone = 'sDCp';
 
 static const int32 kMsgSetAverageWeight = 'afEa';

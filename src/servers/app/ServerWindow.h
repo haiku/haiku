@@ -57,9 +57,14 @@ public:
 			status_t			Init(BRect frame, window_look look,
 									window_feel feel, uint32 flags,
 									uint32 workspace);
+
 	virtual port_id				MessagePort() const { return fMessagePort; }
 
 			::EventTarget&		EventTarget() { return fEventTarget; }
+
+	inline	ServerApp*			App() const { return fServerApp; }
+			::Desktop*			Desktop() const { return fDesktop; }
+			::Window*			Window() const;
 
 			// methods for sending various messages to client.
 			void				NotifyQuitRequested();
@@ -79,12 +84,6 @@ public:
 	virtual	::Window*			MakeWindow(BRect frame, const char* name,
 									window_look look, window_feel feel,
 									uint32 flags, uint32 workspace);
-
-			// to who we belong. who do we own. our title.
-	inline	ServerApp*			App() const { return fServerApp; }
-			::Desktop*			Desktop() const { return fDesktop; }
-			::Window*			Window() const;
-			bool				IsOffscreen() const;
 
 			void				SetTitle(const char* newTitle);
 	inline	const char*			Title() const { return fTitle; }

@@ -21,16 +21,16 @@
 <body>
 
 <div class="logo">
-        <img src="../../images/logo.png" alt="logo" width="372" height="86" />
-        <div class="title">Icon-O-Matic</div>
+        <img src="../images/logo.png" alt="logo" class="noprint" id="logo" name="logo" />
 </div>
+
 <div class="topnav">
         <p>
-                <a href="../applications.html#list-of-apps">Applications</a>
-                &#160;&#160;&#160;
-                Previous: <a href="apps-expander.html">Expander</a>
-                &#160;&#160;&#160;
-                Next: <a href="apps-installer.html">Installer</a>
+                &laquo;&#160;&#160;<a href="apps-expander.html">Expander</a>
+                &#160;&#160;::&#160;&#160;
+		<a href="../applications.html#list-of-apps" class="uplink">Applications</a>
+		&#160;&#160;::&#160;&#160;
+                <a href="apps-installer.html">Installer</a>&#160;&#160;&raquo;
         </p>
 </div>
 
@@ -63,7 +63,7 @@
 <p>Before we come to the actual creating of icons in Icon-O-Matic, a few words on Haiku's icons in general.</p>
 
 <h1>
-<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
 <a id="bitmap-vector" name="bitmap-vector">BeOS bitmap vs. Haiku vector icons</a></h1>
 <p>Contrary to the BeOS, Haiku uses vector icons instead of bitmap icons. A special Haiku Vector Icon Format (HVIF) was developed that is highly optimized for small file sizes and fast rendering. That's why our icons are for the most part <i>much</i> smaller than either a bitmap or the widely used SVG format. Also, unlike BeOS' bitmap icons, Haiku isn't limited to an 8bit palette (256 colors).<br />
 Take this icon of the Terminal, for example:</p>
@@ -102,13 +102,13 @@ width="128" height="128" /></td>
 </table>
 
 <h1>
-<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
 <a id="icons-attributes" name="icons-attributes">Icons are attributes</a></h1>
 <p>Icons are stored as an attribute with their file. However, that doesn't mean that every file has to have this attribute to appear with an icon in a Tracker window: data files inherit their icon from their filetype. To globally change the filetype's icon you use the <span class="app">FileTypes</span> preferences. If you only want to add a special icon to an individual file, you use the <span class="app">FileType Add-On</span> on it instead. See topic <a href="../filetypes.html">Filetypes</a> for more information.</p>
 <div class="box-info">Being an attribute, it follows that only filesystems supporting metadata can retain a file's individual icon. So, if you move files off your BFS volume, consider zipping them up so you don't lose icons or other attributes.</div>
 
 <h1>
-<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
 <a id="i-o-m" name="i-o-m">Creating icons with Icon-O-Matic</a></h1>
 <p>Icon-O-Matic is Haiku's icon editor that can save your work as HVIF, SVG or PNG. The icon can also be directly attached as attribute to an existing file or exported as a resource or source file used by developers. Since the application was tailored to the optimized HVIF format, its usage reflects the inner workings of this format.</p>
 <p>Other than your normal vector graphics software, you don't deal with separate objects that each include all their specific properties like path, stroke width, stroke and fill color etc. Rather, you assemble your objects ("shapes") from shared paths and colors ("styles") and set certain properties. This re-using of elements is one secret of HVIF's efficiency. Although that imposes some constraints on the icon designer, there are a few advantages, too.<br />
@@ -121,7 +121,7 @@ For example, by re-using a path, several objects can be modified together by man
 
 
 <h2>
-<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
 <a id="i-o-m-path" name="i-o-m-path">Path</a></h2>
 <p>A path consists of several points which are connected with lines or Bezier curves. To add or change points, make sure, the path is selected in the path list.</p>
 
@@ -185,7 +185,7 @@ width="16" height="16" /></td>
 
 
 <h2>
-<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
 <a id="i-o-m-shape" name="i-o-m-shape">Shape</a></h2>
 <p>A shape groups together one or more paths with a style. Practically, it's the object that you'll actually see on the canvas. The grouping is done with the checkboxes in front of the paths and styles: Just select your shape and tick off the desired path(s) and a style.</p>
 <p>A shape defines how a path and style is applied, e.g. if the object is filled or only stroked (which is done by using Transformers on the shape, we'll get to that later). Also, a shape can be moved, rotated or resized without touching the used path. That way, you can re-use a single path and get different, but related, shapes.</p>
@@ -259,7 +259,7 @@ For example, if Shape 1 were to be shown below 48px and Shape 2 from 48px upward
 
 
 <h2>
-<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
 <a id="i-o-m-style" name="i-o-m-style">Style</a></h2>
 <p>A style can either be a solid color or some type of gradient.<br />
 Besides the predefined colors under <span class="menu">Swatches</span>, you can mix your own by clicking on the current color. Also, note the slider under the color spectrum which sets the alpha-channel (transparency).</p>
@@ -277,7 +277,7 @@ Of course you can move these indicators to change the gradient to your liking. Y
 
 
 <h2>
-<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
 <a id="i-o-m-transformer" name="i-o-m-transformer">Transformer</a></h2>
 <p>A shape can have Transformers which change its appearance. The effects, however, are more subtle than a truck turning into a battle robot...</p>
 
@@ -300,7 +300,7 @@ Of course you can move these indicators to change the gradient to your liking. Y
 
 
 <h2>
-<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
 <a id="i-o-m-save" name="i-o-m-save">Saving an icon</a></h2>
 <p>There's your usual menu bar at the top, <span class="menu">File</span>, <span class="menu">Edit</span>, <span class="menu">Options</span>. The usage is pretty much self-explaining, so we'll only look at how to save your work.</p>
 <p><span class="menu">File | Save As...</span> will save in a special Icon-O-Matic format that retains additional information like the names of paths, shapes and styles. These will be stripped from the actual icon once you export it to save space. It's a good idea to back-up your work like this, because without named objects everything's named "&lt;path&gt;/&lt;shape&gt;/&lt;style&gt;" which makes specific changes tedious.</p>
@@ -319,7 +319,7 @@ Of course you can move these indicators to change the gradient to your liking. Y
 
 
 <h2>
-<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
 <a id="i-o-m-tips" name="i-o-m-tips">Tips & Tricks</a></h2>
 <p>A few things you should keep in mind when working with Icon-O-Matic and some general tips for its usage:</p>
 <ul>
@@ -335,7 +335,7 @@ Of course you can move these indicators to change the gradient to your liking. Y
 
 <!--
 <h2>
-<a href="#index"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" /></a>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
 <a id="i-o-m-workshops" name="i-o-m-workshops">Workshops</a></h2>
 <p>The above is of course quite theoretical. The best way to learn using Icon-O-Matic is by experimenting. To get you started and once more show the basics, have a look at these short clips:</p>
 <ul>
@@ -354,11 +354,11 @@ Of course you can move these indicators to change the gradient to your liking. Y
 
 <div class="bottomnav">
         <p>
-                <a href="../applications.html#list-of-apps">Applications</a>
-                &#160;&#160;&#160;
-                Previous: <a href="apps-expander.html">Expander</a>
-                &#160;&#160;&#160;
-                Next: <a href="apps-installer.html">Installer</a>
+                &laquo;&#160;&#160;<a href="apps-expander.html">Expander</a>
+                &#160;&#160;::&#160;&#160;
+		<a href="../applications.html#list-of-apps" class="uplink">Applications</a>
+		&#160;&#160;::&#160;&#160;
+                <a href="apps-installer.html">Installer</a>&#160;&#160;&raquo;
         </p>
 </div>
 

@@ -27,7 +27,7 @@
 #include <stdio.h>
 
 
-TPeopleView::TPeopleView(BRect rect, char *title, entry_ref *ref)
+TPeopleView::TPeopleView(BRect rect, const char *title, entry_ref *ref)
 		   :BView(rect, title, B_FOLLOW_NONE, B_WILL_DRAW)
 {
 	if (ref)
