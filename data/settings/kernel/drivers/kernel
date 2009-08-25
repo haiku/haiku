@@ -1,7 +1,7 @@
 #disable_smp true
 	# disables multiprocessor support, default is enabled
 
-#serial_debug_output false
+serial_debug_output false
 	# disables serial debug output, default is enabled
 
 #serial_debug_port 1
