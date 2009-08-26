@@ -1,9 +1,6 @@
 /*
- * Copyright 2001-2008, Haiku, Inc.
+ * Copyright 2001-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
- *
- * Authors:
- *		Graham MacDonald (macdonag@btopenworld.com)
  */
 #ifndef _PICTURE_BUTTON_H
 #define _PICTURE_BUTTON_H
@@ -20,85 +17,88 @@ enum {
 };
 
 
-class BPictureButton : public BControl
-{
+class BPictureButton : public BControl {
 public:
-				BPictureButton(BRect frame, const char* name, BPicture* off,
-								BPicture* on, BMessage* message,
-								uint32 behavior = B_ONE_STATE_BUTTON,
-								uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-								uint32 flgs = B_WILL_DRAW | B_NAVIGABLE);
-				BPictureButton(BMessage* data);
+								BPictureButton(BRect frame, const char* name,
+									BPicture* off, BPicture* on,
+									BMessage* message,
+									uint32 behavior = B_ONE_STATE_BUTTON,
+									uint32 resizeMask = B_FOLLOW_LEFT
+										| B_FOLLOW_TOP,
+									uint32 flgs = B_WILL_DRAW | B_NAVIGABLE);
+								BPictureButton(BMessage* archive);
 
-	virtual		~BPictureButton();
+	virtual						~BPictureButton();
 
+	static	BArchivable*		Instantiate(BMessage* archive);
+	virtual	status_t			Archive(BMessage* archive,
+									bool deep = true) const;
 
-	static	BArchivable*	Instantiate(BMessage* data);
-	virtual	status_t		Archive(BMessage* data, bool deep = true) const;
+	virtual	void				AttachedToWindow();
+	virtual	void				DetachedFromWindow();
+	virtual	void				AllAttached();
+	virtual	void				AllDetached();
 
-	virtual	void			Draw(BRect updateRect);
+	virtual	void				ResizeToPreferred();
+	virtual	void				GetPreferredSize(float* _width,
+									float* _height);
+	virtual	void				FrameMoved(BPoint position);
+	virtual	void				FrameResized(float width, float height);
 
-	virtual	void			MouseDown(BPoint point);
-	virtual	void			KeyDown(const char* bytes, int32 numBytes);
+	virtual	void				WindowActivated(bool state);
+	virtual	void				MakeFocus(bool state = true);
 
-	virtual	void			SetEnabledOn(BPicture* on);
-	virtual	void			SetEnabledOff(BPicture* off);
-	virtual	void			SetDisabledOn(BPicture* on);
-	virtual	void			SetDisabledOff(BPicture* off);
+	virtual	void				Draw(BRect updateRect);
 
-			BPicture*		EnabledOn() const;
-			BPicture*		EnabledOff() const;
-			BPicture*		DisabledOn() const;
-			BPicture*		DisabledOff() const;
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				KeyDown(const char* bytes, int32 numBytes);
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseUp(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 transit,
+									const BMessage* message);
 
-	virtual	void			SetBehavior(uint32 behavior);
-	uint32					Behavior() const;
+	virtual	void				SetEnabledOn(BPicture* on);
+	virtual	void				SetEnabledOff(BPicture* off);
+	virtual	void				SetDisabledOn(BPicture* on);
+	virtual	void				SetDisabledOff(BPicture* off);
 
-	virtual	void			MessageReceived(BMessage* message);
-	virtual	void			MouseUp(BPoint point);
-	virtual	void			WindowActivated(bool state);
-	virtual	void			MouseMoved(BPoint pt, uint32 code,
-								const BMessage* message);
-	virtual	void			AttachedToWindow();
-	virtual	void			DetachedFromWindow();
-	virtual	void			SetValue(int32 value);
-	virtual	status_t		Invoke(BMessage* message = NULL);
-	virtual	void			FrameMoved(BPoint newPosition);
-	virtual	void			FrameResized(float newWidth, float newHeight);
+			BPicture*			EnabledOn() const;
+			BPicture*			EnabledOff() const;
+			BPicture*			DisabledOn() const;
+			BPicture*			DisabledOff() const;
 
-	virtual	BHandler*		ResolveSpecifier(BMessage* message, int32 index,
-								BMessage* specifier, int32 form, const char* p);
-	virtual	status_t		GetSupportedSuites(BMessage* data);
+	virtual	void				SetBehavior(uint32 behavior);
+	uint32						Behavior() const;
 
-	virtual	void			ResizeToPreferred();
-	virtual	void			GetPreferredSize(float* width, float* height);
-	virtual	void			MakeFocus(bool state = true);
-	virtual	void			AllAttached();
-	virtual	void			AllDetached();
+	virtual	void				SetValue(int32 value);
+	virtual	status_t			Invoke(BMessage* message = NULL);
 
-	virtual	status_t		Perform(perform_code d, void* arg);
+	virtual	BHandler*			ResolveSpecifier(BMessage* message,
+									int32 index, BMessage* specifier,
+									int32 form, const char* property);
+	virtual	status_t			GetSupportedSuites(BMessage* data);
+
+	virtual	status_t			Perform(perform_code code, void* data);
 
 private:
+	// FBC padding and forbidden methods
+	virtual	void				_ReservedPictureButton1();
+	virtual	void				_ReservedPictureButton2();
+	virtual	void				_ReservedPictureButton3();
 
-	virtual	void			_ReservedPictureButton1();
-	virtual	void			_ReservedPictureButton2();
-	virtual	void			_ReservedPictureButton3();
+			BPictureButton&		operator=(const BPictureButton& other);
 
-							BPictureButton &operator=(const BPictureButton &);
+private:
+			BPicture*			fEnabledOff;
+			BPicture*			fEnabledOn;
+			BPicture*			fDisabledOff;
+			BPicture*			fDisabledOn;
 
-			void			_Redraw();
-			void			_InitData();
+			bool				unused;
 
-			BPicture*		fEnabledOff;
-			BPicture*		fEnabledOn;
-			BPicture*		fDisabledOff;
-			BPicture*		fDisabledOn;
+			uint32				fBehavior;
 
-			bool			unused;
-
-			uint32			fBehavior;
-			uint32			_reserved[4];
+			uint32				_reserved[4];
 };
 
-
-#endif
+#endif // _PICTURE_BUTTON_H
