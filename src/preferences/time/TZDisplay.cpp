@@ -123,7 +123,7 @@ TTZDisplay::SetTime(int32 hour, int32 minute)
 	if (ahour == 0)
 		ahour = 12;
 
-	char *ap = "AM";
+	const char *ap = "AM";
 	if (hour > 11)
 		ap = "PM";
 

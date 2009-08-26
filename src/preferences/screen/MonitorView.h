@@ -17,7 +17,7 @@
 
 class MonitorView : public BView {
 public:
-							MonitorView(BRect frame, char* name,
+							MonitorView(BRect frame, const char* name,
 								int32 screenWidth, int32 screenHeight);
 	virtual					~MonitorView();
 

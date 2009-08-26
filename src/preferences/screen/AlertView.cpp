@@ -25,7 +25,7 @@
 #include <Path.h>
 
 
-AlertView::AlertView(BRect frame, char *name)
+AlertView::AlertView(BRect frame, const char *name)
 	: BView(frame, name, B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED),
 	// we will wait 12 seconds until we send a message
 	fSeconds(12)
