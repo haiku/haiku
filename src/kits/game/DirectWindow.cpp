@@ -330,6 +330,7 @@ BDirectWindow::ConvertToMessage(void *raw, int32 code)
 void
 BDirectWindow::DirectConnected(direct_buffer_info *info)
 {
+	fprintf(stderr, "BDirectWindow::DirectConnected(): should not be ever called!!!!\n");
 	// implemented in subclasses
 }
 
@@ -429,7 +430,8 @@ BDirectWindow::SupportsWindowMode(screen_id id)
 	// At least, I can't see why window mode shouldn't be supported.
 	// additional NOTE: it probably depends on wether hardware cursor is supported or
 	// not
-	return true;
+	return false;
+	// TODO: For now
 }
 
 
