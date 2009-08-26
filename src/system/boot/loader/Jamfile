@@ -69,6 +69,7 @@ KernelStaticLibrary boot_loader :
 	kernel_cpp.cpp
 	KMessage.cpp
 	list.c
+	safemode_settings.cpp
 
 	: -fno-pic
 	;
@@ -93,6 +94,9 @@ SEARCH on [ FGristFiles kernel_cpp.cpp list.c ]
 
 SEARCH on [ FGristFiles KMessage.cpp ]
     = [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
+
+SEARCH on [ FGristFiles safemode_settings.cpp ]
+    = [ FDirName $(HAIKU_TOP) src system kernel debug ] ;
 
 SEARCH on [ FGristFiles driver_settings.c ]
     = [ FDirName $(HAIKU_TOP) src system libroot os ] ;

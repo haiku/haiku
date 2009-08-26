@@ -7,6 +7,9 @@
 
 #include "load_driver_settings.h"
 
+#include <string.h>
+#include <unistd.h>
+
 #include <OS.h>
 #include <drivers/driver_settings.h>
 
@@ -14,22 +17,6 @@
 #include <boot/kernel_args.h>
 #include <boot/stage2.h>
 #include <boot/platform.h>
-
-#include <string.h>
-#include <unistd.h>
-
-
-static driver_settings_file*
-find_driver_settings_file(const char* name)
-{
-	for (driver_settings_file* file = gKernelArgs.driver_settings; file != NULL;
-			file = file->next) {
-		if (!strcmp(file->name, name))
-			return file;
-	}
-
-	return NULL;
-}
 
 
 static status_t
@@ -98,38 +85,6 @@ load_driver_settings(stage2_args* /*args*/, Directory* volume)
 		}
 
 		settings->Close(cookie);
-	}
-
-	// Check if a kernel settings file exists
-	// if it does, prepend it to the safe mode settings. This allows the
-	// settings from the kernel file to take effect while still allowing
-	// overrides by safe mode since the settings are searched
-	// in reverse order. This allows us to permanently set things like
-	// disable_smp
-	driver_settings_file* kernelFile = find_driver_settings_file("kernel");
-	if (kernelFile != NULL) {
-		driver_settings_file* safemodeFile
-			= find_driver_settings_file(B_SAFEMODE_DRIVER_SETTINGS);
-		if (safemodeFile != NULL) {
-			char* buffer = (char*)kernel_args_malloc(
-				safemodeFile->size + kernelFile->size + 2);
-			if (buffer != NULL) {
-				memcpy(buffer, kernelFile->buffer, kernelFile->size);
-
-				// insert a newline just in case the kernel settings file
-				// doesn't end with one
-				buffer[kernelFile->size] = '\n';
-
-				memcpy(buffer + kernelFile->size + 1, safemodeFile->buffer,
-					safemodeFile->size);
-
-				kernel_args_free(safemodeFile->buffer);
-				safemodeFile->buffer = buffer;
-				safemodeFile->size = safemodeFile->size + kernelFile->size + 1;
-				buffer[safemodeFile->size] = '\0';
-			}
-		} else
-			add_safe_mode_settings(kernelFile->buffer);
 	}
 
 	return B_OK;

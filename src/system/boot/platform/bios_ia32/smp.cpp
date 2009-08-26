@@ -9,9 +9,8 @@
 
 
 #include "smp.h"
-#include "mmu.h"
-#include "acpi.h"
-#include "hpet.h"
+
+#include <string.h>
 
 #include <KernelExport.h>
 
@@ -23,7 +22,10 @@
 #include <arch/x86/arch_apic.h>
 #include <arch/x86/arch_system_info.h>
 
-#include <string.h>
+#include "mmu.h"
+#include "acpi.h"
+#include "hpet.h"
+
 
 #define NO_SMP 0
 
@@ -386,15 +388,10 @@ calculate_apic_timer_conversion_factor(void)
 void
 smp_init_other_cpus(void)
 {
-	void *handle = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
-	if (handle != NULL) {
-		if (get_driver_boolean_parameter(handle, B_SAFEMODE_DISABLE_SMP, false,
-				false)) {
-			// SMP has been disabled!
-			TRACE(("smp disabled per safemode setting\n"));
-			gKernelArgs.num_cpus = 1;
-		}
-		unload_driver_settings(handle);
+	if (get_safemode_boolean(B_SAFEMODE_DISABLE_SMP, false)) {
+		// SMP has been disabled!
+		TRACE(("smp disabled per safemode setting\n"));
+		gKernelArgs.num_cpus = 1;
 	}
 
 	if (gKernelArgs.arch_args.apic_phys == 0)
@@ -573,7 +570,6 @@ dprintf("wait for delivery\n");
 void
 smp_add_safemode_menus(Menu *menu)
 {
-
 	if (gKernelArgs.num_cpus < 2)
 		return;
 

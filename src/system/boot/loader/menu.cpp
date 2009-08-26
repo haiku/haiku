@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,12 +21,14 @@
 
 #include <string.h>
 
+
 #define TRACE_MENU
 #ifdef TRACE_MENU
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
+
 
 MenuItem::MenuItem(const char *label, Menu *subMenu)
 	:
@@ -154,7 +156,7 @@ MenuItem::SetHelpText(const char *text)
 }
 
 
-void 
+void
 MenuItem::SetMenu(Menu *menu)
 {
 	fMenu = menu;
@@ -206,7 +208,7 @@ Menu::ItemAt(int32 index)
 }
 
 
-int32 
+int32
 Menu::IndexOf(MenuItem *searchedItem)
 {
 	MenuItemIterator iterator = ItemIterator();
@@ -452,10 +454,18 @@ add_safe_mode_menu()
 	item->SetType(MENU_ITEM_MARKABLE);
     item->SetHelpText("Disables IDE DMA, increasing IDE compatibilty "
 		"at the expense of performance.");
-	
+
 	platform_add_menus(safeMenu);
 
-	safeMenu->AddItem(item = new(nothrow) MenuItem("Enable on screen debug output"));
+	safeMenu->AddItem(item
+		= new(nothrow) MenuItem("Enable serial debug output"));
+	item->SetData("serial_debug_output");
+	item->SetType(MENU_ITEM_MARKABLE);
+    item->SetHelpText("Turns on forwarding the syslog output to the serial "
+		"interface.");
+
+	safeMenu->AddItem(item
+		= new(nothrow) MenuItem("Enable on screen debug output"));
 	item->SetData("debug_screen");
 	item->SetType(MENU_ITEM_MARKABLE);
     item->SetHelpText("Displays debug output on screen while the system "

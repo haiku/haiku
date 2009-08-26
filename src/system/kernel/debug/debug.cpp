@@ -22,6 +22,7 @@
 #include <int.h>
 #include <kernel.h>
 #include <ksystem_info.h>
+#include <safemode.h>
 #include <smp.h>
 #include <thread.h>
 #include <tracing.h>
@@ -1299,27 +1300,15 @@ debug_init_post_vm(kernel_args* args)
 	tracing_init();
 
 	// get debug settings
-	void* handle = load_driver_settings("kernel");
-	if (handle != NULL) {
-		sSerialDebugEnabled = get_driver_boolean_parameter(handle,
-			"serial_debug_output", sSerialDebugEnabled, sSerialDebugEnabled);
-		sSyslogOutputEnabled = get_driver_boolean_parameter(handle,
-			"syslog_debug_output", sSyslogOutputEnabled, sSyslogOutputEnabled);
-		sBlueScreenOutput = get_driver_boolean_parameter(handle,
-			"bluescreen", true, true);
-		sEmergencyKeysEnabled = get_driver_boolean_parameter(handle,
-			"emergency_keys", sEmergencyKeysEnabled, sEmergencyKeysEnabled);
 
-		unload_driver_settings(handle);
-	}
-
-	handle = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
-	if (handle != NULL) {
-		sDebugScreenEnabled = get_driver_boolean_parameter(handle,
-			"debug_screen", false, false);
-
-		unload_driver_settings(handle);
-	}
+	sSerialDebugEnabled = get_safemode_boolean("serial_debug_output",
+		sSerialDebugEnabled);
+	sSyslogOutputEnabled = get_safemode_boolean("syslog_debug_output",
+		sSyslogOutputEnabled);
+	sBlueScreenOutput = get_safemode_boolean("bluescreen", true);
+	sEmergencyKeysEnabled = get_safemode_boolean("emergency_keys",
+		sEmergencyKeysEnabled);
+	sDebugScreenEnabled = get_safemode_boolean("debug_screen", false);
 
 	if ((sBlueScreenOutput || sDebugScreenEnabled)
 		&& blue_screen_init() != B_OK)
