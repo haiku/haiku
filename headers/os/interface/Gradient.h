@@ -1,14 +1,10 @@
 /*
- * Copyright 2006-2009, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Artur Wyszynski <harakash@gmail.com>
+ * Copyright 2006-2009, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  */
-
 #ifndef _GRADIENT_H
 #define _GRADIENT_H
+
 
 #include <Archivable.h>
 #include <GraphicsDefs.h>
@@ -17,6 +13,14 @@
 
 class BMessage;
 class BRect;
+
+
+// WARNING! This is experimental API and may change! Be prepared to
+// recompile your software in a next version of haiku. In particular,
+// the offsets are currently specified on [0..255], but may be changed
+// to the interval [0..1]. This class also does not have any FBC padding,
+// So your software will definitely break when this class gets new
+// virtuals. And the object size may change too...
 
 
 class BGradient : public BArchivable {
@@ -43,40 +47,45 @@ public:
 	};
 
 public:
-						BGradient();
-						BGradient(BMessage* archive);
-	virtual				~BGradient();
+								BGradient();
+								BGradient(BMessage* archive);
+	virtual						~BGradient();
 	
-	status_t			Archive(BMessage* into, bool deep = true) const;
+			status_t			Archive(BMessage* into,
+									bool deep = true) const;
 	
-	BGradient&			operator=(const BGradient& other);
+			BGradient&			operator=(const BGradient& other);
 	
-	bool				operator==(const BGradient& other) const;
-	bool				operator!=(const BGradient& other) const;
-	bool				ColorStopsAreEqual(const BGradient& other) const;
+			bool				operator==(const BGradient& other) const;
+			bool				operator!=(const BGradient& other) const;
+			bool				ColorStopsAreEqual(
+									const BGradient& other) const;
 	
-	void				SetColorStops(const BGradient& other);
+			void				SetColorStops(const BGradient& other);
 	
-	int32				AddColor(const rgb_color& color, float offset);
-	bool				AddColorStop(const ColorStop& colorStop, int32 index);
+			int32				AddColor(const rgb_color& color,
+									float offset);
+			bool				AddColorStop(const ColorStop& colorStop,
+									int32 index);
 	
-	bool				RemoveColor(int32 index);
+			bool				RemoveColor(int32 index);
 	
-	bool				SetColorStop(int32 index, const ColorStop& colorStop);
-	bool				SetColor(int32 index, const rgb_color& color);
-	bool				SetOffset(int32 index, float offset);
+			bool				SetColorStop(int32 index,
+									const ColorStop& colorStop);
+			bool				SetColor(int32 index, const rgb_color& color);
+			bool				SetOffset(int32 index, float offset);
 	
-	int32				CountColorStops() const;
-	ColorStop*			ColorStopAt(int32 index) const;
-	ColorStop*			ColorStopAtFast(int32 index) const;
-	ColorStop*			ColorStops() const;
-	void				SortColorStopsByOffset();
+			int32				CountColorStops() const;
+			ColorStop*			ColorStopAt(int32 index) const;
+			ColorStop*			ColorStopAtFast(int32 index) const;
+			ColorStop*			ColorStops() const;
+			void				SortColorStopsByOffset();
 	
-	Type				GetType() const
-							{ return fType; }
+			Type				GetType() const
+									{ return fType; }
 	
-	void				MakeEmpty();
-	
+			void				MakeEmpty();
+
 private:
 	friend class BGradientLinear;
 	friend class BGradientRadial;
@@ -84,26 +93,26 @@ private:
 	friend class BGradientDiamond;
 	friend class BGradientConic;
 
-	union {
-		struct {
-			float x1, y1, x2, y2;
-		} linear;
-		struct {
-			float cx, cy, radius;
-		} radial;
-		struct {
-			float cx, cy, fx, fy, radius;
-		} radial_focus;
-		struct {
-			float cx, cy;
-		} diamond;
-		struct {
-			float cx, cy, angle;
-		} conic;
-	} fData;
+			union {
+				struct {
+					float x1, y1, x2, y2;
+				} linear;
+				struct {
+					float cx, cy, radius;
+				} radial;
+				struct {
+					float cx, cy, fx, fy, radius;
+				} radial_focus;
+				struct {
+					float cx, cy;
+				} diamond;
+				struct {
+					float cx, cy, angle;
+				} conic;
+			} fData;
 
-	BList				fColorStops;
-	Type				fType;
+			BList				fColorStops;
+			Type				fType;
 };
 
 #endif // _GRADIENT_H
