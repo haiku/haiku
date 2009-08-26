@@ -1,9 +1,14 @@
-#include <stdio.h>
-// for O_WRONLY
+/*
+ * Copyright 2002, François Revol, revol@free.fr.
+ * Distributed under the terms of the MIT License.
+ */
+
 #include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
-// 2002, Fran�ois Revol
+// 2002, François Revol
 // technical reference:
 // http://bedriven.be-in.org/document/280-serial_port_driver.html
 // 2004: bedriven is down now, mirror at:
