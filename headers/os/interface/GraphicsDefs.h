@@ -175,7 +175,8 @@ typedef enum {
 	// non linear color space -- incidently, all with 8 bits per value
 	// Note, BBitmap and BView do not support all of these!
 
-	// loss/saturation points are Y 16-235 (absolute), Cb/Cr 16-240 (center 128)
+	// loss/saturation points are Y 16-235 (absolute), Cb/Cr 16-240
+	// (center 128)
 
 	B_YCbCr422			= 0x4000,	// Y0  Cb0  Y1  Cr0  Y2...
 									// Cb2 Y3  Cr2...
