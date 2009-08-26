@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2009, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc. All rights resrerved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -135,6 +135,9 @@ BListView::~BListView()
 }
 
 
+// #pragma mark -
+
+
 BArchivable*
 BListView::Instantiate(BMessage* archive)
 {
@@ -178,6 +181,9 @@ BListView::Archive(BMessage* archive, bool deep) const
 }
 
 
+// #pragma mark -
+
+
 void
 BListView::Draw(BRect updateRect)
 {
@@ -199,6 +205,71 @@ BListView::Draw(BRect updateRect)
 
 
 void
+BListView::AttachedToWindow()
+{
+	BView::AttachedToWindow();
+	_FontChanged();
+
+	if (!Messenger().IsValid())
+		SetTarget(Window(), NULL);
+
+	_FixupScrollBar();
+}
+
+
+void
+BListView::DetachedFromWindow()
+{
+	BView::DetachedFromWindow();
+}
+
+
+void
+BListView::AllAttached()
+{
+	BView::AllAttached();
+}
+
+
+void
+BListView::AllDetached()
+{
+	BView::AllDetached();
+}
+
+
+void
+BListView::FrameResized(float width, float height)
+{
+	_FixupScrollBar();
+}
+
+
+void
+BListView::FrameMoved(BPoint new_position)
+{
+	BView::FrameMoved(new_position);
+}
+
+
+void
+BListView::TargetedByScrollView(BScrollView *view)
+{
+	fScrollView = view;
+}
+
+
+void
+BListView::WindowActivated(bool state)
+{
+	BView::WindowActivated(state);
+}
+
+
+// #pragma mark -
+
+
+void
 BListView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
@@ -215,7 +286,8 @@ BListView::MessageReceived(BMessage* msg)
 				|| specifier.FindString("property", &property) != B_OK)
 				return;
 
-			switch (propInfo.FindMatch(msg, 0, &specifier, msg->what, property)) {
+			switch (propInfo.FindMatch(msg, 0, &specifier, msg->what,
+					property)) {
 				case B_ERROR:
 					BView::MessageReceived(msg);
 					break;
@@ -297,6 +369,96 @@ BListView::MessageReceived(BMessage* msg)
 
 		default:
 			BView::MessageReceived(msg);
+	}
+}
+
+
+void
+BListView::KeyDown(const char *bytes, int32 numBytes)
+{
+	bool extend
+		= fListType == B_MULTIPLE_SELECTION_LIST
+			&& (modifiers() & B_SHIFT_KEY) != 0;
+
+	switch (bytes[0]) {
+		case B_UP_ARROW:
+		{
+			if (fFirstSelected == -1) {
+				// if nothing is selected yet, always select the first item
+				Select(0);
+			} else {
+				if (fAnchorIndex > 0) {
+					if (!extend || fAnchorIndex <= fFirstSelected)
+						Select(fAnchorIndex - 1, extend);
+					else
+						Deselect(fAnchorIndex--);
+				}
+			}
+
+			ScrollToSelection();
+			break;
+		}
+		case B_DOWN_ARROW:
+		{
+			if (fFirstSelected == -1) {
+				// if nothing is selected yet, always select the first item
+				Select(0);
+			} else {
+				if (fAnchorIndex < CountItems() - 1) {
+					if (!extend || fAnchorIndex >= fLastSelected)
+						Select(fAnchorIndex + 1, extend);
+					else
+						Deselect(fAnchorIndex++);
+				}
+			}
+
+			ScrollToSelection();
+			break;
+		}
+
+		case B_HOME:
+			if (extend) {
+				Select(0, fAnchorIndex, true);
+				fAnchorIndex = 0;
+			} else
+				Select(0, false);
+			ScrollToSelection();
+			break;
+		case B_END:
+			if (extend) {
+				Select(fAnchorIndex, CountItems() - 1, true);
+				fAnchorIndex = CountItems() - 1;
+			} else
+				Select(CountItems() - 1, false);
+			ScrollToSelection();
+			break;
+
+		case B_PAGE_UP:
+		{
+			BPoint scrollOffset(LeftTop());
+			scrollOffset.y = max_c(0, scrollOffset.y - Bounds().Height());
+			ScrollTo(scrollOffset);
+			break;
+		}
+		case B_PAGE_DOWN:
+		{
+			BPoint scrollOffset(LeftTop());
+			if (BListItem* item = LastItem()) {
+				scrollOffset.y += Bounds().Height();
+				scrollOffset.y = min_c(item->Bottom() - Bounds().Height(),
+					scrollOffset.y);
+			}
+			ScrollTo(scrollOffset);
+			break;
+		}
+
+		case B_RETURN:
+		case B_SPACE:
+			Invoke();
+			break;
+
+		default:
+			BView::KeyDown(bytes, numBytes);
 	}
 }
 
@@ -408,94 +570,72 @@ BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 }
 
 
-void
-BListView::KeyDown(const char *bytes, int32 numBytes)
+bool
+BListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
 {
-	bool extend
-		= fListType == B_MULTIPLE_SELECTION_LIST
-			&& (modifiers() & B_SHIFT_KEY) != 0;
+	return false;
+}
 
-	switch (bytes[0]) {
-		case B_UP_ARROW:
-		{
-			if (fFirstSelected == -1) {
-				// if nothing is selected yet, always select the first item
-				Select(0);
-			} else {
-				if (fAnchorIndex > 0) {
-					if (!extend || fAnchorIndex <= fFirstSelected)
-						Select(fAnchorIndex - 1, extend);
-					else
-						Deselect(fAnchorIndex--);
-				}
-			}
 
-			ScrollToSelection();
-			break;
-		}
-		case B_DOWN_ARROW:
-		{
-			if (fFirstSelected == -1) {
-				// if nothing is selected yet, always select the first item
-				Select(0);
-			} else {
-				if (fAnchorIndex < CountItems() - 1) {
-					if (!extend || fAnchorIndex >= fLastSelected)
-						Select(fAnchorIndex + 1, extend);
-					else
-						Deselect(fAnchorIndex++);
-				}
-			}
+// #pragma mark -
 
-			ScrollToSelection();
-			break;
+
+void
+BListView::ResizeToPreferred()
+{
+	BView::ResizeToPreferred();
+}
+
+
+void
+BListView::GetPreferredSize(float* _width, float* _height)
+{
+	int32 count = CountItems();
+
+	if (count > 0) {
+		float maxWidth = 0.0;
+		for (int32 i = 0; i < count; i++) {
+			float itemWidth = ItemAt(i)->Width();
+			if (itemWidth > maxWidth)
+				maxWidth = itemWidth;
 		}
 
-		case B_HOME:
-			if (extend) {
-				Select(0, fAnchorIndex, true);
-				fAnchorIndex = 0;
-			} else
-				Select(0, false);
-			ScrollToSelection();
-			break;
-		case B_END:
-			if (extend) {
-				Select(fAnchorIndex, CountItems() - 1, true);
-				fAnchorIndex = CountItems() - 1;
-			} else
-				Select(CountItems() - 1, false);
-			ScrollToSelection();
-			break;
-
-		case B_PAGE_UP:
-		{
-			BPoint scrollOffset(LeftTop());
-			scrollOffset.y = max_c(0, scrollOffset.y - Bounds().Height());
-			ScrollTo(scrollOffset);
-			break;
-		}
-		case B_PAGE_DOWN:
-		{
-			BPoint scrollOffset(LeftTop());
-			if (BListItem* item = LastItem()) {
-				scrollOffset.y += Bounds().Height();
-				scrollOffset.y = min_c(item->Bottom() - Bounds().Height(),
-					scrollOffset.y);
-			}
-			ScrollTo(scrollOffset);
-			break;
-		}
-
-		case B_RETURN:
-		case B_SPACE:
-			Invoke();
-			break;
-
-		default:
-			BView::KeyDown(bytes, numBytes);
+		if (_width != NULL)
+			*_width = maxWidth;
+		if (_height != NULL)
+			*_height = ItemAt(count - 1)->Bottom();
+	} else {
+		BView::GetPreferredSize(_width, _height);
 	}
 }
+
+
+BSize
+BListView::MinSize()
+{
+	// We need a stable min size: the BView implementation uses
+	// GetPreferredSize(), which by default just returns the current size.
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), BSize(10, 10));
+}
+
+
+BSize
+BListView::MaxSize()
+{
+	return BView::MaxSize();
+}
+
+
+BSize
+BListView::PreferredSize()
+{
+	// We need a stable preferred size: the BView implementation uses
+	// GetPreferredSize(), which by default just returns the current size.
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), BSize(100, 50));
+}
+
+
+// #pragma mark -
 
 
 void
@@ -512,33 +652,6 @@ BListView::MakeFocus(bool focused)
 
 
 void
-BListView::AttachedToWindow()
-{
-	BView::AttachedToWindow();
-	_FontChanged();
-
-	if (!Messenger().IsValid())
-		SetTarget(Window(), NULL);
-
-	_FixupScrollBar();
-}
-
-
-void
-BListView::FrameResized(float width, float height)
-{
-	_FixupScrollBar();
-}
-
-
-void
-BListView::FrameMoved(BPoint new_position)
-{
-	BView::FrameMoved(new_position);
-}
-
-
-void
 BListView::SetFont(const BFont* font, uint32 mask)
 {
 	BView::SetFont(font, mask);
@@ -547,17 +660,13 @@ BListView::SetFont(const BFont* font, uint32 mask)
 
 
 void
-BListView::TargetedByScrollView(BScrollView *view)
-{
-	fScrollView = view;
-}
-
-
-void
 BListView::ScrollTo(BPoint point)
 {
 	BView::ScrollTo(point);
 }
+
+
+// #pragma mark - List ops
 
 
 bool
@@ -1119,6 +1228,9 @@ BListView::ItemFrame(int32 index)
 }
 
 
+// #pragma mark -
+
+
 BHandler*
 BListView::ResolveSpecifier(BMessage* message, int32 index,
 	BMessage* specifier, int32 form, const char* property)
@@ -1210,96 +1322,6 @@ BListView::Perform(perform_code code, void* _data)
 }
 
 
-void
-BListView::WindowActivated(bool state)
-{
-	BView::WindowActivated(state);
-}
-
-
-void
-BListView::DetachedFromWindow()
-{
-	BView::DetachedFromWindow();
-}
-
-
-bool
-BListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
-{
-	return false;
-}
-
-
-void
-BListView::ResizeToPreferred()
-{
-	BView::ResizeToPreferred();
-}
-
-
-void
-BListView::GetPreferredSize(float* _width, float* _height)
-{
-	int32 count = CountItems();
-
-	if (count > 0) {
-		float maxWidth = 0.0;
-		for (int32 i = 0; i < count; i++) {
-			float itemWidth = ItemAt(i)->Width();
-			if (itemWidth > maxWidth)
-				maxWidth = itemWidth;
-		}
-
-		if (_width != NULL)
-			*_width = maxWidth;
-		if (_height != NULL)
-			*_height = ItemAt(count - 1)->Bottom();
-	} else {
-		BView::GetPreferredSize(_width, _height);
-	}
-}
-
-
-void
-BListView::AllAttached()
-{
-	BView::AllAttached();
-}
-
-
-void
-BListView::AllDetached()
-{
-	BView::AllDetached();
-}
-
-
-BSize
-BListView::MinSize()
-{
-	// We need a stable min size: the BView implementation uses
-	// GetPreferredSize(), which by default just returns the current size.
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(), BSize(10, 10));
-}
-
-
-BSize
-BListView::MaxSize()
-{
-	return BView::MaxSize();
-}
-
-
-BSize
-BListView::PreferredSize()
-{
-	// We need a stable preferred size: the BView implementation uses
-	// GetPreferredSize(), which by default just returns the current size.
-	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), BSize(100, 50));
-}
-
-
 bool
 BListView::DoMiscellaneous(MiscCode code, MiscData* data)
 {
@@ -1324,6 +1346,9 @@ BListView::DoMiscellaneous(MiscCode code, MiscData* data)
 }
 
 
+// #pragma mark -
+
+
 void BListView::_ReservedListView2() {}
 void BListView::_ReservedListView3() {}
 void BListView::_ReservedListView4() {}
@@ -1334,6 +1359,9 @@ BListView::operator=(const BListView& /*other*/)
 {
 	return *this;
 }
+
+
+// #pragma mark -
 
 
 void
