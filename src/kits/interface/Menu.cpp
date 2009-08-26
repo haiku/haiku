@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
- * Distributed under the terms of the MIT License.
+ * Copyright 2001-2009, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Rene Gollent (anevilyak@gmail.com)
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
@@ -86,8 +87,8 @@ bool BMenu::sAltAsCommandKey;
 
 static property_info sPropList[] = {
 	{ "Enabled", { B_GET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if menu or menu item is enabled; false "
-		"otherwise.",
+		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if menu or menu item is "
+		"enabled; false otherwise.",
 		0, { B_BOOL_TYPE }
 	},
 
@@ -97,31 +98,34 @@ static property_info sPropList[] = {
 	},
 
 	{ "Label", { B_GET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Returns the string label of the menu or menu item.",
+		{ B_DIRECT_SPECIFIER, 0 }, "Returns the string label of the menu or "
+		"menu item.",
 		0, { B_STRING_TYPE }
 	},
 
 	{ "Label", { B_SET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Sets the string label of the menu or menu item.",
+		{ B_DIRECT_SPECIFIER, 0 }, "Sets the string label of the menu or menu "
+		"item.",
 		0, { B_STRING_TYPE }
 	},
 
 	{ "Mark", { B_GET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if the menu item or the menu's superitem "
-		"is marked; false otherwise.",
+		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if the menu item or the "
+		"menu's superitem is marked; false otherwise.",
 		0, { B_BOOL_TYPE }
 	},
 
 	{ "Mark", { B_SET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Marks or unmarks the menu item or the menu's superitem.",
+		{ B_DIRECT_SPECIFIER, 0 }, "Marks or unmarks the menu item or the "
+		"menu's superitem.",
 		0, { B_BOOL_TYPE }
 	},
 
 	{ "Menu", { B_CREATE_PROPERTY, 0 },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
-		"Adds a new menu item at the specified index with the text label found in \"data\" "
-		"and the int32 command found in \"what\" (used as the what field in the CMessage "
-		"sent by the item)." , 0, {},
+		"Adds a new menu item at the specified index with the text label "
+		"found in \"data\" and the int32 command found in \"what\" (used as "
+		"the what field in the BMessage sent by the item)." , 0, {},
 		{ 	{{{"data", B_STRING_TYPE}}}
 		}
 	},
@@ -133,20 +137,21 @@ static property_info sPropList[] = {
 
 	{ "Menu", { },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
-		"Directs scripting message to the specified menu, first popping the current "
-		"specifier off the stack.", 0, {}
+		"Directs scripting message to the specified menu, first popping the "
+		"current specifier off the stack.", 0, {}
 	},
 
 	{ "MenuItem", { B_COUNT_PROPERTIES, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Counts the number of menu items in the specified menu.",
+		{ B_DIRECT_SPECIFIER, 0 }, "Counts the number of menu items in the "
+		"specified menu.",
 		0, { B_INT32_TYPE }
 	},
 
 	{ "MenuItem", { B_CREATE_PROPERTY, 0 },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
-		"Adds a new menu item at the specified index with the text label found in \"data\" "
-		"and the int32 command found in \"what\" (used as the what field in the CMessage "
-		"sent by the item).", 0, {},
+		"Adds a new menu item at the specified index with the text label "
+		"found in \"data\" and the int32 command found in \"what\" (used as "
+		"the what field in the BMessage sent by the item).", 0, {},
 		{	{ {{"data", B_STRING_TYPE },
 			{"be:invoke_message", B_MESSAGE_TYPE},
 			{"what", B_INT32_TYPE},
@@ -166,8 +171,8 @@ static property_info sPropList[] = {
 
 	{ "MenuItem", { },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
-		"Directs scripting message to the specified menu, first popping the current "
-		"specifier off the stack."
+		"Directs scripting message to the specified menu, first popping the "
+		"current specifier off the stack."
 	},
 
 	{}
@@ -181,6 +186,9 @@ struct BMenu::LayoutData {
 	BSize	preferred;
 	uint32	lastResizingMode;
 };
+
+
+// #pragma mark -
 
 
 BMenu::BMenu(const char* name, menu_layout layout)
@@ -252,18 +260,6 @@ BMenu::BMenu(const char* name, float width, float height)
 }
 
 
-BMenu::~BMenu()
-{
-	_DeleteMenuWindow();
-
-	RemoveItems(0, CountItems(), true);
-
-	delete fInitMatrixSize;
-	delete fExtraMenuData;
-	delete fLayoutData;
-}
-
-
 BMenu::BMenu(BMessage* archive)
 	:
 	BView(archive),
@@ -297,6 +293,21 @@ BMenu::BMenu(BMessage* archive)
 {
 	_InitData(archive);
 }
+
+
+BMenu::~BMenu()
+{
+	_DeleteMenuWindow();
+
+	RemoveItems(0, CountItems(), true);
+
+	delete fInitMatrixSize;
+	delete fExtraMenuData;
+	delete fLayoutData;
+}
+
+
+// #pragma mark -
 
 
 BArchivable*
@@ -347,6 +358,9 @@ BMenu::Archive(BMessage* data, bool deep) const
 }
 
 
+// #pragma mark -
+
+
 void
 BMenu::AttachedToWindow()
 {
@@ -390,6 +404,279 @@ void
 BMenu::DetachedFromWindow()
 {
 	BView::DetachedFromWindow();
+}
+
+
+void
+BMenu::AllAttached()
+{
+	BView::AllAttached();
+}
+
+
+void
+BMenu::AllDetached()
+{
+	BView::AllDetached();
+}
+
+
+// #pragma mark -
+
+
+void
+BMenu::Draw(BRect updateRect)
+{
+	if (_RelayoutIfNeeded()) {
+		Invalidate();
+		return;
+	}
+
+
+	DrawBackground(updateRect);
+	_DrawItems(updateRect);
+}
+
+
+void
+BMenu::MessageReceived(BMessage* msg)
+{
+	switch (msg->what) {
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			float deltaY = 0;
+			msg->FindFloat("be:wheel_delta_y", &deltaY);
+			if (deltaY == 0)
+				return;
+
+			BMenuWindow* window = dynamic_cast<BMenuWindow*>(Window());
+			if (window == NULL)
+				return;
+
+			float largeStep;
+			float smallStep;
+			window->GetSteps(&smallStep, &largeStep);
+
+			// pressing the option/command/control key scrolls faster
+			if (modifiers() & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY))
+				deltaY *= largeStep;
+			else
+				deltaY *= smallStep;
+
+			window->TryScrollBy(deltaY);
+			break;
+		}
+
+		default:
+			BView::MessageReceived(msg);
+			break;
+	}
+}
+
+
+void
+BMenu::KeyDown(const char* bytes, int32 numBytes)
+{
+	// TODO: Test how it works on beos and implement it correctly
+	switch (bytes[0]) {
+		case B_UP_ARROW:
+			if (fLayout == B_ITEMS_IN_COLUMN)
+				_SelectNextItem(fSelected, false);
+			break;
+
+		case B_DOWN_ARROW:
+			if (fLayout == B_ITEMS_IN_COLUMN)
+				_SelectNextItem(fSelected, true);
+			break;
+
+		case B_LEFT_ARROW:
+			if (fLayout == B_ITEMS_IN_ROW)
+				_SelectNextItem(fSelected, false);
+			else {
+				// this case has to be handled a bit specially.
+				BMenuItem* item = Superitem();
+				if (item) {
+					if (dynamic_cast<BMenuBar*>(Supermenu())) {
+						// If we're at the top menu below the menu bar, pass
+						// the keypress to the menu bar so we can move to
+						// another top level menu.
+						BMessenger msgr(Supermenu());
+						msgr.SendMessage(Window()->CurrentMessage());
+					} else
+						Supermenu()->_SelectItem(item, false, false);
+				}
+			}
+			break;
+
+		case B_RIGHT_ARROW:
+			if (fLayout == B_ITEMS_IN_ROW)
+				_SelectNextItem(fSelected, true);
+			else {
+				if (fSelected && fSelected->Submenu()) {
+					_SelectItem(fSelected, true, true);
+				} else if (dynamic_cast<BMenuBar*>(Supermenu())) {
+					// if we have no submenu and we're an
+					// item in the top menu below the menubar,
+					// pass the keypress to the menubar
+					// so you can use the keypress to switch menus.
+					BMessenger msgr(Supermenu());
+					msgr.SendMessage(Window()->CurrentMessage());
+				}
+			}
+			break;
+
+		case B_PAGE_UP:
+		case B_PAGE_DOWN:
+		{
+			BMenuWindow* window = dynamic_cast<BMenuWindow*>(Window());
+			if (window == NULL || !window->HasScrollers())
+				break;
+
+			int32 deltaY = bytes[0] == B_PAGE_UP ? -1 : 1;
+
+			float largeStep;
+			window->GetSteps(NULL, &largeStep);
+			window->TryScrollBy(deltaY * largeStep);
+			break;
+		}
+
+		case B_ENTER:
+		case B_SPACE:
+			if (fSelected) {
+				_InvokeItem(fSelected);
+				_QuitTracking(false);
+			}
+			break;
+
+		case B_ESCAPE:
+			_QuitTracking();
+			break;
+
+		default:
+		{
+			uint32 trigger = UTF8ToCharCode(&bytes);
+
+			for (uint32 i = CountItems(); i-- > 0;) {
+				BMenuItem* item = ItemAt(i);
+				if (item->fTriggerIndex < 0 || item->fTrigger != trigger)
+					continue;
+
+				_InvokeItem(item);
+			}
+			break;
+		}
+	}
+}
+
+
+// #pragma mark -
+
+
+BSize
+BMenu::MinSize()
+{
+	_ValidatePreferredSize();
+
+	BSize size = (GetLayout() ? GetLayout()->MinSize()
+		: fLayoutData->preferred);
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+
+
+BSize
+BMenu::MaxSize()
+{
+	_ValidatePreferredSize();
+
+	BSize size = (GetLayout() ? GetLayout()->MaxSize()
+		: fLayoutData->preferred);
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
+}
+
+
+BSize
+BMenu::PreferredSize()
+{
+	_ValidatePreferredSize();
+
+	BSize size = (GetLayout() ? GetLayout()->PreferredSize()
+		: fLayoutData->preferred);
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
+}
+
+
+void
+BMenu::GetPreferredSize(float* _width, float* _height)
+{
+	_ValidatePreferredSize();
+
+	if (_width)
+		*_width = fLayoutData->preferred.width;
+	if (_height)
+		*_height = fLayoutData->preferred.height;
+}
+
+
+void
+BMenu::ResizeToPreferred()
+{
+	BView::ResizeToPreferred();
+}
+
+
+void
+BMenu::DoLayout()
+{
+	// If the user set a layout, we let the base class version call its
+	// hook.
+	if (GetLayout()) {
+		BView::DoLayout();
+		return;
+	}
+
+	if (_RelayoutIfNeeded())
+		Invalidate();
+}
+
+
+void
+BMenu::FrameMoved(BPoint new_position)
+{
+	BView::FrameMoved(new_position);
+}
+
+
+void
+BMenu::FrameResized(float new_width, float new_height)
+{
+	BView::FrameResized(new_width, new_height);
+}
+
+
+void
+BMenu::InvalidateLayout()
+{
+	InvalidateLayout(false);
+}
+
+
+void
+BMenu::InvalidateLayout(bool descendants)
+{
+	fUseCachedMenuLayout = false;
+	fLayoutData->preferred.Set(B_SIZE_UNSET, B_SIZE_UNSET);
+
+	BView::InvalidateLayout(descendants);
+}
+
+
+// #pragma mark -
+
+
+void
+BMenu::MakeFocus(bool focused)
+{
+	BView::MakeFocus(focused);
 }
 
 
@@ -589,8 +876,10 @@ bool
 BMenu::RemoveItem(BMenu* submenu)
 {
 	for (int32 i = 0; i < fItems.CountItems(); i++) {
-		if (static_cast<BMenuItem*>(fItems.ItemAtFast(i))->Submenu() == submenu)
+		if (static_cast<BMenuItem*>(fItems.ItemAtFast(i))->Submenu()
+				== submenu) {
 			return _RemoveItems(i, 1, NULL, false);
+		}
 	}
 
 	return false;
@@ -827,246 +1116,7 @@ BMenu::Superitem() const
 }
 
 
-void
-BMenu::MessageReceived(BMessage* msg)
-{
-	switch (msg->what) {
-		case B_MOUSE_WHEEL_CHANGED:
-		{
-			float deltaY = 0;
-			msg->FindFloat("be:wheel_delta_y", &deltaY);
-			if (deltaY == 0)
-				return;
-
-			BMenuWindow* window = dynamic_cast<BMenuWindow*>(Window());
-			if (window == NULL)
-				return;
-
-			float largeStep;
-			float smallStep;
-			window->GetSteps(&smallStep, &largeStep);
-
-			// pressing the option/command/control key scrolls faster
-			if (modifiers() & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY))
-				deltaY *= largeStep;
-			else
-				deltaY *= smallStep;
-
-			window->TryScrollBy(deltaY);
-			break;
-		}
-
-		default:
-			BView::MessageReceived(msg);
-			break;
-	}
-}
-
-
-void
-BMenu::KeyDown(const char* bytes, int32 numBytes)
-{
-	// TODO: Test how it works on beos and implement it correctly
-	switch (bytes[0]) {
-		case B_UP_ARROW:
-			if (fLayout == B_ITEMS_IN_COLUMN)
-				_SelectNextItem(fSelected, false);
-			break;
-
-		case B_DOWN_ARROW:
-			if (fLayout == B_ITEMS_IN_COLUMN)
-				_SelectNextItem(fSelected, true);
-			break;
-
-		case B_LEFT_ARROW:
-			if (fLayout == B_ITEMS_IN_ROW)
-				_SelectNextItem(fSelected, false);
-			else {
-				// this case has to be handled a bit specially.
-				BMenuItem* item = Superitem();
-				if (item) {
-					if (dynamic_cast<BMenuBar*>(Supermenu())) {
-						// if we're at the top menu below the menu bar, pass the keypress to
-						// the menu bar so we can move to another top level menu
-						BMessenger msgr(Supermenu());
-						msgr.SendMessage(Window()->CurrentMessage());
-					} else
-						Supermenu()->_SelectItem(item, false, false);
-				}
-			}
-			break;
-
-		case B_RIGHT_ARROW:
-			if (fLayout == B_ITEMS_IN_ROW)
-				_SelectNextItem(fSelected, true);
-			else {
-				if (fSelected && fSelected->Submenu()) {
-					_SelectItem(fSelected, true, true);
-				} else if (dynamic_cast<BMenuBar*>(Supermenu())) {
-					// if we have no submenu and we're an
-					// item in the top menu below the menubar,
-					// pass the keypress to the menubar
-					// so you can use the keypress to switch menus.
-					BMessenger msgr(Supermenu());
-					msgr.SendMessage(Window()->CurrentMessage());
-				}
-			}
-			break;
-
-		case B_PAGE_UP:
-		case B_PAGE_DOWN:
-		{
-			BMenuWindow* window = dynamic_cast<BMenuWindow*>(Window());
-			if (window == NULL || !window->HasScrollers())
-				break;
-
-			int32 deltaY = bytes[0] == B_PAGE_UP ? -1 : 1;
-
-			float largeStep;
-			window->GetSteps(NULL, &largeStep);
-			window->TryScrollBy(deltaY * largeStep);
-			break;
-		}
-
-		case B_ENTER:
-		case B_SPACE:
-			if (fSelected) {
-				_InvokeItem(fSelected);
-				_QuitTracking(false);
-			}
-			break;
-
-		case B_ESCAPE:
-			_QuitTracking();
-			break;
-
-		default:
-		{
-			uint32 trigger = UTF8ToCharCode(&bytes);
-
-			for (uint32 i = CountItems(); i-- > 0;) {
-				BMenuItem* item = ItemAt(i);
-				if (item->fTriggerIndex < 0 || item->fTrigger != trigger)
-					continue;
-
-				_InvokeItem(item);
-			}
-			break;
-		}
-	}
-}
-
-
-void
-BMenu::Draw(BRect updateRect)
-{
-	if (_RelayoutIfNeeded()) {
-		Invalidate();
-		return;
-	}
-
-
-	DrawBackground(updateRect);
-	_DrawItems(updateRect);
-}
-
-
-BSize
-BMenu::MinSize()
-{
-	_ValidatePreferredSize();
-
-	BSize size = (GetLayout() ? GetLayout()->MinSize()
-		: fLayoutData->preferred);
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
-}
-
-
-BSize
-BMenu::MaxSize()
-{
-	_ValidatePreferredSize();
-
-	BSize size = (GetLayout() ? GetLayout()->MaxSize()
-		: fLayoutData->preferred);
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
-}
-
-
-BSize
-BMenu::PreferredSize()
-{
-	_ValidatePreferredSize();
-
-	BSize size = (GetLayout() ? GetLayout()->PreferredSize()
-		: fLayoutData->preferred);
-	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
-}
-
-
-void
-BMenu::GetPreferredSize(float* _width, float* _height)
-{
-	_ValidatePreferredSize();
-
-	if (_width)
-		*_width = fLayoutData->preferred.width;
-	if (_height)
-		*_height = fLayoutData->preferred.height;
-}
-
-
-void
-BMenu::ResizeToPreferred()
-{
-	BView::ResizeToPreferred();
-}
-
-
-void
-BMenu::DoLayout()
-{
-	// If the user set a layout, we let the base class version call its
-	// hook.
-	if (GetLayout()) {
-		BView::DoLayout();
-		return;
-	}
-
-	if (_RelayoutIfNeeded())
-		Invalidate();
-}
-
-
-void
-BMenu::FrameMoved(BPoint new_position)
-{
-	BView::FrameMoved(new_position);
-}
-
-
-void
-BMenu::FrameResized(float new_width, float new_height)
-{
-	BView::FrameResized(new_width, new_height);
-}
-
-
-void
-BMenu::InvalidateLayout()
-{
-	InvalidateLayout(false);
-}
-
-
-void
-BMenu::InvalidateLayout(bool descendants)
-{
-	fUseCachedMenuLayout = false;
-	fLayoutData->preferred.Set(B_SIZE_UNSET, B_SIZE_UNSET);
-
-	BView::InvalidateLayout(descendants);
-}
+// #pragma mark -
 
 
 BHandler*
@@ -1191,30 +1241,10 @@ BMenu::Perform(perform_code code, void* _data)
 }
 
 
-void
-BMenu::MakeFocus(bool focused)
-{
-	BView::MakeFocus(focused);
-}
-
-
-void
-BMenu::AllAttached()
-{
-	BView::AllAttached();
-}
-
-
-void
-BMenu::AllDetached()
-{
-	BView::AllDetached();
-}
-
-
 BMenu::BMenu(BRect frame, const char* name, uint32 resizingMode, uint32 flags,
 		menu_layout layout, bool resizeToFit)
-	: BView(frame, name, resizingMode, flags),
+	:
+	BView(frame, name, resizingMode, flags),
 	fChosenItem(NULL),
 	fSelected(NULL),
 	fCachedMenuWindow(NULL),
@@ -1467,7 +1497,8 @@ BMenu::_Show(bool selectFirstItem)
 		// Menu didn't have the time to add its items: aborting...
 		if (fAttachAborted) {
 			window->DetachMenu();
-			// TODO: Probably not needed, we can just let _hide() quit the window
+			// TODO: Probably not needed, we can just let _hide() quit the
+			// window.
 			if (ourWindow)
 				window->Quit();
 			else
@@ -1518,7 +1549,8 @@ BMenu::_Hide()
 
 const static bigtime_t kOpenSubmenuDelay = 225000;
 const static bigtime_t kNavigationAreaTimeout = 1000000;
-const static bigtime_t kHysteresis = 200000; // TODO: Test and reduce if needed.
+const static bigtime_t kHysteresis = 200000;
+	// TODO: Test and reduce if needed.
 const static int32 kMouseMotionThreshold = 15;
 	// TODO: Same as above. Actually, we could get rid of the kHysteresis
 
@@ -1795,7 +1827,8 @@ BMenu::_UpdateStateOpenSelect(BMenuItem* item, BPoint position,
 			float yOffset = navAreaRectBelow.bottom - position.y;
 			float ratio = navAreaRectBelow.Width() / navAreaRectBelow.Height();
 
-			inNavArea = yOffset >= (navAreaRectBelow.Height() - xOffset / ratio);
+			inNavArea = yOffset >= (navAreaRectBelow.Height() - xOffset
+				/ ratio);
 		}
 
 		bigtime_t systime = system_time();
@@ -1823,7 +1856,8 @@ BMenu::_UpdateStateOpenSelect(BMenuItem* item, BPoint position,
 
 		if (!navAreaRectAbove.IsValid() && !navAreaRectBelow.IsValid()) {
 			position = ConvertToScreen(position);
-			_UpdateNavigationArea(position, navAreaRectAbove, navAreaRectBelow);
+			_UpdateNavigationArea(position, navAreaRectAbove,
+				navAreaRectBelow);
 		}
 	}
 
@@ -1896,7 +1930,8 @@ BMenu::_AddItem(BMenuItem* item, int32 index)
 
 
 bool
-BMenu::_RemoveItems(int32 index, int32 count, BMenuItem* item, bool deleteItems)
+BMenu::_RemoveItems(int32 index, int32 count, BMenuItem* item,
+	bool deleteItems)
 {
 	bool success = false;
 	bool invalidateLayout = false;
@@ -2229,8 +2264,10 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 		else if (frame.left < screenFrame.left)
 			frame.OffsetBy(-frame.left, 0);
 	} else if (superMenu->Layout() == B_ITEMS_IN_COLUMN) {
-		if (frame.right > screenFrame.right)
-			frame.OffsetBy(-superItem->Frame().Width() - frame.Width() - 2, 0);
+		if (frame.right > screenFrame.right) {
+			frame.OffsetBy(-superItem->Frame().Width() - frame.Width() - 2,
+				0);
+		}
 
 		if (frame.left < 0)
 			frame.OffsetBy(-frame.left + 6, 0);
@@ -2244,7 +2281,8 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 				&& frame.top < (screenFrame.bottom - 80)) {
 				scroll = true;
 			} else {
-				frame.OffsetBy(0, -superItem->Frame().Height() - frame.Height() - 3);
+				frame.OffsetBy(0, -superItem->Frame().Height()
+					- frame.Height() - 3);
 			}
 		}
 
@@ -2531,8 +2569,10 @@ BMenu::_NextItem(BMenuItem* item, bool forward) const
 			index = 0;
 	} while (!ItemAt(index)->IsEnabled() && index != startIndex);
 
-	if (index == startIndex) // we are back where we started and no item was enabled
+	if (index == startIndex) {
+		// We are back where we started and no item was enabled.
 		return NULL;
+	}
 
 	return ItemAt(index);
 }
@@ -2698,7 +2738,8 @@ BMenu::_OkToProceed(BMenuItem* item)
 	// or releases the mouse button in nonsticky mode
 	// or moves the pointer over another item
 	// TODO: I added the check for BMenuBar to solve a problem with Deskbar.
-	// BeOS seems to do something similar. This could also be a bug in Deskbar, though.
+	// BeOS seems to do something similar. This could also be a bug in
+	// Deskbar, though.
 	if ((buttons != 0 && stickyMode)
 		|| ((dynamic_cast<BMenuBar*>(this) == NULL
 			&& (buttons == 0 && !stickyMode)) || _HitTestItems(where) != item))
@@ -2713,7 +2754,8 @@ BMenu::_CustomTrackingWantsToQuit()
 {
 	if (fExtraMenuData != NULL && fExtraMenuData->trackingHook != NULL
 		&& fExtraMenuData->trackingState != NULL) {
-		return fExtraMenuData->trackingHook(this, fExtraMenuData->trackingState);
+		return fExtraMenuData->trackingHook(this,
+			fExtraMenuData->trackingState);
 	}
 
 	return false;
@@ -2741,7 +2783,8 @@ BMenu::_QuitTracking(bool onlyThis)
 //	#pragma mark -
 
 
-// TODO: Maybe the following two methods would fit better into InterfaceDefs.cpp
+// TODO: Maybe the following two methods would fit better into
+// InterfaceDefs.cpp
 // In R5, they do all the work client side, we let the app_server handle the
 // details.
 status_t
