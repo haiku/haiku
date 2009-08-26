@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Dustin Howett, dustin.howett@gmail.com. All rights reserved.
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -75,7 +75,8 @@ smp_get_current_cpu(void)
 	if (gKernelArgs.arch_args.apic == NULL)
 		return 0;
 
-	return gKernelArgs.arch_args.cpu_os_id[(apic_read(APIC_ID) & 0xffffffff) >> 24];
+	return gKernelArgs.arch_args.cpu_os_id[
+		(apic_read(APIC_ID) & 0xffffffff) >> 24];
 }
 
 
@@ -85,7 +86,8 @@ smp_mp_probe(uint32 base, uint32 limit)
 	TRACE(("smp_mp_probe: entry base 0x%lx, limit 0x%lx\n", base, limit));
 	for (uint32 *pointer = (uint32 *)base; (uint32)pointer < limit; pointer++) {
 		if (*pointer == MP_FLOATING_SIGNATURE) {
-			TRACE(("smp_mp_probe: found floating pointer structure at %p\n", pointer));
+			TRACE(("smp_mp_probe: found floating pointer structure at %p\n",
+				pointer));
 			return (mp_floating_struct *)pointer;
 		}
 	}
@@ -105,32 +107,32 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 
 	if (floatingStruct->config_table == NULL) {
 #if 1
-		// XXX need to implement
-		TRACE(("smp: standard configuration %d unimplemented\n", floatingStruct->mp_feature_1));
+		// TODO: need to implement
+		TRACE(("smp: standard configuration %d unimplemented\n",
+			floatingStruct->mp_feature_1));
 		gKernelArgs.num_cpus = 1;
 		return B_OK;
 #else
-		/* this system conforms to one of the default configurations */
+		// this system conforms to one of the default configurations
 		TRACE(("smp: standard configuration %d\n", floatingStruct->mp_feature_1));
 		gKernelArgs.num_cpus = 2;
 		gKernelArgs.cpu_apic_id[0] = 0;
 		gKernelArgs.cpu_apic_id[1] = 1;
-		apic_phys = (unsigned int *) 0xfee00000;
-		ioapic_phys = (unsigned int *) 0xfec00000;
+		apic_phys = (unsigned int *)0xfee00000;
+		ioapic_phys = (unsigned int *)0xfec00000;
 		dprintf("smp: WARNING: standard configuration code is untested");
 		return B_OK;
 #endif
 	}
 
-	/*
-	 * we are not running in standard configuration, so we have to look through
-	 * all of the mp configuration table crap to figure out how many processors
-	 * we have, where our apics are, etc.
-	 */
+	// We are not running in standard configuration, so we have to look through
+	// all of the mp configuration table crap to figure out how many processors
+	// we have, where our apics are, etc.
+
 	mp_config_table *config = floatingStruct->config_table;
 	gKernelArgs.num_cpus = 0;
 
-	/* print out our new found configuration. */
+	// print our new found configuration.
 	TRACE(("smp: oem id: %.8s product id: %.12s\n", config->oem,
 		config->product));
 	TRACE(("smp: base table has %d entries, extended section %d bytes\n",
@@ -143,32 +145,39 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 		switch (*pointer) {
 			case MP_BASE_PROCESSOR:
 			{
-				struct mp_base_processor *processor = (struct mp_base_processor *)pointer;
+				struct mp_base_processor *processor
+					= (struct mp_base_processor *)pointer;
 				pointer += sizeof(struct mp_base_processor);
 
 				if (gKernelArgs.num_cpus == MAX_BOOT_CPUS) {
-					TRACE(("smp: already reached maximum boot CPUs (%d)\n", MAX_BOOT_CPUS));
+					TRACE(("smp: already reached maximum boot CPUs (%d)\n",
+						MAX_BOOT_CPUS));
 					continue;
 				}
 
-				/* skip if the processor is not enabled. */
+				// skip if the processor is not enabled.
 				if (!(processor->cpu_flags & 0x1)) {
-					TRACE(("smp: skip apic id %d: disabled\n", processor->apic_id));
+					TRACE(("smp: skip apic id %d: disabled\n",
+						processor->apic_id));
 					continue;
 				}
 
-				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = processor->apic_id;
-				gKernelArgs.arch_args.cpu_os_id[processor->apic_id] = gKernelArgs.num_cpus;
-				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = processor->apic_version;
+				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus]
+					= processor->apic_id;
+				gKernelArgs.arch_args.cpu_os_id[processor->apic_id]
+					= gKernelArgs.num_cpus;
+				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus]
+					= processor->apic_version;
 
 #ifdef TRACE_SMP
 				const char *cpuFamily[] = { "", "", "", "", "Intel 486",
 					"Intel Pentium", "Intel Pentium Pro", "Intel Pentium II" };
 #endif
 				TRACE(("smp: cpu#%ld: %s, apic id %d, version %d%s\n",
-					gKernelArgs.num_cpus, cpuFamily[(processor->signature & 0xf00) >> 8],
-					processor->apic_id, processor->apic_version, (processor->cpu_flags & 0x2) ?
-					", BSP" : ""));
+					gKernelArgs.num_cpus,
+					cpuFamily[(processor->signature & 0xf00) >> 8],
+					processor->apic_id, processor->apic_version,
+					(processor->cpu_flags & 0x2) ? ", BSP" : ""));
 
 				gKernelArgs.num_cpus++;
 				break;
@@ -199,10 +208,12 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 			case MP_BASE_IO_INTR:
 			case MP_BASE_LOCAL_INTR:
 			{
-				struct mp_base_interrupt *interrupt = (struct mp_base_interrupt *)pointer;
+				struct mp_base_interrupt *interrupt
+					= (struct mp_base_interrupt *)pointer;
 				pointer += sizeof(struct mp_base_interrupt);
 
-				dprintf("smp: %s int: type %d, source bus %d, irq %3d, dest apic %d, int %3d, polarity %d, trigger mode %d\n",
+				dprintf("smp: %s int: type %d, source bus %d, irq %3d, dest "
+					"apic %d, int %3d, polarity %d, trigger mode %d\n",
 					interrupt->type == MP_BASE_IO_INTR ? "I/O" : "local",
 					interrupt->interrupt_type, interrupt->source_bus_id,
 					interrupt->source_bus_irq, interrupt->dest_apic_id,
@@ -247,21 +258,26 @@ smp_do_acpi_config(void)
 			case ACPI_MADT_LOCAL_APIC:
 			{
 				if (gKernelArgs.num_cpus == MAX_BOOT_CPUS) {
-					TRACE(("smp: already reached maximum boot CPUs (%d)\n", MAX_BOOT_CPUS));
+					TRACE(("smp: already reached maximum boot CPUs (%d)\n",
+						MAX_BOOT_CPUS));
 					break;
 				}
 
 				acpi_local_apic *localApic = (acpi_local_apic *)apic;
-				TRACE(("smp: found local APIC with id %u\n", localApic->apic_id));
+				TRACE(("smp: found local APIC with id %u\n",
+					localApic->apic_id));
 				if ((localApic->flags & ACPI_LOCAL_APIC_ENABLED) == 0) {
 					TRACE(("smp: APIC is disabled and will not be used\n"));
 					break;
 				}
 
-				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = localApic->apic_id;
-				gKernelArgs.arch_args.cpu_os_id[localApic->apic_id] = gKernelArgs.num_cpus;
-				// ToDo: how to find out? putting 0x10 in to indicate a local apic
-				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = 0x10;
+				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus]
+					= localApic->apic_id;
+				gKernelArgs.arch_args.cpu_os_id[localApic->apic_id]
+					= gKernelArgs.num_cpus;
+				// TODO: how to find out? putting 0x10 in to indicate a local apic
+				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus]
+					= 0x10;
 				gKernelArgs.num_cpus++;
 				break;
 			}
@@ -282,13 +298,12 @@ smp_do_acpi_config(void)
 }
 
 
-/** Target function of the trampoline code.
- *	The trampoline code should have the pgdir and a gdt set up for us,
- *	along with us being on the final stack for this processor. We need
- *	to set up the local APIC and load the global idt and gdt. When we're
- *	done, we'll jump into the kernel with the cpu number as an argument.
- */
-
+/*!	Target function of the trampoline code.
+	The trampoline code should have the pgdir and a gdt set up for us,
+	along with us being on the final stack for this processor. We need
+	to set up the local APIC and load the global idt and gdt. When we're
+	done, we'll jump into the kernel with the cpu number as an argument.
+*/
 static int
 smp_cpu_ready(void)
 {
@@ -322,7 +337,8 @@ smp_cpu_ready(void)
 		"pushl 	$0x0;"					// dummy retval for call to main
 		"pushl 	%2;	"					// this is the start address
 		"ret;		"					// jump.
-		: : "g" (curr_cpu), "g" (&gKernelArgs), "g" (gKernelArgs.kernel_image.elf_header.e_entry));
+		: : "g" (curr_cpu), "g" (&gKernelArgs),
+			"g" (gKernelArgs.kernel_image.elf_header.e_entry));
 
 	// no where to return to
 	return 0;
@@ -338,7 +354,8 @@ calculate_apic_timer_conversion_factor(void)
 
 	// setup the timer
 	config = apic_read(APIC_LVT_TIMER);
-	config = (config & APIC_LVT_TIMER_MASK) + APIC_LVT_MASKED; // timer masked, vector 0
+	config = (config & APIC_LVT_TIMER_MASK) + APIC_LVT_MASKED;
+		// timer masked, vector 0
 	apic_write(APIC_LVT_TIMER, config);
 
 	config = (apic_read(APIC_TIMER_DIVIDE_CONFIG) & ~0x0000000f);
@@ -355,9 +372,11 @@ calculate_apic_timer_conversion_factor(void)
 
 	count = 0xffffffff - count;
 
-	gKernelArgs.arch_args.apic_time_cv_factor = (uint32)((1000000.0/(t2 - t1)) * count);
+	gKernelArgs.arch_args.apic_time_cv_factor
+		= (uint32)((1000000.0/(t2 - t1)) * count);
 
-	TRACE(("APIC ticks/sec = %ld\n", gKernelArgs.arch_args.apic_time_cv_factor));
+	TRACE(("APIC ticks/sec = %ld\n",
+		gKernelArgs.arch_args.apic_time_cv_factor));
 }
 
 
@@ -369,7 +388,8 @@ smp_init_other_cpus(void)
 {
 	void *handle = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
 	if (handle != NULL) {
-		if (get_driver_boolean_parameter(handle, B_SAFEMODE_DISABLE_SMP, false, false)) {
+		if (get_driver_boolean_parameter(handle, B_SAFEMODE_DISABLE_SMP, false,
+				false)) {
 			// SMP has been disabled!
 			TRACE(("smp disabled per safemode setting\n"));
 			gKernelArgs.num_cpus = 1;
@@ -380,9 +400,11 @@ smp_init_other_cpus(void)
 	if (gKernelArgs.arch_args.apic_phys == 0)
 		return;
 
-	TRACE(("smp: found %ld cpu%s\n", gKernelArgs.num_cpus, gKernelArgs.num_cpus != 1 ? "s" : ""));
+	TRACE(("smp: found %ld cpu%s\n", gKernelArgs.num_cpus,
+		gKernelArgs.num_cpus != 1 ? "s" : ""));
 	TRACE(("smp: apic_phys = %p\n", (void *)gKernelArgs.arch_args.apic_phys));
-	TRACE(("smp: ioapic_phys = %p\n", (void *)gKernelArgs.arch_args.ioapic_phys));
+	TRACE(("smp: ioapic_phys = %p\n",
+		(void *)gKernelArgs.arch_args.ioapic_phys));
 
 	// map in the apic & ioapic (if available)
 	gKernelArgs.arch_args.apic = (uint32 *)mmu_map_physical_memory(
@@ -419,8 +441,8 @@ smp_boot_other_cpus(void)
 
 	TRACE(("trampolining other cpus\n"));
 
-	// The first 8 MB are identity mapped, either 0x9e000-0x9ffff is reserved for
-	// this, or when PXE services are used 0x8b000-0x8cfff.
+	// The first 8 MB are identity mapped, either 0x9e000-0x9ffff is reserved
+	// for this, or when PXE services are used 0x8b000-0x8cfff.
 
 	// allocate a stack and a code area for the smp trampoline
 	// (these have to be < 1M physical, 0xa0000-0xfffff is reserved by the BIOS,
@@ -468,7 +490,8 @@ smp_boot_other_cpus(void)
 		*((uint32 *)(trampolineStack + 2)) = trampolineStack + 8;
 
 		// put the gdt at the bottom
-		memcpy(&((uint32 *)trampolineStack)[2], (void *)gKernelArgs.arch_args.vir_gdt, 6*4);
+		memcpy(&((uint32 *)trampolineStack)[2],
+			(void *)gKernelArgs.arch_args.vir_gdt, 6 * 4);
 
 		/* clear apic errors */
 		if (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0) {
@@ -482,7 +505,8 @@ smp_boot_other_cpus(void)
 			| (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
 		apic_write(APIC_INTR_COMMAND_2, config); /* set target pe */
 		config = (apic_read(APIC_INTR_COMMAND_1) & 0xfff00000)
-			| APIC_TRIGGER_MODE_LEVEL | APIC_INTR_COMMAND_1_ASSERT | APIC_DELIVERY_MODE_INIT;
+			| APIC_TRIGGER_MODE_LEVEL | APIC_INTR_COMMAND_1_ASSERT
+			| APIC_DELIVERY_MODE_INIT;
 		apic_write(APIC_INTR_COMMAND_1, config);
 
 dprintf("wait for delivery\n");
@@ -508,7 +532,8 @@ dprintf("wait for delivery\n");
 		spin(10000);
 
 		/* is this a local apic or an 82489dx ? */
-		numStartups = (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0) ? 2 : 0;
+		numStartups = (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0)
+			? 2 : 0;
 dprintf("num startups = %ld\n", numStartups);
 		for (j = 0; j < numStartups; j++) {
 			/* it's a local apic, so send STARTUP IPIs */
