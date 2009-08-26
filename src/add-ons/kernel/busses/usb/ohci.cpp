@@ -1664,7 +1664,7 @@ OHCI::_ReadDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 
 		size_t bufferSize = current->buffer_size;
 		if (current->buffer_physical != 0) {
-			bufferSize = current->last_physical_byte_address
+			bufferSize -= current->last_physical_byte_address
 				- current->buffer_physical + 1;
 		}
 
@@ -1716,7 +1716,7 @@ OHCI::_ReadActualLength(ohci_general_td *topDescriptor)
 		!= OHCI_TD_CONDITION_NOT_ACCESSED) {
 		size_t length = current->buffer_size;
 		if (current->buffer_physical != 0) {
-			length = current->last_physical_byte_address
+			length -= current->last_physical_byte_address
 				- current->buffer_physical + 1;
 		}
 
