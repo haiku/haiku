@@ -520,6 +520,8 @@ error_description(int error)
 			return "STREAM ioctl() timeout";
 		case ETXTBSY:
 			return "Text file busy";
+		case ENOATTR:
+			return "No such attribute";
 
 		default:
 			return NULL;
