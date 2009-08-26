@@ -1,13 +1,15 @@
 /*
- * Copyright (c) 2001-2008, Haiku Inc. All rights reserved.
- * Distributed under the terms of the MIT/X11 license.
+ * Copyright 2001-2008, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef	_RADIO_BUTTON_H
 #define	_RADIO_BUTTON_H
 
+
 #include <BeBuild.h>
 #include <Control.h>
 #include <Bitmap.h>
+
 
 class BRadioButton : public BControl {
 public:
@@ -34,7 +36,8 @@ public:
 	virtual	void				AttachedToWindow();
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				SetValue(int32 value);
-	virtual	void				GetPreferredSize(float* _width, float* _height);
+	virtual	void				GetPreferredSize(float* _width,
+									float* _height);
 	virtual	void				ResizeToPreferred();
 	virtual	status_t			Invoke(BMessage* message = NULL);
 
@@ -70,7 +73,8 @@ private:
 			BRadioButton&		operator=(const BRadioButton& other);
 
 			BRect				_KnobFrame() const;
-			BRect				_KnobFrame(const font_height& fontHeight) const;
+			BRect				_KnobFrame(
+									const font_height& fontHeight) const;
 			void				_Redraw();
 				// for use in "synchronous" BWindows
 
