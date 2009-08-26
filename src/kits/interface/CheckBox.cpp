@@ -1,15 +1,18 @@
 /*
- * Copyright 2001-2007, Haiku Inc.
+ * Copyright 2001-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 /*!	BCheckBox displays an on/off control. */
 
 
 #include <CheckBox.h>
+
+#include <new>
 
 #include <ControlLook.h>
 #include <LayoutUtils.h>
@@ -36,17 +39,27 @@ BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
 
 BCheckBox::BCheckBox(const char *name, const char *label, BMessage *message,
 	uint32 flags)
-	: BControl(name, label, message, flags | B_WILL_DRAW | B_NAVIGABLE),
-	  fPreferredSize(),
-	  fOutlined(false)
+	:
+	BControl(name, label, message, flags | B_WILL_DRAW | B_NAVIGABLE),
+	fPreferredSize(),
+	fOutlined(false)
 {
 }
 
 
 BCheckBox::BCheckBox(const char *label, BMessage *message)
-	: BControl(NULL, label, message, B_WILL_DRAW | B_NAVIGABLE),
-	  fPreferredSize(),
-	  fOutlined(false)
+	:
+	BControl(NULL, label, message, B_WILL_DRAW | B_NAVIGABLE),
+	fPreferredSize(),
+	fOutlined(false)
+{
+}
+
+
+BCheckBox::BCheckBox(BMessage *archive)
+	:
+	BControl(archive),
+	fOutlined(false)
 {
 }
 
@@ -56,18 +69,14 @@ BCheckBox::~BCheckBox()
 }
 
 
-BCheckBox::BCheckBox(BMessage *archive)
-	: BControl(archive),
-	fOutlined(false)
-{
-}
+// #pragma mark -
 
 
 BArchivable *
 BCheckBox::Instantiate(BMessage *archive)
 {
 	if (validate_instantiation(archive, "BCheckBox"))
-		return new BCheckBox(archive);
+		return new(std::nothrow) BCheckBox(archive);
 
 	return NULL;
 }
@@ -78,6 +87,9 @@ BCheckBox::Archive(BMessage *archive, bool deep) const
 {
 	return BControl::Archive(archive, deep);
 }
+
+
+// #pragma mark -
 
 
 void
@@ -255,6 +267,65 @@ BCheckBox::AttachedToWindow()
 
 
 void
+BCheckBox::DetachedFromWindow()
+{
+	BControl::DetachedFromWindow();
+}
+
+
+void
+BCheckBox::AllAttached()
+{
+	BControl::AllAttached();
+}
+
+
+void
+BCheckBox::AllDetached()
+{
+	BControl::AllDetached();
+}
+
+
+void
+BCheckBox::FrameMoved(BPoint newLocation)
+{
+	BControl::FrameMoved(newLocation);
+}
+
+
+void
+BCheckBox::FrameResized(float width, float height)
+{
+	BControl::FrameResized(width, height);
+}
+
+
+void
+BCheckBox::WindowActivated(bool active)
+{
+	BControl::WindowActivated(active);
+}
+
+
+// #pragma mark -
+
+
+void
+BCheckBox::MessageReceived(BMessage *message)
+{
+	BControl::MessageReceived(message);
+}
+
+
+void
+BCheckBox::KeyDown(const char *bytes, int32 numBytes)
+{
+	BControl::KeyDown(bytes, numBytes);
+}
+
+
+void
 BCheckBox::MouseDown(BPoint point)
 {
 	if (!IsEnabled())
@@ -299,27 +370,6 @@ BCheckBox::MouseDown(BPoint point)
 
 
 void
-BCheckBox::MessageReceived(BMessage *message)
-{
-	BControl::MessageReceived(message);
-}
-
-
-void
-BCheckBox::WindowActivated(bool active)
-{
-	BControl::WindowActivated(active);
-}
-
-
-void
-BCheckBox::KeyDown(const char *bytes, int32 numBytes)
-{
-	BControl::KeyDown(bytes, numBytes);
-}
-
-
-void
 BCheckBox::MouseUp(BPoint point)
 {
 	if (!IsTracking())
@@ -359,24 +409,7 @@ BCheckBox::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 }
 
 
-void
-BCheckBox::DetachedFromWindow()
-{
-	BControl::DetachedFromWindow();
-}
-
-
-void
-BCheckBox::SetValue(int32 value)
-{
-	value = value ? B_CONTROL_ON : B_CONTROL_OFF;
-		// we only accept boolean values
-
-	if (value != Value()) {
-		BControl::SetValueNoUpdate(value);
-		Invalidate(_CheckBoxFrame());
-	}
-}
+// #pragma mark -
 
 
 void
@@ -403,120 +436,6 @@ void
 BCheckBox::ResizeToPreferred()
 {
 	BControl::ResizeToPreferred();
-}
-
-
-status_t
-BCheckBox::Invoke(BMessage *message)
-{
-	return BControl::Invoke(message);
-}
-
-
-void
-BCheckBox::FrameMoved(BPoint newLocation)
-{
-	BControl::FrameMoved(newLocation);
-}
-
-
-void
-BCheckBox::FrameResized(float width, float height)
-{
-	BControl::FrameResized(width, height);
-}
-
-
-BHandler *
-BCheckBox::ResolveSpecifier(BMessage *message, int32 index,
-	BMessage *specifier, int32 what, const char *property)
-{
-	return BControl::ResolveSpecifier(message, index, specifier, what,
-		property);
-}
-
-
-status_t
-BCheckBox::GetSupportedSuites(BMessage *message)
-{
-	return BControl::GetSupportedSuites(message);
-}
-
-
-void
-BCheckBox::MakeFocus(bool focused)
-{
-	BControl::MakeFocus(focused);
-}
-
-
-void
-BCheckBox::AllAttached()
-{
-	BControl::AllAttached();
-}
-
-
-void
-BCheckBox::AllDetached()
-{
-	BControl::AllDetached();
-}
-
-
-status_t
-BCheckBox::Perform(perform_code code, void* _data)
-{
-	switch (code) {
-		case PERFORM_CODE_MIN_SIZE:
-			((perform_data_min_size*)_data)->return_value
-				= BCheckBox::MinSize();
-			return B_OK;
-		case PERFORM_CODE_MAX_SIZE:
-			((perform_data_max_size*)_data)->return_value
-				= BCheckBox::MaxSize();
-			return B_OK;
-		case PERFORM_CODE_PREFERRED_SIZE:
-			((perform_data_preferred_size*)_data)->return_value
-				= BCheckBox::PreferredSize();
-			return B_OK;
-		case PERFORM_CODE_LAYOUT_ALIGNMENT:
-			((perform_data_layout_alignment*)_data)->return_value
-				= BCheckBox::LayoutAlignment();
-			return B_OK;
-		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
-			((perform_data_has_height_for_width*)_data)->return_value
-				= BCheckBox::HasHeightForWidth();
-			return B_OK;
-		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
-		{
-			perform_data_get_height_for_width* data
-				= (perform_data_get_height_for_width*)_data;
-			BCheckBox::GetHeightForWidth(data->width, &data->min, &data->max,
-				&data->preferred);
-			return B_OK;
-}
-		case PERFORM_CODE_SET_LAYOUT:
-		{
-			perform_data_set_layout* data = (perform_data_set_layout*)_data;
-			BCheckBox::SetLayout(data->layout);
-			return B_OK;
-		}
-		case PERFORM_CODE_INVALIDATE_LAYOUT:
-		{
-			perform_data_invalidate_layout* data
-				= (perform_data_invalidate_layout*)_data;
-			BCheckBox::InvalidateLayout(data->descendants);
-			return B_OK;
-		}
-		case PERFORM_CODE_DO_LAYOUT:
-		{
-			BCheckBox::DoLayout();
-			return B_OK;
-		}
-	}
-
-	return BControl::Perform(code, _data);
 }
 
 
@@ -554,16 +473,114 @@ BCheckBox::PreferredSize()
 }
 
 
+// #pragma mark -
+
+
+void
+BCheckBox::MakeFocus(bool focused)
+{
+	BControl::MakeFocus(focused);
+}
+
+
+void
+BCheckBox::SetValue(int32 value)
+{
+	value = value ? B_CONTROL_ON : B_CONTROL_OFF;
+		// we only accept boolean values
+
+	if (value != Value()) {
+		BControl::SetValueNoUpdate(value);
+		Invalidate(_CheckBoxFrame());
+	}
+}
+
+
+status_t
+BCheckBox::Invoke(BMessage *message)
+{
+	return BControl::Invoke(message);
+}
+
+
+BHandler *
+BCheckBox::ResolveSpecifier(BMessage *message, int32 index,
+	BMessage *specifier, int32 what, const char *property)
+{
+	return BControl::ResolveSpecifier(message, index, specifier, what,
+		property);
+}
+
+
+status_t
+BCheckBox::GetSupportedSuites(BMessage *message)
+{
+	return BControl::GetSupportedSuites(message);
+}
+
+
+status_t
+BCheckBox::Perform(perform_code code, void* _data)
+{
+	switch (code) {
+		case PERFORM_CODE_MIN_SIZE:
+			((perform_data_min_size*)_data)->return_value
+				= BCheckBox::MinSize();
+			return B_OK;
+		case PERFORM_CODE_MAX_SIZE:
+			((perform_data_max_size*)_data)->return_value
+				= BCheckBox::MaxSize();
+			return B_OK;
+		case PERFORM_CODE_PREFERRED_SIZE:
+			((perform_data_preferred_size*)_data)->return_value
+				= BCheckBox::PreferredSize();
+			return B_OK;
+		case PERFORM_CODE_LAYOUT_ALIGNMENT:
+			((perform_data_layout_alignment*)_data)->return_value
+				= BCheckBox::LayoutAlignment();
+			return B_OK;
+		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
+			((perform_data_has_height_for_width*)_data)->return_value
+				= BCheckBox::HasHeightForWidth();
+			return B_OK;
+		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
+		{
+			perform_data_get_height_for_width* data
+				= (perform_data_get_height_for_width*)_data;
+			BCheckBox::GetHeightForWidth(data->width, &data->min, &data->max,
+				&data->preferred);
+			return B_OK;
+		}
+		case PERFORM_CODE_SET_LAYOUT:
+		{
+			perform_data_set_layout* data = (perform_data_set_layout*)_data;
+			BCheckBox::SetLayout(data->layout);
+			return B_OK;
+		}
+		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		{
+			perform_data_invalidate_layout* data
+				= (perform_data_invalidate_layout*)_data;
+			BCheckBox::InvalidateLayout(data->descendants);
+			return B_OK;
+		}
+		case PERFORM_CODE_DO_LAYOUT:
+		{
+			BCheckBox::DoLayout();
+			return B_OK;
+		}
+	}
+
+	return BControl::Perform(code, _data);
+}
+
+
+// #pragma mark - FBC padding
+
+
 void BCheckBox::_ReservedCheckBox1() {}
 void BCheckBox::_ReservedCheckBox2() {}
 void BCheckBox::_ReservedCheckBox3() {}
-
-
-BCheckBox &
-BCheckBox::operator=(const BCheckBox &)
-{
-	return *this;
-}
 
 
 BRect
@@ -597,3 +614,11 @@ BCheckBox::_ValidatePreferredSize()
 
 	return fPreferredSize;
 }
+
+
+BCheckBox &
+BCheckBox::operator=(const BCheckBox &)
+{
+	return *this;
+}
+
