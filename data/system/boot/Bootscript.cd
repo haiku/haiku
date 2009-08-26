@@ -45,19 +45,13 @@ runprog() {
 ##
 
 
-# Launch Terminal or consoled depending on $SAFEMODE
-if [ "$SAFEMODE" != "yes" ]; then
-	cd /boot/home
-	if [ -x /boot/system/apps/Installer ]; then
-		/boot/system/apps/Installer
-		#/boot/system/apps/Terminal -x /boot/system/apps/Installer
-	else
-		/boot/system/apps/Terminal
-	fi
-	#launch system/apps/Terminal
+# Launch Installer
+
+cd /boot/home
+if [ -x /boot/system/apps/Installer ]; then
+	/boot/system/apps/Installer
 else
-	launch system/bin/consoled
-	exit 0 # return so we don't eject and reboot
+	/boot/system/apps/Terminal
 fi
 
 # sync disks
