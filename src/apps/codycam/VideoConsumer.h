@@ -106,7 +106,7 @@ class VideoConsumer : public BMediaEventLooper, public BBufferConsumer {
 
 		void FtpThread();
 							
-		void UpdateFtpStatus(char* status);
+		void UpdateFtpStatus(const char* status);
 
 		status_t LocalSave(char* filename, BBitmap* bitmap);
 

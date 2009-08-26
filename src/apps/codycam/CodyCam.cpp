@@ -84,7 +84,7 @@ AddTranslationItems(BMenu* intoMenu, uint32 fromType)
 
 	use = BTranslatorRoster::Default();
 	translatorIdName = "be:translator";
-	translatorTypeName = "be:type";
+	translatorTypeName = (char *)"be:type";
 	translator_id* ids = NULL;
 	int32 count = 0;
 

@@ -633,7 +633,7 @@ VideoConsumer::FtpThread()
 
 
 void
-VideoConsumer::UpdateFtpStatus(char* status)
+VideoConsumer::UpdateFtpStatus(const char* status)
 {
 	printf("FTP STATUS: %s\n",status);
 	if (fView->Window()->Lock()) {
