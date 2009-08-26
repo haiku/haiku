@@ -23,9 +23,10 @@
 
 BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
 		BMessage *message, uint32 resizingMode, uint32 flags)
-	: BControl(frame, name, label, message, resizingMode, flags),
-	  fPreferredSize(),
-	  fOutlined(false)
+	:
+	BControl(frame, name, label, message, resizingMode, flags),
+	fPreferredSize(),
+	fOutlined(false)
 {
 	// Resize to minimum height if needed
 	font_height fontHeight;
