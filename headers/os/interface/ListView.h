@@ -62,9 +62,6 @@ public:
 	virtual void				MouseMoved(BPoint point, uint32 code,
 									const BMessage* dragMessage);
 
-	virtual bool				InitiateDrag(BPoint point, int32 itemIndex,
-									bool initialySelected);
-
 	virtual void				ResizeToPreferred();
 	virtual void				GetPreferredSize(float* _width,
 									float* _height);
@@ -128,6 +125,9 @@ public:
 			void				Deselect(int32 index);
 
 	virtual void				SelectionChanged();
+
+	virtual bool				InitiateDrag(BPoint point, int32 itemIndex,
+									bool initialySelected);
 
 			void				SortItems(int (*cmp)(const void*,
 									const void*));
