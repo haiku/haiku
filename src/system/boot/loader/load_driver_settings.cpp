@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Rene Gollent, rene@gollent.com. All rights reserved.
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,10 +19,11 @@
 #include <unistd.h>
 
 
-static driver_settings_file *
-find_driver_settings_file(const char *name)
+static driver_settings_file*
+find_driver_settings_file(const char* name)
 {
-	for (driver_settings_file *file = gKernelArgs.driver_settings; file != NULL; file = file->next) {
+	for (driver_settings_file* file = gKernelArgs.driver_settings; file != NULL;
+			file = file->next) {
 		if (!strcmp(file->name, name))
 			return file;
 	}
@@ -32,7 +33,7 @@ find_driver_settings_file(const char *name)
 
 
 static status_t
-load_driver_settings_file(Directory *directory, const char *name)
+load_driver_settings_file(Directory* directory, const char* name)
 {
 	int fd = open_from(directory, name, O_RDONLY);
 	if (fd < 0)
@@ -41,14 +42,15 @@ load_driver_settings_file(Directory *directory, const char *name)
 	struct stat stat;
 	fstat(fd, &stat);
 
-	char *buffer = (char *)kernel_args_malloc(stat.st_size + 1);
+	char* buffer = (char*)kernel_args_malloc(stat.st_size + 1);
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
 	if (read(fd, buffer, stat.st_size) != stat.st_size)
 		return B_IO_ERROR;
 
-	driver_settings_file *file = (driver_settings_file *)kernel_args_malloc(sizeof(driver_settings_file));
+	driver_settings_file* file = (driver_settings_file*)kernel_args_malloc(
+		sizeof(driver_settings_file));
 	if (file == NULL) {
 		kernel_args_free(buffer);
 		return B_NO_MEMORY;
@@ -69,18 +71,21 @@ load_driver_settings_file(Directory *directory, const char *name)
 }
 
 
+//	#pragma mark -
+
+
 status_t
-load_driver_settings(stage2_args */*args*/, Directory *volume)
+load_driver_settings(stage2_args* /*args*/, Directory* volume)
 {
 	int fd = open_from(volume, "home/config/settings/kernel/drivers", O_RDONLY);
 	if (fd < B_OK)
 		return fd;
 
-	Directory *settings = (Directory *)get_node_from(fd);
+	Directory* settings = (Directory*)get_node_from(fd);
 	if (settings == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	void *cookie;
+	void* cookie;
 	if (settings->Open(&cookie, O_RDONLY) == B_OK) {
 		char name[B_FILE_NAME_LENGTH];
 		while (settings->GetNextEntry(cookie, name, sizeof(name)) == B_OK) {
@@ -95,38 +100,35 @@ load_driver_settings(stage2_args */*args*/, Directory *volume)
 		settings->Close(cookie);
 	}
 
-	// check if a kernel settings file exists
-	// if it does, prepend it to the safe mode settings. This allows the 
-	// settings from the kernel file to take effect while still allowing 
+	// Check if a kernel settings file exists
+	// if it does, prepend it to the safe mode settings. This allows the
+	// settings from the kernel file to take effect while still allowing
 	// overrides by safe mode since the settings are searched
-	// in reverse order. This allows us to permanently set things like 
+	// in reverse order. This allows us to permanently set things like
 	// disable_smp
-	driver_settings_file *kernelFile = find_driver_settings_file("kernel");
+	driver_settings_file* kernelFile = find_driver_settings_file("kernel");
 	if (kernelFile != NULL) {
-		driver_settings_file *safemodeFile = 
-			find_driver_settings_file(B_SAFEMODE_DRIVER_SETTINGS);
+		driver_settings_file* safemodeFile
+			= find_driver_settings_file(B_SAFEMODE_DRIVER_SETTINGS);
 		if (safemodeFile != NULL) {
-			char *buffer = (char *)kernel_args_malloc(
+			char* buffer = (char*)kernel_args_malloc(
 				safemodeFile->size + kernelFile->size + 2);
 			if (buffer != NULL) {
-				memcpy(buffer, kernelFile->buffer, 
-					kernelFile->size);
+				memcpy(buffer, kernelFile->buffer, kernelFile->size);
 
 				// insert a newline just in case the kernel settings file
 				// doesn't end with one
 				buffer[kernelFile->size] = '\n';
 
-				memcpy(buffer + kernelFile->size + 1, 
-					safemodeFile->buffer, 
+				memcpy(buffer + kernelFile->size + 1, safemodeFile->buffer,
 					safemodeFile->size);
 
 				kernel_args_free(safemodeFile->buffer);
 				safemodeFile->buffer = buffer;
-				safemodeFile->size = safemodeFile->size + 
-					kernelFile->size + 1;
+				safemodeFile->size = safemodeFile->size + kernelFile->size + 1;
 				buffer[safemodeFile->size] = '\0';
-			} 
-		} else 
+			}
+		} else
 			add_safe_mode_settings(kernelFile->buffer);
 	}
 
@@ -135,30 +137,31 @@ load_driver_settings(stage2_args */*args*/, Directory *volume)
 
 
 status_t
-add_stage2_driver_settings(stage2_args *args)
+add_stage2_driver_settings(stage2_args* args)
 {
-	const char **p = args->arguments;
-	//TODO: split more intelligently
-	for (; p && *p; p++) {
-		dprintf("adding args: '%s'\n", *p);
-		add_safe_mode_settings((char *)*p);
+	// TODO: split more intelligently
+	for (const char** arg = args->arguments;
+			arg != NULL && arg[0] != NULL; arg++) {
+		dprintf("adding args: '%s'\n", arg[0]);
+		add_safe_mode_settings((char*)arg[0]);
 	}
 	return B_OK;
 }
 
 
 status_t
-add_safe_mode_settings(char *settings)
+add_safe_mode_settings(char* settings)
 {
 	if (settings == NULL || settings[0] == '\0')
 		return B_OK;
 
 	size_t length = strlen(settings);
-	char *buffer = (char *)kernel_args_malloc(length + 1);
+	char* buffer = (char*)kernel_args_malloc(length + 1);
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	driver_settings_file *file = (driver_settings_file *)kernel_args_malloc(sizeof(driver_settings_file));
+	driver_settings_file* file = (driver_settings_file*)kernel_args_malloc(
+		sizeof(driver_settings_file));
 	if (file == NULL) {
 		kernel_args_free(buffer);
 		return B_NO_MEMORY;
@@ -175,4 +178,3 @@ add_safe_mode_settings(char *settings)
 
 	return B_OK;
 }
-
