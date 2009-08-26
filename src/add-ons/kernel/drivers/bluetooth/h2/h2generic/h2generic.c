@@ -269,10 +269,13 @@ device_added(usb_device* dev, void** cookie)
 	/* Place to find out whats our concrete device and set up  some special info to our driver */
 	/* TODO: if this code increases too much reconsider this implementation*/
 	desc = usb->get_device_descriptor(dev);
-	if ( desc->vendor_id == 0x0a5c && (desc->product_id == 0x200a ||
-										desc->product_id == 0x2009 ||
-										desc->product_id == 0x2035 )) {
+	if (desc->vendor_id == 0x0a5c 
+		&& (desc->product_id == 0x200a
+			|| desc->product_id == 0x2009
+			|| desc->product_id == 0x2035)) {
+
 		new_bt_dev->driver_info = BT_WILL_NEED_A_RESET | BT_SCO_NOT_WORKING;
+
 	}
 	/*
 	else if ( desc->vendor_id == YOUR_VENDOR_HERE && desc->product_id == YOUR_PRODUCT_HERE ) {
@@ -287,7 +290,8 @@ device_added(usb_device* dev, void** cookie)
 
 	// security check
 	if (config->interface->active->descr->interface_number > 0){
-		debugf("Strange condition happened %d\n", config->interface->active->descr->interface_number);
+		debugf("Strange condition happened %d\n",
+			config->interface->active->descr->interface_number);
 		err = B_ERROR;
 		goto bail;
 	}
@@ -298,8 +302,7 @@ device_added(usb_device* dev, void** cookie)
 	for (e = 0; e < uif->descr->num_endpoints; e++) {
 
 		ep = &uif->endpoint[e];
-		switch (ep->descr->attributes & USB_ENDPOINT_ATTR_MASK)
-		{
+		switch (ep->descr->attributes & USB_ENDPOINT_ATTR_MASK) {
 			case USB_ENDPOINT_ATTR_INTERRUPT:
 				if (ep->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)
 				{
@@ -314,11 +317,11 @@ device_added(usb_device* dev, void** cookie)
 			case USB_ENDPOINT_ATTR_BULK:
 				if (ep->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)	{
 					new_bt_dev->bulk_in_ep  = ep;
-					new_bt_dev->max_packet_size_bulk_in = ep->descr->max_packet_size;;
+					new_bt_dev->max_packet_size_bulk_in = ep->descr->max_packet_size;
 					flowf("BULK int\n");
 				} else	{
 					new_bt_dev->bulk_out_ep = ep;
-					new_bt_dev->max_packet_size_bulk_out = ep->descr->max_packet_size;;
+					new_bt_dev->max_packet_size_bulk_out = ep->descr->max_packet_size;
 					flowf("BULK out\n");
 				}
 			break;
@@ -341,7 +344,7 @@ device_added(usb_device* dev, void** cookie)
 	/* set the cookie that will be passed to other USB
 	   hook functions (currently device_removed() is the only other) */
 	*cookie = new_bt_dev;
-	debugf("Ok %p\n",bt_usb_devices[0]);
+	debugf("Ok %p\n", new_bt_dev);
 	return B_OK;
 
 bail:
@@ -362,14 +365,12 @@ device_removed(void* cookie)
 	debugf("device_removed(%p)\n", bdev);
 
     if (bdev == NULL) {
-        flowf(" not present in driver¿?\n");
+        flowf(" not present in driver?\n");
         return B_ERROR;
     }
 
-	if (!TEST_AND_CLEAR(&bdev->state, RUNNING)) {
-		flowf(" wasnt running¿?\n");
-	}
-
+	if (!TEST_AND_CLEAR(&bdev->state, RUNNING)) 
+		flowf("wasnt running?\n");
 
 	flowf("Cancelling queues...\n");
 	if (bdev->intr_in_ep != NULL) {
@@ -388,7 +389,6 @@ device_removed(void* cookie)
 	}
 
 	bdev->connected = false;
-	
 
 	return B_OK;
 }
@@ -412,10 +412,11 @@ submit_nbuffer(hci_id hid, net_buffer* nbuf)
 	bdev = fetch_device(NULL, hid);
 
 	debugf("index=%lx nbuf=%p bdev=%p\n",hid, nbuf, bdev);
+	
 	if (bdev != NULL) {
 		switch (nbuf->protocol) {
 			case BT_COMMAND:
-				// not issed this way
+				// not issued this way
 			break;
 			
 			case BT_ACL:
@@ -440,7 +441,7 @@ device_open(const char *name, uint32 flags, void **cookie)
 {
 	status_t err = ENODEV;
 	bt_usb_dev* bdev = NULL;
-	hci_id 		hdev;
+	hci_id hdev;
 	int i;
 
 	flowf("device_open()\n");
@@ -496,12 +497,13 @@ device_open(const char *name, uint32 flags, void **cookie)
     		bdev->hdev = hdev = ndev->index; // get the index
     		bdev->ndev = ndev;  // get the net_device
 
-    		ndev->media = (uint32) submit_nbuffer; //XXX: interlayer-Hack
+    		ndev->media = (uint32)submit_nbuffer; //XXX: interlayer-Hack
 
- 		} else
-	        hdev = bdev->num; /* XXX: Lets try to go on*/
+ 		} else {
+			hdev = bdev->num; /* XXX: Lets try to go on*/
+ 		}
     } else {
-	        hdev = bdev->num; /* XXX: Lets try to go on*/
+		hdev = bdev->num; /* XXX: Lets try to go on*/
     }
 
 	bdev->hdev = hdev;
@@ -576,7 +578,7 @@ device_close(void *cookie)
 
 	// unSet RUNNING
 	if (TEST_AND_CLEAR(&bdev->state, RUNNING)) {
-	    debugf(" %s not running¿?\n",bdev->name);
+	    debugf(" %s not running?\n",bdev->name);
 	    return B_ERROR;
 	}
 
@@ -850,7 +852,7 @@ uninit_driver(void)
 		    //	if (connected_dev != NULL) {
             //		debugf("Device %p still exists.\n",	connected_dev);
             //	}
-            debugf("%s still present¿?\n",bt_usb_devices[j]->name);
+            debugf("%s still present?\n",bt_usb_devices[j]->name);
 			kill_device(bt_usb_devices[j]);
 		}
 	}

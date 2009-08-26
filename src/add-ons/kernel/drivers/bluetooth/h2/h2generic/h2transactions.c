@@ -17,6 +17,7 @@
 
 #include <string.h>
 
+//#define DUMP_BUFFERS
 #define BT_DEBUG_THIS_MODULE
 #include <btDebug.h>
 
@@ -44,7 +45,9 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void* data, int count)
 
 	size_t currentPacketLen = 0;
 	size_t expectedPacketLen = 0;
-
+#ifdef DUMP_BUFFERS
+	int16 index;
+#endif
 	bdev->stat.bytesRX += count;
 
 	if (type == BT_EVENT)
@@ -62,11 +65,17 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void* data, int count)
 			/* new buffer incoming */
 			switch (type) {
 				case BT_EVENT:
-					if (count >= HCI_EVENT_HDR_SIZE) {
+					if (count >= HCI_EVENT_HDR_SIZE) {					
 						struct hci_event_header* headerPkt = data;
 						expectedPacketLen = HCI_EVENT_HDR_SIZE + headerPkt->elen;
 						snbuf = bdev->eventRx = snb_fetch(&bdev->snetBufferRecycleTrash, 
 							expectedPacketLen);
+#ifdef DUMP_BUFFERS
+						debugf("## Incoming EVENT frame %p len = %d ", snbuf, count);
+						for (index = 0 ; index < count; index++)
+							dprintf("%x:",((uint8*)data)[index]);
+						dprintf(" ## \n");
+#endif
 					} else {
 						flowf("EVENT frame corrupted\n");
 						return EILSEQ;
@@ -75,7 +84,6 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void* data, int count)
 
 				case BT_ACL:
 					if (count >= HCI_ACL_HDR_SIZE) {
-						int16 index;
 						struct hci_acl_header* headerPkt = data;
 
 						expectedPacketLen = HCI_ACL_HDR_SIZE
@@ -84,12 +92,12 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void* data, int count)
 						// Create the buffer -> TODO: this allocation can fail
 						bdev->nbufferRx[type] = nbuf = nb->create(expectedPacketLen);
 						nbuf->protocol = type;
-
+#ifdef DUMP_BUFFERS
 						debugf("## Incoming ACL frame %p len = %d ", nbuf, count);
 						for (index = 0 ; index < count; index++)
 							dprintf("%x:",((uint8*)data)[index]);
 						dprintf(" ## \n");
-
+#endif
 					} else {
 						flowf("ACL frame corrupted\n");
 						return EILSEQ;
@@ -141,7 +149,7 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void* data, int count)
 
 		/* in case in the pipe there is info about the next buffer ... */
 		count -= currentPacketLen;
-		data  += currentPacketLen;
+		data += currentPacketLen;
 	}
 
 	return B_OK;
@@ -162,7 +170,7 @@ event_complete(void* cookie, status_t status, void* data, size_t actual_len)
 {
 	bt_usb_dev* bdev = cookie;
 	//bt_usb_dev* bdev = fetch_device(cookie, 0); -> safer/slower option
-	status_t    error;
+	status_t error;
 
 	debugf("cookie@%p status=%s len=%ld\n", cookie, strerror(status), actual_len);
 
@@ -184,7 +192,7 @@ event_complete(void* cookie, status_t status, void* data, size_t actual_len)
 resubmit:
 
 	error = usb->queue_interrupt(bdev->intr_in_ep->handle, data, 
-		bdev->max_packet_size_intr_in, event_complete, bdev);
+		max(HCI_MAX_EVENT_SIZE, bdev->max_packet_size_intr_in), event_complete, bdev);
 
 	if (error != B_OK) {
 		reuse_room(&bdev->eventRoom, data);
@@ -244,7 +252,7 @@ resubmit:
 status_t
 submit_rx_event(bt_usb_dev* bdev)
 {
-	size_t size = bdev->max_packet_size_intr_in;
+	size_t size = max(HCI_MAX_EVENT_SIZE, bdev->max_packet_size_intr_in);
 	void* buf = alloc_room(&bdev->eventRoom, size);
 	status_t status;
 
@@ -293,7 +301,6 @@ submit_rx_acl(bt_usb_dev* bdev)
 status_t
 submit_rx_sco(bt_usb_dev* bdev)
 {
-
 	/* not yet implemented */
 	return B_ERROR;
 }
@@ -341,7 +348,7 @@ acl_tx_complete(void* cookie, status_t status, void* data, size_t actual_len)
 	net_buffer* nbuf = (net_buffer*)cookie;
 	bt_usb_dev* bdev = GET_DEVICE(nbuf);
 
-	debugf("fetched=%p status=%ld nbuftype %lx B%p\n",bdev, status, nbuf->type, data);
+	debugf("fetched=%p status=%ld nbuftype %lx B%p\n", bdev, status, nbuf->type, data);
 
 	if (status == B_OK) {
 		bdev->stat.successfulTX++;
@@ -417,7 +424,7 @@ submit_tx_acl(bt_usb_dev* bdev, net_buffer* nbuf)
 	flowf("### \n");
 
 	error = usb->queue_bulk(bdev->bulk_out_ep->handle, nb_get_whole_buffer(nbuf),
-						nbuf->size,	acl_tx_complete, (void*)nbuf);
+		nbuf->size, acl_tx_complete, (void*)nbuf);
 
 	if (error != B_OK) {
 		bdev->stat.rejectedTX++;
