@@ -55,10 +55,29 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	WonderBrush			- native graphics application
 #	Yasm				- the assembler utility
 
+
+rule ObsoleteOptionalPackageWarning package
+{
+	Echo "WARNING: Optional package $(package) needs to be rebuilt for"
+		"Haiku R1 alpha 1!" ;
+}
+
+rule IsObsoleteOptionalHaikuImagePackageAdded package
+{
+	if [ IsOptionalHaikuImagePackageAdded $(package) ] {
+		ObsoleteOptionalPackageWarning $(package) ;
+		return 1 ;
+	}
+
+	return ;
+}
+
+
 local baseURL = http://haiku-files.org/files/optional-packages ;
 
+
 # APR
-if [ IsOptionalHaikuImagePackageAdded APR ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded APR ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package APR available for $(TARGET_ARCH)" ;
 	} else {
@@ -71,7 +90,7 @@ if [ IsOptionalHaikuImagePackageAdded APR ] {
 
 
 # APR-util
-if [ IsOptionalHaikuImagePackageAdded APR-util ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded APR-util ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package APR-util available for $(TARGET_ARCH)" ;
 	} else {
@@ -84,7 +103,7 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 
 
 # Beam
-if [ IsOptionalHaikuImagePackageAdded Beam ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Beam ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Beam available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
@@ -112,7 +131,7 @@ if [ IsOptionalHaikuImagePackageAdded BeBook ] {
 
 
 # BeHappy
-if [ IsOptionalHaikuImagePackageAdded BeHappy ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded BeHappy ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package BeHappy available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
@@ -147,7 +166,7 @@ if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 
 
 # BePDF
-if [ IsOptionalHaikuImagePackageAdded BePDF ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded BePDF ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package BePDF available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
@@ -187,7 +206,7 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 
 
 # CDRecord
-if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded CDRecord ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package CDRecord available for $(TARGET_ARCH)" ;
 	} else {
@@ -200,7 +219,7 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 
 
 # Clockwerk
-if [ IsOptionalHaikuImagePackageAdded Clockwerk ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Clockwerk ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Clockwerk available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
@@ -222,7 +241,7 @@ if [ IsOptionalHaikuImagePackageAdded Clockwerk ] {
 
 
 # CLucene
-if [ IsOptionalHaikuImagePackageAdded CLucene ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded CLucene ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package CLucene available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) < 4 && ! $(isHybridBuild) {
@@ -238,7 +257,7 @@ if [ IsOptionalHaikuImagePackageAdded CLucene ] {
 
 
 # CVS
-if [ IsOptionalHaikuImagePackageAdded CVS ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded CVS ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package CVS available for $(TARGET_ARCH)" ;
 	} else {
@@ -261,6 +280,11 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 		: $(baseURL)/libtool-2.2.6a-gcc2-2008-11-09.zip ;
 	InstallOptionalHaikuImagePackage texinfo-4.13a-gcc2-2008-11-09
 		: $(baseURL)/texinfo-4.13a-gcc2-2008-11-09.zip ;
+
+ObsoleteOptionalPackageWarning autoconf ;
+ObsoleteOptionalPackageWarning automake ;
+ObsoleteOptionalPackageWarning libtool ;
+ObsoleteOptionalPackageWarning texinfo ;
 }
 
 
@@ -276,6 +300,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
 		InstallOptionalHaikuImagePackage gcc-4.3.3-x86-gcc4-2009-06-29-2
 			: $(baseURL)/gcc-4.3.3-x86-gcc4-2009-06-29-2.zip ;
+ObsoleteOptionalPackageWarning "GCC 4" ;
 
 		# symlink cpp to g++'s headers
 		AddSymlinkToHaikuImage develop abi x86 gcc4 headers
@@ -397,7 +422,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 
 
 # Firefox web browser
-if [ IsOptionalHaikuImagePackageAdded Firefox ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Firefox ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Firefox available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
@@ -420,7 +445,7 @@ if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 
 
 # KeymapSwitcher
-if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package KeymapSwitcher available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
@@ -444,7 +469,7 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 
 
 # LibIconv
-if [ IsOptionalHaikuImagePackageAdded LibIconv ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded LibIconv ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package LibIconv available for $(TARGET_ARCH)" ;
 	} else {
@@ -457,7 +482,7 @@ if [ IsOptionalHaikuImagePackageAdded LibIconv ] {
 
 
 # LibLayout library
-if [ IsOptionalHaikuImagePackageAdded LibLayout ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded LibLayout ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package LibLayout available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
@@ -472,7 +497,7 @@ if [ IsOptionalHaikuImagePackageAdded LibLayout ] {
 
 
 # LibXML2
-if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded LibXML2 ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package LibXML2 available for $(TARGET_ARCH)" ;
 	} else {
@@ -485,7 +510,7 @@ if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 
 
 # Links web browser
-if [ IsOptionalHaikuImagePackageAdded Links ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Links ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Links available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
@@ -502,7 +527,7 @@ if [ IsOptionalHaikuImagePackageAdded Links ] {
 
 
 # Nano
-if [ IsOptionalHaikuImagePackageAdded Nano ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Nano ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Nano available for $(TARGET_ARCH)" ;
 	} else {
@@ -515,7 +540,7 @@ if [ IsOptionalHaikuImagePackageAdded Nano ] {
 
 
 # Neon
-if [ IsOptionalHaikuImagePackageAdded Neon ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Neon ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Neon available for $(TARGET_ARCH)" ;
 	} else {
@@ -528,7 +553,7 @@ if [ IsOptionalHaikuImagePackageAdded Neon ] {
 
 
 # NetSurf web browser
-if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded NetSurf ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package NetSurf available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
@@ -545,7 +570,7 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 
 
 # OpenSound drivers
-if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded OpenSound ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package OpenSound available for $(TARGET_ARCH)" ;
 	} else {
@@ -559,7 +584,7 @@ if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
 
 
 # OpenSSH
-if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded OpenSSH ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package OpenSSH available for $(TARGET_ARCH)" ;
 	} else {
@@ -580,7 +605,7 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 
 
 # OpenSSL
-if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded OpenSSL ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package OpenSSL available for $(TARGET_ARCH)" ;
 	} else {
@@ -593,7 +618,7 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 
 
 # P7zip
-if [ IsOptionalHaikuImagePackageAdded P7zip ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded P7zip ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package P7zip available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
@@ -618,7 +643,7 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 
 
 # Pe text editor
-if [ IsOptionalHaikuImagePackageAdded Pe ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Pe ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Pe available for $(TARGET_ARCH)" ;
 	} else {
@@ -641,7 +666,7 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 
 
 # Perl
-if [ IsOptionalHaikuImagePackageAdded Perl ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Perl ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Perl available for $(TARGET_ARCH)" ;
 	} else {
@@ -654,7 +679,7 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 
 
 # Python
-if [ IsOptionalHaikuImagePackageAdded Python ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Python ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Python available for $(TARGET_ARCH)" ;
 	} else {
@@ -667,7 +692,7 @@ if [ IsOptionalHaikuImagePackageAdded Python ] {
 
 
 # Rsync
-if [ IsOptionalHaikuImagePackageAdded Rsync ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Rsync ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Rsync available for $(TARGET_ARCH)" ;
 	} else {
@@ -680,7 +705,7 @@ if [ IsOptionalHaikuImagePackageAdded Rsync ] {
 
 
 # SQLite
-if [ IsOptionalHaikuImagePackageAdded SQLite ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded SQLite ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package SQLite available for $(TARGET_ARCH)" ;
 	} else {
@@ -693,7 +718,7 @@ if [ IsOptionalHaikuImagePackageAdded SQLite ] {
 
 
 # Subversion
-if [ IsOptionalHaikuImagePackageAdded Subversion ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Subversion ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Subversion available for $(TARGET_ARCH)" ;
 	} else {
@@ -706,7 +731,7 @@ if [ IsOptionalHaikuImagePackageAdded Subversion ] {
 
 
 # Tar
-if [ IsOptionalHaikuImagePackageAdded Tar ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Tar ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Tar available for $(TARGET_ARCH)" ;
 	} else {
@@ -772,7 +797,7 @@ if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 
 
 # Vim
-if [ IsOptionalHaikuImagePackageAdded Vim ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Vim ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Vim available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
@@ -794,7 +819,7 @@ if [ IsOptionalHaikuImagePackageAdded Vim ] {
 
 
 # Vision
-if [ IsOptionalHaikuImagePackageAdded Vision ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Vision ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Vision available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
@@ -816,7 +841,7 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 
 
 # VLC media player
-if [ IsOptionalHaikuImagePackageAdded VLC ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded VLC ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package VLC available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
@@ -851,7 +876,7 @@ if [ IsOptionalHaikuImagePackageAdded Welcome ] {
 
 
 # WonderBrush
-if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded WonderBrush ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package WonderBrush available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
@@ -868,7 +893,7 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 
 
 # Yasm
-if [ IsOptionalHaikuImagePackageAdded Yasm ] {
+if [ IsObsoleteOptionalHaikuImagePackageAdded Yasm ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Yasm available for $(TARGET_ARCH)" ;
 	} else {
