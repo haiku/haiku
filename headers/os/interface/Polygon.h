@@ -1,9 +1,6 @@
 /*
- * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Marc Flerackers, mflerackers@androme.be
+ * Copyright 2001-2009, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  */
 #ifndef _POLYGON_H
 #define _POLYGON_H
@@ -13,39 +10,48 @@
 #include <InterfaceDefs.h>
 #include <Rect.h>
 
-namespace BPrivate { class BAffineTransform; }
-using namespace BPrivate;
+//namespace BPrivate { class BAffineTransform; }
+//using namespace BPrivate;
+
 
 class BPolygon {
-	public:
-							BPolygon(const BPoint *ptArray, int32 numPoints);
-							BPolygon(const BPolygon *polygon);
-							BPolygon();
-		virtual				~BPolygon();
+public:
+								BPolygon(const BPoint* points, int32 count);
+								BPolygon(const BPolygon& other);
+								BPolygon(const BPolygon* other);
+								BPolygon();
+	virtual						~BPolygon();
 
-				BPolygon 	&operator=(const BPolygon &from);
+			BPolygon&			operator=(const BPolygon& other);
 
-				BRect		Frame() const;
-				void		AddPoints(const BPoint *ptArray, int32 numPoints);
-				int32		CountPoints() const;
-				void		MapTo(BRect srcRect, BRect dstRect);
-				void		PrintToStream() const;
+			BRect				Frame() const;
+			void				AddPoints(const BPoint* points, int32 count);
+			int32				CountPoints() const;
+			void				MapTo(BRect srcRect, BRect dstRect);
+			void				PrintToStream() const;
 
-				void		Transform(const BAffineTransform& transform);
-				BPolygon&	TransformBySelf(const BAffineTransform& transform);
-				BPolygon*	TransformByCopy(const BAffineTransform& transform) const;
+//			void				TransformBy(const BAffineTransform& transform);
+//			BPolygon&			TransformBySelf(
+//									const BAffineTransform& transform);
+//			BPolygon			TransformByCopy(
+//									const BAffineTransform& transform) const;
 
-	private:
-		friend class BView;
+private:
+	friend class BView;
 
-		void _ComputeBounds();
-		void _MapPoint(BPoint *point, BRect srcRect, BRect dstRect);
-		void _MapRectangle(BRect *rect, BRect srcRect, BRect dstRect);
+			bool				_AddPoints(const BPoint* points, int32 count,
+									bool computeBounds);
+			void				_ComputeBounds();
+			void				_MapPoint(BPoint* point, const BRect& srcRect,
+										const BRect& dstRect);
+			void				_MapRectangle(BRect* rect,
+									const BRect& srcRect,
+									const BRect& dstRect);
 
-	private:
-		BRect	fBounds;
-		uint32	fCount;
-		BPoint	*fPoints;
+private:
+			BRect				fBounds;
+			uint32				fCount;
+			BPoint*				fPoints;
 };
 
 #endif // _POLYGON_H_
