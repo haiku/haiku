@@ -127,6 +127,7 @@ private:
 	virtual void				_PrepareQuit();
 	virtual void				_GetLooperName(char* name, size_t size);
 
+		static	bool				_SupportsDirectMode();
 			status_t			_EnableDirectWindowMode();
 
 			void				_SetCurrentView(View* view);

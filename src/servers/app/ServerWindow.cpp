@@ -3441,6 +3441,15 @@ ServerWindow::MakeWindow(BRect frame, const char* name,
 }
 
 
+/* static */
+bool
+ServerWindow::_SupportsDirectMode()
+{
+	return false;
+	// TODO: For now, since it's broken
+}
+
+
 status_t
 ServerWindow::_EnableDirectWindowMode()
 {
@@ -3448,6 +3457,9 @@ ServerWindow::_EnableDirectWindowMode()
 		// already in direct window mode
 		return B_ERROR;
 	}
+
+	if (!ServerWindow::_SupportsDirectMode())
+		return B_ERROR;
 
 	fDirectWindowData = new (nothrow) DirectWindowData;
 	if (fDirectWindowData == NULL)
