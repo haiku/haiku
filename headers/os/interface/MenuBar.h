@@ -1,9 +1,10 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2003-2009, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  */
 #ifndef _MENU_BAR_H
 #define _MENU_BAR_H
+
 
 #include <BeBuild.h>
 #include <InterfaceDefs.h>
@@ -24,87 +25,92 @@ class BMenuField;
 
 
 class BMenuBar : public BMenu {
-	public:
-		BMenuBar(BRect frame, const char *title,
-				uint32 resizeMask = B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-				menu_layout layout = B_ITEMS_IN_ROW,
-				bool resizeToFit = true);
-		BMenuBar(const char *title, menu_layout layout = B_ITEMS_IN_ROW,
-				uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS);
-		BMenuBar(BMessage *data);
-		virtual ~BMenuBar();
+public:
+								BMenuBar(BRect frame, const char* title,
+									uint32 resizeMask = B_FOLLOW_LEFT_RIGHT
+										| B_FOLLOW_TOP,
+									menu_layout layout = B_ITEMS_IN_ROW,
+									bool resizeToFit = true);
+								BMenuBar(const char* title,
+									menu_layout layout = B_ITEMS_IN_ROW,
+									uint32 flags = B_WILL_DRAW
+										| B_FRAME_EVENTS);
+								BMenuBar(BMessage* archive);
+	virtual						~BMenuBar();
 		
-		static BArchivable*	Instantiate(BMessage *data);
-		virtual	status_t	Archive(BMessage *data, bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* archive);
+	virtual	status_t			Archive(BMessage* archive,
+									bool deep = true) const;
 
-		virtual	void		SetBorder(menu_bar_border border);
-		menu_bar_border		Border() const;
-		
-		virtual	void		Draw(BRect updateRect);
-		virtual void		AttachedToWindow();
-		virtual	void		DetachedFromWindow();
-		virtual void		MessageReceived(BMessage *message);
-		virtual	void		MouseDown(BPoint where);
-		virtual void		WindowActivated(bool state);
-		virtual	void		MouseUp(BPoint where);
-		virtual	void		FrameMoved(BPoint newPosition);
-		virtual	void		FrameResized(float newWidth, float newHeight);
+	virtual	void				AttachedToWindow();
+	virtual	void				DetachedFromWindow();
+	virtual void				AllAttached();
+	virtual void				AllDetached();
+
+	virtual	void				WindowActivated(bool state);
+	virtual void				MakeFocus(bool state = true);
+
+	virtual void				ResizeToPreferred();
+	virtual void				GetPreferredSize(float* _width,
+									float* _height);
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
+	virtual	BSize				PreferredSize();
+	virtual	void				FrameMoved(BPoint newPosition);
+	virtual	void				FrameResized(float newWidth, float newHeight);
+
+	virtual	void				Show();
+	virtual	void				Hide();
+
+	virtual	void				Draw(BRect updateRect);
+
+	virtual	void				MessageReceived(BMessage *message);
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseUp(BPoint where);
+
+	virtual	BHandler*			ResolveSpecifier(BMessage* message,
+									int32 index, BMessage* specifier,
+									int32 form, const char* property);
+	virtual status_t			GetSupportedSuites(BMessage* data);
+
+	virtual	void				SetBorder(menu_bar_border border);
+			menu_bar_border		Border() const;
 	
-		virtual void		Show();
-		virtual void		Hide();
+	virtual status_t			Perform(perform_code code, void* data);
 
-		virtual BHandler*	ResolveSpecifier(BMessage *message, int32 index,
-							BMessage *specifier, int32 form,
-							const char *property);
-		virtual status_t	GetSupportedSuites(BMessage *data);
+private:
+	friend class BWindow;
+	friend class BMenuField;
+	friend class BMenu;
 
-		virtual void		ResizeToPreferred();
-		virtual void		GetPreferredSize(float *width, float *height);
-		virtual void		MakeFocus(bool state = true);
-		virtual void		AllAttached();
-		virtual void		AllDetached();
-	
+	virtual	void				_ReservedMenuBar1();
+	virtual	void				_ReservedMenuBar2();
+	virtual	void				_ReservedMenuBar3();
+	virtual	void				_ReservedMenuBar4();
 
-		// layout related
-		virtual	BSize		MinSize();
-		virtual	BSize		MaxSize();
-		virtual	BSize		PreferredSize();
+			BMenuBar			&operator=(const BMenuBar &);
 
-		virtual status_t	Perform(perform_code code, void *arg);
+	// TODO: Tracker uses this function so we can't change
+	// its signature without breaking it
+			void				StartMenuBar(int32 menuIndex,
+									bool sticky = true, bool showMenu = false,
+									BRect* special_rect = NULL);
+			
+	static	int32				_TrackTask(void *arg);
+			BMenuItem*			_Track(int32 *action, int32 startIndex = -1,
+									bool showMenu = false);
+			void				_StealFocus();
+			void				_RestoreFocus();
+			void				_InitData(menu_layout layout);
 
-	private:
-		friend class BWindow;
-		friend class BMenuField;
-		friend class BMenu;
+			menu_bar_border		fBorder;
+			thread_id			fTrackingPID;
+			int32				fPrevFocusToken;
+			sem_id				fMenuSem;
+			BRect*				fLastBounds;
+			uint32				_reserved[2];
 
-		virtual	void		_ReservedMenuBar1();
-		virtual	void		_ReservedMenuBar2();
-		virtual	void		_ReservedMenuBar3();
-		virtual	void		_ReservedMenuBar4();
-
-		BMenuBar		&operator=(const BMenuBar &);
-
-		// TODO: Tracker uses this function so we can't change
-		// its signature without breaking it
-		void			StartMenuBar(int32 menuIndex, bool sticky = true,
-							bool showMenu = false,
-							BRect *special_rect = NULL);
-				
-		static int32		_TrackTask(void *arg);
-		BMenuItem		*_Track(int32 *action, int32 startIndex = -1,
-								bool showMenu = false);
-		void			_StealFocus();
-		void			_RestoreFocus();
-		void			_InitData(menu_layout layout);
-
-		menu_bar_border		fBorder;
-		thread_id		fTrackingPID;
-		int32			fPrevFocusToken;
-		sem_id			fMenuSem;
-		BRect*			fLastBounds;
-		uint32			_reserved[2];	// was 3
-
-		bool			fTracking;
+			bool				fTracking;
 };
 
 

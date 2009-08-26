@@ -1,6 +1,6 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
- * Distributed under the terms of the MIT License.
+ * Copyright 2001-2009, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
@@ -133,17 +133,140 @@ BMenuBar::Archive(BMessage* data, bool deep) const
 }
 
 
+// #pragma mark -
+
+
 void
-BMenuBar::SetBorder(menu_bar_border border)
+BMenuBar::AttachedToWindow()
 {
-	fBorder = border;
+	_Install(Window());
+	Window()->SetKeyMenuBar(this);
+
+	BMenu::AttachedToWindow();
+
+	*fLastBounds = Bounds();
 }
 
 
-menu_bar_border
-BMenuBar::Border() const
+void
+BMenuBar::DetachedFromWindow()
 {
-	return fBorder;
+	BMenu::DetachedFromWindow();
+}
+
+
+void
+BMenuBar::AllAttached()
+{
+	BMenu::AllAttached();
+}
+
+
+void
+BMenuBar::AllDetached()
+{
+	BMenu::AllDetached();
+}
+
+
+void
+BMenuBar::WindowActivated(bool state)
+{
+	BView::WindowActivated(state);
+}
+
+
+void
+BMenuBar::MakeFocus(bool state)
+{
+	BMenu::MakeFocus(state);
+}
+
+
+// #pragma mark -
+
+
+void
+BMenuBar::ResizeToPreferred()
+{
+	BMenu::ResizeToPreferred();
+}
+
+
+void
+BMenuBar::GetPreferredSize(float* width, float* height)
+{
+	BMenu::GetPreferredSize(width, height);
+}
+
+
+BSize
+BMenuBar::MinSize()
+{
+	return BMenu::MinSize();
+}
+
+
+BSize
+BMenuBar::MaxSize()
+{
+	BSize size = BMenu::MaxSize();
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		BSize(B_SIZE_UNLIMITED, size.height));
+}
+
+
+BSize
+BMenuBar::PreferredSize()
+{
+	return BMenu::PreferredSize();
+}
+
+
+void
+BMenuBar::FrameMoved(BPoint newPosition)
+{
+	BMenu::FrameMoved(newPosition);
+}
+
+
+void
+BMenuBar::FrameResized(float newWidth, float newHeight)
+{
+	// invalidate right border
+	if (newWidth != fLastBounds->Width()) {
+		BRect rect(min_c(fLastBounds->right, newWidth), 0,
+			max_c(fLastBounds->right, newWidth), newHeight);
+		Invalidate(rect);
+	}
+
+	// invalidate bottom border
+	if (newHeight != fLastBounds->Height()) {
+		BRect rect(0, min_c(fLastBounds->bottom, newHeight) - 1,
+			newWidth, max_c(fLastBounds->bottom, newHeight));
+		Invalidate(rect);
+	}
+
+	fLastBounds->Set(0, 0, newWidth, newHeight);
+
+	BMenu::FrameResized(newWidth, newHeight);
+}
+
+
+// #pragma mark -
+
+
+void
+BMenuBar::Show()
+{
+	BView::Show();
+}
+
+
+void
+BMenuBar::Hide()
+{
+	BView::Hide();
 }
 
 
@@ -198,23 +321,7 @@ BMenuBar::Draw(BRect updateRect)
 }
 
 
-void
-BMenuBar::AttachedToWindow()
-{
-	_Install(Window());
-	Window()->SetKeyMenuBar(this);
-
-	BMenu::AttachedToWindow();
-
-	*fLastBounds = Bounds();
-}
-
-
-void
-BMenuBar::DetachedFromWindow()
-{
-	BMenu::DetachedFromWindow();
-}
+// #pragma mark -
 
 
 void
@@ -241,61 +348,13 @@ BMenuBar::MouseDown(BPoint where)
 
 
 void
-BMenuBar::WindowActivated(bool state)
-{
-	BView::WindowActivated(state);
-}
-
-
-void
 BMenuBar::MouseUp(BPoint where)
 {
 	BView::MouseUp(where);
 }
 
 
-void
-BMenuBar::FrameMoved(BPoint newPosition)
-{
-	BMenu::FrameMoved(newPosition);
-}
-
-
-void
-BMenuBar::FrameResized(float newWidth, float newHeight)
-{
-	// invalidate right border
-	if (newWidth != fLastBounds->Width()) {
-		BRect rect(min_c(fLastBounds->right, newWidth), 0,
-			max_c(fLastBounds->right, newWidth), newHeight);
-		Invalidate(rect);
-	}
-
-	// invalidate bottom border
-	if (newHeight != fLastBounds->Height()) {
-		BRect rect(0, min_c(fLastBounds->bottom, newHeight) - 1,
-			newWidth, max_c(fLastBounds->bottom, newHeight));
-		Invalidate(rect);
-	}
-
-	fLastBounds->Set(0, 0, newWidth, newHeight);
-
-	BMenu::FrameResized(newWidth, newHeight);
-}
-
-
-void
-BMenuBar::Show()
-{
-	BView::Show();
-}
-
-
-void
-BMenuBar::Hide()
-{
-	BView::Hide();
-}
+// #pragma mark -
 
 
 BHandler*
@@ -313,39 +372,24 @@ BMenuBar::GetSupportedSuites(BMessage* data)
 }
 
 
-void
-BMenuBar::ResizeToPreferred()
-{
-	BMenu::ResizeToPreferred();
-}
+// #pragma mark -
 
 
 void
-BMenuBar::GetPreferredSize(float* width, float* height)
+BMenuBar::SetBorder(menu_bar_border border)
 {
-	BMenu::GetPreferredSize(width, height);
+	fBorder = border;
 }
 
 
-void
-BMenuBar::MakeFocus(bool state)
+menu_bar_border
+BMenuBar::Border() const
 {
-	BMenu::MakeFocus(state);
+	return fBorder;
 }
 
 
-void
-BMenuBar::AllAttached()
-{
-	BMenu::AllAttached();
-}
-
-
-void
-BMenuBar::AllDetached()
-{
-	BMenu::AllDetached();
-}
+// #pragma mark -
 
 
 status_t
@@ -404,29 +448,6 @@ BMenuBar::Perform(perform_code code, void* _data)
 }
 
 
-BSize
-BMenuBar::MinSize()
-{
-	return BMenu::MinSize();
-}
-
-
-BSize
-BMenuBar::MaxSize()
-{
-	BSize size = BMenu::MaxSize();
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
-		BSize(B_SIZE_UNLIMITED, size.height));
-}
-
-
-BSize
-BMenuBar::PreferredSize()
-{
-	return BMenu::PreferredSize();
-}
-
-
 // #pragma mark -
 
 
@@ -441,6 +462,9 @@ BMenuBar::operator=(const BMenuBar &)
 {
 	return *this;
 }
+
+
+// #pragma mark -
 
 
 void
