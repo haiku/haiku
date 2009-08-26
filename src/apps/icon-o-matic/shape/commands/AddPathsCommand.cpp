@@ -35,14 +35,24 @@ AddPathsCommand::AddPathsCommand(PathContainer* container,
 		return;
 
 	memcpy(fPaths, paths, sizeof(VectorPath*) * fCount);
+
+	if (!fOwnsPaths) {
+		// Add references to paths
+		for (int32 i = 0; i < fCount; i++) {
+			if (fPaths[i] != NULL)
+				fPaths[i]->Acquire();
+		}
+	}
 }
 
 // destructor
 AddPathsCommand::~AddPathsCommand()
 {
-	if (fOwnsPaths && !fPathsAdded && fPaths) {
-		for (int32 i = 0; i < fCount; i++)
-			fPaths[i]->Release();
+	if (!fPathsAdded && fPaths) {
+		for (int32 i = 0; i < fCount; i++) {
+			if (fPaths[i] != NULL)
+				fPaths[i]->Release();
+		}
 	}
 	delete[] fPaths;
 }
@@ -58,23 +68,18 @@ AddPathsCommand::InitCheck()
 status_t
 AddPathsCommand::Perform()
 {
-	status_t ret = B_OK;
-
 	// add paths to container
-	int32 index = fIndex;
 	for (int32 i = 0; i < fCount; i++) {
-		if (fPaths[i] && !fContainer->AddPath(fPaths[i], index)) {
-			ret = B_ERROR;
+		if (fPaths[i] && !fContainer->AddPath(fPaths[i], fIndex + i)) {
 			// roll back
 			for (int32 j = i - 1; j >= 0; j--)
 				fContainer->RemovePath(fPaths[j]);
-			break;
+			return B_ERROR;
 		}
-		index++;
 	}
 	fPathsAdded = true;
 
-	return ret;
+	return B_OK;
 }
 
 // Undo
