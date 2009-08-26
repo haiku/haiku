@@ -269,8 +269,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 		&& $(TARGET_ARCH) = x86 {
 	# gcc and binutils
 	if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) {
-		InstallOptionalHaikuImagePackage gcc-2.95.3-x86-gcc2-2009-06-29
-			: $(baseURL)/gcc-2.95.3-x86-gcc2-2009-06-29.zip ;
+		InstallOptionalHaikuImagePackage gcc-2.95.3-r1a1-x86-gcc2-2009-08-26
+			: $(baseURL)/gcc-2.95.3-r1a1-x86-gcc2-2009-08-26.zip ;
 	}
 
 	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
