@@ -54,7 +54,7 @@ struct AttributeName {
 			} else
 				sprintf(typeString, "%08lx", type);
 
-			snprintf(name, sizeof(name), "%s%s#%s\n", kXattrNamespace,
+			snprintf(name, sizeof(name), "%s%s#%s", kXattrNamespace,
 				haikuName, typeString);
 		}
 	}
@@ -67,7 +67,6 @@ struct AttributeName {
 
 			if (_DecodeNameAndType(xattrName))
 				return;
-
 		}
 
 		// a simple xattr
@@ -99,7 +98,9 @@ private:
 			return false;
 
 		strlcpy(name, xattrName,
-			std::min(sizeof(name), (size_t)(typeString - xattrName - 1)));
+			std::min(sizeof(name), (size_t)(typeString - xattrName)));
+			// typeString - xattrName - 1 is the name length, but we need to
+			// specify one more for the terminating null
 		return true;
 	}
 };
@@ -174,8 +175,27 @@ struct Node {
 		AttributeName attributeName;
 		attributeName.Init(attribute);
 
+		// get the attribute size -- we read all or nothing
+		attr_info info;
+		if (fs_stat_attr(fFileFD, attributeName.name, &info) != 0) {
+			// translate B_ENTRY_NOT_FOUND to ENOATTR
+			if (errno == B_ENTRY_NOT_FOUND)
+				errno = ENOATTR;
+			return -1;
+		}
+
+		// if an empty buffer is given, return the attribute size
+		if (size == 0)
+			return info.size;
+
+		// if the buffer is too small, fail
+		if (size < info.size) {
+			errno = ERANGE;
+			return -1;
+		}
+
 		ssize_t bytesRead = fs_read_attr(fFileFD, attributeName.name,
-			B_XATTR_TYPE, 0, buffer, size);
+			B_XATTR_TYPE, 0, buffer, info.size);
 
 		// translate B_ENTRY_NOT_FOUND to ENOATTR
 		if (bytesRead < 0 && errno == B_ENTRY_NOT_FOUND)
@@ -201,8 +221,10 @@ struct Node {
 		return result;
 	}
 
-	ssize_t GetList(void* buffer, size_t size)
+	ssize_t GetList(void* _buffer, size_t size)
 	{
+		char* buffer = (char*)_buffer;
+
 		if (fFileFD < 0)
 			return -1;
 
@@ -227,6 +249,7 @@ struct Node {
 
 			if (remainingSize > nameLength) {
 				strcpy((char*)buffer, attributeName.name);
+				buffer += nameLength + 1;
 				remainingSize -= nameLength + 1;
 			} else
 				remainingSize = 0;
