@@ -50,16 +50,17 @@ public:
 									const BRegion& clipRegion);
 			
 			BRect				old_window_frame;
-			direct_buffer_info*	buffer_info;
 			bool				full_screen;
 
 private:
 			status_t			_SyncronizeWithClient();
-		
+
+			direct_buffer_info*		fBufferInfo;
 			sem_id				fSem;
 			sem_id				fAcknowledgeSem;
 			area_id				fBufferArea;
 			direct_buffer_state		fPreviousState;
 			int32				fTransition;
+			bool				fStarted;
 };
 
