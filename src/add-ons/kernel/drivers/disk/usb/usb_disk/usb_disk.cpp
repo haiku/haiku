@@ -382,8 +382,11 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 				return B_OK;
 			} else {
 				// the operation is complete but has failed at the SCSI level
-				TRACE_ALWAYS("operation 0x%02x failed at the SCSI level\n",
-					operation);
+				if (operation != SCSI_TEST_UNIT_READY_6) {
+					TRACE_ALWAYS("operation 0x%02x failed at the SCSI level\n",
+						operation);
+				}
+
 				result = usb_disk_request_sense(lun);
 				return result == B_OK ? B_ERROR : result;
 			}
