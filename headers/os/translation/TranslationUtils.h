@@ -6,6 +6,7 @@
 #define _TRANSLATION_UTILS_H
 
 
+#include <GraphicsDefs.h>
 #include <SupportDefs.h>
 #include <TranslationDefs.h>
 
