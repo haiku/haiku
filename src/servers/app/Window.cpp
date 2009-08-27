@@ -77,6 +77,7 @@ Window::Window(const BRect& frame, const char *name,
 	:
 	fTitle(name),
 	fFrame(frame),
+	fScreen(NULL),
 
 	fVisibleRegion(),
 	fVisibleContentRegion(),
@@ -213,8 +214,6 @@ Window::SetClipping(BRegion* stillAvailableOnScreen)
 
 	fVisibleContentRegionValid = false;
 	fEffectiveDrawingRegionValid = false;
-
-	fWindow->HandleDirectConnection(B_DIRECT_MODIFY | B_CLIPPING_MODIFIED);
 }
 
 
@@ -562,13 +561,19 @@ Window::PreviousWindow(int32 index) const
 }
 
 
-::Screen*
+void
+Window::SetScreen(const ::Screen* screen)
+{
+	ASSERT_MULTI_WRITE_LOCKED(fDesktop->ScreenLocker());
+	fScreen = screen;
+}
+
+
+const ::Screen*
 Window::Screen() const
 {
-	ASSERT_MULTI_LOCKED(fDesktop->WindowLocker());
-
-	// TODO: we need to know which screen the window is on
-	return fDesktop->VirtualScreen().ScreenAt(0);
+	ASSERT_MULTI_READ_LOCKED(fDesktop->ScreenLocker());
+	return fScreen;
 }
 
 
@@ -1215,18 +1220,12 @@ Window::_AlterDeltaForSnap(BPoint& delta, bigtime_t now)
 void
 Window::WorkspaceActivated(int32 index, bool active)
 {
-	if (!active && !IsHidden())
-		fWindow->HandleDirectConnection(B_DIRECT_STOP);
-
 	BMessage activatedMsg(B_WORKSPACE_ACTIVATED);
 	activatedMsg.AddInt64("when", system_time());
 	activatedMsg.AddInt32("workspace", index);
 	activatedMsg.AddBool("active", active);
 
 	ServerWindow()->SendMessageToClient(&activatedMsg);
-
-	if (active && !IsHidden())
-		fWindow->HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
 }
 
 
@@ -1338,8 +1337,8 @@ Window::IsVisible() const
 
 
 void
-Window::SetSizeLimits(int32 minWidth, int32 maxWidth,
-	int32 minHeight, int32 maxHeight)
+Window::SetSizeLimits(int32 minWidth, int32 maxWidth, int32 minHeight,
+	int32 maxHeight)
 {
 	if (minWidth < 0)
 		minWidth = 0;
@@ -1354,8 +1353,8 @@ Window::SetSizeLimits(int32 minWidth, int32 maxWidth,
 
 	// give the Decorator a say in this too
 	if (fDecorator) {
-		fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight,
-								  &fMaxWidth, &fMaxHeight);
+		fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth,
+			&fMaxHeight);
 	}
 
 	_ObeySizeLimits();
@@ -1455,7 +1454,8 @@ Window::SetLook(window_look look, BRegion* updateRegion)
 		fDecorator->SetLook(settings, look, updateRegion);
 
 		// we might need to resize the window!
-		fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
+		fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth,
+			&fMaxHeight);
 		_ObeySizeLimits();
 	}
 
@@ -1471,8 +1471,10 @@ void
 Window::SetFeel(window_feel feel)
 {
 	// if the subset list is no longer needed, clear it
-	if ((fFeel == B_MODAL_SUBSET_WINDOW_FEEL || fFeel == B_FLOATING_SUBSET_WINDOW_FEEL)
-		&& (feel != B_MODAL_SUBSET_WINDOW_FEEL && feel != B_FLOATING_SUBSET_WINDOW_FEEL))
+	if ((fFeel == B_MODAL_SUBSET_WINDOW_FEEL
+			|| fFeel == B_FLOATING_SUBSET_WINDOW_FEEL)
+		&& feel != B_MODAL_SUBSET_WINDOW_FEEL
+		&& feel != B_FLOATING_SUBSET_WINDOW_FEEL)
 		fSubsets.MakeEmpty();
 
 	fFeel = feel;
@@ -1793,8 +1795,7 @@ Window::InSubsetWorkspace(int32 index) const
 // #pragma mark - static
 
 
-/*static*/
-bool
+/*static*/ bool
 Window::IsValidLook(window_look look)
 {
 	return look == B_TITLED_WINDOW_LOOK
@@ -1808,8 +1809,7 @@ Window::IsValidLook(window_look look)
 }
 
 
-/*static*/
-bool
+/*static*/ bool
 Window::IsValidFeel(window_feel feel)
 {
 	return feel == B_NORMAL_WINDOW_FEEL
@@ -1826,8 +1826,7 @@ Window::IsValidFeel(window_feel feel)
 }
 
 
-/*static*/
-bool
+/*static*/ bool
 Window::IsModalFeel(window_feel feel)
 {
 	return feel == B_MODAL_SUBSET_WINDOW_FEEL
@@ -1836,8 +1835,7 @@ Window::IsModalFeel(window_feel feel)
 }
 
 
-/*static*/
-bool
+/*static*/ bool
 Window::IsFloatingFeel(window_feel feel)
 {
 	return feel == B_FLOATING_SUBSET_WINDOW_FEEL
@@ -2115,7 +2113,8 @@ Window::BeginUpdate(BPrivate::PortLink& link)
 	// supress back to front buffer copies in the drawing engine
 	fDrawingEngine->SetCopyToFrontEnabled(false);
 
-	if (!fCurrentUpdateSession->IsExpose() && fDrawingEngine->LockParallelAccess()) {
+	if (!fCurrentUpdateSession->IsExpose()
+		&& fDrawingEngine->LockParallelAccess()) {
 		fDrawingEngine->SuspendAutoSync();
 
 		fTopView->Draw(fDrawingEngine, dirty, &fContentRegion, true);

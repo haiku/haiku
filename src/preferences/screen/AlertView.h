@@ -20,7 +20,7 @@ class BStringView;
 
 class AlertView : public BView {
 	public:
-		AlertView(BRect frame, char* name);
+		AlertView(BRect frame, const char* name);
 
 		virtual void AttachedToWindow();
 		virtual void Draw(BRect updateRect);

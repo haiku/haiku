@@ -1,12 +1,11 @@
 /*
- * Copyright 2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _GRAPHICS_DEFS_H
 #define _GRAPHICS_DEFS_H
 
 
-#include <BeBuild.h>
 #include <SupportDefs.h>
 
 
@@ -175,7 +174,8 @@ typedef enum {
 	// non linear color space -- incidently, all with 8 bits per value
 	// Note, BBitmap and BView do not support all of these!
 
-	// loss/saturation points are Y 16-235 (absolute), Cb/Cr 16-240 (center 128)
+	// loss/saturation points are Y 16-235 (absolute), Cb/Cr 16-240
+	// (center 128)
 
 	B_YCbCr422			= 0x4000,	// Y0  Cb0  Y1  Cr0  Y2...
 									// Cb2 Y3  Cr2...

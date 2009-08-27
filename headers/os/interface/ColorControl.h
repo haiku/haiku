@@ -60,15 +60,16 @@ public:
 	virtual	void				MouseMoved(BPoint point, uint32 code,
 									const BMessage* dragMessage);
 	virtual	void				DetachedFromWindow();
-	virtual	void				GetPreferredSize(float* _width, float* _height);
+	virtual	void				GetPreferredSize(float* _width,
+									float* _height);
 	virtual	void				ResizeToPreferred();
 	virtual	status_t			Invoke(BMessage* message = NULL);
 	virtual	void				FrameMoved(BPoint newPosition);
 	virtual	void				FrameResized(float newWidth, float newHeight);
 
-	virtual	BHandler*			ResolveSpecifier(BMessage* message, int32 index,
-									BMessage* specifier, int32 what,
-									const char* property);
+	virtual	BHandler*			ResolveSpecifier(BMessage* message,
+									int32 index, BMessage* specifier,
+									int32 what, const char* property);
 	virtual	status_t			GetSupportedSuites(BMessage* data);
 
 	virtual	void				MakeFocus(bool state = true);
@@ -130,4 +131,4 @@ BColorControl::SetValue(rgb_color color)
 	SetValue(c);
 }
 
-#endif /* _COLOR_CONTROL_H */
+#endif // _COLOR_CONTROL_H

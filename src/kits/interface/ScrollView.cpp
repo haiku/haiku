@@ -85,61 +85,11 @@ BScrollView::~BScrollView()
 }
 
 
-void
-BScrollView::_Init(bool horizontal, bool vertical)
-{
-	fHorizontalScrollBar = NULL;
-	fVerticalScrollBar = NULL;
-	fHighlighted = false;
-
-	if (be_control_look != NULL)
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	BRect targetFrame;
-	if (fTarget) {
-		// layout target and add it
-		fTarget->TargetedByScrollView(this);
-		fTarget->MoveTo(B_ORIGIN);
-
-		if (fBorder != B_NO_BORDER)
-			fTarget->MoveBy(_BorderSize(), _BorderSize());
-
-		AddChild(fTarget);
-		targetFrame = fTarget->Frame();
-	} else {
-		// no target specified
-		targetFrame = Bounds();
-		if (horizontal)
-			targetFrame.bottom -= B_H_SCROLL_BAR_HEIGHT + 1;
-		if (vertical)
-			targetFrame.right -= B_V_SCROLL_BAR_WIDTH + 1;
-		if (fBorder == B_FANCY_BORDER) {
-			targetFrame.bottom--;
-			targetFrame.right--;
-		}
-	}
-
-	if (horizontal) {
-		fHorizontalScrollBar = new BScrollBar(BRect(0, 0, 14, 14), "_HSB_",
-			fTarget, 0, 1000, B_HORIZONTAL);
-		AddChild(fHorizontalScrollBar);
-	}
-
-	if (vertical) {
-		fVerticalScrollBar = new BScrollBar(BRect(0, 0, 14, 14), "_VSB_",
-			fTarget, 0, 1000, B_VERTICAL);
-		AddChild(fVerticalScrollBar);
-	}
-
-	_AlignScrollBars(horizontal, vertical, targetFrame);
-
-	fPreviousWidth = uint16(Bounds().Width());
-	fPreviousHeight = uint16(Bounds().Height());
-}
+// #pragma mark -
 
 
-BArchivable *
-BScrollView::Instantiate(BMessage *archive)
+BArchivable*
+BScrollView::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, "BScrollView"))
 		return new BScrollView(archive);
@@ -149,7 +99,7 @@ BScrollView::Instantiate(BMessage *archive)
 
 
 status_t
-BScrollView::Archive(BMessage *archive, bool deep) const
+BScrollView::Archive(BMessage* archive, bool deep) const
 {
 	status_t status = BView::Archive(archive, deep);
 	if (status != B_OK)
@@ -245,21 +195,24 @@ BScrollView::Draw(BRect updateRect)
 	}
 
 	if (fBorder == B_PLAIN_BORDER) {
-		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			B_DARKEN_2_TINT));
 		StrokeRect(Bounds());
 		return;
 	} else if (fBorder != B_FANCY_BORDER)
 		return;
 
 	BRect bounds = Bounds();
-	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_2_TINT));
 	StrokeRect(bounds.InsetByCopy(1, 1));
 
 	if (fHighlighted && Window()->IsActive()) {
 		SetHighColor(ui_color(B_NAVIGATION_BASE_COLOR));
 		StrokeRect(bounds);
 	} else {
-		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			B_DARKEN_1_TINT));
 		StrokeLine(bounds.LeftBottom(), bounds.LeftTop());
 		bounds.left++;
 		StrokeLine(bounds.LeftTop(), bounds.RightTop());
@@ -273,7 +226,215 @@ BScrollView::Draw(BRect updateRect)
 }
 
 
-BScrollBar *
+// #pragma mark -
+
+
+void
+BScrollView::WindowActivated(bool active)
+{
+	if (fHighlighted)
+		Invalidate();
+
+	BView::WindowActivated(active);
+}
+
+
+void
+BScrollView::MakeFocus(bool state)
+{
+	BView::MakeFocus(state);
+}
+
+
+// #pragma mark -
+
+
+void
+BScrollView::GetPreferredSize(float *_width, float *_height)
+{
+	BSize size = PreferredSize();
+
+	if (_width)
+		*_width = size.width;
+	if (_height)
+		*_height = size.height;
+}
+
+
+BSize
+BScrollView::MinSize()
+{
+	BSize size = _ComputeSize(fTarget != NULL ? fTarget->MinSize()
+		: BSize(16, 16));
+
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+
+
+BSize
+BScrollView::MaxSize()
+{
+	BSize size = _ComputeSize(fTarget != NULL ? fTarget->MaxSize()
+		: BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
+}
+
+
+BSize
+BScrollView::PreferredSize()
+{
+	BSize size = _ComputeSize(fTarget != NULL ? fTarget->PreferredSize()
+		: BSize(32, 32));
+
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
+}
+
+
+void
+BScrollView::ResizeToPreferred()
+{
+	if (Window() == NULL)
+		return;
+	BView::ResizeToPreferred();
+}
+
+
+void
+BScrollView::InvalidateLayout(bool descendants)
+{
+	BView::InvalidateLayout(descendants);
+}
+
+
+void
+BScrollView::DoLayout()
+{
+	if (!(Flags() & B_SUPPORTS_LAYOUT))
+		return;
+
+	// If the user set a layout, we let the base class version call its hook.
+	if (GetLayout()) {
+		BView::DoLayout();
+		return;
+	}
+
+	BRect innerFrame = _InnerFrame();
+
+	if (fTarget != NULL) {
+		fTarget->MoveTo(innerFrame.left, innerFrame.top);
+		fTarget->ResizeTo(innerFrame.Width(), innerFrame.Height());
+
+		//BLayoutUtils::AlignInFrame(fTarget, fTarget->Bounds());
+	}
+
+	_AlignScrollBars(fHorizontalScrollBar != NULL, fVerticalScrollBar != NULL,
+		innerFrame);
+}
+
+
+void
+BScrollView::FrameMoved(BPoint position)
+{
+	BView::FrameMoved(position);
+}
+
+
+void
+BScrollView::FrameResized(float width, float height)
+{
+	BView::FrameResized(width, height);
+
+	if (fBorder == B_NO_BORDER)
+		return;
+
+	BRect bounds = Bounds();
+	float border = _BorderSize() - 1;
+
+	if (be_control_look && fHorizontalScrollBar && fVerticalScrollBar) {
+		BRect scrollCorner(bounds);
+		scrollCorner.left = min_c(
+			fPreviousWidth - fVerticalScrollBar->Frame().Height(),
+			fHorizontalScrollBar->Frame().right + 1);
+		scrollCorner.top = min_c(
+			fPreviousHeight - fHorizontalScrollBar->Frame().Width(),
+			fVerticalScrollBar->Frame().bottom + 1);
+		Invalidate(scrollCorner);
+	}
+
+	// changes in width
+
+	if (bounds.Width() > fPreviousWidth) {
+		// invalidate the region between the old and the new right border
+		BRect rect = bounds;
+		rect.left += fPreviousWidth - border;
+		rect.right--;
+		Invalidate(rect);
+	} else if (bounds.Width() < fPreviousWidth) {
+		// invalidate the region of the new right border
+		BRect rect = bounds;
+		rect.left = rect.right - border;
+		Invalidate(rect);
+	}
+
+	// changes in height
+
+	if (bounds.Height() > fPreviousHeight) {
+		// invalidate the region between the old and the new bottom border
+		BRect rect = bounds;
+		rect.top += fPreviousHeight - border;
+		rect.bottom--;
+		Invalidate(rect);
+	} else if (bounds.Height() < fPreviousHeight) {
+		// invalidate the region of the new bottom border
+		BRect rect = bounds;
+		rect.top = rect.bottom - border;
+		Invalidate(rect);
+	}
+
+	fPreviousWidth = uint16(bounds.Width());
+	fPreviousHeight = uint16(bounds.Height());
+}
+
+
+// #pragma mark -
+
+
+void
+BScrollView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		default:
+			BView::MessageReceived(message);
+	}
+}
+
+
+void
+BScrollView::MouseDown(BPoint point)
+{
+	BView::MouseDown(point);
+}
+
+
+void
+BScrollView::MouseUp(BPoint point)
+{
+	BView::MouseUp(point);
+}
+
+
+void
+BScrollView::MouseMoved(BPoint point, uint32 code, const BMessage *dragMessage)
+{
+	BView::MouseMoved(point, code, dragMessage);
+}
+
+
+// #pragma mark -
+
+
+BScrollBar*
 BScrollView::ScrollBar(orientation posture) const
 {
 	if (posture == B_HORIZONTAL)
@@ -425,126 +586,141 @@ BScrollView::SetTarget(BView *target)
 }
 
 
-BView *
+BView*
 BScrollView::Target() const
 {
 	return fTarget;
 }
 
 
-void
-BScrollView::MessageReceived(BMessage *message)
+// #pragma mark -
+
+
+
+BHandler*
+BScrollView::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
+	int32 form, const char* property)
 {
-	switch (message->what) {
-		default:
-			BView::MessageReceived(message);
-	}
+	return BView::ResolveSpecifier(msg, index, specifier, form, property);
 }
 
 
-void
-BScrollView::MouseDown(BPoint point)
+status_t
+BScrollView::GetSupportedSuites(BMessage *data)
 {
-	BView::MouseDown(point);
+	return BView::GetSupportedSuites(data);
 }
 
 
-void
-BScrollView::MouseUp(BPoint point)
+status_t
+BScrollView::Perform(perform_code code, void* _data)
 {
-	BView::MouseUp(point);
-}
-
-
-void
-BScrollView::MouseMoved(BPoint point, uint32 code, const BMessage *dragMessage)
-{
-	BView::MouseMoved(point, code, dragMessage);
-}
-
-
-void
-BScrollView::FrameMoved(BPoint position)
-{
-	BView::FrameMoved(position);
-}
-
-
-void
-BScrollView::FrameResized(float width, float height)
-{
-	BView::FrameResized(width, height);
-
-	if (fBorder == B_NO_BORDER)
-		return;
-
-	BRect bounds = Bounds();
-	float border = _BorderSize() - 1;
-
-	if (be_control_look && fHorizontalScrollBar && fVerticalScrollBar) {
-		BRect scrollCorner(bounds);
-		scrollCorner.left = min_c(
-			fPreviousWidth - fVerticalScrollBar->Frame().Height(),
-			fHorizontalScrollBar->Frame().right + 1);
-		scrollCorner.top = min_c(
-			fPreviousHeight - fHorizontalScrollBar->Frame().Width(),
-			fVerticalScrollBar->Frame().bottom + 1);
-		Invalidate(scrollCorner);
-	}
-
-	// changes in width
-
-	if (bounds.Width() > fPreviousWidth) {
-		// invalidate the region between the old and the new right border
-		BRect rect = bounds;
-		rect.left += fPreviousWidth - border;
-		rect.right--;
-		Invalidate(rect);
-	} else if (bounds.Width() < fPreviousWidth) {
-		// invalidate the region of the new right border
-		BRect rect = bounds;
-		rect.left = rect.right - border;
-		Invalidate(rect);
+	switch (code) {
+		case PERFORM_CODE_MIN_SIZE:
+			((perform_data_min_size*)_data)->return_value
+				= BScrollView::MinSize();
+			return B_OK;
+		case PERFORM_CODE_MAX_SIZE:
+			((perform_data_max_size*)_data)->return_value
+				= BScrollView::MaxSize();
+			return B_OK;
+		case PERFORM_CODE_PREFERRED_SIZE:
+			((perform_data_preferred_size*)_data)->return_value
+				= BScrollView::PreferredSize();
+			return B_OK;
+		case PERFORM_CODE_LAYOUT_ALIGNMENT:
+			((perform_data_layout_alignment*)_data)->return_value
+				= BScrollView::LayoutAlignment();
+			return B_OK;
+		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
+			((perform_data_has_height_for_width*)_data)->return_value
+				= BScrollView::HasHeightForWidth();
+			return B_OK;
+		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
+		{
+			perform_data_get_height_for_width* data
+				= (perform_data_get_height_for_width*)_data;
+			BScrollView::GetHeightForWidth(data->width, &data->min, &data->max,
+				&data->preferred);
+			return B_OK;
+		}
+		case PERFORM_CODE_SET_LAYOUT:
+		{
+			perform_data_set_layout* data = (perform_data_set_layout*)_data;
+			BScrollView::SetLayout(data->layout);
+			return B_OK;
+		}
+		case PERFORM_CODE_INVALIDATE_LAYOUT:
+		{
+			perform_data_invalidate_layout* data
+				= (perform_data_invalidate_layout*)_data;
+			BScrollView::InvalidateLayout(data->descendants);
+			return B_OK;
+		}
+		case PERFORM_CODE_DO_LAYOUT:
+		{
+			BScrollView::DoLayout();
+			return B_OK;
+		}
 	}
 
-	// changes in height
+	return BView::Perform(code, _data);
+}
 
-	if (bounds.Height() > fPreviousHeight) {
-		// invalidate the region between the old and the new bottom border
-		BRect rect = bounds;
-		rect.top += fPreviousHeight - border;
-		rect.bottom--;
-		Invalidate(rect);
-	} else if (bounds.Height() < fPreviousHeight) {
-		// invalidate the region of the new bottom border
-		BRect rect = bounds;
-		rect.top = rect.bottom - border;
-		Invalidate(rect);
+
+// #pragma mark -
+
+
+void
+BScrollView::_Init(bool horizontal, bool vertical)
+{
+	fHorizontalScrollBar = NULL;
+	fVerticalScrollBar = NULL;
+	fHighlighted = false;
+
+	if (be_control_look != NULL)
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	BRect targetFrame;
+	if (fTarget) {
+		// layout target and add it
+		fTarget->TargetedByScrollView(this);
+		fTarget->MoveTo(B_ORIGIN);
+
+		if (fBorder != B_NO_BORDER)
+			fTarget->MoveBy(_BorderSize(), _BorderSize());
+
+		AddChild(fTarget);
+		targetFrame = fTarget->Frame();
+	} else {
+		// no target specified
+		targetFrame = Bounds();
+		if (horizontal)
+			targetFrame.bottom -= B_H_SCROLL_BAR_HEIGHT + 1;
+		if (vertical)
+			targetFrame.right -= B_V_SCROLL_BAR_WIDTH + 1;
+		if (fBorder == B_FANCY_BORDER) {
+			targetFrame.bottom--;
+			targetFrame.right--;
+		}
 	}
 
-	fPreviousWidth = uint16(bounds.Width());
-	fPreviousHeight = uint16(bounds.Height());
-}
+	if (horizontal) {
+		fHorizontalScrollBar = new BScrollBar(BRect(0, 0, 14, 14), "_HSB_",
+			fTarget, 0, 1000, B_HORIZONTAL);
+		AddChild(fHorizontalScrollBar);
+	}
 
+	if (vertical) {
+		fVerticalScrollBar = new BScrollBar(BRect(0, 0, 14, 14), "_VSB_",
+			fTarget, 0, 1000, B_VERTICAL);
+		AddChild(fVerticalScrollBar);
+	}
 
-void
-BScrollView::ResizeToPreferred()
-{
-	if (Window() == NULL)
-		return;
-	BView::ResizeToPreferred();
-}
+	_AlignScrollBars(horizontal, vertical, targetFrame);
 
-
-void
-BScrollView::GetPreferredSize(float *_width, float *_height)
-{
-	BSize size = PreferredSize();
-
-	if (_width)
-		*_width = size.width;
-	if (_height)
-		*_height = size.height;
+	fPreviousWidth = uint16(Bounds().Width());
+	fPreviousHeight = uint16(Bounds().Height());
 }
 
 
@@ -671,8 +847,8 @@ BScrollView::_ComputeFrame(BRect frame, bool horizontal, bool vertical,
 BScrollView::_ComputeFrame(BView *target, bool horizontal, bool vertical,
 	border_style border)
 {
-	return _ComputeFrame(target != NULL ? target->Frame() : BRect(0, 0, 16, 16),
-		horizontal, vertical, border);
+	return _ComputeFrame(target != NULL ? target->Frame()
+		: BRect(0, 0, 16, 16), horizontal, vertical, border);
 }
 
 
@@ -705,155 +881,7 @@ BScrollView::_ModifyFlags(int32 flags, border_style border)
 }
 
 
-void
-BScrollView::WindowActivated(bool active)
-{
-	if (fHighlighted)
-		Invalidate();
-
-	BView::WindowActivated(active);
-}
-
-
-void
-BScrollView::MakeFocus(bool state)
-{
-	BView::MakeFocus(state);
-}
-
-
-BHandler*
-BScrollView::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
-	int32 form, const char* property)
-{
-	return BView::ResolveSpecifier(msg, index, specifier, form, property);
-}
-
-
-status_t
-BScrollView::GetSupportedSuites(BMessage *data)
-{
-	return BView::GetSupportedSuites(data);
-}
-
-
-BSize
-BScrollView::MinSize()
-{
-	BSize size = _ComputeSize(fTarget != NULL ? fTarget->MinSize()
-		: BSize(16, 16));
-
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
-}
-
-
-BSize
-BScrollView::MaxSize()
-{
-	BSize size = _ComputeSize(fTarget != NULL ? fTarget->MaxSize()
-		: BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
-
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
-}
-
-
-BSize
-BScrollView::PreferredSize()
-{
-	BSize size = _ComputeSize(fTarget != NULL ? fTarget->PreferredSize()
-		: BSize(32, 32));
-
-	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
-}
-
-
-void
-BScrollView::InvalidateLayout(bool descendants)
-{
-	BView::InvalidateLayout(descendants);
-}
-
-
-void
-BScrollView::DoLayout()
-{
-	if (!(Flags() & B_SUPPORTS_LAYOUT))
-		return;
-
-	// If the user set a layout, we let the base class version call its hook.
-	if (GetLayout()) {
-		BView::DoLayout();
-		return;
-	}
-
-	BRect innerFrame = _InnerFrame();
-
-	if (fTarget != NULL) {
-		fTarget->MoveTo(innerFrame.left, innerFrame.top);
-		fTarget->ResizeTo(innerFrame.Width(), innerFrame.Height());
-
-		//BLayoutUtils::AlignInFrame(fTarget, fTarget->Bounds());
-	}
-
-	_AlignScrollBars(fHorizontalScrollBar != NULL, fVerticalScrollBar != NULL,
-		innerFrame);
-}
-
-
-status_t
-BScrollView::Perform(perform_code code, void* _data)
-{
-	switch (code) {
-		case PERFORM_CODE_MIN_SIZE:
-			((perform_data_min_size*)_data)->return_value
-				= BScrollView::MinSize();
-			return B_OK;
-		case PERFORM_CODE_MAX_SIZE:
-			((perform_data_max_size*)_data)->return_value
-				= BScrollView::MaxSize();
-			return B_OK;
-		case PERFORM_CODE_PREFERRED_SIZE:
-			((perform_data_preferred_size*)_data)->return_value
-				= BScrollView::PreferredSize();
-			return B_OK;
-		case PERFORM_CODE_LAYOUT_ALIGNMENT:
-			((perform_data_layout_alignment*)_data)->return_value
-				= BScrollView::LayoutAlignment();
-			return B_OK;
-		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
-			((perform_data_has_height_for_width*)_data)->return_value
-				= BScrollView::HasHeightForWidth();
-			return B_OK;
-		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
-		{
-			perform_data_get_height_for_width* data
-				= (perform_data_get_height_for_width*)_data;
-			BScrollView::GetHeightForWidth(data->width, &data->min, &data->max,
-				&data->preferred);
-			return B_OK;
-		}
-		case PERFORM_CODE_SET_LAYOUT:
-		{
-			perform_data_set_layout* data = (perform_data_set_layout*)_data;
-			BScrollView::SetLayout(data->layout);
-			return B_OK;
-		}
-		case PERFORM_CODE_INVALIDATE_LAYOUT:
-		{
-			perform_data_invalidate_layout* data
-				= (perform_data_invalidate_layout*)_data;
-			BScrollView::InvalidateLayout(data->descendants);
-			return B_OK;
-		}
-		case PERFORM_CODE_DO_LAYOUT:
-		{
-			BScrollView::DoLayout();
-			return B_OK;
-		}
-	}
-
-	return BView::Perform(code, _data);
-}
+//	#pragma mark -
 
 
 BScrollView &
@@ -861,22 +889,6 @@ BScrollView::operator=(const BScrollView &)
 {
 	return *this;
 }
-
-
-/** Although BScrollView::InitObject() was defined in the original ScrollView.h,
- *	it is not exported by the R5 libbe.so, so we don't have to export it as well.
- */
-
-#if 0
-void
-BScrollView::InitObject()
-{
-}
-#endif
-
-
-//	#pragma mark -
-//	Reserved virtuals
 
 
 void BScrollView::_ReservedScrollView1() {}

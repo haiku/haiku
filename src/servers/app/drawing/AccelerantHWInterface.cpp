@@ -830,11 +830,11 @@ AccelerantHWInterface::GetPreferredMode(display_mode* preferredMode)
 {
 	status_t status = B_NOT_SUPPORTED;
 
-//	if (fAccGetPreferredDisplayMode != NULL) {
-//		status = fAccGetPreferredDisplayMode(preferredMode);
-//		if (status == B_OK)
-//			return B_OK;
-//	}
+	if (fAccGetPreferredDisplayMode != NULL) {
+		status = fAccGetPreferredDisplayMode(preferredMode);
+		if (status == B_OK)
+			return B_OK;
+	}
 
 	if (fAccGetEDIDInfo != NULL) {
 		edid1_info info;

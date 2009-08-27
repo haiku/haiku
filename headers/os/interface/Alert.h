@@ -1,15 +1,11 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2006, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Erik Jaesler (erik@cgsoftware.com)
  */
 #ifndef	_ALERT_H
 #define	_ALERT_H
 
 
-#include <BeBuild.h>
 #include <Window.h>
 
 

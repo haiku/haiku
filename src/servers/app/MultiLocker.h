@@ -2,7 +2,7 @@
  * Copyright 2005-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
- * Copyright 1999, Be Incorporated.   All Rights Reserved.
+ * Copyright 1999, Be Incorporated. All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
 #ifndef MULTI_LOCKER_H
@@ -66,6 +66,11 @@ public:
 #endif
 
 private:
+								MultiLocker();
+								MultiLocker(const MultiLocker& other);
+			MultiLocker&		operator=(const MultiLocker& other);
+									// not implemented
+
 #if MULTI_LOCKER_DEBUG
 			// functions for managing the DEBUG reader array
 			void				_RegisterThread();
@@ -114,14 +119,20 @@ public:
 		:
 		fLock(*lock)
 	{
-		fLock.WriteLock();
+		fLocked = fLock.WriteLock();
 	}
 
 	AutoWriteLocker(MultiLocker& lock)
 		:
 		fLock(lock)
 	{
-		fLock.WriteLock();
+		fLocked = fLock.WriteLock();
+	}
+
+	~AutoWriteLocker()
+	{
+		if (fLocked)
+			fLock.WriteUnlock();
 	}
 
 	bool IsLocked() const
@@ -129,13 +140,17 @@ public:
 		return fLock.IsWriteLocked();
 	}
 
-	~AutoWriteLocker()
+	void Unlock()
 	{
-		fLock.WriteUnlock();
+		if (fLocked) {
+			fLock.WriteUnlock();
+			fLocked = false;
+		}
 	}
 
 private:
  	MultiLocker&	fLock;
+	bool			fLocked;
 };
 
 
@@ -160,8 +175,7 @@ public:
 		Unlock();
 	}
 
-	void
-	Unlock()
+	void Unlock()
 	{
 		if (fLocked) {
 			fLock.ReadUnlock();

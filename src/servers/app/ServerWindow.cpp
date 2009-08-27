@@ -51,7 +51,7 @@
 
 #include "AppServer.h"
 #include "Desktop.h"
-#include "DirectWindowSupport.h"
+#include "DirectWindowInfo.h"
 #include "DrawingEngine.h"
 #include "HWInterface.h"
 #include "Overlay.h"
@@ -166,8 +166,8 @@ ServerWindow::ServerWindow(const char* title, ServerApp* app,
 	fCurrentDrawingRegion(),
 	fCurrentDrawingRegionValid(false),
 
-	fDirectWindowData(NULL),
-	fDirectWindowFeel(B_NORMAL_WINDOW_FEEL)
+	fDirectWindowInfo(NULL),
+	fIsDirectlyAccessing(false)
 {
 	STRACE(("ServerWindow(%s)::ServerWindow()\n", title));
 
@@ -207,7 +207,7 @@ ServerWindow::~ServerWindow()
 
 	BPrivate::gDefaultTokens.RemoveToken(fServerToken);
 
-	delete fDirectWindowData;
+	delete fDirectWindowInfo;
 	STRACE(("ServerWindow(%p) will exit NOW\n", this));
 
 	delete_sem(fDeathSemaphore);
@@ -1072,7 +1072,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fLink.StartMessage(status);
 			if (status == B_OK) {
 				struct direct_window_sync_data syncData;
-				fDirectWindowData->GetSyncData(syncData);
+				fDirectWindowInfo->GetSyncData(syncData);
 
 				fLink.Attach(&syncData, sizeof(syncData));
 			}
@@ -1087,7 +1087,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<bool>(&enable);
 
 			status_t status = B_OK;
-			if (fDirectWindowData != NULL)
+			if (fDirectWindowInfo != NULL)
 				_DirectWindowSetFullScreen(enable);
 			else
 				status = B_BAD_TYPE;
@@ -3401,19 +3401,10 @@ ServerWindow::_MessageLooper()
 void
 ServerWindow::ScreenChanged(const BMessage* message)
 {
-	// TODO: execute the stop notification earlier
-	HandleDirectConnection(B_DIRECT_STOP);
 	SendMessageToClient(message);
 
-	if (fDirectWindowData != NULL && fDirectWindowData->full_screen) {
-		BRect screenFrame = fWindow->Screen()->Frame();
-		fDesktop->ResizeWindowBy(fWindow,
-			screenFrame.Width() - fWindow->Frame().Width(),
-			screenFrame.Height() - fWindow->Frame().Height());
-	}
-
-	HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET,
-		B_SCREEN_CHANGED);
+	if (fDirectWindowInfo != NULL && fDirectWindowInfo->IsFullScreen())
+		_ResizeToFullScreen();
 }
 
 
@@ -3441,61 +3432,38 @@ ServerWindow::MakeWindow(BRect frame, const char* name,
 }
 
 
-status_t
-ServerWindow::_EnableDirectWindowMode()
-{
-	if (fDirectWindowData != NULL) {
-		// already in direct window mode
-		return B_ERROR;
-	}
-
-	fDirectWindowData = new (nothrow) DirectWindowData;
-	if (fDirectWindowData == NULL)
-		return B_NO_MEMORY;
-
-	status_t status = fDirectWindowData->InitCheck();
-	if (status != B_OK) {
-		delete fDirectWindowData;
-		fDirectWindowData = NULL;
-
-		return status;
-	}
-
-	return B_OK;
-}
-
-
 void
 ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 {
+	ASSERT_MULTI_LOCKED(fDesktop->WindowLocker());
+
+	if (fDirectWindowInfo == NULL)
+		return;
+
 	STRACE(("HandleDirectConnection(bufferState = %ld, driverState = %ld)\n",
 		bufferState, driverState));
 
-	if (fDirectWindowData == NULL)
-		return;
+	status_t status = fDirectWindowInfo->SetState(
+		(direct_buffer_state)bufferState, (direct_driver_state)driverState,
+		fDesktop->HWInterface()->FrontBuffer(), fWindow->Frame(),
+		fWindow->VisibleContentRegion());
 
-	if (fDesktop->LockSingleWindow()) {
-		status_t status = fDirectWindowData->SetState(
-			(direct_buffer_state)bufferState,
-			(direct_driver_state)driverState,
-			fDesktop->HWInterface()->FrontBuffer(), fWindow->Frame(),
-				fWindow->VisibleContentRegion());
+	if (status != B_OK) {
+		char errorString[256];
+		snprintf(errorString, sizeof(errorString),
+			"%s killed for a problem in DirectConnected(): %s",
+			App()->Signature(), strerror(status));
+		syslog(LOG_ERR, errorString);
 
-		if (status != B_OK) {
-			char errorString[256];
-			snprintf(errorString, sizeof(errorString),
-				"%s killed for a problem in DirectConnected(): %s",
-				App()->Signature(), strerror(status));
-			syslog(LOG_ERR, errorString);
-
-			// The client application didn't release the semaphore
-			// within the given timeout. Or something else went wrong.
-			// Deleting this member should make it crash.
-			delete fDirectWindowData;
-			fDirectWindowData = NULL;
-		}
-		fDesktop->UnlockSingleWindow();
-	}
+		// The client application didn't release the semaphore
+		// within the given timeout. Or something else went wrong.
+		// Deleting this member should make it crash.
+		delete fDirectWindowInfo;
+		fDirectWindowInfo = NULL;
+	} else if ((bufferState & B_DIRECT_MODE_MASK) == B_DIRECT_START)
+		fIsDirectlyAccessing = true;
+	else if ((bufferState & B_DIRECT_MODE_MASK) == B_DIRECT_STOP)
+		fIsDirectlyAccessing = false;
 }
 
 
@@ -3591,34 +3559,70 @@ ServerWindow::_MessageNeedsAllWindowsLocked(uint32 code) const
 
 
 void
+ServerWindow::_ResizeToFullScreen()
+{
+	BRect screenFrame = fWindow->Screen()->Frame();
+
+	fDesktop->MoveWindowBy(fWindow,
+		screenFrame.left - fWindow->Frame().left,
+		screenFrame.top - fWindow->Frame().top);
+	fDesktop->ResizeWindowBy(fWindow,
+		screenFrame.Width() - fWindow->Frame().Width(),
+		screenFrame.Height() - fWindow->Frame().Height());
+}
+
+
+status_t
+ServerWindow::_EnableDirectWindowMode()
+{
+	if (fDirectWindowInfo != NULL) {
+		// already in direct window mode
+		return B_ERROR;
+	}
+
+	fDirectWindowInfo = new(std::nothrow) DirectWindowInfo;
+	if (fDirectWindowInfo == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = fDirectWindowInfo->InitCheck();
+	if (status != B_OK) {
+		delete fDirectWindowInfo;
+		fDirectWindowInfo = NULL;
+
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+void
 ServerWindow::_DirectWindowSetFullScreen(bool enable)
 {
+	window_feel feel = kWindowScreenFeel;
+
 	if (enable) {
 		fDesktop->HWInterface()->SetCursorVisible(false);
 
-		fDirectWindowData->old_window_frame = fWindow->Frame();
-		BRect screenFrame = fWindow->Screen()->Frame();
-		fDirectWindowFeel = fWindow->Feel();
-		fDesktop->MoveWindowBy(fWindow, -fWindow->Frame().left,
-			-fWindow->Frame().top);
-		fDesktop->ResizeWindowBy(fWindow,
-			screenFrame.Width() - fWindow->Frame().Width(),
-			screenFrame.Height() - fWindow->Frame().Height());
+		fDirectWindowInfo->EnableFullScreen(fWindow->Frame(), fWindow->Feel());
+		_ResizeToFullScreen();
 	} else {
-		const BRect &oldFrame = fDirectWindowData->old_window_frame;
+		const BRect& originalFrame = fDirectWindowInfo->OriginalFrame();
+
+		fDirectWindowInfo->DisableFullScreen();
+
+		// Resize window back to its original size
 		fDesktop->MoveWindowBy(fWindow,
-			oldFrame.left - fWindow->Frame().left,
-			oldFrame.top - fWindow->Frame().top);
+			originalFrame.left - fWindow->Frame().left,
+			originalFrame.top - fWindow->Frame().top);
 		fDesktop->ResizeWindowBy(fWindow,
-			oldFrame.Width() - fWindow->Frame().Width(),
-			oldFrame.Height() - fWindow->Frame().Height());
+			originalFrame.Width() - fWindow->Frame().Width(),
+			originalFrame.Height() - fWindow->Frame().Height());
 
 		fDesktop->HWInterface()->SetCursorVisible(true);
 	}
 
-	fDirectWindowData->full_screen = enable;
-	fDesktop->SetWindowFeel(fWindow,
-		enable ? kWindowScreenFeel : fDirectWindowFeel);
+	fDesktop->SetWindowFeel(fWindow, feel);
 }
 
 

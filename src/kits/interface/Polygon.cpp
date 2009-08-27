@@ -1,70 +1,59 @@
 /*
- * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2001-2009, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Marc Flerackers, mflerackers@androme.be
  *		Marcus Overhagen
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-
-#include <AffineTransform.h>
 #include <Polygon.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
+#include <AffineTransform.h>
+
 
 // Limit to avoid integer overflow when calculating the size to allocate
 #define MAX_POINT_COUNT 10000000
 
 
-BPolygon::BPolygon(const BPoint *ptArray, int32 numPoints)
+BPolygon::BPolygon(const BPoint* points, int32 count)
 	:
-	fBounds(0.0, 0.0, 0.0, 0.0),
-	fCount(numPoints),
-	fPoints(NULL)
-{
-	if (fCount) {
-		if (fCount > MAX_POINT_COUNT)
-			debugger("BPolygon::BPolygon too many points");
-
-		// Note the use of memcpy here.  The assumption is that an array of BPoints can
-		// be copied bit by bit and not use a copy constructor or an assignment
-		// operator.  This breaks the containment of BPoint but will result in better
-		// performance.  An example where the memcpy will fail would be if BPoint begins
-		// to do lazy copying through reference counting.  By copying the bits, we will
-		// copy reference counting state which will not be relevant at the destination.
-		// Luckily, BPoint is a very simple class which isn't likely to change much.
-		//
-		// Similar use of memcpy appears later in this implementation also.
-		size_t size = fCount * sizeof(BPoint);
-		fPoints = (BPoint *)malloc(size);
-		if (!fPoints) {
-			fprintf(stderr, "BPolygon::BPolygon out of memory\n");
-			fCount = 0;
-			return;
-		}
-		memcpy(fPoints, ptArray, size);
-		_ComputeBounds();
-	}
-}
-
-
-BPolygon::BPolygon(const BPolygon *poly)
-	:
-	fBounds(0.0, 0.0, 0.0, 0.0),
+	fBounds(0.0f, 0.0f, -1.0f, -1.0f),
 	fCount(0),
 	fPoints(NULL)
 {
-	*this = *poly;
+	_AddPoints(points, count, true);
+}
+
+
+BPolygon::BPolygon(const BPolygon& other)
+	:
+	fBounds(0.0f, 0.0f, -1.0f, -1.0f),
+	fCount(0),
+	fPoints(NULL)
+{
+	*this = other;
+}
+
+
+BPolygon::BPolygon(const BPolygon* other)
+	:
+	fBounds(0.0f, 0.0f, -1.0f, -1.0f),
+	fCount(0),
+	fPoints(NULL)
+{
+	*this = *other;
 }
 
 
 BPolygon::BPolygon()
 	:
-	fBounds(0.0, 0.0, 0.0, 0.0),
+	fBounds(0.0f, 0.0f, -1.0f, -1.0f),
 	fCount(0),
 	fPoints(NULL)
 {
@@ -77,28 +66,21 @@ BPolygon::~BPolygon()
 }
 
 
-BPolygon &
-BPolygon::operator=(const BPolygon &from)
+BPolygon&
+BPolygon::operator=(const BPolygon& other)
 {
 	// Make sure we aren't trying to perform a "self assignment".
-	if (this != &from) {
-		free(fPoints);		
-		fBounds = from.fBounds;
-		fCount = from.fCount;
-		if (fCount) {
-			if (fCount > MAX_POINT_COUNT)
-				debugger("BPolygon::operator= too many points");
-			fPoints = (BPoint *)malloc(fCount * sizeof(BPoint));
-			if (!fPoints) {
-				fprintf(stderr, "BPolygon::operator= out of memory\n");
-				fCount = 0;
-			} else {
-				memcpy(fPoints, from.fPoints, fCount * sizeof(BPoint));
-			}
-		} else {
-			fPoints = NULL;
-		}
-	}
+	if (this == &other)
+		return *this;
+
+	free(fPoints);
+	fPoints = NULL;
+	fCount = 0;
+	fBounds.Set(0.0f, 0.0f, -1.0f, -1.0f);
+
+	if (_AddPoints(other.fPoints, other.fCount, false))
+		fBounds = other.fBounds;
+
 	return *this;
 }
 
@@ -111,24 +93,9 @@ BPolygon::Frame() const
 
 
 void
-BPolygon::AddPoints(const BPoint *ptArray, int32 numPoints)
+BPolygon::AddPoints(const BPoint* points, int32 count)
 {
-	if (numPoints < 0)
-		debugger("BPolygon::AddPoints negative points");
-	if (numPoints > MAX_POINT_COUNT || (fCount + numPoints) > MAX_POINT_COUNT)
-		debugger("BPolygon::AddPoints too many points");
-
-	if (numPoints > 0) {
-		BPoint *points = (BPoint *)realloc(fPoints, (fCount + numPoints) * sizeof(BPoint));
-		if (!points) {
-			fprintf(stderr, "BPolygon::AddPoints out of memory\n");
-		} else {
-			fPoints = points;
-			memcpy(fPoints + fCount, ptArray, numPoints * sizeof(BPoint));
-			fCount += numPoints;
-			_ComputeBounds();
-		}
-	}
+	_AddPoints(points, count, true);
 }
 
 
@@ -156,28 +123,60 @@ BPolygon::PrintToStream () const
 }
 
 
-void
-BPolygon::Transform(const BAffineTransform& transform)
+//void
+//BPolygon::TransformBy(const BAffineTransform& transform)
+//{
+//	transform.Apply(fPoints, (int32)fCount);
+//	_ComputeBounds();
+//}
+//
+//
+//BPolygon&
+//BPolygon::TransformBySelf(const BAffineTransform& transform)
+//{
+//	TransformBy(transform);
+//	return *this;
+//}
+//
+//
+//BPolygon
+//BPolygon::TransformByCopy(const BAffineTransform& transform) const
+//{
+//	BPolygon copy(this);
+//	copy.TransformBy(transform);
+//	return copy;
+//}
+
+
+// #pragma mark -
+
+
+bool
+BPolygon::_AddPoints(const BPoint* points, int32 count, bool computeBounds)
 {
-	transform.Apply(fPoints, (int32)fCount);
-	_ComputeBounds();
-}
+	if (points == NULL || count <= 0)
+		return false;
+	if (count > MAX_POINT_COUNT || (fCount + count) > MAX_POINT_COUNT) {
+		fprintf(stderr, "BPolygon::_AddPoints(%ld) - too many points\n",
+			count);
+		return false;
+	}
 
+	BPoint* newPoints = (BPoint*)realloc(fPoints, (fCount + count)
+		* sizeof(BPoint));
+	if (newPoints == NULL) {
+		fprintf(stderr, "BPolygon::_AddPoints(%ld) out of memory\n", count);
+		return false;
+	}
 
-BPolygon&
-BPolygon::TransformBySelf(const BAffineTransform& transform)
-{
-	Transform(transform);
-	return *this;
-}
+	fPoints = newPoints;
+	memcpy(fPoints + fCount, points, count * sizeof(BPoint));
+	fCount += count;
 
+	if (computeBounds)
+		_ComputeBounds();
 
-BPolygon*
-BPolygon::TransformByCopy(const BAffineTransform& transform) const
-{
-	BPolygon* copy = new BPolygon(this);
-	copy->Transform(transform);
-	return copy;
+	return true;
 }
 
 
@@ -185,7 +184,7 @@ void
 BPolygon::_ComputeBounds()
 {
 	if (fCount == 0) {
-		fBounds = BRect(0.0, 0.0, 0.0, 0.0);
+		fBounds = BRect(0.0, 0.0, -1.0f, -1.0f);
 		return;
 	}
 
@@ -205,7 +204,7 @@ BPolygon::_ComputeBounds()
 
 
 void
-BPolygon::_MapPoint(BPoint *point, BRect srcRect, BRect dstRect)
+BPolygon::_MapPoint(BPoint* point, const BRect& srcRect, const BRect& dstRect)
 {
 	point->x = (point->x - srcRect.left) * dstRect.Width() / srcRect.Width()
 		+ dstRect.left;
@@ -215,7 +214,8 @@ BPolygon::_MapPoint(BPoint *point, BRect srcRect, BRect dstRect)
 
 
 void
-BPolygon::_MapRectangle(BRect *rect, BRect srcRect, BRect dstRect)
+BPolygon::_MapRectangle(BRect* rect, const BRect& srcRect,
+	const BRect& dstRect)
 {
 	BPoint leftTop = rect->LeftTop();
 	BPoint bottomRight = rect->RightBottom();

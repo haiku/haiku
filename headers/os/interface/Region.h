@@ -1,12 +1,11 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
+ * Copyright 2007, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 #ifndef	_REGION_H
 #define	_REGION_H
 
-#include <BeBuild.h>
 #include <Rect.h>
 
 namespace BPrivate {

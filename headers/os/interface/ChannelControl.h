@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008-2009 Haiku, Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2008-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _CHANNEL_CONTROL_H
 #define _CHANNEL_CONTROL_H

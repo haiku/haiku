@@ -58,7 +58,7 @@ byte_string(int64 size)
 	if (value < 1024)
 		snprintf(string, sizeof(string), "%Ld B", size);
 	else {
-		char *units[] = {"K", "M", "G", NULL};
+		const char *units[] = {"K", "M", "G", NULL};
 		int32 i = -1;
 
 		do {

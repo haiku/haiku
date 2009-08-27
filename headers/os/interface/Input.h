@@ -1,15 +1,13 @@
 /*
- * Copyright 2008, Haiku, Inc.
- * Distributed under the terms of the MIT license.
+ * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
  */
 #ifndef _INPUT_H
 #define _INPUT_H
 
 
-#include <BeBuild.h>
 #include <Messenger.h>
-#include <SupportDefs.h>
 
 
 enum input_method_op {

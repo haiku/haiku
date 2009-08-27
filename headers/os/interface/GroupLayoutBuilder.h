@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku Inc.
+ * Copyright 2006, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_GROUP_LAYOUT_BUILDER_H

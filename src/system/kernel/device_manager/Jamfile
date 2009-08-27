@@ -11,8 +11,6 @@ KernelMergeObject kernel_device_manager.o :
 	io_resources.cpp
 	IOScheduler.cpp
 	legacy_drivers.cpp
-#	probe.cpp
-	settings.cpp
 
 	dma_resources.cpp
 	io_requests.cpp

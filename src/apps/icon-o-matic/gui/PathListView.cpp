@@ -737,10 +737,10 @@ PathListView::SetMenu(BMenu* menu)
 	fDuplicateMI = new BMenuItem("Duplicate", new BMessage(MSG_DUPLICATE));
 	fReverseMI = new BMenuItem("Reverse", new BMessage(MSG_REVERSE));
 	fCleanUpMI = new BMenuItem("Clean Up", new BMessage(MSG_CLEAN_UP));
-	fRotateIndicesLeftMI = new BMenuItem("Rotate Indices Left",
-		new BMessage(MSG_ROTATE_INDICES_CW), 'R');
 	fRotateIndicesRightMI = new BMenuItem("Rotate Indices Right",
-		new BMessage(MSG_ROTATE_INDICES_CCW), 'R', B_SHIFT_KEY);
+		new BMessage(MSG_ROTATE_INDICES_CCW), 'R');
+	fRotateIndicesLeftMI = new BMenuItem("Rotate Indices Left",
+		new BMessage(MSG_ROTATE_INDICES_CW), 'R', B_SHIFT_KEY);
 	fRemoveMI = new BMenuItem("Remove", new BMessage(MSG_REMOVE));
 
 	fMenu->AddItem(fAddMI);

@@ -1,11 +1,13 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
- * Author:	Erik Jaesler <erik@cgsoftware.com>
+ * Authors:
+ *		Erik Jaesler <erik@cgsoftware.com>
  */
 
-/**	Semaphore-type class for thread safety */
+
+/*!	Semaphore-type class for thread safety */
 
 
 #include <OS.h>
@@ -14,7 +16,7 @@
 
 #include "support_kit_config.h"
 
-//
+
 // Data Member Documentation:
 //
 // The "fBenaphoreCount" member is set to 1 if the BLocker style is
@@ -40,13 +42,6 @@
 //
 
 
-//
-// Constructors:
-//
-// All constructors just pass their arguments to InitLocker().  Note that
-// the default for "name" is "some BLocker" and "benaphore_style" is true.
-//
-
 BLocker::BLocker()
 {
 	InitLocker(NULL, true);
@@ -71,11 +66,10 @@ BLocker::BLocker(const char *name, bool benaphoreStyle)
 }
 
 
-//
-//	This constructor is not documented.  The final argument is ignored for
-//	now.  In Be's headers, its called "for_IPC".  DO NOT USE THIS
-//	CONSTRUCTOR!
-//
+/*!	This constructor is not documented.  The final argument is ignored for
+	now.  In Be's headers, its called "for_IPC".  DO NOT USE THIS
+	CONSTRUCTOR!
+*/
 BLocker::BLocker(const char *name, bool benaphoreStyle,
 	bool)
 {
@@ -83,10 +77,6 @@ BLocker::BLocker(const char *name, bool benaphoreStyle,
 }
 
 
-//
-// The destructor just deletes the semaphore.  By deleting the semaphore,
-// any threads waiting to acquire the BLocker will be unblocked.
-//
 BLocker::~BLocker()
 {
 	delete_sem(fSemaphoreID);
@@ -101,7 +91,7 @@ BLocker::InitCheck() const
 
 
 bool
-BLocker::Lock(void)
+BLocker::Lock()
 {
 	status_t result;
     return AcquireLock(B_INFINITE_TIMEOUT, &result);
@@ -120,7 +110,7 @@ BLocker::LockWithTimeout(bigtime_t timeout)
 
 
 void
-BLocker::Unlock(void)
+BLocker::Unlock()
 {
 	// If the thread currently holds the lockdecrement
 	if (IsLocked()) {
@@ -153,14 +143,14 @@ BLocker::Unlock(void)
 
 
 thread_id
-BLocker::LockingThread(void) const
+BLocker::LockingThread() const
 {
     return fLockOwner;
 }
 
 
 bool
-BLocker::IsLocked(void) const
+BLocker::IsLocked() const
 {
 	// This member returns true if the calling thread holds the lock.
 	// The easiest way to determine this is to compare the result of
@@ -170,21 +160,21 @@ BLocker::IsLocked(void) const
 
 
 int32
-BLocker::CountLocks(void) const
+BLocker::CountLocks() const
 {
     return fRecursiveCount;
 }
 
 
 int32
-BLocker::CountLockRequests(void) const
+BLocker::CountLockRequests() const
 {
     return fBenaphoreCount;
 }
 
 
 sem_id
-BLocker::Sem(void) const
+BLocker::Sem() const
 {
     return fSemaphoreID;
 }

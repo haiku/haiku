@@ -102,6 +102,10 @@ fi
 
 # Now ask the user if he wants to run the Installer or continue to the Desktop.
 if [ "$isReadOnly" = "yes" ]; then
+	# Create Installer links (using the write overlay)
+	ln -sf /boot/system/apps/Installer /boot/home/Desktop/Installer
+	ln -sf /boot/system/apps/Installer /boot/home/config/be/Applications/Installer
+
 	/bin/alert "Do you wish to run the Installer or continue booting to the Desktop?" "Installer" "Desktop"
 	if [ $? -eq 0 ]; then
 		launchscript $SCRIPTS/Bootscript.cd

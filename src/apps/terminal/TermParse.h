@@ -93,7 +93,6 @@ private:
 	uchar fParserBuffer[ESC_PARSER_BUFFER_SIZE];
 	int32 fParserBufferSize;
 	int32 fParserBufferOffset;
-	volatile bool fParserWaiting;
 	
 	int fLockFlag;
 

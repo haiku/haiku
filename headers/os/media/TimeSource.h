@@ -1,16 +1,10 @@
-/*******************************************************************************
-/
-/	File:			TimeSource.h
-/
-/   Description:  A BTimeSource is something to which others can slave timing information
-/	using the Media Kit.
-/
-/	Copyright 1997-98, Be Incorporated, All Rights Reserved
-/
-*******************************************************************************/
-
-#if !defined(_TIME_SOURCE_H)
+/*
+ * Copyright 2009, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _TIME_SOURCE_H
 #define _TIME_SOURCE_H
+
 
 #include <MediaDefs.h>
 #include <MediaNode.h>
@@ -18,133 +12,115 @@
 
 class _BSlaveNodeStorageP;
 
-namespace BPrivate { namespace media {
-	class BMediaRosterEx;
-	class TimeSourceObject;
-	class SystemTimeSourceObject;
-	class SlaveNodes;
-	struct TimeSourceTransmit;
-} }
+namespace BPrivate {
+	namespace media {
+		class BMediaRosterEx;
+		class TimeSourceObject;
+		class SystemTimeSourceObject;
+		class SlaveNodes;
+		struct TimeSourceTransmit;
+	}
+}
 
 
-class BTimeSource :
-	public virtual BMediaNode
-{
+class BTimeSource : public virtual BMediaNode {
 protected:
-		/* this has to be at the top to force a vtable */
-virtual	~BTimeSource();
+	virtual						~BTimeSource();
 
 public:
+	virtual	status_t			SnoozeUntil(bigtime_t performanceTime,
+									bigtime_t withLatency = 0,
+									bool retrySignals = false);
 
-virtual	status_t SnoozeUntil(				/* returns error if stopped */
-				bigtime_t performance_time,
-				bigtime_t with_latency = 0,
-				bool retry_signals = false);
+			bigtime_t			Now();
+			bigtime_t			PerformanceTimeFor(bigtime_t realTime);
+			bigtime_t			RealTimeFor(bigtime_t performanceTime,
+									bigtime_t withLatency);
+			bool				IsRunning();
 
-		bigtime_t Now();	/* convenience, less accurate */
-		bigtime_t PerformanceTimeFor(	/* all three go through GetTime() */
-				bigtime_t real_time);
-		bigtime_t RealTimeFor(
-				bigtime_t performance_time,
-				bigtime_t with_latency);
-		bool IsRunning();
+			status_t			GetTime(bigtime_t* _performanceTime,
+									bigtime_t* _realTime, float* _drift);
+			status_t			GetStartLatency(bigtime_t* _latency);
 
-		status_t GetTime(	/* return B_OK if reading is usable */
-				bigtime_t * performance_time,
-				bigtime_t * real_time,
-				float * drift);
-
-static	bigtime_t RealTime();	/* this produces real time, nothing else is guaranteed to */
-
-		status_t GetStartLatency(
-				bigtime_t * out_latency);
+	static	bigtime_t			RealTime();
 
 protected:
+								BTimeSource();
 
-		BTimeSource();
+	virtual	status_t			HandleMessage(int32 message, const void* data,
+									size_t size);
 
-virtual	status_t HandleMessage(
-				int32 message,
-				const void * data,
-				size_t size);
+			void				PublishTime(bigtime_t performanceTime,
+									bigtime_t realTime, float drift);
 
-		void PublishTime(	/* call this at convenient times to update approximation */
-				bigtime_t performance_time,
-				bigtime_t real_time,
-				float drift);
+			void				BroadcastTimeWarp(bigtime_t atRealTime,
+									bigtime_t newPerformanceTime);
 
-		void BroadcastTimeWarp(
-				bigtime_t at_real_time,
-				bigtime_t new_performance_time);	/* when running */
-		void SendRunMode(
-				run_mode mode);
+			void				SendRunMode(run_mode mode);
+	virtual	void				SetRunMode(run_mode mode);
 
-virtual	void SetRunMode(
-				run_mode mode);		/* or, instead, SendRunMode() */
+	enum time_source_op {
+		B_TIMESOURCE_START = 1,
+		B_TIMESOURCE_STOP,
+		B_TIMESOURCE_STOP_IMMEDIATELY,
+		B_TIMESOURCE_SEEK
+	};
 
-		enum time_source_op {
-			B_TIMESOURCE_START = 1,
-			B_TIMESOURCE_STOP,
-			B_TIMESOURCE_STOP_IMMEDIATELY,
-			B_TIMESOURCE_SEEK
-		};
-		struct time_source_op_info {
-			time_source_op op;
-			int32 _reserved1;
-			bigtime_t real_time;
-			bigtime_t performance_time;
-			int32 _reserved2[6];
-		};
-virtual	status_t TimeSourceOp(
-				const time_source_op_info & op,
-				void * _reserved) = 0;
+	struct time_source_op_info {
+		time_source_op	op;
+		int32			_reserved1;
+		bigtime_t		real_time;
+		bigtime_t		performance_time;
+		int32			_reserved2[6];
+	};
+
+	virtual	status_t			TimeSourceOp(const time_source_op_info& op,
+									void* _reserved) = 0;
 
 private:
-
 	friend class BMediaNode;
 	friend class BMediaRoster;
 	friend class BPrivate::media::BMediaRosterEx;
-	friend class BPrivate::media::TimeSourceObject;
 	friend class BPrivate::media::SystemTimeSourceObject;
+	friend class BPrivate::media::TimeSourceObject;
 
-		BTimeSource(		/* private unimplemented */
-				const BTimeSource & clone);
-		BTimeSource & operator=(
-				const BTimeSource & clone);
+								BTimeSource(const BTimeSource& other);
+			BTimeSource&		operator=(const BTimeSource& other);
+									// not implemented
 
-		/* Mmmh, stuffing! */
-			status_t _Reserved_TimeSource_0(void *); // TimeSourceOp()
-virtual		status_t _Reserved_TimeSource_1(void *);
-virtual		status_t _Reserved_TimeSource_2(void *);
-virtual		status_t _Reserved_TimeSource_3(void *);
-virtual		status_t _Reserved_TimeSource_4(void *);
-virtual		status_t _Reserved_TimeSource_5(void *);
+	explicit					BTimeSource(media_node_id id);
 
-		bool fStarted;
-		area_id fArea;
-		volatile BPrivate::media::TimeSourceTransmit *fBuf;
-		BPrivate::media::SlaveNodes *fSlaveNodes;
+			status_t			_Reserved_TimeSource_0(void*);
+				// used for TimeSourceOp()
+	virtual	status_t			_Reserved_TimeSource_1(void*);
+	virtual	status_t			_Reserved_TimeSource_2(void*);
+	virtual	status_t			_Reserved_TimeSource_3(void*);
+	virtual	status_t			_Reserved_TimeSource_4(void*);
+	virtual	status_t			_Reserved_TimeSource_5(void*);
 
-		area_id _reserved_area;
-		bool fIsRealtime;
-		bool _reserved_bool_[3];
-		uint32 _reserved_time_source_[10];
+	virtual	status_t			RemoveMe(BMediaNode* node);
+	virtual	status_t			AddMe(BMediaNode* node);
 
-explicit	BTimeSource(
-				media_node_id id);
-		void FinishCreate(); /* called by roster and/or server */
+			void				FinishCreate();
 
-virtual	status_t RemoveMe(BMediaNode * node);
-virtual	status_t AddMe(BMediaNode * node);
+			void				DirectStart(bigtime_t at);
+			void				DirectStop(bigtime_t at, bool immediate);
+			void				DirectSeek(bigtime_t to, bigtime_t at);
+			void				DirectSetRunMode(run_mode mode);
+			void				DirectAddMe(const media_node& node);
+			void				DirectRemoveMe(const media_node& node);
 
-		void	DirectStart(bigtime_t at);
-		void	DirectStop(bigtime_t at, bool immediate);
-		void	DirectSeek(bigtime_t to, bigtime_t at);
-		void	DirectSetRunMode(run_mode mode);
-		void	DirectAddMe(const media_node &node);
-		void	DirectRemoveMe(const media_node &node);
+private:
+			bool				fStarted;
+			area_id				fArea;
+	volatile BPrivate::media::TimeSourceTransmit* fBuf;
+			BPrivate::media::SlaveNodes* fSlaveNodes;
+
+			area_id				_reserved_area;
+			bool				fIsRealtime;
+			bool				_reserved_bool_[3];
+			uint32				_reserved_time_source_[10];
 };
 
 
-#endif /* _TIME_SOURCE_H */
-
+#endif	// _TIME_SOURCE_H

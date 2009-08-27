@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"../../../../html-dtd/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>E-mail</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div class="logo">
+	<img src="../images/logo.png" alt="logo" class="noprint" id="logo" name="logo" />
+</div>
+
+<div class="topnav">
+	<p>
+		&laquo;&#160;&#160;<a href="datatranslations.html">DataTranslations</a>
+		&#160;&#160;::&#160;&#160;
+		<a href="../preferences.html" class="uplink">Preferences</a>
+		&#160;&#160;::&#160;&#160;
+		<a href="filetypes.html">FileTypes</a>&#160;&#160;&raquo;
+	</p>
+</div>
+
+<div class="content">
+
+
+<table class="index" id="index" name="index" summary="index" align="right">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td>
+	<a href="#creating">Creating a new e-mail account</a><br />
+	<a href="#incoming">Setting up incoming e-mail</a><br />
+	<a href="#outgoing">Setting up outgoing e-mail</a><br />
+	<a href="#filters">Setting up e-mail filters</a><br />
+	<a href="#settings">Setting up the mail_daemon</a>
+</td></tr>
+</table>
+
+<h1><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png"
+width="64" height="64" />E-mail</h1>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>Location:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
+<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
+</table>
+<p>Haiku provides a system that retrieves e-mail regularly via a mail_daemon and saves each mail as a single text file. It parses the mail and fills its attributes with all necessary header information, like from, to, subject and its unread status. Now it can be queried by you or any application. This system also makes switching e-mail clients easy as all the data and your configuration stays the same.<br />
+The configuration is done in the E-Mail preference panel.</p>
+
+<h1>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="creating" name="creating">Creating a new e-mail account</a></h1>
+<p>Let's go through the process of setting up an e-mail account.<br />
+You start by clicking the <span class="button">Add</span> button to create a new, unnamed account. This opens a panel where you fill in your account info:</p>
+<img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
+<p>First, declare the <i>Account Type</i> which is either <span class="menu">Receive Mail Only</span>, <span class="menu">Send Mail Only</span>, or the most usual type, <span class="menu">Send and Receive Mail</span>. Then you set how you get your mail, via <span class="menu">POP3</span> or <span class="menu">IMAP</span>.</p>
+<p>Now you enter your <i>E-mail Address</i>, <i>Login Name</i> and <i>Password</i>, give an <i>Account Name</i> under which it will be known under Haiku and your <i>Real Name</i>.</p>
+<p>If your account is from a major e-mail provider, Haiku already knows all technical details like server IP addresses and the following information is already filled in automatically. If that is not the case, just follow this guide and fill in the details to your e-mail account accordingly.</p>
+
+<h1>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="incoming" name="incoming">Setting up incoming e-mail</a></h1>
+<p>Click on <span class="menu">Incoming</span> under your account's name to set up how e-mails are received.</p>
+<img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
+<p>From the drop-down menu you choose the protocol used by your provider. <span class="menu">IMAP</span> and <span class="menu">POP3</span> are supported.</p>
+<p>Next is the <span class="menu">Mail Server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
+<p>Then you enter your login information, <i>Username</i> and <i>Password</i>, and if necessary change the <i>Login Type</i> from the default <span class="menu">Plain Text</span> to <span class="menu">APOP</span> for authentication.</p>
+<p>If you use <i>POP3</i> and retrieve mails of this account from different computers, you may want to activate the option to <span class="menu">Leave mail on server</span> and only <span class="menu">Remove mail from server when deleted</span> locally.</p>
+<p>If you use <i>IMAP</i> instead, you have the option to <span class="menu">Remove mail from server when deleted</span> locally. You can specify a <span class="menu">Top Mailbox Folder</span> to only synchronize with a specific folder and its subfolders.</p>
+<p>The <span class="menu">New Mail Notification</span> offers different methods to announce the arrival of new mail. Try different settings to see what works best for you.</p>
+<p>You can change the <i>Location</i> of your inbox (default: <span class="path">/boot/home/mail/in/</span>), which is useful if you'd like to separate the mails from different accounts into their own folders. However, queries let you sort things out just as well.</p>
+<p>Last on this page, you can opt to only <span class="menu">Partially download messages</span> that are larger than a certain size. This will only get the header and you can decide if you want to download the rest of the message plus possible attachments after seeing the subject and who sent it. Useful if you have a slow connection.</p>
+
+<h1>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="outgoing" name="outgoing">Setting up outgoing e-mail</a></h1>
+<p>Click on <span class="menu">Outgoing</span> under your account's name to set up how e-mails are sent.</p>
+<img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
+<p>As with incoming mail, you can also change the <i>Location</i> of your outbox (default: <span class="path">/boot/home/mail/out/</span>).</p>
+<p>Next is the <i>SMTP Server</i> address for outgoing mails. As with the incoming server before, you can use a specific port if needed, e.g. <tt>mail.your-provider.org:1200</tt>.</p>
+<p>If you need to login, you change the <i>Login Type</i> to <span class="menu">ESMTP</span> and enter username and password above. The other type is used for providers that need you to check for mail with <span class="menu">POP3 before SMTP</span> for identification.</p>
+
+<h1>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="filters" name="filters">Setting up e-mail filters</a></h1>
+<p>If you want to filter your incoming email, you click on <span class="menu">E-Mail Filters</span> under your account's name to set up automatic sorting. You can add any number of filters that are applied one after the other. You can rearrange them by drag&amp;dropping them to their new position.<br />
+Besides the <span class="menu">R5 Daemon Filter</span> that's used for backward compatibility, there are two other <span class="menu">Incoming Mail Filters</span> you can add.</p>
+
+<h2>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+Spam Filter</h2>
+<img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
+<p>The spam filter uses statistical methods to classify a mail as unwanted spam. It assigns a value between 0 and 1 to it and you can decide what are the limits for a genuine mail and what will be considered spam.<br />
+You can have that spam rating added to the start of the subject.<br />
+Also, the spam filter can learn from all incoming e-mail. Of course, you'll have to teach it by sorting out the false positives, mails that were mistakenly marked as spam. You'll find more on that when we discuss the application <span class="app">Mail</span>.</p>
+<p>Together with the following <span class="menu">Match Header</span> filter, you're able to automatically sort out detected spam mails.</p>
+
+<h2>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+Match Header</h2>
+<img src="../images/prefs-images/e-mail-filter-header.png" alt="e-mail-filter-header.png" />
+<p>This filter compares a header to a search pattern and performs some action when it matches.<br />
+With the first text field you specify which header to check against. These are available:</p>
+<table summary="match header" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><span class="menu">Name</span></td><td style="width:5px;">&#160;</td>
+		<td>the name of the sender</td></tr>
+	<tr><td><span class="menu">From</span></td><td>&#160;</td>
+		<td>the e-mail address of the sender</td></tr>
+	<tr><td><span class="menu">To</span></td><td>&#160;</td>
+		<td>your e-mail address (different for each e-mail account)</td></tr>
+	<tr><td><span class="menu">Reply To</span></td><td>&#160;</td>
+		<td>the e-mail address replies are sent to</td></tr>
+	<tr><td><span class="menu">When</span></td><td>&#160;</td>
+		<td>the date and time the mail was received</td></tr>
+	<tr><td><span class="menu">Subject</span></td><td>&#160;</td>
+		<td>the subject line</td></tr>
+	<tr><td><span class="menu">Cc</span></td><td>&#160;</td>
+		<td>addresses of anyone receiving a carbon copy (Cc)</td></tr>
+	<tr><td><span class="menu">Account</span></td><td>&#160;</td>
+		<td>the name of the e-mail's account</td></tr>
+	<tr><td><span class="menu">Status</span></td><td>&#160;</td>
+		<td>The current status of the e-mail. Normally, this can be "Read", "Replied", "Sent", "Forwarded", "New", or anything you have designated yourself. However, unless you change it yourself in a filter, it will always be "New" when the mail_daemon fetched the mail.</td></tr>
+	<tr><td><span class="menu">Priority</span></td><td>&#160;</td>
+		<td>is set by the sender's e-mail program (e.g. "urgent")</td></tr>
+	<tr><td><span class="menu">Thread</span></td><td>&#160;</td>
+		<td>essentially the same as "Subject", but without things like Re: or Fwd:</td></tr>
+	<tr><td><span class="menu">Classification Group</span></td><td>&#160;</td>
+		<td>depending on what the spam filter classified it as, this will either be empty (if uncertain) or contain the word "Genuine" or "Spam"</td></tr>
+	<tr><td><span class="menu">Spam/Genuine Estimate</span></td><td>&#160;</td>
+		<td>this is a numerical estimate that the spam filter assigned to the e-mail. They are shown in scientific notation, where 1.065e-12 translates to 1.065 divided by 10 to the 12th power, which in this case translates to 0.000000000001065.</td></tr>
+</table>
+<p>The second text field holds your search pattern. It accepts <a href="http://en.wikipedia.org/wiki/Regular_expression" class='external free' title="http://en.wikipedia.org/wiki/Regular expression" rel="nofollow">regular expressions</a> which gives it great flexibility, while unfortunately complicating things a bit. Read up on it a bit, it's well worth it and simple search patterns aren't <i>that</i> complicated at all.</p>
+<p>With the drop-down menu below it, you assign an action when the pattern matches. You can move or delete a mail, set the status to "Read" or anything else or set the e-mail account you'll reply with.</p>
+
+<h2>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+Outgoing Mail Filters</h2>
+<p>At this moment, there's only one filter that deals with outgoing mail: <span class="cli">fortune</span>.
+<br />It will attach a randomly chosen funny or wise "fortune cookie" to the end of every mail before it's sent out. You can do a dry run by issuing the command <span class="cli">fortune</span> in a Terminal.</p>
+
+<h1>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="settings" name="settings">Setting up the mail_daemon</a></h1>
+<p>Now that your incoming and outgoing mail servers (and maybe some filters, too), are configured, you have to tell the mail_server that does all the actual mail checking and fetching how to do its job.</p>
+<img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
+<p>Under <i>Mail Checking</i> you configure the interval at which the account's mail server is probed for new mail.<br />
+If you're on a dial-up connection, you may want to do that <span class="menu">Only When Dial-Up is Connected</span> and also <span class="menu">Schedule Outgoing Mail When Dial-Up is Disconnected</span> to avoid dialing automatically in regularly only to check for mail.</p>
+<p>The mail_daemon has a status window which you can set to show up <span class="menu">Never</span>, <span class="menu">While Sending</span>, <span class="menu">While Sending and Receiving</span> or <span class="menu">Always</span>.</p>
+<p>Make sure to <span class="menu">Start Mail Services on Startup</span> or there will be no mail_daemon running to do your bidding...</p>
+<img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
+<p><span class="menu">Edit Mailbox Menu...</span> will open the folder <span class="path">/boot/home/config/Mail/Menu Links/</span>. All folders or queries (!) or their links put into this folder will appear in the context menu of the mailbox icon of the Mail Services in the Deskbar tray.</p>
+<p>From that menu, you can also <span class="menu">Create New Message...</span>, <span class="menu">Check For Mail Now</span> or <span class="menu">Edit Preferences...</span>.</p>
+<p>The mailbox icon itself shows if there are unread messages (status "New") when there are envelopes inside.</p>
+
+</div>
+
+<div class="bottomnav">
+	<p>
+		&laquo;&#160;&#160;<a href="datatranslations.html">DataTranslations</a>
+		&#160;&#160;::&#160;&#160;
+		<a href="../preferences.html" class="uplink">Preferences</a>
+		&#160;&#160;::&#160;&#160;
+		<a href="filetypes.html">FileTypes</a>&#160;&#160;&raquo;
+	</p>
+</div>
+
+</body>
+</html>

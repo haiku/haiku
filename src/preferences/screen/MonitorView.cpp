@@ -20,7 +20,7 @@
 #include "Constants.h"
 
 
-MonitorView::MonitorView(BRect rect, char *name, int32 width, int32 height)
+MonitorView::MonitorView(BRect rect, const char *name, int32 width, int32 height)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fMaxWidth(1920),
 	fMaxHeight(1200),

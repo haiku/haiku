@@ -1,7 +1,8 @@
 /*
- * Copyright 2005-2008, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include <errno.h>
 #include <fcntl.h>
@@ -22,26 +23,24 @@
 // Linux and FreeBSD support
 #ifdef HAIKU_HOST_PLATFORM_LINUX
 #	include <ctype.h>
+#	include <linux/fs.h>
 #	include <linux/hdreg.h>
 #	include <sys/ioctl.h>
 
-#	include "PartitionMap.h"
-#	include "PartitionMapParser.h"
+#	define USE_PARTITION_MAP 1
 #elif HAIKU_HOST_PLATFORM_FREEBSD
 #	include <ctype.h>
 #	include <sys/disklabel.h>
 #	include <sys/disk.h>
 #	include <sys/ioctl.h>
 
-#	include "PartitionMap.h"
-#	include "PartitionMapParser.h"
+#	define USE_PARTITION_MAP 1
 #elif HAIKU_HOST_PLATFORM_DARWIN
 #	include <ctype.h>
 #	include <sys/disk.h>
 #	include <sys/ioctl.h>
 
-#	include "PartitionMap.h"
-#	include "PartitionMapParser.h"
+#	define USE_PARTITION_MAP 1
 #endif
 
 #ifdef __HAIKU__
@@ -53,6 +52,11 @@
 #	include <Path.h>
 
 #	include "bfs_control.h"
+#endif
+
+#if USE_PARTITION_MAP
+#	include "PartitionMap.h"
+#	include "PartitionMapParser.h"
 #endif
 
 
@@ -194,6 +198,7 @@ write_boot_code_part(const char *fileName, int fd, off_t imageOffset,
 
 
 #ifdef __HAIKU__
+
 static status_t
 find_own_image(image_info *info)
 {
@@ -208,6 +213,36 @@ find_own_image(image_info *info)
 
 	return B_NAME_NOT_FOUND;
 }
+
+#endif
+
+
+#if USE_PARTITION_MAP
+
+static void
+dump_partition_map(const PartitionMap& map)
+{
+	fprintf(stderr, "partitions:\n");
+	int32 count = map.CountPartitions();
+	for (int i = 0; i < count; i++) {
+		const Partition* partition = map.PartitionAt(i);
+		fprintf(stderr, "%2d: ", i);
+		if (partition == NULL) {
+			fprintf(stderr, "<null>\n");
+			continue;
+		}
+
+		if (partition->IsEmpty()) {
+			fprintf(stderr, "<empty>\n");
+			continue;
+		}
+
+		fprintf(stderr, "offset: %16lld, size: %16lld, type: %x%s\n",
+			(int64)partition->Offset(), (int64)partition->Size(),
+			partition->Type(), partition->IsExtended() ? " (extended)" : "");
+	}
+}
+
 #endif
 
 
@@ -299,7 +334,7 @@ main(int argc, const char *const *argv)
 		int64 partitionOffset = 0;
 		fs_info info;	// needs to be here (we use the device name later)
 		if (S_ISDIR(st.st_mode)) {
-			#if defined(__BEOS__) || defined(__HAIKU__) 
+			#if defined(__BEOS__) || defined(__HAIKU__)
 
 				// a directory: get the device
 				error = fs_stat_dev(st.st_dev, &info);
@@ -400,12 +435,14 @@ main(int argc, const char *const *argv)
 					if (!partition || partition->IsEmpty()) {
 						fprintf(stderr, "Error: Invalid partition index %d.\n",
 							partitionIndex);
+						dump_partition_map(map);
 						exit(1);
 					}
 
 					if (partition->IsExtended()) {
 						fprintf(stderr, "Error: Partition %d is an extended "
 							"partition.\n", partitionIndex);
+						dump_partition_map(map);
 						exit(1);
 					}
 
@@ -453,16 +490,22 @@ main(int argc, const char *const *argv)
 						exit(1);
 					}
 
-					// get device geometry
+					// get device size -- try BLKGETSIZE64, but, if it doesn't
+					// work, fall back to the obsolete HDIO_GETGEO
+					int64 deviceSize;
 					hd_geometry geometry;
-					if (ioctl(baseFD, HDIO_GETGEO, &geometry) < 0) {
+					if (ioctl(baseFD, BLKGETSIZE64, &deviceSize) == 0
+						&& deviceSize > 0) {
+						// looks good
+					} else if (ioctl(baseFD, HDIO_GETGEO, &geometry) == 0) {
+						deviceSize = (int64)geometry.heads * geometry.sectors
+							* geometry.cylinders * 512;
+					} else {
 						fprintf(stderr, "Error: Failed to get device geometry "
 							"for \"%s\": %s\n", baseDeviceName,
 							strerror(errno));
 						exit(1);
 					}
-					int64 deviceSize = (int64)geometry.heads * geometry.sectors
-						* geometry.cylinders * 512;
 
 					// parse the partition map
 					// TODO: block size!
@@ -483,17 +526,18 @@ main(int argc, const char *const *argv)
 					if (!partition || partition->IsEmpty()) {
 						fprintf(stderr, "Error: Invalid partition index %d.\n",
 							partitionIndex);
+						dump_partition_map(map);
 						exit(1);
 					}
 
 					if (partition->IsExtended()) {
 						fprintf(stderr, "Error: Partition %d is an extended "
 							"partition.\n", partitionIndex);
+						dump_partition_map(map);
 						exit(1);
 					}
 
 					partitionOffset = partition->Offset();
-
 				} else {
 					// The given device is the base device. We'll write at
 					// offset 0.
@@ -554,13 +598,15 @@ main(int argc, const char *const *argv)
 				Partition *partition = map.PartitionAt(partitionIndex - 1);
 				if (!partition || partition->IsEmpty()) {
 					fprintf(stderr, "Error: Invalid partition index %d.\n",
-							partitionIndex);
+						partitionIndex);
+					dump_partition_map(map);
 					exit(1);
 				}
 
 				if (partition->IsExtended()) {
 					fprintf(stderr, "Error: Partition %d is an extended "
-							"partition.\n", partitionIndex);
+						"partition.\n", partitionIndex);
+					dump_partition_map(map);
 					exit(1);
 				}
 				partitionOffset = partition->Offset();

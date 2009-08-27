@@ -1,6 +1,6 @@
 /*
  * Copyright 2001-2009, Haiku, Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _CONTROL_H
 #define _CONTROL_H

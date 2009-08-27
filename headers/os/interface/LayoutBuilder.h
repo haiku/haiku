@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku Inc.
+ * Copyright 2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_LAYOUT_BUILDER_H

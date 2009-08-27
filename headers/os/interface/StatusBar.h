@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STATUS_BAR_H
@@ -26,9 +26,32 @@ public:
 									bool deep = true) const;
 
 	virtual	void				AttachedToWindow();
-	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				DetachedFromWindow();
+	virtual	void				AllAttached();
+	virtual	void				AllDetached();
+
+	virtual	void				WindowActivated(bool state);
+	virtual	void				MakeFocus(bool focus = true);
+
+	virtual	void				GetPreferredSize(float* _width,
+									float* _height);
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
+	virtual	BSize				PreferredSize();
+	virtual	void				ResizeToPreferred();
+	virtual	void				FrameMoved(BPoint newPosition);
+	virtual	void				FrameResized(float newWidth, float newHeight);
+
 	virtual	void				Draw(BRect updateRect);
 
+	virtual	void				MessageReceived(BMessage* message);
+
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseUp(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 transit,
+									const BMessage* dragMessage);
+
+	// BStatusBar
 	virtual	void				SetBarColor(rgb_color color);
 	virtual	void				SetBarHeight(float height);
 
@@ -53,32 +76,12 @@ public:
 			const char*			Label() const;
 			const char*			TrailingLabel() const;
 
-	virtual	void				MouseDown(BPoint where);
-	virtual	void				MouseUp(BPoint where);
-	virtual	void				WindowActivated(bool state);
-	virtual	void				MouseMoved(BPoint where, uint32 transit,
-									const BMessage* dragMessage);
-	virtual	void				DetachedFromWindow();
-	virtual	void				FrameMoved(BPoint newPosition);
-	virtual	void				FrameResized(float newWidth, float newHeight);
-
-	virtual	BHandler*			ResolveSpecifier(BMessage* message, int32 index,
-									BMessage* specifier, int32 what,
-									const char* property);
-
-	virtual	void				ResizeToPreferred();
-	virtual	void				GetPreferredSize(float* _width, float* _height);
-	virtual	void				MakeFocus(bool focus = true);
-	virtual	void				AllAttached();
-	virtual	void				AllDetached();
+	virtual	BHandler*			ResolveSpecifier(BMessage* message,
+									int32 index, BMessage* specifier,
+									int32 what, const char* property);
 	virtual	status_t			GetSupportedSuites(BMessage* data);
 
 	virtual	status_t			Perform(perform_code d, void* arg);
-
-	// Layout methods
-	virtual	BSize				MinSize();
-	virtual	BSize				MaxSize();
-	virtual	BSize				PreferredSize();
 
 private:
 	// FBC memebers

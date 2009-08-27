@@ -3,12 +3,15 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "application/msword";
 
-resource(2, "META:S:DESC") #'MSDC' "Microsoft Word Document";
+resource(2, "META:S:DESC") #'MSDC' "Word Document";
 
-resource(3, "META:EXTENS") message(234) {
+resource(3, "META:L:DESC") #'MLDC' "Microsoft® Word® Document";
+
+resource(4, "META:EXTENS") message(234) {
 	"extensions" = "doc",
 	"extensions" = "dot",
 	"type" = "application/msword"
 };
 
-resource(4, "META:SNIFF_RULE") "0.50 (\"\\320\\317\\021\\340\\241\\261\\032\\341\")";
+resource(5, "META:SNIFF_RULE") "0.50 (\"\\320\\317\\021\\340\\241\\261\\032\\341\")";
+

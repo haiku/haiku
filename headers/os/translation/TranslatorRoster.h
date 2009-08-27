@@ -5,6 +5,7 @@
 #ifndef _TRANSLATOR_ROSTER_H
 #define _TRANSLATOR_ROSTER_H
 
+
 #include <Archivable.h>
 #include <TranslationDefs.h>
 
@@ -123,4 +124,5 @@ private:
 	static	BTranslatorRoster*		sDefaultRoster;
 };
 
-#endif	/* _TRANSLATOR_ROSTER_H */
+
+#endif	// _TRANSLATOR_ROSTER_H

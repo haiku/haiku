@@ -1,11 +1,11 @@
 /*
-	
+
 	ChartRender.c
-	
+
 	by Pierre Raynaud-Richard.
-	
+
 	Copyright 1998 Be Incorporated, All Rights Reserved.
-	
+
 */
 
 /* This file has been designed to be easy to compile as a stand-alone
@@ -17,14 +17,14 @@
 
 /* This table provide the horizontal and vertical offset of the matrix
    of pixel used for drawing stars. This matrix is designed as follow:
-   
+
     --  [00] [01] [02] [03]  --
    [04] [05] [06] [07] [08] [09]
    [10] [11] [12] [13] [14] [15]
    [16] [17] [18] [19] [20] [21]
    [22] [23] [24] [25] [26] [27]
     --  [28] [29] [30] [31]  --
-    
+
    The reference pixel is [12]. */
 int8	pattern_dh[32] = {
 		-1, 0, 1, 2,
@@ -68,7 +68,7 @@ static uint32	visible_mask_left[6] = {
 	0x8c30c308,
 	0x08208200
 };
-			
+
 static uint32	visible_mask_right[6] = {
 	0xffffffff,
 	0xf7df7dff,
@@ -77,7 +77,7 @@ static uint32	visible_mask_right[6] = {
 	0x10c30c31,
 	0x00410410,
 };
-			
+
 static uint32	visible_mask_top[6] = {
 	0xffffffff,
 	0xfffffff0,
@@ -86,7 +86,7 @@ static uint32	visible_mask_top[6] = {
 	0xffc00000,
 	0xf0000000
 };
-			
+
 static uint32	visible_mask_bottom[6] = {
 	0xffffffff,
 	0x0fffffff,
@@ -95,7 +95,7 @@ static uint32	visible_mask_bottom[6] = {
 	0x000003ff,
 	0x0000000f
 };
-			
+
 /* Private functions used only internally. */
 bool		ProjectStar(star *s, geometry *geo);
 bool		CheckClipping(star *s, buffer *buf, bool reset_clipping);
@@ -108,33 +108,33 @@ void		EraseStar(star *s, buffer *buf);
    x : -0.25, y : -0.25
    x : +0.25, y : -0.25
    x : -0.25, y : +0.25
-   x : +0.25, y : +0.25 */		
+   x : +0.25, y : +0.25 */
 void InitPatterns()
 {
 	int32		i, j, k, count;
 	float		radius, x0, y0, x, y, dist, delta;
 	uint8		color;
 	uint8		*list, *color_offset;
-	
+
 	/* do the 4 half-pixel alignement */
 	for (j=0; j<4; j++) {
 		if (j&1) x0 = 1.25;
-		else	 x0 = 0.75; 
+		else	 x0 = 0.75;
 		if (j&2) y0 = 1.25;
-		else	 y0 = 0.75; 
-		
+		else	 y0 = 0.75;
+
 		/* do the 32 sizes */
 		for (i=0; i<LEVEL_COUNT; i++) {
 			radius = (float)(i+1) * (2.8/(float)LEVEL_COUNT);
 			count = 0;
 			list = pattern_list[j*LEVEL_COUNT + i];
 			color_offset = pattern_color_offset[j*LEVEL_COUNT + i];
-			
+
 			/* scan the 32 pixels of the matrix */
 			for (k=0; k<32; k++) {
 				x = ((float)pattern_dh[k] + ROUNDING) - x0;
 				y = ((float)pattern_dv[k] + ROUNDING) - y0;
-				
+
 				dist = sqrt(x*x + y*y);
 				/* process non source pixel */
 				if (dist > 0.5) {
@@ -194,7 +194,7 @@ bool ProjectStar(star *s, geometry *geo)
 	/* Calculate the coordinate of the star after doing the cycling operation
 	   that convert the cube of the starfield in a torus. This ensure that
 	   get the copy of the star that is the only one likely to be visible from
-	   the camera. */	
+	   the camera. */
 	x0 = s->x;
 	if (x0 < geo->cutx)
 		x0 += 1.0;
@@ -208,7 +208,7 @@ bool ProjectStar(star *s, geometry *geo)
 	x0 -= geo->x;
 	y0 -= geo->y;
 	z0 -= geo->z;
-	
+
 	/* Calculate the z coordinate (depth) of the star in the camera referential. */
 	z = geo->m[0][2]*x0 + geo->m[1][2]*y0 + geo->m[2][2]*z0;
 
@@ -218,27 +218,27 @@ bool ProjectStar(star *s, geometry *geo)
 
 	/* Calculate the x coordinate (horizontal) of the star in the camera referential. */
 	x = geo->m[0][0]*x0 + geo->m[1][0]*y0 + geo->m[2][0]*z0;
-	
+
 	/* Do the left and right clipping based on the pyramid of vision. */
 	if ((x < geo->xz_min*z-BORDER_CLIPPING) || (x > geo->xz_max*z+BORDER_CLIPPING))
 		return false;
-	
+
 	/* Calculate the y coordinate (vertical) of the star in the camera referential. */
 	y = geo->m[0][1]*x0 + geo->m[1][1]*y0 + geo->m[2][1]*z0;
-	
+
 	/* Do the top and bottom clipping based on the pyramid of vision. */
 	if ((y < geo->yz_min*z-BORDER_CLIPPING) || (y > geo->yz_max*z+BORDER_CLIPPING))
 		return false;
-	
+
 	/* Calculate the invert of z, used to project both H and V coordinate. Apply
 	   the zoom-factor at the same time. The zoom-factor was overscale by a factor
 	   of two in advance, for the half-pixel precision processing */
-	inv_z = geo->zoom_factor/z;	
+	inv_z = geo->zoom_factor/z;
 
 	/* Calculate the double pixel coordinate in the buffer (in half-pixel). */
 	h_double = (int32)(x * inv_z + geo->offset_h);
 	v_double = (int32)(y * inv_z + geo->offset_v);
-	
+
 	/* Calculate the light level of the star. We use that little weird function
 	   to a get faster gradient to black near the rear plan. */
 	level = (int32)(s->size * (inv_z * geo->z_max_square - z * geo->zoom_factor)) >> 8;
@@ -262,8 +262,8 @@ bool ProjectStar(star *s, geometry *geo)
    which pixel of the star matrix are visible (if any). This depend of the
    clipping of the specific buffer you're using. This function will do that
    for the star (s), in the buffer (buf). It will return false if the star
-   is fully invisible, true if not. The falg reset_clipping is used to
-   reprocess the clipping from scratsh, or to just cumulate the new clipping
+   is fully invisible, true if not. The flag reset_clipping is used to
+   reprocess the clipping from scratch, or to just cumulate the new clipping
    to the last drawing clipping (this is needed when updating the clipping
    of every stars after changing the clipping region of the buffer). */
 bool CheckClipping(star *s, buffer *buf, bool reset_clipping)
@@ -295,7 +295,7 @@ bool CheckClipping(star *s, buffer *buf, bool reset_clipping)
 				(s->v >= r->top) &&
 				(s->v <= r->bottom))
 				goto visible;
-		/* The pixel is not visible. The star is marked as not drawn. */ 
+		/* The pixel is not visible. The star is marked as not drawn. */
 	invisible:
 		s->last_draw_offset = INVALID;
 		return false;
@@ -315,7 +315,7 @@ bool CheckClipping(star *s, buffer *buf, bool reset_clipping)
 		box.bottom = s->v + 3;
 
 		/* Check if the box is fully outside of the bounding box of the clipping
-		   region. That woudl guarantee that the star is invisible. */ 
+		   region. That woudl guarantee that the star is invisible. */
 		if ((box.right < buf->clip_bounds.left) ||
 			(box.left > buf->clip_bounds.right) ||
 			(box.bottom < buf->clip_bounds.top) ||
@@ -336,35 +336,35 @@ bool CheckClipping(star *s, buffer *buf, bool reset_clipping)
 				tmp_visible = 0xffffffff;
 			else
 				tmp_visible = s->last_draw_pattern;
-			
+
 			/* Calculate the clipping on the left side of the rectangle. */
 			delta = r->left-box.left;
 			if (delta > 5)
 				continue;
 			if (delta > 0)
 				tmp_visible &= visible_mask_left[delta];
-			
+
 			/* Calculate the clipping on the right side of the rectangle. */
 			delta = box.right-r->right;
 			if (delta > 5)
 				continue;
 			if (delta > 0)
 				tmp_visible &= visible_mask_right[delta];
-			
+
 			/* Calculate the clipping on the top side of the rectangle. */
 			delta = r->top-box.top;
 			if (delta > 5)
 				continue;
 			if (delta > 0)
 				tmp_visible &= visible_mask_top[delta];
-			
+
 			/* Calculate the clipping on the bottom side of the rectangle. */
 			delta = box.bottom-r->bottom;
 			if (delta > 5)
 				continue;
 			if (delta > 0)
 				tmp_visible &= visible_mask_bottom[delta];
-			
+
 			/* Pixel of the matrix not clipped out at that point are visible
 			   inside this rectangle of the clipping region. We need to add
 			   them to the mask of currently known visible pixel. */
@@ -377,8 +377,8 @@ bool CheckClipping(star *s, buffer *buf, bool reset_clipping)
 		/* If no pixel are visible, then we know... */
 		if (total_visible != 0)
 			goto visible_pat;
-			
-		/* The star is not visible. It's marked as not drawn. */ 
+
+		/* The star is not visible. It's marked as not drawn. */
 	invisible_pat:
 		s->last_draw_offset = INVALID;
 		return false;
@@ -436,7 +436,7 @@ void DrawStar(star *s, buffer *buf)
 		colors = buf->colors[s->color_type];
 		pat_list = pattern_list[s->pattern_level];
 		pat_color_offset = pattern_color_offset[s->pattern_level];
-		
+
 		/* Plot all pixel used to represent the star one after one... */
 		for (i=0; i<count; i++) {
 			/* This is the index of the pixel in the matrix */
@@ -480,7 +480,7 @@ void EraseStar(star *s, buffer *buf)
 
 	/* Color pattern we use to erase the buffer. */
 	back_color = buf->back_color;
-	
+
 	/* Simple case : the star is represented by only one pixel. */
 	count = pattern_list_count[s->pattern_level];
 	if (count == 1) {
@@ -507,7 +507,7 @@ void EraseStar(star *s, buffer *buf)
 	/* Complex case : the star is represented by a multiple pixels. */
 	else {
 		pat_list = pattern_list[s->pattern_level];
-		
+
 		/* Erase all pixel used to represent the star one after one... */
 		for (i=0; i<count; i++) {
 			index = pat_list[i];
@@ -542,21 +542,21 @@ void RefreshStarPacket(buffer *buf, star_packet *sp, geometry *geo)
 {
 	int32			i, min_count;
 	star			*s;
-	
+
 	// TODO: For some reason, when selecting the "2 threads" option under vmware,
 	// some weird timing calculations finish with setting the star packet count to
 	// a negative number. This screws all the next calculations, and the animation
 	// then comes to a stop.
-	sp->count = max_c(sp->count, 0);	
+	sp->count = max_c(sp->count, 0);
 
 	/* Calculate the number of stars that were process during the
 	   previous frame and still need to be process for that frame. */
 	min_count = sp->erase_count;
 	if (sp->count < min_count)
 		min_count = sp->count;
-	
+
 	s = sp->list;
-	
+
 	/* For all those star... */
 	for (i=0; i<min_count; s++, i++) {
 		/* ... erase them if necessary, ... */
@@ -575,13 +575,14 @@ void RefreshStarPacket(buffer *buf, star_packet *sp, geometry *geo)
 		else
 			s->last_draw_offset = INVALID;
 	}
-	
+
 	/* For star that were process at the previous frame but that we don't
 	   want to process anymore, we just need to erase them. */
-	for (; i<sp->erase_count; s++, i++)
+	for (; i<sp->erase_count; s++, i++) {
 		if (s->last_draw_offset != INVALID)
 			EraseStar(s, buf);
-	
+	}
+
 	/* For star that were not process before, but are now, we just need to
 	   go through the projection, clipping and drawing steps. */
 	for (; i<sp->count; s++, i++) {
@@ -602,9 +603,10 @@ void RefreshClipping(buffer *buf, star_packet *sp)
 	int32		i;
 
 	s = sp->list;
-	for (i=0; i<sp->erase_count; s++, i++)
+	for (i=0; i<sp->erase_count; s++, i++) {
 		if (s->last_draw_offset != INVALID)
 			CheckClipping(s, buf, false);
+	}
 }
 
 

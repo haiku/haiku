@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"../../../../html-dtd/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Screenshot</title>
+	<link rel="stylesheet" type="text/css" href="../../../Haiku-doc.css" />
+</head>
+<body>
+
+<div class="logo">
+	<img src="../images/logo.png" alt="logo" class="noprint" id="logo" name="logo" />
+</div>
+
+<div class="topnav">
+	<p>
+		&laquo;&#160;&#160;<a href="poorman.html">PoorMan</a>
+		&#160;&#160;::&#160;&#160;
+		<a href="../applications.html#list-of-apps" class="uplink">Applications</a>
+		&#160;&#160;::&#160;&#160;
+		<a href="showimage.html">Showimage</a>&#160;&#160;&raquo;
+	</p>
+</div>
+
+<div class="content">
+
+<h1><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png"
+width="64" height="64" />Screenshot</h1>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/Screenshot</span></td></tr>
+<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
+</table>
+<p><br/></p>
+<p>Besides normal screenshots taken via <span class="key">PRINT</span>, which puts a PNG of the current screen into <span class="path">/boot/home/</span>, this application provides some useful options.</p>
+<p><img id="sreenshot" src="../images/apps-images/screenshot.png" alt="screenshot.png" /></p>
+<p>Starting Screenshot will take a screenshot as usual, but offers from its main window controls to set filename, format and folder before saving the image.</p>
+<p>The <span class="button">Options</span> dialog has a few more settings:</p>
+<p><img id="sreenshot-options" src="../images/apps-images/screenshot-options.png" alt="screenshot-options.png" /></p>
+<p>Besides the obvious, toggle between taking the whole screen or just the active window, including the window border and the mouse pointer, you can enter a delay before a screenshot is taken. Of course, this delay takes only effect if you take a new shot by pressing <span class="button">Take Screenshot</span>.</p>
+
+<h1>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+Taking a screenshot from Terminal</h1>
+<p>The Screenshot application is also usable from Terminal or a script.<br />
+<span class="cli">Screenshot --help</span> shows the familiar options as parameters:</p>
+
+<pre class="terminal">~> Screenshot --help
+
+Screenshot [OPTION]... Creates a bitmap of the current screen
+OPTION
+  -o, --options         Show options window first
+  -m, --mouse           Have the mouse pointer in the screenshot
+  -b, --border          Include the window border with the screenshot
+  -w, --window          Use active window instead of the entire screen
+  -d, --delay=seconds   Take screenshot after specified delay [in seconds]
+  -s, --silent          Saves the screenshot without the application window
+                        overwrites --options, saves to home directory as png
+
+Note: OPTION -b, --border takes only effect when used with -w, --window
+</pre>
+
+
+</div>
+
+<div class="bottomnav">
+	<p>
+		&laquo;&#160;&#160;<a href="poorman.html">PoorMan</a>
+		&#160;&#160;::&#160;&#160;
+		<a href="../applications.html#list-of-apps" class="uplink">Applications</a>
+		&#160;&#160;::&#160;&#160;
+		<a href="showimage.html">Showimage</a>&#160;&#160;&raquo;
+	</p>
+</div>
+
+</body>
+</html>

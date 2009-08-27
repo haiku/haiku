@@ -8,26 +8,28 @@
 
 #include <PictureButton.h>
 
-#include <binary_compatibility/Interface.h>
-
 #include <new>
+
+#include <binary_compatibility/Interface.h>
 
 
 BPictureButton::BPictureButton(BRect frame, const char* name,
 		BPicture* off, BPicture* on, BMessage* message,
 		uint32 behavior, uint32 resizeMask, uint32 flags)
-	: BControl(frame, name, "", message, resizeMask, flags),
-	  fDisabledOff(NULL),
-	  fDisabledOn(NULL),
-	  fBehavior(behavior)
+	:
+	BControl(frame, name, "", message, resizeMask, flags),
+	fEnabledOff(new(std::nothrow) BPicture(*off)),
+	fEnabledOn(new(std::nothrow) BPicture(*on)),
+	fDisabledOff(NULL),
+	fDisabledOn(NULL),
+	fBehavior(behavior)
 {
-	fEnabledOff = new (std::nothrow)BPicture(*off);
-	fEnabledOn = new (std::nothrow) BPicture(*on);
 }
 
 
 BPictureButton::BPictureButton(BMessage* data)
-	: BControl(data),
+	:
+	BControl(data),
 	fEnabledOff(NULL),
 	fEnabledOn(NULL),
 	fDisabledOff(NULL),
@@ -41,16 +43,16 @@ BPictureButton::BPictureButton(BMessage* data)
 
 	// Now expand the pictures:
 	if (data->FindMessage("_e_on", &pictureArchive) == B_OK)
-		fEnabledOn = new (std::nothrow) BPicture(&pictureArchive);
+		fEnabledOn = new(std::nothrow) BPicture(&pictureArchive);
 
 	if (data->FindMessage("_e_off", &pictureArchive) == B_OK)
-		fEnabledOff = new (std::nothrow) BPicture(&pictureArchive);
+		fEnabledOff = new(std::nothrow) BPicture(&pictureArchive);
 
 	if (data->FindMessage("_d_on", &pictureArchive) == B_OK)
-		fDisabledOn = new (std::nothrow) BPicture(&pictureArchive);
+		fDisabledOn = new(std::nothrow) BPicture(&pictureArchive);
 
 	if (data->FindMessage("_d_off", &pictureArchive) == B_OK)
-		fDisabledOff = new (std::nothrow) BPicture(&pictureArchive);
+		fDisabledOff = new(std::nothrow) BPicture(&pictureArchive);
 }
 
 
@@ -61,6 +63,9 @@ BPictureButton::~BPictureButton()
 	delete fDisabledOn;
 	delete fDisabledOff;
 }
+
+
+// #pragma mark -
 
 
 BArchivable*
@@ -113,6 +118,85 @@ BPictureButton::Archive(BMessage* data, bool deep) const
 }
 
 
+// #pragma mark -
+
+
+void
+BPictureButton::AttachedToWindow()
+{
+	BControl::AttachedToWindow();
+}
+
+
+void
+BPictureButton::DetachedFromWindow()
+{
+	BControl::DetachedFromWindow();
+}
+
+
+void
+BPictureButton::AllAttached()
+{
+	BControl::AllAttached();
+}
+
+
+void
+BPictureButton::AllDetached()
+{
+	BControl::AllDetached();
+}
+
+
+// #pragma mark -
+
+
+void
+BPictureButton::ResizeToPreferred()
+{
+	BControl::ResizeToPreferred();
+}
+
+
+void
+BPictureButton::GetPreferredSize(float* _width, float* _height)
+{
+	BControl::GetPreferredSize(_width, _height);
+}
+
+
+void
+BPictureButton::FrameMoved(BPoint newPosition)
+{
+	BControl::FrameMoved(newPosition);
+}
+
+
+void
+BPictureButton::FrameResized(float newWidth, float newHeight)
+{
+	BControl::FrameResized(newWidth, newHeight);
+}
+
+
+// #pragma mark -
+
+
+void
+BPictureButton::WindowActivated(bool state)
+{
+	BControl::WindowActivated(state);
+}
+
+
+void
+BPictureButton::MakeFocus(bool state)
+{
+	BControl::MakeFocus(state);
+}
+
+
 void
 BPictureButton::Draw(BRect updateRect)
 {
@@ -137,6 +221,39 @@ BPictureButton::Draw(BRect updateRect)
 		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 		StrokeRect(Bounds(), B_SOLID_HIGH);
 	}
+}
+
+
+void
+BPictureButton::MessageReceived(BMessage* msg)
+{
+	BControl::MessageReceived(msg);
+}
+
+
+void
+BPictureButton::KeyDown(const char* bytes, int32 numBytes)
+{
+	if (numBytes == 1) {
+		switch (bytes[0]) {
+			case B_ENTER:
+			case B_SPACE:
+				if (fBehavior == B_ONE_STATE_BUTTON) {
+					SetValue(B_CONTROL_ON);
+					snooze(50000);
+					SetValue(B_CONTROL_OFF);
+				} else {
+					if (Value() == B_CONTROL_ON)
+						SetValue(B_CONTROL_OFF);
+					else
+						SetValue(B_CONTROL_ON);
+				}
+				Invoke();
+				return;
+		}
+	}
+
+	BControl::KeyDown(bytes, numBytes);
 }
 
 
@@ -195,30 +312,7 @@ BPictureButton::MouseMoved(BPoint point, uint32 transit, const BMessage* msg)
 }
 
 
-void
-BPictureButton::KeyDown(const char* bytes, int32 numBytes)
-{
-	if (numBytes == 1) {
-		switch (bytes[0]) {
-			case B_ENTER:
-			case B_SPACE:
-				if (fBehavior == B_ONE_STATE_BUTTON) {
-					SetValue(B_CONTROL_ON);
-					snooze(50000);
-					SetValue(B_CONTROL_OFF);
-				} else {
-					if (Value() == B_CONTROL_ON)
-						SetValue(B_CONTROL_OFF);
-					else
-						SetValue(B_CONTROL_ON);
-				}
-				Invoke();
-				return;
-		}
-	}
-
-	BControl::KeyDown(bytes, numBytes);
-}
+// #pragma mark -
 
 
 void
@@ -296,34 +390,6 @@ BPictureButton::Behavior() const
 
 
 void
-BPictureButton::MessageReceived(BMessage* msg)
-{
-	BControl::MessageReceived(msg);
-}
-
-
-void
-BPictureButton::WindowActivated(bool state)
-{
-	BControl::WindowActivated(state);
-}
-
-
-void
-BPictureButton::AttachedToWindow()
-{
-	BControl::AttachedToWindow();
-}
-
-
-void
-BPictureButton::DetachedFromWindow()
-{
-	BControl::DetachedFromWindow();
-}
-
-
-void
 BPictureButton::SetValue(int32 value)
 {
 	BControl::SetValue(value);
@@ -334,20 +400,6 @@ status_t
 BPictureButton::Invoke(BMessage* msg)
 {
 	return BControl::Invoke(msg);
-}
-
-
-void
-BPictureButton::FrameMoved(BPoint newPosition)
-{
-	BControl::FrameMoved(newPosition);
-}
-
-
-void
-BPictureButton::FrameResized(float newWidth, float newHeight)
-{
-	BControl::FrameResized(newWidth, newHeight);
 }
 
 
@@ -363,41 +415,6 @@ status_t
 BPictureButton::GetSupportedSuites(BMessage* data)
 {
 	return BControl::GetSupportedSuites(data);
-}
-
-
-void
-BPictureButton::ResizeToPreferred()
-{
-	BControl::ResizeToPreferred();
-}
-
-
-void
-BPictureButton::GetPreferredSize(float* _width, float* _height)
-{
-	BControl::GetPreferredSize(_width, _height);
-}
-
-
-void
-BPictureButton::MakeFocus(bool state)
-{
-	BControl::MakeFocus(state);
-}
-
-
-void
-BPictureButton::AllAttached()
-{
-	BControl::AllAttached();
-}
-
-
-void
-BPictureButton::AllDetached()
-{
-	BControl::AllDetached();
 }
 
 
@@ -432,7 +449,7 @@ BPictureButton::Perform(perform_code code, void* _data)
 			BPictureButton::GetHeightForWidth(data->width, &data->min, &data->max,
 				&data->preferred);
 			return B_OK;
-}
+		}
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
@@ -457,6 +474,9 @@ BPictureButton::Perform(perform_code code, void* _data)
 }
 
 
+// #pragma mark -
+
+
 void BPictureButton::_ReservedPictureButton1() {}
 void BPictureButton::_ReservedPictureButton2() {}
 void BPictureButton::_ReservedPictureButton3() {}
@@ -466,17 +486,5 @@ BPictureButton&
 BPictureButton::operator=(const BPictureButton &button)
 {
 	return *this;
-}
-
-
-void
-BPictureButton::_Redraw()
-{
-}
-
-
-void
-BPictureButton::_InitData()
-{
 }
 

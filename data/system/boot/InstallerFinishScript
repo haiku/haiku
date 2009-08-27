@@ -1,19 +1,22 @@
 #!/bin/sh
 ## The installer finish script.
 
-mount=$1
+target=$1
 
-if [ -z "$mount" ]; then
-	echo "Usage: $0 volume"
+if [ -z "$target" ]; then
+	echo "Usage: $0 <volume>"
 	exit 1
 fi
 
-if [ ! -d "$mount" ]; then
-	echo "$mount isn't mounted"
+if [ ! -d "$target" ]; then
+	echo "$target isn't mounted"
 	exit 1
 fi
 
-mkdir -p "$mount/var/tmp"
+mkdir -p "$target/var/tmp"
 
-makebootable "$mount"
+# remove Installer links
+rm -f $target/home/Desktop/Installer
+rm -f $target/home/config/be/Applications/Installer
 
+makebootable "$target"

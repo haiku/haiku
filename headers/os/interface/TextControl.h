@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_TEXT_CONTROL_H
@@ -11,8 +11,9 @@
 
 class BLayoutItem;
 namespace BPrivate {
-class _BTextInput_;
+	class _BTextInput_;
 }
+
 
 class BTextControl : public BControl {
 public:
@@ -62,13 +63,14 @@ public:
 	virtual	void				FrameResized(float newWidth, float newHeight);
 	virtual	void				WindowActivated(bool active);
 
-	virtual	void				GetPreferredSize(float* _width, float* _height);
+	virtual	void				GetPreferredSize(float* _width,
+									float* _height);
 	virtual	void				ResizeToPreferred();
 
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	BHandler*			ResolveSpecifier(BMessage* message, int32 index,
-									BMessage* specifier, int32 what,
-									const char* property);
+	virtual	BHandler*			ResolveSpecifier(BMessage* message,
+									int32 index, BMessage* specifier,
+									int32 what, const char* property);
 
 	virtual	void				MouseUp(BPoint point);
 	virtual	void				MouseMoved(BPoint point, uint32 transit,
@@ -93,14 +95,7 @@ protected:
 	virtual	void				DoLayout();
 
 private:
-			class LabelLayoutItem;
-			class TextViewLayoutItem;
-			struct LayoutData;
-
-			friend class _BTextInput_;
-			friend class LabelLayoutItem;
-			friend class TextViewLayoutItem;
-
+	// FBC padding and forbidden methods
 	virtual	status_t			Perform(perform_code d, void* arg);
 
 	virtual	void				_ReservedTextControl1();
@@ -110,9 +105,19 @@ private:
 
 			BTextControl&		operator=(const BTextControl& other);
 
+private:
+	class LabelLayoutItem;
+	class TextViewLayoutItem;
+	struct LayoutData;
+
+	friend class _BTextInput_;
+	friend class LabelLayoutItem;
+	friend class TextViewLayoutItem;
+
 			void				_CommitValue();
 			void				_UpdateTextViewColors(bool enabled);
-			void				_InitData(const char* label, const char* initialText,
+			void				_InitData(const char* label,
+									const char* initialText,
 									BMessage* archive = NULL);
 			void				_ValidateLayout();
 			void				_LayoutTextView();

@@ -72,7 +72,7 @@ class BWindowScreen : public BWindow {
 		virtual void		_ReservedWindowScreen3();
 		virtual void		_ReservedWindowScreen4();
 
-		// not implemented:		
+		// not implemented:
 							BWindowScreen();
 							BWindowScreen(BWindowScreen& other);
 							BWindowScreen &operator=(BWindowScreen& other);
@@ -80,6 +80,7 @@ class BWindowScreen : public BWindow {
 		status_t			_InitData(uint32 space, uint32 attributes);
 		void				_DisposeData();
 
+		status_t			_LockScreen(bool lock);
 		status_t			_Activate();
 		status_t			_Deactivate();
 
@@ -103,7 +104,6 @@ class BWindowScreen : public BWindow {
 
 		display_mode*		fOriginalDisplayMode;
 		display_mode*		fDisplayMode;
-		sem_id				fActivateSem;
 		sem_id				fDebugSem;
 		image_id			fAddonImage;
 		uint32				fAttributes;
@@ -126,7 +126,7 @@ class BWindowScreen : public BWindow {
 		GetAccelerantHook	fGetAccelerantHook;
 		wait_engine_idle	fWaitEngineIdle;
 
-		uint32				_reserved[162];
+		uint32				_reserved[163];
 };
 
 #endif	// _WINDOW_SCREEN_H

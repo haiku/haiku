@@ -1,6 +1,6 @@
 /*
  * Copyright 2001-2009, Haiku, Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _TAB_VIEW_H
 #define _TAB_VIEW_H
@@ -51,6 +51,7 @@ public:
 									tab_position position, bool full = true);
 
 private:
+	// FBC padding and forbidden methods
 	virtual	void				_ReservedTab1();
 	virtual	void				_ReservedTab2();
 	virtual	void				_ReservedTab3();
@@ -66,6 +67,7 @@ private:
 
 			BTab&				operator=(const BTab&);
 
+private:
 			bool 				fEnabled;
 			bool				fSelected;
 			bool				fFocus;
@@ -79,15 +81,15 @@ class BTabView : public BView {
 public:
 								BTabView(const char* name,
 									button_width width = B_WIDTH_AS_USUAL,
-									uint32 flags = B_FULL_UPDATE_ON_RESIZE |
-										 B_WILL_DRAW | B_NAVIGABLE_JUMP |
-										 B_FRAME_EVENTS | B_NAVIGABLE);
+									uint32 flags = B_FULL_UPDATE_ON_RESIZE
+										| B_WILL_DRAW | B_NAVIGABLE_JUMP
+										| B_FRAME_EVENTS | B_NAVIGABLE);
 								BTabView(BRect frame, const char* name,
 									button_width width = B_WIDTH_AS_USUAL,
 									uint32 resizingMode = B_FOLLOW_ALL,
-									uint32 flags = B_FULL_UPDATE_ON_RESIZE |
-										B_WILL_DRAW | B_NAVIGABLE_JUMP |
-										B_FRAME_EVENTS | B_NAVIGABLE);
+									uint32 flags = B_FULL_UPDATE_ON_RESIZE
+										| B_WILL_DRAW | B_NAVIGABLE_JUMP
+										| B_FRAME_EVENTS | B_NAVIGABLE);
 	virtual						~BTabView();
 
 								BTabView(BMessage* archive);
@@ -96,15 +98,12 @@ public:
 									bool deep = true) const;
 	virtual	status_t			Perform(perform_code d, void* arg);
 
-	virtual	void				WindowActivated(bool active);
 	virtual	void 				AttachedToWindow();
+	virtual	void				DetachedFromWindow();
 	virtual	void				AllAttached();
 	virtual	void				AllDetached();
-	virtual	void				DetachedFromWindow();
 
 	virtual	void 				MessageReceived(BMessage* message);
-	virtual	void 				FrameMoved(BPoint newLocation);
-	virtual	void				FrameResized(float width,float height);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MouseDown(BPoint point);
 	virtual	void				MouseUp(BPoint point);
@@ -115,6 +114,7 @@ public:
 	virtual	void				Select(int32 tab);
 			int32				Selection() const;
 
+	virtual	void				WindowActivated(bool active);
 	virtual	void				MakeFocus(bool focused = true);
 	virtual	void				SetFocusTab(int32 tab, bool focused);
 			int32				FocusTab() const;
@@ -135,11 +135,15 @@ public:
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
 
+	virtual	void 				FrameMoved(BPoint newLocation);
+	virtual	void				FrameResized(float width,float height);
+
 	virtual	BHandler*			ResolveSpecifier(BMessage* message,
 									int32 index, BMessage* specifier,
 									int32 what, const char* property);
 	virtual	status_t			GetSupportedSuites(BMessage* message);
 
+	// BTabView
 	virtual	void				AddTab(BView* target, BTab* tab = NULL);
 	virtual	BTab*				RemoveTab(int32 tabIndex);
 
@@ -157,9 +161,7 @@ public:
 			BView*				ViewForTab(int32 tabIndex) const;
 
 private:
-			void				_InitObject(bool layouted, button_width width);
-			BSize				_TabsMinSize() const;
-
+	// FBC padding and forbidden methods
 	virtual	void				_ReservedTabView1();
 	virtual	void				_ReservedTabView2();
 	virtual	void				_ReservedTabView3();
@@ -176,6 +178,11 @@ private:
 								BTabView(const BTabView&);
 			BTabView&			operator=(const BTabView&);
 
+private:
+			void				_InitObject(bool layouted, button_width width);
+			BSize				_TabsMinSize() const;
+
+private:
 			BList*				fTabList;
 			BView*				fContainerView;
 			button_width		fTabWidthSetting;

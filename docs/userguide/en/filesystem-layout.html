@@ -49,7 +49,9 @@
 <tr><td><span class="path">/boot/home/</span></td><td>&#160;</td><td>is your personal folder where you keep your data and settings.</td></tr>
 </table>
 
-<h1><a id="system" name="system">The system folder - <span class="path">/boot/system/</span></a></h1>
+<h1>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="system" name="system">The system folder - <span class="path">/boot/system/</span></a></h1>
 <p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
 Whatever it's named, you should not alter what's inside. Every update of Haiku can add, remove or overwrite anything within it. If you want to add functionality, maybe with other Tracker Add-Ons or Translators or maybe another hardware driver, you install these things under your own <span class="path">/boot/home/</span> hierarchy or, if it's supposed to be for every user, under <span class="path">/boot/common/</span>. As long as Haiku isn't multi-user, this distinction has no apparent effect, as there's only one user with one <i>home</i> folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
 <p>So, let's say you want to install a new Translator for the latest image format, you <b>don't</b> simply copy it into the respective system folder. Remember: Don't touch!<br />
@@ -71,10 +73,14 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 -->
 </p>
 
-<h1><a id="common" name="common">The common folder - <span class="path">/boot/common/</span></a></h1>
+<h1>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="common" name="common">The common folder - <span class="path">/boot/common/</span></a></h1>
 <p>Haiku is not a multi-user system yet. Once it is though, every user has her own <i>home</i> folder that is not accessible to anyone else. Every application or added component like Tracker Add-Ons, Translators etc. as well as any data that's supposed to be shared between different users, go here.</p>
 
-<h1><a id="home" name="home">The home folder - <span class="path">/boot/home/</span></a></h1>
+<h1>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="home" name="home">The home folder - <span class="path">/boot/home/</span></a></h1>
 <p>This folder belongs to you. Here you can create and delete files and folders as you wish. However, you shouldn't mess too much with the <span class="path">~/config/</span> directory and its subfolders. You <i>could</i> delete e.g. the <span class="path">~/config/settings/</span> folder without damaging the operating system itself, but who wants to lose all his configurations and application settings? In any case, the system warns you with the at the top mentioned alert.</p>
 <p>Besides the <span class="path">~/config/add-ons/</span> folder, which mirrors the system's add-ons folder for additional components as described above, there are a few other folders of interest. (By the way, the tilde ("<tt>~</tt>") is a shortcut for your home folder, so you don't always have to write "<span class="path">/boot/home/</span>" in Terminal.)</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
@@ -91,7 +97,10 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 <td>Complements the system's <span class="path">/boot/system/bin/</span> folder and holds all your command line programs.</td></tr>
 
 <tr><td><span class="path">~/config/boot/</span></td><td>&#160;</td>
-<td>This folder is the place for <a href="scripting.html#user-scripts">User Scripts</a> that are executed before or after the system boots up or shuts down.</td></tr>
+<td>This folder is the place for <a href="bash-scripting.html#user-scripts">User Scripts</a> that are executed before or after the system boots up or shuts down.</td></tr>
+
+<tr><td><span class="path">~/config/boot/launch/</span></td><td>&#160;</td>
+<td>Links to programs or documents in this folder are automatically launched on every boot-up.</td></tr>
 
 <tr><td><span class="path">~/config/fonts/</span></td><td>&#160;</td>
 <td>Simply copy a TrueType or Postscript font into this folder and its usable right away.</td></tr>

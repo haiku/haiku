@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ERRORS_H
@@ -43,6 +43,7 @@
 #define B_WOULD_BLOCK				(B_GENERAL_ERROR_BASE + 11)
 #define B_CANCELED					(B_GENERAL_ERROR_BASE + 12)
 #define B_NO_INIT					(B_GENERAL_ERROR_BASE + 13)
+#define B_NOT_INITIALIZED			(B_GENERAL_ERROR_BASE + 13)
 #define B_BUSY						(B_GENERAL_ERROR_BASE + 14)
 #define B_NOT_ALLOWED				(B_GENERAL_ERROR_BASE + 15)
 #define B_BAD_DATA					(B_GENERAL_ERROR_BASE + 16)
@@ -281,6 +282,11 @@
 #define B_DEV_PENDING					(B_DEVICE_ERROR_BASE + 28)
 #define B_DEV_MULTIPLE_ERRORS			(B_DEVICE_ERROR_BASE + 29)
 #define B_DEV_TOO_LATE					(B_DEVICE_ERROR_BASE + 30)
+
+/* Translation Kit Errors */
+#define B_TRANSLATION_BASE_ERROR		(B_TRANSLATION_ERROR_BASE + 0)
+#define B_NO_TRANSLATOR					(B_TRANSLATION_ERROR_BASE + 1)
+#define B_ILLEGAL_DATA					(B_TRANSLATION_ERROR_BASE + 2)
 
 
 #define B_TO_POSITIVE_ERROR(error)	_to_positive_error(error)

@@ -1,59 +1,46 @@
-/*******************************************************************************
-/
-/	File:		net_settings.h
-/
-/	Description:	Network preferences settings.
-/
-/	Copyright 1993-98, Be Incorporated, All Rights Reserved.
-/
-*******************************************************************************/
-
+/*
+ * Copyright 2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _NET_SETTINGS_H
 #define _NET_SETTINGS_H
 
-#include <BeBuild.h>
+
 #include <SupportDefs.h>
 
 #if __cplusplus
-extern "C" {
+	extern "C" {
 #endif /* __cplusplus */
 
-/*
- * Private types 
- */
+
+/* private types */
 typedef struct _ns_entry {
-	const char *key;
-	const char *value;
+	const char*		key;
+	const char*		value;
 } _ns_entry_t;
 
 typedef struct _ns_section {
-	const char *heading;
-	unsigned nentries;
-	_ns_entry_t *entries;
+	const char*		heading;
+	unsigned		nentries;
+	_ns_entry_t*	entries;
 } _ns_section_t;
 
 
-/*
- * Public type, but the data members are private
- */
+/* public type (data members are private) */
 typedef struct _net_settings {
-	int _dirty;
-	unsigned _nsections;
-	_ns_section_t *_sections;
-	char _fname[64];
+	int				_dirty;
+	unsigned		_nsections;
+	_ns_section_t*	_sections;
+	char			_fname[64];
 } net_settings;
 
-/*
- * For finding and setting network preferences
- */
-extern
-char *find_net_setting(net_settings *ncw, 
-					   const char *heading, const char *name, char *value,
-					   unsigned nbytes);
-extern
-status_t set_net_setting(net_settings *ncw, 
-						 const char *heading, const char *name, 
-						 const char *value);
+/* finding and setting network preferences */
+extern char* find_net_setting(net_settings* ncw, const char* heading,
+	const char* name, char* value, unsigned nbytes);
+
+extern status_t set_net_setting(net_settings* ncw, const char* heading,
+	const char* name, const char* value);
+
 
 #if __cplusplus
 }

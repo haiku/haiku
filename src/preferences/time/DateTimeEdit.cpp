@@ -170,7 +170,7 @@ TTimeEdit::DrawSeparator(uint32 index)
 	BRect bounds = section->Frame();
 	float sepWidth = SeparatorWidth();
 
-	char* sep = ":";
+	const char* sep = ":";
 	if (index == 2)
 		sep = "-";
 

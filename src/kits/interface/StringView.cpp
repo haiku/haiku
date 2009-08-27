@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku Inc. All rights reserved.
+ * Copyright 2001-2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -64,6 +64,12 @@ BStringView::BStringView(BMessage* data)
 }
 
 
+BStringView::~BStringView()
+{
+	free(fText);
+}
+
+
 BArchivable*
 BStringView::Instantiate(BMessage* data)
 {
@@ -89,10 +95,197 @@ BStringView::Archive(BMessage* data, bool deep) const
 }
 
 
-BStringView::~BStringView()
+// #pragma mark -
+
+
+void
+BStringView::AttachedToWindow()
 {
-	free(fText);
+	rgb_color color = B_TRANSPARENT_COLOR;
+
+	BView* parent = Parent();
+	if (parent != NULL)
+		color = parent->ViewColor();
+
+	if (color == B_TRANSPARENT_COLOR)
+		color = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+	SetViewColor(color);
 }
+
+
+void
+BStringView::DetachedFromWindow()
+{
+	BView::DetachedFromWindow();
+}
+
+
+void
+BStringView::AllAttached()
+{
+	BView::AllAttached();
+}
+
+
+void
+BStringView::AllDetached()
+{
+	BView::AllDetached();
+}
+
+
+// #pragma mark -
+
+
+void
+BStringView::MakeFocus(bool state)
+{
+	BView::MakeFocus(state);
+}
+
+
+void
+BStringView::GetPreferredSize(float* _width, float* _height)
+{
+	_ValidatePreferredSize();
+
+	if (_width)
+		*_width = fPreferredSize.width;
+
+	if (_height)
+		*_height = fPreferredSize.height;
+}
+
+
+BSize
+BStringView::MinSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(),
+		_ValidatePreferredSize());
+}
+
+
+BSize
+BStringView::MaxSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		_ValidatePreferredSize());
+}
+
+
+BSize
+BStringView::PreferredSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
+		_ValidatePreferredSize());
+}
+
+
+void
+BStringView::InvalidateLayout(bool descendants)
+{
+	// invalidate cached preferred size
+	fPreferredSize.Set(-1, -1);
+
+	BView::InvalidateLayout(descendants);
+}
+
+
+void
+BStringView::ResizeToPreferred()
+{
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	// Resize the width only for B_ALIGN_LEFT (if its large enough already, that is)
+	if (Bounds().Width() > width && Alignment() != B_ALIGN_LEFT)
+		width = Bounds().Width();
+
+	BView::ResizeTo(width, height);
+}
+
+
+void
+BStringView::FrameMoved(BPoint newPosition)
+{
+	BView::FrameMoved(newPosition);
+}
+
+
+void
+BStringView::FrameResized(float newWidth, float newHeight)
+{
+	BView::FrameResized(newWidth, newHeight);
+}
+
+
+// #pragma mark -
+
+
+void
+BStringView::Draw(BRect updateRect)
+{
+	if (!fText)
+		return;
+
+	SetLowColor(ViewColor());
+
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+
+	BRect bounds = Bounds();
+
+	float y = (bounds.top + bounds.bottom - ceilf(fontHeight.ascent)
+		- ceilf(fontHeight.descent)) / 2.0 + ceilf(fontHeight.ascent);
+	float x;
+	switch (fAlign) {
+		case B_ALIGN_RIGHT:
+			x = bounds.Width() - StringWidth(fText);
+			break;
+
+		case B_ALIGN_CENTER:
+			x = (bounds.Width() - StringWidth(fText)) / 2.0;
+			break;
+
+		default:
+			x = 0.0;
+			break;
+	}
+
+	DrawString(fText, BPoint(x, y));
+}
+
+
+void
+BStringView::MessageReceived(BMessage* message)
+{
+	BView::MessageReceived(message);
+}
+
+
+void
+BStringView::MouseDown(BPoint point)
+{
+	BView::MouseDown(point);
+}
+
+
+void
+BStringView::MouseUp(BPoint point)
+{
+	BView::MouseUp(point);
+}
+
+
+void
+BStringView::MouseMoved(BPoint point, uint32 transit, const BMessage* msg)
+{
+	BView::MouseMoved(point, transit, msg);
+}
+
+
+// #pragma mark -
 
 
 void
@@ -131,158 +324,11 @@ BStringView::Alignment() const
 }
 
 
-void
-BStringView::AttachedToWindow()
-{
-	rgb_color color = B_TRANSPARENT_COLOR;
-
-	BView* parent = Parent();
-	if (parent != NULL)
-		color = parent->ViewColor();
-
-	if (color == B_TRANSPARENT_COLOR)
-		color = ui_color(B_PANEL_BACKGROUND_COLOR);
-
-	SetViewColor(color);
-}
-
-
-void
-BStringView::Draw(BRect updateRect)
-{
-	if (!fText)
-		return;
-
-	SetLowColor(ViewColor());
-
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
-
-	BRect bounds = Bounds();
-
-	float y = (bounds.top + bounds.bottom - ceilf(fontHeight.ascent)
-		- ceilf(fontHeight.descent)) / 2.0 + ceilf(fontHeight.ascent);
-	float x;
-	switch (fAlign) {
-		case B_ALIGN_RIGHT:
-			x = bounds.Width() - StringWidth(fText);
-			break;
-
-		case B_ALIGN_CENTER:
-			x = (bounds.Width() - StringWidth(fText)) / 2.0;
-			break;
-
-		default:
-			x = 0.0;
-			break;
-	}
-
-	DrawString(fText, BPoint(x, y));
-}
-
-
-void
-BStringView::ResizeToPreferred()
-{
-	float width, height;
-	GetPreferredSize(&width, &height);
-
-	// Resize the width only for B_ALIGN_LEFT (if its large enough already, that is)
-	if (Bounds().Width() > width && Alignment() != B_ALIGN_LEFT)
-		width = Bounds().Width();
-
-	BView::ResizeTo(width, height);
-}
-
-
-void
-BStringView::GetPreferredSize(float* _width, float* _height)
-{
-	_ValidatePreferredSize();
-
-	if (_width)
-		*_width = fPreferredSize.width;
-
-	if (_height)
-		*_height = fPreferredSize.height;
-}
-
-
-void
-BStringView::MessageReceived(BMessage* message)
-{
-	BView::MessageReceived(message);
-}
-
-
-void
-BStringView::MouseDown(BPoint point)
-{
-	BView::MouseDown(point);
-}
-
-
-void
-BStringView::MouseUp(BPoint point)
-{
-	BView::MouseUp(point);
-}
-
-
-void
-BStringView::MouseMoved(BPoint point, uint32 transit, const BMessage* msg)
-{
-	BView::MouseMoved(point, transit, msg);
-}
-
-
-void
-BStringView::DetachedFromWindow()
-{
-	BView::DetachedFromWindow();
-}
-
-
-void
-BStringView::FrameMoved(BPoint newPosition)
-{
-	BView::FrameMoved(newPosition);
-}
-
-
-void
-BStringView::FrameResized(float newWidth, float newHeight)
-{
-	BView::FrameResized(newWidth, newHeight);
-}
-
-
 BHandler*
 BStringView::ResolveSpecifier(BMessage* msg, int32 index,
 	BMessage* specifier, int32 form, const char* property)
 {
 	return NULL;
-}
-
-
-void
-BStringView::MakeFocus(bool state)
-{
-	BView::MakeFocus(state);
-}
-
-
-void
-BStringView::AllAttached()
-{
-	BView::AllAttached();
-}
-
-
-void
-BStringView::AllDetached()
-{
-	BView::AllDetached();
 }
 
 
@@ -303,38 +349,7 @@ BStringView::SetFont(const BFont* font, uint32 mask)
 }
 
 
-void
-BStringView::InvalidateLayout(bool descendants)
-{
-	// invalidate cached preferred size
-	fPreferredSize.Set(-1, -1);
-
-	BView::InvalidateLayout(descendants);
-}
-
-
-BSize
-BStringView::MinSize()
-{
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(),
-		_ValidatePreferredSize());
-}
-
-
-BSize
-BStringView::MaxSize()
-{
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
-		_ValidatePreferredSize());
-}
-
-
-BSize
-BStringView::PreferredSize()
-{
-	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
-		_ValidatePreferredSize());
-}
+// #pragma mark -
 
 
 status_t
@@ -405,6 +420,10 @@ BStringView::operator=(const BStringView&)
 	// Assignment not allowed (private)
 	return *this;
 }
+
+
+// #pragma mark -
+
 
 BSize
 BStringView::_ValidatePreferredSize()
