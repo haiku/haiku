@@ -18,7 +18,7 @@ struct scan_spots_struct {
 	uint32 length;
 };
 
-acpi_descriptor_header *acpi_find_table(char *signature);
+acpi_descriptor_header *acpi_find_table(const char *signature);
 void acpi_init(void);
 
 #ifdef __cplusplus
