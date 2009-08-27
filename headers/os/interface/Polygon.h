@@ -1,6 +1,6 @@
 /*
- * Copyright 2001-2009, Haiku Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _POLYGON_H
 #define _POLYGON_H

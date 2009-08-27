@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2007-2008, Haiku, Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2007-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _TEXTVIEW_H
 #define _TEXTVIEW_H
@@ -38,7 +38,8 @@ enum undo_state {
 
 namespace BPrivate {
 	class TextGapBuffer;
-} // namespace BPrivate
+}
+
 
 class BTextView : public BView {
 public:
@@ -59,12 +60,13 @@ public:
 									const rgb_color* initialColor,
 									uint32 flags);
 
-								BTextView(BMessage* data);
+								BTextView(BMessage* archive);
 
 	virtual						~BTextView();
 
-	static	BArchivable*		Instantiate(BMessage* data);
-	virtual	status_t			Archive(BMessage* data, bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* archive);
+	virtual	status_t			Archive(BMessage* archive,
+									bool deep = true) const;
 
 	virtual	void				AttachedToWindow();
 	virtual	void				DetachedFromWindow();
@@ -80,11 +82,10 @@ public:
 	virtual	void				MakeFocus(bool focusState = true);
 	virtual	void				MessageReceived(BMessage* message);
 
-	virtual	BHandler*			ResolveSpecifier(BMessage* message, int32 index,
-									BMessage* specifier, int32 form,
-									const char* property);
+	virtual	BHandler*			ResolveSpecifier(BMessage* message,
+									int32 index, BMessage* specifier,
+									int32 form, const char* property);
 	virtual	status_t			GetSupportedSuites(BMessage* data);
-	virtual	status_t			Perform(perform_code d, void* arg);
 
 			void				SetText(const char* inText,
 									const text_run_array* inRuns = NULL);
@@ -224,9 +225,6 @@ public:
 protected:
 	virtual	void				DoLayout();
 
-private:
-			void				_ValidateLayoutData();
-
 public:
 	virtual	void				AllAttached();
 	virtual	void				AllDetached();
@@ -256,6 +254,22 @@ protected:
 									BBitmap** _bitmap, BPoint* point,
 									BHandler** _handler);
 
+	// FBC padding and forbidden methods
+public:
+	virtual	status_t			Perform(perform_code code, void* data);
+
+private:
+	virtual	void				_ReservedTextView3();
+	virtual	void				_ReservedTextView4();
+	virtual	void				_ReservedTextView5();
+	virtual	void				_ReservedTextView6();
+	virtual	void				_ReservedTextView7();
+	virtual	void				_ReservedTextView8();
+	virtual	void				_ReservedTextView9();
+	virtual	void				_ReservedTextView10();
+	virtual	void				_ReservedTextView11();
+	virtual	void				_ReservedTextView12();
+
 private:
 			class InlineInput;
 			struct LayoutData;
@@ -273,20 +287,11 @@ private:
 
 			friend class TextTrackState;
 
-	virtual	void				_ReservedTextView3();
-	virtual	void				_ReservedTextView4();
-	virtual	void				_ReservedTextView5();
-	virtual	void				_ReservedTextView6();
-	virtual	void				_ReservedTextView7();
-	virtual	void				_ReservedTextView8();
-	virtual	void				_ReservedTextView9();
-	virtual	void				_ReservedTextView10();
-	virtual	void				_ReservedTextView11();
-	virtual	void				_ReservedTextView12();
-
 			void				_InitObject(BRect textRect,
 									const BFont* initialFont,
 									const rgb_color* initialColor);
+
+			void				_ValidateLayoutData();
 
 			void				_HandleBackspace();
 			void				_HandleArrowKey(uint32 inArrowKey);
@@ -316,14 +321,17 @@ private:
 									int32 inLength, int32 inOffset,
 									const text_run_array* inRuns);
 
-			void				_DoDeleteText(int32 fromOffset, int32 toOffset);
+			void				_DoDeleteText(int32 fromOffset,
+									int32 toOffset);
 
 			void				_DrawLine(BView* view, const int32 &startLine,
-									const int32& startOffset, const bool& erase,
-									BRect& eraseRect, BRegion& inputRegion);
+									const int32& startOffset,
+									const bool& erase, BRect& eraseRect,
+									BRegion& inputRegion);
 
 			void				_DrawLines(int32 startLine, int32 endLine,
-									int32 startOffset = -1, bool erase = false);
+									int32 startOffset = -1,
+									bool erase = false);
 			void				_RequestDrawLines(int32 startLine,
 									int32 endLine, int32 startOffset = -1,
 									bool erase = false);
@@ -398,6 +406,7 @@ private:
 									float verticalStep);
 			void				_ScrollTo(float x, float y);
 
+private:
 			BPrivate::TextGapBuffer*	fText;
 			LineBuffer*			fLines;
 			StyleBuffer*		fStyles;

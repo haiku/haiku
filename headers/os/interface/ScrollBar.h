@@ -1,12 +1,6 @@
 /*
- * Copyright (c) 2001-2008, Haiku, Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
- *
- * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
- *		DarkWyrm (bpmagic@columbus.rr.com)
- *		Stefano Ceccherini (burton666@libero.it)
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2001-2008, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef	_SCROLL_BAR_H
 #define	_SCROLL_BAR_H
@@ -32,11 +26,13 @@ public:
 									BView* target, float min, float max,
 									orientation direction);
 								BScrollBar(const char* name, BView* target,
-									float min, float max, orientation direction);
-								BScrollBar(BMessage* data);
+									float min, float max,
+									enum orientation orientation);
+								BScrollBar(BMessage* archive);
 	virtual						~BScrollBar();
-	static	BArchivable*		Instantiate(BMessage* data);
-	virtual	status_t			Archive(BMessage *data, bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* archive);
+	virtual	status_t			Archive(BMessage* archive,
+									bool deep = true) const;
 
 	virtual	void				AttachedToWindow();
 			void				SetValue(float value);
@@ -56,7 +52,7 @@ public:
 			void				SetOrientation(enum orientation orientation);
 			orientation			Orientation() const;
 
-			// TODO: make this a virtual method, it should be one,
+			// TODO: Make this a virtual method, it should be one,
 			// but it's not important right now. This is supposed
 			// to be used in case the BScrollBar should draw part of
 			// the focus indication of the target view for aesthetical
@@ -78,7 +74,8 @@ public:
 									int32 form, const char* property);
 
 	virtual void				ResizeToPreferred();
-	virtual void				GetPreferredSize(float* _width, float* _height);
+	virtual void				GetPreferredSize(float* _width,
+									float* _height);
 	virtual void				MakeFocus(bool state = true);
 	virtual void				AllAttached();
 	virtual void				AllDetached();
@@ -128,6 +125,7 @@ private:
 
 			BSize				_MinSize() const;
 
+private:
 			float				fMin;
 			float				fMax;
 			float				fSmallStep;

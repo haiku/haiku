@@ -1,9 +1,6 @@
 /*
- * Copyright 2001-2005, Haiku Inc.
+ * Copyright 2001-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Frans van Nispen (xlr8@tref.nl)
  */
 #ifndef _STRING_VIEW_H
 #define _STRING_VIEW_H
@@ -14,70 +11,78 @@
 
 
 class BStringView : public BView{
-	public:
-							BStringView(BRect bounds, const char* name,
-								const char* text,
-								uint32 resizeFlags = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-								uint32 flags = B_WILL_DRAW);
-							BStringView(const char* name, const char* text,
-								uint32 flags = B_WILL_DRAW);
-							BStringView(BMessage* data);
-		virtual 			~BStringView();
+public:
+								BStringView(BRect bounds, const char* name,
+									const char* text, uint32 resizeFlags
+										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 flags = B_WILL_DRAW);
+								BStringView(const char* name, const char* text,
+									uint32 flags = B_WILL_DRAW);
+								BStringView(BMessage* archive);
+	virtual 					~BStringView();
 
-		static BArchivable*	Instantiate(BMessage* data);
-		virtual	status_t	Archive(BMessage* data, bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* archive);
+	virtual	status_t			Archive(BMessage* archive,
+									bool deep = true) const;
 
-		void				SetText(const char* text);
-		const char*			Text() const;
-		void				SetAlignment(alignment flag);
-		alignment			Alignment() const;
+			void				SetText(const char* text);
+			const char*			Text() const;
+			void				SetAlignment(alignment flag);
+			alignment			Alignment() const;
 
-		virtual	void		AttachedToWindow();
-		virtual	void		Draw(BRect bounds);
+	virtual	void				AttachedToWindow();
+	virtual	void				DetachedFromWindow();
+	virtual	void				AllAttached();
+	virtual	void				AllDetached();
 
-		virtual void		MessageReceived(BMessage* message);
-		virtual	void		MouseDown(BPoint point);
-		virtual	void		MouseUp(BPoint point);
-		virtual	void		MouseMoved(BPoint point, uint32 transit,
-								const BMessage* dragMessage);
-		virtual	void		DetachedFromWindow();
-		virtual	void		FrameMoved(BPoint newPosition);
-		virtual	void		FrameResized(float newWidth, float newHeight);
+	virtual	void				MakeFocus(bool state = true);
 
-		virtual BHandler*	ResolveSpecifier(BMessage* msg, int32 index,
-								BMessage* specifier, int32 form,
-								const char* property);
+	virtual void				GetPreferredSize(float* _width,
+									float* _height);
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
+	virtual	BSize				PreferredSize();
+	virtual	void				InvalidateLayout(bool descendants = false);
+	virtual	void				ResizeToPreferred();
+	virtual	void				FrameMoved(BPoint newPosition);
+	virtual	void				FrameResized(float newWidth, float newHeight);
 
-		virtual void		ResizeToPreferred();
-		virtual void		GetPreferredSize(float* _width, float* _height);
-		virtual void		MakeFocus(bool state = true);
-		virtual void		AllAttached();
-		virtual void		AllDetached();
-		virtual status_t	GetSupportedSuites(BMessage* data);
+	virtual	void				Draw(BRect bounds);
 
-		virtual	void		SetFont(const BFont* font,
-								uint32 mask = B_FONT_ALL);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				MouseDown(BPoint point);
+	virtual	void				MouseUp(BPoint point);
+	virtual	void				MouseMoved(BPoint point, uint32 transit,
+									const BMessage* dragMessage);
 
-		virtual	void		InvalidateLayout(bool descendants = false);
-		
-		virtual	BSize		MinSize();
-		virtual	BSize		MaxSize();
-		virtual	BSize		PreferredSize();
+	virtual	BHandler*			ResolveSpecifier(BMessage* message,
+									int32 index, BMessage* specifier,
+									int32 form, const char* property);
+	virtual	status_t			GetSupportedSuites(BMessage* data);
 
-	private:
-		virtual status_t	Perform(perform_code d, void* arg);
-		virtual	void		_ReservedStringView1();
-		virtual	void		_ReservedStringView2();
-		virtual	void		_ReservedStringView3();
+	virtual	void				SetFont(const BFont* font,
+									uint32 mask = B_FONT_ALL);
 
-				BSize		_ValidatePreferredSize();
 
-		BStringView	&operator=(const BStringView&);
+private:
+	// FBC padding and forbidden methods
+	virtual	status_t			Perform(perform_code code, void* data);
 
-		char*		fText;
-		alignment	fAlign;
-		BSize		fPreferredSize;
-		uint32		_reserved[1];
+	virtual	void				_ReservedStringView1();
+	virtual	void				_ReservedStringView2();
+	virtual	void				_ReservedStringView3();
+
+			BStringView&		operator=(const BStringView& other);
+
+private:
+			BSize				_ValidatePreferredSize();
+
+private:
+			char*				fText;
+			alignment			fAlign;
+			BSize				fPreferredSize;
+
+			uint32				_reserved[1];
 };
 
-#endif	// _STRING_VIEW_H
+#endif // _STRING_VIEW_H

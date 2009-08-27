@@ -1,6 +1,6 @@
 /*
  * Copyright 2006-2009, Haiku, Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _LIST_ITEM_H
 #define _LIST_ITEM_H

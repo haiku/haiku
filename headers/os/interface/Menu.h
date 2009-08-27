@@ -1,6 +1,6 @@
 /*
- * Copyright 2007-2009, Haiku Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2007-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _MENU_H
 #define _MENU_H

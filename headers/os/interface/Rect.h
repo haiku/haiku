@@ -1,15 +1,11 @@
 /*
- * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Frans van Nispen
  */
 #ifndef	_RECT_H
 #define	_RECT_H
 
 
-#include <SupportDefs.h>
 #include <Point.h>
 #include <Size.h>
 
@@ -17,77 +13,79 @@
 
 
 class BRect {
-	public:
-		float	left;
-		float	top;
-		float	right;
-		float	bottom;
+public:
+			float				left;
+			float				top;
+			float				right;
+			float				bottom;
 
-		BRect();
-		BRect(const BRect &r);
-		BRect(float l, float t, float r, float b);
-		BRect(BPoint lt, BPoint rb);
-		BRect(BPoint leftTop, BSize size);
+								BRect();
+								BRect(const BRect& other);
+								BRect(float left, float top, float right,
+									float bottom);
+								BRect(BPoint leftTop, BPoint rightBottom);
+								BRect(BPoint leftTop, BSize size);
 
-		BRect	&operator=(const BRect &r);
-		void	Set(float l, float t, float r, float b);
+			BRect&				operator=(const BRect& other);
+			void				Set(float left, float top, float right,
+									float bottom);
 
-		void	PrintToStream() const;
+			void				PrintToStream() const;
 
-		BPoint	LeftTop() const;
-		BPoint	RightBottom() const;
-		BPoint	LeftBottom() const;
-		BPoint	RightTop() const;
+			BPoint				LeftTop() const;
+			BPoint				RightBottom() const;
+			BPoint				LeftBottom() const;
+			BPoint				RightTop() const;
 
-		void	SetLeftTop(const BPoint p);
-		void	SetRightBottom(const BPoint p);
-		void	SetLeftBottom(const BPoint p);
-		void	SetRightTop(const BPoint p);
+			void				SetLeftTop(const BPoint leftTop);
+			void				SetRightBottom(const BPoint rightBottom);
+			void				SetLeftBottom(const BPoint leftBottom);
+			void				SetRightTop(const BPoint rightTop);
 
-		// transformation
-		void	InsetBy(BPoint p);
-		void	InsetBy(float dx, float dy);
-		void	OffsetBy(BPoint p);
-		void	OffsetBy(float dx, float dy);
-		void	OffsetTo(BPoint p);
-		void	OffsetTo(float x, float y);
+	// Transformation
+			void				InsetBy(BPoint inset);
+			void				InsetBy(float dx, float dy);
+			void				OffsetBy(BPoint delta);
+			void				OffsetBy(float dx, float dy);
+			void				OffsetTo(BPoint offset);
+			void				OffsetTo(float x, float y);
 
-		// expression transformations
-		BRect&	InsetBySelf(BPoint);
-		BRect&	InsetBySelf(float dx, float dy);
-		BRect	InsetByCopy(BPoint);
-		BRect	InsetByCopy(float dx, float dy);
-		BRect&	OffsetBySelf(BPoint);
-		BRect&	OffsetBySelf(float dx, float dy);
-		BRect	OffsetByCopy(BPoint);
-		BRect	OffsetByCopy(float dx, float dy);
-		BRect&	OffsetToSelf(BPoint);
-		BRect&	OffsetToSelf(float dx, float dy);
-		BRect	OffsetToCopy(BPoint);
-		BRect	OffsetToCopy(float dx, float dy);
+	// Expression transformations
+			BRect&				InsetBySelf(BPoint inset);
+			BRect&				InsetBySelf(float dx, float dy);
+			BRect				InsetByCopy(BPoint inset);
+			BRect				InsetByCopy(float dx, float dy);
+			BRect&				OffsetBySelf(BPoint offset);
+			BRect&				OffsetBySelf(float dx, float dy);
+			BRect				OffsetByCopy(BPoint offset);
+			BRect				OffsetByCopy(float dx, float dy);
+			BRect&				OffsetToSelf(BPoint offset);
+			BRect&				OffsetToSelf(float dx, float dy);
+			BRect				OffsetToCopy(BPoint offset);
+			BRect				OffsetToCopy(float dx, float dy);
 
-		// comparison
-		bool	operator==(BRect r) const;
-		bool	operator!=(BRect r) const;
+	// Comparison
+			bool				operator==(BRect r) const;
+			bool				operator!=(BRect r) const;
 
-		// intersection and union
-		BRect	operator&(BRect r) const;
-		BRect	operator|(BRect r) const;
+	// Intersection and union
+			BRect				operator&(BRect r) const;
+			BRect				operator|(BRect r) const;
 
-		bool	IsValid() const;
-		float	Width() const;
-		int32	IntegerWidth() const;
-		float	Height() const;
-		int32	IntegerHeight() const;
-		BSize	Size() const;
+			bool				IsValid() const;
+			float				Width() const;
+			int32				IntegerWidth() const;
+			float				Height() const;
+			int32				IntegerHeight() const;
+			BSize				Size() const;
 
-		bool	Intersects(BRect r) const;
-		bool	Contains(BPoint p) const;
-		bool	Contains(BRect r) const;
+			bool				Intersects(BRect r) const;
+			bool				Contains(BPoint p) const;
+			bool				Contains(BRect r) const;
 };
 
 
-// inline definitions ----------------------------------------------------------
+// #pragma mark - inline definitions
 
 inline BPoint
 BRect::LeftTop() const
@@ -136,7 +134,7 @@ BRect::BRect(float l, float t, float r, float b)
 
 
 inline
-BRect::BRect(const BRect &r)
+BRect::BRect(const BRect& r)
 {
 	left = r.left;
 	top = r.top;
@@ -165,7 +163,7 @@ BRect::BRect(BPoint leftTop, BSize size)
 }
 
 
-inline BRect &
+inline BRect&
 BRect::operator=(const BRect& from)
 {
 	left = from.left;

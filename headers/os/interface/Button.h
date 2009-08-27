@@ -1,10 +1,6 @@
 /*
- * Copyright 2001-2009 Haiku Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
- *
- * Authors:
- *		Marc Flerackers <mflerackers@androme.be>
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _BUTTON_H
 #define _BUTTON_H

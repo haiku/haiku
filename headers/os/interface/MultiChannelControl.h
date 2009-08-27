@@ -1,6 +1,6 @@
 /*
- * Copyright 2009, Haiku Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _MULTI_CHANNEL_CONTROL_H
 #define _MULTI_CHANNEL_CONTROL_H

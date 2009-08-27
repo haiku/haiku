@@ -1,10 +1,10 @@
 /*
- * Copyright 2001-2009, Stephan Aßmus <superstippi@gmx.de>
- * Copyright 2001-2009, Ingo Weinhold <ingo_weinhold@gmx.de>
- * All rights reserved. Distributed under the terms of the MIT license.
+ * Copyright 2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _SEPARATOR_VIEW_H
 #define _SEPARATOR_VIEW_H
+
 
 #include <Alignment.h>
 #include <String.h>
@@ -55,8 +55,8 @@ public:
 									bool deep = true) const;
 
 	virtual	void				Draw(BRect updateRect);
-	virtual	void				GetPreferredSize(float* width, float* height);
 
+	virtual	void				GetPreferredSize(float* width, float* height);
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
@@ -74,6 +74,7 @@ protected:
 	virtual	void				DoLayout();
 
 private:
+	// FBC padding
 	virtual	void				_ReservedSeparatorView1();
 	virtual	void				_ReservedSeparatorView2();
 	virtual	void				_ReservedSeparatorView3();
@@ -93,6 +94,7 @@ private:
 			float				_BorderSize() const;
 			BRect				_MaxLabelBounds() const;
 
+private:
 			BString				fLabel;
 			BView*				fLabelView;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CONTROL_LOOK_H
@@ -14,6 +14,10 @@
 class BControl;
 class BGradientLinear;
 class BView;
+
+
+// WARNING! This is experimental API and may change! Be prepared to
+// recompile your software in a next version of haiku.
 
 
 namespace BPrivate {

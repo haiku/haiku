@@ -1,6 +1,6 @@
 /*
  * Copyright 2001-2009, Haiku, Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
@@ -382,7 +382,7 @@ BTab &BTab::operator=(const BTab &)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BTabView
 
 
 BTabView::BTabView(const char *name, button_width width, uint32 flags)
@@ -524,21 +524,18 @@ BTabView::Perform(perform_code d, void *arg)
 
 
 void
-BTabView::WindowActivated(bool active)
-{
-	BView::WindowActivated(active);
-
-	if (IsFocus())
-		Invalidate();
-}
-
-
-void
 BTabView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
 	Select(fSelection);
+}
+
+
+void
+BTabView::DetachedFromWindow()
+{
+	BView::DetachedFromWindow();
 }
 
 
@@ -556,11 +553,7 @@ BTabView::AllDetached()
 }
 
 
-void
-BTabView::DetachedFromWindow()
-{
-	BView::DetachedFromWindow();
-}
+// #pragma mark -
 
 
 void
@@ -632,20 +625,6 @@ BTabView::MessageReceived(BMessage *message)
 			BView::MessageReceived(message);
 			break;
 	}
-}
-
-
-void
-BTabView::FrameMoved(BPoint newLocation)
-{
-	BView::FrameMoved(newLocation);
-}
-
-
-void
-BTabView::FrameResized(float width,float height)
-{
-	BView::FrameResized(width, height);
 }
 
 
@@ -770,6 +749,16 @@ int32
 BTabView::Selection() const
 {
 	return fSelection;
+}
+
+
+void
+BTabView::WindowActivated(bool active)
+{
+	BView::WindowActivated(active);
+
+	if (IsFocus())
+		Invalidate();
 }
 
 
@@ -1060,6 +1049,16 @@ BTabView::SetResizingMode(uint32 mode)
 }
 
 
+// #pragma mark -
+
+
+void
+BTabView::ResizeToPreferred()
+{
+	BView::ResizeToPreferred();
+}
+
+
 void
 BTabView::GetPreferredSize(float *width, float *height)
 {
@@ -1104,10 +1103,20 @@ BTabView::PreferredSize()
 
 
 void
-BTabView::ResizeToPreferred()
+BTabView::FrameMoved(BPoint newLocation)
 {
-	BView::ResizeToPreferred();
+	BView::FrameMoved(newLocation);
 }
+
+
+void
+BTabView::FrameResized(float width,float height)
+{
+	BView::FrameResized(width, height);
+}
+
+
+// #pragma mark -
 
 
 BHandler *
@@ -1134,6 +1143,9 @@ BTabView::GetSupportedSuites(BMessage *message)
 
 	return BView::GetSupportedSuites(message);
 }
+
+
+// #pragma mark -
 
 
 void

@@ -1,9 +1,6 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
  */
 #ifndef _SLIDER_H
 #define _SLIDER_H
@@ -56,11 +53,12 @@ public:
 									uint32 flags = B_NAVIGABLE | B_WILL_DRAW
 										| B_FRAME_EVENTS);
 
-								BSlider(BMessage* data);
+								BSlider(BMessage* archive);
 	virtual						~BSlider();
 
-	static 	BArchivable*		Instantiate(BMessage* data);
-	virtual	status_t 			Archive(BMessage* data, bool deep = true) const;
+	static 	BArchivable*		Instantiate(BMessage* archive);
+	virtual	status_t 			Archive(BMessage* archive,
+									bool deep = true) const;
 	virtual status_t			Perform(perform_code code, void* data);
 
 	virtual void				WindowActivated(bool state);
@@ -89,7 +87,8 @@ public:
 	virtual void				SetPosition(float);
 			float				Position() const;
 	virtual void				SetEnabled(bool on);
-			void				GetLimits(int32* minimum, int32* maximum) const;
+			void				GetLimits(int32* minimum,
+									int32* maximum) const;
 
 	virtual	void				Draw(BRect);
 	virtual void				DrawSlider();
@@ -108,13 +107,14 @@ public:
 	virtual	void				SetFlags(uint32 flags);
 	virtual	void				SetResizingMode(uint32 mode);
 
-	virtual void				GetPreferredSize(float* width, float* height);
+	virtual void				GetPreferredSize(float* _width,
+									float* _height);
 	virtual void				ResizeToPreferred();
 
 	virtual status_t			Invoke(BMessage* message = NULL);
-	virtual BHandler*			ResolveSpecifier(BMessage* message, int32 index,
-									BMessage* specifier, int32 form,
-									const char* property);
+	virtual BHandler*			ResolveSpecifier(BMessage* message,
+									int32 index, BMessage* specifier,
+									int32 form, const char* property);
 	virtual	status_t			GetSupportedSuites(BMessage* data);
 
 	virtual	void				SetModificationMessage(BMessage* message);
@@ -176,6 +176,11 @@ private:
 
 			BSize				_ValidateMinSize();
 
+			void				_InitBarColor();
+			void				_InitObject();
+
+private:
+	// FBC padding and forbidden methods
 	virtual	void				_ReservedSlider6();
 	virtual	void				_ReservedSlider7();
 	virtual	void				_ReservedSlider8();
@@ -185,9 +190,6 @@ private:
 	virtual	void				_ReservedSlider12();
 
 			BSlider&			operator=(const BSlider& other);
-
-			void				_InitBarColor();
-			void				_InitObject();
 
 private:
 			BMessage*			fModificationMessage;

@@ -1,9 +1,6 @@
 /*
- * Copyright (c) 2001-2008, Haiku, Inc.
- * Distributed under the terms of the MIT license.
- *
- * Authors:
- *		Erik Jaesler (erik@cgsoftware.com)
+ * Copyright 2001-2008, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef	_INTERFACE_DEFS_H
 #define	_INTERFACE_DEFS_H

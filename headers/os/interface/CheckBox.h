@@ -1,6 +1,6 @@
 /*
- * Copyright 2001-2009, Haiku Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _CHECK_BOX_H
 #define _CHECK_BOX_H

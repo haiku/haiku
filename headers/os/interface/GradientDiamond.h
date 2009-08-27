@@ -1,6 +1,6 @@
 /*
- * Copyright 2006-2009, Haiku Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _GRADIENT_DIAMOND_H
 #define _GRADIENT_DIAMOND_H

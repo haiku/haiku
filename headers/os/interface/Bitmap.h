@@ -1,9 +1,6 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2007, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Ingo Weinhold (bonefish@users.sf.net)
  */
 #ifndef	_BITMAP_H
 #define	_BITMAP_H

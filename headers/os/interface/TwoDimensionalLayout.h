@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku Inc.
+ * Copyright 2006, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_TWO_DIMENSIONAL_LAYOUT_H
 #define	_TWO_DIMENSIONAL_LAYOUT_H
+
 
 #include <Layout.h>
 
@@ -90,4 +91,4 @@ private:
 			LocalLayouter*		fLocalLayouter;
 };
 
-#endif	//	_TWO_DIMENSIONAL_LAYOUT_H
+#endif // _TWO_DIMENSIONAL_LAYOUT_H

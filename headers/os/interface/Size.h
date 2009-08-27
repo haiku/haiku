@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku Inc.
+ * Copyright 2006, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_SIZE_H
@@ -45,7 +45,6 @@ public:
 };
 
 
-// constructor
 inline
 BSize::BSize()
 	: width(B_SIZE_UNSET),
@@ -54,7 +53,6 @@ BSize::BSize()
 }
 
 
-// copy constructor
 inline
 BSize::BSize(const BSize& other)
 	: width(other.width),
@@ -63,7 +61,6 @@ BSize::BSize(const BSize& other)
 }
 
 
-// constructor
 inline
 BSize::BSize(float width, float height)
 	: width(width),
@@ -72,7 +69,6 @@ BSize::BSize(float width, float height)
 }
 
 
-// Width
 inline float
 BSize::Width() const
 {
@@ -80,7 +76,6 @@ BSize::Width() const
 }
 
 
-// Height
 inline float
 BSize::Height() const
 {
@@ -88,7 +83,6 @@ BSize::Height() const
 }
 
 
-// Set
 inline void
 BSize::Set(float width, float height)
 {
@@ -97,7 +91,6 @@ BSize::Set(float width, float height)
 }
 
 
-// SetWidth
 inline void
 BSize::SetWidth(float width)
 {
@@ -105,7 +98,6 @@ BSize::SetWidth(float width)
 }
 
 
-// SetHeight
 inline void
 BSize::SetHeight(float height)
 {
@@ -113,7 +105,6 @@ BSize::SetHeight(float height)
 }
 
 
-// IntegerWidth
 inline int32
 BSize::IntegerWidth() const
 {
@@ -121,7 +112,6 @@ BSize::IntegerWidth() const
 }
 
 
-// IntegerHeight
 inline int32
 BSize::IntegerHeight() const
 {
@@ -129,7 +119,6 @@ BSize::IntegerHeight() const
 }
 
 
-// IsWidthSet
 inline bool
 BSize::IsWidthSet() const
 {
@@ -137,7 +126,6 @@ BSize::IsWidthSet() const
 }
 
 
-// IsHeightSet
 inline bool
 BSize::IsHeightSet() const
 {
@@ -145,7 +133,6 @@ BSize::IsHeightSet() const
 }
 
 
-// ==
 inline bool
 BSize::operator==(const BSize& other) const
 {
@@ -153,7 +140,6 @@ BSize::operator==(const BSize& other) const
 }
 
 
-// !=
 inline bool
 BSize::operator!=(const BSize& other) const
 {
@@ -161,7 +147,6 @@ BSize::operator!=(const BSize& other) const
 }
 
 
-// =
 inline BSize&
 BSize::operator=(const BSize& other)
 {
@@ -170,4 +155,4 @@ BSize::operator=(const BSize& other)
 	return *this;
 }
 
-#endif	// _SIZE_H
+#endif // _SIZE_H

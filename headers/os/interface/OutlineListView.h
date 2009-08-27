@@ -1,6 +1,6 @@
 /*
- * Copyright 2006-2009, Haiku Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _OUTLINE_LIST_VIEW_H
 #define _OUTLINE_LIST_VIEW_H

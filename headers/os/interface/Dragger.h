@@ -1,6 +1,6 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2006-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _DRAGGER_H
 #define _DRAGGER_H

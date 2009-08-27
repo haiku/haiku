@@ -1,12 +1,11 @@
 /*
- * Copyright 2001-2009, Haiku Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef	_PICTURE_H
 #define	_PICTURE_H
 
 
-#include <BeBuild.h>
 #include <InterfaceDefs.h>
 #include <Rect.h>
 #include <Archivable.h>

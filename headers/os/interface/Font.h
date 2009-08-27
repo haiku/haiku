@@ -1,6 +1,6 @@
 /*
- * Copyright 2005-2009, Haiku, Inc. All Rights Reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2005-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _FONT_H_
 #define _FONT_H_

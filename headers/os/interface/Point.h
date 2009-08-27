@@ -1,87 +1,88 @@
 /*
- * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Frans van Nispen
  */
 #ifndef	_POINT_H
 #define	_POINT_H
 
 
-#include <BeBuild.h>
 #include <SupportDefs.h>
 
 
 class BRect;
 
+
 class BPoint {
 public:
-	float x;
-	float y;
+			float				x;
+			float				y;
 
-	BPoint();
-	BPoint(float X, float Y);
-	BPoint(const BPoint &p);
+								BPoint();
+								BPoint(float x, float y);
+								BPoint(const BPoint& p);
 		
-	BPoint	&operator=(const BPoint &p);
-	void	Set(float X, float Y);
+			BPoint&				operator=(const BPoint& other);
+			void				Set(float x, float y);
 
-	void	ConstrainTo(BRect r);
-	void	PrintToStream() const;
+			void				ConstrainTo(BRect rect);
+			void				PrintToStream() const;
 			
-	BPoint	operator-() const;
-	BPoint	operator+(const BPoint &p) const;
-	BPoint	operator-(const BPoint &p) const;
-	BPoint&	operator+=(const BPoint &p);
-	BPoint&	operator-=(const BPoint &p);
+			BPoint				operator-() const;
+			BPoint				operator+(const BPoint& other) const;
+			BPoint				operator-(const BPoint& other) const;
+			BPoint&				operator+=(const BPoint& other);
+			BPoint&				operator-=(const BPoint& other);
 
-	bool	operator!=(const BPoint &p) const;
-	bool	operator==(const BPoint &p) const;
+			bool				operator!=(const BPoint& other) const;
+			bool				operator==(const BPoint& other) const;
 };
 
 
 extern const BPoint B_ORIGIN;
-	// returns (0,0)
+	// returns (0, 0)
 
 
 inline
 BPoint::BPoint()
+	:
+	x(0.0f),
+	y(0.0f)
 {
-	x = y = 0;
 }
 
 
 inline
-BPoint::BPoint(float X, float Y)
+BPoint::BPoint(float x, float y)
+	:
+	x(x),
+	y(y)
 {
-	x = X;
-	y = Y;
 }
 
 
 inline
-BPoint::BPoint(const BPoint& pt)
+BPoint::BPoint(const BPoint& other)
+	:
+	x(other.x),
+	y(other.y)
 {
-	x = pt.x;
-	y = pt.y;
 }
 
 
-inline BPoint &
-BPoint::operator=(const BPoint& from)
+inline BPoint&
+BPoint::operator=(const BPoint& other)
 {
-	x = from.x;
-	y = from.y;
+	x = other.x;
+	y = other.y;
 	return *this;
 }
 
 
 inline void
-BPoint::Set(float X, float Y)
+BPoint::Set(float x, float y)
 {
-	x = X;
-	y = Y;
+	this->x = x;
+	this->y = y;
 }
 
-#endif	// _POINT_H
+#endif // _POINT_H
