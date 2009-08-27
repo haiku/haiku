@@ -1,13 +1,18 @@
-/* 
- * Copyright 2003-2008, Haiku Inc.
+/*
+ * Copyright 2003-2009, Haiku Inc.
  * Authors:
  *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
  *		Carwyn Jones <turok2@currantbun.com>
- * 
+ *
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <DirectWindow.h>
+
+#include <stdio.h>
+#include <string.h>
+
 #include <Screen.h>
 
 #include <clipping.h>
@@ -15,13 +20,13 @@
 #include <DirectWindowPrivate.h>
 #include <ServerProtocol.h>
 
-#include <stdio.h>
-#include <string.h>
 
-//#define DEBUG 1
+//#define DEBUG		1
+#define OUTPUT		printf
+//#define OUTPUT	debug_printf
 
-	
-// We don't need this kind of locking, since the directDaemonFunc 
+
+// We don't need this kind of locking, since the directDaemonFunc
 // doesn't access critical shared data.
 #define DW_NEEDS_LOCKING 0
 
@@ -33,6 +38,8 @@ enum dw_status_bits {
 
 
 #if DEBUG
+
+
 static void
 print_direct_buffer_state(const direct_buffer_state &state)
 {
@@ -41,7 +48,7 @@ print_direct_buffer_state(const direct_buffer_state &state)
 	if (modeState == B_DIRECT_START)
 		strcpy(string, "B_DIRECT_START");
 	else if (modeState == B_DIRECT_MODIFY)
-		strcpy(string, "B_DIRECT_MODIFY"); 
+		strcpy(string, "B_DIRECT_MODIFY");
 	else if (modeState == B_DIRECT_STOP)
 		strcpy(string, "B_DIRECT_STOP");
 
@@ -53,8 +60,8 @@ print_direct_buffer_state(const direct_buffer_state &state)
 		strcat(string, " | B_BUFFER_MOVED");
 	if (state & B_BUFFER_RESET)
 		strcat(string, " | B_BUFFER_RESET");
-	
-	printf("direct_buffer_state: %s\n", string);	
+
+	OUTPUT("direct_buffer_state: %s\n", string);
 }
 
 
@@ -66,30 +73,33 @@ print_direct_driver_state(const direct_driver_state &state)
 
 	char string[64];
 	if (state == B_DRIVER_CHANGED)
-		strcpy(string, "B_DRIVER_CHANGED");	
+		strcpy(string, "B_DRIVER_CHANGED");
 	else if (state == B_MODE_CHANGED)
 		strcpy(string, "B_MODE_CHANGED");
-	
-	printf("direct_driver_state: %s\n", string);
+
+	OUTPUT("direct_driver_state: %s\n", string);
 }
+
+
+#if DEBUG > 1
 
 
 static void
 print_direct_buffer_layout(const buffer_layout &layout)
-{	
+{
 	char string[64];
 	if (layout == B_BUFFER_NONINTERLEAVED)
-		strcpy(string, "B_BUFFER_NONINTERLEAVED");	
+		strcpy(string, "B_BUFFER_NONINTERLEAVED");
 	else
 		strcpy(string, "unknown");
-	
-	printf("layout: %s\n", string);
+
+	OUTPUT("layout: %s\n", string);
 }
 
 
 static void
 print_direct_buffer_orientation(const buffer_orientation &orientation)
-{	
+{
 	char string[64];
 	switch (orientation) {
 		case B_BUFFER_TOP_TO_BOTTOM:
@@ -102,9 +112,12 @@ print_direct_buffer_orientation(const buffer_orientation &orientation)
 			strcpy(string, "unknown");
 			break;
 	}
-	
-	printf("orientation: %s\n", string);
+
+	OUTPUT("orientation: %s\n", string);
 }
+
+
+#endif	// DEBUG > 2
 
 
 static void
@@ -112,51 +125,58 @@ print_direct_buffer_info(const direct_buffer_info &info)
 {
 	print_direct_buffer_state(info.buffer_state);
 	print_direct_driver_state(info.driver_state);
-	
-#if DEBUG > 1
-	printf("bits: %p\n", info.bits);
-	printf("pci_bits: %p\n", info.pci_bits);
-	printf("bytes_per_row: %ld\n", info.bytes_per_row);
-	printf("bits_per_pixel: %lu\n", info.bits_per_pixel);
-	printf("pixel_format: %d\n", info.pixel_format);
+
+#	if DEBUG > 1
+	OUTPUT("bits: %p\n", info.bits);
+	OUTPUT("pci_bits: %p\n", info.pci_bits);
+	OUTPUT("bytes_per_row: %ld\n", info.bytes_per_row);
+	OUTPUT("bits_per_pixel: %lu\n", info.bits_per_pixel);
+	OUTPUT("pixel_format: %d\n", info.pixel_format);
 	print_direct_buffer_layout(info.layout);
 	print_direct_buffer_orientation(info.orientation);
 
-#if DEBUG > 2	
+#		if DEBUG > 2
+	// TODO: this won't work correctly with debug_printf()
 	printf("CLIPPING INFO:\n");
 	printf("clipping_rects count: %ld\n", info.clip_list_count);
-		
+
 	printf("- window_bounds:\n");
 	BRegion region;
 	region.Set(info.window_bounds);
 	region.PrintToStream();
-		
+
 	region.MakeEmpty();
 	for (uint32 i = 0; i < info.clip_list_count; i++)
 		region.Include(info.clip_list[i]);
-		
+
 	printf("- clip_list:\n");
 	region.PrintToStream();
-#endif
-#endif
+#		endif
+#	endif
 
-	printf("\n\n");
+	OUTPUT("\n");
 }
 
-#endif
+
+#endif	// DEBUG
+
+
+//	#pragma mark -
 
 
 BDirectWindow::BDirectWindow(BRect frame, const char *title, window_type type,
-	uint32 flags, uint32 workspace)
-	: BWindow(frame, title, type, flags, workspace)
+		uint32 flags, uint32 workspace)
+	:
+	BWindow(frame, title, type, flags, workspace)
 {
 	_InitData();
 }
 
 
 BDirectWindow::BDirectWindow(BRect frame, const char *title, window_look look,
-	window_feel feel, uint32 flags, uint32 workspace)
-	: BWindow(frame, title, look, feel, flags, workspace)
+		window_feel feel, uint32 flags, uint32 workspace)
+	:
+	BWindow(frame, title, look, feel, flags, workspace)
 {
 	_InitData();
 }
@@ -168,7 +188,9 @@ BDirectWindow::~BDirectWindow()
 }
 
 
-// start of regular BWindow API
+//	#pragma mark - BWindow API implementation
+
+
 BArchivable *
 BDirectWindow::Instantiate(BMessage *data)
 {
@@ -270,7 +292,7 @@ BDirectWindow::MenusEnded()
 void
 BDirectWindow::WindowActivated(bool state)
 {
-	inherited::WindowActivated(state);	
+	inherited::WindowActivated(state);
 }
 
 
@@ -330,7 +352,6 @@ BDirectWindow::ConvertToMessage(void *raw, int32 code)
 void
 BDirectWindow::DirectConnected(direct_buffer_info *info)
 {
-	fprintf(stderr, "BDirectWindow::DirectConnected(): should not be ever called!!!!\n");
 	// implemented in subclasses
 }
 
@@ -343,12 +364,12 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 
 	if (IsLocked() || !_LockDirect())
 		return B_ERROR;
-	
+
 	if (fInDirectConnect) {
 		_UnlockDirect();
 		return B_ERROR;
 	}
-		
+
 	// BPoint's coordinates are floats. We can only work
 	// with integers._DaemonStarter
 	int32 originX, originY;
@@ -376,8 +397,8 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 			fBufferDesc->clip_list[c]);
 	}
 
-	// adjust bounds by the given origin point 
-	region->OffsetBy(-originX, -originY);		
+	// adjust bounds by the given origin point
+	region->OffsetBy(-originX, -originY);
 #endif
 
 	_UnlockDirect();
@@ -415,30 +436,22 @@ BDirectWindow::IsFullScreen() const
 }
 
 
-/*static*/
-bool
+/*static*/ bool
 BDirectWindow::SupportsWindowMode(screen_id id)
 {
-/*	display_mode mode;
+	display_mode mode;
 	status_t status = BScreen(id).GetMode(&mode);
 	if (status == B_OK)
-		return mode.flags & B_PARALLEL_ACCESS;
+		return (mode.flags & B_PARALLEL_ACCESS) != 0;
 
-	return false;*/
-	// TODO: Apparently, the above is false for the vesa driver,
-	// but enabling it doesn't do any harm... maybe we should just return always true.
-	// At least, I can't see why window mode shouldn't be supported.
-	// additional NOTE: it probably depends on wether hardware cursor is supported or
-	// not
 	return false;
-	// TODO: For now
 }
 
 
 //	#pragma mark - Private methods
 
-/* static */
-int32
+
+/*static*/ int32
 BDirectWindow::_daemon_thread(void *arg)
 {
 	return static_cast<BDirectWindow *>(arg)->_DirectDaemon();
@@ -457,9 +470,8 @@ BDirectWindow::_DirectDaemon()
 			status = acquire_sem(fDisableSem);
 		} while (status == B_INTERRUPTED);
 
-		if (status < B_OK) {
-			fprintf(stderr,
-				"DirectDaemon: failed to acquire direct sem\n",
+		if (status != B_OK) {
+			fprintf(stderr, "DirectDaemon: failed to acquire direct sem: %s\n",
 				 strerror(status));
 			return -1;
 		}
@@ -469,14 +481,16 @@ BDirectWindow::_DirectDaemon()
 #endif
 
 		if (_LockDirect()) {
-			if ((fBufferDesc->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_START)
+			if ((fBufferDesc->buffer_state & B_DIRECT_MODE_MASK)
+					== B_DIRECT_START)
 				fConnectionEnable = true;
 
-			fInDirectConnect = true;			
-			DirectConnected(fBufferDesc);	
+			fInDirectConnect = true;
+			DirectConnected(fBufferDesc);
 			fInDirectConnect = false;
 
-			if ((fBufferDesc->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_STOP)
+			if ((fBufferDesc->buffer_state & B_DIRECT_MODE_MASK)
+					== B_DIRECT_STOP)
 				fConnectionEnable = false;
 
 			_UnlockDirect();
@@ -486,8 +500,7 @@ BDirectWindow::_DirectDaemon()
 		// If we aren't quick enough to release this sem, our app
 		// will be terminated by the app_server
 		if ((status = release_sem(fDisableSemAck)) != B_OK) {
-			fprintf(stderr,
-				"DirectDaemon: failed to release sem: (%s)\n",
+			fprintf(stderr, "DirectDaemon: failed to release sem: %s\n",
 				strerror(status));
 			return -1;
 		}
@@ -497,24 +510,25 @@ BDirectWindow::_DirectDaemon()
 }
 
 
-// LockDirect() and UnlockDirect() are no-op on R5. I tried to call (R5's) LockDirect()
-// repeatedly, from the same thread and from different threads, nothing happened.
-// They're not needed though, as the direct_daemon_thread doesn't change
-// any shared data. They are probably here for future enhancements
 bool
 BDirectWindow::_LockDirect() const
 {
+	// LockDirect() and UnlockDirect() are no-op on BeOS. I tried to call BeOS's
+	// version repeatedly, from the same thread and from different threads,
+	// nothing happened.
+	// They're not needed though, as the direct_daemon_thread doesn't change
+	// any shared data. They are probably here for future enhancements.
 	status_t status = B_OK;
 
 #if DW_NEEDS_LOCKING
 	BDirectWindow *casted = const_cast<BDirectWindow *>(this);
-	
+
 	if (atomic_add(&casted->fDirectLock, 1) > 0) {
 		do {
 			status = acquire_sem(casted->fDirectSem);
 		} while (status == B_INTERRUPTED);
 	}
-		
+
 	if (status == B_OK) {
 		casted->fDirectLockOwner = find_thread(NULL);
 		casted->fDirectLockCount++;
@@ -530,10 +544,10 @@ BDirectWindow::_UnlockDirect() const
 {
 #if DW_NEEDS_LOCKING
 	BDirectWindow *casted = const_cast<BDirectWindow *>(this);
-	
+
 	if (atomic_add(&casted->fDirectLock, -1) > 1)
 		release_sem(casted->fDirectSem);
-	
+
 	casted->fDirectLockCount--;
 #endif
 }
@@ -545,23 +559,22 @@ BDirectWindow::_InitData()
 	fConnectionEnable = false;
 	fIsFullScreen = false;
 	fInDirectConnect = false;
-	
+
 	fInitStatus = 0;
-	
+
 	status_t status = B_ERROR;
 	struct direct_window_sync_data syncData;
 	if (Lock()) {
 		fLink->StartMessage(AS_DIRECT_WINDOW_GET_SYNC_DATA);
-		if (fLink->FlushWithReply(status) == B_OK
-			&& status == B_OK) {
+		if (fLink->FlushWithReply(status) == B_OK && status == B_OK)
 			fLink->Read<direct_window_sync_data>(&syncData);
-		}	
+
 		Unlock();
 	}
 	if (status < B_OK)
 		return;
 
-#if DW_NEEDS_LOCKING	
+#if DW_NEEDS_LOCKING
 	fDirectLock = 0;
 	fDirectLockCount = 0;
 	fDirectLockOwner = -1;
@@ -569,20 +582,20 @@ BDirectWindow::_InitData()
 	fDirectSem = create_sem(0, "direct sem");
 	if (fDirectSem > 0)
 		fInitStatus |= DW_STATUS_SEM_CREATED;
-#endif		
+#endif
 
 	fSourceClippingArea = syncData.area;
 	fDisableSem = syncData.disable_sem;
 	fDisableSemAck = syncData.disable_sem_ack;
 
 	fClonedClippingArea = clone_area("cloned direct area", (void**)&fBufferDesc,
-		B_ANY_ADDRESS, B_READ_AREA, fSourceClippingArea);		
+		B_ANY_ADDRESS, B_READ_AREA, fSourceClippingArea);
 
-	if (fClonedClippingArea > 0) {			
+	if (fClonedClippingArea > 0) {
 		fInitStatus |= DW_STATUS_AREA_CLONED;
 
 		fDirectDaemonId = spawn_thread(_daemon_thread, "direct daemon",
-				B_DISPLAY_PRIORITY, this);
+			B_DISPLAY_PRIORITY, this);
 
 		if (fDirectDaemonId > 0) {
 			fDaemonKiller = false;
@@ -603,9 +616,9 @@ BDirectWindow::_DisposeData()
 	// notification, or bad things will happen
 	while (fConnectionEnable)
 		snooze(50000);
-	
+
 	_LockDirect();
-	
+
 	if (fInitStatus & DW_STATUS_THREAD_STARTED) {
 		fDaemonKiller = true;
 		// delete this sem, otherwise the Direct daemon thread
@@ -614,11 +627,11 @@ BDirectWindow::_DisposeData()
 		status_t retVal;
 		wait_for_thread(fDirectDaemonId, &retVal);
 	}
-	
+
 #if DW_NEEDS_LOCKING
 	if (fInitStatus & DW_STATUS_SEM_CREATED)
 		delete_sem(fDirectSem);
-#endif	
+#endif
 
 	if (fInitStatus & DW_STATUS_AREA_CLONED)
 		delete_area(fClonedClippingArea);
