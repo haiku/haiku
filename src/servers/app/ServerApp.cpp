@@ -2252,36 +2252,41 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_GET_SCREEN_ID_FROM_WINDOW:
 		{
-			status_t status = B_ENTRY_NOT_FOUND;
+			status_t status = B_BAD_VALUE;
 
 			// Attached data
 			// 1) int32 - window client token
 			int32 clientToken;
 			if (link.Read<int32>(&clientToken) != B_OK)
 				status = B_BAD_DATA;
-			else if (fDesktop->LockAllWindows()) {
+			else {
 				BAutolock locker(fWindowListLock);
 
 				for (int32 i = fWindowList.CountItems(); i-- > 0;) {
-					ServerWindow* window = fWindowList.ItemAt(i);
+					ServerWindow* serverWindow = fWindowList.ItemAt(i);
 
-					if (window->ClientToken() == clientToken) {
+					if (serverWindow->ClientToken() == clientToken) {
+						AutoReadLocker _(fDesktop->ScreenLocker());
+
 						// found it!
-						if (window->Window() == NULL) {
+						Window* window = serverWindow->Window();
+						const Screen* screen = NULL;
+						if (window != NULL)
+							screen = window->Screen();
+
+						if (screen == NULL) {
 							// The window hasn't been added to the desktop yet,
 							// or it's an offscreen window
 							break;
 						}
 
 						fLink.StartMessage(B_OK);
-						fLink.Attach<int32>(window->Window()->Screen()->ID());
+						fLink.Attach<int32>(screen->ID());
 						status = B_OK;
 						break;
 					}
 				}
-				fDesktop->UnlockAllWindows();
-			} else
-				status = B_ERROR;
+			}
 
 			if (status != B_OK)
 				fLink.StartMessage(status);

@@ -7,16 +7,17 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+
 #include "DirectWindowSupport.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <syslog.h>
 
 #include <Autolock.h>
 
 #include "RenderingBuffer.h"
 #include "clipping.h"
-
-#include <stdio.h>
-#include <string.h>
-#include <syslog.h>
 
 
 DirectWindowData::DirectWindowData()
@@ -25,9 +26,7 @@ DirectWindowData::DirectWindowData()
 	fBufferInfo(NULL),
 	fSem(-1),
 	fAcknowledgeSem(-1),
-	fBufferArea(-1),
-	fTransition(0),
-	fStarted(false)
+	fBufferArea(-1)
 {
 	fBufferArea = create_area("direct area", (void**)&fBufferInfo,
 		B_ANY_ADDRESS, DIRECT_BUFFER_INFO_AREA_SIZE,
@@ -87,46 +86,31 @@ DirectWindowData::_SyncronizeWithClient()
 	if (status != B_OK)
 		return status;
 
-	//syslog(LOG_INFO, "Syncronize: released sem");
 	// Wait with a timeout of half a second until the client exits
 	// from its DirectConnected() implementation
 	do {
 #if 0
 		status = acquire_sem(fAcknowledgeSem);
-#else	
+#else
 		status = acquire_sem_etc(fAcknowledgeSem, 1, B_TIMEOUT, 500000);
 #endif
 	} while (status == B_INTERRUPTED);
 
-	//syslog(LOG_INFO, "Syncronize: acquired sem");
 	return status;
 }
 
 
 status_t
-DirectWindowData::SetState(const direct_buffer_state& bufferState,
-	const direct_driver_state& driverState, RenderingBuffer *buffer,
+DirectWindowData::SetState(direct_buffer_state bufferState,
+	direct_driver_state driverState, RenderingBuffer* buffer,
 	const BRect& windowFrame, const BRegion& clipRegion)
-{	
-	if (!fStarted && (bufferState & B_DIRECT_MODE_MASK)
-			!= B_DIRECT_START)
-		return B_OK; 
-	
+{
 	if ((fBufferInfo->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_STOP
 		&& (bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_START)
 		return B_OK;
-#if 0
-	if ((bufferState & B_DIRECT_MODE_MASK) == B_DIRECT_MODIFY)
-		syslog(LOG_INFO, "direct_modify");
-#endif
-	fStarted = true;
-#if 0						
-	char string[256];
-	snprintf(string, sizeof(string), "bufferState: 0x%x\n", (int)bufferState);
-	syslog(LOG_INFO, string);
-#endif
+
 	fBufferInfo->buffer_state = bufferState;
-		
+
 	if (driverState != -1)
 		fBufferInfo->driver_state = driverState;
 
@@ -180,6 +164,6 @@ DirectWindowData::SetState(const direct_buffer_state& bufferState,
 		for (uint32 i = 0; i < fBufferInfo->clip_list_count; i++)
 			fBufferInfo->clip_list[i] = clipRegion.RectAtInt(i);
 	}
-	
+
 	return _SyncronizeWithClient();
 }

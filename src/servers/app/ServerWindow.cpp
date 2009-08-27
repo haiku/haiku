@@ -167,6 +167,7 @@ ServerWindow::ServerWindow(const char* title, ServerApp* app,
 	fCurrentDrawingRegionValid(false),
 
 	fDirectWindowData(NULL),
+	fIsDirectlyAccessing(false),
 	fDirectWindowFeel(B_NORMAL_WINDOW_FEEL)
 {
 	STRACE(("ServerWindow(%s)::ServerWindow()\n", title));
@@ -3401,8 +3402,6 @@ ServerWindow::_MessageLooper()
 void
 ServerWindow::ScreenChanged(const BMessage* message)
 {
-	// TODO: execute the stop notification earlier
-	HandleDirectConnection(B_DIRECT_STOP);
 	SendMessageToClient(message);
 
 	if (fDirectWindowData != NULL && fDirectWindowData->full_screen) {
@@ -3411,9 +3410,6 @@ ServerWindow::ScreenChanged(const BMessage* message)
 			screenFrame.Width() - fWindow->Frame().Width(),
 			screenFrame.Height() - fWindow->Frame().Height());
 	}
-
-	HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET,
-		B_SCREEN_CHANGED);
 }
 
 
@@ -3441,15 +3437,6 @@ ServerWindow::MakeWindow(BRect frame, const char* name,
 }
 
 
-/* static */
-bool
-ServerWindow::_SupportsDirectMode()
-{
-	return false;
-	// TODO: For now, since it's broken
-}
-
-
 status_t
 ServerWindow::_EnableDirectWindowMode()
 {
@@ -3457,9 +3444,6 @@ ServerWindow::_EnableDirectWindowMode()
 		// already in direct window mode
 		return B_ERROR;
 	}
-
-	if (!ServerWindow::_SupportsDirectMode())
-		return B_ERROR;
 
 	fDirectWindowData = new (nothrow) DirectWindowData;
 	if (fDirectWindowData == NULL)
@@ -3480,34 +3464,35 @@ ServerWindow::_EnableDirectWindowMode()
 void
 ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 {
-	STRACE(("HandleDirectConnection(bufferState = %ld, driverState = %ld)\n",
-		bufferState, driverState));
+	ASSERT_MULTI_LOCKED(fDesktop->WindowLocker());
 
 	if (fDirectWindowData == NULL)
 		return;
 
-	if (fDesktop->LockSingleWindow()) {
-		status_t status = fDirectWindowData->SetState(
-			(direct_buffer_state)bufferState,
-			(direct_driver_state)driverState,
-			fDesktop->HWInterface()->FrontBuffer(), fWindow->Frame(),
-				fWindow->VisibleContentRegion());
+	STRACE(("HandleDirectConnection(bufferState = %ld, driverState = %ld)\n",
+		bufferState, driverState));
 
-		if (status != B_OK) {
-			char errorString[256];
-			snprintf(errorString, sizeof(errorString),
-				"%s killed for a problem in DirectConnected(): %s",
-				App()->Signature(), strerror(status));
-			syslog(LOG_ERR, errorString);
+	status_t status = fDirectWindowData->SetState(
+		(direct_buffer_state)bufferState, (direct_driver_state)driverState,
+		fDesktop->HWInterface()->FrontBuffer(), fWindow->Frame(),
+		fWindow->VisibleContentRegion());
 
-			// The client application didn't release the semaphore
-			// within the given timeout. Or something else went wrong.
-			// Deleting this member should make it crash.
-			delete fDirectWindowData;
-			fDirectWindowData = NULL;
-		}
-		fDesktop->UnlockSingleWindow();
-	}
+	if (status != B_OK) {
+		char errorString[256];
+		snprintf(errorString, sizeof(errorString),
+			"%s killed for a problem in DirectConnected(): %s",
+			App()->Signature(), strerror(status));
+		syslog(LOG_ERR, errorString);
+
+		// The client application didn't release the semaphore
+		// within the given timeout. Or something else went wrong.
+		// Deleting this member should make it crash.
+		delete fDirectWindowData;
+		fDirectWindowData = NULL;
+	} else if ((bufferState & B_DIRECT_MODE_MASK) == B_DIRECT_START)
+		fIsDirectlyAccessing = true;
+	else if ((bufferState & B_DIRECT_MODE_MASK) == B_DIRECT_STOP)
+		fIsDirectlyAccessing = false;
 }
 
 

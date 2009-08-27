@@ -13,12 +13,6 @@
 #define SERVER_WINDOW_H
 
 
-#include "EventDispatcher.h"
-#include "MessageLooper.h"
-
-#include <PortLink.h>
-#include <TokenSpace.h>
-
 #include <GraphicsDefs.h>
 #include <Locker.h>
 #include <Message.h>
@@ -27,6 +21,13 @@
 #include <Region.h>
 #include <String.h>
 #include <Window.h>
+
+#include <PortLink.h>
+#include <TokenSpace.h>
+
+#include "EventDispatcher.h"
+#include "MessageLooper.h"
+
 
 class BString;
 class BMessenger;
@@ -46,6 +47,7 @@ struct window_info;
 #define AS_UPDATE_DECORATOR 'asud'
 #define AS_UPDATE_COLORS 'asuc'
 #define AS_UPDATE_FONTS 'asuf'
+
 
 class ServerWindow : public MessageLooper {
 public:
@@ -77,8 +79,8 @@ public:
 			const BMessenger&	HandlerMessenger() const
 									{ return fHandlerMessenger; }
 
-			void			ScreenChanged(const BMessage *screenChangedMessage);
-			status_t			SendMessageToClient(const BMessage* msg,
+			void				ScreenChanged(const BMessage* message);
+			status_t			SendMessageToClient(const BMessage* message,
 									int32 target = B_NULL_TOKEN) const;
 
 	virtual	::Window*			MakeWindow(BRect frame, const char* name,
@@ -91,15 +93,19 @@ public:
 			// related thread/team_id(s).
 	inline	team_id				ClientTeam() const { return fClientTeam; }
 
-			void				HandleDirectConnection(int32 bufferState,
-									int32 driverState = -1);
-
 	inline	int32				ClientToken() const { return fClientToken; }
 	inline	int32				ServerToken() const { return fServerToken; }
 
 			void				RequestRedraw();
 
 			void				GetInfo(window_info& info);
+
+			void				HandleDirectConnection(int32 bufferState,
+									int32 driverState = 0);
+			bool				HasDirectFrameBufferAccess() const
+									{ return fDirectWindowData != NULL; }
+			bool				IsDirectlyAccessing() const
+									{ return fIsDirectlyAccessing; }
 
 			void				ResyncDrawState();
 
@@ -127,8 +133,8 @@ private:
 	virtual void				_PrepareQuit();
 	virtual void				_GetLooperName(char* name, size_t size);
 
-		static	bool				_SupportsDirectMode();
 			status_t			_EnableDirectWindowMode();
+			void				_DirectWindowSetFullScreen(bool set);
 
 			void				_SetCurrentView(View* view);
 			void				_UpdateDrawState(View* view);
@@ -136,8 +142,6 @@ private:
 
 			bool				_MessageNeedsAllWindowsLocked(
 									uint32 code) const;
-
-			void				_DirectWindowSetFullScreen(bool set);
 
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,
@@ -171,6 +175,7 @@ private:
 			bool				fCurrentDrawingRegionValid;
 
 			DirectWindowData*	fDirectWindowData;
+			bool				fIsDirectlyAccessing;
 			window_feel			fDirectWindowFeel;
 };
 

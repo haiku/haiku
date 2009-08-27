@@ -67,7 +67,8 @@ public:
 			::EventTarget&		EventTarget() const
 									{ return fWindow->EventTarget(); }
 
-			::Screen*			Screen() const;
+			void				SetScreen(const ::Screen* screen);
+			const ::Screen*		Screen() const;
 
 			// setting and getting the "hard" clipping, you need to have
 			// WriteLock()ed the clipping!
@@ -234,18 +235,15 @@ public:
 			void				FindWorkspacesViews(
 									BObjectList<WorkspacesView>& list) const;
 
-	static bool					IsValidLook(window_look look);
-	static bool					IsValidFeel(window_feel feel);
-	static bool					IsModalFeel(window_feel feel);
-	static bool					IsFloatingFeel(window_feel feel);
+	static	bool				IsValidLook(window_look look);
+	static	bool				IsValidFeel(window_feel feel);
+	static	bool				IsModalFeel(window_feel feel);
+	static	bool				IsFloatingFeel(window_feel feel);
 
-	static uint32				ValidWindowFlags();
-	static uint32				ValidWindowFlags(window_feel feel);
+	static	uint32				ValidWindowFlags();
+	static	uint32				ValidWindowFlags(window_feel feel);
 
 protected:
- 	friend class Desktop;
- 		// TODO: for now (list management)
-
 			void				_ShiftPartOfRegion(BRegion* region,
 									BRegion* regionToShift, int32 xOffset,
 									int32 yOffset);
@@ -278,6 +276,7 @@ protected:
 			BString				fTitle;
 			// TODO: no fp rects anywhere
 			BRect				fFrame;
+			const ::Screen*		fScreen;
 
 			window_anchor		fAnchor[kListCount];
 

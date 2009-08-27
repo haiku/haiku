@@ -86,7 +86,7 @@ public:
 			void				UnlockAllWindows()
 									{ fWindowLock.WriteUnlock(); }
 
-			MultiLocker			WindowLocker() { return fWindowLock; }
+			const MultiLocker&	WindowLocker() { return fWindowLock; }
 #else // USE_MULTI_LOCKER
 			bool				LockSingleWindow()
 									{ return fWindowLock.Lock(); }
@@ -124,6 +124,8 @@ public:
 			status_t			GetScreenFrame(int32 workspace, int32 id,
 									BRect& frame);
 			void				RevertScreenModes(uint32 workspaces);
+
+			MultiLocker&		ScreenLocker() { return fScreenLock; }
 
 			const ::VirtualScreen& VirtualScreen() const
 									{ return fVirtualScreen; }
@@ -268,6 +270,7 @@ private:
 			Window*				_LastFocusSubsetWindow(Window* window);
 			void				_SendFakeMouseMoved(Window* window = NULL);
 
+			Screen*				_DetermineScreenFor(BRect frame);
 			void				_RebuildClippingForAllWindows(
 									BRegion& stillAvailableOnScreen);
 			void				_TriggerWindowRedrawing(
@@ -277,6 +280,9 @@ private:
 									Window* window, BRegion& dirty);
 
 			status_t			_ActivateApp(team_id team);
+
+			void				_SuspendDirectFrameBufferAccess();
+			void				_ResumeDirectFrameBufferAccess();
 
 			void				_ScreenChanged(Screen* screen);
 			void				_SetCurrentWorkspaceConfiguration();
@@ -302,6 +308,7 @@ private:
 			int32				fShutdownCount;
 
 			::Workspace::Private fWorkspaces[kMaxWorkspaces];
+			MultiLocker			fScreenLock;
 			int32				fCurrentWorkspace;
 			int32				fPreviousWorkspace;
 

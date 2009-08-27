@@ -289,13 +289,15 @@ workspace_in_workspaces(int32 index, uint32 workspaces)
 
 
 Desktop::Desktop(uid_t userID)
-	: MessageLooper("desktop"),
+	:
+	MessageLooper("desktop"),
 
 	fUserID(userID),
 	fSettings(NULL),
 	fSharedReadOnlyArea(-1),
 	fApplicationsLock("application list"),
 	fShutdownSemaphore(-1),
+	fScreenLock("screen lock"),
 	fCurrentWorkspace(0),
 	fPreviousWorkspace(0),
 	fAllWindows(kAllWindowList),
@@ -492,13 +494,13 @@ status_t
 Desktop::SetScreenMode(int32 workspace, int32 id, const display_mode& mode,
 	bool makeDefault)
 {
+	AutoWriteLocker _(fWindowLock);
+
 	if (workspace == B_CURRENT_WORKSPACE_INDEX)
 		workspace = fCurrentWorkspace;
 
 	if (workspace < 0 || workspace > kMaxWorkspaces)
 		return B_BAD_VALUE;
-
-	AutoWriteLocker _(fWindowLock);
 
 	Screen* screen = fVirtualScreen.ScreenByID(id);
 	if (screen == NULL)
@@ -516,9 +518,17 @@ Desktop::SetScreenMode(int32 workspace, int32 id, const display_mode& mode,
 
 		// Set the new one
 
+		_SuspendDirectFrameBufferAccess();
+
+		AutoWriteLocker locker(fScreenLock);
+
 		status_t status = screen->SetMode(mode);
-		if (status != B_OK)
+		if (status != B_OK) {
+			locker.Unlock();
+
+			_ResumeDirectFrameBufferAccess();
 			return status;
+		}
 	} else {
 		// retrieve from settings
 		screen_configuration* configuration
@@ -543,6 +553,9 @@ Desktop::SetScreenMode(int32 workspace, int32 id, const display_mode& mode,
 	}
 
 	_ScreenChanged(screen);
+	if (workspace == fCurrentWorkspace)
+		_ResumeDirectFrameBufferAccess();
+
 	return B_OK;
 }
 
@@ -550,13 +563,13 @@ Desktop::SetScreenMode(int32 workspace, int32 id, const display_mode& mode,
 status_t
 Desktop::GetScreenMode(int32 workspace, int32 id, display_mode& mode)
 {
+	AutoReadLocker _(fScreenLock);
+
 	if (workspace == B_CURRENT_WORKSPACE_INDEX)
 		workspace = fCurrentWorkspace;
 
 	if (workspace < 0 || workspace > kMaxWorkspaces)
 		return B_BAD_VALUE;
-
-	AutoReadLocker _(fWindowLock);
 
 	if (workspace == fCurrentWorkspace) {
 		// retrieve from current screen
@@ -582,13 +595,13 @@ Desktop::GetScreenMode(int32 workspace, int32 id, display_mode& mode)
 status_t
 Desktop::GetScreenFrame(int32 workspace, int32 id, BRect& frame)
 {
+	AutoReadLocker _(fScreenLock);
+
 	if (workspace == B_CURRENT_WORKSPACE_INDEX)
 		workspace = fCurrentWorkspace;
 
 	if (workspace < 0 || workspace > kMaxWorkspaces)
 		return B_BAD_VALUE;
-
-	AutoReadLocker _(fWindowLock);
 
 	if (workspace == fCurrentWorkspace) {
 		// retrieve from current screen
@@ -647,8 +660,11 @@ Desktop::RevertScreenModes(uint32 workspaces)
 				fWorkspaces[workspace].CurrentScreenConfiguration()
 					.Remove(current);
 
-				if (workspace == fCurrentWorkspace)
+				if (workspace == fCurrentWorkspace) {
+					_SuspendDirectFrameBufferAccess();
 					_SetCurrentWorkspaceConfiguration();
+					_ResumeDirectFrameBufferAccess();
+				}
 			} else
 				SetScreenMode(workspace, screen->ID(), stored->mode, false);
 		}
@@ -1078,8 +1094,12 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	// the dirty region starts with the visible area of the window being moved
 	BRegion newDirtyRegion(window->VisibleRegion());
 
-	// no more drawing for DirectWindows
-	window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
+	// stop direct frame buffer access
+	bool direct = false;
+	if (window->ServerWindow()->IsDirectlyAccessing()) {
+		window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
+		direct = true;
+	}
 
 	window->MoveBy((int32)x, (int32)y);
 
@@ -1108,9 +1128,13 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 	_SetBackground(background);
 	_WindowChanged(window);
 
-	// allow DirectWindows to draw again after the visual
-	// content is at the new location
-	window->ServerWindow()->HandleDirectConnection(B_DIRECT_START | B_BUFFER_MOVED);
+	// resume direct frame buffer access
+	if (direct) {
+		// TODO: the clipping actually only changes when we move our window
+		// off screen, or behind some other window
+		window->ServerWindow()->HandleDirectConnection(
+			B_DIRECT_START | B_BUFFER_MOVED | B_CLIPPING_MODIFIED);
+	}
 
 	UnlockAllWindows();
 }
@@ -1135,7 +1159,12 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 	// it is shrunk in "previouslyOccupiedRegion"
 	BRegion previouslyOccupiedRegion(window->VisibleRegion());
 
-	window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
+	// stop direct frame buffer access
+	bool direct = false;
+	if (window->ServerWindow()->IsDirectlyAccessing()) {
+		window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
+		direct = true;
+	}
 
 	window->ResizeBy((int32)x, (int32)y, &newDirtyRegion);
 
@@ -1155,7 +1184,11 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 	_SetBackground(background);
 	_WindowChanged(window);
 
-	window->ServerWindow()->HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESIZED);
+	// resume direct frame buffer access
+	if (direct) {
+		window->ServerWindow()->HandleDirectConnection(
+			B_DIRECT_START | B_BUFFER_RESIZED | B_CLIPPING_MODIFIED);
+	}
 
 	UnlockAllWindows();
 }
@@ -2428,8 +2461,10 @@ Desktop::_ShowWindow(Window* window, bool affectsOtherWindows)
 	} else
 		MarkDirty(dirty);
 
-	window->ServerWindow()->HandleDirectConnection(
-		B_DIRECT_START | B_BUFFER_RESET);
+	if (window->ServerWindow()->HasDirectFrameBufferAccess()) {
+		window->ServerWindow()->HandleDirectConnection(
+			B_DIRECT_START | B_BUFFER_RESET);
+	}
 }
 
 
@@ -2439,7 +2474,8 @@ Desktop::_ShowWindow(Window* window, bool affectsOtherWindows)
 void
 Desktop::_HideWindow(Window* window)
 {
-	window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
+	if (window->ServerWindow()->IsDirectlyAccessing())
+		window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
 
 	// after rebuilding the clipping,
 	// this window will not have a visible
@@ -2540,8 +2576,9 @@ Desktop::_ChangeWindowWorkspaces(Window* window, uint32 oldWorkspaces,
 					window->SetCurrentWorkspace(fCurrentWorkspace);
 
 					if (!window->IsHidden()) {
-						// this only affects other windows if this windows has floating or
-						// modal windows that need to be shown as well
+						// This only affects other windows if this window has
+						// floating or modal windows that need to be shown as
+						// well
 						// TODO: take care of this
 						_ShowWindow(window, FrontWindow() == window);
 					}
@@ -2674,6 +2711,16 @@ Desktop::_SendFakeMouseMoved(Window* window)
 }
 
 
+Screen*
+Desktop::_DetermineScreenFor(BRect frame)
+{
+	AutoReadLocker _(fScreenLock);
+
+	// TODO: choose the screen depending on where most of the area is
+	return fVirtualScreen.ScreenAt(0);
+}
+
+
 void
 Desktop::_RebuildClippingForAllWindows(BRegion& stillAvailableOnScreen)
 {
@@ -2688,6 +2735,13 @@ Desktop::_RebuildClippingForAllWindows(BRegion& stillAvailableOnScreen)
 			window = window->PreviousWindow(fCurrentWorkspace)) {
 		if (!window->IsHidden()) {
 			window->SetClipping(&stillAvailableOnScreen);
+			window->SetScreen(_DetermineScreenFor(window->Frame()));
+
+			if (window->ServerWindow()->IsDirectlyAccessing()) {
+				window->ServerWindow()->HandleDirectConnection(
+					B_DIRECT_MODIFY | B_CLIPPING_MODIFIED);
+			}
+
 			// that windows region is not available on screen anymore
 			stillAvailableOnScreen.Exclude(&window->VisibleRegion());
 		}
@@ -2756,6 +2810,13 @@ Desktop::_RebuildAndRedrawAfterWindowChange(Window* changedWindow,
 				dirty.IntersectWith(&stillAvailableOnScreen);
 
 			window->SetClipping(&stillAvailableOnScreen);
+			window->SetScreen(_DetermineScreenFor(window->Frame()));
+
+			if (window->ServerWindow()->IsDirectlyAccessing()) {
+				window->ServerWindow()->HandleDirectConnection(
+					B_DIRECT_MODIFY | B_CLIPPING_MODIFIED);
+			}
+
 			// that windows region is not available on screen anymore
 			stillAvailableOnScreen.Exclude(&window->VisibleRegion());
 		}
@@ -2765,6 +2826,39 @@ Desktop::_RebuildAndRedrawAfterWindowChange(Window* changedWindow,
 	_WindowChanged(changedWindow);
 
 	_TriggerWindowRedrawing(dirty);
+}
+
+
+//! Suspend all windows with direct access to the frame buffer
+void
+Desktop::_SuspendDirectFrameBufferAccess()
+{
+	ASSERT_MULTI_LOCKED(fWindowLock);
+
+	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		if (window->ServerWindow()->IsDirectlyAccessing())
+			window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
+	}
+}
+
+
+//! Resume all windows with direct access to the frame buffer
+void
+Desktop::_ResumeDirectFrameBufferAccess()
+{
+	ASSERT_MULTI_LOCKED(fWindowLock);
+
+	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		if (window->IsHidden() || !window->InWorkspace(fCurrentWorkspace))
+			continue;
+
+		if (window->ServerWindow()->HasDirectFrameBufferAccess()) {
+			window->ServerWindow()->HandleDirectConnection(
+				B_DIRECT_START | B_BUFFER_RESET, B_MODE_CHANGED);
+		}
+	}
 }
 
 
@@ -2800,10 +2894,10 @@ Desktop::_ScreenChanged(Screen* screen)
 
 	fVirtualScreen.UpdateFrame();
 
-	// TODO: currently ignores the screen argument!
 	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
-		window->ServerWindow()->ScreenChanged(&update);
+		if (window->Screen() == screen)
+			window->ServerWindow()->ScreenChanged(&update);
 	}
 }
 
@@ -2852,6 +2946,8 @@ Desktop::_SetCurrentWorkspaceConfiguration()
 {
 	ASSERT_MULTI_WRITE_LOCKED(fWindowLock);
 
+	AutoWriteLocker _(fScreenLock);
+
 	uint32 changedScreens;
 	fVirtualScreen.SetConfiguration(*this,
 		fWorkspaces[fCurrentWorkspace].CurrentScreenConfiguration(),
@@ -2870,6 +2966,8 @@ Desktop::_SetCurrentWorkspaceConfiguration()
 void
 Desktop::_SetWorkspace(int32 index)
 {
+	ASSERT_MULTI_WRITE_LOCKED(fWindowLock);
+
 	int32 previousIndex = fCurrentWorkspace;
 	rgb_color previousColor = fWorkspaces[fCurrentWorkspace].Color();
 	bool movedMouseEventWindow = false;
@@ -2913,6 +3011,10 @@ Desktop::_SetWorkspace(int32 index)
 			window != NULL; window = window->NextWindow(previousIndex)) {
 		// store current position in Workspace anchor
 		window->Anchor(previousIndex).position = window->Frame().LeftTop();
+
+		if (!window->IsHidden()
+			&& window->ServerWindow()->IsDirectlyAccessing())
+			window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
 
 		window->WorkspaceActivated(previousIndex, false);
 
@@ -2997,6 +3099,12 @@ Desktop::_SetWorkspace(int32 index)
 			window = window->NextWindow(index)) {
 		// send B_WORKSPACE_ACTIVATED message
 		window->WorkspaceActivated(index, true);
+
+		if (!window->IsHidden()
+			&& window->ServerWindow()->HasDirectFrameBufferAccess()) {
+			window->ServerWindow()->HandleDirectConnection(
+				B_DIRECT_START | B_BUFFER_RESET, B_MODE_CHANGED);
+		}
 
 		if (window->InWorkspace(previousIndex) || window->IsHidden()
 			|| (window == fMouseEventWindow && fMouseEventWindow->IsNormal())
