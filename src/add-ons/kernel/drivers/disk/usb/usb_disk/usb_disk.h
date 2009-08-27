@@ -44,6 +44,7 @@ typedef struct disk_device_s {
 	uint8		interface;
 	uint32		current_tag;
 	uint8		sync_support;
+	bool		tur_supported;
 
 	// used to store callback information
 	sem_id		notify;

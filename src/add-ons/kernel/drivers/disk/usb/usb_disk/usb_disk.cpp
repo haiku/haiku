@@ -493,8 +493,19 @@ usb_disk_mode_sense(device_lun *lun)
 status_t
 usb_disk_test_unit_ready(device_lun *lun)
 {
-	return usb_disk_operation(lun, SCSI_TEST_UNIT_READY_6, 6, 0, 0, NULL, NULL,
-		true);
+	// if unsupported we assume the unit is fixed and therefore always ok
+	if (!lun->device->tur_supported)
+		return B_OK;
+
+	status_t result = usb_disk_operation(lun, SCSI_TEST_UNIT_READY_6, 6, 0, 0,
+		NULL, NULL, true);
+
+	if (result == B_DEV_INVALID_IOCTL) {
+		lun->device->tur_supported = false;
+		return B_OK;
+	}
+
+	return result;
 }
 
 
@@ -633,6 +644,7 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 	device->interface = 0xff;
 	device->current_tag = 0;
 	device->sync_support = SYNC_SUPPORT_RELOAD;
+	device->tur_supported = true;
 	device->luns = NULL;
 
 	// scan through the interfaces to find our bulk-only data interface
