@@ -158,8 +158,9 @@ ServerApp::~ServerApp()
 	fWindowListLock.Unlock();
 
 	// wait for the windows to quit
-
 	snooze(20000);
+
+	fDesktop->RevertScreenModes(fTemporaryDisplayModeChange);
 
 	fWindowListLock.Lock();
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
@@ -186,8 +187,6 @@ ServerApp::~ServerApp()
 		}
 		fWindowListLock.Lock();
 	}
-
-	fDesktop->RevertScreenModes(fTemporaryDisplayModeChange);
 
 	for (int32 i = fBitmapList.CountItems(); i-- > 0;) {
 		gBitmapManager->DeleteBitmap((ServerBitmap*)fBitmapList.ItemAt(i));
