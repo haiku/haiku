@@ -6,7 +6,6 @@
 #define _SLIDER_H
 
 
-#include <BeBuild.h>
 #include <Control.h>
 
 

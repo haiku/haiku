@@ -6,7 +6,6 @@
 #ifndef	_REGION_H
 #define	_REGION_H
 
-#include <BeBuild.h>
 #include <Rect.h>
 
 namespace BPrivate {

@@ -6,7 +6,6 @@
 #define _MENU_BAR_H
 
 
-#include <BeBuild.h>
 #include <InterfaceDefs.h>
 #include <Menu.h>
 #include <OS.h>

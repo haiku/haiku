@@ -6,9 +6,8 @@
 #define	_RADIO_BUTTON_H
 
 
-#include <BeBuild.h>
-#include <Control.h>
 #include <Bitmap.h>
+#include <Control.h>
 
 
 class BRadioButton : public BControl {

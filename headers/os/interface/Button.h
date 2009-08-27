@@ -5,7 +5,6 @@
 #ifndef _BUTTON_H
 #define _BUTTON_H
 
-#include <BeBuild.h>
 #include <Control.h>
 
 

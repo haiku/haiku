@@ -6,7 +6,6 @@
 #define _POLYGON_H
 
 
-#include <BeBuild.h>
 #include <InterfaceDefs.h>
 #include <Rect.h>
 

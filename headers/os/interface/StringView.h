@@ -6,7 +6,6 @@
 #define _STRING_VIEW_H
 
 
-#include <BeBuild.h>
 #include <View.h>
 
 

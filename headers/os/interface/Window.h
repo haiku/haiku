@@ -6,12 +6,7 @@
 #define	_WINDOW_H
 
 
-#include <BeBuild.h>
-#include <InterfaceDefs.h>
-#include <List.h>
 #include <Looper.h>
-#include <Rect.h>
-#include <Size.h>
 #include <StorageDefs.h>
 #include <View.h>
 

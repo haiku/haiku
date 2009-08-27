@@ -7,12 +7,10 @@
 
 
 #include <Alignment.h>
-#include <BeBuild.h>
 #include <Font.h>
 #include <Handler.h>
 #include <InterfaceDefs.h>
 #include <Rect.h>
-#include <Size.h>
 #include <Gradient.h>
 
 

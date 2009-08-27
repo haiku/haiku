@@ -6,7 +6,6 @@
 #define	_DESKBAR_H
 
 
-#include <BeBuild.h>
 #include <Rect.h>
 
 class BMessenger;

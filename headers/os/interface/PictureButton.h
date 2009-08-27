@@ -6,7 +6,6 @@
 #define _PICTURE_BUTTON_H
 
 
-#include <BeBuild.h>
 #include <Control.h>
 #include <Picture.h>
 

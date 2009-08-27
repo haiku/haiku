@@ -6,7 +6,6 @@
 #define	_SCROLL_BAR_H
 
 
-#include <BeBuild.h>
 #include <View.h>
 
 

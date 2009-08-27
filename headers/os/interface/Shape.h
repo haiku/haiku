@@ -6,7 +6,6 @@
 #define _SHAPE_H
 
 
-#include <BeBuild.h>
 #include <Archivable.h>
 
 class BPoint;

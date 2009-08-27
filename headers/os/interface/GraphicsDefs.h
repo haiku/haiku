@@ -6,7 +6,6 @@
 #define _GRAPHICS_DEFS_H
 
 
-#include <BeBuild.h>
 #include <SupportDefs.h>
 
 

@@ -6,9 +6,7 @@
 #define _MENU_FIELD_H
 
 
-#include <BeBuild.h>
 #include <Menu.h>
-#include <View.h>
 
 
 class BMenuBar;

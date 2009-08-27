@@ -7,9 +7,7 @@
 #define _INPUT_H
 
 
-#include <BeBuild.h>
 #include <Messenger.h>
-#include <SupportDefs.h>
 
 
 enum input_method_op {

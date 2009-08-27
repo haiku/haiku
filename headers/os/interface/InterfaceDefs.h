@@ -6,7 +6,6 @@
 #define	_INTERFACE_DEFS_H
 
 
-#include <BeBuild.h>
 #include <GraphicsDefs.h>
 #include <OS.h>
 

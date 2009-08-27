@@ -6,7 +6,6 @@
 #define	_ALERT_H
 
 
-#include <BeBuild.h>
 #include <Window.h>
 
 
