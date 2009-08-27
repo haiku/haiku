@@ -178,6 +178,8 @@ protected:
 			void				SetInitialLatency(bigtime_t inInitialLatency,
 									uint32 flags = 0);
 
+	// TODO: Needs a Perform() virtual method!
+
 private:
 	// FBC padding and forbidden methods
 								BBufferProducer();
@@ -223,5 +225,5 @@ private:
 			uint32				_reserved_buffer_producer_[12];
 };
 
-#endif /* _BUFFER_PRODUCER_H */
+#endif // _BUFFER_PRODUCER_H
 
