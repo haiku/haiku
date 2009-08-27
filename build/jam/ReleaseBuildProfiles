@@ -12,10 +12,10 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_IMAGE_SIZE = 500 ;
 		HAIKU_ATA_STACK = 1 ;
 
-		AddOptionalHaikuImagePackages BePDF Clockwerk Firefox Pe Vision VLC
-			WonderBrush ;
-		AddOptionalHaikuImagePackages CVS Development Subversion OpenSSH ;
-		AddOptionalHaikuImagePackages Welcome BeBook ;
+		AddOptionalHaikuImagePackages BePDF Firefox Pe Vision WonderBrush ;
+		AddOptionalHaikuImagePackages CVS Development Python Subversion
+			OpenSSH ;
+		AddOptionalHaikuImagePackages Nano P7zip Welcome BeBook ;
 	}
 
 	case "beta-*" : {
