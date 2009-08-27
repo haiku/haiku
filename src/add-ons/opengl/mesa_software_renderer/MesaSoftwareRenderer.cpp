@@ -320,6 +320,8 @@ MesaSoftwareRenderer::~MesaSoftwareRenderer()
 	_mesa_destroy_framebuffer(fFrameBuffer);
 	_mesa_destroy_context(fContext);
 
+	free(fInfo);
+	
 	delete fBitmap;
 }
 
@@ -577,10 +579,15 @@ MesaSoftwareRenderer::EnableDirectMode(bool enabled)
 void
 MesaSoftwareRenderer::DirectConnected(direct_buffer_info *info)
 {	
+	// TODO: I'm not sure we need to do this: BGLView already
+	// keeps a local copy of the direct_buffer_info passed by
+	// BDirectWindow::DirectConnected().
 	BAutolock lock(fInfoLocker);
 	if (info) {
 		if (!fInfo) {
-			fInfo = (direct_buffer_info *)calloc(1, DIRECT_BUFFER_INFO_AREA_SIZE);
+			fInfo = (direct_buffer_info *)malloc(DIRECT_BUFFER_INFO_AREA_SIZE);
+			if (!fInfo)
+				return;
 		}
 		memcpy(fInfo, info, DIRECT_BUFFER_INFO_AREA_SIZE);
 	} else if (fInfo) {
