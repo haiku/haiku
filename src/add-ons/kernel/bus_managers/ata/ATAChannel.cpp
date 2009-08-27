@@ -118,12 +118,6 @@ ATAChannel::SetBus(scsi_bus bus)
 status_t
 ATAChannel::ScanBus()
 {
-	// check if there is anything at all
-	if (AltStatus() == 0xff) {
-		TRACE_ALWAYS("illegal status value, assuming no devices connected\n");
-		return B_OK;
-	}
-
 	bool devicePresent[fDeviceCount];
 	uint16 deviceSignature[fDeviceCount];
 	status_t result = Reset(devicePresent, deviceSignature);
@@ -274,17 +268,6 @@ ATAChannel::SelectDevice(uint8 device)
 
 	_FlushAndWait(1);
 
-#if 1
-	// for debugging only
-	_ReadRegs(&taskFile, ATA_MASK_DEVICE_HEAD);
-	if (taskFile.lba.device != device) {
-		TRACE_ERROR("device %d not selected! unused 0x%x, mode 0x%x,"
-			" device %d\n", device, taskFile.lba.lba_24_27, taskFile.lba.mode,
-			taskFile.lba.device);
-		return B_ERROR;
-	}
-#endif
-
 	return B_OK;
 }
 
@@ -330,30 +313,68 @@ ATAChannel::Reset(bool *presence, uint16 *signatures)
 
 	_FlushAndWait(150 * 1000);
 
-	if (presence != NULL) {
-		for (uint8 i = 0; i < fDeviceCount; i++)
-			presence[i] = false;
-	}
+	for (uint8 i = 0; i < fDeviceCount; i++)
+		presence[i] = false;
 
-	uint8 deviceCount = fDeviceCount;
-	for (uint8 i = 0; i < deviceCount; i++) {
-		if (SelectDevice(i) != B_OK || SelectedDevice() != i) {
-			TRACE_ALWAYS("cannot select device %d, assuming not present\n", i);
-			continue;
+	// up to 2 devices on each channel
+	for (uint8 i = 0; i < fDeviceCount; i++) {
+		TRACE_ALWAYS("probing device %d\n", i);
+		SelectDevice(i);
+		if (i == 1) {
+			if (presence[0]) {
+				TRACE_ALWAYS("possibly master and slave configuration...\n");
+			} else {
+				TRACE_ALWAYS("possibly single device 1 configuration...\n");
+				int maxtrys;
+				for (maxtrys = 20; maxtrys > 0; maxtrys--) {
+					SelectDevice(1);
+					ata_task_file taskFile;
+					taskFile.chs.sector_count = 0x5a;
+					taskFile.chs.sector_number = 0xa5;
+					if (_WriteRegs(&taskFile, ATA_MASK_SECTOR_COUNT 
+						| ATA_MASK_SECTOR_NUMBER) != B_OK) {
+						TRACE_ERROR("writing registers failed\n");
+						return B_ERROR;
+					}
+					if (_ReadRegs(&taskFile, ATA_MASK_SECTOR_COUNT 
+						| ATA_MASK_SECTOR_NUMBER) != B_OK) {
+						TRACE_ERROR("reading registers failed\n");
+						return B_ERROR;
+					}
+					if (taskFile.chs.sector_count == 0x5a && 
+						taskFile.chs.sector_number == 0xa5)
+						break;
+					snooze(100000);
+				}
+				if (maxtrys == 0) {
+					TRACE_ALWAYS("Can't access device 1\n");
+					continue;
+				}
+			}
 		}
 
 		// ensure interrupts are disabled for this device
 		_WriteControl(ATA_DEVICE_CONTROL_DISABLE_INTS);
 
+		if (AltStatus() == 0xff)
+			snooze(150 * 1000);
+
 		if (AltStatus() == 0xff) {
-			TRACE_ALWAYS("illegal status value for device %d,"
-				" assuming not present\n", i);
+			TRACE_ALWAYS("illegal status value for device %d\n", i);
 			continue;
 		}
 
 		// wait up to 31 seconds for busy to clear
 		if (Wait(0, ATA_STATUS_BUSY, 0, 31 * 1000 * 1000) != B_OK) {
-			TRACE_ERROR("device %d reset timeout\n", i);
+			TRACE_ALWAYS("device %d reset timeout\n", i);
+			continue;
+		}
+
+		// reselect device
+		SelectDevice(i);
+
+		if (SelectedDevice() != i) {
+			TRACE_ALWAYS("device selection failed for device %i\n", i);
 			continue;
 		}
 
@@ -364,33 +385,21 @@ ATAChannel::Reset(bool *presence, uint16 *signatures)
 			return B_ERROR;
 		}
 
-		if (taskFile.read.error != 0x01
-			&& (i > 0 || taskFile.read.error != 0x81)) {
-			TRACE_ERROR("device %d failed, error code is 0x%02x\n", i,
-				taskFile.read.error);
-			// Workaround for Gigabyte i-RAM, which always reports 0x00 
-			// TODO: find something nicer
-			if (i == 1 && taskFile.read.error == 0x00) {
-				TRACE_ERROR("continuing anyway...\n");
-			} else
-				continue;
+		// for information only
+		if ((i == 0) && (taskFile.read.error & 0x80)) {
+			TRACE_ERROR("device 0 indicates that device 1 failed"
+				" error code is 0x%02x\n", taskFile.read.error);
+		} else if (taskFile.read.error != 0x01) {
+			TRACE_ERROR("device %d failed, error code is 0x%02x\n", 
+				i, taskFile.read.error);
 		}
 
-		if (i == 0 && taskFile.read.error >= 0x80) {
-			TRACE_ERROR("device %d indicates that other device failed"
-				" with code 0x%02x\n", i, taskFile.read.error);
-			deviceCount = 1;
-		}
+		presence[i] = true;
 
-		if (presence != NULL)
-			presence[i] = true;
-
-		uint16 signature = taskFile.lba.lba_8_15
+		signatures[i] = taskFile.lba.lba_8_15
 			| (((uint16)taskFile.lba.lba_16_23) << 8);
-		TRACE_ALWAYS("signature of device %d: 0x%04x\n", i, signature);
+		TRACE_ALWAYS("signature of device %d: 0x%04x\n", i, signatures[i]);
 
-		if (signatures != NULL)
-			signatures[i] = signature;
 	}
 
 	return B_OK;

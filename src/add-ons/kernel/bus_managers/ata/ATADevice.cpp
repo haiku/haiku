@@ -304,7 +304,15 @@ ATADevice::GetRestrictions(bool *noAutoSense, uint32 *maxBlocks)
 status_t
 ATADevice::Select()
 {
-	return fChannel->SelectDevice(fIndex);
+	status_t err = fChannel->SelectDevice(fIndex);
+#if 1	
+    // for debugging only                                                                                                                                                                                                                      
+	if (fChannel->SelectedDevice() != fIndex) {
+		TRACE_ERROR("device %d not selected!\n", fIndex);
+		return B_ERROR;                                                                                                                                                                                                                    
+	}                                                                                                                                                                                                                                          
+#endif
+	return err;
 }
 
 
