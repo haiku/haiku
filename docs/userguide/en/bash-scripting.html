@@ -41,17 +41,24 @@
 <p>"Scripting" is the technique of automating procedures by stringing together commands and saving it all as text files, so called "scripts". Every time you run such a script, the commands are processed one after the other just like they would if you entered them into the <a href="applications/apps-terminal.html">Terminal</a> by hand.<br />
 Scripts can range from simply executing a few commands in a specific order to sophisticated pieces of code that solve complex tasks.</p>
 
-<h1><a id="bash" name="bash">The Bash</a></h1>
+<h1>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="bash" name="bash">The Bash</a></h1>
 <p>Since scripts rely naturally a lot on the shell they are interpreted by, you should first familiarize yourself with the BASH that's used by Haiku. There are many resources online as it's a widely used shell. One nice document is Johan Jansson's <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a>.</p>
 
-<h1><a id="scripting-bible" name="scripting-bible">The Scripting Bible</a></h1>
+<h1>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="scripting-bible" name="scripting-bible">The Scripting Bible</a></h1>
 <p>After you've learned a few basics about working in the shell, it's time to slowly ease yourself into the world of scripting. Again, you'll find loads of tutorials and reference material online as well as in bookstores. A very nice introduction that's practically tailor-made for Haiku is the online available <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) of Scot Hacker's BeOS Bible.</p>
 
-<h1><a id="user-scripts" name="user-scripts">Scripts in Haiku</a></h1>
+<h1>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a><a id="user-scripts" name="user-scripts">Scripts in Haiku</a></h1>
 <p>In Haiku, the system makes of course also use of scripting. Booting and shutting down are typical scripting procedures. These defined sequences can be augmented by the user with certain user scripts.<br />
 If they don't exist already, you'll have to create the needed files yourself. Otherwise simply add your commands where in the process you want them to be executed.</p>
 
-<h2><a id="userbootscript" name="userbootscript">The UserBootscript</a></h2>
+<h2>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="userbootscript" name="userbootscript">The UserBootscript</a></h2>
 <p><span class="path">/boot/home/config/boot/UserBootscript</span> will be executed after the system has finished its boot process. For example, you could launch a number of programs that would then be automatically started on every boot up:</p>
 <pre># Start LaunchBox
 /boot/system/apps/LaunchBox &amp;
@@ -62,10 +69,14 @@ If they don't exist already, you'll have to create the needed files yourself. Ot
 
 <p>A simple alternative to the above for launching applications at boot up is to put links to them in the <span class="path">/boot/home/config/boot/launch</span> directory. This can be done simply by right-clicking on the application you wish to have started automatically, going to <span class="menu">Create Link</span> and then <a href="tracker.html#navigating">navigating</a> to the above directory.</p>
 
-<h2><a id="usershutdownscript" name="usershutdownscript">The UserShutdownScript</a></h2>
+<h2>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="usershutdownscript" name="usershutdownscript">The UserShutdownScript</a></h2>
 <p><span class="path">/boot/home/config/boot/UserShutdownScript</span> will be executed as the first step in the shutdown process. If the script returns a non-zero exit status, the shutdown is aborted.</p>
 
-<h2><a id="usershutdownfinishscript" name="usershutdownfinishscript">The UserShutdownFinishScript</a></h2>
+<h2>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">The UserShutdownFinishScript</a></h2>
 <p><span class="path">/boot/home/config/boot/UserShutdownFinishScript</span> is executed as the last step in the shutdown process. Note, that most parts of the system have terminated by the time this script is executed.</p>
 
 

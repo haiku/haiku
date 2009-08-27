@@ -59,7 +59,7 @@
 <p>This is a workshop to show the use of <a href="attributes.html">Attributes</a>, <a href="queries.html">Queries</a>, the <a href="index.html">Index</a> and custom <a href="filetypes.html">Filetypes</a>. As an example, we build a database to keep track of our DVD library.</p>
 
 <h1>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
 <a id="preparations" name="preparations">Preparations</a></h1>
 <p>Let's first decide what filetype and attributes would serve our needs. Originally, I wanted to use a Bookmark file with a link to the movie's IMdB page, but Haiku doesn't have a "bookmarkable" browser like BeOS' <span class="app">NetPositive</span> at the moment, so I came up with this: The file itself will be a JPEG image for the movie cover.<br />
 To that we add a couple of attributes. Here we have to decide if we want to query it later (then we have to add it to the index) and if so, what type of attribute it should be. Numbers (int, float) can be evaluated differently than text (&lt;/=/&gt; vs. is/contains/starts with).</p>
@@ -76,7 +76,7 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
 </ul>
 
 <h1>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
 <a id="custom-filetype" name="custom-filetype">Creating a custom filetype</a></h1>
 <p>Start the <span class="app">Filetypes</span> preferences, and click on the <span class="button">Add...</span> button below the hierarchical list on the left. A small dialog opens and you specify in which MIME Group your new filetype will reside. You can also create a completely new group. Let's put it into "<i>applications</i>" and set the "Internal Name" to <i>DVDdb</i>.</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-new-file-type.png" alt="filetypes-new-file-type.png" />
@@ -84,17 +84,17 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb.png" alt="filetypes-dvddb.png" />
 
 <h2>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
 <a id="icon" name="icon">Icon</a></h2>
 <p>Double-click the icon well to open  <a href="applications/apps-icon-o-matic.html">Icon-O-Matic</a> to design an icon for your filetype. You can also drag&amp;drop an icon from the icon well of another type, maybe as starting point for a modified version.</p>
 
 <h2>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
 <a id="file-recognition" name="file-recognition">File Recognition</a></h2>
 <p>You can add suffixes like .txt, .jpg, .mp3 to recognize files by their extention. Useful when working with files from systems without MIME typing. We don't need that for our example.</p>
 
 <h2>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
 <a id="decription" name="decription">Description</a></h2>
 <ul>
 <li><i>Type Name</i> - Appears e.g. in the Attribute menu of Tracker windows and the "Kind" attribute of a file.</li>
@@ -102,7 +102,7 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
 </ul>
 
 <h2>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
 <a id="pref_app" name="pref_app">Preferred Application</a></h2>
 <p>This drop-down menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -111,7 +111,7 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
 </table>
 
 <h2>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
 <a id="extra_attribute" name="extra_attribute">Extra Attributes</a></h2>
 <p>Here we enter all the custom attributes we decided on in our preparations. Clicking the <span class="button">Add...</span> button opens a panel:</p>
 <img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
@@ -152,7 +152,7 @@ To that we add a couple of attributes. Here we have to decide if we want to quer
 </table>
 
 <h1>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
 <a id="indexing" name="indexing">Indexing</a></h1>
 <p>Before we start entering data in our little DVD database, we should add certain attributes to the <a href="index.html">Index</a>. Only indexed attributes can use Haiku's fast <a href="queries.html">Queries</a>.<br />
 So, what will we be searching in the future? We probably won't ask "What's in the B4 coordinate in my shelf?" or "Does the IMdB URL or the plot of the movie contain the word 'pope-shenooda'?".</p>
@@ -173,7 +173,7 @@ mkindex -t int DVDdb:rating</pre>
 <p>The <span class="cli">-t</span> option defines the type of attribute, which is "string" for all but the rating, which is an integer number.</p>
 
 <h1>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
 <a id="filling-data" name="filling-data">Filling in the data</a></h1>
 <p>Now, everything's set and we can begin putting some data into our base.<br />
 Since our basic file is a cover image, we go to some online resource like IMdB, look for our first movie and save the cover or movie poster in a new folder where we want to keep our DVDdb files.</p>
@@ -185,7 +185,7 @@ Since our basic file is a cover image, we go to some online resource like IMdB, 
 <p>Right-clicking into a Tracker window, you'll find a new entry under <span class="menu">New...</span> besides the default "New folder".</p>
 
 <h1>
-<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" width="16" height="16" class="noprint" /></a>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
 <a id="query-db" name="query-db">Querying the database</a></h1>
 <p>Several hours of grunt work later, we have a nice little database that you can query to find all your Christina Ricci movies that have a 7+ rating...  :)</p>
 <p>You can assign a sensible attribute layout for query results of a specific filetype.<br />
