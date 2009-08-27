@@ -8,7 +8,7 @@
  */
 
 
-#include "DirectWindowSupport.h"
+#include "DirectWindowInfo.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -20,13 +20,14 @@
 #include "clipping.h"
 
 
-DirectWindowData::DirectWindowData()
+DirectWindowInfo::DirectWindowInfo()
 	:
-	full_screen(false),
 	fBufferInfo(NULL),
 	fSem(-1),
 	fAcknowledgeSem(-1),
-	fBufferArea(-1)
+	fBufferArea(-1),
+	fOriginalFeel(B_NORMAL_WINDOW_FEEL),
+	fFullScreen(false)
 {
 	fBufferArea = create_area("direct area", (void**)&fBufferInfo,
 		B_ANY_ADDRESS, DIRECT_BUFFER_INFO_AREA_SIZE,
@@ -40,7 +41,7 @@ DirectWindowData::DirectWindowData()
 }
 
 
-DirectWindowData::~DirectWindowData()
+DirectWindowInfo::~DirectWindowInfo()
 {
 	// this should make the client die in case it's still running
 	fBufferInfo->bits = NULL;
@@ -53,7 +54,7 @@ DirectWindowData::~DirectWindowData()
 
 
 status_t
-DirectWindowData::InitCheck() const
+DirectWindowInfo::InitCheck() const
 {
 	if (fBufferArea < B_OK)
 		return fBufferArea;
@@ -67,7 +68,7 @@ DirectWindowData::InitCheck() const
 
 
 status_t
-DirectWindowData::GetSyncData(direct_window_sync_data& data) const
+DirectWindowInfo::GetSyncData(direct_window_sync_data& data) const
 {
 	data.area = fBufferArea;
 	data.disable_sem = fSem;
@@ -78,30 +79,7 @@ DirectWindowData::GetSyncData(direct_window_sync_data& data) const
 
 
 status_t
-DirectWindowData::_SyncronizeWithClient()
-{
-	// Releasing this semaphore causes the client to call
-	// BDirectWindow::DirectConnected()
-	status_t status = release_sem(fSem);
-	if (status != B_OK)
-		return status;
-
-	// Wait with a timeout of half a second until the client exits
-	// from its DirectConnected() implementation
-	do {
-#if 0
-		status = acquire_sem(fAcknowledgeSem);
-#else
-		status = acquire_sem_etc(fAcknowledgeSem, 1, B_TIMEOUT, 500000);
-#endif
-	} while (status == B_INTERRUPTED);
-
-	return status;
-}
-
-
-status_t
-DirectWindowData::SetState(direct_buffer_state bufferState,
+DirectWindowInfo::SetState(direct_buffer_state bufferState,
 	direct_driver_state driverState, RenderingBuffer* buffer,
 	const BRect& windowFrame, const BRegion& clipRegion)
 {
@@ -142,7 +120,7 @@ DirectWindowData::SetState(direct_buffer_state bufferState,
 				break;
 			default:
 				syslog(LOG_ERR,
-					"unknown colorspace in DirectWindowData::SetState()!\n");
+					"unknown colorspace in DirectWindowInfo::SetState()!\n");
 				fBufferInfo->bits_per_pixel = 0;
 				break;
 		}
@@ -153,7 +131,6 @@ DirectWindowData::SetState(direct_buffer_state bufferState,
 			// TODO
 		fBufferInfo->window_bounds = to_clipping_rect(windowFrame);
 
-		// TODO: Review this
 		const int32 kMaxClipRectsCount = (DIRECT_BUFFER_INFO_AREA_SIZE
 			- sizeof(direct_buffer_info)) / sizeof(clipping_rect);
 
@@ -166,4 +143,39 @@ DirectWindowData::SetState(direct_buffer_state bufferState,
 	}
 
 	return _SyncronizeWithClient();
+}
+
+
+void
+DirectWindowInfo::EnableFullScreen(const BRect& frame, window_feel feel)
+{
+	fOriginalFrame = frame;
+	fOriginalFeel = feel;
+	fFullScreen = true;
+}
+
+
+void
+DirectWindowInfo::DisableFullScreen()
+{
+	fFullScreen = false;
+}
+
+
+status_t
+DirectWindowInfo::_SyncronizeWithClient()
+{
+	// Releasing this semaphore causes the client to call
+	// BDirectWindow::DirectConnected()
+	status_t status = release_sem(fSem);
+	if (status != B_OK)
+		return status;
+
+	// Wait with a timeout of half a second until the client exits
+	// from its DirectConnected() implementation
+	do {
+		status = acquire_sem_etc(fAcknowledgeSem, 1, B_TIMEOUT, 500000);
+	} while (status == B_INTERRUPTED);
+
+	return status;
 }

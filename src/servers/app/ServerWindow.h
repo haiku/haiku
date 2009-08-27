@@ -41,7 +41,7 @@ class Window;
 class Workspace;
 class View;
 class ServerPicture;
-class DirectWindowData;
+class DirectWindowInfo;
 struct window_info;
 
 #define AS_UPDATE_DECORATOR 'asud'
@@ -103,7 +103,7 @@ public:
 			void				HandleDirectConnection(int32 bufferState,
 									int32 driverState = 0);
 			bool				HasDirectFrameBufferAccess() const
-									{ return fDirectWindowData != NULL; }
+									{ return fDirectWindowInfo != NULL; }
 			bool				IsDirectlyAccessing() const
 									{ return fIsDirectlyAccessing; }
 
@@ -133,6 +133,7 @@ private:
 	virtual void				_PrepareQuit();
 	virtual void				_GetLooperName(char* name, size_t size);
 
+			void				_ResizeToFullScreen();
 			status_t			_EnableDirectWindowMode();
 			void				_DirectWindowSetFullScreen(bool set);
 
@@ -174,9 +175,8 @@ private:
 			BRegion				fCurrentDrawingRegion;
 			bool				fCurrentDrawingRegionValid;
 
-			DirectWindowData*	fDirectWindowData;
+			DirectWindowInfo*	fDirectWindowInfo;
 			bool				fIsDirectlyAccessing;
-			window_feel			fDirectWindowFeel;
 };
 
 #endif	// SERVER_WINDOW_H
