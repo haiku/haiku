@@ -20,6 +20,7 @@
 #include <syslog.h>
 
 #include <Debug.h>
+#include <debugger.h>
 #include <DirectWindow.h>
 #include <Entry.h>
 #include <Message.h>
@@ -298,6 +299,8 @@ Desktop::Desktop(uid_t userID)
 	fApplicationsLock("application list"),
 	fShutdownSemaphore(-1),
 	fScreenLock("screen lock"),
+	fDirectScreenLock("direct screen lock"),
+	fDirectScreenTeam(-1),
 	fCurrentWorkspace(0),
 	fPreviousWorkspace(0),
 	fAllWindows(kAllWindowList),
@@ -669,6 +672,33 @@ Desktop::RevertScreenModes(uint32 workspaces)
 				SetScreenMode(workspace, screen->ID(), stored->mode, false);
 		}
 	}
+}
+
+
+status_t
+Desktop::LockDirectScreen(team_id team)
+{
+	// TODO: BWindowScreens should use the same mechanism as BDirectWindow,
+	// which would make this method superfluous.
+
+	status_t status = fDirectScreenLock.LockWithTimeout(1000000L);
+	if (status == B_OK)
+		fDirectScreenTeam = team;
+
+	return status;
+}
+
+
+status_t
+Desktop::UnlockDirectScreen(team_id team)
+{
+	if (fDirectScreenTeam == team) {
+		fDirectScreenLock.Unlock();
+		fDirectScreenTeam = -1;
+		return B_OK;
+	}
+
+	return B_PERMISSION_DENIED;
 }
 
 
@@ -2945,6 +2975,18 @@ void
 Desktop::_SetCurrentWorkspaceConfiguration()
 {
 	ASSERT_MULTI_WRITE_LOCKED(fWindowLock);
+
+	status_t status = fDirectScreenLock.LockWithTimeout(1000000L);
+	if (status != B_OK) {
+		// The application having the direct screen lock didn't give it up in
+		// time, make it crash
+		syslog(LOG_ERR, "Team %ld did not give up its direct screen lock.\n",
+			fDirectScreenTeam);
+
+		debug_thread(fDirectScreenTeam);
+		fDirectScreenTeam = -1;
+	} else
+		fDirectScreenLock.Unlock();
 
 	AutoWriteLocker _(fScreenLock);
 

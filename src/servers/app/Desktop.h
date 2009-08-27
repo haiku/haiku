@@ -127,6 +127,9 @@ public:
 
 			MultiLocker&		ScreenLocker() { return fScreenLock; }
 
+			status_t			LockDirectScreen(team_id team);
+			status_t			UnlockDirectScreen(team_id team);
+
 			const ::VirtualScreen& VirtualScreen() const
 									{ return fVirtualScreen; }
 			DrawingEngine*		GetDrawingEngine() const
@@ -309,6 +312,8 @@ private:
 
 			::Workspace::Private fWorkspaces[kMaxWorkspaces];
 			MultiLocker			fScreenLock;
+			BLocker				fDirectScreenLock;
+			team_id				fDirectScreenTeam;
 			int32				fCurrentWorkspace;
 			int32				fPreviousWorkspace;
 

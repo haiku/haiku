@@ -2735,6 +2735,26 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		// BWindowScreen communication
+
+		case AS_DIRECT_SCREEN_LOCK:
+		{
+			bool lock;
+			link.Read<bool>(&lock);
+
+			status_t status;
+			if (lock)
+				status = fDesktop->LockDirectScreen(ClientTeam());
+			else
+				status = fDesktop->UnlockDirectScreen(ClientTeam());
+
+			fLink.StartMessage(status);
+			fLink.Flush();
+			break;
+		}
+
+		// Hinting and aliasing
+
 		case AS_SET_SUBPIXEL_ANTIALIASING:
 		{
 			bool subpix;

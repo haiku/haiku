@@ -319,7 +319,6 @@ set_is_subpixel_ordering_regular(bool subpixelOrdering)
 status_t
 get_is_subpixel_ordering_regular(bool* subpixelOrdering)
 {
-
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_GET_SUBPIXEL_ORDERING);
@@ -984,7 +983,7 @@ _init_interface_kit_()
 	status = get_menu_info(&BMenu::sMenuInfo);
 	if (status != B_OK)
 		return status;
-		
+
 	general_info.background_color = ui_color(B_PANEL_BACKGROUND_COLOR);
 	general_info.mark_color.set_to(0, 0, 0);
 	general_info.highlight_color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);

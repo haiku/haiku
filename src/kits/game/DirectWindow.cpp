@@ -564,14 +564,12 @@ BDirectWindow::_InitData()
 
 	status_t status = B_ERROR;
 	struct direct_window_sync_data syncData;
-	if (Lock()) {
-		fLink->StartMessage(AS_DIRECT_WINDOW_GET_SYNC_DATA);
-		if (fLink->FlushWithReply(status) == B_OK && status == B_OK)
-			fLink->Read<direct_window_sync_data>(&syncData);
 
-		Unlock();
-	}
-	if (status < B_OK)
+	fLink->StartMessage(AS_DIRECT_WINDOW_GET_SYNC_DATA);
+	if (fLink->FlushWithReply(status) == B_OK && status == B_OK)
+		fLink->Read<direct_window_sync_data>(&syncData);
+
+	if (status != B_OK)
 		return;
 
 #if DW_NEEDS_LOCKING
