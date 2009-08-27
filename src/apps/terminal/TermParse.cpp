@@ -74,7 +74,6 @@ TermParse::TermParse(int fd)
 	fReadBufferSize(0),
 	fParserBufferSize(0),
 	fParserBufferOffset(0),
-	fParserWaiting(false),
 	fBuffer(NULL),
 	fQuitting(true)
 {
@@ -252,7 +251,7 @@ TermParse::PtyReader()
 			memcpy(fReadBuffer + readPos, buf, nread);
 
 		bufferSize = atomic_add(&fReadBufferSize, nread);
-		if (bufferSize == 0 && fParserWaiting)
+		if (bufferSize == 0)
 			release_sem(fReaderSem);
 
 		bufferSize += nread;
@@ -1012,16 +1011,17 @@ TermParse::_ReadParserBuffer()
 
 	// wait for new input from pty
 	if (fReadBufferSize == 0) {
-		fParserWaiting = true;
-
 		status_t status = B_OK;
 		while (fReadBufferSize == 0 && status == B_OK) {
 			do {
 				status = acquire_sem(fReaderSem);
 			} while (status == B_INTERRUPTED);
-		}
 
-		fParserWaiting = false;
+			// eat any sems that were released unconditionally
+			int32 semCount;
+			if (get_sem_count(fReaderSem, &semCount) == B_OK && semCount > 0)
+				acquire_sem_etc(fReaderSem, semCount, B_RELATIVE_TIMEOUT, 0);
+		}
 
 		if (status < B_OK) {
 			fBuffer->Lock();
@@ -1034,6 +1034,8 @@ TermParse::_ReadParserBuffer()
 		toRead = ESC_PARSER_BUFFER_SIZE;
 
 	for (int32 i = 0; i < toRead; i++) {
+		// TODO: This could be optimized using memcpy instead and
+		// calculating space left as in the PtyReader().
 		fParserBuffer[i] = fReadBuffer[fBufferPosition];
 		fBufferPosition = (fBufferPosition + 1) % READ_BUF_SIZE;
 	}
