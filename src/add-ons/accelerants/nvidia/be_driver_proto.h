@@ -28,6 +28,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set);
 status_t GET_DISPLAY_MODE(display_mode *current_mode);
 #ifdef __HAIKU__
 status_t GET_EDID_INFO(void* info, size_t size, uint32* _version);
+status_t GET_PREFERRED_DISPLAY_MODE(display_mode* preferredMode);
 #endif
 status_t GET_FRAME_BUFFER_CONFIG(frame_buffer_config *a_frame_buffer);
 status_t GET_PIXEL_CLOCK_LIMITS(display_mode *dm, uint32 *low, uint32 *high);

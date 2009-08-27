@@ -42,6 +42,8 @@ status_t parse_pins(void);
 void set_pll(uint32 reg, uint32 clk);
 void get_panel_modes(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2);
 void fake_panel_start(void);
+status_t get_crtc1_screen_native_mode(display_mode *mode);
+status_t get_crtc2_screen_native_mode(display_mode *mode);
 void set_specs(void);
 void dump_pins(void);
 

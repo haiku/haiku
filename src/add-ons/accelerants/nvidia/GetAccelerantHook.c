@@ -65,6 +65,7 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 		HOOK(GET_DISPLAY_MODE);
 #ifdef __HAIKU__
 		HOOK(GET_EDID_INFO);
+		HOOK(GET_PREFERRED_DISPLAY_MODE);
 #endif
 		HOOK(GET_FRAME_BUFFER_CONFIG);
 		HOOK(GET_PIXEL_CLOCK_LIMITS);

@@ -163,14 +163,14 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 			case CRTC1_TMDS:	/* digital panel on head 1, nothing on head 2 */
 			case CRTC1_VGA:		/* analog connected screen on head 1, nothing on head 2 */
 				if (si->ps.crtc1_screen.aspect < (target_aspect - 0.10)) {
-					LOG(4, ("PROPOSEMODE: screen at crtc1 is not widescreen type, aborted.\n"));
+					LOG(4, ("PROPOSEMODE: screen at crtc1 is not widescreen (enough) type, aborted.\n"));
 					return B_ERROR;
 				}
 				break;
 			case CRTC2_TMDS:	/* nothing on head 1, digital panel on head 2 */
 			case CRTC2_VGA:		/* analog connected screen on head 2, nothing on head 1 */
 				if (si->ps.crtc2_screen.aspect < (target_aspect - 0.10)) {
-					LOG(4, ("PROPOSEMODE: screen at crtc2 is not widescreen type, aborted.\n"));
+					LOG(4, ("PROPOSEMODE: screen at crtc2 is not widescreen (enough) type, aborted.\n"));
 					return B_ERROR;
 				}
 				break;
@@ -181,7 +181,7 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 			default:						/* more than two screens connected (illegal setup) */
 				if ((si->ps.crtc1_screen.aspect < (target_aspect - 0.10)) ||
 					(si->ps.crtc2_screen.aspect < (target_aspect - 0.10))) {
-					LOG(4, ("PROPOSEMODE: not all connected screens are widescreen type, aborted.\n"));
+					LOG(4, ("PROPOSEMODE: not all connected screens are widescreen (enough) type, aborted.\n"));
 					return B_ERROR;
 				}
 				break;
