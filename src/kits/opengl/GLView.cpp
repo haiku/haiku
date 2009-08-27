@@ -76,7 +76,7 @@ BGLView::BGLView(BRect rect, char* name, ulong resizingMode, ulong mode,
 
 BGLView::~BGLView()
 {
-	delete (glview_direct_info *)fClipInfo;
+	delete fClipInfo;
 	if (fRenderer)
 		fRenderer->Release();
 }
@@ -213,10 +213,8 @@ BGLView::AttachedToWindow()
 			Bounds().IntegerHeight());
 
 		if (fClipInfo) {
-			fRenderer->DirectConnected(
-				((glview_direct_info *)fClipInfo)->direct_info);
-			fRenderer->EnableDirectMode(
-				((glview_direct_info *)fClipInfo)->enable_direct_mode);
+			fRenderer->DirectConnected(fClipInfo->direct_info);
+			fRenderer->EnableDirectMode(fClipInfo->enable_direct_mode);
 		}
 
 		return;
@@ -337,17 +335,16 @@ void
 BGLView::DirectConnected(direct_buffer_info *info)
 {
 	if (fClipInfo == NULL) {
-		fClipInfo = new(std::nothrow) glview_direct_info();
+		fClipInfo = new (std::nothrow) glview_direct_info();
 		if (fClipInfo == NULL)
 			return;
 	}
 
-	glview_direct_info *glviewDirectInfo = (glview_direct_info *)fClipInfo;
-	direct_buffer_info *localInfo = glviewDirectInfo->direct_info;
+	direct_buffer_info *localInfo = fClipInfo->direct_info;
 
 	switch (info->buffer_state & B_DIRECT_MODE_MASK) {
 		case B_DIRECT_START:
-			glviewDirectInfo->direct_connected = true;
+			fClipInfo->direct_connected = true;
 			memcpy(localInfo, info, DIRECT_BUFFER_INFO_AREA_SIZE);
 			_UnlockDraw();
 			break;
@@ -359,7 +356,7 @@ BGLView::DirectConnected(direct_buffer_info *info)
 			break;
 
 		case B_DIRECT_STOP:
-			glviewDirectInfo->direct_connected = false;
+			fClipInfo->direct_connected = false;
 			_LockDraw();
 			break;
 	}
@@ -375,21 +372,19 @@ BGLView::EnableDirectMode(bool enabled)
 	if (fRenderer)
 		fRenderer->EnableDirectMode(enabled);
 	if (fClipInfo == NULL) {
-		fClipInfo = new(std::nothrow) glview_direct_info();
+		fClipInfo = new (std::nothrow) glview_direct_info();
 		if (fClipInfo == NULL)
 			return;
 	}
 
-	((glview_direct_info *)fClipInfo)->enable_direct_mode = enabled;
+	fClipInfo->enable_direct_mode = enabled;
 }
 
 
 void
 BGLView::_LockDraw()
 {
-	glview_direct_info *info = (glview_direct_info *)fClipInfo;
-
-	if (!info || !info->enable_direct_mode)
+	if (!fClipInfo || !fClipInfo->enable_direct_mode)
 		return;
 
 	fDrawLock.Lock();
@@ -399,9 +394,7 @@ BGLView::_LockDraw()
 void
 BGLView::_UnlockDraw()
 {
-	glview_direct_info *info = (glview_direct_info *)fClipInfo;
-
-	if (!info || !info->enable_direct_mode)
+	if (!fClipInfo || !fClipInfo->enable_direct_mode)
 		return;
 
 	fDrawLock.Unlock();
@@ -414,9 +407,8 @@ BGLView::_CallDirectConnected()
 	if (!fClipInfo)
 		return;
 
-	glview_direct_info *glviewDirectInfo = (glview_direct_info *)fClipInfo;
-	direct_buffer_info *localInfo = glviewDirectInfo->direct_info;
-	direct_buffer_info *info = (direct_buffer_info *)calloc(1,
+	direct_buffer_info *localInfo = fClipInfo->direct_info;
+	direct_buffer_info *info = (direct_buffer_info *)malloc(
 		DIRECT_BUFFER_INFO_AREA_SIZE);
 	if (info == NULL)
 		return;
