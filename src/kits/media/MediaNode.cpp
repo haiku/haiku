@@ -60,7 +60,7 @@ using std::nothrow_t;
 int32 BMediaNode::_m_changeTag = 0;
 
 /*************************************************************
- * media_node 
+ * media_node
  *************************************************************/
 
 // final & verified
@@ -84,7 +84,7 @@ media_node::~media_node()
 media_node media_node::null;
 
 /*************************************************************
- * media_input 
+ * media_input
  *************************************************************/
 
 // final
@@ -99,7 +99,7 @@ media_input::~media_input()
 }
 
 /*************************************************************
- * media_output 
+ * media_output
  *************************************************************/
 
 // final
@@ -114,7 +114,7 @@ media_output::~media_output()
 }
 
 /*************************************************************
- * live_node_info 
+ * live_node_info
  *************************************************************/
 
 // final & verified
@@ -137,8 +137,8 @@ live_node_info::~live_node_info()
 BMediaNode::~BMediaNode()
 {
 	CALLED();
-	// BeBook: UnregisterNode() unregisters a node from the Media Server. It's called automatically 
-	// BeBook: by the BMediaNode destructor, but it might be convenient to call it sometime before 
+	// BeBook: UnregisterNode() unregisters a node from the Media Server. It's called automatically
+	// BeBook: by the BMediaNode destructor, but it might be convenient to call it sometime before
 	// BeBook: you delete your node instance, depending on your implementation and circumstances.
 
 	// first we remove the time source
@@ -153,7 +153,7 @@ BMediaNode::~BMediaNode()
 	// shadow object, and the real one still exists
 	if (0 == (fKinds & NODE_KIND_SHADOW_TIMESOURCE)) {
 		BMediaRoster::Roster()->UnregisterNode(this);
-	
+
 		if (fControlPort > 0)
 			delete_port(fControlPort);
 	} else {
@@ -239,13 +239,13 @@ BTimeSource *
 BMediaNode::TimeSource() const
 {
 	PRINT(7, "CALLED BMediaNode::TimeSource()\n");
-	
+
 	// return the currently assigned time source
 	if (fTimeSource != 0)
 		return fTimeSource;
-		
+
 	TRACE("BMediaNode::TimeSource node %ld enter\n", ID());
-	
+
 	// If the node doesn't have a time source object, we need to create one.
 	// If the node is still unregistered, we can't call MakeTimeSourceFor(),
 	// but since the node does still have the default system time source, we
@@ -305,7 +305,7 @@ BMediaNode::ReportError(node_error what,
 			ERROR("BMediaNode::ReportError: invalid what!\n");
 			return B_BAD_VALUE;
 	}
-	
+
 	// Transmits the error code specified by what to anyone
 	// that's receiving notifications from this node
 	return BPrivate::media::notifications::ReportError(Node(), what, info);
@@ -318,14 +318,14 @@ BMediaNode::NodeStopped(bigtime_t whenPerformance)
 	UNIMPLEMENTED();
 	// called by derived classes when they have
 	// finished handling a stop request.
-	
+
 	// notify anyone who is listening for stop notifications!
 	BPrivate::media::notifications::NodeStopped(Node(), whenPerformance);
-	
-	// XXX If your node is a BBufferProducer, downstream consumers 
-	// XXX will be notified that your node stopped (automatically, no less) 
+
+	// XXX If your node is a BBufferProducer, downstream consumers
+	// XXX will be notified that your node stopped (automatically, no less)
 	// XXX through the BBufferConsumer::ProducerDataStatus(B_PRODUCER_STOPPED) call.
-	
+
 	return B_OK;
 }
 
@@ -337,8 +337,8 @@ BMediaNode::TimerExpired(bigtime_t notifyPoint,
 {
 	UNIMPLEMENTED();
 	// Used with AddTimer
-	// This will, in turn, cause the BMediaRoster::SyncToNode() call 
-	// that instigated the timer to return to the caller. 
+	// This will, in turn, cause the BMediaRoster::SyncToNode() call
+	// that instigated the timer to return to the caller.
 	// Probably only important to classes derived from BTimeSource.
 }
 
@@ -358,9 +358,9 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 {
 	TRACE("entering: BMediaNode::WaitForMessage()\n");
 
-	// This function waits until either real time specified by 
+	// This function waits until either real time specified by
 	// waitUntil or a message is received on the control port.
-	// The flags are currently unused and should be 0. 
+	// The flags are currently unused and should be 0.
 
 	char data[B_MEDIA_MESSAGE_SIZE]; // about 16 KByte stack used
 	int32 message;
@@ -382,7 +382,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 		if (B_OK == BMediaNode::HandleMessage(message, data, size))
 			return B_OK;
 	}
-	
+
 	if (message > PRODUCER_MESSAGE_START && message < PRODUCER_MESSAGE_END) {
 		if (!fProducerThis)
 			fProducerThis = dynamic_cast<BBufferProducer *>(this);
@@ -448,7 +448,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 		return B_OK;
 
 	HandleBadMessage(message, data, size);
-	
+
 	return B_ERROR;
 }
 
@@ -458,8 +458,8 @@ BMediaNode::Start(bigtime_t performance_time)
 {
 	CALLED();
 	// This hook function is called when a node is started
-	// by a call to the BMediaRoster. The specified 
-	// performanceTime, the time at which the node 
+	// by a call to the BMediaRoster. The specified
+	// performanceTime, the time at which the node
 	// should start running, may be in the future.
 	// It may be overriden by derived classes.
 	// The BMediaEventLooper class handles this event!
@@ -473,8 +473,8 @@ BMediaNode::Stop(bigtime_t performance_time,
 {
 	CALLED();
 	// This hook function is called when a node is stopped
-	// by a call to the BMediaRoster. The specified 
-	// performanceTime, the time at which the node 
+	// by a call to the BMediaRoster. The specified
+	// performanceTime, the time at which the node
 	// should stop running, may be in the future.
 	// It may be overriden by derived classes.
 	// The BMediaEventLooper class handles this event!
@@ -488,8 +488,8 @@ BMediaNode::Seek(bigtime_t media_time,
 {
 	CALLED();
 	// This hook function is called when a node is asked
-	// to seek to the specified mediaTime by a call to 
-	// the BMediaRoster. The specified performanceTime, 
+	// to seek to the specified mediaTime by a call to
+	// the BMediaRoster. The specified performanceTime,
 	// the time at which the node should begin the seek
 	// operation, may be in the future.
 	// It may be overriden by derived classes.
@@ -503,9 +503,9 @@ BMediaNode::SetRunMode(run_mode mode)
 {
 	CALLED();
 
-	// this is a hook function, and 
+	// this is a hook function, and
 	// may be overriden by derived classes.
-	
+
 	// the functionality here is only to
 	// support those people that don't
 	// use the roster to set the run mode
@@ -534,12 +534,12 @@ BMediaNode::Preroll()
 BMediaNode::SetTimeSource(BTimeSource *time_source)
 {
 	CALLED();
-	// this is a hook function, and 
+	// this is a hook function, and
 	// may be overriden by derived classes.
 
 	if (time_source == NULL || time_source == fTimeSource)
 		return;
-	
+
 	// we just trip into debugger, code that tries to do this is broken.
 	debugger("BMediaNode::SetTimeSource() can't be used to set a timesource, use BMediaRoster::SetTimeSourceFor()!\n");
 }
@@ -570,10 +570,10 @@ BMediaNode::HandleMessage(int32 message,
 			BMessage msg(NODE_FINAL_RELEASE);
 			msg.AddPointer("node", this);
 			BMediaRoster::Roster()->PostMessage(&msg);
-			
+
 			return B_OK;
 		}
-	
+
 		case NODE_START:
 		{
 			const node_start_command *command = static_cast<const node_start_command *>(data);
@@ -622,15 +622,15 @@ BMediaNode::HandleMessage(int32 message,
 			Preroll();
 			return B_OK;
 		}
-		
+
 		case NODE_SET_TIMESOURCE:
 		{
 			const node_set_timesource_command *command = static_cast<const node_set_timesource_command *>(data);
 
 			TRACE("BMediaNode::HandleMessage NODE_SET_TIMESOURCE, node %ld, timesource %ld enter\n", fNodeID, command->timesource_id);
-			
+
 			fTimeSourceID = command->timesource_id;
-			
+
 			if (fTimeSource) {
 				// as this node already had a timesource, we need
 				// we need to remove this node from time source control
@@ -651,7 +651,7 @@ BMediaNode::HandleMessage(int32 message,
 
 			return B_OK;
 		}
-		
+
 		case NODE_GET_TIMESOURCE:
 		{
 			const node_get_timesource_request *request = static_cast<const node_get_timesource_request *>(data);
@@ -669,7 +669,7 @@ BMediaNode::HandleMessage(int32 message,
 			RequestCompleted(command->info);
 			return B_OK;
 		}
-		
+
 	};
 	return B_ERROR;
 }
@@ -728,8 +728,8 @@ BMediaNode::operator delete(void *ptr)
 	::operator delete(ptr);
 }
 
-void 
-BMediaNode::operator delete(void * ptr, 
+void
+BMediaNode::operator delete(void * ptr,
 							const nothrow_t &) throw()
 {
 	CALLED();
@@ -746,7 +746,7 @@ BMediaNode::RequestCompleted(const media_request_info &info)
 	CALLED();
 	// This function is called whenever a request issued by the node is completed.
 	// May be overriden by derived classes.
-	// info.change_tag can be used to match up requests against 
+	// info.change_tag can be used to match up requests against
 	// the accompaning calles from
 	// BBufferConsumer::RequestFormatChange()
 	// BBufferConsumer::SetOutputBuffersFor()
@@ -826,7 +826,7 @@ BMediaNode::DeleteHook(BMediaNode *node)
 BMediaNode::NodeRegistered()
 {
 	CALLED();
-	// The Media Server calls this hook function after the node has been registered. 
+	// The Media Server calls this hook function after the node has been registered.
 	// May be overriden by derived classes.
 }
 
@@ -891,8 +891,6 @@ BMediaNode::_InitObject(const char *name, media_node_id id, uint64 kinds)
 		fName[B_MEDIA_NAME_LENGTH - 1] = 0;
 	}
 	fRunMode = B_INCREASE_LATENCY;
-	_mChangeCount = 0;			//	deprecated
-	_mChangeCountReserved = 0;	//	deprecated
 	fKinds = kinds;
 	fProducerThis = 0;
 	fConsumerThis = 0;
@@ -902,7 +900,7 @@ BMediaNode::_InitObject(const char *name, media_node_id id, uint64 kinds)
 
 	// create control port
 	fControlPort = create_port(64, fName);
-	
+
 	// nodes are assigned the system time source by default
 	fTimeSourceID = NODE_SYSTEM_TIMESOURCE_ID;
 
@@ -930,7 +928,7 @@ BMediaNode::BMediaNode(const char *name,
 BMediaNode::NewChangeTag()
 {
 	CALLED();
-	// change tags have been used in BeOS R4 to match up 
+	// change tags have been used in BeOS R4 to match up
 	// format change requests between producer and consumer,
 	// This has changed starting with R4.5
 	// now "change tags" are used with
