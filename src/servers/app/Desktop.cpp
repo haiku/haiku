@@ -1099,6 +1099,9 @@ Desktop::HideWindow(Window* window)
 void
 Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 {
+	if (x == 0 && y == 0)
+		return;
+
 	if (!LockAllWindows())
 		return;
 
@@ -1173,6 +1176,9 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 void
 Desktop::ResizeWindowBy(Window* window, float x, float y)
 {
+	if (x == 0 && y == 0)
+		return;
+
 	if (!LockAllWindows())
 		return;
 
