@@ -15,6 +15,7 @@
 
 const usb_webcam_support_descriptor kSupportedDevices[] = {
 {{ 0, 0, 0, 0x0c45, 0x6005 }, "Sonix", "Sonix", "tas5110c1b" }, // mine
+{{ 0, 0, 0, 0x0c45, 0x6007 }, "Sonix", "macally ICECAM", "tas5110c1b" }, // Rajah's cam - SN9C101R
 {{ 0, 0, 0, 0x0c45, 0x6009 }, "Trust", "spacec@m 120", NULL },
 {{ 0, 0, 0, 0x0c45, 0x600d }, "Trust", "spacec@m 120", NULL },
 
@@ -126,10 +127,81 @@ SonixCamDevice::SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 		return;
 	}
 	
+		//XXX: the XP driver sends this to the ICECAM... need to investigate.
+#if 1
+	uint8 tmp_3[] = {
+		0x44, 0x44, 0x00, 0x00, 0x00, 0x04, 0x00, 0xa0,
+		0x61, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40,
+		0x00, 0x41, 0x09, 0x00, 0x16, 0x12, 0x60, 0x86,
+		0x3b, 0x0f, 0x0e, 0x06, 0x00, 0x00, 0x03 };
+	WriteReg(SN9C102_CHIP_CTRL, tmp_3, 0x1f);
+#endif
+		//XXX:DEBUG
+
+#if 0
+		//XXX: the XP driver sends all this... investigate.
+	uint8 tmp_1[] = {0x09, 0x44};
+	WriteReg(SN9C102_CHIP_CTRL, tmp_1, sizeof(tmp_1));
+	WriteReg8(SN9C102_CHIP_CTRL, 0x44);
+
+	WriteReg8(SN9C102_CLOCK_SEL /*0x17*/, 0x29);
+
+	uint8 tmp_2[] = {0x44, 0x44};
+	WriteReg(SN9C102_CHIP_CTRL, tmp_2, 2);
+		//URB_FUNCTION_VENDOR_INTERFACE:
+		//(USBD_TRANSFER_DIRECTION_OUT, ~USBD_SHORT_TRANSFER_OK) 
+
+	uint8 tmp_3[] = {
+		0x44, 0x44, 0x00, 0x00, 0x00, 0x04, 0x00, 0xa0,
+		0x61, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40,
+		0x00, 0x41, 0x09, 0x00, 0x16, 0x12, 0x60, 0x86,
+		0x3b, 0x0f, 0x0e, 0x06, 0x00, 0x00, 0x03 };
+	WriteReg(SN9C102_CHIP_CTRL, tmp_3, 0x1f);
+
+	uint8 tmp_4[] = {0x01, 0x01, 0x07, 0x06};
+	//WriteReg(SN9C102_AE_STRX, tmp_4, 4);
+
+	uint8 tmp_5[] = {0x14, 0x0f};
+	//WriteReg(SN9C102_H_SIZE, tmp_5, 2);
+
+	WriteReg8(SN9C102_SYNC_N_SCALE, 0x86);
+
+	WriteReg8(SN9C102_CHIP_CTRL, 0x44);	// again ??
+
+	uint8 tmp_6[] = { 0x60, 0x86 };
+	WriteReg(SN9C102_CLOCK_SEL /*0x17*/, tmp_6, 2);
+
+	WriteReg8(SN9C102_PIX_CLK, 0x2b);
+
+	// some IIC stuff for the sensor
+	uint8 tmp_7[] = { 0xb0, 0x61, 0x1c, 0xf8, 0x10, 0x00, 0x00, 0x16 };
+	//WriteReg(SN9C102_I2C_SETUP, tmp_7, 8);
+
+	WriteReg8(SN9C102_PIX_CLK, 0x4b);
+
+	uint8 tmp_8[] = { 0xa0, 0x61, 0x1c, 0x0f, 0x10, 0x00, 0x00, 0x16 };
+	//WriteReg(SN9C102_I2C_SETUP, tmp_8, 8);
+
+#endif
+#if 0
+	// some IIC stuff for the sensor
+	uint8 tmp_7[] = { 0xb0, 0x61, 0x1c, 0xf8, 0x10, 0x00, 0x00, 0x16 };
+	WriteReg(SN9C102_I2C_SETUP, tmp_7, 8);
+
+	WriteReg8(SN9C102_PIX_CLK, 0x4b);
+
+	uint8 tmp_8[] = { 0xa0, 0x61, 0x1c, 0x0f, 0x10, 0x00, 0x00, 0x16};
+	WriteReg(SN9C102_I2C_SETUP, tmp_8, 8);
+#endif
+
+	//WriteReg8(SN9C102_PIX_CLK, 0x4b);
+
+//###############
 	
 	if (Sensor()) {
 		PRINT((CH ": CamSensor: %s" CT, Sensor()->Name()));
 		fInitStatus = Sensor()->Setup();
+
 		fVideoFrame = BRect(0, 0, Sensor()->MaxWidth()-1, Sensor()->MaxHeight()-1);
 //		SetVideoFrame(BRect(0, 0, Sensor()->MaxWidth()-1, Sensor()->MaxHeight()-1));
 //		SetVideoFrame(BRect(0, 0, 320-1, 240-1));
@@ -205,16 +277,29 @@ DumpRegs();
 }
 
 
+status_t
+SonixCamDevice::PowerOnSensor(bool on)
+{
+	if (OrReg8(SN9C102_CHIP_CTRL, on ? 0x01 : 0x00) < 0)
+		return EIO;
+	return B_OK;
+}
+
+
 ssize_t
 SonixCamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
 {
 	PRINT((CH "(%u, @%p, %u)" CT, address, data, count));
+	status_t err;
 	if (address + count > SN9C102_REG_COUNT) {
 		PRINT((CH ": Invalid register range [%u;%u]" CT, address, address+count));
 		return EINVAL;
 	}
 	memcpy(&fCachedRegs[address], data, count);
-	return SendCommand(USB_REQTYPE_DEVICE_OUT, 0x08, address, 0, count, data);
+	err = SendCommand(USB_REQTYPE_DEVICE_OUT, 0x08, address, 0, count, data);
+	if (err < B_OK)
+		return err;
+	return count;
 }
 
 
@@ -222,6 +307,7 @@ ssize_t
 SonixCamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
 {
 	PRINT((CH "(%u, @%p, %u, %d)" CT, address, data, count, cached));
+	status_t err;
 	if (address + count > SN9C102_REG_COUNT) {
 		PRINT((CH ": Invalid register range [%u;%u]" CT, address, address+count));
 		return EINVAL;
@@ -230,7 +316,10 @@ SonixCamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
 		memcpy(data, &fCachedRegs[address], count);
 		return count;
 	}
-	return SendCommand(USB_REQTYPE_DEVICE_IN, 0x00, address, 0, count, data);
+	err = SendCommand(USB_REQTYPE_DEVICE_IN, 0x00, address, 0, count, data);
+	if (err < B_OK)
+		return err;
+	return count;
 }
 
 
@@ -272,6 +361,8 @@ SonixCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 {
 	status_t err;
 	uint8 buffer[8];
+	PRINT((CH "(%u, @%p, %u)" CT, address, data, count));
+
 	if (!Sensor())
 		return B_NO_INIT;
 	//dprintf(ID "sonix_i2c_write_multi(, %02x, %d, {%02x, %02x, %02x, %02x, %02x})\n", slave, count, d0, d1, d2, d3, d4);
@@ -284,7 +375,7 @@ SonixCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 	buffer[2] = address;
 	memset(&buffer[3], 0, 5);
 	memcpy(&buffer[3], data, count-1);
-	buffer[7] = 0x10; /*0x14;*/ /* absolutely no idea why V4L2 driver use that value */
+	buffer[7] = 0x16; /* V4L2 driver uses 0x10, XP driver uses 0x16 ? */
 	for (int i = 0; i < 8; i++) {
 		PRINT(("[%d] = %02x\n", i, buffer[i]));
 	}
@@ -311,6 +402,8 @@ SonixCamDevice::ReadIIC(uint8 address, uint8 *data)
 {
 	status_t err, lasterr = B_OK;
 	uint8 buffer[8];
+	PRINT((CH "(%u, @%p)" CT, address, data));
+
 	if (!Sensor())
 		return B_NO_INIT;
 	//dprintf(ID "sonix_i2c_write_multi(, %02x, %d, {%02x, %02x, %02x, %02x, %02x})\n", slave, count, d0, d1, d2, d3, d4);
@@ -321,7 +414,7 @@ SonixCamDevice::ReadIIC(uint8 address, uint8 *data)
 	buffer[7] = 0x10; /* absolutely no idea why V4L2 driver use that value */
 	err = WriteReg(SN9C102_I2C_SETUP, buffer, 8);
 	//dprintf(ID "sonix_i2c_write_multi: set_regs error 0x%08lx\n", err);
-	if (err) return err;
+	if (err < 8) return EIO;
 	err = WaitReadyIIC();
 	//dprintf(ID "sonix_i2c_write_multi: sonix_i2c_wait_ready error 0x%08lx\n", err);
 	//if (err) return err;
@@ -334,17 +427,17 @@ SonixCamDevice::ReadIIC(uint8 address, uint8 *data)
 	buffer[7] = 0x10; /* absolutely no idea why V4L2 driver use that value */
 	err = WriteReg(SN9C102_I2C_SETUP, buffer, 8);
 	//dprintf(ID "sonix_i2c_write_multi: set_regs error 0x%08lx\n", err);
-	if (err) return err;
+	if (err < 8) return EIO;
 	err = WaitReadyIIC();
 	//dprintf(ID "sonix_i2c_write_multi: sonix_i2c_wait_ready error 0x%08lx\n", err);
-	if (err) return err;
+	if (err < B_OK) return err;
 	
 	err = ReadReg(SN9C102_I2C_DATA0, buffer, 5);
-	if (err) lasterr = err;
+	if (err < 5) return EIO;
 
 	err = GetStatusIIC();
 	//dprintf(ID "sonix_i2c_write_multi: sonix_i2c_status error 0x%08lx\n", err);
-	if (err) return err;
+	if (err < B_OK) return err;
 	//dprintf(ID "sonix_i2c_write_multi: succeeded\n");
 	if (lasterr) return err;
 
