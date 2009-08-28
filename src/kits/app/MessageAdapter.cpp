@@ -521,13 +521,13 @@ MessageAdapter::_UnflattenR5Message(uint32 format, BMessage *into,
 
 	header->what = into->what = r5header.what;
 	if (r5header.flags & R5_MESSAGE_FLAG_INCLUDE_TARGET)
-		reader(header->target);
+		reader(&header->target, sizeof(header->target));
 
 	if (r5header.flags & R5_MESSAGE_FLAG_INCLUDE_REPLY) {
 		// reply info
-		reader(header->reply_port);
-		reader(header->reply_target);
-		reader(header->reply_team);
+		reader(&header->reply_port, sizeof(header->reply_port));
+		reader(&header->reply_target, sizeof(header->reply_target));
+		reader(&header->reply_team, sizeof(header->reply_team));
 
 		// big flags
 		uint8 bigFlag;
