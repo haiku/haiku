@@ -56,7 +56,7 @@ acpi_check_rsdt(acpi_rsdp *rsdp)
 
 
 acpi_descriptor_header *
-acpi_find_table(char *signature)
+acpi_find_table(const char *signature)
 {
 	if (sAcpiRsdt == NULL)
 		return NULL;

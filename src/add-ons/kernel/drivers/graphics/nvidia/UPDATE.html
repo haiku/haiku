@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (SVN 0.96, Rudolf)</h1></p>
+<p><h1>head (SVN 0.97, Rudolf)</h1></p>
 <ul>
 <li>Fixed driver assuming enabling AGP mode succeeded on some occasions if it did not block it itself. Blocking AGP mode completely via the AGP busmanager (option 'block_agp') resulted in a crashing acceleration engine because it was setup for AGP transfers instead of using PCI transfers. Error was solved with help from user kraton.
 <li>Fixed shared_info struct problem occuring when 3D 'accelerant' is used (tested Alpha 4.1): the TVencoder type definition list apparantly gets some memory assigned these days when done inside the definition of shared_info. Moved encoder list outside the shared_info definition.
@@ -23,7 +23,8 @@
 <li>Fixed acceleration engine crashes on at least G72 cards (Geforce 7300/7400/7500) by powering up new part(s) of the acceleration engines too..
 <li>Modified GPU PTimer programming which according to the Nouveau project fixes LVDS panel programming in some cases.
 <li>Corrected/Added detection of third I2C bus on cards that support it. The old detection method for a third and (non-existing) fourth bus was faulty. The driver uses I2C channels for monitor DDC/EDID and TVencoder communications.
-<li>DDC/EDID fetching now also works on GCC4 binaries due to a fixed fault in the accelerants/common code (which is used for that function).
+<li>DDC/EDID fetching now also works on GCC4 binaries due to a fixed fault in the accelerants/common code (which is used for that function);
+<li>Added support for Haiku specific driverhook GET_PREFERRED_DISPLAY_MODE. Laptops should now also startup in native mode automatically at first system boot.
 </ul>
 <p><h1>nv_driver 0.80 (Rudolf)</h1></p>
 <ul>
@@ -253,7 +254,7 @@ The features below are shutdown because they are possibly dangerous without feed
 <p><h1>Still todo:</h1></p>
 <ul>
 	<li>Extend TVout feature to support more encoder-types (Chrontel, Philips);
-	<li>Improve/extend various stuff when/if possible (like extending the use of DDC/EDID).
+	<li>Improve/extend various stuff when/if possible.
 </ul>
 </p>
 </body>

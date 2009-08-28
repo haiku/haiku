@@ -3561,7 +3561,16 @@ ServerWindow::_MessageNeedsAllWindowsLocked(uint32 code) const
 void
 ServerWindow::_ResizeToFullScreen()
 {
-	BRect screenFrame = fWindow->Screen()->Frame();
+	BRect screenFrame;
+
+	{
+		AutoReadLocker _(fDesktop->ScreenLocker());
+		const Screen* screen = fWindow->Screen();
+		if (screen == NULL)
+			return;
+
+		screenFrame = fWindow->Screen()->Frame();
+	}
 
 	fDesktop->MoveWindowBy(fWindow,
 		screenFrame.left - fWindow->Frame().left,

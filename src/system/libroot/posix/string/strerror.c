@@ -7,12 +7,10 @@
  */
 
 
-#include <SupportDefs.h>
-#include <translation/TranslationErrors.h>
-#include <media/MediaDefs.h>
-
 #include <string.h>
 #include <stdio.h>
+
+#include <SupportDefs.h>
 
 
 static const struct error_base {

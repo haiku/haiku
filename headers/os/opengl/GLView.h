@@ -29,6 +29,7 @@
 #include <Window.h>
 #include <WindowScreen.h>
 
+struct glview_direct_info;
 class BGLRenderer;
 class GLRendererRoster;
 
@@ -102,7 +103,7 @@ private:
 		uint32      fDitherCount;
 		BLocker		fDrawLock;
 		BLocker     fDisplayLock;
-		void *		fClipInfo;
+		glview_direct_info *		fClipInfo;
 		
 		BGLRenderer *fRenderer;
 		GLRendererRoster *fRoster;

@@ -2897,39 +2897,34 @@ static void setup_output_matrix()
 	}
 }
 
-void get_panel_modes(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2)
+status_t get_crtc1_screen_native_mode(display_mode *mode)
 {
-	if (si->ps.monitors & CRTC1_TMDS)
-	{
-		/* timing ('modeline') */
-		p1->timing = si->ps.p1_timing;
-		/* setup the rest */
-		p1->space = B_CMAP8;
-		p1->virtual_width = p1->timing.h_display;
-		p1->virtual_height = p1->timing.v_display;
-		p1->h_display_start = 0;
-		p1->v_display_start = 0;
-		p1->flags = 0;
-		*pan1 = true;
-	}
-	else
-		*pan1 = false;
+	if (!si->ps.crtc1_screen.have_native_edid) return B_ERROR;
 
-	if (si->ps.monitors & CRTC2_TMDS)
-	{
-		/* timing ('modeline') */
-		p2->timing = si->ps.p2_timing;
-		/* setup the rest */
-		p2->space = B_CMAP8;
-		p2->virtual_width = p2->timing.h_display;
-		p2->virtual_height = p2->timing.v_display;
-		p2->h_display_start = 0;
-		p2->v_display_start = 0;
-		p2->flags = 0;
-		*pan2 = true;
-	}
-	else
-		*pan2 = false;
+	mode->space = B_RGB32_LITTLE;
+	mode->virtual_width = si->ps.crtc1_screen.timing.h_display;
+	mode->virtual_height = si->ps.crtc1_screen.timing.v_display;
+	mode->h_display_start = 0;
+	mode->v_display_start = 0;
+	mode->flags = 0;
+	memcpy(&mode->timing, &si->ps.crtc1_screen.timing, sizeof(mode->timing));
+
+	return B_OK;
+}
+
+status_t get_crtc2_screen_native_mode(display_mode *mode)
+{
+	if (!si->ps.crtc2_screen.have_native_edid) return B_ERROR;
+
+	mode->space = B_RGB32_LITTLE;
+	mode->virtual_width = si->ps.crtc2_screen.timing.h_display;
+	mode->virtual_height = si->ps.crtc2_screen.timing.v_display;
+	mode->h_display_start = 0;
+	mode->v_display_start = 0;
+	mode->flags = 0;
+	memcpy(&mode->timing, &si->ps.crtc2_screen.timing, sizeof(mode->timing));
+
+	return B_OK;
 }
 
 static void pinsnv4_fake(void)
