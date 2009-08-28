@@ -16,27 +16,27 @@ BD2A::~BD2A()
 
 
 status_t
-BD2A::Open(const char *portName)
+BD2A::Open(const char* portName)
 {
 	return B_ERROR;
 }
 
 
 void
-BD2A::Close(void)
+BD2A::Close()
 {
 }
 
 
 bool
-BD2A::IsOpen(void)
+BD2A::IsOpen()
 {
 	return false;
 }
 
 
 ssize_t
-BD2A::Read(uint8 *buf)
+BD2A::Read(uint8* buf)
 {
 	return 0;
 }
