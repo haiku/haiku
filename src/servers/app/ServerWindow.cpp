@@ -3561,7 +3561,13 @@ ServerWindow::_MessageNeedsAllWindowsLocked(uint32 code) const
 void
 ServerWindow::_ResizeToFullScreen()
 {
-	BRect screenFrame = fWindow->Screen()->Frame();
+	const Screen *screen = fWindow->Screen();
+	if (screen == NULL) {
+		return;
+		// the window isn't yet attached to a screen
+	}
+
+	BRect screenFrame = screen->Frame();
 
 	fDesktop->MoveWindowBy(fWindow,
 		screenFrame.left - fWindow->Frame().left,
@@ -3605,6 +3611,7 @@ ServerWindow::_DirectWindowSetFullScreen(bool enable)
 		fDesktop->HWInterface()->SetCursorVisible(false);
 
 		fDirectWindowInfo->EnableFullScreen(fWindow->Frame(), fWindow->Feel());
+		
 		_ResizeToFullScreen();
 	} else {
 		const BRect& originalFrame = fDirectWindowInfo->OriginalFrame();
