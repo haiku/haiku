@@ -2364,7 +2364,9 @@
 
 
 /* Define as a macro for copying va_list variables. */
+#if __GNUC__ < 3
 #define va_copy __va_copy
+#endif
 
 /* Define as `fork' if `vfork' does not work. */
 /* #undef vfork */
