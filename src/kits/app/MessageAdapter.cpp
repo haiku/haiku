@@ -180,7 +180,6 @@ MessageAdapter::Unflatten(uint32 format, BMessage *into, const char *buffer)
 			case MESSAGE_FORMAT_R5:
 			{
 				r5_message_header *header = (r5_message_header *)buffer;
-				debug_printf("creating memory io for message buffer %p with flattened size %ld\n", buffer, header->flattened_size);
 				BMemoryIO stream(buffer + sizeof(uint32),
 					header->flattened_size - sizeof(uint32));
 				return _UnflattenR5Message(format, into, &stream);
@@ -189,7 +188,6 @@ MessageAdapter::Unflatten(uint32 format, BMessage *into, const char *buffer)
 			case MESSAGE_FORMAT_R5_SWAPPED:
 			{
 				r5_message_header *header = (r5_message_header *)buffer;
-				debug_printf("creating swapped memory io for message buffer %p with flattened size %ld\n", buffer, header->flattened_size);
 				BMemoryIO stream(buffer + sizeof(uint32),
 					__swap_int32(header->flattened_size) - sizeof(uint32));
 				return _UnflattenR5Message(format, into, &stream);
