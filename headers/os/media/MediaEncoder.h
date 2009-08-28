@@ -9,12 +9,6 @@
 #include <MediaFormats.h>
 
 
-//namespace BPrivate {
-//	class Encoder;
-//	class _AddonManager;
-//}
-
-
 class BMediaEncoder {
 public:
 								BMediaEncoder();
@@ -78,8 +72,6 @@ private:
 			void				Init();
 			void				ReleaseEncoder();
 
-//			BPrivate::_AddonManager* fEncoderMgr;
-//			BPrivate::Encoder*	fEncoder;
 			uint32				_reserved_was_fEncoderMgr;
 			uint32				_reserved_was_fEncoder;
 
