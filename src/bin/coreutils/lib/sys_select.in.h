@@ -45,8 +45,12 @@
 # include <sys/types.h>
 
 /* On OSF/1 4.0, <sys/select.h> provides only a forward declaration
-   of 'struct timeval', and no definition of this type..  */
+   of 'struct timeval', and no definition of this type.  */
 # include <sys/time.h>
+
+/* On Solaris 10, <sys/select.h> provides an FD_ZERO implementation
+   that relies on memset(), but without including <string.h>.  */
+# include <string.h>
 
 /* The include_next requires a split double-inclusion guard.  */
 # @INCLUDE_NEXT@ @NEXT_SYS_SELECT_H@

@@ -1,5 +1,5 @@
 /* provide a replacement openat function
-   Copyright (C) 2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2004-2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -47,12 +47,9 @@ openat (int fd, char const *file, int flags, ...)
       va_list arg;
       va_start (arg, flags);
 
-      /* If mode_t is narrower than int, use the promoted type (int),
-         not mode_t.  Use sizeof to guess whether mode_t is narrower;
-         we don't know of any practical counterexamples.  */
-      mode = (sizeof (mode_t) < sizeof (int)
-	      ? va_arg (arg, int)
-	      : va_arg (arg, mode_t));
+      /* We have to use PROMOTED_MODE_T instead of mode_t, otherwise GCC 4
+	 creates crashing code when 'mode_t' is smaller than 'int'.  */
+      mode = va_arg (arg, PROMOTED_MODE_T);
 
       va_end (arg);
     }

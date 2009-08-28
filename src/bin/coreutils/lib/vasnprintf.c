@@ -5479,6 +5479,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
 #undef TCHARS_PER_DCHAR
 #undef SNPRINTF
 #undef USE_SNPRINTF
+#undef DCHAR_SET
 #undef DCHAR_CPY
 #undef PRINTF_PARSE
 #undef DIRECTIVES

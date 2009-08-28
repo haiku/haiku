@@ -46,6 +46,30 @@
 #ifndef _GL_SYS_SOCKET_H
 #define _GL_SYS_SOCKET_H
 
+#if !@HAVE_SA_FAMILY_T@
+typedef unsigned short  sa_family_t;
+#endif
+
+#if !@HAVE_STRUCT_SOCKADDR_STORAGE@
+# include <alignof.h>
+/* Code taken from glibc sysdeps/unix/sysv/linux/bits/socket.h on
+   2009-05-08, licensed under LGPLv2.1+, plus portability fixes. */
+# define __ss_aligntype unsigned long int
+# define _SS_SIZE 256
+# define _SS_PADSIZE \
+    (_SS_SIZE - ((sizeof (sa_family_t) >= alignof (__ss_aligntype)	\
+		  ? sizeof (sa_family_t)				\
+		  : alignof (__ss_aligntype))				\
+		 + sizeof (__ss_aligntype)))
+
+struct sockaddr_storage
+{
+  sa_family_t ss_family;      /* Address family, etc.  */
+  __ss_aligntype __ss_align;  /* Force desired alignment.  */
+  char __ss_padding[_SS_PADSIZE];
+};
+#endif
+
 #if @HAVE_SYS_SOCKET_H@
 
 /* A platform that has <sys/socket.h>.  */

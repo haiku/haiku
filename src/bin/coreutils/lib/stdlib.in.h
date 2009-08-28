@@ -35,6 +35,8 @@
 #ifndef _GL_STDLIB_H
 #define _GL_STDLIB_H
 
+/* NetBSD 5.0 mis-defines NULL.  */
+#include <stddef.h>
 
 /* Solaris declares getloadavg() in <sys/loadavg.h>.  */
 #if @GNULIB_GETLOADAVG@ && @HAVE_SYS_LOADAVG_H@

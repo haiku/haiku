@@ -1,5 +1,5 @@
 /* readlink -- display value of a symbolic link.
-   Copyright (C) 2002-2008 Free Software Foundation, Inc.
+   Copyright (C) 2002-2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ usage (int status)
   else
     {
       printf (_("Usage: %s [OPTION]... FILE\n"), program_name);
-      fputs (_("Display value of a symbolic link on standard output.\n\n"),
+      fputs (_("Print value of a symbolic link or canonical file name\n\n"),
 	     stdout);
       fputs (_("\
   -f, --canonicalize            canonicalize by following every symlink in\n\

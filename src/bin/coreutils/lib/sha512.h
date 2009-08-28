@@ -1,6 +1,6 @@
 /* Declarations of functions and data types used for SHA512 and SHA384 sum
    library functions.
-   Copyright (C) 2005, 2006, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2008, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,6 +21,10 @@
 # include <stdio.h>
 
 # include "u64.h"
+
+# ifdef __cplusplus
+extern "C" {
+# endif
 
 /* Structure to save state of computation between the single steps.  */
 struct sha512_ctx
@@ -83,5 +87,9 @@ extern int sha384_stream (FILE *stream, void *resblock);
    digest.  */
 extern void *sha512_buffer (const char *buffer, size_t len, void *resblock);
 extern void *sha384_buffer (const char *buffer, size_t len, void *resblock);
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif

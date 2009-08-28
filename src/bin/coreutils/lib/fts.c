@@ -932,7 +932,9 @@ next:	tmp = p;
 				SET(FTS_STOP);
 				return (NULL);
 			}
+			free_dir(sp);
 			fts_load(sp, p);
+			setup_dir(sp);
 			goto check_for_dir;
 		}
 

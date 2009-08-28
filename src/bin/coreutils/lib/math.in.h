@@ -22,7 +22,7 @@
 #endif
 
 /* The include_next requires a split double-inclusion guard.  */
-#@INCLUDE_NEXT_AS_FIRST_DIRECTIVE@ @NEXT_MATH_H@
+#@INCLUDE_NEXT_AS_FIRST_DIRECTIVE@ @NEXT_AS_FIRST_DIRECTIVE_MATH_H@
 
 #ifndef _GL_MATH_H
 #define _GL_MATH_H
@@ -148,7 +148,8 @@ extern long double ceill (long double x);
 #endif
 
 
-#if @GNULIB_MATHL@ || !@HAVE_DECL_COSL@
+#if @GNULIB_MATHL@ || (!@HAVE_DECL_COSL@ && !defined cosl)
+# undef cosl
 extern long double cosl (long double x);
 #endif
 #if !@GNULIB_MATHL@ && defined GNULIB_POSIXCHECK
@@ -237,7 +238,8 @@ extern long double ldexpl (long double x, int exp);
 #endif
 
 
-#if @GNULIB_MATHL@ || !@HAVE_DECL_LOGL@
+#if @GNULIB_MATHL@ || (!@HAVE_DECL_LOGL@ && !defined logl)
+# undef logl
 extern long double logl (long double x);
 #endif
 #if !@GNULIB_MATHL@ && defined GNULIB_POSIXCHECK
@@ -292,7 +294,8 @@ extern long double roundl (long double x);
 #endif
 
 
-#if @GNULIB_MATHL@ || !@HAVE_DECL_SINL@
+#if @GNULIB_MATHL@ || (!@HAVE_DECL_SINL@ && !defined sinl)
+# undef sinl
 extern long double sinl (long double x);
 #endif
 #if !@GNULIB_MATHL@ && defined GNULIB_POSIXCHECK

@@ -1,4 +1,882 @@
+2009-08-20  Jim Meyering  <meyering@redhat.com>
+
+	version 7.5
+	* NEWS: Record release date.
+
+	tests: skip the stdbuf tests when the abs build directory name is bogus
+	* tests/misc/stdbuf: Avoid spurious failure when the directory name
+	from which we'd set LD_PRELOAD contains unsafe characters.
+
+	install: avoid a portability bug when compiling with non-gcc
+	* src/install.c (extra_mode): Be careful to return only a 0 or 1
+	value, since this is a "bool" function, and there are still some
+	compilers for which this is necessary.  Without this change,
+	Bernhard Voelker reported that the Forte Developer 7 C 5.4 2002/03/09
+	compiler would produce a malfunctioning "install" binary.  Details in
+	http://thread.gmane.org/gmane.comp.gnu.coreutils.bugs/17710/focus=17760
+
+2009-08-19  Jim Meyering  <meyering@redhat.com>
+
+	tests: make install-C slightly less prone to confusion
+	* tests/install/install-C: Invoke framework_failure, if necessary.
+
+	build: avoid "make dist" failure in man/
+	Now that "make check" no longer builds programs like arch, ...
+	* src/Makefile.am (dist-hook): Depend on $(all_programs), so that the
+	subsequent build in man/ doesn't fail due to lack of a program like
+	arch that is not going to be installed.
+
+2009-08-18  Jim Meyering  <meyering@redhat.com>
+
+	build: update from gnulib
+	* gnulib: Update submodule to latest.
+
+2009-08-18  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	nl: deprecate --page-increment in favor of --line-increment
+	* NEWS: Mention the change.
+	* doc/coreutils.texi: Document the new --line-increment option.
+	* src/nl.c (struct option): Add --line-increment,
+	(usage): Describe it,
+	(main): Use it.
+
+2009-08-18  Jim Meyering  <meyering@redhat.com>
+
+	tests: stdbuf: fix a bug in test script
+	* tests/misc/stdbuf: Use skip_test_ only after it's defined.
+	Reported by Berhnard Voelker.
+
+	(sc_check-AUTHORS): Rename rule from check-AUTHORS.
+
+	build: perform check-AUTHORS via syntax-check, not via "make check"
+	* src/Makefile.am (check): Don't depend on check-AUTHORS.
+	That check fails on systems for which a program like stdbuf is
+	not built.  Instead, move this check to "make syntax-check".
+	(sc_check-AUTHORS): Rename rule from check-AUTHORS.
+	* cfg.mk (sc_check-AUTHORS): New rule.
+	Reported by Berhnard Voelker.
+
+	sort: use more portable initialization syntax
+	* src/sort.c (find_unit_order): Spell out 256-element static
+	initializer, rather than relying on C99 syntax.
+	Required for Forte Developer 7 C 5.4 2002/03/09 on Solaris 10.
+	Reported by Bernhard Voelker.
+
+2009-08-17  Jim Meyering  <meyering@redhat.com>
+
+	build: suppress warnings due to gcc's new -Wjump-misses-init
+	* configure.ac: Ignore -Wjump-misses-init violations in remove.c.
+
+	build: update from gnulib
+	* gnulib: Update submodule to latest.
+
+2009-08-16  Jim Meyering  <meyering@redhat.com>
+
+	tests: tail-2/append-only: don't discard stderr
+	* tests/tail-2/append-only: Don't discard a diagnostic that
+	may help explain why this test fails for some.  Details in
+	http://thread.gmane.org/gmane.comp.gnu.coreutils.bugs/17621/focus=17641
+
+2009-08-14  Jim Meyering  <meyering@redhat.com>
+
+	tests: skip the misc/stdbuf test if stdbuf was not built
+	* tests/misc/stdbuf: Skip this test when stdbuf is not built.
+	Reported by Eric Blake.
+
+	build: use gnulib's getopt-gnu module (getopt is now deprecated)
+	* bootstrap.conf (gnulib_modules): Gnulib's getopt module is now
+	deprecated; use the new, preferred name, getopt-gnu.
+	* gnulib: Update to latest.
+
+2009-08-14  Pádraig Brady  <P@draigBrady.com>
+
+	cp,mv: fix issues with preserving timestamps of copied symlinks
+	* src/copy.c (copy_internal): On systems without utimensat don't
+	use utimens on a symlink, as that would dereference the symlink.
+	* tests/cp/abuse: To work around possible attribute preservation
+	failures breaking the test, use cp -dR rather than cp -a.
+
+	doc: clarify the cp --reflink NEWS
+	* NEWS: Remove the description associated with the removed
+	experimental code which unconditionally tried to reflink() on copy.
+	Also clarify where --reflink works exactly.
+
+2009-08-13  Jim Meyering  <meyering@redhat.com>
+
+	tests: raise ulimit virt-mem limit to avoid new failure
+	* tests/cp/link-heap: Raise limit from 16MB to ~20MB,
+	to avoid spurious failure on rawhide.
+
+2009-08-13  Pádraig Brady  <P@draigBrady.com>
+
+	tail: fix tail -f failure when inotify used
+	* src/tail.c (tail_forever_inotify): Remove the redundant and
+	incorrect error check of the return from inotify_add_watch().
+	Also initialize the wd member of each File_spec to an invalid value.
+	Reported by C de-Avillez.
+
+	dd: fix a signal handling race
+	* src/dd.c (main): Install the signal handlers at startup
+	rather than just before the copy starts. In this way signals
+	received before the copy (like during a slow truncate for e.g.)
+	will be deferred and handled consistently.
+	* THANKS: Add Bernhard's email address.
+	* NEWS: Mention the fix.
+	Reported by Bernhard Voelker.
+
+2009-08-12  Pádraig Brady  <P@draigBrady.com>
+
+	tests: improve one of the tail --pid tests
+	* tests/tail-2/pid: Speed up the test by specifying a
+	timeout of 100ms rather than the default 1s.  Also
+	skip the test instead of failing in the unlikely case
+	were the pid required to be missing pid is present.
+
+2009-08-10  Jim Meyering  <meyering@redhat.com>
+
+	nl, pinky: replace uses of strcat
+	* src/nl.c (main): Avoid strcat, on principle.  Use stpcpy instead.
+	* src/pinky.c (print_long_entry): Likewise.
+
+	build: update from gnulib, for HOST_NAME_MAX on solaris 10
+	* gnulib: Update submodule to latest.
+
+2009-08-07  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	cp: accept the --reflink option
+	* NEWS: Mention it.
+	* doc/coreutils.texi (cp invocation): Describe it.
+	* src/copy.h (struct cp_options) [reflink]: New member.
+	* src/copy.c (usage): Describe it.
+	(copy_reg): If reflink is true try to clone the file.
+	(main): Check for --reflink.
+	(cp_option_init): Initialize the new member.
+	* src/install.c (cp_option_init): Initialize the new member.
+	* src/mv.c (cp_option_init): Likewise.
+	* tests/cp/sparse: Add a new test case.
+
+2009-08-07  Jim Meyering  <meyering@redhat.com>
+
+	dd: preserve semantics of O_DIRECT even for final block
+	* src/dd.c: Include "ignore-value.h"
+	(iwrite): When disabling O_DIRECT, try to compensate
+	via POSIX_FADV_DONTNEED and fsync.
+	Suggested by Eric Sandeen.
+
+2009-08-06  Jim Meyering  <meyering@redhat.com>
+
+	maint: move selinux-at module from gl/ to gnulib
+	* gl/lib/selinux-at.c: Remove file.
+	* gl/lib/selinux-at.h: Likewise.
+	* gl/modules/selinux-at: Likewise.
+	* gnulib: update to latest, to get the new module.
+
+	dd: work around buffer length restrictions with oflag=direct (O_DIRECT)
+	dd oflag=direct would fail to copy a file with size that is
+	not a multiple of 512 (destination file system specific)
+
+	* NEWS (Bug fixes): Mention it.
+	* src/dd.c (iwrite): Turn off O_DIRECT for any
+	smaller-than-obs-sized write.  Don't bother to restore it.
+	* tests/dd/direct: New test for the above.
+	* tests/Makefile.am (TESTS): Add dd/direct.
+	* doc/coreutils.texi (dd invocation): Mention oflag=direct
+	buffer size restriction.
+	Details in http://thread.gmane.org/gmane.comp.gnu.coreutils.bugs/17586
+	Reported by Eric Sandeen.
+
+2009-08-04  Jim Meyering  <meyering@redhat.com>
+
+	dd: remove unnecessary #if HAVE_FTRUNCATE
+	* src/dd.c (main): Remove unnecessary cpp directives.
+	Gnulib guarantees that ftruncate is usable.
+
+	cp -pP (and e.g., -a): preserve time stamps on symlinks, too
+	* src/copy.c (utimensat_if_possible): New function.
+	(copy_internal): Remove variable, "preserve_metadata".
+	Replace with "dest_is_symlink".  That covers all cases but one:
+	the one in which cp --link has created hard links to non-directories.
+	In that case, there is no need to update attributes of the links.
+	Use utimensat_if_possible, to preserve timestamps of symlinks.
+	* NEWS (New features): Mention this.
+	* tests/Makefile.am (TESTS): Add cp/preserve-slink-time.
+	* tests/cp/preserve-slink-time: New file.
+	* m4/jm-macros.m4 (coreutils_MACROS): Test for utimensat.
+	Reported in http://bugzilla.redhat.com/230866
+
+2009-08-04  Kamil Dudka  <kdudka@redhat.com>
+
+	install runs faster again with SELinux enabled
+	* m4/jm-macros.m4: Pull in SELinux libraries while checking for
+	matchpathcon_init_prefix ().  Emit configure warning when not found
+	with SELinux enabled.
+	* NEWS (Bug fixes): Mention it.
+	The bug was introduced in coreutils-7.0 via commit 0647f3eb, 2008-06-02,
+	"accommodate older SELinux which lacks matchpathcon_init_prefix".
+
+2009-08-04  Jim Meyering  <meyering@redhat.com>
+
+	maint: move the update-copyright rule to gnulib's maint.mk
+	* gnulib: Update submodule to get latest maint.mk.
+	* Makefile.am (update-copyright): Remove rule; now it's in maint.mk.
+	* m4/check-decl.m4: Update sole remaining copyright year list.
+
+2009-07-31  Jim Meyering  <meyering@redhat.com>
+
+	build: *really* update to a usable gnulib commit
+
+	build: update to a usable gnulib commit
+	The commit, 5ef90695, 2009-07-29, "maint: move update-copyright
+	to gnulib" recorded a local-only commit.
+	Reported by Pádraig Brady.
+
+2009-07-30  Jim Meyering  <meyering@redhat.com>
+
+	tests: new function: require_openat_support_
+	* tests/rm/inaccessible: Factor out openat-support-detection code...
+	* tests/test-lib.sh (require_openat_support_): ...into this new function.
+
+	tail: tweak indentation
+	* src/tail.c (tail_forever_inotify): Adjust indentation of continued line.
+
+2009-07-30  Pádraig Brady  <P@draigBrady.com>
+
+	tail: properly parse fractional seconds when monitoring a pid
+	* src/tail.c (tail_forever_inotify): The fractional
+	part of the delay was 1000 times too large.
+	* tests/tail-2/pid: Add a test to ensure the
+	timeout happens for this case.
+
+2009-07-30  Jim Meyering  <meyering@redhat.com>
+
+	tests: test for just-fixed tail --pid bug
+	* tests/tail-2/pid: Ensure tail exits successfully when PID dies.
+
+2009-07-30  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	tail: exit successfully upon watched process death
+	* src/tail.c (tail_forever_inotify): If a PID is specified and the
+	watched process dies, exit with status EXIT_SUCCESS, rather than
+	falling through to an EXIT_FAILURE.
+
+2009-07-29  Jim Meyering  <meyering@redhat.com>
+
+	maint: move update-copyright to gnulib
+	* build-aux/update-copyright: Remove file.
+	* bootstrap.conf (gnulib_modules): Add update-copyright.
+	* gnulib: Update submodule to latest.
+
+	maint: make update-copyright work in yet another case
+	* build-aux/update-copyright: Handle the case in which "\n#"
+	appears between the final year number and the copyright holder name.
+	* m4/lib-check.m4: Update copyright year list.
+	Reported by Joel E. Denny.
+
+	maint: update NEWS
+	* NEWS (New features): Mention it.
+
+2009-07-29  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	cp: support btrfs' copy-on-write file clone operation
+	* src/copy.c [HAVE_SYS_IOCTL_H]: Include <sys/ioctl.h>.
+	(BTRFS_IOCTL_MAGIC, BTRFS_IOC_CLONE): Define.
+	(clone_file): New function.
+	(copy_reg): Use the btrfs clone operation if possible.
+
+2009-07-29  Jim Meyering  <meyering@redhat.com>
+
+	maint: update sleep.c's copyright year list
+	* src/sleep.c: Update copyright year list to include 2009.
+	* tests/sort-time/rand-gen: Remove long-unused file.
+	* tests/sort-time/README: Likewise.
+
+2009-07-29  Joel E. Denny  <jdenny@clemson.edu>
+
+	maint: improve update-copyright rule
+	* Makefile.am (update-copyright): Relax the selection rule
+	to match any file containing the word "Copyright".
+	Correct the exclusion rule so that it also excludes ChangeLog
+	and COPYING files that are not in the top level directory.
+
+2009-07-29  Jim Meyering  <meyering@redhat.com>
+
+	maint: update-copyright: fix just-introduced bug
+	* build-aux/update-copyright: ... and revert-for-now the
+	change that made this script invoke localtime only once.
+
+	maint: make update-copyright handle more cases
+	* build-aux/update-copyright: Handle cases in which the final
+	year number and copyright holder are on separate lines.
+	Prompted by a report from Joel E. Denny.
+	Also, do not invoke localtime for each line we process.
+
+2009-07-29  Pádraig Brady  <P@draigBrady.com>
+
+	doc: fix the generated HTML index
+	* doc/coreutils.texi: Move the "SELinux context" section
+	down below the "System context" nodes so that the HTML
+	index is generated correctly. Also some extraneous and missing
+	'.' characters were corrected in the index.
+	Reported by Benno Schulenberg.
+
+2009-07-28  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	tail: use the inotify backend also with --pid=PID
+	* src/tail.c (tail_forever_inotify): When a PID is specified, use
+	select to block for no more than sleep_interval seconds at a time,
+	and check for process death upon timeout.
+	(main): Adapt to new tail_forever_inotify interface.
+
+2009-07-27  Jim Meyering  <meyering@redhat.com>
+
+	tests: new test for bug in ls -1U dir arg ...
+	* tests/misc/ls-misc (multi-arg-U1): New test.
+
+2009-07-27  Kamil Dudka  <kdudka@redhat.com>
+
+	ls -1U dir arg ... now works again
+	* src/ls.c (print_dir): Emit "$dir_name:\n" *before* accumulating (and
+	possibly printing) directory entry names.
+	The bug was introduced in coreutils-7.0 via commit
+	8d974b00, 2008-07-30, "ls -U1 now uses constant memory".
+	Reported by Julian Bradfield.
+	* NEWS (Bug fixes): Mention it.
+
+2009-07-27  Heikki Orsila  <heikki.orsila@iki.fi>
+
+	tr: improve --help's description of --complement (-c)
+
+2009-07-27  Pádraig Brady  <P@draigBrady.com>
+
+	doc: add a sort by line length example
+	* doc/coreutils.texi (sort invocation): Add an example showing how
+	to sort data not directly supported by the sort command.
+
+	doc: mention realpath in the readlink info
+	* doc/coreutils.texi (readlink invocation): Add realpath to the index,
+	and also mention it in the readlink description so people
+	searching for that functionality can easily make the connection.
+
+2009-07-26  Jim Meyering  <meyering@redhat.com>
+
+	build: use a fixed-name temporary in man/Makefile.am
+	* man/Makefile.am (check-x-vs-1): Using a fixed-name temporary file
+	is better than one ending in -$$, because many -$$-suffixed files
+	may accumulate over time.
+
+2009-07-24  Kamil Dudka  <kdudka@redhat.com>
+
+	doc: improve readlink description here, too
+	* doc/coreutils.texi (readlink invocation): Update menus.
+	Add @cindex entries.
+
+2009-07-24  Jim Meyering  <meyering@redhat.com>
+
+	readlink: improve one-line summary: prints canonical file names, too
+	* src/readlink.c (usage): Adjust one-line summary.
+	* man/readlink.x: Likewise.
+	Suggested by Kamil Dudka.
+
+2009-07-21  Jim Meyering  <meyering@redhat.com>
+
+	build: update from gnulib
+	* gnulib: Update submodule to latest.
+
+2009-07-14  Jim Meyering  <meyering@redhat.com>
+
+	doc: point to Guile's ChangeLog-writing guidelines
+	* HACKING (Commit log requirements): Point to Guile's
+	http://www.gnu.org/software/guile/changelogs/guile-changelogs_3.html.
+	Mention that a bit of prose can be welcome.
+
+2009-07-11  Jim Meyering  <meyering@redhat.com>
+
+	tail: adjust type of a local variable
+	* src/tail.c (tail_forever_inotify): Declare "len" to be of type
+	size_t, not ssize_t, since the former is what safe_read returns.
+
+2009-07-09  Jim Meyering  <meyering@redhat.com>
+
+	tests: avoid false-positive cp/link-heap failure
+	* tests/cp/link-heap: Increase address space limit from 14000KB
+	to 16000KB, to avoid failure with Debian unstable's libc6-dev-2.9-19
+
+	build: avoid build warn/failure due to -Wstack-protector
+	* configure.ac: Do not enable -Wstack-protector.
+	Otherwise, at least df.c would provoke a warning.
+
+2009-07-08  Ondřej Vašík  <ovasik@redhat.com>
+
+	copy.c: remove a duplicate expression
+	* src/copy.c (copy_attr_error): remove a redundant expression
+	added in commit e0cf592f, 2009-04-27, "factor out test for errno ...".
+
+2009-07-08  Jim Meyering  <meyering@redhat.com>
+
+	build: update from gnulib
+	* gnulib: Update submodule to latest.
+
+	tail: use size_t for counter and index variables, ...
+	* src/tail.c (any_live_files): ... not "int" or even unsigned int
+	(tail_forever, tail_forever_inotify, main): Likewise.
+
+	tail: declare "file descriptor" variable to be "int", not size_t
+	* src/tail.c (tail_forever_inotify): Use "int", not size_t
+	as the type of a file descriptor variable.
+
+2009-07-04  Jim Meyering  <meyering@redhat.com>
+
+	move argv-iter module to gnulib
+	* gl/lib/argv-iter.c: Remove file.
+	* gl/lib/argv-iter.h: Remove file.
+	* gl/modules/argv-iter: Remove file.
+	* gl/modules/argv-iter-tests: Remove file.
+	* gl/tests/test-argv-iter.c: Remove file.
+	* gnulib: Update submodule, to get argv-iter
+
+2009-07-04  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	tests: refactor code to use require_proc_pid_status_
+	* tests/tail-2/tail-n0f: Read the process status using the test-lib.sh
+	require_proc_pid_status_ function.
+
+	tests: use the "nobody" user's group as the default group id
+	* tests/chroot/credentials: Use the group id, not its name.
+	* tests/test-lib.sh (NON_ROOT_GROUP): Use the "nobody" user's group in
+	place of "nogroup".
+
+2009-07-03  Jim Meyering  <meyering@redhat.com>
+
+	build: update from gnulib
+	* gnulib: Update submodule to latest.
+
+2009-07-03  Pádraig Brady  <P@draigBrady.com>
+
+	sort: allow SI and IEC units on separate human sort fields
+	* src/sort.c: Store the si_present state per key rather than globally
+	* tests/misc/sort: Add a check that would have previously failed.
+	Also add a test to demonstrate that invalid IEC/SI mixtures are not
+	always noticed when they're not significant to the sort.
+
+2009-07-03  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	tail: avoid an inotify portability problem in kernels prior to 2.6.21
+	* src/tail.c (tail_forever_inotify): Handle the special case in which
+	an old inotify watcher returns 0.  Affects kernels in [2.6.13, 2.6.21).
+
+2009-07-03  Jim Meyering  <meyering@redhat.com>
+
+	tests: tail-2/wait: rename internal file name
+	* tests/tail-2/wait: Rename file from not_accessible to unreadable,
+	since all the test cares about is readability.
+
+2009-07-03  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	tests: tail-2/wait: don't fail when run as root
+	* tests/tail-2/wait: Ensure that the unreadable file really is not
+	readable before trying to run "tail -f" on it.
+
+2009-07-03  Pádraig Brady  <P@draigBrady.com>
+
+	doc: update the info on sort -b and -k
+	* doc/coreutils.texi (sort invocation): Mention in the description
+	of -b, that the locale can also affect whether blanks are significant.
+	Update the list of ordering options for a --key that cause it
+	to not inherit any global ordering options.
+	Update the list of ordering options that implicitly skip whitespace.
+
+	maint: generalize the development prerequisites docs
+	* README-hacking: Add a little more high level info and
+	merge notes on specific developer prerequisites into README-prereq
+	* README-prereq: Remove the Fedora 8 specific information
+	and generalize the information to be applicable to any system.
+
+2009-06-29  Jim Meyering  <meyering@redhat.com>
+
+	tail: add comments noting potential inotify-related problems
+	* src/tail.c (tail_forever_inotify): Add two FIXME comments.
+
+2009-06-28  Jim Meyering  <meyering@redhat.com>
+
+	maint: bootstrap: merge changes from gnulib
+	* bootstrap: Indent using spaces, not TABs.
+
+	maint: bootstrap: sync submodule usage from gnulib
+	* bootstrap: Config for git submodule use only if .gitmodules exists.
+
+	maint: bootstrap: split a few long lines
+	* bootstrap (found_aux_dir): Avoid lines longer than 80 columns.
+
+2009-06-27  Jim Meyering  <meyering@redhat.com>
+
+	maint: don't change COPYING
+	* COPYING: Don't modify Copyright date list in imported file.
+	This file is one of very few exceptions in that we version-control it,
+	even though its primary source is another package.
+	Spotted by Eric Blake.
+
+	maint: add a rule to automate the annual copyright-year-update process
+	* build-aux/update-copyright: New file.
+	* Makefile.am (changelog_etc): Add update-copyright.
+	(update-copyright): New rule.
+
+2009-06-27  Pádraig Brady  <P@draigBrady.com>
+
+	stdbuf: fix to stop -i option causing an assertion
+	* src/stdbuf.c (main): Fix the array bounds check in the assert
+	* tests/misc/stdbuf: Add a test for all standard streams
+
+2009-06-25  Pádraig Brady  <P@draigBrady.com>
+
+	doc: clarify the tail inotify NEWS
+	* NEWS: Say why inotify was used
+
+2009-06-23  Jim Meyering  <meyering@redhat.com>
+
+	maint: update all Copyright year lists to include 2009
+
+	maint: remove old TODO files
+	* lib/TODO: Remove file.
+	* tests/join/TODO: Likewise.
+
+	doc: README-hacking tweak
+	* README-hacking: Move the "While building..." sentence down
+	to where it belongs.
+
+	tests: tail-2/pid: include more info upon failure
+	* tests/tail-2/pid: Print unexpected $state upon failing.
+
+2009-06-20  Jim Meyering  <meyering@redhat.com>
+
+	doc: typo fix in README-hacking
+	* README-hacking: Fix a typo.
+	Don't make building from a git-cloned tree sound so hard.
+
+	build: update from gnulib (hash module updates; maint.mk tweak)
+	* gnulib: Update submodule to latest.
+
+2009-06-17  Jim Meyering  <meyering@redhat.com>
+
+	doc: fix a typo
+	* doc/coreutils.texi (stdbuf invocation): Insert missing "to".
+
+2009-06-17  Pádraig Brady  <P@draigBrady.com>
+
+	stdbuf: A new program to run a command with modified stdio buffering
+	* AUTHORS: Register as the author.
+	* NEWS: Mention this change.
+	* README: Add stdbuf command to list.
+	* configure.ac: Only enable on ELF systems with GCC.
+	* cfg.mk (sc_system_h_headers): Use VC_LIST_EXCEPT rather than
+	VC_LIST, so we can add an exception, if needed.
+	* .x-sc_system_h_headers: New file.  Exempt libstdbuf.c.
+	* Makefile.am (syntax_check_exceptions): Add .x-sc_system_h_headers.
+	* doc/coreutils.texi (stdbuf invocation): Add stdbuf info.
+	* man/.gitignore: Ignore generated manpage.
+	* src/.gitignore: Ignore stdbuf and libstdbuf.so binaries.
+	* man/Makefile.am (stdbuf.1): Add dependency.
+	* man/stdbuf.x: New file with example usage.
+	* po/POTFILES.in: Reference new command and shared library sources.
+	* src/Makefile.am (build_if_possible__progs): Add stdbuf and libstdbuf,
+	(pkglib_PROGRAMS): Reference optional shared lib,
+	(libstdbuf_so_LDADD): Ensure we don't link with non PIC libcoreutils.a.
+	(libstdbuf_so_LDFLAGS): Add -shared GCC option,
+	(libstdbuf_so_CFLAGS): Add -fPIC GCC option.
+	(check-README): Exclude libstbuf.
+	(check-AUTHORS): ditto.
+	(sc_tight_scope): Exclude functions starting with __.
+	* src/libstdbuf.c: The LD_PRELOAD shared library to control buffering.
+	* src/stdbuf.c: New file to setup env variables before execing command.
+	* tests/Makefile.am: Reference new test file.
+	* tests/misc/help-version: Set expected exit codes.
+	* tests/misc/invalid-opt: ditto.
+	* tests/misc/stdbuf: Add 9 tests.
+
+2009-06-16  Jim Meyering  <meyering@redhat.com>
+
+	doc: cp: describe an oddity of combining -H/-L and --preserve=links
+	* doc/coreutils.texi (cp invocation) [-L]: Elaborate.
+	[--preserve=links]: Remove comments saying that we need documentation
+	for just this situation.  Provide more explanation and examples.
+	Reported by Brian M. Carlson in http://bugs.debian.org/525048.
+
+2009-06-15  Jim Meyering  <meyering@redhat.com>
+
+	maint: revert last change: we're not ready for "local" in scripts, yet
+	Revert "use a local var: more readable"
+	This reverts commit c0d82452883a10911c9cbc69c84144d99b7e6b08.
+
+	use a local var: more readable
+
+2009-06-15  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	tail: use inotify if it is available
+	* NEWS: Document the new feature.
+	* m4/jm-macros.m4: Check if inotify is present.
+	* src/tail.c (tail_forever_inotify): New function.
+	(main): Use the inotify-based function, if possible.
+	* tests/Makefile.am: Add new tests for tail.
+	* tests/test-lib.sh (require_proc_pid_status_, get_process_status_):
+	New functions.
+	* tests/tail-2/pid: New file.
+	* tests/tail-2/wait: New file.
+	* tests/tail-2/tail-n0f: Refactor code into the test-lib.sh
+	require_proc_pid_status_ function.
+
+2009-06-13  Jim Meyering  <meyering@redhat.com>
+
+	diag: say "failed to...", rather than "cannot..." in a few diagnostics
+	* src/chroot.c (main): ...it's more precise.
+	* src/nohup.c (main): Likewise.
+	* src/setuidgid.c (main): Likewise.
+	* src/timeout.c (main): Likewise.
+
+2009-06-13  Cliff Miller  <cbm@whatexit.org>
+
+	sort: Ignore fields where end position is before the start position
+	* NEWS: Mention the fix
+	* THANKS: Add Cliff Miller
+	* src/sort.c (keycompare): Ensure lima >= texta
+	* tests/misc/sort: Add 3 corresponding tests
+
+2009-06-11  Pádraig Brady  <P@draigBrady.com>
+
+	tests: ls --color, permissions override hardlink coloring
+	* tests/ls/multihardlink: Add a test case to demonstrate
+	and test this non obvious behavior.
+
+2009-06-11  Kamil Dudka  <kdudka@redhat.com>
+
+	ls --color: do not colorize files with multiple hard links by default
+	* src/ls.c: Rename hl->mh, do not colorize files with multiple
+	hard links by default.
+	* src/dircolors.c: Rename HARDLINK -> MULTIHARDLINK, hl -> mh.
+	* src/dircolors.hin: Do not colorize files with multiple hard links by
+	default.
+	* tests/Makefile.am: Rename the test case accordingly.
+	* tests/ls/multihardlink: Additionally test ls' default behavior
+	and factor out some duplication.
+	* NEWS: Mention the change in behavior.
+
+2009-06-08  Pádraig Brady  <P@draigBrady.com>
+
+	maint: Add a syntax-check to ensure all .x-sc_ files are distributed
+	* Makefile.am: Add a couple of missing entries to
+	syntax_check_exceptions for distribution.
+	* cfg.mk: Add a rule to ensure the syntax_check_exceptions list
+	stays in sync with the .x-sc_* files in the repository.
+
+2009-06-07  Jim Meyering  <meyering@redhat.com>
+
+	build: update from gnulib
+	* gnulib: Update submodule to latest.
+
+	sort: die immediately upon heap allocation failure
+	* src/sort.c (register_proc): Handle hash_insert failure.
+
+2009-06-04  Mike Frysinger  <vapier@gentoo.org>
+
+	dircolors: add screen-256color-bce to TERM list
+	* src/dircolors.hin: Add screen-256color-bce.
+
+2009-06-03  Jim Meyering  <meyering@redhat.com>
+
+	doc: HACKING: minor adjustments, additions
+	* HACKING (Amending...): Remove spurious "-e" used with commit --amend.
+	(log message policy): Mention the 72-column limit.
+	"build:" and "maint:" are common prefixes, these days.
+
+	doc: adjust wording in README-prereq
+
+	dircolors: recognize .xz, .txz, .tbz and .tlz suffixes
+	* src/dircolors.hin: Add .xz, .txz, .tbz and .tlz.
+
+	doc: use newer URL for XZ utils
+	* README-hacking: Use <http://tukaani.org/xz/>
+	* README-prereq: Mention xz, not lzma.
+
+2009-06-03  Matěj Cepl  <mcepl@redhat.com>
+
+	doc: adjust README-prereq instructions
+	* README-prereq: Mention new requirement on automake-1.11,
+	with its new location and updated dependency on autoconf-2.62.
+	Remove the reference to coreutils-7.0 so that this file
+	implicitly refers to the latest or release version of coreutils.
+	Fix and clarify the instructions for updating the $PATH.
+
+2009-06-02  Jim Meyering  <meyering@redhat.com>
+
+	doc: HACKING: mention the GNU Coding Standards
+	* HACKING (Add documentation): Add a link to the GCS.
+
+	build: no longer list gnulib's "memchr" module as obsolete
+	* bootstrap.conf (obsolete_gnulib_modules): Remove memchr from
+	the list, now that it fixes a problem in some modern C libraries.
+	(gnulib_modules): Add it here.
+
+	build: make generated man/*.1 files read-only
+	This should help people notice that they are generated.
+	Note: each file already has a comment to that effect from help2man.
+	* man/Makefile.am (.x.1): Make generated files read-only.
+	Also, don't redirect directly to the target, $@.
+
+	build (man/): use automake's new $(AM_V_GEN) variable
+	* man/Makefile.am (.x.1, check-x-vs-1, check-programs-vs-x):
+	Mark with $(AM_V_GEN), so that automake-1.11 prints
+	"GEN $@" by default (stick with "GEN" in spite of the latter two
+	rules not officially generating anything -- they're just tests).
+
+	chroot: make --groups= work without --userspec=;  be more robust
+	* src/chroot.c (set_additional_groups): Add comments.
+	Given an empty or all-comma group list, diagnose it and return nonzero.
+	When more than one group is invalid, diagnose all of them,
+	not just the first.
+	(main): Honor --groups= also when --userspec= is not specified.
+	Now that set_additional_groups consistently diagnoses its failures,
+	don't diagnose it separately here.
+	* tests/chroot/credentials: Do not invoke with an empty group list.
+
+	chroot: don't set bogus user-ID or group-ID for --u=U: or --u=:G
+	* src/chroot.c (main): Initialize both "uid" and "gid".  To -1.
+	This also allows one to set the user-ID or primary group-ID to 0,
+	in case it's not that already.
+	* tests/chroot/credentials: Test for the above.
+
+	chroot: set-*-ID failure must provoke nonzero exit before execvp
+	* src/chroot.c (main): Exit upon set-group-ID or set-user-ID failure.
+
+	tests: use "nobody" as the default group name in chroot test
+	* tests/test-lib.sh (NON_ROOT_GROUP): Use "nobody", not "nogroup".
+
+	build: make distcheck rules use --enable-gcc-warnings
+	* dist-check.mk (warn_cflags): Remove definition, now that it's
+	been subsumed by --enable-gcc-warnings.
+	(my-distcheck): Use configure with --enable-gcc-warnings and remove
+	use of $(warn_cflags).
+
+2009-05-30  Eric Blake  <ebb9@byu.net>
+
+	head, tail: make --help less ambiguous
+	* src/head.c (usage): Use -n K, not -n N, to avoid confusion.
+	* src/tail.c (usage): Likewise.
+	* doc/coreutils.texi (head invocation, tail invocation):
+	Likewise.
+	Reported by Christophe Lyon.
+
+2009-05-26  Michael Speer  <knomenet@gmail.com>
+
+	sort: new --human-numeric-sort option to sort KiB MB etc.
+	* NEWS: Document the new option
+	* doc/coreutils.texi (sort invocation): ditto
+	* src/sort.c (main): handle the new --human-numeric-sort option (-h).
+	(human_numcompare): A new function to compare SI and IEC suffixes
+	before falling back to the standard --numeric comparison.
+	(find_unit_order): A new helper function to find the order
+	of magnitude of a number string as determined by its suffix.
+	(check_mixed_SI_IEC): A new helper function to exit with error
+	if both SI and IEC suffixes are presented.
+	* tests/misc/sort: Add 8 tests to test the new functionality.
+	* THANKS: Update
+
+2009-05-26  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	chroot: accept new options --userspec=U:G and --groups=G1,G2,G3
+	* NEWS: Note chroot's new options.
+	* doc/coreutils.texi: Document them.
+	* src/chroot.c (main): Add support for --userspec and --groups.
+	* tests/Makefile.am (root-tests): Add chroot/credentials.
+	* tests/chroot/credentials: New file.
+	* tests/test-lib.sh: Define NON_ROOT_GROUP to a default value.
+
+2009-05-18  Pádraig Brady  <P@draigBrady.com>
+
+	doc: clarify the operation of the comm -123 parameters
+	* src/comm.c (usage): give more information on the -123 parameters,
+	with examples to show that they can be combined.
+	Addresses <http://savannah.gnu.org/bugs/?24974>.
+	* doc/coreutils.texi (comm invocation): Mention that the
+	column separators are suppressed along with the column.
+	Suggestion from Dan Jacobson.
+	* man/comm.x: Reference other commands that match adjacent lines.
+	* man/join.x: ditto.
+	* man/uniq.x: ditto.
+
+2009-05-18  Jim Meyering  <meyering@redhat.com>
+
+	build: require automake-1.11
+	* bootstrap.conf (buildreq): Require automake-1.11, not 1.10b,
+	for our use of AM_SILENT_RULES.
+	* configure.ac (AM_INIT_AUTOMAKE): Likewise.
+
+2009-05-17  Jim Meyering  <meyering@redhat.com>
+
+	maint: HACKING: mention a few more useful git commands
+	* HACKING (Miscellaneous useful git commands): Add a few.
+
+	build: avoid new "make distcheck" failure with gcc 4.5.0 20090517
+	* dist-check.mk (warn_cflags): Add -Wno-enum-compare.
+
+	build: avoid new warnings from gcc 4.5.0 20090517
+	* configure.ac: Add an explicit -Wno-logical-op,
+	now that not listing -Wlogical-op is insufficient.
+
+	maint: use ARRAY_CARDINALITY more
+	* src/sort.c (main): Use ARRAY_CARDINALITY, rather than open-coding it.
+	* src/factor.c (WHEEL_END): Likewise.
+	* src/csplit.c (main): Likewise.
+	* src/od.c: Likewise,
+	* src/ls.c (main): Likewise.
+	(N_ENTRIES): Remove definition.  Use ARRAY_CARDINALITY instead.
+	* src/dircolors.c: Likewise.
+	(array_len): Remove definition.
+
+	build: tr: avoid a warning due to newer gcc's -Wenum-compare
+	* src/tr.c (N_CHAR_CLASSES): Remove anonymous enum definition.
+	(look_up_char_class): Use ARRAY_CARDINALITY, rather than N_CHAR_CLASSES.
+
+	maint: define ARRAY_CARDINALITY in system.h
+	* src/system.h (ARRAY_CARDINALITY): Define if not already defined.
+
+	build: turn off -Wlong-long
+	* configure.ac: With --enable-gcc-warnings, -Wlong-long would
+	cause compilation failure due to inclusion of lib/gethrxtime.h.
+	Initialize "nw".
+
+2009-05-16  Jim Meyering  <meyering@redhat.com>
+
+	maint: cfg.mk: remove now-unnecessary gnulib_dir definition
+	* cfg.mk (gnulib_dir): Remove definition, now that gnulib's
+	maint.mk provides the default we want.
+	* gnulib: Update submodule to latest.
+
+2009-05-15  Pádraig Brady  <P@draigBrady.com>
+
+	tests: fix date-next-dow failure on older systems
+	* tests/misc/date-next-dow: In the strftime call use %Y-%m-%d
+	rather than the newer %F equivalent which is not available
+	on Solaris 8 for example.
+
+2009-05-14  Jim Meyering  <meyering@redhat.com>
+
+	build: update from gnulib, for rename.m4 fix, improved tests, etc.
+	* gnulib: Update submodule to latest.
+
+	maint: README-release: minor improvements
+	* README-release: Mention gnu_ftp_host-{alpha,...} settings in cfg.mk.
+	Now that XZ_OPT is set via maint.mk, don't mention it here.
+
+2009-05-11  Eric Blake  <ebb9@byu.net>
+
+	truncate: fix bug in use of isspace
+	* src/truncate.c (main): Pass unsigned characters to isspace.
+	* NEWS: Mention this.
+
 2009-05-07  Jim Meyering  <meyering@redhat.com>
+
+	post-release administrivia
+	* NEWS: Add header line for next release.
+	* .prev-version: Record previous version.
+	* cfg.mk (old_NEWS_hash): Auto-update.
 
 	version 7.4
 	* NEWS (Build-related): Mention make check fixes.

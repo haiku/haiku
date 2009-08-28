@@ -1,5 +1,5 @@
 /* Iterate over arguments from argv or --files0-from=FILE
-   Copyright (C) 2008 Free Software Foundation, Inc.
+   Copyright (C) 2008-2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -109,9 +109,3 @@ argv_iter_free (struct argv_iterator *ai)
     free (ai->tok);
   free (ai);
 }
-
-/*
- * Local variables:
- *  indent-tabs-mode: nil
- * End:
- */

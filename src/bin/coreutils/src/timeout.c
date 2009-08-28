@@ -1,5 +1,5 @@
 /* timeout -- run a command with bounded time
-   Copyright (C) 2008 Free Software Foundation, Inc.
+   Copyright (C) 2008-2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -301,7 +301,7 @@ main (int argc, char **argv)
 
       /* exit like sh, env, nohup, ...  */
       exit_status = (errno == ENOENT ? EXIT_ENOENT : EXIT_CANNOT_INVOKE);
-      error (0, errno, _("cannot run command %s"), quote (argv[0]));
+      error (0, errno, _("failed to run command %s"), quote (argv[0]));
       return exit_status;
     }
   else

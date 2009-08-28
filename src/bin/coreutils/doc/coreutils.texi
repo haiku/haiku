@@ -105,6 +105,7 @@
 * sort: (coreutils)sort invocation.             Sort text files.
 * split: (coreutils)split invocation.           Split into fixed-size pieces.
 * stat: (coreutils)stat invocation.             Report file(system) status.
+* stdbuf: (coreutils)stdbuf invocation.         Modify stdio buffering.
 * stty: (coreutils)stty invocation.             Print/change terminal settings.
 * su: (coreutils)su invocation.                 Modify user and group ID.
 * sum: (coreutils)sum invocation.               Print traditional checksum.
@@ -197,7 +198,7 @@ Free Documentation License''.
 * User information::                   id logname whoami groups users who
 * System context::                     date uname hostname hostid uptime
 * SELinux context::                    chcon runcon
-* Modified command invocation::        chroot env nice nohup su timeout
+* Modified command invocation::        chroot env nice nohup stdbuf su timeout
 * Process control::                    kill
 * Delaying::                           sleep
 * Numeric operations::                 factor seq
@@ -321,7 +322,7 @@ Special file types
 * mkdir invocation::            Make directories
 * mkfifo invocation::           Make FIFOs (named pipes)
 * mknod invocation::            Make block or character special files
-* readlink invocation::         Print the referent of a symbolic link
+* readlink invocation::         Print value of a symlink or canonical file name
 * rmdir invocation::            Remove empty directories
 * unlink invocation::           Remove files via unlink syscall
 
@@ -425,6 +426,7 @@ System context
 * Examples of date::             Examples.
 
 SELinux context
+
 * chcon invocation::             Change SELinux context of file
 * runcon invocation::            Run a command in specified SELinux context
 
@@ -434,6 +436,7 @@ Modified command invocation
 * env invocation::               Run a command in a modified environment
 * nice invocation::              Run a command with modified niceness
 * nohup invocation::             Run a command immune to hangups
+* stdbuf invocation::            Run a command with modified I/O buffering
 * su invocation::                Run a command with substitute user and group ID
 * timeout invocation::           Run a command with a time limit
 
@@ -1685,9 +1688,9 @@ Analogous to @option{--body-numbering}.
 Analogous to @option{--body-numbering}.
 
 @item -i @var{number}
-@itemx --page-increment=@var{number}
+@itemx --line-increment=@var{number}
 @opindex -i
-@opindex --page-increment
+@opindex --line-increment
 Increment line numbers by @var{number} (default 1).
 
 @item -l @var{number}
@@ -2004,7 +2007,7 @@ address.
 @exitstatus
 
 @node base64 invocation
-@section @command{base64}: Transform data into printable data.
+@section @command{base64}: Transform data into printable data
 
 @pindex base64
 @cindex base64 encoding
@@ -2653,22 +2656,22 @@ The program accepts the following options.  Also see @ref{Common options}.
 
 @table @samp
 
-@item -c @var{n}
-@itemx --bytes=@var{n}
+@item -c @var{k}
+@itemx --bytes=@var{k}
 @opindex -c
 @opindex --bytes
-Print the first @var{n} bytes, instead of initial lines.
-However, if @var{n} starts with a @samp{-},
-print all but the last @var{n} bytes of each file.
-@multiplierSuffixes{n}
+Print the first @var{k} bytes, instead of initial lines.
+However, if @var{k} starts with a @samp{-},
+print all but the last @var{k} bytes of each file.
+@multiplierSuffixes{k}
 
-@itemx -n @var{n}
-@itemx --lines=@var{n}
+@itemx -n @var{k}
+@itemx --lines=@var{k}
 @opindex -n
 @opindex --lines
-Output the first @var{n} lines.
-However, if @var{n} starts with a @samp{-},
-print all but the last @var{n} lines of each file.
+Output the first @var{k} lines.
+However, if @var{k} starts with a @samp{-},
+print all but the last @var{k} lines of each file.
 Size multiplier suffixes are the same as with the @option{-c} option.
 
 @item -q
@@ -2738,14 +2741,14 @@ The program accepts the following options.  Also see @ref{Common options}.
 
 @table @samp
 
-@item -c @var{n}
-@itemx --bytes=@var{n}
+@item -c @var{k}
+@itemx --bytes=@var{k}
 @opindex -c
 @opindex --bytes
-Output the last @var{n} bytes, instead of final lines.
-However, if @var{n} starts with a @samp{+}, start printing with the
-@var{n}th byte from the start of each file, instead of from the end.
-@multiplierSuffixes{n}
+Output the last @var{k} bytes, instead of final lines.
+However, if @var{k} starts with a @samp{+}, start printing with the
+@var{k}th byte from the start of each file, instead of from the end.
+@multiplierSuffixes{k}
 
 @item -f
 @itemx --follow[=@var{how}]
@@ -2850,13 +2853,13 @@ number of seconds between when tail prints the last pre-rotation lines
 and when it prints the lines that have accumulated in the new log file.
 This option is meaningful only when following by name.
 
-@itemx -n @var{n}
-@itemx --lines=@var{n}
+@itemx -n @var{k}
+@itemx --lines=@var{k}
 @opindex -n
 @opindex --lines
-Output the last @var{n} lines.
-However, if @var{n} starts with a @samp{+}, start printing with the
-@var{n}th line from the start of each file, instead of from the end.
+Output the last @var{k} lines.
+However, if @var{k} starts with a @samp{+}, start printing with the
+@var{k}th line from the start of each file, instead of from the end.
 Size multiplier suffixes are the same as with the @option{-c} option.
 
 @item -q
@@ -3721,7 +3724,9 @@ so portable shell scripts should specify global options first.
 @vindex LC_CTYPE
 Ignore leading blanks when finding sort keys in each line.
 By default a blank is a space or a tab, but the @env{LC_CTYPE} locale
-can change this.
+can change this.  Note blanks may be ignored by your locale's collating
+rules, but without this option they will be significant for character
+positions specified in keys with the @option{-k} option.
 
 @item -d
 @itemx --dictionary-order
@@ -3784,6 +3789,21 @@ Plus infinity.
 Use this option only if there is no alternative; it is much slower than
 @option{--numeric-sort} (@option{-n}) and it can lose information when
 converting to floating point.
+
+@item -h
+@itemx --human-numeric-sort
+@itemx --sort=human-numeric
+@opindex -h
+@opindex --human-numeric-sort
+@opindex --sort
+@cindex human numeric sort
+@vindex LC_NUMERIC
+Sort numerically, as per the @option{--numeric-sort} option below, and in
+addition handle IEC or SI suffixes like MiB, MB etc (@ref{Block size}).
+Note a mixture of IEC and SI suffixes is not supported and will
+be flagged as an error.  Also the numbers must be abbreviated uniformly.
+I.E. values with different precisions like 6000K and 5M will be sorted
+incorrectly.
 
 @item -i
 @itemx --ignore-nonprinting
@@ -3916,7 +3936,7 @@ according to different rules; see below for details.  Keys can span
 multiple fields.
 
 Example:  To sort on the second field, use @option{--key=2,2}
-(@option{-k 2,2}).  See below for more examples.
+(@option{-k 2,2}).  See below for more notes on keys and more examples.
 
 @item --batch-size=@var{nmerge}
 @opindex --batch-size
@@ -4085,15 +4105,15 @@ affect the meaning of character positions in field specifications in
 obscure cases.  The only fix is to add an explicit @option{-b}.
 
 A position in a sort field specified with @option{-k} may have any
-of the option letters @samp{Mbdfinr} appended to it, in which case the
-global ordering options are not used for that particular field.  The
+of the option letters @samp{MbdfghinRrV} appended to it, in which case no
+global ordering options are inherited by that particular field.  The
 @option{-b} option may be independently attached to either or both of
 the start and end positions of a field specification, and if it is
 inherited from the global options it will be attached to both.
 If input lines can contain leading or adjacent blanks and @option{-t}
-is not used, then @option{-k} is typically combined with @option{-b},
-@option{-g}, @option{-M}, or @option{-n}; otherwise the varying
-numbers of leading blanks in fields can cause confusing results.
+is not used, then @option{-k} is typically combined with @option{-b} or
+an option that implicitly ignores leading blanks (@samp{MghnV}) as otherwise
+the varying numbers of leading blanks in fields can cause confusing results.
 
 If the start position in a sort field specifier falls after the end of
 the line or after the end field, the field is empty.  If the @option{-b}
@@ -4237,6 +4257,17 @@ by the sort operation.
 @c @example
 @c printf 'c\n\nb\n\na\n'|perl -0pe 's/\n\n/\n\0/g'|sort -z|perl -0pe 's/\0/\n/g'
 @c @end example
+
+@item
+Use the common @acronym{DSU, Decorate Sort Undecorate} idiom to
+sort lines according to their length.
+
+@example
+awk '@{print length, $0@}' /etc/passwd | sort -n | cut -f2- -d' '
+@end example
+
+In general this technique can be used to sort data that the @command{sort}
+command does not support, or is inefficient at, sorting directly.
 
 @item
 Shuffle a list of directories, but preserve the order of files within
@@ -4565,7 +4596,7 @@ Columns are separated by a single TAB character.
 @opindex -2
 @opindex -3
 The options @option{-1}, @option{-2}, and @option{-3} suppress printing of
-the corresponding columns.  Also see @ref{Common options}.
+the corresponding columns (and separators).  Also see @ref{Common options}.
 
 Unlike some other comparison utilities, @command{comm} has an exit
 status that does not depend on the result of the comparison.
@@ -7373,6 +7404,9 @@ Make hard links instead of copies of non-directories.
 @opindex -L
 @opindex --dereference
 Follow symbolic links when copying from them.
+With this option, @command{cp} cannot create a symbolic link.
+For example, a symlink (to regular file) in the source tree will be copied to
+a regular file in the destination tree.
 
 @item -n
 @itemx --no-clobber
@@ -7420,8 +7454,27 @@ not yet take advantage of that.
 @itemx links
 Preserve in the destination files
 any links between corresponding source files.
-@c Give examples illustrating how hard links are preserved.
-@c Also, show how soft links map to hard links with -L and -H.
+Note that with @option{-L} or @option{-H}, this option can convert
+symbolic links to hard links.  For example,
+@example
+$ mkdir c; : > a; ln -s a b; cp -aH a b c; ls -i1 c
+74161745 a
+74161745 b
+@end example
+@noindent
+Note the inputs: @file{b} is a symlink to regular file @file{a},
+yet the files in destination directory, @file{c/}, are hard-linked.
+Since @option{-a} implies @option{--preserve=links}, and since @option{-H}
+tells @command{cp} to dereference command line arguments, it sees two files
+with the same inode number, and preserves the perceived hard link.
+
+Here is a similar example that exercises @command{cp}'s @option{-L} option:
+@smallexample
+$ mkdir b c; (cd b; : > a; ln -s a b); cp -aL b c; ls -i1 c/b
+74163295 a
+74163295 b
+@end smallexample
+
 @itemx context
 Preserve SELinux security context of the file. @command{cp} will fail
 if the preserving of SELinux security context is not succesful.
@@ -7489,6 +7542,15 @@ non-@sc{gnu} systems, @option{-r} implies the equivalent of
 Also, it is not portable to use @option{-R} to copy symbolic links
 unless you also specify @option{-P}, as @acronym{POSIX} allows
 implementations that dereference symbolic links by default.
+
+@item --reflink
+@opindex --reflink
+Perform a lightweight, copy-on-write (COW) copy.
+Copying with this option can succeed only on some relatively new file systems.
+Once it has succeeded, beware that the source and destination files
+share the same disk data blocks as long as they remain unmodified.
+Thus, if a disk I/O error affects data blocks of one of the files,
+the other suffers the exact same fate.
 
 @item --remove-destination
 @opindex --remove-destination
@@ -7808,6 +7870,10 @@ same time.
 @opindex direct
 @cindex direct I/O
 Use direct I/O for data, avoiding the buffer cache.
+Note that the kernel may impose restrictions on read or write buffer sizes.
+For example, with an ext4 destination file system and a linux-based kernel,
+using @samp{oflag=direct} will cause writes to fail with @code{EINVAL} if the
+output buffer size is not a multiple of 512.
 
 @item directory
 @opindex directory
@@ -8642,7 +8708,7 @@ Besides directories, other special file types include named pipes
 * mkdir invocation::            Make directories.
 * mkfifo invocation::           Make FIFOs (named pipes).
 * mknod invocation::            Make block or character special files.
-* readlink invocation::         Print the referent of a symbolic link.
+* readlink invocation::         Print value of a symlink or canonical file name.
 * rmdir invocation::            Remove empty directories.
 * unlink invocation::           Remove files via the unlink syscall
 @end menu
@@ -9087,10 +9153,14 @@ Set the default SELinux security context to be used for created files.
 
 
 @node readlink invocation
-@section @command{readlink}: Print the referent of a symbolic link
+@section @command{readlink}: Print value of a symlink or canonical file name
 
 @pindex readlink
 @cindex displaying value of a symbolic link
+@cindex canonical file name
+@cindex canonicalize a file name
+@pindex realpath
+@findex realpath
 
 @command{readlink} may work in one of two supported modes:
 
@@ -9169,6 +9239,9 @@ Report error messages.
 @end table
 
 The @command{readlink} utility first appeared in OpenBSD 2.1.
+
+There is a @command{realpath} command on some systems
+which operates like @command{readlink} in canonicalize mode.
 
 @exitstatus
 
@@ -13066,185 +13139,13 @@ This section describes commands that print or change system-wide
 information.
 
 @menu
-* arch invocation::             Print machine hardware name.
 * date invocation::             Print or set system date and time.
+* arch invocation::             Print machine hardware name.
 * uname invocation::            Print system information.
 * hostname invocation::         Print or set system name.
 * hostid invocation::           Print numeric host identifier.
-* uptime invocation::           Print system uptime and load
+* uptime invocation::           Print system uptime and load.
 @end menu
-
-@node SELinux context
-@chapter SELinux context
-
-@cindex SELinux context
-@cindex SELinux, context
-@cindex commands for SELinux context
-
-This section describes commands for operations with SELinux
-contexts.
-
-@menu
-* chcon invocation::            Change SELinux context of file
-* runcon invocation::           Run a command in specified SELinux context
-@end menu
-
-@node chcon invocation
-@section @command{chcon}: Change SELinux context of file.
-
-@pindex chcon
-@cindex changing security context
-@cindex change SELinux context
-
-@command{chcon} changes the SELinux security context of the selected files.
-Synopses:
-
-@smallexample
-chcon [@var{option}]@dots{} @var{context} @var{file}@dots{}
-chcon [@var{option}]@dots{} [-u @var{user}] [-r @var{role}] [-l @var{range}] [-t @var{type}] @var{file}@dots{}
-chcon [@var{option}]@dots{} --reference=@var{rfile} @var{file}@dots{}
-@end smallexample
-
-Change the SELinux security context of each @var{file} to @var{context}.
-With @option{--reference}, change the security context of each @var{file}
-to that of @var{rfile}.
-
-The program accepts the following options.  Also see @ref{Common options}.
-
-@table @samp
-
-@item -h
-@itemx --no-dereference
-@opindex -h
-@opindex --no-dereference
-@cindex no dereference
-Affect symbolic links instead of any referenced file.
-
-@item --reference=@var{rfile}
-@opindex --reference
-@cindex reference file
-Use @var{rfile}'s security context rather than specifying a @var{context} value.
-
-@item -R
-@itemx --recursive
-@opindex -R
-@opindex --recursive
-Operate on files and directories recursively.
-
-@choptH
-@xref{Traversing symlinks}.
-
-@choptL
-@xref{Traversing symlinks}.
-
-@choptP
-@xref{Traversing symlinks}.
-
-@item -v
-@itemx --verbose
-@opindex -v
-@opindex --verbose
-@cindex diagnostic
-Output a diagnostic for every file processed.
-
-@item -u @var{user}
-@itemx --user=@var{user}
-@opindex -u
-@opindex --user
-Set user @var{user} in the target security context.
-
-@item -r @var{role}
-@itemx --role=@var{role}
-@opindex -r
-@opindex --role
-Set role @var{role} in the target security context.
-
-@item -t @var{type}
-@itemx --type=@var{type}
-@opindex -t
-@opindex --type
-Set type @var{type} in the target security context.
-
-@item -l @var{range}
-@itemx --range=@var{range}
-@opindex -l
-@opindex --range
-Set range @var{range} in the target security context.
-
-@end table
-
-@exitstatus
-
-@node runcon invocation
-@section @command{runcon}: Run a command in specified SELinux context
-
-@pindex runcon
-@cindex run with security context
-
-
-@command{runcon} runs file in specified SELinux security context.
-
-Synopses:
-@smallexample
-runcon @var{context} @var{command} [@var{args}]
-runcon [ -c ] [-u @var{user}] [-r @var{role}] [-t @var{type}] [-l @var{range}] @var{command} [@var{args}]
-@end smallexample
-
-Run @var{command} with completely-specified @var{context}, or with
-current or transitioned security context modified by one or more of @var{level},
-@var{role}, @var{type} and @var{user}.
-
-If none of @option{-c}, @option{-t}, @option{-u}, @option{-r}, or @option{-l}
-is specified, the first argument is used as the complete context.
-Any additional arguments after @var{command}
-are interpreted as arguments to the command.
-
-With neither @var{context} nor @var{command}, print the current security context.
-
-The program accepts the following options.  Also see @ref{Common options}.
-
-@table @samp
-
-@item -c
-@itemx --compute
-@opindex -c
-@opindex --compute
-Compute process transition context before modifying.
-
-@item -u @var{user}
-@itemx --user=@var{user}
-@opindex -u
-@opindex --user
-Set user @var{user} in the target security context.
-
-@item -r @var{role}
-@itemx --role=@var{role}
-@opindex -r
-@opindex --role
-Set role @var{role} in the target security context.
-
-@item -t @var{type}
-@itemx --type=@var{type}
-@opindex -t
-@opindex --type
-Set type @var{type} in the target security context.
-
-@item -l @var{range}
-@itemx --range=@var{range}
-@opindex -l
-@opindex --range
-Set range @var{range} in the target security context.
-
-@end table
-
-@cindex exit status of @command{runcon}
-Exit status:
-
-@display
-126 if @var{command} is found but cannot be invoked
-127 if @command{runcon} itself fails or if @var{command} cannot be found
-the exit status of @var{command} otherwise
-@end display
 
 @node date invocation
 @section @command{date}: Print or set system date and time
@@ -14053,7 +13954,7 @@ options}.
 
 
 @node hostid invocation
-@section @command{hostid}: Print numeric host identifier.
+@section @command{hostid}: Print numeric host identifier
 
 @pindex hostid
 @cindex printing the host identifier
@@ -14107,6 +14008,178 @@ also include processes in the uninterruptible sleep state (that is,
 those processes which are waiting for disk I/O).  The Linux kernel
 includes uninterruptible processes.
 
+@node SELinux context
+@chapter SELinux context
+
+@cindex SELinux context
+@cindex SELinux, context
+@cindex commands for SELinux context
+
+This section describes commands for operations with SELinux
+contexts.
+
+@menu
+* chcon invocation::            Change SELinux context of file
+* runcon invocation::           Run a command in specified SELinux context
+@end menu
+
+@node chcon invocation
+@section @command{chcon}: Change SELinux context of file
+
+@pindex chcon
+@cindex changing security context
+@cindex change SELinux context
+
+@command{chcon} changes the SELinux security context of the selected files.
+Synopses:
+
+@smallexample
+chcon [@var{option}]@dots{} @var{context} @var{file}@dots{}
+chcon [@var{option}]@dots{} [-u @var{user}] [-r @var{role}] [-l @var{range}] [-t @var{type}] @var{file}@dots{}
+chcon [@var{option}]@dots{} --reference=@var{rfile} @var{file}@dots{}
+@end smallexample
+
+Change the SELinux security context of each @var{file} to @var{context}.
+With @option{--reference}, change the security context of each @var{file}
+to that of @var{rfile}.
+
+The program accepts the following options.  Also see @ref{Common options}.
+
+@table @samp
+
+@item -h
+@itemx --no-dereference
+@opindex -h
+@opindex --no-dereference
+@cindex no dereference
+Affect symbolic links instead of any referenced file.
+
+@item --reference=@var{rfile}
+@opindex --reference
+@cindex reference file
+Use @var{rfile}'s security context rather than specifying a @var{context} value.
+
+@item -R
+@itemx --recursive
+@opindex -R
+@opindex --recursive
+Operate on files and directories recursively.
+
+@choptH
+@xref{Traversing symlinks}.
+
+@choptL
+@xref{Traversing symlinks}.
+
+@choptP
+@xref{Traversing symlinks}.
+
+@item -v
+@itemx --verbose
+@opindex -v
+@opindex --verbose
+@cindex diagnostic
+Output a diagnostic for every file processed.
+
+@item -u @var{user}
+@itemx --user=@var{user}
+@opindex -u
+@opindex --user
+Set user @var{user} in the target security context.
+
+@item -r @var{role}
+@itemx --role=@var{role}
+@opindex -r
+@opindex --role
+Set role @var{role} in the target security context.
+
+@item -t @var{type}
+@itemx --type=@var{type}
+@opindex -t
+@opindex --type
+Set type @var{type} in the target security context.
+
+@item -l @var{range}
+@itemx --range=@var{range}
+@opindex -l
+@opindex --range
+Set range @var{range} in the target security context.
+
+@end table
+
+@exitstatus
+
+@node runcon invocation
+@section @command{runcon}: Run a command in specified SELinux context
+
+@pindex runcon
+@cindex run with security context
+
+
+@command{runcon} runs file in specified SELinux security context.
+
+Synopses:
+@smallexample
+runcon @var{context} @var{command} [@var{args}]
+runcon [ -c ] [-u @var{user}] [-r @var{role}] [-t @var{type}] [-l @var{range}] @var{command} [@var{args}]
+@end smallexample
+
+Run @var{command} with completely-specified @var{context}, or with
+current or transitioned security context modified by one or more of @var{level},
+@var{role}, @var{type} and @var{user}.
+
+If none of @option{-c}, @option{-t}, @option{-u}, @option{-r}, or @option{-l}
+is specified, the first argument is used as the complete context.
+Any additional arguments after @var{command}
+are interpreted as arguments to the command.
+
+With neither @var{context} nor @var{command}, print the current security context.
+
+The program accepts the following options.  Also see @ref{Common options}.
+
+@table @samp
+
+@item -c
+@itemx --compute
+@opindex -c
+@opindex --compute
+Compute process transition context before modifying.
+
+@item -u @var{user}
+@itemx --user=@var{user}
+@opindex -u
+@opindex --user
+Set user @var{user} in the target security context.
+
+@item -r @var{role}
+@itemx --role=@var{role}
+@opindex -r
+@opindex --role
+Set role @var{role} in the target security context.
+
+@item -t @var{type}
+@itemx --type=@var{type}
+@opindex -t
+@opindex --type
+Set type @var{type} in the target security context.
+
+@item -l @var{range}
+@itemx --range=@var{range}
+@opindex -l
+@opindex --range
+Set range @var{range} in the target security context.
+
+@end table
+
+@cindex exit status of @command{runcon}
+Exit status:
+
+@display
+126 if @var{command} is found but cannot be invoked
+127 if @command{runcon} itself fails or if @var{command} cannot be found
+the exit status of @var{command} otherwise
+@end display
+
 @node Modified command invocation
 @chapter Modified command invocation
 
@@ -14123,6 +14196,7 @@ user, etc.
 * env invocation::              Modify environment variables.
 * nice invocation::             Modify niceness.
 * nohup invocation::            Immunize to hangups.
+* stdbuf invocation::           Modify buffering of standard streams.
 * su invocation::               Modify user and group ID.
 * timeout invocation::          Run with time limit.
 @end menu
@@ -14144,7 +14218,7 @@ underlying function is non-privileged due to lack of support in MS-Windows.}
 Synopses:
 
 @example
-chroot @var{newroot} [@var{command} [@var{args}]@dots{}]
+chroot @var{option} @var{newroot} [@var{command} [@var{args}]@dots{}]
 chroot @var{option}
 @end example
 
@@ -14157,8 +14231,25 @@ variable or @command{/bin/sh} if not set, invoked with the @option{-i} option.
 @var{command} must not be a special built-in utility
 (@pxref{Special built-in utilities}).
 
-The only options are @option{--help} and @option{--version}.  @xref{Common
-options}.  Options must precede operands.
+The program accepts the following options.  Also see @ref{Common options}.
+Options must precede operands.
+
+@table @samp
+
+@itemx --userspec=@var{user}[:@var{group}]
+@opindex --userspec
+By default, @var{command} is run with the same credentials
+as the invoking process.
+Use this option to run it as a different @var{user} and/or with a
+different primary @var{group}.
+
+@itemx --groups=@var{groups}
+@opindex --groups
+Use this option to specify the supplementary @var{groups} to be
+used by the new process.
+The items in the list (names or numeric IDs) must be separated by commas.
+
+@end table
 
 Here are a few tips to help avoid common problems in using chroot.
 To start with a simple example, make @var{command} refer to a statically
@@ -14465,6 +14556,85 @@ Exit status:
 @display
 126 if @var{command} is found but cannot be invoked
 127 if @command{nohup} itself fails or if @var{command} cannot be found
+the exit status of @var{command} otherwise
+@end display
+
+
+@node stdbuf invocation
+@section @command{stdbuf}: Run a command with modified I/O stream buffering
+
+@pindex stdbuf
+@cindex standard streams, buffering
+@cindex line buffered
+
+@command{stdbuf} allows one to modify the buffering operations of the
+three standard I/O streams associated with a program.  Synopsis:
+
+@example
+stdbuf @var{option}@dots{} @var{command}
+@end example
+
+Any additional @var{arg}s are passed as additional arguments to the
+@var{command}.
+
+The program accepts the following options.  Also see @ref{Common options}.
+
+@table @samp
+
+@item -i @var{mode}
+@itemx --input=@var{mode}
+@opindex -i
+@opindex --input
+Adjust the standard input stream buffering.
+
+@item -o @var{mode}
+@itemx --output=@var{mode}
+@opindex -o
+@opindex --output
+Adjust the standard output stream buffering.
+
+@item -e @var{mode}
+@itemx --error=@var{mode}
+@opindex -e
+@opindex --error
+Adjust the standard error stream buffering.
+
+@end table
+
+The @var{mode} can be specified as follows:
+
+@table @samp
+
+@item L
+Set the stream to line buffered mode.
+In this mode data is coalesced until a newline is output or
+input is read from any stream attached to a terminal device.
+This option is invalid with standard input.
+
+@item 0
+Disable buffering of the selected stream.
+In this mode data is output immediately and only the
+amount of data requested is read from input.
+
+@item @var{size}
+Specify the size of the buffer to use in fully buffered mode.
+@multiplierSuffixesNoBlocks{size}
+
+@end table
+
+NOTE: If @var{command} adjusts the buffering of its standard streams
+(@command{tee} does for e.g.) then that will override corresponding settings
+changed by @command{stdbuf}.  Also some filters (like @command{dd} and
+@command{cat} etc.) don't use streams for I/O, and are thus unaffected
+by @command{stdbuf} settings.
+
+@cindex exit status of @command{stdbuf}
+Exit status:
+
+@display
+125 if @command{stdbuf} itself fails
+126 if @var{command} is found but cannot be invoked
+127 if @var{command} cannot be found
 the exit status of @var{command} otherwise
 @end display
 

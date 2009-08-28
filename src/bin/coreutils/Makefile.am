@@ -25,6 +25,7 @@ changelog_etc =				\
   ChangeLog-2007			\
   ChangeLog-2008			\
   build-aux/ChangeLog-2007		\
+  build-aux/update-copyright		\
   doc/ChangeLog-2007			\
   lib/ChangeLog-2007			\
   m4/ChangeLog-2007			\
@@ -40,6 +41,7 @@ changelog_etc =				\
 
 syntax_check_exceptions =		\
   .x-sc_GPL_version			\
+  .x-sc_error_message_uppercase		\
   .x-sc_file_system			\
   .x-sc_obsolete_symbols		\
   .x-sc_po_check			\
@@ -48,8 +50,10 @@ syntax_check_exceptions =		\
   .x-sc_prohibit_stat_st_blocks		\
   .x-sc_prohibit_strcmp			\
   .x-sc_require_config_h		\
+  .x-sc_require_config_h_first		\
   .x-sc_space_tab			\
   .x-sc_sun_os_names			\
+  .x-sc_system_h_headers		\
   .x-sc_trailing_blank			\
   .x-sc_unmarked_diagnostics		\
   .x-sc_useless_cpp_parens

@@ -105,6 +105,7 @@ sleep.1:	$(common_dep)	$(srcdir)/sleep.x	../src/sleep.c
 sort.1:		$(common_dep)	$(srcdir)/sort.x	../src/sort.c
 split.1:	$(common_dep)	$(srcdir)/split.x	../src/split.c
 stat.1:		$(common_dep)	$(srcdir)/stat.x	../src/stat.c
+stdbuf.1:	$(common_dep)	$(srcdir)/stdbuf.x	../src/stdbuf.c
 stty.1:		$(common_dep)	$(srcdir)/stty.x	../src/stty.c
 su.1:		$(common_dep)	$(srcdir)/su.x		../src/su.c
 sum.1:		$(common_dep)	$(srcdir)/sum.x		../src/sum.c
@@ -148,14 +149,14 @@ mapped_name = `echo $*|sed 's/^install$$/ginstall/; s/^test$$/[/'`
 # That is necessary to avoid failures for programs that are also shell built-in
 # functions like echo, false, printf, pwd.
 .x.1:
-	@case '$(PERL)' in					\
+	$(AM_V_GEN)case '$(PERL)' in				\
 	  *"/missing "*)					\
 	    echo 'WARNING: cannot update man page $@ since perl is missing' \
-	      'or inadequate' 1>&2 \
+	      'or inadequate' 1>&2				\
 	    ;;							\
 	  *)							\
-	    rm -f $@						\
-	    && { echo "Updating man page $@";			\
+	    rm -f $@ $@-t					\
+	    && {						\
 		 rm -rf $t;					\
 		 mkdir $t;					\
 		 (cd $t && $(LN_S) ../../src/$(mapped_name) $*); \
@@ -164,8 +165,11 @@ mapped_name = `echo $*|sed 's/^install$$/ginstall/; s/^test$$/[/'`
 		     --include=$(srcdir)/$*.x			\
 		     --output=$t/$@ $t/$*;			\
 	       }						\
-	    && sed 's|$*\.td/||g' $t/$@ > $@			\
-	    && rm -rf $t ;;					\
+	    && sed 's|$*\.td/||g' $t/$@ > $@-t			\
+	    && rm -rf $t					\
+	    && chmod -w $@-t					\
+	    && mv $@-t $@					\
+	    ;;							\
 	esac
 
 distcheck-hook: check-x-vs-1 check-programs-vs-x
@@ -181,8 +185,8 @@ ASSORT = LC_ALL=C sort
 # add them here manually.
 .PHONY: check-x-vs-1
 check-x-vs-1:
-	PATH=../src$(PATH_SEPARATOR)$$PATH; export PATH;		\
-	t=ls-files.$$$$;						\
+	$(AM_V_GEN)PATH=../src$(PATH_SEPARATOR)$$PATH; export PATH;	\
+	t=$@-t;								\
 	(cd $(srcdir) && ls -1 *.x) | sed 's/\.x$$//' | $(ASSORT) > $$t;\
 	(echo $(dist_man1_MANS) $(NO_INSTALL_PROGS_DEFAULT)		\
 	  | tr -s ' ' '\n' | sed 's/\.1$$//')				\
@@ -195,7 +199,7 @@ all_programs =								\
 
 .PHONY: check-programs-vs-x
 check-programs-vs-x:
-	status=0;					\
+	$(AM_V_GEN)status=0;				\
 	for p in dummy `$(all_programs)`; do		\
 	  test $$p = dummy && continue;			\
 	  test $$p = ginstall && p=install || : ;	\

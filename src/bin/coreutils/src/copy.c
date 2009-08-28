@@ -66,6 +66,10 @@
 # include "verror.h"
 #endif
 
+#if HAVE_SYS_IOCTL_H
+# include <sys/ioctl.h>
+#endif
+
 #ifndef HAVE_FCHOWN
 # define HAVE_FCHOWN false
 # define fchown(fd, uid, gid) (-1)
@@ -118,6 +122,37 @@ static bool owner_failure_ok (struct cp_options const *x);
    when we detect the user is trying to copy a directory into itself.  */
 static char const *top_level_src_name;
 static char const *top_level_dst_name;
+
+/* Set the timestamp of symlink, FILE, to TIMESPEC.
+   If this system lacks support for that, simply return 0.  */
+static inline int
+utimens_symlink (char const *file, struct timespec const *timespec)
+{
+#if HAVE_UTIMENSAT
+  return utimensat (AT_FDCWD, file, timespec, AT_SYMLINK_NOFOLLOW);
+#else
+  /* Don't set errno=ENOTSUP here as we don't want
+     to output an error message for this case.  */
+  return 0;
+#endif
+}
+
+/* Perform the O(1) btrfs clone operation, if possible.
+   Upon success, return 0.  Otherwise, return -1 and set errno.  */
+static inline int
+clone_file (int dest_fd, int src_fd)
+{
+#ifdef __linux__
+# undef BTRFS_IOCTL_MAGIC
+# define BTRFS_IOCTL_MAGIC 0x94
+# undef BTRFS_IOC_CLONE
+# define BTRFS_IOC_CLONE _IOW (BTRFS_IOCTL_MAGIC, 9, int)
+  return ioctl (dest_fd, BTRFS_IOC_CLONE, src_fd);
+#else
+  errno = ENOTSUP;
+  return -1;
+#endif
+}
 
 /* FIXME: describe */
 /* FIXME: rewrite this to use a hash table so we avoid the quadratic
@@ -236,7 +271,6 @@ copy_attr_error (struct error_context *ctx ATTRIBUTE_UNUSED,
   va_list ap;
 
   if (!errno_unsupported (errno))
-  if (errno != ENOTSUP && errno != ENODATA)
     {
       /* use verror module to print error message */
       va_start (ap, fmt);
@@ -681,6 +715,16 @@ copy_reg (char const *src_name, char const *dst_name,
     {
       error (0, errno, _("cannot fstat %s"), quote (dst_name));
       return_val = false;
+      goto close_src_and_dst_desc;
+    }
+
+  if (x->reflink)
+    {
+      if (clone_file (dest_desc, source_desc))
+        {
+          error (0, errno, _("failed to clone %s"), quote (dst_name));
+          return_val = false;
+        }
       goto close_src_and_dst_desc;
     }
 
@@ -1283,7 +1327,7 @@ copy_internal (char const *src_name, char const *dst_name,
   bool backup_succeeded = false;
   bool delayed_ok;
   bool copied_as_regular = false;
-  bool preserve_metadata;
+  bool dest_is_symlink = false;
   bool have_dst_lstat = false;
 
   if (x->move_mode && rename_succeeded)
@@ -1890,12 +1934,6 @@ copy_internal (char const *src_name, char const *dst_name,
 	}
     }
 
-  /* In certain modes (cp's --symbolic-link), and for certain file types
-     (symlinks and hard links) it doesn't make sense to preserve metadata,
-     or it's possible to preserve only some of it.
-     In such cases, set this variable to zero.  */
-  preserve_metadata = true;
-
   if (S_ISDIR (src_mode))
     {
       struct dir_list *dir;
@@ -1989,8 +2027,7 @@ copy_internal (char const *src_name, char const *dst_name,
     }
   else if (x->symbolic_link)
     {
-      preserve_metadata = false;
-
+      dest_is_symlink = true;
       if (*src_name != '/')
 	{
 	  /* Check that DST_NAME denotes a file in the current directory.  */
@@ -2042,7 +2079,6 @@ copy_internal (char const *src_name, char const *dst_name,
 #endif
 	   )
     {
-      preserve_metadata = false;
       if (link (src_name, dst_name))
 	{
 	  error (0, errno, _("cannot create link %s"), quote (dst_name));
@@ -2087,6 +2123,7 @@ copy_internal (char const *src_name, char const *dst_name,
   else if (S_ISLNK (src_mode))
     {
       char *src_link_val = areadlink_with_size (src_name, src_sb.st_size);
+      dest_is_symlink = true;
       if (src_link_val == NULL)
 	{
 	  error (0, errno, _("cannot read symbolic link %s"), quote (src_name));
@@ -2124,9 +2161,6 @@ copy_internal (char const *src_name, char const *dst_name,
 
       if (x->preserve_security_context)
 	restore_default_fscreatecon_or_die ();
-
-      /* There's no need to preserve timestamps or permissions.  */
-      preserve_metadata = false;
 
       if (x->preserve_ownership)
 	{
@@ -2169,8 +2203,10 @@ copy_internal (char const *src_name, char const *dst_name,
 	record_file (x->dest_info, dst_name, &sb);
     }
 
-  if ( ! preserve_metadata)
-    return true;
+  /* If we've just created a hard-link due to cp's --link option,
+     we're done.  */
+  if (x->hard_link && ! S_ISDIR (src_mode))
+    return delayed_ok;
 
   if (copied_as_regular)
     return delayed_ok;
@@ -2193,13 +2229,20 @@ copy_internal (char const *src_name, char const *dst_name,
       timespec[0] = get_stat_atime (&src_sb);
       timespec[1] = get_stat_mtime (&src_sb);
 
-      if (utimens (dst_name, timespec) != 0)
+      if ((dest_is_symlink
+	   ? utimens_symlink (dst_name, timespec)
+	   : utimens (dst_name, timespec))
+	  != 0)
 	{
 	  error (0, errno, _("preserving times for %s"), quote (dst_name));
 	  if (x->require_preserve)
 	    return false;
 	}
     }
+
+  /* The operations beyond this point may dereference a symlink.  */
+  if (dest_is_symlink)
+    return delayed_ok;
 
   /* Avoid calling chown if we know it's not necessary.  */
   if (x->preserve_ownership
@@ -2307,6 +2350,7 @@ valid_options (const struct cp_options *co)
   assert (VALID_BACKUP_TYPE (co->backup_type));
   assert (VALID_SPARSE_MODE (co->sparse_mode));
   assert (!(co->hard_link && co->symbolic_link));
+  assert (!(co->reflink && co->sparse_mode != SPARSE_AUTO));
   return true;
 }
 

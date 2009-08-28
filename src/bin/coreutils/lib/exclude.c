@@ -1,7 +1,7 @@
 /* exclude.c -- exclude file names
 
    Copyright (C) 1992, 1993, 1994, 1997, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007 Free Software Foundation, Inc.
+   2004, 2005, 2006, 2007, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,10 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* Written by Paul Eggert <eggert@twinsun.com>  */
+/* Written by Paul Eggert <eggert@twinsun.com>
+   and Sergey Poznyakoff <gray@gnu.org>.
+   Thanks to Phil Proudman <phil@proudman51.freeserve.co.uk>
+   for improvement suggestions. */
 
 #include <config.h>
 
@@ -30,6 +33,8 @@
 #include <string.h>
 
 #include "exclude.h"
+#include "hash.h"
+#include "mbuiter.h"
 #include "fnmatch.h"
 #include "xalloc.h"
 #include "verify.h"
@@ -54,6 +59,14 @@ verify (((EXCLUDE_ANCHORED | EXCLUDE_INCLUDE | EXCLUDE_WILDCARDS)
 	    | FNM_CASEFOLD | FNM_EXTMATCH))
 	== 0);
 
+
+/* Exclusion patterns are grouped into a singly-linked list of
+   "exclusion segments".  Each segment represents a set of patterns
+   that can be matches using the same algorithm.  Non-wildcard
+   patterns are kept in hash tables, to speed up searches.  Wildcard
+   patterns are stored as arrays of patterns. */
+
+
 /* An exclude pattern-options pair.  The options are fnmatch options
    ORed with EXCLUDE_* options.  */
 
@@ -63,14 +76,62 @@ struct patopts
     int options;
   };
 
-/* An exclude list, of pattern-options pairs.  */
+/* An array of pattern-options pairs.  */
 
-struct exclude
+struct exclude_pattern
   {
     struct patopts *exclude;
     size_t exclude_alloc;
     size_t exclude_count;
   };
+
+enum exclude_type
+  {
+    exclude_hash,                    /* a hash table of excluded names */
+    exclude_pattern                  /* an array of exclude patterns */
+  };
+
+struct exclude_segment
+  {
+    struct exclude_segment *next;    /* next segment in list */
+    enum exclude_type type;          /* type of this segment */
+    int options;                     /* common options for this segment */
+    union
+    {
+      Hash_table *table;             /* for type == exclude_hash */
+      struct exclude_pattern pat;    /* for type == exclude_pattern */
+    } v;
+  };
+
+/* The exclude structure keeps a singly-linked list of exclude segments */
+struct exclude
+  {
+    struct exclude_segment *head, *tail;
+  };
+
+/* Return true if str has wildcard characters */
+bool
+fnmatch_pattern_has_wildcards (const char *str, int options)
+{
+  char *cset = "\\?*[]";
+  if (options & FNM_NOESCAPE)
+    cset++;
+  while (*str)
+    {
+      size_t n = strcspn (str, cset);
+      if (str[n] == 0)
+	break;
+      else if (str[n] == '\\')
+	{
+	  str += n + 1;
+	  if (*str)
+	    str++;
+	}
+      else
+	return true;
+    }
+  return false;
+}
 
 /* Return a newly allocated and empty exclude list.  */
 
@@ -80,12 +141,122 @@ new_exclude (void)
   return xzalloc (sizeof *new_exclude ());
 }
 
-/* Free the storage associated with an exclude list.  */
+/* Calculate the hash of string.  */
+static size_t
+string_hasher (void const *data, size_t n_buckets)
+{
+  char const *p = data;
+  return hash_string (p, n_buckets);
+}
 
+/* Ditto, for case-insensitive hashes */
+static size_t
+string_hasher_ci (void const *data, size_t n_buckets)
+{
+  char const *p = data;
+  mbui_iterator_t iter;
+  size_t value = 0;
+
+  for (mbui_init (iter, p); mbui_avail (iter); mbui_advance (iter))
+    {
+      mbchar_t m = mbui_cur (iter);
+      wchar_t wc;
+
+      if (m.wc_valid)
+	wc = towlower (m.wc);
+      else
+	wc = *m.ptr;
+
+      value = (value * 31 + wc) % n_buckets;
+    }
+
+  return value;
+}
+
+/* compare two strings for equality */
+static bool
+string_compare (void const *data1, void const *data2)
+{
+  char const *p1 = data1;
+  char const *p2 = data2;
+  return strcmp (p1, p2) == 0;
+}
+
+/* compare two strings for equality, case-insensitive */
+static bool
+string_compare_ci (void const *data1, void const *data2)
+{
+  char const *p1 = data1;
+  char const *p2 = data2;
+  return mbscasecmp (p1, p2) == 0;
+}
+
+static void
+string_free (void *data)
+{
+  free (data);
+}
+
+/* Create new exclude segment of given TYPE and OPTIONS, and attach it
+   to the tail of list in EX */
+struct exclude_segment *
+new_exclude_segment (struct exclude *ex, enum exclude_type type, int options)
+{
+  struct exclude_segment *sp = xzalloc (sizeof (struct exclude_segment));
+  sp->type = type;
+  sp->options = options;
+  switch (type)
+    {
+    case exclude_pattern:
+      break;
+
+    case exclude_hash:
+      sp->v.table = hash_initialize (0, NULL,
+				     (options & FNM_CASEFOLD) ?
+				       string_hasher_ci
+				       : string_hasher,
+				     (options & FNM_CASEFOLD) ?
+				       string_compare_ci
+				       : string_compare,
+				     string_free);
+      break;
+    }
+  if (ex->tail)
+    ex->tail->next = sp;
+  else
+    ex->head = sp;
+  ex->tail = sp;
+  return sp;
+}
+
+/* Free a single exclude segment */
+static void
+free_exclude_segment (struct exclude_segment *seg)
+{
+  switch (seg->type)
+    {
+    case exclude_pattern:
+      free (seg->v.pat.exclude);
+      break;
+
+    case exclude_hash:
+      hash_free (seg->v.table);
+      break;
+    }
+  free (seg);
+}
+
+/* Free the storage associated with an exclude list.  */
 void
 free_exclude (struct exclude *ex)
 {
-  free (ex->exclude);
+  struct exclude_segment *seg;
+  for (seg = ex->head; seg; )
+    {
+      struct exclude_segment *next = seg->next;
+      free_exclude_segment (seg);
+      seg = next;
+    }
   free (ex);
 }
 
@@ -155,36 +326,113 @@ exclude_fnmatch (char const *pattern, char const *f, int options)
   return matched;
 }
 
+/* Return true if the exclude_pattern segment SEG excludes F.  */
+
+bool
+excluded_file_pattern_p (struct exclude_segment const *seg, char const *f)
+{
+  size_t exclude_count = seg->v.pat.exclude_count;
+  struct patopts const *exclude = seg->v.pat.exclude;
+  size_t i;
+  bool excluded = !! (exclude[0].options & EXCLUDE_INCLUDE);
+
+  /* Scan through the options, until they change excluded */
+  for (i = 0; i < exclude_count; i++)
+    {
+      char const *pattern = exclude[i].pattern;
+      int options = exclude[i].options;
+      if (excluded != exclude_fnmatch (pattern, f, options))
+	return !excluded;
+    }
+  return excluded;
+}
+
+/* Return true if the exclude_hash segment SEG excludes F.
+   BUFFER is an auxiliary storage of the same length as F (with nul
+   terminator included) */
+bool
+excluded_file_name_p (struct exclude_segment const *seg, char const *f,
+		      char *buffer)
+{
+  int options = seg->options;
+  bool excluded = !! (options & EXCLUDE_INCLUDE);
+  Hash_table *table = seg->v.table;
+
+  do
+    {
+      /* initialize the pattern */
+      strcpy (buffer, f);
+
+      while (1)
+	{
+	  if (hash_lookup (table, buffer))
+	    return !excluded;
+	  if (options & FNM_LEADING_DIR)
+	    {
+	      char *p = strrchr (buffer, '/');
+	      if (p)
+		{
+		  *p = 0;
+		  continue;
+		}
+	    }
+	  break;
+	}
+
+      if (!(options & EXCLUDE_ANCHORED))
+	{
+	  f = strchr (f, '/');
+	  if (f)
+	    f++;
+	}
+      else
+	break;
+    }
+  while (f);
+  return excluded;
+}
+
 /* Return true if EX excludes F.  */
 
 bool
 excluded_file_name (struct exclude const *ex, char const *f)
 {
-  size_t exclude_count = ex->exclude_count;
+  struct exclude_segment *seg;
+  bool excluded;
+  char *filename = NULL;
 
-  /* If no options are given, the default is to include.  */
-  if (exclude_count == 0)
+  /* If no patterns are given, the default is to include.  */
+  if (!ex->head)
     return false;
-  else
+
+  /* Otherwise, the default is the opposite of the first option.  */
+  excluded = !! (ex->head->options & EXCLUDE_INCLUDE);
+  /* Scan through the segments, seeing whether they change status from
+     excluded to included or vice versa.  */
+  for (seg = ex->head; seg; seg = seg->next)
     {
-      struct patopts const *exclude = ex->exclude;
-      size_t i;
+      bool rc;
 
-      /* Otherwise, the default is the opposite of the first option.  */
-      bool excluded = !! (exclude[0].options & EXCLUDE_INCLUDE);
-
-      /* Scan through the options, seeing whether they change F from
-	 excluded to included or vice versa.  */
-      for (i = 0;  i < exclude_count;  i++)
+      switch (seg->type)
 	{
-	  char const *pattern = exclude[i].pattern;
-	  int options = exclude[i].options;
-	  if (excluded == !! (options & EXCLUDE_INCLUDE))
-	    excluded ^= exclude_fnmatch (pattern, f, options);
-	}
+	case exclude_pattern:
+	  rc = excluded_file_pattern_p (seg, f);
+	  break;
 
-      return excluded;
+	case exclude_hash:
+	  if (!filename)
+	    filename = xmalloc (strlen (f) + 1);
+	  rc = excluded_file_name_p (seg, f, filename);
+	  break;
+	}
+      if (rc != excluded)
+	{
+	  excluded = rc;
+	  break;
+	}
     }
+  free (filename);
+  return excluded;
 }
 
 /* Append to EX the exclusion PATTERN with OPTIONS.  */
@@ -192,15 +440,46 @@ excluded_file_name (struct exclude const *ex, char const *f)
 void
 add_exclude (struct exclude *ex, char const *pattern, int options)
 {
-  struct patopts *patopts;
+  struct exclude_segment *seg;
 
-  if (ex->exclude_count == ex->exclude_alloc)
-    ex->exclude = x2nrealloc (ex->exclude, &ex->exclude_alloc,
-			      sizeof *ex->exclude);
+  if ((options & EXCLUDE_WILDCARDS)
+      && fnmatch_pattern_has_wildcards (pattern, options))
+    {
+      struct exclude_pattern *pat;
+      struct patopts *patopts;
 
-  patopts = &ex->exclude[ex->exclude_count++];
-  patopts->pattern = pattern;
-  patopts->options = options;
+      if (ex->tail && ex->tail->type == exclude_pattern
+	  && ((ex->tail->options & EXCLUDE_INCLUDE) ==
+	      (options & EXCLUDE_INCLUDE)))
+	seg = ex->tail;
+      else
+	seg = new_exclude_segment (ex, exclude_pattern, options);
+
+      pat = &seg->v.pat;
+      if (pat->exclude_count == pat->exclude_alloc)
+	pat->exclude = x2nrealloc (pat->exclude, &pat->exclude_alloc,
+				   sizeof *pat->exclude);
+      patopts = &pat->exclude[pat->exclude_count++];
+      patopts->pattern = pattern;
+      patopts->options = options;
+    }
+  else
+    {
+      char *str, *p;
+#define EXCLUDE_HASH_FLAGS (EXCLUDE_INCLUDE|EXCLUDE_ANCHORED|\
+			    FNM_LEADING_DIR|FNM_CASEFOLD)
+      if (ex->tail && ex->tail->type == exclude_hash
+	  && ((ex->tail->options & EXCLUDE_HASH_FLAGS) ==
+	      (options & EXCLUDE_HASH_FLAGS)))
+	seg = ex->tail;
+      else
+	seg = new_exclude_segment (ex, exclude_hash, options);
+
+      str = xstrdup (pattern);
+      p = hash_insert (seg->v.table, str);
+      if (p != str)
+	free (str);
+    }
 }
 
 /* Use ADD_FUNC to append to EX the patterns in FILE_NAME, each with

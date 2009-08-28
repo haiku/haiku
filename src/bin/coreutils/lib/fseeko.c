@@ -82,7 +82,7 @@ rpl_fseeko (FILE *fp, off_t offset, int whence)
       && ((fp->__modeflags & (__FLAG_READONLY | __FLAG_READING)) == 0
 	  || fp->__bufpos == fp->__bufread))
 #elif defined __QNX__               /* QNX */
-  if ((fp->_Mode & _MWRITE ? fp->_Next == fp->_Buf : fp->_Next == fp->_Rend)
+  if ((fp->_Mode & 0x2000 /* _MWRITE */ ? fp->_Next == fp->_Buf : fp->_Next == fp->_Rend)
       && fp->_Rback == fp->_Back + sizeof (fp->_Back)
       && fp->_Rsave == NULL)
 #elif defined __MINT__              /* Atari FreeMiNT */

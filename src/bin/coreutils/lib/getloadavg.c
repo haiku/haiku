@@ -44,8 +44,8 @@
 				otherwise, no load average is available.
    HAVE_NLIST_H                 nlist.h is available.  NLIST_STRUCT defaults
                                 to this.
-   NLIST_STRUCT			Include nlist.h, not a.out.h, and
-				the nlist n_name element is a pointer,
+   NLIST_STRUCT			Include nlist.h, not a.out.h.
+   N_NAME_POINTER		The nlist n_name element is a pointer,
 				not an array.
    HAVE_STRUCT_NLIST_N_UN_N_NAME `n_un.n_name' is member of `struct nlist'.
    LINUX_LDAV_FILE		[__linux__, __CYGWIN__]: File containing
@@ -900,7 +900,7 @@ getloadavg (double loadavg[], int nelem)
   if (offset == 0)
     {
 #  ifndef sgi
-#   ifndef NLIST_STRUCT
+#   if ! defined NLIST_STRUCT || ! defined N_NAME_POINTER
       strcpy (nl[0].n_name, LDAV_SYMBOL);
       strcpy (nl[1].n_name, "");
 #   else /* NLIST_STRUCT */

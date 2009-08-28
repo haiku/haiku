@@ -1,6 +1,6 @@
 /* getugroups.c -- return a list of the groups a user is in
 
-   Copyright (C) 1990, 1991, 1998-2000, 2003-2008 Free Software Foundation.
+   Copyright (C) 1990, 1991, 1998-2000, 2003-2009 Free Software Foundation.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ struct group *getgrent (void);
 
 #include <string.h>
 
-#define STREQ(s1, s2) ((strcmp (s1, s2) == 0))
+#define STREQ(s1, s2) (strcmp (s1, s2) == 0)
 
 /* Like `getgroups', but for user USERNAME instead of for the current
    process.  Store at most MAXCOUNT group IDs in the GROUPLIST array.

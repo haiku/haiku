@@ -1,4 +1,4 @@
-# generated automatically by aclocal 1.10c -*- Autoconf -*-
+# generated automatically by aclocal 1.11a -*- Autoconf -*-
 
 # Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
 # 2005, 2006, 2007, 2008, 2009  Free Software Foundation, Inc.
@@ -13,8 +13,8 @@
 
 m4_ifndef([AC_AUTOCONF_VERSION],
   [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
-m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.63b.42-b26d5],,
-[m4_warning([this file was generated for autoconf 2.63b.42-b26d5.
+m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.64.16-4cdf58],,
+[m4_warning([this file was generated for autoconf 2.64.16-4cdf58.
 You have another version of autoconf.  It may work, but is not guaranteed to.
 If you have problems, you may need to regenerate the build system entirely.
 To do so, use the procedure documented by the package, typically `autoreconf'.])])
@@ -31,10 +31,10 @@ To do so, use the procedure documented by the package, typically `autoreconf'.])
 # generated from the m4 files accompanying Automake X.Y.
 # (This private macro should not be called outside this file.)
 AC_DEFUN([AM_AUTOMAKE_VERSION],
-[am__api_version='1.10c'
+[am__api_version='1.11a'
 dnl Some users find AM_AUTOMAKE_VERSION and mistake it for a way to
 dnl require some minimum version.  Point them to the right macro.
-m4_if([$1], [1.10c], [],
+m4_if([$1], [1.11a], [],
       [AC_FATAL([Do not call $0, use AM_INIT_AUTOMAKE([$1]).])])dnl
 ])
 
@@ -50,7 +50,7 @@ m4_define([_AM_AUTOCONF_VERSION], [])
 # Call AM_AUTOMAKE_VERSION and AM_AUTOMAKE_VERSION so they can be traced.
 # This function is AC_REQUIREd by AM_INIT_AUTOMAKE.
 AC_DEFUN([AM_SET_CURRENT_AUTOMAKE_VERSION],
-[AM_AUTOMAKE_VERSION([1.10c])dnl
+[AM_AUTOMAKE_VERSION([1.11a])dnl
 m4_ifndef([AC_AUTOCONF_VERSION],
   [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
 _AM_AUTOCONF_VERSION(m4_defn([AC_AUTOCONF_VERSION]))])
@@ -1214,6 +1214,8 @@ m4_include([m4/mkdir-p.m4])
 m4_include([m4/mkdir-slash.m4])
 m4_include([m4/mkstemp.m4])
 m4_include([m4/mktime.m4])
+m4_include([m4/mmap-anon.m4])
+m4_include([m4/mode_t.m4])
 m4_include([m4/modechange.m4])
 m4_include([m4/mountlist.m4])
 m4_include([m4/mpsort.m4])
@@ -1286,6 +1288,7 @@ m4_include([m4/stat-prog.m4])
 m4_include([m4/stat-time.m4])
 m4_include([m4/stdarg.m4])
 m4_include([m4/stdbool.m4])
+m4_include([m4/stddef_h.m4])
 m4_include([m4/stdint.m4])
 m4_include([m4/stdint_h.m4])
 m4_include([m4/stdio-safer.m4])
@@ -1303,6 +1306,7 @@ m4_include([m4/strndup.m4])
 m4_include([m4/strnlen.m4])
 m4_include([m4/strnumcmp.m4])
 m4_include([m4/strpbrk.m4])
+m4_include([m4/strstr.m4])
 m4_include([m4/strtod.m4])
 m4_include([m4/strtoimax.m4])
 m4_include([m4/strtol.m4])
@@ -1338,6 +1342,7 @@ m4_include([m4/utimes.m4])
 m4_include([m4/vasnprintf.m4])
 m4_include([m4/vasprintf-posix.m4])
 m4_include([m4/vasprintf.m4])
+m4_include([m4/version-etc.m4])
 m4_include([m4/vfprintf-posix.m4])
 m4_include([m4/vprintf-posix.m4])
 m4_include([m4/warnings.m4])

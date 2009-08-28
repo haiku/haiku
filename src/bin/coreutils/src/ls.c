@@ -529,7 +529,7 @@ enum indicator_no
     C_LEFT, C_RIGHT, C_END, C_RESET, C_NORM, C_FILE, C_DIR, C_LINK,
     C_FIFO, C_SOCK,
     C_BLK, C_CHR, C_MISSING, C_ORPHAN, C_EXEC, C_DOOR, C_SETUID, C_SETGID,
-    C_STICKY, C_OTHER_WRITABLE, C_STICKY_OTHER_WRITABLE, C_CAP, C_HARDLINK,
+    C_STICKY, C_OTHER_WRITABLE, C_STICKY_OTHER_WRITABLE, C_CAP, C_MULTIHARDLINK,
     C_CLR_TO_EOL
   };
 
@@ -537,7 +537,7 @@ static const char *const indicator_name[]=
   {
     "lc", "rc", "ec", "rs", "no", "fi", "di", "ln", "pi", "so",
     "bd", "cd", "mi", "or", "ex", "do", "su", "sg", "st",
-    "ow", "tw", "ca", "hl", "cl", NULL
+    "ow", "tw", "ca", "mh", "cl", NULL
   };
 
 struct color_ext_type
@@ -571,7 +571,7 @@ static struct bin_str color_indicator[] =
     { LEN_STR_PAIR ("34;42") },		/* ow: other-writable: blue on green */
     { LEN_STR_PAIR ("30;42") },		/* tw: ow w/ sticky: black on green */
     { LEN_STR_PAIR ("30;41") },		/* ca: black on red */
-    { LEN_STR_PAIR ("44;37") },		/* hl: white on blue */
+    { 0, NULL },			/* mh: disabled by default */
     { LEN_STR_PAIR ("\033[K") },	/* cl: clear to end of line */
   };
 
@@ -1228,7 +1228,7 @@ main (int argc, char **argv)
       SIGXFSZ,
 #endif
     };
-  enum { nsigs = sizeof sig / sizeof sig[0] };
+  enum { nsigs = ARRAY_CARDINALITY (sig) };
 
 #if ! SA_NOCLDSTOP
   bool caught_sig[nsigs];
@@ -1243,8 +1243,8 @@ main (int argc, char **argv)
   initialize_exit_failure (LS_FAILURE);
   atexit (close_stdout);
 
-#define N_ENTRIES(Array) (sizeof Array / sizeof *(Array))
-  assert (N_ENTRIES (color_indicator) + 1 == N_ENTRIES (indicator_name));
+  assert (ARRAY_CARDINALITY (color_indicator) + 1
+          == ARRAY_CARDINALITY (indicator_name));
 
   exit_status = EXIT_SUCCESS;
   print_dir_name = true;
@@ -2463,6 +2463,19 @@ print_dir (char const *name, char const *realname, bool command_line_arg)
       DEV_INO_PUSH (dir_stat.st_dev, dir_stat.st_ino);
     }
 
+  if (recursive | print_dir_name)
+    {
+      if (!first)
+	DIRED_PUTCHAR ('\n');
+      first = false;
+      DIRED_INDENT ();
+      PUSH_CURRENT_DIRED_POS (&subdired_obstack);
+      dired_pos += quote_name (stdout, realname ? realname : name,
+			       dirname_quoting_options, NULL);
+      PUSH_CURRENT_DIRED_POS (&subdired_obstack);
+      DIRED_FPUTS_LITERAL (":\n", stdout);
+    }
+
   /* Read the directory entries, and insert the subfiles into the `cwd_file'
      table.  */
 
@@ -2502,7 +2515,8 @@ print_dir (char const *name, char const *realname, bool command_line_arg)
 		 ls uses constant memory while processing the entries of
 		 this directory.  Useful when there are many (millions)
 		 of entries in a directory.  */
-	      if (format == one_per_line && sort_type == sort_none)
+	      if (format == one_per_line && sort_type == sort_none
+		      && !print_block_size && !recursive)
 		{
 		  /* We must call sort_files in spite of
 		     "sort_type == sort_none" for its initialization
@@ -2537,19 +2551,6 @@ print_dir (char const *name, char const *realname, bool command_line_arg)
 
   if (recursive)
     extract_dirs_from_files (name, command_line_arg);
-
-  if (recursive | print_dir_name)
-    {
-      if (!first)
-	DIRED_PUTCHAR ('\n');
-      first = false;
-      DIRED_INDENT ();
-      PUSH_CURRENT_DIRED_POS (&subdired_obstack);
-      dired_pos += quote_name (stdout, realname ? realname : name,
-			       dirname_quoting_options, NULL);
-      PUSH_CURRENT_DIRED_POS (&subdired_obstack);
-      DIRED_FPUTS_LITERAL (":\n", stdout);
-    }
 
   if (format == long_format || print_block_size)
     {
@@ -4118,8 +4119,8 @@ print_color_indicator (const char *name, mode_t mode, int linkok,
 	    type = C_CAP;
 	  else if ((mode & S_IXUGO) != 0)
 	    type = C_EXEC;
-	  else if (is_colored (C_HARDLINK) && (1 < nlink))
-	    type = C_HARDLINK;
+	  else if (is_colored (C_MULTIHARDLINK) && (1 < nlink))
+	    type = C_MULTIHARDLINK;
 	}
       else if (S_ISDIR (mode))
 	{

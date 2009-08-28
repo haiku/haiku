@@ -3,7 +3,7 @@
 #line 1
 /* Declarations of functions and data types used for SHA1 sum
    library functions.
-   Copyright (C) 2000, 2001, 2003, 2005, 2006, 2008
+   Copyright (C) 2000, 2001, 2003, 2005, 2006, 2008, 2009
    Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
@@ -25,6 +25,10 @@
 
 # include <stdio.h>
 # include <stdint.h>
+
+# ifdef __cplusplus
+extern "C" {
+# endif
 
 #define SHA1_DIGEST_SIZE 20
 
@@ -83,5 +87,9 @@ extern int sha1_stream (FILE *stream, void *resblock);
    output yields to the wanted ASCII representation of the message
    digest.  */
 extern void *sha1_buffer (const char *buffer, size_t len, void *resblock);
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif

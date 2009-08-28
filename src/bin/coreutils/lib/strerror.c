@@ -313,7 +313,13 @@ rpl_strerror (int n)
       break;
 # endif
 
-# if GNULIB_defined_
+# if GNULIB_defined_ESTALE
+    case ESTALE:
+      msg = "Stale NFS file handle";
+      break;
+# endif
+
+# if GNULIB_defined_ECANCELED
     case ECANCELED:
       msg = "Operation canceled";
       break;

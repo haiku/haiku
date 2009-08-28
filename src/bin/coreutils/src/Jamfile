@@ -74,7 +74,7 @@ StdBinCommands
 	wc.c
 	whoami.c
 	yes.c
-	: libfetish.a : $(coreutils_rsrc) ;
+	: libfetish.a libiconv.a : $(coreutils_rsrc) ;
 
 # set set-uid bit on su
 MODE on su = 04755 ;
@@ -96,7 +96,7 @@ StdBinCommands
 	pwd.c
 	sleep.c
 	sort.c
-        : libfetish.a libroot.so : $(coreutils_rsrc) ;
+        : libfetish.a libiconv.a libroot.so : $(coreutils_rsrc) ;
 
 # df.c
 # hostid.c
@@ -126,7 +126,7 @@ BinCommand chown :
 	: libfetish.a libroot.so : $(coreutils_rsrc) ;
 
 BinCommand cp : 
-	cp.c copy.c cp-hash.c : libfetish.a : $(coreutils_rsrc) ;
+	cp.c copy.c cp-hash.c : libfetish.a libiconv.a : $(coreutils_rsrc) ;
 
 BinCommand mv : 
 	mv.c [ FGristFiles copy.o cp-hash.o remove.o ]
@@ -154,4 +154,4 @@ BinCommand rmdir : rmdir.c [ FGristFiles prog-fprintf.o ] : libfetish.a libroot.
 
 BinCommand uname : uname.c uname-uname.c : libfetish.a $(TARGET_SELECT_UNAME_ETC_LIB) : $(coreutils_rsrc) ;
 
-BinCommand timeout : timeout.c [ FGristFiles operand2sig.o ] : libfetish.a : $(coreutils_rsrc) ;
+BinCommand timeout : timeout.c [ FGristFiles operand2sig.o ] : libfetish.a libiconv.a : $(coreutils_rsrc) ;

@@ -17,7 +17,7 @@
 #include <config.h>
 
 /* Specification.  */
-#include "fpurge.h"
+#include <stdio.h>
 
 #if HAVE___FPURGE                   /* glibc >= 2.2, Haiku, Solaris >= 7 */
 # include <stdio_ext.h>
@@ -35,7 +35,7 @@ fpurge (FILE *fp)
   /* The __fpurge function does not have a return value.  */
   return 0;
 
-#elif HAVE_FPURGE                   /* FreeBSD, NetBSD, OpenBSD, DragonFly, MacOS X */
+#elif HAVE_FPURGE                   /* FreeBSD, NetBSD, OpenBSD, DragonFly, MacOS X, Cygwin 1.7 */
 
   /* Call the system's fpurge function.  */
 # undef fpurge
@@ -49,7 +49,7 @@ fpurge (FILE *fp)
        <stdio.h> on BSD systems says:
          "The following always hold: if _flags & __SRD, _w is 0."
        If this invariant is not fulfilled and the stream is read-write but
-       currently writing, subsequent putc or fputc calls will write directly
+       currently reading, subsequent putc or fputc calls will write directly
        into the buffer, although they shouldn't be allowed to.  */
     if ((fp_->_flags & __SRD) != 0)
       fp_->_w = 0;

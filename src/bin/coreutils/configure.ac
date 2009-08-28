@@ -32,7 +32,7 @@ AC_CONFIG_SRCDIR([src/ls.c])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([lib/config.h:lib/config.hin])
 
-AM_INIT_AUTOMAKE([1.10b dist-xz color-tests parallel-tests])
+AM_INIT_AUTOMAKE([1.11 dist-xz color-tests parallel-tests])
 AM_SILENT_RULES([yes]) # make --enable-silent-rules the default.
 
 AC_PROG_CC_STDC
@@ -60,9 +60,11 @@ if test "$gl_gcc_warnings" = yes; then
   gl_WARN_ADD([-Werror], [WERROR_CFLAGS])
   AC_SUBST([WERROR_CFLAGS])
 
-  # Add many warnings, except some...
+  nw=
+  # This, $nw, is the list of warnings we disable.
   nw="$nw -Wdeclaration-after-statement" # too useful to forbid
   nw="$nw -Waggregate-return"       # anachronistic
+  nw="$nw -Wlong-long"              # C90 is anachronistic (lib/gethrxtime.h)
   nw="$nw -Wc++-compat"             # We don't care about C++ compilers
   nw="$nw -Wundef"                  # Warns on '#if GNULIB_FOO' etc in gnulib
   nw="$nw -Wtraditional"            # Warns on #elif which we use often
@@ -80,6 +82,7 @@ if test "$gl_gcc_warnings" = yes; then
   nw="$nw -Wnested-externs"         # use of XARGMATCH/verify_function__
   nw="$nw -Wswitch-enum"            # Too many warnings for now
   nw="$nw -Wswitch-default"         # Too many warnings for now
+  nw="$nw -Wstack-protector"        # not worth working around
   # things I might fix soon:
   nw="$nw -Wfloat-equal"            # sort.c, seq.c
   nw="$nw -Wmissing-format-attribute" # copy.c
@@ -97,6 +100,14 @@ if test "$gl_gcc_warnings" = yes; then
   gl_WARN_ADD([-Wno-sign-compare])     # Too many warnings for now
   gl_WARN_ADD([-Wno-pointer-sign])     # Too many warnings for now
   gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
+
+  # Offenders in pre-fts remove.c; FIXME: remove upon remove.c rewrite
+  gl_WARN_ADD([-Wno-jump-misses-init])
+
+  # In spite of excluding -Wlogical-op above, it is enabled, as of
+  # gcc 4.5.0 20090517, and it provokes warnings in cat.c, dd.c, truncate.c
+  gl_WARN_ADD([-Wno-logical-op])
+
   gl_WARN_ADD([-fdiagnostics-show-option])
 
   AC_SUBST([WARN_CFLAGS])
@@ -314,6 +325,19 @@ if test $gl_cv_list_mounted_fs = yes && test $gl_cv_fs_space = yes; then
   gl_ADD_PROG([optional_bin_progs], [df])
 fi
 
+# Limit stdbuf to ELF systems with GCC
+optional_pkglib_progs=
+AC_MSG_CHECKING([whether this is an ELF system])
+AC_EGREP_CPP([yes], [#if __ELF__
+yes
+#endif], [elf_sys=yes], [elf_sys=no])
+AC_MSG_RESULT([$elf_sys])
+if test "$elf_sys" = "yes" && \
+   test "$GCC" = "yes"; then
+  gl_ADD_PROG([optional_bin_progs], [stdbuf])
+  gl_ADD_PROG([optional_pkglib_progs], [libstdbuf.so])
+fi
+
 ############################################################################
 mk="$srcdir/src/Makefile.am"
 # Extract all literal names from the definition of $(EXTRA_PROGRAMS)
@@ -386,6 +410,8 @@ MAN=`echo "$MAN"|sed 's/\@<:@\.1//'`
 
 OPTIONAL_BIN_PROGS=`echo "$optional_bin_progs "|sed 's/ /\$(EXEEXT) /g;s/ $//'`
 AC_SUBST([OPTIONAL_BIN_PROGS])
+OPTIONAL_PKGLIB_PROGS=`echo "$optional_pkglib_progs " | sed 's/ $//'`
+AC_SUBST([OPTIONAL_PKGLIB_PROGS])
 NO_INSTALL_PROGS_DEFAULT=$no_install_progs_default
 AC_SUBST([NO_INSTALL_PROGS_DEFAULT])
 

@@ -1,6 +1,6 @@
 /* Declarations of functions and data types used for SHA256 and SHA224 sum
    library functions.
-   Copyright (C) 2005, 2006, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2008, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,10 @@
 
 # include <stdio.h>
 # include <stdint.h>
+
+# ifdef __cplusplus
+extern "C" {
+# endif
 
 /* Structure to save state of computation between the single steps.  */
 struct sha256_ctx
@@ -79,5 +83,9 @@ extern int sha224_stream (FILE *stream, void *resblock);
    digest.  */
 extern void *sha256_buffer (const char *buffer, size_t len, void *resblock);
 extern void *sha224_buffer (const char *buffer, size_t len, void *resblock);
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif

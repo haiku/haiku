@@ -24,7 +24,7 @@ no_install__progs = \
   arch hostname su
 
 build_if_possible__progs = \
-  chroot df hostid nice pinky stty su uname uptime users who
+  chroot df hostid nice pinky stdbuf libstdbuf.so stty su uname uptime users who
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 
@@ -48,6 +48,8 @@ bin_PROGRAMS = $(OPTIONAL_BIN_PROGS)
 
 noinst_PROGRAMS = setuidgid getlimits
 
+pkglib_PROGRAMS = $(OPTIONAL_PKGLIB_PROGS)
+
 noinst_HEADERS = \
   chown-core.h \
   copy.h \
@@ -70,7 +72,7 @@ BUILT_SOURCES =
 CLEANFILES = $(SCRIPTS) su
 
 # Also remove these sometimes-built programs.
-# For example, even when excluded, they're built via check-AUTHORS.
+# For example, even when excluded, they're built via sc_check-AUTHORS.
 CLEANFILES += $(no_install__progs)
 
 AM_CPPFLAGS = -I$(top_srcdir)/lib
@@ -91,6 +93,7 @@ du_LDADD = $(LDADD)
 getlimits_LDADD = $(LDADD)
 ptx_LDADD = $(LDADD)
 split_LDADD = $(LDADD)
+stdbuf_LDADD = $(LDADD)
 timeout_LDADD = $(LDADD)
 truncate_LDADD = $(LDADD)
 
@@ -170,6 +173,7 @@ du_LDADD += $(LIBICONV)
 getlimits_LDADD += $(LIBICONV)
 ptx_LDADD += $(LIBICONV)
 split_LDADD += $(LIBICONV)
+stdbuf_LDADD += $(LIBICONV)
 timeout_LDADD += $(LIBICONV)
 truncate_LDADD += $(LIBICONV)
 
@@ -286,6 +290,16 @@ sha512sum_CPPFLAGS = -DHASH_ALGO_SHA512=1 $(AM_CPPFLAGS)
 
 ginstall_CPPFLAGS = -DENABLE_MATCHPATHCON=1 $(AM_CPPFLAGS)
 
+# Ensure we don't link against libcoreutils.a as that lib is
+# not compiled with -fPIC which causes issues on 64 bit at least
+libstdbuf_so_LDADD =
+
+# Note libstdbuf is only compiled if GCC is available
+# (as per the check in configure.ac), so these flags should be available.
+# libtool is probably required to relax this dependency.
+libstdbuf_so_LDFLAGS = -shared
+libstdbuf_so_CFLAGS = -fPIC $(AM_CFLAGS)
+
 editpl = sed -e 's,@''PERL''@,$(PERL),g'
 
 BUILT_SOURCES += dircolors.h
@@ -359,16 +373,22 @@ all_programs.list:
 	@echo $(all_programs) | tr ' ' '\n' | sed -e 's,$(EXEEXT)$$,,' \
 	  | $(ASSORT) -u
 
+# This is required because we have broken inter-directory dependencies:
+# in order to generate all man pages, even those for which we don't
+# install a binary, require that all programs be built at distribution time.
+dist-hook: $(all_programs)
+
 pm = progs-makefile
 pr = progs-readme
 # Ensure that the list of programs in README matches the list
 # of programs we can build.
-check: check-README check-duplicate-no-install check-AUTHORS
+check: check-README check-duplicate-no-install
 .PHONY: check-README
 check-README:
 	rm -rf $(pr) $(pm)
 	echo $(all_programs) \
 	 | tr -s ' ' '\n' | sed -e 's,$(EXEEXT)$$,,;s/ginstall/install/' \
+	 | sed /libstdbuf/d \
 	 | $(ASSORT) -u > $(pm) && \
 	sed -n '/^The programs .* are:/,/^[a-zA-Z]/p' $(top_srcdir)/README \
 	  | sed -n '/^   */s///p' | tr -s ' ' '\n' > $(pr)
@@ -386,14 +406,15 @@ check-duplicate-no-install: tr
 # translation inhibits printing of UTF-8 names, just skip this test.
 au_dotdot = authors-dotdot
 au_actual = authors-actual
-.PHONY: check-AUTHORS
-check-AUTHORS: $(all_programs)
+.PHONY: sc_check-AUTHORS
+sc_check-AUTHORS: $(all_programs)
 	$(AM_V_GEN)locale=en_US.UTF-8;			\
 	LC_ALL="$$locale" ./cat --version		\
 	    | grep ' Torbjorn '	> /dev/null		\
 	  && { echo "$@: skipping this check"; exit 0; }; \
 	rm -f $(au_actual) $(au_dotdot);		\
 	for i in `ls $(all_programs) | sed -e 's,$(EXEEXT)$$,,' \
+	    | sed /libstdbuf/d				\
 	    | $(ASSORT) -u`; do				\
 	  test "$$i" = '[' && continue;			\
 	  exe=$$i;					\
@@ -416,7 +437,9 @@ check-AUTHORS: $(all_programs)
 # Most functions in src/*.c should have static scope.
 # Any that don't must be marked with `extern', but `main'
 # and `usage' are exceptions.  They're always extern, but
-# don't need to be marked.
+# don't need to be marked. Also functions starting with __
+# are exempted due to possibly being added by the compiler
+# (when compiled as a shared library for example).
 #
 # The second nm|grep checks for file-scope variables with `extern' scope.
 .PHONY: sc_tight_scope
@@ -427,7 +450,7 @@ sc_tight_scope: $(bin_PROGRAMS)
 	       test -f $$f && d= || d=$(srcdir)/; echo $$d$$f; done`;	\
 	hdr=`for f in $(noinst_HEADERS); do				\
 	       test -f $$f && d= || d=$(srcdir)/; echo $$d$$f; done`;	\
-	( printf 'main\nusage\n';					\
+	( printf 'main\nusage\n_.*\n';					\
 	  grep -h -A1 '^extern .*[^;]$$' $$src				\
 	    | grep -vE '^(extern |--)' | sed 's/ .*//';			\
 	  perl -ne '/^extern \S+ (\S*) \(/ and print "$$1\n"' $$hdr;	\

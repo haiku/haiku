@@ -1,5 +1,5 @@
 /* hash - hashing table processing.
-   Copyright (C) 1998, 1999, 2001, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2003, 2009 Free Software Foundation, Inc.
    Written by Jim Meyering <meyering@ascend.com>, 1998.
 
    This program is free software: you can redistribute it and/or modify
@@ -26,16 +26,21 @@
 # include <stdio.h>
 # include <stdbool.h>
 
+/* The warn_unused_result attribute appeared first in gcc-3.4.0 */
+# ifndef __attribute__
+#  if __GNUC__ < 3 || (__GNUC__ == 3 && __GNUC_MINOR__ < 4)
+#   define __attribute__(x)
+#  endif
+# endif
+
+# ifndef ATTRIBUTE_WUR
+#  define ATTRIBUTE_WUR __attribute__ ((__warn_unused_result__))
+# endif
+
 typedef size_t (*Hash_hasher) (const void *, size_t);
 typedef bool (*Hash_comparator) (const void *, const void *);
 typedef void (*Hash_data_freer) (void *);
 typedef bool (*Hash_processor) (void *, void *);
-
-struct hash_entry
-  {
-    void *data;
-    struct hash_entry *next;
-  };
 
 struct hash_tuning
   {
@@ -75,13 +80,13 @@ size_t hash_string (const char *, size_t);
 void hash_reset_tuning (Hash_tuning *);
 Hash_table *hash_initialize (size_t, const Hash_tuning *,
 			     Hash_hasher, Hash_comparator,
-			     Hash_data_freer);
+			     Hash_data_freer) ATTRIBUTE_WUR;
 void hash_clear (Hash_table *);
 void hash_free (Hash_table *);
 
 /* Insertion and deletion.  */
-bool hash_rehash (Hash_table *, size_t);
-void *hash_insert (Hash_table *, const void *);
+bool hash_rehash (Hash_table *, size_t) ATTRIBUTE_WUR;
+void *hash_insert (Hash_table *, const void *) ATTRIBUTE_WUR;
 void *hash_delete (Hash_table *, const void *);
 
 #endif

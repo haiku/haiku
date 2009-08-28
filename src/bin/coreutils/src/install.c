@@ -189,7 +189,7 @@ static bool
 extra_mode (mode_t input)
 {
   const mode_t mask = ~S_IRWXUGO & ~S_IFMT;
-  return input & mask;
+  return !! (input & mask);
 }
 
 /* Return true if copy of file SRC_NAME to file DEST_NAME is necessary. */
@@ -269,6 +269,7 @@ cp_option_init (struct cp_options *x)
 {
   cp_options_default (x);
   x->copy_as_regular = true;
+  x->reflink = false;
   x->dereference = DEREF_ALWAYS;
   x->unlink_dest_before_opening = true;
   x->unlink_dest_after_failed_open = false;

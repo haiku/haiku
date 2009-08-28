@@ -3,7 +3,7 @@
 #line 1
 /* A GNU-like <string.h>.
 
-   Copyright (C) 1995-1996, 2001-2008 Free Software Foundation, Inc.
+   Copyright (C) 1995-1996, 2001-2009 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,6 +31,8 @@
 #ifndef _GL_STRING_H
 #define _GL_STRING_H
 
+/* NetBSD 5.0 mis-defines NULL.  */
+#include <stddef.h>
 
 #ifndef __attribute__
 /* This feature is available in gcc versions 2.5 and later.  */
@@ -51,6 +53,21 @@
 extern "C" {
 #endif
 
+
+/* Return the first instance of C within N bytes of S, or NULL.  */
+#if @GNULIB_MEMCHR@
+# if @REPLACE_MEMCHR@
+#  define memchr rpl_memchr
+extern void *memchr (void const *__s, int __c, size_t __n)
+  __attribute__ ((__pure__));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef memchr
+# define memchr(s,c,n) \
+    (GL_LINK_WARNING ("memchr has platform-specific bugs - " \
+                      "use gnulib module memchr for portability" ), \
+     memchr (s, c, n))
+#endif
 
 /* Return the first occurrence of NEEDLE in HAYSTACK.  */
 #if @GNULIB_MEMMEM@

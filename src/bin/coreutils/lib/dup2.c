@@ -1,6 +1,7 @@
 /* Duplicate an open file descriptor to a specified file descriptor.
 
-   Copyright (C) 1999, 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2004, 2005, 2006, 2007, 2009 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,7 +26,45 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#ifndef F_DUPFD
+#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+/* Get declarations of the Win32 API functions.  */
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
+#endif
+
+#if REPLACE_DUP2
+
+# undef dup2
+
+int
+rpl_dup2 (int fd, int desired_fd)
+{
+  int result;
+# if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+  /* If fd is closed, mingw hangs on dup2 (fd, fd).  If fd is open,
+     dup2 (fd, fd) returns 0, but all further attempts to use fd in
+     future dup2 calls will hang.  */
+  if (fd == desired_fd)
+    {
+      if ((HANDLE) _get_osfhandle (fd) == INVALID_HANDLE_VALUE)
+        {
+          errno = EBADF;
+          return -1;
+        }
+      return fd;
+    }
+# endif
+  result = dup2 (fd, desired_fd);
+  if (result == 0)
+    result = desired_fd;
+  return result;
+}
+
+#else /* !REPLACE_DUP2 */
+
+/* On older platforms, dup2 did not exist.  */
+
+# ifndef F_DUPFD
 static int
 dupfd (int fd, int desired_fd)
 {
@@ -41,7 +80,7 @@ dupfd (int fd, int desired_fd)
       return r;
     }
 }
-#endif
+# endif
 
 int
 dup2 (int fd, int desired_fd)
@@ -49,9 +88,10 @@ dup2 (int fd, int desired_fd)
   if (fd == desired_fd)
     return fd;
   close (desired_fd);
-#ifdef F_DUPFD
+# ifdef F_DUPFD
   return fcntl (fd, F_DUPFD, desired_fd);
-#else
+# else
   return dupfd (fd, desired_fd);
-#endif
+# endif
 }
+#endif /* !REPLACE_DUP2 */

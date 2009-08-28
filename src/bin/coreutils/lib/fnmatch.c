@@ -1,7 +1,7 @@
 /* -*- buffer-read-only: t -*- vi: set ro: */
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
-/* Copyright (C) 1991,1992,1993,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007
+/* Copyright (C) 1991,1992,1993,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2009
 	Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -92,7 +92,7 @@ extern int fnmatch (const char *pattern, const char *string, int flags);
 #  define isblank(c) ((c) == ' ' || (c) == '\t')
 # endif
 
-# define STREQ(s1, s2) ((strcmp (s1, s2) == 0))
+# define STREQ(s1, s2) (strcmp (s1, s2) == 0)
 
 # if defined _LIBC || WIDE_CHAR_SUPPORT
 /* The GNU C library provides support for user-defined character classes

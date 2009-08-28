@@ -1,7 +1,7 @@
 /* exclude.h -- declarations for excluding file names
 
    Copyright (C) 1992, 1993, 1994, 1997, 1999, 2001, 2002, 2003, 2005,
-   2006 Free Software Foundation, Inc.
+   2006, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* Written by Paul Eggert <eggert@twinsun.com>  */
+/* Written by Paul Eggert <eggert@twinsun.com>
+   and Sergey Poznyakoff <gray@gnu.org> */
 
 /* Exclude options, which can be ORed with fnmatch options.  */
 
@@ -32,6 +33,8 @@
 #define EXCLUDE_WILDCARDS (1 << 28)
 
 struct exclude;
+
+bool fnmatch_pattern_has_wildcards (const char *, int);
 
 struct exclude *new_exclude (void);
 void free_exclude (struct exclude *);

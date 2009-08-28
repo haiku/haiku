@@ -2,8 +2,8 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* getdelim.c --- Implementation of replacement getdelim function.
-   Copyright (C) 1994, 1996, 1997, 1998, 2001, 2003, 2005, 2006, 2007, 2008 Free
-   Software Foundation, Inc.
+   Copyright (C) 1994, 1996, 1997, 1998, 2001, 2003, 2005, 2006, 2007,
+   2008, 2009 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -27,12 +27,10 @@
 #include <stdio.h>
 
 #include <limits.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <errno.h>
 
-#ifndef SIZE_MAX
-# define SIZE_MAX ((size_t) -1)
-#endif
 #ifndef SSIZE_MAX
 # define SSIZE_MAX ((ssize_t) (SIZE_MAX / 2))
 #endif

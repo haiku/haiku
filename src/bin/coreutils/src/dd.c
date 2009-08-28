@@ -29,6 +29,7 @@
 #include "fd-reopen.h"
 #include "gethrxtime.h"
 #include "human.h"
+#include "ignore-value.h"
 #include "long-options.h"
 #include "quote.h"
 #include "quotearg.h"
@@ -836,6 +837,30 @@ static size_t
 iwrite (int fd, char const *buf, size_t size)
 {
   size_t total_written = 0;
+
+  if ((output_flags & O_DIRECT) && size < output_blocksize)
+    {
+      int old_flags = fcntl (STDOUT_FILENO, F_GETFL);
+      if (fcntl (STDOUT_FILENO, F_SETFL, old_flags & ~O_DIRECT) != 0)
+        error (0, errno, _("failed to turn off O_DIRECT: %s"),
+               quote (output_file));
+
+      /* Since we have just turned off O_DIRECT for the final write,
+         here we try to preserve some of its semantics.  First, use
+         posix_fadvise to tell the system not to pollute the buffer
+         cache with this data.  Don't bother to diagnose lseek or
+         posix_fadvise failure. */
+#ifdef POSIX_FADV_DONTNEED
+      off_t off = lseek (STDOUT_FILENO, 0, SEEK_CUR);
+      if (0 <= off)
+        ignore_value (posix_fadvise (STDOUT_FILENO,
+                                     off, 0, POSIX_FADV_DONTNEED));
+#endif
+
+      /* Attempt to ensure that that final block is committed
+         to disk as quickly as possible.  */
+      conversions_mask |= C_FSYNC;
+    }
 
   while (total_written < size)
     {
@@ -1803,6 +1828,8 @@ main (int argc, char **argv)
   int exit_status;
   off_t offset;
 
+  install_signal_handlers ();
+
   initialize_main (&argc, &argv);
   set_program_name (argv[0]);
   setlocale (LC_ALL, "");
@@ -1869,7 +1896,6 @@ main (int argc, char **argv)
 	      < 0))
 	error (EXIT_FAILURE, errno, _("opening %s"), quote (output_file));
 
-#if HAVE_FTRUNCATE
       if (seek_records != 0 && !(conversions_mask & C_NOTRUNC))
 	{
 	  uintmax_t size = seek_records * output_blocksize;
@@ -1898,14 +1924,11 @@ main (int argc, char **argv)
 		  || S_ISDIR (stdout_stat.st_mode)
 		  || S_TYPEISSHM (&stdout_stat))
 		error (EXIT_FAILURE, ftruncate_errno,
-		       _("truncating at %"PRIuMAX" bytes in output file %s"),
+                   _("failed to truncate to %"PRIuMAX" bytes in output file %s"),
 		       size, quote (output_file));
 	    }
 	}
-#endif
     }
-
-  install_signal_handlers ();
 
   start_time = gethrxtime ();
 

@@ -1,7 +1,7 @@
 # Configuration file for dircolors, a utility to help you set the
 # LS_COLORS environment variable used by GNU ls with the --color option.
 
-# Copyright (C) 1996, 1999-2008
+# Copyright (C) 1996, 1999-2009
 # Free Software Foundation, Inc.
 # Copying and distribution of this file, with or without modification,
 # are permitted provided the copyright notice and this notice are preserved.
@@ -44,6 +44,7 @@ TERM rxvt-cygwin-native
 TERM rxvt-unicode
 TERM screen
 TERM screen-256color
+TERM screen-256color-bce
 TERM screen-bce
 TERM screen-w
 TERM screen.linux
@@ -69,7 +70,7 @@ RESET 0		# reset to "normal" color
 DIR 01;34	# directory
 LINK 01;36	# symbolic link.  (If you set this to 'target' instead of a
 		# numerical value, the color is as for the file pointed to.)
-HARDLINK 44;37	# regular file with more than one link
+MULTIHARDLINK 00	# regular file with more than one link
 FIFO 40;33	# pipe
 SOCK 01;35	# socket
 DOOR 01;35	# door
@@ -108,13 +109,17 @@ EXEC 01;32
 .taz 01;31
 .lzh 01;31
 .lzma 01;31
+.tlz 01;31
+.txz 01;31
 .zip 01;31
 .z   01;31
 .Z   01;31
 .dz  01;31
 .gz  01;31
+.xz  01;31
 .bz2 01;31
 .bz  01;31
+.tbz 01;31
 .tbz2 01;31
 .tz  01;31
 .deb 01;31

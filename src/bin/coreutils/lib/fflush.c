@@ -25,7 +25,6 @@
 #include <unistd.h>
 
 #include "freading.h"
-#include "fpurge.h"
 
 #include "stdio-impl.h"
 

@@ -1,5 +1,5 @@
 /* fchdir replacement.
-   Copyright (C) 2006-2008 Free Software Foundation, Inc.
+   Copyright (C) 2006-2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -172,13 +172,19 @@ rpl_dup (int oldfd)
   return newfd;
 }
 
+/* Our <unistd.h> replacement overrides dup2 twice; be sure to pick
+   the one we want.  */
+#if REPLACE_DUP2
+# undef dup2
+# define dup2 rpl_dup2
+#endif
+
 int
-rpl_dup2 (int oldfd, int newfd)
-#undef dup2
+rpl_dup2_fchdir (int oldfd, int newfd)
 {
   int retval = dup2 (oldfd, newfd);
 
-  if (retval >= 0 && oldfd >= 0 && newfd >= 0 && newfd != oldfd)
+  if (retval >= 0 && newfd != oldfd)
     {
       ensure_dirs_slot (newfd);
       if (newfd < dirs_allocated)
