@@ -26,11 +26,11 @@
 
 <div class="topnav">
 	<p>
-		&laquo;&#160;&#160;<a href="keyboard.html">Keyboard</a>
+		«&#160;&#160;<a href="keyboard.html">Keyboard</a>
 		&#160;&#160;::&#160;&#160;
 		<a href="../preferences.html" class="uplink">Preferences</a>
 		&#160;&#160;::&#160;&#160;
-		<a href="media.html">Media</a>&#160;&#160;&raquo;
+		<a href="media.html">Media</a>&#160;&#160;»
 	</p>
 </div>
 
@@ -46,15 +46,15 @@
 <p><br /></p>
 <img src="../images/prefs-images/keymap.png" alt="keymap.png" />
 <p>To the right, the Keymap window shows a representation of your keyboard. When you press a key, the corresponding key is darkened and the assigned symbol is entered into the <i>Sample and Clipboard</i> text field at the bottom. From there you can also copy and paste it into a document.<br />
-Thus, the Keymap preferences are not only for configuring your local keymap, but are also useful when looking for a special symbol used in other languages. For example, you can switch the keymap to "French", find the "&ccedil;" and copy it into your mail to Fran&ccedil;ois. (Though you'll find the "cedil" also in other keymaps...)</p>
+Thus, the Keymap preferences are not only for configuring your local keymap, but are also useful when looking for a special symbol used in other languages. For example, you can switch the keymap to "French", find the "ç" and copy it into your mail to François. (Though you'll find the "cedil" also in other keymaps...)</p>
 <p>Pressing modifier keys like <span class="key">SHIFT</span>, <span class="key">CONTROL</span> or <span class="key">OPTION</span> changes the displayed keyboard accordingly.</p>
-<p>Then there are the keys that are marked with a blue background. These keys are called <i>Dead Keys</i> that can change the key you press after that. If you click on such a blue key with your mouse, those changeable keys light up yellow. Click again and everything's back to normal. Examples are &eacute;, &ntilde;, &oacute; or &euml;.</p>
+<p>Then there are the keys that are marked with a blue background. These keys are called <i>Dead Keys</i> that can change the key you press after that. If you click on such a blue key with your mouse, those changeable keys light up yellow. Click again and everything's back to normal. Examples are é, ñ, ó or ë.</p>
 <p>Below the keyboard representation are two more options:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Select Dead Keys</span></td><td>&#160;</td><td>for setting the above mentioned blue keys.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Switch Shortcut Key...</span></td><td>&#160;</td><td>for using the shortcut key in Windows/Linux mode, i.e. <span class="key">CONTROL</span> (normally <span class="key">CTRL</span>) or Haiku mode, i.e. <span class="key">COMMAND</span> (normally <span class="key">ALT</span>).</td></tr>
 </table>
-<p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.<br />
+<p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&amp;drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.<br />
 When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
 <p>To better match the Keymap panel to your physical keyboard, there are several different settings available from the <span class="menu">Layout</span> menu.</p>
 <p>The font used in the keyboard representation is set from the <span class="menu">Font</span> menu. Note, that it may or may not contain all symbols for a specific keymap.</p>
@@ -64,7 +64,7 @@ When you're done you can save the result from the menu <span class="menu">File |
 <a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
 <a id="advanced-keymapping" name="advanced-keymapping">Advanced keymap manipulation</a></h1>
 <p>There's another method to customize your keymap besides the Keymap preference panel. It involves editing a text file containing loads of hex values, which may appear daunting on first sight, but isn't really that impossible to grasp.</p>
-<p>You can dump the current keymap with a command in Terminal:<p>
+<p>You can dump the current keymap with a command in Terminal:</p>
 <pre class="terminal">keymap -d MyKeymap</pre>
 <p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
 At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use e.g. <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
@@ -156,7 +156,7 @@ Key 0x13 = '2'      '"'      ''       0xc2b2   ''       '"'      '2'      0xc2b2
 Key 0x14 = '3'      0xc2a7   ''       0xc2b3   ''       0xc2a7   '3'      0xc2b3   ''       
 Key 0x15 = '4'      '$'      ''       ' '      ''       '$'      '4'      ' '      ''       
 Key 0x16 = '5'      '%'      ''       ' '      ''       '%'      '5'      ' '      ''       
-Key 0x17 = '6'      '&'      ''       ' '      ''       '&'      '6'      ' '      ''       
+Key 0x17 = '6'      '&amp;'      ''       ' '      ''       '&amp;'      '6'      ' '      ''       
 Key 0x18 = '7'      '/'      ''       '{'      ''       '/'      '7'      '{'      ''       
 Key 0x19 = '8'      '('      ''       '['      ''       '('      '8'      '['      ''       
 Key 0x1a = '9'      ')'      ''       ']'      ''       ')'      '9'      ']'      ''       
@@ -238,7 +238,7 @@ Key 0x65 = 0x7f     ','      0x7f     0x7f     ','      0x7f     ','      0x7f  
 Key 0x66 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
 Key 0x67 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
 Key 0x68 = ''       ''       ''       ''       ''       ''       ''       ''       ''       
-Key 0x69 = '<'      '>'      ''       '|'      ''       '<'      '>'      '|'      ''       
+Key 0x69 = '&lt;'      '&gt;'      ''       '|'      ''       '&lt;'      '&gt;'      '|'      ''       
 Key 0x6a = ''       ''       ''       ''       ''       ''       ''       ''       ''       
 Key 0x6b = ''       ''       ''       ''       ''       ''       ''       ''       ''       
 Key 0x6c = ''       ''       ''       ''       ''       ''       ''       ''       ''       
@@ -352,11 +352,11 @@ TildeTab = Normal Shift Option Option-Shift CapsLock CapsLock-Shift CapsLock-Opt
 
 <div class="bottomnav">
 	<p>
-		&laquo;&#160;&#160;<a href="keyboard.html">Keyboard</a>
+		«&#160;&#160;<a href="keyboard.html">Keyboard</a>
 		&#160;&#160;::&#160;&#160;
 		<a href="../preferences.html" class="uplink">Preferences</a>
 		&#160;&#160;::&#160;&#160;
-		<a href="media.html">Media</a>&#160;&#160;&raquo;
+		<a href="media.html">Media</a>&#160;&#160;»
 	</p>
 </div>
 

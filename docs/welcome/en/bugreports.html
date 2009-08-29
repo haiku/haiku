@@ -37,18 +37,21 @@ To keep our bugtracker effective, it's essential to abide by the <a href="http:/
 <ol>
 <li><p>Before reporting a bug please <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=~text+you+want+to+search+for&amp;order=priority">make sure</a> that it does not yet exist. You can also use the <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">search</a> function for this.</p></li>
 <li><p>After you have established this is a unique bug, make your information as accurate as possible:
-<ul>
-<li><p>Include basic information such as how you are testing Haiku (on real hardware, on VMWare, on QEMU, etc.).</p></li>
-<li><p>Mention which revision from <acronym title="Subversion, the source code management system we use">SVN</acronym> you are running. You can find this information in '<i>About This System...</i>' from the Deskbar menu.</p></li>
-<li><p>Describe the problem you are experiencing. Try to be as accurate as you can: describe the actual behavior, and the behavior you expected.</p></li>
-<li><p>Describe what steps you need to perform in order to expose the bug. This will help developers reproduce the bug.</p></li>
-<li><p>Attach as much information as you have. If it is a GUI bug, or a bug in one of the applications, try to make a screen shot (the <span class="key">PRINT</span> key files a <acronym title="Portable Network Graphics image format">PNG</acronym> into <span class="path">/boot/home/</span>).</p>
-<p>If it is a hardware problem, include a copy of the <span class="cli">syslog</span> file (just query for "<tt>syslog</tt>" to find it).</p>
-<p>Also interesting when dealing with hardware issues, is the output of <span class="cli">listdev</span> and <span class="cli">sysinfo</span>. This will pipe the output into text files that you can attach to your bugreport or email:</p>
-<pre class="terminal">listdev > listdev-output.txt
-sysinfo > sysinfo-output.txt</pre></li>
+	<ul>
+	<li><p>Include basic information such as how you are testing Haiku (on real hardware, on VMWare, on QEMU, etc.).</p></li>
+	<li><p>Mention which revision from <acronym title="Subversion, the source code management system we use">SVN</acronym> you are running. You can find this information in '<i>About This System...</i>' from the Deskbar menu.</p></li>
+	<li><p>Describe the problem you are experiencing. Try to be as accurate as you can: describe the actual behavior, and the behavior you expected.</p></li>
+	<li><p>Describe what steps you need to perform in order to expose the bug. This will help developers reproduce the bug.</p></li>
+	<li><p>Attach as much information as you have. If it is a GUI bug, or a bug in one of the applications, try to make a screen shot (the <span class="key">PRINT</span> key files a <acronym title="Portable Network Graphics image format">PNG</acronym> into <span class="path">/boot/home/</span>).</p></li>
+	</ul>
+	</p>
+	<p>If it is a hardware problem, include a copy of the <span class="cli">syslog</span> file (just query for "<tt>syslog</tt>" to find it).</p>
+	<p>Also interesting when dealing with hardware issues, is the output of <span class="cli">listdev</span> and <span class="cli">sysinfo</span>. This will pipe the output into text files that you can attach to your bugreport or email:</p>
+	<pre class="terminal">listdev &gt; listdev-output.txt
+sysinfo &gt; sysinfo-output.txt</pre>
+
+</li>
 <li><p>When an application crashed, you should invoke the debugger from the alert that pops up. Entering <span class="cli">bt</span> into the launched debug Terminal, you create a "backtrace" that you should copy into your bugreport.</p></li>
-</ul></li>
 <li><p>After the bug has been reported, a developer will look at your bug and try to classify it. Remember, we are all volunteers, and as such, sometimes a bug report might go unanswered for a while. Adding new information when it becomes available usually helps getting a bug picked up quicker, but do not try to 'bump' the bug up by adding non-descriptive comments.</p></li>
 <li><p>Remember, reporting a bug is not something you spend a little time on and then you are done. If you reported a bug, then you are part of the Haiku development process. Developers might come up with questions while they are trying to fix your bug. Please stay around to answer these. Consider your participation 'done' when the bug is marked as 'fixed'. Together we can improve Haiku, bit by bit.</p></li>
 </ol>
