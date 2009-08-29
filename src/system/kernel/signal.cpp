@@ -59,7 +59,7 @@ const char * const sigstr[NSIG] = {
 
 
 static status_t deliver_signal(struct thread *thread, uint signal,
-	uint32 flags, bool& reschedule);
+	uint32 flags, bool &reschedule);
 
 
 
@@ -489,7 +489,7 @@ is_signal_blocked(int signal)
 */
 static status_t
 deliver_signal(struct thread *thread, uint signal, uint32 flags, 
-	bool& reschedule)
+	bool &reschedule)
 {
 	if (flags & B_CHECK_PERMISSION) {
 		// ToDo: introduce euid & uid fields to the team and check permission
@@ -581,10 +581,8 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 		GRAB_THREAD_LOCK();
 
 		thread = thread_get_thread_struct_locked(id);
-		if (thread != NULL) {
-			status = deliver_signal(thread, signal, flags, 
-				reschedule);
-		}
+		if (thread != NULL)
+			status = deliver_signal(thread, signal, flags, reschedule);
 	} else {
 		// send a signal to the specified process group
 		// (the absolute value of the id)
@@ -617,8 +615,7 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 				if (thread != NULL) {
 					// we don't stop because of an error sending the signal; we
 					// rather want to send as much signals as possible
-					status = deliver_signal(thread, signal, flags, 
-						reschedule);
+					status = deliver_signal(thread, signal, flags, reschedule);
 				}
 
 				RELEASE_THREAD_LOCK();
