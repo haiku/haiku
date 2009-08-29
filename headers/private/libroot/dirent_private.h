@@ -10,7 +10,7 @@
 
 
 #define DIR_BUFFER_SIZE	4096
-#define DIRENT_BUFFER_SIZE (DIR_BUFFER_SIZE - 2 * sizeof(int))
+#define DIRENT_BUFFER_SIZE (DIR_BUFFER_SIZE - offsetof(struct __DIR, first_entry))
 
 struct __DIR {
 	int				fd;
