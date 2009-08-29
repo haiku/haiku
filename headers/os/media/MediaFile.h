@@ -76,7 +76,8 @@ public:
 			status_t			InitCheck() const;
 
 	// Get info about the underlying file format.
-			status_t			GetFileFormatInfo(media_file_format* mfi) const;
+			status_t			GetFileFormatInfo(
+									media_file_format* mfi) const;
 
 	//
 	// These functions are for read-only access to a media file.
