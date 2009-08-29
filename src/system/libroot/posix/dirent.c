@@ -6,13 +6,26 @@
 
 
 #include <dirent.h>
+
 #include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
 
-#include <dirent_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
+
+
+#define DIR_BUFFER_SIZE	4096
+
+
+struct __DIR {
+	int				fd;
+	short			next_entry;
+	unsigned short	entries_left;
+	long			seek_position;
+	long			current_position;
+	struct dirent	first_entry;
+};
 
 
 static int
@@ -62,8 +75,8 @@ do_seek_dir(DIR* dir)
 		dir->current_position += dir->entries_left;
 		dir->entries_left = 0;
 
-		count = _kern_read_dir(dir->fd, &dir->first_entry, DIRENT_BUFFER_SIZE,
-			USHRT_MAX);
+		count = _kern_read_dir(dir->fd, &dir->first_entry,
+			(char*)dir + DIR_BUFFER_SIZE - (char*)&dir->first_entry, USHRT_MAX);
 		if (count <= 0) {
 			if (count < 0)
 				errno = count;
@@ -83,21 +96,14 @@ do_seek_dir(DIR* dir)
 // #pragma mark -
 
 
-DIR *
-opendir(const char *path)
+DIR*
+fdopendir(int fd)
 {
-	DIR *dir;
-
-	int fd = _kern_open_dir(-1, path);
-	if (fd < 0) {
-		errno = fd;
-		return NULL;
-	}
+	DIR* dir;
 
 	/* allocate the memory for the DIR structure */
-	if ((dir = (DIR *)malloc(DIR_BUFFER_SIZE)) == NULL) {
+	if ((dir = (DIR*)malloc(DIR_BUFFER_SIZE)) == NULL) {
 		errno = B_NO_MEMORY;
-		_kern_close(fd);
 		return NULL;
 	}
 
@@ -110,10 +116,38 @@ opendir(const char *path)
 }
 
 
-int
-closedir(DIR *dir)
+DIR*
+opendir(const char* path)
 {
-	int status = _kern_close(dir->fd);
+	DIR* dir;
+
+	int fd = _kern_open_dir(-1, path);
+	if (fd < 0) {
+		errno = fd;
+		return NULL;
+	}
+
+	// allocate the DIR structure
+	if ((dir = fdopendir(fd)) == NULL) {
+		_kern_close(fd);
+		return NULL;
+	}
+
+	return dir;
+}
+
+
+int
+closedir(DIR* dir)
+{
+	int status;
+
+	if (dir == NULL) {
+		errno = B_BAD_VALUE;
+		return -1;
+	}
+
+	status = _kern_close(dir->fd);
 
 	free(dir);
 
@@ -121,8 +155,8 @@ closedir(DIR *dir)
 }
 
 
-struct dirent *
-readdir(DIR *dir)
+struct dirent*
+readdir(DIR* dir)
 {
 	ssize_t count;
 
@@ -145,8 +179,8 @@ readdir(DIR *dir)
 
 	// we need to retrieve new entries
 
-	count = _kern_read_dir(dir->fd, &dir->first_entry, DIRENT_BUFFER_SIZE,
-		USHRT_MAX);
+	count = _kern_read_dir(dir->fd, &dir->first_entry,
+		(char*)dir + DIR_BUFFER_SIZE - (char*)&dir->first_entry, USHRT_MAX);
 	if (count <= 0) {
 		if (count < 0)
 			errno = count;
@@ -165,7 +199,7 @@ readdir(DIR *dir)
 
 
 int
-readdir_r(DIR *dir, struct dirent *entry, struct dirent **_result)
+readdir_r(DIR* dir, struct dirent* entry, struct dirent** _result)
 {
 	ssize_t count = _kern_read_dir(dir->fd, entry, sizeof(struct dirent)
 		+ B_FILE_NAME_LENGTH, 1);
@@ -183,7 +217,7 @@ readdir_r(DIR *dir, struct dirent *entry, struct dirent **_result)
 
 
 void
-rewinddir(DIR *dir)
+rewinddir(DIR* dir)
 {
 	dir->seek_position = 0;
 }
@@ -204,7 +238,7 @@ telldir(DIR* dir)
 
 
 int
-dirfd(const DIR *dir)
+dirfd(const DIR* dir)
 {
 	return dir->fd;
 }

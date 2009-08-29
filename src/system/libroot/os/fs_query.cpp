@@ -6,13 +6,14 @@
 
 #include <fs_query.h>
 
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
-#include <errno.h>
 
-#include <dirent_private.h>
 #include <syscalls.h>
+#include <syscall_utils.h>
 
 
 static DIR *
@@ -31,16 +32,12 @@ open_query_etc(dev_t device, const char *query,
 		return NULL;
 	}
 
-	// allocate a DIR
-	DIR *dir = (DIR *)malloc(DIR_BUFFER_SIZE);
-	if (!dir) {
+	// allocate the DIR structure
+	DIR *dir = fdopendir(fd);
+	if (dir == NULL) {
 		_kern_close(fd);
-		errno = B_NO_MEMORY;
 		return NULL;
 	}
-
-	dir->fd = fd;
-	dir->entries_left = 0;
 
 	return dir;
 }
@@ -70,14 +67,7 @@ fs_open_live_query(dev_t device, const char *query,
 int
 fs_close_query(DIR *dir)
 {
-	if (dir == NULL) {
-		errno = B_BAD_VALUE;
-		return -1;
-	}
-
-	int fd = dir->fd;
-	free(dir);
-	return _kern_close(fd);
+	return closedir(dir);
 }
 
 
