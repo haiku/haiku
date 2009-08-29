@@ -41,7 +41,7 @@
 <ol>
 <li><p>Install all needed packages:</p>
 <dl>
-<dt class="collapsable_dt">Debian & Ubuntu</dt>
+<dt class="collapsable_dt">Debian &amp; Ubuntu</dt>
 <dd>
 <p>On Ubuntu you can do so by clicking <a href="apt:subversion,autoconf,automake,texinfo,flex,bison,gawk,build-essential,yasm,wget">here</a>, or use the command line:</p>
 <pre class="terminal">sudo apt-get install subversion autoconf automake texinfo flex bison gawk build-essential yasm wget</pre>
@@ -62,7 +62,7 @@
 <p>
 <a href="http://haiku-user.info/files/custom-puppy-421.iso">Here</a> is a premade Puppy iso containing all of the necessary tools - just burn it.
 </p>
-<dd>
+</dd>
 
 </dl>
 
@@ -134,7 +134,7 @@ AddOptionalHaikuImagePackages WonderBrush ;</pre>
 <pre># Add symlink/file (timezone and keymap settings) to the image.
 AddSymlinkToHaikuImage home config settings
 	: /boot/system/etc/timezones/Europe/Paris : timezone ;
-AddFilesToHaikuImage home config settings : <keymap>German 
+AddFilesToHaikuImage home config settings : &lt;keymap&gt;German 
 	: Key_map ;</pre></li> 
 <li><p>The build process can be fine tuned until it fits your needs. You could create your own folder <span class="path">haiku/trunk/user_data/</span> and put files there that are then copied or unzipped into the image. Zipping is important when dealing with Haiku files and their attributes, because zipping them up will preserve them on non-BFS partitions.<br />
 For example:</p>

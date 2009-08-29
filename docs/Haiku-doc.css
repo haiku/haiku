@@ -78,7 +78,7 @@ div.logo {
 	left: 0px;
 	top: 0px;
 	height: 84px;
-	background: #efefef;
+	background: #eeeeee;
 }
 div.logo img {
 	margin-left: 10px;
@@ -102,7 +102,7 @@ div.topnav p {
 	font-size: 0.8em;
 }
 div.bottomnav {
-	background: #efefef;
+	background: #eeeeee;
 }
 div.bottomnav p {
 	margin-right: 40px;
@@ -131,7 +131,7 @@ table.index tr.heading {
 	font-size: 1.1em;
 }
 table.index tr.index {
-	background-color: #efefef;
+	background-color: #eeeeee;
 }
 table.index td {
 	padding: 5px 20px;
