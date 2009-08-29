@@ -103,12 +103,14 @@ public:
 		status_t			InitCheck();
 
 		bool				IsVirtual() { return fIsVirtual; }
+		bool				IsModified() { return fIsModified; }
 
 		fs_volume *			Volume() { return fVolume->Volume(); }
 		fs_volume *			SuperVolume() { return fVolume->SuperVolume(); }
 		fs_vnode *			SuperVnode() { return &fSuperVnode; }
 		ino_t				InodeNumber() { return fInodeNumber; }
 
+		void				SetModified();
 		void				CreateCache();
 
 		void				SetParentDir(OverlayInode *parentDir);
@@ -167,6 +169,7 @@ private:
 		bool				fHasStat;
 		bool				fHasDirents;
 		bool				fIsVirtual;
+		bool				fIsModified;
 		void *				fFileCache;
 };
 
@@ -202,6 +205,7 @@ OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
 		fHasStat(false),
 		fHasDirents(false),
 		fIsVirtual(superVnode == NULL),
+		fIsModified(false),
 		fFileCache(NULL)
 {
 	TRACE("inode created %lld\n", fInodeNumber);
@@ -253,6 +257,19 @@ OverlayInode::InitCheck()
 
 
 void
+OverlayInode::SetModified()
+{
+	// we must ensure that a modified node never get's put, as we cannot get it
+	// from the underlying filesystem, so we get an additional reference here
+	// and deliberately leak it
+	// TODO: what about non-force unmounting then?
+	void *unused = NULL;
+	get_vnode(Volume(), fInodeNumber, &unused);
+	fIsModified = true;
+}
+
+
+void
 OverlayInode::CreateCache()
 {
 	if (!S_ISDIR(fStat.st_mode) && !S_ISLNK(fStat.st_mode)) {
@@ -297,6 +314,8 @@ void
 OverlayInode::SetName(const char *name)
 {
 	fName = name;
+	if (!fIsModified)
+		SetModified();
 }
 
 
@@ -370,6 +389,9 @@ OverlayInode::WriteStat(const struct stat *stat, uint32 statMask)
 		statMask |= B_STAT_MODIFICATION_TIME;
 	}
 
+	if (!fIsModified)
+		SetModified();
+
 	notify_stat_changed(SuperVolume()->id, fInodeNumber, statMask);
 	return B_OK;
 }
@@ -422,8 +444,11 @@ OverlayInode::Open(int openMode, void **_cookie)
 		fOriginalNodeLength = stat.st_size;
 	}
 
-	if (openMode & O_TRUNC)
+	if (openMode & O_TRUNC) {
 		fStat.st_size = 0;
+		if (!fIsModified)
+			SetModified();
+	}
 
 	openMode &= ~(O_RDWR | O_WRONLY | O_TRUNC | O_CREAT);
 	status_t result = fSuperVnode.ops->open(SuperVolume(), &fSuperVnode,
@@ -556,6 +581,9 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 		if (cookie->open_mode & O_APPEND)
 			position = fStat.st_size;
 	}
+
+	if (!fIsModified)
+		SetModified();
 
 	// find insertion point
 	write_buffer **link = &fWriteBuffers;
@@ -787,6 +815,10 @@ OverlayInode::AddEntry(overlay_dirent *entry)
 
 	fDirents = newDirents;
 	fDirents[fDirentCount++] = entry;
+
+	if (!fIsModified)
+		SetModified();
+
 	return B_OK;
 }
 
@@ -809,6 +841,9 @@ OverlayInode::RemoveEntry(const char *name, overlay_dirent **_entry)
 				*_entry = entry;
 			else
 				entry->remove_and_dispose(Volume(), fInodeNumber);
+
+			if (!fIsModified)
+				SetModified();
 
 			return B_OK;
 		}
@@ -965,6 +1000,7 @@ OverlayInode::_CreateCommon(const char *name, int type, int perms,
 		return result;
 	}
 
+	node->SetModified();
 	node->CreateCache();
 
 	if (newInodeNumber != NULL)
@@ -998,7 +1034,8 @@ overlay_put_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
 {
 	TRACE("put_vnode\n");
 	OverlayInode *node = (OverlayInode *)vnode->private_node;
-	if (node->IsVirtual()) {
+	if (node->IsVirtual() || node->IsModified()) {
+		panic("loosing virtual/modified node\n");
 		delete node;
 		return B_OK;
 	}
