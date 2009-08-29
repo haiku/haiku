@@ -930,9 +930,16 @@ rootfs_rename(fs_volume* _volume, fs_vnode* _fromDir, const char* fromName,
 	struct rootfs_vnode* fromDirectory = (rootfs_vnode*)_fromDir->private_node;
 	struct rootfs_vnode* toDirectory = (rootfs_vnode*)_toDir->private_node;
 
-	TRACE(("rootfs_rename: from %p (0x%Lx), fromName '%s', to %p (0x%Lx), "
-		"toName '%s'\n", fromDirectory, fromDirectory->id, fromName, toDirectory,
-		toDirectory->id, toName));
+	TRACE(("rootfs_rename: from %p (0x%Lx, %s), fromName '%s', to %p "
+		"(0x%Lx, %s), toName '%s'\n", fromDirectory, fromDirectory->id,
+		fromDirectory->name != NULL ? fromDirectory->name : "NULL",
+		fromName, toDirectory, toDirectory->id,
+		toDirectory->name != NULL ? toDirectory->name : "NULL",
+		toName));
+
+	// Prevent renaming /boot, since that will stop everything from working.
+	if (fromDirectory->id == 1 && strcmp(fromName, "boot") == 0)
+		return EPERM;
 
 	MutexLocker _(&fs->lock);
 
