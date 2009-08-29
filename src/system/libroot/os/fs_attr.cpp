@@ -6,25 +6,17 @@
 
 #include <fs_attr.h>
 
-#include <stdlib.h>
-#include <fcntl.h>
+#include <syscall_utils.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <stdlib.h>
 
-#include "dirent_private.h"
-#include "syscalls.h"
+#include <syscalls.h>
+#include <syscall_utils.h>
 
 
 // TODO: think about adding special syscalls for the read/write/stat functions
 // to speed them up
-
-#define RETURN_AND_SET_ERRNO(status) \
-	{ \
-		if (status < 0) { \
-			errno = status; \
-			return -1; \
-		} \
-		return status; \
-	}
 
 
 static DIR *
@@ -38,15 +30,11 @@ open_attr_dir(int file, const char *path)
 		return NULL;
 	}
 
-	/* allocate the memory for the DIR structure */
-	if ((dir = (DIR *)malloc(DIR_BUFFER_SIZE)) == NULL) {
-		errno = B_NO_MEMORY;
+	// allocate the DIR structure
+	if ((dir = fdopendir(fd)) == NULL) {
 		_kern_close(fd);
 		return NULL;
 	}
-
-	dir->fd = fd;
-	dir->entries_left = 0;
 
 	return dir;
 }
@@ -151,11 +139,7 @@ fs_fopen_attr_dir(int fd)
 extern "C" int
 fs_close_attr_dir(DIR* dir)
 {
-	int status = _kern_close(dir->fd);
-
-	free(dir);
-
-	RETURN_AND_SET_ERRNO(status);
+	return closedir(dir);
 }
 
 

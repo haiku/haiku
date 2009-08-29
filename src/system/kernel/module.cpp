@@ -11,6 +11,7 @@
 
 #include <kmodule.h>
 
+#include <dirent.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,8 +19,6 @@
 
 #include <FindDirectory.h>
 #include <NodeMonitor.h>
-
-#include <dirent_private.h>
 
 #include <boot_device.h>
 #include <boot/elf.h>
@@ -1529,24 +1528,21 @@ ModuleNotificationService::_ScanDirectory(Stack<DIR*>& stack, DIR* dir,
 		}
 
 		struct stat stat;
-		status_t status = vfs_read_stat(dir->fd, dirent->d_name, true, &stat,
+		status_t status = vfs_read_stat(dirfd(dir), dirent->d_name, true, &stat,
 			true);
 		if (status != B_OK)
 			continue;
 
 		if (S_ISDIR(stat.st_mode)) {
-			int fd = _kern_open_dir(dir->fd, dirent->d_name);
+			int fd = _kern_open_dir(dirfd(dir), dirent->d_name);
 			if (fd < 0)
 				continue;
 
-			DIR* subDir = (DIR*)malloc(DIR_BUFFER_SIZE);
+			DIR* subDir = fdopendir(fd);
 			if (subDir == NULL) {
 				close(fd);
 				continue;
 			}
-
-			subDir->fd = fd;
-			subDir->entries_left = 0;
 
 			stack.Push(subDir);
 
@@ -1554,7 +1550,7 @@ ModuleNotificationService::_ScanDirectory(Stack<DIR*>& stack, DIR* dir,
 				&& directMatch)
 				directMatchAdded = true;
 		} else if (S_ISREG(stat.st_mode)) {
-			if (_AddModuleNode(stat.st_dev, stat.st_ino, dir->fd,
+			if (_AddModuleNode(stat.st_dev, stat.st_ino, dirfd(dir),
 					dirent->d_name) == B_OK && directMatch)
 				directMatchAdded = true;
 		}
@@ -1564,7 +1560,7 @@ ModuleNotificationService::_ScanDirectory(Stack<DIR*>& stack, DIR* dir,
 		// We need to monitor this directory to see if a matching file
 		// is added.
 		struct stat stat;
-		status_t status = vfs_read_stat(dir->fd, NULL, true, &stat, true);
+		status_t status = vfs_read_stat(dirfd(dir), NULL, true, &stat, true);
 		if (status == B_OK)
 			_AddDirectoryNode(stat.st_dev, stat.st_ino);
 	}

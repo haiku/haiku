@@ -6,22 +6,13 @@
 
 #include <fs_index.h>
 
-#include <stdlib.h>
-#include <fcntl.h>
+#include <dirent.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <stdlib.h>
 
-#include <dirent_private.h>
 #include <syscalls.h>
-
-
-#define RETURN_AND_SET_ERRNO(status) \
-	{ \
-		if (status < 0) { \
-			errno = status; \
-			return -1; \
-		} \
-		return status; \
-	}
+#include <syscall_utils.h>
 
 
 int
@@ -72,15 +63,11 @@ fs_open_index_dir(dev_t device)
 		return NULL;
 	}
 
-	/* allocate the memory for the DIR structure */
-	if ((dir = (DIR *)malloc(DIR_BUFFER_SIZE)) == NULL) {
-		errno = B_NO_MEMORY;
+	// allocate the DIR structure
+	if ((dir = fdopendir(fd)) == NULL) {
 		_kern_close(fd);
 		return NULL;
 	}
-
-	dir->fd = fd;
-	dir->entries_left = 0;
 
 	return dir;
 }
@@ -89,11 +76,7 @@ fs_open_index_dir(dev_t device)
 int
 fs_close_index_dir(DIR *dir)
 {
-	int status = _kern_close(dir->fd);
-
-	free(dir);
-
-	RETURN_AND_SET_ERRNO(status);
+	return closedir(dir);
 }
 
 
