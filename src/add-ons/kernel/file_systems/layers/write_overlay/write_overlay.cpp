@@ -116,6 +116,8 @@ public:
 		void				SetParentDir(OverlayInode *parentDir);
 		OverlayInode *		ParentDir() { return fParentDir; }
 
+		bool				IsNonEmptyDirectory();
+
 		status_t			Lookup(const char *name, ino_t *inodeNumber);
 		void				SetName(const char *name);
 		status_t			GetName(char *buffer, size_t bufferSize);
@@ -284,6 +286,22 @@ void
 OverlayInode::SetParentDir(OverlayInode *parentDir)
 {
 	fParentDir = parentDir;
+}
+
+
+bool
+OverlayInode::IsNonEmptyDirectory()
+{
+	if (!fHasStat)
+		ReadStat(NULL);
+
+	if (!S_ISDIR(fStat.st_mode))
+		return false;
+
+	if (!fHasDirents)
+		_PopulateDirents();
+
+	return fDirentCount > 2; // accounting for "." and ".." entries
 }
 
 
@@ -829,10 +847,26 @@ OverlayInode::RemoveEntry(const char *name, overlay_dirent **_entry)
 	if (!fHasDirents)
 		_PopulateDirents();
 
-	// TODO: we may not simply remove non-empty directories
 	for (uint32 i = 0; i < fDirentCount; i++) {
 		overlay_dirent *entry = fDirents[i];
 		if (strcmp(entry->name, name) == 0) {
+			if (_entry == NULL) {
+				// check for non-empty directories when trying
+				// to dispose the entry
+				OverlayInode *node = NULL;
+				status_t result = get_vnode(Volume(), entry->inode_number,
+					(void **)&node);
+				if (result != B_OK)
+					return result;
+
+				if (node->IsNonEmptyDirectory())
+					result = B_DIRECTORY_NOT_EMPTY;
+
+				put_vnode(Volume(), entry->inode_number);
+				if (result != B_OK)
+					return result;
+			}
+
 			for (uint32 j = i + 1; j < fDirentCount; j++)
 				fDirents[j - 1] = fDirents[j];
 			fDirentCount--;
