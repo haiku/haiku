@@ -60,7 +60,6 @@ struct device_event {
 	dev_t					device;
 	ino_t					directory;
 	ino_t					node;
-	NotificationListener*	listener;
 };
 
 
@@ -159,7 +158,29 @@ public:
 				deviceEvent->device = event->GetInt32("device", -1);
 				deviceEvent->directory = event->GetInt64("directory", -1);
 				deviceEvent->node = event->GetInt64("node", -1);
-				deviceEvent->listener = this;
+
+				struct stat st;
+				if (vfs_stat_node_ref(deviceEvent->device, 
+					deviceEvent->node, &st) != 0) {
+					delete deviceEvent;
+					break;
+				}
+				if (S_ISDIR(st.st_mode)) {
+					if (opcode == B_ENTRY_CREATED) {
+						add_node_listener(
+							deviceEvent->device,
+							deviceEvent->node,
+							B_WATCH_DIRECTORY,
+							*this);
+					} else {
+						remove_node_listener(
+							deviceEvent->device,
+							deviceEvent->node,
+							*this);
+					}
+					delete deviceEvent;
+					break;
+				}
 
 				// TODO: a real in-kernel DPC mechanism would be preferred...
 				thread_id thread = spawn_kernel_thread(_HandleDeviceEvent,
@@ -179,22 +200,8 @@ public:
 	static status_t _HandleDeviceEvent(void* _event)
 	{
 		device_event* event = (device_event*)_event;
-
-		struct stat st;
-		if (vfs_stat_node_ref(event->device, event->node, &st) != 0) {
-			delete event;
-			return B_ERROR;
-		}
-
-		if (S_ISDIR(st.st_mode)) {
-			if (event->opcode == B_ENTRY_CREATED) {
-				add_node_listener(event->device, event->node, B_WATCH_DIRECTORY,
-					*event->listener);
-			} else {
-				remove_node_listener(event->device, event->node,
-					*event->listener);
-			}
-		} else if (strcmp(event->name, "raw") == 0) {
+		
+		if (strcmp(event->name, "raw") == 0) {
 			// a new raw device was added/removed
 			KPath path(B_PATH_NAME_LENGTH + 1);
 			if (path.InitCheck() != B_OK
@@ -206,7 +213,6 @@ public:
 			}
 
 			path.UnlockBuffer();
-
 			if (event->opcode == B_ENTRY_CREATED)
 				KDiskDeviceManager::Default()->CreateDevice(path.Path());
 			else
