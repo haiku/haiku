@@ -7,8 +7,6 @@
  *		Axel Dörfler (axeld@pinc-software.de)
  *		Andrew McCall (mccall@digitalparadise.co.uk)
  */
-
-
 #ifndef MOUSE_VIEW_H
 #define MOUSE_VIEW_H
 
