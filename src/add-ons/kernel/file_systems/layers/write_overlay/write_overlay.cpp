@@ -154,6 +154,8 @@ public:
 								overlay_dirent **entry);
 
 private:
+		void				_TrimBuffers();
+
 		status_t			_PopulateDirents();
 		status_t			_CreateCommon(const char *name, int type, int perms,
 								ino_t *newInodeNumber, OverlayInode **node);
@@ -388,8 +390,10 @@ OverlayInode::WriteStat(const struct stat *stat, uint32 statMask)
 	if (!fHasStat)
 		ReadStat(NULL);
 
-	if (statMask & B_STAT_SIZE)
+	if (statMask & B_STAT_SIZE) {
 		fStat.st_size = stat->st_size;
+		_TrimBuffers();
+	}
 
 	if (statMask & B_STAT_MODE)
 		fStat.st_mode = (fStat.st_mode & ~S_IUMSK) | (stat->st_mode & S_IUMSK);
@@ -445,8 +449,10 @@ OverlayInode::Open(int openMode, void **_cookie)
 	*_cookie = cookie;
 
 	if (fIsVirtual) {
-		if (openMode & O_TRUNC)
+		if (openMode & O_TRUNC) {
 			fStat.st_size = 0;
+			_TrimBuffers();
+		}
 
 		return B_OK;
 	}
@@ -466,6 +472,7 @@ OverlayInode::Open(int openMode, void **_cookie)
 
 	if (openMode & O_TRUNC) {
 		fStat.st_size = 0;
+		_TrimBuffers();
 		if (!fIsModified)
 			SetModified();
 	}
@@ -886,6 +893,57 @@ OverlayInode::RemoveEntry(const char *name, overlay_dirent **_entry)
 	}
 
 	return B_ENTRY_NOT_FOUND;
+}
+
+
+void
+OverlayInode::_TrimBuffers()
+{
+	// the file size has been changed and we want to trim
+	// off everything that goes beyond the new size
+	write_buffer **link = &fWriteBuffers;
+	write_buffer *buffer = fWriteBuffers;
+
+	while (buffer != NULL) {
+		off_t bufferEnd = buffer->position + buffer->length;
+		if (bufferEnd > fStat.st_size)
+			break;
+
+		link = &buffer->next;
+		buffer = buffer->next;
+	}
+
+	if (buffer == NULL) {
+		// didn't find anything crossing or past the end
+		return;
+	}
+
+	if (buffer->position < fStat.st_size) {
+		// got a crossing buffer to resize
+		size_t newLength = fStat.st_size - buffer->position;
+		write_buffer *newBuffer = (write_buffer *)realloc(buffer,
+			sizeof(write_buffer) - 1 + newLength);
+
+		if (newBuffer != NULL) {
+			buffer = newBuffer;
+			*link = newBuffer;
+		} else {
+			// we don't really care if it worked, if it didn't we simply
+			// keep the old buffer and reset it's size
+		}
+
+		buffer->length = newLength;
+		link = &buffer->next;
+		buffer = buffer->next;
+	}
+
+	// everything else we can throw away
+	*link = NULL;
+	while (buffer != NULL) {
+		write_buffer *next = buffer->next;
+		free(buffer);
+		buffer = next;
+	}
 }
 
 
