@@ -690,6 +690,8 @@ i2c_DumpSpecsEDID(edid_specs* specs)
  *   not depend on the way screens are connected to the cards (DVI/VGA, 1 or 2 screens).
  * - on some NV40 architecture cards i2c bus2 connects to con2 instead of i2c bus0. This
  *   is confirmed on GeForce FX 6600 (NV43, id 0x0141) and GeForce 7300 (G72, id 0x01d1). 
+ * - on pre-NV40 laptops i2c bus2 can connect to con2 as well: confirmed on a Geforce FX
+ *   5200 Go (NV34, id 0x0324).
  * - con1 has CRTC1 and DAC1, and con2 has CRTC2 and DAC2 if nv_general_output_select()
  *   is set to 'straight' and there are only VGA type screens connected. */
 void i2c_DetectScreens(void)
@@ -749,7 +751,11 @@ void i2c_DetectScreens(void)
 				}
 				break;
 			default:
-				LOG(4,("I2C: DetectScreens: WARNING, unexpected behaviour detected!\n"));
+				if (!si->ps.con2_screen.have_native_edid && si->ps.laptop) {
+					i2c_ExtractSpecsEDID(&edid, &si->ps.con2_screen);
+				} else {
+					LOG(4,("I2C: DetectScreens: WARNING, unexpected behaviour detected!\n"));
+				}
 				break;
 			}
 		}
