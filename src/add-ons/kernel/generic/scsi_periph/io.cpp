@@ -41,7 +41,8 @@ prevent_allow(scsi_periph_device_info *device, bool prevent)
 	cmd.opcode = SCSI_OP_PREVENT_ALLOW;
 	cmd.prevent = prevent;
 
-	return periph_simple_exec(device, (uint8 *)&cmd, sizeof(cmd), NULL, 0, 0);
+	return periph_simple_exec(device, (uint8 *)&cmd, sizeof(cmd), NULL, 0,
+		SCSI_DIR_NONE);
 }
 
 
