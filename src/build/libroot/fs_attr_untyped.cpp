@@ -43,6 +43,8 @@
 #	include "fs_attr_xattr.h"
 #elif defined(HAIKU_HOST_PLATFORM_FREEBSD)
 #	include "fs_attr_extattr.h"
+#elif defined(HAIKU_HOST_PLATFORM_DARWIN)
+#	include "fs_attr_bsdxattr.h"
 #else
 #	error No attribute support for this host platform!
 #endif
