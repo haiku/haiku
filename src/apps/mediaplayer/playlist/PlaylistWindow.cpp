@@ -141,6 +141,8 @@ PlaylistWindow::MessageReceived(BMessage* message)
 		}
 
 		case B_REFS_RECEIVED:
+			// Used for when we open a playlist from playlist window
+			message->AddInt32("append_index", -1);
 		case B_SIMPLE_DATA: {
 			// only accept this message when it comes from the
 			// player window, _not_ when it is dropped in this window

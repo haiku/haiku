@@ -848,7 +848,7 @@ MainWin::VideoFormatChange(int width, int height, int widthAspect,
 void
 MainWin::_RefsReceived(BMessage* msg)
 {
-	// the playlist ist replaced by dropped files
+	// the playlist is replaced by dropped files
 	// or the dropped files are appended to the end
 	// of the existing playlist if <shift> is pressed
 	BAutolock _(fPlaylist);
