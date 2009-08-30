@@ -286,6 +286,8 @@ void
 OverlayInode::SetParentDir(OverlayInode *parentDir)
 {
 	fParentDir = parentDir;
+	if (fHasDirents && fDirentCount >= 2)
+		fDirents[1]->inode_number = parentDir->InodeNumber();
 }
 
 
@@ -318,7 +320,7 @@ OverlayInode::Lookup(const char *name, ino_t *inodeNumber)
 			OverlayInode *node = NULL;
 			status_t result = get_vnode(Volume(), *inodeNumber,
 				(void **)&node);
-			if (result == B_OK && node != NULL)
+			if (result == B_OK && node != NULL && i >= 2)
 				node->SetParentDir(this);
 			return result;
 		}
