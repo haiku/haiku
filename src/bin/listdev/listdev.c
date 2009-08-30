@@ -113,6 +113,8 @@ dump_device(device_node_cookie *node, uint8 level)
 	attr.value.raw.data = data;
 	attr.value.raw.length = sizeof(data);
 
+	put_level(level);
+	printf("(%d)\n", level);
 	while (dm_get_next_attr(&attr) == B_OK) {
 		dump_attribute(&attr, level);
 	}
