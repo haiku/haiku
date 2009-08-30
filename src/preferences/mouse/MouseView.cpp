@@ -1,13 +1,14 @@
 /*
- * Copyright 2003 - 2009, Haiku, Inc. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jérôme Duval,
- *		Andrew McCall (mccall@digitalparadise.co.uk)
  *		Axel Dörfler (axeld@pinc-software.de)
+ *		Andrew McCall (mccall@digitalparadise.co.uk)
  *		Philippe Saint-Pierre stpere@gmail.com
  */
+
 
 #include "MouseView.h"
 
@@ -44,7 +45,7 @@ static const rgb_color kButtonReleasedSeparatorColor = {88, 88, 88};
 static const rgb_color kButtonTextColor = {32, 32, 32};
 
 
-static const int32 *
+static const int32*
 getButtonOffsets(int32 type)
 {
 	switch (type) {
@@ -78,7 +79,8 @@ getMappingNumber(int32 mapping)
 
 
 MouseView::MouseView(BRect rect, const MouseSettings &settings)
-	: BView(rect, "mouse_view", B_FOLLOW_ALL, B_PULSE_NEEDED | B_WILL_DRAW),
+	:
+	BView(rect, "mouse_view", B_FOLLOW_ALL, B_PULSE_NEEDED | B_WILL_DRAW),
 	fSettings(settings),
 	fType(-1),
 	fButtons(0),
@@ -100,7 +102,7 @@ MouseView::~MouseView()
 
 
 void 
-MouseView::GetPreferredSize(float *_width, float *_height)
+MouseView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width)
 		*_width = fMouseBitmap != NULL ? fMouseBitmap->Bounds().Width() : 57;
@@ -143,7 +145,7 @@ MouseView::MouseDown(BPoint where)
 		fOldButtons = fButtons;
 	}
 
-	const int32 *offset = getButtonOffsets(fType);
+	const int32* offset = getButtonOffsets(fType);
 	int32 button = -1;
 	for (int32 i = 0; i <= fType; i++) {
 		BRect frame(offset[i], kButtonTop, offset[i + 1] - 1,
@@ -160,7 +162,7 @@ MouseView::MouseDown(BPoint where)
 	// is not active, so make sure that we don't display the menu when
 	// the user clicked inside our view, but another window is on top.
 	if (clipping.Contains(where)) {
-		button = ConvertFromVisualOrder(button);
+		button = _ConvertFromVisualOrder(button);
 	
 		BPopUpMenu menu("Mouse Map Menu");
 		BMessage message(kMsgMouseMap);
@@ -203,19 +205,21 @@ MouseView::Draw(BRect updateFrame)
 	mouse_map map;
 	fSettings.Mapping(map);
 
-	const int32 *offset = getButtonOffsets(fType);
+	const int32* offset = getButtonOffsets(fType);
 	bool middlePressed = fType == 3 && (map.button[2] & fButtons) != 0;
 
 	for (int32 i = 0; i < fType; i++) {
 		BRect border(offset[i] + 1, kButtonTop + 2, offset[i + 1] - 1,
 			kButtonTop + fMouseDownBounds.Height() - 4);
-		bool pressed = (fButtons & map.button[ConvertFromVisualOrder(i)]) != 0;
+		bool pressed = (fButtons & map.button[_ConvertFromVisualOrder(i)]) != 0;
 			// is button currently pressed?
 
 		if (pressed) {
-			BRect frame(offset[i], 0, offset[i + 1], fMouseDownBounds.Height() + 1);
+			BRect frame(offset[i], 0, offset[i + 1], 
+				fMouseDownBounds.Height() + 1);
 			if (fMouseDownBitmap != NULL)
-				DrawBitmapAsync(fMouseDownBitmap, frame, frame.OffsetByCopy(0, kButtonTop));
+				DrawBitmapAsync(fMouseDownBitmap, frame, 
+					frame.OffsetByCopy(0, kButtonTop));
 			else if (fMouseBitmap == NULL) {
 				SetHighColor(kButtonPressedColor);
 				SetDrawingMode(B_OP_OVER);
@@ -226,7 +230,8 @@ MouseView::Draw(BRect updateFrame)
 
 		if (i > 0 && fType > i) {
 			// left border
-			SetHighColor(pressed ? kButtonPressedColor : kButtonReleasedLeftColor);
+			SetHighColor(pressed ? 
+				kButtonPressedColor : kButtonReleasedLeftColor);
 			StrokeLine(BPoint(border.LeftTop()), BPoint(border.LeftBottom()));
 
 			// draw separator
@@ -237,13 +242,16 @@ MouseView::Draw(BRect updateFrame)
 
 			SetHighColor(middlePressed ?
 				kButtonPressedSeparatorColor : kButtonReleasedSeparatorColor);
-			StrokeLine(BPoint(separator.LeftTop()), BPoint(separator.LeftBottom()));			
+			StrokeLine(BPoint(separator.LeftTop()), 
+				BPoint(separator.LeftBottom()));
 		}
 
 		if (fType > 1 && i + 1 < fType) {
 			// right border
-			SetHighColor(pressed ? kButtonPressedColor : kButtonReleasedRightColor);
-			StrokeLine(BPoint(border.RightTop()), BPoint(border.RightBottom()));
+			SetHighColor(pressed ? 
+				kButtonPressedColor : kButtonReleasedRightColor);
+			StrokeLine(BPoint(border.RightTop()), 
+				BPoint(border.RightBottom()));
 		}
 
 		// draw mapping number centered over the button
@@ -251,16 +259,17 @@ MouseView::Draw(BRect updateFrame)
 		SetHighColor(kButtonTextColor);
 
 		char number[2] = {0};
-		number[0] = getMappingNumber(map.button[ConvertFromVisualOrder(i)]) + '1';
+		number[0] = getMappingNumber(map.button[_ConvertFromVisualOrder(i)]) 
+			+ '1';
 
-		DrawString(number,
-			BPoint(border.left + (border.Width() - StringWidth(number)) / 2, kButtonTop + 18));
+		DrawString(number, BPoint(border.left + 
+			(border.Width() - StringWidth(number)) / 2, kButtonTop + 18));
 	}
 }
 
 
 int32
-MouseView::ConvertFromVisualOrder(int32 i)
+MouseView::_ConvertFromVisualOrder(int32 i)
 {
 	if (fType < 3)
 		return i;

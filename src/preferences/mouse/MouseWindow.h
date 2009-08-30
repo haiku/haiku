@@ -1,19 +1,14 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:			MouseWindow.h
-//  Authors:		Jérôme Duval,
-//					Andrew McCall (mccall@digitalparadise.co.uk)
-//					Axel Dörfler (axeld@pinc-software.de)
-//  Description:	Mouse Preferences
-//  Created:		December 10, 2003
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval,
+ *		Axel Dörfler (axeld@pinc-software.de)
+ *		Andrew McCall (mccall@digitalparadise.co.uk)
+ */
+
+
 #ifndef MOUSE_WINDOW_H
 #define MOUSE_WINDOW_H
 
@@ -27,13 +22,13 @@ class SettingsView;
 
 
 class MouseWindow : public BWindow {
-	public:
+public:
 		MouseWindow(BRect rect);
 
 		virtual bool QuitRequested();
 		virtual void MessageReceived(BMessage *message);
 
-	private:
+private:
 		MouseSettings	fSettings;
 		BButton			*fDefaultsButton;
 		BButton			*fRevertButton;

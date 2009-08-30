@@ -1,19 +1,13 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:			SettingsView.cpp
-//  Authors:		Jérôme Duval,
-//					Andrew McCall (mccall@digitalparadise.co.uk)
-//					Axel Dörfler (axeld@pinc-software.de)
-//  Description:	Mouse Preferences
-//  Created:		December 10, 2003
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval,
+ *		Axel Dörfler (axeld@pinc-software.de)
+ *		Andrew McCall (mccall@digitalparadise.co.uk)
+ */
+
 
 #include <InterfaceDefs.h>
 #include <Button.h>
@@ -55,7 +49,8 @@ mouse_mode_to_index(mode_mouse mode)
 
 
 SettingsView::SettingsView(BRect rect, MouseSettings &settings)
-	: BBox(rect, "main_view"),
+	:
+	BBox(rect, "main_view"),
 	fSettings(settings)
 {
 	ResizeToPreferred();
@@ -70,7 +65,8 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	fTypeMenu->AddItem(new BMenuItem("2-Button", new BMessage(kMsgMouseType)));
 	fTypeMenu->AddItem(new BMenuItem("3-Button", new BMessage(kMsgMouseType)));
 
-	BMenuField *field = new BMenuField(BRect(7, 8, 155, 190), "mouse_type", "Mouse type:", fTypeMenu);
+	BMenuField *field = new BMenuField(BRect(7, 8, 155, 190), "mouse_type", 
+		"Mouse type:", fTypeMenu);
 	field->SetDivider(field->StringWidth(field->Label()) + kItemSpace);
 	field->SetAlignment(B_ALIGN_RIGHT);
 	AddChild(field);
@@ -84,8 +80,8 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	fRightArea.Set(fLeftArea.right + 10, 11, 200, 7);
 
 	// Create the "Double-click speed slider...
-	fClickSpeedSlider = new BSlider(fRightArea, "double_click_speed", "Double-click speed", 
-		new BMessage(kMsgDoubleClickSpeed), 0, 1000);
+	fClickSpeedSlider = new BSlider(fRightArea, "double_click_speed", 
+		"Double-click speed", new BMessage(kMsgDoubleClickSpeed), 0, 1000);
 	fClickSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fClickSpeedSlider->SetHashMarkCount(5);
 	fClickSpeedSlider->SetLimitLabels("Slow", "Fast");
@@ -109,8 +105,8 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	fRightArea.top += length;
 
 	// Create the "Mouse Acceleration" slider...
-	fAccelerationSlider = new BSlider(fRightArea, "mouse_acceleration", "Mouse Acceleration", 
-		new BMessage(kMsgAccelerationFactor), 0, 1000);
+	fAccelerationSlider = new BSlider(fRightArea, "mouse_acceleration", 
+		"Mouse Acceleration", new BMessage(kMsgAccelerationFactor), 0, 1000);
 	fAccelerationSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fAccelerationSlider->SetHashMarkCount(5);
 	fAccelerationSlider->SetLimitLabels("Slow", "Fast");
@@ -123,7 +119,8 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	// Add the "Focus follows mouse" pop up menu
 	fFocusMenu = new BPopUpMenu("Disabled");
 	
-	const char *focusLabels[] = {"Disabled", "Enabled", "Warping", "Instant-Warping"};
+	const char *focusLabels[] = {"Disabled", "Enabled", "Warping", 
+		"Instant-Warping"};
 	const mode_mouse focusModes[] = {B_NORMAL_MOUSE, B_FOCUS_FOLLOWS_MOUSE,
 		B_WARP_MOUSE, B_INSTANT_WARP_MOUSE};
 
@@ -137,7 +134,8 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	BRect frame(fRightArea.left, fRightArea.top + 10, fRightArea.left +
 			font.StringWidth("Focus follows mouse:") + 
 			font.StringWidth(focusLabels[0]) + 30, 200);
-	field = new BMenuField(frame, "ffm", "Focus follows mouse:", fFocusMenu, true);
+	field = new BMenuField(frame, "ffm", "Focus follows mouse:", fFocusMenu, 
+		true);
 	field->SetDivider(field->StringWidth(field->Label()) + kItemSpace);
 	field->SetAlignment(B_ALIGN_RIGHT);
 	AddChild(field);
@@ -151,9 +149,11 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	fLeftArea.bottom = fRightArea.bottom;
 
 	// Position mouse bitmaps
-	fDoubleClickBmpPoint.x = fRightArea.right - fDoubleClickBitmap->Bounds().right - 15; 
+	fDoubleClickBmpPoint.x = fRightArea.right - 
+		fDoubleClickBitmap->Bounds().right - 15;
 	fSpeedBmpPoint.x = fRightArea.right - fSpeedBitmap->Bounds().right - 15;
-	fAccelerationBmpPoint.x = fRightArea.right - fAccelerationBitmap->Bounds().right - 15;
+	fAccelerationBmpPoint.x = fRightArea.right - 
+		fAccelerationBitmap->Bounds().right - 15;
 
 	// Resize sliders to equal size
 	length = fRightArea.left - 5;
@@ -174,8 +174,8 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 
 	// Create the "Double-click test area" text box...
 	frame.Set(fLeftArea.left, fLeftArea.bottom + 10, fLeftArea.right, 0);
-	BTextControl *textControl = new BTextControl(frame, "double_click_test_area", NULL,
-		"Double-click test area", NULL);
+	BTextControl *textControl = new BTextControl(frame, 
+		"double_click_test_area", NULL, "Double-click test area", NULL);
 	textControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_CENTER);
 	AddChild(textControl);
 
@@ -199,7 +199,7 @@ SettingsView::AttachedToWindow()
 
 
 void 
-SettingsView::GetPreferredSize(float *_width, float *_height)
+SettingsView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width)
 		*_width = fRightArea.right + 5;
@@ -248,15 +248,14 @@ SettingsView::Draw(BRect updateFrame)
 		DrawBitmapAsync(fDoubleClickBitmap, fDoubleClickBmpPoint);
 
 	if (fSpeedBitmap != NULL 
-		&& updateFrame.Intersects(BRect(fSpeedBmpPoint,
-			fSpeedBmpPoint + fSpeedBitmap->Bounds().RightBottom())))
+		&& updateFrame.Intersects(BRect(fSpeedBmpPoint, fSpeedBmpPoint 
+			+ fSpeedBitmap->Bounds().RightBottom())))
 		DrawBitmapAsync(fSpeedBitmap, fSpeedBmpPoint);
 	
 	if (fAccelerationBitmap != NULL 
-		&& updateFrame.Intersects(BRect(fAccelerationBmpPoint,
-			fAccelerationBmpPoint + fAccelerationBitmap->Bounds().RightBottom())))
+		&& updateFrame.Intersects(BRect(fAccelerationBmpPoint, fAccelerationBmpPoint
+			+ fAccelerationBitmap->Bounds().RightBottom())))
 		DrawBitmapAsync(fAccelerationBitmap, fAccelerationBmpPoint);
-	
 
 	SetDrawingMode(B_OP_COPY);
 }
@@ -283,7 +282,7 @@ SettingsView::UpdateFromSettings()
 		// slow = 1000000, fast = 0
 	fClickSpeedSlider->SetValue(value);
 
-	value = int32((log(fSettings.MouseSpeed() / 8192.0) / log(2)) * 1000 / 6);  
+	value = int32((log(fSettings.MouseSpeed() / 8192.0) / log(2)) * 1000 / 6);
 		// slow = 8192, fast = 524287
 	fMouseSpeedSlider->SetValue(value);
 
@@ -301,4 +300,3 @@ SettingsView::UpdateFromSettings()
 	if (item != NULL)
 		item->SetMarked(true);
 }
-

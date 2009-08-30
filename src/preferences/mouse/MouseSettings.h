@@ -1,12 +1,14 @@
 /*
- * Copyright 2003-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Jérôme Duval
- *		Andrew McCall (mccall@digitalparadise.co.uk)
+ *		Jérôme Duval,
  *		Axel Dörfler (axeld@pinc-software.de)
+ *		Andrew McCall (mccall@digitalparadise.co.uk)
  */
+
+
 #ifndef MOUSE_SETTINGS_H
 #define MOUSE_SETTINGS_H
 
@@ -20,7 +22,7 @@ class BPath;
 
 
 class MouseSettings {
-	public:
+public:
 		MouseSettings();
 		~MouseSettings();
 
@@ -52,10 +54,10 @@ class MouseSettings {
 		mode_mouse MouseMode() const { return fMode; }
 		void SetMouseMode(mode_mouse mode);
 
-	private:
-		static status_t GetSettingsPath(BPath &path);
-		void RetrieveSettings();
-		status_t SaveSettings();
+private:
+		static status_t _GetSettingsPath(BPath &path);
+		void _RetrieveSettings();
+		status_t _SaveSettings();
 
 		mouse_settings	fSettings, fOriginalSettings;
 		mode_mouse		fMode, fOriginalMode;
