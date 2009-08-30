@@ -628,9 +628,9 @@ sHasDiskExtensions			db	0	; 1 if the drive supports the extended read
 ; If DEBUG is enabled, we use more descriptive ones.
 %if DEBUG
 kReadErrorString			db	"read error", 0
-kBadSuperBlockMagicString	db	"bad superblock magic", 0
+kBadSuperBlockMagicString	db	"bad superblock", 0
 kNotADirectoryString		db	"not a directory", 0
-kBadInodeMagicString		db	"bad inode magic", 0
+kBadInodeMagicString		db	"bad inode", 0
 kNoZbeosString				db	"haiku_loader not found", 0
 %else
 kErrorString				db	"Failed to load OS. Press any key to reboot..."
