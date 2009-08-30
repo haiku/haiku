@@ -133,7 +133,7 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 
 	BRect frame(fRightArea.left, fRightArea.top + 10, fRightArea.left +
 			font.StringWidth("Focus follows mouse:") + 
-			font.StringWidth(focusLabels[0]) + 30, 200);
+			font.StringWidth(focusLabels[3]) + 30, 200);
 	field = new BMenuField(frame, "ffm", "Focus follows mouse:", fFocusMenu, 
 		true);
 	field->SetDivider(field->StringWidth(field->Label()) + kItemSpace);
