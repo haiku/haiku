@@ -7,10 +7,9 @@
  *		Axel Dörfler (axeld@pinc-software.de)
  *		Andrew McCall (mccall@digitalparadise.co.uk)
  */
-
-
 #ifndef MOUSE_CONSTANTS_H
 #define MOUSE_CONSTANTS_H
+
 
 // interface messages
 const uint32 kMsgDefaults			= 'BTde';

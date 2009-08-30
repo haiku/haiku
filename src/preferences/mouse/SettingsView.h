@@ -7,7 +7,6 @@
  *		Axel Dörfler (axeld@pinc-software.de)
  *		Andrew McCall (mccall@digitalparadise.co.uk)
  */
-
 #ifndef SETTINGS_VIEW_H
 #define SETTINGS_VIEW_H
 
