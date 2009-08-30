@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Andrew McCall (mccall@digitalparadise.co.uk)
- *		Jérôme Duval
+ *		Jérôme Duval,
  *		Axel Dörfler (axeld@pinc-software.de)
+ *		Andrew McCall (mccall@digitalparadise.co.uk)
  */
 
 
@@ -20,7 +20,8 @@ const char* kSignature = "application/x-vnd.Haiku-Mouse";
 
 
 MouseApplication::MouseApplication()
-	: BApplication(kSignature)					
+	:
+	BApplication(kSignature)					
 {
 	BRect rect(0, 0, 397, 293);
 	MouseWindow *window = new MouseWindow(rect);

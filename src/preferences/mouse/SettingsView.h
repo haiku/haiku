@@ -1,19 +1,13 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:			SettingsView.h
-//  Authors:		Jérôme Duval,
-//					Andrew McCall (mccall@digitalparadise.co.uk)
-//					Axel Dörfler (axeld@pinc-software.de)
-//  Description:	Mouse Preferences
-//  Created:		December 10, 2003
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval,
+ *		Axel Dörfler (axeld@pinc-software.de)
+ *		Andrew McCall (mccall@digitalparadise.co.uk)
+ */
+
 #ifndef SETTINGS_VIEW_H
 #define SETTINGS_VIEW_H
 
@@ -30,19 +24,19 @@ class MouseView;
 
 
 class SettingsView : public BBox {
-	public:
+public:
 		SettingsView(BRect frame, MouseSettings &settings);
 		virtual ~SettingsView();
 
 		virtual void AttachedToWindow();
-		virtual void GetPreferredSize(float *_width, float *_height);
+		virtual void GetPreferredSize(float* _width, float* _height);
 		virtual void Draw(BRect frame);
 
 		void SetMouseType(int32 type);
 		void MouseMapUpdated();
 		void UpdateFromSettings();
 
-	private:
+private:
 		typedef BBox inherited;
 
 		const MouseSettings &fSettings;

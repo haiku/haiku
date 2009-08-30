@@ -1,19 +1,13 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:			MouseSettings.h
-//  Authors:		Jérôme Duval,
-//					Andrew McCall (mccall@digitalparadise.co.uk),
-//					Axel Dörfler (axeld@pinc-software.de)
-//  Description:	Mouse Preferences
-//  Created:		December 10, 2003
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval,
+ *		Axel Dörfler (axeld@pinc-software.de)
+ *		Andrew McCall (mccall@digitalparadise.co.uk)
+ */
+
 
 #include <FindDirectory.h>
 #include <File.h>
@@ -39,7 +33,7 @@ MouseSettings::MouseSettings()
 	:
 	fWindowPosition(-1, -1)
 {
-	RetrieveSettings();
+	_RetrieveSettings();
 
 	fOriginalSettings = fSettings;
 	fOriginalMode = fMode;
@@ -48,12 +42,12 @@ MouseSettings::MouseSettings()
 
 MouseSettings::~MouseSettings()
 {
-	SaveSettings();
+	_SaveSettings();
 }
 
 
 status_t 
-MouseSettings::GetSettingsPath(BPath &path)
+MouseSettings::_GetSettingsPath(BPath &path)
 {
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	if (status < B_OK)
@@ -65,19 +59,19 @@ MouseSettings::GetSettingsPath(BPath &path)
 
 
 void 
-MouseSettings::RetrieveSettings()
+MouseSettings::_RetrieveSettings()
 {
 	// retrieve current values
 
-	if (get_mouse_map(&fSettings.map)!=B_OK)
+	if (get_mouse_map(&fSettings.map) != B_OK)
 		fprintf(stderr, "error when get_mouse_map\n");
-	if (get_click_speed(&fSettings.click_speed)!=B_OK)
+	if (get_click_speed(&fSettings.click_speed) != B_OK)
 		fprintf(stderr, "error when get_click_speed\n");
-	if (get_mouse_speed(&fSettings.accel.speed)!=B_OK)
+	if (get_mouse_speed(&fSettings.accel.speed) != B_OK)
 		fprintf(stderr, "error when get_mouse_speed\n");
-	if (get_mouse_acceleration(&fSettings.accel.accel_factor)!=B_OK)
+	if (get_mouse_acceleration(&fSettings.accel.accel_factor) != B_OK)
 		fprintf(stderr, "error when get_mouse_acceleration\n");
-	if (get_mouse_type(&fSettings.type)!=B_OK)
+	if (get_mouse_type(&fSettings.type) != B_OK)
 		fprintf(stderr, "error when get_mouse_type\n");
 
 	fMode = mouse_mode();
@@ -85,7 +79,7 @@ MouseSettings::RetrieveSettings()
 	// also try to load the window position from disk
 
 	BPath path;
-	if (GetSettingsPath(path) < B_OK)
+	if (_GetSettingsPath(path) < B_OK)
 		return;
 
 	BFile file(path.Path(), B_READ_ONLY);
@@ -93,13 +87,15 @@ MouseSettings::RetrieveSettings()
 		return;
 
 #if R5_COMPATIBLE
-	const off_t kOffset = sizeof(mouse_settings) - sizeof(mouse_map) + sizeof(int32) * 3;
+	const off_t kOffset = sizeof(mouse_settings) - sizeof(mouse_map) 
+		+ sizeof(int32) * 3;
 		// we have to do this because mouse_map counts 16 buttons in OBOS
 #else
 	const off_t kOffset = sizeof(mouse_settings);
 #endif
 
-	if (file.ReadAt(kOffset, &fWindowPosition, sizeof(BPoint)) != sizeof(BPoint)) {
+	if (file.ReadAt(kOffset, &fWindowPosition, sizeof(BPoint)) 
+		!= sizeof(BPoint)) {
 		// set default window position (invalid positions will be
 		// corrected by the application; the window will be centered
 		// in this case)
@@ -114,10 +110,10 @@ MouseSettings::RetrieveSettings()
 
 
 status_t 
-MouseSettings::SaveSettings()
+MouseSettings::_SaveSettings()
 {
 	BPath path;
-	status_t status = GetSettingsPath(path);
+	status_t status = _GetSettingsPath(path);
 	if (status < B_OK)
 		return status;
 
@@ -126,7 +122,8 @@ MouseSettings::SaveSettings()
 		return status;
 
 #if R5_COMPATIBLE
-	const off_t kOffset = sizeof(mouse_settings) - sizeof(mouse_map) + sizeof(int32) * 3;
+	const off_t kOffset = sizeof(mouse_settings) - sizeof(mouse_map) 
+		+ sizeof(int32) * 3;
 	// we have to do this because mouse_map counts 16 buttons in OBOS
 #else
 	const off_t kOffset = sizeof(mouse_settings);
@@ -143,7 +140,9 @@ void
 MouseSettings::Dump()
 {
 	printf("type:\t\t%ld button mouse\n", fSettings.type);
-	printf("map:\t\tleft = %lu : middle = %lu : right = %lu\n", fSettings.map.button[0], fSettings.map.button[2], fSettings.map.button[1]);
+	printf("map:\t\tleft = %lu : middle = %lu : right = %lu\n", 
+		fSettings.map.button[0], fSettings.map.button[2], 
+		fSettings.map.button[1]);
 	printf("click speed:\t%Ld\n", fSettings.click_speed);
 	printf("accel:\t\t%s\n", fSettings.accel.enabled ? "enabled" : "disabled");
 	printf("accel factor:\t%ld\n", fSettings.accel.accel_factor);
@@ -169,9 +168,7 @@ MouseSettings::Dump()
 #endif
 
 
-/**	Resets the settings to the system defaults
- */
-
+// Resets the settings to the system defaults
 void
 MouseSettings::Defaults()
 {
@@ -191,9 +188,7 @@ MouseSettings::Defaults()
 }
 
 
-/** Checks if the settings are different then the system defaults
- */
-
+// Checks if the settings are different then the system defaults
 bool
 MouseSettings::IsDefaultable()
 {
@@ -208,9 +203,7 @@ MouseSettings::IsDefaultable()
 }
 
 
-/**	Reverts to the active settings at program startup
- */
-
+//	Reverts to the active settings at program startup
 void 
 MouseSettings::Revert()
 {

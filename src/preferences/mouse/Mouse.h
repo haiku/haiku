@@ -1,12 +1,14 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Andrew McCall (mccall@digitalparadise.co.uk)
- *		Jérôme Duval
+ *		Jérôme Duval,
  *		Axel Dörfler (axeld@pinc-software.de)
+ *		Andrew McCall (mccall@digitalparadise.co.uk)
  */
+
+
 #ifndef MOUSE_H
 #define MOUSE_H
 
@@ -15,7 +17,7 @@
 
 
 class MouseApplication : public BApplication {
-	public:
+public:
 		MouseApplication();
 
 		virtual void AboutRequested();

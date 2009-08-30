@@ -1,19 +1,13 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:			MouseWindow.cpp
-//  Authors:		Jérôme Duval,
-//					Andrew McCall (mccall@digitalparadise.co.uk)
-//					Axel Dörfler (axeld@pinc-software.de)
-//  Description:	Mouse Preferences
-//  Created:		December 10, 2003
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval,
+ *		Axel Dörfler (axeld@pinc-software.de)
+ *		Andrew McCall (mccall@digitalparadise.co.uk)
+ */
+
 
 #include <Alert.h>
 #include <Application.h>
@@ -33,29 +27,32 @@
 
 
 MouseWindow::MouseWindow(BRect _rect)
-	: BWindow(_rect, "Mouse", B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+	: 
+		BWindow(_rect, "Mouse", B_TITLED_WINDOW, 
+			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
-	BView *view = new BView(Bounds(), "view", B_FOLLOW_ALL, 0);
+	BView* view = new BView(Bounds(), "view", B_FOLLOW_ALL, 0);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(view);
 
 	// Add the main settings view
-	fSettingsView = new SettingsView(Bounds().InsetBySelf(kBorderSpace, kBorderSpace),
-		fSettings);
+	fSettingsView = new SettingsView(Bounds().InsetBySelf(kBorderSpace, 
+		kBorderSpace), fSettings);
 	view->AddChild(fSettingsView);
 
 	// Add the "Default" button
 	BRect rect(kBorderSpace, fSettingsView->Frame().bottom + kItemSpace + 2,
 		kBorderSpace + 75, fSettingsView->Frame().bottom + 20);
-	fDefaultsButton = new BButton(rect, "defaults", "Defaults", new BMessage(kMsgDefaults));
+	fDefaultsButton = new BButton(rect, "defaults", "Defaults", 
+		new BMessage(kMsgDefaults));
 	fDefaultsButton->ResizeToPreferred();
 	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
 	view->AddChild(fDefaultsButton);
 
 	// Add the "Revert" button
 	rect.OffsetBy(fDefaultsButton->Bounds().Width() + kItemSpace, 0);
-	fRevertButton = new BButton(rect, "revert", "Revert", new BMessage(kMsgRevert));
+	fRevertButton = new BButton(rect, "revert", "Revert", 
+		new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
 	fRevertButton->ResizeToPreferred();
 	view->AddChild(fRevertButton);
@@ -98,7 +95,7 @@ MouseWindow::QuitRequested()
 
 
 void
-MouseWindow::MessageReceived(BMessage *message)
+MouseWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgDefaults: {
