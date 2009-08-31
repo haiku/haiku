@@ -2,10 +2,12 @@
  * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
  * Distributed under the terms of the MIT/X11 license.
  *
- * Copyright (c) 1999 Mike Steed. You are free to use and distribute this software
- * as long as it is accompanied by it's documentation and this copyright notice.
- * The software comes with no warranty, etc.
+ * Copyright (c) 1999 Mike Steed. You are free to use and distribute this
+ * software as long as it is accompanied by it's documentation and this
+ * copyright notice. The software comes with no warranty, etc.
  */
+
+
 #include "App.h"
 
 #include <stdio.h>
@@ -53,6 +55,12 @@ App::ArgvReceived(int32 argc, char** argv)
 void
 App::RefsReceived(BMessage* message)
 {
+	if (!message->HasRef("refs") && message->HasRef("dir_ref")) {
+		entry_ref dirRef;
+		if (message->FindRef("dir_ref", &dirRef) == B_OK)
+			message->AddRef("refs", &dirRef);
+	}
+
 	if (fMainWindow == NULL) {
 		// ReadyToRun() has not been called yet, this happens when someone
 		// launches us with a B_REFS_RECEIVED message.
@@ -110,3 +118,4 @@ App::QuitRequested()
 
 	return BApplication::QuitRequested();
 }
+
