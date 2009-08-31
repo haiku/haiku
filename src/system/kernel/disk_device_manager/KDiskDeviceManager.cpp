@@ -159,24 +159,19 @@ public:
 				deviceEvent->directory = event->GetInt64("directory", -1);
 				deviceEvent->node = event->GetInt64("node", -1);
 
-				struct stat st;
-				if (vfs_stat_node_ref(deviceEvent->device, 
-					deviceEvent->node, &st) != 0) {
+				struct stat stat;
+				if (vfs_stat_node_ref(deviceEvent->device,  deviceEvent->node,
+						&stat) != 0) {
 					delete deviceEvent;
 					break;
 				}
-				if (S_ISDIR(st.st_mode)) {
+				if (S_ISDIR(stat.st_mode)) {
 					if (opcode == B_ENTRY_CREATED) {
-						add_node_listener(
-							deviceEvent->device,
-							deviceEvent->node,
-							B_WATCH_DIRECTORY,
-							*this);
+						add_node_listener(deviceEvent->device,
+							deviceEvent->node, B_WATCH_DIRECTORY, *this);
 					} else {
-						remove_node_listener(
-							deviceEvent->device,
-							deviceEvent->node,
-							*this);
+						remove_node_listener(deviceEvent->device,
+							deviceEvent->node, *this);
 					}
 					delete deviceEvent;
 					break;
@@ -200,7 +195,7 @@ public:
 	static status_t _HandleDeviceEvent(void* _event)
 	{
 		device_event* event = (device_event*)_event;
-		
+
 		if (strcmp(event->name, "raw") == 0) {
 			// a new raw device was added/removed
 			KPath path(B_PATH_NAME_LENGTH + 1);
