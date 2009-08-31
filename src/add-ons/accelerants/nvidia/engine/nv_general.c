@@ -931,10 +931,11 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "XBOX, NV20");
 		status = nvxx_general_powerup();
 		break;
-	case 0x02e110de:
+	case 0x02e010de: /* Nvidia GeForce 7600 GT */
+	case 0x02e110de: /* Nvidia GeForce 7600 GS */
 		si->ps.card_type = G73;
 		si->ps.card_arch = NV40A;
-		sprintf(si->adi.name, "Nvidia GeForce 7600 GS");
+		sprintf(si->adi.name, "Nvidia GeForce 7600");
 		sprintf(si->adi.chipset, "G73");
 		status = nvxx_general_powerup();
 		break;
