@@ -249,10 +249,12 @@ private:
 			void				DrawTitle(BView* view, BRect frame,
 									BColumn* column, bool depressed);
 
+			float				_VirtualWidth() const;
+
 			OutlineView*		fOutlineView;
 			BList*				fColumns;
 			BList*				fSortColumns;
-			float				fColumnsWidth;
+//			float				fColumnsWidth;
 			BRect				fVisibleRect;
 
 #if DOUBLE_BUFFERED_COLUMN_RESIZE
@@ -1159,10 +1161,6 @@ BColumnListView::ResizeColumnToPreferred(int32 index)
 
 	// get the preferred column width
 	float width = fOutlineView->GetColumnPreferredWidth(column);
-	if (width < column->MinWidth())
-		width = column->MinWidth();
-	else if (width > column->MaxWidth())
-		width = column->MaxWidth();
 
 	// set it
 	float oldWidth = column->Width();
@@ -1879,7 +1877,17 @@ BColumnListView::PreferredSize()
 {
 	BSize size = MinSize();
 	size.height += ceilf(be_plain_font->Size()) * 20;
-	// TODO: size.width = entire width of title view (all columns)
+
+	int32 count = CountColumns();
+	if (count > 0) {
+		// return MinSize().width if there are no columns.
+		size.width = 40.0f;
+		for (int32 i = 0; i < count; i++) {
+			BColumn* column = ColumnAt(i);
+			if (column != NULL)
+				size.width += fOutlineView->GetColumnPreferredWidth(column);
+		}
+	}
 
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
 }
@@ -2039,7 +2047,7 @@ TitleView::TitleView(BRect rect, OutlineView* horizontalSlave,
 	fOutlineView(horizontalSlave),
 	fColumns(visibleColumns),
 	fSortColumns(sortColumns),
-	fColumnsWidth(0),
+//	fColumnsWidth(0),
 	fVisibleRect(rect.OffsetToCopy(0, 0)),
 	fCurrentState(INACTIVE),
 	fColumnPop(NULL),
@@ -2097,7 +2105,7 @@ TitleView::~TitleView()
 void
 TitleView::ColumnAdded(BColumn* column)
 {
-	fColumnsWidth += column->Width() + 1;
+//	fColumnsWidth += column->Width();
 	FixScrollBar(false);
 	Invalidate();
 }
@@ -2106,7 +2114,7 @@ TitleView::ColumnAdded(BColumn* column)
 void
 TitleView::ColumnResized(BColumn* column, float oldWidth)
 {
-	fColumnsWidth += column->Width() - oldWidth;
+//	fColumnsWidth += column->Width() - oldWidth;
 	FixScrollBar(false);
 	Invalidate();
 }
@@ -2129,10 +2137,10 @@ TitleView::SetColumnVisible(BColumn* column, bool visible)
 	// Now really set the visibility
 	column->fVisible = visible;
 
-	if (visible)
-		fColumnsWidth += column->Width();
-	else
-		fColumnsWidth -= column->Width();
+//	if (visible)
+//		fColumnsWidth += column->Width();
+//	else
+//		fColumnsWidth -= column->Width();
 
 	BRect outlineInvalid(fOutlineView->VisibleRect());
 	outlineInvalid.left = titleInvalid.left;
@@ -2199,8 +2207,7 @@ TitleView::FixScrollBar(bool scrollToFit)
 	if (hScrollBar == NULL)
 		return;
 
-	float virtualWidth = fColumnsWidth + MAX(kLeftMargin,
-		fMasterView->LatchWidth()) + kRightMargin * 2;
+	float virtualWidth = _VirtualWidth();
 
 	if (virtualWidth > fVisibleRect.Width()) {
 		hScrollBar->SetProportion(fVisibleRect.Width() / virtualWidth);
@@ -2274,15 +2281,11 @@ TitleView::ResizeSelectedColumn(BPoint position, bool preferred)
 	float minWidth = fSelectedColumn->MinWidth();
 	float maxWidth = fSelectedColumn->MaxWidth();
 
-	float originalEdge = fSelectedColumnRect.left + fSelectedColumn->Width();
+	float oldWidth = fSelectedColumn->Width();
+	float originalEdge = fSelectedColumnRect.left + oldWidth;
 	if (preferred) {
 		float width = fOutlineView->GetColumnPreferredWidth(fSelectedColumn);
-		if (width < minWidth)
-			fSelectedColumn->SetWidth(minWidth);
-		else if (width > maxWidth)
-			fSelectedColumn->SetWidth(maxWidth);
-		else
-			fSelectedColumn->SetWidth(width);
+		fSelectedColumn->SetWidth(width);
 	} else if (position.x > fSelectedColumnRect.left + maxWidth)
 		fSelectedColumn->SetWidth(maxWidth);
 	else if (position.x < fSelectedColumnRect.left + minWidth)
@@ -2326,7 +2329,7 @@ TitleView::ResizeSelectedColumn(BPoint position, bool preferred)
 		fOutlineView->RedrawColumn(fSelectedColumn, fSelectedColumnRect.left,
 			fResizingFirstColumn);
 
-		fColumnsWidth += dX;
+//		fColumnsWidth += dX;
 
 		// Update the cursor
 		if (fSelectedColumn->Width() == minWidth)
@@ -2335,6 +2338,8 @@ TitleView::ResizeSelectedColumn(BPoint position, bool preferred)
 			SetViewCursor(fMaxResizeCursor, true);
 		else
 			SetViewCursor(fResizeCursor, true);
+
+		ColumnResized(fSelectedColumn, oldWidth);
 	}
 }
 
@@ -2526,6 +2531,22 @@ TitleView::DrawTitle(BView* view, BRect rect, BColumn* column, bool depressed)
 }
 
 
+float
+TitleView::_VirtualWidth() const
+{
+	float width = 0.0f;
+
+	int32 count = fColumns->CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BColumn* column = reinterpret_cast<BColumn*>(fColumns->ItemAt(i));
+		width += column->Width();
+	}
+
+	return width + MAX(kLeftMargin,
+		fMasterView->LatchWidth()) + kRightMargin * 2;
+}
+
+
 void
 TitleView::Draw(BRect invalidRect)
 {
@@ -2588,8 +2609,7 @@ TitleView::ScrollTo(BPoint position)
 
 	// Perform the little trick if the user is scrolled over too far.
 	// See OutlineView::ScrollTo for a more in depth explanation
-	float maxScrollBarValue = fColumnsWidth + MAX(kLeftMargin,
-		fMasterView->LatchWidth()) + kRightMargin * 2 - fVisibleRect.Width();
+	float maxScrollBarValue = _VirtualWidth() - fVisibleRect.Width();
 	BScrollBar* hScrollBar = ScrollBar(B_HORIZONTAL);
 	float min, max;
 	hScrollBar->GetRange(&min, &max);
@@ -2684,6 +2704,8 @@ TitleView::MouseDown(BPoint position)
 				fSelectedColumn = column;
 				fSelectedColumnRect.Set(leftEdge, 0, rightEdge,
 					fVisibleRect.Height());
+				fClickPoint = BPoint(position.x - rightEdge - 1,
+					position.y - fSelectedColumnRect.top);
 				SetMouseEventMask(B_POINTER_EVENTS,
 					B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
 				break;
@@ -2720,7 +2742,7 @@ TitleView::MouseMoved(BPoint position, uint32 transit,
 	// Handle column manipulation
 	switch (fCurrentState) {
 		case RESIZING_COLUMN:
-			ResizeSelectedColumn(position);
+			ResizeSelectedColumn(position - BPoint(fClickPoint.x, 0));
 			break;
 
 		case PRESSING_COLUMN: {
@@ -2788,7 +2810,7 @@ TitleView::MouseMoved(BPoint position, uint32 transit,
 				BeginRectTracking(dragRect, B_TRACK_WHOLE_RECT);
 			} else if (position.x < fLeftDragBoundry
 				|| position.x > fRightDragBoundry) {
-				DragSelectedColumn(position);
+				DragSelectedColumn(position - BPoint(fClickPoint.x, 0));
 			}
 
 #if DRAG_TITLE_OUTLINE
@@ -2813,7 +2835,7 @@ TitleView::MouseMoved(BPoint position, uint32 transit,
 				EndRectTracking();
 				fCurrentState = DRAG_COLUMN_INSIDE_TITLE;
 				fSelectedColumn->SetVisible(true);
-				DragSelectedColumn(position);
+				DragSelectedColumn(position - BPoint(fClickPoint.x, 0));
 			}
 
 			break;
@@ -2865,10 +2887,9 @@ TitleView::MouseUp(BPoint position)
 
 	switch (fCurrentState) {
 		case RESIZING_COLUMN:
-			ResizeSelectedColumn(position);
+			ResizeSelectedColumn(position - BPoint(fClickPoint.x, 0));
 			fCurrentState = INACTIVE;
 			FixScrollBar(false);
-			SetViewCursor(B_CURSOR_SYSTEM_DEFAULT, true);
 			break;
 
 		case PRESSING_COLUMN: {
@@ -4760,6 +4781,13 @@ OutlineView::GetColumnPreferredWidth(BColumn* column)
 				preferred = width;
 		}
 	}
+	// Constrain to preferred width. This makes the method do a little
+	// more than asked, but it's for convenience.
+	if (preferred < column->MinWidth())
+		preferred = column->MinWidth();
+	else if (preferred > column->MaxWidth())
+		preferred = column->MaxWidth();
+
 	return preferred;
 }
 

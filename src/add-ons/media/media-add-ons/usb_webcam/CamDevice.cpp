@@ -524,7 +524,7 @@ CamDevice::DataPumpThread()
 			len = fBulkIn->BulkTransfer(fBuffer, fBufferLen);
 #endif
 			
-			PRINT((CH ": got %ld bytes" CT, len));
+			//PRINT((CH ": got %ld bytes" CT, len));
 #ifdef DEBUG_WRITE_DUMP
 			write(fDumpFD, fBuffer, len);
 #endif

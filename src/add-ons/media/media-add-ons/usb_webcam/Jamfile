@@ -6,10 +6,11 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	usbKitLibraryName = libdevice.so ;
 } else {
-#	usbKitLibraryName = usb ;
-	usbKitLibraryName = USBKit.a ;
-	UsePublicHeaders [ FDirName drivers ] ;
-	UsePublicHeaders [ FDirName device ] ;
+#	usbKitLibraryName = USBKit.a ;
+#	UsePublicHeaders [ FDirName drivers ] ;
+#	UsePublicHeaders [ FDirName device ] ;
+	# use -lusb on ZETA
+	usbKitLibraryName = usb ;
 }
 
 # source directories
@@ -38,7 +39,8 @@ csTransformsSources = Bayer.cpp ;
 
 ## sensors sources
 local sensorsSources ;
-sensorsSources = hdcs1000.cpp hv7131e1.cpp pb0100.cpp tas5110c1b.cpp ;
+sensorsSources = hdcs1000.cpp hv7131e1.cpp pas106b.cpp pb0100.cpp 
+	tas5110c1b.cpp tas5130d1b.cpp ;
 
 ## how to build header files from sources to include the list of built-in addons.
 # but it doesn't seem to work for some reason...

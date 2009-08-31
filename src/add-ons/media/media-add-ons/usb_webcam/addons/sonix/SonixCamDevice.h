@@ -64,6 +64,9 @@ class SonixCamDevice : public CamDevice
 	virtual status_t	StartTransfer();
 	virtual status_t	StopTransfer();
 
+	// sensor chip handling
+	virtual status_t	PowerOnSensor(bool on);
+
 	// generic register-like access
 	virtual ssize_t		WriteReg(uint16 address, uint8 *data, size_t count=1);
 	virtual ssize_t		ReadReg(uint16 address, uint8 *data, size_t count=1, bool cached=false);
