@@ -178,7 +178,7 @@ class Volume;
 #define INODE_MAGIC1			0x3bbe0ad9
 #define INODE_FILE_NAME_LENGTH	256
 #define INODE_TIME_SHIFT		16
-#define INODE_TIME_MASK			0xffff
+#define INODE_TIME_MASK			0xfff0
 
 inline uint32 unique_from_nsec(uint32 time);
 
@@ -284,7 +284,7 @@ unique_from_nsec(uint32 time)
 {
 	static vint32 number;
 	if (time != 0)
-		return ((time >> 14) & INODE_TIME_MASK) | (++number & 0xf);
+		return (((time + 16383) >> 14) & INODE_TIME_MASK) | (++number & 0xf);
 
 	return ++number & 0xfff;
 }
