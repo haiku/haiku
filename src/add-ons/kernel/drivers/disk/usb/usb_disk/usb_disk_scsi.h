@@ -99,6 +99,9 @@ typedef enum {
 	SCSI_SENSE_KEY_ABORTED_COMMAND = 0x0b,
 } scsi_sense_key;
 
+// request sense additional sense codes
+#define SCSI_ASC_MEDIUM_NOT_PRESENT			0x3a
+
 // mode sense page code/parameter
 #define SCSI_MODE_PAGE_DEVICE_CONFIGURATION	0x10
 #define SCSI_DEVICE_SPECIFIC_WRITE_PROTECT	0x80

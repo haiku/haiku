@@ -426,7 +426,8 @@ usb_disk_request_sense(device_lun *lun)
 		return result;
 	}
 
-	if (parameter.sense_key > SCSI_SENSE_KEY_NOT_READY) {
+	if (parameter.sense_key > SCSI_SENSE_KEY_NOT_READY
+		&& parameter.sense_key != SCSI_SENSE_KEY_UNIT_ATTENTION) {
 		TRACE_ALWAYS("request_sense: key: 0x%02x; asc: 0x%02x; ascq: 0x%02x;\n",
 			parameter.sense_key, parameter.additional_sense_code,
 			parameter.additional_sense_code_qualifier);
@@ -436,14 +437,6 @@ usb_disk_request_sense(device_lun *lun)
 		case SCSI_SENSE_KEY_NO_SENSE:
 		case SCSI_SENSE_KEY_RECOVERED_ERROR:
 			return B_OK;
-
-		case SCSI_SENSE_KEY_NOT_READY:
-			TRACE("request_sense: device not ready (asc 0x%02x ascq 0x%02x)\n",
-				parameter.additional_sense_code,
-				parameter.additional_sense_code_qualifier);
-			lun->media_present = false;
-			usb_disk_reset_capacity(lun);
-			return B_DEV_NO_MEDIA;
 
 		case SCSI_SENSE_KEY_HARDWARE_ERROR:
 		case SCSI_SENSE_KEY_MEDIUM_ERROR:
@@ -455,10 +448,21 @@ usb_disk_request_sense(device_lun *lun)
 			return B_DEV_INVALID_IOCTL;
 
 		case SCSI_SENSE_KEY_UNIT_ATTENTION:
-			TRACE_ALWAYS("request_sense: media changed\n");
-			lun->media_changed = true;
-			lun->media_present = true;
-			return B_DEV_MEDIA_CHANGED;
+			if (parameter.additional_sense_code != SCSI_ASC_MEDIUM_NOT_PRESENT) {
+				TRACE_ALWAYS("request_sense: media changed\n");
+				lun->media_changed = true;
+				lun->media_present = true;
+				return B_DEV_MEDIA_CHANGED;
+			}
+			// fall through
+
+		case SCSI_SENSE_KEY_NOT_READY:
+			TRACE("request_sense: device not ready (asc 0x%02x ascq 0x%02x)\n",
+				parameter.additional_sense_code,
+				parameter.additional_sense_code_qualifier);
+			lun->media_present = false;
+			usb_disk_reset_capacity(lun);
+			return B_DEV_NO_MEDIA;
 
 		case SCSI_SENSE_KEY_DATA_PROTECT:
 			TRACE_ALWAYS("request_sense: write protected\n");
