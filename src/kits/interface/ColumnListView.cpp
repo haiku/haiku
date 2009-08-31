@@ -2684,6 +2684,8 @@ TitleView::MouseDown(BPoint position)
 				fSelectedColumn = column;
 				fSelectedColumnRect.Set(leftEdge, 0, rightEdge,
 					fVisibleRect.Height());
+				fClickPoint = BPoint(position.x - rightEdge - 1,
+					position.y - fSelectedColumnRect.top);
 				SetMouseEventMask(B_POINTER_EVENTS,
 					B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
 				break;
@@ -2720,7 +2722,7 @@ TitleView::MouseMoved(BPoint position, uint32 transit,
 	// Handle column manipulation
 	switch (fCurrentState) {
 		case RESIZING_COLUMN:
-			ResizeSelectedColumn(position);
+			ResizeSelectedColumn(position - BPoint(fClickPoint.x, 0));
 			break;
 
 		case PRESSING_COLUMN: {
@@ -2788,7 +2790,7 @@ TitleView::MouseMoved(BPoint position, uint32 transit,
 				BeginRectTracking(dragRect, B_TRACK_WHOLE_RECT);
 			} else if (position.x < fLeftDragBoundry
 				|| position.x > fRightDragBoundry) {
-				DragSelectedColumn(position);
+				DragSelectedColumn(position - BPoint(fClickPoint.x, 0));
 			}
 
 #if DRAG_TITLE_OUTLINE
@@ -2813,7 +2815,7 @@ TitleView::MouseMoved(BPoint position, uint32 transit,
 				EndRectTracking();
 				fCurrentState = DRAG_COLUMN_INSIDE_TITLE;
 				fSelectedColumn->SetVisible(true);
-				DragSelectedColumn(position);
+				DragSelectedColumn(position - BPoint(fClickPoint.x, 0));
 			}
 
 			break;
@@ -2865,10 +2867,9 @@ TitleView::MouseUp(BPoint position)
 
 	switch (fCurrentState) {
 		case RESIZING_COLUMN:
-			ResizeSelectedColumn(position);
+			ResizeSelectedColumn(position - BPoint(fClickPoint.x, 0));
 			fCurrentState = INACTIVE;
 			FixScrollBar(false);
-			SetViewCursor(B_CURSOR_SYSTEM_DEFAULT, true);
 			break;
 
 		case PRESSING_COLUMN: {
