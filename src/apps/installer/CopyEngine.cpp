@@ -212,7 +212,7 @@ printf("CopyFile - cancled\n");
 
 		fBytesRead += read;
 		loopIteration += 1;
-		if (loopIteration % 10 == 0)
+		if (loopIteration % 2 == 0)
 			_UpdateProgress();
 
 		buffer->deleteFile = read == 0;
@@ -413,15 +413,15 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 				BSymLink srcLink(&entry);
 				if (ret < B_OK)
 					return ret;
-	
+
 				char linkPath[B_PATH_NAME_LENGTH];
 				ssize_t read = srcLink.ReadLink(linkPath, B_PATH_NAME_LENGTH - 1);
 				if (read < 0)
 					return (status_t)read;
-	
+
 				// just in case it already exists...
 				copy.Remove();
-	
+
 				BSymLink dstLink;
 				ret = destination.CreateSymLink(name, linkPath, &dstLink);
 				if (ret < B_OK)

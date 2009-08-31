@@ -41,6 +41,7 @@ public:
 	// MainWindow
 			status_t			StoreSettings(BMessage* archive) const;
 			status_t			RestoreSettings(BMessage* archive);
+			void				ApplyDefaultSettings();
 
 private:
 			void				_ScanDrives();
@@ -68,7 +69,7 @@ private:
 									const BString& diskSystemName);
 			void				_Create(BDiskDevice* disk,
 									partition_id selectedPartition);
-			void				_Delete(BDiskDevice* disk, 
+			void				_Delete(BDiskDevice* disk,
 									partition_id selectedPartition);
 
 
