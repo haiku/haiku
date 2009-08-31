@@ -53,9 +53,11 @@ public:
 
 	virtual	bool				AcceptsField(const BField* field) const;
 
+	static	void				InitTextMargin(BView* parent);
+
 private:
 			uint32				fTruncateMode;
-	static	float				fTextMargin;
+	static	float				sTextMargin;
 };
 
 
@@ -66,7 +68,7 @@ public:
 								PartitionListRow(BPartition* partition);
 								PartitionListRow(partition_id parentID,
 									partition_id id, off_t offset, off_t size);
-	
+
 			partition_id		ID() const
 									{ return fPartitionID; }
 			partition_id		ParentID() const
@@ -88,7 +90,9 @@ class PartitionListView : public BColumnListView {
 public:
 								PartitionListView(const BRect& frame,
 									uint32 resizeMode);
-	
+
+	virtual	void				AttachedToWindow();
+
 			PartitionListRow*	FindRow(partition_id id,
 									PartitionListRow* parent = NULL);
 			PartitionListRow*	AddPartition(BPartition* partition);

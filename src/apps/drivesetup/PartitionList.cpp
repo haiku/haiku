@@ -42,7 +42,7 @@ BBitmapStringField::SetBitmap(BBitmap* bitmap)
 // #pragma mark - PartitionColumn
 
 
-float PartitionColumn::fTextMargin = 0.0;
+float PartitionColumn::sTextMargin = 0.0;
 
 
 PartitionColumn::PartitionColumn(const char* title, float width, float minWidth,
@@ -57,14 +57,6 @@ PartitionColumn::PartitionColumn(const char* title, float width, float minWidth,
 void
 PartitionColumn::DrawField(BField* field, BRect rect, BView* parent)
 {
-	if (fTextMargin == 0.0) {
-		// we are the first column to draw something and need to
-		// init the text margin
-		BFont font;
-		parent->GetFont(&font);
-		fTextMargin = ceilf(font.Size() * 0.8);
-	}
-
 	BBitmapStringField* bitmapField
 		= dynamic_cast<BBitmapStringField*>(field);
 	BStringField* stringField = dynamic_cast<BStringField*>(field);
@@ -82,14 +74,14 @@ PartitionColumn::DrawField(BField* field, BRect rect, BView* parent)
 			default:
 			case B_ALIGN_LEFT:
 			case B_ALIGN_CENTER:
-				x = rect.left + fTextMargin;
-				width = rect.right - (x + r.Width()) - (2 * fTextMargin);
+				x = rect.left + sTextMargin;
+				width = rect.right - (x + r.Width()) - (2 * sTextMargin);
 				r.Set(x + r.Width(), rect.top, rect.right - width, rect.bottom);
 				break;
 
 			case B_ALIGN_RIGHT:
-				x = rect.right - fTextMargin - r.Width();
-				width = (x - rect.left - (2 * fTextMargin));
+				x = rect.right - sTextMargin - r.Width();
+				width = (x - rect.left - (2 * sTextMargin));
 				r.Set(rect.left, rect.top, rect.left + width, rect.bottom);
 				break;
 		}
@@ -113,7 +105,7 @@ PartitionColumn::DrawField(BField* field, BRect rect, BView* parent)
 
 	} else if (stringField) {
 
-		float width = rect.Width() - (2 * fTextMargin);
+		float width = rect.Width() - (2 * sTextMargin);
 
 		if (width != stringField->Width()) {
 			BString truncatedString(stringField->String());
@@ -142,7 +134,7 @@ PartitionColumn::GetPreferredWidth(BField *_field, BView* parent) const
 		const BBitmap* bitmap = bitmapField->Bitmap();
 		BFont font;
 		parent->GetFont(&font);
-		width = font.StringWidth(bitmapField->String()) + 3 * fTextMargin;
+		width = font.StringWidth(bitmapField->String()) + 3 * sTextMargin;
 		if (bitmap)
 			width += bitmap->Bounds().Width();
 		else
@@ -150,7 +142,7 @@ PartitionColumn::GetPreferredWidth(BField *_field, BView* parent) const
 	} else if (stringField) {
 		BFont font;
 		parent->GetFont(&font);
-		width = font.StringWidth(stringField->String()) + 2 * fTextMargin;
+		width = font.StringWidth(stringField->String()) + 2 * sTextMargin;
 	}
 	return max_c(width, parentWidth);
 }
@@ -160,6 +152,15 @@ bool
 PartitionColumn::AcceptsField(const BField* field) const
 {
 	return dynamic_cast<const BStringField*>(field) != NULL;
+}
+
+
+void
+PartitionColumn::InitTextMargin(BView* parent)
+{
+	BFont font;
+	parent->GetFont(&font);
+	sTextMargin = ceilf(font.Size() * 0.8);
 }
 
 
@@ -258,6 +259,14 @@ PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 		B_TRUNCATE_END, B_ALIGN_RIGHT), kSizeColumn);
 
 	SetSortingEnabled(false);
+}
+
+
+void
+PartitionListView::AttachedToWindow()
+{
+	Inherited::AttachedToWindow();
+	PartitionColumn::InitTextMargin(ScrollView());
 }
 
 
