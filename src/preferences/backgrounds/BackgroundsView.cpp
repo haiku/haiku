@@ -990,6 +990,12 @@ BackgroundsView::UpdateButtons()
 void
 BackgroundsView::RefsReceived(BMessage *msg)
 {
+	if (!msg->HasRef("refs") && msg->HasRef("dir_ref")) {
+		entry_ref dirRef;
+		if (msg->FindRef("dir_ref", &dirRef) == B_OK)
+			msg->AddRef("refs", &dirRef);
+	}
+
 	entry_ref ref;
 	int32 i = 0;
 	BMimeType imageType("image");
@@ -1092,23 +1098,6 @@ BackgroundsView::AddImage(BPath path)
 
 	fImageList.AddItem(new Image(path));
 	return -index - 1;
-}
-
-
-void
-BackgroundsView::ProcessRefs(entry_ref dir, BMessage* refs)
-{
-	fWorkspaceMenu->FindItem(kMsgDefaultFolder)->SetMarked(true);
-	BMessenger messenger(this);
-	messenger.SendMessage(kMsgDefaultFolder);
-
-	if (refs->CountNames(B_REF_TYPE) > 0) {
-		messenger.SendMessage(refs);
-	} else {
-		BMessage message(B_REFS_RECEIVED);
-		message.AddRef("refs", &dir);
-		messenger.SendMessage(&message);
-	}
 }
 
 

@@ -90,7 +90,6 @@ class BackgroundsView : public BBox {
 		void WorkspaceActivated(uint32 oldWorkspaces, bool active);
 		int32 AddImage(BPath path);
 		Image* GetImage(int32 imageIndex);
-		void ProcessRefs(entry_ref dir_ref, BMessage* msg);
 
 		void GetPreferredSize(float* _width, float* _height);
 

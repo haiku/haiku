@@ -11,7 +11,7 @@
 #include "BackgroundsView.h"
 
 #include <Application.h>
-#include <TrackerAddOn.h>
+#include <TrackerAddOnAppLaunch.h>
 #include <Window.h>
 
 
@@ -27,8 +27,6 @@ class BackgroundsApplication : public BApplication {
 class BackgroundsWindow : public BWindow {
 	public:
 		BackgroundsWindow(BRect frame, bool standalone = true);
-
-		void ProcessRefs(entry_ref dir, BMessage* refs);
 
 	protected:
 		virtual	bool QuitRequested();
@@ -92,30 +90,7 @@ BackgroundsWindow::WorkspaceActivated(int32 oldWorkspaces, bool active)
 }
 
 
-void
-BackgroundsWindow::ProcessRefs(entry_ref dir, BMessage* refs)
-{
-	fBackgroundsView->ProcessRefs(dir, refs);
-}
-
-
 //	#pragma mark -
-
-
-/*!
-	\brief Tracker add-on entry
-*/
-void
-process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
-{
-	BackgroundsWindow* window = new BackgroundsWindow(BRect(100, 100, 570, 325), false);
-	window->ProcessRefs(dir, refs);
-	snooze(500);
-	window->Show();
-
-	status_t status;
-	wait_for_thread(window->Thread(), &status);
-}
 
 
 int
@@ -129,5 +104,4 @@ main(int argc, char** argv)
 
 	return 0;
 }
-
 
