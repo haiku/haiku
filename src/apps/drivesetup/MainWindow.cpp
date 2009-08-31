@@ -372,6 +372,32 @@ MainWindow::RestoreSettings(BMessage* archive)
 }
 
 
+void
+MainWindow::ApplyDefaultSettings()
+{
+	if (!Lock())
+		return;
+
+	fListView->ResizeAllColumnsToPreferred();
+
+	// Adjust window size for convenience
+	float enlargeBy = fListView->PreferredSize().width
+		- fListView->Bounds().Width();
+	if (enlargeBy > 0.0f) {
+		BScreen screen(this);
+		float windowWidth = Frame().Width() + enlargeBy;
+		if (windowWidth > screen.Frame().Width() - 20.0f)
+			windowWidth = screen.Frame().Width() - 20.0f;
+
+		ResizeTo(windowWidth, Frame().Height());
+	}
+
+	CenterOnScreen();
+
+	Unlock();
+}
+
+
 // #pragma mark -
 
 

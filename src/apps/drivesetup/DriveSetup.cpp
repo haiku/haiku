@@ -36,7 +36,8 @@ void
 DriveSetup::ReadyToRun()
 {
 	fWindow = new MainWindow(BRect(50, 50, 600, 450));
-	_RestoreSettings();
+	if (_RestoreSettings() != B_OK)
+		fWindow->ApplyDefaultSettings();
 	fWindow->Show();
 }
 
