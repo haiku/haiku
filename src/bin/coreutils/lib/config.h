@@ -832,10 +832,10 @@
 /* #undef HAVE_HURD_H */
 
 /* Define if you have the iconv() function and it works. */
-#define HAVE_ICONV 1
+/* #undef HAVE_ICONV */
 
 /* Define to 1 if you have the <iconv.h> header file. */
-#define HAVE_ICONV_H 1
+/* #undef HAVE_ICONV_H */
 
 /* Define to 1 if you have the `inet_ntop' function. */
 /* #undef HAVE_INET_NTOP */

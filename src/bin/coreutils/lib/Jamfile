@@ -8,7 +8,6 @@ SubDirCcFlags -DHAVE_CONFIG_H ;
 
 SubDirSysHdrs $(SUBDIR) ;
 #SubDirSysHdrs $(SUBDIR) $(DOTDOT) ;
-UseLibraryHeaders iconv ;
 
 StaticLibrary libfetish.a : 
 #	__fpending.c
@@ -180,7 +179,6 @@ StaticLibrary libfetish.a :
 #	strcspn.c
 #	strdup.c
 	strftime.c
-	striconv.c
 	strintcmp.c
 	stripslash.c
 	strnlen1.c
@@ -225,7 +223,6 @@ StaticLibrary libfetish.a :
 	xmemxfrm.c
 	xnanosleep.c
 	xprintf.c
-	xstriconv.c
 	xstrndup.c
 	xstrtod.c
 	xstrtoimax.c
