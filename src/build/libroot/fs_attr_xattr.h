@@ -9,7 +9,7 @@
 */
 
 
-#include <attr/xattr.h>
+#include <sys/xattr.h>
 
 
 // the namespace all attributes live in
