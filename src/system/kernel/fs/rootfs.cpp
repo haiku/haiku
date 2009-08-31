@@ -938,6 +938,10 @@ rootfs_rename(fs_volume* _volume, fs_vnode* _fromDir, const char* fromName,
 		toName));
 
 	// Prevent renaming /boot, since that will stop everything from working.
+	// TODO: This should be solved differently. Either root should still be
+	// able to do this or a mechanism should be introduced that does this
+	// at the VFS level, for example by checking nodes for a specific
+	// attribute.
 	if (fromDirectory->id == 1 && strcmp(fromName, "boot") == 0)
 		return EPERM;
 
