@@ -247,8 +247,8 @@ PartitionMapWriter::_ReadBlock(off_t partitionOffset,
 	if (partitionOffset < 0)
 		return B_BAD_VALUE;
 	// TODO: If fBlockSize > sizeof(partition_table) then stop/read NULL after
-	if (read_pos(fDeviceFD, partitionOffset, &partitionTable, fBlockSize)
-		!= fBlockSize) {
+	if (read_pos(fDeviceFD, partitionOffset, &partitionTable,
+		sizeof(partitionTable)) != sizeof(partitionTable)) {
 		status_t error = errno;
 		if (error == B_OK)
 			error = B_IO_ERROR;
@@ -266,9 +266,10 @@ PartitionMapWriter::_WriteBlock(off_t partitionOffset,
 {
 	if (partitionOffset < 0)
 		return B_BAD_VALUE;
-	// TODO: If fBlockSize > sizeof(partition_table) then stop/write NULL after
-	if (write_pos(fDeviceFD, partitionOffset, &partitionTable, fBlockSize)
-		!= fBlockSize) {
+	// TODO: maybe clear the rest of the block if
+	// fBlockSize > sizeof(partition_table)?
+	if (write_pos(fDeviceFD, partitionOffset, &partitionTable,
+		sizeof(partitionTable)) != sizeof(partitionTable)) {
 		status_t error = errno;
 		if (error == B_OK)
 			error = B_IO_ERROR;
