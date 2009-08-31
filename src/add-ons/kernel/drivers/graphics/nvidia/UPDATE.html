@@ -25,7 +25,7 @@
 <li>Corrected/Added detection of third I2C bus on cards that support it. The old detection method for a third and (non-existing) fourth bus was faulty. The driver uses I2C channels for monitor DDC/EDID and TVencoder communications.
 <li>DDC/EDID fetching now also works on GCC4 binaries due to a fixed fault in the accelerants/common code (which is used for that function);
 <li>Added support for Haiku specific driverhook GET_PREFERRED_DISPLAY_MODE. Laptops should now also startup in native mode automatically at first system boot;
-<li>Rewrote framebuffer memory detection. Accelerant now only uses the amount of RAM mapped by the kerneldriver as maximum. This fixes black screen at app_server startup on a number of GF7xxx cards.
+<li>Rewrote framebuffer memory detection. Accelerant now only uses the amount of RAM mapped by the kerneldriver as maximum. This fixes black screen at app_server startup on a number of GF6xxx and GF7xxx cards.
 </ul>
 <p><h1>nv_driver 0.80 (Rudolf)</h1></p>
 <ul>
