@@ -558,7 +558,8 @@ ata_adapter_init_controller(device_node *node,
 	pci_device *device;
 	ata_adapter_controller_info *controller;
 	uint16 bus_master_base;
-//	uint16 pcicmd;
+	uint16 pcicmdOld;
+	uint16 pcicmdNew;
 
 	// get device data
 	if (sDeviceManager->get_attr_uint16(node, ATA_ADAPTER_BUS_MASTER_BASE, &bus_master_base, false) != B_OK)
@@ -575,18 +576,20 @@ ata_adapter_init_controller(device_node *node,
 		return B_NO_MEMORY;
 
 #if 0
-	pcicmd = pci->read_pci_config(node, PCI_command, 2);
-	TRACE("PCI-ATA: adapter init: pcicmd old setting 0x%04x\n", pcicmd);
-	if ((pcicmd & PCI_command_io) == 0) {
+	pcicmdOld = pcicmdNew = pci->read_pci_config(node, PCI_command, 2);
+	if ((pcicmdNew & PCI_command_io) == 0) {
 		TRACE("PCI-ATA: adapter init: enabling io decoder\n");
-		pcicmd |= PCI_command_io;
+		pcicmdNew |= PCI_command_io;
 	}
-	if ((pcicmd & PCI_command_master) == 0) {
+	if ((pcicmdNew & PCI_command_master) == 0) {
 		TRACE("PCI-ATA: adapter init: enabling bus mastering\n");
-		pcicmd |= PCI_command_master;
+		pcicmdNew |= PCI_command_master;
 	}
-	pci->write_pci_config(node, PCI_command, 2, pcicmd);
-	TRACE("PCI-ATA: adapter init: pcicmd new setting 0x%04x\n", pci->read_pci_config(node, PCI_command, 2));
+	if (pcicmdOld != pcicmdNew) {
+		pci->write_pci_config(node, PCI_command, 2, pcicmdNew);
+		TRACE("PCI-ATA: adapter init: pcicmd old 0x%04x, new 0x%04x\n", 
+			pcicmdOld, pcicmdNew);
+	}
 #endif
 
 	controller->node = node;
