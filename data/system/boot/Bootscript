@@ -85,15 +85,26 @@ fi
 
 # We must wait for the app_server and registrar to be ready
 launch $SERVERS/registrar _roster_thread_	# launch registrar
+if [ "$isReadOnly" = "yes" ]; then
+	sleep 4s
+fi
 
 launch $SERVERS/debug_server				# launch debug_server
+if [ "$isReadOnly" = "yes" ]; then
+	sleep 2s
+fi
 
-# Init Network
-if [ "$SAFEMODE" != "yes" ]; then
-	launch $SERVERS/net_server				# launch net_server
+if [ "$isReadOnly" != "yes" ]; then
+	# Init Network
+	if [ "$SAFEMODE" != "yes" ]; then
+		launch $SERVERS/net_server				# launch net_server
+	fi
 fi
 
 launch $SERVERS/app_server picasso		# launch app_server
+if [ "$isReadOnly" = "yes" ]; then
+	sleep 10s
+fi
 
 if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/syslog_daemon
@@ -105,14 +116,18 @@ if [ "$isReadOnly" = "yes" ]; then
 	# Create Installer links (using the write overlay)
 	ln -sf /boot/system/apps/Installer /boot/home/Desktop/Installer
 	ln -sf /boot/system/apps/Installer /boot/home/config/be/Applications/Installer
-
-	/bin/alert "Do you wish to run the Installer or continue booting to the Desktop?" "Installer" "Desktop"
-	if [ $? -eq 0 ]; then
+	sleep 2s
+	/bin/alert "Do you wish to run the Installer or continue booting to the Desktop?" "Desktop" "Installer"
+	if [ $? -eq 1 ]; then
 		launchscript $SCRIPTS/Bootscript.cd
 		exit 0 # and return
 	fi
-fi
 
+	# Init Network
+	if [ "$SAFEMODE" != "yes" ]; then
+		launch $SERVERS/net_server				# launch net_server
+	fi
+fi
 
 if [ -e /etc/users ]; then
 	launch system/Login
