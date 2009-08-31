@@ -229,7 +229,11 @@ MainWindow::MainWindow(BRect frame)
 	fListView->SetSelectionMessage(new BMessage(MSG_PARTITION_ROW_SELECTED));
 	fListView->SetTarget(this);
 
-	BDiskDeviceRoster().StartWatching(this);
+	status_t ret = fDDRoster.StartWatching(BMessenger(this));
+	if (ret != B_OK) {
+		fprintf(stderr, "Failed to start watching for device changes: %s\n",
+			strerror(ret));
+	}
 
 	// visit all disks in the system and show their contents
 	_ScanDrives();
@@ -296,6 +300,7 @@ MainWindow::MessageReceived(BMessage* message)
 
 		// TODO: this could probably be done better!
 		case B_DEVICE_UPDATE:
+			printf("B_DEVICE_UPDATE\n");
 		case MSG_RESCAN:
 			_ScanDrives();
 			break;
@@ -521,13 +526,13 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		if (parentPartition && parentPartition->ContainsPartitioningSystem())
 			fCreateMI->SetEnabled(true);
 
-		BPartition* partition = disk->FindDescendant(selectedPartition);
-		if (partition == NULL)
-			partition = disk;
-
 		bool prepared = disk->PrepareModifications() == B_OK;
 		fInitMenu->SetEnabled(prepared);
 		fDeleteMI->SetEnabled(prepared);
+
+		BPartition* partition = disk->FindDescendant(selectedPartition);
+		if (partition == NULL)
+			partition = disk;
 
 		BDiskSystem diskSystem;
 		fDDRoster.RewindDiskSystems();
@@ -554,9 +559,6 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			item->SetEnabled(partition->CanInitialize(diskSystem.PrettyName()));
 			fInitMenu->AddItem(item);
 		}
-
-		if (prepared)
-			disk->CancelModifications();
 
 		// Mount items
 		if (partition) {
@@ -587,6 +589,10 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			fMountMI->SetEnabled(false);
 			fUnmountMI->SetEnabled(false);
 		}
+
+		if (prepared)
+			disk->CancelModifications();
+
 		fMountAllMI->SetEnabled(true);
 	}
 	if (selectedPartition < 0) {
