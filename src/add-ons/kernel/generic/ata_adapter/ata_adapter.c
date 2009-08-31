@@ -482,6 +482,8 @@ ata_adapter_detect_channel(pci_device_module_info *pci, pci_device *pci_device,
 	device_node **node, bool supports_compatibility_mode)
 {
 	uint8 api;
+	uint16 pcicmdOld;
+	uint16 pcicmdNew;
 
 	SHOW_FLOW0( 3, "" );
 
@@ -519,6 +521,24 @@ ata_adapter_detect_channel(pci_device_module_info *pci, pci_device *pci_device,
 		TRACE("PCI-ATA: Controller in native mode: cmd %#x, ctrl %#x, irq %d\n",
 			  command_block_base, control_block_base, intnum);
 	}
+
+
+	// this should be done in ata_adapter_init_controller but there is crashes
+	pcicmdOld = pcicmdNew = pci->read_pci_config(pci_device, PCI_command, 2);
+	if ((pcicmdNew & PCI_command_io) == 0) {
+		TRACE("PCI-ATA: enabling io decoder\n");
+		pcicmdNew |= PCI_command_io;
+	}
+	if ((pcicmdNew & PCI_command_master) == 0) {
+		TRACE("PCI-ATA: enabling bus mastering\n");
+		pcicmdNew |= PCI_command_master;
+	}
+	if (pcicmdOld != pcicmdNew) {
+		pci->write_pci_config(pci_device, PCI_command, 2, pcicmdNew);
+		TRACE("PCI-ATA: pcicmd old 0x%04x, new 0x%04x\n", 
+			pcicmdOld, pcicmdNew);
+	}
+
 
 	if (supports_compatibility_mode) {
 		// read status of primary(!) channel to detect simplex
