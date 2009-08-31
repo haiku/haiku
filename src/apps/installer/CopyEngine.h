@@ -65,11 +65,12 @@ private:
 			};
 			struct Buffer {
 				Buffer(BFile* file)
-					: file(file)
-					, buffer(malloc(BUFFER_SIZE))
-					, size(BUFFER_SIZE)
-					, validBytes(0)
-					, deleteFile(false)
+					:
+					file(file),
+					buffer(malloc(BUFFER_SIZE)),
+					size(BUFFER_SIZE),
+					validBytes(0),
+					deleteFile(false)
 				{
 				}
 				~Buffer()
