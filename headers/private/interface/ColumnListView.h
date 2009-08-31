@@ -368,6 +368,12 @@ public:
 			void				SetEditMode(bool state);
 			void				Refresh();
 
+	virtual BSize				MinSize();
+	virtual BSize				PreferredSize();
+	virtual BSize				MaxSize();
+
+	virtual	void				InvalidateLayout(bool descendants = false);
+
 protected:
 	virtual	void 				MessageReceived(BMessage* message);
 	virtual	void 				KeyDown(const char* bytes, int32 numBytes);
@@ -375,11 +381,6 @@ protected:
 	virtual	void 				WindowActivated(bool active);
 	virtual	void 				Draw(BRect updateRect);
 
-	virtual BSize				MinSize();
-	virtual BSize				PreferredSize();
-	virtual BSize				MaxSize();
-
-	virtual	void				InvalidateLayout(bool descendants = false);
 	virtual	void				DoLayout();
 
 private:
