@@ -466,7 +466,7 @@ make_partition_label(BPartition* partition, char* label, char* menuLabel,
 	bool showContentType)
 {
 	char size[15];
-	SizeAsString(partition->ContentSize(), size);
+	SizeAsString(partition->Size(), size);
 
 	BPath path;
 	partition->GetPath(&path);
