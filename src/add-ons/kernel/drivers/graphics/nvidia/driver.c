@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-6/2009.
+	Rudolf Cornelissen 3/2002-8/2009.
 */
 
 
@@ -681,6 +681,10 @@ map_device(device_info *di)
 	/* remember the DMA address of the frame buffer for BDirectWindow?? purposes */
 	si->framebuffer_pci = (void *) di->pcii.u.h0.base_registers_pci[frame_buffer];
 
+	/* note the amount of memory mapped by the kerneldriver so we can make sure we
+	 * don't attempt to adress more later on */
+	si->ps.memory_size = di->pcii.u.h0.base_register_sizes[frame_buffer];
+
 	// remember settings for use here and in accelerant
 	si->settings = sSettings;
 
@@ -851,6 +855,7 @@ open_hook(const char* name, uint32 flags, void** cookie)
 	physical_entry map[1];
 	size_t net_buf_size;
 	void *unaligned_dma_buffer;
+	uint32 mem_size;
 
 	/* find the device name in the list of devices */
 	/* we're never passed a name we didn't publish */
@@ -946,21 +951,32 @@ open_hook(const char* name, uint32 flags, void** cookie)
 	 * wrongly identify the INT request coming from us! */
 	si->ps.secondary_head = false;
 
+	/* map the device */
+	result = map_device(di);
+	if (result < 0) goto free_shared_and_alldma;
+
+	/* we will be returning OK status for sure now */
+	result = B_OK;
+
 	/* note the amount of system RAM the system BIOS assigned to the card if applicable:
 	 * unified memory architecture (UMA) */
 	switch ((((uint32)(si->device_id)) << 16) | si->vendor_id)
 	{
 	case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
 		/* device at bus #0, device #0, function #1 holds value at byte-index 0x7C */
-		si->ps.memory_size = 1024 * 1024 *
+		mem_size = 1024 * 1024 *
 			(((((*pci_bus->read_pci_config)(0, 0, 1, 0x7c, 4)) & 0x000007c0) >> 6) + 1);
+		/* don't attempt to adress memory not mapped by the kerneldriver */
+		if (si->ps.memory_size > mem_size) si->ps.memory_size = mem_size;
 		/* last 64kB RAM is used for the BIOS (or something else?) */
 		si->ps.memory_size -= (64 * 1024);
 		break;
 	case 0x01f010de: /* Nvidia GeForce4 MX Integrated GPU */
 		/* device at bus #0, device #0, function #1 holds value at byte-index 0x84 */
-		si->ps.memory_size = 1024 * 1024 *
+		mem_size = 1024 * 1024 *
 			(((((*pci_bus->read_pci_config)(0, 0, 1, 0x84, 4)) & 0x000007f0) >> 4) + 1);
+		/* don't attempt to adress memory not mapped by the kerneldriver */
+		if (si->ps.memory_size > mem_size) si->ps.memory_size = mem_size;
 		/* last 64kB RAM is used for the BIOS (or something else?) */
 		si->ps.memory_size -= (64 * 1024);
 		break;
@@ -969,13 +985,6 @@ open_hook(const char* name, uint32 flags, void** cookie)
 		 * accelerant. */
 		break;
 	}
-
-	/* map the device */
-	result = map_device(di);
-	if (result < 0) goto free_shared_and_alldma;
-
-	/* we will be returning OK status for sure now */
-	result = B_OK;
 
 	/* disable and clear any pending interrupts */
 	//fixme:

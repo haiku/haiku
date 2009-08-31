@@ -3233,6 +3233,7 @@ static void getRAMsize_arch_nv10_20_30_40(void)
 {
 	uint32 dev_manID = CFGR(DEVID);
 	uint32 strapinfo = NV_REG32(NV32_NV10STRAPINFO);
+	uint32 mem_size;
 
 	switch (dev_manID)
 	{
@@ -3243,44 +3244,19 @@ static void getRAMsize_arch_nv10_20_30_40(void)
 		LOG(8,("INFO: nVidia GPU with UMA detected\n"));
 		break;
 	default:
+		LOG(8,("INFO: kerneldriver mapped %3.3fMb framebuffer memory\n",
+			(si->ps.memory_size / (1024.0 * 1024.0))));
 		LOG(8,("INFO: (Memory detection) Strapinfo value is: $%08x\n", strapinfo));
 
-		switch ((strapinfo & 0x3ff00000) >> 20)
-		{
-		case 2:
-			si->ps.memory_size = 2 * 1024 * 1024;
-			break;
-		case 4:
-			si->ps.memory_size = 4 * 1024 * 1024;
-			break;
-		case 8:
-			si->ps.memory_size = 8 * 1024 * 1024;
-			break;
-		case 16:
-			si->ps.memory_size = 16 * 1024 * 1024;
-			break;
-		case 32:
-			si->ps.memory_size = 32 * 1024 * 1024;
-			break;
-		case 64:
-			si->ps.memory_size = 64 * 1024 * 1024;
-			break;
-		case 128:
-			si->ps.memory_size = 128 * 1024 * 1024;
-			break;
-		case 256:
-			si->ps.memory_size = 256 * 1024 * 1024;
-			break;
-		case 512:
-			si->ps.memory_size = 512 * 1024 * 1024;
-			break;
-		default:
-			si->ps.memory_size = 16 * 1024 * 1024;
+		mem_size = (strapinfo & 0x3ff00000);
+		if (!mem_size) {
+			mem_size = 16 * 1024 * 1024;
 
 			LOG(8,("INFO: NV10/20/30 architecture chip with unknown RAM amount detected;\n"));
 			LOG(8,("INFO: Setting 16Mb\n"));
-			break;
 		}
+		/* don't attempt to adress memory not mapped by the kerneldriver */
+		if (si->ps.memory_size > mem_size) si->ps.memory_size = mem_size;
 	}
 }
 
