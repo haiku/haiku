@@ -292,14 +292,18 @@ BVolume::SetName(const char *name)
 		FS_WRITE_FSINFO_NAME);
 	if (error != B_OK)
 		return error;
+
 	// change the name of the mount point
+
 	// R5 implementation checks, if an entry with the volume's old name
 	// exists in the root directory and renames that entry, if it is indeed
 	// the mount point of the volume (or a link referring to it). In all other
 	// cases, nothing is done (even if the mount point is named like the
 	// volume, but lives in a different directory).
 	// We follow suit for the time being.
-	// create the entry
+	// NOTE: If the volume name itself is actually "boot", then this code
+	// tries to rename /boot, but that is prevented in the kernel.
+
 	BPath entryPath;
 	BEntry entry;
 	BEntry traversedEntry;
@@ -313,7 +317,7 @@ BVolume::SetName(const char *name)
 		&& traversedEntry.GetNodeRef(&entryNodeRef) == B_OK
 		&& entryNodeRef.device == fDevice
 		&& entryNodeRef.node == oldInfo.root) {
-		traversedEntry.Rename(name, false);
+		entry.Rename(name, false);
 	}
 	return error;
 }

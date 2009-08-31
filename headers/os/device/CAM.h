@@ -1,27 +1,20 @@
-/* ++++++++++
-	CAM.h
-	Copyright (c) 1996-98 by Be Incorporated.  All Rights Reserved.
-
-	Definitions for the SCSI Common Access Method as implemented in the Be OS.
-
-	See also "Draft Proposed American National Standard, SCSI-2 Common
-	Access Method Transport and SCSI Interface Module", Revision 12, 
-	ANSI refernce number X3.232-199x.
-
-	This file consists of the definitions for the fictional "UNIVOS"
-	operating system described in the standard.  The file is mostly
-	the same text as the standard, with Be-provided additions as needed.
-+++++ */
-
+/*
+ * Copyright 2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ *
+ * Definitions for the SCSI Common Access Method as implemented in Haiku.
+ *
+ * See also "Draft Proposed American National Standard, SCSI-2 Common
+ * Access Method Transport and SCSI Interface Module", Revision 12, 
+ * ANSI refernce number X3.232-199x.
+ * 
+*/
 
 #ifndef _CAM_H
 #define _CAM_H
 
 #include <bus_manager.h>
-
-/* ---
-   Be-provided additions to the standard include file.
---- */
 
 #include <sys/types.h>
 
@@ -41,22 +34,19 @@ typedef long I32;
 typedef unsigned short U16;
 #endif
 
+/* Haiku specific additions */
+
 typedef struct {
-	uint32 serial;  /* operation serial number                    */
-	uint32 micros;  /* operation time in microseconds (4294s max) */
-	uint32 bytes;   /* number of bytes to transfer                */
-	uchar path;     /* target SIM ID                              */
-	uchar target;   /* target device ID                           */
-	uchar sgcount;  /* # of sg segments (0 if non-sg operation)   */
-	uchar scsi_op;  /* scsi operation byte                        */	
+	uint32	serial;		/* operation serial number                    */
+	uint32	micros;		/* operation time in microseconds (4294s max) */
+	uint32	bytes;		/* number of bytes to transfer                */
+	uchar	path;		/* target SIM ID                              */
+	uchar	target;		/* target device ID                           */
+	uchar	sgcount;	/* # of sg segments (0 if non-sg operation)   */
+	uchar	scsi_op;	/* scsi operation byte                        */	
 } cam_iostat;
 
-
-/* -----
-   The rest of this file contains the definitions and data structures for
-   the CAM Subsystem interface.  The contents of this file should match the
-   data structures and constants that are specified in the CAM document
------ */
+/* End of Haiku specific additions */
 
 /* Defines for the XPT function codes, Table 8-2 in the CAM spec. */
 
@@ -91,8 +81,6 @@ typedef struct {
 #define XPT_FUNC		0x7F	/* TEMPLATE */
 #define XPT_VUNIQUE		0x80	/* All the rest are vendor unique commands */
 
-/* ---------------------------------------------------------------------- */
-
 /* General allocation length defines for the CCB structures. */
 
 #define IOCDBLEN	12	/* Space for the CDB bytes/pointer */
@@ -100,8 +88,8 @@ typedef struct {
 #define SIM_ID		16	/* ASCII string len for SIM ID */
 #define HBA_ID		16	/* ASCII string len for HBA ID */
 
-#define BE_SIM_CCB_SIZE 1536    /* we want to allocate 1.5k chunks */
-#define BE_SIM_SCSIIO_SIZE 88   /* sizeof(CAM_CCB_SCSIIO) - SIM_PRIV */  
+#define BE_SIM_CCB_SIZE		1536	/* we want to allocate 1.5k chunks */
+#define BE_SIM_SCSIIO_SIZE	88		/* sizeof(CAM_CCB_SCSIIO) - SIM_PRIV */  
 #define SIM_PRIV	(BE_SIM_CCB_SIZE - BE_SIM_SCSIIO_SIZE) /* Length of SIM private data area */
 
 /* SIM_PRIV (sim private data area)  Terms and Conditions:
@@ -124,15 +112,15 @@ subsystem. */
 /* Common CCB header definition. */
 typedef struct ccb_header
 {
-	uint32          phys_addr;      /* physical address of this CCB */
-	uint16			cam_ccb_len;	/* Length of the entire CCB */
-	uchar			cam_func_code;	/* XPT function code */
-	uchar			cam_status;		/* Returned CAM subsystem status */
-	uchar			cam_hrsvd0;		/* Reserved field, for alignment */ 
-	uchar			cam_path_id;	/* Path ID for the request */
-	uchar			cam_target_id;	/* Target device ID */
-	uchar			cam_target_lun;	/* Target LUN number */
-	uint32			cam_flags;		/* Flags for operation of the subsystem */
+	uint32		phys_addr;		/* physical address of this CCB */
+	uint16		cam_ccb_len;	/* Length of the entire CCB */
+	uchar		cam_func_code;	/* XPT function code */
+	uchar		cam_status;		/* Returned CAM subsystem status */
+	uchar		cam_hrsvd0;		/* Reserved field, for alignment */ 
+	uchar		cam_path_id;	/* Path ID for the request */
+	uchar		cam_target_id;	/* Target device ID */
+	uchar		cam_target_lun;	/* Target LUN number */
+	uint32		cam_flags;		/* Flags for operation of the subsystem */
 } CCB_HEADER;
 
 /* Common SCSI functions. */
@@ -140,16 +128,16 @@ typedef struct ccb_header
 /* Union definition for the CDB space in the SCSI I/O request CCB */
 typedef union cdb_un
 {
-	uchar	*cam_cdb_ptr;				/* Pointer to the CDB bytes to send */
-	uchar	cam_cdb_bytes[ IOCDBLEN ];	/* Area for the CDB to send */
+	uchar*	cam_cdb_ptr;				/* Pointer to the CDB bytes to send */
+	uchar	cam_cdb_bytes[IOCDBLEN];	/* Area for the CDB to send */
 } CDB_UN;
 
 /* Get device type CCB */
 typedef struct ccb_getdev
 {
-	CCB_HEADER	cam_ch;					/* Header information fields */
-	char		*cam_inq_data;			/* Ptr to the inquiry data space */
-	uchar		cam_pd_type;			/* Periph device type from the TLUN */
+	CCB_HEADER	cam_ch;			/* Header information fields */
+	char*		cam_inq_data;	/* Ptr to the inquiry data space */
+	uchar		cam_pd_type;	/* Periph device type from the TLUN */
 } CCB_GETDEV;
 
 /* Path inquiry CCB */
@@ -161,52 +149,52 @@ typedef struct ccb_pathinq
 	uchar		cam_target_sprt;			/* Flags for target mode support */
 	uchar		cam_hba_misc;				/* Misc HBA feature flags */
 	uint16		cam_hba_eng_cnt;			/* HBA engine count */
-	uchar		cam_vuhba_flags[ VUHBA ];	/* Vendor unique capabilities */
+	uchar		cam_vuhba_flags[VUHBA];		/* Vendor unique capabilities */
 	uint32		cam_sim_priv;				/* Size of SIM private data area */
 	uint32		cam_async_flags;			/* Event cap. for Async Callback */
 	uchar		cam_hpath_id;				/* Highest path ID in the subsystem */
 	uchar		cam_initiator_id;			/* ID of the HBA on the SCSI bus */
 	uchar		cam_prsvd0;					/* Reserved field, for alignment */
 	uchar		cam_prsvd1;					/* Reserved field, for alignment */
-	char		cam_sim_vid[ SIM_ID ];		/* Vendor ID of the SIM */
-	char		cam_hba_vid[ HBA_ID ];		/* Vendor ID of the HBA */
-	uchar		*cam_osd_usage;				/* Ptr for the OSD specific area */
+	char		cam_sim_vid[SIM_ID];		/* Vendor ID of the SIM */
+	char		cam_hba_vid[HBA_ID];		/* Vendor ID of the HBA */
+	uchar*		cam_osd_usage;				/* Ptr for the OSD specific area */
 } CCB_PATHINQ;
 
 /* Release SIM Queue CCB */
 typedef struct ccb_relsim
 {
-	CCB_HEADER	cam_ch;						/* Header information fields */
+	CCB_HEADER	cam_ch;				/* Header information fields */
 } CCB_RELSIM;
 
 /* SCSI I/O Request CCB */
 typedef struct ccb_scsiio
 {
-	CCB_HEADER	cam_ch;					/* Header information fields */
-	uchar		*cam_pdrv_ptr;			/* Ptr used by the Peripheral driver */
-	CCB_HEADER	*cam_next_ccb;			/* Ptr to the next CCB for action */
-	uchar		*cam_req_map;			/* Ptr for mapping info on the Req. */
-	void		(*cam_cbfcnp)(struct ccb_scsiio *);		
-	                                    /* Callback on completion function */
-	uchar		*cam_data_ptr;			/* Pointer to the data buf/SG list */
-	uint32		cam_dxfer_len;			/* Data xfer length */
-	uchar		*cam_sense_ptr;			/* Pointer to the sense data buffer */
-	uchar		cam_sense_len;			/* Num of bytes in the Autosense buf */
-	uchar		cam_cdb_len;			/* Number of bytes for the CDB */
-	uint16		cam_sglist_cnt;			/* Num of scatter gather list entries */
-	uint32		cam_sort;				/* Value used by SIM to sort on */
-	uchar		cam_scsi_status;		/* Returned scsi device status */
-	uchar		cam_sense_resid;		/* Autosense resid length: 2's comp */
-	uchar		cam_osd_rsvd1[2];		/* OSD Reserved field, for alignment */
-	int32		cam_resid;				/* Transfer residual length: 2's comp */
-	CDB_UN		cam_cdb_io;				/* Union for CDB bytes/pointer */
-	uint32		cam_timeout;			/* Timeout value */
-	uchar		*cam_msg_ptr;			/* Pointer to the message buffer */
-	uint16		cam_msgb_len;			/* Num of bytes in the message buf */
-	uint16		cam_vu_flags;			/* Vendor unique flags */
-	uchar		cam_tag_action;			/* What to do for tag queuing */
-	uchar		cam_iorsvd0[3];			/* Reserved field, for alignment */
-	uchar		cam_sim_priv[ SIM_PRIV ];	/* SIM private data area */
+	CCB_HEADER	cam_ch;				/* Header information fields */
+	uchar*		cam_pdrv_ptr;		/* Ptr used by the Peripheral driver */
+	CCB_HEADER*	cam_next_ccb;		/* Ptr to the next CCB for action */
+	uchar*		cam_req_map;		/* Ptr for mapping info on the Req. */
+	void		(*cam_cbfcnp)(struct ccb_scsiio*);		
+									/* Callback on completion function */
+	uchar*		cam_data_ptr;		/* Pointer to the data buf/SG list */
+	uint32		cam_dxfer_len;		/* Data xfer length */
+	uchar*		cam_sense_ptr;		/* Pointer to the sense data buffer */
+	uchar		cam_sense_len;		/* Num of bytes in the Autosense buf */
+	uchar		cam_cdb_len;		/* Number of bytes for the CDB */
+	uint16		cam_sglist_cnt;		/* Num of scatter gather list entries */
+	uint32		cam_sort;			/* Value used by SIM to sort on */
+	uchar		cam_scsi_status;	/* Returned scsi device status */
+	uchar		cam_sense_resid;	/* Autosense resid length: 2's comp */
+	uchar		cam_osd_rsvd1[2];	/* OSD Reserved field, for alignment */
+	int32		cam_resid;			/* Transfer residual length: 2's comp */
+	CDB_UN		cam_cdb_io;			/* Union for CDB bytes/pointer */
+	uint32		cam_timeout;		/* Timeout value */
+	uchar*		cam_msg_ptr;		/* Pointer to the message buffer */
+	uint16		cam_msgb_len;		/* Num of bytes in the message buf */
+	uint16		cam_vu_flags;		/* Vendor unique flags */
+	uchar		cam_tag_action;		/* What to do for tag queuing */
+	uchar		cam_iorsvd0[3];		/* Reserved field, for alignment */
+	uchar		cam_sim_priv[SIM_PRIV];	/* SIM private data area */
 } CCB_SCSIIO;
 
 /* Set Async Callback CCB */
@@ -215,15 +203,15 @@ typedef struct ccb_setasync
 	CCB_HEADER	cam_ch;					/* Header information fields */
 	uint32		cam_async_flags;		/* Event enables for Callback resp */
 	void		(*cam_async_func)();	/* Async Callback function address */
-	uchar		*pdrv_buf;				/* Buffer set aside by the Per. drv */
+	uchar*		pdrv_buf;				/* Buffer set aside by the Per. drv */
 	uchar		pdrv_buf_len;			/* The size of the buffer */
 } CCB_SETASYNC;
 
 /* Set device type CCB */
 typedef struct ccb_setdev
 {
-	CCB_HEADER	 cam_ch;				/* Header information fields */
-	uchar		cam_dev_type;			/* Val for the dev type field in EDT */
+	CCB_HEADER	cam_ch;				/* Header information fields */
+	uchar		cam_dev_type;		/* Val for the dev type field in EDT */
 } CCB_SETDEV;
 
 /* SCSI Control Functions. */
@@ -232,7 +220,7 @@ typedef struct ccb_setdev
 typedef struct ccb_abort
 {
 	CCB_HEADER	cam_ch;					/* Header information fields */
-	CCB_HEADER	*cam_abort_ch;			/* Pointer to the CCB to abort */
+	CCB_HEADER*	cam_abort_ch;			/* Pointer to the CCB to abort */
 } CCB_ABORT;
 
 /* Reset SCSI Bus CCB */
@@ -251,7 +239,7 @@ typedef struct ccb_resetdev
 typedef struct ccb_termio
 {
 	CCB_HEADER	cam_ch;					/* Header information fields */
-	CCB_HEADER	*cam_termio_ch;			/* Pointer to the CCB to terminate */
+	CCB_HEADER*	cam_termio_ch;			/* Pointer to the CCB to terminate */
 } CCB_TERMIO;
 
 /* Target mode structures. */
@@ -262,7 +250,7 @@ typedef struct ccb_en_lun
 	CCB_HEADER	cam_ch;					/* Header information fields */
 	uint16		cam_grp6_len;			/* Group 6 VU CDB length */
 	uint16		cam_grp7_len;			/* Group 7 VU CDB length */
-	uchar		*cam_ccb_listptr;		/* Pointer to the target CCB list */
+	uchar*		cam_ccb_listptr;		/* Pointer to the target CCB list */
 	uint16		cam_ccb_listcnt;		/* Count of Target CCBs in the list */
 } CCB_EN_LUN;
 
@@ -272,20 +260,20 @@ typedef struct ccb_enable_lun
 	CCB_HEADER	cam_ch;					/* Header information fields */
 	uint16		cam_grp6_length;		/* Group 6 Vendor Unique CDB Lengths */
 	uint16		cam_grp7_length;		/* Group 7 Vendor Unique CDB Lengths */
-	uchar		*cam_immed_notify_list;	/* Ptr to Immediate Notify CCB list */
+	uchar*		cam_immed_notify_list;	/* Ptr to Immediate Notify CCB list */
 	uint32		cam_immed_notify_cnt;	/* Number of Immediate Notify CCBs */
-	uchar		*cam_accept_targ_list;	/* Ptr to Accept Target I/O CCB list */
+	uchar*		cam_accept_targ_list;	/* Ptr to Accept Target I/O CCB list */
 	uint32		cam_accept_targ_cnt;	/* Number of Accept Target I/O CCBs */
-	uchar		cam_sim_priv[ SIM_PRIV ]; /* SIM private data area */
+	uchar		cam_sim_priv[SIM_PRIV];	/* SIM private data area */
 } CCB_ENABLE_LUN;
 
 /* Immediate Notify CCB */
 typedef struct ccb_immed_notify
 {
 	CCB_HEADER	cam_ch;					/* Header information fields */
-	uchar		*cam_pdrv_ptr;			/* Ptr used by the Peripheral driver */
+	uchar*		cam_pdrv_ptr;			/* Ptr used by the Peripheral driver */
 	void		(*cam_cbfnot)();		/* Callback on notification function */
-	uchar		*cam_sense_ptr;			/* Pointer to the sense data buffer */
+	uchar*		cam_sense_ptr;			/* Pointer to the sense data buffer */
 	uchar		cam_sense_len;			/* Num of bytes in the Autosense buf */
 	uchar		cam_init_id;			/* ID of Initiator that selected */
 	uint16		cam_seq_id;				/* Sequence Identifier */
@@ -306,13 +294,13 @@ typedef struct ccb_notify_ack
 typedef struct ccb_accept_targ
 {
 	CCB_HEADER	cam_ch;					/* Header information fields */
-	uchar		*cam_pdrv_ptr;			/* Ptr used by the Peripheral driver */
-	CCB_HEADER	*cam_next_ccb;			/* Ptr to the next CCB for action */
-	uchar		*cam_req_map;			/* Ptr for mapping info on the Req. */
+	uchar*		cam_pdrv_ptr;			/* Ptr used by the Peripheral driver */
+	CCB_HEADER*	cam_next_ccb;			/* Ptr to the next CCB for action */
+	uchar*		cam_req_map;			/* Ptr for mapping info on the Req. */
 	void		(*cam_cbfcnot)();		/* Callback on completion function */
-	uchar		*cam_data_ptr;			/* Pointer to the data buf/SG list */
+	uchar*		cam_data_ptr;			/* Pointer to the data buf/SG list */
 	uint32		cam_dxfer_len;			/* Data xfer length */
-	uchar		*cam_sense_ptr;			/* Pointer to the sense data buffer */
+	uchar*		cam_sense_ptr;			/* Pointer to the sense data buffer */
 	uchar		cam_sense_len;			/* Num of bytes in the Autosense buf */
 	uchar		cam_cdb_len;			/* Number of bytes for the CDB */
 	uint16		cam_sglist_cnt;			/* Num of scatter gather list entries */
@@ -323,14 +311,14 @@ typedef struct ccb_accept_targ
 	int32		cam_resid;				/* Transfer residual length: 2's comp */
 	CDB_UN		cam_cdb_io;				/* Union for CDB bytes/pointer */
 	uint32		cam_timeout;			/* Timeout value */
-	uchar		*cam_msg_ptr;			/* Pointer to the message buffer */
+	uchar*		cam_msg_ptr;			/* Pointer to the message buffer */
 	uint16		cam_msgb_len;			/* Num of bytes in the message buf */
 	uint16		cam_vu_flags;			/* Vendor unique flags */
 	uchar		cam_tag_action;			/* What to do for tag queuing */
 	uchar		cam_tag_id;				/* Tag ID */
 	uchar		cam_initiator_id;		/* Initiator ID */
 	uchar		cam_iorsvd0[1];			/* Reserved field, for alignment */
-	uchar		cam_sim_priv[ SIM_PRIV ]; /* SIM private data area */
+	uchar		cam_sim_priv[SIM_PRIV];	/* SIM private data area */
 } CCB_ACCEPT_TARG;
 
 /* Continue Target I/O CCB */
@@ -350,13 +338,13 @@ typedef struct ccb_eng_inq
 typedef struct ccb_eng_exec	/* NOTE: must match SCSIIO size */
 {
 	CCB_HEADER	cam_ch;					/* Header information fields */
-	uchar		*cam_pdrv_ptr;			/* Ptr used by the Peripheral driver */
+	uchar*		cam_pdrv_ptr;			/* Ptr used by the Peripheral driver */
 	uint32		cam_engrsvd0;			/* Reserved field, for alignment */
-	uchar		*cam_req_map;			/* Ptr for mapping info on the Req. */
+	uchar*		cam_req_map;			/* Ptr for mapping info on the Req. */
 	void		(*cam_cbfcnp)();		/* Callback on completion function */
-	uchar		*cam_data_ptr;			/* Pointer to the data buf/SG list */
+	uchar*		cam_data_ptr;			/* Pointer to the data buf/SG list */
 	uint32		cam_dxfer_len;			/* Data xfer length */
-	uchar		*cam_engdata_ptr;		/* Pointer to the engine buffer data */
+	uchar*		cam_engdata_ptr;		/* Pointer to the engine buffer data */
 	uchar		cam_engrsvd1;			/* Reserved field, for alignment */
 	uchar		cam_engrsvd2;			/* Reserved field, for alignment */
 	uint16		cam_sglist_cnt;			/* Num of scatter gather list entries */
@@ -370,7 +358,7 @@ typedef struct ccb_eng_exec	/* NOTE: must match SCSIIO size */
 	uint16		cam_vu_flags;			/* Vendor unique flags */
 	uchar		cam_engrsvd5;			/* Reserved field, for alignment */
 	uchar		cam_engrsvd6[3];		/* Reserved field, for alignment */
-	uchar		cam_sim_priv[ SIM_PRIV ]; /* SIM private data area */
+	uchar		cam_sim_priv[SIM_PRIV]; /* SIM private data area */
 } CCB_ENG_EXEC;
 
 /* The sim_module_info definition is used to define the entry points for
@@ -382,14 +370,14 @@ entries. */
 typedef struct sim_module_info sim_module_info;
 
 struct sim_module_info {
-	module_info		minfo;
+	module_info	minfo;
 };
 
 typedef struct CAM_SIM_ENTRY CAM_SIM_ENTRY;
 
 struct CAM_SIM_ENTRY {
-	status_t		(*sim_init)();
-	int32			(*sim_action)();
+	status_t	(*sim_init)();
+	int32		(*sim_action)();
 };
 
 /* ---------------------------------------------------------------------- */
@@ -544,7 +532,7 @@ SIM's default timeout can take effect. */
 
 typedef struct sg_elem
 {
-	uchar		*cam_sg_address;		/* Scatter/Gather address */
+	uchar*		cam_sg_address;		/* Scatter/Gather address */
 	uint32		cam_sg_count;			/* Scatter/Gather count */
 } SG_ELEM;
 
@@ -588,11 +576,11 @@ in a linked list structure. */
 
 typedef struct async_info
 {
-	struct async_info	*cam_async_next;		/* pointer to the next structure */
+	struct async_info*	cam_async_next;			/* pointer to the next structure */
 	uint32				cam_event_enable;		/* Event enables for Callback resp */
 	void				(*cam_async_func)();	/* Async Callback function address */
 	uint32				cam_async_blen;			/* Length of "information" buffer */
-	uchar				*cam_async_ptr;			/* Address for the "information */
+	uchar*				cam_async_ptr;			/* Address for the "information */
 } ASYNC_INFO;
 
 /* The CAM EDT table contains the device information for all the
@@ -603,9 +591,9 @@ table contains a CAM_EDT_ENTRY structure for each device on the bus.
 typedef struct cam_edt_entry
 {
 	int32		cam_tlun_found;			/* Flag for the existence of the target/LUN */
-	ASYNC_INFO	*cam_ainfo;				/* Async callback list info for this B/T/L */
+	ASYNC_INFO*	cam_ainfo;				/* Async callback list info for this B/T/L */
 	uint32		cam_owner_tag;			/* Tag for the peripheral driver's ownership */
-	char		cam_inq_data[ INQLEN ];	/* storage for the inquiry data */
+	char		cam_inq_data[INQLEN];	/* storage for the inquiry data */
 } CAM_EDT_ENTRY;
 
 
@@ -628,15 +616,15 @@ typedef struct cam_edt_entry
 typedef struct ccb_extended_pathinq
 {
 	CCB_PATHINQ	cam_path;					/* Default path inquiry */
-	char		cam_sim_version [ VERS ];	/* SIM version number */
-	char		cam_hba_version [ VERS ];	/* HBA version number */
-	char		cam_controller_family [ FAM_ID ]; /* Controller family */
-	char		cam_controller_type [ TYPE_ID ]; /* Controller type */
+	char		cam_sim_version[VERS];		/* SIM version number */
+	char		cam_hba_version[VERS];		/* HBA version number */
+	char		cam_controller_family[FAM_ID]; /* Controller family */
+	char		cam_controller_type[TYPE_ID]; /* Controller type */
 } CCB_EXTENDED_PATHINQ;
 
 
 /* ---
-	Vendor unique flags supported by Be OS (cam_vu_flags)
+	Vendor unique flags supported by Haiku (cam_vu_flags)
 --- */
 
 enum {
@@ -655,9 +643,9 @@ typedef struct cam_for_driver_module_info cam_for_driver_module_info;
 
 struct cam_for_driver_module_info {
 	bus_manager_info	minfo;	
-	CCB_HEADER *		(*xpt_ccb_alloc)(void);
-	void				(*xpt_ccb_free)(void *ccb);
-	long				(*xpt_action)(CCB_HEADER *ccbh);
+	CCB_HEADER*			(*xpt_ccb_alloc)(void);
+	void				(*xpt_ccb_free)(void* ccb);
+	long				(*xpt_action)(CCB_HEADER* ccbh);
 };
 
 #define	B_CAM_FOR_DRIVER_MODULE_NAME	"bus_managers/scsi/driver/v1"
@@ -670,8 +658,8 @@ typedef struct cam_for_sim_module_info cam_for_sim_module_info;
 
 struct cam_for_sim_module_info {
 	bus_manager_info	minfo;	
-	long				(*xpt_bus_register) (CAM_SIM_ENTRY *sim);
-	long				(*xpt_bus_deregister) (long path);
+	long				(*xpt_bus_register)(CAM_SIM_ENTRY* sim);
+	long				(*xpt_bus_deregister)(long path);
 };
 
 #define	B_CAM_FOR_SIM_MODULE_NAME		"bus_managers/scsi/sim/v1"

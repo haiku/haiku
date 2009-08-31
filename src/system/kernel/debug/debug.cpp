@@ -1297,7 +1297,6 @@ debug_init_post_vm(kernel_args* args)
 	debug_variables_init();
 	frame_buffer_console_init(args);
 	arch_debug_console_init_settings(args);
-	tracing_init();
 
 	// get debug settings
 
@@ -1319,7 +1318,9 @@ debug_init_post_vm(kernel_args* args)
 
 	syslog_init(args);
 
-	return arch_debug_init(args);
+	arch_debug_init(args);
+	tracing_init();
+	return B_OK;
 }
 
 

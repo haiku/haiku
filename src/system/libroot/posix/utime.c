@@ -1,14 +1,16 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
+#include <utime.h>
+
+#include <errno.h>
+#include <time.h>
+
 #include <NodeMonitor.h>
 
-#include <utime.h>
-#include <time.h>
-#include <errno.h>
 #include <syscalls.h>
 
 
@@ -27,10 +29,14 @@ utime(const char *path, const struct utimbuf *times)
 	status_t status;
 
 	if (times != NULL) {
-		stat.st_atime = times->actime;
-		stat.st_mtime = times->modtime;
-	} else
-		stat.st_atime = stat.st_mtime = time(NULL);
+		stat.st_atim.tv_sec = times->actime;
+		stat.st_mtim.tv_sec = times->modtime;
+		stat.st_atim.tv_nsec = stat.st_mtim.tv_nsec = 0;
+	} else {
+		bigtime_t now = real_time_clock_usecs();
+		stat.st_atim.tv_sec = stat.st_mtim.tv_sec = now / 1000000;
+		stat.st_atim.tv_nsec = stat.st_mtim.tv_nsec = (now % 1000000) * 1000;
+	}
 
 	status = _kern_write_stat(-1, path, true, &stat, sizeof(struct stat),
 		B_STAT_MODIFICATION_TIME | B_STAT_ACCESS_TIME);
