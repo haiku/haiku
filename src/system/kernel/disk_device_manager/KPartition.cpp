@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <DiskDeviceRoster.h>
 #include <Drivers.h>
 #include <Errors.h>
 #include <fs_volume.h>
@@ -692,14 +693,28 @@ KPartition::GetPath(KPath* path) const
 void
 KPartition::SetVolumeID(dev_t volumeID)
 {
-	if (fPartitionData.volume != volumeID) {
-		fPartitionData.volume = volumeID;
-		FireVolumeIDChanged(volumeID);
-		if (VolumeID() >= 0)
-			AddFlags(B_PARTITION_MOUNTED);
-		else
-			ClearFlags(B_PARTITION_MOUNTED);
-	}
+	if (fPartitionData.volume == volumeID)
+		return;
+
+	fPartitionData.volume = volumeID;
+	FireVolumeIDChanged(volumeID);
+	if (VolumeID() >= 0)
+		AddFlags(B_PARTITION_MOUNTED);
+	else
+		ClearFlags(B_PARTITION_MOUNTED);
+
+	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
+
+	char messageBuffer[512];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_DEVICE_UPDATE);
+	message.AddInt32("event", volumeID >= 0
+		? B_DEVICE_PARTITION_MOUNTED : B_DEVICE_PARTITION_UNMOUNTED);
+	message.AddInt32("id", ID());
+	if (volumeID >= 0)
+		message.AddInt32("volume", volumeID);
+
+	manager->Notify(message, B_DEVICE_REQUEST_MOUNTING);
 }
 
 
@@ -996,6 +1011,16 @@ KPartition::SetDiskSystem(KDiskSystem* diskSystem, float priority)
 	}
 	// notify listeners
 	FireDiskSystemChanged(fDiskSystem);
+
+	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
+
+	char messageBuffer[512];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_DEVICE_UPDATE);
+	message.AddInt32("event", B_DEVICE_PARTITION_INITIALIZED);
+	message.AddInt32("id", ID());
+
+	manager->Notify(message, B_DEVICE_REQUEST_PARTITION);
 }
 
 
