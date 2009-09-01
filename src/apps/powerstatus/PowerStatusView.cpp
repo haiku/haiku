@@ -332,7 +332,9 @@ PowerStatusView::Update(bool force)
 
 	_GetBatteryInfo(&fBatteryInfo, fBatteryID);
 
-	fPercent = (100 * fBatteryInfo.capacity) / fBatteryInfo.full_capacity;
+	if (fBatteryInfo.full_capacity != 0)
+		fPercent = (100 * fBatteryInfo.capacity) / fBatteryInfo.full_capacity;
+
 	fTimeLeft = fBatteryInfo.time_left;
 	if ((fBatteryInfo.state & BATTERY_CHARGING) != 0)
 		fOnline = true;

@@ -6880,7 +6880,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	KPath normalizedDevice;
 	bool newlyCreatedFileDevice = false;
 
-	if (!(flags & B_MOUNT_VIRTUAL_DEVICE) && device) {
+	if (!(flags & B_MOUNT_VIRTUAL_DEVICE) && device != NULL) {
 		// normalize the device path
 		status = normalizedDevice.SetTo(device, true);
 		if (status != B_OK)
@@ -6888,8 +6888,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 		// get a corresponding partition from the DDM
 		partition = ddm->RegisterPartition(normalizedDevice.Path());
-
-		if (!partition) {
+		if (partition == NULL) {
 			// Partition not found: This either means, the user supplied
 			// an invalid path, or the path refers to an image file. We try
 			// to let the DDM create a file device for the path.
@@ -6929,7 +6928,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 	DeviceWriteLocker writeLocker(diskDevice, true);
 		// this takes over the write lock acquired before
 
-	if (partition) {
+	if (partition != NULL) {
 		// make sure, that the partition is not busy
 		if (partition->IsBusy()) {
 			TRACE(("fs_mount(): Partition is busy.\n"));
@@ -6937,7 +6936,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		}
 
 		// if no FS name had been supplied, we get it from the partition
-		if (!fsName) {
+		if (fsName == NULL) {
 			KDiskSystem* diskSystem = partition->DiskSystem();
 			if (!diskSystem) {
 				TRACE(("fs_mount(): No FS name was given, and the DDM didn't "
@@ -7191,7 +7190,7 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	KDiskDeviceManager* ddm = KDiskDeviceManager::Default();
 	KPartition* partition = mount->partition;
 	KDiskDevice* diskDevice = NULL;
-	if (partition) {
+	if (partition != NULL) {
 		if (partition->Device() == NULL) {
 			dprintf("fs_unmount(): There is no device!\n");
 			return B_ERROR;
@@ -7205,7 +7204,7 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	DeviceWriteLocker writeLocker(diskDevice, true);
 
 	// make sure, that the partition is not busy
-	if (partition) {
+	if (partition != NULL) {
 		if ((flags & B_UNMOUNT_BUSY_PARTITION) == 0 && partition->IsBusy()) {
 			TRACE(("fs_unmount(): Partition is busy.\n"));
 			return B_BUSY;
