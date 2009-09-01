@@ -17,6 +17,7 @@
 #include <fs_cache.h>
 #include <fs_info.h>
 #include <fs_interface.h>
+#include <io_requests.h>
 
 #include <debug.h>
 #include <KernelExport.h>
@@ -1294,14 +1295,26 @@ overlay_write_pages(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 }
 
 
-#if 0
 static status_t
 overlay_io(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	io_request *request)
 {
-	OVERLAY_CALL(io, cookie, request)
+	if (io_request_is_write(request))
+		return B_UNSUPPORTED;
+
+	OverlayInode *node = (OverlayInode *)vnode->private_node;
+	if (node->IsModified())
+		return B_UNSUPPORTED;
+
+	TRACE("relaying op: io\n");
+	fs_vnode *superVnode = node->SuperVnode();
+	if (superVnode->ops->io != NULL) {
+		return superVnode->ops->io(volume->super_volume, superVnode, cookie,
+			request);
+	}
+
+	return B_UNSUPPORTED;
 }
-#endif
 
 
 static status_t
@@ -1714,9 +1727,7 @@ static fs_vnode_ops sOverlayVnodeOps = {
 	&overlay_read_pages,
 	&overlay_write_pages,
 
-	// TODO: the io scheduler uses it when available but we may simply
-	// return B_UNSUPPORTED and I'm not sure it then falls back correctly
-	NULL, //&overlay_io,
+	&overlay_io,
 	&overlay_cancel_io,
 
 	&overlay_get_file_map,

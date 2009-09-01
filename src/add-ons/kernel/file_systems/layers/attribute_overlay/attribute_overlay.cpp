@@ -1187,14 +1187,12 @@ overlay_write_pages(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 }
 
 
-#if 0
 static status_t
 overlay_io(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	io_request *request)
 {
 	OVERLAY_CALL(io, cookie, request)
 }
-#endif
 
 
 static status_t
@@ -1641,9 +1639,7 @@ static fs_vnode_ops sOverlayVnodeOps = {
 	&overlay_read_pages,
 	&overlay_write_pages,
 
-	// TODO: the io scheduler uses it when available but we may simply
-	// return B_UNSUPPORTED and I'm not sure it then falls back correctly
-	NULL, //&overlay_io,
+	&overlay_io,
 	&overlay_cancel_io,
 
 	&overlay_get_file_map,
