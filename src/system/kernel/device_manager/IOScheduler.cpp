@@ -102,6 +102,7 @@ IOScheduler::IOScheduler(DMAResource* resource)
 	fOperationArray(NULL),
 	fAllocatedRequestOwners(NULL),
 	fRequestOwners(NULL),
+	fBlockSize(0),
 	fPendingOperations(0)
 {
 	mutex_init(&fLock, "I/O scheduler");
