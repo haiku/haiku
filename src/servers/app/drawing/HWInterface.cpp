@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku.
+ * Copyright 2005-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -40,25 +40,26 @@ HWInterfaceListener::~HWInterfaceListener()
 
 
 HWInterface::HWInterface(bool doubleBuffered, bool enableUpdateQueue)
-	: MultiLocker("hw interface lock"),
-	  fCursorAreaBackup(NULL),
-	  fFloatingOverlaysLock("floating overlays lock"),
-	  fCursor(NULL),
-	  fDragBitmap(NULL),
-	  fDragBitmapOffset(0, 0),
-	  fCursorAndDragBitmap(NULL),
-	  fCursorVisible(false),
-	  fCursorObscured(false),
-	  fCursorLocation(0, 0),
-	  fDoubleBuffered(doubleBuffered),
-	  fVGADevice(-1),
-	  fUpdateExecutor(NULL),
-	  fListeners(20)
+	:
+	MultiLocker("hw interface lock"),
+	fCursorAreaBackup(NULL),
+	fFloatingOverlaysLock("floating overlays lock"),
+	fCursor(NULL),
+	fDragBitmap(NULL),
+	fDragBitmapOffset(0, 0),
+	fCursorAndDragBitmap(NULL),
+	fCursorVisible(false),
+	fCursorObscured(false),
+	fCursorLocation(0, 0),
+	fDoubleBuffered(doubleBuffered),
+	fVGADevice(-1),
+	fUpdateExecutor(NULL),
+	fListeners(20)
 {
 	SetAsyncDoubleBuffered(doubleBuffered && enableUpdateQueue);
 }
 
-// destructor
+
 HWInterface::~HWInterface()
 {
 	SetAsyncDoubleBuffered(false);
@@ -70,7 +71,7 @@ HWInterface::~HWInterface()
 		delete fCursorAndDragBitmap;
 }
 
-// Initialize
+
 status_t
 HWInterface::Initialize()
 {
@@ -151,18 +152,19 @@ HWInterface::SetCursor(ServerCursor* cursor)
 	fFloatingOverlaysLock.Unlock();
 }
 
-// Cursor
+
 ServerCursorReference
 HWInterface::Cursor() const
 {
 	if (!fFloatingOverlaysLock.Lock())
 		return ServerCursorReference(NULL);
+
 	ServerCursorReference reference(fCursor);
 	fFloatingOverlaysLock.Unlock();
 	return reference;
 }
 
-// SetCursorVisible
+
 void
 HWInterface::SetCursorVisible(bool visible)
 {
@@ -191,7 +193,7 @@ HWInterface::SetCursorVisible(bool visible)
 	fFloatingOverlaysLock.Unlock();
 }
 
-// IsCursorVisible
+
 bool
 HWInterface::IsCursorVisible()
 {
@@ -203,7 +205,7 @@ HWInterface::IsCursorVisible()
 	return visible;
 }
 
-// ObscureCursor
+
 void
 HWInterface::ObscureCursor()
 {
@@ -217,9 +219,9 @@ HWInterface::ObscureCursor()
 	fFloatingOverlaysLock.Unlock();
 }
 
-// MoveCursorTo
+
 void
-HWInterface::MoveCursorTo(const float& x, const float& y)
+HWInterface::MoveCursorTo(float x, float y)
 {
 	if (!fFloatingOverlaysLock.Lock())
 		return;
@@ -269,7 +271,7 @@ HWInterface::CursorPosition()
 
 void
 HWInterface::SetDragBitmap(const ServerBitmap* bitmap,
-						   const BPoint& offsetFromCursor)
+	const BPoint& offsetFromCursor)
 {
 	if (fFloatingOverlaysLock.Lock()) {
 		_AdoptDragBitmap(bitmap, offsetFromCursor);
@@ -315,7 +317,8 @@ HWInterface::IsDoubleBuffered() const
 }
 
 
-// * the object needs to be already locked!
+/*! The object needs to be already locked!
+*/
 status_t
 HWInterface::Invalidate(const BRect& frame)
 {
@@ -340,7 +343,8 @@ HWInterface::Invalidate(const BRect& frame)
 }
 
 
-// * the object must already be locked!
+/*! The object must already be locked!
+*/
 status_t
 HWInterface::CopyBackToFront(const BRect& frame)
 {
@@ -464,10 +468,8 @@ HWInterface::HideFloatingOverlays(const BRect& area)
 	if (!fFloatingOverlaysLock.Lock())
 		return false;
 	if (fCursorAreaBackup && !fCursorAreaBackup->cursor_hidden) {
-		BRect backupArea(fCursorAreaBackup->left,
-						 fCursorAreaBackup->top,
-						 fCursorAreaBackup->right,
-						 fCursorAreaBackup->bottom);
+		BRect backupArea(fCursorAreaBackup->left, fCursorAreaBackup->top,
+			fCursorAreaBackup->right, fCursorAreaBackup->bottom);
 		if (area.Intersects(backupArea)) {
 			_RestoreCursorArea();
 			// do not unlock the cursor lock
@@ -495,9 +497,9 @@ HWInterface::HideFloatingOverlays()
 void
 HWInterface::ShowFloatingOverlays()
 {
-	if (fCursorAreaBackup && fCursorAreaBackup->cursor_hidden) {
+	if (fCursorAreaBackup && fCursorAreaBackup->cursor_hidden)
 		_DrawCursor(_CursorFrame());
-	}
+
 	fFloatingOverlaysLock.Unlock();
 }
 
@@ -524,10 +526,10 @@ HWInterface::RemoveListener(HWInterfaceListener* listener)
 // #pragma mark -
 
 
-// * default implementation, can be used as fallback or for
-//   software cursor
-// * area is where we potentially draw the cursor, the cursor
-//   might be somewhere else, in which case this function does nothing
+/*!	Default implementation, can be used as fallback or for software cursor.
+	\param area is where we potentially draw the cursor, the cursor
+		might be somewhere else, in which case this function does nothing
+*/
 void
 HWInterface::_DrawCursor(IntRect area) const
 {
@@ -641,10 +643,11 @@ HWInterface::_DrawCursor(IntRect area) const
 }
 
 
-// * source is assumed to be already at the right offset
-// * source is assumed to be in B_RGBA32 format
-// * location in front buffer is calculated
-// * conversion from B_RGBA32 to format of front buffer is taken care of
+/*!	- source is assumed to be already at the right offset
+	- source is assumed to be in B_RGBA32 format
+	- location in front buffer is calculated
+	- conversion from B_RGBA32 to format of front buffer is taken care of
+*/
 void
 HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 	int32 right, int32 bottom) const
@@ -657,7 +660,8 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 	// transfer, handle colorspace conversion
 	switch (frontBuffer->ColorSpace()) {
 		case B_RGB32:
-		case B_RGBA32: {
+		case B_RGBA32:
+		{
 			int32 bytes = (right - x + 1) * 4;
 
 			if (bytes > 0) {
@@ -673,8 +677,9 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 			}
 			break;
 		}
-		// NOTE: on R5, B_RGB24 bitmaps are not supported by DrawBitmap()
-		case B_RGB24: {
+
+		case B_RGB24:
+		{
 			// offset to left top pixel in dest buffer
 			dst += y * dstBPR + x * 3;
 			int32 left = x;
@@ -694,7 +699,9 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 			}
 			break;
 		}
-		case B_RGB16: {
+
+		case B_RGB16:
+		{
 			// offset to left top pixel in dest buffer
 			dst += y * dstBPR + x * 2;
 			int32 left = x;
@@ -704,9 +711,8 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 				uint8* srcHandle = src;
 				uint16* dstHandle = (uint16*)dst;
 				for (x = left; x <= right; x++) {
-					*dstHandle = (uint16)(((srcHandle[2] & 0xf8) << 8) |
-										  ((srcHandle[1] & 0xfc) << 3) |
-										  (srcHandle[0] >> 3));
+					*dstHandle = (uint16)(((srcHandle[2] & 0xf8) << 8)
+						| ((srcHandle[1] & 0xfc) << 3) | (srcHandle[0] >> 3));
 					dstHandle ++;
 					srcHandle += 4;
 				}
@@ -715,8 +721,10 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 			}
 			break;
 		}
+
 		case B_RGB15:
-		case B_RGBA15: {
+		case B_RGBA15:
+		{
 			// offset to left top pixel in dest buffer
 			dst += y * dstBPR + x * 2;
 			int32 left = x;
@@ -726,9 +734,8 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 				uint8* srcHandle = src;
 				uint16* dstHandle = (uint16*)dst;
 				for (x = left; x <= right; x++) {
-					*dstHandle = (uint16)(((srcHandle[2] & 0xf8) << 7) |
-										  ((srcHandle[1] & 0xf8) << 2) |
-										  (srcHandle[0] >> 3));
+					*dstHandle = (uint16)(((srcHandle[2] & 0xf8) << 7)
+						| ((srcHandle[1] & 0xf8) << 2) | (srcHandle[0] >> 3));
 					dstHandle ++;
 					srcHandle += 4;
 				}
@@ -737,7 +744,9 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 			}
 			break;
 		}
-		case B_CMAP8: {
+
+		case B_CMAP8:
+		{
 			const color_map *colorMap = SystemColorMap();
 			// offset to left top pixel in dest buffer
 			dst += y * dstBPR + x;
@@ -749,7 +758,8 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 				uint8* srcHandle = src;
 				uint8* dstHandle = dst;
 				for (x = left; x <= right; x++) {
-					index = ((srcHandle[2] & 0xf8) << 7) | ((srcHandle[1] & 0xf8) << 2) | (srcHandle[0] >> 3);
+					index = ((srcHandle[2] & 0xf8) << 7)
+						| ((srcHandle[1] & 0xf8) << 2) | (srcHandle[0] >> 3);
 					*dstHandle = colorMap->index_map[index];
 					dstHandle ++;
 					srcHandle += 4;
@@ -760,6 +770,7 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 
 			break;
 		}
+
 		case B_GRAY8:
 			if (frontBuffer->Width() > dstBPR) {
 				// VGA 16 color grayscale planar mode
@@ -771,7 +782,8 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 					args.top = y;
 					args.right = right;
 					args.bottom = bottom;
-					if (ioctl(fVGADevice, VGA_PLANAR_BLIT, &args, sizeof(args)) == 0)
+					if (ioctl(fVGADevice, VGA_PLANAR_BLIT, &args, sizeof(args))
+							== 0)
 						break;
 				}
 
@@ -822,7 +834,8 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 					uint8* srcHandle = src;
 					uint8* dstHandle = dst;
 					for (x = left; x <= right; x++) {
-						*dstHandle = (308 * srcHandle[2] + 600 * srcHandle[1] + 116 * srcHandle[0]) / 1024;
+						*dstHandle = (308 * srcHandle[2] + 600 * srcHandle[1]
+							+ 116 * srcHandle[0]) / 1024;
 						dstHandle ++;
 						srcHandle += 4;
 					}
@@ -833,14 +846,15 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 			break;
 
 		default:
-			fprintf(stderr, "HWInterface::CopyBackToFront() - unsupported front "
-				"buffer format! (0x%x)\n", frontBuffer->ColorSpace());
+			fprintf(stderr, "HWInterface::CopyBackToFront() - unsupported "
+				"front buffer format! (0x%x)\n", frontBuffer->ColorSpace());
 			break;
 	}
 }
 
 
-// PRE: the object must be locked
+/*!	The object must be locked
+*/
 IntRect
 HWInterface::_CursorFrame() const
 {
@@ -857,25 +871,23 @@ void
 HWInterface::_RestoreCursorArea() const
 {
 	if (fCursorAreaBackup && !fCursorAreaBackup->cursor_hidden) {
-		_CopyToFront(fCursorAreaBackup->buffer,
-					 fCursorAreaBackup->bpr,
-					 fCursorAreaBackup->left,
-					 fCursorAreaBackup->top,
-					 fCursorAreaBackup->right,
-					 fCursorAreaBackup->bottom);
+		_CopyToFront(fCursorAreaBackup->buffer, fCursorAreaBackup->bpr,
+			fCursorAreaBackup->left, fCursorAreaBackup->top,
+			fCursorAreaBackup->right, fCursorAreaBackup->bottom);
 
 		fCursorAreaBackup->cursor_hidden = true;
 	}
 }
 
-// _AdoptDragBitmap
+
 void
 HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 {
 	// TODO: support other colorspaces/convert bitmap
 	if (bitmap && !(bitmap->ColorSpace() == B_RGB32
 		|| bitmap->ColorSpace() == B_RGBA32)) {
-		fprintf(stderr, "HWInterface::_AdoptDragBitmap() - bitmap has yet unsupported colorspace\n");
+		fprintf(stderr, "HWInterface::_AdoptDragBitmap() - bitmap has yet "
+			"unsupported colorspace\n");
 		return;
 	}
 
@@ -910,8 +922,7 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 			bitmapFrame.OffsetBy(shift);
 
 			fCursorAndDragBitmap = new ServerCursor(combindedBounds,
-													bitmap->ColorSpace(), 0,
-													hotspot + shift);
+				bitmap->ColorSpace(), 0, hotspot + shift);
 
 			// clear the combined buffer
 			uint8* dst = (uint8*)fCursorAndDragBitmap->Bits();
@@ -923,7 +934,8 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 			uint8* src = (uint8*)bitmap->Bits();
 			uint32 srcBPR = bitmap->BytesPerRow();
 
-			dst += (int32)bitmapFrame.top * dstBPR + (int32)bitmapFrame.left * 4;
+			dst += (int32)bitmapFrame.top * dstBPR
+				+ (int32)bitmapFrame.left * 4;
 
 			uint32 width = bitmapFrame.IntegerWidth() + 1;
 			uint32 height = bitmapFrame.IntegerHeight() + 1;
@@ -936,7 +948,8 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 
 			// compose cursor into combined buffer
 			dst = (uint8*)fCursorAndDragBitmap->Bits();
-			dst += (int32)cursorFrame.top * dstBPR + (int32)cursorFrame.left * 4;
+			dst += (int32)cursorFrame.top * dstBPR
+				+ (int32)cursorFrame.left * 4;
 
 			src = (uint8*)fCursor->Bits();
 			srcBPR = fCursor->BytesPerRow();
@@ -959,12 +972,16 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 							d[3] = 255;
 						} else {
 							uint8 alphaRest = 255 - s[3];
-							uint32 alphaTemp = (65025 - alphaRest * (255 - d[3]));
+							uint32 alphaTemp
+								= (65025 - alphaRest * (255 - d[3]));
 							uint32 alphaDest = d[3] * alphaRest;
 							uint32 alphaSrc = 255 * s[3];
-							d[0] = (d[0] * alphaDest + s[0] * alphaSrc) / alphaTemp;
-							d[1] = (d[1] * alphaDest + s[1] * alphaSrc) / alphaTemp;
-							d[2] = (d[2] * alphaDest + s[2] * alphaSrc) / alphaTemp;
+							d[0] = (d[0] * alphaDest + s[0] * alphaSrc)
+								/ alphaTemp;
+							d[1] = (d[1] * alphaDest + s[1] * alphaSrc)
+								/ alphaTemp;
+							d[2] = (d[2] * alphaDest + s[2] * alphaSrc)
+								/ alphaTemp;
 							d[3] = alphaTemp / 255;
 						}
 					}
@@ -998,9 +1015,8 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 			}
 		} else {
 			fCursorAndDragBitmap = new ServerCursor(bitmap->Bits(),
-													bitmapFrame.IntegerWidth() + 1,
-													bitmapFrame.IntegerHeight() + 1,
-													bitmap->ColorSpace());
+				bitmapFrame.IntegerWidth() + 1, bitmapFrame.IntegerHeight() + 1,
+				bitmap->ColorSpace());
 			fCursorAndDragBitmap->SetHotSpot(BPoint(-offset.x, -offset.y));
 		}
 	} else {
@@ -1029,7 +1045,7 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 	if (fCursorAndDragBitmap && !IsDoubleBuffered()) {
 		BRect cursorBounds = fCursorAndDragBitmap->Bounds();
 		fCursorAreaBackup = new buffer_clip(cursorBounds.IntegerWidth() + 1,
-											cursorBounds.IntegerHeight() + 1);
+			cursorBounds.IntegerHeight() + 1);
 	}
  	_DrawCursor(_CursorFrame());
 }

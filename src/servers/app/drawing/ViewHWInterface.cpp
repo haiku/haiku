@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,7 +7,11 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-/**	BView/BWindow combination HWInterface implementation */
+
+/*!	BView/BWindow combination HWInterface implementation */
+
+
+#include "ViewHWInterface.h"
 
 #include <new>
 #include <stdio.h>
@@ -33,7 +37,6 @@
 #include "ServerCursor.h"
 #include "UpdateQueue.h"
 
-#include "ViewHWInterface.h"
 
 #ifdef DEBUG_DRIVER_MODULE
 #	include <stdio.h>
@@ -42,17 +45,20 @@
 #	define STRACE(x) ;
 #endif
 
+
 const unsigned char kEmptyCursor[] = { 16, 1, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
+static const bool kDefaultDoubleBuffered = true;
+
 enum {
-	MSG_UPDATE = 'updt',
+	MSG_UPDATE = 'updt'
 };
 
-// string_for_color_space
+
 const char*
 string_for_color_space(color_space format)
 {
@@ -91,7 +97,7 @@ string_for_color_space(color_space format)
 	return name;
 }
 
-// run_app_thread
+
 static int32
 run_app_thread(void* cookie)
 {
@@ -105,8 +111,9 @@ run_app_thread(void* cookie)
 
 //#define INPUTSERVER_TEST_MODE 1
 
+
 class CardView : public BView {
- public:
+public:
 								CardView(BRect bounds);
 	virtual						~CardView();
 
@@ -115,7 +122,7 @@ class CardView : public BView {
 	virtual	void				MessageReceived(BMessage* message);
 
 								// CardView
-			void				SetBitmap(const BBitmap* bimtap);
+			void				SetBitmap(const BBitmap* bitmap);
 
 			void				ForwardMessage(BMessage* message = NULL);
 
@@ -125,7 +132,7 @@ private:
 };
 
 class CardWindow : public BWindow {
- public:
+public:
 								CardWindow(BRect frame);
 	virtual						~CardWindow();
 
@@ -136,7 +143,7 @@ class CardWindow : public BWindow {
 			void				SetBitmap(const BBitmap* bitmap);
 			void				Invalidate(const BRect& area);
 
- private:	
+private:
 			CardView*			fView;
 			BMessageRunner*		fUpdateRunner;
 			BRegion				fUpdateRegion;
@@ -144,21 +151,23 @@ class CardWindow : public BWindow {
 };
 
 class CardMessageFilter : public BMessageFilter {
-	public:
-		CardMessageFilter(CardView* view);
+public:
+								CardMessageFilter(CardView* view);
 
-		virtual filter_result Filter(BMessage *message, BHandler **_target);
+	virtual filter_result		Filter(BMessage* message, BHandler** _target);
 
-	private:
-		CardView*	fView;
+private:
+			CardView*			fView;
 };
+
 
 //	#pragma mark -
 
 
 CardView::CardView(BRect bounds)
-	: BView(bounds, "graphics card view", B_FOLLOW_ALL, B_WILL_DRAW),
-	  fBitmap(NULL)
+	:
+	BView(bounds, "graphics card view", B_FOLLOW_ALL, B_WILL_DRAW),
+	fBitmap(NULL)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
@@ -179,25 +188,24 @@ CardView::~CardView()
 }
 
 
-// AttachedToWindow
 void
 CardView::AttachedToWindow()
 {
 }
 
-// Draw
+
 void
 CardView::Draw(BRect updateRect)
 {
-	if (fBitmap) {
+	if (fBitmap != NULL)
 		DrawBitmapAsync(fBitmap, updateRect, updateRect);
-	}
 }
 
-// These functions emulate the Input Server by sending the *exact* same kind of messages
-// to the server's port. Being we're using a regular window, it would make little sense
-// to do anything else.
 
+/*!	These functions emulate the Input Server by sending the *exact* same kind of
+	messages to the server's port. Being we're using a regular window, it would
+	make little sense to do anything else.
+*/
 void
 CardView::ForwardMessage(BMessage* message)
 {
@@ -232,7 +240,6 @@ CardView::MessageReceived(BMessage* message)
 }
 
 
-// SetBitmap
 void
 CardView::SetBitmap(const BBitmap* bitmap)
 {
@@ -249,14 +256,15 @@ CardView::SetBitmap(const BBitmap* bitmap)
 
 
 CardMessageFilter::CardMessageFilter(CardView* view)
-	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+	:
+	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
 	fView(view)
 {
 }
 
 
 filter_result
-CardMessageFilter::Filter(BMessage *message, BHandler **target)
+CardMessageFilter::Filter(BMessage* message, BHandler** target)
 {
 	switch (message->what) {
 		case B_KEY_DOWN:
@@ -292,11 +300,12 @@ CardMessageFilter::Filter(BMessage *message, BHandler **target)
 
 
 CardWindow::CardWindow(BRect frame)
-	: BWindow(frame, "Haiku App Server", B_TITLED_WINDOW,
-			  B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
-	  fUpdateRunner(NULL),
-	  fUpdateRegion(),
-	  fUpdateLock("update lock")
+	:
+	BWindow(frame, "Haiku App Server", B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+	fUpdateRunner(NULL),
+	fUpdateRegion(),
+	fUpdateLock("update lock")
 {
 	fView = new CardView(Bounds());
 	AddChild(fView);
@@ -312,7 +321,7 @@ CardWindow::~CardWindow()
 
 
 void
-CardWindow::MessageReceived(BMessage *msg)
+CardWindow::MessageReceived(BMessage* msg)
 {
 	STRACE("CardWindow::MessageReceived()\n");
 	switch (msg->what) {
@@ -343,7 +352,6 @@ CardWindow::MessageReceived(BMessage *msg)
 }
 
 
-// QuitRequested
 bool
 CardWindow::QuitRequested()
 {
@@ -360,21 +368,22 @@ CardWindow::QuitRequested()
 	return false;
 }
 
-// SetBitmap
+
 void
 CardWindow::SetBitmap(const BBitmap* bitmap)
 {
 	fView->SetBitmap(bitmap);
 }
 
-// Invalidate
+
 void
 CardWindow::Invalidate(const BRect& frame)
 {
 	if (fUpdateLock.Lock()) {
 		if (!fUpdateRunner) {
 			BMessage message(MSG_UPDATE);
-			fUpdateRunner = new BMessageRunner(BMessenger(this, this), &message, 20000);
+			fUpdateRunner = new BMessageRunner(BMessenger(this, this), &message,
+				20000);
 		}
 		fUpdateRegion.Include(frame);
 		fUpdateLock.Unlock();
@@ -385,14 +394,12 @@ CardWindow::Invalidate(const BRect& frame)
 //	#pragma mark -
 
 
-static const bool kDefaultDoubleBuffered = true;
-
-
 ViewHWInterface::ViewHWInterface()
-	: HWInterface(kDefaultDoubleBuffered),
-	  fBackBuffer(NULL),
-	  fFrontBuffer(NULL),
-	  fWindow(NULL)
+	:
+	HWInterface(kDefaultDoubleBuffered),
+	fBackBuffer(NULL),
+	fFrontBuffer(NULL),
+	fWindow(NULL)
 {
 	fDisplayMode.virtual_width = 640;
 	fDisplayMode.virtual_height = 480;
@@ -415,23 +422,23 @@ ViewHWInterface::~ViewHWInterface()
 	delete be_app;
 }
 
-// Initialize
+
 status_t
 ViewHWInterface::Initialize()
 {
 	return B_OK;
 }
 
-// Shutdown
+
 status_t
 ViewHWInterface::Shutdown()
 {
 	return B_OK;
 }
 
-// SetMode
+
 status_t
-ViewHWInterface::SetMode(const display_mode &mode)
+ViewHWInterface::SetMode(const display_mode& mode)
 {
 	AutoWriteLocker _(this);
 
@@ -445,7 +452,7 @@ ViewHWInterface::SetMode(const display_mode &mode)
 
 	// check if we support the mode
 
-	display_mode *modes;
+	display_mode* modes;
 	uint32 modeCount, i;
 	if (GetModeList(&modes, &modeCount) != B_OK)
 		return B_NO_MEMORY;
@@ -466,9 +473,8 @@ ViewHWInterface::SetMode(const display_mode &mode)
 	if (i == modeCount)
 		return B_BAD_VALUE;
 
-	BRect frame(0.0, 0.0,
-				fDisplayMode.virtual_width - 1,
-				fDisplayMode.virtual_height - 1);
+	BRect frame(0.0, 0.0, fDisplayMode.virtual_width - 1,
+		fDisplayMode.virtual_height - 1);
 
 	// create the window if we don't have one already
 	if (!fWindow) {
@@ -480,7 +486,7 @@ ViewHWInterface::SetMode(const display_mode &mode)
 		app->Unlock();
 
 		thread_id appThread = spawn_thread(run_app_thread, "app thread",
-										   B_NORMAL_PRIORITY, app);
+			B_NORMAL_PRIORITY, app);
 		if (appThread >= B_OK)
 			ret = resume_thread(appThread);
 		else
@@ -488,7 +494,7 @@ ViewHWInterface::SetMode(const display_mode &mode)
 
 		if (ret < B_OK)
 			return ret;
-		
+
 		fWindow = new CardWindow(frame.OffsetToCopy(BPoint(50.0, 50.0)));
 
 		// fire up the window thread but don't show it on screen yet
@@ -500,7 +506,7 @@ ViewHWInterface::SetMode(const display_mode &mode)
 		// just to be save
 		fWindow->SetBitmap(NULL);
 
-		// free and reallocate the bitmaps while the window is locked, 
+		// free and reallocate the bitmaps while the window is locked,
 		// so that the view does not accidentally draw a freed bitmap
 		delete fBackBuffer;
 		fBackBuffer = NULL;
@@ -514,11 +520,12 @@ ViewHWInterface::SetMode(const display_mode &mode)
 		// -> fall back to double buffer for fDisplayMode.space != B_RGB32
 		// as intermediate solution...
 		bool doubleBuffered = HWInterface::IsDoubleBuffered();
-		if ((color_space)fDisplayMode.space != B_RGB32 &&
-			(color_space)fDisplayMode.space != B_RGBA32)
+		if ((color_space)fDisplayMode.space != B_RGB32
+			&& (color_space)fDisplayMode.space != B_RGBA32)
 			doubleBuffered = true;
 
-		BBitmap* frontBitmap = new BBitmap(frame, 0, (color_space)fDisplayMode.space);
+		BBitmap* frontBitmap
+			= new BBitmap(frame, 0, (color_space)fDisplayMode.space);
 		fFrontBuffer = new BBitmapBuffer(frontBitmap);
 
 		status_t err = fFrontBuffer->InitCheck();
@@ -534,7 +541,7 @@ ViewHWInterface::SetMode(const display_mode &mode)
 			// is in effect also always B_RGBA32.
 			BBitmap* backBitmap = new BBitmap(frame, 0, B_RGBA32);
 			fBackBuffer = new BBitmapBuffer(backBitmap);
-	
+
 			err = fBackBuffer->InitCheck();
 			if (err < B_OK) {
 				delete fBackBuffer;
@@ -551,7 +558,7 @@ ViewHWInterface::SetMode(const display_mode &mode)
 			if (fBackBuffer)
 				memset(fBackBuffer->Bits(), 255, fBackBuffer->BitsLength());
 			memset(fFrontBuffer->Bits(), 255, fFrontBuffer->BitsLength());
-	
+
 			// change the window size and update the bitmap used for drawing
 			fWindow->ResizeTo(frame.Width(), frame.Height());
 			fWindow->SetBitmap(fFrontBuffer->Bitmap());
@@ -568,7 +575,7 @@ ViewHWInterface::SetMode(const display_mode &mode)
 	return ret;
 }
 
-// GetMode
+
 void
 ViewHWInterface::GetMode(display_mode* mode)
 {
@@ -578,9 +585,9 @@ ViewHWInterface::GetMode(display_mode* mode)
 	}
 }
 
-// GetDeviceInfo
+
 status_t
-ViewHWInterface::GetDeviceInfo(accelerant_device_info *info)
+ViewHWInterface::GetDeviceInfo(accelerant_device_info* info)
 {
 	// We really don't have to provide anything here because this is strictly
 	// a software-only driver, but we'll have some fun, anyway.
@@ -614,7 +621,7 @@ ViewHWInterface::GetFrameBufferConfig(frame_buffer_config& config)
 
 
 status_t
-ViewHWInterface::GetModeList(display_mode **_modes, uint32 *_count)
+ViewHWInterface::GetModeList(display_mode** _modes, uint32* _count)
 {
 	AutoReadLocker _(this);
 
@@ -628,7 +635,7 @@ ViewHWInterface::GetModeList(display_mode **_modes, uint32 *_count)
 	const uint32 colors[] = {B_CMAP8, B_RGB15, B_RGB16, B_RGB32};
 	uint32 count = resolutionCount * 4;
 
-	display_mode *modes = new(nothrow) display_mode[count];
+	display_mode* modes = new(std::nothrow) display_mode[count];
 	if (modes == NULL)
 		return B_NO_MEMORY;
 
@@ -670,37 +677,43 @@ ViewHWInterface::GetModeList(display_mode **_modes, uint32 *_count)
 	return B_OK;
 }
 
+
 status_t
-ViewHWInterface::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
+ViewHWInterface::GetPixelClockLimits(display_mode* mode, uint32* low,
+	uint32* high)
 {
 	return B_ERROR;
 }
 
+
 status_t
-ViewHWInterface::GetTimingConstraints(display_timing_constraints *dtc)
+ViewHWInterface::GetTimingConstraints(display_timing_constraints* constraints)
 {
 	return B_ERROR;
 }
 
+
 status_t
-ViewHWInterface::ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high)
+ViewHWInterface::ProposeMode(display_mode* candidate, const display_mode* low,
+	const display_mode* high)
 {
-	// We should be able to get away with this because we're not dealing with any
-	// specific hardware. This is a Good Thing(TM) because we can support any hardware
-	// we wish within reasonable expectaions and programmer laziness. :P
+	// We should be able to get away with this because we're not dealing with
+	// any specific hardware. This is a Good Thing(TM) because we can support
+	// any hardware we wish within reasonable expectaions and programmer
+	// laziness. :P
 	return B_OK;
 }
 
-// SetDPMSMode
+
 status_t
-ViewHWInterface::SetDPMSMode(const uint32 &state)
+ViewHWInterface::SetDPMSMode(uint32 state)
 {
 	AutoWriteLocker _(this);
 
 	return BScreen().SetDPMS(state);
 }
 
-// DPMSMode
+
 uint32
 ViewHWInterface::DPMSMode()
 {
@@ -709,7 +722,7 @@ ViewHWInterface::DPMSMode()
 	return BScreen().DPMSState();
 }
 
-// DPMSCapabilities
+
 uint32
 ViewHWInterface::DPMSCapabilities()
 {
@@ -718,14 +731,14 @@ ViewHWInterface::DPMSCapabilities()
 	return BScreen().DPMSCapabilites();
 }
 
-// RetraceSemaphore
+
 sem_id
 ViewHWInterface::RetraceSemaphore()
 {
 	return -1;
 }
 
-// WaitForRetrace
+
 status_t
 ViewHWInterface::WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT)
 {
@@ -734,21 +747,21 @@ ViewHWInterface::WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT)
 	return screen.WaitForRetrace(timeout);
 }
 
-// FrontBuffer
+
 RenderingBuffer*
 ViewHWInterface::FrontBuffer() const
 {
 	return fFrontBuffer;
 }
 
-// BackBuffer
+
 RenderingBuffer*
 ViewHWInterface::BackBuffer() const
 {
 	return fBackBuffer;
 }
 
-// IsDoubleBuffered
+
 bool
 ViewHWInterface::IsDoubleBuffered() const
 {
@@ -758,7 +771,7 @@ ViewHWInterface::IsDoubleBuffered() const
 	return HWInterface::IsDoubleBuffered();
 }
 
-// Invalidate
+
 status_t
 ViewHWInterface::Invalidate(const BRect& frame)
 {
@@ -769,7 +782,7 @@ ViewHWInterface::Invalidate(const BRect& frame)
 	return ret;
 }
 
-// CopyBackToFront
+
 status_t
 ViewHWInterface::CopyBackToFront(const BRect& frame)
 {

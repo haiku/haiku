@@ -4,10 +4,7 @@
  */
 
 /*
-	Generic IDE adapter library.
-
-	The correct name would be ATA adapter, but I chose the old name as it's
-	more widely known.
+	Generic ATA adapter library.
 */
 
 #include <KernelExport.h>
@@ -325,7 +322,7 @@ ata_adapter_init_channel(device_node *node,
 	uint8 channel_index;
 	status_t res;
 
-	TRACE("PCI-IDE: init channel...\n");
+	TRACE("PCI-ATA: init channel...\n");
 
 #if 0
 	if (1 /* debug */){
@@ -336,7 +333,7 @@ ata_adapter_init_channel(device_node *node,
 		sDeviceManager->get_attr_uint8(node, PCI_DEVICE_FUNCTION_ITEM, &function, true);
 		sDeviceManager->get_attr_uint16(node, PCI_DEVICE_VENDOR_ID_ITEM, &vendorID, true);
 		sDeviceManager->get_attr_uint16(node, PCI_DEVICE_DEVICE_ID_ITEM, &deviceID, true);
-		TRACE("PCI-IDE: bus %3d, device %2d, function %2d: vendor %04x, device %04x\n",
+		TRACE("PCI-ATA: bus %3d, device %2d, function %2d: vendor %04x, device %04x\n",
 			bus, device, function, vendorID, deviceID);
 	}
 #endif
@@ -360,7 +357,7 @@ ata_adapter_init_channel(device_node *node,
 		goto err;
 	}
 
-	TRACE("PCI-IDE: channel index %d\n", channel_index);
+	TRACE("PCI-ATA: channel index %d\n", channel_index);
 
 	channel->node = node;
 	channel->pci = controller->pci;
@@ -373,7 +370,7 @@ ata_adapter_init_channel(device_node *node,
 	channel->dmaing = false;
 	channel->inthand = inthand;
 
-	TRACE("PCI-IDE: bus master base %#x\n", channel->bus_master_base);
+	TRACE("PCI-ATA: bus master base %#x\n", channel->bus_master_base);
 
 	// PRDT must be contiguous, dword-aligned and must not cross 64K boundary
 	prdt_size = (ATA_ADAPTER_MAX_SG_COUNT * sizeof( prd_entry ) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
@@ -397,7 +394,7 @@ ata_adapter_init_channel(device_node *node,
 		goto err3;
 	}
 
-	TRACE("PCI-IDE: init channel done\n");
+	TRACE("PCI-ATA: init channel done\n");
 
 	// disable interrupts
 	ata_adapter_write_device_control(channel, ATA_DEVICE_CONTROL_BIT3 | ATA_DEVICE_CONTROL_DISABLE_INTS);
@@ -496,22 +493,22 @@ ata_adapter_detect_channel(pci_device_module_info *pci, pci_device *pci_device,
 		command_block_base = 0x1f0;
 		control_block_base = 0x3f6;
 		intnum = 14;
-		TRACE("PCI-IDE: Controller in legacy mode: cmd %#x, ctrl %#x, irq %d\n",
+		TRACE("PCI-ATA: Controller in legacy mode: cmd %#x, ctrl %#x, irq %d\n",
 			  command_block_base, control_block_base, intnum);
 	} else if (supports_compatibility_mode
 		&& channel_index == 1 && (api & ATA_API_PRIMARY_NATIVE) == 0) {
 		command_block_base = 0x170;
 		control_block_base = 0x376;
 		intnum = 15;
-		TRACE("PCI-IDE: Controller in legacy mode: cmd %#x, ctrl %#x, irq %d\n",
+		TRACE("PCI-ATA: Controller in legacy mode: cmd %#x, ctrl %#x, irq %d\n",
 			  command_block_base, control_block_base, intnum);
 	} else {
 		if (command_block_base == 0 || control_block_base == 0) {
-			TRACE("PCI-IDE: Command/Control Block base is not configured\n");
+			TRACE("PCI-ATA: Command/Control Block base is not configured\n");
 			return B_ERROR;
 		}
 		if (intnum == 0 || intnum == 0xff) {
-			TRACE("PCI-IDE: Interrupt is not configured\n");
+			TRACE("PCI-ATA: Interrupt is not configured\n");
 			return B_ERROR;
 		}
 
@@ -519,7 +516,7 @@ ata_adapter_detect_channel(pci_device_module_info *pci, pci_device *pci_device,
 		// to be aligned at 4 bytes, so only 3f4h/374h can be specified; thus
 		// PCI IDE defines that control block starts at offset 2
 		control_block_base += 2;
-		TRACE("PCI-IDE: Controller in native mode: cmd %#x, ctrl %#x, irq %d\n",
+		TRACE("PCI-ATA: Controller in native mode: cmd %#x, ctrl %#x, irq %d\n",
 			  command_block_base, control_block_base, intnum);
 	}
 
@@ -534,7 +531,7 @@ ata_adapter_detect_channel(pci_device_module_info *pci, pci_device *pci_device,
 			// better were to use a controller lock, but this had to be done in the IDE
 			// bus manager, and I don't see any reason to add extra code for old
 			// simplex controllers
-			TRACE("PCI-IDE: Simplex controller - disabling DMA of secondary channel\n");
+			TRACE("PCI-ATA: Simplex controller - disabling DMA of secondary channel\n");
 			controller_can_dma = false;
 		}
 	}
@@ -579,17 +576,17 @@ ata_adapter_init_controller(device_node *node,
 
 #if 0
 	pcicmd = pci->read_pci_config(node, PCI_command, 2);
-	TRACE("PCI-IDE: adapter init: pcicmd old setting 0x%04x\n", pcicmd);
+	TRACE("PCI-ATA: adapter init: pcicmd old setting 0x%04x\n", pcicmd);
 	if ((pcicmd & PCI_command_io) == 0) {
-		TRACE("PCI-IDE: adapter init: enabling io decoder\n");
+		TRACE("PCI-ATA: adapter init: enabling io decoder\n");
 		pcicmd |= PCI_command_io;
 	}
 	if ((pcicmd & PCI_command_master) == 0) {
-		TRACE("PCI-IDE: adapter init: enabling bus mastering\n");
+		TRACE("PCI-ATA: adapter init: enabling bus mastering\n");
 		pcicmd |= PCI_command_master;
 	}
 	pci->write_pci_config(node, PCI_command, 2, pcicmd);
-	TRACE("PCI-IDE: adapter init: pcicmd new setting 0x%04x\n", pci->read_pci_config(node, PCI_command, 2));
+	TRACE("PCI-ATA: adapter init: pcicmd new setting 0x%04x\n", pci->read_pci_config(node, PCI_command, 2));
 #endif
 
 	controller->node = node;
@@ -684,7 +681,7 @@ ata_adapter_detect_controller(pci_device_module_info *pci, pci_device *pci_devic
 	SHOW_FLOW0( 3, "" );
 
 	if (bus_master_base == 0) {
-		TRACE("PCI-IDE: Controller detection failed! bus master base not configured\n");
+		TRACE("PCI-ATA: Controller detection failed! bus master base not configured\n");
 		return B_ERROR;
 	}
 
