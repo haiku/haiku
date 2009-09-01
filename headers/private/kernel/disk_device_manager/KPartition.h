@@ -229,7 +229,7 @@ protected:
 	int32				fReferenceCount;
 	bool				fObsolete;
 	char				*fPublishedName;
-	static int32		fNextID;
+	static int32		sNextID;
 };
 
 } // namespace DiskDevice
