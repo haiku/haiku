@@ -12,6 +12,8 @@
 #include <device_manager.h>
 #include <bus/PCI.h>
 
+// name of PCI legacy driver endpoint module
+#define PCI_LEGACY_DRIVER_MODULE_NAME "bus_managers/pci/legacy_v1"
 
 // name of PCI device modules
 #define PCI_DEVICE_MODULE_NAME "bus_managers/pci/driver_v1"
@@ -45,6 +47,11 @@ extern "C" {
 void *		pci_ram_address(const void *physical_address_in_system_memory);
 
 status_t 	pci_find_capability(uchar bus, uchar device, uchar function, uchar cap_id, uchar *offset);
+
+status_t	pci_reserve_device(uchar virtualBus, uchar device, uchar function,
+			const char *driverName, void *nodeCookie);
+status_t	pci_unreserve_device(uchar virtualBus, uchar device, uchar function,
+			const char *driverName, void *nodeCookie);
 
 status_t 	pci_io_init(void);
 uint8		pci_read_io_8(int mapped_io_addr);

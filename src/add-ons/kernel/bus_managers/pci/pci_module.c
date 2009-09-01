@@ -64,7 +64,9 @@ static struct pci_module_info sOldPCIModule = {
 	&pci_read_config,
 	&pci_write_config,
 	&pci_ram_address,
-	&pci_find_capability
+	&pci_find_capability,
+	&pci_reserve_device,
+	&pci_unreserve_device
 };
 
 module_dependency module_dependencies[] = {
@@ -72,9 +74,19 @@ module_dependency module_dependencies[] = {
 	{}
 };
 
+driver_module_info gPCILegacyDriverModule = {
+	{
+		PCI_LEGACY_DRIVER_MODULE_NAME,
+		0,
+		NULL,
+	},
+	NULL
+};
+
 module_info *modules[] = {
 	(module_info *)&sOldPCIModule,
 	(module_info *)&gPCIRootModule,
 	(module_info *)&gPCIDeviceModule,
+	(module_info *)&gPCILegacyDriverModule,
 	NULL
 };

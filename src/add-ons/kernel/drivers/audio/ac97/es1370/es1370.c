@@ -501,6 +501,7 @@ init_driver(void)
 	pci_info info;
 	int ix = 0;
 	num_cards = 0;
+	status_t err;
 
 	PRINT(("init_driver()\n"));
 
@@ -529,7 +530,7 @@ init_driver(void)
 	if (get_module(pci_name, (module_info **) &pci))
 		return ENOSYS;
 		
-	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
+	while ((*pci->get_nth_pci_info)(ix++, &info) == B_OK) {
 		if (info.vendor_id == 0x1274
                         && (info.device_id == 0x5000
                         /*|| info.device_id == 0x1371
@@ -541,6 +542,14 @@ init_driver(void)
 			}
 			memset(&cards[num_cards], 0, sizeof(es1370_dev));
 			cards[num_cards].info = info;
+#ifdef __HAIKU__
+			if ((err = (*pci->reserve_device)(info.bus, info.device, info.function,
+				DRIVER_NAME, &cards[num_cards])) < B_OK) {
+				dprintf("es1370: failed to reserve_device(%d, %d, %d,): %s\n",
+					info.bus, info.device, info.function, strerror(err));
+				continue;
+			}
+#endif
 			if (es1370_setup(&cards[num_cards])) {
 				PRINT(("Setup of es1370 %ld failed\n", num_cards+1));
 			}
@@ -548,7 +557,6 @@ init_driver(void)
 				num_cards++;
 			}
 		}
-		ix++;
 	}
 	if (!num_cards) {
 		PRINT(("no cards\n"));
@@ -579,8 +587,14 @@ uninit_driver(void)
 	num_cards = 0;
 
 	PRINT(("uninit_driver()\n"));
-	for (ix=0; ix<cnt; ix++)
+	for (ix=0; ix<cnt; ix++) {
 		es1370_shutdown(&cards[ix]);
+#ifdef __HAIKU__
+		(*pci->unreserve_device)(cards[ix].info.bus,
+			cards[ix].info.device, cards[ix].info.function,
+			DRIVER_NAME, &cards[ix]);
+#endif
+	}
 	memset(&cards, 0, sizeof(cards));
 	put_module(pci_name);
 }

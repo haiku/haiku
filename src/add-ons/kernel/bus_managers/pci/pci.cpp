@@ -86,6 +86,196 @@ pci_find_capability(uchar virtualBus, uchar device, uchar function,
 }
 
 
+status_t
+pci_reserve_device(uchar virtualBus, uchar device, uchar function,
+	const char *driverName, void *nodeCookie)
+{
+	status_t status;
+	uint8 bus;
+	int domain;
+
+	/*
+	 * we add 2 nodes to the PCI devices, one with constant attributes,
+	 * so adding for another driver fails, and a subnode with the
+	 * driver-provided informations.
+	 */
+
+	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
+		return B_ERROR;
+
+	//TRACE(("%s(%d [%d:%d], %d, %d, %s, %p)\n", __FUNCTION__, virtualBus, 
+	//	domain, bus, device, function, driverName, nodeCookie));
+
+	device_attr matchPCIRoot[] = {
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "PCI"}},
+		{NULL}
+	};
+	device_attr matchThis[] = {
+		// info about device
+		{B_DEVICE_BUS, B_STRING_TYPE, {string: "pci"}},
+
+		// location on PCI bus
+		{B_PCI_DEVICE_DOMAIN, B_UINT32_TYPE, {ui32: domain}},
+		{B_PCI_DEVICE_BUS, B_UINT8_TYPE, {ui8: bus}},
+		{B_PCI_DEVICE_DEVICE, B_UINT8_TYPE, {ui8: device}},
+		{B_PCI_DEVICE_FUNCTION, B_UINT8_TYPE, {ui8: function}},
+		{NULL}
+	};
+	device_attr legacyAttrs[] = {
+		// info about device
+		{B_DEVICE_BUS, B_STRING_TYPE, {string: "legacy_driver"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Legacy Driver Reservation"}},
+		{NULL}
+	};
+	device_attr drvAttrs[] = {
+		// info about device
+		{B_DEVICE_BUS, B_STRING_TYPE, {string: "legacy_driver"}},
+		{"legacy_driver", B_STRING_TYPE, {string: driverName}},
+		{"legacy_driver_cookie", B_UINT64_TYPE, {ui64: (uint64)nodeCookie}},
+		{NULL}
+	};
+	device_node *root, *pci, *node, *legacy;
+
+	status = B_DEVICE_NOT_FOUND;
+	root = gDeviceManager->get_root_node();
+	if (!root)
+		return status;
+	
+	pci = NULL;
+	if (gDeviceManager->get_next_child_node(root, matchPCIRoot, &pci) < B_OK)
+		goto err0;
+
+	node = NULL;
+	if (gDeviceManager->get_next_child_node(pci, matchThis, &node) < B_OK)
+		goto err1;
+	
+	// common API for all legacy modules ?
+	//status = legacy_driver_register(node, driverName, nodeCookie, PCI_LEGACY_DRIVER_MODULE_NAME);
+
+	status = gDeviceManager->register_node(node, PCI_LEGACY_DRIVER_MODULE_NAME, 
+		legacyAttrs, NULL, &legacy);
+	if (status < B_OK)
+		goto err2;
+
+	status = gDeviceManager->register_node(legacy, PCI_LEGACY_DRIVER_MODULE_NAME, 
+		drvAttrs, NULL, NULL);
+	if (status < B_OK)
+		goto err3;
+
+	gDeviceManager->put_node(node);
+	gDeviceManager->put_node(pci);
+	gDeviceManager->put_node(root);
+
+	return B_OK;
+
+err3:
+	gDeviceManager->unregister_node(legacy);
+err2:
+	gDeviceManager->put_node(node);
+err1:
+	gDeviceManager->put_node(pci);
+err0:
+	gDeviceManager->put_node(root);
+	TRACE(("pci_reserve_device for driver %s failed: %s\n", driverName, strerror(status)));
+	return status;
+}
+
+
+status_t
+pci_unreserve_device(uchar virtualBus, uchar device, uchar function,
+	const char *driverName, void *nodeCookie)
+{
+	status_t status;
+	uint8 bus;
+	int domain;
+
+	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
+		return B_ERROR;
+
+	//TRACE(("%s(%d [%d:%d], %d, %d, %s, %p)\n", __FUNCTION__, virtualBus, 
+	//	domain, bus, device, function, driverName, nodeCookie));
+
+	device_attr matchPCIRoot[] = {
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "PCI"}},
+		{NULL}
+	};
+	device_attr matchThis[] = {
+		// info about device
+		{B_DEVICE_BUS, B_STRING_TYPE, {string: "pci"}},
+
+		// location on PCI bus
+		{B_PCI_DEVICE_DOMAIN, B_UINT32_TYPE, {ui32: domain}},
+		{B_PCI_DEVICE_BUS, B_UINT8_TYPE, {ui8: bus}},
+		{B_PCI_DEVICE_DEVICE, B_UINT8_TYPE, {ui8: device}},
+		{B_PCI_DEVICE_FUNCTION, B_UINT8_TYPE, {ui8: function}},
+		{NULL}
+	};
+	device_attr legacyAttrs[] = {
+		// info about device
+		{B_DEVICE_BUS, B_STRING_TYPE, {string: "legacy_driver"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Legacy Driver Reservation"}},
+		{NULL}
+	};
+	device_attr drvAttrs[] = {
+		// info about device
+		{B_DEVICE_BUS, B_STRING_TYPE, {string: "legacy_driver"}},
+		{"legacy_driver", B_STRING_TYPE, {string: driverName}},
+		{"legacy_driver_cookie", B_UINT64_TYPE, {ui64: (uint64)nodeCookie}},
+		{NULL}
+	};
+	device_node *root, *pci, *node, *legacy, *drv;
+
+	status = B_DEVICE_NOT_FOUND;
+	root = gDeviceManager->get_root_node();
+	if (!root)
+		return status;
+
+	pci = NULL;
+	if (gDeviceManager->get_next_child_node(root, matchPCIRoot, &pci) < B_OK)
+		goto err0;
+
+	node = NULL;
+	if (gDeviceManager->get_next_child_node(pci, matchThis, &node) < B_OK)
+		goto err1;
+	
+	// common API for all legacy modules ?
+	//status = legacy_driver_unregister(node, driverName, nodeCookie);
+
+	legacy = NULL;
+	if (gDeviceManager->get_next_child_node(node, legacyAttrs, &legacy) < B_OK)
+		goto err2;
+
+	drv = NULL;
+	if (gDeviceManager->get_next_child_node(legacy, drvAttrs, &drv) < B_OK)
+		goto err3;
+
+	gDeviceManager->put_node(drv);
+	status = gDeviceManager->unregister_node(drv);
+	//dprintf("unreg:drv:%s\n", strerror(status));
+
+	gDeviceManager->put_node(legacy);
+	status = gDeviceManager->unregister_node(legacy);
+	//dprintf("unreg:legacy:%s\n", strerror(status));
+	// we'll get EBUSY here anyway...
+
+	gDeviceManager->put_node(node);
+	gDeviceManager->put_node(pci);
+	gDeviceManager->put_node(root);
+	return B_OK;
+
+err3:
+	gDeviceManager->put_node(legacy);
+err2:
+	gDeviceManager->put_node(node);
+err1:
+	gDeviceManager->put_node(pci);
+err0:
+	gDeviceManager->put_node(root);
+	TRACE(("pci_unreserve_device for driver %s failed: %s\n", driverName, strerror(status)));
+	return status;
+}
+
+
 // used by pci_info.cpp print_info_basic()
 void
 __pci_resolve_virtual_bus(uint8 virtualBus, int *domain, uint8 *bus)

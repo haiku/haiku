@@ -155,6 +155,18 @@ struct pci_module_info {
 						uchar	cap_id,
 						uchar	*offset
 					);
+	status_t		(*reserve_device) (
+						uchar bus,
+						uchar device,
+						uchar function,
+						const char *driver_name,
+						void *cookie);
+	status_t		(*unreserve_device) (
+						uchar bus,
+						uchar device,
+						uchar function,
+						const char *driver_name,
+						void *cookie);
 };
 
 #define	B_PCI_MODULE_NAME		"bus_managers/pci/v1"

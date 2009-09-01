@@ -55,6 +55,14 @@ init_driver(void)
 			&& gNumCards < MAX_CARDS; i++) {
 		if (info.class_base == PCI_multimedia
 			&& info.class_sub == PCI_hd_audio) {
+#ifdef __HAIKU__
+			if ((*gPci->reserve_device)(info.bus, info.device, info.function, "hda",
+				&gCards[gNumCards]) < B_OK) {
+				dprintf("HDA: Failed to reserve PCI:%d:%d:%d\n",
+					info.bus, info.device, info.function);
+				continue;
+			}
+#endif
 			memset(&gCards[gNumCards], 0, sizeof(hda_controller));
 			gCards[gNumCards].pci_info = info;
 			gCards[gNumCards].opened = 0;
@@ -84,6 +92,10 @@ uninit_driver(void)
 	dprintf("IRA: %s\n", __func__);
 
 	for (uint32 i = 0; i < gNumCards; i++) {
+#ifdef __HAIKU__
+		(*gPci->unreserve_device)(gCards[i].pci_info.bus, gCards[i].pci_info.device,
+			gCards[i].pci_info.function, "hda", &gCards[i]);
+#endif
 		free((void*)gCards[i].devfs_path);
 		gCards[i].devfs_path = NULL;
 	}
