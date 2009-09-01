@@ -80,7 +80,7 @@ SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 SYSTEM_LIBS = libalm.so libbe.so libbsd.so libbnetapi.so libdebug.so
 	libdevice.so libfluidsynth.so libfreetype.so libgame.so libGL.so libgnu.so
 	libilmimf.so libjpeg.so liblinprog.so liblpsolve55.so libmail.so libmedia.so
-	libmidi.so libmidi2.so libnetwork.so libpng.so <revisioned>libroot.so 
+	libmidi.so libmidi2.so libnetwork.so libpng.so <revisioned>libroot.so
 	libscreensaver.so libtextencoding.so libtracker.so libtranslation.so
 	libz.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
@@ -159,8 +159,7 @@ SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci $(X86_ONLY)ps2 $(X86_ONLY)isa
 	$(IDE_ONLY)ide scsi config_manager agp_gart usb firewire $(X86_ONLY)acpi
 ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs cdda ext2 fat iso9660 nfs attribute_overlay
-	write_overlay $(GPL_ONLY)ntfs $(GPL_ONLY)reiserfs ;
-#googlefs ;
+	write_overlay ntfs reiserfs ; #googlefs
 
 
 # modules
