@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src system libroot posix malloc_debug ;
+
+UsePrivateSystemHeaders ;
+
+MergeObject posix_malloc.o :
+	heap.cpp 
+;
