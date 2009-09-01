@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku.
+ * Copyright 2005-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,18 +9,18 @@
 #define HW_INTERFACE_H
 
 
-#include "IntRect.h"
-#include "MultiLocker.h"
-#include "ServerCursor.h"
-
-#include <video_overlay.h>
-
 #include <Accelerant.h>
 #include <GraphicsCard.h>
 #include <List.h>
 #include <Locker.h>
 #include <OS.h>
 #include <Region.h>
+
+#include <video_overlay.h>
+
+#include "IntRect.h"
+#include "MultiLocker.h"
+#include "ServerCursor.h"
 
 
 class Overlay;
@@ -29,22 +29,25 @@ class ServerBitmap;
 class UpdateQueue;
 class BString;
 
+
 enum {
 	HW_ACC_COPY_REGION					= 0x00000001,
 	HW_ACC_FILL_REGION					= 0x00000002,
 	HW_ACC_INVERT_REGION				= 0x00000004,
 };
 
+
 class HWInterfaceListener {
- public:
+public:
 								HWInterfaceListener();
 	virtual						~HWInterfaceListener();
 
 	virtual	void				FrameBufferChanged() = 0;
 };
 
+
 class HWInterface : protected MultiLocker {
- public:
+public:
 								HWInterface(bool doubleBuffered = false,
 									bool enableUpdateQueue = true);
 	virtual						~HWInterface();
@@ -52,12 +55,14 @@ class HWInterface : protected MultiLocker {
 	// locking
 			bool				LockParallelAccess() { return ReadLock(); }
 #if DEBUG
-			bool				IsParallelAccessLocked() { return IsReadLocked(); }
+			bool				IsParallelAccessLocked()
+									{ return IsReadLocked(); }
 #endif
 			void				UnlockParallelAccess() { ReadUnlock(); }
 
 			bool				LockExclusiveAccess() { return WriteLock(); }
-			bool				IsExclusiveAccessLocked() { return IsWriteLocked(); }
+			bool				IsExclusiveAccessLocked()
+									{ return IsWriteLocked(); }
 			void				UnlockExclusiveAccess() { WriteUnlock(); }
 
 	// You need to WriteLock
@@ -65,32 +70,34 @@ class HWInterface : protected MultiLocker {
 	virtual	status_t			Shutdown() = 0;
 
 	// screen mode stuff
-	virtual	status_t			SetMode(const display_mode &mode) = 0;
-	virtual	void				GetMode(display_mode *mode) = 0;
+	virtual	status_t			SetMode(const display_mode& mode) = 0;
+	virtual	void				GetMode(display_mode* mode) = 0;
 
-	virtual status_t			GetDeviceInfo(accelerant_device_info *info) = 0;
-	virtual status_t			GetFrameBufferConfig(frame_buffer_config& config) = 0;
-	virtual status_t			GetModeList(display_mode **mode_list,
-											uint32 *count) = 0;
-	virtual status_t			GetPixelClockLimits(display_mode *mode,
-													uint32 *low,
-													uint32 *high) = 0;
-	virtual status_t			GetTimingConstraints(display_timing_constraints *dtc) = 0;
-	virtual status_t			ProposeMode(display_mode *candidate,
-											const display_mode *low,
-											const display_mode *high) = 0;
+	virtual status_t			GetDeviceInfo(accelerant_device_info* info) = 0;
+	virtual status_t			GetFrameBufferConfig(
+									frame_buffer_config& config) = 0;
+	virtual status_t			GetModeList(display_mode** _modeList,
+									uint32* _count) = 0;
+	virtual status_t			GetPixelClockLimits(display_mode* mode,
+									uint32* _low, uint32* _high) = 0;
+	virtual status_t			GetTimingConstraints(display_timing_constraints*
+									constraints) = 0;
+	virtual status_t			ProposeMode(display_mode* candidate,
+									const display_mode* low,
+									const display_mode* high) = 0;
 	virtual	status_t			GetPreferredMode(display_mode* mode);
 	virtual status_t			GetMonitorInfo(monitor_info* info);
 
 	virtual sem_id				RetraceSemaphore() = 0;
-	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT) = 0;
+	virtual status_t			WaitForRetrace(
+									bigtime_t timeout = B_INFINITE_TIMEOUT) = 0;
 
-	virtual status_t			SetDPMSMode(const uint32 &state) = 0;
+	virtual status_t			SetDPMSMode(uint32 state) = 0;
 	virtual uint32				DPMSMode() = 0;
 	virtual uint32				DPMSCapabilities() = 0;
 
-	virtual status_t			GetAccelerantPath(BString &path);
-	virtual status_t			GetDriverPath(BString &path);
+	virtual status_t			GetAccelerantPath(BString& path);
+	virtual status_t			GetDriverPath(BString& path);
 
 	// query for available hardware accleration and perform it
 	// (Initialize() must have been called already)
@@ -98,11 +105,10 @@ class HWInterface : protected MultiLocker {
 									{ return 0; }
 
 	virtual	void				CopyRegion(const clipping_rect* sortedRectList,
-										   uint32 count,
-										   int32 xOffset, int32 yOffset) {}
+									uint32 count, int32 xOffset, int32 yOffset)
+									{}
 	virtual	void				FillRegion(/*const*/ BRegion& region,
-										   const rgb_color& color,
-										   bool autoSync) {}
+									const rgb_color& color, bool autoSync) {}
 	virtual	void				InvertRegion(/*const*/ BRegion& region) {}
 
 	virtual	void				Sync() {}
@@ -113,12 +119,11 @@ class HWInterface : protected MultiLocker {
 	virtual	void				SetCursorVisible(bool visible);
 			bool				IsCursorVisible();
 	virtual	void				ObscureCursor();
-	virtual	void				MoveCursorTo(const float& x,
-											 const float& y);
+	virtual	void				MoveCursorTo(float x, float y);
 			BPoint				CursorPosition();
 
 			void				SetDragBitmap(const ServerBitmap* bitmap,
-											  const BPoint& offsetFromCursor);
+									const BPoint& offsetFromCursor);
 
 	// overlay support
 	virtual overlay_token		AcquireOverlayChannel();
@@ -174,19 +179,18 @@ public:
 			bool				AddListener(HWInterfaceListener* listener);
 			void				RemoveListener(HWInterfaceListener* listener);
 
- protected:
+protected:
 	// implement this in derived classes
 	virtual	void				_DrawCursor(IntRect area) const;
 
 	// does the actual transfer and handles color space conversion
-			void				_CopyToFront(uint8* src, uint32 srcBPR,
-											 int32 x, int32 y,
-											 int32 right, int32 bottom) const;
+			void				_CopyToFront(uint8* src, uint32 srcBPR, int32 x,
+									int32 y, int32 right, int32 bottom) const;
 
 			IntRect				_CursorFrame() const;
 			void				_RestoreCursorArea() const;
 			void				_AdoptDragBitmap(const ServerBitmap* bitmap,
-												 const BPoint& offset);
+									const BPoint& offset);
 
 			void				_NotifyFrameBufferChanged();
 
@@ -197,23 +201,25 @@ public:
 			// we can restore that area when the cursor needs to be
 			// drawn somewhere else.
 			struct buffer_clip {
-								buffer_clip(int32 width, int32 height)
-								{
-									bpr = width * 4;
-									if (bpr > 0 && height > 0)
-										buffer = new uint8[bpr * height];
-									else
-										buffer = NULL;
-									left = 0;
-									top = 0;
-									right = -1;
-									bottom = -1;
-									cursor_hidden = true;
-								}
-								~buffer_clip()
-								{
-									delete[] buffer;
-								}
+				buffer_clip(int32 width, int32 height)
+				{
+					bpr = width * 4;
+					if (bpr > 0 && height > 0)
+						buffer = new uint8[bpr * height];
+					else
+						buffer = NULL;
+					left = 0;
+					top = 0;
+					right = -1;
+					bottom = -1;
+					cursor_hidden = true;
+				}
+
+				~buffer_clip()
+				{
+					delete[] buffer;
+				}
+
 				uint8*			buffer;
 				int32			left;
 				int32			top;
@@ -239,7 +245,7 @@ public:
 			bool				fDoubleBuffered;
 			int					fVGADevice;
 
- private:
+private:
 			UpdateQueue*		fUpdateExecutor;
 
 			BList				fListeners;

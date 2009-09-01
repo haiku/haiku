@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Haiku.
+ * Copyright 2002-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,9 +23,10 @@ using std::nothrow;
 
 
 BitmapHWInterface::BitmapHWInterface(ServerBitmap* bitmap)
-	: HWInterface(false, false),
-	  fBackBuffer(NULL),
-	  fFrontBuffer(new(nothrow) BitmapBuffer(bitmap))
+	:
+	HWInterface(false, false),
+	fBackBuffer(NULL),
+	fFrontBuffer(new(nothrow) BitmapBuffer(bitmap))
 {
 }
 
@@ -54,8 +55,7 @@ BitmapHWInterface::Initialize()
 	if (fFrontBuffer->ColorSpace() != B_RGB32
 		&& fFrontBuffer->ColorSpace() != B_RGBA32) {
 		BBitmap* backBitmap = new BBitmap(fFrontBuffer->Bounds(),
-										  B_BITMAP_NO_SERVER_LINK,
-										  B_RGBA32);
+			B_BITMAP_NO_SERVER_LINK, B_RGBA32);
 		fBackBuffer = new BBitmapBuffer(backBitmap);
 
 		ret = fBackBuffer->InitCheck();
@@ -66,10 +66,8 @@ BitmapHWInterface::Initialize()
 			// import the current contents of the bitmap
 			// into the back bitmap
 			backBitmap->ImportBits(fFrontBuffer->Bits(),
-								   fFrontBuffer->BitsLength(),
-								   fFrontBuffer->BytesPerRow(),
-								   0,
-								   fFrontBuffer->ColorSpace());
+				fFrontBuffer->BitsLength(), fFrontBuffer->BytesPerRow(), 0,
+				fFrontBuffer->ColorSpace());
 		}
 	}
 
@@ -85,23 +83,22 @@ BitmapHWInterface::Shutdown()
 
 
 status_t
-BitmapHWInterface::SetMode(const display_mode &mode)
+BitmapHWInterface::SetMode(const display_mode& mode)
 {
 	return B_UNSUPPORTED;
 }
 
 
 void
-BitmapHWInterface::GetMode(display_mode *mode)
+BitmapHWInterface::GetMode(display_mode* mode)
 {
-	if (mode) {
+	if (mode != NULL)
 		memset(mode, 0, sizeof(display_mode));
-	}
 }
 
 
 status_t
-BitmapHWInterface::GetDeviceInfo(accelerant_device_info *info)
+BitmapHWInterface::GetDeviceInfo(accelerant_device_info* info)
 {
 	return B_UNSUPPORTED;
 }
@@ -120,77 +117,79 @@ BitmapHWInterface::GetModeList(display_mode** modes, uint32 *count)
 	return B_UNSUPPORTED;
 }
 
-// GetPixelClockLimits
+
 status_t
-BitmapHWInterface::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
+BitmapHWInterface::GetPixelClockLimits(display_mode* mode, uint32* low,
+	uint32* high)
 {
 	return B_UNSUPPORTED;
 }
 
-// GetPixelClockLimits
+
 status_t
-BitmapHWInterface::GetTimingConstraints(display_timing_constraints *dtc)
+BitmapHWInterface::GetTimingConstraints(display_timing_constraints* constraints)
 {
 	return B_UNSUPPORTED;
 }
 
-// ProposeMode
+
 status_t
-BitmapHWInterface::ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high)
+BitmapHWInterface::ProposeMode(display_mode* candidate, const display_mode* low,
+	const display_mode* high)
 {
 	return B_UNSUPPORTED;
 }
 
-// RetraceSemaphore
+
 sem_id
 BitmapHWInterface::RetraceSemaphore()
 {
 	return B_ERROR;
 }
 
-// WaitForRetrace
+
 status_t
 BitmapHWInterface::WaitForRetrace(bigtime_t timeout)
 {
 	return B_UNSUPPORTED;
 }
 
-// SetDPMSMode
+
 status_t
-BitmapHWInterface::SetDPMSMode(const uint32 &state)
+BitmapHWInterface::SetDPMSMode(uint32 state)
 {
 	return B_UNSUPPORTED;
 }
 
-// DPMSMode
+
 uint32
 BitmapHWInterface::DPMSMode()
 {
 	return 0;
 }
 
-// DPMSCapabilities
+
 uint32
 BitmapHWInterface::DPMSCapabilities()
 {
 	return 0;
 }
 
-// FrontBuffer
-RenderingBuffer *
+
+RenderingBuffer*
 BitmapHWInterface::FrontBuffer() const
 {
 	return fFrontBuffer;
 }
 
-// BackBuffer
-RenderingBuffer *
+
+RenderingBuffer*
 BitmapHWInterface::BackBuffer() const
 {
 	return fBackBuffer;
 }
 
-// IsDoubleBuffered
+
 bool
 BitmapHWInterface::IsDoubleBuffered() const
 {
@@ -200,5 +199,3 @@ BitmapHWInterface::IsDoubleBuffered() const
 
 	return HWInterface::IsDoubleBuffered();
 }
-
-
