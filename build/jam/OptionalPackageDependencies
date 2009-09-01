@@ -12,3 +12,5 @@ OptionalPackageDependencies Firefox : LibIconv ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
 OptionalPackageDependencies NetSurf : OpenSSL ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
+OptionalPackageDependencies Mercurial : Python ;
+OptionalPackageDependencies Git : Expat Curl OpenSSL ;
