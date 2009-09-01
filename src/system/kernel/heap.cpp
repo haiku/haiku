@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Michael Lotz, mmlr@mlotz.ch.
+ * Copyright 2008-2009, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
@@ -1193,10 +1193,35 @@ heap_free_pages_removed(heap_allocator *heap, heap_area *area, uint32 pageCount)
 
 	if (area->free_page_count == 0) {
 		// the area is now full so we remove it from the area list
-		heap->areas = area->next;
+		if (area->prev)
+			area->prev->next = area->next;
 		if (area->next)
-			area->next->prev = NULL;
+			area->next->prev = area->prev;
+		if (heap->areas == area)
+			heap->areas = area->next;
 		area->next = area->prev = NULL;
+	} else {
+		// we might need to move forward in the area list
+		if (area->prev && area->prev->free_page_count > area->free_page_count) {
+			// move ourselfs so the list stays ordered
+			heap_area *insert = area->prev;
+			while (insert->prev
+				&& insert->prev->free_page_count > area->free_page_count)
+				insert = insert->prev;
+
+			if (area->prev)
+				area->prev->next = area->next;
+			if (area->next)
+				area->next->prev = area->prev;
+
+			area->prev = insert->prev;
+			area->next = insert;
+			if (area->prev)
+				area->prev->next = area;
+			if (heap->areas == insert)
+				heap->areas = area;
+			insert->prev = area;
+		}
 	}
 }
 
