@@ -23,6 +23,8 @@
 #include <KernelExport.h>
 #include <NodeMonitor.h>
 
+#include "IORequest.h"
+
 
 //#define TRACE_OVERLAY
 #ifdef TRACE_OVERLAY
@@ -132,9 +134,14 @@ public:
 		status_t			Close(void *cookie);
 		status_t			FreeCookie(void *cookie);
 		status_t			Read(void *cookie, off_t position, void *buffer,
-								size_t *length, bool readPages);
+								size_t *length, bool readPages,
+								IORequest *ioRequest);
 		status_t			Write(void *cookie, off_t position,
-								const void *buffer, size_t *length);
+								const void *buffer, size_t length,
+								IORequest *request);
+
+		status_t			SynchronousIO(void *cookie, IORequest *request);
+
 		status_t			SetFlags(void *cookie, int flags);
 
 		status_t			CreateDir(const char *name, int perms);
@@ -519,7 +526,7 @@ OverlayInode::FreeCookie(void *_cookie)
 
 status_t
 OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
-	bool readPages)
+	bool readPages, IORequest *ioRequest)
 {
 	if (position >= fStat.st_size) {
 		*length = 0;
@@ -555,6 +562,20 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 				result = fSuperVnode.ops->read_pages(SuperVolume(),
 					&fSuperVnode, superCookie, position, &vector, 1,
 					&readLength);
+			} else if (ioRequest != NULL) {
+				IORequest *subRequest;
+				result = ioRequest->CreateSubRequest(position, position,
+					readLength, subRequest);
+				if (result != B_OK)
+					return result;
+
+				result = fSuperVnode.ops->io(SuperVolume(), &fSuperVnode,
+					superCookie, subRequest);
+				if (result != B_OK)
+					return result;
+
+				result = subRequest->Wait(0, 0);
+				readLength = subRequest->TransferredBytes();
 			} else {
 				result = fSuperVnode.ops->read(SuperVolume(), &fSuperVnode,
 					superCookie, position, pointer, &readLength);
@@ -572,7 +593,11 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 		if (gapSize > 0) {
 			// there's a gap before our next position which we cannot
 			// fill with original file content, zero it out
-			memset(pointer, 0, gapSize);
+			if (ioRequest != NULL)
+				;// TODO: handle this case
+			else
+				memset(pointer, 0, gapSize);
+
 			bytesLeft -= gapSize;
 			position += gapSize;
 			pointer += gapSize;
@@ -585,8 +610,14 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 		off_t elementEnd = element->position + element->length;
 		if (elementEnd > position) {
 			size_t copyLength = MIN(elementEnd - position, bytesLeft);
-			memcpy(pointer, element->buffer + (position - element->position),
-				copyLength);
+
+			const void *source = element->buffer + (position
+				- element->position);
+			if (ioRequest != NULL) {
+				ioRequest->CopyData(source, (addr_t)pointer - (addr_t)buffer,
+					copyLength);
+			} else
+				memcpy(pointer, source, copyLength);
 
 			bytesLeft -= copyLength;
 			position += copyLength;
@@ -602,7 +633,7 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 
 status_t
 OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
-	size_t *length)
+	size_t length, IORequest *ioRequest)
 {
 	if (_cookie != NULL) {
 		open_cookie *cookie = (open_cookie *)_cookie;
@@ -618,7 +649,7 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 	write_buffer *other = fWriteBuffers;
 	write_buffer *swallow = NULL;
 	off_t newPosition = position;
-	size_t newLength = *length;
+	size_t newLength = length;
 	uint32 swallowCount = 0;
 
 	while (other) {
@@ -643,8 +674,11 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 		if (other->position <= newPosition) {
 			if (swallowCount == 1 && otherEnd >= newEnd) {
 				// other chunk completely covers us, just copy
-				memcpy(other->buffer + (newPosition - other->position),
-					buffer, *length);
+				void *target = other->buffer + (newPosition - other->position);
+				if (ioRequest != NULL)
+					ioRequest->CopyData(0, target, length);
+				else
+					memcpy(target, buffer, length);
 
 				fStat.st_mtime = time(NULL);
 				notify_stat_changed(SuperVolume()->id, fInodeNumber,
@@ -694,11 +728,34 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 		}
 	}
 
-	memcpy(element->buffer + (position - newPosition), buffer, *length);
+	void *target = element->buffer + (position - newPosition);
+	if (ioRequest != NULL)
+		ioRequest->CopyData(0, target, length);
+	else
+		memcpy(target, buffer, length);
 
 	fStat.st_mtime = time(NULL);
 	notify_stat_changed(SuperVolume()->id, fInodeNumber,
 		B_STAT_MODIFICATION_TIME | (sizeChanged ? B_STAT_SIZE : 0));
+	return B_OK;
+}
+
+
+status_t
+OverlayInode::SynchronousIO(void *cookie, IORequest *request)
+{
+	status_t result;
+	size_t length = request->Length();
+	if (request->IsWrite())
+		result = Write(cookie, request->Offset(), NULL, length, request);
+	else
+		result = Read(cookie, request->Offset(), NULL, &length, false, request);
+
+	if (result != B_OK)
+		return result;
+
+	request->SetTransferredBytes(false, length);
+	request->SetStatusAndNotify(B_OK);
 	return B_OK;
 }
 
@@ -803,8 +860,7 @@ OverlayInode::CreateSymlink(const char *name, const char *path, int mode)
 	if (result != B_OK)
 		return result;
 
-	size_t writeLength = strlen(path);
-	return newNode->Write(NULL, 0, path, &writeLength);
+	return newNode->Write(NULL, 0, path, strlen(path), NULL);
 }
 
 
@@ -815,7 +871,7 @@ OverlayInode::ReadSymlink(char *buffer, size_t *bufferSize)
 		if (!S_ISLNK(fStat.st_mode))
 			return B_BAD_VALUE;
 
-		return Read(NULL, 0, buffer, bufferSize, false);
+		return Read(NULL, 0, buffer, bufferSize, false, NULL);
 	}
 
 	if (fSuperVnode.ops->read_symlink == NULL)
@@ -1239,7 +1295,7 @@ overlay_read_pages(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	for (size_t i = 0; i < count; i++) {
 		size_t transferBytes = MIN(vecs[i].iov_len, bytesLeft);
 		status_t result = node->Read(cookie, pos, vecs[i].iov_base,
-			&transferBytes, true);
+			&transferBytes, true, NULL);
 		if (result != B_OK) {
 			*numBytes -= bytesLeft;
 			return result;
@@ -1272,7 +1328,7 @@ overlay_write_pages(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 	for (size_t i = 0; i < count; i++) {
 		size_t transferBytes = MIN(vecs[i].iov_len, bytesLeft);
 		status_t result = node->Write(cookie, pos, vecs[i].iov_base,
-			&transferBytes);
+			transferBytes, NULL);
 		if (result != B_OK) {
 			*numBytes -= bytesLeft;
 			return result;
@@ -1299,17 +1355,15 @@ static status_t
 overlay_io(fs_volume *volume, fs_vnode *vnode, void *cookie,
 	io_request *request)
 {
-	if (io_request_is_write(request))
-		return B_UNSUPPORTED;
-
 	OverlayInode *node = (OverlayInode *)vnode->private_node;
-	if (node->IsModified())
-		return B_UNSUPPORTED;
+	if (io_request_is_write(request) || node->IsModified())
+		return node->SynchronousIO(cookie, (IORequest *)request);
 
 	TRACE("relaying op: io\n");
 	fs_vnode *superVnode = node->SuperVnode();
 	if (superVnode->ops->io != NULL) {
-		return superVnode->ops->io(volume->super_volume, superVnode, cookie,
+		return superVnode->ops->io(volume->super_volume, superVnode,
+			cookie != NULL ? ((open_cookie *)cookie)->super_cookie : NULL,
 			request);
 	}
 
@@ -1521,7 +1575,7 @@ overlay_read(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 {
 	TRACE("read\n");
 	return ((OverlayInode *)vnode->private_node)->Read(cookie, pos, buffer,
-		length, false);
+		length, false, NULL);
 }
 
 
@@ -1531,7 +1585,7 @@ overlay_write(fs_volume *volume, fs_vnode *vnode, void *cookie, off_t pos,
 {
 	TRACE("write\n");
 	return ((OverlayInode *)vnode->private_node)->Write(cookie, pos, buffer,
-		length);
+		*length, NULL);
 }
 
 
