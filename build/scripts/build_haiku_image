@@ -35,7 +35,7 @@ fi
 # path of the actual device path under Linux).
 if readlink -f "$imagePath" &> /dev/null; then
 	normalizedImagePath=$(readlink -f "$imagePath")
-	if [ $normalizedImagePath ]; then
+	if [ "$normalizedImagePath" ]; then
 		imagePath="$normalizedImagePath"
 	fi
 fi
