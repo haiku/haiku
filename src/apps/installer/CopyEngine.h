@@ -18,6 +18,7 @@ class BFile;
 class BMessage;
 class BMessenger;
 
+
 class CopyEngine {
 public:
 								CopyEngine(const BMessenger& messenger,
@@ -109,4 +110,4 @@ private:
 };
 
 
-#endif // COPY_ENGINE_2_H
+#endif // COPY_ENGINE_H

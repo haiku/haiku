@@ -19,44 +19,12 @@
 #include <String.h>
 #include <SymLink.h>
 
-#include "AutoLocker.h"
 #include "InstallerWindow.h"
 	// TODO: For PACKAGES_DIRECTORY and VAR_DIRECTORY, not so nice...
+#include "SemaphoreLocker.h"
+
 
 using std::nothrow;
-
-
-// SemaphoreLocking
-class SemaphoreLocking {
-public:
-	inline bool Lock(sem_id* lockable)
-	{
-		return acquire_sem(*lockable) == B_OK;
-	}
-
-	inline void Unlock(sem_id* lockable)
-	{
-		release_sem(*lockable);
-	}
-};
-
-// SemaphoreLocker
-class SemaphoreLocker : public AutoLocker<sem_id, SemaphoreLocking> {
-public:
-	inline SemaphoreLocker(sem_id semaphore, bool alreadyLocked = false,
-			bool lockIfNotLocked = true)
-		:
-		AutoLocker<sem_id, SemaphoreLocking>(),
-		fSem(semaphore)
-	{
-		SetTo(&fSem, alreadyLocked, lockIfNotLocked);
-	}
-
-private:
-	sem_id	fSem;
-};
-
-
 
 
 CopyEngine::CopyEngine(const BMessenger& messenger, BMessage* message)
