@@ -44,7 +44,10 @@ width="64" height="64" />DriveSetup</h1>
 <tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
 </table>
 <p><br/></p>
-<p>Documentation is still missing. If you want to work on it, please announce it on the <a href="http://www.freelists.org/list/haiku-doc">Documentation mailing list</a> to avoid duplication.</p>
+<p>DriveSetup is a tool to create, delete and initialize partitions. At this time it can't resize or move existing partitions, so that you'll either need an unpartitioned volume (perhaps an external USB drive or another harddisk) or do the initial setup with a tool like the <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> to provide the space for another partition.</p>
+<img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
+<p>At the top is a graphical representation of all partitions inside the device chosen in the list below it. Besides a maximum of 4 primary partitions, each of those can contain a number of extended/logical partitions. You may have to expand such a list with the widget that appears in that case in front of that device to see the details of every logical partition.</p>
+<p>You can mount and unmount volumes from the <span class="menu">Partition</span> menu.</p>
 
 </div>
 <!--
