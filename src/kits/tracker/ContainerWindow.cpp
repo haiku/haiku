@@ -3078,9 +3078,9 @@ BContainerWindow::NewAttributeMenu(BMenu *menu)
 	ASSERT(PoseView());
 
 	BMenuItem *item;
-	menu->AddItem(item = new BMenuItem("Copy Attributes", new BMessage(kCopyAttributes)));
+	menu->AddItem(item = new BMenuItem("Copy Layout", new BMessage(kCopyAttributes)));
 	item->SetTarget(PoseView());
-	menu->AddItem(item = new BMenuItem("Paste Attributes", new BMessage(kPasteAttributes)));
+	menu->AddItem(item = new BMenuItem("Paste Layout", new BMessage(kPasteAttributes)));
 	item->SetTarget(PoseView());
 	menu->AddSeparatorItem();
 
