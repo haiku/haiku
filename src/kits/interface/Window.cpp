@@ -1983,6 +1983,10 @@ BWindow::ConvertFromScreen(BRect rect) const
 bool
 BWindow::IsMinimized() const
 {
+	BAutolock locker(const_cast<BWindow*>(this));
+	if (!locker.IsLocked())
+		return false;
+
 	// Hiding takes precendence over minimization!!!
 	if (IsHidden())
 		return false;
@@ -2456,7 +2460,7 @@ BWindow::CenterIn(const BRect& rect)
 	// Set size limits now if needed
 	_CheckSizeLimits();
 
-	MoveTo(BLayoutUtils::AlignInFrame(rect, Size(), 
+	MoveTo(BLayoutUtils::AlignInFrame(rect, Size(),
 		BAlignment(B_ALIGN_HORIZONTAL_CENTER,
 			B_ALIGN_VERTICAL_CENTER)).LeftTop());
 }
