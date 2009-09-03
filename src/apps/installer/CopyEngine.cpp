@@ -501,6 +501,20 @@ CopyEngine::_ShouldCopyEntry(const char* name, const struct stat& statInfo,
 			printf("ignoring '%s'.\n", name);
 			return false;
 		}
+		if (strcmp("rr_moved", name) == 0) {
+			printf("ignoring '%s'.\n", name);
+			return false;
+		}
+	}
+	if (level == 1 && S_ISREG(statInfo.st_mode)) {
+		if (strcmp("boot.catalog", name) == 0) {
+			printf("ignoring '%s'.\n", name);
+			return false;
+		}
+		if (strcmp("haiku-boot-floppy.image", name) == 0) {
+			printf("ignoring '%s'.\n", name);
+			return false;
+		}
 	}
 	return true;
 }
