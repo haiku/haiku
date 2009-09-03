@@ -195,15 +195,12 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 			if (msg->FindInt32("opcode", &opcode) == B_OK) {
 				switch (opcode) {
 					case B_ENTRY_REMOVED:
-						// We lost our file. Reset everything. We don't need
-						// to explicitly disable the node monitor.
+						// We lost our file. Close the window by quiting its
+						// looper.
 						delete fRef;
 						fRef = NULL;
 						
-						for (int32 i = 0; gFields[i].attribute; i++)
-							fView->SetField(i, "", true);
-
-						SetTitle("New Person");
+						PostMessage(B_QUIT_REQUESTED);
 						break;
 					
 					case B_ENTRY_MOVED:
