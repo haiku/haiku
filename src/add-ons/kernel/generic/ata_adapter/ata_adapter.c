@@ -525,6 +525,10 @@ ata_adapter_detect_channel(pci_device_module_info *pci, pci_device *pci_device,
 
 	// this should be done in ata_adapter_init_controller but there is crashes
 	pcicmdOld = pcicmdNew = pci->read_pci_config(pci_device, PCI_command, 2);
+	if ((pcicmdNew & (1 << 10)) != 0) {
+		TRACE("PCI-ATA: enabling interrupts\n");
+		pcicmdNew &= ~(1 << 10);
+	}
 	if ((pcicmdNew & PCI_command_io) == 0) {
 		TRACE("PCI-ATA: enabling io decoder\n");
 		pcicmdNew |= PCI_command_io;
@@ -535,9 +539,9 @@ ata_adapter_detect_channel(pci_device_module_info *pci, pci_device *pci_device,
 	}
 	if (pcicmdOld != pcicmdNew) {
 		pci->write_pci_config(pci_device, PCI_command, 2, pcicmdNew);
-		TRACE("PCI-ATA: pcicmd old 0x%04x, new 0x%04x\n", 
-			pcicmdOld, pcicmdNew);
 	}
+	TRACE("PCI-ATA: pcicmd old 0x%04x, new 0x%04x\n", 
+		pcicmdOld, pcicmdNew);
 
 
 	if (supports_compatibility_mode) {
