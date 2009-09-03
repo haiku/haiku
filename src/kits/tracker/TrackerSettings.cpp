@@ -191,7 +191,7 @@ TTrackerState::LoadSettingsIfNeeded()
 	Add(fDateOrderFormat = new ScalarValueSetting("DateOrderFormat", 2, "", ""));
 	Add(f24HrClock = new BooleanValueSetting("24HrClock", false));
 
-	Add(fShowVolumeSpaceBar = new BooleanValueSetting("ShowVolumeSpaceBar", false));
+	Add(fShowVolumeSpaceBar = new BooleanValueSetting("ShowVolumeSpaceBar", true));
 
 	Add(fUsedSpaceColor = new HexScalarValueSetting("UsedSpaceColor", 0xc000cb00, "", ""));
 	Add(fFreeSpaceColor = new HexScalarValueSetting("FreeSpaceColor", 0xc0ffffff, "", ""));
