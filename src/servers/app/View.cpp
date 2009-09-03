@@ -206,7 +206,7 @@ void
 View::DetachedFromWindow()
 {
 	// remove view from local token space
-	if (fWindow != NULL)
+	if (fWindow != NULL && fWindow->ServerWindow()->App() != NULL)
 		fWindow->ServerWindow()->App()->ViewTokens().RemoveToken(fToken);
 
 	fWindow = NULL;

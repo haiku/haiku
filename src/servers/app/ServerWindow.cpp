@@ -197,8 +197,10 @@ ServerWindow::~ServerWindow()
 		fDesktop->RemoveWindow(fWindow);
 	}
 
-	if (App() != NULL)
+	if (App() != NULL) {
 		App()->RemoveWindow(this);
+		fServerApp = NULL;
+	}
 
 	delete fWindow;
 
