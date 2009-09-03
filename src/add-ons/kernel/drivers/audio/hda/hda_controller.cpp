@@ -786,7 +786,7 @@ hda_hw_init(hda_controller* controller)
 		case INTEL_VENDORID:
 			if (controller->pci_info.device_id == INTEL_SCH_DEVICEID) {
 				update_pci_register(controller, INTEL_SCH_HDA_DEVC,
-					~INTEL_SCH_HDA_DEVC_SNOOP, INTEL_SCH_HDA_DEVC_SNOOP, 2);
+					~INTEL_SCH_HDA_DEVC_SNOOP, 0, 2);
 			}
 			break;
 	}
