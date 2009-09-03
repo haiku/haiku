@@ -142,6 +142,10 @@ else
 fi
 
 if [ "$SAFEMODE" != "yes" ]; then
+	if [ "$isReadOnly" = "yes" ]; then
+		mimeset -f -apps /boot/$SERVERS/media_addon_server
+	fi
+
 	launch $SERVERS/media_server
 	launch $SERVERS/midi_server
 fi
