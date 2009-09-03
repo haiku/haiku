@@ -1770,12 +1770,14 @@ devfs_io(fs_volume *volume, fs_vnode *_vnode, void *_cookie,
 				|| (!isWrite && !vnode->stream.u.dev.device->HasRead()))
 			&& !vnode->stream.u.dev.device->HasIO())
 		|| cookie == NULL) {
+		request->SetStatusAndNotify(B_NOT_ALLOWED);
 		return B_NOT_ALLOWED;
 	}
 
 	if (vnode->stream.u.dev.partition != NULL) {
 		if (request->Offset() + request->Length()
-				>= vnode->stream.u.dev.partition->info.size) {
+				> vnode->stream.u.dev.partition->info.size) {
+			request->SetStatusAndNotify(B_BAD_VALUE);
 			return B_BAD_VALUE;
 		}
 		translate_partition_access(vnode->stream.u.dev.partition, request);
