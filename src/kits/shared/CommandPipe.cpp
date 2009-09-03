@@ -304,6 +304,10 @@ BCommandPipe::ReadLines(FILE* file)
 			fResult("")
 		{
 		}
+		
+		virtual ~AllLinesReader()
+		{
+		}
 
 		virtual bool IsCanceled()
 		{
