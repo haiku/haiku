@@ -751,12 +751,11 @@ OverlayInode::SynchronousIO(void *cookie, IORequest *request)
 	else
 		result = Read(cookie, request->Offset(), NULL, &length, false, request);
 
-	if (result != B_OK)
-		return result;
+	if (result == B_OK)
+		request->SetTransferredBytes(false, length);
 
-	request->SetTransferredBytes(false, length);
-	request->SetStatusAndNotify(B_OK);
-	return B_OK;
+	request->SetStatusAndNotify(result);
+	return result;
 }
 
 
