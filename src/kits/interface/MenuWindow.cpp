@@ -416,17 +416,22 @@ BMenuWindow::_Scroll(const BPoint& where)
 	ASSERT((fUpperScroller != NULL));
 
 	const BPoint cursor = ConvertFromScreen(where);
+	const BRect &lowerFrame = fLowerScroller->Frame();
+	const BRect &upperFrame = fUpperScroller->Frame();
 
-	BRect lowerFrame = fLowerScroller->Frame();
-	BRect upperFrame = fUpperScroller->Frame();
-
+	int32 delta = 0;
 	if (fLowerScroller->IsEnabled() && lowerFrame.Contains(cursor))
-		_ScrollBy(1);
+		delta = 1;
 	else if (fUpperScroller->IsEnabled() && upperFrame.Contains(cursor))
-		_ScrollBy(-1);
-	else
+		delta = -1;
+	
+	if (delta == 0)
 		return false;
 
+	float smallStep;
+	GetSteps(&smallStep, NULL);
+	_ScrollBy(smallStep * delta);
+	
 	snooze(5000);
 
 	return true;
