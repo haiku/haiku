@@ -246,6 +246,9 @@ do_iterative_fd_io_iterate(void* _cookie, io_request* request,
 	if (error != B_OK && subRequestCount == 0)
 		return error;
 
+	// Reset the error code for the loop below
+	error = B_OK;
+
 	request->Advance(requestOffset - cookie->request_offset);
 	cookie->request_offset = requestOffset;
 
