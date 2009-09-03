@@ -20,6 +20,8 @@
 #include <Font.h>
 #include <Clipboard.h>
 #include <TextView.h>
+#include <NodeMonitor.h>
+#include <String.h>
 
 #include "PeopleApp.h"
 #include "PeopleView.h"
@@ -71,6 +73,7 @@ TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
 	if (ref) {
 		fRef = new entry_ref(*ref);
 		SetTitle(ref->name);
+		WatchChanges(true);
 	} else
 		fRef = NULL;
 
@@ -85,6 +88,9 @@ TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
 
 TPeopleWindow::~TPeopleWindow(void)
 {
+	if (fRef)
+		WatchChanges(false);
+
 	delete fRef;
 	delete fPanel;
 }
@@ -166,9 +172,12 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 
 						directory.FindEntry(name, &entry);
 						entry.GetRef(&dir);
-						if (fRef)
+						if (fRef) {
+							WatchChanges(false);
 							delete fRef;
+						}
 						fRef = new entry_ref(dir);
+						WatchChanges(true);
 						SetTitle(fRef->name);
 						fView->NewFile(fRef);
 					}
@@ -179,6 +188,54 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 				}
 			}
 			break;
+			
+		case B_NODE_MONITOR:
+		{
+			int32 opcode;
+			if (msg->FindInt32("opcode", &opcode) == B_OK) {
+				switch (opcode) {
+					case B_ENTRY_REMOVED:
+						// We lost our file. Reset everything. We don't need
+						// to explicitly disable the node monitor.
+						delete fRef;
+						fRef = NULL;
+						
+						for (int32 i = 0; gFields[i].attribute; i++)
+							fView->SetField(i, "", true);
+
+						SetTitle("New Person");
+						break;
+					
+					case B_ENTRY_MOVED:
+					{
+						// We may have renamed our entry. Update the title
+						// just in case.
+						BString name;
+						if (msg->FindString("name", &name) == B_OK)
+							SetTitle(name);
+					}
+					break;
+					
+					case B_ATTR_CHANGED:
+					{
+						// An attribute was updated.
+						BString attr;
+						if (msg->FindString("attr", &attr) == B_OK) {
+							for (int32 i = 0; gFields[i].attribute; i++) {
+								if (attr == gFields[i].attribute) {
+									fView->SetField(i, true);
+								}
+							}
+						}
+					}
+					break;
+							
+					default:
+						msg->PrintToStream();
+				}
+			}
+		}
+		break;
 
 		default:
 			BWindow::MessageReceived(msg);
@@ -282,4 +339,34 @@ TPeopleWindow::SaveAs(void)
 			fPanel->Window()->Show();
 		fPanel->Window()->Unlock();
 	}	
+}
+
+
+void
+TPeopleWindow::WatchChanges(bool enable)
+{
+	if (fRef == NULL)
+		return;
+
+	node_ref nodeRef;
+	
+	BNode node(fRef);
+	node.GetNodeRef(&nodeRef);
+	
+	uint32 flags;
+	BString action;
+
+	if (enable) {
+		// Start watching.
+		flags = B_WATCH_ALL;
+		action = "starting";
+	} else {
+		// Stop watching.
+		flags = B_STOP_WATCHING;
+		action = "stoping";
+	}
+	
+	if (watch_node(&nodeRef, flags, this) != B_OK) {
+		printf("Error %s node monitor.\n", action.String());
+	}
 }

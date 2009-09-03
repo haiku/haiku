@@ -35,6 +35,7 @@ class TPeopleView : public BView {
 		const char*		GetField(int32);
 		void			NewFile(entry_ref*);
 		void			Save(void);
+		void			SetField(int32, bool);
 		void			SetField(int32, char*, bool);
 		bool			TextSelected(void);
 

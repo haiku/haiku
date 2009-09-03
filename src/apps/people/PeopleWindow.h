@@ -28,6 +28,8 @@ class TPeopleWindow : public BWindow {
 
 private:
 
+	void			WatchChanges(bool);
+
 	BFilePanel		*fPanel;
 	BMenuItem		*fCopy;
 	BMenuItem		*fCut;

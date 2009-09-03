@@ -254,6 +254,23 @@ TPeopleView::Save(void)
 
 
 void
+TPeopleView::SetField(int32 index, bool update)
+{
+	char *text = NULL;
+	attr_info info;
+	if (fFile && fFile->GetAttrInfo(gFields[index].attribute, &info) == B_OK) {
+		text = (char *)calloc(info.size, 1);
+		fFile->ReadAttr(gFields[index].attribute, B_STRING_TYPE, 0, text,
+			info.size);
+	}
+
+	SetField(index, text, update);
+	
+	free(text);
+}
+
+
+void
 TPeopleView::SetField(int32 index, char *data, bool update)
 {
 	Window()->Lock();
