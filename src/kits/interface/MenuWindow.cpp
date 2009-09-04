@@ -71,7 +71,7 @@ public:
 using namespace BPrivate;
 
 
-const int kScrollerHeight = 10;
+const int kScrollerHeight = 12;
 
 
 BMenuScroller::BMenuScroller(BRect frame)
@@ -367,7 +367,7 @@ BMenuWindow::SetSmallStep(float step)
 
 
 void
-BMenuWindow::GetSteps(float* _smallStep, float* _largeStep)
+BMenuWindow::GetSteps(float* _smallStep, float* _largeStep) const
 {
 	if (_smallStep != NULL)
 		*_smallStep = fScrollStep;

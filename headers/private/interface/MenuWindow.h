@@ -36,7 +36,7 @@ public:
 			void			DetachScrollers();
 
 			void			SetSmallStep(float step);
-			void			GetSteps(float* _smallStep, float* _largeStep);
+			void			GetSteps(float* _smallStep, float* _largeStep) const;
 			bool			HasScrollers() const;
 			bool			CheckForScrolling(const BPoint& cursor);
 			bool			TryScrollBy(const float& step);
