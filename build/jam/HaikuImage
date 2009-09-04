@@ -29,9 +29,9 @@ if $(HAIKU_ATA_STACK) = 1 {
 
 SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	cal cat catattr checkfs chgrp chmod chop chown chroot cksum clear
-	clockconfig cmp collectcatkeys comm compress copyattr CortexAddOnHost cp
+	clockconfig cmp comm compress copyattr CortexAddOnHost cp
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
-	draggers driveinfo dstcheck du dumpcatalog
+	draggers driveinfo dstcheck du
 	echo eject env error expand expr
 	factor false fdinfo ffm filepanel find finddir fmt fold fortune frcode
 	ftp ftpd
@@ -41,7 +41,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	id ident ideinfo idestatus ifconfig <bin>install installsound iroster
 	isvolume
 	join
-	keymap kill less lessecho lesskey link linkcatkeys listarea listattr
+	keymap kill less lessecho lesskey link listarea listattr
 	listimage listdev
 	listport listres listsem listusb ln locate logger login logname ls lsindex
 	makebootable md5sum merge message mimeset mkdos mkdir mkfifo mkfs mkindex
@@ -73,7 +73,7 @@ SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc DiskProb
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations E-mail
 	FileTypes Fonts Keyboard Keymap Media Mouse Network Printers
 	Screen ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
-; # Locale
+;
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 	GLTeapot Haiku3d Mandelbrot Pairs Playground Pulse Sudoku Gradients
 ;
@@ -360,11 +360,6 @@ spellFiles = $(spellFiles:G=spell) ;
 SEARCH on $(spellFiles)
 	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
 AddFilesToHaikuImage system etc word_dictionary : $(spellFiles) ;
-
-# Locale kit language files
-local languageDir = [ FDirName $(HAIKU_TOP) src data etc locale languages ] ;
-local languages = [ Glob $(languageDir) : *.language ] ;
-AddFilesToHaikuImage system data locale languages : $(languages) ;
 
 local etcFiles = bash_completion inputrc profile teapot.data ;
 etcFiles = $(etcFiles:G=etc) ;
