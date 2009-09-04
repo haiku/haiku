@@ -92,7 +92,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.98 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.99 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -1804,9 +1804,20 @@ static status_t nv_general_bios_to_powergraphics()
 	//It feels like in some screen configurations it can move the output to the other
 	//output connector as well...
 	DACW(TSTCTRL, (DACR(TSTCTRL) & 0xfffeefff));
+	/* b20 enables DAC video output on some newer cards
+	 * (confirmed video to be almost black if zero on Geforce 7300, id 0x01d1 (G72)) */
+	if ((si->ps.card_type == NV44) || (si->ps.card_type >= G70))
+		DACW(TSTCTRL, (DACR(TSTCTRL) | 0x00100000));
+
 	/* turn on DAC2 if it exists
 	 * (NOTE: testsignal function block resides in DAC1 only (!)) */
-	if (si->ps.secondary_head) DAC2W(TSTCTRL, (DAC2R(TSTCTRL) & 0xfffeefff));
+	if (si->ps.secondary_head) {
+		DAC2W(TSTCTRL, (DAC2R(TSTCTRL) & 0xfffeefff));
+		/* b20 might enable DAC video output on some newer cards
+		 * (not confirmed yet) */
+		if ((si->ps.card_type == NV44) || (si->ps.card_type >= G70))
+			DAC2W(TSTCTRL, (DAC2R(TSTCTRL) | 0x00100000));
+	}
 
 	/* NV40 and NV45 need a 'tweak' to make sure the CRTC FIFO's/shiftregisters get
 	 * their data in time (otherwise momentarily ghost images of windows or such
