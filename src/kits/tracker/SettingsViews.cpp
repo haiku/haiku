@@ -1190,9 +1190,9 @@ SpaceBarSettingsView::SetDefaults()
 
 	TrackerSettings settings;
 
-	if (settings.ShowVolumeSpaceBar()) {
-		settings.SetShowVolumeSpaceBar(false);
-		send_bool_notices(kShowVolumeSpaceBar, "ShowVolumeSpaceBar", false);
+	if (!settings.ShowVolumeSpaceBar()) {
+		settings.SetShowVolumeSpaceBar(true);
+		send_bool_notices(kShowVolumeSpaceBar, "ShowVolumeSpaceBar", true);
 	}
 
 	if (settings.UsedSpaceColor() != kDefaultUsedSpaceColor
@@ -1213,7 +1213,7 @@ SpaceBarSettingsView::IsDefaultable() const
 {
 	TrackerSettings settings;
 
-	return settings.ShowVolumeSpaceBar() != false
+	return settings.ShowVolumeSpaceBar() != true
 		|| settings.UsedSpaceColor() != kDefaultUsedSpaceColor
 		|| settings.FreeSpaceColor() != kDefaultFreeSpaceColor
 		|| settings.WarningSpaceColor() != kDefaultWarningSpaceColor;
