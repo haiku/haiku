@@ -1065,15 +1065,20 @@ Desktop::HideWindow(Window* window)
 		fMouseEventWindow = NULL;
 	}
 
+	if (fLockedFocusWindow == window) {
+		// Remove the focus lock so the focus can be changed below
+		fLockedFocusWindow = NULL;
+	}
+
 	if (window->InWorkspace(fCurrentWorkspace)) {
 		_UpdateSubsetWorkspaces(window);
 		_HideWindow(window);
 		_UpdateFronts();
-
-		if (FocusWindow() == window)
-			SetFocusWindow();
 	} else
 		_WindowChanged(window);
+
+	if (FocusWindow() == window)
+		SetFocusWindow();
 
 	_WindowRemoved(window);
 
