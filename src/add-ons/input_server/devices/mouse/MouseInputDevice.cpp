@@ -308,6 +308,9 @@ MouseDevice::_BuildShortName() const
 
 	if (name == "ps2")
 		name = "PS/2";
+
+	if (name.Length() < 4)
+		name.ToUpper();
 	else
 		name.Capitalize();
 
