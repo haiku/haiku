@@ -264,6 +264,10 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 			void				SetTransferredBytes(bool partialTransfer,
 									size_t transferredBytes);
 
+			void				SetSuppressChildNotifications(bool suppress);
+			bool				SuppressChildNotifications() const
+									{ return fSuppressChildNotifications; }
+
 			bool				IsWrite() const	{ return fIsWrite; }
 			bool				IsRead() const	{ return !fIsWrite; }
 			team_id				Team() const	{ return fTeam; }
@@ -325,6 +329,7 @@ private:
 			thread_id			fThread;
 			bool				fIsWrite;
 			bool				fPartialTransfer;
+			bool				fSuppressChildNotifications;
 
 			io_request_finished_callback	fFinishedCallback;
 			void*				fFinishedCookie;
