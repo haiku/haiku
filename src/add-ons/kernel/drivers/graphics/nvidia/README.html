@@ -41,7 +41,7 @@ Geforce 8xxx and later series cards (NV50, G80, also known as GPGPU, general pur
 	<li>B_YCbCr422 hardware overlay support on both TNT and GeForce series cards, <strong>except</strong> for GeForce 6xxx and 7xxx series (GeForce 6800 works though). Overlay output 'follows head' in dualhead stretch/switch modes;
 	<li>Dualhead support on GeForce dualhead cards (use 'Dualhead Setup' from BeBits for now);
 	<li>DVI and laptop panel support;
-	<li>Widescreen mode support (<strong>all</strong> screens must be widescreen type <strong>and</strong> they must all be digitally connected);
+	<li>Widescreen mode support (<strong>all</strong> screens must be widescreen type;
 	<li>Basic AGP mode support on AGP cards, using the new (seperate) Haiku AGP busmanager;
 	<li>Basic ('legacy') PCIe support;
 	<li>Coldstart support for analog connected screens on most cards except TNT1, GeForce 6xxx and 7xxx series;
@@ -54,20 +54,20 @@ Geforce 8xxx and later series cards (NV50, G80, also known as GPGPU, general pur
 	<li>If the driver seems to create 'random' trouble make sure you have a fully functional VGA BIOS, or system BIOS for embedded cards (check for updates on the manufacturor's site). Make sure you mail me if you still have trouble but also if this version fixed that!
 	<li>If on a laptop the internal panel doesn't work when you connect an external monitor, make sure you set 'output device selection' to 'internal' (instead of 'auto') in the system BIOS if it has such an option. If you have this symptom on a normal card, or on a laptop without that BIOS option then you are probably out of luck for dualhead support;
 	<li><strong>NV40 architecture cards:</strong> (GeForce 6xxx, but 6800 AGP seems to be OK)<br>
- 	Secondary analog monitor load detection doesn't work and we can't control very well to which connector the card's output gets routed (lack of specs). This means you might have to experiment a bit with the way you connect your monitor to the card. A single analog or DVI screen should work OK, and two analog screens should be OK as well.
+ 	We can't control very well to which connector the card's output gets routed (lack of specs). This means you might have to experiment a bit with the way you connect your monitor to the card.
 </ul>
 <br>
 <hr>
 <h2>Installation:</h2>
-If you encounter bugs, please checkout the driver's <a href="http://web.inter.nl.net/users/be-hold/BeOS/NVdriver/index.html">website</a> to see if it's already on the todo list. You can also checkout the <a href="UPDATE.html">UPDATE</a> file included with this driver to see if it should have been fixed. If you think it's prudent, or if you are unsure, then please fill out the <a href="http://web.inter.nl.net/users/be-hold/BeOS/NVdriver/bugreport.html">bugreport form</a> on the site or send me an <a href="mailto:info.be-hold@inter.nl.net">Email</a>. Make sure you are as precise as possible because that will make things easier to trackdown and fix...<br>
+If you encounter bugs, please see if a matching bug report already exists at <a href="http://dev.haiku-os.org">the Haiku website</a>. If not, or if you are unsure, file a new one. Make sure you are as precise as possible because that will make things easier to trackdown and fix...<br>
 <br>
 <br>
 OK, now that's all said let's get to it ;-)<br>
 <br>
-In contrary to what I have said before you don't need to de-install official Be drivers for this driver to work correctly. This driver will install in the user part of the BeOS, so not in the system part where the official drivers are.<br>
-BeOS first checks (during boot) if there are 'user-addons' that should be loaded for a device. If not, it loads it's own drivers (if any). You can select which driver should be loaded by hitting the spacebar as soon as the BeOS 'icons' screen appears. If you select <strong>disable user addons</strong> the system will load it's own drivers. If you don't do anything, the system will load the Haiku Nvidia TNT/GeForce graphics driver.<br>
+You don't need to de-install official drivers for this driver to work correctly. This driver will install in the user part of Haiku, so not in the system part where the official drivers are.<br>
+Haiku first checks (during boot) if there are 'user-addons' that should be loaded for a device. If not, it loads it's own drivers (if any). You can select which driver should be loaded by hitting the spacebar just before the Haiku 'icons' splash screen appears. If you select <strong>disable user addons</strong> the system will load it's own drivers. If you don't do anything, the system will load the Haiku Nvidia TNT/GeForce graphics driver.<br>
 <br>
-<strong>Note:</strong> This might turn out to be handy if you run into trouble upon testing the driver, or if you are 'tweaking' the nv.settings file...<br>
+<strong>Note:</strong> This might turn out to be handy if you run into trouble upon testing the driver, or if you are 'tweaking' the nvidia.settings file...<br>
 <br><br>
 <strong>actual INSTALLATION:</strong><br>
 <br>
@@ -83,10 +83,10 @@ Unzip the zip file that contains the driver to the root folder. Now reboot and y
 <br>
 Currently there's no uninstall script included. Just do it manually:<br>
 <br>
-Delete the <strong>nv.accelerant</strong> file in <strong>home/config/add-ons/accelerants/</strong><br>
-Delete the <strong>nv.driver</strong> file in <strong>home/config/add-ons/kernel/drivers/bin/</strong><br>
-Delete the <strong>nv.settings</strong> file in <strong>home/config/settings/kernel/drivers/</strong><br>
-Delete the <strong>nv.driver shortcut</strong> in <strong>home/config/add-ons/kernel/drivers/dev/graphics/</strong> which pointed to the file <strong>nv.driver</strong>.<br>
+Delete the <strong>nvidia.accelerant</strong> file in <strong>home/config/add-ons/accelerants/</strong><br>
+Delete the <strong>nvidia.driver</strong> file in <strong>home/config/add-ons/kernel/drivers/bin/</strong><br>
+Delete the <strong>nvidia.settings</strong> file in <strong>home/config/settings/kernel/drivers/</strong><br>
+Delete the <strong>nvidia.driver shortcut</strong> in <strong>home/config/add-ons/kernel/drivers/dev/graphics/</strong> which pointed to the file <strong>nvidia.driver</strong>.<br>
 <br>
 You have to reboot in order to apply the original configuration.<br>
 <br>
@@ -254,6 +254,6 @@ The acceleration engine is disabled.
 <hr>
 <br>
 Rudolf Cornelissen.<br>
-<p>(Page last updated on August 23, 2009)</p>
+<p>(Page last updated on September 5, 2009)</p>
 </body>
 </html>

@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-8/2009
+   Rudolf Cornelissen 10/2002-9/2009
    tst..
 */
 
@@ -92,7 +92,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.99 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 1.00 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -1788,13 +1788,6 @@ static status_t nv_general_bios_to_powergraphics()
 	/* enable palettes */
 	DACW(GENCTRL, 0x00100100);
 	if (si->ps.secondary_head) DAC2W(GENCTRL, 0x00100100);
-
-	/* enable programmable PLLs */
-	/* (confirmed PLLSEL to be a write-only register on NV04 and NV11!) */
-	if (si->ps.secondary_head)
-		DACW(PLLSEL, 0x30000f00);
-	else
-		DACW(PLLSEL, 0x10000700);
 
 	/* turn on DAC and make sure detection testsignal routing is disabled
 	 * (b16 = disable DAC,
