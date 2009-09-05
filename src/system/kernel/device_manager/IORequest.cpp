@@ -653,7 +653,8 @@ IORequest::Init(off_t offset, size_t firstVecOffset, const iovec* vecs,
 	fTeam = thread->team->id;
 	fThread = thread->id;
 	fIsWrite = write;
-	fPartialTransfer = 0;
+	fPartialTransfer = false;
+	fSuppressChildNotifications = false;
 
 	// these are for iteration
 	fVecIndex = 0;
@@ -935,7 +936,7 @@ IORequest::SubRequestFinished(IORequest* request, status_t status,
 	if (status != B_OK && fStatus == 1)
 		fStatus = status;
 
-	if (--fPendingChildren > 0)
+	if (--fPendingChildren > 0 || fSuppressChildNotifications)
 		return;
 
 	// last child finished
@@ -968,6 +969,13 @@ IORequest::SetTransferredBytes(bool partialTransfer, size_t transferredBytes)
 
 	fPartialTransfer = partialTransfer;
 	fTransferSize = transferredBytes;
+}
+
+
+void
+IORequest::SetSuppressChildNotifications(bool suppress)
+{
+	fSuppressChildNotifications = suppress;
 }
 
 
