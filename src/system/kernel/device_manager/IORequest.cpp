@@ -736,6 +736,7 @@ IORequest::DeleteSubRequests()
 {
 	while (IORequestChunk* chunk = fChildren.RemoveHead())
 		delete chunk;
+	fPendingChildren = 0;
 }
 
 
