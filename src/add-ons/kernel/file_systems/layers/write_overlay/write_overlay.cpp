@@ -569,6 +569,8 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 				if (result != B_OK)
 					return result;
 
+				bool wereSuppressed = ioRequest->SuppressChildNotifications();
+				ioRequest->SetSuppressChildNotifications(true);
 				result = fSuperVnode.ops->io(SuperVolume(), &fSuperVnode,
 					superCookie, subRequest);
 				if (result != B_OK)
@@ -576,6 +578,7 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 
 				result = subRequest->Wait(0, 0);
 				readLength = subRequest->TransferredBytes();
+				ioRequest->SetSuppressChildNotifications(wereSuppressed);
 			} else {
 				result = fSuperVnode.ops->read(SuperVolume(), &fSuperVnode,
 					superCookie, position, pointer, &readLength);
@@ -614,8 +617,8 @@ OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 			const void *source = element->buffer + (position
 				- element->position);
 			if (ioRequest != NULL) {
-				ioRequest->CopyData(source, (addr_t)pointer - (addr_t)buffer,
-					copyLength);
+				ioRequest->CopyData(source, ioRequest->Offset()
+					+ ((addr_t)pointer - (addr_t)buffer), copyLength);
 			} else
 				memcpy(pointer, source, copyLength);
 
@@ -676,7 +679,7 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 				// other chunk completely covers us, just copy
 				void *target = other->buffer + (newPosition - other->position);
 				if (ioRequest != NULL)
-					ioRequest->CopyData(0, target, length);
+					ioRequest->CopyData(ioRequest->Offset(), target, length);
 				else
 					memcpy(target, buffer, length);
 
