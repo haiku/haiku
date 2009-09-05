@@ -46,19 +46,23 @@ width="64" height="64" />DriveSetup</h1>
 <p><br/></p>
 <p>DriveSetup is a tool to create, delete and initialize partitions. At this time it can't resize or move existing partitions, so that you'll either need an unpartitioned volume (perhaps an external USB drive or another harddisk) or do the initial setup with a tool like the <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> to provide the space for another partition.</p>
 <img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
-<p>At the top is a graphical representation of all partitions inside the device chosen in the list below it. Besides a maximum of 4 primary partitions, each of those can contain a number of extended/logical partitions. You may have to expand such a list with the +/- widget that appears in that case in front of the device to see the details of every logical partition.</p>
+<p>At the top is a graphical representation of all partitions inside the device chosen in the list below it. Besides a maximum of 4 primary partitions, each of those can contain a number of extended/logical partitions. You may have to expand such a list with the +/- widget that appears in that case in front of that device to see the details of every logical partition.</p>
 <p>You can select a partition from the list and mount and unmount them with the commands in the <span class="menu">Partition</span> menu or by pressing <span class="key">ALT</span>&#160;<span class="key">M</span> or <span class="key">ALT</span>&#160;<span class="key">U</span>.</p>
 <p>You can also completely delete a partition with <span class="menu">Partition|Delete</span>.<br />
 Which brings us to this:</p>
-<div class="box-stop">Dealing with creating, deleting or initializing partitions is very dangerous business. Always check twice to be sure you're working with the right one and always keep an up-to-date backup of your data in case something goes wrong!</div>
+<div class="box-stop">Dealing with creating/deleting/initializing partitions is very dangerous business. Always check twice to be sure you're working with the right one and always keep an up-to-date backup of your data in case something goes wrong!</div>
 <h1>
-<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>Creating a new partition</h1>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="creating" name="creating">Creating a new partition</a></h1>
+<div class="box-info">If you plan to use the entire drive as one partition, e.g. a USB stick or a Compact Flash card, you can skip the creation of a partition and proceed right to <a href="#initializing">Initializing</a>.</div>
 <p>When you found unformatted space on a drive, like the above <tt>&lt;empty&gt;</tt>, you can create a new partition in this space with <span class="menu">Partition|Create...</span>(<span class="key">ALT</span>&#160;<span class="key">C</span>).</p>
 <img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
 <p>You're prompted with this dialog that lets you adjust the partition size and type. Choose <span class="menu">Be File System</span> if you want to use the partition for an Haiku installation or if you want to use all the interesting Haiku features with it, like attributes and queries. Note, that other operating systems might not be able to access such a partition.</p>
+<p>If you have created a primary partition instead of just another extended/logical partition within one, the above dialog also displays an <span class="menu">Active Partition</span> checkbox. You'll have to check that, if you'll use that partition to boot a Haiku installation.</p>
 <p>Before you can use, or even mount the newly created partition, it has to be initialized with a filesystem.</p>
 <h1>
-<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>Initializing a partition</h1>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="initializing" name="initializing">Initializing a partition</a></h1>
 <p>Only unmounted partitions can be initialized by using the <span class="menu">Partition|Initialize</span> menu.</p>
 <img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
 <p>Here you set the name for the partition and it's blocksize. 2048 bytes per block are recommended, but you can choose larger or smaller sizes if you have these very specific needs.</p>
