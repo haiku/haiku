@@ -1,6 +1,6 @@
 /* program the secondary DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003-7/2009
+   Rudolf Cornelissen 12/2003-9/2009
 */
 
 #define MODULE_BIT 0x00001000
@@ -203,6 +203,20 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 
 	/* Give the PIXPLL frequency some time to lock... (there's no indication bit available) */
 	snooze(1000);
+
+	/* enable programmable PLLs */
+	/* (confirmed PLLSEL to be a write-only register on NV04 and NV11!) */
+	/* note:
+	 * setup PLL assignment _after_ programming PLL */
+	if (si->ps.secondary_head) {
+		if (si->ps.card_arch < NV40A)
+			DACW(PLLSEL, 0x30000f00);
+		else
+			DACW(PLLSEL, 0x30000f04);
+	} else {
+		DACW(PLLSEL, 0x10000700);
+	}
+
 	LOG(2,("DAC2: PIX PLL frequency should be locked now...\n"));
 
 	return B_OK;

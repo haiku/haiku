@@ -4,7 +4,7 @@
 # dependencies.
 
 OptionalPackageDependencies Subversion : APR-util Neon LibIconv LibXML2 OpenSSL SQLite ;
-OptionalPackageDependencies APR-util : APR ;
+OptionalPackageDependencies APR-util : APR Expat ;
 OptionalPackageDependencies BeHappy : BeBook NetSurf ;
 OptionalPackageDependencies Development : DevelopmentBase Perl ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;

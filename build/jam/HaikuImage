@@ -29,9 +29,9 @@ if $(HAIKU_ATA_STACK) = 1 {
 
 SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	cal cat catattr checkfs chgrp chmod chop chown chroot cksum clear
-	clockconfig cmp collectcatkeys comm compress copyattr CortexAddOnHost cp
+	clockconfig cmp comm compress copyattr CortexAddOnHost cp
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
-	draggers driveinfo dstcheck du dumpcatalog
+	draggers driveinfo dstcheck du
 	echo eject env error expand expr
 	factor false fdinfo ffm filepanel find finddir fmt fold fortune frcode
 	ftp ftpd funzip
@@ -40,7 +40,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	id ident ideinfo idestatus ifconfig <bin>install installsound iroster
 	isvolume
 	join
-	keymap kill less lessecho lesskey link linkcatkeys listarea listattr
+	keymap kill less lessecho lesskey link listarea listattr
 	listimage listdev
 	listport listres listsem listusb ln locate logger login logname ls lsindex
 	makebootable md5sum merge message mimeset mkdos mkdir mkfifo mkfs mkindex
@@ -136,7 +136,7 @@ SYSTEM_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR Parallel\ Port
 	Print\ To\ File Serial\ Port USB\ Port
 ;
 SYSTEM_ADD_ONS_SCREENSAVERS = DebugNow Flurry Haiku IFS Spider Message ;
-SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ;
+SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ;	#humdinger: removed 'hda'
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia sis7018 usb_audio ;
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 	$(X86_ONLY)neomagic $(X86_ONLY)matrox $(X86_ONLY)intel_extreme
@@ -359,11 +359,6 @@ SEARCH on $(spellFiles)
 	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
 AddFilesToHaikuImage system etc word_dictionary : $(spellFiles) ;
 
-# Locale kit language files
-local languageDir = [ FDirName $(HAIKU_TOP) src data etc locale languages ] ;
-local languages = [ Glob $(languageDir) : *.language ] ;
-AddFilesToHaikuImage system data locale languages : $(languages) ;
-
 local etcFiles = bash_completion inputrc profile teapot.data ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
@@ -474,7 +469,7 @@ AddFilesToHaikuImage system add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToHaikuImage system add-ons media plugins
 	: $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
 AddFilesToHaikuImage system add-ons Tracker
-	: FileType-F Mark\ as\ New-N Mark\ as\ Read-R Open\ Target\ Folder-T OpenTerminal-T ZipOMatic-Z ;
+	: FileType-F Mark\ as\ New-N Mark\ as\ Read-R Open\ Target\ Folder-O OpenTerminal-T ZipOMatic-Z ;
 AddSymlinkToHaikuImage system add-ons Tracker
 	: /boot/system/preferences/Backgrounds : Background-B ;
 AddSymlinkToHaikuImage system add-ons Tracker
