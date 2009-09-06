@@ -19,3 +19,5 @@ mimeset -apps -f "$SYSTEM/preferences"
 mimeset -apps -f "$SYSTEM/servers"
 mimeset -apps -f "/boot/apps"
 
+query -f 'BEOS:APP_SIG=*' | xargs --no-run-if-empty mimeset -apps -f 
+
