@@ -168,13 +168,23 @@ status_t nv_dac_set_pix_pll(display_mode target)
 
 	/* signal that we actually want to set the mode */
 	result = nv_dac_pix_pll_find(target,&pix_setting,&m,&n,&p, 1);
-	if (result != B_OK)
-	{
-		return result;
-	}
+	if (result != B_OK) return result;
 
 	/* dump old setup for learning purposes */
 	nv_dac_dump_pix_pll();
+
+	/* some logging for learning purposes */
+	LOG(4,("DAC: current NV30_PLLSETUP settings: $%08x\n", DACR(NV30_PLLSETUP)));
+	/* this register seems to (dis)connect functions blocks and PLLs:
+	 * there seem to be two PLL types per function block (on some cards),
+	 * b16-17 DAC1clk, b18-19 DAC2clk, b20-21 GPUclk, b22-23 MEMclk. */
+	LOG(4,("DAC: current (0x0000c040) settings: $%08x\n", NV_REG32(0x0000c040)));
+
+	/* disable spread spectrum modes for the pixelPLLs _first_ */
+	/* spread spectrum: b0,1 = GPUclk, b2,3 = MEMclk, b4,5 = DAC1clk, b6,7 = DAC2clk;
+	 * b16-19 influence clock routing to digital outputs (internal/external LVDS transmitters?) */
+	if (si->ps.card_arch >= NV30A)
+		DACW(NV30_PLLSETUP, (DACR(NV30_PLLSETUP) & ~0x000000f0));
 
 	/* we offer this option because some panels have very tight restrictions,
 	 * and there's no overlapping settings range that makes them all work.

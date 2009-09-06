@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (SVN 1.01, Rudolf)</h1></p>
+<p><h1>head (SVN 1.03, Rudolf)</h1></p>
 <ul>
 <li>Fixed driver assuming enabling AGP mode succeeded on some occasions if it did not block it itself. Blocking AGP mode completely via the AGP busmanager (option 'block_agp') resulted in a crashing acceleration engine because it was setup for AGP transfers instead of using PCI transfers. Error was solved with help from user kraton.
 <li>Fixed shared_info struct problem occuring when 3D 'accelerant' is used (tested Alpha 4.1): the TVencoder type definition list apparantly gets some memory assigned these days when done inside the definition of shared_info. Moved encoder list outside the shared_info definition.
@@ -26,7 +26,8 @@
 <li>DDC/EDID fetching now also works on GCC4 binaries due to a fixed fault in the accelerants/common code (which is used for that function);
 <li>Added support for Haiku specific driverhook GET_PREFERRED_DISPLAY_MODE. Laptops should now also startup in native mode automatically at first system boot;
 <li>Rewrote framebuffer memory detection. Accelerant now only uses the amount of RAM mapped by the kerneldriver as maximum. This fixes black screen at app_server startup on a number of GF6xxx and GF7xxx cards;
-<li>Finally(!) fixed PLL selection trouble on NV40 architecture (Geforce 6xxx and 7xxx) cards. Now dualhead should (almost) always work OK, and now low-res bootscreens should nolonger result in 'frequency out of range' messages on DVI connected screens.
+<li>Finally(!) fixed PLL selection trouble on NV40 architecture (Geforce 6xxx and 7xxx) cards. Now dualhead should (almost) always work OK, and now low-res bootscreens should nolonger result in 'frequency out of range' messages on DVI connected screens;
+<li>Fixed shivering display on some systems (confirmed a Geforce 5200 laptop): Pixelclocks should <strong>never</strong> be setup for spread spectrum on analog connections.
 </ul>
 <p><h1>nv_driver 0.80 (Rudolf)</h1></p>
 <ul>
