@@ -205,11 +205,24 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 					
 					case B_ENTRY_MOVED:
 					{
-						// We may have renamed our entry. Update the title
-						// just in case.
+						// We may have renamed our entry. Obtain relevant data
+						// from message.
 						BString name;
-						if (msg->FindString("name", &name) == B_OK)
-							SetTitle(name);
+						msg->FindString("name", &name);
+
+						int64 directory;
+						msg->FindInt64("to directory", &directory);
+						
+						int32 device;
+						msg->FindInt32("device", &device);
+						
+						// Update our ref.
+						delete fRef;
+						fRef = new entry_ref(device, directory, name.String()); 
+						
+						
+						// And our window title.
+						SetTitle(name);
 						break;
 					}
 					
