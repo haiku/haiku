@@ -210,8 +210,8 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 						BString name;
 						if (msg->FindString("name", &name) == B_OK)
 							SetTitle(name);
+						break;
 					}
-					break;
 					
 					case B_ATTR_CHANGED:
 					{
@@ -224,15 +224,12 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 								}
 							}
 						}
-					}
-					break;
-							
-					default:
-						msg->PrintToStream();
+						break;
+					}							
 				}
 			}
+			break;
 		}
-		break;
 
 		default:
 			BWindow::MessageReceived(msg);
