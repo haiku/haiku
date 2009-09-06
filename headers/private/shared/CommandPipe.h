@@ -63,6 +63,7 @@ public:
 
 			class LineReader {
 			public:
+				virtual				~LineReader() {}
 				virtual	bool		IsCanceled() = 0;
 				virtual	status_t	ReadLine(const BString& line) = 0;
 				// TODO: Add a Timeout() method.
