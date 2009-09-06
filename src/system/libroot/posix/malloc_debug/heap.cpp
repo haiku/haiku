@@ -1752,3 +1752,24 @@ calloc(size_t numElements, size_t size)
 
 	return address;
 }
+
+
+extern "C" void *
+valloc(size_t size)
+{
+	return memalign(B_PAGE_SIZE, size);
+}
+
+
+extern "C" int
+posix_memalign(void **pointer, size_t alignment, size_t size)
+{
+	if (!is_valid_alignment(alignment))
+		return EINVAL;
+
+	*pointer = memalign(alignment, size);
+	if (*pointer == NULL)
+		return ENOMEM;
+
+	return 0;
+}
