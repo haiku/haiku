@@ -5,28 +5,19 @@
 
 #include "ProgressReporter.h"
 
-#include <new>
-
-#include <math.h>
 #include <stdio.h>
-#include <string.h>
-
-
-using std::nothrow;
 
 
 ProgressReporter::ProgressReporter(const BMessenger& messenger,
 		BMessage* message)
 	:
-	fBytesRead(0),
-	fItemsCopied(0),
-	fTimeRead(0),
+	fStartTime(0),
 
+	fBytesToWrite(0),
 	fBytesWritten(0),
-	fTimeWritten(0),
 
-	fBytesToCopy(0),
-	fItemsToCopy(0),
+	fItemsToWrite(0),
+	fItemsWritten(0),
 
 	fMessenger(messenger),
 	fMessage(message)
@@ -43,15 +34,11 @@ ProgressReporter::~ProgressReporter()
 void
 ProgressReporter::Reset()
 {
-	fBytesRead = 0;
-	fItemsCopied = 0;
-	fTimeRead = 0;
-
+	fBytesToWrite = 0;
 	fBytesWritten = 0;
-	fTimeWritten = 0;
 
-	fBytesToCopy = 0;
-	fItemsToCopy = 0;
+	fItemsToWrite = 0;
+	fItemsWritten = 0;
 
 	if (fMessage) {
 		BMessage message(*fMessage);
@@ -64,22 +51,35 @@ ProgressReporter::Reset()
 void
 ProgressReporter::AddItems(uint64 count, off_t bytes)
 {
-	// TODO ...
+	fBytesToWrite += bytes;
+	fItemsToWrite += count;
 }
 
 
 void
 ProgressReporter::StartTimer()
 {
-	// TODO ...
+	fStartTime = system_time();
+
+	printf("%lld bytes to write in %lld files\n", fBytesToWrite,
+		fItemsToWrite);
+
+	if (fMessage) {
+		BMessage message(*fMessage);
+		message.AddString("status", "Performing installation.");
+		fMessenger.SendMessage(&message);
+	}
 }
 
 
 void
-ProgressReporter::ItemsCopied(uint64 items, off_t bytes, const char* itemName,
-	const char* targetFolder)
+ProgressReporter::ItemsWritten(uint64 items, off_t bytes,
+	const char* itemName, const char* targetFolder)
 {
-	// TODO ...
+	fItemsWritten += items;
+	fBytesWritten += bytes;
+
+	_UpdateProgress(itemName, targetFolder);
 }
 
 
@@ -87,14 +87,17 @@ void
 ProgressReporter::_UpdateProgress(const char* itemName,
 	const char* targetFolder)
 {
-	if (fMessage != NULL) {
-		BMessage message(*fMessage);
-		float progress = 100.0 * fBytesRead / fBytesToCopy;
-		message.AddFloat("progress", progress);
-		message.AddInt32("current", fItemsCopied);
-		message.AddInt32("maximum", fItemsToCopy);
-		message.AddString("item", itemName);
-		message.AddString("folder", targetFolder);
-		fMessenger.SendMessage(&message);
-	}
+	if (fMessage == NULL)
+		return;
+
+	// TODO: Could add time to finish calculation here...
+
+	BMessage message(*fMessage);
+	float progress = 100.0 * fBytesWritten / fBytesToWrite;
+	message.AddFloat("progress", progress);
+	message.AddInt32("current", fItemsWritten);
+	message.AddInt32("maximum", fItemsToWrite);
+	message.AddString("item", itemName);
+	message.AddString("folder", targetFolder);
+	fMessenger.SendMessage(&message);
 }

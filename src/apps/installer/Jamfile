@@ -9,6 +9,7 @@ Application Installer :
 	InstallerWindow.cpp
 	PackageViews.cpp
 	PartitionMenuItem.cpp
+	ProgressReporter.cpp
 	UnzipEngine.cpp
 	WorkerThread.cpp
 	: be tracker translation libshared.a $(TARGET_LIBSTDC++)

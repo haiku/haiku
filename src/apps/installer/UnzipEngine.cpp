@@ -21,12 +21,13 @@
 
 #include "CommandPipe.h"
 #include "SemaphoreLocker.h"
+#include "ProgressReporter.h"
 
 
 using std::nothrow;
 
 
-UnzipEngine::UnzipEngine(const BMessenger& messenger, BMessage* message,
+UnzipEngine::UnzipEngine(ProgressReporter* reporter,
 		sem_id cancelSemaphore)
 	:
 	fPackage(""),
@@ -34,11 +35,12 @@ UnzipEngine::UnzipEngine(const BMessenger& messenger, BMessage* message,
 
 	fBytesToUncompress(0),
 	fBytesUncompressed(0),
+	fLastBytesUncompressed(0),
 	fItemsToUncompress(0),
 	fItemsUncompressed(0),
+	fLastItemsUncompressed(0),
 
-	fMessenger(messenger),
-	fMessage(message),
+	fProgressReporter(reporter),
 	fCancelSemaphore(cancelSemaphore)
 {
 }
@@ -46,7 +48,6 @@ UnzipEngine::UnzipEngine(const BMessenger& messenger, BMessage* message,
 
 UnzipEngine::~UnzipEngine()
 {
-	delete fMessage;
 }
 
 
@@ -60,8 +61,10 @@ UnzipEngine::SetTo(const char* pathToPackage, const char* destinationFolder)
 
 	fBytesToUncompress = 0;
 	fBytesUncompressed = 0;
+	fLastBytesUncompressed = 0;
 	fItemsToUncompress = 0;
 	fItemsUncompressed = 0;
+	fLastItemsUncompressed = 0;
 
 	BPrivate::BCommandPipe commandPipe;
 	status_t ret = commandPipe.AddArg("unzip");
@@ -94,12 +97,6 @@ UnzipEngine::UnzipPackage()
 {
 	if (fItemsToUncompress == 0)
 		return B_NO_INIT;
-
-	if (fMessage) {
-		BMessage message(*fMessage);
-		message.AddString("status", "Extracting package.");
-		fMessenger.SendMessage(&message);
-	}
 
 	BPrivate::BCommandPipe commandPipe;
 	status_t ret = commandPipe.AddArg("unzip");
@@ -155,19 +152,6 @@ UnzipEngine::ReadLine(const BString& line)
 status_t
 UnzipEngine::_ReadLineListing(const BString& line)
 {
-//	static const char* kListingFormat = "%llu files, %llu bytes uncompressed, "
-//		"%llu bytes compressed: %f%%";
-//
-//	uint64 bytesCompressed;
-//	float compresssionRatio;
-//	if (sscanf(line.String(), kListingFormat, &fItemsToUncompress,
-//		&fBytesToUncompress, &bytesCompressed, &compresssionRatio) != 4) {
-//		fBytesToUncompress = 0;
-//		fItemsToUncompress = 0;
-//		fprintf(stderr, "error reading command output: %s\n", line.String());
-//		return B_ERROR;
-//	}
-
 	static const char* kListingFormat = "%llu  %s %s   %s\n";
 
 	const char* string = line.String();
@@ -197,7 +181,7 @@ UnzipEngine::_ReadLineListing(const BString& line)
 			if (destination.Append(itemPath.String()) == B_OK) {
 				BEntry test(destination.Path());
 				if (test.Exists() && test.IsDirectory()) {
-					printf("ignoring %s\n", itemPath.String());
+//					printf("ignoring %s\n", itemPath.String());
 					itemCount = 0;
 				}
 			}
@@ -205,8 +189,8 @@ UnzipEngine::_ReadLineListing(const BString& line)
 
 		fItemsToUncompress += itemCount;
 
-		printf("item %s with %llu bytes to %s\n", itemName.String(),
-			bytes, itemPath.String());
+//		printf("item %s with %llu bytes to %s\n", itemName.String(),
+//			bytes, itemPath.String());
 
 		fEntrySizeMap.Put(itemName.String(), bytes);
 	} else {
@@ -243,8 +227,8 @@ UnzipEngine::_ReadLineExtract(const BString& line)
 			fBytesUncompressed += bytes;
 		}
 
-		printf("%llu extracted %s to %s (%llu)\n", fItemsUncompressed,
-			itemName.String(), itemPath.String(), bytes);
+//		printf("%llu extracted %s to %s (%llu)\n", fItemsUncompressed,
+//			itemName.String(), itemPath.String(), bytes);
 
 		_UpdateProgress(itemName.String(), itemPath.String());
 	} else {
@@ -258,14 +242,20 @@ UnzipEngine::_ReadLineExtract(const BString& line)
 void
 UnzipEngine::_UpdateProgress(const char* item, const char* targetFolder)
 {
-	if (fMessage != NULL) {
-		BMessage message(*fMessage);
-		float progress = 100.0 * fBytesUncompressed / fBytesToUncompress;
-		message.AddFloat("progress", progress);
-		message.AddInt32("current", fItemsUncompressed);
-		message.AddInt32("maximum", fItemsToUncompress);
-		message.AddString("item", item);
-		message.AddString("folder", targetFolder);
-		fMessenger.SendMessage(&message);
+	if (fProgressReporter == NULL)
+		return;
+
+	uint64 items = 0;
+	if (fLastItemsUncompressed < fItemsUncompressed) {
+		items = fItemsUncompressed - fLastItemsUncompressed;
+		fLastItemsUncompressed = fItemsUncompressed;
 	}
+
+	off_t bytes = 0;
+	if (fLastBytesUncompressed < fBytesUncompressed) {
+		bytes = fBytesUncompressed - fLastBytesUncompressed;
+		fLastBytesUncompressed = fBytesUncompressed;
+	}
+
+	fProgressReporter->ItemsWritten(items, bytes, item, targetFolder);
 }

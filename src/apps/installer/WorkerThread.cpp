@@ -27,6 +27,7 @@
 #include "InstallerWindow.h"
 #include "PackageViews.h"
 #include "PartitionMenuItem.h"
+#include "ProgressReporter.h"
 #include "UnzipEngine.h"
 
 
@@ -251,7 +252,9 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	entry_ref testRef;
 
 	BMessenger messenger(fWindow);
-	CopyEngine engine(messenger, new BMessage(MSG_STATUS_MESSAGE));
+	ProgressReporter reporter(messenger, new BMessage(MSG_STATUS_MESSAGE));
+	CopyEngine engine(&reporter);
+	BList unzipEngines;
 
 	PartitionMenuItem* targetItem = (PartitionMenuItem*)targetMenu->FindMarked();
 	PartitionMenuItem* srcItem = (PartitionMenuItem*)srcMenu->FindMarked();
@@ -397,6 +400,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 		goto error;
 	}
 
+	// Begin actuall installation
 
 	_LaunchInitScript(targetDirectory);
 
@@ -419,6 +423,14 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 		}
 	}
 
+	// collect information about all zip packages
+	err = _ProcessZipPackages(srcDirectory.Path(), targetDirectory.Path(),
+		&reporter, unzipEngines);
+	if (err != B_OK)
+		goto error;
+
+	reporter.StartTimer();
+
 	// copy source volume
 	err = engine.CopyFolder(srcDirectory.Path(), targetDirectory.Path(),
 		fCancelSemaphore);
@@ -439,37 +451,17 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 		}
 	}
 
-#if 0
-	// extract zip packages
-	// TODO: Put those in the optional packages list view
-	// TODO: Implement mechanism to handle dependencies between these
-	// packages. (Selecting one will auto-select others.)
-	{
-		BPath pkgRootDir(srcDirectory.Path(), PACKAGES_DIRECTORY);
-		BDirectory directory(pkgRootDir.Path());
-		BEntry entry;
-		while (directory.GetNextEntry(&entry) == B_OK) {
-			char name[B_FILE_NAME_LENGTH];
-			if (entry.GetName(name) != B_OK)
-				continue;
-			int nameLength = strlen(name);
-			if (nameLength <= 0)
-				continue;
-			char* nameExtension = name + nameLength - 4;
-printf("inspecting %s (%s)\n", name, nameExtension);
-			if (strcasecmp(nameExtension, ".zip") != 0)
-				continue;
-			printf("found .zip package: %s\n", name);
-
-			UnzipEngine unzipEngine(messenger, new BMessage(MSG_STATUS_MESSAGE),
-				fCancelSemaphore);
-			BPath path;
-			entry.GetPath(&path);
-			unzipEngine.SetTo(path.Path(), targetDirectory.Path());
-			unzipEngine.UnzipPackage();
-		}
+	// Extract all zip packages. If an error occured, delete the rest of
+	// the engines, but stop extracting.
+	for (int32 i = 0; i < unzipEngines.CountItems(); i++) {
+		UnzipEngine* engine = reinterpret_cast<UnzipEngine*>(
+			unzipEngines.ItemAtFast(i));
+		if (err == B_OK)
+			err = engine->UnzipPackage();
+		delete engine;
 	}
-#endif
+	if (err != B_OK)
+		goto error;
 
 	_LaunchFinishScript(targetDirectory);
 
@@ -484,6 +476,48 @@ error:
 		statusMessage.AddInt32("error", err);
 	ERR("_PerformInstall failed");
 	BMessenger(fWindow).SendMessage(&statusMessage);
+}
+
+
+status_t
+WorkerThread::_ProcessZipPackages(const char* sourcePath,
+	const char* targetPath, ProgressReporter* reporter, BList& unzipEngines)
+{
+	// TODO: Put those in the optional packages list view
+	// TODO: Implement mechanism to handle dependencies between these
+	// packages. (Selecting one will auto-select others.)
+	BPath pkgRootDir(sourcePath, PACKAGES_DIRECTORY);
+	BDirectory directory(pkgRootDir.Path());
+	BEntry entry;
+	while (directory.GetNextEntry(&entry) == B_OK) {
+		char name[B_FILE_NAME_LENGTH];
+		if (entry.GetName(name) != B_OK)
+			continue;
+		int nameLength = strlen(name);
+		if (nameLength <= 0)
+			continue;
+		char* nameExtension = name + nameLength - 4;
+		if (strcasecmp(nameExtension, ".zip") != 0)
+			continue;
+		printf("found .zip package: %s\n", name);
+
+		UnzipEngine* unzipEngine = new(std::nothrow) UnzipEngine(reporter,
+			fCancelSemaphore);
+		if (unzipEngine == NULL || !unzipEngines.AddItem(unzipEngine)) {
+			delete unzipEngine;
+			return B_NO_MEMORY;
+		}
+		BPath path;
+		entry.GetPath(&path);
+		status_t ret = unzipEngine->SetTo(path.Path(), targetPath);
+		if (ret != B_OK)
+			return ret;
+
+		reporter->AddItems(unzipEngine->ItemsToUncompress(),
+			unzipEngine->BytesToUncompress());
+	}
+
+	return B_OK;
 }
 
 

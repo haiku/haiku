@@ -22,19 +22,22 @@
 #include "InstallerWindow.h"
 	// TODO: For PACKAGES_DIRECTORY and VAR_DIRECTORY, not so nice...
 #include "SemaphoreLocker.h"
+#include "ProgressReporter.h"
 
 
 using std::nothrow;
 
 
-CopyEngine::CopyEngine(const BMessenger& messenger, BMessage* message)
+CopyEngine::CopyEngine(ProgressReporter* reporter)
 	:
 	fBufferQueue(),
 	fWriterThread(-1),
 	fQuitting(false),
 
 	fBytesRead(0),
+	fLastBytesRead(0),
 	fItemsCopied(0),
+	fLastItemsCopied(0),
 	fTimeRead(0),
 
 	fBytesWritten(0),
@@ -46,8 +49,7 @@ CopyEngine::CopyEngine(const BMessenger& messenger, BMessage* message)
 	fCurrentTargetFolder(NULL),
 	fCurrentItem(NULL),
 
-	fMessenger(messenger),
-	fMessage(message)
+	fProgressReporter(reporter)
 {
 	fWriterThread = spawn_thread(_WriteThreadEntry, "buffer writer",
 		B_NORMAL_PRIORITY, this);
@@ -73,16 +75,19 @@ CopyEngine::~CopyEngine()
 		int32 exitValue;
 		wait_for_thread(fWriterThread, &exitValue);
 	}
-
-	delete fMessage;
 }
 
 
 void
 CopyEngine::ResetTargets()
 {
+	// TODO: One could subtract the bytes/items which were added to the
+	// ProgressReporter before resetting them...
+
 	fBytesRead = 0;
+	fLastBytesRead = 0;
 	fItemsCopied = 0;
+	fLastItemsCopied = 0;
 	fTimeRead = 0;
 
 	fBytesWritten = 0;
@@ -93,12 +98,6 @@ CopyEngine::ResetTargets()
 
 	fCurrentTargetFolder = NULL;
 	fCurrentItem = NULL;
-
-	if (fMessage) {
-		BMessage message(*fMessage);
-		message.AddString("status", "Collecting copy information.");
-		fMessenger.SendMessage(&message);
-	}
 }
 
 
@@ -106,7 +105,10 @@ status_t
 CopyEngine::CollectTargets(const char* source, sem_id cancelSemaphore)
 {
 	int32 level = 0;
-	return _CollectCopyInfo(source, level, cancelSemaphore);
+	status_t ret = _CollectCopyInfo(source, level, cancelSemaphore);
+	if (ret == B_OK && fProgressReporter != NULL)
+		fProgressReporter->AddItems(fItemsToCopy, fBytesToCopy);
+	return ret;
 }
 
 
@@ -114,14 +116,6 @@ status_t
 CopyEngine::CopyFolder(const char* source, const char* destination,
 	sem_id cancelSemaphore)
 {
-	printf("%lld bytes to read in %lld files\n", fBytesToCopy, fItemsToCopy);
-
-	if (fMessage) {
-		BMessage message(*fMessage);
-		message.AddString("status", "Performing installation.");
-		fMessenger.SendMessage(&message);
-	}
-
 	int32 level = 0;
 	return _CopyFolder(source, destination, level, cancelSemaphore);
 }
@@ -475,16 +469,23 @@ CopyEngine::_RemoveFolder(BEntry& entry)
 void
 CopyEngine::_UpdateProgress()
 {
-	if (fMessage != NULL) {
-		BMessage message(*fMessage);
-		float progress = 100.0 * fBytesRead / fBytesToCopy;
-		message.AddFloat("progress", progress);
-		message.AddInt32("current", fItemsCopied);
-		message.AddInt32("maximum", fItemsToCopy);
-		message.AddString("item", fCurrentItem);
-		message.AddString("folder", fCurrentTargetFolder);
-		fMessenger.SendMessage(&message);
+	if (fProgressReporter == NULL)
+		return;
+
+	uint64 items = 0;
+	if (fLastItemsCopied < fItemsCopied) {
+		items = fItemsCopied - fLastItemsCopied;
+		fLastItemsCopied = fItemsCopied;
 	}
+
+	off_t bytes = 0;
+	if (fLastBytesRead < fBytesRead) {
+		bytes = fBytesRead - fLastBytesRead;
+		fLastBytesRead = fBytesRead;
+	}
+
+	fProgressReporter->ItemsWritten(items, bytes, fCurrentItem,
+		fCurrentTargetFolder);
 }
 
 

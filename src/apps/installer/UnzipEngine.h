@@ -15,14 +15,12 @@
 #include "HashMap.h"
 #include "HashString.h"
 
-class BMessage;
-class BMessenger;
+class ProgressReporter;
 
 
 class UnzipEngine : private BCommandPipe::LineReader {
 public:
-								UnzipEngine(const BMessenger& messenger,
-									BMessage* message,
+								UnzipEngine(ProgressReporter* reporter,
 									sem_id cancelSemaphore = -1);
 	virtual						~UnzipEngine();
 
@@ -59,11 +57,12 @@ private:
 
 			off_t				fBytesToUncompress;
 			off_t				fBytesUncompressed;
+			off_t				fLastBytesUncompressed;
 			uint64				fItemsToUncompress;
 			uint64				fItemsUncompressed;
+			uint64				fLastItemsUncompressed;
 
-			BMessenger			fMessenger;
-			BMessage*			fMessage;
+			ProgressReporter*	fProgressReporter;
 			sem_id				fCancelSemaphore;
 };
 

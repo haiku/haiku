@@ -16,6 +16,7 @@
 class BList;
 class BMenu;
 class InstallerWindow;
+class ProgressReporter;
 
 class WorkerThread : public BLooper {
 public:
@@ -41,7 +42,12 @@ private:
 			void				_LaunchInitScript(BPath& path);
 			void				_LaunchFinishScript(BPath& path);
 
-			void				_PerformInstall(BMenu* srcMenu, BMenu* dstMenu);
+			void				_PerformInstall(BMenu* srcMenu,
+									BMenu* dstMenu);
+			status_t			_ProcessZipPackages(const char* sourcePath,
+									const char* targetPath,
+									ProgressReporter* reporter,
+									BList& unzipEngines);
 
 			void				_SetStatusMessage(const char* status);
 
