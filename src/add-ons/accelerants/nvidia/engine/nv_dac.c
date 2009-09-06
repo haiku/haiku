@@ -206,10 +206,12 @@ status_t nv_dac_set_pix_pll(display_mode target)
 	/* note:
 	 * setup PLL assignment _after_ programming PLL */
 	if (si->ps.secondary_head) {
-		if (si->ps.card_arch < NV40A)
+		if (si->ps.card_arch < NV40A) {
 			DACW(PLLSEL, 0x30000f00);
-		else
+		} else {
+			DACW(NV40_PLLSEL2, (DACR(NV40_PLLSEL2) & ~0x10000100));
 			DACW(PLLSEL, 0x30000f04);
+		}
 	} else {
 		DACW(PLLSEL, 0x10000700);
 	}
