@@ -1,10 +1,11 @@
 /*
- * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ithamar Adema, ithamar AT unet DOT nl
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Jérôme Duval, korli@users.berlios.de
  */
 
 
@@ -153,12 +154,15 @@ dump_widget_pm_support(hda_widget& widget)
 static void
 dump_widget_stream_support(hda_widget& widget)
 {
-	dprintf("\tSupported formats: %s%s%s%s%s\n",
+	dprintf("\tSupported formats: %s%s%s%s%s%s%s%s\n",
 		widget.d.io.formats & B_FMT_8BIT_S ? "8bits " : "",
 		widget.d.io.formats & B_FMT_16BIT ? "16bits " : "",
 		widget.d.io.formats & B_FMT_20BIT ? "20bits " : "",
 		widget.d.io.formats & B_FMT_24BIT ? "24bits " : "",
-		widget.d.io.formats & B_FMT_32BIT ? "32bits " : "");
+		widget.d.io.formats & B_FMT_32BIT ? "32bits " : "",
+		widget.d.io.formats & B_FMT_FLOAT ? "float " : "",
+		widget.d.io.formats & B_FMT_DOUBLE ? "double " : "",
+		widget.d.io.formats & B_FMT_EXTENDED ? "extended " : "");
 	dprintf("\tSupported rates: %s%s%s%s%s%s%s%s%s%s%s%s\n",
 		widget.d.io.rates & B_SR_8000 ? "8khz " : "",
 		widget.d.io.rates & B_SR_11025 ? "11khz " : "",

@@ -141,8 +141,9 @@ uint32
 select_format(uint32 format)
 {
 	// best format
-	if (format & B_FMT_FLOAT)
-		return B_FMT_FLOAT;
+	// TODO ensure we support this format
+	/*if (format & B_FMT_FLOAT)
+		return B_FMT_FLOAT;*/
 	if (format & B_FMT_32BIT)
 		return B_FMT_32BIT;
 	if (format & B_FMT_24BIT)
