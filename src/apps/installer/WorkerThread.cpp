@@ -27,6 +27,7 @@
 #include "InstallerWindow.h"
 #include "PackageViews.h"
 #include "PartitionMenuItem.h"
+#include "UnzipEngine.h"
 
 
 //#define COPY_TRACE
@@ -390,6 +391,8 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 			"version.",
 			"Install Anyway", "Cancel", 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
+		// TODO: Would be cool to offer the option here to clean additional
+		// folders at the user's choice (like /boot/common and /boot/develop).
 		err = B_CANCELED;
 		goto error;
 	}
@@ -435,6 +438,38 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 				goto error;
 		}
 	}
+
+#if 0
+	// extract zip packages
+	// TODO: Put those in the optional packages list view
+	// TODO: Implement mechanism to handle dependencies between these
+	// packages. (Selecting one will auto-select others.)
+	{
+		BPath pkgRootDir(srcDirectory.Path(), PACKAGES_DIRECTORY);
+		BDirectory directory(pkgRootDir.Path());
+		BEntry entry;
+		while (directory.GetNextEntry(&entry) == B_OK) {
+			char name[B_FILE_NAME_LENGTH];
+			if (entry.GetName(name) != B_OK)
+				continue;
+			int nameLength = strlen(name);
+			if (nameLength <= 0)
+				continue;
+			char* nameExtension = name + nameLength - 4;
+printf("inspecting %s (%s)\n", name, nameExtension);
+			if (strcasecmp(nameExtension, ".zip") != 0)
+				continue;
+			printf("found .zip package: %s\n", name);
+
+			UnzipEngine unzipEngine(messenger, new BMessage(MSG_STATUS_MESSAGE),
+				fCancelSemaphore);
+			BPath path;
+			entry.GetPath(&path);
+			unzipEngine.SetTo(path.Path(), targetDirectory.Path());
+			unzipEngine.UnzipPackage();
+		}
+	}
+#endif
 
 	_LaunchFinishScript(targetDirectory);
 

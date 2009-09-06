@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
  *  All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -26,20 +26,20 @@
 using std::nothrow;
 
 
-UnzipEngine::UnzipEngine(const BMessenger& messenger, BMessage* message)
+UnzipEngine::UnzipEngine(const BMessenger& messenger, BMessage* message,
+		sem_id cancelSemaphore)
 	:
 	fPackage(""),
+	fRetrievingListing(false),
 
 	fBytesToUncompress(0),
 	fBytesUncompressed(0),
 	fItemsToUncompress(0),
 	fItemsUncompressed(0),
 
-	fCurrentTargetFolder(NULL),
-	fCurrentItem(NULL),
-
 	fMessenger(messenger),
-	fMessage(message)
+	fMessage(message),
+	fCancelSemaphore(cancelSemaphore)
 {
 }
 
@@ -51,16 +51,22 @@ UnzipEngine::~UnzipEngine()
 
 
 status_t
-UnzipEngine::SetTo(const char* pathToPackage)
+UnzipEngine::SetTo(const char* pathToPackage, const char* destinationFolder)
 {
 	fPackage = pathToPackage;
+	fDestinationFolder = destinationFolder;
+
+	fEntrySizeMap.Clear();
+
+	fBytesToUncompress = 0;
+	fBytesUncompressed = 0;
+	fItemsToUncompress = 0;
+	fItemsUncompressed = 0;
 
 	BPrivate::BCommandPipe commandPipe;
 	status_t ret = commandPipe.AddArg("unzip");
 	if (ret == B_OK)
-		ret = commandPipe.AddArg("-Z");
-	if (ret == B_OK)
-		ret = commandPipe.AddArg("-t");
+		ret = commandPipe.AddArg("-l");
 	if (ret == B_OK)
 		ret = commandPipe.AddArg(fPackage.String());
 	if (ret != B_OK)
@@ -72,30 +78,19 @@ UnzipEngine::SetTo(const char* pathToPackage)
 	if (unzipThread < 0)
 		return (status_t)unzipThread;
 
-	BString result = commandPipe.ReadLines(stdOutAndErrPipe);
-	static const char* kListingFormat = "%llu files, %llu bytes uncompressed, "
-		"%llu bytes compressed: %f%%";
+	fRetrievingListing = true;
+	ret = commandPipe.ReadLines(stdOutAndErrPipe, this);
+	fRetrievingListing = false;
 
-	uint64 bytesCompressed;
-	float compresssionRatio;
-	if (sscanf(result.String(), kListingFormat, &fItemsToUncompress,
-		&fBytesToUncompress, &bytesCompressed, &compresssionRatio) != 4) {
-		fBytesToUncompress = 0;
-		fItemsToUncompress = 0;
-		fprintf(stderr, "error reading command output: %s\n", result.String());
-		return B_ERROR;
-	}
-
-	printf("%s: %llu items in %llu bytes\n", pathToPackage, fItemsToUncompress,
+	printf("%llu items in %llu bytes\n", fItemsToUncompress,
 		fBytesToUncompress);
 
-	return B_OK;
+	return ret;
 }
 
 
 status_t
-UnzipEngine::UnzipPackage(const char* destinationFolder,
-	sem_id cancelSemaphore)
+UnzipEngine::UnzipPackage()
 {
 	if (fItemsToUncompress == 0)
 		return B_NO_INIT;
@@ -115,7 +110,7 @@ UnzipEngine::UnzipPackage(const char* destinationFolder,
 	if (ret == B_OK)
 		ret = commandPipe.AddArg("-d");
 	if (ret == B_OK)
-		ret = commandPipe.AddArg(destinationFolder);
+		ret = commandPipe.AddArg(fDestinationFolder.String());
 	if (ret == B_OK)
 		ret = commandPipe.AddArg("-x");
 	if (ret == B_OK)
@@ -129,87 +124,139 @@ UnzipEngine::UnzipPackage(const char* destinationFolder,
 	if (unzipThread < 0)
 		return (status_t)unzipThread;
 
-	return _ReadFromPipe(stdOutAndErrPipe, commandPipe, cancelSemaphore);
+	return commandPipe.ReadLines(stdOutAndErrPipe, this);
 }
 
 
 // #pragma mark -
 
 
-status_t
-UnzipEngine::_ReadFromPipe(FILE* stdOutAndErrPipe,
-	BPrivate::BCommandPipe& commandPipe, sem_id cancelSemaphore)
+bool
+UnzipEngine::IsCanceled()
 {
-	class LineReader : public BPrivate::BCommandPipe::LineReader {
-	public:
-		LineReader(sem_id cancelSemaphore, off_t bytesToUncompress,
-				uint64 itemsToUncompress, BMessenger& messenger,
-				const BMessage* message)
-			:
-			fCancelSemaphore(cancelSemaphore),
+	if (fCancelSemaphore < 0)
+		return false;
 
-			fBytesToUncompress(itemsToUncompress),
-			fBytesUncompressed(0),
-			fItemsToUncompress(itemsToUncompress),
-			fItemsUncompressed(0),
+	SemaphoreLocker locker(fCancelSemaphore);
+	return !locker.IsLocked();
+}
 
-			fMessenger(messenger),
-			fMessage(message)
-		{
-		}
 
-		virtual bool IsCanceled()
-		{
-			if (fCancelSemaphore < 0)
-				return false;
+status_t
+UnzipEngine::ReadLine(const BString& line)
+{
+	if (fRetrievingListing)
+		return _ReadLineListing(line);
+	else
+		return _ReadLineExtract(line);
+}
 
-			SemaphoreLocker locker(fCancelSemaphore);
-			return !locker.IsLocked();
-		}
 
-		virtual status_t ReadLine(const BString& line)
-		{
-			char item[1024];
-			char linkTarget[256];
-			const char* kInflatingFormat = "   inflating: %s\n";
-			const char* kLinkingFormat = "     linking: %s -> %s\n";
-			if (sscanf(line.String(), kInflatingFormat, &item) == 1
-				|| sscanf(line.String(), kLinkingFormat, &item,
-					&linkTarget) == 2) {
-				BString itemPath(item);
-				int pos = itemPath.FindLast('/');
-				BString itemName = itemPath.String() + pos + 1;
-				itemPath.Truncate(pos);
-				printf("extracted %s to %s\n", itemName.String(),
-					itemPath.String());
-			} else {
-				printf("ignored: %s", line.String());
+status_t
+UnzipEngine::_ReadLineListing(const BString& line)
+{
+//	static const char* kListingFormat = "%llu files, %llu bytes uncompressed, "
+//		"%llu bytes compressed: %f%%";
+//
+//	uint64 bytesCompressed;
+//	float compresssionRatio;
+//	if (sscanf(line.String(), kListingFormat, &fItemsToUncompress,
+//		&fBytesToUncompress, &bytesCompressed, &compresssionRatio) != 4) {
+//		fBytesToUncompress = 0;
+//		fItemsToUncompress = 0;
+//		fprintf(stderr, "error reading command output: %s\n", line.String());
+//		return B_ERROR;
+//	}
+
+	static const char* kListingFormat = "%llu  %s %s   %s\n";
+
+	const char* string = line.String();
+	while (string[0] == ' ')
+		string++;
+
+	uint64 bytes;
+	char date[16];
+	char time[16];
+	char path[1024];
+	if (sscanf(string, kListingFormat, &bytes, &date, &time, &path) == 4) {
+		fBytesToUncompress += bytes;
+
+		BString itemPath(path);
+		BString itemName(path);
+		int leafPos = itemPath.FindLast('/');
+		if (leafPos >= 0)
+			itemName = itemPath.String() + leafPos + 1;
+
+		// We check if the target folder exists and don't increment
+		// the item count in that case. Unzip won't report on folders that did
+		// not need to be created. This may mess up our current item count.
+		uint32 itemCount = 1;
+		if (bytes == 0 && itemName.Length() == 0) {
+			// a folder?
+			BPath destination(fDestinationFolder.String());
+			if (destination.Append(itemPath.String()) == B_OK) {
+				BEntry test(destination.Path());
+				if (test.Exists() && test.IsDirectory()) {
+					printf("ignoring %s\n", itemPath.String());
+					itemCount = 0;
+				}
 			}
-
-			return B_OK;
 		}
 
-	private:
-		sem_id			fCancelSemaphore;
+		fItemsToUncompress += itemCount;
 
-		off_t			fBytesToUncompress;
-		off_t			fBytesUncompressed;
-		uint64			fItemsToUncompress;
-		uint64			fItemsUncompressed;
+		printf("item %s with %llu bytes to %s\n", itemName.String(),
+			bytes, itemPath.String());
 
-		BMessenger&		fMessenger;
-		const BMessage*	fMessage;
-	};
+		fEntrySizeMap.Put(itemName.String(), bytes);
+	} else {
+//		printf("listing not understood: %s", string);
+	}
 
-	LineReader lineReader(cancelSemaphore, fBytesToUncompress,
-		fItemsToUncompress, fMessenger, fMessage);
+	return B_OK;
+}
 
-	return commandPipe.ReadLines(stdOutAndErrPipe, &lineReader);
+
+status_t
+UnzipEngine::_ReadLineExtract(const BString& line)
+{
+	char item[1024];
+	char linkTarget[256];
+	const char* kCreatingFormat = "    creating: %s\n";
+	const char* kInflatingFormat = "   inflating: %s\n";
+	const char* kLinkingFormat = "     linking: %s -> %s\n";
+	if (sscanf(line.String(), kCreatingFormat, &item) == 1
+		|| sscanf(line.String(), kInflatingFormat, &item) == 1
+		|| sscanf(line.String(), kLinkingFormat, &item,
+			&linkTarget) == 2) {
+
+		fItemsUncompressed++;
+
+		BString itemPath(item);
+		int pos = itemPath.FindLast('/');
+		BString itemName = itemPath.String() + pos + 1;
+		itemPath.Truncate(pos);
+
+		off_t bytes = 0;
+		if (fEntrySizeMap.ContainsKey(itemName.String())) {
+			bytes = fEntrySizeMap.Get(itemName.String());
+			fBytesUncompressed += bytes;
+		}
+
+		printf("%llu extracted %s to %s (%llu)\n", fItemsUncompressed,
+			itemName.String(), itemPath.String(), bytes);
+
+		_UpdateProgress(itemName.String(), itemPath.String());
+	} else {
+//		printf("ignored: %s", line.String());
+	}
+
+	return B_OK;
 }
 
 
 void
-UnzipEngine::_UpdateProgress()
+UnzipEngine::_UpdateProgress(const char* item, const char* targetFolder)
 {
 	if (fMessage != NULL) {
 		BMessage message(*fMessage);
@@ -217,8 +264,8 @@ UnzipEngine::_UpdateProgress()
 		message.AddFloat("progress", progress);
 		message.AddInt32("current", fItemsUncompressed);
 		message.AddInt32("maximum", fItemsToUncompress);
-		message.AddString("item", fCurrentItem);
-		message.AddString("folder", fCurrentTargetFolder);
+		message.AddString("item", item);
+		message.AddString("folder", targetFolder);
 		fMessenger.SendMessage(&message);
 	}
 }

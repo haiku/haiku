@@ -11,43 +11,60 @@
 #include <Messenger.h>
 #include <String.h>
 
-namespace BPrivate {
-	class BCommandPipe;
-}
+#include "CommandPipe.h"
+#include "HashMap.h"
+#include "HashString.h"
+
 class BMessage;
 class BMessenger;
 
 
-class UnzipEngine {
+class UnzipEngine : private BCommandPipe::LineReader {
 public:
 								UnzipEngine(const BMessenger& messenger,
-									BMessage* message);
+									BMessage* message,
+									sem_id cancelSemaphore = -1);
 	virtual						~UnzipEngine();
 
-			status_t			SetTo(const char* pathToPackage);
+			status_t			SetTo(const char* pathToPackage,
+									const char* destinationFolder);
 
-			status_t			UnzipPackage(const char* destinationFolder,
-									sem_id cancelSemaphore = -1);
+	inline	off_t				BytesToUncompress() const
+									{ return fBytesToUncompress; }
+	inline	uint64				ItemsToUncompress() const
+									{ return fItemsToUncompress; }
+
+			status_t			UnzipPackage();
 
 private:
-			status_t			_ReadFromPipe(FILE* stdOutAndErrPipe,
-									BPrivate::BCommandPipe& commandPipe,
-									sem_id cancelSemaphore);
-			void				_UpdateProgress();
+	// BCommandPipe::LineReader
+			friend class BCommandPipe;
+
+	virtual	bool				IsCanceled();
+	virtual	status_t			ReadLine(const BString& line);
+
+			status_t			_ReadLineListing(const BString& line);
+			status_t			_ReadLineExtract(const BString& line);
+
+			void				_UpdateProgress(const char* item,
+									const char* targetFolder);
 
 private:
 			BString				fPackage;
+			BString				fDestinationFolder;
+			bool				fRetrievingListing;
+
+			typedef HashMap<HashString, off_t> EntrySizeMap;
+			EntrySizeMap		fEntrySizeMap;
 
 			off_t				fBytesToUncompress;
 			off_t				fBytesUncompressed;
 			uint64				fItemsToUncompress;
 			uint64				fItemsUncompressed;
 
-			const char*			fCurrentTargetFolder;
-			const char*			fCurrentItem;
-
 			BMessenger			fMessenger;
 			BMessage*			fMessage;
+			sem_id				fCancelSemaphore;
 };
 
 
