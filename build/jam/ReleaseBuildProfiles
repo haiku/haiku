@@ -13,8 +13,9 @@ switch $(HAIKU_BUILD_PROFILE) {
 
 		AddOptionalHaikuImagePackages BePDF Clockwerk Firefox Pe Vision VLC
 			WonderBrush ;
-		AddOptionalHaikuImagePackages CVS Development Subversion OpenSSH ;
-		AddOptionalHaikuImagePackages Welcome BeBook ;
+		AddOptionalHaikuImagePackages CVS Development Git Mercurial
+			Python Subversion OpenSSH ;
+		AddOptionalHaikuImagePackages Nano P7zip Welcome BeBook ;
 	}
 
 	case "beta-*" : {
