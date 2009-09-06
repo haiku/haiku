@@ -40,6 +40,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Nano				- the command line text editor
 #	Neon				- support libraries used for example by SVN
 #	NetSurf				- the web browser
+#	OCaml				- the Objective Caml language
 #	OpenSound			- additional audio driver package
 #	OpenSSH				- the secure shell
 #	OpenSSL				- secure sockets library
@@ -597,6 +598,25 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/netsurf/NetSurf ;
+	}
+}
+
+
+# OCaml
+if [ IsOptionalHaikuImagePackageAdded OCaml ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package OCaml available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+		Echo "No optional package OCaml available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage ocaml-3.11.1-r1a1-x86-gcc2-2009-09-06
+			: http://jerome.duval.free.fr/obos/ocaml-3.11.1-r1a1-x86-gcc2-2009-09-06.zip
+			:
+		;
+		InstallOptionalHaikuImagePackage camlp5-5.12-r1a1-x86-gcc2-2009-09-06
+			: http://jerome.duval.free.fr/obos/camlp5-5.12-r1a1-x86-gcc2-2009-09-06.zip
+			:
+		;
 	}
 }
 
