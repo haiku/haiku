@@ -452,6 +452,10 @@ vfs_mount_boot_file_system(kernel_args* args)
 		if (strcmp(bootPartition->ContentType(), "ISO9660 File System") == 0) {
 			fsName = "iso9660:write_overlay:attribute_overlay";
 			readOnly = true;
+		} else if (bootPartition->IsReadOnly()
+			&& strcmp(bootPartition->ContentType(), "Be File System") == 0) {
+			fsName = "bfs:write_overlay";
+			readOnly = true;
 		}
 
 		TRACE(("trying to mount boot partition: %s\n", path.Path()));
