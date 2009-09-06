@@ -156,21 +156,6 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 	float pix_setting, req_pclk;
 	status_t result;
 
-	/* we offer this option because some panels have very tight restrictions,
-	 * and there's no overlapping settings range that makes them all work.
-	 * note:
-	 * this assumes the cards BIOS correctly programmed the panel (is likely) */
-	//fixme: when VESA DDC EDID stuff is implemented, this option can be deleted...
-	if ((si->ps.monitors & CRTC2_TMDS) && !si->settings.pgm_panel)
-	{
-		LOG(4,("DAC2: Not programming DFP refresh (specified in nvidia.settings)\n"));
-
-		/* dump current setup for learning purposes */
-		nv_dac2_dump_pix_pll();
-
-		return B_OK;
-	}
-
 	/* fix a DVI or laptop flatpanel to 60Hz refresh! */
 	/* Note:
 	 * The pixelclock drives the flatpanel modeline, not the CRTC modeline. */
@@ -183,7 +168,6 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 	}
 
 	req_pclk = (target.timing.pixel_clock)/1000.0;
-	LOG(4,("DAC2: Setting PIX PLL for pixelclock %f\n", req_pclk));
 
 	/* signal that we actually want to set the mode */
 	result = nv_dac2_pix_pll_find(target,&pix_setting,&m,&n,&p, 1);
@@ -195,14 +179,27 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 	/* dump old setup for learning purposes */
 	nv_dac2_dump_pix_pll();
 
-	/* program new frequency */
-	DAC2W(PIXPLLC, ((p << 16) | (n << 8) | m));
+	/* we offer this option because some panels have very tight restrictions,
+	 * and there's no overlapping settings range that makes them all work.
+	 * note:
+	 * this assumes the cards BIOS correctly programmed the panel (is likely) */
+	//fixme: when VESA DDC EDID stuff is implemented, this option can be deleted...
+	if ((si->ps.monitors & CRTC2_TMDS) && !si->settings.pgm_panel) {
+		LOG(4,("DAC2: Not programming DFP refresh (specified in nvidia.settings)\n"));
+	} else {
+		LOG(4,("DAC2: Setting PIX PLL for pixelclock %f\n", req_pclk));
 
-	/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
-	if (si->ps.ext_pll) DAC2W(PIXPLLC2, 0x80000401);
+		/* program new frequency */
+		DAC2W(PIXPLLC, ((p << 16) | (n << 8) | m));
 
-	/* Give the PIXPLL frequency some time to lock... (there's no indication bit available) */
-	snooze(1000);
+		/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
+		if (si->ps.ext_pll) DAC2W(PIXPLLC2, 0x80000401);
+
+		/* Give the PIXPLL frequency some time to lock... (there's no indication bit available) */
+		snooze(1000);
+
+		LOG(2,("DAC2: PIX PLL frequency should be locked now...\n"));
+	}
 
 	/* enable programmable PLLs */
 	/* (confirmed PLLSEL to be a write-only register on NV04 and NV11!) */
@@ -214,8 +211,6 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 		DACW(NV40_PLLSEL2, (DACR(NV40_PLLSEL2) & ~0x10000100));
 		DACW(PLLSEL, 0x30000f04);
 	}
-
-	LOG(2,("DAC2: PIX PLL frequency should be locked now...\n"));
 
 	return B_OK;
 }
