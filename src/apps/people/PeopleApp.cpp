@@ -106,16 +106,10 @@ TPeopleApp::TPeopleApp(void)
 		}
 	}
 	if (!valid) {
-		BBitmap largeIcon(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_CMAP8);
-		BBitmap miniIcon(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_CMAP8);
-
 		mime.Install();
-		largeIcon.SetBits(kLargePersonIcon, largeIcon.BitsLength(), 0, B_CMAP8);
-		miniIcon.SetBits(kSmallPersonIcon, miniIcon.BitsLength(), 0, B_CMAP8);
 		mime.SetShortDescription("Person");
 		mime.SetLongDescription("Contact information for a person.");
-		mime.SetIcon(&largeIcon, B_LARGE_ICON);
-		mime.SetIcon(&miniIcon, B_MINI_ICON);
+		mime.SetIcon(kPersonIcon, sizeof(kPersonIcon));
 		mime.SetPreferredApp(APP_SIG);
 
 		// add relevant person fields to meta-mime type
