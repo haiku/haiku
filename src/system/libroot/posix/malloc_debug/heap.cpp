@@ -1335,6 +1335,7 @@ heap_free(heap_allocator *heap, void *address)
 
 		area = heap->areas;
 		while (area != NULL && heap->empty_areas > 1) {
+			heap_area *next = area->next;
 			if (area->area >= 0
 				&& area->free_page_count == area->page_count
 				&& heap_remove_area(heap, area) == B_OK) {
@@ -1342,7 +1343,7 @@ heap_free(heap_allocator *heap, void *address)
 				heap->empty_areas--;
 			}
 
-			area = area->next;
+			area = next;
 		}
 	}
 
