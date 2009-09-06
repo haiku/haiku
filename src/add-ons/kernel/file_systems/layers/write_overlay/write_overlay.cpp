@@ -13,6 +13,7 @@
 #include <dirent.h>
 
 #include <util/kernel_cpp.h>
+#include <util/AutoLock.h>
 
 #include <fs_cache.h>
 #include <fs_info.h>
@@ -105,6 +106,9 @@ public:
 
 		status_t			InitCheck();
 
+		bool				Lock() { return recursive_lock_lock(&fLock) == B_OK; }
+		void				Unlock() { recursive_lock_unlock(&fLock); }
+
 		bool				IsVirtual() { return fIsVirtual; }
 		bool				IsModified() { return fIsModified; }
 
@@ -168,6 +172,7 @@ private:
 		status_t			_CreateCommon(const char *name, int type, int perms,
 								ino_t *newInodeNumber, OverlayInode **node);
 
+		recursive_lock		fLock;
 		OverlayVolume *		fVolume;
 		OverlayInode *		fParentDir;
 		const char *		fName;
@@ -222,6 +227,7 @@ OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
 {
 	TRACE("inode created %lld\n", fInodeNumber);
 
+	recursive_lock_init(&fLock, "write overlay inode lock");
 	if (superVnode != NULL)
 		fSuperVnode = *superVnode;
 	else {
@@ -258,6 +264,8 @@ OverlayInode::~OverlayInode()
 	for (uint32 i = 0; i < fDirentCount; i++)
 		free(fDirents[i]);
 	free(fDirents);
+
+	recursive_lock_destroy(&fLock);
 }
 
 
@@ -295,6 +303,7 @@ OverlayInode::CreateCache()
 void
 OverlayInode::SetParentDir(OverlayInode *parentDir)
 {
+	RecursiveLocker locker(fLock);
 	fParentDir = parentDir;
 	if (fHasDirents && fDirentCount >= 2)
 		fDirents[1]->inode_number = parentDir->InodeNumber();
@@ -304,6 +313,7 @@ OverlayInode::SetParentDir(OverlayInode *parentDir)
 bool
 OverlayInode::IsNonEmptyDirectory()
 {
+	RecursiveLocker locker(fLock);
 	if (!fHasStat)
 		ReadStat(NULL);
 
@@ -320,12 +330,14 @@ OverlayInode::IsNonEmptyDirectory()
 status_t
 OverlayInode::Lookup(const char *name, ino_t *inodeNumber)
 {
+	RecursiveLocker locker(fLock);
 	if (!fHasDirents)
 		_PopulateDirents();
 
 	for (uint32 i = 0; i < fDirentCount; i++) {
 		if (strcmp(fDirents[i]->name, name) == 0) {
 			*inodeNumber = fDirents[i]->inode_number;
+			locker.Unlock();
 
 			OverlayInode *node = NULL;
 			status_t result = get_vnode(Volume(), *inodeNumber,
@@ -343,6 +355,7 @@ OverlayInode::Lookup(const char *name, ino_t *inodeNumber)
 void
 OverlayInode::SetName(const char *name)
 {
+	RecursiveLocker locker(fLock);
 	fName = name;
 	if (!fIsModified)
 		SetModified();
@@ -352,6 +365,7 @@ OverlayInode::SetName(const char *name)
 status_t
 OverlayInode::GetName(char *buffer, size_t bufferSize)
 {
+	RecursiveLocker locker(fLock);
 	if (fName != NULL) {
 		strlcpy(buffer, fName, bufferSize);
 		return B_OK;
@@ -371,6 +385,7 @@ OverlayInode::GetName(char *buffer, size_t bufferSize)
 status_t
 OverlayInode::ReadStat(struct stat *stat)
 {
+	RecursiveLocker locker(fLock);
 	if (!fHasStat) {
 		if (fSuperVnode.ops->read_stat == NULL)
 			return B_UNSUPPORTED;
@@ -395,6 +410,7 @@ OverlayInode::ReadStat(struct stat *stat)
 status_t
 OverlayInode::WriteStat(const struct stat *stat, uint32 statMask)
 {
+	RecursiveLocker locker(fLock);
 	if (!fHasStat)
 		ReadStat(NULL);
 
@@ -446,6 +462,7 @@ OverlayInode::Create(const char *name, int openMode, int perms, void **cookie,
 status_t
 OverlayInode::Open(int openMode, void **_cookie)
 {
+	RecursiveLocker locker(fLock);
 	if (!fHasStat)
 		ReadStat(NULL);
 
@@ -528,6 +545,7 @@ status_t
 OverlayInode::Read(void *_cookie, off_t position, void *buffer, size_t *length,
 	bool readPages, IORequest *ioRequest)
 {
+	RecursiveLocker locker(fLock);
 	if (position >= fStat.st_size) {
 		*length = 0;
 		return B_OK;
@@ -638,6 +656,7 @@ status_t
 OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 	size_t length, IORequest *ioRequest)
 {
+	RecursiveLocker locker(fLock);
 	if (_cookie != NULL) {
 		open_cookie *cookie = (open_cookie *)_cookie;
 		if (cookie->open_mode & O_APPEND)
@@ -789,6 +808,7 @@ OverlayInode::RemoveDir(const char *name)
 status_t
 OverlayInode::OpenDir(void **cookie)
 {
+	RecursiveLocker locker(fLock);
 	if (!fHasDirents)
 		_PopulateDirents();
 
@@ -822,6 +842,7 @@ status_t
 OverlayInode::ReadDir(void *cookie, struct dirent *buffer, size_t bufferSize,
 	uint32 *num)
 {
+	RecursiveLocker locker(fLock);
 	open_dir_cookie *dirCookie = (open_dir_cookie *)cookie;
 	if (dirCookie->index >= fDirentCount) {
 		*num = 0;
@@ -887,6 +908,7 @@ OverlayInode::ReadSymlink(char *buffer, size_t *bufferSize)
 status_t
 OverlayInode::AddEntry(overlay_dirent *entry)
 {
+	RecursiveLocker locker(fLock);
 	if (!fHasDirents)
 		_PopulateDirents();
 
@@ -912,6 +934,7 @@ OverlayInode::AddEntry(overlay_dirent *entry)
 status_t
 OverlayInode::RemoveEntry(const char *name, overlay_dirent **_entry)
 {
+	RecursiveLocker locker(fLock);
 	if (!fHasDirents)
 		_PopulateDirents();
 
@@ -1111,11 +1134,14 @@ status_t
 OverlayInode::_CreateCommon(const char *name, int type, int perms,
 	ino_t *newInodeNumber, OverlayInode **_node)
 {
+	RecursiveLocker locker(fLock);
 	if (!fHasStat)
 		ReadStat(NULL);
 
 	if (!S_ISDIR(fStat.st_mode))
 		return B_NOT_A_DIRECTORY;
+
+	locker.Unlock();
 
 	overlay_dirent *entry = (overlay_dirent *)malloc(sizeof(overlay_dirent));
 	if (entry == NULL)
@@ -1153,8 +1179,10 @@ OverlayInode::_CreateCommon(const char *name, int type, int perms,
 		return result;
 	}
 
+	node->Lock();
 	node->SetModified();
 	node->CreateCache();
+	node->Unlock();
 
 	if (newInodeNumber != NULL)
 		*newInodeNumber = entry->inode_number;
