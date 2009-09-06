@@ -22,6 +22,7 @@
 #include <TextView.h>
 #include <NodeMonitor.h>
 #include <String.h>
+#include <Volume.h>
 
 #include "PeopleApp.h"
 #include "PeopleView.h"
@@ -223,6 +224,20 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 						
 						// And our window title.
 						SetTitle(name);
+
+						// If moved to Trash, close window.
+						BVolume volume(device);
+						BPath trash;
+						find_directory(B_TRASH_DIRECTORY, &trash, false,
+							&volume);
+						BPath folder(fRef);
+						folder.GetParent(&folder);
+						if (folder == trash) {
+							delete fRef;
+							fRef = NULL;
+							PostMessage(B_QUIT_REQUESTED);
+						}
+
 						break;
 					}
 					
