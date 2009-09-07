@@ -478,8 +478,8 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 			: /boot/common/bin/KeymapSwitcher ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			KeymapSwitcher-1.2.3-x86-gcc2-2009-05-31
-			:  $(baseURL)/KeymapSwitcher-1.2.3-x86-gcc2-2009-05-31.zip
+			KeymapSwitcher-1.2.4-r1a1-x86-gcc2-2009-09-06
+			:  $(baseURL)/KeymapSwitcher-1.2.4-r1a1-x86-gcc2-2009-09-06.zip
 			:
 		;
 		AddSymlinkToHaikuImage home config be Desktop\ Applets
@@ -861,8 +861,8 @@ if [ IsOptionalHaikuImagePackageAdded Vim ] {
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/common/bin/gvim ;
 	} else {
-		InstallOptionalHaikuImagePackage vim-7.2-x86-gcc2-2009-05-31
-			:  $(baseURL)/vim-7.2-x86-gcc2-2009-05-31.zip
+		InstallOptionalHaikuImagePackage vim-7.2-r1a1-x86-gcc2-2009-09-06
+			:  $(baseURL)/vim-7.2-r1a1-x86-gcc2-2009-09-06.zip
 			:
 		;
 		AddSymlinkToHaikuImage home config be Applications
