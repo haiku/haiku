@@ -147,11 +147,14 @@ InputDeviceListItem::Matches(const char* name, input_device_type type) const
 InputServer::InputServer()
 	: BApplication(INPUTSERVER_SIGNATURE),
 	fSafeMode(false),
+	fKeyboardID(0),
 	fInputDeviceListLocker("input server device list"),
 	fKeyboardSettings(),
 	fMouseSettings(),
 	fChars(NULL),
 	fScreen(B_MAIN_SCREEN_ID),
+	fEventQueueLock("input server event queue"),
+	fReplicantMessenger(NULL),
 	fInputMethodWindow(NULL),
 	fInputMethodAware(false),
 	fCursorSem(-1),
@@ -273,8 +276,11 @@ InputServer::_InitKeyboardMouseStates()
 
 	fFrame = fScreen.Frame();
 	if (fFrame == BRect(0, 0, 0, 0))
-		fFrame = BRect(0, 0, 800, 600);
-	fMousePos = BPoint(fFrame.right / 2, fFrame.bottom / 2);
+		fFrame = BRect(0, 0, 799, 599);
+	fMousePos = BPoint((int32)((fFrame.right + 1) / 2),
+		(int32)((fFrame.bottom + 1) / 2));
+
+	memset(&fKeyInfo, 0, sizeof(fKeyInfo));
 
 	if (_LoadKeymap() != B_OK)
 		_LoadSystemKeymap();

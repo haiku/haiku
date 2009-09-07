@@ -209,10 +209,7 @@ class InputServer : public BApplication {
 		void _ReleaseInput(BMessage* message);
 
 	private:
-		bool 			fEventLoopRunning;
 		bool 			fSafeMode;
-		port_id 		fEventPort;
-
 		uint16			fKeyboardID;
 
 		BList			fInputDeviceList;
@@ -251,7 +248,6 @@ class InputServer : public BApplication {
 #else
 		uint32*			fCursorBuffer;
 #endif
-
 };
 
 extern InputServer* gInputServer;
