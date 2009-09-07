@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Marcus Overhagen. All rights reserved.
+ * Copyright 2006-2009, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,9 +8,10 @@
 #include <string.h>
 
 #include <ata_adapter.h>
+#include <tracing.h>
 
-#define TRACE(x...) dprintf("si-3112: " x)
-//#define FLOW(x...)	dprintf("si-3112: " x)
+#define TRACE(x...)	do { dprintf("si-3112: " x); ktrace_printf("si-3112: " x); } while (0)
+//#define FLOW(x...)	ktrace_printf("si-3112: " x)
 #define FLOW(x...)
 
 
@@ -24,20 +25,13 @@ enum asic_type {
 	ASIC_SI3114 = 1,
 };
 
-#if 0
-static const char *adapter_asic_names[] = {
-	"si3112",
-	"si3114",
-	NULL
-};
-#endif
-
 static const struct {
 	uint16 channel_count;
 	uint32 mmio_bar_size;
+	const char *asic_name;
 } kASICData[2] = {
-	{ 2, 0x200 },
-	{ 4, 0x400 },
+	{ 2, 0x200, "si3112" },
+	{ 4, 0x400, "si3114" },
 };
 
 static const struct {
@@ -291,9 +285,10 @@ controller_init(device_node *node, void **_controllerCookie)
 	sDeviceManager->get_driver(parent, (driver_module_info **)&pci, (void **)&device);
 	sDeviceManager->put_node(parent);
 
-	TRACE("asic %ld\n", asicIndex);
-	TRACE("int_num %ld\n", interruptNumber);
-	TRACE("mmio_addr %p\n", (void *)mmioAddr);
+	TRACE("asic index %ld\n", asicIndex);
+	TRACE("asic name %s\n", kASICData[asicIndex].asic_name);
+	TRACE("int num %ld\n", interruptNumber);
+	TRACE("mmio addr %p\n", (void *)mmioAddr);
 
 	controller->pci = pci;
 	controller->device = device;
@@ -484,8 +479,9 @@ channel_init(device_node *node, void **_channelCookie)
 
 	controller->channel[channelIndex] = channel;
 
-	// enable interrupts so the channel is ready to run
-	device_control_write(channel, ATA_DEVICE_CONTROL_BIT3);
+	// disable interrupts
+	device_control_write(channel, ATA_DEVICE_CONTROL_BIT3
+		| ATA_DEVICE_CONTROL_DISABLE_INTS);
 
 	*_channelCookie = channel;
 
@@ -505,13 +501,9 @@ channel_uninit(void *channelCookie)
 
 	TRACE("channel_uninit enter\n");
 
-	// disable IRQs
-	device_control_write(channel, ATA_DEVICE_CONTROL_BIT3 | ATA_DEVICE_CONTROL_DISABLE_INTS);
-
-	// catch spurious interrupt
-	// (some controllers generate an IRQ when you _disable_ interrupts,
-	//  they are delayed by less then 40 µs, so 1 ms is safe)
-	snooze(1000);
+	// disable interrupts
+	device_control_write(channel, ATA_DEVICE_CONTROL_BIT3
+		| ATA_DEVICE_CONTROL_DISABLE_INTS);
 
 	delete_area(channel->prd_area);
 	free(channel);
@@ -793,8 +785,7 @@ handle_interrupt(void *arg)
 	int32 result;
 	int i;
 
-//	FLOW("handle_interrupt\n");
-
+	FLOW("handle_interrupt\n");
 
 	result = B_UNHANDLED_INTERRUPT;
 
@@ -803,15 +794,16 @@ handle_interrupt(void *arg)
 		if (!channel || channel->lost)
 			continue;
 
-		// this could be a spurious interrupt, so always read status
-		// register unconditionally to acknowledge those
-		statusATA = *(channel->command_block + 7);
-
-		if (!channel->dma_active)
+		if (!channel->dma_active) {
+			// this could be a spurious interrupt, so read
+			// ata status register to acknowledge
+			*(channel->command_block + 7);
 			continue;
+		}
 
 		statusBM = *channel->bm_status_reg;
 		if (statusBM & ATA_BM_STATUS_INTERRUPT) {
+			statusATA = *(channel->command_block + 7);
 			*channel->bm_status_reg
 				= (statusBM & 0xf8) | ATA_BM_STATUS_INTERRUPT;
 			sATA->interrupt_handler(channel->ataChannel, statusATA);
