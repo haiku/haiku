@@ -577,11 +577,22 @@ ATAChannel::RecoverLostInterrupt()
 status_t
 ATAChannel::SendRequest(ATARequest *request, uint32 flags)
 {
+	// TODO: implement this:
+	// resetting the device here would discard current configuration,
+	// it's better when the SCSI bus manager requests an external reset.
+
 	TRACE_FUNCTION("\n");
 	ATADevice *device = request->Device();
-	if (device->Select() != B_OK || WaitForIdle() != B_OK) {
-		// resetting the device here will discard current configuration,
-		// it's better when the SCSI bus manager requests an external reset.
+
+	TRACE("SendRequest status 0x%02x\n", AltStatus());
+
+	if (device->Select() != B_OK) {
+		TRACE_ERROR("device selection failed\n");
+		request->SetStatus(SCSI_SEL_TIMEOUT);
+		return B_TIMED_OUT;
+	}
+
+	if (WaitForIdle() != B_OK) {
 		TRACE_ERROR("device selection timeout\n");
 		request->SetStatus(SCSI_SEL_TIMEOUT);
 		return B_TIMED_OUT;
