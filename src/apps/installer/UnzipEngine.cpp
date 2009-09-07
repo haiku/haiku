@@ -184,7 +184,7 @@ UnzipEngine::UnzipPackage()
 		ssize_t read = descriptionFile.Read(buffer, bufferSize);
 		if (read > 0) {
 			int32 length = copyrightAttr.Length();
-			if (read < bufferSize)
+			if (read < (ssize_t)bufferSize)
 				buffer[read] = '\0';
 			int32 bufferLength = strlen(buffer);
 				// Should be "read", but maybe we have a zero in the
