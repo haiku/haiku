@@ -269,8 +269,6 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 bool
 TPeopleWindow::QuitRequested(void)
 {
-	printf("TPeopleWindow::QuitRequested(void)\n");
-
 	status_t result;
 
 	if (fView->CheckSave()) {
