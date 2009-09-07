@@ -847,60 +847,55 @@ page_scrubber(void *unused)
 	for (;;) {
 		snooze(100000); // 100ms
 
-		if (sFreePageQueue.count > 0) {
-			vm_page *page[SCRUB_SIZE];
-			int32 i, scrubCount;
+		if (sFreePageQueue.count == 0)
+			continue;
 
-			// get some pages from the free queue
+		InterruptsSpinLocker locker(sPageLock);
 
-			InterruptsSpinLocker locker(sPageLock);
+		// Since we temporarily remove pages from the free pages reserve,
+		// we must make sure we don't cause a violation of the page
+		// reservation warranty. The following is usually stricter than
+		// necessary, because we don't have information on how many of the
+		// reserved pages have already been allocated.
+		int32 scrubCount = SCRUB_SIZE;
+		uint32 freeCount = free_page_queue_count();
+		if (freeCount <= sReservedPages)
+			continue;
 
-			// Since we temporarily remove pages from the free pages reserve,
-			// we must make sure we don't cause a violation of the page
-			// reservation warranty. The following is usually stricter than
-			// necessary, because we don't have information on how many of the
-			// reserved pages have already been allocated.
-			scrubCount = SCRUB_SIZE;
-			uint32 freeCount = free_page_queue_count();
-			if (freeCount < sReservedPages)
-				scrubCount = 0;
-			else if ((uint32)scrubCount > freeCount - sReservedPages)
-				scrubCount = freeCount - sReservedPages;
+		if ((uint32)scrubCount > freeCount - sReservedPages)
+			scrubCount = freeCount - sReservedPages;
 
-			for (i = 0; i < scrubCount; i++) {
-				page[i] = dequeue_page(&sFreePageQueue);
-				if (page[i] == NULL)
-					break;
-				page[i]->state = PAGE_STATE_BUSY;
+		// get some pages from the free queue
+		vm_page *page[SCRUB_SIZE];
+		for (int32 i = 0; i < scrubCount; i++) {
+			page[i] = dequeue_page(&sFreePageQueue);
+			if (page[i] == NULL) {
+				scrubCount = i;
+				break;
 			}
 
-			scrubCount = i;
-
-			if (scrubCount > 0) {
-				T(ScrubbingPages(scrubCount));
-			}
-
-			locker.Unlock();
-
-			// clear them
-
-			for (i = 0; i < scrubCount; i++) {
-				clear_page(page[i]);
-			}
-
-			locker.Lock();
-
-			// and put them into the clear queue
-
-			for (i = 0; i < scrubCount; i++) {
-				page[i]->state = PAGE_STATE_CLEAR;
-				enqueue_page(&sClearPageQueue, page[i]);
-			}
-
-			if (scrubCount > 0) {
-				T(ScrubbedPages(scrubCount));
-			}
+			page[i]->state = PAGE_STATE_BUSY;
 		}
+
+		if (scrubCount == 0)
+			continue;
+
+		T(ScrubbingPages(scrubCount));
+		locker.Unlock();
+
+		// clear them
+		for (int32 i = 0; i < scrubCount; i++)
+			clear_page(page[i]);
+
+		locker.Lock();
+
+		// and put them into the clear queue
+		for (int32 i = 0; i < scrubCount; i++) {
+			page[i]->state = PAGE_STATE_CLEAR;
+			enqueue_page(&sClearPageQueue, page[i]);
+		}
+
+		T(ScrubbedPages(scrubCount));
 	}
 
 	return 0;
@@ -1443,9 +1438,9 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 					page->state = PAGE_STATE_FREE;
 
 					T(StolenPage());
-				} else if (stolen < maxCount) {
+				} else if (stolen < maxCount)
 					pages[stolen] = page;
-				}
+
 				stolen++;
 				count--;
 			} else
@@ -1870,6 +1865,7 @@ vm_page_reserve_pages(uint32 count)
 	if (sReservedPages <= freePages)
 		return;
 
+	count = sReservedPages - freePages;
 	locker.Unlock();
 
 	steal_pages(NULL, count + 1, true);
@@ -1932,7 +1928,7 @@ vm_page_allocate_page(int pageState, bool reserved)
 					panic("queue %p corrupted, count = %d\n", queue, queue->count);
 #endif
 
-				// if the primary queue was empty, grap the page from the
+				// if the primary queue was empty, grab the page from the
 				// secondary queue
 				page = dequeue_page(otherQueue);
 			}
@@ -2005,8 +2001,7 @@ vm_page_allocate_page_run(int pageState, addr_t base, addr_t length)
 
 	InterruptsSpinLocker locker(sPageLock);
 
-	if (sFreePageQueue.count + sClearPageQueue.count - sReservedPages
-			< length) {
+	if (free_page_queue_count() - sReservedPages < length) {
 		// TODO: add more tries, ie. free some inactive, ...
 		// no free space
 		return NULL;
@@ -2183,7 +2178,12 @@ vm_page_num_free_pages(void)
 size_t
 vm_page_num_unused_pages(void)
 {
-	return free_page_queue_count() - sReservedPages;
+	size_t reservedPages = sReservedPages;
+	size_t count = free_page_queue_count();
+	if (reservedPages >= count)
+		return 0;
+
+	return count - reservedPages;
 }
 
 
