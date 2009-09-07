@@ -493,8 +493,8 @@ if [ IsOptionalHaikuImagePackageAdded LibIconv ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package LibIconv available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage libiconv-1.13.1-r1a1-x86-gcc2-2009-09-06
-			: $(baseURL)/libiconv-1.13.1-r1a1-x86-gcc2-2009-09-06.zip
+		InstallOptionalHaikuImagePackage libiconv-1.13.1-r1a1-x86-gcc2-2009-09-07
+			: $(baseURL)/libiconv-1.13.1-r1a1-x86-gcc2-2009-09-07.zip
 			:
 		;
 	}
