@@ -49,7 +49,7 @@ struct people_field gFields[] = {
 
 TPeopleApp::TPeopleApp(void)
 	: BApplication(APP_SIG),
-	fHaveWindow(false)
+	fWindowCount(0)
 {
 	fPosition.Set(6, TITLE_BAR_HEIGHT, 6 + WIND_WIDTH, TITLE_BAR_HEIGHT + WIND_HEIGHT);
 	BPoint pos = fPosition.LeftTop();
@@ -179,7 +179,15 @@ TPeopleApp::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case M_NEW:
+		case B_SILENT_RELAUNCH:
 			NewWindow();
+			break;
+
+		case M_WINDOW_QUITS:
+			SavePreferences(msg);
+			fWindowCount--;
+			if (fWindowCount < 1)
+				PostMessage(B_QUIT_REQUESTED);
 			break;
 
 		default:
@@ -212,7 +220,7 @@ TPeopleApp::RefsReceived(BMessage *message)
 void
 TPeopleApp::ReadyToRun(void)
 {
-	if (!fHaveWindow)
+	if (fWindowCount < 1)
 		NewWindow();
 }
 
@@ -224,7 +232,7 @@ TPeopleApp::NewWindow(entry_ref *ref)
 
 	window = new TPeopleWindow(fPosition, "New Person", ref);
 	window->Show();
-	fHaveWindow = true;
+	fWindowCount++;
 	fPosition.OffsetBy(20, 20);
 
 	if (fPosition.bottom > BScreen(B_MAIN_SCREEN_ID).Frame().bottom)
@@ -248,3 +256,20 @@ TPeopleApp::FindWindow(entry_ref ref)
 	}
 	return NULL;
 }
+
+
+void
+TPeopleApp::SavePreferences(BMessage* message)
+{
+	BRect frame;
+	if (message->FindRect("frame", &frame) != B_OK)
+		return;
+
+	BPoint leftTop = frame.LeftTop();
+
+	if (fPrefs) {
+		fPrefs->Seek(0, 0);	
+		fPrefs->Write(&leftTop, sizeof(BPoint));
+	}
+}
+

@@ -44,7 +44,7 @@ TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
 	menu = new BMenu("File");
 	menu->AddItem(item = new BMenuItem("New Person" B_UTF8_ELLIPSIS, new BMessage(M_NEW), 'N'));
 	item->SetTarget(NULL, be_app);
-	menu->AddItem(new BMenuItem("Close", new BMessage(B_CLOSE_REQUESTED), 'W'));
+	menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED), 'W'));
 	menu->AddSeparatorItem();
 	menu->AddItem(fSave = new BMenuItem("Save", new BMessage(M_SAVE), 'S'));
 	fSave->SetEnabled(FALSE);
@@ -52,7 +52,9 @@ TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
 	menu->AddItem(fRevert = new BMenuItem("Revert", new BMessage(M_REVERT), 'R'));
 	fRevert->SetEnabled(FALSE);
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
+	item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q');
+	item->SetTarget(NULL, be_app);
+	menu->AddItem(item);
 	menuBar->AddItem(menu);
 
 	menu = new BMenu("Edit");
@@ -93,7 +95,6 @@ TPeopleWindow::~TPeopleWindow(void)
 		WatchChanges(false);
 
 	delete fRef;
-	delete fPanel;
 }
 
 
@@ -268,12 +269,9 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 bool
 TPeopleWindow::QuitRequested(void)
 {
-	int32			count = 0;
-	int32			index = 0;
-	BPoint			pos;
-	BRect			r;
-	status_t		result;
-	TPeopleWindow	*window;
+	printf("TPeopleWindow::QuitRequested(void)\n");
+
+	status_t result;
 
 	if (fView->CheckSave()) {
 		result = (new BAlert("", "Save changes before quitting?",
@@ -289,20 +287,16 @@ TPeopleWindow::QuitRequested(void)
 			return false;
 	}
 
-	while ((window = (TPeopleWindow *)be_app->WindowAt(index++))) {
-		if (window->FindView("PeopleView"))
-			count++;
-	}
+	if (fPanel)
+		delete fPanel;
 
-	if (count == 1) {
-		r = Frame();
-		pos = r.LeftTop();
-		if (((TPeopleApp*)be_app)->fPrefs) {
-			((TPeopleApp*)be_app)->fPrefs->Seek(0, 0);
-			((TPeopleApp*)be_app)->fPrefs->Write(&pos, sizeof(BPoint));
-		}
-		be_app->PostMessage(B_QUIT_REQUESTED);
+	BMessage message(M_WINDOW_QUITS);
+	message.AddRect("frame", Frame());
+	if (be_app->Lock()) {
+		be_app->PostMessage(&message);
+		be_app->Unlock();
 	}
+	
 	return true;
 }
 

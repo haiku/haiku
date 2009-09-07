@@ -34,7 +34,8 @@ enum messages{
 	M_UNDO, M_SELECT, M_GROUP_MENU, M_DIRTY,
 	M_NAME, M_NICKNAME, M_COMPANY, M_ADDRESS,
 	M_CITY, M_STATE, M_ZIP, M_COUNTRY, M_HPHONE,
-	M_WPHONE, M_FAX, M_EMAIL, M_URL, M_GROUP
+	M_WPHONE, M_FAX, M_EMAIL, M_URL, M_GROUP,
+	M_WINDOW_QUITS
 };
 
 enum fields {
@@ -63,8 +64,11 @@ class TPeopleApp : public BApplication {
 		BFile			*fPrefs;
 
 	private:
-		bool			fHaveWindow;
+				void	SavePreferences(BMessage* message);
+
+		uint32			fWindowCount;
 		BRect			fPosition;
 };
 
 #endif /* PEOPLEAPP_H */
+
