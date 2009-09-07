@@ -115,23 +115,115 @@ ATAChannel::SetBus(scsi_bus bus)
 }
 
 
+bool
+ATAChannel::_DevicePresent(int device)
+{
+	SelectDevice(device);
+
+	if (SelectedDevice() != device) {
+		TRACE_ALWAYS("_DevicePresent: device selection failed for device %i\n",
+		device);
+		return false;
+	}
+
+	ata_task_file taskFile;
+	taskFile.chs.sector_count = 0x5a;
+	taskFile.chs.sector_number = 0xa5;
+	if (_WriteRegs(&taskFile, ATA_MASK_SECTOR_COUNT 
+		| ATA_MASK_SECTOR_NUMBER) != B_OK) {
+		TRACE_ERROR("_DevicePresent: writing registers failed\n");
+		return false;
+	}
+	if (_ReadRegs(&taskFile, ATA_MASK_SECTOR_COUNT 
+		| ATA_MASK_SECTOR_NUMBER) != B_OK) {
+		TRACE_ERROR("_DevicePresent: reading registers failed\n");
+		return false;
+	}
+	bool present = (taskFile.chs.sector_count == 0x5a && 
+		taskFile.chs.sector_number == 0xa5);
+
+	TRACE_ALWAYS("_DevicePresent: device %i, presence %d\n", device, present);
+	return present;
+}
+
+
 status_t
 ATAChannel::ScanBus()
 {
-	bool devicePresent[fDeviceCount];
-	uint16 deviceSignature[fDeviceCount];
-	status_t result = Reset(devicePresent, deviceSignature);
+	uint deviceMask = 0;
+
+	for (int i = 0; i < fDeviceCount; i++)
+		deviceMask |= (int)_DevicePresent(i) << i;
+
+	status_t result = Reset();
 	if (result != B_OK) {
 		TRACE_ERROR("resetting the channel failed\n");
 		return result;
 	}
 
-	for (uint8 i = 0; i < fDeviceCount; i++) {
-		if (!devicePresent[i])
+	TRACE_ALWAYS("deviceMask %d\n", deviceMask);
+
+	for (int i = 0; i < fDeviceCount; i++) {
+		if (!(deviceMask & (1 << i))) {
+			TRACE_ALWAYS("ignoring device %d\n", i);
 			continue;
+		}
+
+		TRACE_ALWAYS("probing device %d\n", i);
+		SelectDevice(i);
+
+		// ensure interrupts are disabled for this device
+		_WriteControl(ATA_DEVICE_CONTROL_DISABLE_INTS);
+
+		// wait up to 3 seconds for busy to clear
+		if (Wait(0, ATA_STATUS_BUSY, 0, 3 * 1000 * 1000) != B_OK) {
+			uint8 status = AltStatus();
+			if (status == 0xff || status == 0x7f) {
+				TRACE_ALWAYS("illegal status value 0x%02x for device %d\n", 
+					status, i);
+				continue;
+			} else {
+				TRACE_ALWAYS("device %d is slow\n", i);
+			}
+		}
+
+		// wait up to 31 seconds for busy to clear (already 3 sec. waited)
+		if (Wait(0, ATA_STATUS_BUSY, 0, 28 * 1000 * 1000) != B_OK) {
+			TRACE_ALWAYS("device %d reset timeout\n", i);
+			continue;
+		}
+
+		// reselect device
+		SelectDevice(i);
+		WaitForIdle();
+
+		if (SelectedDevice() != i) {
+			TRACE_ALWAYS("device selection failed for device %i\n", i);
+			continue;
+		}
+
+		ata_task_file taskFile;
+		if (_ReadRegs(&taskFile, ATA_MASK_LBA_MID | ATA_MASK_LBA_HIGH
+				| ATA_MASK_ERROR) != B_OK) {
+			TRACE_ERROR("reading status failed\n");
+			return B_ERROR;
+		}
+
+		// for information only
+		if ((i == 0) && (taskFile.read.error & 0x80)) {
+			TRACE_ERROR("device 0 indicates that device 1 failed"
+				" error code is 0x%02x\n", taskFile.read.error);
+		} else if (taskFile.read.error != 0x01) {
+			TRACE_ERROR("device %d failed, error code is 0x%02x\n", 
+				i, taskFile.read.error);
+		}
+
+		uint16 signature = taskFile.lba.lba_8_15
+			| (((uint16)taskFile.lba.lba_16_23) << 8);
+		TRACE_ALWAYS("signature of device %d: 0x%04x\n", i, signature);
 
 		ATADevice *device = NULL;
-		if (deviceSignature[i] == ATA_SIGNATURE_ATAPI)
+		if (signature == ATA_SIGNATURE_ATAPI)
 			device = new(std::nothrow) ATAPIDevice(this, i);
 		else
 			device = new(std::nothrow) ATADevice(this, i);
@@ -290,7 +382,7 @@ ATAChannel::SelectedDevice()
 
 
 status_t
-ATAChannel::Reset(bool *presence, uint16 *signatures)
+ATAChannel::Reset()
 {
 	TRACE_FUNCTION("\n");
 
@@ -313,95 +405,6 @@ ATAChannel::Reset(bool *presence, uint16 *signatures)
 
 	_FlushAndWait(150 * 1000);
 
-	for (uint8 i = 0; i < fDeviceCount; i++)
-		presence[i] = false;
-
-	// up to 2 devices on each channel
-	for (uint8 i = 0; i < fDeviceCount; i++) {
-		TRACE_ALWAYS("probing device %d\n", i);
-		SelectDevice(i);
-		if (i == 1) {
-			if (presence[0]) {
-				TRACE_ALWAYS("possibly master and slave configuration...\n");
-			} else {
-				TRACE_ALWAYS("possibly single device 1 configuration...\n");
-				int maxtrys;
-				for (maxtrys = 20; maxtrys > 0; maxtrys--) {
-					SelectDevice(1);
-					ata_task_file taskFile;
-					taskFile.chs.sector_count = 0x5a;
-					taskFile.chs.sector_number = 0xa5;
-					if (_WriteRegs(&taskFile, ATA_MASK_SECTOR_COUNT 
-						| ATA_MASK_SECTOR_NUMBER) != B_OK) {
-						TRACE_ERROR("writing registers failed\n");
-						return B_ERROR;
-					}
-					if (_ReadRegs(&taskFile, ATA_MASK_SECTOR_COUNT 
-						| ATA_MASK_SECTOR_NUMBER) != B_OK) {
-						TRACE_ERROR("reading registers failed\n");
-						return B_ERROR;
-					}
-					if (taskFile.chs.sector_count == 0x5a && 
-						taskFile.chs.sector_number == 0xa5)
-						break;
-					snooze(100000);
-				}
-				if (maxtrys == 0) {
-					TRACE_ALWAYS("Can't access device 1\n");
-					continue;
-				}
-			}
-		}
-
-		// ensure interrupts are disabled for this device
-		_WriteControl(ATA_DEVICE_CONTROL_DISABLE_INTS);
-
-		if (AltStatus() == 0xff)
-			snooze(150 * 1000);
-
-		if (AltStatus() == 0xff) {
-			TRACE_ALWAYS("illegal status value for device %d\n", i);
-			continue;
-		}
-
-		// wait up to 31 seconds for busy to clear
-		if (Wait(0, ATA_STATUS_BUSY, 0, 31 * 1000 * 1000) != B_OK) {
-			TRACE_ALWAYS("device %d reset timeout\n", i);
-			continue;
-		}
-
-		// reselect device
-		SelectDevice(i);
-
-		if (SelectedDevice() != i) {
-			TRACE_ALWAYS("device selection failed for device %i\n", i);
-			continue;
-		}
-
-		ata_task_file taskFile;
-		if (_ReadRegs(&taskFile, ATA_MASK_LBA_MID | ATA_MASK_LBA_HIGH
-				| ATA_MASK_ERROR) != B_OK) {
-			TRACE_ERROR("reading status failed\n");
-			return B_ERROR;
-		}
-
-		// for information only
-		if ((i == 0) && (taskFile.read.error & 0x80)) {
-			TRACE_ERROR("device 0 indicates that device 1 failed"
-				" error code is 0x%02x\n", taskFile.read.error);
-		} else if (taskFile.read.error != 0x01) {
-			TRACE_ERROR("device %d failed, error code is 0x%02x\n", 
-				i, taskFile.read.error);
-		}
-
-		presence[i] = true;
-
-		signatures[i] = taskFile.lba.lba_8_15
-			| (((uint16)taskFile.lba.lba_16_23) << 8);
-		TRACE_ALWAYS("signature of device %d: 0x%04x\n", i, signatures[i]);
-
-	}
-
 	return B_OK;
 }
 
@@ -413,7 +416,7 @@ ATAChannel::Wait(uint8 setBits, uint8 clearedBits, uint32 flags,
 	bigtime_t startTime = system_time();
 	_FlushAndWait(1);
 
-	TRACE("waiting for set bits 0x%02x and cleared bits 0x%02x\n",
+	TRACE("wait for set bits 0x%02x and cleared bits 0x%02x\n",
 		setBits, clearedBits);
 
 #if ATA_TRACING
@@ -424,34 +427,39 @@ ATAChannel::Wait(uint8 setBits, uint8 clearedBits, uint32 flags,
 		if ((flags & ATA_CHECK_ERROR_BIT) != 0
 			&& (status & ATA_STATUS_BUSY) == 0
 			&& (status & ATA_STATUS_ERROR) != 0) {
-			TRACE("error bit set while waiting\n");
+			TRACE("wait failed, error bit set, status 0x%02x\n", status);
 			return B_ERROR;
 		}
 
 		if ((flags & ATA_CHECK_DEVICE_FAULT) != 0
 			&& (status & ATA_STATUS_BUSY) == 0
 			&& (status & ATA_STATUS_DEVICE_FAULT) != 0) {
-			TRACE("device fault bit set while waiting\n");
+			TRACE("wait failed, device fault bit set, status 0x%02x\n", status);
 			return B_ERROR;
 		}
 
 		if ((status & clearedBits) == 0) {
-			if ((flags & ATA_WAIT_ANY_BIT) != 0 && (status & setBits) != 0)
+			if ((flags & ATA_WAIT_ANY_BIT) != 0 && (status & setBits) != 0) {
+				TRACE("wait success, status 0x%02x\n", status);
 				return B_OK;
-			if ((status & setBits) == setBits)
+			}
+			if ((status & setBits) == setBits) {
+				TRACE("wait success, status 0x%02x\n", status);
 				return B_OK;
+			}
 		}
 
 		bigtime_t elapsedTime = system_time() - startTime;
 #if ATA_TRACING
 		if (lastStatus != status) {
-			TRACE("wait status after %lld: 0x%02x\n", elapsedTime, status);
+			TRACE("wait status changed after %lld, status 0x%02x\n", 
+				elapsedTime, status);
 			lastStatus = status;
 		}
 #endif
 
 		if (elapsedTime > timeout) {
-			TRACE("timeout, wait status after %lld: 0x%02x\n",
+			TRACE("wait timeout after %lld, status 0x%02x\n",
 				elapsedTime, status);
 			return B_TIMED_OUT;
 		}
@@ -492,6 +500,27 @@ ATAChannel::WaitForIdle()
 }
 
 
+status_t
+ATAChannel::Interrupt(uint8 status)
+{
+	SpinLocker locker(fInterruptLock);
+	if (!fExpectsInterrupt) {
+		TRACE("interrupt when not expecting transfer\n");
+		return B_UNHANDLED_INTERRUPT;
+	}
+
+	if ((status & ATA_STATUS_BUSY) != 0) {
+		TRACE("interrupt while device is busy\n");
+		return B_UNHANDLED_INTERRUPT;
+	}
+
+	TRACE("interrupt\n");
+
+	fInterruptCondition.NotifyAll();
+	return B_INVOKE_SCHEDULER;
+}
+
+
 void
 ATAChannel::PrepareWaitingForInterrupt()
 {
@@ -516,11 +545,15 @@ ATAChannel::WaitForInterrupt(bigtime_t timeout)
 	fExpectsInterrupt = false;
 	locker.Unlock();
 
+	if (result != B_OK) {
+		TRACE_ERROR("timeout waiting for interrupt\n");
+		result = RecoverLostInterrupt();
+	}
+
 	// disable interrupts
 	_WriteControl(ATA_DEVICE_CONTROL_DISABLE_INTS);
 
 	if (result != B_OK) {
-		TRACE_ERROR("timeout waiting for interrupt\n");
 		return B_TIMED_OUT;
 	}
 
@@ -529,8 +562,22 @@ ATAChannel::WaitForInterrupt(bigtime_t timeout)
 
 
 status_t
+ATAChannel::RecoverLostInterrupt()
+{
+	uint8 status = AltStatus();
+	if (status & (ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST)) {
+		TRACE_ERROR("RecoverLostInterrupt: device busy, status 0x%02x\n", status);
+		return B_ERROR;
+	}
+	TRACE_ERROR("RecoverLostInterrupt: lost interrupt, status 0x%02x\n", status);
+	return B_OK;
+}
+
+
+status_t
 ATAChannel::SendRequest(ATARequest *request, uint32 flags)
 {
+	TRACE_FUNCTION("\n");
 	ATADevice *device = request->Device();
 	if (device->Select() != B_OK || WaitForIdle() != B_OK) {
 		// resetting the device here will discard current configuration,
@@ -561,6 +608,7 @@ ATAChannel::SendRequest(ATARequest *request, uint32 flags)
 status_t
 ATAChannel::FinishRequest(ATARequest *request, uint32 flags, uint8 errorMask)
 {
+	TRACE_FUNCTION("\n");
 	if (flags & ATA_WAIT_FINISH) {
 		// wait for the device to finish current command (device no longer busy)
 		status_t result = Wait(0, ATA_STATUS_BUSY, flags, request->Timeout());
@@ -603,8 +651,8 @@ ATAChannel::FinishRequest(ATARequest *request, uint32 flags, uint8 errorMask)
 
 	if ((taskFile->read.error & ATA_ERROR_MEDIUM_CHANGED)
 			!= ATA_ERROR_MEDIUM_CHANGED) {
-		TRACE_ERROR("command failed, error bit is set: 0x%02x\n",
-			taskFile->read.error);
+		TRACE_ERROR("command failed, error bit is set. status 0x%02x, error 0x%02x\n",
+			taskFile->read.status, taskFile->read.error);
 	}
 
 	uint8 error = taskFile->read.error & errorMask;
@@ -753,25 +801,6 @@ ATAChannel::WritePIO(uint8 *buffer, size_t length)
 {
 	return fController->write_pio(fCookie, (uint16 *)buffer,
 		length / sizeof(uint16), true);
-}
-
-
-status_t
-ATAChannel::Interrupt(uint8 status)
-{
-	SpinLocker locker(fInterruptLock);
-	if (!fExpectsInterrupt) {
-		TRACE("interrupt when not expecting transfer\n");
-		return B_UNHANDLED_INTERRUPT;
-	}
-
-	if ((status & ATA_STATUS_BUSY) != 0) {
-		TRACE(("interrupt while device is busy\n"));
-		return B_UNHANDLED_INTERRUPT;
-	}
-
-	fInterruptCondition.NotifyAll();
-	return B_INVOKE_SCHEDULER;
 }
 
 
