@@ -7,17 +7,15 @@
 
 #include <new>
 
-#include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/resource.h>
 
 #include <Directory.h>
-#include <fs_attr.h>
-#include <NodeInfo.h>
+#include <Entry.h>
+#include <File.h>
+#include <Node.h>
 #include <Path.h>
 #include <String.h>
-#include <SymLink.h>
 
 #include "CommandPipe.h"
 #include "SemaphoreLocker.h"
@@ -108,12 +106,11 @@ UnzipEngine::UnzipPackage()
 		ret = commandPipe.AddArg("-d");
 	if (ret == B_OK)
 		ret = commandPipe.AddArg(fDestinationFolder.String());
-	if (ret == B_OK)
-		ret = commandPipe.AddArg("-x");
-	if (ret == B_OK)
-		ret = commandPipe.AddArg(".OptionalPackageDescription");
-	if (ret != B_OK)
+	if (ret != B_OK) {
+		fprintf(stderr, "Faild to construct argument list for unzip "
+			"process: %s\n", strerror(ret));
 		return ret;
+	}
 
 	// Launch the unzip thread and start reading the stdout and stderr output.
 	FILE* stdOutAndErrPipe = NULL;
@@ -121,7 +118,104 @@ UnzipEngine::UnzipPackage()
 	if (unzipThread < 0)
 		return (status_t)unzipThread;
 
-	return commandPipe.ReadLines(stdOutAndErrPipe, this);
+	ret = commandPipe.ReadLines(stdOutAndErrPipe, this);
+	if (ret != B_OK) {
+		fprintf(stderr, "Piping the unzip process failed: %s\n",
+			strerror(ret));
+		return ret;
+	}
+
+	// Add the contents of a potentially existing .OptionalPackageDescription
+	// to the COPYRIGHTS attribute of AboutSystem.
+	BPath descriptionPath(fDestinationFolder.String(),
+		".OptionalPackageDescription");
+	ret = descriptionPath.InitCheck();
+	if (ret != B_OK) {
+		fprintf(stderr, "Failed to construct path to "
+			".OptionalPackageDescription: %s\n", strerror(ret));
+		return ret;
+	}
+
+	BEntry descriptionEntry(descriptionPath.Path());
+	if (!descriptionEntry.Exists())
+		return B_OK;
+
+	BFile descriptionFile(&descriptionEntry, B_READ_ONLY);
+	ret = descriptionFile.InitCheck();
+	if (ret != B_OK) {
+		fprintf(stderr, "Failed to construct file to "
+			".OptionalPackageDescription: %s\n", strerror(ret));
+		return ret;
+	}
+
+	BPath aboutSystemPath(fDestinationFolder.String(),
+		"system/apps/AboutSystem");
+	ret = aboutSystemPath.InitCheck();
+	if (ret != B_OK) {
+		fprintf(stderr, "Failed to construct path to AboutSystem: %s\n",
+			strerror(ret));
+		return ret;
+	}
+
+	BNode aboutSystemNode(aboutSystemPath.Path());
+	ret = aboutSystemNode.InitCheck();
+	if (ret != B_OK) {
+		fprintf(stderr, "Failed to construct node to AboutSystem: %s\n",
+			strerror(ret));
+		return ret;
+	}
+
+	const char* kCopyrightsAttrName = "COPYRIGHTS";
+
+	BString copyrightAttr;
+	ret = aboutSystemNode.ReadAttrString(kCopyrightsAttrName, &copyrightAttr);
+	if (ret != B_OK && ret != B_ENTRY_NOT_FOUND) {
+		fprintf(stderr, "Failed to read current COPYRIGHTS attribute from "
+			"AboutSystem: %s\n", strerror(ret));
+		return ret;
+	}
+
+	// Append the contents of the current optional package description to
+	// the existing COPYRIGHTS attribute from AboutSystem
+	size_t bufferSize = 2048;
+	char buffer[bufferSize + 1];
+	buffer[bufferSize] = '\0';
+	while (true) {
+		ssize_t read = descriptionFile.Read(buffer, bufferSize);
+		if (read > 0) {
+			int32 length = copyrightAttr.Length();
+			if (read < bufferSize)
+				buffer[read] = '\0';
+			int32 bufferLength = strlen(buffer);
+				// Should be "read", but maybe we have a zero in the
+				// buffer in which case the next check would be fooled.
+			copyrightAttr << buffer;
+			if (copyrightAttr.Length() != length + bufferLength) {
+				fprintf(stderr, "Failed to append buffer to COPYRIGHTS "
+					"attribute.\n");
+				return B_NO_MEMORY;
+			}
+		} else
+			break;
+	}
+
+	if (copyrightAttr[copyrightAttr.Length() - 1] != '\n')
+		copyrightAttr << '\n\n';
+	else
+		copyrightAttr << '\n';
+
+	ret = aboutSystemNode.WriteAttrString(kCopyrightsAttrName, &copyrightAttr);
+	if (ret != B_OK && ret != B_ENTRY_NOT_FOUND) {
+		fprintf(stderr, "Failed to read current COPYRIGHTS attribute from "
+			"AboutSystem: %s\n", strerror(ret));
+		return ret;
+	}
+
+	// Don't leave the .OptionalPackageDescription behind.
+	descriptionFile.Unset();
+	descriptionEntry.Remove();
+
+	return B_OK;
 }
 
 
