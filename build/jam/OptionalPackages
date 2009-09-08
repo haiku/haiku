@@ -739,8 +739,8 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Perl available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage perl-5.10.0-gcc2-2008-10-29
-			: $(baseURL)/perl-5.10.0-gcc2-2008-10-29.zip
+		InstallOptionalHaikuImagePackage perl-5.10.1-r1a1-x86-gcc2-2009-09-08
+			: $(baseURL)/perl-5.10.1-r1a1-x86-gcc2-2009-09-08.zip
 			:
 			: true
 		;
