@@ -283,8 +283,8 @@ AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 # Deskbar Application links
 AddDirectoryToHaikuImage home config be Applications ;
 DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
-	DiskProbe DriveSetup DiskUsage Expander Icon-O-Matic Magnify Mail
-	MediaConverter MediaPlayer MidiPlayer People PoorMan Screenshot
+	DiskProbe DriveSetup DiskUsage Expander Icon-O-Matic Installer Magnify
+	Mail MediaConverter MediaPlayer MidiPlayer People PoorMan Screenshot
 	SoundRecorder StyledEdit Terminal TV
 ;
 local linkTarget ;

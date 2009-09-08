@@ -15,8 +15,7 @@ fi
 
 mkdir -p "$target/var/tmp"
 
-# remove Installer links
-rm -f $target/home/Desktop/Installer
-rm -f $target/home/config/be/Applications/Installer
+# remove Installer link
+rm -f "$target/home/Desktop/Installer"
 
 makebootable "$target"
