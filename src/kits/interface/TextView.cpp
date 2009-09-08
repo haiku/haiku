@@ -3627,14 +3627,13 @@ BTextView::_HandleAlphaKey(const char *bytes, int32 numBytes)
 		start = offset = OffsetAt(_LineAt(fSelStart));
 
 		while (ByteAt(offset) != '\0' &&
-				(ByteAt(offset) == B_TAB || ByteAt(offset) == B_SPACE))
+				(ByteAt(offset) == B_TAB || ByteAt(offset) == B_SPACE)
+				&& offset < fSelStart)
 			offset++;
 
+		_DoInsertText(bytes, numBytes, fSelStart, NULL);
 		if (start != offset)
 			_DoInsertText(Text() + start, offset - start, fSelStart, NULL);
-
-		_DoInsertText(bytes, numBytes, fSelStart, NULL);
-
 	} else
 		_DoInsertText(bytes, numBytes, fSelStart, NULL);
 
