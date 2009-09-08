@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Ramshankar, v.ramshankar@gmail.com
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 //! BCommandPipe class to handle reading shell output
@@ -20,8 +21,9 @@
 
 
 BCommandPipe::BCommandPipe()
-	: fOutDesOpen(false)
-	, fErrDesOpen(false)
+	:
+	fStdOutOpen(false),
+	fStdErrOpen(false)
 {
 }
 
@@ -35,8 +37,19 @@ BCommandPipe::~BCommandPipe()
 status_t
 BCommandPipe::AddArg(const char* arg)
 {
-	return (fArgList.AddItem(reinterpret_cast<void*>(strdup(arg))) == true ?
-		B_OK : B_ERROR);
+	if (arg == NULL || arg[0] == '\0')
+		return B_BAD_VALUE;
+
+	char* argCopy = strdup(arg);
+	if (argCopy == NULL)
+		return B_NO_MEMORY;
+
+	if (!fArgList.AddItem(reinterpret_cast<void*>(argCopy))) {
+		free(argCopy);
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
 }
 
 
@@ -44,7 +57,7 @@ void
 BCommandPipe::PrintToStream() const
 {
 	for (int32 i = 0L; i < fArgList.CountItems(); i++)
-		printf("%s ", (char*)fArgList.ItemAtFast(i));
+		printf("%s ", reinterpret_cast<char*>(fArgList.ItemAtFast(i)));
 
 	printf("\n");
 }
@@ -54,10 +67,10 @@ void
 BCommandPipe::FlushArgs()
 {
 	// Delete all arguments from the list
-	for (int32 i = 0; i < fArgList.CountItems(); i++)
-		free(fArgList.RemoveItem(0L));
-
+	for (int32 i = fArgList.CountItems() - 1; i >= 0; i--)
+		free(fArgList.ItemAtFast(i));
 	fArgList.MakeEmpty();
+
 	Close();
 }
 
@@ -65,29 +78,29 @@ BCommandPipe::FlushArgs()
 void
 BCommandPipe::Close()
 {
-	if (fErrDesOpen) {
-		close(fErrDes[0]);
-		fErrDesOpen = false;
+	if (fStdErrOpen) {
+		close(fStdErr[0]);
+		fStdErrOpen = false;
 	}
-	
-	if (fOutDesOpen) {
-		close(fOutDes[0]);
-		fOutDesOpen = false;
+
+	if (fStdOutOpen) {
+		close(fStdOut[0]);
+		fStdOutOpen = false;
 	}
 }
 
 
 const char**
-BCommandPipe::Argv(int32& _argc) const
+BCommandPipe::Argv(int32& argc) const
 {
-	// *** Warning *** Freeing is left to caller!! Indicated in Header
-	int32 argc = fArgList.CountItems();
-	const char **argv = (const char**)malloc((argc + 1) * sizeof(char*));
+	// NOTE: Freeing is left to caller as indicated in the header!
+	argc = fArgList.CountItems();
+	const char** argv = reinterpret_cast<const char**>(
+		malloc((argc + 1) * sizeof(char*)));
 	for (int32 i = 0; i < argc; i++)
-		argv[i] = (const char*)fArgList.ItemAtFast(i);
-	
+		argv[i] = reinterpret_cast<const char*>(fArgList.ItemAtFast(i));
+
 	argv[argc] = NULL;
-	_argc = argc;
 	return argv;
 }
 
@@ -96,88 +109,81 @@ BCommandPipe::Argv(int32& _argc) const
 
 
 thread_id
-BCommandPipe::PipeAll(int* outAndErrDes) const
+BCommandPipe::PipeAll(int* stdOutAndErr) const
 {
 	// This function pipes both stdout and stderr to the same filedescriptor
-	// (outdes)
-	int oldstdout;
-	int oldstderr;
-	pipe(outAndErrDes);
-	oldstdout = dup(STDOUT_FILENO);
-	oldstderr = dup(STDERR_FILENO);
+	// (stdOut)
+	int oldStdOut;
+	int oldStdErr;
+	pipe(stdOutAndErr);
+	oldStdOut = dup(STDOUT_FILENO);
+	oldStdErr = dup(STDERR_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
-	dup2(outAndErrDes[1], STDOUT_FILENO);
-	dup2(outAndErrDes[1], STDERR_FILENO);
-	
+	// TODO: This looks broken, using "stdOutAndErr[1]" twice!
+	dup2(stdOutAndErr[1], STDOUT_FILENO);
+	dup2(stdOutAndErr[1], STDERR_FILENO);
+
 	// Construct the argv vector
-	int32 argc = fArgList.CountItems();
-	const char **argv = (const char**)malloc((argc + 1) * sizeof(char*));
-	for (int32 i = 0; i < argc; i++)
-		argv[i] = (const char*)fArgList.ItemAtFast(i);
-	
-	argv[argc] = NULL;
-	
+	int32 argc;
+	const char** argv = Argv(argc);
+
 	// Load the app image... and pass the args
-	thread_id appThread = load_image((int)argc, argv, const_cast<
-		const char**>(environ));
+	thread_id appThread = load_image((int)argc, argv,
+		const_cast<const char**>(environ));
 
-	dup2(oldstdout, STDOUT_FILENO);
-	dup2(oldstderr, STDERR_FILENO);
-	close(oldstdout);
-	close(oldstderr);
+	dup2(oldStdOut, STDOUT_FILENO);
+	dup2(oldStdErr, STDERR_FILENO);
+	close(oldStdOut);
+	close(oldStdErr);
 
-	delete[] argv;
-	
+	free(argv);
+
 	return appThread;
 }
 
 
 thread_id
-BCommandPipe::Pipe(int* outdes, int* errdes) const
+BCommandPipe::Pipe(int* stdOut, int* stdErr) const
 {
-	int oldstdout;
-	int oldstderr;
-	pipe(outdes);
-	pipe(errdes);
-	oldstdout = dup(STDOUT_FILENO);
-	oldstderr = dup(STDERR_FILENO);
+	int oldStdOut;
+	int oldStdErr;
+	pipe(stdOut);
+	pipe(stdErr);
+	oldStdOut = dup(STDOUT_FILENO);
+	oldStdErr = dup(STDERR_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
-	dup2(outdes[1], STDOUT_FILENO);
-	dup2(errdes[1], STDERR_FILENO);
-	
+	dup2(stdOut[1], STDOUT_FILENO);
+	dup2(stdErr[1], STDERR_FILENO);
+
 	// Construct the argv vector
-	int32 argc = fArgList.CountItems();
-	const char **argv = (const char**)malloc((argc + 1) * sizeof(char*));
-	for (int32 i = 0; i < argc; i++)
-		argv[i] = (const char*)fArgList.ItemAtFast(i);
-	
-	argv[argc] = NULL;
-	
+	int32 argc;
+	const char** argv = Argv(argc);
+
 	// Load the app image... and pass the args
 	thread_id appThread = load_image((int)argc, argv, const_cast<
 		const char**>(environ));
 
-	dup2(oldstdout, STDOUT_FILENO);
-	dup2(oldstderr, STDERR_FILENO);
-	close(oldstdout);
-	close(oldstderr);
-	
-	delete[] argv;
+	dup2(oldStdOut, STDOUT_FILENO);
+	dup2(oldStdErr, STDERR_FILENO);
+	close(oldStdOut);
+	close(oldStdErr);
+
+	free(argv);
 
 	return appThread;
 }
 
 
 thread_id
-BCommandPipe::Pipe(int* outdes) const
+BCommandPipe::Pipe(int* stdOut) const
 {
 	// Redirects only output (stdout) to caller, stderr is closed
-	int errdes[2];
-	thread_id tid = Pipe(outdes, errdes);
-	close(errdes[0]);
-	close(errdes[1]);
+	int stdErr[2];
+	thread_id tid = Pipe(stdOut, stdErr);
+	close(stdErr[0]);
+	close(stdErr[1]);
 	return tid;
 }
 
@@ -186,19 +192,20 @@ thread_id
 BCommandPipe::PipeInto(FILE** _out, FILE** _err)
 {
 	Close();
-	thread_id tid = Pipe(fOutDes, fErrDes);
-	
-	resume_thread(tid);
-	
-	close(fErrDes[1]);
-	close(fOutDes[1]);
-	
-	fOutDesOpen = true;
-	fErrDesOpen = true;
 
-	*_out = fdopen(fOutDes[0], "r");
-	*_err = fdopen(fErrDes[0], "r");
-	
+	thread_id tid = Pipe(fStdOut, fStdErr);
+	if (tid >= 0)
+		resume_thread(tid);
+
+	close(fStdErr[1]);
+	close(fStdOut[1]);
+
+	fStdOutOpen = true;
+	fStdErrOpen = true;
+
+	*_out = fdopen(fStdOut[0], "r");
+	*_err = fdopen(fStdErr[0], "r");
+
 	return tid;
 }
 
@@ -207,17 +214,15 @@ thread_id
 BCommandPipe::PipeInto(FILE** _outAndErr)
 {
 	Close();
-	thread_id tid = PipeAll(fOutDes);
-	
-	if (tid == B_ERROR || tid == B_NO_MEMORY)
-		return tid;
-	
-	resume_thread(tid);
-	
-	close(fOutDes[1]);
-	fOutDesOpen = true;
-	
-	*_outAndErr = fdopen(fOutDes[0], "r");
+
+	thread_id tid = PipeAll(fStdOut);
+	if (tid >= 0)
+		resume_thread(tid);
+
+	close(fStdOut[1]);
+	fStdOutOpen = true;
+
+	*_outAndErr = fdopen(fStdOut[0], "r");
 	return tid;
 }
 
@@ -230,14 +235,14 @@ BCommandPipe::Run()
 {
 	// Runs the command without bothering to redirect streams, this is similar
 	// to system() but uses pipes and wait_for_thread.... Synchronous.
-	int outdes[2], errdes[2];
+	int stdOut[2], stdErr[2];
 	status_t exitCode;
-	wait_for_thread(Pipe(outdes, errdes), &exitCode);
+	wait_for_thread(Pipe(stdOut, stdErr), &exitCode);
 
-	close(outdes[0]);
-	close(errdes[0]);
-	close(outdes[1]);
-	close(errdes[1]);
+	close(stdOut[0]);
+	close(stdErr[0]);
+	close(stdOut[1]);
+	close(stdErr[1]);
 }
 
 
@@ -256,69 +261,107 @@ BCommandPipe::RunAsync()
 // #pragma mark -
 
 
-BString
-BCommandPipe::ReadLines(FILE* file, bool* cancel, BMessenger& target,
-	const BMessage& message, const BString& stringFieldName)
+status_t
+BCommandPipe::ReadLines(FILE* file, LineReader* lineReader)
 {
-	// Reads output of file, line by line. The entire output is returned
-	// and as each line is being read "target" (if any) is informed,
-	// with "message" i.e. AddString (stringFieldName, <line read from pipe>)
-	
-	// "cancel" cancels the reading process, when it becomes true (unless its
-	// waiting on fgetc()) and I don't know how to cancel the waiting fgetc()
-	// call.
-	
-	BString result;
+	// Reads output of file, line by line. Each line is passed to lineReader
+	// for inspection, and the IsCanceled() method is repeatedly called.
+
+	if (file == NULL || lineReader == NULL)
+		return B_BAD_VALUE;
+
 	BString line;
-	BMessage updateMsg(message);
 
 	while (!feof(file)) {
-		if (cancel != NULL && *cancel == true)
-			break;
-		
+		if (lineReader->IsCanceled())
+			return B_CANCELED;
+
 		unsigned char c = fgetc(file);
-		
-		if (c != 255) {
+			// TODO: fgetc() blocks, is there a way to make it timeout?
+
+		if (c != 255)
 			line << (char)c;
-			result << (char)c;
-		}
-		
+
 		if (c == '\n') {
-			updateMsg.RemoveName(stringFieldName.String());
-			updateMsg.AddString(stringFieldName.String(), line);
-			target.SendMessage(&updateMsg);
+			status_t ret = lineReader->ReadLine(line);
+			if (ret != B_OK)
+				return ret;
 			line = "";
 		}
 	}
-	
-	return result;
+
+	return B_OK;
 }
 
 
-BCommandPipe&
-BCommandPipe::operator<<(const char* _arg)
+BString
+BCommandPipe::ReadLines(FILE* file)
 {
-	AddArg(_arg);
+	class AllLinesReader : public LineReader {
+	public:
+		AllLinesReader()
+			:
+			fResult("")
+		{
+		}
+
+		virtual bool IsCanceled()
+		{
+			return false;
+		}
+
+		virtual status_t ReadLine(const BString& line)
+		{
+			int lineLength = line.Length();
+			int resultLength = fResult.Length();
+			fResult << line;
+			if (fResult.Length() != lineLength + resultLength)
+				return B_NO_MEMORY;
+			return B_OK;
+		}
+
+		BString Result() const
+		{
+			return fResult;
+		}
+
+	private:
+		BString fResult;
+	} lineReader;
+
+	ReadLines(file, &lineReader);
+
+	return lineReader.Result();
+}
+
+
+// #pragma mark -
+
+
+BCommandPipe&
+BCommandPipe::operator<<(const char* arg)
+{
+	AddArg(arg);
 	return *this;
 }
 
 
 BCommandPipe&
-BCommandPipe::operator<<(const BString& _arg)
+BCommandPipe::operator<<(const BString& arg)
 {
-	AddArg(_arg.String());
+	AddArg(arg.String());
 	return *this;
 }
 
 
 BCommandPipe&
-BCommandPipe::operator<<(const BCommandPipe& _arg)
+BCommandPipe::operator<<(const BCommandPipe& arg)
 {
 	int32 argc;
-	const char** argv = _arg.Argv(argc);
+	const char** argv = arg.Argv(argc);
 	for (int32 i = 0; i < argc; i++)
 		AddArg(argv[i]);
-	
+
 	return *this;
 }
 

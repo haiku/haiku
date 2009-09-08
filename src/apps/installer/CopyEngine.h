@@ -15,13 +15,12 @@
 #include "BlockingQueue.h"
 
 class BFile;
-class BMessage;
-class BMessenger;
+class ProgressReporter;
+
 
 class CopyEngine {
 public:
-								CopyEngine(const BMessenger& messenger,
-									BMessage* message);
+								CopyEngine(ProgressReporter* reporter);
 	virtual						~CopyEngine();
 
 			void				ResetTargets();
@@ -92,7 +91,9 @@ private:
 	volatile bool				fQuitting;
 
 			off_t				fBytesRead;
+			uint64				fLastBytesRead;
 			uint64				fItemsCopied;
+			uint64				fLastItemsCopied;
 			bigtime_t			fTimeRead;
 
 			off_t				fBytesWritten;
@@ -104,9 +105,8 @@ private:
 			const char*			fCurrentTargetFolder;
 			const char*			fCurrentItem;
 
-			BMessenger			fMessenger;
-			BMessage*			fMessage;
+			ProgressReporter*	fProgressReporter;
 };
 
 
-#endif // COPY_ENGINE_2_H
+#endif // COPY_ENGINE_H

@@ -758,13 +758,18 @@ rule OptionalPackageDependencies package : dependencies
 	}
 }
 
-rule InstallOptionalHaikuImagePackage package : url : dirTokens
+rule InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
 {
 	# download zip file
 	local zipFile = [ DownloadOptionalPackage $(package) : $(url) ] ;
 
-	# unzip onto image
-	UnzipArchiveToHaikuImage $(dirTokens) : $(zipFile) ;
+	if $(isCDPackage) = true || $(isCDPackage) = 1 && $(HAIKU_CD_NAME) {
+		# copy onto image
+		AddFilesToHaikuImage _packages_ : $(zipFile) ;
+	} else {
+		# unzip onto image
+		UnzipArchiveToHaikuImage $(dirTokens) : $(zipFile) ;
+	}
 }
 
 rule AddEntryToHaikuImageUserGroupFile file : entry
