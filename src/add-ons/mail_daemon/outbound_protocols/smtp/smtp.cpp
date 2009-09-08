@@ -358,6 +358,7 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 
         #ifdef USE_SSL
 		use_ssl = (fSettings->FindInt32("flavor") == 1);
+		use_STARTTLS = (fSettings->FindInt32("flavor") == 2);
 		ssl = NULL;
 		ctx = NULL;
 	#endif
@@ -458,8 +459,57 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 		return B_ERROR;
 	}
 
-	delete[] cmd;
+	
+	
+	#ifdef USE_SSL
+	// Check for STARTTLS
+	if(use_STARTTLS)
+	{
+		const char *res = fLog.String();
+		char *p;
+		
+		SSL_library_init();
+		RAND_seed(this,sizeof(SMTPProtocol));
+		::sprintf(cmd, "STARTTLS"CRLF);
+		
+		if ((p = ::strstr(res, "STARTTLS")) != NULL)
+		{
+			// Server advertises STARTTLS support
+			if(SendCommand(cmd) != B_OK)
+			{
+				delete[] cmd;
+				return B_ERROR;
+			}
+			
+			// We should start TLS negotiation
+			use_ssl = true;
+			ctx = SSL_CTX_new(TLSv1_method());
+    		ssl = SSL_new(ctx);
+    		sbio = BIO_new_socket(_fd,BIO_NOCLOSE);
+    		BIO_set_nbio(sbio, 0);
+    		SSL_set_bio(ssl, sbio, sbio);
+    		SSL_set_connect_state(ssl);
+    		if(SSL_do_handshake(ssl) != 1)
+    			return B_ERROR;
+    		
+    		// Should send EHLO command again
+    		if(!esmtp)
+    			::sprintf(cmd, "HELO %s"CRLF, localhost);
+    		else
+    			::sprintf(cmd, "EHLO %s"CRLF, localhost);
+    			
+    		if(SendCommand(cmd) != B_OK)
+    		{
+    			delete[] cmd;
+    			return B_ERROR;
+    		}
+		}
 
+	}
+	#endif
+	
+	delete[] cmd;
+	
 	// Check auth type
 	if (esmtp) {
 		const char *res = fLog.String();
@@ -1055,6 +1105,7 @@ instantiate_config_panel(BMessage *settings, BMessage *)
 																B_MAIL_PROTOCOL_HAS_FLAVORS);
 	view->AddFlavor("Unencrypted");
 	view->AddFlavor("SSL");
+	view->AddFlavor("STARTTLS");
 	#else
 	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS |
 																B_MAIL_PROTOCOL_HAS_USERNAME |

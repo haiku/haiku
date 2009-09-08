@@ -51,6 +51,7 @@ class SMTPProtocol : public BMailFilter {
 		BIO *sbio;
 
 		bool use_ssl;
+		bool use_STARTTLS;
 #endif
 
 		status_t fStatus;
