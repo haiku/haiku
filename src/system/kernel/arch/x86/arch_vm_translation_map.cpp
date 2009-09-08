@@ -295,8 +295,11 @@ map_max_pages_need(vm_translation_map */*map*/, addr_t start, addr_t end)
 {
 	// If start == 0, the actual base address is not yet known to the caller and
 	// we shall assume the worst case.
-	if (start == 0)
+	if (start == 0) {
+		// offset the range so it has the worst possible alignment
+		start = 1023 * B_PAGE_SIZE;
 		end += 1023 * B_PAGE_SIZE;
+	}
 
 	return VADDR_TO_PDENT(end) + 1 - VADDR_TO_PDENT(start);
 }
