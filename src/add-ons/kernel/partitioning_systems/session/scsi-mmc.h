@@ -110,9 +110,12 @@ inline
 uint32
 msf_to_lba(msf_address msf)
 {
-	return (CDROM_FRAMES_PER_MINUTE * msf.minutes)
+	uint32 lba = (CDROM_FRAMES_PER_MINUTE * msf.minutes)
 	       + (CDROM_FRAMES_PER_SECOND * msf.seconds)
-	       + msf.frames - 150;
+	       + msf.frames;
+	if (lba < 150)
+		return lba;
+	return (lba - 150);
 }
 
 /*! \brief Header for data returned by all formats of SCSI
