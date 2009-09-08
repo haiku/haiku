@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Marcus Overhagen. All rights reserved.
+ * Copyright 2007-2009, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,7 +9,7 @@
 #include <string.h>
 #include <new>
 
-#define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
+#define TRACE(a...) dprintf("ahci: " a)
 //#define FLOW(a...)	dprintf("ahci: " a)
 #define FLOW(a...)
 

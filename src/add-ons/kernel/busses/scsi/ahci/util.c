@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Marcus Overhagen. All rights reserved.
+ * Copyright 2004-2009, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #include "util.h"
@@ -10,8 +10,8 @@
 #include <string.h>
 
 
-#define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
-#define ERROR(a...) dprintf("\33[34mahci:\33[0m " a)
+#define TRACE(a...) dprintf("ahci: " a)
+#define ERROR(a...) dprintf("ahci: " a)
 
 
 static inline uint32
