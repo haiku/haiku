@@ -45,8 +45,8 @@ static const struct {
 	{B_SR_96000, MAKE_RATE(48000, 2, 1), 96000},
 	{B_SR_176400, MAKE_RATE(44100, 4, 1), 176400},
 	{B_SR_192000, MAKE_RATE(48000, 4, 1), 192000},
-// TODO: What about this one?
-//	{B_SR_384000, MAKE_RATE(44100, ??, ??), 384000},
+	// this one is not supported by hardware.
+	// {B_SR_384000, MAKE_RATE(44100, ??, ??), 384000},
 };
 
 
@@ -113,6 +113,13 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 	stream->real_time = system_time();
 	stream->frames_count += stream->buffer_length;
 	stream->buffer_cycle = position / bufferSize;
+
+	// playback interrupts come early, offsets don't work on non intel
+	// TODO find out why
+	if (stream->type == STREAM_PLAYBACK
+		&& stream->controller->pci_info.vendor_id != INTEL_VENDORID) {
+		stream->buffer_cycle++;
+	}
 
 	release_spinlock(&stream->lock);
 
@@ -548,10 +555,10 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 
 	// Stream interrupts seem to arrive too early on most HDA
 	// so we adjust buffer descriptors to take this into account
-	// TODO check on other vendors, uncomment last line in stream_handle_interrupt()
+	// TODO check on other vendors, see in stream_handle_interrupt()
 	// Tested only on Intel ICH8
 	uint32 offset = 0;
-	if (stream->type == STREAM_PLAYBACK) {
+	if (stream->type == STREAM_PLAYBACK && stream->controller->pci_info.vendor_id == INTEL_VENDORID) {
 		if (stream->sample_size == 2)
 			offset = 6;
 		else if (stream->sample_size > 2)
