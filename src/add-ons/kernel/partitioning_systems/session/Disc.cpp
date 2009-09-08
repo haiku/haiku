@@ -635,6 +635,13 @@ Disc::GetSession(int32 index)
 					PRINT(("found session #%ld info (data session)\n", index));
 
 					off_t startLBA = track->start_lba;
+					if (startLBA < 0) {
+						WARN(("%s: warning: invalid negative start LBA of %lld"
+							" for data track assuming 0\n", kModuleDebugName,
+							startLBA));
+						startLBA = 0;
+					}
+
 					off_t endLBA = track->next
 						? ((struct track*)track->next)->start_lba
 						: session->end_lba;
