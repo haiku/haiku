@@ -107,7 +107,7 @@ make_msf_address(uint8 minutes, uint8 seconds, uint8 frames)
 */
 static
 inline
-uint32
+off_t
 msf_to_lba(msf_address msf)
 {
 	return (CDROM_FRAMES_PER_MINUTE * msf.minutes)

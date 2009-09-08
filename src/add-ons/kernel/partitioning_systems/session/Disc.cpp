@@ -223,7 +223,7 @@ dump_full_table_of_contents(uchar* data, uint16 dataLength)
 		TRACE(("  pminutes = %d\n", entries[i].pminutes));
 		TRACE(("  pseconds = %d\n", entries[i].pseconds));
 		TRACE(("  pframes  = %d\n", entries[i].pframes));
-		TRACE(("  lba      = %ld\n",
+		TRACE(("  lba      = %lld\n",
 			msf_to_lba(make_msf_address(entries[i].pminutes,
 			entries[i].pseconds, entries[i].pframes))));
 	}
