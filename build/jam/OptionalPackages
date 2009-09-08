@@ -493,8 +493,8 @@ if [ IsOptionalHaikuImagePackageAdded LibIconv ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package LibIconv available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage libiconv-1.13.1-r1a1-x86-gcc2-2009-09-07
-			: $(baseURL)/libiconv-1.13.1-r1a1-x86-gcc2-2009-09-07.zip
+		InstallOptionalHaikuImagePackage libiconv-1.13.1-r1a1-x86-gcc2-2009-09-08
+			: $(baseURL)/libiconv-1.13.1-r1a1-x86-gcc2-2009-09-08.zip
 			:
 		;
 	}
@@ -521,8 +521,8 @@ if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package LibXML2 available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage libxml2-2.7.3-git-r1a1-x86-gcc2-2009-08-30
-			: $(baseURL)/libxml2-2.7.3-git-r1a1-x86-gcc2-2009-08-30.zip
+		InstallOptionalHaikuImagePackage libxml2-2.7.3-r1a1-x86-gcc2-2009-09-08
+			: $(baseURL)/libxml2-2.7.3-r1a1-x86-gcc2-2009-09-08.zip
 			:
 		;
 	}
