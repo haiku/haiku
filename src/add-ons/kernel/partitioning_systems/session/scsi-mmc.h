@@ -107,15 +107,12 @@ make_msf_address(uint8 minutes, uint8 seconds, uint8 frames)
 */
 static
 inline
-uint32
+off_t
 msf_to_lba(msf_address msf)
 {
-	uint32 lba = (CDROM_FRAMES_PER_MINUTE * msf.minutes)
+	return (CDROM_FRAMES_PER_MINUTE * msf.minutes)
 	       + (CDROM_FRAMES_PER_SECOND * msf.seconds)
-	       + msf.frames;
-	if (lba < 150)
-		return lba;
-	return (lba - 150);
+	       + msf.frames - 150;
 }
 
 /*! \brief Header for data returned by all formats of SCSI
