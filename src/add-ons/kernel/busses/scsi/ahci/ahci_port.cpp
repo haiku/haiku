@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Marcus Overhagen. All rights reserved.
+ * Copyright 2007-2009, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -20,12 +20,12 @@
 
 #define TRACE_AHCI
 #ifdef TRACE_AHCI
-#	define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
+#	define TRACE(a...) dprintf("ahci: " a)
 #else
 #	define TRACE(a...)
 #endif
 //#define FLOW(a...)	dprintf("ahci: " a)
-//#define RWTRACE(a...) dprintf("\33[34mahci:\33[0m " a)
+//#define RWTRACE(a...) dprintf("ahci: " a)
 #define FLOW(a...)
 #define RWTRACE(a...)
 

@@ -79,7 +79,7 @@ public:
 		status_t					SelectDevice(uint8 index);
 		uint8						SelectedDevice();
 
-		status_t					Reset(bool *presence, uint16 *signatures);
+		status_t					Reset();
 
 		bool						UseDMA() { return fUseDMA; };
 
@@ -91,6 +91,7 @@ public:
 
 		void						PrepareWaitingForInterrupt();
 		status_t					WaitForInterrupt(bigtime_t timeout);
+		status_t					RecoverLostInterrupt();
 
 		// request handling
 		status_t					SendRequest(ATARequest *request,
@@ -107,7 +108,6 @@ public:
 
 		status_t					ReadRegs(ATADevice *device);
 		uint8						AltStatus();
-		bool						IsDMAInterruptSet();
 
 		status_t					ReadPIO(uint8 *buffer, size_t length);
 		status_t					WritePIO(uint8 *buffer, size_t length);
@@ -122,6 +122,8 @@ private:
 		status_t					_WriteControl(uint8 value);
 
 		void						_FlushAndWait(bigtime_t waitTime);
+
+		bool						_DevicePresent(int device);
 
 		status_t					_ReadPIOBlock(ATARequest *request,
 										size_t length);
