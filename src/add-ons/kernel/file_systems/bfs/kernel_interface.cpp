@@ -1576,7 +1576,7 @@ bfs_open_dir(fs_volume* _volume, fs_vnode* _node, void** _cookie)
 	// we don't ask here for directories only, because the bfs_open_index_dir()
 	// function utilizes us (so we must be able to open indices as well)
 	if (!inode->IsContainer())
-		RETURN_ERROR(B_BAD_VALUE);
+		RETURN_ERROR(B_NOT_A_DIRECTORY);
 
 	BPlusTree* tree = inode->Tree();
 	if (tree == NULL)

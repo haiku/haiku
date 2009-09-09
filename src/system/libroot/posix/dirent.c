@@ -123,10 +123,7 @@ opendir(const char* path)
 
 	int fd = _kern_open_dir(-1, path);
 	if (fd < 0) {
-		if (fd == B_BAD_VALUE)
-			errno = B_NOT_A_DIRECTORY;
-		else
-			errno = fd;
+		errno = fd;
 		return NULL;
 	}
 

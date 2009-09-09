@@ -310,7 +310,7 @@ udf_open_dir(fs_volume *volume, fs_vnode *vnode, void **cookie)
 	if (!dir->IsDirectory()) {
 		TRACE_ERROR(("udf_open_dir: given Icb is not a directory (type: %d)\n",
 			dir->Type()));
-		return B_BAD_VALUE;
+		return B_NOT_A_DIRECTORY;
 	}
 
 	DirectoryIterator *iterator = NULL;

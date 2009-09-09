@@ -437,7 +437,7 @@ ext2_open_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 		return status;
 
 	if (!inode->IsDirectory())
-		return B_BAD_VALUE;
+		return B_NOT_A_DIRECTORY;
 
 	DirectoryIterator* iterator = new(std::nothrow) DirectoryIterator(inode);
 	if (iterator == NULL)

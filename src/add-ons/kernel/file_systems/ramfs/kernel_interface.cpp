@@ -1180,14 +1180,14 @@ ramfs_open_dir(fs_volume /*fs*/, fs_vnode _node, fs_cookie *_cookie)
 	Node *node = (Node*)_node;
 FUNCTION(("dir: (%Lu)\n", node->GetID()));
 	// get the Directory
-	status_t error = (node->IsDirectory() ? B_OK : B_BAD_VALUE);
+	status_t error = (node->IsDirectory() ? B_OK : B_NOT_A_DIRECTORY);
 	Directory *dir = NULL;
 	if (error == B_OK) {
 		dir = dynamic_cast<Directory*>(node);
 		if (!dir) {
 			FATAL(("Node %Ld pretends to be a Directory, but isn't!\n",
 				   node->GetID()));
-			error = B_BAD_VALUE;
+			error = B_NOT_A_DIRECTORY;
 		}
 	}
 	// create a DirectoryCookie

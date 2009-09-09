@@ -510,7 +510,7 @@ reiserfs_open_dir(fs_volume *fs, fs_vnode *_node, void **cookie)
 	VNode *node = (VNode*)_node->private_node;
 FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		  node->GetObjectID()));
-	status_t error = (node->IsDir() ? B_OK : B_BAD_VALUE);
+	status_t error = (node->IsDir() ? B_OK : B_NOT_A_DIRECTORY);
 	if (error == B_OK) {
 		DirectoryCookie *iterator = new(nothrow) DirectoryCookie(
 			volume->GetTree(), node->GetDirID(), node->GetObjectID());

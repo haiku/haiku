@@ -1785,7 +1785,7 @@ cdda_open_dir(fs_volume* _volume, fs_vnode* _node, void** _cookie)
 
 	Inode* inode = (Inode*)_node->private_node;
 	if (!S_ISDIR(inode->Type()))
-		return B_BAD_VALUE;
+		return B_NOT_A_DIRECTORY;
 
 	if (inode != &volume->RootNode())
 		panic("pipefs: found directory that's not the root!");
