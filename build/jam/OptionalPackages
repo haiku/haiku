@@ -445,7 +445,7 @@ if [ IsOptionalHaikuImagePackageAdded Expat ] {
 if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Firefox available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package Firefox available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage 
