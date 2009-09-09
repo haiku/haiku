@@ -721,8 +721,8 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 				: $(baseURL)/Pe-2.4.2-x86-gcc4-2009-08-04.zip
 			;
 		} else {
-			InstallOptionalHaikuImagePackage Pe-2.4.2-r593-r1a1-x86-gcc2-2009-09-04
-				: $(baseURL)/Pe-2.4.2-r593-r1a1-x86-gcc2-2009-09-04.zip
+			InstallOptionalHaikuImagePackage Pe-2.4.2-r593-r1a1-x86-gcc2-2009-09-08
+				: $(baseURL)/Pe-2.4.2-r593-r1a1-x86-gcc2-2009-09-08.zip
 			;
 		}
 
