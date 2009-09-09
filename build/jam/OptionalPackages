@@ -454,9 +454,10 @@ if [ IsOptionalHaikuImagePackageAdded Firefox ] {
  		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
 	} else {
-		InstallOptionalHaikuImagePackage BeZillaBrowser-gcc2-20090218
-			: http://bezilla.beuser.de/builds/BeZillaBrowser-gcc2-20090218.zip
- 			: apps
+		InstallOptionalHaikuImagePackage 
+			BeZillaBrowser-2.0.0.22pre-r1a1-x86-gcc2-2009-09-08
+			: $(baseURL)/BeZillaBrowser-2.0.0.22pre-r1a1-x86-gcc2-2009-09-08.zip
+ 			:
  		;
  		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
