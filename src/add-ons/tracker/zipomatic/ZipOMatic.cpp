@@ -7,25 +7,10 @@
 #include <Alert.h>
 #include <Roster.h>
 #include <Screen.h>
-#include <TrackerAddOn.h>
+#include <TrackerAddOnAppLaunch.h>
 
 #include "ZipOMaticMisc.h"
 #include "ZipOMaticWindow.h"
-
-
-extern "C" void 
-process_refs(entry_ref dirRef, BMessage* message, void*)
-{
-	status_t status = B_OK;
-	type_code refType = B_REF_TYPE;
-	int32 refCount = 0;
-	
-	status = message->GetInfo("refs", &refType, &refCount);
-	if (status != B_OK || refCount < 1)
-		be_roster->Launch(ZIPOMATIC_APP_SIG);
-	else
-		be_roster->Launch(ZIPOMATIC_APP_SIG, message);
-}
 
 
 int
@@ -65,6 +50,15 @@ ZipOMatic::~ZipOMatic()
 void 
 ZipOMatic::RefsReceived(BMessage* message)
 {
+	message->RemoveName("dir_ref");
+
+	entry_ref ref;
+	if (message->FindRef("refs", &ref) != B_OK) {
+		if (!IsLaunching())
+			PostMessage(B_SILENT_RELAUNCH);
+		return;
+	}
+
 	if (IsLaunching())
 		fGotRefs = true;
 	
