@@ -52,17 +52,18 @@ process_refs(entry_ref directory, BMessage* refs, void* reserved)
 	if (get_ref_for_path(image.name, &addonRef) != B_OK)
 		return;
 
-	if (be_roster->Launch(&addonRef, refs) != B_OK) {
+	status = be_roster->Launch(&addonRef, refs);
+	if (status == B_OK || status == B_ALREADY_RUNNING)
+		return;
 
-		// If launching by entry_ref fails it's probably futile to
-		// launch by signature this way, but we can try anyway.
+	// If launching by entry_ref fails it's probably futile to
+	// launch by signature this way, but we can try anyway.
 
-		app_info appInfo;
-		if (be_roster->GetAppInfo(&addonRef, &appInfo) != B_OK)
-			return;
+	app_info appInfo;
+	if (be_roster->GetAppInfo(&addonRef, &appInfo) != B_OK)
+		return;
 
-		be_roster->Launch(appInfo.signature, refs);
-	}
+	be_roster->Launch(appInfo.signature, refs);
 }
 
 
