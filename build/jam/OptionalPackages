@@ -668,7 +668,7 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 
 
 # OpenSSL
-if [ IsObsoleteOptionalHaikuImagePackageAdded OpenSSL ] {
+if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package OpenSSL available for $(TARGET_ARCH)" ;
 	} else {
