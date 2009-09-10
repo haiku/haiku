@@ -119,13 +119,6 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 	stream->frames_count += stream->buffer_length;
 	stream->buffer_cycle = position / bufferSize;
 
-	// playback interrupts come early, offsets don't work on non intel
-	// TODO find out why
-	if (stream->type == STREAM_PLAYBACK
-		&& stream->controller->pci_info.vendor_id != INTEL_VENDORID) {
-		stream->buffer_cycle++;
-	}
-
 	release_spinlock(&stream->lock);
 
 	release_sem_etc(controller->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
@@ -563,13 +556,18 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	// TODO check on other vendors, see in stream_handle_interrupt()
 	// Tested only on Intel ICH8
 	uint32 offset = 0;
-	if (stream->type == STREAM_PLAYBACK && stream->controller->pci_info.vendor_id == INTEL_VENDORID) {
-		if (stream->sample_size == 2)
-			offset = 6;
-		else if (stream->sample_size > 2)
-			offset = 8;
+	if (stream->type == STREAM_PLAYBACK) {
+		if (stream->controller->pci_info.vendor_id == INTEL_VENDORID) {
+			if (stream->sample_size == 2)
+				offset = 3;
+			else if (stream->sample_size > 2)
+				offset = 4;
+		} else {
+			offset = 11;	
+		}
+		offset *= 64;
+		offset = ALIGN(offset, 128);
 	}
-	offset *= 32;
 	
 	/* Calculate size of buffer (aligned to 128 bytes) */
 	bufferSize = stream->sample_size * stream->num_channels
