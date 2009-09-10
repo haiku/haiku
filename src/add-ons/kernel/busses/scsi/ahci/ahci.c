@@ -9,7 +9,7 @@
 #include <string.h>
 
 
-#define TRACE(a...) dprintf("\33[35mahci:\33[0m " a)
+#define TRACE(a...) dprintf("ahci: " a)
 #define FLOW(a...)	dprintf("ahci: " a)
 
 #define AHCI_ID_GENERATOR "ahci/id"
