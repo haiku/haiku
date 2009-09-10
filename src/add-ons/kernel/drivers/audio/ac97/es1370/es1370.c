@@ -500,8 +500,8 @@ init_driver(void)
 	void *settings_handle;
 	pci_info info;
 	int ix = 0;
-	num_cards = 0;
 	status_t err;
+	num_cards = 0;
 
 	PRINT(("init_driver()\n"));
 
