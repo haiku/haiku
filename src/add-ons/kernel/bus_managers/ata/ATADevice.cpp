@@ -523,7 +523,7 @@ ATADevice::Identify()
 		swap_words(modelNumber, sizeof(modelNumber) - 1);
 		swap_words(serialNumber, sizeof(serialNumber) - 1);
 		swap_words(firmwareRev, sizeof(firmwareRev) - 1);
-		TRACE_ALWAYS("model number:  %s\n", modelNumber);
+		TRACE_ALWAYS("model number: %s\n", modelNumber);
 		TRACE_ALWAYS("serial number: %s\n", serialNumber);
   		TRACE_ALWAYS("firmware rev.: %s\n", firmwareRev);
 	}
