@@ -512,6 +512,22 @@ ATADevice::Identify()
 		return B_ERROR;
 	}
 
+	if (1) {
+		// print device information
+		char modelNumber[sizeof(fInfoBlock.model_number) + 1];
+		char serialNumber[sizeof(fInfoBlock.serial_number) + 1];
+		char firmwareRev[sizeof(fInfoBlock.firmware_revision) + 1];
+		strlcpy(modelNumber, fInfoBlock.model_number, sizeof(modelNumber));
+		strlcpy(serialNumber, fInfoBlock.serial_number, sizeof(serialNumber));
+		strlcpy(firmwareRev, fInfoBlock.firmware_revision, sizeof(firmwareRev));
+		swap_words(modelNumber, sizeof(modelNumber) - 1);
+		swap_words(serialNumber, sizeof(serialNumber) - 1);
+		swap_words(firmwareRev, sizeof(firmwareRev) - 1);
+		TRACE_ALWAYS("model number:  %s\n", modelNumber);
+		TRACE_ALWAYS("serial number: %s\n", serialNumber);
+  		TRACE_ALWAYS("firmware rev.: %s\n", firmwareRev);
+	}
+
 	return B_OK;
 }
 

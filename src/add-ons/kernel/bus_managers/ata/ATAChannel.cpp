@@ -832,6 +832,7 @@ ATAChannel::_WriteRegs(ata_task_file *taskFile, ata_reg_mask mask)
 	return fController->write_command_block_regs(fCookie, taskFile, mask);
 }
 
+
 uint8
 ATAChannel::_Status()
 {
