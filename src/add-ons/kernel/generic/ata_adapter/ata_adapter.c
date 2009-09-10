@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include <ata_adapter.h>
+#include <tracing.h>
 
 #define debug_level_flow 0
 #define debug_level_error 3
@@ -25,12 +26,17 @@
 
 #define INTERRUPT_TRACING 0
 #if INTERRUPT_TRACING 
-	#include <tracing.h>
 	#define TRACE_INT(a...) 	ktrace_printf(a)
 #else
 	#define TRACE_INT(a...)
 #endif
 
+
+#if ATA_DMA_TRACING
+	#define TRACE_DMA(x...)		ktrace_printf(x)
+#else
+	#define TRACE_DMA(x...)
+#endif
 
 static ata_for_controller_interface *sATA;
 static device_manager_info *sDeviceManager;
@@ -240,12 +246,17 @@ ata_adapter_prepare_dma(ata_adapter_channel_info *channel,
 	prd_entry *prd = channel->prdt;
 	int i;
 
+	TRACE_DMA("ata_adapter: prepare_dma (%s) %u entrys:\n", 
+		writeToDevice ? "write" : "read", sgListCount);
+
 	for (i = sgListCount - 1, prd = channel->prdt; i >= 0; --i, ++prd, ++sgList) {
 		prd->address = B_HOST_TO_LENDIAN_INT32(pci->ram_address(device, sgList->address));
 		// 0 means 64K - this is done automatically be discarding upper 16 bits
 		prd->count = B_HOST_TO_LENDIAN_INT16((uint16)sgList->size);
 		prd->EOT = i == 0;
 
+		TRACE_DMA("ata_adapter: %p, %ld => 0x%08x, %d, %d\n", 
+			sgList->address, sgList->size, prd->address, prd->count, prd->EOT);
 		SHOW_FLOW( 4, "%x, %x, %d", (int)prd->address, prd->count, prd->EOT);
 	}
 

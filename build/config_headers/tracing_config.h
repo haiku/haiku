@@ -20,6 +20,7 @@
 
 #define AHCI_PORT_TRACING						0
 #define ATA_TRACING								0
+#define ATA_DMA_TRACING							0
 #define ATAPI_TRACING							0
 #define BFS_TRACING								0
 #define BLOCK_CACHE_BLOCK_TRACING				0
