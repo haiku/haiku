@@ -4388,6 +4388,9 @@ vm_init(kernel_args* args)
 			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	}
 
+	void* lastPage = (void*)ROUNDDOWN(~(addr_t)0, B_PAGE_SIZE);
+	vm_block_address_range("overflow protection", lastPage, B_PAGE_SIZE - 1);
+
 #if DEBUG_CACHE_LIST
 	create_area("cache info table", (void**)&sCacheInfoTable,
 		B_ANY_KERNEL_ADDRESS,
