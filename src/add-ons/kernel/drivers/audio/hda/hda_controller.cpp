@@ -98,8 +98,13 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 
 	stream->Write8(HDAC_STREAM_STATUS, status);
 
+	if (status & STATUS_FIFO_ERROR)
+		dprintf("hda: stream fifo error (id:%ld)\n", stream->id);
+	if (status & STATUS_DESCRIPTOR_ERROR)
+		dprintf("hda: stream descriptor error (id:%ld)\n", stream->id);
+
 	if ((status & STATUS_BUFFER_COMPLETED) == 0) {
-		dprintf("hda: stream status %x\n", status);
+		dprintf("hda: stream buffer not completed (id:%ld)\n", stream->id);
 		return;
 	}
 
