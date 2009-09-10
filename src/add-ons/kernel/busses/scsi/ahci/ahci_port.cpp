@@ -632,7 +632,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	swap_words(serialNumber, sizeof(serialNumber) - 1);
 	swap_words(firmwareRev, sizeof(firmwareRev) - 1);
 
-	TRACE("model number:  %s\n", modelNumber);
+	TRACE("model number: %s\n", modelNumber);
 	TRACE("serial number: %s\n", serialNumber);
   	TRACE("firmware rev.: %s\n", firmwareRev);
 
