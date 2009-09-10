@@ -405,6 +405,9 @@ ATAChannel::Reset()
 
 	_FlushAndWait(150 * 1000);
 
+	// read status to clear any pending interrupts
+	_Status();
+
 	return B_OK;
 }
 
@@ -564,7 +567,8 @@ ATAChannel::WaitForInterrupt(bigtime_t timeout)
 status_t
 ATAChannel::RecoverLostInterrupt()
 {
-	uint8 status = AltStatus();
+	// read status to clear any pending interrupts
+	uint8 status = _Status();
 	if (status & (ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST)) {
 		TRACE_ERROR("RecoverLostInterrupt: device busy, status 0x%02x\n", status);
 		return B_ERROR;
@@ -826,6 +830,15 @@ status_t
 ATAChannel::_WriteRegs(ata_task_file *taskFile, ata_reg_mask mask)
 {
 	return fController->write_command_block_regs(fCookie, taskFile, mask);
+}
+
+uint8
+ATAChannel::_Status()
+{
+	ata_task_file taskFile;
+	if (_ReadRegs(&taskFile, ATA_MASK_STATUS) != B_OK)
+		return 0x01;
+	return taskFile.read.status;
 }
 
 

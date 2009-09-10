@@ -120,6 +120,7 @@ private:
 		status_t					_WriteRegs(ata_task_file *taskFile,
 										ata_reg_mask mask);
 		status_t					_WriteControl(uint8 value);
+		uint8						_Status();
 
 		void						_FlushAndWait(bigtime_t waitTime);
 
