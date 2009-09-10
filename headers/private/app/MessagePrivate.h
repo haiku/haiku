@@ -208,6 +208,12 @@ class BMessage::Private {
 		}
 
 		static void
+		StaticReInitForkedChild()
+		{
+			BMessage::_StaticReInitForkedChild();
+		}
+
+		static void
 		StaticCleanup()
 		{
 			BMessage::_StaticCleanup();

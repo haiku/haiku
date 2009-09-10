@@ -339,6 +339,7 @@ class BMessage {
 							port_id port, int32 token, bigtime_t timeout);
 
 		static void		_StaticInit();
+		static void		_StaticReInitForkedChild();
 		static void		_StaticCleanup();
 		static void		_StaticCacheCleanup();
 		static int32	_StaticGetCachedReplyPort();

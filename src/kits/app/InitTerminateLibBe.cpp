@@ -10,6 +10,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <ClipboardPrivate.h>
 #include <MessagePrivate.h>
@@ -22,6 +23,17 @@
 #define OUT	printf
 
 
+static void
+initialize_forked_child()
+{
+	DBG(OUT("initialize_forked_child()\n"));
+
+	BMessage::Private::StaticReInitForkedChild();
+
+	DBG(OUT("initialize_forked_child() done\n"));
+}
+
+
 extern "C" void
 initialize_before()
 {
@@ -29,6 +41,8 @@ initialize_before()
 
 	BMessage::Private::StaticInit();
 	BRoster::Private::InitBeRoster();
+
+	atfork(initialize_forked_child);
 
 	DBG(OUT("initialize_before() done\n"));
 }

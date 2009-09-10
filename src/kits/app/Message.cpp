@@ -1972,6 +1972,22 @@ BMessage::_StaticInit()
 
 
 void
+BMessage::_StaticReInitForkedChild()
+{
+	DEBUG_FUNCTION_ENTER2;
+
+	// overwrite the inherited ports with a set of our own
+	sReplyPorts[0] = create_port(1, "tmp_rport0");
+	sReplyPorts[1] = create_port(1, "tmp_rport1");
+	sReplyPorts[2] = create_port(1, "tmp_rport2");
+
+	sReplyPortInUse[0] = 0;
+	sReplyPortInUse[1] = 0;
+	sReplyPortInUse[2] = 0;
+}
+
+
+void
 BMessage::_StaticCleanup()
 {
 	DEBUG_FUNCTION_ENTER2;
