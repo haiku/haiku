@@ -798,7 +798,8 @@ private:
 enum {
 	PAGE_FAULT_ERROR_NO_AREA		= 0,
 	PAGE_FAULT_ERROR_KERNEL_ONLY,
-	PAGE_FAULT_ERROR_READ_ONLY,
+	PAGE_FAULT_ERROR_WRITE_PROTECTED,
+	PAGE_FAULT_ERROR_READ_PROTECTED,
 	PAGE_FAULT_ERROR_KERNEL_BAD_USER_MEMORY,
 	PAGE_FAULT_ERROR_NO_ADDRESS_SPACE
 };
@@ -823,8 +824,12 @@ public:
 			case PAGE_FAULT_ERROR_KERNEL_ONLY:
 				out.Print("page fault error: area: %ld, kernel only", fArea);
 				break;
-			case PAGE_FAULT_ERROR_READ_ONLY:
-				out.Print("page fault error: area: %ld, read only", fArea);
+			case PAGE_FAULT_ERROR_WRITE_PROTECTED:
+				out.Print("page fault error: area: %ld, write protected",
+					fArea);
+				break;
+			case PAGE_FAULT_ERROR_READ_PROTECTED:
+				out.Print("page fault error: area: %ld, read protected", fArea);
 				break;
 			case PAGE_FAULT_ERROR_KERNEL_BAD_USER_MEMORY:
 				out.Print("page fault error: kernel touching bad user memory");
@@ -4919,10 +4924,18 @@ vm_soft_fault(vm_address_space* addressSpace, addr_t originalAddress,
 		}
 		if (isWrite && (protection
 				& (B_WRITE_AREA | (isUser ? 0 : B_KERNEL_WRITE_AREA))) == 0) {
-			dprintf("write access attempted on read-only area 0x%lx at %p\n",
-				area->id, (void*)originalAddress);
+			dprintf("write access attempted on write-protected area 0x%lx at"
+				" %p\n", area->id, (void*)originalAddress);
 			TPF(PageFaultError(area->id,
-				VMPageFaultTracing::PAGE_FAULT_ERROR_READ_ONLY));
+				VMPageFaultTracing::PAGE_FAULT_ERROR_WRITE_PROTECTED));
+			status = B_PERMISSION_DENIED;
+			break;
+		} else if (!isWrite && (protection
+				& (B_READ_AREA | (isUser ? 0 : B_KERNEL_READ_AREA))) == 0) {
+			dprintf("read access attempted on read-protected area 0x%lx at"
+				" %p\n", area->id, (void*)originalAddress);
+			TPF(PageFaultError(area->id,
+				VMPageFaultTracing::PAGE_FAULT_ERROR_READ_PROTECTED));
 			status = B_PERMISSION_DENIED;
 			break;
 		}
