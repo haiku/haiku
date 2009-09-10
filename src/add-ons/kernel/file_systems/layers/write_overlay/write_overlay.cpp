@@ -958,6 +958,14 @@ status_t
 OverlayInode::OpenDir(void **cookie, bool attribute)
 {
 	RecursiveLocker locker(fLock);
+	if (!attribute) {
+		if (!fHasStat)
+			_PopulateStat();
+
+		if (!S_ISDIR(fStat.st_mode))
+			return B_NOT_A_DIRECTORY;
+	}
+
 	if (!attribute && !fHasDirents)
 		_PopulateDirents();
 	else if (attribute && !fHasAttributeDirents)
