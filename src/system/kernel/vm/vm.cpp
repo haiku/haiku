@@ -1702,7 +1702,7 @@ vm_block_address_range(const char* name, void* address, addr_t size)
 	cache->Lock();
 
 	vm_area* area;
-	void *areaAddress = address;
+	void* areaAddress = address;
 	status = map_backing_store(addressSpace, cache, &areaAddress, 0, size,
 		B_EXACT_ADDRESS, B_ALREADY_WIRED, 0, REGION_NO_PRIVATE_MAP, &area, name,
 		false, true);
