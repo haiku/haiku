@@ -1673,6 +1673,46 @@ err1:
 
 
 status_t
+vm_block_address_range(const char* name, void* address, addr_t size)
+{
+	if (!arch_vm_supports_protection(0))
+		return B_NOT_SUPPORTED;
+
+	AddressSpaceWriteLocker locker;
+	status_t status = locker.SetTo(vm_kernel_address_space_id());
+	if (status != B_OK)
+		return status;
+
+	vm_address_space* addressSpace = locker.AddressSpace();
+
+	// create an anonymous cache
+	vm_cache* cache;
+	status = VMCacheFactory::CreateAnonymousCache(cache, false, 0, 0, false);
+	if (status != B_OK)
+		return status;
+
+	cache->temporary = 1;
+	cache->virtual_end = size;
+	cache->scan_skip = 1;
+	cache->Lock();
+
+	vm_area* area;
+	void *areaAddress = address;
+	status = map_backing_store(addressSpace, cache, &areaAddress, 0, size,
+		B_EXACT_ADDRESS, B_ALREADY_WIRED, 0, REGION_NO_PRIVATE_MAP, &area, name,
+		false, true);
+	if (status != B_OK) {
+		cache->ReleaseRefAndUnlock();
+		return status;
+	}
+
+	cache->Unlock();
+	area->cache_type = CACHE_TYPE_RAM;
+	return area->id;
+}
+
+
+status_t
 vm_unreserve_address_range(team_id team, void* address, addr_t size)
 {
 	AddressSpaceWriteLocker locker(team);
