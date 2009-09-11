@@ -1094,6 +1094,12 @@ find_reserved_area(vm_address_space* addressSpace, addr_t start,
 }
 
 
+// verifies that an area with the given aligned base and size fits into
+// the spot defined by base and limit and does check for overflows
+#define IS_VALID_SPOT(base, alignedBase, size, limit) \
+	((alignedBase) >= (base) && (alignedBase) + ((size) - 1) > (alignedBase) \
+		&& (alignedBase) + ((size) - 1) <= (limit))
+
 /*!	Must be called with this address space's sem held */
 static status_t
 find_and_insert_area_slot(vm_address_space* addressSpace, addr_t start,
@@ -1157,10 +1163,11 @@ second_chance:
 			// find a hole big enough for a new area
 			if (last == NULL) {
 				// see if we can build it at the beginning of the virtual map
-				if (next == NULL || next->base > ROUNDUP(addressSpace->base,
-						alignment) + (size - 1)) {
+				addr_t alignedBase = ROUNDUP(addressSpace->base, alignment);
+				if (IS_VALID_SPOT(addressSpace->base, alignedBase, size,
+						next == NULL ? end : next->base)) {
 					foundSpot = true;
-					area->base = ROUNDUP(addressSpace->base, alignment);
+					area->base = alignedBase;
 					break;
 				}
 
@@ -1170,9 +1177,11 @@ second_chance:
 
 			// keep walking
 			while (next != NULL) {
-				addr_t newBase = ROUNDUP(last->base + last->size, alignment);
-				if (next->base > newBase && next->base - newBase >= size) {
-					// we found a spot (it'll be filled up below)
+				addr_t alignedBase = ROUNDUP(last->base + last->size, alignment);
+				if (IS_VALID_SPOT(last->base + (last->size - 1), alignedBase,
+						size, next->base)) {
+					foundSpot = true;
+					area->base = alignedBase;
 					break;
 				}
 
@@ -1180,13 +1189,15 @@ second_chance:
 				next = next->address_space_next;
 			}
 
-			addr_t newBase = ROUNDUP(last->base + last->size, alignment);
-			addr_t aspaceEnd = addressSpace->base + (addressSpace->size - 1);
-			if (next != NULL || (aspaceEnd > newBase
-					&& aspaceEnd - (newBase - 1) >= size)) {
+			if (foundSpot)
+				break;
+
+			addr_t alignedBase = ROUNDUP(last->base + last->size, alignment);
+			if (IS_VALID_SPOT(last->base + (last->size - 1), alignedBase,
+					size, end)) {
 				// got a spot
 				foundSpot = true;
-				area->base = newBase;
+				area->base = alignedBase;
 				break;
 			} else {
 				// We didn't find a free spot - if there were any reserved areas
@@ -1203,8 +1214,8 @@ second_chance:
 
 					// TODO: take free space after the reserved area into
 					// account!
-					if (next->base == ROUNDUP(next->base, alignment)
-						&& next->size == size) {
+					addr_t alignedBase = ROUNDUP(next->base, alignment);
+					if (next->base == alignedBase && next->size == size) {
 						// The reserved area is entirely covered, and thus,
 						// removed
 						if (last)
@@ -1213,32 +1224,31 @@ second_chance:
 							addressSpace->areas = next->address_space_next;
 
 						foundSpot = true;
-						area->base = next->base;
+						area->base = alignedBase;
 						free(next);
 						break;
 					}
 
-					addr_t newBase = ROUNDUP(next->base, alignment);
-					if (newBase == next->base && next->size >= size) {
+					if (alignedBase == next->base && next->size >= size) {
 						// The new area will be placed at the beginning of the
 						// reserved area and the reserved area will be offset
 						// and resized
 						foundSpot = true;
 						next->base += size;
 						next->size -= size;
-						area->base = newBase;
+						area->base = alignedBase;
 						break;
 					}
 
-					if (newBase <= next->base + (next->size - 1)
-						&& next->size - (newBase - next->base) >= size) {
+					if (IS_VALID_SPOT(next->base, alignedBase, size,
+							next->base + (next->size - 1))) {
 						// The new area will be placed at the end of the
 						// reserved area, and the reserved area will be resized
 						// to make space
 						foundSpot = true;
-						next->size = newBase - next->base;
+						next->size = alignedBase - next->base;
 						last = next;
-						area->base = newBase;
+						area->base = alignedBase;
 						break;
 					}
 
@@ -1249,6 +1259,7 @@ second_chance:
 		}
 
 		case B_BASE_ADDRESS:
+		{
 			// find a hole big enough for a new area beginning with "start"
 			if (last == NULL) {
 				// see if we can build it at the beginning of the specified start
@@ -1273,14 +1284,14 @@ second_chance:
 				next = next->address_space_next;
 			}
 
-			if (next != NULL || addressSpace->base + (addressSpace->size - 1)
-					- last->base + (last->size - 1) >= size) {
+			addr_t lastEnd = last->base + (last->size - 1);
+			if (next != NULL || end - lastEnd >= size) {
 				// got a spot
 				foundSpot = true;
-				if (last->base + last->size <= start)
+				if (lastEnd < start)
 					area->base = start;
 				else
-					area->base = last->base + last->size;
+					area->base = lastEnd + 1;
 				break;
 			}
 
@@ -1290,6 +1301,7 @@ second_chance:
 			addressSpec = B_ANY_ADDRESS;
 			last = NULL;
 			goto second_chance;
+		}
 
 		case B_EXACT_ADDRESS:
 			// see if we can create it exactly here
