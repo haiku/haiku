@@ -1758,20 +1758,20 @@ clean_up_parser()
 	// it doesn't seem to hurt, and we only do it in DEBUG mode anyway.
 
 	for (sym_iter_t i = symbol_table.begin(); i != symbol_table.end(); ++i) {
-		free_mem(i->first);
+		free_mem((void*) i->first);
 	}
 
 	for (type_iter_t i = type_table.begin(); i != type_table.end(); ++i) {
-		free_mem(i->first);
+		free_mem((void*) i->first);
 		type_t type = i->second;
 
 		for (int32 t = 0; t < type.count; ++t) {
-			free_mem(type.fields[t].name);
-			free_mem(type.fields[t].data.ptr);
+			free_mem((void*) type.fields[t].name);
+			free_mem((void*) type.fields[t].data.ptr);
 		}
-		free_mem(type.fields);
-		free_mem(type.name);
-		free_mem(type.def_name);
+		free_mem((void*) type.fields);
+		free_mem((void*) type.name);
+		free_mem((void*) type.def_name);
 	}
 #endif
 
