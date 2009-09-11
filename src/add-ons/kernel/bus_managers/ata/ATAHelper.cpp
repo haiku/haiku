@@ -64,3 +64,15 @@ copy_sg_data(scsi_ccb *ccb, uint offset, uint allocationLength,
 
 	return size == 0;
 }
+
+
+void
+swap_words(void *data, size_t size)
+{
+	uint16 *word = (uint16 *)data;
+	size_t count = size / 2;
+	while (count--) {
+		*word = (*word << 8) | (*word >> 8);
+		word++;
+	}
+}

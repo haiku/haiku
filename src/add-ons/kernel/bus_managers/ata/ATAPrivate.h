@@ -55,6 +55,8 @@ extern device_manager_info *gDeviceManager;
 
 bool copy_sg_data(scsi_ccb *ccb, uint offset, uint allocationLength,
 	void *buffer, int size, bool toBuffer);
+void swap_words(void *data, size_t size);
+
 
 class ATAChannel {
 public:
@@ -120,6 +122,7 @@ private:
 		status_t					_WriteRegs(ata_task_file *taskFile,
 										ata_reg_mask mask);
 		status_t					_WriteControl(uint8 value);
+		uint8						_Status();
 
 		void						_FlushAndWait(bigtime_t waitTime);
 
