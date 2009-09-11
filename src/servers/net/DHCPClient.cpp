@@ -550,10 +550,9 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 				// configure interface
 				BMessage reply;
-				Target().SendMessage(&fConfiguration, &reply);
-
-				if (reply.FindInt32("status", &fStatus) != B_OK)
-					status = B_OK;
+				status = Target().SendMessage(&fConfiguration, &reply);
+				if (status == B_OK)
+					status = reply.FindInt32("status", &fStatus);
 				break;
 			}
 
