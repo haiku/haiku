@@ -361,8 +361,16 @@ ExpanderWindow::MessageReceived(BMessage *msg)
 			if (!fExpandingStarted && fListingStarted) {
 				BString string;
 				int32 i = 0;
-				while (msg->FindString("output", i++, &string) == B_OK)
+				while (msg->FindString("output", i++, &string) == B_OK) {
+					// expand the window if we need...
+					float delta = fListingText->StringWidth(string.String())
+						- fListingText->Frame().Width();
+					if (delta > 0) {
+						ResizeTo(Frame().Width() + delta,
+							Frame().Height());
+					}
 					fListingText->Insert(string.String());
+				}
 				fListingText->ScrollToSelection();
 			}
 
