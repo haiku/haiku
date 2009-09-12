@@ -38,8 +38,8 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	funzip fwcontrol
 	gawk $(X86_ONLY)gdb getlimits grep groups gzip gzexe
 	hd head hey hostname
-	id ident ideinfo idestatus ifconfig <bin>install installsound iroster
-	isvolume
+	id ident ifconfig <bin>install installsound iroster isvolume
+	$(IDE_ONLY)ideinfo $(IDE_ONLY)idestatus
 	join
 	keymap kill less lessecho lesskey link listarea listattr
 	listimage listdev
