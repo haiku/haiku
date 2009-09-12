@@ -53,45 +53,44 @@ get_node_type(ntfs_inode* ni, int* _type)
 {
 	ntfs_attr* na;
 
-	// get the node type
 	if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
+		// Directory
 		*_type = S_IFDIR;
 		return B_OK;
-	}
+	} else {
+		// Regular or Interix (INTX) file
+		*_type = S_IFREG;
+				
+		if (ni->flags & FILE_ATTR_SYSTEM) {
+			na = ntfs_attr_open(ni, AT_DATA, NULL,0);
+			if (!na) {
+				return ENOENT;
+			}
+			// Check whether it's Interix symbolic link
+			if (na->data_size <= sizeof(INTX_FILE_TYPES) + 
+			    sizeof(ntfschar) * PATH_MAX && 
+			    na->data_size > sizeof(INTX_FILE_TYPES)) {
+				INTX_FILE *intx_file;
 
-	// Regular or Interix (INTX) file.
-	*_type = S_IFREG;
-
-	na = ntfs_attr_open(ni, AT_DATA, NULL, 0);
-	if (!na)
-		return ENOENT;
-
-	if (!(ni->flags & FILE_ATTR_HIDDEN)) {
-		if (na->data_size == 0)
-			*_type = S_IFIFO;
-	}
-
-	if (na->data_size <= sizeof(INTX_FILE_TYPES) + sizeof(ntfschar) * MAX_PATH
-			&& na->data_size > sizeof(INTX_FILE_TYPES)) {
-		INTX_FILE* intx_file;
-
-		intx_file = ntfs_malloc(na->data_size);
-		if (!intx_file)	{
+				intx_file = ntfs_malloc(na->data_size);
+				if (!intx_file) {
+					ntfs_attr_close(na);
+					return EINVAL;
+				}
+				if (ntfs_attr_pread(na, 0, na->data_size,
+						intx_file) != na->data_size) {
+					free(intx_file);
+					ntfs_attr_close(na);
+					return EINVAL;
+				}
+				if (intx_file->magic == INTX_SYMBOLIC_LINK)
+					*_type = FS_SLNK_MODE;
+				free(intx_file);
+			}
 			ntfs_attr_close(na);
-			return EINVAL;
 		}
-		if (ntfs_attr_pread(na, 0, na->data_size, intx_file) != na->data_size) {
-			free(intx_file);
-			ntfs_attr_close(na);
-			return EINVAL;
-		}
-		if (intx_file->magic == INTX_SYMBOLIC_LINK)
-			*_type = S_IFLNK;
-		free(intx_file);
 	}
-
-	ntfs_attr_close(na);
-
+		
 	return B_OK;
 }
 
@@ -591,75 +590,70 @@ fs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *stbuf)
 		result = ENOENT;
 		goto exit;
 	}
-
-	stbuf->st_dev = ns->id;
-	stbuf->st_ino = MREF(ni->mft_no);
-
 	if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
+		// Directory
 		stbuf->st_mode = FS_DIR_MODE;
 		na = ntfs_attr_open(ni, AT_INDEX_ALLOCATION, NTFS_INDEX_I30, 4);
 		if (na) {
 			stbuf->st_size = na->data_size;
+			stbuf->st_blocks = na->allocated_size >> 9;
 			ntfs_attr_close(na);
-		} else {
-			stbuf->st_size = 0;
 		}
-		stbuf->st_nlink = 1; // Needed for correct find work.
+		stbuf->st_nlink = 1;
 	} else {
-		// Regular or Interix (INTX) file.
+		// Regular or Interix (INTX) file
 		stbuf->st_mode = FS_FILE_MODE;
 		stbuf->st_size = ni->data_size;
+		stbuf->st_blocks = (ni->allocated_size + 511) >> 9;
 		stbuf->st_nlink = le16_to_cpu(ni->mrec->link_count);
-
-		na = ntfs_attr_open(ni, AT_DATA, NULL,0);
-		if (!na) {
-			result = ENOENT;
-			goto exit;
-		}
-
-		stbuf->st_size = na->data_size;
-
-		if (!(ni->flags & FILE_ATTR_HIDDEN)) {
-			if (na->data_size == 0)
-			stbuf->st_mode = S_IFIFO;
-		}
-
-		if (na->data_size <= sizeof(INTX_FILE_TYPES)
-				+ sizeof(ntfschar) * MAX_PATH
-			&& na->data_size >sizeof(INTX_FILE_TYPES)) {
-			INTX_FILE *intx_file;
-
-			intx_file = ntfs_malloc(na->data_size);
-			if (!intx_file)	{
-				result = EINVAL;
-				ntfs_attr_close(na);
+		
+		if (ni->flags & FILE_ATTR_SYSTEM) {
+			na = ntfs_attr_open(ni, AT_DATA, NULL,0);
+			if (!na) {
+				result = ENOENT;
 				goto exit;
 			}
-			if (ntfs_attr_pread(na, 0, na->data_size,intx_file)
-					!= na->data_size) {
-				result = EINVAL;
+			stbuf->st_size = na->data_size;
+			stbuf->st_blocks = na->allocated_size >> 9;
+			// Check whether it's Interix symbolic link
+			if (na->data_size <= sizeof(INTX_FILE_TYPES) + 
+			    sizeof(ntfschar) * PATH_MAX && 
+			    na->data_size > sizeof(INTX_FILE_TYPES)) {
+				INTX_FILE *intx_file;
+
+				intx_file = ntfs_malloc(na->data_size);
+				if (!intx_file) {
+					result = EINVAL;
+					ntfs_attr_close(na);
+					goto exit;
+				}
+				if (ntfs_attr_pread(na, 0, na->data_size,
+						intx_file) != na->data_size) {
+					result = EINVAL;
+					free(intx_file);
+					ntfs_attr_close(na);
+					goto exit;
+				}
+				if (intx_file->magic == INTX_SYMBOLIC_LINK)
+					stbuf->st_mode = FS_SLNK_MODE;
 				free(intx_file);
-				ntfs_attr_close(na);
-				goto exit;
 			}
-			if (intx_file->magic == INTX_SYMBOLIC_LINK)
-				stbuf->st_mode = FS_SLNK_MODE;
-			free(intx_file);
+			ntfs_attr_close(na);
 		}
-		ntfs_attr_close(na);
 		stbuf->st_mode |= 0666;
 	}
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		stbuf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 	}
-
+		
 	stbuf->st_uid = 0;
 	stbuf->st_gid = 0;
+	stbuf->st_ino = MREF(ni->mft_no);
 	stbuf->st_atime = ni->last_access_time;
 	stbuf->st_ctime = ni->last_mft_change_time;
-	stbuf->st_mtime = ni->last_data_change_time;
-
+	stbuf->st_mtime = ni->last_data_change_time;	
+	
 exit:
 	if (ni)
 		ntfs_inode_close(ni);
@@ -797,9 +791,9 @@ fs_open(fs_volume *_vol, fs_vnode *_node, int omode, void **_cookie)
 	ntfs_attr *na = NULL;
 	status_t result = B_NO_ERROR;
 
-	LOCK_VOL(ns);
-
 	ERRPRINT("fs_open - ENTER\n");
+
+	LOCK_VOL(ns);
 
 	if (node == NULL) {
 		result = EINVAL;
