@@ -27,13 +27,10 @@ public:
 
 	virtual	bool			QuitRequested();
 	virtual	void			MessageReceived(BMessage *message);
-	virtual	void			Show();
 
 
 private:
 		void				_Center();
-
-		bool				fCentered;
 
 		BMessageRunner*		fRunner;
 		FontView*			fFontsView;

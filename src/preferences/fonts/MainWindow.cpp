@@ -36,8 +36,7 @@ static const uint32 kMsgCheckFonts = 'chkf';
 
 MainWindow::MainWindow()
 	: BWindow(BRect(0, 0, 1, 1), "Fonts", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
-	fCentered(false)
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	fDefaultsButton = new BButton("defaults", "Defaults",
 		new BMessage(kMsgSetDefaults), B_WILL_DRAW);
@@ -77,35 +76,20 @@ MainWindow::MainWindow()
 
 	if (fSettings.WindowCorner() == BPoint(-1, -1)) {
 		// center window on screen
-		fCentered = true;
+		CenterOnScreen();
 	} else {
 		MoveTo(fSettings.WindowCorner());
 
 		// make sure window is on screen
 		BScreen screen(this);
 		if (!screen.Frame().InsetByCopy(10, 10).Intersects(Frame()))
-			fCentered = true;
-	}
-
-	if (fCentered) {
-		// draw offscreen to avoid flashing windows
-		MoveTo(BPoint(-1000, -1000));
+			CenterOnScreen();
 	}
 
 	fRunner = new BMessageRunner(this, new BMessage(kMsgCheckFonts), 3000000);
 		// every 3 seconds
 
 	fDefaultsButton->SetEnabled(fFontsView->IsDefaultable());
-}
-
-
-void
-MainWindow::Show()
-{
-	BWindow::Show();
-
-	if (fCentered)
-		_Center();
 }
 
 
