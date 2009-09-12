@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src preferences opengl ;
+
+UsePrivateHeaders interface ;
+
+Preference OpenGL :
+	OpenGLApp.cpp
+	OpenGLWindow.cpp
+	OpenGLView.cpp
+	CapabilitiesView.cpp
+	ExtensionsList.cpp
+	ExtensionsView.cpp
+	InfoView.cpp
+	LogoView.cpp
+	: be GL translation libcolumnlistview.a $(TARGET_LIBSUPC++)
+	: OpenGL.rdef
+	;
+
