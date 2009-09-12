@@ -17,5 +17,6 @@ mimeset -apps -f "$SYSTEM/apps"
 mimeset       -f "$SYSTEM/documentation"
 mimeset -apps -f "$SYSTEM/preferences"
 mimeset -apps -f "$SYSTEM/servers"
+mimeset -apps -f "$SYSTEM/add-ons/Tracker"
 mimeset -apps -f "/boot/apps"
 
