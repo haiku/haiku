@@ -365,9 +365,8 @@ ExpanderWindow::MessageReceived(BMessage *msg)
 					// expand the window if we need...
 					float delta = fListingText->StringWidth(string.String())
 						- fListingText->Frame().Width();
-					if (delta > 0) {
-						ResizeTo(Frame().Width() + delta,
-							Frame().Height());
+					if (delta > fLargestDelta) {
+						fLargestDelta = delta;
 					}
 					fListingText->Insert(string.String());
 				}
@@ -385,6 +384,9 @@ ExpanderWindow::MessageReceived(BMessage *msg)
 			} else if (fListingStarted){
 				fSourceChanged = false;
 				StopListing();
+				if (fLargestDelta > 0.0f)
+					ResizeBy(fLargestDelta, 0.0f);
+				fLargestDelta = 0.0f;
 			} else
 				fStatusView->SetText("");
 			break;
@@ -596,6 +598,8 @@ void
 ExpanderWindow::StartListing()
 {
 	_UpdateWindowSize(true);
+
+	fLargestDelta = 0.0f;
 
 	if (fListingScroll->IsHidden())
 		fListingScroll->Show();

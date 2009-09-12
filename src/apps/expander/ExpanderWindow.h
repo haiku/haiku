@@ -77,6 +77,8 @@ class ExpanderWindow : public BWindow {
 		BMessage fSettings;
 		ExpanderPreferences *fPreferences;
 		ExpanderRules fRules;
+
+		float	fLargestDelta;
 };
 
 #endif /* EXPANDER_WINDOW_H */
