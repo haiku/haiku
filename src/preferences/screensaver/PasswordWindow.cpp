@@ -18,6 +18,8 @@
 #include <Screen.h>
 #include <TextControl.h>
 
+#include <ctype.h>
+
 
 const uint32 kMsgDone = 'done';
 const uint32 kMsgPasswordTypeChanged = 'pwtp';
@@ -139,10 +141,7 @@ PasswordWindow::_SanitizeSalt(const char *password)
 	uint8 i = 0;
 	uint8 j = 0;
 	for (; i < length; i++) {
-		if ((password[i] >= 'A' && password[i] <= 'Z')
-			|| (password[i] >= 'a' && password[i] <= 'z')
-			|| (password[i] >= '0' && password[i] <= '9')
-			|| (password[i] == '.' || password[i] == '/')) {
+		if (isalnum(password[i]) || password[i] == '.' || password[i] == '/') {
 			salt[j] = password[i];
 			j++;
 		}
