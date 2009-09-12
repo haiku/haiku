@@ -39,8 +39,6 @@ private:
 		typedef BView inherited;
 
 		const MouseSettings &fSettings;
-		BBitmap		*fMouseBitmap, *fMouseDownBitmap;
-		BRect		fMouseDownBounds;
 
 		int32		fType;
 		uint32		fButtons;

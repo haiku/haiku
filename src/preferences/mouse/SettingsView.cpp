@@ -89,7 +89,8 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 
 	length = fClickSpeedSlider->Bounds().Height() + 6;
 	fDoubleClickBmpPoint.y = fRightArea.top + 
-		(length - fDoubleClickBitmap->Bounds().Height()) / 2;
+		(length - (fDoubleClickBitmap != NULL
+			? fDoubleClickBitmap->Bounds().Height() : 0)) / 2;
 	fRightArea.top += length;
 
 	// Create the "Mouse Speed" slider...
@@ -101,7 +102,8 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	AddChild(fMouseSpeedSlider);
 
 	fSpeedBmpPoint.y = fRightArea.top + 
-		(length - fSpeedBitmap->Bounds().Height()) / 2;
+		(length - (fSpeedBitmap != NULL
+			? fSpeedBitmap->Bounds().Height() : 0)) / 2;
 	fRightArea.top += length;
 
 	// Create the "Mouse Acceleration" slider...
@@ -113,7 +115,8 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	AddChild(fAccelerationSlider);
 
 	fAccelerationBmpPoint.y = fRightArea.top + 
-		(length - fAccelerationBitmap->Bounds().Height()) / 2;
+		(length - (fAccelerationBitmap != NULL
+			? fAccelerationBitmap->Bounds().Height() : 0)) / 2;
 	fRightArea.top += length - 3;
 	
 	// Add the "Focus follows mouse" pop up menu
@@ -149,15 +152,17 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	fLeftArea.bottom = fRightArea.bottom;
 
 	// Position mouse bitmaps
-	fDoubleClickBmpPoint.x = fRightArea.right - 
-		fDoubleClickBitmap->Bounds().right - 15;
-	fSpeedBmpPoint.x = fRightArea.right - fSpeedBitmap->Bounds().right - 15;
-	fAccelerationBmpPoint.x = fRightArea.right - 
-		fAccelerationBitmap->Bounds().right - 15;
+	fDoubleClickBmpPoint.x = fRightArea.right - 15
+		- (fDoubleClickBitmap != NULL ? fDoubleClickBitmap->Bounds().right : 0);
+	fSpeedBmpPoint.x = fRightArea.right - 15
+		- (fSpeedBitmap != NULL ? fSpeedBitmap->Bounds().right : 0);
+	fAccelerationBmpPoint.x = fRightArea.right - 15
+		- (fAccelerationBitmap != NULL ? fAccelerationBitmap->Bounds().right
+			: 0);
 
 	// Resize sliders to equal size
 	length = fRightArea.left - 5;
-	fClickSpeedSlider->ResizeTo(fDoubleClickBmpPoint.x - length - 11, 
+	fClickSpeedSlider->ResizeTo(fDoubleClickBmpPoint.x - length, 
 			fClickSpeedSlider->Bounds().Height());
 	fMouseSpeedSlider->ResizeTo(fSpeedBmpPoint.x - length, 
 			fMouseSpeedSlider->Bounds().Height());

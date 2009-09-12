@@ -66,8 +66,8 @@ KeyboardView::KeyboardView(BRect rect)
 	
 	// Create the "Typing test area" text box...
 	frame.OffsetBy(0,frame.Height() + 15);
-	frame.right = fDelaySlider->Frame().right + fIconBitmap->Bounds().Width() +
-				  kBorderSpace;
+	frame.right = fDelaySlider->Frame().right + kBorderSpace
+		+ (fIconBitmap != NULL ? fIconBitmap->Bounds().Width() : 0);
 	BTextControl *textcontrol = new BTextControl(frame,"typing_test_area",NULL,
 									"Typing test area",
 									new BMessage('TTEA'),
@@ -80,11 +80,11 @@ KeyboardView::KeyboardView(BRect rect)
 	
 	// Create the box for the sliders...
 	frame.left = frame.top = kBorderSpace;
-	frame.right = frame.left + fDelaySlider->Frame().right + 
-				fClockBitmap->Bounds().Width() + (kBorderSpace*2);
-	frame.bottom = textcontrol->Frame().bottom + (kBorderSpace*2);
-	fBox = new BBox(frame,"keyboard_box",B_FOLLOW_LEFT,B_WILL_DRAW,
-					B_FANCY_BORDER);
+	frame.right = frame.left + fDelaySlider->Frame().right + (kBorderSpace * 2)
+		+ (fClockBitmap != NULL ? fClockBitmap->Bounds().Width() : 0);
+	frame.bottom = textcontrol->Frame().bottom + (kBorderSpace * 2);
+	fBox = new BBox(frame,"keyboard_box",B_FOLLOW_LEFT, B_WILL_DRAW,
+		B_FANCY_BORDER);
 	AddChild(fBox);
 	
 	fBox->AddChild(fRepeatSlider);
@@ -118,14 +118,18 @@ KeyboardView::Draw(BRect updateFrame)
 {
 	BPoint pt;
 	pt.x = fRepeatSlider->Frame().right + 10;
-	pt.y = fRepeatSlider->Frame().bottom - 35 - 
-			(fIconBitmap->Bounds().Height()/3);
-	
-	fBox->DrawBitmap(fIconBitmap,pt);
-	
-	pt.y = fDelaySlider->Frame().bottom - 35 - 
-			(fIconBitmap->Bounds().Height()/3);
-	fBox->DrawBitmap(fClockBitmap,pt);
+
+	if (fIconBitmap != NULL) {
+		pt.y = fRepeatSlider->Frame().bottom - 35
+			- fIconBitmap->Bounds().Height() / 3;
+		fBox->DrawBitmap(fIconBitmap,pt);
+	}
+
+	if (fClockBitmap != NULL) {
+		pt.y = fDelaySlider->Frame().bottom - 35
+			- fClockBitmap->Bounds().Height() / 3;
+		fBox->DrawBitmap(fClockBitmap,pt);
+	}
 }
 
 void

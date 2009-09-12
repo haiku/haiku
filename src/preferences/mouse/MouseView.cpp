@@ -12,10 +12,10 @@
 
 #include "MouseView.h"
 
-#include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
 #include <Debug.h>
+#include <GradientLinear.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -31,19 +31,27 @@
 #include "MouseWindow.h"
 
 
-static const int32 kOneButtonOffsets[4] = {0, 55};
-static const int32 kTwoButtonOffsets[4] = {0, 27, 55};
-static const int32 kThreeButtonOffsets[4] = {0, 18, 36, 55};
-
 static const int32 kButtonTop = 6;
+static const int32 kMouseDownWidth = 72;
+static const int32 kMouseDownHeight = 30;
 
-static const rgb_color kButtonPressedColor = {120, 120, 120};
-static const rgb_color kButtonReleasedLeftColor = {255, 255, 255};
-static const rgb_color kButtonReleasedRightColor = {184, 184, 184};
-static const rgb_color kButtonPressedSeparatorColor = {48, 48, 48};
-static const rgb_color kButtonReleasedSeparatorColor = {88, 88, 88};
-static const rgb_color kButtonTextColor = {32, 32, 32};
+static const int32 kOneButtonOffsets[4]
+	= { 0, kMouseDownWidth };
+static const int32 kTwoButtonOffsets[4]
+	= { 0, kMouseDownWidth / 2, kMouseDownWidth };
+static const int32 kThreeButtonOffsets[4]
+	= { 0, kMouseDownWidth / 3, kMouseDownWidth / 3 * 2, kMouseDownWidth };
 
+static const rgb_color kButtonPressedColor = { 120, 120, 120 };
+static const rgb_color kButtonReleasedLeftColor = { 255, 255, 255 };
+static const rgb_color kButtonReleasedRightColor = { 184, 184, 184 };
+static const rgb_color kButtonPressedSeparatorColor = { 48, 48, 48 };
+static const rgb_color kButtonReleasedSeparatorColor = { 88, 88, 88 };
+static const rgb_color kButtonTextColor = { 32, 32, 32 };
+static const rgb_color kMouseShadowColor = { 150, 150, 150 };
+static const rgb_color kMouseBodyTopColor = { 210, 210, 210 };
+static const rgb_color kMouseBodyBottomColor = { 140, 140, 140 };
+static const rgb_color kMouseOutlineColor = { 0, 0, 0 };
 
 static const int32*
 getButtonOffsets(int32 type)
@@ -86,18 +94,12 @@ MouseView::MouseView(BRect rect, const MouseSettings &settings)
 	fButtons(0),
 	fOldButtons(0)
 {
-	fMouseBitmap = BTranslationUtils::GetBitmap("mouse_bmap");
-	fMouseDownBitmap = BTranslationUtils::GetBitmap("pressed_mouse_bmap");
-
-	fMouseDownBounds = fMouseDownBitmap->Bounds();
 	SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 }
 
 
 MouseView::~MouseView()
 {
-	delete fMouseBitmap;
-	delete fMouseDownBitmap;
 }
 
 
@@ -105,9 +107,9 @@ void
 MouseView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width)
-		*_width = fMouseBitmap != NULL ? fMouseBitmap->Bounds().Width() : 57;
+		*_width = kMouseDownWidth + 2;
 	if (_height)
-		*_height = fMouseBitmap != NULL ? fMouseBitmap->Bounds().Height() : 82;
+		*_height = 100;
 }
 
 
@@ -115,8 +117,8 @@ void
 MouseView::MouseUp(BPoint)
 {
 	fButtons = 0;
-	Invalidate(BRect(0, kButtonTop, fMouseDownBounds.Width(), 
-		kButtonTop + fMouseDownBounds.Height()));
+	Invalidate(BRect(0, kButtonTop, kMouseDownWidth,
+		kButtonTop + kMouseDownHeight));
 	fOldButtons = fButtons;
 }
 
@@ -140,8 +142,8 @@ MouseView::MouseDown(BPoint where)
 	GetClippingRegion(&clipping);
 
 	if (fOldButtons != fButtons) {
-		Invalidate(BRect(0, kButtonTop,
-			fMouseDownBounds.Width(), kButtonTop + fMouseDownBounds.Height()));
+		Invalidate(BRect(0, kButtonTop, kMouseDownWidth, kButtonTop
+			+ kMouseDownHeight));
 		fOldButtons = fButtons;
 	}
 
@@ -149,7 +151,7 @@ MouseView::MouseDown(BPoint where)
 	int32 button = -1;
 	for (int32 i = 0; i <= fType; i++) {
 		BRect frame(offset[i], kButtonTop, offset[i + 1] - 1,
-			kButtonTop + fMouseDownBounds.Height());
+			kButtonTop + kMouseDownHeight);
 		if (frame.Contains(where)) {
 			button = i;
 			break;
@@ -197,10 +199,24 @@ MouseView::AttachedToWindow()
 void 
 MouseView::Draw(BRect updateFrame)
 {
-	// Draw the mouse top
-	SetDrawingMode(B_OP_ALPHA);
-	if (fMouseBitmap != NULL)
-		DrawBitmapAsync(fMouseBitmap, updateFrame, updateFrame);
+	BRect mouseBody(Bounds());
+	mouseBody.right -= 2;
+	mouseBody.bottom -= 2;
+	float radius = 10;
+
+	// Draw the shadow
+	SetHighColor(kMouseShadowColor);
+	FillRoundRect(mouseBody.OffsetByCopy(2, 2), radius, radius);
+
+	// Draw the body
+	BGradientLinear gradient(mouseBody.LeftTop(), mouseBody.LeftBottom());
+	gradient.AddColor(kMouseBodyTopColor, 0);
+	gradient.AddColor(kMouseBodyBottomColor, 255);
+	FillRoundRect(mouseBody, radius, radius, gradient);
+
+	// Draw the outline
+	SetHighColor(kMouseOutlineColor);
+	StrokeRoundRect(mouseBody, radius, radius);
 
 	mouse_map map;
 	fSettings.Mapping(map);
@@ -210,22 +226,17 @@ MouseView::Draw(BRect updateFrame)
 
 	for (int32 i = 0; i < fType; i++) {
 		BRect border(offset[i] + 1, kButtonTop + 2, offset[i + 1] - 1,
-			kButtonTop + fMouseDownBounds.Height() - 4);
+			kButtonTop + kMouseDownHeight - 4);
 		bool pressed = (fButtons & map.button[_ConvertFromVisualOrder(i)]) != 0;
 			// is button currently pressed?
 
 		if (pressed) {
-			BRect frame(offset[i], 0, offset[i + 1], 
-				fMouseDownBounds.Height() + 1);
-			if (fMouseDownBitmap != NULL)
-				DrawBitmapAsync(fMouseDownBitmap, frame, 
-					frame.OffsetByCopy(0, kButtonTop));
-			else if (fMouseBitmap == NULL) {
-				SetHighColor(kButtonPressedColor);
-				SetDrawingMode(B_OP_OVER);
-				FillRect(frame.OffsetByCopy(0, kButtonTop));
-			}
+			BRect frame(offset[i], 0, offset[i + 1], kMouseDownHeight - 1);
+			frame.InsetBy(1, 1);
+			SetHighColor(kButtonPressedColor);
+			FillRect(frame.OffsetByCopy(0, kButtonTop));
 		}
+
 		SetDrawingMode(B_OP_OVER);
 
 		if (i > 0 && fType > i) {
