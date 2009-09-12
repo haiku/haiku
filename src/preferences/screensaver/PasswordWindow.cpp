@@ -82,6 +82,7 @@ PasswordWindow::_Setup()
 	float width, height;
 	fConfirmControl->GetPreferredSize(&width, &height);
 	fPasswordControl->ResizeTo(width, height);
+	fConfirmControl->ResizeTo(width, height);
 	
 	float divider = be_plain_font->StringWidth("Confirm password:") + 5.0;
 	fConfirmControl->SetDivider(divider);
@@ -123,6 +124,44 @@ PasswordWindow::Update()
 }
 
 
+char *
+PasswordWindow::_SanitizeSalt(const char *password)
+{
+	char *salt;
+	
+	uint8 length = strlen(password);	
+
+	if (length < 2)
+		salt = new char[3];
+	else
+		salt = new char[length + 1];
+
+	uint8 i = 0;
+	uint8 j = 0;
+	for (; i < length; i++) {
+		if ((password[i] >= 'A' && password[i] <= 'Z')
+			|| (password[i] >= 'a' && password[i] <= 'z')
+			|| (password[i] >= '0' && password[i] <= '9')
+			|| (password[i] == '.' || password[i] == '/')) {
+			salt[j] = password[i];
+			j++;
+		}
+	}
+
+	/*
+	 *	We need to pad the salt.
+	 */ 
+	while (j < 2) {
+		salt[j] = '.';
+		j++;
+	}
+
+	salt[j] = '\0';
+	
+	return salt;
+}
+
+
 void 
 PasswordWindow::MessageReceived(BMessage *message) 
 {
@@ -135,9 +174,10 @@ PasswordWindow::MessageReceived(BMessage *message)
 						"Passwords don't match. Try again.","OK");
 					alert->Go();
 					break;
-				} 
-				fSettings.SetPassword(crypt(fPasswordControl->Text(), 
-					fPasswordControl->Text()));
+				}
+				const char *salt = _SanitizeSalt(fPasswordControl->Text());
+				fSettings.SetPassword(crypt(fPasswordControl->Text(), salt));
+				delete salt;
 			} else {
 				fSettings.SetPassword("");
 			}

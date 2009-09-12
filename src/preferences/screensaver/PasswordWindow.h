@@ -30,6 +30,7 @@ class PasswordWindow : public BWindow {
 
 	private:
 		void			_Setup();
+		char * 			_SanitizeSalt(const char *password);
 
 		BRadioButton	*fUseCustom;
 		BRadioButton	*fUseNetwork;
