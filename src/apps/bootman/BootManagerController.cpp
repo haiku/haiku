@@ -297,7 +297,7 @@ BootManagerController::_CreateSaveMBRPage(BRect frame)
 		"save the MBR into.\n\n"
 		"If something goes wrong with the installation or if "
 		"you later wish to remove the boot menu, simply run the "
-		"bootman program and choose to 'Uninstall' option.";	
+		"bootman program and choose the 'Uninstall' option.";	
 	
 	return new FileSelectionPage(&fSettings, frame, "saveMBR", description.String(), 
 		B_SAVE_PANEL);
