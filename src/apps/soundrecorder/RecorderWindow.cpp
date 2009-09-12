@@ -135,6 +135,7 @@ RecorderWindow::RecorderWindow() :
 		Show();
 }
 
+
 RecorderWindow::~RecorderWindow()
 {
 	//	The sound consumer and producer are Nodes; it has to be released and the Roster
@@ -673,6 +674,7 @@ RecorderWindow::Record(BMessage * message)
 	}
 }
 
+
 void
 RecorderWindow::Play(BMessage * message)
 {
@@ -714,6 +716,7 @@ RecorderWindow::Play(BMessage * message)
 	fPlayer->SetHasData(true);
 }
 
+
 void
 RecorderWindow::Stop(BMessage * message)
 {
@@ -723,6 +726,7 @@ RecorderWindow::Stop(BMessage * message)
 	//	Stop player.
 	StopPlaying();
 }
+
 
 void
 RecorderWindow::Save(BMessage * message)
@@ -748,6 +752,7 @@ RecorderWindow::Save(BMessage * message)
 	fSavePanel->SetMessage(&saveMsg);
 	fSavePanel->Show();
 }
+
 
 void
 RecorderWindow::DoSave(BMessage * message)
@@ -814,6 +819,7 @@ RecorderWindow::Input(BMessage * message)
 	}
 }
 
+
 void
 RecorderWindow::Selected(BMessage * message)
 {
@@ -830,6 +836,7 @@ RecorderWindow::Selected(BMessage * message)
 	}
 	UpdateButtons();
 }
+
 
 status_t
 RecorderWindow::MakeRecordConnection(const media_node & input)
@@ -940,6 +947,7 @@ RecorderWindow::BreakRecordConnection()
 	return err;
 }
 
+
 status_t
 RecorderWindow::StopRecording()
 {
@@ -1032,6 +1040,7 @@ RecorderWindow::UpdateButtons()
 extern "C" status_t DecodedFormat__11BMediaTrackP12media_format(BMediaTrack *self, media_format *inout_format);
 #endif
 
+
 status_t
 RecorderWindow::UpdatePlayFile(SoundListItem* item, bool updateDisplay)
 {
@@ -1059,7 +1068,7 @@ RecorderWindow::UpdatePlayFile(SoundListItem* item, bool updateDisplay)
 		return err;
 	}
 
-	for (int ix=0; ix<fPlayFile->CountTracks(); ix++) {
+	for (int ix=0; ix < fPlayFile->CountTracks(); ix++) {
 		BMediaTrack * track = fPlayFile->TrackAt(ix);
 		fPlayFormat.type = B_MEDIA_RAW_AUDIO;
 #ifdef __HAIKU__
@@ -1249,6 +1258,7 @@ RecorderWindow::PlayFile(void * cookie, void * data, size_t size,
 		window->PostMessage(STOP_PLAYING);
 	}
 }
+
 
 void
 RecorderWindow::NotifyPlayFile(void * cookie, 

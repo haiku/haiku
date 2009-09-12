@@ -17,9 +17,11 @@ SoundListView::SoundListView(
 {
 }
 
+
 SoundListView::~SoundListView()
 {
 }
+
 
 void
 SoundListView::Draw(BRect updateRect)
@@ -64,6 +66,7 @@ SoundListItem::SoundListItem(
 	fEntry.GetName(name);
 	SetText(name);
 }
+
 
 SoundListItem::~SoundListItem()
 {
