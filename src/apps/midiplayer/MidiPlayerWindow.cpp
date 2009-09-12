@@ -290,18 +290,6 @@ void MidiPlayerWindow::CreateViews()
 
 //------------------------------------------------------------------------------
 
-void MidiPlayerWindow::CenterOnScreen()
-{
-	BRect screenRect = BScreen(this).Frame();
-	BRect windowRect = Frame();
-
-	MoveTo(
-		(screenRect.Width()  - windowRect.Width())  / 2,
-		(screenRect.Height() - windowRect.Height()) / 2);
-}
-
-//------------------------------------------------------------------------------
-
 void MidiPlayerWindow::InitControls()
 {
 	Lock();

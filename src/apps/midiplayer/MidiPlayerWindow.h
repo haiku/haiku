@@ -64,7 +64,6 @@ private:
 	void CreateInputMenu();
 	void CreateReverbMenu();
 	void CreateViews();
-	void CenterOnScreen();
 	void InitControls();
 	void LoadSettings();
 	void SaveSettings();
