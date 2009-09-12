@@ -50,6 +50,7 @@ const uint32 SHOW_BOTTOM_MESSAGE = 'iSBT';
 const uint32 SETUP_MESSAGE = 'iSEP';
 const uint32 START_SCAN = 'iSSC';
 const uint32 PACKAGE_CHECKBOX = 'iPCB';
+const uint32 ENCOURAGE_DRIVESETUP = 'iENC';
 
 class LogoView : public BView {
 public:
@@ -382,6 +383,13 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			fSizeView->SetText(string);
 			break;
 		}
+		case ENCOURAGE_DRIVESETUP:
+		{
+			(new BAlert("use drive setup", "No partitions have been found that "
+				"are suitable for installation. Please setup partitions and "
+				"initialize at least one partition with the Be File System." ,
+				"Ok"))->Go();
+		}
 		case MSG_STATUS_MESSAGE:
 		{
 // TODO: Was this supposed to prevent status messages still arriving
@@ -629,10 +637,7 @@ InstallerWindow::_UpdateControls()
 	if (!fEncouragedToSetupPartitions && !foundOneSuitableTarget) {
 		// Focus the users attention on the DriveSetup button
 		fEncouragedToSetupPartitions = true;
-		(new BAlert("use drive setup", "No partitions have been found that "
-			"are suitable for installation. Please setup partitions and "
-			"initialize at least one partition with the Be File System." ,
-			"Ok"))->Go();
+		PostMessage(ENCOURAGE_DRIVESETUP);
 	}
 }
 
