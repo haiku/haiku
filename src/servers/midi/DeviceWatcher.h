@@ -1,47 +1,39 @@
 /*
- * Copyright (c) 2003 Matthijs Hollemans
- * Copyright (c) 2003 Jerome Leveque
+ * Copyright 2004-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * Authors:
+ *		Matthijs Hollemans
+ *		Jerome Leveque
+ *		Philippe Houdoin
  */
-
 #ifndef DEVICE_WATCHER_H
 #define DEVICE_WATCHER_H
+
+#include <Looper.h>
+
 
 class BBitmap;
 class BMidiEndpoint;
 
-class DeviceWatcher
-{
+class DeviceWatcher : public BLooper {
 public:
-	DeviceWatcher();
-	~DeviceWatcher();
+				DeviceWatcher();
+				~DeviceWatcher();
+	
+	void		MessageReceived(BMessage* message);
 
-	void Start();
+	status_t 	Start();
+	status_t	Stop();
 
 private:
-	static int32 SpawnThread(void* data);
-	void ScanDevices(const char* path);
-	void SetIcons(BMidiEndpoint* endp);
+	void _ScanDevices(const char* path);
+	void _AddDevice(const char* path);
+	void _RemoveDevice(const char* path);
+	void _SetIcons(BMidiEndpoint* endp);
 
-	BBitmap* largeIcon;
-	BBitmap* miniIcon;
+	BBitmap* fLargeIcon;
+	BBitmap* fMiniIcon;
 };
 
 #endif // DEVICE_WATCHER_H

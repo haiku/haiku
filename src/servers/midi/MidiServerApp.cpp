@@ -20,14 +20,17 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <Alert.h>
-
 #include "debug.h"
 #include "MidiServerApp.h"
 #include "PortDrivers.h"
 #include "ServerDefs.h"
 #include "protocol.h"
 
+#include <Alert.h>
+
+#include <new>
+
+using std::nothrow;
 
 MidiServerApp::MidiServerApp()
 	: BApplication(MIDI_SERVER_SIGNATURE)
@@ -35,12 +38,17 @@ MidiServerApp::MidiServerApp()
 	TRACE(("Running Haiku MIDI server"))
 
 	nextId = 1;
-	devWatcher.Start();
+	fDeviceWatcher = new(std::nothrow) DeviceWatcher();
+	if (fDeviceWatcher != NULL)
+		fDeviceWatcher->Run();
 }
 
 
 MidiServerApp::~MidiServerApp()
 {
+	if (fDeviceWatcher && fDeviceWatcher->Lock())
+		fDeviceWatcher->Quit();
+
 	for (int32 t = 0; t < CountApps(); ++t) {
 		delete AppAt(t);
 	}
