@@ -9,8 +9,9 @@
 #ifndef EXTENSIONS_VIEW_H
 #define EXTENSIONS_VIEW_H
 
-
 #include <View.h>
+
+class ExtensionsList;
 
 class ExtensionsView : public BView {
 public:
@@ -20,6 +21,10 @@ public:
 	virtual	void MessageReceived(BMessage* message);
 	virtual	void AttachedToWindow();
 	virtual	void DetachedFromWindow();
+	
+private:
+			void _AddExtensionsList(ExtensionsList *extList, char* stringList);
+
 };
 
 

@@ -5,8 +5,8 @@
  * Author:
  *		Artur Wyszynski <harakash@gmail.com>
  */
-
 #include "ExtensionsView.h"
+#include "ExtensionsList.h"
 
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
@@ -14,7 +14,7 @@
 #include <SpaceLayoutItem.h>
 #include <String.h>
 #include <GL/gl.h>
-#include "ExtensionsList.h"
+#include <GL/glu.h>
 
 
 ExtensionsView::ExtensionsView()
@@ -27,19 +27,8 @@ ExtensionsView::ExtensionsView()
 
 	ExtensionsList *extList = new ExtensionsList();
 	
-	char *list = (char*)glGetString(GL_EXTENSIONS);
-	if (list) {
-		while (*list) {
-			char extName[255];
-			int n = strcspn(list, " ");
-			strncpy(extName, list, n);
-			extName[n] = 0;
-			extList->AddRow(new ExtensionRow(extName));
-			if (!list[n])
-				break;
-			list += (n + 1); // next !
-		}
-	}
+	_AddExtensionsList(extList, (char*) glGetString(GL_EXTENSIONS));
+	_AddExtensionsList(extList, (char*) gluGetString(GLU_EXTENSIONS));
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
 		.Add(extList)
@@ -76,3 +65,25 @@ ExtensionsView::DetachedFromWindow()
 {
 		
 }
+
+// #pragma mark
+
+void
+ExtensionsView::_AddExtensionsList(ExtensionsList *extList, char* stringList)
+{
+	if (!stringList)
+		// empty extentions string
+		return;
+		
+	while (*stringList) {
+		char extName[255];
+		int n = strcspn(stringList, " ");
+		strncpy(extName, stringList, n);
+		extName[n] = 0;
+		extList->AddRow(new ExtensionRow(extName));
+		if (!stringList[n])
+			break;
+		stringList += (n + 1); // next !
+	}
+}
+	
