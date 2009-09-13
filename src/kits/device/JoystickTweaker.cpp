@@ -31,10 +31,10 @@ LOG(const char *fmt, ...)
 	va_start(ap, fmt);
 	vsprintf(buf, fmt, ap);
 	va_end(ap);
-	fputs(buf, BJoystick::sLogFile); fflush(BJoystick::sLogFile);
+	fputs(buf, _BJoystickTweaker::sLogFile); fflush(_BJoystickTweaker::sLogFile);
 }
 #	define LOG_ERR(text...) LOG(text)
-FILE *BJoystick::sLogFile = NULL;
+FILE *_BJoystickTweaker::sLogFile = NULL;
 #else
 #	define LOG(text...)
 #	define LOG_ERR(text...) fprintf(stderr, text)
@@ -184,7 +184,7 @@ _BJoystickTweaker::_BuildFromJoystickDesc(char *string, _joystick_info* info)
 		str.RemoveFirst("num_sticks = ");
 		info->num_sticks = atoi(str.String());
 	} else {
-		LOG("Path = %s\n", str->String());
+		LOG("Path = %s\n", str.String());
 	}
 }
 

@@ -9,6 +9,10 @@
 #include <OS.h>
 #include <SupportDefs.h>
 
+#if DEBUG
+#include <stdio.h>
+#endif
+
 class BList;
 class BString;
 class _BJoystickTweaker;

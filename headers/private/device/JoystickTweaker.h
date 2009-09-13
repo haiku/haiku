@@ -11,6 +11,10 @@
 #include <List.h>
 #include <Entry.h>
 
+#if DEBUG
+#include <stdio.h>
+#endif
+
 #define DEVICEPATH "/dev/joystick/"
 #define JOYSTICKPATH "/boot/home/config/settings/joysticks/"
 
