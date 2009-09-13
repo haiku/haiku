@@ -94,6 +94,16 @@ get_node_type(ntfs_inode* ni, int* _type)
 	return B_OK;
 }
 
+void 
+fs_ntfs_update_times(fs_volume *vol, ntfs_inode *ni, ntfs_time_update_flags mask)
+{
+	nspace *ns = (nspace*)vol->private_volume;
+	
+	if (ns->noatime)
+		mask &= ~NTFS_UPDATE_ATIME;
+				
+	ntfs_inode_update_times(ni, mask);
+}
 
 float
 fs_identify_partition(int fd, partition_data *partition, void **_cookie)
@@ -213,8 +223,6 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 		mountFlags |= MS_RDONLY;
 		ns->flags |= B_FS_IS_READONLY;
 	}
-//	if (ns->noatime)
-//		mnt_flags |= MS_NOATIME;
 
 	// TODO: this does not take read-only volumes into account!
 	ns->ntvol = utils_mount_volume(device, mountFlags, true);
@@ -931,8 +939,10 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 				S_IFREG, 0);
 
 			ntfs_mark_free_space_outdated(ns);
+			fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_MCTIME);
 
 			notify_entry_created(ns->id, MREF(bi->mft_no), name, *_vnid);
+			
 		} else
 			result = errno;
 	}
@@ -1022,7 +1032,8 @@ fs_read(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, void *buf,
 	}
 
 	*len = total;
-
+	fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_ATIME);
+	
 exit:
 	if (na)
 		ntfs_attr_close(na);
@@ -1117,6 +1128,9 @@ fs_write(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset,
 	}
 
 	*len = total;
+	if (total > 0)
+		fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_MCTIME);	
+	
 	ERRPRINT(("fs_write - OK\n"));
 
 exit:
@@ -1339,7 +1353,9 @@ fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name,
 	}
 
 	put_vnode(_vol, MREF(sym->mft_no));
-
+	fs_ntfs_update_times(_vol, sym, NTFS_UPDATE_CTIME);
+	fs_ntfs_update_times(_vol, bi, NTFS_UPDATE_MCTIME);
+	
 	notify_entry_created(ns->id, MREF( bi->mft_no ), name, MREF(sym->mft_no));
 
 exit:
@@ -1420,6 +1436,7 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 		put_vnode(_vol, MREF(ni->mft_no));
 
 		ntfs_mark_free_space_outdated(ns);
+		fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_MCTIME);
 
 		notify_entry_created(ns->id, MREF(bi->mft_no), name, vnid);
 	} else

@@ -38,4 +38,6 @@ status_t	fs_opendir(fs_volume *volume, fs_vnode *vnode, void** cookie);
 status_t  	fs_readdir(fs_volume *volume, fs_vnode *vnode, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num );
 status_t	fs_rewinddir(fs_volume *volume, fs_vnode *vnode, void *cookie);
 
+extern void fs_ntfs_update_times(fs_volume *vol, ntfs_inode *ni, ntfs_time_update_flags mask);
+
 #endif

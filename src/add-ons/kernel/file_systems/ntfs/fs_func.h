@@ -52,6 +52,7 @@
 extern fs_vnode_ops gNTFSVnodeOps;
 extern fs_volume_ops gNTFSVolumeOps;
 
+void 		fs_ntfs_update_times(fs_volume *vol, ntfs_inode *ni, ntfs_time_update_flags mask);
 
 float		fs_identify_partition(int fd, partition_data *partition,
 				void **_cookie);

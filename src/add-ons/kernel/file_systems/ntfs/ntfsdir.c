@@ -136,16 +136,31 @@ status_t
 fs_closedir( fs_volume *_vol, fs_vnode *_node, void *cookie )
 {
 	nspace		*ns = (nspace*)_vol->private_volume;	
-
+	vnode		*node = (vnode*)_node->private_node;
+	int			result = B_NO_ERROR;
+	ntfs_inode	*ni=NULL;
+	
 	LOCK_VOL(ns);
 	
 	ERRPRINT("fs_closedir - ENTER\n");
+
+	ni = ntfs_inode_open(ns->ntvol, node->vnid);		
+	if(ni==NULL) {
+			result = ENOENT;
+			goto exit;
+	}
+		
+	fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_ATIME);
+
+exit:		
+	if(ni)
+		ntfs_inode_close(ni);
 		
 	ERRPRINT("fs_closedir - EXIT\n");
 	
 	UNLOCK_VOL(ns);
 	
-	return B_NO_ERROR;
+	return result;
 }
 
 status_t
