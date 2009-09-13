@@ -558,8 +558,10 @@ EthernetSettingsView::MessageReceived(BMessage* message)
 		case kMsgApply:
 			if (_ValidateControl(fIPTextControl)
 				&& _ValidateControl(fNetMaskTextControl)
-				&& _ValidateControl(fGatewayTextControl)
-				&& _ValidateControl(fPrimaryDNSTextControl)
+				&& (strlen(fGatewayTextControl->Text()) == 0
+					|| _ValidateControl(fGatewayTextControl))
+				&& (strlen(fPrimaryDNSTextControl->Text()) == 0
+					|| _ValidateControl(fPrimaryDNSTextControl))
 				&& (strlen(fSecondaryDNSTextControl->Text()) == 0
 					|| _ValidateControl(fSecondaryDNSTextControl)))
 				_SaveConfiguration();
