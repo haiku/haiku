@@ -154,7 +154,7 @@ dump_widget_pm_support(hda_widget& widget)
 static void
 dump_widget_stream_support(hda_widget& widget)
 {
-	dprintf("\tSupported formats: %s%s%s%s%s%s%s%s\n",
+	dprintf("\tSupported formats: %s%s%s%s%s%s%s%s%s\n",
 		widget.d.io.formats & B_FMT_8BIT_S ? "8bits " : "",
 		widget.d.io.formats & B_FMT_16BIT ? "16bits " : "",
 		widget.d.io.formats & B_FMT_20BIT ? "20bits " : "",
@@ -162,7 +162,8 @@ dump_widget_stream_support(hda_widget& widget)
 		widget.d.io.formats & B_FMT_32BIT ? "32bits " : "",
 		widget.d.io.formats & B_FMT_FLOAT ? "float " : "",
 		widget.d.io.formats & B_FMT_DOUBLE ? "double " : "",
-		widget.d.io.formats & B_FMT_EXTENDED ? "extended " : "");
+		widget.d.io.formats & B_FMT_EXTENDED ? "extended " : "",
+		widget.d.io.formats & B_FMT_BITSTREAM ? "bitstream " : "");
 	dprintf("\tSupported rates: %s%s%s%s%s%s%s%s%s%s%s%s\n",
 		widget.d.io.rates & B_SR_8000 ? "8khz " : "",
 		widget.d.io.rates & B_SR_11025 ? "11khz " : "",
@@ -885,13 +886,17 @@ dprintf("build tree!\n");
 			widget.active_input = 0;
 		if (widget.num_inputs < 2)
 			continue;
+			
+		if (widget.type != WT_AUDIO_INPUT
+			&& widget.type != WT_AUDIO_SELECTOR
+			&& widget.type != WT_PIN_COMPLEX)
+			continue;
 
 		corb_t verb = MAKE_VERB(audioGroup->codec->addr,
 			widget.node_id, VID_SET_CONNECTION_SELECT, widget.active_input);
-		if (hda_send_verbs(audioGroup->codec, &verb, NULL, 1) != B_OK) {
+		if (hda_send_verbs(audioGroup->codec, &verb, NULL, 1) != B_OK)
 			dprintf("hda: Setting output selector %ld failed on widget %ld!\n",
 				widget.active_input, widget.node_id);
-		}
 	}
 
 	dump_audiogroup_widgets(audioGroup);
@@ -1039,6 +1044,7 @@ dprintf("UNMUTE/SET INPUT GAIN widget %ld (offset %ld)\n", widget.node_id,
 						AMP_SET_INPUT | AMP_SET_LEFT_CHANNEL
 							| AMP_SET_RIGHT_CHANNEL
 							| AMP_SET_INPUT_INDEX(i)
+							| ((widget.active_input == (int32)i) ? 0 : AMP_MUTE)
 							| AMP_CAP_OFFSET(widget.capabilities.input_amplifier));
 					hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
 				}

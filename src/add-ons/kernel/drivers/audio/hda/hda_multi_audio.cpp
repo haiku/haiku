@@ -25,7 +25,9 @@
 
 typedef enum {
 	B_MIX_GAIN = 1 << 0,
-	B_MIX_MUTE = 1 << 1
+	B_MIX_MUTE = 1 << 1,
+	B_MIX_MUX_MIXER = 1 << 2,
+	B_MIX_MUX_SELECTOR = 1 << 3
 } mixer_type;
 
 
@@ -191,6 +193,73 @@ set_global_format(hda_audio_group* audioGroup, multi_format_info* data)
 }
 
 
+static enum strind_id 
+hda_find_multi_string(hda_widget& widget)
+{
+	switch (CONF_DEFAULT_DEVICE(widget.d.pin.config)) {
+		case PIN_DEV_CD:
+			return S_CD;
+		case PIN_DEV_LINE_IN:
+		case PIN_DEV_LINE_OUT:
+			return S_LINE;
+		case PIN_DEV_MIC_IN:
+			return S_MIC;
+		case PIN_DEV_AUX:
+			return S_AUX;
+		case PIN_DEV_SPDIF_IN:
+		case PIN_DEV_SPDIF_OUT:
+			return S_SPDIF;
+		case PIN_DEV_HEAD_PHONE_OUT:
+			return S_HEADPHONE;
+	}
+	TRACE("couln't find a string for widget %ld in hda_find_multi_string()\n", widget.node_id);
+	return S_null;
+}
+
+
+static const char *
+hda_find_multi_custom_string(hda_widget& widget)
+{
+	switch (CONF_DEFAULT_DEVICE(widget.d.pin.config)) {
+		case PIN_DEV_LINE_IN:
+		case PIN_DEV_LINE_OUT:
+		case PIN_DEV_MIC_IN:
+			switch (CONF_DEFAULT_COLOR(widget.d.pin.config)) {
+				case 1:
+					return "Rear";
+				case 2:
+					return "Side";
+				case 3:
+					return "Line In";
+				case 4:
+					return "Front";
+				case 6:
+					return "Center/Sub";
+				case 9:
+					return "Mic in";
+			}
+			if (CONF_DEFAULT_DEVICE(widget.d.pin.config) == PIN_DEV_LINE_IN)
+				return "Line In";
+			if (CONF_DEFAULT_DEVICE(widget.d.pin.config) == PIN_DEV_MIC_IN)
+				return "Mic In";
+			return "Line Out";
+			break;
+		case PIN_DEV_SPDIF_IN:
+			return "SPDIF In";
+		case PIN_DEV_SPDIF_OUT:
+			return "SPDIF Out";
+		case PIN_DEV_CD:
+			return "CD";
+		case PIN_DEV_HEAD_PHONE_OUT:
+			return "Headphones";
+		case PIN_DEV_SPEAKER:
+			return "Speaker";
+	}
+	TRACE("couldn't find a string for widget %ld in hda_find_multi_custom_string()\n", widget.node_id);
+	return NULL;
+}
+
+
 static int32
 hda_create_group_control(hda_multi *multi, uint32 *index, int32 parent,
 	enum strind_id string, const char* name) {
@@ -261,69 +330,43 @@ hda_create_channel_control(hda_multi *multi, uint32 *index, int32 parent, int32 
 }
 
 
-static enum strind_id 
-hda_find_multi_string(hda_widget& widget)
-{
-	switch (CONF_DEFAULT_DEVICE(widget.d.pin.config)) {
-		case PIN_DEV_CD:
-			return S_CD;
-		case PIN_DEV_LINE_IN:
-		case PIN_DEV_LINE_OUT:
-			return S_LINE;
-		case PIN_DEV_MIC_IN:
-			return S_MIC;
-		case PIN_DEV_AUX:
-			return S_AUX;
-		case PIN_DEV_SPDIF_IN:
-		case PIN_DEV_SPDIF_OUT:
-			return S_SPDIF;
-		case PIN_DEV_HEAD_PHONE_OUT:
-			return S_HEADPHONE;
+static void
+hda_create_mux_control(hda_multi *multi, uint32 *index, int32 parent, hda_widget& widget) {
+	uint32 i = *index, parent2;
+	hda_multi_mixer_control control;
+	hda_audio_group *audioGroup = multi->group;
+	
+	control.nid = widget.node_id;
+	control.input = true;
+	control.mute = 0;
+	control.gain = 0;
+	control.mix_control.master = MULTI_CONTROL_MASTERID;
+	control.mix_control.parent = parent;
+	control.mix_control.id = MULTI_CONTROL_FIRSTID + i;
+	control.mix_control.flags = B_MULTI_MIX_MUX;
+	control.mix_control.string = S_null;
+	control.type = (widget.type == WT_AUDIO_MIXER) ? B_MIX_MUX_MIXER : B_MIX_MUX_SELECTOR;
+	multi->controls[i] = control;
+	strcpy(multi->controls[i].mix_control.name, "");
+	i++;
+	parent2 = control.mix_control.id;
+	
+	for (uint32 j = 0; j < widget.num_inputs; j++) {
+		hda_widget *input = hda_audio_group_get_widget(audioGroup, widget.inputs[j]);
+		if (input->type != WT_PIN_COMPLEX)
+			continue;
+		control.nid = widget.node_id;
+		control.input = true;
+		control.mix_control.id = MULTI_CONTROL_FIRSTID + i;
+		control.mix_control.flags = B_MULTI_MIX_MUX_VALUE;
+		control.mix_control.parent = parent2;
+		control.mix_control.string = S_null;
+		multi->controls[i] = control;
+		strcpy(multi->controls[i].mix_control.name, hda_find_multi_custom_string(*input));
+		i++;
 	}
-	TRACE("couln't find a string for widget %ld in hda_find_multi_string()\n", widget.node_id);
-	return S_null;
-}
-
-static const char *
-hda_find_multi_custom_string(hda_widget& widget)
-{
-	switch (CONF_DEFAULT_DEVICE(widget.d.pin.config)) {
-		case PIN_DEV_LINE_IN:
-		case PIN_DEV_LINE_OUT:
-		case PIN_DEV_MIC_IN:
-			switch (CONF_DEFAULT_COLOR(widget.d.pin.config)) {
-				case 1:
-					return "Rear";
-				case 2:
-					return "Side";
-				case 3:
-					return "Line In";
-				case 4:
-					return "Front";
-				case 6:
-					return "Center/Sub";
-				case 9:
-					return "Mic in";
-			}
-			if (CONF_DEFAULT_DEVICE(widget.d.pin.config) == PIN_DEV_LINE_IN)
-				return "Line In";
-			if (CONF_DEFAULT_DEVICE(widget.d.pin.config) == PIN_DEV_MIC_IN)
-				return "Mic In";
-			return "Line Out";
-			break;
-		case PIN_DEV_SPDIF_IN:
-			return "SPDIF In";
-		case PIN_DEV_SPDIF_OUT:
-			return "SPDIF Out";
-		case PIN_DEV_CD:
-			return "CD";
-		case PIN_DEV_HEAD_PHONE_OUT:
-			return "Headphones";
-		case PIN_DEV_SPEAKER:
-			return "Speaker";
-	}
-	TRACE("couldn't find a string for widget %ld in hda_find_multi_custom_string()\n", widget.node_id);
-	return NULL;
+		
+	*index = i;
 }
 
 
@@ -450,6 +493,12 @@ hda_create_controls_list(hda_multi *multi)
 		bool gain = true, mute = true;
 		hda_create_channel_control(multi, &index, parent2, 0, 
 			widget, true, capabilities, 0, gain, mute);
+				
+		hda_widget *mixer = hda_audio_group_get_widget(audioGroup, widget.inputs[0]);
+		if (mixer->type != WT_AUDIO_MIXER && mixer->type != WT_AUDIO_SELECTOR)
+			continue;
+		TRACE("  create mixer nid %lu\n", mixer->node_id);
+		hda_create_mux_control(multi, &index, parent2, *mixer);
 	}
 	
 	multi->control_count = index;
@@ -539,15 +588,35 @@ get_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 						* AMP_CAP_STEP_SIZE(control->capabilities);
 				TRACE("get_mix: %ld gain: %f (%ld)\n", control->nid, mmvi->values[i].gain, value);
 			}
-
 			
+		} else if (control->mix_control.flags & B_MIX_MUX_MIXER) {
+			hda_widget *mixer = hda_audio_group_get_widget(audioGroup, control->nid);
+			mmvi->values[i].mux = 0;
+			for (uint32 j = 0; j < mixer->num_inputs; j++) {
+				uint32 verb = MAKE_VERB(audioGroup->codec->addr,
+					control->nid, VID_GET_AMPLIFIER_GAIN_MUTE, AMP_GET_INPUT
+					| AMP_GET_LEFT_CHANNEL | AMP_GET_INPUT_INDEX(j));
+				uint32 resp;
+				if (hda_send_verbs(audioGroup->codec, &verb, &resp, 1) == B_OK) {
+					TRACE("get_mix: %ld mixer %ld is %smute\n", control->nid,
+						j, (resp & AMP_MUTE) ? "" : "un");
+					if ((resp & AMP_MUTE) == 0) {
+						mmvi->values[i].mux = j;
+#ifndef TRACE_MULTI_AUDIO
+						break;
+#endif
+					}
+				}
+			}
+			TRACE("get_mix: %ld mixer: %ld\n", control->nid, mmvi->values[i].mux);
+		} else if (control->mix_control.flags & B_MIX_MUX_SELECTOR) {
+			uint32 verb = MAKE_VERB(audioGroup->codec->addr, control->nid,
+				VID_GET_CONNECTION_SELECT, 0);
+			uint32 resp;
+			if (hda_send_verbs(audioGroup->codec, &verb, &resp, 1) == B_OK)
+				mmvi->values[i].mux = resp & 0xff;
+			TRACE("get_mix: %ld selector: %ld\n", control->nid, mmvi->values[i].mux);
 		}
-		
-		/*if (control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
-			float values[1];
-			control->get(audioGroup, control, values);
-			mmvi->values[i].mux = (int32)values[0];
-		}*/
 	}
 	return B_OK;
 }
@@ -659,14 +728,29 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 			
 			if (control2)
 				i++;
+		} else if (control->mix_control.flags & B_MIX_MUX_MIXER) {
+			TRACE("set_mix: %ld mixer: %ld\n", control->nid, mmvi->values[i].mux);
+			hda_widget *mixer = hda_audio_group_get_widget(audioGroup, control->nid);
+			uint32 verb[mixer->num_inputs];
+			for (uint32 j = 0; j < mixer->num_inputs; j++) {
+				verb[j] = MAKE_VERB(audioGroup->codec->addr,
+					control->nid, VID_SET_AMPLIFIER_GAIN_MUTE, AMP_SET_INPUT
+					| AMP_SET_LEFT_CHANNEL | AMP_SET_RIGHT_CHANNEL | AMP_SET_INPUT_INDEX(j)
+					| ((mmvi->values[i].mux == j) ? 0 : AMP_MUTE));
+				TRACE("set_mix: %ld mixer %smuting %ld (%lx)\n", control->nid,
+					(mmvi->values[i].mux == j) ? "un" : "", j, verb[j]);
+			}
+			if (hda_send_verbs(audioGroup->codec, verb, NULL, mixer->num_inputs) != B_OK)
+				dprintf("hda: Setting mixer %ld failed on widget %ld!\n",
+					mmvi->values[i].mux, control->nid);	
+		} else if (control->mix_control.flags & B_MIX_MUX_SELECTOR) {
+			uint32 verb = MAKE_VERB(audioGroup->codec->addr, control->nid,
+				VID_SET_CONNECTION_SELECT, mmvi->values[i].mux);
+			if (hda_send_verbs(audioGroup->codec, &verb, NULL, 1) != B_OK)
+				dprintf("hda: Setting output selector %ld failed on widget %ld!\n",
+					mmvi->values[i].mux, control->nid);
+			TRACE("set_mix: %ld selector: %ld\n", control->nid, mmvi->values[i].mux);
 		}
-			
-		/*if (control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
-			float values[1];
-			
-			values[0] = (float)mmvi->values[i].mux;
-			control->set(card, control->channel, control->type, values);
-		}*/
 	}
 	return B_OK;
 }
