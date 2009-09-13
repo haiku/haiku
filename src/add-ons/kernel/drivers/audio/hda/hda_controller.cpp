@@ -644,7 +644,8 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	}
 
 	/* Setup buffer descriptor list (BDL) entries */
-	for (uint32 index = 0; index < stream->num_buffers; index++, bufferDescriptors++) {
+	for (uint32 index = 0; index < stream->num_buffers; index++, 
+		bufferDescriptors++) {
 		bufferDescriptors->lower = stream->physical_buffers[index] + offset;
 		bufferDescriptors->upper = 0;
 		fragments++;
@@ -673,7 +674,8 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		stream->controller->Read32(HDAC_DMA_POSITION_BASE_LOWER)
 		| DMA_POSITION_ENABLED);
 
-	dprintf("hda: stream: %ld num_io_widgets: %ld\n", stream->id, stream->num_io_widgets);
+	dprintf("hda: stream: %ld fifo size: %d num_io_widgets: %ld\n", stream->id, 
+		stream->Read16(HDAC_STREAM_FIFO_SIZE), stream->num_io_widgets);
 	dprintf("hda: widgets: ");
 
 	hda_codec* codec = audioGroup->codec;
@@ -693,7 +695,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		dprintf("%ld ", stream->io_widgets[i]);
 	}
 	dprintf("\n");
-
+	
 	snooze(1000);
 	return B_OK;
 }
