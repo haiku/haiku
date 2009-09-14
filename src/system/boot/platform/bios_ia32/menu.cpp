@@ -53,6 +53,12 @@ platform_add_menus(Menu *menu)
 			item->SetData(B_SAFEMODE_DISABLE_IOAPIC);
 			item->SetHelpText("Disables using the IO APIC for interrupt handling, "
 				"forcing instead the use of the PIC.");
+
+			menu->AddItem(item = new(nothrow) MenuItem("Disable APIC Timers"));
+			item->SetType(MENU_ITEM_MARKABLE);
+			item->SetData(B_SAFEMODE_DISABLE_APIC);
+			item->SetHelpText("Disables using the APIC timers for timekeeping");
+			
 			break;
 		default:
 			break;

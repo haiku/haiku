@@ -17,6 +17,7 @@
 #include <debug.h>
 #include <timer.h>
 #include <int.h>
+#include <safemode.h>
 
 #include <arch/timer.h>
 
@@ -67,10 +68,22 @@ arch_init_timer(kernel_args *args)
 	int i = 0;
 	int bestPriority = -1;
 	timer_info *timer = NULL;
+	bool disableAPIC = false;	
+	void *handle = NULL;	
 	cpu_status state = disable_interrupts();
+
+	handle = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+	if (handle != NULL) {
+		disableAPIC = get_driver_boolean_parameter(handle, B_SAFEMODE_DISABLE_APIC,
+			disableAPIC, disableAPIC);
+		unload_driver_settings(handle);
+	}
 
 	for (i = 0; (timer = sTimers[i]) != NULL; i++) {
 		int priority = timer->get_priority();
+
+		if (timer == &gAPICTimer && disableAPIC)		
+			continue;
 
 		if (priority < bestPriority) {
 			TRACE(("arch_init_timer: Skipping %s because there is a higher priority timer (%s) initialized.\n", timer->name, sTimer->name));
