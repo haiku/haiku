@@ -533,7 +533,7 @@ IPW2100::Control(uint32 op, void *buffer, size_t length)
 
 		case ETHER_GETFRAMESIZE: {
 			TRACE(("IPW2100: ETHER_GETFRAMESIZE\n"));
-			*(uint32 *)buffer = 2000;
+			*(uint32 *)buffer = 1500;
 			return B_OK;
 		}
 
