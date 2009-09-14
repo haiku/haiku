@@ -1305,6 +1305,8 @@ legacy_driver_add_preloaded(kernel_args* args)
 			pathStatus = imagePath.Append(image->name);
 
 		// try to add the driver
+		dprintf("devfs_add_preloaded_drivers: adding driver %s\n",
+			imagePath.Path());
 		status_t addStatus = pathStatus;
 		if (pathStatus == B_OK)
 			addStatus = add_driver(imagePath.Path(), image->id);
