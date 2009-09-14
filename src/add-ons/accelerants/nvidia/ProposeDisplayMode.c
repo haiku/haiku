@@ -4,7 +4,7 @@
 
 	Other authors for NV driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-8/2009
+	Rudolf Cornelissen 9/2002-9/2009
 */
 
 #define MODULE_BIT 0x00400000
@@ -91,7 +91,8 @@ static const display_mode mode_list[] = {
 /* 16:9 panel mode; 1366x768 (HDTV '1280x720p')
    note: horizontal CRTC timing must be a multiple of 8! (hardware restriction) */
 { { 85500, 1368, 1440, 1576, 1792, 768, 771, 774, 798, T_POSITIVE_SYNC}, B_CMAP8, 1368, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1366X768) */
-/* fixme, add: 16:9 panel mode; 1920x1080 (HDTV 1920x1080p) */
+/* 16:9 panel mode; 1920x1080 (HDTV 1920x1080p) */
+{ { 148500, 1920, 2008, 2052, 2200, 1080, 1084, 1089, 1125, T_POSITIVE_SYNC}, B_CMAP8, 1920, 1080, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1080) */
 };
 
 
