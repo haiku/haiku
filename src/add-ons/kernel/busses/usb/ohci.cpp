@@ -12,6 +12,7 @@
 #include <PCI.h>
 #include <USB3.h>
 #include <KernelExport.h>
+#include <util/AutoLock.h>
 
 #include "ohci.h"
 
@@ -886,9 +887,11 @@ OHCI::_FinishTransfers()
 		while (transfer) {
 			bool transferDone = false;
 			ohci_general_td *descriptor = transfer->first_descriptor;
+			ohci_endpoint_descriptor *endpoint = transfer->endpoint;
 			status_t callbackStatus = B_OK;
 
-			ohci_endpoint_descriptor *endpoint = transfer->endpoint;
+			MutexLocker endpointLocker(endpoint->lock);
+
 			if ((endpoint->head_physical_descriptor & OHCI_ENDPOINT_HEAD_MASK)
 				!= endpoint->tail_physical_descriptor) {
 				// there are still active transfers on this endpoint, we need
@@ -899,6 +902,8 @@ OHCI::_FinishTransfers()
 				transfer = transfer->link;
 				continue;
 			}
+
+			endpointLocker.Unlock();
 
 			while (descriptor && !transfer->canceled) {
 				uint32 status = OHCI_TD_GET_CONDITION_CODE(descriptor->flags);
@@ -1148,6 +1153,8 @@ OHCI::_SubmitRequest(Transfer *transfer)
 	// Add to the transfer list
 	ohci_endpoint_descriptor *endpoint
 		= (ohci_endpoint_descriptor *)transfer->TransferPipe()->ControllerCookie();
+
+	MutexLocker endpointLocker(endpoint->lock);
 	result = _AddPendingTransfer(transfer, endpoint, setupDescriptor,
 		dataDescriptor, statusDescriptor, directionIn);
 	if (result < B_OK) {
@@ -1158,6 +1165,7 @@ OHCI::_SubmitRequest(Transfer *transfer)
 
 	// Add the descriptor chain to the endpoint
 	_SwitchEndpointTail(endpoint, setupDescriptor, statusDescriptor);
+	endpointLocker.Unlock();
 
 	// Tell the controller to process the control list
 	endpoint->flags &= ~OHCI_ENDPOINT_SKIP;
@@ -1199,6 +1207,8 @@ OHCI::_SubmitTransfer(Transfer *transfer)
 	// Add to the transfer list
 	ohci_endpoint_descriptor *endpoint
 		= (ohci_endpoint_descriptor *)pipe->ControllerCookie();
+
+	MutexLocker endpointLocker(endpoint->lock);
 	result = _AddPendingTransfer(transfer, endpoint, firstDescriptor,
 		firstDescriptor, lastDescriptor, directionIn);
 	if (result < B_OK) {
@@ -1209,8 +1219,9 @@ OHCI::_SubmitTransfer(Transfer *transfer)
 
 	// Add the descriptor chain to the endpoint
 	_SwitchEndpointTail(endpoint, firstDescriptor, lastDescriptor);
-	endpoint->flags &= ~OHCI_ENDPOINT_SKIP;
+	endpointLocker.Unlock();
 
+	endpoint->flags &= ~OHCI_ENDPOINT_SKIP;
 	if (pipe->Type() & USB_OBJECT_BULK_PIPE) {
 		// Tell the controller to process the bulk list
 		_WriteReg(OHCI_COMMAND_STATUS, OHCI_BULK_LIST_FILLED);
@@ -1306,12 +1317,21 @@ OHCI::_AllocateEndpoint()
 	ohci_endpoint_descriptor *endpoint;
 	void *physicalAddress;
 
+	mutex *lock = (mutex *)malloc(sizeof(mutex));
+	if (lock == NULL) {
+		TRACE_ERROR("no memory to allocate endpoint lock\n");
+		return NULL;
+	}
+
 	// Allocate memory chunk
 	if (fStack->AllocateChunk((void **)&endpoint, &physicalAddress,
 		sizeof(ohci_endpoint_descriptor)) < B_OK) {
 		TRACE_ERROR("failed to allocate endpoint descriptor\n");
+		free(lock);
 		return NULL;
 	}
+
+	mutex_init(lock, "ohci endpoint lock");
 
 	endpoint->flags = OHCI_ENDPOINT_SKIP;
 	endpoint->physical_address = (addr_t)physicalAddress;
@@ -1320,6 +1340,7 @@ OHCI::_AllocateEndpoint()
 	endpoint->tail_physical_descriptor = 0;
 	endpoint->next_logical_endpoint = NULL;
 	endpoint->next_physical_endpoint = 0;
+	endpoint->lock = lock;
 	return endpoint;
 }
 
@@ -1329,6 +1350,9 @@ OHCI::_FreeEndpoint(ohci_endpoint_descriptor *endpoint)
 {
 	if (!endpoint)
 		return;
+
+	mutex_destroy(endpoint->lock);
+	free(endpoint->lock);
 
 	fStack->FreeChunk((void *)endpoint, (void *)endpoint->physical_address,
 		sizeof(ohci_endpoint_descriptor));

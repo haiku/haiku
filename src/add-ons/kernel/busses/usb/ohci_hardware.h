@@ -304,6 +304,7 @@ typedef struct {
 	addr_t	physical_address;			// Physical pointer to this address
 	void	*tail_logical_descriptor;	// Queue tail logical pointer
 	void	*next_logical_endpoint;		// Logical pointer to the next endpoint
+	mutex	*lock;						// Protects tail changes and checks
 } ohci_endpoint_descriptor;
 
 #define	OHCI_ENDPOINT_ADDRESS_MASK				0x0000007f
