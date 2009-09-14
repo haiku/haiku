@@ -557,6 +557,7 @@ reboot(void)
 	return B_ERROR;
 }
 
+
 struct acpi_module_info gACPIModule = {
 	{
 		B_ACPI_MODULE_NAME,
