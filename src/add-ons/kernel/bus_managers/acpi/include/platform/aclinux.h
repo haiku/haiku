@@ -1,7 +1,6 @@
 /******************************************************************************
  *
- * Name: aclinux.h - OS specific defines, etc.
- *       $Revision: 1.44 $
+ * Name: aclinux.h - OS specific defines, etc. for Linux
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,27 +116,38 @@
 #ifndef __ACLINUX_H__
 #define __ACLINUX_H__
 
+/* Common (in-kernel/user-space) ACPICA configuration */
+
 #define ACPI_USE_SYSTEM_CLIBRARY
 #define ACPI_USE_DO_WHILE_0
+#define ACPI_MUTEX_TYPE             ACPI_BINARY_SEMAPHORE
+
 
 #ifdef __KERNEL__
 
-#include <linux/config.h>
 #include <linux/string.h>
 #include <linux/kernel.h>
+#include <linux/module.h>
 #include <linux/ctype.h>
+#include <linux/sched.h>
 #include <asm/system.h>
 #include <asm/atomic.h>
 #include <asm/div64.h>
 #include <asm/acpi.h>
+#include <linux/slab.h>
+#include <linux/spinlock_types.h>
+#include <asm/current.h>
 
-/* Host-dependent types and defines */
+/* Host-dependent types and defines for in-kernel ACPICA */
 
 #define ACPI_MACHINE_WIDTH          BITS_PER_LONG
-#define ACPI_CACHE_T                kmem_cache_t
-#define ACPI_SPINLOCK               spinlock_t
-#define ACPI_EXPORT_SYMBOL(Symbol)  EXPORT_SYMBOL(Symbol);
+#define ACPI_EXPORT_SYMBOL(symbol)  EXPORT_SYMBOL(symbol);
 #define strtoul                     simple_strtoul
+
+#define ACPI_CACHE_T                struct kmem_cache
+#define ACPI_SPINLOCK               spinlock_t *
+#define ACPI_CPU_FLAGS              unsigned long
+#define ACPI_THREAD_ID              struct task_struct *
 
 #else /* !__KERNEL__ */
 
@@ -146,6 +156,11 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <unistd.h>
+
+/* Host-dependent types and defines for user-space ACPICA */
+
+#define ACPI_FLUSH_CPU_CACHE()
+#define ACPI_THREAD_ID              pthread_t
 
 #if defined(__ia64__) || defined(__x86_64__)
 #define ACPI_MACHINE_WIDTH          64
@@ -162,11 +177,57 @@
 #define __cdecl
 #endif
 
-#define ACPI_FLUSH_CPU_CACHE()
 #endif /* __KERNEL__ */
 
 /* Linux uses GCC */
 
 #include "acgcc.h"
+
+
+#ifdef __KERNEL__
+/*
+ * Overrides for in-kernel ACPICA
+ */
+static inline acpi_thread_id acpi_os_get_thread_id(void)
+{
+    return current;
+}
+
+/*
+ * The irqs_disabled() check is for resume from RAM.
+ * Interrupts are off during resume, just like they are for boot.
+ * However, boot has  (system_state != SYSTEM_RUNNING)
+ * to quiet __might_sleep() in kmalloc() and resume does not.
+ */
+#include <acpi/actypes.h>
+static inline void *acpi_os_allocate(acpi_size size)
+{
+    return kmalloc(size, irqs_disabled() ? GFP_ATOMIC : GFP_KERNEL);
+}
+
+static inline void *acpi_os_allocate_zeroed(acpi_size size)
+{
+    return kzalloc(size, irqs_disabled() ? GFP_ATOMIC : GFP_KERNEL);
+}
+
+static inline void *acpi_os_acquire_object(acpi_cache_t * cache)
+{
+    return kmem_cache_zalloc(cache,
+        irqs_disabled() ? GFP_ATOMIC : GFP_KERNEL);
+}
+
+#define ACPI_ALLOCATE(a)        acpi_os_allocate(a)
+#define ACPI_ALLOCATE_ZEROED(a) acpi_os_allocate_zeroed(a)
+#define ACPI_FREE(a)            kfree(a)
+
+/* Used within ACPICA to show where it is safe to preempt execution */
+
+#define ACPI_PREEMPTION_POINT() \
+    do { \
+        if (!irqs_disabled()) \
+            cond_resched(); \
+    } while (0)
+
+#endif /* __KERNEL__ */
 
 #endif /* __ACLINUX_H__ */

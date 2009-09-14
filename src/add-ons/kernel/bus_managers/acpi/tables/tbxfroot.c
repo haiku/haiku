@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: tbxfroot - Find the root ACPI table (RSDT)
- *              $Revision: 1.106 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,6 +116,7 @@
 #define __TBXFROOT_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "actables.h"
 
 
@@ -160,7 +160,8 @@ AcpiTbValidateRsdp (
      * Note: Sometimes there exists more than one RSDP in memory; the valid
      * RSDP has a valid checksum, all others have an invalid checksum.
      */
-    if (ACPI_STRNCMP ((char *) Rsdp, ACPI_SIG_RSDP, sizeof (ACPI_SIG_RSDP)-1) != 0)
+    if (ACPI_STRNCMP ((char *) Rsdp, ACPI_SIG_RSDP,
+            sizeof (ACPI_SIG_RSDP)-1) != 0)
     {
         /* Nope, BAD Signature */
 
@@ -188,7 +189,7 @@ AcpiTbValidateRsdp (
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiTbFindRsdp
+ * FUNCTION:    AcpiFindRootPointer
  *
  * PARAMETERS:  TableAddress            - Where the table pointer is returned
  *

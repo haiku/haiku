@@ -20,7 +20,7 @@
 #include <safemode.h>
 
 #include "acpi.h"
-#include "acpixf.h"
+#include "accommon.h"
 #include "acpi_priv.h"
 
 //#define TRACE_ACPI_BUS
@@ -32,6 +32,7 @@
 
 #define ERROR(x...) dprintf("acpi: " x)
 
+#define ACPI_DEVICE_ID_LENGTH	0x08
 
 extern pci_module_info* gPCIManager;
 
@@ -541,11 +542,11 @@ reboot(void)
 
 	TRACE("reboot\n");
 
-	if (AcpiGbl_FADT.Flags & ACPI_FADT_RESET_REGISTER == 0)
+	if ((AcpiGbl_FADT.Flags & ACPI_FADT_RESET_REGISTER) == 0)
 		return B_UNSUPPORTED;
 
-	status = AcpiHwLowLevelWrite(AcpiGbl_FADT.ResetRegister.BitWidth,
-		AcpiGbl_FADT.ResetValue, &AcpiGbl_FADT.ResetRegister);
+	status = AcpiWrite(AcpiGbl_FADT.ResetValue,
+		&AcpiGbl_FADT.ResetRegister);
 	
 	if (status != AE_OK) {
 		ERROR("Reset failed, status = %d\n", status);

@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Name: acmacros.h - C macros for the entire subsystem.
- *       $Revision: 1.199 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -119,24 +118,6 @@
 
 
 /*
- * Data manipulation macros
- */
-#define ACPI_LOWORD(l)                  ((UINT16)(UINT32)(l))
-#define ACPI_HIWORD(l)                  ((UINT16)((((UINT32)(l)) >> 16) & 0xFFFF))
-#define ACPI_LOBYTE(l)                  ((UINT8)(UINT16)(l))
-#define ACPI_HIBYTE(l)                  ((UINT8)((((UINT16)(l)) >> 8) & 0xFF))
-
-#define ACPI_SET_BIT(target,bit)        ((target) |= (bit))
-#define ACPI_CLEAR_BIT(target,bit)      ((target) &= ~(bit))
-#define ACPI_MIN(a,b)                   (((a)<(b))?(a):(b))
-#define ACPI_MAX(a,b)                   (((a)>(b))?(a):(b))
-
-/* Size calculation */
-
-#define ACPI_ARRAY_LENGTH(x)            (sizeof(x) / sizeof((x)[0]))
-
-
-/*
  * Extract data using a pointer. Any more than a byte and we
  * get into potential aligment issues -- see the STORE macros below.
  * Use with care.
@@ -149,41 +130,6 @@
 #define ACPI_SET16(ptr)                 *ACPI_CAST_PTR (UINT16, ptr)
 #define ACPI_SET32(ptr)                 *ACPI_CAST_PTR (UINT32, ptr)
 #define ACPI_SET64(ptr)                 *ACPI_CAST_PTR (UINT64, ptr)
-
-/*
- * Pointer manipulation
- */
-#define ACPI_CAST_PTR(t, p)             ((t *) (ACPI_UINTPTR_T) (p))
-#define ACPI_CAST_INDIRECT_PTR(t, p)    ((t **) (ACPI_UINTPTR_T) (p))
-#define ACPI_ADD_PTR(t, a, b)           ACPI_CAST_PTR (t, (ACPI_CAST_PTR (UINT8, (a)) + (ACPI_SIZE)(b)))
-#define ACPI_PTR_DIFF(a, b)             (ACPI_SIZE) (ACPI_CAST_PTR (UINT8, (a)) - ACPI_CAST_PTR (UINT8, (b)))
-
-/* Pointer/Integer type conversions */
-
-#define ACPI_TO_POINTER(i)              ACPI_ADD_PTR (void, (void *) NULL,(ACPI_SIZE) i)
-#define ACPI_TO_INTEGER(p)              ACPI_PTR_DIFF (p, (void *) NULL)
-#define ACPI_OFFSET(d, f)               (ACPI_SIZE) ACPI_PTR_DIFF (&(((d *)0)->f), (void *) NULL)
-#define ACPI_PHYSADDR_TO_PTR(i)         ACPI_TO_POINTER(i)
-#define ACPI_PTR_TO_PHYSADDR(i)         ACPI_TO_INTEGER(i)
-
-#ifndef ACPI_MISALIGNMENT_NOT_SUPPORTED
-#define ACPI_COMPARE_NAME(a,b)          (*ACPI_CAST_PTR (UINT32, (a)) == *ACPI_CAST_PTR (UINT32, (b)))
-#else
-#define ACPI_COMPARE_NAME(a,b)          (!ACPI_STRNCMP (ACPI_CAST_PTR (char, (a)), ACPI_CAST_PTR (char, (b)), ACPI_NAME_SIZE))
-#endif
-
-/*
- * Full 64-bit integer must be available on both 32-bit and 64-bit platforms
- */
-typedef struct acpi_integer_overlay
-{
-    UINT32              LoDword;
-    UINT32              HiDword;
-
-} ACPI_INTEGER_OVERLAY;
-
-#define ACPI_LODWORD(Integer)           (ACPI_CAST_PTR (ACPI_INTEGER_OVERLAY, &Integer)->LoDword)
-#define ACPI_HIDWORD(Integer)           (ACPI_CAST_PTR (ACPI_INTEGER_OVERLAY, &Integer)->HiDword)
 
 /*
  * printf() format helpers
@@ -287,7 +233,7 @@ typedef struct acpi_integer_overlay
 /*
  * The hardware does not support unaligned transfers. We must move the
  * data one byte at a time. These macros work whether the source or
- * the destination (or both) is/are unaligned.  (Little-endian move)
+ * the destination (or both) is/are unaligned. (Little-endian move)
  */
 
 /* 16-bit source, 16/32/64 destination */
@@ -409,10 +355,6 @@ typedef struct acpi_integer_overlay
 #define ACPI_GET_DESCRIPTOR_TYPE(d)     (((ACPI_DESCRIPTOR *)(void *)(d))->Common.DescriptorType)
 #define ACPI_SET_DESCRIPTOR_TYPE(d, t)  (((ACPI_DESCRIPTOR *)(void *)(d))->Common.DescriptorType = t)
 
-/* Macro to test the object type */
-
-#define ACPI_GET_OBJECT_TYPE(d)         (((ACPI_OPERAND_OBJECT *)(void *)(d))->Common.Type)
-
 /*
  * Macros for the master AML opcode table
  */
@@ -422,12 +364,6 @@ typedef struct acpi_integer_overlay
 #else
 #define ACPI_OP(Name, PArgs, IArgs, ObjType, Class, Type, Flags) \
     {(UINT32)(PArgs), (UINT32)(IArgs), (UINT32)(Flags), ObjType, Class, Type}
-#endif
-
-#ifdef ACPI_DISASSEMBLER
-#define ACPI_DISASM_ONLY_MEMBERS(a)     a;
-#else
-#define ACPI_DISASM_ONLY_MEMBERS(a)
 #endif
 
 #define ARG_TYPE_WIDTH                  5
@@ -455,84 +391,36 @@ typedef struct acpi_integer_overlay
 #define GET_CURRENT_ARG_TYPE(List)      (List & ((UINT32) 0x1F))
 #define INCREMENT_ARG_LIST(List)        (List >>= ((UINT32) ARG_TYPE_WIDTH))
 
-
-#if defined (ACPI_DEBUG_OUTPUT) || !defined (ACPI_NO_ERROR_MESSAGES)
-/*
- * Module name is include in both debug and non-debug versions primarily for
- * error messages. The __FILE__ macro is not very useful for this, because it
- * often includes the entire pathname to the module
- */
-#define ACPI_MODULE_NAME(Name)          static const char ACPI_UNUSED_VAR _AcpiModuleName[] = Name;
-#else
-#define ACPI_MODULE_NAME(Name)
-#endif
-
 /*
  * Ascii error messages can be configured out
  */
 #ifndef ACPI_NO_ERROR_MESSAGES
-#define AE_INFO                         _AcpiModuleName, __LINE__
-
 /*
  * Error reporting. Callers module and line number are inserted by AE_INFO,
  * the plist contains a set of parens to allow variable-length lists.
  * These macros are used for both the debug and non-debug versions of the code.
  */
-#define ACPI_INFO(plist)                AcpiUtInfo plist
-#define ACPI_WARNING(plist)             AcpiUtWarning plist
-#define ACPI_EXCEPTION(plist)           AcpiUtException plist
-#define ACPI_ERROR(plist)               AcpiUtError plist
 #define ACPI_ERROR_NAMESPACE(s, e)      AcpiNsReportError (AE_INFO, s, e);
 #define ACPI_ERROR_METHOD(s, n, p, e)   AcpiNsReportMethodError (AE_INFO, s, n, p, e);
+#define ACPI_WARN_PREDEFINED(plist)     AcpiUtPredefinedWarning plist
 
 #else
 
 /* No error messages */
 
-#define ACPI_INFO(plist)
-#define ACPI_WARNING(plist)
-#define ACPI_EXCEPTION(plist)
-#define ACPI_ERROR(plist)
 #define ACPI_ERROR_NAMESPACE(s, e)
 #define ACPI_ERROR_METHOD(s, n, p, e)
-#endif
+#define ACPI_WARN_PREDEFINED(plist)
+
+#endif /* ACPI_NO_ERROR_MESSAGES */
 
 /*
  * Debug macros that are conditionally compiled
  */
 #ifdef ACPI_DEBUG_OUTPUT
-
-/*
- * Common parameters used for debug output functions:
- * line number, function name, module(file) name, component ID
- */
-#define ACPI_DEBUG_PARAMETERS           __LINE__, ACPI_GET_FUNCTION_NAME, _AcpiModuleName, _COMPONENT
-
 /*
  * Function entry tracing
  */
-
-/*
- * If ACPI_GET_FUNCTION_NAME was not defined in the compiler-dependent header,
- * define it now. This is the case where there the compiler does not support
- * a __FUNCTION__ macro or equivalent.
- */
-#ifndef ACPI_GET_FUNCTION_NAME
-#define ACPI_GET_FUNCTION_NAME          _AcpiFunctionName
-/*
- * The Name parameter should be the procedure name as a quoted string.
- * The function name is also used by the function exit macros below.
- * Note: (const char) is used to be compatible with the debug interfaces
- * and macros such as __FUNCTION__.
- */
-#define ACPI_FUNCTION_NAME(Name)        static const char _AcpiFunctionName[] = #Name;
-
-#else
-/* Compiler supports __FUNCTION__ (or equivalent) -- Ignore this macro */
-
-#define ACPI_FUNCTION_NAME(Name)
-#endif
-
 #define ACPI_FUNCTION_TRACE(a)          ACPI_FUNCTION_NAME(a) \
                                             AcpiUtTrace(ACPI_DEBUG_PARAMETERS)
 #define ACPI_FUNCTION_TRACE_PTR(a, b)   ACPI_FUNCTION_NAME(a) \
@@ -626,16 +514,6 @@ typedef struct acpi_integer_overlay
 #define ACPI_DUMP_PATHNAME(a, b, c, d)  AcpiNsDumpPathname(a, b, c, d)
 #define ACPI_DUMP_BUFFER(a, b)          AcpiUtDumpBuffer((UINT8 *) a, b, DB_BYTE_DISPLAY, _COMPONENT)
 
-/*
- * Master debug print macros
- * Print iff:
- *    1) Debug print for the current component is enabled
- *    2) Debug error level or trace level for the print statement is enabled
- */
-#define ACPI_DEBUG_PRINT(plist)         AcpiUtDebugPrint plist
-#define ACPI_DEBUG_PRINT_RAW(plist)     AcpiUtDebugPrintRaw plist
-
-
 #else
 /*
  * This is the non-debug case -- make everything go away,
@@ -643,7 +521,6 @@ typedef struct acpi_integer_overlay
  */
 #define ACPI_DEBUG_EXEC(a)
 #define ACPI_DEBUG_ONLY_MEMBERS(a)
-#define ACPI_FUNCTION_NAME(a)
 #define ACPI_FUNCTION_TRACE(a)
 #define ACPI_FUNCTION_TRACE_PTR(a, b)
 #define ACPI_FUNCTION_TRACE_U32(a, b)
@@ -668,7 +545,7 @@ typedef struct acpi_integer_overlay
 #define return_UINT32(s)                return(s)
 #define return_PTR(s)                   return(s)
 
-#endif
+#endif /* ACPI_DEBUG_OUTPUT */
 
 /*
  * Some code only gets executed when the debugger is built in.

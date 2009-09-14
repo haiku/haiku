@@ -2,7 +2,6 @@
 /******************************************************************************
  *
  * Module Name: exregion - ACPI default OpRegion (address space) handlers
- *              $Revision: 1.103 $
  *
  *****************************************************************************/
 
@@ -10,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -119,6 +118,7 @@
 #define __EXREGION_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acinterp.h"
 
 
@@ -384,14 +384,14 @@ AcpiExSystemIoSpaceHandler (
     {
     case ACPI_READ:
 
-        Status = AcpiOsReadPort ((ACPI_IO_ADDRESS) Address,
+        Status = AcpiHwReadPort ((ACPI_IO_ADDRESS) Address,
                     &Value32, BitWidth);
         *Value = Value32;
         break;
 
     case ACPI_WRITE:
 
-        Status = AcpiOsWritePort ((ACPI_IO_ADDRESS) Address,
+        Status = AcpiHwWritePort ((ACPI_IO_ADDRESS) Address,
                     (UINT32) *Value, BitWidth);
         break;
 

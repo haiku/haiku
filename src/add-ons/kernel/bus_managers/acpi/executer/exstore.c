@@ -2,7 +2,6 @@
 /******************************************************************************
  *
  * Module Name: exstore - AML Interpreter object store support
- *              $Revision: 1.210 $
  *
  *****************************************************************************/
 
@@ -10,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,11 +117,11 @@
 #define __EXSTORE_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acdispat.h"
 #include "acinterp.h"
 #include "amlcode.h"
 #include "acnamesp.h"
-#include "acparser.h"
 
 
 #define _COMPONENT          ACPI_EXECUTER
@@ -217,7 +216,7 @@ AcpiExDoDebugObject (
 
     /* SourceDesc is of type ACPI_DESC_TYPE_OPERAND */
 
-    switch (ACPI_GET_OBJECT_TYPE (SourceDesc))
+    switch (SourceDesc->Common.Type)
     {
     case ACPI_TYPE_INTEGER:
 
@@ -265,22 +264,28 @@ AcpiExDoDebugObject (
 
     case ACPI_TYPE_LOCAL_REFERENCE:
 
-        if (SourceDesc->Reference.Opcode == AML_INDEX_OP)
-        {
-            ACPI_DEBUG_PRINT_RAW ((ACPI_DB_DEBUG_OBJECT, "[%s, 0x%X]\n",
-                AcpiPsGetOpcodeName (SourceDesc->Reference.Opcode),
-                SourceDesc->Reference.Offset));
-        }
-        else
-        {
-            ACPI_DEBUG_PRINT_RAW ((ACPI_DB_DEBUG_OBJECT, "[%s]",
-                AcpiPsGetOpcodeName (SourceDesc->Reference.Opcode)));
-        }
+        ACPI_DEBUG_PRINT_RAW ((ACPI_DB_DEBUG_OBJECT, "[%s] ",
+            AcpiUtGetReferenceName (SourceDesc)));
 
-        if (SourceDesc->Reference.Opcode == AML_LOAD_OP) /* Load and LoadTable */
+        /* Decode the reference */
+
+        switch (SourceDesc->Reference.Class)
         {
-            ACPI_DEBUG_PRINT_RAW ((ACPI_DB_DEBUG_OBJECT,
-                " Table OwnerId %p\n", SourceDesc->Reference.Object));
+        case ACPI_REFCLASS_INDEX:
+
+            ACPI_DEBUG_PRINT_RAW ((ACPI_DB_DEBUG_OBJECT, "0x%X\n",
+                SourceDesc->Reference.Value));
+            break;
+
+        case ACPI_REFCLASS_TABLE:
+
+            /* Case for DdbHandle */
+
+            ACPI_DEBUG_PRINT_RAW ((ACPI_DB_DEBUG_OBJECT, "Table Index 0x%X\n",
+                SourceDesc->Reference.Value));
+            return;
+
+        default:
             break;
         }
 
@@ -407,7 +412,7 @@ AcpiExStore (
 
     /* Destination object must be a Reference or a Constant object */
 
-    switch (ACPI_GET_OBJECT_TYPE (DestDesc))
+    switch (DestDesc->Common.Type)
     {
     case ACPI_TYPE_LOCAL_REFERENCE:
         break;
@@ -435,16 +440,16 @@ AcpiExStore (
     }
 
     /*
-     * Examine the Reference opcode.  These cases are handled:
+     * Examine the Reference class. These cases are handled:
      *
      * 1) Store to Name (Change the object associated with a name)
      * 2) Store to an indexed area of a Buffer or Package
      * 3) Store to a Method Local or Arg
      * 4) Store to the debug object
      */
-    switch (RefDesc->Reference.Opcode)
+    switch (RefDesc->Reference.Class)
     {
-    case AML_REF_OF_OP:
+    case ACPI_REFCLASS_REFOF:
 
         /* Storing an object into a Name "container" */
 
@@ -454,7 +459,7 @@ AcpiExStore (
         break;
 
 
-    case AML_INDEX_OP:
+    case ACPI_REFCLASS_INDEX:
 
         /* Storing to an Index (pointer into a packager or buffer) */
 
@@ -462,17 +467,17 @@ AcpiExStore (
         break;
 
 
-    case AML_LOCAL_OP:
-    case AML_ARG_OP:
+    case ACPI_REFCLASS_LOCAL:
+    case ACPI_REFCLASS_ARG:
 
         /* Store to a method local/arg  */
 
-        Status = AcpiDsStoreObjectToLocal (RefDesc->Reference.Opcode,
-                    RefDesc->Reference.Offset, SourceDesc, WalkState);
+        Status = AcpiDsStoreObjectToLocal (RefDesc->Reference.Class,
+                    RefDesc->Reference.Value, SourceDesc, WalkState);
         break;
 
 
-    case AML_DEBUG_OP:
+    case ACPI_REFCLASS_DEBUG:
 
         /*
          * Storing to the Debug object causes the value stored to be
@@ -488,9 +493,9 @@ AcpiExStore (
 
     default:
 
-        ACPI_ERROR ((AE_INFO, "Unknown Reference opcode %X",
-            RefDesc->Reference.Opcode));
-        ACPI_DUMP_ENTRY (RefDesc, ACPI_LV_ERROR);
+        ACPI_ERROR ((AE_INFO, "Unknown Reference Class %2.2X",
+            RefDesc->Reference.Class));
+        ACPI_DUMP_ENTRY (RefDesc, ACPI_LV_INFO);
 
         Status = AE_AML_INTERNAL;
         break;
@@ -548,8 +553,8 @@ AcpiExStoreObjectToIndex (
          */
         ObjDesc = *(IndexDesc->Reference.Where);
 
-        if (ACPI_GET_OBJECT_TYPE (SourceDesc) == ACPI_TYPE_LOCAL_REFERENCE &&
-            SourceDesc->Reference.Opcode == AML_LOAD_OP)
+        if (SourceDesc->Common.Type == ACPI_TYPE_LOCAL_REFERENCE &&
+            SourceDesc->Reference.Class == ACPI_REFCLASS_TABLE)
         {
             /* This is a DDBHandle, just add a reference to it */
 
@@ -612,8 +617,8 @@ AcpiExStoreObjectToIndex (
          * by the INDEX_OP code.
          */
         ObjDesc = IndexDesc->Reference.Object;
-        if ((ACPI_GET_OBJECT_TYPE (ObjDesc) != ACPI_TYPE_BUFFER) &&
-            (ACPI_GET_OBJECT_TYPE (ObjDesc) != ACPI_TYPE_STRING))
+        if ((ObjDesc->Common.Type != ACPI_TYPE_BUFFER) &&
+            (ObjDesc->Common.Type != ACPI_TYPE_STRING))
         {
             return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
         }
@@ -622,7 +627,7 @@ AcpiExStoreObjectToIndex (
          * The assignment of the individual elements will be slightly
          * different for each source type.
          */
-        switch (ACPI_GET_OBJECT_TYPE (SourceDesc))
+        switch (SourceDesc->Common.Type)
         {
         case ACPI_TYPE_INTEGER:
 
@@ -651,7 +656,7 @@ AcpiExStoreObjectToIndex (
 
         /* Store the source value into the target buffer byte */
 
-        ObjDesc->Buffer.Pointer[IndexDesc->Reference.Offset] = Value;
+        ObjDesc->Buffer.Pointer[IndexDesc->Reference.Value] = Value;
         break;
 
 
@@ -807,7 +812,7 @@ AcpiExStoreObjectToNode (
         /* No conversions for all other types.  Just attach the source object */
 
         Status = AcpiNsAttachObject (Node, SourceDesc,
-                    ACPI_GET_OBJECT_TYPE (SourceDesc));
+                    SourceDesc->Common.Type);
         break;
     }
 

@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Name: actables.h - ACPI table management
- *       $Revision: 1.65 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -127,8 +126,7 @@ AcpiAllocateRootTable (
  */
 void
 AcpiTbParseFadt (
-    UINT32                  TableIndex,
-    UINT8                   Flags);
+    UINT32                  TableIndex);
 
 void
 AcpiTbCreateLocalFadt (
@@ -179,7 +177,7 @@ void
 AcpiTbTerminate (
     void);
 
-void
+ACPI_STATUS
 AcpiTbDeleteNamespaceByOwner (
     UINT32                  TableIndex);
 
@@ -209,6 +207,10 @@ AcpiTbSetTableLoadedFlag (
 /*
  * tbutils - table manager utilities
  */
+ACPI_STATUS
+AcpiTbInitializeFacs (
+    void);
+
 BOOLEAN
 AcpiTbTablesLoaded (
     void);
@@ -231,13 +233,11 @@ AcpiTbVerifyChecksum (
 void
 AcpiTbInstallTable (
     ACPI_PHYSICAL_ADDRESS   Address,
-    UINT8                   Flags,
     char                    *Signature,
     UINT32                  TableIndex);
 
 ACPI_STATUS
 AcpiTbParseRootTable (
-    ACPI_PHYSICAL_ADDRESS   RsdpAddress,
-    UINT8                   Flags);
+    ACPI_PHYSICAL_ADDRESS   RsdpAddress);
 
 #endif /* __ACTABLES_H__ */

@@ -2,7 +2,6 @@
  *
  * Module Name: dsopcode - Dispatcher Op Region support and handling of
  *                         "control" opcodes
- *              $Revision: 1.115 $
  *
  *****************************************************************************/
 
@@ -10,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,6 +117,7 @@
 #define __DSOPCODE_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acparser.h"
 #include "amlcode.h"
 #include "acdispat.h"
@@ -507,28 +507,6 @@ AcpiDsGetRegionArguments (
 
     Status = AcpiDsExecuteArguments (Node, AcpiNsGetParentNode (Node),
                 ExtraDesc->Extra.AmlLength, ExtraDesc->Extra.AmlStart);
-    if (ACPI_FAILURE (Status))
-    {
-        return_ACPI_STATUS (Status);
-    }
-
-    /* Validate the region address/length via the host OS */
-
-    Status = AcpiOsValidateAddress (ObjDesc->Region.SpaceId,
-                ObjDesc->Region.Address, (ACPI_SIZE) ObjDesc->Region.Length);
-    if (ACPI_FAILURE (Status))
-    {
-        /*
-         * Invalid address/length. We will emit an error message and mark
-         * the region as invalid, so that it will cause an additional error if
-         * it is ever used. Then return AE_OK.
-         */
-        ACPI_EXCEPTION ((AE_INFO, Status,
-            "During address validation of OpRegion [%4.4s]", Node->Name.Ascii));
-        ObjDesc->Common.Flags |= AOPOBJ_INVALID;
-        Status = AE_OK;
-    }
-
     return_ACPI_STATUS (Status);
 }
 
@@ -600,7 +578,7 @@ AcpiDsInitBufferField (
 
     /* Host object must be a Buffer */
 
-    if (ACPI_GET_OBJECT_TYPE (BufferDesc) != ACPI_TYPE_BUFFER)
+    if (BufferDesc->Common.Type != ACPI_TYPE_BUFFER)
     {
         ACPI_ERROR ((AE_INFO,
             "Target of Create Field is not a Buffer object - %s",
@@ -1303,8 +1281,27 @@ AcpiDsExecBeginControlOp (
 
     switch (Op->Common.AmlOpcode)
     {
-    case AML_IF_OP:
     case AML_WHILE_OP:
+
+        /*
+         * If this is an additional iteration of a while loop, continue.
+         * There is no need to allocate a new control state.
+         */
+        if (WalkState->ControlState)
+        {
+            if (WalkState->ControlState->Control.AmlPredicateStart ==
+                (WalkState->ParserState.Aml - 1))
+            {
+                /* Reset the state to start-of-loop */
+
+                WalkState->ControlState->Common.State = ACPI_CONTROL_CONDITIONAL_EXECUTING;
+                break;
+            }
+        }
+
+        /*lint -fallthrough */
+
+    case AML_IF_OP:
 
         /*
          * IF/WHILE: Create a new control state to manage these
@@ -1412,12 +1409,34 @@ AcpiDsExecEndControlOp (
 
         ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH, "[WHILE_OP] Op=%p\n", Op));
 
-        if (WalkState->ControlState->Common.Value)
+        ControlState = WalkState->ControlState;
+        if (ControlState->Common.Value)
         {
-            /* Predicate was true, go back and evaluate it again! */
+            /* Predicate was true, the body of the loop was just executed */
 
+            /*
+             * This loop counter mechanism allows the interpreter to escape
+             * possibly infinite loops. This can occur in poorly written AML
+             * when the hardware does not respond within a while loop and the
+             * loop does not implement a timeout.
+             */
+            ControlState->Control.LoopCount++;
+            if (ControlState->Control.LoopCount > ACPI_MAX_LOOP_ITERATIONS)
+            {
+                Status = AE_AML_INFINITE_LOOP;
+                break;
+            }
+
+            /*
+             * Go back and evaluate the predicate and maybe execute the loop
+             * another time
+             */
             Status = AE_CTRL_PENDING;
+            WalkState->AmlLastWhile = ControlState->Control.AmlPredicateStart;
+            break;
         }
+
+        /* Predicate was false, terminate this while loop */
 
         ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
             "[WHILE_OP] termination! Op=%p\n",Op));
@@ -1425,8 +1444,6 @@ AcpiDsExecEndControlOp (
         /* Pop this control state and free it */
 
         ControlState = AcpiUtPopGenericState (&WalkState->ControlState);
-
-        WalkState->AmlLastWhile = ControlState->Control.AmlPredicateStart;
         AcpiUtDeleteGenericState (ControlState);
         break;
 
@@ -1489,8 +1506,8 @@ AcpiDsExecEndControlOp (
              * Allow references created by the Index operator to return unchanged.
              */
             if ((ACPI_GET_DESCRIPTOR_TYPE (WalkState->Results->Results.ObjDesc[0]) == ACPI_DESC_TYPE_OPERAND) &&
-                (ACPI_GET_OBJECT_TYPE (WalkState->Results->Results.ObjDesc [0]) == ACPI_TYPE_LOCAL_REFERENCE) &&
-                ((WalkState->Results->Results.ObjDesc [0])->Reference.Opcode != AML_INDEX_OP))
+                ((WalkState->Results->Results.ObjDesc [0])->Common.Type == ACPI_TYPE_LOCAL_REFERENCE) &&
+                ((WalkState->Results->Results.ObjDesc [0])->Reference.Class != ACPI_REFCLASS_INDEX))
             {
                 Status = AcpiExResolveToValue (&WalkState->Results->Results.ObjDesc [0], WalkState);
                 if (ACPI_FAILURE (Status))
@@ -1534,12 +1551,20 @@ AcpiDsExecEndControlOp (
 
     case AML_BREAK_POINT_OP:
 
-        /* Call up to the OS service layer to handle this */
+        /*
+         * Set the single-step flag. This will cause the debugger (if present)
+         * to break to the console within the AML debugger at the start of the
+         * next AML instruction.
+         */
+        ACPI_DEBUGGER_EXEC (
+            AcpiGbl_CmSingleStep = TRUE);
+        ACPI_DEBUGGER_EXEC (
+            AcpiOsPrintf ("**break** Executed AML BreakPoint opcode\n"));
 
-        Status = AcpiOsSignal (ACPI_SIGNAL_BREAKPOINT, "Executed AML Breakpoint opcode");
+        /* Call to the OSL in case OS wants a piece of the action */
 
-        /* If and when it returns, all done. */
-
+        Status = AcpiOsSignal (ACPI_SIGNAL_BREAKPOINT,
+                    "Executed AML Breakpoint opcode");
         break;
 
 

@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: psxface - Parser external interfaces
- *              $Revision: 1.94 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,9 +116,11 @@
 #define __PSXFACE_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acparser.h"
 #include "acdispat.h"
 #include "acinterp.h"
+#include "amlcode.h"
 
 
 #define _COMPONENT          ACPI_PARSER
@@ -391,6 +392,45 @@ AcpiPsExecuteMethod (
     {
         AcpiDsDeleteWalkState (WalkState);
         goto Cleanup;
+    }
+
+    if (Info->ObjDesc->Method.Flags & AOPOBJ_MODULE_LEVEL)
+    {
+        WalkState->ParseFlags |= ACPI_PARSE_MODULE_LEVEL;
+    }
+
+    /* Invoke an internal method if necessary */
+
+    if (Info->ObjDesc->Method.MethodFlags & AML_METHOD_INTERNAL_ONLY)
+    {
+        Status = Info->ObjDesc->Method.Implementation (WalkState);
+        Info->ReturnObject = WalkState->ReturnDesc;
+
+        /* Cleanup states */
+
+        AcpiDsScopeStackClear (WalkState);
+        AcpiPsCleanupScope (&WalkState->ParserState);
+        AcpiDsTerminateControlMethod (WalkState->MethodDesc, WalkState);
+        AcpiDsDeleteWalkState (WalkState);
+        goto Cleanup;
+    }
+
+    /*
+     * Start method evaluation with an implicit return of zero. This is done
+     * for Windows compatibility.
+     */
+    if (AcpiGbl_EnableInterpreterSlack)
+    {
+        WalkState->ImplicitReturnObj =
+            AcpiUtCreateInternalObject (ACPI_TYPE_INTEGER);
+        if (!WalkState->ImplicitReturnObj)
+        {
+            Status = AE_NO_MEMORY;
+            AcpiDsDeleteWalkState (WalkState);
+            goto Cleanup;
+        }
+
+        WalkState->ImplicitReturnObj->Integer.Value = 0;
     }
 
     /* Parse the AML */

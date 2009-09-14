@@ -2,7 +2,6 @@
 /******************************************************************************
  *
  * Module Name: aslstubs - Stubs used to link to Aml interpreter
- *              $Revision: 1.23 $
  *
  *****************************************************************************/
 
@@ -10,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -115,12 +114,12 @@
  *
  *****************************************************************************/
 
-#include <stdio.h>
 #include "aslcompiler.h"
 #include "acdispat.h"
 #include "actables.h"
 #include "acevents.h"
 #include "acinterp.h"
+#include "acnamesp.h"
 
 #define _COMPONENT          ACPI_COMPILER
         ACPI_MODULE_NAME    ("aslstubs")
@@ -138,6 +137,30 @@ AeLocalGetRootPointer (
     return 0;
 }
 
+void
+AcpiNsExecModuleCodeList (
+    void)
+{
+}
+
+ACPI_STATUS
+AcpiHwReadPort (
+    ACPI_IO_ADDRESS         Address,
+    UINT32                  *Value,
+    UINT32                  Width)
+{
+    return (AE_OK);
+}
+
+ACPI_STATUS
+AcpiHwWritePort (
+    ACPI_IO_ADDRESS         Address,
+    UINT32                  Value,
+    UINT32                  Width)
+{
+    return (AE_OK);
+}
+
 ACPI_STATUS
 AcpiDsMethodError (
     ACPI_STATUS             Status,
@@ -148,7 +171,7 @@ AcpiDsMethodError (
 
 ACPI_STATUS
 AcpiDsMethodDataGetValue (
-    UINT16                  Opcode,
+    UINT8                   Type,
     UINT32                  Index,
     ACPI_WALK_STATE         *WalkState,
     ACPI_OPERAND_OBJECT     **DestDesc)
@@ -158,7 +181,7 @@ AcpiDsMethodDataGetValue (
 
 ACPI_STATUS
 AcpiDsMethodDataGetNode (
-    UINT16                  Opcode,
+    UINT8                   Type,
     UINT32                  Index,
     ACPI_WALK_STATE         *WalkState,
     ACPI_NAMESPACE_NODE     **Node)
@@ -168,7 +191,7 @@ AcpiDsMethodDataGetNode (
 
 ACPI_STATUS
 AcpiDsStoreObjectToLocal (
-    UINT16                  Opcode,
+    UINT8                   Type,
     UINT32                  Index,
     ACPI_OPERAND_OBJECT     *SrcDesc,
     ACPI_WALK_STATE         *WalkState)

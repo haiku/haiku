@@ -2,7 +2,6 @@
  *
  * Module Name: tbxface - Public interfaces to the ACPI subsystem
  *                         ACPI table oriented interfaces
- *              $Revision: 1.88 $
  *
  *****************************************************************************/
 
@@ -10,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,6 +117,7 @@
 #define __TBXFACE_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acnamesp.h"
 #include "actables.h"
 
@@ -237,7 +237,7 @@ AcpiInitializeTables (
      * Root Table Array. This array contains the information of the RSDT/XSDT
      * in a common, more useable format.
      */
-    Status = AcpiTbParseRootTable (RsdpAddress, ACPI_TABLE_ORIGIN_MAPPED);
+    Status = AcpiTbParseRootTable (RsdpAddress);
     return_ACPI_STATUS (Status);
 }
 
@@ -304,7 +304,7 @@ AcpiReallocateRootTable (
 ACPI_EXPORT_SYMBOL (AcpiReallocateRootTable)
 
 
-/******************************************************************************
+/*******************************************************************************
  *
  * FUNCTION:    AcpiGetTableHeader
  *
@@ -319,7 +319,7 @@ ACPI_EXPORT_SYMBOL (AcpiReallocateRootTable)
  * NOTE:        Caller is responsible in unmapping the header with
  *              AcpiOsUnmapMemory
  *
- *****************************************************************************/
+ ******************************************************************************/
 
 ACPI_STATUS
 AcpiGetTableHeader (
@@ -339,9 +339,8 @@ AcpiGetTableHeader (
         return (AE_BAD_PARAMETER);
     }
 
-    /*
-     * Walk the root table list
-     */
+    /* Walk the root table list */
+
     for (i = 0, j = 0; i < AcpiGbl_RootTableList.Count; i++)
     {
         if (!ACPI_COMPARE_NAME (&(AcpiGbl_RootTableList.Tables[i].Signature),
@@ -357,10 +356,12 @@ AcpiGetTableHeader (
 
         if (!AcpiGbl_RootTableList.Tables[i].Pointer)
         {
-            if ((AcpiGbl_RootTableList.Tables[i].Flags & ACPI_TABLE_ORIGIN_MASK) ==
+            if ((AcpiGbl_RootTableList.Tables[i].Flags &
+                    ACPI_TABLE_ORIGIN_MASK) ==
                 ACPI_TABLE_ORIGIN_MAPPED)
             {
-                Header = AcpiOsMapMemory (AcpiGbl_RootTableList.Tables[i].Address,
+                Header = AcpiOsMapMemory (
+                            AcpiGbl_RootTableList.Tables[i].Address,
                             sizeof (ACPI_TABLE_HEADER));
                 if (!Header)
                 {
@@ -370,16 +371,15 @@ AcpiGetTableHeader (
                 ACPI_MEMCPY (OutTableHeader, Header, sizeof(ACPI_TABLE_HEADER));
                 AcpiOsUnmapMemory (Header, sizeof(ACPI_TABLE_HEADER));
             }
-
             else
             {
                 return AE_NOT_FOUND;
             }
         }
-
         else
         {
-            ACPI_MEMCPY (OutTableHeader, AcpiGbl_RootTableList.Tables[i].Pointer,
+            ACPI_MEMCPY (OutTableHeader,
+                AcpiGbl_RootTableList.Tables[i].Pointer,
                 sizeof(ACPI_TABLE_HEADER));
         }
 
@@ -392,7 +392,7 @@ AcpiGetTableHeader (
 ACPI_EXPORT_SYMBOL (AcpiGetTableHeader)
 
 
-/******************************************************************************
+/*******************************************************************************
  *
  * FUNCTION:    AcpiGetTable
  *
@@ -404,7 +404,7 @@ ACPI_EXPORT_SYMBOL (AcpiGetTableHeader)
  *
  * DESCRIPTION: Finds and verifies an ACPI table.
  *
- *****************************************************************************/
+ ******************************************************************************/
 
 ACPI_STATUS
 AcpiGetTable (
@@ -424,9 +424,8 @@ AcpiGetTable (
         return (AE_BAD_PARAMETER);
     }
 
-    /*
-     * Walk the root table list
-     */
+    /* Walk the root table list */
+
     for (i = 0, j = 0; i < AcpiGbl_RootTableList.Count; i++)
     {
         if (!ACPI_COMPARE_NAME (&(AcpiGbl_RootTableList.Tables[i].Signature),
@@ -534,7 +533,6 @@ AcpiTbLoadNamespace (
     void)
 {
     ACPI_STATUS             Status;
-    ACPI_TABLE_HEADER       *Table;
     UINT32                  i;
 
 
@@ -548,56 +546,38 @@ AcpiTbLoadNamespace (
      * are optional.
      */
     if (!AcpiGbl_RootTableList.Count ||
-        !ACPI_COMPARE_NAME (&(AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT].Signature),
-                ACPI_SIG_DSDT) ||
-        ACPI_FAILURE (AcpiTbVerifyTable(&AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT])))
+        !ACPI_COMPARE_NAME (
+            &(AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT].Signature),
+            ACPI_SIG_DSDT) ||
+        ACPI_FAILURE (AcpiTbVerifyTable (
+            &AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT])))
     {
         Status = AE_NO_ACPI_TABLES;
         goto UnlockAndExit;
     }
 
-    /*
-     * Find DSDT table
-     */
-    Status = AcpiOsTableOverride (
-                AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT].Pointer, &Table);
-    if (ACPI_SUCCESS (Status) && Table)
-    {
-        /*
-         * DSDT table has been found
-         */
-        AcpiTbDeleteTable (&AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT]);
-        AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT].Pointer = Table;
-        AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT].Length = Table->Length;
-        AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT].Flags = ACPI_TABLE_ORIGIN_UNKNOWN;
+    /* A valid DSDT is required */
 
-        ACPI_INFO ((AE_INFO, "Table DSDT replaced by host OS"));
-        AcpiTbPrintTableHeader (0, Table);
-    }
-
-    Status = AcpiTbVerifyTable (&AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT]);
+    Status = AcpiTbVerifyTable (
+        &AcpiGbl_RootTableList.Tables[ACPI_TABLE_INDEX_DSDT]);
     if (ACPI_FAILURE (Status))
     {
-        /* A valid DSDT is required */
-
         Status = AE_NO_ACPI_TABLES;
         goto UnlockAndExit;
     }
 
     (void) AcpiUtReleaseMutex (ACPI_MTX_TABLES);
 
-    /*
-     * Load and parse tables.
-     */
+    /* Load and parse tables */
+
     Status = AcpiNsLoadTable (ACPI_TABLE_INDEX_DSDT, AcpiGbl_RootNode);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
     }
 
-    /*
-     * Load any SSDT or PSDT tables. Note: Loop leaves tables locked
-     */
+    /* Load any SSDT or PSDT tables. Note: Loop leaves tables locked */
+
     (void) AcpiUtAcquireMutex (ACPI_MTX_TABLES);
     for (i = 0; i < AcpiGbl_RootTableList.Count; ++i)
     {
@@ -605,7 +585,8 @@ AcpiTbLoadNamespace (
                     ACPI_SIG_SSDT) &&
              !ACPI_COMPARE_NAME (&(AcpiGbl_RootTableList.Tables[i].Signature),
                     ACPI_SIG_PSDT)) ||
-             ACPI_FAILURE (AcpiTbVerifyTable (&AcpiGbl_RootTableList.Tables[i])))
+             ACPI_FAILURE (AcpiTbVerifyTable (
+                &AcpiGbl_RootTableList.Tables[i])))
         {
             continue;
         }
@@ -647,13 +628,13 @@ AcpiLoadTables (
     ACPI_FUNCTION_TRACE (AcpiLoadTables);
 
 
-    /*
-     * Load the namespace from the tables
-     */
+    /* Load the namespace from the tables */
+
     Status = AcpiTbLoadNamespace ();
     if (ACPI_FAILURE (Status))
     {
-        ACPI_EXCEPTION ((AE_INFO, Status, "While loading namespace from ACPI tables"));
+        ACPI_EXCEPTION ((AE_INFO, Status,
+            "While loading namespace from ACPI tables"));
     }
 
     return_ACPI_STATUS (Status);

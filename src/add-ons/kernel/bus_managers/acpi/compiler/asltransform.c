@@ -2,7 +2,6 @@
 /******************************************************************************
  *
  * Module Name: asltransform - Parse tree transforms
- *              $Revision: 1.44 $
  *
  *****************************************************************************/
 
@@ -10,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -778,7 +777,7 @@ TrDoSwitch (
 
     case ACPI_BTYPE_STRING:
         NewOp2->Asl.Next = TrCreateValuedLeafNode (PARSEOP_STRING_LITERAL,
-                                (ACPI_INTEGER) "");
+                                (ACPI_INTEGER) ACPI_TO_INTEGER (""));
         break;
 
     case ACPI_BTYPE_BUFFER:

@@ -1,7 +1,6 @@
 /*******************************************************************************
  *
  * Module Name: rscreate - Create resource lists/tables
- *              $Revision: 1.79 $
  *
  ******************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -114,12 +113,11 @@
  *
  *****************************************************************************/
 
-
 #define __RSCREATE_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acresrc.h"
-#include "amlcode.h"
 #include "acnamesp.h"
 
 #define _COMPONENT          ACPI_RESOURCES
@@ -300,7 +298,7 @@ AcpiRsCreatePciRoutingTable (
 
         /* Each element of the top-level package must also be a package */
 
-        if (ACPI_GET_OBJECT_TYPE (*TopObjectList) != ACPI_TYPE_PACKAGE)
+        if ((*TopObjectList)->Common.Type != ACPI_TYPE_PACKAGE)
         {
             ACPI_ERROR ((AE_INFO,
                 "(PRT[%X]) Need sub-package, found %s",
@@ -328,7 +326,7 @@ AcpiRsCreatePciRoutingTable (
         /* 1) First subobject: Dereference the PRT.Address */
 
         ObjDesc = SubObjectList[0];
-        if (ACPI_GET_OBJECT_TYPE (ObjDesc) != ACPI_TYPE_INTEGER)
+        if (ObjDesc->Common.Type != ACPI_TYPE_INTEGER)
         {
             ACPI_ERROR ((AE_INFO, "(PRT[%X].Address) Need Integer, found %s",
                 Index, AcpiUtGetObjectTypeName (ObjDesc)));
@@ -340,7 +338,7 @@ AcpiRsCreatePciRoutingTable (
         /* 2) Second subobject: Dereference the PRT.Pin */
 
         ObjDesc = SubObjectList[1];
-        if (ACPI_GET_OBJECT_TYPE (ObjDesc) != ACPI_TYPE_INTEGER)
+        if (ObjDesc->Common.Type != ACPI_TYPE_INTEGER)
         {
             ACPI_ERROR ((AE_INFO, "(PRT[%X].Pin) Need Integer, found %s",
                 Index, AcpiUtGetObjectTypeName (ObjDesc)));
@@ -356,7 +354,7 @@ AcpiRsCreatePciRoutingTable (
          * other ACPI implementations.
          */
         ObjDesc = SubObjectList[3];
-        if (!ObjDesc || (ACPI_GET_OBJECT_TYPE (ObjDesc) != ACPI_TYPE_INTEGER))
+        if (!ObjDesc || (ObjDesc->Common.Type != ACPI_TYPE_INTEGER))
         {
             SubObjectList[3] = SubObjectList[2];
             SubObjectList[2] = ObjDesc;
@@ -373,15 +371,15 @@ AcpiRsCreatePciRoutingTable (
         ObjDesc = SubObjectList[2];
         if (ObjDesc)
         {
-            switch (ACPI_GET_OBJECT_TYPE (ObjDesc))
+            switch (ObjDesc->Common.Type)
             {
             case ACPI_TYPE_LOCAL_REFERENCE:
 
-                if (ObjDesc->Reference.Opcode != AML_INT_NAMEPATH_OP)
+                if (ObjDesc->Reference.Class != ACPI_REFCLASS_NAME)
                 {
                     ACPI_ERROR ((AE_INFO,
-                        "(PRT[%X].Source) Need name, found reference op %X",
-                        Index, ObjDesc->Reference.Opcode));
+                        "(PRT[%X].Source) Need name, found Reference Class %X",
+                        Index, ObjDesc->Reference.Class));
                     return_ACPI_STATUS (AE_BAD_DATA);
                 }
 
@@ -441,7 +439,7 @@ AcpiRsCreatePciRoutingTable (
         /* 4) Fourth subobject: Dereference the PRT.SourceIndex */
 
         ObjDesc = SubObjectList[3];
-        if (ACPI_GET_OBJECT_TYPE (ObjDesc) != ACPI_TYPE_INTEGER)
+        if (ObjDesc->Common.Type != ACPI_TYPE_INTEGER)
         {
             ACPI_ERROR ((AE_INFO,
                 "(PRT[%X].SourceIndex) Need Integer, found %s",

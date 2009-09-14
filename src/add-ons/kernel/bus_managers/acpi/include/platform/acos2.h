@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Module Name: 16bit.h - 16-bit support
+ * Name: acos2.h - OS/2 specific defines, etc.
  *
  *****************************************************************************/
 
@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,53 +113,60 @@
  *
  *****************************************************************************/
 
-
-#define GET_SEGMENT(ptr)            ((UINT16)(_segment)(ptr))
-#define GET_OFFSET(ptr)             ((UINT16)(UINT32) (ptr))
-#define GET_PHYSICAL_ADDRESS(ptr)   (((((UINT32)GET_SEGMENT(ptr)) << 4)) + GET_OFFSET(ptr))
-#define PTR_OVL_BUILD_PTR(p,b,o)    {p.ovl.base=b;p.ovl.offset=o;}
-
-typedef union ptr_ovl
-{
-    void                *ptr;
-    UINT32              dword;
-    struct
-    {
-        UINT16              offset;
-        UINT16              base;
-    } ovl;
-
-} PTR_OVL;
+#ifndef __ACOS2_H__
+#define __ACOS2_H__
+#define INCL_LONGLONG
+#include <os2.h>
 
 
-int ACPI_INTERNAL_VAR_XFACE
-FlatMove (
-    UINT32              Dest,
-    UINT32              Src,
-    UINT16              Size);
+#define ACPI_MACHINE_WIDTH          32
 
-int ACPI_INTERNAL_VAR_XFACE
-FlatMove32 (
-    UINT32              Dest,
-    UINT32              Src,
-    UINT16              Size);
+#define COMPILER_DEPENDENT_INT64    long long
+#define COMPILER_DEPENDENT_UINT64   unsigned long long
+#define ACPI_USE_NATIVE_DIVIDE
 
-ACPI_NATIVE_INT
-AfWriteBuffer (
-    char                *Filename,
-    char                *Buffer,
-    UINT32              Length);
+#define ACPI_SYSTEM_XFACE           APIENTRY
+#define ACPI_EXTERNAL_XFACE         APIENTRY
+#define ACPI_INTERNAL_XFACE         APIENTRY
+#define ACPI_INTERNAL_VAR_XFACE     APIENTRY
 
-char *
-AfGenerateFilename (char *TableId);
+/*
+ * Some compilers complain about unused variables. Sometimes we don't want to
+ * use all the variables (most specifically for _THIS_MODULE). This allow us
+ * to to tell the compiler warning in a per-variable manner that a variable
+ * is unused.
+ */
+#define ACPI_UNUSED_VAR
 
+#define ACPI_USE_STANDARD_HEADERS
+#include <io.h>
 
-ACPI_STATUS
-AfFindTable(
-    char                *TableName,
-    UINT8               **TablePtr,
-    UINT32              *TableLength);
+#define ACPI_FLUSH_CPU_CACHE() Wbinvd()
+void Wbinvd(void);
 
-void
-AfDumpTables (void);
+#define ACPI_ACQUIRE_GLOBAL_LOCK(GLptr, Acq)       Acq = OSPMAcquireGlobalLock(GLptr)
+#define ACPI_RELEASE_GLOBAL_LOCK(GLptr, Pnd)       Pnd = OSPMReleaseGlobalLock(GLptr)
+unsigned short OSPMAcquireGlobalLock (void *);
+unsigned short OSPMReleaseGlobalLock (void *);
 
+#define ACPI_SHIFT_RIGHT_64(n_hi, n_lo) \
+{ \
+    unsigned long long val = 0LL; \
+    val = n_lo | ( ((unsigned long long)h_hi) << 32 ); \
+    __llrotr (val,1); \
+    n_hi = (unsigned long)((val >> 32 ) & 0xffffffff ); \
+    n_lo = (unsigned long)(val & 0xffffffff); \
+}
+
+/* IBM VAC does not have inline */
+
+#if __IBMC__ || __IBMCPP__
+#define inline
+#endif
+
+#ifndef ACPI_ASL_COMPILER
+#define ACPI_USE_LOCAL_CACHE
+#undef ACPI_DEBUGGER
+#endif
+
+#endif /* __ACOS2_H__ */

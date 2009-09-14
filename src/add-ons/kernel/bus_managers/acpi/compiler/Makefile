@@ -14,6 +14,7 @@ SRCS=	aslcompilerparse.c aslcompilerlex.c aslanalyze.c aslcodegen.c \
 	../utilities/utdelete.c \
 	../utilities/utglobal.c \
 	../utilities/utinit.c \
+	../utilities/utlock.c \
 	../utilities/utobject.c \
 	../utilities/utmisc.c \
 	../utilities/utmath.c \
@@ -104,6 +105,8 @@ YFLAGS+= -y -pAslCompiler
 #.else
 #CFLAGS+= -D_USE_BERKELEY_YACC
 #.endif
+
+LDLIBS = -lpthread -lrt
 
 aslmain : $(patsubst %.c,%.o, $(SRCS))
 	$(CC) $(LDFLAGS) $(patsubst %.c,%.o, $(SRCS)) \

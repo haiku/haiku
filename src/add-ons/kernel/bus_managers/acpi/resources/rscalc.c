@@ -1,7 +1,6 @@
 /*******************************************************************************
  *
  * Module Name: rscalc - Calculate stream and list lengths
- *              $Revision: 1.84 $
  *
  ******************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,9 +116,10 @@
 #define __RSCALC_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acresrc.h"
-#include "amlcode.h"
 #include "acnamesp.h"
+
 
 #define _COMPONENT          ACPI_RESOURCES
         ACPI_MODULE_NAME    ("rscalc")
@@ -656,6 +656,14 @@ AcpiRsGetPciRoutingTableLength (
 
         PackageElement = *TopObjectList;
 
+        /* We must have a valid Package object */
+
+        if (!PackageElement ||
+            (PackageElement->Common.Type != ACPI_TYPE_PACKAGE))
+        {
+            return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
+        }
+
         /*
          * The SubObjectList will now point to an array of the
          * four IRQ elements: Address, Pin, Source and SourceIndex
@@ -671,13 +679,13 @@ AcpiRsGetPciRoutingTableLength (
             if (*SubObjectList && /* Null object allowed */
 
                 ((ACPI_TYPE_STRING ==
-                    ACPI_GET_OBJECT_TYPE (*SubObjectList)) ||
+                    (*SubObjectList)->Common.Type) ||
 
                 ((ACPI_TYPE_LOCAL_REFERENCE ==
-                    ACPI_GET_OBJECT_TYPE (*SubObjectList)) &&
+                    (*SubObjectList)->Common.Type) &&
 
-                    ((*SubObjectList)->Reference.Opcode ==
-                        AML_INT_NAMEPATH_OP))))
+                    ((*SubObjectList)->Reference.Class ==
+                        ACPI_REFCLASS_NAME))))
             {
                 NameFound = TRUE;
             }
@@ -695,7 +703,7 @@ AcpiRsGetPciRoutingTableLength (
 
         if (NameFound)
         {
-            if (ACPI_GET_OBJECT_TYPE (*SubObjectList) == ACPI_TYPE_STRING)
+            if ((*SubObjectList)->Common.Type == ACPI_TYPE_STRING)
             {
                 /*
                  * The length String.Length field does not include the

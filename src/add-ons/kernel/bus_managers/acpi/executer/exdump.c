@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: exdump - Interpreter debug output routines
- *              $Revision: 1.206 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,10 +116,11 @@
 #define __EXDUMP_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acinterp.h"
 #include "amlcode.h"
 #include "acnamesp.h"
-#include "acparser.h"
+
 
 #define _COMPONENT          ACPI_EXECUTER
         ACPI_MODULE_NAME    ("exdump")
@@ -213,10 +213,11 @@ static ACPI_EXDUMP_INFO     AcpiExDumpEvent[2] =
     {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Event.OsSemaphore),            "OsSemaphore"}
 };
 
-static ACPI_EXDUMP_INFO     AcpiExDumpMethod[8] =
+static ACPI_EXDUMP_INFO     AcpiExDumpMethod[9] =
 {
     {ACPI_EXD_INIT,     ACPI_EXD_TABLE_SIZE (AcpiExDumpMethod),         NULL},
-    {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Method.ParamCount),            "ParamCount"},
+    {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Method.MethodFlags),           "Method Flags"},
+    {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Method.ParamCount),            "Parameter Count"},
     {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Method.SyncLevel),             "Sync Level"},
     {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Method.Mutex),                 "Mutex"},
     {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Method.OwnerId),               "Owner Id"},
@@ -305,12 +306,12 @@ static ACPI_EXDUMP_INFO     AcpiExDumpIndexField[5] =
     {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (IndexField.DataObj),           "Data Object"}
 };
 
-
-static ACPI_EXDUMP_INFO     AcpiExDumpReference[7] =
+static ACPI_EXDUMP_INFO     AcpiExDumpReference[8] =
 {
     {ACPI_EXD_INIT,     ACPI_EXD_TABLE_SIZE (AcpiExDumpReference),       NULL},
+    {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Reference.Class),              "Class"},
     {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Reference.TargetType),         "Target Type"},
-    {ACPI_EXD_UINT32,   ACPI_EXD_OFFSET (Reference.Offset),             "Offset"},
+    {ACPI_EXD_UINT32,   ACPI_EXD_OFFSET (Reference.Value),              "Value"},
     {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Reference.Object),             "Object Desc"},
     {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Reference.Node),               "Node"},
     {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Reference.Where),              "Where"},
@@ -344,7 +345,6 @@ static ACPI_EXDUMP_INFO     AcpiExDumpCommon[4] =
     {ACPI_EXD_UINT16,   ACPI_EXD_OFFSET (Common.ReferenceCount),        "Reference Count"},
     {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Common.Flags),                 "Flags"}
 };
-
 
 static ACPI_EXDUMP_INFO     AcpiExDumpFieldCommon[7] =
 {
@@ -449,6 +449,7 @@ AcpiExDumpObject (
             break;
 
         case ACPI_EXD_TYPE:
+
             AcpiExOutString  ("Type", AcpiUtGetObjectTypeName (ObjDesc));
             break;
 
@@ -470,7 +471,7 @@ AcpiExDumpObject (
         case ACPI_EXD_UINT64:
 
             AcpiOsPrintf ("%20s : %8.8X%8.8X\n", "Value",
-                    ACPI_FORMAT_UINT64 (ACPI_GET64 (Target)));
+                ACPI_FORMAT_UINT64 (ACPI_GET64 (Target)));
             break;
 
         case ACPI_EXD_POINTER:
@@ -505,13 +506,15 @@ AcpiExDumpObject (
 
         case ACPI_EXD_REFERENCE:
 
-            AcpiExOutString ("Opcode",
-                (AcpiPsGetOpcodeInfo (ObjDesc->Reference.Opcode))->Name);
+            AcpiExOutString ("Class Name",
+                ACPI_CAST_PTR (char, AcpiUtGetReferenceName (ObjDesc)));
             AcpiExDumpReferenceObj (ObjDesc);
             break;
 
         default:
-            AcpiOsPrintf ("**** Invalid table opcode [%X] ****\n", Info->Opcode);
+
+            AcpiOsPrintf ("**** Invalid table opcode [%X] ****\n",
+                Info->Opcode);
             return;
         }
 
@@ -589,91 +592,57 @@ AcpiExDumpOperand (
 
     /* Decode object type */
 
-    switch (ACPI_GET_OBJECT_TYPE (ObjDesc))
+    switch (ObjDesc->Common.Type)
     {
     case ACPI_TYPE_LOCAL_REFERENCE:
 
-        switch (ObjDesc->Reference.Opcode)
+        AcpiOsPrintf ("Reference: [%s] ", AcpiUtGetReferenceName (ObjDesc));
+
+        switch (ObjDesc->Reference.Class)
         {
-        case AML_DEBUG_OP:
-
-            AcpiOsPrintf ("Reference: Debug\n");
-            break;
-
-
-        case AML_INDEX_OP:
-
-            AcpiOsPrintf ("Reference: Index %p\n",
-                ObjDesc->Reference.Object);
-            break;
-
-
-        case AML_LOAD_OP:
-
-            AcpiOsPrintf ("Reference: [DdbHandle] TableIndex %p\n",
-                ObjDesc->Reference.Object);
-            break;
-
-
-        case AML_REF_OF_OP:
-
-            AcpiOsPrintf ("Reference: (RefOf) %p [%s]\n",
-                ObjDesc->Reference.Object,
-                AcpiUtGetTypeName (((ACPI_OPERAND_OBJECT *) ObjDesc->Reference.Object)->Common.Type));
-            break;
-
-
-        case AML_ARG_OP:
-
-            AcpiOsPrintf ("Reference: Arg%d",
-                ObjDesc->Reference.Offset);
-
-            if (ACPI_GET_OBJECT_TYPE (ObjDesc) == ACPI_TYPE_INTEGER)
-            {
-                /* Value is an Integer */
-
-                AcpiOsPrintf (" value is [%8.8X%8.8x]",
-                    ACPI_FORMAT_UINT64 (ObjDesc->Integer.Value));
-            }
+        case ACPI_REFCLASS_DEBUG:
 
             AcpiOsPrintf ("\n");
             break;
 
 
-        case AML_LOCAL_OP:
+        case ACPI_REFCLASS_INDEX:
 
-            AcpiOsPrintf ("Reference: Local%d",
-                ObjDesc->Reference.Offset);
-
-            if (ACPI_GET_OBJECT_TYPE (ObjDesc) == ACPI_TYPE_INTEGER)
-            {
-
-                /* Value is an Integer */
-
-                AcpiOsPrintf (" value is [%8.8X%8.8x]",
-                    ACPI_FORMAT_UINT64 (ObjDesc->Integer.Value));
-            }
-
-            AcpiOsPrintf ("\n");
+            AcpiOsPrintf ("%p\n", ObjDesc->Reference.Object);
             break;
 
 
-        case AML_INT_NAMEPATH_OP:
+        case ACPI_REFCLASS_TABLE:
 
-            AcpiOsPrintf ("Reference: Namepath %X [%4.4s]\n",
-                ObjDesc->Reference.Node->Name.Integer,
-                ObjDesc->Reference.Node->Name.Ascii);
+            AcpiOsPrintf ("Table Index %X\n", ObjDesc->Reference.Value);
             break;
 
 
-        default:
+        case ACPI_REFCLASS_REFOF:
 
-            /* Unknown opcode */
-
-            AcpiOsPrintf ("Unknown Reference opcode=%X\n",
-                ObjDesc->Reference.Opcode);
+            AcpiOsPrintf ("%p [%s]\n", ObjDesc->Reference.Object,
+                AcpiUtGetTypeName (((ACPI_OPERAND_OBJECT *)
+                    ObjDesc->Reference.Object)->Common.Type));
             break;
 
+
+        case ACPI_REFCLASS_NAME:
+
+            AcpiOsPrintf ("- [%4.4s]\n", ObjDesc->Reference.Node->Name.Ascii);
+            break;
+
+
+        case ACPI_REFCLASS_ARG:
+        case ACPI_REFCLASS_LOCAL:
+
+            AcpiOsPrintf ("%X\n", ObjDesc->Reference.Value);
+            break;
+
+
+        default:    /* Unknown reference class */
+
+            AcpiOsPrintf ("%2.2X\n", ObjDesc->Reference.Class);
+            break;
         }
         break;
 
@@ -682,7 +651,6 @@ AcpiExDumpOperand (
 
         AcpiOsPrintf ("Buffer length %.2X @ %p\n",
             ObjDesc->Buffer.Length, ObjDesc->Buffer.Pointer);
-
 
         /* Debug only -- dump the buffer contents */
 
@@ -694,7 +662,8 @@ AcpiExDumpOperand (
                 Length = 128;
             }
 
-            AcpiOsPrintf ("Buffer Contents: (displaying length 0x%.2X)\n", Length);
+            AcpiOsPrintf ("Buffer Contents: (displaying length 0x%.2X)\n",
+                Length);
             ACPI_DUMP_BUFFER (ObjDesc->Buffer.Pointer, Length);
         }
         break;
@@ -770,8 +739,8 @@ AcpiExDumpOperand (
 
     case ACPI_TYPE_LOCAL_REGION_FIELD:
 
-        AcpiOsPrintf (
-            "RegionField: Bits=%X AccWidth=%X Lock=%X Update=%X at byte=%X bit=%X of below:\n",
+        AcpiOsPrintf ("RegionField: Bits=%X AccWidth=%X Lock=%X Update=%X at "
+            "byte=%X bit=%X of below:\n",
             ObjDesc->Field.BitLength,
             ObjDesc->Field.AccessByteWidth,
             ObjDesc->Field.FieldFlags & AML_FIELD_LOCK_RULE_MASK,
@@ -791,8 +760,7 @@ AcpiExDumpOperand (
 
     case ACPI_TYPE_BUFFER_FIELD:
 
-        AcpiOsPrintf (
-            "BufferField: %X bits at byte %X bit %X of\n",
+        AcpiOsPrintf ("BufferField: %X bits at byte %X bit %X of\n",
             ObjDesc->BufferField.BitLength,
             ObjDesc->BufferField.BaseByteOffset,
             ObjDesc->BufferField.StartFieldBitOffset);
@@ -801,7 +769,7 @@ AcpiExDumpOperand (
         {
             ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "*NULL*\n"));
         }
-        else if (ACPI_GET_OBJECT_TYPE (ObjDesc->BufferField.BufferObj) !=
+        else if ((ObjDesc->BufferField.BufferObj)->Common.Type !=
                     ACPI_TYPE_BUFFER)
         {
             AcpiOsPrintf ("*not a Buffer*\n");
@@ -861,7 +829,7 @@ AcpiExDumpOperand (
     default:
         /* Unknown Type */
 
-        AcpiOsPrintf ("Unknown Type %X\n", ACPI_GET_OBJECT_TYPE (ObjDesc));
+        AcpiOsPrintf ("Unknown Type %X\n", ObjDesc->Common.Type);
         break;
     }
 
@@ -977,10 +945,10 @@ AcpiExDumpNamespaceNode (
         }
     }
 
-    AcpiOsPrintf ("%20s : %4.4s\n",       "Name", AcpiUtGetNodeName (Node));
-    AcpiExOutString  ("Type",             AcpiUtGetTypeName (Node->Type));
-    AcpiExOutPointer ("Attached Object",  AcpiNsGetAttachedObject (Node));
-    AcpiExOutPointer ("Parent",           AcpiNsGetParentNode (Node));
+    AcpiOsPrintf ("%20s : %4.4s\n", "Name", AcpiUtGetNodeName (Node));
+    AcpiExOutString  ("Type", AcpiUtGetTypeName (Node->Type));
+    AcpiExOutPointer ("Attached Object", AcpiNsGetAttachedObject (Node));
+    AcpiExOutPointer ("Parent", AcpiNsGetParentNode (Node));
 
     AcpiExDumpObject (ACPI_CAST_PTR (ACPI_OPERAND_OBJECT, Node),
         AcpiExDumpNode);
@@ -1007,9 +975,9 @@ AcpiExDumpReferenceObj (
 
     RetBuf.Length = ACPI_ALLOCATE_LOCAL_BUFFER;
 
-    if (ObjDesc->Reference.Opcode == AML_INT_NAMEPATH_OP)
+    if (ObjDesc->Reference.Class == ACPI_REFCLASS_NAME)
     {
-        AcpiOsPrintf (" Named Object %p ", ObjDesc->Reference.Node);
+        AcpiOsPrintf (" %p ", ObjDesc->Reference.Node);
 
         Status = AcpiNsHandleToPathname (ObjDesc->Reference.Node, &RetBuf);
         if (ACPI_FAILURE (Status))
@@ -1027,25 +995,20 @@ AcpiExDumpReferenceObj (
         if (ACPI_GET_DESCRIPTOR_TYPE (ObjDesc) == ACPI_DESC_TYPE_OPERAND)
         {
             AcpiOsPrintf (" Target: %p", ObjDesc->Reference.Object);
-            if (ObjDesc->Reference.Opcode == AML_LOAD_OP)
+            if (ObjDesc->Reference.Class == ACPI_REFCLASS_TABLE)
             {
-                /*
-                 * For DDBHandle reference,
-                 * ObjDesc->Reference.Object is the table index
-                 */
-                AcpiOsPrintf (" [DDBHandle]\n");
+                AcpiOsPrintf (" Table Index: %X\n", ObjDesc->Reference.Value);
             }
             else
             {
-                AcpiOsPrintf (" [%s]\n",
+                AcpiOsPrintf (" Target: %p [%s]\n", ObjDesc->Reference.Object,
                     AcpiUtGetTypeName (((ACPI_OPERAND_OBJECT *)
                         ObjDesc->Reference.Object)->Common.Type));
             }
         }
         else
         {
-            AcpiOsPrintf (" Target: %p\n",
-                ObjDesc->Reference.Object);
+            AcpiOsPrintf (" Target: %p\n", ObjDesc->Reference.Object);
         }
     }
 }
@@ -1096,12 +1059,12 @@ AcpiExDumpPackageObj (
 
     /* Packages may only contain a few object types */
 
-    switch (ACPI_GET_OBJECT_TYPE (ObjDesc))
+    switch (ObjDesc->Common.Type)
     {
     case ACPI_TYPE_INTEGER:
 
         AcpiOsPrintf ("[Integer] = %8.8X%8.8X\n",
-                    ACPI_FORMAT_UINT64 (ObjDesc->Integer.Value));
+            ACPI_FORMAT_UINT64 (ObjDesc->Integer.Value));
         break;
 
 
@@ -1122,7 +1085,7 @@ AcpiExDumpPackageObj (
         if (ObjDesc->Buffer.Length)
         {
             AcpiUtDumpBuffer (ACPI_CAST_PTR (UINT8, ObjDesc->Buffer.Pointer),
-                    ObjDesc->Buffer.Length, DB_DWORD_DISPLAY, _COMPONENT);
+                ObjDesc->Buffer.Length, DB_DWORD_DISPLAY, _COMPONENT);
         }
         else
         {
@@ -1134,7 +1097,7 @@ AcpiExDumpPackageObj (
     case ACPI_TYPE_PACKAGE:
 
         AcpiOsPrintf ("[Package] Contains %d Elements:\n",
-                ObjDesc->Package.Count);
+            ObjDesc->Package.Count);
 
         for (i = 0; i < ObjDesc->Package.Count; i++)
         {
@@ -1145,15 +1108,16 @@ AcpiExDumpPackageObj (
 
     case ACPI_TYPE_LOCAL_REFERENCE:
 
-        AcpiOsPrintf ("[Object Reference] %s",
-            (AcpiPsGetOpcodeInfo (ObjDesc->Reference.Opcode))->Name);
+        AcpiOsPrintf ("[Object Reference] Type [%s] %2.2X",
+            AcpiUtGetReferenceName (ObjDesc),
+            ObjDesc->Reference.Class);
         AcpiExDumpReferenceObj (ObjDesc);
         break;
 
 
     default:
 
-        AcpiOsPrintf ("[Unknown Type] %X\n", ACPI_GET_OBJECT_TYPE (ObjDesc));
+        AcpiOsPrintf ("[Unknown Type] %X\n", ObjDesc->Common.Type);
         break;
     }
 }

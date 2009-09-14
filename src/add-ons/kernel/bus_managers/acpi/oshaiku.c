@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -137,6 +137,7 @@ extern void *gDPCHandle;
 #endif
 
 #include "acpi.h"
+#include "accommon.h"
 #include "amlcode.h"
 #include "acparser.h"
 #include "acdebug.h"
@@ -931,32 +932,6 @@ AcpiOsValidateInterface(char *Interface)
 {
 	DEBUG_FUNCTION_F("interface: \"%s\"", Interface);
 	return AE_SUPPORT;
-}
-
-
-/******************************************************************************
- *
- * FUNCTION:	AcpiOsValidateAddress
- *
- * PARAMETERS:	SpaceId				- ACPI space ID
- *				Address				- Physical address
- *				Length				- Address length
- *
- * RETURN:		AE_OK if Address/Length is valid for the SpaceId. Otherwise,
- *				should return AE_AML_ILLEGAL_ADDRESS.
- *
- * DESCRIPTION:	Validate a system address via the host OS. Used to validate
- *				the addresses accessed by AML operation regions.
- *
- *****************************************************************************/
-
-ACPI_STATUS
-AcpiOsValidateAddress(UINT8 SpaceId, ACPI_PHYSICAL_ADDRESS Address,
-	ACPI_SIZE Length)
-{
-	DEBUG_FUNCTION_F("space: %u; addr: 0x%08lx; length: %lu",
-		(uint8)SpaceId, (addr_t)Address, (size_t)Length);
-	return AE_OK;
 }
 
 

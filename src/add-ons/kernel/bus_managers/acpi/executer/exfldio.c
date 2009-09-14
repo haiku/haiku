@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: exfldio - Aml Field I/O
- *              $Revision: 1.131 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,6 +117,7 @@
 #define __EXFLDIO_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acinterp.h"
 #include "amlcode.h"
 #include "acevents.h"
@@ -179,10 +179,10 @@ AcpiExSetupRegion (
 
     /* We must have a valid region */
 
-    if (ACPI_GET_OBJECT_TYPE (RgnDesc) != ACPI_TYPE_REGION)
+    if (RgnDesc->Common.Type != ACPI_TYPE_REGION)
     {
         ACPI_ERROR ((AE_INFO, "Needed Region, found type %X (%s)",
-            ACPI_GET_OBJECT_TYPE (RgnDesc),
+            RgnDesc->Common.Type,
             AcpiUtGetObjectTypeName (RgnDesc)));
 
         return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
@@ -201,20 +201,14 @@ AcpiExSetupRegion (
         }
     }
 
-    /* Exit if Address/Length have been disallowed by the host OS */
-
-    if (RgnDesc->Common.Flags & AOPOBJ_INVALID)
-    {
-        return_ACPI_STATUS (AE_AML_ILLEGAL_ADDRESS);
-    }
-
     /*
-     * Exit now for SMBus address space, it has a non-linear address space
+     * Exit now for SMBus or IPMI address space, it has a non-linear address space
      * and the request cannot be directly validated
      */
-    if (RgnDesc->Region.SpaceId == ACPI_ADR_SPACE_SMBUS)
+    if (RgnDesc->Region.SpaceId == ACPI_ADR_SPACE_SMBUS ||
+        RgnDesc->Region.SpaceId == ACPI_ADR_SPACE_IPMI)
     {
-        /* SMBus has a non-linear address space */
+        /* SMBus or IPMI has a non-linear address space */
 
         return_ACPI_STATUS (AE_OK);
     }
@@ -321,7 +315,7 @@ AcpiExAccessRegion (
 {
     ACPI_STATUS             Status;
     ACPI_OPERAND_OBJECT     *RgnDesc;
-    ACPI_PHYSICAL_ADDRESS   Address;
+    UINT32                  RegionOffset;
 
 
     ACPI_FUNCTION_TRACE (ExAccessRegion);
@@ -345,9 +339,9 @@ AcpiExAccessRegion (
      * 3) The current offset into the field
      */
     RgnDesc = ObjDesc->CommonField.RegionObj;
-    Address = RgnDesc->Region.Address +
-                ObjDesc->CommonField.BaseByteOffset +
-                FieldDatumByteOffset;
+    RegionOffset =
+        ObjDesc->CommonField.BaseByteOffset +
+        FieldDatumByteOffset;
 
     if ((Function & ACPI_IO_MASK) == ACPI_READ)
     {
@@ -365,12 +359,11 @@ AcpiExAccessRegion (
         ObjDesc->CommonField.AccessByteWidth,
         ObjDesc->CommonField.BaseByteOffset,
         FieldDatumByteOffset,
-        ACPI_CAST_PTR (void, Address)));
+        ACPI_CAST_PTR (void, (RgnDesc->Region.Address + RegionOffset))));
 
     /* Invoke the appropriate AddressSpace/OpRegion handler */
 
-    Status = AcpiEvAddressSpaceDispatch (RgnDesc, Function,
-                Address,
+    Status = AcpiEvAddressSpaceDispatch (RgnDesc, Function, RegionOffset,
                 ACPI_MUL_8 (ObjDesc->CommonField.AccessByteWidth), Value);
 
     if (ACPI_FAILURE (Status))
@@ -499,7 +492,7 @@ AcpiExFieldDatumIo (
      * IndexField  - Write to an Index Register, then read/write from/to a
      *               Data Register
      */
-    switch (ACPI_GET_OBJECT_TYPE (ObjDesc))
+    switch (ObjDesc->Common.Type)
     {
     case ACPI_TYPE_BUFFER_FIELD:
         /*
@@ -614,12 +607,12 @@ AcpiExFieldDatumIo (
             return_ACPI_STATUS (Status);
         }
 
-        ACPI_DEBUG_PRINT ((ACPI_DB_BFIELD,
-            "I/O to Data Register: ValuePtr %p\n", Value));
-
         if (ReadWrite == ACPI_READ)
         {
             /* Read the datum from the DataRegister */
+
+            ACPI_DEBUG_PRINT ((ACPI_DB_BFIELD,
+                "Read from Data Register\n"));
 
             Status = AcpiExExtractFromField (ObjDesc->IndexField.DataObj,
                         Value, sizeof (ACPI_INTEGER));
@@ -627,6 +620,10 @@ AcpiExFieldDatumIo (
         else
         {
             /* Write the datum to the DataRegister */
+
+            ACPI_DEBUG_PRINT ((ACPI_DB_BFIELD,
+                "Write to Data Register: Value %8.8X%8.8X\n",
+                ACPI_FORMAT_UINT64 (*Value)));
 
             Status = AcpiExInsertIntoField (ObjDesc->IndexField.DataObj,
                         Value, sizeof (ACPI_INTEGER));
@@ -637,7 +634,7 @@ AcpiExFieldDatumIo (
     default:
 
         ACPI_ERROR ((AE_INFO, "Wrong object type in field I/O %X",
-            ACPI_GET_OBJECT_TYPE (ObjDesc)));
+            ObjDesc->Common.Type));
         Status = AE_AML_INTERNAL;
         break;
     }

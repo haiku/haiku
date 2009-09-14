@@ -25,6 +25,8 @@ local hardware_src =
 	hwregs.c
 	hwsleep.c
 	hwtimer.c
+	hwvalid.c
+	hwxface.c
 ;
 
 local debugger_src =
@@ -99,6 +101,8 @@ local namespace_src =
 	nsnames.c
 	nsobject.c
 	nsparse.c
+	nspredef.c
+	nsrepair.c
 	nssearch.c
 	nsutils.c
 	nswalk.c
@@ -140,7 +144,9 @@ local utilities_src =
 	utdelete.c
 	uteval.c
 	utglobal.c
+	utids.c
 	utinit.c
+	utlock.c
 	utmath.c
 	utmisc.c
 	utmutex.c
@@ -165,13 +171,13 @@ StaticLibrary libacpi_ca.a :
 
 
 # this is a workaround for an optimization bug in our GCC4 with -O1 and -O2, this should be dropped when we upgrade
-oldOPTIM = $(OPTIM) ;
-OPTIM = -O3 ;
+#oldOPTIM = $(OPTIM) ;
+#OPTIM = -O3 ;
 StaticLibrary libacpi_ca.a :
 	tbutils.c
 ;
 
-OPTIM = $(oldOPTIM) ;
+#OPTIM = $(oldOPTIM) ;
 
 SEARCH on [ FGristFiles $(events_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi events ] ;
 SEARCH on [ FGristFiles $(hardware_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi hardware ] ;

@@ -2,7 +2,6 @@
 /******************************************************************************
  *
  * Module Name: exstorob - AML Interpreter object store support, store to object
- *              $Revision: 1.63 $
  *
  *****************************************************************************/
 
@@ -10,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,6 +117,7 @@
 #define __EXSTOROB_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acinterp.h"
 
 
@@ -149,6 +149,13 @@ AcpiExStoreBufferToBuffer (
 
     ACPI_FUNCTION_TRACE_PTR (ExStoreBufferToBuffer, SourceDesc);
 
+
+    /* If Source and Target are the same, just return */
+
+    if (SourceDesc == TargetDesc)
+    {
+        return_ACPI_STATUS (AE_OK);
+    }
 
     /* We know that SourceDesc is a buffer by now */
 
@@ -247,6 +254,13 @@ AcpiExStoreStringToString (
 
     ACPI_FUNCTION_TRACE_PTR (ExStoreStringToString, SourceDesc);
 
+
+    /* If Source and Target are the same, just return */
+
+    if (SourceDesc == TargetDesc)
+    {
+        return_ACPI_STATUS (AE_OK);
+    }
 
     /* We know that SourceDesc is a string by now */
 

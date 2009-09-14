@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: utcopy - Internal to external object translation utilities
- *              $Revision: 1.137 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,7 +116,7 @@
 #define __UTCOPY_C__
 
 #include "acpi.h"
-#include "amlcode.h"
+#include "accommon.h"
 #include "acnamesp.h"
 
 
@@ -227,11 +226,11 @@ AcpiUtCopyIsimpleToEsimple (
      * In general, the external object will be the same type as
      * the internal object
      */
-    ExternalObject->Type = ACPI_GET_OBJECT_TYPE (InternalObject);
+    ExternalObject->Type = InternalObject->Common.Type;
 
     /* However, only a limited number of external types are supported */
 
-    switch (ACPI_GET_OBJECT_TYPE (InternalObject))
+    switch (InternalObject->Common.Type)
     {
     case ACPI_TYPE_STRING:
 
@@ -269,40 +268,47 @@ AcpiUtCopyIsimpleToEsimple (
 
         /* This is an object reference. */
 
-        switch (InternalObject->Reference.Opcode)
+        switch (InternalObject->Reference.Class)
         {
-        case AML_INT_NAMEPATH_OP:
+        case ACPI_REFCLASS_NAME:
 
-            /* For namepath, return the object handle ("reference") */
-
-        default:
-
-            /* We are referring to the namespace node */
-
+            /*
+             * For namepath, return the object handle ("reference")
+             * We are referring to the namespace node
+             */
             ExternalObject->Reference.Handle =
                 InternalObject->Reference.Node;
             ExternalObject->Reference.ActualType =
                 AcpiNsGetType (InternalObject->Reference.Node);
             break;
+
+        default:
+
+            /* All other reference types are unsupported */
+
+            return_ACPI_STATUS (AE_TYPE);
         }
         break;
 
 
     case ACPI_TYPE_PROCESSOR:
 
-        ExternalObject->Processor.ProcId      = InternalObject->Processor.ProcId;
-        ExternalObject->Processor.PblkAddress = InternalObject->Processor.Address;
-        ExternalObject->Processor.PblkLength  = InternalObject->Processor.Length;
+        ExternalObject->Processor.ProcId =
+            InternalObject->Processor.ProcId;
+        ExternalObject->Processor.PblkAddress =
+            InternalObject->Processor.Address;
+        ExternalObject->Processor.PblkLength =
+            InternalObject->Processor.Length;
         break;
 
 
     case ACPI_TYPE_POWER:
 
         ExternalObject->PowerResource.SystemLevel =
-                            InternalObject->PowerResource.SystemLevel;
+            InternalObject->PowerResource.SystemLevel;
 
         ExternalObject->PowerResource.ResourceOrder =
-                            InternalObject->PowerResource.ResourceOrder;
+            InternalObject->PowerResource.ResourceOrder;
         break;
 
 
@@ -310,8 +316,9 @@ AcpiUtCopyIsimpleToEsimple (
         /*
          * There is no corresponding external object type
          */
-        ACPI_ERROR ((AE_INFO, "Unsupported object type, cannot convert to external object: %s",
-            AcpiUtGetTypeName (ACPI_GET_OBJECT_TYPE (InternalObject))));
+        ACPI_ERROR ((AE_INFO,
+            "Unsupported object type, cannot convert to external object: %s",
+            AcpiUtGetTypeName (InternalObject->Common.Type)));
 
         return_ACPI_STATUS (AE_SUPPORT);
     }
@@ -451,7 +458,7 @@ AcpiUtCopyIpackageToEpackage (
     Info.ObjectSpace = 0;
     Info.NumPackages = 1;
 
-    ExternalObject->Type             = ACPI_GET_OBJECT_TYPE (InternalObject);
+    ExternalObject->Type             = InternalObject->Common.Type;
     ExternalObject->Package.Count    = InternalObject->Package.Count;
     ExternalObject->Package.Elements = ACPI_CAST_PTR (ACPI_OBJECT,
                                             Info.FreeSpace);
@@ -498,7 +505,7 @@ AcpiUtCopyIobjectToEobject (
     ACPI_FUNCTION_TRACE (UtCopyIobjectToEobject);
 
 
-    if (ACPI_GET_OBJECT_TYPE (InternalObject) == ACPI_TYPE_PACKAGE)
+    if (InternalObject->Common.Type == ACPI_TYPE_PACKAGE)
     {
         /*
          * Package object:  Copy all subobjects (including
@@ -581,7 +588,8 @@ AcpiUtCopyEsimpleToIsimple (
     default:
         /* All other types are not supported */
 
-        ACPI_ERROR ((AE_INFO, "Unsupported object type, cannot convert to internal object: %s",
+        ACPI_ERROR ((AE_INFO,
+            "Unsupported object type, cannot convert to internal object: %s",
             AcpiUtGetTypeName (ExternalObject->Type)));
 
         return_ACPI_STATUS (AE_SUPPORT);
@@ -595,7 +603,9 @@ AcpiUtCopyEsimpleToIsimple (
     case ACPI_TYPE_STRING:
 
         InternalObject->String.Pointer =
-            ACPI_ALLOCATE_ZEROED ((ACPI_SIZE) ExternalObject->String.Length + 1);
+            ACPI_ALLOCATE_ZEROED ((ACPI_SIZE)
+                ExternalObject->String.Length + 1);
+
         if (!InternalObject->String.Pointer)
         {
             goto ErrorExit;
@@ -639,7 +649,7 @@ AcpiUtCopyEsimpleToIsimple (
 
         /* TBD: should validate incoming handle */
 
-        InternalObject->Reference.Opcode = AML_INT_NAMEPATH_OP;
+        InternalObject->Reference.Class = ACPI_REFCLASS_NAME;
         InternalObject->Reference.Node = ExternalObject->Reference.Handle;
         break;
 
@@ -786,6 +796,7 @@ AcpiUtCopySimpleObject (
 {
     UINT16                  ReferenceCount;
     ACPI_OPERAND_OBJECT     *NextObject;
+    ACPI_STATUS             Status;
 
 
     /* Save fields from destination that we don't want to overwrite */
@@ -809,7 +820,7 @@ AcpiUtCopySimpleObject (
 
     /* Handle the objects with extra data */
 
-    switch (ACPI_GET_OBJECT_TYPE (DestDesc))
+    switch (DestDesc->Common.Type)
     {
     case ACPI_TYPE_BUFFER:
         /*
@@ -862,11 +873,11 @@ AcpiUtCopySimpleObject (
          * We copied the reference object, so we now must add a reference
          * to the object pointed to by the reference
          *
-         * DDBHandle reference (from Load/LoadTable is a special reference,
-         * it's Reference.Object is the table index, so does not need to
+         * DDBHandle reference (from Load/LoadTable) is a special reference,
+         * it does not have a Reference.Object, so does not need to
          * increase the reference count
          */
-        if (SourceDesc->Reference.Opcode == AML_LOAD_OP)
+        if (SourceDesc->Reference.Class == ACPI_REFCLASS_TABLE)
         {
             break;
         }
@@ -881,6 +892,29 @@ AcpiUtCopySimpleObject (
         if (DestDesc->Region.Handler)
         {
             AcpiUtAddReference (DestDesc->Region.Handler);
+        }
+        break;
+
+    /*
+     * For Mutex and Event objects, we cannot simply copy the underlying
+     * OS object. We must create a new one.
+     */
+    case ACPI_TYPE_MUTEX:
+
+        Status = AcpiOsCreateMutex (&DestDesc->Mutex.OsMutex);
+        if (ACPI_FAILURE (Status))
+        {
+            return (Status);
+        }
+        break;
+
+    case ACPI_TYPE_EVENT:
+
+        Status = AcpiOsCreateSemaphore (ACPI_NO_UNIT_LIMIT, 0,
+                    &DestDesc->Event.OsSemaphore);
+        if (ACPI_FAILURE (Status))
+        {
+            return (Status);
         }
         break;
 
@@ -937,7 +971,7 @@ AcpiUtCopyIelementToIelement (
              * This is a simple object, just copy it
              */
             TargetObject = AcpiUtCreateInternalObject (
-                                ACPI_GET_OBJECT_TYPE (SourceObject));
+                                SourceObject->Common.Type);
             if (!TargetObject)
             {
                 return (AE_NO_MEMORY);
@@ -1022,7 +1056,7 @@ AcpiUtCopyIpackageToIpackage (
     ACPI_FUNCTION_TRACE (UtCopyIpackageToIpackage);
 
 
-    DestObj->Common.Type    = ACPI_GET_OBJECT_TYPE (SourceObj);
+    DestObj->Common.Type    = SourceObj->Common.Type;
     DestObj->Common.Flags   = SourceObj->Common.Flags;
     DestObj->Package.Count  = SourceObj->Package.Count;
 
@@ -1083,7 +1117,7 @@ AcpiUtCopyIobjectToIobject (
 
     /* Create the top level object */
 
-    *DestDesc = AcpiUtCreateInternalObject (ACPI_GET_OBJECT_TYPE (SourceDesc));
+    *DestDesc = AcpiUtCreateInternalObject (SourceDesc->Common.Type);
     if (!*DestDesc)
     {
         return_ACPI_STATUS (AE_NO_MEMORY);
@@ -1091,7 +1125,7 @@ AcpiUtCopyIobjectToIobject (
 
     /* Copy the object and possible subobjects */
 
-    if (ACPI_GET_OBJECT_TYPE (SourceDesc) == ACPI_TYPE_PACKAGE)
+    if (SourceDesc->Common.Type == ACPI_TYPE_PACKAGE)
     {
         Status = AcpiUtCopyIpackageToIpackage (SourceDesc, *DestDesc,
                         WalkState);

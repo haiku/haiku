@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: asllookup- Namespace lookup
- *              $Revision: 1.106 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -180,6 +179,14 @@ LsDoOnePathname (
     UINT32                  Level,
     void                    *Context,
     void                    **ReturnValue);
+
+void
+LsSetupNsList (
+    void                    *Handle);
+
+ACPI_PARSE_OBJECT *
+LkGetNameOp (
+    ACPI_PARSE_OBJECT       *Op);
 
 
 /*******************************************************************************
@@ -436,7 +443,8 @@ LsDoOneNamespaceObject (
  ******************************************************************************/
 
 void
-LsSetupNsList (void * Handle)
+LsSetupNsList (
+    void                    *Handle)
 {
 
     Gbl_NsOutputFlag = TRUE;
@@ -923,6 +931,17 @@ LkNamespaceLocateBegin (
     }
 
     /*
+     * One special case: CondRefOf operator - we don't care if the name exists
+     * or not at this point, just ignore it, the point of the operator is to
+     * determine if the name exists at runtime.
+     */
+    if ((Op->Asl.Parent) &&
+        (Op->Asl.Parent->Asl.ParseOpcode == PARSEOP_CONDREFOF))
+    {
+        return (AE_OK);
+    }
+
+    /*
      * We must enable the "search-to-root" for single NameSegs, but
      * we have to be very careful about opening up scopes
      */
@@ -1010,14 +1029,6 @@ LkNamespaceLocateBegin (
                 {
                     /* The name doesn't exist, period */
 
-                    if ((Op->Asl.Parent) &&
-                        (Op->Asl.Parent->Asl.ParseOpcode == PARSEOP_CONDREFOF))
-                    {
-                        /* Ignore not found if parent is CondRefOf */
-
-                        return (AE_OK);
-                    }
-
                     AslError (ASL_ERROR, ASL_MSG_NOT_EXIST,
                         Op, Op->Asl.ExternalName);
                 }
@@ -1029,14 +1040,6 @@ LkNamespaceLocateBegin (
                 if (Path[0] == AML_ROOT_PREFIX)
                 {
                     /* Gave full path, the object does not exist */
-
-                    if ((Op->Asl.Parent) &&
-                        (Op->Asl.Parent->Asl.ParseOpcode == PARSEOP_CONDREFOF))
-                    {
-                        /* Ignore not found if parent is CondRefOf */
-
-                        return (AE_OK);
-                    }
 
                     AslError (ASL_ERROR, ASL_MSG_NOT_EXIST, Op,
                         Op->Asl.ExternalName);
@@ -1334,6 +1337,7 @@ LkNamespaceLocateBegin (
                 break;
 
             case REGION_SMBUS:
+            case REGION_IPMI:
 
                 if ((UINT8) Op->Asl.Parent->Asl.Value.Integer != AML_FIELD_ACCESS_BUFFER)
                 {

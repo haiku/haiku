@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: adfile - Application-level disassembler file support routines
- *              $Revision: 1.4 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -116,6 +115,7 @@
 
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acapps.h"
 
 #include <stdio.h>
@@ -125,6 +125,13 @@
 #define _COMPONENT          ACPI_TOOLS
         ACPI_MODULE_NAME    ("adfile")
 
+/* Local prototypes */
+
+INT32
+AdWriteBuffer (
+    char                    *Filename,
+    char                    *Buffer,
+    UINT32                  Length);
 
 char                        FilenameBuf[20];
 
@@ -185,12 +192,12 @@ AdGenerateFilename (
 
 INT32
 AdWriteBuffer (
-    char                *Filename,
-    char                *Buffer,
-    UINT32              Length)
+    char                    *Filename,
+    char                    *Buffer,
+    UINT32                  Length)
 {
-    FILE                *fp;
-    ACPI_SIZE           Actual;
+    FILE                    *fp;
+    ACPI_SIZE               Actual;
 
 
     fp = fopen (Filename, "wb");

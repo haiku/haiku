@@ -2,7 +2,6 @@
  *
  * Module Name: nsutils - Utilities for accessing ACPI namespace, accessing
  *                        parents and siblings and Scope manipulation
- *              $Revision: 1.157 $
  *
  *****************************************************************************/
 
@@ -10,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,6 +117,7 @@
 #define __NSUTILS_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acnamesp.h"
 #include "amlcode.h"
 
@@ -170,7 +170,7 @@ AcpiNsReportError (
     {
         /* There is a non-ascii character in the name */
 
-        ACPI_MOVE_32_TO_32 (&BadName, InternalName);
+        ACPI_MOVE_32_TO_32 (&BadName, ACPI_CAST_PTR (UINT32, InternalName));
         AcpiOsPrintf ("[0x%4.4X] (NON-ASCII)", BadName);
     }
     else
@@ -434,16 +434,22 @@ AcpiNsGetInternalNameLength (
      *
      * strlen() + 1 covers the first NameSeg, which has no path separator
      */
-    if (AcpiNsValidRootPrefix (NextExternalChar[0]))
+    if (AcpiNsValidRootPrefix (*NextExternalChar))
     {
         Info->FullyQualified = TRUE;
         NextExternalChar++;
+
+        /* Skip redundant RootPrefix, like \\_SB.PCI0.SBRG.EC0 */
+
+        while (AcpiNsValidRootPrefix (*NextExternalChar))
+        {
+            NextExternalChar++;
+        }
     }
     else
     {
-        /*
-         * Handle Carat prefixes
-         */
+        /* Handle Carat prefixes */
+
         while (*NextExternalChar == '^')
         {
             Info->NumCarats++;
@@ -716,9 +722,8 @@ AcpiNsExternalizeName (
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
-    /*
-     * Check for a prefix (one '\' | one or more '^').
-     */
+    /* Check for a prefix (one '\' | one or more '^') */
+
     switch (InternalName[0])
     {
     case '\\':
@@ -750,7 +755,7 @@ AcpiNsExternalizeName (
     }
 
     /*
-     * Check for object names.  Note that there could be 0-255 of these
+     * Check for object names. Note that there could be 0-255 of these
      * 4-byte elements.
      */
     if (PrefixLength < InternalNameLength)
@@ -810,9 +815,8 @@ AcpiNsExternalizeName (
         return_ACPI_STATUS (AE_BAD_PATHNAME);
     }
 
-    /*
-     * Build ConvertedName
-     */
+    /* Build the ConvertedName */
+
     *ConvertedName = ACPI_ALLOCATE_ZEROED (RequiredLength);
     if (!(*ConvertedName))
     {
@@ -865,6 +869,9 @@ AcpiNsExternalizeName (
  *       and keep all pointers within this subsystem - however this introduces
  *       more (and perhaps unnecessary) overhead.
  *
+ * The current implemenation is basically a placeholder until such time comes
+ * that it is needed.
+ *
  ******************************************************************************/
 
 ACPI_NAMESPACE_NODE *
@@ -875,9 +882,8 @@ AcpiNsMapHandleToNode (
     ACPI_FUNCTION_ENTRY ();
 
 
-    /*
-     * Simple implementation
-     */
+    /* Parameter validation */
+
     if ((!Handle) || (Handle == ACPI_ROOT_OBJECT))
     {
         return (AcpiGbl_RootNode);
@@ -1042,7 +1048,7 @@ AcpiNsGetNode (
     char                    *InternalPath;
 
 
-    ACPI_FUNCTION_TRACE_PTR (NsGetNode, Pathname);
+    ACPI_FUNCTION_TRACE_PTR (NsGetNode, ACPI_CAST_PTR (char, Pathname));
 
 
     if (!Pathname)
@@ -1082,7 +1088,7 @@ AcpiNsGetNode (
                 NULL, ReturnNode);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "%s, %s\n",
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "%s, %s\n",
                 Pathname, AcpiFormatException (Status)));
     }
 

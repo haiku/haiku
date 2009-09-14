@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: evrgnini- ACPI AddressSpace (OpRegion) init
- *              $Revision: 1.89 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,6 +117,7 @@
 #define __EVRGNINI_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acevents.h"
 #include "acnamesp.h"
 
@@ -125,10 +125,6 @@
         ACPI_MODULE_NAME    ("evrgnini")
 
 /* Local prototypes */
-
-static BOOLEAN
-AcpiEvMatchPciRootBridge (
-    char                    *Id);
 
 static BOOLEAN
 AcpiEvIsPciRootBridge (
@@ -335,16 +331,17 @@ AcpiEvPciConfigRegionSetup (
                     if (Status == AE_SAME_HANDLER)
                     {
                         /*
-                         * It is OK if the handler is already installed on the root
-                         * bridge.  Still need to return a context object for the
-                         * new PCI_Config operation region, however.
+                         * It is OK if the handler is already installed on the
+                         * root bridge. Still need to return a context object
+                         * for the new PCI_Config operation region, however.
                          */
                         Status = AE_OK;
                     }
                     else
                     {
                         ACPI_EXCEPTION ((AE_INFO, Status,
-                            "Could not install PciConfig handler for Root Bridge %4.4s",
+                            "Could not install PciConfig handler "
+                            "for Root Bridge %4.4s",
                             AcpiUtGetNodeName (PciRootNode)));
                     }
                 }
@@ -379,8 +376,8 @@ AcpiEvPciConfigRegionSetup (
     }
 
     /*
-     * For PCI_Config space access, we need the segment, bus,
-     * device and function numbers.  Acquire them here.
+     * For PCI_Config space access, we need the segment, bus, device and
+     * function numbers. Acquire them here.
      *
      * Find the parent device object. (This allows the operation region to be
      * within a subscope under the device, such as a control method.)
@@ -398,14 +395,15 @@ AcpiEvPciConfigRegionSetup (
     }
 
     /*
-     * Get the PCI device and function numbers from the _ADR object
-     * contained in the parent's scope.
+     * Get the PCI device and function numbers from the _ADR object contained
+     * in the parent's scope.
      */
-    Status = AcpiUtEvaluateNumericObject (METHOD_NAME__ADR, PciDeviceNode, &PciValue);
+    Status = AcpiUtEvaluateNumericObject (METHOD_NAME__ADR,
+                PciDeviceNode, &PciValue);
 
     /*
-     * The default is zero, and since the allocation above zeroed
-     * the data, just do nothing on failure.
+     * The default is zero, and since the allocation above zeroed the data,
+     * just do nothing on failure.
      */
     if (ACPI_SUCCESS (Status))
     {
@@ -415,7 +413,8 @@ AcpiEvPciConfigRegionSetup (
 
     /* The PCI segment number comes from the _SEG method */
 
-    Status = AcpiUtEvaluateNumericObject (METHOD_NAME__SEG, PciRootNode, &PciValue);
+    Status = AcpiUtEvaluateNumericObject (METHOD_NAME__SEG,
+                PciRootNode, &PciValue);
     if (ACPI_SUCCESS (Status))
     {
         PciId->Segment = ACPI_LOWORD (PciValue);
@@ -423,7 +422,8 @@ AcpiEvPciConfigRegionSetup (
 
     /* The PCI bus number comes from the _BBN method */
 
-    Status = AcpiUtEvaluateNumericObject (METHOD_NAME__BBN, PciRootNode, &PciValue);
+    Status = AcpiUtEvaluateNumericObject (METHOD_NAME__BBN,
+                PciRootNode, &PciValue);
     if (ACPI_SUCCESS (Status))
     {
         PciId->Bus = ACPI_LOWORD (PciValue);
@@ -435,42 +435,6 @@ AcpiEvPciConfigRegionSetup (
 
     *RegionContext = PciId;
     return_ACPI_STATUS (AE_OK);
-}
-
-
-/*******************************************************************************
- *
- * FUNCTION:    AcpiEvMatchPciRootBridge
- *
- * PARAMETERS:  Id              - The HID/CID in string format
- *
- * RETURN:      TRUE if the Id is a match for a PCI/PCI-Express Root Bridge
- *
- * DESCRIPTION: Determine if the input ID is a PCI Root Bridge ID.
- *
- ******************************************************************************/
-
-static BOOLEAN
-AcpiEvMatchPciRootBridge (
-    char                    *Id)
-{
-
-    /*
-     * Check if this is a PCI root.
-     * ACPI 3.0+: check for a PCI Express root also.
-     */
-    if (!(ACPI_STRNCMP (Id,
-            PCI_ROOT_HID_STRING,
-            sizeof (PCI_ROOT_HID_STRING)))      ||
-
-        !(ACPI_STRNCMP (Id,
-            PCI_EXPRESS_ROOT_HID_STRING,
-            sizeof (PCI_EXPRESS_ROOT_HID_STRING))))
-    {
-        return (TRUE);
-    }
-
-    return (FALSE);
 }
 
 
@@ -492,29 +456,30 @@ AcpiEvIsPciRootBridge (
     ACPI_NAMESPACE_NODE     *Node)
 {
     ACPI_STATUS             Status;
-    ACPI_DEVICE_ID          Hid;
-    ACPI_COMPATIBLE_ID_LIST *Cid;
+    ACPI_DEVICE_ID          *Hid;
+    ACPI_DEVICE_ID_LIST     *Cid;
     UINT32                  i;
+    BOOLEAN                 Match;
 
 
-    /*
-     * Get the _HID and check for a PCI Root Bridge
-     */
+    /* Get the _HID and check for a PCI Root Bridge */
+
     Status = AcpiUtExecute_HID (Node, &Hid);
     if (ACPI_FAILURE (Status))
     {
         return (FALSE);
     }
 
-    if (AcpiEvMatchPciRootBridge (Hid.Value))
+    Match = AcpiUtIsPciRootBridge (Hid->String);
+    ACPI_FREE (Hid);
+
+    if (Match)
     {
         return (TRUE);
     }
 
-    /*
-     * The _HID did not match.
-     * Get the _CID and check for a PCI Root Bridge
-     */
+    /* The _HID did not match. Get the _CID and check for a PCI Root Bridge */
+
     Status = AcpiUtExecute_CID (Node, &Cid);
     if (ACPI_FAILURE (Status))
     {
@@ -525,7 +490,7 @@ AcpiEvIsPciRootBridge (
 
     for (i = 0; i < Cid->Count; i++)
     {
-        if (AcpiEvMatchPciRootBridge (Cid->Id[i].Value))
+        if (AcpiUtIsPciRootBridge (Cid->Ids[i].String))
         {
             ACPI_FREE (Cid);
             return (TRUE);
@@ -652,9 +617,9 @@ AcpiEvDefaultRegionSetup (
  *              Get the appropriate address space handler for a newly
  *              created region.
  *
- *              This also performs address space specific initialization.  For
+ *              This also performs address space specific initialization. For
  *              example, PCI regions must have an _ADR object that contains
- *              a PCI address in the scope of the definition.  This address is
+ *              a PCI address in the scope of the definition. This address is
  *              required to perform an access to PCI config space.
  *
  * MUTEX:       Interpreter should be unlocked, because we may run the _REG
@@ -714,7 +679,7 @@ AcpiEvInitializeRegion (
     {
         /*
          * The _REG method is optional and there can be only one per region
-         * definition.  This will be executed when the handler is attached
+         * definition. This will be executed when the handler is attached
          * or removed
          */
         RegionObj2->Extra.Method_REG = MethodNode;
@@ -772,8 +737,8 @@ AcpiEvInitializeRegion (
                                 AcpiNsLocked);
 
                     /*
-                     * Tell all users that this region is usable by running the _REG
-                     * method
+                     * Tell all users that this region is usable by
+                     * running the _REG method
                      */
                     if (AcpiNsLocked)
                     {
@@ -804,10 +769,8 @@ AcpiEvInitializeRegion (
             }
         }
 
-        /*
-         * This node does not have the handler we need;
-         * Pop up one level
-         */
+        /* This node does not have the handler we need; Pop up one level */
+
         Node = AcpiNsGetParentNode (Node);
     }
 

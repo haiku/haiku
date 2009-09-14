@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: dsfield - Dispatcher field routines
- *              $Revision: 1.87 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,6 +116,7 @@
 #define __DSFIELD_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "amlcode.h"
 #include "acdispat.h"
 #include "acinterp.h"
@@ -211,9 +211,12 @@ AcpiDsCreateBufferField (
         Flags = ACPI_NS_NO_UPSEARCH | ACPI_NS_DONT_OPEN_SCOPE |
                 ACPI_NS_ERROR_IF_FOUND;
 
-        /* Mark node temporary if we are executing a method */
-
-        if (WalkState->MethodNode)
+        /*
+         * Mark node temporary if we are executing a normal control
+         * method. (Don't mark if this is a module-level code method)
+         */
+        if (WalkState->MethodNode &&
+            !(WalkState->ParseFlags & ACPI_PARSE_MODULE_LEVEL))
         {
             Flags |= ACPI_NS_TEMPORARY;
         }
@@ -566,9 +569,12 @@ AcpiDsInitFieldObjects (
     Flags = ACPI_NS_NO_UPSEARCH | ACPI_NS_DONT_OPEN_SCOPE |
             ACPI_NS_ERROR_IF_FOUND;
 
-    /* Mark node(s) temporary if we are executing a method */
-
-    if (WalkState->MethodNode)
+    /*
+     * Mark node(s) temporary if we are executing a normal control
+     * method. (Don't mark if this is a module-level code method)
+     */
+    if (WalkState->MethodNode &&
+        !(WalkState->ParseFlags & ACPI_PARSE_MODULE_LEVEL))
     {
         Flags |= ACPI_NS_TEMPORARY;
     }

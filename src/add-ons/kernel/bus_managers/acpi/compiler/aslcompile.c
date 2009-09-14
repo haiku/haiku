@@ -2,7 +2,6 @@
 /******************************************************************************
  *
  * Module Name: aslcompile - top level compile module
- *              $Revision: 1.99 $
  *
  *****************************************************************************/
 
@@ -10,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -131,6 +130,16 @@ CmFlushSourceCode (
 static ACPI_STATUS
 FlCheckForAscii (
     ASL_FILE_INFO           *FileInfo);
+
+void
+FlConsumeAnsiComment (
+    ASL_FILE_INFO           *FileInfo,
+    ASL_FILE_STATUS         *Status);
+
+void
+FlConsumeNewComment (
+    ASL_FILE_INFO           *FileInfo,
+    ASL_FILE_STATUS         *Status);
 
 
 /*******************************************************************************
@@ -466,7 +475,7 @@ FlCheckForAscii (
 
         /* Check for an ASCII character */
 
-        if (!isascii (Byte))
+        if (!ACPI_IS_ASCII (Byte))
         {
             if (BadBytes < 10)
             {

@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: utobject - ACPI object create/delete/size/cache routines
- *              $Revision: 1.108 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,8 +116,8 @@
 #define __UTOBJECT_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acnamesp.h"
-#include "amlcode.h"
 
 
 #define _COMPONENT          ACPI_UTILITIES
@@ -420,7 +419,7 @@ AcpiUtValidInternalObject (
 
     if (!Object)
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "**** Null Object Ptr\n"));
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "**** Null Object Ptr\n"));
         return (FALSE);
     }
 
@@ -435,7 +434,7 @@ AcpiUtValidInternalObject (
         return (TRUE);
 
     default:
-        ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
                 "%p is not not an ACPI operand obj [%s]\n",
                 Object, AcpiUtGetDescriptorName (Object)));
         break;
@@ -549,6 +548,7 @@ AcpiUtGetSimpleObjectSize (
     ACPI_SIZE               *ObjLength)
 {
     ACPI_SIZE               Length;
+    ACPI_SIZE               Size;
     ACPI_STATUS             Status = AE_OK;
 
 
@@ -586,7 +586,7 @@ AcpiUtGetSimpleObjectSize (
      * must be accessed bytewise or there may be alignment problems on
      * certain processors
      */
-    switch (ACPI_GET_OBJECT_TYPE (InternalObject))
+    switch (InternalObject->Common.Type)
     {
     case ACPI_TYPE_STRING:
 
@@ -611,16 +611,21 @@ AcpiUtGetSimpleObjectSize (
 
     case ACPI_TYPE_LOCAL_REFERENCE:
 
-        switch (InternalObject->Reference.Opcode)
+        switch (InternalObject->Reference.Class)
         {
-        case AML_INT_NAMEPATH_OP:
+        case ACPI_REFCLASS_NAME:
 
             /*
              * Get the actual length of the full pathname to this object.
              * The reference will be converted to the pathname to the object
              */
-            Length += ACPI_ROUND_UP_TO_NATIVE_WORD (
-                        AcpiNsGetPathnameLength (InternalObject->Reference.Node));
+            Size = AcpiNsGetPathnameLength (InternalObject->Reference.Node);
+            if (!Size)
+            {
+                return_ACPI_STATUS (AE_BAD_PARAMETER);
+            }
+
+            Length += ACPI_ROUND_UP_TO_NATIVE_WORD (Size);
             break;
 
         default:
@@ -630,9 +635,10 @@ AcpiUtGetSimpleObjectSize (
              * Notably, Locals and Args are not supported, but this may be
              * required eventually.
              */
-            ACPI_ERROR ((AE_INFO,
-                "Unsupported Reference opcode=%X in object %p",
-                InternalObject->Reference.Opcode, InternalObject));
+            ACPI_ERROR ((AE_INFO, "Cannot convert to external object - "
+                "unsupported Reference Class [%s] %X in object %p",
+                AcpiUtGetReferenceName (InternalObject),
+                InternalObject->Reference.Class, InternalObject));
             Status = AE_TYPE;
             break;
         }
@@ -641,8 +647,10 @@ AcpiUtGetSimpleObjectSize (
 
     default:
 
-        ACPI_ERROR ((AE_INFO, "Unsupported type=%X in object %p",
-            ACPI_GET_OBJECT_TYPE (InternalObject), InternalObject));
+        ACPI_ERROR ((AE_INFO, "Cannot convert to external object - "
+            "unsupported type [%s] %X in object %p",
+            AcpiUtGetObjectTypeName (InternalObject),
+            InternalObject->Common.Type, InternalObject));
         Status = AE_TYPE;
         break;
     }
@@ -801,7 +809,7 @@ AcpiUtGetObjectSize (
 
 
     if ((ACPI_GET_DESCRIPTOR_TYPE (InternalObject) == ACPI_DESC_TYPE_OPERAND) &&
-        (ACPI_GET_OBJECT_TYPE (InternalObject) == ACPI_TYPE_PACKAGE))
+        (InternalObject->Common.Type == ACPI_TYPE_PACKAGE))
     {
         Status = AcpiUtGetPackageObjectSize (InternalObject, ObjLength);
     }

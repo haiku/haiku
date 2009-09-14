@@ -2,7 +2,6 @@
 /******************************************************************************
  *
  * Module Name: aslstartup - Compiler startup routines, called from main
- *              $Revision: 1.5 $
  *
  *****************************************************************************/
 
@@ -10,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,7 +116,6 @@
 
 
 #include "aslcompiler.h"
-#include "acnamesp.h"
 #include "actables.h"
 #include "acapps.h"
 
@@ -141,10 +139,6 @@ static char **
 AsDoWildcard (
     char                    *DirectoryPathname,
     char                    *FileSpecifier);
-
-static ACPI_STATUS
-AslDoOneFile (
-    char                    *Filename);
 
 
 /*******************************************************************************
@@ -275,7 +269,7 @@ AsDoWildcard (
  *
  ******************************************************************************/
 
-static ACPI_STATUS
+ACPI_STATUS
 AslDoOneFile (
     char                    *Filename)
 {

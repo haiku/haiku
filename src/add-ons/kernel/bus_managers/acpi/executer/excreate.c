@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: excreate - Named object creation
- *              $Revision: 1.117 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,6 +117,7 @@
 #define __EXCREATE_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acinterp.h"
 #include "amlcode.h"
 #include "acnamesp.h"
@@ -614,7 +614,7 @@ AcpiExCreateMethod (
          * ACPI 2.0: SyncLevel = SyncLevel in method declaration
          */
         ObjDesc->Method.SyncLevel = (UINT8)
-            ((MethodFlags & AML_METHOD_SYNCH_LEVEL) >> 4);
+            ((MethodFlags & AML_METHOD_SYNC_LEVEL) >> 4);
     }
 
     /* Attach the new object to the method Node */

@@ -1,7 +1,6 @@
 /*******************************************************************************
  *
  * Module Name: utmisc - common utility procedures
- *              $Revision: 1.154 $
  *
  ******************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,11 +117,18 @@
 #define __UTMISC_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acnamesp.h"
 
 
 #define _COMPONENT          ACPI_UTILITIES
         ACPI_MODULE_NAME    ("utmisc")
+
+/*
+ * Common suffix for messages
+ */
+#define ACPI_COMMON_MSG_SUFFIX \
+    AcpiOsPrintf (" (%8.8X/%s-%u)\n", ACPI_CA_VERSION, ModuleName, LineNumber)
 
 
 /*******************************************************************************
@@ -202,6 +208,40 @@ AcpiUtValidateException (
     }
 
     return (ACPI_CAST_PTR (const char, Exception));
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiUtIsPciRootBridge
+ *
+ * PARAMETERS:  Id              - The HID/CID in string format
+ *
+ * RETURN:      TRUE if the Id is a match for a PCI/PCI-Express Root Bridge
+ *
+ * DESCRIPTION: Determine if the input ID is a PCI Root Bridge ID.
+ *
+ ******************************************************************************/
+
+BOOLEAN
+AcpiUtIsPciRootBridge (
+    char                    *Id)
+{
+
+    /*
+     * Check if this is a PCI root bridge.
+     * ACPI 3.0+: check for a PCI Express root also.
+     */
+    if (!(ACPI_STRCMP (Id,
+            PCI_ROOT_HID_STRING)) ||
+
+        !(ACPI_STRCMP (Id,
+            PCI_EXPRESS_ROOT_HID_STRING)))
+    {
+        return (TRUE);
+    }
+
+    return (FALSE);
 }
 
 
@@ -860,7 +900,7 @@ AcpiUtRepairName (
         }
         else
         {
-            ACPI_DEBUG_PRINT ((ACPI_DB_WARN,
+            ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
                 "Found bad character(s) in name, repaired: [%4.4s]\n", Name));
         }
     }
@@ -1176,7 +1216,7 @@ AcpiUtWalkPackageTree (
          */
         if ((!ThisSourceObj) ||
             (ACPI_GET_DESCRIPTOR_TYPE (ThisSourceObj) != ACPI_DESC_TYPE_OPERAND) ||
-            (ACPI_GET_OBJECT_TYPE (ThisSourceObj) != ACPI_TYPE_PACKAGE))
+            (ThisSourceObj->Common.Type != ACPI_TYPE_PACKAGE))
         {
             Status = WalkCallback (ACPI_COPY_TYPE_SIMPLE, ThisSourceObj,
                                     State, Context);
@@ -1237,6 +1277,13 @@ AcpiUtWalkPackageTree (
                                             State->Pkg.ThisTargetObj, 0);
             if (!State)
             {
+                /* Free any stacked Update State objects */
+
+                while (StateList)
+                {
+                    State = AcpiUtPopGenericState (&StateList);
+                    AcpiUtDeleteGenericState (State);
+                }
                 return_ACPI_STATUS (AE_NO_MEMORY);
             }
         }
@@ -1250,7 +1297,7 @@ AcpiUtWalkPackageTree (
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiUtError, AcpiUtWarning, AcpiUtInfo
+ * FUNCTION:    AcpiError, AcpiException, AcpiWarning, AcpiInfo
  *
  * PARAMETERS:  ModuleName          - Caller's module name (for error output)
  *              LineNumber          - Caller's line number (for error output)
@@ -1263,7 +1310,7 @@ AcpiUtWalkPackageTree (
  ******************************************************************************/
 
 void  ACPI_INTERNAL_VAR_XFACE
-AcpiUtError (
+AcpiError (
     const char              *ModuleName,
     UINT32                  LineNumber,
     const char              *Format,
@@ -1272,16 +1319,16 @@ AcpiUtError (
     va_list                 args;
 
 
-    AcpiOsPrintf ("ACPI Error (%s-%04d): ", ModuleName, LineNumber);
+    AcpiOsPrintf ("ACPI Error: ");
 
     va_start (args, Format);
     AcpiOsVprintf (Format, args);
-    AcpiOsPrintf (" [%X]\n", ACPI_CA_VERSION);
+    ACPI_COMMON_MSG_SUFFIX;
     va_end (args);
 }
 
 void  ACPI_INTERNAL_VAR_XFACE
-AcpiUtException (
+AcpiException (
     const char              *ModuleName,
     UINT32                  LineNumber,
     ACPI_STATUS             Status,
@@ -1291,17 +1338,16 @@ AcpiUtException (
     va_list                 args;
 
 
-    AcpiOsPrintf ("ACPI Exception (%s-%04d): %s, ", ModuleName, LineNumber,
-        AcpiFormatException (Status));
+    AcpiOsPrintf ("ACPI Exception: %s, ", AcpiFormatException (Status));
 
     va_start (args, Format);
     AcpiOsVprintf (Format, args);
-    AcpiOsPrintf (" [%X]\n", ACPI_CA_VERSION);
+    ACPI_COMMON_MSG_SUFFIX;
     va_end (args);
 }
 
 void  ACPI_INTERNAL_VAR_XFACE
-AcpiUtWarning (
+AcpiWarning (
     const char              *ModuleName,
     UINT32                  LineNumber,
     const char              *Format,
@@ -1310,16 +1356,16 @@ AcpiUtWarning (
     va_list                 args;
 
 
-    AcpiOsPrintf ("ACPI Warning (%s-%04d): ", ModuleName, LineNumber);
+    AcpiOsPrintf ("ACPI Warning: ");
 
     va_start (args, Format);
     AcpiOsVprintf (Format, args);
-    AcpiOsPrintf (" [%X]\n", ACPI_CA_VERSION);
+    ACPI_COMMON_MSG_SUFFIX;
     va_end (args);
 }
 
 void  ACPI_INTERNAL_VAR_XFACE
-AcpiUtInfo (
+AcpiInfo (
     const char              *ModuleName,
     UINT32                  LineNumber,
     const char              *Format,
@@ -1328,10 +1374,6 @@ AcpiUtInfo (
     va_list                 args;
 
 
-    /*
-     * Removed ModuleName, LineNumber, and acpica version, not needed
-     * for info output
-     */
     AcpiOsPrintf ("ACPI: ");
 
     va_start (args, Format);
@@ -1340,3 +1382,56 @@ AcpiUtInfo (
     va_end (args);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiError)
+ACPI_EXPORT_SYMBOL (AcpiException)
+ACPI_EXPORT_SYMBOL (AcpiWarning)
+ACPI_EXPORT_SYMBOL (AcpiInfo)
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiUtPredefinedWarning
+ *
+ * PARAMETERS:  ModuleName      - Caller's module name (for error output)
+ *              LineNumber      - Caller's line number (for error output)
+ *              Pathname        - Full pathname to the node
+ *              NodeFlags       - From Namespace node for the method/object
+ *              Format          - Printf format string + additional args
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Warnings for the predefined validation module. Messages are
+ *              only emitted the first time a problem with a particular
+ *              method/object is detected. This prevents a flood of error
+ *              messages for methods that are repeatedly evaluated.
+ *
+ ******************************************************************************/
+
+void  ACPI_INTERNAL_VAR_XFACE
+AcpiUtPredefinedWarning (
+    const char              *ModuleName,
+    UINT32                  LineNumber,
+    char                    *Pathname,
+    UINT8                   NodeFlags,
+    const char              *Format,
+    ...)
+{
+    va_list                 args;
+
+
+    /*
+     * Warning messages for this method/object will be disabled after the
+     * first time a validation fails or an object is successfully repaired.
+     */
+    if (NodeFlags & ANOBJ_EVALUATED)
+    {
+        return;
+    }
+
+    AcpiOsPrintf ("ACPI Warning for %s: ", Pathname);
+
+    va_start (args, Format);
+    AcpiOsVprintf (Format, args);
+    ACPI_COMMON_MSG_SUFFIX;
+    va_end (args);
+}

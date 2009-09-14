@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: tbinstal - ACPI table installation and removal
- *              $Revision: 1.94 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,6 +117,7 @@
 #define __TBINSTAL_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acnamesp.h"
 #include "actables.h"
 
@@ -155,7 +155,8 @@ AcpiTbVerifyTable (
         if ((TableDesc->Flags & ACPI_TABLE_ORIGIN_MASK) ==
             ACPI_TABLE_ORIGIN_MAPPED)
         {
-            TableDesc->Pointer = AcpiOsMapMemory (TableDesc->Address, TableDesc->Length);
+            TableDesc->Pointer = AcpiOsMapMemory (
+                TableDesc->Address, TableDesc->Length);
         }
 
         if (!TableDesc->Pointer)
@@ -186,7 +187,9 @@ AcpiTbVerifyTable (
  *
  * RETURN:      Status
  *
- * DESCRIPTION: This function is called to add the ACPI table
+ * DESCRIPTION: This function is called to add an ACPI table. It is used to
+ *              dynamically load tables via the Load and LoadTable AML
+ *              operators.
  *
  ******************************************************************************/
 
@@ -197,6 +200,7 @@ AcpiTbAddTable (
 {
     UINT32                  i;
     ACPI_STATUS             Status = AE_OK;
+    ACPI_TABLE_HEADER       *OverrideTable = NULL;
 
 
     ACPI_FUNCTION_TRACE (TbAddTable);
@@ -228,7 +232,8 @@ AcpiTbAddTable (
         if (!AcpiGbl_RootTableList.Tables[i].Pointer)
         {
             Status = AcpiTbVerifyTable (&AcpiGbl_RootTableList.Tables[i]);
-            if (ACPI_FAILURE (Status) || !AcpiGbl_RootTableList.Tables[i].Pointer)
+            if (ACPI_FAILURE (Status) ||
+                !AcpiGbl_RootTableList.Tables[i].Pointer)
             {
                 continue;
             }
@@ -290,6 +295,30 @@ AcpiTbAddTable (
         }
     }
 
+    /*
+     * ACPI Table Override:
+     * Allow the host to override dynamically loaded tables.
+     */
+    Status = AcpiOsTableOverride (TableDesc->Pointer, &OverrideTable);
+    if (ACPI_SUCCESS (Status) && OverrideTable)
+    {
+        ACPI_INFO ((AE_INFO,
+            "%4.4s @ 0x%p Table override, replaced with:",
+            TableDesc->Pointer->Signature,
+            ACPI_CAST_PTR (void, TableDesc->Address)));
+
+        /* We can delete the table that was passed as a parameter */
+
+        AcpiTbDeleteTable (TableDesc);
+
+        /* Setup descriptor for the new table */
+
+        TableDesc->Address = ACPI_PTR_TO_PHYSADDR (OverrideTable);
+        TableDesc->Pointer = OverrideTable;
+        TableDesc->Length = OverrideTable->Length;
+        TableDesc->Flags = ACPI_TABLE_ORIGIN_OVERRIDE;
+    }
+
     /* Add the table to the global root table list */
 
     Status = AcpiTbStoreTable (TableDesc->Address, TableDesc->Pointer,
@@ -341,8 +370,9 @@ AcpiTbResizeRootTableList (
     /* Increase the Table Array size */
 
     Tables = ACPI_ALLOCATE_ZEROED (
-        ((ACPI_SIZE) AcpiGbl_RootTableList.Size + ACPI_ROOT_TABLE_SIZE_INCREMENT)
-        * sizeof (ACPI_TABLE_DESC));
+        ((ACPI_SIZE) AcpiGbl_RootTableList.Size +
+            ACPI_ROOT_TABLE_SIZE_INCREMENT) *
+        sizeof (ACPI_TABLE_DESC));
     if (!Tables)
     {
         ACPI_ERROR ((AE_INFO, "Could not allocate new root table array"));
@@ -522,32 +552,62 @@ AcpiTbTerminate (
  *
  * PARAMETERS:  TableIndex          - Table index
  *
- * RETURN:      None
+ * RETURN:      Status
  *
  * DESCRIPTION: Delete all namespace objects created when this table was loaded.
  *
  ******************************************************************************/
 
-void
+ACPI_STATUS
 AcpiTbDeleteNamespaceByOwner (
     UINT32                  TableIndex)
 {
     ACPI_OWNER_ID           OwnerId;
+    ACPI_STATUS             Status;
 
 
-    (void) AcpiUtAcquireMutex (ACPI_MTX_TABLES);
-    if (TableIndex < AcpiGbl_RootTableList.Count)
+    ACPI_FUNCTION_TRACE (TbDeleteNamespaceByOwner);
+
+
+    Status = AcpiUtAcquireMutex (ACPI_MTX_TABLES);
+    if (ACPI_FAILURE (Status))
     {
-        OwnerId = AcpiGbl_RootTableList.Tables[TableIndex].OwnerId;
+        return_ACPI_STATUS (Status);
     }
-    else
+
+    if (TableIndex >= AcpiGbl_RootTableList.Count)
     {
+        /* The table index does not exist */
+
         (void) AcpiUtReleaseMutex (ACPI_MTX_TABLES);
-        return;
+        return_ACPI_STATUS (AE_NOT_EXIST);
     }
 
+    /* Get the owner ID for this table, used to delete namespace nodes */
+
+    OwnerId = AcpiGbl_RootTableList.Tables[TableIndex].OwnerId;
     (void) AcpiUtReleaseMutex (ACPI_MTX_TABLES);
+
+    /*
+     * Need to acquire the namespace writer lock to prevent interference
+     * with any concurrent namespace walks. The interpreter must be
+     * released during the deletion since the acquisition of the deletion
+     * lock may block, and also since the execution of a namespace walk
+     * must be allowed to use the interpreter.
+     */
+    (void) AcpiUtReleaseMutex (ACPI_MTX_INTERPRETER);
+    Status = AcpiUtAcquireWriteLock (&AcpiGbl_NamespaceRwLock);
+
     AcpiNsDeleteNamespaceByOwner (OwnerId);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    AcpiUtReleaseWriteLock (&AcpiGbl_NamespaceRwLock);
+
+    Status = AcpiUtAcquireMutex (ACPI_MTX_INTERPRETER);
+    return_ACPI_STATUS (Status);
 }
 
 
@@ -610,7 +670,8 @@ AcpiTbReleaseOwnerId (
     (void) AcpiUtAcquireMutex (ACPI_MTX_TABLES);
     if (TableIndex < AcpiGbl_RootTableList.Count)
     {
-        AcpiUtReleaseOwnerId (&(AcpiGbl_RootTableList.Tables[TableIndex].OwnerId));
+        AcpiUtReleaseOwnerId (
+            &(AcpiGbl_RootTableList.Tables[TableIndex].OwnerId));
         Status = AE_OK;
     }
 
@@ -676,7 +737,8 @@ AcpiTbIsTableLoaded (
     if (TableIndex < AcpiGbl_RootTableList.Count)
     {
         IsLoaded = (BOOLEAN)
-            (AcpiGbl_RootTableList.Tables[TableIndex].Flags & ACPI_TABLE_IS_LOADED);
+            (AcpiGbl_RootTableList.Tables[TableIndex].Flags &
+            ACPI_TABLE_IS_LOADED);
     }
 
     (void) AcpiUtReleaseMutex (ACPI_MTX_TABLES);
@@ -708,11 +770,13 @@ AcpiTbSetTableLoadedFlag (
     {
         if (IsLoaded)
         {
-            AcpiGbl_RootTableList.Tables[TableIndex].Flags |= ACPI_TABLE_IS_LOADED;
+            AcpiGbl_RootTableList.Tables[TableIndex].Flags |=
+                ACPI_TABLE_IS_LOADED;
         }
         else
         {
-            AcpiGbl_RootTableList.Tables[TableIndex].Flags &= ~ACPI_TABLE_IS_LOADED;
+            AcpiGbl_RootTableList.Tables[TableIndex].Flags &=
+                ~ACPI_TABLE_IS_LOADED;
         }
     }
 

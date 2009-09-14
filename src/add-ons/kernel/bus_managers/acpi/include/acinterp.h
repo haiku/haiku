@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Name: acinterp.h - Interpreter subcomponent prototypes and defines
- *       $Revision: 1.173 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -697,13 +696,13 @@ AcpiExReleaseGlobalLock (
 
 void
 AcpiExEisaIdToString (
-    UINT32                  NumericId,
-    char                    *OutString);
+    char                    *Dest,
+    ACPI_INTEGER            CompressedId);
 
 void
-AcpiExUnsignedIntegerToString (
-    ACPI_INTEGER            Value,
-    char                    *OutString);
+AcpiExIntegerToString (
+    char                    *Dest,
+    ACPI_INTEGER            Value);
 
 
 /*

@@ -1,7 +1,6 @@
 /*******************************************************************************
  *
  * Module Name: utdelete - object deletion and reference count utilities
- *              $Revision: 1.126 $
  *
  ******************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,10 +116,11 @@
 #define __UTDELETE_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acinterp.h"
 #include "acnamesp.h"
 #include "acevents.h"
-#include "amlcode.h"
+
 
 #define _COMPONENT          ACPI_UTILITIES
         ACPI_MODULE_NAME    ("utdelete")
@@ -158,6 +158,7 @@ AcpiUtDeleteInternalObj (
     ACPI_OPERAND_OBJECT     *HandlerDesc;
     ACPI_OPERAND_OBJECT     *SecondDesc;
     ACPI_OPERAND_OBJECT     *NextDesc;
+    ACPI_OPERAND_OBJECT     **LastObjPtr;
 
 
     ACPI_FUNCTION_TRACE_PTR (UtDeleteInternalObj, Object);
@@ -172,7 +173,7 @@ AcpiUtDeleteInternalObj (
      * Must delete or free any pointers within the object that are not
      * actual ACPI objects (for example, a raw buffer pointer).
      */
-    switch (ACPI_GET_OBJECT_TYPE (Object))
+    switch (Object->Common.Type)
     {
     case ACPI_TYPE_STRING:
 
@@ -317,6 +318,25 @@ AcpiUtDeleteInternalObj (
             HandlerDesc = Object->Region.Handler;
             if (HandlerDesc)
             {
+                NextDesc = HandlerDesc->AddressSpace.RegionList;
+                LastObjPtr = &HandlerDesc->AddressSpace.RegionList;
+
+                /* Remove the region object from the handler's list */
+
+                while (NextDesc)
+                {
+                    if (NextDesc == Object)
+                    {
+                        *LastObjPtr = NextDesc->Region.Next;
+                        break;
+                    }
+
+                    /* Walk the linked list of handler */
+
+                    LastObjPtr = &NextDesc->Region.Next;
+                    NextDesc = NextDesc->Region.Next;
+                }
+
                 if (HandlerDesc->AddressSpace.HandlerFlags &
                     ACPI_ADDR_HANDLER_DEFAULT_INSTALLED)
                 {
@@ -494,7 +514,7 @@ AcpiUtUpdateRefCount (
                 Object, NewCount));
         }
 
-        if (ACPI_GET_OBJECT_TYPE (Object) == ACPI_TYPE_METHOD)
+        if (Object->Common.Type == ACPI_TYPE_METHOD)
         {
             ACPI_DEBUG_PRINT ((ACPI_DB_ALLOCATIONS,
                 "Method Obj %p Refs=%X, [Decremented]\n", Object, NewCount));
@@ -587,7 +607,7 @@ AcpiUtUpdateObjectReference (
          * All sub-objects must have their reference count incremented also.
          * Different object types have different subobjects.
          */
-        switch (ACPI_GET_OBJECT_TYPE (Object))
+        switch (Object->Common.Type)
         {
         case ACPI_TYPE_DEVICE:
         case ACPI_TYPE_PROCESSOR:
@@ -659,8 +679,8 @@ AcpiUtUpdateObjectReference (
              * reference must track changes to the ref count of the index or
              * target object.
              */
-            if ((Object->Reference.Opcode == AML_INDEX_OP) ||
-                (Object->Reference.Opcode == AML_INT_NAMEPATH_OP))
+            if ((Object->Reference.Class == ACPI_REFCLASS_INDEX) ||
+                (Object->Reference.Class== ACPI_REFCLASS_NAME))
             {
                 NextObject = Object->Reference.Object;
             }
@@ -696,10 +716,19 @@ AcpiUtUpdateObjectReference (
 
     return_ACPI_STATUS (AE_OK);
 
+
 ErrorExit:
 
     ACPI_EXCEPTION ((AE_INFO, Status,
         "Could not update object reference count"));
+
+    /* Free any stacked Update State objects */
+
+    while (StateList)
+    {
+        State = AcpiUtPopGenericState (&StateList);
+        AcpiUtDeleteGenericState (State);
+    }
 
     return_ACPI_STATUS (Status);
 }

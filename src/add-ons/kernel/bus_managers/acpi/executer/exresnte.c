@@ -2,7 +2,6 @@
 /******************************************************************************
  *
  * Module Name: exresnte - AML Interpreter object resolution
- *              $Revision: 1.78 $
  *
  *****************************************************************************/
 
@@ -10,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,11 +117,10 @@
 #define __EXRESNTE_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acdispat.h"
 #include "acinterp.h"
 #include "acnamesp.h"
-#include "acparser.h"
-#include "amlcode.h"
 
 
 #define _COMPONENT          ACPI_EXECUTER
@@ -222,7 +220,7 @@ AcpiExResolveNodeToValue (
     {
     case ACPI_TYPE_PACKAGE:
 
-        if (ACPI_GET_OBJECT_TYPE (SourceDesc) != ACPI_TYPE_PACKAGE)
+        if (SourceDesc->Common.Type != ACPI_TYPE_PACKAGE)
         {
             ACPI_ERROR ((AE_INFO, "Object not a Package, type %s",
                 AcpiUtGetObjectTypeName (SourceDesc)));
@@ -242,7 +240,7 @@ AcpiExResolveNodeToValue (
 
     case ACPI_TYPE_BUFFER:
 
-        if (ACPI_GET_OBJECT_TYPE (SourceDesc) != ACPI_TYPE_BUFFER)
+        if (SourceDesc->Common.Type != ACPI_TYPE_BUFFER)
         {
             ACPI_ERROR ((AE_INFO, "Object not a Buffer, type %s",
                 AcpiUtGetObjectTypeName (SourceDesc)));
@@ -262,7 +260,7 @@ AcpiExResolveNodeToValue (
 
     case ACPI_TYPE_STRING:
 
-        if (ACPI_GET_OBJECT_TYPE (SourceDesc) != ACPI_TYPE_STRING)
+        if (SourceDesc->Common.Type != ACPI_TYPE_STRING)
         {
             ACPI_ERROR ((AE_INFO, "Object not a String, type %s",
                 AcpiUtGetObjectTypeName (SourceDesc)));
@@ -278,7 +276,7 @@ AcpiExResolveNodeToValue (
 
     case ACPI_TYPE_INTEGER:
 
-        if (ACPI_GET_OBJECT_TYPE (SourceDesc) != ACPI_TYPE_INTEGER)
+        if (SourceDesc->Common.Type != ACPI_TYPE_INTEGER)
         {
             ACPI_ERROR ((AE_INFO, "Object not a Integer, type %s",
                 AcpiUtGetObjectTypeName (SourceDesc)));
@@ -330,11 +328,11 @@ AcpiExResolveNodeToValue (
 
     case ACPI_TYPE_LOCAL_REFERENCE:
 
-        switch (SourceDesc->Reference.Opcode)
+        switch (SourceDesc->Reference.Class)
         {
-        case AML_LOAD_OP:   /* This is a DdbHandle */
-        case AML_REF_OF_OP:
-        case AML_INDEX_OP:
+        case ACPI_REFCLASS_TABLE:   /* This is a DdbHandle */
+        case ACPI_REFCLASS_REFOF:
+        case ACPI_REFCLASS_INDEX:
 
             /* Return an additional reference to the object */
 
@@ -346,9 +344,8 @@ AcpiExResolveNodeToValue (
             /* No named references are allowed here */
 
             ACPI_ERROR ((AE_INFO,
-                "Unsupported Reference opcode %X (%s)",
-                SourceDesc->Reference.Opcode,
-                AcpiPsGetOpcodeName (SourceDesc->Reference.Opcode)));
+                "Unsupported Reference type %X",
+                SourceDesc->Reference.Class));
 
             return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
         }

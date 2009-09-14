@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: nsparse - namespace interface to AML parser
- *              $Revision: 1.19 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,6 +116,7 @@
 #define __NSPARSE_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acnamesp.h"
 #include "acparser.h"
 #include "acdispat.h"
@@ -267,7 +267,8 @@ AcpiNsParseTable (
      * performs another complete parse of the AML.
      */
     ACPI_DEBUG_PRINT ((ACPI_DB_PARSE, "**** Start pass 1\n"));
-    Status = AcpiNsOneCompleteParse (ACPI_IMODE_LOAD_PASS1, TableIndex, StartNode);
+    Status = AcpiNsOneCompleteParse (ACPI_IMODE_LOAD_PASS1,
+                TableIndex, StartNode);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -283,7 +284,8 @@ AcpiNsParseTable (
      * parse objects are all cached.
      */
     ACPI_DEBUG_PRINT ((ACPI_DB_PARSE, "**** Start pass 2\n"));
-    Status = AcpiNsOneCompleteParse (ACPI_IMODE_LOAD_PASS2, TableIndex, StartNode);
+    Status = AcpiNsOneCompleteParse (ACPI_IMODE_LOAD_PASS2,
+                TableIndex, StartNode);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);

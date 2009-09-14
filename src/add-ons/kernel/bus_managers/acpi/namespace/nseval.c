@@ -1,7 +1,6 @@
 /*******************************************************************************
  *
  * Module Name: nseval - Object evaluation, includes control method execution
- *              $Revision: 1.145 $
  *
  ******************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,6 +117,7 @@
 #define __NSEVAL_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acparser.h"
 #include "acinterp.h"
 #include "acnamesp.h"
@@ -125,6 +125,13 @@
 
 #define _COMPONENT          ACPI_NAMESPACE
         ACPI_MODULE_NAME    ("nseval")
+
+/* Local prototypes */
+
+static void
+AcpiNsExecModuleCode (
+    ACPI_OPERAND_OBJECT     *MethodObj,
+    ACPI_EVALUATE_INFO      *Info);
 
 
 /*******************************************************************************
@@ -159,6 +166,7 @@ AcpiNsEvaluate (
     ACPI_EVALUATE_INFO      *Info)
 {
     ACPI_STATUS             Status;
+    ACPI_NAMESPACE_NODE     *Node;
 
 
     ACPI_FUNCTION_TRACE (NsEvaluate);
@@ -172,6 +180,7 @@ AcpiNsEvaluate (
     /* Initialize the return value to an invalid object */
 
     Info->ReturnObject = NULL;
+    Info->ParamCount = 0;
 
     /*
      * Get the actual namespace node for the target object. Handles these cases:
@@ -200,6 +209,8 @@ AcpiNsEvaluate (
     ACPI_DEBUG_PRINT ((ACPI_DB_NAMES, "%s [%p] Value %p\n", Info->Pathname,
         Info->ResolvedNode, AcpiNsGetAttachedObject (Info->ResolvedNode)));
 
+    Node = Info->ResolvedNode;
+
     /*
      * Two major cases here:
      *
@@ -221,39 +232,21 @@ AcpiNsEvaluate (
             return_ACPI_STATUS (AE_NULL_OBJECT);
         }
 
-        /* Calculate the number of arguments being passed to the method */
+        /* Count the number of arguments being passed to the method */
 
-        Info->ParamCount = 0;
         if (Info->Parameters)
         {
             while (Info->Parameters[Info->ParamCount])
             {
+                if (Info->ParamCount > ACPI_METHOD_MAX_ARG)
+                {
+                    return_ACPI_STATUS (AE_LIMIT);
+                }
                 Info->ParamCount++;
             }
         }
 
-        /* Error if too few arguments were passed in */
-
-        if (Info->ParamCount < Info->ObjDesc->Method.ParamCount)
-        {
-            ACPI_ERROR ((AE_INFO,
-                "Insufficient arguments - method [%4.4s] needs %d, found %d",
-                AcpiUtGetNodeName (Info->ResolvedNode),
-                Info->ObjDesc->Method.ParamCount, Info->ParamCount));
-            return_ACPI_STATUS (AE_MISSING_ARGUMENTS);
-        }
-
-        /* Just a warning if too many arguments */
-
-        else if (Info->ParamCount > Info->ObjDesc->Method.ParamCount)
-        {
-            ACPI_WARNING ((AE_INFO,
-                "Excess arguments - method [%4.4s] needs %d, found %d",
-                AcpiUtGetNodeName (Info->ResolvedNode),
-                Info->ObjDesc->Method.ParamCount, Info->ParamCount));
-        }
-
-        ACPI_DUMP_PATHNAME (Info->ResolvedNode, "Execute Method:",
+        ACPI_DUMP_PATHNAME (Info->ResolvedNode, "ACPI: Execute Method",
             ACPI_LV_INFO, _COMPONENT);
 
         ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
@@ -277,7 +270,28 @@ AcpiNsEvaluate (
     {
         /*
          * 2) Object is not a method, return its current value
+         *
+         * Disallow certain object types. For these, "evaluation" is undefined.
          */
+        switch (Info->ResolvedNode->Type)
+        {
+        case ACPI_TYPE_DEVICE:
+        case ACPI_TYPE_EVENT:
+        case ACPI_TYPE_MUTEX:
+        case ACPI_TYPE_REGION:
+        case ACPI_TYPE_THERMAL:
+        case ACPI_TYPE_LOCAL_SCOPE:
+
+            ACPI_ERROR ((AE_INFO,
+                "[%4.4s] Evaluation of object type [%s] is not supported",
+                Info->ResolvedNode->Name.Ascii,
+                AcpiUtGetTypeName (Info->ResolvedNode->Type)));
+
+            return_ACPI_STATUS (AE_TYPE);
+
+        default:
+            break;
+        }
 
         /*
          * Objects require additional resolution steps (e.g., the Node may be
@@ -319,8 +333,15 @@ AcpiNsEvaluate (
     }
 
     /*
-     * Check if there is a return value that must be dealt with
+     * Check input argument count against the ASL-defined count for a method.
+     * Also check predefined names: argument count and return value against
+     * the ACPI specification. Some incorrect return value types are repaired.
      */
+    (void) AcpiNsCheckPredefinedNames (Node, Info->ParamCount,
+                Status, &Info->ReturnObject);
+
+    /* Check if there is a return value that must be dealt with */
+
     if (Status == AE_CTRL_RETURN_VALUE)
     {
         /* If caller does not want the return value, delete it */
@@ -344,5 +365,147 @@ AcpiNsEvaluate (
      * just return
      */
     return_ACPI_STATUS (Status);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiNsExecModuleCodeList
+ *
+ * PARAMETERS:  None
+ *
+ * RETURN:      None. Exceptions during method execution are ignored, since
+ *              we cannot abort a table load.
+ *
+ * DESCRIPTION: Execute all elements of the global module-level code list.
+ *              Each element is executed as a single control method.
+ *
+ ******************************************************************************/
+
+void
+AcpiNsExecModuleCodeList (
+    void)
+{
+    ACPI_OPERAND_OBJECT     *Prev;
+    ACPI_OPERAND_OBJECT     *Next;
+    ACPI_EVALUATE_INFO      *Info;
+    UINT32                  MethodCount = 0;
+
+
+    ACPI_FUNCTION_TRACE (NsExecModuleCodeList);
+
+
+    /* Exit now if the list is empty */
+
+    Next = AcpiGbl_ModuleCodeList;
+    if (!Next)
+    {
+        return_VOID;
+    }
+
+    /* Allocate the evaluation information block */
+
+    Info = ACPI_ALLOCATE (sizeof (ACPI_EVALUATE_INFO));
+    if (!Info)
+    {
+        return_VOID;
+    }
+
+    /* Walk the list, executing each "method" */
+
+    while (Next)
+    {
+        Prev = Next;
+        Next = Next->Method.Mutex;
+
+        /* Clear the link field and execute the method */
+
+        Prev->Method.Mutex = NULL;
+        AcpiNsExecModuleCode (Prev, Info);
+        MethodCount++;
+
+        /* Delete the (temporary) method object */
+
+        AcpiUtRemoveReference (Prev);
+    }
+
+    ACPI_INFO ((AE_INFO,
+        "Executed %u blocks of module-level executable AML code",
+        MethodCount));
+
+    ACPI_FREE (Info);
+    AcpiGbl_ModuleCodeList = NULL;
+    return_VOID;
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiNsExecModuleCode
+ *
+ * PARAMETERS:  MethodObj           - Object container for the module-level code
+ *              Info                - Info block for method evaluation
+ *
+ * RETURN:      None. Exceptions during method execution are ignored, since
+ *              we cannot abort a table load.
+ *
+ * DESCRIPTION: Execute a control method containing a block of module-level
+ *              executable AML code. The control method is temporarily
+ *              installed to the root node, then evaluated.
+ *
+ ******************************************************************************/
+
+static void
+AcpiNsExecModuleCode (
+    ACPI_OPERAND_OBJECT     *MethodObj,
+    ACPI_EVALUATE_INFO      *Info)
+{
+    ACPI_OPERAND_OBJECT     *RootObj;
+    ACPI_STATUS             Status;
+
+
+    ACPI_FUNCTION_TRACE (NsExecModuleCode);
+
+
+    /* Initialize the evaluation information block */
+
+    ACPI_MEMSET (Info, 0, sizeof (ACPI_EVALUATE_INFO));
+    Info->PrefixNode = AcpiGbl_RootNode;
+
+    /*
+     * Get the currently attached root object. Add a reference, because the
+     * ref count will be decreased when the method object is installed to
+     * the root node.
+     */
+    RootObj = AcpiNsGetAttachedObject (AcpiGbl_RootNode);
+    AcpiUtAddReference (RootObj);
+
+    /* Install the method (module-level code) in the root node */
+
+    Status = AcpiNsAttachObject (AcpiGbl_RootNode, MethodObj,
+                ACPI_TYPE_METHOD);
+    if (ACPI_FAILURE (Status))
+    {
+        goto Exit;
+    }
+
+    /* Execute the root node as a control method */
+
+    Status = AcpiNsEvaluate (Info);
+
+    ACPI_DEBUG_PRINT ((ACPI_DB_INIT, "Executed module-level code at %p\n",
+        MethodObj->Method.AmlStart));
+
+    /* Detach the temporary method object */
+
+    AcpiNsDetachObject (AcpiGbl_RootNode);
+
+    /* Restore the original root object */
+
+    Status = AcpiNsAttachObject (AcpiGbl_RootNode, RootObj, ACPI_TYPE_DEVICE);
+
+Exit:
+    AcpiUtRemoveReference (RootObj);
+    return_VOID;
 }
 

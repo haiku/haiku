@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Name: acnamesp.h - Namespace subcomponent prototypes and defines
- *       $Revision: 1.154 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -147,6 +146,14 @@
 #define ACPI_NS_WALK_UNLOCK         0x01
 #define ACPI_NS_WALK_TEMP_NODES     0x02
 
+/* Object is not a package element */
+
+#define ACPI_NOT_PACKAGE_ELEMENT    ACPI_UINT32_MAX
+
+/* Always emit warning message, not dependent on node flags */
+
+#define ACPI_WARN_ALWAYS            0
+
 
 /*
  * nsinit - Namespace initialization
@@ -188,10 +195,14 @@ AcpiNsWalkNamespace (
 
 ACPI_NAMESPACE_NODE *
 AcpiNsGetNextNode (
-    ACPI_OBJECT_TYPE        Type,
     ACPI_NAMESPACE_NODE     *Parent,
     ACPI_NAMESPACE_NODE     *Child);
 
+ACPI_NAMESPACE_NODE *
+AcpiNsGetNextNodeTyped (
+    ACPI_OBJECT_TYPE        Type,
+    ACPI_NAMESPACE_NODE     *Parent,
+    ACPI_NAMESPACE_NODE     *Child);
 
 /*
  * nsparse - table parsing
@@ -235,6 +246,10 @@ AcpiNsCreateNode (
 
 void
 AcpiNsDeleteNode (
+    ACPI_NAMESPACE_NODE     *Node);
+
+void
+AcpiNsRemoveNode (
     ACPI_NAMESPACE_NODE     *Node);
 
 void
@@ -307,6 +322,32 @@ ACPI_STATUS
 AcpiNsEvaluate (
     ACPI_EVALUATE_INFO      *Info);
 
+void
+AcpiNsExecModuleCodeList (
+    void);
+
+
+/*
+ * nspredef - Support for predefined/reserved names
+ */
+ACPI_STATUS
+AcpiNsCheckPredefinedNames (
+    ACPI_NAMESPACE_NODE     *Node,
+    UINT32                  UserParamCount,
+    ACPI_STATUS             ReturnStatus,
+    ACPI_OPERAND_OBJECT     **ReturnObject);
+
+const ACPI_PREDEFINED_INFO *
+AcpiNsCheckForPredefinedName (
+    ACPI_NAMESPACE_NODE     *Node);
+
+void
+AcpiNsCheckParameterCount (
+    char                        *Pathname,
+    ACPI_NAMESPACE_NODE         *Node,
+    UINT32                      UserParamCount,
+    const ACPI_PREDEFINED_INFO  *Info);
+
 
 /*
  * nsnames - Name and Scope manipulation
@@ -315,7 +356,7 @@ UINT32
 AcpiNsOpensScope (
     ACPI_OBJECT_TYPE        Type);
 
-void
+ACPI_STATUS
 AcpiNsBuildExternalPath (
     ACPI_NAMESPACE_NODE     *Node,
     ACPI_SIZE               Size,
@@ -384,6 +425,22 @@ AcpiNsGetAttachedData (
     ACPI_NAMESPACE_NODE     *Node,
     ACPI_OBJECT_HANDLER     Handler,
     void                    **Data);
+
+
+/*
+ * nsrepair - return object repair for predefined methods/objects
+ */
+ACPI_STATUS
+AcpiNsRepairObject (
+    ACPI_PREDEFINED_DATA    *Data,
+    UINT32                  ExpectedBtypes,
+    UINT32                  PackageIndex,
+    ACPI_OPERAND_OBJECT     **ReturnObjectPtr);
+
+ACPI_STATUS
+AcpiNsRepairPackageList (
+    ACPI_PREDEFINED_DATA    *Data,
+    ACPI_OPERAND_OBJECT     **ObjDescPtr);
 
 
 /*

@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Name: acwin.h - OS specific defines, etc.
- *       $Revision: 1.17 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -136,13 +135,7 @@
 
 /*! [Begin] no source code translation  */
 
-#define ACPI_ASM_MACROS
-#define causeinterrupt(level)
-#define BREAKPOINT3
-#define ACPI_DISABLE_IRQS()
-#define ACPI_ENABLE_IRQS()
 #define ACPI_FLUSH_CPU_CACHE()
-
 
 /*
  * For Acpi applications, we don't want to try to access the global lock

@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Module Name: dsinit - Object initialization namespace walk
- *              $Revision: 1.29 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,6 +116,7 @@
 #define __DSINIT_C__
 
 #include "acpi.h"
+#include "accommon.h"
 #include "acdispat.h"
 #include "acnamesp.h"
 #include "actables.h"
@@ -272,12 +272,23 @@ AcpiDsInitializeObjects (
 
     /* Walk entire namespace from the supplied root */
 
-    Status = AcpiWalkNamespace (ACPI_TYPE_ANY, StartNode, ACPI_UINT32_MAX,
-                    AcpiDsInitOneObject, &Info, NULL);
+    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    /*
+     * We don't use AcpiWalkNamespace since we do not want to acquire
+     * the namespace reader lock.
+     */
+    Status = AcpiNsWalkNamespace (ACPI_TYPE_ANY, StartNode, ACPI_UINT32_MAX,
+                ACPI_NS_WALK_UNLOCK, AcpiDsInitOneObject, &Info, NULL);
     if (ACPI_FAILURE (Status))
     {
         ACPI_EXCEPTION ((AE_INFO, Status, "During WalkNamespace"));
     }
+    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
 
     Status = AcpiGetTableByIndex (TableIndex, &Table);
     if (ACPI_FAILURE (Status))

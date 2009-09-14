@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Name: acwin.h - OS specific defines, etc.
- *       $Revision: 1.30 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -127,7 +126,6 @@
 
 #define ACPI_MACHINE_WIDTH      32
 
-#define isascii                 __isascii
 #define inline                  __inline
 
 #define ACPI_USE_STANDARD_HEADERS
@@ -156,16 +154,9 @@ typedef COMPILER_DEPENDENT_UINT64       u64;
 
 /*! [Begin] no source code translation  */
 
-#define ACPI_ASM_MACROS
 #ifdef ACPI_APPLICATION
-#define BREAKPOINT3
-#define ACPI_DISABLE_IRQS()
-#define ACPI_ENABLE_IRQS()
 #define ACPI_FLUSH_CPU_CACHE()
 #else
-#define BREAKPOINT3             __asm {int 3}
-#define ACPI_DISABLE_IRQS()     __asm {cli}
-#define ACPI_ENABLE_IRQS()      __asm {sti}
 #define ACPI_FLUSH_CPU_CACHE()  __asm {WBINVD}
 #endif
 

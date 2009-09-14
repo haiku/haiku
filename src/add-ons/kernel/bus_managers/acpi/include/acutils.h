@@ -1,7 +1,6 @@
 /******************************************************************************
  *
  * Name: acutils.h -- prototypes for the common (subsystem-wide) procedures
- *       $Revision: 1.204 $
  *
  *****************************************************************************/
 
@@ -9,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -190,7 +189,7 @@ typedef struct acpi_pkg_info
 /*
  * utglobal - Global data structures and procedures
  */
-void
+ACPI_STATUS
 AcpiUtInitGlobals (
     void);
 
@@ -217,6 +216,10 @@ AcpiUtGetNodeName (
 char *
 AcpiUtGetDescriptorName (
     void                    *Object);
+
+const char *
+AcpiUtGetReferenceName (
+    ACPI_OPERAND_OBJECT     *Object);
 
 char *
 AcpiUtGetObjectTypeName (
@@ -352,7 +355,9 @@ extern const UINT8 _acpi_ctype[];
 #define ACPI_IS_PRINT(c)  (_acpi_ctype[(unsigned char)(c)] & (_ACPI_LO | _ACPI_UP | _ACPI_DI | _ACPI_SP | _ACPI_PU))
 #define ACPI_IS_ALPHA(c)  (_acpi_ctype[(unsigned char)(c)] & (_ACPI_LO | _ACPI_UP))
 
-#endif /* ACPI_USE_SYSTEM_CLIBRARY */
+#endif /* !ACPI_USE_SYSTEM_CLIBRARY */
+
+#define ACPI_IS_ASCII(c)  ((c) < 0x80)
 
 
 /*
@@ -503,58 +508,6 @@ AcpiUtReportWarning (
     char                    *ModuleName,
     UINT32                  LineNumber);
 
-/* Error and message reporting interfaces */
-
-void ACPI_INTERNAL_VAR_XFACE
-AcpiUtDebugPrint (
-    UINT32                  RequestedDebugLevel,
-    UINT32                  LineNumber,
-    const char              *FunctionName,
-    const char              *ModuleName,
-    UINT32                  ComponentId,
-    const char              *Format,
-    ...) ACPI_PRINTF_LIKE(6);
-
-void ACPI_INTERNAL_VAR_XFACE
-AcpiUtDebugPrintRaw (
-    UINT32                  RequestedDebugLevel,
-    UINT32                  LineNumber,
-    const char              *FunctionName,
-    const char              *ModuleName,
-    UINT32                  ComponentId,
-    const char              *Format,
-    ...) ACPI_PRINTF_LIKE(6);
-
-void ACPI_INTERNAL_VAR_XFACE
-AcpiUtError (
-    const char              *ModuleName,
-    UINT32                  LineNumber,
-    const char              *Format,
-    ...) ACPI_PRINTF_LIKE(3);
-
-void  ACPI_INTERNAL_VAR_XFACE
-AcpiUtException (
-    const char              *ModuleName,
-    UINT32                  LineNumber,
-    ACPI_STATUS             Status,
-    const char              *Format,
-    ...) ACPI_PRINTF_LIKE(4);
-
-void ACPI_INTERNAL_VAR_XFACE
-AcpiUtWarning (
-    const char              *ModuleName,
-    UINT32                  LineNumber,
-    const char              *Format,
-    ...) ACPI_PRINTF_LIKE(3);
-
-void ACPI_INTERNAL_VAR_XFACE
-AcpiUtInfo (
-    const char              *ModuleName,
-    UINT32                  LineNumber,
-    const char              *Format,
-    ...) ACPI_PRINTF_LIKE(3);
-
-
 /*
  * utdelete - Object deletion and reference counts
  */
@@ -597,17 +550,7 @@ ACPI_STATUS
 AcpiUtEvaluateNumericObject (
     char                    *ObjectName,
     ACPI_NAMESPACE_NODE     *DeviceNode,
-    ACPI_INTEGER            *Address);
-
-ACPI_STATUS
-AcpiUtExecute_HID (
-    ACPI_NAMESPACE_NODE     *DeviceNode,
-    ACPI_DEVICE_ID          *Hid);
-
-ACPI_STATUS
-AcpiUtExecute_CID (
-    ACPI_NAMESPACE_NODE     *DeviceNode,
-    ACPI_COMPATIBLE_ID_LIST **ReturnCidList);
+    ACPI_INTEGER            *Value);
 
 ACPI_STATUS
 AcpiUtExecute_STA (
@@ -615,14 +558,58 @@ AcpiUtExecute_STA (
     UINT32                  *StatusFlags);
 
 ACPI_STATUS
-AcpiUtExecute_UID (
+AcpiUtExecutePowerMethods (
     ACPI_NAMESPACE_NODE     *DeviceNode,
-    ACPI_DEVICE_ID          *Uid);
+    const char              **MethodNames,
+    UINT8                   MethodCount,
+    UINT8                   *OutValues);
+
+
+/*
+ * utids - device ID support
+ */
+ACPI_STATUS
+AcpiUtExecute_HID (
+    ACPI_NAMESPACE_NODE     *DeviceNode,
+    ACPI_DEVICE_ID          **ReturnId);
 
 ACPI_STATUS
-AcpiUtExecute_Sxds (
+AcpiUtExecute_UID (
     ACPI_NAMESPACE_NODE     *DeviceNode,
-    UINT8                   *Highest);
+    ACPI_DEVICE_ID          **ReturnId);
+
+ACPI_STATUS
+AcpiUtExecute_CID (
+    ACPI_NAMESPACE_NODE     *DeviceNode,
+    ACPI_DEVICE_ID_LIST     **ReturnCidList);
+
+
+/*
+ * utlock - reader/writer locks
+ */
+ACPI_STATUS
+AcpiUtCreateRwLock (
+    ACPI_RW_LOCK            *Lock);
+
+void
+AcpiUtDeleteRwLock (
+    ACPI_RW_LOCK            *Lock);
+
+ACPI_STATUS
+AcpiUtAcquireReadLock (
+    ACPI_RW_LOCK            *Lock);
+
+ACPI_STATUS
+AcpiUtReleaseReadLock (
+    ACPI_RW_LOCK            *Lock);
+
+ACPI_STATUS
+AcpiUtAcquireWriteLock (
+    ACPI_RW_LOCK            *Lock);
+
+void
+AcpiUtReleaseWriteLock (
+    ACPI_RW_LOCK            *Lock);
 
 
 /*
@@ -749,6 +736,10 @@ AcpiUtValidateException (
     ACPI_STATUS             Status);
 
 BOOLEAN
+AcpiUtIsPciRootBridge (
+    char                    *Id);
+
+BOOLEAN
 AcpiUtIsAmlTable (
     ACPI_TABLE_HEADER       *Table);
 
@@ -794,6 +785,15 @@ AcpiUtStrtoul64 (
     char                    *String,
     UINT32                  Base,
     ACPI_INTEGER            *RetInteger);
+
+void ACPI_INTERNAL_VAR_XFACE
+AcpiUtPredefinedWarning (
+    const char              *ModuleName,
+    UINT32                  LineNumber,
+    char                    *Pathname,
+    UINT8                   NodeFlags,
+    const char              *Format,
+    ...);
 
 /* Values for Base above (16=Hex, 10=Decimal) */
 

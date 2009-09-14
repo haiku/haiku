@@ -3,7 +3,6 @@
  * Name: amlcode.h - Definitions for AML, as included in "definition blocks"
  *                   Declarations and definitions contained herein are derived
  *                   directly from the ACPI specification.
- *       $Revision: 1.87 $
  *
  *****************************************************************************/
 
@@ -11,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2009, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -486,6 +485,7 @@ typedef enum
     REGION_SMBUS,
     REGION_CMOS,
     REGION_PCI_BAR,
+    REGION_IPMI,
     REGION_DATA_TABLE,              /* Internal use only */
     REGION_FIXED_HW                 = 0x7F
 
@@ -583,7 +583,7 @@ typedef enum
 
 #define AML_METHOD_ARG_COUNT        0x07
 #define AML_METHOD_SERIALIZED       0x08
-#define AML_METHOD_SYNCH_LEVEL      0xF0
+#define AML_METHOD_SYNC_LEVEL       0xF0
 
 /* METHOD_FLAGS_ARG_COUNT is not used internally, define additional flags */
 
