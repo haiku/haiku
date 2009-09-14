@@ -107,23 +107,21 @@ int32 MidiPortProducer::GetData()
 			return B_ERROR;
 		}
 
-		if (haveSysEx)  // System Exclusive
-		{
-			if (next < 0x80)  // data byte
-			{
+		if (haveSysEx) { // System Exclusive mode
+			if (next < 0x80) { // System Exclusive data byte
 				sysexBuf[sysexSize++] = next;
-				if (sysexSize == sysexAlloc)
-				{
+				if (sysexSize == sysexAlloc) {
 					sysexAlloc *= 2;
 					sysexBuf = (uint8*) realloc(sysexBuf, sysexAlloc);
 				}
-				continue;
-			}
-			else if (next < 0xF8)  // end of sysex
-			{
+			} else if (next == B_SYS_EX_END) {
 				SpraySystemExclusive(sysexBuf, sysexSize);
 				haveSysEx = false;
+			} else if ((next & 0xF8) == 0xF8) {
+				// System Realtime interleaved in System Exclusive byte(s)
+				SpraySystemRealTime(next);
 			}
+			continue;
 		}
 		
 		if ((next & 0xF8) == 0xF8)  // System Realtime
@@ -140,8 +138,7 @@ int32 MidiPortProducer::GetData()
 				case B_SYS_EX_START:
 					sysexAlloc = 4096;
 					sysexBuf = (uint8*) malloc(sysexAlloc);
-					sysexBuf[0] = next;
-					sysexSize = 1;
+					sysexSize = 0;
 					haveSysEx = true;
 					break;
 
@@ -158,7 +155,7 @@ int32 MidiPortProducer::GetData()
 					break;
 			
 				case B_TUNE_REQUEST:
-				case B_SYS_EX_END:
+				case B_SYS_EX_END:	// Unpaired with B_SYS_EX_START, but pass it anyway...
 					SpraySystemCommon(next, 0, 0);
 					break;
 			}			
