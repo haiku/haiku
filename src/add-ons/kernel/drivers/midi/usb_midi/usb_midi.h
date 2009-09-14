@@ -2,8 +2,8 @@
  * midi usb driver
  * usb_midi.h
  *
- * Copyright 2009 Haiku Inc.  All rights reserved.
- * Distributed under tthe terms of the MIT Licence.
+ * Copyright 2006-2009 Haiku Inc.  All rights reserved.
+ * Distributed under the terms of the MIT Licence.
  *
  * Authors:
  *		Jérôme Duval
