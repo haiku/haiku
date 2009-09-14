@@ -271,6 +271,13 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 
 Device::~Device()
 {
+	delete fDefaultPipe;
+
+	if (fConfigurations == NULL) {
+		// we didn't get far in device setup, so everything below is unneeded
+		return;
+	}
+
 	// Destroy open endpoints. Do not send a device request to unconfigure
 	// though, since we may be deleted because the device was unplugged
 	// already.
@@ -305,7 +312,6 @@ Device::~Device()
 	}
 
 	free(fConfigurations);
-	delete fDefaultPipe;
 }
 
 
