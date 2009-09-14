@@ -224,6 +224,7 @@ struct acpi_module_info {
 	status_t	(*prepare_sleep_state)(uint8 state, void (*wakeFunc)(void),
 					size_t size);
 	status_t	(*enter_sleep_state)(uint8 state);
+	status_t	(*reboot)(void);
 };
 
 

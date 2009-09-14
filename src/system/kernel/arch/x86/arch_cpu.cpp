@@ -103,7 +103,7 @@ x86_optimized_functions gOptimizedFunctions = {
 
 
 static status_t
-acpi_shutdown(void)
+acpi_shutdown(bool rebootSystem)
 {
 	if (debug_debugger_running())
 		return B_ERROR;
@@ -112,11 +112,16 @@ acpi_shutdown(void)
 	if (get_module(B_ACPI_MODULE_NAME, (module_info**)&acpi) != B_OK)
 		return B_NOT_SUPPORTED;
 
-	status_t status = acpi->prepare_sleep_state(ACPI_POWER_STATE_OFF, NULL, 0);
-	if (status == B_OK) {
-		//cpu_status state = disable_interrupts();
-		status = acpi->enter_sleep_state(ACPI_POWER_STATE_OFF);
-		//restore_interrupts(state);
+	status_t status;
+	if (rebootSystem) {
+		status = acpi->reboot();
+	} else {
+		status = acpi->prepare_sleep_state(ACPI_POWER_STATE_OFF, NULL, 0);
+		if (status == B_OK) {
+			//cpu_status state = disable_interrupts();
+			status = acpi->enter_sleep_state(ACPI_POWER_STATE_OFF);
+			//restore_interrupts(state);
+		}
 	}
 
 	put_module(B_ACPI_MODULE_NAME);
@@ -822,14 +827,12 @@ error:
 status_t
 arch_cpu_shutdown(bool rebootSystem)
 {
-	if (!rebootSystem) {
-		status_t status = acpi_shutdown();
-		if (status != B_OK)
-			status = apm_shutdown();
-
-		return status;
-	}
-
+	if (acpi_shutdown(rebootSystem) == B_OK)
+		return B_OK;
+	
+	if (!rebootSystem)
+		return apm_shutdown();
+	
 	cpu_status state = disable_interrupts();
 
 	// try to reset the system using the keyboard controller

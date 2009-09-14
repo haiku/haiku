@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Vincent Duvert, vincent.duvert@free.fr
  * Copyright 2009, Clemens Zeidler, haiku@clemens-zeidler.de
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2006, Bryan Varner. All rights reserved.
@@ -533,6 +534,29 @@ enter_sleep_state(uint8 state)
 }
 
 
+static status_t
+reboot(void)
+{
+	ACPI_STATUS status;
+
+	TRACE("reboot\n");
+
+	if (AcpiGbl_FADT.Flags & ACPI_FADT_RESET_REGISTER == 0)
+		return B_UNSUPPORTED;
+
+	status = AcpiHwLowLevelWrite(AcpiGbl_FADT.ResetRegister.BitWidth,
+		AcpiGbl_FADT.ResetValue, &AcpiGbl_FADT.ResetRegister);
+	
+	if (status != AE_OK) {
+		ERROR("Reset failed, status = %d\n", status);
+		return B_ERROR;
+	}
+	
+	snooze(1000000);
+	ERROR("Reset failed, timeout\n");	
+	return B_ERROR;
+}
+
 struct acpi_module_info gACPIModule = {
 	{
 		B_ACPI_MODULE_NAME,
@@ -566,5 +590,6 @@ struct acpi_module_info gACPIModule = {
 	evaluate_object,
 	evaluate_method,
 	prepare_sleep_state,
-	enter_sleep_state
+	enter_sleep_state,
+	reboot
 };
