@@ -7,6 +7,10 @@
 #include "smp.h"
 #include "video.h"
 
+// TODO: Move these away!
+#include <arch/x86/arch_apic.h>
+#include <boot/stage2.h>
+
 #include <boot/menu.h>
 #include <boot/platform/generic/text_menu.h>
 #include <safemode.h>
@@ -48,17 +52,22 @@ platform_add_menus(Menu *menu)
 				"Interface hardware support, overriding the ACPI setting "
 				"in the kernel settings file.");
 
-			menu->AddItem(item = new(nothrow) MenuItem("Disable IO-APIC"));
-			item->SetType(MENU_ITEM_MARKABLE);
-			item->SetData(B_SAFEMODE_DISABLE_IOAPIC);
-			item->SetHelpText("Disables using the IO APIC for interrupt handling, "
-				"forcing instead the use of the PIC.");
-
-			menu->AddItem(item = new(nothrow) MenuItem("Disable APIC Timers"));
-			item->SetType(MENU_ITEM_MARKABLE);
-			item->SetData(B_SAFEMODE_DISABLE_APIC);
-			item->SetHelpText("Disables using the APIC timers for timekeeping");
-			
+#if 0
+			// TODO: IOAPIC isn't yet used anywhere
+			if (gKernelArgs.arch_args.ioapic != NULL) {
+				menu->AddItem(item = new(nothrow) MenuItem("Disable IO-APIC"));
+				item->SetType(MENU_ITEM_MARKABLE);
+				item->SetData(B_SAFEMODE_DISABLE_IOAPIC);
+				item->SetHelpText("Disables using the IO APIC for interrupt handling, "
+					"forcing instead the use of the PIC.");
+			}
+#endif		
+			if (gKernelArgs.arch_args.apic != NULL) {
+				menu->AddItem(item = new(nothrow) MenuItem("Disable APIC Timers"));
+				item->SetType(MENU_ITEM_MARKABLE);
+				item->SetData(B_SAFEMODE_DISABLE_APIC);
+				item->SetHelpText("Disables using the LOCAL APIC for timekeeping.");
+			}
 			break;
 		default:
 			break;
