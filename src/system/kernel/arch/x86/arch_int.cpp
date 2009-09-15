@@ -560,6 +560,18 @@ ioapic_init(kernel_args *args)
 		return;
 	}
 
+	bool disableAPIC = false;	
+	void *handle = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+	if (handle != NULL) {
+		disableAPIC = get_driver_boolean_parameter(handle, B_SAFEMODE_DISABLE_APIC,
+			disableAPIC, disableAPIC);
+		unload_driver_settings(handle);
+	}
+	
+	if (disableAPIC) {
+		args->arch_args.apic = NULL;
+		return;
+	}
 	// always map the local apic as it can be used for timers even if we
 	// don't end up using the io apic
 	sLocalAPIC = args->arch_args.apic;
@@ -569,7 +581,7 @@ ioapic_init(kernel_args *args)
 		panic("mapping the local apic failed");
 		return;
 	}
-
+	
 	if (args->arch_args.ioapic == NULL) {
 		dprintf("no ioapic available, not using ioapics for interrupt routing\n");
 		return;
