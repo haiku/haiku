@@ -7,6 +7,6 @@
 
 #include <SupportDefs.h>
 
-status_t apic_smp_init_timer(struct kernel_args *args, int32 cpu);
+status_t apic_init_timer(struct kernel_args *args, int32 cpu);
 
 #endif /* _KERNEL_ARCH_x86_TIMERS_APIC_H */

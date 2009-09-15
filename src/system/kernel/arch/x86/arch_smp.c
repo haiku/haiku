@@ -101,7 +101,7 @@ setup_apic(kernel_args *args, int32 cpu)
 	}
 #endif
 
-	apic_smp_init_timer(args, cpu);
+	apic_init_timer(args, cpu);
 
 	/* setup error vector to 0xfe */
 	config = (apic_read(APIC_LVT_ERROR) & 0xffffff00) | 0xfe;

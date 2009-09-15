@@ -145,7 +145,7 @@ apic_init(struct kernel_args *args)
 
 
 status_t
-apic_smp_init_timer(struct kernel_args *args, int32 cpu)
+apic_init_timer(struct kernel_args *args, int32 cpu)
 {
 	uint32 config;
 
