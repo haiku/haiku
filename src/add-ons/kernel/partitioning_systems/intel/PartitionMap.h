@@ -52,14 +52,6 @@ is_extended_type(uint8 type)
 }
 
 
-// fill_buffer
-static inline void
-fill_buffer(char* buffer, uint32 length, char ch)
-{
-	for (uint32 i = 0; i < length; i++)
-		buffer[i] = ch;
-}
-
 void get_partition_type_string(uint8 type, char* buffer);
 
 // chs
@@ -86,10 +78,14 @@ struct partition_descriptor {
 
 // partition_table
 struct partition_table {
-	char					pad1[446];
+	char					code_area[446];
 	partition_descriptor	table[4];
 	uint16					signature;
-	void clear_code_area()		{ fill_buffer(pad1, 446, '\0'); }
+
+	void clear_code_area()
+	{
+		memset(code_area, 0, sizeof(code_area));
+	}
 } _PACKED;
 
 static const uint16 kPartitionTableSectorSignature = 0xaa55;
