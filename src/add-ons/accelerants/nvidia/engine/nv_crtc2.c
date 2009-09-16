@@ -1,6 +1,6 @@
 /* second CTRC functionality for GeForce cards */
 /* Author:
-   Rudolf Cornelissen 11/2002-6/2009
+   Rudolf Cornelissen 11/2002-9/2009
 */
 
 #define MODULE_BIT 0x00020000
@@ -232,10 +232,24 @@ status_t nv_crtc2_set_timing(display_mode target)
 				target.timing.h_total -= 32;
 		}
 
+		/* assure sync pulse is at the correct timing position */
 		if (target.timing.h_sync_start == target.timing.h_display)
 			target.timing.h_sync_start += 8;
 		if (target.timing.h_sync_end == target.timing.h_total)
 			target.timing.h_sync_end -= 8;
+		/* assure we (still) have a sync pulse */
+		if (target.timing.h_sync_start == target.timing.h_sync_end) {
+			if (target.timing.h_sync_end < (target.timing.h_total - 8)) {
+				target.timing.h_sync_end += 8;
+			} else {
+				if (target.timing.h_sync_start > (target.timing.h_display + 8)) {
+					target.timing.h_sync_start -= 8;
+				} else {
+					LOG(2,("CRTC2: tuning modeline, not enough room for Hsync pulse, forcing it anyway..\n"));
+					target.timing.h_sync_start -= 8;
+				}
+			}
+		}
 
 		/* vertical timing */
 		target.timing.v_sync_start =
@@ -250,10 +264,24 @@ status_t nv_crtc2_set_timing(display_mode target)
 			((uint16)((si->ps.p2_timing.v_total / ((float)si->ps.p2_timing.v_display)) *
 			target.timing.v_display)) - 1;
 
+		/* assure sync pulse is at the correct timing position */
 		if (target.timing.v_sync_start == target.timing.v_display)
 			target.timing.v_sync_start += 1;
 		if (target.timing.v_sync_end == target.timing.v_total)
 			target.timing.v_sync_end -= 1;
+		/* assure we (still) have a sync pulse */
+		if (target.timing.v_sync_start == target.timing.v_sync_end) {
+			if (target.timing.v_sync_end < (target.timing.v_total - 1)) {
+				target.timing.v_sync_end += 1;
+			} else {
+				if (target.timing.v_sync_start > (target.timing.v_display + 1)) {
+					target.timing.v_sync_start -= 1;
+				} else {
+					LOG(2,("CRTC2: tuning modeline, not enough room for Vsync pulse, forcing it anyway..\n"));
+					target.timing.v_sync_start -= 1;
+				}
+			}
+		}
 
 		/* disable GPU scaling testmode so automatic scaling will be done */
 		DAC2W(FP_DEBUG1, 0);
