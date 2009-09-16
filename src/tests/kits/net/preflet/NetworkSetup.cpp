@@ -38,6 +38,6 @@ Application::Application()
 void
 Application::ReadyToRun(void)
 {
-	NetworkSetupWindow* window = new NetworkSetupWindow(SOFTWARE_NAME);
+	NetworkSetupWindow* window = new NetworkSetupWindow(NAME);
 	window->Show();
 }
