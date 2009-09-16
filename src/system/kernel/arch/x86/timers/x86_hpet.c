@@ -145,7 +145,7 @@ hpet_init(struct kernel_args *args)
 
 	/* There is no hpet legacy support, so error out on init */
 	if (!HPET_IS_LEGACY_CAPABLE(sHPETRegs)) {
-		dprintf("hpet_init: HPET does support legacy mode. Skipping.\n");
+		dprintf("hpet_init: HPET doesn' support legacy mode. Skipping.\n");
 		return B_ERROR;
 	}
 
