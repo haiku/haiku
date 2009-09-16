@@ -4,22 +4,26 @@
 
 
 NetworkSetupProfile::NetworkSetupProfile()
+	:
+	fRoot(new BEntry()),
+	fPath(new BPath())
 {
-	root = new BEntry();
-	path = new BPath();
 }
 
-NetworkSetupProfile::NetworkSetupProfile(const char *path)
+
+NetworkSetupProfile::NetworkSetupProfile(const char* path)
 {
 	SetTo(path);
 }
 
-NetworkSetupProfile::NetworkSetupProfile(const entry_ref *ref)
+
+NetworkSetupProfile::NetworkSetupProfile(const entry_ref* ref)
 {
 	SetTo(ref);
 }
 
-NetworkSetupProfile::NetworkSetupProfile(BEntry *entry)
+
+NetworkSetupProfile::NetworkSetupProfile(BEntry* entry)
 {
 	SetTo(entry);
 }
@@ -27,92 +31,100 @@ NetworkSetupProfile::NetworkSetupProfile(BEntry *entry)
 
 NetworkSetupProfile::~NetworkSetupProfile()
 {
-	delete root;
+	delete fRoot;
 }
 
 
-status_t NetworkSetupProfile::SetTo(const char *path)
+status_t
+NetworkSetupProfile::SetTo(const char* path)
 {
-	BEntry *entry = new BEntry(path);
-	SetTo(entry);
+	SetTo(new BEntry(path));
 	return B_OK;
 }
 
 
-status_t NetworkSetupProfile::SetTo(const entry_ref *ref)
+status_t
+NetworkSetupProfile::SetTo(const entry_ref* ref)
 {
-	BEntry *entry = new BEntry(ref);
-	SetTo(entry);
+	SetTo(new BEntry(ref));
 	return B_OK;
 }
 
 
-status_t NetworkSetupProfile::SetTo(BEntry *entry)
+status_t
+NetworkSetupProfile::SetTo(BEntry *entry)
 {
-	delete root;
-	delete path;
-	root = entry;
+	delete fRoot;
+	delete fPath;
+	fRoot = entry;
 	return B_OK;
 }
 
 
-const char * NetworkSetupProfile::Name()
+const char*
+NetworkSetupProfile::Name()
 {
-	if (!name) {
-		root->GetPath(path);
-		name = path->Leaf();
-	};
+	if (!fName) {
+		fRoot->GetPath(fPath);
+		fName = fPath->Leaf();
+	}
 
-	return name;
+	return fName;
 }
 
 
-status_t NetworkSetupProfile::SetName(const char *name)
+status_t 
+NetworkSetupProfile::SetName(const char* name)
 {
 	return B_OK;
 }
 
 
-bool NetworkSetupProfile::Exists()
+bool
+NetworkSetupProfile::Exists()
 {
-	return root->Exists();
+	return fRoot->Exists();
 }
 
 
-status_t NetworkSetupProfile::Delete()
+status_t
+NetworkSetupProfile::Delete()
 {
 	return B_ERROR;
 }
 
 
-bool NetworkSetupProfile::IsDefault()
+bool
+NetworkSetupProfile::IsDefault()
 {
-	return is_default;
+	return fIsDefault;
 }
 
 
-bool NetworkSetupProfile::IsCurrent()
+bool
+NetworkSetupProfile::IsCurrent()
 {
-	return is_current;
+	return fIsCurrent;
 }
 
 
-status_t NetworkSetupProfile::MakeCurrent()
+status_t
+NetworkSetupProfile::MakeCurrent()
 {
 	return B_ERROR;
 }
+
 
 // #pragma mark -
-
-
-NetworkSetupProfile * NetworkSetupProfile::Default()
+NetworkSetupProfile*
+NetworkSetupProfile::Default()
 {
 	return NULL;
 }
 
 
-NetworkSetupProfile * NetworkSetupProfile::Current()
+NetworkSetupProfile*
+NetworkSetupProfile::Current()
 {
 	return NULL;
 }
-
