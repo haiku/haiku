@@ -7,7 +7,7 @@
 #include <sys/bus.h>
 
 
-HAIKU_FBSD_DRIVER_GLUE(atl1, age, pci);
+HAIKU_FBSD_DRIVER_GLUE(attansic_l1, age, pci);
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_SWI_TASKQUEUE);
 
 
