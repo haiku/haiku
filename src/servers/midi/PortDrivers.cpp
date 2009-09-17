@@ -1,85 +1,79 @@
 /*
- * Copyright (c) 2003-2004 Matthijs Hollemans
- * Copyright (c) 2004 Christian Packmann
- * Copyright (c) 2003 Jerome Leveque
+ * Copyright 2003-2009, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * Authors:
+ *		Matthijs Hollemans
+ *		Christian Packmann
+ *		Jerome Leveque
+ *		Philippe Houdoin
  */
+
+#include "PortDrivers.h"
+
+#include <String.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "PortDrivers.h"
 
-//------------------------------------------------------------------------------
-
-MidiPortConsumer::MidiPortConsumer(int fd_, const char* name = NULL)
+MidiPortConsumer::MidiPortConsumer(int fd, const char* name)
 	: BMidiLocalConsumer(name)
 {
-	fd = fd_;
+	fFileDescriptor = fd;
 }
 
-//------------------------------------------------------------------------------
 
-void MidiPortConsumer::Data(
-	uchar* data, size_t length, bool atomic, bigtime_t time)
+void 
+MidiPortConsumer::Data(uchar* data, size_t length, 
+	bool atomic, bigtime_t time)
 {
 	snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 
-	if (write(fd, data, length) == -1)
-	{
+	if (write(fFileDescriptor, data, length) == -1) {
 		perror("Error sending data to driver");
 	}
 }
 
-//------------------------------------------------------------------------------
 
-MidiPortProducer::MidiPortProducer(int fd_, const char *name = NULL)
+// #pragma mark -
+
+
+MidiPortProducer::MidiPortProducer(int fd, const char *name)
 	: BMidiLocalProducer(name)
 {
-	fd = fd_;
-	keepRunning = true;
+	fFileDescriptor = fd;
+	fKeepRunning = true;
 
-	thread_id thread = spawn_thread(
-		SpawnThread, "MidiPortProducer", B_URGENT_PRIORITY, this);
+	BString tmp = name;
+	tmp << " reader";
+	
+	fReaderThread = spawn_thread(
+		_ReaderThread, tmp.String(), B_URGENT_PRIORITY, this);
 
-	resume_thread(thread);
+	resume_thread(fReaderThread);
 }
 
-//------------------------------------------------------------------------------
 
 MidiPortProducer::~MidiPortProducer()
 {
-	keepRunning = false;
+	fKeepRunning = false;
+	
+	status_t dummy;
+	wait_for_thread(fReaderThread, &dummy);
 }
 
-//------------------------------------------------------------------------------
 
-int32 MidiPortProducer::SpawnThread(void* data)
+int32 
+MidiPortProducer::_ReaderThread(void* data)
 {
 	return ((MidiPortProducer*) data)->GetData();
 }
 
-//------------------------------------------------------------------------------
 
-int32 MidiPortProducer::GetData()
+int32 
+MidiPortProducer::GetData()
 {
 	uint8 msgBuf[3];
 	uint8* sysexBuf = NULL;
@@ -95,9 +89,9 @@ int32 MidiPortProducer::GetData()
 
 	uint8 next = 0;
 
-	while (keepRunning)
+	while (fKeepRunning)
 	{
-		if (read(fd, &next, 1) != 1)
+		if (read(fFileDescriptor, &next, 1) != 1)
 		{
 			perror("Error reading data from driver");
 			if (haveSysEx)
@@ -114,14 +108,20 @@ int32 MidiPortProducer::GetData()
 					sysexAlloc *= 2;
 					sysexBuf = (uint8*) realloc(sysexBuf, sysexAlloc);
 				}
-			} else if (next == B_SYS_EX_END) {
-				SpraySystemExclusive(sysexBuf, sysexSize);
-				haveSysEx = false;
+				continue;
 			} else if ((next & 0xF8) == 0xF8) {
 				// System Realtime interleaved in System Exclusive byte(s)
 				SpraySystemRealTime(next);
+				continue;
+			} else {  // whatever byte, this one ends the running SysEx sequence
+				SpraySystemExclusive(sysexBuf, sysexSize);
+				haveSysEx = false;
+				if (next == B_SYS_EX_END)
+					// swallow SysEx end byte
+					continue;	
+				// any other byte, while ending the SysEx sequence, 
+				// should be handled, not dropped
 			}
-			continue;
 		}
 		
 		if ((next & 0xF8) == 0xF8)  // System Realtime

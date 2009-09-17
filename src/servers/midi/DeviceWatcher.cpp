@@ -10,7 +10,6 @@
 
 #include "DeviceWatcher.h"
 #include "PortDrivers.h"
-#include "debug.h"
 
 #include <Application.h>
 #include <Bitmap.h>
@@ -20,15 +19,36 @@
 #include <Path.h>
 #include <Resources.h>
 #include <Roster.h>
-
 #include <PathMonitor.h>
 
+#include <new>
+using std::nothrow;
+
 using namespace BPrivate;
+using BPrivate::HashMap;
+using BPrivate::HashString;
+
 
 const char *kDevicesRoot = "/dev/midi";
 
+
+class DeviceEndpoints {
+public:
+	DeviceEndpoints(int fd, MidiPortConsumer* consumer, MidiPortProducer* producer)
+		:  fFD(fd), fConsumer(consumer), fProducer(producer)
+	{
+	}
+		
+	int 				fFD;
+	MidiPortConsumer*		fConsumer;
+	MidiPortProducer*		fProducer;
+};
+
+
+
 DeviceWatcher::DeviceWatcher()
-	: BLooper("MIDI devices watcher")
+	: BLooper("MIDI devices watcher"),
+	fDeviceEndpointsMap()
 {
 	// TODO: add support for vector icons
 	
@@ -138,23 +158,29 @@ DeviceWatcher::_ScanDevices(const char* path)
 void
 DeviceWatcher::_AddDevice(const char* path)
 {
+	if ( fDeviceEndpointsMap.ContainsKey(path) )
+		// Already known
+		return;
+		
 	int fd = open(path, O_RDWR | O_EXCL);
 	if (fd < 0)
 		return;
 		
 	// printf("DeviceWatcher::_AddDevice(\"%s\");\n", path);
-		
-	BMidiEndpoint* endpoint;
 
-	endpoint = new MidiPortConsumer(fd, path);
-	_SetIcons(endpoint);
-	printf("Register %s MidiPortConsumer\n", endpoint->Name());
-	endpoint->Register();
+	
+	MidiPortConsumer* consumer = new MidiPortConsumer(fd, path);
+	_SetIcons(consumer);
+	// printf("Register %s MidiPortConsumer\n", consumer->Name());
+	consumer->Register();
 
-	endpoint = new MidiPortProducer(fd, path);
-	_SetIcons(endpoint);
-	printf("Register %s MidiPortProducer\n", endpoint->Name());
-	endpoint->Register();
+	MidiPortProducer* producer = new MidiPortProducer(fd, path);
+	_SetIcons(producer);
+	// printf("Register %s MidiPortProducer\n", producer->Name());
+	producer->Register();
+
+	DeviceEndpoints * deviceEndpoints = new DeviceEndpoints(fd, consumer, producer);
+	fDeviceEndpointsMap.Put(path, deviceEndpoints);	
 }
 
 
@@ -163,7 +189,19 @@ DeviceWatcher::_RemoveDevice(const char* path)
 {
 	// printf("DeviceWatcher::_RemoveDevice(\"%s\");\n", path);
 		
-	// TODO: handle device removing
+	DeviceEndpoints * deviceEndpoints = fDeviceEndpointsMap.Get(path);
+	if (!deviceEndpoints)
+		return;
+		
+	close(deviceEndpoints->fFD);
+
+	deviceEndpoints->fConsumer->Unregister();
+	deviceEndpoints->fProducer->Unregister();
+
+	delete deviceEndpoints->fConsumer;
+	delete deviceEndpoints->fProducer;
+
+	fDeviceEndpointsMap.Remove(path);
 }
 
 

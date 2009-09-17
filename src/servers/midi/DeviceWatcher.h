@@ -12,9 +12,12 @@
 
 #include <Looper.h>
 
+#include "HashMap.h"
+#include "HashString.h"
 
 class BBitmap;
 class BMidiEndpoint;
+class DeviceEndpoints;
 
 class DeviceWatcher : public BLooper {
 public:
@@ -31,6 +34,9 @@ private:
 	void _AddDevice(const char* path);
 	void _RemoveDevice(const char* path);
 	void _SetIcons(BMidiEndpoint* endp);
+
+	typedef HashMap<HashString, DeviceEndpoints*> DeviceEndpointsMap;
+	DeviceEndpointsMap		fDeviceEndpointsMap;
 
 	BBitmap* fLargeIcon;
 	BBitmap* fMiniIcon;
