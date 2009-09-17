@@ -24,7 +24,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD
+ * $FreeBSD: src/sys/dev/age/if_agereg.h,v 1.1 2008/05/19 01:39:59 yongari Exp $
  */
 
 #ifndef	_IF_AGEREG_H
@@ -91,6 +91,9 @@
 #define	AGE_SPI_OP_READ			0x217	/* 8bits */
 
 #define	AGE_TWSI_CTRL			0x218
+#define	TWSI_CTRL_SW_LD_START		0x00000800
+#define	TWSI_CTRL_HW_LD_START		0x00001000
+#define	TWSI_CTRL_LD_EXIST		0x00400000
 
 #define AGE_DEV_MISC_CTRL		0x21C
 
@@ -482,10 +485,6 @@
 #define	AGE_INTRS						\
 	(INTR_SMB | INTR_DMA_RD_TO_RST | INTR_DMA_WR_TO_RST |	\
 	INTR_CMB_TX | INTR_CMB_RX)
-
-#define	AGE_RD_RRD_IDX			0x1800
-
-#define AGE_TPD_IDX			0x1804
 
 /* Statistics counters collected by the MAC. */
 struct smb {
