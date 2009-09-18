@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 - 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef LAUNCH_BUTTON_H
@@ -27,7 +27,6 @@ public:
 
 	// IconButton interface
 	virtual	void				AttachedToWindow();
-	virtual	void				DetachedFromWindow();
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				MouseDown(BPoint where);
@@ -59,9 +58,11 @@ public:
 	static	bool				IgnoreDoubleClick()
 									{ return sIgnoreDoubleClick; }
 
- private:
+private:
 			void				_UpdateToolTip();
 			void				_UpdateIcon(const entry_ref* ref);
+
+			void				_NotifySettingsChanged();
 
 			entry_ref*			fRef;
 			char*				fAppSig;

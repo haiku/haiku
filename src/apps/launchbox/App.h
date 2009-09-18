@@ -1,9 +1,6 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef APP_H
 #define APP_H
@@ -14,7 +11,7 @@
 class MainWindow;
 
 class App : public BApplication {
- public:
+public:
 								App();
 	virtual						~App();
 
@@ -22,8 +19,12 @@ class App : public BApplication {
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				AboutRequested();
+	virtual	void				Pulse();
 
- private:
+private:
+			void				_StoreSettingsIfNeeded();
+
+			bool				fSettingsChanged;
 };
 
 #endif // APP_H

@@ -209,7 +209,6 @@ MainWindow::MessageReceived(BMessage* message)
 					if (ref) {
 						BString helper("Description for '");
 						helper << ref->name << "'";
-//						BRect* frame = fNamePanelFrame.IsValid() ? &fNamePanelFrame : NULL;
 						new NamePanel(helper.String(), button->Description(),
 							this, this, new BMessage(*message),
 							fNamePanelFrame);
@@ -286,16 +285,20 @@ MainWindow::WorkspaceActivated(int32 workspace, bool active)
 void
 MainWindow::FrameMoved(BPoint origin)
 {
-	if (IsActive())
+	if (IsActive()) {
 		_GetLocation();
+		_NotifySettingsChanged();
+	}
 }
 
 
 void
 MainWindow::FrameResized(float width, float height)
 {
-	if (IsActive())
+	if (IsActive()) {
 		_GetLocation();
+		_NotifySettingsChanged();
+	}
 	BWindow::FrameResized(width, height);
 }
 
@@ -308,6 +311,8 @@ MainWindow::ToggleAutoRaise()
 		fPadView->SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 	else
 		fPadView->SetEventMask(0);
+
+	_NotifySettingsChanged();
 }
 
 
@@ -599,4 +604,10 @@ MainWindow::_AddEmptyButtons()
 	fPadView->AddButton(button);
 }
 
+
+void
+MainWindow::_NotifySettingsChanged()
+{
+	be_app->PostMessage(MSG_SETTINGS_CHANGED);
+}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 - 2009, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MAIN_WINDOW_H
@@ -20,6 +20,7 @@ enum {
 	MSG_SET_DESCRIPTION			= 'dscr',
 
 	MSG_ADD_WINDOW				= 'addw',
+	MSG_SETTINGS_CHANGED		= 'stch',
 };
 
 
@@ -61,6 +62,8 @@ private:
 			void				_AdjustLocation(BRect frame);
 			void				_AddDefaultButtons();
 			void				_AddEmptyButtons();
+
+			void				_NotifySettingsChanged();
 
 			BMessage*			fSettings;
 			PadView*			fPadView;

@@ -1,11 +1,7 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef NAME_PANEL_H
 #define NAME_PANEL_H
 
@@ -14,7 +10,7 @@
 class BTextControl;
 
 class NamePanel : public Panel {
- public:
+public:
 							NamePanel(const char* label,
 									  const char* text,
 									  BWindow* window,
@@ -25,9 +21,7 @@ class NamePanel : public Panel {
 
 	virtual void			MessageReceived(BMessage *message);
 
- private:
-			BRect			_CalculateFrame(BRect frame);
-
+private:
 	BTextControl*			fNameTC;
 	BWindow*				fWindow;
 	BHandler*				fTarget;

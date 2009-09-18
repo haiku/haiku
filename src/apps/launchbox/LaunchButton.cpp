@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 - 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Application.h>
 #include <AppDefs.h>
 #include <AppFileInfo.h>
 #include <Bitmap.h>
@@ -19,13 +20,13 @@
 #include <Roster.h>
 #include <Window.h>
 
-//#include "BubbleHelper.h"
 #include "PadView.h"
+#include "MainWindow.h"
 
 
 static const float kDragStartDist = 10.0;
 static const float kDragBitmapAlphaScale = 0.6;
-//static const char* kEmptyHelpString = "You can drag an icon here.";
+static const char* kEmptyHelpString = "You can drag an icon here.";
 
 
 bigtime_t
@@ -37,13 +38,14 @@ LaunchButton::sIgnoreDoubleClick = true;
 
 LaunchButton::LaunchButton(const char* name, uint32 id, const char* label,
 		BMessage* message, BHandler* target)
-	: IconButton(name, id, label, message, target),
-	  fRef(NULL),
-	  fAppSig(NULL),
-	  fDescription(""),
-	  fAnticipatingDrop(false),
-	  fLastClickTime(0),
-	  fIconSize(DEFAULT_ICON_SIZE)
+	:
+	IconButton(name, id, label, message, target),
+	fRef(NULL),
+	fAppSig(NULL),
+	fDescription(""),
+	fAnticipatingDrop(false),
+	fLastClickTime(0),
+	fIconSize(DEFAULT_ICON_SIZE)
 {
 	if (sClickSpeed == 0 || get_click_speed(&sClickSpeed) != B_OK)
 		sClickSpeed = 500000;
@@ -66,18 +68,11 @@ LaunchButton::AttachedToWindow()
 
 
 void
-LaunchButton::DetachedFromWindow()
-{
-//	BubbleHelper::Default()->SetHelp(this, NULL);
-}
-
-
-void
 LaunchButton::Draw(BRect updateRect)
 {
 	if (fAnticipatingDrop) {
 		rgb_color color = fRef ? ui_color(B_KEYBOARD_NAVIGATION_COLOR)
-							   : (rgb_color){ 0, 130, 60, 255 };
+			: (rgb_color){ 0, 130, 60, 255 };
 		SetHighColor(color);
 		// limit clipping region to exclude the blue rect we just drew
 		BRect r(Bounds());
@@ -317,6 +312,7 @@ LaunchButton::SetTo(const entry_ref* ref)
 		ClearIcon();
 	}
 	_UpdateToolTip();
+	_NotifySettingsChanged();
 }
 
 
@@ -340,6 +336,7 @@ LaunchButton::SetTo(const char* appSig, bool updateIcon)
 		}
 	}
 	_UpdateToolTip();
+	_NotifySettingsChanged();
 }
 
 
@@ -348,6 +345,7 @@ LaunchButton::SetDescription(const char* text)
 {
 	fDescription.SetTo(text);
 	_UpdateToolTip();
+	_NotifySettingsChanged();
 }
 
 
@@ -393,9 +391,9 @@ LaunchButton::_UpdateToolTip()
 				helper << "\n\n" << info.short_info;
 			}
 		}
-//		BubbleHelper::Default()->SetHelp(this, helper.String());
+		SetToolTip(helper.String());
 	} else {
-//		BubbleHelper::Default()->SetHelp(this, kEmptyHelpString);
+		SetToolTip(kEmptyHelpString);
 	}
 }
 
@@ -411,4 +409,11 @@ LaunchButton::_UpdateIcon(const entry_ref* ref)
 		SetIcon(icon);
 
 	delete icon;
+}
+
+
+void
+LaunchButton::_NotifySettingsChanged()
+{
+	be_app->PostMessage(MSG_SETTINGS_CHANGED);
 }

@@ -1,9 +1,6 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include <stdio.h>
@@ -22,21 +19,20 @@ enum {
 };
 
 // constructor
-NamePanel::NamePanel(const char* label,
-					 const char* text,
-					 BWindow *window,
-					 BHandler* target,
-					 BMessage* message,
-					 BRect frame)
-	: Panel(frame, "Name Panel",
-			B_MODAL_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL,
-			B_ASYNCHRONOUS_CONTROLS | B_NOT_V_RESIZABLE),
-	  fWindow(window),
-	  fTarget(target),
-	  fMessage(message)
+NamePanel::NamePanel(const char* label, const char* text, BWindow* window,
+		BHandler* target, BMessage* message, BRect frame)
+	:
+	Panel(frame, "Name Panel",
+		B_MODAL_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_V_RESIZABLE
+			| B_AUTO_UPDATE_SIZE_LIMITS),
+	fWindow(window),
+	fTarget(target),
+	fMessage(message)
 {
 	BButton* defaultButton = new BButton("Ok", new BMessage(MSG_PANEL_OK));
-	BButton* cancelButton = new BButton("Cancel", new BMessage(MSG_PANEL_CANCEL));
+	BButton* cancelButton = new BButton("Cancel",
+		new BMessage(MSG_PANEL_CANCEL));
 	fNameTC = new BTextControl(label, text, NULL);
 
 	BView* topView = BGroupLayoutBuilder(B_VERTICAL, 10)
@@ -80,18 +76,14 @@ NamePanel::NamePanel(const char* label,
 	}	
 
 	AddToSubset(fWindow);
-	Hide();
+
+	if (!frame.IsValid())
+		CenterOnScreen();
+
 	Show();
-	if (Lock()) {
-		frame = _CalculateFrame(Frame());
-		MoveTo(frame.LeftTop());
-//		ResizeTo(frame.Width(), frame.Height());
-		Show();
-		Unlock();
-	}
 }
 
-// destructor
+
 NamePanel::~NamePanel()
 {
 	if (fWindow && fWindow->Lock()) {
@@ -101,7 +93,7 @@ NamePanel::~NamePanel()
 	delete fMessage;
 }
 
-// MessageReceived
+
 void NamePanel::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -124,26 +116,4 @@ void NamePanel::MessageReceived(BMessage* message)
 		default:
 			Panel::MessageReceived(message);
 	}
-}
-
-// _CalculateFrame
-BRect
-NamePanel::_CalculateFrame(BRect frame)
-{
-	BScreen screen(this);
-	BRect screenFrame = screen.Frame();
-	if (!frame.IsValid())
-		frame.Set(-1000.0, -1000.0, -900.0, -900.0);
-	if (!screenFrame.Contains(frame)) {
-		float width = frame.Width();
-		float height = frame.Height();
-		BPoint center;
-		center.x = screenFrame.left + screenFrame.Width() / 2.0;
-		center.y = screenFrame.top + screenFrame.Height() / 4.0;
-		frame.left = center.x - width / 2.0;
-		frame.right = frame.left + width;
-		frame.top = center.y - height / 2.0;
-		frame.bottom = frame.top + height;
-	}
-	return frame;
 }

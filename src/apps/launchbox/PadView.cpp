@@ -1,9 +1,6 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "PadView.h"
@@ -282,13 +279,18 @@ PadView::AddButton(LaunchButton* button, LaunchButton* beforeButton)
 		fButtonLayout->AddView(fButtonLayout->IndexOfView(beforeButton), button);
 	else
 		fButtonLayout->AddView(button);
+
+	_NotifySettingsChanged();
 }
 
 
 bool
 PadView::RemoveButton(LaunchButton* button)
 {
-	return fButtonLayout->RemoveView(button);
+	bool result = fButtonLayout->RemoveView(button);
+	if (result)
+		_NotifySettingsChanged();
+	return result;
 }
 
 
@@ -323,7 +325,7 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 	menu->AddItem(item);
 	// button options
 	if (button) {
-		// remove button
+		// clear button
 		message = new BMessage(MSG_CLEAR_SLOT);
 		message->AddPointer("be:source", (void*)button);
 		item = new BMenuItem("Clear Button", message);
@@ -335,14 +337,14 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 		item = new BMenuItem("Remove Button", message);
 		item->SetTarget(window);
 		menu->AddItem(item);
-// TODO: disabled because Haiku does not yet support tool tips
-//		if (button->Ref()) {
-//			message = new BMessage(MSG_SET_DESCRIPTION);
-//			message->AddPointer("be:source", (void*)button);
-//			item = new BMenuItem("Set Description"B_UTF8_ELLIPSIS, message);
-//			item->SetTarget(window);
-//			menu->AddItem(item);
-//		}
+		// set button description
+		if (button->Ref()) {
+			message = new BMessage(MSG_SET_DESCRIPTION);
+			message->AddPointer("be:source", (void*)button);
+			item = new BMenuItem("Set Description"B_UTF8_ELLIPSIS, message);
+			item->SetTarget(window);
+			menu->AddItem(item);
+		}
 	}
 	menu->AddSeparatorItem();
 	// window settings
@@ -447,6 +449,7 @@ PadView::SetOrientation(enum orientation orientation)
 		fButtonLayout->SetInsets(7, 2, 2, 2);
 		fButtonLayout->SetOrientation(B_HORIZONTAL);
 	}
+	_NotifySettingsChanged();
 }
 
 
@@ -467,6 +470,8 @@ PadView::SetIconSize(uint32 size)
 
 	for (int32 i = 0; LaunchButton* button = ButtonAt(i); i++)
 		button->SetIconSize(fIconSize);
+
+	_NotifySettingsChanged();
 }
 
 
@@ -481,6 +486,8 @@ void
 PadView::SetIgnoreDoubleClick(bool refuse)
 {
 	LaunchButton::SetIgnoreDoubleClick(refuse);
+
+	_NotifySettingsChanged();
 }
 
 
@@ -490,4 +497,10 @@ PadView::IgnoreDoubleClick() const
 	return LaunchButton::IgnoreDoubleClick();
 }
 
+
+void
+PadView::_NotifySettingsChanged()
+{
+	be_app->PostMessage(MSG_SETTINGS_CHANGED);
+}
 

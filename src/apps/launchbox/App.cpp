@@ -1,11 +1,7 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 
 #include "App.h"
 
@@ -21,37 +17,28 @@
 #include "MainWindow.h"
 
 
-// constructor
 App::App()
-	: BApplication("application/x-vnd.Haiku-LaunchBox")
+	:
+	BApplication("application/x-vnd.Haiku-LaunchBox"),
+	fSettingsChanged(false)
 {
+	SetPulseRate(3000000);
 }
 
-// destructor
+
 App::~App()
 {
 }
 
-// QuitRequested
+
 bool
 App::QuitRequested()
 {
-	BMessage settings('sett');
-	for (int32 i = 0; BWindow* window = WindowAt(i); i++) {
-		if (MainWindow* padWindow = dynamic_cast<MainWindow*>(window)) {
-			BMessage* windowSettings = padWindow->Settings();
-			if (windowSettings && padWindow->Lock()) {
-				padWindow->SaveSettings(windowSettings);
-				padWindow->Unlock();
-				settings.AddMessage("window", windowSettings);
-			}
-		}
-	}
-	save_settings(&settings, "main_settings", "LaunchBox");
+	_StoreSettingsIfNeeded();
 	return true;
 }
 
-// ReadyToRun
+
 void
 App::ReadyToRun()
 {
@@ -80,7 +67,7 @@ App::ReadyToRun()
 	}
 }
 
-// MessageReceived
+
 void
 App::MessageReceived(BMessage* message)
 {
@@ -95,15 +82,19 @@ App::MessageReceived(BMessage* message)
 			if (wasCloned)
 				window->MoveBy(10, 10);
 			window->Show();
+			fSettingsChanged = true;
 			break;
 		}
+		case MSG_SETTINGS_CHANGED:
+			fSettingsChanged = true;
+			break;
 		default:
 			BApplication::MessageReceived(message);
 			break;
 	}
 }
 
-// AboutRequested
+
 void
 App::AboutRequested()
 {
@@ -111,4 +102,34 @@ App::AboutRequested()
 	authors[0] = "Stephan Aßmus (aka stippi)";
 	authors[1] = NULL;
 	(new BAboutWindow("LaunchBox", 2004, authors))->Show();
+}
+
+
+void
+App::Pulse()
+{
+	_StoreSettingsIfNeeded();
+}
+
+
+void
+App::_StoreSettingsIfNeeded()
+{
+	if (!fSettingsChanged)
+		return;
+
+	BMessage settings('sett');
+	for (int32 i = 0; BWindow* window = WindowAt(i); i++) {
+		if (MainWindow* padWindow = dynamic_cast<MainWindow*>(window)) {
+			BMessage* windowSettings = padWindow->Settings();
+			if (windowSettings && padWindow->Lock()) {
+				padWindow->SaveSettings(windowSettings);
+				padWindow->Unlock();
+				settings.AddMessage("window", windowSettings);
+			}
+		}
+	}
+	save_settings(&settings, "main_settings", "LaunchBox");
+
+	fSettingsChanged = false;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 - 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PAD_VIEW_H
@@ -44,6 +44,8 @@ public:
 			bool				IgnoreDoubleClick() const;
 
 private:
+			void				_NotifySettingsChanged();
+
 			BPoint				fDragOffset;
 			bool				fDragging;
 			bigtime_t			fClickTime;
