@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src tests kits net preflet DialUpAddOn ;
+SubDir HAIKU_TOP src tests kits net preflet DialUpAddOn ;
 
 # set some additional defines
 {
@@ -15,18 +15,18 @@ SubDir OBOS_TOP src tests kits net preflet DialUpAddOn ;
 
 UsePrivateHeaders net ;
 # For NetworkSetupAddOn.h, to be moved to private once...
-UseHeaders [ FDirName $(OBOS_TOP) src tests kits net preflet ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net preflet ] ;
 
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 
 # additonal headers for built-in add-ons:
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp pppoe ] ; # PPPoE
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp ipcp ] ; # IPCP
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp pppoe ] ; # PPPoE
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp ipcp ] ; # IPCP
 
 AddResources DialUp : DialUpPreflet.rdef ;
 
-Addon DialUp : network_setup :
+Addon DialUp : 
 	AddOn.cpp
 	DialUpView.cpp
 	

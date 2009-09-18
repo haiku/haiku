@@ -1,11 +1,18 @@
 SubDir HAIKU_TOP src tests kits net preflet StatusAddOn ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net preflet ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers net ] : true ;
 
-Addon Overview : network_setup :
+UsePrivateHeaders shared ;
+
+Addon Overview : 
 	NetworkStatusAddOn.cpp
+	InterfaceStatusItem.cpp
+	Setting.cpp
+	NetworkWindow.cpp
+	EthernetSettingsView.cpp
+	
+	: be <nogrist>NetworkSetup $(HAIKU_NETWORK_LIBS) $(TARGET_LIBSTDC++)
 ;
 
-LinkSharedOSLibs Overview : be ;
 AddResources Overview : Resource.rsrc ;
-

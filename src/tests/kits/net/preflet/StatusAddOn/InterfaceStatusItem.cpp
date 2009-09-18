@@ -115,7 +115,7 @@ InterfaceStatusItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 		if (fSetting->GetAutoConfigure())
 			owner->DrawString("DHCP enabled", commentPt);
 		else
-			owner->DrawString("DHCP Disabled, use static IP adress", commentPt);
+			owner->DrawString("DHCP disabled, use static IP adress", commentPt);
 
 		
 	} else 

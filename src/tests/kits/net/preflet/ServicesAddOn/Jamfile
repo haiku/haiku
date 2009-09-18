@@ -2,9 +2,8 @@ SubDir HAIKU_TOP src tests kits net preflet ServicesAddOn ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net preflet ] ;
 
-Addon Services : network_setup :
+Addon Services : 
 	ServicesAddOn.cpp
+	: be <nogrist>NetworkSetup  $(TARGET_LIBSTDC++) # $(HAIKU_NETWORK_LIBS)
 ;
-
-LinkSharedOSLibs Services : <installed>Network_Setup be ;
 

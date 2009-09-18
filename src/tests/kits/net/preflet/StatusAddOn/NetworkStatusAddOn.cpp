@@ -159,6 +159,7 @@ NetworkStatusAddOn::MessageReceived(BMessage* msg)
 			break;
 		
 		item->SetEnabled(!item->Enabled());
+		fOnOff->SetLabel(item->Enabled() ? "Disable" : "Enable");
 		fListview->Invalidate();
 		break;
 
