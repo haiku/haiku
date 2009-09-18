@@ -134,11 +134,9 @@ InterfaceStatusItem::_InitIcon()
 	BResources *resources = fAddon->Resources();
 	if (resources) {
 		size_t size;
-//		printf("Name = %s\n", Name());
-//		const void *data = resources->LoadResource('ICON', Name(), &size);
-//		if (!data)
-
-		const void *data = resources->LoadResource('ICON', "generic_device", &size);
+		const void *data = resources->LoadResource('ICON', Name(), &size);
+		if (!data)
+			data = resources->LoadResource('ICON', "generic_device", &size);
 
 		if (data) {
 			// Now build the bitmap

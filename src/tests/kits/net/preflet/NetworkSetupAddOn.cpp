@@ -1,9 +1,12 @@
-#include <stdlib.h>
+
+#include "NetworkSetupAddOn.h"
 
 #include <kernel/image.h>
 #include <storage/Resources.h>
 
-#include "NetworkSetupAddOn.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 
 NetworkSetupAddOn::NetworkSetupAddOn(image_id image)
 	: 

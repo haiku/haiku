@@ -5,14 +5,20 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers net ] : true ;
 
 UsePrivateHeaders shared ;
 
+AddResources Overview : 
+ 	Icons.rdef 
+;
+
 Addon Overview : 
 	NetworkStatusAddOn.cpp
 	InterfaceStatusItem.cpp
 	Setting.cpp
 	NetworkWindow.cpp
 	EthernetSettingsView.cpp
-	
-	: be <nogrist>NetworkSetup $(HAIKU_NETWORK_LIBS) $(TARGET_LIBSTDC++)
+	: 
+	be 
+	<nogrist>NetworkSetup 
+	$(HAIKU_NETWORK_LIBS) 
+	$(TARGET_LIBSTDC++) 
 ;
 
-AddResources Overview : Resource.rsrc ;
