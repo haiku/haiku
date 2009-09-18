@@ -23,6 +23,8 @@ NetworkWindow::NetworkWindow(Setting* setting)
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	fEthernetView = new EthernetSettingsView(setting);
 	GetLayout()->AddView(fEthernetView);
+	
+	SetTitle(setting->GetName());
 }
 
 
