@@ -91,7 +91,7 @@ private:
 	volatile bool				fQuitting;
 
 			off_t				fBytesRead;
-			uint64				fLastBytesRead;
+			off_t				fLastBytesRead;
 			uint64				fItemsCopied;
 			uint64				fLastItemsCopied;
 			bigtime_t			fTimeRead;
