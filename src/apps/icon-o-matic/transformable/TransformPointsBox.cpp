@@ -31,6 +31,8 @@ TransformPointsBox::TransformPointsBox(CanvasView* view,
 	  fCount(count),
 	  fPoints(count > 0 ? new (nothrow) control_point[count] : NULL)
 {
+	fPath->Acquire();
+
 	BRect bounds(0, 0, -1, -1);
 
 	if (fPoints && fIndices) {
@@ -68,6 +70,7 @@ TransformPointsBox::~TransformPointsBox()
 {
 	delete[] fIndices;
 	delete[] fPoints;
+	fPath->Release();
 }
 
 // #pragma mark -

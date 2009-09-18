@@ -31,7 +31,7 @@ TransformShapesBox::TransformShapesBox(CanvasView* view,
 
 	  fParentTransform()
 {
-	if (fShapes) {
+	if (fShapes != NULL) {
 		// allocate storage for the current transformations
 		// of each object
 		fOriginals = new double[fCount * Transformable::matrix_size];
@@ -39,8 +39,10 @@ TransformShapesBox::TransformShapesBox(CanvasView* view,
 		memcpy(fShapes, shapes, fCount * sizeof(Shape*));
 
 		for (int32 i = 0; i < fCount; i++) {
-			if (fShapes[i])
+			if (fShapes[i]) {
+				fShapes[i]->Acquire();
 				fShapes[i]->AddObserver(this);
+			}
 		}
 
 		// trigger init
@@ -55,8 +57,10 @@ TransformShapesBox::~TransformShapesBox()
 {
 	if (fShapes) {
 		for (int32 i = 0; i < fCount; i++) {
-			if (fShapes[i])
+			if (fShapes[i]) {
 				fShapes[i]->RemoveObserver(this);
+				fShapes[i]->Release();
+			}
 		}
 		delete[] fShapes;
 	}
