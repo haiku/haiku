@@ -1,6 +1,7 @@
 /*
  * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
- * Distributed under the terms of the MIT License.
+ * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
@@ -10,6 +11,7 @@
 #include <Autolock.h>
 #include <LayoutBuilder.h>
 #include <MessageRunner.h>
+#include <Screen.h>
 
 #include <WindowPrivate.h>
 #include <ToolTip.h>
@@ -113,10 +115,6 @@ ToolTipWindow::ToolTipWindow(BToolTip* tip, BPoint where)
 		kMenuWindowFeel, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS | B_AVOID_FRONT | B_AVOID_FOCUS)
 {
-	MoveTo(where + tip->MouseRelativeLocation());
-
-	// TODO: take alignment into account!
-
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	BToolTipManager::Lock();
@@ -126,6 +124,28 @@ ToolTipWindow::ToolTipWindow(BToolTip* tip, BPoint where)
 	BSize size = ChildAt(0)->PreferredSize();
 	ResizeTo(size.width, size.height);
 	//AddChild(BLayoutBuilder::Group<>(B_VERTICAL).Add(new ToolTipView(tip)));
+
+	// figure out location
+	// TODO: take alignment into account!
+	where += tip->MouseRelativeLocation();
+
+	BScreen screen(this);
+	if (screen.IsValid()) {
+		BRect screenFrame = screen.Frame().InsetBySelf(5, 5);
+		BRect frame = Frame().OffsetToSelf(where);
+		if (!screenFrame.Contains(frame)) {
+			if (screenFrame.top > frame.top)
+				where.y -= frame.top - screenFrame.top;
+			else if (screenFrame.bottom < frame.bottom)
+				where.y -= frame.bottom - screenFrame.bottom;
+			if (screenFrame.left > frame.left)
+				where.x -= frame.left - screenFrame.left;
+			else if (screenFrame.right < frame.right)
+				where.x -= frame.right - screenFrame.right;
+		}
+	}
+
+	MoveTo(where);
 }
 
 
