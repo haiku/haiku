@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
@@ -76,7 +76,8 @@ BCollator::BCollator()
 }
 
 
-BCollator::BCollator(BCollatorAddOn *collator, int8 strength, bool ignorePunctuation)
+BCollator::BCollator(BCollatorAddOn *collator, int8 strength,
+	bool ignorePunctuation)
 	:
 	fCollator(collator),
 	fCollatorImage(B_ERROR),
@@ -93,6 +94,7 @@ BCollator::BCollator(BMessage *archive)
 	fCollator(NULL),
 	fCollatorImage(B_ERROR)
 {
+#if HAIKU_TARGET_PLATFORM_HAIKU
 	int32 data;
 	if (archive->FindInt32("loc:strength", &data) == B_OK)
 		fStrength = (uint8)data;
@@ -104,7 +106,8 @@ BCollator::BCollator(BMessage *archive)
 
 	BMessage collatorArchive;
 	if (archive->FindMessage("loc:collator", &collatorArchive) == B_OK) {
-		BArchivable *unarchived = instantiate_object(&collatorArchive, &fCollatorImage);
+		BArchivable *unarchived =
+			instantiate_object(&collatorArchive, &fCollatorImage);
 
 		// do we really have a BCollatorAddOn here?
 		fCollator = dynamic_cast<BCollatorAddOn *>(unarchived);
@@ -116,6 +119,7 @@ BCollator::BCollator(BMessage *archive)
 		fCollator = new BCollatorAddOn();
 		fCollatorImage = B_ERROR;
 	}
+#endif
 }
 
 
@@ -173,11 +177,12 @@ BCollator::Compare(const char *a, const char *b, int32 length, int8 strength)
 		length = 0x7fffffff;
 
 	return fCollator->Compare(a, b, length,
-				strength == B_COLLATE_DEFAULT ? fStrength : strength, fIgnorePunctuation);
+				strength == B_COLLATE_DEFAULT ? fStrength : strength,
+				fIgnorePunctuation);
 }
 
 
-status_t 
+status_t
 BCollator::Archive(BMessage *archive, bool deep) const
 {
 	status_t status = BArchivable::Archive(archive, deep);
@@ -271,7 +276,8 @@ BCollatorAddOn::PutPrimaryKey(const char *string, char *buffer, int32 length,
 	input_context context(ignorePunctuation);
 
 	uint32 c;
-	for (int32 i = 0; (c = GetNextChar(&string, context)) != 0 && i < length; i++) {
+	for (int32 i = 0; (c = GetNextChar(&string, context)) != 0 && i < length;
+		i++) {
 		if (c < 0x80)
 			*buffer++ = tolower(c);
 		else
@@ -282,7 +288,7 @@ BCollatorAddOn::PutPrimaryKey(const char *string, char *buffer, int32 length,
 }
 
 
-size_t 
+size_t
 BCollatorAddOn::PrimaryKeyLength(size_t length)
 {
 	return length * 2;
@@ -290,7 +296,7 @@ BCollatorAddOn::PrimaryKeyLength(size_t length)
 }
 
 
-status_t 
+status_t
 BCollatorAddOn::GetSortKey(const char *string, BString *key, int8 strength,
 	bool ignorePunctuation)
 {
@@ -318,8 +324,9 @@ BCollatorAddOn::GetSortKey(const char *string, BString *key, int8 strength,
 
 		case B_COLLATE_SECONDARY:
 		{
-			char *begin = key->LockBuffer(PrimaryKeyLength(length) + length + 1);
-				// the primary key + the secondary key + separator char
+			char *begin
+				= key->LockBuffer(PrimaryKeyLength(length) + length + 1);
+					// the primary key + the secondary key + separator char
 			if (begin == NULL)
 				return B_NO_MEMORY;
 
@@ -329,7 +336,8 @@ BCollatorAddOn::GetSortKey(const char *string, BString *key, int8 strength,
 
 			input_context context(ignorePunctuation);
 			uint32 c;
-			for (uint32 i = 0; (c = GetNextChar(&string, context)) && i < length; i++) {
+			for (uint32 i = 0;
+				(c = GetNextChar(&string, context)) && i < length; i++) {
 				if (c < 0x80)
 					*buffer++ = tolower(c);
 				else
@@ -344,8 +352,9 @@ BCollatorAddOn::GetSortKey(const char *string, BString *key, int8 strength,
 		case B_COLLATE_TERTIARY:
 		case B_COLLATE_QUATERNARY:
 		{
-			char *begin = key->LockBuffer(PrimaryKeyLength(length) + length + 1);
-				// the primary key + the tertiary key + separator char
+			char *begin
+				= key->LockBuffer(PrimaryKeyLength(length) + length + 1);
+					// the primary key + the tertiary key + separator char
 			if (begin == NULL)
 				return B_NO_MEMORY;
 
@@ -355,7 +364,8 @@ BCollatorAddOn::GetSortKey(const char *string, BString *key, int8 strength,
 
 			input_context context(ignorePunctuation);
 			uint32 c;
-			for (uint32 i = 0; (c = GetNextChar(&string, context)) && i < length; i++) {
+			for (uint32 i = 0;
+				(c = GetNextChar(&string, context)) && i < length; i++) {
 				BUnicodeChar::ToUTF8(c, &buffer);
 			}
 			*buffer = '\0';
@@ -374,9 +384,9 @@ BCollatorAddOn::GetSortKey(const char *string, BString *key, int8 strength,
 }
 
 
-int 
-BCollatorAddOn::Compare(const char *a, const char *b, int32 length, int8 strength,
-	bool ignorePunctuation)
+int
+BCollatorAddOn::Compare(const char *a, const char *b, int32 length,
+	int8 strength, bool ignorePunctuation)
 {
 	if (strength >= B_COLLATE_QUATERNARY) {
 		// the difference between tertiary and quaternary collation strength
@@ -410,7 +420,8 @@ BCollatorAddOn::Compare(const char *a, const char *b, int32 length, int8 strengt
 		case B_COLLATE_SECONDARY:
 		{
 			// diacriticals can only change the order between equal strings
-			int32 compare = Compare(a, b, length, B_COLLATE_PRIMARY, ignorePunctuation);
+			int32 compare
+				= Compare(a, b, length, B_COLLATE_PRIMARY, ignorePunctuation);
 			if (compare != 0)
 				return compare;
 
@@ -432,7 +443,8 @@ BCollatorAddOn::Compare(const char *a, const char *b, int32 length, int8 strengt
 		case B_COLLATE_QUATERNARY:
 		{
 			// diacriticals can only change the order between equal strings
-			int32 compare = Compare(a, b, length, B_COLLATE_PRIMARY, ignorePunctuation);
+			int32 compare
+				= Compare(a, b, length, B_COLLATE_PRIMARY, ignorePunctuation);
 			if (compare != 0)
 				return compare;
 
@@ -457,7 +469,7 @@ BCollatorAddOn::Compare(const char *a, const char *b, int32 length, int8 strengt
 }
 
 
-status_t 
+status_t
 BCollatorAddOn::Archive(BMessage *archive, bool deep) const
 {
 	return BArchivable::Archive(archive, deep);

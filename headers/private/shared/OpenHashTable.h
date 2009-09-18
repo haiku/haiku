@@ -45,7 +45,7 @@ All rights reserved.
 #ifndef __OPEN_HASH_TABLE__
 #define __OPEN_HASH_TABLE__
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <new>
 
 // don't include <Debug.h>

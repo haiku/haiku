@@ -4,7 +4,9 @@ SubDir HAIKU_TOP src add-ons locale catalogs ;
 NotFile LocaleKitCatalogAddons ;
 Depends LocaleKitCatalogAddons
 	:
+	<catalog-addon>plaintext
 	<catalog-addon>zeta
 	;
 
+SubInclude HAIKU_TOP src add-ons locale catalogs plaintext ;
 SubInclude HAIKU_TOP src add-ons locale catalogs zeta ;

@@ -1,3 +1,52 @@
 SubDir HAIKU_TOP src tools locale ;
 
-SubInclude HAIKU_TOP src tools locale genprops ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits tracker ] ;
+
+local localetools =
+	<build>linkcatkeys
+	<build>collectcatkeys
+;
+
+USES_BE_API on $(localetools) = true ;
+
+if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os app ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os interface ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os kernel ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers private locale ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers private shared ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os locale ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
+}
+
+UseLibraryHeaders icu ;
+
+# TODO: temporary kludge
+local libHaikuCompat ;
+if $(HOST_PLATFORM) in r5 bone dano {
+	ObjectC++Flags database_support.cpp UpdateMimeInfoThread.cpp
+		MimeUpdateThread.cpp
+		: -include [ FDirName $(HAIKU_TOP) headers build
+			HaikuBuildCompatibility.h ] ;
+	libHaikuCompat = libhaikucompat_build.a ;
+}
+
+BuildPlatformMain <build>collectcatkeys :
+	collectcatkeys.cpp
+	PlainTextCatalog.cpp
+	HashMapCatalog.cpp
+	Catalog.cpp
+	RegExp.cpp
+	adler32.c
+	: $(HOST_LIBBE)  $(HOST_LIBSUPC++) ;
+
+BuildPlatformMain <build>linkcatkeys :
+	linkcatkeys.cpp
+	PlainTextCatalog.cpp
+	HashMapCatalog.cpp
+	DefaultCatalog.cpp
+	Catalog.cpp
+	adler32.c
+	: $(HOST_LIBBE) $(HOST_LIBSUPC++) ;

@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src tests kits locale ;
 
 UsePublicHeaders locale ;
+UsePrivateHeaders locale shared ;
+UseLibraryHeaders icu ;
 
 # Pseudo target to build all locale kit tests
 NotFile LocaleKitTests ;
@@ -12,6 +14,7 @@ Depends LocaleKitTests
 	collatorSpeed
 	collatorTest
 	localeTest
+	ICUTest
 	libNumberFormatTests.so
 	;
 
@@ -29,6 +32,10 @@ LocaleTest collatorSpeed.cpp ;
 LocaleTest collatorTest.cpp ;
 LocaleTest genericNumberFormatTest.cpp ;
 LocaleTest localeTest.cpp ;
+
+Application ICUTest : 
+	ICUTest.cpp :
+	be libicu-common.so libicu-i18n.so libicu-data.so $(TARGET_LIBSUPC++) ;
 
 Addon catalogTestAddOn 
 	: catalogTestAddOn.cpp 

@@ -15,7 +15,7 @@ class BCatalog {
 	public:
 		BCatalog();
 		BCatalog(const char *signature, const char *language = NULL,
-			int32 fingerprint = 0);
+			uint32 fingerprint = 0);
 		virtual ~BCatalog();
 
 		const char *GetString(const char *string, const char *context = NULL,
@@ -27,7 +27,7 @@ class BCatalog {
 
 		status_t GetSignature(BString *sig);
 		status_t GetLanguage(BString *lang);
-		status_t GetFingerprint(int32 *fp);
+		status_t GetFingerprint(uint32 *fp);
 
 		status_t InitCheck() const;
 		int32 CountItems() const;
@@ -143,7 +143,7 @@ class BCatalogAddOn {
 		friend class BLocaleRoster;
 	public:
 		BCatalogAddOn(const char *signature, const char *language,
-					  int32 fingerprint);
+					  uint32 fingerprint);
 		virtual ~BCatalogAddOn();
 
 		virtual const char *GetString(const char *string,
@@ -195,7 +195,7 @@ class BCatalogAddOn {
 		status_t 			fInitCheck;
 		BString 			fSignature;
 		BString 			fLanguageName;
-		int32				fFingerprint;
+		uint32				fFingerprint;
 		BCatalogAddOn 		*fNext;
 
 		friend class BCatalog;
@@ -206,7 +206,7 @@ class BCatalogAddOn {
 // ...the function that instantiates a catalog for this add-on-type...
 extern "C"
 BCatalogAddOn *instantiate_catalog(const char *signature,
-	const char *language, int32 fingerprint);
+	const char *language, uint32 fingerprint);
 // ...the function that creates an empty catalog for this add-on-type...
 extern "C"
 BCatalogAddOn *create_catalog(const char *signature,
@@ -243,7 +243,7 @@ BCatalog::GetLanguage(BString *lang)
 
 
 inline status_t
-BCatalog::GetFingerprint(int32 *fp)
+BCatalog::GetFingerprint(uint32 *fp)
 {
 	if (!fp)
 		return B_BAD_VALUE;

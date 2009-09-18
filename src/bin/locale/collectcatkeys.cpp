@@ -1,7 +1,12 @@
-/* 
-** Copyright 2003, Oliver Tappe, zooey@hirschkaefer.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2009, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Oliver Tappe, zooey@hirschkaefer.de
+ *		Adrien Destugues, pulkomandy@gmail.com
+ */
+
 
 #include <cctype>
 #include <cerrno>
@@ -13,7 +18,9 @@ using namespace BPrivate;
 #include <Entry.h>
 #include <File.h>
 #include "RegExp.h"
+#include <StorageDefs.h>
 #include <String.h>
+
 
 bool showKeys = false;
 bool showSummary = false;
@@ -34,7 +41,7 @@ EditableCatalog *catalog = NULL;
 
 
 void
-usage() 
+usage()
 {
 	fprintf(stderr,
 		"usage: collectcatkeys [-pvw] [-r <regex>] [-o <outfile>] [-l <catalogLanguage>]\n"
@@ -56,55 +63,74 @@ bool
 fetchStr(const char *&in, BString &str, bool lookForID)
 {
 	int parLevel = 0;
-	while(isspace(*in) || *in == '(') {
+	while (isspace(*in) || *in == '(') {
 		if (*in == '(')
 			parLevel++;
 		in++;
 	}
 	if (*in == '"') {
-		in++;
+		bool inString = true;
 		bool quoted = false;
-		while (*in != '"' || quoted) {
-			if (quoted) {
-				if (*in == 'n')
-					str.Append("\n",1);
-				else if (*in == 't')
-					str.Append("\t",1);
-				else if (*in == '"')
-					str.Append("\"",1);
+		in++;
+		while (parLevel >= 0 && inString)
+		{
+			// Collect string content until we find a quote marking end of
+			// string (skip escaped quotes)
+			while (*in != '"' || !quoted)
+			{
+				str.Append(in,1);
+				if (*in == '\\' && !quoted)
+					quoted = true;
 				else
-					// dump quote from unknown quoting-sequence:
-					str.Append(in,1);
-				quoted = false;
-			} else {
-				quoted = (*in == '\\');
-				if (!quoted)
-					str.Append(in,1);
+					quoted = false;
+				in++;
+			}
+			in++;
+
+			inString = false;
+
+			// Strip all whitespace until we find a closing parenthesis, or the
+			// beginning of another string
+			// TODO: ignore comments
+			while (isspace(*in) || *in == ')') {
+				if (*in == ')') {
+					if (parLevel == 0)
+						return true;
+					parLevel--;
+				}
+
+				in++;
+			}
+
+			if (*in == '"') {
+				inString = true;
+				in++;
+			}
+		}
+	} else {
+		if (!memcmp(in, "__null", 6)) {
+			// NULL is preprocessed into __null, which we parse as ""
+			in += 6;
+		} else if (lookForID && (isdigit(*in) || *in == '-' || *in == '+')) {
+			// try to parse an ID (a long):
+			errno = 0;
+			char *next;
+			id = strtol(in, &next, 10);
+			if (id != 0 || errno == 0) {
+				haveID = true;
+				in = next;
+			}
+		} else
+			return false;
+
+		while (isspace(*in) || *in == ')') {
+			if (*in == ')') {
+				if (!parLevel)
+					return true;
+				parLevel--;
 			}
 			in++;
 		}
-		in++;
-	} else if (!memcmp(in, "__null", 6)) {
-		// NULL is preprocessed into __null, which we parse as ""
-		in += 6;
-	} else if (lookForID && (isdigit(*in) || *in == '-' || *in == '+')) {
-		// try to parse an ID (a long):
-		errno = 0;
-		char *next;
-		id = strtol(in, &next, 10);
-		if (id != 0 || errno == 0) {
-			haveID = true;
-			in = next;
-		}
-	} else
-		return false;
-	while(isspace(*in) || *in == ')') {
-		if (*in == ')') {
-			if (!parLevel)
-				return true;
-			parLevel--;
-		}
-		in++;
 	}
 	return true;
 }
@@ -145,7 +171,7 @@ collectAllCatalogKeys(BString& inputStr)
 	}
 	status_t res;
 	const char *in = inputStr.String();
-	while(rx.RunMatcher(rxprg, in)) {
+	while (rx.RunMatcher(rxprg, in)) {
 		const char *start = rxprg->startp[0];
 		in = rxprg->endp[0];
 		if (fetchKey(in)) {
@@ -154,18 +180,21 @@ collectAllCatalogKeys(BString& inputStr)
 					printf("CatKey(%ld)\n", id);
 				res = catalog->SetString(id, "");
 				if (res != B_OK) {
-					fprintf(stderr, "couldn't add key %ld - error: %s\n", 
+					fprintf(stderr, "couldn't add key %ld - error: %s\n",
 						id, strerror(res));
 					exit(-1);
 				}
 			} else {
-				if (showKeys)
-					printf("CatKey(\"%s\", \"%s\", \"%s\")\n", str.String(), 
+				if (showKeys) {
+					printf("CatKey(\"%s\", \"%s\", \"%s\")\n", str.String(),
 						ctx.String(), cmt.String());
-				res = catalog->SetString(str.String(), str.String(), ctx.String(), cmt.String());
+				}
+				res = catalog->SetString(str.String(), str.String(),
+					ctx.String(), cmt.String());
 				if (res != B_OK) {
-					fprintf(stderr, "couldn't add key %s,%s,%s - error: %s\n", 
-						str.String(), ctx.String(), cmt.String(), strerror(res));
+					fprintf(stderr, "couldn't add key %s,%s,%s - error: %s\n",
+						str.String(), ctx.String(), cmt.String(),
+						strerror(res));
 					exit(-1);
 				}
 			}
@@ -174,9 +203,10 @@ collectAllCatalogKeys(BString& inputStr)
 			BString match;
 			if (end)
 				match.SetTo(start, end-start+1);
-			else
-				// can't determine end of statement, we output next 40 characters
+			else {
+				// can't determine end of statement, we output next 40 chars
 				match.SetTo(start, 40);
+			}
 			fprintf(stderr, "Warning: couldn't resolve catalog-access:\n\t%s\n",
 				match.String());
 		}
@@ -221,7 +251,7 @@ main(int argc, char **argv)
 		}
 	}
 	if (!outputFile.Length() && inputFile) {
-		// generate default output-file from input-file by replacing 
+		// generate default output-file from input-file by replacing
 		// the extension with '.catkeys':
 		outputFile = inputFile;
 		int32 dot = outputFile.FindLast('.');
@@ -231,11 +261,11 @@ main(int argc, char **argv)
 	}
 	if (!inputFile || !catalogSig || !outputFile.Length() || !catalogLang)
 		usage();
-	
+
 	BFile inFile;
 	status_t res = inFile.SetTo(inputFile, B_READ_ONLY);
 	if (res != B_OK) {
-		fprintf(stderr, "unable to open inputfile %s - error: %s\n", inputFile, 
+		fprintf(stderr, "unable to open inputfile %s - error: %s\n", inputFile,
 			strerror(res));
 		exit(-1);
 	}
@@ -246,16 +276,16 @@ main(int argc, char **argv)
 		char *buf = inputStr.LockBuffer(sz);
 		off_t rsz = inFile.Read(buf, sz);
 		if (rsz < sz) {
-			fprintf(stderr, "couldn't read %Ld bytes from %s (got only %Ld)\n", 
+			fprintf(stderr, "couldn't read %Ld bytes from %s (got only %Ld)\n",
 				sz, inputFile, rsz);
 			exit(-1);
 		}
 		inputStr.UnlockBuffer(rsz);
-		catalog = new EditableCatalog("Default", catalogSig, catalogLang);
+		catalog = new EditableCatalog("plaintext", catalogSig, catalogLang);
 		collectAllCatalogKeys(inputStr);
 		res = catalog->WriteToFile(outputFile.String());
 		if (res != B_OK) {
-			fprintf(stderr, "couldn't write catalog to %s - error: %s\n", 
+			fprintf(stderr, "couldn't write catalog to %s - error: %s\n",
 				outputFile.String(), strerror(res));
 			exit(-1);
 		}
@@ -272,6 +302,6 @@ main(int argc, char **argv)
 
 //	BEntry inEntry(inputFile);
 //	inEntry.Remove();
-	
+
 	return res;
 }

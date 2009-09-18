@@ -1,7 +1,9 @@
-/* 
+/*
 ** Copyright 2003, Oliver Tappe, zooey@hirschkaefer.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
+
+#include <new>
 
 #include <syslog.h>
 
@@ -23,8 +25,8 @@
 class ZetaCatalog : public BCatalogAddOn {
 
 	public:
-		ZetaCatalog(const char *signature, const char *language, 
-			int32 fingerprint);
+		ZetaCatalog(const char *signature, const char *language,
+			uint32 fingerprint);
 		~ZetaCatalog();
 
 		const char *GetString(const char *string, const char *context=NULL,
@@ -35,22 +37,22 @@ class ZetaCatalog : public BCatalogAddOn {
 
 };
 
-ZetaCatalog::ZetaCatalog(const char *signature, const char *language, 
-	int32 fingerprint)
+ZetaCatalog::ZetaCatalog(const char *signature, const char *language,
+	uint32 fingerprint)
 	:
 	BCatalogAddOn(signature, language, fingerprint)
 {
 	app_info appInfo;
-	be_app->GetAppInfo(&appInfo); 
+	be_app->GetAppInfo(&appInfo);
 	node_ref nref;
 	nref.device = appInfo.ref.device;
 	nref.node = appInfo.ref.directory;
 	BDirectory appDir( &nref);
 
-	// ToDo: implement loading of zeta-catalog 
+	// ToDo: implement loading of zeta-catalog
 	fInitCheck = EOPNOTSUPP;
 
-	log_team(LOG_DEBUG, 
+	log_team(LOG_DEBUG,
 		"trying to load zeta-catalog with sig %s for lang %s results in %s",
 		signature, language, strerror(fInitCheck));
 }
@@ -75,9 +77,10 @@ ZetaCatalog::GetString(uint32 id)
 
 
 extern "C" BCatalogAddOn *
-instantiate_catalog(const char *signature, const char *language, int32 fingerprint)
+instantiate_catalog(const char *signature, const char *language, uint32 fingerprint)
 {
-	ZetaCatalog *catalog = new ZetaCatalog(signature, language, fingerprint);
+	ZetaCatalog *catalog
+		= new(std::nothrow) ZetaCatalog(signature, language, fingerprint);
 	if (catalog && catalog->InitCheck() != B_OK) {
 		delete catalog;
 		return NULL;

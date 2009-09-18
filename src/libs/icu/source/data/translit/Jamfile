@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src libs icu source data translit ;
+
+# this file has been converted to Jamfile format from trsnfiles.mk
+
+ICU_TRANSLIT_SOURCE = root.txt en.txt el.txt ;
+
+# -----------------------------------------------------------------------------
+# general resource bundles (*.res)
+# -----------------------------------------------------------------------------
+
+local translitSources = [ FGristFiles $(ICU_TRANSLIT_SOURCE) ] ;
+MakeLocate $(translitSources) : $(SUBDIR) ;
+GenerateResourceBundles $(translitSources) : translit : translit ;
+

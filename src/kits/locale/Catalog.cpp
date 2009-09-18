@@ -32,7 +32,7 @@ BCatalog::BCatalog()
 
 
 BCatalog::BCatalog(const char *signature, const char *language, 
-	int32 fingerprint)
+	uint32 fingerprint)
 {
 	fCatalog = be_locale_roster->LoadCatalog(signature, language, fingerprint);
 }
@@ -118,10 +118,10 @@ BCatalog::GetAppCatalog(BCatalog* catalog)
 		sig.Remove(0, pos+1);
 
 	// try to fetch fingerprint from app-file (attribute):
-	int32 fingerprint = 0;
+	uint32 fingerprint = 0;
 	BNode appNode(&appInfo.ref);
-	appNode.ReadAttr(BLocaleRoster::kCatFingerprintAttr, B_INT32_TYPE, 0, 
-		&fingerprint, sizeof(int32));
+	appNode.ReadAttr(BLocaleRoster::kCatFingerprintAttr, B_UINT32_TYPE, 0, 
+		&fingerprint, sizeof(uint32));
 	// try to load catalog (with given fingerprint):
 	catalog->fCatalog
 		= be_locale_roster->LoadCatalog(sig.String(), NULL,	fingerprint);
@@ -152,7 +152,7 @@ BCatalog::GetAppCatalog(BCatalog* catalog)
 
 //#pragma mark - BCatalogAddOn
 BCatalogAddOn::BCatalogAddOn(const char *signature, const char *language,
-	int32 fingerprint)
+	uint32 fingerprint)
 	:
 	fInitCheck(B_NO_INIT),
 	fSignature(signature),

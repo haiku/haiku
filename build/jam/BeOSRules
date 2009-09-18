@@ -204,8 +204,10 @@ rule ResComp
 
 	DEFINES on $(1) = $(defines) ;
 	CCDEFS on $(1) = [ FDefines $(defines) ] ;
-	HDRS on $(1) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) : $(localIncludesOption) ] ;
-	RCHDRS on $(1) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) : "-I " ] ;
+	HDRS on $(1) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) 
+		: $(localIncludesOption) ] ;
+	RCHDRS on $(1) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) 
+		: "-I " ] ;
 	CC on $(1) = $(cc) ;
 
 	# set up other vars
@@ -265,4 +267,117 @@ actions ResAttr1
 		$(RM) $(1)
 	fi
 	$(2[1]) -O -o "$(1)" "$(2[2-])"
+}
+
+# Localization rules
+
+# Extract catalog entries from the sourcefile and put the output textfile in 
+# target. This output file is then used to create the binary catalog with 
+# linkcatkeys.
+rule ExtractCatalogEntries target : source : signature
+{
+# get compiler and defines for the platform
+	local headers ;
+	local sysHeaders ;
+	local cc ;
+	local defines ;
+	local localIncludesOption ;
+	local systemIncludesOption ;
+
+	on $(target) { # use on $(target) variable values
+		headers = $(HAIKU_CONFIG_HEADERS) $(SEARCH_SOURCE) $(SUBDIRHDRS)
+			$(HDRS) ;
+		sysHeaders = $(SUBDIRSYSHDRS) $(SYSHDRS) ;
+		defines = $(DEFINES) ;
+
+		if $(PLATFORM) = host {
+			sysHeaders += $(HOST_HDRS) ;
+			defines += $(HOST_DEFINES) ;
+
+			if $(USES_BE_API) {
+				sysHeaders += $(HOST_BE_API_HEADERS) ;
+			}
+
+			defines += $(HOST_DEFINES) ;
+			cc = $(HOST_CC) ;
+			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
+			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
+		} else {
+			sysHeaders += $(TARGET_HDRS) ;
+			defines += $(TARGET_DEFINES) ;
+			defines += $(TARGET_DEFINES) ;
+			cc = $(TARGET_CC) ;
+			localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
+			systemIncludesOption = $(TARGET_SYSTEM_INCLUDES_OPTION) ;
+		}
+	}
+
+	DEFINES on $(target) = $(defines) ;
+	CCDEFS on $(target) = [ FDefines $(defines) ] ;
+	HDRS on $(target) = [ FIncludes $(headers) : $(localIncludesOption) ]
+		$(includesSeparator)
+		[ FSysIncludes $(sysHeaders) : $(systemIncludesOption) ] ;
+	CC on $(target) = $(cc) ;
+
+	LOCALE_KIT_SIGNATURE on $(target) = $(signature) ;
+
+	SEARCH on $(source) += $(SEARCH_SOURCE) ;
+
+	MakeLocatePlatform $(target) ;
+	Depends $(target) : $(source) <build>collectcatkeys ;
+	LocalClean clean : $(target) ;
+	ExtractCatalogEntries1 $(target) : <build>collectcatkeys $(source) ;
+}
+
+actions ExtractCatalogEntries1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+		cat "$(2[2-])" | $(CC) -E $(CCDEFS) $(HDRS) - > "$(1)".pre 
+		$(2[1]) -s $(LOCALE_KIT_SIGNATURE) -p -o "$(1)" "$(1)".pre
+}
+
+# Link catalog entries from given catkey file into output compiled catalog file.
+# Compiled catalog file will then be copied into the image, but only if the 
+# fingerprint matches the one from the untranslated catalog for the same file.
+rule LinkApplicationCatalog target : sources : signature : language
+{
+	MakeLocateArch $(target) ;
+	LOCALE_KIT_SIGNATURE on $(target) = $(signature) ;
+	Depends $(target) : $(sources) <build>linkcatkeys ;
+	LocalClean clean : $(target) ;
+	LinkApplicationCatalog1 $(target) 
+		: <build>linkcatkeys $(language) $(sources) ;
+}
+
+actions LinkApplicationCatalog1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+		$(2[1]) "$(2[3-])" -l $(2[2]:B) -v -s $(LOCALE_KIT_SIGNATURE) -o "$(1)"
+}
+
+# General rules to invoke from jamfiles and that do (almost) everything related
+# to localization
+rule DoCatalogs appName	# Application name
+	: signature 		# Application MIME signature (must match the one
+						# declared in the sourcecode)
+	: sources 			# List of cpp files where to search keys
+	: generatedCatalog	# Name of the generated catalog (most probably
+						# english.catalog)
+	: translatedCatalogs # List of available translations
+{
+	genCat = [ FGristFiles $(generatedCatalog) ] ;
+	
+	ExtractCatalogEntries $(genCat:S=.catkeys) : $(sources) : $(signature) ;
+
+	LinkApplicationCatalog $(genCat) : $(genCat:S=.catkeys)
+		: $(signature) : $(genCat:B) ;
+	
+	for catalog in $(translatedCatalogs)
+	{
+		LinkApplicationCatalog $(catalog:B).catalog : $(catalog)
+			: $(signature) : $(catalog:B) ;
+	}
+	
+	AddFilesToHaikuImage system etc locale catalogs $(signature) :
+		$(genCat) $(translatedCatalogs:B).catalog ;
 }

@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2003, Oliver Tappe, zooey@hirschkaefer.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
@@ -12,7 +12,7 @@
 #include <String.h>
 
 void
-usage() 
+usage()
 {
 	fprintf(stderr, "usage: dumpcatalog <catalogFiles>\n");
 	exit(-1);
@@ -31,38 +31,33 @@ main(int argc, char **argv)
 	}
 	if (!inputFile || !strlen(inputFile))
 		usage();
-	
+
 	EditableCatalog inputCatalog("Default", "dummy", "dummy");
 	if ((res = inputCatalog.InitCheck()) != B_OK) {
-		fprintf(stderr, "couldn't construct catalog %s - error: %s\n", 
+		fprintf(stderr, "couldn't construct catalog %s - error: %s\n",
 			inputFile, strerror(res));
 		exit(-1);
 	}
 	if ((res = inputCatalog.ReadFromFile(inputFile)) != B_OK) {
-		fprintf(stderr, "couldn't load input-catalog %s - error: %s\n", 
+		fprintf(stderr, "couldn't load input-catalog %s - error: %s\n",
 			inputFile, strerror(res));
 		exit(-1);
 	}
 	DefaultCatalog* inputCatImpl
 		= dynamic_cast<DefaultCatalog*>(inputCatalog.CatalogAddOn());
 	if (!inputCatImpl) {
-		fprintf(stderr, "couldn't access impl of input-catalog %s\n", 
+		fprintf(stderr, "couldn't access impl of input-catalog %s\n",
 			inputFile);
 		exit(-1);
 	}
 	// now walk over all entries in input-catalog and dump them to
 	// stdout
-	DefaultCatalog::CatWalker walker;
-	if ((res = inputCatImpl->GetWalker(&walker)) != B_OK) {
-		fprintf(stderr, "couldn't get walker for input-catalog %s - error: %s\n", 
-			inputFile, strerror(res));
-		exit(-1);
-	}
+	DefaultCatalog::CatWalker walker(inputCatImpl);
 	BString str, ctx, cmt;
-	while(!walker.AtEnd()) {
+	while (!walker.AtEnd()) {
 		const CatKey &key(walker.GetKey());
 		key.GetStringParts(&str, &ctx, &cmt);
-		printf("Hash:\t\t%ld\nKey:\t\t<%s:%s:%s>\nTranslation:\t%s\n-----\n", 
+		printf("Hash:\t\t%lu\nKey:\t\t<%s:%s:%s>\nTranslation:\t%s\n-----\n", 
 			key.fHashVal, str.String(), ctx.String(), cmt.String(), 
 			walker.GetValue());
 		walker.Next();

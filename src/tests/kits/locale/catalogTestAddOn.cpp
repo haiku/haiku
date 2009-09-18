@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <CatalogInAddOn.h>
 #include <DefaultCatalog.h>
@@ -100,7 +101,7 @@ CatalogTestAddOn::Check() {
 	res = get_add_on_catalog(&cat, catSig);
 	assert(res == B_OK);
 	// fetch basic data:
-	int32 fingerprint;
+	uint32 fingerprint;
 	res = cat.GetFingerprint(&fingerprint);
 	assert(res == B_OK);
 	BString lang;

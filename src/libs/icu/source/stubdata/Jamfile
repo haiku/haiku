@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src libs icu source stubdata ;
+
+UseLibraryHeaders icu ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) src libs icu source common ] ;
+
+SharedLibrary <stub>libicu-data.so :	
+	stubdata.c
+	;

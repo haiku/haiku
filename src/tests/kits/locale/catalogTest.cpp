@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include <Application.h>
@@ -112,7 +113,7 @@ CatalogTest::Check()
 	res = be_locale->GetAppCatalog(&cat);
 	assert(res == B_OK);
 	// fetch basic data:
-	int32 fingerprint = 0;
+	uint32 fingerprint = 0;
 	res = cat.GetFingerprint(&fingerprint);
 	assert(res == B_OK);
 	BString lang;

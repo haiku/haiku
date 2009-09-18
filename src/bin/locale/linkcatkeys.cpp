@@ -8,10 +8,13 @@
 #include <vector>
 
 #include <Catalog.h>
-#include <DefaultCatalog.h>
 #include <Entry.h>
 #include <File.h>
 #include <String.h>
+
+#include <DefaultCatalog.h>
+#include <HashMapCatalog.h>
+#include <PlainTextCatalog.h>
 
 using std::vector;
 
@@ -48,7 +51,7 @@ main(int argc, char **argv)
 	};
 	TargetType outputTarget = TARGET_FILE;
 	const char *catalogSig = NULL;
-	const char *catalogLang = "English";
+	BString catalogLang("English");
 	status_t res;
 	while ((++argv)[0]) {
 		if (argv[0][0] == '-' && argv[0][1] != '-') {
@@ -57,6 +60,8 @@ main(int argc, char **argv)
 			while ((c = *arg++) != '\0') {
 				if (c == 's')
 					catalogSig = (++argv)[0];
+				else if (c == 'l')
+					catalogLang = (++argv)[0];
 				else if (c == 'v')
 					showSummary = true;
 				else if (c == 'w')
@@ -83,7 +88,7 @@ main(int argc, char **argv)
 	if (inputFiles.empty() || !catalogSig || !outputFile.Length())
 		usage();
 
-	EditableCatalog targetCatalog("Default", catalogSig, catalogLang);
+	EditableCatalog targetCatalog("Default", catalogSig, catalogLang.String());
 	if ((res = targetCatalog.InitCheck()) != B_OK) {
 		fprintf(stderr, "couldn't construct target-catalog %s - error: %s\n",
 			outputFile.String(), strerror(res));
@@ -99,33 +104,36 @@ main(int argc, char **argv)
 
 	uint32 count = inputFiles.size();
 	for( uint32 i=0; i<count; ++i) {
-		EditableCatalog inputCatalog("Default", catalogSig, "native");
+		EditableCatalog inputCatalog("plaintext", catalogSig, "native");
 		if ((res = inputCatalog.ReadFromFile(inputFiles[i])) != B_OK) {
-			fprintf(stderr, "couldn't load target-catalog %s - error: %s\n",
+			fprintf(stderr, "couldn't load source-catalog %s - error: %s\n",
 				inputFiles[i], strerror(res));
 			exit(-1);
 		}
-		DefaultCatalog* inputCatImpl
-			= dynamic_cast<DefaultCatalog*>(inputCatalog.CatalogAddOn());
+		BHashMapCatalog* inputCatImpl
+			= dynamic_cast<BHashMapCatalog*>(inputCatalog.CatalogAddOn());
 		if (!inputCatImpl) {
 			fprintf(stderr, "couldn't access impl of input-catalog %s\n",
 				inputFiles[i]);
 			exit(-1);
 		}
+
 		// now walk over all entries in input-catalog and add them to
 		// target catalog, unless they already exist there.
-		// (This could be improved by simply inserting the hashmaps,
-		// but this should be fast enough).
-		DefaultCatalog::CatWalker walker;
-		if ((res = inputCatImpl->GetWalker(&walker)) != B_OK) {
-			fprintf(stderr, "couldn't get walker for input-catalog %s - error: %s\n",
-				inputFiles[i], strerror(res));
-			exit(-1);
-		}
-		while(!walker.AtEnd()) {
-			const CatKey &key(walker.GetKey());
-			if (!targetCatImpl->GetString(key))
-				targetCatImpl->SetString(key, walker.GetValue());
+		BHashMapCatalog::CatWalker walker(inputCatImpl);
+		while (!walker.AtEnd()) {
+			const CatKey &plainTextKey(walker.GetKey());
+			BString keyString, keyComment, keyContext;
+			plainTextKey.GetStringParts(&keyString,&keyComment,&keyContext);
+			const CatKey fixedCatKey(keyString.String(), keyComment.String(),
+					keyContext.String());
+
+			BString translatedString = walker.GetValue();
+
+			if (!targetCatImpl->GetString(fixedCatKey)) {
+				targetCatImpl->SetString(fixedCatKey,
+					translatedString.String());
+			}
 			walker.Next();
 		}
 	}
@@ -137,7 +145,8 @@ main(int argc, char **argv)
 			entry.GetRef(&eref);
 			res = targetCatalog.WriteToAttribute(&eref);
 			if (res != B_OK) {
-				fprintf(stderr, "couldn't write target-attribute to %s - error: %s\n",
+				fprintf(stderr,
+					"couldn't write target-attribute to %s - error: %s\n",
 					outputFile.String(), strerror(res));
 				exit(-1);
 			}
@@ -149,7 +158,8 @@ main(int argc, char **argv)
 			entry.GetRef(&eref);
 			res = targetCatalog.WriteToResource(&eref);
 			if (res != B_OK) {
-				fprintf(stderr, "couldn't write target-resource to %s - error: %s\n",
+				fprintf(stderr,
+					"couldn't write target-resource to %s - error: %s\n",
 					outputFile.String(), strerror(res));
 				exit(-1);
 			}
@@ -157,7 +167,8 @@ main(int argc, char **argv)
 		default: {
 			res = targetCatalog.WriteToFile(outputFile.String());
 			if (res != B_OK) {
-				fprintf(stderr, "couldn't write target-catalog to %s - error: %s\n",
+				fprintf(stderr,
+					"couldn't write target-catalog to %s - error: %s\n",
 					outputFile.String(), strerror(res));
 				exit(-1);
 			}
@@ -165,10 +176,10 @@ main(int argc, char **argv)
 	}
 	if (showSummary) {
 		int32 count = targetCatalog.CountItems();
-		if (count)
+		if (count) {
 			fprintf(stderr, "%ld key%s found and written to %s\n",
 				count, (count==1 ? "": "s"), outputFile.String());
-		else
+		} else
 			fprintf(stderr, "no keys found\n");
 	}
 

@@ -1,10 +1,15 @@
 /*
- * Copyright 2003, Oliver Tappe, zooey@hirschkaefer.de. All rights reserved.
+ * Copyright 2003-2009, Haiku.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Oliver Tappe, zooey@hirschkaefer.de
+ *		Adrien Destugues, pulkomandy@gmail.com
  */
 
 
 #include <memory>
+#include <new>
 #include <syslog.h>
 
 #include <Application.h>
@@ -24,9 +29,6 @@
 
 #include <cstdio>
 
-#if __GNUC__ > 2
-using __gnu_cxx::hash;
-#endif
 
 using std::auto_ptr;
 using std::min;
@@ -35,128 +37,10 @@ using std::pair;
 
 
 /*
- *	This file implements the default catalog-type for the opentracker locale kit.
- *  Alternatively, this could be used as a full add-on, but currently this
+ *	This file implements the default catalog-type for the opentracker locale
+ *	kit. Alternatively, this could be used as a full add-on, but currently this
  *  is provided as part of liblocale.so.
  */
-
-extern "C" uint32 adler32(uint32 adler, const uint8 *buf, uint32 len);
-	// definition lives in adler32.c
-
-#if B_BEOS_VERSION <= B_BEOS_VERSION_5 && !defined(__HAIKU__)
-// B_BAD_DATA was introduced with DANO, so we define it for R5:
-#	define B_BAD_DATA -2147483632L
-#endif
-
-
-/*
- * CatKey
- */
-size_t hash<CatKey>::operator()(const CatKey &key) const
-{
-	return key.fHashVal;
-}
-
-
-static const char kSeparator = '\01';
-
-
-CatKey::CatKey(const char *str, const char *ctx, const char *cmt)
-	:
-	fFlags(0)
-{
-	uint32 strLen = str ? strlen(str) : 0;
-	uint32 ctxLen = ctx ? strlen(ctx) : 0;
-	uint32 cmtLen = cmt ? strlen(cmt) : 0;
-	int32 keyLen = strLen + ctxLen + cmtLen + 2;
-	char *keyBuf = fKey.LockBuffer(keyLen);
-	if (!keyBuf)
-		return;
-	if (strLen) {
-		memcpy(keyBuf, str, strLen);
-		keyBuf += strLen;
-	}
-	*keyBuf++ = kSeparator;
-	if (ctxLen) {
-		memcpy(keyBuf, ctx, ctxLen);
-		keyBuf += ctxLen;
-	}
-	*keyBuf++ = kSeparator;
-	if (cmtLen) {
-		memcpy(keyBuf, cmt, cmtLen);
-		keyBuf += cmtLen;
-	}
-	*keyBuf = '\0';
-	fKey.UnlockBuffer(keyLen);
-	fHashVal = HashFun(fKey.String());
-}
-
-
-CatKey::CatKey(uint32 id)
-	:
-	fHashVal(id),
-	fFlags(0)
-{
-}
-
-
-CatKey::CatKey()
-	:
-	fHashVal(0),
-	fFlags(0)
-{
-}
-
-
-bool
-CatKey::operator== (const CatKey& right) const
-{
-	// Two keys are equal if their hashval and key (string,context,comment)
-	// are equal:
-	return fHashVal == right.fHashVal
-		&& fKey == right.fKey;
-}
-
-
-status_t
-CatKey::GetStringParts(BString* str, BString* ctx, BString* cmt) const
-{
-	int32 pos1 = fKey.FindFirst(kSeparator);
-	if (pos1 < B_OK) {
-		if (str)
-			str->SetTo(fKey);
-		if (ctx)
-			ctx->Truncate(0);
-		if (cmt)
-			cmt->Truncate(0);
-	} else {
-		if (str)
-			fKey.CopyInto(*str, 0, pos1);
-		int32 pos2 = fKey.FindFirst(kSeparator, pos1+1);
-		if (pos2 < B_OK) {
-			if (ctx)
-				ctx->SetTo(fKey, pos1+1);
-			if (cmt)
-				cmt->Truncate(0);
-		} else {
-			if (ctx)
-				fKey.CopyInto(*ctx, pos1+1, pos2-pos1-1);
-			if (cmt)
-				cmt->SetTo(fKey.String()+pos2+1);
-		}
-	}
-
-	return B_OK;
-}
-
-
-size_t CatKey::HashFun(const char* s) {
-	unsigned long h = 0;
-	for ( ; *s; ++s)
-		h = 5*h + *s;
-
-	return size_t(h);
-}
 
 
 static const char *kCatFolder = "catalogs";
@@ -176,9 +60,9 @@ static int16 kCatArchiveVersion = 1;
  * give an appropriate error-code otherwise.
  */
 DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
-	int32 fingerprint)
+	uint32 fingerprint)
 	:
-	BCatalogAddOn(signature, language, fingerprint)
+	BHashMapCatalog(signature, language, fingerprint)
 {
 	// give highest priority to catalog living in sub-folder of app's folder:
 	app_info appInfo;
@@ -238,7 +122,7 @@ DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
  */
 DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 	:
-	BCatalogAddOn("", "", 0)
+	BHashMapCatalog("", "", 0)
 {
 	fInitCheck = ReadFromResource(appOrAddOnRef);
 	log_team(LOG_DEBUG,
@@ -255,7 +139,7 @@ DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 DefaultCatalog::DefaultCatalog(const char *path, const char *signature,
 	const char *language)
 	:
-	BCatalogAddOn(signature, language, 0),
+	BHashMapCatalog(signature, language, 0),
 	fPath(path)
 {
 	fInitCheck = B_OK;
@@ -290,15 +174,20 @@ DefaultCatalog::ReadFromFile(const char *path)
 		return res;
 	}
 
-	auto_ptr<char> buf(new char [sz]);
+	auto_ptr<char> buf(new(std::nothrow) char [sz]);
+	if (buf.get() == NULL) {
+		log_team(LOG_ERR, "couldn't allocate array of %d chars", sz);
+		return B_NO_MEMORY;
+	}
 	res = catalogFile.Read(buf.get(), sz);
 	if (res < B_OK) {
 		log_team(LOG_ERR, "couldn't read from catalog-file %s", path);
 		return res;
 	}
 	if (res < sz) {
-		log_team(LOG_ERR, "only got %lu instead of %Lu bytes from catalog-file %s",
-			res, sz, path);
+		log_team(LOG_ERR,
+			"only got %lu instead of %Lu bytes from catalog-file %s", res, sz,
+			path);
 		return res;
 	}
 	BMemoryIO memIO(buf.get(), sz);
@@ -324,7 +213,8 @@ DefaultCatalog::ReadFromAttribute(entry_ref *appOrAddOnRef)
 	BNode node;
 	status_t res = node.SetTo(appOrAddOnRef);
 	if (res != B_OK) {
-		log_team(LOG_ERR, "couldn't find app or add-on (dev=%lu, dir=%Lu, name=%s)",
+		log_team(LOG_ERR,
+			"couldn't find app or add-on (dev=%lu, dir=%Lu, name=%s)",
 			appOrAddOnRef->device, appOrAddOnRef->directory,
 			appOrAddOnRef->name);
 		return B_ENTRY_NOT_FOUND;
@@ -348,7 +238,11 @@ DefaultCatalog::ReadFromAttribute(entry_ref *appOrAddOnRef)
 	}
 
 	size_t size = attrInfo.size;
-	auto_ptr<char> buf(new char [size]);
+	auto_ptr<char> buf(new(std::nothrow) char [size]);
+	if (buf.get() == NULL) {
+		log_team(LOG_ERR, "couldn't allocate array of %d chars", size);
+		return B_NO_MEMORY;
+	}
 	res = node.ReadAttr(BLocaleRoster::kEmbeddedCatAttr, B_MESSAGE_TYPE, 0,
 		buf.get(), size);
 	if (res < (ssize_t)size) {
@@ -369,7 +263,8 @@ DefaultCatalog::ReadFromResource(entry_ref *appOrAddOnRef)
 	BFile file;
 	status_t res = file.SetTo(appOrAddOnRef, B_READ_ONLY);
 	if (res != B_OK) {
-		log_team(LOG_ERR, "couldn't find app or add-on (dev=%lu, dir=%Lu, name=%s)",
+		log_team(LOG_ERR,
+			"couldn't find app or add-on (dev=%lu, dir=%Lu, name=%s)",
 			appOrAddOnRef->device, appOrAddOnRef->directory,
 			appOrAddOnRef->name);
 		return B_ENTRY_NOT_FOUND;
@@ -414,7 +309,7 @@ DefaultCatalog::WriteToFile(const char *path)
 		return res;
 
 	BMallocIO mallocIO;
-	mallocIO.SetBlockSize(max(fCatMap.size()*20, 256UL));
+	mallocIO.SetBlockSize(max(fCatMap.Size() * 20, 256L));
 		// set a largish block-size in order to avoid reallocs
 	res = Flatten(&mallocIO);
 	if (res == B_OK) {
@@ -425,9 +320,6 @@ DefaultCatalog::WriteToFile(const char *path)
 
 		// set mimetype-, language- and signature-attributes:
 		UpdateAttributes(catalogFile);
-		// finally write fingerprint:
-		catalogFile.WriteAttr(BLocaleRoster::kCatFingerprintAttr, B_INT32_TYPE,
-			0, &fFingerprint, sizeof(int32));
 	}
 	if (res == B_OK)
 		UpdateAttributes(catalogFile);
@@ -436,7 +328,8 @@ DefaultCatalog::WriteToFile(const char *path)
 
 
 /*
- * this method is not currently being used, but it may be useful in the future...
+ * this method is not currently being used, but it may be useful in the
+ * future...
  */
 status_t
 DefaultCatalog::WriteToAttribute(entry_ref *appOrAddOnRef)
@@ -447,7 +340,7 @@ DefaultCatalog::WriteToAttribute(entry_ref *appOrAddOnRef)
 		return res;
 
 	BMallocIO mallocIO;
-	mallocIO.SetBlockSize(max(fCatMap.size()*20, 256UL));
+	mallocIO.SetBlockSize(max(fCatMap.Size() * 20, 256L));
 		// set a largish block-size in order to avoid reallocs
 	res = Flatten(&mallocIO);
 
@@ -478,142 +371,51 @@ DefaultCatalog::WriteToResource(entry_ref *appOrAddOnRef)
 		return res;
 
 	BMallocIO mallocIO;
-	mallocIO.SetBlockSize(max(fCatMap.size()*20, 256UL));
+	mallocIO.SetBlockSize(max(fCatMap.Size() * 20, 256L));
 		// set a largish block-size in order to avoid reallocs
 	res = Flatten(&mallocIO);
 
-	if (res == B_OK)
+	if (res == B_OK) {
 		res = rsrc.AddResource(B_MESSAGE_TYPE, BLocaleRoster::kEmbeddedCatResId,
 			mallocIO.Buffer(), mallocIO.BufferLength(), "embedded catalog");
+	}
 
 	return res;
 }
 
 
-void
-DefaultCatalog::MakeEmpty()
-{
-	fCatMap.clear();
-}
-
-
-int32
-DefaultCatalog::CountItems() const
-{
-	return fCatMap.size();
-}
-
-
-const char *
-DefaultCatalog::GetString(const char *string, const char *context,
-	const char *comment)
-{
-	CatKey key(string, context, comment);
-	return GetString(key);
-}
-
-
-const char *
-DefaultCatalog::GetString(uint32 id)
-{
-	CatKey key(id);
-	return GetString(key);
-}
-
-
-const char *
-DefaultCatalog::GetString(const CatKey& key)
-{
-	CatMap::const_iterator iter = fCatMap.find(key);
-	if (iter != fCatMap.end())
-		return iter->second.String();
-	else
-		return NULL;
-}
-
-
-status_t
-DefaultCatalog::SetString(const char *string, const char *translated,
-	const char *context, const char *comment)
-{
-	CatKey key(string, context, comment);
-	fCatMap[key] = translated;
-		// overwrite existing element
-	return B_OK;
-}
-
-
-status_t
-DefaultCatalog::SetString(int32 id, const char *translated)
-{
-	CatKey key(id);
-	fCatMap[key] = translated;
-		// overwrite existing element
-	return B_OK;
-}
-
-
-status_t
-DefaultCatalog::SetString(const CatKey& key, const char *translated)
-{
-	fCatMap[key] = translated;
-		// overwrite existing element
-	return B_OK;
-}
-
-
 /*
- * computes an adler32-checksum (we call it fingerprint) on all the catalog-keys.
- * We do not include the values, since we want catalogs for different languages
- * of the same app to have the same fingerprint, since we use it to separate
- * different catalog-versions.
- */
-int32
-DefaultCatalog::ComputeFingerprint() const
-{
-	uint32 adler = adler32(0, NULL, 0);
-
-	int32 hash;
-	CatMap::const_iterator iter;
-	for (iter = fCatMap.begin(); iter!=fCatMap.end(); ++iter) {
-		hash = B_HOST_TO_LENDIAN_INT32(iter->first.fHashVal);
-		adler = adler32(adler, reinterpret_cast<uint8*>(&hash), sizeof(int32));
-	}
-	return adler;
-}
-
-
-void
-DefaultCatalog::UpdateFingerprint()
-{
-	fFingerprint = ComputeFingerprint();
-}
-
-
-/*
- * writes mimetype, language-name and signature of catalog into the catalog-file.
+ * writes mimetype, language-name and signature of catalog into the
+ * catalog-file.
  */
 void
 DefaultCatalog::UpdateAttributes(BFile& catalogFile)
 {
 	static const int bufSize = 256;
 	char buf[bufSize];
-	if (catalogFile.ReadAttr("BEOS:TYPE", B_MIME_STRING_TYPE, 0, &buf, bufSize) <= 0
+	uint32 temp;
+	if (catalogFile.ReadAttr("BEOS:TYPE", B_MIME_STRING_TYPE, 0, &buf,
+			bufSize) <= 0
 		|| strcmp(kCatMimeType, buf) != 0) {
 		catalogFile.WriteAttr("BEOS:TYPE", B_MIME_STRING_TYPE, 0,
 			kCatMimeType, strlen(kCatMimeType)+1);
 	}
 	if (catalogFile.ReadAttr(BLocaleRoster::kCatLangAttr, B_STRING_TYPE, 0,
-		&buf, bufSize) <= 0
+			&buf, bufSize) <= 0
 		|| fLanguageName != buf) {
 		catalogFile.WriteAttr(BLocaleRoster::kCatLangAttr, B_STRING_TYPE, 0,
 			fLanguageName.String(), fLanguageName.Length()+1);
 	}
 	if (catalogFile.ReadAttr(BLocaleRoster::kCatSigAttr, B_STRING_TYPE, 0,
-		&buf, bufSize) <= 0
+			&buf, bufSize) <= 0
 		|| fSignature != buf) {
 		catalogFile.WriteAttr(BLocaleRoster::kCatSigAttr, B_STRING_TYPE, 0,
 			fSignature.String(), fSignature.Length()+1);
+	}
+	if (catalogFile.ReadAttr(BLocaleRoster::kCatFingerprintAttr, B_UINT32_TYPE,
+		0, &temp, sizeof(uint32)) <= 0) {
+		catalogFile.WriteAttr(BLocaleRoster::kCatFingerprintAttr, B_UINT32_TYPE,
+			0, &fFingerprint, sizeof(uint32));
 	}
 }
 
@@ -626,25 +428,39 @@ DefaultCatalog::Flatten(BDataIO *dataIO)
 
 	status_t res;
 	BMessage archive;
-	int32 count = fCatMap.size();
-	res = archive.AddString("class", "DefaultCatalog")
-		|| archive.AddInt32("c:sz", count)
-		|| archive.AddInt16("c:ver", kCatArchiveVersion)
-		|| archive.AddString("c:lang", fLanguageName.String())
-		|| archive.AddString("c:sig", fSignature.String())
-		|| archive.AddInt32("c:fpr", fFingerprint);
+	int32 count = fCatMap.Size();
+	res = archive.AddString("class", "DefaultCatalog");
+	if (res == B_OK)
+		res = archive.AddInt32("c:sz", count);
+	if (res == B_OK)
+		res = archive.AddInt16("c:ver", kCatArchiveVersion);
+	if (res == B_OK)
+		res = archive.AddString("c:lang", fLanguageName.String());
+	if (res == B_OK)
+		res = archive.AddString("c:sig", fSignature.String());
+	if (res == B_OK)
+		res = archive.AddInt32("c:fpr", fFingerprint);
 	if (res == B_OK)
 		res = archive.Flatten(dataIO);
 
-	CatMap::const_iterator iter;
-	for (iter = fCatMap.begin(); res==B_OK && iter!=fCatMap.end(); ++iter) {
+	CatMap::Iterator iter = fCatMap.GetIterator();
+	CatMap::Entry entry;
+	while (res == B_OK && iter.HasNext()) {
+		entry = iter.Next();
 		archive.MakeEmpty();
-		res = archive.AddString("c:key", iter->first.fKey.String())
-			|| archive.AddInt32("c:hash", iter->first.fHashVal)
-			|| archive.AddString("c:tstr", iter->second.String());
+		res = archive.AddString("c:ostr", entry.key.fString.String());
+		if (res == B_OK)
+			res = archive.AddString("c:ctxt", entry.key.fContext.String());
+		if (res == B_OK)
+			res = archive.AddString("c:comt", entry.key.fComment.String());
+		if (res == B_OK)
+			res = archive.AddInt32("c:hash", entry.key.fHashVal);
+		if (res == B_OK)
+			res = archive.AddString("c:tstr", entry.value.String());
 		if (res == B_OK)
 			res = archive.Flatten(dataIO);
 	}
+
 	return res;
 }
 
@@ -652,7 +468,7 @@ DefaultCatalog::Flatten(BDataIO *dataIO)
 status_t
 DefaultCatalog::Unflatten(BDataIO *dataIO)
 {
-	fCatMap.clear();
+	fCatMap.Clear();
 	int32 count = 0;
 	int16 version;
 	BMessage archiveMsg;
@@ -665,11 +481,11 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 	if (res == B_OK) {
 		fLanguageName = archiveMsg.FindString("c:lang");
 		fSignature = archiveMsg.FindString("c:sig");
-		int32 foundFingerprint = archiveMsg.FindInt32("c:fpr");
+		uint32 foundFingerprint = archiveMsg.FindInt32("c:fpr");
 
-		// if a specific fingerprint has been requested and the catalog does in fact
-		// have a fingerprint, both are compared. If they mismatch, we do not accept
-		// this catalog:
+		// if a specific fingerprint has been requested and the catalog does in
+		// fact have a fingerprint, both are compared. If they mismatch, we do
+		// not accept this catalog:
 		if (foundFingerprint != 0 && fFingerprint != 0
 			&& foundFingerprint != fFingerprint) {
 			log_team(LOG_INFO, "default-catalog(sig=%s, lang=%s) "
@@ -685,23 +501,33 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 	if (res == B_OK && count > 0) {
 		CatKey key;
 		const char *keyStr;
+		const char *keyCtx;
+		const char *keyCmt;
 		const char *translated;
-#ifdef __GCC
-		fCatMap.resize(count);
-#endif
-		for (int i=0; res==B_OK && i<count; ++i) {
+
+		// fCatMap.resize(count);
+			// There is no resize method in Haiku's HashMap to preallocate
+			// memory.
+		for (int i=0; res == B_OK && i < count; ++i) {
 			res = archiveMsg.Unflatten(dataIO);
+			if (res == B_OK)
+				res = archiveMsg.FindString("c:ostr", &keyStr);
+			if (res == B_OK)
+				res = archiveMsg.FindString("c:ctxt", &keyCtx);
+			if (res == B_OK)
+				res = archiveMsg.FindString("c:comt", &keyCmt);
+			if (res == B_OK)
+				res = archiveMsg.FindInt32("c:hash", (int32*)&key.fHashVal);
+			if (res == B_OK)
+				res = archiveMsg.FindString("c:tstr", &translated);
 			if (res == B_OK) {
-				res = archiveMsg.FindString("c:key", &keyStr)
-					|| archiveMsg.FindInt32("c:hash", (int32*)&key.fHashVal)
-					|| archiveMsg.FindString("c:tstr", &translated);
-			}
-			if (res == B_OK) {
-				key.fKey = keyStr;
-				fCatMap.insert(pair<const BPrivate::CatKey, BString>(key, translated));
+				key.fString = keyStr;
+				key.fContext = keyCtx;
+				key.fComment = keyCmt;
+				fCatMap.Put(key, translated);
 			}
 		}
-		int32 checkFP = ComputeFingerprint();
+		uint32 checkFP = ComputeFingerprint();
 		if (fFingerprint != checkFP) {
 			log_team(LOG_WARNING, "default-catalog(sig=%s, lang=%s) "
 				"has wrong fingerprint after load (%ld instead of the %ld). "
@@ -717,9 +543,10 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 
 BCatalogAddOn *
 DefaultCatalog::Instantiate(const char *signature, const char *language,
-	int32 fingerprint)
+	uint32 fingerprint)
 {
-	DefaultCatalog *catalog = new DefaultCatalog(signature, language, fingerprint);
+	DefaultCatalog *catalog
+		= new(std::nothrow) DefaultCatalog(signature, language, fingerprint);
 	if (catalog && catalog->InitCheck() != B_OK) {
 		delete catalog;
 		return NULL;
@@ -731,7 +558,7 @@ DefaultCatalog::Instantiate(const char *signature, const char *language,
 BCatalogAddOn *
 DefaultCatalog::InstantiateEmbedded(entry_ref *appOrAddOnRef)
 {
-	DefaultCatalog *catalog = new DefaultCatalog(appOrAddOnRef);
+	DefaultCatalog *catalog = new(std::nothrow) DefaultCatalog(appOrAddOnRef);
 	if (catalog && catalog->InitCheck() != B_OK) {
 		delete catalog;
 		return NULL;
@@ -743,7 +570,8 @@ DefaultCatalog::InstantiateEmbedded(entry_ref *appOrAddOnRef)
 BCatalogAddOn *
 DefaultCatalog::Create(const char *signature, const char *language)
 {
-	DefaultCatalog *catalog = new DefaultCatalog("", signature, language);
+	DefaultCatalog *catalog
+		= new(std::nothrow) DefaultCatalog("", signature, language);
 	if (catalog && catalog->InitCheck() != B_OK) {
 		delete catalog;
 		return NULL;

@@ -29,20 +29,18 @@ if $(HAIKU_ATA_STACK) = 1 {
 
 SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	cal cat catattr checkfs chgrp chmod chop chown chroot cksum clear
-	clockconfig cmp comm compress copyattr CortexAddOnHost cp
+	clockconfig cmp collectcatkeys comm compress copyattr CortexAddOnHost cp
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
-	draggers driveinfo dstcheck du
+	draggers driveinfo dstcheck du dumpcatalog
 	echo eject env error expand expr
 	factor false fdinfo ffm filepanel find finddir fmt fold fortune frcode
-	ftp ftpd
-	funzip fwcontrol
+	ftp ftpd funzip fwcontrol
 	gawk $(X86_ONLY)gdb getlimits grep groups gzip gzexe
 	hd head hey hostname
 	id ident ifconfig <bin>install installsound iroster isvolume
 	$(IDE_ONLY)ideinfo $(IDE_ONLY)idestatus
-	join
-	keymap kill less lessecho lesskey link listarea listattr
-	listimage listdev
+	join keymap kill 
+	less lessecho lesskey link linkcatkeys listarea listattr listimage listdev
 	listport listres listsem listusb ln locate logger login logname ls lsindex
 	makebootable md5sum merge message mimeset mkdos mkdir mkfifo mkfs mkindex
 	modifiers mount mount_nfs mountvolume mv
@@ -71,19 +69,31 @@ SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc DiskProb
 	ShowImage SoundRecorder StyledEdit Terminal TextSearch TV Workspaces
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations E-mail
-	FileTypes Fonts Keyboard Keymap Media Mouse Network OpenGL Printers
+	FileTypes Fonts Keyboard Keymap Locale Media Mouse Network OpenGL Printers
 	Screen ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
 ;
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 	GLTeapot Haiku3d Mandelbrot Pairs Playground Pulse Sudoku Gradients
 ;
-SYSTEM_LIBS = libalm.so libbe.so libbsd.so libbnetapi.so libdebug.so
-	libdevice.so libfluidsynth.so libfreetype.so libgame.so libGL.so libgnu.so
-	libilmimf.so libjpeg.so liblinprog.so liblpsolve55.so libmail.so libmedia.so
-	libmidi.so libmidi2.so libnetwork.so libpng.so <revisioned>libroot.so
-	libscreensaver.so libtextencoding.so libtracker.so libtranslation.so
+ICU_LIBS = libicu-common.so libicu-data.so libicu-i18n.so
+;
+SYSTEM_LIBS = 
+	libalm.so 
+	libbe.so libbsd.so libbnetapi.so 
+	libdebug.so libdevice.so 
+	libfluidsynth.so libfreetype.so 
+	libgame.so libGL.so libgnu.so
+	libilmimf.so 
+	libjpeg.so 
+	liblinprog.so liblocale.so liblpsolve55.so 
+	libmail.so libmedia.so libmidi.so libmidi2.so 
+	libnetwork.so 
+	libpng.so 
+	<revisioned>libroot.so 
+	libscreensaver.so 
+	libtextencoding.so libtracker.so libtranslation.so 
 	libz.so
-	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
+	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++) $(ICU_LIBS)
 ;
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
 	media_addon_server media_server midi_server net_server print_server
@@ -109,6 +119,7 @@ SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
 	RAWTranslator RTF-Translator SGITranslator STXTTranslator TGATranslator
 	TIFFTranslator WonderBrushTranslator
 ;
+SYSTEM_ADD_ONS_LOCALE_CATALOGS = <catalog-addon>zeta <catalog-addon>plaintext ;
 SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon cortex_flanger.media_addon
 	dvb.media_addon
 	hmulti_audio.media_addon
@@ -352,7 +363,8 @@ AddFilesToHaikuImage system data artwork : $(logoArtwork) ;
 AddDirectoryToHaikuImage system data sounds ;
 
 # Add mail provider infos.
-AddFilesToHaikuImage home config settings Mail ProviderInfo : $(HAIKU_PROVIDER_INFOS) ;
+AddFilesToHaikuImage home config settings Mail ProviderInfo : 
+	$(HAIKU_PROVIDER_INFOS) ;
 
 # Mail spell check dictionaries
 local spellFiles = words geekspeak ;
@@ -360,6 +372,11 @@ spellFiles = $(spellFiles:G=spell) ;
 SEARCH on $(spellFiles)
 	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
 AddFilesToHaikuImage system etc word_dictionary : $(spellFiles) ;
+
+# Locale kit language files
+local languageDir = [ FDirName $(HAIKU_TOP) src data etc locale languages ] ;
+local languages = [ Glob $(languageDir) : *.language ] ;
+AddFilesToHaikuImage system data locale languages : $(languages) ;
 
 local etcFiles = bash_completion inputrc profile teapot.data ;
 etcFiles = $(etcFiles:G=etc) ;
@@ -462,6 +479,7 @@ AddFilesToHaikuImage system add-ons opengl
 	: Mesa\ Software\ Renderer ;
 AddFilesToHaikuHybridImage system add-ons Translators
 	: $(SYSTEM_ADD_ONS_TRANSLATORS) : : true ;
+AddFilesToHaikuImage system add-ons locale catalogs : $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
 AddFilesToHaikuImage system add-ons mail_daemon inbound_protocols : POP3 IMAP ;
 AddFilesToHaikuImage system add-ons mail_daemon outbound_protocols : SMTP ;
 AddFilesToHaikuImage system add-ons mail_daemon inbound_filters : Match\ Header Spam\ Filter R5\ Daemon\ Filter ;

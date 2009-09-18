@@ -5,21 +5,27 @@
 
 
 #include <Country.h>
+
+#include <assert.h>
+
 #include <String.h>
+
+#include <unicode/datefmt.h>
+#include <unicode/dcfmtsym.h>
+#include <unicode/decimfmt.h>
+#include <unicode/dtfmtsym.h>
+#include <unicode/smpdtfmt.h>
+#include <ICUWrapper.h>
 
 #include <monetary.h>
 #include <stdarg.h>
 
 
-const char *gStrings[] = {
+const char* gStrings[] = {
 	// date/time format
 	"",
 	"",
-	"",
-	"",
 	// short date/time format
-	"",
-	"",
 	"",
 	"",
 	// am/pm string
@@ -28,31 +34,30 @@ const char *gStrings[] = {
 	// separators
 	".",
 	":",
-	" ",
-	".",
-	",",
-	// positive/negative sign
-	"+",
-	"-",
+
 	// currency/monetary
-	"US$"
-	" "
 	"."
 	","
 };
 
 
-BCountry::BCountry()
+BCountry::BCountry(const char* languageCode, const char* countryCode)
 	:
-	fStrings(gStrings)
+	fStrings(gStrings),
+	fICULocale(languageCode, countryCode)
 {
 }
 
 
-BCountry::BCountry(const char **strings)
+BCountry::BCountry(const char* languageAndCountryCode)
 	:
-	fStrings(strings)
+	fStrings(gStrings),
+	fICULocale(languageAndCountryCode)
 {
+	fICULongDateFormatter = DateFormat::createDateInstance(
+		DateFormat::FULL, fICULocale);
+ 	fICUShortDateFormatter = DateFormat::createDateInstance(
+		DateFormat::SHORT, fICULocale);
 }
 
 
@@ -61,14 +66,26 @@ BCountry::~BCountry()
 }
 
 
-const char *
-BCountry::Name() const
+bool
+BCountry::Name(BString& name) const
 {
-	return "United States Of America";
+	UnicodeString uString;
+	fICULocale.getDisplayName(uString);
+	BStringByteSink stringConverter(&name);
+	uString.toUTF8(stringConverter);
+	return true;
 }
 
 
-const char *
+const char*
+BCountry::Code() const
+{
+	return fICULocale.getName();
+}
+
+
+// TODO use ICU backend keywords instead
+const char*
 BCountry::GetString(uint32 id) const
 {
 	if (id < B_COUNTRY_STRINGS_BASE || id >= B_NUM_COUNTRY_STRINGS)
@@ -78,119 +95,324 @@ BCountry::GetString(uint32 id) const
 }
 
 
-void 
-BCountry::FormatDate(char *string, size_t maxSize, time_t time, bool longFormat)
+void
+BCountry::FormatDate(char* string, size_t maxSize, time_t time, bool longFormat)
 {
-	// ToDo: implement us
+	BString fullString;
+	FormatDate(&fullString, time, longFormat);
+	strncpy(string, fullString.String(), maxSize);
 }
 
 
-void 
+void
 BCountry::FormatDate(BString *string, time_t time, bool longFormat)
 {
+	// TODO: ICU allows for 4 different levels of expansion :
+	// short, medium, long, and full. Our bool parameter is not enough...
+	icu_4_2::DateFormat* dateFormatter
+		= longFormat ? fICULongDateFormatter : fICUShortDateFormatter;
+	UnicodeString ICUString;
+	ICUString = dateFormatter->format((UDate)time * 1000, ICUString);
+
+	string->Truncate(0);
+	BStringByteSink stringConverter(string);
+
+	ICUString.toUTF8(stringConverter);
 }
 
 
-void 
-BCountry::FormatTime(char *string, size_t maxSize, time_t time, bool longFormat)
+void
+BCountry::FormatTime(char* string, size_t maxSize, time_t time, bool longFormat)
 {
+	BString fullString;
+	FormatTime(&fullString, time, longFormat);
+	strncpy(string, fullString.String(), maxSize);
 }
 
 
-void 
-BCountry::FormatTime(BString *string, time_t time, bool longFormat)
+void
+BCountry::FormatTime(BString* string, time_t time, bool longFormat)
 {
+	// TODO: ICU allows for 4 different levels of expansion :
+	// short, medium, long, and full. Our bool parameter is not enough...
+	icu_4_2::DateFormat* timeFormatter;
+ 	timeFormatter = DateFormat::createTimeInstance(
+		longFormat ? DateFormat::FULL : DateFormat::SHORT,
+		fICULocale);
+	UnicodeString ICUString;
+	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);
+
+	string->Truncate(0);
+	BStringByteSink stringConverter(string);
+
+	ICUString.toUTF8(stringConverter);
 }
 
 
-const char *
-BCountry::DateFormat(bool longFormat) const
+bool
+BCountry::DateFormat(BString& format, bool longFormat) const
 {
-	return fStrings[longFormat ? B_DATE_FORMAT : B_SHORT_DATE_FORMAT];
+	icu_4_2::DateFormat* dateFormatter
+		= longFormat ? fICULongDateFormatter : fICUShortDateFormatter;
+	SimpleDateFormat* dateFormatterImpl
+		= static_cast<SimpleDateFormat*>(dateFormatter);
+
+	UnicodeString ICUString;
+	ICUString = dateFormatterImpl->toPattern(ICUString);
+
+	BStringByteSink stringConverter(&format);
+
+	ICUString.toUTF8(stringConverter);
+
+	return true;
 }
 
 
-const char *
-BCountry::TimeFormat(bool longFormat) const
+void
+BCountry::SetDateFormat(const char* formatString, bool longFormat)
 {
-	return fStrings[longFormat ? B_TIME_FORMAT : B_SHORT_TIME_FORMAT];
+	icu_4_2::DateFormat* dateFormatter
+		= longFormat ? fICULongDateFormatter : fICUShortDateFormatter;
+	SimpleDateFormat* dateFormatterImpl
+		= static_cast<SimpleDateFormat*>(dateFormatter);
+
+	UnicodeString pattern(formatString);
+	dateFormatterImpl->applyPattern(pattern);
 }
 
 
-const char *
+bool
+BCountry::TimeFormat(BString& format, bool longFormat) const
+{
+	icu_4_2::DateFormat* dateFormatter;
+ 	dateFormatter = DateFormat::createTimeInstance(
+		longFormat ? DateFormat::FULL : DateFormat::SHORT,
+		fICULocale);
+	SimpleDateFormat* dateFormatterImpl
+		= static_cast<SimpleDateFormat*>(dateFormatter);
+
+	UnicodeString ICUString;
+	ICUString = dateFormatterImpl->toPattern(ICUString);
+
+	BStringByteSink stringConverter(&format);
+
+	ICUString.toUTF8(stringConverter);
+
+	return true;
+}
+
+
+// TODO find how to get it from ICU (setting it is ok, we use the pattern-string
+// for that)
+// Or remove this function ?
+const char*
 BCountry::DateSeparator() const
 {
 	return fStrings[B_DATE_SEPARATOR];
 }
 
 
-const char *
+const char*
 BCountry::TimeSeparator() const
 {
 	return fStrings[B_TIME_SEPARATOR];
 }
 
 
-void 
-BCountry::FormatNumber(char *string, size_t maxSize, double value)
+void
+BCountry::FormatNumber(char* string, size_t maxSize, double value)
 {
+	BString fullString;
+	FormatNumber(&fullString, value);
+	strncpy(string, fullString.String(), maxSize);
 }
 
 
-void 
-BCountry::FormatNumber(BString *string, double value)
+UErrorCode
+BCountry::FormatNumber(BString* string, double value)
 {
+	UErrorCode err = U_ZERO_ERROR;
+	NumberFormat* numberFormatter
+		= NumberFormat::createInstance(fICULocale, NumberFormat::kNumberStyle,
+			err);
+
+	if (U_FAILURE(err)) return err;
+
+	UnicodeString ICUString;
+	ICUString = numberFormatter->format(value, ICUString);
+
+	string->Truncate(0);
+	BStringByteSink stringConverter(string);
+
+	ICUString.toUTF8(stringConverter);
+
+	return U_ZERO_ERROR;
 }
 
 
-void 
-BCountry::FormatNumber(char *string, size_t maxSize, int32 value)
+void
+BCountry::FormatNumber(char* string, size_t maxSize, int32 value)
 {
+	BString fullString;
+	FormatNumber(&fullString, value);
+	strncpy(string, fullString.String(), maxSize);
 }
 
 
-void 
-BCountry::FormatNumber(BString *string, int32 value)
+void
+BCountry::FormatNumber(BString* string, int32 value)
 {
+	UErrorCode err;
+	NumberFormat* numberFormatter
+		= NumberFormat::createInstance(fICULocale, err);
+
+	assert(err == U_ZERO_ERROR);
+
+	UnicodeString ICUString;
+	ICUString = numberFormatter->format((int32_t)value, ICUString);
+
+	string->Truncate(0);
+	BStringByteSink stringConverter(string);
+
+	ICUString.toUTF8(stringConverter);
 }
 
 
-const char *
-BCountry::DecimalPoint() const
+// This will only work for locales using the decimal system...
+bool
+BCountry::DecimalPoint(BString& format) const
 {
-	return fStrings[B_DECIMAL_POINT];
+	UErrorCode err;
+	NumberFormat* numberFormatter
+		= NumberFormat::createInstance(fICULocale, err);
+
+	assert(err == U_ZERO_ERROR);
+
+	DecimalFormat* decimalFormatter
+		= dynamic_cast<DecimalFormat*>(numberFormatter);
+
+	assert(decimalFormatter != NULL);
+
+	const DecimalFormatSymbols* syms
+		= decimalFormatter->getDecimalFormatSymbols();
+
+	UnicodeString ICUString;
+	ICUString = syms->getSymbol(DecimalFormatSymbols::kDecimalSeparatorSymbol);
+
+	BStringByteSink stringConverter(&format);
+
+	ICUString.toUTF8(stringConverter);
+
+	return true;
 }
 
 
-const char *
-BCountry::ThousandsSeparator() const
+bool
+BCountry::ThousandsSeparator(BString& separator) const
 {
-	return fStrings[B_THOUSANDS_SEPARATOR];
+	UErrorCode err;
+	NumberFormat* numberFormatter
+		= NumberFormat::createInstance(fICULocale, err);
+	assert(err == U_ZERO_ERROR);
+	DecimalFormat* decimalFormatter
+		= dynamic_cast<DecimalFormat*>(numberFormatter);
+
+	assert(decimalFormatter != NULL);
+
+	const DecimalFormatSymbols* syms
+		= decimalFormatter->getDecimalFormatSymbols();
+
+	UnicodeString ICUString;
+	ICUString = syms->getSymbol(DecimalFormatSymbols::kPatternSeparatorSymbol);
+
+	BStringByteSink stringConverter(&separator);
+
+	ICUString.toUTF8(stringConverter);
+
+	return true;
 }
 
 
-const char *
-BCountry::Grouping() const
+bool
+BCountry::Grouping(BString& grouping) const
 {
-	return fStrings[B_GROUPING];
+	UErrorCode err;
+	NumberFormat* numberFormatter
+		= NumberFormat::createInstance(fICULocale, err);
+	assert(err == U_ZERO_ERROR);
+	DecimalFormat* decimalFormatter
+		= dynamic_cast<DecimalFormat*>(numberFormatter);
+
+	assert(decimalFormatter != NULL);
+
+	const DecimalFormatSymbols* syms
+		= decimalFormatter->getDecimalFormatSymbols();
+
+	UnicodeString ICUString;
+	ICUString = syms->getSymbol(DecimalFormatSymbols::kGroupingSeparatorSymbol);
+
+	BStringByteSink stringConverter(&grouping);
+
+	ICUString.toUTF8(stringConverter);
+
+	return true;
 }
 
 
-const char *
-BCountry::PositiveSign() const
+bool
+BCountry::PositiveSign(BString& sign) const
 {
-	return fStrings[B_POSITIVE_SIGN];
+	UErrorCode err;
+	NumberFormat* numberFormatter
+		= NumberFormat::createInstance(fICULocale, err);
+	assert(err == U_ZERO_ERROR);
+	DecimalFormat* decimalFormatter
+		= dynamic_cast<DecimalFormat*>(numberFormatter);
+
+	assert(decimalFormatter != NULL);
+
+	const DecimalFormatSymbols* syms
+		= decimalFormatter->getDecimalFormatSymbols();
+
+	UnicodeString ICUString;
+	ICUString = syms->getSymbol(DecimalFormatSymbols::kPlusSignSymbol);
+
+	BStringByteSink stringConverter(&sign);
+
+	ICUString.toUTF8(stringConverter);
+
+	return true;
 }
 
 
-const char *
-BCountry::NegativeSign() const
+bool
+BCountry::NegativeSign(BString& sign) const
 {
-	return fStrings[B_NEGATIVE_SIGN];
+	UErrorCode err;
+	NumberFormat* numberFormatter
+		= NumberFormat::createInstance(fICULocale, err);
+	assert(err == U_ZERO_ERROR);
+	DecimalFormat* decimalFormatter
+		= dynamic_cast<DecimalFormat*>(numberFormatter);
+
+	assert(decimalFormatter != NULL);
+
+	const DecimalFormatSymbols* syms
+		= decimalFormatter->getDecimalFormatSymbols();
+
+	UnicodeString ICUString;
+	ICUString = syms->getSymbol(DecimalFormatSymbols::kMinusSignSymbol);
+
+	BStringByteSink stringConverter(&sign);
+
+	ICUString.toUTF8(stringConverter);
+
+	return true;
 }
 
 
-int8 
+// TODO does ICU even support this ? Is it in the keywords ?
+int8
 BCountry::Measurement() const
 {
 	return B_US;
@@ -198,62 +420,168 @@ BCountry::Measurement() const
 
 
 ssize_t
-BCountry::FormatMonetary(char *string, size_t maxSize, char *format, ...)
+BCountry::FormatMonetary(char* string, size_t maxSize, double value)
 {
-	va_list args;
-	va_start(args,format);
-
-	ssize_t status = vstrfmon(string, maxSize, format, args);
-
-	va_end(args);
-
-	return status;
+	BString fullString;
+	FormatMonetary(&fullString, value);
+	strncpy(string, fullString.String(), maxSize);
 }
 
 
-ssize_t 
-BCountry::FormatMonetary(BString *string, char *format, ...)
+ssize_t
+BCountry::FormatMonetary(BString* string, double value)
 {
+	UErrorCode err;
+	NumberFormat* numberFormatter
+		= NumberFormat::createCurrencyInstance(fICULocale, err);
+
+	assert(err == U_ZERO_ERROR);
+
+	UnicodeString ICUString;
+	ICUString = numberFormatter->format(value, ICUString);
+
+	string->Truncate(0);
+	BStringByteSink stringConverter(string);
+
+	ICUString.toUTF8(stringConverter);
+
 	return B_OK;
 }
 
 
-const char *
-BCountry::CurrencySymbol() const
+bool
+BCountry::CurrencySymbol(BString& symbol) const
 {
-	return fStrings[B_CURRENCY_SYMBOL];
+	UErrorCode err;
+	NumberFormat* numberFormatter
+		= NumberFormat::createCurrencyInstance(fICULocale, err);
+	assert(err == U_ZERO_ERROR);
+	DecimalFormat* decimalFormatter
+		= dynamic_cast<DecimalFormat*>(numberFormatter);
+
+	assert(decimalFormatter != NULL);
+
+	const DecimalFormatSymbols* syms
+		= decimalFormatter->getDecimalFormatSymbols();
+
+	UnicodeString ICUString;
+	ICUString = syms->getSymbol(DecimalFormatSymbols::kCurrencySymbol);
+
+	BStringByteSink stringConverter(&symbol);
+
+	ICUString.toUTF8(stringConverter);
+
+	return true;
 }
 
 
-const char *
-BCountry::InternationalCurrencySymbol() const
+bool
+BCountry::InternationalCurrencySymbol(BString& symbol) const
 {
-	return fStrings[B_INT_CURRENCY_SYMBOL];
+	UErrorCode err;
+	NumberFormat* numberFormatter
+		= NumberFormat::createCurrencyInstance(fICULocale, err);
+	assert(err == U_ZERO_ERROR);
+	DecimalFormat* decimalFormatter
+		= dynamic_cast<DecimalFormat*>(numberFormatter);
+
+	assert(decimalFormatter != NULL);
+
+	const DecimalFormatSymbols* syms
+		= decimalFormatter->getDecimalFormatSymbols();
+
+	UnicodeString ICUString;
+	ICUString = syms->getSymbol(DecimalFormatSymbols::kIntlCurrencySymbol);
+
+	BStringByteSink stringConverter(&symbol);
+
+	ICUString.toUTF8(stringConverter);
+
+	return true;
 }
 
 
-const char *
-BCountry::MonDecimalPoint() const
+bool
+BCountry::MonDecimalPoint(BString& decimal) const
 {
-	return fStrings[B_MON_DECIMAL_POINT];
+	UErrorCode err;
+	NumberFormat* numberFormatter
+		= NumberFormat::createCurrencyInstance(fICULocale, err);
+	assert(err == U_ZERO_ERROR);
+	DecimalFormat* decimalFormatter
+		= dynamic_cast<DecimalFormat*>(numberFormatter);
+
+	assert(decimalFormatter != NULL);
+
+	const DecimalFormatSymbols* syms
+		= decimalFormatter->getDecimalFormatSymbols();
+
+	UnicodeString ICUString;
+	ICUString = syms->getSymbol(DecimalFormatSymbols::kMonetarySeparatorSymbol);
+
+	BStringByteSink stringConverter(&decimal);
+
+	ICUString.toUTF8(stringConverter);
+
+	return true;
 }
 
 
-const char *
-BCountry::MonThousandsSeparator() const
+bool
+BCountry::MonThousandsSeparator(BString& separator) const
 {
-	return fStrings[B_MON_THOUSANDS_SEPARATOR];
+	UErrorCode err;
+	NumberFormat* numberFormatter
+		= NumberFormat::createCurrencyInstance(fICULocale, err);
+	assert(err == U_ZERO_ERROR);
+	DecimalFormat* decimalFormatter
+		= dynamic_cast<DecimalFormat*>(numberFormatter);
+
+	assert(decimalFormatter != NULL);
+
+	const DecimalFormatSymbols* syms
+		= decimalFormatter->getDecimalFormatSymbols();
+
+	UnicodeString ICUString;
+	ICUString = syms->getSymbol(DecimalFormatSymbols::kPatternSeparatorSymbol);
+
+	BStringByteSink stringConverter(&separator);
+
+	ICUString.toUTF8(stringConverter);
+
+	return true;
 }
 
 
-const char *
-BCountry::MonGrouping() const
+bool
+BCountry::MonGrouping(BString& grouping) const
 {
-	return fStrings[B_MON_GROUPING];
+	UErrorCode err;
+	NumberFormat* numberFormatter
+		= NumberFormat::createCurrencyInstance(fICULocale, err);
+	assert(err == U_ZERO_ERROR);
+	DecimalFormat* decimalFormatter
+		= dynamic_cast<DecimalFormat*>(numberFormatter);
+
+	assert(decimalFormatter != NULL);
+
+	const DecimalFormatSymbols* syms
+		= decimalFormatter->getDecimalFormatSymbols();
+
+	UnicodeString ICUString;
+	ICUString = syms->getSymbol(
+		DecimalFormatSymbols::kMonetaryGroupingSeparatorSymbol);
+
+	BStringByteSink stringConverter(&grouping);
+
+	ICUString.toUTF8(stringConverter);
+
+	return true;
 }
 
 
-int32 
+// TODO: is this possible to get from ICU ?
+int32
 BCountry::MonFracDigits() const
 {
 	return 2;

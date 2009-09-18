@@ -1,10 +1,11 @@
-/* 
+/*
 ** Copyright 2003, Oliver Tappe, zooey@hirschkaefer.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <typeinfo>
 #include <unistd.h>
 
@@ -12,7 +13,7 @@
 #include <StopWatch.h>
 
 #include <Catalog.h>
-#include <DefaultCatalog.h>
+#include <HashMapCatalog.h>
 #include <Entry.h>
 #include <Locale.h>
 #include <Path.h>
@@ -65,7 +66,7 @@ CatalogSpeed::TestCreation()
 		cat1.SetString(strs[i].String(), trls[i].String(), ctxs[i].String());
 	}
 	watch.Suspend();
-	printf("\tadded %ld strings in           %9Ld usecs\n", 
+	printf("\tadded %ld strings in           %9Ld usecs\n",
 		cat1.CountItems(), watch.ElapsedTime());
 
 	watch.Reset();
@@ -73,7 +74,7 @@ CatalogSpeed::TestCreation()
 	res = cat1.WriteToFile("./locale/catalogs/"catSig"/klingon.catalog");
 	assert(res == B_OK);
 	watch.Suspend();
-	printf("\t%ld strings written to disk in %9Ld usecs\n", 
+	printf("\t%ld strings written to disk in %9Ld usecs\n",
 		cat1.CountItems(), watch.ElapsedTime());
 }
 
@@ -84,11 +85,11 @@ CatalogSpeed::TestLookup()
 	BStopWatch watch("catalogSpeed", true);
 
 	BCatalog *cat = be_catalog = new BCatalog(catSig, "klingon");
-	
+
 	assert(cat != NULL);
 	assert(cat->InitCheck() == B_OK);
 	watch.Suspend();
-	printf("\t%ld strings read from disk in  %9Ld usecs\n", 
+	printf("\t%ld strings read from disk in  %9Ld usecs\n",
 		cat->CountItems(), watch.ElapsedTime());
 
 	watch.Reset();
@@ -97,7 +98,7 @@ CatalogSpeed::TestLookup()
 		translated = TR(strs[i].String());
 	}
 	watch.Suspend();
-	printf("\tlooked up %lu strings in       %9Ld usecs\n", 
+	printf("\tlooked up %lu strings in       %9Ld usecs\n",
 		kNumStrings, watch.ElapsedTime());
 
 	delete cat;
@@ -131,7 +132,7 @@ CatalogSpeed::TestIdCreation()
 		cat1.SetString(i, trls[i].String());
 	}
 	watch.Suspend();
-	printf("\tadded %ld strings by id in     %9Ld usecs\n", 
+	printf("\tadded %ld strings by id in     %9Ld usecs\n",
 		cat1.CountItems(), watch.ElapsedTime());
 
 	watch.Reset();
@@ -139,7 +140,7 @@ CatalogSpeed::TestIdCreation()
 	res = cat1.WriteToFile("./locale/catalogs/"catSig"/klingon.catalog");
 	assert( res == B_OK);
 	watch.Suspend();
-	printf("\t%ld strings written to disk in %9Ld usecs\n", 
+	printf("\t%ld strings written to disk in %9Ld usecs\n",
 		cat1.CountItems(), watch.ElapsedTime());
 }
 
@@ -154,7 +155,7 @@ CatalogSpeed::TestIdLookup()
 	assert(cat != NULL);
 	assert(cat->InitCheck() == B_OK);
 	watch.Suspend();
-	printf("\t%ld strings read from disk in  %9Ld usecs\n", 
+	printf("\t%ld strings read from disk in  %9Ld usecs\n",
 		cat->CountItems(), watch.ElapsedTime());
 
 	watch.Reset();
@@ -163,7 +164,7 @@ CatalogSpeed::TestIdLookup()
 		translated = TR_ID(i);
 	}
 	watch.Suspend();
-	printf("\tlooked up %lu strings in       %9Ld usecs\n", 
+	printf("\tlooked up %lu strings in       %9Ld usecs\n",
 		kNumStrings, watch.ElapsedTime());
 
 	delete cat;
@@ -173,7 +174,7 @@ CatalogSpeed::TestIdLookup()
 int
 main(int argc, char **argv)
 {
-	BApplication* testApp 
+	BApplication* testApp
 		= new BApplication("application/"catSig);
 
 	// change to app-folder:
@@ -199,6 +200,6 @@ main(int argc, char **argv)
 	catSpeed.TestIdLookup();
 
 	delete testApp;
-	
+
 	return 0;
 }

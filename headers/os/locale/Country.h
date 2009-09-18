@@ -6,6 +6,13 @@
 #include <LocaleStrings.h>
 #include <String.h>
 
+#include <unicode/locid.h>
+
+namespace icu_4_2 {
+	class DateFormat;
+}
+
+
 enum {
 	B_METRIC = 0,
 	B_US
@@ -14,39 +21,46 @@ enum {
 
 class BCountry {
 	public:
-		BCountry();
+		BCountry(const char* languageCode, const char* countryCode);
+		BCountry(const char* languageAndCountryCode = "en_US");
 		virtual ~BCountry();
 
-		virtual const char *Name() const;
+		virtual bool Name(BString&) const;
+		const char* Code() const;
 
 		// see definitions below
 		const char *GetString(uint32 id) const;
 
 		// date & time
 
-		virtual void	FormatDate(char *string,size_t maxSize,time_t time,bool longFormat);
-		virtual void	FormatDate(BString *string,time_t time,bool longFormat);
-		virtual void	FormatTime(char *string,size_t maxSize,time_t time,bool longFormat);
-		virtual void	FormatTime(BString *string,time_t time,bool longFormat);
+		virtual void FormatDate(char* string, size_t maxSize, time_t time,
+			bool longFormat);
+		virtual void FormatDate(BString* string, time_t time, bool longFormat);
+		virtual void FormatTime(char* string, size_t maxSize, time_t time,
+			bool longFormat);
+		virtual void FormatTime(BString* string, time_t time,
+			bool longFormat);
 
-		const char		*DateFormat(bool longFormat) const;
-		const char		*TimeFormat(bool longFormat) const;
-		const char		*DateSeparator() const;
-		const char		*TimeSeparator() const;
+		bool		DateFormat(BString&, bool longFormat) const;
+		void		SetDateFormat(const char* formatString,
+						bool longFormat = true);
+		bool		TimeFormat(BString&, bool longFormat) const;
+		const char*	DateSeparator() const;
+		const char*	TimeSeparator() const;
 
 		// numbers
 
-		virtual void	FormatNumber(char *string,size_t maxSize,double value);
-		virtual void	FormatNumber(BString *string,double value);
-		virtual void	FormatNumber(char *string,size_t maxSize,int32 value);
-		virtual void	FormatNumber(BString *string,int32 value);
+		virtual void FormatNumber(char* string, size_t maxSize, double value);
+		virtual UErrorCode FormatNumber(BString* string, double value);
+		virtual void FormatNumber(char* string, size_t maxSize, int32 value);
+		virtual void FormatNumber(BString* string, int32 value);
 
-		const char		*DecimalPoint() const;
-		const char		*ThousandsSeparator() const;
-		const char		*Grouping() const;
+		bool		DecimalPoint(BString&) const;
+		bool		ThousandsSeparator(BString&) const;
+		bool		Grouping(BString&) const;
 
-		const char		*PositiveSign() const;
-		const char		*NegativeSign() const;
+		bool		PositiveSign(BString&) const;
+		bool		NegativeSign(BString&) const;
 
 		// measurements
 
@@ -54,21 +68,22 @@ class BCountry {
 
 		// monetary
 
-		virtual ssize_t	FormatMonetary(char *string,size_t maxSize,char *format, ...);
-		virtual ssize_t	FormatMonetary(BString *string,char *format, ...);
+		virtual ssize_t	FormatMonetary(char* string, size_t maxSize,
+			double value);
+		virtual ssize_t	FormatMonetary(BString* string, double value);
 
-		const char		*CurrencySymbol() const;
-		const char		*InternationalCurrencySymbol() const;
-		const char		*MonDecimalPoint() const;
-		const char		*MonThousandsSeparator() const;
-		const char		*MonGrouping() const;
+		bool		CurrencySymbol(BString&) const;
+		bool		InternationalCurrencySymbol(BString&) const;
+		bool		MonDecimalPoint(BString&) const;
+		bool		MonThousandsSeparator(BString&) const;
+		bool		MonGrouping(BString&) const;
 		virtual int32	MonFracDigits() const;
 
-	protected:
-		BCountry(const char **strings);
-
 	private:
-		const char	**fStrings;
+		icu_4_2::DateFormat* fICULongDateFormatter;
+		icu_4_2::DateFormat* fICUShortDateFormatter;
+		const char**	fStrings;
+		Locale fICULocale;
 };
 
 #endif	/* _COUNTRY_H_ */

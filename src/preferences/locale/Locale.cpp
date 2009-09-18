@@ -9,13 +9,18 @@
 
 #include <Application.h>
 #include <Alert.h>
+#include <Catalog.h>
 #include <TextView.h>
 #include <FindDirectory.h>
 #include <File.h>
+#include <Locale.h>
 #include <Path.h>
 
 #include <stdio.h>
 #include <string.h>
+
+
+#define TR_CONTEXT "Locale Preflet"
 
 
 const char *kSignature = "application/x-vnd.Haiku-Locale";
@@ -39,10 +44,10 @@ class Settings {
 };
 
 
-class Locale : public BApplication {
+class LocalePreflet : public BApplication {
 	public:
-		Locale();
-		virtual ~Locale();
+		LocalePreflet();
+		virtual ~LocalePreflet();
 
 		virtual void ReadyToRun();
 		virtual void MessageReceived(BMessage *message);
@@ -54,6 +59,8 @@ class Locale : public BApplication {
 		Settings	fSettings;
 		BWindow		*fOpenWindow;
 		BRect		fWindowFrame;
+
+		BCatalog	cat;
 };
 
 
@@ -70,6 +77,8 @@ Settings::Settings()
 		|| fMessage.Unflatten(&file) != B_OK) {
 		// set default prefs
 		fMessage.AddRect("window_frame", BRect(50, 50, 550, 500));
+		fMessage.AddString("language", "en");
+		fMessage.AddString("country", "en_US");
 		return;
 	}
 }
@@ -109,6 +118,21 @@ Settings::UpdateFrom(BMessage *message)
 	if (message->FindRect("window_frame", &frame) == B_OK)
 		fMessage.ReplaceRect("window_frame", frame);
 
+	BString langName;
+	// We make sure there is at least one string before erasing the previous
+	// settings, then we add the remaining ones, if any
+	if (message->FindString("language",&langName) == B_OK) {
+		// Remove any old data as we know we have newer one to replace it
+		fMessage.RemoveName("language");
+		for (int i = 0; message->FindString("language", i, &langName) == B_OK;
+				i++)
+			fMessage.AddString("language", langName);
+	}
+
+	if (message->FindString("country",&langName) == B_OK) 
+		fMessage.ReplaceString("country", langName);
+
+
 	fUpdated = true;
 }
 
@@ -116,23 +140,25 @@ Settings::UpdateFrom(BMessage *message)
 //	#pragma mark -
 
 
-Locale::Locale()
+LocalePreflet::LocalePreflet()
 	: BApplication(kSignature)
 {
 	fWindowFrame = fSettings.Message().FindRect("window_frame");
+
+	be_locale -> GetAppCatalog(&cat);
 
 	BWindow* window = new LocaleWindow(fWindowFrame);
 	window->Show();
 }
 
 
-Locale::~Locale()
+LocalePreflet::~LocalePreflet()
 {
 }
 
 
 void 
-Locale::ReadyToRun()
+LocalePreflet::ReadyToRun()
 {
 	// are there already windows open?
 	if (CountWindows() != 1)
@@ -144,7 +170,7 @@ Locale::ReadyToRun()
 
 
 void 
-Locale::MessageReceived(BMessage *message)
+LocalePreflet::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgSettingsChanged:
@@ -159,11 +185,11 @@ Locale::MessageReceived(BMessage *message)
 
 
 void
-Locale::AboutRequested()
+LocalePreflet::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "Locale\n"
+	BAlert *alert = new BAlert("about", TR("Locale\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2005, Haiku.\n\n", "Ok");
+		"\tCopyright 2005, Haiku.\n\n"), "Ok");
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -179,7 +205,7 @@ Locale::AboutRequested()
 
 
 bool 
-Locale::QuitRequested()
+LocalePreflet::QuitRequested()
 {
 	return true;
 }
@@ -191,7 +217,7 @@ Locale::QuitRequested()
 int 
 main(int argc, char **argv)
 {
-	Locale app;
+	LocalePreflet app;
 
 	app.Run();
 	return 0;

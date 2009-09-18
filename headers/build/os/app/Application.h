@@ -16,6 +16,8 @@ public:
 							BApplication(const char* signature,
 										 status_t* error);
 	virtual					~BApplication();
+
+	status_t				GetAppInfo(app_info* info);
 };
 
 // Global Objects

@@ -25,7 +25,8 @@ class BLocale {
 
 		void FormatString(char *target, size_t maxSize, char *fmt, ...);
 		void FormatString(BString *, char *fmt, ...);
-		void FormatDateTime(char *target, size_t maxSize, const char *fmt, time_t);
+		void FormatDateTime(char *target, size_t maxSize, const char *fmt,
+			time_t);
 		void FormatDateTime(BString *, const char *fmt, time_t);
 
 		// Country short-hands
@@ -37,8 +38,10 @@ class BLocale {
 
 		// Collator short-hands
 
-		int StringCompare(const char *, const char *, int32 len = -1, int8 strength = B_COLLATE_DEFAULT) const;
-		int StringCompare(const BString *, const BString *, int32 len = -1, int8 strength = B_COLLATE_DEFAULT) const;
+		int StringCompare(const char *, const char *, int32 len = -1,
+			int8 strength = B_COLLATE_DEFAULT) const;
+		int StringCompare(const BString *, const BString *,
+			int32 len = -1, int8 strength = B_COLLATE_DEFAULT) const;
 
 		void GetSortKey(const char *string, BString *key);
 

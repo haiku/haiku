@@ -9,6 +9,8 @@
 #include <Window.h>
 
 class BButton;
+class BListView;
+class TimeFormatSettingsView;
 
 
 class LocaleWindow : public BWindow {
@@ -20,6 +22,8 @@ class LocaleWindow : public BWindow {
 
 	private:
 		BButton*	fRevertButton;
+		BListView*	fPreferredListView;
+		TimeFormatSettingsView* fTimeFormatSettings;
 };
 
 #endif	/* LOCALE_WINDOW_H */

@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src bin locale ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
 UsePublicHeaders locale ;
+UsePrivateHeaders locale shared ;
 
 BinCommand collectcatkeys : collectcatkeys.cpp RegExp.cpp 
 	: be liblocale.so $(TARGET_LIBSUPC++) ;

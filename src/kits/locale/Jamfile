@@ -1,8 +1,8 @@
 SubDir HAIKU_TOP src kits locale ;
 
-UsePrivateHeaders locale ;
-
+UsePrivateHeaders locale shared ;
 UsePublicHeaders locale storage ;
+UseLibraryHeaders icu ;
 
 SharedLibrary liblocale.so
 	: adler32.c
@@ -19,6 +19,7 @@ SharedLibrary liblocale.so
 	  FormatImpl.cpp
 	  FormatParameters.cpp
 	  GenericNumberFormat.cpp
+	  HashMapCatalog.cpp
 	  IntegerFormat.cpp
 	  IntegerFormatImpl.cpp
 	  IntegerFormatParameters.cpp
@@ -33,5 +34,5 @@ SharedLibrary liblocale.so
 	  PropertyFile.cpp
 	  strfmon.cpp
 	  UnicodeChar.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be $(TARGET_LIBSTDC++) libicu-common.so libicu-i18n.so
 	;

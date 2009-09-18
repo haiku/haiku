@@ -1,8 +1,24 @@
 SubDir HAIKU_TOP src preferences locale ;
 
+UseLibraryHeaders icu ;
+UsePrivateHeaders locale ;
+
 Preference Locale :
 	Locale.cpp
 	LocaleWindow.cpp
-	: be liblocale.so $(TARGET_LIBSUPC++)
+	TimeFormatSettingsView.cpp
+	: be liblocale.so $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) libicu-common.so 
+		libicu-data.so
 	: Locale.rdef 
+	;
+
+DoCatalogs Locale		# application name
+	: x-vnd.Haiku-Locale # app MIME signature
+	:					# sources to extract the keys from
+	Locale.cpp
+	LocaleWindow.cpp
+	TimeFormatSettingsView.cpp
+	: en.catalog		# default catalog generated from sourcecode
+	:					# translations
+	[ FDirName $(HAIKU_TOP) src preferences locale fr.catkeys ]
 	;
