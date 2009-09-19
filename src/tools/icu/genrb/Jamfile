@@ -30,6 +30,7 @@ BuildPlatformMain <build>genrb :
 	<build>libicu-common.so 
 	<build!stub>libicu-data.so
 	$(HOST_LIBSUPC++)
+	$(HOST_LIBROOT)
 	;
 
 BuildPlatformMain <build>derb :	
@@ -40,4 +41,5 @@ BuildPlatformMain <build>derb :
 	<build>libicu-common.so 
 	<build!stub>libicu-data.so
 	$(HOST_LIBSUPC++)
+	$(HOST_LIBROOT)
 	;

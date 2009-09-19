@@ -21,4 +21,5 @@ BuildPlatformMain <build>pkgdata :
 	<build>libicu-common.so 
 	<build!stub>libicu-data.so
 	$(HOST_LIBSUPC++)
+	$(HOST_LIBROOT)
 	;

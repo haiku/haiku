@@ -23,4 +23,5 @@ BuildPlatformMain <build>makeconv :
 	<build>libicu-common.so 
 	<build!stub>libicu-data.so
 	$(HOST_LIBSUPC++)
+	$(HOST_LIBROOT)
 	;
