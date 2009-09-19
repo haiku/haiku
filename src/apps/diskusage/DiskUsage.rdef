@@ -9,7 +9,7 @@ resource app_version {
 		internal = 0,
 
 		short_info = "1.0.1",
-		long_info = "1.0.1 (c) 1999 Mike Steed, (c) 2008 Haiku"
+		long_info = "1.0.1 (c) 1999 Mike Steed, (c) 2009 Haiku"
 };
 
 resource app_flags B_MULTIPLE_LAUNCH;
@@ -78,3 +78,4 @@ resource(116, "STR_MOD") "Modified";
 resource(117, "STR_TIMEFMT") "%a, %d %b %Y, %r";
 resource(118, "STR_KIND") "Kind";
 resource(119, "STR_PATH") "Path";
+

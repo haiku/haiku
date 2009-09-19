@@ -1,6 +1,3 @@
-/*
- * Pairs.rdef
- */
 
 resource app_signature "application/x-vnd.Haiku-Pairs";
 
@@ -19,7 +16,7 @@ resource app_version {
 	internal = 1,
 
 	short_info = "Pairs",
-	long_info = "Pairs, Copyright 2008 Haiku Inc."
+	long_info = "Pairs, Copyright 2009 Haiku Inc."
 };
 
 
@@ -42,3 +39,4 @@ resource vector_icon {
 	$"070108000A060107000A0001041815FF01178400040A00010418001501178600"
 	$"040A040104000A0301090815FF"
 };
+

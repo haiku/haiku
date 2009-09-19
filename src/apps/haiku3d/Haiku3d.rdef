@@ -53,3 +53,4 @@ resource(4, "LetterI") import "./data/LetterI.hk3d.bin";
 resource(5, "LetterK") import "./data/LetterK.hk3d.bin";
 
 resource(6, "LetterU") import "./data/LetterU.hk3d.bin";
+

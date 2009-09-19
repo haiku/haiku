@@ -14,7 +14,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Screenshot",
-	long_info  = "Screenshot ©2008 Haiku"
+	long_info  = "Screenshot ©2009 Haiku"
 };
 
 resource vector_icon {
@@ -48,3 +48,4 @@ resource vector_icon {
 	$"0B73BD11333F6C1B4A6724C968940A0D010D02B8307E3A7163BA7600B82C644A"
 	$"AAA84832F80A0D010E023EE2433C8C01BC90D03EDCDB4A6EE0C86667"
 };
+

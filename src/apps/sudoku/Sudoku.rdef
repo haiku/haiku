@@ -10,12 +10,10 @@ resource app_version {
 	internal = 3,
 
 	short_info = "Sudoku",
-	long_info = "Sudoku ©2007 Haiku, Inc."
+	long_info = "Sudoku ©2009 Haiku, Inc."
 };
 
 resource app_flags B_MULTIPLE_LAUNCH;
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 
 resource vector_icon {
 	$"6E636966050500020006023B2B47BB18653D0FA53D225148297046CA1900FFEC"
@@ -40,6 +38,4 @@ resource vector_icon {
 	$"3EF8780000000000003F1885465E1E46C1320A030105023EF878000000000000"
 	$"3F1885465E1E46C132"
 };
-
-#endif // HAIKU_TARGET_PLATFORM_HAIKU
 

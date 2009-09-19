@@ -12,10 +12,8 @@ resource app_version {
 	internal = 0,
 
 	short_info = "PowerStatus",
-	long_info = "PowerStatus ©2006-2007 Haiku"
+	long_info = "PowerStatus ©2006-2009 Haiku"
 };
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 
 resource vector_icon {
 	$"6E6369660A03000100010001007102000604BC00000000000000003C00004940"
@@ -46,4 +44,3 @@ resource vector_icon {
 	$"4C0A04010700"
 };
 
-#endif // HAIKU_TARGET_PLATFORM_HAIKU

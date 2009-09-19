@@ -9,14 +9,11 @@ resource app_version {
 	internal   = 0,
 	short_info = "AutoRaise",
 	long_info  = "AutoRaise 0.0.1 ©2002-2008 François Revol.,\n"
-		"©2008 Haiku, Inc.\n"
+		"©2009 Haiku, Inc.\n"
 		"Automatic window raise"
 };
 
 resource app_flags B_SINGLE_LAUNCH;
-
-/*resource file_types message {
-};*/
 
 resource(104, "AddToDeskbar") #'ICON' array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"

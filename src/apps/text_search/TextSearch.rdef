@@ -1,6 +1,3 @@
-/*
- * TextSearch.rdef
- */
 
 resource app_signature "application/x-vnd.Haiku.TextSearch";
 
@@ -45,3 +42,4 @@ resource vector_icon {
 	$"010B000A05010D1001178400040A08010D000A05010C1001178400040A07010C"
 	$"000A09010C023C00000000000000003C000048B00048F000"
 };
+

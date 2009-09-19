@@ -12,10 +12,8 @@ resource app_version {
 	internal = 1,
 
 	short_info = "LaunchBox",
-	long_info = "LaunchBox ©2006 Haiku"
+	long_info = "LaunchBox ©2009 Haiku"
 };
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 
 resource vector_icon {
 	$"6E6369660D0500020112023DEB47BD4D713B47993BE4594843FB4BC62F000032"
@@ -44,12 +42,3 @@ resource vector_icon {
 	$"0A0A0106000A090107000A0001081001178400040A070108000A0B010900"
 };
 
-#else // HAIKU_TARGET_PLATFORM_HAIKU
-
-//resource large_icon {
-//};
-//
-//resource mini_icon {
-//};
-
-#endif // HAIKU_TARGET_PLATFORM_HAIKU

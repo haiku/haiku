@@ -1,6 +1,3 @@
-/*
- * Icon-O-Matic.rdef
- */
 
 resource app_signature "application/x-vnd.haiku-icon_o_matic";
 
@@ -16,14 +13,10 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Icon-O-Matic",
-	long_info = "Icon-O-Matic ©2006-2007 Haiku, Inc."
+	long_info = "Icon-O-Matic ©2006-2009 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;
-
-//resource file_types message {
-//	"types" = "application/x-haiku_icon",
-//};
 
 resource vector_icon {
 	$"6E6369660E050102000603399E0F3D9C0ABF82B23B84A94B88504910C900A5B1"

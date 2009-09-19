@@ -10,12 +10,10 @@ resource app_version {
 	internal = 3,
 
 	short_info = "ActivityMonitor",
-	long_info = "ActivityMonitor ©2008 Haiku, Inc."
+	long_info = "ActivityMonitor ©2009 Haiku, Inc."
 };
 
 resource app_flags B_MULTIPLE_LAUNCH;
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 
 resource vector_icon {
 	$"6E6369660E03010000020002023980000000000000004000004BE00008908100"
@@ -43,4 +41,3 @@ resource vector_icon {
 	$"770615FF0A0C010B0A3FEAF70000000000003FEAF7C573B4C2770615FF"
 };
 
-#endif // HAIKU_TARGET_PLATFORM_HAIKU

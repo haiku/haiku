@@ -1,6 +1,3 @@
-/*
- * Icon-O-Matic.rdef
- */
 
 resource app_signature "application/x-vnd.Haiku.TV";
 
@@ -16,7 +13,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "TV",
-	long_info = "TV ©2005-2007 Marcus Overhagen"
+	long_info = "TV ©2005-2009 Marcus Overhagen"
 };
 
 resource app_flags B_SINGLE_LAUNCH;

@@ -12,10 +12,8 @@ resource app_version {
 	internal = 0,
 
 	short_info = "NetworkStatus",
-	long_info = "NetworkStatus ©2007 Haiku"
+	long_info = "NetworkStatus ©2009 Haiku"
 };
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 
 resource vector_icon {
 	$"6E63696608050005B8020016023A692E36692FBA2ECD3E2ECD4B89A449631800"
@@ -39,4 +37,3 @@ resource vector_icon {
 	$"00010B1001178800040A07010B00"
 };
 
-#endif

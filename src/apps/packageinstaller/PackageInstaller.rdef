@@ -14,12 +14,10 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Package Installer",
-	long_info = "Package Installer ©2007-2008 Haiku, Inc."
+	long_info = "Package Installer ©2007-2009 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 
 resource vector_icon {
 	$"6E6369660E0500040065035D2B0C0385501C0200060238B0AD39B313BC39613B"
@@ -42,4 +40,3 @@ resource vector_icon {
 	$"0A0C010E00"
 };
 
-#endif

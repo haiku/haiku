@@ -32,5 +32,5 @@ Application Terminal :
 	VTKeyTbl.c
 	VTPrsTbl.c
 	: be game tracker textencoding $(TARGET_LIBSUPC++)
-	: Terminal.rdef Terminal.icons.rdef
+	: Terminal.rdef
 ;
