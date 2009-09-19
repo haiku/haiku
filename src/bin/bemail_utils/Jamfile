@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src bin bemail_utils ;
+SubDir HAIKU_TOP src bin mail_utils ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -9,21 +9,21 @@ if $(TARGET_PLATFORM) != haiku {
 UsePrivateHeaders mail ;
 
 StdBinCommands
-	bemailtombox.cpp
+	mail2mbox.cpp
 	: be
-	: bemailtombox.rdef
+	: mail2mbox.rdef
 	;
 Package haiku-maildaemon-cvs :
-	bemailtombox :
+	mail2mbox :
 	boot home config bin ;
 
 StdBinCommands
-	mboxtobemail.cpp
+	mbox2mail.cpp
 	: be libmail.so
-	: mboxtobemail.rdef
+	: mbox2mail.rdef
 	;
 Package haiku-maildaemon-cvs :
-	mboxtobemail :
+	mbox2mail :
 	boot home config bin ;
 
 StdBinCommands

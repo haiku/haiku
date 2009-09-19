@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id:$
+ * $Id$
  *
  * BeMailToMBox is a utility program (requested by Frank Zschockelt) that
  * converts BeOS e-mail files into Unix mailbox files (the kind that Pine
@@ -392,7 +392,7 @@ int main (int argc, char** argv)
     printf ("output.  Usage:\n\n");
     printf ("bemailtombox InputDirectory >OutputFile\n\n");
     printf ("Public domain, by Alexander G. M. Smith.\n");
-    printf ("$Id:$\n");
+    printf ("$Id$\n");
     printf ("$HeadURL$\n");
     return -10;
   }

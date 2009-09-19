@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id:$
+ * $Id$
  *
  * MboxToBeMail is a utility program that converts Unix mailbox (mbox) files
  * (the kind that Pine uses) into e-mail files for use with BeOS.  It also
