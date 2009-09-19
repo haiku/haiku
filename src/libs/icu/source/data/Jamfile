@@ -1,3 +1,5 @@
+SubDir HAIKU_TOP src libs icu source data ;
+
 ICU_UNICODE_VERSION = 5.1 ;
 ICU_CLDR_VERSION = $(ICU_GENRB_CLDR_VERSION) ;
 ICU_DAT_FILES = pnames.icu unames.icu cnvalias.icu ucadata.icu invuca.icu ;
@@ -114,13 +116,13 @@ rule GeneratePackageList target
 actions GeneratePackageList1
 {
 	cd $(ICU_DATA_DIR)
-	find . -type f -name \*.brk -printf "%P\n" >$(1:D=)
-	find . -type f -name \*.cfu -printf "%P\n" >>$(1:D=)
-	find . -type f -name \*.cnv -printf "%P\n" >>$(1:D=)
-	find . -type f -name \*.ctd -printf "%P\n" >>$(1:D=)
-	find . -type f -name \*.icu -printf "%P\n" >>$(1:D=)
-	find . -type f -name \*.res -printf "%P\n" >>$(1:D=)
-	find . -type f -name \*.spp -printf "%P\n" >>$(1:D=)
+	find . -type f -name \*.brk -print | sed 's/^\.\///' >$(1:D=)
+	find . -type f -name \*.cfu -print | sed 's/^\.\///' >>$(1:D=)
+	find . -type f -name \*.cnv -print | sed 's/^\.\///' >>$(1:D=)
+	find . -type f -name \*.ctd -print | sed 's/^\.\///' >>$(1:D=)
+	find . -type f -name \*.icu -print | sed 's/^\.\///' >>$(1:D=)
+	find . -type f -name \*.res -print | sed 's/^\.\///' >>$(1:D=)
+	find . -type f -name \*.spp -print | sed 's/^\.\///' >>$(1:D=)
 }
 
 rule GeneratePackageInclude target
