@@ -1,15 +1,14 @@
 /* 
-** Distributed under the terms of the OpenBeOS License.
-** Copyright 2003-2004. All rights reserved.
-**
-** Authors:	Axel Dörfler, axeld@pinc-software.de
-**			Oliver Tappe, zooey@hirschkaefer.de
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2003-2004, Oliver Tappe, zooey@hirschkaefer.de
+ * Distributed under the terms of the MIT License.
+ */
+
+#include <Catalog.h>
 
 #include <syslog.h>
 
 #include <Application.h>
-#include <Catalog.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
 #include <Node.h>

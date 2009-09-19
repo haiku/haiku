@@ -1,3 +1,8 @@
+/* 
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2003-2004, Oliver Tappe, zooey@hirschkaefer.de
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _CATALOG_H_
 #define _CATALOG_H_
 
