@@ -12,7 +12,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Network",
-	long_info = "Network ©2007-2008 Haiku"
+	long_info = "Network ©2007-2009 Haiku"
 };
 
 resource vector_icon {

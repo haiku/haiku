@@ -1,6 +1,3 @@
-/*
- * bluetooth_pref.rdef
- */
 
 resource app_signature "application/x-vnd.haiku-BluetoothPrefs";
 
@@ -15,7 +12,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "bluetooth_pref",
-	long_info = "bluetooth_pref ©2007-2008 Haiku"
+	long_info = "bluetooth_pref ©2007-2009 Haiku"
 };
 
 resource vector_icon array {
@@ -55,3 +52,4 @@ resource vector_icon array {
 	$"03040506000A0503070809000A06010A000A07010B000A08010C000A09010D00"
 	$"0A0A010E000A0B010F000A0C011000"
 };
+
