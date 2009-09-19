@@ -319,7 +319,7 @@ actions CopySetHaikuRevision1
 	# Try svn or git-svn
 	# Extract from "Revision: 12345" line
 	revision=`(LC_ALL=C LANG=C svn info $(HAIKU_TOP) ||
-		(cd $(HAIKU_TOP) && LC_ALL=C LANG=C git svn info)) 2> /dev/null |
+		(cd $(HAIKU_TOP) && [ -d .git/svn ] && LC_ALL=C LANG=C git svn info)) 2> /dev/null |
 			grep Revision | awk '{printf $2}'`
 	if [ "$revision" = 0 -o "$revision" = "" ]; then
 		# git-svn not present or not configured for this repository
