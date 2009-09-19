@@ -203,7 +203,7 @@ InstallerWindow::InstallerWindow()
 	fBeginButton->SetEnabled(false);
 
 	fSetupButton = new BButton("setup_button",
-		"Setup partitions" B_UTF8_ELLIPSIS, new BMessage(SETUP_MESSAGE));
+		"Set up partitions" B_UTF8_ELLIPSIS, new BMessage(SETUP_MESSAGE));
 
 	fMakeBootableButton = new BButton("makebootable_button",
 		"Write Boot Sector", new BMessage(MSG_WRITE_BOOT_SECTOR));
@@ -400,7 +400,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		case ENCOURAGE_DRIVESETUP:
 		{
 			(new BAlert("use drive setup", "No partitions have been found that "
-				"are suitable for installation. Please setup partitions and "
+				"are suitable for installation. Please set up partitions and "
 				"initialize at least one partition with the Be File System." ,
 				"Ok"))->Go();
 		}
