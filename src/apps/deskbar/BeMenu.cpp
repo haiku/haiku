@@ -366,7 +366,7 @@ TBeMenu::AddStandardBeMenuItems()
 
 	AddSeparatorItem();
 
-	BMenu *shutdownMenu = new BMenu("Shutdown");
+	BMenu *shutdownMenu = new BMenu("Shutdown" B_UTF8_ELLIPSIS);
 
 	item = new BMenuItem("Restart System", new BMessage(CMD_REBOOT_SYSTEM));
 	item->SetEnabled(!dragging);
