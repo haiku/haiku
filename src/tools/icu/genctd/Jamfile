@@ -16,5 +16,6 @@ BuildPlatformMain <build>genctd :
 	<build>libicu-common.so 
 	<build!stub>libicu-data.so
 	$(HOST_LIBSUPC++)
+	$(HOST_LIBSTDC++)
 	$(HOST_LIBROOT)
 	;
