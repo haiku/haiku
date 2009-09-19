@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src tools locale ;
 
+UsePrivateHeaders locale ;
+UsePrivateHeaders shared ;
+
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
 local localetools =
@@ -40,7 +43,7 @@ BuildPlatformMain <build>collectcatkeys :
 	Catalog.cpp
 	RegExp.cpp
 	adler32.c
-	: $(HOST_LIBBE)  $(HOST_LIBSUPC++) ;
+	: $(HOST_LIBBE)  $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) ;
 
 BuildPlatformMain <build>linkcatkeys :
 	linkcatkeys.cpp
@@ -49,4 +52,4 @@ BuildPlatformMain <build>linkcatkeys :
 	DefaultCatalog.cpp
 	Catalog.cpp
 	adler32.c
-	: $(HOST_LIBBE) $(HOST_LIBSUPC++) ;
+	: $(HOST_LIBBE) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) ;
