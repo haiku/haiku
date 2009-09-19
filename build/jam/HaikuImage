@@ -291,6 +291,12 @@ AddSymlinkToHaikuImage system bin : trash : untrash ;
 
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
+# Mailbox folders and symlink
+AddDirectoryToHaikuImage home mail drafts ;
+AddDirectoryToHaikuImage home mail in ;
+AddDirectoryToHaikuImage home mail out ;
+AddSymlinkToHaikuImage home config settings Mail : ../../../mail/in : mailbox ;
+
 # Deskbar Application links
 AddDirectoryToHaikuImage home config be Applications ;
 DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc

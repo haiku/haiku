@@ -93,7 +93,7 @@ const char* kSpamServerSignature =
 const char* kDraftPath = "mail/draft";
 const char* kDraftType = "text/x-vnd.Be-MailDraft";
 const char* kMailFolder = "mail";
-const char* kMailboxFolder = "mail/mailbox";
+const char* kMailboxFolder = "config/settings/Mail/mailbox";
 
 
 int32

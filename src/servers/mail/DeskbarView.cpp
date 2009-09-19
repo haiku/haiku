@@ -344,7 +344,7 @@ void
 DeskbarView::MouseUp(BPoint pos)
 {
 	if (fLastButtons & B_PRIMARY_MOUSE_BUTTON) {
-		if (OpenFolder("mail/mailbox") != B_OK
+		if (OpenFolder("config/settings/Mail/mailbox") != B_OK
 			&& OpenFolder("mail/in") != B_OK
 			&& OpenFolder("mail/INBOX") != B_OK)
 			OpenFolder("mail");
