@@ -19,11 +19,13 @@ Addon ffmpeg :
 	EncoderTable.cpp
 	FFmpegPlugin.cpp
 	MuxerTable.cpp
+	CpuCapabilities.cpp
 
 	gfx_conv_c.cpp
 	gfx_conv_c_lookup.cpp
-#	gfx_conv_mmx.cpp
+	gfx_conv_mmx.cpp
  	gfx_util.cpp
+ 	yuvrgb.nasm
 	:
 	libavformat.a
 	libavcodec.a

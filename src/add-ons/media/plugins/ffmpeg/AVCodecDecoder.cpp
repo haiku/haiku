@@ -215,7 +215,6 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 					fBlockAlign
 						= ioEncodedFormat->u.encoded_audio.output.buffer_size;
 				}
-printf("XXX extra data size %ld\n", infoSize);
 				if (extraData != NULL && fExtraDataSize > 0) {
 					TRACE("AVCodecDecoder: extra data size %ld\n", infoSize);
 					fExtraData = new(std::nothrow) char[fExtraDataSize];
@@ -731,13 +730,13 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 			profileCounter++;
 			if (!(fFrame % 10)) {
 				if (info) {
-					TRACE("[v] profile: d1 = %lld, d2 = %lld (%Ld) required "
+					printf("[v] profile: d1 = %lld, d2 = %lld (%Ld) required "
 						"%Ld\n",
 						decodingTime / profileCounter,
 						conversionTime / profileCounter,
 						fFrame, info->time_to_decode);
 				} else {
-					TRACE("[v] profile: d1 = %lld, d2 = %lld (%Ld) required "
+					printf("[v] profile: d1 = %lld, d2 = %lld (%Ld) required "
 						"%Ld\n",
 						decodingTime / profileCounter,
 						conversionTime / profileCounter,

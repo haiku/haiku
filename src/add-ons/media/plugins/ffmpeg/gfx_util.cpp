@@ -3,6 +3,7 @@
 #include "gfx_util.h"
 #include "gfx_conv_c.h"
 #include "gfx_conv_mmx.h"
+#include "CpuCapabilities.h"
 
 /*
  * ref docs
@@ -15,61 +16,51 @@
   #define TRACE(a...)
 #endif
 
-//#define INCLUDE_MMX 	defined(__INTEL__)
-#define INCLUDE_MMX 	0
-
 // this function will try to find the best colorspaces for both the ff-codec and 
 // the Media Kit sides.
 gfx_convert_func resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat)
 {
-#if INCLUDE_MMX
-	bool mmx = IsMmxCpu();
-#endif
+CPUCapabilities cpu;
 
 	switch (colorSpace)
 	{
 		case B_RGB32:
 			if (pixelFormat == PIX_FMT_YUV410P) {
-				#if INCLUDE_MMX
-				if (mmx) {
-					TRACE("resolve_colorspace: gfx_conv_yuv410p_rgb32_mmx\n");
-					return gfx_conv_yuv410p_rgb32_mmx;
-				} else
-				#endif
-				{
+//				if (cpu.HasMMX()) {
+//					TRACE("resolve_colorspace: gfx_conv_yuv410p_rgb32_mmx\n");
+//					return gfx_conv_yuv410p_rgb32_mmx;
+//				} else {
 					TRACE("resolve_colorspace: gfx_conv_yuv410p_rgb32_c\n");
 					return gfx_conv_yuv410p_rgb32_c;
-				}
+//				}
 			}
 			
 			if (pixelFormat == PIX_FMT_YUV411P) {
-				#if INCLUDE_MMX
-				if (mmx) {
-					TRACE("resolve_colorspace: gfx_conv_yuv411p_rgb32_mmx\n");
-					return gfx_conv_yuv411p_rgb32_mmx;
-				} else
-				#endif
-				{
+//				if (cpu.HasMMX()) {
+//					TRACE("resolve_colorspace: gfx_conv_yuv411p_rgb32_mmx\n");
+//					return gfx_conv_yuv411p_rgb32_mmx;
+//				} else {
 					TRACE("resolve_colorspace: gfx_conv_yuv411p_rgb32_c\n");
 					return gfx_conv_yuv411p_rgb32_c;
-				}
+//				}
 			}
 					
 			if (pixelFormat == PIX_FMT_YUV420P || pixelFormat == PIX_FMT_YUVJ420P) {
-				#if INCLUDE_MMX
-				if (mmx) {
-					TRACE("resolve_colorspace: gfx_conv_yuv420p_rgb32_mmx\n");
-					return gfx_conv_yuv420p_rgb32_mmx;
-				} else
-				#endif
-				{
-					TRACE("resolve_colorspace: gfx_conv_yuv420p_rgb32_c\n");
+				if (cpu.HasSSE2()) {
+					TRACE("resolve_colorspace: gfx_conv_yuv420p_rgba32_sse2\n");
+					return gfx_conv_yuv420p_rgba32_sse2;
+				} else {
+					TRACE("resolve_colorspace: gfx_conv_YCbCr420p_RGB32_c\n");
 					return gfx_conv_YCbCr420p_RGB32_c;
 				}
 			}
 			
 			if (pixelFormat == PIX_FMT_YUV422P || pixelFormat == PIX_FMT_YUVJ422P) {
-				return gfx_conv_YCbCr422_RGB32_c;
+				if (cpu.HasSSE2()) {
+					return gfx_conv_yuv422p_rgba32_sse2;
+				} else {
+					return gfx_conv_YCbCr422_RGB32_c;
+				}
 			}
 
 			TRACE("resolve_colorspace: %s => B_RGB32: NULL\n", pixfmt_to_string(pixelFormat));
@@ -86,55 +77,43 @@ gfx_convert_func resolve_colorspace(color_space colorSpace, PixelFormat pixelFor
 		case B_YCbCr422:
 
 			if (pixelFormat == PIX_FMT_YUV410P) {
-				#if INCLUDE_MMX
-				if (mmx) {
-					TRACE("resolve_colorspace: gfx_conv_yuv410p_ycbcr422_mmx\n");
-					return gfx_conv_yuv410p_ycbcr422_mmx;
-				} else
-				#endif
-				{
+//				if (cpu.HasMMX()) {
+//					TRACE("resolve_colorspace: gfx_conv_yuv410p_ycbcr422_mmx\n");
+//					return gfx_conv_yuv410p_ycbcr422_mmx;
+//				} else {
 					TRACE("resolve_colorspace: gfx_conv_yuv410p_ycbcr422_c\n");
 					return gfx_conv_yuv410p_ycbcr422_c;
-				}
+//				}
 			}
 
 			if (pixelFormat == PIX_FMT_YUV411P) {
-				#if INCLUDE_MMX
-				if (mmx) {
-					TRACE("resolve_colorspace: gfx_conv_yuv411p_ycbcr422_mmx\n");
-					return gfx_conv_yuv411p_ycbcr422_mmx;
-				} else
-				#endif
-				{
+//				if (cpu.HasMMX()) {
+//					TRACE("resolve_colorspace: gfx_conv_yuv411p_ycbcr422_mmx\n");
+//					return gfx_conv_yuv411p_ycbcr422_mmx;
+//				} else {
 					TRACE("resolve_colorspace: gfx_conv_yuv411p_ycbcr422_c\n");
 					return gfx_conv_yuv411p_ycbcr422_c;
-				}
+//				}
 			}
 			
 			if (pixelFormat == PIX_FMT_YUV420P || pixelFormat == PIX_FMT_YUVJ420P) {
-				#if INCLUDE_MMX
-				if (mmx) {
-					TRACE("resolve_colorspace: gfx_conv_yuv420p_ycbcr422_mmx\n");
-					return gfx_conv_yuv420p_ycbcr422_mmx;
-				} else
-				#endif
-				{
+//				if (cpu.HasMMX()) {
+//					TRACE("resolve_colorspace: gfx_conv_yuv420p_ycbcr422_mmx\n");
+//					return gfx_conv_yuv420p_ycbcr422_mmx;
+//				} else {
 					TRACE("resolve_colorspace: gfx_conv_yuv420p_ycbcr422_c\n");
 					return gfx_conv_yuv420p_ycbcr422_c;
-				}
+//				}
 			}
 			
 			if (pixelFormat == PIX_FMT_YUYV422) {
-				#if INCLUDE_MMX
-				if (mmx) {
-					TRACE("resolve_colorspace: PIX_FMT_YUV422 => B_YCbCr422: gfx_conv_null_mmx\n");
-					return gfx_conv_null_mmx;
-				} else
-				#endif
-				{
+//				if (cpu.HasMMX()) {
+//					TRACE("resolve_colorspace: PIX_FMT_YUV422 => B_YCbCr422: gfx_conv_null_mmx\n");
+//					return gfx_conv_null_mmx;
+//				} else {
 					TRACE("resolve_colorspace: PIX_FMT_YUV422 => B_YCbCr422: gfx_conv_null_c\n");
 					return gfx_conv_null_c;
-				}
+//				}
 			}
 			
 			TRACE("resolve_colorspace: %s => B_YCbCr422: NULL\n", pixfmt_to_string(pixelFormat));
