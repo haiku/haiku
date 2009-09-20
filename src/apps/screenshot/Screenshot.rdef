@@ -14,7 +14,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Screenshot",
-	long_info  = "Screenshot ©2009 Haiku"
+	long_info  = "Screenshot ©2008-2009 Haiku"
 };
 
 resource vector_icon {

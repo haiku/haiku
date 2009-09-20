@@ -12,7 +12,7 @@ resource app_version {
 	internal = 1,
 
 	short_info = "LaunchBox",
-	long_info = "LaunchBox ©2009 Haiku"
+	long_info = "LaunchBox ©2006-2009 Haiku"
 };
 
 resource vector_icon {

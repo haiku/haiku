@@ -10,7 +10,7 @@ resource app_version {
 	internal = 3,
 
 	short_info = "ActivityMonitor",
-	long_info = "ActivityMonitor ©2009 Haiku, Inc."
+	long_info = "ActivityMonitor ©2008-2009 Haiku, Inc."
 };
 
 resource app_flags B_MULTIPLE_LAUNCH;

@@ -9,7 +9,7 @@ resource app_version {
 		internal = 0,
 
 		short_info = "1.0.1",
-		long_info = "1.0.1 (c) 1999 Mike Steed, (c) 2009 Haiku"
+		long_info = "1.0.1 ©1999 Mike Steed, ©2008-2009 Haiku"
 };
 
 resource app_flags B_MULTIPLE_LAUNCH;

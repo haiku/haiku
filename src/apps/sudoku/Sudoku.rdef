@@ -10,7 +10,7 @@ resource app_version {
 	internal = 3,
 
 	short_info = "Sudoku",
-	long_info = "Sudoku ©2009 Haiku, Inc."
+	long_info = "Sudoku ©2007-2009 Haiku, Inc."
 };
 
 resource app_flags B_MULTIPLE_LAUNCH;
