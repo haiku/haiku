@@ -21,6 +21,7 @@
 #include <Messenger.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
+#include <OpenWithTracker.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Query.h>
@@ -196,28 +197,6 @@ void DeskbarView::Draw(BRect /*updateRect*/)
 }
 
 
-status_t OpenFolder(const char* end)
-{
-	BPath path;
-	find_directory(B_USER_DIRECTORY, &path);
-	path.Append(end);
-
-	entry_ref ref;
-	if (get_ref_for_path(path.Path(), &ref) != B_OK)
-		return B_NAME_NOT_FOUND;
-
-	if (!BEntry(&ref).Exists())
-		return B_NAME_NOT_FOUND;
-
-	BMessage open_mbox(B_REFS_RECEIVED);
-	open_mbox.AddRef("refs",&ref);
-
-	BMessenger tracker("application/x-vnd.Be-TRAK");
-	tracker.SendMessage(&open_mbox);
-	return B_OK;
-}
-
-
 void
 DeskbarView::MessageReceived(BMessage* message)
 {
@@ -344,10 +323,9 @@ void
 DeskbarView::MouseUp(BPoint pos)
 {
 	if (fLastButtons & B_PRIMARY_MOUSE_BUTTON) {
-		if (OpenFolder("config/settings/Mail/mailbox") != B_OK
-			&& OpenFolder("mail/in") != B_OK
-			&& OpenFolder("mail/INBOX") != B_OK)
-			OpenFolder("mail");
+		if (OpenWithTracker(B_USER_SETTINGS_DIRECTORY, "Mail/mailbox") != B_OK
+			&& OpenWithTracker(B_USER_DIRECTORY, "mail/in") != B_OK)
+			OpenWithTracker(B_USER_DIRECTORY, "mail");
 	}
 
 	if (fLastButtons & B_TERTIARY_MOUSE_BUTTON)

@@ -79,7 +79,8 @@ extern const char* kSpamServerSignature;
 extern const char* kDraftPath;
 extern const char* kDraftType;
 extern const char* kMailFolder;
-extern const char* kMailboxFolder;
+extern const char* kMailboxSymlink;
 
 
 #endif // _MAIL_SUPPORT_H
+

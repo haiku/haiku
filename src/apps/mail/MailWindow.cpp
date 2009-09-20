@@ -48,6 +48,7 @@ All rights reserved.
 #include <Debug.h>
 #include <E-mail.h>
 #include <InterfaceKit.h>
+#include <OpenWithTracker.h>
 #ifdef __HAIKU__
 #  include <PathMonitor.h>
 #endif
@@ -1475,29 +1476,13 @@ TMailWindow::MessageReceived(BMessage *msg)
 			break;
 
 		case M_OPEN_MAIL_FOLDER:
-		case M_OPEN_MAIL_BOX:
-		{
-			BEntry folderEntry;
-			BPath path;
-			// Get the user home directory
-			if (find_directory(B_USER_DIRECTORY, &path) != B_OK)
-				break;
-			if (msg->what == M_OPEN_MAIL_FOLDER)
-				path.Append(kMailFolder);
-			else
-				path.Append(kMailboxFolder);
-			if (folderEntry.SetTo(path.Path()) == B_OK && folderEntry.Exists())
-			{
-				BMessage thePackage(B_REFS_RECEIVED);
-				BMessenger tracker("application/x-vnd.Be-TRAK");
-
-				entry_ref ref;
-				folderEntry.GetRef(&ref);
-				thePackage.AddRef("refs", &ref);
-				tracker.SendMessage(&thePackage);
-			}
+			OpenWithTracker(B_USER_DIRECTORY, kMailFolder);
 			break;
-		}
+
+		case M_OPEN_MAIL_BOX:
+			OpenWithTracker(B_USER_SETTINGS_DIRECTORY, kMailboxSymlink);
+			break;
+
 		case RESET_BUTTONS:
 			fChanged = false;
 			fFieldState = 0;
