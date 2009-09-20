@@ -31,28 +31,30 @@
 char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 "
 	"Marcus Overhagen <Marcus@Overhagen.de>";
 
+#include <Alert.h>
 #include <Application.h>
+#include <Autolock.h>
+#include <Directory.h>
 #include <Roster.h>
-#include <Messenger.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
-#include <Autolock.h>
-#include <Alert.h>
+#include <Messenger.h>
+
 #include <stdio.h>
 #include <string.h>
 
-#include "MMediaFilesManager.h"
-#include "NotificationManager.h"
-#include "ServerInterface.h"
-#include "DataExchange.h"
-#include "BufferManager.h"
-#include "NodeManager.h"
 #include "AddOnManager.h"
 #include "AppManager.h"
+#include "BufferManager.h"
+#include "DataExchange.h"
 #include "FormatManager.h"
 #include "MediaMisc.h"
-#include "media_server.h"
+#include "MMediaFilesManager.h"
+#include "NodeManager.h"
+#include "NotificationManager.h"
+#include "ServerInterface.h"
 #include "debug.h"
+#include "media_server.h"
 
 /*
  *
@@ -215,12 +217,15 @@ ServerApp::ArgvReceived(int32 argc, char **argv)
 
 void
 ServerApp::StartAddonServer()
-{
-	status_t err;
-
-	// launching media_addon_server from this application's directoy
-	// should no longer be needed, we now can launch by mime signature
-/*
+{	
+	// Try to launch media_addon_server by mime signature.
+	// If it fails (for example on the Live CD, where the executable
+	// hasn't yet been mimesetted), try from this application's
+	// directory
+	status_t err = be_roster->Launch(B_MEDIA_ADDON_SERVER_SIGNATURE);
+	if (err == B_OK)
+		return;
+	
 	app_info info;
 	BEntry entry;
 	BDirectory dir;
@@ -235,11 +240,6 @@ ServerApp::StartAddonServer()
 
 	if (err == B_OK)
 		be_roster->Launch(&ref);
-	if (err == B_OK)
-		return;
-*/
-
-	err = be_roster->Launch(B_MEDIA_ADDON_SERVER_SIGNATURE);
 	if (err == B_OK)
 		return;
 
