@@ -21,6 +21,7 @@
 #include <Roster.h>
 #include <PathMonitor.h>
 
+#include <stdio.h>
 #include <new>
 using std::nothrow;
 
@@ -30,6 +31,7 @@ using BPrivate::HashString;
 
 
 const char *kDevicesRoot = "/dev/midi";
+// const char *kDevicesRoot = "/Data/tmp";
 
 
 class DeviceEndpoints {
@@ -88,9 +90,17 @@ status_t
 DeviceWatcher::Start()
 {
 	// Do an initial scan
-    _ScanDevices(kDevicesRoot);
 
-	// Okay, now just watch for any change
+	// We need to do this from a separate thread, otherwise we will deadlock.
+	// The reason is that we instantiate a BMidiRoster object, which sends a
+	// message to the midi_server to register itself, and blocks until it gets
+	// a response. But since we _are_ the midi_server we will never be able to
+	// send that response if our main thread is already blocking.
+	
+    resume_thread(spawn_thread(_InitialDevicesScanThread,
+		"Initial devices scan", B_NORMAL_PRIORITY, this));
+
+	// And watch for any change
 	return BPathMonitor::StartWatching(kDevicesRoot, B_ENTRY_CREATED
 		| B_ENTRY_REMOVED | B_ENTRY_MOVED | B_WATCH_FILES_ONLY
 		| B_WATCH_RECURSIVELY, this);
@@ -136,9 +146,20 @@ DeviceWatcher::MessageReceived(BMessage* message)
 // #pragma mark -
 
 
+/* static  */
+int32 
+DeviceWatcher::_InitialDevicesScanThread(void* data)
+{
+	((DeviceWatcher*) data)->_ScanDevices(kDevicesRoot);
+	return 0;
+}
+
+
 void 
 DeviceWatcher::_ScanDevices(const char* path)
 {
+	// printf("DeviceWatcher::_ScanDevices(\"%s\");\n", path);
+	
 	BDirectory dir(path);
 	if (dir.InitCheck() != B_OK)
 		return;
@@ -158,6 +179,13 @@ DeviceWatcher::_ScanDevices(const char* path)
 void
 DeviceWatcher::_AddDevice(const char* path)
 {
+	// printf("DeviceWatcher::_AddDevice(\"%s\");\n", path);
+
+	BEntry entry(path);
+	if (! entry.IsFile())
+		// Invalid path !
+		return;
+
 	if ( fDeviceEndpointsMap.ContainsKey(path) )
 		// Already known
 		return;
@@ -166,8 +194,6 @@ DeviceWatcher::_AddDevice(const char* path)
 	if (fd < 0)
 		return;
 		
-	// printf("DeviceWatcher::_AddDevice(\"%s\");\n", path);
-
 	
 	MidiPortConsumer* consumer = new MidiPortConsumer(fd, path);
 	_SetIcons(consumer);
@@ -198,8 +224,8 @@ DeviceWatcher::_RemoveDevice(const char* path)
 	deviceEndpoints->fConsumer->Unregister();
 	deviceEndpoints->fProducer->Unregister();
 
-	delete deviceEndpoints->fConsumer;
-	delete deviceEndpoints->fProducer;
+	deviceEndpoints->fConsumer->Release();
+	deviceEndpoints->fProducer->Release();
 
 	fDeviceEndpointsMap.Remove(path);
 }

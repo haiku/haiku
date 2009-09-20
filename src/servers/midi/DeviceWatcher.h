@@ -30,6 +30,7 @@ public:
 	status_t	Stop();
 
 private:
+	static int32 _InitialDevicesScanThread(void* data);
 	void _ScanDevices(const char* path);
 	void _AddDevice(const char* path);
 	void _RemoveDevice(const char* path);
