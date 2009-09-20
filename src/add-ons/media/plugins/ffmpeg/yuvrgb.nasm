@@ -1,8 +1,8 @@
-/*
- * Copyright (C) 2009 David McPaul
- *
- * All rights reserved. Distributed under the terms of the MIT License.
- */
+;
+; Copyright (C) 2009 David McPaul
+;
+; All rights reserved. Distributed under the terms of the MIT License.
+;
 
 ; A rather unoptimised set of yuv to rgb converters
 ; does 8 pixels at a time
