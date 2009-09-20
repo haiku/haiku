@@ -1,17 +1,17 @@
-SubDir HAIKU_TOP src tests kits net preflet StatusAddOn ;
+SubDir HAIKU_TOP src tests kits net preflet InterfacesAddOn ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net preflet ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers net ] : true ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders net shared ;
 
-AddResources Overview : 
+AddResources Interfaces : 
  	Icons.rdef 
 ;
 
-Addon Overview : 
-	NetworkStatusAddOn.cpp
-	InterfaceStatusItem.cpp
+Addon Interfaces : 
+	InterfacesAddOn.cpp
+	InterfacesListView.cpp
 	Setting.cpp
 	NetworkWindow.cpp
 	EthernetSettingsView.cpp

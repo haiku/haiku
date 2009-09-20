@@ -24,7 +24,7 @@ NetworkWindow::NetworkWindow(Setting* setting)
 	fEthernetView = new EthernetSettingsView(setting);
 	GetLayout()->AddView(fEthernetView);
 	
-	SetTitle(setting->GetName());
+	SetTitle(setting->Name());
 }
 
 

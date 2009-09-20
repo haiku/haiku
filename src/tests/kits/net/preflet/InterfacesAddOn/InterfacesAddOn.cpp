@@ -13,32 +13,30 @@
  */
 
 
-#include "NetworkStatusAddOn.h"
-
-#include <net/if.h>
-
-#include <sys/sockio.h>
+#include "InterfacesAddOn.h"
+#include "InterfacesListView.h"
+#include "NetworkWindow.h"
 
 #include <stdio.h>
-#include <AutoDeleter.h>
 
 #include <ScrollView.h>
 #include <Alert.h>
 
-#include "InterfaceStatusItem.h"
-#include "NetworkWindow.h"
+
 
 NetworkSetupAddOn*
 get_nth_addon(image_id image, int index)
 {
 	if (index == 0)
-		return new NetworkStatusAddOn(image);
+		return new InterfacesAddOn(image);
 	return NULL;
 }
 
 
 // #pragma mark -
-NetworkStatusAddOn::NetworkStatusAddOn(image_id image)
+
+
+InterfacesAddOn::InterfacesAddOn(image_id image)
 	:
 	NetworkSetupAddOn(image),
 	BBox(BRect(0, 0, 0, 0), NULL, B_FOLLOW_ALL, B_NAVIGABLE_JUMP, B_NO_BORDER)
@@ -46,20 +44,20 @@ NetworkStatusAddOn::NetworkStatusAddOn(image_id image)
 }
 
 
-NetworkStatusAddOn::~NetworkStatusAddOn()
+InterfacesAddOn::~InterfacesAddOn()
 {
 }
 
 
 const char*
-NetworkStatusAddOn::Name()
+InterfacesAddOn::Name()
 {
-	return "Overview";
+	return "Interfaces";
 }
 
 
 BView*
-NetworkStatusAddOn::CreateView(BRect *bounds)
+InterfacesAddOn::CreateView(BRect *bounds)
 {
 	float w, h;
 	BRect r = *bounds;
@@ -77,8 +75,7 @@ NetworkStatusAddOn::CreateView(BRect *bounds)
 	rlv.bottom -= 72;
 	rlv.InsetBy(2, 2);
 	rlv.right -= B_V_SCROLL_BAR_WIDTH;
-	fListview = new BListView(rlv, NULL, B_SINGLE_SELECTION_LIST, 
-		B_FOLLOW_ALL_SIDES);
+	fListview = new InterfacesListView(rlv, "interfaces", B_FOLLOW_ALL_SIDES);
 	fListview->SetSelectionMessage(new BMessage(INTERFACE_SELECTED_MSG));
 	fListview->SetInvocationMessage(new BMessage(CONFIGURE_INTERFACE_MSG));	
 	AddChild(new BScrollView(NULL, fListview, B_FOLLOW_ALL_SIDES, B_WILL_DRAW 
@@ -102,16 +99,13 @@ NetworkStatusAddOn::CreateView(BRect *bounds)
 	fOnOff->Hide();
 	AddChild(fOnOff);
 
-	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
-	_LookupDevices();
-
 	*bounds = Bounds();	
 	return this;
 }
 
 
 void
-NetworkStatusAddOn::AttachedToWindow()
+InterfacesAddOn::AttachedToWindow()
 {
 	fListview->SetTarget(this);
 	fConfigure->SetTarget(this);
@@ -121,19 +115,16 @@ NetworkStatusAddOn::AttachedToWindow()
 
 
 void
-NetworkStatusAddOn::MessageReceived(BMessage* msg)
+InterfacesAddOn::MessageReceived(BMessage* msg)
 {
 	int nr = fListview->CurrentSelection();
-	InterfaceStatusItem *item = NULL;
+	InterfaceListItem *item = NULL;
 	if(nr != -1) {		
-		item = dynamic_cast<InterfaceStatusItem*>(fListview->ItemAt(nr));
+		item = dynamic_cast<InterfaceListItem*>(fListview->ItemAt(nr));
 	}
 
 	switch (msg->what) {
 	case INTERFACE_SELECTED_MSG: {
-		if (!item)
-			break;
-
 		fConfigure->SetEnabled(item != NULL);
 		fOnOff->SetEnabled(item != NULL);
 		if (item == NULL) {
@@ -166,41 +157,4 @@ NetworkStatusAddOn::MessageReceived(BMessage* msg)
 	default:
 		BBox::MessageReceived(msg);
 	}
-}
-
-
-status_t
-NetworkStatusAddOn::_LookupDevices()
-{
-	// iterate over all interfaces and retrieve minimal status
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(fSocket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
-		return B_ERROR;
-
-	uint32 count = (uint32)config.ifc_value;
-	if (count == 0)
-		return B_ERROR;
-
-	void* buffer = malloc(count * sizeof(struct ifreq));
-	if (buffer == NULL)
-		return B_ERROR;
-
-	MemoryDeleter deleter(buffer);
-	
-	config.ifc_len = count * sizeof(struct ifreq);
-	config.ifc_buf = buffer;
-	if (ioctl(fSocket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
-		return B_ERROR;
-
-	ifreq* interface = (ifreq*)buffer;
-	fListview->MakeEmpty();
-
-	for (uint32 i = 0; i < count; i++) {
-		fListview->AddItem(new InterfaceStatusItem(interface->ifr_name, this));
-//		printf("Name = %s\n", interface->ifr_name);
-		interface = (ifreq*)((addr_t)interface + IF_NAMESIZE 
-			+ interface->ifr_addr.sa_len);
-	}	
-	return B_OK;
 }

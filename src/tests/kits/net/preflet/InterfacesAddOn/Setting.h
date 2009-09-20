@@ -22,11 +22,11 @@ class Setting {
 		void SetNetmask(BString ip) {fNetmask = ip; }
 		void SetAutoConfigure(bool t) {fAuto = t; }
 		
-		const char* GetIP()  {return fIP.String(); }
-		const char* GetGateway()  {return fGateway.String(); }		
-		const char* GetNetmask()  {return fNetmask.String(); }
-		const char* GetName()  {return fName.String(); }
-		bool GetAutoConfigure() {return fAuto; }
+		const char* IP()  {return fIP.String(); }
+		const char* Gateway()  {return fGateway.String(); }		
+		const char* Netmask()  {return fNetmask.String(); }
+		const char* Name()  {return fName.String(); }
+		bool AutoConfigured() {return fAuto; }
 		BObjectList<BString> fNameservers;
 		void ReadConfiguration();
 

@@ -15,8 +15,8 @@
 // --------------------------------------------------------------
 NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	:
-	BWindow(BRect(100, 100, 600, 600), title, B_TITLED_WINDOW
-		, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+	BWindow(BRect(100, 100, 600, 600), title, B_TITLED_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	BMenu 		*show_menu;
 	BMenu		*profiles_menu;
@@ -250,7 +250,7 @@ NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 msg_what)
 	
 	menu->SetRadioMode(true);
 
-	BDirectory dir("/etc/network/profiles");
+	BDirectory dir("/boot/common/settings/network/profiles");
 
 	if (dir.InitCheck() == B_OK) {
 		BEntry entry;

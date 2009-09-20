@@ -193,19 +193,19 @@ EthernetSettingsView::_ShowConfiguration(Setting* setting)
 	fTypeMenuField->SetEnabled(setting != NULL);
 
 	if (setting) {
-		fIPTextControl->SetText(setting->GetIP());
-		fGatewayTextControl->SetText(setting->GetGateway());
-		fNetMaskTextControl->SetText(setting->GetNetmask());
+		fIPTextControl->SetText(setting->IP());
+		fGatewayTextControl->SetText(setting->Gateway());
+		fNetMaskTextControl->SetText(setting->Netmask());
 
 		BMenuItem* item;
-		if (setting->GetAutoConfigure() == true)
+		if (setting->AutoConfigured() == true)
 			item = fTypeMenuField->Menu()->FindItem("DHCP");
 		else
 			item = fTypeMenuField->Menu()->FindItem("Static");
 		if (item)
 			item->SetMarked(true);
 
-		enableControls = setting->GetAutoConfigure() == false;
+		enableControls = setting->AutoConfigured() == false;
 
 		if (setting->fNameservers.CountItems() >= 2) {
 			fSecondaryDNSTextControl->SetText(
@@ -219,7 +219,7 @@ EthernetSettingsView::_ShowConfiguration(Setting* setting)
 	}
 
 	//We don't want to enable loop
-	if (strcmp(fCurrentSettings->GetName(), "loop") == 0) {
+	if (strcmp(fCurrentSettings->Name(), "loop") == 0) {
 		_EnableTextControls(false);
 		fTypeMenuField->SetEnabled(false);
 	} else
@@ -268,8 +268,8 @@ EthernetSettingsView::_SaveConfiguration()
 	_ApplyControlsToConfiguration();
 	_SaveDNSConfiguration();
 	_SaveAdaptersConfiguration();
-	if (fCurrentSettings->GetAutoConfigure())
-		_TriggerAutoConfig(fCurrentSettings->GetName());
+	if (fCurrentSettings->AutoConfigured())
+		_TriggerAutoConfig(fCurrentSettings->Name());
 }
 
 
@@ -305,7 +305,7 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 		return;
 
 	FILE* fp = NULL;
-	if (fCurrentSettings->GetAutoConfigure())
+	if (fCurrentSettings->AutoConfigured())
 		return;
 
 	if (fp == NULL) {
@@ -317,11 +317,11 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 		}
 	}
 
-	fprintf(fp, "interface %s {\n\t\taddress {\n",fCurrentSettings->GetName());
+	fprintf(fp, "interface %s {\n\t\taddress {\n",fCurrentSettings->Name());
 	fprintf(fp, "\t\t\tfamily\tinet\n");
-	fprintf(fp, "\t\t\taddress\t%s\n",fCurrentSettings->GetIP());
-	fprintf(fp, "\t\t\tgateway\t%s\n",fCurrentSettings->GetGateway());
-	fprintf(fp, "\t\t\tmask\t%s\n",fCurrentSettings->GetNetmask());
+	fprintf(fp, "\t\t\taddress\t%s\n",fCurrentSettings->IP());
+	fprintf(fp, "\t\t\tgateway\t%s\n",fCurrentSettings->Gateway());
+	fprintf(fp, "\t\t\tmask\t%s\n",fCurrentSettings->Netmask());
 	fprintf(fp, "\t\t}\n}\n\n");
 
 	if (fp) {
@@ -445,7 +445,7 @@ EthernetSettingsView::MessageReceived(BMessage* message)
 		case kMsgChange:
 			fErrorMessage->SetText("");
 				//We don't want to enable loop
-				if (strcmp(fCurrentSettings->GetName(), "loop") == 0)
+				if (strcmp(fCurrentSettings->Name(), "loop") == 0)
 					fApplyButton->SetEnabled(false);
 				else
 					fApplyButton->SetEnabled(true);
