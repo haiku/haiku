@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-8/2009.
+	Rudolf Cornelissen 3/2002-9/2009.
 */
 
 
@@ -1430,9 +1430,9 @@ init_driver(void)
 			sSettings.tv_output = value;
 
 		sSettings.hardcursor = get_driver_boolean_parameter(settings,
-			"hardcursor", false, false);
+			"hardcursor", true, true);
 		sSettings.usebios = get_driver_boolean_parameter(settings,
-			"usebios", false, false);
+			"usebios", true, true);
 		sSettings.switchhead = get_driver_boolean_parameter(settings,
 			"switchhead", false, false);
 		sSettings.force_pci = get_driver_boolean_parameter(settings,
@@ -1442,7 +1442,7 @@ init_driver(void)
 		sSettings.pgm_panel = get_driver_boolean_parameter(settings,
 			"pgm_panel", false, false);
 		sSettings.dma_acc = get_driver_boolean_parameter(settings,
-			"dma_acc", false, false);
+			"dma_acc", true, true);
 		sSettings.vga_on_tv = get_driver_boolean_parameter(settings,
 			"vga_on_tv", false, false);
 		sSettings.force_sync = get_driver_boolean_parameter(settings,
