@@ -28,7 +28,8 @@ const char *inputFile = NULL;
 BString outputFile;
 const char *catalogSig = NULL;
 const char *catalogLang = "English";
-BString rxString("be_catalog\\s*->\\s*GetString\\s*");
+BString rxString("(be_catalog\\s*->\\s*GetString\\s*"
+	"|BCatalogAddOn\\s*::\\s*MarkForTranslation\\s*)");
 
 
 BString str, ctx, cmt;

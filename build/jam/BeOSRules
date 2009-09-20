@@ -271,8 +271,8 @@ actions ResAttr1
 
 # Localization rules
 
-# Extract catalog entries from the sourcefile and put the output textfile in 
-# target. This output file is then used to create the binary catalog with 
+# Extract catalog entries from the sourcefile and put the output textfile in
+# target. This output file is then used to create the binary catalog with
 # linkcatkeys.
 rule ExtractCatalogEntries target : source : signature
 {
@@ -332,12 +332,12 @@ rule ExtractCatalogEntries target : source : signature
 actions ExtractCatalogEntries1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-		cat "$(2[2-])" | $(CC) -E $(CCDEFS) $(HDRS) - > "$(1)".pre 
+		cat "$(2[2-])" | $(CC) -E $(CCDEFS) $(HDRS) - > "$(1)".pre
 		$(2[1]) -s $(LOCALE_KIT_SIGNATURE) -p -o "$(1)" "$(1)".pre
 }
 
 # Link catalog entries from given catkey file into output compiled catalog file.
-# Compiled catalog file will then be copied into the image, but only if the 
+# Compiled catalog file will then be copied into the image, but only if the
 # fingerprint matches the one from the untranslated catalog for the same file.
 rule LinkApplicationCatalog target : sources : signature : language
 {
@@ -345,7 +345,7 @@ rule LinkApplicationCatalog target : sources : signature : language
 	LOCALE_KIT_SIGNATURE on $(target) = $(signature) ;
 	Depends $(target) : $(sources) <build>linkcatkeys ;
 	LocalClean clean : $(target) ;
-	LinkApplicationCatalog1 $(target) 
+	LinkApplicationCatalog1 $(target)
 		: <build>linkcatkeys $(language) $(sources) ;
 }
 
@@ -366,18 +366,20 @@ rule DoCatalogs appName	# Application name
 	: translatedCatalogs # List of available translations
 {
 	genCat = [ FGristFiles $(generatedCatalog) ] ;
-	
+	trans = [ FGristFiles $(translatedCatalogs) ] ;
+	SEARCH on $(trans) += $(SEARCH_SOURCE) ;
+
 	ExtractCatalogEntries $(genCat:S=.catkeys) : $(sources) : $(signature) ;
 
 	LinkApplicationCatalog $(genCat) : $(genCat:S=.catkeys)
 		: $(signature) : $(genCat:B) ;
 	
-	for catalog in $(translatedCatalogs)
+	for catalog in $(trans)
 	{
-		LinkApplicationCatalog $(catalog:B).catalog : $(catalog)
+		LinkApplicationCatalog $(catalog:S=.catalog) : $(catalog)
 			: $(signature) : $(catalog:B) ;
 	}
 	
 	AddFilesToHaikuImage system etc locale catalogs $(signature) :
-		$(genCat) $(translatedCatalogs:B).catalog ;
+		$(genCat) $(trans:S=.catalog) ;
 }

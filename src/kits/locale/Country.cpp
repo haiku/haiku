@@ -43,26 +43,27 @@ const char* gStrings[] = {
 
 BCountry::BCountry(const char* languageCode, const char* countryCode)
 	:
-	fStrings(gStrings),
-	fICULocale(languageCode, countryCode)
+	fStrings(gStrings)
 {
+	fICULocale = new icu_4_2::Locale(languageCode, countryCode);
 }
 
 
 BCountry::BCountry(const char* languageAndCountryCode)
 	:
-	fStrings(gStrings),
-	fICULocale(languageAndCountryCode)
+	fStrings(gStrings)
 {
+	fICULocale = new icu_4_2::Locale(languageAndCountryCode);
 	fICULongDateFormatter = DateFormat::createDateInstance(
-		DateFormat::FULL, fICULocale);
+		DateFormat::FULL, *fICULocale);
  	fICUShortDateFormatter = DateFormat::createDateInstance(
-		DateFormat::SHORT, fICULocale);
+		DateFormat::SHORT, *fICULocale);
 }
 
 
 BCountry::~BCountry()
 {
+	delete fICULocale;
 }
 
 
@@ -70,7 +71,7 @@ bool
 BCountry::Name(BString& name) const
 {
 	UnicodeString uString;
-	fICULocale.getDisplayName(uString);
+	fICULocale->getDisplayName(uString);
 	BStringByteSink stringConverter(&name);
 	uString.toUTF8(stringConverter);
 	return true;
@@ -80,7 +81,7 @@ BCountry::Name(BString& name) const
 const char*
 BCountry::Code() const
 {
-	return fICULocale.getName();
+	return fICULocale->getName();
 }
 
 
@@ -138,7 +139,7 @@ BCountry::FormatTime(BString* string, time_t time, bool longFormat)
 	icu_4_2::DateFormat* timeFormatter;
  	timeFormatter = DateFormat::createTimeInstance(
 		longFormat ? DateFormat::FULL : DateFormat::SHORT,
-		fICULocale);
+		*fICULocale);
 	UnicodeString ICUString;
 	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);
 
@@ -187,7 +188,7 @@ BCountry::TimeFormat(BString& format, bool longFormat) const
 	icu_4_2::DateFormat* dateFormatter;
  	dateFormatter = DateFormat::createTimeInstance(
 		longFormat ? DateFormat::FULL : DateFormat::SHORT,
-		fICULocale);
+		*fICULocale);
 	SimpleDateFormat* dateFormatterImpl
 		= static_cast<SimpleDateFormat*>(dateFormatter);
 
@@ -228,14 +229,15 @@ BCountry::FormatNumber(char* string, size_t maxSize, double value)
 }
 
 
-UErrorCode
+status_t
 BCountry::FormatNumber(BString* string, double value)
 {
 	UErrorCode err = U_ZERO_ERROR;
 	NumberFormat* numberFormatter
-		= NumberFormat::createInstance(fICULocale, NumberFormat::kNumberStyle,
+		= NumberFormat::createInstance(*fICULocale, NumberFormat::kNumberStyle,
 			err);
 
+	// Warning: we're returning an ICU error here but the type is status_t.
 	if (U_FAILURE(err)) return err;
 
 	UnicodeString ICUString;
@@ -264,7 +266,7 @@ BCountry::FormatNumber(BString* string, int32 value)
 {
 	UErrorCode err;
 	NumberFormat* numberFormatter
-		= NumberFormat::createInstance(fICULocale, err);
+		= NumberFormat::createInstance(*fICULocale, err);
 
 	assert(err == U_ZERO_ERROR);
 
@@ -284,7 +286,7 @@ BCountry::DecimalPoint(BString& format) const
 {
 	UErrorCode err;
 	NumberFormat* numberFormatter
-		= NumberFormat::createInstance(fICULocale, err);
+		= NumberFormat::createInstance(*fICULocale, err);
 
 	assert(err == U_ZERO_ERROR);
 
@@ -312,7 +314,7 @@ BCountry::ThousandsSeparator(BString& separator) const
 {
 	UErrorCode err;
 	NumberFormat* numberFormatter
-		= NumberFormat::createInstance(fICULocale, err);
+		= NumberFormat::createInstance(*fICULocale, err);
 	assert(err == U_ZERO_ERROR);
 	DecimalFormat* decimalFormatter
 		= dynamic_cast<DecimalFormat*>(numberFormatter);
@@ -338,7 +340,7 @@ BCountry::Grouping(BString& grouping) const
 {
 	UErrorCode err;
 	NumberFormat* numberFormatter
-		= NumberFormat::createInstance(fICULocale, err);
+		= NumberFormat::createInstance(*fICULocale, err);
 	assert(err == U_ZERO_ERROR);
 	DecimalFormat* decimalFormatter
 		= dynamic_cast<DecimalFormat*>(numberFormatter);
@@ -364,7 +366,7 @@ BCountry::PositiveSign(BString& sign) const
 {
 	UErrorCode err;
 	NumberFormat* numberFormatter
-		= NumberFormat::createInstance(fICULocale, err);
+		= NumberFormat::createInstance(*fICULocale, err);
 	assert(err == U_ZERO_ERROR);
 	DecimalFormat* decimalFormatter
 		= dynamic_cast<DecimalFormat*>(numberFormatter);
@@ -390,7 +392,7 @@ BCountry::NegativeSign(BString& sign) const
 {
 	UErrorCode err;
 	NumberFormat* numberFormatter
-		= NumberFormat::createInstance(fICULocale, err);
+		= NumberFormat::createInstance(*fICULocale, err);
 	assert(err == U_ZERO_ERROR);
 	DecimalFormat* decimalFormatter
 		= dynamic_cast<DecimalFormat*>(numberFormatter);
@@ -433,7 +435,7 @@ BCountry::FormatMonetary(BString* string, double value)
 {
 	UErrorCode err;
 	NumberFormat* numberFormatter
-		= NumberFormat::createCurrencyInstance(fICULocale, err);
+		= NumberFormat::createCurrencyInstance(*fICULocale, err);
 
 	assert(err == U_ZERO_ERROR);
 
@@ -454,7 +456,7 @@ BCountry::CurrencySymbol(BString& symbol) const
 {
 	UErrorCode err;
 	NumberFormat* numberFormatter
-		= NumberFormat::createCurrencyInstance(fICULocale, err);
+		= NumberFormat::createCurrencyInstance(*fICULocale, err);
 	assert(err == U_ZERO_ERROR);
 	DecimalFormat* decimalFormatter
 		= dynamic_cast<DecimalFormat*>(numberFormatter);
@@ -480,7 +482,7 @@ BCountry::InternationalCurrencySymbol(BString& symbol) const
 {
 	UErrorCode err;
 	NumberFormat* numberFormatter
-		= NumberFormat::createCurrencyInstance(fICULocale, err);
+		= NumberFormat::createCurrencyInstance(*fICULocale, err);
 	assert(err == U_ZERO_ERROR);
 	DecimalFormat* decimalFormatter
 		= dynamic_cast<DecimalFormat*>(numberFormatter);
@@ -506,7 +508,7 @@ BCountry::MonDecimalPoint(BString& decimal) const
 {
 	UErrorCode err;
 	NumberFormat* numberFormatter
-		= NumberFormat::createCurrencyInstance(fICULocale, err);
+		= NumberFormat::createCurrencyInstance(*fICULocale, err);
 	assert(err == U_ZERO_ERROR);
 	DecimalFormat* decimalFormatter
 		= dynamic_cast<DecimalFormat*>(numberFormatter);
@@ -532,7 +534,7 @@ BCountry::MonThousandsSeparator(BString& separator) const
 {
 	UErrorCode err;
 	NumberFormat* numberFormatter
-		= NumberFormat::createCurrencyInstance(fICULocale, err);
+		= NumberFormat::createCurrencyInstance(*fICULocale, err);
 	assert(err == U_ZERO_ERROR);
 	DecimalFormat* decimalFormatter
 		= dynamic_cast<DecimalFormat*>(numberFormatter);
@@ -558,7 +560,7 @@ BCountry::MonGrouping(BString& grouping) const
 {
 	UErrorCode err;
 	NumberFormat* numberFormatter
-		= NumberFormat::createCurrencyInstance(fICULocale, err);
+		= NumberFormat::createCurrencyInstance(*fICULocale, err);
 	assert(err == U_ZERO_ERROR);
 	DecimalFormat* decimalFormatter
 		= dynamic_cast<DecimalFormat*>(numberFormatter);

@@ -22,7 +22,20 @@ Preference Appearance :
 	#FontMenu.cpp
 	#MenuView.cpp
 	
-	: be $(TARGET_LIBSTDC++)
+	: be $(TARGET_LIBSTDC++) liblocale.so
 	: Appearance.rdef
+	;
+
+DoCatalogs Appearance :
+	x-vnd.Haiku-Appearance
+	:
+	AntialiasingSettingsView.cpp
+	APRView.cpp
+	APRWindow.cpp
+	ColorSet.cpp
+	ColorWell.cpp
+	ColorWhichItem.cpp
+	: en.catalog
+	: fr.catkeys
 	;
 

@@ -20,5 +20,5 @@ DoCatalogs Locale		# application name
 	TimeFormatSettingsView.cpp
 	: en.catalog		# default catalog generated from sourcecode
 	:					# translations
-	[ FDirName $(HAIKU_TOP) src preferences locale fr.catkeys ]
+	fr.catkeys
 	;

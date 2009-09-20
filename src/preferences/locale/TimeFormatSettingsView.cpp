@@ -29,6 +29,8 @@
 #include <TextControl.h>
 #include <Window.h>
 
+#include <unicode/utypes.h>
+
 
 #define TR_CONTEXT "TimeFormatSettings"
 
@@ -680,11 +682,11 @@ TimeFormatSettingsView::_UpdateExamples()
 	fCountry->FormatTime(&timeFormat, timeValue, false);
 	fShortTimeExampleView->SetText(timeFormat);
 
-	UErrorCode Error = fCountry->FormatNumber(&timeFormat, 1234.5678);
-	if (Error == 0)
+	status_t Error = fCountry->FormatNumber(&timeFormat, 1234.5678);
+	if (Error == U_ZERO_ERROR)
 		fNumberFormatExampleView->SetText(timeFormat);
 	else
-		fNumberFormatExampleView->SetText(u_errorName(Error));
+		fNumberFormatExampleView->SetText(u_errorName((UErrorCode)Error));
 }
 
 

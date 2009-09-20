@@ -8,7 +8,9 @@
 #include "APRWindow.h"
 
 #include <Button.h>
+#include <Catalog.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <Messenger.h>
 #include <SpaceLayoutItem.h>
 #include <TabView.h>
@@ -16,20 +18,23 @@
 #include "APRView.h"
 #include "defs.h"
 
+#define TR_CONTEXT "APRWindow"
+
 static const uint32 kMsgSetDefaults = 'dflt';
 static const uint32 kMsgRevert = 'rvrt';
 
 APRWindow::APRWindow(BRect frame)
- :	BWindow(frame, "Appearance", B_TITLED_WINDOW,
+ :	BWindow(frame, TR("Appearance"), B_TITLED_WINDOW,
  		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
  		B_ALL_WORKSPACES)
 {
+
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	fDefaultsButton = new BButton("defaults", "Defaults",
+	fDefaultsButton = new BButton("defaults", TR("Defaults"),
 		new BMessage(kMsgSetDefaults), B_WILL_DRAW);
 
-	fRevertButton = new BButton("revert", "Revert",
+	fRevertButton = new BButton("revert", TR("Revert"),
 		new BMessage(kMsgRevert), B_WILL_DRAW);
 
 	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);

@@ -6,12 +6,10 @@
 #include <LocaleStrings.h>
 #include <String.h>
 
-#include <unicode/locid.h>
-
 namespace icu_4_2 {
 	class DateFormat;
+	class Locale;
 }
-
 
 enum {
 	B_METRIC = 0,
@@ -51,7 +49,7 @@ class BCountry {
 		// numbers
 
 		virtual void FormatNumber(char* string, size_t maxSize, double value);
-		virtual UErrorCode FormatNumber(BString* string, double value);
+		virtual status_t FormatNumber(BString* string, double value);
 		virtual void FormatNumber(char* string, size_t maxSize, int32 value);
 		virtual void FormatNumber(BString* string, int32 value);
 
@@ -83,7 +81,7 @@ class BCountry {
 		icu_4_2::DateFormat* fICULongDateFormatter;
 		icu_4_2::DateFormat* fICUShortDateFormatter;
 		const char**	fStrings;
-		Locale fICULocale;
+		icu_4_2::Locale* fICULocale;
 };
 
 #endif	/* _COUNTRY_H_ */
