@@ -13,7 +13,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Joysticks",
-    long_info  = "Joysticks ©2009 Haiku"
+    long_info  = "Joysticks ©2007-2009 Haiku"
 };
 
 resource app_flags B_SINGLE_LAUNCH;
