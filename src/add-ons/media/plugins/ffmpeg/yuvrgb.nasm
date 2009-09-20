@@ -101,9 +101,9 @@
 	packuswb xmm4,xmm7				; clamp to 0,255 and pack G to 8 bit per pixel
 	packuswb xmm5,xmm7				; clamp to 0,255 and pack B to 8 bit per pixel
 ; convert to bgra32 packed
-	punpcklbw xmm3,xmm7				; r0r0r0r0r0r0r0r0
 	punpcklbw xmm5,xmm4				; bgbgbgbgbgbgbgbg
-	movdqa xmm0, xmm5				; save gb values
+	movdqa xmm0, xmm5				; save bg values
+	punpcklbw xmm3,xmm7				; r0r0r0r0r0r0r0r0
 	punpcklwd xmm5,xmm3				; lower half bgr0bgr0bgr0bgr0
 	punpckhwd xmm0,xmm3				; upper half bgr0bgr0bgr0bgr0
 ; write to output ptr
@@ -226,13 +226,10 @@ cglobal Convert_YUV420P_RGBA32_SSE2
 REPEATLOOP1:						; loop over width / 8
 ;	push ecx						; preserve loop counter
 ; YUV420 Planar inputer
-	movq mm0, [esi]					; fetch 8 y values (8 bit) (direct unaligned sse2 loads might be better)
-	movd mm1, [eax]					; fetch 4 u values
-	movd mm2, [ebx]					; fetch 4 v values
+	movq xmm0, [esi]				; fetch 8 y values (8 bit) yyyyyyyy00000000
+	movd xmm1, [eax]				; fetch 4 u values (8 bit) uuuu000000000000
+	movd xmm2, [ebx]				; fetch 4 v values (8 bit) vvvv000000000000
 	
-	movq2dq xmm0, mm0				; copy y to sse register  yyyyyyyy00000000
-	movq2dq xmm1, mm1				; copy u to sse register  uuuu000000000000
-	movq2dq xmm2, mm2				; copy v to sse register  vvvv000000000000
 ; extract y
 	pxor xmm7,xmm7					; 00000000000000000000000000000000
 	punpcklbw xmm0,xmm7				; interleave xmm7 into xmm0 y0y0y0y0y0y0y0y0
@@ -261,7 +258,6 @@ rgba32output
 	jnz REPEATLOOP1
 ENDLOOP1:
 ; Cleanup
-	emms
 	pop ebx
 	pop eax
 	pop ecx
