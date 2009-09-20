@@ -331,7 +331,8 @@ const static uint32 kMsgRevert = 'revt';
 
 LocaleWindow::LocaleWindow(BRect rect)
 	: BWindow(rect, "Locale", B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
+			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 

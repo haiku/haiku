@@ -498,7 +498,7 @@ BLocaleRoster::GetInstalledLanguages(BMessage *languages) const
 	BString languageName;
 	std::set<BString> languageSet;
 
-#define REALLY_ALL_LANGUAGES
+#undef REALLY_ALL_LANGUAGES
 #ifdef REALLY_ALL_LANGUAGES
 	static const char* const* icuLocaleList = Locale::getISOLanguages();
 
@@ -513,7 +513,12 @@ BLocaleRoster::GetInstalledLanguages(BMessage *languages) const
 
 	// Loop over the strings and add them to an std::set to remove duplicates
 	for (i = 0; i < localeCount; i++) {
-		languageSet.insert(BString(icuLocaleList[i]));
+		UnicodeString ICULanguageName;
+		BString LanguageName;
+		BStringByteSink StringConverter(&LanguageName);
+		icuLocaleList[i].getDisplayLanguage(ICULanguageName);
+		ICULanguageName.toUTF8(StringConverter);
+		languageSet.insert(LanguageName);
 	}
 #endif
 
@@ -523,7 +528,7 @@ BLocaleRoster::GetInstalledLanguages(BMessage *languages) const
 		languages->AddString("langs", *setIterator);
 	}
 
-	return B_OK; 
+	return B_OK;
 }
 
 

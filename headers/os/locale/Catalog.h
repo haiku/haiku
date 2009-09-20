@@ -87,11 +87,11 @@ extern BCatalog* be_app_catalog;
 	be_catalog->GetString((str), TR_CONTEXT)
 
 #undef TR_CMT
-#define TR_CMT(str,cmt) \
+#define TR_CMT(str, cmt) \
 	be_catalog->GetString((str), TR_CONTEXT, (cmt))
 
 #undef TR_ALL
-#define TR_ALL(str,ctx,cmt) \
+#define TR_ALL(str, ctx, cmt) \
 	be_catalog->GetString((str), (ctx), (cmt))
 
 #undef TR_ID
@@ -127,11 +127,11 @@ extern BCatalog* be_app_catalog;
 	BCatalogAddOn::MarkForTranslation((str), TR_CONTEXT, "")
 
 #undef TR_MARK_CMT
-#define TR_MARK_CMT(str,cmt) \
+#define TR_MARK_CMT(str, cmt) \
 	BCatalogAddOn::MarkForTranslation((str), TR_CONTEXT, (cmt))
 
 #undef TR_MARK_ALL
-#define TR_MARK_ALL(str,ctx,cmt) \
+#define TR_MARK_ALL(str, ctx, cmt) \
 	BCatalogAddOn::MarkForTranslation((str), (ctx), (cmt))
 
 #undef TR_MARK_ID
@@ -148,20 +148,20 @@ class BCatalogAddOn {
 		friend class BLocaleRoster;
 	public:
 		BCatalogAddOn(const char *signature, const char *language,
-					  uint32 fingerprint);
+			uint32 fingerprint);
 		virtual ~BCatalogAddOn();
 
 		virtual const char *GetString(const char *string,
-								const char *context=NULL,
-								const char *comment=NULL) = 0;
+								const char *context = NULL,
+								const char *comment = NULL) = 0;
 		virtual const char *GetString(uint32 id) = 0;
 
 		status_t InitCheck() const;
 		BCatalogAddOn *Next();
 
-		// the following could be used to localize non-textual data (e.g. icons),
-		// but these will only be implemented if there's demand for such a
-		// feature:
+		// the following could be used to localize non-textual data (e.g.
+		// icons), but these will only be implemented if there's demand for such
+		// a feature:
 		virtual bool CanHaveData() const;
 		virtual status_t GetData(const char *name, BMessage *msg);
 		virtual status_t GetData(uint32 id, BMessage *msg);
@@ -169,21 +169,21 @@ class BCatalogAddOn {
 		// interface for catalog-editor-app and testing apps:
 		virtual status_t SetString(const char *string,
 							const char *translated,
-							const char *context=NULL,
-							const char *comment=NULL);
+							const char *context = NULL,
+							const char *comment = NULL);
 		virtual status_t SetString(int32 id, const char *translated);
-		//
+		
 		virtual bool CanWriteData() const;
 		virtual status_t SetData(const char *name, BMessage *msg);
 		virtual status_t SetData(uint32 id, BMessage *msg);
-		//
+		
 		virtual status_t ReadFromFile(const char *path = NULL);
 		virtual status_t ReadFromAttribute(entry_ref *appOrAddOnRef);
 		virtual status_t ReadFromResource(entry_ref *appOrAddOnRef);
 		virtual status_t WriteToFile(const char *path = NULL);
 		virtual status_t WriteToAttribute(entry_ref *appOrAddOnRef);
 		virtual status_t WriteToResource(entry_ref *appOrAddOnRef);
-		//
+		
 		virtual void MakeEmpty();
 		virtual int32 CountItems() const;
 
@@ -323,21 +323,21 @@ class EditableCatalog : public BCatalog {
 
 		status_t SetString(const char *string,
 					const char *translated,
-					const char *context=NULL,
-					const char *comment=NULL);
+					const char *context = NULL,
+					const char *comment = NULL);
 		status_t SetString(int32 id, const char *translated);
-		//
+		
 		bool CanWriteData() const;
 		status_t SetData(const char *name, BMessage *msg);
 		status_t SetData(uint32 id, BMessage *msg);
-		//
+		
 		status_t ReadFromFile(const char *path = NULL);
 		status_t ReadFromAttribute(entry_ref *appOrAddOnRef);
 		status_t ReadFromResource(entry_ref *appOrAddOnRef);
 		status_t WriteToFile(const char *path = NULL);
 		status_t WriteToAttribute(entry_ref *appOrAddOnRef);
 		status_t WriteToResource(entry_ref *appOrAddOnRef);
-		//
+		
 		void MakeEmpty();
 
 	private:
@@ -350,4 +350,4 @@ class EditableCatalog : public BCatalog {
 
 } // namespace BPrivate
 
-#endif	/* _CATALOG_H_ */
+#endif /* _CATALOG_H_ */

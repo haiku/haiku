@@ -30,7 +30,7 @@ BCatalog::BCatalog()
 }
 
 
-BCatalog::BCatalog(const char *signature, const char *language, 
+BCatalog::BCatalog(const char *signature, const char *language,
 	uint32 fingerprint)
 {
 	fCatalog = be_locale_roster->LoadCatalog(signature, language, fingerprint);
@@ -46,7 +46,8 @@ BCatalog::~BCatalog()
 
 
 const char *
-BCatalog::GetString(const char *string, const char *context, const char *comment)
+BCatalog::GetString(const char *string, const char *context,
+	const char *comment)
 {
 	const char *translated;
 	for (BCatalogAddOn* cat = fCatalog; cat != NULL; cat = cat->fNext) {
@@ -71,7 +72,7 @@ BCatalog::GetString(uint32 id)
 }
 
 
-status_t 
+status_t
 BCatalog::GetData(const char *name, BMessage *msg)
 {
 	if (!fCatalog)
@@ -80,14 +81,13 @@ BCatalog::GetData(const char *name, BMessage *msg)
 	for (BCatalogAddOn* cat = fCatalog; cat != NULL; cat = cat->fNext) {
 		res = cat->GetData(name, msg);
 		if (res != B_NAME_NOT_FOUND && res != EOPNOTSUPP)
-			return res;	
-				// return B_OK if found, or specific error-code
+			return res;	// return B_OK if found, or specific error-code
 	}
 	return B_NAME_NOT_FOUND;
 }
 
 
-status_t 
+status_t
 BCatalog::GetData(uint32 id, BMessage *msg)
 {
 	if (!fCatalog)
@@ -96,15 +96,14 @@ BCatalog::GetData(uint32 id, BMessage *msg)
 	for (BCatalogAddOn* cat = fCatalog; cat != NULL; cat = cat->fNext) {
 		res = cat->GetData(id, msg);
 		if (res != B_NAME_NOT_FOUND && res != EOPNOTSUPP)
-			return res;	
-				// return B_OK if found, or specific error-code
+			return res;	// return B_OK if found, or specific error-code
 	}
 	return B_NAME_NOT_FOUND;
 }
 
 
-status_t 
-BCatalog::GetAppCatalog(BCatalog* catalog) 
+status_t
+BCatalog::GetAppCatalog(BCatalog* catalog)
 {
 	app_info appInfo;
 	if (!be_app || be_app->GetAppInfo(&appInfo) != B_OK)
@@ -119,15 +118,15 @@ BCatalog::GetAppCatalog(BCatalog* catalog)
 	// try to fetch fingerprint from app-file (attribute):
 	uint32 fingerprint = 0;
 	BNode appNode(&appInfo.ref);
-	appNode.ReadAttr(BLocaleRoster::kCatFingerprintAttr, B_UINT32_TYPE, 0, 
+	appNode.ReadAttr(BLocaleRoster::kCatFingerprintAttr, B_UINT32_TYPE, 0,
 		&fingerprint, sizeof(uint32));
 	// try to load catalog (with given fingerprint):
 	catalog->fCatalog
 		= be_locale_roster->LoadCatalog(sig.String(), NULL,	fingerprint);
 
-	// load native embedded id-based catalog. If such a catalog exists, 
+	// load native embedded id-based catalog. If such a catalog exists,
 	// we can fall back to native strings for id-based access, too.
-	BCatalogAddOn *embeddedCatalog 
+	BCatalogAddOn *embeddedCatalog
 		= be_locale_roster->LoadEmbeddedCatalog(&appInfo.ref);
 	if (embeddedCatalog) {
 		if (!catalog->fCatalog)
@@ -178,35 +177,35 @@ BCatalogAddOn::UpdateFingerprint()
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::InitCheck() const
-{ 
+{
 	return fInitCheck;
 }
 
 
-bool 
+bool
 BCatalogAddOn::CanHaveData() const
 {
 	return false;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::GetData(const char *name, BMessage *msg)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::GetData(uint32 id, BMessage *msg)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::SetString(const char *string, const char *translated,
 	const char *context, const char *comment)
 {
@@ -214,70 +213,70 @@ BCatalogAddOn::SetString(const char *string, const char *translated,
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::SetString(int32 id, const char *translated)
 {
 	return EOPNOTSUPP;
 }
 
 
-bool 
+bool
 BCatalogAddOn::CanWriteData() const
 {
 	return false;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::SetData(const char *name, BMessage *msg)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::SetData(uint32 id, BMessage *msg)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::ReadFromFile(const char *path)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::ReadFromAttribute(entry_ref *appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::ReadFromResource(entry_ref *appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::WriteToFile(const char *path)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::WriteToAttribute(entry_ref *appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::WriteToResource(entry_ref *appOrAddOnRef)
 {
 	return EOPNOTSUPP;
@@ -289,7 +288,7 @@ void BCatalogAddOn::MakeEmpty()
 }
 
 
-int32 
+int32
 BCatalogAddOn::CountItems() const
 {
 	return 0;
@@ -298,7 +297,7 @@ BCatalogAddOn::CountItems() const
 
 //#pragma mark - EditableCatalog
 namespace BPrivate {
-EditableCatalog::EditableCatalog(const char *type, const char *signature, 
+EditableCatalog::EditableCatalog(const char *type, const char *signature,
 	const char *language)
 {
 	fCatalog = be_locale_roster->CreateCatalog(type, signature, language);
@@ -310,7 +309,7 @@ EditableCatalog::~EditableCatalog()
 }
 
 
-status_t 
+status_t
 EditableCatalog::SetString(const char *string, const char *translated,
 	const char *context, const char *comment)
 {
@@ -320,7 +319,7 @@ EditableCatalog::SetString(const char *string, const char *translated,
 }
 
 
-status_t 
+status_t
 EditableCatalog::SetString(int32 id, const char *translated)
 {
 	if (!fCatalog)
@@ -329,7 +328,7 @@ EditableCatalog::SetString(int32 id, const char *translated)
 }
 
 
-bool 
+bool
 EditableCatalog::CanWriteData() const
 {
 	if (!fCatalog)
@@ -338,7 +337,7 @@ EditableCatalog::CanWriteData() const
 }
 
 
-status_t 
+status_t
 EditableCatalog::SetData(const char *name, BMessage *msg)
 {
 	if (!fCatalog)
@@ -347,7 +346,7 @@ EditableCatalog::SetData(const char *name, BMessage *msg)
 }
 
 
-status_t 
+status_t
 EditableCatalog::SetData(uint32 id, BMessage *msg)
 {
 	if (!fCatalog)
@@ -356,7 +355,7 @@ EditableCatalog::SetData(uint32 id, BMessage *msg)
 }
 
 
-status_t 
+status_t
 EditableCatalog::ReadFromFile(const char *path)
 {
 	if (!fCatalog)
@@ -365,7 +364,7 @@ EditableCatalog::ReadFromFile(const char *path)
 }
 
 
-status_t 
+status_t
 EditableCatalog::ReadFromAttribute(entry_ref *appOrAddOnRef)
 {
 	if (!fCatalog)
@@ -374,7 +373,7 @@ EditableCatalog::ReadFromAttribute(entry_ref *appOrAddOnRef)
 }
 
 
-status_t 
+status_t
 EditableCatalog::ReadFromResource(entry_ref *appOrAddOnRef)
 {
 	if (!fCatalog)
@@ -383,7 +382,7 @@ EditableCatalog::ReadFromResource(entry_ref *appOrAddOnRef)
 }
 
 
-status_t 
+status_t
 EditableCatalog::WriteToFile(const char *path)
 {
 	if (!fCatalog)
@@ -392,7 +391,7 @@ EditableCatalog::WriteToFile(const char *path)
 }
 
 
-status_t 
+status_t
 EditableCatalog::WriteToAttribute(entry_ref *appOrAddOnRef)
 {
 	if (!fCatalog)
@@ -401,7 +400,7 @@ EditableCatalog::WriteToAttribute(entry_ref *appOrAddOnRef)
 }
 
 
-status_t 
+status_t
 EditableCatalog::WriteToResource(entry_ref *appOrAddOnRef)
 {
 	if (!fCatalog)
