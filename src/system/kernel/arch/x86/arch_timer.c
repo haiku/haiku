@@ -26,7 +26,7 @@
 
 #include "interrupts.h"
 
-//#define TRACE_TIMER
+#define TRACE_TIMER
 #ifdef TRACE_TIMER
 #	define TRACE(x) dprintf x
 #else
@@ -99,7 +99,7 @@ arch_init_timer(kernel_args *args)
 	state = disable_interrupts();
 
 	for (i = 0; (timer = sTimers[i]) != NULL; i++) {
-		if (timer->init(args) != B_OK)
+		if (timer->init(args) == B_OK)
 			break;
 	}
 
