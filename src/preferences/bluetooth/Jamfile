@@ -17,3 +17,17 @@ Preference Bluetooth :
 	: be libbluetooth.so $(TARGET_LIBSUPC++)
 	;
 
+DoCatalogs Bluetooth :
+	x-vnd.Haiku-BluetoothPrefs
+	:
+	BluetoothDeviceView.cpp
+	BluetoothMain.cpp
+	BluetoothSettingsView.cpp
+	BluetoothWindow.cpp
+	ExtendedLocalDeviceView.cpp
+	InquiryPanel.cpp
+	RemoteDevicesView.cpp
+	: en.catalog
+	: fr.catkeys
+	;
+

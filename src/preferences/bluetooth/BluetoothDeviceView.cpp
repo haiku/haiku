@@ -10,11 +10,15 @@
 
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <SpaceLayoutItem.h>
 #include <StringView.h>
 #include <TextView.h>
 
+
+#define TR_CONTEXT "Device View"
 
 BluetoothDeviceView::BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice, uint32 resizingMode, uint32 flags)
  :	BView(frame,"BluetoothDeviceView", resizingMode, flags | B_WILL_DRAW), 
@@ -30,7 +34,7 @@ BluetoothDeviceView::BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice, 
 		
 	fBdaddr = new BStringView("bdaddr", bdaddrUtils::ToString(bdaddrUtils::NullAddress()));
 	
-	fClassService = new BStringView("ServiceClass", "Service Classes: ");
+	fClassService = new BStringView("ServiceClass", TR("Service Classes: "));
 
 	fClass = new BStringView("class", "- / -");
 
@@ -89,7 +93,7 @@ BluetoothDeviceView::SetBluetoothDevice(BluetoothDevice* bDevice)
 		fName->SetText(bDevice->GetFriendlyName().String());
 		fBdaddr->SetText(bdaddrUtils::ToString(bDevice->GetBluetoothAddress()));
 	
-		BString str("Service Classes: ");
+		BString str(TR("Service Classes: "));
 		bDevice->GetDeviceClass().GetServiceClass(str);
 		fClassService->SetText(str.String());
 	

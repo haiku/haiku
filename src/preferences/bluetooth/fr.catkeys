@@ -1,0 +1,50 @@
+1	french	x-vnd.Haiku-BluetoothPrefs	698965680
+Defaults	Device View		Défaut
+Refresh LocalDevicesxE2x80xA6	Device View		Rafraîchir LocalDevicesxE2x80xA6
+Scanning progress	Device View		Avancée du balayage
+Discoverable	Device View		Découvrable
+Stop Bluetooth ServicesxE2x80xA6	Device View		Arrêter les services bluetoothxE2x80xA6
+Remove	Device View		Enlever
+As Blocked	Device View		Bloqué
+Always ask	Device View		Toujours demander
+Settings	Device View		Réglages
+As Trusted	Device View		De confiance
+Server	Device View		Serveur
+Check that the bluetooth capabilities of your remote device are activated. Press Inquiry to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them	Device View		Vérifiez que les fonctionalités bluetooth de votre appareil distant sont activées. Appuyez sur Recherche pour lancer un balayage. Le temps nécessaire pour récupérer les noms est inconnu, mais ne devrait pas dépasser 3 secondes par appareil. Ensuite vous pourrez les ajouter à la liste principale, puis vous associer avec eux.
+Identify host as:	Device View		Identifier l'hôte comme :
+Incoming connections policy:	Device View		Attitude pour les connexiosn entrantes :
+There has not been found any bluetooth LocalDevice device registered on the system	Device View		Aucun LocalDevice bluetooth n'est enregistré sur ce système
+Local Devices found on system:	Device View		Appareils locaux trouvés sur le système :
+Only from Trusted devices	Device View		Seulement les appareils de confiance
+Add device to list	Device View		Ajouter l'appareil à la liste
+Inquiry	Device View		Recherche
+Remote Devices	Device View		Appareils distants
+Retrieving name of 	Device View		Récupère le nom de 
+Smart Phone	Device View		Smart Phone
+Identify us as...	Device View		S'identifier comme...
+Scanning completed.	Device View		Balayage complet.
+Show Bluetooth consolexE2x80xA6	Device View		Afficher la console bluetoothxE2x80xA6
+Handheld	Device View		PDA
+15 secs	Device View		15 secs
+Help	Device View		Aide
+Revert	Device View		Défaire
+Start Bluetooth ServicesxE2x80xA6	Device View		Démarrer les serrvices bluetoothxE2x80xA6
+61 secs	Device View		61 secs
+Default Inquiry time:	Device View		Temps de recherche par défaut :
+Connections & Channels listxE2x80xA6	Device View		Liste des canaux et connexionsxE2x80xA6
+ seconds	Device View		 secondes
+Policy...	Device View		Attitude...
+Show Name	Device View		Montrer le nom
+Laptop	Device View		Portable
+AboutxE2x80xA6	Device View		À proposxE2x80xA6
+Service Classes: 	Device View		Classes de services: 
+Remaining 	Device View		Restant 
+Pick LocalDevice...	Device View		Sélectionner LocalDevice...
+Remote Devices ListxE2x80xA6	Device View		Liste des appareils distantsxE2x80xA6
+RefreshxE2x80xA6	Device View		RafraîchirxE2x80xA6
+AddxE2x80xA6	Device View		AjouterxE2x80xA6
+View	Device View		Vue
+Desktop	Device View		Bureau
+Retrieving names...	Device View		Récupération des noms...
+Starting scan...	Device View		Début du balayage...
+From all devices	Device View		Depuis tous les appareils

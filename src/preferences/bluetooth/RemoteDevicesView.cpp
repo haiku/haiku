@@ -5,10 +5,12 @@
 #include <stdio.h>
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <Messenger.h>
 #include <Path.h>
 #include <SpaceLayoutItem.h>
@@ -31,21 +33,21 @@ RemoteDevicesView::RemoteDevicesView(const char *name, uint32 flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
-	addButton = new BButton("add", "Add" B_UTF8_ELLIPSIS, 
+	addButton = new BButton("add", TR("Add" B_UTF8_ELLIPSIS),
 										new BMessage(kMsgAddDevices));
 	
-	removeButton = new BButton("remove", "Remove", 
+	removeButton = new BButton("remove", TR("Remove"),
 										new BMessage(kMsgRemoveDevice));
 
-	trustButton = new BButton("trust", "As Trusted", 
+	trustButton = new BButton("trust", TR("As Trusted"),
 										new BMessage(kMsgTrustDevice));
 
 
-	blockButton = new BButton("trust", "As Blocked", 
+	blockButton = new BButton("trust", TR("As Blocked"),
 										new BMessage(kMsgBlockDevice));
 
 
-	availButton = new BButton("check", "Refresh" B_UTF8_ELLIPSIS, 
+	availButton = new BButton("check", TR("Refresh" B_UTF8_ELLIPSIS),
 										new BMessage(kMsgRefreshDevices));
 
 	

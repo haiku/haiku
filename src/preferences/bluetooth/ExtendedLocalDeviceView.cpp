@@ -9,8 +9,10 @@
 #include "defs.h"
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <SpaceLayoutItem.h>
 #include <StringView.h>
 
@@ -28,8 +30,9 @@ ExtendedLocalDeviceView::ExtendedLocalDeviceView(BRect frame, LocalDevice* bDevi
 
 	fDeviceView = new BluetoothDeviceView(BRect(0,0,5,5), bDevice);
 
-	fDiscoverable = new BCheckBox(iDontCare, "Discoverable","Discoverable", new BMessage(SET_DISCOVERABLE));
-	fVisible = new BCheckBox(iDontCare, "Visible", "Show Name", new BMessage(SET_VISIBLE));
+	fDiscoverable = new BCheckBox(iDontCare, "Discoverable", TR("Discoverable"),
+		new BMessage(SET_DISCOVERABLE));
+	fVisible = new BCheckBox(iDontCare, "Visible", TR("Show Name"), new BMessage(SET_VISIBLE));
 
 	fDiscoverable->SetEnabled(false);
 	fVisible->SetEnabled(false);
