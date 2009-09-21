@@ -351,7 +351,7 @@ Worker::WaitForJob(Job* waitingJob, const JobKey& key)
 	// a job waiting for a dependency won't abort the job before the dependency
 	// is done.
 	locker.Unlock();
-	_ProcessJobs(job);
+	_ProcessJobs(waitingJob);
 	locker.Lock();
 
 	// ignore the actual wait status when the game is over anyway
@@ -384,7 +384,7 @@ Worker::_WorkerLoop()
 
 
 void
-Worker::_ProcessJobs(Job* finalJob)
+Worker::_ProcessJobs(Job* waitingJob)
 {
 	while (true) {
 		AutoLocker<Worker> locker(this);
@@ -407,7 +407,7 @@ Worker::_ProcessJobs(Job* finalJob)
 		while (Job* job = fAbortedJobs.RemoveHead()) {
 			_FinishJob(job);
 
-			if (job == finalJob)
+			if (waitingJob != NULL && waitingJob->State() != JOB_STATE_WAITING)
 				break;
 		}
 
@@ -426,7 +426,7 @@ Worker::_ProcessJobs(Job* finalJob)
 
 			_FinishJob(job);
 
-			if (job == finalJob)
+			if (waitingJob != NULL && waitingJob->State() != JOB_STATE_WAITING)
 				break;
 		}
 	}
