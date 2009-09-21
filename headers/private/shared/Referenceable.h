@@ -83,10 +83,12 @@ public:
 
 	void SetTo(Type* object, bool alreadyHasReference = false)
 	{
+		if (object != NULL && !alreadyHasReference)
+			object->AddReference();
+
 		Unset();
+
 		fObject = object;
-		if (fObject && !alreadyHasReference)
-			fObject->AddReference();
 	}
 
 	void Unset()
