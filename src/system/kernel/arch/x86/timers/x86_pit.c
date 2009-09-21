@@ -15,9 +15,6 @@
 
 #include "pit.h"
 
-#define PIT_CLOCK_RATE 1193180
-#define PIT_MAX_TIMER_INTERVAL (0xffff * 1000000ll / PIT_CLOCK_RATE)
-
 static bool sPITTimerInitialized = false;
 
 struct timer_info gPITTimer = {
@@ -55,9 +52,9 @@ pit_set_hardware_timer(bigtime_t relativeTimeout)
 	else
 		nextEventClocks = 0xffff;
 
-	out8(0x30, 0x43);
-	out8(nextEventClocks & 0xff, 0x40);
-	out8((nextEventClocks >> 8) & 0xff, 0x40);
+	out8(PIT_SELCH0 | PIT_RWBOTH | PIT_MD_INTON0, PIT_CTRL);
+	out8(nextEventClocks & 0xff, PIT_CNT0);
+	out8((nextEventClocks >> 8) & 0xff, PIT_CNT0);
 
 	arch_int_enable_io_interrupt(0);
 	return B_OK;
@@ -78,9 +75,9 @@ pit_init(struct kernel_args *args)
 	if (sPITTimerInitialized) {
 		return B_OK;
 	}
-
+	
 	install_io_interrupt_handler(0, &pit_timer_interrupt, NULL, 0);
-	pit_clear_hardware_timer();
+	pit_clear_hardware_timer();	
 
 	sPITTimerInitialized = true;
 
