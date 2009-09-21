@@ -64,7 +64,7 @@ setup_apic(kernel_args *args, int32 cpu)
 	uint32 config;
 
 	TRACE(("setting up the APIC for CPU %ld...\n", cpu));
-	TRACE(("	apic id %d, version %d\n", apic_read(APIC_ID), apic_read(APIC_VERSION)));
+	TRACE(("	apic id %ld, version %ld\n", apic_read(APIC_ID), apic_read(APIC_VERSION)));
 
 	/* set spurious interrupt vector to 0xff */
 	config = apic_read(APIC_SPURIOUS_INTR_VECTOR) & 0xffffff00;
@@ -123,7 +123,7 @@ i386_ici_interrupt(void *data)
 {
 	// genuine inter-cpu interrupt
 	int cpu = smp_get_current_cpu();
-	TRACE(("inter-cpu interrupt on cpu %ld\n", cpu));
+	TRACE(("inter-cpu interrupt on cpu %d\n", cpu));
 
 	// if we are not using the IO APIC we need to acknowledge the
 	// interrupt ourselfs
