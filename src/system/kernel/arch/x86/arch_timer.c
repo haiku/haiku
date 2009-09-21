@@ -26,7 +26,7 @@
 
 #include "interrupts.h"
 
-#define TRACE_TIMER
+//#define TRACE_TIMER
 #ifdef TRACE_TIMER
 #	define TRACE(x) dprintf x
 #else
