@@ -19,6 +19,7 @@
 #include "StackFrameValues.h"
 #include "Team.h"
 #include "Thread.h"
+#include "Tracing.h"
 #include "TypeComponentPath.h"
 #include "Variable.h"
 
@@ -32,7 +33,8 @@ public:
 		fVariable(variable),
 		fPath(path),
 		fName(name),
-		fType(type)
+		fType(type),
+		fChildrenAdded(false)
 	{
 		fVariable->AcquireReference();
 		fPath->AcquireReference();
@@ -108,6 +110,16 @@ public:
 		return true;
 	}
 
+	bool ChildrenAdded() const
+	{
+		return fChildrenAdded;
+	}
+
+	void SetChildrenAdded(bool added)
+	{
+		fChildrenAdded = added;
+	}
+
 private:
 	typedef BObjectList<ValueNode> ChildList;
 
@@ -119,6 +131,7 @@ private:
 	Type*				fType;
 	BVariant			fValue;
 	ChildList			fChildren;
+	bool				fChildrenAdded;
 };
 
 
@@ -323,6 +336,13 @@ public:
 		}
 	}
 
+	void NodeExpanded(ValueNode* node)
+	{
+		// add children of all children
+		for (int32 i = 0; ValueNode* child = node->ChildAt(i); i++)
+			_AddChildNodes(child);
+	}
+
 private:
 	typedef BObjectList<ValueNode> ValueList;
 
@@ -340,6 +360,157 @@ private:
 			delete node;
 			return;
 		}
+
+		// automatically add child nodes for the top level nodes
+		_AddChildNodes(node);
+	}
+
+	void _AddChildNodes(ValueNode* node)
+	{
+		if (node == NULL || node->ChildrenAdded())
+			return;
+
+		_AddChildNodesInternal(node);
+		node->SetChildrenAdded(true);
+
+		// If the node is already known, notify the model listeners about the
+		// new child nodes. We assume that this holds true for the all but the
+		// top-level nodes.
+		TreeTablePath treePath;
+		if (node->Parent() != NULL && node->CountChildren() > 0
+			&& _GetTreePath(node, treePath)) {
+			NotifyNodesAdded(treePath, 0, node->CountChildren());
+		}
+	}
+
+	void _AddChildNodesInternal(ValueNode* node)
+	{
+		TRACE_LOCALS("_AddChildNodesInternal(%p)\n", node);
+
+		Type* type = node->GetType();
+		TypeComponentPath* path
+			= new(std::nothrow) TypeComponentPath(*node->Path());
+		if (path == NULL
+			|| path->CountComponents() != node->Path()->CountComponents()) {
+			delete path;
+			return;
+		}
+		Reference<TypeComponentPath> pathReference(path, true);
+
+		bool dereferencedType = false;
+		while (true) {
+			bool done = false;
+			TypeComponent component;
+
+			switch (type->Kind()) {
+				case TYPE_PRIMITIVE:
+					TRACE_LOCALS("TYPE_PRIMITIVE\n");
+					done = true;
+					break;
+				case TYPE_COMPOUND:
+				{
+					TRACE_LOCALS("TYPE_COMPOUND\n");
+					CompoundType* compoundType
+						= dynamic_cast<CompoundType*>(type);
+
+					// base types
+					for (int32 i = 0; BaseType* baseType
+							= compoundType->BaseTypeAt(i); i++) {
+						TRACE_LOCALS("  base %ld\n", i);
+
+						component.SetToBaseType(type->Kind(), i);
+						TypeComponentPath* baseTypePath
+							= new(std::nothrow) TypeComponentPath(*path);
+						if (baseTypePath == NULL
+							|| baseTypePath->CountComponents()
+								!= path->CountComponents()
+							|| !baseTypePath->AddComponent(component)) {
+							delete baseTypePath;
+							return;
+						}
+						Reference<TypeComponentPath> baseTypePathReference(
+							baseTypePath, true);
+						_AddChildNode(node, node->GetVariable(), baseTypePath,
+							baseType->GetType()->Name(), baseType->GetType());
+					}
+
+					// members
+					for (int32 i = 0; DataMember* member
+							= compoundType->DataMemberAt(i); i++) {
+						BString name = member->Name();
+
+						TRACE_LOCALS("  member %ld: \"%s\"\n", i, name.String());
+
+						component.SetToDataMember(type->Kind(), i, name);
+						TypeComponentPath* memberPath
+							= new(std::nothrow) TypeComponentPath(*path);
+						if (memberPath == NULL
+							|| memberPath->CountComponents()
+								!= path->CountComponents()
+							|| !memberPath->AddComponent(component)) {
+							delete memberPath;
+							return;
+						}
+						Reference<TypeComponentPath> memberPathReference(
+							memberPath, true);
+						_AddChildNode(node, node->GetVariable(), memberPath,
+							name, member->GetType());
+					}
+					return;
+				}
+				case TYPE_MODIFIED:
+					TRACE_LOCALS("TYPE_MODIFIED\n");
+					component.SetToBaseType(type->Kind());
+					type = dynamic_cast<ModifiedType*>(type)->BaseType();
+					break;
+				case TYPE_TYPEDEF:
+					TRACE_LOCALS("TYPE_TYPEDEF\n");
+					component.SetToBaseType(type->Kind());
+					type = dynamic_cast<TypedefType*>(type)->BaseType();
+					break;
+				case TYPE_ADDRESS:
+					TRACE_LOCALS("TYPE_ADDRESS\n");
+					// don't dereference twice
+					if (dereferencedType) {
+						done = true;
+						break;
+					}
+
+					component.SetToBaseType(type->Kind());
+					type = dynamic_cast<AddressType*>(type)->BaseType();
+					dereferencedType = true;
+					break;
+				case TYPE_ARRAY:
+					TRACE_LOCALS("TYPE_ARRAY\n");
+					// TODO:...
+					return;
+				default:
+					TRACE_LOCALS("unknown\n");
+					return;
+			}
+
+			if (done) {
+				if (dereferencedType) {
+					_AddChildNode(node, node->GetVariable(), path,
+						BString("*") << node->Name(), type);
+				}
+				return;
+			}
+
+			if (!path->AddComponent(component))
+				return;
+		}
+	}
+
+	void _AddChildNode(ValueNode* parent, Variable* variable,
+		TypeComponentPath* path, const BString& name, Type* type)
+	{
+		ValueNode* node = new(std::nothrow) ValueNode(parent, variable, path,
+			name, type);
+		if (node == NULL || !parent->AddChild(node)) {
+			delete node;
+			return;
+		}
 	}
 
 	ValueNode* _GetNode(Variable* variable, TypeComponentPath* path) const
@@ -353,15 +524,32 @@ private:
 		if (node == NULL)
 			return NULL;
 
-		// now walk along the path, finding the respective child node for each
-		// component
+		// Now walk along the path, finding the respective child node for each
+		// component (might be several components at once).
 		int32 componentCount = path->CountComponents();
-		for (int32 i = 0; i < componentCount; i++) {
+		for (int32 i = 0; i < componentCount;) {
 			ValueNode* childNode = NULL;
-			TypeComponent typeComponent = path->ComponentAt(i);
+
 			for (int32 k = 0; (childNode = node->ChildAt(k)) != NULL; k++) {
-				if (childNode->Path()->ComponentAt(i) == typeComponent)
+				TypeComponentPath* childPath = childNode->Path();
+				int32 childComponentCount = childPath->CountComponents();
+				if (childComponentCount > componentCount)
+					continue;
+
+				for (int32 componentIndex = i;
+					componentIndex < childComponentCount; componentIndex++) {
+					if (childPath->ComponentAt(componentIndex)
+							!= path->ComponentAt(componentIndex)) {
+						childNode = NULL;
+						break;
+					}
+				}
+
+				if (childNode != NULL) {
+					// got a match -- skip the matched children components
+					i = childComponentCount;
 					break;
+				}
 			}
 
 			if (childNode == NULL)
@@ -480,10 +668,36 @@ VariablesView::StackFrameValueRetrieved(StackFrame* stackFrame,
 
 
 void
+VariablesView::TreeTableNodeExpandedChanged(TreeTable* table,
+	const TreeTablePath& path, bool expanded)
+{
+	if (expanded) {
+		ValueNode* node = (ValueNode*)fVariableTableModel->NodeForPath(path);
+		if (node == NULL)
+			return;
+
+		fVariableTableModel->NodeExpanded(node);
+
+		// request the values of all children that don't have any yet
+		for (int32 i = 0; ValueNode* child = node->ChildAt(i); i++) {
+			Variable* variable = child->GetVariable();
+			TypeComponentPath* path = child->Path();
+			if (fStackFrame->Values()->HasValue(variable->ID(), *path))
+				continue;
+
+			fListener->StackFrameValueRequested(fThread, fStackFrame, variable,
+				path);
+		}
+	}
+}
+
+
+void
 VariablesView::_Init()
 {
 	fVariableTable = new TreeTable("variable list", 0, B_FANCY_BORDER);
 	AddChild(fVariableTable->ToView());
+	fVariableTable->SetSortingEnabled(false);
 
 	// columns
 	fVariableTable->AddColumn(new StringTableColumn(0, "Variable", 80, 40, 1000,
@@ -510,8 +724,7 @@ VariablesView::_RequestVariableValue(Variable* variable)
 		return;
 	Reference<TypeComponentPath> pathReference(path, true);
 
-	fListener->StackFrameValueRequested(fThread, fStackFrame,
-		variable, path);
+	fListener->StackFrameValueRequested(fThread, fStackFrame, variable, path);
 }
 
 

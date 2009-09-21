@@ -10,6 +10,7 @@
 
 #include <util/OpenHashTable.h>
 
+#include "StackFrameDebugInfo.h"
 #include "Type.h"
 
 
@@ -28,25 +29,39 @@ class DwarfFile;
 class DwarfTargetInterface;
 class FunctionID;
 class LocationDescription;
+class MemberLocation;
 class ObjectID;
 class RegisterMap;
-class Type;
-class ValueLocation;
 class Variable;
 
 
-class DwarfInterfaceFactory {
+class DwarfStackFrameDebugInfo : public StackFrameDebugInfo {
 public:
-								DwarfInterfaceFactory(DwarfFile* file,
+								DwarfStackFrameDebugInfo(DwarfFile* file,
 									CompilationUnit* compilationUnit,
 									DIESubprogram* subprogramEntry,
 									target_addr_t instructionPointer,
 									target_addr_t framePointer,
 									DwarfTargetInterface* targetInterface,
 									RegisterMap* fromDwarfRegisterMap);
-								~DwarfInterfaceFactory();
+								~DwarfStackFrameDebugInfo();
 
 			status_t			Init();
+
+	virtual	status_t			ResolveObjectDataLocation(
+									StackFrame* stackFrame, Type* type,
+									target_addr_t objectAddress,
+									ValueLocation*& _location);
+	virtual	status_t			ResolveBaseTypeLocation(
+									StackFrame* stackFrame, Type* type,
+									BaseType* baseType,
+									const ValueLocation& parentLocation,
+									ValueLocation*& _location);
+	virtual	status_t			ResolveDataMemberLocation(
+									StackFrame* stackFrame, Type* type,
+									DataMember* member,
+									const ValueLocation& parentLocation,
+									ValueLocation*& _location);
 
 			status_t			CreateType(DIEType* typeEntry, Type*& _type);
 									// returns reference
@@ -63,6 +78,7 @@ private:
 			struct DwarfFunctionParameterID;
 			struct DwarfLocalVariableID;
 			struct DwarfType;
+			struct DwarfInheritance;
 			struct DwarfDataMember;
 			struct DwarfPrimitiveType;
 			struct DwarfCompoundType;
@@ -75,6 +91,15 @@ private:
 			typedef BOpenHashTable<DwarfTypeHashDefinition> TypeTable;
 
 private:
+			status_t			_ResolveDataMemberLocation(
+									StackFrame* stackFrame,
+									DwarfCompoundType* type,
+									Type* memberType,
+									const MemberLocation* memberLocation,
+									const ValueLocation& parentLocation,
+									ValueLocation*& _location);
+									// returns a new location
+
 			status_t			_CreateType(DIEType* typeEntry,
 									DwarfType*& _type);
 			status_t			_CreateTypeInternal(DIEType* typeEntry,

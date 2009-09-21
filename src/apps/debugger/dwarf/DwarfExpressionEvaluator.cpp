@@ -17,6 +17,7 @@
 #include "DataReader.h"
 #include "Dwarf.h"
 #include "DwarfTargetInterface.h"
+#include "Tracing.h"
 #include "ValueLocation.h"
 
 
@@ -147,7 +148,8 @@ DwarfExpressionEvaluator::Evaluate(const void* expression, size_t size,
 		_result = _Pop();
 		return B_OK;
 	} catch (const EvaluationException& exception) {
-printf("DwarfExpressionEvaluator::Evaluate(): %s\n", exception.message);
+		WARNING("DwarfExpressionEvaluator::Evaluate(): %s\n",
+			exception.message);
 		return B_BAD_VALUE;
 	} catch (const std::bad_alloc& exception) {
 		return B_NO_MEMORY;
@@ -173,6 +175,11 @@ DwarfExpressionEvaluator::EvaluateLocation(const void* expression, size_t size,
 
 	// parse the first (and maybe only) expression
 	try {
+		// push the object address, if any
+		target_addr_t objectAddress;
+		if (fContext->GetObjectAddress(objectAddress))
+			_Push(objectAddress);
+
 		ValuePieceLocation piece;
 		status_t error = _Evaluate(&piece);
 		if (error != B_OK)
@@ -201,7 +208,8 @@ DwarfExpressionEvaluator::EvaluateLocation(const void* expression, size_t size,
 		if (fDataReader.BytesRemaining() == 0)
 			return B_BAD_DATA;
 	} catch (const EvaluationException& exception) {
-printf("DwarfExpressionEvaluator::EvaluateLocation(): %s\n", exception.message);
+		WARNING("DwarfExpressionEvaluator::EvaluateLocation(): %s\n",
+			exception.message);
 		return B_BAD_VALUE;
 	} catch (const std::bad_alloc& exception) {
 		return B_NO_MEMORY;
@@ -215,6 +223,11 @@ printf("DwarfExpressionEvaluator::EvaluateLocation(): %s\n", exception.message);
 			fDataReader.AddressSize());
 
 		try {
+			// push the object address, if any
+			target_addr_t objectAddress;
+			if (fContext->GetObjectAddress(objectAddress))
+				_Push(objectAddress);
+
 			ValuePieceLocation piece;
 			status_t error = _Evaluate(&piece);
 			if (error != B_OK)
@@ -236,7 +249,8 @@ printf("DwarfExpressionEvaluator::EvaluateLocation(): %s\n", exception.message);
 			} else
 				return B_BAD_DATA;
 		} catch (const EvaluationException& exception) {
-printf("DwarfExpressionEvaluator::EvaluateLocation(): %s\n", exception.message);
+			WARNING("DwarfExpressionEvaluator::EvaluateLocation(): %s\n",
+				exception.message);
 			return B_BAD_VALUE;
 		} catch (const std::bad_alloc& exception) {
 			return B_NO_MEMORY;
@@ -250,15 +264,16 @@ printf("DwarfExpressionEvaluator::EvaluateLocation(): %s\n", exception.message);
 status_t
 DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 {
-{
-printf("DwarfExpressionEvaluator::_Evaluate(%p, %lld)\n", fDataReader.Data(),
-fDataReader.BytesRemaining());
-const uint8* data = (const uint8*)fDataReader.Data();
-int32 count = fDataReader.BytesRemaining();
-for (int32 i = 0; i < count; i++)
-printf(" %02x", data[i]);
-printf("\n");
-}
+	TRACE_EXPR_ONLY({
+		TRACE_EXPR("DwarfExpressionEvaluator::_Evaluate(%p, %lld)\n",
+			fDataReader.Data(), fDataReader.BytesRemaining());
+		const uint8* data = (const uint8*)fDataReader.Data();
+		int32 count = fDataReader.BytesRemaining();
+		for (int32 i = 0; i < count; i++)
+			TRACE_EXPR(" %02x", data[i]);
+		TRACE_EXPR("\n");
+	})
+
 	uint32 operationsExecuted = 0;
 
 	while (fDataReader.BytesRemaining() > 0) {
@@ -266,66 +281,66 @@ printf("\n");
 
 		switch (opcode) {
 			case DW_OP_addr:
-printf("  DW_OP_addr\n");
+				TRACE_EXPR("  DW_OP_addr\n");
 				_Push(fDataReader.ReadAddress(0));
 				break;
 			case DW_OP_const1u:
-printf("  DW_OP_const1u\n");
+				TRACE_EXPR("  DW_OP_const1u\n");
 				_Push(fDataReader.Read<uint8>(0));
 				break;
 			case DW_OP_const1s:
-printf("  DW_OP_const1s\n");
+				TRACE_EXPR("  DW_OP_const1s\n");
 				_Push(fDataReader.Read<int8>(0));
 				break;
 			case DW_OP_const2u:
-printf("  DW_OP_const2u\n");
+				TRACE_EXPR("  DW_OP_const2u\n");
 				_Push(fDataReader.Read<uint16>(0));
 				break;
 			case DW_OP_const2s:
-printf("  DW_OP_const2s\n");
+				TRACE_EXPR("  DW_OP_const2s\n");
 				_Push(fDataReader.Read<int16>(0));
 				break;
 			case DW_OP_const4u:
-printf("  DW_OP_const4u\n");
+				TRACE_EXPR("  DW_OP_const4u\n");
 				_Push(fDataReader.Read<uint32>(0));
 				break;
 			case DW_OP_const4s:
-printf("  DW_OP_const4s\n");
+				TRACE_EXPR("  DW_OP_const4s\n");
 				_Push(fDataReader.Read<int32>(0));
 				break;
 			case DW_OP_const8u:
-printf("  DW_OP_const8u\n");
+				TRACE_EXPR("  DW_OP_const8u\n");
 				_Push(fDataReader.Read<uint64>(0));
 				break;
 			case DW_OP_const8s:
-printf("  DW_OP_const8s\n");
+				TRACE_EXPR("  DW_OP_const8s\n");
 				_Push(fDataReader.Read<int64>(0));
 				break;
 			case DW_OP_constu:
-printf("  DW_OP_constu\n");
+				TRACE_EXPR("  DW_OP_constu\n");
 				_Push(fDataReader.ReadUnsignedLEB128(0));
 				break;
 			case DW_OP_consts:
-printf("  DW_OP_consts\n");
+				TRACE_EXPR("  DW_OP_consts\n");
 				_Push(fDataReader.ReadSignedLEB128(0));
 				break;
 			case DW_OP_dup:
-printf("  DW_OP_dup\n");
+				TRACE_EXPR("  DW_OP_dup\n");
 				_AssertMinStackSize(1);
 				_Push(fStack[fStackSize - 1]);
 				break;
 			case DW_OP_drop:
-printf("  DW_OP_drop\n");
+				TRACE_EXPR("  DW_OP_drop\n");
 				_Pop();
 				break;
 			case DW_OP_over:
-printf("  DW_OP_over\n");
+				TRACE_EXPR("  DW_OP_over\n");
 				_AssertMinStackSize(1);
 				_Push(fStack[fStackSize - 2]);
 				break;
 			case DW_OP_pick:
 			{
-printf("  DW_OP_pick\n");
+				TRACE_EXPR("  DW_OP_pick\n");
 				uint8 index = fDataReader.Read<uint8>(0);
 				_AssertMinStackSize(index + 1);
 				_Push(fStack[fStackSize - index - 1]);
@@ -333,14 +348,14 @@ printf("  DW_OP_pick\n");
 			}
 			case DW_OP_swap:
 			{
-printf("  DW_OP_swap\n");
+				TRACE_EXPR("  DW_OP_swap\n");
 				_AssertMinStackSize(2);
 				std::swap(fStack[fStackSize - 1], fStack[fStackSize - 2]);
 				break;
 			}
 			case DW_OP_rot:
 			{
-printf("  DW_OP_rot\n");
+				TRACE_EXPR("  DW_OP_rot\n");
 				_AssertMinStackSize(3);
 				target_addr_t tmp = fStack[fStackSize - 1];
 				fStack[fStackSize - 1] = fStack[fStackSize - 2];
@@ -350,25 +365,25 @@ printf("  DW_OP_rot\n");
 			}
 
 			case DW_OP_deref:
-printf("  DW_OP_deref\n");
+				TRACE_EXPR("  DW_OP_deref\n");
 				_DereferenceAddress(fContext->AddressSize());
 				break;
 			case DW_OP_deref_size:
-printf("  DW_OP_deref_size\n");
+				TRACE_EXPR("  DW_OP_deref_size\n");
 				_DereferenceAddress(fDataReader.Read<uint8>(0));
 				break;
 			case DW_OP_xderef:
-printf("  DW_OP_xderef\n");
+				TRACE_EXPR("  DW_OP_xderef\n");
 				_DereferenceAddressSpaceAddress(fContext->AddressSize());
 				break;
 			case DW_OP_xderef_size:
-printf("  DW_OP_xderef_size\n");
+				TRACE_EXPR("  DW_OP_xderef_size\n");
 				_DereferenceAddressSpaceAddress(fDataReader.Read<uint8>(0));
 				break;
 
 			case DW_OP_abs:
 			{
-printf("  DW_OP_abs\n");
+				TRACE_EXPR("  DW_OP_abs\n");
 				target_addr_t value = _Pop();
 				if (fContext->AddressSize() == 4) {
 					int32 signedValue = (int32)value;
@@ -380,12 +395,12 @@ printf("  DW_OP_abs\n");
 				break;
 			}
 			case DW_OP_and:
-printf("  DW_OP_and\n");
+				TRACE_EXPR("  DW_OP_and\n");
 				_Push(_Pop() & _Pop());
 				break;
 			case DW_OP_div:
 			{
-printf("  DW_OP_div\n");
+				TRACE_EXPR("  DW_OP_div\n");
 				int64 top = (int64)_Pop();
 				int64 second = (int64)_Pop();
 				_Push(top != 0 ? second / top : 0);
@@ -393,14 +408,14 @@ printf("  DW_OP_div\n");
 			}
 			case DW_OP_minus:
 			{
-printf("  DW_OP_minus\n");
+				TRACE_EXPR("  DW_OP_minus\n");
 				target_addr_t top = _Pop();
 				_Push(_Pop() - top);
 				break;
 			}
 			case DW_OP_mod:
 			{
-printf("  DW_OP_mod\n");
+				TRACE_EXPR("  DW_OP_mod\n");
 				// While the specs explicitly speak of signed integer division
 				// for "div", nothing is mentioned for "mod".
 				target_addr_t top = _Pop();
@@ -409,12 +424,12 @@ printf("  DW_OP_mod\n");
 				break;
 			}
 			case DW_OP_mul:
-printf("  DW_OP_mul\n");
+				TRACE_EXPR("  DW_OP_mul\n");
 				_Push(_Pop() * _Pop());
 				break;
 			case DW_OP_neg:
 			{
-printf("  DW_OP_neg\n");
+				TRACE_EXPR("  DW_OP_neg\n");
 				if (fContext->AddressSize() == 4)
 					_Push(-(int32)_Pop());
 				else
@@ -422,38 +437,38 @@ printf("  DW_OP_neg\n");
 				break;
 			}
 			case DW_OP_not:
-printf("  DW_OP_not\n");
+				TRACE_EXPR("  DW_OP_not\n");
 				_Push(~_Pop());
 				break;
 			case DW_OP_or:
-printf("  DW_OP_or\n");
+				TRACE_EXPR("  DW_OP_or\n");
 				_Push(_Pop() | _Pop());
 				break;
 			case DW_OP_plus:
-printf("  DW_OP_plus\n");
+				TRACE_EXPR("  DW_OP_plus\n");
 				_Push(_Pop() + _Pop());
 				break;
 			case DW_OP_plus_uconst:
-printf("  DW_OP_plus_uconst\n");
+				TRACE_EXPR("  DW_OP_plus_uconst\n");
 				_Push(_Pop() + fDataReader.ReadUnsignedLEB128(0));
 				break;
 			case DW_OP_shl:
 			{
-printf("  DW_OP_shl\n");
+				TRACE_EXPR("  DW_OP_shl\n");
 				target_addr_t top = _Pop();
 				_Push(_Pop() << top);
 				break;
 			}
 			case DW_OP_shr:
 			{
-printf("  DW_OP_shr\n");
+				TRACE_EXPR("  DW_OP_shr\n");
 				target_addr_t top = _Pop();
 				_Push(_Pop() >> top);
 				break;
 			}
 			case DW_OP_shra:
 			{
-printf("  DW_OP_shra\n");
+				TRACE_EXPR("  DW_OP_shra\n");
 				target_addr_t top = _Pop();
 				int64 second = (int64)_Pop();
 				_Push(second >= 0 ? second >> top : -(-second >> top));
@@ -461,18 +476,18 @@ printf("  DW_OP_shra\n");
 				break;
 			}
 			case DW_OP_xor:
-printf("  DW_OP_xor\n");
+				TRACE_EXPR("  DW_OP_xor\n");
 				_Push(_Pop() ^ _Pop());
 				break;
 
 			case DW_OP_bra:
-printf("  DW_OP_bra\n");
+				TRACE_EXPR("  DW_OP_bra\n");
 				if (_Pop() == 0)
 					break;
 				// fall through
 			case DW_OP_skip:
 			{
-printf("  DW_OP_skip\n");
+				TRACE_EXPR("  DW_OP_skip\n");
 				int16 offset = fDataReader.Read<int16>(0);
 				if (offset >= 0 ? offset > fDataReader.BytesRemaining()
 						: -offset > fDataReader.Offset()) {
@@ -483,45 +498,45 @@ printf("  DW_OP_skip\n");
 			}
 
 			case DW_OP_eq:
-printf("  DW_OP_eq\n");
+				TRACE_EXPR("  DW_OP_eq\n");
 				_Push(_Pop() == _Pop() ? 1 : 0);
 				break;
 			case DW_OP_ge:
 			{
-printf("  DW_OP_ge\n");
+				TRACE_EXPR("  DW_OP_ge\n");
 				int64 top = (int64)_Pop();
 				_Push((int64)_Pop() >= top ? 1 : 0);
 				break;
 			}
 			case DW_OP_gt:
 			{
-printf("  DW_OP_gt\n");
+				TRACE_EXPR("  DW_OP_gt\n");
 				int64 top = (int64)_Pop();
 				_Push((int64)_Pop() > top ? 1 : 0);
 				break;
 			}
 			case DW_OP_le:
 			{
-printf("  DW_OP_le\n");
+				TRACE_EXPR("  DW_OP_le\n");
 				int64 top = (int64)_Pop();
 				_Push((int64)_Pop() <= top ? 1 : 0);
 				break;
 			}
 			case DW_OP_lt:
 			{
-printf("  DW_OP_lt\n");
+				TRACE_EXPR("  DW_OP_lt\n");
 				int64 top = (int64)_Pop();
 				_Push((int64)_Pop() < top ? 1 : 0);
 				break;
 			}
 			case DW_OP_ne:
-printf("  DW_OP_ne\n");
+				TRACE_EXPR("  DW_OP_ne\n");
 				_Push(_Pop() == _Pop() ? 1 : 0);
 				break;
 
 			case DW_OP_push_object_address:
 			{
-printf("  DW_OP_push_object_address\n");
+				TRACE_EXPR("  DW_OP_push_object_address\n");
 				target_addr_t address;
 				if (!fContext->GetObjectAddress(address))
 					throw EvaluationException("failed to get object address");
@@ -530,7 +545,7 @@ printf("  DW_OP_push_object_address\n");
 			}
 			case DW_OP_call_frame_cfa:
 			{
-printf("  DW_OP_call_frame_cfa\n");
+				TRACE_EXPR("  DW_OP_call_frame_cfa\n");
 				target_addr_t address;
 				if (!fContext->GetFrameAddress(address))
 					throw EvaluationException("failed to get frame address");
@@ -540,7 +555,7 @@ printf("  DW_OP_call_frame_cfa\n");
 			case DW_OP_fbreg:
 			{
 				int64 offset = fDataReader.ReadSignedLEB128(0);
-printf("  DW_OP_fbreg(%lld)\n", offset);
+				TRACE_EXPR("  DW_OP_fbreg(%lld)\n", offset);
 				target_addr_t address;
 				if (!fContext->GetFrameBaseAddress(address)) {
 					throw EvaluationException(
@@ -551,7 +566,7 @@ printf("  DW_OP_fbreg(%lld)\n", offset);
 			}
 			case DW_OP_form_tls_address:
 			{
-printf("  DW_OP_form_tls_address\n");
+				TRACE_EXPR("  DW_OP_form_tls_address\n");
 				target_addr_t address;
 				if (!fContext->GetTLSAddress(_Pop(), address))
 					throw EvaluationException("failed to get tls address");
@@ -561,7 +576,7 @@ printf("  DW_OP_form_tls_address\n");
 
 			case DW_OP_regx:
 			{
-printf("  DW_OP_regx\n");
+				TRACE_EXPR("  DW_OP_regx\n");
 				if (_piece == NULL) {
 					throw EvaluationException(
 						"DW_OP_regx in non-location expression");
@@ -575,22 +590,22 @@ printf("  DW_OP_regx\n");
 
 			case DW_OP_bregx:
 			{
-printf("  DW_OP_bregx\n");
+				TRACE_EXPR("  DW_OP_bregx\n");
 				uint32 reg = fDataReader.ReadUnsignedLEB128(0);
 				_PushRegister(reg, fDataReader.ReadSignedLEB128(0));
 				break;
 			}
 
 			case DW_OP_call2:
-printf("  DW_OP_call2\n");
+				TRACE_EXPR("  DW_OP_call2\n");
 				_Call(fDataReader.Read<uint16>(0), true);
 				break;
 			case DW_OP_call4:
-printf("  DW_OP_call4\n");
+				TRACE_EXPR("  DW_OP_call4\n");
 				_Call(fDataReader.Read<uint32>(0), true);
 				break;
 			case DW_OP_call_ref:
-printf("  DW_OP_call_ref\n");
+				TRACE_EXPR("  DW_OP_call_ref\n");
 				if (fContext->AddressSize() == 4)
 					_Call(fDataReader.Read<uint32>(0), false);
 				else
@@ -608,15 +623,15 @@ printf("  DW_OP_call_ref\n");
 				return B_OK;
 
 			case DW_OP_nop:
-printf("  DW_OP_nop\n");
+				TRACE_EXPR("  DW_OP_nop\n");
 				break;
 
 			default:
 				if (opcode >= DW_OP_lit0 && opcode <= DW_OP_lit31) {
-printf("  DW_OP_lit%u\n", opcode - DW_OP_lit0);
+					TRACE_EXPR("  DW_OP_lit%u\n", opcode - DW_OP_lit0);
 					_Push(opcode - DW_OP_lit0);
 				} else if (opcode >= DW_OP_reg0 && opcode <= DW_OP_reg31) {
-printf("  DW_OP_reg%u\n", opcode - DW_OP_reg0);
+					TRACE_EXPR("  DW_OP_reg%u\n", opcode - DW_OP_reg0);
 					if (_piece == NULL) {
 						throw EvaluationException(
 							"DW_OP_reg* in non-location expression");
@@ -625,11 +640,12 @@ printf("  DW_OP_reg%u\n", opcode - DW_OP_reg0);
 					return B_OK;
 				} else if (opcode >= DW_OP_breg0 && opcode <= DW_OP_breg31) {
 					int64 offset = fDataReader.ReadSignedLEB128(0);
-printf("  DW_OP_breg%u(%lld)\n", opcode - DW_OP_breg0, offset);
+					TRACE_EXPR("  DW_OP_breg%u(%lld)\n", opcode - DW_OP_breg0,
+						offset);
 					_PushRegister(opcode - DW_OP_breg0, offset);
 				} else {
-					printf("DwarfExpressionEvaluator::_Evaluate(): unsupported "
-						"opcode: %u\n", opcode);
+					WARNING("DwarfExpressionEvaluator::_Evaluate(): "
+						"unsupported opcode: %u\n", opcode);
 					return B_BAD_DATA;
 				}
 				break;

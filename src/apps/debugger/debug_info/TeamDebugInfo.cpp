@@ -481,7 +481,6 @@ TeamDebugInfo::DisassembleFunction(FunctionInstance* functionInstance,
 status_t
 TeamDebugInfo::AddImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 {
-printf("TeamDebugInfo::AddImageDebugInfo(%p)\n", imageDebugInfo);
 	AutoLocker<BLocker> locker(fLock);
 		// We have both locks now, so that for read-only access either lock
 		// suffices.
@@ -497,7 +496,6 @@ printf("TeamDebugInfo::AddImageDebugInfo(%p)\n", imageDebugInfo);
 		Function* function = fFunctions->Lookup(instance);
 		if (function != NULL) {
 // TODO: Also update possible user breakpoints in this function!
-printf("  adding instance %p to existing function %p\n", instance, function);
 			function->AddInstance(instance);
 			instance->SetFunction(function);
 
@@ -515,7 +513,6 @@ printf("  adding instance %p to existing function %p\n", instance, function);
 				RemoveImageDebugInfo(imageDebugInfo);
 				return B_NO_MEMORY;
 			}
-printf("  adding instance %p to new function %p\n", instance, function);
 			function->AddInstance(instance);
 			instance->SetFunction(function);
 

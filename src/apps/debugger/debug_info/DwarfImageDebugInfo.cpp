@@ -25,7 +25,7 @@
 #include "Dwarf.h"
 #include "DwarfFile.h"
 #include "DwarfFunctionDebugInfo.h"
-#include "DwarfInterfaceFactory.h"
+#include "DwarfStackFrameDebugInfo.h"
 #include "DwarfTargetInterface.h"
 #include "DwarfUtils.h"
 #include "ElfFile.h"
@@ -42,6 +42,7 @@
 #include "StringUtils.h"
 #include "TargetAddressRangeList.h"
 #include "TeamMemory.h"
+#include "Tracing.h"
 #include "UnsupportedLanguage.h"
 #include "ValueLocation.h"
 #include "Variable.h"
@@ -208,8 +209,8 @@ DwarfImageDebugInfo::Init()
 status_t
 DwarfImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 {
-printf("DwarfImageDebugInfo::GetFunctions()\n");
-printf("  %ld compilation units\n", fFile->CountCompilationUnits());
+	TRACE_IMAGES("DwarfImageDebugInfo::GetFunctions()\n");
+	TRACE_IMAGES("  %ld compilation units\n", fFile->CountCompilationUnits());
 
 	for (int32 i = 0; CompilationUnit* unit = fFile->CompilationUnitAt(i);
 			i++) {
@@ -329,7 +330,9 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 		functionInstance->GetFunctionDebugInfo());
 	if (function == NULL)
 		return B_BAD_VALUE;
-printf("DwarfImageDebugInfo::CreateFrame(): subprogram DIE: %p\n", function->SubprogramEntry());
+
+	TRACE_CFI("DwarfImageDebugInfo::CreateFrame(): subprogram DIE: %p\n",
+		function->SubprogramEntry());
 
 	int32 registerCount = fArchitecture->CountRegisters();
 	const Register* registers = fArchitecture->Registers();
@@ -352,10 +355,22 @@ printf("DwarfImageDebugInfo::CreateFrame(): subprogram DIE: %p\n", function->Sub
 	Reference<CpuState> previousCpuStateReference(previousCpuState, true);
 
 	// create the target interfaces
-	UnwindTargetInterface inputInterface(registers, registerCount,
-		fromDwarfMap, toDwarfMap, cpuState, fArchitecture, fTeamMemory);
-	UnwindTargetInterface outputInterface(registers, registerCount,
-		fromDwarfMap, toDwarfMap, previousCpuState, fArchitecture, fTeamMemory);
+	UnwindTargetInterface* inputInterface
+		= new(std::nothrow) UnwindTargetInterface(registers, registerCount,
+			fromDwarfMap, toDwarfMap, cpuState, fArchitecture, fTeamMemory);
+	if (inputInterface == NULL)
+		return B_NO_MEMORY;
+	Reference<UnwindTargetInterface> inputInterfaceReference(inputInterface,
+		true);
+
+	UnwindTargetInterface* outputInterface
+		= new(std::nothrow) UnwindTargetInterface(registers, registerCount,
+			fromDwarfMap, toDwarfMap, previousCpuState, fArchitecture,
+			fTeamMemory);
+	if (outputInterface == NULL)
+		return B_NO_MEMORY;
+	Reference<UnwindTargetInterface> outputInterfaceReference(outputInterface,
+		true);
 
 	// do the unwinding
 	target_addr_t instructionPointer
@@ -363,23 +378,41 @@ printf("DwarfImageDebugInfo::CreateFrame(): subprogram DIE: %p\n", function->Sub
 	target_addr_t framePointer;
 	CompilationUnit* unit = function->GetCompilationUnit();
 	error = fFile->UnwindCallFrame(unit, function->SubprogramEntry(),
-		instructionPointer, &inputInterface, &outputInterface, framePointer);
+		instructionPointer, inputInterface, outputInterface, framePointer);
 	if (error != B_OK)
 		return B_UNSUPPORTED;
 
-printf("unwound registers:\n");
-for (int32 i = 0; i < registerCount; i++) {
-const Register* reg = registers + i;
-BVariant value;
-if (previousCpuState->GetRegisterValue(reg, value)) {
-	printf("  %3s: %#lx\n", reg->Name(), value.ToUInt32());
-} else
-	printf("  %3s: undefined\n", reg->Name());
-}
+	TRACE_CFI_ONLY(
+		TRACE_CFI("unwound registers:\n");
+		for (int32 i = 0; i < registerCount; i++) {
+			const Register* reg = registers + i;
+			BVariant value;
+			if (previousCpuState->GetRegisterValue(reg, value))
+				TRACE_CFI("  %3s: %#lx\n", reg->Name(), value.ToUInt32());
+			else
+				TRACE_CFI("  %3s: undefined\n", reg->Name());
+		}
+	)
+
+	// create the stack frame debug info
+	DIESubprogram* subprogramEntry = function->SubprogramEntry();
+	DwarfStackFrameDebugInfo* stackFrameDebugInfo
+		= new(std::nothrow) DwarfStackFrameDebugInfo(fFile, unit,
+			subprogramEntry, instructionPointer, framePointer, inputInterface,
+			fromDwarfMap);
+	if (stackFrameDebugInfo == NULL)
+		return B_NO_MEMORY;
+	Reference<DwarfStackFrameDebugInfo> stackFrameDebugInfoReference(
+		stackFrameDebugInfo, true);
+
+	error = stackFrameDebugInfo->Init();
+	if (error != B_OK)
+		return error;
 
 	// create the stack frame
 	StackFrame* frame = new(std::nothrow) StackFrame(STACK_FRAME_TYPE_STANDARD,
-		cpuState, framePointer, cpuState->InstructionPointer());
+		cpuState, framePointer, cpuState->InstructionPointer(),
+		stackFrameDebugInfo);
 	if (frame == NULL)
 		return B_NO_MEMORY;
 	Reference<StackFrame> frameReference(frame, true);
@@ -398,13 +431,6 @@ if (previousCpuState->GetRegisterValue(reg, value)) {
 	Reference<FunctionID> functionIDReference(functionID, true);
 
 	// create function parameter objects
-	DIESubprogram* subprogramEntry = function->SubprogramEntry();
-	DwarfInterfaceFactory factory(fFile, unit, subprogramEntry,
-		instructionPointer, framePointer, &inputInterface, fromDwarfMap);
-	error = factory.Init();
-	if (error != B_OK)
-		return error;
-
 	for (DebugInfoEntryList::ConstIterator it = subprogramEntry->Parameters()
 			.GetIterator(); DebugInfoEntry* entry = it.Next();) {
 		BString parameterName;
@@ -415,8 +441,8 @@ if (previousCpuState->GetRegisterValue(reg, value)) {
 		DIEFormalParameter* parameterEntry
 			= dynamic_cast<DIEFormalParameter*>(entry);
 		Variable* parameter;
-		if (factory.CreateParameter(functionID, parameterEntry, parameter)
-				!= B_OK) {
+		if (stackFrameDebugInfo->CreateParameter(functionID, parameterEntry,
+				parameter) != B_OK) {
 			continue;
 		}
 		Reference<Variable> parameterReference(parameter, true);
@@ -426,8 +452,8 @@ if (previousCpuState->GetRegisterValue(reg, value)) {
 	}
 
 	// create objects for the local variables
-	_CreateLocalVariables(unit, frame, functionID, factory, instructionPointer,
-		functionInstance->Address() - fRelocationDelta,
+	_CreateLocalVariables(unit, frame, functionID, *stackFrameDebugInfo,
+		instructionPointer, functionInstance->Address() - fRelocationDelta,
 		subprogramEntry->Variables(), subprogramEntry->Blocks());
 
 	_previousFrame = frameReference.Detach();
@@ -441,15 +467,15 @@ status_t
 DwarfImageDebugInfo::GetStatement(FunctionDebugInfo* _function,
 	target_addr_t address, Statement*& _statement)
 {
-printf("DwarfImageDebugInfo::GetStatement(function: %p, address: %#llx)\n",
-_function, address);
+	TRACE_CODE("DwarfImageDebugInfo::GetStatement(function: %p, address: %#llx)\n",
+		_function, address);
+
 	DwarfFunctionDebugInfo* function
 		= dynamic_cast<DwarfFunctionDebugInfo*>(_function);
-	if (function == NULL)
-{
-printf("  -> no dwarf function\n");
+	if (function == NULL) {
+		TRACE_LINES("  -> no dwarf function\n");
 		return B_BAD_VALUE;
-}
+	}
 
 	AutoLocker<BLocker> locker(fLock);
 
@@ -457,7 +483,8 @@ printf("  -> no dwarf function\n");
 	CompilationUnit* unit = function->GetCompilationUnit();
 	LocatableFile* file = function->SourceFile();
 	if (file == NULL) {
-printf("  -> no source file\n");
+		TRACE_CODE("  -> no source file\n");
+
 		// no source code -- rather return the assembly statement
 		return fArchitecture->GetStatement(function, address, _statement);
 	}
@@ -469,11 +496,10 @@ printf("  -> no source file\n");
 	// Get the statement by executing the line number program for the
 	// compilation unit.
 	LineNumberProgram& program = unit->GetLineNumberProgram();
-	if (!program.IsValid())
-{
-printf("  -> no line number program\n");
+	if (!program.IsValid()) {
+		TRACE_CODE("  -> no line number program\n");
 		return B_BAD_DATA;
-}
+	}
 
 	// adjust address
 	address -= fRelocationDelta;
@@ -517,7 +543,7 @@ printf("  -> no line number program\n");
 		}
 	}
 
-printf("  -> no line number program match\n");
+	TRACE_CODE("  -> no line number program match\n");
 	return B_ENTRY_NOT_FOUND;
 }
 
@@ -530,10 +556,14 @@ DwarfImageDebugInfo::GetStatementAtSourceLocation(FunctionDebugInfo* _function,
 		= dynamic_cast<DwarfFunctionDebugInfo*>(_function);
 	if (function == NULL)
 		return B_BAD_VALUE;
-target_addr_t functionStartAddress = function->Address() - fRelocationDelta;
-target_addr_t functionEndAddress = functionStartAddress + function->Size();
-printf("DwarfImageDebugInfo::GetStatementAtSourceLocation(%p, (%ld, %ld)): function range: %#llx - %#llx\n",
-function, sourceLocation.Line(), sourceLocation.Column(), functionStartAddress, functionEndAddress);
+
+	target_addr_t functionStartAddress = function->Address() - fRelocationDelta;
+	target_addr_t functionEndAddress = functionStartAddress + function->Size();
+
+	TRACE_LINES2("DwarfImageDebugInfo::GetStatementAtSourceLocation(%p, "
+		"(%ld, %ld)): function range: %#llx - %#llx\n", function,
+		sourceLocation.Line(), sourceLocation.Column(),
+		functionStartAddress, functionEndAddress);
 
 	AutoLocker<BLocker> locker(fLock);
 
@@ -547,9 +577,6 @@ function, sourceLocation.Line(), sourceLocation.Column(), functionStartAddress, 
 	// get the index of the source file in the compilation unit for cheaper
 	// comparison below
 	int32 fileIndex = _GetSourceFileIndex(unit, file);
-
-//	target_addr_t functionStartAddress = function->Address() - fRelocationDelta;
-//	target_addr_t functionEndAddress = functionStartAddress + function->Size();
 
 	// Get the statement by executing the line number program for the
 	// compilation unit.
@@ -569,15 +596,20 @@ function, sourceLocation.Line(), sourceLocation.Column(), functionStartAddress, 
 		if (statementAddress != 0
 			&& (!isOurFile || state.isStatement || state.isSequenceEnd)) {
 			target_addr_t endAddress = state.address;
-if (statementAddress < endAddress) {
-printf("  statement: %#llx - %#llx, location: (%ld, %ld)\n", statementAddress, endAddress, statementLine, statementColumn);
-}
+
+			if (statementAddress < endAddress) {
+				TRACE_LINES2("  statement: %#llx - %#llx, location: "
+					"(%ld, %ld)\n", statementAddress, endAddress, statementLine,
+					statementColumn);
+			}
+
 			if (statementAddress < endAddress
 				&& statementAddress >= functionStartAddress
 				&& statementAddress < functionEndAddress
 				&& statementLine == (int32)sourceLocation.Line()
 				&& statementColumn == (int32)sourceLocation.Column()) {
-printf("  -> found statement!\n");
+				TRACE_LINES2("  -> found statement!\n");
+
 				ContiguousStatement* statement = new(std::nothrow)
 					ContiguousStatement(
 						SourceLocation(statementLine, statementColumn),
@@ -690,7 +722,9 @@ DwarfImageDebugInfo::_AddSourceCodeInfo(CompilationUnit* unit,
 	int32 statementLine = -1;
 	int32 statementColumn = -1;
 	while (program.GetNextRow(state)) {
-printf("  %#llx  (%ld, %ld, %ld)  %d\n", state.address, state.file, state.line, state.column, state.isStatement);
+		TRACE_LINES2("  %#llx  (%ld, %ld, %ld)  %d\n", state.address,
+			state.file, state.line, state.column, state.isStatement);
+
 		bool isOurFile = state.file == fileIndex;
 
 		if (statementAddress != 0
@@ -702,7 +736,10 @@ printf("  %#llx  (%ld, %ld, %ld)  %d\n", state.address, state.file, state.line, 
 					SourceLocation(statementLine, statementColumn));
 				if (error != B_OK)
 					return error;
-printf("  -> statement: %#llx - %#llx, source location: (%ld, %ld)\n", statementAddress, endAddress, statementLine, statementColumn);
+
+				TRACE_LINES2("  -> statement: %#llx - %#llx, source location: "
+					"(%ld, %ld)\n", statementAddress, endAddress, statementLine,
+					statementColumn);
 			}
 
 			statementAddress = 0;
@@ -747,18 +784,22 @@ DwarfImageDebugInfo::_GetSourceFileIndex(CompilationUnit* unit,
 
 status_t
 DwarfImageDebugInfo::_CreateLocalVariables(CompilationUnit* unit,
-	StackFrame* frame, FunctionID* functionID, DwarfInterfaceFactory& factory,
-	target_addr_t instructionPointer, target_addr_t lowPC,
-	const EntryListWrapper& variableEntries,
+	StackFrame* frame, FunctionID* functionID,
+	DwarfStackFrameDebugInfo& factory, target_addr_t instructionPointer,
+	target_addr_t lowPC, const EntryListWrapper& variableEntries,
 	const EntryListWrapper& blockEntries)
 {
-printf("DwarfImageDebugInfo::_CreateLocalVariables(): ip: %#llx, low PC: %#llx\n",
-instructionPointer, lowPC);
+	TRACE_LOCALS("DwarfImageDebugInfo::_CreateLocalVariables(): ip: %#llx, "
+		"low PC: %#llx\n", instructionPointer, lowPC);
+
 	// iterate through the variables and add the ones in scope
 	for (DebugInfoEntryList::ConstIterator it
 			= variableEntries.list.GetIterator();
 		DIEVariable* variableEntry = dynamic_cast<DIEVariable*>(it.Next());) {
-printf("  variableEntry %p, scope start: %llu\n", variableEntry, variableEntry->StartScope());
+
+		TRACE_LOCALS("  variableEntry %p, scope start: %llu\n", variableEntry,
+			variableEntry->StartScope());
+
 		// check the variable's scope
 		if (instructionPointer < lowPC + variableEntry->StartScope())
 			continue;
@@ -778,34 +819,35 @@ printf("  variableEntry %p, scope start: %llu\n", variableEntry, variableEntry->
 	// iterate through the blocks and find the one we're currently in (if any)
 	for (DebugInfoEntryList::ConstIterator it = blockEntries.list.GetIterator();
 		DIELexicalBlock* block = dynamic_cast<DIELexicalBlock*>(it.Next());) {
-printf("  lexical block: %p\n", block);
+
+		TRACE_LOCALS("  lexical block: %p\n", block);
 
 		// check whether the block has low/high PC attributes
 		if (block->LowPC() != 0) {
-printf("    has lowPC\n");
+			TRACE_LOCALS("    has lowPC\n");
+
 			// yep, compare with the instruction pointer
 			if (instructionPointer < block->LowPC()
 				|| instructionPointer >= block->HighPC()) {
 				continue;
 			}
 		} else {
-printf("    no lowPC\n");
+			TRACE_LOCALS("    no lowPC\n");
+
 			// check the address ranges instead
 			TargetAddressRangeList* rangeList = fFile->ResolveRangeList(unit,
 				block->AddressRangesOffset());
-			if (rangeList == NULL)
-{
-printf("    failed to get ranges\n");
+			if (rangeList == NULL) {
+				TRACE_LOCALS("    failed to get ranges\n");
 				continue;
-}
+			}
 			Reference<TargetAddressRangeList> rangeListReference(rangeList,
 				true);
 
-			if (!rangeList->Contains(instructionPointer))
-{
-printf("    ranges don't contain IP\n");
+			if (!rangeList->Contains(instructionPointer)) {
+				TRACE_LOCALS("    ranges don't contain IP\n");
 				continue;
-}
+			}
 		}
 
 		// found a block -- recurse

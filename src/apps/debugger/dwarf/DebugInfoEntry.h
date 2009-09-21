@@ -27,6 +27,7 @@ struct ConstantAttributeValue;
 struct DeclarationLocation;
 struct DynamicAttributeValue;
 struct LocationDescription;
+struct MemberLocation;
 struct SourceLanguageInfo;
 
 
@@ -170,6 +171,8 @@ protected:
 									const AttributeValue& value);
 			status_t	 		SetConstantAttributeValue(
 									ConstantAttributeValue& toSet,
+									const AttributeValue& value);
+			status_t	 		SetMemberLocation(MemberLocation& toSet,
 									const AttributeValue& value);
 
 protected:

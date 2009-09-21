@@ -80,6 +80,9 @@ public:
 								ValueLocation(const ValuePieceLocation& piece);
 								ValueLocation(const ValueLocation& other);
 
+			bool				SetTo(const ValueLocation& other,
+									uint64 bitOffset, uint64 bitSize);
+
 			void				Clear();
 			bool				AddPiece(const ValuePieceLocation& piece);
 

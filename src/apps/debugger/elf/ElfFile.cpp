@@ -17,6 +17,8 @@
 
 #include <AutoDeleter.h>
 
+#include "Tracing.h"
+
 
 // #pragma mark - ElfSection
 
@@ -129,20 +131,17 @@ ElfFile::Init(const char* fileName)
 	// open file
 	fFD = open(fileName, O_RDONLY);
 	if (fFD < 0) {
-		fprintf(stderr, "Failed to open \"%s\": %s\n", fileName,
-			strerror(errno));
+		WARNING("Failed to open \"%s\": %s\n", fileName, strerror(errno));
 		return errno;
 	}
 
 	// stat() file to get its size
 	struct stat st;
 	if (fstat(fFD, &st) < 0) {
-		fprintf(stderr, "Failed to stat \"%s\": %s\n", fileName,
-			strerror(errno));
+		WARNING("Failed to stat \"%s\": %s\n", fileName, strerror(errno));
 		return errno;
 	}
 	fFileSize = st.st_size;
-printf("fFileSize: %lld\n", fFileSize);
 
 	// read the elf header
 	fElfHeader = (Elf32_Ehdr*)malloc(sizeof(Elf32_Ehdr));
@@ -155,7 +154,7 @@ printf("fFileSize: %lld\n", fFileSize);
 
 	// check the ELF header
 	if (!_CheckRange(0, sizeof(Elf32_Ehdr)) || !_CheckElfHeader()) {
-		fprintf(stderr, "\"%s\": Not an ELF file\n", fileName);
+		WARNING("\"%s\": Not an ELF file\n", fileName);
 		return B_BAD_DATA;
 	}
 
@@ -165,10 +164,9 @@ printf("fFileSize: %lld\n", fFileSize);
 	int sectionCount = fElfHeader->e_shnum;
 	size_t sectionHeaderTableSize = sectionHeaderSize * sectionCount;
 	if (!_CheckRange(sectionHeadersOffset, sectionHeaderTableSize)) {
-		fprintf(stderr, "\"%s\": Invalid ELF header\n", fileName);
+		WARNING("\"%s\": Invalid ELF header\n", fileName);
 		return B_BAD_DATA;
 	}
-printf("sectionHeaderTable: %lld\n", sectionHeadersOffset);
 
 	// read the section header table
 	uint8* sectionHeaderTable = (uint8*)malloc(sectionHeaderTableSize);
@@ -186,11 +184,10 @@ printf("sectionHeaderTable: %lld\n", sectionHeadersOffset);
 		+ fElfHeader->e_shstrndx * sectionHeaderSize);
 	if (!_CheckRange(stringSectionHeader->sh_offset,
 			stringSectionHeader->sh_size)) {
-		fprintf(stderr, "\"%s\": Invalid string section header\n", fileName);
+		WARNING("\"%s\": Invalid string section header\n", fileName);
 		return B_BAD_DATA;
 	}
 	size_t sectionStringSize = stringSectionHeader->sh_size;
-printf("sectionStrings: %ld\n", stringSectionHeader->sh_offset);
 
 	ElfSection* sectionStringSection = new(std::nothrow) ElfSection(".shstrtab",
 		fFD, stringSectionHeader->sh_offset, sectionStringSize);
@@ -230,10 +227,9 @@ printf("sectionStrings: %ld\n", stringSectionHeader->sh_offset);
 	int segmentCount = fElfHeader->e_phnum;
 	size_t programHeaderTableSize = programHeaderSize * segmentCount;
 	if (!_CheckRange(programHeadersOffset, programHeaderTableSize)) {
-		fprintf(stderr, "\"%s\": Invalid ELF header\n", fileName);
+		WARNING("\"%s\": Invalid ELF header\n", fileName);
 		return B_BAD_DATA;
 	}
-printf("programHeaderTable: %lld\n", programHeadersOffset);
 
 	// read the program header table
 	uint8* programHeaderTable = (uint8*)malloc(programHeaderTableSize);

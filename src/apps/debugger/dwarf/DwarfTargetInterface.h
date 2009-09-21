@@ -6,6 +6,7 @@
 #define DWARF_TARGET_INTERFACE_H
 
 
+#include <Referenceable.h>
 #include <Variant.h>
 
 #include "Types.h"
@@ -14,7 +15,7 @@
 class Register;
 
 
-class DwarfTargetInterface {
+class DwarfTargetInterface : public Referenceable {
 public:
 	virtual						~DwarfTargetInterface();
 

@@ -16,6 +16,7 @@
 #include "SpecificImageDebugInfo.h"
 #include "Statement.h"
 #include "Team.h"
+#include "Tracing.h"
 
 
 BreakpointManager::BreakpointManager(Team* team,
@@ -44,36 +45,41 @@ status_t
 BreakpointManager::InstallUserBreakpoint(UserBreakpoint* userBreakpoint,
 	bool enabled)
 {
-printf("BreakpointManager::InstallUserBreakpoint(%p, %d)\n", userBreakpoint, enabled);
+	TRACE_CONTROL("BreakpointManager::InstallUserBreakpoint(%p, %d)\n",
+		userBreakpoint, enabled);
+
 	AutoLocker<BLocker> installLocker(fLock);
 	AutoLocker<Team> teamLocker(fTeam);
 
 	bool oldEnabled = userBreakpoint->IsEnabled();
-	if (userBreakpoint->IsValid() && enabled == oldEnabled)
-{
-printf("  user breakpoint already valid and with same enabled state\n");
+	if (userBreakpoint->IsValid() && enabled == oldEnabled) {
+		TRACE_CONTROL("  user breakpoint already valid and with same enabled "
+			"state\n");
 		return B_OK;
-}
+	}
 
 	// get/create the breakpoints for all instances
-printf("  creating breakpoints for breakpoint instances\n");
+	TRACE_CONTROL("  creating breakpoints for breakpoint instances\n");
+
 	status_t error = B_OK;
 	for (int32 i = 0;
 		UserBreakpointInstance* instance = userBreakpoint->InstanceAt(i); i++) {
-printf("    breakpoint instance %p\n", instance);
-		if (instance->GetBreakpoint() != NULL)
-{
-printf("    -> already has breakpoint\n");
+
+		TRACE_CONTROL("    breakpoint instance %p\n", instance);
+
+		if (instance->GetBreakpoint() != NULL) {
+			TRACE_CONTROL("    -> already has breakpoint\n");
 			continue;
-}
+		}
 
 		target_addr_t address = instance->Address();
 		Breakpoint* breakpoint = fTeam->BreakpointAtAddress(address);
 		if (breakpoint == NULL) {
-printf("    -> no breakpoint at that address yet\n");
+			TRACE_CONTROL("    -> no breakpoint at that address yet\n");
+
 			Image* image = fTeam->ImageByAddress(address);
 			if (image == NULL) {
-printf("    -> no image at that address\n");
+				TRACE_CONTROL("    -> no image at that address\n");
 				error = B_BAD_ADDRESS;
 				break;
 			}
@@ -86,7 +92,8 @@ printf("    -> no image at that address\n");
 			}
 		}
 
-printf("    -> adding instance to breakpoint %p\n", breakpoint);
+		TRACE_CONTROL("    -> adding instance to breakpoint %p\n", breakpoint);
+
 		breakpoint->AddUserBreakpoint(instance);
 		instance->SetBreakpoint(breakpoint);
 	}
@@ -108,12 +115,14 @@ printf("    -> adding instance to breakpoint %p\n", breakpoint);
 	teamLocker.Unlock();
 
 	// install/uninstall the breakpoints as needed
-printf("  updating breakpoints\n");
+	TRACE_CONTROL("  updating breakpoints\n");
+
 	if (error == B_OK) {
 		for (int32 i = 0;
 			UserBreakpointInstance* instance = userBreakpoint->InstanceAt(i);
 			i++) {
-printf("    breakpoint instance %p\n", instance);
+			TRACE_CONTROL("    breakpoint instance %p\n", instance);
+
 			error = _UpdateBreakpointInstallation(instance->GetBreakpoint());
 			if (error != B_OK)
 				break;
@@ -121,7 +130,8 @@ printf("    breakpoint instance %p\n", instance);
 	}
 
 	if (error == B_OK) {
-printf("  success, marking user breakpoint valid\n");
+		TRACE_CONTROL("  success, marking user breakpoint valid\n");
+
 		// everything went fine -- mark the user breakpoint valid
 		if (!userBreakpoint->IsValid()) {
 			teamLocker.Lock();
@@ -132,7 +142,8 @@ printf("  success, marking user breakpoint valid\n");
 		}
 	} else {
 		// something went wrong -- revert the situation
-printf("  error, reverting\n");
+		TRACE_CONTROL("  error, reverting\n");
+
 		teamLocker.Lock();
 		userBreakpoint->SetEnabled(oldEnabled);
 		teamLocker.Unlock();
@@ -471,7 +482,11 @@ status_t
 BreakpointManager::_UpdateBreakpointInstallation(Breakpoint* breakpoint)
 {
 	bool shouldBeInstalled = breakpoint->ShouldBeInstalled();
-printf("BreakpointManager::_UpdateBreakpointInstallation(%p): should be installed: %d, is installed: %d\n", breakpoint, shouldBeInstalled, breakpoint->IsInstalled());
+
+	TRACE_CONTROL("BreakpointManager::_UpdateBreakpointInstallation(%p): "
+		"should be installed: %d, is installed: %d\n", breakpoint,
+		shouldBeInstalled, breakpoint->IsInstalled());
+
 	if (shouldBeInstalled == breakpoint->IsInstalled())
 		return B_OK;
 
@@ -481,12 +496,18 @@ printf("BreakpointManager::_UpdateBreakpointInstallation(%p): should be installe
 			breakpoint->Address());
 		if (error != B_OK)
 			return error;
-printf("BREAKPOINT at %#llx installed: %s\n", breakpoint->Address(), strerror(error));
+
+		TRACE_CONTROL("BREAKPOINT at %#llx installed: %s\n",
+			breakpoint->Address(), strerror(error));
+
 		breakpoint->SetInstalled(true);
 	} else {
 		// uninstall
 		fDebuggerInterface->UninstallBreakpoint(breakpoint->Address());
-printf("BREAKPOINT at %#llx uninstalled\n", breakpoint->Address());
+
+		TRACE_CONTROL("BREAKPOINT at %#llx uninstalled\n",
+			breakpoint->Address());
+
 		breakpoint->SetInstalled(false);
 	}
 

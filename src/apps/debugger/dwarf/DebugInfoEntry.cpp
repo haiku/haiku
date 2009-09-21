@@ -346,3 +346,23 @@ DebugInfoEntry::SetConstantAttributeValue(ConstantAttributeValue& toSet,
 			return B_BAD_DATA;
 	}
 }
+
+
+status_t
+DebugInfoEntry::SetMemberLocation(MemberLocation& toSet,
+	const AttributeValue& value)
+{
+	switch (value.attributeClass) {
+		case ATTRIBUTE_CLASS_CONSTANT:
+			toSet.SetToConstant(value.constant);
+			return B_OK;
+		case ATTRIBUTE_CLASS_BLOCK:
+			toSet.SetToExpression(value.block.data, value.block.length);
+			return B_OK;
+		case ATTRIBUTE_CLASS_LOCLISTPTR:
+			toSet.SetToLocationList(value.pointer);
+			return B_OK;
+		default:
+			return B_BAD_DATA;
+	}
+}

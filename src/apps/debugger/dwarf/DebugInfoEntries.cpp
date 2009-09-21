@@ -215,6 +215,13 @@ DIEType::Name() const
 }
 
 
+bool
+DIEType::IsDeclaration() const
+{
+	return false;
+}
+
+
 const DynamicAttributeValue*
 DIEType::ByteSize() const
 {
@@ -310,6 +317,13 @@ DebugInfoEntry*
 DIEDeclaredType::AbstractOrigin() const
 {
 	return fAbstractOrigin;
+}
+
+
+bool
+DIEDeclaredType::IsDeclaration() const
+{
+	return fDeclaration;
 }
 
 
@@ -560,6 +574,13 @@ const char*
 DIEDeclaredNamedBase::Description() const
 {
 	return fDescription;
+}
+
+
+bool
+DIEDeclaredNamedBase::IsDeclaration() const
+{
+	return fDeclaration;
 }
 
 
@@ -994,6 +1015,38 @@ DIEMember::AddAttribute_type(uint16 attributeName,
 }
 
 
+status_t
+DIEMember::AddAttribute_byte_size(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fByteSize, value);
+}
+
+
+status_t
+DIEMember::AddAttribute_bit_size(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fBitSize, value);
+}
+
+
+status_t
+DIEMember::AddAttribute_data_member_location(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetMemberLocation(fLocation, value);
+}
+
+
+status_t
+DIEMember::AddAttribute_bit_offset(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fBitOffset, value);
+}
+
+
 // #pragma mark - DIEPointerType
 
 
@@ -1283,6 +1336,14 @@ DIEInheritance::AddAttribute_type(uint16 attributeName,
 {
 	fType = dynamic_cast<DIEType*>(value.reference);
 	return fType != NULL ? B_OK : B_BAD_DATA;
+}
+
+
+status_t
+DIEInheritance::AddAttribute_data_member_location(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetMemberLocation(fLocation, value);
 }
 
 

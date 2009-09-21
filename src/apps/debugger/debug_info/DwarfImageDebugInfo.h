@@ -17,7 +17,7 @@
 
 class Architecture;
 class CompilationUnit;
-class DwarfInterfaceFactory;
+class DwarfStackFrameDebugInfo;
 class DwarfFile;
 class ElfSegment;
 class FileManager;
@@ -78,7 +78,7 @@ private:
 
 			status_t			_CreateLocalVariables(CompilationUnit* unit,
 									StackFrame* frame, FunctionID* functionID,
-									DwarfInterfaceFactory& factory,
+									DwarfStackFrameDebugInfo& factory,
 									target_addr_t instructionPointer,
 									target_addr_t lowPC,
 									const EntryListWrapper& variableEntries,

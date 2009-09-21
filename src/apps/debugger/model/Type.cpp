@@ -7,6 +7,14 @@
 #include "Type.h"
 
 
+// #pragma mark - BaseType
+
+
+BaseType::~BaseType()
+{
+}
+
+
 // #pragma mark - DataMember
 
 

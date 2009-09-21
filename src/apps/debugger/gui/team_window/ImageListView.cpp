@@ -16,6 +16,7 @@
 #include <ObjectList.h>
 
 #include "table/TableColumns.h"
+#include "Tracing.h"
 
 
 enum {
@@ -181,7 +182,8 @@ ImageListView::SetImage(Image* image)
 {
 	if (image == fImage)
 		return;
-printf("ImageListView::SetImage(%p)\n", image);
+
+	TRACE_GUI("ImageListView::SetImage(%p)\n", image);
 
 	if (fImage != NULL)
 		fImage->RemoveReference();
@@ -194,14 +196,16 @@ printf("ImageListView::SetImage(%p)\n", image);
 		for (int32 i = 0; Image* other = fImagesTableModel->ImageAt(i); i++) {
 			if (fImage == other) {
 				fImagesTable->SelectRow(i, false);
-printf("ImageListView::SetImage() done\n");
+
+				TRACE_GUI("ImageListView::SetImage() done\n");
 				return;
 			}
 		}
 	}
 
 	fImagesTable->DeselectAllRows();
-printf("ImageListView::SetImage() done\n");
+
+	TRACE_GUI("ImageListView::SetImage() done\n");
 }
 
 

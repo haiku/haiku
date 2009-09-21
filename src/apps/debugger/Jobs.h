@@ -11,6 +11,7 @@
 
 
 class Architecture;
+class BVariant;
 class CpuState;
 class DebuggerInterface;
 class Function;
@@ -20,7 +21,9 @@ class StackFrame;
 class StackFrameValues;
 class Team;
 class Thread;
+class Type;
 class TypeComponentPath;
+class ValueLocation;
 class Variable;
 
 
@@ -176,6 +179,18 @@ private:
 
 private:
 			status_t			_GetValue();
+			status_t			_SetValue(const BVariant& value, Type* type,
+									ValueLocation* location);
+			status_t			_ResolveTypeAndLocation(Type*& _type,
+									ValueLocation*& _location,
+									bool& _valueResolved);
+									// returns references
+			status_t			_GetTypeLocationAndValue(
+									TypeComponentPath* parentPath,
+									Type*& _parentType,
+									ValueLocation*& _parentLocation,
+									BVariant& _parentValue);
+									// returns references
 
 private:
 			GetStackFrameValueJobKey fKey;

@@ -26,6 +26,7 @@
 #include "StackTrace.h"
 #include "Statement.h"
 #include "Team.h"
+#include "Tracing.h"
 #include "Worker.h"
 
 
@@ -108,7 +109,9 @@ ThreadHandler::HandleBreakpointHit(BreakpointHitEvent* event)
 {
 	CpuState* cpuState = event->GetCpuState();
 	target_addr_t instructionPointer = cpuState->InstructionPointer();
-printf("ThreadHandler::HandleBreakpointHit(): ip: %llx\n", instructionPointer);
+
+	TRACE_EVENTS("ThreadHandler::HandleBreakpointHit(): ip: %llx\n",
+		instructionPointer);
 
 	// check whether this is a temporary breakpoint we're waiting for
 	if (fBreakpointAddress != 0 && instructionPointer == fBreakpointAddress
@@ -225,7 +228,8 @@ ThreadHandler::HandleThreadAction(uint32 action)
 		case MSG_THREAD_STEP_OUT:
 			break;
 	}
-printf("ThreadHandler::HandleThreadAction(MSG_THREAD_STEP_*)\n");
+
+	TRACE_CONTROL("ThreadHandler::HandleThreadAction(MSG_THREAD_STEP_*)\n");
 
 	// We want to step. We need a stack trace for that purpose. If we don't
 	// have one yet, get it. Start with the CPU state.
@@ -247,7 +251,8 @@ printf("ThreadHandler::HandleThreadAction(MSG_THREAD_STEP_*)\n");
 	}
 
 	StackFrame* frame = stackTrace->FrameAt(0);
-printf("  ip: %#llx\n", frame->InstructionPointer());
+
+	TRACE_CONTROL("  ip: %#llx\n", frame->InstructionPointer());
 
 	// When the thread is in a syscall, do the same for all step kinds: Stop it
 	// when it return by means of a breakpoint.
@@ -290,8 +295,10 @@ printf("  ip: %#llx\n", frame->InstructionPointer());
 		_StepFallback();
 		return;
 	}
-printf("  statement: %#llx - %#llx\n", fStepStatement->CoveringAddressRange().Start(),
-fStepStatement->CoveringAddressRange().End());
+
+	TRACE_CONTROL("  statement: %#llx - %#llx\n",
+		fStepStatement->CoveringAddressRange().Start(),
+		fStepStatement->CoveringAddressRange().End());
 
 	if (action == MSG_THREAD_STEP_INTO) {
 		// step into
@@ -430,7 +437,8 @@ ThreadHandler::_StepFallback()
 bool
 ThreadHandler::_DoStepOver(CpuState* cpuState)
 {
-printf("ThreadHandler::_DoStepOver()\n");
+	TRACE_CONTROL("ThreadHandler::_DoStepOver()\n");
+
 	// The basic strategy is to single-step out of the statement like for
 	// "step into", only we have to avoid stepping into subroutines. Hence we
 	// check whether the current instruction is a subroutine call. If not, we
@@ -438,18 +446,20 @@ printf("ThreadHandler::_DoStepOver()\n");
 	InstructionInfo info;
 	if (fDebuggerInterface->GetArchitecture()->GetInstructionInfo(
 			cpuState->InstructionPointer(), info) != B_OK) {
-printf("  failed to get instruction info\n");
+		TRACE_CONTROL("  failed to get instruction info\n");
 		return false;
 	}
 
 	if (info.Type() != INSTRUCTION_TYPE_SUBROUTINE_CALL) {
 		_SingleStepThread(cpuState->InstructionPointer());
-printf("  not a subroutine call\n");
+
+		TRACE_CONTROL("  not a subroutine call\n");
 		return true;
 	}
 
-printf("  subroutine call -- installing breakpoint at address %#llx\n",
-info.Address() + info.Size());
+	TRACE_CONTROL("  subroutine call -- installing breakpoint at address "
+		"%#llx\n", info.Address() + info.Size());
+
 	if (_InstallTemporaryBreakpoint(info.Address() + info.Size()) != B_OK)
 		return false;
 
@@ -548,7 +558,9 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 bool
 ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 {
-printf("ThreadHandler::_HandleSingleStepStep(): ip: %llx\n", cpuState->InstructionPointer());
+	TRACE_CONTROL("ThreadHandler::_HandleSingleStepStep(): ip: %llx\n",
+		cpuState->InstructionPointer());
+
 	switch (fStepMode) {
 		case STEP_INTO:
 		{

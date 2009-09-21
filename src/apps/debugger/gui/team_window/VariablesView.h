@@ -35,6 +35,11 @@ public:
 									TypeComponentPath* path);
 
 private:
+	// TreeTableListener
+	virtual	void				TreeTableNodeExpandedChanged(TreeTable* table,
+									const TreeTablePath& path, bool expanded);
+
+private:
 			class ValueNode;
 			class VariableValueColumn;
 			class VariableTableModel;

@@ -16,6 +16,7 @@
 #include "DisassembledCode.h"
 #include "FunctionDebugInfo.h"
 #include "InstructionInfo.h"
+#include "NoOpStackFrameDebugInfo.h"
 #include "RegisterMap.h"
 #include "StackFrame.h"
 #include "Statement.h"
@@ -320,8 +321,15 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 	}
 
 	// create the stack frame
+	StackFrameDebugInfo* stackFrameDebugInfo
+		= new(std::nothrow) NoOpStackFrameDebugInfo;
+	if (stackFrameDebugInfo == NULL)
+		return B_NO_MEMORY;
+	Reference<StackFrameDebugInfo> stackFrameDebugInfoReference(
+		stackFrameDebugInfo, true);
+
 	StackFrame* frame = new(std::nothrow) StackFrame(frameType, cpuState,
-		framePointer, eip);
+		framePointer, eip, stackFrameDebugInfo);
 	if (frame == NULL)
 		return B_NO_MEMORY;
 	Reference<StackFrame> frameReference(frame, true);

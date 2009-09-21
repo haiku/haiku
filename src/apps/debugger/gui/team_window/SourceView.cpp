@@ -35,6 +35,7 @@
 #include "StackTrace.h"
 #include "Statement.h"
 #include "Team.h"
+#include "Tracing.h"
 
 
 static const int32 kLeftTextMargin = 3;
@@ -1670,7 +1671,8 @@ SourceView::UnsetListener()
 void
 SourceView::SetStackTrace(StackTrace* stackTrace)
 {
-printf("SourceView::SetStackTrace(%p)\n", stackTrace);
+	TRACE_GUI("SourceView::SetStackTrace(%p)\n", stackTrace);
+
 	if (stackTrace == fStackTrace)
 		return;
 
@@ -1758,7 +1760,8 @@ SourceView::UserBreakpointChanged(target_addr_t address)
 bool
 SourceView::ScrollToAddress(target_addr_t address)
 {
-printf("SourceView::ScrollToAddress(%#llx)\n", address);
+	TRACE_GUI("SourceView::ScrollToAddress(%#llx)\n", address);
+
 	if (fSourceCode == NULL)
 		return false;
 
@@ -1779,7 +1782,8 @@ printf("SourceView::ScrollToAddress(%#llx)\n", address);
 bool
 SourceView::ScrollToLine(uint32 line)
 {
-printf("SourceView::ScrollToLine(%lu)\n", line);
+	TRACE_GUI("SourceView::ScrollToLine(%lu)\n", line);
+
 	if (fSourceCode == NULL || line >= (uint32)fSourceCode->CountLines())
 		return false;
 
@@ -1787,17 +1791,18 @@ printf("SourceView::ScrollToLine(%lu)\n", line);
 	float bottom = top + fFontInfo.lineHeight - 1;
 
 	BRect visible = Bounds();
-printf("SourceView::ScrollToLine(%ld)\n", line);
-printf("  visible: (%f, %f) - (%f, %f), line: %f - %f\n", visible.left, visible.top, visible.right, visible.bottom, top, bottom);
+
+	TRACE_GUI("SourceView::ScrollToLine(%ld)\n", line);
+	TRACE_GUI("  visible: (%f, %f) - (%f, %f), line: %f - %f\n", visible.left,
+		visible.top, visible.right, visible.bottom, top, bottom);
 
 	// If not visible at all, scroll to the center, otherwise scroll so that at
 	// least one more line is visible.
-	if (top >= visible.bottom || bottom <= visible.top)
-{
-printf("  -> scrolling to (%f, %f)\n", visible.left, top - (visible.Height() + 1) / 2);
+	if (top >= visible.bottom || bottom <= visible.top) {
+		TRACE_GUI("  -> scrolling to (%f, %f)\n", visible.left,
+			top - (visible.Height() + 1) / 2);
 		ScrollTo(visible.left, top - (visible.Height() + 1) / 2);
-}
-	else if (top - fFontInfo.lineHeight < visible.top)
+	} else if (top - fFontInfo.lineHeight < visible.top)
 		ScrollBy(0, top - fFontInfo.lineHeight - visible.top);
 	else if (bottom + fFontInfo.lineHeight > visible.bottom)
 		ScrollBy(0, bottom + fFontInfo.lineHeight - visible.bottom);

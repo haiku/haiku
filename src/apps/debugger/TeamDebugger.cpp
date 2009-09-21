@@ -38,6 +38,7 @@
 #include "SymbolInfo.h"
 #include "TeamDebugInfo.h"
 #include "TeamSettings.h"
+#include "Tracing.h"
 #include "Variable.h"
 
 // #pragma mark - ImageHandler
@@ -360,7 +361,7 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		fTeamWindow = TeamWindow::Create(fTeam, this);
 	} catch (...) {
 		// TODO: Notify the user!
-		fprintf(stderr, "Error: Failed to create team window!\n");
+		ERROR("Error: Failed to create team window!\n");
 		return B_NO_MEMORY;
 	}
 
@@ -645,21 +646,21 @@ TeamDebugger::TeamWindowQuitRequested()
 void
 TeamDebugger::JobDone(Job* job)
 {
-printf("TeamDebugger::JobDone(%p)\n", job);
+	TRACE_JOBS("TeamDebugger::JobDone(%p)\n", job);
 }
 
 
 void
 TeamDebugger::JobFailed(Job* job)
 {
-printf("TeamDebugger::JobFailed(%p)\n", job);
+	TRACE_JOBS("TeamDebugger::JobFailed(%p)\n", job);
 }
 
 
 void
 TeamDebugger::JobAborted(Job* job)
 {
-printf("TeamDebugger::JobAborted(%p)\n", job);
+	TRACE_JOBS("TeamDebugger::JobAborted(%p)\n", job);
 	// TODO: For a stack frame source loader thread we should reset the
 	// loading state! Asynchronously due to locking order.
 }
@@ -721,8 +722,8 @@ TeamDebugger::_DebugEventListener()
 
 
 		if (event->Team() != fTeamID) {
-printf("TeamDebugger for team %ld: received event from team %ld!\n", fTeamID,
-event->Team());
+			TRACE_EVENTS("TeamDebugger for team %ld: received event from team "
+				"%ld!\n", fTeamID, event->Team());
 			continue;
 		}
 
@@ -741,7 +742,9 @@ event->Team());
 void
 TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 {
-printf("TeamDebugger::_HandleDebuggerMessage(): %d\n", event->EventType());
+	TRACE_EVENTS("TeamDebugger::_HandleDebuggerMessage(): %d\n",
+		event->EventType());
+
 	bool handled = false;
 
 	ThreadHandler* handler = _GetThreadHandler(event->Thread());
@@ -749,42 +752,54 @@ printf("TeamDebugger::_HandleDebuggerMessage(): %d\n", event->EventType());
 
 	switch (event->EventType()) {
 		case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
-printf("B_DEBUGGER_MESSAGE_THREAD_DEBUGGED: thread: %ld\n", event->Thread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_THREAD_DEBUGGED: thread: %ld\n",
+				event->Thread());
+
 			if (handler != NULL) {
 				handled = handler->HandleThreadDebugged(
 					dynamic_cast<ThreadDebuggedEvent*>(event));
 			}
 			break;
 		case B_DEBUGGER_MESSAGE_DEBUGGER_CALL:
-printf("B_DEBUGGER_MESSAGE_DEBUGGER_CALL: thread: %ld\n", event->Thread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_DEBUGGER_CALL: thread: %ld\n",
+				event->Thread());
+
 			if (handler != NULL) {
 				handled = handler->HandleDebuggerCall(
 					dynamic_cast<DebuggerCallEvent*>(event));
 			}
 			break;
 		case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
-printf("B_DEBUGGER_MESSAGE_BREAKPOINT_HIT: thread: %ld\n", event->Thread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_BREAKPOINT_HIT: thread: %ld\n",
+				event->Thread());
+
 			if (handler != NULL) {
 				handled = handler->HandleBreakpointHit(
 					dynamic_cast<BreakpointHitEvent*>(event));
 			}
 			break;
 		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
-printf("B_DEBUGGER_MESSAGE_WATCHPOINT_HIT: thread: %ld\n", event->Thread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_WATCHPOINT_HIT: thread: %ld\n",
+				event->Thread());
+
 			if (handler != NULL) {
 				handled = handler->HandleWatchpointHit(
 					dynamic_cast<WatchpointHitEvent*>(event));
 			}
 			break;
 		case B_DEBUGGER_MESSAGE_SINGLE_STEP:
-printf("B_DEBUGGER_MESSAGE_SINGLE_STEP: thread: %ld\n", event->Thread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_SINGLE_STEP: thread: %ld\n",
+				event->Thread());
+
 			if (handler != NULL) {
 				handled = handler->HandleSingleStep(
 					dynamic_cast<SingleStepEvent*>(event));
 			}
 			break;
 		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
-printf("B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED: thread: %ld\n", event->Thread());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED: thread: %ld\n",
+				event->Thread());
+
 			if (handler != NULL) {
 				handled = handler->HandleExceptionOccurred(
 					dynamic_cast<ExceptionOccurredEvent*>(event));
@@ -795,10 +810,12 @@ printf("B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED: thread: %ld\n", event->Thread());
 //			break;
 		case B_DEBUGGER_MESSAGE_TEAM_DELETED:
 			// TODO: Handle!
-printf("B_DEBUGGER_MESSAGE_TEAM_DELETED: team: %ld\n", event->Team());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_TEAM_DELETED: team: %ld\n",
+				event->Team());
 			break;
 		case B_DEBUGGER_MESSAGE_TEAM_EXEC:
-printf("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %ld\n", event->Team());
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %ld\n",
+				event->Team());
 			// TODO: Handle!
 			break;
 		case B_DEBUGGER_MESSAGE_THREAD_CREATED:
@@ -825,7 +842,7 @@ printf("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %ld\n", event->Team());
 			// not interested
 			break;
 		default:
-			printf("TeamDebugger for team %ld: unknown event type: "
+			WARNING("TeamDebugger for team %ld: unknown event type: "
 				"%d\n", fTeamID, event->EventType());
 			break;
 	}
@@ -926,7 +943,7 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 void
 TeamDebugger::_HandleImageFileChanged(image_id imageID)
 {
-printf("TeamDebugger::_HandleImageFileChanged(%ld)\n", imageID);
+	TRACE_IMAGES("TeamDebugger::_HandleImageFileChanged(%ld)\n", imageID);
 // TODO: Reload the debug info!
 }
 
@@ -934,7 +951,9 @@ printf("TeamDebugger::_HandleImageFileChanged(%ld)\n", imageID);
 void
 TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
 {
-printf("TeamDebugger::_HandleSetUserBreakpoint(%#llx, %d)\n", address, enabled);
+	TRACE_CONTROL("TeamDebugger::_HandleSetUserBreakpoint(%#llx, %d)\n",
+		address, enabled);
+
 	// check whether there already is a breakpoint
 	AutoLocker< ::Team> locker(fTeam);
 
@@ -945,24 +964,32 @@ printf("TeamDebugger::_HandleSetUserBreakpoint(%#llx, %d)\n", address, enabled);
 	Reference<UserBreakpoint> userBreakpointReference(userBreakpoint);
 
 	if (userBreakpoint == NULL) {
-printf("  no breakpoint yet\n");
+		TRACE_CONTROL("  no breakpoint yet\n");
+
 		// get the function at the address
 		Image* image = fTeam->ImageByAddress(address);
-printf("  image: %p\n", image);
+
+		TRACE_CONTROL("  image: %p\n", image);
+
 		if (image == NULL)
 			return;
 		ImageDebugInfo* imageDebugInfo = image->GetImageDebugInfo();
-printf("  image debug info: %p\n", imageDebugInfo);
+
+		TRACE_CONTROL("  image debug info: %p\n", imageDebugInfo);
+
 		if (imageDebugInfo == NULL)
 			return;
 			// TODO: Handle this case by loading the debug info, if possible!
 		FunctionInstance* functionInstance
 			= imageDebugInfo->FunctionAtAddress(address);
-printf("  function instance: %p\n", functionInstance);
+
+		TRACE_CONTROL("  function instance: %p\n", functionInstance);
+
 		if (functionInstance == NULL)
 			return;
 		Function* function = functionInstance->GetFunction();
-printf("  function: %p\n", function);
+
+		TRACE_CONTROL("  function: %p\n", function);
 
 		// get the source location for the address
 		FunctionDebugInfo* functionDebugInfo
@@ -978,7 +1005,10 @@ printf("  function: %p\n", function);
 		breakpointStatement->ReleaseReference();
 
 		target_addr_t relativeAddress = address - functionInstance->Address();
-printf("  relative address: %#llx, source location: (%ld, %ld)\n", relativeAddress, sourceLocation.Line(), sourceLocation.Column());
+
+		TRACE_CONTROL("  relative address: %#llx, source location: "
+			"(%ld, %ld)\n", relativeAddress, sourceLocation.Line(),
+			sourceLocation.Column());
 
 		// get function id
 		FunctionID* functionID = functionInstance->GetFunctionID();
@@ -993,14 +1023,18 @@ printf("  relative address: %#llx, source location: (%ld, %ld)\n", relativeAddre
 		if (userBreakpoint == NULL)
 			return;
 		userBreakpointReference.SetTo(userBreakpoint, true);
-printf("  created user breakpoint: %p\n", userBreakpoint);
+
+		TRACE_CONTROL("  created user breakpoint: %p\n", userBreakpoint);
 
 		// iterate through all function instances and create
 		// UserBreakpointInstances
 		for (FunctionInstanceList::ConstIterator it
 					= function->Instances().GetIterator();
 				FunctionInstance* instance = it.Next();) {
-printf("  function instance %p: range: %#llx - %#llx\n", instance, instance->Address(), instance->Address() + instance->Size());
+			TRACE_CONTROL("  function instance %p: range: %#llx - %#llx\n",
+				instance, instance->Address(),
+				instance->Address() + instance->Size());
+
 			// get the breakpoint address for the instance
 			target_addr_t instanceAddress = 0;
 			if (instance == functionInstance) {
@@ -1019,7 +1053,9 @@ printf("  function instance %p: range: %#llx - %#llx\n", instance, instance->Add
 					statement->ReleaseReference();
 				}
 			}
-printf("    breakpoint address using source info: %llx\n", instanceAddress);
+
+			TRACE_CONTROL("    breakpoint address using source info: %llx\n",
+				instanceAddress);
 
 			if (instanceAddress == 0) {
 				// No source file (or we failed getting the statement), so try
@@ -1028,7 +1064,9 @@ printf("    breakpoint address using source info: %llx\n", instanceAddress);
 					continue;
 				instanceAddress = instance->Address() + relativeAddress;
 			}
-printf("    final breakpoint address: %llx\n", instanceAddress);
+
+			TRACE_CONTROL("    final breakpoint address: %llx\n",
+				instanceAddress);
 
 			UserBreakpointInstance* breakpointInstance = new(std::nothrow)
 				UserBreakpointInstance(userBreakpoint, instanceAddress);
@@ -1037,7 +1075,8 @@ printf("    final breakpoint address: %llx\n", instanceAddress);
 				delete breakpointInstance;
 				return;
 			}
-printf("  breakpoint instance: %p\n", breakpointInstance);
+
+			TRACE_CONTROL("  breakpoint instance: %p\n", breakpointInstance);
 		}
 	}
 
@@ -1055,7 +1094,7 @@ printf("  breakpoint instance: %p\n", breakpointInstance);
 void
 TeamDebugger::_HandleClearUserBreakpoint(target_addr_t address)
 {
-printf("TeamDebugger::_HandleClearUserBreakpoint(%#llx)\n", address);
+	TRACE_CONTROL("TeamDebugger::_HandleClearUserBreakpoint(%#llx)\n", address);
 
 	AutoLocker< ::Team> locker(fTeam);
 

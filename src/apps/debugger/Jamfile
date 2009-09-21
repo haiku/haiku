@@ -30,8 +30,8 @@ SubDirHdrs [ FDirName $(debugAnalyzerSources) gui ] ;
 SourceHdrs
 	DwarfFunctionDebugInfo.cpp
 	DwarfImageDebugInfo.cpp
+	DwarfStackFrameDebugInfo.cpp
 	DwarfTeamDebugInfo.cpp
-	DwarfInterfaceFactory.cpp
 	: [ FDirName $(SUBDIR) dwarf ]
 ;
 
@@ -60,15 +60,17 @@ Application Debugger :
 	DebuggerTeamDebugInfo.cpp
 	DwarfFunctionDebugInfo.cpp
 	DwarfImageDebugInfo.cpp
+	DwarfStackFrameDebugInfo.cpp
 	DwarfTeamDebugInfo.cpp
-	DwarfInterfaceFactory.cpp
 	Function.cpp
 	FunctionDebugInfo.cpp
 	FunctionInstance.cpp
 	ImageDebugInfo.cpp
 	ImageDebugInfoProvider.cpp
+	NoOpStackFrameDebugInfo.cpp
 	SpecificImageDebugInfo.cpp
 	SpecificTeamDebugInfo.cpp
+	StackFrameDebugInfo.cpp
 	TeamDebugInfo.cpp
 
 	# debugger_interface
@@ -110,6 +112,7 @@ Application Debugger :
 	SourceCode.cpp
 	StackFrame.cpp
 	StackFrameValues.cpp
+	StackFrameValueInfos.cpp
 	StackTrace.cpp
 	Statement.cpp
 	SymbolInfo.cpp

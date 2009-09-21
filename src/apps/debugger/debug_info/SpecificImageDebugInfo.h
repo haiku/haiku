@@ -13,6 +13,7 @@
 
 class Architecture;
 class CpuState;
+class DataMember;
 class DebuggerInterface;
 class FileSourceCode;
 class FunctionDebugInfo;
@@ -23,6 +24,8 @@ class SourceLanguage;
 class SourceLocation;
 class StackFrame;
 class Statement;
+class Type;
+class ValueLocation;
 
 
 class SpecificImageDebugInfo : public Referenceable {

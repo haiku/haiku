@@ -6,6 +6,8 @@
 
 #include "TypeComponentPath.h"
 
+#include <stdio.h>
+
 #include <new>
 
 #include "StringUtils.h"
@@ -19,6 +21,49 @@ TypeComponent::HashValue() const
 {
 	uint32 hash = ((uint32)index << 8) | (componentKind << 4) | typeKind;
 	return StringUtils::HashValue(name) * 13 + hash;
+}
+
+
+void
+TypeComponent::Dump() const
+{
+	switch (typeKind) {
+		case TYPE_PRIMITIVE:
+			printf("primitive");
+			break;
+		case TYPE_COMPOUND:
+			printf("compound");
+			break;
+		case TYPE_MODIFIED:
+			printf("modified");
+			break;
+		case TYPE_TYPEDEF:
+			printf("typedef");
+			break;
+		case TYPE_ADDRESS:
+			printf("address");
+			break;
+		case TYPE_ARRAY:
+			printf("array");
+			break;
+	}
+
+	printf(" ");
+
+	switch (componentKind) {
+		case TYPE_COMPONENT_UNDEFINED:
+			printf("undefined");
+			break;
+		case TYPE_COMPONENT_BASE_TYPE:
+			printf("base %llu \"%s\"", index, name.String());
+			break;
+		case TYPE_COMPONENT_DATA_MEMBER:
+			printf("member %llu \"%s\"", index, name.String());
+			break;
+		case TYPE_COMPONENT_ARRAY_ELEMENT:
+			printf("element %llu \"%s\"", index, name.String());
+			break;
+	}
 }
 
 
@@ -90,6 +135,26 @@ TypeComponentPath::Clear()
 }
 
 
+TypeComponentPath*
+TypeComponentPath::CreateSubPath(int32 componentCount) const
+{
+	if (componentCount < 0 || componentCount > fComponents.CountItems())
+		componentCount = fComponents.CountItems();
+
+	TypeComponentPath* path = new(std::nothrow) TypeComponentPath;
+	if (path == NULL)
+		return NULL;
+	Reference<TypeComponentPath> pathReference(path, true);
+
+	for (int32 i = 0; i < componentCount; i++) {
+		if (!path->AddComponent(*fComponents.ItemAt(i)))
+			return NULL;
+	}
+
+	return pathReference.Detach();
+}
+
+
 uint32
 TypeComponentPath::HashValue() const
 {
@@ -103,6 +168,21 @@ TypeComponentPath::HashValue() const
 		hash = hash * 17 + fComponents.ItemAt(i)->HashValue();
 
 	return hash;
+}
+
+
+void
+TypeComponentPath::Dump() const
+{
+	int32 count = fComponents.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		if (i == 0)
+			printf("[");
+		else
+			printf(" -> [");
+		fComponents.ItemAt(i)->Dump();
+		printf("]");
+	}
 }
 
 

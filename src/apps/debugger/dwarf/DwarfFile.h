@@ -110,6 +110,10 @@ private:
 									off_t instructionOffset,
 									off_t instructionSize);
 
+			status_t			_ParsePublicTypesInfo();
+			status_t			_ParsePublicTypesInfo(DataReader& dataReader,
+									bool dwarf64);
+
 			status_t			_GetAbbreviationTable(off_t offset,
 									AbbreviationTable*& _table);
 
@@ -139,6 +143,7 @@ private:
 			ElfSection*			fDebugLineSection;
 			ElfSection*			fDebugFrameSection;
 			ElfSection*			fDebugLocationSection;
+			ElfSection*			fDebugPublicTypesSection;
 			AbbreviationTableList fAbbreviationTables;
 			DebugInfoEntryFactory fDebugInfoFactory;
 			CompilationUnitList	fCompilationUnits;

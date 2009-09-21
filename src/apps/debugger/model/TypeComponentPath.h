@@ -78,6 +78,8 @@ struct TypeComponent {
 
 	uint32 HashValue() const;
 
+	void Dump() const;
+
 	TypeComponent& operator=(const TypeComponent& other)
 
 	{
@@ -110,7 +112,13 @@ public:
 			bool				AddComponent(const TypeComponent& component);
 			void				Clear();
 
+			TypeComponentPath*	CreateSubPath(int32 componentCount) const;
+									// returns a new object (or NULL when out
+									// of memory)
+
 			uint32				HashValue() const;
+
+			void				Dump() const;
 
 			TypeComponentPath&	operator=(const TypeComponentPath& other);
 

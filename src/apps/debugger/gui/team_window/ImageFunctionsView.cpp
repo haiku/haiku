@@ -18,6 +18,7 @@
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "LocatableFile.h"
+#include "Tracing.h"
 
 
 // #pragma mark - FunctionsTableModel
@@ -346,7 +347,8 @@ ImageFunctionsView::SetImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 {
 	if (imageDebugInfo == fImageDebugInfo)
 		return;
-printf("ImageFunctionsView::SetImageDebugInfo(%p)\n", imageDebugInfo);
+
+	TRACE_GUI("ImageFunctionsView::SetImageDebugInfo(%p)\n", imageDebugInfo);
 
 	if (fImageDebugInfo != NULL)
 		fImageDebugInfo->RemoveReference();
@@ -369,14 +371,16 @@ printf("ImageFunctionsView::SetImageDebugInfo(%p)\n", imageDebugInfo);
 	if (fImageDebugInfo != NULL)
 		fFunctionsTable->ResizeAllColumnsToPreferred();
 
-printf("ImageFunctionsView::SetImageDebugInfo(%p) done\n", imageDebugInfo);
+	TRACE_GUI("ImageFunctionsView::SetImageDebugInfo(%p) done\n",
+		imageDebugInfo);
 }
 
 
 void
 ImageFunctionsView::SetFunction(FunctionInstance* function)
 {
-printf("ImageFunctionsView::SetFunction(%p)\n", function);
+	TRACE_GUI("ImageFunctionsView::SetFunction(%p)\n", function);
+
 	TreeTablePath path;
 	if (fFunctionsTableModel->GetFunctionPath(function, path)) {
 		fFunctionsTable->SetNodeExpanded(path, true, true);

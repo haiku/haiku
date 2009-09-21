@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "Dwarf.h"
+#include "Tracing.h"
 
 
 static const uint8 kLineNumberStandardOpcodeOperands[]
@@ -48,7 +49,8 @@ LineNumberProgram::Init(const void* program, size_t programSize,
 		kLineNumberStandardOpcodeCount);
 	for (uint8 i = 0; i < standardOpcodeCount; i++) {
 		if (standardOpcodeLengths[i] != kLineNumberStandardOpcodeOperands[i]) {
-printf("operand count for standard opcode %u does not what we expect\n", i + 1);
+			WARNING("operand count for standard opcode %u does not what we "
+				"expect\n", i + 1);
 			return B_BAD_DATA;
 		}
 	}
@@ -143,7 +145,7 @@ LineNumberProgram::GetNextRow(State& state) const
 					state.instructionSet = dataReader.ReadUnsignedLEB128(0);
 					break;
 				default:
-printf("unsupported standard opcode %u\n", opcode);
+					WARNING("unsupported standard opcode %u\n", opcode);
 					for (int32 i = 0; i < fStandardOpcodeLengths[opcode - 1];
 							i++) {
 						dataReader.ReadUnsignedLEB128(0);
@@ -174,7 +176,8 @@ printf("unsupported standard opcode %u\n", opcode);
 					break;
 				}
 				default:
-printf("unsupported extended opcode: %u\n", extendedOpcode);
+					WARNING("unsupported extended opcode: %u\n",
+						extendedOpcode);
 					break;
 			}
 

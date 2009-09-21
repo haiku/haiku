@@ -10,6 +10,8 @@
 #include "CpuState.h"
 #include "FunctionInstance.h"
 #include "Image.h"
+#include "StackFrameDebugInfo.h"
+#include "StackFrameValueInfos.h"
 #include "StackFrameValues.h"
 #include "Variable.h"
 
@@ -18,18 +20,22 @@
 
 
 StackFrame::StackFrame(stack_frame_type type, CpuState* cpuState,
-	target_addr_t frameAddress, target_addr_t instructionPointer)
+	target_addr_t frameAddress, target_addr_t instructionPointer,
+	StackFrameDebugInfo* debugInfo)
 	:
 	fType(type),
 	fCpuState(cpuState),
 	fFrameAddress(frameAddress),
 	fInstructionPointer(instructionPointer),
 	fReturnAddress(0),
+	fDebugInfo(debugInfo),
 	fImage(NULL),
 	fFunction(NULL),
-	fValues(NULL)
+	fValues(NULL),
+	fValueInfos(NULL)
 {
 	fCpuState->AcquireReference();
+	fDebugInfo->AcquireReference();
 }
 
 
@@ -43,6 +49,8 @@ StackFrame::~StackFrame()
 
 	SetImage(NULL);
 	SetFunction(NULL);
+
+	fDebugInfo->ReleaseReference();
 	fCpuState->ReleaseReference();
 }
 
@@ -50,11 +58,25 @@ StackFrame::~StackFrame()
 status_t
 StackFrame::Init()
 {
+	// create values map
 	fValues = new(std::nothrow) StackFrameValues;
 	if (fValues == NULL)
 		return B_NO_MEMORY;
 
-	return fValues->Init();
+	status_t error = fValues->Init();
+	if (error != B_OK)
+		return error;
+
+	// create value infos map
+	fValueInfos = new(std::nothrow) StackFrameValueInfos;
+	if (fValueInfos == NULL)
+		return B_NO_MEMORY;
+
+	error = fValueInfos->Init();
+	if (error != B_OK)
+		return error;
+
+	return B_OK;
 }
 
 

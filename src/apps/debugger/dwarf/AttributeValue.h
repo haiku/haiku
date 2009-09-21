@@ -209,6 +209,65 @@ struct ConstantAttributeValue {
 };
 
 
+struct MemberLocation {
+	union {
+		uint64				constant;
+		off_t				listOffset;
+		struct {
+			const void*		data;
+			off_t			length;
+		}					expression;
+	};
+	uint8				attributeClass;
+
+	MemberLocation()
+		:
+		attributeClass(ATTRIBUTE_CLASS_UNKNOWN)
+	{
+	}
+
+	bool IsValid() const
+	{
+		return attributeClass != ATTRIBUTE_CLASS_UNKNOWN;
+	}
+
+	bool IsConstant() const
+	{
+		return attributeClass == ATTRIBUTE_CLASS_CONSTANT;
+	}
+
+	bool IsExpression() const
+	{
+		return attributeClass == ATTRIBUTE_CLASS_BLOCK
+			&& expression.data != NULL;
+	}
+
+	bool IsLocationList() const
+	{
+		return attributeClass == ATTRIBUTE_CLASS_LOCLISTPTR;
+	}
+
+	void SetToConstant(uint64 constant)
+	{
+		this->constant = constant;
+		attributeClass = ATTRIBUTE_CLASS_CONSTANT;
+	}
+
+	void SetToExpression(const void* data, off_t length)
+	{
+		expression.data = data;
+		expression.length = length;
+		attributeClass = ATTRIBUTE_CLASS_BLOCK;
+	}
+
+	void SetToLocationList(off_t listOffset)
+	{
+		this->listOffset = listOffset;
+		attributeClass = ATTRIBUTE_CLASS_LOCLISTPTR;
+	}
+};
+
+
 struct LocationDescription {
 	union {
 		off_t			listOffset;	// location list

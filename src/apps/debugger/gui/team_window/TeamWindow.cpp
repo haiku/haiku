@@ -31,6 +31,7 @@
 #include "RegistersView.h"
 #include "StackTrace.h"
 #include "StackTraceView.h"
+#include "Tracing.h"
 #include "TypeComponentPath.h"
 #include "Variable.h"
 
@@ -361,8 +362,10 @@ TeamWindow::UserBreakpointChanged(const Team::BreakpointEvent& event)
 void
 TeamWindow::FunctionSourceCodeChanged(Function* function)
 {
-printf("TeamWindow::FunctionSourceCodeChanged(%p): source: %p, state: %d\n",
-function, function->GetSourceCode(), function->SourceCodeState());
+	TRACE_GUI("TeamWindow::FunctionSourceCodeChanged(%p): source: %p, "
+		"state: %d\n", function, function->GetSourceCode(),
+		function->SourceCodeState());
+
 	PostMessage(MSG_FUNCTION_SOURCE_CODE_CHANGED);
 }
 
@@ -807,7 +810,8 @@ TeamWindow::_HandleStackFrameValueRetrieved(StackFrame* stackFrame,
 void
 TeamWindow::_HandleImageDebugInfoChanged(image_id imageID)
 {
-printf("TeamWindow::_HandleImageDebugInfoChanged(%ld)\n", imageID);
+	TRACE_GUI("TeamWindow::_HandleImageDebugInfoChanged(%ld)\n", imageID);
+
 	// We're only interested in the currently selected thread
 	if (fActiveImage == NULL || imageID != fActiveImage->ID())
 		return;
@@ -816,7 +820,9 @@ printf("TeamWindow::_HandleImageDebugInfoChanged(%ld)\n", imageID);
 
 	ImageDebugInfo* imageDebugInfo = fActiveImage != NULL
 		? fActiveImage->GetImageDebugInfo() : NULL;
-printf("  image debug info: %p\n", imageDebugInfo);
+
+	TRACE_GUI("  image debug info: %p\n", imageDebugInfo);
+
 	Reference<ImageDebugInfo> imageDebugInfoReference(imageDebugInfo);
 		// hold a reference until we've set it
 

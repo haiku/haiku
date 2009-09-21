@@ -39,6 +39,14 @@ enum {
 class Type;
 
 
+class BaseType : public Referenceable {
+public:
+	virtual						~BaseType();
+
+	virtual	Type*				GetType() const = 0;
+};
+
+
 class DataMember : public Referenceable {
 public:
 	virtual						~DataMember();
@@ -54,6 +62,7 @@ public:
 
 	virtual	const char*			Name() const = 0;
 	virtual	type_kind			Kind() const = 0;
+	virtual	target_size_t		ByteSize() const = 0;
 };
 
 
@@ -72,6 +81,9 @@ public:
 	virtual						~CompoundType();
 
 	virtual	type_kind			Kind() const;
+
+	virtual	int32				CountBaseTypes() const = 0;
+	virtual	BaseType*			BaseTypeAt(int32 index) const = 0;
 
 	virtual	int32				CountDataMembers() const = 0;
 	virtual	DataMember*			DataMemberAt(int32 index) const = 0;

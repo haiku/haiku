@@ -26,6 +26,8 @@ enum stack_frame_type {
 class CpuState;
 class Image;
 class FunctionInstance;
+class StackFrameDebugInfo;
+class StackFrameValueInfos;
 class StackFrameValues;
 class TypeComponentPath;
 class Variable;
@@ -39,7 +41,8 @@ public:
 								StackFrame(stack_frame_type type,
 									CpuState* cpuState,
 									target_addr_t frameAddress,
-									target_addr_t instructionPointer);
+									target_addr_t instructionPointer,
+									StackFrameDebugInfo* debugInfo);
 								~StackFrame();
 
 			status_t			Init();
@@ -47,6 +50,7 @@ public:
 			stack_frame_type	Type() const			{ return fType; }
 			CpuState*			GetCpuState() const		{ return fCpuState; }
 			target_addr_t		FrameAddress() const { return fFrameAddress; }
+			StackFrameDebugInfo* DebugInfo() const		{ return fDebugInfo; }
 
 			target_addr_t		InstructionPointer() const
 									{ return fInstructionPointer; }
@@ -68,7 +72,8 @@ public:
 			Variable*			LocalVariableAt(int32 index) const;
 			bool				AddLocalVariable(Variable* variable);
 
-			StackFrameValues*	Values() const	{ return fValues; }
+			StackFrameValues*	Values() const			{ return fValues; }
+			StackFrameValueInfos* ValueInfos() const	{ return fValueInfos; }
 
 			// team lock must be held
 			void				AddListener(Listener* listener);
@@ -87,11 +92,13 @@ private:
 			target_addr_t		fFrameAddress;
 			target_addr_t		fInstructionPointer;
 			target_addr_t		fReturnAddress;
+			StackFrameDebugInfo* fDebugInfo;
 			Image*				fImage;
 			FunctionInstance*	fFunction;
 			VariableList		fParameters;
 			VariableList		fLocalVariables;
 			StackFrameValues*	fValues;
+			StackFrameValueInfos* fValueInfos;
 			ListenerList		fListeners;
 };
 

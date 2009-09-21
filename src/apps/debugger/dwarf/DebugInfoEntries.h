@@ -219,6 +219,7 @@ public:
 
 	virtual	const char*			Name() const;
 
+	virtual	bool				IsDeclaration() const;
 	virtual	const DynamicAttributeValue* ByteSize() const;
 
 	virtual	status_t			AddAttribute_name(uint16 attributeName,
@@ -271,6 +272,8 @@ public:
 
 	virtual	const char*			Description() const;
 	virtual	DebugInfoEntry*		AbstractOrigin() const;
+
+	virtual	bool				IsDeclaration() const;
 
 	virtual	status_t			AddAttribute_accessibility(uint16 attributeName,
 									const AttributeValue& value);
@@ -348,6 +351,9 @@ class DIEClassBaseType : public DIECompoundType {
 public:
 								DIEClassBaseType();
 
+			const DebugInfoEntryList& BaseTypes() const
+									{ return fBaseTypes; }
+
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
 protected:
@@ -398,7 +404,7 @@ public:
 
 			uint8				Accessibility() const { return fAccessibility; }
 			uint8				Visibility() const	{ return fVisibility; }
-			bool				IsDeclaration() const { return fDeclaration; }
+	virtual	bool				IsDeclaration() const;
 
 	virtual	status_t			AddAttribute_name(uint16 attributeName,
 									const AttributeValue& value);
@@ -628,19 +634,36 @@ public:
 	virtual	uint16				Tag() const;
 
 			DIEType*			GetType() const	{ return fType; }
+			const DynamicAttributeValue* ByteSize() const
+									{ return &fByteSize; }
+			const DynamicAttributeValue* BitOffset() const
+									{ return &fBitOffset; }
+			const DynamicAttributeValue* BitSize() const
+									{ return &fBitSize; }
+			const MemberLocation* Location() const
+									{ return &fLocation; }
 
 	virtual	status_t			AddAttribute_type(uint16 attributeName,
 									const AttributeValue& value);
+	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_bit_size(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_bit_offset(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_data_member_location(
+									uint16 attributeName,
+									const AttributeValue& value);
 
 // TODO:
-// DW_AT_bit_offset
-// DW_AT_bit_size
-// DW_AT_byte_size
-// DW_AT_data_member_location
 // DW_AT_mutable
 
 private:
 			DIEType*			fType;
+			DynamicAttributeValue fByteSize;
+			DynamicAttributeValue fBitOffset;
+			DynamicAttributeValue fBitSize;
+			MemberLocation		fLocation;
 };
 
 
@@ -805,17 +828,22 @@ public:
 	virtual	uint16				Tag() const;
 
 			DIEType*			GetType() const	{ return fType; }
+			const MemberLocation* Location() const
+									{ return &fLocation; }
 
 	virtual	status_t			AddAttribute_type(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_data_member_location(
+									uint16 attributeName,
 									const AttributeValue& value);
 
 // TODO:
 // DW_AT_accessibility
-// DW_AT_data_member_location
 // DW_AT_virtuality
 
 private:
 			DIEType*			fType;
+			MemberLocation		fLocation;
 };
 
 
