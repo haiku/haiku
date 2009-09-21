@@ -57,7 +57,7 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 			} else {
 				UdfString string(entry->id(), entry->id_length());
 				TRACE(("DirectoryIterator::GetNextEntry: UfdString id == `%s', "
-				"length = %d\n", string.Utf8(), string.Utf8Length()));
+				"length = %lu\n", string.Utf8(), string.Utf8Length()));
 				DUMP(entry->icb());
 				sprintf(name, "%s", string.Utf8());
 				*length = string.Utf8Length();

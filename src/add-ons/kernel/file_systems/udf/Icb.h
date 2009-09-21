@@ -114,7 +114,8 @@ public:
 private:
 	AbstractFileEntry			*_AbstractEntry() { return (_Tag().id()
 									== TAGID_EXTENDED_FILE_ENTRY)
-									? &fExtendedEntry : &fFileEntry; }
+									? (AbstractFileEntry *)&fExtendedEntry 
+									: (AbstractFileEntry *)&fFileEntry; }
 
 	descriptor_tag				&_Tag() { return ((icb_header *)fData.Block())->tag(); }
 	icb_entry_tag				&_IcbTag() { return ((icb_header *)fData.Block())->icb_tag(); }

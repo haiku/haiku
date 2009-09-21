@@ -359,7 +359,7 @@ domain_id_suffix::domain_id_suffix(uint16 udfRevision, uint8 domainFlags)
 // entity_id
 //----------------------------------------------------------------------
 
-entity_id::entity_id(uint8 flags, char *identifier, uint8 *identifier_suffix)
+entity_id::entity_id(uint8 flags, const char *identifier, uint8 *identifier_suffix)
 	: _flags(flags)
 {
 	memset(_identifier, 0, kIdentifierLength);
@@ -371,7 +371,7 @@ entity_id::entity_id(uint8 flags, char *identifier, uint8 *identifier_suffix)
 		memset(_identifier_suffix.data, 0, kIdentifierSuffixLength);
 }
 
-entity_id::entity_id(uint8 flags, char *identifier,
+entity_id::entity_id(uint8 flags, const char *identifier,
 	                 const udf_id_suffix &suffix)
 	: _flags(flags)
 {
@@ -381,7 +381,7 @@ entity_id::entity_id(uint8 flags, char *identifier,
 	memcpy(_identifier_suffix.data, &suffix, kIdentifierSuffixLength);
 }	                 
 
-entity_id::entity_id(uint8 flags, char *identifier,
+entity_id::entity_id(uint8 flags, const char *identifier,
 	                 const implementation_id_suffix &suffix)
 	: _flags(flags)
 {
@@ -391,7 +391,7 @@ entity_id::entity_id(uint8 flags, char *identifier,
 	memcpy(_identifier_suffix.data, &suffix, kIdentifierSuffixLength);
 }	                 
 
-entity_id::entity_id(uint8 flags, char *identifier,
+entity_id::entity_id(uint8 flags, const char *identifier,
 	                 const domain_id_suffix &suffix)
 	: _flags(flags)
 {

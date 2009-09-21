@@ -226,7 +226,6 @@ private:
 	#define RETURN(status) return status;
 	#define FATAL(x) { __out("udf: fatal error: "); __out x; }
 	#define DBG(x) ;
-	#define DUMP(x) ;
 #endif	// ifdef DEBUG else
 
 #define TRACE(x) dprintf x

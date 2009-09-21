@@ -11,8 +11,8 @@ PhysicalPartition::PhysicalPartition(uint16 number, uint32 start, uint32 length)
 	fStart(start),
 	fLength(length)
 {
-	TRACE(("PhysicalPartition::PhysicalPartition: number = %d, start = %d,
-		length = %d\n", number, start, length));
+	TRACE(("PhysicalPartition::PhysicalPartition: number = %d, start = %lu,"
+		"length = %lu\n", number, start, length));
 }
 
 
@@ -33,8 +33,8 @@ PhysicalPartition::MapBlock(uint32 logicalBlock, off_t &physicalBlock)
 {
 	TRACE(("PhysicalPartition::MapBlock: %ld\n", logicalBlock));
 	if (logicalBlock >= fLength) {
-		TRACE_ERROR(("PhysicalPartition::MapBlock: block %ld invalid,
-			length = %ld\n", logicalBlock, fLength));
+		TRACE_ERROR(("PhysicalPartition::MapBlock: block %ld invalid,"
+			"length = %ld\n", logicalBlock, fLength));
 		return B_BAD_ADDRESS;
 	} else {
 		physicalBlock = fStart + logicalBlock;

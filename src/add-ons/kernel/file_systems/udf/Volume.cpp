@@ -203,8 +203,8 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 		fBlockSize = blockSize;
 		fBlockShift = blockShift;
 	}
-	TRACE(("Volume::Mount: device = %d, offset = %d, length = %ld, "
-		"blockSize = %d, blockShift = %d\n", device, offset, length,
+	TRACE(("Volume::Mount: device = %d, offset = %Ld, length = %Ld, "
+		"blockSize = %ld, blockShift = %ld\n", device, offset, length,
 		blockSize, blockShift));
 	// At this point we've found a valid set of volume descriptors and
 	// our partitions are all set up. We now need to investigate the file
@@ -248,7 +248,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 						return B_NO_MEMORY;
 				}
 
-				TRACE(("Volume::Mount: Root Node id = %d\n", fRootIcb->Id()));
+				TRACE(("Volume::Mount: Root Node id = %Ld\n", fRootIcb->Id()));
 				if (!status) {
 					status = publish_vnode(fFSVolume, fRootIcb->Id(), fRootIcb,
 						&gUDFVnodeOps, fRootIcb->Mode(), 0);
@@ -261,7 +261,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 						delete fRootIcb;
 						fRootIcb = NULL;
 					}
-					TRACE(("Volume::Mount: Root vnode published. Id = %d\n",
+					TRACE(("Volume::Mount: Root vnode published. Id = %Ld\n",
 						fRootIcb->Id()));
 				}
 			}

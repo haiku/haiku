@@ -5,6 +5,7 @@
 
 /*! \file Utils.cpp - Miscellaneous Udf utility functions. */
 
+#include "UdfStructures.h"
 #include "Utils.h"
 
 extern "C" {

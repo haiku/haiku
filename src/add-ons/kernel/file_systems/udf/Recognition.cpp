@@ -60,7 +60,7 @@ udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 	status = walk_volume_recognition_sequence(device, offset, blockSize,
 		blockShift);
 	if (status != B_OK) {
-		TRACE_ERROR(("udf_recognize: Invalid sequence. status = %d\n", status));
+		TRACE_ERROR(("udf_recognize: Invalid sequence. status = %ld\n", status));
 		return status;
 	}
 	// Now hunt down a volume descriptor sequence from one of
@@ -69,7 +69,7 @@ udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 		blockSize, blockShift, logicalVolumeDescriptor, partitionDescriptors,
 		partitionDescriptorCount);
 	if (status != B_OK) {
-		TRACE_ERROR(("udf_recognize: cannot find volume descriptor. status = %d\n",
+		TRACE_ERROR(("udf_recognize: cannot find volume descriptor. status = %ld\n",
 			status));
 		return status;
 	}
@@ -79,7 +79,7 @@ udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 		logicalVolumeDescriptor.integrity_sequence_extent());
 	if (status != B_OK) {
 		TRACE_ERROR(("udf_recognize: last integrity descriptor not closed. "
-			"status = %d\n", status));
+			"status = %ld\n", status));
 		return status;
 	}
 
@@ -96,7 +96,7 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 	uint32 blockShift)
 {
 	TRACE(("walk_volume_recognition_sequence: device = %d, offset = %Ld, "
-		"blockSize = %ld, blockShift = %d\n", device, offset, blockSize,
+		"blockSize = %ld, blockShift = %lu\n", device, offset, blockSize,
 		blockShift));
 
 	// vrs starts at block 16. Each volume structure descriptor (vsd)
@@ -117,7 +117,7 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 	for (uint32 block = 16; true; block++) {
 		off_t address = (offset + block) << blockShift;
 		TRACE(("walk_volume_recognition_sequence: block = %ld, "
-			"address = %d, ", block, address));
+			"address = %Ld, ", block, address));
 		ssize_t bytesRead = read_pos(device, address, chunk.Data(), blockSize);
 		if (bytesRead == (ssize_t)blockSize) {
 			volume_structure_descriptor_header* descriptor

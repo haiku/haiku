@@ -43,8 +43,8 @@ extern fs_vnode_ops gUDFVnodeOps;
 static float
 udf_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
-	TRACE(("udf_identify_partition: fd = %d, id = %d, offset = %d, size = %d "
-		"content_size = %d, block_size = %d\n", fd, partition->id,
+	TRACE(("udf_identify_partition: fd = %d, id = %ld, offset = %Ld, size = %Ld "
+		"content_size = %Ld, block_size = %lu\n", fd, partition->id,
 		partition->offset, partition->size, partition->content_size,
 		partition->block_size));
 
@@ -123,7 +123,7 @@ udf_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 
 	// Convert the given vnode id to an address, and create
 	// and return a corresponding Icb object for it.
-	TRACE(("udf_get_vnode: id = %d, blockSize = %d\n", id, volume->BlockSize()));
+	TRACE(("udf_get_vnode: id = %Ld, blockSize = %lu\n", id, volume->BlockSize()));
 	Icb *icb = new(std::nothrow) Icb(volume,
 		to_long_address(id, volume->BlockSize()));
 	if (icb) {
@@ -224,7 +224,7 @@ udf_read_stat(fs_volume *_volume, fs_vnode *node, struct stat *stat)
 	stat->st_nlink = icb->FileLinkCount();
 	stat->st_blksize = volume->BlockSize();
 
-	TRACE(("udf_read_stat: st_dev = %d, st_ino = %d, st_blksize = %d\n",
+	TRACE(("udf_read_stat: st_dev = %ld, st_ino = %Ld, st_blksize = %d\n",
 		stat->st_dev, stat->st_ino, stat->st_blksize));
 
 	stat->st_uid = icb->Uid();
@@ -240,7 +240,7 @@ udf_read_stat(fs_volume *_volume, fs_vnode *node, struct stat *stat)
 	stat->st_atime = icb->AccessTime();
 	stat->st_mtime = stat->st_ctime = stat->st_crtime = icb->ModificationTime();
 
-	TRACE(("udf_read_stat: mode = 0x%lx, st_ino: %Ld\n", stat->st_mode,
+	TRACE(("udf_read_stat: mode = 0x%x, st_ino: %Ld\n", stat->st_mode,
 		stat->st_ino));
 
 	return B_OK;

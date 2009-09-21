@@ -5,9 +5,12 @@
 #ifndef _UDF_UTILS_H
 #define _UDF_UTILS_H
 
+#include <SupportDefs.h>
+
 /*! \file Utils.h - Miscellaneous Udf utility functions. */
 
-#include "UdfStructures.h"
+class timestamp;
+struct long_address;
 
 const char		*bool_to_string(bool value);
 uint16			calculate_crc(uint8 *data, uint16 length);

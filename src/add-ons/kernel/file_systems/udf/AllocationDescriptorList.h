@@ -146,7 +146,7 @@ AllocationDescriptorList<Accessor>::FindExtent(off_t start,
 
 
 template<class Accessor>
-AllocationDescriptorList<Accessor>::Descriptor*
+AllocationDescriptorList<class Accessor>::Descriptor*
 AllocationDescriptorList<Accessor>::_CurrentDescriptor() const
 {
 	TRACE(("AllocationDescriptorList<>::_CurrentDescriptor:\n"

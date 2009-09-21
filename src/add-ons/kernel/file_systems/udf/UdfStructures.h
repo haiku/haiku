@@ -13,6 +13,7 @@
 #include <SupportDefs.h>
 
 #include "UdfDebug.h"
+#include "Utils.h"
 
 #include "Array.h"
 
@@ -265,13 +266,13 @@ public:
 	static const int kIdentifierLength = 23;
 	static const int kIdentifierSuffixLength = 8;
 
-	entity_id(uint8 flags = 0, char *identifier = NULL,
+	entity_id(uint8 flags = 0, const char *identifier = NULL,
 	          uint8 *identifier_suffix = NULL);
-	entity_id(uint8 flags, char *identifier,
+	entity_id(uint8 flags, const char *identifier,
 	          const udf_id_suffix &suffix);
-	entity_id(uint8 flags, char *identifier,
+	entity_id(uint8 flags, const char *identifier,
 	          const implementation_id_suffix &suffix);
-	entity_id(uint8 flags, char *identifier,
+	entity_id(uint8 flags, const char *identifier,
 	          const domain_id_suffix &suffix);
 	
 	void dump() const;
