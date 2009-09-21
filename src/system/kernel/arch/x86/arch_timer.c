@@ -62,33 +62,50 @@ arch_timer_clear_hardware_timer(void)
 }
 
 
+static void
+sort_timers(timer_info *timers[], int numTimers)
+{
+	int size;
+	timer_info *tempPtr;
+	int max = 0;	
+	int i = 0;
+	
+	for (size = numTimers; size > 1; size--) {
+		for (i = 0; i < size; i++) {
+			if (timers[i]->get_priority() > timers[max]->get_priority())
+				max = i;
+		}
+		tempPtr = timers[max];
+		timers[max] = timers[size - 1];
+		timers[size - 1] = tempPtr;		
+	}
+#if 0
+	for (i = 0; i < numTimers; i++) {
+		dprintf("timer[%d]: prio %d\n", i, timers[i]->get_priority());
+	}
+#endif
+}
+
+
 int
 arch_init_timer(kernel_args *args)
 {
 	int i = 0;
-	int bestPriority = -1;
 	timer_info *timer = NULL;
-	cpu_status state = disable_interrupts();
+	cpu_status state;
+
+	sort_timers(sTimers, (sizeof(sTimers) / sizeof(sTimers[0])) - 1);
+
+	state = disable_interrupts();
 
 	for (i = 0; (timer = sTimers[i]) != NULL; i++) {
-		int priority = timer->get_priority();
-
-		if (priority < bestPriority) {
-			TRACE(("arch_init_timer: Skipping %s because there is a higher priority timer (%s) initialized.\n", timer->name, sTimer->name));
-			continue;
-		}
-
-		if (timer->init(args) != B_OK) {
+		if (timer->init(args) == B_OK) {
 			TRACE(("arch_init_timer: %s failed init. Skipping.\n", timer->name));
-			continue;
-		}
-
-		if (priority > bestPriority) {
-			bestPriority = priority;
-			sTimer = timer;
-			TRACE(("arch_init_timer: %s is now best timer module with prio %d.\n", timer->name, bestPriority));
+			break;
 		}
 	}
+
+	sTimer = timer;
 
 	if (sTimer != NULL) {
 		dprintf("arch_init_timer: using %s timer.\n", sTimer->name);
