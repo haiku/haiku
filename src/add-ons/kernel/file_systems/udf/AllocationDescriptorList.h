@@ -146,7 +146,7 @@ AllocationDescriptorList<Accessor>::FindExtent(off_t start,
 
 
 template<class Accessor>
-AllocationDescriptorList<Accessor>::Descriptor*
+typename AllocationDescriptorList<Accessor>::Descriptor*
 AllocationDescriptorList<Accessor>::_CurrentDescriptor() const
 {
 	TRACE(("AllocationDescriptorList<>::_CurrentDescriptor:\n"
@@ -227,11 +227,11 @@ AllocationDescriptorList<Accessor>::_Rewind()
 
 
 template<class Accessor>
-AllocationDescriptorList<Accessor>::Descriptor*
+typename AllocationDescriptorList<Accessor>::Descriptor*
 AllocationDescriptorList<Accessor>::_DescriptorArray() const
 {
 	return fReadFromIcb ? fIcbDescriptors
-		: (AllocationDescriptorList<Accessor>::Descriptor *)
+		: (typename AllocationDescriptorList<Accessor>::Descriptor *)
 			fAdditionalDescriptors.Block();
 }
 
