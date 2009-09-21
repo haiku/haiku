@@ -10,10 +10,12 @@
 #include "APRView.h"
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <Messenger.h>
 #include <Path.h>
 #include <SpaceLayoutItem.h>
@@ -26,6 +28,8 @@
 #include "ColorWhichItem.h"
 #include "ColorSet.h"
 
+
+#define TR_CONTEXT "Colors tab"
 
 #define COLOR_DROPPED 'cldp'
 #define DECORATOR_CHANGED 'dcch'
@@ -80,7 +84,7 @@ APRView::APRView(const char *name, uint32 flags)
 	
 	for (int32 i = 0; i < color_description_count(); i++) {
 		const ColorDescription& description = *get_color_description(i); 
-		const char* text = description.text;
+		const char* text = TR(description.text);
 		color_which which = description.which;
 		fAttrList->AddItem(new ColorWhichItem(text, which));
 	}

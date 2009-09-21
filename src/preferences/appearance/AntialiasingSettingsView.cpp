@@ -85,20 +85,20 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	// antialiasing menu
 	_BuildAntialiasingMenu();
 	fAntialiasingMenuField = new BMenuField("antialiasing",
-		"Anti-aliasing type:", fAntialiasingMenu, NULL);
+		TR("Anti-aliasing type:"), fAntialiasingMenu, NULL);
 
 	// "average weight" in subpixel filtering
 	fAverageWeightControl = new BSlider("averageWeightControl",
-		"Reduce colored edges filter strength:",
+		TR("Reduce colored edges filter strength:"),
 		new BMessage(kMsgSetAverageWeight), 0, 255, B_HORIZONTAL);
-	fAverageWeightControl->SetLimitLabels("Off", "Strong");
+	fAverageWeightControl->SetLimitLabels(TR("Off"), TR("Strong"));
 	fAverageWeightControl->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fAverageWeightControl->SetHashMarkCount(255 / 15);
 	fAverageWeightControl->SetEnabled(false);
 
 	// hinting menu
 	_BuildHintingMenu();
-	fHintingMenuField = new BMenuField("hinting", "Glyph hinting:",
+	fHintingMenuField = new BMenuField("hinting", TR("Glyph hinting:"),
 		fHintingMenu, NULL);
 
 #ifdef DISABLE_HINTING_CONTROL
@@ -116,11 +116,11 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	BTextView* subpixelAntialiasingDisabledLabel = new BTextView(
 		textBounds, "unavailable label", textBounds, &infoFont, &infoColor,
 		B_FOLLOW_NONE, B_WILL_DRAW | B_SUPPORTS_LAYOUT);
-	subpixelAntialiasingDisabledLabel->SetText("Subpixel based anti-aliasing "
+	subpixelAntialiasingDisabledLabel->SetText(TR("Subpixel based anti-aliasing "
 		"in combination with glyph hinting is not available in this build of "
 		"Haiku to avoid possible patent issues. To enable this feature, you "
 		"have to build Haiku yourself and enable certain options in the "
-		"libfreetype configuration header.");
+		"libfreetype configuration header."));
 	subpixelAntialiasingDisabledLabel->SetViewColor(
 		ui_color(B_PANEL_BACKGROUND_COLOR));
 	subpixelAntialiasingDisabledLabel->MakeEditable(false);
@@ -227,7 +227,7 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 void
 AntialiasingSettingsView::_BuildAntialiasingMenu()
 {
-	fAntialiasingMenu = new BPopUpMenu("Antialiasing menu");
+	fAntialiasingMenu = new BPopUpMenu(TR("Antialiasing menu"));
 
 	BMessage* message = new BMessage(kMsgSetAntialiasing);
 	message->AddBool("antialiasing", false);
@@ -248,7 +248,7 @@ AntialiasingSettingsView::_BuildAntialiasingMenu()
 void
 AntialiasingSettingsView::_BuildHintingMenu()
 {
-	fHintingMenu = new BPopUpMenu("Hinting menu");
+	fHintingMenu = new BPopUpMenu(TR("Hinting menu"));
 
 	BMessage* message = new BMessage(kMsgSetHinting);
 	message->AddInt8("hinting", HINTING_MODE_OFF);

@@ -9,45 +9,49 @@
  */
 
 #include <stdio.h>
-#include <InterfaceDefs.h>
-#include <Message.h>
-#include <File.h>
-#include <Entry.h>
+#include <Catalog.h>
 #include <Directory.h>
+#include <Entry.h>
+#include <File.h>
+#include <InterfaceDefs.h>
+#include <Locale.h>
+#include <Message.h>
 #include <String.h>
 #include "ColorSet.h"
 
+#define TR_CONTEXT "Colors tab"
 
 static ColorDescription sColorDescriptionTable[] =
 {
-	{ B_PANEL_BACKGROUND_COLOR, "Panel Background" },
-	{ B_PANEL_TEXT_COLOR, "Panel Text" },
-	{ B_DOCUMENT_BACKGROUND_COLOR, "Document Background" },
-	{ B_DOCUMENT_TEXT_COLOR, "Document Text" },
-	{ B_CONTROL_BACKGROUND_COLOR, "Control Background" },
-	{ B_CONTROL_TEXT_COLOR, "Control Text" },
-	{ B_CONTROL_BORDER_COLOR, "Control Border" },
-	{ B_CONTROL_HIGHLIGHT_COLOR, "Control Highlight" },
-	{ B_NAVIGATION_BASE_COLOR, "Navigation Base" },
-	{ B_NAVIGATION_PULSE_COLOR, "Navigation Pulse" },
-	{ B_SHINE_COLOR, "Shine" },
-	{ B_SHADOW_COLOR, "Shadow" },
-	{ B_MENU_BACKGROUND_COLOR, "Menu Background" },
-	{ B_MENU_SELECTED_BACKGROUND_COLOR, "Selected Menu Item Background" },
-	{ B_MENU_ITEM_TEXT_COLOR, "Menu Item Text" },
-	{ B_MENU_SELECTED_ITEM_TEXT_COLOR, "Selected Menu Item Text" },
-	{ B_MENU_SELECTED_BORDER_COLOR, "Selected Menu Item Border" },
-	{ B_TOOL_TIP_BACKGROUND_COLOR, "Tooltip Background" },
-	{ B_TOOL_TIP_TEXT_COLOR, "Tooltip Text" },
-	{ B_SUCCESS_COLOR, "Success" },
-	{ B_FAILURE_COLOR, "Failure" },
-	{ B_WINDOW_TAB_COLOR, "Window Tab" },
-	{ B_WINDOW_TEXT_COLOR, "Window Tab Text" },
-	{ B_WINDOW_INACTIVE_TAB_COLOR, "Inactive Window Tab" },
-	{ B_WINDOW_INACTIVE_TEXT_COLOR, "Inactive Window Tab Text" }
+	{ B_PANEL_BACKGROUND_COLOR, TR_MARK("Panel Background") },
+	{ B_PANEL_TEXT_COLOR, TR_MARK("Panel Text") },
+	{ B_DOCUMENT_BACKGROUND_COLOR, TR_MARK("Document Background") },
+	{ B_DOCUMENT_TEXT_COLOR, TR_MARK("Document Text") },
+	{ B_CONTROL_BACKGROUND_COLOR, TR_MARK("Control Background") },
+	{ B_CONTROL_TEXT_COLOR, TR_MARK("Control Text") },
+	{ B_CONTROL_BORDER_COLOR, TR_MARK("Control Border") },
+	{ B_CONTROL_HIGHLIGHT_COLOR, TR_MARK("Control Highlight") },
+	{ B_NAVIGATION_BASE_COLOR, TR_MARK("Navigation Base") },
+	{ B_NAVIGATION_PULSE_COLOR, TR_MARK("Navigation Pulse") },
+	{ B_SHINE_COLOR, TR_MARK("Shine") },
+	{ B_SHADOW_COLOR, TR_MARK("Shadow") },
+	{ B_MENU_BACKGROUND_COLOR, TR_MARK("Menu Background") },
+	{ B_MENU_SELECTED_BACKGROUND_COLOR, TR_MARK("Selected Menu Item Background") },
+	{ B_MENU_ITEM_TEXT_COLOR, TR_MARK("Menu Item Text") },
+	{ B_MENU_SELECTED_ITEM_TEXT_COLOR, TR_MARK("Selected Menu Item Text") },
+	{ B_MENU_SELECTED_BORDER_COLOR, TR_MARK("Selected Menu Item Border") },
+	{ B_TOOL_TIP_BACKGROUND_COLOR, TR_MARK("Tooltip Background") },
+	{ B_TOOL_TIP_TEXT_COLOR, TR_MARK("Tooltip Text") },
+	{ B_SUCCESS_COLOR, TR_MARK("Success") },
+	{ B_FAILURE_COLOR, TR_MARK("Failure") },
+	{ B_WINDOW_TAB_COLOR, TR_MARK("Window Tab") },
+	{ B_WINDOW_TEXT_COLOR, TR_MARK("Window Tab Text") },
+	{ B_WINDOW_INACTIVE_TAB_COLOR, TR_MARK("Inactive Window Tab") },
+	{ B_WINDOW_INACTIVE_TEXT_COLOR, TR_MARK("Inactive Window Tab Text") }
 };
 
-const int32 sColorDescriptionCount = sizeof(sColorDescriptionTable) / sizeof(ColorDescription);
+const int32 sColorDescriptionCount = sizeof(sColorDescriptionTable)
+	/ sizeof(ColorDescription);
 
 const ColorDescription*
 get_color_description(int32 index)

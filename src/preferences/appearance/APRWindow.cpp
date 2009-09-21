@@ -39,8 +39,8 @@ APRWindow::APRWindow(BRect frame)
 
 	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
 
-	fAntialiasingSettings = new AntialiasingSettingsView("Antialiasing");
-	fColorsView = new APRView("Colors", B_WILL_DRAW);
+	fAntialiasingSettings = new AntialiasingSettingsView(TR("Antialiasing"));
+	fColorsView = new APRView(TR("Colors"), B_WILL_DRAW);
 
 	tabView->AddTab(fColorsView);
 	tabView->AddTab(fAntialiasingSettings);
