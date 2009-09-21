@@ -513,12 +513,7 @@ BLocaleRoster::GetInstalledLanguages(BMessage *languages) const
 
 	// Loop over the strings and add them to an std::set to remove duplicates
 	for (i = 0; i < localeCount; i++) {
-		UnicodeString ICULanguageName;
-		BString LanguageName;
-		BStringByteSink StringConverter(&LanguageName);
-		icuLocaleList[i].getDisplayLanguage(ICULanguageName);
-		ICULanguageName.toUTF8(StringConverter);
-		languageSet.insert(LanguageName);
+		languageSet.insert(icuLocaleList[i].getLanguage());
 	}
 #endif
 
