@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src tools locale ;
 
+UsePublicHeaders locale ;
 UsePrivateHeaders locale ;
 UsePrivateHeaders shared ;
 
@@ -17,9 +18,6 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers build os app ] : true ;
 	UseHeaders [ FDirName $(HAIKU_TOP) headers build os interface ] : true ;
 	UseHeaders [ FDirName $(HAIKU_TOP) headers build os kernel ] : true ;
-	UseHeaders [ FDirName $(HAIKU_TOP) headers private locale ] : true ;
-	UseHeaders [ FDirName $(HAIKU_TOP) headers private shared ] : true ;
-	UseHeaders [ FDirName $(HAIKU_TOP) headers os locale ] : true ;
 	UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
 	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 }
