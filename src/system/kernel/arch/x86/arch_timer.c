@@ -99,10 +99,8 @@ arch_init_timer(kernel_args *args)
 	state = disable_interrupts();
 
 	for (i = 0; (timer = sTimers[i]) != NULL; i++) {
-		if (timer->init(args) == B_OK) {
-			TRACE(("arch_init_timer: %s failed init. Skipping.\n", timer->name));
+		if (timer->init(args) != B_OK)
 			break;
-		}
 	}
 
 	sTimer = timer;
