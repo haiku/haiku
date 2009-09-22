@@ -5,6 +5,7 @@
  * Authors:
  *		Jérôme Duval, korli@users.berlios.de
  *		Philippe Houdoin, philippe.houdoin@free.fr
+ *		Artur Wyszynski, harakash@gmail.com
  */
 /*
  * Mesa 3-D graphics library
@@ -13,14 +14,15 @@
  * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
  */
 
-#define CALLED() 			//printf("CALLED %s\n",__PRETTY_FUNCTION__)
-
 #include "MesaSoftwareRenderer.h"
 
+#include <stdio.h>
+#include <string.h>
 #include <Autolock.h>
 #include <DirectWindowPrivate.h>
 #include <GraphicsDefs.h>
 #include <Screen.h>
+
 
 extern "C" {
 #include "extensions.h"
@@ -38,6 +40,8 @@ extern "C" {
 #include "tnl/t_pipeline.h"
 #include "vbo/vbo.h"
 
+
+#define CALLED() //printf("CALLED %s\n",__PRETTY_FUNCTION__)
 
 #if defined(USE_X86_ASM)
 #include "x86/common_x86_asm.h"
@@ -69,6 +73,8 @@ extern const char * color_space_name(color_space space);
 /**********************************************************************/
 /*****        Read/write spans/arrays of pixels                   *****/
 /**********************************************************************/
+
+extern "C" {
 
 /* 32-bit RGBA */
 #define NAME(PREFIX) PREFIX##_RGBA32
@@ -191,6 +197,8 @@ extern const char * color_space_name(color_space space);
 	DST[ACOMP] = 0xff
 #include "swrast/s_spantemp.h"
 
+}
+
 extern "C" _EXPORT BGLRenderer*
 instantiate_gl_renderer(BGLView* view, ulong options,
 	BGLDispatcher* dispatcher)
@@ -209,6 +217,8 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	fContext(NULL),
 	fVisual(NULL),
 	fFrameBuffer(NULL),
+	fFrontRenderBuffer(NULL),
+	fBackRenderBuffer(NULL),
 	fColorSpace(B_NO_COLOR_SPACE)
 {
 	CALLED();
@@ -220,12 +230,14 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 
 	fClearIndex = 0;
 
+	fColorSpace = BScreen(GLView()->Window()).ColorSpace();
+
 	// We force single buffering for the time being
 	//options &= !BGL_DOUBLE;
 
 	const GLboolean rgbFlag = ((options & BGL_INDEX) == 0);
 	const GLboolean alphaFlag = ((options & BGL_ALPHA) == BGL_ALPHA);
-	const GLboolean dblFlag = false; //((options & BGL_DOUBLE) == BGL_DOUBLE);
+	const GLboolean dblFlag = ((options & BGL_DOUBLE) == BGL_DOUBLE);
 	const GLboolean stereoFlag = false;
 	const GLint depth = (options & BGL_DEPTH) ? 16 : 0;
 	const GLint stencil = (options & BGL_STENCIL) ? 8 : 0;
@@ -246,14 +258,12 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	// Initialize device driver function table
 	_mesa_init_driver_functions(&functions);
 
-	functions.GetString 	= GetString;
-	functions.UpdateState 	= UpdateState;
-	//functions.Clear 		= Clear;
-	//functions.ClearIndex 	= ClearIndex;
-	//functions.ClearColor 	= ClearColor;
-	functions.Error			= Error;
-	functions.Viewport      = Viewport;
-	functions.Flush		= Flush;
+	functions.GetString 	= _GetString;
+	functions.UpdateState 	= _UpdateState;
+	functions.GetBufferSize = NULL;
+	functions.Error			= _Error;
+	functions.Viewport		= _Viewport;
+	functions.Flush			= _Flush;
 
 	// create core context
 	fContext = _mesa_create_context(fVisual, NULL, &functions, this);
@@ -262,33 +272,12 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 		return;
 	}
 
-	// create core framebuffer
-	fFrameBuffer = _mesa_create_framebuffer(fVisual);
-
 	/* Initialize the software rasterizer and helper modules. */
 	_swrast_CreateContext(fContext);
 	_vbo_CreateContext(fContext);
 	_tnl_CreateContext(fContext);
 	_swsetup_CreateContext(fContext);
 	_swsetup_Wakeup(fContext);
-
-	fRenderBuffer = _mesa_new_renderbuffer(fContext, BUFFER_FRONT_LEFT);
-
-	fRenderBuffer->InternalFormat = GL_RGBA;
-	fRenderBuffer->_BaseFormat = GL_RGBA;
-	fRenderBuffer->DataType = GL_UNSIGNED_BYTE;
-	fRenderBuffer->Data = NULL;
-	fRenderBuffer->AllocStorage = RenderbufferStorage;
-
-	_mesa_add_renderbuffer(fFrameBuffer, BUFFER_FRONT_LEFT, fRenderBuffer);
-
-	_mesa_add_soft_renderbuffers(fFrameBuffer,
-		GL_FALSE,
-		fVisual->haveDepthBuffer,
-		fVisual->haveStencilBuffer,
-		fVisual->haveAccumBuffer,
-		alphaFlag,
-		GL_FALSE);
 
 	// Use default TCL pipeline
 	TNL_CONTEXT(fContext)->Driver.RunPipeline = _tnl_run_pipeline;
@@ -300,13 +289,60 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	_mesa_enable_2_0_extensions(fContext);
 	_mesa_enable_2_1_extensions(fContext);
 
+	// create core framebuffer
+	fFrameBuffer = (struct msr_framebuffer*)_mesa_calloc(
+		sizeof(*fFrameBuffer));
+	_mesa_initialize_framebuffer(&fFrameBuffer->Base, fVisual);
+
+	fFrontRenderBuffer = (struct msr_renderbuffer*)_mesa_calloc(
+		sizeof(*fFrontRenderBuffer));
+	_mesa_init_renderbuffer(&fFrontRenderBuffer->Base, 0);
+
+	fFrontRenderBuffer->Base.AllocStorage = _FrontRenderbufferStorage;
+	fFrontRenderBuffer->Base.Data = NULL;
+	fFrontRenderBuffer->Base.InternalFormat = GL_RGBA;
+	fFrontRenderBuffer->Base._BaseFormat = GL_RGBA;
+	fFrontRenderBuffer->Base.DataType = GL_UNSIGNED_BYTE;
+	fFrontRenderBuffer->Base.RedBits   = 8 * sizeof(GLubyte);
+	fFrontRenderBuffer->Base.GreenBits = 8 * sizeof(GLubyte);
+	fFrontRenderBuffer->Base.BlueBits  = 8 * sizeof(GLubyte);
+	fFrontRenderBuffer->Base.AlphaBits = 8 * sizeof(GLubyte);
+	_SetSpanFuncs(fFrontRenderBuffer, fColorSpace);
+	_mesa_add_renderbuffer(&fFrameBuffer->Base, BUFFER_FRONT_LEFT,
+		&fFrontRenderBuffer->Base);
+
+	if (dblFlag) {
+		fBackRenderBuffer = (struct msr_renderbuffer*)_mesa_calloc(
+			sizeof(*fBackRenderBuffer));
+		_mesa_init_renderbuffer(&fBackRenderBuffer->Base, 0);
+
+		fBackRenderBuffer->Base.AllocStorage = _BackRenderbufferStorage;
+		fBackRenderBuffer->Base.Data = NULL;
+		fBackRenderBuffer->Base.Delete = _DeleteBackBuffer;
+		fBackRenderBuffer->Base.InternalFormat = GL_RGBA;
+		fBackRenderBuffer->Base._BaseFormat = GL_RGBA;
+		fBackRenderBuffer->Base.DataType = GL_UNSIGNED_BYTE;
+		fBackRenderBuffer->Base.RedBits   = 8 * sizeof(GLubyte);
+		fBackRenderBuffer->Base.GreenBits = 8 * sizeof(GLubyte);
+		fBackRenderBuffer->Base.BlueBits  = 8 * sizeof(GLubyte);
+		fBackRenderBuffer->Base.AlphaBits = 8 * sizeof(GLubyte);
+		_SetSpanFuncs(fBackRenderBuffer, fColorSpace);
+		_mesa_add_renderbuffer(&fFrameBuffer->Base, BUFFER_BACK_LEFT,
+			&fBackRenderBuffer->Base);
+	}
+
+	_mesa_add_soft_renderbuffers(&fFrameBuffer->Base, GL_FALSE,
+		fVisual->haveDepthBuffer, fVisual->haveStencilBuffer,
+		fVisual->haveAccumBuffer, alphaFlag, GL_FALSE);
+
 	BRect bounds = view->Bounds();
 	fWidth = fNewWidth = (GLint)bounds.Width();
 	fHeight = fNewHeight = (GLint)bounds.Height();
-	
+
 	// some stupid applications (Quake2) don't even think about calling LockGL()
 	// before using glGetString and its glGet*() friends...
 	// so make sure there is at least a valid context.
+
 	if (!_mesa_get_current_context()) {
 		LockGL();
 		// not needed, we don't have a looper yet: UnlockLooper();
@@ -316,12 +352,16 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 MesaSoftwareRenderer::~MesaSoftwareRenderer()
 {
 	CALLED();
+	_swsetup_DestroyContext(fContext);
+	_swrast_DestroyContext(fContext);
+	_tnl_DestroyContext(fContext);
+	_vbo_DestroyContext(fContext);
 	_mesa_destroy_visual(fVisual);
-	_mesa_destroy_framebuffer(fFrameBuffer);
+	_mesa_destroy_framebuffer(&fFrameBuffer->Base);
 	_mesa_destroy_context(fContext);
 
 	free(fInfo);
-	
+
 	delete fBitmap;
 }
 
@@ -332,85 +372,27 @@ MesaSoftwareRenderer::LockGL()
 	CALLED();
 	BGLRenderer::LockGL();
 
-	_mesa_make_current(fContext, fFrameBuffer, fFrameBuffer);
+	_mesa_make_current(fContext, &fFrameBuffer->Base, &fFrameBuffer->Base);
 
 	color_space cs = B_RGBA32;
-	
+
 	BAutolock lock(fInfoLocker);
 	if (fDirectModeEnabled && fInfo != NULL) {
 		cs = BScreen(GLView()->Window()).ColorSpace();
-		fNewWidth = fInfo->window_bounds.right 
+		fNewWidth = fInfo->window_bounds.right
 			- fInfo->window_bounds.left + 1;
-		fNewHeight = fInfo->window_bounds.bottom 
+		fNewHeight = fInfo->window_bounds.bottom
 			- fInfo->window_bounds.top + 1;
 	}
 
-	if (fBitmap && cs == fColorSpace && fNewWidth == fWidth 
+	if (fBitmap && cs == fColorSpace && fNewWidth == fWidth
 		&& fNewHeight == fHeight)
 		return;
 
 	if (cs != fColorSpace) {
 		fColorSpace = cs;
-		switch (fColorSpace) {
-			case B_RGBA32:
-				fRenderBuffer->GetRow = get_row_RGBA32;
-				fRenderBuffer->GetValues = get_values_RGBA32;
-				fRenderBuffer->PutRow = put_row_RGBA32;
-				fRenderBuffer->PutRowRGB = put_row_rgb_RGBA32;
-				fRenderBuffer->PutMonoRow = put_mono_row_RGBA32;
-				fRenderBuffer->PutValues = put_values_RGBA32;
-				fRenderBuffer->PutMonoValues = put_mono_values_RGBA32;
-				break;
-			case B_RGB32:
-				fRenderBuffer->GetRow = get_row_RGB32;
-				fRenderBuffer->GetValues = get_values_RGB32;
-				fRenderBuffer->PutRow = put_row_RGB32;
-				fRenderBuffer->PutRowRGB = put_row_rgb_RGB32;
-				fRenderBuffer->PutMonoRow = put_mono_row_RGB32;
-				fRenderBuffer->PutValues = put_values_RGB32;
-				fRenderBuffer->PutMonoValues = put_mono_values_RGB32;
-				break;
-			case B_RGB24:
-				fRenderBuffer->GetRow = get_row_RGB24;
-				fRenderBuffer->GetValues = get_values_RGB24;
-				fRenderBuffer->PutRow = put_row_RGB24;
-				fRenderBuffer->PutRowRGB = put_row_rgb_RGB24;
-				fRenderBuffer->PutMonoRow = put_mono_row_RGB24;
-				fRenderBuffer->PutValues = put_values_RGB24;
-				fRenderBuffer->PutMonoValues = put_mono_values_RGB24;
-				break;
-			case B_RGB16:
-				fRenderBuffer->GetRow = get_row_RGB16;
-				fRenderBuffer->GetValues = get_values_RGB16;
-				fRenderBuffer->PutRow = put_row_RGB16;
-				fRenderBuffer->PutRowRGB = put_row_rgb_RGB16;
-				fRenderBuffer->PutMonoRow = put_mono_row_RGB16;
-				fRenderBuffer->PutValues = put_values_RGB16;
-				fRenderBuffer->PutMonoValues = put_mono_values_RGB16;
-				break;
-			case B_RGB15:
-				fRenderBuffer->GetRow = get_row_RGB15;
-				fRenderBuffer->GetValues = get_values_RGB15;
-				fRenderBuffer->PutRow = put_row_RGB15;
-				fRenderBuffer->PutRowRGB = put_row_rgb_RGB15;
-				fRenderBuffer->PutMonoRow = put_mono_row_RGB15;
-				fRenderBuffer->PutValues = put_values_RGB15;
-				fRenderBuffer->PutMonoValues = put_mono_values_RGB15;
-				break;
-			case B_CMAP8:
-				fRenderBuffer->GetRow = get_row_CMAP8;
-				fRenderBuffer->GetValues = get_values_CMAP8;
-				fRenderBuffer->PutRow = put_row_CMAP8;
-				fRenderBuffer->PutRowRGB = put_row_rgb_CMAP8;
-				fRenderBuffer->PutMonoRow = put_mono_row_CMAP8;
-				fRenderBuffer->PutValues = put_values_CMAP8;
-				fRenderBuffer->PutMonoValues = put_mono_values_CMAP8;
-				break;
-			default:
-				fprintf(stderr, "unsupported screen color space %d\n", fColorSpace);
-				debugger("unsupported OpenGL color space");
-				break;
-		}
+		_SetSpanFuncs(fFrontRenderBuffer, fColorSpace);
+		_SetSpanFuncs(fBackRenderBuffer, fColorSpace);
 	}
 
 	fWidth = fNewWidth;
@@ -437,10 +419,9 @@ MesaSoftwareRenderer::SwapBuffers(bool VSync)
 {
 	CALLED();
 
-	// TODO: support VSync	
-
 	if (!fBitmap)
 		return;
+
 	if (fVisual->doubleBufferMode)
 		_mesa_notifySwapBuffers(fContext);
 
@@ -471,7 +452,7 @@ MesaSoftwareRenderer::SwapBuffers(bool VSync)
 			* fInfo->bytes_per_row + clip->left * bytesPerPixel;
 		uint8 *b = (uint8 *)fBitmap->Bits()
 			+ (clip->top - fInfo->window_bounds.top) * bytesPerRow
-			+ (clip->left - fInfo->window_bounds.left) 
+			+ (clip->left - fInfo->window_bounds.left)
 				* bytesPerPixel;
 
 		for (int y = 0; y < height; y++) {
@@ -479,6 +460,11 @@ MesaSoftwareRenderer::SwapBuffers(bool VSync)
 			p += fInfo->bytes_per_row;
 			b += bytesPerRow;
 		}
+	}
+
+	if (VSync) {
+		BScreen screen(GLView()->Window());
+		screen.WaitForRetrace();
 	}
 }
 
@@ -489,7 +475,7 @@ MesaSoftwareRenderer::Draw(BRect updateRect)
 	CALLED();
 	if (fBitmap && (!fDirectModeEnabled || (fInfo == NULL)))
 		GLView()->DrawBitmap(fBitmap, updateRect, updateRect);
-	
+
 }
 
 
@@ -578,7 +564,7 @@ MesaSoftwareRenderer::EnableDirectMode(bool enabled)
 
 void
 MesaSoftwareRenderer::DirectConnected(direct_buffer_info *info)
-{	
+{
 	// TODO: I'm not sure we need to do this: BGLView already
 	// keeps a local copy of the direct_buffer_info passed by
 	// BDirectWindow::DirectConnected().
@@ -594,7 +580,7 @@ MesaSoftwareRenderer::DirectConnected(direct_buffer_info *info)
 		free(fInfo);
 		fInfo = NULL;
 	}
-		
+
 }
 
 
@@ -622,8 +608,12 @@ MesaSoftwareRenderer::_AllocateBitmap()
 			+ i * fBitmap->BytesPerRow());
 	}
 
-	_mesa_resize_framebuffer(fContext, fFrameBuffer, fWidth, fHeight);
-	fRenderBuffer->Data = fBitmap->Bits();
+	_mesa_resize_framebuffer(fContext, &fFrameBuffer->Base, fWidth, fHeight);
+	fFrontRenderBuffer->Base.Data = fBitmap->Bits();
+	fFrontRenderBuffer->Size = fBitmap->BitsLength();
+	fBackRenderBuffer->Size = fBitmap->BitsLength();
+	fFrameBuffer->Width = fWidth;
+	fFrameBuffer->Height = fHeight;
 }
 
 
@@ -631,7 +621,7 @@ MesaSoftwareRenderer::_AllocateBitmap()
 
 
 void
-MesaSoftwareRenderer::Error(GLcontext *ctx)
+MesaSoftwareRenderer::_Error(GLcontext *ctx)
 {
 	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	if (mr && mr->GLView())
@@ -640,7 +630,7 @@ MesaSoftwareRenderer::Error(GLcontext *ctx)
 
 
 const GLubyte *
-MesaSoftwareRenderer::GetString(GLcontext *ctx, GLenum name)
+MesaSoftwareRenderer::_GetString(GLcontext *ctx, GLenum name)
 {
 	switch (name) {
 		case GL_RENDERER: {
@@ -707,17 +697,22 @@ MesaSoftwareRenderer::GetString(GLcontext *ctx, GLenum name)
 
 
 void
-MesaSoftwareRenderer::Viewport(GLcontext *ctx, GLint x, GLint y, GLsizei w,
+MesaSoftwareRenderer::_Viewport(GLcontext *ctx, GLint x, GLint y, GLsizei w,
 	GLsizei h)
 {
 	CALLED();
-	// poll for window size change and realloc software Z/stencil/etc if needed
-	_mesa_ResizeBuffersMESA();
+
+	GLframebuffer *draw = ctx->WinSysDrawBuffer;
+	GLframebuffer *read = ctx->WinSysReadBuffer;
+	struct msr_framebuffer *msr = msr_framebuffer(draw);
+
+	_mesa_resize_framebuffer(ctx, draw, msr->Width, msr->Height);
+	_mesa_resize_framebuffer(ctx, read, msr->Width, msr->Height);
 }
 
 
 void
-MesaSoftwareRenderer::UpdateState(GLcontext *ctx, GLuint new_state)
+MesaSoftwareRenderer::_UpdateState(GLcontext *ctx, GLuint new_state)
 {
 	if (!ctx)
 		return;
@@ -731,44 +726,7 @@ MesaSoftwareRenderer::UpdateState(GLcontext *ctx, GLuint new_state)
 
 
 void
-MesaSoftwareRenderer::ClearIndex(GLcontext *ctx, GLuint index)
-{
-	CALLED();
-
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	mr->fClearIndex = index;
-}
-
-
-void
-MesaSoftwareRenderer::ClearColor(GLcontext *ctx, const GLfloat color[4])
-{
-	CALLED();
-
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	CLAMPED_FLOAT_TO_CHAN(mr->fClearColor[BE_RCOMP], color[0]);
-	CLAMPED_FLOAT_TO_CHAN(mr->fClearColor[BE_GCOMP], color[1]);
-	CLAMPED_FLOAT_TO_CHAN(mr->fClearColor[BE_BCOMP], color[2]);
-	CLAMPED_FLOAT_TO_CHAN(mr->fClearColor[BE_ACOMP], color[3]);
-	assert(mr->GLView());
-}
-
-
-void
-MesaSoftwareRenderer::Clear(GLcontext *ctx, GLbitfield mask)
-{
-	CALLED();
-	if (mask & BUFFER_BIT_FRONT_LEFT)
-		ClearFront(ctx);
-
-	mask &= ~(BUFFER_BIT_FRONT_LEFT | BUFFER_BIT_BACK_LEFT);
-	if (mask)
-		_swrast_Clear(ctx, mask);
-}
-
-
-void
-MesaSoftwareRenderer::ClearFront(GLcontext *ctx)
+MesaSoftwareRenderer::_ClearFront(GLcontext *ctx)
 {
 	CALLED();
 
@@ -813,23 +771,112 @@ MesaSoftwareRenderer::ClearFront(GLcontext *ctx)
 
 
 GLboolean
-MesaSoftwareRenderer::RenderbufferStorage(GLcontext* ctx,
+MesaSoftwareRenderer::_FrontRenderbufferStorage(GLcontext* ctx,
 	struct gl_renderbuffer* render, GLenum internalFormat,
 	GLuint width, GLuint height)
 {
 	render->Width = width;
 	render->Height = height;
+
+	return GL_TRUE;
+}
+
+
+GLboolean
+MesaSoftwareRenderer::_BackRenderbufferStorage(GLcontext* ctx,
+	struct gl_renderbuffer* render, GLenum internalFormat,
+	GLuint width, GLuint height)
+{
+	struct msr_renderbuffer *mrb = msr_renderbuffer(render);
+	_mesa_free(render->Data);
+	_FrontRenderbufferStorage(ctx, render, internalFormat, width, height);
+	render->Data = _mesa_malloc(mrb->Size);
 	return GL_TRUE;
 }
 
 
 void
-MesaSoftwareRenderer::Flush(GLcontext *ctx)
+MesaSoftwareRenderer::_Flush(GLcontext *ctx)
 {
 	CALLED();
 	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
 	if ((mr->fOptions & BGL_DOUBLE) == 0) {
 		mr->SwapBuffers();
 	}
+}
+
+
+void
+MesaSoftwareRenderer::_SetSpanFuncs(
+	struct msr_renderbuffer* buffer, color_space colorSpace)
+{
+	switch (colorSpace) {
+		case B_RGBA32:
+			buffer->Base.GetRow = get_row_RGBA32;
+			buffer->Base.GetValues = get_values_RGBA32;
+			buffer->Base.PutRow = put_row_RGBA32;
+			buffer->Base.PutRowRGB = put_row_rgb_RGBA32;
+			buffer->Base.PutMonoRow = put_mono_row_RGBA32;
+			buffer->Base.PutValues = put_values_RGBA32;
+			buffer->Base.PutMonoValues = put_mono_values_RGBA32;
+			break;
+		case B_RGB32:
+			buffer->Base.GetRow = get_row_RGB32;
+			buffer->Base.GetValues = get_values_RGB32;
+			buffer->Base.PutRow = put_row_RGB32;
+			buffer->Base.PutRowRGB = put_row_rgb_RGB32;
+			buffer->Base.PutMonoRow = put_mono_row_RGB32;
+			buffer->Base.PutValues = put_values_RGB32;
+			buffer->Base.PutMonoValues = put_mono_values_RGB32;
+			break;
+		case B_RGB24:
+			buffer->Base.GetRow = get_row_RGB24;
+			buffer->Base.GetValues = get_values_RGB24;
+			buffer->Base.PutRow = put_row_RGB24;
+			buffer->Base.PutRowRGB = put_row_rgb_RGB24;
+			buffer->Base.PutMonoRow = put_mono_row_RGB24;
+			buffer->Base.PutValues = put_values_RGB24;
+			buffer->Base.PutMonoValues = put_mono_values_RGB24;
+			break;
+		case B_RGB16:
+			buffer->Base.GetRow = get_row_RGB16;
+			buffer->Base.GetValues = get_values_RGB16;
+			buffer->Base.PutRow = put_row_RGB16;
+			buffer->Base.PutRowRGB = put_row_rgb_RGB16;
+			buffer->Base.PutMonoRow = put_mono_row_RGB16;
+			buffer->Base.PutValues = put_values_RGB16;
+			buffer->Base.PutMonoValues = put_mono_values_RGB16;
+			break;
+		case B_RGB15:
+			buffer->Base.GetRow = get_row_RGB15;
+			buffer->Base.GetValues = get_values_RGB15;
+			buffer->Base.PutRow = put_row_RGB15;
+			buffer->Base.PutRowRGB = put_row_rgb_RGB15;
+			buffer->Base.PutMonoRow = put_mono_row_RGB15;
+			buffer->Base.PutValues = put_values_RGB15;
+			buffer->Base.PutMonoValues = put_mono_values_RGB15;
+			break;
+		case B_CMAP8:
+			buffer->Base.GetRow = get_row_CMAP8;
+			buffer->Base.GetValues = get_values_CMAP8;
+			buffer->Base.PutRow = put_row_CMAP8;
+			buffer->Base.PutRowRGB = put_row_rgb_CMAP8;
+			buffer->Base.PutMonoRow = put_mono_row_CMAP8;
+			buffer->Base.PutValues = put_values_CMAP8;
+			buffer->Base.PutMonoValues = put_mono_values_CMAP8;
+			break;
+		default:
+			fprintf(stderr, "Unsupported screen color space %d\n", fColorSpace);
+			debugger("Unsupported OpenGL color space");
+			break;
+	}
+}
+
+
+void
+MesaSoftwareRenderer::_DeleteBackBuffer(struct gl_renderbuffer* rb)
+{
+	_mesa_free(rb->Data);
+	_mesa_free(rb);
 }
 

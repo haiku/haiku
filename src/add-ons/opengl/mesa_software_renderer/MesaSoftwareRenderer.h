@@ -5,6 +5,7 @@
  * Authors:
  *		Jérôme Duval, korli@users.berlios.de
  * 		Philippe Houdoin, philippe.houdoin@free.fr
+ *		Artur Wyszynski, harakash@gmail.com
  */
 /*
  * Mesa 3-D graphics library
@@ -21,12 +22,38 @@ extern "C" {
 
 #include "context.h"
 
+struct msr_renderbuffer {
+	struct gl_renderbuffer Base;
+	uint32 Size;
+};
+
+
+static INLINE struct msr_renderbuffer*
+msr_renderbuffer(struct gl_renderbuffer* rb)
+{
+	return (struct msr_renderbuffer*)rb;
+}
+
+
+struct msr_framebuffer {
+	struct gl_framebuffer Base;
+	uint32 Width;
+	uint32 Height;
+};
+
+
+static INLINE struct msr_framebuffer*
+msr_framebuffer(struct gl_framebuffer* rb)
+{
+	return (struct msr_framebuffer*)rb;
+}
+
 }
 
 class MesaSoftwareRenderer : public BGLRenderer {
 public:
 								MesaSoftwareRenderer(BGLView* view,
-									ulong bgl_options, 
+									ulong bgl_options,
 									BGLDispatcher* dispatcher);
 		virtual					~MesaSoftwareRenderer();
 
@@ -45,34 +72,38 @@ public:
 		virtual	void			DirectConnected(direct_buffer_info* info);
 
 private:
-		static	void			Error(GLcontext* ctx);
-		static	const GLubyte*	GetString(GLcontext* ctx, GLenum name);
-		static	void			Viewport(GLcontext* ctx, GLint x, GLint y,
+		static	void			_Error(GLcontext* ctx);
+		static	const GLubyte*	_GetString(GLcontext* ctx, GLenum name);
+		static	void			_Viewport(GLcontext* ctx, GLint x, GLint y,
 									GLsizei w, GLsizei h);
-		static	void			UpdateState(GLcontext* ctx, GLuint newState);
-		static	void 			ClearFront(GLcontext* ctx);
-		static	void 			ClearIndex(GLcontext* ctx, GLuint index);
-		static	void 			ClearColor(GLcontext* ctx,
-									const GLfloat color[4]);
-		static	void 			Clear(GLcontext* ctx, GLbitfield mask);
-		static	GLboolean		RenderbufferStorage(GLcontext* ctx,
+		static	void			_UpdateState(GLcontext* ctx, GLuint newState);
+		static	void 			_ClearFront(GLcontext* ctx);
+		static	GLboolean		_FrontRenderbufferStorage(GLcontext* ctx,
 									struct gl_renderbuffer* render,
 									GLenum internalFormat,
 									GLuint width, GLuint height);
-		static void			Flush(GLcontext *ctx);
+		static	GLboolean		_BackRenderbufferStorage(GLcontext* ctx,
+									struct gl_renderbuffer* render,
+									GLenum internalFormat,
+									GLuint width, GLuint height);
+		static void				_Flush(GLcontext *ctx);
+		void					_SetSpanFuncs(struct msr_renderbuffer* buffer,
+									color_space colorSpace);
+		static void				_DeleteBackBuffer(struct gl_renderbuffer* rb);
 
-		void				_AllocateBitmap();
+		void					_AllocateBitmap();
 
 		BBitmap*				fBitmap;
 		bool					fDirectModeEnabled;
-		direct_buffer_info*			fInfo;
+		direct_buffer_info*		fInfo;
 		BLocker					fInfoLocker;
 		ulong					fOptions;
 
 		GLcontext*				fContext;
 		GLvisual*				fVisual;
-		GLframebuffer*			fFrameBuffer;
-		struct gl_renderbuffer*	fRenderBuffer;
+		struct msr_framebuffer*	fFrameBuffer;
+		struct msr_renderbuffer*	fFrontRenderBuffer;
+		struct msr_renderbuffer*	fBackRenderBuffer;
 
 		GLchan 					fClearColor[4];	// buffer clear color
 		GLuint 					fClearIndex;	// buffer clear color index
