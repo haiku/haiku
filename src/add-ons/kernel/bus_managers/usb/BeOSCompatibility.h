@@ -11,6 +11,8 @@
 
 #define IS_USER_ADDRESS(x)		(((uint32)x & 0x80000000) > 0)
 #define IS_KERNEL_ADDRESS(x)	(((uint32)x & 0x80000000) == 0)
+#define B_SPINLOCK_INITIALIZER	0
+#define PCI_usb_ehci			0x20
 
 #ifndef HAIKU_TARGET_PLATFORM_DANO
 enum {
@@ -28,6 +30,9 @@ enum {
 	B_DEV_TOO_LATE,
 };
 #endif
+
+// wrong, but it won't change for BeOS anymore
+typedef uint32 addr_t;
 
 
 typedef struct mutex {
@@ -100,6 +105,13 @@ snprintf(char *buffer, size_t bufferSize, const char *format, ...)
 	int result = vsprintf(buffer, format, args);
 	va_end(args);
 	return result;
+}
+
+
+inline int32
+atomic_get(vint32 *value)
+{
+	return atomic_or(value, 0);
 }
 
 #undef B_KERNEL_READ_AREA
