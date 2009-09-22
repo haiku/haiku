@@ -12,8 +12,10 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <Deskbar.h>
 #include <GroupLayout.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -21,6 +23,8 @@
 #include <TextView.h>
 
 #include "CPUFrequencyView.h"
+
+#define TR_CONTEXT "Status view"
 
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
@@ -190,18 +194,18 @@ FrequencyMenu::FrequencyMenu(BMenu* menu, BHandler* target,
 	fStorage(storage),
 	fInterface(interface)
 {
-	fDynamicPerformance = new BMenuItem("Dynamic Performance",
+	fDynamicPerformance = new BMenuItem(TR("Dynamic Performance"),
 		new BMessage(kMsgPolicyDynamic));
-	fHighPerformance = new BMenuItem("High Performance",
+	fHighPerformance = new BMenuItem(TR("High Performance"),
 		new BMessage(kMsgPolicyPerformance));
-	fLowEnergie = new BMenuItem("Low Energy",
+	fLowEnergie = new BMenuItem(TR("Low Energy"),
 		new BMessage(kMsgPolicyLowEnergy));
 
 	menu->AddItem(fDynamicPerformance);
 	menu->AddItem(fHighPerformance);
 	menu->AddItem(fLowEnergie);
 
-	fCustomStateMenu = new BMenu("Set State");
+	fCustomStateMenu = new BMenu(TR("Set State"));
 
 	StateList* stateList = fInterface->GetCpuFrequencyStates();
 	for (int i = 0; i < stateList->CountItems(); i++) {
@@ -397,9 +401,9 @@ StatusView::~StatusView()
 void
 StatusView::_AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "CPU Frequency\n"
+	BAlert *alert = new BAlert("about", TR("CPU Frequency\n"
 		"\twritten by Clemens Zeidler\n"
-		"\tCopyright 2009, Haiku, Inc.\n", "Ok");
+		"\tCopyright 2009, Haiku, Inc.\n"), TR("Ok"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -479,7 +483,7 @@ StatusView::AttachedToWindow()
 	fPreferencesMenu->SetFont(be_plain_font);
 
 	fPreferencesMenu->AddSeparatorItem();
-	fOpenPrefItem = new BMenuItem("Open Speedstep Preferences" B_UTF8_ELLIPSIS,
+	fOpenPrefItem = new BMenuItem(TR("Open Speedstep Preferences" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOpenSSPreferences));
 	fPreferencesMenu->AddItem(fOpenPrefItem);
 	fOpenPrefItem->SetTarget(this);
@@ -649,8 +653,8 @@ StatusView::_OpenPreferences()
 			ret = be_roster->ActivateApp(info.team);
 	}
 	if (ret < B_OK) {
-		BString errorMessage("Launching the CPU Frequency preflet failed.\n\n"
-			"Error: ");
+		BString errorMessage(TR("Launching the CPU Frequency preflet failed.\n\n"
+			"Error: "));
 		errorMessage << strerror(ret);
 		BAlert* alert = new BAlert("launch error", errorMessage.String(),
 			"Ok");

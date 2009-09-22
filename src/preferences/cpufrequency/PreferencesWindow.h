@@ -19,6 +19,8 @@
 #endif
 
 #include <Button.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <Window.h>
@@ -38,6 +40,7 @@
 #include <Screen.h>
 #include <SpaceLayoutItem.h>
 
+#define TR_CONTEXT "Pref Window"
 
 // messages PrefFileWatcher
 const uint32 kUpdatedPreferences = '&UdP';
@@ -331,12 +334,12 @@ PreferencesWindow<Preferences>::PreferencesWindow(const char* title,
 		fPreferencesView(NULL)
 {
 	BGroupView* buttonView = new BGroupView(B_HORIZONTAL);
-	fDefaultButton = new BButton("Defaults",
+	fDefaultButton = new BButton(TR("Defaults"),
 									new BMessage(kDefaultMsg));
 
 	buttonView->AddChild(fDefaultButton);
 	buttonView->GetLayout()->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(7));
-	fRevertButton = new BButton("Revert", new BMessage(kRevertMsg));
+	fRevertButton = new BButton(TR("Revert"), new BMessage(kRevertMsg));
 	
 	fRevertButton->SetEnabled(false);
 	buttonView->AddChild(fRevertButton);

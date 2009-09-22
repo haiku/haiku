@@ -11,10 +11,14 @@
 #include "StatusView.h"
 
 #include <Box.h>
+#include <Catalog.h>
 #include <Deskbar.h>
 #include <GroupView.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <SpaceLayoutItem.h>
+
+#define TR_CONTEXT "CPU Frequency View"
 
 const char* kCPUFreqPreferencesFile = "CPUFrequency";
 const char* kPrefSignature = "application/x-vnd.Haiku-CPUFrequencyPref";
@@ -40,21 +44,21 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 	BRect rect = Bounds();
 	rect.InsetBy(5, 5);
 	BBox *policyBox = new BBox(rect, "policyBox");
-	policyBox->SetLabel("Stepping Policy");
+	policyBox->SetLabel(TR("Stepping Policy"));
 	BGroupLayout* policyLayout = new BGroupLayout(B_VERTICAL);
 	policyLayout->SetInsets(10, policyBox->TopBorderOffset() * 2 + 10, 10, 10);
 	policyLayout->SetSpacing(10);
 	policyBox->SetLayout(policyLayout);
 	mainLayout->AddView(policyBox);
 	
-	fPolicyMenu = new BMenu("Stepping Policy");
-	BMenuField *menuField = new BMenuField("Stepping Policy", fPolicyMenu);
+	fPolicyMenu = new BMenu(TR("Stepping Policy"));
+	BMenuField *menuField = new BMenuField(TR("Stepping Policy"), fPolicyMenu);
 	
 	policyLayout->AddView(menuField);
 	
 	// dynamic stepping
 	BBox *dynamicBox = new BBox(rect, "dynamicBox");
-	dynamicBox->SetLabel("Dynamic Stepping");
+	dynamicBox->SetLabel(TR("Dynamic Stepping"));
 	BGroupLayout* dynamicLayout = new BGroupLayout(B_VERTICAL);
 	dynamicLayout->SetInsets(10, dynamicBox->TopBorderOffset() * 2 + 10,
 								10, 10);
@@ -67,7 +71,7 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 	
 	fIntegrationTime = new BTextControl(BRect(0,0,Bounds().Width(),10),
 											"intergal",
-											"Integration Time [ms]", "",
+											TR("Integration Time [ms]"), "",
 											new BMessage(kIntegrationTimeChanged));
 	
 	dynamicLayout->AddView(fColorStepView);
@@ -75,7 +79,7 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 	
 	// status view
 	BBox *statusBox = new BBox(rect, "statusBox");
-	statusBox->SetLabel("CPU Frequency Status View");
+	statusBox->SetLabel(TR("CPU Frequency Status View"));
 	BGroupLayout* statusLayout = new BGroupLayout(B_HORIZONTAL);
 	statusLayout->SetInsets(10, statusBox->TopBorderOffset() * 2 + 10, 10, 10);
 	statusLayout->SetSpacing(10);
@@ -87,7 +91,7 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 	fStatusView->ShowPopUpMenu(false);
 		
 	fInstallButton = new BButton("installButton",
-									"Install Replicant into Deskbar",
+									TR("Install Replicant into Deskbar"),
 									new BMessage(kInstallIntoDeskbar));
 	
 	statusLayout->AddView(fStatusView);

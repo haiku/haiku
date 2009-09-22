@@ -2,12 +2,25 @@ SubDir HAIKU_TOP src preferences cpufrequency ;
 
 UsePrivateHeaders shared ;
 
-Preference CPUFrequency : 
+Preference CPUFrequency :
 	ColorStepView.cpp
 	CPUFrequencyView.cpp
 	DriverInterface.cpp
 	main.cpp
 	StatusView.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be $(TARGET_LIBSUPC++) liblocale.so
 	: cpufrequency.rdef
 	;
+
+DoCatalogs CPUFrequency :
+	x-vnd.Haiku-CPUFrequencyPref
+	:
+	ColorStepView.cpp
+	CPUFrequencyView.cpp
+	main.cpp
+	StatusView.cpp
+	PreferencesWindow.h
+	: en.catalog
+	: fr.catkeys
+	;
+

@@ -9,14 +9,21 @@
 #include "PreferencesWindow.h"
 #include "CPUFrequencyView.h"
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 
+#define TR_CONTEXT "Main window"
 
 int 
 main(int argc, char* argv[])
 {
 	BApplication	*app = new BApplication(kPrefSignature);
+
+	BCatalog cat;
+	be_locale->GetAppCatalog(&cat);
+
 	PreferencesWindow<freq_preferences> *window;
-	window = new PreferencesWindow<freq_preferences>("CPU Frequency",
+	window = new PreferencesWindow<freq_preferences>(TR("CPU Frequency"),
 														kPreferencesFileName,
 														kDefaultPreferences);
 	CPUFrequencyView* prefView = new CPUFrequencyView(BRect(0, 0, 400, 350),

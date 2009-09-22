@@ -10,7 +10,12 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
 #include <Window.h>
+
+
+#define TR_CONTEXT "Color Step View"
 
 
 const int32 kColorBarHeight = 15;
@@ -280,7 +285,7 @@ ColorStepView::_InitView()
 	
 	BRect sliderFrame(Bounds());
 	
-	fSlider = new BSlider(sliderFrame, "StepSlider", "Step up by CPU usage:",
+	fSlider = new BSlider(sliderFrame, "StepSlider", TR("Step up by CPU usage:"),
 							new BMessage(kSteppingChanged), 0, 100);
 	fSlider->SetModificationMessage(new BMessage(kMSGSliderChanged));
 	
