@@ -65,24 +65,28 @@ arch_timer_clear_hardware_timer(void)
 static void
 sort_timers(timer_info *timers[], int numTimers)
 {
-	int size;
 	timer_info *tempPtr;
 	int max = 0;	
 	int i = 0;
+	int j = 0;
 	
-	for (size = numTimers; size > 1; size--) {
-		for (i = 0; i < size; i++) {
-			if (timers[i]->get_priority() < timers[max]->get_priority())
-				max = i;
+	for (i = 0; i < numTimers - 1; i++) {
+		max = i;
+		for (j = i + 1; j < numTimers; j++) {
+			if (timers[j]->get_priority() > timers[max]->get_priority())
+				max = j;
 		}
-		tempPtr = timers[max];
-		timers[max] = timers[size - 1];
-		timers[size - 1] = tempPtr;		
+		if (max != i) {
+			tempPtr = timers[max];
+			timers[max] = timers[i];
+			timers[i] = tempPtr;		
+		}
 	}
-
-	dprintf("arch_init_timer:timers found:\n");
+	
+#if 0
 	for (i = 0; i < numTimers; i++)
 		dprintf(" %s: priority %d\n", timers[i]->name, timers[i]->get_priority());
+#endif
 }
 
 
