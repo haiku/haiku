@@ -467,7 +467,7 @@ AddFilesToHaikuImage system : haiku_loader ;
 
 # boot module links
 AddBootModuleSymlinksToHaikuImage
-	$(X86_ONLY)acpi $(ATA_ONLY)ata pci $(X86_ONLY)isa config_manager
+	$(X86_ONLY)acpi $(ATA_ONLY)ata pci $(X86_ONLY)isa config_manager dpc
 	$(IDE_ONLY)ide scsi usb
 	$(PPC_ONLY)openpic
 	$(ATA_ONLY)ata_adapter $(IDE_ONLY)ide_adapter locked_pool scsi_periph

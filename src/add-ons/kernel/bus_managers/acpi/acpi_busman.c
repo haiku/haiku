@@ -79,13 +79,17 @@ acpi_std_ops(int32 op,...)
 		case B_MODULE_INIT:
 		{
 			ACPI_STATUS status;
-			bool acpiDisabled = false;
+			uint32 flags;
 			void *settings;
+			bool acpiDisabled = false;
+			bool acpiAvoidFullInit = false;
 
 			settings = load_driver_settings("kernel");
 			if (settings != NULL) {
 				acpiDisabled = !get_driver_boolean_parameter(settings, "acpi",
 					false, false);
+				acpiAvoidFullInit = get_driver_boolean_parameter(settings,
+					"acpi_avoid_full_init", false, false);
 				unload_driver_settings(settings);
 			}
 
@@ -103,6 +107,8 @@ acpi_std_ops(int32 op,...)
 				ERROR("ACPI disabled\n");
 				return ENOSYS;
 			}
+			AcpiGbl_EnableInterpreterSlack = true;
+//			AcpiGbl_CreateOSIMethod = true;
 
 #ifdef ACPI_DEBUG_OUTPUT
 			AcpiDbgLevel = ACPI_DEBUG_ALL | ACPI_LV_VERBOSE;
@@ -130,6 +136,13 @@ acpi_std_ops(int32 op,...)
 				goto err;
 			}
 
+			flags = acpiAvoidFullInit ? 
+					ACPI_NO_DEVICE_INIT | ACPI_NO_OBJECT_INIT :
+					ACPI_FULL_INITIALIZATION;
+			
+			// FreeBSD seems to pass in the above flags here as
+			// well but specs don't define ACPI_NO_DEVICE_INIT
+			// and ACPI_NO_OBJECT_INIT here.
 			status = AcpiEnableSubsystem(ACPI_FULL_INITIALIZATION);
 			if (status != AE_OK) {
 				ERROR("AcpiEnableSubsystem failed (%s)\n",
@@ -137,6 +150,13 @@ acpi_std_ops(int32 op,...)
 				goto err;
 			}
 	
+			status = AcpiInitializeObjects(flags);
+			if (status != AE_OK) {
+				ERROR("AcpiInitializeObjects failed (%s)\n",
+					AcpiFormatException(status));
+				goto err;
+			}
+
 			/* Phew. Now in ACPI mode */
 			TRACE("ACPI initialized\n");
 			return B_OK;
@@ -545,8 +565,7 @@ reboot(void)
 	if ((AcpiGbl_FADT.Flags & ACPI_FADT_RESET_REGISTER) == 0)
 		return B_UNSUPPORTED;
 
-	status = AcpiWrite(AcpiGbl_FADT.ResetValue,
-		&AcpiGbl_FADT.ResetRegister);
+	status = AcpiWrite(AcpiGbl_FADT.ResetValue, &AcpiGbl_FADT.ResetRegister);
 	
 	if (status != AE_OK) {
 		ERROR("Reset failed, status = %d\n", status);

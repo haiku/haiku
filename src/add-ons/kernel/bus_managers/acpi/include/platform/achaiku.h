@@ -117,61 +117,48 @@
 #ifndef __ACHAIKU_H__
 #define __ACHAIKU_H__
 
-/* Haiku uses GCC */
-
 #include "acgcc.h"
 
 #include <SupportDefs.h>
 
-/*#ifdef _LP64
-#define ACPI_MACHINE_WIDTH      64
-#else*/
-#define ACPI_MACHINE_WIDTH      32 /* Haiku always 32 bit right now */
-/*#endif*/
 
-#define COMPILER_DEPENDENT_INT64  int64
-#define COMPILER_DEPENDENT_UINT64 uint64
+/* Host-dependent types and defines for user- and kernel-space ACPICA */
 
-#ifdef _KERNEL_MODE
-/* #include "opt_acpi.h"           collect build-time options here */
+#define ACPI_USE_SYSTEM_CLIBRARY
+#define ACPI_USE_STANDARD_HEADERS
 
-#include <string.h>
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdlib.h>
+/* TODO: add mutex or benaphore code 
+#define ACPI_MUTEX_TYPE				ACPI_OSL_MUTEX
+#define ACPI_MUTEX					sem_id				
+*/
 
-#define asm         __asm
-
-#define ACPI_USE_LOCAL_CACHE
+//#define ACPI_MUTEX_DEBUG				
 #define ACPI_USE_NATIVE_DIVIDE
 
-#define ACPI_ASM_MACROS         /* tell acenv.h */
+#define ACPI_THREAD_ID				thread_id
+#define ACPI_SEMAPHORE				sem_id
+#define ACPI_SPINLOCK				spinlock *
+#define ACPI_CPU_FLAGS				cpu_status
 
-#define ACPI_SYSTEM_XFACE
-#define ACPI_EXTERNAL_XFACE
-#define ACPI_INTERNAL_XFACE
-#define ACPI_INTERNAL_VAR_XFACE
+#define COMPILER_DEPENDENT_INT64	int64
+#define COMPILER_DEPENDENT_UINT64	uint64
 
+/* TODO: Add 64 bit when Haiku goes 64 bit */
+#define ACPI_MACHINE_WIDTH				32
+
+
+#ifdef _KERNEL_MODE
+/* Host-dependent types and defines for in-kernel ACPICA */
+
+#include <KernelExport.h>
+
+#define ACPI_USE_LOCAL_CACHE
+
+
+/* TODO: Use Haiku's slab code */
+//#define ACPI_CACHE_T                struct kmem_cache
 
 #define ACPI_FLUSH_CPU_CACHE() __asm __volatile("wbinvd");
-
-#ifdef ACPI_DEBUG
-#define ACPI_DEBUG_OUTPUT
-#define ACPI_DBG_TRACK_ALLOCATIONS
-#ifdef DEBUGGER_THREADING
-#undef DEBUGGER_THREADING
-#endif /* DEBUGGER_THREADING */
-#define DEBUGGER_THREADING 0    /* integrated with DDB */
-//#include "opt_ddb.h"
-//#ifdef DDB
-#define ACPI_DISASSEMBLER
-#define ACPI_DEBUGGER
-//#endif /* DDB */
-#endif /* ACPI_DEBUG */
-
-/* The following Global Lock code stolen from NetBSD
-   src/sys/arch/i386/include/acpi_func.h which in turn
-   was stolen from Intel's spec document */
 
 #define	ACPI_ACQUIRE_GLOBAL_LOCK(GLptr, Acq) \
 do { \
@@ -206,26 +193,10 @@ do { \
 	: "edx"); \
 } while (0)
 
-
 #else /* _KERNEL_MODE */
+/* Host-dependent types and defines for user-space ACPICA */
 
-#include <ctype.h>
-
-/* Not building kernel code, so use libc */
-#define ACPI_USE_STANDARD_HEADERS
-#define ACPI_FLUSH_CPU_CACHE()
-
-#define __cli()
-#define __sti()
-
-/* XXX */
-#define __inline inline
+#error "We only support kernel mode ACPI atm."
 
 #endif /* _KERNEL_MODE */
-
-/* Always use Haiku code over our local versions */
-#define ACPI_USE_SYSTEM_CLIBRARY
-#define ACPI_USE_NATIVE_DIVIDE
-
-
 #endif /* __ACHAIKU_H__ */

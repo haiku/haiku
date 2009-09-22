@@ -55,3 +55,7 @@
 
 #acpi true
 	# ACPI support, off by default
+
+#acpi_avoid_full_init true
+	# Avoids running _INI and _STA methods and final object initialization,
+	# which may be used to for debugging ACPI issues, false by default
