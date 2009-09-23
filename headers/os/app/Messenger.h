@@ -9,7 +9,6 @@
 #define _MESSENGER_H
 
 
-#include <BeBuild.h>
 #include <OS.h>
 #include <ByteOrder.h>
 #include <Message.h>

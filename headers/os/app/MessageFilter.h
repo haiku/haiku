@@ -9,7 +9,6 @@
 #define _MESSAGE_FILTER_H
 
 
-#include <BeBuild.h>
 #include <Handler.h>
 
 
