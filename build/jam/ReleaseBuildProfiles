@@ -1,6 +1,9 @@
 DefineBuildProfile alpha-raw : image : "haiku-alpha.image" ;
 DefineBuildProfile alpha-vmware : vmware-image : "haiku-alpha.vmdk" ;
 DefineBuildProfile alpha-cd : cd-image : "haiku-alpha.iso" ;
+DefineBuildProfile nightly-raw : image : "haiku-nightly.image" ;
+DefineBuildProfile nightly-vmware : vmware-image : "haiku-nightly.vmdk" ;
+DefineBuildProfile nightly-cd : cd-image : "haiku-nightly.iso" ;
 
 switch $(HAIKU_BUILD_PROFILE) {
 	case "alpha-*" : {
@@ -20,5 +23,17 @@ switch $(HAIKU_BUILD_PROFILE) {
 
 	case "beta-*" : {
 		Echo You wish. ;
+	}
+
+	case "nightly-*" : {
+		Echo Building Haiku Nightly ;
+		HAIKU_ROOT_USER_NAME = user ;
+		HAIKU_ROOT_USER_REAL_NAME = "Yourself" ;
+		AddGroupToHaikuImage party : 101 : user sshd ;
+		HAIKU_IMAGE_HOST_NAME = shredder ;
+		HAIKU_IMAGE_SIZE = 350 ;
+
+		AddOptionalHaikuImagePackages Pe Nano Vision P7zip ;
+		AddOptionalHaikuImagePackages Development Subversion OpenSSH ;
 	}
 }
