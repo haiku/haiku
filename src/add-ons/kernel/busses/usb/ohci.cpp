@@ -71,6 +71,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		fFinishTransfersSem(-1),
 		fFinishThread(-1),
 		fStopFinishThread(false),
+		fProcessingPipe(NULL),
 		fRootHub(NULL),
 		fRootHubAddress(0),
 		fPortCount(0)
@@ -471,6 +472,10 @@ OHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 		free(list);
 		list = next;
 	}
+
+	// wait for any transfers that might have made it before canceling
+	while (fProcessingPipe == pipe)
+		snooze(1000);
 
 	// notify the finisher so it can clean up the canceled transfers
 	release_sem_etc(fFinishTransfersSem, 1, B_DO_NOT_RESCHEDULE);
@@ -1021,6 +1026,11 @@ OHCI::_FinishTransfers()
 				if (transfer == fLastTransfer)
 					fLastTransfer = lastTransfer;
 
+				// store the currently processing pipe here so we can wait
+				// in cancel if we are processing something on the target pipe
+				if (!transfer->canceled)
+					fProcessingPipe = transfer->transfer->TransferPipe();
+
 				transfer->link = NULL;
 				Unlock();
 			}
@@ -1071,6 +1081,7 @@ OHCI::_FinishTransfers()
 				}
 
 				transfer->transfer->Finished(callbackStatus, actualLength);
+				fProcessingPipe = NULL;
 			}
 
 			if (callbackStatus != B_OK) {

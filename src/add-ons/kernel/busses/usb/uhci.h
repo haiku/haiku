@@ -233,6 +233,7 @@ static	pci_module_info *			sPCIModule;
 		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
 		bool						fStopThreads;
+		Pipe *						fProcessingPipe;
 
 		transfer_data *				fFreeList;
 		thread_id					fCleanupThread;

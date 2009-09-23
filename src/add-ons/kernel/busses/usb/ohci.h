@@ -163,6 +163,7 @@ static	pci_module_info *			sPCIModule;
 		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
 		bool						fStopFinishThread;
+		Pipe *						fProcessingPipe;
 
 		// Root Hub
 		OHCIRootHub *				fRootHub;

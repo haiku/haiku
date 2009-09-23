@@ -157,6 +157,7 @@ static	pci_module_info *			sPCIModule;
 		thread_id					fCleanupThread;
 		bool						fStopThreads;
 		ehci_qh *					fFreeListHead;
+		Pipe *						fProcessingPipe;
 
 		// Root Hub
 		EHCIRootHub *				fRootHub;
