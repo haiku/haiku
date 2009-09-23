@@ -58,8 +58,11 @@
 <h1>
 <a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
 <a id="attributes-terminal" name="attributes-terminal">Attributes in Terminal</a></h1>
-<p>If you prefer to use the commandline or plan to work with many files using scripting, there are several commands for controlling attributes from Terminal:</p>
-<ul><li><b>listattr</b> - lists a file's attributes, but doesn't show the contents of the attributes.<br />
+<p>If you prefer to use the commandline or plan to work with many files using scripting, there are several commands for controlling attributes from Terminal.</p>
+<h2>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="listattr" name="listattr">listattr</a></h2>
+<p><span class="cli">listattr</span> lists a file's attributes, but doesn't show the contents of the attributes.</p>
 <pre>usage: listattr 'filename' ['filename' ...]</pre>
 <p>From our screenshot example above:</p>
 <pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
@@ -91,17 +94,21 @@ MIME String         21  &quot;BEOS:TYPE&quot;
 <ul>
 <li><p><tt>BEOS:TYPE</tt> holds the file type as a <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> string, here "<tt>application/x-person</tt>. It determines the default icon and the application that opens the file when you e.g. double click it.</p></li>
 <li><p>"<tt>_trk/pinfo_le</tt>" is the attribute with which Tracker keeps track of a file's icon position.</p></li></ul>
-<div class="box-info">Note the backslash after "Clara". In Terminal you have to "escape" special characters like <tt>'"*\$?!</tt>. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</div></li>
-</ul>
-<p><br /></p>
-<ul><li><b>catattr</b> - displays the contents of a specific attribute of a file.
+<div class="box-info">Note the backslash after "Clara". In Terminal you have to "escape" special characters like <tt>'"*\$?!</tt>. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</div>
+
+<h2>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="catattr" name="catattr">catattr</a></h2>
+<p><span class="cli">catattr</span> displays the contents of a specific attribute of a file.</p>
 <pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
 <p>Again our example:</p>
 <pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
-Clara Botters&#160;: string&#160;: Whelton</pre></li>
-</ul>
-<p><br /></p>
-<ul><li><b>addattr</b> - adds an attribute to a file and/or fills it with a value.
+Clara Botters&#160;: string&#160;: Whelton</pre>
+
+<h2>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="addattr" name="addattr">addattr</a></h2>
+<p><span class="cli">addattr</span> adds an attribute to a file and/or fills it with a value.</p>
 <pre>usage: addattr [-t type] attr value file1 [file2...]
     or: addattr [-f value-from-file] [-t type] attr file1 [file2...]
  
@@ -110,22 +117,27 @@ Clara Botters&#160;: string&#160;: Whelton</pre></li>
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          The default is &quot;string&quot;</pre>
 <p>So, say dear Clara took a job with the multi-national Barkelbaer Inc., you fill the formerly empty "Company" attribute with that data (which is of type "string"):</p>
-<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre></li>
-</ul>
-<p><br /></p>
-<ul><li><b>rmattr</b> - completely removes an attribute from a file.
+<pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
+
+<h2>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="rmattr" name="rmattr">rmattr</a></h2>
+<p><span class="cli">rmattr</span> completely removes an attribute from a file.</p>
 
 <pre>usage: rmattr [-p] attr filename1 [filename2...]
          'attr' is the name of an attribute of the file
          If '-p' is specified, 'attr' is regarded as a pattern.</pre>
 <p>Though in all practicality it would be enough to just not fill the "Fax" attribute, you can completely remove it from Clara's file by typing:</p>
-<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre></li></ul>
-<p><br /></p>
-<ul><li><b>copyattr</b> - copies attributes from one or more files to another. By default, the actual contents of the file is <b>not</b> copied.
+<pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
+
+<h2>
+<a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="copyattr" name="copyattr">copyattr</a></h2>
+<p><span class="cli">copyattr</span> copies attributes from one or more files to another. By default, the actual contents of the file is <b>not</b> copied.</p>
 <pre>Usage: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
 
-If you do want to copy the attributes plus the data of the file itself, you can add the option "<span class="cli">-d</span>" or "<span class="cli">--data</span>".</li>
-</ul>
+<p>If you do want to copy the attributes plus the data of the file itself, you can add the option "<span class="cli">-d</span>" or "<span class="cli">--data</span>".</p>
+
 <p><br /></p>
 <p>More information on these commands and their options can be found by typing the command name followed by "<span class="cli">-h</span>" or "<span class="cli">--help</span>".</p>
 
