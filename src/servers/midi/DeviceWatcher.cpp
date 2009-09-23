@@ -181,19 +181,25 @@ DeviceWatcher::_AddDevice(const char* path)
 {
 	// printf("DeviceWatcher::_AddDevice(\"%s\");\n", path);
 
-	BEntry entry(path);
-	if (! entry.IsFile())
-		// Invalid path !
-		return;
-
 	if ( fDeviceEndpointsMap.ContainsKey(path) )
 		// Already known
 		return;
 		
-	int fd = open(path, O_RDWR | O_EXCL);
-	if (fd < 0)
+	BEntry entry(path);
+	if (entry.IsDirectory())
+		// Invalid path !
 		return;
 		
+	if (entry.IsSymLink()) {
+		BEntry symlink(path, true);
+		if (symlink.IsDirectory())
+			// Invalid path!
+			return;
+	}
+
+	int fd = open(path, O_RDWR | O_EXCL);
+	if (fd < 0)
+		return;	
 	
 	MidiPortConsumer* consumer = new MidiPortConsumer(fd, path);
 	_SetIcons(consumer);
