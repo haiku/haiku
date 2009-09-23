@@ -1131,28 +1131,38 @@ operator<(const entry_ref & a, const entry_ref & b)
 
 
 #ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+#	if __GNUC__ == 2	// gcc 2
 
-B_DEFINE_SYMBOL_VERSION("_GetStat__C6BEntryP4stat",
-	"GetStat__C6BEntryP4stat@@LIBBE_TEST");
+	B_DEFINE_SYMBOL_VERSION("_GetStat__C6BEntryP4stat",
+		"GetStat__C6BEntryP4stat@@LIBBE_TEST");
 
-#elif __GNUC__ == 2	// gcc 2
+#	else	// gcc 4
 
-// BeOS compatible GetStat()
-B_DEFINE_SYMBOL_VERSION("_GetStat__C6BEntryP9stat_beos",
-	"GetStat__C6BEntryP4stat@LIBBE_BASE");
+	// Haiku GetStat()
+	B_DEFINE_SYMBOL_VERSION("_ZNK6BEntry8_GetStatEP4stat",
+		"_ZNK6BEntry7GetStatEP4stat@@LIBBE_TEST");
 
-// Haiku GetStat()
-B_DEFINE_SYMBOL_VERSION("_GetStat__C6BEntryP4stat",
-	"GetStat__C6BEntryP4stat@@LIBBE_1_ALPHA1");
+#	endif	// gcc 4
+#else	// !HAIKU_TARGET_PLATFORM_LIBBE_TEST
+#	if __GNUC__ == 2	// gcc 2
 
-#else	// gcc 4
+	// BeOS compatible GetStat()
+	B_DEFINE_SYMBOL_VERSION("_GetStat__C6BEntryP9stat_beos",
+		"GetStat__C6BEntryP4stat@LIBBE_BASE");
 
-// BeOS compatible GetStat()
-B_DEFINE_SYMBOL_VERSION("_ZNK6BEntry8_GetStatEP9stat_beos",
-	"_ZNK6BEntry7GetStatEP4stat@LIBBE_BASE");
+	// Haiku GetStat()
+	B_DEFINE_SYMBOL_VERSION("_GetStat__C6BEntryP4stat",
+		"GetStat__C6BEntryP4stat@@LIBBE_1_ALPHA1");
 
-// Haiku GetStat()
-B_DEFINE_SYMBOL_VERSION("_ZNK6BEntry8_GetStatEP4stat",
-	"_ZNK6BEntry7GetStatEP4stat@@LIBBE_1_ALPHA1");
+#	else	// gcc 4
 
-#endif	// gcc 4
+	// BeOS compatible GetStat()
+	B_DEFINE_SYMBOL_VERSION("_ZNK6BEntry8_GetStatEP9stat_beos",
+		"_ZNK6BEntry7GetStatEP4stat@LIBBE_BASE");
+
+	// Haiku GetStat()
+	B_DEFINE_SYMBOL_VERSION("_ZNK6BEntry8_GetStatEP4stat",
+		"_ZNK6BEntry7GetStatEP4stat@@LIBBE_1_ALPHA1");
+
+#	endif	// gcc 4
+#endif	// !HAIKU_TARGET_PLATFORM_LIBBE_TEST

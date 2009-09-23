@@ -998,28 +998,37 @@ create_directory(const char* path, mode_t mode)
 
 
 #ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+#	if __GNUC__ == 2	// gcc 2
 
-B_DEFINE_SYMBOL_VERSION("_GetStatFor__C10BDirectoryPCcP4stat",
-	"GetStatFor__C10BDirectoryPCcP4stat@@LIBBE_TEST");
+	B_DEFINE_SYMBOL_VERSION("_GetStatFor__C10BDirectoryPCcP4stat",
+		"GetStatFor__C10BDirectoryPCcP4stat@@LIBBE_TEST");
 
-#elif __GNUC__ == 2	// gcc 2
+#	else	// gcc 4
 
-// BeOS compatible GetStatFor()
-B_DEFINE_SYMBOL_VERSION("_GetStatFor__C10BDirectoryPCcP9stat_beos",
-	"GetStatFor__C10BDirectoryPCcP4stat@LIBBE_BASE");
+	B_DEFINE_SYMBOL_VERSION("_ZNK10BDirectory11_GetStatForEPKcP4stat",
+		"_ZNK10BDirectory10GetStatForEPKcP4stat@@LIBBE_TEST");
 
-// Haiku GetStatFor()
-B_DEFINE_SYMBOL_VERSION("_GetStatFor__C10BDirectoryPCcP4stat",
-	"GetStatFor__C10BDirectoryPCcP4stat@@LIBBE_1_ALPHA1");
+#	endif	// gcc 4
+#else	// !HAIKU_TARGET_PLATFORM_LIBBE_TEST
+#	if __GNUC__ == 2	// gcc 2
 
-#else	// gcc 4
+	// BeOS compatible GetStatFor()
+	B_DEFINE_SYMBOL_VERSION("_GetStatFor__C10BDirectoryPCcP9stat_beos",
+		"GetStatFor__C10BDirectoryPCcP4stat@LIBBE_BASE");
 
-// BeOS compatible GetStatFor()
-B_DEFINE_SYMBOL_VERSION("_ZNK10BDirectory11_GetStatForEPKcP9stat_beos",
-	"_ZNK10BDirectory10GetStatForEPKcP4stat@LIBBE_BASE");
+	// Haiku GetStatFor()
+	B_DEFINE_SYMBOL_VERSION("_GetStatFor__C10BDirectoryPCcP4stat",
+		"GetStatFor__C10BDirectoryPCcP4stat@@LIBBE_1_ALPHA1");
 
-// Haiku GetStatFor()
-B_DEFINE_SYMBOL_VERSION("_ZNK10BDirectory11_GetStatForEPKcP4stat",
-	"_ZNK10BDirectory10GetStatForEPKcP4stat@@LIBBE_1_ALPHA1");
+#	else	// gcc 4
 
-#endif	// gcc 4
+	// BeOS compatible GetStatFor()
+	B_DEFINE_SYMBOL_VERSION("_ZNK10BDirectory11_GetStatForEPKcP9stat_beos",
+		"_ZNK10BDirectory10GetStatForEPKcP4stat@LIBBE_BASE");
+
+	// Haiku GetStatFor()
+	B_DEFINE_SYMBOL_VERSION("_ZNK10BDirectory11_GetStatForEPKcP4stat",
+		"_ZNK10BDirectory10GetStatForEPKcP4stat@@LIBBE_1_ALPHA1");
+
+#	endif	// gcc 4
+#endif	// !HAIKU_TARGET_PLATFORM_LIBBE_TEST
