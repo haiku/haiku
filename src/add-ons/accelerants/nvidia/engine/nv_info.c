@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-8/2009
+   Rudolf Cornelissen 7/2003-9/2009
 */
 
 #define MODULE_BIT 0x00002000
@@ -2768,10 +2768,33 @@ static void setup_output_matrix()
 				si->ps.crtc2_prim = true;
 				break;
 			case 0x20: /* nothing on head 1, analog panel or CRT on head 2 */
-				LOG(2,("INFO: head 1 has nothing connected;\n"));
-				LOG(2,("INFO: head 2 has an analog panel or CRT:\n"));
-				LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
-				si->ps.crtc2_prim = true;
+				if (si->ps.card_arch < NV40A) {
+					LOG(2,("INFO: head 1 has nothing connected;\n"));
+					LOG(2,("INFO: head 2 has an analog panel or CRT:\n"));
+					LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
+					si->ps.crtc2_prim = true;
+				} else {
+					switch (si->ps.card_type) {
+					case NV40: /* Geforce 6800 AGP was confirmed OK 'in the old days' */
+					case NV41: /* Geforce 6800 type as well - needs to be confirmed (guessing) */
+					case NV45: /* Geforce 6800 PCIe - needs to be confirmed (guessing) */
+						LOG(2,("INFO: head 1 has nothing connected;\n"));
+						LOG(2,("INFO: head 2 has an analog panel or CRT:\n"));
+						LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
+						si->ps.crtc2_prim = true;
+						break;
+					default:
+						/* newer NV40 architecture cards contains (an) additional switch(es)
+						 * to connect a CRTC/DAC combination to a connector. The BIOSes of
+						 * these cards connect head1 to connectors 1 and 2 simultaneously if
+						 * only one VGA screen is found being on connector 2. Which is the
+						 * case here.
+						 * Confirmed on NV43, NV44, G71 and G72. */
+						LOG(2,("INFO: Both card outputs are connected to head 1;\n"));
+						LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+						break;
+					}
+				}
 				break;
 			case 0x30: /* nothing on head 1, both types on head 2 */
 				LOG(2,("INFO: head 1 has nothing connected;\n"));
@@ -2809,23 +2832,12 @@ static void setup_output_matrix()
 				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
 				break;
 			case 0x32: /* more than two monitors connected to just two outputs: illegal! */
-				//general fixme:
-				//NV40 architecture contains (an) additional switch(es) to
-				//connect a CRTC/DAC combination to a connector. We can't work as
-				//usual (yet) because this interferes via BIOS card pre-programming.
-				//
-				//Also: it looks as if each pixelclock PLL can select different CRTC's
-				//as well now via a new register: one PLL can be driving both CRTC's
-				//and there's nothing we can do about that (yet). (DVI/dualhead trouble)
-				if (si->ps.card_arch < NV40A)
-				{
-					LOG(2,("INFO: illegal monitor setup ($%02x):\n", si->ps.monitors));
-					/* head 2 takes precedence because it has a digital panel while
-					 * head 1 has not. */
-					LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
-					si->ps.crtc2_prim = true;
-					break;
-				}
+				LOG(2,("INFO: illegal monitor setup ($%02x):\n", si->ps.monitors));
+				/* head 2 takes precedence because it has a digital panel while
+				 * head 1 has not. */
+				LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
+				si->ps.crtc2_prim = true;
+				break;
 			default: /* more than two monitors connected to just two outputs: illegal! */
 				LOG(2,("INFO: illegal monitor setup ($%02x):\n", si->ps.monitors));
 				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
