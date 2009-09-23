@@ -7,6 +7,10 @@
 
 #include <InterfaceDefs.h>
 
+#ifndef B_MAX_MOUSE_BUTTONS
+#define B_MAX_MOUSE_BUTTONS		8
+#endif
+
 #include "ProtocolHandler.h"
 
 class HIDReportItem;

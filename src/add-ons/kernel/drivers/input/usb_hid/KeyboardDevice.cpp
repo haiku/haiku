@@ -3,6 +3,8 @@
  * Distributed under the terms of the MIT license.
  */
 
+#include <new>
+#include <stdlib.h>
 #include <string.h>
 
 #include <usb/USB_hid.h>

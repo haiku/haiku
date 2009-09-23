@@ -10,9 +10,9 @@
 #include <KernelExport.h>
 #include <OS.h>
 #include <USB3.h>
+#include <util/kernel_cpp.h>
 
 #include "DeviceList.h"
-#include "kernel_cpp.h"
 
 #define DRIVER_NAME	"usb_hid"
 

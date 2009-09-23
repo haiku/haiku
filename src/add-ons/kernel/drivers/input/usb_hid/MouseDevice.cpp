@@ -11,6 +11,7 @@
 #include "HIDReport.h"
 #include "HIDReportItem.h"
 
+#include <new>
 #include <string.h>
 #include <usb/USB_hid.h>
 
@@ -91,7 +92,12 @@ MouseDevice::Control(uint32 op, void *buffer, size_t length)
 			return RingBufferRead(buffer, sizeof(mouse_movement));
 
 		case MS_NUM_EVENTS:
-			return RingBufferReadable() / sizeof(mouse_movement);
+		{
+			int32 count = RingBufferReadable() / sizeof(mouse_movement);
+			if (count == 0 && fReport->Device()->IsRemoved())
+				return B_DEV_NOT_READY;
+			return count;
+		}
 
 		case MS_SET_CLICKSPEED:
 #ifdef __HAIKU__
@@ -113,7 +119,7 @@ MouseDevice::_ReadReport()
 	if (result != B_OK) {
 		if (fReport->Device()->IsRemoved()) {
 			TRACE("device has been removed\n");
-			return B_ERROR;
+			return B_DEV_NOT_READY;
 		}
 
 		if (result != B_INTERRUPTED) {

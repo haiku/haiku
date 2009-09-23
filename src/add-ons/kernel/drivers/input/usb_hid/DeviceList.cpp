@@ -4,7 +4,7 @@
 	Distributed under the terms of the MIT license.
 */
 #include "DeviceList.h"
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 #include <stdlib.h>
 #include <string.h>
 #include <new>

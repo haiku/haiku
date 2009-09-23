@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <stdlib.h>
 #include <ring_buffer.h>
 
 #include "Driver.h"
