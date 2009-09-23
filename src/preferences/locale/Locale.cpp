@@ -98,7 +98,7 @@ Settings::~Settings()
 }
 
 
-status_t 
+status_t
 Settings::Open(BFile *file, int32 mode)
 {
 	BPath path;
@@ -111,7 +111,7 @@ Settings::Open(BFile *file, int32 mode)
 }
 
 
-void 
+void
 Settings::UpdateFrom(BMessage *message)
 {
 	BRect frame;
@@ -129,7 +129,7 @@ Settings::UpdateFrom(BMessage *message)
 			fMessage.AddString("language", langName);
 	}
 
-	if (message->FindString("country",&langName) == B_OK) 
+	if (message->FindString("country",&langName) == B_OK)
 		fMessage.ReplaceString("country", langName);
 
 
@@ -157,7 +157,7 @@ LocalePreflet::~LocalePreflet()
 }
 
 
-void 
+void
 LocalePreflet::ReadyToRun()
 {
 	// are there already windows open?
@@ -169,7 +169,7 @@ LocalePreflet::ReadyToRun()
 }
 
 
-void 
+void
 LocalePreflet::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
@@ -197,14 +197,14 @@ LocalePreflet::AboutRequested()
 
 	view->GetFont(&font);
 	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE); 			
+	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 7, &font);
 
 	alert->Go();
 }
 
 
-bool 
+bool
 LocalePreflet::QuitRequested()
 {
 	return true;
@@ -214,7 +214,7 @@ LocalePreflet::QuitRequested()
 //	#pragma mark -
 
 
-int 
+int
 main(int argc, char **argv)
 {
 	LocalePreflet app;
