@@ -1,4 +1,6 @@
 LIBBE_BASE {
+	global:
+		*;
 };
 
 LIBBE_1_ALPHA1 {
