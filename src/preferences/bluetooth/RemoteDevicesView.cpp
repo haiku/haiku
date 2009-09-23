@@ -22,6 +22,8 @@
 
 #include "RemoteDevicesView.h"
 
+#define TR_CONTEXT "Remote devices"
+
 static const uint32 kMsgAddDevices = 'ddDv';
 static const uint32 kMsgRemoveDevice = 'rmDv';
 static const uint32 kMsgTrustDevice = 'trDv';

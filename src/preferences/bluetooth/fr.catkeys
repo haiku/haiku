@@ -1,50 +1,53 @@
-1	french	x-vnd.Haiku-BluetoothPrefs	698965680
-Defaults	Device View		DÃ©faut
-Refresh LocalDevicesxE2x80xA6	Device View		RafraÃ®chir LocalDevicesxE2x80xA6
-Scanning progress	Device View		AvancÃ©e du balayage
-Discoverable	Device View		DÃ©couvrable
-Stop Bluetooth ServicesxE2x80xA6	Device View		ArrÃªter les services bluetoothxE2x80xA6
-Remove	Device View		Enlever
-As Blocked	Device View		BloquÃ©
-Always ask	Device View		Toujours demander
-Settings	Device View		RÃ©glages
-As Trusted	Device View		De confiance
-Server	Device View		Serveur
-Check that the bluetooth capabilities of your remote device are activated. Press Inquiry to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them	Device View		VÃ©rifiez que les fonctionalitÃ©s bluetooth de votre appareil distant sont activÃ©es. Appuyez sur Recherche pour lancer un balayage. Le temps nÃ©cessaire pour rÃ©cupÃ©rer les noms est inconnu, mais ne devrait pas dÃ©passer 3 secondes par appareil. Ensuite vous pourrez les ajouter Ã  la liste principale, puis vous associer avec eux.
-Identify host as:	Device View		Identifier l'hÃ´te comme :
-Incoming connections policy:	Device View		Attitude pour les connexiosn entrantes :
-There has not been found any bluetooth LocalDevice device registered on the system	Device View		Aucun LocalDevice bluetooth n'est enregistrÃ© sur ce systÃ¨me
-Local Devices found on system:	Device View		Appareils locaux trouvÃ©s sur le systÃ¨me :
-Only from Trusted devices	Device View		Seulement les appareils de confiance
-Add device to list	Device View		Ajouter l'appareil Ã  la liste
-Inquiry	Device View		Recherche
-Remote Devices	Device View		Appareils distants
-Retrieving name of 	Device View		RÃ©cupÃ¨re le nom de 
-Smart Phone	Device View		Smart Phone
-Identify us as...	Device View		S'identifier comme...
-Scanning completed.	Device View		Balayage complet.
-Show Bluetooth consolexE2x80xA6	Device View		Afficher la console bluetoothxE2x80xA6
-Handheld	Device View		PDA
-15 secs	Device View		15 secs
-Help	Device View		Aide
-Revert	Device View		DÃ©faire
-Start Bluetooth ServicesxE2x80xA6	Device View		DÃ©marrer les serrvices bluetoothxE2x80xA6
-61 secs	Device View		61 secs
-Default Inquiry time:	Device View		Temps de recherche par dÃ©faut :
-Connections & Channels listxE2x80xA6	Device View		Liste des canaux et connexionsxE2x80xA6
- seconds	Device View		 secondes
-Policy...	Device View		Attitude...
-Show Name	Device View		Montrer le nom
-Laptop	Device View		Portable
-AboutxE2x80xA6	Device View		Ã€ proposxE2x80xA6
+1	french	x-vnd.Haiku-BluetoothPrefs	3058329015
+Handheld	Settings view		Appareil de poche
+Only from Trusted devices	Settings view		Seulement les appareils de confiance
+Refresh LocalDevicesxE2x80xA6	Window		Rafraîchir LocalDevicexE2x80xA6
+Add device to list	Inquiry panel		Ajouter l'appareil à la liste
+Starting scan...	Inquiry panel		Démarrage de la recherche...
+Smart Phone	Settings view		Téléphone
+ seconds	Inquiry panel		 secondes
+Remote Devices	Window		Appareils distants
+Server	Settings view		Serveur
+Default Inquiry time:	Settings view		Temps de requête par défaut:
+Identify host as:	Settings view		Identifier l'hôte comme :
+View	Window		Vue
+Show Bluetooth consolexE2x80xA6	Window		Montrer le terminal bluetoothxE2x80xA6
+Incoming connections policy:	Settings view		Attitude envers les connexions entrantes :
+From all devices	Settings view		Tous les appareils
+RefreshxE2x80xA6	Remote devices		RafraîchirxE2x80xA6
+Connections & Channels listxE2x80xA6	Window		Liste des connexions et canauxxE2x80xA6
+Server	Window		Serveur
+Scanning completed.	Inquiry panel		Recherche complète.
+Start Bluetooth ServicesxE2x80xA6	Window		Démarrer les services bluetoothxE2x80xA6
+Remove	Remote devices		Enlever
+15 secs	Settings view		15 secs
+Policy...	Settings view		Attitude...
+61 secs	Settings view		61 secs
+AddxE2x80xA6	Remote devices		AjouterxE2x80xA6
+Identify us as...	Settings view		S'identifier comme...
+Remaining 	Inquiry panel		Restant 
+Pick LocalDevice...	Settings view		Choisir LocalDevice...
+Defaults	Window		Défauts
+Inquiry	Inquiry panel		Requête
+Desktop	Settings view		Bureau
+Revert	Window		Défaire
+AboutxE2x80xA6	Window		À proposxE2x80xA6
+Remote Devices ListxE2x80xA6	Window		Liste d'appareils distantsxE2x80xA6
+Laptop	Settings view		Portable
+Retrieving name of 	Inquiry panel		Récupérer le nom de 
+Local Devices found on system:	Settings view		Appareils locaux trouvés sur le système :
+As Trusted	Remote devices		Comme de confiance
+Discoverable	Extended local device view		Découvrable
+As Blocked	Remote devices		Comme bloqué
 Service Classes: 	Device View		Classes de services: 
-Remaining 	Device View		Restant 
-Pick LocalDevice...	Device View		SÃ©lectionner LocalDevice...
-Remote Devices ListxE2x80xA6	Device View		Liste des appareils distantsxE2x80xA6
-RefreshxE2x80xA6	Device View		RafraÃ®chirxE2x80xA6
-AddxE2x80xA6	Device View		AjouterxE2x80xA6
-View	Device View		Vue
-Desktop	Device View		Bureau
-Retrieving names...	Device View		RÃ©cupÃ©ration des noms...
-Starting scan...	Device View		DÃ©but du balayage...
-From all devices	Device View		Depuis tous les appareils
+Stop Bluetooth ServicesxE2x80xA6	Window		Arrêter les services bluetoothxE2x80xA6
+Settings	Window		Paramètres
+Check that the bluetooth capabilities of your remote device are activated. Press Inquiry to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them	Inquiry panel		Vérifiez que les fonctionnalités bluetooth de votre appareil distant sont activées. Appuyez sur "Requête" pour lancer la recherche. Le temps nécessaire pour récupérer les noms n'est pas connu, mais ça ne devrait pas prendre plus de 3 secondes par appareil. Ensuite vous pourrez les ajouter à la liste principale, où vous pourrez vous associer avec eux.
+Scanning progress	Inquiry panel		Avancée de la recherche
+Always ask	Settings view		Toujours demander
+Haiku Bluetooth System, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas FÃ¤rber\n\t- JÃ¶rg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Système bluetooth Haiku, (ARCE)\n\nCréé par Oliver Ruiz Dorantes\n\nAvec l'aide de :\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nMerci à tous ceux qui ont aidé...\n\nEnvoi.don de matériel :\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nÉconomiquement:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nAvec des patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas FÃ¤rber\n\t- JÃ¶rg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nQui m'ont tout appris:\n\t- l'équipe yellowTAB
+Retrieving names...	Inquiry panel		Récupération des noms...
+Help	Window		Aide
+Ok	main		Ok
+There has not been found any bluetooth LocalDevice device registered on the system	Inquiry panel		Aucun matériel bluetooth trouvé sur le système
+Show Name	Extended local device view		Montrer le nom

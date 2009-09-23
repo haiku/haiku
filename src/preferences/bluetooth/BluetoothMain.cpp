@@ -13,6 +13,7 @@
 #include "defs.h"
 
 
+#define TR_CONTEXT "main"
 
 BluetoothApplication::BluetoothApplication(void)
  :	BApplication(BLUETOOTH_APP_SIGNATURE)
@@ -58,7 +59,7 @@ BluetoothApplication::AboutRequested()
                              "	- Petter H. Juliussen\n"
                              "	- Adrien Destugues\n\n"
                              "Who gave me all the knowledge:\n"
-                             "	- the yellowTAB team", "OK")))->Go();
+                             "	- the yellowTAB team"), TR("Ok")))->Go();
 	
 }
 

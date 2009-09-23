@@ -26,6 +26,8 @@
 #include "DeviceListItem.h"
 #include "defs.h"
 
+#define TR_CONTEXT "Inquiry panel"
+
 using Bluetooth::DeviceListItem;
 
 // private funcionaility provided by kit

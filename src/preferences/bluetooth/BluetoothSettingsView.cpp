@@ -8,8 +8,10 @@
 #include <stdlib.h>
 
 #include <Box.h>
+#include <Catalog.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -23,6 +25,8 @@
 
 #include "defs.h"
 #include "BluetoothWindow.h"
+
+#define TR_CONTEXT "Settings view"
 	
 static const int32 kMsgSetAntialiasing = 'anti';
 static const int32 kMsgSetDeviceClassDesktop = 'sDCd';

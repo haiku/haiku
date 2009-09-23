@@ -20,6 +20,8 @@
 
 #include "defs.h"
 
+#define TR_CONTEXT "Window"
+
 static const uint32 kMsgSetDefaults = 'dflt';
 static const uint32 kMsgRevert = 'rvrt';
 
