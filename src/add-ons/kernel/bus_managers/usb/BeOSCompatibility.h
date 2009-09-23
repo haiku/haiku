@@ -90,6 +90,75 @@ mutex_unlock(mutex *ben)
 }
 
 
+class ConditionVariableEntry {
+public:
+	ConditionVariableEntry()
+		:	fSem(-1)
+	{
+	}
+
+	~ConditionVariableEntry()
+	{
+		if (fSem >= 0)
+			delete_sem(fSem);
+	}
+
+	sem_id Added()
+	{
+		if (fSem < 0)
+			fSem = create_sem(0, "condvar entry");
+		return fSem;
+	}
+
+	status_t Wait(uint32 flags, bigtime_t timeout)
+	{
+		return acquire_sem_etc(fSem, 1, flags, timeout);
+	}
+
+private:
+	sem_id					fSem;
+};
+
+
+class ConditionVariable {
+public:
+	ConditionVariable()
+		:	fObject(NULL),
+			fName("condvar"),
+			fSemCount(0)
+	{
+	}
+
+	void Init(void *object, const char *name)
+	{
+		fObject = object;
+		fName = name;
+	}
+
+	void Add(ConditionVariableEntry *entry)
+	{
+		fSems[fSemCount++] = entry->Added();
+	}
+
+	void NotifyAll()
+	{
+		int32 semCount = fSemCount;
+		sem_id sems[semCount];
+		memcpy(sems, fSems, sizeof(sem_id) * semCount);
+		fSemCount = 0;
+
+		for (int32 i = 0; i < semCount; i++)
+			release_sem(sems[i]);
+	}
+
+private:
+	void *		fObject;
+	const char *fName;
+	sem_id		fSems[30];
+	int32		fSemCount;
+};
+
+
 inline void
 load_driver_symbols(char *driver)
 {
@@ -113,6 +182,26 @@ atomic_get(vint32 *value)
 {
 	return atomic_or(value, 0);
 }
+
+
+inline int32
+atomic_set(vint32 *value, int32 setValue)
+{
+	int32 result = atomic_and(value, 0);
+	int32 previous = atomic_add(value, setValue);
+	if (previous != 0)
+		result = previous;
+	return result;
+}
+
+
+inline status_t
+user_memcpy(void *target, void *source, size_t length)
+{
+	memcpy(target, source, length);
+	return B_OK;
+}
+
 
 #undef B_KERNEL_READ_AREA
 #define B_KERNEL_READ_AREA 0
