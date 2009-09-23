@@ -13,9 +13,9 @@ SetSubDirSupportedPlatforms libbe_test ;
 
 SimpleTest TestApp_Clock :
 	cl_view.cpp
-	cl_wind.cpp 
+	cl_wind.cpp
 	clock.cpp
-	: be
+	: be $(TARGET_LIBSUPC++)
 	: Clock.rdef
 	;
 

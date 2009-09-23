@@ -111,7 +111,7 @@ updateRect.PrintToStream();
 
 // Archive
 status_t
-TestView::Archive(BMessage* into, bool deep = true) const
+TestView::Archive(BMessage* into, bool deep) const
 {
 	status_t ret = BView::Archive(into, deep);
 
@@ -160,7 +160,7 @@ show_window(BRect frame, const char* name)
 				printf("instatiated BView\n");
 		}
 	}
-	
+
 	if (!view)
 		view = new TestView(window->Bounds(), "test", B_FOLLOW_ALL, B_WILL_DRAW);
 

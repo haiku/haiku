@@ -146,6 +146,7 @@ Server test_app_server :
 	z libtestappserver.so libpainter.a be
 	libhwinterface.so libhwinterfaceimpl.so
 	libagg.a libfreetype.so libtextencoding.so
+	$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
 ;
 
 # install in the test dir
