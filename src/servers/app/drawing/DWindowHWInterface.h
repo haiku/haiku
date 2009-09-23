@@ -13,6 +13,7 @@
 #include "HWInterface.h"
 
 #include <Accelerant.h>
+#include <image.h>
 #include <Region.h>
 #include <String.h>
 

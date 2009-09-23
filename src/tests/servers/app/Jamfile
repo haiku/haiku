@@ -66,6 +66,7 @@ SharedLibrary libtestappserver.so :
 	CursorManager.cpp
 	CursorSet.cpp
 	DesktopSettings.cpp
+	DirectWindowInfo.cpp
 	DrawState.cpp
 	FontCache.cpp
 	FontCacheEntry.cpp
@@ -132,6 +133,7 @@ Server test_app_server :
 	OffscreenWindow.cpp
 	RegionPool.cpp
 	Screen.cpp
+	ScreenConfigurations.cpp
 	ServerPicture.cpp
 	View.cpp
 	Window.cpp
