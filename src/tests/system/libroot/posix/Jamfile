@@ -52,7 +52,7 @@ SimpleTest sigsetjmp_test
 	: sigsetjmp_test.c
 ;
 
-SimpleTest truncate
+SimpleTest <test>truncate
 	: truncate.cpp
 ;
 
