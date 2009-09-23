@@ -909,15 +909,17 @@ usb_disk_open(const char *name, uint32 flags, void **cookie)
 		return B_NAME_NOT_FOUND;
 
 	int32 lastPart = 0;
-	for (int32 i = strlen(name) - 1; i >= 0; i--) {
+	size_t nameLength = strlen(name);
+	for (int32 i = nameLength - 1; i >= 0; i--) {
 		if (name[i] == '/') {
 			lastPart = i;
 			break;
 		}
 	}
 
-	char rawName[32];
-	strlcpy(rawName, name, lastPart + 2);
+	char rawName[nameLength + 4];
+	strncpy(rawName, name, lastPart + 1);
+	rawName[lastPart + 1] = 0;
 	strcat(rawName, "raw");
 	TRACE("opening raw device %s for %s\n", rawName, name);
 
@@ -1027,7 +1029,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 		case B_FLUSH_DRIVE_CACHE:
 			TRACE("B_FLUSH_DRIVE_CACHE\n");
-			usb_disk_synchronize(lun, true);
+			result = usb_disk_synchronize(lun, true);
 			break;
 
 		case B_EJECT_DEVICE:
@@ -1040,6 +1042,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				NULL, NULL, false);
 			break;
 
+#if HAIKU_TARGET_PLATFORM_HAIKU
 		case B_GET_ICON:
 			// We don't support this legacy ioctl anymore, but the two other
 			// icon ioctls below instead.
@@ -1075,6 +1078,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			result = user_memcpy(buffer, &iconData, sizeof(device_icon));
 			break;
 		}
+#endif
 
 		default:
 			TRACE_ALWAYS("unhandled ioctl %ld\n", op);
