@@ -14,7 +14,7 @@ Preference Bluetooth :
 	ExtendedLocalDeviceView.cpp
 	InquiryPanel.cpp
 	RemoteDevicesView.cpp
-	: be libbluetooth.so $(TARGET_LIBSUPC++)
+	: be libbluetooth.so $(TARGET_LIBSUPC++) liblocale.so
 	;
 
 DoCatalogs Bluetooth :
