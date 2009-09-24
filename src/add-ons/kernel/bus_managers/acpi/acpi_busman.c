@@ -127,22 +127,47 @@ acpi_std_ops(int32 op,...)
 #endif
 
 			status = AcpiInitializeSubsystem();
-			if (status != AE_OK) {
+			if (ACPI_FAILURE(status)) {
 				ERROR("AcpiInitializeSubsystem failed (%s)\n",
 					AcpiFormatException(status));
 				goto err;
 			}
 
 			status = AcpiInitializeTables(NULL, 0, TRUE);
-			if (status != AE_OK) {
+			if (ACPI_FAILURE(status)) {
 				ERROR("AcpiInitializeTables failed (%s)\n",
 					AcpiFormatException(status));
 				goto err;
 			}
 
 			status = AcpiLoadTables();
-			if (status != AE_OK) {
+			if (ACPI_FAILURE(status)) {
 				ERROR("AcpiLoadTables failed (%s)\n",
+					AcpiFormatException(status));
+				goto err;
+			}
+			
+			/* Install the default address space handlers. */
+			status = AcpiInstallAddressSpaceHandler(ACPI_ROOT_OBJECT,
+				ACPI_ADR_SPACE_SYSTEM_MEMORY, ACPI_DEFAULT_HANDLER, NULL, NULL);
+			if (ACPI_FAILURE(status)) {
+				ERROR("Could not initialise SystemMemory handler: %s\n",
+					AcpiFormatException(status));
+				goto err;
+			}
+			
+			status = AcpiInstallAddressSpaceHandler(ACPI_ROOT_OBJECT,
+				ACPI_ADR_SPACE_SYSTEM_IO, ACPI_DEFAULT_HANDLER, NULL, NULL);
+			if (ACPI_FAILURE(status)) {
+				ERROR("Could not initialise SystemIO handler: %s\n",
+					AcpiFormatException(status));
+				goto err;
+			}
+
+			status = AcpiInstallAddressSpaceHandler(ACPI_ROOT_OBJECT,
+				ACPI_ADR_SPACE_PCI_CONFIG, ACPI_DEFAULT_HANDLER, NULL, NULL);
+			if (ACPI_FAILURE(status)) {
+				ERROR("Could not initialise PciConfig handler: %s\n",
 					AcpiFormatException(status));
 				goto err;
 			}
@@ -155,14 +180,14 @@ acpi_std_ops(int32 op,...)
 			// well but specs don't define ACPI_NO_DEVICE_INIT
 			// and ACPI_NO_OBJECT_INIT here.
 			status = AcpiEnableSubsystem(ACPI_FULL_INITIALIZATION);
-			if (status != AE_OK) {
+			if (ACPI_FAILURE(status)) {
 				ERROR("AcpiEnableSubsystem failed (%s)\n",
 					AcpiFormatException(status));
 				goto err;
 			}
 	
 			status = AcpiInitializeObjects(flags);
-			if (status != AE_OK) {
+			if (ACPI_FAILURE(status)) {
 				ERROR("AcpiInitializeObjects failed (%s)\n",
 					AcpiFormatException(status));
 				goto err;
