@@ -45,7 +45,7 @@ public:
 								~PartitionMapWriter();
 
 			status_t			WriteMBR(const PartitionMap* map,
-									bool clearCode);
+									bool writeBootCode);
 			status_t			WriteLogical(const LogicalPartition* logical,
 									const PrimaryPartition* primary,
 									bool clearCode);

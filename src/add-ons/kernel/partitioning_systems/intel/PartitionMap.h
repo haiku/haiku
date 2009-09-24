@@ -86,6 +86,11 @@ struct partition_table {
 	{
 		memset(code_area, 0, sizeof(code_area));
 	}
+
+	void fill_code_area(const uint8* code, size_t size)
+	{
+		memcpy(code_area, code, min_c(sizeof(code_area), size));
+	}
 } _PACKED;
 
 static const uint16 kPartitionTableSectorSignature = 0xaa55;
