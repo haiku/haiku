@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003, Haiku, Inc.
 ** Distributed under the terms of the MIT License.
 */
 
