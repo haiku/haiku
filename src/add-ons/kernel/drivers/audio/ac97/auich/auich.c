@@ -707,15 +707,23 @@ auich_setup(auich_dev * card)
 	}
 
 	if (current_settings.use_thread) {
-		int_thread_id = spawn_kernel_thread(auich_int_thread, "auich interrupt poller", B_REAL_TIME_PRIORITY, card);
+		int_thread_id = spawn_kernel_thread(auich_int_thread, 
+			"auich interrupt poller", B_REAL_TIME_PRIORITY, card);
 		resume_thread(int_thread_id);
 	} else {
 		PRINT(("installing interrupt : %lx\n", card->config.irq));
-		install_io_interrupt_handler(card->config.irq, auich_int, card, 0);
+		err = install_io_interrupt_handler(card->config.irq, auich_int,
+			card, 0);
+		if (err != B_OK) {
+			PRINT(("failed to install interrupt\n"));
+			ac97_detach(card->config.ac97);
+			unmap_io_memory(&card->config);
+			return err;
+		}
 	}
 		
-	if ((err = auich_init(card)))
-		return (err);
+	if ((err = auich_init(card)) != B_OK)
+		return err;
 		
 	PRINT(("init_driver done\n"));
 
