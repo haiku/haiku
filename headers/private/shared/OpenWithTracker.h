@@ -40,13 +40,15 @@ OpenWithTracker(const char* path)
 
 
 status_t
-OpenWithTracker(directory_which which, const char* relativePath,
+OpenWithTracker(directory_which which, const char* relativePath = NULL,
 	bool createDirectory = false, BVolume* volume = NULL)
 {
 	status_t status;
 	BPath path;
 	find_directory(which, &path, createDirectory, volume);
-	path.Append(relativePath);
+
+	if (relativePath)
+		path.Append(relativePath);
 
 	entry_ref ref;
 	BEntry entry(path.Path());
