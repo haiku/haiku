@@ -285,8 +285,7 @@ TPeopleWindow::QuitRequested(void)
 			return false;
 	}
 
-	if (fPanel)
-		delete fPanel;
+	delete fPanel;
 
 	BMessage message(M_WINDOW_QUITS);
 	message.AddRect("frame", Frame());
