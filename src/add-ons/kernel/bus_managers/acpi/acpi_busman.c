@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include <ACPI.h>
+#include <dpc.h>
 #include <KernelExport.h>
 #include <PCI.h>
 
@@ -35,6 +36,8 @@
 #define ACPI_DEVICE_ID_LENGTH	0x08
 
 extern pci_module_info* gPCIManager;
+extern dpc_module_info* gDPC;
+void* gDPCHandle = NULL;
 
 
 static ACPI_STATUS
@@ -107,6 +110,14 @@ acpi_std_ops(int32 op,...)
 				ERROR("ACPI disabled\n");
 				return ENOSYS;
 			}
+			
+			if (gDPC->new_dpc_queue(&gDPCHandle, "acpi_task",
+				B_NORMAL_PRIORITY) != B_OK) {
+				ERROR("failed to create os execution queue\n");
+				return B_ERROR;
+			}
+			
+
 			AcpiGbl_EnableInterpreterSlack = true;
 //			AcpiGbl_CreateOSIMethod = true;
 
@@ -169,6 +180,9 @@ acpi_std_ops(int32 op,...)
 		{
 			if (AcpiTerminate() != AE_OK)
 				ERROR("Could not bring system out of ACPI mode. Oh well.\n");
+
+			gDPC->delete_dpc_queue(gDPCHandle);
+			gDPCHandle = NULL;
 			break;
 		}
 

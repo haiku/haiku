@@ -13,8 +13,6 @@
 #include <dpc.h>
 #include <PCI.h>
 
-dpc_module_info* gDPC = NULL;
-void* gDPCHandle = NULL;
 
 //#define TRACE_ACPI_MODULE
 #ifdef TRACE_ACPI_MODULE
@@ -25,10 +23,12 @@ void* gDPCHandle = NULL;
 
 device_manager_info *gDeviceManager = NULL;
 pci_module_info *gPCIManager = NULL;
+dpc_module_info* gDPC = NULL;
 
 module_dependency module_dependencies[] = {
 	{B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager},
 	{B_PCI_MODULE_NAME, (module_info **)&gPCIManager},
+	{B_DPC_MODULE_NAME, (module_info **)&gDPC},
 	{}
 };
 
@@ -172,16 +172,6 @@ acpi_module_register_child_devices(void *cookie)
 static status_t
 acpi_module_init(device_node *node, void **_cookie)
 {
-	if (get_module(B_DPC_MODULE_NAME, (module_info **)&gDPC) != B_OK) {
-		dprintf("failed to get dpc module\n");
-		return B_ERROR;
-	}
-	if (gDPC->new_dpc_queue(&gDPCHandle, "acpi_task",
-		B_NORMAL_PRIORITY) != B_OK) {
-		dprintf("failed to create os execution queue\n");
-		return B_ERROR;
-	}
-			
 	*_cookie = node;
 	return B_OK;
 }
@@ -190,10 +180,6 @@ acpi_module_init(device_node *node, void **_cookie)
 static void
 acpi_module_uninit(void *cookie)
 {
-	gDPC->delete_dpc_queue(gDPCHandle);
-	gDPCHandle = NULL;
-	put_module(B_DPC_MODULE_NAME);
-	gDPC = NULL;
 }
 
 
