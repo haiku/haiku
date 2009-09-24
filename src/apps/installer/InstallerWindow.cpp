@@ -455,7 +455,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			char status[1024];
 			snprintf(status, sizeof(status), "Installation completed. "
 				"Boot sector has been written to '%s'. Press Quit to %s "
-				"or chose a new target volume to perform another "
+				"or choose a new target volume to perform another "
 				"installation.", dstItem ? dstItem->Name() : "???", quitString);
 			_SetStatusMessage(status);
 			fInstallStatus = kFinished;
