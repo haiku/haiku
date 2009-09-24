@@ -2,8 +2,8 @@
 #define _BLUETOOTH_SERVER_PRIVATE_H
 
 
-#define BLUETOOTH_SIGNATURE "application/x-vnd.Be-bluetooth_server"
-#define BLUETOOTH_APP_SIGNATURE "application/x-vnd.haiku-BluetoothPrefs"
+#define BLUETOOTH_SIGNATURE "application/x-vnd.Haiku-bluetooth_server"
+#define BLUETOOTH_APP_SIGNATURE "application/x-vnd.Haiku-BluetoothPrefs"
 
 /* Kit Comunication */
 
