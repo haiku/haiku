@@ -361,7 +361,7 @@ OpenDMLParser::Parse()
 
 		if (size == 0 && fourcc == FOURCC('R','I','F','F')) {
 			//Calculate size from filesize
-			size = fSize - 8;
+			size = maxsize;
 			ERROR("OpenDMLParser::Parse: Warning chunk '"FOURCC_FORMAT"', size is 0 calculating as %lu\n", FOURCC_PARAM(fourcc), size);
 		}
 		
