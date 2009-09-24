@@ -359,7 +359,14 @@ OpenDMLParser::Parse()
 			size = maxsize;
 		}
 
+		if (size == 0 && fourcc == FOURCC('R','I','F','F')) {
+			//Calculate size from filesize
+			size = fSize - 8;
+			ERROR("OpenDMLParser::Parse: Warning chunk '"FOURCC_FORMAT"', size is 0 calculating as %lu\n", FOURCC_PARAM(fourcc), size);
+		}
+		
 		if (size == 0) {
+			// size is still 0
 			ERROR("OpenDMLParser::Parse: Error: chunk of size 0 found\n");
 			return B_ERROR;
 		}
@@ -455,8 +462,8 @@ OpenDMLParser::ParseChunk_AVI(int number, uint64 start, uint32 size)
 		}
 
 		if (Chunksize == 0) {
-			TRACE("OpenDMLParser::ParseChunk_AVI: chunk '"FOURCC_FORMAT"' has size 0\n", FOURCC_PARAM(Chunkfcc));
-			return B_OK;
+			ERROR("OpenDMLParser::ParseChunk_AVI: chunk '"FOURCC_FORMAT"' has size 0 assuming %lu\n", FOURCC_PARAM(Chunkfcc), maxsize);
+			Chunksize = maxsize; // Assume maxsize
 		}
 
 		if (Chunkfcc == FOURCC('L','I','S','T')) {
