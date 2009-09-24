@@ -8,8 +8,13 @@
  *		Philippe Houdoin
  */
 
+
+#include "debug.h"
 #include "DeviceWatcher.h"
 #include "PortDrivers.h"
+
+#include <stdio.h>
+#include <new>
 
 #include <Application.h>
 #include <Bitmap.h>
@@ -17,18 +22,15 @@
 #include <Entry.h>
 #include <File.h>
 #include <Path.h>
+#include <PathMonitor.h>
 #include <Resources.h>
 #include <Roster.h>
-#include <PathMonitor.h>
 
-#include <stdio.h>
-#include <new>
 using std::nothrow;
 
 using namespace BPrivate;
 using BPrivate::HashMap;
 using BPrivate::HashString;
-
 
 const char *kDevicesRoot = "/dev/midi";
 // const char *kDevicesRoot = "/Data/tmp";
@@ -42,8 +44,8 @@ public:
 	}
 		
 	int 				fFD;
-	MidiPortConsumer*		fConsumer;
-	MidiPortProducer*		fProducer;
+	MidiPortConsumer*	fConsumer;
+	MidiPortProducer*	fProducer;
 };
 
 
@@ -150,7 +152,7 @@ DeviceWatcher::MessageReceived(BMessage* message)
 int32 
 DeviceWatcher::_InitialDevicesScanThread(void* data)
 {
-	((DeviceWatcher*) data)->_ScanDevices(kDevicesRoot);
+	((DeviceWatcher*)data)->_ScanDevices(kDevicesRoot);
 	return 0;
 }
 
@@ -158,7 +160,7 @@ DeviceWatcher::_InitialDevicesScanThread(void* data)
 void 
 DeviceWatcher::_ScanDevices(const char* path)
 {
-	// printf("DeviceWatcher::_ScanDevices(\"%s\");\n", path);
+	TRACE(("DeviceWatcher::_ScanDevices(\"%s\");\n", path));
 	
 	BDirectory dir(path);
 	if (dir.InitCheck() != B_OK)
@@ -179,11 +181,12 @@ DeviceWatcher::_ScanDevices(const char* path)
 void
 DeviceWatcher::_AddDevice(const char* path)
 {
-	// printf("DeviceWatcher::_AddDevice(\"%s\");\n", path);
+	TRACE(("DeviceWatcher::_AddDevice(\"%s\");\n", path));
 
-	if ( fDeviceEndpointsMap.ContainsKey(path) )
+	if (fDeviceEndpointsMap.ContainsKey(path)) {
 		// Already known
 		return;
+	}
 		
 	BEntry entry(path);
 	if (entry.IsDirectory())
@@ -192,9 +195,10 @@ DeviceWatcher::_AddDevice(const char* path)
 		
 	if (entry.IsSymLink()) {
 		BEntry symlink(path, true);
-		if (symlink.IsDirectory())
+		if (symlink.IsDirectory()) {
 			// Invalid path!
 			return;
+		}
 	}
 
 	int fd = open(path, O_RDWR | O_EXCL);
@@ -203,15 +207,15 @@ DeviceWatcher::_AddDevice(const char* path)
 	
 	MidiPortConsumer* consumer = new MidiPortConsumer(fd, path);
 	_SetIcons(consumer);
-	// printf("Register %s MidiPortConsumer\n", consumer->Name());
+	TRACE(("Register %s MidiPortConsumer\n", consumer->Name()));
 	consumer->Register();
 
 	MidiPortProducer* producer = new MidiPortProducer(fd, path);
 	_SetIcons(producer);
-	// printf("Register %s MidiPortProducer\n", producer->Name());
+	TRACE(("Register %s MidiPortProducer\n", producer->Name()));
 	producer->Register();
 
-	DeviceEndpoints * deviceEndpoints = new DeviceEndpoints(fd, consumer, producer);
+	DeviceEndpoints* deviceEndpoints = new DeviceEndpoints(fd, consumer, producer);
 	fDeviceEndpointsMap.Put(path, deviceEndpoints);	
 }
 
@@ -219,9 +223,9 @@ DeviceWatcher::_AddDevice(const char* path)
 void
 DeviceWatcher::_RemoveDevice(const char* path)
 {
-	// printf("DeviceWatcher::_RemoveDevice(\"%s\");\n", path);
+	TRACE(("DeviceWatcher::_RemoveDevice(\"%s\");\n", path));
 		
-	DeviceEndpoints * deviceEndpoints = fDeviceEndpointsMap.Get(path);
+	DeviceEndpoints* deviceEndpoints = fDeviceEndpointsMap.Get(path);
 	if (!deviceEndpoints)
 		return;
 		

@@ -9,19 +9,19 @@
  *		Philippe Houdoin
  */
 
-#include "PortDrivers.h"
 
-#include <String.h>
+#include "PortDrivers.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <String.h>
 
 MidiPortConsumer::MidiPortConsumer(int fd, const char* name)
-	: BMidiLocalConsumer(name)
+	: BMidiLocalConsumer(name),
+	fFileDescriptor(fd)
 {
-	fFileDescriptor = fd;
 }
 
 
@@ -41,11 +41,10 @@ MidiPortConsumer::Data(uchar* data, size_t length,
 
 
 MidiPortProducer::MidiPortProducer(int fd, const char *name)
-	: BMidiLocalProducer(name)
+	: BMidiLocalProducer(name),
+	fFileDescriptor(fd), fKeepRunning(true)
+	
 {
-	fFileDescriptor = fd;
-	fKeepRunning = true;
-
 	BString tmp = name;
 	tmp << " reader";
 	
@@ -89,20 +88,16 @@ MidiPortProducer::GetData()
 
 	uint8 next = 0;
 
-	while (fKeepRunning)
-	{
-		if (read(fFileDescriptor, &next, 1) != 1)
-		{
+	while (fKeepRunning) {
+		if (read(fFileDescriptor, &next, 1) != 1) {
 			perror("Error reading data from driver");
-			if (haveSysEx)
-			{
-				free(sysexBuf);
-			}
-			return B_ERROR;
+			break;
 		}
 
-		if (haveSysEx) { // System Exclusive mode
-			if (next < 0x80) { // System Exclusive data byte
+		if (haveSysEx) { 
+			// System Exclusive mode
+			if (next < 0x80) { 
+				// System Exclusive data byte
 				sysexBuf[sysexSize++] = next;
 				if (sysexSize == sysexAlloc) {
 					sysexAlloc *= 2;
@@ -110,31 +105,31 @@ MidiPortProducer::GetData()
 				}
 				continue;
 			} else if ((next & 0xF8) == 0xF8) {
-				// System Realtime interleaved in System Exclusive byte(s)
+				// System Realtime interleaved in System Exclusive sequence
 				SpraySystemRealTime(next);
 				continue;
-			} else {  // whatever byte, this one ends the running SysEx sequence
+			} else {  
+				// Whatever byte, this one ends the running SysEx sequence
 				SpraySystemExclusive(sysexBuf, sysexSize);
 				haveSysEx = false;
-				if (next == B_SYS_EX_END)
+				if (next == B_SYS_EX_END) {
 					// swallow SysEx end byte
-					continue;	
+					continue;
+				}
 				// any other byte, while ending the SysEx sequence, 
 				// should be handled, not dropped
 			}
 		}
 		
-		if ((next & 0xF8) == 0xF8)  // System Realtime
-		{
+		if ((next & 0xF8) == 0xF8) {
+			// System Realtime
 			SpraySystemRealTime(next);
-		}
-		else if ((next & 0xF0) == 0xF0)  // System Common
-		{
+		} else if ((next & 0xF0) == 0xF0) {
+			// System Common
 			runningStatus = 0;
 			msgBuf[0] = next;
 			msgPtr = msgBuf + 1;
-			switch (next)
-			{
+			switch (next) {
 				case B_SYS_EX_START:
 					sysexAlloc = 4096;
 					sysexBuf = (uint8*) malloc(sysexAlloc);
@@ -154,19 +149,18 @@ MidiPortProducer::GetData()
 					msgSize = 2;
 					break;
 			
+				case B_SYS_EX_END:	
+					// Unpaired with B_SYS_EX_START, but pass it anyway...
 				case B_TUNE_REQUEST:
-				case B_SYS_EX_END:	// Unpaired with B_SYS_EX_START, but pass it anyway...
 					SpraySystemCommon(next, 0, 0);
 					break;
 			}			
-		}
-		else if ((next & 0x80) == 0x80)  // Voice message
-		{
+		} else if ((next & 0x80) == 0x80) {
+			// Voice message
 			runningStatus = next;
 			msgBuf[0] = next;
 			msgPtr = msgBuf + 1;
-			switch (next & 0xF0)
-			{
+			switch (next & 0xF0) {
 				case B_NOTE_OFF:
 				case B_NOTE_ON:
 				case B_KEY_PRESSURE:
@@ -182,14 +176,11 @@ MidiPortProducer::GetData()
 					msgSize = 2;
 					break;
 			}
-		}
-		else if (needed > 0)  // Data bytes to complete message
-		{
+		} else if (needed > 0) {
+			// Data bytes to complete message
 			*msgPtr++ = next;
-			if (--needed == 0)
-			{
-				switch (msgBuf[0] & 0xF0)
-				{
+			if (--needed == 0) {
+				switch (msgBuf[0] & 0xF0) {
 					case B_NOTE_OFF:
 						SprayNoteOff(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2]);
 						break;
@@ -219,8 +210,7 @@ MidiPortProducer::GetData()
 						break;
 				}
 
-				switch (msgBuf[0])
-				{
+				switch (msgBuf[0]) {
 					case B_SONG_POSITION:
 						SpraySystemCommon(msgBuf[0], msgBuf[1], msgBuf[2]);
 						break;
@@ -232,22 +222,17 @@ MidiPortProducer::GetData()
 						break;
 				}
 			}
-		}
-		else if (runningStatus != 0)  // Repeated voice command
-		{
+		} else if (runningStatus != 0) {
+			// Repeated voice command
 			msgBuf[0] = runningStatus;
 			msgBuf[1] = next;
 			msgPtr = msgBuf + 2;
 			needed = msgSize - 2;
 		}
-	}
+	}	// while fKeepRunning
 
 	if (haveSysEx)
-	{
 		free(sysexBuf);
-	}
 
-	return B_OK;
+	return fKeepRunning ? B_ERROR : B_OK;
 }
-
-//------------------------------------------------------------------------------

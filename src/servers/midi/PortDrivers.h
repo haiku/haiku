@@ -10,13 +10,13 @@
 #ifndef PORT_DRIVERS_H
 #define PORT_DRIVERS_H
 
+
 #include <MidiProducer.h>
 #include <MidiConsumer.h>
 
-class MidiPortConsumer : public BMidiLocalConsumer
-{
+class MidiPortConsumer : public BMidiLocalConsumer {
 public:
-	MidiPortConsumer(int fd, const char* path);
+					MidiPortConsumer(int fd, const char* path);
 
 	void 			Data(uchar* data, size_t length, bool atomic, bigtime_t time);
 
@@ -25,11 +25,10 @@ private:
 };
 
 
-class MidiPortProducer : public BMidiLocalProducer
-{
+class MidiPortProducer : public BMidiLocalProducer {
 public:
-	MidiPortProducer(int fd, const char* path = NULL);
-	~MidiPortProducer(void);
+					MidiPortProducer(int fd, const char* path = NULL);
+	virtual			~MidiPortProducer(void);
 
 	int32 			GetData(void);
 
