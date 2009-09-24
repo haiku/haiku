@@ -88,7 +88,8 @@ emuxki_settings current_settings = {
 		2       // buffer count	
 };
 
-status_t emuxki_init(emuxki_dev * card);
+status_t emuxki_init(emuxki_dev *card);
+void emuxki_shutdown(emuxki_dev *card);
 
 extern device_hooks multi_hooks;
 extern device_hooks midi_hooks;
@@ -135,13 +136,14 @@ dump_hardware_regs(device_config *config)
 	
 }
 
-static void 
+
+/*static void 
 trace_hardware_regs(device_config *config)
 {
 	TRACE(("EMU_IPR = %#08x\n",emuxki_reg_read_32(config, EMU_IPR)));
 	TRACE(("EMU_INTE = %#08x\n",emuxki_reg_read_32(config, EMU_INTE)));
 	TRACE(("EMU_HCFG = %#08x\n",emuxki_reg_read_32(config, EMU_HCFG)));
-}
+}*/
 
 /* Misc stuff relative to Emuxki */
 
@@ -150,6 +152,7 @@ int             emu10k1_recbuf_sizes[] = {
 	2048, 2560, 3072, 3584, 4096, 5120, 6144, 7168, 8192, 10240, 12288,
 	14366, 16384, 20480, 24576, 28672, 32768, 40960, 49152, 57344, 65536
 };
+
 
 static uint32
 emuxki_rate_to_pitch(uint32 rate)
@@ -230,6 +233,7 @@ emuxki_mem_new(emuxki_dev *card, int ptbidx, size_t size)
 	return mem;
 }
 
+
 static void
 emuxki_mem_delete(emuxki_mem *mem)
 {
@@ -237,6 +241,7 @@ emuxki_mem_delete(emuxki_mem *mem)
 		delete_area(mem->area);
 	free(mem);
 }
+
 
 void *
 emuxki_pmem_alloc(emuxki_dev *card, size_t size)
@@ -290,6 +295,7 @@ emuxki_pmem_alloc(emuxki_dev *card, size_t size)
 	return NULL;
 }
 
+
 void *
 emuxki_rmem_alloc(emuxki_dev *card, size_t size)
 {
@@ -306,6 +312,7 @@ emuxki_rmem_alloc(emuxki_dev *card, size_t size)
 
 	return mem->log_base;
 }
+
 
 void
 emuxki_mem_free(emuxki_dev *card, void *ptr)
@@ -404,6 +411,7 @@ emuxki_chanparms_set_defaults(emuxki_channel *chan)
 	chan->tremolo_depth = 0x00;
 }
 
+
 static emuxki_channel *
 emuxki_channel_new(emuxki_voice *voice, uint8 num)
 {
@@ -419,12 +427,14 @@ emuxki_channel_new(emuxki_voice *voice, uint8 num)
 	return chan;
 }
 
+
 static void
 emuxki_channel_delete(emuxki_channel *chan)
 {
 	chan->voice->stream->card->channel[chan->num] = NULL;
 	free(chan);
 }
+
 
 static void
 emuxki_channel_set_fxsend(emuxki_channel *chan,
@@ -451,6 +461,7 @@ emuxki_channel_set_fxsend(emuxki_channel *chan,
 	chan->fxsend.h.dest = fxsend->h.dest;
 }
 
+
 static void
 emuxki_channel_set_srate(emuxki_channel *chan, uint32 srate)
 {
@@ -463,6 +474,7 @@ emuxki_channel_set_srate(emuxki_channel *chan, uint32 srate)
 		(emuxki_rate_to_pitch(srate) >> 8) & EMU_CHAN_IP_MASK;
 }
 
+
 /* voice params must be set before calling this */
 static void
 emuxki_channel_set_bufparms(emuxki_channel *chan,
@@ -471,6 +483,7 @@ emuxki_channel_set_bufparms(emuxki_channel *chan,
 	chan->loop.start = start & EMU_CHAN_PSST_LOOPSTARTADDR_MASK;
 	chan->loop.end = end & EMU_CHAN_DSL_LOOPENDADDR_MASK;
 }
+
 
 static void
 emuxki_channel_commit_fx(emuxki_channel *chan)
@@ -514,6 +527,7 @@ emuxki_channel_commit_fx(emuxki_channel *chan)
 	emuxki_chan_write(&card->config, chano, EMU_CHAN_PSST,
 		      (chan->fxsend.c.level << 24) | chan->loop.start);
 }
+
 
 static void
 emuxki_channel_commit_parms(emuxki_channel *chan)
@@ -576,6 +590,7 @@ emuxki_channel_commit_parms(emuxki_channel *chan)
 	//splx(s);
 }
 
+
 static void
 emuxki_channel_start(emuxki_channel *chan)
 {
@@ -622,6 +637,7 @@ emuxki_channel_start(emuxki_channel *chan)
 	//splx(s);
 }
 
+
 static void
 emuxki_channel_stop(emuxki_channel *chan)
 {
@@ -641,8 +657,9 @@ emuxki_channel_stop(emuxki_channel *chan)
 	//splx(s);
 }
 
+
 /*	Emuxki voice functions */
-static void 
+/*static void 
 emuxki_dump_voice(emuxki_voice *voice)
 {
 	LOG(("voice->use = %#u\n", voice->use));
@@ -662,7 +679,8 @@ emuxki_dump_voice(emuxki_voice *voice)
 	LOG(("voice->trigblk = %#u\n", voice->trigblk));
 	LOG(("voice->blkmod = %#u\n", voice->blkmod));
 	LOG(("voice->timerate = %#u\n", voice->timerate));
-}
+}*/
+
 
 /* Allocate channels for voice in case of play voice */
 static status_t
@@ -700,6 +718,7 @@ emuxki_voice_channel_create(emuxki_voice *voice)
 	return EAGAIN;
 }
 
+
 /* When calling this function we assume no one can access the voice */
 static void
 emuxki_voice_channel_destroy(emuxki_voice *voice)
@@ -710,6 +729,7 @@ emuxki_voice_channel_destroy(emuxki_voice *voice)
 		emuxki_channel_delete(voice->dataloc.chan[1]);
 	voice->dataloc.chan[1] = NULL;
 }
+
 
 static status_t
 emuxki_voice_dataloc_create(emuxki_voice *voice)
@@ -724,6 +744,7 @@ emuxki_voice_dataloc_create(emuxki_voice *voice)
 	}
 	return B_OK;
 }
+
 
 static void
 emuxki_voice_dataloc_destroy(emuxki_voice *voice)
@@ -750,9 +771,11 @@ emuxki_voice_dataloc_destroy(emuxki_voice *voice)
 				return;
 		}
 		emuxki_chan_write(&voice->stream->card->config, 0, buffaddr_reg, 0);
-		emuxki_chan_write(&voice->stream->card->config, 0, buffsize_reg, EMU_RECBS_BUFSIZE_NONE);
+		emuxki_chan_write(&voice->stream->card->config, 0, buffsize_reg, 
+			EMU_RECBS_BUFSIZE_NONE);
 	}
 }
+
 
 static void
 emuxki_voice_fxupdate(emuxki_voice *voice)
@@ -1017,6 +1040,7 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 	}
 }
 
+
 static status_t
 emuxki_voice_set_stereo(emuxki_voice *voice, uint8 stereo)
 {
@@ -1029,6 +1053,7 @@ emuxki_voice_set_stereo(emuxki_voice *voice, uint8 stereo)
 	emuxki_voice_fxupdate(voice);
 	return B_OK;
 }
+
 
 static status_t
 emuxki_voice_set_srate(emuxki_voice *voice, uint32 srate)
@@ -1044,6 +1069,7 @@ emuxki_voice_set_srate(emuxki_voice *voice, uint32 srate)
 	}
 	return B_OK;
 }
+
 
 status_t
 emuxki_voice_set_audioparms(emuxki_voice *voice, uint8 stereo,
@@ -1064,6 +1090,7 @@ emuxki_voice_set_audioparms(emuxki_voice *voice, uint8 stereo,
 		emuxki_voice_set_srate(voice, srate);
 	return B_OK;
 }
+
 
 status_t
 emuxki_voice_set_recparms(emuxki_voice *voice, emuxki_recsrc_t recsrc,
@@ -1089,6 +1116,7 @@ emuxki_voice_set_recparms(emuxki_voice *voice, emuxki_recsrc_t recsrc,
 	}
 	return B_OK;
 }
+
 
 /* voice audio parms (see just before) must be set prior to this */
 status_t
@@ -1137,6 +1165,7 @@ emuxki_voice_set_bufparms(emuxki_voice *voice, void *ptr,
 	return error;
 }
 
+
 status_t
 emuxki_voice_commit_parms(emuxki_voice *voice)
 {
@@ -1178,6 +1207,7 @@ emuxki_voice_commit_parms(emuxki_voice *voice)
 	return B_OK;
 }
 
+
 static uint32
 emuxki_voice_curaddr(emuxki_voice *voice)
 {
@@ -1208,6 +1238,7 @@ emuxki_voice_curaddr(emuxki_voice *voice)
 				     idx_reg);
 	}
 }
+
 
 static void
 emuxki_resched_timer(emuxki_dev *card)
@@ -1251,6 +1282,7 @@ emuxki_resched_timer(emuxki_dev *card)
 	LOG(("emuxki_resched_timer state : %x\n", card->timerstate));
 	//splx(s);
 }
+
 
 static uint32 
 emuxki_voice_adc_rate(emuxki_voice *voice)
@@ -1297,6 +1329,7 @@ emuxki_voice_adc_rate(emuxki_voice *voice)
 	}
 	return 0;
 }
+
 
 void
 emuxki_voice_start(emuxki_voice *voice)
@@ -1352,6 +1385,7 @@ emuxki_voice_start(emuxki_voice *voice)
 	}
 }
 
+
 void
 emuxki_voice_halt(emuxki_voice *voice)
 {
@@ -1389,6 +1423,7 @@ emuxki_voice_halt(emuxki_voice *voice)
 	}
 }
 
+
 emuxki_voice *
 emuxki_voice_new(emuxki_stream *stream, uint8 use, uint8 voicenum)
 {
@@ -1418,6 +1453,7 @@ emuxki_voice_new(emuxki_stream *stream, uint8 use, uint8 voicenum)
 	voice->voicenum = voicenum;
 	return voice;
 }
+
 
 void
 emuxki_voice_delete(emuxki_voice *voice)
@@ -1479,13 +1515,16 @@ emuxki_stream_set_audioparms(emuxki_stream *stream, bool stereo, uint8 channels,
 			if (!stream->first_voice)
 				stream->first_voice = voice;
 			LIST_INSERT_HEAD((&stream->voices), voice, next);
-			if ((error = emuxki_voice_set_audioparms(voice, stream->stereo, stream->b16, stream->sample_rate)))
+			if ((error = emuxki_voice_set_audioparms(voice, stream->stereo, 
+				stream->b16, stream->sample_rate)))
 				return error;
 						
 			if (stream->use & EMU_USE_PLAY)
-				buffer = emuxki_pmem_alloc(stream->card, stream->bufframes * frame_size * stream->bufcount);
+				buffer = emuxki_pmem_alloc(stream->card, stream->bufframes 
+					* frame_size * stream->bufcount);
 			else
-				buffer = emuxki_rmem_alloc(stream->card, stream->bufframes * frame_size * stream->bufcount);
+				buffer = emuxki_rmem_alloc(stream->card, stream->bufframes 
+					* frame_size * stream->bufcount);
 			
 			emuxki_voice_set_bufparms(voice, buffer, 
 				stream->bufframes * frame_size * stream->bufcount, 
@@ -1495,6 +1534,7 @@ emuxki_stream_set_audioparms(emuxki_stream *stream, bool stereo, uint8 channels,
 		
 	return B_OK;
 }
+
 
 status_t 
 emuxki_stream_set_recparms(emuxki_stream *stream, emuxki_recsrc_t recsrc,
@@ -1527,6 +1567,7 @@ emuxki_stream_set_recparms(emuxki_stream *stream, emuxki_recsrc_t recsrc,
 	return B_OK;
 }
 
+
 status_t
 emuxki_stream_commit_parms(emuxki_stream *stream)
 {
@@ -1540,6 +1581,7 @@ emuxki_stream_commit_parms(emuxki_stream *stream)
 	
 	return B_OK;
 }
+
 
 status_t
 emuxki_stream_get_nth_buffer(emuxki_stream *stream, uint8 chan, uint8 buf, 
@@ -1563,7 +1605,8 @@ emuxki_stream_get_nth_buffer(emuxki_stream *stream, uint8 chan, uint8 buf,
 			else 
 				break;
 		if (voice) {
-			*buffer = (char*)voice->buffer->log_base + (buf * stream->bufframes * sample_size * 2);
+			*buffer = (char*)voice->buffer->log_base
+				+ (buf * stream->bufframes * sample_size * 2);
 			if (chan % 2 == 1)
 				*buffer += sample_size;
 			*stride = sample_size * 2;
@@ -1579,7 +1622,8 @@ emuxki_stream_get_nth_buffer(emuxki_stream *stream, uint8 chan, uint8 buf,
 			else 
 				break;
 		if (voice) {
-			*buffer = (char*)voice->buffer->log_base + (buf * stream->bufframes * sample_size);
+			*buffer = (char*)voice->buffer->log_base 
+				+ (buf * stream->bufframes * sample_size);
 			*stride = sample_size;
 		} else
 			return B_ERROR;
@@ -1587,6 +1631,7 @@ emuxki_stream_get_nth_buffer(emuxki_stream *stream, uint8 chan, uint8 buf,
 	
 	return B_OK;
 }
+
 
 void
 emuxki_stream_start(emuxki_stream *stream, void (*inth) (void *), void *inthparam)
@@ -1603,6 +1648,7 @@ emuxki_stream_start(emuxki_stream *stream, void (*inth) (void *), void *inthpara
 	stream->state |= EMU_STATE_STARTED;
 }
 
+
 void
 emuxki_stream_halt(emuxki_stream *stream)
 {
@@ -1614,6 +1660,7 @@ emuxki_stream_halt(emuxki_stream *stream)
 	}
 	stream->state &= ~EMU_STATE_STARTED;
 }
+
 
 emuxki_stream *
 emuxki_stream_new(emuxki_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
@@ -1654,6 +1701,7 @@ emuxki_stream_new(emuxki_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 	return stream;
 }
 
+
 void
 emuxki_stream_delete(emuxki_stream *stream)
 {
@@ -1678,6 +1726,7 @@ emuxki_stream_delete(emuxki_stream *stream)
 	free(stream);
 }
 
+
 /* Emuxki gprs */
 // 87 values from 0.0dB to -xdB (-0.75dB each)
 static uint32 db_table[] = {
@@ -1695,6 +1744,7 @@ static uint32 db_table[] = {
 	2782465,	2552289,	2341153,	2147483,	1969835,	1806882,	1657409,
 	1520301,	1394536,	1279174
 };
+
 
 void
 emuxki_gpr_set(emuxki_dev *card, emuxki_gpr *gpr, int32 type, float *values)
@@ -1736,6 +1786,7 @@ emuxki_gpr_set(emuxki_dev *card, emuxki_gpr *gpr, int32 type, float *values)
 	}
 }
 
+
 void
 emuxki_gpr_get(emuxki_dev *card, emuxki_gpr *gpr, int32 type, float *values)
 {
@@ -1756,6 +1807,7 @@ emuxki_gpr_get(emuxki_dev *card, emuxki_gpr *gpr, int32 type, float *values)
 	}
 }
 
+
 void 
 emuxki_gpr_dump(emuxki_dev * card, uint16 count)
 {
@@ -1769,6 +1821,7 @@ emuxki_gpr_dump(emuxki_dev * card, uint16 count)
 		LOG(("dsp_gpr pc=%x, value=%x\n", pc, value));
 	}
 }
+
 
 static emuxki_gpr *
 emuxki_gpr_new(emuxki_dev *card, const char *name, emuxki_gpr_type type, uint16 *gpr_num, 
@@ -1861,6 +1914,7 @@ emuxki_parameter_set(emuxki_dev *card, const void* cookie, int32 type, int32 *va
 	}
 }
 
+
 void 
 emuxki_parameter_get(emuxki_dev *card, const void* cookie, int32 type, int32 *value)
 {
@@ -1875,6 +1929,7 @@ emuxki_parameter_get(emuxki_dev *card, const void* cookie, int32 type, int32 *va
 			break;
 	}
 }
+
 
 /* Emuxki interrupt */
 static int32 
@@ -2052,6 +2107,7 @@ init_hardware(void)
 	return err;
 }
 
+
 static void
 make_device_names(
 	emuxki_dev * card)
@@ -2076,7 +2132,7 @@ emuxki_setup(emuxki_dev * card)
 {
 	status_t err = B_OK;
 	unsigned char cmd;
-	int32 base;
+	//int32 base;
 
 	PRINT(("setup_emuxki(%p)\n", card));
 
@@ -2217,7 +2273,12 @@ emuxki_setup(emuxki_dev * card)
 	}
 	
 	PRINT(("installing interrupt : %lx\n", card->config.irq));
-	install_io_interrupt_handler(card->config.irq, emuxki_int, card, 0);
+	err = install_io_interrupt_handler(card->config.irq, emuxki_int, card, 0);
+	if (err != B_OK) {
+		PRINT(("failed to install interrupt\n"));
+		emuxki_shutdown(card);
+		return err;	
+	}
 
 	emuxki_inte_enable(&card->config, EMU_INTE_VOLINCRENABLE | EMU_INTE_VOLDECRENABLE
 		| EMU_INTE_MUTEENABLE | EMU_INTE_FXDSPENABLE);
@@ -2238,6 +2299,7 @@ emuxki_setup(emuxki_dev * card)
 	return err;
 }
 
+
 void 
 emuxki_dump_fx(emuxki_dev * card)
 {
@@ -2257,6 +2319,7 @@ emuxki_dump_fx(emuxki_dev * card)
 		}
 	}
 }
+
 
 static void
 emuxki_initfx(emuxki_dev * card)
@@ -2644,6 +2707,7 @@ emuxki_initfx(emuxki_dev * card)
 	emuxki_dump_fx(card);
 }
 
+
 status_t
 emuxki_init(emuxki_dev * card)
 {
@@ -2792,7 +2856,6 @@ emuxki_init(emuxki_dev * card)
 }
 
 
-
 status_t
 init_driver(void)
 {
@@ -2873,8 +2936,7 @@ init_driver(void)
 			cards[num_cards].info = info;
 			if (emuxki_setup(&cards[num_cards])) {
 				PRINT(("Setup of emuxki %ld failed\n", num_cards+1));
-			}
-			else {
+			} else {
 				num_cards++;
 			}
 		}
@@ -2892,7 +2954,7 @@ init_driver(void)
 }
 
 
-static void
+void
 emuxki_shutdown(emuxki_dev *card)
 {
 	uint32       i;
@@ -3018,6 +3080,3 @@ find_device(const char * name)
 }
 
 int32	api_version = B_CUR_DRIVER_API_VERSION;
-
-
-
