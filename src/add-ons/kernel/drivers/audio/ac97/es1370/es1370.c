@@ -483,7 +483,11 @@ es1370_setup(es1370_dev * card)
 	snooze(50000); // 50 ms
 
 	PRINT(("installing interrupt : %lx\n", card->config.irq));
-	install_io_interrupt_handler(card->config.irq, es1370_int, card, 0);
+	err = install_io_interrupt_handler(card->config.irq, es1370_int, card, 0);
+	if (err != B_OK) {
+		PRINT(("failed to install interrupt\n"));
+		return err;
+	}
 		
 	if ((err = es1370_init(card)))
 		return (err);
