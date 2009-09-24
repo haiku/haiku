@@ -11,11 +11,11 @@
 /* Doing it this way is Required since the HPET only supports 32/64-bit aligned reads. */
 
 /* Global Capability Register Masks */
-#define HPET_CAP_MASK_ID			0x000000FF
-#define HPET_CAP_MASK_NUMTIMERS			0x00001F00
-#define HPET_CAP_MASK_WIDTH			0x00002000
-#define HPET_CAP_MASK_LEGACY			0x00008000
-#define HPET_CAP_MASK_VENDOR_ID			0xFFFF0000
+#define HPET_CAP_MASK_ID			0x000000FFL
+#define HPET_CAP_MASK_NUMTIMERS			0x00001F00L
+#define HPET_CAP_MASK_WIDTH			0x00002000L
+#define HPET_CAP_MASK_LEGACY			0x00008000L
+#define HPET_CAP_MASK_VENDOR_ID			0xFFFF0000L
 
 /* Retrieve Global Capabilities */
 #define HPET_GET_ID(regs)		((regs)->capability & HPET_CAP_MASK_ID)
@@ -54,9 +54,9 @@ struct hpet_timer {
 
 struct hpet_regs {
 	/* Capability bits */
+	volatile uint32 capability;			/* Capabilities */	
 	volatile uint32 period;
-	volatile uint32 capability;			/* Capabilities */
-
+	
 	volatile uint64 reserved1;
 
 	/* Config Bits */
