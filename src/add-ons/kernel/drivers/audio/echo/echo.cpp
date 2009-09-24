@@ -703,25 +703,32 @@ cardbus_device_removed(void *cookie)
 static status_t
 echo_setup(echo_dev * card)
 {
-	status_t err = B_OK;
 	unsigned char cmd;
 	char *name;
 	
 	PRINT(("echo_setup(%p)\n", card));
 
 #ifndef CARDBUS
-	(*pci->write_pci_config)(card->info.bus, card->info.device, card->info.function, 
-		PCI_latency, 1, 0xc0 );
+	(*pci->write_pci_config)(card->info.bus, card->info.device, 
+		card->info.function, PCI_latency, 1, 0xc0 );
 	
 	make_device_names(card);
 #endif
 	card->bmbar = card->info.u.h0.base_registers[0];
 	card->irq = card->info.u.h0.interrupt_line;
 
+	card->area_bmbar = map_mem(&card->log_bmbar, (void *)card->bmbar, 
+		card->info.u.h0.base_register_sizes[0], DRIVER_NAME" bmbar io");
+	if (card->area_bmbar <= B_OK) {
+		LOG(("mapping of bmbar io failed, error = %#x\n",card->area_bmbar));
+		goto err5;
+	}
+	LOG(("mapping of bmbar: area %#x, phys %#x, log %#x\n", card->area_bmbar,
+		card->bmbar, card->log_bmbar));
 
 	card->pOSS = new COsSupport(card->info.device_id, card->info.revision);
 	if (card->pOSS == NULL)
-		return B_ERROR;
+		goto err4;
 
 	switch (card->type) {
 #ifdef ECHOGALS_FAMILY
@@ -781,27 +788,21 @@ echo_setup(echo_dev * card)
 			break;
 #endif
 		default:
-			PRINT(("card type 0x%x not supported by "DRIVER_NAME"\n", card->type));
-			delete card->pOSS;
-			return B_ERROR;
+			PRINT(("card type 0x%x not supported by "DRIVER_NAME"\n", 
+				card->type));
 	}
 
 	if (card->pEG == NULL)
-		return B_ERROR;
-		
-	card->area_bmbar = map_mem(&card->log_bmbar, (void *)card->bmbar, 
-		card->info.u.h0.base_register_sizes[0], DRIVER_NAME" bmbar io");
-	if (card->area_bmbar <= B_OK) {
-		LOG(("mapping of bmbar io failed, error = %#x\n",card->area_bmbar));
-		return B_ERROR;
-	}
-	LOG(("mapping of bmbar: area %#x, phys %#x, log %#x\n", card->area_bmbar, card->bmbar, card->log_bmbar));
-
+		goto err2;
+	
 #ifndef CARDBUS
-	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
+	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, 
+		card->info.function, PCI_command, 2);
 	PRINT(("PCI command before: %x\n", cmd));
-	(*pci->write_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2, cmd | PCI_command_io);
-	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
+	(*pci->write_pci_config)(card->info.bus, card->info.device, 
+		card->info.function, PCI_command, 2, cmd | PCI_command_io);
+	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device,
+		card->info.function, PCI_command, 2);
 	PRINT(("PCI command after: %x\n", cmd));
 #endif
 
@@ -810,7 +811,7 @@ echo_setup(echo_dev * card)
 	ECHOSTATUS status;
 	status = card->pEG->InitHw();
 	if (status != ECHOSTATUS_OK)
-		return B_ERROR;
+		goto err3;
 
 	card->pEG->GetCapabilities(&card->caps);
 
@@ -825,7 +826,11 @@ echo_setup(echo_dev * card)
 #endif
 	
 	PRINT(("installing interrupt : %x\n", card->irq));
-	install_io_interrupt_handler(card->irq, echo_int, card, 0);
+	status = install_io_interrupt_handler(card->irq, echo_int, card, 0);
+	if (status != B_OK) {
+		PRINT(("failed to install interrupt\n"));
+		goto err2;
+	}
 	
 	PRINT(("echo_setup done\n"));
 
@@ -833,15 +838,32 @@ echo_setup(echo_dev * card)
 
 #ifdef ECHO3G_FAMILY
 	if (card->type == ECHO3G) {
-		strncpy(card->caps.szName, ((C3g*)card->pEG)->Get3gBoxName(), ECHO_MAXNAMELEN);
+		strncpy(card->caps.szName, ((C3g*)card->pEG)->Get3gBoxName(), 
+			ECHO_MAXNAMELEN);
 	}
 #endif
 
 	status = card->pEG->OpenMixer(card->mixer);
-	if (status != ECHOSTATUS_OK)
-		return B_ERROR;
+	if (status != ECHOSTATUS_OK) {
+		PRINT(("failed to open mixer\n"));
+		goto err1;
+	}
 
-	return err;
+	return B_OK;
+
+err1:
+	remove_io_interrupt_handler(card->irq, echo_int, card);
+err2:
+#ifdef MIDI_SUPPORT
+	delete_sem(card->midi.midi_ready_sem);
+#endif
+err3:
+	delete card->pEG;
+err4:
+	delete card->pOSS;
+err5:
+	delete_area(card->area_bmbar);
+	return B_ERROR;
 }
 
 static void
