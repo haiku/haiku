@@ -82,6 +82,7 @@ auvia_mem_new(auvia_dev *card, size_t size)
 	return mem;
 }
 
+
 static void
 auvia_mem_delete(auvia_mem *mem)
 {
@@ -89,6 +90,7 @@ auvia_mem_delete(auvia_mem *mem)
 		delete_area(mem->area);
 	free(mem);
 }
+
 
 static void *
 auvia_mem_alloc(auvia_dev *card, size_t size)
@@ -103,6 +105,7 @@ auvia_mem_alloc(auvia_dev *card, size_t size)
 
 	return mem;
 }
+
 
 static void
 auvia_mem_free(auvia_dev *card, void *ptr)
@@ -143,7 +146,8 @@ auvia_stream_set_audioparms(auvia_stream *stream, uint8 channels,
 	sample_size = stream->b16 + 1;
 	frame_size = sample_size * stream->channels;
 	
-	stream->buffer = auvia_mem_alloc(stream->card, stream->bufframes * frame_size * stream->bufcount);
+	stream->buffer = auvia_mem_alloc(stream->card, stream->bufframes 
+		* frame_size * stream->bufcount);
 	
 	stream->trigblk = 0;	/* This shouldn't be needed */
 	stream->blkmod = stream->bufcount;
@@ -151,6 +155,7 @@ auvia_stream_set_audioparms(auvia_stream *stream, uint8 channels,
 		
 	return B_OK;
 }
+
 
 status_t
 auvia_stream_commit_parms(auvia_stream *stream)
@@ -175,33 +180,41 @@ auvia_stream_commit_parms(auvia_stream *stream)
 		(uint32)stream->dmaops_phy_base);
 		
 	if(stream->use & AUVIA_USE_RECORD)
-		auvia_codec_write(&stream->card->config, AC97_PCM_L_R_ADC_RATE, (uint16)stream->sample_rate);
+		auvia_codec_write(&stream->card->config, AC97_PCM_L_R_ADC_RATE, 
+			(uint16)stream->sample_rate);
 	else
-		auvia_codec_write(&stream->card->config, AC97_PCM_FRONT_DAC_RATE, (uint16)stream->sample_rate);
+		auvia_codec_write(&stream->card->config, AC97_PCM_FRONT_DAC_RATE, 
+			(uint16)stream->sample_rate);
 	
 	if(IS_8233(&stream->card->config)) {
 		if(stream->base != AUVIA_8233_MP_BASE) {
-			value = auvia_reg_read_32(&stream->card->config, stream->base + AUVIA_8233_RP_RATEFMT);
-			value &= ~(AUVIA_8233_RATEFMT_48K | AUVIA_8233_RATEFMT_STEREO | AUVIA_8233_RATEFMT_16BIT);
+			value = auvia_reg_read_32(&stream->card->config, stream->base 
+				+ AUVIA_8233_RP_RATEFMT);
+			value &= ~(AUVIA_8233_RATEFMT_48K | AUVIA_8233_RATEFMT_STEREO 
+				| AUVIA_8233_RATEFMT_16BIT);
 			if(stream->use & AUVIA_USE_PLAY)
-				value |= AUVIA_8233_RATEFMT_48K * (stream->sample_rate / 20) / (48000 / 20);
+				value |= AUVIA_8233_RATEFMT_48K * (stream->sample_rate / 20) 
+					/ (48000 / 20);
 			value |= (stream->channels == 2 ? AUVIA_8233_RATEFMT_STEREO : 0)
 				| (stream->b16 ? AUVIA_8233_RATEFMT_16BIT : 0);
-			auvia_reg_write_32(&stream->card->config, stream->base + AUVIA_8233_RP_RATEFMT, value);
+			auvia_reg_write_32(&stream->card->config, stream->base 
+				+ AUVIA_8233_RP_RATEFMT, value);
 		} else {
-			static const uint32 slottab[7] = {0, 0xff000011, 0xff000021, 0xff000521,
-											0xff004321, 0xff054321, 0xff654321};
+			static const uint32 slottab[7] = {0, 0xff000011, 0xff000021, 
+				0xff000521, 0xff004321, 0xff054321, 0xff654321};
 			value = (stream->b16 ? AUVIA_8233_MP_FORMAT_16BIT : AUVIA_8233_MP_FORMAT_8BIT)
 				| ((stream->channels << 4) & AUVIA_8233_MP_FORMAT_CHANNEL_MASK) ;
-			auvia_reg_write_8(&stream->card->config, stream->base + AUVIA_8233_OFF_MP_FORMAT, value);
-			auvia_reg_write_32(&stream->card->config, stream->base + AUVIA_8233_OFF_MP_STOP, 
-				slottab[stream->channels]);
+			auvia_reg_write_8(&stream->card->config, stream->base 
+				+ AUVIA_8233_OFF_MP_FORMAT, value);
+			auvia_reg_write_32(&stream->card->config, stream->base 
+				+ AUVIA_8233_OFF_MP_STOP, slottab[stream->channels]);
 		}
 	}
 	//auvia_codec_write(&stream->card->config, AC97_SPDIF_CONTROL, (uint16)stream->sample_rate);
 		
 	return B_OK;
 }
+
 
 status_t
 auvia_stream_get_nth_buffer(auvia_stream *stream, uint8 chan, uint8 buf, 
@@ -220,6 +233,7 @@ auvia_stream_get_nth_buffer(auvia_stream *stream, uint8 chan, uint8 buf,
 	return B_OK;
 }
 
+
 static uint32
 auvia_stream_curaddr(auvia_stream *stream)
 {
@@ -234,6 +248,7 @@ auvia_stream_curaddr(auvia_stream *stream)
 		return (addr - (uint32)stream->dmaops_phy_base - 8) / 8;
 	}
 }
+
 
 void
 auvia_stream_start(auvia_stream *stream, void (*inth) (void *), void *inthparam)
@@ -258,9 +273,11 @@ auvia_stream_start(auvia_stream *stream, void (*inth) (void *), void *inthparam)
 			| (stream->b16 == 1 ? AUVIA_RPMODE_16BIT : 0)
 			| AUVIA_RPMODE_INTR_FLAG | AUVIA_RPMODE_INTR_EOL | AUVIA_RPMODE_AUTOSTART;
 		auvia_reg_write_8(&stream->card->config, stream->base + AUVIA_RP_MODE, regvalue);
-		auvia_reg_write_8(&stream->card->config, stream->base + AUVIA_RP_CONTROL, AUVIA_RPCTRL_START);
+		auvia_reg_write_8(&stream->card->config, stream->base + AUVIA_RP_CONTROL,
+			AUVIA_RPCTRL_START);
 	}
 }
+
 
 void
 auvia_stream_halt(auvia_stream *stream)
@@ -269,8 +286,10 @@ auvia_stream_halt(auvia_stream *stream)
 			
 	stream->state &= ~AUVIA_STATE_STARTED;
 	
-	auvia_reg_write_8(&stream->card->config, stream->base + AUVIA_RP_CONTROL, AUVIA_RPCTRL_TERMINATE);
+	auvia_reg_write_8(&stream->card->config, stream->base + AUVIA_RP_CONTROL, 
+		AUVIA_RPCTRL_TERMINATE);
 }
+
 
 auvia_stream *
 auvia_stream_new(auvia_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
@@ -332,6 +351,7 @@ auvia_stream_new(auvia_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 	return stream;
 }
 
+
 void
 auvia_stream_delete(auvia_stream *stream)
 {
@@ -388,7 +408,8 @@ auvia_int(void *arg)
 				auvia_reg_write_8(&card->config, stream->base + AUVIA_RP_STAT, AUVIA_RPSTAT_INTR);
 			}
 	} else {
-		TRACE(("SGD_SHADOW %x %x\n", card->interrupt_mask, auvia_reg_read_32(&card->config, AUVIA_SGD_SHADOW)));
+		TRACE(("SGD_SHADOW %x %x\n", card->interrupt_mask, 
+			auvia_reg_read_32(&card->config, AUVIA_SGD_SHADOW)));
 	}
 	
 	if(gotone)
@@ -446,14 +467,18 @@ auvia_init(auvia_dev * card)
 {
 	uint32 pr;
 
-	pr = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, AUVIA_PCICONF_JUNK, 4);
+	pr = (*pci->read_pci_config)(card->info.bus, card->info.device, 
+		card->info.function, AUVIA_PCICONF_JUNK, 4);
 	PRINT(("AUVIA_PCICONF_JUNK before: %lx\n", pr));
 	pr &= ~AUVIA_PCICONF_ENABLES;
-	pr |= AUVIA_PCICONF_ACLINKENAB | AUVIA_PCICONF_ACNOTRST | AUVIA_PCICONF_ACVSR | AUVIA_PCICONF_ACSGD;
+	pr |= AUVIA_PCICONF_ACLINKENAB | AUVIA_PCICONF_ACNOTRST 
+		| AUVIA_PCICONF_ACVSR | AUVIA_PCICONF_ACSGD;
 	pr &= ~(AUVIA_PCICONF_ACFM | AUVIA_PCICONF_ACSB);
-	(*pci->write_pci_config)(card->info.bus, card->info.device, card->info.function, AUVIA_PCICONF_JUNK, 4, pr );
+	(*pci->write_pci_config)(card->info.bus, card->info.device, 
+		card->info.function, AUVIA_PCICONF_JUNK, 4, pr );
 	snooze(100); 
-	pr = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, AUVIA_PCICONF_JUNK, 4);
+	pr = (*pci->read_pci_config)(card->info.bus, card->info.device, 
+		card->info.function, AUVIA_PCICONF_JUNK, 4);
 	PRINT(("AUVIA_PCICONF_JUNK after: %lx\n", pr));
 
 	if(IS_8233(&card->config)) {
@@ -479,6 +504,16 @@ auvia_init(auvia_dev * card)
 	return B_OK;
 }
 
+
+static void
+auvia_shutdown(auvia_dev *card)
+{
+	PRINT(("shutdown(%p)\n", card));
+	ac97_detach(card->config.ac97);
+	remove_io_interrupt_handler(card->config.irq, auvia_int, card);
+}
+
+
 static status_t
 auvia_setup(auvia_dev * card)
 {
@@ -499,13 +534,17 @@ auvia_setup(auvia_dev * card)
 	if(card->info.device_id == VIATECH_8233_AC97_DEVICE_ID)
 		card->config.type |= TYPE_8233;
 	
-	PRINT(("%s deviceid = %#04x chiprev = %x model = %x enhanced at %lx\n", card->name, card->info.device_id,
-		card->info.revision, card->info.u.h0.subsystem_id, card->config.nabmbar));
+	PRINT(("%s deviceid = %#04x chiprev = %x model = %x enhanced at %lx\n", 
+		card->name, card->info.device_id, card->info.revision, 
+		card->info.u.h0.subsystem_id, card->config.nabmbar));
 		
-	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
+	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, 
+		card->info.function, PCI_command, 2);
 	PRINT(("PCI command before: %x\n", cmd));
-	(*pci->write_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2, cmd | PCI_command_io);
-	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
+	(*pci->write_pci_config)(card->info.bus, card->info.device, 
+		card->info.function, PCI_command, 2, cmd | PCI_command_io);
+	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, 
+		card->info.function, PCI_command, 2);
 	PRINT(("PCI command after: %x\n", cmd));
 
 	/* attach the codec */
@@ -515,10 +554,17 @@ auvia_setup(auvia_dev * card)
 		card->config.subvendor_id, card->config.subsystem_id);
 
 	PRINT(("installing interrupt : %lx\n", card->config.irq));
-	install_io_interrupt_handler(card->config.irq, auvia_int, card, 0);
+	err = install_io_interrupt_handler(card->config.irq, auvia_int, card, 0);
+	if (err != B_OK) {
+		PRINT(("failed to install interrupt\n"));
+		ac97_detach(card->config.ac97);
+		return err;
+	}
 		
-	if ((err = auvia_init(card)))
-		return (err);
+	if ((err = auvia_init(card))) {
+		auvia_shutdown(card);
+		return err;
+	}
 		
 	PRINT(("init_driver done\n"));
 
@@ -571,15 +617,6 @@ init_driver(void)
 	//add_debugger_command("auvia", auvia_debug, "auvia [card# (1-n)]");
 #endif
 	return B_OK;
-}
-
-
-static void
-auvia_shutdown(auvia_dev *card)
-{
-	PRINT(("shutdown(%p)\n", card));
-	ac97_detach(card->config.ac97);
-	remove_io_interrupt_handler(card->config.irq, auvia_int, card);
 }
 
 
