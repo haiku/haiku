@@ -120,8 +120,10 @@ acpi_thermal_control(void* _cookie, uint32 op, void* arg, size_t len)
 	
 	acpi_thermal_type *att = NULL;
 	
-	size_t bufsize = sizeof(acpi_object_type);
-	acpi_object_type buf;
+	uint32 integer;
+	acpi_data buffer;
+	buffer.pointer = &integer;
+	buffer.length = sizeof(integer);
 	
 	switch (op) {
 		case drvOpGetThermalType: {
@@ -129,16 +131,13 @@ acpi_thermal_control(void* _cookie, uint32 op, void* arg, size_t len)
 			att = (acpi_thermal_type *)arg;
 			
 			// Read basic temperature thresholds.
-			err = device->acpi->evaluate_method(device->acpi_cookie, "_CRT", &buf, bufsize, NULL, 0);
-			att->critical_temp = buf.data.integer;
-			err = device->acpi->evaluate_method(device->acpi_cookie, "_TMP", &buf, bufsize, NULL, 0);
-			att->current_temp = buf.data.integer;
-			err = device->acpi->evaluate_method(device->acpi_cookie, "_HOT", &buf, bufsize, NULL, 0);
-			if (err == B_OK) {
-				att->hot_temp = buf.data.integer;
-			} else {
-				att->hot_temp = 0;
-			}
+			err = device->acpi->evaluate_method(device->acpi_cookie, "_CRT", NULL, &buffer);
+			att->critical_temp = (err == B_OK) ? integer : 0;
+			err = device->acpi->evaluate_method(device->acpi_cookie, "_TMP", NULL, &buffer);
+			att->current_temp = (err == B_OK) ? integer : 0;
+			err = device->acpi->evaluate_method(device->acpi_cookie, "_HOT", NULL, &buffer);
+			att->hot_temp = (err == B_OK) ? integer : 0;
+
 			dprintf("acpi_thermal: GotBasicTemperatures()\n");
 			
 			// Read Passive Cooling devices
@@ -227,7 +226,6 @@ acpi_thermal_uninit_driver(void *driverCookie)
 static status_t
 acpi_thermal_register_child_devices(void *_cookie)
 {
-	status_t err;
 	device_node *node = _cookie;
 	int path_id;
 	char name[128];
