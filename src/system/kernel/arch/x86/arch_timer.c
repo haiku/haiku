@@ -38,7 +38,7 @@ extern timer_info gAPICTimer;
 extern timer_info gHPETTimer;
 
 static timer_info *sTimers[] = {
-//	&gHPETTimer,
+	&gHPETTimer,
 	&gAPICTimer,
 	&gPITTimer,
 	NULL

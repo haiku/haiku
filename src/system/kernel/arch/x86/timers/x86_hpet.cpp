@@ -40,7 +40,7 @@ struct timer_info gHPETTimer = {
 static int
 hpet_get_prio()
 {
-	return 3;
+	return 0; //TODO: Should be 3, so it gets picked first
 }
 
 
@@ -68,15 +68,12 @@ hpet_set_hardware_timer(bigtime_t relativeTimeout)
 	sHPETRegs->timer[2].comparator = convert_timeout(relativeTimeout);
 
 	// Clear the interrupt (set to 0)
-	//dprintf("clearing interrupts\n");
 	sHPETRegs->timer[2].config &= (~31 << 9);
 
 	// Non-periodic mode, edge triggered
-	//dprintf("edge mode\n");
 	sHPETRegs->timer[2].config &= ~(0x8 & 0x2);
 
 	// Enable timer
-	//dprintf("enable\n");
 	sHPETRegs->timer[2].config |= 0x4;
 
 	restore_interrupts(state);
@@ -120,6 +117,7 @@ hpet_set_legacy(struct hpet_regs *regs, bool enabled)
 }
 
 
+#ifdef TRACE_HPET
 static void
 dump_timer(volatile struct hpet_timer *timer)
 {
@@ -128,6 +126,7 @@ dump_timer(volatile struct hpet_timer *timer)
 	dprintf(" fsb_value: 0x%lx\n", timer->fsb_value);
 	dprintf(" fsb_addr: 0x%lx\n", timer->fsb_addr);	
 }
+#endif
 
 
 static status_t
@@ -170,19 +169,20 @@ hpet_init(struct kernel_args *args)
 	TRACE(("hpet_init: HPET supports %lu timers, and is %s bits wide.\n",
 		numTimers, HPET_IS_64BIT(sHPETRegs) ? "64" : "32"));
 	
-	dprintf("hpet_init: configuration: 0x%llx, timer_interrupts: 0x%llx\n",
-		sHPETRegs->config, sHPETRegs->timer_interrupts);
+	TRACE(("hpet_init: configuration: 0x%llx, timer_interrupts: 0x%llx\n",
+		sHPETRegs->config, sHPETRegs->timer_interrupts));
 
 	if (numTimers < 3) {
 		dprintf("hpet_init: HPET does not have at least 3 timers. Skipping.\n");
 		return B_ERROR;
 	}
 
+#ifdef TRACE_HPET
 	for (uint32 c = 0; c < numTimers; c++) {
-		dprintf("hpet_init: timer %lu:\n", c);	
+		TRACE(("hpet_init: timer %lu:\n", c));	
 		dump_timer(&sHPETRegs->timer[c]);
 	}
-	
+#endif	
 	install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE,
 		&hpet_timer_interrupt, NULL, B_NO_LOCK_VECTOR);
 	install_io_interrupt_handler(0, &hpet_timer_interrupt, NULL,
