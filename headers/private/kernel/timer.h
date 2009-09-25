@@ -20,7 +20,7 @@ struct kernel_args;
 
 /* Timer info structure */
 struct timer_info {
-	char *name;
+	const char *name;
 	int (*get_priority)(void);
 	status_t (*set_hardware_timer)(bigtime_t timeout);
 	status_t (*clear_hardware_timer)(void);
