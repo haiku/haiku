@@ -39,7 +39,7 @@ KernelMergeObject kernel_arch_x86.o :
 
 	x86_pit.c
 	x86_apic.c
-	x86_hpet.c
+	x86_hpet.cpp
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS)
 ;

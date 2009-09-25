@@ -13,8 +13,6 @@
 #include <arch/cpu.h>
 #include <int.h>
 
-#include "hpet.h"
-
 #define TRACE_HPET
 #ifdef TRACE_HPET
 	#define TRACE(x) dprintf x
@@ -23,6 +21,12 @@
 #endif
 
 static struct hpet_regs *sHPETRegs;
+
+static int hpet_get_prio();
+static status_t hpet_set_hardware_timer(bigtime_t relativeTimeout);
+static status_t hpet_clear_hardware_timer();
+static status_t hpet_init(struct kernel_args *args);
+
 
 struct timer_info gHPETTimer = {
 	"HPET",
@@ -34,7 +38,7 @@ struct timer_info gHPETTimer = {
 
 
 static int
-hpet_get_prio(void)
+hpet_get_prio()
 {
 	return 3;
 }
@@ -50,15 +54,12 @@ hpet_timer_interrupt(void *arg)
 static status_t
 hpet_set_hardware_timer(bigtime_t relativeTimeout)
 {
-	cpu_status state;
-	uint64 timerValue;
-
 	//dprintf("disabling interrupts\n");
 
-	state = disable_interrupts();
+	cpu_status state = disable_interrupts();
 
 	//dprintf("getting value\n");
-	timerValue = relativeTimeout;
+	uint64 timerValue = relativeTimeout;
 	timerValue *= 1000000000;
 	timerValue /= sHPETRegs->period;
 	//dprintf("adding hpet counter value\n");
@@ -87,7 +88,7 @@ hpet_set_hardware_timer(bigtime_t relativeTimeout)
 
 
 static status_t
-hpet_clear_hardware_timer(void)
+hpet_clear_hardware_timer()
 {
 	// Disable timer
 	sHPETRegs->timer[2].config &= ~0x4;
@@ -95,7 +96,7 @@ hpet_clear_hardware_timer(void)
 }
 
 
-static int
+static status_t
 hpet_set_enabled(struct hpet_regs *regs, bool enabled)
 {
 	if (enabled)
@@ -106,7 +107,7 @@ hpet_set_enabled(struct hpet_regs *regs, bool enabled)
 }
 
 
-static int
+static status_t
 hpet_set_legacy(struct hpet_regs *regs, bool enabled)
 {
 //	if (!HPET_IS_LEGACY_CAPABLE(regs))
@@ -116,6 +117,7 @@ hpet_set_legacy(struct hpet_regs *regs, bool enabled)
 		regs->config |= HPET_CONF_MASK_LEGACY;
 	else
 		regs->config &= ~HPET_CONF_MASK_LEGACY;
+	
 	return B_OK;
 }
 
@@ -133,16 +135,11 @@ dump_timer(volatile struct hpet_timer *timer)
 static status_t
 hpet_init(struct kernel_args *args)
 {
-	int c;
-	uint32 numTimers = 0;
-	
 	/* hpet_acpi_probe() through a similar "scan spots" table
 	   to that of smp.cpp.
 	   Seems to be the most elegant solution right now. */
-
-	if (args->arch_args.hpet == NULL) {
+	if (args->arch_args.hpet == NULL)
 		return B_ERROR;
-	}
 
 	if (sHPETRegs == NULL) {
 		sHPETRegs = (struct hpet_regs *)args->arch_args.hpet;
@@ -155,8 +152,8 @@ hpet_init(struct kernel_args *args)
 		}
 	}
 
-	TRACE(("hpet_init: HPET is at %p. Vendor ID: %lx.\n", sHPETRegs,
-		HPET_GET_VENDOR_ID(sHPETRegs)));
+	TRACE(("hpet_init: HPET is at %p. Vendor ID: %lx. Period: %ld\n",
+		sHPETRegs, HPET_GET_VENDOR_ID(sHPETRegs), sHPETRegs->period));
 
 	/* There is no hpet legacy support, so error out on init */
 	if (!HPET_IS_LEGACY_CAPABLE(sHPETRegs)) {
@@ -164,8 +161,11 @@ hpet_init(struct kernel_args *args)
 		return B_ERROR;
 	}
 
-	hpet_set_legacy(sHPETRegs, true);
-	numTimers = HPET_GET_NUM_TIMERS(sHPETRegs) + 1;
+	status_t status = hpet_set_legacy(sHPETRegs, true);
+	if (status != B_OK)
+		return status;
+
+	uint32 numTimers = HPET_GET_NUM_TIMERS(sHPETRegs) + 1;
 	
 	TRACE(("hpet_init: HPET does%s support legacy mode.\n",
 		HPET_IS_LEGACY_CAPABLE(sHPETRegs) ? "" : " not"));
@@ -177,8 +177,8 @@ hpet_init(struct kernel_args *args)
 		return B_ERROR;
 	}
 
-	for (c = 0; c < numTimers; c++) {
-		dprintf("hpet_init: timer %d:\n", c);	
+	for (uint32 c = 0; c < numTimers; c++) {
+		dprintf("hpet_init: timer %lu:\n", c);	
 		dump_timer(&sHPETRegs->timer[c]);
 	}
 	
@@ -187,6 +187,8 @@ hpet_init(struct kernel_args *args)
 	install_io_interrupt_handler(0, &hpet_timer_interrupt, NULL,
 		B_NO_LOCK_VECTOR);
 
-	hpet_set_enabled(sHPETRegs, true);
-	return B_OK;
+	status = hpet_set_enabled(sHPETRegs, true);
+
+	return status;
 }
+
