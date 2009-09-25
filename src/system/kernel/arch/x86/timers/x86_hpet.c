@@ -59,7 +59,7 @@ hpet_set_hardware_timer(bigtime_t relativeTimeout)
 
 	//dprintf("getting value\n");
 	timerValue = relativeTimeout;
-	timerValue *= 1000000;
+	timerValue *= 1000000000;
 	timerValue /= sHPETRegs->period;
 	//dprintf("adding hpet counter value\n");
 	timerValue += sHPETRegs->counter;
