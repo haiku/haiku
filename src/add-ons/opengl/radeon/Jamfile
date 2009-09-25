@@ -10,12 +10,12 @@ if $(TARGET_PLATFORM) != haiku {
 
 UsePrivateHeaders opengl ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa main ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa glapi ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa tnl ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa x86 ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa ppc ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa main ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa glapi ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa tnl ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa x86 ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa ppc ] ;
 
 Addon Radeon\ Hardware\ Renderer : opengl :
 	RadeonHardwareRenderer.cpp

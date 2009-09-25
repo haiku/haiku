@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src kits opengl glu ;
+SubDir HAIKU_TOP src libs mesa glu ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 

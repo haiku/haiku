@@ -7,7 +7,6 @@ if $(TARGET_PLATFORM) != haiku {
 		# We need our public GL headers also when not compiling for Haiku.
 }
 
-
 {
 	local defines ;
 	defines = BEOS_THREADS GNU_ASSEMBLER ;
@@ -24,23 +23,20 @@ if $(TARGET_PLATFORM) != haiku {
 	SubDirC++Flags [ FDefines $(defines) ] ;
 }
 
-UsePrivateHeaders interface opengl ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa main ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa glapi ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa tnl ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa x86 ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa ppc ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa sparc ] ;
+UsePrivateHeaders interface ;
+UseLibraryHeaders mesa ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa main ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa glapi ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa tnl ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa x86 ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa ppc ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa sparc ] ;
 
 Addon Mesa\ Software\ Renderer :
 	MesaSoftwareRenderer.cpp
 	: libGL.so libmesa.a be $(TARGET_LIBSUPC++)
 ;
 
-Package haiku-opengl-cvs : 
-	Mesa\ Software\ Renderer :  
-	boot home config add-ons opengl 
-;
- 

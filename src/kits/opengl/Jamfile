@@ -2,7 +2,8 @@ SubDir HAIKU_TOP src kits opengl ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders interface opengl ;
+UsePrivateHeaders interface ;
+UseLibraryHeaders mesa ;
 UsePrivateSystemHeaders ;
 
 if $(TARGET_PLATFORM) != haiku {
@@ -11,14 +12,14 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 
-UseHeaders [ FDirName $(SUBDIR) mesa ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa main ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa glapi ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa math ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa tnl ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa shader ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa swrast ] ;
-UseHeaders [ FDirName $(SUBDIR) mesa swrast_setup ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa main ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa glapi ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa math ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa tnl ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa shader ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa swrast ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa swrast_setup ] ;
 
 {
 	local defines ;
@@ -36,6 +37,7 @@ UseHeaders [ FDirName $(SUBDIR) mesa swrast_setup ] ;
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
+	SubDirAsFlags $(defines) ;
 }
 
 SharedLibrary libGL.so :
@@ -43,7 +45,6 @@ SharedLibrary libGL.so :
 	GLDispatcher.cpp
 	GLRenderer.cpp
 	GLRendererRoster.cpp
-
 	:
 
 	# Mesa GL API dispatching code
@@ -60,11 +61,3 @@ SharedLibrary libGL.so :
 	game			# BWindowScreen needed by BGLScreen stub class 
 	$(TARGET_LIBSTDC++)
 ;
-
-Package haiku-opengl-cvs :
-	libGL.so : 
-	boot beos system lib ;
-
-SubInclude HAIKU_TOP src kits opengl glu ;
-SubInclude HAIKU_TOP src kits opengl glut ;
-SubInclude HAIKU_TOP src kits opengl mesa ;

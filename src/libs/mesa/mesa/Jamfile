@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src kits opengl mesa ;
+SubDir HAIKU_TOP src libs mesa mesa ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -10,7 +10,7 @@ if $(TARGET_PLATFORM) != haiku {
 # Don't compile libmesa.a with debugging.
 DEBUG = 0 ;
 
-UsePrivateHeaders opengl ;
+UseLibraryHeaders mesa ;
 
 UseHeaders [ FDirName $(SUBDIR) main ] ;
 UseHeaders [ FDirName $(SUBDIR) glapi ] ;
