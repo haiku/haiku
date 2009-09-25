@@ -798,6 +798,7 @@ AboutView::_CreateCreditsView()
 		"Marc Flerackers\n"
 		"Michele Frau (zuMi)\n"
 		"Matthijs Hollemans\n"
+		"Fredrik Holmqvist\n"
 		"Mathew Hounsell\n"
 		"Morgan Howe\n"
 		"Ma Jie\n"
