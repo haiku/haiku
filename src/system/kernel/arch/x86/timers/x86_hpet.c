@@ -123,10 +123,10 @@ hpet_set_legacy(struct hpet_regs *regs, bool enabled)
 static void
 dump_timer(volatile struct hpet_timer *timer)
 {
-	dprintf("config: 0x%lx\n", timer->config);
-	dprintf("interrupts: 0x%lx\n", timer->interrupts);
-	dprintf("fsb_value: 0x%lx\n", timer->fsb_value);
-	dprintf("fsb_addr: 0x%lx\n", timer->fsb_addr);	
+	dprintf(" config: 0x%lx\n", timer->config);
+	dprintf(" interrupts: 0x%lx\n", timer->interrupts);
+	dprintf(" fsb_value: 0x%lx\n", timer->fsb_value);
+	dprintf(" fsb_addr: 0x%lx\n", timer->fsb_addr);	
 }
 
 
@@ -177,8 +177,10 @@ hpet_init(struct kernel_args *args)
 		return B_ERROR;
 	}
 
-	for (c = 0; c < numTimers; c++)
+	for (c = 0; c < numTimers; c++) {
+		dprintf("hpet_init: timer %d:\n", c);	
 		dump_timer(&sHPETRegs->timer[c]);
+	}
 	
 	install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE,
 		&hpet_timer_interrupt, NULL, B_NO_LOCK_VECTOR);
