@@ -76,9 +76,7 @@ struct hpet_regs {
 
 	volatile uint64 reserved4;
 
-	volatile struct hpet_timer timer0;
-	volatile struct hpet_timer timer1;
-	volatile struct hpet_timer timer2;
+	volatile struct hpet_timer timer[1];
 };
 
 

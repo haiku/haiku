@@ -15,7 +15,7 @@
 
 #include "hpet.h"
 
-//#define TRACE_HPET
+#define TRACE_HPET
 #ifdef TRACE_HPET
 	#define TRACE(x) dprintf x
 #else
@@ -65,19 +65,19 @@ hpet_set_hardware_timer(bigtime_t relativeTimeout)
 	timerValue += sHPETRegs->counter;
 
 	//dprintf("setting value %d, cur is %d\n", timerValue, sHPETRegs->counter);
-	sHPETRegs->timer2.comparator = timerValue;
+	sHPETRegs->timer[2].comparator = timerValue;
 
 	// Clear the interrupt (set to 0)
 	//dprintf("clearing interrupts\n");
-	sHPETRegs->timer2.config &= (~31 << 9);
+	sHPETRegs->timer[2].config &= (~31 << 9);
 
 	// Non-periodic mode, edge triggered
 	//dprintf("edge mode\n");
-	sHPETRegs->timer2.config &= ~(0x8 & 0x2);
+	sHPETRegs->timer[2].config &= ~(0x8 & 0x2);
 
 	// Enable timer
 	//dprintf("enable\n");
-	sHPETRegs->timer2.config |= 0x4;
+	sHPETRegs->timer[2].config |= 0x4;
 
 	//dprintf("reenable interrupts\n");
 	restore_interrupts(state);
@@ -90,7 +90,7 @@ static status_t
 hpet_clear_hardware_timer(void)
 {
 	// Disable timer
-	sHPETRegs->timer2.config &= ~0x4;
+	sHPETRegs->timer[2].config &= ~0x4;
 	return B_OK;
 }
 
@@ -120,10 +120,24 @@ hpet_set_legacy(struct hpet_regs *regs, bool enabled)
 }
 
 
+static void
+dump_timer(volatile struct hpet_timer *timer)
+{
+	dprintf("config: 0x%lx\n", timer->config);
+	dprintf("interrupts: 0x%lx\n", timer->interrupts);
+	dprintf("fsb_value: 0x%lx\n", timer->fsb_value);
+	dprintf("fsb_addr: 0x%lx\n", timer->fsb_addr);	
+}
+
+
 static status_t
 hpet_init(struct kernel_args *args)
 {
-	/* hpet_acpi_probe() through a similar "scan spots" table to that of smp.cpp.
+	int c;
+	uint32 numTimers = 0;
+	
+	/* hpet_acpi_probe() through a similar "scan spots" table
+	   to that of smp.cpp.
 	   Seems to be the most elegant solution right now. */
 
 	if (args->arch_args.hpet == NULL) {
@@ -141,7 +155,8 @@ hpet_init(struct kernel_args *args)
 		}
 	}
 
-	TRACE(("hpet_init: HPET is at %p. Vendor ID: %lx.\n", sHPETRegs, HPET_GET_VENDOR_ID(sHPETRegs)));
+	TRACE(("hpet_init: HPET is at %p. Vendor ID: %lx.\n", sHPETRegs,
+		HPET_GET_VENDOR_ID(sHPETRegs)));
 
 	/* There is no hpet legacy support, so error out on init */
 	if (!HPET_IS_LEGACY_CAPABLE(sHPETRegs)) {
@@ -150,16 +165,25 @@ hpet_init(struct kernel_args *args)
 	}
 
 	hpet_set_legacy(sHPETRegs, true);
-	TRACE(("hpet_init: HPET does%s support legacy mode.\n", HPET_IS_LEGACY_CAPABLE(sHPETRegs) ? "" : " not"));
-	TRACE(("hpet_init: HPET supports %lu timers, and is %s bits wide.\n", HPET_GET_NUM_TIMERS(sHPETRegs) + 1, HPET_IS_64BIT(sHPETRegs) ? "64" : "32"));
+	numTimers = HPET_GET_NUM_TIMERS(sHPETRegs) + 1;
+	
+	TRACE(("hpet_init: HPET does%s support legacy mode.\n",
+		HPET_IS_LEGACY_CAPABLE(sHPETRegs) ? "" : " not"));
+	TRACE(("hpet_init: HPET supports %lu timers, and is %s bits wide.\n",
+		numTimers, HPET_IS_64BIT(sHPETRegs) ? "64" : "32"));
 
-	if (HPET_GET_NUM_TIMERS(sHPETRegs) < 2) {
+	if (numTimers < 3) {
 		dprintf("hpet_init: HPET does not have at least 3 timers. Skipping.\n");
 		return B_ERROR;
 	}
 
-	install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE, &hpet_timer_interrupt, NULL, B_NO_LOCK_VECTOR);
-	install_io_interrupt_handler(0, &hpet_timer_interrupt, NULL, B_NO_LOCK_VECTOR);
+	for (c = 0; c < numTimers; c++)
+		dump_timer(&sHPETRegs->timer[c]);
+	
+	install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE,
+		&hpet_timer_interrupt, NULL, B_NO_LOCK_VECTOR);
+	install_io_interrupt_handler(0, &hpet_timer_interrupt, NULL,
+		B_NO_LOCK_VECTOR);
 
 	hpet_set_enabled(sHPETRegs, true);
 	return B_OK;
