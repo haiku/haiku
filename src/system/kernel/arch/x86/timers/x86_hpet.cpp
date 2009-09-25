@@ -51,22 +51,21 @@ hpet_timer_interrupt(void *arg)
 }
 
 
+static inline bigtime_t
+convert_timeout(const bigtime_t &relativeTimeout)
+{
+	return ((relativeTimeout * 1000000000LL)
+		/ sHPETRegs->period) + sHPETRegs->counter;
+}
+
+
 static status_t
 hpet_set_hardware_timer(bigtime_t relativeTimeout)
 {
-	//dprintf("disabling interrupts\n");
-
 	cpu_status state = disable_interrupts();
 
-	//dprintf("getting value\n");
-	uint64 timerValue = relativeTimeout;
-	timerValue *= 1000000000;
-	timerValue /= sHPETRegs->period;
-	//dprintf("adding hpet counter value\n");
-	timerValue += sHPETRegs->counter;
-
 	//dprintf("setting value %d, cur is %d\n", timerValue, sHPETRegs->counter);
-	sHPETRegs->timer[2].comparator = timerValue;
+	sHPETRegs->timer[2].comparator = convert_timeout(relativeTimeout);
 
 	// Clear the interrupt (set to 0)
 	//dprintf("clearing interrupts\n");
@@ -80,7 +79,6 @@ hpet_set_hardware_timer(bigtime_t relativeTimeout)
 	//dprintf("enable\n");
 	sHPETRegs->timer[2].config |= 0x4;
 
-	//dprintf("reenable interrupts\n");
 	restore_interrupts(state);
 
 	return B_OK;
@@ -110,8 +108,8 @@ hpet_set_enabled(struct hpet_regs *regs, bool enabled)
 static status_t
 hpet_set_legacy(struct hpet_regs *regs, bool enabled)
 {
-//	if (!HPET_IS_LEGACY_CAPABLE(regs))
-//		return B_NOT_SUPPORTED;
+	if (!HPET_IS_LEGACY_CAPABLE(regs))
+		return B_NOT_SUPPORTED;
 
 	if (enabled)
 		regs->config |= HPET_CONF_MASK_LEGACY;
@@ -171,6 +169,9 @@ hpet_init(struct kernel_args *args)
 		HPET_IS_LEGACY_CAPABLE(sHPETRegs) ? "" : " not"));
 	TRACE(("hpet_init: HPET supports %lu timers, and is %s bits wide.\n",
 		numTimers, HPET_IS_64BIT(sHPETRegs) ? "64" : "32"));
+	
+	dprintf("hpet_init: configuration: 0x%llx, timer_interrupts: 0x%llx\n",
+		sHPETRegs->config, sHPETRegs->timer_interrupts);
 
 	if (numTimers < 3) {
 		dprintf("hpet_init: HPET does not have at least 3 timers. Skipping.\n");
