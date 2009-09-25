@@ -141,7 +141,7 @@ _start(void)
 	apm_init();
 	acpi_init();
 	smp_init();
-	//hpet_init(); // TODO: Not yet
+	hpet_init();
 	dump_multiboot_info();
 	main(&args);
 }
