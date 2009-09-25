@@ -8,7 +8,7 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 
-UsePrivateHeaders opengl ;
+UseLibraryHeaders mesa ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs mesa mesa main ] ;
