@@ -71,7 +71,7 @@ void usb_asix_trace(bool force, const char* func, const char *fmt, ...)
 	}
 
 	va_list arg_list;
-	static char *prefix = "\33[33m"DRIVER_NAME":\33[0m";
+	static const char *prefix = "\33[33m"DRIVER_NAME":\33[0m";
 	static char buffer[1024];
 	char *buf_ptr = buffer;
 	if(gLogFilePath == NULL){
