@@ -60,7 +60,7 @@ VMWareMouseFilter::Filter(BMessage *message, BList *outList)
 		{
 			uint16 status, numWords;
 			_GetStatus(&status, &numWords);
-			if (status == VMWWARE_ERROR) {
+			if (status == VMWARE_ERROR) {
 				TRACE_ERROR("error indicated when reading status, resetting\n");
 				_Disable();
 				fIsEnabled = _Enable();
@@ -98,8 +98,8 @@ VMWareMouseFilter::Filter(BMessage *message, BList *outList)
 void
 VMWareMouseFilter::_ExecuteCommand(union packet_u &packet)
 {
-	packet.command.magic = VMWWARE_PORT_MAGIC;
-	packet.command.port = VMWWARE_PORT_NUMBER;
+	packet.command.magic = VMWARE_PORT_MAGIC;
+	packet.command.port = VMWARE_PORT_NUMBER;
 
 	int dummy;
 	asm volatile (
@@ -126,8 +126,8 @@ bool
 VMWareMouseFilter::_Enable()
 {
 	union packet_u packet;
-	packet.command.command = VMWWARE_COMMAND_POINTER_COMMAND;
-	packet.command.value = VMWWARE_VALUE_READ_ID;
+	packet.command.command = VMWARE_COMMAND_POINTER_COMMAND;
+	packet.command.value = VMWARE_VALUE_READ_ID;
 	_ExecuteCommand(packet);
 
 	uint16 numWords;
@@ -137,19 +137,19 @@ VMWareMouseFilter::_Enable()
 		return false;
 	}
 
-	packet.command.command = VMWWARE_COMMAND_POINTER_DATA;
+	packet.command.command = VMWARE_COMMAND_POINTER_DATA;
 	packet.command.value = 1; // read size, 1 word
 	_ExecuteCommand(packet);
 
-	if (packet.version.version != VMWWARE_VERSION_ID) {
+	if (packet.version.version != VMWARE_VERSION_ID) {
 		TRACE_ERROR("got back unexpected version 0x%08lx\n",
 			packet.version.version);
 		return false;
 	}
 
 	// request absolute data
-	packet.command.command = VMWWARE_COMMAND_POINTER_COMMAND;
-	packet.command.value = VMWWARE_VALUE_REQUEST_ABSOLUTE;
+	packet.command.command = VMWARE_COMMAND_POINTER_COMMAND;
+	packet.command.value = VMWARE_VALUE_REQUEST_ABSOLUTE;
 	_ExecuteCommand(packet);
 
 	TRACE_ALWAYS("successfully enabled\n");
@@ -161,13 +161,13 @@ void
 VMWareMouseFilter::_Disable()
 {
 	union packet_u packet;
-	packet.command.command = VMWWARE_COMMAND_POINTER_COMMAND;
-	packet.command.value = VMWWARE_VALUE_DISABLE;
+	packet.command.command = VMWARE_COMMAND_POINTER_COMMAND;
+	packet.command.value = VMWARE_VALUE_DISABLE;
 	_ExecuteCommand(packet);
 
 	uint16 status;
 	_GetStatus(&status, NULL);
-	if (status != VMWWARE_ERROR) {
+	if (status != VMWARE_ERROR) {
 		TRACE_ERROR("didn't get expected status value after disabling\n");
 		return;
 	}
@@ -180,7 +180,7 @@ void
 VMWareMouseFilter::_GetStatus(uint16 *status, uint16 *numWords)
 {
 	union packet_u packet;
-	packet.command.command = VMWWARE_COMMAND_POINTER_STATUS;
+	packet.command.command = VMWARE_COMMAND_POINTER_STATUS;
 	packet.command.value = 0;
 	_ExecuteCommand(packet);
 
@@ -195,7 +195,7 @@ void
 VMWareMouseFilter::_GetPosition(int32 &x, int32 &y)
 {
 	union packet_u packet;
-	packet.command.command = VMWWARE_COMMAND_POINTER_DATA;
+	packet.command.command = VMWARE_COMMAND_POINTER_DATA;
 	packet.command.value = 4; // read size, 4 words
 	_ExecuteCommand(packet);
 	x = packet.data.x;
