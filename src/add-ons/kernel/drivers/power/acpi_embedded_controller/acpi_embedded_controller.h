@@ -26,9 +26,8 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-
-#ifndef ACPI_BATTERY_H
-#define ACPI_BATTERY_H
+#ifndef ACPI_EMBEDDED_CONTROLLER_H
+#define ACPI_EMBEDDED_CONTROLLER_H
 
 #include <ctype.h>
 
@@ -308,4 +307,4 @@ static status_t			EcWrite(struct acpi_ec_cookie *sc, uint8 address,
          ((status) & EC_FLAG_INPUT_BUFFER) == 0))
 
 
-#endif
+#endif	// ACPI_EMBEDDED_CONTROLLER_H
