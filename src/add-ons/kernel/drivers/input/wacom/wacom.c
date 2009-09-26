@@ -113,9 +113,11 @@ add_device(usb_device dev)
 	const usb_configuration_info *conf;
 	bool setConfiguration = false;
 
-	// we need these two for a Wacom tablet
+	// we need these four for a Wacom tablet
 	size_t controlTransferLength;
+	int i;
 	char repData[2] = { 0x02, 0x02 };
+	char retData[2] = { 0x00, 0x00 };
 
 	conf = usb->get_configuration(dev);
 	DPRINTF_INFO((ID "add_device(%ld, %p)\n", dev, conf));
@@ -202,24 +204,65 @@ got_one:
 		// let's hope Wacom doesn't produce normal mice any time soon, or this
 		// check will have to be more specific about product_id...hehe
 		if (udd->vendor_id == 0x056a) {
-			// do the control transfers to set up absolute mode (default is HID mode)
+			// do the control transfers to set up absolute mode (default is HID
+			// mode)
+			
+			// see 'Device Class Definition for HID 1.11' (HID1_11.pdf),
+			// par. 7.2 (available at www.usb.org/developers/hidpage)
+
+			// set protocol mode to 'report' (instead of 'boot')
 			controlTransferLength = 0;
+			// HID Class-Specific Request, Host to device (=0x21):
+			// SET_PROTOCOL (=0x0b) to Report Protocol (=1)
+			// of Interface #0 (=0)
 			st = usb->send_request(dev, 0x21, 0x0b, 1, 0, 0, 0,
 				&controlTransferLength);
-	
+
 			if (st < B_OK) {
 				dprintf(ID "add_device() - control transfer 1 failed: %ld\n",
 					st);
 			}
-	
-			// "set interface" -> ?!?
+
+			// try up to five times to set the tablet to 'Wacom'-mode (enabling
+			// absolute mode, pressure data, etc.)
 			controlTransferLength = 2;
-			st = usb->send_request(dev, 0x21, 0x09, (3 << 8) + 2, 1, 2, repData,
-				&controlTransferLength);
+
+			for (i = 0; i < 5; i++) {
+				// HID Class-Specific Request, Host to device (=0x21):
+				// SET_REPORT (=0x09) type Feature (=3) with ID 2 (=2) of
+				// Interface #0 (=0) to repData (== { 0x02, 0x02 })
+				st = usb->send_request(dev, 0x21, 0x09, (3 << 8) + 2, 0, 2,
+					repData, &controlTransferLength);
 	
-			if (st < B_OK) {
-				dprintf(ID "add_device() - control transfer 2 failed: %ld\n",
-					st);
+				if (st < B_OK) {
+					dprintf(ID "add_device() - control transfer 2 failed: %ld\
+						\n", st);
+				}
+	
+				// check if registers are set correctly
+	
+				// HID Class-Specific Request, Device to host (=0xA1):
+				// GET_REPORT (=0x01) type Feature (=3) with ID 2 (=2) of
+				// Interface #0 (=0) to retData
+				st = usb->send_request(dev, 0xA1, 0x01, (3 << 8) + 2, 0, 2,
+					retData, &controlTransferLength);
+	
+				if (st < B_OK) {
+					dprintf(ID "add_device() - control transfer 3 failed: %ld\
+						\n", st);
+				}
+	
+				dprintf(ID "retData: %u - %u\n", retData[0], retData[1]);
+				dprintf("====================================\n");
+				
+				if (retData[0] == repData[0] && retData[1] == repData[1]) break;
+				
+			}
+
+			dprintf(ID "count: %u\n", i);
+			
+			if (i > 4) {
+				dprintf(ID "add_device() - set 'Wacom'-mode failed\n");
 			}
 		}
 //	}
