@@ -11,7 +11,7 @@
 #include <OS.h>
 #include <USB3.h>
 
-#include "kernel_cpp.h"
+#include <util/kernel_cpp.h>
 
 #define DRIVER_NAME	"usb_ecm"
 #define MAX_DEVICES	8

@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "kernel_cpp.h"
+#include <util/kernel_cpp.h>
 
 #define DRIVER_NAME	"usb_asix"
 #define MAX_DEVICES	8
