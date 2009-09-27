@@ -5,6 +5,7 @@
 #ifndef DEBUG_INFO_ENTRIES_H
 #define DEBUG_INFO_ENTRIES_H
 
+
 #include "DebugInfoEntry.h"
 
 #include "AttributeValue.h"
@@ -440,6 +441,9 @@ public:
 
 	virtual	const DynamicAttributeValue* ByteSize() const;
 
+			const DebugInfoEntryList& Dimensions() const
+									{ return fDimensions; }
+
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
 	virtual	status_t			AddAttribute_ordering(uint16 attributeName,
@@ -500,6 +504,9 @@ public:
 	virtual	DebugInfoEntry*		Specification() const;
 
 	virtual	const DynamicAttributeValue* ByteSize() const;
+
+			const DebugInfoEntryList& Enumerators() const
+									{ return fEnumerators; }
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
@@ -930,6 +937,17 @@ public:
 
 	virtual	const DynamicAttributeValue* ByteSize() const;
 
+			const DynamicAttributeValue* BitStride() const
+									{ return &fBitStride; }
+			const DynamicAttributeValue* ByteStride() const
+									{ return &fByteStride; }
+			const DynamicAttributeValue* LowerBound() const
+									{ return &fLowerBound; }
+			const DynamicAttributeValue* UpperBound() const
+									{ return &fUpperBound; }
+			const DynamicAttributeValue* Count() const
+									{ return &fCount; }
+
 	virtual	status_t			AddAttribute_bit_stride(uint16 attributeName,
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
@@ -942,7 +960,8 @@ public:
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_upper_bound(uint16 attributeName,
 									const AttributeValue& value);
-	virtual	status_t			AddAttribute_threads_scaled(uint16 attributeName,
+	virtual	status_t			AddAttribute_threads_scaled(
+									uint16 attributeName,
 									const AttributeValue& value);
 
 private:
