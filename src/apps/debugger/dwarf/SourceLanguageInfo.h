@@ -11,6 +11,7 @@
 struct SourceLanguageInfo {
 	const char*	name;
 	uint8		arrayOrdering;
+	uint64		subrangeLowerBound;
 };
 
 

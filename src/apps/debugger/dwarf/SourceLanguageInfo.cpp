@@ -12,12 +12,14 @@ UnknownSourceLanguageInfo::UnknownSourceLanguageInfo()
 {
 	name = "unknown";
 	arrayOrdering = DW_ORD_row_major;
+	subrangeLowerBound = 0;
 }
 
 
 CFamilySourceLanguageInfo::CFamilySourceLanguageInfo()
 {
 	arrayOrdering = DW_ORD_row_major;
+	subrangeLowerBound = 0;
 }
 
 
