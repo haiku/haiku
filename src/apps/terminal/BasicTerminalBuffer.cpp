@@ -1317,6 +1317,9 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 				fScreen[lineToDrop]->Clear();
 				std::swap(fScreen[lineToDrop], fScreen[lineToKeep]);
 			}
+			// clear any lines between the two swapped ranges above
+			for (int32 i = bottom - numLines + 1; i < top + numLines; i++)
+				_LineAt(i)->Clear();
 
 			_Invalidate(top, bottom);
 		}
@@ -1339,6 +1342,9 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 				fScreen[lineToDrop]->Clear();
 				std::swap(fScreen[lineToDrop], fScreen[lineToKeep]);
 			}
+			// clear any lines between the two swapped ranges above
+			for (int32 i = bottom - numLines + 1; i < top + numLines; i++)
+				_LineAt(i)->Clear();
 
 			_Invalidate(top, bottom);
 		}
