@@ -103,6 +103,7 @@ public:
 									uint32 attributes);
 	inline	void				InsertChar(const char* c, int32 length,
 									uint32 width, uint32 attributes);
+			void				FillScreen(UTF8Char c, uint32 width, uint32 attr);
 
 			void				InsertCR();
 			void				InsertLF();

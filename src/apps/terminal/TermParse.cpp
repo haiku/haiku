@@ -821,10 +821,7 @@ TermParse::EscParse()
 
 				case CASE_DECALN:
 					/* DECALN */
-					//      if(screen->cursor_state)
-					//	HideCursor();
-					//      ScrnRefresh(screen, 0, 0, screen->max_row + 1,
-					//		  screen->max_col + 1, False);
+					fBuffer->FillScreen(UTF8Char('E'), 1, 0);
 					parsestate = groundtable;
 					break;
 

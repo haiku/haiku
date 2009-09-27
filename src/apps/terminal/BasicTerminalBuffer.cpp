@@ -579,6 +579,28 @@ BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 width, uint32 attributes)
 
 
 void
+BasicTerminalBuffer::FillScreen(UTF8Char c, uint32 width, uint32 attributes)
+{
+	// TODO: Check if this method can be removed completely
+	//int width = CodeConv::UTF8GetFontWidth(c.bytes);
+	if ((int32)width == FULL_WIDTH)
+		attributes |= A_WIDTH;
+
+	fSoftWrappedCursor = false;
+
+	for (int32 y = 0; y < fHeight; y++) {
+		TerminalLine *line = _LineAt(y);
+		for (int32 x = 0; x < fWidth / (int32)width; x++) {
+			line->cells[x].character = c;
+			line->cells[x].attributes = attributes;
+		}
+		line->length = fWidth / width;
+	}
+
+	_Invalidate(0, fHeight - 1);
+}
+
+void
 BasicTerminalBuffer::InsertCR()
 {
 	_LineAt(fCursor.y)->softBreak = false;
