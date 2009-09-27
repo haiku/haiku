@@ -64,13 +64,16 @@ public:
 
 	inline	BVariant&			operator=(const BVariant& other);
 
+			bool				operator==(const BVariant& other) const;
+	inline	bool				operator!=(const BVariant& other) const;
+
 	inline	type_code			Type() const		{ return fType; }
 			size_t				Size() const;
 			const uint8*		Bytes() const;
 
-			bool				IsNumber() const;
-			bool				IsInteger() const;
-			bool				IsFloat() const;
+	inline	bool				IsNumber() const;
+	inline	bool				IsInteger(bool* _isSigned = NULL) const;
+	inline	bool				IsFloat() const;
 									// floating point, not just float
 
 			bool				ToBool() const;
@@ -93,6 +96,10 @@ public:
 									// counting as scalar, not string, though)
 
 	static	size_t				SizeOfType(type_code type);
+	static	bool				TypeIsNumber(type_code type);
+	static	bool				TypeIsInteger(type_code type,
+									bool* _isSigned = NULL);
+	static	bool				TypeIsFloat(type_code type);
 
 private:
 			void				_SetTo(const BVariant& other);
@@ -245,6 +252,13 @@ BVariant::operator=(const BVariant& other)
 }
 
 
+bool
+BVariant::operator!=(const BVariant& other) const
+{
+	return !(*this == other);
+}
+
+
 void
 BVariant::SetTo(const BVariant& other)
 {
@@ -362,6 +376,27 @@ BVariant::SetTo(BReferenceable* value, type_code type)
 {
 	Unset();
 	_SetTo(value, type);
+}
+
+
+bool
+BVariant::IsNumber() const
+{
+	return TypeIsNumber(fType);
+}
+
+
+bool
+BVariant::IsInteger(bool* _isSigned) const
+{
+	return TypeIsInteger(fType, _isSigned);
+}
+
+
+bool
+BVariant::IsFloat() const
+{
+	return TypeIsFloat(fType);
 }
 
 

@@ -125,6 +125,55 @@ BVariant::Unset()
 }
 
 
+bool
+BVariant::operator==(const BVariant& other) const
+{
+	if (fType == 0)
+		return other.fType == 0;
+	if (other.fType == 0)
+		return false;
+
+	// TODO: The number comparisons are not really accurate. Particularly a
+	// conversion between signed and unsigned integers might actually change the
+	// value.
+
+	switch (fType) {
+		case B_BOOL_TYPE:
+			return fBool == other.ToBool();
+		case B_INT8_TYPE:
+		case B_INT16_TYPE:
+		case B_INT32_TYPE:
+		case B_INT64_TYPE:
+			if (!other.IsNumber())
+				return false;
+			return ToInt64() == other.ToInt64();
+		case B_UINT8_TYPE:
+		case B_UINT16_TYPE:
+		case B_UINT32_TYPE:
+		case B_UINT64_TYPE:
+			if (!other.IsNumber())
+				return false;
+			return ToUInt64() == other.ToUInt64();
+		case B_FLOAT_TYPE:
+		case B_DOUBLE_TYPE:
+			if (!other.IsNumber())
+				return false;
+			return ToDouble() == other.ToDouble();
+		case B_POINTER_TYPE:
+			return other.fType == B_POINTER_TYPE
+				&& fPointer == other.fPointer;
+		case B_STRING_TYPE:
+			if (other.fType != B_STRING_TYPE)
+				return false;
+			if (fString == NULL || other.fString == NULL)
+				return fString == other.fString;
+			return strcmp(fString, other.fString) == 0;
+		default:
+			return false;
+	}
+}
+
+
 size_t
 BVariant::Size() const
 {
@@ -143,60 +192,6 @@ BVariant::Bytes() const
 		return (const uint8*)fString;
 	return fBytes;
 }
-
-
-bool
-BVariant::IsNumber() const
-{
-	switch (fType) {
-		case B_INT8_TYPE:
-		case B_UINT8_TYPE:
-		case B_INT16_TYPE:
-		case B_UINT16_TYPE:
-		case B_INT32_TYPE:
-		case B_UINT32_TYPE:
-		case B_INT64_TYPE:
-		case B_UINT64_TYPE:
-		case B_FLOAT_TYPE:
-		case B_DOUBLE_TYPE:
-			return true;
-		default:
-			return false;
-	}
-}
-
-
-bool
-BVariant::IsInteger() const
-{
-	switch (fType) {
-		case B_INT8_TYPE:
-		case B_UINT8_TYPE:
-		case B_INT16_TYPE:
-		case B_UINT16_TYPE:
-		case B_INT32_TYPE:
-		case B_UINT32_TYPE:
-		case B_INT64_TYPE:
-		case B_UINT64_TYPE:
-			return true;
-		default:
-			return false;
-	}
-}
-
-
-bool
-BVariant::IsFloat() const
-{
-	switch (fType) {
-		case B_FLOAT_TYPE:
-		case B_DOUBLE_TYPE:
-			return true;
-		default:
-			return false;
-	}
-}
-
 
 
 bool
@@ -391,6 +386,64 @@ BVariant::SizeOfType(type_code type)
 			return sizeof(void*);
 		default:
 			return 0;
+	}
+}
+
+
+/*static*/ bool
+BVariant::TypeIsNumber(type_code type)
+{
+	switch (type) {
+		case B_INT8_TYPE:
+		case B_UINT8_TYPE:
+		case B_INT16_TYPE:
+		case B_UINT16_TYPE:
+		case B_INT32_TYPE:
+		case B_UINT32_TYPE:
+		case B_INT64_TYPE:
+		case B_UINT64_TYPE:
+		case B_FLOAT_TYPE:
+		case B_DOUBLE_TYPE:
+			return true;
+		default:
+			return false;
+	}
+}
+
+
+/*static*/ bool
+BVariant::TypeIsInteger(type_code type, bool* _isSigned)
+{
+	switch (type) {
+		case B_INT8_TYPE:
+		case B_INT16_TYPE:
+		case B_INT32_TYPE:
+		case B_INT64_TYPE:
+			if (_isSigned != NULL)
+				*_isSigned = true;
+			return true;
+		case B_UINT8_TYPE:
+		case B_UINT16_TYPE:
+		case B_UINT32_TYPE:
+		case B_UINT64_TYPE:
+			if (_isSigned != NULL)
+				*_isSigned = false;
+			return true;
+		default:
+			return false;
+	}
+}
+
+
+/*static*/ bool
+BVariant::TypeIsFloat(type_code type)
+{
+	switch (type) {
+		case B_FLOAT_TYPE:
+		case B_DOUBLE_TYPE:
+			return true;
+		default:
+			return false;
 	}
 }
 
