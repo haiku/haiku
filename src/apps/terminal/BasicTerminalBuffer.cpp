@@ -1219,7 +1219,7 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 				// TODO: It may be more efficient to actually move the scrolled
 				// lines only (might depend on the number of scrolled/unscrolled
 				// lines).
-				for (int32 i = bottom + 1; i < fHeight; i++) {
+				for (int32 i = fHeight - 1; i > bottom; i--) {
 					std::swap(fScreen[_LineIndex(i)],
 						fScreen[_LineIndex(i + numLines)]);
 				}
