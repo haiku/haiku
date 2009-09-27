@@ -1,9 +1,6 @@
-/*
- * Copyright 2008, Haiku, Inc. All Rights Reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Oliver Ruiz Dorantes, oliver-ruiz.dorantes_at_gmail.com
+/* 
+ * Copyright 2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef L2CAP_ENDPOINT_H
 #define L2CAP_ENDPOINT_H
@@ -47,17 +44,18 @@ public:
 		mutex_unlock(&fLock);
 	}
 
-	status_t Bind(const struct sockaddr *_address);
-	status_t Unbind();
-	status_t Listen(int backlog);
-	status_t Connect(const struct sockaddr *address);
-	status_t Accept(net_socket **_acceptedSocket);
+	status_t	Bind(const struct sockaddr *_address);
+	status_t	Unbind();
+	status_t	Listen(int backlog);
+	status_t	Connect(const struct sockaddr *address);
+	status_t	Accept(net_socket **_acceptedSocket);
 
-	ssize_t Send(const iovec *vecs, size_t vecCount,
-		ancillary_data_container *ancillaryData);
-	ssize_t Receive(const iovec *vecs, size_t vecCount,
-		ancillary_data_container **_ancillaryData, struct sockaddr *_address,
-		socklen_t *_addressLength);
+	ssize_t		Send(const iovec *vecs, size_t vecCount, 
+					ancillary_data_container *ancillaryData);
+	ssize_t		Receive(const iovec *vecs, size_t vecCount,	
+					ancillary_data_container **_ancillaryData, 
+					struct sockaddr *_address, socklen_t *_addressLength);
+
 	ssize_t ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer);
 	ssize_t Sendable();
 	ssize_t Receivable();
@@ -67,15 +65,19 @@ public:
 
 	status_t Shutdown(int direction);
 
-	void 	BindToChannel(L2capChannel* channel);
-
-	static   L2capEndpoint* ForPsm(uint16 psm);
-
-	ChannelConfiguration configuration;
-	L2capChannel*	channel;
-
-	bool configurationSet;
-	net_fifo		fReceivingFifo;
+	void 		BindToChannel(L2capChannel* channel);
+	status_t	MarkEstablished();
+	
+	static L2capEndpoint* ForPsm(uint16 psm);
+	
+	bool RequiresConfiguration()
+	{
+		return fConfigurationSet;
+	}
+	
+	ChannelConfiguration 	configuration;
+	net_fifo 				fReceivingFifo;
+	bool 					fConfigurationSet;
 	
 private:
 	typedef enum {
@@ -101,7 +103,7 @@ private:
 	State    		fState;
 	L2capEndpoint*	fPeerEndpoint;
 	sem_id			fAcceptSemaphore;
-
+	L2capChannel* 	fChannel;
 };
 
 

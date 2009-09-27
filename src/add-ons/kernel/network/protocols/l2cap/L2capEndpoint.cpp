@@ -1,9 +1,6 @@
-/*
- * Copyright 2008, Haiku, Inc. All Rights Reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Oliver Ruiz Dorantes, oliver-ruiz.dorantes_at_gmail.com
+/* 
+ * Copyright 2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "L2capEndpoint.h"
 #include "l2cap_address.h"
@@ -15,6 +12,9 @@
 
 #include <bluetooth/L2CAP/btL2CAP.h>
 #define BT_DEBUG_THIS_MODULE
+#define MODULE_NAME "l2cap"
+#define SUBMODULE_NAME "Endpoint"
+#define SUBMODULE_COLOR 32
 #include <btDebug.h>
 
 
@@ -32,10 +32,12 @@ absolute_timeout(bigtime_t timeout)
 L2capEndpoint::L2capEndpoint(net_socket* socket)
 	:
 	ProtocolSocket(socket),
+	fConfigurationSet(false),
 	fPeerEndpoint(NULL),
-	fAcceptSemaphore(-1)
+	fAcceptSemaphore(-1),
+	fChannel(NULL)
 {
-	debugf("[%ld] %p->L2capEndpoint::L2capEndpoint()\n", find_thread(NULL), this);
+	debugf("[%ld] %p\n", find_thread(NULL), this);
 
 	/* Set MTU and flow control settings to defaults */
 	configuration.imtu = L2CAP_MTU_DEFAULT;
@@ -47,16 +49,13 @@ L2capEndpoint::L2capEndpoint(net_socket* socket)
 	configuration.flush_timo = L2CAP_FLUSH_TIMO_DEFAULT;
 	configuration.link_timo  = L2CAP_LINK_TIMO_DEFAULT;
 
-	configurationSet = false;
-
 	gStackModule->init_fifo(&fReceivingFifo, "l2cap recvfifo", L2CAP_MTU_DEFAULT);
 }
 
 
 L2capEndpoint::~L2capEndpoint()
 {
-	debugf("[%ld] %p->L2capEndpoint::~L2capEndpoint()\n", find_thread(NULL), this);
-
+	debugf("[%ld] %p\n", find_thread(NULL), this);
 
 }
 
@@ -64,7 +63,7 @@ L2capEndpoint::~L2capEndpoint()
 status_t
 L2capEndpoint::Init()
 {
-	debugf("[%ld] %p->L2capEndpoint::Init()\n", find_thread(NULL), this);
+	debugf("[%ld] %p\n", find_thread(NULL), this);
 
 	return B_OK;
 }
@@ -73,7 +72,7 @@ L2capEndpoint::Init()
 void
 L2capEndpoint::Uninit()
 {
-	debugf("[%ld] %p->L2capEndpoint::Uninit()\n", find_thread(NULL), this);
+	debugf("[%ld] %p\n", find_thread(NULL), this);
 
 }
 
@@ -81,7 +80,7 @@ L2capEndpoint::Uninit()
 status_t
 L2capEndpoint::Open()
 {
-	debugf("[%ld] %p->L2capEndpoint::Open()\n", find_thread(NULL), this);
+	debugf("[%ld] %p\n", find_thread(NULL), this);
 
 	status_t error = ProtocolSocket::Open();
 	if (error != B_OK)
@@ -94,7 +93,7 @@ L2capEndpoint::Open()
 status_t
 L2capEndpoint::Close()
 {
-	debugf("[%ld] %p->L2capEndpoint::Close()\n", find_thread(NULL), this);
+	debugf("[%ld] %p\n", find_thread(NULL), this);
 
 	return B_OK;
 }
@@ -103,7 +102,7 @@ L2capEndpoint::Close()
 status_t
 L2capEndpoint::Free()
 {
-	debugf("[%ld] %p->L2capEndpoint::Free()\n", find_thread(NULL), this);
+	debugf("[%ld] %p\n", find_thread(NULL), this);
 
 	return B_OK;
 }
@@ -137,7 +136,7 @@ L2capEndpoint::Bind(const struct sockaddr *_address)
 	memcpy(&socket->address, _address, sizeof(struct sockaddr_l2cap));
 	socket->address.ss_len = sizeof(struct sockaddr_l2cap);
 
-	fState = LISTEN;
+	fState = CLOSED;
 
 	return B_OK;
 
@@ -147,7 +146,7 @@ L2capEndpoint::Bind(const struct sockaddr *_address)
 status_t
 L2capEndpoint::Unbind()
 {
-	debugf("[%ld] %p->L2capEndpoint::Unbind()\n", find_thread(NULL), this);
+	debugf("[%ld] %p\n", find_thread(NULL), this);
 
 	return B_OK;
 }
@@ -156,12 +155,20 @@ L2capEndpoint::Unbind()
 status_t
 L2capEndpoint::Listen(int backlog)
 {
-	if (fState != CLOSED)
+	debugf("[%ld] %p\n", find_thread(NULL), this);
+	
+	if (fState != CLOSED) {
+		flowf("Invalid State\n");
 		return B_BAD_VALUE;
+	}
 
-	fAcceptSemaphore = create_sem(0, "tcp accept");
-	if (fAcceptSemaphore < B_OK)
+	fAcceptSemaphore = create_sem(0, "l2cap serv accept");
+	if (fAcceptSemaphore < B_OK) {
+		flowf("Semaphore could not be created\n");
 		return ENOBUFS;
+	}
+
+	gSocketModule->set_max_backlog(socket, backlog);
 
 	fState = LISTEN;
 
@@ -190,12 +197,42 @@ L2capEndpoint::Connect(const struct sockaddr *_address)
 status_t
 L2capEndpoint::Accept(net_socket **_acceptedSocket)
 {
-	debugf("[%ld] %p->L2capEndpoint::Accept()\n", find_thread(NULL), this);
+	debugf("[%ld]\n", find_thread(NULL));
 
-	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
+	// MutexLocker locker(fLock);
 
-	TOUCH(timeout);
-	return B_OK;
+	status_t status;
+	bigtime_t timeout = absolute_timeout(300*1000*1000);
+
+	do {
+		// locker.Unlock();
+
+		status = acquire_sem_etc(fAcceptSemaphore, 1, B_ABSOLUTE_TIMEOUT
+			| B_CAN_INTERRUPT, timeout);
+
+		if (status != B_OK)
+			return status;
+
+		// locker.Lock();
+		status = gSocketModule->dequeue_connected(socket, _acceptedSocket);
+		
+		if (status != B_OK)
+			debugf("Could not dequeue socket %s\n", strerror(status));
+
+		//TODO: Establish relationship with the negotiated channel by the parent endpoint
+		((L2capEndpoint*)socket)->fChannel = fChannel;
+
+		// point parent
+		((L2capEndpoint*)socket)->fPeerEndpoint = this;
+
+		// unassign any channel for the parent endpoint
+		fChannel = NULL;
+
+		fState = LISTEN;
+
+	} while (status != B_OK);
+
+	return status;
 }
 
 
@@ -203,7 +240,7 @@ ssize_t
 L2capEndpoint::Send(const iovec *vecs, size_t vecCount,
 	ancillary_data_container *ancillaryData)
 {
-	debugf("[%ld] %p->L2capEndpoint::Send(%p, %ld, %p)\n", find_thread(NULL),
+	debugf("[%ld] %p Send(%p, %ld, %p)\n", find_thread(NULL),
 		this, vecs, vecCount, ancillaryData);
 
 	return B_OK;
@@ -215,7 +252,7 @@ L2capEndpoint::Receive(const iovec *vecs, size_t vecCount,
 	ancillary_data_container **_ancillaryData, struct sockaddr *_address,
 	socklen_t *_addressLength)
 {
-	debugf("[%ld] %p->L2capEndpoint::Receive(%p, %ld)\n", find_thread(NULL),
+	debugf("[%ld] %p Receive(%p, %ld)\n", find_thread(NULL),
 		this, vecs, vecCount);
 
 
@@ -227,15 +264,15 @@ ssize_t
 L2capEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 {
 
-	return gStackModule->fifo_dequeue_buffer(&fReceivingFifo, flags, B_INFINITE_TIMEOUT, _buffer);
-
+	return gStackModule->fifo_dequeue_buffer(&fReceivingFifo, flags,
+		B_INFINITE_TIMEOUT, _buffer);
 }
 
 
 ssize_t
 L2capEndpoint::Sendable()
 {
-	debugf("[%ld] %p->L2capEndpoint::Sendable()\n", find_thread(NULL), this);
+	debugf("[%ld] %p\n", find_thread(NULL), this);
 
 	return 0;
 }
@@ -244,7 +281,7 @@ L2capEndpoint::Sendable()
 ssize_t
 L2capEndpoint::Receivable()
 {
-	debugf("[%ld] %p->L2capEndpoint::Receivable()\n", find_thread(NULL), this);
+	debugf("[%ld] %p\n", find_thread(NULL), this);
 
 	return 0;
 }
@@ -253,8 +290,7 @@ L2capEndpoint::Receivable()
 L2capEndpoint*
 L2capEndpoint::ForPsm(uint16 psm)
 {
-
-	L2capEndpoint*	endpoint;
+	L2capEndpoint* endpoint;
 
 	DoublyLinkedList<L2capEndpoint>::Iterator iterator = EndpointList.GetIterator();
 
@@ -275,8 +311,29 @@ L2capEndpoint::ForPsm(uint16 psm)
 void
 L2capEndpoint::BindToChannel(L2capChannel* channel)
 {
+	fChannel = channel;
+	fChannel->endpoint = this;
+	
+	fChannel->configuration = &configuration;
+	
+	debugf("Endpoint %p for psm %d, schannel %x dchannel %x\n", this, 
+		channel->psm, channel->scid, channel->dcid);
 
-	this->channel = channel;
-	channel->configuration = &configuration;	
+}
 
+
+status_t
+L2capEndpoint::MarkEstablished()
+{
+	debugf("Endpoint %p for psm %d, schannel %x dchannel %x\n", this, 
+		fChannel->psm, fChannel->scid, fChannel->dcid);	
+	
+	net_socket* newSocket;
+	status_t error = gSocketModule->spawn_pending_socket(socket,	&newSocket);
+
+	gSocketModule->set_connected(newSocket);
+
+	release_sem(fAcceptSemaphore);
+	
+	return error;
 }

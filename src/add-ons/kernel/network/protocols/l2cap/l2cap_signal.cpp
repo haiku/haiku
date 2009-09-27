@@ -100,7 +100,8 @@ l2cap_process_cmd_rej(HciConnection* conn, uint8 ident, net_buffer* buffer);
 status_t
 l2cap_process_signal_cmd(HciConnection* conn, net_buffer* buffer)
 {
-	net_buffer* 		m = buffer;
+	net_buffer* m = buffer;
+	
 	debugf("Signal size=%ld\n", buffer->size);
 
 	while (m != NULL) {
@@ -212,8 +213,8 @@ l2cap_process_signal_cmd(HciConnection* conn, net_buffer* buffer)
 static status_t
 l2cap_process_con_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 {
-	L2capChannel*	ch;
-	uint16			dcid, psm;
+	L2capChannel* ch;
+	uint16 dcid, psm;
 
 	/* Get con req data */
 	NetBufferHeaderReader<l2cap_con_req_cp> command(buffer);
@@ -262,9 +263,9 @@ l2cap_process_con_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 static status_t
 l2cap_process_con_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
 {
-	L2capFrame*	cmd = NULL;
-	uint16 		scid, dcid, result, status;
-	status_t	   error = 0;
+	L2capFrame* cmd = NULL;
+	uint16 scid, dcid, result, status;
+	status_t error = 0;
 
 	/* Get command parameters */
 	NetBufferHeaderReader<l2cap_con_rsp_cp> command(buffer);
@@ -359,7 +360,7 @@ reject:
 static option_status
 getNextSignalOption(net_buffer* nbuf, size_t* off, l2cap_cfg_opt_t* hdr, l2cap_cfg_opt_val_t* val)
 {
-	int	hint;
+	int hint;
 	size_t len = nbuf->size - (*off);
 
 	if (len == 0)
@@ -425,16 +426,16 @@ getNextSignalOption(net_buffer* nbuf, size_t* off, l2cap_cfg_opt_t* hdr, l2cap_c
 static status_t
 l2cap_process_cfg_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 {
-	L2capChannel*	channel = NULL;
-	uint16  dcid;
-	uint16  respond;
-	uint16  result;
+	L2capChannel* channel = NULL;
+	uint16 dcid;
+	uint16 respond;
+	uint16 result;
 
-	l2cap_cfg_opt_t	 hdr;
+	l2cap_cfg_opt_t hdr;
 	l2cap_cfg_opt_val_t val;
 
-	size_t	off;
-	status_t	error = 0;
+	size_t off;
+	status_t error = 0;
 
 
 	debugf("configuration=%ld\n", buffer->size);
@@ -554,14 +555,14 @@ reject:
 static status_t
 l2cap_process_cfg_rsp(HciConnection *conn, uint8 ident, net_buffer *buffer)
 {
-	L2capFrame     *cmd = NULL;
-	uint16  		 scid, cflag, result;
+	L2capFrame *cmd = NULL;
+	uint16 scid, cflag, result;
 
-	l2cap_cfg_opt_t	 hdr;
-	l2cap_cfg_opt_val_t	 val;
+	l2cap_cfg_opt_t hdr;
+	l2cap_cfg_opt_val_t val;
 
-	size_t			 off;
-	status_t		 error = 0;
+	size_t off;
+	status_t error = 0;
 
     NetBufferHeaderReader<l2cap_cfg_rsp_cp> command(buffer);
 	status_t status = command.Status();
@@ -655,7 +656,7 @@ l2cap_process_cfg_rsp(HciConnection *conn, uint8 ident, net_buffer *buffer)
 		btCoreData->TimeoutSignal(cmd, bluetooth_l2cap_rtx_timeout);
 	else {
 		/* Send L2CA_Config response to the upper layer protocol */
-		//INDICATION error = ng_l2cap_l2ca_cfg_rsp(cmd->channel, cmd->token, result);
+		error = l2cap_upper_cfg_rsp(cmd->channel /*, cmd->token, result*/);
 		if (error != 0) {
 			/*
 			 * XXX FIXME what to do here? we were not able to send
@@ -668,10 +669,7 @@ l2cap_process_cfg_rsp(HciConnection *conn, uint8 ident, net_buffer *buffer)
 
 			btCoreData->RemoveChannel(conn, cmd->channel->scid);
 		}
-		cmd->channel->cfgState |= L2CAP_CFG_OUT;
-		if ((cmd->channel->cfgState & L2CAP_CFG_BOTH) == L2CAP_CFG_BOTH) {
-			cmd->channel->state = L2CAP_CHAN_OPEN;
-		}
+
 		btCoreData->AcknowledgeSignal(cmd);
 	}
 
@@ -770,7 +768,7 @@ reject:
 static status_t
 l2cap_process_discon_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
 {
-	L2capFrame *cmd = NULL;
+	L2capFrame* cmd = NULL;
 	int16 scid, dcid;
 	status_t error = 0;
 
@@ -827,7 +825,7 @@ out:
 static status_t
 l2cap_process_echo_req(HciConnection *conn, uint8 ident, net_buffer *buffer)
 {
-	L2capFrame      *cmd = NULL;
+	L2capFrame* cmd = NULL;
 
 	cmd = btCoreData->SpawnSignal(conn, NULL, l2cap_echo_req(ident, NULL, 0), ident, L2CAP_ECHO_RSP);
 	if (cmd == NULL) {
@@ -917,8 +915,8 @@ static status_t
 l2cap_process_info_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
 {
 	l2cap_info_rsp_cp* cp = NULL;
-	L2capFrame*		cmd = NULL;
-	status_t           error = B_OK;
+	L2capFrame* cmd = NULL;
+	status_t error = B_OK;
 
 	/* Get command parameters */
     NetBufferHeaderReader<l2cap_info_rsp_cp> command(buffer);
@@ -950,8 +948,7 @@ l2cap_process_info_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
 		switch (command->type) {
 
     		case L2CAP_CONNLESS_MTU:
-			/*
-				// TODO: Check specs ??
+				/* TODO: Check specs ??
 	    	    if (conn->rx_pkt->m_pkthdr.len == sizeof(uint16)) {
 				    *mtod(conn->rx_pkt, uint16 *) = le16toh(*mtod(conn->rx_pkt,uint16 *));
 			    } else {

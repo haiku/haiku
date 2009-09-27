@@ -126,9 +126,7 @@ l2cap_connect(net_protocol* protocol, const struct sockaddr* address)
 status_t
 l2cap_accept(net_protocol* protocol, struct net_socket** _acceptedSocket)
 {
-	flowf("\n");
-	
-	return EOPNOTSUPP;
+	return ((L2capEndpoint*)protocol)->Accept(_acceptedSocket);
 }
 
 
@@ -160,7 +158,7 @@ l2cap_setsockopt(net_protocol* protocol, int level, int option,
 {
 	flowf("\n");
 
-	((L2capEndpoint*)protocol)->configurationSet = true;
+	((L2capEndpoint*)protocol)->fConfigurationSet = true;
 
 /*	return protocol->next->module->setsockopt(protocol->next, level, option, value, length); */
 	return EOPNOTSUPP;
