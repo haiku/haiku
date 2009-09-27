@@ -78,8 +78,13 @@ private:
 	void _DeviceStatusReport(int n);
 	void _DecPrivateModeSet(int value);
 	void _DecPrivateModeReset(int value);
+	void _DecSaveCursor();
+	void _DecRestoreCursor();
 
 	int fFd;
+
+	ushort fAttr;
+	ushort fSavedAttr;
 
 	thread_id fParseThread;
 	thread_id fReaderThread;

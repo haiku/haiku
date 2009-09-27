@@ -311,8 +311,6 @@ TermParse::EscParse()
 
 	int now_coding = -1;
 
-	ushort attr = BACKCOLOR;
-
 	int param[NPARAM];
 	int nparam = 1;
 
@@ -324,6 +322,8 @@ TermParse::EscParse()
 
 	int width = 1;
 	BAutolock locker(fBuffer);
+
+	fAttr = fSavedAttr = BACKCOLOR;
 
 	while (!fQuitting) {
 		uchar c;
@@ -371,7 +371,7 @@ TermParse::EscParse()
 //debug_printf("TermParse: char: '%c' (%d), parse state: %d\n", c, c, parsestate[c]);
 		switch (parsestate[c]) {
 			case CASE_PRINT:
-				fBuffer->InsertChar((char)c, attr);
+				fBuffer->InsertChar((char)c, fAttr);
 				break;
 
 			case CASE_PRINT_GR:
@@ -422,7 +422,7 @@ TermParse::EscParse()
 						B_EUC_CONVERSION);
 				}
 
-				fBuffer->InsertChar(dstbuf, 4, width, attr);
+				fBuffer->InsertChar(dstbuf, 4, width, fAttr);
 				break;
 
 			case CASE_PRINT_CS96:
@@ -431,7 +431,7 @@ TermParse::EscParse()
 				cbuf[1] = c | 0x80;
 				cbuf[2] = 0;
 				CodeConv::ConvertToInternal(cbuf, 2, dstbuf, B_EUC_CONVERSION);
-				fBuffer->InsertChar(dstbuf, 4, attr);
+				fBuffer->InsertChar(dstbuf, 4, fAttr);
 				break;
 
 			case CASE_LF:
@@ -446,7 +446,7 @@ TermParse::EscParse()
 				cbuf[0] = c;
 				cbuf[1] = '\0';
 				CodeConv::ConvertToInternal(cbuf, 1, dstbuf, now_coding);
-				fBuffer->InsertChar(dstbuf, 4, attr);
+				fBuffer->InsertChar(dstbuf, 4, fAttr);
 				break;
 
 			case CASE_SJIS_INSTRING:
@@ -455,7 +455,7 @@ TermParse::EscParse()
 				cbuf[1] = c;
 				cbuf[2] = '\0';
 				CodeConv::ConvertToInternal(cbuf, 2, dstbuf, now_coding);
-				fBuffer->InsertChar(dstbuf, 4, attr);
+				fBuffer->InsertChar(dstbuf, 4, fAttr);
 				break;
 
 			case CASE_UTF8_2BYTE:
@@ -466,7 +466,7 @@ TermParse::EscParse()
 				cbuf[1] = c;
 				cbuf[2] = '\0';
 
-				fBuffer->InsertChar(cbuf, 2, attr);
+				fBuffer->InsertChar(cbuf, 2, fAttr);
 				break;
 
 			case CASE_UTF8_3BYTE:
@@ -481,7 +481,7 @@ TermParse::EscParse()
 					break;
 				cbuf[2] = c;
 				cbuf[3] = '\0';
-				fBuffer->InsertChar(cbuf, 3, attr);
+				fBuffer->InsertChar(cbuf, 3, fAttr);
 				break;
 
 			case CASE_MBCS:
@@ -645,9 +645,22 @@ TermParse::EscParse()
 				parsestate = groundtable;
 				break;
 
-			case CASE_EL:		// delete line
+			case CASE_EL:		// ESC [ ...K delete line
 				/* EL */
-				fBuffer->DeleteColumns();
+				switch (param[0]) {
+					case DEFAULT:
+					case 0:
+						fBuffer->DeleteColumns();
+						break;
+
+					case 1:
+						fBuffer->EraseCharsFrom(0, fBuffer->Cursor().x + 1);
+						break;
+
+					case 2:
+						fBuffer->DeleteColumnsFrom(0);
+						break;
+				}
 				parsestate = groundtable;
 				break;
 
@@ -695,32 +708,32 @@ TermParse::EscParse()
 					switch (param[row]) {
 						case DEFAULT:
 						case 0: /* Reset attribute */
-							attr = 0;
+							fAttr = 0;
 							break;
 
 						case 1:
 						case 5:	/* Bold		*/
-							attr |= BOLD;
+							fAttr |= BOLD;
 							break;
 
 						case 4:	/* Underline	*/
-							attr |= UNDERLINE;
+							fAttr |= UNDERLINE;
 							break;
 
 						case 7:	/* Inverse	*/
-							attr |= INVERSE;
+							fAttr |= INVERSE;
 							break;
 
 						case 22:	/* Not Bold	*/
-							attr &= ~BOLD;
+							fAttr &= ~BOLD;
 							break;
 
 						case 24:	/* Not Underline	*/
-							attr &= ~UNDERLINE;
+							fAttr &= ~UNDERLINE;
 							break;
 
 						case 27:	/* Not Inverse	*/
-							attr &= ~INVERSE;
+							fAttr &= ~INVERSE;
 							break;
 
 						case 30:
@@ -731,13 +744,13 @@ TermParse::EscParse()
 						case 35:
 						case 36:
 						case 37:
-							attr &= ~FORECOLOR;
-							attr |= FORECOLORED(param[row] - 30);
-							attr |= FORESET;
+							fAttr &= ~FORECOLOR;
+							fAttr |= FORECOLORED(param[row] - 30);
+							fAttr |= FORESET;
 							break;
 
 						case 39:
-							attr &= ~FORESET;
+							fAttr &= ~FORESET;
 							break;
 
 						case 40:
@@ -748,13 +761,13 @@ TermParse::EscParse()
 						case 45:
 						case 46:
 						case 47:
-							attr &= ~BACKCOLOR;
-							attr |= BACKCOLORED(param[row] - 40);
-							attr |= BACKSET;
+							fAttr &= ~BACKCOLOR;
+							fAttr |= BACKCOLORED(param[row] - 40);
+							fAttr |= BACKSET;
 							break;
 
 						case 49:
-							attr &= ~BACKSET;
+							fAttr &= ~BACKSET;
 							break;
 					}
 				}
@@ -822,13 +835,13 @@ TermParse::EscParse()
 
 				case CASE_DECSC:
 					/* DECSC */
-					fBuffer->SaveCursor();
+					_DecSaveCursor();
 					parsestate = groundtable;
 					break;
 
 				case CASE_DECRC:
 					/* DECRC */
-					fBuffer->RestoreCursor();
+					_DecRestoreCursor();
 					parsestate = groundtable;
 					break;
 
@@ -840,10 +853,7 @@ TermParse::EscParse()
 
 				case CASE_RI:
 					/* RI */
-					if (fBuffer->Cursor().y == 0)
-						fBuffer->ScrollBy(-1);
-					else
-						fBuffer->MoveCursorUp(1);
+					fBuffer->InsertRI();
 					parsestate = groundtable;
 					break;
 
@@ -1095,6 +1105,10 @@ TermParse::_DecPrivateModeSet(int value)
 			// screen).
 			// Not supported yet.
 			break;
+		case 6:
+			// Set Origin Mode.
+			fBuffer->SetOriginMode(true);
+			break;
 		case 9:
 			// Set Mouse X and Y on button press.
 			fBuffer->ReportX10MouseEvent(true);
@@ -1139,7 +1153,7 @@ TermParse::_DecPrivateModeSet(int value)
 		case 1049:
 			// Save cursor as in DECSC and use Alternate Screen Buffer, clearing
 			// it first.
-			fBuffer->SaveCursor();
+			_DecSaveCursor();
 			fBuffer->UseAlternateScreenBuffer(true);
 			break;
 	}
@@ -1165,6 +1179,10 @@ TermParse::_DecPrivateModeReset(int value)
 		case 5:
 			// Normal Video (Leaves Reverse Video, cf. there).
 			// Not supported yet.
+			break;
+		case 6:
+			// Reset Origin Mode.
+			fBuffer->SetOriginMode(false);
 			break;
 		case 9:
 			// Disable Mouse X and Y on button press.
@@ -1210,7 +1228,25 @@ TermParse::_DecPrivateModeReset(int value)
 		case 1049:
 			// Use Normal Screen Buffer and restore cursor as in DECRC.
 			fBuffer->UseNormalScreenBuffer();
-			fBuffer->RestoreCursor();
+			_DecRestoreCursor();
 			break;
 	}
+}
+
+
+void
+TermParse::_DecSaveCursor()
+{
+	fBuffer->SaveCursor();
+	fBuffer->SaveOriginMode();
+	fSavedAttr = fAttr;
+}
+
+
+void
+TermParse::_DecRestoreCursor()
+{
+	fBuffer->RestoreCursor();
+	fBuffer->RestoreOriginMode();
+	fAttr = fSavedAttr;
 }

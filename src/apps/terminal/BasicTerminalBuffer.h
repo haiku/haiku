@@ -106,21 +106,24 @@ public:
 
 			void				InsertCR();
 			void				InsertLF();
+			void				InsertRI();
 			void				SetInsertMode(int flag);
 			void				InsertSpace(int32 num);
 			void				InsertLines(int32 numLines);
 
 			// delete chars/lines
-			void				EraseChars(int32 numChars);
+	inline	void				EraseChars(int32 numChars);
+			void				EraseCharsFrom(int32 first, int32 numChars);
 			void				EraseAbove();
 			void				EraseBelow();
 			void				EraseAll();
 			void				DeleteChars(int32 numChars);
-			void				DeleteColumns();
+	inline	void				DeleteColumns();
+			void				DeleteColumnsFrom(int32 first);
 			void				DeleteLines(int32 numLines);
 
 			// get and set cursor position
-			void				SetCursor(int32 x, int32 y);
+	inline	void				SetCursor(int32 x, int32 y);
 	inline	void				SetCursorX(int32 x);
 	inline	void				SetCursorY(int32 y);
 	inline	TermPos				Cursor() const			{ return fCursor; }
@@ -136,6 +139,9 @@ public:
 			// scroll region
 	inline	void				ScrollBy(int32 numLines);
 			void				SetScrollRegion(int32 top, int32 bottom);
+			void				SetOriginMode(bool enabled);
+			void				SaveOriginMode();
+			void				RestoreOriginMode();
 
 protected:
 	virtual	void				NotifyListener();
@@ -147,6 +153,7 @@ protected:
 
 	inline	void				_Invalidate(int32 top, int32 bottom);
 	inline	void				_CursorChanged();
+			void				_SetCursor(int32 x, int32 y, bool absolute);
 			void				_InvalidateAll();
 
 	static	TerminalLine**		_AllocateLines(int32 width, int32 count);
@@ -193,6 +200,8 @@ protected:
 
 			bool				fOverwriteMode;	// false for insert
 			bool				fAlternateScreenActive;
+			bool				fOriginMode;
+			bool				fSavedOriginMode;
 
 			int					fEncoding;
 
@@ -235,6 +244,24 @@ BasicTerminalBuffer::InsertChar(const char* c, int32 length, uint32 width, uint3
 	return InsertChar(UTF8Char(c, length), width, attributes);
 }
 
+
+void
+BasicTerminalBuffer::EraseChars(int32 numChars)
+{
+	EraseCharsFrom(fCursor.x, numChars);
+}
+
+void
+BasicTerminalBuffer::DeleteColumns()
+{
+	DeleteColumnsFrom(fCursor.x);
+}
+
+void
+BasicTerminalBuffer::SetCursor(int32 x, int32 y)
+{
+	_SetCursor(x, y, false);
+}
 
 void
 BasicTerminalBuffer::SetCursorX(int32 x)

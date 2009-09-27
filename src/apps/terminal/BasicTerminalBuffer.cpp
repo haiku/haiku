@@ -122,6 +122,7 @@ BasicTerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 
 	fOverwriteMode = true;
 	fAlternateScreenActive = false;
+	fOriginMode = fSavedOriginMode = false;
 
 	fScreen = _AllocateLines(width, height);
 	if (fScreen == NULL)
@@ -605,6 +606,22 @@ BasicTerminalBuffer::InsertLF()
 
 
 void
+BasicTerminalBuffer::InsertRI()
+{
+	fSoftWrappedCursor = false;
+
+	// If we're at the beginning of the scroll region, scroll. Otherwise just
+	// reverse the cursor.
+	if (fCursor.y == fScrollTop) {
+		_Scroll(fScrollTop, fScrollBottom, -1);
+	} else {
+		if (fCursor.y > 0)
+			fCursor.y--;
+		_CursorChanged();
+	}
+}
+
+void
 BasicTerminalBuffer::InsertLines(int32 numLines)
 {
 	if (fCursor.y >= fScrollTop && fCursor.y < fScrollBottom) {
@@ -645,7 +662,7 @@ BasicTerminalBuffer::InsertSpace(int32 num)
 
 
 void
-BasicTerminalBuffer::EraseChars(int32 numChars)
+BasicTerminalBuffer::EraseCharsFrom(int32 first, int32 numChars)
 {
 	TerminalLine* line = _LineAt(fCursor.y);
 	if (fCursor.y >= line->length)
@@ -653,8 +670,7 @@ BasicTerminalBuffer::EraseChars(int32 numChars)
 
 	fSoftWrappedCursor = false;
 
-	int32 first = fCursor.x;
-	int32 end = min_c(fCursor.x + numChars, line->length);
+	int32 end = min_c(first + numChars, line->length);
 	if (first > 0 && IS_WIDTH(line->cells[first - 1].attributes))
 		first--;
 	if (end > 0 && IS_WIDTH(line->cells[end - 1].attributes))
@@ -713,7 +729,7 @@ void
 BasicTerminalBuffer::EraseAll()
 {
 	fSoftWrappedCursor = false;
-	_Scroll(fScrollTop, fScrollBottom, fHeight);
+	_Scroll(0, fHeight - 1, fHeight);
 }
 
 
@@ -740,13 +756,13 @@ BasicTerminalBuffer::DeleteChars(int32 numChars)
 
 
 void
-BasicTerminalBuffer::DeleteColumns()
+BasicTerminalBuffer::DeleteColumnsFrom(int32 first)
 {
 	fSoftWrappedCursor = false;
 
 	TerminalLine* line = _LineAt(fCursor.y);
-	if (fCursor.x < line->length) {
-		line->length = fCursor.x;
+	if (first < line->length) {
+		line->length = first;
 		_Invalidate(fCursor.y, fCursor.y);
 	}
 }
@@ -763,21 +779,6 @@ BasicTerminalBuffer::DeleteLines(int32 numLines)
 
 
 void
-BasicTerminalBuffer::SetCursor(int32 x, int32 y)
-{
-//debug_printf("BasicTerminalBuffer::SetCursor(%d, %d)\n", x, y);
-	fSoftWrappedCursor = false;
-	x = restrict_value(x, 0, fWidth - 1);
-	y = restrict_value(y, 0, fHeight - 1);
-	if (x != fCursor.x || y != fCursor.y) {
-		fCursor.x = x;
-		fCursor.y = y;
-		_CursorChanged();
-	}
-}
-
-
-void
 BasicTerminalBuffer::SaveCursor()
 {
 	fSavedCursor = fCursor;
@@ -787,7 +788,7 @@ BasicTerminalBuffer::SaveCursor()
 void
 BasicTerminalBuffer::RestoreCursor()
 {
-	SetCursor(fSavedCursor.x, fSavedCursor.y);
+	_SetCursor(fSavedCursor.x, fSavedCursor.y, true);
 }
 
 
@@ -798,7 +799,29 @@ BasicTerminalBuffer::SetScrollRegion(int32 top, int32 bottom)
 	fScrollBottom = restrict_value(bottom, fScrollTop, fHeight - 1);
 
 	// also sets the cursor position
-	SetCursor(0, 0);
+	_SetCursor(0, 0, false);
+}
+
+
+void
+BasicTerminalBuffer::SetOriginMode(bool enabled)
+{
+	fOriginMode = enabled;
+	_SetCursor(0, 0, false);
+}
+
+
+void
+BasicTerminalBuffer::SaveOriginMode()
+{
+	fSavedOriginMode = fOriginMode;
+}
+
+
+void
+BasicTerminalBuffer::RestoreOriginMode()
+{
+	fOriginMode = fSavedOriginMode;
 }
 
 
@@ -810,6 +833,28 @@ BasicTerminalBuffer::NotifyListener()
 
 
 // #pragma mark - private methods
+
+
+void
+BasicTerminalBuffer::_SetCursor(int32 x, int32 y, bool absolute)
+{
+//debug_printf("BasicTerminalBuffer::_SetCursor(%d, %d)\n", x, y);
+	fSoftWrappedCursor = false;
+
+	x = restrict_value(x, 0, fWidth - 1);
+	if (fOriginMode && !absolute) {
+		y += fScrollTop;
+		y = restrict_value(y, fScrollTop, fScrollBottom);
+	} else {
+		y = restrict_value(y, 0, fHeight - 1);
+	}
+
+	if (x != fCursor.x || y != fCursor.y) {
+		fCursor.x = x;
+		fCursor.y = y;
+		_CursorChanged();
+	}
+}
 
 
 void
@@ -984,6 +1029,7 @@ BasicTerminalBuffer::_ResizeSimple(int32 width, int32 height,
 
 	fScrollTop = 0;
 	fScrollBottom = fHeight - 1;
+	fOriginMode = fSavedOriginMode = false;
 
 	fScreenOffset = 0;
 
@@ -1177,6 +1223,7 @@ BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
 
 	fScrollTop = 0;
 	fScrollBottom = fHeight - 1;
+	fOriginMode = fSavedOriginMode = false;
 
 	return B_OK;
 }
