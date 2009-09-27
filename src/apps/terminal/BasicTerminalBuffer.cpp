@@ -1352,7 +1352,7 @@ BasicTerminalBuffer::_InsertGap(int32 width)
 			line->cells + fCursor.x, toMove * sizeof(TerminalCell));
 	}
 
-	line->length += width;
+	line->length = min_c(line->length + width, fWidth);
 }
 
 
