@@ -59,7 +59,7 @@ BluetoothApplication::AboutRequested()
                              "	- Petter H. Juliussen\n"
                              "	- Adrien Destugues\n\n"
                              "Who gave me all the knowledge:\n"
-                             "	- the yellowTAB team"), TR("Ok")))->Go();
+                             "	- the yellowTAB team"), /*TR*/("Ok")))->Go();
 	
 }
 

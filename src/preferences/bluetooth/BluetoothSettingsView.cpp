@@ -42,7 +42,7 @@ static const char* kAllLabel = TR_MARK("From all devices");
 static const char* kTrustedLabel = TR_MARK("Only from Trusted devices");
 static const char* kAlwaysLabel = TR_MARK("Always ask");
 
-static const char* kDesktopLabel = /*TR_MARK*/("Desktop");
+static const char* kDesktopLabel = TR_MARK("Desktop");
 static const char* kServerLabel = TR_MARK("Server");
 static const char* kLaptopLabel = TR_MARK("Laptop");
 static const char* kHandheldLabel = TR_MARK("Handheld");
@@ -62,7 +62,7 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 	fAverageWeightControl = new BSlider("averageWeightControl",
 		TR("Default Inquiry time:"), new BMessage(kMsgSetAverageWeight), 0, 255,
 		B_HORIZONTAL);
-	fAverageWeightControl->SetLimitLabels(/*TR*/("15 secs"), /*TR*/("61 secs"));
+	fAverageWeightControl->SetLimitLabels(TR("15 secs"), TR("61 secs"));
 	fAverageWeightControl->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fAverageWeightControl->SetHashMarkCount(255 / 15);
 	fAverageWeightControl->SetEnabled(true);
