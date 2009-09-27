@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/select.h>
 
 #include <Entry.h>
 #include <Deskbar.h>
@@ -21,6 +22,8 @@
 
 #include <bluetoothserver_p.h>
 #include <bluetooth/HCI/btHCI_command.h>
+#include <bluetooth/L2CAP/btL2CAP.h>
+#include <bluetooth/bluetooth.h>
 #include <bluetooth/bluetooth_util.h>
 
 #include "BluetoothServer.h"
@@ -53,7 +56,10 @@ DispatchEvent(struct hci_event_header* header, int32 code, size_t size)
 }
 
 
-BluetoothServer::BluetoothServer() : BApplication(BLUETOOTH_SIGNATURE)
+BluetoothServer::BluetoothServer()
+	: BApplication(BLUETOOTH_SIGNATURE)
+	, fSDPThreadID(-1)
+	, fIsShuttingDown(false)
 {
 	Output::Instance()->Run();
 	Output::Instance()->SetTitle("Bluetooth message gathering");
@@ -61,6 +67,7 @@ BluetoothServer::BluetoothServer() : BApplication(BLUETOOTH_SIGNATURE)
 	Output::Instance()->AddTab("General", BLACKBOARD_GENERAL);
 	Output::Instance()->AddTab("Device Manager", BLACKBOARD_DEVICEMANAGER);
 	Output::Instance()->AddTab("Kit", BLACKBOARD_KIT);
+	Output::Instance()->AddTab("SDP", BLACKBOARD_SDP);
 
 	fDeviceManager = new DeviceManager();
 	fLocalDevicesList.MakeEmpty();
@@ -81,8 +88,14 @@ bool BluetoothServer::QuitRequested(void)
 		delete lDeviceImpl;
  
  	_RemoveDeskbarIcon();
+ 	
+ 	/* stop the SDP server thread */
+ 	fIsShuttingDown = true;
+ 	status_t threadReturnStatus;
+ 	wait_for_thread(fSDPThreadID, &threadReturnStatus);
+ 	printf("SDP server thread exited with: %s\n", strerror(threadReturnStatus));
  
-	printf("Accepting quitting of the application\n");
+	printf("Shutting down bluetooth_server.\n");
 	return BApplication::QuitRequested();
 }
 
@@ -99,19 +112,28 @@ void BluetoothServer::ArgvReceived(int32 argc, char **argv)
 
 void BluetoothServer::ReadyToRun(void)
 {
+	ShowWindow(Output::Instance());
+	
 	fDeviceManager->StartMonitoringDevice("bluetooth/h2");
 	fDeviceManager->StartMonitoringDevice("bluetooth/h3");
 	fDeviceManager->StartMonitoringDevice("bluetooth/h4");
 	fDeviceManager->StartMonitoringDevice("bluetooth/h5");
 
 	if (fEventListener2->Launch() != B_OK)
-		Output::Instance()->Post("Bluetooth port listener failed\n", BLACKBOARD_GENERAL);
+		Output::Instance()->Post("Bluetooth event listener failed\n", BLACKBOARD_GENERAL);
 	else
-		Output::Instance()->Post("Bluetooth server Ready\n", BLACKBOARD_GENERAL);
-
-	ShowWindow(Output::Instance());
+		Output::Instance()->Post("Bluetooth event listener Ready\n", BLACKBOARD_GENERAL);
 
 	_InstallDeskbarIcon();
+	
+	// Spawn the SDP server thread
+	fSDPThreadID = spawn_thread(SDPServerThread, "SDP server thread",
+		B_NORMAL_PRIORITY, this);
+		
+	if (fSDPThreadID <= 0 || resume_thread(fSDPThreadID) != B_OK) {
+		Output::Instance()->Postf(BLACKBOARD_SDP,
+			"Failed launching the SDP server thread: %x\n",	fSDPThreadID);
+	}
 }
 
 
@@ -422,9 +444,94 @@ BluetoothServer::HandleGetProperty(BMessage* message, BMessage* reply)
 #endif
 
 int32 
-BluetoothServer::sdp_server_Thread(void* data)
+BluetoothServer::SDPServerThread(void* data)
 {
+	const BluetoothServer *server = (BluetoothServer *)data;
+	
+	/* Set up the SDP socket. */
+	struct sockaddr_l2cap loc_addr = { 0 };
+    int socketServer;
+    int client;
+    status_t status;
+    char buff[512] = "";
+    
 
+	Output::Instance()->Postf(BLACKBOARD_SDP, "SDP server thread up...\n");
+
+    socketServer = socket(PF_BLUETOOTH, SOCK_STREAM /*SOCK_SEQPACKET*/, BLUETOOTH_PROTO_L2CAP);
+
+	if (socketServer < 0) {
+		Output::Instance()->Post("Could not create server socket ...\n", BLACKBOARD_SDP);
+		return B_ERROR;
+	}
+
+    // bind socket to port 0x1001 of the first available 
+    // bluetooth adapter
+    loc_addr.l2cap_family = AF_BLUETOOTH;
+    loc_addr.l2cap_bdaddr = *BDADDR_ANY;
+    loc_addr.l2cap_psm = B_HOST_TO_LENDIAN_INT16(1); // correct?
+	loc_addr.l2cap_len = sizeof(struct sockaddr_l2cap);
+
+	status = bind(socketServer, (struct sockaddr *)&loc_addr, sizeof(struct sockaddr_l2cap));
+
+	if (status < 0) {
+		Output::Instance()->Postf(BLACKBOARD_SDP, "Could not bind server socket %d ...\n", status);
+		return status;
+	}
+   
+	// setsockopt(sock, SOL_L2CAP, SO_L2CAP_OMTU, &omtu, len );
+	// getsockopt(sock, SOL_L2CAP, SO_L2CAP_IMTU, &omtu, &len );
+
+    /* Listen for up to 10 connections. */
+    status = listen(socketServer, 10);
+	
+	if (status != B_OK) {
+		Output::Instance()->Postf(BLACKBOARD_SDP, "Could not listen server socket %d ...\n", status);
+		return status;
+	}
+	
+	
+	while (!server->fIsShuttingDown) {
+
+		Output::Instance()->Postf(BLACKBOARD_SDP, "Waiting connection for socket %d ...\n", socketServer);
+		
+		uint len = sizeof(struct sockaddr_l2cap);
+   		client = accept(socketServer, (struct sockaddr *) &loc_addr, &len);
+
+		Output::Instance()->Postf(BLACKBOARD_SDP, "Incomming connection... %ld\n", client);
+
+		ssize_t leng = recv(client, buff, 29 , 0);
+		if (leng == -1) {
+			Output::Instance()->Post("Error reading client socket\n", BLACKBOARD_SDP);
+			
+		}
+		
+		Output::Instance()->Postf(BLACKBOARD_SDP, "Received from SDP client: %ld:\n", leng);
+		for (int i = 0; i < leng ; i++)
+			Output::Instance()->Postf(BLACKBOARD_SDP, "%x:", buff[i]);
+			
+		Output::Instance()->Post("\n", BLACKBOARD_SDP);	
+		
+
+/*		fd_set fdSet;
+		FD_ZERO(&fdSet);
+		FD_SET(s, &fdSet);
+		
+		struct timeval timeout;
+		memset(&timeout, 0, sizeof(timeout));
+		// TODO initialize timeout!
+		
+		int ret = select(1, &fdSet, NULL, NULL, &timeout);
+		printf("ready to read descriptors: %d\n", ret);
+*/		
+
+		snooze(5000000);
+		Output::Instance()->Post("Waiting for next connection...\n", BLACKBOARD_SDP);
+	}
+	
+	/* Close the socket */
+	close(socketServer);
+	
 	return B_NO_ERROR;	
 }
 

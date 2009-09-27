@@ -17,6 +17,6 @@ Server bluetooth_server
 	LocalDeviceHandler.cpp
 	LocalDeviceImpl.cpp  
 	Output.cpp
-	: be libbluetooth.so
+	: be network libbluetooth.so
 	$(TARGET_LIBSTDC++)
 ;

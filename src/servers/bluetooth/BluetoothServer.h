@@ -28,6 +28,7 @@ typedef enum {
 	BLACKBOARD_GENERAL = 0,
 	BLACKBOARD_DEVICEMANAGER,
 	BLACKBOARD_KIT,
+	BLACKBOARD_SDP,
 	// more blackboards
 	BLACKBOARD_END
 } BluetoothServerBlackBoardIndex;
@@ -54,7 +55,7 @@ public:
 	virtual void AppActivated(bool act);
 	virtual void MessageReceived(BMessage *message);
 
-	static int32 sdp_server_Thread(void* data);
+	static int32 SDPServerThread(void* data);
 	
 	/* Messages reply */
 	status_t	HandleLocalDevicesCount(BMessage* message, BMessage* reply);
@@ -84,6 +85,10 @@ private:
 	DeviceManager*			fDeviceManager;
 	
 	BPoint 					fCenter;
+	
+	thread_id				fSDPThreadID;
+	
+	bool					fIsShuttingDown;
 };
 
 #endif
