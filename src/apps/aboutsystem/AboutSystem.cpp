@@ -792,6 +792,7 @@ AboutView::_CreateCreditsView()
 		"Cian Duffy\n"
 		"Vincent Duvert\n"
 		"Fredrik Ekdahl\n"
+		"Joshua R. Elsasser\n"
 		"Mark Erben\n"
 		"Christian Fasshauer\n"
 		"Andreas Färber\n"
