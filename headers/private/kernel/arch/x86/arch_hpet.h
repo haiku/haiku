@@ -11,14 +11,14 @@
 /* Doing it this way is Required since the HPET only supports 32/64-bit aligned reads. */
 
 /* Global Capability Register Masks */
-#define HPET_CAP_MASK_ID			0x000000FFL
+#define HPET_CAP_MASK_REVID			0x000000FFL
 #define HPET_CAP_MASK_NUMTIMERS			0x00001F00L
 #define HPET_CAP_MASK_WIDTH			0x00002000L
 #define HPET_CAP_MASK_LEGACY			0x00008000L
 #define HPET_CAP_MASK_VENDOR_ID			0xFFFF0000L
 
 /* Retrieve Global Capabilities */
-#define HPET_GET_ID(regs)		((regs)->capability & HPET_CAP_MASK_ID)
+#define HPET_GET_REVID(regs)		((regs)->capability & HPET_CAP_MASK_REVID)
 #define HPET_GET_NUM_TIMERS(regs)	(((regs)->capability & HPET_CAP_MASK_NUMTIMERS) >> 8)
 #define HPET_IS_64BIT(regs)		(((regs)->capability & HPET_CAP_MASK_WIDTH) >> 13)
 #define HPET_IS_LEGACY_CAPABLE(regs)	(((regs)->capability & HPET_CAP_MASK_LEGACY) >> 15)
@@ -35,18 +35,18 @@
 #define ACPI_HPET_SIGNATURE			"HPET"
 
 struct hpet_timer {
-	/* Timer Configuration/Capability bits, Reversed because x86 is LSB */
+	/* Timer Configuration/Capability bits, Reversed because x86 is LSB */	
 	volatile uint32 config;
-	volatile uint32 interrupts;		/* Each bit represents one allowed interrupt for this timer. */
-					/* Read Only. If interrupt 16 is allowed, bit 16 will be 1. */
+	volatile uint32 interrupts;	/* R/W: Each bit represents one allowed interrupt for this timer. */
+					/* If interrupt 16 is allowed, bit 16 will be 1. */
 
-	volatile uint64 comparator;		/* Comparator value */
+	volatile uint64 comparator;	/* R/W: Comparator value */
 					/* non-periodic mode: fires once when main counter = this comparator */
 					/* periodic mode: fires when timer reaches this value, is increased by the original value */
 
-	/* FSB Interrupt Route values */
-	volatile uint32 fsb_value;
-	volatile uint32 fsb_addr;		/* Where fsb_value should be written */
+	
+	volatile uint32 fsb_value;	/* R/W: FSB Interrupt Route values */
+	volatile uint32 fsb_addr;	/* R/W: Where fsb_value should be written */
 
 	volatile uint64 reserved;
 };
@@ -54,13 +54,12 @@ struct hpet_timer {
 
 struct hpet_regs {
 	/* Capability bits */
-	volatile uint32 capability;			/* Capabilities */	
-	volatile uint32 period;
+	volatile uint32 capability;	/* Read Only: Capabilities */	
+	volatile uint32 period;		/* Read Only: Period */
 	
 	volatile uint64 reserved1;
 
-	/* Config Bits */
-	volatile uint64 config;
+	volatile uint64 config;		/* R/W: Config Bits */
 
 	volatile uint64 reserved2;
 
@@ -72,7 +71,7 @@ struct hpet_regs {
 
 	volatile uint8 reserved3[200];
 
-	volatile uint64 counter;
+	volatile uint64 counter;	/* R/W */
 
 	volatile uint64 reserved4;
 
