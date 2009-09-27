@@ -7,6 +7,7 @@
 
 
 #include <Referenceable.h>
+#include <Variant.h>
 
 #include "Types.h"
 
@@ -17,6 +18,8 @@ enum type_kind {
 	TYPE_MODIFIED,
 	TYPE_TYPEDEF,
 	TYPE_ADDRESS,
+	TYPE_ENUMERATION,
+	TYPE_SUBRANGE,
 	TYPE_ARRAY
 };
 
@@ -56,6 +59,26 @@ public:
 };
 
 
+class EnumerationValue : public Referenceable {
+public:
+	virtual						~EnumerationValue();
+
+	virtual	const char*			Name() const = 0;
+	virtual	BVariant			Value() const = 0;
+};
+
+
+class ArrayDimension : public Referenceable {
+public:
+	virtual						~ArrayDimension();
+
+	virtual	Type*				GetType() const = 0;
+									// subrange or enumeration
+	virtual	uint64				CountElements() const;
+									// returns 0, if unknown
+};
+
+
 class Type : public Referenceable {
 public:
 	virtual						~Type();
@@ -63,6 +86,8 @@ public:
 	virtual	const char*			Name() const = 0;
 	virtual	type_kind			Kind() const = 0;
 	virtual	target_size_t		ByteSize() const = 0;
+	virtual	Type*				ResolveRawType() const;
+									// strips modifiers and typedefs
 };
 
 
@@ -98,6 +123,7 @@ public:
 
 	virtual	uint32				Modifiers() const = 0;
 	virtual	Type*				BaseType() const = 0;
+	virtual	Type*				ResolveRawType() const;
 };
 
 
@@ -108,6 +134,7 @@ public:
 	virtual	type_kind			Kind() const;
 
 	virtual	Type*				BaseType() const = 0;
+	virtual	Type*				ResolveRawType() const;
 };
 
 
@@ -122,6 +149,34 @@ public:
 };
 
 
+class EnumerationType : public virtual Type {
+public:
+	virtual						~EnumerationType();
+
+	virtual	type_kind			Kind() const;
+
+	virtual	Type*				BaseType() const = 0;
+									// may return NULL
+
+	virtual	int32				CountValues() const = 0;
+	virtual	EnumerationValue*	ValueAt(int32 index) const = 0;
+	virtual	EnumerationValue*	ValueFor(const BVariant& value) const;
+};
+
+
+class SubrangeType : public virtual Type {
+public:
+	virtual						~SubrangeType();
+
+	virtual	type_kind			Kind() const;
+
+	virtual	Type*				BaseType() const = 0;
+
+	virtual	BVariant			LowerBound() const = 0;
+	virtual	BVariant			UpperBound() const = 0;
+};
+
+
 class ArrayType : public virtual Type {
 public:
 	virtual						~ArrayType();
@@ -129,9 +184,9 @@ public:
 	virtual	type_kind			Kind() const;
 
 	virtual	Type*				BaseType() const = 0;
-	virtual	target_size_t		CountElements() const = 0;
-		// TODO: That doesn't work. We need a list of dimensions which in turn
-		// are enumeration or subrange types.
+
+	virtual	int32				CountDimensions() const = 0;
+	virtual	ArrayDimension*		DimensionAt(int32 index) const = 0;
 };
 
 

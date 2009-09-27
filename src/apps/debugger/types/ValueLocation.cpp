@@ -7,12 +7,59 @@
 #include "ValueLocation.h"
 
 
+// #pragma mark - ValuePieceLocation
+
+
+ValuePieceLocation&
+ValuePieceLocation::Normalize(bool bigEndian)
+{
+	uint64 excessMSBs = bitOffset / 8;
+	uint64 excessLSBs = size - (bitOffset + bitSize + 7) / 8;
+
+	if (excessMSBs > 0 || excessLSBs > 0) {
+		switch (type) {
+			case VALUE_PIECE_LOCATION_MEMORY:
+				if (bigEndian)
+					address += excessMSBs;
+				else
+					address += excessLSBs;
+				bitOffset -= excessMSBs * 8;
+				size -= excessMSBs + excessLSBs;
+				break;
+			case VALUE_PIECE_LOCATION_UNKNOWN:
+				bitOffset -= excessMSBs * 8;
+				size -= excessMSBs + excessLSBs;
+				break;
+			case VALUE_PIECE_LOCATION_REGISTER:
+			default:
+				break;
+		}
+	}
+
+	return *this;
+}
+
+
+// #pragma mark - ValueLocation
+
+
 ValueLocation::ValueLocation()
+	:
+	fBigEndian(false)
 {
 }
 
 
-ValueLocation::ValueLocation(const ValuePieceLocation& piece)
+ValueLocation::ValueLocation(bool bigEndian)
+	:
+	fBigEndian(bigEndian)
+{
+}
+
+
+ValueLocation::ValueLocation(bool bigEndian, const ValuePieceLocation& piece)
+	:
+	fBigEndian(bigEndian)
 {
 	AddPiece(piece);
 }
@@ -20,7 +67,8 @@ ValueLocation::ValueLocation(const ValuePieceLocation& piece)
 
 ValueLocation::ValueLocation(const ValueLocation& other)
 	:
-	fPieces(other.fPieces)
+	fPieces(other.fPieces),
+	fBigEndian(other.fBigEndian)
 {
 }
 
@@ -31,60 +79,105 @@ ValueLocation::SetTo(const ValueLocation& other, uint64 bitOffset,
 {
 	Clear();
 
-	// skip pieces before the offset
+	fBigEndian = other.fBigEndian;
+
+	// compute the total bit size
 	int32 count = other.CountPieces();
-	int32 i;
-	ValuePieceLocation piece;
-	for (i = 0; i < count; i++) {
-		piece = other.PieceAt(i);
-		if (piece.size * 8 + piece.bitSize > bitOffset)
-			break;
-		bitOffset -= piece.size * 8 + piece.bitSize;
+	uint64 totalBitSize = 0;
+	for (int32 i = 0; i < count; i++) {
+		ValuePieceLocation piece = other.PieceAt(i);
+		totalBitSize += piece.bitSize;
 	}
 
-	if (i >= count)
-		return true;
+	// adjust requested bit offset/size to something reasonable, if necessary
+	if (bitOffset + bitSize > totalBitSize) {
+		if (bitOffset >= totalBitSize)
+			return true;
+		bitSize = totalBitSize - bitOffset;
+	}
 
-	// handle partial piece
-	if (bitOffset > 0) {
-		uint64 remainingBits = piece.size * 8 + piece.bitSize - bitOffset;
-		piece.size = remainingBits / 8;
-		piece.bitSize = remainingBits % 8;
+	if (fBigEndian) {
+		// Big endian: Skip the superfluous most significant bits, copy the
+		// pieces we need (cutting the first and the last one as needed) and
+		// ignore the remaining pieces.
 
-		switch (piece.type) {
-			case VALUE_PIECE_LOCATION_MEMORY:
-				piece.address += (bitOffset + piece.bitOffset) / 8;
-				piece.bitOffset = (bitOffset + piece.bitOffset) % 8;
+		// skip pieces for the most significant bits we don't need anymore
+		uint64 bitsToSkip = bitOffset;
+		int32 i;
+		ValuePieceLocation piece;
+		for (i = 0; i < count; i++) {
+			piece = other.PieceAt(i);
+			if (piece.bitSize > bitsToSkip)
 				break;
-			case VALUE_PIECE_LOCATION_UNKNOWN:
-				piece.bitOffset = 0;
-				break;
-			case VALUE_PIECE_LOCATION_REGISTER:
-				piece.bitOffset += bitOffset;
-				break;
-			default:
-				break;
+			bitsToSkip -= piece.bitSize;
 		}
-	}
 
-	// handle remaining pieces
-	while (bitSize > 0) {
-		target_addr_t pieceSize = piece.size * 8 + piece.bitSize;
-		if (pieceSize > bitSize) {
-			// the piece is bigger than the remaining size -- cut it
-			piece.size = bitSize / 8;
-			piece.bitSize = bitSize % 8;
-			bitSize = 0;
-		} else
-			bitSize -= pieceSize;
+		// handle partial piece
+		if (bitsToSkip > 0) {
+			piece.bitOffset += bitsToSkip;
+			piece.bitSize -= bitsToSkip;
+			piece.Normalize(fBigEndian);
+		}
 
-		if (!AddPiece(piece))
-			return false;
+		// handle remaining pieces
+		while (bitSize > 0) {
+			if (piece.bitSize > bitSize) {
+				// the piece is bigger than the remaining size -- cut it
+				piece.bitSize = bitSize;
+				piece.Normalize(fBigEndian);
+				bitSize = 0;
+			} else
+				bitSize -= piece.bitSize;
 
-		if (++i >= count)
-			break;
+			if (!AddPiece(piece))
+				return false;
 
-		piece = other.PieceAt(i);
+			if (++i >= count)
+				break;
+
+			piece = other.PieceAt(i);
+		}
+	} else {
+		// Little endian: Skip the superfluous least significant bits, copy the
+		// pieces we need (cutting the first and the last one as needed) and
+		// ignore the remaining pieces.
+
+		// skip pieces for the least significant bits we don't need anymore
+		uint64 bitsToSkip = totalBitSize - bitOffset - bitSize;
+		int32 i;
+		ValuePieceLocation piece;
+		for (i = 0; i < count; i++) {
+			piece = other.PieceAt(i);
+			if (piece.bitSize > bitsToSkip)
+				break;
+			bitsToSkip -= piece.bitSize;
+		}
+
+		// handle partial piece
+		if (bitsToSkip > 0) {
+			piece.bitSize -= bitsToSkip;
+			piece.Normalize(fBigEndian);
+		}
+
+		// handle remaining pieces
+		while (bitSize > 0) {
+			if (piece.bitSize > bitSize) {
+				// the piece is bigger than the remaining size -- cut it
+				piece.bitOffset += piece.bitSize - bitSize;
+				piece.bitSize = bitSize;
+				piece.Normalize(fBigEndian);
+				bitSize = 0;
+			} else
+				bitSize -= piece.bitSize;
+
+			if (!AddPiece(piece))
+				return false;
+
+			if (++i >= count)
+				break;
+
+			piece = other.PieceAt(i);
+		}
 	}
 
 	return true;
@@ -101,6 +194,8 @@ ValueLocation::Clear()
 bool
 ValueLocation::AddPiece(const ValuePieceLocation& piece)
 {
+	// Just add, don't normalize. This allows for using the class with different
+	// semantics (e.g. in the DWARF code).
 	return fPieces.Add(piece);
 }
 
@@ -136,6 +231,7 @@ ValueLocation&
 ValueLocation::operator=(const ValueLocation& other)
 {
 	fPieces = other.fPieces;
+	fBigEndian = other.fBigEndian;
 	return *this;
 }
 
@@ -144,7 +240,8 @@ void
 ValueLocation::Dump() const
 {
 	int32 count = fPieces.Size();
-	printf("ValueLocation: %ld pieces:\n", count);
+	printf("ValueLocation: %s endian, %ld pieces:\n",
+		fBigEndian ? "big" : "little", count);
 
 	for (int32 i = 0; i < count; i++) {
 		const ValuePieceLocation& piece = fPieces[i];
@@ -163,7 +260,7 @@ ValueLocation::Dump() const
 				break;
 		}
 
-		printf(" size: %llu+%u, offset: %u\n", piece.size, piece.bitSize,
-			piece.bitOffset);
+		printf(" size: %llu (%llu bits), offset: %llu bits\n", piece.size,
+			piece.bitSize, piece.bitOffset);
 	}
 }

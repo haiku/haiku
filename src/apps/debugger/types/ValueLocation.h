@@ -25,9 +25,11 @@ struct ValuePieceLocation {
 		target_addr_t			address;	// memory address
 		uint32					reg;		// register number
 	};
-	target_size_t				size;		// size in bytes (complete ones)
-	uint8						bitSize;	// totalBitSize = size * 8 + bitSize
-	uint8						bitOffset;	// offset in bits
+	target_size_t				size;		// size in bytes (including
+											// incomplete ones)
+	uint64						bitSize;	// total size in bits
+	uint64						bitOffset;	// bit offset (to the most
+											// significant bit)
 	value_piece_location_type	type;
 
 	ValuePieceLocation()
@@ -61,29 +63,36 @@ struct ValuePieceLocation {
 	void SetSize(target_size_t size)
 	{
 		this->size = size;
-		this->bitSize = 0;
+		this->bitSize = size * 8;
 		this->bitOffset = 0;
 	}
 
-	void SetSize(uint64 bitSize, uint8 bitOffset)
+	void SetSize(uint64 bitSize, uint64 bitOffset)
 	{
-		this->size = bitSize / 8;
-		this->bitSize = bitSize % 8;
+		this->size = (bitOffset + bitSize + 7) / 8;
+		this->bitSize = bitSize;
 		this->bitOffset = bitOffset;
 	}
+
+	ValuePieceLocation& Normalize(bool bigEndian);
 };
 
 
 class ValueLocation : public Referenceable {
 public:
 								ValueLocation();
-								ValueLocation(const ValuePieceLocation& piece);
+								ValueLocation(bool bigEndian);
+								ValueLocation(bool bigEndian,
+									const ValuePieceLocation& piece);
 								ValueLocation(const ValueLocation& other);
 
 			bool				SetTo(const ValueLocation& other,
 									uint64 bitOffset, uint64 bitSize);
 
 			void				Clear();
+
+			bool				IsBigEndian() const	{ return fBigEndian; }
+
 			bool				AddPiece(const ValuePieceLocation& piece);
 
 			int32				CountPieces() const;
@@ -100,6 +109,7 @@ private:
 
 private:
 			PieceArray			fPieces;
+			bool				fBigEndian;
 };
 
 

@@ -19,9 +19,11 @@ class DIEAddressingType;
 class DIEArrayType;
 class DIEBaseType;
 class DIECompoundType;
+class DIEEnumerationType;
 class DIEFormalParameter;
 class DIEModifiedType;
 class DIESubprogram;
+class DIESubrangeType;
 class DIEType;
 class DIETypedef;
 class DIEVariable;
@@ -37,7 +39,8 @@ class Variable;
 
 class DwarfStackFrameDebugInfo : public StackFrameDebugInfo {
 public:
-								DwarfStackFrameDebugInfo(DwarfFile* file,
+								DwarfStackFrameDebugInfo(
+									Architecture* architecture, DwarfFile* file,
 									CompilationUnit* compilationUnit,
 									DIESubprogram* subprogramEntry,
 									target_addr_t instructionPointer,
@@ -50,7 +53,7 @@ public:
 
 	virtual	status_t			ResolveObjectDataLocation(
 									StackFrame* stackFrame, Type* type,
-									target_addr_t objectAddress,
+									const ValueLocation& objectLocation,
 									ValueLocation*& _location);
 	virtual	status_t			ResolveBaseTypeLocation(
 									StackFrame* stackFrame, Type* type,
@@ -80,11 +83,15 @@ private:
 			struct DwarfType;
 			struct DwarfInheritance;
 			struct DwarfDataMember;
+			struct DwarfEnumerationValue;
+			struct DwarfArrayDimension;
 			struct DwarfPrimitiveType;
 			struct DwarfCompoundType;
 			struct DwarfModifiedType;
 			struct DwarfTypedefType;
 			struct DwarfAddressType;
+			struct DwarfEnumerationType;
+			struct DwarfSubrangeType;
 			struct DwarfArrayType;
 			struct DwarfTypeHashDefinition;
 
@@ -123,6 +130,12 @@ private:
 			status_t			_CreateArrayType(const BString& name,
 									DIEArrayType* typeEntry,
 									DwarfType*& _type);
+			status_t			_CreateEnumerationType(const BString& name,
+									DIEEnumerationType* typeEntry,
+									DwarfType*& _type);
+			status_t			_CreateSubrangeType(const BString& name,
+									DIESubrangeType* typeEntry,
+									DwarfType*& _type);
 
 			status_t			_CreateVariable(ObjectID* id,
 									const BString& name, DIEType* typeEntry,
@@ -134,8 +147,10 @@ private:
 			status_t			_ResolveTypeByteSize(DIEType* typeEntry,
 									uint64& _size);
 
-			void				_FixLocation(ValueLocation* location,
-									DwarfType* type);
+			status_t			_ResolveLocation(
+									const LocationDescription* description,
+									target_addr_t objectAddress, Type* type,
+									ValueLocation& _location);
 
 	template<typename EntryType>
 	static	DIEType*			_GetDIEType(EntryType* entry);

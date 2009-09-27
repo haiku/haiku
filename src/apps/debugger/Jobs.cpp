@@ -519,10 +519,13 @@ GetStackFrameValueJob::_GetValue()
 
 	// find out the type of the data we want to read
 	type_code valueType = 0;
+	bool shortValueIsFine = false;
 	while (valueType == 0) {
 		switch (type->Kind()) {
 			case TYPE_PRIMITIVE:
 				valueType = dynamic_cast<PrimitiveType*>(type)->TypeConstant();
+				shortValueIsFine = BVariant::TypeIsInteger(valueType)
+					|| valueType == B_BOOL_TYPE;
 
 				TRACE_LOCALS("  TYPE_PRIMITIVE: '%c%c%c%c'\n",
 					int(valueType >> 24), int(valueType >> 16),
@@ -560,6 +563,38 @@ GetStackFrameValueJob::_GetValue()
 				// recursion work smoothly, we have to set the type and
 				// location at least.
 				return _SetValue(BVariant(), actualType, location);
+			case TYPE_ENUMERATION:
+			{
+				TRACE_LOCALS("  TYPE_ENUMERATION\n");
+				// If a base type is known, use that.
+				EnumerationType* enumType
+					= dynamic_cast<EnumerationType*>(type);
+				if (enumType->BaseType() != NULL) {
+					type = enumType->BaseType();
+					break;
+				}
+
+				// get the value type constant
+				// TODO: This is C source language specific!
+				switch (enumType->ByteSize()) {
+					case 1:
+						valueType = B_INT8_TYPE;
+						break;
+					case 2:
+						valueType = B_INT16_TYPE;
+						break;
+					case 4:
+					default:
+						valueType = B_INT32_TYPE;
+						break;
+					case 8:
+						valueType = B_INT64_TYPE;
+						break;
+				}
+
+				shortValueIsFine = true;
+				break;
+			}
 			default:
 				TRACE_LOCALS("  default -> unsupported\n");
 				return B_UNSUPPORTED;
@@ -578,7 +613,7 @@ GetStackFrameValueJob::_GetValue()
 	// check whether we know the complete location
 	int32 count = location->CountPieces();
 
-	TRACE_LOCALS("  location: %p, %ld pieces\n", location, count);
+	TRACE_LOCALS_ONLY(location->Dump();)
 
 	if (count == 0) {
 		TRACE_LOCALS("  -> no location\n");
@@ -592,7 +627,7 @@ GetStackFrameValueJob::_GetValue()
 		if (piece.type == VALUE_PIECE_LOCATION_MEMORY) {
 			ValueLocation* dataLocation;
 			error = fStackFrame->DebugInfo()->ResolveObjectDataLocation(
-				fStackFrame, type, piece.address, dataLocation);
+				fStackFrame, type, *location, dataLocation);
 			if (error != B_OK)
 				return error;
 
@@ -601,7 +636,7 @@ GetStackFrameValueJob::_GetValue()
 		}
 	}
 
-	target_size_t totalSize = 0;
+	static const size_t kMaxPieceSize = 16;
 	uint64 totalBitSize = 0;
 	for (int32 i = 0; i < count; i++) {
 		ValuePieceLocation piece = location->PieceAt(i);
@@ -614,48 +649,51 @@ GetStackFrameValueJob::_GetValue()
 				break;
 		}
 
-		totalSize += piece.size;
+		if (piece.size > kMaxPieceSize) {
+			TRACE_LOCALS("  -> overly long piece size (%llu bytes)\n",
+				piece.size);
+			return B_UNSUPPORTED;
+		}
+
 		totalBitSize += piece.bitSize;
 	}
 
-	TRACE_LOCALS("  -> totalSize: %llu, totalBitSize: %llu\n", totalSize,
-		totalBitSize);
+	TRACE_LOCALS("  -> totalBitSize: %llu\n", totalBitSize);
 
-	if (totalSize == 0 && totalBitSize == 0) {
+	if (totalBitSize == 0) {
 		TRACE_LOCALS("  -> no size\n");
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	if (totalSize > 8 || totalSize + (totalBitSize + 7) / 8 > 8) {
-		TRACE_LOCALS("  -> longer than 8 bytes: unsupported\n");
+	if (totalBitSize > 64) {
+		TRACE_LOCALS("  -> longer than 64 bits: unsupported\n");
 		return B_UNSUPPORTED;
 	}
 
-	if (totalSize + (totalBitSize + 7) / 8 < BVariant::SizeOfType(valueType)) {
-		TRACE_LOCALS("  -> too short for value type (%llu vs. %lu)\n",
-			totalSize + (totalBitSize + 7) / 8,
-			BVariant::SizeOfType(valueType));
+	uint64 valueBitSize = BVariant::SizeOfType(valueType) * 8;
+	if (!shortValueIsFine && totalBitSize < valueBitSize) {
+		TRACE_LOCALS("  -> too short for value type (%llu vs. %llu bits)\n",
+			totalBitSize, valueBitSize);
 		return B_BAD_VALUE;
 	}
 
-	// load the data
+	// Load the data. Since the BitBuffer class we're using only supports big
+	// endian bit semantics, we convert all data to big endian before pushing
+	// them to the buffer. For later conversion to BVariant we need to make sure
+	// the final buffer has the size of the value type, so we pad the most
+	// significant bits with zeros.
 	BitBuffer valueBuffer;
+	if (totalBitSize < valueBitSize)
+		valueBuffer.AddZeroBits(valueBitSize - totalBitSize);
 
-	// If the total bit size is not byte aligned, push the respective number of
-	// 0 bits on a big endian architecture to get an immediately usable value.
-	// On a little endian architecture we'll play with the last read byte
-	// instead.
-	if (fArchitecture->IsBigEndian() && totalBitSize % 8 != 0) {
-		const uint8 zero = 0;
-		valueBuffer.AddBits(&zero, 8 - totalBitSize % 8, 0);
-	}
-
+	bool bigEndian = fArchitecture->IsBigEndian();
 	const Register* registers = fArchitecture->Registers();
 	for (int32 i = 0; i < count; i++) {
-		ValuePieceLocation piece = location->PieceAt(i);
+		ValuePieceLocation piece = location->PieceAt(
+			bigEndian ? i : count - i - 1);
+		uint32 bytesToRead = piece.size;
+		uint32 bitSize = piece.bitSize;
 		uint8 bitOffset = piece.bitOffset;
-		uint32 bitSize = piece.size * 8 + piece.bitSize;
-		uint32 bytesToRead = (bitSize + 7) / 8;
 
 		switch (piece.type) {
 			case VALUE_PIECE_LOCATION_INVALID:
@@ -663,13 +701,12 @@ GetStackFrameValueJob::_GetValue()
 				return B_ENTRY_NOT_FOUND;
 			case VALUE_PIECE_LOCATION_MEMORY:
 			{
-				target_addr_t address = piece.address + bitOffset / 8;
+				target_addr_t address = piece.address;
 
 				TRACE_LOCALS("  piece %ld: memory address: %#llx, bits: %lu\n",
 					i, address, bitSize);
 
-				bitOffset %= 8;
-				uint8 pieceBuffer[8];
+				uint8 pieceBuffer[kMaxPieceSize];
 				ssize_t bytesRead = fDebuggerInterface->ReadMemory(address,
 					pieceBuffer, bytesToRead);
 				if (bytesRead < 0)
@@ -683,6 +720,14 @@ GetStackFrameValueJob::_GetValue()
 						TRACE_LOCALS("%02x", pieceBuffer[k]);
 					TRACE_LOCALS("\n");
 				)
+
+				// convert to big endian
+				if (!bigEndian) {
+					for (int32 k = bytesRead / 2 - 1; k >= 0; k--) {
+						std::swap(pieceBuffer[k],
+							pieceBuffer[bytesRead - k - 1]);
+					}
+				}
 
 				valueBuffer.AddBits(pieceBuffer, bitSize, bitOffset);
 				break;
@@ -700,7 +745,7 @@ GetStackFrameValueJob::_GetValue()
 				if (registerValue.Size() < bytesToRead)
 					return B_ENTRY_NOT_FOUND;
 
-				if (!fArchitecture->IsHostEndian())
+				if (!bigEndian)
 					registerValue.SwapEndianess();
 				valueBuffer.AddBits(registerValue.Bytes(), bitSize, bitOffset);
 				break;
@@ -708,12 +753,9 @@ GetStackFrameValueJob::_GetValue()
 		}
 	}
 
-	// If the total bit size is not byte aligned, shift the last byte by the
-	// respective number of bits on a little endian architecture to get a usable
-	// value.
-	if (!fArchitecture->IsBigEndian() && totalBitSize % 8 != 0)
-		valueBuffer.Bytes()[totalBitSize / 8] >>= 8 - totalBitSize % 8;
-			// TODO: Verify that this is the way to handle it!
+	// If we don't have enough bits in the buffer apparently adding some failed.
+	if (valueBuffer.BitSize() < valueBitSize)
+		return B_NO_MEMORY;
 
 	// convert the bits into something we can work with
 	BVariant value;
@@ -723,8 +765,10 @@ GetStackFrameValueJob::_GetValue()
 		return error;
 	}
 
-	if (!fArchitecture->IsHostEndian())
+	// convert to host endianess
+	#if B_HOST_IS_LENDIAN
 		value.SwapEndianess();
+	#endif
 
 	return _SetValue(value, actualType, location);
 }
@@ -788,9 +832,10 @@ GetStackFrameValueJob::_ResolveTypeAndLocation(Type*& _type,
 	TypeComponent component = fPath->ComponentAt(componentCount - 1);
 	switch (component.typeKind) {
 		case TYPE_PRIMITIVE:
+		case TYPE_ENUMERATION:
 			// cannot happen
 			TRACE_LOCALS("GetStackFrameValueJob::_ResolveTypeAndLocation(): "
-				"TYPE_PRIMITIVE subcomponent!\n");
+				"TYPE_PRIMITIVE/TYPE_ENUMERATION subcomponent!\n");
 			return B_BAD_VALUE;
 		case TYPE_COMPOUND:
 		{

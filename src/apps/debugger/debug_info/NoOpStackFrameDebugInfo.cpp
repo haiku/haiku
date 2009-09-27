@@ -7,7 +7,9 @@
 #include "NoOpStackFrameDebugInfo.h"
 
 
-NoOpStackFrameDebugInfo::NoOpStackFrameDebugInfo()
+NoOpStackFrameDebugInfo::NoOpStackFrameDebugInfo(Architecture* architecture)
+	:
+	StackFrameDebugInfo(architecture)
 {
 }
 
@@ -19,7 +21,7 @@ NoOpStackFrameDebugInfo::~NoOpStackFrameDebugInfo()
 
 status_t
 NoOpStackFrameDebugInfo::ResolveObjectDataLocation(StackFrame* stackFrame,
-	Type* type, target_addr_t objectAddress, ValueLocation*& _location)
+	Type* type, const ValueLocation& objectLocation, ValueLocation*& _location)
 {
 	return B_UNSUPPORTED;
 }

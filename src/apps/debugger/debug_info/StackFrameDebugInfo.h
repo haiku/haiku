@@ -11,6 +11,7 @@
 #include "Types.h"
 
 
+class Architecture;
 class BaseType;
 class DataMember;
 class StackFrame;
@@ -20,13 +21,18 @@ class ValueLocation;
 
 class StackFrameDebugInfo : public Referenceable {
 public:
-								StackFrameDebugInfo();
+								StackFrameDebugInfo(Architecture* architecture);
 	virtual						~StackFrameDebugInfo();
 
 	virtual	status_t			ResolveObjectDataLocation(
 									StackFrame* stackFrame, Type* type,
-									target_addr_t objectAddress,
+									const ValueLocation& objectLocation,
 									ValueLocation*& _location) = 0;
+									// returns a reference
+			status_t			ResolveObjectDataLocation(
+									StackFrame* stackFrame, Type* type,
+									target_addr_t objectAddress,
+									ValueLocation*& _location);
 									// returns a reference
 	virtual	status_t			ResolveBaseTypeLocation(
 									StackFrame* stackFrame, Type* type,
@@ -40,6 +46,9 @@ public:
 									const ValueLocation& parentLocation,
 									ValueLocation*& _location) = 0;
 									// returns a reference
+
+protected:
+			Architecture*		fArchitecture;
 };
 
 

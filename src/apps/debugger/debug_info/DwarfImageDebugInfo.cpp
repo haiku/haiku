@@ -44,7 +44,6 @@
 #include "TeamMemory.h"
 #include "Tracing.h"
 #include "UnsupportedLanguage.h"
-#include "ValueLocation.h"
 #include "Variable.h"
 
 
@@ -397,7 +396,7 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	// create the stack frame debug info
 	DIESubprogram* subprogramEntry = function->SubprogramEntry();
 	DwarfStackFrameDebugInfo* stackFrameDebugInfo
-		= new(std::nothrow) DwarfStackFrameDebugInfo(fFile, unit,
+		= new(std::nothrow) DwarfStackFrameDebugInfo(fArchitecture, fFile, unit,
 			subprogramEntry, instructionPointer, framePointer, inputInterface,
 			fromDwarfMap);
 	if (stackFrameDebugInfo == NULL)

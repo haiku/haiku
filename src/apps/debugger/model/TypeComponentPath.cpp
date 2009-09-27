@@ -43,6 +43,12 @@ TypeComponent::Dump() const
 		case TYPE_ADDRESS:
 			printf("address");
 			break;
+		case TYPE_ENUMERATION:
+			printf("enum");
+			break;
+		case TYPE_SUBRANGE:
+			printf("subrange");
+			break;
 		case TYPE_ARRAY:
 			printf("array");
 			break;

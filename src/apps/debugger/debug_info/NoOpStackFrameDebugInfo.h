@@ -11,12 +11,13 @@
 
 class NoOpStackFrameDebugInfo : public StackFrameDebugInfo {
 public:
-								NoOpStackFrameDebugInfo();
+								NoOpStackFrameDebugInfo(
+									Architecture* architecture);
 	virtual						~NoOpStackFrameDebugInfo();
 
 	virtual	status_t			ResolveObjectDataLocation(
 									StackFrame* stackFrame, Type* type,
-									target_addr_t objectAddress,
+									const ValueLocation& objectLocation,
 									ValueLocation*& _location);
 	virtual	status_t			ResolveBaseTypeLocation(
 									StackFrame* stackFrame, Type* type,

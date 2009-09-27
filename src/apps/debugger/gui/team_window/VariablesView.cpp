@@ -24,7 +24,12 @@
 #include "Variable.h"
 
 
-class VariablesView::ValueNode : Referenceable {
+enum {
+	VALUE_NODE_TYPE	= 'valn'
+};
+
+
+class VariablesView::ValueNode : public Referenceable {
 public:
 	ValueNode(ValueNode* parent, Variable* variable, TypeComponentPath* path,
 		const BString& name, Type* type)
@@ -34,11 +39,13 @@ public:
 		fPath(path),
 		fName(name),
 		fType(type),
+		fRawType(type->ResolveRawType()),
 		fChildrenAdded(false)
 	{
 		fVariable->AcquireReference();
 		fPath->AcquireReference();
 		fType->AcquireReference();
+		fRawType->AcquireReference();
 	}
 
 	~ValueNode()
@@ -49,6 +56,7 @@ public:
 		fVariable->ReleaseReference();
 		fPath->ReleaseReference();
 		fType->ReleaseReference();
+		fRawType->ReleaseReference();
 	}
 
 	ValueNode* Parent() const
@@ -74,6 +82,11 @@ public:
 	Type* GetType() const
 	{
 		return fType;
+	}
+
+	Type* RawType() const
+	{
+		return fRawType;
 	}
 
 	const BVariant& Value() const
@@ -129,6 +142,7 @@ private:
 	TypeComponentPath*	fPath;
 	BString				fName;
 	Type*				fType;
+	Type*				fRawType;
 	BVariant			fValue;
 	ChildList			fChildren;
 	bool				fChildrenAdded;
@@ -150,16 +164,21 @@ public:
 	}
 
 protected:
-	virtual BField* PrepareField(const BVariant& value) const
+	virtual BField* PrepareField(const BVariant& _value) const
 	{
+		BVariant value = _ResolveValue(_value);
+
 		char buffer[64];
 		return StringTableColumn::PrepareField(
 			BVariant(_ToString(value, buffer, sizeof(buffer)),
 				B_VARIANT_DONT_COPY_DATA));
 	}
 
-	virtual int CompareValues(const BVariant& a, const BVariant& b)
+	virtual int CompareValues(const BVariant& _a, const BVariant& _b)
 	{
+		BVariant a = _ResolveValue(_a);
+		BVariant b = _ResolveValue(_b);
+
 		// If neither value is a number, compare the strings. If only one value
 		// is a number, it is considered to be greater.
 		if (!a.IsNumber()) {
@@ -190,6 +209,26 @@ protected:
 	}
 
 private:
+	BVariant _ResolveValue(const BVariant& nodeValue) const
+	{
+		BVariant value;
+		if (nodeValue.Type() != VALUE_NODE_TYPE)
+			return BVariant();
+
+		ValueNode* node = dynamic_cast<ValueNode*>(nodeValue.ToReferenceable());
+
+		// replace enumerations values with their names
+		if (node->RawType()->Kind() == TYPE_ENUMERATION) {
+			EnumerationValue* enumValue
+				= dynamic_cast<EnumerationType*>(node->RawType())
+					->ValueFor(node->Value());
+			if (enumValue != NULL)
+				return enumValue->Name();
+		}
+
+		return node->Value();
+	}
+
 	const char* _ToString(const BVariant& value, char* buffer,
 		size_t bufferSize) const
 	{
@@ -329,7 +368,7 @@ public:
 				if (node->Value().Type() == 0)
 					return false;
 
-				_value = node->Value();
+				_value.SetTo(node, VALUE_NODE_TYPE);
 				return true;
 			default:
 				return false;
@@ -483,6 +522,10 @@ private:
 				case TYPE_ARRAY:
 					TRACE_LOCALS("TYPE_ARRAY\n");
 					// TODO:...
+					return;
+				case TYPE_ENUMERATION:
+					TRACE_LOCALS("TYPE_ENUMERATION\n");
+					done = true;
 					return;
 				default:
 					TRACE_LOCALS("unknown\n");
