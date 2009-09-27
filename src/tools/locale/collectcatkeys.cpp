@@ -78,7 +78,7 @@ fetchStr(const char *&in, BString &str, bool lookForID)
 			// string (skip escaped quotes)
 			while (*in != '"' || quoted)
 			{
-				str.Append(in,1);
+				str.Append(in, 1);
 				if (*in == '\\' && !quoted)
 					quoted = true ;
 				else
@@ -143,7 +143,6 @@ fetchKey(const char *&in)
 	haveID = false;
 	// fetch native string or id:
 	if (!fetchStr(in, str, true)) {
-		fprintf(stderr,"String parsing error\n");
 		return false;
 	}
 	if (*in == ',') {
@@ -187,8 +186,8 @@ collectAllCatalogKeys(BString& inputStr)
 					printf("CatKey(%ld)\n", id);
 				res = catalog->SetString(id, "");
 				if (res != B_OK) {
-					fprintf(stderr, "couldn't add key %ld - error: %s\n",
-						id, strerror(res));
+					fprintf(stderr, "Collectcatkeys: couldn't add key %ld - "
+						"error: %s\n", id, strerror(res));
 					exit(-1);
 				}
 			} else {

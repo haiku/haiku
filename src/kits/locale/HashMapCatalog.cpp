@@ -79,21 +79,21 @@ CatKey::operator!= (const CatKey& right) const
 status_t
 CatKey::GetStringParts(BString* str, BString* ctx, BString* cmt) const
 {
-	if(str) *str = fString;
-	if(ctx) *ctx = fContext;
-	if(cmt) *cmt = fComment;
+	if (str) *str = fString;
+	if (ctx) *ctx = fContext;
+	if (cmt) *cmt = fComment;
 
 	return B_OK;
 }
 
 
-size_t CatKey::HashFun(const char* s, int startValue) {
+uint32 CatKey::HashFun(const char* s, int startValue) {
 	unsigned long h = startValue;
 	for ( ; *s; ++s)
-		h = 5*h + *s;
+		h = 5 * h + *s;
 
 	// Add 1 to differenciate ("ab","cd","ef") from ("abcd","e","f")
-	h = 5*h + 1;
+	h = 5 * h + 1;
 
 	return size_t(h);
 }
@@ -136,7 +136,11 @@ BHashMapCatalog::GetString(uint32 id)
 const char *
 BHashMapCatalog::GetString(const CatKey& key)
 {
-	return fCatMap.Get(key);
+	BString value = fCatMap.Get(key);
+	if (value.Length() == 0)
+		return NULL;
+	else
+		return value.String();
 }
 
 
@@ -230,7 +234,8 @@ BHashMapCatalog::ComputeFingerprint() const
 	int32 hash;
 	CatMap::Iterator iter = fCatMap.GetIterator();
 	CatMap::Entry entry;
-	while(iter.HasNext()) {
+	while (iter.HasNext())
+	{
 		entry = iter.Next();
 		hash = B_HOST_TO_LENDIAN_INT32(entry.key.fHashVal);
 		adler = adler32(adler, reinterpret_cast<uint8*>(&hash), sizeof(int32));

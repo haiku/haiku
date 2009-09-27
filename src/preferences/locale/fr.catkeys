@@ -1,8 +1,4 @@
-1	fr	x-vnd.Haiku-Locale	2841580836
-Revert	Locale Preflet Window		Défaire
-Country	Locale Preflet Window		Pays
-Language	Locale Preflet Window		Langage
-Preferred languages	Locale Preflet Window		Langues préférées
+1	french	x-vnd.Haiku-Locale	1616861198
 day of week (short name)	TimeFormatSettings		jour de la semaine (abrégé)
 Available languages	Locale Preflet Window		Langues disponibles
 Decimal separator	TimeFormatSettings		Séparateur décimal
@@ -10,14 +6,16 @@ Separator:	TimeFormatSettings		Separateur:
 Year (4 digits)	TimeFormatSettings		Année (4 chiffres)
 After	TimeFormatSettings		Après
 Long format:	TimeFormatSettings		Format long:
+Before	TimeFormatSettings		Avant
 Currency	TimeFormatSettings		Avant
 Year	TimeFormatSettings		Année
 Short format:	TimeFormatSettings		Format court:
 Currency symbol:	TimeFormatSettings		Symbole monétaire:
-Example:	TimeFormatSettings		Exemple:
 Space	TimeFormatSettings		Espace
+Language	Locale Preflet Window		Langage
 Thousand separator	TimeFormatSettings		Séparateur de milliers
 Year (2 digits)	TimeFormatSettings		Année (2 chiffres)
+Preferred languages	Locale Preflet Window		Langues préférées
 Symbol position	TimeFormatSettings		Position du symbole
 month number	TimeFormatSettings		numéro du mois
 month number (2 digits)	TimeFormatSettings		numéro du mois (2 chiffres)
@@ -28,9 +26,11 @@ Negative marker:	TimeFormatSettings		Marqueur de nombre négatifs:
 Defaults	Locale Preflet Window		Défauts
 Locale\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n\n	Locale Preflet		Locale\n\técrit par Axel Dörfler\n\tCopyright 2009, Haiku.\n\n
 Separator	TimeFormatSettings		Separateur
-Negative marker	TimeFormatSettings		Marqueur de nombres n�gatifs
+Country	Locale Preflet Window		Pays
+Revert	Locale Preflet Window		Défaire
 day in month	TimeFormatSettings		jour du mois
 day of week in month	TimeFormatSettings		jour de la semaine dans le mois
+Negative marker	TimeFormatSettings		Marqueur de nombres n�gatifs
 Ok	Locale Preflet Window		Ok
 Time	TimeFormatSettings		Heure
 Date	TimeFormatSettings		Date
@@ -39,6 +39,7 @@ day of week	TimeFormatSettings		jour de la semaine
 None	TimeFormatSettings		Aucun
 day in month (2 digits)	TimeFormatSettings		jour du mois (2 chiffres)
 Clock	TimeFormatSettings		Horloge
+Example:	TimeFormatSettings		Exemple:
 day of week (name)	TimeFormatSettings		jour de la semaine (nom)
 month name	TimeFormatSettings		nom du mois
 Day	TimeFormatSettings		Jour

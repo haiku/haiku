@@ -54,7 +54,7 @@ class CatKey {
 		bool operator== (const CatKey& right) const;
 		bool operator!= (const CatKey& right) const;
 		status_t GetStringParts(BString* str, BString* ctx, BString* cmt) const;
-		static uint32 HashFun(const char* s, int startvalue=0);
+		static uint32 HashFun(const char* s, int startvalue = 0);
 			// The hash function is called 3 times, cumulating the 3 strings to
 			// calculate the key
 		uint32 GetHashCode() const { return fHashVal; }
@@ -68,7 +68,7 @@ namespace BPrivate {
 class BHashMapCatalog: public BCatalogAddOn {
 	protected:
 		uint32 ComputeFingerprint() const;
-		typedef HashMap<CatKey,BString> CatMap;
+		typedef HashMap<CatKey, BString> CatMap;
 		CatMap 				fCatMap;
 
 	public:

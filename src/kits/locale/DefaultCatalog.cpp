@@ -160,34 +160,37 @@ DefaultCatalog::ReadFromFile(const char *path)
 	BFile catalogFile;
 	status_t res = catalogFile.SetTo(path, B_READ_ONLY);
 	if (res != B_OK) {
-		log_team(LOG_DEBUG, "no catalog at %s", path);
+		log_team(LOG_DEBUG, "LocaleKit DefaultCatalog: no catalog at %s", path);
 		return B_ENTRY_NOT_FOUND;
 	}
 
 	fPath = path;
-	log_team(LOG_DEBUG, "found catalog at %s", path);
+	log_team(LOG_DEBUG, "LocaleKit DefaultCatalog: found catalog at %s", path);
 
 	off_t sz = 0;
 	res = catalogFile.GetSize(&sz);
 	if (res != B_OK) {
-		log_team(LOG_ERR, "couldn't get size for catalog-file %s", path);
+		log_team(LOG_ERR, "LocaleKit DefaultCatalog: couldn't get size for "
+			"catalog-file %s", path);
 		return res;
 	}
 
 	auto_ptr<char> buf(new(std::nothrow) char [sz]);
 	if (buf.get() == NULL) {
-		log_team(LOG_ERR, "couldn't allocate array of %d chars", sz);
+		log_team(LOG_ERR, "LocaleKit DefaultCatalog: couldn't allocate array "
+			"of %d chars", sz);
 		return B_NO_MEMORY;
 	}
 	res = catalogFile.Read(buf.get(), sz);
 	if (res < B_OK) {
-		log_team(LOG_ERR, "couldn't read from catalog-file %s", path);
+		log_team(LOG_ERR, "LocaleKit DefaultCatalog: couldn't read from "
+			"catalog-file %s", path);
 		return res;
 	}
 	if (res < sz) {
 		log_team(LOG_ERR,
-			"only got %lu instead of %Lu bytes from catalog-file %s", res, sz,
-			path);
+			"LocaleKit DefaultCatalog: only got %lu instead of %Lu bytes from "
+			"catalog-file %s", res, sz, path);
 		return res;
 	}
 	BMemoryIO memIO(buf.get(), sz);

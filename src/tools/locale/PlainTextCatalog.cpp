@@ -122,7 +122,7 @@ PlainTextCatalog::ReadFromFile(const char *path)
 	// Now read all the data from the file
 
 	// The first line holds some info about the catalog :
-	// ArchiveVersion \t LanguageName \t Signature \t FingerPrint
+	// ArchiveVersion \t LanguageName \t AppSignature \t FingerPrint
 	if (std::getline(catalogFile, currentItem, '\t').good()) {
 		// Get the archive version
 		int arcver= -1;
@@ -150,7 +150,7 @@ PlainTextCatalog::ReadFromFile(const char *path)
 
 	if (std::getline(catalogFile, currentItem, '\t').good()) {
 		// Get the language
-		fLanguageName << currentItem.c_str() ;
+		fLanguageName = currentItem.c_str() ;
 	} else {
 		fprintf(stderr, "Unable to get language from %s\n", path);
 		return B_ERROR;
@@ -158,7 +158,7 @@ PlainTextCatalog::ReadFromFile(const char *path)
 
 	if (std::getline(catalogFile, currentItem, '\t').good()) {
 		// Get the signature
-		fSignature << currentItem.c_str() ;
+		fSignature = currentItem.c_str() ;
 	} else {
 		fprintf(stderr, "Unable to get signature from %s\n", path);
 		return B_ERROR;
@@ -175,7 +175,10 @@ PlainTextCatalog::ReadFromFile(const char *path)
 			return B_ERROR;
 		}
 
-		if (fFingerprint!=0 && fFingerprint != foundFingerprint) {
+		if (fFingerprint == 0)
+			fFingerprint = foundFingerprint;
+
+		if (fFingerprint != foundFingerprint) {
 			return B_MISMATCHED_VALUES;
 		}
 	} else {
@@ -185,7 +188,7 @@ PlainTextCatalog::ReadFromFile(const char *path)
 
 	// We managed to open the file, so we remember it's the one we are using
 	fPath = path;
-	fprintf(stderr, "found plaintext catalog at %s\n", path);
+	fprintf(stderr, "LocaleKit Plaintext: found catalog at %s\n", path);
 
 	std::string originalString;
 	std::string context;
@@ -223,6 +226,23 @@ PlainTextCatalog::ReadFromFile(const char *path)
 	}
 
 	catalogFile.close();
+
+	uint32 checkFP = ComputeFingerprint();
+	if (fFingerprint != checkFP) {
+		fprintf(stderr, "plaintext-catalog(sig=%s, lang=%s) "
+			"has wrong fingerprint after load (%lX instead of %lX). "
+			"The catalog data may be corrupted, so this catalog is "
+			"skipped.\n",
+			fSignature.String(), fLanguageName.String(), checkFP,
+			fFingerprint);
+		// TODO: This is what should be done if the fingerprint calculation
+		// actually worked. Unfortunately, adler32 will not give the same
+		// results if you swap strings, and an HashMap is not an ordered
+		// container so you can get a different result each time you iterate
+		// over it...
+
+		// return B_BAD_DATA;
+	}
 
 	// some information living in member variables needs to be copied
 	// to attributes. Although these attributes should have been written
