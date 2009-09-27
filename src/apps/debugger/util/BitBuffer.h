@@ -20,6 +20,7 @@ public:
 			bool				AddBytes(const void* data, size_t size);
 			bool				AddBits(const void* data, uint64 bitSize,
 									uint32 bitOffset = 0);
+			bool				AddZeroBits(uint64 bitSize);
 
 			uint8*				Bytes() const	{ return fBytes.Elements(); }
 			size_t				Size() const	{ return fBytes.Size(); }

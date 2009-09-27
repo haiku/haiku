@@ -138,3 +138,38 @@ BitBuffer::AddBits(const void* _data, uint64 bitSize, uint32 bitOffset)
 
 	return true;
 }
+
+
+bool
+BitBuffer::AddZeroBits(uint64 bitSize)
+{
+	if (bitSize == 0)
+		return true;
+
+	// handle special case first: no more bits than missing
+	size_t oldSize = fBytes.Size();
+	if (fMissingBits > 0 && bitSize <= fMissingBits) {
+		fMissingBits -= bitSize;
+		return true;
+	}
+
+	// resize the buffer
+	if (!fBytes.AddUninitialized((bitSize - fMissingBits + 7) / 8))
+		return false;
+
+	// fill in missing bits
+	if (fMissingBits > 0) {
+		bitSize -= fMissingBits;
+		fMissingBits = 0;
+	}
+
+	// zero the remaining bytes, including a potentially partial last byte
+	uint8* buffer = fBytes.Elements() + oldSize;
+	memset(buffer, 0, (bitSize + 7) / 8);
+	bitSize %= 8;
+
+	if (bitSize > 0)
+		fMissingBits = 8 - bitSize;
+
+	return true;
+}
