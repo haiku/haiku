@@ -108,6 +108,7 @@ public:
 			void				InsertCR();
 			void				InsertLF();
 			void				InsertRI();
+			void				InsertTab();
 			void				SetInsertMode(int flag);
 			void				InsertSpace(int32 num);
 			void				InsertLines(int32 numLines);
@@ -143,6 +144,9 @@ public:
 			void				SetOriginMode(bool enabled);
 			void				SaveOriginMode();
 			void				RestoreOriginMode();
+			void				SetTabStop(int32 x);
+			void				ClearTabStop(int32 x);
+			void				ClearAllTabStops();
 
 protected:
 	virtual	void				NotifyListener();
@@ -167,6 +171,7 @@ protected:
 									int32 historyCapacity);
 			status_t			_ResizeRewrap(int32 width, int32 height,
 									int32 historyCapacity);
+			status_t			_ResetTabStops(int32 width);
 
 			void				_Scroll(int32 top, int32 bottom,
 									int32 numLines);
@@ -203,6 +208,7 @@ protected:
 			bool				fAlternateScreenActive;
 			bool				fOriginMode;
 			bool				fSavedOriginMode;
+			bool*				fTabStops;
 
 			int					fEncoding;
 

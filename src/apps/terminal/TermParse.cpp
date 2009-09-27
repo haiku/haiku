@@ -301,7 +301,6 @@ TermParse::DumpState(int *groundtable, int *parsestate, uchar c)
 int32
 TermParse::EscParse()
 {
-	int tmp;
 	int top, bot;
 	int cs96 = 0;
 	uchar curess = 0;
@@ -517,9 +516,7 @@ TermParse::EscParse()
 				break;
 
 			case CASE_TAB:
-				tmp = fBuffer->Cursor().x;
-				tmp %= 8;
-				fBuffer->MoveCursorRight(8 - tmp);
+				fBuffer->InsertTab();
 				break;
 
 			case CASE_ESC:
@@ -844,7 +841,16 @@ TermParse::EscParse()
 
 				case CASE_HTS:
 					/* HTS */
-					//      TabSet(term->tabs, screen->cur_col);
+					fBuffer->SetTabStop(fBuffer->Cursor().x);
+					parsestate = groundtable;
+					break;
+
+				case CASE_TBC:
+					/* TBC */
+					if (param[0] < 1)
+						fBuffer->ClearTabStop(fBuffer->Cursor().x);
+					else if (param[0] == 3)
+						fBuffer->ClearAllTabStops();
 					parsestate = groundtable;
 					break;
 

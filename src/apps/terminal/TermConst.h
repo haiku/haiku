@@ -152,6 +152,8 @@ enum{
   SCRDOWN
 };
 
+#define TAB_WIDTH 8
+
 #define MIN_COLS 10
 #define MAX_COLS 256
 #define MIN_ROWS 10

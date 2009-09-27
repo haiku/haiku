@@ -93,7 +93,8 @@ BasicTerminalBuffer::_CursorChanged()
 BasicTerminalBuffer::BasicTerminalBuffer()
 	:
 	fScreen(NULL),
-	fHistory(NULL)
+	fHistory(NULL),
+	fTabStops(NULL)
 {
 }
 
@@ -102,12 +103,15 @@ BasicTerminalBuffer::~BasicTerminalBuffer()
 {
 	delete fHistory;
 	_FreeLines(fScreen, fHeight);
+	delete[] fTabStops;
 }
 
 
 status_t
 BasicTerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 {
+	status_t error;
+
 	fWidth = width;
 	fHeight = height;
 
@@ -133,10 +137,14 @@ BasicTerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 		if (fHistory == NULL)
 			return B_NO_MEMORY;
 
-		status_t error = fHistory->Init(width, historySize);
+		error = fHistory->Init(width, historySize);
 		if (error != B_OK)
 			return error;
 	}
+
+	error = _ResetTabStops(fWidth);
+	if (error != B_OK)
+		return error;
 
 	for (int32 i = 0; i < fHeight; i++)
 		fScreen[i]->Clear();
@@ -644,6 +652,23 @@ BasicTerminalBuffer::InsertRI()
 }
 
 void
+BasicTerminalBuffer::InsertTab()
+{
+	int32 x;
+
+	fSoftWrappedCursor = false;
+
+	for (x = fCursor.x + 1; x < fWidth && !fTabStops[x]; x++)
+		; // no body
+	x = restrict_value(x, 0, fWidth - 1);
+
+	if (x != fCursor.x) {
+		fCursor.x = x;
+		_CursorChanged();
+	}
+}
+
+void
 BasicTerminalBuffer::InsertLines(int32 numLines)
 {
 	if (fCursor.y >= fScrollTop && fCursor.y < fScrollBottom) {
@@ -846,6 +871,29 @@ BasicTerminalBuffer::RestoreOriginMode()
 	fOriginMode = fSavedOriginMode;
 }
 
+void
+BasicTerminalBuffer::SetTabStop(int32 x)
+{
+	x = restrict_value(x, 0, fWidth - 1);
+	fTabStops[x] = true;
+}
+
+
+void
+BasicTerminalBuffer::ClearTabStop(int32 x)
+{
+	x = restrict_value(x, 0, fWidth - 1);
+	fTabStops[x] = false;
+}
+
+
+void
+BasicTerminalBuffer::ClearAllTabStops()
+{
+	for (int32 i = 0; i < fWidth; i++)
+		fTabStops[i] = false;
+}
+
 
 void
 BasicTerminalBuffer::NotifyListener()
@@ -1046,6 +1094,12 @@ BasicTerminalBuffer::_ResizeSimple(int32 width, int32 height,
 	_FreeLines(fScreen, fHeight);
 	fScreen = lines;
 
+	if (fWidth != width) {
+		status_t error = _ResetTabStops(width);
+		if (error != B_OK)
+			return error;
+	}
+
 	fWidth = width;
 	fHeight = height;
 
@@ -1231,6 +1285,12 @@ BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
 	fScreen = screen;
 	fHistory = history;
 
+	if (fWidth != width) {
+		status_t error = _ResetTabStops(width);
+		if (error != B_OK)
+			return error;
+	}
+
 //debug_printf("  cursor: (%ld, %ld) -> (%ld, %ld)\n", fCursor.x, fCursor.y,
 //cursor.x, cursor.y);
 	fCursor.x = cursor.x;
@@ -1250,6 +1310,21 @@ BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
 	return B_OK;
 }
 
+
+status_t
+BasicTerminalBuffer::_ResetTabStops(int32 width)
+{
+	if (fTabStops != NULL)
+		delete[] fTabStops;
+
+	fTabStops = new(std::nothrow) bool[width];
+	if (fTabStops == NULL)
+		return B_NO_MEMORY;
+
+	for (int32 i = 0; i < width; i++)
+		fTabStops[i] = (i % TAB_WIDTH) == 0;
+	return B_OK;
+}
 
 void
 BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
