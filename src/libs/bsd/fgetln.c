@@ -34,6 +34,8 @@ fgetln(FILE *stream, size_t *_length)
 
 	line = sBuffer;
 	left = sBufferSize;
+	if (_length != NULL)
+		*_length = 0;
 
 	for (;;) {
 		line = fgets(line, left, stream);
@@ -44,6 +46,8 @@ fgetln(FILE *stream, size_t *_length)
 		}
 
 		length = strlen(line);
+		if (_length != NULL)
+			*_length += length;
 		if (line[length - 1] != '\n' && length == sBufferSize - 1) {
 			// more data is following, enlarge buffer
 			char *newBuffer = realloc(sBuffer, sBufferSize + LINE_LENGTH);
