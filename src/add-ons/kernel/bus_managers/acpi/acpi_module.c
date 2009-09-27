@@ -78,74 +78,48 @@ acpi_enumerate_child_devices(device_node *node, const char *root)
 	// get a reference on the parent
 	parent = gDeviceManager->get_parent_node(node);
 
-	while (get_next_entry(ACPI_TYPE_ANY, root, result, 255, &counter) == B_OK) {
+	while (get_next_entry(ACPI_TYPE_ANY, root, result, sizeof(result), &counter) == B_OK) {
 		uint32 type = get_object_type(result);
 		device_node *deviceNode;
 
-		if (!strcmp("\\_PR_", result) || !strcmp("\\_TZ_", result)
-			|| !strcmp("\\_SI_", result) || !strcmp("\\_SB_", result)) {
-			acpi_enumerate_child_devices(node, result);
-			continue;
-		}
-
 		switch (type) {
-		case ACPI_TYPE_DEVICE: {
-			char hid[16] = "";
-			device_attr attrs[] = {
-				// info about device
-				{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
-
-				// location on ACPI bus
-				{ ACPI_DEVICE_PATH_ITEM, B_STRING_TYPE, { string: result }},
-
-				// info about the device
-				{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { string: hid }},
-				{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: type }},
-
-				// consumer specification
-				/*{ B_DRIVER_MAPPING, B_STRING_TYPE, { string:
-					"hid_%" ACPI_DEVICE_HID_ITEM "%" }},
-				{ B_DRIVER_MAPPING "/0", B_STRING_TYPE, { string:
-					"type_%" ACPI_DEVICE_TYPE_ITEM "%" }},*/
-				{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: /*B_FIND_CHILD_ON_DEMAND|*/B_FIND_MULTIPLE_CHILDREN }},
-				{ NULL }
-			};
-
-			get_device_hid(result, hid, sizeof(hid));
-
-			if (gDeviceManager->register_node(node, ACPI_DEVICE_MODULE_NAME, attrs,
-					NULL, &deviceNode) == B_OK)
-                		acpi_enumerate_child_devices(deviceNode, result);
-
-			break;
-		}
-		case ACPI_TYPE_POWER:
-		case ACPI_TYPE_PROCESSOR:
-		case ACPI_TYPE_THERMAL: {
-			device_attr attrs[] = {
-				// info about device
-				{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
-
-				// location on ACPI bus
-				{ ACPI_DEVICE_PATH_ITEM, B_STRING_TYPE, { string: result }},
-
-				// info about the device
-				{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: type }},
-
-				// consumer specification
-				/*{ B_DRIVER_MAPPING, B_STRING_TYPE, { string:
-					"type_%" ACPI_DEVICE_TYPE_ITEM "%" }},*/
-				{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: /*B_FIND_CHILD_ON_DEMAND|*/B_FIND_MULTIPLE_CHILDREN }},
-				{ NULL }
-			};
-
-			if (gDeviceManager->register_node(node, ACPI_DEVICE_MODULE_NAME, attrs, NULL, &deviceNode) == B_OK)
-				acpi_enumerate_child_devices(deviceNode, result);
-			break;
-		}
-		default:
-			acpi_enumerate_child_devices(node, result);
-			break;
+			case ACPI_TYPE_POWER:
+			case ACPI_TYPE_PROCESSOR:
+			case ACPI_TYPE_THERMAL:
+			case ACPI_TYPE_DEVICE: {
+				char hid[16] = "";
+				device_attr attrs[] = {
+					// info about device
+					{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
+	
+					// location on ACPI bus
+					{ ACPI_DEVICE_PATH_ITEM, B_STRING_TYPE, { string: result }},
+	
+					// info about the device
+					{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { string: hid }},
+					{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: type }},
+	
+					// consumer specification
+					/*{ B_DRIVER_MAPPING, B_STRING_TYPE, { string:
+						"hid_%" ACPI_DEVICE_HID_ITEM "%" }},
+					{ B_DRIVER_MAPPING "/0", B_STRING_TYPE, { string:
+						"type_%" ACPI_DEVICE_TYPE_ITEM "%" }},*/
+					{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: /*B_FIND_CHILD_ON_DEMAND|*/B_FIND_MULTIPLE_CHILDREN }},
+					{ NULL }
+				};
+	
+				if (type == ACPI_TYPE_DEVICE)
+					get_device_hid(result, hid, sizeof(hid));
+	
+				if (gDeviceManager->register_node(node, ACPI_DEVICE_MODULE_NAME, attrs,
+						NULL, &deviceNode) == B_OK)
+	                		acpi_enumerate_child_devices(deviceNode, result);
+	
+				break;
+			}
+			default:
+				acpi_enumerate_child_devices(node, result);
+				break;
 		}
 
 	}
