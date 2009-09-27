@@ -76,6 +76,7 @@ private:
 	status_t _ReadParserBuffer();
 
 	void _DeviceStatusReport(int n);
+	void _DecReqTermParms(int value);
 	void _DecPrivateModeSet(int value);
 	void _DecPrivateModeReset(int value);
 	void _DecSaveCursor();

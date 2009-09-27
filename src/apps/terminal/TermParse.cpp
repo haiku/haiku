@@ -778,6 +778,14 @@ TermParse::EscParse()
 					parsestate = groundtable;
 					break;
 
+				case CASE_DA1:
+					// DA - report device attributes
+					if (param[0] < 1)
+						// claim to be a VT102
+						write(fFd, "\033[?6c", 5);
+					parsestate = groundtable;
+					break;
+
 				case CASE_DECSTBM:
 					/* DECSTBM - set scrolling region */
 
@@ -799,6 +807,8 @@ TermParse::EscParse()
 					break;
 
 				case CASE_DECREQTPARM:
+					// DEXREQTPARM - request terminal parameters
+					_DecReqTermParms(param[0]);
 					parsestate = groundtable;
 					break;
 
@@ -1079,13 +1089,17 @@ TermParse::_DeviceStatusReport(int n)
 	switch (n) {
 		case 5:
 		{
+			// Device status report requested
+			// reply with "no malfunction detected"
 			const char* toWrite = "\033[0n";
 			write(fFd, toWrite, strlen(toWrite));
 			break ;
 		}
 		case 6:
-			len = sprintf(sbuf, "\033[%ld;%ldR", fBuffer->Height(),
-				fBuffer->Width()) ;
+			// Cursor position report requested
+			len = sprintf(sbuf, "\033[%ld;%ldR",
+				fBuffer->Cursor().y + 1,
+				fBuffer->Cursor().x + 1);
 			write(fFd, sbuf, len);
 			break ;
 		default:
@@ -1093,6 +1107,29 @@ TermParse::_DeviceStatusReport(int n)
 	}
 }
 
+
+void
+TermParse::_DecReqTermParms(int value)
+{
+	// Terminal parameters report:
+	//   type (2 or 3);
+	//   no parity (1);
+	//   8 bits per character (1);
+	//   transmit speed 38400bps (128);
+	//   receive speed 38400bps (128);
+	//   bit rate multiplier 16 (1);
+	//   no flags (0)
+	char parms[] = "\033[?;1;1;128;128;1;0x";
+
+	if (value < 1)
+		parms[2] = '2';
+	else if (value == 1)
+		parms[2] = '3';
+	else
+		return;
+
+	write(fFd, parms, strlen(parms));
+}
 
 void
 TermParse::_DecPrivateModeSet(int value)
