@@ -702,14 +702,19 @@ DwarfFile::EvaluateDynamicValue(CompilationUnit* unit,
 	DIESubprogram* subprogramEntry, const DynamicAttributeValue* value,
 	const DwarfTargetInterface* targetInterface,
 	target_addr_t instructionPointer, target_addr_t framePointer,
-	BVariant& _result)
+	BVariant& _result, DIEType** _type)
 {
 	if (!value->IsValid())
 		return B_BAD_VALUE;
 
+	DIEType* dummyType;
+	if (_type == NULL)
+		_type = &dummyType;
+
 	switch (value->attributeClass) {
 		case ATTRIBUTE_CLASS_CONSTANT:
 			_result.SetTo(value->constant);
+			*_type = NULL;
 			return B_OK;
 
 		case ATTRIBUTE_CLASS_REFERENCE:
@@ -725,28 +730,50 @@ DwarfFile::EvaluateDynamicValue(CompilationUnit* unit,
 				return B_BAD_VALUE;
 
 			const ConstantAttributeValue* constantValue = NULL;
+			DIEType* type = NULL;
 
 			switch (entry->Tag()) {
 				case DW_TAG_constant:
-					constantValue = dynamic_cast<DIEConstant*>(entry)
-						->ConstValue();
+				{
+					DIEConstant* constantEntry
+						= dynamic_cast<DIEConstant*>(entry);
+					constantValue = constantEntry->ConstValue();
+					type = constantEntry->GetType();
 					break;
+				}
 				case DW_TAG_enumerator:
 					constantValue = dynamic_cast<DIEEnumerator*>(entry)
 						->ConstValue();
+					if (DIEEnumerationType* enumerationType
+							= dynamic_cast<DIEEnumerationType*>(
+								entry->Parent())) {
+						type = enumerationType->GetType();
+					}
 					break;
 				case DW_TAG_formal_parameter:
-					constantValue = dynamic_cast<DIEFormalParameter*>(entry)
-						->ConstValue();
+				{
+					DIEFormalParameter* parameterEntry
+						= dynamic_cast<DIEFormalParameter*>(entry);
+					constantValue = parameterEntry->ConstValue();
+					type = parameterEntry->GetType();
 					break;
+				}
 				case DW_TAG_template_value_parameter:
-					constantValue = dynamic_cast<DIETemplateValueParameter*>(
-						entry)->ConstValue();
+				{
+					DIETemplateValueParameter* parameterEntry
+						= dynamic_cast<DIETemplateValueParameter*>(entry);
+					constantValue = parameterEntry->ConstValue();
+					type = parameterEntry->GetType();
 					break;
+				}
 				case DW_TAG_variable:
-					constantValue = dynamic_cast<DIEVariable*>(entry)
-						->ConstValue();
+				{
+					DIEVariable* variableEntry
+						= dynamic_cast<DIEVariable*>(entry);
+					constantValue = variableEntry->ConstValue();
+					type = variableEntry->GetType();
 					break;
+				}
 				default:
 					return B_BAD_VALUE;
 			}
@@ -754,8 +781,14 @@ DwarfFile::EvaluateDynamicValue(CompilationUnit* unit,
 			if (constantValue == NULL || !constantValue->IsValid())
 				return B_BAD_VALUE;
 
-			return EvaluateConstantValue(unit, subprogramEntry, constantValue,
-				targetInterface, instructionPointer, framePointer, _result);
+			status_t error = EvaluateConstantValue(unit, subprogramEntry,
+				constantValue, targetInterface, instructionPointer,
+				framePointer, _result);
+			if (error != B_OK)
+				return error;
+
+			*_type = type;
+			return B_OK;
 		}
 
 		case ATTRIBUTE_CLASS_BLOCK:
@@ -768,6 +801,7 @@ DwarfFile::EvaluateDynamicValue(CompilationUnit* unit,
 				return error;
 
 			_result.SetTo(result);
+			*_type = NULL;
 			return B_OK;
 		}
 
@@ -961,6 +995,9 @@ DwarfFile::_FinishCompilationUnit(CompilationUnit* unit)
 			return error;
 		}
 	}
+
+	// set the compilation unit's source language
+	unit->SetSourceLanguage(entryInitInfo.languageInfo);
 
 	// resolve the compilation unit's address range list
 	if (TargetAddressRangeList* ranges = ResolveRangeList(unit,

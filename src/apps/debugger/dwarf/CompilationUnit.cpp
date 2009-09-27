@@ -81,6 +81,13 @@ CompilationUnit::SetUnitEntry(DIECompileUnitBase* entry)
 
 
 void
+CompilationUnit::SetSourceLanguage(const SourceLanguageInfo* language)
+{
+	fSourceLanguage = language;
+}
+
+
+void
 CompilationUnit::SetAddressRanges(TargetAddressRangeList* ranges)
 {
 	if (fAddressRanges != NULL)

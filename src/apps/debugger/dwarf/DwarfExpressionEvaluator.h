@@ -58,6 +58,9 @@ public:
 									target_addr_t& _result);
 			status_t			EvaluateLocation(const void* expression,
 									size_t size, ValueLocation& _location);
+									// The returned location will have DWARF
+									// semantics regarding register numbers and
+									// bit offsets/sizes (cf. bit pieces).
 
 private:
 			struct EvaluationException;

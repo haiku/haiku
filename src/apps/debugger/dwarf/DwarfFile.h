@@ -68,6 +68,9 @@ public:
 									target_addr_t objectPointer,
 									target_addr_t framePointer,
 									ValueLocation& _result);
+									// The returned location will have DWARF
+									// semantics regarding register numbers and
+									// bit offsets/sizes (cf. bit pieces).
 
 			status_t			EvaluateConstantValue(CompilationUnit* unit,
 									DIESubprogram* subprogramEntry,
@@ -82,7 +85,7 @@ public:
 									const DwarfTargetInterface* targetInterface,
 									target_addr_t instructionPointer,
 									target_addr_t framePointer,
-									BVariant& _result);
+									BVariant& _result, DIEType** _type = NULL);
 
 private:
 			struct ExpressionEvaluationContext;

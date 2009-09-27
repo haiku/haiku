@@ -18,6 +18,7 @@
 class AbbreviationTable;
 class DebugInfoEntry;
 class DIECompileUnitBase;
+class SourceLanguageInfo;
 class TargetAddressRangeList;
 
 
@@ -52,6 +53,11 @@ public:
 
 			DIECompileUnitBase*	UnitEntry() const	{ return fUnitEntry; }
 			void				SetUnitEntry(DIECompileUnitBase* entry);
+
+			const SourceLanguageInfo* SourceLanguage() const
+									{ return fSourceLanguage; }
+			void				SetSourceLanguage(
+									const SourceLanguageInfo* language);
 
 			TargetAddressRangeList* AddressRanges() const
 									{ return fAddressRanges; }
@@ -91,6 +97,7 @@ private:
 			off_t				fAbbreviationOffset;
 			AbbreviationTable*	fAbbreviationTable;
 			DIECompileUnitBase*	fUnitEntry;
+			const SourceLanguageInfo* fSourceLanguage;
 			TargetAddressRangeList* fAddressRanges;
 			Array<DebugInfoEntry*> fEntries;
 			Array<off_t>		fEntryOffsets;
