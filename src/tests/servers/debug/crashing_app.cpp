@@ -1,15 +1,18 @@
 /*
- * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
+
 
 #undef NDEBUG
 
 #include <assert.h>
+#include <errno.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <OS.h>
 
@@ -22,6 +25,7 @@ static const char *kUsage =
 	"\n"
 	"Options:\n"
 	"  -d                   - call disable_debugger() first\n"
+	"  -f, --fork           - fork() and continue in the child\n"
 	"  -h, --help           - print this info text\n"
 	"  --multi              - crash in multiple threads\n"
 	"  --signal             - crash in a signal handler\n"
@@ -126,7 +130,8 @@ struct Options {
 		inThread(false),
 		multipleThreads(false),
 		inSignalHandler(false),
-		disableDebugger(false)
+		disableDebugger(false),
+		fork(false)
 	{
 	}
 
@@ -135,6 +140,7 @@ struct Options {
 	bool				multipleThreads;
 	bool				inSignalHandler;
 	bool				disableDebugger;
+	bool				fork;
 };
 
 static Options sOptions;
@@ -207,6 +213,8 @@ main(int argc, const char* const* argv)
 				print_usage_and_exit(false);
 			} else if (strcmp(arg, "-d") == 0) {
 				sOptions.disableDebugger = true;
+			} else if (strcmp(arg, "-f") == 0 || strcmp(arg, "--fork") == 0) {
+				sOptions.fork = true;
 			} else if (strcmp(arg, "--multi") == 0) {
 				sOptions.inThread = true;
 				sOptions.multipleThreads = true;
@@ -231,6 +239,21 @@ main(int argc, const char* const* argv)
 
 	if (sOptions.disableDebugger)
 		disable_debugger(true);
+
+	if (sOptions.fork) {
+		pid_t child = fork();
+		if (child < 0) {
+			fprintf(stderr, "fork() failed: %s\n", strerror(errno));
+			exit(1);
+		}
+
+		if (child > 0) {
+			// the parent exits
+			exit(1);
+		}
+
+		// the child continues...
+	}
 
 	if (sOptions.inThread) {
 		thread_id thread = spawn_thread(crashing_thread, "crashing thread",
