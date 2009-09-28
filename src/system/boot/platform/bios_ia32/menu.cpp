@@ -48,19 +48,6 @@ platform_add_menus(Menu *menu)
 				"Interface hardware support, overriding the ACPI setting "
 				"in the kernel settings file.");
 
-#if 0
-			// TODO: IOAPIC isn't yet used anywhere
-			menu->AddItem(item = new(nothrow) MenuItem("Disable IO-APIC"));
-			item->SetType(MENU_ITEM_MARKABLE);
-			item->SetData(B_SAFEMODE_DISABLE_IOAPIC);
-			item->SetHelpText("Disables using the IO APIC for interrupt handling, "
-				"forcing instead the use of the PIC.");
-#endif		
-			menu->AddItem(item = new(nothrow) MenuItem("Disable LOCAL APIC"));
-			item->SetType(MENU_ITEM_MARKABLE);
-			item->SetData(B_SAFEMODE_DISABLE_APIC);
-			item->SetHelpText("Disables using the LOCAL APIC for timekeeping.");
-			
 			break;
 		default:
 			break;

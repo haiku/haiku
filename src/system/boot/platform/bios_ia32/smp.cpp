@@ -570,10 +570,28 @@ dprintf("wait for delivery\n");
 void
 smp_add_safemode_menus(Menu *menu)
 {
+	MenuItem *item;
+#if 0
+	if (gKernelArgs.arch_args.ioapic_phys != 0) {
+		// TODO: IOAPIC isn't yet used anywhere
+		menu->AddItem(item = new(nothrow) MenuItem("Disable IO-APIC"));
+		item->SetType(MENU_ITEM_MARKABLE);
+		item->SetData(B_SAFEMODE_DISABLE_IOAPIC);
+		item->SetHelpText("Disables using the IO APIC for interrupt handling, "
+			"forcing instead the use of the PIC.");
+	}
+#endif			
+	if (gKernelArgs.arch_args.apic_phys != 0) {
+		menu->AddItem(item = new(nothrow) MenuItem("Disable LOCAL APIC"));
+		item->SetType(MENU_ITEM_MARKABLE);
+		item->SetData(B_SAFEMODE_DISABLE_APIC);
+		item->SetHelpText("Disables using the LOCAL APIC for timekeeping.");
+	}
+	
 	if (gKernelArgs.num_cpus < 2)
 		return;
 
-	MenuItem *item = new(nothrow) MenuItem("Disable SMP");
+	item = new(nothrow) MenuItem("Disable SMP");
 	menu->AddItem(item);
 	item->SetData(B_SAFEMODE_DISABLE_SMP);
 	item->SetType(MENU_ITEM_MARKABLE);
