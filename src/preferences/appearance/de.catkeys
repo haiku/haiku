@@ -1,0 +1,43 @@
+1	german	x-vnd.Haiku-Appearance	4000077587
+Navigation Pulse	Colors tab		Navigations Puls
+Shadow	Colors tab		Schatten
+On	AntialiasingSettingsView		Ein
+Defaults	APRWindow		Standard
+Grayscale	AntialiasingSettingsView		Graustufen
+Shine	Colors tab		Glanz
+Off	AntialiasingSettingsView		Aus
+Anti-aliasing type:	AntialiasingSettingsView		Kantenglättungstyp :
+Success	Colors tab		Erfolg
+Inactive Window Tab	Colors tab		Inaktives Fenster
+Failure	Colors tab		Fehler
+Hinting menu	AntialiasingSettingsView		Menu-hinting
+Control Border	Colors tab		Steuerelementrahmen
+Document Background	Colors tab		Dokumenthintergrund
+Revert	APRWindow		Rückgängig
+Selected Menu Item Border	Colors tab		Rahmen ausgewählter Menüeintrag
+Selected Menu Item Text	Colors tab		Textfarbe ausgewählter Menüeintrag
+Antialiasing	APRWindow		Kantenglättung
+Window Tab Text	Colors tab		FensterreitertText
+Tooltip Background	Colors tab		Tooltip Hintergrund
+Document Text	Colors tab		Dokumenttext
+Navigation Base	Colors tab		Aktives Steuerelement
+Menu Background	Colors tab		Menühintergrund
+Appearance	APRWindow		Aussehen
+Control Background	Colors tab		Steuerelementhintergrund
+Colors	APRWindow		Farben
+Panel Background	Colors tab		Panelhintergrund
+Window Tab	Colors tab		Fensterreiter
+Reduce colored edges filter strength:	AntialiasingSettingsView		Stärke des Farbsaumfilters
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Um Patentprobleme zu umgehen ist subpixelbasierende Kantenglättung in Verbindung mit Zeichen-hinting in diesem Build nicht verfügbar. Um diese Funktion zu aktivieren müssen sie Haiku selbst kompilieren und spezielle Funktionen im libfreetype Konfiguarions-Header aktivieren.
+Menu Item Text	Colors tab		Menüeintragtext
+Monospaced Fonts Only	AntialiasingSettingsView		Nur Monospace Schriften
+LCD subpixel	AntialiasingSettingsView		LCD Subpixel
+Inactive Window Tab Text	Colors tab		Inaktiver Fensterreiter
+Strong	AntialiasingSettingsView		Stark
+Control Highlight	Colors tab		Steuerelement Randschatten links und oben
+Control Text	Colors tab		Steuerelementtext
+Tooltip Text	Colors tab		Tooltiptext
+Antialiasing menu	AntialiasingSettingsView		Menu Kantenglättung
+Selected Menu Item Background	Colors tab		Hintergrund ausgewählter Menüeintrag
+Glyph hinting:	AntialiasingSettingsView		Zeichen-hinting :
+Panel Text	Colors tab		Paneltext

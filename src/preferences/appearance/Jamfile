@@ -36,6 +36,6 @@ DoCatalogs Appearance :
 	ColorWell.cpp
 	ColorWhichItem.cpp
 	: en.catalog
-	: fr.catkeys
+	: fr.catkeys de.catkeys
 	;
 
