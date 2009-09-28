@@ -372,7 +372,7 @@ TeamDescriptionView::MessageReceived(BMessage* message)
 void
 TeamDescriptionView::CtrlAltDelPressed(bool keyDown)
 {
-	if (!(keyDown ^ fRebootRunner != NULL))
+	if (!(keyDown ^ (fRebootRunner != NULL)))
 		return;
 
 	delete fRebootRunner;
