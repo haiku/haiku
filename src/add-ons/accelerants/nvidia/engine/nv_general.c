@@ -826,6 +826,14 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
+	case 0x024710de: /* Nvidia GeForce 6100 Go (NFORCE4 Integr.GPU) */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		sprintf(si->adi.name, "Nvidia GeForce 6100 Go");
+		sprintf(si->adi.chipset, "NV44");
+		status = nvxx_general_powerup();
+		break;
 	case 0x025010de: /* Nvidia GeForce4 Ti 4600 */
 	case 0x025110de: /* Nvidia GeForce4 Ti 4400 */
 	case 0x025210de: /* Nvidia GeForce4 Ti 4600 */

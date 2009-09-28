@@ -238,6 +238,7 @@ static uint16 nvidia_device_list[] = {
 	0x0242, /* Nvidia GeForce 6100 (NFORCE4 Integr.GPU) */
 	0x0244, /* Nvidia GeForce Go 6150 (NFORCE4 Integr.GPU) */
 	0x0245, /* Nvidia Quadro NVS 210S / GeForce 6150LE */
+	0x0247, /* Nvidia GeForce 6100 Go (NFORCE4 Integr.GPU) */
 	0x0250, /* Nvidia GeForce4 Ti 4600 */
 	0x0251, /* Nvidia GeForce4 Ti 4400 */
 	0x0252, /* Nvidia GeForce4 Ti 4600 */
