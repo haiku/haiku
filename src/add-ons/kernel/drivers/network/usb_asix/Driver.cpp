@@ -73,6 +73,7 @@ create_asix_device(usb_device device)
 		// AX88772
 		case IDS(0x0b95, 0x7720): return new AX88772Device(device, "ASIX 88772 10/100");
 		case IDS(0x13b1, 0x0018): return new AX88772Device(device, "Linksys USB200M rev.2");
+		case IDS(0x07d1, 0x3c05): // alternate D-Link DUB-E100 rev. B1
 		case IDS(0x2001, 0x3c05): return new AX88772Device(device, "D-Link DUB-E100 rev.B1");
 		case IDS(0x1557, 0x7720): return new AX88772Device(device, "OQO 01+ Ethernet");
 		case IDS(0x05ac, 0x1402): return new AX88772Device(device, "Apple A1277");
