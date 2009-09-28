@@ -32,6 +32,17 @@
 #define HPET_IS_ENABLED(regs)		((regs)->config & HPET_CONF_MASK_ENABLED)
 #define HPET_IS_LEGACY(regs)		(((regs)->config & HPET_CONF_MASK_LEGACY) >> 1)
 
+/* Timer Configuration */
+#define HPET_TIMER_INT_ENB_CNF			0x00000004
+#define HPET_TIMER_TYPE_CNF			0x00000008
+#define HPET_TIMER_PER_INT_CAP			0x00000010
+#define HPET_TIMER_SIZE_CAP			0x00000020
+#define HPET_TIMER_VAL_SET_CNF			0x00000040
+#define HPET_TIMER_32MODE_CNF			0x00000100
+#define HPET_TIMER_TN_FSB_EN_CNF		0x00004000
+#define HPET_TIMER_TN_FSB_INT_DEL_CAP		0x00008000
+
+
 #define ACPI_HPET_SIGNATURE			"HPET"
 
 struct hpet_timer {
