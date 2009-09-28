@@ -51,6 +51,9 @@ static int16 kCatArchiveVersion = 1;
 	// version of the catalog archive structure, bump this if you change it!
 
 
+// Note: \xNN is not replaced back, so you get the unescaped value in the catkey
+// file. This is fine for regular unicode chars (B_UTF8_ELLIPSIS) but may be
+// dangerous if you use \x10 as a newline...
 void
 escapeQuotedChars(BString& stringToEscape)
 {

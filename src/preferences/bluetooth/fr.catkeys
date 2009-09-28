@@ -1,7 +1,7 @@
-1	french	x-vnd.Haiku-BluetoothPrefs	1173425682
+1	french	x-vnd.Haiku-BluetoothPrefs	2566651844
+About…	Window		À propos…
 Handheld	Settings view		Appareil de poche
 Only from Trusted devices	Settings view		Seulement les appareils de confiance
-Refresh LocalDevicesxE2x80xA6	Window		Rafraîchir LocalDevicexE2x80xA6
 Add device to list	Inquiry panel		Ajouter l'appareil à la liste
 Starting scan...	Inquiry panel		Démarrage de la recherche...
 Smart Phone	Settings view		Téléphone
@@ -11,28 +11,25 @@ Server	Settings view		Serveur
 Default Inquiry time:	Settings view		Temps de requête par défaut:
 Identify host as:	Settings view		Identifier l'hôte comme :
 View	Window		Vue
-Show Bluetooth consolexE2x80xA6	Window		Montrer le terminal bluetoothxE2x80xA6
+Refresh…	Remote devices		Rafraîchir…
+Show Bluetooth console…	Window		Montrer le terminal bluetooth…
 Incoming connections policy:	Settings view		Attitude envers les connexions entrantes :
 From all devices	Settings view		Tous les appareils
-RefreshxE2x80xA6	Remote devices		RafraîchirxE2x80xA6
-Connections & Channels listxE2x80xA6	Window		Liste des connexions et canauxxE2x80xA6
+Start Bluetooth Services…	Window		Démarrer les services bluetooth…
 Server	Window		Serveur
 Scanning completed.	Inquiry panel		Recherche complète.
-Start Bluetooth ServicesxE2x80xA6	Window		Démarrer les services bluetoothxE2x80xA6
 Remove	Remote devices		Enlever
 15 secs	Settings view		15 secs
 Policy...	Settings view		Attitude...
 61 secs	Settings view		61 secs
-AddxE2x80xA6	Remote devices		AjouterxE2x80xA6
 Identify us as...	Settings view		S'identifier comme...
 Remaining 	Inquiry panel		Restant 
+Connections & Channels list…	Window		Liste des canaux et connexions…
 Pick LocalDevice...	Settings view		Choisir LocalDevice...
 Defaults	Window		Défauts
 Inquiry	Inquiry panel		Requête
 Desktop	Settings view		Bureau
 Revert	Window		Défaire
-AboutxE2x80xA6	Window		À proposxE2x80xA6
-Remote Devices ListxE2x80xA6	Window		Liste d'appareils distantsxE2x80xA6
 Laptop	Settings view		Portable
 Retrieving name of 	Inquiry panel		Récupérer le nom de 
 Local Devices found on system:	Settings view		Appareils locaux trouvés sur le système :
@@ -40,12 +37,15 @@ As Trusted	Remote devices		Comme de confiance
 Discoverable	Extended local device view		Découvrable
 As Blocked	Remote devices		Comme bloqué
 Service Classes: 	Device View		Classes de services: 
-Stop Bluetooth ServicesxE2x80xA6	Window		Arrêter les services bluetoothxE2x80xA6
+Refresh LocalDevices…	Window		Rafraîchir les LocalDevices…
 Settings	Window		Paramètres
 Check that the bluetooth capabilities of your remote device are activated. Press Inquiry to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them	Inquiry panel		Vérifiez que les fonctionnalités bluetooth de votre appareil distant sont activées. Appuyez sur "Requête" pour lancer la recherche. Le temps nécessaire pour récupérer les noms n'est pas connu, mais ça ne devrait pas prendre plus de 3 secondes par appareil. Ensuite vous pourrez les ajouter à la liste principale, où vous pourrez vous associer avec eux.
 Scanning progress	Inquiry panel		Avancée de la recherche
 Always ask	Settings view		Toujours demander
+Remote Devices List…	Window		Liste des appareils distants…
 Retrieving names...	Inquiry panel		Récupération des noms...
 Help	Window		Aide
+Add…	Remote devices		Ajouter…
 There has not been found any bluetooth LocalDevice device registered on the system	Inquiry panel		Aucun matériel bluetooth trouvé sur le système
+Stop Bluetooth Services…	Window		Arrêter les services bluetooth…
 Show Name	Extended local device view		Montrer le nom

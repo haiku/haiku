@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-CPUFrequencyPref	1503797596
+1	french	x-vnd.Haiku-CPUFrequencyPref	2623066734
 Ok	Status view		Ok
 Integration Time [ms]	CPU Frequency View		Temps d'intégration	 [ms]
 High Performance	Status view		Haute performance
@@ -7,8 +7,8 @@ CPU Frequency Status View	CPU Frequency View		État de la fréquence du processe
 Dynamic Performance	Status view		Performance dynamique
 Step up by CPU usage:	Color Step View		Accélération par utilisation processeur:
 Stepping Policy	CPU Frequency View		Attitude d'accélération
+Open Speedstep Preferences…	Status view		Ouvrir les préférences Speestep…
 Set State	Status view		Changer l'état
-Open Speedstep PreferencesxE2x80xA6	Status view		Préférences speedstepxE2x80xA6
 Launching the CPU Frequency preflet failed.\n\nError: 	Status view		Échec de lancement des préférences de fréquence du processeur.\n\nErreur: 
 Install Replicant into Deskbar	CPU Frequency View		Installer le réplicant dans la Deskbar
 Low Energy	Status view		Basse consommation

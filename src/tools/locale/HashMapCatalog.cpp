@@ -8,6 +8,8 @@
 
 #include <ByteOrder.h>
 
+#include <stdlib.h>
+
 
 /*
  * This is the standard implementation of a localization catalog, using a hash
@@ -161,7 +163,13 @@ parseQuotedChars(BString& stringToParse)
 				*out = '\t';
 			else if (*in == '"')
 				*out = '"';
-			else {
+			else if (*in == 'x') {
+				// Parse the 2-digit hex integer that follows
+				unsigned int hexchar = strtoul(in + 1, NULL, 16);
+				*out = hexchar;
+				// skip the number
+				in += 2;
+			} else {
 				// dump quote from unknown quoting-sequence:
 				*out = *in ;
 			}
