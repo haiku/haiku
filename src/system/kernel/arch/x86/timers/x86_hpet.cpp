@@ -71,10 +71,10 @@ hpet_set_hardware_timer(bigtime_t relativeTimeout)
 	sHPETRegs->timer[2].config &= (~31 << 9);
 
 	// Non-periodic mode, edge triggered
-	sHPETRegs->timer[2].config &= ~(0x8 & 0x2);
+	sHPETRegs->timer[2].config &= ~(HPET_TN_TYPE_CNF & HPET_TN_INT_TYPE_CNF);
 
 	// Enable timer
-	sHPETRegs->timer[2].config |= 0x4;
+	sHPETRegs->timer[2].config |= HPET_TN_INT_ENB_CNF;
 
 	restore_interrupts(state);
 
@@ -86,7 +86,7 @@ static status_t
 hpet_clear_hardware_timer()
 {
 	// Disable timer
-	sHPETRegs->timer[2].config &= ~0x4;
+	sHPETRegs->timer[2].config &= ~HPET_TN_INT_ENB_CNF;
 	return B_OK;
 }
 
