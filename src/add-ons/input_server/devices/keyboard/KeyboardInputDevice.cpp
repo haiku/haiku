@@ -1,7 +1,7 @@
 /*
  * Copyright 2004-2006, Jérôme Duval. All rights reserved.
  * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2008, Stephan Aßmus, superstippi@gmx.de.
+ * Copyright 2008-2009, Stephan Aßmus, superstippi@gmx.de.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -43,17 +43,17 @@
 			fFunctionDepth++;
 			fPrepend.Append(' ', fFunctionDepth * 2);
 			fFunctionName << className << "::" << functionName << "()";
-	
+
 			debug_printf("%p -> %s%s {\n", fPointer, fPrepend.String(),
 				fFunctionName.String());
 		}
-	
+
 		 ~FunctionTracer()
 		{
 			debug_printf("%p -> %s}\n", fPointer, fPrepend.String());
 			fFunctionDepth--;
 		}
-	
+
 	private:
 		BString	fFunctionName;
 		BString	fPrepend;
@@ -733,10 +733,9 @@ KeyboardDevice::_ControlThread()
 			msg->AddInt32("modifiers", fModifiers);
 			msg->AddData("states", B_UINT8_TYPE, states, 16);
 			if (numBytes > 0) {
-				for (int i = 0; i < numBytes; i++) {
+				for (int i = 0; i < numBytes; i++)
 					msg->AddInt8("byte", (int8)string[i]);
-				}
-				msg->AddString("bytes", string);
+				msg->AddData("bytes", B_STRING_TYPE, string, numBytes);
 
 				if (rawNumBytes <= 0) {
 					rawNumBytes = 1;

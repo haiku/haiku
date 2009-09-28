@@ -1114,8 +1114,11 @@ FrameMoved(origin);
 					// different font encoding per view (it's supposed to be
 					// converted by _HandleKeyDown() one day)
 					const char* string;
-					if (msg->FindString("bytes", &string) == B_OK)
-						view->KeyDown(string, strlen(string));
+					ssize_t bytes;
+					if (msg->FindData("bytes", B_STRING_TYPE,
+						(const void**)&string, &bytes) == B_OK) {
+						view->KeyDown(string, bytes);
+					}
 				} else
 					target->MessageReceived(msg);
 			}
@@ -1124,13 +1127,15 @@ FrameMoved(origin);
 
 		case B_KEY_UP:
 		{
-			const char* string = NULL;
-			msg->FindString("bytes", &string);
-
 			// TODO: same as above
-			if (BView* view = dynamic_cast<BView*>(target))
-				view->KeyUp(string, strlen(string));
-			else
+			if (BView* view = dynamic_cast<BView*>(target)) {
+				const char* string;
+				ssize_t bytes;
+				if (msg->FindData("bytes", B_STRING_TYPE,
+					(const void**)&string, &bytes) == B_OK) {
+					view->KeyUp(string, bytes);
+				}
+			} else
 				target->MessageReceived(msg);
 			break;
 		}
