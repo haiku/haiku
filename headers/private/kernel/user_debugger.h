@@ -1,11 +1,12 @@
 /*
- * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  *
  * Userland debugger support.
  */
 #ifndef _KERNEL_USER_DEBUGGER_H
 #define _KERNEL_USER_DEBUGGER_H
+
 
 #include <debugger.h>
 
@@ -32,7 +33,7 @@ struct thread;
 //    (i.e. the struct team it lives in) isn't deleted. Thus one either needs to
 //    acquire the global team lock, or one accesses the structure from a thread
 //    of that team.
-// 2) Access to the `flags' field is atomically. Reading via atomic_get()
+// 2) Access to the `flags' field is atomic. Reading via atomic_get()
 //    requires no further locks (in addition to 1) that is). Writing requires
 //    `lock' being held and must be done atomically, too
 //    (atomic_{set,and,or}()). Reading with `lock' being held doesn't need to
@@ -148,6 +149,7 @@ enum {
 	B_TEAM_DEBUG_KERNEL_FLAG_MASK		= 0xffff,
 
 	B_TEAM_DEBUG_DEFAULT_FLAGS			= 0,
+	B_TEAM_DEBUG_INHERITED_FLAGS		= B_TEAM_DEBUG_DEBUGGER_DISABLED
 };
 
 // thread debugging flags (user-specifiable flags are in <debugger.h>)

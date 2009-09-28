@@ -1521,6 +1521,10 @@ fork_team(void)
 
 	teamLocker.Unlock();
 
+	// inherit some team debug flags
+	team->debug_info.flags |= atomic_get(&parentTeam->debug_info.flags)
+		& B_TEAM_DEBUG_INHERITED_FLAGS;
+
 	forkArgs = (struct fork_arg *)malloc(sizeof(struct fork_arg));
 	if (forkArgs == NULL) {
 		status = B_NO_MEMORY;
