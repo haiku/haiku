@@ -221,15 +221,17 @@ BHashMapCatalog::SetString(const CatKey& key, const char *translated)
 
 
 /*
- * computes an adler32-checksum (we call it fingerprint) on all the
- * catalog-keys. We do not include the values, since we want catalogs for
- * different languages of the same app to have the same fingerprint, since we
- * use it to separate different catalog-versions.
+ * computes a checksum (we call it fingerprint) on all the catalog-keys. We do
+ * not include the values, since we want catalogs for different languages of the
+ * same app to have the same fingerprint, since we use it to separate different
+ * catalog-versions. We use a simple sum because there is no well known
+ * checksum algorithm that gives the same result if the string are sorted in the
+ * wrong order, and this does happen, as an hash map is an unsorted container.
  */
 uint32
 BHashMapCatalog::ComputeFingerprint() const
 {
-	uint32 adler = adler32(0, NULL, 0);
+	uint32 checksum = 0;
 
 	int32 hash;
 	CatMap::Iterator iter = fCatMap.GetIterator();
@@ -238,9 +240,9 @@ BHashMapCatalog::ComputeFingerprint() const
 	{
 		entry = iter.Next();
 		hash = B_HOST_TO_LENDIAN_INT32(entry.key.fHashVal);
-		adler = adler32(adler, reinterpret_cast<uint8*>(&hash), sizeof(int32));
+		checksum += hash;
 	}
-	return adler;
+	return checksum;
 }
 
 

@@ -44,9 +44,6 @@ using std::pair;
  */
 
 
-extern "C" uint32 adler32(uint32 adler, const uint8 *buf, uint32 len);
-	// definition lives in adler32.c
-
 const char *PlainTextCatalog::kCatMimeType
 	= "locale/x-vnd.Be.locale-catalog.plaintext";
 
@@ -235,13 +232,7 @@ PlainTextCatalog::ReadFromFile(const char *path)
 			"skipped.\n",
 			fSignature.String(), fLanguageName.String(), checkFP,
 			fFingerprint);
-		// TODO: This is what should be done if the fingerprint calculation
-		// actually worked. Unfortunately, adler32 will not give the same
-		// results if you swap strings, and an HashMap is not an ordered
-		// container so you can get a different result each time you iterate
-		// over it...
-
-		// return B_BAD_DATA;
+		return B_BAD_DATA;
 	}
 
 	// some information living in member variables needs to be copied

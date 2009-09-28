@@ -5,8 +5,7 @@ UsePublicHeaders locale storage ;
 UseLibraryHeaders icu ;
 
 SharedLibrary liblocale.so
-	: adler32.c
-	  cat.cpp
+	: cat.cpp
 	  Catalog.cpp
 	  Collator.cpp
 	  Country.cpp

@@ -152,7 +152,7 @@ status_t
 PlainTextCatalog::ReadFromFile(const char *path)
 {
 	std::fstream catalogFile;
-	std::string  currentItem;
+	std::string currentItem;
 
 	if (!path)
 		path = fPath.String();
@@ -173,7 +173,7 @@ PlainTextCatalog::ReadFromFile(const char *path)
 		std::istringstream ss(currentItem);
 		ss >> arcver;
 		if (ss.fail()) {
-    		// can't convert to int
+			// can't convert to int
 			log_team(LOG_DEBUG,
 				"Unable to extract archive version ( string: %s ) from %s",
 				currentItem.c_str(), path);
@@ -181,7 +181,7 @@ PlainTextCatalog::ReadFromFile(const char *path)
 		}
 
 		if (arcver != kCatArchiveVersion) {
-    		// wrong version
+			// wrong version
 			log_team(LOG_DEBUG,
 				"Wrong archive version ! Got %d instead of %d from %s", arcver,
 				kCatArchiveVersion, path);
@@ -194,7 +194,7 @@ PlainTextCatalog::ReadFromFile(const char *path)
 
 	if (std::getline(catalogFile, currentItem, '\t').good()) {
 		// Get the language
-		fLanguageName << currentItem.c_str() ;
+		fLanguageName = currentItem.c_str() ;
 	} else {
 		log_team(LOG_DEBUG, "Unable to get language from %s", path);
 		return B_ERROR;
@@ -202,7 +202,7 @@ PlainTextCatalog::ReadFromFile(const char *path)
 
 	if (std::getline(catalogFile, currentItem, '\t').good()) {
 		// Get the signature
-		fSignature << currentItem.c_str() ;
+		fSignature = currentItem.c_str() ;
 	} else {
 		log_team(LOG_DEBUG, "Unable to get signature from %s", path);
 		return B_ERROR;
@@ -219,7 +219,10 @@ PlainTextCatalog::ReadFromFile(const char *path)
 			return B_ERROR;
 		}
 
-		if (fFingerprint!=0 && fFingerprint != foundFingerprint) {
+		if (fFingerprint == 0)
+			fFingerprint = foundFingerprint;
+
+		if (fFingerprint != foundFingerprint) {
 			return B_MISMATCHED_VALUES;
 		}
 	} else {
@@ -237,23 +240,21 @@ PlainTextCatalog::ReadFromFile(const char *path)
 	std::string translated;
 
 	while (std::getline(catalogFile, originalString,'\t').good()) {
-		// Each line is : "original string \t key \t translated string"
-		// However, the original string is also tab-separated because it
-		// also holds the context and comment
+		// Each line is : "original string \t context \t comment \t translation"
 
-		if (!std::getline(catalogFile,context,'\t').good()) {
+		if (!std::getline(catalogFile, context,'\t').good()) {
 			log_team(LOG_DEBUG, "Unable to get context for string %s from %s",
 				originalString.c_str(), path);
 			return B_ERROR;
 		}
 
-		if (!std::getline(catalogFile,comment,'\t').good()) {
+		if (!std::getline(catalogFile, comment,'\t').good()) {
 			log_team(LOG_DEBUG, "Unable to get comment for string %s from %s",
 				originalString.c_str(), path);
 			return B_ERROR;
 		}
 
-		if (!std::getline(catalogFile,translated).good()) {
+		if (!std::getline(catalogFile, translated).good()) {
 			log_team(LOG_DEBUG,
 				"Unable to get translated text for string %s from %s",
 				originalString.c_str(), path);
@@ -271,6 +272,17 @@ PlainTextCatalog::ReadFromFile(const char *path)
 	}
 
 	catalogFile.close();
+
+	uint32 checkFP = ComputeFingerprint();
+	if (fFingerprint != checkFP) {
+		log_team(LOG_DEBUG, "plaintext-catalog(sig=%s, lang=%s) "
+			"has wrong fingerprint after load (%lX instead of %lX). "
+			"The catalog data may be corrupted, so this catalog is "
+			"skipped.\n",
+			fSignature.String(), fLanguageName.String(), checkFP,
+			fFingerprint);
+		return B_BAD_DATA;
+	}
 
 	// some information living in member variables needs to be copied
 	// to attributes. Although these attributes should have been written
@@ -295,7 +307,6 @@ PlainTextCatalog::WriteToFile(const char *path)
 
 	UpdateFingerprint();
 		// make sure we have the correct fingerprint before we flatten it
-
 
 	textContent << kCatArchiveVersion << "\t" << fLanguageName.String() << "\t"
 		<< fSignature.String() << "\t" << fFingerprint << "\n";
@@ -409,8 +420,8 @@ extern "C"
 BCatalogAddOn *create_catalog(const char *signature,
 	const char *language)
 {
-	PlainTextCatalog *catalog =
-		new(std::nothrow) PlainTextCatalog("emptycat", signature, language);
+	PlainTextCatalog *catalog
+		= new(std::nothrow) PlainTextCatalog("emptycat", signature, language);
 	return catalog;
 }
 

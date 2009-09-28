@@ -31,7 +31,6 @@ BuildPlatformMain <build>collectcatkeys :
 	HashMapCatalog.cpp
 	Catalog.cpp
 	RegExp.cpp
-	adler32.c
 	: $(HOST_LIBBE)  $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) ;
 
 BuildPlatformMain <build>linkcatkeys :
@@ -40,5 +39,4 @@ BuildPlatformMain <build>linkcatkeys :
 	HashMapCatalog.cpp
 	DefaultCatalog.cpp
 	Catalog.cpp
-	adler32.c
 	: $(HOST_LIBBE) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) ;
