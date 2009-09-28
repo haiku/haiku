@@ -1131,6 +1131,7 @@ TermParse::_DecReqTermParms(int value)
 	write(fFd, parms, strlen(parms));
 }
 
+
 void
 TermParse::_DecPrivateModeSet(int value)
 {
