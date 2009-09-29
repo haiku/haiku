@@ -9,7 +9,6 @@ OptionalPackageDependencies Beam : LibIconv LibLayout OpenSSL Pe ;  # FIXME: Pe 
 OptionalPackageDependencies BeHappy : BeBook NetSurf ;
 OptionalPackageDependencies Development : DevelopmentBase Perl ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
-OptionalPackageDependencies Firefox : LibIconv ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
 OptionalPackageDependencies NetSurf : OpenSSL ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;

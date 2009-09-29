@@ -447,16 +447,17 @@ if [ IsOptionalHaikuImagePackageAdded Firefox ] {
 		Echo "No optional package Firefox available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01
-			: $(baseURL)/BeZillaBrowser-2.0.0.21pre-haiku-gcc4-x86-09-03-01.zip
- 			: apps
+			BeZillaBrowser-2.0.0.22pre-x86-gcc4-2009-09-28
+			: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc4-2009-09-28.zip
+ 			: 
  		;
  		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
 	} else {
-		InstallOptionalHaikuImagePackage BeZillaBrowser-gcc2-20090218
-			: http://bezilla.beuser.de/builds/BeZillaBrowser-gcc2-20090218.zip
- 			: apps
+		InstallOptionalHaikuImagePackage 
+			BeZillaBrowser-2.0.0.22pre-x86-gcc2-2009-09-27
+			: $(baseURL)/BeZillaBrowser-2.0.0.22pre-x86-gcc2-2009-09-27.zip
+ 			: 
  		;
  		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/BeZillaBrowser/BeZillaBrowser ;
