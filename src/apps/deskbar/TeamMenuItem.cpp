@@ -63,7 +63,7 @@ const float kLabelOffset = 8.0f;
 const float kSwitchWidth = 12;
 
 
-TTeamMenuItem::TTeamMenuItem(BList *team, BBitmap *icon, char *name, char *sig,
+TTeamMenuItem::TTeamMenuItem(BList* team, BBitmap* icon, char* name, char* sig,
 	float width, float height, bool drawLabel, bool vertical)
 	:	BMenuItem(new TWindowMenu(team, sig))
 {
@@ -79,7 +79,7 @@ TTeamMenuItem::TTeamMenuItem(float width,float height,bool vertical)
 
 
 void
-TTeamMenuItem::InitData(BList *team, BBitmap *icon, char *name, char *sig,
+TTeamMenuItem::InitData(BList* team, BBitmap* icon, char* name, char* sig,
 	float width, float height, bool drawLabel, bool vertical)
 {
 	fTeam = team;
@@ -122,16 +122,16 @@ TTeamMenuItem::~TTeamMenuItem()
 
 
 status_t
-TTeamMenuItem::Invoke(BMessage *message)
+TTeamMenuItem::Invoke(BMessage* message)
 {
-	if ((static_cast<TBarApp *>(be_app))->BarView()->InvokeItem(Signature()))
+	if ((static_cast<TBarApp*>(be_app))->BarView()->InvokeItem(Signature()))
 		//	handles drop on application
 		return B_OK;
 
 	//	if the app could not handle the drag message
 	//	and we were dragging, then kill the drag
 	//	should never get here, disabled item will not invoke
-	TBarView *barview = (static_cast<TBarApp *>(be_app))->BarView();
+	TBarView* barview = (static_cast<TBarApp*>(be_app))->BarView();
 	if (barview && barview->Dragging())
 		barview->DragStop();
 
@@ -174,21 +174,21 @@ TTeamMenuItem::LabelWidth() const
 }
 
 
-BList *
+BList*
 TTeamMenuItem::Teams() const
 {
 	return fTeam;
 }
 
 
-const char *
+const char*
 TTeamMenuItem::Signature() const
 {
 	return fSig;
 }
 
 
-const char *
+const char*
 TTeamMenuItem::Name() const
 {
 	return fName;
@@ -196,7 +196,7 @@ TTeamMenuItem::Name() const
 
 
 void
-TTeamMenuItem::GetContentSize(float *width, float *height)
+TTeamMenuItem::GetContentSize(float* width, float* height)
 {
 	BRect iconBounds;
 
@@ -229,11 +229,11 @@ void
 TTeamMenuItem::Draw()
 {
 	BRect frame(Frame());
-	BMenu *menu = Menu();
+	BMenu* menu = Menu();
 	menu->PushState();
 	rgb_color menuColor = menu->LowColor();
 
-	TBarView *barview = (static_cast<TBarApp *>(be_app))->BarView();
+	TBarView* barview = (static_cast<TBarApp*>(be_app))->BarView();
 	bool canHandle = !barview->Dragging()
 		|| barview->AppCanHandleTypes(Signature());
 
@@ -328,7 +328,7 @@ TTeamMenuItem::Draw()
 void
 TTeamMenuItem::DrawContent()
 {
-	BMenu *menu = Menu();
+	BMenu* menu = Menu();
 	if (fIcon) {
 		if (fIcon->ColorSpace() == B_RGBA32) {
 			menu->SetDrawingMode(B_OP_ALPHA);
@@ -367,8 +367,8 @@ TTeamMenuItem::DrawContent()
 	}
 
 	// Draw the expandable icon.
-	TBarView *barView = (static_cast<TBarApp *>(be_app))->BarView();
-	if (fVertical && static_cast<TBarApp *>(be_app)->Settings()->superExpando
+	TBarView* barView = (static_cast<TBarApp*>(be_app))->BarView();
+	if (fVertical && static_cast<TBarApp*>(be_app)->Settings()->superExpando
 		&& barView->Expando()) {
 		BRect frame(Frame());
 		BRect rect(0, 0, kSwitchWidth, 10);
@@ -430,17 +430,17 @@ TTeamMenuItem::DrawContent()
 void
 TTeamMenuItem::DrawContentLabel()
 {
-	BMenu *menu = Menu();
+	BMenu* menu = Menu();
 	menu->MovePenBy(0, fLabelAscent);
 
 	float cachedWidth = menu->StringWidth(Label());	
 	if (Submenu() && fVertical)
 		cachedWidth += 18;
 
-	const char *label = Label();
-	char *truncLabel = NULL;
+	const char* label = Label();
+	char* truncLabel = NULL;
 	float max = 0;
-	if (static_cast<TBarApp *>(be_app)->Settings()->superExpando && fVertical)
+	if (static_cast<TBarApp*>(be_app)->Settings()->superExpando && fVertical)
 		max = menu->MaxContentWidth() - kSwitchWidth;
 	else
 		max = menu->MaxContentWidth();
@@ -450,7 +450,7 @@ TTeamMenuItem::DrawContentLabel()
 		BRect frame = Frame();
 		float offset = penloc.x - frame.left;
 	 	if (cachedWidth + offset > max) {
-			truncLabel = (char *)malloc(strlen(label) + 4);
+			truncLabel = (char*)malloc(strlen(label) + 4);
 			if (!truncLabel)
 				return;
 			TruncateLabel(max-offset, truncLabel);
@@ -461,7 +461,7 @@ TTeamMenuItem::DrawContentLabel()
 	if (!label)
 		label = Label();
 
-	TBarView *barview = (static_cast<TBarApp *>(be_app))->BarView();
+	TBarView* barview = (static_cast<TBarApp*>(be_app))->BarView();
 	bool canHandle = !barview->Dragging()
 		|| barview->AppCanHandleTypes(Signature());
 	if (_IsSelected() && IsEnabled() && canHandle)
@@ -490,7 +490,7 @@ TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 	
 	if (fExpanded) {
 		// Populate Menu() with the stuff from SubMenu().
-		TWindowMenu *sub = (static_cast<TWindowMenu *>(Submenu()));
+		TWindowMenu* sub = (static_cast<TWindowMenu*>(Submenu()));
 		if (sub) {
 			// force the menu to update it's contents.
 			bool locked = sub->LockLooper();
@@ -500,14 +500,14 @@ TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 				sub->UnlockLooper();
 
 			if (sub->CountItems() > 1){
-				TExpandoMenuBar *parent = static_cast<TExpandoMenuBar *>(Menu());
+				TExpandoMenuBar* parent = static_cast<TExpandoMenuBar*>(Menu());
 				int myindex = parent->IndexOf(this) + 1;
 
-				TWindowMenuItem *windowItem = NULL;
+				TWindowMenuItem* windowItem = NULL;
 				int childIndex = 0;
 				int totalChildren = sub->CountItems() - 4; // hide, show, close, separator.
 				for (; childIndex < totalChildren; childIndex++) {
-					windowItem = static_cast<TWindowMenuItem *>(sub->RemoveItem((int32)0));
+					windowItem = static_cast<TWindowMenuItem*>(sub->RemoveItem((int32)0));
 					parent->AddItem(windowItem, myindex + childIndex);
 					windowItem->ExpandedItem(true);
 				}
@@ -520,15 +520,15 @@ TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 		}
 	} else {
 		// Remove the goodies from the Menu() that should be in the SubMenu();
-		TWindowMenu *sub = static_cast<TWindowMenu *>(Submenu());
+		TWindowMenu* sub = static_cast<TWindowMenu*>(Submenu());
 
 		if (sub) {
-			TExpandoMenuBar *parent = static_cast<TExpandoMenuBar *>(Menu());
+			TExpandoMenuBar* parent = static_cast<TExpandoMenuBar*>(Menu());
 
-			TWindowMenuItem *windowItem = NULL;
+			TWindowMenuItem* windowItem = NULL;
 			int childIndex = parent->IndexOf(this) + 1;
 			while (!parent->SubmenuAt(childIndex) && childIndex < parent->CountItems()) {
-				windowItem = static_cast<TWindowMenuItem *>(parent->RemoveItem(childIndex));
+				windowItem = static_cast<TWindowMenuItem*>(parent->RemoveItem(childIndex));
 				sub->AddItem(windowItem, 0);
 				windowItem->ExpandedItem(false);
 			}
@@ -548,11 +548,11 @@ TTeamMenuItem::ExpandedWindowItem(int32 id)
 	if (!fExpanded)	// Paranoia
 		return NULL;
 
-	TExpandoMenuBar *parent = static_cast<TExpandoMenuBar *>(Menu());
+	TExpandoMenuBar* parent = static_cast<TExpandoMenuBar*>(Menu());
 	int childIndex = parent->IndexOf(this) + 1;
 
 	while (!parent->SubmenuAt(childIndex) && childIndex < parent->CountItems()) {
-		TWindowMenuItem *item = static_cast<TWindowMenuItem *>(parent->ItemAt(childIndex));
+		TWindowMenuItem* item = static_cast<TWindowMenuItem*>(parent->ItemAt(childIndex));
 		if (item->ID() == id)
 			return item;
 

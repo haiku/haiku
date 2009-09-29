@@ -65,10 +65,10 @@ All rights reserved.
 #else
 #	error "You may want to port this ugly hack to your compiler ABI"
 #endif
-extern "C" void BMenuBar_StartMenuBar_Hack(BMenuBar *,int32,bool,bool,BRect *);
+extern "C" void BMenuBar_StartMenuBar_Hack(BMenuBar*,int32,bool,bool,BRect*);
 
 
-TBeMenu *TBarWindow::sBeMenu = NULL;
+TBeMenu* TBarWindow::sBeMenu = NULL;
 
 
 TBarWindow::TBarWindow()
@@ -80,7 +80,7 @@ TBarWindow::TBarWindow()
 			| B_ASYNCHRONOUS_CONTROLS,
 		B_ALL_WORKSPACES)
 {
-	desk_settings *settings = ((TBarApp *)be_app)->Settings();
+	desk_settings* settings = ((TBarApp*)be_app)->Settings();
 	if (settings->alwaysOnTop)
 		SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 	fBarView = new TBarView(Bounds(), settings->vertical, settings->left,
@@ -94,12 +94,12 @@ TBarWindow::TBarWindow()
 
 
 void
-TBarWindow::DispatchMessage(BMessage *message, BHandler *handler)
+TBarWindow::DispatchMessage(BMessage* message, BHandler* handler)
 {
 	// Activate the window when you click on it (ie. on the tray area,
 	// the menu part will do this automatically)
 	if (message->what == B_MOUSE_DOWN
-		&& !((TBarApp *)be_app)->Settings()->autoRaise)
+		&& !((TBarApp*)be_app)->Settings()->autoRaise)
 		Activate(true);
 
 	BWindow::DispatchMessage(message, handler);
@@ -165,7 +165,7 @@ TBarWindow::MenusEnded()
 
 
 void
-TBarWindow::MessageReceived(BMessage *message)
+TBarWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kFindButton:
@@ -265,13 +265,13 @@ TBarWindow::ScreenChanged(BRect size, color_space depth)
 
 
 void
-TBarWindow::SetBeMenu(TBeMenu *menu)
+TBarWindow::SetBeMenu(TBeMenu* menu)
 {
 	sBeMenu = menu;
 }
 
 
-TBeMenu *
+TBeMenu*
 TBarWindow::BeMenu()
 {
 	return sBeMenu;
@@ -281,7 +281,7 @@ TBarWindow::BeMenu()
 void
 TBarWindow::ShowBeMenu()
 {
-	BMenuBar *menuBar = fBarView->BarMenuBar();
+	BMenuBar* menuBar = fBarView->BarMenuBar();
 	if (menuBar == NULL)
 		menuBar = KeyMenuBar();
 
@@ -334,7 +334,7 @@ TBarWindow::DeskbarLocation() const
 
 
 void
-TBarWindow::GetLocation(BMessage *message)
+TBarWindow::GetLocation(BMessage* message)
 {
 	BMessage reply('rply');
 	reply.AddInt32("location", (int32)DeskbarLocation());
@@ -407,18 +407,18 @@ TBarWindow::SetDeskbarLocation(deskbar_location location, bool newExpandState)
 }
 
 void
-TBarWindow::SetLocation(BMessage *message)
+TBarWindow::SetLocation(BMessage* message)
 {
 	deskbar_location location;
 	bool expand;
-	if (message->FindInt32("location", (int32 *)&location) == B_OK
+	if (message->FindInt32("location", (int32*)&location) == B_OK
 		&& message->FindBool("expand", &expand) == B_OK)
 		SetDeskbarLocation(location, expand);
 }
 
 
 void
-TBarWindow::IsExpanded(BMessage *message)
+TBarWindow::IsExpanded(BMessage* message)
 {
 	BMessage reply('rply');
 	reply.AddBool("expanded", fBarView->Expando());
@@ -427,7 +427,7 @@ TBarWindow::IsExpanded(BMessage *message)
 
 
 void
-TBarWindow::Expand(BMessage *message)
+TBarWindow::Expand(BMessage* message)
 {
 	bool expand;
 	if (message->FindBool("expand", &expand) == B_OK) {
@@ -440,10 +440,10 @@ TBarWindow::Expand(BMessage *message)
 
 
 void
-TBarWindow::ItemInfo(BMessage *message)
+TBarWindow::ItemInfo(BMessage* message)
 {
 	BMessage replyMsg;
-	const char *name;
+	const char* name;
 	int32 id;
 	DeskbarShelf shelf;
 	if (message->FindInt32("id", &id) == B_OK) {
@@ -467,15 +467,15 @@ TBarWindow::ItemInfo(BMessage *message)
 
 
 void
-TBarWindow::ItemExists(BMessage *message)
+TBarWindow::ItemExists(BMessage* message)
 {
 	BMessage replyMsg;
-	const char *name;
+	const char* name;
 	int32 id;
 	DeskbarShelf shelf;
 
 #if SHELF_AWARE
-	if (message->FindInt32("shelf", (int32 *)&shelf) != B_OK)
+	if (message->FindInt32("shelf", (int32*)&shelf) != B_OK)
 #endif
 		shelf = B_DESKBAR_TRAY;
 
@@ -491,12 +491,12 @@ TBarWindow::ItemExists(BMessage *message)
 
 
 void
-TBarWindow::CountItems(BMessage *message)
+TBarWindow::CountItems(BMessage* message)
 {
 	DeskbarShelf shelf;
 
 #if SHELF_AWARE
-	if (message->FindInt32("shelf", (int32 *)&shelf) != B_OK)
+	if (message->FindInt32("shelf", (int32*)&shelf) != B_OK)
 #endif
 		shelf = B_DESKBAR_TRAY;
 
@@ -507,7 +507,7 @@ TBarWindow::CountItems(BMessage *message)
 
 
 void
-TBarWindow::AddItem(BMessage *message)
+TBarWindow::AddItem(BMessage* message)
 {
 	DeskbarShelf shelf;
 	entry_ref ref;
@@ -518,7 +518,7 @@ TBarWindow::AddItem(BMessage *message)
 	BMessage archivedView;
 	if (message->FindMessage("view", &archivedView) == B_OK) {
 #if SHELF_AWARE
-		if (message->FindInt32("shelf", (int32 *)&shelf) != B_OK)
+		if (message->FindInt32("shelf", (int32*)&shelf) != B_OK)
 #endif
 			shelf = B_DESKBAR_TRAY;
 
@@ -529,7 +529,7 @@ TBarWindow::AddItem(BMessage *message)
 	} else if (message->FindRef("addon", &ref) == B_OK) {
 		//
 		//	exposing the name of the view here is not so great
-		TReplicantTray *tray = dynamic_cast<TReplicantTray *>(FindView("Status"));
+		TReplicantTray* tray = dynamic_cast<TReplicantTray*>(FindView("Status"));
 		if (tray) {
 			// Force this into the deskbar even if the security code is wrong
 			// This is OK because the user specifically asked for this replicant
@@ -548,15 +548,15 @@ TBarWindow::AddItem(BMessage *message)
 
 
 void
-TBarWindow::RemoveItem(BMessage *message)
+TBarWindow::RemoveItem(BMessage* message)
 {
 	int32 id;
-	const char *name;
+	const char* name;
 
 	// 	ids ought to be unique across all shelves, assuming, of course,
 	//	that sometime in the future there may be more than one
 #if SHELF_AWARE
-	if (message->FindInt32("shelf", (int32 *)&shelf) == B_OK) {
+	if (message->FindInt32("shelf", (int32*)&shelf) == B_OK) {
 		if (message->FindString("name", &name) == B_OK)
 			fBarView->RemoveItem(name, shelf);
 	} else {
@@ -575,11 +575,11 @@ TBarWindow::RemoveItem(BMessage *message)
 
 
 void
-TBarWindow::GetIconFrame(BMessage *message)
+TBarWindow::GetIconFrame(BMessage* message)
 {
 	BRect frame(0, 0, 0, 0);
 
-	const char *name;
+	const char* name;
 	int32 id;
 	if (message->FindInt32("id", &id) == B_OK)
 		frame = fBarView->IconFrame(id);

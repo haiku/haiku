@@ -68,7 +68,7 @@ TWindowMenu::WindowShouldBeListed(uint32 behavior)
 }
 
 
-TWindowMenu::TWindowMenu(const BList *team, const char *signature)
+TWindowMenu::TWindowMenu(const BList* team, const char* signature)
 	: BMenu("Deskbar Team Menu"),
 	fTeam(team),
 	fApplicationSignature(signature),
@@ -89,7 +89,7 @@ TWindowMenu::AttachedToWindow()
 	int32 miniCount = 0;
 
 	bool dragging = false;
-	TBarView *barview =(static_cast<TBarApp *>(be_app))->BarView();
+	TBarView* barview =(static_cast<TBarApp*>(be_app))->BarView();
 	if (barview && barview->LockLooper()) {
 		//	'dragging' mode set in BarView::CacheDragData
 		//		invoke in MouseEnter in ExpandoMenuBar
@@ -116,10 +116,10 @@ TWindowMenu::AttachedToWindow()
 	for (int32 i = 0; i < numTeams; i++) {
 		team_id	theTeam = (team_id)fTeam->ItemAt(i);
 		int32 count = 0;
-		int32 *tokens = get_token_list(theTeam, &count);
+		int32* tokens = get_token_list(theTeam, &count);
 
 		for (int32 j = 0; j < count; j++) {
-			client_window_info *wInfo = get_window_info(tokens[j]);
+			client_window_info* wInfo = get_window_info(tokens[j]);
 			if (wInfo == NULL)
 				continue;
 
@@ -134,7 +134,7 @@ TWindowMenu::AttachedToWindow()
 						break;
 
 				if (!fExpanded) {
-					TWindowMenuItem *item = new TWindowMenuItem(wInfo->name,
+					TWindowMenuItem* item = new TWindowMenuItem(wInfo->name,
 						wInfo->server_token, wInfo->is_mini,
 						((1 << current_workspace()) & wInfo->workspaces) != 0,
 						dragging);
@@ -145,10 +145,10 @@ TWindowMenu::AttachedToWindow()
 
 					AddItem(item, addIndex);
 				} else {
-					TTeamMenuItem *parentItem
-						= static_cast<TTeamMenuItem *>(Superitem());
+					TTeamMenuItem* parentItem
+						= static_cast<TTeamMenuItem*>(Superitem());
 					if (parentItem->ExpandedWindowItem(wInfo->server_token)) {
-						TWindowMenuItem *item = parentItem->ExpandedWindowItem(
+						TWindowMenuItem* item = parentItem->ExpandedWindowItem(
 							wInfo->server_token);
 						if (item == NULL)
 							continue;
@@ -171,7 +171,7 @@ TWindowMenu::AttachedToWindow()
 
 	int32 itemCount = CountItems() + parentMenuItems;
 	if (itemCount < 1) {
-		TWindowMenuItem *noWindowsItem =
+		TWindowMenuItem* noWindowsItem =
  			new TWindowMenuItem("No Windows", -1, false, false);
 
 		noWindowsItem->SetEnabled(false);
@@ -188,9 +188,9 @@ TWindowMenu::AttachedToWindow()
 		//	if we are in drag mode, then don't add the window controls
 		//	to the menu
 		if (!dragging) {
-			TShowHideMenuItem *hide =
+			TShowHideMenuItem* hide =
 				new TShowHideMenuItem("Hide All", fTeam, B_MINIMIZE_WINDOW);
-			TShowHideMenuItem *show =
+			TShowHideMenuItem* show =
 				new TShowHideMenuItem("Show All", fTeam, B_BRING_TO_FRONT);
 			TShowHideMenuItem* close =
 				new TShowHideMenuItem("Close All", fTeam, B_QUIT_REQUESTED);
@@ -217,7 +217,7 @@ TWindowMenu::DetachedFromWindow()
 {
 	// in expando mode the teammenu will not call DragStop,
 	// thus, it needs to be called from here
-	TBarView *barview = (dynamic_cast<TBarApp*>(be_app))->BarView();
+	TBarView* barview = (dynamic_cast<TBarApp*>(be_app))->BarView();
 	if (barview && barview->Expando() && barview->Dragging() && barview->LockLooper()) {
 		// We changed the show level in AttachedToWindow().  Undo it.
 		Window()->Show();

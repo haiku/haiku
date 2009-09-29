@@ -58,20 +58,20 @@ enum drag_and_drop_selection {
 
 class TExpandoMenuBar : public BMenuBar {
 	public:
-		TExpandoMenuBar(TBarView *bar, BRect frame, const char *name, bool vertical,
+		TExpandoMenuBar(TBarView* bar, BRect frame, const char* name, bool vertical,
 			bool drawLabel = true);
 
 		virtual void AttachedToWindow();
 		virtual void DetachedFromWindow();
-		virtual void MessageReceived(BMessage *message);
+		virtual void MessageReceived(BMessage* message);
 		virtual void MouseDown(BPoint where);
-		virtual void MouseMoved(BPoint where, uint32 code, const BMessage *);
+		virtual void MouseMoved(BPoint where, uint32 code, const BMessage*);
 		virtual void MouseUp(BPoint where);
 
 		virtual void Draw(BRect update);
 		virtual void DrawBackground(BRect update);
 
-		TTeamMenuItem *TeamItemAtPoint(BPoint location, BMenuItem **_item = NULL);
+		TTeamMenuItem* TeamItemAtPoint(BPoint location, BMenuItem** _item = NULL);
 		bool InBeMenu(BPoint) const;
 
 		void CheckItemSizes(int32 delta);
@@ -82,11 +82,11 @@ class TExpandoMenuBar : public BMenuBar {
 		void CheckForSizeOverrun();
 
 	private:
-		static int CompareByName( const void *first, const void *second);
-		static int32 monitor_team_windows(void *arg);
+		static int CompareByName( const void* first, const void* second);
+		static int32 monitor_team_windows(void* arg);
 
-		void AddTeam(BList *team, BBitmap *icon, char *name, char *signature);
-		void AddTeam(team_id team, const char *signature);
+		void AddTeam(BList* team, BBitmap* icon, char* name, char* signature);
+		void AddTeam(team_id team, const char* signature);
 		void RemoveTeam(team_id team, bool partial);
 
 		void _FinishedDrag(bool invoke = false);
@@ -100,12 +100,12 @@ class TExpandoMenuBar : public BMenuBar {
 
 		float fBeMenuWidth;
 
-		TBarView *fBarView;
+		TBarView* fBarView;
 		int32 fFirstApp;
 
-		TBarMenuTitle *fBeMenuItem;
-		TTeamMenuItem *fSeparatorItem;
-		TTeamMenuItem *fPreviousDragTargetItem;
+		TBarMenuTitle* fBeMenuItem;
+		TTeamMenuItem* fSeparatorItem;
+		TTeamMenuItem* fPreviousDragTargetItem;
 
 #ifdef DOUBLECLICKBRINGSTOFRONT
 		int32 fLastClickItem;

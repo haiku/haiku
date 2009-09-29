@@ -43,18 +43,18 @@ All rights reserved.
 
 class TShowHideMenuItem : public BMenuItem {
 public:
-						TShowHideMenuItem(const char *title, 
-										  const BList *teams,
+						TShowHideMenuItem(const char* title, 
+										  const BList* teams,
 										  uint32 action);
 
 	static status_t 	TeamShowHideCommon(int32 action, 
-							const BList *teamList, 
+							const BList* teamList, 
 							BRect zoomRect = BRect(0, 0, 0, 0), 
 							bool doZoom = false);
 protected:
-	virtual void		GetContentSize(float *width, float *height);
+	virtual void		GetContentSize(float* width, float* height);
 	virtual void		DrawContent();
-	virtual status_t	Invoke(BMessage *message = NULL);
+	virtual status_t	Invoke(BMessage* message = NULL);
 
 private: 
 	const BList*		fTeams;

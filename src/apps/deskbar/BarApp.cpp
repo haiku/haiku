@@ -145,13 +145,14 @@ TBarApp::~TBarApp()
 
 	int32 teamCount = sBarTeamInfoList.CountItems();
 	for (int32 i = 0; i < teamCount; i++) {
-		BarTeamInfo *barInfo = (BarTeamInfo *)sBarTeamInfoList.ItemAt(i);
+		BarTeamInfo* barInfo = (BarTeamInfo*)sBarTeamInfoList.ItemAt(i);
 		delete barInfo;
 	}
 
 	int32 subsCount = sSubscribers.CountItems();
 	for (int32 i = 0; i < subsCount; i++) {
-		BMessenger *messenger = static_cast<BMessenger *>(sSubscribers.ItemAt(i));
+		BMessenger* messenger =
+			static_cast<BMessenger*>(sSubscribers.ItemAt(i));
 		delete messenger;
 	}
 	SaveSettings();
@@ -244,7 +245,7 @@ TBarApp::InitSettings()
 	settings.autoRaise = false;
 
 	BPath dirPath;
-	const char *settingsFileName = "Deskbar_settings";
+	const char* settingsFileName = "Deskbar_settings";
 
 	find_directory(B_USER_DESKBAR_DIRECTORY, &dirPath, true);
 	// just make it
@@ -309,7 +310,7 @@ TBarApp::InitSettings()
 
 
 void
-TBarApp::MessageReceived(BMessage *message)
+TBarApp::MessageReceived(BMessage* message)
 {
 	int32 count;
 	switch (message->what) {
@@ -364,9 +365,9 @@ TBarApp::MessageReceived(BMessage *message)
 			message->FindInt32("be:team", &team);
 
 			uint32 flags = 0;
-			message->FindInt32("be:flags", (long *)&flags);
+			message->FindInt32("be:flags", (long*)&flags);
 
-			const char *sig = NULL;
+			const char* sig = NULL;
 			message->FindString("be:signature", &sig);
 
 			entry_ref ref;
@@ -390,70 +391,70 @@ TBarApp::MessageReceived(BMessage *message)
 			fStatusViewMessenger.SendMessage(message);
 			break;
 
-		case msg_Be:
+		case kBe:
 			__set_window_decor(0);
 			break;
 
-		case msg_Win95:
+		case kWin95:
 			__set_window_decor(2);
 			break;
 
-		case msg_Amiga:
+		case kAmiga:
 			__set_window_decor(1);
 			break;
 
-		case msg_Mac:
+		case kMac:
 			__set_window_decor(3);
 			break;
 
-		case msg_ToggleDraggers:
+		case kToggleDraggers:
 			if (BDragger::AreDraggersDrawn())
 				BDragger::HideAllDraggers();
 			else
 				BDragger::ShowAllDraggers();
 			break;
 
-		case msg_AlwaysTop:
+		case kAlwaysTop:
  			fSettings.alwaysOnTop = !fSettings.alwaysOnTop;
 
  			fBarWindow->SetFeel(fSettings.alwaysOnTop ?
  				B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
  			break;
 
-		case msg_AutoRaise:
+		case kAutoRaise:
 		{
 			fSettings.autoRaise = !fSettings.autoRaise;
 
-			TBarView *barView = static_cast<TBarApp *>(be_app)->BarView();
+			TBarView* barView = static_cast<TBarApp*>(be_app)->BarView();
 			fBarWindow->Lock();
 			barView->UpdateAutoRaise();
 			fBarWindow->Unlock();
 			break;
 		}
 
-		case msg_trackerFirst:
+		case kTrackerFirst:
 		{
 			fSettings.trackerAlwaysFirst = !fSettings.trackerAlwaysFirst;
 
-			TBarView *barView = static_cast<TBarApp *>(be_app)->BarView();
+			TBarView* barView = static_cast<TBarApp*>(be_app)->BarView();
 			fBarWindow->Lock();
 			barView->UpdatePlacement();
 			fBarWindow->Unlock();
 			break;
 		}
 
-		case msg_sortRunningApps:
+		case kSortRunningApps:
 		{
 			fSettings.sortRunningApps = !fSettings.sortRunningApps;
 
-			TBarView *barView = static_cast<TBarApp *>(be_app)->BarView();
+			TBarView* barView = static_cast<TBarApp*>(be_app)->BarView();
 			fBarWindow->Lock();
 			barView->UpdatePlacement();
 			fBarWindow->Unlock();
 			break;
 		}
 
-		case msg_Unsubscribe:
+		case kUnsubscribe:
 		{
 			BMessenger messenger;
 			if (message->FindMessenger("messenger", &messenger) == B_OK)
@@ -461,22 +462,22 @@ TBarApp::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case msg_superExpando:
+		case kSuperExpando:
 		{
 			fSettings.superExpando = !fSettings.superExpando;
 
-			TBarView *barView = static_cast<TBarApp *>(be_app)->BarView();
+			TBarView* barView = static_cast<TBarApp*>(be_app)->BarView();
 			fBarWindow->Lock();
 			barView->UpdatePlacement();
 			fBarWindow->Unlock();
 			break;
 		}
 
-		case msg_expandNewTeams:
+		case kExpandNewTeams:
 		{
 			fSettings.expandNewTeams = !fSettings.expandNewTeams;
 
-			TBarView *barView = static_cast<TBarApp *>(be_app)->BarView();
+			TBarView* barView = static_cast<TBarApp*>(be_app)->BarView();
 			fBarWindow->Lock();
 			barView->UpdatePlacement();
 			fBarWindow->Unlock();
@@ -529,7 +530,7 @@ TBarApp::MessageReceived(BMessage *message)
  */
 
 void
-TBarApp::RefsReceived(BMessage *refs)
+TBarApp::RefsReceived(BMessage* refs)
 {
 	entry_ref ref;
 	for (int32 i = 0; refs->FindRef("refs", i, &ref) == B_OK; i++) {
@@ -544,7 +545,7 @@ TBarApp::RefsReceived(BMessage *refs)
 
 
 void
-TBarApp::Subscribe(const BMessenger &subscriber, BList *list)
+TBarApp::Subscribe(const BMessenger &subscriber, BList* list)
 {
 	// called when ExpandoMenuBar, TeamMenu or Switcher are built/rebuilt
 	list->MakeEmpty();
@@ -555,15 +556,15 @@ TBarApp::Subscribe(const BMessenger &subscriber, BList *list)
 
 	int32 numTeams = sBarTeamInfoList.CountItems();
 	for (int32 i = 0; i < numTeams; i++) {
-		BarTeamInfo *barInfo = (BarTeamInfo *)sBarTeamInfoList.ItemAt(i);
-		BarTeamInfo *newBarInfo = new (std::nothrow) BarTeamInfo(*barInfo);
+		BarTeamInfo* barInfo = (BarTeamInfo*)sBarTeamInfoList.ItemAt(i);
+		BarTeamInfo* newBarInfo = new (std::nothrow) BarTeamInfo(*barInfo);
 		if (newBarInfo != NULL)
 			list->AddItem(newBarInfo);
 	}
 
 	int32 subsCount = sSubscribers.CountItems();
 	for (int32 i = 0; i < subsCount; i++) {
-		BMessenger *messenger = (BMessenger *)sSubscribers.ItemAt(i);
+		BMessenger* messenger = (BMessenger*)sSubscribers.ItemAt(i);
 		if (*messenger == subscriber)
 			return;
 	}
@@ -581,7 +582,7 @@ TBarApp::Unsubscribe(const BMessenger &subscriber)
 
 	int32 count = sSubscribers.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		BMessenger *messenger = (BMessenger *)sSubscribers.ItemAt(i);
+		BMessenger* messenger = (BMessenger*)sSubscribers.ItemAt(i);
 		if (*messenger == subscriber) {
 			sSubscribers.RemoveItem(i);
 			delete messenger;
@@ -592,7 +593,7 @@ TBarApp::Unsubscribe(const BMessenger &subscriber)
 
 
 void
-TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
+TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 {
 	BAutolock autolock(sSubscriberLock);
 	if (!autolock.IsLocked())
@@ -600,27 +601,27 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
 
 	// have we already seen this team, is this another instance of
 	// a known app?
-	BarTeamInfo *multiLaunchTeam = NULL;
+	BarTeamInfo* multiLaunchTeam = NULL;
 	int32 teamCount = sBarTeamInfoList.CountItems();
 	for (int32 i = 0; i < teamCount; i++) {
-		BarTeamInfo *barInfo = (BarTeamInfo *)sBarTeamInfoList.ItemAt(i);
-		if (barInfo->teams->HasItem((void *)team))
+		BarTeamInfo* barInfo = (BarTeamInfo*)sBarTeamInfoList.ItemAt(i);
+		if (barInfo->teams->HasItem((void*)team))
 			return;
 		if (strcasecmp(barInfo->sig, sig) == 0)
 			multiLaunchTeam = barInfo;
 	}
 
 	if (multiLaunchTeam != NULL) {
-		multiLaunchTeam->teams->AddItem((void *)team);
+		multiLaunchTeam->teams->AddItem((void*)team);
 
 		int32 subsCount = sSubscribers.CountItems();
 		if (subsCount > 0) {
-			BMessage message(msg_AddTeam);
+			BMessage message(kAddTeam);
 			message.AddInt32("team", team);
 			message.AddString("sig", multiLaunchTeam->sig);
 
 			for (int32 i = 0; i < subsCount; i++)
-				((BMessenger *)sSubscribers.ItemAt(i))->SendMessage(&message);
+				((BMessenger*)sSubscribers.ItemAt(i))->SendMessage(&message);
 		}
 		return;
 	}
@@ -628,10 +629,10 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
 	BFile file(ref, B_READ_ONLY);
 	BAppFileInfo appMime(&file);
 
-	BarTeamInfo *barInfo = new BarTeamInfo(new BList(), flags, strdup(sig),
+	BarTeamInfo* barInfo = new BarTeamInfo(new BList(), flags, strdup(sig),
 		new BBitmap(kIconSize, kIconFormat), strdup(ref->name));
 
-	barInfo->teams->AddItem((void *)team);
+	barInfo->teams->AddItem((void*)team);
 	if (appMime.GetIcon(barInfo->icon, B_MINI_ICON) != B_OK)
 		appMime.GetTrackerIcon(barInfo->icon, B_MINI_ICON);
 
@@ -640,13 +641,13 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
 	int32 subsCount = sSubscribers.CountItems();
 	if (subsCount > 0) {
 		for (int32 i = 0; i < subsCount; i++) {
-			BMessenger *messenger = (BMessenger *)sSubscribers.ItemAt(i);
+			BMessenger* messenger = (BMessenger*)sSubscribers.ItemAt(i);
 			BMessage message(B_SOME_APP_LAUNCHED);
 
-			BList *tList = new BList(*(barInfo->teams));
+			BList* tList = new BList(*(barInfo->teams));
 			message.AddPointer("teams", tList);
 
-			BBitmap *icon = new BBitmap(barInfo->icon);
+			BBitmap* icon = new BBitmap(barInfo->icon);
 			ASSERT(icon);
 
 			message.AddPointer("icon", icon);
@@ -670,23 +671,23 @@ TBarApp::RemoveTeam(team_id team)
 
 	int32 teamCount = sBarTeamInfoList.CountItems();
 	for (int32 i = 0; i < teamCount; i++) {
-		BarTeamInfo *barInfo = (BarTeamInfo *)sBarTeamInfoList.ItemAt(i);
-		if (barInfo->teams->HasItem((void *)team)) {
+		BarTeamInfo* barInfo = (BarTeamInfo*)sBarTeamInfoList.ItemAt(i);
+		if (barInfo->teams->HasItem((void*)team)) {
 			int32 subsCount = sSubscribers.CountItems();
 			if (subsCount > 0) {
 				BMessage message((barInfo->teams->CountItems() == 1) ?
-					 B_SOME_APP_QUIT : msg_RemoveTeam);
+					 B_SOME_APP_QUIT : kRemoveTeam);
 
 				message.AddInt32("team", team);
 				for (int32 i = 0; i < subsCount; i++) {
-					BMessenger *messenger = (BMessenger *)sSubscribers.ItemAt(i);
+					BMessenger* messenger = (BMessenger*)sSubscribers.ItemAt(i);
 					messenger->SendMessage(&message);
 				}
 			}
 
-			barInfo->teams->RemoveItem((void *)team);
+			barInfo->teams->RemoveItem((void*)team);
 			if (barInfo->teams->CountItems() < 1) {
-				delete (BarTeamInfo *)sBarTeamInfoList.RemoveItem(i);
+				delete (BarTeamInfo*)sBarTeamInfoList.RemoveItem(i);
 				return;
 			}
 		}
@@ -709,7 +710,8 @@ TBarApp::ShowPreferencesWindow()
 //	#pragma mark -
 
 
-BarTeamInfo::BarTeamInfo(BList *teams, uint32 flags, char *sig, BBitmap *icon, char *name)
+BarTeamInfo::BarTeamInfo(BList* teams, uint32 flags, char* sig, BBitmap* icon,
+	char* name)
 	:	teams(teams),
 		flags(flags),
 		sig(sig),

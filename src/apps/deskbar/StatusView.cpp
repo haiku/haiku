@@ -78,19 +78,19 @@ using std::max;
 //	Icon - physical replicant handed to the DeskbarClass class
 //	AddOn - attribute based add-on
 
-const char *const kInstantiateItemCFunctionName = "instantiate_deskbar_item";
-const char *const kInstantiateEntryCFunctionName = "instantiate_deskbar_entry";
-const char *const kDeskbarSecurityCodeFile = "Deskbar_security_code";
-const char *const kDeskbarSecurityCodeAttr = "be:deskbar_security_code";
-const char *const kStatusPredicate = "be:deskbar_item_status";
-const char *const kEnabledPredicate = "be:deskbar_item_status=enabled";
-const char *const kDisabledPredicate = "be:deskbar_item_status=disabled";
+const char* const kInstantiateItemCFunctionName = "instantiate_deskbar_item";
+const char* const kInstantiateEntryCFunctionName = "instantiate_deskbar_entry";
+const char* const kDeskbarSecurityCodeFile = "Deskbar_security_code";
+const char* const kDeskbarSecurityCodeAttr = "be:deskbar_security_code";
+const char* const kStatusPredicate = "be:deskbar_item_status";
+const char* const kEnabledPredicate = "be:deskbar_item_status=enabled";
+const char* const kDisabledPredicate = "be:deskbar_item_status=disabled";
 
 float sMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
 
 
 static void
-DumpItem(DeskbarItemInfo *item)
+DumpItem(DeskbarItemInfo* item)
 {
 	printf("is addon: %i, id: %li\n", item->isAddOn, item->id);
 	printf("entry_ref:  %ld, %Ld, %s\n", item->entryRef.device,
@@ -100,7 +100,7 @@ DumpItem(DeskbarItemInfo *item)
 
 
 static void
-DumpList(BList *itemlist)
+DumpList(BList* itemlist)
 {
 	int32 count = itemlist->CountItems() - 1;
 	if (count < 0) {
@@ -108,7 +108,7 @@ DumpList(BList *itemlist)
 		return;
 	}
 	for (int32 i = count ; i >= 0 ; i--) {
-		DeskbarItemInfo *item = (DeskbarItemInfo*)itemlist->ItemAt(i);
+		DeskbarItemInfo* item = (DeskbarItemInfo*)itemlist->ItemAt(i);
 		if (!item)
 			continue;
 
@@ -120,7 +120,7 @@ DumpList(BList *itemlist)
 
 // don't change the name of this view to anything other than "Status"!
 
-TReplicantTray::TReplicantTray(TBarView *parent, bool vertical)
+TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 	: BView(BRect(0, 0, 1, 1), "Status", B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_FRAME_EVENTS),
 	fClock(NULL),
@@ -190,7 +190,7 @@ void
 TReplicantTray::RememberClockSettings()
 {
 	if (fClock)	{
-		desk_settings *settings = ((TBarApp *)be_app)->Settings();
+		desk_settings* settings = ((TBarApp*)be_app)->Settings();
 
 		settings->timeShowSeconds = fClock->ShowingSeconds();
 		settings->timeShowMil = fClock->ShowingMilTime();
@@ -252,7 +252,7 @@ TReplicantTray::DealWithClock(bool showClock)
 
 	if (showClock) {
 		if (!fClock) {
-			desk_settings *settings = ((TBarApp *)be_app)->Settings();
+			desk_settings* settings = ((TBarApp*)be_app)->Settings();
 
 			fClock = new TTimeView(fMinimumTrayWidth, kMaxReplicantHeight - 1.0,
 				settings->timeShowSeconds, settings->timeShowMil,
@@ -281,7 +281,7 @@ TReplicantTray::DealWithClock(bool showClock)
 	replicant widths
 */
 void
-TReplicantTray::GetPreferredSize(float *preferredWidth, float *preferredHeight)
+TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 {
 	float width = 0, height = kMinimumTrayHeight;
 	
@@ -361,7 +361,7 @@ return;
 
 
 void
-TReplicantTray::MessageReceived(BMessage *message)
+TReplicantTray::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case 'time':
@@ -403,7 +403,7 @@ TReplicantTray::MessageReceived(BMessage *message)
 void
 TReplicantTray::ShowReplicantMenu(BPoint point)
 {
-	BPopUpMenu *menu = new BPopUpMenu("", false, false);
+	BPopUpMenu* menu = new BPopUpMenu("", false, false);
 	menu->SetFont(be_plain_font);
 
 	// If the clock is visible, show the extended menu
@@ -412,7 +412,7 @@ TReplicantTray::ShowReplicantMenu(BPoint point)
 	if (fBarView->ShowingClock())
 		fClock->ShowClockOptions(ConvertToScreen(point));
 	else {
-		BMenuItem *item = new BMenuItem("Show Time", new BMessage('time'));
+		BMenuItem* item = new BMenuItem("Show Time", new BMessage('time'));
 		menu->AddItem(item);
 		menu->SetTargetForItems(this);
 		BPoint where = ConvertToScreen(point);
@@ -432,7 +432,7 @@ TReplicantTray::MouseDown(BPoint where)
 
 	uint32	buttons;
 
-	Window()->CurrentMessage()->FindInt32("buttons", (int32 *)&buttons);
+	Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 	if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 		ShowReplicantMenu(where);
 	} else {
@@ -515,7 +515,7 @@ void
 TReplicantTray::DeleteAddOnSupport()
 {
 	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
-		DeskbarItemInfo *item = (DeskbarItemInfo *)fItemList->RemoveItem(i);
+		DeskbarItemInfo* item = (DeskbarItemInfo*)fItemList->RemoveItem(i);
 		if (item) {
 			if (item->isAddOn)
 				watch_node(&(item->nodeRef), B_STOP_WATCHING, this, Window());
@@ -531,7 +531,7 @@ TReplicantTray::DeleteAddOnSupport()
 
 
 void
-TReplicantTray::RunAddOnQuery(BVolume *volume, const char *predicate)
+TReplicantTray::RunAddOnQuery(BVolume* volume, const char* predicate)
 {
 	// Since the new BFS supports querying for attributes without
 	// an index, we only run the query if the index exists (for
@@ -572,11 +572,11 @@ TReplicantTray::IsAddOn(entry_ref &ref)
 }
 
 
-DeskbarItemInfo *
+DeskbarItemInfo*
 TReplicantTray::DeskbarItemFor(node_ref &nodeRef)
 {
 	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
-		DeskbarItemInfo *item = (DeskbarItemInfo *)fItemList->ItemAt(i);
+		DeskbarItemInfo* item = (DeskbarItemInfo*)fItemList->ItemAt(i);
 		if (item == NULL)
 			continue;
 
@@ -588,11 +588,11 @@ TReplicantTray::DeskbarItemFor(node_ref &nodeRef)
 }
 
 
-DeskbarItemInfo *
+DeskbarItemInfo*
 TReplicantTray::DeskbarItemFor(int32 id)
 {
 	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
-		DeskbarItemInfo *item = (DeskbarItemInfo *)fItemList->ItemAt(i);
+		DeskbarItemInfo* item = (DeskbarItemInfo*)fItemList->ItemAt(i);
 		if (item == NULL)
 			continue;
 
@@ -615,7 +615,7 @@ TReplicantTray::NodeExists(node_ref &nodeRef)
 	for the registered add-ons.
 */
 void
-TReplicantTray::HandleEntryUpdate(BMessage *message)
+TReplicantTray::HandleEntryUpdate(BMessage* message)
 {
 	int32 opcode;
 	if (message->FindInt32("opcode", &opcode) != B_OK)
@@ -626,7 +626,7 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 		case B_ENTRY_CREATED:
 		{
 			// entry was just listed, matches live query
-			const char *name;
+			const char* name;
 			ino_t directory;
 			dev_t device;
 			// received when an app adds a ref to the
@@ -654,7 +654,7 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 			if (message->FindInt32("device", &(nodeRef.device)) == B_OK
 				&& message->FindInt64("node", &(nodeRef.node)) == B_OK) {
 				// get the add-on this is for
-				DeskbarItemInfo *item = DeskbarItemFor(nodeRef);
+				DeskbarItemInfo* item = DeskbarItemFor(nodeRef);
 				if (item == NULL)
 					break;
 
@@ -683,7 +683,7 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 			entry_ref ref;
 			ino_t todirectory;
 			ino_t node;
-			const char *name;
+			const char* name;
 			if (message->FindString("name", &name) == B_OK
 				&& message->FindInt64("from directory", &(ref.directory)) == B_OK
 				&& message->FindInt64("to directory", &todirectory) == B_OK
@@ -707,7 +707,7 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 			node_ref nodeRef;
 			if (message->FindInt32("device", &(nodeRef.device)) == B_OK
 				&& message->FindInt64("node", &(nodeRef.node)) == B_OK) {
-				DeskbarItemInfo *item = DeskbarItemFor(nodeRef);
+				DeskbarItemInfo* item = DeskbarItemFor(nodeRef);
 				if (item == NULL)
 					break;
 
@@ -755,7 +755,7 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 	primary function is the Instantiate function
 */
 status_t
-TReplicantTray::LoadAddOn(BEntry *entry, int32 *id, bool force)
+TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool force)
 {
 	if (!entry)
 		return B_ERROR;
@@ -796,18 +796,18 @@ TReplicantTray::LoadAddOn(BEntry *entry, int32 *id, bool force)
 	//    we first look for a symbol that takes an image_id
 	//    and entry_ref pointer, if not found, go with normal
 	//    instantiate function
-	BView *(*entryFunction)(image_id, const entry_ref *);
-	BView *(*itemFunction)(void);
-	BView *view = NULL;
+	BView* (*entryFunction)(image_id, const entry_ref*);
+	BView* (*itemFunction)(void);
+	BView* view = NULL;
 
 	entry_ref ref;
 	entry->GetRef(&ref);
 
 	if (get_image_symbol(image, kInstantiateEntryCFunctionName,
-			B_SYMBOL_TYPE_TEXT, (void **)&entryFunction) >= B_OK) {
+			B_SYMBOL_TYPE_TEXT, (void**)&entryFunction) >= B_OK) {
 		view = (*entryFunction)(image, &ref);
 	} else if (get_image_symbol(image, kInstantiateItemCFunctionName,
-			B_SYMBOL_TYPE_TEXT, (void **)&itemFunction) >= B_OK) {
+			B_SYMBOL_TYPE_TEXT, (void**)&itemFunction) >= B_OK) {
 		view = (*itemFunction)();
 	} else {
 		unload_add_on(image);
@@ -820,7 +820,7 @@ TReplicantTray::LoadAddOn(BEntry *entry, int32 *id, bool force)
 		return B_ERROR;
 	}
 
-	BMessage *data = new BMessage;
+	BMessage* data = new BMessage;
 	view->Archive(data);
 	delete view;
 
@@ -837,7 +837,7 @@ TReplicantTray::LoadAddOn(BEntry *entry, int32 *id, bool force)
 status_t
 TReplicantTray::AddItem(int32 id, node_ref nodeRef, BEntry &entry, bool isAddOn)
 {
-	DeskbarItemInfo *item = new DeskbarItemInfo;
+	DeskbarItemInfo* item = new DeskbarItemInfo;
 	if (item == NULL)
 		return B_NO_MEMORY;
 
@@ -865,11 +865,11 @@ TReplicantTray::AddItem(int32 id, node_ref nodeRef, BEntry &entry, bool isAddOn)
  */
 
 void
-TReplicantTray::UnloadAddOn(node_ref *nodeRef, dev_t *device,
+TReplicantTray::UnloadAddOn(node_ref* nodeRef, dev_t* device,
 	bool which, bool removeAll)
 {
 	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
-		DeskbarItemInfo *item = (DeskbarItemInfo*)fItemList->ItemAt(i);
+		DeskbarItemInfo* item = (DeskbarItemInfo*)fItemList->ItemAt(i);
 		if (!item)
 			continue;
 
@@ -891,11 +891,11 @@ TReplicantTray::UnloadAddOn(node_ref *nodeRef, dev_t *device,
 void
 TReplicantTray::RemoveItem(int32 id)
 {
-	DeskbarItemInfo *item = DeskbarItemFor(id);
+	DeskbarItemInfo* item = DeskbarItemFor(id);
 	if (item == NULL)
 		return;
 
-	// attribute was added via Deskbar API (AddItem(entry_ref *, int32 *)
+	// attribute was added via Deskbar API (AddItem(entry_ref*, int32*)
 	if (item->isAddOn) {
 		BNode node(&item->entryRef);
 		node.RemoveAttr(kStatusPredicate);
@@ -912,7 +912,7 @@ TReplicantTray::RemoveItem(int32 id)
  */
 	
 void
-TReplicantTray::MoveItem(entry_ref *ref, ino_t toDirectory)
+TReplicantTray::MoveItem(entry_ref* ref, ino_t toDirectory)
 {
 	if (!ref)
 		return;
@@ -922,7 +922,7 @@ TReplicantTray::MoveItem(entry_ref *ref, ino_t toDirectory)
 	// don't need to change node info as it does not change
 
 	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
-		DeskbarItemInfo *item = (DeskbarItemInfo *)fItemList->ItemAt(i);
+		DeskbarItemInfo* item = (DeskbarItemInfo*)fItemList->ItemAt(i);
 		if (!item)
 			continue;
 
@@ -951,13 +951,13 @@ TReplicantTray::MoveItem(entry_ref *ref, ino_t toDirectory)
  */
 
 status_t
-TReplicantTray::ItemInfo(int32 id, const char **name)
+TReplicantTray::ItemInfo(int32 id, const char** name)
 {
 	if (id < 0)
 		return B_ERROR;
 
 	int32 index, temp;
-	BView *view = ViewAt(&index, &temp, id, false);
+	BView* view = ViewAt(&index, &temp, id, false);
 	if (view) {
 		*name = view->Name();
 		return B_OK;
@@ -972,13 +972,13 @@ TReplicantTray::ItemInfo(int32 id, const char **name)
  */
 
 status_t
-TReplicantTray::ItemInfo(const char *name, int32 *id)
+TReplicantTray::ItemInfo(const char* name, int32* id)
 {
 	if (!name || strlen(name) <= 0)
 		return B_ERROR;
 		
 	int32 index;
-	BView *view = ViewAt(&index, id, name);
+	BView* view = ViewAt(&index, id, name);
 	if (view)
 		return B_OK;
 	
@@ -991,13 +991,13 @@ TReplicantTray::ItemInfo(const char *name, int32 *id)
  */
 
 status_t
-TReplicantTray::ItemInfo(int32 index, const char **name, int32 *id)
+TReplicantTray::ItemInfo(int32 index, const char** name, int32* id)
 {
 	if (index < 0)
 		return B_ERROR;
 		
-	BView *view;
-	fShelf->ReplicantAt(index, &view, (uint32 *)id, NULL);
+	BView* view;
+	fShelf->ReplicantAt(index, &view, (uint32*)id, NULL);
 	if (view) {
 		*name = view->Name();
 		return B_OK;
@@ -1013,7 +1013,7 @@ bool
 TReplicantTray::IconExists(int32 target, bool byIndex)
 {
 	int32 index, id;
-	BView *view = ViewAt(&index, &id, target, byIndex);
+	BView* view = ViewAt(&index, &id, target, byIndex);
 		
 	return view && index >= 0;
 }
@@ -1022,13 +1022,13 @@ TReplicantTray::IconExists(int32 target, bool byIndex)
 /**	replicant exists, by name */
 
 bool
-TReplicantTray::IconExists(const char *name)
+TReplicantTray::IconExists(const char* name)
 {
 	if (!name || strlen(name) == 0)
 		return false;
 		
 	int32 index, id;
-	BView *view = ViewAt(&index, &id, name);
+	BView* view = ViewAt(&index, &id, name);
 	
 	return view && index >= 0;
 }
@@ -1047,7 +1047,7 @@ TReplicantTray::IconCount() const
 	Returns the current replicant ID.
 */
 status_t
-TReplicantTray::AddIcon(BMessage *archive, int32 *id, const entry_ref *addOn)
+TReplicantTray::AddIcon(BMessage* archive, int32* id, const entry_ref* addOn)
 {
 	if (archive == NULL || id == NULL)
 		return B_ERROR;
@@ -1059,7 +1059,7 @@ TReplicantTray::AddIcon(BMessage *archive, int32 *id, const entry_ref *addOn)
 		// Use it if we got it
 		ref = *addOn;
 	} else {
-		const char *signature;
+		const char* signature;
 		status_t status = archive->FindString("add_on", &signature);
 		if (status == B_OK) {
 			BRoster roster;
@@ -1102,8 +1102,8 @@ TReplicantTray::AddIcon(BMessage *archive, int32 *id, const entry_ref *addOn)
 		return status;
 
 	int32 count = fShelf->CountReplicants();
-	BView *view;
-	fShelf->ReplicantAt(count - 1, &view, (uint32 *)id, NULL);
+	BView* view;
+	fShelf->ReplicantAt(count - 1, &view, (uint32*)id, NULL);
 
 	if (originalBounds != view->Bounds()) {
 		// The replicant changed its size when added to the window, so we need
@@ -1133,7 +1133,7 @@ TReplicantTray::RemoveIcon(int32 target, bool byIndex)
 		return;
 	
 	int32 index, id;
-	BView *view = ViewAt(&index, &id, target, byIndex);
+	BView* view = ViewAt(&index, &id, target, byIndex);
 	if (view && index >= 0) {
 		// remove the reference from the item list & the shelf
 		RemoveItem(id);
@@ -1146,13 +1146,13 @@ TReplicantTray::RemoveIcon(int32 target, bool byIndex)
 
 
 void
-TReplicantTray::RemoveIcon(const char *name)
+TReplicantTray::RemoveIcon(const char* name)
 {
 	if (!name || strlen(name) <= 0)
 		return;
 	
 	int32 id, index;
-	BView *view = ViewAt(&index, &id, name);
+	BView* view = ViewAt(&index, &id, name);
 	if (view && index >= 0) {
 		// remove the reference from the item list & shelf
 		RemoveItem(id);
@@ -1192,14 +1192,14 @@ TReplicantTray::RealReplicantAdjustment(int32 startIndex)
  *	return the view and index
  */
 
-BView *
-TReplicantTray::ViewAt(int32 *index, int32 *id, int32 target, bool byIndex)
+BView*
+TReplicantTray::ViewAt(int32* index, int32* id, int32 target, bool byIndex)
 {
 	*index = -1;
 	
-	BView *view;
+	BView* view;
 	if (byIndex){
-		if (fShelf->ReplicantAt(target, &view, (uint32 *)id)) {
+		if (fShelf->ReplicantAt(target, &view, (uint32*)id)) {
 			if (view) {
 				*index = target;
 				return view;
@@ -1209,7 +1209,7 @@ TReplicantTray::ViewAt(int32 *index, int32 *id, int32 target, bool byIndex)
 		int32 count = fShelf->CountReplicants()-1;
 		int32 localid;
 		for (int32 repIndex = count ; repIndex >= 0 ; repIndex--) {
-			fShelf->ReplicantAt(repIndex, &view, (uint32 *)&localid);
+			fShelf->ReplicantAt(repIndex, &view, (uint32*)&localid);
 			if (localid == target && view) {
 				*index = repIndex;
 				*id = localid;
@@ -1226,16 +1226,16 @@ TReplicantTray::ViewAt(int32 *index, int32 *id, int32 target, bool byIndex)
  *	return the view, index and the id of the replicant
  */
 
-BView *
-TReplicantTray::ViewAt(int32 *index, int32 *id, const char *name)
+BView*
+TReplicantTray::ViewAt(int32* index, int32* id, const char* name)
 {
 	*index = -1;
 	*id = -1;
 	
-	BView *view;
+	BView* view;
 	int32 count = fShelf->CountReplicants()-1;
 	for (int32 repIndex = count ; repIndex >= 0 ; repIndex--) {
-		fShelf->ReplicantAt(repIndex, &view, (uint32 *)id);
+		fShelf->ReplicantAt(repIndex, &view, (uint32*)id);
 		if (view && view->Name() && strcmp(name, view->Name()) == 0) {
 			*index = repIndex;
 			return view;
@@ -1251,7 +1251,7 @@ TReplicantTray::ViewAt(int32 *index, int32 *id, const char *name)
  */
 
 bool
-TReplicantTray::AcceptAddon(BRect replicantFrame, BMessage *message)
+TReplicantTray::AcceptAddon(BRect replicantFrame, BMessage* message)
 {
 	if (!message)
 		return false;
@@ -1266,10 +1266,10 @@ TReplicantTray::AcceptAddon(BRect replicantFrame, BMessage *message)
 		else
 			align = fBarView->Left() ? B_ALIGN_LEFT : B_ALIGN_RIGHT;
 	} else if (message->HasInt32("deskbar:align"))
-		message->FindInt32("deskbar:align", (int32 *)&align);
+		message->FindInt32("deskbar:align", (int32*)&align);
 
 	if (message->HasInt32("deskbar:private_align"))
-		message->FindInt32("deskbar:private_align", (int32 *)&align);
+		message->FindInt32("deskbar:private_align", (int32*)&align);
 	else
 		align = B_ALIGN_LEFT;
 
@@ -1300,7 +1300,7 @@ TReplicantTray::LocationForReplicant(int32 index, float width)
 				rect.right -= fClock->Frame().Width() + kIconGap;
 
 			for (int32 i = 0; i < index; i++) {
-				BView *view = NULL;
+				BView* view = NULL;
 				fShelf->ReplicantAt(i, &view);
 				if (view == NULL || view->Frame().top != rect.top)
 					continue;
@@ -1317,7 +1317,7 @@ TReplicantTray::LocationForReplicant(int32 index, float width)
 	} else {
 		if (index > 0) {
 			// get the last replicant added for placement reference
-			BView *view = NULL;
+			BView* view = NULL;
 			fShelf->ReplicantAt(index - 1, &view);
 			if (view) {
 				// push this rep placement past the last one
@@ -1341,7 +1341,7 @@ BRect
 TReplicantTray::IconFrame(int32 target, bool byIndex)
 {
 	int32 index, id;
-	BView *view = ViewAt(&index, &id, target, byIndex);
+	BView* view = ViewAt(&index, &id, target, byIndex);
 	if (view)
 		return view->Frame();
 
@@ -1350,13 +1350,13 @@ TReplicantTray::IconFrame(int32 target, bool byIndex)
 
 
 BRect
-TReplicantTray::IconFrame(const char *name)
+TReplicantTray::IconFrame(const char* name)
 {
 	if (!name)
 		return BRect(0, 0, 0, 0);
 
 	int32 id, index;
-	BView *view = ViewAt(&index, &id, name);
+	BView* view = ViewAt(&index, &id, name);
 	if (view)
 		return view->Frame();
 
@@ -1381,7 +1381,7 @@ TReplicantTray::RealignReplicants(int32 startIndex)
 	if (startIndex == 0)
 		fRightBottomReplicant.Set(0, 0, 0, 0);
 
-	BView *view = NULL;
+	BView* view = NULL;
 	for (int32 i = startIndex ; i < count ; i++){
 		fShelf->ReplicantAt(i, &view);
 		if (view != NULL) {
@@ -1412,7 +1412,7 @@ TReplicantTray::SetMultiRow(bool state)
  *	dragging does not block other activities
  */
 
-TDragRegion::TDragRegion(TBarView *parent, BView *child)
+TDragRegion::TDragRegion(TBarView* parent, BView* child)
 	:	BControl(BRect(0, 0, 0, 0), "", "", NULL, B_FOLLOW_NONE,
 			B_WILL_DRAW | B_FRAME_EVENTS),
 		fBarView(parent),
@@ -1435,7 +1435,7 @@ TDragRegion::AttachedToWindow()
 
 
 void
-TDragRegion::GetPreferredSize(float *width, float *height)
+TDragRegion::GetPreferredSize(float* width, float* height)
 {
 	fChild->ResizeToPreferred();
 	*width = fChild->Bounds().Width();
@@ -1654,7 +1654,7 @@ TDragRegion::SwitchModeForRect(BPoint mouse, BRect rect,
 
 
 void 
-TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage *message)
+TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 {
 	if (IsTracking()) {
 		BScreen screen;

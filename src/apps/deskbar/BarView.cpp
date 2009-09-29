@@ -151,7 +151,7 @@ TBarView::Draw(BRect)
 
 
 void
-TBarView::MessageReceived(BMessage *message)
+TBarView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_REFS_RECEIVED:
@@ -329,7 +329,7 @@ TBarView::PlaceApplicationBar(BRect screenFrame)
 
 
 void
-TBarView::GetPreferredWindowSize(BRect screenFrame, float *width, float *height)
+TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 {
 	float windowHeight = 0;
 	float windowWidth = sMinimumWindowWidth;
@@ -396,7 +396,7 @@ TBarView::PositionWindow(BRect screenFrame)
 void
 TBarView::SaveSettings()
 {
-	desk_settings *settings = ((TBarApp *)be_app)->Settings();
+	desk_settings* settings = ((TBarApp*)be_app)->Settings();
 
 	settings->vertical = Vertical();
 	settings->left = Left();
@@ -446,16 +446,16 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 
 	// We need to keep track of what apps are expanded.
 	BList expandedItems;
-	BString *signature = NULL;
-	if (fVertical && Expando() && static_cast<TBarApp *>(be_app)->Settings()->superExpando) {
+	BString* signature = NULL;
+	if (fVertical && Expando() && static_cast<TBarApp*>(be_app)->Settings()->superExpando) {
 		// Get a list of the Signatures of expanded apps - Can't use team_id because
 		// there can be more than one team per application
 		if (fVertical && Expando() && vertical && fExpando) {
 			for (int index = 0; index < fExpando->CountItems(); index++) {
-				TTeamMenuItem *item = dynamic_cast<TTeamMenuItem *>(fExpando->ItemAt(index));
+				TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(fExpando->ItemAt(index));
 				if (item != NULL && item->IsExpanded()) {
 					signature = new BString(item->Signature());
-					expandedItems.AddItem((void *)signature);
+					expandedItems.AddItem((void*)signature);
 				}
 			}
 		}
@@ -469,14 +469,14 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 	// Re-expand those apps.
 	if (expandedItems.CountItems() > 0) {
 		for (int sigIndex = expandedItems.CountItems(); sigIndex-- > 0;) {
-			signature = static_cast<BString *>(expandedItems.ItemAt(sigIndex));
+			signature = static_cast<BString*>(expandedItems.ItemAt(sigIndex));
 			if (signature == NULL)
 				continue;
 
 			// Start at the 'bottom' of the list working up.
 			// Prevents being thrown off by expanding items.
 			for (int teamIndex = fExpando->CountItems(); teamIndex-- > 0;) {
-				TTeamMenuItem *item = dynamic_cast<TTeamMenuItem *>(fExpando->ItemAt(teamIndex));
+				TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(fExpando->ItemAt(teamIndex));
 				if (item != NULL && !signature->Compare(item->Signature())) {
 					item->ToggleExpandState(false);
 					break;
@@ -486,7 +486,7 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 
 		// Clean up expanded signature list.
 		while (!expandedItems.IsEmpty()) {
-			delete static_cast<BString *>(expandedItems.RemoveItem((int32)0));
+			delete static_cast<BString*>(expandedItems.RemoveItem((int32)0));
 		}
 
 		fExpando->SizeWindow();
@@ -573,7 +573,7 @@ TBarView::ShowingClock() const
 //	#pragma mark - Drag and Drop
 
 void
-TBarView::CacheDragData(const BMessage *incoming)
+TBarView::CacheDragData(const BMessage* incoming)
 {
 	if (!incoming)
 		return;	
@@ -588,13 +588,13 @@ TBarView::CacheDragData(const BMessage *incoming)
 
 
 static void
-init_tracking_hook(BMenuItem *item,
-	bool (*hookFunction)(BMenu *, void *), void *state)
+init_tracking_hook(BMenuItem* item,
+	bool (*hookFunction)(BMenu*, void*), void* state)
 {
 	if (!item)
 		return;
 
-	BMenu *windowMenu = item->Submenu();
+	BMenu* windowMenu = item->Submenu();
 	if (windowMenu) {
 		// have a menu, set the tracking hook
 		windowMenu->SetTrackingHook(hookFunction, state);
@@ -615,7 +615,7 @@ TBarView::DragStart()
 	if (fExpando && fExpando->Frame().Contains(loc)) {
 		ConvertToScreen(&loc);
 		BPoint expandoLocation = fExpando->ConvertFromScreen(loc);		
-		TTeamMenuItem *item = fExpando->TeamItemAtPoint(expandoLocation);
+		TTeamMenuItem* item = fExpando->TeamItemAtPoint(expandoLocation);
 
 		if (fLastDragItem)
 			init_tracking_hook(fLastDragItem, NULL, NULL);
@@ -633,14 +633,14 @@ TBarView::DragStart()
 
 
 bool
-TBarView::MenuTrackingHook(BMenu *menu, void *castToThis)
+TBarView::MenuTrackingHook(BMenu* menu, void* castToThis)
 {
 	// return true if the menu should go away
-	TrackingHookData *data = static_cast<TrackingHookData *>(castToThis);
+	TrackingHookData* data = static_cast<TrackingHookData*>(castToThis);
 	if (!data)
 		return false;
 
-	TBarView *barview = dynamic_cast<TBarView *>(data->fTarget.Target(NULL));
+	TBarView* barview = dynamic_cast<TBarView*>(data->fTarget.Target(NULL));
 	if (!barview || !menu->LockLooper())
 		return false;
 
@@ -660,8 +660,8 @@ TBarView::MenuTrackingHook(BMenu *menu, void *castToThis)
 		// see if the mouse is in the team/be menu item
 		menu->ConvertToScreen(&location);
 		if (barview->LockLooper()) {
-			TExpandoMenuBar *expando = barview->ExpandoMenuBar();
-			TBeMenu *bemenu = (dynamic_cast<TBarWindow*>(barview->Window()))->BeMenu();
+			TExpandoMenuBar* expando = barview->ExpandoMenuBar();
+			TBeMenu* bemenu = (dynamic_cast<TBarWindow*>(barview->Window()))->BeMenu();
 
 			if (bemenu && bemenu->LockLooper()) {
 				bemenu->ConvertFromScreen(&location);
@@ -673,7 +673,7 @@ TBarView::MenuTrackingHook(BMenu *menu, void *castToThis)
 
 			if (endMenu && expando) {
 				expando->ConvertFromScreen(&location);
-				BMenuItem *item = expando->TeamItemAtPoint(location);
+				BMenuItem* item = expando->TeamItemAtPoint(location);
 				if (item) 
 					endMenu = false;
 			}
@@ -688,7 +688,7 @@ TBarView::MenuTrackingHook(BMenu *menu, void *castToThis)
 
 // used by WindowMenu and TeamMenu to
 // set the tracking hook for dragging
-TrackingHookData *
+TrackingHookData*
 TBarView::GetTrackingHookData()
 {
 	// all tracking hook data is
@@ -722,7 +722,7 @@ TBarView::DragStop(bool full)
 
 
 bool
-TBarView::AppCanHandleTypes(const char *signature)
+TBarView::AppCanHandleTypes(const char* signature)
 {
 	// used for filtering apps/teams in the ExpandoMenuBar and TeamMenu
 
@@ -780,7 +780,7 @@ TBarView::DragOverride()
 
 
 status_t
-TBarView::SendDragMessage(const char *signature, entry_ref *ref)
+TBarView::SendDragMessage(const char* signature, entry_ref* ref)
 {
 	status_t err = B_ERROR;
 	if (fDragMessage) {
@@ -807,7 +807,7 @@ TBarView::SendDragMessage(const char *signature, entry_ref *ref)
 
 
 bool
-TBarView::InvokeItem(const char *signature)
+TBarView::InvokeItem(const char* signature)
 {
 	// sent from TeamMenuItem
 	if (Dragging() && AppCanHandleTypes(signature)) {
@@ -822,7 +822,7 @@ TBarView::InvokeItem(const char *signature)
 
 
 void
-TBarView::HandleBeMenu(BMessage *messagewithdestination)
+TBarView::HandleBeMenu(BMessage* messagewithdestination)
 {
 	if (!Dragging())
 		return;
@@ -868,7 +868,7 @@ TBarView::HandleBeMenu(BMessage *messagewithdestination)
 // storing items
 
 status_t
-TBarView::ItemInfo(int32 id, const char **name, DeskbarShelf *shelf)
+TBarView::ItemInfo(int32 id, const char** name, DeskbarShelf* shelf)
 {
 	*shelf = B_DESKBAR_TRAY;
 	return fReplicantTray->ItemInfo(id, name);
@@ -876,7 +876,7 @@ TBarView::ItemInfo(int32 id, const char **name, DeskbarShelf *shelf)
 
 
 status_t
-TBarView::ItemInfo(const char *name, int32 *id, DeskbarShelf *shelf)
+TBarView::ItemInfo(const char* name, int32* id, DeskbarShelf* shelf)
 {
 	*shelf = B_DESKBAR_TRAY;
 	return fReplicantTray->ItemInfo(name, id);
@@ -891,7 +891,7 @@ TBarView::ItemExists(int32 id, DeskbarShelf)
 
 
 bool
-TBarView::ItemExists(const char *name, DeskbarShelf)
+TBarView::ItemExists(const char* name, DeskbarShelf)
 {
 	return fReplicantTray->IconExists(name);
 }
@@ -905,7 +905,7 @@ TBarView::CountItems(DeskbarShelf)
 
 
 status_t
-TBarView::AddItem(BMessage *item, DeskbarShelf, int32 *id)
+TBarView::AddItem(BMessage* item, DeskbarShelf, int32* id)
 {
 	return fReplicantTray->AddIcon(item, id);
 }
@@ -919,7 +919,7 @@ TBarView::RemoveItem(int32 id)
 
 
 void
-TBarView::RemoveItem(const char *name, DeskbarShelf)
+TBarView::RemoveItem(const char* name, DeskbarShelf)
 {
 	fReplicantTray->RemoveIcon(name);
 }
@@ -947,7 +947,7 @@ TBarView::IconFrame(int32 id) const
 
 
 BRect
-TBarView::IconFrame(const char *name) const
+TBarView::IconFrame(const char* name) const
 {
 	return OffsetIconFrame(fReplicantTray->IconFrame(name));
 }

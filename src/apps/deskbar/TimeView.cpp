@@ -54,12 +54,12 @@ All rights reserved.
 #include <string.h>
 
 
-const char *kShortDateFormat = "%m/%d/%y";
-const char *kShortEuroDateFormat = "%d/%m/%y";
-const char *kLongDateFormat = "%a, %B %d, %Y";
-const char *kLongEuroDateFormat = "%a, %d %B, %Y";
+const char* kShortDateFormat = "%m/%d/%y";
+const char* kShortEuroDateFormat = "%d/%m/%y";
+const char* kLongDateFormat = "%a, %B %d, %Y";
+const char* kLongEuroDateFormat = "%a, %d %B, %Y";
 
-static const char * const kMinString = "99:99 AM";
+static const char*  const kMinString = "99:99 AM";
 static const float kHMargin = 2.0;
 
 
@@ -98,7 +98,7 @@ TTimeView::TTimeView(float maxWidth, float height, bool showSeconds, bool milTim
 
 
 #ifdef AS_REPLICANT
-TTimeView::TTimeView(BMessage *data)
+TTimeView::TTimeView(BMessage* data)
 	: BView(data)
 {
 	fTime = fLastTime = time(NULL);
@@ -120,7 +120,7 @@ TTimeView::~TTimeView()
 
 #ifdef AS_REPLICANT
 BArchivable*
-TTimeView::Instantiate(BMessage *data)
+TTimeView::Instantiate(BMessage* data)
 {
 	if (!validate_instantiation(data, "TTimeView"))
 		return NULL;
@@ -130,7 +130,7 @@ TTimeView::Instantiate(BMessage *data)
 
 
 status_t
-TTimeView::Archive(BMessage *data, bool deep) const
+TTimeView::Archive(BMessage* data, bool deep) const
 {
 	BView::Archive(data, deep);
 	data->AddBool("seconds", fShowSeconds);
@@ -163,7 +163,7 @@ TTimeView::AttachedToWindow()
 
 
 void
-TTimeView::GetPreferredSize(float *width, float *height)
+TTimeView::GetPreferredSize(float* width, float* height)
 {
 	*height = fHeight;
 
@@ -267,7 +267,7 @@ TTimeView::ShowCalendar(BPoint where)
 
 #ifdef _SHOW_CALENDAR_MENU_ITEM
 
-	BPopUpMenu *menu = new BPopUpMenu("", false, false);
+	BPopUpMenu* menu = new BPopUpMenu("", false, false);
 	menu->SetFont(be_plain_font);
 
 	menu->AddItem(new CalendarMenuItem());
@@ -398,7 +398,7 @@ TTimeView::MouseDown(BPoint point)
 {
 	uint32 buttons;
 
-	Window()->CurrentMessage()->FindInt32("buttons", (int32 *)&buttons);
+	Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 	if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 		ShowClockOptions(ConvertToScreen(point));
 		return;
@@ -570,9 +570,9 @@ TTimeView::CalculateTextPlacement()
 void
 TTimeView::ShowClockOptions(BPoint point)
 {
-	BPopUpMenu *menu = new BPopUpMenu("", false, false);
+	BPopUpMenu* menu = new BPopUpMenu("", false, false);
 	menu->SetFont(be_plain_font);
-	BMenuItem *item;
+	BMenuItem* item;
 
 	item = new BMenuItem("Change Time" B_UTF8_ELLIPSIS, new BMessage(kMsgChangeClock));
 	menu->AddItem(item);

@@ -15,7 +15,7 @@ class CalendarMenuItem : public BMenuItem {
 		~CalendarMenuItem();
 
 		virtual void DrawContent();
-		virtual void GetContentSize(float *_width, float *_height);
+		virtual void GetContentSize(float* _width, float* _height);
 
 	private:
 		float	fTitleHeight, fRowHeight, fColumnWidth, fFontHeight;

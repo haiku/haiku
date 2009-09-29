@@ -545,7 +545,7 @@ TSwitchManager::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case msg_AddTeam:
+		case kAddTeam:
 		{
 			const char* signature = message->FindString("sig");
 			team_id team = message->FindInt32("team");
@@ -562,7 +562,7 @@ TSwitchManager::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case msg_RemoveTeam:
+		case kRemoveTeam:
 		{
 			team_id team = message->FindInt32("team");
 

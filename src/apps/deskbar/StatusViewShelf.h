@@ -43,15 +43,15 @@ All rights reserved.
 class TReplicantTray;
 class TReplicantShelf : public BShelf {
 public:
-						TReplicantShelf(TReplicantTray *view);
+						TReplicantShelf(TReplicantTray* view);
 						~TReplicantShelf();
 						
 		void			MessageReceived(BMessage*);
 		
 protected:
-		bool 			CanAcceptReplicantView(BRect, BView *, BMessage *) const;
-		BPoint 			AdjustReplicantBy(BRect, BMessage *) const;
-		void 			ReplicantDeleted(int32, const BMessage *, const BView *);
+		bool 			CanAcceptReplicantView(BRect, BView*, BMessage*) const;
+		BPoint 			AdjustReplicantBy(BRect, BMessage*) const;
+		void 			ReplicantDeleted(int32, const BMessage*, const BView*);
 
 private:
 		TReplicantTray* 	fParent;

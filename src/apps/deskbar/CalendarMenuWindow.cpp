@@ -100,7 +100,7 @@ CalendarMenuWindow::CalendarMenuWindow(BPoint where, bool euroDate)
 	fCalendarView->SetInvocationMessage(new BMessage(kInvokationMessage));
 	fCalendarView->SetFontSize(10.0);
 
-	BGroupLayout *layout = new BGroupLayout(B_HORIZONTAL);
+	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL);
 	SetLayout(layout);
 
 	float width, height;

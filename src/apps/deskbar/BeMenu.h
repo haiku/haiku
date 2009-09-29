@@ -50,8 +50,8 @@ enum recent_type {
 
 class TRecentsMenu : public BNavMenu {
 	public:
-		TRecentsMenu(const char *name, TBarView *bar, int32 which,
-			const char *signature = NULL, entry_ref *appRef = NULL);
+		TRecentsMenu(const char* name, TBarView* bar, int32 which,
+			const char* signature = NULL, entry_ref* appRef = NULL);
 		virtual ~TRecentsMenu();
 
 		void			DetachedFromWindow();
@@ -88,7 +88,7 @@ TRecentsMenu::RecentsCount()
 
 class TBeMenu : public BNavMenu {
 	public:
-		TBeMenu(TBarView *bar);
+		TBeMenu(TBarView* bar);
 
 		void			AttachedToWindow();
 		void			DetachedFromWindow();

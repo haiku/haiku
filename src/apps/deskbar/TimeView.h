@@ -52,17 +52,17 @@ class TTimeView : public BView {
 	public:
 		TTimeView(float maxWidth, float height, bool showSeconds = false, bool milTime = false, bool fullDate = false,
 			bool euroDate = false, bool showInterval = false);
-		TTimeView(BMessage *data);
+		TTimeView(BMessage* data);
 		~TTimeView();
 
 #ifdef AS_REPLICANT
-		status_t Archive(BMessage *data, bool deep = true) const;
-		static BArchivable *Instantiate(BMessage *data);
+		status_t Archive(BMessage* data, bool deep = true) const;
+		static BArchivable* Instantiate(BMessage* data);
 #endif
 
 		void		AttachedToWindow();
 		void		Draw(BRect update);
-		void		GetPreferredSize(float *width, float *height);
+		void		GetPreferredSize(float* width, float* height);
 		void		ResizeToPreferred();
 		void		FrameMoved(BPoint);
 		void		MessageReceived(BMessage*);

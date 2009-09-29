@@ -50,12 +50,12 @@ class TBarWindow : public BWindow {
 		virtual	bool	QuitRequested();
 		virtual void	WorkspaceActivated(int32 ws, bool activate);
 		virtual void	ScreenChanged(BRect size, color_space depth);
-		virtual void	DispatchMessage(BMessage *message, BHandler *handler);
-		virtual void	MessageReceived(BMessage *m);
+		virtual void	DispatchMessage(BMessage* message, BHandler* handler);
+		virtual void	MessageReceived(BMessage* m);
 
 		void			SaveSettings();
 		TBarView*		BarView() const { return fBarView; };
-		static 	void	SetBeMenu(TBeMenu *menu);
+		static 	void	SetBeMenu(TBeMenu* menu);
 		TBeMenu*		BeMenu();
 
 		void			ShowBeMenu();

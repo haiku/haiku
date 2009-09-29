@@ -48,7 +48,7 @@ const float kHPad = 10.0f;
 const float kVPad = 2.0f;
 
 
-TShowHideMenuItem::TShowHideMenuItem(const char *title, const BList *teams, uint32 action)
+TShowHideMenuItem::TShowHideMenuItem(const char* title, const BList* teams, uint32 action)
 	:	BMenuItem(title, NULL),
 	fTeams(teams),
 	fAction(action)
@@ -63,7 +63,7 @@ TShowHideMenuItem::TShowHideMenuItem(const char *title, const BList *teams, uint
 
 
 void
-TShowHideMenuItem::GetContentSize(float *width, float *height)
+TShowHideMenuItem::GetContentSize(float* width, float* height)
 {
 	*width = kHPad + fTitleWidth + kHPad;
 	*height = fTitleAscent + fTitleDescent;
@@ -85,11 +85,11 @@ TShowHideMenuItem::DrawContent()
 
 
 status_t
-TShowHideMenuItem::Invoke(BMessage *)
+TShowHideMenuItem::Invoke(BMessage*)
 {
 	bool doZoom = false;
 	BRect zoomRect(0, 0, 0, 0);
-	BMenuItem *item = Menu()->Superitem();
+	BMenuItem* item = Menu()->Superitem();
 
 	if (item->Menu()->Window() != NULL) { 
 		zoomRect = item->Menu()->ConvertToScreen(item->Frame());
@@ -100,7 +100,7 @@ TShowHideMenuItem::Invoke(BMessage *)
 
 
 status_t 
-TShowHideMenuItem::TeamShowHideCommon(int32 action, const BList *teamList, 
+TShowHideMenuItem::TeamShowHideCommon(int32 action, const BList* teamList, 
 	BRect zoomRect, bool doZoom)
 {
 	if (teamList == NULL)
@@ -121,7 +121,7 @@ TShowHideMenuItem::TeamShowHideCommon(int32 action, const BList *teamList,
 
 			case B_QUIT_REQUESTED:
 				{
-					BMessenger messenger((char *)NULL, team);
+					BMessenger messenger((char*)NULL, team);
 					uint32 command = B_QUIT_REQUESTED;
 					app_info aInfo;
 					be_roster->GetRunningAppInfo(team, &aInfo);

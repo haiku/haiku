@@ -50,14 +50,14 @@ All rights reserved.
 #include "TeamMenu.h"
 
 
-TBarMenuBar::TBarMenuBar(TBarView *bar, BRect frame, const char *name)
+TBarMenuBar::TBarMenuBar(TBarView* bar, BRect frame, const char* name)
 	: BMenuBar(frame, name, B_FOLLOW_NONE, B_ITEMS_IN_ROW, false),
 	fBarView(bar),
 	fAppListMenuItem(NULL)
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 
-	TBeMenu *beMenu = new TBeMenu(bar);
+	TBeMenu* beMenu = new TBeMenu(bar);
 	TBarWindow::SetBeMenu(beMenu);
 
 	fBeMenuItem = new TBarMenuTitle(frame.Width(), frame.Height(),
@@ -116,7 +116,7 @@ TBarMenuBar::RemoveTeamMenu()
 		return;
 
 	if (fAppListMenuItem) {
-		RemoveItem((BMenuItem *)fAppListMenuItem);
+		RemoveItem((BMenuItem*)fAppListMenuItem);
 		delete fAppListMenuItem;
 		fAppListMenuItem = NULL;
 	}
@@ -142,7 +142,7 @@ TBarMenuBar::DrawBackground(BRect rect)
 
 
 void
-TBarMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage *message)
+TBarMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 {
 	// the following code parallels that in ExpandoMenuBar for DnD tracking
 
@@ -161,7 +161,7 @@ TBarMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 			GetMouse(&loc, &buttons);
 			// attempt to start DnD tracking
 			if (message && buttons != 0) {
-				fBarView->CacheDragData(const_cast<BMessage *>(message));
+				fBarView->CacheDragData(const_cast<BMessage*>(message));
 				MouseDown(loc);
 			}
 			break;
@@ -172,13 +172,13 @@ TBarMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 
 
 static void
-init_tracking_hook(BMenuItem *item, bool (*hookFunction)(BMenu *, void *),
-	void *state)
+init_tracking_hook(BMenuItem* item, bool (*hookFunction)(BMenu*, void*),
+	void* state)
 {
 	if (!item)
 		return;
 
-	BMenu *windowMenu = item->Submenu();
+	BMenu* windowMenu = item->Submenu();
 	if (windowMenu) 
 		//	have a menu, set the tracking hook
 		windowMenu->SetTrackingHook(hookFunction, state);					
@@ -186,8 +186,8 @@ init_tracking_hook(BMenuItem *item, bool (*hookFunction)(BMenu *, void *),
 
 
 void
-TBarMenuBar::InitTrackingHook(bool (*hookFunction)(BMenu *, void *),
-	void *state, bool both)
+TBarMenuBar::InitTrackingHook(bool (*hookFunction)(BMenu*, void*),
+	void* state, bool both)
 {
 	BPoint loc;
 	uint32 buttons;

@@ -51,34 +51,34 @@ All rights reserved.
 
 class BarTeamInfo {
 public:
-	BarTeamInfo(BList *teams, uint32 flags, char *sig, BBitmap *icon,
-				char *name);
+	BarTeamInfo(BList* teams, uint32 flags, char* sig, BBitmap* icon,
+				char* name);
 	BarTeamInfo(const BarTeamInfo &info);
 	~BarTeamInfo();
 
-	BList *teams;
+	BList* teams;
 	uint32 flags;
-	char *sig;
-	BBitmap *icon;
-	char *name;
+	char* sig;
+	BBitmap* icon;
+	char* name;
 };
 
-const uint32 msg_Win95 = 'Bill';
-const uint32 msg_Amiga = 'Ncro';
-const uint32 msg_Mac = 'WcOS';
-const uint32 msg_Be = 'Tabs';
-const uint32 msg_AlwaysTop = 'TTop';
-const uint32 msg_ToggleDraggers = 'TDra';
-const uint32 msg_Unsubscribe = 'Unsb';
-const uint32 msg_AddTeam = 'AdTm';
-const uint32 msg_RemoveTeam = 'RmTm';
-const uint32 msg_Restart = 'Rtrt';
-const uint32 msg_ShutDown = 'ShDn';
-const uint32 msg_trackerFirst = 'TkFt';
-const uint32 msg_sortRunningApps = 'SAps';
-const uint32 msg_superExpando = 'SprE';
-const uint32 msg_expandNewTeams = 'ExTm';
-const uint32 msg_AutoRaise = 'AtRs';
+const uint32 kWin95 = 'Bill';
+const uint32 kAmiga = 'Ncro';
+const uint32 kMac = 'WcOS';
+const uint32 kBe = 'Tabs';
+const uint32 kAlwaysTop = 'TTop';
+const uint32 kToggleDraggers = 'TDra';
+const uint32 kUnsubscribe = 'Unsb';
+const uint32 kAddTeam = 'AdTm';
+const uint32 kRemoveTeam = 'RmTm';
+const uint32 kRestart = 'Rtrt';
+const uint32 kShutDown = 'ShDn';
+const uint32 kTrackerFirst = 'TkFt';
+const uint32 kSortRunningApps = 'SAps';
+const uint32 kSuperExpando = 'SprE';
+const uint32 kExpandNewTeams = 'ExTm';
+const uint32 kAutoRaise = 'AtRs';
 
 // from roster_private.h
 const uint32 CMD_SHUTDOWN_SYSTEM = 301;
@@ -139,17 +139,17 @@ class TBarApp : public BApplication {
 		virtual ~TBarApp();
 
 		virtual	bool QuitRequested();
-		virtual void MessageReceived(BMessage *message);
-		virtual void RefsReceived(BMessage *refs);
+		virtual void MessageReceived(BMessage* message);
+		virtual void RefsReceived(BMessage* refs);
 
-		desk_settings *Settings()
+		desk_settings* Settings()
 			{ return &fSettings; }
-		TBarView *BarView() const
+		TBarView* BarView() const
 			{ return fBarWindow->BarView(); }
-		TBarWindow *BarWindow() const
+		TBarWindow* BarWindow() const
 			{ return fBarWindow; }
 
-		static void Subscribe(const BMessenger &subscriber, BList *);
+		static void Subscribe(const BMessenger &subscriber, BList*);
 		static void Unsubscribe(const BMessenger &subscriber);
 
 	private:
@@ -161,10 +161,10 @@ class TBarApp : public BApplication {
 
 		void ShowPreferencesWindow();
 
-		TBarWindow *fBarWindow;
+		TBarWindow* fBarWindow;
 		BMessenger fSwitcherMessenger;
 		BMessenger fStatusViewMessenger;
-		BFile *fSettingsFile;
+		BFile* fSettingsFile;
 		desk_settings fSettings;
 
 		PreferencesWindow* fPreferencesWindow;

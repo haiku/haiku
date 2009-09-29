@@ -45,7 +45,7 @@ All rights reserved.
 
 class TWindowMenu : public BMenu {
 	public:
-		TWindowMenu(const BList *team, const char *signature);
+		TWindowMenu(const BList* team, const char* signature);
 
 		virtual void	AttachedToWindow();
 		virtual void	DetachedFromWindow();

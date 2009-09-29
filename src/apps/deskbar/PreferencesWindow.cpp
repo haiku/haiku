@@ -43,13 +43,13 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		new BMessage(kUpdateRecentCounts));
 
 	fAppsSort = new BCheckBox("Sort Running Applications",
-		new BMessage(msg_sortRunningApps));
+		new BMessage(kSortRunningApps));
 	fAppsSortTrackerFirst = new BCheckBox("Tracker Always First",
-		new BMessage(msg_trackerFirst));
+		new BMessage(kTrackerFirst));
 	fAppsShowExpanders = new BCheckBox("Show Application Expander",
-		new BMessage(msg_superExpando));
+		new BMessage(kSuperExpando));
 	fAppsExpandNew = new BCheckBox("Expand New Applications",
-		new BMessage(msg_expandNewTeams));
+		new BMessage(kExpandNewTeams));
 
 	fClock24Hours = new BCheckBox("24 Hour Clock", new BMessage(kMsgMilTime));
 	fClockSeconds = new BCheckBox("Show Seconds",
@@ -59,8 +59,8 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fClockFullDate = new BCheckBox("Full Date", new BMessage(kMsgFullDate));
 
 	fWindowAlwaysOnTop = new BCheckBox("Always On Top",
-		new BMessage(msg_AlwaysTop));
-	fWindowAutoRaise = new BCheckBox("Auto-raise", new BMessage(msg_AutoRaise));
+		new BMessage(kAlwaysTop));
+	fWindowAutoRaise = new BCheckBox("Auto-raise", new BMessage(kAutoRaise));
 
 	BTextView* docTextView = fMenuRecentDocumentCount->TextView();
 	BTextView* appTextView = fMenuRecentApplicationCount->TextView();
@@ -272,7 +272,7 @@ PreferencesWindow::MessageReceived(BMessage* message)
 			_UpdateRecentCounts();
 			break;
 
-		case msg_superExpando:
+		case kSuperExpando:
 			_EnableDisableDependentItems();
 			be_app->PostMessage(message);
 			break;

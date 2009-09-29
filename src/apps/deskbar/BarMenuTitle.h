@@ -57,7 +57,7 @@ public:
 		
 protected:
 	void DrawContent();
-	void GetContentSize(float *width, float *height);
+	void GetContentSize(float* width, float* height);
 
 private:
 	float fWidth;

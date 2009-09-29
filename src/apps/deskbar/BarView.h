@@ -95,60 +95,60 @@ class TBarView : public BView {
 		void ShowClock(bool);
 		bool ShowingClock() const;
 
-		void CacheDragData(const BMessage *incoming);
+		void CacheDragData(const BMessage* incoming);
 		status_t DragStart();
-		static bool MenuTrackingHook(BMenu *menu, void *castToThis);
+		static bool MenuTrackingHook(BMenu* menu, void* castToThis);
 		void DragStop(bool full=false);
-		TrackingHookData *GetTrackingHookData();
+		TrackingHookData* GetTrackingHookData();
 		bool Dragging() const;
-		const BMessage *DragMessage() const;
-		BObjectList<BString> *CachedTypesList() const;
-		bool AppCanHandleTypes(const char *signature);
+		const BMessage* DragMessage() const;
+		BObjectList<BString>*CachedTypesList() const;
+		bool AppCanHandleTypes(const char* signature);
 		void SetDragOverride(bool);
 		bool DragOverride();
-		bool InvokeItem(const char *signature);
+		bool InvokeItem(const char* signature);
 
-		void HandleBeMenu(BMessage *targetmessage);
+		void HandleBeMenu(BMessage* targetmessage);
 
-		status_t ItemInfo(int32 id, const char **name, DeskbarShelf *shelf);
-		status_t ItemInfo(const char *name, int32 *id, DeskbarShelf *shelf);
+		status_t ItemInfo(int32 id, const char** name, DeskbarShelf* shelf);
+		status_t ItemInfo(const char* name, int32* id, DeskbarShelf* shelf);
 
 		bool ItemExists(int32 id, DeskbarShelf shelf);
-		bool ItemExists(const char *name, DeskbarShelf shelf);
+		bool ItemExists(const char* name, DeskbarShelf shelf);
 
 		int32 CountItems(DeskbarShelf shelf);
 
-		status_t AddItem(BMessage *, DeskbarShelf shelf, int32 *id);
+		status_t AddItem(BMessage* , DeskbarShelf shelf, int32* id);
 
 		void RemoveItem(int32 id);
-		void RemoveItem(const char *name, DeskbarShelf shelf);
+		void RemoveItem(const char* name, DeskbarShelf shelf);
 
 		BRect OffsetIconFrame(BRect rect) const;
 		BRect IconFrame(int32 id) const;
-		BRect IconFrame(const char *name) const;
+		BRect IconFrame(const char* name) const;
 
-		void GetPreferredWindowSize(BRect screenFrame, float *width, float *height);
+		void GetPreferredWindowSize(BRect screenFrame, float* width, float* height);
 		void SizeWindow(BRect screenFrame);
 		void PositionWindow(BRect screenFrame);
 
-		TExpandoMenuBar *ExpandoMenuBar() const;
-		TBarMenuBar *BarMenuBar() const;
+		TExpandoMenuBar* ExpandoMenuBar() const;
+		TBarMenuBar* BarMenuBar() const;
 		friend class TBeMenu;
 		friend class PreferencesWindow;
 
 	private:
-		status_t SendDragMessage(const char *signature, entry_ref *ref = NULL);
+		status_t SendDragMessage(const char* signature, entry_ref* ref = NULL);
 
 		void PlaceBeMenu();
 		void PlaceTray(bool vertSwap, bool leftSwap, BRect screenFrame);
 		void PlaceApplicationBar(BRect screenFrame);
 
-		TBarMenuBar *fBarMenuBar;
-		TExpandoMenuBar *fExpando;
+		TBarMenuBar* fBarMenuBar;
+		TExpandoMenuBar* fExpando;
 
 		int32 fTrayLocation;
-		TDragRegion *fDragRegion;
-		TReplicantTray *fReplicantTray;
+		TDragRegion* fDragRegion;
+		TReplicantTray* fReplicantTray;
 
 		bool fShowInterval : 1;
 		bool fShowClock : 1;
@@ -160,25 +160,25 @@ class TBarView : public BView {
 
 		bigtime_t fPulseRate;
 		bool fRefsRcvdOnly;
-		BMessage *fDragMessage;
-		BObjectList<BString> *fCachedTypesList;
+		BMessage* fDragMessage;
+		BObjectList<BString>*fCachedTypesList;
 		TrackingHookData fTrackingHookData;
 
 		uint32 fMaxRecentDocs;
 		uint32 fMaxRecentApps;
 
-		TTeamMenuItem *fLastDragItem;
+		TTeamMenuItem* fLastDragItem;
 };
 
 
-inline TExpandoMenuBar *
+inline TExpandoMenuBar*
 TBarView::ExpandoMenuBar() const
 {
 	return fExpando;
 }
 
 
-inline TBarMenuBar *
+inline TBarMenuBar*
 TBarView::BarMenuBar() const
 {
 	return fBarMenuBar;
@@ -192,14 +192,14 @@ TBarView::Dragging() const
 }
 
 
-inline const BMessage *
+inline const BMessage*
 TBarView::DragMessage() const
 {
 	return fDragMessage;
 }
 
 
-inline BObjectList<BString> *
+inline BObjectList<BString>*
 TBarView::CachedTypesList() const
 {
 	return fCachedTypesList;

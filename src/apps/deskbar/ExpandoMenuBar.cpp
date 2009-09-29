@@ -70,7 +70,7 @@ thread_id TExpandoMenuBar::sMonThread = B_ERROR;
 BLocker TExpandoMenuBar::sMonLocker("expando monitor");
 
 
-TExpandoMenuBar::TExpandoMenuBar(TBarView *bar, BRect frame, const char *name,
+TExpandoMenuBar::TExpandoMenuBar(TBarView* bar, BRect frame, const char* name,
 	bool vertical, bool drawLabel)
 	: BMenuBar(frame, name, B_FOLLOW_NONE,
 			vertical ? B_ITEMS_IN_COLUMN : B_ITEMS_IN_ROW, vertical),
@@ -78,8 +78,8 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView *bar, BRect frame, const char *name,
 	fOverflow(false),
 	fDrawLabel(drawLabel),
 	fIsScrolling(false),
-	fShowTeamExpander(static_cast<TBarApp *>(be_app)->Settings()->superExpando),
-	fExpandNewTeams(static_cast<TBarApp *>(be_app)->Settings()->expandNewTeams),
+	fShowTeamExpander(static_cast<TBarApp*>(be_app)->Settings()->superExpando),
+	fExpandNewTeams(static_cast<TBarApp*>(be_app)->Settings()->expandNewTeams),
 	fBeMenuWidth(kDefaultBeMenuWidth),
 	fBarView(bar),
 	fFirstApp(0),
@@ -97,10 +97,10 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView *bar, BRect frame, const char *name,
 
 
 int
-TExpandoMenuBar::CompareByName(const void *first, const void *second)
+TExpandoMenuBar::CompareByName(const void* first, const void* second)
 {
-	return strcasecmp((*(static_cast<BarTeamInfo * const*>(first)))->name,
-		(*(static_cast<BarTeamInfo * const*>(second)))->name);
+	return strcasecmp((*(static_cast<BarTeamInfo* const*>(first)))->name,
+		(*(static_cast<BarTeamInfo* const*>(second)))->name);
 }
 
 
@@ -115,7 +115,7 @@ TExpandoMenuBar::AttachedToWindow()
 
 	// top or bottom mode, add be menu and sep for menubar tracking consistency
 	if (!fVertical) {
-		TBeMenu *beMenu = new TBeMenu(fBarView);
+		TBeMenu* beMenu = new TBeMenu(fBarView);
 		TBarWindow::SetBeMenu(beMenu);
 		const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
 			R_BeLogoIcon);
@@ -134,14 +134,14 @@ TExpandoMenuBar::AttachedToWindow()
 		fSeparatorItem = NULL;
 	}
 
-	desk_settings *settings = ((TBarApp *)be_app)->Settings();
+	desk_settings* settings = ((TBarApp*)be_app)->Settings();
 
 	if (settings->sortRunningApps)
 		teamList.SortItems(CompareByName);
 
 	int32 count = teamList.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		BarTeamInfo *barInfo = (BarTeamInfo *)teamList.ItemAt(i);
+		BarTeamInfo* barInfo = (BarTeamInfo*)teamList.ItemAt(i);
 		if ((barInfo->flags & B_BACKGROUND_APP) == 0
 			&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
 			if (settings->trackerAlwaysFirst
@@ -196,7 +196,7 @@ TExpandoMenuBar::DetachedFromWindow()
 	}
 
 	BMessenger self(this);
-	BMessage message(msg_Unsubscribe);
+	BMessage message(kUnsubscribe);
 	message.AddMessenger("messenger", self);
 	be_app->PostMessage(&message);
 
@@ -205,20 +205,20 @@ TExpandoMenuBar::DetachedFromWindow()
 
 
 void
-TExpandoMenuBar::MessageReceived(BMessage *message)
+TExpandoMenuBar::MessageReceived(BMessage* message)
 {
 	int32 index;
-	TTeamMenuItem *item;
+	TTeamMenuItem* item;
 
 	switch (message->what) {
 		case B_SOME_APP_LAUNCHED: {
-			BList *teams = NULL;
-			message->FindPointer("teams", (void **)&teams);
+			BList* teams = NULL;
+			message->FindPointer("teams", (void**)&teams);
 
-			BBitmap *icon = NULL;
-			message->FindPointer("icon", (void **)&icon);
+			BBitmap* icon = NULL;
+			message->FindPointer("icon", (void**)&icon);
 
-			const char *signature;
+			const char* signature;
 			if (message->FindString("sig", &signature) == B_OK
 				&&strcasecmp(signature, kDeskbarSignature) == 0) {
 				delete teams;
@@ -234,18 +234,18 @@ TExpandoMenuBar::MessageReceived(BMessage *message)
 				break;
 			}
 
-			const char *name = NULL;
+			const char* name = NULL;
 			message->FindString("name", &name);
 
 			AddTeam(teams, icon, strdup(name), strdup(signature));
 			break;
 		}
 
-		case msg_AddTeam:
+		case kAddTeam:
 			AddTeam(message->FindInt32("team"), message->FindString("sig"));
 			break;
 
-		case msg_RemoveTeam:
+		case kRemoveTeam:
 		{
 			team_id team = -1;
 			message->FindInt32("team", &team);
@@ -266,7 +266,7 @@ TExpandoMenuBar::MessageReceived(BMessage *message)
 		case M_MINIMIZE_TEAM:
 		{
 			index = message->FindInt32("itemIndex");
-			item = dynamic_cast<TTeamMenuItem *>(ItemAt(index));
+			item = dynamic_cast<TTeamMenuItem*>(ItemAt(index));
 			if (item == NULL)
 				break;
 
@@ -280,7 +280,7 @@ TExpandoMenuBar::MessageReceived(BMessage *message)
 		case M_BRING_TEAM_TO_FRONT:
 		{
 			index = message->FindInt32("itemIndex");
-			item = dynamic_cast<TTeamMenuItem *>(ItemAt(index));
+			item = dynamic_cast<TTeamMenuItem*>(ItemAt(index));
 			if (item == NULL)
 				break;
 
@@ -300,7 +300,7 @@ TExpandoMenuBar::MessageReceived(BMessage *message)
 void
 TExpandoMenuBar::MouseDown(BPoint where)
 {
-	BMessage *message = Window()->CurrentMessage();
+	BMessage* message = Window()->CurrentMessage();
 
 	// check for three finger salute, a.k.a. Vulcan Death Grip
 	if (message != NULL) {
@@ -311,7 +311,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 			&& (modifiers & B_OPTION_KEY) != 0
 			&& (modifiers & B_SHIFT_KEY) != 0
 			&& !fBarView->Dragging()) {
-			TTeamMenuItem *item = TeamItemAtPoint(where);
+			TTeamMenuItem* item = TeamItemAtPoint(where);
 
 			if (item != NULL) {
 				const BList	*teams = item->Teams();
@@ -336,7 +336,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 #ifdef DOUBLECLICKBRINGSTOFRONT
 	// doubleclick on an item brings all to front
 	for (int32 i = fFirstApp; i < count; i++) {
-		TTeamMenuItem *item = (TTeamMenuItem *)ItemAt(i);
+		TTeamMenuItem* item = (TTeamMenuItem*)ItemAt(i);
 		if (item->Frame().Contains(where)) {
 			bigtime_t clickSpeed = 0;
 			get_click_speed(&clickSpeed);
@@ -362,7 +362,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 		message->FindInt32("modifiers", &modifiers);
 		if ((modifiers & B_CONTROL_KEY) != 0
 			&& ! fBarView->Dragging()) {
-			TTeamMenuItem *item = TeamItemAtPoint(where);
+			TTeamMenuItem* item = TeamItemAtPoint(where);
 			if (item != NULL) {
 				// show/hide item's teams
 				BMessage showMessage((modifiers & B_SHIFT_KEY) != 0
@@ -376,7 +376,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 
 	// Check the bounds of the expand Team icon
 	if (fShowTeamExpander && fVertical && !fBarView->Dragging()) {
-		TTeamMenuItem *item = TeamItemAtPoint(where);
+		TTeamMenuItem* item = TeamItemAtPoint(where);
 		if (item != NULL) {
 			BRect expanderRect = item->ExpanderBounds();
 			if (expanderRect.Contains(where)) {
@@ -398,7 +398,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 
 
 void
-TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage *message)
+TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 {
 	if (!message) {
 		// force a cleanup
@@ -474,9 +474,9 @@ TExpandoMenuBar::InBeMenu(BPoint loc) const
 		if (fBeMenuItem && fBeMenuItem->Frame().Contains(loc))
 			return true;
 	} else {
-		TBarWindow *window = dynamic_cast<TBarWindow*>(Window());
+		TBarWindow* window = dynamic_cast<TBarWindow*>(Window());
 		if (window) {
-			if (TBeMenu *bemenu = window->BeMenu()) {
+			if (TBeMenu* bemenu = window->BeMenu()) {
 				bool inBeMenu = false;
 				if (bemenu->LockLooper()) {
 					inBeMenu = bemenu->Frame().Contains(loc);
@@ -497,17 +497,17 @@ TExpandoMenuBar::InBeMenu(BPoint loc) const
  *	that point (which might be a window item when the expander is on).
  */
 
-TTeamMenuItem *
-TExpandoMenuBar::TeamItemAtPoint(BPoint point, BMenuItem **_item)
+TTeamMenuItem*
+TExpandoMenuBar::TeamItemAtPoint(BPoint point, BMenuItem** _item)
 {
-	TTeamMenuItem *lastApp = NULL;
+	TTeamMenuItem* lastApp = NULL;
 	int32 count = CountItems();
 
 	for (int32 i = fFirstApp; i < count; i++) {
-		BMenuItem *item = ItemAt(i);
+		BMenuItem* item = ItemAt(i);
 
-		if (dynamic_cast<TTeamMenuItem *>(item) != NULL)
-			lastApp = (TTeamMenuItem *)item;
+		if (dynamic_cast<TTeamMenuItem*>(item) != NULL)
+			lastApp = (TTeamMenuItem*)item;
 
 		if (item && item->Frame().Contains(point)) {
 			if (_item != NULL)
@@ -527,19 +527,21 @@ TExpandoMenuBar::TeamItemAtPoint(BPoint point, BMenuItem **_item)
 
 
 void
-TExpandoMenuBar::AddTeam(BList *team, BBitmap *icon, char *name, char *signature)
+TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
+	char* signature)
 {
 	float itemWidth = fVertical ? fBarView->Bounds().Width() : sMinimumWindowWidth;
 	float itemHeight = -1.0f;
 
-	desk_settings *settings = ((TBarApp *)be_app)->Settings();
-	TTeamMenuItem *item = new TTeamMenuItem(team, icon, name, signature, itemWidth,
-		itemHeight, fDrawLabel, fVertical);
+	desk_settings* settings = ((TBarApp*)be_app)->Settings();
+	TTeamMenuItem* item = new TTeamMenuItem(team, icon, name, signature,
+		itemWidth, itemHeight, fDrawLabel, fVertical);
 
 	if (settings->trackerAlwaysFirst && !strcmp(signature, kTrackerSignature)) {
 		AddItem(item, fFirstApp);
 	} else if (settings->sortRunningApps) {
-		TTeamMenuItem *teamItem = dynamic_cast<TTeamMenuItem *>(ItemAt(fFirstApp));
+		TTeamMenuItem* teamItem =
+			dynamic_cast<TTeamMenuItem*>(ItemAt(fFirstApp));
 		int32 firstApp = fFirstApp;
 
 		// if Tracker should always be the first item, we need to skip it
@@ -551,7 +553,7 @@ TExpandoMenuBar::AddTeam(BList *team, BBitmap *icon, char *name, char *signature
 
 		int32 count = CountItems(), i;
 		for (i = firstApp; i < count; i++) {
-			teamItem = dynamic_cast<TTeamMenuItem *>(ItemAt(i));
+			teamItem = dynamic_cast<TTeamMenuItem*>(ItemAt(i));
 			if (teamItem != NULL && strcasecmp(teamItem->Name(), name) > 0) {
 				AddItem(item, i);
 				break;
@@ -576,15 +578,15 @@ TExpandoMenuBar::AddTeam(BList *team, BBitmap *icon, char *name, char *signature
 
 
 void
-TExpandoMenuBar::AddTeam(team_id team, const char *signature)
+TExpandoMenuBar::AddTeam(team_id team, const char* signature)
 {
 	int32 count = CountItems();
 	for (int32 i = fFirstApp; i < count; i++) {
 		// Only add to team menu items
-		if (TTeamMenuItem *item = dynamic_cast<TTeamMenuItem *>(ItemAt(i))) {
+		if (TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i))) {
 			if (strcasecmp(item->Signature(), signature) == 0) {
-				if (!(item->Teams()->HasItem((void *)team)))
-					item->Teams()->AddItem((void *)team);
+				if (!(item->Teams()->HasItem((void*)team)))
+					item->Teams()->AddItem((void*)team);
 
 				break;
 			}
@@ -598,8 +600,8 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 {
 	int32 count = CountItems();
 	for (int32 i = fFirstApp; i < count; i++) {
-		if (TTeamMenuItem *item = dynamic_cast<TTeamMenuItem *>(ItemAt(i))) {
-			if (item->Teams()->HasItem((void *)team)) {
+		if (TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i))) {
+			if (item->Teams()->HasItem((void*)team)) {
 				item->Teams()->RemoveItem(team);
 
 				if (partial)
@@ -670,7 +672,7 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 		InvalidateLayout();
 
 		for (int32 index = fFirstApp; ; index++) {
-			TTeamMenuItem *item = (TTeamMenuItem *)ItemAt(index);
+			TTeamMenuItem* item = (TTeamMenuItem*)ItemAt(index);
 			if (!item)
 				break;
 			item->SetOverrideWidth(newWidth);
@@ -759,9 +761,9 @@ TExpandoMenuBar::SizeWindow()
 
 
 int32
-TExpandoMenuBar::monitor_team_windows(void *arg)
+TExpandoMenuBar::monitor_team_windows(void* arg)
 {
-	TExpandoMenuBar *teamMenu = (TExpandoMenuBar *)arg;
+	TExpandoMenuBar* teamMenu = (TExpandoMenuBar*)arg;
 
 	while (teamMenu->sDoMonitor) {
 		sMonLocker.Lock();
@@ -770,23 +772,23 @@ TExpandoMenuBar::monitor_team_windows(void *arg)
 			int32 totalItems = teamMenu->CountItems();
 
 			// Set all WindowMenuItems to require an update.
-			TWindowMenuItem *item = NULL;
+			TWindowMenuItem* item = NULL;
 			for (int32 i = 0; i < totalItems; i++) {
 				if (!teamMenu->SubmenuAt(i)){
-					item = static_cast<TWindowMenuItem *>(teamMenu->ItemAt(i));
+					item = static_cast<TWindowMenuItem*>(teamMenu->ItemAt(i));
 					item->SetRequireUpdate();
 				}
 			}
 
 			// Perform SetTo() on all the items that still exist as well as add new items.
 			bool itemModified = false, resize = false;
-			TTeamMenuItem *teamItem = NULL;
+			TTeamMenuItem* teamItem = NULL;
 
 			for (int32 i = 0; i < totalItems; i++) {
 				if (teamMenu->SubmenuAt(i) == NULL)
 					continue;
 
-				teamItem = static_cast<TTeamMenuItem *>(teamMenu->ItemAt(i));
+				teamItem = static_cast<TTeamMenuItem*>(teamMenu->ItemAt(i));
 				if (teamItem->IsExpanded()) {
 					int32 teamCount = teamItem->Teams()->CountItems();
 					for (int32 j = 0; j < teamCount; j++) {
@@ -794,10 +796,10 @@ TExpandoMenuBar::monitor_team_windows(void *arg)
 						// WindowMenu.cpp
 						team_id	theTeam = (team_id)teamItem->Teams()->ItemAt(j);
 						int32 count = 0;
-						int32 *tokens = get_token_list(theTeam, &count);
+						int32* tokens = get_token_list(theTeam, &count);
 
 						for (int32 k = 0; k < count; k++) {
-							client_window_info *wInfo
+							client_window_info* wInfo
 								= get_window_info(tokens[k]);
 							if (wInfo == NULL)
 								continue;
@@ -839,9 +841,9 @@ TExpandoMenuBar::monitor_team_windows(void *arg)
 			// Remove any remaining items which require an update.
 			for (int32 i = 0; i < totalItems; i++) {
 				if (!teamMenu->SubmenuAt(i)){
-					item = static_cast<TWindowMenuItem *>(teamMenu->ItemAt(i));
+					item = static_cast<TWindowMenuItem*>(teamMenu->ItemAt(i));
 					if (item && item->RequiresUpdate()) {
-						item = static_cast<TWindowMenuItem *>(teamMenu->RemoveItem(i));
+						item = static_cast<TWindowMenuItem*>(teamMenu->RemoveItem(i));
 						delete item;
 						totalItems--;
 

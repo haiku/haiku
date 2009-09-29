@@ -146,7 +146,7 @@ CalendarMenuItem::DrawContent()
 
 
 void
-CalendarMenuItem::GetContentSize(float *_width, float *_height)
+CalendarMenuItem::GetContentSize(float* _width, float* _height)
 {
 	time_t currentTime = time(NULL);
 	struct tm tm;

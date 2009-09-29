@@ -49,13 +49,13 @@ class BBitmap;
 
 class TTeamMenuItem : public BMenuItem {
 	public:
-		TTeamMenuItem(BList *team, BBitmap *icon, char *name, char *sig,
+		TTeamMenuItem(BList* team, BBitmap* icon, char* name, char* sig,
 			float width = -1.0f, float height = -1.0f,
 			bool drawLabel = true, bool vertical = true);
 		TTeamMenuItem(float width = -1.0f, float height = -1.0f, bool vertical=true);
 		virtual ~TTeamMenuItem();
 
-		status_t Invoke(BMessage *msg = NULL);
+		status_t Invoke(BMessage* msg = NULL);
 
 		void SetOverrideWidth(float width);
 		void SetOverrideHeight(float height);
@@ -67,28 +67,28 @@ class TTeamMenuItem : public BMenuItem {
 		TWindowMenuItem* ExpandedWindowItem(int32 id);
 
 		float LabelWidth() const;
-		BList *Teams() const;
-		const char *Signature() const;
-		const char *Name() const;
+		BList* Teams() const;
+		const char* Signature() const;
+		const char* Name() const;
 
 	protected:
-		void GetContentSize(float *width, float *height);
+		void GetContentSize(float* width, float* height);
 		void Draw();
 		void DrawContent();
 		void DrawContentLabel();
 
 	private:
 		friend class TExpandoMenuBar;
-		void InitData(BList *team, BBitmap *icon, char *name, char *sig,
+		void InitData(BList* team, BBitmap* icon, char* name, char* sig,
 			float width = -1.0f, float height = -1.0f,
 			bool drawLabel = true,bool vertical=true);
 
 		bool _IsSelected() const;
 
-		BList *fTeam;
-		BBitmap *fIcon;
-		char *fName;
-		char *fSig;
+		BList* fTeam;
+		BBitmap* fIcon;
+		char* fName;
+		char* fSig;
 		float fLabelWidth;
 		float fLabelAscent;
 		float fLabelDescent;

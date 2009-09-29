@@ -59,7 +59,7 @@ void run_be_about();
 
 class DeskbarMountMenu : public BPrivate::MountMenu {
 	public:
-		DeskbarMountMenu(const char *name);
+		DeskbarMountMenu(const char* name);
 		virtual bool AddDynamicItem(add_state s);
 };
 
@@ -68,7 +68,7 @@ class DeskbarMountMenu : public BPrivate::MountMenu {
 //#define SHOW_RECENT_FIND_ITEMS
 
 namespace BPrivate {
-	BMenu *TrackerBuildRecentFindItemsMenu(const char *);
+	BMenu* TrackerBuildRecentFindItemsMenu(const char*);
 }
 using namespace BPrivate;
 
@@ -76,7 +76,7 @@ using namespace BPrivate;
 //	#pragma mark -
 
 
-TBeMenu::TBeMenu(TBarView *barView)
+TBeMenu::TBeMenu(TBarView* barView)
 	: BNavMenu("BeMenu", B_REFS_RECEIVED, DefaultTarget()),
 	fAddState(kStart),
 	fBarView(barView)
@@ -137,7 +137,7 @@ void
 TBeMenu::DoneBuildingItemList()
 {
 	if (fItemList->CountItems() <= 0) {
-		BMenuItem *item = new BMenuItem("<Be folder is empty>", 0);
+		BMenuItem* item = new BMenuItem("<Be folder is empty>", 0);
 		item->SetEnabled(false);
 		AddItem(item);
 	} else
@@ -151,12 +151,12 @@ TBeMenu::AddNextItem()
 	if (fAddState == kStart)
 		return AddStandardBeMenuItems();
 
-	TrackingHookData *data = fBarView->GetTrackingHookData();
+	TrackingHookData* data = fBarView->GetTrackingHookData();
 	if (fAddState == kAddingRecents) {
-		const char *recentTitle[] = {"Recent Documents", "Recent Folders", "Recent Applications"};
+		const char* recentTitle[] = {"Recent Documents", "Recent Folders", "Recent Applications"};
 		const int recentType[] = {kRecentDocuments, kRecentFolders, kRecentApplications};
 		const int recentTypes = 3;
-		TRecentsMenu *recentItem[recentTypes];
+		TRecentsMenu* recentItem[recentTypes];
 		int count = 0;
 
 		for (int i = 0; i < recentTypes; i++) {
@@ -193,9 +193,9 @@ TBeMenu::AddNextItem()
 		// keep reentering and adding items
 		// until this returns false
 		bool done = BNavMenu::AddNextItem();
-		BMenuItem *item = ItemAt(CountItems() - 1);
+		BMenuItem* item = ItemAt(CountItems() - 1);
 		if (item) {
-			BNavMenu *menu = dynamic_cast<BNavMenu *>(item->Menu());
+			BNavMenu* menu = dynamic_cast<BNavMenu*>(item->Menu());
 			if (menu) {
 				if (data && fBarView->Dragging()) {
 					menu->InitTrackingHook(data->fTrackingHook,
@@ -244,13 +244,13 @@ TBeMenu::AddStandardBeMenuItems()
 	item->SetEnabled(!dragging);
 	AddItem(item);
 
-	item = new BMenuItem("Show Replicants", new BMessage(msg_ToggleDraggers));
+	item = new BMenuItem("Show Replicants", new BMessage(kToggleDraggers));
 	item->SetEnabled(!dragging);
 	item->SetMarked(BDragger::AreDraggersDrawn());
 	AddItem(item);
 
 #ifdef MOUNT_MENU_IN_DESKBAR
-	DeskbarMountMenu *mountMenu = new DeskbarMountMenu("Mount");
+	DeskbarMountMenu* mountMenu = new DeskbarMountMenu("Mount");
 	mountMenu->SetEnabled(!dragging);
 	AddItem(mountMenu);
 #endif
@@ -266,22 +266,22 @@ TBeMenu::AddStandardBeMenuItems()
 		subMenu = new BMenu("Window Decor");
 		subMenu->SetEnabled(!dragging);
 
-		item = new BMenuItem("BeOS", new BMessage(msg_Be));
+		item = new BMenuItem("BeOS", new BMessage(kBe));
 		item->SetTarget(be_app);
 		item->SetEnabled(!dragging);
 		subMenu->AddItem(item);
 
-		item = new BMenuItem("AmigaOS", new BMessage(msg_Amiga));
+		item = new BMenuItem("AmigaOS", new BMessage(kAmiga));
 		item->SetTarget(be_app);
 		item->SetEnabled(!dragging);
 		subMenu->AddItem(item);
 
-		item = new BMenuItem("MacOS 8", new BMessage(msg_Mac));
+		item = new BMenuItem("MacOS 8", new BMessage(kMac));
 		item->SetTarget(be_app);
 		item->SetEnabled(!dragging);
 		subMenu->AddItem(item);
 
-		item = new BMenuItem("Windows 95/98", new BMessage(msg_Win95));
+		item = new BMenuItem("Windows 95/98", new BMessage(kWin95));
 		item->SetTarget(be_app);
 		item->SetEnabled(!dragging);
 		subMenu->AddItem(item);
@@ -293,7 +293,7 @@ TBeMenu::AddStandardBeMenuItems()
 
 	AddSeparatorItem();
 
-	BMenu *shutdownMenu = new BMenu("Shutdown" B_UTF8_ELLIPSIS);
+	BMenu* shutdownMenu = new BMenu("Shutdown" B_UTF8_ELLIPSIS);
 
 	item = new BMenuItem("Restart System", new BMessage(CMD_REBOOT_SYSTEM));
 	item->SetEnabled(!dragging);
@@ -357,7 +357,7 @@ TBeMenu::ResetTargets()
 	SetTargetForItems(Target());
 
 	for (int32 i = 0; ; i++) {
-		BMenuItem *item = ItemAt(i);
+		BMenuItem* item = ItemAt(i);
 		if (item == NULL)
 			break;
 
@@ -374,9 +374,9 @@ TBeMenu::ResetTargets()
 					item->SetTarget(BMessenger(kTrackerSignature));
 					break;
 
-				case msg_ToggleDraggers:
+				case kToggleDraggers:
 				case kConfigShow:
-				case msg_AlwaysTop:
+				case kAlwaysTop:
 				case kMsgShowSeconds:
 				case kMsgMilTime:
 				case kMsgEuroDate:
@@ -440,8 +440,8 @@ TBeMenu::DefaultTarget()
 //	#pragma mark -
 
 
-TRecentsMenu::TRecentsMenu(const char *name, TBarView *bar, int32 which,
-		const char *signature, entry_ref *appRef)
+TRecentsMenu::TRecentsMenu(const char* name, TBarView* bar, int32 which,
+		const char* signature, entry_ref* appRef)
 	: BNavMenu(name, B_REFS_RECEIVED, TBeMenu::DefaultTarget()),
 	fWhich(which),
 	fAppRef(NULL),
@@ -450,7 +450,7 @@ TRecentsMenu::TRecentsMenu(const char *name, TBarView *bar, int32 which,
 	fItemIndex(0),
 	fBarView(bar)
 {
-	TBarApp *app = dynamic_cast<TBarApp *>(be_app);
+	TBarApp* app = dynamic_cast<TBarApp*>(be_app);
 	if (app == NULL)
 		return;
 
@@ -552,13 +552,13 @@ TRecentsMenu::AddRecents(int32 count)
 			Model model(&ref, true);
 
 			if (fWhich != kRecentApplications) {
-				BMessage *message = new BMessage(B_REFS_RECEIVED);
+				BMessage* message = new BMessage(B_REFS_RECEIVED);
 				if (fWhich == kRecentAppDocuments) {
 					// add application as handler
 					message->AddRef("handler", fAppRef);
 				}
 
-				ModelMenuItem *item = BNavMenu::NewModelItem(&model,
+				ModelMenuItem* item = BNavMenu::NewModelItem(&model,
 					message, Target(), false, NULL, TypesList());
 
 				if (item)
@@ -574,7 +574,7 @@ TRecentsMenu::AddRecents(int32 count)
 					|| appInfo.GetSignature(signature) != B_OK)
 					continue;
 
-				ModelMenuItem *item = NULL;
+				ModelMenuItem* item = NULL;
 				BMessage doc;
 				be_roster->GetRecentDocuments(&doc, 1, NULL, signature);
 					// ToDo: check if the documents do exist at all to
@@ -582,7 +582,7 @@ TRecentsMenu::AddRecents(int32 count)
 
 				if (doc.CountNames(B_REF_TYPE) > 0) {
 					// create recents menu that will contain the recent docs of this app
-					TRecentsMenu *docs = new TRecentsMenu(ref.name, fBarView,
+					TRecentsMenu* docs = new TRecentsMenu(ref.name, fBarView,
 						kRecentAppDocuments, signature, &ref);
 					docs->SetTypesList(TypesList());
 					docs->SetTarget(Target());
@@ -593,7 +593,7 @@ TRecentsMenu::AddRecents(int32 count)
 
 				if (item) {
 					// add refs-message so that the recent app can be launched
-					BMessage *msg = new BMessage(B_REFS_RECEIVED);
+					BMessage* msg = new BMessage(B_REFS_RECEIVED);
 					msg->AddRef("refs", &ref);
 					item->SetMessage(msg);
 					item->SetTarget(Target());
@@ -655,7 +655,7 @@ TRecentsMenu::ResetTargets()
 
 #ifdef MOUNT_MENU_IN_DESKBAR
 
-DeskbarMountMenu::DeskbarMountMenu(const char *name)
+DeskbarMountMenu::DeskbarMountMenu(const char* name)
 	: BPrivate::MountMenu(name)
 {
 	SetFont(be_plain_font);

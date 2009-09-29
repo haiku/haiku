@@ -115,7 +115,7 @@ TReplicantShelf::CanAcceptReplicantView(BRect frame, BView* view,
 
 
 BPoint
-TReplicantShelf::AdjustReplicantBy(BRect frame, BMessage *message) const
+TReplicantShelf::AdjustReplicantBy(BRect frame, BMessage* message) const
 {
 	// added in AcceptAddon, from TReplicantTray
 	BPoint point;

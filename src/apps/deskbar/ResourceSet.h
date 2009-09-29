@@ -54,20 +54,20 @@ const uint32 B_STRING_BLOCK_TYPE = 'SBLK';
 
 class TStringBlock {
 public:
-	TStringBlock(BDataIO *data);
-	TStringBlock(const void *block, size_t size);
+	TStringBlock(BDataIO* data);
+	TStringBlock(const void* block, size_t size);
 	virtual ~TStringBlock();
 	
-	const char *String(size_t index) const;
+	const char* String(size_t index) const;
 
 private:
-	size_t PreIndex(char *strings, ssize_t len);
-	void MakeIndex(const char *strings, ssize_t len,
-		size_t indexLen, size_t *outIndex);
+	size_t PreIndex(char* strings, ssize_t len);
+	void MakeIndex(const char* strings, ssize_t len,
+		size_t indexLen, size_t* outIndex);
 	
 	size_t fNumEntries;
-	size_t *fIndex;
-	char *fStrings;
+	size_t* fIndex;
+	char* fStrings;
 	bool fOwnData;
 };
 
@@ -76,37 +76,37 @@ public:
 	TResourceSet();
 	virtual ~TResourceSet();
 
-	status_t AddResources(BResources *resources);
-	status_t AddDirectory(const char *fullPath);
-	status_t AddEnvDirectory(const char *envPath,
-		const char *defaultValue = NULL);
+	status_t AddResources(BResources* resources);
+	status_t AddDirectory(const char* fullPath);
+	status_t AddEnvDirectory(const char* envPath,
+		const char* defaultValue = NULL);
 	
-	const void *FindResource(type_code type, int32 id,
-		size_t *outSize);
-	const void *FindResource(type_code type, const char *name,
-		size_t *outSize);
+	const void* FindResource(type_code type, int32 id,
+		size_t* outSize);
+	const void* FindResource(type_code type, const char* name,
+		size_t* outSize);
 	
-	const BBitmap *FindBitmap(type_code type, int32 id);
-	const BBitmap *FindBitmap(type_code type, const char *name);
+	const BBitmap* FindBitmap(type_code type, int32 id);
+	const BBitmap* FindBitmap(type_code type, const char* name);
 	
-	const TStringBlock *FindStringBlock(type_code type, int32 id);
-	const TStringBlock *FindStringBlock(type_code type, const char *name);
+	const TStringBlock* FindStringBlock(type_code type, int32 id);
+	const TStringBlock* FindStringBlock(type_code type, const char* name);
 	
-	const char *FindString(type_code type, int32 id, uint32 index);
-	const char *FindString(type_code type, const char *name, uint32 index);
+	const char* FindString(type_code type, int32 id, uint32 index);
+	const char* FindString(type_code type, const char* name, uint32 index);
 	
 private:
-	status_t ExpandString(BString *out, const char *in);
-	TypeList *FindTypeList(type_code type);
+	status_t ExpandString(BString* out, const char* in);
+	TypeList* FindTypeList(type_code type);
 	
-	TypeItem *FindItemID(type_code type, int32 id);
-	TypeItem *FindItemName(type_code type, const char *name);
+	TypeItem* FindItemID(type_code type, int32 id);
+	TypeItem* FindItemName(type_code type, const char* name);
 	
-	TypeItem *LoadResource(type_code type, int32 id, const char *name,
-		TypeList **inoutList = NULL);
+	TypeItem* LoadResource(type_code type, int32 id, const char* name,
+		TypeList** inoutList = NULL);
 	
-	BBitmap *ReturnBitmapItem(type_code type, TypeItem *from);
-	TStringBlock *ReturnStringBlockItem(TypeItem *from);
+	BBitmap* ReturnBitmapItem(type_code type, TypeItem* from);
+	TStringBlock* ReturnStringBlockItem(TypeItem* from);
 	
 	BLocker fLock;				// access control.
 	BList fResources;			// containing BResources objects.
@@ -114,6 +114,6 @@ private:
 	BList fTypes;				// containing TypeList objects.
 };
 
-TResourceSet *AppResSet();
+TResourceSet* AppResSet();
 
 #endif

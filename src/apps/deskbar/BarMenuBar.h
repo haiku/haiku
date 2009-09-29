@@ -48,10 +48,10 @@ All rights reserved.
 
 class TBarMenuBar : public BMenuBar {
 	public:
-		TBarMenuBar(TBarView *bar, BRect frame, const char *name);
+		TBarMenuBar(TBarView* bar, BRect frame, const char* name);
 		virtual ~TBarMenuBar();
 
-		virtual void MouseMoved(BPoint where, uint32 code, const BMessage *message);
+		virtual void MouseMoved(BPoint where, uint32 code, const BMessage* message);
 		virtual void Draw(BRect);
 
 		void DrawBackground(BRect);
@@ -60,13 +60,13 @@ class TBarMenuBar : public BMenuBar {
 		void AddTeamMenu();
 		void RemoveTeamMenu();
 
-		void InitTrackingHook(bool (* hookfunction)(BMenu *, void *), void *state,
+		void InitTrackingHook(bool (* hookfunction)(BMenu*, void*), void* state,
 			bool both = false);
 	
 	private:
-		TBarView *fBarView;
-		TBarMenuTitle *fBeMenuItem;
-		TBarMenuTitle *fAppListMenuItem;
+		TBarView* fBarView;
+		TBarMenuTitle* fBeMenuItem;
+		TBarMenuTitle* fAppListMenuItem;
 };
 
 #endif /* BARMENUBAR_H */

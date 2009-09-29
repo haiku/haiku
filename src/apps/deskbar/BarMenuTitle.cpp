@@ -45,8 +45,8 @@ All rights reserved.
 #include "ExpandoMenuBar.h"
 
 
-TBarMenuTitle::TBarMenuTitle(float width, float height, const BBitmap *icon,
-	BMenu *menu, bool inexpando)
+TBarMenuTitle::TBarMenuTitle(float width, float height, const BBitmap* icon,
+	BMenu* menu, bool inexpando)
 	:	BMenuItem(menu, new BMessage(B_REFS_RECEIVED)),
 		fWidth(width),
 		fHeight(height),
@@ -70,7 +70,7 @@ TBarMenuTitle::SetWidthHeight(float width, float height)
 
 
 void
-TBarMenuTitle::GetContentSize(float *width, float *height)
+TBarMenuTitle::GetContentSize(float* width, float* height)
 {
 	*width = fWidth;
 	*height = fHeight;
@@ -111,7 +111,7 @@ TBarMenuTitle::Draw()
 void
 TBarMenuTitle::DrawContent()
 {
-	BMenu *menu = Menu();
+	BMenu* menu = Menu();
 	BRect frame(Frame());
 
 	if (be_control_look != NULL) {
@@ -192,11 +192,11 @@ TBarMenuTitle::DrawContent()
 
 
 status_t
-TBarMenuTitle::Invoke(BMessage *message)
+TBarMenuTitle::Invoke(BMessage* message)
 {
-	TBarView *barview = dynamic_cast<TBarApp *>(be_app)->BarView();
+	TBarView* barview = dynamic_cast<TBarApp*>(be_app)->BarView();
 	if (barview) {
-		BLooper *looper = barview->Looper();
+		BLooper* looper = barview->Looper();
 		if (looper->Lock()) {
 			// tell barview to add the refs to the be menu
 			barview->HandleBeMenu(NULL);			

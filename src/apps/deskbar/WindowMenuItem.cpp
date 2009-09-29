@@ -54,7 +54,7 @@ const float	kLabelOffset = 8.0f;
 const BRect	kIconRect(1.0f, 1.0f, 13.0f, 14.0f);
 
 
-TWindowMenuItem::TWindowMenuItem(const char *title, int32 id, bool mini,
+TWindowMenuItem::TWindowMenuItem(const char* title, int32 id, bool mini,
 		bool currentWorkspace, bool dragging)
 	: BMenuItem(title, NULL),
 	fID(id),
@@ -71,7 +71,7 @@ TWindowMenuItem::TWindowMenuItem(const char *title, int32 id, bool mini,
 
 
 void
-TWindowMenuItem::Initialize(const char *title)
+TWindowMenuItem::Initialize(const char* title)
 {
 	if (fMini) {
  		fBitmap = fCurrentWorkSpace
@@ -93,7 +93,7 @@ TWindowMenuItem::Initialize(const char *title)
 
 
 void
-TWindowMenuItem::SetTo(const char *title, int32 id, bool mini,
+TWindowMenuItem::SetTo(const char* title, int32 id, bool mini,
 	bool currentWorkspace, bool dragging)
 {
 	fModified = fCurrentWorkSpace != currentWorkspace || fMini != mini;
@@ -142,7 +142,7 @@ TWindowMenuItem::ID()
 
 
 void
-TWindowMenuItem::GetContentSize(float *width, float *height)
+TWindowMenuItem::GetContentSize(float* width, float* height)
 {
 	if (width != NULL) {
 		if (!fExpanded) {
@@ -173,12 +173,12 @@ TWindowMenuItem::Draw()
 	if (fExpanded) {
 		rgb_color menuColor = Menu()->ViewColor();
 		BRect frame(Frame());
-		BMenu *menu = Menu();
+		BMenu* menu = Menu();
 
 		menu->PushState();
 
 		//	if not selected or being tracked on, fill with gray
-		TBarView *barview = (static_cast<TBarApp *>(be_app))->BarView();
+		TBarView* barview = (static_cast<TBarApp*>(be_app))->BarView();
 		if (!IsSelected() && !menu->IsRedrawAfterSticky()
 			|| barview->Dragging() || !IsEnabled()) {
 			menu->SetHighColor(menuColor);
@@ -211,7 +211,7 @@ TWindowMenuItem::Draw()
 void
 TWindowMenuItem::DrawContent()
 {
-	BMenu *menu = Menu();
+	BMenu* menu = Menu();
 	menu->PushState();
 
 	BRect frame(Frame());
@@ -261,7 +261,7 @@ TWindowMenuItem::Invoke(BMessage* /*message*/)
 
 			bool doZoom = false;
 			BRect zoomRect(0.0f, 0.0f, 0.0f, 0.0f);
-			BMenuItem *item;
+			BMenuItem* item;
 			if (!fExpanded)
 				item = Menu()->Superitem();
 			else

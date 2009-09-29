@@ -51,11 +51,11 @@ class BBitmap;
 
 class TWindowMenuItem : public BMenuItem {
 	public:
-		TWindowMenuItem(const char *title, int32 id, bool mini,
+		TWindowMenuItem(const char* title, int32 id, bool mini,
 			bool currentWorkSpace, bool dragging = false);
 
 		void ExpandedItem(bool state);
-		void SetTo(const char *title, int32 id, bool mini,
+		void SetTo(const char* title, int32 id, bool mini,
 			bool currentWorkSpace, bool dragging = false);
 		int32 ID();
 		void SetRequireUpdate();
@@ -65,10 +65,10 @@ class TWindowMenuItem : public BMenuItem {
 	virtual	void	SetLabel(const char* string);
 
 	protected:
-		void Initialize(const char *title);
-		virtual	void GetContentSize(float *width, float *height);
+		void Initialize(const char* title);
+		virtual	void GetContentSize(float* width, float* height);
 		virtual void DrawContent();
-		virtual status_t Invoke(BMessage *message = NULL);
+		virtual status_t Invoke(BMessage* message = NULL);
 		virtual void Draw();
 
 	private:
@@ -138,8 +138,8 @@ enum window_action {
 
 // from interface_misc.h
 void do_window_action(int32 window_id, int32 action, BRect zoomRect, bool zoom);
-client_window_info *get_window_info(int32 token);
-int32* get_token_list(team_id app, int32 *count);
+client_window_info* get_window_info(int32 token);
+int32* get_token_list(team_id app, int32* count);
 void do_minimize_team(BRect zoomRect, team_id team, bool zoom);
 void do_bring_to_front_team(BRect zoomRect, team_id app, bool zoom);
 

@@ -53,10 +53,10 @@ TTeamMenu::TTeamMenu()
 
 
 int
-TTeamMenu::CompareByName(const void *first, const void *second)
+TTeamMenu::CompareByName(const void* first, const void* second)
 {
-	return strcasecmp((*(static_cast<BarTeamInfo * const*>(first)))->name,
-		(*(static_cast<BarTeamInfo * const*>(second)))->name);
+	return strcasecmp((*(static_cast<BarTeamInfo* const*>(first)))->name,
+		(*(static_cast<BarTeamInfo* const*>(second)))->name);
 }
 
 
@@ -69,21 +69,21 @@ TTeamMenu::AttachedToWindow()
 	BList teamList;
 	TBarApp::Subscribe(self, &teamList);
 
-	TBarView *barview = (dynamic_cast<TBarApp *>(be_app))->BarView();
+	TBarView* barview = (dynamic_cast<TBarApp*>(be_app))->BarView();
 	bool dragging = barview && barview->Dragging();
 
-	desk_settings *settings = ((TBarApp *)be_app)->Settings();
+	desk_settings* settings = ((TBarApp*)be_app)->Settings();
 
 	if (settings->sortRunningApps)
 		teamList.SortItems(CompareByName);
 
 	int32 count = teamList.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		BarTeamInfo *barInfo = (BarTeamInfo *)teamList.ItemAt(i);
+		BarTeamInfo* barInfo = (BarTeamInfo*)teamList.ItemAt(i);
 
 		if (((barInfo->flags & B_BACKGROUND_APP) == 0)
 			&& (strcasecmp(barInfo->sig, kDeskbarSignature) != 0)) {
-			TTeamMenuItem *item = new TTeamMenuItem(barInfo->teams, barInfo->icon, 
+			TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams, barInfo->icon, 
 				barInfo->name, barInfo->sig, -1, -1, true, true);
 
 			if ((settings->trackerAlwaysFirst)
@@ -93,12 +93,12 @@ TTeamMenu::AttachedToWindow()
 				AddItem(item);
 
 			if (dragging && item) {
-				bool canhandle = (dynamic_cast<TBarApp *>(be_app))->BarView()->
+				bool canhandle = (dynamic_cast<TBarApp*>(be_app))->BarView()->
 					AppCanHandleTypes(item->Signature());
 				if (item->IsEnabled() != canhandle)
 					item->SetEnabled(canhandle);
 
-				BMenu *menu = item->Submenu();
+				BMenu* menu = item->Submenu();
 				if (menu)
 					menu->SetTrackingHook(barview->MenuTrackingHook,
 						barview->GetTrackingHookData());
@@ -113,7 +113,7 @@ TTeamMenu::AttachedToWindow()
 	}
 
 	if (CountItems() == 0) {
-		BMenuItem *item = new BMenuItem("no application running", NULL);
+		BMenuItem* item = new BMenuItem("no application running", NULL);
 		item->SetEnabled(false);
 		AddItem(item);
 	}
@@ -131,9 +131,9 @@ TTeamMenu::AttachedToWindow()
 void
 TTeamMenu::DetachedFromWindow()
 {
-	TBarView *barView = (dynamic_cast<TBarApp *>(be_app))->BarView();
+	TBarView* barView = (dynamic_cast<TBarApp*>(be_app))->BarView();
 	if (barView) {
-		BLooper *looper = barView->Looper();
+		BLooper* looper = barView->Looper();
 		if (looper->Lock()) {
 			barView->DragStop();
 			looper->Unlock();
