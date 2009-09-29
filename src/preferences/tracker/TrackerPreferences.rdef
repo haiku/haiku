@@ -16,7 +16,7 @@ resource app_version {
 	long_info  = "Tracker Preferences Launcher ©2009 Haiku"
 };
 
-resource app_flags B_SINGLE_LAUNCH;
+resource app_flags B_SINGLE_LAUNCH | B_BACKGROUND_APP;
 
 resource vector_icon {
 	$"6E636966120500040068020106023ECFFF0000000000003EFFFF486000474000"
