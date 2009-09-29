@@ -13,7 +13,7 @@
 #define HAS_PHOTO_JPEG
 #define HAS_MOTION_JPEG
 
-#define FOURCC(a) B_SWAP_INT32(a)
+#define FOURCC(a) B_HOST_TO_BENDIAN_INT32(a)
 
 const struct codec_table gCodecTable[] = {
 
