@@ -94,6 +94,7 @@ private:
 			const void*			fChunkBuffer;
 			int32				fChunkBufferOffset;
 			size_t				fChunkBufferSize;
+			bool				fAudioDecodeError;
 
 			char*				fOutputBuffer;
 			int32				fOutputBufferOffset;
