@@ -27,6 +27,7 @@
 
 #include "APRWindow.h"
 
+#undef TR_CONTEXT
 #define TR_CONTEXT "AntialiasingSettingsView"
 
 

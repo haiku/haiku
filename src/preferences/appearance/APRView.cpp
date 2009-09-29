@@ -29,6 +29,7 @@
 #include "ColorSet.h"
 
 
+#undef TR_CONTEXT
 #define TR_CONTEXT "Colors tab"
 
 #define COLOR_DROPPED 'cldp'

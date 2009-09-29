@@ -18,6 +18,7 @@
 #include "APRView.h"
 #include "defs.h"
 
+#undef TR_CONTEXT
 #define TR_CONTEXT "APRWindow"
 
 static const uint32 kMsgSetDefaults = 'dflt';
