@@ -97,12 +97,12 @@ if [ IsOptionalHaikuImagePackageAdded Beam ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package Beam available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage Beam-1.1.2
-			: $(baseURL)/Beam-1.1.2-x86-gcc2-2008-03-27.zip
+		InstallOptionalHaikuImagePackage Beam-1.2alpha
+			: $(baseURL)/Beam-1.2alpha-x86-gcc2-2009-09-29.zip
 			: apps
 		;
 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/beam-1-1-2-r5-with-libs/Beam ;
+			: /boot/apps/beam-1.2alpha-haiku/Beam ;
 	}
 }
 
