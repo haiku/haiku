@@ -62,7 +62,7 @@ extern device_hooks multi_hooks;
 
 auich_settings current_settings = {
 	48000,	// sample rate
-	256,	// buffer frames
+	4096,	// buffer frames
 	4,	// buffer count
 	false	// use thread
 };
