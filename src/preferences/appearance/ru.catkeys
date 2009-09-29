@@ -1,0 +1,43 @@
+1	Russian	x-vnd.Haiku-Appearance	959674221
+Navigation Pulse	Colors tab		мЮБХЦЮЖХЪ Pulse
+Shadow	Colors tab		рЕМЭ
+On	AntialiasingSettingsView		бЙКЧВЕМХЕ
+Defaults	APRWindow		оН СЛНКВЮМХЧ
+Grayscale	AntialiasingSettingsView		нРРЕМЙХ ЯЕПНЦН
+Shine	Colors tab		яХЪМХЕ 
+Off	AntialiasingSettingsView		бШЙКЧВЕМХЕ
+Anti-aliasing type:	AntialiasingSettingsView		рХО ЯЦКЮФХБЮМХЪ :
+Success	Colors tab		сЯОЕУ
+Inactive Window Tab	Colors tab		мЕЮЙРХБМШИ
+Failure	Colors tab		chec
+Hinting menu	AntialiasingSettingsView		мЮЛ╦Й ЛЕМЧ
+Control Border	Colors tab		цПЮМХЖЮ СОПЮБКЕМХЪ
+Document Background	Colors tab		тНМ ДНЙСЛЕМРЮ
+Revert	APRWindow		бЕПМСРЭЯЪ
+Selected Menu Item Border	Colors tab		бШАПЮММЮЪ ЦПЮМХЖЮ ОСМЙРЮ ЛЕМЧ
+Selected Menu Item Text	Colors tab		бШАПЮММШИ РЕЙЯР ОСМЙРЮ ЛЕМЧ
+Antialiasing	APRWindow		яЦКЮФХБЮМХЕ
+Window Tab Text	Colors tab		рЕЙЯР ОНГХЖХХ РЮАСКЪЖХХ НЙМЮ
+Tooltip Background	Colors tab		тНМ ОНДЯЙЮГЙХ
+Document Text	Colors tab		рЕЙЯР ДНЙСЛЕМРЮ
+Navigation Base	Colors tab		мЮБХЦЮЖХНММНЕ ЪДПН
+Menu Background	Colors tab		тНМ ЛЕМЧ
+Appearance	APRWindow		бМЕЬМНЯРЭ
+Control Background	Colors tab		тНМ СОПЮБКЕМХЪ
+Colors	APRWindow		жБЕРЮ
+Panel Background	Colors tab		тНМНБЮЪ ОЮМЕКЭ
+Window Tab	Colors tab		оНГХЖХЪ РЮАСКЪЖХХ НЙМЮ
+Reduce colored edges filter strength:	AntialiasingSettingsView		сЛЕМЭЬХРЕ ЯХКС ТХКЭРПЮ ОНЙПЮЯЙХ ЙПЮ╦Б:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		аЮГНБНЕ ОНОХЙЯЕКЭМНЕ ЯЦКЮФХБЮМХЕ Б ЙНЛАХМЮЖХХ Я ЦКХТНЛ МЕ ДНЯРСОМН Б ЩРНИ ЯАНПЙЕ Haiku, ВРНАШ ХГАЕФЮРЭ БНГЛНФМШУ ДНЯРСОМШУ ОПНАКЕЛ. вРНАШ БЙКЧВХРЭ ЩРС НЯНАЕММНЯРЭ, бШ ДНКФМШ ЯНАПЮРЭ Haiku ЯЮЛНЯРНЪРЕКЭМН Х БЙКЧВХРЭ НОЖХХ Б libfreetype ГЮЦНКНБЙЕ ЙНМТХЦСПЮЖХХ.
+Menu Item Text	Colors tab		рЕЙЯР ОСМЙРЮ ЛЕМЧ
+Monospaced Fonts Only	AntialiasingSettingsView		рНКЭЙН ПЮБМНЬХПХММШЕ ЬПХТРШ 
+LCD subpixel	AntialiasingSettingsView		оНДОХЙЯЕКЭ LCD
+Inactive Window Tab Text	Colors tab		мЕЮЙРХБМШИ РЕЙЯР ОНГХЖХХ РЮАСКЪЖХХ НЙМЮ
+Strong	AntialiasingSettingsView		яХКЭМШИ
+Control Highlight	Colors tab		сОПЮБКЕМХЕ БШДЕКЕМХЪЛХ
+Control Text	Colors tab		сОПЮБКЕМХЕ РЕЙЯРНЛ
+Tooltip Text	Colors tab		рЕЙЯР ОНДЯЙЮГЙХ
+Antialiasing menu	AntialiasingSettingsView		лЕМЧ ЯЦКЮФХБЮМХЪ
+Selected Menu Item Background	Colors tab		бШАПЮММШИ ТНМ ОСМЙРЮ ЛЕМЧ
+Glyph hinting:	AntialiasingSettingsView		мЮЛ╦Й ЦКХТЮ:
+Panel Text	Colors tab		рЕЙЯРНБЮЪ ОЮМЕКЭ

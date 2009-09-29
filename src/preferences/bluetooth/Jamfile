@@ -28,6 +28,6 @@ DoCatalogs Bluetooth :
 	InquiryPanel.cpp
 	RemoteDevicesView.cpp
 	: en.catalog
-	: fr.catkeys
+	: fr.catkeys ru.catkeys
 	;
 

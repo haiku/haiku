@@ -1,0 +1,51 @@
+1	Russian	x-vnd.Haiku-BluetoothPrefs	2566651844
+About…	Window		 н ОПНЦПЮЛЛЕ
+Handheld	Settings view		оЕПЕМНЯМНИ
+Only from Trusted devices	Settings view		рНКЭЙН НР ДНБЕПЕММШУ СЯРПНИЯРБ
+Add device to list	Inquiry panel		дНАЮБЭРЕ СЯРПНИЯРБН Б ЯОХЯНЙ
+Starting scan...	Inquiry panel		мЮВЮКН ЯЙЮМХПНБЮМХЪ...
+Smart Phone	Settings view		Smart Phone
+ seconds	Inquiry panel		 ЯЕЙСМД
+Remote Devices	Window		сДЮК╦ММШЕ СЯРПНИЯРБЮ
+Server	Settings view		яЕПБЕП
+Default Inquiry time:	Settings view		гЮДЮММНЕ ОН СЛНКВЮМХЧ БПЕЛЪ ГЮОПНЯЮ:
+Identify host as:	Settings view		хДЕМРХТХЖХПСЕР ЙЮЙ:
+View	Window		бХД
+Refresh…	Remote devices		нАМНБХРЭ
+Show Bluetooth console…	Window		оНЙЮГЮРЭ Bluetooth ЙНМЯНКЭ
+Incoming connections policy:	Settings view		бУНДЪЫЮЪ ОНКХРХЙЮ ОНДЙКЧВЕМХИ:
+From all devices	Settings view		нР БЯЕУ СЯРПНИЯРБ
+Start Bluetooth Services…	Window		гЮОСЯЙ Bluetooth ЯКСФАШ
+Server	Window		яЕПБЕП
+Scanning completed.	Inquiry panel		яЙЮМХПНБЮМХЕ ГЮБЕПЬЕММН.
+Remove	Remote devices		сДЮКХРЭ
+15 secs	Settings view		15 ЯЕЙ
+Policy...	Settings view		оНКХРХЙЮ...
+61 secs	Settings view		61 ЯЕЙ
+Identify us as...	Settings view		хДЕМРХТХЖХПНБЮРЭ МЮЯ ЙЮЙ...
+Remaining 	Inquiry panel		нЯРЮБЮРЭЯЪ 
+Connections & Channels list…	Window		яОХЯНЙ ОНДЙКЧВЕМХИ Х ЙЮМЮКНБ
+Pick LocalDevice...	Settings view		бШАНП КНЙЮКЭМНЦН СЯРПНИЯРБЮ
+Defaults	Window		оН СЛНКВЮМХЧ
+Inquiry	Inquiry panel		гЮОПНЯ
+Desktop	Settings view		пЮАНВХИ ЯРНК
+Revert	Window		бЕПМСРЭЯЪ
+Laptop	Settings view		мНСРАСЙ
+Retrieving name of 	Inquiry panel		бНЯЯРЮМНБКЕМХЕ МЮГБЮМХЪ 
+Local Devices found on system:	Settings view		кНЙЮКЭМШЕ СЯРПНИЯРБЮ МЮИДЕММШЕ Б ЯХЯРЕЛЕ:
+As Trusted	Remote devices		йЮЙ ДНБЕПЕММШИ
+Discoverable	Extended local device view		оНДДЮЧЫХИЯЪ НАМЮПСФЕМХЧ
+As Blocked	Remote devices		йЮЙ АКНЙХПНБЮММШИ
+Service Classes: 	Device View		йКЮЯЯШ ЯЕПБХЯЮ: 
+Refresh LocalDevices…	Window		нАМНБКЕМХЕ КНЙЮКЭМШИ СЯРПНИЯРБ
+Settings	Window		мЮЯРПНИЙХ
+Check that the bluetooth capabilities of your remote device are activated. Press Inquiry to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them	Inquiry panel		оПНБЕПЭРЕ ЩРН Bluetooth ЯНЕДХМЕМХЕ БЮЬЕЦНЮЙРХБМНЦН СДЮК╦ММНЦН СЯРПНИЯРБЮ. мЮФЛХРЕ ГЮОПНЯ, ВРНАШ ГЮОСЯРХРЭ ЯЙЮМХПНБЮМХЕ. мЕНАУНДХЛН БПЕЛЪ ДКЪ ОНХЯЙЮ МЕХГБЕЯРМШУ МЮГБЮМХИ, УНРЪ МЕ ДНКФМН ГЮМЪРЭ АНКЭЬЕ ВЕЛ 3 ЯЕЙСМДШ ГЮ СЯРПНИЯРБН. бОНЯКЕДЯРБХХ БШ АСДЕРЕ ХЛЕРЭ БНГЛНФМНЯРЭ ДНАЮБХРЭ ХУ Й ЯБНЕЛС НЯМНБМНЛС ЯОХЯЙС, ЦДЕ БШ ЯЛНФЕРЕ ОНДЙКЧВХРЭЯЪ Й МХЛ.
+Scanning progress	Inquiry panel		оПНЖЕЯЯ ЯЙЮМХПНБЮМХЪ
+Always ask	Settings view		бЯЕЦДЮ ЯОПЮЬХБЮРЭ
+Remote Devices List…	Window		сДЮКЕМХЕ ЯОХЯЙЮ СЯРПНИЯРБ
+Retrieving names...	Inquiry panel		бНЯЯРЮМНБКЕМХЕ МЮГБЮМХИ...
+Help	Window		оНЛНЫЭ
+Add…	Remote devices		Ajouter
+There has not been found any bluetooth LocalDevice device registered on the system	Inquiry panel		рЮЛ МЕ АШКН МЮИДЕМН Bluetooth СЯРПНИЯРБН, ГЮПЕЦХЯРПХПНБЮММНЕ Б ЯХЯРЕЛЕ
+Stop Bluetooth Services…	Window		нЯРЮМНБХРЭ Bluetooth ЯКСФАС
+Show Name	Extended local device view		оНЙЮГШБЮРЭ МЮГБЮМХЕ:

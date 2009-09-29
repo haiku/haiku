@@ -1,0 +1,47 @@
+1	Russian	x-vnd.Haiku-Locale	2641784784
+day of week (short name)	TimeFormatSettings		ДЕМЭ МЕДЕКХ (ЙНПНРЙНЕ МЮГБЮМХЕ)
+Available languages	Locale Preflet Window		дНЯРСОМШЕ ЪГШЙХ
+Decimal separator	TimeFormatSettings		дЕЯЪРХВМШИ ПЮГДЕКХРЕКЭ
+Separator:	TimeFormatSettings		пЮГДЕКХРЕКЭ:
+Year (4 digits)	TimeFormatSettings		цНД (4 ЖХТПШ)
+After	TimeFormatSettings		оНЯКЕ
+Long format:	TimeFormatSettings		дКХММШИ ТНПЛЮР:
+Before	TimeFormatSettings		дН
+Currency	TimeFormatSettings		бЮКЧРШ
+Year	TimeFormatSettings		цНД
+Short format:	TimeFormatSettings		йПЮРЙХИ ТНПЛЮР:
+Currency symbol:	TimeFormatSettings		яХЛБНК БЮКЧРШ:
+Space	TimeFormatSettings		оПНЯРПЮМЯРБЮ
+Language	Locale Preflet Window		ъГШЙ
+Thousand separator	TimeFormatSettings		пЮГДЕКХРЕКЭ РШЯЪВХ
+Year (2 digits)	TimeFormatSettings		цНД (2 ЖХТПШ)
+Preferred languages	Locale Preflet Window		оПЕДОНВРХРЕКЭМШЕ ЪГШЙХ
+Symbol position	TimeFormatSettings		яХЛБНК ОНГХЖХХ
+month number	TimeFormatSettings		МНЛЕП ЛЕЯЪЖЮ
+month number (2 digits)	TimeFormatSettings		МНЛЕП ЛЕЯЪЖЮ (2 ЖХТПШ)
+Unable to find the available languages! You can't use thispreflet!	Locale Preflet Window		мЕ СДЮЕРЯЪ МЮИРХ ДНЯРСОМШЕ ЪГШЙХ! бШ МЕ ЛНФЕРЕ ХЯОНКЭГНБЮРЭ ЩРС ТСМЙЖХЧ !
+Numbers	TimeFormatSettings		вХЯКЮ
+ (unknown format)	TimeFormatSettings		 (МЕХГБЕЯРМШИ ТНПЛЮР)
+Negative marker:	TimeFormatSettings		нРПХЖЮРЕКЭМШИ ЛЮПЙЕП:
+Defaults	Locale Preflet Window		оН СЛНКВЮМХЧ
+Locale\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n\n	Locale Preflet		Locale\n\tМЮОХЯЮМ Axel Dörfler\n\tCopyright 2009, Haiku.\n\n
+Separator	TimeFormatSettings		пЮГДЕКХРЕКЭ
+Country	Locale Preflet Window		яРПЮМЮ
+Revert	Locale Preflet Window		бЕПМСРЭЯЪ
+day in month	TimeFormatSettings		ДЕМЭ Б ЛЕЯЪЖЕ
+day of week in month	TimeFormatSettings		ДЕМЭ МЕДЕКХ Б ЛЕЯЪЖЕ
+Negative marker	TimeFormatSettings		нРПХЖЮРЕКЭМШИ ЛЮПЙЕП
+Ok	Locale Preflet Window		нЙ
+Time	TimeFormatSettings		бПЕЛЪ
+Date	TimeFormatSettings		дЮРЮ
+List separator	TimeFormatSettings		пЮГДЕКХРЕКЭ ЯОХЯЙЮ
+day of week	TimeFormatSettings		ДЕМЭ МЕДЕКХ
+None	TimeFormatSettings		мХ НДХМ
+day in month (2 digits)	TimeFormatSettings		ДЕМЭ Б ЛЕЯЪЖЕ (2 ЖХТПШ)
+Clock	TimeFormatSettings		вЮЯШ
+Example:	TimeFormatSettings		оПХЛЕП:
+day of week (name)	TimeFormatSettings		ДЕМЭ МЕДЕКХ (МЮГБЮМХЕ)
+month name	TimeFormatSettings		МЮГБЮМХЕ ЛЕЯЪЖЮ
+Day	TimeFormatSettings		дЕМЭ
+Leading 0	TimeFormatSettings		лЕФЯРПНВМШИ ХМРЕПБЮК 0
+ 
