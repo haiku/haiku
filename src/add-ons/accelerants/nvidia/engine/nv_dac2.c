@@ -23,9 +23,10 @@ bool nv_dac2_crt_connected()
 	 * actual secondary DAC function. */
 	/* (It DOES have a secondary palette RAM and pixelclock PLL though.) */
 	case NV11:
-	/* on NV40 arch (confirmed NV43, G71) this routine doesn't work. */
+	/* on NV40 arch (confirmed NV43, G71, G73) this routine doesn't work. */
 	case NV43:
 	case G71:
+	case G73:
 		LOG(4,("DAC2: no load detection available. reporting no CRT detected on connector #2\n"));
 		return false;
 	}

@@ -2789,7 +2789,7 @@ static void setup_output_matrix()
 						 * these cards connect head1 to connectors 1 and 2 simultaneously if
 						 * only one VGA screen is found being on connector 2. Which is the
 						 * case here.
-						 * Confirmed on NV43, NV44, G71 and G72. */
+						 * Confirmed on NV43, NV44, G71 and G73. */
 						LOG(2,("INFO: Both card outputs are connected to head 1;\n"));
 						LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
 						break;
