@@ -103,7 +103,7 @@ BNetAddress::~BNetAddress()
 
 
 BNetAddress&
-BNetAddress::operator=( const BNetAddress& other)
+BNetAddress::operator=(const BNetAddress& other)
 {
 	fInit = other.fInit;
 	fFamily = other.fFamily;
@@ -184,15 +184,15 @@ BNetAddress::GetAddr(char* hostname, unsigned short* port) const
  *		with both POSIX and non-POSIX versions of said struct.  The port and
  *		address values added to the output parameter are in network byte order.
  */
-status_t BNetAddress::GetAddr( struct sockaddr_in& sa ) const
+status_t BNetAddress::GetAddr(struct sockaddr_in& sa) const
 {
-	if ( fInit != B_OK )
+	if (fInit != B_OK)
 		return B_NO_INIT;
 
 	sa.sin_port = fPort;
 	sa.sin_addr.s_addr = fAddress;
 	if (check_r5_compatibility()) {
-		r5_sockaddr_in* r5Addr = (r5_sockaddr_in *)&sa;
+		r5_sockaddr_in* r5Addr = (r5_sockaddr_in*)&sa;
 		if (fFamily == AF_INET)
 			r5Addr->sin_family = R5_AF_INET;
 		else
@@ -220,14 +220,14 @@ status_t BNetAddress::GetAddr( struct sockaddr_in& sa ) const
  *		Output port will be in host byte order, but addr will be in the usual
  *		network byte order (ready to be used by other network functions).
  */
-status_t BNetAddress::GetAddr( in_addr& addr, unsigned short* port ) const
+status_t BNetAddress::GetAddr(in_addr& addr, unsigned short* port) const
 {
-	if ( fInit != B_OK )
+	if (fInit != B_OK)
 		return B_NO_INIT;
 
 	addr.s_addr = fAddress;
 
-	if ( port != NULL )
+	if (port != NULL)
 		*port = ntohs(fPort);
 
 	return B_OK;
@@ -242,9 +242,9 @@ status_t BNetAddress::GetAddr( in_addr& addr, unsigned short* port ) const
  * Returns:
  *		B_OK if this instance is initialized, B_ERROR if not.
  */
-status_t BNetAddress::InitCheck( void ) const
+status_t BNetAddress::InitCheck() const
 {
-	return ( fInit == B_OK ) ? B_OK : B_ERROR;
+	return fInit == B_OK ? B_OK : B_ERROR;
 }
 
 
@@ -269,18 +269,18 @@ status_t BNetAddress::InitCheck()
  *		B_OK/BERROR on success/failure.  Returns B_NO_INIT if instance not
  *		properly initialized.
  */
-status_t BNetAddress::Archive( BMessage* into, bool deep ) const
+status_t BNetAddress::Archive(BMessage* into, bool deep) const
 {
-	if ( fInit != B_OK )
+	if (fInit != B_OK)
 		return B_NO_INIT;
 
-	if ( into->AddInt16( "bnaddr_family", fFamily ) != B_OK )
+	if (into->AddInt16("bnaddr_family", fFamily) != B_OK)
 		return B_ERROR;
 
-	if ( into->AddInt16( "bnaddr_port", fPort ) != B_OK )
+	if (into->AddInt16("bnaddr_port", fPort) != B_OK)
 		return B_ERROR;
 
-	if ( into->AddInt32( "bnaddr_addr", fAddress ) != B_OK )
+	if (into->AddInt32("bnaddr_addr", fAddress) != B_OK)
 		return B_ERROR;
 
 	return B_OK;
@@ -376,7 +376,7 @@ BNetAddress::SetTo(const struct sockaddr_in& addr)
 	fAddress = addr.sin_addr.s_addr;
 
 	if (check_r5_compatibility()) {
-		const r5_sockaddr_in* r5Addr = (const r5_sockaddr_in *)&addr;
+		const r5_sockaddr_in* r5Addr = (const r5_sockaddr_in*)&addr;
 		if (r5Addr->sin_family == R5_AF_INET)
 			fFamily = AF_INET;
 		else
