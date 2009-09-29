@@ -68,9 +68,10 @@ SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc DiskProb
 	PackageInstaller People PoorMan PowerStatus ProcessController Screenshot
 	ShowImage SoundRecorder StyledEdit Terminal TextSearch TV Workspaces
 ;
-SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations E-mail
-	FileTypes Fonts Keyboard Keymap Locale Media Mouse Network OpenGL Printers
-	Screen ScreenSaver Sounds Time Touchpad <preference>Tracker VirtualMemory
+SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
+	<preference>Deskbar E-mail FileTypes Fonts Keyboard Keymap Locale Media
+	Mouse Network OpenGL Printers Screen ScreenSaver Sounds Time Touchpad
+	<preference>Tracker VirtualMemory
 ;
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 	GLTeapot Haiku3d Mandelbrot Pairs Playground Pulse Sudoku Gradients

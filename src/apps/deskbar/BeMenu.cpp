@@ -255,83 +255,10 @@ TBeMenu::AddStandardBeMenuItems()
 	AddItem(mountMenu);
 #endif
 
- 	// insert preferences menu
- 	BMenu *subMenu = new BMenu("Deskbar Settings");
-	subMenu->SetEnabled(!dragging);
-
-#ifdef __HAIKU__
-	item = new BMenuItem("Configure Deskbar Menu"B_UTF8_ELLIPSIS, new BMessage(msg_config_db));
-#else
-	item = new BMenuItem("Configure Be Menu"B_UTF8_ELLIPSIS, new BMessage(msg_config_db));
-#endif
+	item = new BMenuItem("Deskbar Preferences" B_UTF8_ELLIPSIS,
+		new BMessage(kConfigShow));
  	item->SetTarget(be_app);
-	subMenu->AddItem(item);
-
-	item = new BMenuItem("Always on Top", new BMessage(msg_AlwaysTop));
- 	item->SetTarget(be_app);
- 	// set checkbox based on current state of Deskbar's main window feel
- 	if (BWindow *window = static_cast<TBarApp *>(be_app)->BarWindow())
-	 	item->SetMarked((window->Feel() & B_FLOATING_ALL_WINDOW_FEEL) != 0);
- 	subMenu->AddItem(item);
-
-	item = new BMenuItem("Auto Raise", new BMessage(msg_AutoRaise));
- 	item->SetTarget(be_app);
-	item->SetMarked(static_cast<TBarApp *>(be_app)->Settings()->autoRaise);
- 	subMenu->AddItem(item);
-
-	item = new BMenuItem("Sort Running Applications", new BMessage(msg_sortRunningApps));
-	item->SetTarget(be_app);
-	item->SetMarked(static_cast<TBarApp *>(be_app)->Settings()->sortRunningApps);
-	subMenu->AddItem(item);
-
-	item = new BMenuItem("Tracker Always First", new BMessage(msg_trackerFirst));
-	item->SetTarget(be_app);
-	item->SetMarked(static_cast<TBarApp *>(be_app)->Settings()->trackerAlwaysFirst);
-	subMenu->AddItem(item);
-
- 	subMenu->AddSeparatorItem();
-
- 	TReplicantTray *replicantTray = ((TBarApp *)be_app)->BarView()->fReplicantTray;
-
-	item = new BMenuItem("24 Hour Clock", new BMessage(kMsgMilTime));
- 	item->SetTarget(replicantTray);
- 	item->SetEnabled(((TBarApp *)be_app)->BarView()->ShowingClock());
- 	item->SetMarked(replicantTray->ShowingMiltime());
- 	subMenu->AddItem(item);
-
-	item = new BMenuItem("Show Seconds", new BMessage(kMsgShowSeconds));
- 	item->SetTarget(replicantTray);
- 	item->SetEnabled(((TBarApp *)be_app)->BarView()->ShowingClock());
- 	item->SetMarked(replicantTray->ShowingSeconds());
- 	subMenu->AddItem(item);
-
-	item = new BMenuItem("European Date", new BMessage(kMsgEuroDate));
- 	item->SetTarget(replicantTray);
- 	item->SetEnabled(((TBarApp *)be_app)->BarView()->ShowingClock());
- 	item->SetMarked(replicantTray->ShowingEuroDate());
- 	subMenu->AddItem(item);
-
-	item = new BMenuItem("Full Date", new BMessage(kMsgFullDate));
-	item->SetTarget(replicantTray);
-	item->SetEnabled(replicantTray->CanShowFullDate());
-	item->SetMarked(replicantTray->ShowingFullDate());
-	subMenu->AddItem(item);
-
-	subMenu->AddSeparatorItem();
-
-	item = new BMenuItem("Show Application Expander", new BMessage(msg_superExpando));
-	item->SetTarget(be_app);
-	item->SetMarked(static_cast<TBarApp *>(be_app)->Settings()->superExpando);
-	subMenu->AddItem(item);
-
-	item = new BMenuItem("Expand New Applications", new BMessage(msg_expandNewTeams));
-	item->SetTarget(be_app);
-	item->SetMarked(static_cast<TBarApp *>(be_app)->Settings()->expandNewTeams);
-	item->SetEnabled(static_cast<TBarApp *>(be_app)->Settings()->superExpando);
-	subMenu->AddItem(item);
-
-	subMenu->SetFont(be_plain_font);
-	AddItem(subMenu);
+	AddItem(item);
 
 #ifndef __HAIKU__
 	if ((modifiers() & (B_LEFT_SHIFT_KEY|B_LEFT_CONTROL_KEY|B_LEFT_COMMAND_KEY))
@@ -448,7 +375,7 @@ TBeMenu::ResetTargets()
 					break;
 
 				case msg_ToggleDraggers:
-				case msg_config_db:
+				case kConfigShow:
 				case msg_AlwaysTop:
 				case kMsgShowSeconds:
 				case kMsgMilTime:

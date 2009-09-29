@@ -51,8 +51,6 @@ All rights reserved.
 #	include <RosterPrivate.h>
 #endif
 
-#include "FavoritesConfig.h"
-
 #include "icons.h"
 #include "tracker_private.h"
 #include "BarApp.h"
@@ -101,7 +99,7 @@ main()
 TBarApp::TBarApp()
 	:	BApplication(kDeskbarSignature),
 		fSettingsFile(NULL),
-		fConfigWindow(NULL)
+		fPreferencesWindow(NULL)
 {
 	InitSettings();
 	InitIconPreloader();
@@ -164,9 +162,23 @@ TBarApp::~TBarApp()
 bool
 TBarApp::QuitRequested()
 {
-	if (CurrentMessage() && CurrentMessage()->FindBool("shortcut"))
-		// don't allow user quitting
+	// don't allow user quitting
+	if (CurrentMessage() && CurrentMessage()->FindBool("shortcut")) {
+		// but allow quitting to hide fPreferencesWindow
+		int32 index = 0;
+		BWindow* window = NULL;
+		while ((window = WindowAt(index++)) != NULL) {
+			if (window == fPreferencesWindow) {
+				if (fPreferencesWindow->Lock()) {
+					if (fPreferencesWindow->IsActive())
+						fPreferencesWindow->PostMessage(B_QUIT_REQUESTED);
+					fPreferencesWindow->Unlock();
+				}
+				break;
+			}
+		}
 		return false;
+	}
 
 	// system quitting, call inherited to notify all loopers
 	fBarWindow->SaveSettings();
@@ -221,7 +233,7 @@ TBarApp::InitSettings()
 	settings.recentDocsCount = 10;
 	settings.timeShowSeconds = false;
 	settings.timeShowMil = false;
-	settings.recentFoldersCount = 0;	// default is hidden
+	settings.recentFoldersCount = 10;
 	settings.timeShowEuro = false;
 	settings.alwaysOnTop = false;
 	settings.timeFullDate = false;
@@ -229,7 +241,7 @@ TBarApp::InitSettings()
 	settings.sortRunningApps = false;
 	settings.superExpando = false;
 	settings.expandNewTeams = false;
-	settings.autoRaise = true;
+	settings.autoRaise = false;
 
 	BPath dirPath;
 	const char *settingsFileName = "Deskbar_settings";
@@ -316,13 +328,7 @@ TBarApp::MessageReceived(BMessage *message)
 			break;
 
 		case kConfigShow:
-			if (message->FindInt32("count", &count) == B_OK)
-				fSettings.recentDocsCount = count;
-			break;
-
-		case kUpdateAppsCount:
-			if (message->FindInt32("count", &count) == B_OK)
-				fSettings.recentAppsCount = count;
+			ShowPreferencesWindow();
 			break;
 
 		case kShowBeMenu:
@@ -339,19 +345,17 @@ TBarApp::MessageReceived(BMessage *message)
 			}
 			break;
 
-		case msg_config_db:
-			ShowConfigWindow();
-			break;
-
-		case kConfigClose:
+		case kUpdateRecentCounts:
 			if (message->FindInt32("applications", &count) == B_OK)
 				fSettings.recentAppsCount = count;
 			if (message->FindInt32("folders", &count) == B_OK)
 				fSettings.recentFoldersCount = count;
 			if (message->FindInt32("documents", &count) == B_OK)
 				fSettings.recentDocsCount = count;
+			break;
 
-			fConfigWindow = NULL;
+		case kConfigClose:
+			fPreferencesWindow = NULL;
 			break;
 
 		case B_SOME_APP_LAUNCHED:
@@ -691,27 +695,13 @@ TBarApp::RemoveTeam(team_id team)
 
 
 void
-TBarApp::ShowConfigWindow()
+TBarApp::ShowPreferencesWindow()
 {
-	if (fConfigWindow)
-		fConfigWindow->Activate();
+	if (fPreferencesWindow)
+		fPreferencesWindow->Activate();
  	else {
-		//	always start at top, could be cached and we could start
-		//	where we left off.
-		BPath path;
-		find_directory (B_USER_DESKBAR_DIRECTORY, &path);
-		entry_ref startref;
-		get_ref_for_path(path.Path(), &startref);
-
-		fConfigWindow = new TFavoritesConfigWindow(BRect(0, 0, 320, 240),
-#ifdef __HAIKU__
-			"Configure Deskbar Menu", false, B_ANY_NODE,
-#else
-			"Configure Be Menu", false, B_ANY_NODE,
-#endif
-			BMessenger(this), &startref,
-			fSettings.recentAppsCount, fSettings.recentDocsCount,
-			fSettings.recentFoldersCount);
+		fPreferencesWindow = new PreferencesWindow(BRect(0, 0, 320, 240));
+		fPreferencesWindow->Show();
 	}
 }
 

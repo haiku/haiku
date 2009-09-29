@@ -38,6 +38,7 @@ All rights reserved.
 #include <Application.h>
 #include <List.h>
 #include "BarWindow.h"
+#include "PreferencesWindow.h"
 
 
 /* ------------------------------------ */
@@ -68,7 +69,6 @@ const uint32 msg_Mac = 'WcOS';
 const uint32 msg_Be = 'Tabs';
 const uint32 msg_AlwaysTop = 'TTop';
 const uint32 msg_ToggleDraggers = 'TDra';
-const uint32 msg_config_db = 'cnfg';
 const uint32 msg_Unsubscribe = 'Unsb';
 const uint32 msg_AddTeam = 'AdTm';
 const uint32 msg_RemoveTeam = 'RmTm';
@@ -131,10 +131,6 @@ const uint32 kValidSettingsSize10 = sizeof(bool) + kValidSettingsSize9;
 class TBarView;
 class BFile;
 
-namespace BPrivate {
-	class TFavoritesConfigWindow;
-}
-
 using namespace BPrivate;
 
 class TBarApp : public BApplication {
@@ -163,7 +159,7 @@ class TBarApp : public BApplication {
 		void InitSettings();
 		void SaveSettings();
 
-		void ShowConfigWindow();
+		void ShowPreferencesWindow();
 
 		TBarWindow *fBarWindow;
 		BMessenger fSwitcherMessenger;
@@ -171,7 +167,7 @@ class TBarApp : public BApplication {
 		BFile *fSettingsFile;
 		desk_settings fSettings;
 
-		TFavoritesConfigWindow *fConfigWindow;
+		PreferencesWindow* fPreferencesWindow;
 
 		static BLocker sSubscriberLock;
 		static BList sBarTeamInfoList;
@@ -179,3 +175,4 @@ class TBarApp : public BApplication {
 };
 
 #endif	// BAR_APP_H
+

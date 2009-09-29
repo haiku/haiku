@@ -5,6 +5,7 @@ SubInclude HAIKU_TOP src preferences backgrounds ;
 SubInclude HAIKU_TOP src preferences bluetooth ;
 SubInclude HAIKU_TOP src preferences cpufrequency ;
 SubInclude HAIKU_TOP src preferences datatranslations ;
+SubInclude HAIKU_TOP src preferences deskbar ;
 SubInclude HAIKU_TOP src preferences devices ;
 #SubInclude HAIKU_TOP src preferences dun ;
 SubInclude HAIKU_TOP src preferences filetypes ;
@@ -26,3 +27,4 @@ SubInclude HAIKU_TOP src preferences time ;
 SubInclude HAIKU_TOP src preferences touchpad ;
 SubInclude HAIKU_TOP src preferences tracker ;
 SubInclude HAIKU_TOP src preferences virtualmemory ;
+

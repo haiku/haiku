@@ -134,6 +134,7 @@ class TBarView : public BView {
 		TExpandoMenuBar *ExpandoMenuBar() const;
 		TBarMenuBar *BarMenuBar() const;
 		friend class TBeMenu;
+		friend class PreferencesWindow;
 
 	private:
 		status_t SendDragMessage(const char *signature, entry_ref *ref = NULL);
