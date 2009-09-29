@@ -83,6 +83,11 @@ AVCodecDecoder::AVCodecDecoder()
 	fOutputFrameRate(1.0),
 	fOutputFrameSize(0),
 
+	fChunkBuffer(NULL),
+	fChunkBufferOffset(0),
+	fChunkBufferSize(0),
+	fAudioDecodeError(false),
+
 	fOutputBuffer(NULL),
 	fOutputBufferOffset(0),
 	fOutputBufferSize(0)
@@ -147,7 +152,6 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 		ioEncodedFormat->user_data_type);
 	TRACE("[%c]   meta_data_size = %ld\n", fIsAudio?('a'):('v'),
 		ioEncodedFormat->MetaDataSize());
-	TRACE("[%c]   info_size = %ld\n", fIsAudio?('a'):('v'), infoSize);
 #endif
 
 	media_format_description descr;
@@ -182,24 +186,27 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 					puts("ERR family");
 					return B_ERROR;
 			}
-			TRACE("  0x%04lx codec id = \"%c%c%c%c\"\n", uint32(cid),
-				(char)((cid >> 24) & 0xff), (char)((cid >> 16) & 0xff),
-				(char)((cid >> 8) & 0xff), (char)(cid & 0xff));
 
 			if (gCodecTable[i].family == descr.family
 				&& gCodecTable[i].fourcc == cid) {
+
+				TRACE("  0x%04lx codec id = \"%c%c%c%c\"\n", uint32(cid),
+					(char)((cid >> 24) & 0xff), (char)((cid >> 16) & 0xff),
+					(char)((cid >> 8) & 0xff), (char)(cid & 0xff));
+
 				fCodec = avcodec_find_decoder(gCodecTable[i].id);
 				if (fCodec == NULL) {
-					TRACE("AVCodecDecoder: unable to find the correct FFmpeg "
+					TRACE("  unable to find the correct FFmpeg "
 						"decoder (id = %d)\n", gCodecTable[i].id);
 					return B_ERROR;
 				}
-				TRACE("AVCodecDecoder: found decoder %s\n",fCodec->name);
+				TRACE("  found decoder %s\n", fCodec->name);
 
 				const void* extraData = infoBuffer;
 				fExtraDataSize = infoSize;
 				if (gCodecTable[i].family == B_WAV_FORMAT_FAMILY
 						&& infoSize >= sizeof(wave_format_ex)) {
+					TRACE("  trying to use wave_format_ex\n");
 					// Special case extra data in B_WAV_FORMAT_FAMILY
 					const wave_format_ex* waveFormatData
 						= (const wave_format_ex*)infoBuffer;
@@ -207,13 +214,19 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 					size_t waveFormatSize = infoSize;
 					if (waveFormatData != NULL && waveFormatSize > 0) {
 						fBlockAlign = waveFormatData->block_align;
+						TRACE("  found block align: %d\n", fBlockAlign);
 						fExtraDataSize = waveFormatData->extra_size;
 						// skip the wave_format_ex from the extra data.
 						extraData = waveFormatData + 1;
 					}
 				} else {
-					fBlockAlign
-						= ioEncodedFormat->u.encoded_audio.output.buffer_size;
+					if (fIsAudio) {
+						fBlockAlign
+							= ioEncodedFormat->u.encoded_audio.output
+								.buffer_size;
+						TRACE("  using buffer_size as block align: %d\n",
+							fBlockAlign);
+					}
 				}
 				if (extraData != NULL && fExtraDataSize > 0) {
 					TRACE("AVCodecDecoder: extra data size %ld\n", infoSize);
@@ -350,13 +363,19 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	fContext->block_align = fBlockAlign;
 	fContext->extradata = (uint8_t*)fExtraData;
 	fContext->extradata_size = fExtraDataSize;
-	
+
+	// TODO: This probably needs to go away, there is some misconception
+	// about extra data / info buffer and meta data. See
+	// Reader::GetStreamInfo(). The AVFormatReader puts extradata and
+	// extradata_size into media_format::MetaData(), but used to ignore
+	// the infoBuffer passed to GetStreamInfo(). I think this may be why
+	// the code below was added.
 	if (fInputFormat.MetaDataSize() > 0) {
 		fContext->extradata = (uint8_t*)fInputFormat.MetaData();
 		fContext->extradata_size = fInputFormat.MetaDataSize();
 	}
 
-	TRACE("bit_rate %d, sample_rate %d, channels %d, block_align %d, "
+	TRACE("  bit_rate %d, sample_rate %d, channels %d, block_align %d, "
 		"extradata_size %d\n", fContext->bit_rate, fContext->sample_rate,
 		fContext->channels, fContext->block_align, fContext->extradata_size);
 
@@ -370,19 +389,22 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	int result = avcodec_open(fContext, fCodec);
 	fCodecInitDone = (result >= 0);
 
-	TRACE("audio: bit_rate = %d, sample_rate = %d, chans = %d Init = %d\n",
-		fContext->bit_rate, fContext->sample_rate, fContext->channels,
-		result);
-
 	fStartTime = 0;
 	size_t sampleSize = outputAudioFormat.format
 		& media_raw_audio_format::B_AUDIO_SIZE_MASK;
 	fOutputFrameSize = sampleSize * outputAudioFormat.channel_count;
 	fOutputFrameCount = outputAudioFormat.buffer_size / fOutputFrameSize;
 	fOutputFrameRate = outputAudioFormat.frame_rate;
-	fChunkBuffer = 0;
+
+	TRACE("  bit_rate = %d, sample_rate = %d, channels = %d, init = %d, "
+		"output frame size: %d, count: %ld, rate: %.2f\n",
+		fContext->bit_rate, fContext->sample_rate, fContext->channels,
+		result, fOutputFrameSize, fOutputFrameCount, fOutputFrameRate);
+
+	fChunkBuffer = NULL;
 	fChunkBufferOffset = 0;
 	fChunkBufferSize = 0;
+	fAudioDecodeError = false;
 	fOutputBufferOffset = 0;
 	fOutputBufferSize = 0;
 
@@ -414,11 +436,6 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 
 	fContext->extradata = (uint8_t*)fExtraData;
 	fContext->extradata_size = fExtraDataSize;
-
-//	if (fInputFormat.MetaDataSize() > 0) {
-//		fContext->extradata = (uint8_t*)fInputFormat.MetaData();
-//		fContext->extradata_size = fInputFormat.MetaDataSize();
-//	}
 
 	TRACE("  requested video format 0x%x\n",
 		inOutFormat->u.raw_video.display.format);
@@ -550,16 +567,19 @@ AVCodecDecoder::_DecodeAudio(void* outBuffer, int64* outFrameCount,
 				&out_size, (uint8_t*)fChunkBuffer + fChunkBufferOffset,
 				fChunkBufferSize);
 			if (len < 0) {
-				TRACE("########### audio decode error, "
-					"fChunkBufferSize %ld, fChunkBufferOffset %ld\n",
-					fChunkBufferSize, fChunkBufferOffset);
+				if (!fAudioDecodeError) {
+					TRACE("########### audio decode error, "
+						"fChunkBufferSize %ld, fChunkBufferOffset %ld\n",
+						fChunkBufferSize, fChunkBufferOffset);
+					fAudioDecodeError = true;
+				}
 				out_size = 0;
 				len = 0;
 				fChunkBufferOffset = 0;
 				fChunkBufferSize = 0;
-//				} else {
-//					TRACE("audio decode: len %d, out_size %d\n", len, out_size);
-			}
+			} else
+				fAudioDecodeError = false;
+
 			fChunkBufferOffset += len;
 			fChunkBufferSize -= len;
 			fOutputBufferOffset = 0;
