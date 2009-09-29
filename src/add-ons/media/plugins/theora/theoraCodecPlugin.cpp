@@ -61,7 +61,7 @@ TheoraDecoder::GetCodecInfo(media_codec_info *info)
 
 status_t
 TheoraDecoder::Setup(media_format *inputFormat,
-				  const void *infoBuffer, int32 infoSize)
+				  const void *infoBuffer, size_t infoSize)
 {
 	TRACE("TheoraDecoder::Setup\n");
 	if (!format_is_compatible(theora_encoded_media_format(),*inputFormat)) {
@@ -163,8 +163,8 @@ TheoraDecoder::Decode(void *buffer, int64 *frameCount,
 	bool synced = false;
 
 	// get a new packet
-	void *chunkBuffer;
-	int32 chunkSize;
+	const void *chunkBuffer;
+	size_t chunkSize;
 	media_header mh;
 	status = GetNextChunk(&chunkBuffer, &chunkSize, &mh);
 	if (status == B_LAST_BUFFER_ERROR) {
@@ -181,9 +181,22 @@ TheoraDecoder::Decode(void *buffer, int64 *frameCount,
 
 	// decode the packet
 	{
-		ogg_packet * packet = static_cast<ogg_packet*>(chunkBuffer);
+		ogg_packet packet;
+		if (mh.user_data_type == OGG_PACKET_DATA_TYPE) {
+			memcpy(&packet, mh.user_data, sizeof(packet));
+		} else {
+			// According to http://lists.xiph.org/pipermail/theora-dev/2004-May/002161.html
+			// this is invalid, but results from it are tolerable and better than nothing.
+				TRACE("TheoraDecoder::Decode: using compatibility chunk interpretation\n");
+				packet.b_o_s = 0;
+				packet.e_o_s = 0;
+				packet.granulepos = -1;
+				packet.packetno = 7;
+		}
+		packet.packet = (unsigned char *)chunkBuffer;
+		packet.bytes = chunkSize;
 		// push the packet in and get the decoded yuv output
-		theora_decode_packetin(&fState, packet);
+		theora_decode_packetin(&fState, &packet);
 		yuv_buffer yuv;
 		theora_decode_YUVout(&fState, &yuv);
 		// now copy the decoded yuv output to the buffer
@@ -193,9 +206,9 @@ TheoraDecoder::Decode(void *buffer, int64 *frameCount,
 		uint draw_bytes_per_line = yuv.y_width + yuv.uv_width*2;
 		uint bytes_per_line = draw_bytes_per_line;
 		for (uint line = 0 ; line < fOutput.display.line_count ; line++) {
-			char * y = yuv.y;
-			char * u = yuv.u;
-			char * v = yuv.v;
+			unsigned char * y = yuv.y;
+			unsigned char * u = yuv.u;
+			unsigned char * v = yuv.v;
 			for (uint pos = 0 ; pos < draw_bytes_per_line ; pos += 4) {
 				out[pos]   = *(y++);
 				out[pos+1] = *(u++);

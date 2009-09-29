@@ -42,4 +42,5 @@ public:
 	status_t	GetSupportedFormats(media_format ** formats, size_t * count);
 };
 
-#endif _THEORA_CODEC_PLUGIN_H_
+#endif  // _THEORA_CODEC_PLUGIN_H_
+
