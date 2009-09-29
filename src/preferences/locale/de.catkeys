@@ -1,4 +1,4 @@
-1	de	x-vnd.Haiku-Locale	2641784784
+1	de	x-vnd.Haiku-Locale	3822351296
 day of week (short name)	TimeFormatSettings		Tag der Woche (Abkz.)
 Available languages	Locale Preflet Window		Verfügbare Sprachen
 Decimal separator	TimeFormatSettings		Dezimal Separator
@@ -19,7 +19,7 @@ Preferred languages	Locale Preflet Window		Bevorzugte Sprache
 Symbol position	TimeFormatSettings		Symbol Position
 month number	TimeFormatSettings		Nummer des Monats
 month number (2 digits)	TimeFormatSettings		Nummer des Monats (2 Zahlen)
-Unable to find the available languages!You can't use this preflet!	Locale Preflet Window		Nicht möglich die Sprachen die zur Verfügung stehen zu laden. Einstellungsdialog kann nicht geladen werden !
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nicht möglich die Sprachen die zur Verfügung stehen zu laden. Einstellungsdialog kann nicht geladen werden !
 Numbers	TimeFormatSettings		Nummern
  (unknown format)	TimeFormatSettings		 (unbekanntes Format)
 Negative marker:	TimeFormatSettings		Negativ Zeichen:

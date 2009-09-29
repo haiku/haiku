@@ -384,7 +384,7 @@ LocaleWindow::LocaleWindow(BRect rect)
 
 		} else {
 			BAlert* myAlert = new BAlert("Error",
-				TR("Unable to find the available languages! You can't use this"
+				TR("Unable to find the available languages! You can't use this "
 					"preflet!"),
 				TR("Ok"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_STOP_ALERT);
