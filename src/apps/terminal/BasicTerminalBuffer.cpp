@@ -608,6 +608,7 @@ BasicTerminalBuffer::FillScreen(UTF8Char c, uint32 width, uint32 attributes)
 	_Invalidate(0, fHeight - 1);
 }
 
+
 void
 BasicTerminalBuffer::InsertCR()
 {
@@ -651,6 +652,7 @@ BasicTerminalBuffer::InsertRI()
 	}
 }
 
+
 void
 BasicTerminalBuffer::InsertTab()
 {
@@ -667,6 +669,7 @@ BasicTerminalBuffer::InsertTab()
 		_CursorChanged();
 	}
 }
+
 
 void
 BasicTerminalBuffer::InsertLines(int32 numLines)
@@ -870,6 +873,7 @@ BasicTerminalBuffer::RestoreOriginMode()
 {
 	fOriginMode = fSavedOriginMode;
 }
+
 
 void
 BasicTerminalBuffer::SetTabStop(int32 x)
@@ -1325,6 +1329,7 @@ BasicTerminalBuffer::_ResetTabStops(int32 width)
 		fTabStops[i] = (i % TAB_WIDTH) == 0;
 	return B_OK;
 }
+
 
 void
 BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
