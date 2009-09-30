@@ -216,7 +216,7 @@ hpet_init(struct kernel_args *args)
 	install_io_interrupt_handler(0, &hpet_timer_interrupt, NULL,
 		B_NO_LOCK_VECTOR);
 
-	hpet_init_timer(&sHPETRegs->timer[0]);
+	hpet_init_timer(&sHPETRegs->timer[2]);
 	
 	status = hpet_set_enabled(true);
 
