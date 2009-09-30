@@ -151,8 +151,8 @@ TBarApp::~TBarApp()
 
 	int32 subsCount = sSubscribers.CountItems();
 	for (int32 i = 0; i < subsCount; i++) {
-		BMessenger* messenger =
-			static_cast<BMessenger*>(sSubscribers.ItemAt(i));
+		BMessenger* messenger
+			= static_cast<BMessenger*>(sSubscribers.ItemAt(i));
 		delete messenger;
 	}
 	SaveSettings();
