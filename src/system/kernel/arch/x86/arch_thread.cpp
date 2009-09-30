@@ -446,6 +446,10 @@ arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1,
 	thread_at_kernel_exit();
 		// also disables interrupts
 
+	// install user breakpoints, if any
+	if ((t->flags & THREAD_FLAGS_BREAKPOINTS_DEFINED) != 0)
+		x86_init_user_debug_at_kernel_exit(NULL);
+
 	i386_set_tss_and_kstack(t->kernel_stack_top);
 
 	// set the CPU dependent GDT entry for TLS
