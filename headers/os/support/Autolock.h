@@ -12,20 +12,20 @@
 
 class BAutolock {
 public:
-inline							BAutolock(BLooper* looper);
-inline							BAutolock(BLocker* locker);
-inline							BAutolock(BLocker& locker);
-inline							~BAutolock();
+	inline						BAutolock(BLooper* looper);
+	inline						BAutolock(BLocker* locker);
+	inline						BAutolock(BLocker& locker);
+	inline						~BAutolock();
 
-inline	bool					IsLocked();
+	inline	bool				IsLocked();
 
-inline	bool					Lock();
-inline	void					Unlock();
+	inline	bool				Lock();
+	inline	void				Unlock();
 
 private:
-		BLocker*				fLocker;
-		BLooper*				fLooper;
-		bool					fIsLocked;
+			BLocker*			fLocker;
+			BLooper*			fLooper;
+			bool				fIsLocked;
 };
 
 
