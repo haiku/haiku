@@ -19,6 +19,7 @@ public:
 	
 private:
 	BluetoothWindow *fWindow;
+	BCatalog cat;
 
 };
 

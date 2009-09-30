@@ -20,6 +20,7 @@ public:
 private:
 	
 	APRWindow *fWindow;
+	BCatalog cat;
 };
 
 #endif

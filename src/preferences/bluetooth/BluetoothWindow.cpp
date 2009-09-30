@@ -33,7 +33,7 @@ LocalDevice* ActiveLocalDevice = NULL;
 
 
 BluetoothWindow::BluetoothWindow(BRect frame)
- :	BWindow(frame, "Bluetooth", B_TITLED_WINDOW,
+ :	BWindow(frame, TR("Bluetooth"), B_TITLED_WINDOW,
  		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
  		B_ALL_WORKSPACES)
 {

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-BluetoothPrefs	2566651844
+1	french	x-vnd.Haiku-BluetoothPrefs	406799883
 About…	Window		À propos…
 Handheld	Settings view		Appareil de poche
 Only from Trusted devices	Settings view		Seulement les appareils de confiance
@@ -22,6 +22,7 @@ Remove	Remote devices		Enlever
 15 secs	Settings view		15 secs
 Policy...	Settings view		Attitude...
 61 secs	Settings view		61 secs
+Haiku Bluetooth System, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Système Bluetooth Haiku, (ARCE)\n\nCréé par Oliver Ruiz Dorantes\n\nAvec le soutien de :\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nMerci à toutes les personnes qui ont aidé...\n\nDons de matériel :\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFinancièrement :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nRustines :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTests:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nQui m'ont tout appris :\n\t- l'équipe yellowTAB
 Identify us as...	Settings view		S'identifier comme...
 Remaining 	Inquiry panel		Restant 
 Connections & Channels list…	Window		Liste des canaux et connexions…
@@ -32,6 +33,7 @@ Desktop	Settings view		Bureau
 Revert	Window		Défaire
 Laptop	Settings view		Portable
 Retrieving name of 	Inquiry panel		Récupérer le nom de 
+Bluetooth	Window		Bluetooth
 Local Devices found on system:	Settings view		Appareils locaux trouvés sur le système :
 As Trusted	Remote devices		Comme de confiance
 Discoverable	Extended local device view		Découvrable
@@ -45,6 +47,7 @@ Always ask	Settings view		Toujours demander
 Remote Devices List…	Window		Liste des appareils distants…
 Retrieving names...	Inquiry panel		Récupération des noms...
 Help	Window		Aide
+Ok	main		Ok
 Add…	Remote devices		Ajouter…
 There has not been found any bluetooth LocalDevice device registered on the system	Inquiry panel		Aucun matériel bluetooth trouvé sur le système
 Stop Bluetooth Services…	Window		Arrêter les services bluetooth…

@@ -18,7 +18,6 @@ APRApplication::APRApplication(void)
 {
 	// Do this now because we need to call BWindow constructor with a translated
 	// string.
-	BCatalog cat;
 	be_locale->GetAppCatalog(&cat);
 
 	fWindow = new APRWindow(BRect(100, 100, 550, 420));

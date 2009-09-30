@@ -18,7 +18,6 @@
 BluetoothApplication::BluetoothApplication(void)
  :	BApplication(BLUETOOTH_APP_SIGNATURE)
 {
-	BCatalog cat;
 	be_locale->GetAppCatalog(&cat);
 
 	fWindow = new BluetoothWindow(BRect(100, 100, 550, 420));
@@ -30,7 +29,7 @@ void
 BluetoothApplication::AboutRequested()
 {
 	
-	(new BAlert("about", /*TR*/("Haiku Bluetooth System, (ARCE)\n\n"
+	(new BAlert("about", TR("Haiku Bluetooth System, (ARCE)\n\n"
                              "Created by Oliver Ruiz Dorantes\n\n"
                              "With support of:\n"
                              "	- Mika Lindqvist\n"
@@ -59,7 +58,7 @@ BluetoothApplication::AboutRequested()
                              "	- Petter H. Juliussen\n"
                              "	- Adrien Destugues\n\n"
                              "Who gave me all the knowledge:\n"
-                             "	- the yellowTAB team"), /*TR*/("Ok")))->Go();
+                             "	- the yellowTAB team"), TR("Ok")))->Go();
 	
 }
 
