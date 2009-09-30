@@ -18,7 +18,7 @@
 BluetoothApplication::BluetoothApplication(void)
  :	BApplication(BLUETOOTH_APP_SIGNATURE)
 {
-	be_locale->GetAppCatalog(&cat);
+	be_locale->GetAppCatalog(&fCatalog);
 
 	fWindow = new BluetoothWindow(BRect(100, 100, 550, 420));
 	fWindow->Show();

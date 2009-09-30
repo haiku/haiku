@@ -9,6 +9,7 @@
 #define APR_MAIN_H
 
 #include <Application.h>
+#include <Catalog.h>
 
 class APRWindow;
 
@@ -20,7 +21,7 @@ public:
 private:
 	
 	APRWindow *fWindow;
-	BCatalog cat;
+	BCatalog fCatalog;
 };
 
 #endif
