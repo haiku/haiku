@@ -484,6 +484,7 @@ typedef enum cpu_types {
 	B_CPU_INTEL_PENTIUM_CORE_2,
 	B_CPU_INTEL_PENTIUM_CORE_2_EXTREME	= 0x11067, /* Core 2 Extreme or Xeon
 	                                                   model 23 on 45 nm */
+	B_CPU_INTEL_PENTIUM_CORE_I7		= 0x1106a, /* Core i7 920 @ 2.6(6) */
 	B_CPU_INTEL_PENTIUM_IV				= 0x10f0,
 	B_CPU_INTEL_PENTIUM_IV_MODEL_1,
 	B_CPU_INTEL_PENTIUM_IV_MODEL_2,

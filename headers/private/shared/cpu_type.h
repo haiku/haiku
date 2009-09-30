@@ -115,6 +115,8 @@ get_cpu_model_string(system_info *info)
 			return "Core 2";
 		case B_CPU_INTEL_PENTIUM_CORE_2_EXTREME:
 			return "Core 2 Extreme";
+		case B_CPU_INTEL_PENTIUM_CORE_I7:
+			return "Core i7";
 		case B_CPU_INTEL_PENTIUM_IV:
 		case B_CPU_INTEL_PENTIUM_IV_MODEL_1:
 		case B_CPU_INTEL_PENTIUM_IV_MODEL_2:
