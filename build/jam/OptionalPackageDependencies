@@ -5,7 +5,7 @@
 
 OptionalPackageDependencies Subversion : APR-util Neon LibIconv LibXML2 OpenSSL SQLite ;
 OptionalPackageDependencies APR-util : APR Expat ;
-OptionalPackageDependencies Beam : LibIconv LibLayout OpenSSL Pe ;  # FIXME: Pe for PCRE-libs
+OptionalPackageDependencies Beam : LibIconv LibLayout OpenSSL PCRE ;
 OptionalPackageDependencies BeHappy : BeBook NetSurf ;
 OptionalPackageDependencies Development : DevelopmentBase Perl ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
