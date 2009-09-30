@@ -201,3 +201,4 @@ TBarMenuBar::InitTrackingHook(bool (*hookFunction)(BMenu*, void*),
 	if (fAppListMenuItem && (fAppListMenuItem->Frame().Contains(loc) || both)) 
 		init_tracking_hook(fAppListMenuItem, hookFunction, state);
 }
+

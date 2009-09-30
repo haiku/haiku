@@ -127,7 +127,8 @@ class TBarView : public BView {
 		BRect IconFrame(int32 id) const;
 		BRect IconFrame(const char* name) const;
 
-		void GetPreferredWindowSize(BRect screenFrame, float* width, float* height);
+		void GetPreferredWindowSize(BRect screenFrame, float* width,
+			float* height);
 		void SizeWindow(BRect screenFrame);
 		void PositionWindow(BRect screenFrame);
 
@@ -206,3 +207,4 @@ TBarView::CachedTypesList() const
 }
 
 #endif /* BARVIEW_H */
+

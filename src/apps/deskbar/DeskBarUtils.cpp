@@ -41,6 +41,7 @@ All rights reserved.
 #include <AppFileInfo.h>
 #include <Directory.h>
 #include <FilePanel.h>
+#include <FindDirectory.h>
 #include <List.h>
 #include <Mime.h>
 #include <NodeInfo.h>
@@ -51,22 +52,6 @@ All rights reserved.
 #include "BarMenuBar.h"
 #include "DeskBarUtils.h"
 #include "ExpandoMenuBar.h"
-
-const char* const kBePath = "/boot/home/config/be";
-
-BFilePanel*
-AskForRefLocation(BMessenger* target)
-{
-	entry_ref startRef;
-	get_ref_for_path(kBePath, &startRef);
-	
-	BFilePanel* fp = new BFilePanel(B_OPEN_PANEL, target, &startRef,
-		B_DIRECTORY_NODE | B_FILE_NODE,
-		false, new BMessage(msg_be_container));
-	fp->Show();
-		
-	return fp;		
-}
 
 void
 AddRefsToBeMenu(const BMessage* m, entry_ref* subdirectory)
@@ -98,8 +83,12 @@ AddRefsToBeMenu(const BMessage* m, entry_ref* subdirectory)
 				return;
 				
 			dir.SetTo(&ref);
-		} else
-			dir.SetTo(kBePath);
+		} else {
+			if (find_directory(B_USER_DESKBAR_DIRECTORY, &path) == B_OK)
+				dir.SetTo(path.Path());
+			else
+				return;
+		}
 			
 		for (long i = 0; i < count; i++) {
 			if (m->FindRef("refs", i, &ref) == B_NO_ERROR) {
@@ -113,77 +102,3 @@ AddRefsToBeMenu(const BMessage* m, entry_ref* subdirectory)
 	}
 }
 
-bool
-SignatureForRef(const entry_ref* ref, char* signature)
-{
-	BEntry entry(ref, true);
-	if (entry.InitCheck()==B_OK && entry.Exists()) {
-		if (entry.IsFile()) {
-			BFile file(&entry, O_RDWR);
-			BAppFileInfo finfo(&file);
-			
-			finfo.GetSignature(signature);
-			
-			return true;
-		}	
-	}
-	return false;
-}
-
-void
-CenterWindowOnScreen(BWindow* w)
-{
-	BRect	screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
-	BPoint 	pt;
-	pt.x = screenFrame.Width()/2 - w->Bounds().Width()/2;
-	pt.y = screenFrame.Height()/2 - w->Bounds().Height()/2;
-
-	if (screenFrame.Contains(pt))
-		w->MoveTo(pt);
-}
-
-float
-FontHeight(const BFont* font, bool full)
-{
-	font_height finfo;		
-	font->GetHeight(&finfo);
-	float h = finfo.ascent + finfo.descent;
-
-	if (full)
-		h += finfo.leading;
-	
-	return h;
-}
-
-#ifdef LOG
-const char* const kLogPath = "/boot/home/";
-const char* const kLogFile = "deskbar_log";
-void
-AddToLog(const char* str)
-{
-	if (!str)
-		return;
-		
-//	BFile file;
-//	BDirectory dir(kLogPath);
-//	if (!dir.Contains(kLogFile))
-//		dir.CreateFile(kLogFile, &file);
-//	else {
-//		BEntry entry;
-//		dir.FindEntry(kLogFile, &entry);
-//		file.SetTo(&entry, O_RDWR);
-//	}
-//	
-//	if (file.InitCheck() != B_OK)
-//		printf("Deskbar Log: can't add to log\n");
-//		
-//	off_t size;
-//	file.GetSize(&size);	
-//	file.WriteAt(size, str, strlen(str));
-	
-	char dstr[B_PATH_NAME_LENGTH+1024];
-	sprintf(dstr, "Deskbar: %s\n", str);
-//	printf("%s\n", str);
-	SERIAL_PRINT((dstr));
-}
-#endif

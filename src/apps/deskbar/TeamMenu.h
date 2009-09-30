@@ -56,3 +56,4 @@ class TTeamMenu : public BMenu {
 };
 
 #endif /* TEAMMENU_H */
+

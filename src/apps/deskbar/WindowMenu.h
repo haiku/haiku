@@ -62,3 +62,4 @@ class TWindowMenu : public BMenu {
 };
 
 #endif /* WINDOWMENU_H */
+

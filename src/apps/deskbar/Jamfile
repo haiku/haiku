@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps deskbar ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders app interface shared tracker ;
 UsePrivateHeaders private shared ;
 SubDirHdrs $(HAIKU_TOP) src kits tracker ;
@@ -16,13 +14,9 @@ SubDirC++Flags -DDB_ADDONS -DOPEN_TRACKER=1
 local targetLib ;
 local targetSource ;
 
-if $(TARGET_PLATFORM) = haiku {
 targetLib = libshared.a ;
 targetSource = CalendarMenuWindow.cpp ;
 SubDirC++Flags -D_SHOW_CALENDAR_MENU_WINDOW=1 -DMOUNT_MENU_IN_DESKBAR=1 ;
-} else {
-SubDirC++Flags -D_SHOW_CALENDAR_MENU_ITEM=1 ;
-}
 
 Application Deskbar :
 	BarApp.cpp
@@ -48,3 +42,4 @@ Application Deskbar :
 	$(targetSource)
 	: be tracker $(targetLib) $(TARGET_LIBSUPC++)
 	;
+

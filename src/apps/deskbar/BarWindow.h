@@ -64,7 +64,8 @@ class TBarWindow : public BWindow {
 		void 			GetLocation(BMessage*);
 		deskbar_location 	DeskbarLocation() const;
 		void			SetLocation(BMessage*);
-		void			SetDeskbarLocation(deskbar_location location, bool expand);
+		void			SetDeskbarLocation(deskbar_location location,
+							bool expand);
 		
 		void			IsExpanded(BMessage*);
 		void			Expand(BMessage*);
@@ -85,3 +86,4 @@ private:
 };
 
 #endif	/* BAR_WINDOW_H */
+

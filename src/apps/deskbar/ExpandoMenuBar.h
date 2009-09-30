@@ -58,8 +58,8 @@ enum drag_and_drop_selection {
 
 class TExpandoMenuBar : public BMenuBar {
 	public:
-		TExpandoMenuBar(TBarView* bar, BRect frame, const char* name, bool vertical,
-			bool drawLabel = true);
+		TExpandoMenuBar(TBarView* bar, BRect frame, const char* name,
+			bool vertical, bool drawLabel = true);
 
 		virtual void AttachedToWindow();
 		virtual void DetachedFromWindow();
@@ -71,7 +71,8 @@ class TExpandoMenuBar : public BMenuBar {
 		virtual void Draw(BRect update);
 		virtual void DrawBackground(BRect update);
 
-		TTeamMenuItem* TeamItemAtPoint(BPoint location, BMenuItem** _item = NULL);
+		TTeamMenuItem* TeamItemAtPoint(BPoint location,
+			BMenuItem** _item = NULL);
 		bool InBeMenu(BPoint) const;
 
 		void CheckItemSizes(int32 delta);
@@ -118,3 +119,4 @@ class TExpandoMenuBar : public BMenuBar {
 };
 
 #endif /* EXPANDO_MENU_BAR_H */
+

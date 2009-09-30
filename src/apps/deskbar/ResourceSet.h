@@ -117,3 +117,4 @@ private:
 TResourceSet* AppResSet();
 
 #endif
+

@@ -120,8 +120,9 @@ TBarMenuTitle::DrawContent()
 		if (fIcon != NULL) {
 			BRect dstRect(fIcon->Bounds());
 			dstRect.OffsetTo(frame.LeftTop());
-			dstRect.OffsetBy(rintf(((frame.Width() - dstRect.Width()) / 2) - 1.0f),
-				rintf(((frame.Height() - dstRect.Height()) / 2) - 0.0f));
+			dstRect.OffsetBy(rintf(((frame.Width() - dstRect.Width()) / 2)
+				- 1.0f), rintf(((frame.Height() - dstRect.Height()) / 2)
+				- 0.0f));
 	
 			menu->DrawBitmapAsync(fIcon, dstRect);
 		}
@@ -206,3 +207,4 @@ TBarMenuTitle::Invoke(BMessage* message)
 		
 	return BMenuItem::Invoke(message);
 }
+

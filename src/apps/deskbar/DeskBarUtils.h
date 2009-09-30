@@ -37,22 +37,9 @@ All rights reserved.
 
 #include "tracker_private.h"
 
-class BFilePanel;
 
-enum {
-	msg_be_container
-};
-
-BFilePanel* AskForRefLocation(BMessenger* target);
 void AddRefsToBeMenu(const BMessage* m, entry_ref* subdirectory);
 
-bool SignatureForRef(const entry_ref* ref, char* signature);
-
-void CenterWindowOnScreen(BWindow* w);
-float FontHeight(const BFont* font, bool full);
-
-#ifdef LOG
-void AddToLog(const char*);
-#endif
 
 #endif	/* DB_UTILS_H */
+

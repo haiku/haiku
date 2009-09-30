@@ -51,12 +51,12 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fAppsExpandNew = new BCheckBox("Expand New Applications",
 		new BMessage(kExpandNewTeams));
 
-	fClock24Hours = new BCheckBox("24 Hour Clock", new BMessage(kMsgMilTime));
+	fClock24Hours = new BCheckBox("24 Hour Clock", new BMessage(kMilTime));
 	fClockSeconds = new BCheckBox("Show Seconds",
-		new BMessage(kMsgShowSeconds));
+		new BMessage(kShowSeconds));
 	fClockEuropeanDate = new BCheckBox("European Date",
-		new BMessage(kMsgEuroDate));
-	fClockFullDate = new BCheckBox("Full Date", new BMessage(kMsgFullDate));
+		new BMessage(kEuroDate));
+	fClockFullDate = new BCheckBox("Full Date", new BMessage(kFullDate));
 
 	fWindowAlwaysOnTop = new BCheckBox("Always On Top",
 		new BMessage(kAlwaysTop));

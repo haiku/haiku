@@ -51,10 +51,6 @@ All rights reserved.
 
 #define ROSTER_SIG "application/x-vnd.Be-ROST"
 
-#ifdef B_BEOS_VERSION_5
-void run_be_about();
-#endif
-
 #ifdef MOUNT_MENU_IN_DESKBAR
 
 class DeskbarMountMenu : public BPrivate::MountMenu {
@@ -153,14 +149,18 @@ TBeMenu::AddNextItem()
 
 	TrackingHookData* data = fBarView->GetTrackingHookData();
 	if (fAddState == kAddingRecents) {
-		const char* recentTitle[] = {"Recent Documents", "Recent Folders", "Recent Applications"};
-		const int recentType[] = {kRecentDocuments, kRecentFolders, kRecentApplications};
+		const char* recentTitle[] = {"Recent Documents", "Recent Folders",
+			"Recent Applications"};
+		const int recentType[] = {kRecentDocuments, kRecentFolders,
+			kRecentApplications};
 		const int recentTypes = 3;
 		TRecentsMenu* recentItem[recentTypes];
 		int count = 0;
 
 		for (int i = 0; i < recentTypes; i++) {
-			recentItem[i] = new TRecentsMenu(recentTitle[i], fBarView, recentType[i]);
+			recentItem[i] = new TRecentsMenu(recentTitle[i], fBarView,
+				recentType[i]);
+
 			if (recentItem[i])
 				count += recentItem[i]->RecentsCount();
 		}
@@ -222,14 +222,10 @@ TBeMenu::AddStandardBeMenuItems()
 		dragging = fBarView->Dragging();
 
 	BMenuItem* item = new BMenuItem(
-#ifdef __HAIKU__
-#	ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
-		"About Haiku"
-#	else
-		"About This System"
-#	endif
+#ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
+	"About Haiku"
 #else
-		"About BeOS"
+	"About This System"
 #endif
 		B_UTF8_ELLIPSIS, new BMessage(kShowSplash));
 	item->SetEnabled(!dragging);
@@ -260,67 +256,31 @@ TBeMenu::AddStandardBeMenuItems()
  	item->SetTarget(be_app);
 	AddItem(item);
 
-#ifndef __HAIKU__
-	if ((modifiers() & (B_LEFT_SHIFT_KEY|B_LEFT_CONTROL_KEY|B_LEFT_COMMAND_KEY))
-			== (B_LEFT_SHIFT_KEY|B_LEFT_CONTROL_KEY|B_LEFT_COMMAND_KEY)) {
-		subMenu = new BMenu("Window Decor");
-		subMenu->SetEnabled(!dragging);
-
-		item = new BMenuItem("BeOS", new BMessage(kBe));
-		item->SetTarget(be_app);
-		item->SetEnabled(!dragging);
-		subMenu->AddItem(item);
-
-		item = new BMenuItem("AmigaOS", new BMessage(kAmiga));
-		item->SetTarget(be_app);
-		item->SetEnabled(!dragging);
-		subMenu->AddItem(item);
-
-		item = new BMenuItem("MacOS 8", new BMessage(kMac));
-		item->SetTarget(be_app);
-		item->SetEnabled(!dragging);
-		subMenu->AddItem(item);
-
-		item = new BMenuItem("Windows 95/98", new BMessage(kWin95));
-		item->SetTarget(be_app);
-		item->SetEnabled(!dragging);
-		subMenu->AddItem(item);
-
-		subMenu->SetFont(be_plain_font);
-		AddItem(subMenu);
-	};
-#endif
-
 	AddSeparatorItem();
 
 	BMenu* shutdownMenu = new BMenu("Shutdown" B_UTF8_ELLIPSIS);
 
-	item = new BMenuItem("Restart System", new BMessage(CMD_REBOOT_SYSTEM));
+	item = new BMenuItem("Restart System", new BMessage(kRebootSystem));
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 
 #ifdef APM_SUPPORT
 	if (_kapm_control_(APM_CHECK_ENABLED) == B_OK) {
-		item = new BMenuItem("Suspend", new BMessage(CMD_SUSPEND_SYSTEM));
+		item = new BMenuItem("Suspend", new BMessage(kSuspendSystem));
 		item->SetEnabled(!dragging);
 		shutdownMenu->AddItem(item);
 	}
 #endif
 
-	item = new BMenuItem("Power Off", new BMessage(CMD_SHUTDOWN_SYSTEM));
+	item = new BMenuItem("Power Off", new BMessage(kShutdownSystem));
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 	shutdownMenu->SetFont(be_plain_font);
 
-#ifdef __HAIKU__
 	shutdownMenu->SetTargetForItems(be_app);
-	BMessage* message = new BMessage(CMD_SHUTDOWN_SYSTEM);
+	BMessage* message = new BMessage(kShutdownSystem);
 	message->AddBool("confirm", true);
 	AddItem(new BMenuItem(shutdownMenu, message));
-#else
-	shutdownMenu->SetTargetForItems(BMessenger(ROSTER_SIG));
-	AddItem(shutdownMenu);
-#endif
 
 	fAddState = kAddingRecents;
 
@@ -363,37 +323,21 @@ TBeMenu::ResetTargets()
 
 		if (item->Message()) {
 			switch (item->Message()->what) {
-				case kShowSplash:
-#ifdef B_BEOS_VERSION_5
-					// about box in libbe in BeOS R5
-					item->SetTarget(be_app);
-#endif
-					break;
 				case kFindButton:
-					// about, find
 					item->SetTarget(BMessenger(kTrackerSignature));
 					break;
 
+				case kShowSplash:
 				case kToggleDraggers:
 				case kConfigShow:
 				case kAlwaysTop:
-				case kMsgShowSeconds:
-				case kMsgMilTime:
-				case kMsgEuroDate:
-					// show/hide replicants
+				case kShowSeconds:
+				case kMilTime:
+				case kEuroDate:
+				case kRebootSystem:
+				case kSuspendSystem:
+				case kShutdownSystem:
 					item->SetTarget(be_app);
-					break;
-
-				case CMD_REBOOT_SYSTEM:
-				case CMD_SUSPEND_SYSTEM:
-				case CMD_SHUTDOWN_SYSTEM:
-					// Unreachable cases.
-					// See comment at start of method.
-#ifdef __HAIKU__
-					item->SetTarget(be_app);
-#else
-					item->SetTarget(BMessenger(ROSTER_SIG));
-#endif
 					break;
 			}
 		}
@@ -533,7 +477,8 @@ TRecentsMenu::AddRecents(int32 count)
 				roster.GetRecentApps(&fRecentList, count);
 				break;
 			case kRecentAppDocuments:
-				roster.GetRecentDocuments(&fRecentList, count, NULL, fSignature);
+				roster.GetRecentDocuments(&fRecentList, count, NULL,
+					fSignature);
 				break;
 			case kRecentFolders:
 				roster.GetRecentFolders(&fRecentList, count);
@@ -581,7 +526,8 @@ TRecentsMenu::AddRecents(int32 count)
 					//		avoid the creation of the submenu.
 
 				if (doc.CountNames(B_REF_TYPE) > 0) {
-					// create recents menu that will contain the recent docs of this app
+					// create recents menu that will contain the recent docs of
+					// this app
 					TRecentsMenu* docs = new TRecentsMenu(ref.name, fBarView,
 						kRecentAppDocuments, signature, &ref);
 					docs->SetTypesList(TypesList());
@@ -649,7 +595,7 @@ TRecentsMenu::ResetTargets()
 }
 
 
-//********************************************************************************
+//*****************************************************************************
 //	#pragma mark -
 
 
@@ -673,3 +619,4 @@ DeskbarMountMenu::AddDynamicItem(add_state s)
 }
 
 #endif
+

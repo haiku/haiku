@@ -41,10 +41,8 @@ All rights reserved.
 
 #include <MenuItem.h>
 #include <String.h>
+#include <WindowInfo.h>
 
-#ifdef __HAIKU__
-#	include <WindowInfo.h>
-#endif
 
 class BBitmap;
 
@@ -86,63 +84,6 @@ class TWindowMenuItem : public BMenuItem {
 		BString			fFullTitle;
 };
 
-#ifndef __HAIKU__
-/****************************************************************************
-** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING **
-**                                                                         **
-**                          DANGER, WILL ROBINSON!                         **
-**                                                                         **
-** The rest of the interfaces contained here are part of BeOS's            **
-**                                                                         **
-**                     >> PRIVATE NOT FOR PUBLIC USE <<                    **
-**                                                                         **
-**                                                       implementation.   **
-**                                                                         **
-** These interfaces              WILL CHANGE        in future releases.    **
-** If you use them, your app     WILL BREAK         at some future time.   **
-**                                                                         **
-** (And yes, this does mean that binaries built from OpenTracker will not  **
-** be compatible with some future releases of the OS.  When that happens,  **
-** we will provide an updated version of this file to keep compatibility.) **
-**                                                                         **
-** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING **
-****************************************************************************/
-
-// from interface_defs.h
-struct client_window_info {
-	team_id		team;
-	int32   	server_token;
-
-	int32		thread;
-	int32		client_token;
-	int32		client_port;
-	uint32		workspaces;
-
-	int32		layer;
-	uint32	  	feel;
-	uint32		flags;
-	int32		window_left;
-	int32		window_top;
-	int32		window_right;
-	int32		window_bottom;
-	int32		show_hide_level;
-	bool		is_mini;
-	char		name[1];
-};
-
-// from interface_misc.h
-enum window_action {
-	B_MINIMIZE_WINDOW,
-	B_BRING_TO_FRONT
-};
-
-// from interface_misc.h
-void do_window_action(int32 window_id, int32 action, BRect zoomRect, bool zoom);
-client_window_info* get_window_info(int32 token);
-int32* get_token_list(team_id app, int32* count);
-void do_minimize_team(BRect zoomRect, team_id team, bool zoom);
-void do_bring_to_front_team(BRect zoomRect, team_id app, bool zoom);
-
-#endif	// !__HAIKU__
 
 #endif	/* WINDOWMENUITEM_H */
+

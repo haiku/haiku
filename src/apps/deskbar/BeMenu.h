@@ -121,3 +121,4 @@ class TBeMenu : public BNavMenu {
 };
 
 #endif	/* _BE_MENU_H_ */
+

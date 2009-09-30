@@ -81,9 +81,9 @@ const uint32 kExpandNewTeams = 'ExTm';
 const uint32 kAutoRaise = 'AtRs';
 
 // from roster_private.h
-const uint32 CMD_SHUTDOWN_SYSTEM = 301;
-const uint32 CMD_REBOOT_SYSTEM = 302;
-const uint32 CMD_SUSPEND_SYSTEM = 304;
+const uint32 kShutdownSystem = 301;
+const uint32 kRebootSystem = 302;
+const uint32 kSuspendSystem = 304;
 
 /* --------------------------------------------- */
 
@@ -117,7 +117,8 @@ struct desk_settings {
 // the following structures are defined to compute
 // valid sizes for "struct desk_settings"
 
-const uint32 kValidSettingsSize1 = 5 * sizeof(bool) + sizeof(uint32) + sizeof(float);
+const uint32 kValidSettingsSize1 = 5 * sizeof(bool) + sizeof(uint32)
+	+ sizeof(float);
 const uint32 kValidSettingsSize2 = sizeof(BPoint) + kValidSettingsSize1;
 const uint32 kValidSettingsSize3 = 2 * sizeof(int32) + kValidSettingsSize2;
 const uint32 kValidSettingsSize4 = 2 * sizeof(bool) + kValidSettingsSize3;

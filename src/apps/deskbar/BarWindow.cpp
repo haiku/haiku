@@ -529,7 +529,8 @@ TBarWindow::AddItem(BMessage* message)
 	} else if (message->FindRef("addon", &ref) == B_OK) {
 		//
 		//	exposing the name of the view here is not so great
-		TReplicantTray* tray = dynamic_cast<TReplicantTray*>(FindView("Status"));
+		TReplicantTray* tray
+			= dynamic_cast<TReplicantTray*>(FindView("Status"));
 		if (tray) {
 			// Force this into the deskbar even if the security code is wrong
 			// This is OK because the user specifically asked for this replicant
@@ -590,3 +591,4 @@ TBarWindow::GetIconFrame(BMessage* message)
 	reply.AddRect("frame", frame);
 	message->SendReply(&reply);
 }
+

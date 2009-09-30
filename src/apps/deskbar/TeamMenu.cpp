@@ -83,8 +83,8 @@ TTeamMenu::AttachedToWindow()
 
 		if (((barInfo->flags & B_BACKGROUND_APP) == 0)
 			&& (strcasecmp(barInfo->sig, kDeskbarSignature) != 0)) {
-			TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams, barInfo->icon, 
-				barInfo->name, barInfo->sig, -1, -1, true, true);
+			TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
+				barInfo->icon, barInfo->name, barInfo->sig, -1, -1, true, true);
 
 			if ((settings->trackerAlwaysFirst)
 				&& (strcmp(barInfo->sig, kTrackerSignature) == 0))
@@ -119,7 +119,8 @@ TTeamMenu::AttachedToWindow()
 	}
 
 	if (dragging && barview->LockLooper()) {
-		SetTrackingHook(barview->MenuTrackingHook, barview->GetTrackingHookData());
+		SetTrackingHook(barview->MenuTrackingHook,
+			barview->GetTrackingHookData());
 		barview->DragStart();				
 		barview->UnlockLooper();
 	}
@@ -151,3 +152,4 @@ void
 TTeamMenu::DrawBackground(BRect)
 {
 }
+

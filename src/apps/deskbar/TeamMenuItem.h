@@ -52,7 +52,8 @@ class TTeamMenuItem : public BMenuItem {
 		TTeamMenuItem(BList* team, BBitmap* icon, char* name, char* sig,
 			float width = -1.0f, float height = -1.0f,
 			bool drawLabel = true, bool vertical = true);
-		TTeamMenuItem(float width = -1.0f, float height = -1.0f, bool vertical=true);
+		TTeamMenuItem(float width = -1.0f, float height = -1.0f,
+			bool vertical=true);
 		virtual ~TTeamMenuItem();
 
 		status_t Invoke(BMessage* msg = NULL);
@@ -103,3 +104,4 @@ class TTeamMenuItem : public BMenuItem {
 };
 
 #endif /* TEAMMENUITEM_H */
+

@@ -74,7 +74,8 @@ TReplicantShelf::MessageReceived(BMessage* message)
 			//
 			// note: if specified by index its the index not the id!
 
-			while (message->FindMessage("specifiers", index++, &repspec) == B_OK) {
+			while (message->FindMessage("specifiers", index++, &repspec)
+				== B_OK) {
 				const char* str;
 				if (repspec.FindString("property", &str) == B_OK) {
 					if (strcmp(str, "Replicant") == 0) {
@@ -134,3 +135,4 @@ void
 TReplicantShelf::ReplicantDeleted(int32, const BMessage*, const BView*)
 {
 }
+

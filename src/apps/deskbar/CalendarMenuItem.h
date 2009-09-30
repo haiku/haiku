@@ -23,3 +23,4 @@ class CalendarMenuItem : public BMenuItem {
 };
 
 #endif	/* CALENDAR_MENU_ITEM_H */
+

@@ -1,6 +1,6 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
@@ -13,8 +13,9 @@
 #include <time.h>
 
 
-static const int32 kDaysPerMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-	//								  Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+static const int32 kDaysPerMonth[]
+	= {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	// Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
 
 static const int32 kTitleFontSize = 9;
 
@@ -70,7 +71,8 @@ CalendarMenuItem::DrawContent()
 	Menu()->PushState();
 	Menu()->SetOrigin(ContentLocation());
 
-	rgb_color todayBackgroundColor = tint_color(Menu()->LowColor(), B_LIGHTEN_2_TINT);
+	rgb_color todayBackgroundColor = tint_color(Menu()->LowColor(),
+		B_LIGHTEN_2_TINT);
 	rgb_color dayColor = tint_color(Menu()->HighColor(), B_DARKEN_2_TINT);
 	rgb_color titleColor = Menu()->HighColor();
 
@@ -85,7 +87,8 @@ CalendarMenuItem::DrawContent()
 	char text[64];
 	strftime(text, sizeof(text), "%B, %Y", &tm);
 	float width = Menu()->StringWidth(text);
-	Menu()->DrawString(text, BPoint((fColumnWidth * 7 - width) / 2, fTitleHeight));
+	Menu()->DrawString(text, BPoint((fColumnWidth * 7 - width) / 2,
+		fTitleHeight));
 
 	// Draw weekdays
 
@@ -93,8 +96,8 @@ CalendarMenuItem::DrawContent()
 		strftime(text, sizeof(text), "%a", &tm);
 
 		width = Menu()->StringWidth(text);
-		Menu()->DrawString(text, BPoint(fColumnWidth * tm.tm_wday + (fColumnWidth - width) / 2,
-			2 * fTitleHeight + kTitleGap));
+		Menu()->DrawString(text, BPoint(fColumnWidth * tm.tm_wday
+			+ (fColumnWidth - width) / 2, 2 * fTitleHeight + kTitleGap));
 	}
 
 	// Draw days
@@ -156,11 +159,13 @@ CalendarMenuItem::GetContentSize(float* _width, float* _height)
 	font.SetSize(kTitleFontSize);
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);
-	fTitleHeight = ceilf(fontHeight.ascent + fontHeight.descent + fontHeight.leading);
+	fTitleHeight = ceilf(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading);
 
 	font = be_plain_font;
 	font.GetHeight(&fontHeight);
-	fRowHeight = ceilf(fontHeight.ascent + fontHeight.descent + fontHeight.leading + kRowGap);
+	fRowHeight = ceilf(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading + kRowGap);
 	fFontHeight = ceilf(fontHeight.ascent);
 	fColumnWidth = font.StringWidth("99") + kColumnGap;
 
@@ -174,3 +179,4 @@ CalendarMenuItem::GetContentSize(float* _width, float* _height)
 }
 
 #endif	// _SHOW_CALENDAR_MENU_ITEM
+

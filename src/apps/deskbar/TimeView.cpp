@@ -64,16 +64,18 @@ static const float kHMargin = 2.0;
 
 
 enum {
-	kMsgShowClock,
-	kMsgChangeClock,
-	kMsgHide,
-	kMsgLongClick,
-	kMsgShowCalendar
+	kShowClock,
+	kChangeClock,
+	kHide,
+	kLongClick,
+	kShowCalendar
 };
 
 
-TTimeView::TTimeView(float maxWidth, float height, bool showSeconds, bool milTime, bool fullDate, bool euroDate, bool)
-	: 	BView(BRect(-100,-100,-90,-90), "_deskbar_tv_",
+TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
+	bool milTime, bool fullDate, bool euroDate, bool)
+	:
+	BView(BRect(-100,-100,-90,-90), "_deskbar_tv_",
 	B_FOLLOW_RIGHT | B_FOLLOW_TOP,
 	B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS),
 	fParent(NULL),
@@ -211,23 +213,23 @@ void
 TTimeView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kMsgFullDate:
+		case kFullDate:
 			ShowFullDate(!ShowingFullDate());
 			break;
 
-		case kMsgShowSeconds:
+		case kShowSeconds:
 			ShowSeconds(!ShowingSeconds());
 			break;
 
-		case kMsgMilTime:
+		case kMilTime:
 			ShowMilTime(!ShowingMilTime());
 			break;
 
-		case kMsgEuroDate:
+		case kEuroDate:
 			ShowEuroDate(!ShowingEuroDate());
 			break;
 
-		case kMsgChangeClock:
+		case kChangeClock:
 			// launch the time prefs app
 			be_roster->Launch("application/x-vnd.Haiku-Time");
 			break;
@@ -236,7 +238,7 @@ TTimeView::MessageReceived(BMessage* message)
 			Window()->PostMessage(message, Parent());
 			break;
 			
-		case kMsgLongClick:
+		case kLongClick:
 		{
 			StopLongClickNotifier();
 			BPoint where;
@@ -245,7 +247,7 @@ TTimeView::MessageReceived(BMessage* message)
 			break;
 		}
 		
-		case kMsgShowCalendar:
+		case kShowCalendar:
 		{
 			BRect bounds(Bounds());
 			BPoint center(bounds.LeftTop());
@@ -305,7 +307,7 @@ TTimeView::StartLongClickNotifier(BPoint where)
 {
 	StopLongClickNotifier();
 	
-	BMessage longClickMessage(kMsgLongClick);
+	BMessage longClickMessage(kLongClick);
 	longClickMessage.AddPoint("where", where);
 	
 	bigtime_t longClickThreshold;
@@ -360,9 +362,11 @@ TTimeView::GetCurrentDate()
 	tm time = *localtime(&fTime);
 
 	if (fFullDate && CanShowFullDate())
-		strftime(tmp, 64, fEuroDate ? kLongEuroDateFormat : kLongDateFormat, &time);
+		strftime(tmp, 64, fEuroDate ? kLongEuroDateFormat : kLongDateFormat,
+			&time);
 	else
-		strftime(tmp, 64, fEuroDate ? kShortEuroDateFormat : kShortDateFormat, &time);
+		strftime(tmp, 64, fEuroDate ? kShortEuroDateFormat : kShortDateFormat,
+			&time);
 
 	//	remove leading 0 from date when month is less than 10 (MM/DD/YY)
 	//  or remove leading 0 from date when day is less than 10 (DD/MM/YY)
@@ -574,14 +578,16 @@ TTimeView::ShowClockOptions(BPoint point)
 	menu->SetFont(be_plain_font);
 	BMenuItem* item;
 
-	item = new BMenuItem("Change Time" B_UTF8_ELLIPSIS, new BMessage(kMsgChangeClock));
+	item = new BMenuItem("Change Time" B_UTF8_ELLIPSIS,
+		new BMessage(kChangeClock));
 	menu->AddItem(item);
 
 	item = new BMenuItem("Hide Time", new BMessage('time'));
 	menu->AddItem(item);
 
 #if defined(_SHOW_CALENDAR_MENU_ITEM) || defined(_SHOW_CALENDAR_MENU_WINDOW)
-	item = new BMenuItem("Show Calendar" B_UTF8_ELLIPSIS, new BMessage(kMsgShowCalendar));
+	item = new BMenuItem("Show Calendar" B_UTF8_ELLIPSIS,
+		new BMessage(kShowCalendar));
 	menu->AddItem(item);
 #endif
 	
@@ -591,3 +597,4 @@ TTimeView::ShowClockOptions(BPoint point)
 	menu->Go(point, true, true, BRect(point.x - 4, point.y - 4,
 		point.x + 4, point.y +4), true);
 }
+

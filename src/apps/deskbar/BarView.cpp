@@ -407,7 +407,8 @@ TBarView::SaveSettings()
 	settings->showTime = ShowingClock();
 	
 	fReplicantTray->RememberClockSettings();
-	settings->alwaysOnTop = (Window()->Feel() & B_FLOATING_ALL_WINDOW_FEEL) != 0;
+	settings->alwaysOnTop = (Window()->Feel() & B_FLOATING_ALL_WINDOW_FEEL)
+		!= 0;
 }
 
 
@@ -447,12 +448,14 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 	// We need to keep track of what apps are expanded.
 	BList expandedItems;
 	BString* signature = NULL;
-	if (fVertical && Expando() && static_cast<TBarApp*>(be_app)->Settings()->superExpando) {
-		// Get a list of the Signatures of expanded apps - Can't use team_id because
-		// there can be more than one team per application
+	if (fVertical && Expando()
+		&& static_cast<TBarApp*>(be_app)->Settings()->superExpando) {
+		// Get a list of the signatures of expanded apps. Can't use 
+		// team_id because there can be more than one team per application
 		if (fVertical && Expando() && vertical && fExpando) {
 			for (int index = 0; index < fExpando->CountItems(); index++) {
-				TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(fExpando->ItemAt(index));
+				TTeamMenuItem* item
+					= dynamic_cast<TTeamMenuItem*>(fExpando->ItemAt(index));
 				if (item != NULL && item->IsExpanded()) {
 					signature = new BString(item->Signature());
 					expandedItems.AddItem((void*)signature);
@@ -476,7 +479,8 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 			// Start at the 'bottom' of the list working up.
 			// Prevents being thrown off by expanding items.
 			for (int teamIndex = fExpando->CountItems(); teamIndex-- > 0;) {
-				TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(fExpando->ItemAt(teamIndex));
+				TTeamMenuItem* item
+					= dynamic_cast<TTeamMenuItem*>(fExpando->ItemAt(teamIndex));
 				if (item != NULL && !signature->Compare(item->Signature())) {
 					item->ToggleExpandState(false);
 					break;
@@ -661,7 +665,8 @@ TBarView::MenuTrackingHook(BMenu* menu, void* castToThis)
 		menu->ConvertToScreen(&location);
 		if (barview->LockLooper()) {
 			TExpandoMenuBar* expando = barview->ExpandoMenuBar();
-			TBeMenu* bemenu = (dynamic_cast<TBarWindow*>(barview->Window()))->BeMenu();
+			TBeMenu* bemenu
+				= (dynamic_cast<TBarWindow*>(barview->Window()))->BeMenu();
 
 			if (bemenu && bemenu->LockLooper()) {
 				bemenu->ConvertFromScreen(&location);
@@ -929,8 +934,10 @@ BRect
 TBarView::OffsetIconFrame(BRect rect) const
 {
 	BRect frame(Frame());
-	frame.left += fDragRegion->Frame().left + fReplicantTray->Frame().left + rect.left;
-	frame.top += fDragRegion->Frame().top + fReplicantTray->Frame().top + rect.top;
+	frame.left += fDragRegion->Frame().left + fReplicantTray->Frame().left
+		+ rect.left;
+	frame.top += fDragRegion->Frame().top + fReplicantTray->Frame().top
+		+ rect.top;
 
 	frame.right = frame.left + rect.Width();
 	frame.bottom = frame.top + rect.Height();

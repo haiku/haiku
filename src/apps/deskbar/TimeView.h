@@ -37,10 +37,10 @@ All rights reserved.
 #include <OS.h>
 #include <View.h>
 
-const uint32 kMsgShowSeconds = 'ShSc';
-const uint32 kMsgMilTime = 'MilT';
-const uint32 kMsgFullDate = 'FDat';
-const uint32 kMsgEuroDate = 'EDat';
+const uint32 kShowSeconds = 'ShSc';
+const uint32 kMilTime = 'MilT';
+const uint32 kFullDate = 'FDat';
+const uint32 kEuroDate = 'EDat';
 
 class BMessageRunner;
 
@@ -50,8 +50,9 @@ class _EXPORT	TTimeView;
 
 class TTimeView : public BView {
 	public:
-		TTimeView(float maxWidth, float height, bool showSeconds = false, bool milTime = false, bool fullDate = false,
-			bool euroDate = false, bool showInterval = false);
+		TTimeView(float maxWidth, float height, bool showSeconds = false,
+			bool milTime = false, bool fullDate = false, bool euroDate = false,
+			bool showInterval = false);
 		TTimeView(BMessage* data);
 		~TTimeView();
 
@@ -140,3 +141,4 @@ TTimeView::Orientation() const
 
 
 #endif	/* TIME_VIEW_H */
+

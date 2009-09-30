@@ -46,10 +46,7 @@ All rights reserved.
 #include <Mime.h>
 #include <Path.h>
 #include <Roster.h>
-
-#if __HAIKU__
-#	include <RosterPrivate.h>
-#endif
+#include <RosterPrivate.h>
 
 #include "icons.h"
 #include "tracker_private.h"
@@ -65,9 +62,6 @@ All rights reserved.
 #include "WindowMenuItem.h"
 
 
-// private Be API
-extern void __set_window_decor(int32 theme);
-
 BLocker TBarApp::sSubscriberLock;
 BList TBarApp::sBarTeamInfoList;
 BList TBarApp::sSubscribers;
@@ -78,12 +72,7 @@ const uint32 kShowTeamMenu = 'TmMn';
 
 const BRect kIconSize(0.0f, 0.0f, 15.0f, 15.0f);
 
-#if __HAIKU__
-	static const color_space kIconFormat = B_RGBA32;
-#else
-	static const color_space kIconFormat = B_CMAP8;
-#endif
-
+static const color_space kIconFormat = B_RGBA32;
 
 
 int
@@ -104,9 +93,7 @@ TBarApp::TBarApp()
 	InitSettings();
 	InitIconPreloader();
 
-#ifdef __HAIKU__
 	be_roster->StartWatching(this);
-#endif
 
 	sBarTeamInfoList.MakeEmpty();
 
@@ -139,9 +126,7 @@ TBarApp::TBarApp()
 
 TBarApp::~TBarApp()
 {
-#ifdef __HAIKU__
 	be_roster->StopWatching(this);
-#endif
 
 	int32 teamCount = sBarTeamInfoList.CountItems();
 	for (int32 i = 0; i < teamCount; i++) {
@@ -285,7 +270,8 @@ TBarApp::InitSettings()
 				fSettingsFile->Read(&settings.timeShowMil, sizeof(bool));
 			}
 			if (size >= kValidSettingsSize5)
-				fSettingsFile->Read(&settings.recentFoldersCount, sizeof(int32));
+				fSettingsFile->Read(&settings.recentFoldersCount,
+					sizeof(int32));
 			if (size >= kValidSettingsSize6) {
 				fSettingsFile->Read(&settings.timeShowEuro, sizeof(bool));
 				fSettingsFile->Read(&settings.alwaysOnTop, sizeof(bool));
@@ -391,22 +377,6 @@ TBarApp::MessageReceived(BMessage* message)
 			fStatusViewMessenger.SendMessage(message);
 			break;
 
-		case kBe:
-			__set_window_decor(0);
-			break;
-
-		case kWin95:
-			__set_window_decor(2);
-			break;
-
-		case kAmiga:
-			__set_window_decor(1);
-			break;
-
-		case kMac:
-			__set_window_decor(3);
-			break;
-
 		case kToggleDraggers:
 			if (BDragger::AreDraggersDrawn())
 				BDragger::HideAllDraggers();
@@ -488,14 +458,14 @@ TBarApp::MessageReceived(BMessage* message)
 			fSwitcherMessenger.SendMessage(message);
 			break;
 
-#if __HAIKU__
-		case CMD_SUSPEND_SYSTEM:
+		case kSuspendSystem:
+			// TODO: Call BRoster?
 			break;
 
-		case CMD_REBOOT_SYSTEM:
-		case CMD_SHUTDOWN_SYSTEM:
+		case kRebootSystem:
+		case kShutdownSystem:
 		{
-			bool reboot = (message->what == CMD_REBOOT_SYSTEM);
+			bool reboot = (message->what == kRebootSystem);
 			bool confirm;
 			message->FindBool("confirm", &confirm);
 
@@ -507,14 +477,9 @@ TBarApp::MessageReceived(BMessage* message)
 
 			break;
 		}
-#endif // __HAIKU__
-
-		// in case Tracker is not running
 
 		case kShowSplash:
-#ifdef B_BEOS_VERSION_5
 			run_be_about();
-#endif
 			break;
 
 		default:
@@ -523,11 +488,6 @@ TBarApp::MessageReceived(BMessage* message)
 	}
 }
 
-
-/**	In case Tracker is not running, the TBeMenu will use us as a target.
- *	We'll make sure the user won't be completely confused and take over
- *	Tracker's duties until it's back.
- */
 
 void
 TBarApp::RefsReceived(BMessage* refs)
@@ -738,5 +698,4 @@ BarTeamInfo::~BarTeamInfo()
 	delete icon;
 	free(name);
 }
-
 

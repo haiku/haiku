@@ -378,10 +378,10 @@ TReplicantTray::MessageReceived(BMessage* message)
 			AdjustPlacement();
 			break;
 
-		case kMsgShowSeconds:
-		case kMsgMilTime:
-		case kMsgEuroDate:
-		case kMsgFullDate:
+		case kShowSeconds:
+		case kMilTime:
+		case kEuroDate:
+		case kFullDate:
 			if (fClock != NULL)
 				Window()->PostMessage(message, fClock);
 			break;
@@ -475,8 +475,8 @@ TReplicantTray::InitAddOnSupport()
 
 		BFile file(path.Path(),B_READ_ONLY);
 		if (file.InitCheck() == B_OK
-			&& file.Read(&fDeskbarSecurityCode,
-					sizeof(fDeskbarSecurityCode)) == sizeof(fDeskbarSecurityCode))
+			&& file.Read(&fDeskbarSecurityCode,	sizeof(fDeskbarSecurityCode))
+				== sizeof(fDeskbarSecurityCode))
 			haveKey = true;
 	}
 	if (!haveKey) {
@@ -484,14 +484,15 @@ TReplicantTray::InitAddOnSupport()
 		bigtime_t real = real_time_clock_usecs();
 		bigtime_t boot = system_time();
 		// two computers would have to have exactly matching clocks, and launch
-		// Deskbar at the exact same time into the bootsequence in order for their
-		// security-ID to be identical
+		// Deskbar at the exact same time into the bootsequence in order for
+		// their security-ID to be identical
 		fDeskbarSecurityCode = ((real & 0xffffffffULL) << 32)
 			| (boot & 0xffffffffULL);
 
 	if (find_directory (B_USER_SETTINGS_DIRECTORY, &path, true) == B_OK) {
 			path.Append(kDeskbarSecurityCodeFile);
-			BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+			BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE
+				| B_ERASE_FILE);
 			if (file.InitCheck() == B_OK)
 				file.Write(&fDeskbarSecurityCode, sizeof(fDeskbarSecurityCode));
 		}
@@ -685,7 +686,8 @@ TReplicantTray::HandleEntryUpdate(BMessage* message)
 			ino_t node;
 			const char* name;
 			if (message->FindString("name", &name) == B_OK
-				&& message->FindInt64("from directory", &(ref.directory)) == B_OK
+				&& message->FindInt64("from directory", &(ref.directory))
+				== B_OK
 				&& message->FindInt64("to directory", &todirectory) == B_OK
 				&& message->FindInt32("device", &(ref.device)) == B_OK
 				&& message->FindInt64("node", &node) == B_OK ) {
@@ -1107,8 +1109,8 @@ TReplicantTray::AddIcon(BMessage* archive, int32* id, const entry_ref* addOn)
 
 	if (originalBounds != view->Bounds()) {
 		// The replicant changed its size when added to the window, so we need
-		// to recompute all over again (it's already done once via BShelf::AddReplicant()
-		// and TReplicantShelf::CanAcceptReplicantView())
+		// to recompute all over again (it's already done once via 
+		// BShelf::AddReplicant() and TReplicantShelf::CanAcceptReplicantView())
 		RealignReplicants();
 	}
 
@@ -1295,7 +1297,8 @@ TReplicantTray::LocationForReplicant(int32 index, float width)
 		// try to find free space in every row
 		for (int32 row = 0; ; loc.y += kMaxReplicantHeight + kIconGap, row++) {
 			// determine free space in this row
-			BRect rect(loc.x, loc.y, loc.x + fMinimumTrayWidth - kIconGap - 2.0, loc.y + kMaxReplicantHeight);
+			BRect rect(loc.x, loc.y, loc.x + fMinimumTrayWidth - kIconGap - 2.0,
+				loc.y + kMaxReplicantHeight);
 			if (row == 0 && fBarView->ShowingClock())
 				rect.right -= fClock->Frame().Width() + kIconGap;
 
@@ -1327,9 +1330,10 @@ TReplicantTray::LocationForReplicant(int32 index, float width)
 		}
 	}
 
-	if ((loc.y == fRightBottomReplicant.top && loc.x > fRightBottomReplicant.left)
-		|| loc.y > fRightBottomReplicant.top) {
-		fRightBottomReplicant.Set(loc.x, loc.y, loc.x + width, loc.y + kMaxReplicantHeight);
+	if ((loc.y == fRightBottomReplicant.top && loc.x
+		> fRightBottomReplicant.left) || loc.y > fRightBottomReplicant.top) {
+		fRightBottomReplicant.Set(loc.x, loc.y, loc.x + width, loc.y
+		+ kMaxReplicantHeight);
 		fLastReplicant = index;
 	}
 
@@ -1453,7 +1457,8 @@ TDragRegion::GetPreferredSize(float* width, float* height)
 void
 TDragRegion::FrameMoved(BPoint)
 {
-	if (fBarView->Left() && fBarView->Vertical() && fDragLocation != kNoDragRegion)
+	if (fBarView->Left() && fBarView->Vertical() && fDragLocation
+		!= kNoDragRegion)
 		fChild->MoveTo(5,2);
 	else
 		fChild->MoveTo(2,2);
@@ -1661,31 +1666,42 @@ TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 		BRect frame = screen.Frame();
 
 		float hDivider = frame.Width() / 6;
-		hDivider = (hDivider < sMinimumWindowWidth + 10.0f) ? sMinimumWindowWidth + 10.0f : hDivider;
+		hDivider = (hDivider < sMinimumWindowWidth + 10.0f)
+			? sMinimumWindowWidth + 10.0f : hDivider;
 		float miniDivider = frame.top + kMiniHeight + 10.0f;
 		float vDivider = frame.Height() / 2;
 #ifdef FULL_MODE
 		float thirdScreen = frame.Height() / 3;
 #endif		
-		BRect topLeft(frame.left, frame.top, frame.left + hDivider, miniDivider);
-		BRect topMiddle(frame.left + hDivider, frame.top, frame.right - hDivider, vDivider);
-		BRect topRight(frame.right - hDivider, frame.top, frame.right, miniDivider);
+		BRect topLeft(frame.left, frame.top, frame.left + hDivider,
+			miniDivider);
+		BRect topMiddle(frame.left + hDivider, frame.top, frame.right
+			- hDivider, vDivider);
+		BRect topRight(frame.right - hDivider, frame.top, frame.right,
+			miniDivider);
 
 #ifdef FULL_MODE
 		vDivider = miniDivider + thirdScreen;
 #endif
-		BRect middleLeft(frame.left, miniDivider, frame.left + hDivider, vDivider);
-		BRect middleRight(frame.right - hDivider, miniDivider, frame.right, vDivider);
+		BRect middleLeft(frame.left, miniDivider, frame.left + hDivider,
+			vDivider);
+		BRect middleRight(frame.right - hDivider, miniDivider, frame.right,
+			vDivider);
 
 #ifdef FULL_MODE
-		BRect leftSide(frame.left, vDivider, frame.left + hDivider, frame.bottom - thirdScreen);
-		BRect rightSide(frame.right - hDivider, vDivider, frame.right, frame.bottom - thirdScreen);
+		BRect leftSide(frame.left, vDivider, frame.left + hDivider,
+			frame.bottom - thirdScreen);
+		BRect rightSide(frame.right - hDivider, vDivider, frame.right,
+			frame.bottom - thirdScreen);
 
 		vDivider = frame.bottom - thirdScreen;
 #endif		
-		BRect bottomLeft(frame.left, vDivider, frame.left + hDivider, frame.bottom);
-		BRect bottomMiddle(frame.left + hDivider, vDivider, frame.right - hDivider, frame.bottom);
-		BRect bottomRight(frame.right - hDivider, vDivider, frame.right, frame.bottom);
+		BRect bottomLeft(frame.left, vDivider, frame.left + hDivider,
+			frame.bottom);
+		BRect bottomMiddle(frame.left + hDivider, vDivider, frame.right
+			- hDivider, frame.bottom);
+		BRect bottomRight(frame.right - hDivider, vDivider, frame.right,
+			frame.bottom);
 
 		if (where != fPreviousPosition) {
 			fPreviousPosition = where;
@@ -1693,19 +1709,27 @@ TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 
 			// use short circuit evaluation for convenience
 			if (SwitchModeForRect(where, topLeft, true, true, true, kMiniState)
-				|| SwitchModeForRect(where, topMiddle, false, true, true, kExpandoState)
-				|| SwitchModeForRect(where, topRight, true, false, true, kMiniState)
-
-				|| SwitchModeForRect(where, middleLeft, true, true, true, kExpandoState)
-				|| SwitchModeForRect(where, middleRight, true, false, true, kExpandoState)
+				|| SwitchModeForRect(where, topMiddle, false, true, true,
+					kExpandoState)
+				|| SwitchModeForRect(where, topRight, true, false, true,
+					kMiniState)
+				|| SwitchModeForRect(where, middleLeft, true, true, true,
+					kExpandoState)
+				|| SwitchModeForRect(where, middleRight, true, false, true,
+					kExpandoState)
 
 #ifdef FULL_MODE
-				|| SwitchModeForRect(where, leftSide, true, true, true, kFullState)
-				|| SwitchModeForRect(where, rightSide, true, false, true, kFullState)
+				|| SwitchModeForRect(where, leftSide, true, true, true,
+					kFullState)
+				|| SwitchModeForRect(where, rightSide, true, false, true,
+					kFullState)
 #endif
-				|| SwitchModeForRect(where, bottomLeft, true, true, false, kMiniState)
-				|| SwitchModeForRect(where, bottomMiddle, false, true, false, kExpandoState)
-				|| SwitchModeForRect(where, bottomRight, true, false, false, kMiniState))
+				|| SwitchModeForRect(where, bottomLeft, true, true, false,
+					kMiniState)
+				|| SwitchModeForRect(where, bottomMiddle, false, true, false,
+					kExpandoState)
+				|| SwitchModeForRect(where, bottomRight, true, false, false,
+					kMiniState))
 				;
 		}
 	} else

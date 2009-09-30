@@ -178,11 +178,12 @@ TWindowMenu::AttachedToWindow()
 
 		AddItem(noWindowsItem);
 
-		// if an application has no windows, this feature makes it easy to quit it.
- 		// (but we only add this option if the application is not Tracker.)
+		// if an application has no windows, this feature makes it easy to quit
+		// it. (but we only add this option if the application is not Tracker.)
  		if (fApplicationSignature.ICompare(kTrackerSignature) != 0) {
 			AddSeparatorItem();
-			AddItem(new TShowHideMenuItem("Quit Application", fTeam, B_QUIT_REQUESTED));
+			AddItem(new TShowHideMenuItem("Quit Application", fTeam,
+				B_QUIT_REQUESTED));
  		}
 	} else {
 		//	if we are in drag mode, then don't add the window controls
@@ -218,7 +219,8 @@ TWindowMenu::DetachedFromWindow()
 	// in expando mode the teammenu will not call DragStop,
 	// thus, it needs to be called from here
 	TBarView* barview = (dynamic_cast<TBarApp*>(be_app))->BarView();
-	if (barview && barview->Expando() && barview->Dragging() && barview->LockLooper()) {
+	if (barview && barview->Expando() && barview->Dragging()
+		&& barview->LockLooper()) {
 		// We changed the show level in AttachedToWindow().  Undo it.
 		Window()->Show();
 		barview->DragStop();

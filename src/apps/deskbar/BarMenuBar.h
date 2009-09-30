@@ -51,7 +51,8 @@ class TBarMenuBar : public BMenuBar {
 		TBarMenuBar(TBarView* bar, BRect frame, const char* name);
 		virtual ~TBarMenuBar();
 
-		virtual void MouseMoved(BPoint where, uint32 code, const BMessage* message);
+		virtual void MouseMoved(BPoint where, uint32 code,
+			const BMessage* message);
 		virtual void Draw(BRect);
 
 		void DrawBackground(BRect);

@@ -61,8 +61,8 @@ All rights reserved.
 const float kDefaultBeMenuWidth = 50.0f;
 const float kSepItemWidth = 5.0f;
 
-const uint32 M_MINIMIZE_TEAM = 'mntm';
-const uint32 M_BRING_TEAM_TO_FRONT = 'bftm';
+const uint32 kMinimizeTeam = 'mntm';
+const uint32 kBringTeamToFront = 'bftm';
 
 
 bool TExpandoMenuBar::sDoMonitor = false;
@@ -263,7 +263,7 @@ TExpandoMenuBar::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case M_MINIMIZE_TEAM:
+		case kMinimizeTeam:
 		{
 			index = message->FindInt32("itemIndex");
 			item = dynamic_cast<TTeamMenuItem*>(ItemAt(index));
@@ -277,7 +277,7 @@ TExpandoMenuBar::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case M_BRING_TEAM_TO_FRONT:
+		case kBringTeamToFront:
 		{
 			index = message->FindInt32("itemIndex");
 			item = dynamic_cast<TTeamMenuItem*>(ItemAt(index));
@@ -343,7 +343,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 			if (fLastClickItem == i
 				&& clickSpeed > system_time() - fLastClickTime) {
 				// bring this team's window to the front
-				BMessage showMessage(M_BRING_TEAM_TO_FRONT);
+				BMessage showMessage(kBringTeamToFront);
 				showMessage.AddInt32("itemIndex", i);
 				Window()->PostMessage(&showMessage, this);
 				return;
@@ -366,7 +366,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 			if (item != NULL) {
 				// show/hide item's teams
 				BMessage showMessage((modifiers & B_SHIFT_KEY) != 0
-					? M_MINIMIZE_TEAM : M_BRING_TEAM_TO_FRONT);
+					? kMinimizeTeam : kBringTeamToFront);
 				showMessage.AddInt32("itemIndex", IndexOf(item));
 				Window()->PostMessage(&showMessage, this);
 				return;
@@ -409,7 +409,8 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 
 	uint32 buttons;
 	if (!(Window()->CurrentMessage())
-		|| Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons) < B_OK)
+		|| Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons)
+		< B_OK)
 		buttons = 0;
 
 	if (buttons == 0)
@@ -530,7 +531,8 @@ void
 TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 	char* signature)
 {
-	float itemWidth = fVertical ? fBarView->Bounds().Width() : sMinimumWindowWidth;
+	float itemWidth = fVertical ? fBarView->Bounds().Width()
+		: sMinimumWindowWidth;
 	float itemHeight = -1.0f;
 
 	desk_settings* settings = ((TBarApp*)be_app)->Settings();
@@ -615,10 +617,10 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 				RemoveItem(i);
 
 				if (fVertical) {
-					//	instead of resizing the window here and there in the code
-					//	the resize method will be centered in one place
-					//	thus, the same behavior (good or bad) will be used whereever
-					//	window sizing is done
+					//	instead of resizing the window here and there in the
+					//	code the resize method will be centered in one place
+					//	thus, the same behavior (good or bad) will be used
+					//	whereever window sizing is done
 					fBarView->SizeWindow(BScreen(Window()).Frame());
 				} else
 					CheckItemSizes(-1);
@@ -646,7 +648,8 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 		// in this case there are 2 extra items:
 		//		The Be Menu
 		//		The little separator item
-		fullWidth = fullWidth - (sMinimumWindowWidth * 2) + (fBeMenuWidth + kSepItemWidth);
+		fullWidth = fullWidth - (sMinimumWindowWidth * 2)
+			+ (fBeMenuWidth + kSepItemWidth);
 		width -= (fBeMenuWidth + kSepItemWidth);
 		count -= 2;
 	}
@@ -730,7 +733,8 @@ TExpandoMenuBar::DrawBackground(BRect)
 		StrokeLine(bounds.LeftTop(), bounds.RightTop());
 		StrokeLine(BPoint(bounds.left, bounds.top + 1), bounds.LeftBottom());
 		SetHighColor(hilite);
-		StrokeLine(BPoint(bounds.left + 1, bounds.bottom), bounds.RightBottom());
+		StrokeLine(BPoint(bounds.left + 1, bounds.bottom),
+			bounds.RightBottom());
 	}
 }
 
@@ -780,7 +784,8 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 				}
 			}
 
-			// Perform SetTo() on all the items that still exist as well as add new items.
+			// Perform SetTo() on all the items that still exist as well as add
+			// new items.
 			bool itemModified = false, resize = false;
 			TTeamMenuItem* teamItem = NULL;
 
@@ -813,7 +818,8 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 								if (item) {
 									item->SetTo(wInfo->name,
 										wInfo->server_token, wInfo->is_mini,
-										((1 << current_workspace()) & wInfo->workspaces) != 0);
+										((1 << current_workspace())
+											& wInfo->workspaces) != 0);
 
 									if (strcmp(wInfo->name, item->Label()) != 0)
 										item->SetLabel(wInfo->name);
@@ -824,8 +830,8 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 									// Add the item
 									item = new TWindowMenuItem(wInfo->name,
 										wInfo->server_token, wInfo->is_mini,
-										((1 << current_workspace()) & wInfo->workspaces) != 0,
-										false);
+										((1 << current_workspace())
+											& wInfo->workspaces) != 0, false);
 									item->ExpandedItem(true);
 									teamMenu->AddItem(item, i + 1);
 									resize = true;
@@ -843,7 +849,8 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 				if (!teamMenu->SubmenuAt(i)){
 					item = static_cast<TWindowMenuItem*>(teamMenu->ItemAt(i));
 					if (item && item->RequiresUpdate()) {
-						item = static_cast<TWindowMenuItem*>(teamMenu->RemoveItem(i));
+						item = static_cast<TWindowMenuItem*>
+							(teamMenu->RemoveItem(i));
 						delete item;
 						totalItems--;
 
@@ -852,7 +859,8 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 				}
 			}
 
-			// If any of the WindowMenuItems changed state, we need to force a repaint.
+			// If any of the WindowMenuItems changed state, we need to force a
+			// repaint.
 			if (itemModified || resize) {
 				teamMenu->Invalidate();
 				if (resize)

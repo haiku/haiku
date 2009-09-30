@@ -58,11 +58,8 @@ All rights reserved.
 #define _ALLOW_STICKY_ 0
 	// allows you to press 's' to keep the switcher window on screen
 
-#if __HAIKU__
-	static const color_space kIconFormat = B_RGBA32;
-#else
-	static const color_space kIconFormat = B_CMAP8;
-#endif
+
+static const color_space kIconFormat = B_RGBA32;
 
 
 class TTeamGroup {
@@ -113,8 +110,9 @@ public:
 			TWindowView*	WindowView();
 			TBox*			TopView();
 			bool			HairTrigger();
-			void			Update(int32 previous, int32 current, int32 prevSlot,
-								int32 currentSlot, bool forward);
+			void			Update(int32 previous, int32 current,
+								int32 prevSlot, int32 currentSlot,
+								bool forward);
 			int32			SlotOf(int32);
 			void			Redraw(int32 index);
 
@@ -618,7 +616,6 @@ TSwitchManager::MessageReceived(BMessage* message)
 }
 
 
-#ifdef __HAIKU__
 void
 TSwitchManager::_SortApps()
 {
@@ -654,7 +651,6 @@ TSwitchManager::_SortApps()
 		// add the remaining entries
 	free(teams);
 }
-#endif	// __HAIKU__
 
 
 void
@@ -669,14 +665,13 @@ TSwitchManager::MainEntry(BMessage* message)
 	be_roster->GetActiveAppInfo(&appInfo);
 
 	bool resetQuickSwitch = false;
-#ifdef __HAIKU__
+
 	if (now > fLastSwitch + 400000) {
 		_SortApps();
 		resetQuickSwitch = true;
 	}
 
 	fLastSwitch = now;
-#endif
 
 	int32 index;
 	fCurrentIndex = FindTeam(appInfo.team, &index) != NULL ? index : 0;
@@ -1320,8 +1315,10 @@ TBox::MouseDown(BPoint where)
 
 	frame = fWindow->WindowView()->Frame();
 	if (fUpScroller) {
-		BRect hit1(frame.left - 10, frame.top, frame.left, (frame.top+frame.bottom)/2);
-		BRect hit2(frame.right, frame.top, frame.right + 10, (frame.top+frame.bottom)/2);
+		BRect hit1(frame.left - 10, frame.top, frame.left,
+			(frame.top+frame.bottom)/2);
+		BRect hit2(frame.right, frame.top, frame.right + 10,
+			(frame.top+frame.bottom)/2);
 		if (hit1.Contains(where) || hit2.Contains(where)) {
 			// Want to scroll up 1 window
 			fManager->CycleWindow(false, false);
@@ -1329,8 +1326,10 @@ TBox::MouseDown(BPoint where)
 	}
 
 	if (fDownScroller) {
-		BRect hit1(frame.left - 10, (frame.top+frame.bottom) / 2, frame.left, frame.bottom);
-		BRect hit2(frame.right, (frame.top+frame.bottom) / 2, frame.right + 10, frame.bottom);
+		BRect hit1(frame.left - 10, (frame.top+frame.bottom) / 2, frame.left,
+			frame.bottom);
+		BRect hit2(frame.right, (frame.top+frame.bottom) / 2, frame.right + 10,
+			frame.bottom);
 		if (hit1.Contains(where) || hit2.Contains(where)) {
 			// Want to scroll down 1 window
 			fManager->CycleWindow(true, false);
@@ -1357,7 +1356,8 @@ TBox::Draw(BRect update)
 	rgb_color white = {255, 255, 255, 255};
 	rgb_color standardGray = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color veryDarkGray = {128, 128, 128, 255};
-	rgb_color darkGray = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT);
+	rgb_color darkGray = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_1_TINT);
 
 	// Fill the area with dark gray
 	SetHighColor(darkGray);
@@ -1440,8 +1440,10 @@ TBox::DrawIconScrollers(bool force)
 	bool updateRight = false;
 	rgb_color leftc = {0, 0, 0, 255};
 	rgb_color rightc = {0, 0, 0, 255};
-	rgb_color bkg = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT);
-	rgb_color dark = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT);
+	rgb_color bkg = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_1_TINT);
+	rgb_color dark = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_4_TINT);
 
 	BRect rect = fIconView->Bounds();
 	if (rect.left > (kSlotSize * kCenterSlot)) {
@@ -1504,7 +1506,8 @@ TBox::DrawWindowScrollers(bool force)
 	rgb_color upColor = {0, 0, 0, 255};
 	rgb_color downColor = {0, 0, 0, 255};
 	rgb_color bkg = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color dark = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT);
+	rgb_color dark = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_4_TINT);
 
 	BRect rect = fWindow->WindowView()->Bounds();
 	if (rect.top != 0) {
@@ -1579,9 +1582,9 @@ TBox::DrawWindowScrollers(bool force)
 
 
 TSwitcherWindow::TSwitcherWindow(BRect frame, TSwitchManager* manager)
-	: BWindow(frame, "Twitcher", B_MODAL_WINDOW_LOOK,
-			B_MODAL_ALL_WINDOW_FEEL,
-			B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_NOT_RESIZABLE, B_ALL_WORKSPACES),
+	:
+	BWindow(frame, "Twitcher", B_MODAL_WINDOW_LOOK,	B_MODAL_ALL_WINDOW_FEEL,
+		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_NOT_RESIZABLE, B_ALL_WORKSPACES),
 	fManager(manager),
 	fHairTrigger(true)
 {
@@ -1811,7 +1814,8 @@ TIconView::TIconView(BRect frame, TSwitchManager* manager,
 	fManager(manager)
 {
 	BRect rect(0, 0, kSlotSize - 1, kSlotSize - 1);
-	rgb_color color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT);
+	rgb_color color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DARKEN_1_TINT);
 
 	fOffView = new BView(rect, "off_view", B_FOLLOW_NONE, B_WILL_DRAW);
 	fOffView->SetHighColor(color);
@@ -2037,7 +2041,8 @@ TIconView::FrameOf(int32 index) const
 		visible++;
 	}
 
-	return BRect(visible * kSlotSize, 0, (visible + 1) * kSlotSize - 1, kSlotSize - 1);
+	return BRect(visible * kSlotSize, 0, (visible + 1) * kSlotSize - 1,
+		kSlotSize - 1);
 }
 
 
@@ -2058,12 +2063,9 @@ TIconView::DrawTeams(BRect update)
 			continue;
 
 		if (rect.Intersects(update) && teamGroup) {
-#ifdef __HAIKU__
 			SetDrawingMode(B_OP_ALPHA);
 			SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-#else
-			SetDrawingMode(B_OP_OVER);
-#endif
+
 			teamGroup->Draw(this, rect, !fAutoScrolling && (i == mainIndex));
 
 			if (i == mainIndex)
@@ -2091,7 +2093,8 @@ TIconView::MouseDown(BPoint where)
 		int32 previousIndex = fManager->CurrentIndex();
 		int32 previousSlot = fManager->CurrentSlot();
 		int32 currentSlot = SlotOf(index);
-		fManager->SwitchToApp(previousIndex, index, (currentSlot > previousSlot));
+		fManager->SwitchToApp(previousIndex, index, (currentSlot
+			> previousSlot));
 	}
 }
 
@@ -2289,7 +2292,8 @@ TWindowView::Draw(BRect update)
 			stringWidth = maxWidth;
 		}
 
-		BPoint point((bounds.Width() - (stringWidth + 14 + 5)) / 2, windowRect.bottom - 4);
+		BPoint point((bounds.Width() - (stringWidth + 14 + 5)) / 2,
+			windowRect.bottom - 4);
 		BPoint p(point.x, (windowRect.top + windowRect.bottom) / 2);
 		SetDrawingMode(B_OP_OVER);
 		const BBitmap* bitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
@@ -2298,7 +2302,8 @@ TWindowView::Draw(BRect update)
 		DrawBitmap(bitmap, p);
 
 		if (!local) {
-			SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT));
+			SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+				B_DARKEN_4_TINT));
 			p.x -= 8;
 			p.y += 4;
 			StrokeLine(p + BPoint(2, 2), p + BPoint(2, 2));

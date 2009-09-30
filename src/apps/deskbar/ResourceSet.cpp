@@ -94,7 +94,8 @@ namespace TResourcePrivate {
 	class BitmapTypeItem : public BBitmap, public TypeObject {
 	public:
 		BitmapTypeItem(BRect bounds, uint32 flags, color_space depth,
-			int32 bytesPerRow=B_ANY_BYTES_PER_ROW, screen_id screenID = B_MAIN_SCREEN_ID)
+			int32 bytesPerRow=B_ANY_BYTES_PER_ROW, screen_id screenID
+			= B_MAIN_SCREEN_ID)
 			:	BBitmap(bounds, flags, depth, bytesPerRow, screenID)
 		{
 		}
@@ -545,7 +546,8 @@ TResourceSet::ExpandString(BString* out, const char* in)
 					in++;
 
 			} else 
-				while (isalnum(*in) || *in == '_' && i < sizeof(variableName) - 1)
+				while (isalnum(*in) || *in == '_' && i
+					< sizeof(variableName) - 1)
 					variableName[i++] = *in++;
 			
 			start = in;
@@ -894,3 +896,4 @@ AppResSet()
 	gResourceLocker.Unlock();
 	return gResources;
 }
+

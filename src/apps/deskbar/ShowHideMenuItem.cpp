@@ -48,8 +48,10 @@ const float kHPad = 10.0f;
 const float kVPad = 2.0f;
 
 
-TShowHideMenuItem::TShowHideMenuItem(const char* title, const BList* teams, uint32 action)
-	:	BMenuItem(title, NULL),
+TShowHideMenuItem::TShowHideMenuItem(const char* title, const BList* teams,
+	uint32 action)
+	:
+	BMenuItem(title, NULL),
 	fTeams(teams),
 	fAction(action)
 {
@@ -95,7 +97,8 @@ TShowHideMenuItem::Invoke(BMessage*)
 		zoomRect = item->Menu()->ConvertToScreen(item->Frame());
 		doZoom = true;
 	}
-	return TeamShowHideCommon(static_cast<int32>(fAction), fTeams, zoomRect, doZoom);
+	return TeamShowHideCommon(static_cast<int32>(fAction), fTeams, zoomRect,
+		doZoom);
 }
 
 

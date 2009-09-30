@@ -84,9 +84,7 @@ private:
 			bool			ActivateApp(bool forceShow,
 								bool allowWorkspaceSwitch);
 			void			ActivateWindow(int32 windowID = -1);
-#ifdef __HAIKU__
 			void			_SortApps();
-#endif
 
 			TSwitcherWindow* fWindow;
 			sem_id			fMainMonitor;
@@ -103,3 +101,4 @@ private:
 };
 
 #endif	/* SWITCHER_H */
+

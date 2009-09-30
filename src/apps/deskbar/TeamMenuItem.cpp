@@ -210,7 +210,8 @@ TTeamMenuItem::GetContentSize(float* width, float* height)
 	if (fOverrideWidth != -1.0f)
 		*width = fOverrideWidth;
 	else
-		*width = kHPad + iconBounds.Width() + kLabelOffset + fLabelWidth + kHPad + 20;
+		*width = kHPad + iconBounds.Width() + kLabelOffset + fLabelWidth + kHPad
+			+ 20;
 
 	if (fOverrideHeight != -1.0f) 
 		*height = fOverrideHeight;
@@ -290,20 +291,23 @@ TTeamMenuItem::Draw()
 		if (fVertical)
 			menu->StrokeLine(frame.LeftBottom(), frame.RightBottom());
 		else
-			menu->StrokeLine(frame.LeftBottom() + BPoint(1, 0), frame.RightBottom());
+			menu->StrokeLine(frame.LeftBottom() + BPoint(1, 0),
+				frame.RightBottom());
 
 		menu->StrokeLine(frame.RightBottom(), frame.RightTop());
 
 		menu->SetHighColor(light);
 		menu->StrokeLine(frame.RightTop() + BPoint(-1, 0), frame.LeftTop());
 		if (fVertical)
-			menu->StrokeLine(frame.LeftTop(), frame.LeftBottom() + BPoint(0, -1));
+			menu->StrokeLine(frame.LeftTop(), frame.LeftBottom()
+				+ BPoint(0, -1));
 		else
 			menu->StrokeLine(frame.LeftTop(), frame.LeftBottom());
 	}
 
 	//	if selected or being tracked on, fill with the hilite gray color
-	if (IsEnabled() && _IsSelected() && !menu->IsRedrawAfterSticky() && canHandle) {
+	if (IsEnabled() && _IsSelected() && !menu->IsRedrawAfterSticky()
+		&& canHandle) {
 		// fill
 		menu->SetHighColor(tint_color(menuColor, B_HIGHLIGHT_BACKGROUND_TINT));
 		menu->FillRect(frame);
@@ -505,9 +509,11 @@ TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 
 				TWindowMenuItem* windowItem = NULL;
 				int childIndex = 0;
-				int totalChildren = sub->CountItems() - 4; // hide, show, close, separator.
+				int totalChildren = sub->CountItems() - 4;
+					// hide, show, close, separator.
 				for (; childIndex < totalChildren; childIndex++) {
-					windowItem = static_cast<TWindowMenuItem*>(sub->RemoveItem((int32)0));
+					windowItem = static_cast<TWindowMenuItem*>
+						(sub->RemoveItem((int32)0));
 					parent->AddItem(windowItem, myindex + childIndex);
 					windowItem->ExpandedItem(true);
 				}
@@ -527,8 +533,10 @@ TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 
 			TWindowMenuItem* windowItem = NULL;
 			int childIndex = parent->IndexOf(this) + 1;
-			while (!parent->SubmenuAt(childIndex) && childIndex < parent->CountItems()) {
-				windowItem = static_cast<TWindowMenuItem*>(parent->RemoveItem(childIndex));
+			while (!parent->SubmenuAt(childIndex) && childIndex
+				< parent->CountItems()) {
+				windowItem = static_cast<TWindowMenuItem*>
+					(parent->RemoveItem(childIndex));
 				sub->AddItem(windowItem, 0);
 				windowItem->ExpandedItem(false);
 			}
@@ -551,8 +559,10 @@ TTeamMenuItem::ExpandedWindowItem(int32 id)
 	TExpandoMenuBar* parent = static_cast<TExpandoMenuBar*>(Menu());
 	int childIndex = parent->IndexOf(this) + 1;
 
-	while (!parent->SubmenuAt(childIndex) && childIndex < parent->CountItems()) {
-		TWindowMenuItem* item = static_cast<TWindowMenuItem*>(parent->ItemAt(childIndex));
+	while (!parent->SubmenuAt(childIndex)
+		&& childIndex < parent->CountItems()) {
+		TWindowMenuItem* item
+			= static_cast<TWindowMenuItem*>(parent->ItemAt(childIndex));
 		if (item->ID() == id)
 			return item;
 
