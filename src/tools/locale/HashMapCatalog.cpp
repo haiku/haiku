@@ -245,7 +245,7 @@ BHashMapCatalog::ComputeFingerprint() const
 	while (iter.HasNext())
 	{
 		entry = iter.Next();
-		hash = B_HOST_TO_LENDIAN_INT32(entry.key.fHashVal);
+		hash = entry.key.fHashVal;
 		checksum += hash;
 	}
 	return checksum;

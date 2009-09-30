@@ -1,19 +1,19 @@
 1	Russian	x-vnd.Haiku-CPUFrequencyPref	2623066734
-Ok	Status view		нЙ
-Integration Time [ms]	CPU Frequency View		бПЕЛЪ ХМРЕЦПЮЖХХ	 [ЛЯ]
-High Performance	Status view		бШЯНЙЮЪ ЩТТЕЙРХБМНЯРЭ
-Defaults	Pref Window		оН СЛНКВЮМХЧ
-CPU Frequency Status View	CPU Frequency View		оПЕДЯРЮБКЕМХЕ ЯНЯРНЪМХЪ ВЮЯРНРШ жо
-Dynamic Performance	Status view		дХМЮЛХВЕЯЙЮЪ ОПНХГБНДХРЕКЭМНЯРЭ
-Step up by CPU usage:	Color Step View		ьЮЦ ББЕПУ ОН ХЯОНКЭГНБЮМХЧ ОПНЖЕЯЯНПЮ:
-Stepping Policy	CPU Frequency View		оНЬЮЦНБНЕ ХГЛЕМЕМХЕ ВЮЯРНРШ ЖЕМРПЮКЭМНЦН ОПНЖЕЯЯНПЮ
-Open Speedstep Preferences…	Status view		нРЙПШЕ ОНЬЮЦНБШЕ МЮЯРПНИЙХ
-Set State	Status view		бШАПЮРЭ ЦНЯСДЮПЯРБН
-Launching the CPU Frequency preflet failed.\n\nError: 	Status view		гЮОСЯЙ вЮЯРНРШ ЖЕМРПЮКЭМНЦН ОПНЖЕЯЯНПЮ МЕ СДЮКНЯЭ.\n\nнЬХАЙЮ: 
-Install Replicant into Deskbar	CPU Frequency View		сЯРЮМНБХРЭ пЕОКХЙЮМР Б Deskbar
-Low Energy	Status view		щЙНМНЛХЪ ЩМЕПЦХХ
-Revert	Pref Window		бЕПМСРЭЯЪ
-Dynamic Stepping	CPU Frequency View		дХМЮЛХВЕЯЙНЕ ХГЛЕМЕМХЕ
-CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU Frequency\n\tМЮОХЯЮМЮ   Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
-CPU Frequency	Main window		вЮЯРНРЮ ОПНЖЕЯЯНПЮ
+Ok	Status view		Ок
+Integration Time [ms]	CPU Frequency View		Время интеграции	 [мс]
+High Performance	Status view		Высокая производительность
+Defaults	Pref Window		По умолчанию
+CPU Frequency Status View	CPU Frequency View		Представление состояния частоты ЦП
+Dynamic Performance	Status view		Динамическая производительность
+Step up by CPU usage:	Color Step View		Шаг вверх по производительности ЦП:
+Stepping Policy	CPU Frequency View		Пошаговое изменение частоты ЦП
+Open Speedstep Preferences…	Status view		Открытые пошаговые настройки
+Set State	Status view		Выбрать страну
+Launching the CPU Frequency preflet failed.\n\nError: 	Status view		Запуск CPU Frequency не удалось.\n\nErreur: 
+Install Replicant into Deskbar	CPU Frequency View		Установить репликант в  Deskbar
+Low Energy	Status view		Экономия энергии
+Revert	Pref Window		Вернуться
+Dynamic Stepping	CPU Frequency View		Динамическое изменение
+CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU Frequency\n\tразраьотан  Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPU Frequency	Main window		CPU Frequency
  

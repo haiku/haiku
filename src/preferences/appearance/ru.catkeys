@@ -1,43 +1,43 @@
 1	Russian	x-vnd.Haiku-Appearance	959674221
-Navigation Pulse	Colors tab		мЮБХЦЮЖХЪ Pulse
-Shadow	Colors tab		рЕМЭ
-On	AntialiasingSettingsView		бЙКЧВЕМХЕ
-Defaults	APRWindow		оН СЛНКВЮМХЧ
-Grayscale	AntialiasingSettingsView		нРРЕМЙХ ЯЕПНЦН
-Shine	Colors tab		яХЪМХЕ 
-Off	AntialiasingSettingsView		бШЙКЧВЕМХЕ
-Anti-aliasing type:	AntialiasingSettingsView		рХО ЯЦКЮФХБЮМХЪ :
-Success	Colors tab		сЯОЕУ
-Inactive Window Tab	Colors tab		мЕЮЙРХБМШИ
-Failure	Colors tab		chec
-Hinting menu	AntialiasingSettingsView		мЮЛ╦Й ЛЕМЧ
-Control Border	Colors tab		цПЮМХЖЮ СОПЮБКЕМХЪ
-Document Background	Colors tab		тНМ ДНЙСЛЕМРЮ
-Revert	APRWindow		бЕПМСРЭЯЪ
-Selected Menu Item Border	Colors tab		бШАПЮММЮЪ ЦПЮМХЖЮ ОСМЙРЮ ЛЕМЧ
-Selected Menu Item Text	Colors tab		бШАПЮММШИ РЕЙЯР ОСМЙРЮ ЛЕМЧ
-Antialiasing	APRWindow		яЦКЮФХБЮМХЕ
-Window Tab Text	Colors tab		рЕЙЯР ОНГХЖХХ РЮАСКЪЖХХ НЙМЮ
-Tooltip Background	Colors tab		тНМ ОНДЯЙЮГЙХ
-Document Text	Colors tab		рЕЙЯР ДНЙСЛЕМРЮ
-Navigation Base	Colors tab		мЮБХЦЮЖХНММНЕ ЪДПН
-Menu Background	Colors tab		тНМ ЛЕМЧ
-Appearance	APRWindow		бМЕЬМНЯРЭ
-Control Background	Colors tab		тНМ СОПЮБКЕМХЪ
-Colors	APRWindow		жБЕРЮ
-Panel Background	Colors tab		тНМНБЮЪ ОЮМЕКЭ
-Window Tab	Colors tab		оНГХЖХЪ РЮАСКЪЖХХ НЙМЮ
-Reduce colored edges filter strength:	AntialiasingSettingsView		сЛЕМЭЬХРЕ ЯХКС ТХКЭРПЮ ОНЙПЮЯЙХ ЙПЮ╦Б:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		аЮГНБНЕ ОНОХЙЯЕКЭМНЕ ЯЦКЮФХБЮМХЕ Б ЙНЛАХМЮЖХХ Я ЦКХТНЛ МЕ ДНЯРСОМН Б ЩРНИ ЯАНПЙЕ Haiku, ВРНАШ ХГАЕФЮРЭ БНГЛНФМШУ ДНЯРСОМШУ ОПНАКЕЛ. вРНАШ БЙКЧВХРЭ ЩРС НЯНАЕММНЯРЭ, бШ ДНКФМШ ЯНАПЮРЭ Haiku ЯЮЛНЯРНЪРЕКЭМН Х БЙКЧВХРЭ НОЖХХ Б libfreetype ГЮЦНКНБЙЕ ЙНМТХЦСПЮЖХХ.
-Menu Item Text	Colors tab		рЕЙЯР ОСМЙРЮ ЛЕМЧ
-Monospaced Fonts Only	AntialiasingSettingsView		рНКЭЙН ПЮБМНЬХПХММШЕ ЬПХТРШ 
-LCD subpixel	AntialiasingSettingsView		оНДОХЙЯЕКЭ LCD
-Inactive Window Tab Text	Colors tab		мЕЮЙРХБМШИ РЕЙЯР ОНГХЖХХ РЮАСКЪЖХХ НЙМЮ
-Strong	AntialiasingSettingsView		яХКЭМШИ
-Control Highlight	Colors tab		сОПЮБКЕМХЕ БШДЕКЕМХЪЛХ
-Control Text	Colors tab		сОПЮБКЕМХЕ РЕЙЯРНЛ
-Tooltip Text	Colors tab		рЕЙЯР ОНДЯЙЮГЙХ
-Antialiasing menu	AntialiasingSettingsView		лЕМЧ ЯЦКЮФХБЮМХЪ
-Selected Menu Item Background	Colors tab		бШАПЮММШИ ТНМ ОСМЙРЮ ЛЕМЧ
-Glyph hinting:	AntialiasingSettingsView		мЮЛ╦Й ЦКХТЮ:
-Panel Text	Colors tab		рЕЙЯРНБЮЪ ОЮМЕКЭ
+Navigation Pulse	Colors tab		Навигация Pulse
+Shadow	Colors tab		Тень
+On	AntialiasingSettingsView		Включение
+Defaults	APRWindow		По умолчанию
+Grayscale	AntialiasingSettingsView		Оттенки серого
+Shine	Colors tab		Сияние
+Off	AntialiasingSettingsView		Выключение
+Anti-aliasing type:	AntialiasingSettingsView		Тип сглаживания :
+Success	Colors tab		Успех
+Inactive Window Tab	Colors tab		Неактивный
+Failure	Colors tab		Неудача
+Hinting menu	AntialiasingSettingsView		Намёк меню
+Control Border	Colors tab		Управление границами
+Document Background	Colors tab		Фон документа
+Revert	APRWindow		Вернуться
+Selected Menu Item Border	Colors tab		Выбранная граница пункта меню
+Selected Menu Item Text	Colors tab		Выбранный текст пункта меню
+Antialiasing	APRWindow		Сглаживание
+Window Tab Text	Colors tab		Текст позиции табуляции окна
+Tooltip Background	Colors tab		Фон подсказки
+Document Text	Colors tab		Текст документа
+Navigation Base	Colors tab		Основа навигации
+Menu Background	Colors tab		Фон меню
+Appearance	APRWindow		Внешность
+Control Background	Colors tab		Фон управления
+Colors	APRWindow		Цвета
+Panel Background	Colors tab		Фоновая панель
+Window Tab	Colors tab		Позиция табуляции окна
+Reduce colored edges filter strength:	AntialiasingSettingsView		Уменьшите силу фильтра покраски краёв:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Базовое попиксельное сглаживание в комбинации с глифом не доступно в этой сборке Haiku, что бы избежать возможных доступных проблем. Чтобы включить эту особенность, вы должны собрать Haiku самостоятельно и включить опции в libfreetype заголовке конфигурации.
+Menu Item Text	Colors tab		Текст пункта меню
+Monospaced Fonts Only	AntialiasingSettingsView		Только равноширинные шрифты
+LCD subpixel	AntialiasingSettingsView		Подпиксель LCD
+Inactive Window Tab Text	Colors tab		Неактивный текст табуляции окна
+Strong	AntialiasingSettingsView		Сильный
+Control Highlight	Colors tab		Управление выделением
+Control Text	Colors tab		Управление текстом
+Tooltip Text	Colors tab		Текст подсказки
+Antialiasing menu	AntialiasingSettingsView		Сглаживание меню
+Selected Menu Item Background	Colors tab		Фон выбранного пункта меню
+Glyph hinting:	AntialiasingSettingsView		Намёк глифа:
+Panel Text	Colors tab		Текстовая панель
