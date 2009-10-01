@@ -140,6 +140,7 @@ Application Debugger :
 	X86AssemblyLanguage.cpp
 
 	# types
+	ArrayIndexPath.cpp
 	TargetAddressRangeList.cpp
 	ValueLocation.cpp
 
