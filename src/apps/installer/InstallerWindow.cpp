@@ -145,7 +145,6 @@ layout_item_for(BView* view)
 InstallerWindow::InstallerWindow()
 	: BWindow(BRect(-2000, -2000, -1800, -1800), "Installer", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
-	fNeedsToCenterOnScreen(true),
 	fEncouragedToSetupPartitions(false),
 	fDriveSetupLaunched(false),
 	fInstallStatus(kReadyForInstall),
@@ -269,6 +268,7 @@ InstallerWindow::InstallerWindow()
 	if (!be_roster->IsRunning(kDeskbarSignature))
 		SetFlags(Flags() | B_NOT_MINIMIZABLE);
 
+	CenterOnScreen();
 	Show();
 
 	fDriveSetupLaunched = be_roster->IsRunning(DRIVESETUP_SIG);
@@ -288,22 +288,6 @@ InstallerWindow::~InstallerWindow()
 {
 	_SetCopyEngineCancelSemaphore(-1);
 	be_roster->StopWatching(this);
-}
-
-
-void
-InstallerWindow::FrameResized(float width, float height)
-{
-	BWindow::FrameResized(width, height);
-
-	if (fNeedsToCenterOnScreen) {
-		// We have created ourselves off-screen, since the size adoption
-		// because of the layout management may happen after Show(). We
-		// assume that the first frame event is because of this adoption and
-		// move ourselves to the screen center...
-		fNeedsToCenterOnScreen = false;
-		CenterOnScreen();
-	}
 }
 
 

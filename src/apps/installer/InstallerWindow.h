@@ -45,7 +45,6 @@ public:
 								InstallerWindow();
 	virtual						~InstallerWindow();
 
-	virtual	void				FrameResized(float width, float height);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
@@ -88,7 +87,6 @@ private:
 			BButton*			fSetupButton;
 			BButton*			fMakeBootableButton;
 
-			bool				fNeedsToCenterOnScreen;
 			bool				fEncouragedToSetupPartitions;
 
 			bool				fDriveSetupLaunched;
