@@ -720,7 +720,7 @@ BreakpointManager::_WriteMemory(addr_t _address, const void* _buffer,
 		area_id area = _user_area_for(address);
 		if (area < 0) {
 			TRACE("BreakpointManager::_WriteMemory(): area not found for "
-				"address: %#lx: %lx\n", address, area);
+				"address: %p: %lx\n", address, area);
 			error = area;
 			break;
 		}
