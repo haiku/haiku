@@ -80,6 +80,7 @@ StdBinCommands
 	checkfs.cpp
 	clipboard.cpp
 	df.cpp
+	diskimage.cpp
 	dpms.cpp
 	draggers.cpp
 #	factor.cpp
