@@ -1653,10 +1653,13 @@ status_t
 DwarfStackFrameDebugInfo::_CreateArrayType(const BString& name,
 	DIEArrayType* typeEntry, DwarfType*& _type)
 {
+	TRACE_LOCALS("DwarfStackFrameDebugInfo::_CreateArrayType(\"%s\", %p)\n",
+		name.String(), typeEntry);
+
 	// create the base type
 	DIEArrayType* baseTypeOwnerEntry = DwarfUtils::GetDIEByPredicate(
 		typeEntry, HasTypePredicate<DIEArrayType>());
-	if (baseTypeOwnerEntry != NULL) {
+	if (baseTypeOwnerEntry == NULL) {
 		WARNING("Failed to get base type for array type \"%s\"\n",
 			name.String());
 		return B_BAD_VALUE;
@@ -1664,8 +1667,11 @@ DwarfStackFrameDebugInfo::_CreateArrayType(const BString& name,
 
 	DwarfType* baseType = NULL;
 	status_t error = _CreateType(baseTypeOwnerEntry->GetType(), baseType);
-	if (error != B_OK)
+	if (error != B_OK) {
+		WARNING("Failed to create base type for array type \"%s\": %s\n",
+			name.String(), strerror(error));
 		return error;
+	}
 	Reference<Type> baseTypeReference(baseType, true);
 
 	// create the array type
@@ -1679,7 +1685,7 @@ DwarfStackFrameDebugInfo::_CreateArrayType(const BString& name,
 	DIEArrayType* dimensionOwnerEntry = DwarfUtils::GetDIEByPredicate(
 		typeEntry, HasDimensionsPredicate());
 
-	if (dimensionOwnerEntry != NULL) {
+	if (dimensionOwnerEntry == NULL) {
 		WARNING("Failed to get dimensions for array type \"%s\"\n",
 			name.String());
 		return B_BAD_VALUE;
@@ -1693,8 +1699,11 @@ DwarfStackFrameDebugInfo::_CreateArrayType(const BString& name,
 		// get/create the dimension type
 		DwarfType* dimensionType = NULL;
 		status_t error = _CreateType(dimensionEntry, dimensionType);
-		if (error != B_OK)
+		if (error != B_OK) {
+			WARNING("Failed to create type for array dimension: %s\n",
+				strerror(error));
 			return error;
+		}
 		Reference<Type> dimensionTypeReference(dimensionType, true);
 
 		// create and add the array dimension object
