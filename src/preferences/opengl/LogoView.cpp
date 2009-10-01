@@ -22,7 +22,7 @@ LogoView::LogoView(const BRect& frame)
 	fLogo(NULL)
 {
 	SetViewColor(255, 255, 255);
-	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "OpenGL_logo.png");
+	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "logo.png");
 	if (fLogo) {
 		SetExplicitMinSize(
 			BSize(fLogo->Bounds().Width(), fLogo->Bounds().Height() + 6));

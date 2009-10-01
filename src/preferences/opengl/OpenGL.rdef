@@ -15,7 +15,7 @@ resource app_version {
 	long_info = "OpenGL ©2009 Haiku"
 };
 
-resource(1, "OpenGL_logo.png") #'PNG ' import "OpenGL_logo.png";
+resource(1, "logo.png") #'PNG ' import "logo.png";
 
 resource vector_icon {
 	$"6E6369660B0500020016023A3D24339506B715A93DDB134A79084A1A1100D7FF"
