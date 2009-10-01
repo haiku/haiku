@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include <ddm_modules.h>
+#include <disk_device_types.h>
 #include <DiskDeviceTypes.h>
 #include <KernelExport.h>
 
@@ -19,7 +20,6 @@
 
 
 #define SESSION_PARTITION_MODULE_NAME "partitioning_systems/session/v1"
-#define SESSION_PARTITION_NAME "Multisession Storage Device"
 
 
 static status_t
@@ -115,7 +115,7 @@ static partition_module_info sSessionModule = {
 		standard_operations
 	},
 	"session",							// short_name
-	SESSION_PARTITION_NAME,				// pretty_name
+	MULTISESSION_PARTITION_NAME,		// pretty_name
 	0,									// flags
 
 	// scanning

@@ -4,14 +4,15 @@ SubDir HAIKU_TOP src add-ons kernel partitioning_systems session ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName storage ] ;
+UsePrivateSystemHeaders ;
 
 {
-#	local defines = [ FDefines USER ] ; 
+#	local defines = [ FDefines USER ] ;
 #	SubDirCcFlags $(defines) ;
 #	SubDirC++Flags $(defines) ;
 }
 
-local session_files = 
+local session_files =
 	Debug.cpp
 	Disc.cpp
 	session.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku Inc.
+ * Copyright 2003-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _DISK_DEVICE_TYPES_H
@@ -16,7 +16,6 @@ extern const char *kDeviceTypeOptical;
 extern const char *kPartitionTypeUnrecognized;
 
 extern const char *kPartitionTypeMultisession;
-
 extern const char *kPartitionTypeAudioSession;
 extern const char *kPartitionTypeDataSession;
 
@@ -24,10 +23,8 @@ extern const char *kPartitionTypeAmiga;
 extern const char *kPartitionTypeApple;
 extern const char *kPartitionTypeEFI;
 extern const char *kPartitionTypeIntel;
-
-extern const char *kPartitionTypeIntelPrimary;
 extern const char *kPartitionTypeIntelExtended;
-extern const char *kPartitionTypeIntelLogical;
+extern const char *kPartitionTypeVMDK;
 
 extern const char *kPartitionTypeAmigaFFS;
 extern const char *kPartitionTypeBFS;

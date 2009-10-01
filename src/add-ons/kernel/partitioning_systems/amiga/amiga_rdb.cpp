@@ -9,6 +9,7 @@
 #include <ByteOrder.h>
 #include <KernelExport.h>
 #include <ddm_modules.h>
+#include <disk_device_types.h>
 #ifdef _BOOT_MODE
 #	include <boot/partitions.h>
 #else
@@ -29,7 +30,6 @@
 
 
 #define AMIGA_PARTITION_MODULE_NAME "partitioning_systems/amiga_rdb/v1"
-#define AMIGA_PARTITION_NAME "Amiga Partition Map"
 
 
 template<typename Type> bool

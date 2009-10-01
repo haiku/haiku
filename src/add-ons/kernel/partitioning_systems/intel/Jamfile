@@ -4,6 +4,7 @@ UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
+UsePrivateSystemHeaders ;
 
 KernelAddon intel :
 	intel.cpp

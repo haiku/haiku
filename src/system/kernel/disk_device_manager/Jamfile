@@ -9,6 +9,7 @@ UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel fs ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateSystemHeaders ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 

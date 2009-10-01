@@ -7,6 +7,7 @@
 #include "apple.h"
 
 #include <ddm_modules.h>
+#include <disk_device_types.h>
 #include <KernelExport.h>
 #ifdef _BOOT_MODE
 #	include <boot/partitions.h>
@@ -27,7 +28,6 @@
 #endif
 
 #define APPLE_PARTITION_MODULE_NAME "partitioning_systems/apple/v1"
-#define APPLE_PARTITION_NAME "Apple Partition Map"
 
 static const char *kApplePartitionTypes[] = {
 	"partition_map",	// the partition map itself

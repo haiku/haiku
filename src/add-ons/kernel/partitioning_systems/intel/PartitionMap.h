@@ -16,16 +16,13 @@
 #include <SupportDefs.h>
 #include <driver_settings.h>
 
+#include <disk_device_types.h>
+
 #ifndef _USER_MODE
 #	include <util/kernel_cpp.h>
 #else
 #	include <new>
 #endif
-
-// These match those in DiskDeviceTypes.cpp and *must* be kept in sync.
-#define INTEL_PARTITION_NAME "Intel Partition Map"
-#define INTEL_EXTENDED_PARTITION_NAME "Intel Extended Partition"
-#define BFS_NAME "Be File System"
 
 
 // partition_type

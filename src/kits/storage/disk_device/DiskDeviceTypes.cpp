@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku Inc.
+ * Copyright 2003-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,39 +9,38 @@
 
 #include <DiskDeviceTypes.h>
 
+#include <disk_device_types.h>
+
 
 // Device Types
 
-const char *kDeviceTypeFloppyDisk	= "Floppy Disk Media";
-const char *kDeviceTypeHardDisk		= "Hard Disk Media";
-const char *kDeviceTypeOptical		= "Optical Media";
+const char *kDeviceTypeFloppyDisk		= FLOPPY_DEVICE_NAME;
+const char *kDeviceTypeHardDisk			= HARD_DISK_DEVICE_NAME;
+const char *kDeviceTypeOptical			= OPTICAL_DEVICE_NAME;
 
 // Partition types
 
-const char *kPartitionTypeUnrecognized	= "Unrecognized";
+const char *kPartitionTypeUnrecognized	= UNRECOGNIZED_PARTITION_NAME;
 
-const char *kPartitionTypeMultisession	= "Multisession Storage Device";
+const char *kPartitionTypeMultisession	= MULTISESSION_PARTITION_NAME;
+const char *kPartitionTypeAudioSession	= AUDIO_SESSION_PARTITION_NAME;
+const char *kPartitionTypeDataSession	= DATA_SESSION_PARTITION_NAME;
 
-const char *kPartitionTypeAudioSession	= "Audio Session";
-const char *kPartitionTypeDataSession	= "Data Session";
+const char *kPartitionTypeAmiga			= AMIGA_PARTITION_NAME;
+const char *kPartitionTypeApple			= APPLE_PARTITION_NAME;
+const char *kPartitionTypeEFI			= EFI_PARTITION_NAME;
+const char *kPartitionTypeIntel			= INTEL_PARTITION_NAME;
+const char *kPartitionTypeIntelExtended	= INTEL_EXTENDED_PARTITION_NAME;
+const char *kPartitionTypeVMDK			= VMDK_PARTITION_NAME;
 
-const char *kPartitionTypeAmiga			= "Amiga Partition Map";
-const char *kPartitionTypeApple			= "Apple Partition Map";
-const char *kPartitionTypeEFI			= "EFI GUID Partition Map";
-const char *kPartitionTypeIntel			= "Intel Partition Map";
-
-const char *kPartitionTypeIntelPrimary	= "Intel Primary Partition";
-const char *kPartitionTypeIntelExtended	= "Intel Extended Partition";
-const char *kPartitionTypeIntelLogical	= "Intel Logical Partition";
-
-const char *kPartitionTypeAmigaFFS		= "AmigaFFS File System";
-const char *kPartitionTypeBFS			= "Be File System";
-const char *kPartitionTypeEXT2			= "EXT2 File System";
-const char *kPartitionTypeEXT3			= "EXT3 File System";
-const char *kPartitionTypeFAT12			= "FAT12 File System";
-const char *kPartitionTypeFAT32			= "FAT32 File System";
-const char *kPartitionTypeHFS			= "HFS File System";
-const char *kPartitionTypeHFSPlus		= "HFS+ File System";
-const char *kPartitionTypeISO9660		= "ISO9660 File System";
-const char *kPartitionTypeReiser		= "Reiser File System";
-const char *kPartitionTypeUDF			= "UDF File System";
+const char *kPartitionTypeAmigaFFS		= AMIGA_FFS_NAME;
+const char *kPartitionTypeBFS			= BFS_NAME;
+const char *kPartitionTypeEXT2			= EXT2_FS_NAME;
+const char *kPartitionTypeEXT3			= EXT3_FS_NAME;
+const char *kPartitionTypeFAT12			= FAT12_FS_NAME;
+const char *kPartitionTypeFAT32			= FAT32_FS_NAME;
+const char *kPartitionTypeHFS			= HFS_NAME;
+const char *kPartitionTypeHFSPlus		= HFS_PLUS_NAME;
+const char *kPartitionTypeISO9660		= ISO9660_FS_NAME;
+const char *kPartitionTypeReiser		= REISER_FS_NAME;
+const char *kPartitionTypeUDF			= UDF_FS_NAME;

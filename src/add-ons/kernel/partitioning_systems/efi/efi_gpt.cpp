@@ -10,6 +10,7 @@
 
 #include <KernelExport.h>
 #include <ddm_modules.h>
+#include <disk_device_types.h>
 #ifdef _BOOT_MODE
 #	include <boot/partitions.h>
 #else
@@ -33,7 +34,6 @@
 
 
 #define EFI_PARTITION_MODULE_NAME "partitioning_systems/efi_gpt/v1"
-#define EFI_PARTITION_NAME "EFI GUID Partition Map"
 
 
 struct static_guid {
