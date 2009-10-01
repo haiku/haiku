@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
@@ -15,12 +16,14 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "vmdkimage.h"
+#include <vmdk.h>
+
 
 #if defined(__BEOS__) && !defined(__HAIKU__)
 #define pread(_fd, _buf, _count, _pos) read_pos(_fd, _pos, _buf, _count)
 #define realpath(x, y)	NULL
 #endif
+
 
 static void
 print_usage()
@@ -59,7 +62,7 @@ dump_image_info(const char *filename)
 		exit(EXIT_FAILURE);
 	}
 
-	if (header.magicNumber != SPARSE_MAGICNUMBER) {
+	if (header.magicNumber != VMDK_SPARSE_MAGICNUMBER) {
 		fprintf(stderr, "Error: invalid header magic.\n");
 		exit(EXIT_FAILURE);
 	}
@@ -108,10 +111,10 @@ dump_image_info(const char *filename)
 }
 
 
-static uint64
+static uint64_t
 hash_string(const char *string)
 {
-	uint64 hash = 0;
+	uint64_t hash = 0;
 	char c;
 
 	while ((c = *string++) != 0) {
@@ -145,8 +148,8 @@ is_valid_uuid(const char *uuid)
 int
 main(int argc, char *argv[])
 {
-	uint64 headerSize = 0;
-	uint64 imageSize = 0;
+	uint64_t headerSize = 0;
+	uint64_t imageSize = 0;
 	const char *file = NULL;
 	const char *uuid = NULL;
 	bool headerOnly = false;
@@ -277,9 +280,9 @@ main(int argc, char *argv[])
 //	printf("imageSize %llu\n", imageSize);
 //	printf("file %s\n", file);
 
-	uint64 sectors;
-	uint64 heads;
-	uint64 cylinders;
+	uint64_t sectors;
+	uint64_t heads;
+	uint64_t cylinders;
 
 	// TODO: fixme!
 	sectors = 63;
@@ -294,8 +297,8 @@ main(int argc, char *argv[])
 	memset(desc, 0, sizeof(desc));
 	memset(&header, 0, sizeof(header));
 
-	header.magicNumber = SPARSE_MAGICNUMBER;
-	header.version = 1;
+	header.magicNumber = VMDK_SPARSE_MAGICNUMBER;
+	header.version = VMDK_SPARSE_VERSION;
 	header.flags = 1;
 	header.capacity = 0;
 	header.grainSize = 16;
@@ -312,7 +315,7 @@ main(int argc, char *argv[])
 	header.doubleEndLineChar2 = '\n';
 
 	// Generate UUID for the image by hashing its full path
-	uint64 uuid1 = 0, uuid2 = 0, uuid3 = 0, uuid4 = 0, uuid5 = 0;
+	uint64_t uuid1 = 0, uuid2 = 0, uuid3 = 0, uuid4 = 0, uuid5 = 0;
 	if (uuid == NULL) {
 		char fullPath[PATH_MAX + 6];
 		strcpy(fullPath, "Haiku");
@@ -376,7 +379,7 @@ main(int argc, char *argv[])
 	if (write(fd, desc, sizeof(desc)) != sizeof(desc))
 		goto write_err;
 
-	if ((uint64)lseek(fd, headerSize - 1, SEEK_SET) != headerSize - 1)
+	if ((uint64_t)lseek(fd, headerSize - 1, SEEK_SET) != headerSize - 1)
 		goto write_err;
 
 	if (1 != write(fd, "", 1))
