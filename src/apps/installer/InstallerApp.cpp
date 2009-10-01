@@ -185,10 +185,7 @@ InstallerApp::ReadyToRun()
 		.SetInsets(10, 10, 10, 10)
 	);
 
-	BRect frame = BScreen().Frame();
-	fEULAWindow->MoveTo(frame.left + (frame.Width() - eulaFrame.Width()) / 2,
-		frame.top + (frame.Height() - eulaFrame.Height()) / 2);
-
+	fEULAWindow->CenterOnScreen();
 	fEULAWindow->Show();
 #else
 	// Show the installer window without EULA.

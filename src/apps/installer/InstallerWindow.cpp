@@ -302,9 +302,7 @@ InstallerWindow::FrameResized(float width, float height)
 		// assume that the first frame event is because of this adoption and
 		// move ourselves to the screen center...
 		fNeedsToCenterOnScreen = false;
-		BRect frame = BScreen(this).Frame();
-		MoveTo(frame.left + (frame.Width() - Frame().Width()) / 2,
-			frame.top + (frame.Height() - Frame().Height()) / 2);
+		CenterOnScreen();
 	}
 }
 
