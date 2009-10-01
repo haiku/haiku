@@ -3,80 +3,89 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ryan Leavengood
+ *		Ryan Leavengood, leavengood@gmail.com
  */
 
 
-#include <ScreenSaver.h>
-#include <View.h>
-#include <StringView.h>
 #include <Font.h>
+#include <ScreenSaver.h>
+#include <StringView.h>
+#include <View.h>
+
+#include <BuildScreenSaverDefaultSettingsView.h>
 
 
 const rgb_color kMediumBlue = {0, 0, 100};
 const rgb_color kWhite = {255, 255, 255};
 
 
-// Inspired by the classic BeOS screensaver, of course
+// Inspired by the classic BeOS BuyNow screensaver, of course
 class DebugNow : public BScreenSaver
 {
 	public:
-					DebugNow(BMessage *archive, image_id);
-		void		Draw(BView *view, int32 frame);
-		void		StartConfig(BView *view);
-		status_t	StartSaver(BView *view, bool preview);
+							DebugNow(BMessage *archive, image_id);
+		void				Draw(BView *view, int32 frame);
+		void				StartConfig(BView *view);
+		status_t			StartSaver(BView *view, bool preview);
 		
 	private:
-		const char *fLine1;
-		const char *fLine2;
-		BPoint		fLine1Start;
-		BPoint		fLine2Start;
+		const char* 		fLine1;
+		const char*			fLine2;
+		BPoint				fLine1Start;
+		BPoint				fLine2Start;
+		escapement_delta	fDelta;
 };
 
 
-BScreenSaver *instantiate_screen_saver(BMessage *msg, image_id image) 
+BScreenSaver* instantiate_screen_saver(BMessage *msg, image_id image) 
 { 
 	return new DebugNow(msg, image);
 } 
 
 
 DebugNow::DebugNow(BMessage *archive, image_id id)
- :	BScreenSaver(archive, id)
- ,	fLine1("DEBUG")
- ,	fLine2("NOW")
+	:	
+	BScreenSaver(archive, id),
+	fLine1("DEBUG"),
+	fLine2("NOW")
 {
 }
 
 
 void 
 DebugNow::StartConfig(BView *view) 
-{ 
-	view->AddChild(new BStringView(BRect(20, 10, 200, 35), "", "DEBUG NOW, "
-		"by Ryan Leavengood"));
+{
+	BPrivate::BuildScreenSaverDefaultSettingsView(view, "DEBUG NOW",
+		"by Ryan Leavengood");
 } 
 
 
 status_t 
 DebugNow::StartSaver(BView *view, bool preview)
 {
-	float width = view->Bounds().Width();
-	float height = view->Bounds().Height();
+	float viewWidth = view->Bounds().Width();
+	float viewHeight = view->Bounds().Height();
 	
 	BFont font;
 	view->GetFont(&font);
-	font.SetSize(height / 2.5);
+	font.SetSize(viewHeight / 2.5);
 	view->SetFont(&font);
 	
-	BRect rect;
-	escapement_delta delta;
-	delta.nonspace = 0;
-	delta.space = 0;
-	// If anyone has suggestions for how to clean this up, speak up
-	font.GetBoundingBoxesForStrings(&fLine1, 1, B_SCREEN_METRIC, &delta, &rect);
-	float y = ((height - (rect.Height() * 2 + height / 10)) / 2) + rect.Height();
-	fLine1Start.Set((width - rect.Width()) / 2, y);
-	font.GetBoundingBoxesForStrings(&fLine2, 1, B_SCREEN_METRIC, &delta, &rect);
-	fLine2Start.Set((width - rect.Width()) / 2, y + rect.Height() + height / 10);
+	fDelta.nonspace = 0;
+	fDelta.space = 0;
+	BRect stringRect;
+	font.GetBoundingBoxesForStrings(&fLine1, 1, B_SCREEN_METRIC, &fDelta,
+		&stringRect);
+	float y = ((viewHeight - (stringRect.Height() * 2 + viewHeight / 10)) / 2)
+		+ stringRect.Height();
+	fLine1Start.Set(((viewWidth - stringRect.Width()) / 2) - stringRect.left, y);
+	font.GetBoundingBoxesForStrings(&fLine2, 1, B_SCREEN_METRIC, &fDelta,
+		&stringRect);
+	fLine2Start.Set(((viewWidth - stringRect.Width()) / 2) - stringRect.left,
+		y + stringRect.Height() + viewHeight / 10);
+	
+	// Set tick size to 500,000 microseconds = 0.5 second
+	SetTickSize(500000);
 	
 	return B_OK;
 }
@@ -85,22 +94,19 @@ DebugNow::StartSaver(BView *view, bool preview)
 void 
 DebugNow::Draw(BView *view, int32 frame)
 {
-	if (frame == 0) { 
-		// fill with blue on first frame
-		view->SetLowColor(kMediumBlue); 
-		view->FillRect(view->Bounds(), B_SOLID_LOW); 
+	// On first frame set the low color to make the text rendering correct
+	if (frame == 0)
+		view->SetLowColor(kMediumBlue);
 
-		// Set tick size to 500,000 microseconds = 0.5 second
-		SetTickSize(500000);
-	} else {
-		// Drawing the background color every other frame to make the text blink
-		if (frame % 2 == 1)
-			view->SetHighColor(kWhite);
-		else
-			view->SetHighColor(kMediumBlue);
+	// Draw the background color every frame 
+	view->SetHighColor(kMediumBlue);
+	view->FillRect(view->Bounds());
 
-		view->DrawString(fLine1, fLine1Start);
-		view->DrawString(fLine2, fLine2Start);
+	// Draw the text every other frame to make the it blink
+	if (frame % 2 == 1) {
+		view->SetHighColor(kWhite);
+		view->DrawString(fLine1, fLine1Start, &fDelta);
+		view->DrawString(fLine2, fLine2Start, &fDelta);
 	}
 }
 
