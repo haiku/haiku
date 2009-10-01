@@ -89,7 +89,16 @@ KFileDiskDevice::SetTo(const char *filePath, const char *devicePath)
 	error = set_string(fFilePath, filePath);
 	if (error != B_OK)
 		return error;
-	return KDiskDevice::SetTo(devicePath);
+
+	error = KDiskDevice::SetTo(devicePath);
+	if (error != B_OK)
+		return error;
+
+	// reset the B_DISK_DEVICE_IS_FILE flag -- KDiskDevice::SetTo() has cleared
+	// it
+	SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_IS_FILE);
+
+	return B_OK;
 }
 
 // Unset
