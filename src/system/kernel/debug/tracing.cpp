@@ -253,8 +253,9 @@ TracingMetaData::_FreeFirstEntry()
 	if (fFirstEntry->flags & BUFFER_ENTRY) {
 		// a buffer entry -- just skip it
 	} else if (fFirstEntry->flags & ENTRY_INITIALIZED) {
-		// fully initialized TraceEntry -- destroy it
-		TraceEntry::FromTraceEntry(fFirstEntry)->~TraceEntry();
+		// Fully initialized TraceEntry: We could destroy it, but don't do so
+		// for sake of robustness. The destructors of tracing entry classes
+		// should be empty anyway.
 		fEntries--;
 	} else {
 		// Not fully initialized TraceEntry. We can't free it, since
