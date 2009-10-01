@@ -28,11 +28,14 @@ enum {
 	VALUE_NODE_TYPE	= 'valn'
 };
 
+// maximum number of array elements to show by default
+static const uint64 kMaxArrayElementCount = 10;
+
 
 class VariablesView::ValueNode : public Referenceable {
 public:
 	ValueNode(ValueNode* parent, Variable* variable, TypeComponentPath* path,
-		const BString& name, Type* type)
+		const BString& name, Type* type, bool isPresentationNode)
 		:
 		fParent(parent),
 		fVariable(variable),
@@ -40,7 +43,8 @@ public:
 		fName(name),
 		fType(type),
 		fRawType(type->ResolveRawType()),
-		fChildrenAdded(false)
+		fChildrenAdded(false),
+		fIsPresentationNode(isPresentationNode)
 	{
 		fVariable->AcquireReference();
 		fPath->AcquireReference();
@@ -99,6 +103,11 @@ public:
 		fValue = value;
 	}
 
+	bool IsPresentationNode() const
+	{
+		return fIsPresentationNode;
+	}
+
 	int32 CountChildren() const
 	{
 		return fChildren.CountItems();
@@ -146,6 +155,7 @@ private:
 	BVariant			fValue;
 	ChildList			fChildren;
 	bool				fChildrenAdded;
+	bool				fIsPresentationNode;
 };
 
 
@@ -394,7 +404,7 @@ private:
 		Reference<TypeComponentPath> pathReference(path, true);
 
 		ValueNode* node = new(std::nothrow) ValueNode(NULL, variable, path,
-			variable->Name(), variable->GetType());
+			variable->Name(), variable->GetType(), false);
 		if (node == NULL || !fNodes.AddItem(node)) {
 			delete node;
 			return;
@@ -520,9 +530,77 @@ private:
 					dereferencedType = true;
 					break;
 				case TYPE_ARRAY:
+				{
 					TRACE_LOCALS("TYPE_ARRAY\n");
-					// TODO:...
+					ArrayType* arrayType = dynamic_cast<ArrayType*>(type);
+					int32 dimensionCount = arrayType->CountDimensions();
+
+					// get the base array indices
+					ArrayIndexPath baseIndexPath;
+					int32 baseDimension = 0;
+					if (node->Parent() != NULL
+						&& node->Parent()->GetType() == type) {
+						TypeComponent arrayComponent
+							= path->ComponentAt(path->CountComponents() - 1);
+						if (arrayComponent.componentKind
+								!= TYPE_COMPONENT_ARRAY_ELEMENT) {
+							ERROR("Unexpected array type path component!\n");
+							return;
+						}
+
+						if (!baseIndexPath.SetTo(arrayComponent.name.String()))
+							return;
+
+						baseDimension = baseIndexPath.CountIndices();
+					}
+
+					if (baseDimension >= dimensionCount) {
+						ERROR("Unexpected array base dimension!\n");
+						return;
+					}
+					bool isFinalDimension = baseDimension + 1 == dimensionCount;
+
+					ArrayDimension* dimension = arrayType->DimensionAt(
+						baseDimension);
+					uint64 elementCount = dimension->CountElements();
+					if (elementCount == 0
+						|| elementCount > kMaxArrayElementCount) {
+						elementCount = kMaxArrayElementCount;
+					}
+
+					// create children for the array elements
+					for (int32 i = 0; i < (int32)elementCount; i++) {
+						ArrayIndexPath indexPath(baseIndexPath);
+						if (indexPath.CountIndices()
+								!= baseIndexPath.CountIndices()
+							|| !indexPath.AddIndex(i)) {
+							return;
+						}
+
+						component.SetToArrayElement(type->Kind(), indexPath);
+						TypeComponentPath* elementPath
+							= new(std::nothrow) TypeComponentPath(*path);
+						if (elementPath == NULL
+							|| elementPath->CountComponents()
+								!= path->CountComponents()
+							|| !elementPath->AddComponent(component)) {
+							delete elementPath;
+							return;
+						}
+						Reference<TypeComponentPath> elementPathReference(
+							elementPath, true);
+
+						BString name(node->Name());
+						name << '[' << i << ']';
+
+						_AddChildNode(node, node->GetVariable(), elementPath,
+							name,
+							isFinalDimension ? arrayType->BaseType() : type,
+							!isFinalDimension);
+					}
+
 					return;
+				}
 				case TYPE_ENUMERATION:
 					TRACE_LOCALS("TYPE_ENUMERATION\n");
 					done = true;
@@ -546,10 +624,11 @@ private:
 	}
 
 	void _AddChildNode(ValueNode* parent, Variable* variable,
-		TypeComponentPath* path, const BString& name, Type* type)
+		TypeComponentPath* path, const BString& name, Type* type,
+		bool isPresentationNode = false)
 	{
 		ValueNode* node = new(std::nothrow) ValueNode(parent, variable, path,
-			name, type);
+			name, type, isPresentationNode);
 		if (node == NULL || !parent->AddChild(node)) {
 			delete node;
 			return;
@@ -723,6 +802,9 @@ VariablesView::TreeTableNodeExpandedChanged(TreeTable* table,
 
 		// request the values of all children that don't have any yet
 		for (int32 i = 0; ValueNode* child = node->ChildAt(i); i++) {
+			if (child->IsPresentationNode())
+				continue;
+
 			Variable* variable = child->GetVariable();
 			TypeComponentPath* path = child->Path();
 			if (fStackFrame->Values()->HasValue(variable->ID(), *path))
