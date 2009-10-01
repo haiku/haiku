@@ -1465,6 +1465,8 @@ public:
 		if (!IS_USER_ADDRESS(address))
 			return false;
 
+		if (debug_debugger_running())
+			return debug_strlcpy(buffer, address, bufferSize) >= 0;
 		return user_strlcpy(buffer, address, bufferSize) >= 0;
 	}
 
@@ -1486,6 +1488,8 @@ UserSymbolLookup::_Read(const T* address, T& data)
 	if (!IS_USER_ADDRESS(address))
 		return false;
 
+	if (debug_debugger_running())
+		return debug_memcpy(&data, address, sizeof(T)) == B_OK;
 	return user_memcpy(&data, address, sizeof(T)) == B_OK;
 }
 

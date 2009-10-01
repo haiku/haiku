@@ -239,7 +239,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 		if (type == B_STRING_TYPE) {
 			if (value == 0)
 				kprintf(" \33[31m\"<NULL>\"\33[0m");
-			else if (user_strlcpy(buffer, (char*)value, kBufferSize) < B_OK)
+			else if (debug_strlcpy(buffer, (char*)value, kBufferSize) < B_OK)
 				kprintf(" \33[31m\"<???>\"\33[0m");
 			else
 				kprintf(" \33[36m\"%s\"\33[0m", buffer);
