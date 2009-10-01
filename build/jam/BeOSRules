@@ -367,9 +367,10 @@ rule DoCatalogs appName	# Application name
 {
 	genCat = [ FGristFiles $(generatedCatalog) ] ;
 	trans = [ FGristFiles $(translatedCatalogs) ] ;
+	srcs = [ FGristFiles $(sources) ] ;
 	SEARCH on $(trans) += $(SEARCH_SOURCE) ;
 
-	ExtractCatalogEntries $(genCat:S=.catkeys) : $(sources) : $(signature) ;
+	ExtractCatalogEntries $(genCat:S=.catkeys) : $(srcs) : $(signature) ;
 
 	LinkApplicationCatalog $(genCat) : $(genCat:S=.catkeys)
 		: $(signature) : $(genCat:B) ;

@@ -14,10 +14,14 @@
 
 #include <string.h>
 
+#include <Catalog.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <SpaceLayoutItem.h>
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Font view"
 
 static void
 add_font_selection_view(BGridLayout* layout, FontSelectionView* view,
@@ -50,10 +54,10 @@ FontView::FontView()
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
  
-	fPlainView = new FontSelectionView("plain", "Plain Font:");
-	fBoldView = new FontSelectionView("bold", "Bold Font:");
-	fFixedView = new FontSelectionView("fixed", "Fixed Font:");
-	fMenuView = new FontSelectionView("menu", "Menu Font:");
+	fPlainView = new FontSelectionView("plain", TR("Plain Font:"));
+	fBoldView = new FontSelectionView("bold", TR("Bold Font:"));
+	fFixedView = new FontSelectionView("fixed", TR("Fixed Font:"));
+	fMenuView = new FontSelectionView("menu", TR("Menu Font:"));
 
 	BGridLayout* layout = new BGridLayout(5, 5);
 	layout->SetInsets(10, 10, 10, 10);

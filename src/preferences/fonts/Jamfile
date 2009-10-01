@@ -9,7 +9,7 @@ Preference Fonts :
 	FontView.cpp
 	main.cpp
 	MainWindow.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be $(TARGET_LIBSUPC++) liblocale.so
 	: Fonts.rdef
 	;
 
@@ -17,3 +17,15 @@ if $(TARGET_PLATFORM) = libbe_test {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Fonts
 		: tests!apps ;
 }
+
+DoCatalogs Fonts :
+	x-vnd.Haiku-Fonts
+	:
+	FontSelectionView.cpp
+	FontView.cpp
+	main.cpp
+	MainWindow.cpp
+	: en.catalog
+	: fr.catkeys
+	;
+

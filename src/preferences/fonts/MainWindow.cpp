@@ -18,8 +18,10 @@
 #include <Application.h>
 #include <Button.h>
 #include <Box.h>
+#include <Catalog.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <MessageRunner.h>
 #include <Screen.h>
 #include <SpaceLayoutItem.h>
@@ -28,6 +30,9 @@
 
 #include "FontView.h"
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Main window"
+
 
 static const uint32 kMsgSetDefaults = 'dflt';
 static const uint32 kMsgRevert = 'rvrt';
@@ -35,14 +40,14 @@ static const uint32 kMsgCheckFonts = 'chkf';
 
 
 MainWindow::MainWindow()
-	: BWindow(BRect(0, 0, 1, 1), "Fonts", B_TITLED_WINDOW,
+	: BWindow(BRect(0, 0, 1, 1), TR("Fonts"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	fDefaultsButton = new BButton("defaults", "Defaults",
+	fDefaultsButton = new BButton("defaults", TR("Defaults"),
 		new BMessage(kMsgSetDefaults), B_WILL_DRAW);
 	fDefaultsButton->SetEnabled(false);
 
-	fRevertButton = new BButton("revert", "Revert",
+	fRevertButton = new BButton("revert", TR("Revert"),
 		new BMessage(kMsgRevert), B_WILL_DRAW);
 	fRevertButton->SetEnabled(false);	
 

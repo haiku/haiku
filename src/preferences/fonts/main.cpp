@@ -13,20 +13,28 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <TextView.h>
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "main"
 
 class FontsApp : public BApplication {
 	public:
 		FontsApp();
 
 		virtual void AboutRequested();
+
+	private:
+		BCatalog fCatalog;
 };
 
 
 FontsApp::FontsApp()
 	: BApplication("application/x-vnd.Haiku-Fonts")
 {
+	be_locale->GetAppCatalog(&fCatalog);
 	MainWindow *window = new MainWindow();
 	window->Show();
 }
@@ -35,8 +43,8 @@ FontsApp::FontsApp()
 void
 FontsApp::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "Fonts\n"
-		"\tCopyright 2004-2005, Haiku.\n\n", "Ok");
+	BAlert *alert = new BAlert("about", TR("Fonts\n"
+		"\tCopyright 2004-2005, Haiku.\n\n"), TR("Ok"));
 	BTextView *view = alert->TextView();
 	BFont font;
 

@@ -14,6 +14,8 @@
 #include "MainWindow.h"
 
 #include <Box.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -23,6 +25,9 @@
 #include <GroupLayoutBuilder.h>
 
 #include <stdio.h>
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Font Selection view"
 
 
 #define INSTANT_UPDATE
@@ -98,12 +103,12 @@ FontSelectionView::FontSelectionView(const char* name,
 	fFontsMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	// size menu
-	fSizesMenuField = new BMenuField("size", "Size:", fSizesMenu, NULL);
+	fSizesMenuField = new BMenuField("size", TR("Size:"), fSizesMenu, NULL);
 	fSizesMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	// preview
 	fPreviewText = new BStringView("preview text",
-		"The quick brown fox jumps over the lazy dog."); 
+		TR_CMT("The quick brown fox jumps over the lazy dog.","Don't translate this literally ! Use a phrase showing all chars from A to Z.")); 
 
 	fPreviewText->SetFont(&fCurrentFont);
 	fPreviewText->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET)); 
@@ -201,31 +206,31 @@ FontSelectionView::MessageReceived(BMessage *msg)
 
 
 BLayoutItem* 
-FontSelectionView::CreateSizesLabelLayoutItem() 
-{ 
-	return fSizesMenuField->CreateLabelLayoutItem(); 
-} 
+FontSelectionView::CreateSizesLabelLayoutItem()
+{
+	return fSizesMenuField->CreateLabelLayoutItem();
+}
 
 
 BLayoutItem* 
-FontSelectionView::CreateSizesMenuBarLayoutItem() 
-{ 
-	return fSizesMenuField->CreateMenuBarLayoutItem(); 
-} 
+FontSelectionView::CreateSizesMenuBarLayoutItem()
+{
+	return fSizesMenuField->CreateMenuBarLayoutItem();
+}
 
 
 BLayoutItem* 
-FontSelectionView::CreateFontsLabelLayoutItem() 
-{ 
-	return fFontsMenuField->CreateLabelLayoutItem(); 
-} 
+FontSelectionView::CreateFontsLabelLayoutItem()
+{
+	return fFontsMenuField->CreateLabelLayoutItem();
+}
 
 
 BLayoutItem* 
-FontSelectionView::CreateFontsMenuBarLayoutItem() 
-{ 
-	return fFontsMenuField->CreateMenuBarLayoutItem(); 
-} 
+FontSelectionView::CreateFontsMenuBarLayoutItem()
+{
+	return fFontsMenuField->CreateMenuBarLayoutItem();
+}
 
 
 void
