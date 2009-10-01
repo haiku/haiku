@@ -53,4 +53,4 @@ class ScreenSaverRunner {
 		volatile bool		fQuitting;
 };
 
-#endif //SCREEN_SAVER_THREAD_H
+#endif // SCREEN_SAVER_RUNNER_H
