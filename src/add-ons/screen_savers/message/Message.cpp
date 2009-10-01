@@ -7,6 +7,10 @@
  */
 
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <Bitmap.h>
 #include <Font.h>
 #include <ObjectList.h>
@@ -14,12 +18,10 @@
 #include <Screen.h>
 #include <ScreenSaver.h>
 #include <String.h>
-#include <StringView.h>
+#include <TextView.h>
 #include <View.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <BuildScreenSaverDefaultSettingsView.h>
 
 // Double brackets to satisfy a compiler warning
 const pattern kCheckered = { { 0xcc, 0xcc, 0x33, 0x33, 0xcc, 0xcc, 0x33, 0x33 } };
@@ -123,8 +125,8 @@ Message::~Message()
 void 
 Message::StartConfig(BView *view) 
 { 
-	view->AddChild(new BStringView(BRect(20, 10, 200, 35), "", "Message, by Ryan Leavengood"));
-	view->AddChild(new BStringView(BRect(20, 40, 200, 65), "", "Inspired by Jon Watte's Original"));
+	BPrivate::BuildScreenSaverDefaultSettingsView(view, "Message",
+		"by Ryan Leavengood");
 } 
 
 

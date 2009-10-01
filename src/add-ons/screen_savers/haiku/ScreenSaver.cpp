@@ -14,6 +14,9 @@
 #include <Font.h>
 #include <stdlib.h>
 
+#include <BuildScreenSaverDefaultSettingsView.h>
+
+
 class ScreenSaver : public BScreenSaver
 {
 public:
@@ -52,7 +55,8 @@ ScreenSaver::ScreenSaver(BMessage *archive, image_id id)
 void 
 ScreenSaver::StartConfig(BView *view) 
 { 
-	view->AddChild(new BStringView(BRect(20, 10, 200, 35), "", "Haiku, by Marcus Overhagen"));
+	BPrivate::BuildScreenSaverDefaultSettingsView(view, "Haiku",
+		"by Marcus Overhagen");
 } 
 
 

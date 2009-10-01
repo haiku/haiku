@@ -13,6 +13,8 @@
 #include <MimeType.h>
 #include <StringView.h>
 
+#include <BuildScreenSaverDefaultSettingsView.h>
+
 #include "IconDisplay.h"
 
 
@@ -183,21 +185,7 @@ IconsSaver::Draw(BView *view, int32 frame)
 void
 IconsSaver::StartConfig(BView* view)
 {
-	const uint8 spacer = 5;
-	BRect frame = view->Frame();
-	BRect position(spacer, spacer, frame.Width() - 2 * spacer, 0);
-
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	BStringView* stringView = new BStringView(position, "", "Icons");
-	stringView->SetFont(be_bold_font);
-	stringView->ResizeToPreferred();
-	position.top += stringView->Frame().Height();
-	view->AddChild(stringView);
-
-	stringView = new BStringView(position, "", "By Vincent Duvert");
-	stringView->ResizeToPreferred();
-	position.top += stringView->Frame().Height();
-	view->AddChild(stringView);
+	BPrivate::BuildScreenSaverDefaultSettingsView(view, "Icons",
+		"by Vincent Duvert");
 }
 

@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src add-ons screen_savers message ;
 
+UsePrivateHeaders screen_saver ;
+	# For BuildScreenSaverDefaultSettingsView
 UsePrivateHeaders shared ;
 	# For ObjectList
 

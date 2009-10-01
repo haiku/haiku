@@ -2,12 +2,11 @@ SubDir HAIKU_TOP src add-ons screen_savers haiku ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UsePrivateHeaders screen_saver ;
+	# For BuildScreenSaverDefaultSettingsView
+
 Addon Haiku :
 	ScreenSaver.cpp
 	: be screensaver $(TARGET_LIBSUPC++)
 ;
 
-Package haiku-screensaverkit-cvs :
-	Haiku :
-	boot home config add-ons Screen\ Savers
-;
