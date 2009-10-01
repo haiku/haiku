@@ -532,7 +532,7 @@ ModulesView::_OpenSaver()
 	if (fSettingsView->ChildAt(0) == NULL) {
 		// There are no settings at all, we add the module name here to
 		// let it look a bit better at least.
-		BuildScreenSaverDefaultSettingsView(fSettingsView,
+		BPrivate::BuildScreenSaverDefaultSettingsView(fSettingsView,
 			fSettings.ModuleName()[0] ? fSettings.ModuleName() : "Blackness",
 			saver || !fSettings.ModuleName()[0]
 				? "No options available" : "Could not load screen saver");

@@ -8,6 +8,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers os add-ons screen_saver ] ;
 UsePrivateHeaders screen_saver ;
 
 SharedLibrary libscreensaver.so :
+	BuildScreenSaverDefaultSettingsView.cpp
 	ScreenSaver.cpp
 	ScreenSaverSettings.cpp
 	ScreenSaverRunner.cpp
