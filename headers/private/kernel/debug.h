@@ -131,6 +131,7 @@ extern bool		debug_is_kernel_memory_accessible(addr_t address, size_t size,
 extern int		debug_call_with_fault_handler(jmp_buf jumpBuffer,
 					void (*function)(void*), void* parameter);
 extern status_t	debug_memcpy(void* to, const void* from, size_t size);
+extern ssize_t	debug_strlcpy(char* to, const char* from, size_t size);
 
 extern char		kgetc(void);
 extern void		kputs(const char *string);

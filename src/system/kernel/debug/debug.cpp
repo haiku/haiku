@@ -55,6 +55,13 @@ struct debug_memcpy_parameters {
 	size_t		size;
 };
 
+struct debug_strlcpy_parameters {
+	char*		to;
+	const char*	from;
+	size_t		size;
+	size_t		result;
+};
+
 
 static const char* const kKDLPrompt = "kdebug> ";
 
@@ -1180,6 +1187,16 @@ debug_memcpy_trampoline(void* _parameters)
 }
 
 
+static void
+debug_strlcpy_trampoline(void* _parameters)
+{
+	debug_strlcpy_parameters* parameters
+		= (debug_strlcpy_parameters*)_parameters;
+	parameters->result = strlcpy(parameters->to, parameters->from,
+		parameters->size);
+}
+
+
 void
 call_modules_hook(bool enter)
 {
@@ -1519,6 +1536,22 @@ debug_memcpy(void* to, const void* from, size_t size)
 		return B_BAD_ADDRESS;
 	}
 	return B_OK;
+}
+
+
+/*!	Similar to user_strlcpy(), but can only be invoked from within the kernel
+	debugger (and must not be used outside).
+*/
+ssize_t
+debug_strlcpy(char* to, const char* from, size_t size)
+{
+	debug_strlcpy_parameters parameters = {to, from, size};
+
+	if (debug_call_with_fault_handler(gCPU[sDebuggerOnCPU].fault_jump_buffer,
+			&debug_strlcpy_trampoline, &parameters) != 0) {
+		return B_BAD_ADDRESS;
+	}
+	return parameters.result;
 }
 
 
