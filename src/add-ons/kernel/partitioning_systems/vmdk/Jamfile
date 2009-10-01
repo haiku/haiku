@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons kernel partitioning_systems vmdk ;
+
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders kernel ;
+UsePrivateHeaders shared ;
+UsePrivateHeaders storage ;
+UsePrivateHeaders vmdk ;
+UsePrivateSystemHeaders ;
+
+KernelAddon vmdk : vmdk.cpp ;

@@ -1,8 +1,9 @@
 SubDir HAIKU_TOP src add-ons kernel partitioning_systems ;
 
-SubInclude HAIKU_TOP src add-ons kernel partitioning_systems amiga ;
-SubInclude HAIKU_TOP src add-ons kernel partitioning_systems apple ;
-SubInclude HAIKU_TOP src add-ons kernel partitioning_systems atari ;
-SubInclude HAIKU_TOP src add-ons kernel partitioning_systems efi ;
-SubInclude HAIKU_TOP src add-ons kernel partitioning_systems intel ;
-SubInclude HAIKU_TOP src add-ons kernel partitioning_systems session ;
+HaikuSubInclude amiga ;
+HaikuSubInclude apple ;
+HaikuSubInclude atari ;
+HaikuSubInclude efi ;
+HaikuSubInclude intel ;
+HaikuSubInclude session ;
+HaikuSubInclude vmdk ;
