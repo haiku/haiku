@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -518,6 +518,7 @@ static status_t dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree,
 static inline void put_vnode(struct vnode* vnode);
 static status_t fs_unmount(char* path, dev_t mountID, uint32 flags,
 	bool kernel);
+static int open_vnode(struct vnode* vnode, int openMode, bool kernel);
 
 
 static struct fd_ops sFileOps = {
@@ -3944,7 +3945,7 @@ vfs_get_cookie_from_fd(int fd, void** _cookie)
 }
 
 
-extern "C" int
+extern "C" status_t
 vfs_get_vnode_from_fd(int fd, bool kernel, struct vnode** vnode)
 {
 	*vnode = get_vnode_from_fd(fd, kernel);
@@ -4009,6 +4010,17 @@ vfs_vnode_to_node_ref(struct vnode* vnode, dev_t* _mountID, ino_t* _vnodeID)
 }
 
 
+/*!
+	Calls fs_open() on the given vnode and returns a new
+	file descriptor for it
+*/
+int
+vfs_open_vnode(struct vnode* vnode, int openMode, bool kernel)
+{
+	return open_vnode(vnode, openMode, kernel);
+}
+
+
 /*!	Looks up a vnode with the given mount and vnode ID.
 	Must only be used with "in-use" vnodes as it doesn't grab a reference
 	to the node.
@@ -4030,8 +4042,8 @@ vfs_lookup_vnode(dev_t mountID, ino_t vnodeID, struct vnode** _vnode)
 
 
 extern "C" status_t
-vfs_get_fs_node_from_path(fs_volume* volume, const char* path, bool kernel,
-	void** _node)
+vfs_get_fs_node_from_path(fs_volume* volume, const char* path,
+	bool traverseLeafLink, bool kernel, void** _node)
 {
 	TRACE(("vfs_get_fs_node_from_path(volume = %p, path = \"%s\", kernel %d)\n",
 		volume, path, kernel));
@@ -4051,12 +4063,12 @@ vfs_get_fs_node_from_path(fs_volume* volume, const char* path, bool kernel,
 	struct vnode* vnode = mount->root_vnode;
 
 	if (buffer[0] == '/')
-		status = path_to_vnode(buffer, true, &vnode, NULL, true);
+		status = path_to_vnode(buffer, traverseLeafLink, &vnode, NULL, kernel);
 	else {
 		inc_vnode_ref_count(vnode);
 			// vnode_path_to_vnode() releases a reference to the starting vnode
-		status = vnode_path_to_vnode(vnode, buffer, true, 0, kernel, &vnode,
-			NULL);
+		status = vnode_path_to_vnode(vnode, buffer, traverseLeafLink, 0,
+			kernel, &vnode, NULL);
 	}
 
 	put_mount(mount);

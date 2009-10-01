@@ -20,6 +20,7 @@
 #include <NodeMonitor.h>
 
 #include <arch/cpu.h>
+#include <AutoDeleter.h>
 #include <boot/kernel_args.h>
 #include <boot_device.h>
 #include <debug.h>
@@ -36,6 +37,7 @@
 #include <vm.h>
 
 #include "BaseDevice.h"
+#include "FileDevice.h"
 #include "IORequest.h"
 #include "legacy_drivers.h"
 
@@ -484,7 +486,8 @@ static status_t
 get_node_for_path(struct devfs *fs, const char *path,
 	struct devfs_vnode **_node)
 {
-	return vfs_get_fs_node_from_path(fs->volume, path, true, (void **)_node);
+	return vfs_get_fs_node_from_path(fs->volume, path, false, true,
+		(void **)_node);
 }
 
 
@@ -504,21 +507,6 @@ unpublish_node(struct devfs *fs, devfs_vnode *node, mode_t type)
 
 out:
 	recursive_lock_unlock(&fs->lock);
-	return status;
-}
-
-
-static status_t
-unpublish_node(struct devfs *fs, const char *path, mode_t type)
-{
-	devfs_vnode *node;
-	status_t status = get_node_for_path(fs, path, &node);
-	if (status != B_OK)
-		return status;
-
-	status = unpublish_node(fs, node, type);
-
-	put_vnode(fs->volume, node->id);
 	return status;
 }
 
@@ -818,7 +806,6 @@ dump_node(int argc, char **argv)
 		kprintf(" symlink to:  %s\n", vnode->stream.u.symlink.path);
 	} else {
 		kprintf(" device:      %p\n", vnode->stream.u.dev.device);
-		kprintf(" node:        %p\n", vnode->stream.u.dev.device->Node());
 		kprintf(" partition:   %p\n", vnode->stream.u.dev.partition);
 		if (vnode->stream.u.dev.partition != NULL) {
 			partition_info& info = vnode->stream.u.dev.partition->info;
@@ -1622,6 +1609,7 @@ devfs_deselect(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
 static bool
 devfs_can_page(fs_volume *_volume, fs_vnode *_vnode, void *cookie)
 {
+#if 0
 	struct devfs_vnode *vnode = (devfs_vnode *)_vnode->private_node;
 
 	//TRACE(("devfs_canpage: vnode %p\n", vnode));
@@ -1633,6 +1621,9 @@ devfs_can_page(fs_volume *_volume, fs_vnode *_vnode, void *cookie)
 
 	return vnode->stream.u.dev.device->HasRead()
 		|| vnode->stream.u.dev.device->HasIO();
+#endif
+	// TODO: Obsolete hook!
+	return false;
 }
 
 
@@ -1998,36 +1989,50 @@ file_system_module_info gDeviceFileSystem = {
 extern "C" status_t
 devfs_unpublish_file_device(const char *path)
 {
-	return unpublish_node(sDeviceFileSystem, path, S_IFLNK);
+	// get the device node
+	devfs_vnode* node;
+	status_t status = get_node_for_path(sDeviceFileSystem, path, &node);
+	if (status != B_OK)
+		return status;
+
+	if (!S_ISCHR(node->stream.type)) {
+		put_vnode(sDeviceFileSystem->volume, node->id);
+		return B_BAD_VALUE;
+	}
+
+	// if it is indeed a file device, unpublish it
+	FileDevice* device = dynamic_cast<FileDevice*>(node->stream.u.dev.device);
+	if (device == NULL) {
+		put_vnode(sDeviceFileSystem->volume, node->id);
+		return B_BAD_VALUE;
+	}
+
+	status = unpublish_node(sDeviceFileSystem, node, S_IFCHR);
+
+	put_vnode(sDeviceFileSystem->volume, node->id);
+	return status;
 }
 
 
 extern "C" status_t
 devfs_publish_file_device(const char *path, const char *filePath)
 {
-	struct devfs_vnode *node;
-	struct devfs_vnode *dirNode;
-	status_t status;
-
-	filePath = strdup(filePath);
-	if (filePath == NULL)
+	// create a FileDevice for the file
+	FileDevice* device = new(std::nothrow) FileDevice;
+	if (device == NULL)
 		return B_NO_MEMORY;
+	ObjectDeleter<FileDevice> deviceDeleter(device);
 
-	RecursiveLocker locker(&sDeviceFileSystem->lock);
+	status_t error = device->Init(filePath);
+	if (error != B_OK)
+		return error;
 
-	status = new_node(sDeviceFileSystem, path, &node, &dirNode);
-	if (status != B_OK) {
-		free((char*)filePath);
-		return status;
-	}
+	// publish the device
+	error = publish_device(sDeviceFileSystem, path, device);
+	if (error != B_OK)
+		return error;
 
-	// all went fine, let's initialize the node
-	node->stream.type = S_IFLNK | 0644;
-	node->stream.u.symlink.path = filePath;
-	node->stream.u.symlink.length = strlen(filePath);
-
-	// the node is now fully valid and we may insert it into the dir
-	publish_node(sDeviceFileSystem, dirNode, node);
+	deviceDeleter.Detach();
 	return B_OK;
 }
 

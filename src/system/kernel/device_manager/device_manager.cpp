@@ -27,7 +27,7 @@
 #include <util/DoublyLinkedList.h>
 #include <util/Stack.h>
 
-#include "BaseDevice.h"
+#include "AbstractModuleDevice.h"
 #include "devfs_private.h"
 #include "id_generator.h"
 #include "IORequest.h"
@@ -72,7 +72,8 @@ typedef struct io_resource_info {
 	io_resource			resource;		// info about actual resource
 } io_resource_info;
 
-class Device : public BaseDevice, public DoublyLinkedListLinkImpl<Device> {
+class Device : public AbstractModuleDevice,
+	public DoublyLinkedListLinkImpl<Device> {
 public:
 							Device(device_node* node, const char* moduleName);
 	virtual					~Device();
@@ -1064,10 +1065,10 @@ device_attr_private::Compare(const device_attr* attrA, const device_attr *attrB)
 
 Device::Device(device_node* node, const char* moduleName)
 	:
+	fModuleName(strdup(moduleName)),
 	fRemovedFromParent(false)
 {
 	fNode = node;
-	fModuleName = strdup(moduleName);
 }
 
 

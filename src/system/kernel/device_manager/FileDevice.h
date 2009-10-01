@@ -1,21 +1,20 @@
 /*
- * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef BASE_DEVICE_H
-#define BASE_DEVICE_H
+#ifndef FILE_DEVICE_H
+#define FILE_DEVICE_H
 
 
-#include <device_manager.h>
+#include "BaseDevice.h"
 
 
-class BaseDevice {
+class FileDevice : public BaseDevice {
 public:
-							BaseDevice();
-	virtual					~BaseDevice();
+							FileDevice();
+	virtual					~FileDevice();
 
-			void			SetID(ino_t id)	{ fID = id; }
-			ino_t			ID() const		{ return fID; }
+			status_t		Init(const char* path);
 
 	virtual	status_t		InitDevice();
 	virtual	void			UninitDevice();
@@ -29,7 +28,7 @@ public:
 	virtual	bool			HasIO() const;
 
 	virtual	status_t		Open(const char* path, int openMode,
-								void** _cookie) = 0;
+								void** _cookie);
 	virtual	status_t		Read(void* cookie, off_t pos, void* buffer,
 								size_t* _length);
 	virtual	status_t		Write(void* cookie, off_t pos, const void* buffer,
@@ -41,12 +40,16 @@ public:
 	virtual	status_t		Deselect(void* cookie, uint8 event,
 								selectsync* sync);
 
-	virtual	status_t		Close(void* cookie) = 0;
-	virtual	status_t		Free(void* cookie) = 0;
+	virtual	status_t		Close(void* cookie);
+	virtual	status_t		Free(void* cookie);
 
-protected:
-	ino_t					fID;
+private:
+	struct Cookie;
+
+private:
+	int						fFD;
+	off_t					fFileSize;
 };
 
 
-#endif	// BASE_DEVICE_H
+#endif	// FILE_DEVICE_H

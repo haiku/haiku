@@ -81,7 +81,7 @@ int			vfs_getrlimit(int resource, struct rlimit *rlp);
 int			vfs_setrlimit(int resource, const struct rlimit *rlp);
 
 /* calls needed by the VM for paging and by the file cache */
-int			vfs_get_vnode_from_fd(int fd, bool kernel, struct vnode **_vnode);
+status_t	vfs_get_vnode_from_fd(int fd, bool kernel, struct vnode **_vnode);
 status_t	vfs_get_vnode_from_path(const char *path, bool kernel,
 				struct vnode **_vnode);
 status_t	vfs_get_vnode(dev_t mountID, ino_t vnodeID, bool canWait,
@@ -91,6 +91,7 @@ status_t	vfs_entry_ref_to_vnode(dev_t mountID, ino_t directoryID,
 void		vfs_vnode_to_node_ref(struct vnode *vnode, dev_t *_mountID,
 				ino_t *_vnodeID);
 
+int			vfs_open_vnode(struct vnode* vnode, int openMode, bool kernel);
 status_t	vfs_lookup_vnode(dev_t mountID, ino_t vnodeID,
 				struct vnode **_vnode);
 void		vfs_put_vnode(struct vnode *vnode);
@@ -107,14 +108,14 @@ status_t	vfs_vnode_io(struct vnode* vnode, void* cookie,
 				io_request* request);
 status_t	vfs_synchronous_io(io_request* request,
 				status_t (*doIO)(void* cookie, off_t offset, void* buffer,
-				size_t* length),
-			void* cookie);
+					size_t* length),
+				void* cookie);
 status_t	vfs_get_vnode_cache(struct vnode *vnode, struct VMCache **_cache,
 				bool allocate);
 status_t	vfs_get_file_map(struct vnode *vnode, off_t offset, size_t size,
 				struct file_io_vec *vecs, size_t *_count);
 status_t	vfs_get_fs_node_from_path(fs_volume *volume, const char *path,
-				bool kernel, void **_node);
+				bool traverseLeafLink, bool kernel, void **_node);
 status_t	vfs_stat_vnode(struct vnode *vnode, struct stat *stat);
 status_t	vfs_stat_node_ref(dev_t device, ino_t inode, struct stat *stat);
 status_t	vfs_get_vnode_name(struct vnode *vnode, char *name,

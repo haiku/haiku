@@ -1,26 +1,24 @@
 /*
+ * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef BASE_DEVICE_H
-#define BASE_DEVICE_H
+#ifndef ABSTRACT_MODULE_DEVICE_H
+#define ABSTRACT_MODULE_DEVICE_H
 
 
-#include <device_manager.h>
+#include "BaseDevice.h"
 
 
-class BaseDevice {
+class AbstractModuleDevice : public BaseDevice {
 public:
-							BaseDevice();
-	virtual					~BaseDevice();
+							AbstractModuleDevice();
+	virtual					~AbstractModuleDevice();
 
-			void			SetID(ino_t id)	{ fID = id; }
-			ino_t			ID() const		{ return fID; }
+			device_module_info* Module() const { return fDeviceModule; }
 
-	virtual	status_t		InitDevice();
-	virtual	void			UninitDevice();
-
-	virtual void			Removed();
+			void*			Data() const { return fDeviceData; }
+			device_node*	Node() const { return fNode; }
 
 	virtual	bool			HasSelect() const;
 	virtual	bool			HasDeselect() const;
@@ -29,7 +27,7 @@ public:
 	virtual	bool			HasIO() const;
 
 	virtual	status_t		Open(const char* path, int openMode,
-								void** _cookie) = 0;
+								void** _cookie);
 	virtual	status_t		Read(void* cookie, off_t pos, void* buffer,
 								size_t* _length);
 	virtual	status_t		Write(void* cookie, off_t pos, const void* buffer,
@@ -41,12 +39,15 @@ public:
 	virtual	status_t		Deselect(void* cookie, uint8 event,
 								selectsync* sync);
 
-	virtual	status_t		Close(void* cookie) = 0;
-	virtual	status_t		Free(void* cookie) = 0;
+	virtual	status_t		Close(void* cookie);
+	virtual	status_t		Free(void* cookie);
 
 protected:
-	ino_t					fID;
+	device_node*			fNode;
+	int32					fInitialized;
+	device_module_info*		fDeviceModule;
+	void*					fDeviceData;
 };
 
 
-#endif	// BASE_DEVICE_H
+#endif	// ABSTRACT_MODULE_DEVICE_H

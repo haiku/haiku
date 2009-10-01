@@ -27,7 +27,7 @@
 #include <util/Stack.h>
 #include <vfs.h>
 
-#include "BaseDevice.h"
+#include "AbstractModuleDevice.h"
 #include "devfs_private.h"
 
 
@@ -42,7 +42,7 @@
 
 struct legacy_driver;
 
-class LegacyDevice : public BaseDevice,
+class LegacyDevice : public AbstractModuleDevice,
 	public DoublyLinkedListLinkImpl<LegacyDevice> {
 public:
 							LegacyDevice(legacy_driver* driver,

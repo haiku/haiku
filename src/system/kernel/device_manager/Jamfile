@@ -4,9 +4,11 @@ UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel util ] shared ;
 
 KernelMergeObject kernel_device_manager.o :
+	AbstractModuleDevice.cpp
 	BaseDevice.cpp
 	device_manager.cpp
 	devfs.cpp
+	FileDevice.cpp
 	id_generator.cpp
 	io_resources.cpp
 	IOScheduler.cpp
