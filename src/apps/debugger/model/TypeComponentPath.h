@@ -11,6 +11,7 @@
 #include <ObjectList.h>
 #include <Referenceable.h>
 
+#include "ArrayIndexPath.h"
 #include "Type.h"
 
 
@@ -68,12 +69,20 @@ struct TypeComponent {
 		this->name = name;
 	}
 
-	void SetToArrayElement(type_kind typeKind, uint64 index)
+	void SetToArrayElement(type_kind typeKind, const BString& indexPath)
 	{
 		this->componentKind = TYPE_COMPONENT_ARRAY_ELEMENT;
 		this->typeKind = typeKind;
-		this->index = index;
-		this->name = name;
+		this->index = 0;
+		this->name = indexPath;
+	}
+
+	bool SetToArrayElement(type_kind typeKind, const ArrayIndexPath& indexPath)
+	{
+		this->componentKind = TYPE_COMPONENT_ARRAY_ELEMENT;
+		this->typeKind = typeKind;
+		this->index = 0;
+		return indexPath.GetPathString(this->name);
 	}
 
 	uint32 HashValue() const;
