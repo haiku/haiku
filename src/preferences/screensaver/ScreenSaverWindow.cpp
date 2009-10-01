@@ -9,10 +9,9 @@
  */
 
 
-#include "PreviewView.h"
-#include "ScreenCornerSelector.h"
-#include "ScreenSaverItem.h"
 #include "ScreenSaverWindow.h"
+
+#include <stdio.h>
 
 #include <Application.h>
 #include <Box.h>
@@ -32,7 +31,11 @@
 #include <StringView.h>
 #include <TabView.h>
 
-#include <stdio.h>
+#include <BuildScreenSaverDefaultSettingsView.h>
+
+#include "PreviewView.h"
+#include "ScreenCornerSelector.h"
+#include "ScreenSaverItem.h"
 
 
 const uint32 kPreviewMonitorGap = 16;
@@ -529,18 +532,10 @@ ModulesView::_OpenSaver()
 	if (fSettingsView->ChildAt(0) == NULL) {
 		// There are no settings at all, we add the module name here to
 		// let it look a bit better at least.
-		rect = BRect(15, 15, 20, 20);
-		BStringView* stringView = new BStringView(rect, "module", fSettings.ModuleName()[0]
-			? fSettings.ModuleName() : "Blackness");
-		stringView->SetFont(be_bold_font);
-		stringView->ResizeToPreferred();
-		fSettingsView->AddChild(stringView);
-
-		rect.OffsetBy(0, stringView->Bounds().Height() + 4);
-		stringView = new BStringView(rect, "info", saver || !fSettings.ModuleName()[0]
-			? "No options available" : "Could not load screen saver");
-		stringView->ResizeToPreferred();
-		fSettingsView->AddChild(stringView);
+		BuildScreenSaverDefaultSettingsView(fSettingsView,
+			fSettings.ModuleName()[0] ? fSettings.ModuleName() : "Blackness",
+			saver || !fSettings.ModuleName()[0]
+				? "No options available" : "Could not load screen saver");
 	}
 
 	ScreenSaverWindow* window = dynamic_cast<ScreenSaverWindow*>(Window());
