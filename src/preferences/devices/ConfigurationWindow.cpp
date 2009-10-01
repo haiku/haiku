@@ -142,7 +142,7 @@ ConfigurationWindow::ConfigurationWindow(BRect frame, DeviceItem *item)
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE|B_NOT_RESIZABLE),
 	fItem(item)
 {
-	CenterWindowOnScreen(this);
+	CenterOnScreen();
 	fItem->SetWindow(this);
 	InitWindow();
 	

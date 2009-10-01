@@ -26,8 +26,6 @@ public:
 	
 private:
 
-	void _CenterWindow();
-	
 	BootManagerController fController;	
 	WizardView* fWizardView;
 };

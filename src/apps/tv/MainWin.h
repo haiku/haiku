@@ -75,7 +75,6 @@ public:
 	void				ToggleNoBorder();
 	void				ToggleNoMenu();
 	void				ToggleNoBorderNoMenu();
-	void				CenterWindow();
 
 	void				ShowContextMenu(const BPoint &screen_point);
 	

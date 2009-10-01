@@ -33,25 +33,11 @@ const uint32 TXT_NEW_CONNECTION = 'TxCx';
 // ---------------------------------------------------------------------------------------------------------- //
 
 
-// CenterWindowOnScreen -- Centers the BWindow to the Current Screen
-static void CenterWindowOnScreen(BWindow* w)
-{
-	BRect	screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
-	BPoint 	pt;
-	pt.x = screenFrame.Width()/2 - w->Bounds().Width()/2;
-	pt.y = screenFrame.Height()/2 - w->Bounds().Height()/2;
-
-	if (screenFrame.Contains(pt))
-		w->MoveTo(pt);
-}
-// ---------------------------------------------------------------------------------------------------------- //
-
-
 // NewConnectionWindow - Constructor
 NewConnectionWindow::NewConnectionWindow(BRect frame) : BWindow (frame, "NewConnectionWindow", B_MODAL_WINDOW , B_NOT_RESIZABLE , 0)
 {
 	InitWindow();
-	CenterWindowOnScreen(this);
+	CenterOnScreen();
 	Show();
 }
 

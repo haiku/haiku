@@ -31,8 +31,6 @@ class BStringView;
 
 #define MODEM_ADDED 'moad'
 
-void CenterWindowOnScreen(BWindow* w);
-
 class ResourceUsageWindow : public BWindow {
 	public:
 		ResourceUsageWindow(BRect frame, BList &);

@@ -103,19 +103,6 @@ FontHeight(BView* target, bool full)
 
 
 static void
-CenterWindowOnScreen(BWindow* w)
-{
-	BRect	screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
-	BPoint 	pt;
-	pt.x = screenFrame.Width()/2 - w->Bounds().Width()/2;
-	pt.y = screenFrame.Height()/2 - w->Bounds().Height()/2;
-
-	if (screenFrame.Contains(pt))
-		w->MoveTo(pt);
-}
-
-
-static void
 BoundsSelection(int32 incX, int32 incY, float* x, float* y,
 	int32 xCount, int32 yCount)
 {
@@ -473,7 +460,7 @@ ALMOST_DONE:	//	clean up and try to position the window
 	}
 
 	// 	if prefs dont yet exist or the window is not onscreen, center the window
-	CenterWindowOnScreen(this);
+	CenterOnScreen();
 
 	//	set all the settings to defaults if we get here
 DONE:
@@ -839,7 +826,7 @@ TWindow::ShowHelp()
 	text->Insert("  option-arrow key - moves the mouse location 1 pixel at a time\n");
 	text->Insert("  x marks the selection - the current selection has an 'x' in it\n");
 
-	CenterWindowOnScreen(w);
+	w->CenterOnScreen();
 	w->Show();
 }
 

@@ -48,25 +48,11 @@ const uint32 BTN_CONFIGURE = 'bcfg';
 const uint32 SELECTION_CHANGED = 'slch';
 
 
-// CenterWindowOnScreen -- Centers the BWindow to the Current Screen
-void CenterWindowOnScreen(BWindow* w)
-{
-	BRect	screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
-	BPoint 	pt;
-	pt.x = screenFrame.Width()/2 - w->Bounds().Width()/2;
-	pt.y = screenFrame.Height()/2 - w->Bounds().Height()/2;
-
-	if (screenFrame.Contains(pt))
-		w->MoveTo(pt);
-}
-// ---------------------------------------------------------------------------------------------------------- //
-
-
 // DevicesWindow - Constructor
 DevicesWindow::DevicesWindow(BRect frame) : BWindow (frame, "Devices", B_TITLED_WINDOW, B_NORMAL_WINDOW_FEEL , 0)
 {
 	InitWindow();
-	CenterWindowOnScreen(this);
+	CenterOnScreen();
 	
 	// Load User Settings
 	BPath path;

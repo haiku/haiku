@@ -44,7 +44,7 @@ ModemWindow::ModemWindow(BRect frame, BMessenger messenger)
 	fMessenger(messenger)
 {
 	InitWindow();
-	CenterWindowOnScreen(this);
+	CenterOnScreen();
 	Show();
 }
 // -------------------------------------------------------------------------------------------------- //

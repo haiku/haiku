@@ -219,13 +219,7 @@ const unsigned char kSmallNewGroupIcon [] = {
 void
 CenterWindowOnScreen(BWindow *window)
 {
-	BRect screenFrame = BScreen(B_MAIN_SCREEN_ID).Frame();
-	BPoint point;
-	point.x = screenFrame.Width() / 2 - window->Bounds().Width() / 2;
-	point.y = screenFrame.Height() / 2 - window->Bounds().Height() / 2;
-
-	if (screenFrame.Contains(point))
-		window->MoveTo(point);
+	window->CenterOnScreen();
 }
 
 
@@ -264,7 +258,7 @@ TFavoritesConfigWindow::TFavoritesConfigWindow(BRect frame, const char *title,
 	MoveTo(-1024, -1024);
 	Show();
 	AddParts(maxApps, maxDocs, maxFolders);
-	CenterWindowOnScreen(this);
+	CenterOnScreen();
 	Unlock();
 
 	AddShortcut('R', B_COMMAND_KEY, new BMessage(kRemove));
@@ -2219,7 +2213,7 @@ NameItemPanel::NameItemPanel(BWindow *parent, const char *initialtext)
 	AddParts(initialtext);
 	ResizeTo(Bounds().Width(), fCancelBtn->Frame().bottom + 10);
 	Unlock();
-	CenterWindowOnScreen(this);
+	CenterOnScreen();
 } 
 
 
