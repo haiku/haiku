@@ -767,7 +767,7 @@ arch_clear_kernel_watchpoint(void *address)
 
 
 /**
- *	Interrupts are disabled.
+ *	Interrupts are disabled. \a frame is unused, i.e. can be \c NULL.
  */
 void
 x86_init_user_debug_at_kernel_exit(struct iframe *frame)
