@@ -456,7 +456,11 @@ _user_get_file_disk_device_path(partition_id id, char* buffer,
 			if (fileDevice == NULL)
 				return B_BAD_VALUE;
 
-			return user_strlcpy(buffer, fileDevice->FilePath(), bufferSize);
+			ssize_t copied = user_strlcpy(buffer, fileDevice->FilePath(),
+				bufferSize);
+			if (copied < 0)
+				return copied;
+			return (size_t)copied < bufferSize ? B_OK : B_BUFFER_OVERFLOW;
 		}
 	}
 
