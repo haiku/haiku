@@ -1,18 +1,18 @@
 1	german	x-vnd.Haiku-CPUFrequencyPref	2623066734
 Ok	Status view		Ok
-Integration Time [ms]	CPU Frequency View		Karenzzeit	[ms]
-High Performance	Status view		Hohe Geschwindigkeit
-Defaults	Pref Window		Standard
-CPU Frequency Status View	CPU Frequency View		CPU-Frequenz-Status
-Dynamic Performance	Status view		Dynamische Performance
-Step up by CPU usage:	Color Step View		Hochtaktung bei Prozessorlast :
+Integration Time [ms]	CPU Frequency View		Bewertungszeitraum [ms]
+High Performance	Status view		Hohe Leistung
+Defaults	Pref Window		Standardwerte
+CPU Frequency Status View	CPU Frequency View		CPU-Takt-Anzeige
+Dynamic Performance	Status view		Dynamische Leistung
+Step up by CPU usage:	Color Step View		Taktänderung ab CPU-Auslastung von:
 Stepping Policy	CPU Frequency View		Taktungsrichtlinie
 Open Speedstep Preferences…	Status view		Öffne Speedstep Einstellungen…
-Set State	Status view		Setze Status
-Launching the CPU Frequency preflet failed.\n\nError: 	Status view		Das CPU-Frequenz-Preflet konnte nicht gestartet werden.\n\nFehler: 
+Set State	Status view		Fester Takt
+Launching the CPU Frequency preflet failed.\n\nError: 	Status view		Das CPU-Takt-Preflet konnte nicht gestartet werden.\n\nFehler: 
 Install Replicant into Deskbar	CPU Frequency View		Installiere Replikanten in Deskbar
 Low Energy	Status view		Geringer Energieverbrauch
-Revert	Pref Window		Rückgängig
+Revert	Pref Window		Zurücknehmen
 Dynamic Stepping	CPU Frequency View		Dynamische Taktung
-CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU-Frequenz\n\tgeschrieben von Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
-CPU Frequency	Main window		CPU-Frequenz
+CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU-Takt\n\tgeschrieben von Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPU Frequency	Main window		CPU-Takt
