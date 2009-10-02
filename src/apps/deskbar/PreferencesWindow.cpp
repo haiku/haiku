@@ -184,14 +184,14 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	BView* view;
 	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 10)
-			.AddGroup(B_HORIZONTAL, 10)
-				.AddGroup(B_VERTICAL, 10)
+		.AddGroup(B_VERTICAL, 0)
+			.AddGroup(B_HORIZONTAL, 0)
+				.AddGroup(B_VERTICAL, 0)
 					.Add(fMenuRecentDocuments)
 					.Add(fMenuRecentFolders)
 					.Add(fMenuRecentApplications)
 					.End()
-				.AddGroup(B_VERTICAL, 10)
+				.AddGroup(B_VERTICAL, 0)
 					.Add(fMenuRecentDocumentCount)
 					.Add(fMenuRecentApplicationCount)
 					.Add(fMenuRecentFolderCount)
@@ -199,13 +199,13 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.End()
 			.Add(new BButton("Edit Menu" B_UTF8_ELLIPSIS,
 				new BMessage(kEditMenuInTracker)))
-			.SetInsets(14, 14, 14, 14)
+			.SetInsets(5, 5, 5, 5)
 			.End()
 		.View();
 	fMenuBox->AddChild(view);
 
 	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 10)
+		.AddGroup(B_VERTICAL, 1)
 			.Add(fAppsSort)
 			.Add(fAppsSortTrackerFirst)
 			.Add(fAppsShowExpanders)
@@ -213,38 +213,39 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.SetInsets(20, 0, 0, 0)
 				.Add(fAppsExpandNew)
 				.End()
-			.SetInsets(14, 14, 14, 14)
+			.SetInsets(5, 5, 5, 5)
 			.End()
 		.View();
 	fAppsBox->AddChild(view);
 
 	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 10)
+		.AddGroup(B_VERTICAL, 1)
 			.Add(fClock24Hours)
 			.Add(fClockSeconds)
 			.Add(fClockEuropeanDate)
 			.Add(fClockFullDate)
-			.SetInsets(14, 14, 14, 14)
+			.SetInsets(5, 5, 5, 5)
 			.End()
 		.View();
 	fClockBox->AddChild(view);
 
 	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 10)
+		.AddGroup(B_VERTICAL, 1)
 			.Add(fWindowAlwaysOnTop)
 			.Add(fWindowAutoRaise)
-			.SetInsets(14, 14, 14, 14)
+			.AddGlue()
+			.SetInsets(5, 5, 5, 5)
 			.End()
 		.View();
 	fWindowBox->AddChild(view);
 
 	BLayoutBuilder::Group<>(this)
-		.AddGroup(B_VERTICAL, 10)
+		.AddGroup(B_VERTICAL, 1)
 			.Add(fMenuBox)
 			.Add(fWindowBox)
 			.Add(fAppsBox)
 			.Add(fClockBox)
-			.SetInsets(14, 14, 14, 14)
+			.SetInsets(10, 10, 10, 10)
 			.End()
 		.End();
 
