@@ -31,7 +31,7 @@ const bigtime_t	kMilliSecond = 1000;
 
 
 CPUFrequencyView::CPUFrequencyView(BRect frame,
-									PreferencesStorage<freq_preferences>* storage)
+		PreferencesStorage<freq_preferences>* storage)
 	:	BView(frame, "CPUFrequencyView", B_FOLLOW_NONE, B_WILL_DRAW),
 		fStorage(storage)
 {
@@ -155,7 +155,7 @@ void
 CPUFrequencyView::AttachedToWindow()
 {
 	fFrequencyMenu = new FrequencyMenu(fPolicyMenu, this,
-										fStorage, &fDriverInterface);
+		fStorage, &fDriverInterface);
 	AddFilter(fFrequencyMenu);
 	
 	fColorStepView->SetTarget(this);

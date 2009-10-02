@@ -135,6 +135,8 @@ class StatusView : public BView {
 		
 		BString				fFreqString;
 		BDragger*			fDragger;
+
+		BCatalog			cat;
 };
 
 #endif	// STATUS_VIEW_H

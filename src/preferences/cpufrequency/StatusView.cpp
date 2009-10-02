@@ -194,18 +194,21 @@ FrequencyMenu::FrequencyMenu(BMenu* menu, BHandler* target,
 	fStorage(storage),
 	fInterface(interface)
 {
-	fDynamicPerformance = new BMenuItem(TR("Dynamic Performance"),
+	BCatalog cat("x-vnd.Haiku-CPUFrequencyPref");
+	fDynamicPerformance = new BMenuItem(
+		cat.GetString("Dynamic Performance",TR_CONTEXT),
 		new BMessage(kMsgPolicyDynamic));
-	fHighPerformance = new BMenuItem(TR("High Performance"),
+	fHighPerformance = new BMenuItem(
+		cat.GetString("High Performance",TR_CONTEXT),
 		new BMessage(kMsgPolicyPerformance));
-	fLowEnergie = new BMenuItem(TR("Low Energy"),
+	fLowEnergie = new BMenuItem(cat.GetString("Low Energy",TR_CONTEXT),
 		new BMessage(kMsgPolicyLowEnergy));
 
 	menu->AddItem(fDynamicPerformance);
 	menu->AddItem(fHighPerformance);
 	menu->AddItem(fLowEnergie);
 
-	fCustomStateMenu = new BMenu(TR("Set State"));
+	fCustomStateMenu = new BMenu(cat.GetString("Set State",TR_CONTEXT));
 
 	StateList* stateList = fInterface->GetCpuFrequencyStates();
 	for (int i = 0; i < stateList->CountItems(); i++) {
@@ -348,7 +351,8 @@ StatusView::StatusView(BRect frame,	bool inDeskbar,
 		B_WILL_DRAW | B_FRAME_EVENTS),
 	fInDeskbar(inDeskbar),
 	fCurrentFrequency(NULL),
-	fDragger(NULL)
+	fDragger(NULL),
+	cat("x-vnd.Haiku-CPUFrequencyPref")
 {
 	if (!inDeskbar) {
 		// we were obviously added to a standard window - let's add a dragger
@@ -401,9 +405,9 @@ StatusView::~StatusView()
 void
 StatusView::_AboutRequested()
 {
-	BAlert *alert = new BAlert("about", TR("CPU Frequency\n"
+	BAlert *alert = new BAlert("about", cat.GetString("CPU Frequency\n"
 		"\twritten by Clemens Zeidler\n"
-		"\tCopyright 2009, Haiku, Inc.\n"), TR("Ok"));
+		"\tCopyright 2009, Haiku, Inc.\n",TR_CONTEXT), cat.GetString("Ok",TR_CONTEXT));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -483,13 +487,15 @@ StatusView::AttachedToWindow()
 	fPreferencesMenu->SetFont(be_plain_font);
 
 	fPreferencesMenu->AddSeparatorItem();
-	fOpenPrefItem = new BMenuItem(TR("Open Speedstep Preferences" B_UTF8_ELLIPSIS),
+	fOpenPrefItem = new BMenuItem(
+		cat.GetString("Open Speedstep Preferences" B_UTF8_ELLIPSIS, TR_CONTEXT),
 		new BMessage(kMsgOpenSSPreferences));
 	fPreferencesMenu->AddItem(fOpenPrefItem);
 	fOpenPrefItem->SetTarget(this);
 
 	if (fInDeskbar) {
-		fQuitItem= new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED));
+		fQuitItem= new BMenuItem(cat.GetString("Quit", TR_CONTEXT),
+			new BMessage(B_QUIT_REQUESTED));
 		fPreferencesMenu->AddItem(fQuitItem);
 		fQuitItem->SetTarget(this);
 	}
