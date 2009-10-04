@@ -10,11 +10,8 @@
 #include "ExtendedInfoWindow.h"
 
 #include <Box.h>
-#include <GroupLayout.h>
 #include <GroupView.h>
 #include <SpaceLayoutItem.h>
-#include <Screen.h>
-#include <String.h>
 
 
 const int kLineSpacing = 5;
