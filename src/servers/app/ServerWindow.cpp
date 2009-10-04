@@ -2541,6 +2541,9 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 					fCurrentView->ConvertToScreenForDrawing(&ptList[i]);
 				}
 
+				shapeFrame.OffsetBy(penLocation);
+				fCurrentView->ConvertToScreenForDrawing(&shapeFrame);
+
 				drawingEngine->DrawShape(shapeFrame, opCount, opList, ptCount,
 					ptList, code == AS_FILL_SHAPE);
 			}
@@ -3430,7 +3433,7 @@ ServerWindow::MakeWindow(BRect frame, const char* name,
 	// The non-offscreen ServerWindow uses the DrawingEngine instance from
 	// the desktop.
 	return new(std::nothrow) ::Window(frame, name, look, feel, flags,
-		workspace, this, new (nothrow) DrawingEngine(fDesktop->HWInterface()));
+		workspace, this, fDesktop->HWInterface()->CreateDrawingEngine());
 }
 
 
@@ -3589,6 +3592,11 @@ ServerWindow::_EnableDirectWindowMode()
 	if (fDirectWindowInfo != NULL) {
 		// already in direct window mode
 		return B_ERROR;
+	}
+
+	if (fDesktop->HWInterface()->FrontBuffer() == NULL) {
+		// direct window mode not supported
+		return B_UNSUPPORTED;
 	}
 
 	fDirectWindowInfo = new(std::nothrow) DirectWindowInfo;

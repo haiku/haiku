@@ -18,6 +18,7 @@
 
 #include "drawing_support.h"
 
+#include "DrawingEngine.h"
 #include "RenderingBuffer.h"
 #include "SystemPalette.h"
 #include "UpdateQueue.h"
@@ -76,6 +77,20 @@ status_t
 HWInterface::Initialize()
 {
 	return MultiLocker::InitCheck();
+}
+
+
+DrawingEngine*
+HWInterface::CreateDrawingEngine()
+{
+	return new(std::nothrow) DrawingEngine(this);
+}
+
+
+EventStream*
+HWInterface::CreateEventStream()
+{
+	return NULL;
 }
 
 
@@ -160,6 +175,18 @@ HWInterface::Cursor() const
 		return ServerCursorReference(NULL);
 
 	ServerCursorReference reference(fCursor);
+	fFloatingOverlaysLock.Unlock();
+	return reference;
+}
+
+
+ServerCursorReference
+HWInterface::CursorAndDragBitmap() const
+{
+	if (!fFloatingOverlaysLock.Lock())
+		return ServerCursorReference(NULL);
+
+	ServerCursorReference reference(fCursorAndDragBitmap);
 	fFloatingOverlaysLock.Unlock();
 	return reference;
 }
@@ -314,6 +341,22 @@ bool
 HWInterface::IsDoubleBuffered() const
 {
 	return fDoubleBuffered;
+}
+
+
+/*! The object needs to be already locked!
+*/
+status_t
+HWInterface::InvalidateRegion(BRegion& region)
+{
+	int32 count = region.CountRects();
+	for (int32 i = 0; i < count; i++) {
+		status_t result = Invalidate(region.RectAt(i));
+		if (result != B_OK)
+			return result;
+	}
+
+	return B_OK;
 }
 
 

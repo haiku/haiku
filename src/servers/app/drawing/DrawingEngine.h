@@ -34,160 +34,163 @@ class ServerFont;
 class DrawingEngine : public HWInterfaceListener {
 public:
 							DrawingEngine(HWInterface* interface = NULL);
-	virtual					~DrawingEngine();
+virtual						~DrawingEngine();
 
 	// HWInterfaceListener interface
-	virtual	void			FrameBufferChanged();
+virtual	void				FrameBufferChanged();
 
-			// for "changing" hardware
-			void			SetHWInterface(HWInterface* interface);
+		// for "changing" hardware
+		void				SetHWInterface(HWInterface* interface);
 
-			void			SetCopyToFrontEnabled(bool enable);
-			bool			CopyToFrontEnabled() const
+virtual	void				SetCopyToFrontEnabled(bool enable);
+		bool				CopyToFrontEnabled() const
 								{ return fCopyToFront; }
-			void			CopyToFront(/*const*/ BRegion& region);
+virtual	void				CopyToFront(/*const*/ BRegion& region);
 
-			// locking
-			bool			LockParallelAccess();
-			bool			IsParallelAccessLocked();
-			void			UnlockParallelAccess();
+		// locking
+		bool				LockParallelAccess();
+		bool				IsParallelAccessLocked();
+		void				UnlockParallelAccess();
 
-			bool			LockExclusiveAccess();
-			bool			IsExclusiveAccessLocked();
-			void			UnlockExclusiveAccess();
+		bool				LockExclusiveAccess();
+		bool				IsExclusiveAccessLocked();
+		void				UnlockExclusiveAccess();
 
-			// for screen shots
-			ServerBitmap*	DumpToBitmap();
-			status_t		ReadBitmap(ServerBitmap *bitmap, bool drawCursor,
+		// for screen shots
+		ServerBitmap*		DumpToBitmap();
+virtual	status_t			ReadBitmap(ServerBitmap *bitmap, bool drawCursor,
 								BRect bounds);
 
-			// clipping for all drawing functions, passing a NULL region
-			// will remove any clipping (drawing allowed everywhere)
-			void			ConstrainClippingRegion(const BRegion* region);
+		// clipping for all drawing functions, passing a NULL region
+		// will remove any clipping (drawing allowed everywhere)
+virtual	void				ConstrainClippingRegion(const BRegion* region);
 
-			void			SetDrawState(const DrawState* state,
+virtual	void				SetDrawState(const DrawState* state,
 								int32 xOffset = 0, int32 yOffset = 0);
 
-			void			SetHighColor(const rgb_color& color);
-			void			SetLowColor(const rgb_color& color);
-			void			SetPenSize(float size);
-			void			SetStrokeMode(cap_mode lineCap, join_mode joinMode,
+virtual	void				SetHighColor(const rgb_color& color);
+virtual	void				SetLowColor(const rgb_color& color);
+virtual	void				SetPenSize(float size);
+virtual	void				SetStrokeMode(cap_mode lineCap, join_mode joinMode,
 								float miterLimit);
-			void			SetPattern(const struct pattern& pattern);
-			void			SetDrawingMode(drawing_mode mode);
-			void			SetDrawingMode(drawing_mode mode,
+virtual	void				SetPattern(const struct pattern& pattern);
+virtual	void				SetDrawingMode(drawing_mode mode);
+virtual	void				SetDrawingMode(drawing_mode mode,
 								drawing_mode& oldMode);
-			void			SetBlendingMode(source_alpha srcAlpha,
+virtual	void				SetBlendingMode(source_alpha srcAlpha,
 								alpha_function alphaFunc);
-			void			SetFont(const ServerFont& font);
-			void			SetFont(const DrawState* state);
+virtual	void				SetFont(const ServerFont& font);
+virtual	void				SetFont(const DrawState* state);
 
-			void			SuspendAutoSync();
-			void			Sync();
+		void				SuspendAutoSync();
+		void				Sync();
 
-			// drawing functions
-			void			CopyRegion(/*const*/ BRegion* region,
+		// drawing functions
+virtual	void				CopyRegion(/*const*/ BRegion* region,
 								int32 xOffset, int32 yOffset);
 
-			void			InvertRect(BRect r);
+virtual	void				InvertRect(BRect r);
 
-			void			DrawBitmap(ServerBitmap* bitmap,
+virtual	void				DrawBitmap(ServerBitmap* bitmap,
 								const BRect& bitmapRect, const BRect& viewRect,
 								uint32 options = 0);
-			// drawing primitives
+		// drawing primitives
 
-			void			DrawArc(BRect r, const float& angle,
+virtual	void				DrawArc(BRect r, const float& angle,
 								const float& span, bool filled);
-			void			FillArc(BRect r, const float& angle,
+virtual	void				FillArc(BRect r, const float& angle,
 								const float& span, const BGradient& gradient);
 
-			void			DrawBezier(BPoint* pts, bool filled);
-			void			FillBezier(BPoint* pts, const BGradient& gradient);
+virtual	void				DrawBezier(BPoint* pts, bool filled);
+virtual	void				FillBezier(BPoint* pts, const BGradient& gradient);
 
-			void			DrawEllipse(BRect r, bool filled);
-			void			FillEllipse(BRect r, const BGradient& gradient);
+virtual	void				DrawEllipse(BRect r, bool filled);
+virtual	void				FillEllipse(BRect r, const BGradient& gradient);
 
-			void			DrawPolygon(BPoint* ptlist, int32 numpts,
+virtual	void				DrawPolygon(BPoint* ptlist, int32 numpts,
 								BRect bounds, bool filled, bool closed);
-			void			FillPolygon(BPoint* ptlist, int32 numpts,
+virtual	void				FillPolygon(BPoint* ptlist, int32 numpts,
 								BRect bounds, const BGradient& gradient,
 								bool closed);
 
-			// these rgb_color versions are used internally by the server
-			void			StrokePoint(const BPoint& pt,
+		// these rgb_color versions are used internally by the server
+virtual	void				StrokePoint(const BPoint& point,
 								const rgb_color& color);
-			void			StrokeRect(BRect r, const rgb_color &color);
-			void			FillRect(BRect r, const rgb_color &color);
-			void			FillRegion(BRegion& r, const rgb_color& color);
+virtual	void				StrokeRect(BRect rect, const rgb_color &color);
+virtual	void				FillRect(BRect rect, const rgb_color &color);
+virtual	void				FillRegion(BRegion& region, const rgb_color& color);
 
-			void			StrokeRect(BRect r);
-			void			FillRect(BRect r);
-			void			FillRect(BRect r, const BGradient& gradient);
+virtual	void				StrokeRect(BRect rect);
+virtual	void				FillRect(BRect rect);
+virtual	void				FillRect(BRect rect, const BGradient& gradient);
 
-			void			FillRegion(BRegion& r);
-			void			FillRegion(BRegion& r, const BGradient& gradient);
+virtual	void				FillRegion(BRegion& region);
+virtual	void				FillRegion(BRegion& region,
+								const BGradient& gradient);
 
-			void			DrawRoundRect(BRect r, float xrad,
+virtual	void				DrawRoundRect(BRect rect, float xrad,
 								float yrad, bool filled);
-			void			FillRoundRect(BRect r, float xrad,
+virtual	void				FillRoundRect(BRect rect, float xrad,
 								float yrad, const BGradient& gradient);
 
-			void			DrawShape(const BRect& bounds,
+virtual	void				DrawShape(const BRect& bounds,
 								int32 opcount, const uint32* oplist, 
 								int32 ptcount, const BPoint* ptlist,
 								bool filled);
-			void			FillShape(const BRect& bounds,
+virtual	void				FillShape(const BRect& bounds,
 							  int32 opcount, const uint32* oplist, 
 							  int32 ptcount, const BPoint* ptlist,
 							  const BGradient& gradient);
 	
-			void			DrawTriangle(BPoint* pts, const BRect& bounds,
+virtual	void				DrawTriangle(BPoint* points, const BRect& bounds,
 								bool filled);
-			void			FillTriangle(BPoint* pts,
-								const BRect& bounds, const BGradient& gradient);
+virtual	void				FillTriangle(BPoint* points, const BRect& bounds,
+								const BGradient& gradient);
 
-			// this version used by Decorator
-			void			StrokeLine(const BPoint& start,
+		// these versions are used by the Decorator
+virtual	void				StrokeLine(const BPoint& start,
 								const BPoint& end, const rgb_color& color);
 
-			void			StrokeLine(const BPoint& start,
+virtual	void				StrokeLine(const BPoint& start,
 								const BPoint& end);
 
-			void			StrokeLineArray(int32 numlines,
+virtual	void				StrokeLineArray(int32 numlines,
 								const ViewLineArrayInfo* data);
 
-			// -------- text related calls
+		// -------- text related calls
 
-			// returns the pen position behind the (virtually) drawn
-			// string
-			BPoint			DrawString(const char* string, int32 length,
+		// returns the pen position behind the (virtually) drawn
+		// string
+virtual	BPoint				DrawString(const char* string, int32 length,
 								const BPoint& pt,
 								escapement_delta* delta = NULL);
 
-			float			StringWidth(const char* string, int32 length,
+		float				StringWidth(const char* string, int32 length,
 								escapement_delta* delta = NULL);
 
-			// convenience function which is independent of graphics
-			// state (to be used by Decorator or ServerApp etc)
-			float			StringWidth(const char* string,
+		// convenience function which is independent of graphics
+		// state (to be used by Decorator or ServerApp etc)
+		float				StringWidth(const char* string,
 								int32 length, const ServerFont& font,
 								escapement_delta* delta = NULL);
 
- private:
-			BRect			_CopyRect(BRect r, int32 xOffset,
+		// software rendering backend invoked by CopyRegion() for the sorted
+		// individual rects
+virtual	BRect				CopyRect(BRect rect, int32 xOffset,
 								int32 yOffset) const;
 
-			void			_CopyRect(uint8* bits, uint32 width,
+private:
+		void				_CopyRect(uint8* bits, uint32 width,
 								uint32 height, uint32 bytesPerRow,
 								int32 xOffset, int32 yOffset) const;
 
-	inline	void			_CopyToFront(const BRect& frame);
+inline	void				_CopyToFront(const BRect& frame);
 
-			Painter*		fPainter;
-			HWInterface*	fGraphicsCard;
-			uint32			fAvailableHWAccleration;
-			int32			fSuspendSyncLevel;
-			bool			fCopyToFront;
+		Painter*			fPainter;
+		HWInterface*		fGraphicsCard;
+		uint32				fAvailableHWAccleration;
+		int32				fSuspendSyncLevel;
+		bool				fCopyToFront;
 };
 
 #endif // DRAWING_ENGINE_H_

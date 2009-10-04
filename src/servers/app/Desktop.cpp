@@ -289,11 +289,12 @@ workspace_in_workspaces(int32 index, uint32 workspaces)
 //	#pragma mark -
 
 
-Desktop::Desktop(uid_t userID)
+Desktop::Desktop(uid_t userID, const char* targetScreen)
 	:
 	MessageLooper("desktop"),
 
 	fUserID(userID),
+	fTargetScreen(strdup(targetScreen)),
 	fSettings(NULL),
 	fSharedReadOnlyArea(-1),
 	fApplicationsLock("application list"),
@@ -355,7 +356,7 @@ Desktop::Init()
 
 	const size_t areaSize = B_PAGE_SIZE;
 	char name[B_OS_NAME_LENGTH];
-	snprintf(name, sizeof(name), "d:%d:shared read only", /*id*/0);
+	snprintf(name, sizeof(name), "d:%d:shared read only", fUserID);
 	fSharedReadOnlyArea = create_area(name, (void **)&fServerReadOnlyMemory,
 		B_ANY_ADDRESS, areaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (fSharedReadOnlyArea < B_OK)
@@ -385,8 +386,12 @@ Desktop::Init()
 	gInputManager->AddStream(new InputServerStream);
 #endif
 
+	EventStream* stream = fVirtualScreen.HWInterface()->CreateEventStream();
+	if (stream == NULL)
+		stream = gInputManager->GetStream();
+
 	fEventDispatcher.SetDesktop(this);
-	fEventDispatcher.SetTo(gInputManager->GetStream());
+	fEventDispatcher.SetTo(stream);
 	if (fEventDispatcher.InitCheck() != B_OK)
 		_LaunchInputServer();
 
@@ -2079,7 +2084,8 @@ Desktop::_LaunchInputServer()
 void
 Desktop::_GetLooperName(char* name, size_t length)
 {
-	snprintf(name, length, "d:%d:%s", /*id*/0, /*name*/"baron");
+	snprintf(name, length, "d:%d:%s", fUserID,
+		fTargetScreen == NULL ? "baron" : fTargetScreen);
 }
 
 

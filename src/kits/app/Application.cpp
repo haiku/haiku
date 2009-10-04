@@ -1272,6 +1272,7 @@ BApplication::_ConnectToServer()
 	fServerLink->StartMessage(AS_GET_DESKTOP);
 	fServerLink->Attach<port_id>(clientPort);
 	fServerLink->Attach<int32>(getuid());
+	fServerLink->AttachString(getenv("TARGET_SCREEN"));
 
 	int32 code;
 	if (fServerLink->FlushWithReply(code) != B_OK || code != B_OK) {

@@ -23,11 +23,13 @@
 #include "ServerCursor.h"
 
 
+class BString;
+class DrawingEngine;
+class EventStream;
 class Overlay;
 class RenderingBuffer;
 class ServerBitmap;
 class UpdateQueue;
-class BString;
 
 
 enum {
@@ -68,6 +70,13 @@ public:
 	// You need to WriteLock
 	virtual	status_t			Initialize();
 	virtual	status_t			Shutdown() = 0;
+
+	// allocating a DrawingEngine attached to this HWInterface
+	virtual	DrawingEngine*		CreateDrawingEngine();
+
+	// creating an event stream specific for this HWInterface
+	// returns NULL when there is no specific event stream necessary
+	virtual	EventStream*		CreateEventStream();
 
 	// screen mode stuff
 	virtual	status_t			SetMode(const display_mode& mode) = 0;
@@ -115,6 +124,7 @@ public:
 
 	// cursor handling (these do their own Read/Write locking)
 			ServerCursorReference Cursor() const;
+			ServerCursorReference CursorAndDragBitmap() const;
 	virtual	void				SetCursor(ServerCursor* cursor);
 	virtual	void				SetCursorVisible(bool visible);
 			bool				IsCursorVisible();
@@ -122,7 +132,7 @@ public:
 	virtual	void				MoveCursorTo(float x, float y);
 			BPoint				CursorPosition();
 
-			void				SetDragBitmap(const ServerBitmap* bitmap,
+	virtual	void				SetDragBitmap(const ServerBitmap* bitmap,
 									const BPoint& offsetFromCursor);
 
 	// overlay support
@@ -148,6 +158,7 @@ public:
 	virtual	bool				IsDoubleBuffered() const;
 
 	// Invalidate is used for scheduling an area for updating
+	virtual	status_t			InvalidateRegion(BRegion& region);
 	virtual	status_t			Invalidate(const BRect& frame);
 	// while as CopyBackToFront() actually performs the operation
 	// either directly or asynchronously by the UpdateQueue thread

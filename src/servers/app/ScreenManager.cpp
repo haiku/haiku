@@ -14,6 +14,8 @@
 #include "Screen.h"
 #include "ServerConfig.h"
 
+#include "remote/RemoteHWInterface.h"
+
 #include <Autolock.h>
 #include <Entry.h>
 #include <NodeMonitor.h>
@@ -86,7 +88,7 @@ ScreenManager::CountScreens() const
 
 status_t
 ScreenManager::AcquireScreens(ScreenOwner* owner, int32* wishList,
-	int32 wishCount, bool force, ScreenList& list)
+	int32 wishCount, const char* target, bool force, ScreenList& list)
 {
 	BAutolock locker(this);
 	int32 added = 0;
@@ -99,6 +101,20 @@ ScreenManager::AcquireScreens(ScreenOwner* owner, int32* wishList,
 		if (item->owner == NULL && list.AddItem(item->screen)) {
 			item->owner = owner;
 			added++;
+		}
+	}
+
+	if (added == 0 && target != NULL) {
+		// there's a specific target screen we want to initialize
+		// TODO: right now we only support remote screens, but we could
+		// also target specific accelerants to support other graphics cards
+		RemoteHWInterface* interface = new(nothrow) RemoteHWInterface(target);
+		if (interface != NULL) {
+			screen_item* item = _AddHWInterface(interface);
+			if (item != NULL && list.AddItem(item->screen)) {
+				item->owner = owner;
+				added++;
+			}
 		}
 	}
 
@@ -153,13 +169,13 @@ ScreenManager::_ScanDrivers()
 }
 
 
-void
+ScreenManager::screen_item*
 ScreenManager::_AddHWInterface(HWInterface* interface)
 {
 	Screen* screen = new(nothrow) Screen(interface, fScreenList.CountItems());
 	if (screen == NULL) {
 		delete interface;
-		return;
+		return NULL;
 	}
 
 	// The interface is now owned by the screen
@@ -170,13 +186,14 @@ ScreenManager::_AddHWInterface(HWInterface* interface)
 			item->screen = screen;
 			item->owner = NULL;
 			if (fScreenList.AddItem(item))
-				return;
+				return item;
 
 			delete item;
 		}
 	}
 
 	delete screen;
+	return NULL;
 }
 
 

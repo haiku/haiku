@@ -194,9 +194,7 @@ DrawingEngine::SetCopyToFrontEnabled(bool enable)
 void
 DrawingEngine::CopyToFront(/*const*/ BRegion& region)
 {
-	int32 count = region.CountRects();
-	for (int32 i = 0; i < count; i++)
-		fGraphicsCard->Invalidate(region.RectAt(i));
+	fGraphicsCard->InvalidateRegion(region);
 }
 
 
@@ -521,7 +519,7 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 			sortedRectList[nextSortedIndex].bottom	= (int32)n->rect.bottom;
 			nextSortedIndex++;
 		} else {
-			BRect touched = _CopyRect(n->rect, xOffset, yOffset);
+			BRect touched = CopyRect(n->rect, xOffset, yOffset);
 			fGraphicsCard->Invalidate(touched);
 		}
 
@@ -1399,7 +1397,7 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 // #pragma mark -
 
 BRect
-DrawingEngine::_CopyRect(BRect src, int32 xOffset, int32 yOffset) const
+DrawingEngine::CopyRect(BRect src, int32 xOffset, int32 yOffset) const
 {
 	// TODO: assumes drawing buffer is 32 bits (which it currently always is)
 	BRect dst;

@@ -42,8 +42,8 @@ class AppServer : public MessageLooper  {
 	private:
 		virtual void	_DispatchMessage(int32 code, BPrivate::LinkReceiver& link);
 
-		Desktop*		_CreateDesktop(uid_t userID);
-		Desktop*		_FindDesktop(uid_t userID);
+		Desktop*		_CreateDesktop(uid_t userID, const char* targetScreen);
+		Desktop*		_FindDesktop(uid_t userID, const char* targetScreen);
 
 		void			_LaunchInputServer();
 

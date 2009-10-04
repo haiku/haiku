@@ -80,8 +80,8 @@ VirtualScreen::SetConfiguration(Desktop& desktop,
 	_Reset();
 
 	ScreenList list;
-	status_t status = gScreenManager->AcquireScreens(&desktop, NULL, 0, false,
-		list);
+	status_t status = gScreenManager->AcquireScreens(&desktop, NULL, 0,
+		desktop.TargetScreen(), false, list);
 	if (status != B_OK) {
 		// TODO: we would try again here with force == true
 		return status;
@@ -200,7 +200,7 @@ VirtualScreen::ScreenByID(int32 id) const
 	for (int32 i = fScreenList.CountItems(); i-- > 0;) {
 		screen_item* item = fScreenList.ItemAt(i);
 
-		if (item->screen->ID() == id)
+		if (item->screen->ID() == id || id == B_MAIN_SCREEN_ID.id)
 			return item->screen;
 	}
 

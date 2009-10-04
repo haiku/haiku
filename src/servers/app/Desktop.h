@@ -59,12 +59,13 @@ namespace BPrivate {
 
 class Desktop : public MessageLooper, public ScreenOwner {
 public:
-								Desktop(uid_t userID);
+								Desktop(uid_t userID, const char* targetScreen);
 	virtual						~Desktop();
 
 			status_t			Init();
 
 			uid_t				UserID() const { return fUserID; }
+			const char*			TargetScreen() { return fTargetScreen; }
 	virtual port_id				MessagePort() const { return fMessagePort; }
 			area_id				SharedReadOnlyArea() const
 									{ return fSharedReadOnlyArea; }
@@ -296,6 +297,7 @@ private:
 	friend class LockedDesktopSettings;
 
 			uid_t				fUserID;
+			const char*			fTargetScreen;
 			::VirtualScreen		fVirtualScreen;
 			DesktopSettingsPrivate*	fSettings;
 			port_id				fMessagePort;

@@ -37,6 +37,7 @@ class ServerFont {
 	virtual						~ServerFont();
 
 			ServerFont			&operator=(const ServerFont& font);
+			bool				operator==(const ServerFont& other) const;
 
 			font_direction		Direction() const
 									{ return fDirection; }

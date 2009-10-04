@@ -41,19 +41,20 @@ class ScreenManager : public BLooper {
 		int32			CountScreens() const;
 
 		status_t		AcquireScreens(ScreenOwner* owner, int32* wishList,
-							int32 wishCount, bool force, ScreenList& list);
+							int32 wishCount, const char* target, bool force,
+							ScreenList& list);
 		void			ReleaseScreens(ScreenList& list);
 
 		virtual void	MessageReceived(BMessage* message);
 
 	private:
-		void			_ScanDrivers();
-		void			_AddHWInterface(HWInterface* interface);
-
 		struct screen_item {
 			Screen*			screen;
 			ScreenOwner*	owner;
 		};
+
+		void			_ScanDrivers();
+		screen_item*	_AddHWInterface(HWInterface* interface);
 
 		BObjectList<screen_item>	fScreenList;
 };

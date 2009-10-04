@@ -191,6 +191,23 @@ ServerFont::operator=(const ServerFont& font)
 }
 
 
+bool
+ServerFont::operator==(const ServerFont& other) const
+{
+	if (fStyle == NULL && other.fStyle == NULL)
+		return true;
+
+	if (GetFamilyAndStyle() != other.GetFamilyAndStyle())
+		return false;
+
+	return fSize == other.fSize && fRotation == other.fRotation
+		&& fShear == other.fShear && fFalseBoldWidth == other.fFalseBoldWidth
+		&& fFlags == other.fFlags && fSpacing == other.fSpacing
+		&& fEncoding == other.fEncoding && fBounds == other.fBounds
+		&& fDirection == other.fDirection && fFace == other.fFace;
+}
+
+
 /*!
 	\brief Returns the number of strikes in the font
 	\return The number of strikes in the font

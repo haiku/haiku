@@ -176,12 +176,12 @@ AppServer::RunLooper()
 /*!	\brief Creates a desktop object for an authorized user
 */
 Desktop*
-AppServer::_CreateDesktop(uid_t userID)
+AppServer::_CreateDesktop(uid_t userID, const char* targetScreen)
 {
 	BAutolock locker(fDesktopLock);
 	Desktop* desktop = NULL;
 	try {
-		desktop = new Desktop(userID);
+		desktop = new Desktop(userID, targetScreen);
 
 		status_t status = desktop->Init();
 		if (status == B_OK) {
@@ -208,16 +208,20 @@ AppServer::_CreateDesktop(uid_t userID)
 
 /*!	\brief Finds the desktop object that belongs to a certain user
 */
-Desktop *
-AppServer::_FindDesktop(uid_t userID)
+Desktop*
+AppServer::_FindDesktop(uid_t userID, const char* targetScreen)
 {
 	BAutolock locker(fDesktopLock);
 
 	for (int32 i = 0; i < fDesktops.CountItems(); i++) {
 		Desktop* desktop = fDesktops.ItemAt(i);
 
-		if (desktop->UserID() == userID)
+		if (desktop->UserID() == userID
+			&& ((desktop->TargetScreen() == NULL && targetScreen == NULL)
+				|| (desktop->TargetScreen() != NULL && targetScreen != NULL
+					&& strcmp(desktop->TargetScreen(), targetScreen) == 0))) {
 			return desktop;
+		}
 	}
 
 	return NULL;
@@ -242,15 +246,23 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			int32 userID;
 			msg.Read<int32>(&userID);
 
-			Desktop* desktop = _FindDesktop(userID);
+			char* targetScreen = NULL;
+			msg.ReadString(&targetScreen);
+			if (targetScreen != NULL && strlen(targetScreen) == 0) {
+				free(targetScreen);
+				targetScreen = NULL;
+			}
+
+			Desktop* desktop = _FindDesktop(userID, targetScreen);
 			if (desktop == NULL) {
 				// we need to create a new desktop object for this user
 				// TODO: test if the user exists on the system
 				// TODO: maybe have a separate AS_START_DESKTOP_SESSION for
 				// authorizing the user
-				desktop = _CreateDesktop(userID);
+				desktop = _CreateDesktop(userID, targetScreen);
 			}
 
+			free(targetScreen);
 			BPrivate::LinkSender reply(replyPort);
 			if (desktop != NULL) {
 				reply.StartMessage(B_OK);
