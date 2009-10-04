@@ -84,13 +84,7 @@ BatteryInfoView::GetPreferredSize(float* width, float* height)
 void
 BatteryInfoView::AttachedToWindow()
 {
-	BRect rect = BScreen().Frame();
-	BRect windowFrame = Window()->Frame();
-	BPoint position;
-	// center window on screen
-	position.x = (rect.Width() - windowFrame.Width()) / 2;
-	position.y = (rect.Height() - windowFrame.Height()) / 2;
-	Window()->MoveTo(position);
+	Window()->CenterOnScreen();
 }
 
 
