@@ -1,0 +1,15 @@
+resource app_signature "application/x-vnd.Haiku-RemoteDesktop";
+
+resource app_version {
+	major  = 0,
+	middle = 1,
+	minor  = 0,
+
+	variety = B_APPV_ALPHA,
+	internal = 0,
+
+	short_info = "RemoteDesktop",
+	long_info = "RemoteDesktop ©2009 Haiku, Inc."
+};
+
+resource app_flags B_MULTIPLE_LAUNCH;
