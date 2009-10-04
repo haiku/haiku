@@ -129,10 +129,11 @@ TermApp::Quit()
 void
 TermApp::AboutRequested()
 {
+	// used spaces instead of tabs to avoid Murai's name being wrapped
 	BAlert *alert = new BAlert("about", "Terminal\n"
-		"\twritten by Kazuho Okui and Takashi Murai\n"
-		"\tupdated by Kian Duffy and others\n\n"
-		"\tCopyright " B_UTF8_COPYRIGHT "2003-2008, Haiku.\n", "Ok");
+		"    written by Kazuho Okui and Takashi Murai\n"
+		"    updated by Kian Duffy and others\n\n"
+		"    Copyright " B_UTF8_COPYRIGHT "2003-2008, Haiku.\n", "Ok");
 	BTextView *view = alert->TextView();
 	
 	view->SetStylable(true);

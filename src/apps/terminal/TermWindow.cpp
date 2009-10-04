@@ -416,6 +416,7 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 
 		case MSG_FIND:
+		{
 			fFindPanel->PostMessage(B_QUIT_REQUESTED);
 			message->FindBool("findselection", &fFindSelection);
 			if (!fFindSelection)
@@ -424,8 +425,10 @@ TermWindow::MessageReceived(BMessage *message)
 				_ActiveTermView()->GetSelection(fFindString);
 
 			if (fFindString.Length() == 0) {
-				BAlert *alert = new BAlert("find failed", "No search string.", "Okay", NULL,
+				const char *errorMsg = (!fFindSelection) ? "No search string was entered." : "Nothing is selected.";
+				BAlert *alert = new BAlert("Find failed", errorMsg, "Ok", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				
 				alert->Go();
 				fFindPreviousMenuItem->SetEnabled(false);
 				fFindNextMenuItem->SetEnabled(false);
@@ -438,7 +441,7 @@ TermWindow::MessageReceived(BMessage *message)
 			findresult = _ActiveTermView()->Find(fFindString, fForwardSearch, fMatchCase, fMatchWord);
 
 			if (!findresult) {
-				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
+				BAlert *alert = new BAlert("Find failed", "Text not found.", "Ok", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 				alert->SetShortcut(0, B_ESCAPE);
 				alert->Go();
@@ -451,6 +454,7 @@ TermWindow::MessageReceived(BMessage *message)
 			fFindPreviousMenuItem->SetEnabled(true);
 			fFindNextMenuItem->SetEnabled(true);
 			break;
+		}
 
 		case MENU_FIND_NEXT:
 		case MENU_FIND_PREVIOUS:

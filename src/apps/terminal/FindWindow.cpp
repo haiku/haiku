@@ -49,7 +49,8 @@ FindWindow::FindWindow (BRect frame, BMessenger messenger , BString &str,
 	//These things are calculated from the top
 	float textRadioTop = 12;
 	float textRadioBottom = textRadioTop + 2 + lineHeight + 2 + 1;
-	float textRadioRight = fFindView->StringWidth("Use Text: ") + 30;
+	float textRadioLeft = 14;
+	float textRadioRight = textRadioLeft + fFindView->StringWidth("Use Text: ") + 30;
 	float selectionRadioTop = textRadioBottom + 4;
 	float selectionRadioBottom = selectionRadioTop + lineHeight + 8;
 
@@ -61,7 +62,7 @@ FindWindow::FindWindow (BRect frame, BMessenger messenger , BString &str,
 	float searchButtonRight = searchButtonLeft + fFindView->StringWidth("Find") + 60;
 
 	//Build the Views
-	fTextRadio = new BRadioButton(BRect(14, textRadioTop, textRadioRight, textRadioBottom),
+	fTextRadio = new BRadioButton(BRect(textRadioLeft, textRadioTop, textRadioRight, textRadioBottom),
 		"fTextRadio", "Use Text: ", NULL);
 	fFindView->AddChild(fTextRadio);
 
@@ -160,6 +161,8 @@ FindWindow::_SendFindMessage()
 		message.AddBool("findselection", true);
 
 	//Add the other parameters
+	// TODO: "usetext" is never checked for elsewhere and seems redundant with
+	// "findselection", why is it here?
 	message.AddBool("usetext", fTextRadio->Value() == B_CONTROL_ON);
 	message.AddBool("forwardsearch", fForwardSearchBox->Value() == B_CONTROL_ON);
 	message.AddBool("matchcase", fMatchCaseBox->Value() == B_CONTROL_ON);
@@ -167,3 +170,4 @@ FindWindow::_SendFindMessage()
 
 	fFindDlgMessenger.SendMessage(&message);
 }
+
