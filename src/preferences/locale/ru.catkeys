@@ -1,9 +1,10 @@
-1	Russian	x-vnd.Haiku-Locale	3822351296
+1	Russian	x-vnd.Haiku-Locale	1910872713
 day of week (short name)	TimeFormatSettings		день недели (короткое название)
 Available languages	Locale Preflet Window		Доступные языки
 Decimal separator	TimeFormatSettings		Десятичный разделитель
 Separator:	TimeFormatSettings		Разделитель:
 Year (4 digits)	TimeFormatSettings		Год (4 цифры)
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Не удаётся найти доступные языки! Вы не можете использовать данную функцию!
 After	TimeFormatSettings		После
 Long format:	TimeFormatSettings		Длинный формат:
 Before	TimeFormatSettings		До
@@ -14,17 +15,18 @@ Currency symbol:	TimeFormatSettings		Символ валюты:
 Space	TimeFormatSettings		Пространство
 Language	Locale Preflet Window		Язык
 Thousand separator	TimeFormatSettings		Разделитель тысячи
+24 Hour	TimeFormatSettings		24 Heures
 Year (2 digits)	TimeFormatSettings		Год (2 цифры)
 Preferred languages	Locale Preflet Window		Предпочтительные языки
 Symbol position	TimeFormatSettings		Символ позиции
 month number	TimeFormatSettings		номер месяца 
 month number (2 digits)	TimeFormatSettings		номер месяца (2 цифры)
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Не удаётся найти доступные языки! Вы не можете использовать данную функцию!
 Numbers	TimeFormatSettings		Числа
  (unknown format)	TimeFormatSettings		 (неизвестный формат)
 Negative marker:	TimeFormatSettings		Отрицательный маркер:
+12 Hour	TimeFormatSettings		12 Heures
 Defaults	Locale Preflet Window		По умолчанию
-Locale\n\twritten by Axel Drfler\tCopyright 2005, Haiku.\n\n	Locale Preflet		Locale\n\tразработан Drfler\n\tCopyright 2009, Haiku.\n\n
+Locale\n\twritten by Axel Dörfler\tCopyright 2005, Haiku.\n\n	Locale Preflet		Locale\n\tразработан Axel Dörfler\n\tCopyright 2009, Haiku.\n\n
 Separator	TimeFormatSettings		Разделитель
 Country	Locale Preflet Window		Страна
 Revert	Locale Preflet Window		Вернуться
