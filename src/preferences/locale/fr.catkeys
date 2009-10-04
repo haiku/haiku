@@ -1,9 +1,10 @@
-1	french	x-vnd.Haiku-Locale	3822351296
+1	french	x-vnd.Haiku-Locale	1910872713
 day of week (short name)	TimeFormatSettings		jour de la semaine (abrégé)
 Available languages	Locale Preflet Window		Langues disponibles
 Decimal separator	TimeFormatSettings		Séparateur décimal
 Separator:	TimeFormatSettings		Separateur:
 Year (4 digits)	TimeFormatSettings		Année (4 chiffres)
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La liste des langages disponibles est introuvable, ce preflet est donc inutilisable !
 After	TimeFormatSettings		Après
 Long format:	TimeFormatSettings		Format long:
 Before	TimeFormatSettings		Avant
@@ -14,15 +15,16 @@ Currency symbol:	TimeFormatSettings		Symbole monétaire:
 Space	TimeFormatSettings		Espace
 Language	Locale Preflet Window		Langage
 Thousand separator	TimeFormatSettings		Séparateur de milliers
+24 Hour	TimeFormatSettings		24 Heures
 Year (2 digits)	TimeFormatSettings		Année (2 chiffres)
 Preferred languages	Locale Preflet Window		Langues préférées
 Symbol position	TimeFormatSettings		Position du symbole
 month number	TimeFormatSettings		numéro du mois
 month number (2 digits)	TimeFormatSettings		numéro du mois (2 chiffres)
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La liste des langages disponibles est introuvable, ce preflet est donc inutilisable !
 Numbers	TimeFormatSettings		Nombres
  (unknown format)	TimeFormatSettings		 (format inconnu)
 Negative marker:	TimeFormatSettings		Marqueur de nombre négatifs:
+12 Hour	TimeFormatSettings		12 Heures
 Defaults	Locale Preflet Window		Défauts
 Locale\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n\n	Locale Preflet		Locale\n\técrit par Axel Dörfler\n\tCopyright 2009, Haiku.\n\n
 Separator	TimeFormatSettings		Separateur

@@ -161,10 +161,10 @@ TimeFormatSettingsView::TimeFormatSettingsView(BCountry* country)
 	clockBox->SetLabel(TR("Clock"));
 
 	{
-		f24HrRadioButton = new BRadioButton("", "24 Hour",
+		f24HrRadioButton = new BRadioButton("", TR("24 Hour"),
 				new BMessage(kSettingsContentsModified));
 
-		f12HrRadioButton = new BRadioButton("", "12 Hour",
+		f12HrRadioButton = new BRadioButton("", TR("12 Hour"),
 				new BMessage(kSettingsContentsModified));
 
 		clockBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, 3)
