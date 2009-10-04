@@ -7,12 +7,12 @@ CPU Frequency Status View	CPU Frequency View		CPU-Takt-Anzeige
 Dynamic Performance	Status view		Dynamische Leistung
 Step up by CPU usage:	Color Step View		Taktänderung ab CPU-Auslastung von:
 Stepping Policy	CPU Frequency View		Taktungsrichtlinie
-Open Speedstep Preferences…	Status view		Öffne Speedstep Einstellungen…
+Open Speedstep Preferences…	Status view		Speedstep Einstellungen öffnen…
 Set State	Status view		Fester Takt
 Launching the CPU Frequency preflet failed.\n\nError: 	Status view		Das CPU-Takt-Preflet konnte nicht gestartet werden.\n\nFehler: 
-Install Replicant into Deskbar	CPU Frequency View		Installiere Replikanten in Deskbar
+Install Replicant into Deskbar	CPU Frequency View		Replikanten in Deskbar installieren
 Low Energy	Status view		Geringer Energieverbrauch
 Revert	Pref Window		Zurücknehmen
 Dynamic Stepping	CPU Frequency View		Dynamische Taktung
-CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU-Takt\n\tgeschrieben von Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU-Takt\n\tGeschrieben von Clemens Zeidler.\n\tCopyright 2009, Haiku, Inc.\n
 CPU Frequency	Main window		CPU-Takt
