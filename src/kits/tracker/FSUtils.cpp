@@ -1731,7 +1731,7 @@ PreFlightNameCheck(BObjectList<entry_ref> *srcList, const BDirectory *destDir,
 
 	// prompt user only if there is more than one collision, otherwise the
 	// single collision case will be handled as a "Prompt" case by CheckName
-	if (*collisionCount > 0) {
+	if (*collisionCount > 1) {
 		const char *verb = (moveMode == kMoveSelectionTo) ? "moving" : "copying";
 		char replaceMsg[256];
 		sprintf(replaceMsg, kReplaceManyStr, verb, verb);
