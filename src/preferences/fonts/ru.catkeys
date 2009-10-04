@@ -1,0 +1,12 @@
+1       Russian  x-vnd.Haiku-Fonts       3656873675
+Defaults        Main window             По умолчанию
+Plain Font:     Font view               Простой шрифт:
+Fonts   Main window             Fonts
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n        main            Fonts\n\tCopyright 2004-2005, Haiku.\n\n
+Revert  Main window             Вернуться
+Size:   Font Selection view             Размер:
+Menu Font:      Font view               Шрифт меню:
+The quick brown fox jumps over the lazy dog.    Font Selection view     Don't translate this literally ! Use a phrase showing all chars from A to Z.    Съешь ещё этих мягких французских булок, да выпей  же чаю.
+Bold Font:      Font view               Полужирный шрифт:
+Fixed Font:     Font view               Моноширный шрифт:
+Ok      main            Ок

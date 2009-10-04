@@ -13,7 +13,7 @@ Short format:	TimeFormatSettings		Краткий формат:
 Currency symbol:	TimeFormatSettings		Символ валюты:
 Space	TimeFormatSettings		Пространство
 Language	Locale Preflet Window		Язык
-Thousand separator	TimeFormatSettings		Тазделитель тысячи
+Thousand separator	TimeFormatSettings		Разделитель тысячи
 Year (2 digits)	TimeFormatSettings		Год (2 цифры)
 Preferred languages	Locale Preflet Window		Предпочтительные языки
 Symbol position	TimeFormatSettings		Символ позиции
@@ -24,7 +24,7 @@ Numbers	TimeFormatSettings		Числа
  (unknown format)	TimeFormatSettings		 (неизвестный формат)
 Negative marker:	TimeFormatSettings		Отрицательный маркер:
 Defaults	Locale Preflet Window		По умолчанию
-Locale\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n\n	Locale Preflet		Locale\n\зработан Axel Dörfler\n\tCopyright 2009, Haiku.\n\n
+Locale\n\twritten by Axel Drfler\tCopyright 2005, Haiku.\n\n	Locale Preflet		Locale\n\tразработан Drfler\n\tCopyright 2009, Haiku.\n\n
 Separator	TimeFormatSettings		Разделитель
 Country	Locale Preflet Window		Страна
 Revert	Locale Preflet Window		Вернуться
