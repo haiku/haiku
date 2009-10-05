@@ -546,7 +546,8 @@ GetStackFrameValueJob::_GetValue()
 				type = dynamic_cast<TypedefType*>(type)->BaseType();
 				break;
 			case TYPE_ADDRESS:
-				TRACE_LOCALS("  TYPE_ADDRESS\n");
+			case TYPE_POINTER_TO_MEMBER:
+				TRACE_LOCALS("  TYPE_ADDRESS/TYPE_POINTER_TO_MEMBER\n");
 				if (fArchitecture->AddressSize() == 4) {
 					valueType = B_UINT32_TYPE;
 					TRACE_LOCALS("    -> 32 bit\n");
@@ -595,9 +596,16 @@ GetStackFrameValueJob::_GetValue()
 				shortValueIsFine = true;
 				break;
 			}
-			default:
-				TRACE_LOCALS("  default -> unsupported\n");
+			case TYPE_SUBRANGE:
+				TRACE_LOCALS("  TYPE_SUBRANGE -> unsupported\n");
 				return B_UNSUPPORTED;
+			case TYPE_UNSPECIFIED:
+				// Can't get the value for an unspecified type!
+				return B_BAD_VALUE;
+			case TYPE_FUNCTION:
+				TRACE_LOCALS("  TYPE_FUNCTION\n");
+				// Can't get the value for a function type!
+				return B_BAD_VALUE;
 		}
 	}
 
@@ -833,9 +841,15 @@ GetStackFrameValueJob::_ResolveTypeAndLocation(Type*& _type,
 	switch (component.typeKind) {
 		case TYPE_PRIMITIVE:
 		case TYPE_ENUMERATION:
+		case TYPE_SUBRANGE:
+		case TYPE_UNSPECIFIED:
+		case TYPE_FUNCTION:
+		case TYPE_POINTER_TO_MEMBER:
 			// cannot happen
 			TRACE_LOCALS("GetStackFrameValueJob::_ResolveTypeAndLocation(): "
-				"TYPE_PRIMITIVE/TYPE_ENUMERATION subcomponent!\n");
+				"TYPE_PRIMITIVE/TYPE_ENUMERATION/TYPE_SUBRANGE/"
+				"TYPE_UNSPECIFIED/TYPE_FUNCTION/TYPE_POINTER_TO_MEMBER "
+				"subcomponent!\n");
 			return B_BAD_VALUE;
 		case TYPE_COMPOUND:
 		{
@@ -921,8 +935,9 @@ GetStackFrameValueJob::_ResolveTypeAndLocation(Type*& _type,
 				fStackFrame, type, parentValue.ToUInt64(), location);
 			if (error != B_OK) {
 				TRACE_LOCALS("GetStackFrameValueJob::"
-					"_ResolveTypeAndLocation(): TYPE_ADDRESS: "
-					"ResolveObjectDataLocation() failed: %s\n",
+						"_ResolveTypeAndLocation(): "
+						"TYPE_ADDRESS/TYPE_POINTER_TO_MEMBER: "
+						"ResolveObjectDataLocation() failed: %s\n",
 					strerror(error));
 				return error;
 			}
@@ -935,10 +950,44 @@ GetStackFrameValueJob::_ResolveTypeAndLocation(Type*& _type,
 			return B_OK;
 		}
 		case TYPE_ARRAY:
-			// TODO:...
-		default:
-			return B_UNSUPPORTED;
+		{
+			ArrayType* arrayType = dynamic_cast<ArrayType*>(parentType);
+
+			if (component.componentKind != TYPE_COMPONENT_ARRAY_ELEMENT)
+				return B_UNSUPPORTED;
+
+			// get the index path
+			ArrayIndexPath indexPath;
+			error = indexPath.SetTo(component.name.String());
+			if (error != B_OK)
+				return error;
+
+			if (indexPath.CountIndices() != arrayType->CountDimensions())
+				return B_UNSUPPORTED;
+
+			// resolve the element location
+			ValueLocation* location;
+			error = fStackFrame->DebugInfo()->ResolveArrayElementLocation(
+				fStackFrame, arrayType, indexPath, *parentLocation, location);
+			if (error != B_OK) {
+				TRACE_LOCALS("GetStackFrameValueJob::"
+					"_ResolveTypeAndLocation(): TYPE_ARRAY: "
+					"ResolveArrayElementLocation() failed: %s\n",
+					strerror(error));
+				return error;
+			}
+
+			arrayType->BaseType()->AcquireReference();
+			_type = arrayType->BaseType();
+			_location = location;
+			_valueResolved = false;
+
+			return B_OK;
+		}
 	}
+
+	// Can never get here.
+	return B_UNSUPPORTED;
 }
 
 

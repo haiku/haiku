@@ -85,6 +85,8 @@ struct TypeComponent {
 		return indexPath.GetPathString(this->name);
 	}
 
+	bool HasPrefix(const TypeComponent& other) const;
+
 	uint32 HashValue() const;
 
 	void Dump() const;

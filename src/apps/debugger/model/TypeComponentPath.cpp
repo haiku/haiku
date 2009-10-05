@@ -16,6 +16,18 @@
 // #pragma mark - TypeComponent
 
 
+bool
+TypeComponent::HasPrefix(const TypeComponent& other) const
+{
+	if (*this == other)
+		return true;
+
+	return componentKind == TYPE_COMPONENT_ARRAY_ELEMENT
+		&& other.componentKind == TYPE_COMPONENT_ARRAY_ELEMENT
+		&& name.Compare(other.name, other.name.Length()) == 0;
+}
+
+
 uint32
 TypeComponent::HashValue() const
 {
@@ -51,6 +63,15 @@ TypeComponent::Dump() const
 			break;
 		case TYPE_ARRAY:
 			printf("array");
+			break;
+		case TYPE_UNSPECIFIED:
+			printf("unspecified");
+			break;
+		case TYPE_FUNCTION:
+			printf("function");
+			break;
+		case TYPE_POINTER_TO_MEMBER:
+			printf("pointer to member");
 			break;
 	}
 

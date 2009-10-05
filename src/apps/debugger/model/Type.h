@@ -20,7 +20,10 @@ enum type_kind {
 	TYPE_ADDRESS,
 	TYPE_ENUMERATION,
 	TYPE_SUBRANGE,
-	TYPE_ARRAY
+	TYPE_ARRAY,
+	TYPE_UNSPECIFIED,
+	TYPE_FUNCTION,
+	TYPE_POINTER_TO_MEMBER
 };
 
 
@@ -76,6 +79,15 @@ public:
 									// subrange or enumeration
 	virtual	uint64				CountElements() const;
 									// returns 0, if unknown
+};
+
+
+class FunctionParameter : public Referenceable {
+public:
+	virtual						~FunctionParameter();
+
+	virtual	const char*			Name() const = 0;
+	virtual	Type*				GetType() const = 0;
 };
 
 
@@ -187,6 +199,40 @@ public:
 
 	virtual	int32				CountDimensions() const = 0;
 	virtual	ArrayDimension*		DimensionAt(int32 index) const = 0;
+};
+
+
+class UnspecifiedType : public virtual Type {
+public:
+	virtual						~UnspecifiedType();
+
+	virtual	type_kind			Kind() const;
+};
+
+
+class FunctionType : public virtual Type {
+public:
+	virtual						~FunctionType();
+
+	virtual	type_kind			Kind() const;
+
+	virtual	Type*				ReturnType() const = 0;
+
+	virtual	int32				CountParameters() const = 0;
+	virtual	FunctionParameter*	ParameterAt(int32 index) const = 0;
+
+	virtual	bool				HasVariableArguments() const = 0;
+};
+
+
+class PointerToMemberType : public virtual Type {
+public:
+	virtual						~PointerToMemberType();
+
+	virtual	type_kind			Kind() const;
+
+	virtual	CompoundType*		ContainingType() const = 0;
+	virtual	Type*				BaseType() const = 0;
 };
 
 

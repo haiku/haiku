@@ -50,17 +50,25 @@ ArrayDimension::CountElements() const
 	if (type->Kind() == TYPE_SUBRANGE) {
 		SubrangeType* subrangeType = dynamic_cast<SubrangeType*>(type);
 		BVariant lower = subrangeType->LowerBound();
-		BVariant upper = subrangeType->LowerBound();
+		BVariant upper = subrangeType->UpperBound();
 		bool isSigned;
 		if (!lower.IsInteger(&isSigned) || !upper.IsInteger())
 			return 0;
 
 		return isSigned
-			? upper.ToInt64() - lower.ToInt64()
-			: upper.ToUInt64() - lower.ToUInt64();
+			? upper.ToInt64() - lower.ToInt64() + 1
+			: upper.ToUInt64() - lower.ToUInt64() + 1;
 	}
 
 	return 0;
+}
+
+
+// #pragma mark - FunctionParameter
+
+
+FunctionParameter::~FunctionParameter()
+{
 }
 
 
@@ -223,4 +231,49 @@ type_kind
 ArrayType::Kind() const
 {
 	return TYPE_ARRAY;
+}
+
+
+// #pragma mark - UnspecifiedType
+
+
+UnspecifiedType::~UnspecifiedType()
+{
+}
+
+
+type_kind
+UnspecifiedType::Kind() const
+{
+	return TYPE_UNSPECIFIED;
+}
+
+
+// #pragma mark - FunctionType
+
+
+FunctionType::~FunctionType()
+{
+}
+
+
+type_kind
+FunctionType::Kind() const
+{
+	return TYPE_FUNCTION;
+}
+
+
+// #pragma mark - PointerToMemberType
+
+
+PointerToMemberType::~PointerToMemberType()
+{
+}
+
+
+type_kind
+PointerToMemberType::Kind() const
+{
+	return TYPE_POINTER_TO_MEMBER;
 }

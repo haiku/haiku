@@ -43,3 +43,12 @@ NoOpStackFrameDebugInfo::ResolveDataMemberLocation(StackFrame* stackFrame,
 {
 	return B_UNSUPPORTED;
 }
+
+
+status_t
+NoOpStackFrameDebugInfo::ResolveArrayElementLocation(StackFrame* stackFrame,
+	ArrayType* type, const ArrayIndexPath& indexPath,
+	const ValueLocation& parentLocation, ValueLocation*& _location)
+{
+	return B_UNSUPPORTED;
+}

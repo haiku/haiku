@@ -19,7 +19,7 @@ public:
 								ArrayIndexPath(const ArrayIndexPath& other);
 								~ArrayIndexPath();
 
-			bool				SetTo(const char* path);
+			status_t			SetTo(const char* path);
 			void				Clear();
 
 			bool				GetPathString(BString& path) const;

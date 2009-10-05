@@ -31,33 +31,33 @@ ArrayIndexPath::~ArrayIndexPath()
 }
 
 
-bool
+status_t
 ArrayIndexPath::SetTo(const char* path)
 {
 	fIndices.Clear();
 
 	if (path == NULL)
-		return true;
+		return B_OK;
 
 	while (*path != '\0') {
 		char* numberEnd;
 		int64 index = strtoll(path, &numberEnd, 0);
 		if (numberEnd == path)
-			return false;
+			return B_BAD_VALUE;
 		path = numberEnd;
 
 		if (!fIndices.Add(index))
-			return false;
+			return B_NO_MEMORY;
 
 		if (*path == '\0')
 			break;
 
 		if (*path != kIndexSeparator)
-			return false;
+			return B_BAD_VALUE;
 		path++;
 	}
 
-	return true;
+	return B_OK;
 }
 
 

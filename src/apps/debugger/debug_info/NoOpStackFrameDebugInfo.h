@@ -29,6 +29,11 @@ public:
 									DataMember* member,
 									const ValueLocation& parentLocation,
 									ValueLocation*& _location);
+	virtual	status_t			ResolveArrayElementLocation(
+									StackFrame* stackFrame, ArrayType* type,
+									const ArrayIndexPath& indexPath,
+									const ValueLocation& parentLocation,
+									ValueLocation*& _location);
 };
 
 

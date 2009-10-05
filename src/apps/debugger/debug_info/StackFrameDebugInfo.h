@@ -11,6 +11,8 @@
 #include "Types.h"
 
 
+class ArrayIndexPath;
+class ArrayType;
 class Architecture;
 class BaseType;
 class DataMember;
@@ -43,6 +45,12 @@ public:
 	virtual	status_t			ResolveDataMemberLocation(
 									StackFrame* stackFrame, Type* type,
 									DataMember* member,
+									const ValueLocation& parentLocation,
+									ValueLocation*& _location) = 0;
+									// returns a reference
+	virtual	status_t			ResolveArrayElementLocation(
+									StackFrame* stackFrame, ArrayType* type,
+									const ArrayIndexPath& indexPath,
 									const ValueLocation& parentLocation,
 									ValueLocation*& _location) = 0;
 									// returns a reference

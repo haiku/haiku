@@ -22,10 +22,13 @@ class DIECompoundType;
 class DIEEnumerationType;
 class DIEFormalParameter;
 class DIEModifiedType;
+class DIEPointerToMemberType;
 class DIESubprogram;
 class DIESubrangeType;
+class DIESubroutineType;
 class DIEType;
 class DIETypedef;
+class DIEUnspecifiedType;
 class DIEVariable;
 class DwarfFile;
 class DwarfTargetInterface;
@@ -65,6 +68,11 @@ public:
 									DataMember* member,
 									const ValueLocation& parentLocation,
 									ValueLocation*& _location);
+	virtual	status_t			ResolveArrayElementLocation(
+									StackFrame* stackFrame, ArrayType* type,
+									const ArrayIndexPath& indexPath,
+									const ValueLocation& parentLocation,
+									ValueLocation*& _location);
 
 			status_t			CreateType(DIEType* typeEntry, Type*& _type);
 									// returns reference
@@ -85,6 +93,7 @@ private:
 			struct DwarfDataMember;
 			struct DwarfEnumerationValue;
 			struct DwarfArrayDimension;
+			struct DwarfFunctionParameter;
 			struct DwarfPrimitiveType;
 			struct DwarfCompoundType;
 			struct DwarfModifiedType;
@@ -93,6 +102,9 @@ private:
 			struct DwarfEnumerationType;
 			struct DwarfSubrangeType;
 			struct DwarfArrayType;
+			struct DwarfUnspecifiedType;
+			struct DwarfFunctionType;
+			struct DwarfPointerToMemberType;
 			struct DwarfTypeHashDefinition;
 
 			typedef BOpenHashTable<DwarfTypeHashDefinition> TypeTable;
@@ -135,6 +147,15 @@ private:
 									DwarfType*& _type);
 			status_t			_CreateSubrangeType(const BString& name,
 									DIESubrangeType* typeEntry,
+									DwarfType*& _type);
+			status_t			_CreateUnspecifiedType(const BString& name,
+									DIEUnspecifiedType* typeEntry,
+									DwarfType*& _type);
+			status_t			_CreateFunctionType(const BString& name,
+									DIESubroutineType* typeEntry,
+									DwarfType*& _type);
+			status_t			_CreatePointerToMemberType(const BString& name,
+									DIEPointerToMemberType* typeEntry,
 									DwarfType*& _type);
 
 			status_t			_CreateVariable(ObjectID* id,

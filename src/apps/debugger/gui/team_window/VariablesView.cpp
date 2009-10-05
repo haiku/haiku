@@ -548,7 +548,9 @@ private:
 							return;
 						}
 
-						if (!baseIndexPath.SetTo(arrayComponent.name.String()))
+						status_t error
+							= baseIndexPath.SetTo(arrayComponent.name.String());
+						if (error != B_OK)
 							return;
 
 						baseDimension = baseIndexPath.CountIndices();
@@ -579,10 +581,8 @@ private:
 
 						component.SetToArrayElement(type->Kind(), indexPath);
 						TypeComponentPath* elementPath
-							= new(std::nothrow) TypeComponentPath(*path);
+							= path->CreateSubPath(path->CountComponents() - 1);
 						if (elementPath == NULL
-							|| elementPath->CountComponents()
-								!= path->CountComponents()
 							|| !elementPath->AddComponent(component)) {
 							delete elementPath;
 							return;
@@ -604,10 +604,24 @@ private:
 				case TYPE_ENUMERATION:
 					TRACE_LOCALS("TYPE_ENUMERATION\n");
 					done = true;
+					break;
+				case TYPE_SUBRANGE:
+					TRACE_LOCALS("TYPE_SUBRANGE -> unsupported\n");
+					// TODO: Support!
 					return;
-				default:
-					TRACE_LOCALS("unknown\n");
+				case TYPE_UNSPECIFIED:
+					// Should never get here -- we don't create nodes for
+					// unspecified types.
+					TRACE_LOCALS("TYPE_UNSPECIFIED\n");
 					return;
+				case TYPE_FUNCTION:
+					TRACE_LOCALS("TYPE_FUNCTION -> unsupported\n");
+					// TODO: Support!
+					return;
+				case TYPE_POINTER_TO_MEMBER:
+					TRACE_LOCALS("TYPE_POINTER_TO_MEMBER\n");
+					done = true;
+					break;
 			}
 
 			if (done) {
@@ -627,6 +641,11 @@ private:
 		TypeComponentPath* path, const BString& name, Type* type,
 		bool isPresentationNode = false)
 	{
+		// Don't create nodes for unspecified types -- we can't get/show their
+		// value anyway.
+		if (type->Kind() == TYPE_UNSPECIFIED)
+			return;
+
 		ValueNode* node = new(std::nothrow) ValueNode(parent, variable, path,
 			name, type, isPresentationNode);
 		if (node == NULL || !parent->AddChild(node)) {
@@ -660,8 +679,22 @@ private:
 
 				for (int32 componentIndex = i;
 					componentIndex < childComponentCount; componentIndex++) {
-					if (childPath->ComponentAt(componentIndex)
-							!= path->ComponentAt(componentIndex)) {
+					TypeComponent childComponent
+						= childPath->ComponentAt(componentIndex);
+					TypeComponent pathComponent
+						= path->ComponentAt(componentIndex);
+					if (childComponent != pathComponent) {
+						if (componentIndex + 1 == childComponentCount
+							&& pathComponent.HasPrefix(childComponent)) {
+							// The last child component is a prefix of the
+							// corresponding path component. We consider this a
+							// match, but need to recheck the component with the
+							// next node level.
+							childComponentCount--;
+							break;
+						}
+
+						// mismatch -- skip the child
 						childNode = NULL;
 						break;
 					}

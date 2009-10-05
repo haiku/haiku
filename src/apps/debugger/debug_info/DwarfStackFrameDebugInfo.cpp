@@ -11,6 +11,7 @@
 
 #include <Variant.h>
 
+#include "ArrayIndexPath.h"
 #include "Architecture.h"
 #include "CompilationUnit.h"
 #include "DebugInfoEntries.h"
@@ -40,6 +41,18 @@ struct HasTypePredicate {
 	inline bool operator()(EntryType* entry) const
 	{
 		return entry->GetType() != NULL;
+	}
+};
+
+
+// #pragma mark - HasReturnTypePredicate
+
+
+template<typename EntryType>
+struct HasReturnTypePredicate {
+	inline bool operator()(EntryType* entry) const
+	{
+		return entry->ReturnType() != NULL;
 	}
 };
 
@@ -88,6 +101,18 @@ struct HasBaseTypesPredicate {
 };
 
 
+// #pragma mark - HasParametersPredicate
+
+
+template<typename EntryType>
+struct HasParametersPredicate {
+	inline bool operator()(EntryType* entry) const
+	{
+		return !entry->Parameters().IsEmpty();
+	}
+};
+
+
 // #pragma mark - HasLowerBoundPredicate
 
 
@@ -117,6 +142,41 @@ struct HasCountPredicate {
 	inline bool operator()(DIESubrangeType* entry) const
 	{
 		return entry->Count()->IsValid();
+	}
+};
+
+
+// #pragma mark - HasBitStridePredicate
+
+
+template<typename EntryType>
+struct HasBitStridePredicate {
+	inline bool operator()(EntryType* entry) const
+	{
+		return entry->BitStride()->IsValid();
+	}
+};
+
+
+// #pragma mark - HasByteStridePredicate
+
+
+template<typename EntryType>
+struct HasByteStridePredicate {
+	inline bool operator()(EntryType* entry) const
+	{
+		return entry->ByteStride()->IsValid();
+	}
+};
+
+
+// #pragma mark - HasContainingTypePredicate
+
+
+struct HasContainingTypePredicate {
+	inline bool operator()(DIEPointerToMemberType* entry) const
+	{
+		return entry->ContainingType() != NULL;
 	}
 };
 
@@ -390,8 +450,56 @@ public:
 		return fType;
 	}
 
+	DwarfType* GetDwarfType() const
+	{
+		return fType;
+	}
+
 private:
 	DwarfType*	fType;
+
+};
+
+
+// #pragma mark - DwarfFunctionParameter
+
+
+struct DwarfStackFrameDebugInfo::DwarfFunctionParameter : FunctionParameter {
+public:
+	DwarfFunctionParameter(DIEFormalParameter* entry, const BString& name,
+		DwarfType* type)
+		:
+		fEntry(entry),
+		fName(name),
+		fType(type)
+	{
+		fType->AcquireReference();
+	}
+
+	~DwarfFunctionParameter()
+	{
+		fType->ReleaseReference();
+	}
+
+	virtual const char* Name() const
+	{
+		return fName.Length() > 0 ? fName.String() : NULL;
+	}
+
+	virtual Type* GetType() const
+	{
+		return fType;
+	}
+
+	DIEFormalParameter* Entry() const
+	{
+		return fEntry;
+	}
+
+private:
+	DIEFormalParameter*	fEntry;
+	BString				fName;
+	DwarfType*			fType;
 
 };
 
@@ -814,6 +922,11 @@ struct DwarfStackFrameDebugInfo::DwarfArrayType : ArrayType, DwarfType {
 		return fDimensions.ItemAt(index);
 	}
 
+	DwarfArrayDimension* DwarfDimensionAt(int32 index) const
+	{
+		return fDimensions.ItemAt(index);
+	}
+
 	virtual DIEType* GetDIEType() const
 	{
 		return fEntry;
@@ -840,6 +953,177 @@ private:
 	DIEArrayType*		fEntry;
 	DwarfType*			fBaseType;
 	DimensionList		fDimensions;
+};
+
+
+// #pragma mark - DwarfUnspecifiedType
+
+
+struct DwarfStackFrameDebugInfo::DwarfUnspecifiedType : UnspecifiedType,
+	DwarfType {
+public:
+	// NOTE: The entry may be NULL.
+	DwarfUnspecifiedType(const BString& name, DIEUnspecifiedType* entry)
+		:
+		DwarfType(name),
+		fEntry(entry)
+	{
+	}
+
+	~DwarfUnspecifiedType()
+	{
+	}
+
+	virtual DIEType* GetDIEType() const
+	{
+		return fEntry;
+	}
+
+	DIEUnspecifiedType* Entry() const
+	{
+		return fEntry;
+	}
+
+private:
+	DIEUnspecifiedType*	fEntry;
+};
+
+
+// #pragma mark - DwarfFunctionType
+
+
+struct DwarfStackFrameDebugInfo::DwarfFunctionType : FunctionType, DwarfType {
+	DwarfFunctionType(const BString& name, DIESubroutineType* entry,
+		DwarfType* returnType)
+		:
+		DwarfType(name),
+		fEntry(entry),
+		fReturnType(returnType),
+		fHasVariableArguments(false)
+	{
+		if (fReturnType != NULL)
+			fReturnType->AcquireReference();
+	}
+
+	~DwarfFunctionType()
+	{
+		for (int32 i = 0;
+			DwarfFunctionParameter* parameter = fParameters.ItemAt(i); i++) {
+			parameter->ReleaseReference();
+		}
+
+		if (fReturnType != NULL)
+			fReturnType->ReleaseReference();
+	}
+
+	virtual Type* ReturnType() const
+	{
+		return fReturnType;
+	}
+
+	virtual int32 CountParameters() const
+	{
+		return fParameters.CountItems();
+	}
+
+	virtual FunctionParameter* ParameterAt(int32 index) const
+	{
+		return fParameters.ItemAt(index);
+	}
+
+	DwarfFunctionParameter* DwarfParameterAt(int32 index) const
+	{
+		return fParameters.ItemAt(index);
+	}
+
+	virtual bool HasVariableArguments() const
+	{
+		return fHasVariableArguments;
+	}
+
+	void SetHasVariableArguments(bool hasVarArgs)
+	{
+		fHasVariableArguments = hasVarArgs;
+	}
+
+	virtual DIEType* GetDIEType() const
+	{
+		return fEntry;
+	}
+
+	DIESubroutineType* Entry() const
+	{
+		return fEntry;
+	}
+
+	bool AddParameter(DwarfFunctionParameter* parameter)
+	{
+		if (!fParameters.AddItem(parameter))
+			return false;
+
+		parameter->AcquireReference();
+		return true;
+	}
+
+private:
+	typedef BObjectList<DwarfFunctionParameter> ParameterList;
+
+private:
+	DIESubroutineType*	fEntry;
+	DwarfType*			fReturnType;
+	ParameterList		fParameters;
+	bool				fHasVariableArguments;
+};
+
+
+// #pragma mark - DwarfPointerToMemberType
+
+
+struct DwarfStackFrameDebugInfo::DwarfPointerToMemberType : PointerToMemberType,
+	DwarfType {
+public:
+	DwarfPointerToMemberType(const BString& name, DIEPointerToMemberType* entry,
+		DwarfCompoundType* containingType, DwarfType* baseType)
+		:
+		DwarfType(name),
+		fEntry(entry),
+		fContainingType(containingType),
+		fBaseType(baseType)
+	{
+		fContainingType->AcquireReference();
+		fBaseType->AcquireReference();
+	}
+
+	~DwarfPointerToMemberType()
+	{
+		fContainingType->ReleaseReference();
+		fBaseType->ReleaseReference();
+	}
+
+	virtual CompoundType* ContainingType() const
+	{
+		return fContainingType;
+	}
+
+	virtual Type* BaseType() const
+	{
+		return fBaseType;
+	}
+
+	virtual DIEType* GetDIEType() const
+	{
+		return fEntry;
+	}
+
+	DIEPointerToMemberType* Entry() const
+	{
+		return fEntry;
+	}
+
+private:
+	DIEPointerToMemberType*	fEntry;
+	DwarfCompoundType*		fContainingType;
+	DwarfType*				fBaseType;
 };
 
 
@@ -1059,6 +1343,158 @@ DwarfStackFrameDebugInfo::ResolveDataMemberLocation(StackFrame* stackFrame,
 		return B_NO_MEMORY;
 
 	_location = bitFieldLocationReference.Detach();
+	return B_OK;
+}
+
+
+status_t
+DwarfStackFrameDebugInfo::ResolveArrayElementLocation(StackFrame* stackFrame,
+	ArrayType* _type, const ArrayIndexPath& indexPath,
+	const ValueLocation& parentLocation, ValueLocation*& _location)
+{
+	DwarfArrayType* type = dynamic_cast<DwarfArrayType*>(_type);
+	if (type == NULL || indexPath.CountIndices() != type->CountDimensions())
+		return B_BAD_VALUE;
+	DIEArrayType* typeEntry = type->Entry();
+
+	// If the array entry has a bit stride, get it. Otherwise fall back to the
+	// element type size.
+	int64 bitStride;
+	if (DIEArrayType* bitStrideOwnerEntry = DwarfUtils::GetDIEByPredicate(
+			typeEntry, HasBitStridePredicate<DIEArrayType>())) {
+		BVariant value;
+		status_t error = fFile->EvaluateDynamicValue(fCompilationUnit,
+			fSubprogramEntry, bitStrideOwnerEntry->BitStride(),
+			fTargetInterface, fInstructionPointer, fFramePointer, value);
+		if (error != B_OK)
+			return error;
+		if (!value.IsInteger())
+			return B_BAD_VALUE;
+		bitStride = value.ToInt64();
+	} else
+		bitStride = type->BaseType()->ByteSize() * 8;
+
+	// Iterate backward through the dimensions and compute the total offset of
+	// the element.
+	int64 elementOffset = 0;
+	DwarfArrayDimension* previousDimension = NULL;
+	int64 previousDimensionStride = 0;
+	for (int32 dimensionIndex = type->CountDimensions() - 1;
+			dimensionIndex >= 0; dimensionIndex--) {
+		DwarfArrayDimension* dimension = type->DwarfDimensionAt(dimensionIndex);
+		int64 index = indexPath.IndexAt(dimensionIndex);
+
+		// If the dimension has a special bit/byte stride, get it.
+		int64 dimensionStride = 0;
+		DwarfType* dimensionType = dimension->GetDwarfType();
+		DIEArrayIndexType* dimensionTypeEntry = dimensionType != NULL
+			? dynamic_cast<DIEArrayIndexType*>(dimensionType->GetDIEType())
+			: NULL;
+		if (dimensionTypeEntry != NULL) {
+			DIEArrayIndexType* bitStrideOwnerEntry
+				= DwarfUtils::GetDIEByPredicate(dimensionTypeEntry,
+					HasBitStridePredicate<DIEArrayIndexType>());
+			if (bitStrideOwnerEntry != NULL) {
+				BVariant value;
+				status_t error = fFile->EvaluateDynamicValue(fCompilationUnit,
+					fSubprogramEntry, bitStrideOwnerEntry->BitStride(),
+					fTargetInterface, fInstructionPointer, fFramePointer,
+					value);
+				if (error != B_OK)
+					return error;
+				if (!value.IsInteger())
+					return B_BAD_VALUE;
+				dimensionStride = value.ToInt64();
+			} else {
+				DIEArrayIndexType* byteStrideOwnerEntry
+					= DwarfUtils::GetDIEByPredicate(dimensionTypeEntry,
+						HasByteStridePredicate<DIEArrayIndexType>());
+				if (byteStrideOwnerEntry != NULL) {
+					BVariant value;
+					status_t error = fFile->EvaluateDynamicValue(
+						fCompilationUnit, fSubprogramEntry,
+						byteStrideOwnerEntry->ByteStride(), fTargetInterface,
+						fInstructionPointer, fFramePointer, value);
+					if (error != B_OK)
+						return error;
+					if (!value.IsInteger())
+						return B_BAD_VALUE;
+					dimensionStride = value.ToInt64() * 8;
+				}
+			}
+		}
+
+		// If we don't have a stride for the dimension yet, use the stride of
+		// the previous dimension multiplied by the size of the dimension.
+		if (dimensionStride == 0) {
+			if (previousDimension != NULL) {
+				dimensionStride = previousDimensionStride
+					* previousDimension->CountElements();
+			} else {
+				// the last dimension -- use the element bit stride
+				dimensionStride = bitStride;
+			}
+		}
+
+		// If the dimension stride is still 0 (that can happen, if the dimension
+		// doesn't have a stride and the previous dimension's element count is
+		// not known), we can only resolve the first element.
+		if (dimensionStride == 0 && index != 0) {
+			WARNING("No dimension bit stride for dimension %ld and element "
+				"index is not 0.\n", dimensionIndex);
+			return B_BAD_VALUE;
+		}
+
+		elementOffset += dimensionStride * index;
+
+		previousDimension = dimension;
+		previousDimensionStride = dimensionStride;
+	}
+
+	TRACE_LOCALS("total element bit offset: %lld\n", elementOffset);
+
+	// create the value location object for the element
+	ValueLocation* location = new(std::nothrow) ValueLocation(
+		parentLocation.IsBigEndian());
+	if (location == NULL)
+		return B_NO_MEMORY;
+	Reference<ValueLocation> locationReference(location, true);
+
+	// If we have a single memory piece location for the array, we compute the
+	// element's location by hand -- not uncommonly the array size isn't known.
+	if (parentLocation.CountPieces() == 1) {
+		ValuePieceLocation piece = parentLocation.PieceAt(0);
+		if (piece.type == VALUE_PIECE_LOCATION_MEMORY) {
+			int64 byteOffset = elementOffset >= 0
+				? elementOffset / 8 : (elementOffset - 7) / 8;
+			piece.SetToMemory(piece.address + byteOffset);
+			piece.SetSize(type->BaseType()->ByteSize() * 8);
+			// TODO: Support bit offsets correctly!
+			// TODO: Support bit fields (primitive types) correctly!
+
+			if (!location->AddPiece(piece))
+				return B_NO_MEMORY;
+
+			_location = locationReference.Detach();
+			return B_OK;
+		}
+	}
+
+	// We can't deal with negative element offsets at this point. It doesn't
+	// make a lot of sense anyway, if the array location consists of multiple
+	// pieces or lives in a register.
+	if (elementOffset < 0) {
+		WARNING("Negative element offset unsupported for multiple location "
+			"pieces or register pieces.\n");
+		return B_UNSUPPORTED;
+	}
+
+	if (!location->SetTo(parentLocation, elementOffset,
+			type->BaseType()->ByteSize() * 8)) {
+		return B_NO_MEMORY;
+	}
+
+	_location = locationReference.Detach();
 	return B_OK;
 }
 
@@ -1303,10 +1739,16 @@ DwarfStackFrameDebugInfo::_CreateTypeInternal(DIEType* typeEntry,
 				dynamic_cast<DIESubrangeType*>(typeEntry), _type);
 
 		case DW_TAG_unspecified_type:
+			return _CreateUnspecifiedType(name,
+				dynamic_cast<DIEUnspecifiedType*>(typeEntry), _type);
+
 		case DW_TAG_subroutine_type:
+			return _CreateFunctionType(name,
+				dynamic_cast<DIESubroutineType*>(typeEntry), _type);
+
 		case DW_TAG_ptr_to_member_type:
-			// TODO: Implement!
-			return B_UNSUPPORTED;
+			return _CreatePointerToMemberType(name,
+				dynamic_cast<DIEPointerToMemberType*>(typeEntry), _type);
 
 		case DW_TAG_string_type:
 		case DW_TAG_file_type:
@@ -1523,14 +1965,24 @@ DwarfStackFrameDebugInfo::_CreateAddressType(const BString& name,
 	// get the base type entry
 	DIEAddressingType* baseTypeOwnerEntry = DwarfUtils::GetDIEByPredicate(
 		typeEntry, HasTypePredicate<DIEAddressingType>());
-	if (baseTypeOwnerEntry == NULL)
-		return B_BAD_VALUE;
 
 	// create the base type
 	DwarfType* baseType;
-	status_t error = _CreateType(baseTypeOwnerEntry->GetType(), baseType);
-	if (error != B_OK)
-		return error;
+	if (baseTypeOwnerEntry != NULL) {
+		status_t error = _CreateType(baseTypeOwnerEntry->GetType(), baseType);
+		if (error != B_OK)
+			return error;
+	} else {
+		// According to the DWARF 3 specs a modified type *has* a base type.
+		// GCC 4 doesn't (always?) bother to add one for "void".
+		// TODO: We should probably search for a respective type by name. ATM
+		// we just create a DwarfUnspecifiedType without DIE.
+		TRACE_LOCALS("no base type for address type entry -- creating "
+			"unspecified type\n");
+		baseType = new(std::nothrow) DwarfUnspecifiedType("void", NULL);
+		if (baseType == NULL)
+			return B_NO_MEMORY;
+	}
 	Reference<Type> baseTypeReference(baseType, true);
 
 	DwarfAddressType* type = new(std::nothrow) DwarfAddressType(name, typeEntry,
@@ -1867,9 +2319,9 @@ DwarfStackFrameDebugInfo::_CreateSubrangeType(const BString& name,
 			}
 
 			if (isSigned)
-				upperBound.SetTo(lowerBound.ToInt64() + count.ToInt64());
+				upperBound.SetTo(lowerBound.ToInt64() + count.ToInt64() - 1);
 			else
-				upperBound.SetTo(lowerBound.ToUInt64() + count.ToUInt64());
+				upperBound.SetTo(lowerBound.ToUInt64() + count.ToUInt64() - 1);
 		}
 	}
 
@@ -1894,6 +2346,144 @@ DwarfStackFrameDebugInfo::_CreateSubrangeType(const BString& name,
 	// create the type
 	DwarfSubrangeType* type = new(std::nothrow) DwarfSubrangeType(name,
 		typeEntry, baseType, lowerBound, upperBound);
+	if (type == NULL)
+		return B_NO_MEMORY;
+
+	_type = type;
+	return B_OK;
+}
+
+
+status_t
+DwarfStackFrameDebugInfo::_CreateUnspecifiedType(const BString& name,
+	DIEUnspecifiedType* typeEntry, DwarfType*& _type)
+{
+	DwarfUnspecifiedType* type = new(std::nothrow) DwarfUnspecifiedType(name,
+		typeEntry);
+	if (type == NULL)
+		return B_NO_MEMORY;
+
+	_type = type;
+	return B_OK;
+}
+
+status_t
+DwarfStackFrameDebugInfo::_CreateFunctionType(const BString& name,
+	DIESubroutineType* typeEntry, DwarfType*& _type)
+{
+	// get the return type
+	DIESubroutineType* returnTypeOwnerEntry = DwarfUtils::GetDIEByPredicate(
+		typeEntry, HasReturnTypePredicate<DIESubroutineType>());
+
+	// create the base type
+	DwarfType* returnType = NULL;
+	if (returnTypeOwnerEntry != NULL) {
+		status_t error = _CreateType(returnTypeOwnerEntry->ReturnType(),
+			returnType);
+		if (error != B_OK)
+			return error;
+	}
+	Reference<Type> returnTypeReference(returnType, true);
+
+	DwarfFunctionType* type = new(std::nothrow) DwarfFunctionType(name,
+		typeEntry, returnType);
+	if (type == NULL)
+		return B_NO_MEMORY;
+	Reference<DwarfType> typeReference(type, true);
+
+	// get the parameters
+	DIESubroutineType* parameterOwnerEntry = DwarfUtils::GetDIEByPredicate(
+		typeEntry, HasParametersPredicate<DIESubroutineType>());
+
+	if (parameterOwnerEntry != NULL) {
+		for (DebugInfoEntryList::ConstIterator it
+					= parameterOwnerEntry->Parameters().GetIterator();
+				DebugInfoEntry* _parameterEntry = it.Next();) {
+			if (_parameterEntry->Tag() == DW_TAG_unspecified_parameters) {
+				type->SetHasVariableArguments(true);
+				continue;
+			}
+
+			DIEFormalParameter* parameterEntry
+				= dynamic_cast<DIEFormalParameter*>(_parameterEntry);
+
+			// get the type
+			DIEFormalParameter* typeOwnerEntry = DwarfUtils::GetDIEByPredicate(
+				parameterEntry, HasTypePredicate<DIEFormalParameter>());
+			if (typeOwnerEntry == NULL)
+				return B_BAD_VALUE;
+
+			DwarfType* parameterType;
+			status_t error = _CreateType(typeOwnerEntry->GetType(),
+				parameterType);
+			if (error != B_OK)
+				return error;
+			Reference<DwarfType> parameterTypeReference(parameterType, true);
+
+			// get the name
+			BString parameterName;
+			DwarfUtils::GetDIEName(parameterEntry, parameterName);
+
+			// create and add the parameter object
+			DwarfFunctionParameter* parameter
+				= new(std::nothrow) DwarfFunctionParameter(parameterEntry,
+					parameterName, parameterType);
+			Reference<DwarfFunctionParameter> parameterReference(parameter,
+				true);
+			if (parameter == NULL || !type->AddParameter(parameter))
+				return B_NO_MEMORY;
+		}
+	}
+
+
+	_type = typeReference.Detach();
+	return B_OK;
+}
+
+
+status_t
+DwarfStackFrameDebugInfo::_CreatePointerToMemberType(const BString& name,
+	DIEPointerToMemberType* typeEntry, DwarfType*& _type)
+{
+	// get the containing and base type entries
+	DIEPointerToMemberType* containingTypeOwnerEntry
+		= DwarfUtils::GetDIEByPredicate(typeEntry,
+			HasContainingTypePredicate());
+	DIEPointerToMemberType* baseTypeOwnerEntry = DwarfUtils::GetDIEByPredicate(
+		typeEntry, HasTypePredicate<DIEPointerToMemberType>());
+
+	if (containingTypeOwnerEntry == NULL || baseTypeOwnerEntry == NULL) {
+		WARNING("Failed to get containing or base type for pointer to member "
+			"type \"%s\"\n", name.String());
+		return B_BAD_VALUE;
+	}
+
+	// create the containing type
+	DwarfType* containingType;
+	status_t error = _CreateType(containingTypeOwnerEntry->ContainingType(),
+		containingType);
+	if (error != B_OK)
+		return error;
+	Reference<Type> containingTypeReference(containingType, true);
+
+	DwarfCompoundType* compoundContainingType
+		= dynamic_cast<DwarfCompoundType*>(containingType);
+	if (compoundContainingType == NULL) {
+		WARNING("Containing type for pointer to member type \"%s\" is not a "
+			"compound type.\n", name.String());
+		return B_BAD_VALUE;
+	}
+
+	// create the base type
+	DwarfType* baseType;
+	error = _CreateType(baseTypeOwnerEntry->GetType(), baseType);
+	if (error != B_OK)
+		return error;
+	Reference<Type> baseTypeReference(baseType, true);
+
+	// create the type object
+	DwarfPointerToMemberType* type = new(std::nothrow) DwarfPointerToMemberType(
+		name, typeEntry, compoundContainingType, baseType);
 	if (type == NULL)
 		return B_NO_MEMORY;
 
@@ -2034,6 +2624,7 @@ DwarfStackFrameDebugInfo::_ResolveTypeByteSize(DIEType* typeEntry,
 				break;
 			case DW_TAG_pointer_type:
 			case DW_TAG_reference_type:
+			case DW_TAG_ptr_to_member_type:
 				_size = fCompilationUnit->AddressSize();
 
 				TRACE_LOCALS("  pointer/reference type: size: %llu\n", _size);
