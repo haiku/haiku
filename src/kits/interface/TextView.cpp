@@ -1913,6 +1913,8 @@ BTextView::OffsetAt(BPoint point) const
 int32
 BTextView::OffsetAt(int32 line) const
 {
+	if (line < 0)
+		return 0;
 	if (line > fLines->NumLines())
 		return fText->Length();
 
