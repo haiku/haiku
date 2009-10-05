@@ -1,46 +1,32 @@
-/******************************************************************************
- * $Id$
+/*
+ * Copyright 2005-2009, Haiku Inc.
+ * This file may be used under the terms of the MIT License.
  *
- * BeMailToMBox is a utility program (requested by Frank Zschockelt) that
- * converts BeOS e-mail files into Unix mailbox files (the kind that Pine
- * uses).  All the files in the input directory are concatenated with the
- * appropriate mbox header lines added between them, and trailing blank lines
- * reduced.  The resulting text is written to standard output.  Command line
- * driven.
- *
- * $Log: BeMailToMBox.cpp,v $ (now manually updated)
- * r13960 | agmsmith | 2005-08-13 22:10:49 -0400 (Sat, 13 Aug 2005) | 3 lines
- * More file movement for the BeMail utilities...  Content updates later to
- * avoid confusing svn.
- *
- * r13955 | agmsmith | 2005-08-13 19:43:41 -0400 (Sat, 13 Aug 2005) | 5 lines
- * Half way through adding some more BeMail related utilities - they use
- * libmail.so which isn't backwards compatibile so they need recompiling for
- * Haiku - thus better to include them here.  Also want spam levels of 1E-6 to
- * be visible for genuine messages.
- *
- * Revision 1.1  2002/02/24 18:16:46  agmsmith
- * Initial revision
+ * Originally public domain written by Alexander G. M. Smith.
  */
 
-/* BeOS headers. */
+
+/*!	BeMailToMBox is a utility program (requested by Frank Zschockelt) that
+	converts BeOS e-mail files into Unix mailbox files (the kind that Pine
+	uses).  All the files in the input directory are concatenated with the
+	appropriate mbox header lines added between them, and trailing blank lines
+	reduced.  The resulting text is written to standard output.  Command line
+	driven.
+*/
+
+#include <ctype.h>
+#include <errno.h>
+#include <string.h>
+#include <stdio.h>
+#include <time.h>
 
 #include <Application.h>
 #include <StorageKit.h>
 #include <SupportKit.h>
 
-/* Posix headers. */
 
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <errno.h>
-#include <time.h>
-
-
-/******************************************************************************
- * Globals
- */
+extern const char* __progname;
+static const char* kProgramName = __progname;
 
 time_t DateStampTime;
   /* Time value used for stamping each message header.  Incremented by 1 second
@@ -367,11 +353,6 @@ ErrorExit:
 }
 
 
-
-/******************************************************************************
- * Finally, the main program which drives it all.
- */
-
 int main (int argc, char** argv)
 {
   dirent_t    *DirEntPntr;
@@ -390,10 +371,8 @@ int main (int argc, char** argv)
     printf ("work with other Unix style mailbox files.  Each message in\n");
     printf ("the input directory is converted and sent to the standard\n");
     printf ("output.  Usage:\n\n");
-    printf ("bemailtombox InputDirectory >OutputFile\n\n");
+    printf ("%s InputDirectory >OutputFile\n\n", kProgramName);
     printf ("Public domain, by Alexander G. M. Smith.\n");
-    printf ("$Id$\n");
-    printf ("$HeadURL$\n");
     return -10;
   }
 

@@ -1,92 +1,38 @@
-/******************************************************************************
- * $Id$
+/*
+ * Copyright 2005-2009, Haiku Inc.
+ * This file may be used under the terms of the MIT License.
  *
- * MboxToBeMail is a utility program that converts Unix mailbox (mbox) files
- * (the kind that Pine uses) into e-mail files for use with BeOS.  It also
- * handles news files from rn and trn, which have messages very similar to mail
- * messages but with a different separator line.  The input files store
- * multiple mail messages in text format separated by "From ..." lines or
- * "Article ..." lines.  The output is a bunch of separate files, each one with
- * one message plus BeOS BFS attributes describing that message.  For
- * convenience, all the messages that were from one file are put in a specified
- * directory.
- *
- * Command line driven.  Version 1.7 and up (which have support for
- * international character sets (as requested by "MFC" Zahar from Russia) and
- * the Thread attribute) require the libmail.so that comes with the Mail Daemon
- * Replacement (MDR) version 2.2.6 or later (http://www.bebits.com/app/2289 or
- * http://sourceforge.net/projects/bemaildaemon/).  Use version 1.6 (get it
- * from the version history pages on BeBits) if you don't want to install MDR.
- *
- * $Log: MailboxToBeMail.cpp,v $ (manually updated now that SVN is used)
- * r13960 | agmsmith | 2005-08-13 22:10:49 -0400 (Sat, 13 Aug 2005) | 3 lines
- * More file movement for the BeMail utilities...  Content updates later to
- * avoid confusing svn.
- *
- * r13955 | agmsmith | 2005-08-13 19:43:41 -0400 (Sat, 13 Aug 2005) | 5 lines
- * Half way through adding some more BeMail related utilities - they use
- * libmail.so which isn't backwards compatibile so they need recompiling for
- * Haiku - thus better to include them here.  Also want spam levels of 1E-6 to
- * be visible for genuine messages.
- *
- * Revision 1.9  2003/12/31 00:37:46  agmsmith
- * Use the MDR date parsing routine rather than parsedate, so it
- * can handle newer date formats.
- *
- * Revision 1.8  2003/12/28 19:03:57  agmsmith
- * Added an option to save or not save the separator text line.
- *
- * Revision 1.7  2003/12/28 04:23:21  agmsmith
- * Now uses the Mail Daemon Replacement library to parse the headers,
- * which means they now handle foreign character sets (converted
- * automatically to UTF-8), so Subject and To are correct when they
- * are used as part of the file name.
- *
- * Revision 1.6  2002/01/14 20:23:21  agmsmith
- * Include the detection line with the message header, just for completeness.
- *
- * Revision 1.5  2002/01/14 03:21:43  agmsmith
- * Added processing of UseNet articles, and allowed an older date format.
- *
- * Revision 1.4  2002/01/14 00:06:59  agmsmith
- * Don't allow slashes in file names.
- *
- * Revision 1.3  2002/01/13 23:33:26  agmsmith
- * First seemingly working version.
- *
- * Revision 1.2  2002/01/13 17:57:26  agmsmith
- * Can now pick out separate messages from the inbox.
- *
- * Revision 1.1  2002/01/13 15:25:33  agmsmith
- * Initial revision
+ * Originally public domain written by Alexander G. M. Smith.
  */
 
-/* BeOS headers. */
+
+/*!	MboxToBeMail is a utility program that converts Unix mailbox (mbox) files
+	(the kind that Pine uses) into e-mail files for use with BeOS.  It also
+	handles news files from rn and trn, which have messages very similar to mail
+	messages but with a different separator line.  The input files store
+	multiple mail messages in text format separated by "From ..." lines or
+	"Article ..." lines.  The output is a bunch of separate files, each one with
+	one message plus BeOS BFS attributes describing that message.  For
+	convenience, all the messages that were from one file are put in a specified
+	directory.
+*/
+
+#include <ctype.h>
+#include <errno.h>
+#include <string.h>
+#include <stdio.h>
 
 #include <Application.h>
 #include <E-mail.h>
 #include <StorageKit.h>
 #include <SupportKit.h>
 
-/* Posix headers. */
-
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <errno.h>
-
-/* MDR headers (get the MDR source and add the MDR include/public and
-include/numail directories to the project path settings).  Or just use
-the Haiku build process which is already set up to include the right ones. */
-
 #include <MailMessage.h>
 #include <mail_util.h>
 
 
-
-/******************************************************************************
- * Globals
- */
+extern const char* __progname;
+static const char* kProgramName = __progname;
 
 char       InputPathName [B_PATH_NAME_LENGTH];
 FILE      *InputFile;
@@ -552,11 +498,6 @@ status_t SaveMessage (BString &MessageText)
 }
 
 
-
-/******************************************************************************
- * Finally, the main program which drives it all.
- */
-
 int main (int argc, char** argv)
 {
   char         ErrorMessage [B_PATH_NAME_LENGTH + 80];
@@ -585,10 +526,8 @@ int main (int argc, char** argv)
     printf ("separator text line at the top of each message, the default\n");
     printf ("is to lose it.\n\n");
     printf ("Usage:\n\n");
-    printf ("mboxtobemail [-s] InputFile [OutputDirectory]\n\n");
+    printf ("%s [-s] InputFile [OutputDirectory]\n\n", kProgramName);
     printf ("Public domain, by Alexander G. M. Smith.\n");
-    printf ("$Id$\n");
-    printf ("$HeadURL$\n");
     return -10;
   }
 
