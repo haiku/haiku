@@ -504,7 +504,7 @@ int main (int argc, char** argv)
   bool         HaveOldMessage = false;
   int          MessagesDoneCount = 0;
   BString      MessageText;
-  BApplication MyApp ("application/x-vnd.agmsmith.mboxtobemail");
+  BApplication MyApp ("application/x-vnd.Haiku-mbox2mail");
   int          NextArgIndex;
   char         OutputDirectoryPathName [B_PATH_NAME_LENGTH];
   status_t     ReturnCode = -1;
