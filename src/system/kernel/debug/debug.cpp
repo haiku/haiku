@@ -13,6 +13,8 @@
 
 #include "blue_screen.h"
 
+#include <algorithm>
+
 #include <cpu.h>
 #include <debug.h>
 #include <debug_heap.h>
@@ -1529,6 +1531,10 @@ debug_call_with_fault_handler(jmp_buf jumpBuffer, void (*function)(void*),
 status_t
 debug_memcpy(void* to, const void* from, size_t size)
 {
+	// don't allow address overflows
+	if ((addr_t)from + size < (addr_t)from || (addr_t)to + size < (addr_t)to)
+		return B_BAD_ADDRESS;
+
 	debug_memcpy_parameters parameters = {to, from, size};
 
 	if (debug_call_with_fault_handler(gCPU[sDebuggerOnCPU].fault_jump_buffer,
@@ -1545,12 +1551,26 @@ debug_memcpy(void* to, const void* from, size_t size)
 ssize_t
 debug_strlcpy(char* to, const char* from, size_t size)
 {
-	debug_strlcpy_parameters parameters = {to, from, size};
+	if (size == 0)
+		return 0;
+	if (from == NULL || to == NULL)
+		return B_BAD_ADDRESS;
+
+	// limit size to avoid address overflows
+	size_t maxSize = std::min(size,
+		~(addr_t)0 - std::max((addr_t)from, (addr_t)to) + 1);
+
+	debug_strlcpy_parameters parameters = {to, from, maxSize};
 
 	if (debug_call_with_fault_handler(gCPU[sDebuggerOnCPU].fault_jump_buffer,
 			&debug_strlcpy_trampoline, &parameters) != 0) {
 		return B_BAD_ADDRESS;
 	}
+
+	// If we hit the address overflow boundary, fail.
+	if (parameters.result == maxSize && maxSize < size)
+		return B_BAD_ADDRESS;
+
 	return parameters.result;
 }
 

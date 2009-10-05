@@ -16,6 +16,8 @@
 #include <string.h>
 #include <sys/mman.h>
 
+#include <algorithm>
+
 #include <OS.h>
 #include <KernelExport.h>
 
@@ -5457,6 +5459,10 @@ vm_memcpy_physical_page(addr_t to, addr_t from)
 status_t
 user_memcpy(void* to, const void* from, size_t size)
 {
+	// don't allow address overflows
+	if ((addr_t)from + size < (addr_t)from || (addr_t)to + size < (addr_t)to)
+		return B_BAD_ADDRESS;
+
 	if (arch_cpu_user_memcpy(to, from, size,
 			&thread_get_current_thread()->fault_handler) < B_OK)
 		return B_BAD_ADDRESS;
@@ -5477,14 +5483,34 @@ user_memcpy(void* to, const void* from, size_t size)
 ssize_t
 user_strlcpy(char* to, const char* from, size_t size)
 {
-	return arch_cpu_user_strlcpy(to, from, size,
+	if (size == 0)
+		return 0;
+	if (from == NULL || to == NULL)
+		return B_BAD_ADDRESS;
+
+	// limit size to avoid address overflows
+	size_t maxSize = std::min(size,
+		~(addr_t)0 - std::max((addr_t)from, (addr_t)to) + 1);
+
+
+	ssize_t result = arch_cpu_user_strlcpy(to, from, maxSize,
 		&thread_get_current_thread()->fault_handler);
+
+	// If we hit the address overflow boundary, fail.
+	if (result >= 0 && (size_t)result == maxSize && maxSize < size)
+		return B_BAD_ADDRESS;
+
+	return result;
 }
 
 
 status_t
 user_memset(void* s, char c, size_t count)
 {
+	// don't allow address overflows
+	if ((addr_t)s + count < (addr_t)s)
+		return B_BAD_ADDRESS;
+
 	if (arch_cpu_user_memset(s, c, count,
 			&thread_get_current_thread()->fault_handler) < B_OK)
 		return B_BAD_ADDRESS;
