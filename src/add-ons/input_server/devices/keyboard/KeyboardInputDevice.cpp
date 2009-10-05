@@ -735,7 +735,7 @@ KeyboardDevice::_ControlThread()
 			if (numBytes > 0) {
 				for (int i = 0; i < numBytes; i++)
 					msg->AddInt8("byte", (int8)string[i]);
-				msg->AddData("bytes", B_STRING_TYPE, string, numBytes);
+				msg->AddData("bytes", B_STRING_TYPE, string, numBytes + 1);
 
 				if (rawNumBytes <= 0) {
 					rawNumBytes = 1;

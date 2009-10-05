@@ -1117,7 +1117,7 @@ FrameMoved(origin);
 					ssize_t bytes;
 					if (msg->FindData("bytes", B_STRING_TYPE,
 						(const void**)&string, &bytes) == B_OK) {
-						view->KeyDown(string, bytes);
+						view->KeyDown(string, bytes - 1);
 					}
 				} else
 					target->MessageReceived(msg);
@@ -1133,7 +1133,7 @@ FrameMoved(origin);
 				ssize_t bytes;
 				if (msg->FindData("bytes", B_STRING_TYPE,
 					(const void**)&string, &bytes) == B_OK) {
-					view->KeyUp(string, bytes);
+					view->KeyUp(string, bytes - 1);
 				}
 			} else
 				target->MessageReceived(msg);
