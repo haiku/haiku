@@ -620,6 +620,45 @@ DIEDeclaredNamedBase::AddAttribute_declaration(uint16 attributeName,
 }
 
 
+// #pragma mark - DIEArrayIndexType
+
+
+DIEArrayIndexType::DIEArrayIndexType()
+{
+}
+
+
+const DynamicAttributeValue*
+DIEArrayIndexType::ByteSize() const
+{
+	return &fByteSize;
+}
+
+
+status_t
+DIEArrayIndexType::AddAttribute_bit_stride(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fBitStride, value);
+}
+
+
+status_t
+DIEArrayIndexType::AddAttribute_byte_size(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fByteSize, value);
+}
+
+
+status_t
+DIEArrayIndexType::AddAttribute_byte_stride(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fByteStride, value);
+}
+
+
 // #pragma mark - DIEArrayType
 
 
@@ -770,13 +809,6 @@ DIEEnumerationType::Specification() const
 }
 
 
-const DynamicAttributeValue*
-DIEEnumerationType::ByteSize() const
-{
-	return &fByteSize;
-}
-
-
 status_t
 DIEEnumerationType::AddChild(DebugInfoEntry* child)
 {
@@ -786,30 +818,6 @@ DIEEnumerationType::AddChild(DebugInfoEntry* child)
 	}
 
 	return DIEDerivedType::AddChild(child);
-}
-
-
-status_t
-DIEEnumerationType::AddAttribute_bit_stride(uint16 attributeName,
-	const AttributeValue& value)
-{
-	return SetDynamicAttributeValue(fBitStride, value);
-}
-
-
-status_t
-DIEEnumerationType::AddAttribute_byte_size(uint16 attributeName,
-	const AttributeValue& value)
-{
-	return SetDynamicAttributeValue(fByteSize, value);
-}
-
-
-status_t
-DIEEnumerationType::AddAttribute_byte_stride(uint16 attributeName,
-	const AttributeValue& value)
-{
-	return SetDynamicAttributeValue(fByteStride, value);
 }
 
 
@@ -1414,6 +1422,24 @@ DIEPointerToMemberType::AddAttribute_containing_type(uint16 attributeName,
 }
 
 
+status_t
+DIEPointerToMemberType::AddAttribute_use_location(uint16 attributeName,
+	const AttributeValue& value)
+{
+	if (value.attributeClass == ATTRIBUTE_CLASS_LOCLISTPTR) {
+		fUseLocation.SetToLocationList(value.pointer);
+		return B_OK;
+	}
+
+	if (value.attributeClass == ATTRIBUTE_CLASS_BLOCK) {
+		fUseLocation.SetToExpression(value.block.data, value.block.length);
+		return B_OK;
+	}
+
+	return B_BAD_DATA;
+}
+
+
 // #pragma mark - DIESetType
 
 
@@ -1458,37 +1484,6 @@ uint16
 DIESubrangeType::Tag() const
 {
 	return DW_TAG_subrange_type;
-}
-
-
-const DynamicAttributeValue*
-DIESubrangeType::ByteSize() const
-{
-	return &fByteSize;
-}
-
-
-status_t
-DIESubrangeType::AddAttribute_bit_stride(uint16 attributeName,
-	const AttributeValue& value)
-{
-	return SetDynamicAttributeValue(fBitStride, value);
-}
-
-
-status_t
-DIESubrangeType::AddAttribute_byte_size(uint16 attributeName,
-	const AttributeValue& value)
-{
-	return SetDynamicAttributeValue(fByteSize, value);
-}
-
-
-status_t
-DIESubrangeType::AddAttribute_byte_stride(uint16 attributeName,
-	const AttributeValue& value)
-{
-	return SetDynamicAttributeValue(fByteStride, value);
 }
 
 

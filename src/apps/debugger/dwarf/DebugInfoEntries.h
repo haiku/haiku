@@ -42,6 +42,11 @@
 
 // class base: compound
 
+// array index: derived
+// DW_AT_bit_stride
+// DW_AT_byte_stride
+// DW_AT_byte_size
+
 
 // unspecified: common
 // DECL
@@ -65,10 +70,7 @@
 // DW_AT_type
 
 
-// enumeration: derived
-// DW_AT_bit_stride
-// DW_AT_byte_size
-// DW_AT_byte_stride
+// enumeration: array index
 // DW_AT_specification
 
 // pointer to member: derived
@@ -79,10 +81,7 @@
 // set: derived
 // DW_AT_byte_size
 
-// subrange: derived
-// DW_AT_bit_stride
-// DW_AT_byte_size
-// DW_AT_byte_stride
+// subrange: array index
 // DW_AT_count
 // DW_AT_lower_bound
 // DW_AT_threads_scaled
@@ -425,6 +424,31 @@ protected:
 };
 
 
+class DIEArrayIndexType : public DIEDerivedType {
+public:
+								DIEArrayIndexType();
+
+	virtual	const DynamicAttributeValue* ByteSize() const;
+
+			const DynamicAttributeValue* BitStride() const
+									{ return &fBitStride; }
+			const DynamicAttributeValue* ByteStride() const
+									{ return &fByteStride; }
+
+	virtual	status_t			AddAttribute_bit_stride(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_byte_stride(uint16 attributeName,
+									const AttributeValue& value);
+
+private:
+			DynamicAttributeValue fBitStride;
+			DynamicAttributeValue fByteSize;
+			DynamicAttributeValue fByteStride;
+};
+
+
 // #pragma mark -
 
 
@@ -440,6 +464,9 @@ public:
 	virtual	DebugInfoEntry*		Specification() const;
 
 	virtual	const DynamicAttributeValue* ByteSize() const;
+
+			const DynamicAttributeValue* BitStride() const
+									{ return &fBitStride; }
 
 			const DebugInfoEntryList& Dimensions() const
 									{ return fDimensions; }
@@ -495,7 +522,7 @@ public:
 };
 
 
-class DIEEnumerationType : public DIEDerivedType {
+class DIEEnumerationType : public DIEArrayIndexType {
 public:
 								DIEEnumerationType();
 
@@ -503,26 +530,15 @@ public:
 
 	virtual	DebugInfoEntry*		Specification() const;
 
-	virtual	const DynamicAttributeValue* ByteSize() const;
-
 			const DebugInfoEntryList& Enumerators() const
 									{ return fEnumerators; }
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
-	virtual	status_t			AddAttribute_bit_stride(uint16 attributeName,
-									const AttributeValue& value);
-	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
-									const AttributeValue& value);
-	virtual	status_t			AddAttribute_byte_stride(uint16 attributeName,
-									const AttributeValue& value);
 	virtual	status_t			AddAttribute_specification(uint16 attributeName,
 									const AttributeValue& value);
 
 private:
-			DynamicAttributeValue fBitStride;
-			DynamicAttributeValue fByteSize;
-			DynamicAttributeValue fByteStride;
 			DIEEnumerationType*	fSpecification;
 			DebugInfoEntryList	fEnumerators;
 };
@@ -606,8 +622,8 @@ public:
 			target_addr_t		LowPC() const	{ return fLowPC; }
 			target_addr_t		HighPC() const	{ return fHighPC; }
 
-			const DebugInfoEntryList Variables() const	{ return fVariables; }
-			const DebugInfoEntryList Blocks() const		{ return fBlocks; }
+			const DebugInfoEntryList& Variables() const	{ return fVariables; }
+			const DebugInfoEntryList& Blocks() const	{ return fBlocks; }
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
@@ -737,6 +753,10 @@ public:
 								DIESubroutineType();
 
 	virtual	uint16				Tag() const;
+
+			DIEType*			ReturnType() const	{ return fReturnType; }
+
+			const DebugInfoEntryList& Parameters() const { return fParameters; }
 
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
@@ -899,17 +919,24 @@ public:
 
 	virtual	uint16				Tag() const;
 
+			DIECompoundType*	ContainingType() const
+									{ return fContainingType; }
+
+			const LocationDescription& UseLocation() const
+									{ return fUseLocation; }
+
 	virtual	status_t			AddAttribute_address_class(uint16 attributeName,
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_containing_type(
 									uint16 attributeName,
 									const AttributeValue& value);
+	virtual	status_t			AddAttribute_use_location(uint16 attributeName,
+									const AttributeValue& value);
 
 protected:
 			DIECompoundType*	fContainingType;
+			LocationDescription	fUseLocation;
 			uint8				fAddressClass;
-// TODO:
-// DW_AT_use_location
 };
 
 
@@ -929,18 +956,12 @@ private:
 };
 
 
-class DIESubrangeType : public DIEDerivedType {
+class DIESubrangeType : public DIEArrayIndexType {
 public:
 								DIESubrangeType();
 
 	virtual	uint16				Tag() const;
 
-	virtual	const DynamicAttributeValue* ByteSize() const;
-
-			const DynamicAttributeValue* BitStride() const
-									{ return &fBitStride; }
-			const DynamicAttributeValue* ByteStride() const
-									{ return &fByteStride; }
 			const DynamicAttributeValue* LowerBound() const
 									{ return &fLowerBound; }
 			const DynamicAttributeValue* UpperBound() const
@@ -948,12 +969,6 @@ public:
 			const DynamicAttributeValue* Count() const
 									{ return &fCount; }
 
-	virtual	status_t			AddAttribute_bit_stride(uint16 attributeName,
-									const AttributeValue& value);
-	virtual	status_t			AddAttribute_byte_size(uint16 attributeName,
-									const AttributeValue& value);
-	virtual	status_t			AddAttribute_byte_stride(uint16 attributeName,
-									const AttributeValue& value);
 	virtual	status_t			AddAttribute_count(uint16 attributeName,
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_lower_bound(uint16 attributeName,
@@ -965,9 +980,6 @@ public:
 									const AttributeValue& value);
 
 private:
-			DynamicAttributeValue fBitStride;
-			DynamicAttributeValue fByteSize;
-			DynamicAttributeValue fByteStride;
 			DynamicAttributeValue fCount;
 			DynamicAttributeValue fLowerBound;
 			DynamicAttributeValue fUpperBound;
