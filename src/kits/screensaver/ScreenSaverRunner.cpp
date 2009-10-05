@@ -172,7 +172,8 @@ ScreenSaverRunner::_CleanUp()
 void
 ScreenSaverRunner::_Run() 
 {
-	const uint32 kTickBase = 50000;
+	static const uint32 kInitialTickRate = 50000;
+
 	if (fWindow->Lock()) {
 		fView->SetViewColor(0, 0, 0);
 		fView->SetLowColor(0, 0, 0);
@@ -181,10 +182,13 @@ ScreenSaverRunner::_Run()
 		fWindow->Unlock();
 	}
 	
+	// TODO: This code is getting awfully complicated and should
+	// probably be refactored.
+	uint32 tickBase = kInitialTickRate;
 	int32 snoozeCount = 0;
 	int32 frame = 0;
 	bigtime_t lastTickTime = 0;
-	bigtime_t tick = fSaver ? fSaver->TickSize() : kTickBase;
+	bigtime_t tick = fSaver ? fSaver->TickSize() : tickBase;
 
 	while (!fQuitting) {
 		// break the idle time up into ticks so that we can evaluate
@@ -192,14 +196,23 @@ ScreenSaverRunner::_Run()
 		// otherwise a screen saver that sets, say, a 30 second tick
 		// will result in the screen saver not responding to deactivation
 		// for that length of time
-		snooze(kTickBase);
-		if (system_time() - lastTickTime < tick)
+		snooze(tickBase);
+		if (system_time() - lastTickTime < tick) {
 			continue;
-		else { 
+		} else {
 			// re-evaluate the tick time after each successful wakeup - 
-			// screensavers can adjust it on the fly and we must be
+			// screensavers can adjust it on the fly, and we must be
 			// prepared to accomodate that
-			tick = fSaver ? fSaver->TickSize() : kTickBase;
+			tick = fSaver ? fSaver->TickSize() : tickBase;
+			
+			if (tick < tickBase) {
+				if (tick < 0)
+					tick = 0;
+				tickBase = tick;
+			} else if (tickBase < kInitialTickRate && tick >= kInitialTickRate) {
+				tickBase = kInitialTickRate;
+			}
+			
 			lastTickTime = system_time();
 		}
 		
