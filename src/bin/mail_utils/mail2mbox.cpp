@@ -28,398 +28,336 @@
 extern const char* __progname;
 static const char* kProgramName = __progname;
 
-time_t DateStampTime;
-  /* Time value used for stamping each message header.  Incremented by 1 second
-  for each message, starts out with the current local time. */
+time_t gDateStampTime;
+	// Time value used for stamping each message header. Incremented by 1 second
+	// for each message, starts out with the current local time.
 
 
-/******************************************************************************
- * Global utility function to display an error message and return.  The message
- * part describes the error, and if ErrorNumber is non-zero, gets the string
- * ", error code $X (standard description)." appended to it.  If the message
- * is NULL then it gets defaulted to "Something went wrong".
- */
-
-static void DisplayErrorMessage (
-  const char *MessageString = NULL,
-  int ErrorNumber = 0,
-  const char *TitleString = NULL)
+/*!	Global utility function to display an error message and return.  The message
+	part describes the error, and if errorNumber is non-zero, gets the string
+	", error code $X (standard description)." appended to it.  If the message
+	is NULL then it gets defaulted to "Something went wrong".
+*/
+static void
+DisplayErrorMessage(const char* messageString = NULL, status_t errorNumber = 0,
+	const char* titleString = NULL)
 {
-  char ErrorBuffer [B_PATH_NAME_LENGTH + 80 /* error message */ + 80];
+	char errorBuffer[2048];
 
-  if (TitleString == NULL)
-    TitleString = "Error Message:";
+	if (titleString == NULL)
+		titleString = "Error Message:";
 
-  if (MessageString == NULL)
-  {
-    if (ErrorNumber == 0)
-      MessageString = "No error, no message, why bother?";
-    else
-      MessageString = "Something went wrong";
-  }
+	if (messageString == NULL) {
+		if (errorNumber == B_OK)
+			messageString = "No error, no message, why bother?";
+		else
+			messageString = "Error";
+	}
 
-  if (ErrorNumber != 0)
-  {
-    sprintf (ErrorBuffer, "%s, error code $%X/%d (%s) has occured.",
-      MessageString, ErrorNumber, ErrorNumber, strerror (ErrorNumber));
-    MessageString = ErrorBuffer;
-  }
+	if (errorNumber != 0) {
+		snprintf(errorBuffer, sizeof(errorBuffer), "%s: %s (%lx)"
+			"has occured.", messageString, strerror(errorNumber), errorNumber);
+		messageString = ErrorBuffer;
+	}
 
-  fputs (TitleString, stderr);
-  fputc ('\n', stderr);
-  fputs (MessageString, stderr);
-  fputc ('\n', stderr);
+	fputs(titleString, stderr);
+	fputc('\n', stderr);
+	fputs(messageString, stderr);
+	fputc('\n', stderr);
 }
 
 
-
-/******************************************************************************
- * Determine if a line of text is the start of another message.  Pine mailbox
- * files have messages that start with a line that could say something like
- * "From agmsmith@achilles.net Fri Oct 31 21:19:36 EST 1997" or maybe something
- * like "From POPmail Mon Oct 20 21:12:36 1997" or in a more modern format,
- * "From agmsmith@achilles.net Tue Sep 4 09:04:11 2001 -0400".  I generalise it
- * to "From blah Day MMM NN XX:XX:XX TZONE1 YYYY TZONE2".  Blah is an e-mail
- * address you can ignore (just treat it as a word separated by spaces).  Day
- * is a 3 letter day of the week.  MMM is a 3 letter month name.  NN is the two
- * digit day of the week, has a leading space if the day is less than 10.
- * XX:XX:XX is the time, the X's are digits.  TZONE1 is the old style optional
- * time zone of 3 capital letters.  YYYY is the four digit year.  TZONE2 is the
- * optional modern time zone info, a plus or minus sign and 4 digits.  Returns
- * true if the line of text (ended with a NUL byte, no line feed or carriage
- * returns at the end) is the start of a message.
- */
-
-bool IsStartOfMailMessage (char *LineString)
+/*!	Determine if a line of text is the start of another message.  Pine mailbox
+	files have messages that start with a line that could say something like
+	"From agmsmith@achilles.net Fri Oct 31 21:19:36 EST 1997" or maybe something
+	like "From POPmail Mon Oct 20 21:12:36 1997" or in a more modern format,
+	"From agmsmith@achilles.net Tue Sep 4 09:04:11 2001 -0400".  I generalise it
+	to "From blah Day MMM NN XX:XX:XX TZONE1 YYYY TZONE2".  Blah is an e-mail
+	address you can ignore (just treat it as a word separated by spaces).  Day
+	is a 3 letter day of the week.  MMM is a 3 letter month name.  NN is the two
+	digit day of the week, has a leading space if the day is less than 10.
+	XX:XX:XX is the time, the X's are digits.  TZONE1 is the old style optional
+	time zone of 3 capital letters.  YYYY is the four digit year.  TZONE2 is the
+	optional modern time zone info, a plus or minus sign and 4 digits.  Returns
+	true if the line of text (ended with a NUL byte, no line feed or carriage
+	returns at the end) is the start of a message.
+*/
+bool
+IsStartOfMailMessage(char* lineString)
 {
-  char        *StringPntr;
+	// It starts with "From "
+	if (memcmp("From ", LineString, 5) != 0)
+		return false;
 
-  /* It starts with "From " */
+	char* string = lineString + 4;
+	while (*string == ' ')
+		string++;
 
-  if (memcmp ("From ", LineString, 5) != 0)
-    return false;
-  StringPntr = LineString + 4;
-  while (*StringPntr == ' ')
-    StringPntr++;
+	// Skip over the e-mail address (or stop at the end of string).
 
-  /* Skip over the e-mail address (or stop at the end of string). */
+	while (*string != ' ' && *string != 0)
+		string++;
+	while (*string == ' ')
+		string++;
 
-  while (*StringPntr != ' ' && *StringPntr != 0)
-    StringPntr++;
-  while (*StringPntr == ' ')
-    StringPntr++;
+	// TODO: improve this!!!
 
-  /* Look for the 3 letter day of the week. */
+	// Look for the 3 letter day of the week.
+	if (memcmp(string, "Mon", 3) != 0 && memcmp(string, "Tue", 3) != 0
+		&& memcmp(string, "Wed", 3) != 0 && memcmp(string, "Thu", 3) != 0
+		&& memcmp(string, "Fri", 3) != 0 && memcmp(string, "Sat", 3) != 0
+		&& memcmp(string, "Sun", 3) != 0) {
+		fprintf(stderr, "False alarm, not a valid day of the week in \"%s\""
+			".\n", lineString);
+		return false;
+	}
 
-  if (memcmp (StringPntr, "Mon", 3) != 0 &&
-  memcmp (StringPntr, "Tue", 3) != 0 &&
-  memcmp (StringPntr, "Wed", 3) != 0 &&
-  memcmp (StringPntr, "Thu", 3) != 0 &&
-  memcmp (StringPntr, "Fri", 3) != 0 &&
-  memcmp (StringPntr, "Sat", 3) != 0 &&
-  memcmp (StringPntr, "Sun", 3) != 0)
-  {
-    fprintf (stderr, "False alarm, not a valid day of the week in \"%s\".\n",
-      LineString);
-    return false;
-  }
-  StringPntr += 3;
-  while (*StringPntr == ' ')
-    StringPntr++;
+	string += 3;
+	while (*string == ' ')
+		string++;
 
-  /* Look for the 3 letter month code. */
+	// Look for the 3 letter month code.
+	if (memcmp(string, "Jan", 3) != 0 && memcmp(string, "Feb", 3) != 0
+		&& memcmp(string, "Mar", 3) != 0 && memcmp(string, "Apr", 3) != 0
+		&& memcmp(string, "May", 3) != 0 && memcmp(string, "Jun", 3) != 0
+		&& memcmp(string, "Jul", 3) != 0 && memcmp(string, "Aug", 3) != 0
+		&& memcmp(string, "Sep", 3) != 0 && memcmp(string, "Oct", 3) != 0
+		&& memcmp(string, "Nov", 3) != 0 && memcmp(string, "Dec", 3) != 0) {
+		fprintf(stderr, "False alarm, not a valid month name in \"%s\".\n",
+			lineString);
+		return false;
+	}
 
-  if (memcmp (StringPntr, "Jan", 3) != 0 &&
-  memcmp (StringPntr, "Feb", 3) != 0 &&
-  memcmp (StringPntr, "Mar", 3) != 0 &&
-  memcmp (StringPntr, "Apr", 3) != 0 &&
-  memcmp (StringPntr, "May", 3) != 0 &&
-  memcmp (StringPntr, "Jun", 3) != 0 &&
-  memcmp (StringPntr, "Jul", 3) != 0 &&
-  memcmp (StringPntr, "Aug", 3) != 0 &&
-  memcmp (StringPntr, "Sep", 3) != 0 &&
-  memcmp (StringPntr, "Oct", 3) != 0 &&
-  memcmp (StringPntr, "Nov", 3) != 0 &&
-  memcmp (StringPntr, "Dec", 3) != 0)
-  {
-    fprintf (stderr, "False alarm, not a valid month name in \"%s\".\n",
-      LineString);
-    return false;
-  }
-  StringPntr += 3;
-  while (*StringPntr == ' ')
-    StringPntr++;
+	string += 3;
+	while (*string == ' ')
+		string++;
 
-  /* Skip the day of the month.  Require at least one digit. */
+	// Skip the day of the month.  Require at least one digit.
+	if (*string < '0' || *string > '9') {
+		fprintf(stderr, "False alarm, not a valid day of the "
+			"month number in \"%s\".\n", lineString);
+		return false;
+	}
 
-  if (*StringPntr < '0' || *StringPntr > '9')
-  {
-    fprintf (stderr, "False alarm, not a valid day of the "
-      "month number in \"%s\".\n", LineString);
-    return false;
-  }
-  while (*StringPntr >= '0' && *StringPntr <= '9')
-    StringPntr++;
-  while (*StringPntr == ' ')
-    StringPntr++;
+	while (*string >= '0' && *string <= '9')
+		string++;
+	while (*string == ' ')
+		string++;
 
-  /* Check the time.  Look for the sequence
-  digit-digit-colon-digit-digit-colon-digit-digit. */
+	// Check the time.  Look for the sequence
+	// digit-digit-colon-digit-digit-colon-digit-digit.
 
-  if (StringPntr[0] < '0' || StringPntr[0] > '9' ||
-  StringPntr[1] < '0' || StringPntr[1] > '9' ||
-  StringPntr[2] != ':' ||
-  StringPntr[3] < '0' || StringPntr[3] > '9' ||
-  StringPntr[4] < '0' || StringPntr[4] > '9' ||
-  StringPntr[5] != ':' ||
-  StringPntr[6] < '0' || StringPntr[6] > '9' ||
-  StringPntr[7] < '0' || StringPntr[7] > '9')
-  {
-    fprintf (stderr, "False alarm, not a valid time value in \"%s\".\n",
-      LineString);
-    return false;
-  }
-  StringPntr += 8;
-  while (*StringPntr == ' ')
-    StringPntr++;
+	if (string[0] < '0' || string[0] > '9'
+		|| string[1] < '0' || string[1] > '9'
+		|| string[2] != ':'
+		|| string[3] < '0' || string[3] > '9'
+		|| string[4] < '0' || string[4] > '9'
+		|| string[5] != ':'
+		|| string[6] < '0' || string[6] > '9'
+		|| string[7] < '0' || string[7] > '9') {
+		fprintf(stderr, "False alarm, not a valid time value in \"%s\".\n",
+			lineString);
+		return false;
+	}
 
-  /* Look for the optional antique 3 capital letter time zone and skip it. */
+	string += 8;
+	while (*string == ' ')
+		string++;
 
-  if (StringPntr[0] >= 'A' && StringPntr[0] <= 'Z' &&
-  StringPntr[1] >= 'A' && StringPntr[1] <= 'Z' &&
-  StringPntr[2] >= 'A' && StringPntr[2] <= 'Z')
-  {
-    StringPntr += 3;
-    while (*StringPntr == ' ')
-      StringPntr++;
-  }
+	// Look for the optional antique 3 capital letter time zone and skip it.
+	if (string[0] >= 'A' && string[0] <= 'Z'
+		&& string[1] >= 'A' && string[1] <= 'Z'
+		&& string[2] >= 'A' && string[2] <= 'Z') {
+		string += 3;
+		while (*string == ' ')
+			string++;
+	}
 
-  /* Look for the 4 digit year. */
+	// Look for the 4 digit year.
+	if (string[0] < '0' || string[0] > '9'
+		|| string[1] < '0' || string[1] > '9'
+		|| string[2] < '0' || string[2] > '9'
+		|| string[3] < '0' || string[3] > '9') {
+		fprintf(stderr, "False alarm, not a valid 4 digit year in \"%s\".\n",
+			lineString);
+		return false;
+	}
 
-  if (StringPntr[0] < '0' || StringPntr[0] > '9' ||
-  StringPntr[1] < '0' || StringPntr[1] > '9' ||
-  StringPntr[2] < '0' || StringPntr[2] > '9' ||
-  StringPntr[3] < '0' || StringPntr[3] > '9')
-  {
-    fprintf (stderr, "False alarm, not a valid 4 digit year in \"%s\".\n",
-      LineString);
-    return false;
-  }
-  StringPntr += 4;
-  while (*StringPntr == ' ')
-    StringPntr++;
+	string += 4;
+	while (*string == ' ')
+		string++;
 
-  /* Look for the optional modern time zone and skip over it if present. */
+	// Look for the optional modern time zone and skip over it if present.
+	if ((string[0] == '+' || string[0] == '-')
+		&& string[1] >= '0' && string[1] <= '9'
+		&& string[2] >= '0' && string[2] <= '9'
+		&& string[3] >= '0' && string[3] <= '9'
+		&& string[4] >= '0' && string[4] <= '9') {
+		string += 5;
+		while (*string == ' ')
+			string++;
+	}
 
-  if ((StringPntr[0] == '+' || StringPntr[0] == '-') &&
-  StringPntr[1] >= '0' && StringPntr[1] <= '9' &&
-  StringPntr[2] >= '0' && StringPntr[2] <= '9' &&
-  StringPntr[3] >= '0' && StringPntr[3] <= '9' &&
-  StringPntr[4] >= '0' && StringPntr[4] <= '9')
-  {
-    StringPntr += 5;
-    while (*StringPntr == ' ')
-      StringPntr++;
-  }
+	// Look for end of string.
+	if (*string != 0) {
+		fprintf(stderr, "False alarm, extra stuff after the "
+			"year/time zone in \"%s\".\n", lineString);
+		return false;
+	}
 
-  /* Look for end of string. */
-
-  if (*StringPntr != 0)
-  {
-    fprintf (stderr, "False alarm, extra stuff after the "
-      "year/time zone in \"%s\".\n", LineString);
-    return false;
-  }
-
-  return true;
+	return true;
 }
 
 
-
-/******************************************************************************
- * Read the input file, convert it to mbox format, and write it to standard
- * output.  Returns zero if successful, a negative error code if an error
- * occured.
- */
-
-status_t ProcessMessageFile (char *FileName)
+/*!	Read the input file, convert it to mbox format, and write it to standard
+	output.  Returns zero if successful, a negative error code if an error
+	occured.
+*/
+status_t
+ProcessMessageFile(char* fileName)
 {
-  char        ErrorMessage [B_PATH_NAME_LENGTH + 80];
-  int         i;
-  int         InputFileDescriptor = -1;
-  FILE       *InputFile = NULL;
-  int         LineNumber;
-  BString     MessageText;
-  status_t    ReturnCode = -1;
-  char       *StringPntr;
-  char        TempString [102400];
-  time_t      TimeValue;
+	fprintf(stdout, "Now processing: \"%s\"\n", fileName);
 
-  fprintf (stderr, "Now processing: \"%s\"\n", FileName);
+	FILE* inputFile = fopen(fileName, "rb");
+	if (inputFile == NULL) {
+		DisplayErrorMessage("Unable to open file", errno);
+		return errno;
+	}
 
-  /* Open the file.  Try to open it in exclusive mode, so that it doesn't
-  accidentally open the output file, or any other already open file. */
+	// Extract a text message from the Mail file.
 
-  InputFileDescriptor = open (FileName, O_RDONLY);
-  if (InputFileDescriptor < 0)
-  {
-    ReturnCode = errno;
-    DisplayErrorMessage ("Unable to open file", ReturnCode);
-    return ReturnCode;
-  }
-  InputFile = fdopen (InputFileDescriptor, "rb");
-  if (InputFile == NULL)
-  {
-    ReturnCode = errno;
-    close (InputFileDescriptor);
-    DisplayErrorMessage ("fdopen failed to convert file handle to a "
-      "buffered file", ReturnCode);
-    return ReturnCode;
-  }
+	status_t status = B_ERROR;
+	BString messageText;
+	int lineNumber = 0;
 
-  /* Extract a text message from the BeMail file. */
+	while (!feof(inputFile)) {
+		// First read in one line of text.
+		char line[102400];
+		if (fgets(line, sizeof(line), inputFile) == NULL) {
+			if (ferror(inputFile)) {
+				char errorString[2048];
+				snprintf(errorString, sizeof(errorString),
+					"Error while reading from \"%s\"", fileName);
+				DisplayErrorMessage(errorString, errno);
+				status = errno;
+				goto out;
+			}
+			break;
+				// No error, just end of file.
+		}
 
-  LineNumber = 0;
-  while (!feof (InputFile))
-  {
-    /* First read in one line of text. */
+		// Remove any trailing control characters (line feed usually, or CRLF).
+		// Might also nuke trailing tabs too. Doesn't usually matter. The main
+		// thing is to allow input files with both LF and CRLF endings (and
+		// even CR endings if you come from the Macintosh world).
 
-    if (!fgets (TempString, sizeof (TempString), InputFile))
-    {
-      ReturnCode = errno;
-      if (ferror (InputFile))
-      {
-        sprintf (ErrorMessage,
-          "Error while reading from \"%s\"", FileName);
-        DisplayErrorMessage (ErrorMessage, ReturnCode);
-        goto ErrorExit;
-      }
-      break; /* No error, just end of file. */
-    }
+		char* string = line + strlen(line) - 1;
+		while (string >= line && *string < 32)
+			string--;
+		*(++string) = 0;
 
-    /* Remove any trailing control characters (line feed usually, or CRLF).
-    Might also nuke trailing tabs too.  Doesn't usually matter.  The main thing
-    is to allow input files with both LF and CRLF endings (and even CR endings
-    if you come from the Macintosh world). */
+		if (lineNumber == 0 && line[0] == 0) {
+			// Skip leading blank lines.
+			continue;
+		}
+		lineNumber++;
 
-    StringPntr = TempString + strlen (TempString) - 1;
-    while (StringPntr >= TempString && *StringPntr < 32)
-      StringPntr--;
-    *(++StringPntr) = 0;
+		// Prepend the new mbox message header, if the first line of the message
+		// doesn't already have one.
+		if (lineNumber == 1 && !IsStartOfMailMessage(line)) {
+			time_t timestamp = gDateStampTime++;
+			messageText.Append("From baron@be.com ");
+			messageText.Append(ctime(&timestamp));
+		}
 
-    if (LineNumber == 0 && TempString[0] == 0)
-      continue;  /* Skip leading blank lines. */
-    LineNumber++;
+		// Append the line to the current message text.
+		messageText.Append(line);
+		messageText.Append("\n");
+	}
 
-    /* Prepend the new mbox message header, if the first line of the message
-    doesn't already have one. */
+	// Remove blank lines from the end of the message (a pet peeve of mine), but
+	// end the message with two new lines to separate it from the next message.
+	int i = messageText.Length();
+	while (i > 0 && (messageText[i - 1] == '\n' || messageText[i - 1] == '\r'))
+		i--;
+	messageText.Truncate(i);
+	messageText.Append("\n\n");
 
-    if (LineNumber == 1 && !IsStartOfMailMessage (TempString))
-    {
-      TimeValue = DateStampTime++;
-      MessageText.Append ("From baron@be.com ");
-      MessageText.Append (ctime (&TimeValue));
-    }
+	// Write the message out.
+	if (puts(messageText.String()) < 0) {
+		DisplayErrorMessage ("Error while writing the message", errno);
+		status = errno;
+	} else
+		status = B_OK;
 
-    /* Append the line to the current message text. */
-
-    MessageText.Append (TempString);
-    MessageText.Append ("\n");
-  }
-
-  /* Remove blank lines from the end of the message (a pet peeve of mine), but
-  end the message with two new lines to separate it from the next message. */
-
-  i = MessageText.Length ();
-  while (i > 0 && (MessageText[i-1] == '\n' || MessageText[i-1] == '\r'))
-    i--;
-  MessageText.Truncate (i);
-  MessageText.Append ("\n\n");
-
-  /* Write the message out. */
-
-  if (puts (MessageText.String()) < 0)
-  {
-    ReturnCode = errno;
-    DisplayErrorMessage ("Error while writing the message", ReturnCode);
-    goto ErrorExit;
-  }
-
-  ReturnCode = 0;
-
-ErrorExit:
-  fclose (InputFile);
-  return ReturnCode;
+out:
+	fclose(inputFile);
+	return status;
 }
 
 
-int main (int argc, char** argv)
+int
+main(int argc, char** argv)
 {
-  dirent_t    *DirEntPntr;
-  DIR         *DirHandle;
-  status_t     ErrorCode;
-  char         InputPathName [B_PATH_NAME_LENGTH];
-  int          MessagesDoneCount = 0;
-  BApplication MyApp ("application/x-vnd.agmsmith.bemailtombox");
-  const char  *StringPntr;
-  char         TempString [1024 + 256];
+	BApplication app("application/x-vnd.Haiku-mail2mbox");
 
-  if (argc <= 1 || argc >= 3)
-  {
-    printf ("%s is a utility for converting BeMail e-mail\n", argv[0]);
-    printf ("files to Unix Pine style e-mail files.  It could well\n");
-    printf ("work with other Unix style mailbox files.  Each message in\n");
-    printf ("the input directory is converted and sent to the standard\n");
-    printf ("output.  Usage:\n\n");
-    printf ("%s InputDirectory >OutputFile\n\n", kProgramName);
-    printf ("Public domain, by Alexander G. M. Smith.\n");
-    return -10;
-  }
+	if (argc <= 1 || argc >= 3) {
+		printf("%s is a utility for converting BeMail e-mail\n", argv[0]);
+		printf("files to Unix Pine style e-mail files.  It could well\n");
+		printf("work with other Unix style mailbox files.  Each message in\n");
+		printf("the input directory is converted and sent to the standard\n");
+		printf("output.  Usage:\n\n");
+		printf("%s InputDirectory >OutputFile\n\n", kProgramName);
+		printf("Public domain, by Alexander G. M. Smith.\n");
+		return -10;
+	}
 
-  /* Set the date stamp to the current time. */
+	// Set the date stamp to the current time.
+	gDateStampTime = time (NULL);
 
-  DateStampTime = time (NULL);
+	// Try to open the input directory.
+	char inputPathName[B_PATH_NAME_LENGTH];
+	strlcpy(inputPathName, argv[1], sizeof(inputPathName) - 2);
 
-  /* Try to open the input directory. */
+	char tempString[2048];
 
-  memset (InputPathName, 0, sizeof (InputPathName));
-  strncpy (InputPathName, argv[1], sizeof (InputPathName) - 2);
-  DirHandle = opendir (InputPathName);
-  if (DirHandle == NULL)
-  {
-    ErrorCode = errno;
-    sprintf (TempString, "Problems opening directory named \"%s\".",
-      InputPathName);
-    DisplayErrorMessage (TempString, ErrorCode);
-    return ErrorCode;
-  }
+	DIR* dir = opendir(inputPathName);
+	if (dir == NULL) {
+		sprintf(tempString, "Problems opening directory named \"%s\".",
+			inputPathName);
+		DisplayErrorMessage(tempString, errno);
+		return 1;
+	}
 
-  /* Append a trailing slash to the directory name, if it needs one. */
+	// Append a trailing slash to the directory name, if it needs one.
+	if (inputPathName[strlen(InputPathName) - 1] != '/')
+		strcat(inputPathName, "/");
 
-  if (InputPathName [strlen (InputPathName) - 1] != '/')
-    strcat (InputPathName, "/");
+	int messagesDoneCount = 0;
+	status_t status = B_OK;
 
-  ErrorCode = 0;
-  while (ErrorCode == 0 && (DirEntPntr = readdir (DirHandle)) != NULL)
-  {
-    for (StringPntr = DirEntPntr->d_name; *StringPntr != 0; StringPntr++)
-      if (*StringPntr != '.')
-        break;
-    if (*StringPntr == 0)
-      continue; /* Skip all period names, like . or .. or ... etc. */
+	while (dirent_t* entry = readdir(dir)) {
+		// skip '.' and '..'
+		if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
+			break;
 
-    strcpy (TempString, InputPathName);
-    strcat (TempString, DirEntPntr->d_name);
-    ErrorCode = ProcessMessageFile (TempString);
-    MessagesDoneCount++;
-  }
-  closedir (DirHandle);
-  if (ErrorCode != 0)
-  {
-    DisplayErrorMessage ("Stopping early because an error occured", ErrorCode);
-    return ErrorCode;
-  }
+		strlcpy(tempString, inputPathName, sizeof(tempString));
+		strlcat(tempString, entry->d_name, , sizeof(tempString));
 
-  fprintf (stderr, "Did %d messages successfully.\n", MessagesDoneCount);
-  return 0;
+		status = ProcessMessageFile(tempString);
+		if (status != B_OK)
+			break;
+
+		messagesDoneCount++;
+	}
+
+	closedir(dir);
+
+	if (status != B_OK) {
+		DisplayErrorMessage("Stopping early because an error occured", status);
+		return ErrorCode;
+	}
+
+	fprintf(stderr, "Did %d messages successfully.\n", messagesDoneCount);
+	return 0;
 }
