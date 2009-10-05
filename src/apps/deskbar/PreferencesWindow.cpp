@@ -24,8 +24,8 @@
 
 PreferencesWindow::PreferencesWindow(BRect frame)
 	:
-	BWindow(frame, "Deskbar Preferences", B_TITLED_WINDOW, B_NOT_RESIZABLE
-		| B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
+	BWindow(frame, "Deskbar Preferences", B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
 	// Controls
 	fMenuRecentDocuments = new BCheckBox("Recent Documents:",
@@ -163,28 +163,14 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fClockBox = new BBox("fClockBox");
 	fWindowBox = new BBox("fWindowBox");
 
-	BStringView* menuString = new BStringView(NULL, "Menu");
-	BStringView* appsString = new BStringView(NULL, "Applications");
-	BStringView* clockString = new BStringView(NULL, "Clock");
-	BStringView* windowString = new BStringView(NULL, "Window");
-
-	BFont font;
-	menuString->GetFont(&font);
-	font.SetFace(B_BOLD_FACE);
-
-	menuString->SetFont(&font, B_FONT_FACE);
-	appsString->SetFont(&font, B_FONT_FACE);
-	clockString->SetFont(&font, B_FONT_FACE);
-	windowString->SetFont(&font, B_FONT_FACE);
-
-	fMenuBox->SetLabel(menuString);
-	fAppsBox->SetLabel(appsString);
-	fClockBox->SetLabel(clockString);
-	fWindowBox->SetLabel(windowString);
+	fMenuBox->SetLabel("Menu");
+	fAppsBox->SetLabel("Applications");
+	fClockBox->SetLabel("Clock");
+	fWindowBox->SetLabel("Window");
 
 	BView* view;
 	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 0)
+		.AddGroup(B_VERTICAL, 10)
 			.AddGroup(B_HORIZONTAL, 0)
 				.AddGroup(B_VERTICAL, 0)
 					.Add(fMenuRecentDocuments)
@@ -199,7 +185,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.End()
 			.Add(new BButton("Edit Menu" B_UTF8_ELLIPSIS,
 				new BMessage(kEditMenuInTracker)))
-			.AddGlue()
 			.SetInsets(10, 10, 10, 10)
 			.End()
 		.View();
@@ -256,18 +241,17 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 }
 
 
-PreferencesWindow::~PreferencesWindow()	
+PreferencesWindow::~PreferencesWindow()
 {
 	_UpdateRecentCounts();
 	be_app->PostMessage(kConfigClose);
 }
 
 
-void 
+void
 PreferencesWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		
 		case kEditMenuInTracker:
 			OpenWithTracker(B_USER_DESKBAR_DIRECTORY);
 			break;
@@ -288,7 +272,7 @@ PreferencesWindow::MessageReceived(BMessage* message)
 }
 
 
-void 
+void
 PreferencesWindow::_UpdateRecentCounts()
 {
 	BMessage message(kUpdateRecentCounts);
@@ -318,7 +302,7 @@ PreferencesWindow::_UpdateRecentCounts()
 }
 
 
-void 
+void
 PreferencesWindow::_EnableDisableDependentItems()
 {
 	if (fAppsShowExpanders->Value())
@@ -343,7 +327,7 @@ PreferencesWindow::_EnableDisableDependentItems()
 }
 
 
-void 
+void
 PreferencesWindow::WindowActivated(bool active)
 {
 	if (!active && IsMinimized())
