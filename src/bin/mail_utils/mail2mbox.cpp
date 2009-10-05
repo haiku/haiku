@@ -57,7 +57,7 @@ DisplayErrorMessage(const char* messageString = NULL, status_t errorNumber = 0,
 	if (errorNumber != 0) {
 		snprintf(errorBuffer, sizeof(errorBuffer), "%s: %s (%lx)"
 			"has occured.", messageString, strerror(errorNumber), errorNumber);
-		messageString = ErrorBuffer;
+		messageString = errorBuffer;
 	}
 
 	fputs(titleString, stderr);
@@ -86,7 +86,7 @@ bool
 IsStartOfMailMessage(char* lineString)
 {
 	// It starts with "From "
-	if (memcmp("From ", LineString, 5) != 0)
+	if (memcmp("From ", lineString, 5) != 0)
 		return false;
 
 	char* string = lineString + 4;
@@ -226,7 +226,6 @@ ProcessMessageFile(char* fileName)
 
 	// Extract a text message from the Mail file.
 
-	status_t status = B_ERROR;
 	BString messageText;
 	int lineNumber = 0;
 
@@ -239,8 +238,8 @@ ProcessMessageFile(char* fileName)
 				snprintf(errorString, sizeof(errorString),
 					"Error while reading from \"%s\"", fileName);
 				DisplayErrorMessage(errorString, errno);
-				status = errno;
-				goto out;
+				fclose(inputFile);
+				return errno;
 			}
 			break;
 				// No error, just end of file.
@@ -284,13 +283,14 @@ ProcessMessageFile(char* fileName)
 	messageText.Append("\n\n");
 
 	// Write the message out.
+
+	status_t status = B_OK;
+
 	if (puts(messageText.String()) < 0) {
 		DisplayErrorMessage ("Error while writing the message", errno);
 		status = errno;
-	} else
-		status = B_OK;
+	}
 
-out:
 	fclose(inputFile);
 	return status;
 }
@@ -330,7 +330,7 @@ main(int argc, char** argv)
 	}
 
 	// Append a trailing slash to the directory name, if it needs one.
-	if (inputPathName[strlen(InputPathName) - 1] != '/')
+	if (inputPathName[strlen(inputPathName) - 1] != '/')
 		strcat(inputPathName, "/");
 
 	int messagesDoneCount = 0;
@@ -342,7 +342,7 @@ main(int argc, char** argv)
 			break;
 
 		strlcpy(tempString, inputPathName, sizeof(tempString));
-		strlcat(tempString, entry->d_name, , sizeof(tempString));
+		strlcat(tempString, entry->d_name, sizeof(tempString));
 
 		status = ProcessMessageFile(tempString);
 		if (status != B_OK)
@@ -355,7 +355,7 @@ main(int argc, char** argv)
 
 	if (status != B_OK) {
 		DisplayErrorMessage("Stopping early because an error occured", status);
-		return ErrorCode;
+		return status;
 	}
 
 	fprintf(stderr, "Did %d messages successfully.\n", messagesDoneCount);
