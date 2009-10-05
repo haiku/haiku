@@ -41,9 +41,8 @@
 static const int32 kLeftTextMargin = 3;
 static const float kMinViewHeight = 80.0f;
 static const int32 kSpacesPerTab = 4;
-static const bigtime_t kScrollTimer = 10000LL;
-
 	// TODO: Should be settable!
+static const bigtime_t kScrollTimer = 10000LL;
 
 
 class SourceView::BaseView : public BView {
@@ -1015,8 +1014,7 @@ SourceView::TextView::Draw(BRect updateRect)
 	int32 markerIndex = 0;
 	for (int32 i = minLine; i <= maxLine; i++) {
 		SetLowColor(ViewColor());
-		float y = (float)(i + 1) * fFontInfo->lineHeight
-			- fFontInfo->fontHeight.descent;
+		float y = i * fFontInfo->lineHeight;
 		BString lineString;
 		_FormatLine(fSourceCode->LineAt(i), lineString);
 
@@ -1032,13 +1030,15 @@ SourceView::TextView::Draw(BRect updateRect)
 			 		SetLowColor(96, 216, 216, 255);
 			 	else
 					SetLowColor(255, 255, 0, 255);
-				FillRect(BRect(kLeftTextMargin, y - fFontInfo->lineHeight,
-					Bounds().right,	y), B_SOLID_LOW);
+				FillRect(BRect(kLeftTextMargin, y, Bounds().right,
+					y + fFontInfo->lineHeight), B_SOLID_LOW);
 				break;
 			 } else
 			 	break;
 		}
-		DrawString(lineString, BPoint(kLeftTextMargin, y));
+
+		DrawString(lineString,
+			BPoint(kLeftTextMargin, y + fFontInfo->fontHeight.ascent));
 	}
 
 	if (fSelectionStart.line != -1 && fSelectionEnd.line != -1) {
