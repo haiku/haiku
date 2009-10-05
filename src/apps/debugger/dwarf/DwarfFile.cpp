@@ -1828,10 +1828,10 @@ DwarfFile::_ParsePublicTypesInfo(DataReader& dataReader, bool dwarf64)
 		return B_UNSUPPORTED;
 	}
 
-	TRACE_CFI_ONLY(off_t debugInfoOffset =) dwarf64
+	TRACE_PUBTYPES_ONLY(off_t debugInfoOffset =) dwarf64
 		? dataReader.Read<uint64>(0)
 		: (uint64)dataReader.Read<uint32>(0);
-	TRACE_CFI_ONLY(off_t debugInfoSize =) dwarf64
+	TRACE_PUBTYPES_ONLY(off_t debugInfoSize =) dwarf64
 		? dataReader.Read<uint64>(0)
 		: (uint64)dataReader.Read<uint32>(0);
 
