@@ -263,10 +263,10 @@ movement:
 	if (!cookie->movement_started) {
 		isStartOfMovement = true;
 		cookie->movement_started = true;
-		start_new_movment(&(cookie->movement_maker));
+		start_new_movment(&cookie->movement_maker);
 	}
 
-	get_movement(&(cookie->movement_maker), event->xPosition, event->yPosition);
+	get_movement(&cookie->movement_maker, event->xPosition, event->yPosition);
 
 	movement->xdelta = cookie->movement_maker.xDelta;
 	movement->ydelta = cookie->movement_maker.yDelta;
@@ -313,9 +313,9 @@ scrolling:
 	cookie->valid_edge_motion = false;
 	if (!cookie->scrolling_started) {
 		cookie->scrolling_started = true;
-		start_new_movment(&(cookie->movement_maker));
+		start_new_movment(&cookie->movement_maker);
 	}
-	get_scrolling(&(cookie->movement_maker), event->xPosition,
+	get_scrolling(&cookie->movement_maker, event->xPosition,
 		event->yPosition);
 	movement->wheel_ydelta = cookie->movement_maker.yDelta;
 	movement->wheel_xdelta = cookie->movement_maker.xDelta;
@@ -556,7 +556,7 @@ synaptics_open(const char *name, uint32 flags, void **_cookie)
 	dev->disconnect = &synaptics_disconnect;
 	dev->handle_int = &synaptics_handle_int;
 
-	default_settings(&(cookie->settings));
+	default_settings(&cookie->settings);
 
 	cookie->movement_maker.speed = 1;
 	cookie->movement_maker.scrolling_xStep = cookie->settings.scroll_xstepsize;
@@ -708,7 +708,7 @@ synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 
 		case MS_SET_TOUCHPAD_SETTINGS:
 			TRACE("SYNAPTICS: MS_SET_TOUCHPAD_SETTINGS");
-			user_memcpy(&(cookie->settings), buffer, sizeof(touchpad_settings));
+			user_memcpy(&cookie->settings, buffer, sizeof(touchpad_settings));
 			cookie->movement_maker.scrolling_xStep
 				= cookie->settings.scroll_xstepsize;
 			cookie->movement_maker.scrolling_yStep
