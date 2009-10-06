@@ -274,17 +274,28 @@ get_scrolling(movement_maker *move, uint32 posX, uint32 posY)
 	get_raw_movement(move, posX, posY);
 	compute_acceleration(move, move->scroll_acceleration);
 
-	move->scrolling_x += move->xDelta;
-	move->scrolling_y += move->yDelta;
+	if (move->scrolling_xStep > 0) {
+		move->scrolling_x += move->xDelta;
 
-	stepsX = make_small(move->scrolling_x / move->scrolling_xStep);
-	stepsY = make_small(move->scrolling_y / move->scrolling_yStep);
+		stepsX = make_small(move->scrolling_x / move->scrolling_xStep);
 
-	move->scrolling_x-= stepsX * move->scrolling_xStep;
-	move->scrolling_y-= stepsY * move->scrolling_yStep;
+		move->scrolling_x -= stepsX * move->scrolling_xStep;
+		move->xDelta = stepsX;
+	} else {
+		move->scrolling_x = 0;
+		move->xDelta = 0;
+	}
+	if (move->scrolling_yStep > 0) {
+		move->scrolling_y += move->yDelta;
 
-	move->xDelta = stepsX;
-	move->yDelta = -1 * stepsY;
+		stepsY = make_small(move->scrolling_y / move->scrolling_yStep);
+
+		move->scrolling_y -= stepsY * move->scrolling_yStep;
+		move->yDelta = -1 * stepsY;
+	} else {
+		move->scrolling_y = 0;
+		move->yDelta = 0;
+	}
 }
 
 
