@@ -1,3 +1,12 @@
+/*
+ * Copyright 2008-2009, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Clemens Zeidler (haiku@Clemens-Zeidler.de)
+ */
+
+
 #include "TouchpadPref.h"
 
 #include <List.h>
