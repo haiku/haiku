@@ -10,44 +10,35 @@
 #include <Window.h>
 
 #include <bluetooth/bluetooth.h>
+#include <bluetooth/HCI/btHCI.h>
 
 class BStringView;
 class BButton;
-class BTextControls;
+class BTextControl;
 
 namespace Bluetooth	{
 
 class RemoteDevice;
 
-class PincodeView :	public BView
+class PincodeWindow : public BWindow
 {
-	public:
+public:
+							PincodeWindow(bdaddr_t address, hci_id hid);
+							PincodeWindow(RemoteDevice* rDevice);
+	virtual void			MessageReceived(BMessage *msg);
+	virtual bool			QuitRequested();
+			void			SetBDaddr(const char* address);
 
-		PincodeView(BRect rect);
+private:
+			void			InitUI();
+			bdaddr_t		fBdaddr;
+			hci_id			fHid;
 
-		void SetBDaddr(const char* address);
-
-		BStringView*		fMessage;
-		BStringView*		fRemoteInfo;
-		BButton*			fAcceptButton;
-		BButton*			fCancelButton;
-		BTextControl*		fPincodeText;
-
-};
-
-class PincodeWindow	: public BWindow
-{
-	public:
-		PincodeWindow(bdaddr_t address,	hci_id hid);
-		PincodeWindow(RemoteDevice* rDevice);
-		virtual	void MessageReceived(BMessage *msg);
-		virtual	bool QuitRequested();
-
-	private:
-		PincodeView*	fView;
-		bdaddr_t		bdaddr;
-		bdaddr_t		fBdaddr;
-		hci_id			fHid;
+			BStringView*	fMessage;
+			BStringView*	fRemoteInfo;
+			BButton*		fAcceptButton;
+			BButton*		fCancelButton;
+			BTextControl*	fPincodeText;
 };
 
 }
