@@ -31,11 +31,11 @@ const char *
 get_cpu_vendor_string(enum cpu_types type)
 {
 #if __POWERPC__
-	// We're not that nice here
+	/* We're not that nice here. */
 	return "IBM/Motorola";
 #endif
 #if __INTEL__
-	// Determine x86 vendor name
+	/* Determine x86 vendor name */
 	switch (type & B_CPU_x86_VENDOR_MASK) {
 		case B_CPU_INTEL_x86:
 			return "Intel";
@@ -44,7 +44,7 @@ get_cpu_vendor_string(enum cpu_types type)
 		case B_CPU_CYRIX_x86:
 			return "Cyrix";
 		case B_CPU_IDT_x86:
-			// IDT was bought by VIA
+			/* IDT was bought by VIA */
 			if (((type >> 8) & 0xf) >= 6)
 				return "VIA";
 			return "IDT";
@@ -60,10 +60,73 @@ get_cpu_vendor_string(enum cpu_types type)
 }
 
 
+#ifdef __INTEL__
+/* Parameter 'name' needs to point to an allocated array of 49 characters. */
+void
+get_cpuid_model_string(char *name)
+{
+	/* References:
+	 *
+	 * http://grafi.ii.pw.edu.pl/gbm/x86/cpuid.html
+	 * http://www.sandpile.org/ia32/cpuid.htm
+	 * http://www.amd.com/us-en/assets/content_type/
+	 *	white_papers_and_tech_docs/TN13.pdf (Duron erratum)
+	 */
+
+	cpuid_info baseInfo;
+	cpuid_info cpuInfo;
+	int32 maxStandardFunction, maxExtendedFunction = 0;
+
+	memset(name, 0, 49 * sizeof(char));
+
+	if (get_cpuid(&baseInfo, 0, 0) != B_OK) {
+		/* This CPU doesn't support cpuid. */
+		return;
+	}
+
+	maxStandardFunction = baseInfo.eax_0.max_eax;
+	if (maxStandardFunction >= 500) {
+		maxStandardFunction = 0;
+			/* Old Pentium sample chips have the CPU signature here. */
+	}
+
+	/* Extended cpuid */
+
+	get_cpuid(&cpuInfo, 0x80000000, 0);
+		/* hardcoded to CPU 0 */
+
+	/* Extended cpuid is only supported if max_eax is greater than the */
+	/* service id. */
+	if (cpuInfo.eax_0.max_eax > 0x80000000)
+		maxExtendedFunction = cpuInfo.eax_0.max_eax & 0xff;
+
+	if (maxExtendedFunction >= 4) {
+		int32 i;
+
+		for (i = 0; i < 3; i++) {
+			cpuid_info nameInfo;
+			get_cpuid(&nameInfo, 0x80000002 + i, 0);
+
+			memcpy(name, &nameInfo.regs.eax, 4);
+			memcpy(name + 4, &nameInfo.regs.ebx, 4);
+			memcpy(name + 8, &nameInfo.regs.ecx, 4);
+			memcpy(name + 12, &nameInfo.regs.edx, 4);
+			name += 16;
+		}
+	}
+}
+#endif	/* __INTEL__ */
+
+
 const char *
 get_cpu_model_string(system_info *info)
 {
-	// Determine CPU type
+#if __INTEL__
+	char cpuidName[49];
+		/* for use with get_cpuid_model_string() */
+#endif	/* __INTEL__ */
+
+	/* Determine CPU type */
 	switch (info->cpu_type) {
 #if __POWERPC__
 		case B_CPU_PPC_603:
@@ -76,7 +139,7 @@ get_cpu_model_string(system_info *info)
 			return "604";
 		case B_CPU_PPC_604e:
 			return "604e";
-#endif	// __POWERPC__
+#endif	/* __POWERPC__ */
 #if __INTEL__
 		case B_CPU_x86:
 			return "Unknown x86";
@@ -106,22 +169,42 @@ get_cpu_model_string(system_info *info)
 			return "Pentium III";
 		case B_CPU_INTEL_PENTIUM_M:
 		case B_CPU_INTEL_PENTIUM_M_MODEL_13:
+			get_cpuid_model_string(cpuidName);
+			if (strcasestr(cpuidName, "Celeron") != NULL)
+				return "Pentium M Celeron";
 			return "Pentium M";
 		case B_CPU_INTEL_ATOM:
 			return "Atom";
 		case B_CPU_INTEL_PENTIUM_CORE:
 			return "Core";
 		case B_CPU_INTEL_PENTIUM_CORE_2:
+			get_cpuid_model_string(cpuidName);
+			if (strcasestr(cpuidName, "Xeon") != NULL)
+				return "Core 2 Xeon";
 			return "Core 2";
-		case B_CPU_INTEL_PENTIUM_CORE_2_EXTREME:
+		case B_CPU_INTEL_PENTIUM_CORE_2_45_NM:
+			get_cpuid_model_string(cpuidName);
+			if (strcasestr(cpuidName, "Duo") != NULL ||
+				strcasestr(cpuidName, "Quad") != NULL)
+				return "Core 2";
+			if (strcasestr(cpuidName, "Xeon") != NULL)
+				return "Core 2 Xeon";
 			return "Core 2 Extreme";
 		case B_CPU_INTEL_PENTIUM_CORE_I7:
+			get_cpuid_model_string(cpuidName);
+			if (strcasestr(cpuidName, "Xeon") != NULL)
+				return "Core i7 Xeon";
 			return "Core i7";
 		case B_CPU_INTEL_PENTIUM_IV:
 		case B_CPU_INTEL_PENTIUM_IV_MODEL_1:
 		case B_CPU_INTEL_PENTIUM_IV_MODEL_2:
-		case B_CPU_INTEL_PENTIUM_IV_MODEL_3:		
+		case B_CPU_INTEL_PENTIUM_IV_MODEL_3:
 		case B_CPU_INTEL_PENTIUM_IV_MODEL_4:
+			get_cpuid_model_string(cpuidName);
+			if (strcasestr(cpuidName, "Celeron") != NULL)
+				return "Pentium 4 Celeron";
+			if (strcasestr(cpuidName, "Xeon") != NULL)
+				return "Pentium 4 Xeon";
 			return "Pentium 4";
 
 		/* AMD */
@@ -180,14 +263,14 @@ get_cpu_model_string(system_info *info)
 		case B_CPU_VIA_C3_SAMUEL:
 			return "C3 Samuel";
 		case B_CPU_VIA_C3_SAMUEL_2:
-			// stepping identified the model
+			/* stepping identified the model */
 			if ((info->cpu_revision & 0xf) < 8)
 				return "C3 Eden/Samuel 2";
 			return "C3 Ezra";
 		case B_CPU_VIA_C3_EZRA_T:
 			return "C3 Ezra-T";
 		case B_CPU_VIA_C3_NEHEMIAH:
-			// stepping identified the model
+			/* stepping identified the model */
 			if ((info->cpu_revision & 0xf) < 8)
 				return "C3 Nehemiah";
 			return "C3 Eden-N";
@@ -210,7 +293,7 @@ get_cpu_model_string(system_info *info)
 		/* National Semiconductor */
 		case B_CPU_NATIONAL_GEODE_GX1:
 			return "Geode GX1";
-#endif	// __INTEL__
+#endif	/* __INTEL__ */
 
 		default:
 			return NULL;
@@ -219,7 +302,8 @@ get_cpu_model_string(system_info *info)
 
 
 void
-get_cpu_type(char *vendorBuffer, size_t vendorSize, char *modelBuffer, size_t modelSize)
+get_cpu_type(char *vendorBuffer, size_t vendorSize, char *modelBuffer,
+	size_t modelSize)
 {
 	const char *vendor, *model;
 	system_info info;
