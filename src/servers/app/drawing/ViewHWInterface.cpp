@@ -302,7 +302,7 @@ CardMessageFilter::Filter(BMessage* message, BHandler** target)
 CardWindow::CardWindow(BRect frame)
 	:
 	BWindow(frame, "Haiku App Server", B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NO_SERVER_SIDE_WINDOW_MODIFIERS),
 	fUpdateRunner(NULL),
 	fUpdateRegion(),
 	fUpdateLock("update lock")
