@@ -176,18 +176,25 @@ get_cpu_model_string(system_info *info)
 		case B_CPU_INTEL_ATOM:
 			return "Atom";
 		case B_CPU_INTEL_PENTIUM_CORE:
+			get_cpuid_model_string(cpuidName);
+			if (strcasestr(cpuidName, "Celeron") != NULL)
+				return "Core Celeron";
 			return "Core";
 		case B_CPU_INTEL_PENTIUM_CORE_2:
 			get_cpuid_model_string(cpuidName);
+			if (strcasestr(cpuidName, "Celeron") != NULL)
+				return "Core 2 Celeron";
 			if (strcasestr(cpuidName, "Xeon") != NULL)
 				return "Core 2 Xeon";
 			return "Core 2";
 		case B_CPU_INTEL_PENTIUM_CORE_2_45_NM:
 			get_cpuid_model_string(cpuidName);
-			if (strcasestr(cpuidName, "Duo") != NULL
-				|| strcasestr(cpuidName, "Quad") != NULL) {
-				return "Core 2";
-			}
+			if (strcasestr(cpuidName, "Celeron") != NULL)
+				return "Core 2 Celeron";
+			if (strcasestr(cpuidName, "Duo") != NULL)
+				return "Core 2 Duo";
+			if (strcasestr(cpuidName, "Quad") != NULL)
+				return "Core 2 Quad";
 			if (strcasestr(cpuidName, "Xeon") != NULL)
 				return "Core 2 Xeon";
 			return "Core 2 Extreme";
