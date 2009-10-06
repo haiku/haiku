@@ -133,7 +133,7 @@ ps2_dev_detect_pointing(ps2_dev *dev, device_hooks **hooks)
 
 dev_found:
 	if (dev == &(ps2_device[PS2_DEVICE_SYN_PASSTHROUGH]))
-		synaptics_pt_set_packagesize(dev, dev->packet_size);
+		synaptics_pass_through_set_packet_size(dev, dev->packet_size);
 
 	return B_OK;
 }
