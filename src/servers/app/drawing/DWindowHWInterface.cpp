@@ -333,9 +333,9 @@ DWindowHWInterface::DWindowHWInterface()
 	fAccMoveCursor(NULL),
 	fAccShowCursor(NULL),
 
-	fRectParams(new (nothrow) fill_rect_params[kDefaultParamsCount]),
+	fRectParams(new (std::nothrow) fill_rect_params[kDefaultParamsCount]),
 	fRectParamsCount(kDefaultParamsCount),
-	fBlitParams(new (nothrow) blit_params[kDefaultParamsCount]),
+	fBlitParams(new (std::nothrow) blit_params[kDefaultParamsCount]),
 	fBlitParamsCount(kDefaultParamsCount)
 {
 	fDisplayMode.virtual_width = 800;
@@ -797,7 +797,7 @@ DWindowHWInterface::GetModeList(display_mode** _modes, uint32* _count)
 //	const uint32 colors[] = {B_CMAP8, B_RGB15, B_RGB16, B_RGB32};
 	uint32 count = resolutionCount/* * 4*/;
 
-	display_mode* modes = new(nothrow) display_mode[count];
+	display_mode* modes = new(std::nothrow) display_mode[count];
 	if (modes == NULL)
 		return B_NO_MEMORY;
 
@@ -825,7 +825,7 @@ DWindowHWInterface::GetModeList(display_mode** _modes, uint32* _count)
 #else
 	// support only a single mode, useful
 	// for testing a specific mode
-	display_mode *modes = new(nothrow) display_mode[1];
+	display_mode *modes = new(std::nothrow) display_mode[1];
 	modes[0].virtual_width = 800;
 	modes[0].virtual_height = 600;
 	modes[0].space = B_BRGB32;
@@ -874,7 +874,7 @@ DWindowHWInterface::RetraceSemaphore()
 
 
 status_t
-DWindowHWInterface::WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT)
+DWindowHWInterface::WaitForRetrace(bigtime_t timeout)
 {
 	// Locking shouldn't be necessary here - R5 should handle this for us. :)
 	BScreen screen;
