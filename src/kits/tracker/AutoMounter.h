@@ -35,17 +35,13 @@ All rights reserved.
 #ifndef	_AUTO_MOUNTER_H
 #define _AUTO_MOUNTER_H
 
+#include <DiskDeviceDefs.h>
 #include <File.h>
 #include <Looper.h>
 #include <Message.h>
 
-#ifndef __HAIKU__
-#	include "DeviceMap.h"
-#else
-#	include <DiskDeviceDefs.h>
 class BPartition;
 class BPath;
-#endif
 
 namespace BPrivate {
 
@@ -54,8 +50,6 @@ const uint32 kMountAllNow				= 'mntn';
 const uint32 kSetAutomounterParams 		= 'pmst';
 const uint32 kVolumeMounted				= 'vmtd';
 
-#ifdef __HAIKU__
-//	#pragma mark - Haiku Disk Device API
 
 class AutoMounter : public BLooper {
 public:
@@ -106,103 +100,6 @@ private:
 			BMessage			fSettings;
 };
 
-#else	// !__HAIKU__
-// #pragma mark - R5 DeviceMap API
-
-const uint32 kSuspendAutomounter 		= 'amsp';
-const uint32 kResumeAutomounter	 		= 'amsr';
-const uint32 kTryMountingFloppy	 		= 'mntf';
-const uint32 kAutomounterRescan 		= 'rscn';
-
-const int32 kFloppyID = -1;
-
-struct AutomountParams {
-	bool mountAllFS;
-	bool mountBFS;
-	bool mountHFS;
-	bool mountRemovableDisksOnly;
-};
-
-class AutoMounter : public BLooper {
-	public:
-		AutoMounter(
-			bool checkRemovableOnly = true,			// do not poll nonremovable disks
-			bool checkCDs = true,					// currently ignored
-			bool checkFloppies = false,				//
-			bool checkOtherRemovables = true,		// currently ignored
-			bool autoMountRemovableOnly = true,		// if false, automount nonremovables too
-			bool autoMountAll = false,				// disregard the file system during autoumont
-			bool autoMountAllBFS = true,			// automount bfs disks
-			bool autoMountAllHFS = false,			// automount hfs diska
-			bool initialMountAll = false, 			// mount everything during boot
-			bool initialMountAllBFS = true,			// mount every bfs volume during boot
-			bool initialMountRestore = false,		// restore volumes that were mounted at last shutdown
-			bool initialMountAllHFS = false);		// mount every hfs volume during boot
-		virtual ~AutoMounter();
-		virtual bool QuitRequested();
-
-		void GetSettings(BMessage *);
-
-		void CheckVolumesNow();
-			// mounts everything respecting the current automounting settings
-			// used to sync up right after settings changed
-
-		void EachMountableItemAndFloppy(EachPartitionFunction , void *);
-		void EachMountedItem(EachPartitionFunction, void *);
-		Partition * EachPartition(EachPartitionFunction, void *);
-		Partition *FindPartition(dev_t id);
-
-	private:
-		void ReadSettings();
-		void WriteSettings();
-
-		virtual void MessageReceived(BMessage *);
-
-		void UnmountAndEjectVolume(BMessage *);
-		void SetParams(BMessage *, bool rescan);
-
-		static status_t WatchVolumeBinder(void *);
-		void WatchVolumes();
-
-		static status_t InitialRescanBinder(void *);
-		void InitialRescan();
-
-		void SuspendResume(bool);
-
-		void MountAllNow();
-			// used by the mount all now button
-			// ignores the automounting settings and mounts everything it can
-
-		void MountVolume(BMessage *);
-
-		void RescanDevices();
-
-		void TryMountingFloppy();
-		bool IsFloppyMounted();
-		bool FloppyInList();
-
-		DeviceList fList;
-
-		// automounter settings
-		DeviceScanParams fScanParams;
-		AutomountParams fAutomountParams;
-
-		bool fInitialMountAll;
-		bool fInitialMountAllBFS;
-		bool fInitialMountRestore;
-		bool fInitialMountAllHFS;
-		bool fSuspended;
-
-		// misc.
-		thread_id fScanThread;
-		volatile bool fQuitting;
-
-		BFile fPrefsFile;
-};
-
-Partition *AddMountableItemToMessage(Partition *, void *);
-
-#endif	// !__HAIKU__
 
 } // namespace BPrivate
 
