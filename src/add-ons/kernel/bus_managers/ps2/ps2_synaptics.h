@@ -1,11 +1,20 @@
+/*
+ * Copyright 2008-2009, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors (in chronological order):
+ *		Clemens Zeidler (haiku@Clemens-Zeidler.de)
+ */
 #ifndef SYNAPTICS_H
 #define SYNAPTICS_H
+
 
 #include <KernelExport.h>
 
 #include "kb_mouse_driver.h"
 #include "movement_maker.h"
 #include "packet_buffer.h"
+#include "ps2_service.h"
 #include "touchpad_settings.h"
 
 

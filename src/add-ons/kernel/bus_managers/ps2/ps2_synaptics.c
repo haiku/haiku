@@ -1,20 +1,24 @@
 /*
- * Copyright 2008 Haiku, Inc.
+ * Copyright 2008-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
- *
- * PS/2 synaptics touchpad
  *
  * Authors (in chronological order):
  *		Clemens Zeidler (haiku@Clemens-Zeidler.de)
  */
+
+
+//!	PS/2 synaptics touchpad
+
+
+#include "ps2_synaptics.h"
 
 #include <malloc.h>
 #include <string.h>
 #include <stdlib.h>
 
 #include "ps2_service.h"
-#include "ps2_synaptics.h"
 #include "kb_mouse_driver.h"
+
 
 const char* kSynapticsPath[4] = {
 	"input/touchpad/ps2/synaptics_0",
@@ -23,8 +27,9 @@ const char* kSynapticsPath[4] = {
 	"input/touchpad/ps2/synaptics_3"
 };
 
-static touchpad_info gTouchpadInfo;
-ps2_dev *gPassthroughDevice = &ps2_device[PS2_DEVICE_SYN_PASSTHROUGH];
+
+static touchpad_info sTouchpadInfo;
+static ps2_dev *sPassthroughDevice = &ps2_device[PS2_DEVICE_SYN_PASSTHROUGH];
 
 
 void
@@ -37,7 +42,7 @@ default_settings(touchpad_settings *set)
 status_t
 synaptics_pt_set_packagesize(ps2_dev *dev, uint8 size)
 {
-	synaptics_cookie* syn_cookie = dev->parent_dev->cookie;
+	synaptics_cookie *synapticsCookie = dev->parent_dev->cookie;
 
 	status_t status = ps2_dev_command(dev->parent_dev, PS2_CMD_DISABLE, NULL,
 		0, NULL, 0);
@@ -46,16 +51,16 @@ synaptics_pt_set_packagesize(ps2_dev *dev, uint8 size)
 		return B_ERROR;
 	}
 
-	syn_cookie->packet_index = 0;
+	synapticsCookie->packet_index = 0;
 
 	if (size == 4)
-		syn_cookie->mode|= SYN_FOUR_BYTE_CHILD;
+		synapticsCookie->mode |= SYN_FOUR_BYTE_CHILD;
 	else
-		syn_cookie->mode&= ~SYN_FOUR_BYTE_CHILD;
-	set_touchpad_mode(dev->parent_dev, syn_cookie->mode);
+		synapticsCookie->mode &= ~SYN_FOUR_BYTE_CHILD;
 
-	status = ps2_dev_command(dev->parent_dev, PS2_CMD_ENABLE, NULL, 0, NULL,
-		0);
+	set_touchpad_mode(dev->parent_dev, synapticsCookie->mode);
+
+	status = ps2_dev_command(dev->parent_dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0);
 	if (status < B_OK) {
 		INFO("SYNAPTICS: cannot enable touchpad %s\n", dev->parent_dev->name);
 		return B_ERROR;
@@ -95,14 +100,14 @@ set_touchpad_mode(ps2_dev *dev, uint8 mode)
 
 
 status_t
-passthrough_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count,
-	uint8 *in, int in_count, bigtime_t timeout)
+passthrough_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int outCount,
+	uint8 *in, int inCount, bigtime_t timeout)
 {
 	status_t status;
-	uint8 pt_cmd = SYN_PASSTHROUGH_CMD;
+	uint8 passThroughCmd = SYN_PASSTHROUGH_CMD;
 	uint8 val;
-	uint32 pt_in_count = (in_count + 1) * 6;
-	uint8 pt_in[pt_in_count];
+	uint32 passThroughInCount = (inCount + 1) * 6;
+	uint8 passThroughIn[passThroughInCount];
 	int8 i;
 
 	TRACE("SYNAPTICS: passthrough command 0x%x\n", cmd);
@@ -112,7 +117,7 @@ passthrough_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count,
 	if (status != B_OK)
 		return status;
 
-	for (i = -1; i < out_count; i++) {
+	for (i = -1; i < outCount; i++) {
 		if (i == -1)
 			val = cmd;
 		else
@@ -120,31 +125,31 @@ passthrough_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count,
 		status = send_touchpad_arg_timeout(dev->parent_dev, val, timeout);
 		if (status != B_OK)
 			return status;
-		if (i != out_count -1) {
+		if (i != outCount -1) {
 			status = ps2_dev_command_timeout(dev->parent_dev,
-				PS2_CMD_SET_SAMPLE_RATE, &pt_cmd, 1, NULL, 0, timeout);
+				PS2_CMD_SET_SAMPLE_RATE, &passThroughCmd, 1, NULL, 0, timeout);
 			if (status != B_OK)
 				return status;
 		}
 	}
 	status = ps2_dev_command_timeout(dev->parent_dev, PS2_CMD_SET_SAMPLE_RATE,
-		&pt_cmd, 1, pt_in, pt_in_count, timeout);
+		&passThroughCmd, 1, passThroughIn, passThroughInCount, timeout);
 	if (status != B_OK)
 		return status;
 
-	for (i = 0; i < in_count + 1; i++) {
-		uint8 *inPointer = &(pt_in[i * 6]);
+	for (i = 0; i < inCount + 1; i++) {
+		uint8 *inPointer = &passThroughIn[i * 6];
 		if (!IS_SYN_PT_PACKAGE(inPointer)) {
 			TRACE("SYNAPTICS: not a pass throught package\n");
 			return B_OK;
 		}
 		if (i == 0)
 			continue;
-		in[i - 1] = pt_in[i * 6 + 1];
+
+		in[i - 1] = passThroughIn[i * 6 + 1];
 	}
 
-	status = ps2_dev_command(dev->parent_dev, PS2_CMD_ENABLE, NULL, 0, NULL,
-		0);
+	status = ps2_dev_command(dev->parent_dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0);
 	if (status != B_OK)
 		return status;
 
@@ -190,7 +195,7 @@ touchevent_to_movement(synaptics_cookie* cookie, touch_event *event,
 	bool isStartOfMovement = false;
 	float sens = 0;
 	bigtime_t currentTime = system_time();
-	touchpad_settings * settings = &(cookie->settings);
+	touchpad_settings *settings = &cookie->settings;
 	uint32 buttons = event->buttons;
 
 	if (!movement)
@@ -223,20 +228,20 @@ touchevent_to_movement(synaptics_cookie* cookie, touch_event *event,
 
 	if (event->zPressure >= MIN_PRESSURE && event->zPressure < MAX_PRESSURE
 		&& ((event->wValue >=4 && event->wValue <=7)
-				|| event->wValue == 0 || event->wValue == 1)
+			|| event->wValue == 0 || event->wValue == 1)
 		&& (event->xPosition != 0 || event->yPosition != 0)) {
 		isInTouch = true;
 	}
 
 	if (isInTouch) {
 		if ((SYN_AREA_END_X - SYN_AREA_WIDTH_X * settings->scroll_rightrange
-			< event->xPosition && !cookie->movement_started
+				< event->xPosition && !cookie->movement_started
 			&& settings->scroll_rightrange > 0.000001)
 				|| settings->scroll_rightrange > 0.999999) {
 			isSideScrollingV = true;
 		}
 		if ((SYN_AREA_START_Y + SYN_AREA_WIDTH_Y * settings->scroll_bottomrange
-				> event->yPosition && !cookie->movement_started
+					> event->yPosition && !cookie->movement_started
 				&& settings->scroll_bottomrange > 0.000001)
 					|| settings->scroll_bottomrange > 0.999999) {
 			isSideScrollingH = true;
@@ -383,7 +388,7 @@ notouch:
 
 
 status_t
-get_synaptics_movment(synaptics_cookie* cookie, mouse_movement *movement)
+get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
 {
 	status_t status;
 	touch_event event;
@@ -410,7 +415,7 @@ get_synaptics_movment(synaptics_cookie* cookie, mouse_movement *movement)
 	event.buttons = event_buffer[0] & 3;
  	event.zPressure = event_buffer[2];
 
- 	if (gTouchpadInfo.capExtended) {
+ 	if (sTouchpadInfo.capExtended) {
  		wValue0 = event_buffer[3] >> 2 & 1;
 	 	wValue1 = event_buffer[0] >> 2 & 1;
  		wValue2 = event_buffer[0] >> 4 & 1;
@@ -458,18 +463,18 @@ query_capability(ps2_dev *dev)
 	send_touchpad_arg(dev, 0x02);
 	ps2_dev_command(dev, 0xE9, NULL, 0, val, 3);
 
-	gTouchpadInfo.capExtended = val[0] >> 7 & 1;
+	sTouchpadInfo.capExtended = val[0] >> 7 & 1;
 	TRACE("SYNAPTICS: extended mode %2x\n", val[0] >> 7 & 1);
 	TRACE("SYNAPTICS: sleep mode %2x\n", val[2] >> 4 & 1);
-	gTouchpadInfo.capSleep = val[2] >> 4 & 1;
+	sTouchpadInfo.capSleep = val[2] >> 4 & 1;
 	TRACE("SYNAPTICS: four buttons %2x\n", val[2] >> 3 & 1);
-	gTouchpadInfo.capFourButtons = val[2] >> 3 & 1;
+	sTouchpadInfo.capFourButtons = val[2] >> 3 & 1;
 	TRACE("SYNAPTICS: multi finger %2x\n", val[2] >> 1 & 1);
-	gTouchpadInfo.capMultiFinger = val[2] >> 1 & 1;
+	sTouchpadInfo.capMultiFinger = val[2] >> 1 & 1;
 	TRACE("SYNAPTICS: palm detection %2x\n", val[2] & 1);
-	gTouchpadInfo.capPalmDetection = val[2] & 1;
+	sTouchpadInfo.capPalmDetection = val[2] & 1;
 	TRACE("SYNAPTICS: pass through %2x\n", val[2] >> 7 & 1);
-	gTouchpadInfo.capPassThrough = val[2] >> 7 & 1;
+	sTouchpadInfo.capPassThrough = val[2] >> 7 & 1;
 }
 
 
@@ -491,7 +496,7 @@ probe_synaptics(ps2_dev *dev)
 	if (status != B_OK)
 		return status;
 
-	gTouchpadInfo.minorVersion = val[0];
+	sTouchpadInfo.minorVersion = val[0];
 	deviceId = val[1];
 	if (deviceId != SYN_TOUCHPAD) {
 		TRACE("SYNAPTICS: not found\n");
@@ -499,12 +504,12 @@ probe_synaptics(ps2_dev *dev)
 	}
 
 	TRACE("SYNAPTICS: Touchpad found id:l %2x\n", deviceId);
-	gTouchpadInfo.majorVersion = val[2] & 0x0F;
-	TRACE("SYNAPTICS: version %d.%d\n", gTouchpadInfo.majorVersion,
-		gTouchpadInfo.minorVersion);
+	sTouchpadInfo.majorVersion = val[2] & 0x0F;
+	TRACE("SYNAPTICS: version %d.%d\n", sTouchpadInfo.majorVersion,
+		sTouchpadInfo.minorVersion);
 	// version >= 4.0?
-	if (gTouchpadInfo.minorVersion <= 2
-		&& gTouchpadInfo.majorVersion <= 3) {
+	if (sTouchpadInfo.minorVersion <= 2
+		&& sTouchpadInfo.majorVersion <= 3) {
 		TRACE("SYNAPTICS: too old touchpad not supported\n");
 		return B_ERROR;
 	}
@@ -520,7 +525,7 @@ status_t
 synaptics_open(const char *name, uint32 flags, void **_cookie)
 {
 	status_t status;
-	synaptics_cookie* cookie;
+	synaptics_cookie *cookie;
 	ps2_dev *dev;
 	int i;
 
@@ -583,15 +588,15 @@ synaptics_open(const char *name, uint32 flags, void **_cookie)
 	query_capability(dev);
 
 	// create pass through dev
-	if (gTouchpadInfo.capPassThrough) {
+	if (sTouchpadInfo.capPassThrough) {
 		TRACE("SYNAPTICS: pass through detected\n");
-		gPassthroughDevice->parent_dev = dev;
-		gPassthroughDevice->idx = dev->idx;
-		ps2_service_notify_device_added(gPassthroughDevice);
+		sPassthroughDevice->parent_dev = dev;
+		sPassthroughDevice->idx = dev->idx;
+		ps2_service_notify_device_added(sPassthroughDevice);
 	}
 
 	// Set Mode
-	if (gTouchpadInfo.capExtended)
+	if (sTouchpadInfo.capExtended)
 		cookie->mode = SYN_ABSOLUTE_W_MODE;
 	else
 		cookie->mode = SYN_ABSOLUTE_MODE;
@@ -650,9 +655,9 @@ synaptics_close(void *_cookie)
 		INFO("ps2: reset failed\n");
 		return B_ERROR;
 	}
-		
-	if (gTouchpadInfo.capPassThrough)
-		ps2_service_notify_device_removed(gPassthroughDevice);
+
+	if (sTouchpadInfo.capPassThrough)
+		ps2_service_notify_device_removed(sPassthroughDevice);
 
 	TRACE("SYNAPTICS: close %s done\n", cookie->dev->name);
 	return B_OK;
@@ -731,19 +736,20 @@ synaptics_handle_int(ps2_dev *dev)
 
 	val = cookie->dev->history[0].data;
 
-	if ((cookie->packet_index == 0 || cookie->packet_index == 3) && val & 8) {
+	if ((cookie->packet_index == 0 || cookie->packet_index == 3)
+		&& (val & 8) != 0) {
 		INFO("SYNAPTICS: bad mouse data, trying resync\n");
 		cookie->packet_index = 0;
-		goto unhandled;
+		return B_UNHANDLED_INTERRUPT;
 	}
 	if (cookie->packet_index == 0 && val >> 6 != 0x02) {
 	 	TRACE("SYNAPTICS: first package begins not with bit 1, 0\n");
- 		goto unhandled;
+		return B_UNHANDLED_INTERRUPT;
  	}
  	if (cookie->packet_index == 3 && val >> 6 != 0x03) {
 	 	TRACE("SYNAPTICS: third package begins not with bit 1, 1\n");
 	 	cookie->packet_index = 0;
- 		goto unhandled;
+		return B_UNHANDLED_INTERRUPT;
  	}
  	cookie->packet_buffer[cookie->packet_index] = val;
 
@@ -753,21 +759,21 @@ synaptics_handle_int(ps2_dev *dev)
 
 		// check if package is a pass through package if true pass it
 		// too the pass through interrupt handle
-		if (gPassthroughDevice->active
-			&& gPassthroughDevice->handle_int != NULL
+		if (sPassthroughDevice->active
+			&& sPassthroughDevice->handle_int != NULL
 			&& IS_SYN_PT_PACKAGE(cookie->packet_buffer)) {
 			status_t status;
 
-			gPassthroughDevice->history[0].data = cookie->packet_buffer[1];
-			gPassthroughDevice->handle_int(gPassthroughDevice);
-			gPassthroughDevice->history[0].data = cookie->packet_buffer[4];
-			gPassthroughDevice->handle_int(gPassthroughDevice);
-			gPassthroughDevice->history[0].data = cookie->packet_buffer[5];
-			status = gPassthroughDevice->handle_int(gPassthroughDevice);
+			sPassthroughDevice->history[0].data = cookie->packet_buffer[1];
+			sPassthroughDevice->handle_int(sPassthroughDevice);
+			sPassthroughDevice->history[0].data = cookie->packet_buffer[4];
+			sPassthroughDevice->handle_int(sPassthroughDevice);
+			sPassthroughDevice->history[0].data = cookie->packet_buffer[5];
+			status = sPassthroughDevice->handle_int(sPassthroughDevice);
 
 			if (cookie->dev->packet_size == 4) {
-				gPassthroughDevice->history[0].data = cookie->packet_buffer[2];
-				status = gPassthroughDevice->handle_int(gPassthroughDevice);
+				sPassthroughDevice->history[0].data = cookie->packet_buffer[2];
+				status = sPassthroughDevice->handle_int(sPassthroughDevice);
 			}
 			return status;
 		}
@@ -784,8 +790,6 @@ synaptics_handle_int(ps2_dev *dev)
 	}
 
 	return B_HANDLED_INTERRUPT;
-unhandled:
-	return B_UNHANDLED_INTERRUPT;
 }
 
 
@@ -795,7 +799,7 @@ synaptics_disconnect(ps2_dev *dev)
 	synaptics_cookie *cookie = dev->cookie;
 	// the mouse device might not be opened at this point
 	INFO("SYNAPTICS: synaptics_disconnect %s\n", dev->name);
-	if (dev->flags & PS2_FLAG_OPEN)
+	if ((dev->flags & PS2_FLAG_OPEN) != 0)
 		release_sem(cookie->synaptics_sem);
 }
 
