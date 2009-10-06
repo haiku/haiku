@@ -52,17 +52,17 @@
 			fFunctionDepth++;
 			fPrepend.Append(' ', fFunctionDepth * 2);
 			fFunctionName << className << "::" << functionName << "()";
-	
+
 			debug_printf("%p -> %s%s {\n", fPointer, fPrepend.String(),
 				fFunctionName.String());
 		}
-	
+
 		 ~FunctionTracer()
 		{
 			debug_printf("%p -> %s}\n", fPointer, fPrepend.String());
 			fFunctionDepth--;
 		}
-	
+
 	private:
 		BString	fFunctionName;
 		BString	fPrepend;
@@ -319,7 +319,7 @@ MouseDevice::_BuildShortName() const
 	} else {
 		if (string.FindFirst("intelli") >= 0)
 			name.Prepend("Extended ");
-	
+
 		name << " Mouse ";
 	}
 	name << index;
@@ -357,7 +357,7 @@ MouseDevice::_ControlThread()
 		fIsTouchpad = true;
 
 		fTouchpadSettings = kDefaultTouchpadSettings;
-	
+
 		BPath path;
 		status_t status = _GetTouchpadSettingsPath(path);
 		BFile settingsFile(path.Path(), B_READ_ONLY);
@@ -402,7 +402,7 @@ MouseDevice::_ControlThread()
 			fUpdateSettings = false;
 			if (fIsTouchpad) {
 				BAutolock _(fTouchpadSettingsLock);
-				if (fTouchpadSettingsMessage) {
+				if (fTouchpadSettingsMessage != NULL) {
 					_ReadTouchpadSettingsMsg(fTouchpadSettingsMessage);
 					_UpdateTouchpadSettings();
 					delete fTouchpadSettingsMessage;
@@ -460,8 +460,10 @@ MouseDevice::_ControlThread()
 				continue;
 
 			if (message->AddInt64("when", movements.timestamp) == B_OK
-				&& message->AddFloat("be:wheel_delta_x", movements.wheel_xdelta) == B_OK
-				&& message->AddFloat("be:wheel_delta_y", movements.wheel_ydelta) == B_OK)
+				&& message->AddFloat("be:wheel_delta_x",
+					movements.wheel_xdelta) == B_OK
+				&& message->AddFloat("be:wheel_delta_y",
+					movements.wheel_ydelta) == B_OK)
 				fTarget.EnqueueMessage(message);
 			else
 				delete message;
@@ -546,22 +548,22 @@ MouseDevice::_GetTouchpadSettingsPath(BPath& path)
 status_t
 MouseDevice::_ReadTouchpadSettingsMsg(BMessage* message)
 {
-	message->FindBool("scroll_twofinger",
-		&(fTouchpadSettings.scroll_twofinger));
+	message->FindBool("scroll_twofinger", &fTouchpadSettings.scroll_twofinger);
 	message->FindBool("scroll_multifinger",
-		&(fTouchpadSettings.scroll_multifinger));
+		&fTouchpadSettings.scroll_multifinger);
 	message->FindFloat("scroll_rightrange",
-		&(fTouchpadSettings.scroll_rightrange));
+		&fTouchpadSettings.scroll_rightrange);
 	message->FindFloat("scroll_bottomrange",
-		&(fTouchpadSettings.scroll_bottomrange));
+		&fTouchpadSettings.scroll_bottomrange);
+
 	message->FindInt16("scroll_xstepsize",
-		(int16*)&(fTouchpadSettings.scroll_xstepsize));
+		(int16*)&fTouchpadSettings.scroll_xstepsize);
 	message->FindInt16("scroll_ystepsize",
-		(int16*)&(fTouchpadSettings.scroll_ystepsize));
+		(int16*)&fTouchpadSettings.scroll_ystepsize);
 	message->FindInt8("scroll_acceleration",
-		(int8*)&(fTouchpadSettings.scroll_acceleration));
+		(int8*)&fTouchpadSettings.scroll_acceleration);
 	message->FindInt8("tapgesture_sensibility",
-		(int8*)&(fTouchpadSettings.tapgesture_sensibility));
+		(int8*)&fTouchpadSettings.tapgesture_sensibility);
 
 	return B_OK;
 }
@@ -861,6 +863,3 @@ MouseInputDevice::_RemoveDevice(const char* path)
 
 	return B_OK;
 }
-
-
-
