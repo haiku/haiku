@@ -69,6 +69,7 @@ struct devfs_stream {
 		struct stream_dir {
 			struct devfs_vnode*		dir_head;
 			struct list				cookies;
+			mutex					scan_lock;
 			int32					scanned;
 		} dir;
 		struct stream_dev {
@@ -177,8 +178,15 @@ scan_mode(void)
 
 
 static status_t
-scan_for_drivers(devfs_vnode* dir)
+scan_for_drivers_if_needed(devfs_vnode* dir)
 {
+	ASSERT(S_ISDIR(dir->stream.type));
+
+	MutexLocker _(dir->stream.u.dir.scan_lock);
+
+	if (dir->stream.u.dir.scanned >= scan_mode())
+		return B_OK;
+
 	KPath path;
 	if (path.InitCheck() != B_OK)
 		return B_NO_MEMORY;
@@ -186,7 +194,8 @@ scan_for_drivers(devfs_vnode* dir)
 	get_device_name(dir, path.LockBuffer(), path.BufferSize());
 	path.UnlockBuffer();
 
-	TRACE(("scan_for_drivers: mode %ld: %s\n", scan_mode(), path.Path()));
+	TRACE(("scan_for_drivers_if_needed: mode %ld: %s\n", scan_mode(),
+		path.Path()));
 
 	// scan for drivers at this path
 	static int32 updateCycle = 1;
@@ -221,6 +230,16 @@ devfs_vnode_compare(void* _vnode, const void* _key)
 		return 0;
 
 	return -1;
+}
+
+
+static void
+init_directory_vnode(struct devfs_vnode* vnode, int permissions)
+{
+	vnode->stream.type = S_IFDIR | permissions;
+		mutex_init(&vnode->stream.u.dir.scan_lock, "devfs scan");
+	vnode->stream.u.dir.dir_head = NULL;
+	list_init(&vnode->stream.u.dir.cookies);
 }
 
 
@@ -275,6 +294,8 @@ devfs_delete_vnode(struct devfs* fs, struct devfs_vnode* vnode,
 			// device and is still in use there
 			put_vnode(fs->volume, vnode->stream.u.dev.partition->raw_device->id);
 		}
+	} else if (S_ISDIR(vnode->stream.type)) {
+		mutex_destroy(&vnode->stream.u.dir.scan_lock);
 	}
 
 	free(vnode->name);
@@ -511,6 +532,14 @@ out:
 }
 
 
+static void
+publish_node(devfs* fs, devfs_vnode* dirNode, struct devfs_vnode* node)
+{
+	hash_insert(fs->vnode_hash, node);
+	devfs_insert_in_dir(dirNode, node);
+}
+
+
 static status_t
 publish_directory(struct devfs *fs, const char *path)
 {
@@ -564,12 +593,8 @@ publish_directory(struct devfs *fs, const char *path)
 		}
 
 		// set up the new directory
-		vnode->stream.type = S_IFDIR | 0755;
-		vnode->stream.u.dir.dir_head = NULL;
-		list_init(&vnode->stream.u.dir.cookies);
-
-		hash_insert(sDeviceFileSystem->vnode_hash, vnode);
-		devfs_insert_in_dir(dir, vnode);
+		init_directory_vnode(vnode, 0755);
+		publish_node(sDeviceFileSystem, dir, vnode);
 
 		last = i;
 		dir = vnode;
@@ -643,12 +668,8 @@ new_node(struct devfs *fs, const char *path, struct devfs_vnode **_node,
 		// set up the new vnode
 		if (!atLeaf) {
 			// this is a dir
-			vnode->stream.type = S_IFDIR | 0755;
-			vnode->stream.u.dir.dir_head = NULL;
-			list_init(&vnode->stream.u.dir.cookies);
-
-			hash_insert(fs->vnode_hash, vnode);
-			devfs_insert_in_dir(dir, vnode);
+			init_directory_vnode(vnode, 0755);
+			publish_node(fs, dir, vnode);
 		} else {
 			// this is the last component
 			// Note: We do not yet insert the node into the directory, as it
@@ -667,14 +688,6 @@ new_node(struct devfs *fs, const char *path, struct devfs_vnode **_node,
 
 out:
 	return status;
-}
-
-
-static void
-publish_node(devfs* fs, devfs_vnode* dirNode, struct devfs_vnode* node)
-{
-	hash_insert(fs->vnode_hash, node);
-	devfs_insert_in_dir(dirNode, node);
 }
 
 
@@ -729,7 +742,9 @@ publish_device(struct devfs* fs, const char* path, BaseDevice* device)
 static void
 get_device_name(struct devfs_vnode* vnode, char* buffer, size_t size)
 {
-	struct devfs_vnode *leaf = vnode;
+	RecursiveLocker _(sDeviceFileSystem->lock);
+
+	struct devfs_vnode* leaf = vnode;
 	size_t offset = 0;
 
 	// count levels
@@ -878,9 +893,7 @@ devfs_mount(fs_volume *volume, const char *devfs, uint32 flags,
 	vnode->parent = vnode;
 
 	// create a dir stream for it to hold
-	vnode->stream.type = S_IFDIR | 0755;
-	vnode->stream.u.dir.dir_head = NULL;
-	list_init(&vnode->stream.u.dir.cookies);
+	init_directory_vnode(vnode, 0755);
 	fs->root_vnode = vnode;
 
 	hash_insert(fs->vnode_hash, vnode);
@@ -951,10 +964,10 @@ devfs_lookup(fs_volume *_volume, fs_vnode *_dir, const char *name, ino_t *_id)
 	if (!S_ISDIR(dir->stream.type))
 		return B_NOT_A_DIRECTORY;
 
-	RecursiveLocker locker(&fs->lock);
+	// Make sure the directory contents are up to date
+	scan_for_drivers_if_needed(dir);
 
-	if (dir->stream.u.dir.scanned < scan_mode())
-		scan_for_drivers(dir);
+	RecursiveLocker locker(&fs->lock);
 
 	// look it up
 	vnode = devfs_find_in_dir(dir, name);
@@ -1088,10 +1101,8 @@ devfs_create(fs_volume* _volume, fs_vnode* _dir, const char* name, int openMode,
 		if (status < B_OK)
 			return status;
 
-		locker.Lock();
 		char path[B_FILE_NAME_LENGTH];
 		get_device_name(vnode, path, sizeof(path));
-		locker.Unlock();
 
 		status = device->Open(path, openMode, &cookie->device_cookie);
 		if (status != B_OK)
@@ -1116,7 +1127,6 @@ devfs_open(fs_volume* _volume, fs_vnode* _vnode, int openMode,
 	void** _cookie)
 {
 	struct devfs_vnode* vnode = (struct devfs_vnode*)_vnode->private_node;
-	struct devfs* fs = (struct devfs*)_volume->private_volume;
 	struct devfs_cookie* cookie;
 	status_t status = B_OK;
 
@@ -1124,26 +1134,26 @@ devfs_open(fs_volume* _volume, fs_vnode* _vnode, int openMode,
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
-	TRACE(("devfs_open: vnode %p, openMode 0x%x, cookie %p\n", vnode, openMode, cookie));
+	TRACE(("devfs_open: vnode %p, openMode 0x%x, cookie %p\n", vnode, openMode,
+		cookie));
+
 	cookie->device_cookie = NULL;
 
 	if (S_ISCHR(vnode->stream.type)) {
 		BaseDevice* device = vnode->stream.u.dev.device;
 		status = device->InitDevice();
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 
-		RecursiveLocker locker(fs->lock);
 		char path[B_FILE_NAME_LENGTH];
 		get_device_name(vnode, path, sizeof(path));
-		locker.Unlock();
 
 		status = device->Open(path, openMode, &cookie->device_cookie);
 		if (status != B_OK)
 			device->UninitDevice();
 	}
 
-	if (status < B_OK)
+	if (status != B_OK)
 		free(cookie);
 	else
 		*_cookie = cookie;
@@ -1293,12 +1303,8 @@ devfs_create_dir(fs_volume *_volume, fs_vnode *_dir, const char *name,
 	}
 
 	// set up the new directory
-	vnode->stream.type = S_IFDIR | perms;
-	vnode->stream.u.dir.dir_head = NULL;
-	list_init(&vnode->stream.u.dir.cookies);
-
-	hash_insert(sDeviceFileSystem->vnode_hash, vnode);
-	devfs_insert_in_dir(dir, vnode);
+	init_directory_vnode(vnode, perms);
+	publish_node(sDeviceFileSystem, dir, vnode);
 
 	return B_OK;
 }
@@ -1320,11 +1326,10 @@ devfs_open_dir(fs_volume *_volume, fs_vnode *_vnode, void **_cookie)
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
-	RecursiveLocker locker(&fs->lock);
-
 	// make sure the directory has up-to-date contents
-	if (vnode->stream.u.dir.scanned < scan_mode())
-		scan_for_drivers(vnode);
+	scan_for_drivers_if_needed(vnode);
+
+	RecursiveLocker locker(&fs->lock);
 
 	cookie->current = vnode->stream.u.dir.dir_head;
 	cookie->state = ITERATION_STATE_BEGIN;
