@@ -1,8 +1,5 @@
 SubDir HAIKU_TOP src preferences fonts ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-AddSubDirSupportedPlatforms libbe_test ;
-
 Preference Fonts :
 	FontSelectionView.cpp
 	FontsSettings.cpp
@@ -12,11 +9,6 @@ Preference Fonts :
 	: be $(TARGET_LIBSUPC++) liblocale.so
 	: Fonts.rdef
 	;
-
-if $(TARGET_PLATFORM) = libbe_test {
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Fonts
-		: tests!apps ;
-}
 
 DoCatalogs Fonts :
 	x-vnd.Haiku-Fonts
