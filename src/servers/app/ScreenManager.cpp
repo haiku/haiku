@@ -93,7 +93,7 @@ ScreenManager::AcquireScreens(ScreenOwner* owner, int32* wishList,
 	BAutolock locker(this);
 	int32 added = 0;
 
-	// ToDo: don't ignore the wish list
+	// TODO: don't ignore the wish list
 
 	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
 		screen_item* item = fScreenList.ItemAt(i);
@@ -104,6 +104,7 @@ ScreenManager::AcquireScreens(ScreenOwner* owner, int32* wishList,
 		}
 	}
 
+#if TEST_MODE == 0
 	if (added == 0 && target != NULL) {
 		// there's a specific target screen we want to initialize
 		// TODO: right now we only support remote screens, but we could
@@ -117,6 +118,7 @@ ScreenManager::AcquireScreens(ScreenOwner* owner, int32* wishList,
 			}
 		}
 	}
+#endif // TEST_MODE == 0
 
 	return added > 0 ? B_OK : B_ENTRY_NOT_FOUND;
 }
