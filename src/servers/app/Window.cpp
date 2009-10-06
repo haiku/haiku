@@ -781,7 +781,8 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 	int32 modifiers = _ExtractModifiers(message);
 	bool inBorderRegion = fBorderRegion.Contains(where);
 	bool windowModifier = (fFlags & B_NO_SERVER_SIDE_WINDOW_MODIFIERS) == 0
-		&& (~modifiers & (B_COMMAND_KEY | B_CONTROL_KEY)) == 0;
+		&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
+			| B_SHIFT_KEY)) == B_COMMAND_KEY | B_CONTROL_KEY;
 
 	// default action is to drag the Window
 	if (windowModifier || inBorderRegion) {
@@ -1530,7 +1531,7 @@ Window::SetFlags(uint32 flags, BRegion* updateRegion)
 }
 
 
-/*!	Returns wether or not a window is in the workspace list with the
+/*!	Returns whether or not a window is in the workspace list with the
 	specified \a index.
 */
 bool
@@ -1847,16 +1848,25 @@ Window::IsFloatingFeel(window_feel feel)
 /*static*/ uint32
 Window::ValidWindowFlags()
 {
-	return B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE
-		| B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
-		| B_NOT_H_RESIZABLE | B_NOT_V_RESIZABLE
-		| B_AVOID_FRONT | B_AVOID_FOCUS
-		| B_WILL_ACCEPT_FIRST_CLICK | B_OUTLINE_RESIZE
+	return B_NOT_MOVABLE
+		| B_NOT_CLOSABLE
+		| B_NOT_ZOOMABLE
+		| B_NOT_MINIMIZABLE
+		| B_NOT_RESIZABLE
+		| B_NOT_H_RESIZABLE
+		| B_NOT_V_RESIZABLE
+		| B_AVOID_FRONT
+		| B_AVOID_FOCUS
+		| B_WILL_ACCEPT_FIRST_CLICK
+		| B_OUTLINE_RESIZE
 		| B_NO_WORKSPACE_ACTIVATION
 		| B_NOT_ANCHORED_ON_ACTIVATE
 		| B_ASYNCHRONOUS_CONTROLS
 		| B_QUIT_ON_WINDOW_CLOSE
 		| B_SAME_POSITION_IN_ALL_WORKSPACES
+		| B_AUTO_UPDATE_SIZE_LIMITS
+		| B_CLOSE_ON_ESCAPE
+		| B_NO_SERVER_SIDE_WINDOW_MODIFIERS
 		| kWindowScreenFlag;
 }
 
