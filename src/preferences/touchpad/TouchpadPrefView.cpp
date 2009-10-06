@@ -8,25 +8,25 @@
 
 
 #include "TouchpadPrefView.h"
-#include "kb_mouse_driver.h"
 
-#include <CheckBox.h>
+#include <stdio.h>
+
 #include <Alert.h>
 #include <Box.h>
+#include <CheckBox.h>
 #include <File.h>
 #include <FindDirectory.h>
-#include <GroupLayout.h>
-#include <GroupView.h>
 #include <Input.h>
-#include <SpaceLayoutItem.h>
+#include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <Path.h>
 #include <Screen.h>
+#include <SpaceLayoutItem.h>
 #include <Window.h>
 
-#include <stdio.h>
+#include "kb_mouse_driver.h"
 
 
 const uint32 SCROLL_X_DRAG = 'sxdr';
@@ -283,12 +283,13 @@ TouchpadPrefView::MessageReceived(BMessage* msg)
 			break;
 		case SCROLL_CONTROL_CHANGED:
 			settings.scroll_twofinger = fTwoFingerBox->Value() == B_CONTROL_ON;
-			settings.scroll_multifinger
-				= fMultiFingerBox->Value() == B_CONTROL_ON;
+			settings.scroll_twofinger_horizontal
+				= fTwoFingerHorizontalBox->Value() == B_CONTROL_ON;
 			settings.scroll_acceleration = fScrollAccelSlider->Value();
 			settings.scroll_xstepsize = (20 - fScrollStepXSlider->Value()) * 3;
 			settings.scroll_ystepsize = (20 - fScrollStepYSlider->Value()) * 3;
 			fRevertButton->SetEnabled(true);
+			fTwoFingerHorizontalBox->SetEnabled(settings.scroll_twofinger);
 			fTouchpadPref.UpdateSettings();
 			break;
 		case TAP_CONTROL_CHANGED:
@@ -320,7 +321,7 @@ TouchpadPrefView::AttachedToWindow()
 {
 	fTouchpadView->SetTarget(this);
 	fTwoFingerBox->SetTarget(this);
-	fMultiFingerBox->SetTarget(this);
+	fTwoFingerHorizontalBox->SetTarget(this);
 	fScrollStepXSlider->SetTarget(this);
 	fScrollStepYSlider->SetTarget(this);
 	fScrollAccelSlider->SetTarget(this);
@@ -382,13 +383,16 @@ TouchpadPrefView::SetupView()
 
 	fTwoFingerBox = new BCheckBox("Two Finger Scrolling",
 		new BMessage(SCROLL_CONTROL_CHANGED));
-	fMultiFingerBox = new BCheckBox("Multi Finger Scrolling",
+	fTwoFingerHorizontalBox = new BCheckBox("Horizontal Scrolling",
 		new BMessage(SCROLL_CONTROL_CHANGED));
 
 	BGroupView* scrollPrefLeftLayout = new BGroupView(B_VERTICAL);
-	scrollPrefLeftLayout->AddChild(fTouchpadView);
-	scrollPrefLeftLayout->AddChild(fTwoFingerBox);
-	scrollPrefLeftLayout->AddChild(fMultiFingerBox);
+	BLayoutBuilder::Group<>(scrollPrefLeftLayout)
+		.Add(fTouchpadView)
+		.Add(fTwoFingerBox)
+		.AddGroup(B_HORIZONTAL)
+			.AddStrut(20)
+			.Add(fTwoFingerHorizontalBox);
 
 	BGroupView* scrollPrefRightLayout = new BGroupView(B_VERTICAL);
 	scrollPrefRightLayout->AddChild(fScrollAccelSlider);
@@ -452,8 +456,9 @@ TouchpadPrefView::SetValues(touchpad_settings* settings)
 		settings->scroll_bottomrange);
 	fTwoFingerBox->SetValue(settings->scroll_twofinger
 		? B_CONTROL_ON : B_CONTROL_OFF);
-	fMultiFingerBox->SetValue(settings->scroll_multifinger
+	fTwoFingerHorizontalBox->SetValue(settings->scroll_twofinger_horizontal
 		? B_CONTROL_ON : B_CONTROL_OFF);
+	fTwoFingerHorizontalBox->SetEnabled(settings->scroll_twofinger);
 	fScrollStepXSlider->SetValue(20 - settings->scroll_xstepsize / 2);
 	fScrollStepYSlider->SetValue(20 - settings->scroll_ystepsize / 2);
 	fScrollAccelSlider->SetValue(settings->scroll_acceleration);

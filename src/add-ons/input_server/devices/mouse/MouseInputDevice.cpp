@@ -549,8 +549,8 @@ status_t
 MouseDevice::_ReadTouchpadSettingsMsg(BMessage* message)
 {
 	message->FindBool("scroll_twofinger", &fTouchpadSettings.scroll_twofinger);
-	message->FindBool("scroll_multifinger",
-		&fTouchpadSettings.scroll_multifinger);
+	message->FindBool("scroll_twofinger_horizontal",
+		&fTouchpadSettings.scroll_twofinger_horizontal);
 	message->FindFloat("scroll_rightrange",
 		&fTouchpadSettings.scroll_rightrange);
 	message->FindFloat("scroll_bottomrange",

@@ -59,7 +59,8 @@ TouchpadPref::UpdateSettings()
 
 	BMessage msg;
 	msg.AddBool("scroll_twofinger", fSettings.scroll_twofinger);
-	msg.AddBool("scroll_multifinger", fSettings.scroll_multifinger);
+	msg.AddBool("scroll_twofinger_horizontal",
+		fSettings.scroll_twofinger_horizontal);
 	msg.AddFloat("scroll_rightrange", fSettings.scroll_rightrange);
 	msg.AddFloat("scroll_bottomrange", fSettings.scroll_bottomrange);
 	msg.AddInt16("scroll_xstepsize", fSettings.scroll_xstepsize);

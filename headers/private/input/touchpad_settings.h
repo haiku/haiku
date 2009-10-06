@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TOUCHPAD_SETTINGS_H
@@ -10,7 +10,7 @@
 
 typedef struct {
 	bool	scroll_twofinger;
-	bool	scroll_multifinger;
+	bool	scroll_twofinger_horizontal;
 	float	scroll_rightrange;		// from 0 to 1
 	float	scroll_bottomrange;		// from 0 to 1
 	uint16	scroll_xstepsize;

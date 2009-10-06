@@ -246,13 +246,18 @@ touchevent_to_movement(synaptics_cookie* cookie, touch_event *event,
 					|| settings->scroll_bottomrange > 0.999999) {
 			isSideScrollingH = true;
 		}
-		if (isSideScrollingV || isSideScrollingH
-			|| (event->wValue == 0 && settings->scroll_twofinger)
-			|| (event->wValue == 1 && settings->scroll_multifinger)) {
-			goto scrolling;
-		} else {
-			cookie->scrolling_started = false;
+		if ((event->wValue == 0 || event->wValue == 1)
+			&& settings->scroll_twofinger) {
+			// two finger scrolling is enabled
+			isSideScrollingV = true;
+			isSideScrollingH = settings->scroll_twofinger_horizontal;
 		}
+
+		if (isSideScrollingV || isSideScrollingH)
+			goto scrolling;
+		else
+			cookie->scrolling_started = false;
+
 		goto movement;
 	} else {
 		goto notouch;
