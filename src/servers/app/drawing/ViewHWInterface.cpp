@@ -740,7 +740,7 @@ ViewHWInterface::RetraceSemaphore()
 
 
 status_t
-ViewHWInterface::WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT)
+ViewHWInterface::WaitForRetrace(bigtime_t timeout)
 {
 	// Locking shouldn't be necessary here - R5 should handle this for us. :)
 	BScreen screen;
