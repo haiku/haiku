@@ -17,6 +17,13 @@ UsePrivateHeaders [ FDirName storage ] ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
 }
 
+local genericPlatformSources =
+	text_menu.cpp
+	video_blit.cpp
+	video_splash.cpp
+	video_rle.cpp
+;
+
 local bios_ia32_src =
 	start.c
 	debug.c
@@ -32,6 +39,7 @@ local bios_ia32_src =
 	smp.cpp
 	support.S
 	video.cpp
+	hpet.cpp
 	apm.cpp
 ;
 
@@ -50,9 +58,8 @@ KernelMergeObject boot_platform_pxe_ia32.o :
 	pxe_undi.cpp
 	$(bios_ia32_src)
 	$(bios_ia32_edid_src)
+	$(genericPlatformSources)
 
-	# generic
-	text_menu.cpp
 	: -fno-pic
 ;
 
@@ -76,11 +83,11 @@ BuildPXEstage1 pxehaiku : pxe_stage1.S ;
 SEARCH on [ FGristFiles $(bios_ia32_src) ]
 	= [ FDirName $(SUBDIR) $(DOTDOT) bios_ia32 ] ;
 
-SEARCH on [ FGristFiles text_menu.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
-
 SEARCH on [ FGristFiles $(bios_ia32_edid_src) ]
 	= [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
+
+SEARCH on [ FGristFiles $(genericPlatformSources) ]
+	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
 # We also need the bios_ia32 stage1.bin for building bin/makebootable
 SEARCH on stage1.bin
