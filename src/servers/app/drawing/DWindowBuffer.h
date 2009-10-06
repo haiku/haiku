@@ -1,24 +1,26 @@
 #ifndef D_WINDOW_BUFFER_H
 #define D_WINDOW_BUFFER_H
 
+
 #include "RenderingBuffer.h"
 
-struct direct_buffer_info;
-struct frame_buffer_config;
+#include <Accelerant.h>
+#include <DirectWindow.h>
+
 
 class DWindowBuffer : public RenderingBuffer {
- public:
+public:
 								DWindowBuffer();
 	virtual						~DWindowBuffer();
-	
+
 	virtual	status_t			InitCheck() const;
-	
+
 	virtual	color_space			ColorSpace() const;
 	virtual	void*				Bits() const;
 	virtual	uint32				BytesPerRow() const;
 	virtual	uint32				Width() const;
 	virtual	uint32				Height() const;
-	
+
 			void				SetTo(direct_buffer_info* info);
 
 			void				SetTo(frame_buffer_config* config,
@@ -28,8 +30,8 @@ class DWindowBuffer : public RenderingBuffer {
 
 			BRegion&			WindowClipping()
 									{ return fWindowClipping; }
- private:
-			uint8*				fBits;			
+private:
+			uint8*				fBits;
 			uint32				fWidth;
 			uint32				fHeight;
 			uint32				fBytesPerRow;
