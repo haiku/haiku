@@ -782,7 +782,7 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 	bool inBorderRegion = fBorderRegion.Contains(where);
 	bool windowModifier = (fFlags & B_NO_SERVER_SIDE_WINDOW_MODIFIERS) == 0
 		&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
-			| B_SHIFT_KEY)) == B_COMMAND_KEY | B_CONTROL_KEY;
+			| B_SHIFT_KEY)) == (B_COMMAND_KEY | B_CONTROL_KEY);
 
 	// default action is to drag the Window
 	if (windowModifier || inBorderRegion) {
