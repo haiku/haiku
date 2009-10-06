@@ -1,5 +1,10 @@
-// license: public domain
-// authors: Jonas Sundström, jonas@kirilla.com
+/*
+ * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jonas Sundström, jonas@kirilla.com
+ */
 
 
 #include "GenericThread.h"
