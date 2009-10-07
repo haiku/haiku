@@ -45,7 +45,7 @@ private:
 
 class GlobalTypeLookup {
 public:
-								~GlobalTypeLookup();
+	virtual						~GlobalTypeLookup();
 
 	virtual	status_t			GetType(GlobalTypeLookupContext* context,
 									const BString& name, Type*& _type) = 0;
