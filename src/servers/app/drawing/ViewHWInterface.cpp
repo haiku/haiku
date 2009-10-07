@@ -220,6 +220,7 @@ CardView::ForwardMessage(BMessage* message)
 	copy.RemoveName("be:transit");
 	copy.RemoveName("be:view_where");
 	copy.RemoveName("be:cursor_needed");
+	copy.RemoveName("_view_token");
 
 	size_t length = copy.FlattenedSize();
 	char stream[length];
