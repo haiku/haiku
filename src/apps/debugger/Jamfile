@@ -65,6 +65,7 @@ Application Debugger :
 	Function.cpp
 	FunctionDebugInfo.cpp
 	FunctionInstance.cpp
+	GlobalTypeLookup.cpp
 	ImageDebugInfo.cpp
 	ImageDebugInfoProvider.cpp
 	NoOpStackFrameDebugInfo.cpp

@@ -5,6 +5,7 @@
 #ifndef DEBUGGER_IMAGE_DEBUG_INFO_H
 #define DEBUGGER_IMAGE_DEBUG_INFO_H
 
+
 #include "ImageInfo.h"
 #include "SpecificImageDebugInfo.h"
 
@@ -26,6 +27,8 @@ public:
 
 	virtual	status_t			GetFunctions(
 									BObjectList<FunctionDebugInfo>& functions);
+	virtual	status_t			GetType(GlobalTypeLookupContext* context,
+									const BString& name, Type*& _type);
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,

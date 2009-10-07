@@ -5,6 +5,7 @@
 #ifndef IMAGE_DEBUG_INFO_H
 #define IMAGE_DEBUG_INFO_H
 
+
 #include <String.h>
 
 #include <ObjectList.h>
@@ -19,8 +20,10 @@ class DebuggerInterface;
 class FileSourceCode;
 class FunctionDebugInfo;
 class FunctionInstance;
+class GlobalTypeLookupContext;
 class LocatableFile;
 class SpecificImageDebugInfo;
+class Type;
 
 
 class ImageDebugInfo : public Referenceable {
@@ -32,6 +35,10 @@ public:
 
 			bool				AddSpecificInfo(SpecificImageDebugInfo* info);
 			status_t			FinishInit();
+
+			status_t			GetType(GlobalTypeLookupContext* context,
+									const BString& name, Type*& _type);
+									// returns a reference
 
 			int32				CountFunctions() const;
 			FunctionInstance*	FunctionAt(int32 index) const;

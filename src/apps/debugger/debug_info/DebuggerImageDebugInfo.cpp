@@ -79,6 +79,14 @@ DebuggerImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 
 
 status_t
+DebuggerImageDebugInfo::GetType(GlobalTypeLookupContext* context,
+	const BString& name, Type*& _type)
+{
+	return B_UNSUPPORTED;
+}
+
+
+status_t
 DebuggerImageDebugInfo::CreateFrame(Image* image,
 	FunctionInstance* functionInstance, CpuState* cpuState,
 	StackFrame*& _previousFrame, CpuState*& _previousCpuState)

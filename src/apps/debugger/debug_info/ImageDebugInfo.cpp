@@ -75,6 +75,21 @@ ImageDebugInfo::FinishInit()
 }
 
 
+status_t
+ImageDebugInfo::GetType(GlobalTypeLookupContext* context, const BString& name,
+	Type*& _type)
+{
+	for (int32 i = 0; SpecificImageDebugInfo* specificInfo
+			= fSpecificInfos.ItemAt(i); i++) {
+		status_t error = specificInfo->GetType(context, name, _type);
+		if (error == B_OK || error == B_NO_MEMORY)
+			return error;
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 int32
 ImageDebugInfo::CountFunctions() const
 {

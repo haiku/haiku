@@ -12,6 +12,7 @@
 #include <Referenceable.h>
 #include <util/OpenHashTable.h>
 
+#include "GlobalTypeLookup.h"
 #include "ImageInfo.h"
 
 
@@ -31,7 +32,7 @@ class SourceLocation;
 class SpecificTeamDebugInfo;
 
 
-class TeamDebugInfo : public Referenceable {
+class TeamDebugInfo : public Referenceable, public GlobalTypeLookup {
 public:
 								TeamDebugInfo(
 									DebuggerInterface* debuggerInterface,
@@ -40,6 +41,9 @@ public:
 								~TeamDebugInfo();
 
 			status_t			Init();
+
+	virtual	status_t			GetType(GlobalTypeLookupContext* context,
+									const BString& name, Type*& _type);
 
 			status_t			LoadImageDebugInfo(const ImageInfo& imageInfo,
 									LocatableFile* imageFile,

@@ -23,6 +23,7 @@ class ElfSegment;
 class FileManager;
 class FileSourceCode;
 class FunctionID;
+class GlobalTypeLookup;
 class LocatableFile;
 class SourceCode;
 class TeamMemory;
@@ -33,7 +34,9 @@ public:
 								DwarfImageDebugInfo(const ImageInfo& imageInfo,
 									Architecture* architecture,
 									TeamMemory* teamMemory,
-									FileManager* fileManager, DwarfFile* file);
+									FileManager* fileManager,
+									GlobalTypeLookup* typeLookup,
+									DwarfFile* file);
 	virtual						~DwarfImageDebugInfo();
 
 			status_t			Init();
@@ -43,6 +46,8 @@ public:
 
 	virtual	status_t			GetFunctions(
 									BObjectList<FunctionDebugInfo>& functions);
+	virtual	status_t			GetType(GlobalTypeLookupContext* context,
+									const BString& name, Type*& _type);
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,
@@ -66,6 +71,7 @@ public:
 									FileSourceCode* sourceCode);
 
 private:
+			struct BasicTargetInterface;
 			struct UnwindTargetInterface;
 			struct EntryListWrapper;
 
@@ -90,6 +96,7 @@ private:
 			Architecture*		fArchitecture;
 			TeamMemory*			fTeamMemory;
 			FileManager*		fFileManager;
+			GlobalTypeLookup*	fTypeLookup;
 			DwarfFile*			fFile;
 			ElfSegment*			fTextSegment;
 			target_addr_t		fRelocationDelta;

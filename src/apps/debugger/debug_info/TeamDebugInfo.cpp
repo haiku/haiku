@@ -28,6 +28,7 @@
 #include "SourceLanguage.h"
 #include "SpecificImageDebugInfo.h"
 #include "StringUtils.h"
+#include "Type.h"
 
 
 // #pragma mark - FunctionHashDefinition
@@ -319,7 +320,7 @@ TeamDebugInfo::Init()
 
 	// DWARF
 	DwarfTeamDebugInfo* dwarfInfo = new(std::nothrow) DwarfTeamDebugInfo(
-		fArchitecture, fDebuggerInterface, fFileManager);
+		fArchitecture, fDebuggerInterface, fFileManager, this);
 	if (dwarfInfo == NULL || !fSpecificInfos.AddItem(dwarfInfo)) {
 		delete dwarfInfo;
 		return B_NO_MEMORY;
@@ -343,6 +344,51 @@ TeamDebugInfo::Init()
 		return error;
 
 	return B_OK;
+}
+
+
+status_t
+TeamDebugInfo::GetType(GlobalTypeLookupContext* context, const BString& name,
+	Type*& _type)
+{
+	// maybe the type is already cached
+	AutoLocker<GlobalTypeLookupContext> contextLocker(context);
+	Type* type = context->CachedType(name);
+	if (type != NULL) {
+		type->AcquireReference();
+		_type = type;
+		return B_OK;
+	}
+
+	contextLocker.Unlock();
+
+	// Clone the image list and get references to the images, so we can iterate
+	// through them without locking.
+	AutoLocker<BLocker> locker(fLock);
+
+	ImageList images;
+	for (int32 i = 0; ImageDebugInfo* imageDebugInfo = fImages.ItemAt(i); i++) {
+		if (images.AddItem(imageDebugInfo))
+			imageDebugInfo->AcquireReference();
+	}
+
+	locker.Unlock();
+
+	// get the type
+	status_t error = B_ENTRY_NOT_FOUND;
+	for (int32 i = 0; ImageDebugInfo* imageDebugInfo = images.ItemAt(i); i++) {
+		error = imageDebugInfo->GetType(context, name, type);
+		if (error == B_OK) {
+			_type = type;
+			break;
+		}
+	}
+
+	// release the references
+	for (int32 i = 0; ImageDebugInfo* imageDebugInfo = images.ItemAt(i); i++)
+		imageDebugInfo->ReleaseReference();
+
+	return error;
 }
 
 

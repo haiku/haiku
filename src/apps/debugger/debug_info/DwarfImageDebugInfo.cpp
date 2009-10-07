@@ -33,6 +33,7 @@
 #include "FileSourceCode.h"
 #include "FunctionID.h"
 #include "FunctionInstance.h"
+#include "GlobalTypeLookup.h"
 #include "LocatableFile.h"
 #include "Register.h"
 #include "RegisterMap.h"
@@ -47,32 +48,26 @@
 #include "Variable.h"
 
 
-// #pragma mark - UnwindTargetInterface
+// #pragma mark - BasicTargetInterface
 
 
-struct DwarfImageDebugInfo::UnwindTargetInterface : DwarfTargetInterface {
-	UnwindTargetInterface(const Register* registers, int32 registerCount,
-		RegisterMap* fromDwarfMap, RegisterMap* toDwarfMap, CpuState* cpuState,
-		Architecture* architecture, TeamMemory* teamMemory)
+struct DwarfImageDebugInfo::BasicTargetInterface : DwarfTargetInterface {
+	BasicTargetInterface(const Register* registers, int32 registerCount,
+		RegisterMap* fromDwarfMap, Architecture* architecture,
+		TeamMemory* teamMemory)
 		:
 		fRegisters(registers),
 		fRegisterCount(registerCount),
 		fFromDwarfMap(fromDwarfMap),
-		fToDwarfMap(toDwarfMap),
-		fCpuState(cpuState),
 		fArchitecture(architecture),
 		fTeamMemory(teamMemory)
 	{
 		fFromDwarfMap->AcquireReference();
-		fToDwarfMap->AcquireReference();
-		fCpuState->AcquireReference();
 	}
 
-	~UnwindTargetInterface()
+	~BasicTargetInterface()
 	{
 		fFromDwarfMap->ReleaseReference();
-		fToDwarfMap->ReleaseReference();
-		fCpuState->ReleaseReference();
 	}
 
 	virtual uint32 CountRegisters() const
@@ -88,18 +83,12 @@ struct DwarfImageDebugInfo::UnwindTargetInterface : DwarfTargetInterface {
 
 	virtual bool GetRegisterValue(uint32 index, BVariant& _value) const
 	{
-		const Register* reg = _RegisterAt(index);
-		if (reg == NULL)
-			return false;
-		return fCpuState->GetRegisterValue(reg, _value);
+		return false;
 	}
 
 	virtual bool SetRegisterValue(uint32 index, const BVariant& value)
 	{
-		const Register* reg = _RegisterAt(index);
-		if (reg == NULL)
-			return false;
-		return fCpuState->SetRegisterValue(reg, value);
+		return false;
 	}
 
 	virtual bool IsCalleePreservedRegister(uint32 index) const
@@ -129,21 +118,64 @@ struct DwarfImageDebugInfo::UnwindTargetInterface : DwarfTargetInterface {
 			valueType, _value) == B_OK;
 	}
 
-private:
+protected:
 	const Register* _RegisterAt(uint32 dwarfIndex) const
 	{
 		int32 index = fFromDwarfMap->MapRegisterIndex(dwarfIndex);
 		return index >= 0 && index < fRegisterCount ? fRegisters + index : NULL;
 	}
 
-private:
+protected:
 	const Register*	fRegisters;
 	int32			fRegisterCount;
 	RegisterMap*	fFromDwarfMap;
-	RegisterMap*	fToDwarfMap;
-	CpuState*		fCpuState;
 	Architecture*	fArchitecture;
 	TeamMemory*		fTeamMemory;
+};
+
+
+// #pragma mark - UnwindTargetInterface
+
+
+struct DwarfImageDebugInfo::UnwindTargetInterface : BasicTargetInterface {
+	UnwindTargetInterface(const Register* registers, int32 registerCount,
+		RegisterMap* fromDwarfMap, RegisterMap* toDwarfMap, CpuState* cpuState,
+		Architecture* architecture, TeamMemory* teamMemory)
+		:
+		BasicTargetInterface(registers, registerCount, fromDwarfMap,
+			architecture, teamMemory),
+		fToDwarfMap(toDwarfMap),
+		fCpuState(cpuState)
+	{
+		fToDwarfMap->AcquireReference();
+		fCpuState->AcquireReference();
+	}
+
+	~UnwindTargetInterface()
+	{
+		fToDwarfMap->ReleaseReference();
+		fCpuState->ReleaseReference();
+	}
+
+	virtual bool GetRegisterValue(uint32 index, BVariant& _value) const
+	{
+		const Register* reg = _RegisterAt(index);
+		if (reg == NULL)
+			return false;
+		return fCpuState->GetRegisterValue(reg, _value);
+	}
+
+	virtual bool SetRegisterValue(uint32 index, const BVariant& value)
+	{
+		const Register* reg = _RegisterAt(index);
+		if (reg == NULL)
+			return false;
+		return fCpuState->SetRegisterValue(reg, value);
+	}
+
+private:
+	RegisterMap*	fToDwarfMap;
+	CpuState*		fCpuState;
 };
 
 
@@ -169,13 +201,14 @@ struct DwarfImageDebugInfo::EntryListWrapper {
 
 DwarfImageDebugInfo::DwarfImageDebugInfo(const ImageInfo& imageInfo,
 	Architecture* architecture, TeamMemory* teamMemory,
-	FileManager* fileManager, DwarfFile* file)
+	FileManager* fileManager, GlobalTypeLookup* typeLookup, DwarfFile* file)
 	:
 	fLock("dwarf image debug info"),
 	fImageInfo(imageInfo),
 	fArchitecture(architecture),
 	fTeamMemory(teamMemory),
 	fFileManager(fileManager),
+	fTypeLookup(typeLookup),
 	fFile(file),
 	fTextSegment(NULL),
 	fRelocationDelta(0)
@@ -321,6 +354,72 @@ DwarfImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 
 
 status_t
+DwarfImageDebugInfo::GetType(GlobalTypeLookupContext* context,
+	const BString& name, Type*& _type)
+{
+	int32 registerCount = fArchitecture->CountRegisters();
+	const Register* registers = fArchitecture->Registers();
+
+	// get the DWARF -> architecture register map
+	RegisterMap* fromDwarfMap;
+	status_t error = fArchitecture->GetDwarfRegisterMaps(NULL, &fromDwarfMap);
+	if (error != B_OK)
+		return error;
+	Reference<RegisterMap> fromDwarfMapReference(fromDwarfMap, true);
+
+	// create the target interface
+	BasicTargetInterface inputInterface(registers, registerCount, fromDwarfMap,
+		fArchitecture, fTeamMemory);
+
+	// iterate through all compilation units
+	for (int32 i = 0; CompilationUnit* unit = fFile->CompilationUnitAt(i);
+		i++) {
+		DwarfStackFrameDebugInfo* stackFrameDebugInfo = NULL;
+		Reference<DwarfStackFrameDebugInfo> stackFrameDebugInfoReference;
+
+		// iterate through all types of the compilation unit
+		for (DebugInfoEntryList::ConstIterator it
+				= unit->UnitEntry()->Types().GetIterator();
+			DIEType* typeEntry = dynamic_cast<DIEType*>(it.Next());) {
+			if (typeEntry->IsDeclaration())
+				continue;
+
+			BString typeEntryName;
+			DwarfUtils::GetFullyQualifiedDIEName(typeEntry, typeEntryName);
+			if (typeEntryName != name)
+				continue;
+
+			// The name matches and the entry is not just a declaration --
+			// create the type. First create the StackFrameDebugInfo lazily.
+			if (stackFrameDebugInfo == NULL) {
+				stackFrameDebugInfo = new(std::nothrow)
+					DwarfStackFrameDebugInfo(fArchitecture, fFile, unit, NULL,
+					fTypeLookup, context, 0, 0, &inputInterface, fromDwarfMap);
+				if (stackFrameDebugInfo == NULL)
+					return B_NO_MEMORY;
+				stackFrameDebugInfoReference.SetTo(stackFrameDebugInfo, true);
+
+				error = stackFrameDebugInfo->Init();
+				if (error != B_OK)
+					return error;
+			}
+
+			// create the type
+			Type* type;
+			error = stackFrameDebugInfo->CreateType(typeEntry, type);
+			if (error != B_OK)
+				continue;
+
+			_type = type;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
 DwarfImageDebugInfo::CreateFrame(Image* image,
 	FunctionInstance* functionInstance, CpuState* cpuState,
 	StackFrame*& _previousFrame, CpuState*& _previousCpuState)
@@ -393,12 +492,24 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 		}
 	)
 
+	// create a type lookup context
+	GlobalTypeLookupContext* typeLookupContext
+		= new(std::nothrow) GlobalTypeLookupContext;
+	if (typeLookupContext == NULL)
+		return B_NO_MEMORY;
+	Reference<GlobalTypeLookupContext> typeLookupContextReference(
+		typeLookupContext, true);
+
+	error = typeLookupContext->Init();
+	if (error != B_OK)
+		return error;
+
 	// create the stack frame debug info
 	DIESubprogram* subprogramEntry = function->SubprogramEntry();
 	DwarfStackFrameDebugInfo* stackFrameDebugInfo
 		= new(std::nothrow) DwarfStackFrameDebugInfo(fArchitecture, fFile, unit,
-			subprogramEntry, instructionPointer, framePointer, inputInterface,
-			fromDwarfMap);
+			subprogramEntry, fTypeLookup, typeLookupContext, instructionPointer,
+			framePointer, inputInterface, fromDwarfMap);
 	if (stackFrameDebugInfo == NULL)
 		return B_NO_MEMORY;
 	Reference<DwarfStackFrameDebugInfo> stackFrameDebugInfoReference(

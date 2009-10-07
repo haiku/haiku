@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <new>
 
+#include <AutoLocker.h>
 #include <Variant.h>
 
 #include "ArrayIndexPath.h"
@@ -20,6 +21,7 @@
 #include "DwarfUtils.h"
 #include "FunctionID.h"
 #include "FunctionParameterID.h"
+#include "GlobalTypeLookup.h"
 #include "LocalVariableID.h"
 #include "Register.h"
 #include "RegisterMap.h"
@@ -304,9 +306,6 @@ public:
 private:
 	BString			fName;
 	target_size_t	fByteSize;
-
-public:
-	DwarfType*		fNext;
 };
 
 
@@ -1127,80 +1126,41 @@ private:
 };
 
 
-// #pragma mark - DwarfTypeHashDefinition
-
-
-struct DwarfStackFrameDebugInfo::DwarfTypeHashDefinition {
-	typedef const DIEType*	KeyType;
-	typedef	DwarfType		ValueType;
-
-	size_t HashKey(const DIEType* key) const
-	{
-		return (addr_t)key;
-	}
-
-	size_t Hash(const DwarfType* value) const
-	{
-		return HashKey(value->GetDIEType());
-	}
-
-	bool Compare(const DIEType* key, const DwarfType* value) const
-	{
-		return key == value->GetDIEType();
-	}
-
-	DwarfType*& GetLink(DwarfType* value) const
-	{
-		return value->fNext;
-	}
-};
-
-
 // #pragma mark - DwarfStackFrameDebugInfo
 
 
 DwarfStackFrameDebugInfo::DwarfStackFrameDebugInfo(Architecture* architecture,
 	DwarfFile* file, CompilationUnit* compilationUnit,
-	DIESubprogram* subprogramEntry, target_addr_t instructionPointer,
-	target_addr_t framePointer, DwarfTargetInterface* targetInterface,
-	RegisterMap* fromDwarfRegisterMap)
+	DIESubprogram* subprogramEntry, GlobalTypeLookup* typeLookup,
+	GlobalTypeLookupContext* typeLookupContext,
+	target_addr_t instructionPointer, target_addr_t framePointer,
+	DwarfTargetInterface* targetInterface, RegisterMap* fromDwarfRegisterMap)
 	:
 	StackFrameDebugInfo(architecture),
 	fFile(file),
 	fCompilationUnit(compilationUnit),
 	fSubprogramEntry(subprogramEntry),
+	fTypeLookup(typeLookup),
+	fTypeLookupContext(typeLookupContext),
 	fInstructionPointer(instructionPointer),
 	fFramePointer(framePointer),
 	fTargetInterface(targetInterface),
-	fFromDwarfRegisterMap(fromDwarfRegisterMap),
-	fTypes(NULL)
+	fFromDwarfRegisterMap(fromDwarfRegisterMap)
 {
+	fTypeLookupContext->AcquireReference();
 }
 
 
 DwarfStackFrameDebugInfo::~DwarfStackFrameDebugInfo()
 {
-	if (fTypes != NULL) {
-		DwarfType* type = fTypes->Clear(true);
-		while (type != NULL) {
-			DwarfType* next = type->fNext;
-			type->ReleaseReference();
-			type = next;
-		}
-
-		delete fTypes;
-	}
+	fTypeLookupContext->ReleaseReference();
 }
 
 
 status_t
 DwarfStackFrameDebugInfo::Init()
 {
-	fTypes = new(std::nothrow) TypeTable;
-	if (fTypes == NULL)
-		return B_NO_MEMORY;
-
-	return fTypes->Init();
+	return B_OK;
 }
 
 
@@ -1468,7 +1428,7 @@ DwarfStackFrameDebugInfo::ResolveArrayElementLocation(StackFrame* stackFrame,
 			int64 byteOffset = elementOffset >= 0
 				? elementOffset / 8 : (elementOffset - 7) / 8;
 			piece.SetToMemory(piece.address + byteOffset);
-			piece.SetSize(type->BaseType()->ByteSize() * 8);
+			piece.SetSize(type->BaseType()->ByteSize());
 			// TODO: Support bit offsets correctly!
 			// TODO: Support bit fields (primitive types) correctly!
 
@@ -1647,39 +1607,73 @@ DwarfStackFrameDebugInfo::_ResolveDataMemberLocation(StackFrame* stackFrame,
 status_t
 DwarfStackFrameDebugInfo::_CreateType(DIEType* typeEntry, DwarfType*& _type)
 {
-	// Try the type cache first. If we don't know the type yet, create it.
-	DwarfType* type = fTypes->Lookup(typeEntry);
+	// try the type cache first
+	BString name;
+	DwarfUtils::GetFullyQualifiedDIEName(typeEntry, name);
+// TODO: The DIE may not have a name (e.g. pointer and reference types don't).
 
-	if (type == NULL) {
-		status_t error = _CreateTypeInternal(typeEntry, type);
-		if (error != B_OK)
-			return error;
-
-		// Insert the type into the hash table. Recheck, as the type may already
-		// have been inserted (e.g. in the compound type case).
-		if (fTypes->Lookup(typeEntry) == NULL)
-			fTypes->Insert(type);
-
-		// try to get the type's size
-		uint64 size;
-		if (_ResolveTypeByteSize(typeEntry, size) == B_OK)
-			type->SetByteSize(size);
+	AutoLocker<GlobalTypeLookupContext> contextLocker(fTypeLookupContext);
+	Type* globalType = name.Length() > 0
+		? fTypeLookupContext->CachedType(name) : NULL;
+	if (globalType != NULL) {
+		DwarfType* globalDwarfType = dynamic_cast<DwarfType*>(globalType);
+		if (globalDwarfType != NULL) {
+			globalDwarfType->AcquireReference();
+			_type = globalDwarfType;
+			return B_OK;
+		}
 	}
 
-	type->AcquireReference();
-	_type = type;
+	contextLocker.Unlock();
+
+	// If the type entry indicates a declaration only, we try to look the
+	// type up globally first.
+	if (typeEntry->IsDeclaration() && name.Length() > 0
+		&& fTypeLookup->GetType(fTypeLookupContext, name, globalType)
+			== B_OK) {
+		DwarfType* globalDwarfType
+			= dynamic_cast<DwarfType*>(globalType);
+		if (globalDwarfType != NULL) {
+			_type = globalDwarfType;
+			return B_OK;
+		}
+
+		globalType->ReleaseReference();
+	}
+
+	// No luck yet -- create the type.
+	DwarfType* type;
+	status_t error = _CreateTypeInternal(name, typeEntry, type);
+	if (error != B_OK)
+		return error;
+	Reference<DwarfType> typeReference(type, true);
+
+	// Insert the type into the cache. Re-check, as the type may already
+	// have been inserted (e.g. in the compound type case).
+	if (name.Length() > 0) {
+		contextLocker.Lock();
+		if (fTypeLookupContext->CachedType(name) == NULL) {
+			error = fTypeLookupContext->AddCachedType(name, type);
+			if (error != B_OK)
+				return error;
+		}
+		contextLocker.Unlock();
+	}
+
+	// try to get the type's size
+	uint64 size;
+	if (_ResolveTypeByteSize(typeEntry, size) == B_OK)
+		type->SetByteSize(size);
+
+	_type = typeReference.Detach();
 	return B_OK;
 }
 
 
 status_t
-DwarfStackFrameDebugInfo::_CreateTypeInternal(DIEType* typeEntry,
-	DwarfType*& _type)
+DwarfStackFrameDebugInfo::_CreateTypeInternal(const BString& name,
+	DIEType* typeEntry, DwarfType*& _type)
 {
-	BString name;
-	DwarfUtils::GetFullyQualifiedDIEName(typeEntry, name);
-// TODO: The DIE may not have a name (e.g. pointer and reference types don't).
-
 	switch (typeEntry->Tag()) {
 		case DW_TAG_class_type:
 		case DW_TAG_structure_type:
@@ -1775,10 +1769,17 @@ DwarfStackFrameDebugInfo::_CreateCompoundType(const BString& name,
 		return B_NO_MEMORY;
 	Reference<DwarfCompoundType> typeReference(type, true);
 
-	// Already add the type at this pointer to the hash table, since otherwise
+	// Already add the type at this pointer to the cache, since otherwise
 	// we could run into an infinite recursion when trying to create the types
 	// for the data members.
-	fTypes->Insert(type);
+// TODO: Since access to the type lookup context is multi-threaded, the
+// incomplete type could become visible to other threads. Hence we keep the
+// context locked, but that essentially kills multi-threading for this context.
+	AutoLocker<GlobalTypeLookupContext> contextLocker(fTypeLookupContext);
+	status_t error = fTypeLookupContext->AddCachedType(name, type);
+	if (error != B_OK)
+		return error;
+//	contextLocker.Unlock();
 
 	// find the abstract origin or specification that defines the data members
 	DIECompoundType* memberOwnerEntry = DwarfUtils::GetDIEByPredicate(typeEntry,
@@ -1808,7 +1809,8 @@ DwarfStackFrameDebugInfo::_CreateCompoundType(const BString& name,
 				memberEntry, memberName, memberType);
 			Reference<DwarfDataMember> memberReference(member, true);
 			if (member == NULL || !type->AddDataMember(member)) {
-				fTypes->Remove(type);
+				contextLocker.Lock();
+				fTypeLookupContext->RemoveCachedType(name);
 				return B_NO_MEMORY;
 			}
 		}
@@ -1842,7 +1844,8 @@ DwarfStackFrameDebugInfo::_CreateCompoundType(const BString& name,
 				Reference<DwarfInheritance> inheritanceReference(inheritance,
 					true);
 				if (inheritance == NULL || !type->AddInheritance(inheritance)) {
-					fTypes->Remove(type);
+					contextLocker.Lock();
+					fTypeLookupContext->RemoveCachedType(name);
 					return B_NO_MEMORY;
 				}
 			}

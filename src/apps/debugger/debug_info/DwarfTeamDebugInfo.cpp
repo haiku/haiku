@@ -15,12 +15,14 @@
 
 
 DwarfTeamDebugInfo::DwarfTeamDebugInfo(Architecture* architecture,
-	TeamMemory* teamMemory, FileManager* fileManager)
+	TeamMemory* teamMemory, FileManager* fileManager,
+	GlobalTypeLookup* typeLookup)
 	:
 	fArchitecture(architecture),
 	fTeamMemory(teamMemory),
 	fFileManager(fileManager),
-	fManager(NULL)
+	fManager(NULL),
+	fTypeLookup(typeLookup)
 {
 }
 
@@ -64,17 +66,17 @@ DwarfTeamDebugInfo::CreateImageDebugInfo(const ImageInfo& imageInfo,
 		return error;
 
 	// create the image debug info
-	DwarfImageDebugInfo* debuggerInfo = new(std::nothrow) DwarfImageDebugInfo(
-		imageInfo, fArchitecture, fTeamMemory, fFileManager, file);
-	if (debuggerInfo == NULL)
+	DwarfImageDebugInfo* debugInfo = new(std::nothrow) DwarfImageDebugInfo(
+		imageInfo, fArchitecture, fTeamMemory, fFileManager, fTypeLookup, file);
+	if (debugInfo == NULL)
 		return B_NO_MEMORY;
 
-	error = debuggerInfo->Init();
+	error = debugInfo->Init();
 	if (error != B_OK) {
-		delete debuggerInfo;
+		delete debugInfo;
 		return error;
 	}
 
-	_imageDebugInfo = debuggerInfo;
+	_imageDebugInfo = debugInfo;
 	return B_OK;
 }

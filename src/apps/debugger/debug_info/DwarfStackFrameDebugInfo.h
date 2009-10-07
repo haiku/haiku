@@ -8,8 +8,6 @@
 
 #include <String.h>
 
-#include <util/OpenHashTable.h>
-
 #include "StackFrameDebugInfo.h"
 #include "Type.h"
 
@@ -33,6 +31,8 @@ class DIEVariable;
 class DwarfFile;
 class DwarfTargetInterface;
 class FunctionID;
+class GlobalTypeLookup;
+class GlobalTypeLookupContext;
 class LocationDescription;
 class MemberLocation;
 class ObjectID;
@@ -46,6 +46,8 @@ public:
 									Architecture* architecture, DwarfFile* file,
 									CompilationUnit* compilationUnit,
 									DIESubprogram* subprogramEntry,
+									GlobalTypeLookup* typeLookup,
+									GlobalTypeLookupContext* typeLookupContext,
 									target_addr_t instructionPointer,
 									target_addr_t framePointer,
 									DwarfTargetInterface* targetInterface,
@@ -105,9 +107,6 @@ private:
 			struct DwarfUnspecifiedType;
 			struct DwarfFunctionType;
 			struct DwarfPointerToMemberType;
-			struct DwarfTypeHashDefinition;
-
-			typedef BOpenHashTable<DwarfTypeHashDefinition> TypeTable;
 
 private:
 			status_t			_ResolveDataMemberLocation(
@@ -121,8 +120,8 @@ private:
 
 			status_t			_CreateType(DIEType* typeEntry,
 									DwarfType*& _type);
-			status_t			_CreateTypeInternal(DIEType* typeEntry,
-									DwarfType*& _type);
+			status_t			_CreateTypeInternal(const BString& name,
+									DIEType* typeEntry, DwarfType*& _type);
 
 			status_t			_CreateCompoundType(const BString& name,
 									DIECompoundType* typeEntry,
@@ -180,11 +179,12 @@ private:
 			DwarfFile*			fFile;
 			CompilationUnit*	fCompilationUnit;
 			DIESubprogram*		fSubprogramEntry;
+			GlobalTypeLookup*	fTypeLookup;
+			GlobalTypeLookupContext* fTypeLookupContext;
 			target_addr_t		fInstructionPointer;
 			target_addr_t		fFramePointer;
 			DwarfTargetInterface* fTargetInterface;
 			RegisterMap*		fFromDwarfRegisterMap;
-			TypeTable*			fTypes;
 };
 
 

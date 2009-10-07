@@ -12,6 +12,7 @@ class Architecture;
 class DwarfManager;
 class FileManager;
 class ImageInfo;
+class GlobalTypeLookup;
 class TeamMemory;
 
 
@@ -19,7 +20,8 @@ class DwarfTeamDebugInfo : public SpecificTeamDebugInfo {
 public:
 								DwarfTeamDebugInfo(Architecture* architecture,
 									TeamMemory* teamMemory,
-									FileManager* fileManager);
+									FileManager* fileManager,
+									GlobalTypeLookup* typeLookup);
 	virtual						~DwarfTeamDebugInfo();
 
 			status_t			Init();
@@ -33,6 +35,7 @@ private:
 			TeamMemory*			fTeamMemory;
 			FileManager*		fFileManager;
 			DwarfManager*		fManager;
+			GlobalTypeLookup*	fTypeLookup;
 };
 
 

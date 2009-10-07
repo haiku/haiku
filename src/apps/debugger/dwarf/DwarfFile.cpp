@@ -61,6 +61,9 @@ public:
 
 	virtual bool GetFrameAddress(target_addr_t& _address)
 	{
+		if (fFramePointer == 0)
+			return false;
+
 		_address = fFramePointer;
 		return true;
 	}
@@ -79,6 +82,8 @@ public:
 		fFrameBaseEvaluated = true;
 
 		// get the subprogram's frame base location
+		if (fSubprogramEntry == NULL)
+			return false;
 		const LocationDescription* location = fSubprogramEntry->FrameBase();
 		if (!location->IsValid())
 			return false;
@@ -219,8 +224,7 @@ DwarfFile::Load(const char* fileName)
 	fDebugLineSection = fElfFile->GetSection(".debug_line");
 	fDebugFrameSection = fElfFile->GetSection(".debug_frame");
 	fDebugLocationSection = fElfFile->GetSection(".debug_loc");
-//	fDebugPublicTypesSection = fElfFile->GetSection(".debug_pubtypes");
-fDebugPublicTypesSection = fElfFile->GetSection(".debug_pubnames");
+	fDebugPublicTypesSection = fElfFile->GetSection(".debug_pubtypes");
 
 	// iterate through the debug info section
 	DataReader dataReader(fDebugInfoSection->Data(),
@@ -1914,7 +1918,7 @@ DwarfFile::_GetLocationExpression(CompilationUnit* unit,
 		return B_OK;
 	}
 
-	if (location->IsLocationList()) {
+	if (location->IsLocationList() && instructionPointer != 0) {
 		return _FindLocationExpression(unit, location->listOffset,
 			instructionPointer, _expression, _length);
 	}

@@ -5,6 +5,7 @@
 #ifndef SPECIFIC_IMAGE_DEBUG_INFO_H
 #define SPECIFIC_IMAGE_DEBUG_INFO_H
 
+
 #include <ObjectList.h>
 #include <Referenceable.h>
 
@@ -12,12 +13,14 @@
 
 
 class Architecture;
+class BString;
 class CpuState;
 class DataMember;
 class DebuggerInterface;
 class FileSourceCode;
 class FunctionDebugInfo;
 class FunctionInstance;
+class GlobalTypeLookupContext;
 class Image;
 class LocatableFile;
 class SourceLanguage;
@@ -36,6 +39,10 @@ public:
 									BObjectList<FunctionDebugInfo>& functions)
 										= 0;
 									// returns references
+
+	virtual	status_t			GetType(GlobalTypeLookupContext* context,
+									const BString& name, Type*& _type) = 0;
+									// returns a reference
 
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionInstance* functionInstance,
