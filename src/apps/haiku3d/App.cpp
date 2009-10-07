@@ -14,11 +14,9 @@
 
 App::App()
 	:
-	BApplication("application/x-vnd.Haiku-Haiku3d")
+	BApplication("application/x-vnd.Haiku-Haiku3d"),
+	fMainWindow(NULL)
 {
-	BRect frame(50, 50, 640 + 50, 480 + 50);
-	const char *title = "Haiku3d";
-	fMainWindow = new MainWindow(frame, title);
 }
 
 
@@ -27,7 +25,18 @@ App::~App()
 }
 
 
-void App::AboutRequested()
+void
+App::ReadyToRun()
+{
+	BRect frame(50, 50, 640 + 50, 480 + 50);
+	const char* title = "Haiku3d";
+	fMainWindow = new MainWindow(frame, title);
+	fMainWindow->Show();
+}
+
+
+void
+App::AboutRequested()
 {
 	BAlert* alert;
 	alert = new BAlert("About", "A little 3d demo", "ok");
@@ -35,8 +44,10 @@ void App::AboutRequested()
 }
 
 
-void App::MessageReceived(BMessage *message)
+bool
+App::QuitRequested()
 {
+	return true;
 }
 
 

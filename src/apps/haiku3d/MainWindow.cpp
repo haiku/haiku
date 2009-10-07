@@ -35,16 +35,13 @@ MainWindow::~MainWindow()
 bool
 MainWindow::QuitRequested()
 {
-	be_app->Lock();
-	if (be_app->CountWindows() < 2)
-		be_app_messenger.SendMessage(B_QUIT_REQUESTED);
-	be_app->Unlock();
+	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
 
 
 void
-MainWindow::MessageReceived(BMessage *message)
+MainWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		default:

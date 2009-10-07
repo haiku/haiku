@@ -12,15 +12,16 @@
 #include <Application.h>
 
 class App: public BApplication {
-protected:
-	BWindow*		fMainWindow;
 public:
 					App();
-					~App();
+	virtual			~App();
 
+	virtual	void	ReadyToRun();
 	virtual void	AboutRequested();
-	virtual void	MessageReceived(BMessage *message);
+	virtual	bool	QuitRequested();
 
+protected:
+	BWindow*		fMainWindow;
 };
 
 #endif /* _APP_H */

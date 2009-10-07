@@ -6,7 +6,7 @@
  * 		Alexandre Deckner alex@zappotek.com
  */
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-Haiku3d";
+resource app_signature "application/x-vnd.Haiku-Haiku3d";
 
 resource app_version {
 	major  = 1,
@@ -19,6 +19,8 @@ resource app_version {
 	short_info = "Haiku3d",
 	long_info = "Haiku3d ©2009 Haiku, Inc."
 };
+
+resource app_flags B_SINGLE_LAUNCH;
 
 resource vector_icon {
 	$"6E6369660603040E0B02001602380BBEBE16B13FA2DA398FCAC733EC49EB0A00"
