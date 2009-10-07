@@ -34,15 +34,6 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 	d[2] = (((((r) - _p.data8[2]) * (a)) + (_p.data8[2] << 8)) >> 8); \
 	d[3] = 255; \
 }
-//#define BLEND(d, r, g, b, a) \
-//{ \
-//	pixel32 _p; \
-//	_p.data32 = *(uint32*)d; \
-//	d[0] = (((((b) - _p.data8[0]) * (a)) + ((_p.data8[0] << 8) | _p.data8[0])) / 255); \
-//	d[1] = (((((g) - _p.data8[1]) * (a)) + ((_p.data8[1] << 8) | _p.data8[1])) / 255); \
-//	d[2] = (((((r) - _p.data8[2]) * (a)) + ((_p.data8[2] << 8) | _p.data8[2])) / 255); \
-//	d[3] = 255; \
-//}
 
 
 #define BLEND_SUBPIX(d, r, g, b, a1, a2, a3) \
@@ -54,15 +45,6 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 	d[2] = (((((r) - _p.data8[2]) * (a3)) + (_p.data8[2] << 8)) >> 8); \
 	d[3] = 255; \
 }
-//#define BLEND_SUBPIX(d, r, g, b, a1, a2, a3) \
-//{ \
-//	pixel32 _p; \
-//	_p.data32 = *(uint32*)d; \
-//	d[0] = (((((b) - _p.data8[0]) * (a1)) + ((_p.data8[0] << 8) | _p.data8[0])) / 255); \
-//	d[1] = (((((g) - _p.data8[1]) * (a2)) + ((_p.data8[1] << 8) | _p.data8[1])) / 255); \
-//	d[2] = (((((r) - _p.data8[2]) * (a3)) + ((_p.data8[2] << 8) | _p.data8[2])) / 255); \
-//	d[3] = 255; \
-//}
 
 // BLEND_FROM
 //
@@ -78,13 +60,6 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 	d[2] = (((((r2) - (r1)) * (a)) + ((r1) << 8)) >> 8); \
 	d[3] = 255; \
 }
-//#define BLEND_FROM(d, r1, g1, b1, r2, g2, b2, a) \
-//{ \
-//	d[0] = (((((b2) - (b1)) * (a)) + ((b1) << 8) | b1) / 255); \
-//	d[1] = (((((g2) - (g1)) * (a)) + ((g1) << 8) | g1) / 255); \
-//	d[2] = (((((r2) - (r1)) * (a)) + ((r1) << 8) | r1) / 255); \
-//	d[3] = 255; \
-//}
 
 #define BLEND_FROM_SUBPIX(d, r1, g1, b1, r2, g2, b2, a1, a2, a3) \
 { \
@@ -93,13 +68,6 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 	d[2] = (((((r2) - (r1)) * (a3)) + ((r1) << 8)) >> 8); \
 	d[3] = 255; \
 }
-//#define BLEND_FROM_SUBPIX(d, r1, g1, b1, r2, g2, b2, a1, a2, a3) \
-//{ \
-//	d[0] = (((((b2) - (b1)) * (a1)) + ((b1) << 8) | b1) / 255); \
-//	d[1] = (((((g2) - (g1)) * (a2)) + ((g1) << 8) | g1) / 255); \
-//	d[2] = (((((r2) - (r1)) * (a3)) + ((r1) << 8) | r1) / 255); \
-//	d[3] = 255; \
-//}
 
 // BLEND16
 //
@@ -116,33 +84,15 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 	d[2] = (((((r) - _p.data8[2]) * (a)) + (_p.data8[2] << 16)) >> 16); \
 	d[3] = 255; \
 }
-//#define BLEND16(d, r, g, b, a) \
-//{ \
-//	pixel32 _p; \
-//	_p.data32 = *(uint32*)d; \
-//	d[0] = (((((b) - _p.data8[0]) * (a)) + (_p.data8[0] << 16)) / 65025); \
-//	d[1] = (((((g) - _p.data8[1]) * (a)) + (_p.data8[1] << 16)) / 65025); \
-//	d[2] = (((((r) - _p.data8[2]) * (a)) + (_p.data8[2] << 16)) / 65025); \
-//	d[3] = 255; \
-//}
 
 // BLEND16_SUBPIX
-//#define BLEND16_SUBPIX(d, r, g, b, a1, a2, a3) \
-//{ \
-//	pixel32 _p; \
-//	_p.data32 = *(uint32*)d; \
-//	d[0] = (((((b) - _p.data8[0]) * (a1)) + (_p.data8[0] << 16)) >> 16); \
-//	d[1] = (((((g) - _p.data8[1]) * (a2)) + (_p.data8[1] << 16)) >> 16); \
-//	d[2] = (((((r) - _p.data8[2]) * (a3)) + (_p.data8[2] << 16)) >> 16); \
-//	d[3] = 255; \
-//}
 #define BLEND16_SUBPIX(d, r, g, b, a1, a2, a3) \
 { \
 	pixel32 _p; \
 	_p.data32 = *(uint32*)d; \
-	d[0] = (((((b) - _p.data8[0]) * (a1)) + (_p.data8[0] * 65025)) / 65025); \
-	d[1] = (((((g) - _p.data8[1]) * (a2)) + (_p.data8[1] * 65025)) / 65025); \
-	d[2] = (((((r) - _p.data8[2]) * (a3)) + (_p.data8[2] * 65025)) / 65025); \
+	d[0] = (((((b) - _p.data8[0]) * (a1)) + (_p.data8[0] << 16)) >> 16); \
+	d[1] = (((((g) - _p.data8[1]) * (a2)) + (_p.data8[1] << 16)) >> 16); \
+	d[2] = (((((r) - _p.data8[2]) * (a3)) + (_p.data8[2] << 16)) >> 16); \
 	d[3] = 255; \
 }
 
