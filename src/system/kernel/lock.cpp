@@ -173,7 +173,7 @@ rw_lock_wait(rw_lock* lock, bool writer)
 static void
 rw_lock_unblock(rw_lock* lock)
 {
-	// Check whether there any waiting threads at all and whether anyone
+	// Check whether there are any waiting threads at all and whether anyone
 	// has the write lock.
 	rw_lock_waiter* waiter = lock->waiters;
 	if (waiter == NULL || lock->holder > 0)
