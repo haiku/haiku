@@ -580,8 +580,9 @@ private:
 						}
 
 						component.SetToArrayElement(type->Kind(), indexPath);
-						TypeComponentPath* elementPath
-							= path->CreateSubPath(path->CountComponents() - 1);
+						TypeComponentPath* elementPath = path->CreateSubPath(
+							path->CountComponents()
+								- (baseDimension == 0 ? 0 : 1));
 						if (elementPath == NULL
 							|| !elementPath->AddComponent(component)) {
 							delete elementPath;
