@@ -33,19 +33,11 @@ All rights reserved.
 */
 
 
-#include "Attributes.h"
-#include "AutoLock.h"
-#include "Commands.h"
-#include "DialogPane.h"
-#include "FSUtils.h"
-#include "IconCache.h"
-#include "IconMenuItem.h"
 #include "InfoWindow.h"
-#include "Model.h"
-#include "NavMenu.h"
-#include "PoseView.h"
-#include "Tracker.h"
-#include "WidgetAttributeText.h"
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <Alert.h>
 #include <Debug.h>
@@ -67,9 +59,18 @@ All rights reserved.
 #include <Volume.h>
 #include <VolumeRoster.h>
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "Attributes.h"
+#include "AutoLock.h"
+#include "Commands.h"
+#include "DialogPane.h"
+#include "FSUtils.h"
+#include "IconCache.h"
+#include "IconMenuItem.h"
+#include "Model.h"
+#include "NavMenu.h"
+#include "PoseView.h"
+#include "Tracker.h"
+#include "WidgetAttributeText.h"
 
 
 namespace BPrivate {
@@ -461,7 +462,7 @@ BInfoWindow::MessageReceived(BMessage *message)
 			// Start recalculating..
 			fStopCalc = false;
 			SetSizeStr("calculating" B_UTF8_ELLIPSIS);
-			fCalcThreadID = spawn_thread(BInfoWindow::CalcSize, "CalcSize", 
+			fCalcThreadID = spawn_thread(BInfoWindow::CalcSize, "CalcSize",
 				B_NORMAL_PRIORITY, this);
 			resume_thread(fCalcThreadID);
 			break;
@@ -538,7 +539,7 @@ BInfoWindow::MessageReceived(BMessage *message)
 				newNode << memoryNode;
 
 				// Start watching this again
-				TTracker::WatchNode(TargetModel()->NodeRef(), 
+				TTracker::WatchNode(TargetModel()->NodeRef(),
 					B_WATCH_ALL | B_WATCH_MOUNT, this);
 
 				// Tell the attribute view about this new model
