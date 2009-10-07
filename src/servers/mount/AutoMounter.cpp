@@ -123,6 +123,14 @@ AutoMounter::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kGetAutomounterParams:
+		{
+			BMessage reply;
+			_GetSettings(&reply);
+			message->SendReply(&reply);
+			break;
+		}
+
 		case kMountAllNow:
 			_MountVolumes(kAllVolumes, kAllVolumes);
 			break;
@@ -498,13 +506,8 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 					}
 				}
 
-				if (partition->Mount(NULL, mountFlags) == B_OK
-					&& partition->GetMountPoint(&path) == B_OK) {
-					// notify Tracker that a new volume has been started
-					BMessage note(kVolumeMounted);
-					note.AddString("path", path.Path());
-					note.AddBool("initial rescan", fInitialRescan);
-					be_app->PostMessage(&note);
+				if (partition->Mount(NULL, mountFlags) != B_OK) {
+					// TODO: Error to syslog
 				}
 				return false;
 			}
