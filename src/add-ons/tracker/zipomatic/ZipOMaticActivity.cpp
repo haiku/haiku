@@ -12,10 +12,9 @@
 #include <stdio.h>
 
 
-Activity::Activity(BRect frame, const char* name, uint32 resizingMode,
-	uint32 flags)
+Activity::Activity(const char* name)
 	:
-	BView(frame, name, resizingMode, flags),
+	BView(name, B_WILL_DRAW | B_FRAME_EVENTS),
 	fIsRunning(false),
 	fBitmap(NULL)
 {
@@ -27,6 +26,9 @@ Activity::Activity(BRect frame, const char* name, uint32 resizingMode,
 	fPattern.data[5] = 0xe1;
 	fPattern.data[6] = 0xc3;
 	fPattern.data[7] = 0x87;
+
+	SetExplicitMinSize(BSize(17, 17));
+	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 17));
 };
 
 

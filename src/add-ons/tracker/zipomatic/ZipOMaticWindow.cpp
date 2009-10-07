@@ -32,8 +32,8 @@
 
 ZippoWindow::ZippoWindow(BRect frame, BMessage* refs)
 	:
-	BWindow(frame, "Zip-O-Matic", B_TITLED_WINDOW, B_NOT_RESIZABLE
-		| B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE),
+	BWindow(frame, "Zip-O-Matic", B_TITLED_WINDOW,
+		B_NOT_RESIZABLE	| B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE),
 	fThread(NULL),
 	fWindowGotRefs(false),
 	fZippingWasStopped(false),
@@ -41,9 +41,7 @@ ZippoWindow::ZippoWindow(BRect frame, BMessage* refs)
 	fWindowInvoker(new BInvoker(new BMessage(ZIPPO_QUIT_OR_CONTINUE), NULL,
 		this))
 {
-	fActivityView = new Activity(BRect(0, 0, 171, 17), "activity",
-		B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW | B_FRAME_EVENTS);
-	fActivityView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 17));
+	fActivityView = new Activity("activity");
 	fActivityView->SetExplicitMinSize(BSize(171, 17));
 
 	fArchiveNameView = new BStringView("archive_text", "");

@@ -12,8 +12,7 @@
 class Activity : public BView 
 {
 public:
-							Activity(BRect frame, const char* name,
-								uint32 resizing_mode, uint32 flags);
+							Activity(const char* name);
 							~Activity();
 
 			void			Start();
