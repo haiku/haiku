@@ -28,5 +28,7 @@ const window_type kWindowScreenWindow = window_type(1026);
 /* Private window flags */
 
 const uint32 kWindowScreenFlag = 0x10000;
+const uint32 kAcceptKeyboardFocusFlag = 0x40000;
+	// Accept keyboard input even if B_AVOID_FOCUS is set
 
 #endif // _WINDOW_PRIVATE_H

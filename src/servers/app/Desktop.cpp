@@ -1553,17 +1553,20 @@ Desktop::ViewUnderMouse(const Window* window)
 
 
 /*!	Returns the current keyboard event target candidate - which is either the
-	top-most window (in case it's a menu), or the one having focus.
+	top-most window (in case it has the kAcceptKeyboardFocusFlag flag set), or
+	the one having focus.
 	The window lock must be held when calling this function.
 */
 EventTarget*
 Desktop::KeyboardEventTarget()
 {
+	// Get the top most non-hidden window
 	Window* window = _CurrentWindows().LastWindow();
 	while (window != NULL && window->IsHidden()) {
 		window = window->PreviousWindow(fCurrentWorkspace);
 	}
-	if (window != NULL && window->Feel() == kMenuWindowFeel)
+
+	if (window != NULL && (window->Flags() & kAcceptKeyboardFocusFlag) != 0)
 		return &window->EventTarget();
 
 	if (FocusWindow() != NULL)
