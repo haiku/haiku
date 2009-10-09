@@ -4,6 +4,7 @@
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
+
 #include "SeparatorView.h"
 
 #include <new>
@@ -258,7 +259,7 @@ BSeparatorView::Draw(BRect updateRect)
 	}
 }
 
-// GetPreferredSize
+
 void
 BSeparatorView::GetPreferredSize(float* _width, float* _height)
 {
@@ -464,7 +465,7 @@ BSeparatorView::_BorderSize() const
 		case B_PLAIN_BORDER:
 			return 1.0f;
 		case B_FANCY_BORDER:
-			return 3.0f;
+			return 2.0f;
 
 		case B_NO_BORDER:
 		default:
