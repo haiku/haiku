@@ -1559,6 +1559,8 @@ debug_strlcpy(char* to, const char* from, size_t size)
 	// limit size to avoid address overflows
 	size_t maxSize = std::min(size,
 		~(addr_t)0 - std::max((addr_t)from, (addr_t)to) + 1);
+		// NOTE: Since strlcpy() determines the length of \a from, the source
+		// address might still overflow.
 
 	debug_strlcpy_parameters parameters = {to, from, maxSize};
 
@@ -1568,7 +1570,7 @@ debug_strlcpy(char* to, const char* from, size_t size)
 	}
 
 	// If we hit the address overflow boundary, fail.
-	if (parameters.result == maxSize && maxSize < size)
+	if (parameters.result >= maxSize && maxSize < size)
 		return B_BAD_ADDRESS;
 
 	return parameters.result;

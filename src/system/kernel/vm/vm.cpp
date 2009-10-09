@@ -5491,13 +5491,14 @@ user_strlcpy(char* to, const char* from, size_t size)
 	// limit size to avoid address overflows
 	size_t maxSize = std::min(size,
 		~(addr_t)0 - std::max((addr_t)from, (addr_t)to) + 1);
-
+		// NOTE: Since arch_cpu_user_strlcpy() determines the length of \a from,
+		// the source address might still overflow.
 
 	ssize_t result = arch_cpu_user_strlcpy(to, from, maxSize,
 		&thread_get_current_thread()->fault_handler);
 
 	// If we hit the address overflow boundary, fail.
-	if (result >= 0 && (size_t)result == maxSize && maxSize < size)
+	if (result >= 0 && (size_t)result >= maxSize && maxSize < size)
 		return B_BAD_ADDRESS;
 
 	return result;
