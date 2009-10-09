@@ -22,6 +22,7 @@
 #include <sys/socket.h>
 #include <sys/sockio.h>
 
+#include <IconUtils.h>
 #include <File.h>
 #include <Resources.h>
 
@@ -182,6 +183,18 @@ InterfaceListItem::_InitIcon()
 {
 	BBitmap* icon = NULL;
 	
+	const char* mediaTypeName = "";
+	int media = fSetting->Media();
+	printf("%s media = 0x%x\n", Name(), media);
+	switch (IFM_TYPE(media)) {
+		case IFM_ETHER:
+			mediaTypeName = "ether";
+			break;
+		case IFM_IEEE80211:
+			mediaTypeName = "wifi";
+			break;
+	}
+
 	image_info info;
 	if (our_image(info) != B_OK)
 		return;
@@ -195,16 +208,23 @@ InterfaceListItem::_InitIcon()
 		return;
 
 	size_t size;
-	const void *data = resources.LoadResource('ICON', Name(), &size);
-	if (!data)
-		data = resources.LoadResource('ICON', "generic_device", &size);
+	// Try specific interface icon?
+	const uint8* rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, Name(), &size);
+	if (!rawIcon)
+		// Not found, try interface media type?
+		rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, mediaTypeName, &size);
+	if (!rawIcon)
+		// Not found, try default interface icon?
+		rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, "wifi", &size);
 
-	if (data) {
+	if (rawIcon) {
 		// Now build the bitmap
-		icon = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
-		icon->SetBits(data, size, 0, B_CMAP8);
+		icon = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
+		if (BIconUtils::GetVectorIcon(rawIcon, size, icon) == B_OK)
+			fIcon = icon;
+		else
+			delete icon;
 	}
-	fIcon = icon;
 }
 
 // #pragma mark -
@@ -311,8 +331,10 @@ InterfacesListView::_InitList()
 	MakeEmpty();
 
 	for (uint32 i = 0; i < count; i++) {
-		AddItem(new InterfaceListItem(interface->ifr_name));
-//		printf("Name = %s\n", interface->ifr_name);
+		// if (strcmp(interface->ifr_name, "loop") != 0) {
+			AddItem(new InterfaceListItem(interface->ifr_name));
+	//		printf("Name = %s\n", interface->ifr_name);
+		// }
 		interface = (ifreq*)((addr_t)interface + IF_NAMESIZE 
 			+ interface->ifr_addr.sa_len);
 	}	

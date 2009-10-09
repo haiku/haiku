@@ -26,19 +26,22 @@ class Setting {
 		const char* Gateway()  {return fGateway.String(); }		
 		const char* Netmask()  {return fNetmask.String(); }
 		const char* Name()  {return fName.String(); }
-		bool AutoConfigured() {return fAuto; }
+		bool 		AutoConfigured() {return fAuto; }
+		int			Media()		{ return fMedia; }
 		BObjectList<BString> fNameservers;
 		void ReadConfiguration();
 
 		
 	private:
-		bool _PrepareRequest(struct ifreq& request);
+		bool 	_PrepareRequest(struct ifreq& request);
+		
+		int 	fSocket;
 		BString fIP;
 		BString fGateway;
 		BString fNetmask;
 		BString fName;
-		int fSocket;
-		bool fAuto;
+		bool 	fAuto;
+		int		fMedia;
 };
 
 #endif /* SETTINGS_H */

@@ -4,9 +4,10 @@ UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net preflet ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers net ] : true ;
 
 UsePrivateHeaders net shared ;
+UseLibraryHeaders agg icon ;
 
 AddResources Interfaces : 
- 	Icons.rdef 
+       InterfacesIcons.rdef 
 ;
 
 Addon Interfaces : 
@@ -18,7 +19,8 @@ Addon Interfaces :
 	: 
 	be 
 	<nogrist>NetworkSetup 
-	$(HAIKU_NETWORK_LIBS) 
-	$(TARGET_LIBSTDC++) 
+	$(TARGET_NETWORK_LIBS) 
+	$(TARGET_LIBSUPC++) 
+	libicon.a libagg.a
 ;
 

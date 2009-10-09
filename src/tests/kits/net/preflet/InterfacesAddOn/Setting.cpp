@@ -147,6 +147,9 @@ Setting::ReadConfiguration()
 		flags = request.ifr_flags;
 
 	fAuto = flags & IFF_AUTO_CONFIGURED;
+	
+	if (ioctl(fSocket, SIOCGIFMEDIA, &request, sizeof(struct ifreq)) == 0)
+		fMedia = request.ifr_media;
 
 	// read resolv.conf for the dns.
 	fNameservers.MakeEmpty();
