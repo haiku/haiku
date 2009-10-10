@@ -145,7 +145,7 @@ main(int argc, char** argv)
 
 	screen_mode newMode = currentMode;
 
-        if (listModes) {
+	if (listModes) {
 		const int modeCount = screenMode.CountModes();
 		printf("Available screen modes :\n");
 
@@ -157,7 +157,7 @@ main(int argc, char** argv)
 				currentMode.BitsPerPixel(), currentMode.refresh);
 		}
 		return 0;
-        } else if (fallbackMode) {
+	} else if (fallbackMode) {
 		if (currentMode.width == 800 && currentMode.height == 600) {
 			newMode.width = 640;
 			newMode.height = 480;
