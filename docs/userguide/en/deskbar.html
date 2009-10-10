@@ -55,40 +55,48 @@
 <a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
 <a id="deskbar-menu" name="deskbar-menu">The Deskbar Menu</a></h1>
 <p>A menu opens when you click on the Deskbar's top:</p>
-<img src="images/deskbar-images/settings.png" alt="settings.png" />
+<img src="images/deskbar-images/deskbar.png" alt="deskbar.png" />
 <ul>
 <li><p><b>About This System...</b> - Shows some basic information of the system, licenses and the credits of the Haiku project.</p></li>
 
 <li><p><b>Find...</b> - Opens the <a href="queries.html">Query</a> dialog.</p></li>
 <li><p><b>Show Replicants</b> - Shows/hides the little <a href="gui.html#replicants">Replicant</a> widget you use to drag it around, remove or access its context menu.</p></li>
 <li><p><b>Mount</b> - Offers the same options as when invoked by right-clicking the Desktop (see <a href="tracker.html#mounting-volumes">Mounting Volumes</a>).</p></li>
-<li><p><b>Deskbar Settings</b></p>
-<table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Configure Deskbar Menu...</span></td><td>&#160;</td><td>Opens a panel to configure the Deskbar menu (see below).</td></tr>
-<tr><td><span class="menu">Always on Top</span></td><td>&#160;</td><td>The Deskbar always stays above all other windows.</td></tr>
-<tr><td><span class="menu">Auto Raise</span></td><td>&#160;</td><td>The Deskbar pops to the front if the mouse pointer touches it.</td></tr>
-<tr><td><span class="menu">Sort Running Applications</span></td><td>&#160;</td><td>Sorts the list of running programs alphabetically.</td></tr>
-<tr><td><span class="menu">Tracker always First</span></td><td>&#160;</td><td>Even if you sort alphabetically, the Tracker entry always stays first in the list.</td></tr>
-<tr><td><span class="menu">24 Hour Clock</span></td><td>&#160;</td><td>Toggles between 24 and 12 hour clock.</td></tr>
-<tr><td><span class="menu">Show Seconds</span></td><td>&#160;</td><td>Adds the display of seconds to the clock.</td></tr>
-<tr><td><span class="menu">European Date</span></td><td>&#160;</td><td>Shows the date in European format: day-month-year</td></tr>
-<tr><td><span class="menu">---- Full Date ----</span></td></tr>
-<tr><td class="onelinetop"><span class="menu">Show Application Expander</span></td><td>&#160;</td><td>Provides a small widget to show/hide all windows of a program directly under its entry in the Deskbar.</td></tr>
-<tr><td><span class="menu">Expand New Applications</span></td><td>&#160;</td><td>Newly launched programs have their windows automatically expanded under their entry in the Deskbar.</td></tr>
-    </table></li>
-<li><p><b>Shutdown</b> - Offers options to either <span class="menu">Restart System</span> or <span class="menu">Power Off</span>.</p></li>
-<li><p><b>Recent Documents, Folders, Applications</b> - List of the last recently opened documents, folders and applications (see <span class="menu">Configure Deskbar Menu...</span> below).</p></li>
-<li><p><b>Applications, Demos, Deskbar Applets, Preferences</b> - List of installed applications, demos, applets and preferences (see <span class="menu">Configure Deskbar Menu...</span> below).</p></li>
+<li><p><b>Deskbar Preferences...</b> - Opens a panel with some configuration options (see <span class="menu">Deskbar Preferences</span> below).</p></li>
+<li><p><b>Shutdown...</b> - Offers options to either <span class="menu">Restart System</span> or <span class="menu">Power Off</span>.</p></li>
+<li><p><b>Recent Documents, Folders, Applications</b> - List of the last recently opened documents, folders and applications (see <span class="menu">Deskbar Preferences</span> below).</p></li>
+<li><p><b>Applications, Demos, Deskbar Applets, Preferences</b> - List of installed applications, demos, applets and preferences (see <span class="menu">Deskbar Preferences</span> below).</p></li>
 </ul>
 
 <h2>
 <a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
-Configure Deskbar Menu...</h2>
+<a id="deskbar-prefs" name="deskbar-prefs">Deskbar Preferences</a></h2>
 <img src="images/deskbar-images/configure.png" alt="configure.png" />
-<p>In this panel you set the number of recent documents, folders and applications that are shown in the Deskbar, or if you show them at all.</p>
-<p>Here, you also configure folders and their contents, which are by default Applications, Demos, Deskbar Applets, and Preferences. You can add your own entries and edit or remove items.<br />
-This part of the panel is just a representation of the folder <span class="path">/boot/home/config/be/</span>. You can just as well link or copy files and folders or even queries directly in Tracker to configure your Deskbar.</p>
-<p>It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p>
+<ul>
+<li><p><b>Menu</b><br />
+Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you show them at all.<br />
+The button <span class="button">Edit Menu...</span> opens the folder <span class="path">/boot/home/config/be/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar Applets</span>, and <span class="menu">Preferences</span>.<br />
+You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
+<p>It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p></li>
+<li><p><b>Window</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Always on Top</span></td><td>&#160;</td><td>The Deskbar always stays above all other windows.</td></tr>
+<tr><td><span class="menu">Auto Raise</span></td><td>&#160;</td><td>The Deskbar pops to the front if the mouse pointer touches it.</td></tr>
+</table></li>
+<li><p><b>Applications</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Sort Running Applications</span></td><td>&#160;</td><td>Sorts the list of running programs alphabetically.</td></tr>
+<tr><td><span class="menu">Tracker always First</span></td><td>&#160;</td><td>Even if you sort alphabetically, the Tracker entry always stays first in the list.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Show Application Expander</span></td><td>&#160;</td><td>Provides a small widget to show/hide all windows of a program directly under its entry in the Deskbar.</td></tr>
+<tr><td><span class="menu">Expand New Applications</span></td><td>&#160;</td><td>Newly launched programs have their windows automatically expanded under their entry in the Deskbar.</td></tr>
+</table></li>
+<li><p><b>Clock</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">24 Hour Clock</span></td><td>&#160;</td><td>Toggles between 24 and 12 hour clock.</td></tr>
+<tr><td><span class="menu">Show Seconds</span></td><td>&#160;</td><td>Adds the display of seconds to the clock.</td></tr>
+<tr><td><span class="menu">European Date</span></td><td>&#160;</td><td>Shows the date in European format: day-month-year</td></tr>
+<tr><td><span class="menu">---- Full Date ----</span></td></tr>
+</table></li>
 
 <h1>
 <a href="#logo"><img src="../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
