@@ -217,6 +217,11 @@ public:
 							AsyncIOCallback* callback);
 	virtual	bool		CanWritePage(off_t offset);
 
+	virtual	int32		MaxPagesPerWrite() const
+							{ return -1; } // no restriction
+	virtual	int32		MaxPagesPerAsyncWrite() const
+							{ return -1; } // no restriction
+
 	virtual	status_t	Fault(struct vm_address_space *aspace, off_t offset);
 
 	virtual	void		Merge(VMCache* source);

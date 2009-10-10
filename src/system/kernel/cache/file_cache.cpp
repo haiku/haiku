@@ -363,7 +363,7 @@ read_pages_and_clear_partial(file_cache_ref* ref, void* cookie, off_t offset,
 	pages needed to fulfill that request. This function is called by cache_io().
 	It can only handle a certain amount of bytes, and the caller must make
 	sure that it matches that criterion.
-	The cache_ref lock must be hold when calling this function; during
+	The cache_ref lock must be held when calling this function; during
 	operation it will unlock the cache, though.
 */
 static status_t
