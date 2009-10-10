@@ -1,0 +1,18 @@
+1	finnish	x-vnd.Haiku-CPUFrequencyPref	2623066734
+Ok	Status view		Ok
+Integration Time [ms]	CPU Frequency View		Integraatio Aika [ms]
+High Performance	Status view		Korkea Suorituskyky
+Defaults	Pref Window		Oletusasetukset
+CPU Frequency Status View	CPU Frequency View		CPU Taajuuden Tilanäkymä
+Dynamic Performance	Status view		Dynaaminen Suorituskyky
+Step up by CPU usage:	Color Step View		Muuta ylöspäin tämän CPU:n käyttömäärän kohdalla:
+Stepping Policy	CPU Frequency View		Muutostapa
+Open Speedstep Preferences…	Status view		Avaa Speedstep Valinnat...
+Set State	Status view		Aseta Tila
+Launching the CPU Frequency preflet failed.\n\nError: 	Status view		CPU taajuuden asetusohjelman käynnistys epäonnistui.\n\nVirhe: 
+Install Replicant into Deskbar	CPU Frequency View		Asenna kopio Tilapalkkiin
+Low Energy	Status view		Matala Energiankulutus
+Revert	Pref Window		Palauta
+Dynamic Stepping	CPU Frequency View		Dynaaminen Muutos
+CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Prosessorin Kellotaajuus\n\ttekijä Clemens Zeidler\n\tTekijänoikeudet 2009, Haiku, Inc.\n
+CPU Frequency	Main window		CPU Taajuus

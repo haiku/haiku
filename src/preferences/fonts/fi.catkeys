@@ -1,0 +1,12 @@
+1	finnish	x-vnd.Haiku-Fonts	3656873675
+Defaults	Main window		Oletusasetukset
+Plain Font:	Font view		Tavallinen fontti :
+Fonts	Main window		Fontit
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fontit\n\tTekijänoikeudet 2004-2005, Haiku.\n\n
+Revert	Main window		Palauta
+Size:	Font Selection view		Koko :
+Menu Font:	Font view		Valikko fontti :
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	The quick brown fox jumps over the lazy dog.
+Bold Font:	Font view		Lihavoitu fontti :
+Fixed Font:	Font view		Kiinteävälinen fontti :
+Ok	main		Ok

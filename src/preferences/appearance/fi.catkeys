@@ -1,0 +1,43 @@
+1	finnish	x-vnd.Haiku-Appearance	959674221
+Navigation Pulse	Colors tab		Navigoinnin välke
+Shadow	Colors tab		Varjo
+On	AntialiasingSettingsView		Päällä
+Defaults	APRWindow		Oletusasetukset
+Grayscale	AntialiasingSettingsView		Harmaasävy
+Shine	Colors tab		Hohto
+Off	AntialiasingSettingsView		Pois päältä
+Anti-aliasing type:	AntialiasingSettingsView		Reunanpehmennystapa :
+Success	Colors tab		Onnistuminen
+Inactive Window Tab	Colors tab		Epäaktiivisen ikkunakahvan väri
+Failure	Colors tab		Epäonnistuminen
+Hinting menu	AntialiasingSettingsView		Vinkkausvalikko
+Control Border	Colors tab		Kontrollin reuna
+Document Background	Colors tab		Dokumentin tausta
+Revert	APRWindow		Palauta
+Selected Menu Item Border	Colors tab		Valitun valikkovalinnan reuna
+Selected Menu Item Text	Colors tab		Valitun valikkovalinnan teksti
+Antialiasing	APRWindow		Reunanpehmennys
+Window Tab Text	Colors tab		Ikkunakahvan teksti
+Tooltip Background	Colors tab		Työkaluvinkin tausta
+Document Text	Colors tab		Dokumentin teksti
+Navigation Base	Colors tab		Navigoinnin pohja
+Menu Background	Colors tab		Valikon tausta
+Appearance	APRWindow		Ulkonäkö
+Control Background	Colors tab		Kontrollin tausta
+Colors	APRWindow		Värit
+Panel Background	Colors tab		Paneelin tausta
+Window Tab	Colors tab		Ikkunakahva
+Reduce colored edges filter strength:	AntialiasingSettingsView		Vähennä värillisten reunojen suodatuksen vahvuutta:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Alipikselipohjainen reunanpehmennys ei ole saatavilla tässä Haiku versiossa patenttisyiden takia. Ominaisuuden saaminen käyttöön vaatii Haikun uudelleenkääntämistä ja eräiden optioiden aktivoimista libfreetype:n määrittelytiedostoissa.
+Menu Item Text	Colors tab		Valikkovalinnan teksti
+Monospaced Fonts Only	AntialiasingSettingsView		Vain monospace fontti
+LCD subpixel	AntialiasingSettingsView		LCD alipikseli
+Inactive Window Tab Text	Colors tab		Epäaktiivisen ikkunakahvan tekstin väri
+Strong	AntialiasingSettingsView		Vahva
+Control Highlight	Colors tab		Kontrollin korostus
+Control Text	Colors tab		Kontrollin teksti
+Tooltip Text	Colors tab		Työkaluvinkin teksti
+Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
+Selected Menu Item Background	Colors tab		Valitun valikkovalinnan tausta
+Glyph hinting:	AntialiasingSettingsView		Merkin vinkkaus :
+Panel Text	Colors tab		Paneelin teksti
