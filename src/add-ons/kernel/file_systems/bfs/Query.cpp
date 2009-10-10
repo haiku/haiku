@@ -38,6 +38,7 @@ enum ops {
 	OP_OR,
 
 	OP_EQUATION,
+		// is only used for invalid equations
 
 	OP_EQUAL,
 	OP_UNEQUAL,
@@ -78,6 +79,8 @@ union value {
 #	define B_MIME_STRING_TYPE 'MIMS'
 #endif
 
+/*!	Abstract base class for the operator/equation classes.
+*/
 class Term {
 public:
 						Term(int8 op) : fOp(op), fParent(NULL) {}
@@ -107,15 +110,18 @@ protected:
 			Term*		fParent;
 };
 
-// Although an Equation object is quite independent from the volume on which
-// the query is run, there are some dependencies that are produced while
-// querying:
-// The type/size of the value, the score, and if it has an index or not.
-// So you could run more than one query on the same volume, but it might return
-// wrong values when it runs concurrently on another volume.
-// That's not an issue right now, because we run single-threaded and don't use
-// queries more than once.
 
+/*!	An Equation object represents an "attribute-equation operator-value" pair.
+
+	Although an Equation object is quite independent from the volume on which
+	the query is run, there are some dependencies that are produced while
+	querying:
+	The type/size of the value, the score, and if it has an index or not.
+	So you could run more than one query on the same volume, but it might return
+	wrong values when it runs concurrently on another volume.
+	That's not an issue right now, because we run single-threaded and don't use
+	queries more than once.
+*/
 class Equation : public Term {
 public:
 						Equation(char** expression);
@@ -165,6 +171,10 @@ private:
 			bool		fHasIndex;
 };
 
+
+/*!	The Operator class does not represent a generic operator, but only those
+	that combine two equations, namely "or", and "and".
+*/
 class Operator : public Term {
 public:
 						Operator(Term* left, int8 op, Term* right);
@@ -772,12 +782,12 @@ Equation::Complement()
 status_t
 Equation::MatchEmptyString()
 {
-	// there is no matching attribute, we will just bail out if we
+	// There is no matching attribute, we will just bail out if we
 	// already know that our value is not of a string type.
 	// If not, it will be converted to a string - and then be compared with "".
 	// That's why we have to call ConvertValue() here - but it will be
 	// a cheap call for the next time
-	// Should we do this only for OP_UNEQUAL?
+	// TODO: Should we do this only for OP_UNEQUAL?
 	if (fType != 0 && fType != B_STRING_TYPE)
 		return NO_MATCH;
 
@@ -1162,12 +1172,21 @@ Operator::Match(Inode* inode, const char* attribute, int32 type,
 		return fRight->Match(inode, attribute, type, key, size);
 	} else {
 		// choose the term with the better score for OP_OR
+		Term* first;
+		Term* second;
 		if (fRight->Score() > fLeft->Score()) {
-			status_t status = fRight->Match(inode, attribute, type, key, size);
-			if (status != NO_MATCH)
-				return status;
+			first = fLeft;
+			second = fRight;
+		} else {
+			first = fRight;
+			second = fLeft;
 		}
-		return fLeft->Match(inode, attribute, type, key, size);
+
+		status_t status = first->Match(inode, attribute, type, key, size);
+		if (status != NO_MATCH)
+			return status;
+
+		return second->Match(inode, attribute, type, key, size);
 	}
 }
 
@@ -1468,7 +1487,7 @@ Query::Query(Volume* volume, Expression* expression, uint32 flags)
 	fFlags(flags),
 	fPort(-1)
 {
-	// if the expression has a valid root pointer, the whole tree has
+	// If the expression has a valid root pointer, the whole tree has
 	// already passed the sanity check, so that we don't have to check
 	// every pointer
 	if (volume == NULL || expression == NULL || expression->Root() == NULL)
@@ -1480,14 +1499,14 @@ Query::Query(Volume* volume, Expression* expression, uint32 flags)
 
 	Rewind();
 
-	if (fFlags & B_LIVE_QUERY)
+	if ((fFlags & B_LIVE_QUERY) != 0)
 		volume->AddQuery(this);
 }
 
 
 Query::~Query()
 {
-	if (fFlags & B_LIVE_QUERY)
+	if ((fFlags & B_LIVE_QUERY) != 0)
 		fVolume->RemoveQuery(this);
 }
 
@@ -1525,7 +1544,7 @@ Query::Rewind()
 					stack.Push(op->Left());
 			}
 		} else if (term->Op() == OP_EQUATION
-			|| fStack.Push((Equation*)term) < B_OK)
+			|| fStack.Push((Equation*)term) != B_OK)
 			FATAL(("Unknown term on stack or stack error"));
 	}
 
@@ -1541,17 +1560,20 @@ Query::GetNextEntry(struct dirent* dirent, size_t size)
 	while (true) {
 		if (fIterator == NULL) {
 			if (!fStack.Pop(&fCurrent)
-				|| fCurrent == NULL
-				|| fCurrent->PrepareQuery(fVolume, fIndex, &fIterator,
-						fFlags & B_QUERY_NON_INDEXED) < B_OK)
+				|| fCurrent == NULL)
 				return B_ENTRY_NOT_FOUND;
+
+			status_t status = fCurrent->PrepareQuery(fVolume, fIndex,
+				&fIterator, fFlags & B_QUERY_NON_INDEXED);
+			if (status != B_OK && status != B_ENTRY_NOT_FOUND)
+				return status;
 		}
 		if (fCurrent == NULL)
 			RETURN_ERROR(B_ERROR);
 
 		status_t status = fCurrent->GetNextMatching(fVolume, fIterator, dirent,
 			size);
-		if (status < B_OK) {
+		if (status != B_OK) {
 			delete fIterator;
 			fIterator = NULL;
 			fCurrent = NULL;
