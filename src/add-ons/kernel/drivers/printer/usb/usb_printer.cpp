@@ -20,8 +20,16 @@
 #define DEVICE_NAME_BASE	"printer/usb/"
 #define DEVICE_NAME			DEVICE_NAME_BASE"%ld"
 
+#define SECONDS             ((bigtime_t)1000 * 1000)
+#define MINUTES             (60 * SECONDS)
+#define HOURS               (60 * MINUTES)
 
-#define TRACE_USB_PRINTER 1
+// large timeout so user can fix any issues (for instance insert paper)
+// before printing can start or continue
+#define WRITE_TIMEOUT       (1 * HOURS)
+#define READ_TIMEOUT        (2 * SECONDS)
+
+// #define TRACE_USB_PRINTER 1
 #ifdef TRACE_USB_PRINTER
 #define TRACE(x...)			dprintf(DRIVER_NAME": "x)
 #define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME": "x)
@@ -50,25 +58,6 @@ static void	usb_printer_callback(void *cookie, status_t status, void *data,
 status_t	usb_printer_transfer_data(printer_device *device, bool directionIn,
 				void *data, size_t dataLength);
 
-#if 0
-status_t	usb_printer_mass_storage_reset(printer_device *device);
-uint8		usb_printer_get_max_lun(printer_device *device);
-void		usb_printer_reset_recovery(printer_device *device);
-status_t	usb_printer_receive_csw(printer_device *device,
-				command_status_wrapper *status);
-status_t	usb_printer_operation(device_lun *lun, uint8 operation,
-				uint8 opLength, uint32 logicalBlockAddress,
-				uint16 transferLength, void *data, uint32 *dataLength,
-				bool directionIn);
-
-status_t	usb_printer_request_sense(device_lun *lun);
-status_t	usb_printer_mode_sense(device_lun *lun);
-status_t	usb_printer_test_unit_ready(device_lun *lun);
-status_t	usb_printer_inquiry(device_lun *lun);
-status_t	usb_printer_reset_capacity(device_lun *lun);
-status_t	usb_printer_update_capacity(device_lun *lun);
-status_t	usb_printer_synchronize(device_lun *lun, bool force);
-#endif
 
 //
 //#pragma mark - Device Allocation Helper Functions
@@ -110,7 +99,8 @@ usb_printer_transfer_data(printer_device *device, bool directionIn, void *data,
 	}
 
 	do {
-		result = acquire_sem_etc(device->notify, 1, B_RELATIVE_TIMEOUT, 2000000);
+		bigtime_t timeout = directionIn ? READ_TIMEOUT : WRITE_TIMEOUT;
+		result = acquire_sem_etc(device->notify, 1, B_RELATIVE_TIMEOUT, timeout);
 		if (result == B_TIMED_OUT) {
 			// Cancel the transfer and collect the sem that should now be
 			// released through the callback on cancel. Handling of device
@@ -130,403 +120,6 @@ usb_printer_transfer_data(printer_device *device, bool directionIn, void *data,
 	return B_OK;
 }
 
-#if 0
-status_t
-usb_printer_mass_storage_reset(printer_device *device)
-{
-	return gUSBModule->send_request(device->device, USB_REQTYPE_INTERFACE_OUT
-		| USB_REQTYPE_CLASS, REQUEST_MASS_STORAGE_RESET, 0x0000,
-		device->interface, 0, NULL, NULL);
-}
-
-
-uint8
-usb_printer_get_max_lun(printer_device *device)
-{
-	uint8 result = 0;
-	size_t actualLength = 0;
-
-	// devices that do not support multiple LUNs may stall this request
-	if (gUSBModule->send_request(device->device, USB_REQTYPE_INTERFACE_IN
-		| USB_REQTYPE_CLASS, REQUEST_GET_MAX_LUN, 0x0000, device->interface,
-		1, &result, &actualLength) != B_OK || actualLength != 1)
-		return 0;
-
-	if (result > MAX_LOGICAL_UNIT_NUMBER) {
-		// invalid max lun
-		return 0;
-	}
-
-	return result;
-}
-
-
-status_t
-usb_printer_receive_csw(printer_device *device, command_status_wrapper *status)
-{
-	status_t result = usb_printer_transfer_data(device, true, status,
-		sizeof(command_status_wrapper));
-	if (result != B_OK)
-		return result;
-
-	if (device->status != B_OK
-		|| device->actual_length != sizeof(command_status_wrapper)) {
-		// receiving the command status wrapper failed
-		return B_ERROR;
-	}
-
-	return B_OK;
-}
-
-
-status_t
-usb_printer_operation(device_lun *lun, uint8 operation, uint8 opLength,
-	uint32 logicalBlockAddress, uint16 transferLength, void *data,
-	uint32 *dataLength, bool directionIn)
-{
-	TRACE("operation: lun: %u; op: %u; oplen: %u; lba: %lu; tlen: %u; data: %p; dlen: %p (%lu); in: %c\n",
-		lun->logical_unit_number, operation, opLength, logicalBlockAddress,
-		transferLength, data, dataLength, dataLength ? *dataLength : 0,
-		directionIn ? 'y' : 'n');
-
-	printer_device *device = lun->device;
-	command_block_wrapper command;
-	command.signature = CBW_SIGNATURE;
-	command.tag = device->current_tag++;
-	command.data_transfer_length = (dataLength != NULL ? *dataLength : 0);
-	command.flags = (directionIn ? CBW_DATA_INPUT : CBW_DATA_OUTPUT);
-	command.lun = lun->logical_unit_number;
-	command.command_block_length = opLength;
-	memset(command.command_block, 0, sizeof(command.command_block));
-
-	switch (opLength) {
-		case 6: {
-			scsi_command_6 *commandBlock = (scsi_command_6 *)command.command_block;
-			commandBlock->operation = operation;
-			commandBlock->lun = lun->logical_unit_number << 5;
-			commandBlock->allocation_length = (uint8)transferLength;
-			if (operation == SCSI_MODE_SENSE_6) {
-				// we hijack the lba argument to transport the desired page
-				commandBlock->reserved[1] = (uint8)logicalBlockAddress;
-			}
-			break;
-		}
-
-		case 10: {
-			scsi_command_10 *commandBlock = (scsi_command_10 *)command.command_block;
-			commandBlock->operation = operation;
-			commandBlock->lun_flags = lun->logical_unit_number << 5;
-			commandBlock->logical_block_address = htonl(logicalBlockAddress);
-			commandBlock->transfer_length = htons(transferLength);
-			break;
-		}
-
-		default:
-			TRACE_ALWAYS("unsupported operation length %d\n", opLength);
-			return B_BAD_VALUE;
-	}
-
-	status_t result = usb_printer_transfer_data(device, false, &command,
-		sizeof(command_block_wrapper));
-	if (result != B_OK)
-		return result;
-
-	if (device->status != B_OK ||
-		device->actual_length != sizeof(command_block_wrapper)) {
-		// sending the command block wrapper failed
-		TRACE_ALWAYS("sending the command block wrapper failed\n");
-		usb_printer_reset_recovery(device);
-		return B_ERROR;
-	}
-
-	size_t transferedData = 0;
-	if (data != NULL && dataLength != NULL && *dataLength > 0) {
-		// we have data to transfer in a data stage
-		result = usb_printer_transfer_data(device, directionIn, data, *dataLength);
-		if (result != B_OK)
-			return result;
-
-		transferedData = device->actual_length;
-		if (device->status != B_OK || transferedData != *dataLength) {
-			// sending or receiving of the data failed
-			if (device->status == B_DEV_STALLED) {
-				TRACE("stall while transfering data\n");
-				gUSBModule->clear_feature(directionIn ? device->bulk_in
-					: device->bulk_out, USB_FEATURE_ENDPOINT_HALT);
-			} else {
-				TRACE_ALWAYS("sending or receiving of the data failed\n");
-				usb_printer_reset_recovery(device);
-				return B_ERROR;
-			}
-		}
-	}
-
-	command_status_wrapper status;
-	result =  usb_printer_receive_csw(device, &status);
-	if (result != B_OK) {
-		// in case of a stall or error clear the stall and try again
-		gUSBModule->clear_feature(device->bulk_in, USB_FEATURE_ENDPOINT_HALT);
-		result = usb_printer_receive_csw(device, &status);
-	}
-
-	if (result != B_OK) {
-		TRACE_ALWAYS("receiving the command status wrapper failed\n");
-		usb_printer_reset_recovery(device);
-		return result;
-	}
-
-	if (status.signature != CSW_SIGNATURE || status.tag != command.tag) {
-		// the command status wrapper is not valid
-		TRACE_ALWAYS("command status wrapper is not valid\n");
-		usb_printer_reset_recovery(device);
-		return B_ERROR;
-	}
-
-	switch (status.status) {
-		case CSW_STATUS_COMMAND_PASSED:
-		case CSW_STATUS_COMMAND_FAILED: {
-			if (status.data_residue > command.data_transfer_length) {
-				// command status wrapper is not meaningful
-				TRACE_ALWAYS("command status wrapper has invalid residue\n");
-				usb_printer_reset_recovery(device);
-				return B_ERROR;
-			}
-
-			if (dataLength != NULL) {
-				*dataLength -= status.data_residue;
-				if (transferedData < *dataLength) {
-					TRACE_ALWAYS("less data transfered than indicated\n");
-					*dataLength = transferedData;
-				}
-			}
-
-			if (status.status == CSW_STATUS_COMMAND_PASSED) {
-				// the operation is complete and has succeeded
-				return B_OK;
-			} else {
-				// the operation is complete but has failed at the SCSI level
-				TRACE_ALWAYS("operation 0x%02x failed at the SCSI level\n",
-					operation);
-				result = usb_printer_request_sense(lun);
-				return result == B_OK ? B_ERROR : result;
-			}
-		}
-
-		case CSW_STATUS_PHASE_ERROR: {
-			// a protocol or device error occured
-			TRACE_ALWAYS("phase error in operation 0x%02x\n", operation);
-			usb_printer_reset_recovery(device);
-			return B_ERROR;
-		}
-
-		default: {
-			// command status wrapper is not meaningful
-			TRACE_ALWAYS("command status wrapper has invalid status\n");
-			usb_printer_reset_recovery(device);
-			return B_ERROR;
-		}
-	}
-}
-
-
-//
-//#pragma mark - Helper/Convenience Functions
-//
-
-
-status_t
-usb_printer_request_sense(device_lun *lun)
-{
-	uint32 dataLength = sizeof(scsi_request_sense_6_parameter);
-	scsi_request_sense_6_parameter parameter;
-	status_t result = usb_printer_operation(lun, SCSI_REQUEST_SENSE_6, 6, 0,
-		dataLength, &parameter, &dataLength, true);
-	if (result != B_OK) {
-		TRACE_ALWAYS("getting request sense data failed\n");
-		return result;
-	}
-
-	if (parameter.sense_key > SCSI_SENSE_KEY_NOT_READY) {
-		TRACE_ALWAYS("request_sense: key: 0x%02x; asc: 0x%02x; ascq: 0x%02x;\n",
-			parameter.sense_key, parameter.additional_sense_code,
-			parameter.additional_sense_code_qualifier);
-	}
-
-	switch (parameter.sense_key) {
-		case SCSI_SENSE_KEY_NO_SENSE:
-		case SCSI_SENSE_KEY_RECOVERED_ERROR:
-			return B_OK;
-
-		case SCSI_SENSE_KEY_NOT_READY:
-			TRACE("request_sense: device not ready (asc 0x%02x ascq 0x%02x)\n",
-				parameter.additional_sense_code,
-				parameter.additional_sense_code_qualifier);
-			lun->media_present = false;
-			usb_printer_reset_capacity(lun);
-			return B_DEV_NO_MEDIA;
-
-		case SCSI_SENSE_KEY_HARDWARE_ERROR:
-		case SCSI_SENSE_KEY_MEDIUM_ERROR:
-			TRACE_ALWAYS("request_sense: media or hardware error\n");
-			return B_DEV_UNREADABLE;
-
-		case SCSI_SENSE_KEY_ILLEGAL_REQUEST:
-			TRACE_ALWAYS("request_sense: illegal request\n");
-			return B_DEV_INVALID_IOCTL;
-
-		case SCSI_SENSE_KEY_UNIT_ATTENTION:
-			TRACE_ALWAYS("request_sense: media changed\n");
-			lun->media_changed = true;
-			lun->media_present = true;
-			return B_DEV_MEDIA_CHANGED;
-
-		case SCSI_SENSE_KEY_DATA_PROTECT:
-			TRACE_ALWAYS("request_sense: write protected\n");
-			return B_READ_ONLY_DEVICE;
-
-		case SCSI_SENSE_KEY_ABORTED_COMMAND:
-			TRACE_ALWAYS("request_sense: command aborted\n");
-			return B_CANCELED;
-	}
-
-	return B_ERROR;
-}
-
-
-status_t
-usb_printer_mode_sense(device_lun *lun)
-{
-	uint32 dataLength = sizeof(scsi_mode_sense_6_parameter);
-	scsi_mode_sense_6_parameter parameter;
-	status_t result = usb_printer_operation(lun, SCSI_MODE_SENSE_6, 6,
-		SCSI_MODE_PAGE_DEVICE_CONFIGURATION, dataLength, &parameter,
-		&dataLength, true);
-	if (result != B_OK) {
-		TRACE_ALWAYS("getting mode sense data failed\n");
-		return result;
-	}
-
-	lun->write_protected
-		= (parameter.device_specific & SCSI_DEVICE_SPECIFIC_WRITE_PROTECT) != 0;
-	TRACE_ALWAYS("write protected: %s\n", lun->write_protected ? "yes" : "no");	
-	return B_OK;
-}
-
-
-status_t
-usb_printer_test_unit_ready(device_lun *lun)
-{
-	return usb_printer_operation(lun, SCSI_TEST_UNIT_READY_6, 6, 0, 0, NULL, NULL,
-		true);
-}
-
-
-status_t
-usb_printer_inquiry(device_lun *lun)
-{
-	uint32 dataLength = sizeof(scsi_inquiry_6_parameter);
-	scsi_inquiry_6_parameter parameter;
-	status_t result = B_ERROR;
-	for (uint32 tries = 0; tries < 3; tries++) {
-		result = usb_printer_operation(lun, SCSI_INQUIRY_6, 6, 0, dataLength,
-			&parameter, &dataLength, true);
-		if (result == B_OK)
-			break;
-	}
-	if (result != B_OK) {
-		TRACE_ALWAYS("getting inquiry data failed\n");
-		lun->device_type = B_DISK;
-		lun->removable = true;
-		return result;
-	}
-
-	TRACE("peripherial_device_type  0x%02x\n", parameter.peripherial_device_type);
-	TRACE("peripherial_qualifier    0x%02x\n", parameter.peripherial_qualifier);
-	TRACE("removable_medium         %s\n", parameter.removable_medium ? "yes" : "no");
-	TRACE("version                  0x%02x\n", parameter.version);
-	TRACE("response_data_format     0x%02x\n", parameter.response_data_format);	
-	TRACE_ALWAYS("vendor_identification    \"%.8s\"\n", parameter.vendor_identification);	
-	TRACE_ALWAYS("product_identification   \"%.16s\"\n", parameter.product_identification);	
-	TRACE_ALWAYS("product_revision_level   \"%.4s\"\n", parameter.product_revision_level);	
-	lun->device_type = parameter.peripherial_device_type; /* 1:1 mapping */
-	lun->removable = (parameter.removable_medium == 1);
-	return B_OK;
-}
-
-
-status_t
-usb_printer_reset_capacity(device_lun *lun)
-{
-	lun->block_size = 512;
-	lun->block_count = 0;
-	return B_OK;
-}
-
-
-status_t
-usb_printer_update_capacity(device_lun *lun)
-{
-	uint32 dataLength = sizeof(scsi_read_capacity_10_parameter);
-	scsi_read_capacity_10_parameter parameter;
-	status_t result = B_ERROR;
-
-	// Retry reading the capacity up to three times. The first try might only
-	// yield a unit attention telling us that the device or media status
-	// changed, which is more or less expected if it is the first operation
-	// on the device or the device only clears the unit atention for capacity
-	// reads.
-	for (int32 i = 0; i < 3; i++) {
-		result = usb_printer_operation(lun, SCSI_READ_CAPACITY_10, 10, 0, 0,
-			&parameter, &dataLength, true);
-		if (result == B_OK)
-			break;
-	}
-
-	if (result != B_OK) {
-		TRACE_ALWAYS("failed to update capacity\n");
-		lun->media_present = false;
-		lun->media_changed = false;
-		usb_printer_reset_capacity(lun);
-		return result;
-	}
-
-	lun->media_present = true;
-	lun->media_changed = false;
-	lun->block_size = ntohl(parameter.logical_block_length);
-	lun->block_count = ntohl(parameter.last_logical_block_address) + 1;
-	return B_OK;
-}
-
-
-status_t
-usb_printer_synchronize(device_lun *lun, bool force)
-{
-	if (lun->device->sync_support == 0) {
-		// this device reported an illegal request when syncing or repeatedly
-		// returned an other error, it apparently does not support syncing...
-		return B_UNSUPPORTED;
-	}
-
-	if (!lun->should_sync && !force)
-		return B_OK;
-
-	status_t result = usb_printer_operation(lun, SCSI_SYNCHRONIZE_CACHE_10, 10,
-		0, 0, NULL, NULL, false);
-
-	if (result == B_OK) {
-		lun->device->sync_support = SYNC_SUPPORT_RELOAD;
-		lun->should_sync = false;
-		return B_OK;
-	}
-
-	if (result == B_DEV_INVALID_IOCTL)
-		lun->device->sync_support = 0;
-	else
-		lun->device->sync_support--;
-
-	return result;
-}
-#endif
 
 //
 //#pragma mark - Device Attach/Detach Notifications and Callback
@@ -537,7 +130,6 @@ static void
 usb_printer_callback(void *cookie, status_t status, void *data,
 	size_t actualLength)
 {
-	//TRACE("callback()\n");
 	printer_device *device = (printer_device *)cookie;
 	device->status = status;
 	device->actual_length = actualLength;
@@ -555,7 +147,6 @@ usb_printer_device_added(usb_device newDevice, void **cookie)
 	device->open_count = 0;
 	device->interface = 0xff;
 	device->current_tag = 0;
-	device->sync_support = SYNC_SUPPORT_RELOAD;
 	device->block_size = 4096;
 
 	// scan through the interfaces to find our bulk-only data interface
@@ -693,78 +284,6 @@ usb_printer_device_removed(void *cookie)
 
 
 //
-//#pragma mark - Partial Buffer Functions
-//
-
-#if 0
-static bool
-usb_printer_needs_partial_buffer(printer_device *device, off_t position, size_t length,
-	uint32 &blockPosition, uint16 &blockCount)
-{
-	blockPosition = (uint32)(position / device->block_size);
-	if ((off_t)blockPosition * device->block_size != position)
-		return true;
-
-	blockCount = (uint16)(length / device->block_size);
-	if ((size_t)blockCount * device->block_size != length)
-		return true;
-
-	return false;
-}
-
-
-static status_t
-usb_printer_block_read(printer_device *device, uint32 blockPosition, uint16 blockCount,
-	void *buffer, size_t *length)
-{
-	status_t result = usb_printer_operation(device, SCSI_READ_10, 10, blockPosition,
-		blockCount, buffer, length, true);
-	return result;
-}
-
-
-static status_t
-usb_printer_block_write(printer_device *device, uint32 blockPosition, uint16 blockCount,
-	void *buffer, size_t *length)
-{
-	status_t result = usb_printer_operation(device, SCSI_WRITE_10, 10, blockPosition,
-		blockCount, buffer, length, false);
-	if (result == B_OK)
-		lun->should_sync = true;
-	return result;
-}
-
-
-static status_t
-usb_printer_prepare_partial_buffer(printer_device *device, off_t position, size_t length,
-	void *&partialBuffer, void *&blockBuffer, uint32 &blockPosition,
-	uint16 &blockCount)
-{
-	blockPosition = (uint32)(position / lun->block_size);
-	blockCount = (uint16)((uint32)((position + length + lun->block_size - 1)
-		/ lun->block_size) - blockPosition);
-	size_t blockLength = blockCount * lun->block_size;
-	blockBuffer = malloc(blockLength);
-	if (blockBuffer == NULL) {
-		TRACE_ALWAYS("no memory to allocate partial buffer\n");
-		return B_NO_MEMORY;
-	}
-
-	status_t result = usb_printer_block_read(device, blockPosition, blockCount,
-		blockBuffer, &blockLength);
-	if (result != B_OK) {
-		TRACE_ALWAYS("block read failed when filling partial buffer\n");
-		free(blockBuffer);
-		return result;
-	}
-
-	off_t offset = position - (blockPosition * lun->block_size);
-	partialBuffer = (uint8 *)blockBuffer + offset;
-	return B_OK;
-}
-#endif
-
-//
 //#pragma mark - Driver Hooks
 //
 
@@ -840,7 +359,7 @@ usb_printer_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 	switch (op) {
 		case USB_PRINTER_GET_DEVICE_ID: {
 			// TODO implement
-			strcpy(buffer, "Not implemented");
+			strncpy((char*)buffer, "Not implemented", length);
 			result = B_OK;
 			break;
 		}
@@ -863,7 +382,7 @@ usb_printer_transfer(printer_device* device, bool directionIn, void* buffer, siz
 		return result;
 	}
 
-	result = usb_printer_transfer_data(device, true, buffer, *length);
+	result = usb_printer_transfer_data(device, directionIn, buffer, *length);
 	if (result != B_OK) {
 		return result;
 	}
