@@ -276,11 +276,8 @@ AddPrinterDialog::BuildGUI(int stage)
 
 static directory_which gAddonDirs[] = {
 	B_BEOS_ADDONS_DIRECTORY,
-	B_COMMON_ADDONS_DIRECTORY
-	#if HAIKU_COMPATIBLE
-	// TODO test 
-	// , B_USER_ADDONS_DIRECTORY
-	#endif
+	B_COMMON_ADDONS_DIRECTORY,
+	B_USER_ADDONS_DIRECTORY
 };
 
 void
