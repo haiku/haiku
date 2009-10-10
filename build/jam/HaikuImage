@@ -544,6 +544,7 @@ AddDirectoryToHaikuImage home config add-ons input_server devices ;
 AddDirectoryToHaikuImage home config add-ons input_server filters ;
 AddDirectoryToHaikuImage home config add-ons input_server methods ;
 AddDirectoryToHaikuImage home config add-ons Tracker ;
+AddDirectoryToHaikuImage home config add-ons Print ;
 AddDirectoryToHaikuImage home config add-ons Screen\ Savers ;
 AddDirectoryToHaikuImage home config add-ons Translators ;
 AddDirectoryToHaikuImage system data synth ;
