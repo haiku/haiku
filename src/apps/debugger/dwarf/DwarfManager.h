@@ -25,6 +25,7 @@ public:
 
 			status_t			LoadFile(const char* fileName,
 									DwarfFile*& _file);
+									// returns a reference
 			status_t			FinishLoading();
 
 private:

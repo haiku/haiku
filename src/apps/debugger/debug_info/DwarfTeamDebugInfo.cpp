@@ -9,26 +9,31 @@
 
 #include <string.h>
 
+#include "DwarfFile.h"
 #include "DwarfImageDebugInfo.h"
 #include "DwarfManager.h"
+#include "GlobalTypeLookup.h"
 #include "LocatableFile.h"
 
 
 DwarfTeamDebugInfo::DwarfTeamDebugInfo(Architecture* architecture,
 	TeamMemory* teamMemory, FileManager* fileManager,
-	GlobalTypeLookup* typeLookup)
+	GlobalTypeLookup* typeLookup, GlobalTypeCache* typeCache)
 	:
 	fArchitecture(architecture),
 	fTeamMemory(teamMemory),
 	fFileManager(fileManager),
 	fManager(NULL),
-	fTypeLookup(typeLookup)
+	fTypeLookup(typeLookup),
+	fTypeCache(typeCache)
 {
+	fTypeCache->AcquireReference();
 }
 
 
 DwarfTeamDebugInfo::~DwarfTeamDebugInfo()
 {
+	fTypeCache->ReleaseReference();
 	delete fManager;
 }
 
@@ -60,14 +65,18 @@ DwarfTeamDebugInfo::CreateImageDebugInfo(const ImageInfo& imageInfo,
 	// try to load the DWARF file
 	DwarfFile* file;
 	status_t error = fManager->LoadFile(filePath, file);
-	if (error == B_OK)
-		error = fManager->FinishLoading();
+	if (error != B_OK)
+		return error;
+	Reference<DwarfFile> fileReference(file, true);
+
+	error = fManager->FinishLoading();
 	if (error != B_OK)
 		return error;
 
 	// create the image debug info
 	DwarfImageDebugInfo* debugInfo = new(std::nothrow) DwarfImageDebugInfo(
-		imageInfo, fArchitecture, fTeamMemory, fFileManager, fTypeLookup, file);
+		imageInfo, fArchitecture, fTeamMemory, fFileManager, fTypeLookup,
+		fTypeCache, file);
 	if (debugInfo == NULL)
 		return B_NO_MEMORY;
 

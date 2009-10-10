@@ -23,40 +23,8 @@ class ValueLocation;
 
 class StackFrameDebugInfo : public Referenceable {
 public:
-								StackFrameDebugInfo(Architecture* architecture);
+								StackFrameDebugInfo();
 	virtual						~StackFrameDebugInfo();
-
-	virtual	status_t			ResolveObjectDataLocation(
-									StackFrame* stackFrame, Type* type,
-									const ValueLocation& objectLocation,
-									ValueLocation*& _location) = 0;
-									// returns a reference
-			status_t			ResolveObjectDataLocation(
-									StackFrame* stackFrame, Type* type,
-									target_addr_t objectAddress,
-									ValueLocation*& _location);
-									// returns a reference
-	virtual	status_t			ResolveBaseTypeLocation(
-									StackFrame* stackFrame, Type* type,
-									BaseType* baseType,
-									const ValueLocation& parentLocation,
-									ValueLocation*& _location) = 0;
-									// returns a reference
-	virtual	status_t			ResolveDataMemberLocation(
-									StackFrame* stackFrame, Type* type,
-									DataMember* member,
-									const ValueLocation& parentLocation,
-									ValueLocation*& _location) = 0;
-									// returns a reference
-	virtual	status_t			ResolveArrayElementLocation(
-									StackFrame* stackFrame, ArrayType* type,
-									const ArrayIndexPath& indexPath,
-									const ValueLocation& parentLocation,
-									ValueLocation*& _location) = 0;
-									// returns a reference
-
-protected:
-			Architecture*		fArchitecture;
 };
 
 

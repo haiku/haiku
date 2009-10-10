@@ -48,7 +48,9 @@ DwarfManager::LoadFile(const char* fileName, DwarfFile*& _file)
 	}
 
 	fFiles.Add(file);
+		// we keep the initial reference for ourselves
 
+	file->AcquireReference();
 	_file = file;
 	return B_OK;
 }

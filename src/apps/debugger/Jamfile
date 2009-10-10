@@ -32,6 +32,8 @@ SourceHdrs
 	DwarfImageDebugInfo.cpp
 	DwarfStackFrameDebugInfo.cpp
 	DwarfTeamDebugInfo.cpp
+	DwarfTypeFactory.cpp
+	DwarfTypes.cpp
 	: [ FDirName $(SUBDIR) dwarf ]
 ;
 
@@ -62,6 +64,8 @@ Application Debugger :
 	DwarfImageDebugInfo.cpp
 	DwarfStackFrameDebugInfo.cpp
 	DwarfTeamDebugInfo.cpp
+	DwarfTypeFactory.cpp
+	DwarfTypes.cpp
 	Function.cpp
 	FunctionDebugInfo.cpp
 	FunctionInstance.cpp

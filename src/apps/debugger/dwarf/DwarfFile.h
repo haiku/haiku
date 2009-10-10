@@ -7,6 +7,7 @@
 
 
 #include <ObjectList.h>
+#include <Referenceable.h>
 #include <util/DoublyLinkedList.h>
 
 #include "DebugInfoEntries.h"
@@ -25,7 +26,8 @@ class TargetAddressRangeList;
 class ValueLocation;
 
 
-class DwarfFile : public DoublyLinkedListLinkImpl<DwarfFile> {
+class DwarfFile : public BReferenceable,
+	public DoublyLinkedListLinkImpl<DwarfFile> {
 public:
 								DwarfFile();
 								~DwarfFile();

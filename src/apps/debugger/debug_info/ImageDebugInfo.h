@@ -20,7 +20,7 @@ class DebuggerInterface;
 class FileSourceCode;
 class FunctionDebugInfo;
 class FunctionInstance;
-class GlobalTypeLookupContext;
+class GlobalTypeCache;
 class LocatableFile;
 class SpecificImageDebugInfo;
 class Type;
@@ -36,7 +36,7 @@ public:
 			bool				AddSpecificInfo(SpecificImageDebugInfo* info);
 			status_t			FinishInit();
 
-			status_t			GetType(GlobalTypeLookupContext* context,
+			status_t			GetType(GlobalTypeCache* cache,
 									const BString& name, Type*& _type);
 									// returns a reference
 

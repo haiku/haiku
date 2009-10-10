@@ -6,6 +6,8 @@
 #define TYPE_H
 
 
+#include <image.h>
+
 #include <Referenceable.h>
 #include <Variant.h>
 
@@ -42,7 +44,9 @@ enum {
 };
 
 
+class ArrayIndexPath;
 class Type;
+class ValueLocation;
 
 
 class BaseType : public Referenceable {
@@ -95,11 +99,21 @@ class Type : public Referenceable {
 public:
 	virtual						~Type();
 
+	virtual	image_id			ImageID() const = 0;
 	virtual	const char*			Name() const = 0;
 	virtual	type_kind			Kind() const = 0;
 	virtual	target_size_t		ByteSize() const = 0;
 	virtual	Type*				ResolveRawType() const;
 									// strips modifiers and typedefs
+
+	virtual	status_t			ResolveObjectDataLocation(
+									const ValueLocation& objectLocation,
+									ValueLocation*& _location) = 0;
+									// returns a reference
+	virtual	status_t			ResolveObjectDataLocation(
+									target_addr_t objectAddress,
+									ValueLocation*& _location) = 0;
+									// returns a reference
 };
 
 
@@ -124,6 +138,15 @@ public:
 
 	virtual	int32				CountDataMembers() const = 0;
 	virtual	DataMember*			DataMemberAt(int32 index) const = 0;
+
+	virtual	status_t			ResolveBaseTypeLocation(BaseType* baseType,
+									const ValueLocation& parentLocation,
+									ValueLocation*& _location) = 0;
+									// returns a reference
+	virtual	status_t			ResolveDataMemberLocation(DataMember* member,
+									const ValueLocation& parentLocation,
+									ValueLocation*& _location) = 0;
+									// returns a reference
 };
 
 
@@ -199,6 +222,12 @@ public:
 
 	virtual	int32				CountDimensions() const = 0;
 	virtual	ArrayDimension*		DimensionAt(int32 index) const = 0;
+
+	virtual	status_t			ResolveElementLocation(
+									const ArrayIndexPath& indexPath,
+									const ValueLocation& parentLocation,
+									ValueLocation*& _location) = 0;
+									// returns a reference
 };
 
 

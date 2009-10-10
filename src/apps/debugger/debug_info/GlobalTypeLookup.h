@@ -6,6 +6,7 @@
 #define GLOBAL_TYPE_LOOKUP_H
 
 
+#include <image.h>
 #include <Locker.h>
 
 #include <Referenceable.h>
@@ -16,20 +17,23 @@ class BString;
 class Type;
 
 
-class GlobalTypeLookupContext : public Referenceable {
+class GlobalTypeCache : public Referenceable {
 public:
-								GlobalTypeLookupContext();
-								~GlobalTypeLookupContext();
+								GlobalTypeCache();
+								~GlobalTypeCache();
 
 			status_t			Init();
 
 	inline	bool				Lock();
 	inline	void				Unlock();
 
-			// context must be locked
-			Type*				CachedType(const BString& name) const;
-			status_t			AddCachedType(const BString& name, Type* type);
-			void				RemoveCachedType(const BString& name);
+			// cache must be locked
+			Type*				GetType(const BString& name) const;
+			status_t			AddType(const BString& name, Type* type);
+			void				RemoveType(const BString& name);
+
+			// cache locked by method
+			void				RemoveTypes(image_id imageID);
 
 private:
 			struct TypeEntry;
@@ -39,7 +43,7 @@ private:
 
 private:
 			BLocker				fLock;
-			TypeTable*			fCachedTypes;
+			TypeTable*			fTypes;
 };
 
 
@@ -47,21 +51,21 @@ class GlobalTypeLookup {
 public:
 	virtual						~GlobalTypeLookup();
 
-	virtual	status_t			GetType(GlobalTypeLookupContext* context,
+	virtual	status_t			GetType(GlobalTypeCache* cache,
 									const BString& name, Type*& _type) = 0;
 									// returns a reference
 };
 
 
 bool
-GlobalTypeLookupContext::Lock()
+GlobalTypeCache::Lock()
 {
 	return fLock.Lock();
 }
 
 
 void
-GlobalTypeLookupContext::Unlock()
+GlobalTypeCache::Unlock()
 {
 	fLock.Unlock();
 }

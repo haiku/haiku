@@ -10,11 +10,13 @@
 
 #include <String.h>
 
+#include <AutoLocker.h>
+
 #include "StringUtils.h"
 #include "Type.h"
 
 
-struct GlobalTypeLookupContext::TypeEntry {
+struct GlobalTypeCache::TypeEntry {
 	BString		name;
 	Type*		type;
 	TypeEntry*	fNext;
@@ -34,7 +36,7 @@ struct GlobalTypeLookupContext::TypeEntry {
 };
 
 
-struct GlobalTypeLookupContext::TypeEntryHashDefinition {
+struct GlobalTypeCache::TypeEntryHashDefinition {
 	typedef const BString	KeyType;
 	typedef	TypeEntry		ValueType;
 
@@ -60,22 +62,22 @@ struct GlobalTypeLookupContext::TypeEntryHashDefinition {
 };
 
 
-// #pragma mark - GlobalTypeLookupContext
+// #pragma mark - GlobalTypeCache
 
 
-GlobalTypeLookupContext::GlobalTypeLookupContext()
+GlobalTypeCache::GlobalTypeCache()
 	:
 	fLock("global type lookup"),
-	fCachedTypes(NULL)
+	fTypes(NULL)
 {
 }
 
 
-GlobalTypeLookupContext::~GlobalTypeLookupContext()
+GlobalTypeCache::~GlobalTypeCache()
 {
 	// release all cached type references
-	if (fCachedTypes != NULL) {
-		TypeEntry* entry = fCachedTypes->Clear(true);
+	if (fTypes != NULL) {
+		TypeEntry* entry = fTypes->Clear(true);
 		while (entry != NULL) {
 			TypeEntry* nextEntry = entry->fNext;
 			delete entry;
@@ -86,32 +88,32 @@ GlobalTypeLookupContext::~GlobalTypeLookupContext()
 
 
 status_t
-GlobalTypeLookupContext::Init()
+GlobalTypeCache::Init()
 {
 	status_t error = fLock.InitCheck();
 	if (error != B_OK)
 		return error;
 
-	fCachedTypes = new(std::nothrow) TypeTable;
-	if (fCachedTypes == NULL)
+	fTypes = new(std::nothrow) TypeTable;
+	if (fTypes == NULL)
 		return B_NO_MEMORY;
 
-	return fCachedTypes->Init();
+	return fTypes->Init();
 }
 
 
 Type*
-GlobalTypeLookupContext::CachedType(const BString& name) const
+GlobalTypeCache::GetType(const BString& name) const
 {
-	TypeEntry* typeEntry = fCachedTypes->Lookup(name);
+	TypeEntry* typeEntry = fTypes->Lookup(name);
 	return typeEntry != NULL ? typeEntry->type : NULL;
 }
 
 
 status_t
-GlobalTypeLookupContext::AddCachedType(const BString& name, Type* type)
+GlobalTypeCache::AddType(const BString& name, Type* type)
 {
-	TypeEntry* typeEntry = fCachedTypes->Lookup(name);
+	TypeEntry* typeEntry = fTypes->Lookup(name);
 	if (typeEntry != NULL)
 		return B_BAD_VALUE;
 
@@ -119,17 +121,32 @@ GlobalTypeLookupContext::AddCachedType(const BString& name, Type* type)
 	if (typeEntry == NULL)
 		return B_NO_MEMORY;
 
-	fCachedTypes->Insert(typeEntry);
+	fTypes->Insert(typeEntry);
 	return B_OK;
 }
 
 
 void
-GlobalTypeLookupContext::RemoveCachedType(const BString& name)
+GlobalTypeCache::RemoveType(const BString& name)
 {
-	if (TypeEntry* typeEntry = fCachedTypes->Lookup(name)) {
-		fCachedTypes->Remove(typeEntry);
+	if (TypeEntry* typeEntry = fTypes->Lookup(name)) {
+		fTypes->Remove(typeEntry);
 		delete typeEntry;
+	}
+}
+
+
+void
+GlobalTypeCache::RemoveTypes(image_id imageID)
+{
+	AutoLocker<GlobalTypeCache> locker(this);
+
+	for (TypeTable::Iterator it = fTypes->GetIterator();
+			TypeEntry* typeEntry = it.Next();) {
+		if (typeEntry->type->ImageID() == imageID) {
+			fTypes->RemoveUnchecked(typeEntry);
+			delete typeEntry;
+		}
 	}
 }
 

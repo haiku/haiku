@@ -27,6 +27,8 @@
 #include "DwarfFunctionDebugInfo.h"
 #include "DwarfStackFrameDebugInfo.h"
 #include "DwarfTargetInterface.h"
+#include "DwarfTypeFactory.h"
+#include "DwarfTypes.h"
 #include "DwarfUtils.h"
 #include "ElfFile.h"
 #include "FileManager.h"
@@ -201,7 +203,8 @@ struct DwarfImageDebugInfo::EntryListWrapper {
 
 DwarfImageDebugInfo::DwarfImageDebugInfo(const ImageInfo& imageInfo,
 	Architecture* architecture, TeamMemory* teamMemory,
-	FileManager* fileManager, GlobalTypeLookup* typeLookup, DwarfFile* file)
+	FileManager* fileManager, GlobalTypeLookup* typeLookup,
+	GlobalTypeCache* typeCache, DwarfFile* file)
 	:
 	fLock("dwarf image debug info"),
 	fImageInfo(imageInfo),
@@ -209,15 +212,20 @@ DwarfImageDebugInfo::DwarfImageDebugInfo(const ImageInfo& imageInfo,
 	fTeamMemory(teamMemory),
 	fFileManager(fileManager),
 	fTypeLookup(typeLookup),
+	fTypeCache(typeCache),
 	fFile(file),
 	fTextSegment(NULL),
 	fRelocationDelta(0)
 {
+	fFile->AcquireReference();
+	fTypeCache->AcquireReference();
 }
 
 
 DwarfImageDebugInfo::~DwarfImageDebugInfo()
 {
+	fFile->ReleaseReference();
+	fTypeCache->ReleaseReference();
 }
 
 
@@ -354,7 +362,7 @@ DwarfImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 
 
 status_t
-DwarfImageDebugInfo::GetType(GlobalTypeLookupContext* context,
+DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
 	const BString& name, Type*& _type)
 {
 	int32 registerCount = fArchitecture->CountRegisters();
@@ -374,8 +382,8 @@ DwarfImageDebugInfo::GetType(GlobalTypeLookupContext* context,
 	// iterate through all compilation units
 	for (int32 i = 0; CompilationUnit* unit = fFile->CompilationUnitAt(i);
 		i++) {
-		DwarfStackFrameDebugInfo* stackFrameDebugInfo = NULL;
-		Reference<DwarfStackFrameDebugInfo> stackFrameDebugInfoReference;
+		DwarfTypeContext* typeContext = NULL;
+		Reference<DwarfTypeContext> typeContextReference;
 
 		// iterate through all types of the compilation unit
 		for (DebugInfoEntryList::ConstIterator it
@@ -390,23 +398,20 @@ DwarfImageDebugInfo::GetType(GlobalTypeLookupContext* context,
 				continue;
 
 			// The name matches and the entry is not just a declaration --
-			// create the type. First create the StackFrameDebugInfo lazily.
-			if (stackFrameDebugInfo == NULL) {
-				stackFrameDebugInfo = new(std::nothrow)
-					DwarfStackFrameDebugInfo(fArchitecture, fFile, unit, NULL,
-					fTypeLookup, context, 0, 0, &inputInterface, fromDwarfMap);
-				if (stackFrameDebugInfo == NULL)
+			// create the type. First create the type context lazily.
+			if (typeContext == NULL) {
+				typeContext = new(std::nothrow)
+					DwarfTypeContext(fArchitecture, fImageInfo.ImageID(), fFile,
+					unit, NULL, 0, 0, &inputInterface, fromDwarfMap);
+				if (typeContext == NULL)
 					return B_NO_MEMORY;
-				stackFrameDebugInfoReference.SetTo(stackFrameDebugInfo, true);
-
-				error = stackFrameDebugInfo->Init();
-				if (error != B_OK)
-					return error;
+				typeContextReference.SetTo(typeContext, true);
 			}
 
 			// create the type
-			Type* type;
-			error = stackFrameDebugInfo->CreateType(typeEntry, type);
+			DwarfType* type;
+			DwarfTypeFactory typeFactory(typeContext, fTypeLookup, cache);
+			error = typeFactory.CreateType(typeEntry, type);
 			if (error != B_OK)
 				continue;
 
@@ -492,24 +497,13 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 		}
 	)
 
-	// create a type lookup context
-	GlobalTypeLookupContext* typeLookupContext
-		= new(std::nothrow) GlobalTypeLookupContext;
-	if (typeLookupContext == NULL)
-		return B_NO_MEMORY;
-	Reference<GlobalTypeLookupContext> typeLookupContextReference(
-		typeLookupContext, true);
-
-	error = typeLookupContext->Init();
-	if (error != B_OK)
-		return error;
-
 	// create the stack frame debug info
 	DIESubprogram* subprogramEntry = function->SubprogramEntry();
 	DwarfStackFrameDebugInfo* stackFrameDebugInfo
-		= new(std::nothrow) DwarfStackFrameDebugInfo(fArchitecture, fFile, unit,
-			subprogramEntry, fTypeLookup, typeLookupContext, instructionPointer,
-			framePointer, inputInterface, fromDwarfMap);
+		= new(std::nothrow) DwarfStackFrameDebugInfo(fArchitecture,
+			fImageInfo.ImageID(), fFile, unit, subprogramEntry, fTypeLookup,
+			fTypeCache, instructionPointer, framePointer, inputInterface,
+			fromDwarfMap);
 	if (stackFrameDebugInfo == NULL)
 		return B_NO_MEMORY;
 	Reference<DwarfStackFrameDebugInfo> stackFrameDebugInfoReference(

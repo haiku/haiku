@@ -634,8 +634,7 @@ GetStackFrameValueJob::_GetValue()
 		ValuePieceLocation piece = location->PieceAt(0);
 		if (piece.type == VALUE_PIECE_LOCATION_MEMORY) {
 			ValueLocation* dataLocation;
-			error = fStackFrame->DebugInfo()->ResolveObjectDataLocation(
-				fStackFrame, type, *location, dataLocation);
+			error = type->ResolveObjectDataLocation(*location, dataLocation);
 			if (error != B_OK)
 				return error;
 
@@ -866,9 +865,8 @@ GetStackFrameValueJob::_ResolveTypeAndLocation(Type*& _type,
 				// The parent's location refers to the location of the complete
 				// object. We want to extract the location of a member.
 				ValueLocation* location;
-				error = fStackFrame->DebugInfo()->ResolveBaseTypeLocation(
-					fStackFrame, parentType, baseType, *parentLocation,
-					location);
+				error = compoundType->ResolveBaseTypeLocation(baseType,
+					*parentLocation, location);
 				if (error != B_OK) {
 					TRACE_LOCALS("GetStackFrameValueJob::"
 						"_ResolveTypeAndLocation(): TYPE_COMPOUND: "
@@ -895,9 +893,8 @@ GetStackFrameValueJob::_ResolveTypeAndLocation(Type*& _type,
 				// The parent's location refers to the location of the complete
 				// object. We want to extract the location of a member.
 				ValueLocation* location;
-				error = fStackFrame->DebugInfo()->ResolveDataMemberLocation(
-					fStackFrame, parentType, dataMember, *parentLocation,
-					location);
+				error = compoundType->ResolveDataMemberLocation(dataMember,
+					*parentLocation, location);
 				if (error != B_OK) {
 					TRACE_LOCALS("GetStackFrameValueJob::"
 						"_ResolveTypeAndLocation(): TYPE_COMPOUND: "
@@ -931,8 +928,8 @@ GetStackFrameValueJob::_ResolveTypeAndLocation(Type*& _type,
 			// resolve the location
 			Type* type = dynamic_cast<AddressType*>(parentType)->BaseType();
 			ValueLocation* location;
-			error = fStackFrame->DebugInfo()->ResolveObjectDataLocation(
-				fStackFrame, type, parentValue.ToUInt64(), location);
+			error = type->ResolveObjectDataLocation(parentValue.ToUInt64(),
+				location);
 			if (error != B_OK) {
 				TRACE_LOCALS("GetStackFrameValueJob::"
 						"_ResolveTypeAndLocation(): "
@@ -967,12 +964,12 @@ GetStackFrameValueJob::_ResolveTypeAndLocation(Type*& _type,
 
 			// resolve the element location
 			ValueLocation* location;
-			error = fStackFrame->DebugInfo()->ResolveArrayElementLocation(
-				fStackFrame, arrayType, indexPath, *parentLocation, location);
+			error = arrayType->ResolveElementLocation(indexPath,
+				*parentLocation, location);
 			if (error != B_OK) {
 				TRACE_LOCALS("GetStackFrameValueJob::"
 					"_ResolveTypeAndLocation(): TYPE_ARRAY: "
-					"ResolveArrayElementLocation() failed: %s\n",
+					"ResolveElementLocation() failed: %s\n",
 					strerror(error));
 				return error;
 			}

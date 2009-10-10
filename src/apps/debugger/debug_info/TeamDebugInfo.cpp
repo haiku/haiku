@@ -258,13 +258,17 @@ TeamDebugInfo::TeamDebugInfo(DebuggerInterface* debuggerInterface,
 	fFileManager(fileManager),
 	fSpecificInfos(10, true),
 	fFunctions(NULL),
-	fSourceFiles(NULL)
+	fSourceFiles(NULL),
+	fTypeCache(NULL)
 {
 }
 
 
 TeamDebugInfo::~TeamDebugInfo()
 {
+	if (fTypeCache != NULL)
+		fTypeCache->ReleaseReference();
+
 	if (fSourceFiles != NULL) {
 		SourceFileEntry* entry = fSourceFiles->Clear(true);
 		while (entry != NULL) {
@@ -315,12 +319,21 @@ TeamDebugInfo::Init()
 	if (error != B_OK)
 		return error;
 
+	// create a type cache
+	fTypeCache = new(std::nothrow) GlobalTypeCache;
+	if (fTypeCache == NULL)
+		return B_NO_MEMORY;
+
+	error = fTypeCache->Init();
+	if (error != B_OK)
+		return error;
+
 	// Create specific infos for all types of debug info we support, in
 	// descending order of expressiveness.
 
 	// DWARF
 	DwarfTeamDebugInfo* dwarfInfo = new(std::nothrow) DwarfTeamDebugInfo(
-		fArchitecture, fDebuggerInterface, fFileManager, this);
+		fArchitecture, fDebuggerInterface, fFileManager, this, fTypeCache);
 	if (dwarfInfo == NULL || !fSpecificInfos.AddItem(dwarfInfo)) {
 		delete dwarfInfo;
 		return B_NO_MEMORY;
@@ -348,19 +361,19 @@ TeamDebugInfo::Init()
 
 
 status_t
-TeamDebugInfo::GetType(GlobalTypeLookupContext* context, const BString& name,
+TeamDebugInfo::GetType(GlobalTypeCache* cache, const BString& name,
 	Type*& _type)
 {
 	// maybe the type is already cached
-	AutoLocker<GlobalTypeLookupContext> contextLocker(context);
-	Type* type = context->CachedType(name);
+	AutoLocker<GlobalTypeCache> cacheLocker(cache);
+	Type* type = cache->GetType(name);
 	if (type != NULL) {
 		type->AcquireReference();
 		_type = type;
 		return B_OK;
 	}
 
-	contextLocker.Unlock();
+	cacheLocker.Unlock();
 
 	// Clone the image list and get references to the images, so we can iterate
 	// through them without locking.
@@ -377,7 +390,7 @@ TeamDebugInfo::GetType(GlobalTypeLookupContext* context, const BString& name,
 	// get the type
 	status_t error = B_ENTRY_NOT_FOUND;
 	for (int32 i = 0; ImageDebugInfo* imageDebugInfo = images.ItemAt(i); i++) {
-		error = imageDebugInfo->GetType(context, name, type);
+		error = imageDebugInfo->GetType(cache, name, type);
 		if (error == B_OK) {
 			_type = type;
 			break;
@@ -620,6 +633,9 @@ TeamDebugInfo::RemoveImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 				// reference to the function.
 		}
 	}
+
+	// remove cached types from that image
+	fTypeCache->RemoveTypes(imageDebugInfo->GetImageInfo().ImageID());
 
 	fImages.RemoveItem(imageDebugInfo);
 }

@@ -23,6 +23,7 @@ class ElfSegment;
 class FileManager;
 class FileSourceCode;
 class FunctionID;
+class GlobalTypeCache;
 class GlobalTypeLookup;
 class LocatableFile;
 class SourceCode;
@@ -36,6 +37,7 @@ public:
 									TeamMemory* teamMemory,
 									FileManager* fileManager,
 									GlobalTypeLookup* typeLookup,
+									GlobalTypeCache* typeCache,
 									DwarfFile* file);
 	virtual						~DwarfImageDebugInfo();
 
@@ -46,7 +48,7 @@ public:
 
 	virtual	status_t			GetFunctions(
 									BObjectList<FunctionDebugInfo>& functions);
-	virtual	status_t			GetType(GlobalTypeLookupContext* context,
+	virtual	status_t			GetType(GlobalTypeCache* cache,
 									const BString& name, Type*& _type);
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionInstance* functionInstance,
@@ -97,6 +99,7 @@ private:
 			TeamMemory*			fTeamMemory;
 			FileManager*		fFileManager;
 			GlobalTypeLookup*	fTypeLookup;
+			GlobalTypeCache*	fTypeCache;
 			DwarfFile*			fFile;
 			ElfSegment*			fTextSegment;
 			target_addr_t		fRelocationDelta;

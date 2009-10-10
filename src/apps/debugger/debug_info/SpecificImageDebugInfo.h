@@ -20,7 +20,7 @@ class DebuggerInterface;
 class FileSourceCode;
 class FunctionDebugInfo;
 class FunctionInstance;
-class GlobalTypeLookupContext;
+class GlobalTypeCache;
 class Image;
 class LocatableFile;
 class SourceLanguage;
@@ -40,7 +40,7 @@ public:
 										= 0;
 									// returns references
 
-	virtual	status_t			GetType(GlobalTypeLookupContext* context,
+	virtual	status_t			GetType(GlobalTypeCache* cache,
 									const BString& name, Type*& _type) = 0;
 									// returns a reference
 
