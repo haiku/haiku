@@ -54,7 +54,7 @@ PortPool::GetPort()
 		}
 	Unlock();
 	if (port < 0)
-		debugger("wrong port int PortPool::GetPort()\n");
+		debugger("wrong port in PortPool::GetPort()\n");
 	return port;
 }
 
