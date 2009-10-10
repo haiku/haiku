@@ -727,11 +727,6 @@ if [ IsOptionalHaikuImagePackageAdded PCRE ] {
 				: $(baseURL)/pcre-7.9-x86-gcc2-2009-09-30.zip
 			;
 		}
-
-		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/Pe/Pe ;
-		AddSymlinkToHaikuImage common bin
-			: /boot/apps/Pe/lpe ;
 	}
 }
 
@@ -750,6 +745,11 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 				: $(baseURL)/Pe-2.4.2-r593-r1a1-x86-gcc2-2009-09-08.zip
 			;
 		}
+
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/Pe/Pe ;
+		AddSymlinkToHaikuImage common bin
+			: /boot/apps/Pe/lpe ;
 	}
 }
 
