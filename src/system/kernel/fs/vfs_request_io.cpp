@@ -89,6 +89,24 @@ public:
 		addr_t buffer = (addr_t)_buffer;
 		size_t length = *_length;
 
+		if (length > B_PAGE_SIZE) {
+			// try to not split up the request if possible
+			// TODO: map with less overhead! pre-reserved address space
+			// could be used as a scratch space for example, directly mapping
+			// pages into that instead of creating new areas for each request
+			void* virtualAddress;
+			area_id mapArea = map_physical_memory("physical io request map",
+				(void*)buffer, length, B_ANY_ADDRESS, B_KERNEL_READ_AREA
+					| B_KERNEL_WRITE_AREA, &virtualAddress);
+			if (mapArea >= 0) {
+				status_t result = InternalIO(offset, virtualAddress, _length);
+				delete_area(mapArea);
+				return result;
+			}
+
+			// otherwise we fall back to page wise mapping
+		}
+
 		while (length > 0) {
 			addr_t pageOffset = buffer % B_PAGE_SIZE;
 			addr_t virtualAddress;
