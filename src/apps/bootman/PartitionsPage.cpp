@@ -248,7 +248,7 @@ PartitionsPage::_FillPartitionsView(BView* view)
 	
 	
 	fPartitionsWidth = totalWidth;
-	fPartitionsHeight = frame.Height();	
+	fPartitionsHeight = frame.top;
 }
 
 
