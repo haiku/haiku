@@ -35,30 +35,30 @@
 
 __USE_CORTEX_NAMESPACE
 
-// -------------------------------------------------------- //
 
-const char* const		RouteWindow::s_windowName = "Cortex";
+const char* const RouteWindow::s_windowName = "Cortex";
 
 const BRect RouteWindow::s_initFrame(100,100,700,550);
 
 const char* const g_aboutText =
-"Cortex/Route 2.1.2\n\n"
-"Copyright 1999-2000 Eric Moon\n"
-"All rights reserved.\n\n"
-"The Cortex Team:\n\n"
-"Christopher Lenz: UI\n"
-"Eric Moon: UI, back-end\n\n"
-"Thanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\n"
-"Certain icons used herein are the property of\n"
-"Be, Inc. and are used by permission.";
+	"Cortex/Route 2.1.2\n\n"
+	"Copyright 1999-2000 Eric Moon\n"
+	"All rights reserved.\n\n"
+	"The Cortex Team:\n\n"
+	"Christopher Lenz: UI\n"
+	"Eric Moon: UI, back-end\n\n"
+	"Thanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\n"
+	"Certain icons used herein are the property of\n"
+	"Be, Inc. and are used by permission.";
 
-// -------------------------------------------------------- //
-// ctor/dtor
-// -------------------------------------------------------- //
 
-RouteWindow::~RouteWindow() {}
+RouteWindow::~RouteWindow()
+{
+}
 
-RouteWindow::RouteWindow(RouteAppNodeManager* manager) :
+
+RouteWindow::RouteWindow(RouteAppNodeManager* manager)
+	:
 	BWindow(s_initFrame, s_windowName, B_DOCUMENT_WINDOW, 0),
 	m_hScrollBar(0),
 	m_vScrollBar(0),
@@ -66,24 +66,20 @@ RouteWindow::RouteWindow(RouteAppNodeManager* manager) :
 	m_dormantNodeWindow(0),
 	m_selectedGroupID(0),
 	m_zoomed(false),
-	m_zooming(false) {
-
+	m_zooming(false)
+{
 	BRect b = Bounds();
-		
+
 	// initialize the menu bar: add all menus that target this window
 	BMenuBar* pMenuBar = new BMenuBar(b, "menuBar");
 	BMenu* pFileMenu = new BMenu("File");
-	BMenuItem* item = new BMenuItem(
-		"Open" B_UTF8_ELLIPSIS,
-		new BMessage(RouteApp::M_SHOW_OPEN_PANEL),
-		'O');
+	BMenuItem* item = new BMenuItem("Open" B_UTF8_ELLIPSIS,
+		new BMessage(RouteApp::M_SHOW_OPEN_PANEL), 'O');
 	item->SetTarget(be_app);
 	pFileMenu->AddItem(item);
 	pFileMenu->AddItem(new BSeparatorItem());
-	item = new BMenuItem(
-		"Save Nodes" B_UTF8_ELLIPSIS,
-		new BMessage(RouteApp::M_SHOW_SAVE_PANEL),
-		'S');
+	item = new BMenuItem("Save Nodes" B_UTF8_ELLIPSIS,
+		new BMessage(RouteApp::M_SHOW_SAVE_PANEL), 'S');
 	item->SetTarget(be_app);
 	pFileMenu->AddItem(item);
 	pFileMenu->AddItem(new BSeparatorItem());
@@ -99,21 +95,15 @@ RouteWindow::RouteWindow(RouteAppNodeManager* manager) :
 	rvBounds.top = pMenuBar->Frame().bottom+1;
 	rvBounds.right -= B_V_SCROLL_BAR_WIDTH;
 	rvBounds.bottom -= B_H_SCROLL_BAR_HEIGHT;
-	m_routingView = new MediaRoutingView(
-		manager,
-		rvBounds,
-		"routingView");
-		
+	m_routingView = new MediaRoutingView(manager, rvBounds, "routingView");
+
 	BRect hsBounds = rvBounds;
 	hsBounds.left = rvBounds.left + 199;
 	hsBounds.top = hsBounds.bottom + 1;
 	hsBounds.right++;
 	hsBounds.bottom = b.bottom + 1;
-	
-	m_hScrollBar = new BScrollBar(
-		hsBounds,
-		"hScrollBar",
-		m_routingView,
+
+	m_hScrollBar = new BScrollBar(hsBounds, "hScrollBar", m_routingView,
 		0, 0, B_HORIZONTAL);
 	AddChild(m_hScrollBar);
 
@@ -122,11 +112,8 @@ RouteWindow::RouteWindow(RouteAppNodeManager* manager) :
 	vsBounds.top--;
 	vsBounds.right = b.right + 1;
 	vsBounds.bottom++;
-				
-	m_vScrollBar = new BScrollBar(
-		vsBounds,
-		"vScrollBar",
-		m_routingView,
+
+	m_vScrollBar = new BScrollBar(vsBounds, "vScrollBar", m_routingView,
 		0, 0, B_VERTICAL);
 	AddChild(m_vScrollBar);
 
@@ -135,11 +122,8 @@ RouteWindow::RouteWindow(RouteAppNodeManager* manager) :
 	svBounds.right = hsBounds.left - 1;
 	svBounds.top = svBounds.bottom + 1;
 	svBounds.bottom = b.bottom + 1;
-	
-	m_statusView = new StatusView(
-		svBounds,
-		manager,
-		m_hScrollBar);
+
+	m_statusView = new StatusView(svBounds, manager, m_hScrollBar);
 	AddChild(m_statusView);
 
 	AddChild(m_routingView);
@@ -178,26 +162,32 @@ RouteWindow::RouteWindow(RouteAppNodeManager* manager) :
 	_toggleTransportWindow();
 }
 
-// -------------------------------------------------------- //
-// operations
-// -------------------------------------------------------- //
 
-// enable/disable palette position-locking (when the main
-// window is moved, all palettes follow)
-bool RouteWindow::isPullPalettes() const {
+//	#pragma mark - operations
+
+
+/*!	Enable/disable palette position-locking (when the main
+	window is moved, all palettes follow).
+*/
+bool
+RouteWindow::isPullPalettes() const
+{
 	return m_pullPalettesItem->IsMarked();
-
 }
-void RouteWindow::setPullPalettes(
-	bool												enabled) {
+
+
+void
+RouteWindow::setPullPalettes(bool enabled)
+{
 	m_pullPalettesItem->SetMarked(enabled);
 }
 
-// [e.moon 2dec99] force window & palettes on-screen
-void RouteWindow::constrainToScreen() {
-	
+
+void
+RouteWindow::constrainToScreen()
+{
 	BScreen screen(this);
-	
+
 	const BRect sr = screen.Frame();
 
 	// [c.lenz 1mar2000] this should be handled by every window
@@ -205,7 +195,7 @@ void RouteWindow::constrainToScreen() {
 	_constrainToScreen();
 /*	// main window
 	BRect r = Frame();
-	BPoint offset(0.0, 0.0);	
+	BPoint offset(0.0, 0.0);
 	if(r.left < 0.0)
 		offset.x = -r.left;
 	if(r.top < 0.0)
@@ -233,13 +223,13 @@ void RouteWindow::constrainToScreen() {
 	if(r.top >= (sr.bottom - 20.0))
 		offset.y -= (r.top - (sr.Height()/2));
 
-	if(offset.x != 0.0 || offset.y != 0.0) {	
+	if(offset.x != 0.0 || offset.y != 0.0) {
 		if(m_transportWindow)
 			m_transportWindow->MoveBy(offset.x, offset.y);
 		else
 			m_transportWindowFrame.OffsetBy(offset.x, offset.y);
 	}
-	
+
 	// addon palette
 	offset = BPoint(0.0, 0.0);
 	r = (m_dormantNodeWindow) ?
@@ -254,7 +244,7 @@ void RouteWindow::constrainToScreen() {
 	if(r.top >= (sr.bottom - 20.0))
 		offset.y -= (r.top - (sr.Height()/2));
 
-	if(offset.x != 0.0 || offset.y != 0.0) {	
+	if(offset.x != 0.0 || offset.y != 0.0) {
 		if(m_dormantNodeWindow)
 			m_dormantNodeWindow->MoveBy(offset.x, offset.y);
 		else
@@ -263,30 +253,29 @@ void RouteWindow::constrainToScreen() {
 
 }
 
-// -------------------------------------------------------- //
-// BWindow impl
-// -------------------------------------------------------- //
 
-// [e.moon 17nov99] 'palette-pulling' impl
-void RouteWindow::FrameMoved(
-	BPoint											point) {
-	
+//	#pragma mark - BWindow implementation
+
+
+void
+RouteWindow::FrameMoved(BPoint point)
+{
 	// ignore notification if the window isn't yet visible
 	if(IsHidden())
 		return;
-	
+
 	BPoint delta = point - m_lastFramePosition;
 	m_lastFramePosition = point;
-	
-	if(m_pullPalettesItem->IsMarked()) {
+
+
+	if (m_pullPalettesItem->IsMarked())
 		_movePalettesBy(delta.x, delta.y);
-	}
 }
 
-// [c.lenz 1mar2000] added for better Zoom() support
-void RouteWindow::FrameResized(
-	float width,
-	float height) {
+
+void
+RouteWindow::FrameResized(float width, float height)
+{
 	D_HOOK(("RouteWindow::FrameResized()\n"));
 
 	if (!m_zooming) {
@@ -297,17 +286,18 @@ void RouteWindow::FrameResized(
 	}
 }
 
-bool RouteWindow::QuitRequested() {
 
+bool
+RouteWindow::QuitRequested()
+{
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return false; // [e.moon 20oct99] app now quits window
 }
-	
-// [c.lenz 1mar2000] resize to MediaRoutingView's preferred size
-void RouteWindow::Zoom(
-	BPoint											origin,
-	float											width,
-	float											height) {
+
+
+void
+RouteWindow::Zoom(BPoint origin, float width, float height)
+{
 	D_HOOK(("RouteWindow::Zoom()\n"));
 
 	m_zooming = true;
@@ -338,24 +328,26 @@ void RouteWindow::Zoom(
 	}
 }
 
-// -------------------------------------------------------- //
-// BHandler impl
-// -------------------------------------------------------- //
 
-void RouteWindow::MessageReceived(BMessage* pMsg) {
+//	#pragma mark - BHandler implemenation
+
+
+void
+RouteWindow::MessageReceived(BMessage* pMsg)
+{
 //	PRINT((
 //		"RouteWindow::MessageReceived()\n"));
 //	pMsg->PrintToStream();
-//	
-	switch(pMsg->what) {
+//
+	switch (pMsg->what) {
 		case B_ABOUT_REQUESTED:
 			(new BAlert("About", g_aboutText, "Ok"))->Go();
 			break;
-			
+
 		case MediaRoutingView::M_GROUP_SELECTED:
 			_handleGroupSelected(pMsg);
 			break;
-			
+
 		case MediaRoutingView::M_SHOW_ERROR_MESSAGE:
 			_handleShowErrorMessage(pMsg);
 			break;
@@ -363,37 +355,37 @@ void RouteWindow::MessageReceived(BMessage* pMsg) {
 		case M_TOGGLE_TRANSPORT_WINDOW:
 			_toggleTransportWindow();
 			break;
-		
+
 		case M_REFRESH_TRANSPORT_SETTINGS:
 			_refreshTransportSettings(pMsg);
 			break;
-			
+
 		case M_TOGGLE_PULLING_PALETTES:
 			_togglePullPalettes();
 			break;
-		
+
 		case M_TOGGLE_DORMANT_NODE_WINDOW:
 			_toggleDormantNodeWindow();
 			break;
-		
+
 		case M_TOGGLE_GROUP_ROLLING:
 			_toggleGroupRolling();
 			break;
-			
+
 		default:
 			_inherited::MessageReceived(pMsg);
 			break;
 	}
 }
 
-// -------------------------------------------------------- //
-// *** IStateArchivable
-// -------------------------------------------------------- //
 
-status_t RouteWindow::importState(
-	const BMessage*						archive) {
+//	#pragma mark - IStateArchivable
 
-	status_t err;	
+
+status_t
+RouteWindow::importState(const BMessage* archive)
+{
+	status_t err;
 
 	// frame rect
 	BRect r;
@@ -419,7 +411,7 @@ status_t RouteWindow::importState(
 	err = archive->FindBool("pullPalettes", &b);
 	if(err == B_OK)
 		m_pullPalettesItem->SetMarked(b);
-	
+
 //	const char* p;
 //	err = archive->FindString("saveDir", &p);
 //	if(err == B_OK) {
@@ -429,17 +421,16 @@ status_t RouteWindow::importState(
 //
 	// dormant-node window
 	err = archive->FindRect("addonPaletteFrame", &r);
-	if(err == B_OK)
+	if (err == B_OK)
 		m_dormantNodeWindowFrame = r;
 	err = archive->FindBool("addonPaletteVisible", &b);
-	if(err == B_OK &&
-		(b != (m_dormantNodeWindow != 0))) {
+	if (err == B_OK && (b != (m_dormantNodeWindow != 0))) {
 		_toggleDormantNodeWindow();
 		if(!m_dormantNodeWindow)
 			m_dormantNodeWindowFrame = r;
 	}
 
-	if(m_dormantNodeWindow) {
+	if (m_dormantNodeWindow) {
 		m_dormantNodeWindow->MoveTo(m_dormantNodeWindowFrame.LeftTop());
 		m_dormantNodeWindow->ResizeTo(
 			m_dormantNodeWindowFrame.Width(),
@@ -448,43 +439,40 @@ status_t RouteWindow::importState(
 
 	// transport window
 	err = archive->FindRect("transportFrame", &r);
-	if(err == B_OK)
+	if (err == B_OK)
 		m_transportWindowFrame = r;
 	err = archive->FindBool("transportVisible", &b);
-	if(err == B_OK &&
-		(b != (m_transportWindow != 0))) {
+	if (err == B_OK && (b != (m_transportWindow != 0))) {
 		_toggleTransportWindow();
-		if(!m_transportWindow)
+		if (!m_transportWindow)
 			m_transportWindowFrame = r;
 	}
 
-	if(m_transportWindow) {
+	if (m_transportWindow) {
 		m_transportWindow->MoveTo(m_transportWindowFrame.LeftTop());
 		m_transportWindow->ResizeTo(
 			m_transportWindowFrame.Width(),
 			m_transportWindowFrame.Height());
 	}
-	
+
 	return B_OK;
 }
 
-status_t RouteWindow::exportState(
-	BMessage*									archive) const {
 
+status_t
+RouteWindow::exportState(BMessage* archive) const
+{
 	BRect r = Frame();
 	archive->AddRect("frame", r);
 	archive->AddBool("pullPalettes", m_pullPalettesItem->IsMarked());
 
 	bool b = (m_dormantNodeWindow != 0);
-	r = (b) ?
-		m_dormantNodeWindow->Frame() : 
-		m_dormantNodeWindowFrame;
+	r = b ? m_dormantNodeWindow->Frame() : m_dormantNodeWindowFrame;
 	archive->AddRect("addonPaletteFrame", r);
 	archive->AddBool("addonPaletteVisible", b);
 
 	b = (m_transportWindow != 0);
-	r = (b) ? m_transportWindow->Frame() :
-		m_transportWindowFrame;
+	r = b ? m_transportWindow->Frame() : m_transportWindowFrame;
 
 	archive->AddRect("transportFrame", r);
 	archive->AddBool("transportVisible", b);
@@ -505,14 +493,15 @@ status_t RouteWindow::exportState(
 	return B_OK;
 }
 
-// -------------------------------------------------------- //
-// implementation
-// -------------------------------------------------------- //
 
-// [c.lenz 1mar2000] added for better Zoom() support
-void RouteWindow::_constrainToScreen() {
+//	#pragma mark - implementation
+
+
+void
+RouteWindow::_constrainToScreen()
+{
 	D_INTERNAL(("RouteWindow::_constrainToScreen()\n"));
-	
+
 	BScreen screen(this);
 	BRect screenRect = screen.Frame();
 	BRect windowRect = Frame();
@@ -548,29 +537,28 @@ void RouteWindow::_constrainToScreen() {
 	}
 }
 
-void RouteWindow::_toggleTransportWindow() {
-	if(m_transportWindow) {
+
+void
+RouteWindow::_toggleTransportWindow()
+{
+	if (m_transportWindow) {
 		m_transportWindowFrame = m_transportWindow->Frame();
 		m_transportWindow->Lock();
 		m_transportWindow->Quit();
 		m_transportWindow = 0;
 		m_transportWindowItem->SetMarked(false);
-	}
-	else {
-		m_transportWindow = new TransportWindow(
-			m_routingView->manager,
-			this,
-			"Transport");
-				
+	} else {
+		m_transportWindow = new TransportWindow(m_routingView->manager,
+			this, "Transport");
+
 		// ask for a selection update
 		BMessenger(m_routingView).SendMessage(
 			MediaRoutingView::M_BROADCAST_SELECTION);
 
 		// place & display the window
-		if(m_transportWindowFrame.IsValid()) {
+		if (m_transportWindowFrame.IsValid()) {
 			m_transportWindow->MoveTo(m_transportWindowFrame.LeftTop());
-			m_transportWindow->ResizeTo(
-				m_transportWindowFrame.Width(),
+			m_transportWindow->ResizeTo(m_transportWindowFrame.Width(),
 				m_transportWindowFrame.Height());
 		}
 
@@ -579,63 +567,68 @@ void RouteWindow::_toggleTransportWindow() {
 	}
 }
 
-// [e.moon 17nov99]
-void RouteWindow::_togglePullPalettes() {
-	
+
+void
+RouteWindow::_togglePullPalettes()
+{
 	m_pullPalettesItem->SetMarked(!m_pullPalettesItem->IsMarked());
 }
 
-void RouteWindow::_toggleDormantNodeWindow() {
 
-	if(m_dormantNodeWindow) {
+void
+RouteWindow::_toggleDormantNodeWindow()
+{
+	if (m_dormantNodeWindow) {
 		m_dormantNodeWindowFrame = m_dormantNodeWindow->Frame();
 		m_dormantNodeWindow->Lock();
 		m_dormantNodeWindow->Quit();
 		m_dormantNodeWindow = 0;
 		m_dormantNodeWindowItem->SetMarked(false);
-	}
-	else {
+	} else {
 		m_dormantNodeWindow = new DormantNodeWindow(this);
-		if(m_dormantNodeWindowFrame.IsValid()) {
+		if (m_dormantNodeWindowFrame.IsValid()) {
 			m_dormantNodeWindow->MoveTo(m_dormantNodeWindowFrame.LeftTop());
-			m_dormantNodeWindow->ResizeTo(
-				m_dormantNodeWindowFrame.Width(),
+			m_dormantNodeWindow->ResizeTo(m_dormantNodeWindowFrame.Width(),
 				m_dormantNodeWindowFrame.Height());
 		}
 		m_dormantNodeWindow->Show();
 		m_dormantNodeWindowItem->SetMarked(true);
-	}	
+	}
 }
 
-void RouteWindow::_handleGroupSelected(
-	BMessage*										message) {
+
+void
+RouteWindow::_handleGroupSelected(BMessage* message)
+{
 	status_t err;
 	uint32 groupID;
-	
+
 	err = message->FindInt32("groupID", (int32*)&groupID);
-	if(err < B_OK) {
+	if (err < B_OK) {
 		PRINT((
 			"! RouteWindow::_handleGroupSelected(): no groupID in message!\n"));
 		return;
 	}
 
-	if(!m_transportWindow)
+	if (!m_transportWindow)
 		return;
 
 	BMessage m(TransportWindow::M_SELECT_GROUP);
 	m.AddInt32("groupID", groupID);
 	BMessenger(m_transportWindow).SendMessage(&m);
-	
+
 	m_selectedGroupID = groupID;
 }
 
-void RouteWindow::_handleShowErrorMessage(
-	BMessage*										message) {
+
+void
+RouteWindow::_handleShowErrorMessage(BMessage* message)
+{
 	status_t err;
 	BString text;
 
 	err = message->FindString("text", &text);
-	if(err < B_OK) {
+	if (err < B_OK) {
 		PRINT((
 			"! RouteWindow::_handleShowErrorMessage(): no text in message!\n"));
 		return;
@@ -644,15 +637,16 @@ void RouteWindow::_handleShowErrorMessage(
 	m_statusView->setErrorMessage(text.String(), message->HasBool("error"));
 }
 
-// refresh the transport window for the given group, if any		
-void RouteWindow::_refreshTransportSettings(
-	BMessage*										message) {
 
+//! Refresh the transport window for the given group, if any
+void
+RouteWindow::_refreshTransportSettings(BMessage* message)
+{
 	status_t err;
 	uint32 groupID;
-	
+
 	err = message->FindInt32("groupID", (int32*)&groupID);
-	if(err < B_OK) {
+	if (err < B_OK) {
 		PRINT((
 			"! RouteWindow::_refreshTransportSettings(): no groupID in message!\n"));
 		return;
@@ -663,52 +657,50 @@ void RouteWindow::_refreshTransportSettings(
 		BMessenger(m_transportWindow).SendMessage(message);
 	}
 }
-		
 
-void RouteWindow::_closePalettes() {
+
+void
+RouteWindow::_closePalettes()
+{
 	BAutolock _l(this);
-	
-	if(m_transportWindow) {
+
+	if (m_transportWindow) {
 		m_transportWindow->Lock();
 		m_transportWindow->Quit();
 		m_transportWindow = 0;
 	}
 }
 
-// [e.moon 17nov99] move all palette windows by the
-// specified amounts
-void RouteWindow::_movePalettesBy(
-	float												xDelta,
-	float												yDelta) {
 
-	if(m_transportWindow)
+//!	Move all palette windows by the specified amounts
+void RouteWindow::_movePalettesBy(float xDelta, float yDelta)
+{
+	if (m_transportWindow)
 		m_transportWindow->MoveBy(xDelta, yDelta);
 
-	if(m_dormantNodeWindow)
+	if (m_dormantNodeWindow)
 		m_dormantNodeWindow->MoveBy(xDelta, yDelta);
 }
 
-// [e.moon 1dec99] toggle group playback
-void RouteWindow::_toggleGroupRolling() {
 
-	if(!m_selectedGroupID)
+//!	Toggle group playback
+void
+RouteWindow::_toggleGroupRolling()
+{
+	if (!m_selectedGroupID)
 		return;
-	
+
 	NodeGroup* g;
-	status_t err = m_routingView->manager->findGroup(
-		m_selectedGroupID,
-		&g);
-	if(err < B_OK)
+	status_t err = m_routingView->manager->findGroup(m_selectedGroupID, &g);
+	if (err < B_OK)
 		return;
 
 	Autolock _l(g);
-	uint32 startAction =
-		(g->runMode() == BMediaNode::B_OFFLINE) ?
-			NodeGroup::M_ROLL :
-			NodeGroup::M_START;
-		
+	uint32 startAction = (g->runMode() == BMediaNode::B_OFFLINE)
+		? NodeGroup::M_ROLL : NodeGroup::M_START;
+
 	BMessenger m(g);
-	switch(g->transportState()) {
+	switch (g->transportState()) {
 		case NodeGroup::TRANSPORT_STOPPED:
 			m.SendMessage(startAction);
 			break;
@@ -717,10 +709,8 @@ void RouteWindow::_toggleGroupRolling() {
 		case NodeGroup::TRANSPORT_ROLLING:
 			m.SendMessage(NodeGroup::M_STOP);
 			break;
-			
+
 		default:
 			break;
 	}
 }
-
-// END -- RouteWindow.cpp --
