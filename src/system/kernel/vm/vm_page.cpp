@@ -2264,6 +2264,85 @@ vm_page_allocate_page_run(int pageState, addr_t base, addr_t length)
 
 
 vm_page *
+vm_page_allocate_page_run_no_base(int pageState, addr_t count)
+{
+	InterruptsSpinLocker locker(sPageLock);
+
+	if (free_page_queue_count() - sReservedPages < count) {
+		// TODO: add more tries, ie. free some inactive, ...
+		// no free space
+		return NULL;
+	}
+
+	page_queue *queue;
+	page_queue *otherQueue;
+	switch (pageState) {
+		case PAGE_STATE_FREE:
+			queue = &sFreePageQueue;
+			otherQueue = &sClearPageQueue;
+			break;
+		case PAGE_STATE_CLEAR:
+			queue = &sClearPageQueue;
+			otherQueue = &sFreePageQueue;
+			break;
+		default:
+			return NULL; // invalid
+	}
+
+	vm_page *firstPage = NULL;
+	for (uint32 twice = 0; twice < 2; twice++) {
+		vm_page *page = queue->head;
+		for (; page != NULL; page = page->queue_next) {
+			vm_page *current = page;
+			if (current >= &sPages[sNumPages - count])
+				continue;
+
+			bool foundRun = true;
+			for (uint32 i = 0; i < count; i++, current++) {
+				if (current->state != PAGE_STATE_FREE
+					&& current->state != PAGE_STATE_CLEAR) {
+					foundRun = false;
+					break;
+				}
+			}
+
+			if (foundRun) {
+				// pull the pages out of the appropriate queues
+				current = page;
+				for (uint32 i = 0; i < count; i++, current++) {
+					current->is_cleared = current->state == PAGE_STATE_CLEAR;
+					set_page_state_nolock(current, PAGE_STATE_BUSY);
+					current->usage_count = 2;
+				}
+
+				firstPage = page;
+				break;
+			}
+		}
+
+		if (firstPage != NULL)
+			break;
+
+		queue = otherQueue;
+	}
+
+	T(AllocatePageRun(count));
+
+	locker.Unlock();
+
+	if (firstPage != NULL && pageState == PAGE_STATE_CLEAR) {
+		vm_page *current = firstPage;
+		for (uint32 i = 0; i < count; i++, current++) {
+			if (!current->is_cleared)
+	 			clear_page(current);
+		}
+	}
+
+	return firstPage;
+}
+
+
+vm_page *
 vm_page_at_index(int32 index)
 {
 	return &sPages[index];
