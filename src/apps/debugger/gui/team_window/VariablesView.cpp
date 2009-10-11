@@ -15,6 +15,8 @@
 #include "table/TableColumns.h"
 
 #include "Architecture.h"
+#include "FunctionID.h"
+#include "FunctionInstance.h"
 #include "StackFrame.h"
 #include "StackFrameValues.h"
 #include "Team.h"
@@ -22,6 +24,8 @@
 #include "Tracing.h"
 #include "TypeComponentPath.h"
 #include "Variable.h"
+#include "VariablesViewState.h"
+#include "VariablesViewStateHistory.h"
 
 
 enum {
@@ -749,6 +753,8 @@ VariablesView::VariablesView(Listener* listener)
 	fStackFrame(NULL),
 	fVariableTable(NULL),
 	fVariableTableModel(NULL),
+	fPreviousViewState(NULL),
+	fViewStateHistory(NULL),
 	fListener(listener)
 {
 	SetName("Variables");
@@ -759,6 +765,9 @@ VariablesView::~VariablesView()
 {
 	SetStackFrame(NULL, NULL);
 	fVariableTable->SetTreeTableModel(NULL);
+	if (fPreviousViewState != NULL)
+		fPreviousViewState->ReleaseReference();
+	delete fViewStateHistory;
 	delete fVariableTableModel;
 }
 
@@ -784,6 +793,8 @@ VariablesView::SetStackFrame(Thread* thread, StackFrame* stackFrame)
 {
 	if (thread == fThread && stackFrame == fStackFrame)
 		return;
+
+	_SaveViewState();
 
 	if (fThread != NULL)
 		fThread->ReleaseReference();
@@ -812,6 +823,8 @@ VariablesView::SetStackFrame(Thread* thread, StackFrame* stackFrame)
 			_RequestVariableValue(variable);
 		}
 	}
+
+	_RestoreViewState();
 }
 
 
@@ -868,6 +881,10 @@ VariablesView::_Init()
 	fVariableTable->SetTreeTableModel(fVariableTableModel);
 
 	fVariableTable->AddTreeTableListener(this);
+
+	fViewStateHistory = new VariablesViewStateHistory;
+	if (fViewStateHistory->Init() != B_OK)
+		throw std::bad_alloc();
 }
 
 
@@ -884,6 +901,131 @@ VariablesView::_RequestVariableValue(Variable* variable)
 	Reference<TypeComponentPath> pathReference(path, true);
 
 	fListener->StackFrameValueRequested(fThread, fStackFrame, variable, path);
+}
+
+
+void
+VariablesView::_SaveViewState() const
+{
+	if (fThread == NULL || fStackFrame == NULL)
+		return;
+
+	// get the function ID
+	FunctionID* functionID = fStackFrame->Function()->GetFunctionID();
+	if (functionID == NULL)
+		return;
+	Reference<FunctionID> functionIDReference(functionID, true);
+
+	// create an empty view state
+	VariablesViewState* viewState = new(std::nothrow) VariablesViewState;
+	if (viewState == NULL)
+		return;
+	Reference<VariablesViewState> viewStateReference(viewState, true);
+
+	if (viewState->Init() != B_OK)
+		return;
+
+	// populate it
+	TreeTablePath path;
+	if (_AddViewStateDescendentNodeInfos(viewState, fVariableTableModel->Root(),
+			path) != B_OK) {
+		return;
+	}
+// TODO: Add values!
+
+	// add the view state to the history
+	fViewStateHistory->SetState(fThread->ID(), functionID, viewState);
+}
+
+
+void
+VariablesView::_RestoreViewState()
+{
+	if (fPreviousViewState != NULL) {
+		fPreviousViewState->ReleaseReference();
+		fPreviousViewState = NULL;
+	}
+
+	if (fThread == NULL || fStackFrame == NULL)
+		return;
+
+	// get the function ID
+	FunctionID* functionID = fStackFrame->Function()->GetFunctionID();
+	if (functionID == NULL)
+		return;
+	Reference<FunctionID> functionIDReference(functionID, true);
+
+	// get the previous view state
+	VariablesViewState* viewState = fViewStateHistory->GetState(fThread->ID(),
+		functionID);
+	if (viewState == NULL)
+		return;
+
+	// apply the view state
+	TreeTablePath path;
+	_ApplyViewStateDescendentNodeInfos(viewState, fVariableTableModel->Root(),
+		path);
+}
+
+
+status_t
+VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
+	void* parent, TreeTablePath& path) const
+{
+	int32 childCount = fVariableTableModel->CountChildren(parent);
+	for (int32 i = 0; i < childCount; i++) {
+		ValueNode* node = (ValueNode*)fVariableTableModel->ChildAt(parent, i);
+		if (!path.AddComponent(i))
+			return B_NO_MEMORY;
+
+		// add the node's info
+		VariablesViewNodeInfo nodeInfo;
+		nodeInfo.SetNodeExpanded(fVariableTable->IsNodeExpanded(path));
+
+		status_t error = viewState->SetNodeInfo(node->GetVariable()->ID(),
+			node->Path(), nodeInfo);
+		if (error != B_OK)
+			return error;
+
+		// recurse
+		error = _AddViewStateDescendentNodeInfos(viewState, node, path);
+		if (error != B_OK)
+			return error;
+
+		path.RemoveLastComponent();
+	}
+
+	return B_OK;
+}
+
+
+status_t
+VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
+	void* parent, TreeTablePath& path)
+{
+	int32 childCount = fVariableTableModel->CountChildren(parent);
+	for (int32 i = 0; i < childCount; i++) {
+		ValueNode* node = (ValueNode*)fVariableTableModel->ChildAt(parent, i);
+		if (!path.AddComponent(i))
+			return B_NO_MEMORY;
+
+		// apply the node's info, if any
+		const VariablesViewNodeInfo* nodeInfo = viewState->GetNodeInfo(
+			node->GetVariable()->ID(), node->Path());
+		if (nodeInfo != NULL) {
+			fVariableTable->SetNodeExpanded(path, nodeInfo->IsNodeExpanded());
+
+			// recurse
+			status_t error = _ApplyViewStateDescendentNodeInfos(viewState, node,
+				path);
+			if (error != B_OK)
+				return error;
+		}
+
+		path.RemoveLastComponent();
+	}
+
+	return B_OK;
 }
 
 

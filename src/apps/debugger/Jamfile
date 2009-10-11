@@ -12,6 +12,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) files ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) gui model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) ids ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
@@ -91,6 +92,10 @@ Application Debugger :
 	LocatableEntry.cpp
 	LocatableFile.cpp
 	SourceFile.cpp
+
+	# gui/model
+	VariablesViewState.cpp
+	VariablesViewStateHistory.cpp
 
 	# gui/team_window
 	ImageFunctionsView.cpp

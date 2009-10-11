@@ -15,6 +15,8 @@ class StackFrame;
 class Thread;
 class TypeComponentPath;
 class Variable;
+class VariablesViewState;
+class VariablesViewStateHistory;
 
 
 class VariablesView : public BGroupView, private TreeTableListener {
@@ -49,11 +51,22 @@ private:
 
 			void				_RequestVariableValue(Variable* variable);
 
+			void				_SaveViewState() const;
+			void				_RestoreViewState();
+			status_t			_AddViewStateDescendentNodeInfos(
+									VariablesViewState* viewState, void* parent,
+									TreeTablePath& path) const;
+			status_t			_ApplyViewStateDescendentNodeInfos(
+									VariablesViewState* viewState, void* parent,
+									TreeTablePath& path);
+
 private:
 			Thread*				fThread;
 			StackFrame*			fStackFrame;
 			TreeTable*			fVariableTable;
 			VariableTableModel*	fVariableTableModel;
+			VariablesViewState*	fPreviousViewState;
+			VariablesViewStateHistory* fViewStateHistory;
 			Listener*			fListener;
 };
 
