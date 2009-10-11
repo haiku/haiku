@@ -819,21 +819,40 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			// TODO: Handle!
 			break;
 		case B_DEBUGGER_MESSAGE_THREAD_CREATED:
-			handled = _HandleThreadCreated(
-				dynamic_cast<ThreadCreatedEvent*>(event));
+		{
+			ThreadCreatedEvent* threadEvent
+				= dynamic_cast<ThreadCreatedEvent*>(event);
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_THREAD_CREATED: thread: %ld\n",
+				threadEvent->NewThread());
+			handled = _HandleThreadCreated(threadEvent);
 			break;
+		}
 		case B_DEBUGGER_MESSAGE_THREAD_DELETED:
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_THREAD_DELETED: thread: %ld\n",
+				event->Thread());
 			handled = _HandleThreadDeleted(
 				dynamic_cast<ThreadDeletedEvent*>(event));
 			break;
 		case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
-			handled = _HandleImageCreated(
-				dynamic_cast<ImageCreatedEvent*>(event));
+		{
+			ImageCreatedEvent* imageEvent
+				= dynamic_cast<ImageCreatedEvent*>(event);
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_IMAGE_CREATED: image: \"%s\" "
+				"(%ld)\n", imageEvent->GetImageInfo().Name().String(),
+				imageEvent->GetImageInfo().ImageID());
+			handled = _HandleImageCreated(imageEvent);
 			break;
+		}
 		case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
-			handled = _HandleImageDeleted(
-				dynamic_cast<ImageDeletedEvent*>(event));
+		{
+			ImageDeletedEvent* imageEvent
+				= dynamic_cast<ImageDeletedEvent*>(event);
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_IMAGE_DELETED: image: \"%s\" "
+				"(%ld)\n", imageEvent->GetImageInfo().Name().String(),
+				imageEvent->GetImageInfo().ImageID());
+			handled = _HandleImageDeleted(imageEvent);
 			break;
+		}
 		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 		case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 		case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
