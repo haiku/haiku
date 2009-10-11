@@ -595,8 +595,8 @@ if [ IsOptionalHaikuImagePackageAdded Neon ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Neon available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage neon-0.28.6-r1a1-x86-gcc2-2009-08-30
-			: $(baseURL)/neon-0.28.6-r1a1-x86-gcc2-2009-08-30.zip
+		InstallOptionalHaikuImagePackage neon-0.29.0-r1a1-x86-gcc2-2009-09-13
+			: $(baseURL)/neon-0.29.0-r1a1-x86-gcc2-2009-09-13.zip
 			:
 			: true
 		;
@@ -664,8 +664,8 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 				"variable to be set!" ;
 		}
 
-		InstallOptionalHaikuImagePackage openssh-5.2p1-r1a1-x86-gcc2-2009-08-30
-			: $(baseURL)/openssh-5.2p1-r1a1-x86-gcc2-2009-08-30.zip
+		InstallOptionalHaikuImagePackage openssh-5.3p1-r1a1-x86-gcc2-2009-10-11
+			: $(baseURL)/openssh-5.3p1-r1a1-x86-gcc2-2009-10-11.zip
 			:
 		;
 
