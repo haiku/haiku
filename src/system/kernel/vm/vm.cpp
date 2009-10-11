@@ -2184,7 +2184,7 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 
 	size = PAGE_ALIGN(size);
 
-	// create an device cache
+	// create a device cache
 	status_t status = VMCacheFactory::CreateDeviceCache(cache, physicalAddress);
 	if (status != B_OK)
 		return status;
@@ -2237,6 +2237,98 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 	// modify the pointer returned to be offset back into the new area
 	// the same way the physical address in was offset
 	*_address = (void*)((addr_t)*_address + mapOffset);
+
+	area->cache_type = CACHE_TYPE_DEVICE;
+	return area->id;
+}
+
+
+area_id
+vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
+	uint32 addressSpec, addr_t* _size, uint32 protection, struct iovec* vecs,
+	uint32 vecCount)
+{
+	TRACE(("vm_map_physical_memory_vecs(team = %ld, \"%s\", virtual = %p, "
+		"spec = %ld, size = %lu, protection = %ld, phys = %#lx)\n", team,
+		name, _address, addressSpec, size, protection, physicalAddress));
+
+	if (!arch_vm_supports_protection(protection)
+		|| (addressSpec & B_MTR_MASK) != 0) {
+		return B_NOT_SUPPORTED;
+	}
+
+	AddressSpaceWriteLocker locker(team);
+	if (!locker.IsLocked())
+		return B_BAD_TEAM_ID;
+
+	if (vecCount == 0)
+		return B_BAD_VALUE;
+
+	addr_t size = 0;
+	for (uint32 i = 0; i < vecCount; i++) {
+		if ((addr_t)vecs[i].iov_base % B_PAGE_SIZE != 0
+			|| vecs[i].iov_len % B_PAGE_SIZE != 0) {
+			return B_BAD_VALUE;
+		}
+
+		size += vecs[i].iov_len;
+	}
+
+	// create a device cache
+	vm_cache* cache;
+	status_t result = VMCacheFactory::CreateDeviceCache(cache,
+		(addr_t)vecs[0].iov_base);
+	if (result != B_OK)
+		return result;
+
+	// tell the page scanner to skip over this area, it's pages are special
+	cache->scan_skip = 1;
+	cache->virtual_end = size;
+
+	cache->Lock();
+
+	vm_area* area;
+	result = map_backing_store(locker.AddressSpace(), cache, _address,
+		0, size, addressSpec & ~B_MTR_MASK, B_FULL_LOCK, protection,
+		REGION_NO_PRIVATE_MAP, &area, name, false, true);
+
+	if (result != B_OK)
+		cache->ReleaseRefLocked();
+
+	cache->Unlock();
+
+	if (result != B_OK)
+		return result;
+
+	vm_translation_map* map = &locker.AddressSpace()->translation_map;
+	size_t reservePages = map->ops->map_max_pages_need(map, area->base,
+		area->base + (size - 1));
+
+	vm_page_reserve_pages(reservePages);
+	map->ops->lock(map);
+
+	uint32 vecIndex = 0;
+	size_t vecOffset = 0;
+	for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
+		while (vecOffset >= vecs[vecIndex].iov_len && vecIndex < vecCount) {
+			vecOffset = 0;
+			vecIndex++;
+		}
+
+		if (vecIndex >= vecCount)
+			break;
+
+		map->ops->map(map, area->base + offset,
+			(addr_t)vecs[vecIndex].iov_base + vecOffset, protection);
+
+		vecOffset += B_PAGE_SIZE;
+	}
+
+	map->ops->unlock(map);
+	vm_page_unreserve_pages(reservePages);
+
+	if (_size != NULL)
+		*_size = size;
 
 	area->cache_type = CACHE_TYPE_DEVICE;
 	return area->id;
