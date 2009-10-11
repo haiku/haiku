@@ -39,7 +39,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	hd head hey hostname
 	id ident ifconfig <bin>install installsound iroster isvolume
 	$(IDE_ONLY)ideinfo $(IDE_ONLY)idestatus
-	join keymap kill 
+	join keymap kill
 	less lessecho lesskey link linkcatkeys listarea listattr listimage listdev
 	listport listres listsem listusb ln locate logger login logname ls lsindex
 	mail2mbox makebootable mbox2mail md5sum merge message mimeset mkdos mkdir
@@ -78,21 +78,21 @@ SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 ;
 ICU_LIBS = libicu-common.so libicu-data.so libicu-i18n.so
 ;
-SYSTEM_LIBS = 
-	libalm.so 
-	libbe.so libbsd.so libbnetapi.so 
-	libdebug.so libdevice.so 
-	libfluidsynth.so libfreetype.so 
+SYSTEM_LIBS =
+	libalm.so
+	libbe.so libbsd.so libbnetapi.so
+	libdebug.so libdevice.so
+	libfluidsynth.so libfreetype.so
 	libgame.so libGL.so libgnu.so
-	libilmimf.so 
-	libjpeg.so 
-	liblinprog.so liblocale.so liblpsolve55.so 
-	libmail.so libmedia.so libmidi.so libmidi2.so 
-	libnetwork.so 
-	libpng.so 
-	<revisioned>libroot.so 
-	libscreensaver.so 
-	libtextencoding.so libtracker.so libtranslation.so 
+	libilmimf.so
+	libjpeg.so
+	liblinprog.so liblocale.so liblpsolve55.so
+	libmail.so libmedia.so libmidi.so libmidi2.so
+	libnetwork.so
+	libpng.so
+	<revisioned>libroot.so
+	libscreensaver.so
+	libtextencoding.so libtracker.so libtranslation.so
 	libz.so
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++) $(ICU_LIBS)
 ;
@@ -116,7 +116,8 @@ SYSTEM_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant
 	#$(X86_ONLY)vmware.accelerant
 ;
 SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
-	JPEGTranslator JPEG2000Translator PCXTranslator PNGTranslator PPMTranslator
+	ICOTranslator JPEGTranslator JPEG2000Translator
+	PCXTranslator PNGTranslator PPMTranslator
 	RAWTranslator RTF-Translator SGITranslator STXTTranslator TGATranslator
 	TIFFTranslator WonderBrushTranslator
 ;
@@ -164,8 +165,8 @@ SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)broadcom440x
 	$(X86_ONLY)via_rhine wb840 $(X86_ONLY)ipro100 $(X86_ONLY)nforce
 	#vlance
 	$(X86_ONLY)marvell_yukon $(X86_ONLY)syskonnect
-	$(X86_ONLY)attansic_l1 $(X86_ONLY)attansic_l2 $(X86_ONLY)ar81xx 
-	usb_ecm usb_asix 
+	$(X86_ONLY)attansic_l1 $(X86_ONLY)attansic_l2 $(X86_ONLY)ar81xx
+	usb_ecm usb_asix
 ;
 #SYSTEM_ADD_ONS_DRIVERS_POWER = $(X86_ONLY)acpi_button ;
 SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci $(X86_ONLY)ps2 $(X86_ONLY)isa
@@ -372,7 +373,7 @@ AddFilesToHaikuImage system data artwork : $(logoArtwork) ;
 AddDirectoryToHaikuImage system data sounds ;
 
 # Add mail provider infos.
-AddFilesToHaikuImage home config settings Mail ProviderInfo : 
+AddFilesToHaikuImage home config settings Mail ProviderInfo :
 	$(HAIKU_PROVIDER_INFOS) ;
 
 # Mail spell check dictionaries
