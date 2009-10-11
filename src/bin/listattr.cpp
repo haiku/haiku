@@ -1,18 +1,126 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Ryan Fleet.
  *
  * Distributed under the terms of the MIT license.
  */
 
 
+#include <String.h>
 #include <TypeConstants.h>
 #include <Mime.h>
 
 #include <fs_attr.h>
 
+#include <ctype.h>
 #include <string.h>
 #include <stdio.h>
+
+
+/*!	Dumps the contents of the attribute in the form of raw data. This view
+	is used for the type B_RAW_TYPE, for custom types and for any type that
+	is not directly supported by the utility "addattr".
+*/
+static void
+dump_raw_data(const char *buffer, size_t size)
+{
+	const uint32 kChunkSize = 16;
+	uint32 dumpPosition = 0;
+
+	while (dumpPosition < size) {
+		// Position for this line
+		printf("\t%04lx: ", dumpPosition);
+
+		// Print the bytes in form of hexadecimal numbers
+		for (uint32 i = 0; i < kChunkSize; i++) {
+			if (dumpPosition + i < size) {
+				printf("%02x ", (uint8)buffer[dumpPosition + i]);
+			} else
+				printf("   ");
+		}
+
+		// Print the bytes in form of printable characters
+		// (whenever possible)
+		printf(" ");
+		for (uint32 i = 0; i < kChunkSize; i++) {
+			if (dumpPosition < size) {
+				char c = buffer[dumpPosition];
+				putchar(isgraph(c) ? c : '.');
+			} else
+				putchar(' ');
+
+			dumpPosition++;
+		}
+		printf("\n");
+	}
+}
+
+
+static void
+show_attr_contents(BNode& node, const char* attribute, const attr_info& info)
+{
+	// limit size of the attribute, only the first kLimit byte will make it on
+	// screen
+	int kLimit = 256;
+	off_t size = info.size;
+	if (size > kLimit)
+		size = kLimit;
+
+	char buffer[kLimit];
+	ssize_t bytesRead = node.ReadAttr(attribute, info.type, 0, buffer, size);
+	if (bytesRead != size) {
+		fprintf(stderr, "Could only read %lld bytes from attribute!\n",
+			size);
+		return;
+	}
+
+	switch (info.type) {
+		case B_INT8_TYPE:
+			printf("%d\n", *((int8 *)buffer));
+			break;
+		case B_UINT8_TYPE:
+			printf("%u\n", *((uint8 *)buffer));
+			break;
+		case B_INT16_TYPE:
+			printf("%d\n", *((int16 *)buffer));
+			break;
+		case B_UINT16_TYPE:
+			printf("%u\n", *((uint16 *)buffer));
+			break;
+		case B_INT32_TYPE:
+			printf("%ld\n", *((int32 *)buffer));
+			break;
+		case B_UINT32_TYPE:
+			printf("%lu\n", *((uint32 *)buffer));
+			break;
+		case B_INT64_TYPE:
+			printf("%lld\n", *((int64 *)buffer));
+			break;
+		case B_UINT64_TYPE:
+			printf("%llu\n", *((uint64 *)buffer));
+			break;
+		case B_FLOAT_TYPE:
+			printf("%f\n", *((float *)buffer));
+			break;
+		case B_DOUBLE_TYPE:
+			printf("%f\n", *((double *)buffer));
+			break;
+		case B_BOOL_TYPE:
+			printf("%d\n", *((unsigned char *)buffer));
+			break;
+		case B_STRING_TYPE:
+		case B_MIME_STRING_TYPE:
+			printf("%s\n", buffer);
+			break;
+
+		default:
+			// The rest of the attributes types are displayed as raw data
+			putchar('\n');
+			dump_raw_data(buffer, size);
+			putchar('\n');
+			break;
+	}
+}
 
 
 static const char *
@@ -68,10 +176,12 @@ get_type(type_code type)
 				}
 			}
 
-			if (missed < 2)
-				sprintf(buffer, "'%c%c%c%c'", value[0], value[1], value[2], value[3]);
-			else
+			if (missed < 2) {
+				sprintf(buffer, "'%c%c%c%c'", value[0], value[1], value[2],
+					value[3]);
+			} else
 				sprintf(buffer, "0x%08lx", type);
+
 			return buffer;
 		}
 	}
@@ -87,9 +197,18 @@ main(int argc, char *argv[])
 	else
 		program++;
 
+	bool printContents = false;
+
+	if (argc > 2 && (!strcmp(argv[1], "--long") || !strcmp(argv[1], "-l"))) {
+		printContents = true;
+		argc--;
+		argv++;
+	}
+
 	if (argc < 2 || !strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")) {
-		printf("usage: %s 'filename' ['filename' ...]\n", program);
-		return 1;
+		printf("usage: %s [-l|--long] 'filename' ['filename' ...]\n"
+			"  -l, --long  Shows the attribute contents as well.\n", program);
+		return argc == 2 ? 0 : 1;
 	}
 
 	off_t total = 0;
@@ -105,8 +224,18 @@ main(int argc, char *argv[])
 		}
 
 		printf("File: %s\n", argv[i]);
-		printf("  Type         Size                 Name\n");
-		printf("-----------  ---------  -------------------------------\n");
+
+		const int kTypeWidth = 12;
+		const int kSizeWidth = 10;
+		const int kNameWidth = 36;
+		const int kContentsWidth = 21;
+		printf("%*s %*s  %-*s%s\n", kTypeWidth, "Type", kSizeWidth, "Size",
+			kNameWidth, "Name", printContents ? "Contents" : "");
+
+		BString separator;
+		separator.SetTo('-', kTypeWidth + kSizeWidth + kNameWidth
+			+ (printContents ? kContentsWidth : 0));
+		puts(separator.String());
 
 		char name[B_ATTR_NAME_LENGTH];
 		while (node.GetNextAttrName(name) == B_OK) {
@@ -114,9 +243,20 @@ main(int argc, char *argv[])
 
 			status = node.GetAttrInfo(name, &attrInfo);
 			if (status >= B_OK) {
-				printf("%11s ", get_type(attrInfo.type));
-				printf("% 10Li  ", attrInfo.size);
-				printf("\"%s\"\n", name);
+				printf("%*s", kTypeWidth, get_type(attrInfo.type));
+				printf("% *Li  ", kSizeWidth, attrInfo.size);
+				printf("\"%s\"", name);
+
+				if (printContents) {
+					// padding
+					int length = kNameWidth - 2 - strlen(name);
+					if (length > 0)
+						printf("%*s", length, "");
+
+					show_attr_contents(node, name, attrInfo);
+				} else
+					putchar('\n');
+
 				total += attrInfo.size;
 			} else {
 				fprintf(stderr, "%s: stat failed for \"%s\": %s\n",
