@@ -758,7 +758,7 @@ bool
 TreeTable::IsNodeExpanded(const TreeTablePath& path) const
 {
 	if (TreeTableNode* node = _NodeForPath(path))
-		node->Row()->IsExpanded();
+		return node->Row()->IsExpanded();
 	return false;
 }
 
@@ -950,7 +950,7 @@ TreeTable::_SetNodeExpanded(TreeTableNode* node, bool expanded,
 	if (expanded && expandAncestors && node != fRootNode)
 		_SetNodeExpanded(node->Parent(), true, true);
 
-	BColumnListView::ExpandOrCollapse(node->Row(), expanded);
+	ExpandOrCollapse(node->Row(), expanded);
 }
 
 
