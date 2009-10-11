@@ -25,9 +25,9 @@
 
 // class specific requests
 // bmRequestType
-#define PRINTER_REQUEST				0xA1
+#define PRINTER_REQUEST				(USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_CLASS)
 // bRequest
-#define REQUEST_GET_STATUS_ID		0x00
+#define REQUEST_GET_DEVICE_ID		0x00
 #define REQUEST_GET_PORT_STATUS		0x01
 #define REQUEST_SOFT_RESET			0x02
 
@@ -44,7 +44,7 @@ typedef struct printer_device_s {
 	usb_pipe	bulk_in;
 	usb_pipe	bulk_out;
 	uint8		interface;
-	uint32		current_tag;
+	uint8       alternate_setting;
 
 	// used to store callback information
 	sem_id		notify;
@@ -52,7 +52,6 @@ typedef struct printer_device_s {
 	size_t		actual_length;
 
 	char		name[32];
-	uint32		block_size;
 } printer_device;
 
 #endif // _USB_PRINTER_H_
