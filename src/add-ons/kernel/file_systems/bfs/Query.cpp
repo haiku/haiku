@@ -1565,7 +1565,12 @@ Query::GetNextEntry(struct dirent* dirent, size_t size)
 
 			status_t status = fCurrent->PrepareQuery(fVolume, fIndex,
 				&fIterator, fFlags & B_QUERY_NON_INDEXED);
-			if (status != B_OK && status != B_ENTRY_NOT_FOUND)
+			if (status == B_ENTRY_NOT_FOUND) {
+				// try next equation
+				continue;
+			}
+
+			if (status != B_OK)
 				return status;
 		}
 		if (fCurrent == NULL)
