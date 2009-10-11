@@ -69,10 +69,9 @@ struct iterative_io_cookie {
 
 class DoIO {
 public:
-	DoIO(bool write, bool isPhysical)
+	DoIO(bool write)
 		:
-		fWrite(write),
-		fIsPhysical(isPhysical)
+		fWrite(write)
 	{
 	}
 
@@ -80,88 +79,27 @@ public:
 	{
 	}
 
-	status_t IO(off_t offset, void* _buffer, size_t* _length)
-	{
-		if (!fIsPhysical)
-			return InternalIO(offset, _buffer, _length);
-
-		// buffer points to physical address -- map pages
-		addr_t buffer = (addr_t)_buffer;
-		size_t length = *_length;
-
-		if (length > B_PAGE_SIZE) {
-			// try to not split up the request if possible
-			// TODO: map with less overhead! pre-reserved address space
-			// could be used as a scratch space for example, directly mapping
-			// pages into that instead of creating new areas for each request
-			void* virtualAddress;
-			area_id mapArea = map_physical_memory("physical io request map",
-				(void*)buffer, length, B_ANY_ADDRESS, B_KERNEL_READ_AREA
-					| B_KERNEL_WRITE_AREA, &virtualAddress);
-			if (mapArea >= 0) {
-				status_t result = InternalIO(offset, virtualAddress, _length);
-				delete_area(mapArea);
-				return result;
-			}
-
-			// otherwise we fall back to page wise mapping
-		}
-
-		while (length > 0) {
-			addr_t pageOffset = buffer % B_PAGE_SIZE;
-			addr_t virtualAddress;
-			void* handle;
-			status_t error = vm_get_physical_page(buffer - pageOffset,
-				&virtualAddress, &handle);
-			if (error != B_OK)
-				return error;
-
-			size_t toTransfer = min_c(length, B_PAGE_SIZE - pageOffset);
-			size_t transferred = toTransfer;
-			error = InternalIO(offset, (void*)(virtualAddress + pageOffset),
-				&transferred);
-
-			vm_put_physical_page(virtualAddress, handle);
-
-			if (error != B_OK)
-				return error;
-
-			offset += transferred;
-			buffer += transferred;
-			length -= transferred;
-
-			if (transferred != toTransfer)
-				break;
-		}
-
-		*_length -= length;
-		return B_OK;
-	}
-
-protected:
-	virtual status_t InternalIO(off_t offset, void* buffer, size_t* length) = 0;
+	virtual status_t IO(off_t offset, void* buffer, size_t* length) = 0;
 
 protected:
 	bool	fWrite;
-	bool	fIsPhysical;
 };
 
 
 class CallbackIO : public DoIO {
 public:
-	CallbackIO(bool write, bool isPhysical,
+	CallbackIO(bool write,
 			status_t (*doIO)(void* cookie, off_t offset, void* buffer,
 				size_t* length),
 			void* cookie)
 		:
-		DoIO(write, isPhysical),
+		DoIO(write),
 		fDoIO(doIO),
 		fCookie(cookie)
 	{
 	}
 
-protected:
-	virtual status_t InternalIO(off_t offset, void* buffer, size_t* length)
+	virtual status_t IO(off_t offset, void* buffer, size_t* length)
 	{
 		return fDoIO(fCookie, offset, buffer, length);
 	}
@@ -174,16 +112,15 @@ private:
 
 class VnodeIO : public DoIO {
 public:
-	VnodeIO(bool write, bool isPhysical, struct vnode* vnode, void* cookie)
+	VnodeIO(bool writen, struct vnode* vnode, void* cookie)
 		:
-		DoIO(write, isPhysical),
+		DoIO(write),
 		fVnode(vnode),
 		fCookie(cookie)
 	{
 	}
 
-protected:
-	virtual status_t InternalIO(off_t offset, void* buffer, size_t* length)
+	virtual status_t IO(off_t offset, void* buffer, size_t* length)
 	{
 		iovec vec;
 		vec.iov_base = buffer;
@@ -324,18 +261,19 @@ do_synchronous_iterative_vnode_io(struct vnode* vnode, void* openCookie,
 	iterative_io_finished finished, void* cookie)
 {
 	IOBuffer* buffer = request->Buffer();
-	VnodeIO io(request->IsWrite(), buffer->IsPhysical(), vnode, openCookie);
+	VnodeIO io(request->IsWrite(), vnode, openCookie);
 
-	iovec* vecs = buffer->Vecs();
-	int32 vecCount = buffer->VecCount();
+	iovec vector;
+	void* virtualVecCookie = NULL;
 	off_t offset = request->Offset();
 	size_t length = request->Length();
 
 	status_t error = B_OK;
 
-	for (int32 i = 0; error == B_OK && length > 0 && i < vecCount; i++) {
-		uint8* vecBase = (uint8*)vecs[i].iov_base;
-		size_t vecLength = min_c(vecs[i].iov_len, length);
+	for (; error == B_OK && length > 0
+			&& buffer->GetNextVirtualVec(virtualVecCookie, vector) == B_OK;) {
+		uint8* vecBase = (uint8*)vector.iov_base;
+		size_t vecLength = min_c(vector.iov_len, length);
 
 		while (error == B_OK && vecLength > 0) {
 			file_io_vec fileVecs[8];
@@ -345,7 +283,7 @@ do_synchronous_iterative_vnode_io(struct vnode* vnode, void* openCookie,
 			if (error != B_OK || fileVecCount == 0)
 				break;
 
-			for (uint32 k = 0; k < fileVecCount; k++) {
+			for (uint32 i = 0; i < fileVecCount; i++) {
 				const file_io_vec& fileVec = fileVecs[i];
 				size_t toTransfer = min_c(fileVec.length, length);
 				size_t transferred = toTransfer;
@@ -364,6 +302,8 @@ do_synchronous_iterative_vnode_io(struct vnode* vnode, void* openCookie,
 		}
 	}
 
+	buffer->FreeVirtualVecCookie(virtualVecCookie);
+
 	bool partial = length > 0;
 	size_t bytesTransferred = request->Length() - length;
 	request->SetTransferredBytes(partial, bytesTransferred);
@@ -381,14 +321,15 @@ synchronous_io(io_request* request, DoIO& io)
 
 	IOBuffer* buffer = request->Buffer();
 
-	iovec* vecs = buffer->Vecs();
-	int32 vecCount = buffer->VecCount();
+	iovec vector;
+	void* virtualVecCookie = NULL;
 	off_t offset = request->Offset();
 	size_t length = request->Length();
 
-	for (int32 i = 0; length > 0 && i < vecCount; i++) {
-		void* vecBase = vecs[i].iov_base;
-		size_t vecLength = min_c(vecs[i].iov_len, length);
+	for (; length > 0
+			&& buffer->GetNextVirtualVec(virtualVecCookie, vector) == B_OK;) {
+		void* vecBase = vector.iov_base;
+		size_t vecLength = min_c(vector.iov_len, length);
 
 		TRACE_RIO("[%ld]   I/O: offset: %lld, vecBase: %p, length: %lu\n",
 			find_thread(NULL), offset, vecBase, vecLength);
@@ -397,6 +338,7 @@ synchronous_io(io_request* request, DoIO& io)
 		status_t error = io.IO(offset, vecBase, &transferred);
 		if (error != B_OK) {
 			TRACE_RIO("[%ld]   I/O failed: %#lx\n", find_thread(NULL), error);
+			buffer->FreeVirtualVecCookie(virtualVecCookie);
 			request->SetStatusAndNotify(error);
 			return error;
 		}
@@ -410,6 +352,7 @@ synchronous_io(io_request* request, DoIO& io)
 
 	TRACE_RIO("[%ld] synchronous_io() succeeded\n", find_thread(NULL));
 
+	buffer->FreeVirtualVecCookie(virtualVecCookie);
 	request->SetTransferredBytes(length > 0, request->Length() - length);
 	request->SetStatusAndNotify(B_OK);
 	return B_OK;
@@ -426,8 +369,7 @@ vfs_vnode_io(struct vnode* vnode, void* cookie, io_request* request)
 	if (!HAS_FS_CALL(vnode, io)
 		|| (result = FS_CALL(vnode, io, cookie, request)) == B_UNSUPPORTED) {
 		// no io() call -- fall back to synchronous I/O
-		IOBuffer* buffer = request->Buffer();
-		VnodeIO io(request->IsWrite(), buffer->IsPhysical(), vnode, cookie);
+		VnodeIO io(request->IsWrite(), vnode, cookie);
 		return synchronous_io(request, io);
 	}
 
@@ -440,9 +382,7 @@ vfs_synchronous_io(io_request* request,
 	status_t (*doIO)(void* cookie, off_t offset, void* buffer, size_t* length),
 	void* cookie)
 {
-	IOBuffer* buffer = request->Buffer();
-	CallbackIO io(request->IsWrite(), buffer->IsPhysical(), doIO, cookie);
-
+	CallbackIO io(request->IsWrite(), doIO, cookie);
 	return synchronous_io(request, io);
 }
 
