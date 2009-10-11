@@ -33,6 +33,7 @@ int main(int argc, char **argv)
 		if (sum < old)
 			sum++;
 	}
+	sum = ~sum;
 	fprintf(stderr, "checksum: %lu\n", sum);
 	// big endian
 	((uint32_t *)bootblock)[1] = htonl(sum);
