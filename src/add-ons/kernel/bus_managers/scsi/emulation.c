@@ -126,6 +126,29 @@ scsi_read_write_6(scsi_ccb *request)
 		cdb->length = B_HOST_TO_BENDIAN_INT16((uint16)cmd->length);
 	cdb->control = cmd->control;
 
+	if (0) {
+		static uint32 lastLBA = 0;
+		static uint16 lastLength = 0;
+		static uint32 contigCount = 0;
+		static uint64 totalContig = 0;
+
+		uint32 currentLBA = B_BENDIAN_TO_HOST_INT32(cdb->lba);
+		uint16 currentLength = B_BENDIAN_TO_HOST_INT16(cdb->length);
+
+		if (lastLBA + lastLength == currentLBA) {
+			contigCount++;
+			totalContig++;
+		} else
+			contigCount = 0;
+
+		lastLBA = currentLBA;
+		lastLength = currentLength;
+
+		dprintf("scsi_read_write_6: %lld lba %ld; length: %d\n", totalContig,
+			B_BENDIAN_TO_HOST_INT32(cdb->lba),
+			B_BENDIAN_TO_HOST_INT16(cdb->length));
+	}
+
 	return true;
 }
 
