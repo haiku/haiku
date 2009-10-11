@@ -185,7 +185,11 @@ compare_version_infos(const version_info& info1, const version_info& info2)
 }
 
 
-/*!	\brief Compares the version of two applications.
+/*!	\brief Compares two applications to decide which one should be rather
+		returned as a query result.
+
+	First, it checks if both apps are in the path, and prefers the app that
+	appears earlier.
 
 	If both files have a version info, then those are compared.
 	If one file has a version info, it is said to be greater. If both
@@ -198,8 +202,51 @@ compare_version_infos(const version_info& info1, const version_info& info2)
 			\c 0, if both are equal.
 */
 static int32
-compare_app_versions(const entry_ref* app1, const entry_ref* app2)
+compare_queried_apps(const entry_ref* app1, const entry_ref* app2)
 {
+	BPath path1(app1);
+	BPath path2(app2);
+
+	// Check search path
+
+	const char* searchPathes = getenv("PATH");
+	if (searchPathes != NULL) {
+		char* searchBuffer = strdup(searchPathes);
+		if (searchBuffer != NULL) {
+			char* last;
+			const char* path = strtok_r(searchBuffer, ":", &last);
+			while (path != NULL) {
+				// Check if any app path matches
+				size_t length = strlen(path);
+				bool found1 = !strncmp(path, path1.Path(), length)
+					&& path1.Path()[length] == '/';
+				bool found2 = !strncmp(path, path2.Path(), length)
+					&& path2.Path()[length] == '/';;
+
+				if (found1 != found2) {
+					free(searchBuffer);
+					return found1 ? 1 : -1;
+				}
+
+				path = strtok_r(NULL, ":", &last);
+			}
+
+			free(searchBuffer);
+		}
+	}
+
+	// Check system folder
+
+	static const char* kSystemPath = "/boot/system/servers/";
+	size_t length = strlen(kSystemPath);
+
+	bool inSystem1 = !strncmp(kSystemPath, path1.Path(), length);
+	bool inSystem2 = !strncmp(kSystemPath, path2.Path(), length);
+	if (inSystem1 != inSystem2)
+		return inSystem1 ? 1 : -1;
+
+	// Check version info
+
 	BFile file1, file2;
 	BAppFileInfo appFileInfo1, appFileInfo2;
 	file1.SetTo(app1, B_READ_ONLY);
@@ -305,7 +352,7 @@ query_for_app(const char* signature, entry_ref* appRef)
 			status_t foundAppError = B_OK;
 			entry_ref ref;
 			while (query.GetNextRef(&ref) == B_OK) {
-				if ((!appFound || compare_app_versions(appRef, &ref) < 0)
+				if ((!appFound || compare_queried_apps(appRef, &ref) < 0)
 					&& (foundAppError = can_app_be_used(&ref)) == B_OK) {
 					*appRef = ref;
 					appFound = true;
