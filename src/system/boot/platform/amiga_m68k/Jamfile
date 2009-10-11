@@ -1,0 +1,131 @@
+SubDir HAIKU_TOP src system boot platform amiga_m68k ;
+
+SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
+
+UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+#UsePrivateHeaders [ FDirName graphics vesa ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+
+{
+	local defines = _BOOT_MODE ;
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
+	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
+}
+
+#SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
+
+KernelMergeObject boot_platform_amiga_m68k_shell.o :
+	shell.S
+	: -Wa,--pcrel
+;
+
+# cpu-specific stuff
+# should be moved to boot/arch/m68k/...
+# XXX: add 020+68851 support
+KernelMergeObject boot_arch_m68k_030.o :
+	mmu_030.cpp
+	: -fno-pic -Wno-unused -m68030
+;
+
+KernelMergeObject boot_arch_m68k_040.o :
+	mmu_040.cpp
+	: -fno-pic -Wno-unused -m68040
+;
+
+KernelMergeObject boot_arch_m68k_060.o :
+	mmu_060.cpp
+	: -fno-pic -Wno-unused -m68060
+;
+
+
+KernelMergeObject boot_platform_amiga_m68k_other.o :
+#	shell.S
+	start.c
+	toscalls.c
+	debug.c
+	#bios.S
+	console.cpp
+	#serial.cpp
+	Handle.cpp
+	devices.cpp
+	keyboard.cpp
+	menu.cpp
+	mmu.cpp
+	cpu.cpp
+	#smp.cpp
+	#smp_trampoline.S
+#	support.S
+	video.cpp
+	#apm.cpp
+	
+	# generic
+	text_menu.cpp
+
+	# VESA/DDC EDID
+	#decode_edid.c
+	#dump_edid.c
+
+	: -fno-pic #-Wa,--pcrel
+;
+
+KernelMergeObject boot_platform_amiga_m68k.o :
+	: :
+	boot_platform_amiga_m68k_shell.o
+	boot_platform_amiga_m68k_other.o
+	boot_arch_m68k_030.o
+	boot_arch_m68k_040.o
+;
+
+# AUTO folder PRG target
+
+# based on KernelLd
+rule AtariBootPrgLd
+{
+	# AtariBootPrgLd <name> : <objs> : <linkerscript> : <args> ;
+
+	LINK on $(1) = $(TARGET_LD) ;
+
+	LINKFLAGS on $(1) = $(4) ;
+	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
+
+	# Remove any preset LINKLIBS
+	LINKLIBS on $(1) = ;
+
+	# TODO: Do we really want to invoke SetupKernel here? The objects should
+	# have been compiled with KernelObjects anyway, so we're doing that twice.
+	SetupKernel $(2) ;
+
+	# Show that we depend on the libraries we need
+	LocalClean clean : $(1) ;
+	LocalDepends all : $(1) ;
+	Depends $(1) : $(2) ;
+
+	MakeLocateDebug $(1) ; 
+
+}
+
+actions AtariBootPrgLd
+{
+	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" $(LINKLIBS) ;
+}
+
+AtariBootPrgLd haiku.prg :
+	boot_loader_$(TARGET_BOOT_PLATFORM)
+	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_prg_$(TARGET_BOOT_PLATFORM).ld
+	: -Bstatic
+;
+
+
+SEARCH on [ FGristFiles text_menu.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
+
+# Tell the build system to where stage1.bin can be found, so it can be used
+# elsewhere.
+SEARCH on stage1.bin = $(SUBDIR) ;
+
+# cf pxe_ia32 Jamfile for stage1
