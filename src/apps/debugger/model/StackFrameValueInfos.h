@@ -28,19 +28,19 @@ public:
 									const TypeComponentPath* path,
 									Type** _type, ValueLocation** _location)
 										const;
-									// returns a references
+									// returns references
 	inline	bool				GetInfo(ObjectID* variable,
 									const TypeComponentPath& path,
 									Type** _type, ValueLocation** _location)
 										const;
-									// returns a references
+									// returns references
 			bool				HasInfo(ObjectID* variable,
 									const TypeComponentPath* path) const;
 	inline	bool				HasInfo(ObjectID* variable,
 									const TypeComponentPath& path) const;
 			status_t			SetInfo(ObjectID* variable,
-									TypeComponentPath* path,
-									Type* type, ValueLocation* location);
+									TypeComponentPath* path, Type* type,
+									ValueLocation* location);
 
 private:
 			struct Key;
