@@ -112,7 +112,7 @@ private:
 
 class VnodeIO : public DoIO {
 public:
-	VnodeIO(bool writen, struct vnode* vnode, void* cookie)
+	VnodeIO(bool write, struct vnode* vnode, void* cookie)
 		:
 		DoIO(write),
 		fVnode(vnode),
