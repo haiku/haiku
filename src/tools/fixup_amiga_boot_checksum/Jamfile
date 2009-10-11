@@ -1,0 +1,6 @@
+SubDir HAIKU_TOP src tools fixup_amiga_boot_checksum ;
+
+BuildPlatformMain <build>fixup_amiga_boot_checksum
+	: fixup_amiga_boot_checksum.c
+	:
+;
