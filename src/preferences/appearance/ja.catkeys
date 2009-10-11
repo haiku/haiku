@@ -1,0 +1,43 @@
+1	Japanese	x-vnd.Haiku-Appearance	959674221
+Navigation Pulse	Colors tab		ナビゲーションの点滅
+Shadow	Colors tab		影
+On	AntialiasingSettingsView		有効
+Defaults	APRWindow		デフォルト
+Grayscale	AntialiasingSettingsView		グレースケール
+Shine	Colors tab		光
+Off	AntialiasingSettingsView		無効
+Anti-aliasing type:	AntialiasingSettingsView		アンチエイリアスのタイプ：
+Success	Colors tab		成功
+Inactive Window Tab	Colors tab		非アクティブウィンドウタブ
+Failure	Colors tab		失敗
+Hinting menu	AntialiasingSettingsView		ヒンティングメニュー
+Control Border	Colors tab		コントロールの境界
+Document Background	Colors tab		ドキュメントの背景
+Revert	APRWindow		元に戻す
+Selected Menu Item Border	Colors tab		メニュー選択項目の境界
+Selected Menu Item Text	Colors tab		メニュー選択項目の文字
+Antialiasing	APRWindow		アンチエイリアス
+Window Tab Text	Colors tab		ウィンドウタブの文字
+Tooltip Background	Colors tab		ツールチップの背景
+Document Text	Colors tab		ドキュメントの文字
+Navigation Base	Colors tab		ナビゲーション
+Menu Background	Colors tab		メニューの背景
+Appearance	APRWindow		外観
+Control Background	Colors tab		コントロールの背景
+Colors	APRWindow		色
+Panel Background	Colors tab		パネルの背景
+Window Tab	Colors tab		ウィンドウのタブ
+Reduce colored edges filter strength:	AntialiasingSettingsView		Reduce colored edges filter strength:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		この Haiku のビルドでは、グリフのヒンティングと組合せたサブピクセルベースのアンチエイリアスは特許問題の可能性を回避するため使用できません。有効にするには、Haiku をソースからビルドして、libfreetype の設定ヘッダーファイル中の特定のオプションを有効にしなければなりません。
+Menu Item Text	Colors tab		メニュー項目の文字
+Monospaced Fonts Only	AntialiasingSettingsView		等幅フォントのみ有効
+LCD subpixel	AntialiasingSettingsView		LCD サブピクセル
+Inactive Window Tab Text	Colors tab		非アクティブウィンドウタブの文字
+Strong	AntialiasingSettingsView		強い
+Control Highlight	Colors tab		コントロールのハイライト
+Control Text	Colors tab		コントロールの文字
+Tooltip Text	Colors tab		ツールチップの文字
+Antialiasing menu	AntialiasingSettingsView		アンチエイリアスメニュー
+Selected Menu Item Background	Colors tab		メニュー選択項目の背景
+Glyph hinting:	AntialiasingSettingsView		グリフのヒンティング：
+Panel Text	Colors tab		パネルの文字
