@@ -528,7 +528,13 @@ MountVolume::ArgvReceived(int32 argc, char** argv)
 void
 MountVolume::ReadyToRun()
 {
-	Quit();
+	// We will only get here if we were launched without any arguments or
+	// startup messages
+
+	extern int __libc_argc;
+	extern char** __libc_argv;
+
+	ArgvReceived(__libc_argc, __libc_argv);
 }
 
 
