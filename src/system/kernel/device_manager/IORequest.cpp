@@ -15,6 +15,7 @@
 #include <thread.h>
 #include <util/AutoLock.h>
 #include <vm.h>
+#include <vm_address_space.h>
 
 #include "dma_resources.h"
 
@@ -65,6 +66,15 @@ IORequestChunk::operator delete(void* address, size_t size)
 //	#pragma mark -
 
 
+struct virtual_vec_cookie {
+	uint32	vec_index;
+	size_t	vec_offset;
+	area_id	mapped_area;
+	void*	physical_page_handle;
+	addr_t	virtual_address;
+};
+
+
 IOBuffer*
 IOBuffer::Create(uint32 count, bool vip)
 {
@@ -112,6 +122,92 @@ IOBuffer::SetVecs(size_t firstVecOffset, const iovec* vecs, uint32 count,
 	fLength = length;
 	fUser = IS_USER_ADDRESS(vecs[0].iov_base);
 	fPhysical = (flags & B_PHYSICAL_IO_REQUEST) != 0;
+}
+
+
+status_t
+IOBuffer::GetNextVirtualVec(void*& _cookie, iovec& vector)
+{
+	virtual_vec_cookie* cookie = (virtual_vec_cookie*)_cookie;
+	if (cookie == NULL) {
+		cookie = new(std::nothrow) virtual_vec_cookie;
+		if (cookie == NULL)
+			return B_NO_MEMORY;
+
+		cookie->vec_index = 0;
+		cookie->vec_offset = 0;
+		cookie->mapped_area = -1;
+		cookie->physical_page_handle = NULL;
+		cookie->virtual_address = 0;
+		_cookie = cookie;
+	}
+
+	// recycle a potential previously mapped page
+	if (cookie->physical_page_handle != NULL) {
+		vm_put_physical_page(cookie->virtual_address,
+			cookie->physical_page_handle);
+	}
+
+	if (cookie->vec_index >= fVecCount)
+		return B_BAD_INDEX;
+
+	if (!fPhysical) {
+		vector = fVecs[cookie->vec_index++];
+		return B_OK;
+	}
+
+	if (cookie->vec_index == 0
+		&& (fVecCount > 1 || fVecs[0].iov_len > B_PAGE_SIZE)) {
+		void* mappedAddress;
+		addr_t mappedSize;
+
+		cookie->mapped_area = vm_map_physical_memory_vecs(
+			vm_kernel_address_space_id(), "io buffer mapped physical vecs",
+			&mappedAddress, B_ANY_KERNEL_ADDRESS, &mappedSize,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, fVecs, fVecCount);
+
+		if (cookie->mapped_area >= 0) {
+			vector.iov_base = (void*)mappedAddress;
+			vector.iov_len = mappedSize;
+			return B_OK;
+		} else
+			ktrace_printf("failed to map area: %s\n", strerror(cookie->mapped_area));
+	}
+
+	// fallback to page wise mapping
+	iovec& currentVec = fVecs[cookie->vec_index];
+	addr_t address = (addr_t)currentVec.iov_base + cookie->vec_offset;
+	addr_t pageOffset = address % B_PAGE_SIZE;
+
+	status_t result = vm_get_physical_page(address - pageOffset,
+		&cookie->virtual_address, &cookie->physical_page_handle);
+	if (result != B_OK)
+		return result;
+
+	size_t length = min_c(currentVec.iov_len - cookie->vec_offset,
+		B_PAGE_SIZE - pageOffset);
+
+	vector.iov_base = (void*)(cookie->virtual_address + pageOffset);
+	vector.iov_len = length;
+
+	cookie->vec_offset += length;
+	if (cookie->vec_offset >= currentVec.iov_len) {
+		cookie->vec_index++;
+		cookie->vec_offset = 0;
+	}
+
+	return B_OK;
+}
+
+
+void
+IOBuffer::FreeVirtualVecCookie(void* _cookie)
+{
+	virtual_vec_cookie* cookie = (virtual_vec_cookie*)_cookie;
+	if (cookie->mapped_area >= 0)
+		delete_area(cookie->mapped_area);
+
+	delete cookie;
 }
 
 

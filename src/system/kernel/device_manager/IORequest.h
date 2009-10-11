@@ -55,6 +55,10 @@ public:
 			size_t				VecCount() const { return fVecCount; }
 			size_t				Capacity() const { return fCapacity; }
 
+			status_t			GetNextVirtualVec(void*& cookie,
+									iovec& vector);
+			void				FreeVirtualVecCookie(void* cookie);
+
 			status_t			LockMemory(team_id team, bool isWrite);
 			void				UnlockMemory(team_id team, bool isWrite);
 			bool				IsMemoryLocked() const
