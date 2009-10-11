@@ -5,13 +5,10 @@
 #ifndef	_JOYSTICK_H
 #define	_JOYSTICK_H
 
-#include <BeBuild.h>
+
 #include <OS.h>
 #include <SupportDefs.h>
 
-#if DEBUG
-#include <stdio.h>
-#endif
 
 class BList;
 class BString;
@@ -19,6 +16,7 @@ class _BJoystickTweaker;
 struct entry_ref;
 struct _extended_joystick;
 struct _joystick_info;
+
 
 class BJoystick {
 public:
@@ -35,7 +33,7 @@ public:
 			bigtime_t		timestamp;
 			int16			horizontal;
 			int16			vertical;
-		
+
 			bool			button1;
 			bool			button2;
 
@@ -58,12 +56,12 @@ public:
 								int32 forStick = 0);
 			status_t		GetAxisNameAt(int32 index,
 								BString* outName);
-		
+
 			int32			CountHats();
 			status_t		GetHatValues(uint8* outHats,
 								int32 forStick = 0);
 			status_t		GetHatNameAt(int32 index, BString* outName);
-		
+
 			int32			CountButtons();
 
 			uint32			ButtonValues(int32 forStick = 0);
@@ -80,16 +78,20 @@ friend class _BJoystickTweaker;
 			status_t		GatherEnhanced_info(const entry_ref* ref = NULL);
 			status_t		SaveConfig(const entry_ref* ref = NULL);
 
+			void            _ReservedJoystick1();
+	virtual void            _ReservedJoystick2();
+	virtual void            _ReservedJoystick3();
+	virtual status_t        _Reserved_Joystick_4(void *, ...);
+	virtual status_t        _Reserved_Joystick_5(void *, ...);
+	virtual status_t        _Reserved_Joystick_6(void *, ...);
+
 			bool			fBeBoxMode;
 			bool			fReservedBool;
 			int				ffd;
 			BList*			fDevices;
 			_joystick_info*	fJoystickInfo;
 			char*			fDevName;
-#if DEBUG
-public:
-	static	FILE*			sLogFile;
-#endif
+			uint32          _reserved_Joystick_[10];
 };
 
 #endif // _JOYSTICK_H

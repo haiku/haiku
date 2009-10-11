@@ -4,6 +4,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <List.h>
 #include "Joystick.h"
 
@@ -30,8 +31,11 @@ LOG(const char *fmt, ...)
 	va_end(ap);
 	fputs(buf, BJoystick::sLogFile); fflush(BJoystick::sLogFile);
 }
+
 #	define LOG_ERR(text...) LOG(text)
-FILE *BJoystick::sLogFile = NULL;
+
+static FILE *sLogFile = NULL;
+
 #else
 #	define LOG(text...)
 #	define LOG_ERR(text...) fprintf(stderr, text)
@@ -112,14 +116,14 @@ BJoystick::Open(const char *portName, bool enter_enhanced)
 		//Read the Joystick Description file for this port/joystick
 		_BJoystickTweaker jt(*this);
 		jt.GetInfo(fJoystickInfo, portName);
-	
+
 		LOG("ioctl - %d\n", fJoystickInfo->num_buttons);
 		ioctl(ffd, B_JOYSTICK_SET_DEVICE_MODULE, fJoystickInfo);
 		ioctl(ffd, B_JOYSTICK_GET_DEVICE_MODULE, fJoystickInfo);
 		LOG("ioctl - %d\n", fJoystickInfo->num_buttons);
-		
+
 		return ffd;
-	} else	
+	} else
 		return errno;
 }
 
@@ -152,7 +156,7 @@ BJoystick::CountDevices()
 
 	// Refresh devices list
 	ScanDevices(true);
-	
+
 	int32 count = 0;
 	if (fDevices != NULL)
 		count = fDevices->CountItems();
@@ -361,3 +365,13 @@ BJoystick::SaveConfig(const entry_ref *ref)
 	return B_ERROR;
 }
 
+
+//	#pragma mark - FBC protection
+
+
+void BJoystick::_ReservedJoystick1() {}
+void BJoystick::_ReservedJoystick2() {}
+void BJoystick::_ReservedJoystick3() {}
+status_t BJoystick::_Reserved_Joystick_4(void*, ...) { return B_ERROR; }
+status_t BJoystick::_Reserved_Joystick_5(void*, ...) { return B_ERROR; }
+status_t BJoystick::_Reserved_Joystick_6(void*, ...) { return B_ERROR; }
