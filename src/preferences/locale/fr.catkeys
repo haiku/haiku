@@ -8,7 +8,7 @@ Unable to find the available languages! You can't use this preflet!	Locale Prefl
 After	TimeFormatSettings		Après
 Long format:	TimeFormatSettings		Format long:
 Before	TimeFormatSettings		Avant
-Currency	TimeFormatSettings		Avant
+Currency	TimeFormatSettings		Devise
 Year	TimeFormatSettings		Année
 Short format:	TimeFormatSettings		Format court:
 Currency symbol:	TimeFormatSettings		Symbole monétaire:

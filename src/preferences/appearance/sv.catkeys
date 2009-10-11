@@ -1,0 +1,43 @@
+1	swedish	x-vnd.Haiku-Appearance	959674221
+Navigation Pulse	Colors tab		Navigeringspuls
+Shadow	Colors tab		Skugga
+On	AntialiasingSettingsView		Aktiv
+Defaults	APRWindow		Förval
+Grayscale	AntialiasingSettingsView		Gråskala
+Shine	Colors tab		Ljusstyrka
+Off	AntialiasingSettingsView		Inaktiv
+Anti-aliasing type:	AntialiasingSettingsView		Kantutjämningstyp:
+Success	Colors tab		Framgång
+Inactive Window Tab	Colors tab		Flikfärg för inaktiva fönster
+Failure	Colors tab		Misslyckande
+Hinting menu	AntialiasingSettingsView		Hinting-meny
+Control Border	Colors tab		Kontrollkant
+Document Background	Colors tab		Dokumentbakgrund
+Revert	APRWindow		Återgå
+Selected Menu Item Border	Colors tab		Kantfärg för valt menyalternativ
+Selected Menu Item Text	Colors tab		Textfärg för valt menyalternativ
+Antialiasing	APRWindow		Kantutjämning
+Window Tab Text	Colors tab		Fönsterflikfärg
+Tooltip Background	Colors tab		Tooltipsbakgrund
+Document Text	Colors tab		Dokumenttext
+Navigation Base	Colors tab		Navigeringsbas
+Menu Background	Colors tab		Menybakgrund
+Appearance	APRWindow		Utseende
+Control Background	Colors tab		Kontrollbkgrund
+Colors	APRWindow		Färger
+Panel Background	Colors tab		Panelbakgrund
+Window Tab	Colors tab		Fösterflik
+Reduce colored edges filter strength:	AntialiasingSettingsView		Minska färgintensitet på färgade kanter:
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpixel-baerad kantutjämning i kombination med glyfhinting är inte tillgängligt i färdigbyggda Haiku för att undvika patentproblem. För att aktivera denna funktionalitet, måste du själv kompilera Haiku och välja särskilda val i libfreetypes konfigurationsheader.
+Menu Item Text	Colors tab		Menyalternativstext
+Monospaced Fonts Only	AntialiasingSettingsView		Endast teckensnitt med fast bredd
+LCD subpixel	AntialiasingSettingsView		LCD-subpixel
+Inactive Window Tab Text	Colors tab		Fliktext för inaktiva fönster
+Strong	AntialiasingSettingsView		Framhävd
+Control Highlight	Colors tab		Framhävd kontroll
+Control Text	Colors tab		Kontrolltext
+Tooltip Text	Colors tab		Tooltiptext
+Antialiasing menu	AntialiasingSettingsView		Kantutjämningsmeny
+Selected Menu Item Background	Colors tab		Bakgrund för valt menyalternativ
+Glyph hinting:	AntialiasingSettingsView		Glyfhinting:
+Panel Text	Colors tab		Paneltext
