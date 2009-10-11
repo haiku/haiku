@@ -1014,10 +1014,11 @@ private:
 	PageWriterRun*		fRun;
 	struct VMCache*		fCache;
 	off_t				fOffset;
-	addr_t				fPhysicalPageNumber;
 	uint32				fPageCount;
 	int32				fMaxPages;
 	status_t			fStatus;
+	uint32				fVecCount;
+	iovec				fVecs[32]; // TODO: make dynamic/configurable
 };
 
 
@@ -1152,10 +1153,13 @@ PageWriteTransfer::SetTo(PageWriterRun* run, vm_page* page, int32 maxPages)
 	fRun = run;
 	fCache = page->cache;
 	fOffset = page->cache_offset;
-	fPhysicalPageNumber = page->physical_page_number;
 	fPageCount = 1;
 	fMaxPages = maxPages;
 	fStatus = B_OK;
+
+	fVecs[0].iov_base = (void*)(page->physical_page_number << PAGE_SHIFT);
+	fVecs[0].iov_len = B_PAGE_SIZE;
+	fVecCount = 1;
 }
 
 
@@ -1166,23 +1170,53 @@ PageWriteTransfer::AddPage(vm_page* page)
 		|| (fMaxPages >= 0 && fPageCount >= (uint32)fMaxPages))
 		return false;
 
-	// TODO: this makes it required to be physically contiguous even though
-	// we could put physically disjoint pages into the same write using
-	// seperate iovecs for each page.
-	if ((page->physical_page_number != fPhysicalPageNumber + fPageCount
-			|| page->cache_offset != fOffset + fPageCount)
-		&& (page->physical_page_number != fPhysicalPageNumber - 1
-			|| page->cache_offset != fOffset - 1)) {
-		return false;
+	addr_t nextBase
+		= (addr_t)fVecs[fVecCount - 1].iov_base + fVecs[fVecCount - 1].iov_len;
+
+	if (page->physical_page_number << PAGE_SHIFT == nextBase
+		&& page->cache_offset == fOffset + fPageCount) {
+		// append to last iovec
+		fVecs[fVecCount - 1].iov_len += B_PAGE_SIZE;
+		fPageCount++;
+		return true;
 	}
 
-	if (page->physical_page_number < fPhysicalPageNumber)
-		fPhysicalPageNumber = page->physical_page_number;
-	if (page->cache_offset < fOffset)
+	nextBase = (addr_t)fVecs[0].iov_base - B_PAGE_SIZE;
+	if (page->physical_page_number << PAGE_SHIFT == nextBase
+		&& page->cache_offset == fOffset - 1) {
+		// prepend to first iovec and adjust offset
+		fVecs[0].iov_base = (void*)nextBase;
+		fVecs[0].iov_len += B_PAGE_SIZE;
 		fOffset = page->cache_offset;
+		fPageCount++;
+		return true;
+	}
 
-	fPageCount++;
-	return true;
+	if ((page->cache_offset == fOffset + fPageCount
+			|| page->cache_offset == fOffset - 1)
+		&& fVecCount < sizeof(fVecs) / sizeof(fVecs[0])) {
+		// not physically contiguous or not in the right order
+		uint32 vectorIndex;
+		if (page->cache_offset < fOffset) {
+			// we are pre-pending another vector, move the other vecs
+			for (uint32 i = fVecCount; i > 0; i--)
+				fVecs[i] = fVecs[i - 1];
+
+			fOffset = page->cache_offset;
+			vectorIndex = 0;
+		} else
+			vectorIndex = fVecCount;
+
+		fVecs[vectorIndex].iov_base
+			= (void*)(page->physical_page_number << PAGE_SHIFT);
+		fVecs[vectorIndex].iov_len = B_PAGE_SIZE;
+
+		fVecCount++;
+		fPageCount++;
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -1192,16 +1226,12 @@ PageWriteTransfer::Schedule(uint32 flags)
 	off_t writeOffset = (off_t)fOffset << PAGE_SHIFT;
 	size_t writeLength = fPageCount << PAGE_SHIFT;
 
-	iovec vecs[1];
-	vecs->iov_base = (void*)(addr_t)(fPhysicalPageNumber << PAGE_SHIFT);
-	vecs->iov_len = writeLength;
-
 	if (fRun != NULL) {
-		return fCache->WriteAsync(writeOffset, vecs, 1, writeLength,
+		return fCache->WriteAsync(writeOffset, fVecs, fVecCount, writeLength,
 			flags | B_PHYSICAL_IO_REQUEST, this);
 	}
 
-	status_t status = fCache->Write(writeOffset, vecs, 1,
+	status_t status = fCache->Write(writeOffset, fVecs, fVecCount,
 		flags | B_PHYSICAL_IO_REQUEST, &writeLength);
 
 	SetStatus(status, writeLength);
@@ -2202,6 +2232,7 @@ vm_page_allocate_page_run(int pageState, addr_t base, addr_t length)
 				break;
 			}
 		}
+
 		if (foundRun) {
 			// pull the pages out of the appropriate queues
 			for (i = 0; i < length; i++) {
@@ -2210,11 +2241,11 @@ vm_page_allocate_page_run(int pageState, addr_t base, addr_t length)
 				set_page_state_nolock(&sPages[start + i], PAGE_STATE_BUSY);
 				sPages[start + i].usage_count = 2;
 			}
+
 			firstPage = &sPages[start];
 			break;
-		} else {
+		} else
 			start += i;
-		}
 	}
 
 	T(AllocatePageRun(length));
