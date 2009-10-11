@@ -184,7 +184,7 @@ periph_io(scsi_periph_device_info *device, io_operation *operation,
 		request->flags = operation->IsWrite() ? SCSI_DIR_OUT : SCSI_DIR_IN;
 
 		// make sure we avoid 10 byte commands if they aren't supported
-		if( !device->rw10_enabled || device->preferred_ccb_size == 6) {
+		if (!device->rw10_enabled || device->preferred_ccb_size == 6) {
 			// restricting transfer is OK - the block manager will
 			// take care of transferring the rest
 			if (numBlocks > 0x100)
