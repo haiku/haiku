@@ -67,6 +67,9 @@ AbstractTable::AddColumn(TableColumn* column)
 	}
 
 	BColumnListView::AddColumn(privateColumn, column->ModelIndex());
+
+	// TODO: The derived classes need to be notified, so that they can create
+	// fields for the existing rows.
 }
 
 
