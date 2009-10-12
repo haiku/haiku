@@ -146,12 +146,15 @@ LprSetupView::UpdateViewData()
 			return false;
 		}
 
-		fDir->WriteAttr(LPR_SERVER_NAME, B_STRING_TYPE, 0, fServer->Text(), strlen(fServer->Text()) + 1);
-		fDir->WriteAttr(LPR_QUEUE_NAME,  B_STRING_TYPE, 0, fQueue->Text(),  strlen(fQueue->Text())  + 1);
+		fDir->WriteAttr(LPR_SERVER_NAME, B_STRING_TYPE, 0, fServer->Text(),
+			strlen(fServer->Text()) + 1);
+		fDir->WriteAttr(LPR_QUEUE_NAME,  B_STRING_TYPE, 0, fQueue->Text(),
+			strlen(fQueue->Text())  + 1);
 		return true;
 	}
 
-	BAlert *alert = new BAlert("", "please input parameters.", "OK");
+	BAlert *alert = new BAlert("", "Please enter server address and printer"
+		"queue name.", "OK");
 	alert->Go();
 	return false;
 }
@@ -159,66 +162,32 @@ LprSetupView::UpdateViewData()
 
 LprSetupDlg::LprSetupDlg(BDirectory *dir)
 	:
-	BWindow(BRect(100, 100, 100 + DLG_WIDTH, 100 + DLG_HEIGHT),
+	DialogWindow(BRect(100, 100, 100 + DLG_WIDTH, 100 + DLG_HEIGHT),
 		"LPR Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE)
 {
-	fResult = 0;
-
-	Lock();
-	LprSetupView *view = new LprSetupView(Bounds(), dir);
-	AddChild(view);
-	Unlock();
-
-	fExitSemaphore = create_sem(0, "lprSetupSem");
-}
-
-
-bool
-LprSetupDlg::QuitRequested()
-{
-	fResult = B_ERROR;
-	release_sem(fExitSemaphore);
-	return true;
+	fSetupView = new LprSetupView(Bounds(), dir);
+	AddChild(fSetupView);
 }
 
 
 void
 LprSetupDlg::MessageReceived(BMessage *msg)
 {
-	bool success;
-
 	switch (msg->what) {
 		case M_OK:
-			Lock();
-			success = ((LprSetupView *)ChildAt(0))->UpdateViewData();
-			Unlock();
-			if (success) {
-				fResult = B_NO_ERROR;
-				release_sem(fExitSemaphore);
+			if (fSetupView->UpdateViewData()) {
+				SetResult(B_OK);
+				PostMessage(B_QUIT_REQUESTED);
 			}
 			break;
 
 		case M_CANCEL:
-			fResult = B_ERROR;
-			release_sem(fExitSemaphore);
+			SetResult(B_ERROR);
+			PostMessage(B_QUIT_REQUESTED);
 			break;
 
 		default:
-			BWindow::MessageReceived(msg);
-			break;
+			DialogWindow::MessageReceived(msg);
 	}
-}
-
-
-int
-LprSetupDlg::Go()
-{
-	Show();
-	acquire_sem(fExitSemaphore);
-	delete_sem(fExitSemaphore);
-	int value = fResult;
-	Lock();
-	Quit();
-	return value;
 }

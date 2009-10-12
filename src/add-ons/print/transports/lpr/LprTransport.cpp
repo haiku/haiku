@@ -77,8 +77,20 @@ LprTransport::LprTransport(BMessage *msg)
 
 LprTransport::~LprTransport()
 {
+	if (!fError)
+		_SendFile();
+
+	if (fFile[0] != '\0')
+		unlink(fFile);
+}
+
+
+void
+LprTransport::_SendFile()
+{
 	char hostname[128];
-	gethostname(hostname, sizeof(hostname));
+	if (gethostname(hostname, sizeof(hostname)) != B_OK)
+		strcpy(hostname, "localhost");
 
 	ostringstream cfname;
 	cfname << "cfA" << setw(3) << setfill('0') << fJobId << hostname;
@@ -116,8 +128,6 @@ LprTransport::~LprTransport()
 		BAlert *alert = new BAlert("", err.what(), "OK");
 		alert->Go();
 	}
-
-	unlink(fFile);
 }
 
 

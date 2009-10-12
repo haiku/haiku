@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src add-ons print transports lpr ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons print transports shared ] ;
 
 Addon LPR :
@@ -13,7 +14,11 @@ Addon LPR :
 	Socket.o
 	SocketStream.o
 	DbgMsg.o
-	: be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++)
+	: 
+	be 
+	libprint.a
+	$(TARGET_NETWORK_LIBS) 
+	$(TARGET_LIBSTDC++)
 ;
 
 ObjectReferences

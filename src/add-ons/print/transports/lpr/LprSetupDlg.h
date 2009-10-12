@@ -6,19 +6,20 @@
 
 #include <Window.h>
 
-class BDirectory;
+#include "DialogWindow.h"
 
-class LprSetupDlg : public BWindow {
+class BDirectory;
+class LprSetupView;
+
+
+class LprSetupDlg : public DialogWindow {
 public:
 					LprSetupDlg(BDirectory *);
 					~LprSetupDlg() {}
-	virtual bool	QuitRequested();
 	virtual void	MessageReceived(BMessage *message);
-			int 	Go();
 
 private:
-	int    fResult;
-	sem_id fExitSemaphore;
+	LprSetupView*	fSetupView;
 };
 
 #endif	// __LprSetupDlg_H

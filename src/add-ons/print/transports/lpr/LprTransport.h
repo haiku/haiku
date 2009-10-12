@@ -21,6 +21,8 @@ public:
 			bool 	fail() const;
 
 private:
+	void			_SendFile();
+
 	char    fServer[256];
 	char    fQueue[256];
 	char    fFile[256];
