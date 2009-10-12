@@ -1790,7 +1790,7 @@ BlockAllocator::CheckInode(Inode* inode, check_control* control)
 		if (status != B_OK)
 			return status;
 
-		int32 runsPerBlock = runs_per_block(fVolume);
+		int32 runsPerBlock = runs_per_block(fVolume->BlockSize());
 		int32 runsPerArray = runsPerBlock * data->double_indirect.Length();
 
 		CachedBlock cachedDirect(fVolume);

@@ -1327,8 +1327,8 @@ Inode::AllocatedSize() const
 	if (data.MaxDoubleIndirectRange() != 0) {
 		off_t doubleIndirectSize = data.MaxDoubleIndirectRange()
 			- data.MaxIndirectRange();
-		int32 indirectSize = double_indirect_max_indirect_size(fVolume,
-			data.double_indirect.Length());
+		int32 indirectSize = double_indirect_max_indirect_size(
+			data.double_indirect.Length(), fVolume->BlockSize());
 
 		size += (2 * data.double_indirect.Length()
 				+ doubleIndirectSize / indirectSize)
@@ -1372,8 +1372,8 @@ Inode::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 			int32 runsPerBlock;
 			int32 directSize;
 			int32 indirectSize;
-			get_double_indirect_sizes(fVolume, data->double_indirect.Length(),
-				runsPerBlock, directSize, indirectSize);
+			get_double_indirect_sizes(data->double_indirect.Length(),
+				fVolume->BlockSize(), runsPerBlock, directSize, indirectSize);
 
 			off_t start = pos - data->MaxIndirectRange();
 			int32 index = start / indirectSize;
@@ -1855,8 +1855,8 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 			int32 runsPerBlock;
 			int32 directSize;
 			int32 indirectSize;
-			get_double_indirect_sizes(fVolume, data->double_indirect.Length(),
-				runsPerBlock, directSize, indirectSize);
+			get_double_indirect_sizes(data->double_indirect.Length(),
+				fVolume->BlockSize(), runsPerBlock, directSize, indirectSize);
 
 			off_t start = data->MaxDoubleIndirectRange()
 				- data->MaxIndirectRange();
@@ -1957,10 +1957,13 @@ Inode::_FreeStaticStreamArray(Transaction& transaction, int32 level,
 	block_run run, off_t size, off_t offset, off_t& max)
 {
 	int32 indirectSize;
-	if (level == 0)
-		indirectSize = double_indirect_max_indirect_size(fVolume, run.Length());
-	else
-		indirectSize = double_indirect_max_direct_size(fVolume, run.Length());
+	if (level == 0) {
+		indirectSize = double_indirect_max_indirect_size(run.Length(),
+			fVolume->BlockSize());
+	} else {
+		indirectSize = double_indirect_max_direct_size(run.Length(),
+			fVolume->BlockSize());
+	}
 
 	off_t start;
 	if (size > offset)

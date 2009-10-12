@@ -1,8 +1,10 @@
-/* Stream - inode stream access functions
-**
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
+
+
+//!	Inode stream access functions
 
 
 #include "Stream.h"
@@ -200,15 +202,17 @@ Stream::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 
 			CachedBlock cached(fVolume);
 
+			int32 runsPerBlock;
+			int32 directSize;
+			int32 indirectSize;
+			get_double_indirect_sizes(data.double_indirect.Length(),
+				cached.BlockSize(), runsPerBlock, directSize, indirectSize);
+
 			off_t start = pos - data.MaxIndirectRange();
-			int32 indirectSize = (1L << (INDIRECT_BLOCKS_SHIFT + cached.BlockShift()))
-				* (fVolume.BlockSize() / sizeof(block_run));
-			int32 directSize = NUM_ARRAY_BLOCKS << cached.BlockShift();
 			int32 index = start / indirectSize;
-			int32 runsPerBlock = cached.BlockSize() / sizeof(block_run);
 
 			block_run *indirect = (block_run *)cached.SetTo(
-					fVolume.ToBlock(data.double_indirect) + index / runsPerBlock);
+				fVolume.ToBlock(data.double_indirect) + index / runsPerBlock);
 			if (indirect == NULL)
 				return B_ERROR;
 

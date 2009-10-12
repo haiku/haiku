@@ -8,7 +8,7 @@
 
 #include "system_dependencies.h"
 
-#include "Volume.h"
+#include "bfs.h"
 
 
 enum inode_type {
@@ -96,33 +96,37 @@ get_shift(uint64 i)
 
 
 inline int32
-runs_per_block(Volume* volume)
+runs_per_block(uint32 blockSize)
 {
-	return volume->BlockSize() / sizeof(block_run);
+#ifdef _BOOT_MODE
+	using namespace BFS;
+#endif
+
+	return blockSize / sizeof(struct block_run);
 }
 
 
 inline int32
-double_indirect_max_direct_size(Volume* volume, uint32 baseLength)
+double_indirect_max_direct_size(uint32 baseLength, uint32 blockSize)
 {
-	return baseLength << volume->BlockShift();
+	return baseLength * blockSize;
 }
 
 
 inline int32
-double_indirect_max_indirect_size(Volume* volume, uint32 baseLength)
+double_indirect_max_indirect_size(uint32 baseLength, uint32 blockSize)
 {
-	return baseLength * double_indirect_max_direct_size(volume, baseLength)
-		* runs_per_block(volume);
+	return baseLength * double_indirect_max_direct_size(baseLength, blockSize)
+		* runs_per_block(blockSize);
 }
 
 
 inline void
-get_double_indirect_sizes(Volume* volume, uint32 baseLength,
+get_double_indirect_sizes(uint32 baseLength, uint32 blockSize,
 	int32& runsPerBlock, int32& directSize, int32& indirectSize)
 {
-	runsPerBlock = runs_per_block(volume);
-	directSize = double_indirect_max_direct_size(volume, baseLength);
+	runsPerBlock = runs_per_block(blockSize);
+	directSize = double_indirect_max_direct_size(baseLength, blockSize);
 	indirectSize = baseLength * directSize * runsPerBlock;
 }
 
