@@ -24,6 +24,11 @@ public:
 		return fRowIndex;
 	}
 
+	void SetRowIndex(int32 rowIndex)
+	{
+		fRowIndex = rowIndex;
+	}
+
 private:
 	int32	fRowIndex;
 };
@@ -508,18 +513,27 @@ Table::TableRowsAdded(TableModel* model, int32 rowIndex, int32 count)
 
 		AddRow(row, i);
 	}
+
+	// re-index the subsequent rows
+	_UpdateRowIndices(endRow);
 }
 
 
 void
 Table::TableRowsRemoved(TableModel* model, int32 rowIndex, int32 count)
 {
+	int32 rowsRemoved = 0;
+
 	for (int32 i = rowIndex + count - 1; i >= rowIndex; i--) {
 		if (BRow* row = fRows.RemoveItemAt(i)) {
 			RemoveRow(row);
 			delete row;
+			rowsRemoved++;
 		}
 	}
+
+	// re-index the subsequent rows
+	_UpdateRowIndices(rowIndex);
 }
 
 
@@ -547,6 +561,19 @@ Table::ItemInvoked()
 	int32 listenerCount = fListeners.CountItems();
 	for (int32 i = listenerCount - 1; i >= 0; i--)
 		fListeners.ItemAt(i)->TableRowInvoked(this, index);
+}
+
+
+void
+Table::_UpdateRowIndices(int32 fromIndex)
+{
+	for (int32 i = fromIndex; BRow* row = fRows.ItemAt(i); i++) {
+		for (int32 k = 0;
+			TableField* field = dynamic_cast<TableField*>(row->GetField(k));
+			k++) {
+			field->SetRowIndex(i);
+		}
+	}
 }
 
 

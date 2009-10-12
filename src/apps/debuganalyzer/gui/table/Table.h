@@ -135,6 +135,7 @@ private:
 private:
 	virtual	void				ItemInvoked();
 
+			void				_UpdateRowIndices(int32 fromIndex);
 			int32				_ModelIndexOfRow(BRow* row);
 
 private:
