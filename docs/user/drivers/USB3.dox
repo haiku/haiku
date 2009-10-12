@@ -52,7 +52,7 @@
 */
 
 /*!
-  \typedef usb_interface_list usb_interface_list
+  \typedef struct usb_interface_list usb_interface_list
   \brief Container that holds a list of USB interface descriptors.
   \see Documentation for usb_interface_list.
 */
@@ -74,7 +74,7 @@
   \fn status_t (*usb_notify_hooks::device_added)(usb_device device, void **cookie)
   \brief Called by the stack in case a device is added.
   
-  As soon as you have registered hooks using the 
+  Once you have registered hooks using the 
   usb_module_info::install_notify() method, this hook will be called as soon as
   a device is inserted that matches your provided usb_support_descriptor.
   
@@ -82,7 +82,7 @@
   \param[in] cookie You can store a pointer to an object in this variable.
     When the device is removed, this cookie will be provided to you.
   \return You should return \c B_OK in case of success. The USB stack will then
-    request the kernel to republish your device names, so that the new device
+    request the kernel to republish your device names so that the new device
     will be shown in the \c /dev tree. If you return an error value, the 
     \a device id will become invalid and you will not be notified if this
     device is removed.
@@ -97,7 +97,7 @@
   be called as soon as the device is removed.
   
   \param cookie The cookie you provided in the device_added() hook. Make sure
-    that you free the cookie, if necessary.
+    that you free the cookie if necessary.
   \return Currently the return value of this hook is ignored. It is recommended
     to return \c B_OK though.
 */
@@ -109,8 +109,8 @@
   \brief Description of device descriptor that the driver can handle.
   
   Support descriptors can be used to match any form of class, subclass or
-  protocol, or a vendor and/or product. If any field has the value \c 0, it
-  is treated as a wildcard.
+  protocol, or they can be used to match a vendor and/or product.
+  If any field has the value \c 0, it is treated as a wildcard.
   
   For example, if you want to watch for all the hubs, which have a device
   class of \c 0x09, you would pass this descriptor:
@@ -130,7 +130,7 @@
 
 /*!
   \var usb_support_descriptor::dev_subclass
-  \brief The suported device subclasses.
+  \brief The supported device subclasses.
 */
 
 /*!
@@ -301,15 +301,16 @@
   \param status The status of the transfer. This is one of the following:
     <table>
       <tr>
-        <td><em>B_OK</em></td><td>Transfer succeeded.</td>
+        <td><em>B_OK</em></td><td>The transfer succeeded.</td>
       </tr>
       <tr>
-        <td><em>B_CANCELED</em></td><td>Transfer cancelled by the user via a 
-          usb_module_info::cancel_queued_transfers() call.</td>
+        <td><em>B_CANCELED</em></td><td>The transfer was cancelled by the user
+          via a usb_module_info::cancel_queued_transfers() call.</td>
       </tr>
       <tr>
         <td><em>B_DEV_MULTIPLE_ERRORS</em></td><td>More than one of the errors
-          below. Unfortunately, the stack cannot give you more information.</td>
+          below occurred. Unfortunately, the stack cannot give you more
+          information.</td>
       </tr>
       <tr>
         <td><em>B_DEV_STALLED</em></td><td>The endpoint is stalled. You can use
@@ -322,25 +323,25 @@
       </tr>
       <tr>
         <td><em>B_DEV_DATA_UNDERRUN</em></td><td>Outgoing transfer: more data
-          flowing out than the endpoint accepts.</td>
+          is flowing out than the endpoint accepts.</td>
       </tr>
       <tr>
         <td><em>B_DEV_CRC_ERROR</em></td><td>The internal data consistency
-          checks of the USB protocol failed. You are best to retry. If you keep
-          on getting this error, there might be something wrong with the
+          checks of the USB protocol failed. It is best to retry. If you keep
+          on getting this error there might be something wrong with the
           device.</td>
       </tr>
       <tr>
-        <td><em>B_DEV_UNEXPECTED_PID</em></td><td>Internal error. You should
-          retry your transfer.</td>
+        <td><em>B_DEV_UNEXPECTED_PID</em></td><td>There was an internal error.
+          You should retry your transfer.</td>
       </tr>
       <tr>
-        <td><em>B_DEV_FIFO_OVERRUN</em></td><td>Internal error. You should
-          retry your transfer.</td>
+        <td><em>B_DEV_FIFO_OVERRUN</em></td><td>internal error.
+          You should retry your transfer.</td>
       </tr>
       <tr>
-         <td><em>B_DEV_FIFO_UNDERRUN</em></td><td>Internal error. You should
-          retry your transfer.</td>
+         <td><em>B_DEV_FIFO_UNDERRUN</em></td><td>There was an internal error.
+           You should retry your transfer.</td>
       </tr>
     </table>
   \param data The provided buffer.
@@ -364,14 +365,14 @@
   \brief Register your driver.
   
   To let the USB stack know that a driver is available to support devices, a
-  driver needs to register itself first. To let the stack know which devices
+  driver needs to register itself first. To let the stack know about devices
   it needs to notify the driver of, have a look at usb_support_descriptor.
   
   It is possible to supply a list of support constructors. You should allocate
-  an array of support constructors, and give the amount of constructors in the
+  an array of support constructors and give the amount of constructors in the
   array using the \a supportDescriptorCount parameter.
   
-  In case your driver supports all devices, or more likely, in case you want to
+  In case your driver supports all devices or, more likely, you want to
   monitor all devices plugged in and removed, it is safe to pass \c NULL to the
   \a supportDescriptors paramater and zero (0) to \a supportDescriptorCount.
   
@@ -400,8 +401,8 @@
   are called whenever a device that matches your \link usb_support_descriptor
   support descriptor \endlink . 
   
-  As soon as the hooks are installed you'll receive callbacks for devices that
-  are already attached, so make sure your driver is initialized properly when
+  As soon as the hooks are installed, you'll receive callbacks for devices that
+  are already attached; so make sure your driver is initialized properly when
   calling this method. 
   
   \param driverName The name you passed in register_driver(). 
@@ -419,7 +420,7 @@
   \brief Uninstall notify hooks for your driver.
   
   If your driver needs to stop, you can uninstall the notifier hooks. This will
-  clear the stored hooks in the driver and you will not receive any
+  clear the stored hooks in the driver, and you will not receive any
   notifications when new devices are attached. This method will also call
   usb_notify_hooks::device_removed() for all the devices that you are using and
   all the stack's resources that are allocated to your driver are cleared.
@@ -443,9 +444,9 @@
   
   \param device The id of the device you want to query.
   \param index The (zero based) offset of the list of configurations.
-  \return The usb_configuration_info with the standard usb configuration 
-    descriptor, or \c NULL if the \a id is invalid or the \a index is out of
-    bounds.
+  \return This will normally return the usb_configuration_info with the
+    standard usb configuration descriptor.  \c NULL will be returned if the
+    \a id is invalid or the \a index is out of bounds.
 */
 
 /*!
@@ -453,8 +454,8 @@
   \brief Get the current configuration.
   
   \param id The id of the device you want to query.
-  \retval The usb_configuration_info with the standard usb configuration
-    descriptor, or \c NULL if the \a id is invalid.
+  \retval This will return usb_configuration_info with the standard usb
+    configuration descriptor, or it will return\c NULL if the \a id is invalid.
 */
 
 /*!
@@ -509,8 +510,8 @@
   
   \param[in] handle The object you want to query.
   \param[out] status A variable in which the device can store it's status.
-  \return \c B_OK in case the request succeeded and the device responded
-    positively, or an error code in case it failed.
+  \return \c B_OK is returned in case the request succeeded and the device
+   responded positively, or an error code is returned in case it failed.
 */
   
 /*!
@@ -522,7 +523,7 @@
   \param[in] index In case there are multiple descriptors of this type, you
     select which one you want.
   \param[in] languageID The language you want the descriptor in (if applicable,
-    like with string_descriptors). 
+    as with string_descriptors). 
   \param[out] data The buffer in which the descriptor can be written.
   \param[in] dataLength The size of the buffer (in bytes).
   \param[out] actualLength A pointer to a variable in which the actual number
@@ -565,8 +566,9 @@
   \param callbackCookie A cookie that will be supplied to your callback
     function when the transfer is finished.
   
-  \return Whether or not the queueing of the transfer went well. The return
-   value won't tell you if the transfer actually succeeded.
+  \return This will return a value indicating whether or not the queueing of
+    the transfer went well. The return value won't tell you if the transfer
+    actually succeeded.
   \retval B_OK The interrupt transfer is queued.
   \retval B_NO_MEMORY Error allocating objects.
   \retval B_DEV_INVALID_PIPE The \a pipe is not a valid interrupt pipe.
@@ -595,7 +597,7 @@
   \fn status_t (*usb_module_info::queue_isochronous)(usb_pipe pipe, void *data, size_t dataLength, usb_iso_packet_descriptor *packetDesc, uint32 packetCount, uint32 *startingFrameNumber, uint32 flags, usb_callback_func callback, void *callbackCookie)
   \brief Asynchronously queue a isochronous transfer. Not implemented.
   
-  Not implemented in the current Haiku USB Stack.
+  This is not implemented in the current Haiku USB Stack.
 */
 
 /*!
@@ -621,8 +623,8 @@
   \brief Set some pipe features.
   
   The USB standard specifies some properties that should be able to be set on
-   isochronous pipes. If your driver requires the properties to be changed, you
-   should use this method. 
+  isochronous pipes. If your driver requires the properties to be changed, you
+  should use this method. 
   
   \param pipe The id of the isochronous pipe you want to alter.
   \param maxNumQueuedPackets The maximum number of queued packets allowed on
