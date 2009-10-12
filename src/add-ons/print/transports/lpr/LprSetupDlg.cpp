@@ -16,6 +16,7 @@
 #include "LprDefs.h"
 #include "DbgMsg.h"
 
+
 #define	DLG_WIDTH		370
 #define DLG_HEIGHT		100
 
@@ -74,44 +75,51 @@ enum MSGS {
 
 class LprSetupView : public BView {
 public:
-	LprSetupView(BRect, BDirectory *);
-	~LprSetupView() {}
-	virtual void AttachedToWindow();
-	bool UpdateViewData();
+					LprSetupView(BRect, BDirectory *);
+					~LprSetupView() {}
+	virtual void	AttachedToWindow();
+			bool	UpdateViewData();
 
 private:
-	BTextControl *server;
-	BTextControl *queue;
-	BDirectory   *dir;
+	BTextControl*	fServer;
+	BTextControl*	fQueue;
+	BDirectory*		fDir;
 };
 
+
 LprSetupView::LprSetupView(BRect frame, BDirectory *d)
-	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), dir(d)
+	:
+	BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), fDir(d)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
-void LprSetupView::AttachedToWindow()
+
+void
+LprSetupView::AttachedToWindow()
 {
 	float width = max(StringWidth(SERVER_TEXT), StringWidth(QUEUE_TEXT)) + 10;
 
 	/* server name box */
 
     // TODO remember previous value
-	server = new BTextControl(SERVER_RECT, "", SERVER_TEXT, "192.168.0.0", NULL);
-	AddChild(server);
-	server->SetDivider(width);
+	fServer = new BTextControl(SERVER_RECT, "", SERVER_TEXT, "192.168.0.0",
+		NULL);
+	AddChild(fServer);
+	fServer->SetDivider(width);
 
 	/* queue name box */
 
     // TODO remember previous value
-	queue = new BTextControl(QUEUE_RECT, "", QUEUE_TEXT, "LPT1_PASSTHRU", NULL);
-	AddChild(queue);
-	queue->SetDivider(width);
+	fQueue = new BTextControl(QUEUE_RECT, "", QUEUE_TEXT, "LPT1_PASSTHRU",
+		NULL);
+	AddChild(fQueue);
+	fQueue->SetDivider(width);
 
 	/* cancel */
 
-	BButton *button = new BButton(CANCEL_RECT, "", CANCEL_TEXT, new BMessage(M_CANCEL));
+	BButton *button = new BButton(CANCEL_RECT, "", CANCEL_TEXT,
+		new BMessage(M_CANCEL));
 	AddChild(button);
 
 	/* ok */
@@ -121,12 +129,14 @@ void LprSetupView::AttachedToWindow()
 	button->MakeDefault(true);
 }
 
-bool LprSetupView::UpdateViewData()
+
+bool
+LprSetupView::UpdateViewData()
 {
-	if (*server->Text() && *queue->Text()) {
+	if (*fServer->Text() && *fQueue->Text()) {
 
 		try {
-			LpsClient lpr(server->Text());
+			LpsClient lpr(fServer->Text());
 			lpr.connect();
 		}
 
@@ -136,8 +146,8 @@ bool LprSetupView::UpdateViewData()
 			return false;
 		}
 
-		dir->WriteAttr(LPR_SERVER_NAME, B_STRING_TYPE, 0, server->Text(), strlen(server->Text()) + 1);
-		dir->WriteAttr(LPR_QUEUE_NAME,  B_STRING_TYPE, 0, queue->Text(),  strlen(queue->Text())  + 1);
+		fDir->WriteAttr(LPR_SERVER_NAME, B_STRING_TYPE, 0, fServer->Text(), strlen(fServer->Text()) + 1);
+		fDir->WriteAttr(LPR_QUEUE_NAME,  B_STRING_TYPE, 0, fQueue->Text(),  strlen(fQueue->Text())  + 1);
 		return true;
 	}
 
@@ -146,60 +156,68 @@ bool LprSetupView::UpdateViewData()
 	return false;
 }
 
+
 LprSetupDlg::LprSetupDlg(BDirectory *dir)
-	: BWindow(BRect(100, 100, 100 + DLG_WIDTH, 100 + DLG_HEIGHT),
+	:
+	BWindow(BRect(100, 100, 100 + DLG_WIDTH, 100 + DLG_HEIGHT),
 		"LPR Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE)
 {
-	result = 0;
+	fResult = 0;
 
 	Lock();
 	LprSetupView *view = new LprSetupView(Bounds(), dir);
 	AddChild(view);
 	Unlock();
 
-	semaphore = create_sem(0, "lprSetupSem");
+	fExitSemaphore = create_sem(0, "lprSetupSem");
 }
 
-bool LprSetupDlg::QuitRequested()
+
+bool
+LprSetupDlg::QuitRequested()
 {
-	result = B_ERROR;
-	release_sem(semaphore);
+	fResult = B_ERROR;
+	release_sem(fExitSemaphore);
 	return true;
 }
 
-void LprSetupDlg::MessageReceived(BMessage *msg)
+
+void
+LprSetupDlg::MessageReceived(BMessage *msg)
 {
 	bool success;
 
 	switch (msg->what) {
-	case M_OK:
-		Lock();
-		success = ((LprSetupView *)ChildAt(0))->UpdateViewData();
-		Unlock();
-		if (success) {
-			result = B_NO_ERROR;
-			release_sem(semaphore);
-		}
-		break;
+		case M_OK:
+			Lock();
+			success = ((LprSetupView *)ChildAt(0))->UpdateViewData();
+			Unlock();
+			if (success) {
+				fResult = B_NO_ERROR;
+				release_sem(fExitSemaphore);
+			}
+			break;
 
-	case M_CANCEL:
-		result = B_ERROR;
-		release_sem(semaphore);
-		break;
+		case M_CANCEL:
+			fResult = B_ERROR;
+			release_sem(fExitSemaphore);
+			break;
 
-	default:
-		BWindow::MessageReceived(msg);
-		break;
+		default:
+			BWindow::MessageReceived(msg);
+			break;
 	}
 }
 
-int LprSetupDlg::Go()
+
+int
+LprSetupDlg::Go()
 {
 	Show();
-	acquire_sem(semaphore);
-	delete_sem(semaphore);
-	int value = result;
+	acquire_sem(fExitSemaphore);
+	delete_sem(fExitSemaphore);
+	int value = fResult;
 	Lock();
 	Quit();
 	return value;

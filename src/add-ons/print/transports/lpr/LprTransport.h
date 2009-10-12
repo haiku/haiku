@@ -9,38 +9,37 @@
 #include <fstream>
 #include <string>
 
-#if (!__MWERKS__)
-using namespace std;
-#else 
-#define std
-#endif
 
 class LprTransport : public BDataIO {
 public:
-	LprTransport(BMessage *msg);
-	virtual ~LprTransport();
-	virtual ssize_t Read(void *buffer, size_t size);
+					LprTransport(BMessage *msg);
+	virtual 		~LprTransport();
+	virtual ssize_t	Read(void *buffer, size_t size);
 	virtual ssize_t Write(const void *buffer, size_t size);
 
-	bool operator !() const;
-	bool fail() const;
+			bool 	operator!() const;
+			bool 	fail() const;
 
 private:
-	char    __server[256];
-	char    __queue[256];
-	char    __file[256];
-	char    __user[256];
-	int32   __jobid;
-	fstream __fs;
-	bool    __error;
+	char    fServer[256];
+	char    fQueue[256];
+	char    fFile[256];
+	char    fUser[256];
+	int32   fJobId;
+	fstream fStream;
+	bool    fError;
 };
 
-inline bool LprTransport::fail() const
+
+inline bool
+LprTransport::fail() const
 {
-	return __error;
+	return fError;
 }
 
-inline bool LprTransport::operator !() const
+
+inline bool
+LprTransport::operator!() const
 {
 	return fail();
 }

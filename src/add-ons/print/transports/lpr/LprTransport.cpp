@@ -20,27 +20,23 @@
 #include "LprDefs.h"
 #include "DbgMsg.h"
 
-#if (!__MWERKS__)
-using namespace std;
-#else 
-#define std
-#endif
 
 LprTransport::LprTransport(BMessage *msg)
-	: BDataIO()
+	:
+	BDataIO()
 {
-	__server[0] = '\0';
-	__queue[0]  = '\0';
-	__file[0]   = '\0';
-	__user[0]   = '\0';
-	__jobid     = 0;
-	__error     = false;
+	fServer[0] = '\0';
+	fQueue[0]  = '\0';
+	fFile[0]   = '\0';
+	fUser[0]   = '\0';
+	fJobId     = 0;
+	fError     = false;
 
 	struct passwd *pwd = getpwuid(geteuid());
 	if (pwd != NULL && pwd->pw_name != NULL && pwd->pw_name[0])
-		strcpy(__user, pwd->pw_name);
+		strcpy(fUser, pwd->pw_name);
 	else
-		strcpy(__user, "baron");
+		strcpy(fUser, "baron");
 
 	DUMP_BMESSAGE(msg);
 
@@ -49,34 +45,35 @@ LprTransport::LprTransport(BMessage *msg)
 		BDirectory dir(spool_path);
 		DUMP_BDIRECTORY(&dir);
 
-		dir.ReadAttr(LPR_SERVER_NAME, B_STRING_TYPE, 0, __server, sizeof(__server));
-		if (__server[0] == '\0') {
+		dir.ReadAttr(LPR_SERVER_NAME, B_STRING_TYPE, 0, fServer, sizeof(fServer));
+		if (fServer[0] == '\0') {
 			LprSetupDlg *dlg = new LprSetupDlg(&dir);
 			if (dlg->Go() == B_ERROR) {
-				__error = true;
+				fError = true;
 				return;
 			}
 		}
 
-		dir.ReadAttr(LPR_SERVER_NAME, B_STRING_TYPE, 0, __server, sizeof(__server));
-		dir.ReadAttr(LPR_QUEUE_NAME,  B_STRING_TYPE, 0, __queue,  sizeof(__queue));
-		dir.ReadAttr(LPR_JOB_ID,      B_INT32_TYPE,  0, &__jobid, sizeof(__jobid));
-		__jobid++;
-		if (__jobid > 255) {
-			__jobid = 1;
+		dir.ReadAttr(LPR_SERVER_NAME, B_STRING_TYPE, 0, fServer, sizeof(fServer));
+		dir.ReadAttr(LPR_QUEUE_NAME,  B_STRING_TYPE, 0, fQueue,  sizeof(fQueue));
+		dir.ReadAttr(LPR_JOB_ID,      B_INT32_TYPE,  0, &fJobId, sizeof(fJobId));
+		fJobId++;
+		if (fJobId > 255) {
+			fJobId = 1;
 		}
-		dir.WriteAttr(LPR_JOB_ID, B_INT32_TYPE, 0, &__jobid, sizeof(__jobid));
+		dir.WriteAttr(LPR_JOB_ID, B_INT32_TYPE, 0, &fJobId, sizeof(fJobId));
 
-		sprintf(__file, "%s/%s@ipp.%ld", spool_path, __user, __jobid);
+		sprintf(fFile, "%s/%s@ipp.%ld", spool_path, fUser, fJobId);
 
-		__fs.open(__file, ios::in | ios::out | ios::binary | ios::trunc);
-		if (__fs.good()) {
-			DBGMSG(("spool_file: %s\n", __file));
+		fStream.open(fFile, ios::in | ios::out | ios::binary | ios::trunc);
+		if (fStream.good()) {
+			DBGMSG(("spool_file: %s\n", fFile));
 			return;
 		}
 	}
-	__error = true;
+	fError = true;
 }
+
 
 LprTransport::~LprTransport()
 {
@@ -84,33 +81,33 @@ LprTransport::~LprTransport()
 	gethostname(hostname, sizeof(hostname));
 
 	ostringstream cfname;
-	cfname << "cfA" << setw(3) << setfill('0') << __jobid << hostname;
+	cfname << "cfA" << setw(3) << setfill('0') << fJobId << hostname;
 
 	ostringstream dfname;
-	dfname << "dfA" << setw(3) << setfill('0') << __jobid << hostname;
+	dfname << "dfA" << setw(3) << setfill('0') << fJobId << hostname;
 
 	ostringstream cf;
 	cf << 'H' << hostname     << '\n';
-	cf << 'P' << __user << '\n';
+	cf << 'P' << fUser << '\n';
 	cf << 'l' << dfname.str() << '\n';
 	cf << 'U' << dfname.str() << '\n';
 
 	long cfsize = cf.str().length();
-	long dfsize = __fs.tellg();
-	__fs.seekg(0, ios::beg);
+	long dfsize = fStream.tellg();
+	fStream.seekg(0, ios::beg);
 
 	try {
-		LpsClient lpr(__server);
+		LpsClient lpr(fServer);
 
 		lpr.connect();
-		lpr.receiveJob(__queue);
+		lpr.receiveJob(fQueue);
 
 		lpr.receiveControlFile(cfsize, cfname.str().c_str());
 		lpr.transferData(cf.str().c_str(), cfsize);
 		lpr.endTransfer();
 
 		lpr.receiveDataFile(dfsize, dfname.str().c_str());
-		lpr.transferData(__fs, dfsize);
+		lpr.transferData(fStream, dfsize);
 		lpr.endTransfer();
 	}
 
@@ -120,21 +117,23 @@ LprTransport::~LprTransport()
 		alert->Go();
 	}
 
-	unlink(__file);
+	unlink(fFile);
 }
 
-ssize_t LprTransport::Read(void *, size_t)
+
+ssize_t
+LprTransport::Read(void *, size_t)
 {
 	return 0;
 }
 
-ssize_t LprTransport::Write(const void *buffer, size_t size)
+
+ssize_t
+LprTransport::Write(const void *buffer, size_t size)
 {
-//	DBGMSG(("write: %d\n", size));
-	if (!__fs.write((char *)buffer, size)) {
-		__error = true;
+	if (!fStream.write((char *)buffer, size)) {
+		fError = true;
 		return 0;
 	}
-//	return __fs.pcount();
 	return size;
 }

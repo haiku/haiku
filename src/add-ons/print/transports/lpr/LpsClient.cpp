@@ -1,13 +1,8 @@
 // Sun, 18 Jun 2000
 // Y.Takagi
 
-#if defined(__HAIKU__) || defined(HAIKU_TARGET_PLATFORM_BONE)
-#	include <sys/socket.h>
-#	include <netdb.h>
-#else
-#	include <net/socket.h>
-#	include <net/netdb.h>
-#endif
+#include <sys/socket.h>
+#include <netdb.h>
 
 #include <errno.h>
 #include <string.h>
@@ -16,13 +11,7 @@
 #include <algorithm>
 #include "LpsClient.h"
 #include "Socket.h"
-//#include "DbgMsg.h"
 
-#if (!__MWERKS__)
-using namespace std;
-#else 
-#define std
-#endif
 
 #define LPS_SERVER_PORT		515
 #define LPS_CLIENT_PORT_S	721
@@ -50,110 +39,115 @@ using namespace std;
 
 
 LpsClient::LpsClient(const char *host)
-	: connected(false), __host(host), __sock(NULL)
+	:
+	fConnected(false),
+	fHost(host),
+	fSock(NULL)
 {
 }
+
 
 LpsClient::~LpsClient()
 {
 	close();
 }
 
-void LpsClient::connect() throw(LPSException)
-{
-//	DBGMSG(("connect\n"));
 
-	for (int localPort = LPS_CLIENT_PORT_S ; localPort <=  LPS_CLIENT_PORT_E ; localPort++) {
-		if (__sock) {
-			delete __sock;
+void
+LpsClient::connect() throw(LPSException)
+{
+	for (int localPort = LPS_CLIENT_PORT_S; localPort <=  LPS_CLIENT_PORT_E;
+		localPort++) {
+
+		if (fSock) {
+			delete fSock;
 		}
-		__sock = new Socket(__host.c_str(), LPS_SERVER_PORT, localPort);
-		if (__sock->good()) {
-			__is = &__sock->getInputStream();
-			__os = &__sock->getOutputStream();
-			connected = true;
+		fSock = new Socket(fHost.c_str(), LPS_SERVER_PORT, localPort);
+		if (fSock->good()) {
+			fInput = &fSock->getInputStream();
+			fOutput = &fSock->getOutputStream();
+			fConnected = true;
 			return;
 		}
 	}
 
-	throw(LPSException(__sock->getLastError()));
+	throw(LPSException(fSock->getLastError()));
 }
 
-void LpsClient::close()
-{
-//	DBGMSG(("close\n"));
 
-	connected = false;
-	if (__sock) {
-		delete __sock;
-		__sock = NULL;
+void
+LpsClient::close()
+{
+	fConnected = false;
+	if (fSock) {
+		delete fSock;
+		fSock = NULL;
 	}
 }
 
-void LpsClient::receiveJob(const char *printer) throw(LPSException)
-{
-//	DBGMSG(("tell_receive_job\n"));
 
-	if (connected) {
-		*__os << LPS_PRINT_JOB << printer << '\n' << flush;
+void
+LpsClient::receiveJob(const char *printer) throw(LPSException)
+{
+	if (fConnected) {
+		*fOutput << LPS_PRINT_JOB << printer << '\n' << flush;
 		checkAck();
 	}
 }
 
-void LpsClient::receiveControlFile(int size, const char *name) throw(LPSException)
-{
-//	DBGMSG(("tell_receive_control_file\n"));
 
-	if (connected) {
+void
+LpsClient::receiveControlFile(int size, const char *name) throw(LPSException)
+{
+	if (fConnected) {
 
 		char cfname[32];
 		strncpy(cfname, name, sizeof(cfname));
 		cfname[sizeof(cfname) - 1] = '\0';
 
-		*__os << LPS_RECEIVE_CONTROL_FILE << size << ' ' << cfname << '\n' << flush;
+		*fOutput << LPS_RECEIVE_CONTROL_FILE << size << ' ' << cfname << '\n' << flush;
 
 		checkAck();
 	}
 }
 
-void LpsClient::receiveDataFile(int size, const char *name) throw(LPSException)
+void
+LpsClient::receiveDataFile(int size, const char *name) throw(LPSException)
 {
-//	DBGMSG(("tell_receive_data_file\n"));
-
-	if (connected) {
+	if (fConnected) {
 
 		char dfname[32];
 		strncpy(dfname, name, sizeof(dfname));
 		dfname[sizeof(dfname) - 1] = '\0';
 
-		*__os << LPS_RECEIVE_DATA_FILE << size << ' ' << dfname << '\n' << flush;
+		*fOutput << LPS_RECEIVE_DATA_FILE << size << ' ' << dfname << '\n' << flush;
 
 		checkAck();
 	}
 }
 
-void LpsClient::transferData(const char *buffer, int size) throw(LPSException)
-{
-//	DBGMSG(("send: %d\n", size));
 
-	if (connected) {
+void
+LpsClient::transferData(const char *buffer, int size) throw(LPSException)
+{
+	if (fConnected) {
 
 		if (size < 0) {
 			size = strlen(buffer);
 		}
 
-		if (!__os->write(buffer, size)) {
+		if (!fOutput->write(buffer, size)) {
 			close();
 			throw(LPSException("error talking to lpd server"));
 		}
 	}
 }
 
-void LpsClient::transferData(istream &is, int size) throw(LPSException)
-{
-//	DBGMSG(("send: %d\n", size));
 
-	if (connected) {
+void
+LpsClient::transferData(istream &is, int size) throw(LPSException)
+{
+	if (fConnected) {
 
 		if (size < 0) {
 			is.seekg(0, ios::end);
@@ -163,7 +157,7 @@ void LpsClient::transferData(istream &is, int size) throw(LPSException)
 
 		char c;
 		while (is.get(c)) {
-			if (!__os->put(c)) {
+			if (!fOutput->put(c)) {
 				close();
 				throw(LPSException("error reading file."));
 				return;
@@ -172,41 +166,41 @@ void LpsClient::transferData(istream &is, int size) throw(LPSException)
 	}
 }
 
-void LpsClient::endTransfer() throw(LPSException)
-{
-//	DBGMSG(("tell_end_transfer\n"));
 
-	if (connected) {
-		*__os << LPS_END_TRANSFER << flush;
+void
+LpsClient::endTransfer() throw(LPSException)
+{
+	if (fConnected) {
+		*fOutput << LPS_END_TRANSFER << flush;
 		checkAck();
 	}
 }
 
-void LpsClient::checkAck() throw(LPSException)
-{
-//	DBGMSG(("check_ack\n"));
 
-	if (connected) {
+void
+LpsClient::checkAck() throw(LPSException)
+{
+	if (fConnected) {
 
 		char c;
 
-		if (!__is->get(c)) {
+		if (!fInput->get(c)) {
 			close();
 			throw(LPSException("server not responding."));
 			return;
 		}
 
 		switch (c) {
-		case LPS_OK:
-			break;
-		case LPS_ERROR:
-			close();
-			throw(LPSException("server error."));
-			break;
-		case LPS_NO_SPOOL_SPACE:
-			close();
-			throw(LPSException("not enough spool space on server."));
-			break;
+			case LPS_OK:
+				break;
+			case LPS_ERROR:
+				close();
+				throw(LPSException("server error."));
+				break;
+			case LPS_NO_SPOOL_SPACE:
+				close();
+				throw(LPSException("not enough spool space on server."));
+				break;
 		}
 	}
 }

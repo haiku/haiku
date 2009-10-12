@@ -7,44 +7,54 @@
 #include <iostream>
 #include <string>
 
-#if (!__MWERKS__)
-using namespace std;
-#else 
-#define std
-#endif
 
 class Socket;
 
+
 class LPSException {
-private:
-	string str;
 public:
-	LPSException(const string &what_arg) : str(what_arg) {}
-	const char *what() const { return str.c_str(); }
+					LPSException(const string& what)
+						:
+						fWhat(what)
+					{
+					}
+
+	const char *	what() const
+					{
+						return fWhat.c_str();
+					}
+
+private:
+	string fWhat;
+
 };
+
 
 class LpsClient {
 public:
-	LpsClient(const char *host);
-	~LpsClient();
-	void connect() throw(LPSException);
-	void close();
-	void receiveJob(const char *queue) throw(LPSException);
-	void receiveControlFile(int cfsize, const char *cfname) throw(LPSException);
-	void receiveDataFile(int dfsize, const char *dfname) throw(LPSException);
-	void transferData(const char *buffer, int size = -1) throw(LPSException);
-	void transferData(istream &is, int size = -1) throw(LPSException);
-	void endTransfer() throw(LPSException);
-	void checkAck() throw(LPSException);
-
-protected:
-	bool connected;
+					LpsClient(const char* host);
+					~LpsClient();
+	void			connect() throw(LPSException);
+	void			close();
+	void			receiveJob(const char* queue) throw(LPSException);
+	void			receiveControlFile(int cfsize, const char* cfname)
+						throw(LPSException);
+	void			receiveDataFile(int dfsize, const char* dfname)
+						throw(LPSException);
+	void			transferData(const char* buffer, int size = -1)
+						throw(LPSException);
+	void			transferData(istream& is, int size = -1)
+						throw(LPSException);
+	void			endTransfer() throw(LPSException);
+	void			checkAck() throw(LPSException);
 
 private:
-	string  __host;
-	Socket  *__sock;
-	istream *__is;
-	ostream *__os;
+	bool		fConnected;
+	string  	fHost;
+	Socket* 	fSock;
+	istream*	fInput;
+	ostream*	fOutput;
 };
+
 
 #endif	/* __LPSCLIENT_H */

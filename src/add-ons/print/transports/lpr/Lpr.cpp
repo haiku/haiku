@@ -4,25 +4,28 @@
 #include "LprTransport.h"
 #include "DbgMsg.h"
 
-LprTransport *transport = NULL;
 
-extern "C" _EXPORT void exit_transport()
+static LprTransport *gTransport = NULL;
+
+
+extern "C" void
+exit_transport()
 {
 	DBGMSG(("> exit_transport\n"));
-	if (transport) {
-		delete transport;
-		transport = NULL;
-	}
+	delete gTransport;
+	gTransport = NULL;
 	DBGMSG(("< exit_transport\n"));
 }
 
-extern "C" _EXPORT BDataIO *init_transport(BMessage *msg)
+
+extern "C" BDataIO *
+init_transport(BMessage *msg)
 {
 	DBGMSG(("> init_transport\n"));
 
-	transport = new LprTransport(msg);
+	gTransport = new LprTransport(msg);
 
-	if (transport->fail()) {
+	if (gTransport->fail()) {
 		exit_transport();
 	}
 
@@ -30,5 +33,5 @@ extern "C" _EXPORT BDataIO *init_transport(BMessage *msg)
 		msg->what = 'okok';
 
 	DBGMSG(("< init_transport\n"));
-	return transport;
+	return gTransport;
 }

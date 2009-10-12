@@ -10,15 +10,15 @@ class BDirectory;
 
 class LprSetupDlg : public BWindow {
 public:
-	LprSetupDlg(BDirectory *);
-	~LprSetupDlg() {}
-	virtual bool QuitRequested();
-	virtual void MessageReceived(BMessage *message);
-	int Go();
+					LprSetupDlg(BDirectory *);
+					~LprSetupDlg() {}
+	virtual bool	QuitRequested();
+	virtual void	MessageReceived(BMessage *message);
+			int 	Go();
 
 private:
-	int  result;
-	long semaphore;
+	int    fResult;
+	sem_id fExitSemaphore;
 };
 
 #endif	// __LprSetupDlg_H
