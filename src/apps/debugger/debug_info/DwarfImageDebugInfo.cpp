@@ -537,9 +537,12 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	// create function parameter objects
 	for (DebugInfoEntryList::ConstIterator it = subprogramEntry->Parameters()
 			.GetIterator(); DebugInfoEntry* entry = it.Next();) {
+		if (entry->Tag() != DW_TAG_formal_parameter)
+			continue;
+
 		BString parameterName;
 		DwarfUtils::GetDIEName(entry, parameterName);
-		if (entry->Tag() != DW_TAG_formal_parameter)
+		if (parameterName.Length() == 0)
 			continue;
 
 		DIEFormalParameter* parameterEntry
