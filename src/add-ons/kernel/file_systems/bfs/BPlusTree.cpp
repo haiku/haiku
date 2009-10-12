@@ -2203,7 +2203,7 @@ TreeIterator::Dump()
 	__out("TreeIterator at %p:\n", this);
 	__out("\tfTree = %p\n", fTree);
 	__out("\tfCurrentNodeOffset = %Ld\n", fCurrentNodeOffset);
-	__out("\tfCurrentKey = %ld\n", fCurrentKey);
+	__out("\tfCurrentKey = %d\n", (int)fCurrentKey);
 	__out("\tfDuplicateNode = %Ld (%Ld, 0x%Lx)\n",
 		bplustree_node::FragmentOffset(fDuplicateNode), fDuplicateNode,
 		fDuplicateNode);
@@ -2304,12 +2304,12 @@ bplustree_node::CheckIntegrity(uint32 nodeSize) const
 		if (key + length + sizeof(off_t) + sizeof(uint16)
 				> (uint8*)this + nodeSize
 			|| length > BPLUSTREE_MAX_KEY_LENGTH) {
-			dprintf("node %p, key %ld\n", this, i);
+			dprintf("node %p, key %d\n", this, (int)i);
 			DEBUGGER(("invalid node: keys corrupted"));
 			return B_BAD_DATA;
 		}
 		if (Values()[i] == -1) {
-			dprintf("node %p, value %ld: %Ld\n", this, i, Values()[i]);
+			dprintf("node %p, value %d: %lld\n", this, (int)i, Values()[i]);
 			DEBUGGER(("invalid node: values corrupted"));
 			return B_BAD_DATA;
 		}
