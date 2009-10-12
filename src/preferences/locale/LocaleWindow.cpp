@@ -1,6 +1,6 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
@@ -13,7 +13,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
@@ -35,52 +35,25 @@
 #define ALPHA				170
 #define TEXT_OFFSET			5.0
 
-// Language lists management
 
-
-// This is a language item. It's a BStringItem but we also want to keep the
-// language code and not only the displayName
 class LanguageListItem: public BStringItem
 {
 	public:
-		LanguageListItem(const char* display, const char* code)
-			: BStringItem(display)
-			, LanguageCode(code)
+		LanguageListItem(const char* text, const char* code)
+		:
+		BStringItem(text),
+		fLanguageCode(code)
 		{}
 
 		~LanguageListItem() {};
 
-		const inline BString getLanguageCode() { return LanguageCode; }
-		void Draw(BView *owner, BRect frame);
+		const inline BString LanguageCode() { return fLanguageCode; }
+
 	private:
-		const BString LanguageCode;
+		const BString fLanguageCode;
 };
 
 
-void
-LanguageListItem::Draw(BView *owner, BRect frame)
-{
-	owner->SetLowColor(255, 255, 255, 255);
-	owner->FillRect(frame, B_SOLID_LOW);
-	// label
-	owner->SetHighColor(0, 0, 0, 255);
-	font_height fh;
-	owner->GetFontHeight(&fh);
-	const char* text = Text();
-	BString truncatedString(text);
-	owner->TruncateString(&truncatedString, B_TRUNCATE_MIDDLE,
-		frame.Width() - TEXT_OFFSET - 4.0);
-	float height = frame.Height();
-	float textHeight = fh.ascent + fh.descent;
-	BPoint textPoint;
-	textPoint.x = frame.left + TEXT_OFFSET;
-	textPoint.y = frame.top
-		+ ceilf(height / 2.0 - textHeight / 2.0 + fh.ascent);
-	owner->DrawString(truncatedString.String(), textPoint);
-}
-
-
-// This is a language list. Basically, a drag-n-drop enabled list.
 class LanguageListView: public BListView
 {
 	public:
@@ -107,7 +80,6 @@ class LanguageListView: public BListView
 						if (fDropIndex < 0 || fDropIndex > count)
 							fDropIndex = count;
 
-						// gather all the items from the BMessage
 						BList items;
 						int32 index;
 						for (int32 i = 0; message->FindInt32("index", i, &index)
@@ -115,7 +87,6 @@ class LanguageListView: public BListView
 							if (BListItem* item = ItemAt(index))
 								items.AddItem((void*)item);
 
-						// handle them
 						if (items.CountItems() > 0) {
 							MoveItems(items, fDropIndex);
 						}
@@ -125,7 +96,6 @@ class LanguageListView: public BListView
 						if (fDropIndex < 0 || fDropIndex > count)
 							fDropIndex = count;
 
-						// gather all the items from the BMessage
 						int32 index;
 						for (int32 i = 0; message->FindInt32("index", i, &index)
 								== B_OK; i++)
@@ -224,7 +194,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 					itemBounds.bottom = itemBounds.top + ceilf(item->Height());
 					if (itemBounds.bottom > dragRect.bottom)
 						itemBounds.bottom = dragRect.bottom;
-					item->Draw(v, itemBounds);
+					item->DrawItem(v, itemBounds);
 					itemBounds.top = itemBounds.bottom + 1.0;
 				}
 				// make a black frame arround the edge
@@ -324,40 +294,31 @@ LanguageListView::MouseMoved(BPoint where, uint32 transit, const BMessage *msg)
 }
 
 
-const static uint32 kMsgSelectLanguage = 'slng';
-const static uint32 kMsgDefaults = 'dflt';
-const static uint32 kMsgRevert = 'revt';
-
-
-LocaleWindow::LocaleWindow(BRect rect)
-	: BWindow(rect, "Locale", B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
-			| B_AUTO_UPDATE_SIZE_LIMITS)
+LocaleWindow::LocaleWindow()
+	:
+	BWindow(BRect(0, 0, 0, 0), "Locale", B_TITLED_WINDOW, B_NOT_RESIZABLE
+		| B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
+	BCountry* defaultCountry;
+	be_locale_roster->GetDefaultCountry(&defaultCountry);
+
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	// Buttons at the bottom
-
-	BButton *button = new BButton(TR("Defaults"), new BMessage(kMsgDefaults));
-
+	BButton* button = new BButton(TR("Defaults"), new BMessage(kMsgDefaults));
 	fRevertButton = new BButton(TR("Revert"), new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
 
-	// Tabs
-	BTabView *tabView = new BTabView("tabview");
+	BTabView* tabView = new BTabView("tabview");
 
-	// Language tab
-	BView *tab = new BView(TR("Language"), B_WILL_DRAW);
-	//tab->SetViewColor(tabView->ViewColor());
-	tab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
-	tabView->AddTab(tab);
-
+	BView* languageTab = new BView(TR("Language"), B_WILL_DRAW);
+	languageTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
+	
 	{
 		// first list: available languages
 		LanguageListView *listView = new LanguageListView("available",
 			B_MULTIPLE_SELECTION_LIST);
 		BScrollView *scrollView = new BScrollView("scroller", listView,
-			0, false, true, B_FANCY_BORDER);
+			B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
 		// Fill the language list from the LocaleRoster data
 		BMessage installedLanguages;
@@ -395,7 +356,7 @@ LocaleWindow::LocaleWindow(BRect rect)
 		fPreferredListView = new LanguageListView("preferred",
 			B_MULTIPLE_SELECTION_LIST);
 		BScrollView *scrollViewEnabled = new BScrollView("scroller",
-			fPreferredListView, 0, false, true, B_FANCY_BORDER);
+			fPreferredListView, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
 		// get the preferred languages from the Settings. Move them here from
 		// the other list.
@@ -408,40 +369,34 @@ LocaleWindow::LocaleWindow(BRect rect)
 			for (int listPos = 0; LanguageListItem* lli
 					= static_cast<LanguageListItem*>(listView->ItemAt(listPos));
 					listPos++) {
-				if (langCode == lli->getLanguageCode()) {
+				if (langCode == lli->LanguageCode()) {
 					fPreferredListView->AddItem(lli);
 					listView->RemoveItem(lli);
 				}
 			}
 		}
 
-		tab->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 10)
-			.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
+		languageTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 10)
+			.AddGroup(B_VERTICAL, 10)
 				.Add(new BStringView("", TR("Available languages")))
 				.Add(scrollView)
-			)
-			.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
+				.End()
+			.AddGroup(B_VERTICAL, 10)
 				.Add(new BStringView("", TR("Preferred languages")))
 				.Add(scrollViewEnabled)
-			)
-		);
-
+				.End()
+			.View());
 	}
 
-	// Country tab
-	tab = new BView(TR("Country"), B_WILL_DRAW);
-	//tab->SetViewColor(tabView->ViewColor());
-	tab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
-	tabView->AddTab(tab);
+	BView* countryTab = new BView(TR("Country"), B_WILL_DRAW);
+	countryTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
 
 	{
 		BListView* listView = new BListView("country", B_SINGLE_SELECTION_LIST);
 		BScrollView *scrollView = new BScrollView("scroller",
-			listView, 0, false, true, B_FANCY_BORDER);
-
+			listView, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 		BMessage* msg = new BMessage('csel');
 		listView->SetSelectionMessage(msg);
-
 		
 		// get all available countries from ICU
 		// Use DateFormat::getAvailableLocale so we get only the one we can
@@ -449,8 +404,6 @@ LocaleWindow::LocaleWindow(BRect rect)
 		int32_t localeCount;
 		const Locale* currentLocale
 			= Locale::getAvailableLocales(localeCount);
-		BCountry* defaultCountry;
-		be_locale_roster->GetDefaultCountry(&defaultCountry);
 
 		for (int index = 0; index < localeCount; index++)
 		{
@@ -467,41 +420,37 @@ LocaleWindow::LocaleWindow(BRect rect)
 				listView->Select(listView->CountItems() - 1);
 		}
 
-		fTimeFormatSettings
-			= new TimeFormatSettingsView(defaultCountry);
+		// TODO: find a real solution intead of this hack
+		listView->SetExplicitMinSize(BSize(300, B_SIZE_UNSET));
 
-		tab->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 5)
-			.Add(scrollView)
-			.Add(new BScrollView("advanced", fTimeFormatSettings, 0,
-				false, true, B_NO_BORDER))
+		fTimeFormatSettings = new TimeFormatSettingsView(defaultCountry);
+
+		countryTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 5)
+			.AddGroup(B_VERTICAL, 3)
+				.Add(scrollView)
+				.End()
+			.Add(fTimeFormatSettings)
+			.View()
 		);
 
 		listView->ScrollToSelection();
 	}
 
-	// check if the window is on screen
-	rect = BScreen().Frame();
-	rect.right -= 20;
-	rect.bottom -= 20;
+	tabView->AddTab(languageTab);
+	tabView->AddTab(countryTab);
 
-	BPoint position = Frame().LeftTop();
-	if (!rect.Contains(position)) {
-		// center window on screen as it doesn't fit on the saved position
-		position.x = (rect.Width() - Bounds().Width()) / 2;
-		position.y = (rect.Height() - Bounds().Height()) / 2;
-	}
-	MoveTo(position);
+	BLayoutBuilder::Group<>(this)
+		.AddGroup(B_VERTICAL, 3)
+			.Add(tabView)
+			.AddGroup(B_HORIZONTAL, 3)
+				.Add(button)
+				.Add(fRevertButton)
+				.AddGlue()
+				.End()
+			.SetInsets(5, 5, 5, 5)
+			.End();
 
-	// Layout management
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 3)
-		.Add(tabView)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 3)
-			.Add(button)
-			.Add(fRevertButton)
-			.AddGlue()
-		)
-		.SetInsets(5, 5, 5, 5)
-	);
+	CenterOnScreen();
 }
 
 
@@ -509,11 +458,11 @@ bool
 LocaleWindow::QuitRequested()
 {
 	BMessage update(kMsgSettingsChanged);
-	update.AddRect("window_frame", Frame());
+	update.AddPoint("window_location", Frame().LeftTop());
 	int index = 0;
 	while (index < fPreferredListView->CountItems()) {
 		update.AddString("language", static_cast<LanguageListItem*>
-			(fPreferredListView->ItemAt(index))->getLanguageCode());
+			(fPreferredListView->ItemAt(index))->LanguageCode());
 		index++;
 	}
 	// TODO also save Country tab settings
@@ -547,10 +496,10 @@ LocaleWindow::MessageReceived(BMessage *message)
 			LanguageListItem* lli = static_cast<LanguageListItem*>
 				(countryList->ItemAt(countryList->CurrentSelection()));
 			BMessage* newMessage = new BMessage(kMsgSettingsChanged);
-			newMessage->AddString("country",lli->getLanguageCode());
+			newMessage->AddString("country",lli->LanguageCode());
 			be_app_messenger.SendMessage(newMessage);
 
-			BCountry* country = new BCountry(lli->getLanguageCode());
+			BCountry* country = new BCountry(lli->LanguageCode());
 			fTimeFormatSettings->SetCountry(country);
 			break;
 		}

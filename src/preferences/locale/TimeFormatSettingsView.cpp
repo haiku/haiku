@@ -7,12 +7,12 @@
 #include "TimeFormatSettingsView.h"
 
 #include <Alert.h>
-#include <Box.h>
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <Country.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
 #include <Message.h>
@@ -39,8 +39,8 @@ BMessage*
 MenuMessage(const char* format, BMenuField* field)
 {
 	BMessage* msg = new BMessage('FRMT');
-	msg->AddPointer("dest",field);
-	msg->AddString("format",format);
+	msg->AddPointer("dest", field);
+	msg->AddString("format", format);
 
 	return msg;
 }
@@ -116,26 +116,22 @@ CreateDateMenu(BMenuField** field, bool longFormat = true)
 
 
 TimeFormatSettingsView::TimeFormatSettingsView(BCountry* country)
-	: BView("WindowsSettingsView", 0)
-	, fCountry(country)
+	:
+	BView("WindowsSettingsView", B_FRAME_EVENTS),
+	fCountry(country)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	// Date
-	BSeparatorView* dateHeader = new BSeparatorView(TR("Date"));
-
-	// Long format
 	fLongDateExampleView = new BStringView("", "");
 
 	for (int i = 0; i < 4; i++) {
 		CreateDateMenu(&fLongDateMenu[i]);
-		fLongDateSeparator[i] = new BTextControl("","","",
+		fLongDateSeparator[i] = new BTextControl("", "", "",
 			new BMessage(kSettingsContentsModified));
 		fLongDateSeparator[i]->SetModificationMessage(
 			new BMessage(kSettingsContentsModified));
 	}
 
-	// Short format
 	fShortDateExampleView = new BStringView("", "");
 
 	for (int i = 0; i < 3; i++) {
@@ -153,9 +149,6 @@ TimeFormatSettingsView::TimeFormatSettingsView(BCountry* country)
 	menu->AddItem(new BMenuItem(".", new BMessage(kSettingsContentsModified)));
 
 	fSeparatorMenuField = new BMenuField(TR("Separator:"), menu);
-
-	// Time
-	BSeparatorView* timeHeader = new BSeparatorView(TR("Time"));
 
 	BBox *clockBox = new BBox("Clock");
 	clockBox->SetLabel(TR("Clock"));
@@ -177,9 +170,6 @@ TimeFormatSettingsView::TimeFormatSettingsView(BCountry* country)
 	fLongTimeExampleView = new BStringView("", "");
 	fShortTimeExampleView = new BStringView("", "");
 
-	// Numbers
-	BSeparatorView* numberHeader = new BSeparatorView(TR("Numbers"));
-
 	fNumberFormatExampleView = new BStringView("", "");
 
 	BTextControl* numberThousand = new BTextControl("",
@@ -193,8 +183,6 @@ TimeFormatSettingsView::TimeFormatSettingsView(BCountry* country)
 		new BMessage(kSettingsContentsModified));
 	// Unit system (US/Metric) (radio)
 
-	// Currency
-	BSeparatorView* currencyHeader = new BSeparatorView(TR("Currency"));
 	BTextControl* currencySymbol = new BTextControl("", TR("Currency symbol:"),
 		"", new BMessage(kSettingsContentsModified));
 	menu = new BPopUpMenu(TR("Negative marker"));
@@ -228,76 +216,120 @@ TimeFormatSettingsView::TimeFormatSettingsView(BCountry* country)
 	_UpdateExamples();
 	_ParseDateFormat();
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 5)
-		.Add(dateHeader)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 3)
-			.Add(new BStringView("",TR("Long format:")))
-			.Add(fLongDateExampleView)
-			.AddGlue()
-		)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 3)
-			.Add(fLongDateMenu[0])
-			.Add(fLongDateSeparator[0])
-		)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 3)
-			.Add(fLongDateMenu[1])
-			.Add(fLongDateSeparator[1])
-		)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 3)
-			.Add(fLongDateMenu[2])
-			.Add(fLongDateSeparator[2])
-		)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 3)
-			.Add(fLongDateMenu[3])
-			.Add(fLongDateSeparator[3])
-		)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 3)
-			.Add(new BStringView("",TR("Short format:")))
-			.Add(fShortDateExampleView)
-			.AddGlue()
-		)
-		.Add(fDateMenu[0])
-		.Add(fDateMenu[1])
-		.Add(fDateMenu[2])
-		.Add(fSeparatorMenuField)
+	fDateBox = new BBox(TR("Date"));
+	fTimeBox = new BBox(TR("Time"));
+	fNumbersBox = new BBox(TR("Numbers"));
+	fCurrencyBox = new BBox(TR("Currency"));
 
-		.Add(timeHeader)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 3)
-			.Add(new BStringView("",TR("Long format:")))
-			.Add(fLongTimeExampleView)
-			.AddGlue()
-		)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 3)
-			.Add(new BStringView("",TR("Short format:")))
-			.Add(fShortTimeExampleView)
-			.AddGlue()
-		)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 3)
-			.Add(clockBox)
-			.AddGlue()
-		)
+	fDateBox->SetLabel(TR("Date"));
+	fTimeBox->SetLabel(TR("Time"));
+	fNumbersBox->SetLabel(TR("Numbers"));
+	fCurrencyBox->SetLabel(TR("Currency"));
 
-		.Add(numberHeader)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 3)
-			.Add(new BStringView("",TR("Example:")))
-			.Add(fNumberFormatExampleView)
-			.AddGlue()
-		)
-		.Add(numberThousand)
-		.Add(numberDecimal)
-		.Add(numberLeadingZero)
-		.Add(numberList)
-
-		.Add(currencyHeader)
-		.Add(currencySymbol)
-		.Add(currencyNegative)
-		.Add(currencyDecimal)
-		.Add(currencyLeadingZero)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 3)
-			.Add(formatBox)
-			.AddGlue()
-		)
+	fDateBox->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 5)
+		.AddGroup(B_VERTICAL, 5)
+			.AddGroup(B_HORIZONTAL, 3)
+				.Add(new BStringView("",TR("Long format:")))
+				.Add(fLongDateExampleView)
+				.AddGlue()
+				.End()
+			.AddGroup(B_HORIZONTAL, 3)
+				.Add(fLongDateMenu[0])
+				.Add(fLongDateSeparator[0])
+				.End()
+			.AddGroup(B_HORIZONTAL, 3)
+				.Add(fLongDateMenu[1])
+				.Add(fLongDateSeparator[1])
+				.End()
+			.AddGroup(B_HORIZONTAL, 3)
+				.Add(fLongDateMenu[2])
+				.Add(fLongDateSeparator[2])
+				.End()
+			.AddGroup(B_HORIZONTAL, 3)
+				.Add(fLongDateMenu[3])
+				.Add(fLongDateSeparator[3])
+				.End()
+			.AddGroup(B_HORIZONTAL, 3)
+				.Add(new BStringView("",TR("Short format:")))
+				.Add(fShortDateExampleView)
+				.AddGlue()
+				.End()
+			.Add(fDateMenu[0])
+			.Add(fDateMenu[1])
+			.Add(fDateMenu[2])
+			.End()
 		.SetInsets(5, 5, 5, 5)
+		.View()
+	);
+
+	fTimeBox->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 5)
+		.AddGroup(B_VERTICAL, 5)
+			.AddGroup(B_HORIZONTAL, 3)
+				.Add(new BStringView("",TR("Long format:")))
+				.Add(fLongTimeExampleView)
+				.AddGlue()
+				.End()
+			.AddGroup(B_HORIZONTAL, 3)
+				.Add(new BStringView("",TR("Short format:")))
+				.Add(fShortTimeExampleView)
+				.AddGlue()
+				.End()
+			.AddGroup(B_HORIZONTAL, 3)
+				.Add(clockBox)
+				.AddGlue()
+				.End()
+			.AddGlue()
+			.End()
+		.SetInsets(5, 5, 5, 5)
+		.View()
+	);
+
+	fNumbersBox->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 5)
+		.AddGroup(B_VERTICAL, 5)
+			.AddGroup(B_HORIZONTAL, 3)
+				.Add(new BStringView("",TR("Example:")))
+				.Add(fNumberFormatExampleView)
+				.AddGlue()
+				.End()
+			.Add(numberThousand)
+			.Add(numberDecimal)
+			.Add(numberLeadingZero)
+			.Add(numberList)
+			.AddGlue()
+			.End()
+		.SetInsets(5, 5, 5, 5)
+		.View()
+	);
+
+	fCurrencyBox->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 5)
+		.AddGroup(B_VERTICAL, 5)
+			.Add(currencySymbol)
+			.Add(currencyNegative)
+			.Add(currencyDecimal)
+			.Add(currencyLeadingZero)
+			.AddGroup(B_HORIZONTAL, 3)
+				.Add(formatBox)
+				.AddGlue()
+				.End()
+			.AddGlue()
+			.End()
+		.SetInsets(5, 5, 5, 5)
+		.View()
+	);
+
+	AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 5)
+		.AddGroup(B_VERTICAL, 5)
+			.Add(fDateBox)
+			.Add(fTimeBox)
+			.AddGlue()
+			.End()
+		.AddGroup(B_VERTICAL, 5)
+			.Add(fNumbersBox)
+			.Add(fCurrencyBox)
+			.AddGlue()
+			.End()
+		.SetInsets(5, 5, 5, 5)
+		.View()
 	);
 }
 
@@ -469,7 +501,7 @@ TimeFormatSettingsView::_UpdateLongDateFormatString()
 		newDateFormat.Append(fDateString[2]);
 
 	// TODO save this in the settings preflet and make the roster load it back
-	fCountry->SetDateFormat(newDateFormat.String(),false);
+	fCountry->SetDateFormat(newDateFormat.String(), false);
 }
 
 
@@ -688,5 +720,4 @@ TimeFormatSettingsView::_UpdateExamples()
 	else
 		fNumberFormatExampleView->SetText(u_errorName((UErrorCode)Error));
 }
-
 

@@ -2,13 +2,14 @@ SubDir HAIKU_TOP src preferences locale ;
 
 UseLibraryHeaders icu ;
 UsePrivateHeaders locale ;
+UsePrivateHeaders shared ;
 
 Preference Locale :
 	Locale.cpp
 	LocaleWindow.cpp
 	TimeFormatSettingsView.cpp
 	: be liblocale.so $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) libicu-common.so 
-		libicu-data.so
+		libicu-data.so libshared.a
 	: Locale.rdef 
 	;
 
@@ -22,3 +23,4 @@ DoCatalogs Locale		# application name
 	:					# translations
 	fi.catkeys fr.catkeys de.catkeys ru.catkeys sv.catkeys
 	;
+

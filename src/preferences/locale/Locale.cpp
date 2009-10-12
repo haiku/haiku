@@ -7,6 +7,7 @@
 #include "Locale.h"
 #include "LocaleWindow.h"
 
+#include <AboutWindow.h>
 #include <Application.h>
 #include <Alert.h>
 #include <Catalog.h>
@@ -29,38 +30,34 @@ static const uint32 kMsgLocaleSettings = 'LCst';
 
 
 class Settings {
-	public:
-		Settings();
-		~Settings();
+public:
+							Settings();
+							~Settings();
 
-		const BMessage &Message() const { return fMessage; }
-		void UpdateFrom(BMessage *message);
+	const		BMessage&	Message() const { return fMessage; }
+				void		UpdateFrom(BMessage *message);
 
-	private:
-		status_t Open(BFile *file, int32 mode);
+private:
+				status_t	Open(BFile *file, int32 mode);
 
-		BMessage	fMessage;
-		bool		fUpdated;
+				BMessage	fMessage;
+				bool		fUpdated;
 };
 
 
 class LocalePreflet : public BApplication {
-	public:
-		LocalePreflet();
-		virtual ~LocalePreflet();
+public:
+							LocalePreflet();
+	virtual					~LocalePreflet();
 
-		virtual void ReadyToRun();
-		virtual void MessageReceived(BMessage *message);
+	virtual	void			MessageReceived(BMessage *message);
+	virtual	void			AboutRequested();
+	virtual	bool			QuitRequested();
 
-		virtual void AboutRequested();
-		virtual bool QuitRequested();
-
-	private:
-		Settings	fSettings;
-		BWindow		*fOpenWindow;
-		BRect		fWindowFrame;
-
-		BCatalog	cat;
+private:
+				Settings	fSettings;
+				LocaleWindow*	fLocaleWindow;
+				BCatalog	fCatalog;
 };
 
 
@@ -76,7 +73,6 @@ Settings::Settings()
 	if (Open(&file, B_READ_ONLY) != B_OK
 		|| fMessage.Unflatten(&file) != B_OK) {
 		// set default prefs
-		fMessage.AddRect("window_frame", BRect(50, 50, 550, 500));
 		fMessage.AddString("language", "en");
 		fMessage.AddString("country", "en_US");
 		return;
@@ -86,12 +82,11 @@ Settings::Settings()
 
 Settings::~Settings()
 {
-	// only save the settings if something has changed
 	if (!fUpdated)
 		return;
 
 	BFile file;
-	if (Open(&file, B_CREATE_FILE | B_WRITE_ONLY) != B_OK)
+	if (Open(&file, B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY) != B_OK)
 		return;
 
 	fMessage.Flatten(&file);
@@ -114,19 +109,23 @@ Settings::Open(BFile *file, int32 mode)
 void
 Settings::UpdateFrom(BMessage *message)
 {
-	BRect frame;
-	if (message->FindRect("window_frame", &frame) == B_OK)
-		fMessage.ReplaceRect("window_frame", frame);
+	BPoint point;
+	if (message->FindPoint("window_location", &point) == B_OK) {
+		fMessage.RemoveName("window_location");
+		fMessage.AddPoint("window_location", point);
+	}
 
 	BString langName;
 	// We make sure there is at least one string before erasing the previous
 	// settings, then we add the remaining ones, if any
-	if (message->FindString("language",&langName) == B_OK) {
+	if (message->FindString("language", &langName) == B_OK) {
 		// Remove any old data as we know we have newer one to replace it
 		fMessage.RemoveName("language");
-		for (int i = 0; message->FindString("language", i, &langName) == B_OK;
-				i++)
+		for (int i = 0;; i++) {
+			if (message->FindString("language", i, &langName) != B_OK)
+				break;
 			fMessage.AddString("language", langName);
+		}
 	}
 
 	if (message->FindString("country",&langName) == B_OK)
@@ -141,31 +140,24 @@ Settings::UpdateFrom(BMessage *message)
 
 
 LocalePreflet::LocalePreflet()
-	: BApplication(kSignature)
+	:
+	BApplication(kSignature)
 {
-	fWindowFrame = fSettings.Message().FindRect("window_frame");
+	be_locale->GetAppCatalog(&fCatalog);
 
-	be_locale -> GetAppCatalog(&cat);
+	fLocaleWindow = new LocaleWindow();
 
-	BWindow* window = new LocaleWindow(fWindowFrame);
-	window->Show();
+	if (fSettings.Message().HasPoint("window_location")) {
+		BPoint point = fSettings.Message().FindPoint("window_location");
+		fLocaleWindow->MoveTo(point);
+	}
+
+	fLocaleWindow->Show();
 }
 
 
 LocalePreflet::~LocalePreflet()
 {
-}
-
-
-void
-LocalePreflet::ReadyToRun()
-{
-	// are there already windows open?
-	if (CountWindows() != 1)
-		return;
-
-	// if not, ask the user to open a file
-	PostMessage(kMsgOpenOpenWindow);
 }
 
 
@@ -187,20 +179,11 @@ LocalePreflet::MessageReceived(BMessage *message)
 void
 LocalePreflet::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", TR("Locale\n"
-		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2005, Haiku.\n\n"), "Ok");
-	BTextView *view = alert->TextView();
-	BFont font;
-
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 7, &font);
-
-	alert->Go();
+	const char* authors[3];
+	authors[0] = "Axel Dörfler";
+	authors[1] = "Adrien Destugues";
+	authors[2] = NULL;
+	(new BAboutWindow("Locale", 2005, authors))->Show();
 }
 
 
@@ -218,7 +201,7 @@ int
 main(int argc, char **argv)
 {
 	LocalePreflet app;
-
 	app.Run();
 	return 0;
 }
+

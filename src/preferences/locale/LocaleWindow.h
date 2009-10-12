@@ -15,7 +15,7 @@ class TimeFormatSettingsView;
 
 class LocaleWindow : public BWindow {
 	public:
-		LocaleWindow(BRect rect);
+		LocaleWindow();
 
 		virtual bool QuitRequested();
 		virtual void MessageReceived(BMessage *message);
