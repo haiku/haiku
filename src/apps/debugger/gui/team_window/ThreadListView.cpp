@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "ThreadListView.h"
 
 #include <stdio.h>
@@ -227,7 +228,6 @@ ThreadListView::ThreadRemoved(const Team::ThreadEvent& event)
 {
 	Looper()->PostMessage(MSG_SYNC_THREAD_LIST, this);
 }
-
 
 
 void

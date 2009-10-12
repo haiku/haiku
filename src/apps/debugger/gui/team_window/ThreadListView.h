@@ -5,6 +5,7 @@
 #ifndef THREAD_LIST_VIEW_H
 #define THREAD_LIST_VIEW_H
 
+
 #include <GroupView.h>
 
 #include "table/Table.h"
