@@ -114,10 +114,17 @@ fi
 
 
 if [ -e /etc/users ]; then
+	# TODO: system/Login needs to be fixed to launch the mount_server!
 	launch system/Login
 	# nothing more
 else
 	cd /boot/home
+
+	launch $SERVERS/mount_server
+	waitfor -m application/x-vnd.Haiku-mount_server
+	# delay the boot script until all previous volumes have been mounted
+	hey -s mount_server DO InitialScan
+
 	launch system/Tracker
 	launch system/Deskbar
 

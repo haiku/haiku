@@ -3,18 +3,18 @@ SubDir HAIKU_TOP src kits tracker ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
-UsePrivateHeaders interface shared storage tracker ;
+UsePrivateHeaders interface mount shared storage tracker ;
 
 UseLibraryHeaders icon ;
 
 AddResources libtracker.so : TrackerIcons.rdef ;
 
-SubDirC++Flags 
+SubDirC++Flags
 	-D_BUILDING_tracker=1 -DOPEN_TRACKER=1
 #	-D_INCLUDES_CLASS_DEVICE_MAP=1
 	-D_SUPPORTS_RESOURCES=1
 	-D_SUPPORTS_FEATURE_SCRIPTING=1
-#	-D_SILENTLY_CORRECT_FILE_NAMES=1 
+#	-D_SILENTLY_CORRECT_FILE_NAMES=1
 	;
 
 local vector_icon_libs ;
@@ -24,7 +24,6 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) && $(TARGET_PLATFORM) != libbe_test {
 
 SharedLibrary libtracker.so :
 	AttributeStream.cpp
-	AutoMounter.cpp
 	AutoMounterSettings.cpp
 	BackgroundImage.cpp
 	Bitmaps.cpp

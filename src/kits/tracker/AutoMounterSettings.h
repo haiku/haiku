@@ -41,14 +41,12 @@ All rights reserved.
 
 namespace BPrivate {
 
-class AutoMounter;
-
 class AutomountSettingsDialog : public BWindow {
 	public:
-		AutomountSettingsDialog(BMessage *settings, AutoMounter *);
+		AutomountSettingsDialog(BMessage *settings, const BMessenger &target);
 		virtual ~AutomountSettingsDialog();
 
-		static void RunAutomountSettings(AutoMounter *);
+		static void RunAutomountSettings(const BMessenger &target);
 
 	private:
 		static AutomountSettingsDialog *sOneCopyOnly;

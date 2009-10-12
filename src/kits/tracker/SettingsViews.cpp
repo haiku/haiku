@@ -61,7 +61,7 @@ static const rgb_color kDefaultUsedSpaceColor = {0, 203, 0, kSpaceBarAlpha};
 static const rgb_color kDefaultFreeSpaceColor = {255, 255, 255, kSpaceBarAlpha};
 static const rgb_color kDefaultWarningSpaceColor = {203, 0, 0, kSpaceBarAlpha};
 
-		
+
 static void
 send_bool_notices(uint32 what, const char *name, bool value)
 {
@@ -153,7 +153,7 @@ SettingsView::ShowCurrentSettings()
 bool
 SettingsView::IsRevertable() const
 {
-	return true; 
+	return true;
 }
 
 
@@ -168,10 +168,10 @@ DesktopSettingsView::DesktopSettingsView(BRect rect)
 		new BMessage(kShowDisksIconChanged));
 	fShowDisksIconRadioButton->ResizeToPreferred();
 	AddChild(fShowDisksIconRadioButton);
-	
+
 	const float itemSpacing = fShowDisksIconRadioButton->Bounds().Height() + kItemExtraSpacing;
 	rect.OffsetBy(0, itemSpacing);
-	
+
 	fMountVolumesOntoDesktopRadioButton = new BRadioButton(rect, "",
 		"Show Volumes on Desktop", new BMessage(kVolumesOnDesktopChanged));
 	AddChild(fMountVolumesOntoDesktopRadioButton);
@@ -186,18 +186,13 @@ DesktopSettingsView::DesktopSettingsView(BRect rect)
 
 	rect.OffsetBy(-20, itemSpacing);
 
-	fEjectWhenUnmountingCheckBox = new BCheckBox(rect, "", "Eject When Unmounting",
-		new BMessage(kEjectWhenUnmountingChanged));
-	AddChild(fEjectWhenUnmountingCheckBox);
-	fEjectWhenUnmountingCheckBox->ResizeToPreferred();
-
 	rect = Bounds();
 	rect.top = rect.bottom;
 	fMountButton = new BButton(rect, "", "Mount Settings" B_UTF8_ELLIPSIS,
 		new BMessage(kRunAutomounterSettings), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fMountButton->ResizeToPreferred();
 	fMountButton->MoveBy(0, -fMountButton->Bounds().Height());
-	AddChild(fMountButton);	
+	AddChild(fMountButton);
 
 	fMountButton->SetTarget(be_app);
 }
@@ -211,7 +206,7 @@ DesktopSettingsView::GetPreferredSize(float *_width, float *_height)
 	}
 
 	if (_height != NULL) {
-		*_height = fEjectWhenUnmountingCheckBox->Frame().bottom + 8
+		*_height = fMountSharedVolumesOntoDesktopCheckBox->Frame().bottom + 8
 			+ fMountButton->Bounds().Height();
 	}
 }
@@ -223,7 +218,6 @@ DesktopSettingsView::AttachedToWindow()
 	fShowDisksIconRadioButton->SetTarget(this);
 	fMountVolumesOntoDesktopRadioButton->SetTarget(this);
 	fMountSharedVolumesOntoDesktopCheckBox->SetTarget(this);
-	fEjectWhenUnmountingCheckBox->SetTarget(this);
 }
 
 
@@ -236,7 +230,7 @@ DesktopSettingsView::MessageReceived(BMessage *message)
 
 	TrackerSettings settings;
 
-	switch (message->what) {		
+	switch (message->what) {
 		case kShowDisksIconChanged:
 		{
 			// Turn on and off related settings:
@@ -244,15 +238,15 @@ DesktopSettingsView::MessageReceived(BMessage *message)
 				!fShowDisksIconRadioButton->Value() == 1);
 			fMountSharedVolumesOntoDesktopCheckBox->SetEnabled(
 				fMountVolumesOntoDesktopRadioButton->Value() == 1);
-			
+
 			// Set the new settings in the tracker:
 			settings.SetShowDisksIcon(fShowDisksIconRadioButton->Value() == 1);
 			settings.SetMountVolumesOntoDesktop(
 				fMountVolumesOntoDesktopRadioButton->Value() == 1);
 			settings.SetMountSharedVolumesOntoDesktop(
 				fMountSharedVolumesOntoDesktopCheckBox->Value() == 1);
-			
-			// Construct the notification message:				
+
+			// Construct the notification message:
 			BMessage notificationMessage;
 			notificationMessage.AddBool("ShowDisksIcon",
 				fShowDisksIconRadioButton->Value() == 1);
@@ -276,15 +270,15 @@ DesktopSettingsView::MessageReceived(BMessage *message)
 				!fMountVolumesOntoDesktopRadioButton->Value() == 1);
 			fMountSharedVolumesOntoDesktopCheckBox->SetEnabled(
 				fMountVolumesOntoDesktopRadioButton->Value() == 1);
-			
+
 			// Set the new settings in the tracker:
 			settings.SetShowDisksIcon(fShowDisksIconRadioButton->Value() == 1);
 			settings.SetMountVolumesOntoDesktop(
 				fMountVolumesOntoDesktopRadioButton->Value() == 1);
 			settings.SetMountSharedVolumesOntoDesktop(
 				fMountSharedVolumesOntoDesktopCheckBox->Value() == 1);
-			
-			// Construct the notification message:				
+
+			// Construct the notification message:
 			BMessage notificationMessage;
 			notificationMessage.AddBool("ShowDisksIcon",
 				fShowDisksIconRadioButton->Value() == 1);
@@ -297,20 +291,6 @@ DesktopSettingsView::MessageReceived(BMessage *message)
 			tracker->SendNotices(kVolumesOnDesktopChanged, &notificationMessage);
 
 			// Tell the settings window the contents have changed:
-			Window()->PostMessage(kSettingsContentsModified);
-			break;
-		}
-
-		case kEjectWhenUnmountingChanged:
-		{
-			settings.SetEjectWhenUnmounting(
-				fEjectWhenUnmountingCheckBox->Value() == 1);
-
-			// Send the notification message
-			send_bool_notices(kEjectWhenUnmountingChanged,
-				"EjectWhenUnmounting", fEjectWhenUnmountingCheckBox->Value() == 1);
-
-			// Tell the settings window the contents have changed
 			Window()->PostMessage(kSettingsContentsModified);
 			break;
 		}
@@ -374,7 +354,7 @@ DesktopSettingsView::_SendNotices()
 	if (!tracker)
 		return;
 
-	// Construct the notification message:				
+	// Construct the notification message:
 	BMessage notificationMessage;
 	notificationMessage.AddBool("ShowDisksIcon",
 		fShowDisksIconRadioButton->Value() == 1);
@@ -382,8 +362,6 @@ DesktopSettingsView::_SendNotices()
 		fMountVolumesOntoDesktopRadioButton->Value() == 1);
 	notificationMessage.AddBool("MountSharedVolumesOntoDesktop",
 		fMountSharedVolumesOntoDesktopCheckBox->Value() == 1);
-	notificationMessage.AddBool("EjectWhenUnmounting",
-		fEjectWhenUnmountingCheckBox->Value() == 1);
 
 	// Send notices to the tracker about the change:
 	tracker->SendNotices(kVolumesOnDesktopChanged, &notificationMessage);
@@ -401,8 +379,6 @@ DesktopSettingsView::ShowCurrentSettings()
 
 	fMountSharedVolumesOntoDesktopCheckBox->SetValue(settings.MountSharedVolumesOntoDesktop());
 	fMountSharedVolumesOntoDesktopCheckBox->SetEnabled(settings.MountVolumesOntoDesktop());
-
-	fEjectWhenUnmountingCheckBox->SetValue(settings.EjectWhenUnmounting());
 }
 
 
@@ -426,9 +402,7 @@ DesktopSettingsView::IsRevertable() const
 		|| fMountVolumesOntoDesktop !=
 			(fMountVolumesOntoDesktopRadioButton->Value() > 0)
 		|| fMountSharedVolumesOntoDesktop !=
-			(fMountSharedVolumesOntoDesktopCheckBox->Value() > 0)
-		|| fEjectWhenUnmounting !=
-			(fEjectWhenUnmountingCheckBox->Value() > 0);
+			(fMountSharedVolumesOntoDesktopCheckBox->Value() > 0);
 }
 
 
@@ -504,7 +478,7 @@ WindowsSettingsView::MessageReceived(BMessage *message)
 	if (!tracker)
 		return;
 	TrackerSettings settings;
-		
+
 	switch (message->what) {
 		case kWindowsShowFullPathChanged:
 			settings.SetShowFullPathInTitleBar(fShowFullPathInTitleBarCheckBox->Value() == 1);
@@ -520,7 +494,7 @@ WindowsSettingsView::MessageReceived(BMessage *message)
 			} else {
 				fShowNavigatorCheckBox->SetEnabled(true);
 				settings.SetShowNavigator(fShowNavigatorCheckBox->Value() != 0);
-			}				
+			}
 			tracker->SendNotices(kShowNavigatorChanged);
 			tracker->SendNotices(kSingleWindowBrowseChanged);
 			Window()->PostMessage(kSettingsContentsModified);
@@ -563,7 +537,7 @@ WindowsSettingsView::MessageReceived(BMessage *message)
 	}
 }
 
-	
+
 void
 WindowsSettingsView::SetDefaults()
 {
@@ -869,7 +843,7 @@ TimeFormatSettingsView::MessageReceived(BMessage *message)
 				Window()->PostMessage(kSettingsContentsModified);
 				break;
 			}
-		
+
 		default:
 			_inherited::MessageReceived(message);
 	}
@@ -1021,7 +995,7 @@ TimeFormatSettingsView::_UpdateExamples()
 			separator = kSlashSeparator;
 	} else
 		separator = kSlashSeparator;
-		
+
 	DateOrder order =
 		fYMDRadioButton->Value() ? kYMDFormat :
 		(fDMYRadioButton->Value() ? kDMYFormat : kMDYFormat);
@@ -1036,7 +1010,7 @@ TimeFormatSettingsView::_UpdateExamples()
 
 	TimeFormat(timeFormat, 4, separator, order, clockIs24hr);
 	strftime(buffer, 256, timeFormat.String(), &timeData);
-	
+
 	fShortDateExampleView->SetText(buffer);
 	fShortDateExampleView->ResizeToPreferred();
 }
@@ -1153,10 +1127,10 @@ SpaceBarSettingsView::MessageReceived(BMessage *message)
 
 		case kSpaceBarColorChanged:
 		{
-			rgb_color color = fColorControl->ValueAsColor();				
+			rgb_color color = fColorControl->ValueAsColor();
 			color.alpha = kSpaceBarAlpha;
 				//alpha is ignored by BColorControl but is checked in equalities
-				
+
 			switch (fCurrentColor) {
 				case 0:
 					settings.SetUsedSpaceColor(color);
@@ -1177,7 +1151,7 @@ SpaceBarSettingsView::MessageReceived(BMessage *message)
 		default:
 			_inherited::MessageReceived(message);
 			break;
-	}	
+	}
 }
 
 
@@ -1345,7 +1319,7 @@ TrashSettingsView::MessageReceived(BMessage *message)
 	if (!tracker)
 		return;
 	TrackerSettings settings;
-		
+
 	switch (message->what) {
 		case kDontMoveFilesToTrashChanged:
 			settings.SetDontMoveFilesToTrash(fDontMoveFilesToTrashCheckBox->Value() == 1);
@@ -1367,7 +1341,7 @@ TrashSettingsView::MessageReceived(BMessage *message)
 	}
 }
 
-	
+
 void
 TrashSettingsView::SetDefaults()
 {

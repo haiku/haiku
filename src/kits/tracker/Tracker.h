@@ -47,7 +47,6 @@ All rights reserved.
 
 namespace BPrivate {
 
-class AutoMounter;
 class BClipboardRefsWatcher;
 class BContainerWindow;
 class BDeskWindow;
@@ -127,7 +126,7 @@ class TTracker : public BApplication {
 			// again
 
 		TaskLoop *MainTaskLoop() const;
-		AutoMounter *AutoMounterLoop();
+		BMessenger MountServer() const;
 
 		bool QueryActiveForDevice(dev_t);
 		void CloseActiveQueryWindows(dev_t);
@@ -212,11 +211,10 @@ class TTracker : public BApplication {
 				const node_ref *nodeToSelect = NULL, OpenSelector selector = kOpen,
 				const BMessage *messageToBundle = NULL);
 
-		MimeTypeList *fMimeTypeList;	
+		MimeTypeList *fMimeTypeList;
 		WindowList fWindowList;
 		BClipboardRefsWatcher *fClipboardRefsWatcher;
 		BTrashWatcher *fTrashWatcher;
-		AutoMounter *fAutoMounter;
 		TaskLoop *fTaskLoop;
 		int32 fNodeMonitorCount;
 

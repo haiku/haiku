@@ -56,7 +56,6 @@ All rights reserved.
 
 #include "Attributes.h"
 #include "AutoLock.h"
-#include "AutoMounter.h"
 #include "AutoMounterSettings.h"
 #include "BackgroundImage.h"
 #include "Bitmaps.h"
@@ -349,10 +348,6 @@ TTracker::Quit()
 {
 	TrackerSettings().SaveSettings(false);
 
-	fAutoMounter->Lock();
-	fAutoMounter->QuitRequested();	// automounter does some stuff in QuitRequested
-	fAutoMounter->Quit();			// but we really don't care if it is cooperating or not
-
 	fClipboardRefsWatcher->Lock();
 	fClipboardRefsWatcher->Quit();
 
@@ -376,11 +371,6 @@ TTracker::MessageReceived(BMessage *message)
 		return;
 
 	switch (message->what) {
-		case kOpenPreviouslyOpenWindows:
-			if (!BootedInSafeMode())
-				_OpenPreviouslyOpenedWindows();
-			break;
-
 		case kGetInfo:
 			OpenInfoWindows(message);
 			break;
@@ -415,35 +405,6 @@ TTracker::MessageReceived(BMessage *message)
 			EditQueries(message);
 			break;
 
-		case kUnmountVolume:
-			// When the user attempts to unmount a volume from the mount
-			// context menu, this is where the message gets received.
-			// Save pose locations and forward this to the automounter
-			SaveAllPoseLocations();
-			fAutoMounter->PostMessage(message);
-			break;
-
-		case kRunAutomounterSettings:
-			AutomountSettingsDialog::RunAutomountSettings(fAutoMounter);
-			break;
-
-		case kVolumeMounted:
-		{
-			// This is sent to us by the AutoMounter whenever it mounts
-			// a new volume - we use it to restore the previously opened
-			// windows from that volume in case it has been mounted
-			// during the AutoMounter's initial rescan
-			const char* path;
-			bool initial;
-			if (message->FindBool("initial rescan", &initial) != B_OK
-				|| message->FindString("path", &path) != B_OK
-				|| !initial)
-				break;
-
-			_OpenPreviouslyOpenedWindows(path);
-			break;
-		}
-
 		case kShowSplash:
 			run_be_about();
 			break;
@@ -461,31 +422,40 @@ TTracker::MessageReceived(BMessage *message)
 #ifdef MOUNT_MENU_IN_DESKBAR
 
 		case 'gmtv':
-			{
-				// Someone (probably the deskbar) has requested a list of
-				// mountable volumes.
-				BMessage reply;
-				AutoMounterLoop()->EachMountableItemAndFloppy(&AddMountableItemToMessage,
-				  &reply);
-				message->SendReply(&reply);
-				break;
-			}
+		{
+			// Someone (probably the deskbar) has requested a list of
+			// mountable volumes.
+			BMessage reply;
+			AutoMounterLoop()->EachMountableItemAndFloppy(&AddMountableItemToMessage,
+			  &reply);
+			message->SendReply(&reply);
+			break;
+		}
 
 #endif
 
+		case kUnmountVolume:
+			// When the user attempts to unmount a volume from the mount
+			// context menu, this is where the message gets received.
+			// Save pose locations and forward this to the automounter
+			SaveAllPoseLocations();
+			// Fall through...
 		case kMountVolume:
 		case kMountAllNow:
-			AutoMounterLoop()->PostMessage(message);
+			MountServer().SendMessage(message);
 			break;
 
+		case kRunAutomounterSettings:
+			AutomountSettingsDialog::RunAutomountSettings(MountServer());
+			break;
 
 		case kRestoreBackgroundImage:
-			{
-				BDeskWindow *desktop = GetDeskWindow();
-				AutoLock<BWindow> lock(desktop);
-				desktop->UpdateDesktopBackgroundImages();
-			}
+		{
+			BDeskWindow *desktop = GetDeskWindow();
+			AutoLock<BWindow> lock(desktop);
+			desktop->UpdateDesktopBackgroundImages();
 			break;
+		}
 
  		case kShowSettingsWindow:
  			ShowSettingsWindow();
@@ -514,16 +484,13 @@ TTracker::MessageReceived(BMessage *message)
 		}
 
 		case kFSClipboardChanges:
-		{
 			fClipboardRefsWatcher->UpdatePoseViews(message);
 			break;
-		}
 
 		case kShowVolumeSpaceBar:
-		case kSpaceBarColorChanged: {
+		case kSpaceBarColorChanged:
 			gPeriodicUpdatePoses.DoPeriodicUpdate(true);
 			break;
-		}
 
 		default:
 			_inherited::MessageReceived(message);
@@ -1335,9 +1302,6 @@ TTracker::ReadyToRun()
 	fClipboardRefsWatcher = new BClipboardRefsWatcher();
 	fClipboardRefsWatcher->Run();
 
-	fAutoMounter = new AutoMounter();
-	fAutoMounter->Run();
-
 	fTaskLoop = new StandAloneTaskLoop(true);
 
 	// open desktop window
@@ -1383,6 +1347,8 @@ TTracker::ReadyToRun()
 	if (!BootedInSafeMode()) {
 		// kick of transient query killer
 		DeleteTransientQueriesTask::StartUpTransientQueryCleaner();
+		// the mount_server will have mounted the previous volumes already.
+		_OpenPreviouslyOpenedWindows();
 	}
 }
 
@@ -1570,10 +1536,10 @@ TTracker::WatchNode(const node_ref *node, uint32 flags,
 }
 
 
-AutoMounter *
-TTracker::AutoMounterLoop()
+BMessenger
+TTracker::MountServer() const
 {
-	return fAutoMounter;
+	return BMessenger(kMountServerSignature);
 }
 
 

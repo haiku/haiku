@@ -42,25 +42,16 @@ All rights reserved.
 #include <Volume.h>
 #include <fs_info.h>
 
-#include "AutoMounter.h"
 #include "Commands.h"
 #include "MountMenu.h"
 #include "IconMenuItem.h"
 #include "Tracker.h"
 #include "Bitmaps.h"
 
-#ifdef __HAIKU__
-#	include <DiskDevice.h>
-#	include <DiskDeviceList.h>
-#else
-#	include "DeviceMap.h"
-#endif
+#include <DiskDevice.h>
+#include <DiskDeviceList.h>
 
 #define SHOW_NETWORK_VOLUMES
-
-
-#ifdef __HAIKU__
-//	#pragma mark - Haiku Disk Device API
 
 
 class AddMenuItemVisitor : public BDiskDeviceVisitor {
@@ -159,74 +150,6 @@ AddMenuItemVisitor::Visit(BPartition *partition, int32 level)
 	return false;
 }
 
-#else	// !__HAIKU__
-//	#pragma mark - R5 DeviceMap API
-
-
-struct AddOneAsMenuItemParams {
-	BMenu *mountMenu;
-};
-
-
-static Partition *
-AddOnePartitionAsMenuItem(Partition *partition, void *castToParams)
-{
-	if (partition->Hidden())
-		return NULL;
-
-	AddOneAsMenuItemParams *params = (AddOneAsMenuItemParams *)castToParams;
-	BBitmap *icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1),
-		B_CMAP8);
-	get_device_icon(partition->GetDevice()->Name(), icon->Bits(), B_MINI_ICON);
-
-
-	const char *name = partition->GetDevice()->DisplayName();
-
-	if (!partition->GetDevice()->IsFloppy() ||
-		partition->Mounted() == kMounted) {
-		if (*partition->VolumeName())
-			name = partition->VolumeName();
-		else if (*partition->Type())
-			name = partition->Type();
-	}
-
-	BMessage *message = new BMessage;
-
-	if (partition->Mounted() == kMounted) {
-		message->what = kUnmountVolume;
-		message->AddInt32("device_id", partition->VolumeDeviceID());
-	} else {
-		message->what = kMountVolume;
-
-		//
-		//	Floppies have an ID of -1, because they don't have
-		//	partition (and hence no parititon ID).
-		//
-		if (partition->GetDevice()->IsFloppy())
-			message->AddInt32("id", kFloppyID);
-		else
-			message->AddInt32("id", partition->UniqueID());
-	}
-
-	BMenuItem *item = new IconMenuItem(name, message, icon);
-	if (partition->Mounted() == kMounted)
-		item->SetMarked(true);
-
-	if (partition->Mounted() == kMounted) {
-		BVolume partVolume(partition->VolumeDeviceID());
-
-		BVolume bootVolume;
-		BVolumeRoster().GetBootVolume(&bootVolume);
-		if (partVolume == bootVolume)
-			item->SetEnabled(false);
-	}
-
-	params->mountMenu->AddItem(item);
-
-	return NULL;
-}
-#endif	// !__HAIKU__
-
 
 //	#pragma mark -
 
@@ -249,23 +172,12 @@ MountMenu::AddDynamicItem(add_state)
 		delete item;
 	}
 
-#ifdef __HAIKU__
 	BDiskDeviceList devices;
 	status_t status = devices.Fetch();
 	if (status == B_OK) {
 		AddMenuItemVisitor visitor(this);
 		devices.VisitEachPartition(&visitor);
 	}
-#else
-	AddOneAsMenuItemParams params;
-	params.mountMenu = this;
-
-	AutoMounter *autoMounter = dynamic_cast<TTracker *>(be_app)->
-		AutoMounterLoop();
-
-	autoMounter->CheckVolumesNow();
-	autoMounter->EachPartition(&AddOnePartitionAsMenuItem, &params);
-#endif
 
 #ifdef SHOW_NETWORK_VOLUMES
 	// iterate the volume roster and look for volumes with the
@@ -302,27 +214,14 @@ MountMenu::AddDynamicItem(add_state)
 
 	AddSeparatorItem();
 
-#ifndef __HAIKU__
-	// add an option to rescan the scsii bus, etc.
-	BMenuItem *rescanItem = NULL;
-	if (modifiers() & B_SHIFT_KEY) {
-		rescanItem = new BMenuItem("Rescan Devices", new BMessage(kAutomounterRescan));
-		AddItem(rescanItem);
-	}
-#endif
-
-	BMenuItem *mountAll = new BMenuItem("Mount All", new BMessage(kMountAllNow));
+	BMenuItem *mountAll = new BMenuItem("Mount All",
+		new BMessage(kMountAllNow));
 	AddItem(mountAll);
 	BMenuItem *mountSettings = new BMenuItem("Settings" B_UTF8_ELLIPSIS,
 		new BMessage(kRunAutomounterSettings));
 	AddItem(mountSettings);
 
 	SetTargetForItems(be_app);
-
-#ifndef __HAIKU__
-	if (rescanItem)
-		rescanItem->SetTarget(autoMounter);
-#endif
 
 	return false;
 }

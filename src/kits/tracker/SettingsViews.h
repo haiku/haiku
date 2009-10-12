@@ -89,7 +89,6 @@ class DesktopSettingsView : public SettingsView {
 		BRadioButton *fMountVolumesOntoDesktopRadioButton;
 		BCheckBox *fMountSharedVolumesOntoDesktopCheckBox;
 		BCheckBox *fIntegrateNonBootBeOSDesktopsCheckBox;
-		BCheckBox *fEjectWhenUnmountingCheckBox;
 		BButton *fMountButton;
 
 		bool fShowDisksIcon;
@@ -138,7 +137,7 @@ class TimeFormatSettingsView : public SettingsView {
 		TimeFormatSettingsView(BRect frame);
 
 		virtual void MessageReceived(BMessage *message);
-		virtual void AttachedToWindow();	
+		virtual void AttachedToWindow();
 		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();

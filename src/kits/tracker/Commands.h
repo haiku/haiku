@@ -37,6 +37,8 @@ All rights reserved.
 
 #include "PublicCommands.h"
 
+#include <MountServer.h>
+
 namespace BPrivate {
 
 // external app messages
@@ -77,7 +79,6 @@ const uint32 kEmptyTrash = 'Tetr';
 const uint32 kAddPrinter = 'Tadp';
 const uint32 kMakeActivePrinter = 'Tmap';
 
-const uint32 kUnmountVolume = 'Tunm';
 const uint32 kRunAutomounterSettings = 'Tram';
 
 const uint32 kOpenParentDir = 'Topt';
