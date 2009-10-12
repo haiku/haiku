@@ -138,10 +138,10 @@ TStatusWindow::MessageReceived(BMessage* msg)
 
 				find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
 				dir.SetTo(path.Path());
-				if (dir.FindEntry("bemail", &entry) == B_NO_ERROR)
+				if (dir.FindEntry("Mail", &entry) == B_NO_ERROR)
 					dir.SetTo(&entry);
 				else
-					dir.CreateDirectory("bemail", &dir);
+					dir.CreateDirectory("Mail", &dir);
 				if (dir.InitCheck() != B_NO_ERROR)
 					goto err_exit;
 				if (dir.FindEntry("status", &entry) == B_NO_ERROR)

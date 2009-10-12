@@ -31,6 +31,7 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
+
 #include "Signature.h"
 
 #include <stdio.h>
@@ -102,7 +103,7 @@ TSignatureWindow::TSignatureWindow(BRect rect)
 	fSigView = new TSignatureView(BRect(0, menu_bar->Frame().bottom+1,
 										rect.Width(), menu_bar->Frame().bottom+2));
 	AddChild(fSigView);
-	
+
 	/* resize the window to the correct height */
 	fSigView->SetResizingMode(B_FOLLOW_NONE);
 	ResizeTo(rect.Width()-2, fSigView->Frame().bottom-2);
@@ -142,7 +143,7 @@ TSignatureWindow::MenusBeginning()
 	fPaste->SetEnabled(be_clipboard->Data()->HasData("text/plain", B_MIME_TYPE));
 	be_clipboard->Unlock();
 
-	// Undo stuff	
+	// Undo stuff
 	bool		isRedo = false;
 	undo_state	undoState = B_UNDO_UNAVAILABLE;
 
@@ -189,11 +190,11 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 			if (!(new BAlert("",MDR_DIALECT_CHOICE (
 					"Really delete this signature? This cannot be undone.",
 					"この署名を削除しますか？"),
-					MDR_DIALECT_CHOICE ("Cancel","取消l"), 
+					MDR_DIALECT_CHOICE ("Cancel","取消l"),
 					MDR_DIALECT_CHOICE ("Delete","削除"), NULL, B_WIDTH_AS_USUAL,
 					B_WARNING_ALERT))->Go())
 				break;
-			
+
 			if (fFile) {
 				delete fFile;
 				fFile = NULL;
@@ -253,7 +254,7 @@ TSignatureWindow::QuitRequested()
 }
 
 
-void 
+void
 TSignatureWindow::FrameResized(float width, float height)
 {
 	fSigView->FrameResized(width, height);
@@ -270,7 +271,7 @@ TSignatureWindow::Show()
 	fSigView->fName->MakeFocus(true);
 	text_view->Select(0, text_view->TextLength());
 	Unlock();
-	
+
 	BWindow::Show();
 }
 
@@ -282,7 +283,7 @@ TSignatureWindow::Clear()
 
 	if (IsDirty()) {
 		beep();
-		BAlert *alert = new BAlert("", 
+		BAlert *alert = new BAlert("",
 			MDR_DIALECT_CHOICE ("Save changes to this signature?","変更した署名を保存しますか？"),
 			MDR_DIALECT_CHOICE ("Don't Save","保存しない"),
 			MDR_DIALECT_CHOICE ("Cancel","中止"),
@@ -337,12 +338,12 @@ TSignatureWindow::Save()
 	if (!fFile) {
 		find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
 		dir.SetTo(path.Path());
-		
-		if (dir.FindEntry("bemail", &entry) == B_NO_ERROR)
+
+		if (dir.FindEntry("Mail", &entry) == B_NO_ERROR)
 			dir.SetTo(&entry);
 		else
-			dir.CreateDirectory("bemail", &dir);
-			
+			dir.CreateDirectory("Mail", &dir);
+
 		if (dir.InitCheck() != B_NO_ERROR)
 			goto err_exit;
 
@@ -350,7 +351,7 @@ TSignatureWindow::Save()
 			dir.SetTo(&entry);
 		else
 			dir.CreateDirectory("signatures", &dir);
-			
+
 		if (dir.InitCheck() != B_NO_ERROR)
 			goto err_exit;
 
@@ -396,7 +397,7 @@ TSignatureView::TSignatureView(BRect rect)
 }
 
 
-void 
+void
 TSignatureView::AttachedToWindow()
 {
 	BRect	rect = Bounds();
@@ -411,7 +412,7 @@ TSignatureView::AttachedToWindow()
 
 	rect.InsetBy(8,0);
 	rect.top+= 8;
-	
+
 	fName = new TNameControl(rect, kNameText, new BMessage(NAME_FIELD));
 	AddChild(fName);
 
@@ -502,7 +503,7 @@ TSigTextView::TSigTextView(BRect frame, BRect text)
 }
 
 
-void 
+void
 TSigTextView::FrameResized(float /*width*/, float /*height*/)
 {
 	BRect r(Bounds());
