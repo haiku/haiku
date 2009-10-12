@@ -50,7 +50,6 @@ StdBinCommands
 	unchop.c
 	uptime.cpp
 	vmstat.cpp
-	waitfor.c
 #	whoami.c
 	: : $(haiku-utils_rsrc) ;
 
@@ -102,6 +101,7 @@ StdBinCommands
 	setversion.cpp
 	trash.cpp
 	version.cpp
+	waitfor.cpp
 	WindowShade.cpp
 #	yes.cpp
 	: be : $(haiku-utils_rsrc) ;
