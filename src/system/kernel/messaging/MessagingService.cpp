@@ -1,9 +1,11 @@
-/* 
+/*
  * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
-// kernel-side implementation of the messaging service
+
+//! kernel-side implementation of the messaging service
+
 
 #include <new>
 
@@ -33,13 +35,11 @@ static const int32 kMessagingAreaSize = B_PAGE_SIZE * 4;
 // #pragma mark - MessagingArea
 
 
-// constructor
 MessagingArea::MessagingArea()
 {
 }
 
 
-// destructor
 MessagingArea::~MessagingArea()
 {
 	if (fID >= 0)
@@ -47,7 +47,6 @@ MessagingArea::~MessagingArea()
 }
 
 
-// Create
 MessagingArea *
 MessagingArea::Create(sem_id lockSem, sem_id counterSem)
 {
@@ -76,7 +75,6 @@ MessagingArea::Create(sem_id lockSem, sem_id counterSem)
 }
 
 
-// InitHeader
 void
 MessagingArea::InitHeader()
 {
@@ -90,7 +88,6 @@ MessagingArea::InitHeader()
 }
 
 
-// CheckCommandSize
 bool
 MessagingArea::CheckCommandSize(int32 dataSize)
 {
@@ -101,7 +98,6 @@ MessagingArea::CheckCommandSize(int32 dataSize)
 }
 
 
-// Lock
 bool
 MessagingArea::Lock()
 {
@@ -113,7 +109,6 @@ MessagingArea::Lock()
 }
 
 
-// Unlock
 void
 MessagingArea::Unlock()
 {
@@ -122,7 +117,6 @@ MessagingArea::Unlock()
 }
 
 
-// ID
 area_id
 MessagingArea::ID() const
 {
@@ -130,7 +124,6 @@ MessagingArea::ID() const
 }
 
 
-// Size
 int32
 MessagingArea::Size() const
 {
@@ -138,7 +131,6 @@ MessagingArea::Size() const
 }
 
 
-// Empty
 bool
 MessagingArea::IsEmpty() const
 {
@@ -146,7 +138,6 @@ MessagingArea::IsEmpty() const
 }
 
 
-// AllocateCommand
 void *
 MessagingArea::AllocateCommand(uint32 commandWhat, int32 dataSize,
 	bool &wasEmpty)
@@ -218,7 +209,6 @@ MessagingArea::AllocateCommand(uint32 commandWhat, int32 dataSize,
 }
 
 
-// CommitCommand
 void
 MessagingArea::CommitCommand()
 {
@@ -227,7 +217,6 @@ MessagingArea::CommitCommand()
 }
 
 
-// SetNextArea
 void
 MessagingArea::SetNextArea(MessagingArea *area)
 {
@@ -236,7 +225,6 @@ MessagingArea::SetNextArea(MessagingArea *area)
 }
 
 
-// NextArea
 MessagingArea *
 MessagingArea::NextArea() const
 {
@@ -244,7 +232,6 @@ MessagingArea::NextArea() const
 }
 
 
-// _CheckCommand
 messaging_command *
 MessagingArea::_CheckCommand(int32 offset, int32 &size)
 {
@@ -271,16 +258,15 @@ MessagingArea::_CheckCommand(int32 offset, int32 &size)
 // #pragma mark - MessagingService
 
 
-// constructor
 MessagingService::MessagingService()
-	: fLock("messaging service"),
-	  fFirstArea(NULL),
-	  fLastArea(NULL)
+	:
+	fLock(RECURSIVE_LOCK_INITIALIZER("messaging service")),
+	fFirstArea(NULL),
+	fLastArea(NULL)
 {
 }
 
 
-// destructor
 MessagingService::~MessagingService()
 {
 	// Should actually never be called. Once created the service stays till the
@@ -288,33 +274,27 @@ MessagingService::~MessagingService()
 }
 
 
-// InitCheck
 status_t
 MessagingService::InitCheck() const
 {
-	if (fLock.Sem() < 0)
-		return fLock.Sem();
 	return B_OK;
 }
 
 
-// Lock
 bool
 MessagingService::Lock()
 {
-	return fLock.Lock();
+	return recursive_lock_lock(&fLock) == B_OK;
 }
 
 
-// Unlock
 void
 MessagingService::Unlock()
 {
-	fLock.Unlock();
+	recursive_lock_unlock(&fLock);
 }
 
 
-// RegisterService
 status_t
 MessagingService::RegisterService(sem_id lockSem, sem_id counterSem,
 	area_id &areaID)
@@ -362,7 +342,6 @@ MessagingService::RegisterService(sem_id lockSem, sem_id counterSem,
 }
 
 
-// UnregisterService
 status_t
 MessagingService::UnregisterService()
 {
@@ -392,7 +371,6 @@ MessagingService::UnregisterService()
 }
 
 
-// SendMessage
 status_t
 MessagingService::SendMessage(const void *message, int32 messageSize,
 	const messaging_target *targets, int32 targetCount)
@@ -436,7 +414,6 @@ PRINT(("  Allocated space for send message command: area: %p, data: %p, "
 }
 
 
-// _AllocateCommand
 status_t
 MessagingService::_AllocateCommand(int32 commandWhat, int32 size,
 	MessagingArea *&area, void *&data, bool &wasEmpty)
@@ -513,7 +490,6 @@ MessagingService::_AllocateCommand(int32 commandWhat, int32 size,
 // #pragma mark - kernel private
 
 
-// send_message
 status_t
 send_message(const void *message, int32 messageSize,
 	const messaging_target *targets, int32 targetCount)
@@ -534,7 +510,6 @@ send_message(const void *message, int32 messageSize,
 }
 
 
-// send_message
 status_t
 send_message(const KMessage *message, const messaging_target *targets,
 	int32 targetCount)
@@ -547,7 +522,6 @@ send_message(const KMessage *message, const messaging_target *targets,
 }
 
 
-// init_messaging_service
 status_t
 init_messaging_service()
 {
@@ -573,7 +547,6 @@ init_messaging_service()
 // #pragma mark - syscalls
 
 
-// _user_register_messaging_service
 /** \brief Called by the userland server to register itself as a messaging
 		   service for the kernel.
 	\param lockingSem A semaphore used for locking the shared data. Semaphore
@@ -605,7 +578,6 @@ _user_register_messaging_service(sem_id lockSem, sem_id counterSem)
 }
 
 
-// _user_unregister_messaging_service
 status_t
 _user_unregister_messaging_service()
 {

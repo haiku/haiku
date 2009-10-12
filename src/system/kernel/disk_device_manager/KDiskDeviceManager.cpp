@@ -239,7 +239,7 @@ public:
 
 KDiskDeviceManager::KDiskDeviceManager()
 	:
-	fLock("disk device manager"),
+	fLock(RECURSIVE_LOCK_INITIALIZER("disk device manager")),
 	fDevices(new(nothrow) DeviceMap),
 	fPartitions(new(nothrow) PartitionMap),
 	fDiskSystems(new(nothrow) DiskSystemMap),
@@ -324,7 +324,7 @@ KDiskDeviceManager::InitCheck() const
 		|| fObsoletePartitions == NULL || fNotifications == NULL)
 		return B_NO_MEMORY;
 
-	return fLock.Sem() >= 0 ? B_OK : fLock.Sem();
+	return B_OK;
 }
 
 
@@ -366,14 +366,14 @@ KDiskDeviceManager::Default()
 bool
 KDiskDeviceManager::Lock()
 {
-	return fLock.Lock();
+	return recursive_lock_lock(&fLock) == B_OK;
 }
 
 
 void
 KDiskDeviceManager::Unlock()
 {
-	fLock.Unlock();
+	recursive_lock_unlock(&fLock);
 }
 
 

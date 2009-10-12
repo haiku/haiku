@@ -5,10 +5,12 @@
 #ifndef _K_DISK_DEVICE_H
 #define _K_DISK_DEVICE_H
 
+
 #include <OS.h>
 
+#include <lock.h>
+
 #include "KPartition.h"
-#include "RWLocker.h"
 
 
 namespace BPrivate {
@@ -36,10 +38,8 @@ public:
 	// manager lock owners can be sure, that it won't change.
 	bool ReadLock();
 	void ReadUnlock();
-	bool IsReadLocked(bool orWriteLocked = true);
 	bool WriteLock();
 	void WriteUnlock();
-	bool IsWriteLocked();
 
 	virtual void SetID(partition_id id);
 
@@ -92,7 +92,7 @@ private:
 	void _UpdateDeviceFlags();
 
 	disk_device_data	fDeviceData;
-	RWLocker			fLocker;
+	rw_lock				fLocker;
 	int					fFD;
 	status_t			fMediaStatus;
 };

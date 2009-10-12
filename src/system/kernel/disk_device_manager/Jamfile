@@ -27,10 +27,6 @@ KernelMergeObject kernel_disk_device_manager.o :
 	KPartitionVisitor.cpp
 	UserDataWriter.cpp
 
-	# utilities
-	Locker.cpp
-	RWLocker.cpp
-
 	# disk device types
 	DiskDeviceTypes.cpp
 

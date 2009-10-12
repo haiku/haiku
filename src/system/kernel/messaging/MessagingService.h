@@ -1,16 +1,18 @@
-/* 
+/*
  * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
-// kernel-side implementation-private definitions for the messaging service
-
 #ifndef MESSAGING_SERVICE_H
 #define MESSAGING_SERVICE_H
 
+
+//! kernel-side implementation-private definitions for the messaging service
+
+
 #include <MessagingServiceDefs.h>
 
-#include "Locker.h"
+#include <lock.h>
+
 
 namespace BPrivate {
 
@@ -73,7 +75,7 @@ private:
 	status_t _AllocateCommand(int32 commandWhat, int32 size,
 		MessagingArea *&area, void *&data, bool &wasEmpty);
 
-	BLocker			fLock;
+	recursive_lock	fLock;
 	team_id			fServerTeam;
 	sem_id			fLockSem;
 	sem_id			fCounterSem;

@@ -39,11 +39,9 @@ write_unlock_disk_device(partition_id partitionID)
 {
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	if (KDiskDevice* device = manager->RegisterDevice(partitionID, false)) {
-		bool isLocked = device->IsWriteLocked();
-		if (isLocked) {
-			device->WriteUnlock();
-			device->Unregister();
-		}
+		device->WriteUnlock();
+		device->Unregister();
+
 		device->Unregister();
 	}
 }
@@ -71,11 +69,9 @@ read_unlock_disk_device(partition_id partitionID)
 {
 	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	if (KDiskDevice* device = manager->RegisterDevice(partitionID, false)) {
-		bool isLocked = device->IsReadLocked(false);
-		if (isLocked) {
-			device->ReadUnlock();
-			device->Unregister();
-		}
+		device->ReadUnlock();
+		device->Unregister();
+
 		device->Unregister();
 	}
 }

@@ -133,7 +133,7 @@ private:
 
 	void _NotifyDeviceEvent(KDiskDevice* device, int32 event, uint32 mask);
 
-	BLocker						fLock;
+	recursive_lock				fLock;
 	DeviceMap					*fDevices;
 	PartitionMap				*fPartitions;
 	DiskSystemMap				*fDiskSystems;

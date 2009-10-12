@@ -23,26 +23,27 @@
 #define DBG(x) x
 #define OUT dprintf
 
-// constructor
+
 KDiskDevice::KDiskDevice(partition_id id)
-	: KPartition(id),
-	  fDeviceData(),
-	  fLocker("diskdevice"),
-	  fFD(-1),
-	  fMediaStatus(B_ERROR)
+	:
+	KPartition(id),
+	fDeviceData(),
+	fLocker(RW_LOCK_INITIALIZER("disk device")),
+	fFD(-1),
+	fMediaStatus(B_ERROR)
 {
 	Unset();
 	fDevice = this;
 	fPublishedName = (char*)"raw";
 }
 
-// destructor
+
 KDiskDevice::~KDiskDevice()
 {
 	Unset();
 }
 
-// SetTo
+
 status_t
 KDiskDevice::SetTo(const char *path)
 {
@@ -84,7 +85,7 @@ KDiskDevice::SetTo(const char *path)
 	return B_OK;
 }
 
-// Unset
+
 void
 KDiskDevice::Unset()
 {
@@ -102,57 +103,42 @@ KDiskDevice::Unset()
 	_ResetGeometry();
 }
 
-// InitCheck
+
 status_t
 KDiskDevice::InitCheck() const
 {
-	return fLocker.InitCheck();
+	return B_OK;
 }
 
-// ReadLock
+
 bool
 KDiskDevice::ReadLock()
 {
-	return fLocker.ReadLock();
+	return rw_lock_read_lock(&fLocker) == B_OK;
 }
 
-// ReadUnlock
+
 void
 KDiskDevice::ReadUnlock()
 {
-	fLocker.ReadUnlock();
+	rw_lock_read_unlock(&fLocker);
 }
 
-// IsReadLocked
-bool
-KDiskDevice::IsReadLocked(bool orWriteLocked)
-{
-	return fLocker.IsReadLocked(orWriteLocked);
-}
 
-// WriteLock
 bool
 KDiskDevice::WriteLock()
 {
-	return fLocker.WriteLock();
+	return rw_lock_write_lock(&fLocker) == B_OK;
 }
 
-// WriteUnlock
+
 void
 KDiskDevice::WriteUnlock()
 {
-	fLocker.WriteUnlock();
-}
-
-// IsWriteLocked
-bool
-KDiskDevice::IsWriteLocked()
-{
-	return fLocker.IsWriteLocked();
+	rw_lock_write_unlock(&fLocker);
 }
 
 
-// SetID
 void
 KDiskDevice::SetID(partition_id id)
 {
@@ -160,7 +146,7 @@ KDiskDevice::SetID(partition_id id)
 	fDeviceData.id = id;
 }
 
-// PublishDevice
+
 status_t
 KDiskDevice::PublishDevice()
 {
