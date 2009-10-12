@@ -310,7 +310,7 @@
 #define HAVE_MEMORY_H 1
 
 /* Define if you have the <ncurses.h> header file.  */
-/* #undef HAVE_NCURSES_H */
+#define HAVE_NCURSES_H 1
 
 /* Define if you have the <ncurses/ncurses.h> header file.  */
 /* #undef HAVE_NCURSES_NCURSES_H */

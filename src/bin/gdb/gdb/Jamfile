@@ -10,10 +10,11 @@ SubDirSysHdrs [ FDirName $(HAIKU_TOP) src bin gawk intl ] ;
 	# Use gawk's libintl for the time being.
 	# TODO: Put a current version of intl ot src/libs and build a static lib
 	# all interested apps can link against.
+UseLibraryHeaders ncurses ;
 UsePrivateHeaders debug ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -DLOCALEDIR=\\\"/etc/locale\\\"
-	-DMI_OUT=1 ;
+	-DMI_OUT=1 -DTUI=1 ;
 
 # filter warnings we don't want here
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
@@ -22,6 +23,7 @@ TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 SEARCH_SOURCE += [ FDirName $(SUBDIR) cli ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mi ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) signals ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) tui ] ;
 
 # architecture specific sources
 local gdbHaikuArchTargetSources ;
@@ -215,6 +217,26 @@ local gdbHostSources =
 	mi-symbol-cmds.c
 ;
 
+local gdbTUISources =
+	tui-command.c
+	tui-data.c
+	tui-disasm.c
+	tui-file.c
+	tui-hooks.c
+	tui-interp.c
+	tui-io.c
+	tui-layout.c
+	tui-out.c
+	tui-regs.c
+	tui-source.c
+	tui-stack.c
+	tui-win.c
+	tui-windata.c
+	tui-wingeneral.c
+	tui-winsource.c
+	tui.c
+;
+
 local gdbHaikuTargetSources =
 	haiku-tdep.c
 	solib.c
@@ -232,6 +254,7 @@ local gdbAllLibSources =
 	$(gdbBaseSources)
 	$(gdbGeneratedSources)
 	$(gdbHostSources)
+	$(gdbTUISources)
 	$(gdbHaikuTargetSources)
 	$(gdbHaikuNativeSources)
 	$(gdbHaikuArchTargetSources)
@@ -257,7 +280,7 @@ BinCommand gdb : gdb.c :
 	<gdb>libreadline.a
 	<gawk>libintl.a	# use gawk's libintl for the time being
 
-	libtermcap.a
+	libncurses.a
 
 	libroot.so
 	libdebug.so
