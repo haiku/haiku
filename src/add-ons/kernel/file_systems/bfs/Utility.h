@@ -8,6 +8,8 @@
 
 #include "system_dependencies.h"
 
+#include "Volume.h"
+
 
 enum inode_type {
 	S_DIRECTORY		= S_IFDIR,
@@ -90,6 +92,38 @@ get_shift(uint64 i)
 		c++;
 	}
 	return c;
+}
+
+
+inline int32
+runs_per_block(Volume* volume)
+{
+	return volume->BlockSize() / sizeof(block_run);
+}
+
+
+inline int32
+double_indirect_max_direct_size(Volume* volume, uint32 baseLength)
+{
+	return baseLength << volume->BlockShift();
+}
+
+
+inline int32
+double_indirect_max_indirect_size(Volume* volume, uint32 baseLength)
+{
+	return baseLength * double_indirect_max_direct_size(volume, baseLength)
+		* runs_per_block(volume);
+}
+
+
+inline void
+get_double_indirect_sizes(Volume* volume, uint32 baseLength,
+	int32& runsPerBlock, int32& directSize, int32& indirectSize)
+{
+	runsPerBlock = runs_per_block(volume);
+	directSize = double_indirect_max_direct_size(volume, baseLength);
+	indirectSize = baseLength * directSize * runsPerBlock;
 }
 
 

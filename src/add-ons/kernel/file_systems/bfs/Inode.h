@@ -212,6 +212,7 @@ private:
 			void			_AddIterator(AttributeIterator* iterator);
 			void			_RemoveIterator(AttributeIterator* iterator);
 
+			size_t			_DoubleIndirectBlockLength() const;
 			status_t		_FreeStaticStreamArray(Transaction& transaction,
 								int32 level, block_run run, off_t size,
 								off_t offset, off_t& max);
@@ -219,7 +220,7 @@ private:
 								block_run* array, uint32 arrayLength,
 								off_t size, off_t& offset, off_t& max);
 			status_t		_AllocateBlockArray(Transaction& transaction,
-								block_run& run);
+								block_run& run, size_t length);
 			status_t		_GrowStream(Transaction& transaction, off_t size);
 			status_t		_ShrinkStream(Transaction& transaction, off_t size);
 

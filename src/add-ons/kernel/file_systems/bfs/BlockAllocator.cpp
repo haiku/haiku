@@ -1787,17 +1787,15 @@ BlockAllocator::CheckInode(Inode* inode, check_control* control)
 	if (data->max_double_indirect_range) {
 		status = CheckBlockRun(data->double_indirect, "double indirect",
 			control);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 
-		int32 runsPerBlock = fVolume->BlockSize() / sizeof(block_run);
-		int32 runsPerArray = runsPerBlock << ARRAY_BLOCKS_SHIFT;
+		int32 runsPerBlock = runs_per_block(fVolume);
+		int32 runsPerArray = runsPerBlock * data->double_indirect.Length();
 
 		CachedBlock cachedDirect(fVolume);
-		int32 maxIndirectIndex = (data->double_indirect.Length()
-			<< fVolume->BlockShift()) / sizeof(block_run);
 
-		for (int32 indirectIndex = 0; indirectIndex < maxIndirectIndex;
+		for (int32 indirectIndex = 0; indirectIndex < runsPerArray;
 				indirectIndex++) {
 			// get the indirect array block
 			block_run* array = (block_run*)cached.SetTo(
@@ -1812,7 +1810,7 @@ BlockAllocator::CheckInode(Inode* inode, check_control* control)
 				return B_OK;
 
 			status = CheckBlockRun(indirect, "double indirect->runs", control);
-			if (status < B_OK)
+			if (status != B_OK)
 				return status;
 
 			int32 maxIndex = (indirect.Length() << fVolume->BlockShift())
@@ -1831,7 +1829,7 @@ BlockAllocator::CheckInode(Inode* inode, check_control* control)
 
 					status = CheckBlockRun(runs[index % runsPerBlock],
 						"double indirect->runs->run", control);
-					if (status < B_OK)
+					if (status != B_OK)
 						return status;
 				} while ((++index % runsPerArray) != 0);
 			}
