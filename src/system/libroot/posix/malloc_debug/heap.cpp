@@ -14,6 +14,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <locks.h>
 #include <syscalls.h>
 
 #include <Debug.h>
@@ -41,39 +42,6 @@ panic(const char *format, ...)
 	debugger(buffer);
 }
 
-
-class MutexLocker {
-public:
-	MutexLocker(sem_id lock)
-		:
-		fLock(lock)
-	{
-		Lock();
-	}
-
-	~MutexLocker()
-	{
-		if (fLocked)
-			Unlock();
-	}
-
-	void Lock()
-	{
-		fLocked = acquire_sem(fLock) == B_OK;
-	}
-
-	void Unlock()
-	{
-		fLocked = false;
-		release_sem(fLock);
-	}
-
-	sem_id	fLock;
-	bool	fLocked;
-};
-
-typedef MutexLocker ReadLocker;
-typedef MutexLocker WriteLocker;
 
 #define ROUNDUP(x, y)		(((x) + (y) - 1) / (y) * (y))
 
@@ -125,15 +93,15 @@ typedef struct heap_page_s {
 } heap_page;
 
 typedef struct heap_bin_s {
-	sem_id		lock;
+	mutex		lock;
 	uint32		element_size;
 	uint16		max_free_count;
 	heap_page *	page_list; // sorted so that the desired page is always first
 } heap_bin;
 
 typedef struct heap_allocator_s {
-	sem_id		area_lock;
-	sem_id		page_lock;
+	rw_lock		area_lock;
+	mutex		page_lock;
 
 	const char *name;
 	uint32		bin_count;
@@ -382,7 +350,7 @@ heap_validate_walls()
 		heap_allocator *heap = sHeaps[classIndex];
 		ReadLocker areaReadLocker(heap->area_lock);
 		for (uint32 i = 0; i < heap->bin_count; i++)
-			acquire_sem(heap->bins[i].lock);
+			mutex_lock(&heap->bins[i].lock);
 		MutexLocker pageLocker(heap->page_lock);
 
 		// go through all the pages in all the areas
@@ -476,7 +444,7 @@ heap_validate_walls()
 
 		pageLocker.Unlock();
 		for (uint32 i = 0; i < heap->bin_count; i++)
-			release_sem(heap->bins[i].lock);
+			mutex_unlock(&heap->bins[i].lock);
 	}
 }
 
@@ -486,7 +454,7 @@ heap_validate_heap(heap_allocator *heap)
 {
 	ReadLocker areaReadLocker(heap->area_lock);
 	for (uint32 i = 0; i < heap->bin_count; i++)
-		acquire_sem(heap->bins[i].lock);
+		mutex_lock(&heap->bins[i].lock);
 	MutexLocker pageLocker(heap->page_lock);
 
 	uint32 totalPageCount = 0;
@@ -651,7 +619,7 @@ heap_validate_heap(heap_allocator *heap)
 
 	pageLocker.Unlock();
 	for (uint32 i = 0; i < heap->bin_count; i++)
-		release_sem(heap->bins[i].lock);
+		mutex_unlock(&heap->bins[i].lock);
 }
 
 
@@ -809,7 +777,7 @@ heap_create_allocator(const char *name, addr_t base, size_t size,
 			continue;
 
 		heap_bin *bin = &heap->bins[heap->bin_count];
-		bin->lock = create_sem(1, "heap bin lock");
+		mutex_init(&bin->lock, "heap bin lock");
 		bin->element_size = binSize;
 		bin->max_free_count = heap->page_size / binSize;
 		bin->page_list = NULL;
@@ -822,8 +790,8 @@ heap_create_allocator(const char *name, addr_t base, size_t size,
 	base += heap->bin_count * sizeof(heap_bin);
 	size -= heap->bin_count * sizeof(heap_bin);
 
-	heap->page_lock = create_sem(1, "heap page lock");
-	heap->area_lock = create_sem(1, "heap area lock");
+	rw_lock_init(&heap->area_lock, "heap area lock");
+	mutex_init(&heap->page_lock, "heap page lock");
 
 	heap_add_area(heap, -1, base, size);
 	return heap;
@@ -1570,8 +1538,6 @@ __init_heap(void)
 		base += partSize;
 	}
 
-	heap_debug_set_paranoid_validation(true);
-	heap_debug_start_wall_checking();
 	return B_OK;
 }
 
