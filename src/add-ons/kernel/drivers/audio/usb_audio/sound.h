@@ -1,22 +1,15 @@
-/* ++++++++++
-	$Source: /tmp/bonefish/open-beos/current/src/add-ons/kernel/drivers/audio/usb_audio/sound.h,v $
-	$Revision: 1.1 $
-	$Author: nwhitehorn $
-	$Date: 2004/10/16 19:29:53 $
-
-	Data structures and control calls for using the sound driver
-+++++ */
 /*
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
-*/
 
+	Data structures and control calls for using the sound driver
+*/
 #ifndef _SOUND_H
 #define _SOUND_H
 
-#ifndef _DRIVERS_H
+
 #include <Drivers.h>
-#endif
+
 
 enum adc_source {
   line=0, aux1, mic, loopback
@@ -30,9 +23,9 @@ enum sample_rate {
 
 enum sample_format {
 	linear_8bit_unsigned_mono = 0,		linear_8bit_unsigned_stereo,
-	ulaw_8bit_companded_mono,			ulaw_8bit_companded_stereo,		
+	ulaw_8bit_companded_mono,			ulaw_8bit_companded_stereo,
 	linear_16bit_little_endian_mono, 	linear_16bit_little_endian_stereo,
-	alaw_8bit_companded_mono,			alaw_8bit_companded_stereo,		
+	alaw_8bit_companded_mono,			alaw_8bit_companded_stereo,
 	sample_format_reserved_1,			sample_format_reserved_2,
 	adpcm_4bit_mono,					adpcm_4bit_stereo,
 	linear_16bit_big_endian_mono,		linear_16bit_big_endian_stereo,
@@ -91,4 +84,4 @@ enum {
 	SOUND_GET_PLAYBACK_PREFERRED_BUF_SIZE	/* 10013 */
 };
 
-#endif
+#endif	/* _SOUND_H */
