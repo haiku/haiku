@@ -168,8 +168,8 @@ usb_printer_device_added(usb_device newDevice, void **cookie)
 				PRINTER_INTERFACE_SUBCLASS
 			&& (interface->descr->interface_protocol == PIT_UNIDIRECTIONAL
 				|| interface->descr->interface_protocol == PIT_BIDIRECTIONAL
-				|| interface->descr->interface_protocol ==
-					PIT_1284_4_COMPATIBLE)) {
+				|| interface->descr->interface_protocol
+					== PIT_1284_4_COMPATIBLE)) {
 
 			bool hasIn = false;
 			bool hasOut = false;
