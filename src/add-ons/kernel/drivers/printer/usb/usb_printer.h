@@ -25,7 +25,8 @@
 
 // class specific requests
 // bmRequestType
-#define PRINTER_REQUEST				(USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_CLASS)
+#define PRINTER_REQUEST				(USB_REQTYPE_INTERFACE_IN \
+										| USB_REQTYPE_CLASS)
 // bRequest
 #define REQUEST_GET_DEVICE_ID		0x00
 #define REQUEST_GET_PORT_STATUS		0x01

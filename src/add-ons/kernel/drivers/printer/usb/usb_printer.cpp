@@ -101,7 +101,8 @@ usb_printer_transfer_data(printer_device *device, bool directionIn, void *data,
 
 	do {
 		bigtime_t timeout = directionIn ? READ_TIMEOUT : WRITE_TIMEOUT;
-		result = acquire_sem_etc(device->notify, 1, B_RELATIVE_TIMEOUT, timeout);
+		result = acquire_sem_etc(device->notify, 1, B_RELATIVE_TIMEOUT,
+			timeout);
 		if (result == B_TIMED_OUT) {
 			// Cancel the transfer and collect the sem that should now be
 			// released through the callback on cancel. Handling of device
@@ -150,7 +151,8 @@ usb_printer_device_added(usb_device newDevice, void **cookie)
 	device->alternate_setting = 0;
 
 	// scan through the interfaces to find our bulk-only data interface
-	const usb_configuration_info *configuration = gUSBModule->get_configuration(newDevice);
+	const usb_configuration_info *configuration =
+		gUSBModule->get_configuration(newDevice);
 	if (configuration == NULL) {
 		free(device);
 		return B_ERROR;
@@ -162,10 +164,12 @@ usb_printer_device_added(usb_device newDevice, void **cookie)
 			continue;
 
 		if (interface->descr->interface_class == PRINTER_INTERFACE_CLASS
-			&& interface->descr->interface_subclass == PRINTER_INTERFACE_SUBCLASS
+			&& interface->descr->interface_subclass ==
+				PRINTER_INTERFACE_SUBCLASS
 			&& (interface->descr->interface_protocol == PIT_UNIDIRECTIONAL
 				|| interface->descr->interface_protocol == PIT_BIDIRECTIONAL
-				|| interface->descr->interface_protocol == PIT_1284_4_COMPATIBLE)) {
+				|| interface->descr->interface_protocol ==
+					PIT_1284_4_COMPATIBLE)) {
 
 			bool hasIn = false;
 			bool hasOut = false;
@@ -232,9 +236,9 @@ usb_printer_device_added(usb_device newDevice, void **cookie)
 	}
 	if (freeDeviceMask != (uint32)-1) {
 		// reuse device number of first 32 devices
-		for (int32 device_number = 0; device_number < 32; device_number ++) {
-			if (freeDeviceMask & (1 << device_number) == 0) {
-				device->device_number = device_number;
+		for (int32 deviceNumber = 0; deviceNumber < 32; deviceNumber++) {
+			if (freeDeviceMask & (1 << deviceNumber) == 0) {
+				device->device_number = deviceNumber;
 				break;
 			}
 		}
@@ -353,26 +357,29 @@ usb_printer_get_device_id(printer_device *device, void *buffer)
 	uint16 value = 0;
 	uint16 index = (device->interface << 8) | device->alternate_setting;
 	char device_id[USB_PRINTER_DEVICE_ID_LENGTH + 2];
-	size_t device_id_size = 0;
-	status_t st = gUSBModule->send_request(device->device, PRINTER_REQUEST,
-			REQUEST_GET_DEVICE_ID, value, index,
-			sizeof(device_id), device_id, &device_id_size);
+	size_t deviceIdSize = 0;
+	status_t status = gUSBModule->send_request(device->device, PRINTER_REQUEST,
+		REQUEST_GET_DEVICE_ID, value, index,
+		sizeof(device_id), device_id, &deviceIdSize);
 
-	if (st == B_OK && device_id_size > 2) {
+	if (status == B_OK && deviceIdSize > 2) {
 		// terminate string
-		device_id[device_id_size - 1] = '\0';
+		device_id[deviceIdSize - 1] = '\0';
 		// skip first two bytes containing string length again
-		st = user_strlcpy((char *)buffer, &device_id[2], USB_PRINTER_DEVICE_ID_LENGTH);
+		status = user_strlcpy((char *)buffer, &device_id[2],
+			USB_PRINTER_DEVICE_ID_LENGTH);
 	} else {
-		dprintf("%s: Failed to get device ID for interface %d and alternate setting %d: %s\n",
-				DRIVER_NAME,
-				(int)device->interface,
-				(int)device->alternate_setting,
-				strerror(st));
-		st = user_strlcpy((char *)buffer,
-				"MFG:Unknown;CMD:Unknown;MDL:Unknown;", USB_PRINTER_DEVICE_ID_LENGTH);
+		dprintf("%s: Failed to get device ID for interface %d "
+			"and alternate setting %d: %s\n",
+			DRIVER_NAME,
+			(int)device->interface,
+			(int)device->alternate_setting,
+			strerror(status));
+		status = user_strlcpy((char *)buffer,
+			"MFG:Unknown;CMD:Unknown;MDL:Unknown;",
+			USB_PRINTER_DEVICE_ID_LENGTH);
 	}
-	return st;
+	return status;
 }
 
 
@@ -404,7 +411,8 @@ usb_printer_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 
 static status_t
-usb_printer_transfer(printer_device* device, bool directionIn, void* buffer, size_t* length)
+usb_printer_transfer(printer_device* device, bool directionIn, void* buffer,
+	size_t* length)
 {
 	status_t result = B_ERROR;
 	if (buffer == NULL || length == NULL || *length <= 0) {
@@ -479,7 +487,8 @@ usb_printer_write(void *cookie, off_t position, const void *buffer,
 		return B_DEV_NOT_READY;
 	}
 
-	status_t result = usb_printer_transfer(device, false, (void*)buffer, length);
+	status_t result = usb_printer_transfer(device, false, (void*)buffer,
+		length);
 
 	mutex_unlock(&device->lock);
 	if (result == B_OK) {
@@ -498,7 +507,7 @@ usb_printer_write(void *cookie, off_t position, const void *buffer,
 //
 
 
-status_t 
+status_t
 init_hardware()
 {
 	TRACE("init_hardware()\n");
