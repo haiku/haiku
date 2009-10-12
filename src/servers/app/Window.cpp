@@ -1626,7 +1626,7 @@ Window::Backmost(Window* window, int32 workspace)
 }
 
 
-/*!	\brief Returns the windows that's in front of the frontmost position
+/*!	\brief Returns the window that's in front of the frontmost position
 		this window can get.
 	Returns NULL if this window can be the frontmost window.
 
