@@ -5,6 +5,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <sys/socket.h>
 
 #include <errno.h>
@@ -166,7 +167,7 @@ prepare_userland_msghdr(const msghdr* userMessage, msghdr& message,
 		vecsDeleter.SetTo(vecs);
 
 		if (!IS_USER_ADDRESS(message.msg_iov)
-				|| user_memcpy(vecs, message.msg_iov,
+			|| user_memcpy(vecs, message.msg_iov,
 					message.msg_iovlen * sizeof(iovec)) != B_OK) {
 			return B_BAD_ADDRESS;
 		}
@@ -913,6 +914,9 @@ _user_accept(int socket, struct sockaddr *userAddress,
 ssize_t
 _user_recv(int socket, void *data, size_t length, int flags)
 {
+	if (data == NULL || !IS_USER_ADDRESS(data))
+		return B_BAD_ADDRESS;
+
 	SyscallRestartWrapper<ssize_t> result;
 	return result = common_recv(socket, data, length, flags, false);
 }
@@ -922,6 +926,9 @@ ssize_t
 _user_recvfrom(int socket, void *data, size_t length, int flags,
 	struct sockaddr *userAddress, socklen_t *_addressLength)
 {
+	if (data == NULL || !IS_USER_ADDRESS(data))
+		return B_BAD_ADDRESS;
+
 	// check parameters
 	socklen_t addressLength = 0;
 	status_t error = prepare_userland_address_result(userAddress,
@@ -1010,6 +1017,9 @@ _user_recvmsg(int socket, struct msghdr *userMessage, int flags)
 ssize_t
 _user_send(int socket, const void *data, size_t length, int flags)
 {
+	if (data == NULL || !IS_USER_ADDRESS(data))
+		return B_BAD_ADDRESS;
+
 	SyscallRestartWrapper<ssize_t> result;
 	return result = common_send(socket, data, length, flags, false);
 }
@@ -1019,8 +1029,11 @@ ssize_t
 _user_sendto(int socket, const void *data, size_t length, int flags,
 	const struct sockaddr *userAddress, socklen_t addressLength)
 {
-// TODO: If this is a connection-mode socket, the address parameter is
-// supposed to be ignored.
+	if (data == NULL || !IS_USER_ADDRESS(data))
+		return B_BAD_ADDRESS;
+
+	// TODO: If this is a connection-mode socket, the address parameter is
+	// supposed to be ignored.
 	if (userAddress == NULL || addressLength <= 0
 			|| addressLength > MAX_SOCKET_ADDRESS_LENGTH) {
 		return B_BAD_VALUE;
