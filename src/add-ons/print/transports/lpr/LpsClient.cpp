@@ -13,6 +13,9 @@
 #include "Socket.h"
 
 
+using namespace std;
+
+
 #define LPS_SERVER_PORT		515
 #define LPS_CLIENT_PORT_S	721
 #define LPS_CLIENT_PORT_E	731

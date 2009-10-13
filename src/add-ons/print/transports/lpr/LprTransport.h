@@ -10,6 +10,9 @@
 #include <string>
 
 
+using namespace std;
+
+
 class LprTransport : public BDataIO {
 public:
 					LprTransport(BMessage *msg);

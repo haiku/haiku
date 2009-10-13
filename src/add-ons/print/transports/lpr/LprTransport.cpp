@@ -21,6 +21,9 @@
 #include "DbgMsg.h"
 
 
+using namespace std;
+
+
 LprTransport::LprTransport(BMessage *msg)
 	:
 	BDataIO()

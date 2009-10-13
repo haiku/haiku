@@ -8,6 +8,9 @@
 #include <string>
 
 
+using namespace std;
+
+
 class Socket;
 
 
