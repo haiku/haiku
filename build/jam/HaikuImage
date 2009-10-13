@@ -97,8 +97,8 @@ SYSTEM_LIBS =
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++) $(ICU_LIBS)
 ;
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
-	media_addon_server media_server midi_server net_server print_server
-	registrar syslog_daemon
+	media_addon_server media_server midi_server mount_server net_server
+	print_server registrar syslog_daemon
 ;
 
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;
