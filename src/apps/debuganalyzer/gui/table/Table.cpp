@@ -522,13 +522,10 @@ Table::TableRowsAdded(TableModel* model, int32 rowIndex, int32 count)
 void
 Table::TableRowsRemoved(TableModel* model, int32 rowIndex, int32 count)
 {
-	int32 rowsRemoved = 0;
-
 	for (int32 i = rowIndex + count - 1; i >= rowIndex; i--) {
 		if (BRow* row = fRows.RemoveItemAt(i)) {
 			RemoveRow(row);
 			delete row;
-			rowsRemoved++;
 		}
 	}
 
