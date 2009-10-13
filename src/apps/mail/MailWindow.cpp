@@ -594,7 +594,7 @@ TMailWindow::BuildButtonBar()
 	bbar->AddButton(MDR_DIALECT_CHOICE ("New","新規"), 28, new BMessage(M_NEW));
 	bbar->AddDivider(5);
 	fButtonBar = bbar;
-	
+
 	if (fResending) {
 		fSendButton = bbar->AddButton(MDR_DIALECT_CHOICE ("Send","送信"), 8,
 			new BMessage(M_SEND_NOW));
@@ -656,7 +656,7 @@ TMailWindow::UpdateViews()
 	float bbwidth = 0, bbheight = 0;
 	float nextY = fMenuBar->Frame().bottom+1;
 
-	bool showButtonBar = fApp->ShowButtonBar();
+	uint8 showButtonBar = fApp->ShowButtonBar();
 
 	// Show/Hide Button Bar
 	if (showButtonBar) {
@@ -664,7 +664,7 @@ TMailWindow::UpdateViews()
 		if (!fButtonBar)
 			BuildButtonBar();
 
-		fButtonBar->ShowLabels(showButtonBar);
+		fButtonBar->ShowLabels(showButtonBar == 1);
 		fButtonBar->Arrange(/* True for all buttons same size, false to just fit */
 			MDR_DIALECT_CHOICE (true, true));
 		fButtonBar->GetPreferredSize( &bbwidth, &bbheight);
@@ -675,8 +675,7 @@ TMailWindow::UpdateViews()
 			fButtonBar->Show();
 		else
 			fButtonBar->Invalidate();
-			
-	} else if (fButtonBar)
+	} else if (fButtonBar && !fButtonBar->IsHidden())
 		fButtonBar->Hide();
 
 	// Arange other views to match
@@ -698,7 +697,7 @@ void
 TMailWindow::UpdatePreferences()
 {
 	fAutoMarkRead = fApp->AutoMarkRead();
-	
+
 	_UpdateReadButton();
 }
 
@@ -2866,7 +2865,7 @@ TMailWindow::OpenMessage(entry_ref *ref, uint32 characterSetForDecoding)
 		fContentView->fTextView->SetText("", (int32)0);
 
 		fContentView->fTextView->LoadMessage(fMail, false, NULL);
-		
+
 		if (fApp->ShowButtonBar())
 			_UpdateReadButton();
 	}
@@ -3129,7 +3128,7 @@ TMailWindow::_AddReadButton()
 			newMail = true;
 		}
 	}
-	
+
 	int32 buttonIndex = fButtonBar->IndexOf(fNextButton);
 	if (newMail)
 		fReadButton = fButtonBar->AddButton(
