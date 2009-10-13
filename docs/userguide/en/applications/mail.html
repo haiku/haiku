@@ -5,7 +5,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -36,15 +36,61 @@
 
 <div class="content">
 
+<table class="index" id="index" name="index" summary="index" align="right">
+<tr class="heading"><td>Index</td></tr>
+<tr class="index"><td><a href="#mail-app">The Mail application</a><br />
+                <a href="#mail-symbol">The Deskbar Mail symbol</a><br />
+                <a href="#mail-queries">Query Examples</a>
+<!--                <br />
+                &#160;&#160;<a href="#i-o-m-path">Path</a><br/>
+                &#160;&#160;<a href="#i-o-m-shape">Shape</a><br/>
+                &#160;&#160;<a href="#i-o-m-style">Style</a><br/>
+                &#160;&#160;<a href="#i-o-m-transformer">Transformer</a><br/>
+                &#160;&#160;<a href="#i-o-m-save">Saving an icon</a><br/>
+                &#160;&#160;<a href="#i-o-m-tips">Tips &amp; Tricks</a>
+-->                
+                </td></tr>
+</table>
+
 <h1><img src="../../images/apps-images/mail-icon_64.png" alt="mail-icon_64.png"
 width="64" height="64" />Mail</h1>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/Mail</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/Mail/BeMail Settings</span></td></tr>
+<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/Mail/chains</span> - Contains the settings of your email accounts<br />
+<span class="path">~/config/settings/Mail/Menu Links/</span> - Entries in the Deskbar mail symbol menu<br />
+<span class="path">~/config/settings/Mail/Providerinfo/</span> - A database of common email providers<br />
+<span class="path">~/config/settings/Mail/queries/</span> - Custom queries available from the Mail app<br />
+<span class="path">~/config/settings/Mail/signatures/</span> - Signatures that can be appended to mails<br />
+<span class="path">~/config/settings/Mail/BeMail Settings</span> - Setting file of the Mail app<br />
+<span class="path">~/config/settings/Mail/mailbox</span> - Link to what's launched when clicking the Deskbar mail symbol<br />
+<span class="path">~/config/settings/Mail/New E-mail</span> - Query for "new messages" entry in the Deskbar mail symbol menu<br />
+<span class="path">~/config/settings/Mail/new_mail_daemon</span> - Setting file of the mail_daemon</td></tr>
 </table>
+
 <p><br/></p>
-<p>Documentation is still missing. If you want to work on it, please announce it on the <a href="http://www.freelists.org/list/haiku-doc">Documentation mailing list</a> to avoid duplication.</p>
+<p>In Haiku, a mail_daemon running in the background is responsible for retrieving and sending emails from/to your email accounts. Emails are kept as separate files with a number of attributes, e.g. To, From, Subject, Thread etc., that are automatically filled from the email headers. Accounts, email file locations and other settings for receiving/sending are configured in the <a href="../preferences/e-mail.html">E-mail preferences</a>.</p>
+<p>Once your mails are downloaded from your provider's server, you can create custom queries to quickly find specific mails. Double-clicking a mail launches the preferred mail application, by default Mail.</p>
+
+<h1>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="mail-app" name="mail-app">The Mail application</a></h1>
+<img src="../images/apps-images/mail.png" />
+<p>When opening an email or creating a new one, Mail's window shows above the body of the mail the usual email header fields: recepient (<span class="menu">To</span>), sender account (<span class="menu">From</span>), encoding setting (<span class="menu">Encoding</span>), subject line (<span class="menu">Subject</span>), carbon copy (<span class="menu">CC</span>) and blind carbon copy (<span class="menu">BCC</span>).</p>
+<p>When creating a new mail, <span class="menu">To</span>, <span class="menu">CC</span> and <span class="menu">BCC</span> are drop-down menus that hold the entries of your person files, see topic <a href="people.html">People</a>.</p>
+
+
+<h1>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="mail-symbol" name="mail-symbol">The Deskbar Mail symbol</a></h1>
+
+<h1>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="mail-queries" name="mail-queries">Query Examples</a></h1>
+
+<h1>
+<a href="#logo"><img src="../../images/up.png" align="right" alt="index" border="0" class="noprint" /></a>
+<a id="mail-app" name="mail-app">The Mail application</a></h1>
 
 </div>
 <!--
