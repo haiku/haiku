@@ -16,6 +16,7 @@
 
 #include <ByteOrder.h>
 #include <debug.h>
+#include <kernel.h>
 #include <KernelExport.h>
 #include <util/DoublyLinkedList.h>
 
@@ -1413,7 +1414,11 @@ write_data(net_buffer* _buffer, size_t offset, const void* data, size_t size)
 
 	while (true) {
 		size_t written = min_c(size, node->used - offset);
-		memcpy(node->start + offset, data, written);
+		if (IS_USER_ADDRESS(data)) {
+			if (user_memcpy(node->start + offset, data, written) != B_OK)
+				return B_BAD_ADDRESS;
+		} else
+			memcpy(node->start + offset, data, written);
 
 		size -= written;
 		if (size == 0)
@@ -1456,7 +1461,11 @@ read_data(net_buffer* _buffer, size_t offset, void* data, size_t size)
 
 	while (true) {
 		size_t bytesRead = min_c(size, node->used - offset);
-		memcpy(data, node->start + offset, bytesRead);
+		if (IS_USER_ADDRESS(data)) {
+			if (user_memcpy(data, node->start + offset, bytesRead) != B_OK)
+				return B_BAD_ADDRESS;
+		} else
+			memcpy(data, node->start + offset, bytesRead);
 
 		size -= bytesRead;
 		if (size == 0)
@@ -1572,9 +1581,13 @@ prepend_data(net_buffer* buffer, const void* data, size_t size)
 	if (status < B_OK)
 		return status;
 
-	if (contiguousBuffer)
-		memcpy(contiguousBuffer, data, size);
-	else
+	if (contiguousBuffer) {
+		if (IS_USER_ADDRESS(data)) {
+			if (user_memcpy(contiguousBuffer, data, size) != B_OK)
+				return B_BAD_ADDRESS;
+		} else
+			memcpy(contiguousBuffer, data, size);
+	} else
 		write_data(buffer, 0, data, size);
 
 	//dprintf(" prepend result:\n");
@@ -1683,9 +1696,13 @@ append_data(net_buffer* buffer, const void* data, size_t size)
 	if (status < B_OK)
 		return status;
 
-	if (contiguousBuffer)
-		memcpy(contiguousBuffer, data, size);
-	else
+	if (contiguousBuffer) {
+		if (IS_USER_ADDRESS(data)) {
+			if (user_memcpy(contiguousBuffer, data, size) != B_OK)
+				return B_BAD_ADDRESS;
+		} else
+			memcpy(contiguousBuffer, data, size);
+	} else
 		write_data(buffer, used, data, size);
 
 	return B_OK;
