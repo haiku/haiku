@@ -27,6 +27,8 @@ FontDemoView::FontDemoView(BRect rect)
 	fBitmap(NULL),
 	fBufferView(NULL),
 	fString(NULL),
+	fFontSize(50.0),
+	fSpacing(0.0),
 	fOutLineLevel(0),
 	fDrawingMode(B_OP_COPY),
 	fBoundingBoxes(false),
@@ -35,7 +37,7 @@ FontDemoView::FontDemoView(BRect rect)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetString("Haiku, inc.");
-	SetFontSize(50.0);
+	SetFontSize(fFontSize);
 	SetAntialiasing(true);
 
 	_NewBitmap(Bounds());
