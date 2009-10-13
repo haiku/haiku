@@ -18,7 +18,7 @@
 #include <m_apm.h>
 
 
-static const int32 kMaxDigits = 64;
+static const int32 kMaxDecimalPlaces = 32;
 
 enum {
 	TOKEN_IDENTIFIER			= 0,
@@ -327,13 +327,9 @@ ExpressionParser::Evaluate(const char* expressionString)
 	if (value == 0)
 		return BString("0");
 
-	BString result;
-	char* buffer = result.LockBuffer(kMaxDigits + 1);
-		// + 1 for the decimal point
+	char* buffer = value.toFixPtStringExp(kMaxDecimalPlaces, '.', 0, 0);
 	if (buffer == NULL)
 		throw ParseException("out of memory", 0);
-
-	value.toFixPtString(buffer, kMaxDigits);
 
 	// remove surplus zeros
 	int32 lastChar = strlen(buffer) - 1;
@@ -343,8 +339,9 @@ ExpressionParser::Evaluate(const char* expressionString)
 		if (buffer[lastChar] == '.')
 			lastChar--;
 	}
-	result.UnlockBuffer(lastChar + 1);
 
+	BString result(buffer, lastChar + 1);
+	free(buffer);
 	return result;
 }
 
