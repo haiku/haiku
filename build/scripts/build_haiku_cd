@@ -147,7 +147,7 @@ $cp "$cdBootFloppy" "$outputDir"
 
 # build the iso image
 echo "Building CD image ..."
-mkisofs -uid 0 -gid 0 -b `basename $cdBootFloppy` -U -R -V "$cdLabel" -o "$cdImagePath" "$tPrefix"
+mkisofs -uid 0 -gid 0 -b `basename $cdBootFloppy` -R -V "$cdLabel" -o "$cdImagePath" "$tPrefix"
 
 # cleanup output dir
 $rmAttrs -rf "$outputDir"
