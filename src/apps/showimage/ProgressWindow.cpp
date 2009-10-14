@@ -1,7 +1,8 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include "ProgressWindow.h"
 
@@ -18,7 +19,7 @@
 static const uint32 kMsgShow = 'show';
 
 
-ProgressWindow::ProgressWindow(BWindow* referenceWindow)
+ProgressWindow::ProgressWindow(BWindow* referenceWindow, bool center)
 	:
 	BWindow(BRect(0, 0, 250, 100), "Progress Monitor",
 		B_MODAL_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL,
@@ -40,8 +41,13 @@ ProgressWindow::ProgressWindow(BWindow* referenceWindow)
 	view->AddChild(fStatusBar);
 
 	BScreen screen(referenceWindow);
-	ResizeTo(Bounds().Width(), height + 9);
-	MoveTo(screen.Frame().left + 5, screen.Frame().bottom - Bounds().Height() - 5);
+	if (!center) {
+		ResizeTo(Bounds().Width(), height + 9);
+		// TODO: frame width!
+		MoveTo(screen.Frame().left + 5,
+			screen.Frame().bottom - Bounds().Height() - 5);
+	} else
+		CenterIn(screen.Frame());
 
 	Run();
 }
