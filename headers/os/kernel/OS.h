@@ -322,10 +322,9 @@ extern status_t		resume_thread(thread_id thread);
 extern status_t		suspend_thread(thread_id thread);
 
 extern status_t		rename_thread(thread_id thread, const char *newName);
-extern status_t		set_thread_priority (thread_id thread, int32 newPriority);
+extern status_t		set_thread_priority(thread_id thread, int32 newPriority);
 extern void			exit_thread(status_t status);
-extern status_t		wait_for_thread (thread_id thread,
-						status_t *threadReturnValue);
+extern status_t		wait_for_thread(thread_id thread, status_t *returnValue);
 extern status_t		on_exit_thread(void (*callback)(void *), void *data);
 
 extern thread_id 	find_thread(const char *name);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef _IMAGE_H
@@ -87,8 +87,8 @@ void clear_caches(void *address, size_t length, uint32 flags);
 				_get_next_image_info((team), (cookie), (info), sizeof(*(info)))
 
 /* private, use the macros above */
-status_t _get_image_info (image_id image, image_info *info, size_t size);
-status_t _get_next_image_info (team_id team, int32 *cookie, image_info *info,
+status_t _get_image_info(image_id image, image_info *info, size_t size);
+status_t _get_next_image_info(team_id team, int32 *cookie, image_info *info,
 				size_t size);
 
 #ifdef __cplusplus
