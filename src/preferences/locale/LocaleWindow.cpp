@@ -62,7 +62,7 @@ class LanguageListView: public BListView
 		{}
 
 		bool InitiateDrag(BPoint point, int32 index, bool wasSelected);
-		void MouseMoved(BPoint where, uint32 transit, const BMessage *msg);
+		void MouseMoved(BPoint where, uint32 transit, const BMessage* msg);
 		void MoveItems(BList& items, int32 index);
 		void AttachedToWindow()
 		{
@@ -73,8 +73,8 @@ class LanguageListView: public BListView
 		void MessageReceived (BMessage* message)
 		{
 			if (message->what == 'DRAG') {
-				LanguageListView *list = NULL;
-				if (message->FindPointer("list", (void **)&list) == B_OK) {
+				LanguageListView* list = NULL;
+				if (message->FindPointer("list", (void**)&list) == B_OK) {
 					if (list == this) {
 						int32 count = CountItems();
 						if (fDropIndex < 0 || fDropIndex > count)
@@ -180,7 +180,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 		}
 		BBitmap* dragBitmap = new BBitmap(dragRect, B_RGB32, true);
 		if (dragBitmap && dragBitmap->IsValid()) {
-			if (BView *v = new BView(dragBitmap->Bounds(), "helper",
+			if (BView* v = new BView(dragBitmap->Bounds(), "helper",
 									 B_FOLLOW_NONE, B_WILL_DRAW)) {
 				dragBitmap->AddChild(v);
 				dragBitmap->Lock();
@@ -202,7 +202,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 				v->StrokeRect(v->Bounds());
 				v->Sync();
 	
-				uint8 *bits = (uint8 *)dragBitmap->Bits();
+				uint8* bits = (uint8*)dragBitmap->Bits();
 				int32 height = (int32)dragBitmap->Bounds().Height() + 1;
 				int32 width = (int32)dragBitmap->Bounds().Width() + 1;
 				int32 bpr = dragBitmap->BytesPerRow();
@@ -210,22 +210,22 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 				if (fade) {
 					for (int32 y = 0; y < height - ALPHA / 2;
 							y++, bits += bpr) {
-						uint8 *line = bits + 3;
-						for (uint8 *end = line + 4 * width; line < end;
+						uint8* line = bits + 3;
+						for (uint8* end = line + 4 * width; line < end;
 								line += 4)
 							*line = ALPHA;
 					}
 					for (int32 y = height - ALPHA / 2; y < height;
 							y++, bits += bpr) {
-						uint8 *line = bits + 3;
-						for (uint8 *end = line + 4 * width; line < end;
+						uint8* line = bits + 3;
+						for (uint8* end = line + 4 * width; line < end;
 								line += 4)
 							*line = (height - y) << 1;
 					}
 				} else {
 					for (int32 y = 0; y < height; y++, bits += bpr) {
-						uint8 *line = bits + 3;
-						for (uint8 *end = line + 4 * width; line < end;
+						uint8* line = bits + 3;
+						for (uint8* end = line + 4 * width; line < end;
 								line += 4)
 							*line = ALPHA;
 					}
@@ -248,7 +248,7 @@ LanguageListView::InitiateDrag(BPoint point, int32 index, bool)
 
 
 void
-LanguageListView::MouseMoved(BPoint where, uint32 transit, const BMessage *msg)
+LanguageListView::MouseMoved(BPoint where, uint32 transit, const BMessage* msg)
 {
 	if (msg && (msg->what == 'DRAG')) {
 		switch (transit) {
@@ -315,9 +315,9 @@ LocaleWindow::LocaleWindow()
 	
 	{
 		// first list: available languages
-		LanguageListView *listView = new LanguageListView("available",
+		LanguageListView* listView = new LanguageListView("available",
 			B_MULTIPLE_SELECTION_LIST);
-		BScrollView *scrollView = new BScrollView("scroller", listView,
+		BScrollView* scrollView = new BScrollView("scroller", listView,
 			B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
 		// Fill the language list from the LocaleRoster data
@@ -355,7 +355,7 @@ LocaleWindow::LocaleWindow()
 		// Second list: active languages
 		fPreferredListView = new LanguageListView("preferred",
 			B_MULTIPLE_SELECTION_LIST);
-		BScrollView *scrollViewEnabled = new BScrollView("scroller",
+		BScrollView* scrollViewEnabled = new BScrollView("scroller",
 			fPreferredListView, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
 		// get the preferred languages from the Settings. Move them here from
@@ -393,10 +393,9 @@ LocaleWindow::LocaleWindow()
 
 	{
 		BListView* listView = new BListView("country", B_SINGLE_SELECTION_LIST);
-		BScrollView *scrollView = new BScrollView("scroller",
+		BScrollView* scrollView = new BScrollView("scroller",
 			listView, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
-		BMessage* msg = new BMessage('csel');
-		listView->SetSelectionMessage(msg);
+		listView->SetSelectionMessage(new BMessage(kMsgCountrySelection));
 		
 		// get all available countries from ICU
 		// Use DateFormat::getAvailableLocale so we get only the one we can
@@ -423,13 +422,13 @@ LocaleWindow::LocaleWindow()
 		// TODO: find a real solution intead of this hack
 		listView->SetExplicitMinSize(BSize(300, B_SIZE_UNSET));
 
-		fTimeFormatSettings = new TimeFormatSettingsView(defaultCountry);
+		fFormatView = new FormatView(defaultCountry);
 
 		countryTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 5)
 			.AddGroup(B_VERTICAL, 3)
 				.Add(scrollView)
 				.End()
-			.Add(fTimeFormatSettings)
+			.Add(fFormatView)
 			.View()
 		);
 
@@ -474,18 +473,18 @@ LocaleWindow::QuitRequested()
 
 
 void
-LocaleWindow::MessageReceived(BMessage *message)
+LocaleWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgDefaults:
-			// reset default settings
+			// TODO
 			break;
 
 		case kMsgRevert:
-			// revert to last settings
+			// TODO
 			break;
 
-		case 'csel':
+		case kMsgCountrySelection:
 		{
 			// Country selection changed.
 			// Get the new selected country from the ListView and send it to the
@@ -500,7 +499,7 @@ LocaleWindow::MessageReceived(BMessage *message)
 			be_app_messenger.SendMessage(newMessage);
 
 			BCountry* country = new BCountry(lli->LanguageCode());
-			fTimeFormatSettings->SetCountry(country);
+			fFormatView->SetCountry(country);
 			break;
 		}
 

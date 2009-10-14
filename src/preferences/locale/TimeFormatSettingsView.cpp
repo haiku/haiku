@@ -38,7 +38,7 @@
 BMessage*
 MenuMessage(const char* format, BMenuField* field)
 {
-	BMessage* msg = new BMessage('FRMT');
+	BMessage* msg = new BMessage(kMenuMessage);
 	msg->AddPointer("dest", field);
 	msg->AddString("format", format);
 
@@ -47,22 +47,23 @@ MenuMessage(const char* format, BMenuField* field)
 
 
 class DateMenuItem: public BMenuItem {
-	public:
-		DateMenuItem(const char* label, const char* code, BMenuField* field)
-			:
-			BMenuItem(label, MenuMessage(code, field))
-		{
-			icuCode = code;
-		}
+public:
+							DateMenuItem(const char* label, const char* code,
+								BMenuField* field)
+								:
+								BMenuItem(label, MenuMessage(code, field))
+							{
+								fIcuCode = code;
+							}
 
-		BString icuCode;
+			BString			fIcuCode;
 };
 
 
 void
 CreateDateMenu(BMenuField** field, bool longFormat = true)
 {
-	BMenu *menu = new BMenu("");
+	BMenu* menu = new BMenu("");
 	*field = new BMenuField("", menu);
 
 	BPopUpMenu* dayMenu = new BPopUpMenu(TR("Day"));
@@ -115,7 +116,7 @@ CreateDateMenu(BMenuField** field, bool longFormat = true)
 }
 
 
-TimeFormatSettingsView::TimeFormatSettingsView(BCountry* country)
+FormatView::FormatView(BCountry* country)
 	:
 	BView("WindowsSettingsView", B_FRAME_EVENTS),
 	fCountry(country)
@@ -150,7 +151,7 @@ TimeFormatSettingsView::TimeFormatSettingsView(BCountry* country)
 
 	fSeparatorMenuField = new BMenuField(TR("Separator:"), menu);
 
-	BBox *clockBox = new BBox("Clock");
+	BBox* clockBox = new BBox("Clock");
 	clockBox->SetLabel(TR("Clock"));
 
 	{
@@ -196,7 +197,7 @@ TimeFormatSettingsView::TimeFormatSettingsView(BCountry* country)
 	BCheckBox* currencyLeadingZero = new BCheckBox("", TR("Leading 0"),
 		new BMessage(kSettingsContentsModified));
 
-	BBox *formatBox = new BBox("Symbol position");
+	BBox* formatBox = new BBox("Symbol position");
 	formatBox->SetLabel(TR("Symbol position"));
 
 	{
@@ -346,7 +347,7 @@ bool IsSpecialDateChar(char charToTest)
 
 // Get the date format from ICU and set the date fields accordingly
 void
-TimeFormatSettingsView::_ParseDateFormat()
+FormatView::_ParseDateFormat()
 {
 	// TODO parse the short date too
 	BString dateFormatString;
@@ -374,7 +375,7 @@ TimeFormatSettingsView::_ParseDateFormat()
 			BMenuItem* item;
 			for (int itemIndex = 0; (item = subMenu->ItemAt(itemIndex)) != NULL;
 					itemIndex++) {
-				if (static_cast<DateMenuItem*>(item)->icuCode == str) {
+				if (static_cast<DateMenuItem*>(item)->fIcuCode == str) {
 					item->SetMarked(true);
 					fLongDateMenu[i]->MenuItem()->SetLabel(item->Label());
 					isFound = true;
@@ -426,7 +427,7 @@ TimeFormatSettingsView::_ParseDateFormat()
 			BMenuItem* item;
 			for (int itemIndex = 0; (item = subMenu->ItemAt(itemIndex)) != NULL;
 					itemIndex++) {
-				if (static_cast<DateMenuItem*>(item)->icuCode == str) {
+				if (static_cast<DateMenuItem*>(item)->fIcuCode == str) {
 					item->SetMarked(true);
 					fDateMenu[i]->MenuItem()->SetLabel(item->Label());
 					isFound = true;
@@ -459,7 +460,7 @@ TimeFormatSettingsView::_ParseDateFormat()
 
 
 void
-TimeFormatSettingsView::AttachedToWindow()
+FormatView::AttachedToWindow()
 {
 	f24HrRadioButton->SetTarget(this);
 	f12HrRadioButton->SetTarget(this);
@@ -480,7 +481,7 @@ TimeFormatSettingsView::AttachedToWindow()
 
 
 void
-TimeFormatSettingsView::_UpdateLongDateFormatString()
+FormatView::_UpdateLongDateFormatString()
 {
 	BString newDateFormat;
 
@@ -506,10 +507,10 @@ TimeFormatSettingsView::_UpdateLongDateFormatString()
 
 
 void
-TimeFormatSettingsView::MessageReceived(BMessage *message)
+FormatView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case 'FRMT':
+		case kMenuMessage:
 		{
 			// Update one of the dropdown menus
 			void* pointerFromMessage;
@@ -544,7 +545,7 @@ TimeFormatSettingsView::MessageReceived(BMessage *message)
 		case kSettingsContentsModified:
 			{
 				int32 separator = 0;
-				BMenuItem *item = fSeparatorMenuField->Menu()->FindMarked();
+				BMenuItem* item = fSeparatorMenuField->Menu()->FindMarked();
 				if (item) {
 					separator = fSeparatorMenuField->Menu()->IndexOf(item);
 					if (separator >= 0)
@@ -570,13 +571,13 @@ TimeFormatSettingsView::MessageReceived(BMessage *message)
 			}
 		
 		default:
-			_inherited::MessageReceived(message);
+			BView::MessageReceived(message);
 	}
 }
 
 
 void
-TimeFormatSettingsView::SetDefaults()
+FormatView::SetDefaults()
 {
 	/*
 	TrackerSettings settings;
@@ -594,7 +595,7 @@ TimeFormatSettingsView::SetDefaults()
 
 
 bool
-TimeFormatSettingsView::IsDefaultable() const
+FormatView::IsDefaultable() const
 {
 	/*
 	TrackerSettings settings;
@@ -608,7 +609,7 @@ TimeFormatSettingsView::IsDefaultable() const
 
 
 void
-TimeFormatSettingsView::Revert()
+FormatView::Revert()
 {
 	/*
 	TrackerSettings settings;
@@ -624,7 +625,7 @@ TimeFormatSettingsView::Revert()
 
 
 void
-TimeFormatSettingsView::_SendNotices()
+FormatView::_SendNotices()
 {
 	// Make the notification message and send it to the tracker:
 	/*
@@ -638,7 +639,7 @@ TimeFormatSettingsView::_SendNotices()
 
 
 void
-TimeFormatSettingsView::SetCountry(BCountry* country)
+FormatView::SetCountry(BCountry* country)
 {
 	delete fCountry;
 	fCountry = country;
@@ -658,7 +659,7 @@ TimeFormatSettingsView::SetCountry(BCountry* country)
 
 
 void
-TimeFormatSettingsView::RecordRevertSettings()
+FormatView::RecordRevertSettings()
 {
 	/*
 	f24HrClock = settings.ClockIs24Hr();
@@ -671,11 +672,11 @@ TimeFormatSettingsView::RecordRevertSettings()
 // Return true if the Revert button should be enabled (ie some setting was
 // changed)
 bool
-TimeFormatSettingsView::IsRevertable() const
+FormatView::IsRevertable() const
 {
 	FormatSeparator separator;
 
-	BMenuItem *item = fSeparatorMenuField->Menu()->FindMarked();
+	BMenuItem* item = fSeparatorMenuField->Menu()->FindMarked();
 	if (item) {
 		int32 index = fSeparatorMenuField->Menu()->IndexOf(item);
 		if (index >= 0)
@@ -697,7 +698,7 @@ TimeFormatSettingsView::IsRevertable() const
 
 
 void
-TimeFormatSettingsView::_UpdateExamples()
+FormatView::_UpdateExamples()
 {
 	time_t timeValue = (time_t)time(NULL);
 	BString timeFormat;

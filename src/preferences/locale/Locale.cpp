@@ -24,7 +24,7 @@
 #define TR_CONTEXT "Locale Preflet"
 
 
-const char *kSignature = "application/x-vnd.Haiku-Locale";
+const char* kSignature = "application/x-vnd.Haiku-Locale";
 
 static const uint32 kMsgLocaleSettings = 'LCst';
 
@@ -35,10 +35,10 @@ public:
 							~Settings();
 
 	const		BMessage&	Message() const { return fMessage; }
-				void		UpdateFrom(BMessage *message);
+				void		UpdateFrom(BMessage* message);
 
 private:
-				status_t	Open(BFile *file, int32 mode);
+				status_t	_Open(BFile* file, int32 mode);
 
 				BMessage	fMessage;
 				bool		fUpdated;
@@ -50,7 +50,7 @@ public:
 							LocalePreflet();
 	virtual					~LocalePreflet();
 
-	virtual	void			MessageReceived(BMessage *message);
+	virtual	void			MessageReceived(BMessage* message);
 	virtual	void			AboutRequested();
 	virtual	bool			QuitRequested();
 
@@ -70,7 +70,7 @@ Settings::Settings()
 	fUpdated(false)
 {
 	BFile file;
-	if (Open(&file, B_READ_ONLY) != B_OK
+	if (_Open(&file, B_READ_ONLY) != B_OK
 		|| fMessage.Unflatten(&file) != B_OK) {
 		// set default prefs
 		fMessage.AddString("language", "en");
@@ -86,7 +86,7 @@ Settings::~Settings()
 		return;
 
 	BFile file;
-	if (Open(&file, B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY) != B_OK)
+	if (_Open(&file, B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY) != B_OK)
 		return;
 
 	fMessage.Flatten(&file);
@@ -94,7 +94,7 @@ Settings::~Settings()
 
 
 status_t
-Settings::Open(BFile *file, int32 mode)
+Settings::_Open(BFile* file, int32 mode)
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
@@ -107,7 +107,7 @@ Settings::Open(BFile *file, int32 mode)
 
 
 void
-Settings::UpdateFrom(BMessage *message)
+Settings::UpdateFrom(BMessage* message)
 {
 	BPoint point;
 	if (message->FindPoint("window_location", &point) == B_OK) {
@@ -162,7 +162,7 @@ LocalePreflet::~LocalePreflet()
 
 
 void
-LocalePreflet::MessageReceived(BMessage *message)
+LocalePreflet::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgSettingsChanged:
@@ -198,7 +198,7 @@ LocalePreflet::QuitRequested()
 
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
 	LocalePreflet app;
 	app.Run();

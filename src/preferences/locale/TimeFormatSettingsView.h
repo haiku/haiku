@@ -30,13 +30,14 @@ enum FormatSeparator {
 };
 
 const uint32 kSettingsContentsModified = 'Scmo';
+const uint32 kMenuMessage = 'FRMT';
 
 
-class TimeFormatSettingsView : public BView {
+class FormatView : public BView {
 public:
-							TimeFormatSettingsView(BCountry* country);
+							FormatView(BCountry* country);
 
-	virtual	void			MessageReceived(BMessage *message);
+	virtual	void			MessageReceived(BMessage* message);
 	virtual	void			AttachedToWindow();
 
 	virtual	void			SetDefaults();
@@ -80,8 +81,6 @@ private:
 			BBox*			fTimeBox;
 			BBox*			fNumbersBox;
 			BBox*			fCurrencyBox;
-
-			typedef BView _inherited;
 };
 
 
