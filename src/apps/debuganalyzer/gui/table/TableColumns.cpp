@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "table/TableColumns.h"
 
 #include <stdio.h>
@@ -89,6 +90,38 @@ int
 StringTableColumn::CompareValues(const BVariant& a, const BVariant& b)
 {
 	return strcasecmp(a.ToString(), b.ToString());
+}
+
+
+// #pragma mark - BoolStringTableColumn
+
+
+BoolStringTableColumn::BoolStringTableColumn(int32 modelIndex, const char* title,
+	float width, float minWidth, float maxWidth, const BString& trueString,
+	const BString& falseString, uint32 truncate, alignment align)
+	:
+	StringTableColumn(modelIndex, title, width, minWidth, maxWidth, truncate,
+		align),
+	fTrueString(trueString),
+	fFalseString(falseString)
+{
+}
+
+
+BField*
+BoolStringTableColumn::PrepareField(const BVariant& value) const
+{
+	return StringTableColumn::PrepareField(
+		BVariant(value.ToBool() ? fTrueString : fFalseString,
+			B_VARIANT_DONT_COPY_DATA));
+}
+
+
+int
+BoolStringTableColumn::CompareValues(const BVariant& a, const BVariant& b)
+{
+	bool aValue = a.ToBool();
+	return aValue == b.ToBool() ? 0 : (aValue ? 1 : -1);
 }
 
 

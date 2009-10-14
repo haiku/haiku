@@ -5,6 +5,7 @@
 #ifndef TABLE_COLUMNS_H
 #define TABLE_COLUMNS_H
 
+
 #include <ColumnTypes.h>
 
 #include "table/TableColumn.h"
@@ -53,6 +54,28 @@ protected:
 private:
 			BStringColumn		fColumn;
 	mutable	BStringField		fField;
+};
+
+
+class BoolStringTableColumn : public StringTableColumn {
+public:
+								BoolStringTableColumn(int32 modelIndex,
+									const char* title, float width,
+									float minWidth, float maxWidth,
+									const BString& trueString = "true",
+									const BString& falseString = "false",
+									uint32 truncate = B_TRUNCATE_MIDDLE,
+									alignment align = B_ALIGN_LEFT);
+
+protected:
+	virtual	BField*				PrepareField(const BVariant& value) const;
+
+	virtual	int					CompareValues(const BVariant& a,
+									const BVariant& b);
+
+private:
+			BString				fTrueString;
+			BString				fFalseString;
 };
 
 
