@@ -463,22 +463,25 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 {
 	// recursively append the ref (dive into folders)
 	BEntry entry(&ref, true);
-	if (entry.InitCheck() < B_OK || !entry.Exists())
+	if (entry.InitCheck() != B_OK || !entry.Exists())
 		return;
 
 	if (entry.IsDirectory()) {
 		BDirectory dir(&entry);
-		if (dir.InitCheck() < B_OK)
+		if (dir.InitCheck() != B_OK)
 			return;
+
 		entry.Unset();
+
 		entry_ref subRef;
-		while (dir.GetNextRef(&subRef) == B_OK)
+		while (dir.GetNextRef(&subRef) == B_OK) {
 			AppendToPlaylistRecursive(subRef, playlist);
+		}
 	} else if (entry.IsFile()) {
 		BString mimeString = _MIMEString(&ref);
 		if (_IsMediaFile(mimeString)) {
 			PlaylistItem* item = new (std::nothrow) FilePlaylistItem(ref);
-			if (item == NULL || !playlist->AddItem(item))
+			if (item != NULL && !playlist->AddItem(item))
 				delete item;
 		} else
 			printf("MIME Type = %s\n", mimeString.String());
@@ -490,7 +493,7 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 Playlist::AppendPlaylistToPlaylist(const entry_ref& ref, Playlist* playlist)
 {
 	BEntry entry(&ref, true);
-	if (entry.InitCheck() < B_OK || !entry.Exists())
+	if (entry.InitCheck() != B_OK || !entry.Exists())
 		return;
 
 	BString mimeString = _MIMEString(&ref);

@@ -97,6 +97,10 @@ public:
 									Playlist* playlist);
 
 private:
+								Playlist(const Playlist& other);
+			Playlist&			operator=(const Playlist& other);
+									// unimplemented
+
 	static	bool 				_IsMediaFile(const BString& mimeString);
 	static	bool				_IsTextPlaylist(const BString& mimeString);
 	static	bool				_IsBinaryPlaylist(const BString& mimeString);
