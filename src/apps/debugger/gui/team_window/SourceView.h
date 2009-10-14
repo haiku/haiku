@@ -18,6 +18,7 @@ class StackFrame;
 class StackTrace;
 class Statement;
 class Team;
+class UserBreakpoint;
 
 
 class SourceView : public BView {
@@ -37,7 +38,8 @@ public:
 			void				SetStackFrame(StackFrame* stackFrame);
 			void				SetSourceCode(SourceCode* sourceCode);
 
-			void				UserBreakpointChanged(target_addr_t address);
+			void				UserBreakpointChanged(
+									UserBreakpoint* breakpoint);
 
 			bool				ScrollToAddress(target_addr_t address);
 			bool				ScrollToLine(uint32 line);

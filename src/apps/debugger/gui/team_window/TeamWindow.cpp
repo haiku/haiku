@@ -54,14 +54,17 @@ TeamWindow::TeamWindow(::Team* team, Listener* listener)
 	fActiveImage(NULL),
 	fActiveStackTrace(NULL),
 	fActiveStackFrame(NULL),
+	fActiveBreakpoint(NULL),
 	fActiveFunction(NULL),
 	fActiveSourceCode(NULL),
+	fActiveSourceObject(ACTIVE_SOURCE_NONE),
 	fListener(listener),
 	fTabView(NULL),
 	fLocalsTabView(NULL),
 	fThreadListView(NULL),
 	fImageListView(NULL),
 	fImageFunctionsView(NULL),
+	fBreakpointsView(NULL),
 	fVariablesView(NULL),
 	fRegistersView(NULL),
 	fStackTraceView(NULL),
@@ -95,6 +98,7 @@ TeamWindow::~TeamWindow()
 
 	_SetActiveSourceCode(NULL);
 	_SetActiveFunction(NULL);
+	_SetActiveBreakpoint(NULL);
 	_SetActiveStackFrame(NULL);
 	_SetActiveStackTrace(NULL);
 	_SetActiveImage(NULL);
@@ -236,11 +240,12 @@ TeamWindow::MessageReceived(BMessage* message)
 
 		case MSG_USER_BREAKPOINT_CHANGED:
 		{
-			uint64 address;
-			if (message->FindUInt64("address", &address) != B_OK)
+			UserBreakpoint* breakpoint;
+			if (message->FindPointer("breakpoint", (void**)&breakpoint) != B_OK)
 				break;
+			Reference<UserBreakpoint> breakpointReference(breakpoint, true);
 
-			_HandleUserBreakpointChanged(address);
+			_HandleUserBreakpointChanged(breakpoint);
 			break;
 		}
 
@@ -288,7 +293,33 @@ TeamWindow::StackFrameSelectionChanged(StackFrame* frame)
 void
 TeamWindow::FunctionSelectionChanged(FunctionInstance* function)
 {
+	// If the function wasn't already active, it was just selected by the user.
+	if (function != NULL && function != fActiveFunction)
+		fActiveSourceObject = ACTIVE_SOURCE_FUNCTION;
+
 	_SetActiveFunction(function);
+}
+
+
+void
+TeamWindow::BreakpointSelectionChanged(UserBreakpoint* breakpoint)
+{
+	_SetActiveBreakpoint(breakpoint);
+}
+
+
+void
+TeamWindow::SetBreakpointEnabledRequested(UserBreakpoint* breakpoint,
+	bool enabled)
+{
+	fListener->SetBreakpointEnabledRequested(breakpoint, enabled);
+}
+
+
+void
+TeamWindow::ClearBreakpointRequested(UserBreakpoint* breakpoint)
+{
+	fListener->ClearBreakpointRequested(breakpoint);
 }
 
 
@@ -351,11 +382,14 @@ TeamWindow::ImageDebugInfoChanged(const Team::ImageEvent& event)
 
 
 void
-TeamWindow::UserBreakpointChanged(const Team::BreakpointEvent& event)
+TeamWindow::UserBreakpointChanged(const Team::UserBreakpointEvent& event)
 {
 	BMessage message(MSG_USER_BREAKPOINT_CHANGED);
-	message.AddUInt64("address", event.GetBreakpoint()->Address());
-	PostMessage(&message);
+	Reference<UserBreakpoint> breakpointReference(event.GetBreakpoint());
+	if (message.AddPointer("breakpoint", event.GetBreakpoint()) == B_OK
+		&& PostMessage(&message) == B_OK) {
+		breakpointReference.Detach();
+	}
 }
 
 
@@ -431,6 +465,14 @@ TeamWindow::_Init()
 		.Add(fImageListView = ImageListView::Create(fTeam, this))
 		.Add(fImageFunctionsView = ImageFunctionsView::Create(this));
 
+	// add breakpoints tab
+	BGroupView* breakpointsGroup = new BGroupView(B_HORIZONTAL, 4.0f);
+	breakpointsGroup->SetName("Breakpoints");
+	fTabView->AddTab(breakpointsGroup);
+	BLayoutBuilder::Group<>(breakpointsGroup)
+		.SetInsets(4.0f, 4.0f, 4.0f, 4.0f)
+		.Add(fBreakpointsView = BreakpointsView::Create(fTeam, this));
+
 	// add local variables tab
 	BView* tab = fVariablesView = VariablesView::Create(this);
 	fLocalsTabView->AddTab(tab);
@@ -445,7 +487,7 @@ TeamWindow::_Init()
 	fStepOutButton->SetMessage(new BMessage(MSG_THREAD_STEP_OUT));
 	fRunButton->SetTarget(this);
 	fStepOverButton->SetTarget(this);
-	fRunButton->SetTarget(this);
+	fStepIntoButton->SetTarget(this);
 	fStepOutButton->SetTarget(this);
 
 	// add menus and menu items
@@ -579,6 +621,8 @@ TeamWindow::_SetActiveStackFrame(StackFrame* frame)
 		fActiveStackFrame->AddListener(this);
 		locker.Unlock();
 
+		fActiveSourceObject = ACTIVE_SOURCE_STACK_FRAME;
+
 		_SetActiveFunction(fActiveStackFrame->Function());
 	}
 
@@ -594,8 +638,49 @@ TeamWindow::_SetActiveStackFrame(StackFrame* frame)
 
 
 void
+TeamWindow::_SetActiveBreakpoint(UserBreakpoint* breakpoint)
+{
+	if (breakpoint == fActiveBreakpoint)
+		return;
+
+	if (fActiveBreakpoint != NULL)
+		fActiveBreakpoint->RemoveReference();
+
+	fActiveBreakpoint = breakpoint;
+
+	if (fActiveBreakpoint != NULL) {
+		fActiveBreakpoint->AddReference();
+
+		// get the breakpoint's function (more exactly: some function instance)
+		AutoLocker< ::Team> locker(fTeam);
+
+		Function* function = fTeam->FunctionByID(
+			breakpoint->Location().GetFunctionID());
+		FunctionInstance* functionInstance = function != NULL
+			? function->FirstInstance() : NULL;
+		Reference<FunctionInstance> functionInstanceReference(functionInstance);
+
+		locker.Unlock();
+
+		fActiveSourceObject = ACTIVE_SOURCE_BREAKPOINT;
+
+		_SetActiveFunction(functionInstance);
+
+		// scroll to the breakpoint's source code line number (it is not done
+		// automatically, if the active function remains the same)
+		_ScrollToActiveFunction();
+	}
+
+	fBreakpointsView->SetBreakpoint(fActiveBreakpoint);
+}
+
+
+void
 TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 {
+// TODO: If a function is selected by other means than via selecting a stack
+// frame, we should still select a matching stack frame, if it features the
+// same function.
 	if (functionInstance == fActiveFunction)
 		return;
 
@@ -612,9 +697,8 @@ TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 
 	fActiveFunction = NULL;
 
-	if (functionInstance != NULL) {
+	if (functionInstance != NULL)
 		_SetActiveImage(fTeam->ImageByAddress(functionInstance->Address()));
-	}
 
 	fActiveFunction = functionInstance;
 
@@ -726,12 +810,37 @@ TeamWindow::_UpdateRunButtons()
 void
 TeamWindow::_ScrollToActiveFunction()
 {
-	// Scroll to the active function, if it doesn't match the stack frame (i.e.
-	// has been selected manually).
-	if (fActiveFunction != NULL && fActiveSourceCode != NULL
-		&& (fActiveStackFrame == NULL
-			|| fActiveStackFrame->Function() != fActiveFunction)) {
-		fSourceView->ScrollToAddress(fActiveFunction->Address());
+	// Scroll to the active function, if it has been selected manually.
+	if (fActiveFunction == NULL || fActiveSourceCode == NULL)
+		return;
+
+	switch (fActiveSourceObject) {
+		case ACTIVE_SOURCE_FUNCTION:
+			fSourceView->ScrollToAddress(fActiveFunction->Address());
+			break;
+		case ACTIVE_SOURCE_BREAKPOINT:
+		{
+			if (fActiveBreakpoint == NULL)
+				break;
+
+			const UserBreakpointLocation& location
+				= fActiveBreakpoint->Location();
+			int32 line = location.GetSourceLocation().Line();
+
+			if (location.SourceFile() != NULL && line >= 0
+				&& fActiveSourceCode->GetSourceFile()
+					== location.SourceFile()) {
+				fSourceView->ScrollToLine(line);
+			} else {
+				fSourceView->ScrollToAddress(
+					fActiveFunction->Address()
+						+ location.RelativeAddress());
+			}
+			break;
+		}
+		case ACTIVE_SOURCE_NONE:
+		case ACTIVE_SOURCE_STACK_FRAME:
+			break;
 	}
 }
 
@@ -854,9 +963,10 @@ TeamWindow::_HandleSourceCodeChanged()
 
 
 void
-TeamWindow::_HandleUserBreakpointChanged(target_addr_t address)
+TeamWindow::_HandleUserBreakpointChanged(UserBreakpoint* breakpoint)
 {
-	fSourceView->UserBreakpointChanged(address);
+	fSourceView->UserBreakpointChanged(breakpoint);
+	fBreakpointsView->UserBreakpointChanged(breakpoint);
 }
 
 

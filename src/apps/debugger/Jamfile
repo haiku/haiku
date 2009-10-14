@@ -14,6 +14,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) files ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) gui util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) ids ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) settings ] ;
@@ -98,6 +99,8 @@ Application Debugger :
 	VariablesViewStateHistory.cpp
 
 	# gui/team_window
+	BreakpointListView.cpp
+	BreakpointsView.cpp
 	ImageFunctionsView.cpp
 	ImageListView.cpp
 	RegistersView.cpp
@@ -106,6 +109,9 @@ Application Debugger :
 	TeamWindow.cpp
 	ThreadListView.cpp
 	VariablesView.cpp
+
+	# gui/util
+	TargetAddressTableColumn.cpp
 
 	# ids
 	FunctionID.cpp

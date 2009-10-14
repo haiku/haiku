@@ -12,8 +12,10 @@ enum {
 	MSG_THREAD_STEP_OVER				= 'stov',
 	MSG_THREAD_STEP_INTO				= 'stin',
 	MSG_THREAD_STEP_OUT					= 'stou',
-	MSG_SET_BREAKPONT					= 'sbrk',
-	MSG_CLEAR_BREAKPONT					= 'cbrk',
+	MSG_SET_BREAKPOINT					= 'sbrk',
+	MSG_CLEAR_BREAKPOINT				= 'cbrk',
+	MSG_ENABLE_BREAKPOINT				= 'ebrk',
+	MSG_DISABLE_BREAKPOINT				= 'dbrk',
 
 	MSG_THREAD_STATE_CHANGED			= 'tsch',
 	MSG_THREAD_CPU_STATE_CHANGED		= 'tcsc',

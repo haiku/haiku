@@ -528,11 +528,11 @@ Team::NotifyImageDebugInfoChanged(Image* image)
 
 
 void
-Team::NotifyUserBreakpointChanged(Breakpoint* breakpoint)
+Team::NotifyUserBreakpointChanged(UserBreakpoint* breakpoint)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
 			Listener* listener = it.Next();) {
-		listener->UserBreakpointChanged(BreakpointEvent(
+		listener->UserBreakpointChanged(UserBreakpointEvent(
 			TEAM_EVENT_USER_BREAKPOINT_CHANGED, this, breakpoint));
 	}
 }
@@ -645,6 +645,18 @@ Team::BreakpointEvent::BreakpointEvent(uint32 type, Team* team,
 }
 
 
+// #pragma mark - UserBreakpointEvent
+
+
+Team::UserBreakpointEvent::UserBreakpointEvent(uint32 type, Team* team,
+	UserBreakpoint* breakpoint)
+	:
+	Event(type, team),
+	fBreakpoint(breakpoint)
+{
+}
+
+
 // #pragma mark - Listener
 
 
@@ -714,6 +726,6 @@ Team::Listener::BreakpointRemoved(const Team::BreakpointEvent& event)
 
 
 void
-Team::Listener::UserBreakpointChanged(const Team::BreakpointEvent& event)
+Team::Listener::UserBreakpointChanged(const Team::UserBreakpointEvent& event)
 {
 }

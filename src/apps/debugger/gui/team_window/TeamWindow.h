@@ -9,10 +9,11 @@
 #include <String.h>
 #include <Window.h>
 
-#include "SourceView.h"
+#include "BreakpointsView.h"
 #include "Function.h"
 #include "ImageFunctionsView.h"
 #include "ImageListView.h"
+#include "SourceView.h"
 #include "StackFrame.h"
 #include "StackTraceView.h"
 #include "Team.h"
@@ -27,13 +28,15 @@ class Image;
 class RegistersView;
 class SourceCode;
 class StackFrame;
+class UserBreakpoint;
 class VariablesView;
 
 
 class TeamWindow : public BWindow, ThreadListView::Listener,
 	ImageListView::Listener, StackTraceView::Listener,
-	ImageFunctionsView::Listener, SourceView::Listener, VariablesView::Listener,
-	Team::Listener, Function::Listener, StackFrame::Listener {
+	ImageFunctionsView::Listener, BreakpointsView::Listener,
+	SourceView::Listener, VariablesView::Listener, Team::Listener,
+	Function::Listener, StackFrame::Listener {
 public:
 	class Listener;
 
@@ -50,6 +53,14 @@ public:
 	virtual	bool				QuitRequested();
 
 private:
+	enum ActiveSourceObject {
+		ACTIVE_SOURCE_NONE,
+		ACTIVE_SOURCE_STACK_FRAME,
+		ACTIVE_SOURCE_FUNCTION,
+		ACTIVE_SOURCE_BREAKPOINT
+	};
+
+private:
 	// ThreadListView::Listener
 	virtual	void				ThreadSelectionChanged(::Thread* thread);
 
@@ -62,6 +73,15 @@ private:
 	// ImageFunctionsView::Listener
 	virtual	void				FunctionSelectionChanged(
 									FunctionInstance* function);
+
+	// BreakpointsView::Listener
+	virtual	void				BreakpointSelectionChanged(
+									UserBreakpoint* breakpoint);
+	virtual	void				SetBreakpointEnabledRequested(
+									UserBreakpoint* breakpoint,
+									bool enabled);
+	virtual	void				ClearBreakpointRequested(
+									UserBreakpoint* breakpoint);
 
 	// SourceView::Listener
 	virtual	void				SetBreakpointRequested(target_addr_t address,
@@ -83,7 +103,7 @@ private:
 	virtual	void				ImageDebugInfoChanged(
 									const Team::ImageEvent& event);
 	virtual	void				UserBreakpointChanged(
-									const Team::BreakpointEvent& event);
+									const Team::UserBreakpointEvent& event);
 
 	// Function::Listener
 	virtual	void				FunctionSourceCodeChanged(Function* function);
@@ -99,6 +119,8 @@ private:
 			void				_SetActiveImage(Image* image);
 			void				_SetActiveStackTrace(StackTrace* stackTrace);
 			void				_SetActiveStackFrame(StackFrame* frame);
+			void				_SetActiveBreakpoint(
+									UserBreakpoint* breakpoint);
 			void				_SetActiveFunction(FunctionInstance* function);
 			void				_SetActiveSourceCode(SourceCode* sourceCode);
 			void				_UpdateCpuState();
@@ -114,7 +136,7 @@ private:
 			void				_HandleImageDebugInfoChanged(image_id imageID);
 			void				_HandleSourceCodeChanged();
 			void				_HandleUserBreakpointChanged(
-									target_addr_t address);
+									UserBreakpoint* breakpoint);
 
 private:
 			::Team*				fTeam;
@@ -122,14 +144,17 @@ private:
 			Image*				fActiveImage;
 			StackTrace*			fActiveStackTrace;
 			StackFrame*			fActiveStackFrame;
+			UserBreakpoint*		fActiveBreakpoint;
 			FunctionInstance*	fActiveFunction;
 			SourceCode*			fActiveSourceCode;
+			ActiveSourceObject	fActiveSourceObject;
 			Listener*			fListener;
 			BTabView*			fTabView;
 			BTabView*			fLocalsTabView;
 			ThreadListView*		fThreadListView;
 			ImageListView*		fImageListView;
 			ImageFunctionsView*	fImageFunctionsView;
+			BreakpointsView*	fBreakpointsView;
 			VariablesView*		fVariablesView;
 			RegistersView*		fRegistersView;
 			StackTraceView*		fStackTraceView;
@@ -155,10 +180,18 @@ public:
 									// called with team locked
 	virtual	void				ThreadActionRequested(thread_id threadID,
 									uint32 action) = 0;
+
 	virtual	void				SetBreakpointRequested(target_addr_t address,
+									bool enabled) = 0;
+	virtual	void				SetBreakpointEnabledRequested(
+									UserBreakpoint* breakpoint,
 									bool enabled) = 0;
 	virtual	void				ClearBreakpointRequested(
 									target_addr_t address) = 0;
+	virtual	void				ClearBreakpointRequested(
+									UserBreakpoint* breakpoint) = 0;
+									// TODO: Consolidate those!
+
 	virtual	bool				TeamWindowQuitRequested() = 0;
 };
 

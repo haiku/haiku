@@ -81,7 +81,8 @@ public:
 			void				SetStackTrace(StackTrace* stackTrace);
 			void				SetStackFrame(StackFrame* stackFrame);
 
-			void				UserBreakpointChanged(target_addr_t address);
+			void				UserBreakpointChanged(
+									UserBreakpoint* breakpoint);
 
 			struct Marker;
 			struct InstructionPointerMarker;
@@ -145,7 +146,8 @@ public:
 			void				SetStackTrace(StackTrace* stackTrace);
 			void				SetStackFrame(StackFrame* stackFrame);
 
-			void				UserBreakpointChanged(target_addr_t address);
+			void				UserBreakpointChanged(
+									UserBreakpoint* breakpoint);
 
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
@@ -236,7 +238,8 @@ public:
 									FontInfo* fontInfo);
 
 	virtual	void				SetSourceCode(SourceCode* sourceCode);
-			void				UserBreakpointChanged(target_addr_t address);
+			void				UserBreakpointChanged(
+									UserBreakpoint* breakpoint);
 
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
@@ -530,6 +533,8 @@ void
 SourceView::MarkerManager::SetSourceCode(SourceCode* sourceCode)
 {
 	fSourceCode = sourceCode;
+	_InvalidateIPMarkers();
+	_InvalidateBreakpointMarkers();
 }
 
 
@@ -550,7 +555,7 @@ SourceView::MarkerManager::SetStackFrame(StackFrame* stackFrame)
 
 
 void
-SourceView::MarkerManager::UserBreakpointChanged(target_addr_t address)
+SourceView::MarkerManager::UserBreakpointChanged(UserBreakpoint* breakpoint)
 {
 	_InvalidateBreakpointMarkers();
 }
@@ -827,7 +832,7 @@ SourceView::MarkerView::SetStackFrame(StackFrame* stackFrame)
 
 
 void
-SourceView::MarkerView::UserBreakpointChanged(target_addr_t address)
+SourceView::MarkerView::UserBreakpointChanged(UserBreakpoint* breakpoint)
 {
 	Invalidate();
 }
@@ -975,7 +980,7 @@ SourceView::TextView::SetSourceCode(SourceCode* sourceCode)
 
 
 void
-SourceView::TextView::UserBreakpointChanged(target_addr_t)
+SourceView::TextView::UserBreakpointChanged(UserBreakpoint* breakpoint)
 {
 	Invalidate();
 }
@@ -1749,11 +1754,11 @@ SourceView::SetSourceCode(SourceCode* sourceCode)
 
 
 void
-SourceView::UserBreakpointChanged(target_addr_t address)
+SourceView::UserBreakpointChanged(UserBreakpoint* breakpoint)
 {
-	fMarkerManager->UserBreakpointChanged(address);
-	fMarkerView->UserBreakpointChanged(address);
-	fTextView->UserBreakpointChanged(address);
+	fMarkerManager->UserBreakpointChanged(breakpoint);
+	fMarkerView->UserBreakpointChanged(breakpoint);
+	fTextView->UserBreakpointChanged(breakpoint);
 }
 
 

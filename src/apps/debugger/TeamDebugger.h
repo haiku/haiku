@@ -53,7 +53,12 @@ private:
 									uint32 action);
 	virtual	void				SetBreakpointRequested(target_addr_t address,
 									bool enabled);
+	virtual	void				SetBreakpointEnabledRequested(
+									UserBreakpoint* breakpoint,
+									bool enabled);
 	virtual	void				ClearBreakpointRequested(target_addr_t address);
+	virtual	void				ClearBreakpointRequested(
+									UserBreakpoint* breakpoint);
 	virtual	bool				TeamWindowQuitRequested();
 
 	// JobListener
@@ -96,8 +101,12 @@ private:
 
 			void				_HandleSetUserBreakpoint(target_addr_t address,
 									bool enabled);
+			void				_HandleSetUserBreakpoint(
+									UserBreakpoint* breakpoint, bool enabled);
 			void				_HandleClearUserBreakpoint(
 									target_addr_t address);
+			void				_HandleClearUserBreakpoint(
+									UserBreakpoint* breakpoint);
 
 			ThreadHandler*		_GetThreadHandler(thread_id threadID);
 

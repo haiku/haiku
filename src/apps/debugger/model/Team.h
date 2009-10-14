@@ -48,6 +48,7 @@ class SourceLocation;
 class Statement;
 class TeamDebugInfo;
 class TeamMemory;
+class UserBreakpoint;
 
 
 class Team {
@@ -56,6 +57,7 @@ public:
 			class ThreadEvent;
 			class ImageEvent;
 			class BreakpointEvent;
+			class UserBreakpointEvent;
 			class Listener;
 
 public:
@@ -149,7 +151,7 @@ public:
 
 			// breakpoint related service methods
 			void				NotifyUserBreakpointChanged(
-									Breakpoint* breakpoint);
+									UserBreakpoint* breakpoint);
 
 private:
 			struct BreakpointByAddressPredicate;
@@ -228,6 +230,18 @@ protected:
 };
 
 
+class Team::UserBreakpointEvent : public Event {
+public:
+								UserBreakpointEvent(uint32 type, Team* team,
+									UserBreakpoint* breakpoint);
+
+			UserBreakpoint*		GetBreakpoint() const	{ return fBreakpoint; }
+
+protected:
+			UserBreakpoint*		fBreakpoint;
+};
+
+
 class Team::Listener : public DoublyLinkedListLinkImpl<Team::Listener> {
 public:
 	virtual						~Listener();
@@ -253,7 +267,7 @@ public:
 	virtual	void				BreakpointRemoved(
 									const Team::BreakpointEvent& event);
 	virtual	void				UserBreakpointChanged(
-									const Team::BreakpointEvent& event);
+									const Team::UserBreakpointEvent& event);
 };
 
 

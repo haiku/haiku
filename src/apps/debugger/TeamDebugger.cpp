@@ -408,21 +408,34 @@ TeamDebugger::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case MSG_SET_BREAKPONT:
-		case MSG_CLEAR_BREAKPONT:
+		case MSG_SET_BREAKPOINT:
+		case MSG_CLEAR_BREAKPOINT:
 		{
-			uint64 address;
-			if (message->FindUInt64("address", &address) != B_OK)
+			UserBreakpoint* breakpoint = NULL;
+			Reference<UserBreakpoint> breakpointReference;
+			uint64 address = 0;
+
+			if (message->FindPointer("breakpoint", (void**)&breakpoint) == B_OK)
+				breakpointReference.SetTo(breakpoint, true);
+			else if (message->FindUInt64("address", &address) != B_OK)
 				break;
 
-			if (message->what == MSG_SET_BREAKPONT) {
+			if (message->what == MSG_SET_BREAKPOINT) {
 				bool enabled;
 				if (message->FindBool("enabled", &enabled) != B_OK)
 					enabled = true;
 
-				_HandleSetUserBreakpoint(address, enabled);
-			} else
-				_HandleClearUserBreakpoint(address);
+				if (breakpoint != NULL)
+					_HandleSetUserBreakpoint(breakpoint, enabled);
+				else
+					_HandleSetUserBreakpoint(address, enabled);
+			} else {
+				if (breakpoint != NULL)
+					_HandleClearUserBreakpoint(breakpoint);
+				else
+					_HandleClearUserBreakpoint(address);
+			}
+
 			break;
 		}
 
@@ -587,7 +600,7 @@ TeamDebugger::ThreadActionRequested(thread_id threadID,
 void
 TeamDebugger::SetBreakpointRequested(target_addr_t address, bool enabled)
 {
-	BMessage message(MSG_SET_BREAKPONT);
+	BMessage message(MSG_SET_BREAKPOINT);
 	message.AddUInt64("address", (uint64)address);
 	message.AddBool("enabled", enabled);
 	PostMessage(&message);
@@ -595,11 +608,37 @@ TeamDebugger::SetBreakpointRequested(target_addr_t address, bool enabled)
 
 
 void
+TeamDebugger::SetBreakpointEnabledRequested(UserBreakpoint* breakpoint,
+	bool enabled)
+{
+	BMessage message(MSG_SET_BREAKPOINT);
+	Reference<UserBreakpoint> breakpointReference(breakpoint);
+	if (message.AddPointer("breakpoint", breakpoint) == B_OK
+		&& message.AddBool("enabled", enabled) == B_OK
+		&& PostMessage(&message) == B_OK) {
+		breakpointReference.Detach();
+	}
+}
+
+
+void
 TeamDebugger::ClearBreakpointRequested(target_addr_t address)
 {
-	BMessage message(MSG_CLEAR_BREAKPONT);
+	BMessage message(MSG_CLEAR_BREAKPOINT);
 	message.AddUInt64("address", (uint64)address);
 	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::ClearBreakpointRequested(UserBreakpoint* breakpoint)
+{
+	BMessage message(MSG_CLEAR_BREAKPOINT);
+	Reference<UserBreakpoint> breakpointReference(breakpoint);
+	if (message.AddPointer("breakpoint", breakpoint) == B_OK
+		&& PostMessage(&message) == B_OK) {
+		breakpointReference.Detach();
+	}
 }
 
 
@@ -719,7 +758,6 @@ TeamDebugger::_DebugEventListener()
 		if (error != B_OK)
 			break;
 				// TODO: Error handling!
-
 
 		if (event->Team() != fTeamID) {
 			TRACE_EVENTS("TeamDebugger for team %ld: received event from team "
@@ -1101,7 +1139,14 @@ TeamDebugger::_HandleSetUserBreakpoint(target_addr_t address, bool enabled)
 
 	locker.Unlock();
 
-	status_t error = fBreakpointManager->InstallUserBreakpoint(userBreakpoint,
+	_HandleSetUserBreakpoint(userBreakpoint, enabled);
+}
+
+
+void
+TeamDebugger::_HandleSetUserBreakpoint(UserBreakpoint* breakpoint, bool enabled)
+{
+	status_t error = fBreakpointManager->InstallUserBreakpoint(breakpoint,
 		enabled);
 	if (error != B_OK) {
 		_NotifyUser("Install Breakpoint", "Failed to install breakpoint: %s",
@@ -1126,7 +1171,14 @@ TeamDebugger::_HandleClearUserBreakpoint(target_addr_t address)
 
 	locker.Unlock();
 
-	fBreakpointManager->UninstallUserBreakpoint(userBreakpoint);
+	_HandleClearUserBreakpoint(userBreakpoint);
+}
+
+
+void
+TeamDebugger::_HandleClearUserBreakpoint(UserBreakpoint* breakpoint)
+{
+	fBreakpointManager->UninstallUserBreakpoint(breakpoint);
 }
 
 

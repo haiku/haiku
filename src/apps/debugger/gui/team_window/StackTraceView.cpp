@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "StackTraceView.h"
 
 #include <stdio.h>
@@ -14,39 +15,7 @@
 #include "FunctionInstance.h"
 #include "Image.h"
 #include "StackTrace.h"
-
-
-// #pragma mark - TargetAddressValueColumn
-
-
-class TargetAddressValueColumn : public StringTableColumn {
-public:
-	TargetAddressValueColumn(int32 modelIndex, const char* title, float width,
-		float minWidth, float maxWidth, uint32 truncate = B_TRUNCATE_MIDDLE,
-		alignment align = B_ALIGN_RIGHT)
-		:
-		StringTableColumn(modelIndex, title, width, minWidth, maxWidth,
-			truncate, align)
-	{
-	}
-
-protected:
-	virtual BField* PrepareField(const BVariant& value) const
-	{
-		char buffer[64];
-		snprintf(buffer, sizeof(buffer), "%#llx", value.ToUInt64());
-
-		return StringTableColumn::PrepareField(
-			BVariant(buffer, B_VARIANT_DONT_COPY_DATA));
-	}
-
-	virtual int CompareValues(const BVariant& a, const BVariant& b)
-	{
-		uint64 valueA = a.ToUInt64();
-		uint64 valueB = b.ToUInt64();
-		return valueA < valueB ? -1 : (valueA == valueB ? 0 : 1);
-	}
-};
+#include "TargetAddressTableColumn.h"
 
 
 // #pragma mark - FramesTableModel
@@ -246,9 +215,9 @@ StackTraceView::_Init()
 	fFramesTable->SetSortingEnabled(false);
 
 	// columns
-	fFramesTable->AddColumn(new TargetAddressValueColumn(0, "Frame", 80, 40,
+	fFramesTable->AddColumn(new TargetAddressTableColumn(0, "Frame", 80, 40,
 		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fFramesTable->AddColumn(new TargetAddressValueColumn(1, "IP", 80, 40, 1000,
+	fFramesTable->AddColumn(new TargetAddressTableColumn(1, "IP", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
 	fFramesTable->AddColumn(new StringTableColumn(2, "Function", 300, 100, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));

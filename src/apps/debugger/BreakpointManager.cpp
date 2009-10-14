@@ -104,13 +104,8 @@ BreakpointManager::InstallUserBreakpoint(UserBreakpoint* userBreakpoint,
 		userBreakpoint->SetEnabled(enabled);
 
 	// notify user breakpoint listeners
-	if (error == B_OK) {
-		for (int32 i = 0;
-			UserBreakpointInstance* instance = userBreakpoint->InstanceAt(i);
-			i++) {
-			fTeam->NotifyUserBreakpointChanged(instance->GetBreakpoint());
-		}
-	}
+	if (error == B_OK)
+		fTeam->NotifyUserBreakpointChanged(userBreakpoint);
 
 	teamLocker.Unlock();
 
@@ -138,6 +133,8 @@ BreakpointManager::InstallUserBreakpoint(UserBreakpoint* userBreakpoint,
 			userBreakpoint->SetValid(true);
 			userBreakpoint->AcquireReference();
 			fTeam->AddUserBreakpoint(userBreakpoint);
+			fTeam->NotifyUserBreakpointChanged(userBreakpoint);
+				// notify again -- the breakpoint hadn't been added before
 			teamLocker.Unlock();
 		}
 	} else {
@@ -164,12 +161,15 @@ BreakpointManager::InstallUserBreakpoint(UserBreakpoint* userBreakpoint,
 				_UpdateBreakpointInstallation(breakpoint);
 
 				teamLocker.Lock();
-				fTeam->NotifyUserBreakpointChanged(breakpoint);
 
 				if (breakpoint->IsUnused())
 					fTeam->RemoveBreakpoint(breakpoint);
 				teamLocker.Unlock();
 			}
+
+			teamLocker.Lock();
+			fTeam->NotifyUserBreakpointChanged(userBreakpoint);
+			teamLocker.Unlock();
 		}
 	}
 
@@ -211,12 +211,12 @@ BreakpointManager::UninstallUserBreakpoint(UserBreakpoint* userBreakpoint)
 			instance->SetBreakpoint(NULL);
 			breakpoint->RemoveUserBreakpoint(instance);
 
-			fTeam->NotifyUserBreakpointChanged(breakpoint);
-
 			if (breakpoint->IsUnused())
 				fTeam->RemoveBreakpoint(breakpoint);
 		}
 	}
+
+	fTeam->NotifyUserBreakpointChanged(userBreakpoint);
 
 	teamLocker.Unlock();
 	installLocker.Unlock();
