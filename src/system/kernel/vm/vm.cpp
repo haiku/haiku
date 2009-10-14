@@ -1096,11 +1096,16 @@ find_reserved_area(vm_address_space* addressSpace, addr_t start,
 }
 
 
-// verifies that an area with the given aligned base and size fits into
-// the spot defined by base and limit and does check for overflows
-#define IS_VALID_SPOT(base, alignedBase, size, limit) \
-	((alignedBase) >= (base) && (alignedBase) + ((size) - 1) > (alignedBase) \
-		&& (alignedBase) + ((size) - 1) <= (limit))
+/*!	Verifies that an area with the given aligned base and size fits into
+	the spot defined by base and limit and does check for overflows.
+*/
+static inline bool
+is_valid_spot(addr_t base, addr_t alignedBase, addr_t size, addr_t limit)
+{
+	return (alignedBase >= base && alignedBase + (size - 1) > alignedBase
+		&& alignedBase + (size - 1) <= limit);
+}
+
 
 /*!	Must be called with this address space's sem held */
 static status_t
@@ -1166,7 +1171,7 @@ second_chance:
 			if (last == NULL) {
 				// see if we can build it at the beginning of the virtual map
 				addr_t alignedBase = ROUNDUP(addressSpace->base, alignment);
-				if (IS_VALID_SPOT(addressSpace->base, alignedBase, size,
+				if (is_valid_spot(addressSpace->base, alignedBase, size,
 						next == NULL ? end : next->base)) {
 					foundSpot = true;
 					area->base = alignedBase;
@@ -1180,7 +1185,7 @@ second_chance:
 			// keep walking
 			while (next != NULL) {
 				addr_t alignedBase = ROUNDUP(last->base + last->size, alignment);
-				if (IS_VALID_SPOT(last->base + (last->size - 1), alignedBase,
+				if (is_valid_spot(last->base + (last->size - 1), alignedBase,
 						size, next->base)) {
 					foundSpot = true;
 					area->base = alignedBase;
@@ -1195,16 +1200,15 @@ second_chance:
 				break;
 
 			addr_t alignedBase = ROUNDUP(last->base + last->size, alignment);
-			if (IS_VALID_SPOT(last->base + (last->size - 1), alignedBase,
+			if (is_valid_spot(last->base + (last->size - 1), alignedBase,
 					size, end)) {
 				// got a spot
 				foundSpot = true;
 				area->base = alignedBase;
 				break;
 			} else {
-				// We didn't find a free spot - if there were any reserved areas
-				// with the RESERVED_AVOID_BASE flag set, we can now test those
-				// for free space
+				// We didn't find a free spot - if there are any reserved areas,
+				// we can now test those for free space
 				// TODO: it would make sense to start with the biggest of them
 				next = addressSpace->areas;
 				for (last = NULL; next != NULL;
@@ -1231,7 +1235,8 @@ second_chance:
 						break;
 					}
 
-					if (alignedBase == next->base && next->size >= size) {
+					if ((next->protection & RESERVED_AVOID_BASE) == 0
+						&&  alignedBase == next->base && next->size >= size) {
 						// The new area will be placed at the beginning of the
 						// reserved area and the reserved area will be offset
 						// and resized
@@ -1242,7 +1247,7 @@ second_chance:
 						break;
 					}
 
-					if (IS_VALID_SPOT(next->base, alignedBase, size,
+					if (is_valid_spot(next->base, alignedBase, size,
 							next->base + (next->size - 1))) {
 						// The new area will be placed at the end of the
 						// reserved area, and the reserved area will be resized
@@ -1375,11 +1380,8 @@ insert_area(vm_address_space* addressSpace, void** _address,
 
 	status = find_and_insert_area_slot(addressSpace, searchBase, size,
 		searchEnd, addressSpec, area);
-	if (status == B_OK) {
-		// TODO: do we have to do anything about B_ANY_KERNEL_ADDRESS
-		// vs. B_ANY_KERNEL_BLOCK_ADDRESS here?
+	if (status == B_OK)
 		*_address = (void*)area->base;
-	}
 
 	return status;
 }
@@ -6111,7 +6113,8 @@ delete_area(area_id area)
 
 
 status_t
-_user_reserve_address_range(addr_t* userAddress, uint32 addressSpec, addr_t size)
+_user_reserve_address_range(addr_t* userAddress, uint32 addressSpec,
+	addr_t size)
 {
 	// filter out some unavailable values (for userland)
 	switch (addressSpec) {
