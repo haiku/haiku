@@ -123,8 +123,7 @@ static void thread_kthread_entry(void);
 static void thread_kthread_exit(void);
 
 
-/*!
-	Inserts a thread into a team.
+/*!	Inserts a thread into a team.
 	You must hold the team lock when you call this function.
 */
 static void
@@ -142,8 +141,7 @@ insert_thread_into_team(struct team *team, struct thread *thread)
 }
 
 
-/*!
-	Removes a thread from a team.
+/*!	Removes a thread from a team.
 	You must hold the team lock when you call this function.
 */
 static void
@@ -204,8 +202,7 @@ reset_signals(struct thread *thread)
 }
 
 
-/*!
-	Allocates and fills in thread structure (or reuses one from the
+/*!	Allocates and fills in thread structure (or reuses one from the
 	dead queue).
 
 	\param threadID The ID to be assigned to the new thread. If
@@ -368,8 +365,7 @@ thread_kthread_exit(void)
 }
 
 
-/*!
-	Initializes the thread and jumps to its userspace entry point.
+/*!	Initializes the thread and jumps to its userspace entry point.
 	This function is called at creation time of every user thread,
 	but not for a team's main thread.
 */
@@ -399,8 +395,7 @@ _create_kernel_thread_kentry(void)
 }
 
 
-/*!
-	Creates a new thread in the team with the specified team ID.
+/*!	Creates a new thread in the team with the specified team ID.
 
 	\param threadID The ID to be assigned to the new thread. If
 		  \code < 0 \endcode a fresh one is allocated.
@@ -650,8 +645,7 @@ get_thread_wait_sem(struct thread* thread)
 }
 
 
-/*!
-	Fills the thread_info structure with information from the specified
+/*!	Fills the thread_info structure with information from the specified
 	thread.
 	The thread lock must be held when called.
 */
@@ -695,9 +689,10 @@ fill_thread_info(struct thread *thread, thread_info *info, size_t size)
 	info->sem = get_thread_wait_sem(thread);
 }
 
+
 static status_t
-send_data_etc(thread_id id, int32 code, const void *buffer,
-	size_t bufferSize, int32 flags)
+send_data_etc(thread_id id, int32 code, const void *buffer, size_t bufferSize,
+	int32 flags)
 {
 	struct thread *target;
 	sem_id cachedSem;
@@ -1650,8 +1645,7 @@ thread_get_thread_struct_locked(thread_id id)
 }
 
 
-/*!
-	Called in the interrupt handler code when a thread enters
+/*!	Called in the interrupt handler code when a thread enters
 	the kernel for any reason.
 	Only tracks time for now.
 	Interrupts are disabled.
@@ -1671,8 +1665,7 @@ thread_at_kernel_entry(bigtime_t now)
 }
 
 
-/*!
-	Called whenever a thread exits kernel space to user space.
+/*!	Called whenever a thread exits kernel space to user space.
 	Tracks time, handles signals, ...
 	Interrupts must be enabled. When the function returns, interrupts will be
 	disabled.
@@ -1866,8 +1859,7 @@ thread_yield(bool force)
 }
 
 
-/*!
-	Kernel private thread creation function.
+/*!	Kernel private thread creation function.
 
 	\param threadID The ID to be assigned to the new thread. If
 		  \code < 0 \endcode a fresh one is allocated.
@@ -2277,7 +2269,7 @@ thread_block_timeout(timer* timer)
 	struct thread* thread = (struct thread*)timer->user_data;
 	// the scheduler will tell us whether to reschedule or not via
 	// thread_unblock_locked's return
-	if (thread_unblock_locked(thread, B_TIMED_OUT)) 
+	if (thread_unblock_locked(thread, B_TIMED_OUT))
 		return B_INVOKE_SCHEDULER;
 
 	return B_HANDLED_INTERRUPT;
@@ -2649,8 +2641,7 @@ snooze(bigtime_t timeout)
 }
 
 
-/*!
-	snooze_until() for internal kernel use only; doesn't interrupt on
+/*!	snooze_until() for internal kernel use only; doesn't interrupt on
 	signals.
 */
 status_t
