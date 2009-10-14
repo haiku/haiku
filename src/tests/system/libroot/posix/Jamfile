@@ -2,6 +2,10 @@ SubDir HAIKU_TOP src tests system libroot posix ;
 
 UsePrivateHeaders libroot syslog_daemon ;
 
+SimpleTest abort_test
+	: abort_test.cpp
+;
+
 SimpleTest SyslogTest
 	: SyslogTest.cpp syslog.cpp
 ;
