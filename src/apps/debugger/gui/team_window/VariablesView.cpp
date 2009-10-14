@@ -907,8 +907,10 @@ VariablesView::_RequestVariableValue(Variable* variable)
 void
 VariablesView::_SaveViewState() const
 {
-	if (fThread == NULL || fStackFrame == NULL)
+	if (fThread == NULL || fStackFrame == NULL
+		|| fStackFrame->Function() == NULL) {
 		return;
+	}
 
 	// get the function ID
 	FunctionID* functionID = fStackFrame->Function()->GetFunctionID();
@@ -946,8 +948,10 @@ VariablesView::_RestoreViewState()
 		fPreviousViewState = NULL;
 	}
 
-	if (fThread == NULL || fStackFrame == NULL)
+	if (fThread == NULL || fStackFrame == NULL
+		|| fStackFrame->Function() == NULL) {
 		return;
+	}
 
 	// get the function ID
 	FunctionID* functionID = fStackFrame->Function()->GetFunctionID();
