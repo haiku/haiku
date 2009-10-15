@@ -294,7 +294,7 @@ AX88772Device::StartDevice()
 				"%d bytes of %d written.\n", actualLength, sizeof(fIPG));
 	}
 
-	uint16 rxcontrol = RXCTL_START | RXCTL_MULTICAST;
+	uint16 rxcontrol = RXCTL_START | RXCTL_MULTICAST | RXCTL_BROADCAST;
 	result = WriteRXControlRegister(rxcontrol);
 	if(result != B_OK) {
 		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n", rxcontrol, result);

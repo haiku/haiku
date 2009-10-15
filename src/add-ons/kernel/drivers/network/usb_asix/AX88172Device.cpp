@@ -177,7 +177,8 @@ AX88172Device::StartDevice()
 		}
 	}
 
-	uint16 rxcontrol = RXCTL_START | RXCTL_MULTICAST | RXCTL_UNICAST;
+	uint16 rxcontrol = RXCTL_START | RXCTL_MULTICAST 
+							| RXCTL_UNICAST | RXCTL_BROADCAST;
 	status_t result = WriteRXControlRegister(rxcontrol);
 	if(result != B_OK) {
 		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n", rxcontrol, result);
