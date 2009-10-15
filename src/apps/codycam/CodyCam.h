@@ -1,4 +1,3 @@
-/* CodyCam.h */
 #ifndef CODYCAM_H
 #define CODYCAM_H
 
@@ -16,7 +15,6 @@
 #include <StringView.h>
 #include <TextControl.h>
 #include <Window.h>
-
 
 
 class BMediaRoster;
@@ -86,98 +84,104 @@ const char* kUploadClient[] = {
 
 
 class CodyCam : public BApplication {
-	public:
-		CodyCam();
-		virtual ~CodyCam();
+public:
+							CodyCam();
+	virtual					~CodyCam();
 
-		void ReadyToRun();
-		virtual bool QuitRequested();
-		virtual void MessageReceived(BMessage* message);
+			void			ReadyToRun();
+	virtual	bool			QuitRequested();
+	virtual	void			MessageReceived(BMessage* message);
 
-	private:
-		status_t		_SetUpNodes();
-		void			_TearDownNodes();
+private:
+			status_t		_SetUpNodes();
+			void			_TearDownNodes();
 
-		BMediaRoster*	fMediaRoster; 
-		media_node		fTimeSourceNode;
-		media_node		fProducerNode;
-		VideoConsumer*	fVideoConsumer;
-		media_output	fProducerOut;
-		media_input		fConsumerIn;
-		BWindow*		fWindow;
-		port_id			fPort;
-		BWindow*		fVideoControlWindow;
+			BMediaRoster*	fMediaRoster;
+			media_node		fTimeSourceNode;
+			media_node		fProducerNode;
+			VideoConsumer*	fVideoConsumer;
+			media_output	fProducerOut;
+			media_input		fConsumerIn;
+			BWindow*		fWindow;
+			port_id			fPort;
+			BWindow*		fVideoControlWindow;
 };
 
 
 class VideoWindow : public BWindow {
-	public:
-		VideoWindow(BRect frame, const char* title, window_type type,
-			uint32 flags, port_id* consumerport);
-		~VideoWindow();
+public:
+							VideoWindow(BRect frame, const char* title,
+								window_type type, uint32 flags,
+								port_id* consumerport);
+							~VideoWindow();
 
-		virtual	bool QuitRequested();
-		virtual void MessageReceived(BMessage* message);
+	virtual	bool			QuitRequested();
+	virtual	void			MessageReceived(BMessage* message);
 
-		void ApplyControls();
+			void			ApplyControls();
 
-		BView* VideoView();
-		BStringView* StatusLine();
+			BView*			VideoView();
+			BStringView*	StatusLine();
 
-	private:
-		void _BuildCaptureControls(BView* theView);
+private:
+			void			_BuildCaptureControls(BView* theView);
 
-		void _SetUpSettings(const char* filename, const char* dirname);
-		void _QuitSettings();
+			void			_SetUpSettings(const char* filename,
+								const char* dirname);
+			void			_QuitSettings();
 
-	private:
-		media_node*				fProducer;
-		port_id*				fPortPtr;
+private:
+			media_node*		fProducer;
+			port_id*		fPortPtr;
 
-		BView*					fView;
-		BView*					fVideoView;
+			BView*			fView;
+			BView*			fVideoView;
 
-		BTextControl*			fFileName;
-		BBox*					fCaptureSetupBox;
-		BMenu*					fCaptureRateMenu;
-		BMenuField*				fCaptureRateSelector;
-		BMenu*					fImageFormatMenu;
-		BMenuField*				fImageFormatSelector;
-		BMenu*					fUploadClientMenu;
-		BMenuField*				fUploadClientSelector;
-		BBox*					fFtpSetupBox;
-		BTextControl*			fServerName;
-		BTextControl*			fLoginId;
-		BTextControl*			fPassword;	
-		BTextControl*			fDirectory;
-		BCheckBox*				fPassiveFtp;
-		BBox*					fStatusBox;
-		BStringView*			fStatusLine;
+			BTextControl*	fFileName;
+			BBox*			fCaptureSetupBox;
+			BMenu*			fCaptureRateMenu;
+			BMenuField*		fCaptureRateSelector;
+			BMenu*			fImageFormatMenu;
+			BMenuField*		fImageFormatSelector;
+			BMenu*			fUploadClientMenu;
+			BMenuField*		fUploadClientSelector;
+			BBox*			fFtpSetupBox;
+			BTextControl*	fServerName;
+			BTextControl*	fLoginId;
+			BTextControl*	fPassword;
+			BTextControl*	fDirectory;
+			BCheckBox*		fPassiveFtp;
+			BBox*			fStatusBox;
+			BStringView*	fStatusLine;
 
-		ftp_msg_info			fFtpInfo;
+			ftp_msg_info	fFtpInfo;
 
-		Settings*				fSettings;
-		StringValueSetting*		fServerSetting;
-		StringValueSetting*		fLoginSetting;
-		StringValueSetting*		fPasswordSetting;
-		StringValueSetting*		fDirectorySetting;
-		BooleanValueSetting*	fPassiveFtpSetting;
-		StringValueSetting*		fFilenameSetting;
-		StringValueSetting*		fImageFormatSettings;
-		EnumeratedStringValueSetting* fUploadClientSetting;
-		EnumeratedStringValueSetting* fCaptureRateSetting;
+			Settings*		fSettings;
+
+			StringValueSetting*		fServerSetting;
+			StringValueSetting*		fLoginSetting;
+			StringValueSetting*		fPasswordSetting;
+			StringValueSetting*		fDirectorySetting;
+			BooleanValueSetting*	fPassiveFtpSetting;
+			StringValueSetting*		fFilenameSetting;
+			StringValueSetting*		fImageFormatSettings;
+
+			EnumeratedStringValueSetting*	fUploadClientSetting;
+			EnumeratedStringValueSetting*	fCaptureRateSetting;
 };
 
 
 class ControlWindow : public BWindow {
-	public:
-		ControlWindow(const BRect& frame, BView* controls, media_node node);
-		void MessageReceived(BMessage* message);
-		bool QuitRequested();
+public:
+							ControlWindow(const BRect& frame, BView* controls,
+								media_node node);
+			void			MessageReceived(BMessage* message);
+			bool			QuitRequested();
 
-	private:
-		BView*		fView;
-		media_node	fNode;
+private:
+			BView*			fView;
+			media_node		fNode;
 };
 
 #endif	// CODYCAM_H
+

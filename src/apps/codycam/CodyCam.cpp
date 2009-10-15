@@ -58,15 +58,8 @@ static void
 ErrorAlert(const char* message, status_t err, BWindow *window = NULL)
 {
 	BAlert *alert = new BAlert("", message, "OK");
-	if (window != NULL) {
-		alert->MoveTo(
-			window->Frame().left +
-				window->Bounds().right / 2 -
-				alert->Bounds().right / 2,
-			window->Frame().top +
-				window->Bounds().bottom / 2 -
-				alert->Bounds().bottom / 2);
-	}
+	if (window != NULL)
+		alert->CenterIn(window->Frame());
 	alert->Go();
 
 	printf("%s\n%s [%lx]", message, strerror(err), err);
@@ -158,19 +151,13 @@ CodyCam::~CodyCam()
 void 
 CodyCam::ReadyToRun()
 {
-	/* create the window for the app */
 	fWindow = new VideoWindow(BRect(28, 28, 28, 28),
 		(const char*) "CodyCam", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, &fPort);
 
-	/* set up the node connections */
 	status_t status = _SetUpNodes();
-	if (status != B_OK) {
-		// This error is not needed because _SetUpNodes handles displaying any
-		// errors it runs into.
-//		ErrorAlert("Error setting up nodes", status);
+	if (status != B_OK)
 		return;
-	}
 
 	((VideoWindow*)fWindow)->ApplyControls();
 	
@@ -329,7 +316,6 @@ CodyCam::_SetUpNodes()
 
 
 	/* set time sources */
-
 	status = fMediaRoster->SetTimeSourceFor(fProducerNode.node, fTimeSourceNode.node);
 	if (status != B_OK) {
 		ErrorAlert("Can't set the timesource for the video source", status);
@@ -833,25 +819,35 @@ VideoWindow::_SetUpSettings(const char* filename, const char* dirname)
 {
 	fSettings = new Settings(filename, dirname);
 
-	fSettings->Add(fServerSetting = new StringValueSetting("Server", "ftp.my.server",
-		"server address expected", ""));
-	fSettings->Add(fLoginSetting = new StringValueSetting("Login", "loginID",
-		"login ID expected", ""));
-	fSettings->Add(fPasswordSetting = new StringValueSetting("Password", "password",
-		"password expected", ""));
-	fSettings->Add(fDirectorySetting = new StringValueSetting("Directory", "web/images",
-		"destination directory expected", ""));
-	fSettings->Add(fPassiveFtpSetting = new BooleanValueSetting("PassiveFtp", 1));
-	fSettings->Add(fFilenameSetting = new StringValueSetting("StillImageFilename",
-		"codycam.jpg", "still image filename expected", ""));
-	fSettings->Add(fImageFormatSettings = new StringValueSetting("ImageFileFormat",
-		"JPEG Image", "image file format expected", ""));
-	fSettings->Add(fCaptureRateSetting = new EnumeratedStringValueSetting("CaptureRate",
+	fServerSetting = new StringValueSetting("Server", "ftp.my.server",
+		"server address expected", "");
+	fLoginSetting = new StringValueSetting("Login", "loginID",
+		"login ID expected", "");
+	fPasswordSetting = new StringValueSetting("Password", "password",
+		"password expected", "");
+	fDirectorySetting = new StringValueSetting("Directory", "web/images",
+		"destination directory expected", "");
+	fPassiveFtpSetting = new BooleanValueSetting("PassiveFtp", 1);
+	fFilenameSetting = new StringValueSetting("StillImageFilename",
+		"codycam.jpg", "still image filename expected", "");
+	fImageFormatSettings = new StringValueSetting("ImageFileFormat",
+		"JPEG Image", "image file format expected", "");
+	fCaptureRateSetting = new EnumeratedStringValueSetting("CaptureRate",
 		"Every 5 minutes", kCaptureRate, "capture rate expected",
-		"unrecognized capture rate specified"));
-	fSettings->Add(fUploadClientSetting = new EnumeratedStringValueSetting("UploadClient",
+		"unrecognized capture rate specified");
+	fUploadClientSetting = new EnumeratedStringValueSetting("UploadClient",
 		"FTP", kUploadClient, "upload client name expected",
-		"unrecognized upload client specified"));
+		"unrecognized upload client specified");
+
+	fSettings->Add(fServerSetting);
+	fSettings->Add(fLoginSetting);
+	fSettings->Add(fPasswordSetting);
+	fSettings->Add(fDirectorySetting);
+	fSettings->Add(fPassiveFtpSetting);
+	fSettings->Add(fFilenameSetting);
+	fSettings->Add(fImageFormatSettings);
+	fSettings->Add(fCaptureRateSetting);
+	fSettings->Add(fUploadClientSetting);
 
 	fSettings->TryReadingSettings();
 }
@@ -945,3 +941,4 @@ int main() {
 	app.Run();
 	return 0;	
 }
+
