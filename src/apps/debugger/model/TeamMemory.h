@@ -5,7 +5,11 @@
 #ifndef TEAM_MEMORY_H
 #define TEAM_MEMORY_H
 
+
 #include "TargetAddressRange.h"
+
+
+class BString;
 
 
 class TeamMemory {
@@ -15,6 +19,8 @@ public:
 
 	virtual	ssize_t				ReadMemory(target_addr_t address, void* buffer,
 									size_t size) = 0;
+	virtual	status_t			ReadMemoryString(target_addr_t address,
+									size_t maxLength, BString& _string);
 };
 
 
