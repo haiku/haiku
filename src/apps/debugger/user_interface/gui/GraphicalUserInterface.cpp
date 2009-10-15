@@ -71,6 +71,7 @@ GraphicalUserInterface::NotifyUser(const char* title, const char* message,
 			break;
 		case USER_NOTIFICATION_WARNING:
 		case USER_NOTIFICATION_ERROR:
+		default:
 			alertType = B_WARNING_ALERT;
 			break;
 	}
