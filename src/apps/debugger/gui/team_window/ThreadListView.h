@@ -40,6 +40,8 @@ private:
 	// Team::Listener
 	virtual	void				ThreadAdded(const Team::ThreadEvent& event);
 	virtual	void				ThreadRemoved(const Team::ThreadEvent& event);
+	virtual	void				ThreadStateChanged(
+									const Team::ThreadEvent& event);
 
 	// TableListener
 	virtual	void				TableSelectionChanged(Table* table);

@@ -64,10 +64,14 @@ private:
 	virtual	status_t			GetImageDebugInfo(Image* image,
 									ImageDebugInfo*& _info);
 
-			bool				_HandleThreadStopped(CpuState* cpuState);
+			bool				_HandleThreadStopped(CpuState* cpuState,
+									uint32 stoppedReason,
+									const BString& stoppedReasonInfo
+										= BString());
 
 			void				_SetThreadState(uint32 state,
-									CpuState* cpuState);
+									CpuState* cpuState, uint32 stoppedReason,
+									const BString& stoppedReasonInfo);
 
 			Statement*			_GetStatementAtInstructionPointer(
 									StackFrame* frame);

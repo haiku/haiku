@@ -5,6 +5,8 @@
 
 #include "Thread.h"
 
+#include <stdio.h>
+
 #include "CpuState.h"
 #include "StackTrace.h"
 #include "Team.h"
@@ -15,6 +17,7 @@ Thread::Thread(Team* team, thread_id threadID)
 	fTeam(team),
 	fID(threadID),
 	fState(THREAD_STATE_UNKNOWN),
+	fStoppedReason(THREAD_STOPPED_UNKNOWN),
 	fCpuState(NULL),
 	fStackTrace(NULL)
 {
@@ -52,12 +55,14 @@ Thread::SetName(const BString& name)
 
 
 void
-Thread::SetState(uint32 state)
+Thread::SetState(uint32 state, uint32 reason, const BString& info)
 {
 	if (state == fState)
 		return;
 
 	fState = state;
+	fStoppedReason = reason;
+	fStoppedReasonInfo = info;
 
 	// unset CPU state and stack trace, if the thread isn't stopped
 	if (fState != THREAD_STATE_STOPPED) {

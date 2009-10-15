@@ -17,10 +17,22 @@ class StackTrace;
 class Team;
 
 
+// general thread state
 enum {
 	THREAD_STATE_UNKNOWN,
 	THREAD_STATE_RUNNING,
 	THREAD_STATE_STOPPED
+};
+
+// reason why stopped
+enum {
+	THREAD_STOPPED_UNKNOWN,
+	THREAD_STOPPED_DEBUGGED,
+	THREAD_STOPPED_DEBUGGER_CALL,
+	THREAD_STOPPED_BREAKPOINT,
+	THREAD_STOPPED_WATCHPOINT,
+	THREAD_STOPPED_SINGLE_STEP,
+	THREAD_STOPPED_EXCEPTION
 };
 
 
@@ -40,7 +52,14 @@ public:
 			void				SetName(const BString& name);
 
 			uint32				State() const	{ return fState; }
-			void				SetState(uint32 state);
+			void				SetState(uint32 state,
+									uint32 reason = THREAD_STOPPED_UNKNOWN,
+									const BString& info = BString());
+
+			uint32				StoppedReason() const
+									{ return fStoppedReason; }
+			const BString&		StoppedReasonInfo() const
+									{ return fStoppedReasonInfo; }
 
 			CpuState*			GetCpuState() const	{ return fCpuState; }
 			void				SetCpuState(CpuState* state);
@@ -53,6 +72,8 @@ private:
 			thread_id			fID;
 			BString				fName;
 			uint32				fState;
+			uint32				fStoppedReason;
+			BString				fStoppedReasonInfo;
 			CpuState*			fCpuState;
 			StackTrace*			fStackTrace;
 };

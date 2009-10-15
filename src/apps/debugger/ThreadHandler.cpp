@@ -93,14 +93,16 @@ ThreadHandler::SetBreakpointAndRun(target_addr_t address)
 bool
 ThreadHandler::HandleThreadDebugged(ThreadDebuggedEvent* event)
 {
-	return _HandleThreadStopped(NULL);
+	return _HandleThreadStopped(NULL, THREAD_STOPPED_DEBUGGED);
 }
 
 
 bool
 ThreadHandler::HandleDebuggerCall(DebuggerCallEvent* event)
 {
-	return _HandleThreadStopped(NULL);
+	BString message;
+	fDebuggerInterface->ReadMemoryString(event->Message(), 1024, message);
+	return _HandleThreadStopped(NULL, THREAD_STOPPED_DEBUGGER_CALL, message);
 }
 
 
@@ -155,14 +157,15 @@ ThreadHandler::HandleBreakpointHit(BreakpointHitEvent* event)
 		}
 	}
 
-	return _HandleThreadStopped(cpuState);
+	return _HandleThreadStopped(cpuState, THREAD_STOPPED_BREAKPOINT);
 }
 
 
 bool
 ThreadHandler::HandleWatchpointHit(WatchpointHitEvent* event)
 {
-	return _HandleThreadStopped(event->GetCpuState());
+	return _HandleThreadStopped(event->GetCpuState(),
+		THREAD_STOPPED_WATCHPOINT);
 }
 
 
@@ -175,14 +178,17 @@ ThreadHandler::HandleSingleStep(SingleStepEvent* event)
 			return true;
 	}
 
-	return _HandleThreadStopped(event->GetCpuState());
+	return _HandleThreadStopped(event->GetCpuState(),
+		THREAD_STOPPED_SINGLE_STEP);
 }
 
 
 bool
 ThreadHandler::HandleExceptionOccurred(ExceptionOccurredEvent* event)
 {
-	return _HandleThreadStopped(NULL);
+	char buffer[256];
+	get_debug_exception_string(event->Exception(), buffer, sizeof(buffer));
+	return _HandleThreadStopped(NULL, THREAD_STOPPED_EXCEPTION, buffer);
 }
 
 
@@ -209,8 +215,10 @@ ThreadHandler::HandleThreadAction(uint32 action)
 
 	// When continuing the thread update thread state before actually issuing
 	// the command, since we need to unlock.
-	if (action != MSG_THREAD_STOP)
-		_SetThreadState(THREAD_STATE_RUNNING, NULL);
+	if (action != MSG_THREAD_STOP) {
+		_SetThreadState(THREAD_STATE_RUNNING, NULL, THREAD_STOPPED_UNKNOWN,
+			BString());
+	}
 
 	locker.Unlock();
 
@@ -372,22 +380,25 @@ ThreadHandler::GetImageDebugInfo(Image* image, ImageDebugInfo*& _info)
 
 
 bool
-ThreadHandler::_HandleThreadStopped(CpuState* cpuState)
+ThreadHandler::_HandleThreadStopped(CpuState* cpuState, uint32 stoppedReason,
+	const BString& stoppedReasonInfo)
 {
 	_ClearContinuationState();
 
 	AutoLocker<Team> locker(fThread->GetTeam());
 
-	_SetThreadState(THREAD_STATE_STOPPED, cpuState);
+	_SetThreadState(THREAD_STATE_STOPPED, cpuState, stoppedReason,
+		stoppedReasonInfo);
 
 	return true;
 }
 
 
 void
-ThreadHandler::_SetThreadState(uint32 state, CpuState* cpuState)
+ThreadHandler::_SetThreadState(uint32 state, CpuState* cpuState,
+	uint32 stoppedReason, const BString& stoppedReasonInfo)
 {
-	fThread->SetState(state);
+	fThread->SetState(state, stoppedReason, stoppedReasonInfo);
 	fThread->SetCpuState(cpuState);
 }
 
