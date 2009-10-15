@@ -12,9 +12,11 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) files ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) gui model ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) gui team_window ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) gui util ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui model ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui team_window ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) ids ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) settings ] ;
@@ -94,11 +96,17 @@ Application Debugger :
 	LocatableFile.cpp
 	SourceFile.cpp
 
-	# gui/model
+	# user_interface
+	UserInterface.cpp
+
+	# user_interface/gui
+	GraphicalUserInterface.cpp
+
+	# user_interface/gui/model
 	VariablesViewState.cpp
 	VariablesViewStateHistory.cpp
 
-	# gui/team_window
+	# user_interface/gui/team_window
 	BreakpointListView.cpp
 	BreakpointsView.cpp
 	ImageFunctionsView.cpp
@@ -110,7 +118,7 @@ Application Debugger :
 	ThreadListView.cpp
 	VariablesView.cpp
 
-	# gui/util
+	# user_interface/gui/util
 	TargetAddressTableColumn.cpp
 
 	# ids
@@ -185,4 +193,4 @@ Application Debugger :
 HaikuSubInclude arch x86 disasm ;
 HaikuSubInclude demangler ;
 HaikuSubInclude dwarf ;
-HaikuSubInclude gui running_teams_window ;
+HaikuSubInclude user_interface gui running_teams_window ;

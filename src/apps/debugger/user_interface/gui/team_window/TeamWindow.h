@@ -29,6 +29,7 @@ class RegistersView;
 class SourceCode;
 class StackFrame;
 class UserBreakpoint;
+class UserInterfaceListener;
 class VariablesView;
 
 
@@ -38,13 +39,12 @@ class TeamWindow : public BWindow, ThreadListView::Listener,
 	SourceView::Listener, VariablesView::Listener, Team::Listener,
 	Function::Listener, StackFrame::Listener {
 public:
-	class Listener;
-
-public:
-								TeamWindow(::Team* team, Listener* listener);
+								TeamWindow(::Team* team,
+									UserInterfaceListener* listener);
 								~TeamWindow();
 
-	static	TeamWindow*			Create(::Team* team, Listener* listener);
+	static	TeamWindow*			Create(::Team* team,
+									UserInterfaceListener* listener);
 									// throws
 
 	virtual	void				DispatchMessage(BMessage* message,
@@ -148,7 +148,7 @@ private:
 			FunctionInstance*	fActiveFunction;
 			SourceCode*			fActiveSourceCode;
 			ActiveSourceObject	fActiveSourceObject;
-			Listener*			fListener;
+			UserInterfaceListener* fListener;
 			BTabView*			fTabView;
 			BTabView*			fLocalsTabView;
 			ThreadListView*		fThreadListView;
@@ -164,35 +164,6 @@ private:
 			BButton*			fStepIntoButton;
 			BButton*			fStepOutButton;
 			BMenuBar*			fMenuBar;
-};
-
-
-class TeamWindow::Listener {
-public:
-	virtual						~Listener();
-
-	virtual	void				FunctionSourceCodeRequested(
-									FunctionInstance* function) = 0;
-	virtual	void				ImageDebugInfoRequested(Image* image) = 0;
-	virtual	void				StackFrameValueRequested(::Thread* thread,
-									StackFrame* stackFrame, Variable* variable,
-									TypeComponentPath* path) = 0;
-									// called with team locked
-	virtual	void				ThreadActionRequested(thread_id threadID,
-									uint32 action) = 0;
-
-	virtual	void				SetBreakpointRequested(target_addr_t address,
-									bool enabled) = 0;
-	virtual	void				SetBreakpointEnabledRequested(
-									UserBreakpoint* breakpoint,
-									bool enabled) = 0;
-	virtual	void				ClearBreakpointRequested(
-									target_addr_t address) = 0;
-	virtual	void				ClearBreakpointRequested(
-									UserBreakpoint* breakpoint) = 0;
-									// TODO: Consolidate those!
-
-	virtual	bool				TeamWindowQuitRequested() = 0;
 };
 
 

@@ -11,7 +11,6 @@
 
 #include <new>
 
-#include <Alert.h>
 #include <Message.h>
 
 #include <AutoLocker.h>
@@ -124,7 +123,8 @@ struct TeamDebugger::ImageHandlerHashDefinition {
 // #pragma mark - TeamDebugger
 
 
-TeamDebugger::TeamDebugger(Listener* listener, SettingsManager* settingsManager)
+TeamDebugger::TeamDebugger(Listener* listener, UserInterface* userInterface,
+	SettingsManager* settingsManager)
 	:
 	BLooper("team debugger"),
 	fListener(listener),
@@ -137,10 +137,11 @@ TeamDebugger::TeamDebugger(Listener* listener, SettingsManager* settingsManager)
 	fWorker(NULL),
 	fBreakpointManager(NULL),
 	fDebugEventListener(-1),
-	fTeamWindow(NULL),
+	fUserInterface(userInterface),
 	fTerminating(false),
 	fKillTeamOnQuit(false)
 {
+	fUserInterface->AcquireReference();
 }
 
 
@@ -164,13 +165,9 @@ TeamDebugger::~TeamDebugger()
 	if (fDebugEventListener >= 0)
 		wait_for_thread(fDebugEventListener, NULL);
 
-	// quit window
-	if (fTeamWindow != NULL) {
-		// TODO: This is not clean. If the window has been deleted we shouldn't
-		// try to access it!
-		if (fTeamWindow->Lock())
-			fTeamWindow->Quit();
-	}
+	// terminate UI
+	fUserInterface->Terminate();
+	fUserInterface->ReleaseReference();
 
 	ThreadHandler* threadHandler = fThreadHandlers.Clear(true);
 	while (threadHandler != NULL) {
@@ -356,16 +353,14 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 	if (looperThread < 0)
 		return looperThread;
 
-	// create the team window
-	try {
-		fTeamWindow = TeamWindow::Create(fTeam, this);
-	} catch (...) {
-		// TODO: Notify the user!
-		ERROR("Error: Failed to create team window!\n");
-		return B_NO_MEMORY;
+	// init the UI
+	error = fUserInterface->Init(fTeam, this);
+	if (error != B_OK) {
+		ERROR("Error: Failed to init the UI: %s\n", strerror(error));
+		return error;
 	}
 
-	fTeamWindow->Show();
+	fUserInterface->Show();
 
 	// if requested, stop the given thread
 	if (threadID >= 0) {
@@ -643,7 +638,7 @@ TeamDebugger::ClearBreakpointRequested(UserBreakpoint* breakpoint)
 
 
 bool
-TeamDebugger::TeamWindowQuitRequested()
+TeamDebugger::UserInterfaceQuitRequested()
 {
 	AutoLocker< ::Team> locker(fTeam);
 	BString name(fTeam->Name());
@@ -662,10 +657,10 @@ TeamDebugger::TeamWindowQuitRequested()
 	BString resumeLabel("Resume ");
 	resumeLabel << name;
 
-	BAlert* alert = new BAlert("Quit Debugger", message.String(),
-		killLabel.String(), "Cancel", resumeLabel.String());
+	int32 choice = fUserInterface->SynchronouslyAskUser("Quit Debugger",
+		message, killLabel, "Cancel", resumeLabel);
 
-	switch (alert->Go()) {
+	switch (choice) {
 		case 0:
 			fKillTeamOnQuit = true;
 			break;
@@ -1291,15 +1286,8 @@ TeamDebugger::_NotifyUser(const char* title, const char* text,...)
 	vsnprintf(buffer, sizeof(buffer), text, args);
 	va_end(args);
 
-	// show the alert
-	BAlert* alert = new(std::nothrow) BAlert(title, buffer, "OK",
-		NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-	if (alert != NULL)
-		alert->Go(NULL);
-
-	// TODO: We need to let the alert run asynchronously, but we shouldn't just
-	// create it and don't care anymore. Maybe an error window, which can
-	// display a list of errors would be the better choice.
+	// notify the user
+	fUserInterface->NotifyUser(title, buffer, USER_NOTIFICATION_WARNING);
 }
 
 

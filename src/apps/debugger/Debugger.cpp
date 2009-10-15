@@ -19,6 +19,7 @@
 
 #include "debug_utils.h"
 
+#include "GraphicalUserInterface.h"
 #include "MessageCodes.h"
 #include "SettingsManager.h"
 #include "TeamDebugger.h"
@@ -261,7 +262,15 @@ printf("There's already a debugger for team: %ld\n", team);
 			return;
 		}
 
-		debugger = new(std::nothrow) TeamDebugger(this, &fSettingsManager);
+		UserInterface* userInterface = new(std::nothrow) GraphicalUserInterface;
+		if (userInterface == NULL) {
+			// TODO: Notify the user!
+			fprintf(stderr, "Error: Out of memory!\n");
+		}
+		Reference<UserInterface> userInterfaceReference(userInterface, true);
+
+		debugger = new(std::nothrow) TeamDebugger(this, userInterface,
+			&fSettingsManager);
 		if (debugger == NULL) {
 			// TODO: Notify the user!
 			fprintf(stderr, "Error: Out of memory!\n");

@@ -33,6 +33,7 @@
 #include "StackTraceView.h"
 #include "Tracing.h"
 #include "TypeComponentPath.h"
+#include "UserInterface.h"
 #include "Variable.h"
 
 
@@ -45,7 +46,7 @@ enum {
 // #pragma mark - TeamWindow
 
 
-TeamWindow::TeamWindow(::Team* team, Listener* listener)
+TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	:
 	BWindow(BRect(100, 100, 899, 699), "Team", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
@@ -107,7 +108,7 @@ TeamWindow::~TeamWindow()
 
 
 /*static*/ TeamWindow*
-TeamWindow::Create(::Team* team, Listener* listener)
+TeamWindow::Create(::Team* team, UserInterfaceListener* listener)
 {
 	TeamWindow* self = new TeamWindow(team, listener);
 
@@ -265,7 +266,7 @@ TeamWindow::MessageReceived(BMessage* message)
 bool
 TeamWindow::QuitRequested()
 {
-	return fListener->TeamWindowQuitRequested();
+	return fListener->UserInterfaceQuitRequested();
 }
 
 
@@ -967,12 +968,4 @@ TeamWindow::_HandleUserBreakpointChanged(UserBreakpoint* breakpoint)
 {
 	fSourceView->UserBreakpointChanged(breakpoint);
 	fBreakpointsView->UserBreakpointChanged(breakpoint);
-}
-
-
-// #pragma mark - Listener
-
-
-TeamWindow::Listener::~Listener()
-{
 }

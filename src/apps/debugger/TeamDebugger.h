@@ -13,8 +13,8 @@
 
 #include "DebugEvent.h"
 #include "Team.h"
-#include "TeamWindow.h"
 #include "ThreadHandler.h"
+#include "UserInterface.h"
 #include "Worker.h"
 
 
@@ -24,13 +24,14 @@ class SettingsManager;
 class TeamDebugInfo;
 
 
-class TeamDebugger : public BLooper, private TeamWindow::Listener,
+class TeamDebugger : public BLooper, private UserInterfaceListener,
 	private JobListener, private Team::Listener {
 public:
 	class Listener;
 
 public:
 								TeamDebugger(Listener* listener,
+									UserInterface* userInterface,
 									SettingsManager* settingsManager);
 								~TeamDebugger();
 
@@ -42,7 +43,7 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
-	// TeamWindow::Listener
+	// UserInterfaceListener
 	virtual	void				FunctionSourceCodeRequested(
 									FunctionInstance* function);
 	virtual	void				ImageDebugInfoRequested(Image* image);
@@ -59,7 +60,7 @@ private:
 	virtual	void				ClearBreakpointRequested(target_addr_t address);
 	virtual	void				ClearBreakpointRequested(
 									UserBreakpoint* breakpoint);
-	virtual	bool				TeamWindowQuitRequested();
+	virtual	bool				UserInterfaceQuitRequested();
 
 	// JobListener
 	virtual	void				JobDone(Job* job);
@@ -133,7 +134,7 @@ private:
 			Worker*				fWorker;
 			BreakpointManager*	fBreakpointManager;
 			thread_id			fDebugEventListener;
-			TeamWindow*			fTeamWindow;
+			UserInterface*		fUserInterface;
 	volatile bool				fTerminating;
 			bool				fKillTeamOnQuit;
 };
