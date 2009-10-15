@@ -1022,8 +1022,8 @@ find_reserved_area(vm_address_space* addressSpace, addr_t start,
 	next = addressSpace->areas;
 	while (next != NULL) {
 		if (next->base <= start
-			&& next->base + next->size > start + (size - 1)) {
-			// this area covers the requested range
+			&& next->base + (next->size - 1) >= start + (size - 1)) {
+			// This area covers the requested range
 			if (next->id != RESERVED_AREA_ID) {
 				// but it's not reserved space, it's a real area
 				return B_BAD_VALUE;
@@ -1039,7 +1039,7 @@ find_reserved_area(vm_address_space* addressSpace, addr_t start,
 	if (next == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	// now we have to transfer the requested part of the reserved
+	// Now we have to transfer the requested part of the reserved
 	// range to the new area - and remove, resize or split the old
 	// reserved area.
 
@@ -1126,7 +1126,7 @@ find_and_insert_area_slot(vm_address_space* addressSpace, addr_t start,
 		|| start + (size - 1) > end)
 		return B_BAD_ADDRESS;
 
-	if (addressSpec == B_EXACT_ADDRESS) {
+	if (addressSpec == B_EXACT_ADDRESS && area->id != RESERVED_AREA_ID) {
 		// search for a reserved area
 		status_t status = find_reserved_area(addressSpace, start, size, area);
 		if (status == B_OK || status == B_BAD_VALUE)
@@ -1206,7 +1206,7 @@ second_chance:
 				foundSpot = true;
 				area->base = alignedBase;
 				break;
-			} else {
+			} else if (area->id != RESERVED_AREA_ID) {
 				// We didn't find a free spot - if there are any reserved areas,
 				// we can now test those for free space
 				// TODO: it would make sense to start with the biggest of them
