@@ -194,6 +194,13 @@ TableSelectionModel::_Update()
 }
 
 
+// #pragma mark - TableToolTipProvider
+
+
+TableToolTipProvider::~TableToolTipProvider()
+{
+}
+
 
 // #pragma mark - TableListener
 
@@ -342,6 +349,7 @@ Table::Table(const char* name, uint32 flags, border_style borderStyle,
 	:
 	AbstractTable(name, flags, borderStyle, showHorizontalScrollbar),
 	fModel(NULL),
+	fToolTipProvider(NULL),
 	fSelectionModel(this),
 	fIgnoreSelectionChange(0)
 {
@@ -353,6 +361,7 @@ Table::Table(TableModel* model, const char* name, uint32 flags,
 	:
 	AbstractTable(name, flags, borderStyle, showHorizontalScrollbar),
 	fModel(NULL),
+	fToolTipProvider(NULL),
 	fSelectionModel(this),
 	fIgnoreSelectionChange(0)
 {
@@ -396,6 +405,13 @@ Table::SetTableModel(TableModel* model)
 		column->SetModel(fModel);
 
 	TableRowsAdded(fModel, 0, fModel->CountRows());
+}
+
+
+void
+Table::SetToolTipProvider(TableToolTipProvider* toolTipProvider)
+{
+	fToolTipProvider = toolTipProvider;
 }
 
 
@@ -449,6 +465,27 @@ void
 Table::RemoveTableListener(TableListener* listener)
 {
 	fListeners.RemoveItem(listener);
+}
+
+
+bool
+Table::GetToolTipAt(BPoint point, BToolTip** _tip)
+{
+	if (fToolTipProvider == NULL)
+		return AbstractTable::GetToolTipAt(point, _tip);
+
+	// get the table row
+	BRow* row = RowAt(point);
+	int32 rowIndex = row != NULL ? _ModelIndexOfRow(row) : -1;
+	if (rowIndex < 0)
+		return AbstractTable::GetToolTipAt(point, _tip);
+
+	// get the table column
+	BColumn* column = ColumnAt(point);
+	int32 columnIndex = column != NULL ? column->LogicalFieldNum() : -1;
+
+	return fToolTipProvider->GetToolTipForTableCell(rowIndex, columnIndex,
+		_tip);
 }
 
 

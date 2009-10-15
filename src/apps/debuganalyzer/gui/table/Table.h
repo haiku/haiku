@@ -79,6 +79,16 @@ private:
 };
 
 
+class TableToolTipProvider {
+public:
+	virtual						~TableToolTipProvider();
+
+	virtual	bool				GetToolTipForTableCell(int32 rowIndex,
+									int32 columnIndex, BToolTip** _tip) = 0;
+									// columnIndex can be -1, if not in a column
+};
+
+
 class TableListener {
 public:
 	virtual						~TableListener();
@@ -102,6 +112,11 @@ public:
 			void				SetTableModel(TableModel* model);
 			TableModel*			GetTableModel() const	{ return fModel; }
 
+			void				SetToolTipProvider(
+									TableToolTipProvider* toolTipProvider);
+			TableToolTipProvider* ToolTipProvider() const
+									{ return fToolTipProvider; }
+
 			TableSelectionModel* SelectionModel();
 
 			void				SelectRow(int32 rowIndex, bool extendSelection);
@@ -112,6 +127,8 @@ public:
 			void				RemoveTableListener(TableListener* listener);
 
 protected:
+	virtual bool				GetToolTipAt(BPoint point, BToolTip** _tip);
+
 	virtual	void				SelectionChanged();
 
 	virtual	AbstractColumn*		CreateColumn(TableColumn* column);
@@ -140,6 +157,7 @@ private:
 
 private:
 			TableModel*			fModel;
+			TableToolTipProvider* fToolTipProvider;
 			RowList				fRows;
 			TableSelectionModel	fSelectionModel;
 			ListenerList		fListeners;
