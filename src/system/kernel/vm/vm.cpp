@@ -1252,10 +1252,13 @@ second_chance:
 						// The new area will be placed at the end of the
 						// reserved area, and the reserved area will be resized
 						// to make space
+						alignedBase = ROUNDDOWN(next->base + next->size - size,
+							alignment);
+
 						foundSpot = true;
 						next->size = alignedBase - next->base;
-						last = next;
 						area->base = alignedBase;
+						last = next;
 						break;
 					}
 
