@@ -1118,6 +1118,26 @@ BColumnListView::ColumnAt(int32 field) const
 }
 
 
+BColumn*
+BColumnListView::ColumnAt(BPoint point) const
+{
+	float left = MAX(kLeftMargin, LatchWidth());
+
+	for (int i = 0; BColumn* column = (BColumn*)fColumns.ItemAt(i); i++) {
+		if (!column->IsVisible())
+			continue;
+
+		float right = left + column->Width();
+		if (point.x >= left && point.x <= right)
+			return column;
+
+		left = right + 1;
+	}
+
+	return NULL;
+}
+
+
 void
 BColumnListView::SetColumnVisible(BColumn* column, bool visible)
 {

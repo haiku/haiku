@@ -297,6 +297,7 @@ public:
 			void				RemoveColumn(BColumn* column);
 			int32				CountColumns() const;
 			BColumn*			ColumnAt(int32 index) const;
+			BColumn*			ColumnAt(BPoint point) const;
 			void				SetColumnVisible(BColumn* column,
 									bool isVisible);
 			void				SetColumnVisible(int32, bool);
