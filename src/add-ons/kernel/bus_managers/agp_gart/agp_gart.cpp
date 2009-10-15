@@ -59,8 +59,6 @@
 #define AGP_STATUS(address) (address + 4)
 #define AGP_COMMAND(address) (address + 8)
 
-#define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
-
 /* read and write to PCI config space */
 #define get_pci_config(info, offset, size) \
 	(sPCI->read_pci_config((info).bus, (info).device, (info).function, \
