@@ -617,15 +617,6 @@ makeIndices()
 			|| (info.flags & B_FS_HAS_QUERY) == 0)
 			continue;
 
-		// Work-around for misbehaviour of earlier versions - should be
-		// kept in for some time.
-		// It removes the B_MAIL_ATTR_FLAGS if it is of B_STRING_TYPE,
-		// because that's what the MDR created before...
-		index_info indexInfo;
-		if (fs_stat_index(device, B_MAIL_ATTR_FLAGS, &indexInfo) == 0
-			&& indexInfo.type == B_STRING_TYPE)
-			fs_remove_index(device, B_MAIL_ATTR_FLAGS);
-
 		for (int32 i = 0; stringIndices[i]; i++)
 			fs_create_index(device, stringIndices[i], B_STRING_TYPE, 0);
 
