@@ -1,11 +1,13 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
  *
  * Distributed under the terms of the MIT License.
  */
 
+
 /*! POSIX signals handling routines */
+
 
 #include <ksignal.h>
 
@@ -391,6 +393,7 @@ handle_signals(struct thread *thread)
 				case SIGFPE:
 				case SIGILL:
 				case SIGTRAP:
+				case SIGABRT:
 					// If this is the main thread, we just fall through and let
 					// this signal kill the team. Otherwise we send a SIGKILL to
 					// the main thread first, since the signal will kill this
@@ -398,7 +401,6 @@ handle_signals(struct thread *thread)
 					if (thread != thread->team->main_thread)
 						send_signal(thread->team->main_thread->id, SIGKILL);
 				case SIGQUIT:
-				case SIGABRT:
 				case SIGPOLL:
 				case SIGPROF:
 				case SIGSYS:
@@ -488,7 +490,7 @@ is_signal_blocked(int signal)
 	thread lock held.
 */
 static status_t
-deliver_signal(struct thread *thread, uint signal, uint32 flags, 
+deliver_signal(struct thread *thread, uint signal, uint32 flags,
 	bool &reschedule)
 {
 	if (flags & B_CHECK_PERMISSION) {
