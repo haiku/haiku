@@ -92,12 +92,13 @@ public:
 class ExceptionOccurredEvent : public DebugEvent {
 public:
 								ExceptionOccurredEvent(team_id team,
-									thread_id thread, uint32 exception);
+									thread_id thread,
+									debug_exception_type exception);
 
-			uint32				Exception() const	{ return fException; }
+			debug_exception_type Exception() const	{ return fException; }
 
 private:
-			uint32				fException;
+			debug_exception_type fException;
 };
 
 

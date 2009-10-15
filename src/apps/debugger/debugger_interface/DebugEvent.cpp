@@ -115,7 +115,7 @@ SingleStepEvent::SingleStepEvent(team_id team, thread_id thread,
 
 
 ExceptionOccurredEvent::ExceptionOccurredEvent(team_id team, thread_id thread,
-	uint32 exception)
+	debug_exception_type exception)
 	:
 	DebugEvent(B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED, team, thread),
 	fException(exception)
