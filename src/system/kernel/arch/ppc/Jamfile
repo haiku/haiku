@@ -18,10 +18,10 @@ KernelMergeObject kernel_arch_ppc.o :
 	arch_mmu.cpp
 	arch_platform.cpp
 	arch_real_time_clock.cpp
-	arch_smp.c
-	arch_system_info.c
-	arch_thread.c
-	arch_timer.c
+	arch_smp.cpp
+	arch_system_info.cpp
+	arch_thread.cpp
+	arch_timer.cpp
 	arch_user_debugger.cpp
 	arch_vm.cpp
 	arch_vm_translation_map.cpp
