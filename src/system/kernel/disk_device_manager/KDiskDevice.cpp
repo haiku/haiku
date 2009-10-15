@@ -28,10 +28,11 @@ KDiskDevice::KDiskDevice(partition_id id)
 	:
 	KPartition(id),
 	fDeviceData(),
-	fLocker(RW_LOCK_INITIALIZER("disk device")),
 	fFD(-1),
 	fMediaStatus(B_ERROR)
 {
+	rw_lock_init(&fLocker, "disk device");
+
 	Unset();
 	fDevice = this;
 	fPublishedName = (char*)"raw";

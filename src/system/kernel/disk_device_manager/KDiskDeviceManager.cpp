@@ -239,7 +239,6 @@ public:
 
 KDiskDeviceManager::KDiskDeviceManager()
 	:
-	fLock(RECURSIVE_LOCK_INITIALIZER("disk device manager")),
 	fDevices(new(nothrow) DeviceMap),
 	fPartitions(new(nothrow) PartitionMap),
 	fDiskSystems(new(nothrow) DiskSystemMap),
@@ -250,6 +249,8 @@ KDiskDeviceManager::KDiskDeviceManager()
 	fDeviceWatcher(new(nothrow) DeviceWatcher()),
 	fNotifications(new(nothrow) DiskNotifications)
 {
+	recursive_lock_init(&fLock, "disk device manager");
+
 	if (InitCheck() != B_OK)
 		return;
 

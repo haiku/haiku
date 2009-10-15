@@ -260,10 +260,10 @@ MessagingArea::_CheckCommand(int32 offset, int32 &size)
 
 MessagingService::MessagingService()
 	:
-	fLock(RECURSIVE_LOCK_INITIALIZER("messaging service")),
 	fFirstArea(NULL),
 	fLastArea(NULL)
 {
+	recursive_lock_init(&fLock, "messaging service");
 }
 
 
