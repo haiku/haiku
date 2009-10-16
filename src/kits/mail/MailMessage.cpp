@@ -206,12 +206,12 @@ BEmailMessage::ForwardMessage(bool accountFromMail, bool includeAttachments)
 			BMailComponent *cmpt = GetComponent(i);
 			if (cmpt == _text_body || cmpt == NULL)
 				continue;
-			
+
 			//---I am ashamed to have the written the code between here and the next comment
 			// ... and you still managed to get it wrong ;-)), axeld.
 			// we should really move this stuff into copy constructors
 			// or something like that
-			
+
 			BMallocIO io;
 			cmpt->RenderToRFC822(&io);
 			BMailComponent *clone = cmpt->WhatIsThis();
@@ -274,7 +274,7 @@ BEmailMessage::Priority()
 {
 	int			priorityNumber;
 	const char *priorityString;
-	
+
 	/* The usual values are a number from 1 to 5, or one of three words:
 	X-Priority: 1 and/or X-MSMail-Priority: High
 	X-Priority: 3 and/or X-MSMail-Priority: Normal
@@ -335,7 +335,7 @@ void BEmailMessage::SetBCC(const char *bcc) {
 
 void BEmailMessage::SetPriority(int to) {
 	char	tempString [20];
-	
+
 	if (to < 1)
 		to = 1;
 	if (to > 5)
@@ -684,7 +684,7 @@ BEmailMessage::SetToRFC822(BPositionIO *mail_file, size_t length, bool parse_now
 			RemoveHeader(name);
 		}
 	}
-		
+
 	_body->RemoveHeader("Subject");
 	_body->RemoveHeader("To");
 	_body->RemoveHeader("From");
@@ -743,15 +743,8 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 			"%a, %d %b %Y %H:%M:%S", &tm);
 
 		// GMT offsets are full hours, yes, but you never know :-)
-		if (tm.tm_gmtoff) {
-#ifndef HAIKU_TARGET_PLATFORM_BEOS
-			snprintf(date + length, sizeof(date) - length, " %+03d%02d",
-				tm.tm_gmtoff / 3600, (tm.tm_gmtoff / 60) % 60);
-#else
-			sprintf(date + length, " %+03d%02d",
-				tm.tm_gmtoff / 3600, (tm.tm_gmtoff / 60) % 60);
-#endif
-		}
+		snprintf(date + length, sizeof(date) - length, " %+03d%02d",
+			tm.tm_gmtoff / 3600, (tm.tm_gmtoff / 60) % 60);
 
 		SetHeaderField("Date", date);
 	}
@@ -900,10 +893,10 @@ BEmailMessage::RenderTo(BDirectory *dir, BEntry *msg)
 	status_t status = dir->CreateFile(worker.String(), &file);
 	if (status < B_OK)
 		return status;
-	
+
 	if (msg != NULL)
 		msg->SetTo(dir,worker.String());
-	
+
 	return RenderToRFC822(&file);
 }
 
@@ -920,9 +913,9 @@ BEmailMessage::Send(bool send_now)
 
 	create_directory(via->MetaData()->FindString("path"),0777);
 	BDirectory directory(via->MetaData()->FindString("path"));
-	
+
 	BEntry message;
-	
+
 	status_t status = RenderTo(&directory,&message);
 	delete via;
 	if (status >= B_OK && send_now) {
@@ -948,11 +941,11 @@ BEmailMessage::Send(bool send_now)
 				return B_OK;
 #endif
 		}
-		
+
 		BMessenger daemon("application/x-vnd.Be-POST");
 		if (!daemon.IsValid())
 			return B_MAIL_NO_DAEMON;
-			
+
 		BMessage msg('msnd');
 		msg.AddInt32("chain",_chain_id);
 		BPath path;
