@@ -18,6 +18,7 @@
 #include "lp_lib.h"
 
 #include <List.h>
+#include <String.h>
 #include <OS.h>
 #include <SupportDefs.h>
 #include <math.h>
@@ -37,7 +38,7 @@ class LinearSpec {
 	
 public:
 						LinearSpec();
-						~LinearSpec();
+	virtual				~LinearSpec();
 
 	Variable*			AddVariable();
 
@@ -99,6 +100,9 @@ public:
 	ResultType			Result() const;
 	double				ObjectiveValue() const;
 	double				SolvingTime() const;
+
+	BString*			ToBString();
+	const char*			ToString();
 
 protected:
 	int32 				fCountColumns;

@@ -11,6 +11,7 @@
 #include "Variable.h"
 #include "Summand.h"
 
+#include <File.h>
 #include <List.h>
 #include <String.h>
 #include <SupportDefs.h>
@@ -29,7 +30,7 @@ class Constraint {
 	
 public:
 	int32				Index();
-	
+
 	BList*				LeftSide();
 	void				SetLeftSide(BList* summands);
 	void				UpdateLeftSide();
@@ -46,17 +47,30 @@ public:
 
 	OperatorType		Op();
 	void				SetOp(OperatorType value);
-	double				RightSide();
+	double				RightSide() const;
 	void				SetRightSide(double value);
-	double				PenaltyNeg();
+	double				PenaltyNeg() const;
 	void				SetPenaltyNeg(double value);
-	double				PenaltyPos();
+	double				PenaltyPos() const;
 	void				SetPenaltyPos(double value);
+
+	const char*			Label();
+	void				SetLabel(const char* label);
+
+	void				WriteXML(BFile* file);
 
 	Variable*			DNeg() const;
 	Variable*			DPos() const;
-	
-	BString				ToString();
+
+	void				SetOwner(void* owner);
+	void*				Owner() const;
+
+	bool				IsValid();
+	void				Invalidate();
+
+	BString*			ToBString();
+	const char*			ToString();
+
 						~Constraint();
 
 protected:
@@ -71,6 +85,10 @@ private:
 	double				fRightSide;
 	Summand*			fDNegObjSummand;
 	Summand*			fDPosObjSummand;
+	void*				fOwner;
+	char*				fLabel;
+
+	bool				fIsValid;
 
 public:
 	friend class		LinearSpec;

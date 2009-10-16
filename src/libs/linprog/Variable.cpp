@@ -14,6 +14,16 @@
 #include <float.h>	// for DBL_MAX
 
 
+// Toggle debug output
+//#define DEBUG_VARIABLE
+
+#ifdef DEBUG_VARIABLE
+#	define STRACE(x) debug_printf x
+#else
+#	define STRACE(x) ;
+#endif
+
+
 /**
  * Gets index of the variable.
  * 
@@ -23,8 +33,10 @@ int32
 Variable::Index()
 {
 	int32 i = fLS->Variables()->IndexOf(this);
-	if (i == -1)
+	if (i == -1) {
 		printf("Variable not part of fLS->Variables().");
+		return -1;
+	}
 	return i + 1;
 }
 
@@ -38,18 +50,6 @@ LinearSpec*
 Variable::LS() const
 {
 	return fLS;
-}
-
-
-/**
- * Sets the current linear specification.
- * 
- * @param value	the current linear specification
- */
-void
-Variable::SetLS(LinearSpec* value)
-{
-	fLS = value;
 }
 
 
@@ -97,6 +97,9 @@ Variable::Min() const
 void
 Variable::SetMin(double min)
 {
+	if (!fIsValid)
+		return;
+
 	fMin = min;
 	set_bounds(fLS->fLP, this->Index(), fMin, fMax);
 }
@@ -122,6 +125,9 @@ Variable::Max() const
 void
 Variable::SetMax(double max)
 {
+	if (!fIsValid)
+		return;
+
 	fMax = max;
 	set_bounds(fLS->fLP, this->Index(), fMin, fMax);
 }
@@ -136,9 +142,27 @@ Variable::SetMax(double max)
 void
 Variable::SetRange(double min, double max)
 {
+	if (!fIsValid)
+		return;
+
 	fMin = min;
 	fMax = max;
 	set_bounds(fLS->fLP, this->Index(), fMin, fMax);
+}
+
+
+const char*
+Variable::Label()
+{
+	return fLabel;
+}
+
+
+void
+Variable::SetLabel(const char* label)
+{
+	fLabel = (char*) malloc(strlen(label) + 1);
+	strcpy(fLabel, label);
 }
 
 
@@ -148,9 +172,34 @@ Variable::SetRange(double min, double max)
  * 
  * @return the <code>String</code> index of the variable
  */
-//~ string Variable::ToString() {
-	//~ return "Var" + Index();
-//~ }
+BString*
+Variable::ToBString()
+{
+	BString* str = new BString();
+	if (fLabel) {
+		*str << fLabel;
+		if (!fIsValid)
+			*str << "(invalid)";
+	} else {
+		*str << "Var";
+		if (!fIsValid)
+			*str << "(invalid," << (int32)this << ")";
+		else
+			*str << Index();
+	}
+	return str;
+}
+
+
+const char*
+Variable::ToString()
+{
+	BString* str = ToBString();
+	char* result = (char*) malloc(str->Length() + 1);
+	str->CopyInto(result, 0, str->Length());
+	delete str;
+	return result;
+}
 
 
 /**
@@ -162,6 +211,9 @@ Variable::SetRange(double min, double max)
 Constraint*
 Variable::IsEqual(Variable* var)
 {
+	if (!fIsValid)
+		return NULL;
+
 	return fLS->AddConstraint(1.0, this, -1.0, var, OperatorType(EQ), 0.0);
 }
 
@@ -175,6 +227,9 @@ Variable::IsEqual(Variable* var)
 Constraint*
 Variable::IsSmallerOrEqual(Variable* var)
 {
+	if (!fIsValid)
+		return NULL;
+
 	return fLS->AddConstraint(1.0, this, -1.0, var, OperatorType(LE), 0.0);
 }
 
@@ -186,9 +241,90 @@ Variable::IsSmallerOrEqual(Variable* var)
  * @return the new constraint
  */
 Constraint*
-Variable::IsGreaterorEqual(Variable* var)
+Variable::IsGreaterOrEqual(Variable* var)
 {
+	if (!fIsValid)
+		return NULL;
+
 	return fLS->AddConstraint(-1.0, var, 1.0, this, OperatorType(GE), 0.0);
+}
+
+
+Constraint*
+Variable::IsEqual(Variable* var, double penaltyNeg, double penaltyPos)
+{
+	if (!fIsValid)
+		return NULL;
+
+	return fLS->AddConstraint(1.0, this, -1.0, var, OperatorType(EQ), 0.0,
+		penaltyNeg, penaltyPos);
+}
+
+
+Constraint*
+Variable::IsSmallerOrEqual(Variable* var, double penaltyNeg, double penaltyPos)
+{
+	if (!fIsValid)
+		return NULL;
+
+	return fLS->AddConstraint(1.0, this, -1.0, var, OperatorType(LE), 0.0,
+		penaltyNeg, penaltyPos);
+}
+
+
+Constraint*
+Variable::IsGreaterOrEqual(Variable* var, double penaltyNeg, double penaltyPos)
+{
+	if (!fIsValid)
+		return NULL;
+
+	return fLS->AddConstraint(-1.0, var, 1.0, this, OperatorType(GE), 0.0,
+		penaltyNeg, penaltyPos);
+}
+
+
+bool
+Variable::IsValid()
+{
+	return fIsValid;
+}
+
+
+void
+Variable::Invalidate()
+{
+	STRACE(("Variable::Invalidate() on %s\n", ToString()));
+
+	if (!fIsValid)
+		return;
+
+	fIsValid = false;
+	del_column(fLS->fLP, Index());
+	fLS->Variables()->RemoveItem(this);
+
+	// invalidate all constraints that use this variable
+	BList* markedForInvalidation = new BList();
+	BList* constraints = fLS->Constraints();
+	for (int i = 0; i < constraints->CountItems(); i++) {
+		Constraint* constraint = static_cast<Constraint*>(
+			constraints->ItemAt(i));
+
+		if (!constraint->IsValid())
+			continue;
+
+		BList* summands = constraint->LeftSide();
+		for (int j = 0; j < summands->CountItems(); j++) {
+			Summand* summand = static_cast<Summand*>(summands->ItemAt(j));
+			if (summand->Var() == this) {
+				markedForInvalidation->AddItem(constraint);
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < markedForInvalidation->CountItems(); i++)
+		static_cast<Constraint*>(markedForInvalidation->ItemAt(i))
+			->Invalidate();
+	delete markedForInvalidation;
 }
 
 
@@ -196,18 +332,20 @@ Variable::IsGreaterorEqual(Variable* var)
  * Constructor.
  */
 Variable::Variable(LinearSpec* ls)
+	: fLS(ls),
+	fUsingSummands(new BList()),
+	fValue(NAN),
+	fMin(0),
+	fMax(DBL_MAX),
+	fLabel(NULL),
+	fIsValid(true)
 {
-	fMin = 0;
-	fMax = DBL_MAX;
-	fValue = NULL;
-	fLS = ls;
+	fLS->Variables()->AddItem(this);
 	
-	ls->Variables()->AddItem(this);
-	
-	if (ls->Variables()->CountItems() > ls->CountColumns()) {
+	if (fLS->Variables()->CountItems() > fLS->CountColumns()) {
 		double d = 0;
 		int i = 0;
-		if (!add_columnex(ls->fLP, 0, &d, &i))
+		if (!add_columnex(fLS->fLP, 0, &d, &i))
 			printf("Error in add_columnex.");
 	}
 }
@@ -219,7 +357,8 @@ Variable::Variable(LinearSpec* ls)
  */
 Variable::~Variable()
 {
-	del_column(fLS->fLP, this->Index());
-	fLS->Variables()->RemoveItem(this);
+	Invalidate();
+	free(fLabel);
+	delete fUsingSummands;
 }
 

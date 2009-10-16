@@ -11,6 +11,16 @@
 #include "lp_lib.h"
 
 
+// Toggle debug output
+//#define DEBUG_CONSTRAINT
+
+#ifdef DEBUG_CONSTRAINT
+#	define STRACE(x) debug_printf x
+#else
+#	define STRACE(x) ;
+#endif
+
+
 /**
  * Gets the index of the constraint.
  * 
@@ -20,8 +30,10 @@ int32
 Constraint::Index()
 {
 	int32 i = fLS->Constraints()->IndexOf(this);
-	if (i == -1)
-		printf("Constraint not part of fLS->Constraints().");
+	if (i == -1) {
+		STRACE(("Constraint not part of fLS->Constraints()."));
+		return -1;
+	}
 	return i + 1;
 }
 
@@ -47,6 +59,9 @@ Constraint::LeftSide()
 void
 Constraint::SetLeftSide(BList* summands)
 {
+	if (!fIsValid)
+		return;
+
 	fLeftSide = summands;
 	UpdateLeftSide();
 }
@@ -55,6 +70,9 @@ Constraint::SetLeftSide(BList* summands)
 void
 Constraint::UpdateLeftSide()
 {
+	if (!fIsValid)
+		return;
+
 	double coeffs[fLeftSide->CountItems() + 2];
 	int varIndexes[fLeftSide->CountItems() + 2];
 	int32 i;
@@ -77,7 +95,7 @@ Constraint::UpdateLeftSide()
 	}
 	
 	if (!set_rowex(fLS->fLP, this->Index(), i, &coeffs[0], &varIndexes[0]))
-		printf("Error in set_rowex.");
+		STRACE(("Error in set_rowex."));
 	
 	fLS->UpdateObjFunction();
 	fLS->RemovePresolved();
@@ -87,6 +105,9 @@ Constraint::UpdateLeftSide()
 void
 Constraint::SetLeftSide(double coeff1, Variable* var1)
 {
+	if (!fIsValid)
+		return;
+
 	for (int i=0; i<fLeftSide->CountItems(); i++)
 		delete (Summand*)fLeftSide->ItemAt(i);
 	fLeftSide->MakeEmpty();
@@ -99,6 +120,9 @@ void
 Constraint::SetLeftSide(double coeff1, Variable* var1, 
 	double coeff2, Variable* var2)
 {
+	if (!fIsValid)
+		return;
+
 	for (int i=0; i<fLeftSide->CountItems(); i++)
 		delete (Summand*)fLeftSide->ItemAt(i);
 	fLeftSide->MakeEmpty();
@@ -113,6 +137,9 @@ Constraint::SetLeftSide(double coeff1, Variable* var1,
 	double coeff2, Variable* var2,
 	double coeff3, Variable* var3)
 {
+	if (!fIsValid)
+		return;
+
 	for (int i=0; i<fLeftSide->CountItems(); i++)
 		delete (Summand*)fLeftSide->ItemAt(i);
 	fLeftSide->MakeEmpty();
@@ -129,6 +156,9 @@ Constraint::SetLeftSide(double coeff1, Variable* var1,
 	double coeff3, Variable* var3,
 	double coeff4, Variable* var4)
 {
+	if (!fIsValid)
+		return;
+
 	for (int i=0; i<fLeftSide->CountItems(); i++)
 		delete (Summand*)fLeftSide->ItemAt(i);
 	fLeftSide->MakeEmpty();
@@ -160,12 +190,15 @@ Constraint::Op()
 void
 Constraint::SetOp(OperatorType value)
 {
+	if (!fIsValid)
+		return;
+
 	fOp = value;
 	if (!set_constr_type(fLS->fLP, this->Index(),
 			((fOp == OperatorType(EQ)) ? EQ
 			: (fOp == OperatorType(GE)) ? GE
 			: LE)))
-		printf("Error in set_constr_type.");
+		STRACE(("Error in set_constr_type."));
 	
 	fLS->RemovePresolved();
 }
@@ -177,7 +210,7 @@ Constraint::SetOp(OperatorType value)
  * @return the constant value that is on the right side of the operator
  */
 double
-Constraint::RightSide()
+Constraint::RightSide() const
 {
 	return fRightSide;
 }
@@ -191,9 +224,12 @@ Constraint::RightSide()
 void
 Constraint::SetRightSide(double value)
 {
+	if (!fIsValid)
+		return;
+
 	fRightSide = value;
 	if (!set_rh(fLS->fLP, Index(), fRightSide))
-		printf("Error in set_rh.");
+		STRACE(("Error in set_rh."));
 	
 	fLS->RemovePresolved();
 }
@@ -205,7 +241,7 @@ Constraint::SetRightSide(double value)
  * @return the penalty coefficient
  */
 double
-Constraint::PenaltyNeg()
+Constraint::PenaltyNeg() const
 {
 	if (fDNegObjSummand == NULL)
 		return INFINITY;
@@ -222,6 +258,9 @@ Constraint::PenaltyNeg()
 void
 Constraint::SetPenaltyNeg(double value)
 {
+	if (!fIsValid)
+		return;
+
 	if (fDNegObjSummand == NULL) {
 		fDNegObjSummand = new Summand(value, new Variable(fLS));
 		fLS->ObjFunction()->AddItem(fDNegObjSummand);
@@ -244,7 +283,7 @@ Constraint::SetPenaltyNeg(double value)
  * @return the penalty coefficient
  */
 double
-Constraint::PenaltyPos()
+Constraint::PenaltyPos() const
 {
 	if (fDPosObjSummand == NULL)
 		return INFINITY;
@@ -261,6 +300,9 @@ Constraint::PenaltyPos()
 void
 Constraint::SetPenaltyPos(double value)
 {
+	if (!fIsValid)
+		return;
+
 	if (fDPosObjSummand == NULL) {
 		fDPosObjSummand = new Summand(value, new Variable(fLS));
 		fLS->ObjFunction()->AddItem(fDPosObjSummand);
@@ -274,6 +316,62 @@ Constraint::SetPenaltyPos(double value)
 
 	fDPosObjSummand->SetCoeff(value);
 	fLS->UpdateObjFunction();
+}
+
+
+const char*
+Constraint::Label()
+{
+	return fLabel;
+}
+
+
+void
+Constraint::SetLabel(const char* label)
+{
+	fLabel = (char*) malloc(strlen(label) + 1);
+	strcpy(fLabel, label);
+}
+
+
+void
+Constraint::WriteXML(BFile* file)
+{
+	if (file->IsWritable() && fOwner == NULL) {
+		char buffer[200];
+		
+		file->Write(buffer, sprintf(buffer, "\t<constraint>\n"));
+		file->Write(buffer, sprintf(buffer, "\t\t<leftside>\n"));
+		
+		Summand* summand;
+		for (int32 i = 0; i < fLeftSide->CountItems(); i++) {
+			summand = (Summand*)fLeftSide->ItemAt(i);
+			file->Write(buffer, sprintf(buffer, "\t\t\t<summand>\n"));
+			file->Write(buffer, sprintf(buffer, "\t\t\t\t<coeff>%f</coeff>\n", 
+				summand->Coeff()));
+			BString* varStr = summand->Var()->ToBString();
+			file->Write(buffer, sprintf(buffer, "\t\t\t\t<var>%s</var>\n", 
+				varStr->String()));
+			delete varStr;
+			file->Write(buffer, sprintf(buffer, "\t\t\t</summand>\n"));
+		}
+		
+		file->Write(buffer, sprintf(buffer, "\t\t</leftside>\n"));
+		
+		char* op;
+		if (fOp == OperatorType(EQ))
+			op = "EQ";
+		else if (fOp == OperatorType(LE))
+			op = "LE";
+		else if (fOp == OperatorType(GE))
+			op = "GE";
+		
+		file->Write(buffer, sprintf(buffer, "\t\t<op>%s</op>\n", op));
+		file->Write(buffer, sprintf(buffer, "\t\t<rightside>%f</rightside>\n", fRightSide));
+		//~ file->Write(buffer, sprintf(buffer, "\t\t<penaltyneg>%s</penaltyneg>\n", PenaltyNeg()));
+		//~ file->Write(buffer, sprintf(buffer, "\t\t<penaltypos>%s</penaltypos>\n", PenaltyPos()));
+		file->Write(buffer, sprintf(buffer, "\t</constraint>\n"));
+	}
 }
 
 
@@ -305,17 +403,114 @@ Constraint::DPos() const
 }
 
 
+void
+Constraint::SetOwner(void* owner)
+{
+	fOwner = owner;
+}
+
+
+void*
+Constraint::Owner() const
+{
+	return fOwner;
+}
+
+
+bool
+Constraint::IsValid()
+{
+	return fIsValid;
+}
+
+
+void
+Constraint::Invalidate()
+{
+	STRACE(("Constraint::Invalidate() on %d\n", this));
+
+	if (!fIsValid)
+		return;
+
+	fIsValid = false;
+
+	for (int32 i = 0; i < fLeftSide->CountItems(); i++)
+		delete (Summand*)fLeftSide->ItemAt(i);
+	delete fLeftSide;
+	fLeftSide = NULL;
+
+	if (fDNegObjSummand) {
+		fLS->ObjFunction()->RemoveItem(fDNegObjSummand);
+		delete fDNegObjSummand->Var();
+		delete fDNegObjSummand;
+		fDNegObjSummand = NULL;
+	}
+	if (fDPosObjSummand) {
+		fLS->ObjFunction()->RemoveItem(fDPosObjSummand);
+		delete fDPosObjSummand->Var();
+		delete fDPosObjSummand;
+		fDPosObjSummand = NULL;
+	}
+
+	del_constraint(fLS->fLP, this->Index());	
+	fLS->Constraints()->RemoveItem(this);
+}
+
+
+BString*
+Constraint::ToBString()
+{
+	BString* str = new BString();
+	*str << "Constraint ";
+	if (fLabel)
+		*str << fLabel;
+	*str << "(" << (int32)this << "): ";
+
+	if (fIsValid) {
+		for (int i = 0; i < fLeftSide->CountItems(); i++) {
+			Summand* s = static_cast<Summand*>(fLeftSide->ItemAt(i));
+			*str << (float)s->Coeff() << "*";
+			BString* varString = s->Var()->ToBString();
+			*str << *varString << " ";
+			delete varString;
+		}
+		*str << ((fOp == OperatorType(EQ)) ? "== "
+			: (fOp == OperatorType(GE)) ? ">= "
+			: (fOp == OperatorType(LE)) ? "<= "
+			: "?? ");
+		*str << (float)fRightSide;
+		*str << " PenaltyPos=" << (float)PenaltyPos();
+		*str << " PenaltyNeg=" << (float)PenaltyNeg();
+	} else
+		*str << "invalid";
+	return str;
+}
+
+
+const char*
+Constraint::ToString()
+{
+	BString* str = ToBString();
+	char* result = (char*) malloc(str->Length() + 1);
+	str->CopyInto(result, 0, str->Length());
+	delete str;
+	return result;
+}
+
+
 /**
  * Constructor.
  */
 Constraint::Constraint(LinearSpec* ls, BList* summands, OperatorType op, 
 	double rightSide, double penaltyNeg, double penaltyPos)
+	: fLS(ls),
+	fLeftSide(summands),
+	fOp(op),
+	fRightSide(rightSide),
+	fOwner(NULL),
+	fLabel(NULL),
+	fIsValid(true)
 {
-	fLS = ls;
-	fLeftSide = summands;
-	fOp = op;
-	fRightSide = rightSide;
-		
 	double coeffs[summands->CountItems() + 2];
 	int varIndexes[summands->CountItems() + 2];
 	int32 i;
@@ -327,8 +522,8 @@ Constraint::Constraint(LinearSpec* ls, BList* summands, OperatorType op,
 	
 	if (penaltyNeg != INFINITY
 		&& fOp != OperatorType(LE)) {
-		fDNegObjSummand = new Summand(penaltyNeg, new Variable(ls));
-		ls->fObjFunction->AddItem(fDNegObjSummand);
+		fDNegObjSummand = new Summand(penaltyNeg, new Variable(fLS));
+		fLS->fObjFunction->AddItem(fDNegObjSummand);
 		varIndexes[i] = fDNegObjSummand->Var()->Index();
 		coeffs[i] = 1.0;
 		i++;
@@ -338,8 +533,8 @@ Constraint::Constraint(LinearSpec* ls, BList* summands, OperatorType op,
 	
 	if (penaltyPos != INFINITY
 		&& fOp != OperatorType(GE)) {
-		fDPosObjSummand = new Summand(penaltyPos, new Variable(ls));
-		ls->fObjFunction->AddItem(fDPosObjSummand);
+		fDPosObjSummand = new Summand(penaltyPos, new Variable(fLS));
+		fLS->fObjFunction->AddItem(fDPosObjSummand);
 		varIndexes[i] = fDPosObjSummand->Var()->Index();
 		coeffs[i] = -1.0;
 		i++;
@@ -347,14 +542,14 @@ Constraint::Constraint(LinearSpec* ls, BList* summands, OperatorType op,
 	else
 		fDPosObjSummand = NULL;
 
-	if (!add_constraintex(ls->fLP, i, &coeffs[0], &varIndexes[0],
+	if (!add_constraintex(fLS->fLP, i, &coeffs[0], &varIndexes[0],
 			((fOp == OperatorType(EQ)) ? EQ
 			: (fOp == OperatorType(GE)) ? GE
 			: LE), rightSide))
-		printf("Error in add_constraintex.");
+		STRACE(("Error in add_constraintex."));
 
 	fLS->UpdateObjFunction();
-	ls->Constraints()->AddItem(this);
+	fLS->Constraints()->AddItem(this);
 }
 
 
@@ -364,20 +559,6 @@ Constraint::Constraint(LinearSpec* ls, BList* summands, OperatorType op,
  */
 Constraint::~Constraint()
 {
-	for (int i=0; i<fLeftSide->CountItems(); i++)
-		delete (Summand*)fLeftSide->ItemAt(i);
-	delete fLeftSide;
-	
-	if (fDNegObjSummand != NULL) {
-		delete fDNegObjSummand->Var();
-		delete fDNegObjSummand;
-	}
-	if (fDPosObjSummand != NULL) {
-		delete fDPosObjSummand->Var();
-		delete fDPosObjSummand;
-	}
-
-	del_constraint(fLS->fLP, Index());	
-	fLS->Constraints()->RemoveItem(this);
+	Invalidate();
 }
 

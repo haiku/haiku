@@ -12,21 +12,20 @@
  * Creates a new specification for a linear programming problem.
  */
 LinearSpec::LinearSpec()
+	: fCountColumns(0),
+	fLpPresolved(NULL),
+	fOptimization(MINIMIZE),
+	fObjFunction(new BList()),
+	fVariables(new BList()),
+	fConstraints(new BList()),
+	fResult(ERROR),
+	fObjectiveValue(NAN),
+	fSolvingTime(NAN)
 {
 	fLP = make_lp(0, 0);
 	if (fLP == NULL)
 		printf("Couldn't construct a new model.");
 	set_verbose(fLP, 1);
-	
-	fObjFunction = new BList();
-	fVariables = new BList();
-	fConstraints = new BList();
-	fCountColumns = 0;
-	fLpPresolved = NULL;
-	fOptimization = MINIMIZE;
-	fResult = ERROR;
-	fObjectiveValue = NAN;
-	fSolvingTime = NAN;
 }
 
 
@@ -38,12 +37,11 @@ LinearSpec::LinearSpec()
 LinearSpec::~LinearSpec()
 {
 	RemovePresolved();
-	int i;
-	for (i=0; i<fConstraints->CountItems(); i++)
+	for (int32 i=0; i<fConstraints->CountItems(); i++)
 		delete (Constraint*)fConstraints->ItemAt(i);
-	for (i=0; i<fObjFunction->CountItems(); i++)
+	for (int32 i=0; i<fObjFunction->CountItems(); i++)
 		delete (Summand*)fObjFunction->ItemAt(i);
-	for (i=0; i<fVariables->CountItems(); i++)
+	for (int32 i=0; i<fVariables->CountItems(); i++)
 		delete (Variable*)fVariables->ItemAt(i);
 	delete_lp(fLP);
 }
@@ -496,7 +494,7 @@ LinearSpec::Save(char* fname)
 
 /**
  * Gets the number of columns.
- * 
+ *
  * @return the number of columns
  */
 int32
@@ -593,5 +591,57 @@ double
 LinearSpec::SolvingTime() const
 {
 	return fSolvingTime;
+}
+
+
+BString*
+LinearSpec::ToBString()
+{
+	BString* str = new BString();
+	*str << "LinearSpec " << (int32)this << ":\n";
+	for (int i = 0; i < fVariables->CountItems(); i++) {
+		Variable* variable = static_cast<Variable*>(fVariables->ItemAt(i));
+		BString* vStr = variable->ToBString();
+		*str << *vStr << "=" << (float)variable->Value() << " ";
+		delete vStr;
+	}
+	*str << "\n";
+	for (int i = 0; i < fConstraints->CountItems(); i++) {
+		Constraint* c = static_cast<Constraint*>(fConstraints->ItemAt(i)); 
+		BString* cStr = c->ToBString();
+		*str << i << ": " << *cStr;
+		delete cStr;
+		*str << "\n";
+	}
+	*str << "Result=";
+	if (fResult==-1)
+		*str << "ERROR";
+	else if (fResult==0)
+		*str << "OPTIMAL";
+	else if (fResult==1)
+		*str << "SUBOPTIMAL";
+	else if (fResult==2)
+		*str << "INFEASIBLE";
+	else if (fResult==3)
+		*str << "UNBOUNDED";
+	else if (fResult==4)
+		*str << "DEGENERATE";
+	else if (fResult==5)
+		*str << "NUMFAILURE";
+	else
+		*str << fResult;
+	*str << " SolvingTime=" << (float)fSolvingTime << "ms";
+	return str;
+}
+
+
+const char*
+LinearSpec::ToString()
+{
+	BString* str = ToBString();
+	char* result = (char*) malloc(str->Length() + 1);
+	str->CopyInto(result, 0, str->Length());
+	delete str;
+	return result;
 }
 

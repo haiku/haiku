@@ -29,6 +29,7 @@ public:
 private:
 	double			fCoeff;
 	Variable*		fVar;
+	bool    fUsedInPenaltyFunction;  //not set yet
 
 };
 

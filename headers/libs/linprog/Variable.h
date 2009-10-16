@@ -7,13 +7,16 @@
 #ifndef	VARIABLE_H
 #define	VARIABLE_H
 
+#include <File.h>
 #include <SupportDefs.h>
+#include <List.h>
 
 
 namespace LinearProgramming {
 
 class Constraint;
 class LinearSpec;
+class Summand;
 
 /**
  * Contains minimum and maximum values.
@@ -23,7 +26,6 @@ class Variable {
 public:
 	int32				Index();
 	LinearSpec*			LS() const;
-	void				SetLS(LinearSpec* value);
 	double				Value() const;
 	void				SetValue(double value);
 	double				Min() const;
@@ -31,24 +33,46 @@ public:
 	double				Max() const;
 	void				SetMax(double max);
 	void				SetRange(double min, double max);
-	//~ string			ToString();
+
+	const char*			Label();
+	void				SetLabel(const char* label);
+	
+	BString*			ToBString();
+	const char*			ToString();
+
 	Constraint*			IsEqual(Variable* var);
 	Constraint*			IsSmallerOrEqual(Variable* var);
-	Constraint*			IsGreaterorEqual(Variable* var);
+	Constraint*			IsGreaterOrEqual(Variable* var);
+
+	Constraint*			IsEqual(Variable* var,
+							double penaltyNeg, double penaltyPos);
+	Constraint*			IsSmallerOrEqual(Variable* var,
+							double penaltyNeg, double penaltyPos);
+	Constraint*			IsGreaterOrEqual(Variable* var,
+							double penaltyNeg, double penaltyPos);
+
+	bool				IsValid();
+	void				Invalidate();
+
+	virtual				~Variable();
 
 protected:
 						Variable(LinearSpec* ls);
-						~Variable();
 
 private:
 	LinearSpec*			fLS;
+	BList*				fUsingSummands;  // All Summands that link to this Variable
 	double				fValue;
 	double				fMin;
 	double				fMax;
+	char*				fLabel;
+
+	bool				fIsValid;
 
 public:
-	friend class			LinearSpec;
-	friend class			Constraint;
+	friend class		LinearSpec;
+	friend class		Constraint;
+	friend class		Summand;
 
 };
 
