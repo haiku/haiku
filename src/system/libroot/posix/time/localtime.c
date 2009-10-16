@@ -226,6 +226,26 @@ int			daylight = 0;
 time_t			altzone = 0;
 #endif /* defined ALTZONE */
 
+#ifdef __HAIKU__
+#	include <FindDirectory.h>
+
+static const char*
+get_timezones_directory(void)
+{
+	static char path[PATH_MAX];
+	if (path[0] != '\0')
+		return path;
+
+	if (find_directory(B_SYSTEM_DATA_DIRECTORY, -1, false, path, sizeof(path))
+			== B_OK) {
+		strlcat(path, "/timezones", sizeof(path));
+	} else
+		strcpy(path, "/boot/system/data/timezones");
+
+	return path;
+}
+#endif
+
 static long
 detzcode(codep)
 const char * const	codep;
