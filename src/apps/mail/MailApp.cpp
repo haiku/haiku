@@ -97,20 +97,9 @@ static const char *kExact = ".exact";
 static const char *kMetaphone = ".metaphone";
 
 
-// #pragma mark -
-int
-main()
-{
-	TMailApp().Run();
-	return B_OK;
-}
-
-
-//	#pragma mark -
-
-
 TMailApp::TMailApp()
-	: BApplication("application/x-vnd.Be-MAIL"),
+	:
+	BApplication("application/x-vnd.Be-MAIL"),
 	fWindowCount(0),
 	fPrefsWindow(NULL),
 	fSigWindow(NULL),
@@ -137,7 +126,8 @@ TMailApp::TMailApp()
 	fReplyPreamble[0] = '\0';
 
 	fMailWindowFrame.Set(0, 0, 0, 0);
-	fSignatureWindowFrame.Set(6, TITLE_BAR_HEIGHT, 6 + kSigWidth, TITLE_BAR_HEIGHT + kSigHeight);
+	fSignatureWindowFrame.Set(6, TITLE_BAR_HEIGHT, 6 + kSigWidth,
+		TITLE_BAR_HEIGHT + kSigHeight);
 	fPrefsWindowPos.Set(6, TITLE_BAR_HEIGHT);
 
 	// Find and read settings file.
@@ -168,7 +158,7 @@ TMailApp::AboutRequested()
 
 	view->GetFont(&font);
 	font.SetSize(font.Size() + 7.0f);
-	font.SetFace(B_BOLD_FACE); 			
+	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 4, &font);
 
 	alert->Go();
@@ -459,7 +449,7 @@ TMailApp::QuitRequested()
 		}
 
 	}
-	
+
 	SaveSettings();
 	return true;
 }
@@ -1145,7 +1135,7 @@ bool
 TMailApp::AutoMarkRead()
 {
 	BAutolock _(this);
-	return fAutoMarkRead;	
+	return fAutoMarkRead;
 }
 
 
@@ -1252,3 +1242,15 @@ TMailApp::ContentFont()
 	return fContentFont;
 }
 
+
+//	#pragma mark -
+
+
+int
+main()
+{
+	tzset();
+
+	TMailApp().Run();
+	return B_OK;
+}
