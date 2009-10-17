@@ -531,9 +531,6 @@ ATAChannel::PrepareWaitingForInterrupt()
 	InterruptsSpinLocker locker(fInterruptLock);
 	fExpectsInterrupt = true;
 	fInterruptCondition.Add(&fInterruptConditionEntry);
-
-	// enable interrupts
-	_WriteControl(0);
 }
 
 
@@ -590,15 +587,20 @@ ATAChannel::SendRequest(ATARequest *request, uint32 flags)
 
 	TRACE("SendRequest status 0x%02x\n", AltStatus());
 
+	if (request->UseDMA())
+		_WriteControl(0); // enable interrupts
+
 	if (device->Select() != B_OK) {
 		TRACE_ERROR("device selection failed\n");
 		request->SetStatus(SCSI_SEL_TIMEOUT);
+		_WriteControl(ATA_DEVICE_CONTROL_DISABLE_INTS);
 		return B_TIMED_OUT;
 	}
 
 	if (WaitForIdle() != B_OK) {
 		TRACE_ERROR("device selection timeout\n");
 		request->SetStatus(SCSI_SEL_TIMEOUT);
+		_WriteControl(ATA_DEVICE_CONTROL_DISABLE_INTS);
 		return B_TIMED_OUT;
 	}
 
@@ -606,6 +608,7 @@ ATAChannel::SendRequest(ATARequest *request, uint32 flags)
 		&& (AltStatus() & ATA_STATUS_DEVICE_READY) == 0) {
 		TRACE_ERROR("device ready not set\n");
 		request->SetStatus(SCSI_SEQUENCE_FAIL);
+		_WriteControl(ATA_DEVICE_CONTROL_DISABLE_INTS);
 		return B_ERROR;
 	}
 
@@ -613,6 +616,7 @@ ATAChannel::SendRequest(ATARequest *request, uint32 flags)
 			| ATA_MASK_COMMAND) != B_OK) {
 		TRACE_ERROR("can't write command\n");
 		request->SetStatus(SCSI_HBA_ERR);
+		_WriteControl(ATA_DEVICE_CONTROL_DISABLE_INTS);
 		return B_ERROR;
 	}
 
