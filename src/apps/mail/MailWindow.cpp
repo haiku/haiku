@@ -48,10 +48,7 @@ All rights reserved.
 #include <Debug.h>
 #include <E-mail.h>
 #include <InterfaceKit.h>
-#include <OpenWithTracker.h>
-#ifdef __HAIKU__
-#  include <PathMonitor.h>
-#endif
+#include <PathMonitor.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <StorageKit.h>
@@ -70,12 +67,6 @@ All rights reserved.
 
 #include <CharacterSetRoster.h>
 
-using namespace BPrivate ;
-
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-	#include <netdb.h>
-#endif
-
 #include "ButtonBar.h"
 #include "Content.h"
 #include "Enclosures.h"
@@ -93,6 +84,9 @@ using namespace BPrivate ;
 #include "String.h"
 #include "Utilities.h"
 #include "Words.h"
+
+
+using namespace BPrivate;
 
 
 const char *kUndoStrings[] = {
@@ -639,10 +633,6 @@ TMailWindow::BuildButtonBar()
 			_AddReadButton();
 		}
 	}
-	bbar->AddButton(MDR_DIALECT_CHOICE ("Inbox","受信箱"), 36,
-		new BMessage(M_OPEN_MAIL_BOX));
-	bbar->AddButton(MDR_DIALECT_CHOICE ("Mail","メール"), 32,
-		new BMessage(M_OPEN_MAIL_FOLDER));
 
 	bbar->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	bbar->Hide();
@@ -1472,14 +1462,6 @@ TMailWindow::MessageReceived(BMessage *msg)
 		case M_SAVE_POSITION:
 			if (fRef)
 				SaveTrackerPosition(fRef);
-			break;
-
-		case M_OPEN_MAIL_FOLDER:
-			OpenWithTracker(B_USER_DIRECTORY, kMailFolder);
-			break;
-
-		case M_OPEN_MAIL_BOX:
-			OpenWithTracker(B_USER_SETTINGS_DIRECTORY, kMailboxSymlink);
 			break;
 
 		case RESET_BUTTONS:
