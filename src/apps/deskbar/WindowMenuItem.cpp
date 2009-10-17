@@ -170,41 +170,43 @@ TWindowMenuItem::GetContentSize(float* width, float* height)
 void
 TWindowMenuItem::Draw()
 {
-	if (fExpanded) {
-		rgb_color menuColor = Menu()->ViewColor();
-		BRect frame(Frame());
-		BMenu* menu = Menu();
-
-		menu->PushState();
-
-		//	if not selected or being tracked on, fill with gray
-		TBarView* barview = (static_cast<TBarApp*>(be_app))->BarView();
-		if (!IsSelected() && !menu->IsRedrawAfterSticky()
-			|| barview->Dragging() || !IsEnabled()) {
-			menu->SetHighColor(menuColor);
-			menu->FillRect(frame);
-
-			if (fExpanded) {
-				rgb_color shadow = tint_color(menuColor,
-					(B_NO_TINT + B_DARKEN_1_TINT) / 2.0f);
-				menu->SetHighColor(shadow);
-				frame.right = frame.left + kHPad / 2;
-				menu->FillRect(frame);
-			}
-		}
-
-		if (IsEnabled() && IsSelected() && !menu->IsRedrawAfterSticky()) {
-			// fill
-			menu->SetHighColor(tint_color(menuColor,
-				B_HIGHLIGHT_BACKGROUND_TINT));
-			menu->FillRect(frame);
-		} else
-			menu->SetLowColor(menuColor);
-
-		DrawContent();
-		menu->PopState();
-	} else
+	if (!fExpanded) {
 		BMenuItem::Draw();
+		return;
+	}
+
+	rgb_color menuColor = tint_color(Menu()->ViewColor(), 1.07);
+	BRect frame(Frame());
+	BMenu* menu = Menu();
+
+	menu->PushState();
+
+	//	if not selected or being tracked on, fill with gray
+	TBarView* barview = (static_cast<TBarApp*>(be_app))->BarView();
+	if (!IsSelected() && !menu->IsRedrawAfterSticky()
+		|| barview->Dragging() || !IsEnabled()) {
+
+		rgb_color shadow = tint_color(menuColor, 1.09);
+		menu->SetHighColor(shadow);
+		frame.right = frame.left + kHPad / 2;
+		menu->FillRect(frame);
+
+		menu->SetHighColor(menuColor);
+		frame.left = frame.right + 1;
+		frame.right = Frame().right;
+		menu->FillRect(frame);
+	}
+
+	if (IsEnabled() && IsSelected() && !menu->IsRedrawAfterSticky()) {
+		// fill
+		menu->SetHighColor(tint_color(menuColor,
+			B_HIGHLIGHT_BACKGROUND_TINT));
+		menu->FillRect(frame);
+	} else
+		menu->SetLowColor(menuColor);
+
+	DrawContent();
+	menu->PopState();
 }
 
 
