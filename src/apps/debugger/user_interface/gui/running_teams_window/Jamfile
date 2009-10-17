@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src apps debugger gui running_teams_window ;
+SubDir HAIKU_TOP src apps debugger user_interface gui running_teams_window ;
 
 CCFLAGS +=  -Werror ;
 C++FLAGS += -Werror ;
