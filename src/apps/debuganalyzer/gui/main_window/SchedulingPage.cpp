@@ -226,6 +226,7 @@ public:
 	BaseView(const char* name, FontInfo& fontInfo)
 		:
 		BView(name, B_WILL_DRAW),
+		fModel(NULL),
 		fFontInfo(fontInfo)
 	{
 	}
