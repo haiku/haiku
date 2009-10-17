@@ -122,7 +122,7 @@ typedef BOpenHashTable<SwapHashTableDefinition> SwapHashTable;
 typedef DoublyLinkedList<swap_file> SwapFileList;
 
 static SwapHashTable sSwapHashTable;
-static mutex sSwapHashLock;
+static rw_lock sSwapHashLock;
 
 static SwapFileList sSwapFileList;
 static mutex sSwapFileListLock;
@@ -345,7 +345,7 @@ swap_space_unreserve(off_t amount)
 static void
 swap_hash_resizer(void*, int)
 {
-	MutexLocker locker(sSwapHashLock);
+	WriteLocker locker(sSwapHashLock);
 
 	size_t size;
 	void* allocation;
@@ -784,7 +784,7 @@ VMAnonymousCache::Merge(VMCache* _source)
 			offset < source->virtual_end;
 			offset += B_PAGE_SIZE * SWAP_BLOCK_PAGES) {
 
-		MutexLocker locker(sSwapHashLock);
+		WriteLocker locker(sSwapHashLock);
 
 		page_num_t swapBlockPageIndex = offset >> PAGE_SHIFT;
 		swap_hash_key key = { source, swapBlockPageIndex };
@@ -878,7 +878,7 @@ void
 VMAnonymousCache::_SwapBlockBuild(off_t startPageIndex,
 	swap_addr_t startSlotIndex, uint32 count)
 {
-	mutex_lock(&sSwapHashLock);
+	WriteLocker locker(sSwapHashLock);
 
 	uint32 left = count;
 	for (uint32 i = 0, j = 0; i < count; i += j) {
@@ -893,9 +893,9 @@ VMAnonymousCache::_SwapBlockBuild(off_t startPageIndex,
 				CACHE_DONT_SLEEP);
 			if (swap == NULL) {
 				// Wait a short time until memory is available again.
-				mutex_unlock(&sSwapHashLock);
+				locker.Unlock();
 				snooze(10000);
-				mutex_lock(&sSwapHashLock);
+				locker.Lock();
 				swap = sSwapHashTable.Lookup(key);
 				continue;
 			}
@@ -917,15 +917,13 @@ VMAnonymousCache::_SwapBlockBuild(off_t startPageIndex,
 
 		swap->used += j;
 	}
-
-	mutex_unlock(&sSwapHashLock);
 }
 
 
 void
 VMAnonymousCache::_SwapBlockFree(off_t startPageIndex, uint32 count)
 {
-	mutex_lock(&sSwapHashLock);
+	WriteLocker locker(sSwapHashLock);
 
 	uint32 left = count;
 	for (uint32 i = 0, j = 0; i < count; i += j) {
@@ -947,15 +945,13 @@ VMAnonymousCache::_SwapBlockFree(off_t startPageIndex, uint32 count)
 			object_cache_free(sSwapBlockCache, swap);
 		}
 	}
-
-	mutex_unlock(&sSwapHashLock);
 }
 
 
 swap_addr_t
 VMAnonymousCache::_SwapBlockGetAddress(off_t pageIndex)
 {
-	mutex_lock(&sSwapHashLock);
+	ReadLocker locker(sSwapHashLock);
 
 	swap_hash_key key = { this, pageIndex };
 	swap_block *swap = sSwapHashTable.Lookup(key);
@@ -965,8 +961,6 @@ VMAnonymousCache::_SwapBlockGetAddress(off_t pageIndex)
 		swap_addr_t blockIndex = pageIndex & SWAP_BLOCK_MASK;
 		slotIndex = swap->swap_slots[blockIndex];
 	}
-
-	mutex_unlock(&sSwapHashLock);
 
 	return slotIndex;
 }
@@ -1177,7 +1171,7 @@ swap_init(void)
 
 	// init swap hash table
 	sSwapHashTable.Init(INITIAL_SWAP_HASH_SIZE);
-	mutex_init(&sSwapHashLock, "swaphash");
+	rw_lock_init(&sSwapHashLock, "swaphash");
 
 	error = register_resource_resizer(swap_hash_resizer, NULL,
 		SWAP_HASH_RESIZE_INTERVAL);
