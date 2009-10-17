@@ -438,7 +438,8 @@ save_lvds_mode(void)
 
 	biosMode.h_display_start = 0;
 	biosMode.v_display_start = 0;
-	biosMode.flags = 0;
+	biosMode.flags = B_8_BIT_DAC | B_HARDWARE_CURSOR | B_PARALLEL_ACCESS
+		| B_DPMS | B_SUPPORTS_OVERLAYS;
 
 	gInfo->lvds_panel_mode = biosMode;
 }
