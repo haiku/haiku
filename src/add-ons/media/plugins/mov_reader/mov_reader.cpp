@@ -559,9 +559,9 @@ movReader::GetNextChunk(void *_cookie,
 {
 	mov_cookie *cookie = (mov_cookie *)_cookie;
 
-	int64 start; uint32 size; bool keyframe;
+	int64 start; uint32 size; bool keyframe; uint32 chunkFrameCount;
 
-	if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->frame_pos, &start, &size, &keyframe))
+	if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->frame_pos, &start, &size, &keyframe, &chunkFrameCount))
 		return B_LAST_BUFFER_ERROR;
 
 	if (cookie->buffer_size < size) {
@@ -577,12 +577,12 @@ movReader::GetNextChunk(void *_cookie,
 
 		// This will only work with raw audio I think.
 		mediaHeader->start_time = (cookie->byte_pos * 1000000LL * cookie->bytes_per_sec_scale) / cookie->bytes_per_sec_rate;
-		TRACE("Audio - Frames in Chunk %ld / Actual Start Time %Ld using byte_pos\n",theFileReader->getNoFramesInChunk(cookie->stream,cookie->frame_pos),mediaHeader->start_time);
+//		TRACE("Audio - Frames in Chunk %ld / Actual Start Time %Ld using byte_pos\n",theFileReader->getNoFramesInChunk(cookie->stream,cookie->frame_pos),mediaHeader->start_time);
 		
 		// We should find the current frame position (ie first frame in chunk) then compute using fps
-		cookie->frame_pos = theFileReader->getFirstFrameInChunk(cookie->stream,cookie->frame_pos);
+//		cookie->frame_pos = theFileReader->getFirstFrameInChunk(cookie->stream,cookie->frame_pos);
 		mediaHeader->start_time = (cookie->frame_pos * 1000000LL * (int64)cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
-		TRACE("Audio - Frames in Chunk %ld / Actual Start Time %Ld using frame_no %ld\n",theFileReader->getNoFramesInChunk(cookie->stream,cookie->frame_pos),mediaHeader->start_time, cookie->frame_pos);
+//		TRACE("Audio - Frames in Chunk %ld / Actual Start Time %Ld using frame_no %ld\n",theFileReader->getNoFramesInChunk(cookie->stream,cookie->frame_pos),mediaHeader->start_time, cookie->frame_pos);
 
 		cookie->byte_pos += size;
 	} else {
@@ -594,7 +594,7 @@ movReader::GetNextChunk(void *_cookie,
 		mediaHeader->u.encoded_video.line_count = cookie->line_count;
 	}
 	
-	cookie->frame_pos++;
+	cookie->frame_pos += chunkFrameCount;
 	TRACE("stream %d: start_time %.6f\n", cookie->stream, mediaHeader->start_time / 1000000.0);
 
 	*chunkBuffer = cookie->buffer;

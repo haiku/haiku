@@ -60,12 +60,16 @@ bool MOVFileReader::IsEndOfData(off_t pPosition)
 {
 AtomBase	*aAtomBase;
 
-	aAtomBase = GetChildAtom(uint32('mdat'),0);
-	if (aAtomBase) {
-		MDATAtom *aMdatAtom = dynamic_cast<MDATAtom *>(aAtomBase);
-		return pPosition >= aMdatAtom->getEOF();
+	for (uint32 index=0;index<CountChildAtoms('mdat');index++) {
+		aAtomBase = GetChildAtom(uint32('mdat'),index);
+		if ((aAtomBase) && (aAtomBase->getAtomSize() > 8)) {
+			MDATAtom *aMDATAtom = dynamic_cast<MDATAtom *>(aAtomBase);
+			if (pPosition >= aMDATAtom->getAtomOffset() && pPosition <= aMDATAtom->getEOF()) {
+				return false;
+			}
+		}
 	}
-	
+
 	return true;
 }
 
@@ -276,74 +280,59 @@ uint32	MOVFileReader::getFirstFrameInChunk(uint32 stream_index, uint32 pChunkID)
 	return 0;
 }
 
-uint32	MOVFileReader::getNoFramesInChunk(uint32 stream_index, uint32 pFrameNo)
+uint32	MOVFileReader::getNoFramesInChunk(uint32 stream_index, uint32 pChunkID)
 {
 	// Find Track
 	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),stream_index);
 	if (aAtomBase) {
 		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
-		uint32 ChunkNo = 1;
 
-		if (IsAudio(stream_index)) {
-			ChunkNo = pFrameNo;			
-		}
-		
-		if (IsVideo(stream_index)) {
-			uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
-
-			uint32 OffsetInChunk;
-			ChunkNo = aTrakAtom->getChunkForSample(SampleNo, &OffsetInChunk);
-		}
-
-		return aTrakAtom->getNoSamplesInChunk(ChunkNo);
+		return aTrakAtom->getNoSamplesInChunk(pChunkID);
 	}
 	
 	return 0;
 }
 
-uint64	MOVFileReader::getOffsetForFrame(uint32 stream_index, uint32 pFrameNo)
+uint64	MOVFileReader::getOffsetForFrame(uint32 stream_index, uint32 pFrameNo, uint32 *chunkFrameCount)
 {
 	// Find Track
 	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),stream_index);
 	if (aAtomBase) {
 		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
 
-		if (IsAudio(stream_index)) {
-			// FrameNo is really chunk No for audio
-			uint32 ChunkNo = pFrameNo;
-
+		if (pFrameNo < aTrakAtom->FrameCount()) {
+			// Get Sample for Frame
+			uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
+			// Get Chunk For Sample and the offset for the frame within that chunk
+			uint32 OffsetInChunk;
+			uint32 ChunkID = aTrakAtom->getChunkForSample(SampleNo, &OffsetInChunk);
 			// Get Offset For Chunk
-			return aTrakAtom->getOffsetForChunk(ChunkNo);
-		}
+			uint64 OffsetNo = aTrakAtom->getOffsetForChunk(ChunkID);
 
-		if (IsVideo(stream_index)) {
+			if (IsAudio(stream_index)) {
+				// For audio we return all frames in Chunk less any offset
+				*chunkFrameCount = aTrakAtom->getNoSamplesInChunk(ChunkID) - OffsetInChunk;
+			} else {
+				// For video we always return 1 frame at a time
+				*chunkFrameCount = 1;
+			}
 
-			if (pFrameNo < aTrakAtom->FrameCount()) {
-				// Get Sample for Frame
-				uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
-				// Get Chunk For Sample and the offset for the frame within that chunk
-				uint32 OffsetInChunk;
-				uint32 ChunkNo = aTrakAtom->getChunkForSample(SampleNo, &OffsetInChunk);
-				// Get Offset For Chunk
-				uint64 OffsetNo = aTrakAtom->getOffsetForChunk(ChunkNo);
-
-				if (ChunkNo != 0) {
-					uint32 SampleSize;
-					// Adjust the Offset for the Offset in the chunk
-					if (aTrakAtom->IsSingleSampleSize()) {
-						SampleSize = aTrakAtom->getSizeForSample(SampleNo);
-						OffsetNo = OffsetNo + (OffsetInChunk * SampleSize);
-					} else {
-						// This is bad news performance wise
-						for (uint32 i=1;i<=OffsetInChunk;i++) {
-							SampleSize = aTrakAtom->getSizeForSample(SampleNo-i);
-							OffsetNo = OffsetNo + SampleSize;
-						}
+			if (ChunkID != 0) {
+				uint32 SampleSize;
+				// Adjust the Offset for the Offset in the chunk
+				if (aTrakAtom->IsSingleSampleSize()) {
+					SampleSize = aTrakAtom->getSizeForSample(SampleNo);
+					OffsetNo = OffsetNo + (OffsetInChunk * SampleSize);
+				} else {
+					// This is bad news performance wise
+					for (uint32 i=1;i<=OffsetInChunk;i++) {
+						SampleSize = aTrakAtom->getSizeForSample(SampleNo - i);
+						OffsetNo = OffsetNo + SampleSize;
 					}
 				}
-		
-				return OffsetNo;
 			}
+		
+			return OffsetNo;
 		}
 	}
 	
@@ -568,7 +557,7 @@ const 	mov_stream_header	*MOVFileReader::StreamFormat(uint32 stream_index)
 
 
 uint32
-MOVFileReader::getChunkSize(uint32 streamIndex, uint32 frameNumber)
+MOVFileReader::getChunkSize(uint32 streamIndex, uint32 frameNo)
 {
 	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
 	if (aAtomBase == NULL)
@@ -576,17 +565,22 @@ MOVFileReader::getChunkSize(uint32 streamIndex, uint32 frameNumber)
 
 	TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
 
-	if (IsAudio(streamIndex)) {
-		// We read audio in chunk by chunk so chunk size is chunk size
-		off_t chunkStart = aTrakAtom->getOffsetForChunk(frameNumber);
-		return theChunkSuperIndex.getChunkSize(streamIndex, frameNumber, chunkStart);
-	}
+	if (frameNo < aTrakAtom->FrameCount()) {
+		uint32 SampleNo = aTrakAtom->getSampleForFrame(frameNo);
+		
+		if (IsAudio(streamIndex)) {
+			// Audio Chunk Size is all samples in the chunk
+			// Get Chunk For Sample and the offset for the frame within that chunk
+			uint32 OffsetInChunk;
+			uint32 ChunkID = aTrakAtom->getChunkForSample(SampleNo, &OffsetInChunk);
 
-	if (IsVideo(streamIndex)) {
-		if (frameNumber < aTrakAtom->FrameCount()) {
+			off_t chunkStart = aTrakAtom->getOffsetForChunk(ChunkID);
+			return theChunkSuperIndex.getChunkSize(streamIndex, ChunkID, chunkStart);
+		}
+
+		if (IsVideo(streamIndex)) {
 			// We read video in Sample by Sample so chunk size is Sample Size
-			uint32 sampleNumber = aTrakAtom->getSampleForFrame(frameNumber);
-			return aTrakAtom->getSizeForSample(sampleNumber);
+			return aTrakAtom->getSizeForSample(SampleNo);
 		}
 	}
 
@@ -608,16 +602,23 @@ MOVFileReader::IsKeyFrame(uint32 stream_index, uint32 pFrameNo)
 	return false;
 }
 
-bool	MOVFileReader::GetNextChunkInfo(uint32 stream_index, uint32 pFrameNo, off_t *start, uint32 *size, bool *keyframe)
+bool	MOVFileReader::GetNextChunkInfo(uint32 stream_index, uint32 pFrameNo, off_t *start, uint32 *size, bool *keyframe, uint32 *chunkFrameCount)
 {
-	*start = getOffsetForFrame(stream_index, pFrameNo);
+	*start = getOffsetForFrame(stream_index, pFrameNo, chunkFrameCount);
 	*size = getChunkSize(stream_index, pFrameNo);
 	
 	if ((*start > 0) && (*size > 0)) {
 		*keyframe = IsKeyFrame(stream_index, pFrameNo);
 	}
 
-	return ((*start > 0) && (*size > 0) && !(IsEndOfFile(*start + *size)) && !(IsEndOfData(*start + *size)));
+	printf("(%ld) frame %ld start %Ld, size %ld, eof %s, eod %s\n",stream_index, pFrameNo,*start,*size, IsEndOfFile(*start + *size) ? "true" : "false", IsEndOfData(*start + *size) ? "true" : "false");
+
+	// TODO need a better method for detecting End of Data
+	if (IsEndOfFile(*start + *size) || IsEndOfData(*start + *size)) {
+		return false;
+	}
+	
+	return *start > 0 && *size > 0;
 }
 
 bool	MOVFileReader::IsActive(uint32 stream_index)

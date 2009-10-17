@@ -177,6 +177,10 @@ AtomBase *getAtom(BPositionIO *pStream)
 		return new ESDSAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	}
 
+	if (aAtomType == uint32('avcC')) {
+		return new ESDSAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
+	}
+
 	if (aAtomType == uint32('ftyp')) {
 		return new FTYPAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	}
@@ -645,7 +649,6 @@ SampleSizeEntry	*aSampleSize;
 
 char *STSZAtom::OnGetAtomName()
 {
-	printf("%ld ",theHeader.SampleSize);
 	return "Sample Size Atom";
 }
 

@@ -98,10 +98,10 @@ public:
 	// Is stream (track) a audio track
 	bool		IsAudio(uint32 stream_index);
 
-	uint32	getNoFramesInChunk(uint32 stream_index, uint32 pFrameNo);
+	uint32	getNoFramesInChunk(uint32 stream_index, uint32 pChunkID);
 	uint32	getFirstFrameInChunk(uint32 stream_index, uint32 pChunkID);
 
-	uint64	getOffsetForFrame(uint32 stream_index, uint32 pFrameNo);
+	uint64	getOffsetForFrame(uint32 stream_index, uint32 pFrameNo, uint32 *chunkFrameCount);
 	uint32	getChunkSize(uint32 stream_index, uint32 pFrameNo);
 	bool	IsKeyFrame(uint32 stream_index, uint32 pFrameNo);
 
@@ -110,7 +110,7 @@ public:
 
 	bool	IsActive(uint32 stream_index);
 
-	bool	GetNextChunkInfo(uint32 stream_index, uint32 pFrameNo, off_t *start, uint32 *size, bool *keyframe);
+	bool	GetNextChunkInfo(uint32 stream_index, uint32 pFrameNo, off_t *start, uint32 *size, bool *keyframe, uint32 *chunkFrameCount);
 	
 	// Return all Audio Meta Data
 	const 	AudioMetaData 		*AudioFormat(uint32 stream_index);
