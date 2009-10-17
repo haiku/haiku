@@ -2,7 +2,7 @@
  * i2c interface.
  * Bus should be run at max. 100kHz: see original Philips I2C specification
  *	
- * Rudolf Cornelissen 12/2002-8/2009
+ * Rudolf Cornelissen 12/2002-10/2009
  */
 
 #define MODULE_BIT 0x00004000
@@ -641,6 +641,12 @@ i2c_ExtractSpecsEDID(edid1_info* edid, edid_specs* specs)
 
 	/* check if we actually got a modeline */
 	if (!specs->timing.h_display || !specs->timing.v_display) return B_ERROR;
+
+	/* check if the mode is at least VGA. If it's not, ignore specs */
+	if ((specs->timing.h_display < 640) || (specs->timing.v_display < 480)) {
+		LOG(4,("I2C: specsEDID: screen reports lower than VGA native mode, ignoring specs!\n"));
+		return B_ERROR;
+	}
 
 	/* determine screen aspect ratio */
 	specs->aspect =
