@@ -38,6 +38,8 @@ class IconObjectListView : public PropertyListView,
 			void				SetSelection(Selection* selection);
 			void				SetCommandStack(CommandStack* stack);
 
+			void				FocusNameProperty();
+
  private:
 			void				_SetObject(IconObject* object);
 

@@ -80,13 +80,15 @@ class PropertyListView : public BView,
 			void				Clicked(PropertyItemView* item);
 			void				DoubleClicked(PropertyItemView* item);
 
- private:
+protected:
+			PropertyItemView*	_ItemAt(int32 index) const;
+			int32				_CountItems() const;
+
+private:
 			void				_UpdateSavedProperties();
 
 			bool				_AddItem(PropertyItemView* item);
 			PropertyItemView*	_RemoveItem(int32 index);
-			PropertyItemView*	_ItemAt(int32 index) const;
-			int32				_CountItems() const;
 
 			void				_MakeEmpty();
 

@@ -13,8 +13,10 @@
 #include <string.h>
 
 #include "CommandStack.h"
+#include "CommonPropertyIDs.h"
 #include "IconObject.h"
 #include "Property.h"
+#include "PropertyItemView.h"
 #include "PropertyObject.h"
 #include "Selection.h"
 #include "SetPropertiesCommand.h"
@@ -160,6 +162,25 @@ IconObjectListView::SetCommandStack(CommandStack* stack)
 {
 	fCommandStack = stack;
 }
+
+// FocusNameProperty
+void
+IconObjectListView::FocusNameProperty()
+{
+	if (fObject == NULL)
+		return;
+
+	int32 count = _CountItems();
+	for (int32 i = 0; i < count; i++) {
+		PropertyItemView* item = _ItemAt(i);
+		Property* property = item->GetProperty();
+		if (property != NULL && property->Identifier() == PROPERTY_NAME) {
+			item->MakeFocus(true);
+			break;
+		}
+	}
+}
+
 
 // #pragma mark -
 

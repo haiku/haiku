@@ -1,9 +1,6 @@
 /*
- * Copyright 2006-2008, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "MainWindow.h"
@@ -80,6 +77,8 @@ enum {
 	MSG_STYLE_RESET_TRANSFORMATION	= 'rtst',
 
 	MSG_MOUSE_FILTER_MODE			= 'mfmd',
+
+	MSG_RENAME_OBJECT				= 'rnam',
 };
 
 // constructor
@@ -358,6 +357,10 @@ case MSG_SHAPE_SELECTED: {
 	}
 	break;
 }
+		case MSG_RENAME_OBJECT:
+			fPropertyListView->FocusNameProperty();
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 	}
@@ -576,6 +579,7 @@ MainWindow::_Init()
 
 	AddShortcut('Y', 0, new BMessage(MSG_UNDO));
 	AddShortcut('Y', B_SHIFT_KEY, new BMessage(MSG_REDO));
+	AddShortcut('E', 0, new BMessage(MSG_RENAME_OBJECT));
 }
 
 // _CreateGUI
@@ -1027,9 +1031,9 @@ MainWindow::_CreateMenuBar(BRect frame)
 		new BMessage(MSG_SAVE_AS), 'S', B_SHIFT_KEY));
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem("Export",
-		new BMessage(MSG_EXPORT), 'E'));
+		new BMessage(MSG_EXPORT), 'P'));
 	fileMenu->AddItem(new BMenuItem("Export As"B_UTF8_ELLIPSIS,
-		new BMessage(MSG_EXPORT_AS), 'E', B_SHIFT_KEY));
+		new BMessage(MSG_EXPORT_AS), 'P', B_SHIFT_KEY));
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem(new BMenuItem("Quit",
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
