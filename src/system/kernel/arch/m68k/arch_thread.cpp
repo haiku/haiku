@@ -33,10 +33,10 @@ static struct arch_thread sInitialState;
 struct thread *gCurrentThread;
 
 // Helper function for thread creation, defined in arch_asm.S.
-extern void m68k_kernel_thread_root();
+extern "C" void m68k_kernel_thread_root();
 
-extern void m68k_switch_stack_and_call(addr_t newKstack, void (*func)(void *),
-	void *arg);
+extern "C" void m68k_switch_stack_and_call(addr_t newKstack,
+	void (*func)(void *), void *arg);
 
 
 void
@@ -214,7 +214,7 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 	if ((newPageDirectory % B_PAGE_SIZE) != 0)
 		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", newPageDirectory);
 #warning M68K: export from arch_vm.c
-	m68k_set_pgdir(newPageDirectory);
+	m68k_set_pgdir((void *)newPageDirectory);
 	m68k_context_switch(&from->arch_info.sp, to->arch_info.sp);
 }
 
