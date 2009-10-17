@@ -336,7 +336,7 @@ LocaleWindow::LocaleWindow()
 				UnicodeString languageFullName;
 				BString str;
 				BStringByteSink bbs(&str);
-				currentLocale.getDisplayName(languageFullName);
+				currentLocale.getDisplayName(currentLocale, languageFullName);
 				languageFullName.toUTF8(bbs);
 				LanguageListItem* si
 					= new LanguageListItem(str, currentLanguage.String());
