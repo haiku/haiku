@@ -20,9 +20,9 @@ KernelMergeObject kernel_arch_arm.o :
 	arch_int.cpp
 	arch_platform.cpp
 	arch_real_time_clock.cpp
-	arch_smp.c
+	arch_smp.cpp
 	arch_system_info.cpp
-	arch_thread.c
+	arch_thread.cpp
 	arch_timer.cpp
 	arch_user_debugger.cpp
 	arch_vm.cpp
