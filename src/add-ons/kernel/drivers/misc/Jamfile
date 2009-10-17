@@ -9,6 +9,10 @@ KernelAddon <driver>config :
 	config.c
 	;
 
+KernelAddon <driver>kdl :
+	kdl.c
+	;
+
 KernelAddon <driver>mem :
 	mem.c
 	;
