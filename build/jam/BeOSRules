@@ -369,7 +369,6 @@ rule DoCatalogs appName	# Application name
 	trans = [ FGristFiles $(translatedCatalogs) ] ;
 	srcs = [ FGristFiles $(sources) ] ;
 	SEARCH on $(trans) += [ FDirName $(HAIKU_TOP) data catalogs $(SUBDIR_TOKENS[2-]) ] ;
-	echo [ FDirName $(HAIKU_TOP) data catalogs $(SUBDIR_TOKENS[2-]) ] ;
 
 	ExtractCatalogEntries $(genCat:S=.catkeys) : $(srcs) : $(signature) ;
 
