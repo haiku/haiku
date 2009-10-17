@@ -105,7 +105,7 @@ x86_optimized_functions gOptimizedFunctions = {
 static status_t
 acpi_shutdown(bool rebootSystem)
 {
-	if (debug_debugger_running())
+	if (debug_debugger_running() || !are_interrupts_enabled())
 		return B_ERROR;
 
 	acpi_module_info* acpi;
@@ -829,10 +829,10 @@ arch_cpu_shutdown(bool rebootSystem)
 {
 	if (acpi_shutdown(rebootSystem) == B_OK)
 		return B_OK;
-	
+
 	if (!rebootSystem)
 		return apm_shutdown();
-	
+
 	cpu_status state = disable_interrupts();
 
 	// try to reset the system using the keyboard controller
