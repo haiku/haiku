@@ -72,6 +72,10 @@ public:
 
 	virtual BAlignment			DefaultLabelAlignment() const;
 	virtual float				DefaultLabelSpacing() const;
+
+	/* TODO: virtual*/
+			float				DefaultItemSpacing() const;
+
 			uint32				Flags(BControl* control) const;
 
 	virtual	void				DrawButtonFrame(BView* view, BRect& rect,

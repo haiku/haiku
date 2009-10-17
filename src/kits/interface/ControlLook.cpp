@@ -39,7 +39,14 @@ BControlLook::DefaultLabelAlignment() const
 float
 BControlLook::DefaultLabelSpacing() const
 {
-	return 4.0;//ceilf(be_plain_font->Size() / 4.0);
+	return ceilf(be_plain_font->Size() / 2.0);
+}
+
+
+float
+BControlLook::DefaultItemSpacing() const
+{
+	return ceilf(be_plain_font->Size() * 0.85);
 }
 
 
