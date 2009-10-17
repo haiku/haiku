@@ -37,6 +37,9 @@ struct io_handler {
 	void				*data;
 	bool				use_enable_counter;
 	bool				no_handled_info;
+#if DEBUG_INTERRUPTS
+	int64				handled_count;
+#endif
 };
 
 struct io_vector {
@@ -86,8 +89,8 @@ dump_int_statistics(int argc, char **argv)
 				if (strchr(imageName, '/') != NULL)
 					imageName = strrchr(imageName, '/') + 1;
 
-				kprintf("\t%s:%s (%p), data %p\n", imageName, symbol, io->func,
-					io->data);
+				kprintf("\t%s:%s (%p), data %p, handled %8lld\n", imageName, symbol, io->func,
+					io->data, io->handled_count);
 			} else
 				kprintf("\t%p, data %p\n", io->func, io->data);
 		}
@@ -195,6 +198,9 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 			handled = true;
 		else if (status == B_INVOKE_SCHEDULER)
 			invokeScheduler = true;
+#if DEBUG_INTERRUPTS
+		io->handled_count++;
+#endif
 	}
 
 #if DEBUG_INTERRUPTS
@@ -300,6 +306,9 @@ install_io_interrupt_handler(long vector, interrupt_handler handler, void *data,
 	io->data = data;
 	io->use_enable_counter = (flags & B_NO_ENABLE_COUNTER) == 0;
 	io->no_handled_info = (flags & B_NO_HANDLED_INFO) != 0;
+#if DEBUG_INTERRUPTS
+	io->handled_count = 0LL;
+#endif
 
 	// Disable the interrupts, get the spinlock for this irq only
 	// and then insert the handler
