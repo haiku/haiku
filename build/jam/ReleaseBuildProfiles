@@ -31,7 +31,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_ROOT_USER_REAL_NAME = "Yourself" ;
 		AddGroupToHaikuImage party : 101 : user sshd ;
 		HAIKU_IMAGE_HOST_NAME = shredder ;
-		HAIKU_IMAGE_SIZE = 350 ;
+		HAIKU_IMAGE_SIZE = 450 ;
 
 		AddOptionalHaikuImagePackages Pe Nano Vision P7zip ;
 		AddOptionalHaikuImagePackages Development Subversion OpenSSH ;
