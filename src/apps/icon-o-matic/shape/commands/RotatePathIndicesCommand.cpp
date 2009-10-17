@@ -79,5 +79,7 @@ RotatePathIndicesCommand::_Rotate(bool clockWise)
 	fPath->RemovePoint(removeIndex);
 	fPath->AddPoint(point, addIndex);
 	fPath->SetPoint(addIndex, point, pointIn, pointOut, connected);
+
+	return B_OK;
 }
 
