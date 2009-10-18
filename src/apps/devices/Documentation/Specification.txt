@@ -1,0 +1,69 @@
+Each device has:
+- Name (long/short)
+- Manufacturer (long/short)
+- Category (one master list, each bus type maps its device types onto the master list)
+- Driver used
+- Device paths
+- Its bus type
+- Its connection parent, if applicable
+
+Each source has: (currently the RescanDevices method does this)
+- Init function
+- Scan method that returns the devices.
+- DevManSource, USBSource, FWSource, ...
+
+DeviceManager Specification
+===========================
+
+DeviceManager : BApplication
+-------------
+
+DeviceManagerView : BView
+-----------------
+
+
+Device : public BStringItem
+------
+BString GetName() const;
+BString GetManufacturer() const;
+Category GetCategory() const;
+BString DriverUsed() const;
+BString DevPathsPublished() const;
+BView Get
+private:
+BString _name;
+BString _manufacturer;
+Category _category;
+BString _driverUsed;
+BString devPathsPublished;
+map<BString, BString> _attributes;
+
+Bus : public BStringItem
+---
+virtual bool IsPresent() const = 0;
+virtual Scan() = 0;
+virtual vector<Device *> Devices() = 0;
+
+PCIBus : public Bus
+------
+
+PCIDevice: public Device
+---------
+
+ISABus : public Bus
+-----
+
+ISADevice : public Device
+---------
+
+USBBus : public Bus
+------
+
+USBDevice : public Device
+---------
+
+SCSIBus : public Bus
+-------
+
+SCSIDevice : public Device
+----------

@@ -1,0 +1,128 @@
+DeviceManager Design
+====================
+
+Requirements
+------------
+1) Graphically list each device in the system, with all the information available for that specific device type:
+  - PCI
+  - USB
+  - SCSI
+  - Bluetooth?
+  - ISA?
+  - ATAPI?
+  - AHCI?
+  - Firewire?
+
+2) Generate a comprehensive text listing of the devices present to allow users to share detailed information with developers
+- Generate an email with this information attached
+
+3) Let the user generate a report on how well Haiku supports the devices in the system.
+- Present a list of devices and per device a star rating on the support, and provide a space for comments on the device support.
+- For each device allow comments
+- Include all available information for the device (including loaded driver)
+- Perhaps this can go into the Haikuware compatibility database? 
+
+4) Arrange the devices in different orders (by category, by connection, by bus type, by resource assignment?)
+
+Graphical Design
+----------------
++=========+
+| Devices |
++=========+======================================================+
+| Devices | Help |                                               |
++----------------------------------------------------------------+
+| +------------------------+-----------------------------------+ |
+| | Sort by: [Category v]  | / Basic \/ <Bus> \/ Advanced \    | |
+| | -------------------    | +        +--------+----------+--+ | |
+| | v Audio/Video Devices  | | Device Name:  Netlink 5787M   | | |
+| |     Hauppauge WinTV    | | Manufacturer: Broadcom        | | |
+| |     Intel HDA Audio    | | Category:     Network Devices | | |
+| | v Human Interface Dev. | | Driver used:  broadcom570x    | | |
+| |     USB Mouse          | |                               | | |
+| |     USB Keyboard       | |                               | | |
+| | v Network Devices      | |                               | | |
+| |  -->Broadcom 5787M<--  | |                               | | |
+| |     Intel 4965 WIFI    | |                               | | |
+| | v Graphics Card        | |                               | | |
+| |     NVidia 8600M GT    | |                               | | |
+| |      ....              | +-------------------------------+ | |
+| +------------------------+-----------------------------------+ |
+| +-------------------------+  +------------+   +-----------+    |
+| | Report hardware support |  | Gen. email |   | Gen. Text |    |
+| +-------------------------+  +------------+   +-----------+    |
++================================================================+
+
+Menu:
+Devices
+- Refresh devices
+- Report compatibility
+- Generate system information
+- -----
+- About Devices
+- -----
+- Quit
+
+Interface details:
+- The left list is an OutlineListView, 
+  - Is inside a scroll container
+  - Will contain nice icons per type/device
+  - Clicking on a device will show the details in the right view
+
+- The right view contains 3 tabs:
+  - Basic tab: Information available for every kind device
+  - <Bus> tab: Information specific to the bus type of device. (PCI, USB, etc)
+  - Advanced tab: Has a list of name-value pairs of all available information
+
+- Sort by allows the user to arrange the treeview by:
+  - Category: 
+  - Connection
+  - Bus type
+
+- Report Hardware Support
+  - List all devices
+  - For each device
+
+When you click Report Hardware Support, this appears: 
+ 
++=========================+
+| Report Hardware Support |
++=========================+============================+
+| Report Device                   Supported  Comment   |
+|  [x]   Broadcom Netlink 5787M    *****     _________ |
+|  [x]   Hauppauge WinTV           *****     _________ |
+|  [x]   Intel 4965 WIFI           .....     _________ |
+|  [x]   Intel HDA Audio           ****.     _________ |
+|  [x]   NVidia 8600M GT           ***..     _________ |
+|  [x]   USB Keyboard              *****     _________ |
+|  [x]   USB Mouse                 *****     _________ |
+|  [ ]   Intel 82801 PCI Bridge    .....     _________ |
+|  [ ]   Intel 82801H PCI Express  .....     _________ |
+|                                                      |
+|  If you wish, you can leave your contact details so  |
+|  developers can get in touch with you for questions  |
+|  about your devices. These will be stored privately. |
+|                                                      |
+|  Name: _______________  Email: __________________    |
+|                                                      |
+|  Haiku-os.org account: __________________________    |
+|                                                      |
+|  +--------------------+  +---------------+           |
+|  | Preview submission |  | Generate File |           |
+|  +--------------------+  +---------------+           |
++======================================================+
+
+Interface details:
+------------------
+- All devices are _not_ selected for report by default
+- As soon as a rating is given, it is selected to be reported
+- Preview submission will popup the generated list with a submit button
+- Generate file will generate a file that can be uploaded manually, or emailed to a specific address.
+- As you mouse over the rating, a popup will appear detailing what each star stands for:
+  - ..... : No support
+  - X.... : Crashes Haiku
+  - **... : Detected but doesn't work with 3rd party driver
+  - ***.. : Detected but doesn't work out of the box
+  - ****. : Detected and works with 3rd party driver
+  - ***** : Detected and works out of the box
+  
+  

@@ -1,6 +1,10 @@
 SubDir HAIKU_TOP src apps devices ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
+UsePrivateHeaders shared ;
+UsePrivateHeaders interface ;
+UsePrivateKernelHeaders ;
+UsePrivateSystemHeaders ;
+
 
 rule ISAPnPHeaderGen
 {
@@ -56,17 +60,18 @@ actions PCIHeaderGen1
 
 PCIHeaderGen [ FGristFiles pcihdr.h ] : pci.ids : pci-header.awk ;
 
-Preference Devices :
-	Devices.cpp
-	DevicesWindow.cpp
-	ResourceUsageWindow.cpp
-	ModemWindow.cpp
-	cm_wrapper.c
-	DevicesInfo.cpp
-	ConfigurationWindow.cpp
-	: be $(TARGET_LIBSUPC++)
+Application Devices :
+	DevicesApplication.cpp
+	DevicesView.cpp
+	dm_wrapper.c
+	DevicePCI.cpp
+	Device.cpp
+	PropertyList.cpp
+	PropertyListPlain.cpp
+	: be libcolumnlistview.a tracker $(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
 	: Devices.rdef
 ;
 
-Includes [ FGristFiles DevicesInfo.cpp ] : [ FGristFiles isapnpids.h usbdevs.h usbdevs_data.h ] ;
+Includes [ FGristFiles DevicesInfo.cpp ] : [ FGristFiles isapnpids.h usbdevs.h
+	usbdevs_data.h ] ;
 Includes [ FGristFiles ConfigurationWindow.cpp ] : [ FGristFiles pcihdr.h ] ;

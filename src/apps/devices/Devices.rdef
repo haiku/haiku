@@ -1,5 +1,5 @@
 
-resource app_signature "application/x-vnd.Haiku.Devices";
+resource app_signature "application/x-vnd.Haiku-Devices";
 
 resource app_version
 {
@@ -9,12 +9,12 @@ resource app_version
 
 	/* 0 = development	1 = alpha			2 = beta
 	   3 = gamma		4 = golden master	5 = final */
-	variety = 2,
+	variety = 1,
 
 	internal = 0,
 
 	short_info = "Devices", 
-	long_info  = "Devices ©2002-2009 Haiku"
+	long_info  = "Devices ©2009 Haiku"
 };
 
 resource app_flags B_SINGLE_LAUNCH;
