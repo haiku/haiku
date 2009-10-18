@@ -15,6 +15,7 @@ HaikuSubInclude debuganalyzer ;
 HaikuSubInclude debugger ;
 HaikuSubInclude deskbar ;
 HaikuSubInclude deskcalc ;
+HaikuSubInclude devices ;
 HaikuSubInclude diskprobe ;
 HaikuSubInclude diskusage ;
 HaikuSubInclude drivesetup ;
