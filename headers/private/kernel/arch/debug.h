@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
 status_t arch_debug_init(kernel_args *args);
+void arch_debug_stack_trace(void);
 void *arch_debug_get_caller(void);
 int32 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 		int32 skipIframes, int32 skipFrames, bool userOnly);

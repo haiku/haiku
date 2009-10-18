@@ -883,6 +883,13 @@ cmd_in_context(int argc, char** argv)
 //	#pragma mark -
 
 
+void
+arch_debug_stack_trace(void)
+{
+	stack_trace(0, NULL);
+}
+
+
 bool
 arch_debug_contains_call(struct thread *thread, const char *symbol,
 	addr_t start, addr_t end)

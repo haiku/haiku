@@ -733,6 +733,9 @@ kernel_debugger_loop(const char* message, int32 cpu)
 		}
 	}
 
+	if (!has_debugger_command("help"))
+		arch_debug_stack_trace();
+
 	int32 continuableLine = -1;
 		// Index of the previous command line, if the command returned
 		// B_KDEBUG_CONT, i.e. asked to be repeatable, -1 otherwise.

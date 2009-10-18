@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Haiku Inc. All rights reserved.
+ * Copyright 2003-2009, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -241,6 +241,12 @@ arch_debug_contains_call(struct thread *thread, const char *symbol,
 }
 
 
+void
+arch_debug_stack_trace(void)
+{
+}
+
+
 void *
 arch_debug_get_caller(void)
 {
@@ -376,19 +382,20 @@ arch_debug_init(kernel_args *args)
 	return B_NO_ERROR;
 }
 
+
 void
 arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
-        void (*function)(void*), void* parameter)
+	void (*function)(void*), void* parameter)
 {
-        // TODO: Implement! Most likely in assembly.
-        longjmp(jumpBuffer, 1);
+	// TODO: Implement! Most likely in assembly.
+	longjmp(jumpBuffer, 1);
 }
 
 
 void
 arch_debug_unset_current_thread(void)
 {
-        // TODO: Implement!
+	// TODO: Implement!
 }
 
 
