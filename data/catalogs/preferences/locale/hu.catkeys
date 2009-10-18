@@ -1,0 +1,48 @@
+1	hu	x-vnd.Haiku-Locale	525814056
+day of week (short name)	TimeFormatSettings		A hét napja (rövid)
+Available languages	Locale Preflet Window		Elérhető nyelvek
+Decimal separator	TimeFormatSettings		Tizedesjel
+Separator:	TimeFormatSettings		Elválasztó:
+Year (4 digits)	TimeFormatSettings		Év (4 jegyű)
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nem található nyelvi fájl! Sajnos így a beállítópanel nem használható!
+After	TimeFormatSettings		Utánna
+Long format:	TimeFormatSettings		Hosszú alak:
+Currency	TimeFormatSettings		Pénznem
+Before	TimeFormatSettings		Elé
+Year	TimeFormatSettings		Év
+Short format:	TimeFormatSettings		Rövid alak:
+Currency symbol:	TimeFormatSettings		Pénznem jele:
+Space	TimeFormatSettings		Szóköz
+Language	Locale Preflet Window		Nyelv
+Thousand separator	TimeFormatSettings		Ezres elválasztó
+24 Hour	TimeFormatSettings		24 óra
+Year (2 digits)	TimeFormatSettings		Év (2 jegyű)
+Preferred languages	Locale Preflet Window		Előnyben részesített nyelvek
+Symbol position	TimeFormatSettings		Jel helye
+month number	TimeFormatSettings		Hónap száma
+month number (2 digits)	TimeFormatSettings		Hónap száma (2 jegyű)
+Numbers	TimeFormatSettings		Számok
+ (unknown format)	TimeFormatSettings		 (ismeretlen alak)
+Negative marker:	TimeFormatSettings		Negatív előjel:
+12 Hour	TimeFormatSettings		12 óra
+Defaults	Locale Preflet Window		Alapértelmezés
+Separator	TimeFormatSettings		Elválasztó
+Country	Locale Preflet Window		Ország
+Revert	Locale Preflet Window		Visszaállítás
+day in month	TimeFormatSettings		Hónap napja
+day of week in month	TimeFormatSettings		A hét napja a hónapban
+Negative marker	TimeFormatSettings		Negatív előjel
+Ok	Locale Preflet Window		Ok
+Time	TimeFormatSettings		Idő
+Date	TimeFormatSettings		Dátum
+List separator	TimeFormatSettings		Listaelválasztó
+day of week	TimeFormatSettings		A hét napja
+None	TimeFormatSettings		Semmi
+day in month (2 digits)	TimeFormatSettings		Hónap napja (2 jegyű)
+Clock	TimeFormatSettings		Óra
+Example:	TimeFormatSettings		Példa:
+day of week (name)	TimeFormatSettings		A hét napja (név)
+month name	TimeFormatSettings		Hónap neve
+Day	TimeFormatSettings		Nap
+Leading 0	TimeFormatSettings		Vezető nullák
+Locale\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n\n	Locale Preflet		Nyelv\n\Írta Axel Dörfler.\n\tCopyright 2009, Haiku.\n\n

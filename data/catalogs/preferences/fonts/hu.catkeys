@@ -1,0 +1,12 @@
+1	finnish	x-vnd.Haiku-Fonts	3656873675
+Defaults	Main window		Alapértelmezés
+Plain Font:	Font view		Egyszerű betűtípus :
+Fonts	Main window		Betűtípusok
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Betűtípusok\n\tCopyright 2004-2005, Haiku.\n\n
+Revert	Main window		Visszaállítás
+Size:	Font Selection view		Méret :
+Menu Font:	Font view		Menü betűtípusa :
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Árvíztűrő tükörfúrógép.
+Bold Font:	Font view		Félkövér betűtípus :
+Fixed Font:	Font view		Fix méretű betűtípus :
+Ok	main		Ok

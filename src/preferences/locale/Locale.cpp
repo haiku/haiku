@@ -183,7 +183,7 @@ LocalePreflet::AboutRequested()
 	authors[0] = "Axel Dörfler";
 	authors[1] = "Adrien Destugues";
 	authors[2] = NULL;
-	(new BAboutWindow("Locale", 2005, authors))->Show();
+	(new BAboutWindow(TR("Locale"), 2005, authors))->Show();
 }
 
 
