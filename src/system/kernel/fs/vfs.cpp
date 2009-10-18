@@ -2640,21 +2640,23 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 	int32 maxLevel = 256;
 	int32 length;
 	status_t status;
+	struct io_context* ioContext = get_current_io_context(kernel);
 
 	// we don't use get_vnode() here because this call is more
 	// efficient and does all we need from get_vnode()
 	inc_vnode_ref_count(vnode);
-
-	// resolve a volume root to its mount point
-	struct vnode* mountPoint = resolve_volume_root_to_mount_point(vnode);
-	if (mountPoint) {
-		put_vnode(vnode);
-		vnode = mountPoint;
+	
+	if (vnode != ioContext->root) {
+		// we don't hit the IO context root
+		// resolve a volume root to its mount point
+		struct vnode* mountPoint = resolve_volume_root_to_mount_point(vnode);
+		if (mountPoint) {
+			put_vnode(vnode);
+			vnode = mountPoint;
+		}
 	}
 
 	path[--insert] = '\0';
-
-	struct io_context* ioContext = get_current_io_context(kernel);
 
 	while (true) {
 		// the name buffer is also used for fs_read_dir()
@@ -2678,12 +2680,16 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 		status = get_vnode_name(vnode, parentVnode, (struct dirent*)nameBuffer,
 			sizeof(nameBuffer), ioContext);
 
-		// resolve a volume root to its mount point
-		mountPoint = resolve_volume_root_to_mount_point(parentVnode);
-		if (mountPoint) {
-			put_vnode(parentVnode);
-			parentVnode = mountPoint;
-			parentID = parentVnode->id;
+		if (vnode != ioContext->root) {
+			// we don't hit the IO context root
+			// resolve a volume root to its mount point
+			struct vnode* mountPoint
+				= resolve_volume_root_to_mount_point(parentVnode);
+			if (mountPoint) {
+				put_vnode(parentVnode);
+				parentVnode = mountPoint;
+				parentID = parentVnode->id;
+			}
 		}
 
 		bool hitRoot = (parentVnode == vnode);
