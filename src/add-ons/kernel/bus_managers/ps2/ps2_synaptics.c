@@ -215,6 +215,7 @@ move_to_movement(synaptics_cookie *cookie, touch_event *event,
 		/ (MAX_PRESSURE - MIN_PRESSURE - 100);
 	if (!cookie->tap_started
 		&& isStartOfMovement
+		&& settings->tapgesture_sensibility > 0.
 		&& settings->tapgesture_sensibility > (20 - pressure)) {
 		TRACE("SYNAPTICS: tap started\n");
 		cookie->tap_started = true;
