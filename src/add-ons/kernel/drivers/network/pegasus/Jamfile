@@ -15,5 +15,5 @@ KernelAddon pegasus :
 
 # driver.c currently needs usbdevs.h so we make its path available and adds dependency
 ObjectHdrs [ FGristFiles driver$(SUFOBJ) if_aue$(SUFOBJ) ]
-	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) preferences devices ] ;
-Includes [ FGristFiles driver.c if_aue.c ] : <src!preferences!devices>usbdevs.h ;
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) apps devices ] ;
+Includes [ FGristFiles driver.c if_aue.c ] : <src!apps!devices>usbdevs.h ;

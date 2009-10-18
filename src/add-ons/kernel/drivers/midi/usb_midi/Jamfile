@@ -19,10 +19,10 @@ KernelAddon usb_midi :
 SEARCH on [ FGristFiles ring_buffer.cpp ] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 ObjectHdrs [ FGristFiles usb_midi$(SUFOBJ) ]
-	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) preferences devices ] ;
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) apps devices ] ;
 
 Includes [ FGristFiles usb_midi.c ] :
-	<src!preferences!devices>usbdevs.h <src!preferences!devices>usbdevs_data.h ;
+	<src!apps!devices>usbdevs.h <src!apps!devices>usbdevs_data.h ;
 
 Package haiku-usbmidi-cvs
 	:
