@@ -333,17 +333,42 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors,
 }
 
 
-/*! Store away panel information if identified on startup
-	(used for pipe B->lvds).
-*/
 void
-save_lvds_mode(void)
+retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 {
-	// dump currently programmed mode.
-	display_mode biosMode;
+	uint32 pll = read32(pllRegister);
+	uint32 pllDivisor;
+	uint32 hTotalRegister;
+	uint32 vTotalRegister;
+	uint32 hSyncRegister;
+	uint32 vSyncRegister;
+	uint32 imageSizeRegister;
+	uint32 controlRegister;
 
-	uint32 pll = read32(INTEL_DISPLAY_B_PLL);
-	uint32 pllDivisor = read32(INTEL_DISPLAY_B_PLL_DIVISOR_0);
+	if (pllRegister == INTEL_DISPLAY_A_PLL) {
+		pllDivisor = read32((pll & DISPLAY_PLL_DIVISOR_1) != 0
+			? INTEL_DISPLAY_A_PLL_DIVISOR_1 : INTEL_DISPLAY_A_PLL_DIVISOR_0);
+
+		hTotalRegister = INTEL_DISPLAY_A_HTOTAL;
+		vTotalRegister = INTEL_DISPLAY_A_VTOTAL;
+		hSyncRegister = INTEL_DISPLAY_A_HSYNC;
+		vSyncRegister = INTEL_DISPLAY_A_VSYNC; 
+		imageSizeRegister = INTEL_DISPLAY_A_IMAGE_SIZE;
+		controlRegister = INTEL_DISPLAY_A_CONTROL;
+	} else if (pllRegister == INTEL_DISPLAY_B_PLL) {
+		pllDivisor = read32((pll & DISPLAY_PLL_DIVISOR_1) != 0
+			? INTEL_DISPLAY_B_PLL_DIVISOR_1 : INTEL_DISPLAY_B_PLL_DIVISOR_0);
+
+		hTotalRegister = INTEL_DISPLAY_B_HTOTAL;
+		vTotalRegister = INTEL_DISPLAY_B_VTOTAL;
+		hSyncRegister = INTEL_DISPLAY_B_HSYNC;
+		vSyncRegister = INTEL_DISPLAY_B_VSYNC; 
+		imageSizeRegister = INTEL_DISPLAY_B_IMAGE_SIZE;
+		controlRegister = INTEL_DISPLAY_B_CONTROL;
+	} else {
+		// TODO: not supported
+		return;
+	}
 
 	pll_divisors divisors;
 	divisors.m1 = (pllDivisor & DISPLAY_PLL_M1_DIVISOR_MASK)
@@ -364,9 +389,6 @@ save_lvds_mode(void)
 			divisors.post2 = limits.max.post2;
 		else
 			divisors.post2 = limits.min.post2;
-
-		// Fix this? Need to support dual channel LVDS.
-		divisors.post2 = LVDS_POST2_RATE_SLOW;
 	} else {
 		// 8xx
 		divisors.post1 = (pll & DISPLAY_PLL_POST1_DIVISOR_MASK)
@@ -381,66 +403,71 @@ save_lvds_mode(void)
 	divisors.m = 5 * divisors.m1 + divisors.m2;
 	divisors.post = divisors.post1 * divisors.post2;
 
-	float referenceClock = gInfo->shared_info->pll_info.reference_frequency
-		/ 1000.0f;
-	float pixelClock = ((referenceClock * divisors.m) / divisors.n)
-		/ divisors.post;
+	float referenceClock
+		= gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
+	float pixelClock
+		= ((referenceClock * divisors.m) / divisors.n) / divisors.post;
 
 	// timing
 
-	biosMode.timing.pixel_clock = uint32(pixelClock * 1000);
-	biosMode.timing.flags = 0;
+	mode.timing.pixel_clock = uint32(pixelClock * 1000);
+	mode.timing.flags = 0;
 
-	uint32 value = read32(INTEL_DISPLAY_B_HTOTAL);
-	biosMode.timing.h_total = (value >> 16) + 1;
-	biosMode.timing.h_display = (value & 0xffff) + 1;
+	uint32 value = read32(hTotalRegister);
+	mode.timing.h_total = (value >> 16) + 1;
+	mode.timing.h_display = (value & 0xffff) + 1;
 
-	value = read32(INTEL_DISPLAY_B_HSYNC);
-	biosMode.timing.h_sync_end = (value >> 16) + 1;
-	biosMode.timing.h_sync_start = (value & 0xffff) + 1;
+	value = read32(hSyncRegister);
+	mode.timing.h_sync_end = (value >> 16) + 1;
+	mode.timing.h_sync_start = (value & 0xffff) + 1;
 
-	value = read32(INTEL_DISPLAY_B_VTOTAL);
-	biosMode.timing.v_total = (value >> 16) + 1;
-	biosMode.timing.v_display = (value & 0xffff) + 1;
+	value = read32(vTotalRegister);
+	mode.timing.v_total = (value >> 16) + 1;
+	mode.timing.v_display = (value & 0xffff) + 1;
 
-	value = read32(INTEL_DISPLAY_B_VSYNC);
-	biosMode.timing.v_sync_end = (value >> 16) + 1;
-	biosMode.timing.v_sync_start = (value & 0xffff) + 1;
+	value = read32(vSyncRegister);
+	mode.timing.v_sync_end = (value >> 16) + 1;
+	mode.timing.v_sync_start = (value & 0xffff) + 1;
 
 	// image size and color space
 
-	// using virtual size based on image size is the 'proper' way to do it, however the bios appears to be
-	// suggesting scaling or somesuch, so ignore the proper virtual way for now.
+	value = read32(imageSizeRegister);
+	mode.virtual_width = (value >> 16) + 1;
+	mode.virtual_height = (value & 0xffff) + 1;
 
-	biosMode.virtual_width = biosMode.timing.h_display;
-	biosMode.virtual_height = biosMode.timing.v_display;
-
-	//value = read32(INTEL_DISPLAY_B_IMAGE_SIZE);
-	//biosMode.virtual_width = (value >> 16) + 1;
-	//biosMode.virtual_height = (value & 0xffff) + 1;
-
-	value = read32(INTEL_DISPLAY_B_CONTROL);
+	value = read32(controlRegister);
 	switch (value & DISPLAY_CONTROL_COLOR_MASK) {
 		case DISPLAY_CONTROL_RGB32:
 		default:
-			biosMode.space = B_RGB32;
+			mode.space = B_RGB32;
 			break;
 		case DISPLAY_CONTROL_RGB16:
-			biosMode.space = B_RGB16;
+			mode.space = B_RGB16;
 			break;
 		case DISPLAY_CONTROL_RGB15:
-			biosMode.space = B_RGB15;
+			mode.space = B_RGB15;
 			break;
 		case DISPLAY_CONTROL_CMAP8:
-			biosMode.space = B_CMAP8;
+			mode.space = B_CMAP8;
 			break;
 	}
 
-	biosMode.h_display_start = 0;
-	biosMode.v_display_start = 0;
-	biosMode.flags = B_8_BIT_DAC | B_HARDWARE_CURSOR | B_PARALLEL_ACCESS
+	mode.h_display_start = 0;
+	mode.v_display_start = 0;
+	mode.flags = B_8_BIT_DAC | B_HARDWARE_CURSOR | B_PARALLEL_ACCESS
 		| B_DPMS | B_SUPPORTS_OVERLAYS;
+}
 
+
+/*! Store away panel information if identified on startup
+	(used for pipe B->lvds).
+*/
+void
+save_lvds_mode(void)
+{
+	// dump currently programmed mode.
+	display_mode biosMode;
+	retrieve_current_mode(biosMode, INTEL_DISPLAY_B_PLL);
 	gInfo->lvds_panel_mode = biosMode;
 }
 
@@ -825,101 +852,10 @@ intel_get_display_mode(display_mode *_currentMode)
 {
 	TRACE(("intel_get_display_mode()\n"));
 
-	display_mode &mode = *_currentMode;
-
-	uint32 pll = read32(INTEL_DISPLAY_A_PLL);
-	uint32 pllDivisor = read32((pll & DISPLAY_PLL_DIVISOR_1) != 0
-		? INTEL_DISPLAY_A_PLL_DIVISOR_1 : INTEL_DISPLAY_A_PLL_DIVISOR_0);
-
-	pll_divisors divisors;
-	divisors.m1 = (pllDivisor & DISPLAY_PLL_M1_DIVISOR_MASK)
-		>> DISPLAY_PLL_M1_DIVISOR_SHIFT;
-	divisors.m2 = (pllDivisor & DISPLAY_PLL_M2_DIVISOR_MASK)
-		>> DISPLAY_PLL_M2_DIVISOR_SHIFT;
-	divisors.n = (pllDivisor & DISPLAY_PLL_N_DIVISOR_MASK)
-		>> DISPLAY_PLL_N_DIVISOR_SHIFT;
-
-	pll_limits limits;
-	get_pll_limits(limits);
-
-	if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
-		divisors.post1 = (pll & DISPLAY_PLL_9xx_POST1_DIVISOR_MASK)
-			>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
-
-		if ((pll & DISPLAY_PLL_DIVIDE_HIGH) != 0)
-			divisors.post2 = limits.max.post2;
-		else
-			divisors.post2 = limits.min.post2;
-	} else {
-		// 8xx
-		divisors.post1 = (pll & DISPLAY_PLL_POST1_DIVISOR_MASK)
-			>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
-
-		if ((pll & DISPLAY_PLL_DIVIDE_4X) != 0)
-			divisors.post2 = limits.max.post2;
-		else
-			divisors.post2 = limits.min.post2;
-	}
-
-	divisors.m = 5 * divisors.m1 + divisors.m2;
-	divisors.post = divisors.post1 * divisors.post2;
-
-	float referenceClock
-		= gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
-	float pixelClock
-		= ((referenceClock * divisors.m) / divisors.n) / divisors.post;
-
-	// timing
-
-	mode.timing.pixel_clock = uint32(pixelClock * 1000);
-	mode.timing.flags = 0;
-
-	uint32 value = read32(INTEL_DISPLAY_A_HTOTAL);
-	mode.timing.h_total = (value >> 16) + 1;
-	mode.timing.h_display = (value & 0xffff) + 1;
-
-	value = read32(INTEL_DISPLAY_A_HSYNC);
-	mode.timing.h_sync_end = (value >> 16) + 1;
-	mode.timing.h_sync_start = (value & 0xffff) + 1;
-
-	value = read32(INTEL_DISPLAY_A_VTOTAL);
-	mode.timing.v_total = (value >> 16) + 1;
-	mode.timing.v_display = (value & 0xffff) + 1;
-
-	value = read32(INTEL_DISPLAY_A_VSYNC);
-	mode.timing.v_sync_end = (value >> 16) + 1;
-	mode.timing.v_sync_start = (value & 0xffff) + 1;
-
-	// image size and color space
-
-	value = read32(INTEL_DISPLAY_A_IMAGE_SIZE);
-	mode.virtual_width = (value >> 16) + 1;
-	mode.virtual_height = (value & 0xffff) + 1;
-
-	value = read32(INTEL_DISPLAY_A_CONTROL);
-	switch (value & DISPLAY_CONTROL_COLOR_MASK) {
-		case DISPLAY_CONTROL_RGB32:
-		default:
-			mode.space = B_RGB32;
-			break;
-		case DISPLAY_CONTROL_RGB16:
-			mode.space = B_RGB16;
-			break;
-		case DISPLAY_CONTROL_RGB15:
-			mode.space = B_RGB15;
-			break;
-		case DISPLAY_CONTROL_CMAP8:
-			mode.space = B_CMAP8;
-			break;
-	}
-
-	mode.h_display_start = 0;
-	mode.v_display_start = 0;
-	mode.flags = 0;
+	retrieve_current_mode(*_currentMode, INTEL_DISPLAY_A_PLL);
 	return B_OK;
 }
 
-#ifdef __HAIKU__
 
 status_t
 intel_get_edid_info(void* info, size_t size, uint32* _version)
@@ -936,7 +872,6 @@ intel_get_edid_info(void* info, size_t size, uint32* _version)
 	return B_OK;
 }
 
-#endif	// __HAIKU__
 
 status_t
 intel_get_frame_buffer_config(frame_buffer_config *config)
