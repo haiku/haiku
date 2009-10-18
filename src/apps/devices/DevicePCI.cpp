@@ -8,6 +8,7 @@
 
 
 #include <sstream>
+#include <stdlib.h>
 
 #include "DevicePCI.h"
 

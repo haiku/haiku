@@ -10,6 +10,8 @@
 #include <Application.h>
 #include <MenuBar.h>
 
+#include <iostream>
+
 #include "DevicesView.h"
 
 
