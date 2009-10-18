@@ -5,7 +5,7 @@
  * Authors:
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
- 
+
 #ifndef ACPI_BATTERY_H
 #define ACPI_BATTERY_H
 
@@ -47,4 +47,4 @@ struct battery_device_cookie {
 
 void battery_notify_handler(acpi_handle device, uint32 value, void *context);
 
-#endif /* _EST_H */
+#endif
