@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Locale	1910872713
+1	finnish	x-vnd.Haiku-Locale	2750813901
 day of week (short name)	TimeFormatSettings		viikonpäivä (lyhyt nimi)
 Available languages	Locale Preflet Window		Valittavat kielet
 Decimal separator	TimeFormatSettings		Desimaalierotin
@@ -26,7 +26,6 @@ Numbers	TimeFormatSettings		Numerot
 Negative marker:	TimeFormatSettings		Negatiivisuuden merkki:
 12 Hour	TimeFormatSettings		12 Tuntia
 Defaults	Locale Preflet Window		Oletusasetukset
-Locale\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n\n	Locale Preflet		Locale\n\ttekijä Axel Dörfler\n\tCopyright 2009, Haiku.\n\n
 Separator	TimeFormatSettings		Erotin
 Country	Locale Preflet Window		Maa
 Revert	Locale Preflet Window		Palauta
@@ -38,6 +37,7 @@ Time	TimeFormatSettings		Aika
 Date	TimeFormatSettings		Päivämäärä
 List separator	TimeFormatSettings		Listaerotin
 day of week	TimeFormatSettings		viikonpäivä
+Locale	Locale Preflet		Locale
 None	TimeFormatSettings		Ei mikään
 day in month (2 digits)	TimeFormatSettings		kuukaudenpäivä (2 merkkiä)
 Clock	TimeFormatSettings		Kello

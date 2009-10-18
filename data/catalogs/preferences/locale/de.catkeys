@@ -1,30 +1,31 @@
-1	de	x-vnd.Haiku-Locale	1910872713
+1	de	x-vnd.Haiku-Locale	2750813901
 day of week (short name)	TimeFormatSettings		Wochentag (Abkz.)
 Available languages	Locale Preflet Window		Verfügbare Sprachen
 Decimal separator	TimeFormatSettings		Dezimaltrennzeichen
 Separator:	TimeFormatSettings		Trennzeichen:
 Year (4 digits)	TimeFormatSettings		Jahr (4-stellig)
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Unmöglich die verfügbaren Sprachen zu laden. Preflet kann nicht geladen werden!
 After	TimeFormatSettings		Danach
 Long format:	TimeFormatSettings		Langformat:
-Before	TimeFormatSettings		Davor
 Currency	TimeFormatSettings		Währung
+Before	TimeFormatSettings		Davor
 Year	TimeFormatSettings		Jahr
 Short format:	TimeFormatSettings		Kurzformat:
 Currency symbol:	TimeFormatSettings		Währungssymbol:
 Space	TimeFormatSettings		Abstand
 Language	Locale Preflet Window		Sprache
 Thousand separator	TimeFormatSettings		Tausendertrennzeichen
+24 Hour	TimeFormatSettings		24 Stunden
 Year (2 digits)	TimeFormatSettings		Jahr (2-stellig)
 Preferred languages	Locale Preflet Window		Bevorzugte Sprache
 Symbol position	TimeFormatSettings		Symbolposition
 month number	TimeFormatSettings		Monatsnummer
 month number (2 digits)	TimeFormatSettings		Monatsnummer (2-stellig)
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Unmöglich die verfügbaren Sprachen zu laden. Preflet kann nicht geladen werden!
 Numbers	TimeFormatSettings		Zahlen
  (unknown format)	TimeFormatSettings		 (unbekanntes Format)
 Negative marker:	TimeFormatSettings		Minuszeichen:
+12 Hour	TimeFormatSettings		12 Stunden
 Defaults	Locale Preflet Window		Standardwerte
-Locale\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n\n	Locale Preflet		Locale\n\Geschrieben von Axel Dörfler.\n\tCopyright 2009, Haiku.\n\n
 Separator	TimeFormatSettings		Trennzeichen
 Country	Locale Preflet Window		Land
 Revert	Locale Preflet Window		Zurücknehmen
@@ -36,6 +37,7 @@ Time	TimeFormatSettings		Zeit
 Date	TimeFormatSettings		Datum
 List separator	TimeFormatSettings		Listentrennzeichen
 day of week	TimeFormatSettings		Wochentag
+Locale	Locale Preflet		Locale
 None	TimeFormatSettings		Ohne
 day in month (2 digits)	TimeFormatSettings		Tag des Monats (2-stellig)
 Clock	TimeFormatSettings		Uhr
@@ -44,5 +46,3 @@ day of week (name)	TimeFormatSettings		Wochentag (Name)
 month name	TimeFormatSettings		Monatsname
 Day	TimeFormatSettings		Tag
 Leading 0	TimeFormatSettings		Führende 0
-24 Hour	TimeFormatSettings		24 Stunden
-12 Hour	TimeFormatSettings		12 Stunden

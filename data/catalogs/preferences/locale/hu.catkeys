@@ -1,4 +1,4 @@
-1	hu	x-vnd.Haiku-Locale	525814056
+1	hu	x-vnd.Haiku-Locale	2750813901
 day of week (short name)	TimeFormatSettings		A hét napja (rövid)
 Available languages	Locale Preflet Window		Elérhető nyelvek
 Decimal separator	TimeFormatSettings		Tizedesjel
@@ -37,6 +37,7 @@ Time	TimeFormatSettings		Idő
 Date	TimeFormatSettings		Dátum
 List separator	TimeFormatSettings		Listaelválasztó
 day of week	TimeFormatSettings		A hét napja
+Locale	Locale Preflet		Locale
 None	TimeFormatSettings		Semmi
 day in month (2 digits)	TimeFormatSettings		Hónap napja (2 jegyű)
 Clock	TimeFormatSettings		Óra
@@ -45,4 +46,3 @@ day of week (name)	TimeFormatSettings		A hét napja (név)
 month name	TimeFormatSettings		Hónap neve
 Day	TimeFormatSettings		Nap
 Leading 0	TimeFormatSettings		Vezető nullák
-Locale\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n\n	Locale Preflet		Nyelv\n\Írta Axel Dörfler.\n\tCopyright 2009, Haiku.\n\n
