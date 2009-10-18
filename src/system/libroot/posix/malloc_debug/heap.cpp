@@ -1550,12 +1550,14 @@ memalign(size_t alignment, size_t size)
 {
 	if (size > HEAP_AREA_USE_THRESHOLD) {
 		// don't even attempt such a huge allocation - use areas instead
-		size_t areaSize = size + sizeof(area_allocation_info);
-		if (alignment != 0)
-			areaSize = ROUNDUP(areaSize, alignment);
+		size_t areaSize = ROUNDUP(size + sizeof(area_allocation_info)
+			+ alignment, B_PAGE_SIZE);
+		if (areaSize < size) {
+			// the size overflowed
+			return NULL;
+		}
 
 		void *address = NULL;
-		areaSize = ROUNDUP(areaSize, B_PAGE_SIZE);
 		area_id allocationArea = create_area("memalign area", &address,
 			B_ANY_ADDRESS, areaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (allocationArea < B_OK) {
@@ -1573,8 +1575,11 @@ memalign(size_t alignment, size_t size)
 		info->allocation_alignment = alignment;
 
 		address = (void *)((addr_t)address + sizeof(area_allocation_info));
-		if (alignment != 0)
+		if (alignment != 0) {
 			address = (void *)ROUNDUP((addr_t)address, alignment);
+			ASSERT((addr_t)address % alignment == 0);
+			ASSERT((addr_t)address + size - 1 < (addr_t)info + areaSize - 1);
+		}
 
 		INFO(("heap: allocated area %ld for huge allocation of %lu bytes\n",
 			allocationArea, size));
