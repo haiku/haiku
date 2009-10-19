@@ -1870,7 +1870,7 @@ _user_debug_output(const char* userString)
 	char string[512];
 	int32 length;
 
-	if (!sSerialDebugEnabled)
+	if (!sSerialDebugEnabled && !sSyslogOutputEnabled)
 		return;
 
 	if (!IS_USER_ADDRESS(userString))
