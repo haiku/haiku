@@ -118,13 +118,13 @@ else
 fi
 
 if test "$echo_ft_version" = "yes" ; then
-  major=`grep define $includedir/freetype2/freetype/freetype.h \
+  major=`grep define $includedir/freetype/freetype.h \
          | grep FREETYPE_MAJOR \
          | sed 's/.*[ 	]\([0-9][0-9]*\).*/\1/'`
-  minor=`grep define $includedir/freetype2/freetype/freetype.h \
+  minor=`grep define $includedir/freetype/freetype.h \
          | grep FREETYPE_MINOR \
          | sed 's/.*[ 	]\([0-9][0-9]*\).*/\1/'`
-  patch=`grep define $includedir/freetype2/freetype/freetype.h \
+  patch=`grep define $includedir/freetype/freetype.h \
          | grep FREETYPE_PATCH \
          | sed 's/.*[ 	]\([0-9][0-9]*\).*/\1/'`
   echo $major.$minor.$patch
