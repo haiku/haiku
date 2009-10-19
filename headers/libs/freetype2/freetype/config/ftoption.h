@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    User-selectable configuration macros (specification only).           */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by       */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -92,9 +92,7 @@ FT_BEGIN_HEADER
   /* This is done to allow FreeType clients to run unmodified, forcing     */
   /* them to display normal gray-level anti-aliased glyphs.                */
   /*                                                                       */
-#if HAIKU_INCLUDE_PATENTED_CODE
-#	define FT_CONFIG_OPTION_SUBPIXEL_RENDERING
-#endif
+/* #define FT_CONFIG_OPTION_SUBPIXEL_RENDERING */
 
 
   /*************************************************************************/
@@ -398,6 +396,20 @@ FT_BEGIN_HEADER
 #undef FT_CONFIG_OPTION_USE_MODULE_ERRORS
 
 
+  /*************************************************************************/
+  /*                                                                       */
+  /* Position Independent Code                                             */
+  /*                                                                       */
+  /*   If this macro is set (which is _not_ the default), FreeType2 will   */
+  /*   avoid creating constants that require address fixups. Instead the   */
+  /*   constants will be moved into a struct and additional intialization  */
+  /*   code will be used.                                                  */
+  /*                                                                       */
+  /*   Setting this macro is needed for systems that prohibit address      */
+  /*   fixups, such as BREW.                                               */
+  /*                                                                       */
+/* #define FT_CONFIG_OPTION_PIC */
+
 
   /*************************************************************************/
   /*************************************************************************/
@@ -441,7 +453,7 @@ FT_BEGIN_HEADER
   /* does not contain any glyph name though.                               */
   /*                                                                       */
   /* Accessing SFNT names is done through the functions declared in        */
-  /* `freetype/ftnames.h'.                                                 */
+  /* `freetype/ftsnames.h'.                                                */
   /*                                                                       */
 #define TT_CONFIG_OPTION_SFNT_NAMES
 
@@ -459,6 +471,7 @@ FT_BEGIN_HEADER
 #define TT_CONFIG_CMAP_FORMAT_8
 #define TT_CONFIG_CMAP_FORMAT_10
 #define TT_CONFIG_CMAP_FORMAT_12
+#define TT_CONFIG_CMAP_FORMAT_13
 #define TT_CONFIG_CMAP_FORMAT_14
 
 
@@ -482,9 +495,7 @@ FT_BEGIN_HEADER
   /*   Do not #undef this macro here, since the build system might         */
   /*   define it for certain configurations only.                          */
   /*                                                                       */
-#if HAIKU_INCLUDE_PATENTED_CODE
-#	define TT_CONFIG_OPTION_BYTECODE_INTERPRETER
-#endif
+/* #define TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
 
 
   /*************************************************************************/
