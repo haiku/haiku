@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyTestcase.h,v 1.3 2002/09/28 00:19:49 shatty Exp $
+	$Id: PropertyTestcase.h 1218 2002-09-28 00:19:49Z shatty $
 	
 	This file defines a base class for performing all tests of BPropertyInfo
 	functionality.

@@ -3,7 +3,7 @@
 " Maintainer:	Johannes Zellner <johannes@zellner.org>
 " Last Change:	Tue Apr 27 13:05:59 CEST 2004
 " Filenames:	build.xml
-" $Id: ant.vim,v 1.1 2004/07/13 23:27:58 korli Exp $
+" $Id: ant.vim 8393 2004-07-13 23:28:30Z korli $
 
 " Quit when a syntax file was already loaded
 if exists("b:current_syntax")

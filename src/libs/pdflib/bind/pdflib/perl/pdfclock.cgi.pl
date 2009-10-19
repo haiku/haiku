@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id$
+# $Id: pdfclock.cgi.pl 14574 2005-10-29 16:27:43Z bonefish $
 #
 # PDFlib client: pdfclock CGI example in Perl
 #

@@ -113,7 +113,7 @@
 /*
  * MQ Arithmetic Encoder
  *
- * $Id$
+ * $Id: jpc_mqenc.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JPC_MQENC_H

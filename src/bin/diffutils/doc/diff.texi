@@ -1,5 +1,5 @@
 \input texinfo @c -*-texinfo-*-
-@comment $Id: diff.texi,v 1.1 2004/03/02 00:45:49 michaelphipps Exp $
+@comment $Id: diff.texi 6847 2004-03-02 00:45:50Z michaelphipps $
 @comment %**start of header
 @setfilename diff.info
 @include version.texi

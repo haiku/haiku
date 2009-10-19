@@ -222,7 +222,7 @@ static struct rcslockers *lockerlist;
 static struct stateattri *statelist;
 
 
-mainProg(rlogId, "rlog", "$Id: rlog.c,v 1.1 2003/06/11 15:56:10 darkwyrm Exp $")
+mainProg(rlogId, "rlog", "$Id: rlog.c 3476 2003-06-11 15:56:10Z darkwyrm $")
 {
 	static char const cmdusage[] =
 		"\nrlog usage: rlog -{bhLNRt} -ddates -l[lockers] -r[revs] -sstates -Vn -w[logins] -xsuff -zzone file ...";

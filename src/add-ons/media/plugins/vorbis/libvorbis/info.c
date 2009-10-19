@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: maintain the info structure, info <-> header packets
- last mod: $Id: info.c,v 1.1 2003/12/13 20:17:56 shatty Exp $
+ last mod: $Id: info.c 5664 2003-12-13 20:17:56Z shatty $
 
  ********************************************************************/
 

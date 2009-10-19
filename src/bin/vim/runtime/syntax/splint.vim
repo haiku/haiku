@@ -2,7 +2,7 @@
 " Language:	splint (C with lclint/splint Annotations)
 " Maintainer:	Ralf Wildenhues <Ralf.Wildenhues@gmx.de>
 " Splint Home:	http://www.splint.org/
-" Last Change:	$Date: 2004/07/13 23:27:59 $
+" Last Change:	$Date: 2004-07-14 01:28:30 +0200 (Mi, 14. Jul 2004) $
 " $Revision: 1.1 $
 
 " Note:		Splint annotated files are not detected by default.

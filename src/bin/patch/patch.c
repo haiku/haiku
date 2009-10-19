@@ -1,6 +1,6 @@
 /* patch - a program to apply diffs to original files */
 
-/* $Id: patch.c,v 1.1 2004/06/16 21:22:10 korli Exp $ */
+/* $Id: patch.c 8008 2004-06-16 21:22:10Z korli $ */
 
 /* Copyright 1984, 1985-1987, 1988 Larry Wall
    Copyright 1989, 1990-1993, 1997-1998, 1999 Free Software Foundation, Inc.

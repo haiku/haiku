@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id$ */
+/* PDFlib GmbH cvsid: $Id: t4.h 14574 2005-10-29 16:27:43Z bonefish $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler

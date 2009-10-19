@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     mysql
 " Maintainer:   Kenneth J. Pronovici <pronovic@ieee.org>
-" Last Change:  $Date: 2004/07/13 23:27:59 $
+" Last Change:  $Date: 2004-07-14 01:28:30 +0200 (Mi, 14. Jul 2004) $
 " Filenames:    *.mysql
 " URL:		ftp://cedar-solutions.com/software/mysql.vim
 " Note:		The definitions below are taken from the mysql user manual as of April 2002, for version 3.23

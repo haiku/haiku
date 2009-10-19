@@ -167,7 +167,8 @@ map g   IL
 "   GYKeDP - print the state table and next char table at the end of the file
 "       0S - initialise the state of the machine to E1
 "      2Gl - move to the top left cell of the maze
-map I   G$?.^GYKeDP0S2Gl
+map I   G$?.
+^GYKeDP0S2Gl
 "
 "================================================================
 " L - the loop which is executed forever
@@ -194,7 +195,9 @@ map I   G$?.^GYKeDP0S2Gl
 "            the current character
 "       @m - execute the action associated with this state
 "        U - and repeat
-map L   QAmaGNB0M0E@mwX`a@mGT$B$R0M0E@m2WSbXGVJ0H`a@r@mU
+map L   QAmaGNB0M0E@m
+wX`a@mGT$B$R0M0E@m
+2WSbXGVJ0H`a@r@mU
 "
 "================================================================
 " U - no tail recursion allowed in vi macros so cheat and set U = L
@@ -268,4 +271,5 @@ map Y   osE1  k  N1       sE1_ mm E2       sE2| mm S1       sE2. ll E1
 map K   osW1  j  S1       sW1_ mm W2       sW2| mm N1       sW2. hh W1
 map e   osN1. hh W1       sN1| mm N2       sN2  k  N1       sN2_ mm E1
 map D   osS1. ll E1       sS1| mm S2       sS2  j  S1       sS2_ mm W1
-map P   onE1 kF nE2 lF nW1 G$JF nW2 hF nN1 hF nN2 kF nS1 lF nS2 G$JF E1
+map P   onE1 kF nE2 lF nW1 G$JF nW2 hF nN1 hF nN2 kF nS1 lF nS2 G$JF 
+E1

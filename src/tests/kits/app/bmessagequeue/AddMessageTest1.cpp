@@ -1,5 +1,5 @@
 /*
-	$Id: AddMessageTest1.cpp,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
+	$Id: AddMessageTest1.cpp 383 2002-07-22 09:28:00Z tylerdauwalder $
 	
 	This file implements the first test for the OpenBeOS BMessageQueue code.
 	It tests the Construction, Destruction, Add Message 1, Count Messages,

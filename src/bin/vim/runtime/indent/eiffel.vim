@@ -1,7 +1,7 @@
 " Vim indent file
 " Language:	Eiffel
 " Maintainer:	David Clarke <gadicath@dishevelled.net>
-" $Date: 2004/07/13 23:28:22 $
+" $Date: 2004-07-14 01:28:30 +0200 (Mi, 14. Jul 2004) $
 " $Revision: 1.1 $
 " URL: http://gadicath.webhop.net/other/eiffel.vim
 

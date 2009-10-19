@@ -21,7 +21,7 @@
  */
 
 /*
- * @(#) 102.1 $Id: widedef.h,v 1.1 2004/12/23 22:08:39 korli Exp $
+ * @(#) 102.1 $Id: widedef.h 10527 2004-12-23 22:08:39Z korli $
  */
 // Modified by T.Murai for BeOS
 

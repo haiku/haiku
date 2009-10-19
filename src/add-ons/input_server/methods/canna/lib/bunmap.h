@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char bunmap_id[] = "@(#) 102.1 $Id$";
+static char bunmap_id[] = "@(#) 102.1 $Id: bunmap.h 14875 2005-11-12 21:25:31Z bonefish $";
 #endif /* lint */
 
 extern int DoFuncSequence();

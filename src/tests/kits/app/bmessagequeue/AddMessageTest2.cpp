@@ -1,5 +1,5 @@
 /*
-	$Id: AddMessageTest2.cpp,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
+	$Id: AddMessageTest2.cpp 383 2002-07-22 09:28:00Z tylerdauwalder $
 	
 	This file implements the second test for the OpenBeOS BMessageQueue code.
 	It tests the Add Message 2 use case.  It does so by doing the following:

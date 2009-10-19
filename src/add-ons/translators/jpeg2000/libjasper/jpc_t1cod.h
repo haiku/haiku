@@ -111,7 +111,7 @@
  */
 
 /*
- * $Id$
+ * $Id: jpc_t1cod.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JPC_T1COD_H

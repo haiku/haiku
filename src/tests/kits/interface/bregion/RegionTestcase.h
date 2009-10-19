@@ -1,5 +1,5 @@
 /*
-	$Id: RegionTestcase.h,v 1.1 2003/08/06 06:46:06 jackburton Exp $
+	$Id: RegionTestcase.h 4235 2003-08-06 06:46:06Z jackburton $
 	
 	This file defines a base class for performing all tests of BRegion
 	functionality.

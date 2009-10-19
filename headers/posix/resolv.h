@@ -50,7 +50,7 @@
 
 /*
  *	@(#)resolv.h	8.1 (Berkeley) 6/2/93
- *	$Id$
+ *	$Id: resolv.h 18456 2006-08-08 12:33:33Z axeld $
  */
 
 #ifndef _RESOLV_H_

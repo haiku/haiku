@@ -1,5 +1,5 @@
 /*
-	$Id: RegionExclude.h,v 1.1 2003/08/06 06:46:06 jackburton Exp $
+	$Id: RegionExclude.h 4235 2003-08-06 06:46:06Z jackburton $
 	
 	This file defines a class for performing one test of BRegion
 	functionality.

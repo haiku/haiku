@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: hellodl.c 14574 2005-10-29 16:27:43Z bonefish $
  * PDFlib client: hello example in C with dynamic DLL loading
  *
  */

@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[]="$Id: bits.c,v 1.1 2004/12/23 21:23:50 korli Exp $";
+static char rcsid[]="$Id: bits.c 10525 2004-12-23 21:23:50Z korli $";
 #endif
 /* LINTLIBRARY */
 

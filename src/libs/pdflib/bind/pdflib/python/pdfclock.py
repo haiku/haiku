@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# $Id$
+# $Id: pdfclock.py 14574 2005-10-29 16:27:43Z bonefish $
 #
 # PDFlib client: pdfclock example in Python
 #

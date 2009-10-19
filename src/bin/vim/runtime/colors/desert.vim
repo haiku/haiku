@@ -1,9 +1,9 @@
 " Vim color file
 " Maintainer:	Hans Fugal <hans@fugal.net>
-" Last Change:	$Date: 2004/07/13 23:28:24 $
-" Last Change:	$Date: 2004/07/13 23:28:24 $
+" Last Change:	$Date: 2004-07-14 01:28:30 +0200 (Mi, 14. Jul 2004) $
+" Last Change:	$Date: 2004-07-14 01:28:30 +0200 (Mi, 14. Jul 2004) $
 " URL:		http://hans.fugal.net/vim/colors/desert.vim
-" Version:	$Id: desert.vim,v 1.1 2004/07/13 23:28:24 korli Exp $
+" Version:	$Id: desert.vim 8393 2004-07-13 23:28:30Z korli $
 
 " cool help screens
 " :he group-name

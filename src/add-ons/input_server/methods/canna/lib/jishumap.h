@@ -22,7 +22,7 @@
 // Modified by T.Murai
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char jishumap_id[] = "@(#) 102.1 $Id$";
+static char jishumap_id[] = "@(#) 102.1 $Id: jishumap.h 14875 2005-11-12 21:25:31Z bonefish $";
 #endif /* lint */
 
 #include "canna.h"

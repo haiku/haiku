@@ -113,7 +113,7 @@
 /*
  * Command Line Option Parsing Code
  *
- * $Id$
+ * $Id: jas_getopt.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JAS_GETOPT_H

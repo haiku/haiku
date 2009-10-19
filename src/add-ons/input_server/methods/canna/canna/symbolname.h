@@ -20,7 +20,7 @@
  * PERFORMANCE OF THIS SOFTWARE. 
  */
 
-/* $Id: symbolname.h,v 1.1 2004/12/23 22:08:39 korli Exp $
+/* $Id: symbolname.h 10527 2004-12-23 22:08:39Z korli $
  */
 
 #define S_HenkanNyuuryokuMode	"henkan-nyuuryoku-mode"

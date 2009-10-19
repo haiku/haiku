@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id$ */
+/* PDFlib GmbH cvsid: $Id: uvcode.h 14574 2005-10-29 16:27:43Z bonefish $ */
 
 /* Version 1.0 generated April 7, 1997 by Greg Ward Larson, SGI */
 #define UV_SQSIZ	(float)0.003500

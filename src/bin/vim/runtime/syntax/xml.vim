@@ -5,7 +5,7 @@
 "		Paul Siegmann <pauls@euronet.nl>
 " Last Change:	Fri, 04 Jun 2004 10:41:54 CEST
 " Filenames:	*.xml
-" $Id: xml.vim,v 1.1 2004/07/13 23:27:57 korli Exp $
+" $Id: xml.vim 8393 2004-07-13 23:28:30Z korli $
 
 " CONFIGURATION:
 "   syntax folding can be turned on by

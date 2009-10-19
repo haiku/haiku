@@ -16,7 +16,7 @@
  */
 
 /*
- * $Id$
+ * $Id: pathnames.h 15570 2005-12-16 22:38:13Z wkornew $
  */
 
 #ifndef _PATH_IRS_CONF

@@ -70,7 +70,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static const char sccsid[] = "@(#)inet_addr.c	8.1 (Berkeley) 6/17/93";
-static const char rcsid[] = "$Id$";
+static const char rcsid[] = "$Id: inet_addr.c 24646 2008-03-29 12:41:04Z bonefish $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "port_before.h"

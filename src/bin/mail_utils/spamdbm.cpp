@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id$
+ * $Id: spamdbm.cpp 30630 2009-05-05 01:31:01Z bga $
  *
  * This is a BeOS program for classifying e-mail messages as spam (unwanted
  * junk mail) or as genuine mail using a Bayesian statistical approach.  There
@@ -1593,7 +1593,7 @@ ostream& PrintUsage (ostream& OutputStream)
   OutputStream << "Copyright © 2002 by Alexander G. M. Smith.  ";
   OutputStream << "Released to the public domain.\n\n";
   WrapTextToStream (OutputStream, "Compiled on " __DATE__ " at " __TIME__
-".  $Id$  $HeadURL$");
+".  $Id: spamdbm.cpp 30630 2009-05-05 01:31:01Z bga $  $HeadURL: http://svn.haiku-os.org/haiku/haiku/trunk/src/bin/mail_utils/spamdbm.cpp $");
   OutputStream << "\n"
 "This is a program for classifying e-mail messages as spam (junk mail which\n"
 "you don't want to read) and regular genuine messages.  It can learn what's\n"
@@ -2520,7 +2520,7 @@ doesn't want their meat product associated with junk e-mail.\n\n"
 uses to extract words from messages.  In particular, HTML is now handled.\n\n"
 
 "Released to the public domain, with no warranty.\n"
-"$Revision$\n"
+"$Revision: 30630 $\n"
 "Compiled on " __DATE__ " at " __TIME__ ".", "Done");
   if (AboutAlertPntr != NULL)
   {
@@ -3625,7 +3625,7 @@ status_t ABSApp::LoadSaveDatabase (bool DoLoad, char *ErrorMessage)
   {
     CurrentTime = time (NULL);
     if (fprintf (DatabaseFile, "%s V1 (word, age, genuine count, spam count)\t"
-    "Written by SpamDBM $Revision$\t"
+    "Written by SpamDBM $Revision: 30630 $\t"
     "Compiled on " __DATE__ " at " __TIME__ "\tThis file saved on %s",
     g_DatabaseRecognitionString, ctime (&CurrentTime)) <= 0)
     {

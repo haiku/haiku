@@ -2,7 +2,7 @@
 " Compiler:     splint/lclint (C source code checker)
 " Maintainer:   Ralf Wildenhues <Ralf.Wildenhues@gmx.de>
 " Splint Home:	http://www.splint.org/
-" Last Change:  $Date: 2004/07/13 23:28:21 $
+" Last Change:  $Date: 2004-07-14 01:28:30 +0200 (Mi, 14. Jul 2004) $
 " $Revision: 1.1 $
 
 if exists("current_compiler")

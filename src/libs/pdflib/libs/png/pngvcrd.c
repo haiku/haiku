@@ -12,7 +12,7 @@
  *
  */
 
-/* $Id$ */
+/* $Id: pngvcrd.c 14574 2005-10-29 16:27:43Z bonefish $ */
 
 #define PNG_INTERNAL
 #include "png.h"

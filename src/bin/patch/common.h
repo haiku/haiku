@@ -1,6 +1,6 @@
 /* common definitions for `patch' */
 
-/* $Id: common.h,v 1.1 2004/06/16 21:22:10 korli Exp $ */
+/* $Id: common.h 8008 2004-06-16 21:22:10Z korli $ */
 
 /* Copyright 1986, 1988 Larry Wall
    Copyright 1990, 1991-1993, 1997-1998, 1999 Free Software Foundation, Inc.

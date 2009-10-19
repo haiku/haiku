@@ -113,7 +113,7 @@
 /*
  * JP2 Library
  *
- * $Id$
+ * $Id: jp2_cod.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JP2_COD_H

@@ -1,5 +1,5 @@
 /*
-	$Id: BlockCacheExerciseTest.h,v 1.1 2003/09/07 11:53:03 bonefish Exp $
+	$Id: BlockCacheExerciseTest.h 4522 2003-09-07 11:53:03Z bonefish $
 	
 	This file defines a class for performing tests on the BBlockCache class.
 	

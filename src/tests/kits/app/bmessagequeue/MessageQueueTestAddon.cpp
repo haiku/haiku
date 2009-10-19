@@ -1,5 +1,5 @@
 /*
-	$Id: MessageQueueTestAddon.cpp,v 1.1 2002/07/09 12:24:56 ejakowatz Exp $
+	$Id: MessageQueueTestAddon.cpp 10 2002-07-09 12:24:59Z ejakowatz $
 	
 	This file declares the addonTestName string and addonTestFunc
 	function for the BMessageQueue tests.  These symbols will be used

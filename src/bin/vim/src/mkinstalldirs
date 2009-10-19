@@ -4,7 +4,7 @@
 # Created: 1993-05-16
 # Public domain
 
-# $Id: mkinstalldirs,v 1.1 2004/06/15 09:02:25 korli Exp $
+# $Id: mkinstalldirs 7958 2004-06-15 09:02:28Z korli $
 
 errstatus=0
 

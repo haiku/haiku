@@ -3,7 +3,7 @@
 " Maintainer:	Johannes Zellner <johannes@zellner.org>
 " Last Change:	Tue, 27 Apr 2004 14:54:59 CEST
 " Filenames:	*.dsl
-" $Id: dsl.vim,v 1.1 2004/07/13 23:27:57 korli Exp $
+" $Id: dsl.vim 8393 2004-07-13 23:28:30Z korli $
 
 if exists("b:current_syntax") | finish | endif
 

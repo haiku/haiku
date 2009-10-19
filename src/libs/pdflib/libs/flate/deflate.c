@@ -47,8 +47,8 @@
  *
  */
 
-/* $Id$ */
-/* @(#) $Id$ */
+/* $Id: deflate.c 14574 2005-10-29 16:27:43Z bonefish $ */
+/* @(#) $Id: deflate.c 14574 2005-10-29 16:27:43Z bonefish $ */
 
 #include "deflate.h"
 

@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id$
+/* $Id: p_hyper.c 14574 2005-10-29 16:27:43Z bonefish $
  *
  * PDFlib routines for hypertext stuff: bookmarks, document info, transitions
  *

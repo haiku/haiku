@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id$
+/* $Id: pc_encoding.c 14574 2005-10-29 16:27:43Z bonefish $
  *
  * PDFlib in-core encodings and basic encoding functions
  *

@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id$ */
+/* PDFlib GmbH cvsid: $Id: png.h 14574 2005-10-29 16:27:43Z bonefish $ */
 
 /* png.h - header file for PNG reference library
  *

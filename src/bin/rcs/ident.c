@@ -106,7 +106,7 @@ static int match P((FILE*));
 static int scanfile P((FILE*,char const*,int));
 static void reportError P((char const*));
 
-mainProg(identId, "ident", "$Id: ident.c,v 1.1 2003/06/11 15:56:09 darkwyrm Exp $")
+mainProg(identId, "ident", "$Id: ident.c 3476 2003-06-11 15:56:10Z darkwyrm $")
 /*  Ident searches the named files for all occurrences
  *  of the pattern $@: text $ where @ is a keyword.
  */

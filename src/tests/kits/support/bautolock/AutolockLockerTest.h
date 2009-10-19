@@ -1,5 +1,5 @@
 /*
-	$Id: AutolockLockerTest.h,v 1.2 2002/07/19 06:45:28 tylerdauwalder Exp $
+	$Id: AutolockLockerTest.h 332 2002-07-19 06:45:28Z tylerdauwalder $
 	
 	This file defines the class for performing all BAutolock tests on a
 	BLocker.

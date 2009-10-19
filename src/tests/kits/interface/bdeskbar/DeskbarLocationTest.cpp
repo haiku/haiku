@@ -1,5 +1,5 @@
 /*
-	$Id: DeskbarLocationTest.cpp,v 1.3 2002/09/28 07:27:00 shatty Exp $
+	$Id: DeskbarLocationTest.cpp 1236 2002-09-28 07:27:00Z shatty $
 	
 	This file implements tests for the following use cases of BDeskbar:
 	  - Frame

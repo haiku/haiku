@@ -1,5 +1,5 @@
 /*
-	$Id: DeskbarAddItemTest.cpp,v 1.2 2002/09/28 07:27:00 shatty Exp $
+	$Id: DeskbarAddItemTest.cpp 1236 2002-09-28 07:27:00Z shatty $
 	
 	This file implements tests for the following use cases of BDeskbar:
 	  - Add Item 1

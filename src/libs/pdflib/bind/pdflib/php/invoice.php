@@ -1,5 +1,5 @@
 <?php
-/* $Id$
+/* $Id: invoice.php 14574 2005-10-29 16:27:43Z bonefish $
  *
  * PDFlib client: invoice example in PHP
  */

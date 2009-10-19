@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[]="@(#) 102.1 $Id$";
+static char rcsid[]="@(#) 102.1 $Id: dic.c 14875 2005-11-12 21:25:31Z bonefish $";
 #endif
 /*LINTLIBRARY*/
 

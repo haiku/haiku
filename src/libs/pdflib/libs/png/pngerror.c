@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id$ */
+/* PDFlib GmbH cvsid: $Id: pngerror.c 14574 2005-10-29 16:27:43Z bonefish $ */
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *

@@ -2,7 +2,7 @@
 " Maintainer:		Jiri Brezina <brzj@seznam.cz>
 " vim:set foldmethod=marker:
 " $Revision: 1.1 $
-" $Date: 2004/07/13 23:28:06 $
+" $Date: 2004-07-14 01:28:30 +0200 (Mi, 14. Jul 2004) $
 
 " Quit when menu translations have already been done.
 if exists("did_menu_trans")

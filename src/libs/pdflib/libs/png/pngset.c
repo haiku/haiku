@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id$ */
+/* PDFlib GmbH cvsid: $Id: pngset.c 14574 2005-10-29 16:27:43Z bonefish $ */
 
 /* pngset.c - storage of image information into info struct
  *

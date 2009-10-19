@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: p_icclib.c 14574 2005-10-29 16:27:43Z bonefish $
  *
  * ICClib routines for PDFlib, slightly modified from the original ICClib.
  * (see below).

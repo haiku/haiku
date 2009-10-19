@@ -41,7 +41,7 @@ badoption(a)
 }
 
 
-mainProg(mergeId, "merge", "$Id: merge.c,v 1.1 2003/06/11 15:56:09 darkwyrm Exp $")
+mainProg(mergeId, "merge", "$Id: merge.c 3476 2003-06-11 15:56:10Z darkwyrm $")
 {
 	register char const *a;
 	char const *arg[3], *label[3], *edarg = 0;

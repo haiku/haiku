@@ -10,7 +10,7 @@
  *  This grammar is only a subset of the real C++ language.
  *
  *  DATE: Thu Aug 15 13:10:06 EDT 1996
- *   $Id: parser.y,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $
+ *   $Id: parser.y 10 2002-07-09 12:24:59Z ejakowatz $
  *
  *  Copyright (c) 1996-1998  Michael John Radwin
  *
@@ -357,7 +357,7 @@ extern int collectMemberInitList();
 /* defined here in parser.y */
 static int error_recovery();
 static int yyerror(char *);
-static const char rcsid[] = "$Id: parser.y,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $";
+static const char rcsid[] = "$Id: parser.y 10 2002-07-09 12:24:59Z ejakowatz $";
 
 /* defined in main.c */
 extern FILE *outfile;

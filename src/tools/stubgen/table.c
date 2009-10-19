@@ -5,7 +5,7 @@
  *  DESC: stubgen symbol table goodies
  *
  *  DATE: 1996/08/14 22:04:47
- *   $Id: table.c,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $
+ *   $Id: table.c 10 2002-07-09 12:24:59Z ejakowatz $
  *
  *  Copyright (c) 1996-1998  Michael John Radwin
  *
@@ -31,7 +31,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-static const char rcsid[] = "$Id: table.c,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $";
+static const char rcsid[] = "$Id: table.c 10 2002-07-09 12:24:59Z ejakowatz $";
 
 /* global table */
 static syntaxelem_t etable[NELEMS];

@@ -111,7 +111,7 @@
 /*
  * Debugging-Related Code
  *
- * $Id$
+ * $Id: jas_debug.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JAS_DEBUG_H

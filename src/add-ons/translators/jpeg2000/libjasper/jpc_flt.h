@@ -113,7 +113,7 @@
 /*
  * Floating-Point Class
  *
- * $Id$
+ * $Id: jpc_flt.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JPC_FLT_H

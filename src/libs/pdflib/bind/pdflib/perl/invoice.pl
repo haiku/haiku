@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id$
+# $Id: invoice.pl 14574 2005-10-29 16:27:43Z bonefish $
 #
 # PDFlib client: invoice generation demo
 #

@@ -1,5 +1,5 @@
 /*
-	$Id: ConcurrencyTest1.cpp,v 1.2 2002/07/18 05:32:00 tylerdauwalder Exp $
+	$Id: ConcurrencyTest1.cpp 301 2002-07-18 05:32:00Z tylerdauwalder $
 	
 	This file implements a test class for testing BLocker functionality.
 	It tests use cases "Locking 1", "Locking 2", "Unlocking", "Is Locked",

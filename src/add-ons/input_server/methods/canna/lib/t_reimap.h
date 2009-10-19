@@ -22,7 +22,7 @@
 // Modified by T.Murai
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char t_reimap_id[] = "@(#) 102.1 $Id$";
+static char t_reimap_id[] = "@(#) 102.1 $Id: t_reimap.h 14875 2005-11-12 21:25:31Z bonefish $";
 #endif	/* lint */
 
 #include "canna.h"

@@ -22,7 +22,7 @@
 // Modified by T.Murai
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char kigomap_id[] = "@(#) 102.1 $Id$";
+static char kigomap_id[] = "@(#) 102.1 $Id: kigomap.h 14875 2005-11-12 21:25:31Z bonefish $";
 #endif /* lint */
 
 #ifdef NO_EXTEND_MENU

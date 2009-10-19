@@ -1,5 +1,5 @@
 /*
-	$Id: AutolockLooperTest.cpp,v 1.2 2002/07/19 06:45:28 tylerdauwalder Exp $
+	$Id: AutolockLooperTest.cpp 332 2002-07-19 06:45:28Z tylerdauwalder $
 	
 	This file tests all use cases of the BAutolock when used with a BLooper.
 	BLocker based tests are done seperately.

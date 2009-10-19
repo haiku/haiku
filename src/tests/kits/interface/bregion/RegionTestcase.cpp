@@ -1,5 +1,5 @@
 /*
-	$Id: RegionTestcase.cpp,v 1.3 2004/05/12 06:37:18 jackburton Exp $
+	$Id: RegionTestcase.cpp 7533 2004-05-12 06:37:18Z jackburton $
 	
 	This file implements a base class for all tests of the OpenBeOS
 	BRegion code.

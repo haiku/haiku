@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id$ */
+/* PDFlib GmbH cvsid: $Id: png.c 14574 2005-10-29 16:27:43Z bonefish $ */
 
 /* png.c - location for general purpose libpng functions
  *

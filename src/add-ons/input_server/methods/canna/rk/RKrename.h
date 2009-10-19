@@ -20,7 +20,7 @@
  * PERFORMANCE OF THIS SOFTWARE. 
  */
 
-/* $Id: RKrename.h,v 1.1 2004/12/23 21:23:50 korli Exp $ */
+/* $Id: RKrename.h 10525 2004-12-23 21:23:50Z korli $ */
 
 #define RkGetProtocolVersion	wRkGetProtocolVersion
 #define RkGetServerName		wRkGetServerName

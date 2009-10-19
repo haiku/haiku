@@ -2,7 +2,7 @@
 #
 # Return information about the local PDFlib installation
 #
-# $Id$
+# $Id: pdflib-config.in 14574 2005-10-29 16:27:43Z bonefish $
 
 # installation directories
 prefix=@prefix@

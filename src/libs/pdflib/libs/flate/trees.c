@@ -29,8 +29,8 @@
  *          Addison-Wesley, 1983. ISBN 0-201-06672-6.
  */
 
-/* $Id$ */
-/* @(#) $Id$ */
+/* $Id: trees.c 14574 2005-10-29 16:27:43Z bonefish $ */
+/* @(#) $Id: trees.c 14574 2005-10-29 16:27:43Z bonefish $ */
 
 /* #define GEN_TREES_H */
 

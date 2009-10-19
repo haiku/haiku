@@ -1,5 +1,5 @@
 /*
-	$Id: ConcurrencyTest2.cpp,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
+	$Id: ConcurrencyTest2.cpp 383 2002-07-22 09:28:00Z tylerdauwalder $
 	
 	This file implements a test class for testing BMessageQueue functionality.
 	It tests use cases Destruction, Add Message 3, Remove Message 2,

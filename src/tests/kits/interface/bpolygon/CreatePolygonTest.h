@@ -1,5 +1,5 @@
 /*
-	$Id: CreatePolygonTest.h,v 1.1 2002/11/23 04:42:57 jrand Exp $
+	$Id: CreatePolygonTest.h 2067 2002-11-23 04:42:57Z jrand $
 	
 	This file contains the definition of a class for testing the
 	creation of BPolygon objects through a few different methods.

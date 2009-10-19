@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: invoice.c 14574 2005-10-29 16:27:43Z bonefish $
  *
  * PDFlib/PDI client: invoice generation demo
  */

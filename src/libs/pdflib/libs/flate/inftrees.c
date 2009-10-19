@@ -2,7 +2,7 @@
  * Copyright (C) 1995-2002 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h 
  */
-/* $Id$ */
+/* $Id: inftrees.c 14574 2005-10-29 16:27:43Z bonefish $ */
 
 #include "zutil.h"
 #include "inftrees.h"

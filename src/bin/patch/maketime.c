@@ -64,7 +64,7 @@
 #include <maketime.h>
 
 char const maket_id[] =
-  "$Id: maketime.c,v 1.1 2004/06/16 21:22:10 korli Exp $";
+  "$Id: maketime.c 8008 2004-06-16 21:22:10Z korli $";
 
 static int isleap P ((int));
 static int month_days P ((struct tm const *));

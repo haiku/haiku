@@ -113,7 +113,7 @@
 /*
  * JPEG-2000 Decoder
  *
- * $Id$
+ * $Id: jpc_dec.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JPC_DEC_H

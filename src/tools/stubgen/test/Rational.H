@@ -3,7 +3,7 @@
  *    ACCT: mradwin
  *    FILE: Rational.H
  *    DATE: Sat Mar  4 01:47:16 EST 1995
- *     $Id: Rational.H,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $
+ *     $Id: Rational.H 10 2002-07-09 12:24:59Z ejakowatz $
  ****************************************************************/
 
 class Rational {

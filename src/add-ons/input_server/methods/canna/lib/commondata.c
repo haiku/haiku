@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "@(#) 102.1 $Id: commondata.c,v 1.1 2004/12/23 21:23:49 korli Exp $";
+static char rcs_id[] = "@(#) 102.1 $Id: commondata.c 10525 2004-12-23 21:23:50Z korli $";
 #endif /* lint */
 
 #include "canna.h"

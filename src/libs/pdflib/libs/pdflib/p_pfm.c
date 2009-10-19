@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id$
+/* $Id: p_pfm.c 14574 2005-10-29 16:27:43Z bonefish $
  *
  * PDFlib routines for fast reading of PFM font metrics files
  *

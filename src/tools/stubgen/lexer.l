@@ -9,7 +9,7 @@
  *  (ftp://ftp.uu.net/usenet/net.sources/ansi.c.grammar.Z)
  *
  *  DATE: Thu Aug 15 13:10:06 EDT 1996
- *   $Id: lexer.l,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $
+ *   $Id: lexer.l 10 2002-07-09 12:24:59Z ejakowatz $
  *
  *  Copyright (c) 1996-1998  Michael John Radwin
  *
@@ -194,7 +194,7 @@ IS			(u|U|l|L)*
    the value as a pointer */
 #define RETURN_VAL(x) tokens_seen++; yylval.flag = 37; return(x)
 
-static const char rcsid[] = "$Id: lexer.l,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $";
+static const char rcsid[] = "$Id: lexer.l 10 2002-07-09 12:24:59Z ejakowatz $";
 
 static void count();
 static void comment();

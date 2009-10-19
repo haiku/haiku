@@ -4,7 +4,7 @@
 //     DESCR: Debug log file utility functions
 //
 
-static char rcsid[] = "$Id: Debug.C,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $";
+static char rcsid[] = "$Id: Debug.C 10 2002-07-09 12:24:59Z ejakowatz $";
 
 #include "Debug.H"
 

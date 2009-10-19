@@ -5,7 +5,7 @@
  *  DESC: stubgen symbol table goodies
  *
  *  DATE: 1996/08/14 22:04:47
- *   $Id: table.h,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $
+ *   $Id: table.h 10 2002-07-09 12:24:59Z ejakowatz $
  *
  *  Copyright (c) 1996-1998  Michael John Radwin
  *

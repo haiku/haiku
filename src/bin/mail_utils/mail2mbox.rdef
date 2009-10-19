@@ -1,5 +1,5 @@
 /* Resources for the bemailtombox program, mostly for the icon.
-   $Id$ */
+   $Id: mail2mbox.rdef 33194 2009-09-19 20:59:04Z kirilla $ */
 
 resource app_flags B_SINGLE_LAUNCH | B_ARGV_ONLY;
 
@@ -11,8 +11,8 @@ resource app_version {
 	minor  = 0,
 	variety = B_APPV_FINAL,
 	internal = 1,
-	short_info = "BeMailToMbox $Rev$",
-	long_info = "BeMailToMbox - BeMail to Unix mailbox file converter.  $Id$"
+	short_info = "BeMailToMbox $Rev: 33194 $",
+	long_info = "BeMailToMbox - BeMail to Unix mailbox file converter.  $Id: mail2mbox.rdef 33194 2009-09-19 20:59:04Z kirilla $"
 };
 
 resource large_icon array {

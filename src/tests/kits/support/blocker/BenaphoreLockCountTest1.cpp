@@ -1,5 +1,5 @@
 /*
-	$Id: BenaphoreLockCountTest1.cpp,v 1.3 2002/07/18 05:32:00 tylerdauwalder Exp $
+	$Id: BenaphoreLockCountTest1.cpp 301 2002-07-18 05:32:00Z tylerdauwalder $
 	
 	This file implements a test class for testing BLocker functionality.
 	It tests use cases "Count Lock Requests" for a benaphore style BLocker.

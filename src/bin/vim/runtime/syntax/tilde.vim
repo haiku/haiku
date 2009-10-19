@@ -3,7 +3,7 @@
 " Language:	Tilde
 " Maintainer:	Tobias Rundström <tobi@tildesoftware.net>
 " URL:		http://www.tildesoftware.net
-" CVS:		$Id: tilde.vim,v 1.1 2004/07/13 23:27:57 korli Exp $
+" CVS:		$Id: tilde.vim 8393 2004-07-13 23:28:30Z korli $
 
 if exists("b:current_syntax")
   finish

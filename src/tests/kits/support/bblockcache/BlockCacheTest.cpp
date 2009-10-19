@@ -1,5 +1,5 @@
 /*
-	$Id: BlockCacheTest.cpp,v 1.1 2003/09/07 11:53:03 bonefish Exp $
+	$Id: BlockCacheTest.cpp 4522 2003-09-07 11:53:03Z bonefish $
 */
 	
 	

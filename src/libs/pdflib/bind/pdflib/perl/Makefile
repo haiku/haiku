@@ -1,5 +1,5 @@
 # Makefile for PDFlib's Perl binding
-# $Id$
+# $Id: Makefile 14574 2005-10-29 16:27:43Z bonefish $
 
 top_builddir	= ../../..
 

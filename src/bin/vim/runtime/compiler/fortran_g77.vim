@@ -1,7 +1,7 @@
 " Vim compiler file
 " Compiler:     g77 (GNU Fortran)
 " Maintainer:   Ralf Wildenhues <Ralf.Wildenhues@gmx.de>
-" Last Change:  $Date: 2004/07/13 23:28:22 $
+" Last Change:  $Date: 2004-07-14 01:28:30 +0200 (Mi, 14. Jul 2004) $
 " $Revision: 1.1 $
 
 if exists("current_compiler")

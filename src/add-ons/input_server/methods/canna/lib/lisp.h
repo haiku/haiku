@@ -20,7 +20,7 @@
  * PERFORMANCE OF THIS SOFTWARE. 
  */
 
-/* $Id: lisp.h,v 1.1 2004/12/23 21:23:49 korli Exp $ */
+/* $Id: lisp.h 10525 2004-12-23 21:23:50Z korli $ */
 
 #include "canna.h"
 

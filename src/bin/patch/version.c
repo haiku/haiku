@@ -1,6 +1,6 @@
 /* Print the version number.  */
 
-/* $Id: version.c,v 1.1 2004/06/16 21:22:10 korli Exp $ */
+/* $Id: version.c 8008 2004-06-16 21:22:10Z korli $ */
 
 #define XTERN extern
 #include <common.h>

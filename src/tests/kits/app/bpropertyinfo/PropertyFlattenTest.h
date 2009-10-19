@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyFlattenTest.h,v 1.3 2002/09/28 00:19:49 shatty Exp $
+	$Id: PropertyFlattenTest.h 1218 2002-09-28 00:19:49Z shatty $
 	
 	This file defines a class for performing one test of BPropertyInfo
 	functionality.

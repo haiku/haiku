@@ -1,5 +1,5 @@
 /*
-	$Id: ConstructionTest1.cpp,v 1.2 2002/07/18 05:32:00 tylerdauwalder Exp $
+	$Id: ConstructionTest1.cpp 301 2002-07-18 05:32:00Z tylerdauwalder $
 	
 	This file implements a test class for testing BLocker construction
 	functionality.  It checks the "Construction 1", "Construction 2" and

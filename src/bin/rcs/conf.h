@@ -1,6 +1,6 @@
 /* RCS compile-time configuration */
 
-	/* $Id$ */
+	/* $Id: conf.h 28305 2008-10-23 21:46:26Z bonefish $ */
 
 /*
  * This file is generated automatically.

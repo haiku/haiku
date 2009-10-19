@@ -113,7 +113,7 @@
 /*
  * Memory Allocator
  *
- * $Id$
+ * $Id: jas_malloc.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JAS_MALLOC_H

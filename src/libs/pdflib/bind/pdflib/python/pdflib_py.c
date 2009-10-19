@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id$
+/* $Id: pdflib_py.c 14574 2005-10-29 16:27:43Z bonefish $
  *
  * Wrapper code for the PDFlib Python binding
  *

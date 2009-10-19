@@ -181,7 +181,7 @@ Report problems and direct all questions to:
 
 #include "rcsbase.h"
 
-libId(fnmsId, "$Id: rcsfnms.c,v 1.1 2003/06/11 15:56:09 darkwyrm Exp $")
+libId(fnmsId, "$Id: rcsfnms.c 3476 2003-06-11 15:56:10Z darkwyrm $")
 
 static char const *bindex P((char const*,int));
 static int fin2open P((char const*, size_t, char const*, size_t, char const*, size_t, RILE*(*)P((struct buf*,struct stat*,int)), int));

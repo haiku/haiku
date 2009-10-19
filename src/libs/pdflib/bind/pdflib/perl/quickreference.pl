@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id$
+# $Id: quickreference.pl 14574 2005-10-29 16:27:43Z bonefish $
 #
 # PDFlib/PDI client: mini imposition demo
 #

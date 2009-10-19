@@ -1,5 +1,5 @@
 # Template to be included from every makefile that handles subdirs
-# $Id$
+# $Id: mksubdirs.inc.in 14574 2005-10-29 16:27:43Z bonefish $
 #
 #
 # The Makefile that uses this template has to set

@@ -20,7 +20,7 @@
  * PERFORMANCE OF THIS SOFTWARE. 
  */
 
-/* $Id: patchlevel.h,v 1.1 2004/12/23 22:08:39 korli Exp $ */
+/* $Id: patchlevel.h 10527 2004-12-23 22:08:39Z korli $ */
 
 #define CANNA_MAJOR_MINOR 3005
 #define CANNA_PATCH_LEVEL " beta 2"

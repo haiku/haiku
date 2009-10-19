@@ -11,7 +11,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* $Id: crc32.c,v 1.1 2002/09/21 14:54:45 darkwyrm Exp $ */
+/* $Id: crc32.c 1101 2002-09-21 14:54:45Z darkwyrm $ */
 
 #define __CRC32_C       /* identifies this source module */
 

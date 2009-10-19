@@ -1,7 +1,7 @@
 #ifndef AGMS_BAYESIAN_SPAM_FILTER_H
 #define AGMS_BAYESIAN_SPAM_FILTER_H
 /******************************************************************************
- * $Id$
+ * $Id: SpamFilter.h 13952 2005-08-13 19:31:42Z agmsmith $
  *
  * SpamFilter - Uses Bayesian statistics to evaluate the spaminess of a
  * message.  The evaluation is done by a separate server, this add-on just gets

@@ -26,7 +26,7 @@
 
 
 /*
-static char rcsid[]="$Id: ncache.c,v 1.1 2004/12/23 21:23:50 korli Exp $";
+static char rcsid[]="$Id: ncache.c 10525 2004-12-23 21:23:50Z korli $";
 */
 #include "canna.h"
 #include "RK.h"

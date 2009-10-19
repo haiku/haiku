@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: random psychoacoustics (not including preecho)
- last mod: $Id: psy.h,v 1.1 2003/12/13 20:17:56 shatty Exp $
+ last mod: $Id: psy.h 5664 2003-12-13 20:17:56Z shatty $
 
  ********************************************************************/
 

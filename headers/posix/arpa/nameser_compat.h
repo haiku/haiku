@@ -32,7 +32,7 @@
 
 /*
  *      from nameser.h	8.1 (Berkeley) 6/2/93
- *	$Id$
+ *	$Id: nameser_compat.h 24644 2008-03-29 12:37:05Z bonefish $
  */
 
 #ifndef _ARPA_NAMESER_COMPAT_

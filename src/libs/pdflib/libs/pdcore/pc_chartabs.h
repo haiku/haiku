@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id$
+/* $Id: pc_chartabs.h 14574 2005-10-29 16:27:43Z bonefish $
  *
  * This file contains all Adobe Glyph Names and Unicode tables.
  *

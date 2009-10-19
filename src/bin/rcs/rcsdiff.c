@@ -155,7 +155,7 @@ static int exitstatus;
 static RILE *workptr;
 static struct stat workstat;
 
-mainProg(rcsdiffId, "rcsdiff", "$Id: rcsdiff.c,v 1.1 2003/06/11 15:56:09 darkwyrm Exp $")
+mainProg(rcsdiffId, "rcsdiff", "$Id: rcsdiff.c 3476 2003-06-11 15:56:10Z darkwyrm $")
 {
     static char const cmdusage[] =
 	    "\nrcsdiff usage: rcsdiff -ksubst -q -rrev1 [-rrev2] -Vn -xsuff -zzone [diff options] file ...";

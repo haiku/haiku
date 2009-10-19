@@ -19,7 +19,7 @@
  */
 
 /*
- * $Id$
+ * $Id: ctl.h 15585 2005-12-19 13:26:54Z wkornew $
  */
 
 #include <sys/types.h>

@@ -1,5 +1,5 @@
 /*
-	$Id: FindMessageTest1.cpp,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
+	$Id: FindMessageTest1.cpp 383 2002-07-22 09:28:00Z tylerdauwalder $
 	
 	This file implements the second test for the OpenBeOS BMessageQueue code.
 	It tests the Add Message 1 and Find Message 2 use cases.  It does so by

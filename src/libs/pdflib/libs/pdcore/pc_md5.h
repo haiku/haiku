@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: pc_md5.h 14574 2005-10-29 16:27:43Z bonefish $
  *
  * Header file for the PDFlib MD5 message digest routines
  *

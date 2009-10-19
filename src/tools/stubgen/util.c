@@ -5,7 +5,7 @@
  *  DESC: stubgen utility macros and funcs
  *
  *  DATE: Wed Sep 11 23:31:55 EDT 1996
- *   $Id: util.c,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $
+ *   $Id: util.c 10 2002-07-09 12:24:59Z ejakowatz $
  *
  *  Copyright (c) 1996-1998  Michael John Radwin
  *
@@ -30,7 +30,7 @@
 #include <assert.h>
 #include "util.h"
 
-static const char rcsid[] = "$Id: util.c,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $";
+static const char rcsid[] = "$Id: util.c 10 2002-07-09 12:24:59Z ejakowatz $";
 
 #ifdef SGDEBUG
 static FILE *logfile;

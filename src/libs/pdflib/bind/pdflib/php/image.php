@@ -1,5 +1,5 @@
 <?php
-# $Id$
+# $Id: image.php 14574 2005-10-29 16:27:43Z bonefish $
 
 /* This is where font/image/PDF input files live. Adjust as necessary. */ 
 $searchpath = "../data"; 

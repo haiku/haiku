@@ -17,7 +17,7 @@
    +----------------------------------------------------------------------+
 */
 
-/* $Id$ */
+/* $Id: pdf.c 14574 2005-10-29 16:27:43Z bonefish $ */
 
 /* Bootstrap of PDFlib Feature setup */
 #define PDF_FEATURE_SERIAL

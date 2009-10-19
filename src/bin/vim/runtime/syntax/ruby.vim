@@ -5,7 +5,7 @@
 " Last Change:		2003 May 31
 " URL:			http://mugca.its.monash.edu.au/~djkea2/vim/syntax/ruby.vim
 
-" $Id: ruby.vim,v 1.1 2004/07/13 23:28:00 korli Exp $
+" $Id: ruby.vim 8393 2004-07-13 23:28:30Z korli $
 
 " Thanks to perl.vim authors, and to Reimer Behrends. :-) (MN)
 

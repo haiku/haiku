@@ -1894,7 +1894,7 @@
 	maint: improve release-related process and documentation
 	* README-release: Fix typo. it's "maintainer-clean".
 	Refer to HACKING for full list of dependencies.
-	Use cvs add's -ko option to inhibit $Id$-style keyword expansion.
+	Use cvs add's -ko option to inhibit $Id: ChangeLog 32796 2009-08-28 22:30:24Z korli $-style keyword expansion.
 	* maint.mk (web-manual): Factor out definition of $(manual_title).
 	(vc-dist): Set XZ_OPT=-9ev for the final "make dist".
 	* cfg.mk (manual_title): Define it here.

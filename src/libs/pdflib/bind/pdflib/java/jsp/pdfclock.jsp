@@ -3,7 +3,7 @@
 		java.text.*,
 		java.util.*,
 		com.pdflib.pdflib" %><%
-    /* $Id$
+    /* $Id: pdfclock.jsp 14574 2005-10-29 16:27:43Z bonefish $
      *
      * PDFclock.jsp
      */

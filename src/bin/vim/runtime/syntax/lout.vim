@@ -4,7 +4,7 @@
 " Last Change: Son 22 Jun 2003 20:43:26 CEST
 " Filenames:   *.lout,*.lt
 " URL:			http://www.cvjb.de/comp/vim/lout.vim
-" $Id: lout.vim,v 1.1 2004/07/13 23:27:57 korli Exp $
+" $Id: lout.vim 8393 2004-07-13 23:28:30Z korli $
 "
 " Lout: Basser Lout document formatting system.
 

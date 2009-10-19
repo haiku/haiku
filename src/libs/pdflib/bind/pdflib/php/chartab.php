@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id$
+ * $Id: chartab.php 14574 2005-10-29 16:27:43Z bonefish $
  * PDFlib client: chartab example in PHP
  */
 

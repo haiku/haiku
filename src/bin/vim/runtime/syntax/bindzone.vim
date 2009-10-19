@@ -4,7 +4,7 @@
 " Last change:	Thu Apr 26 02:16:18 SAMST 2001
 " Filenames:	/var/named/*
 " URL:	http://rnd.web-drive.ru/vim/syntax/bindzone.vim
-" $Id: bindzone.vim,v 1.1 2004/07/13 23:27:57 korli Exp $
+" $Id: bindzone.vim 8393 2004-07-13 23:28:30Z korli $
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded

@@ -1,6 +1,6 @@
 /* RCS common definitions and data structures */
 
-#define RCSBASE "$Id: rcsbase.h,v 1.1 2003/06/11 15:56:09 darkwyrm Exp $"
+#define RCSBASE "$Id: rcsbase.h 3476 2003-06-11 15:56:10Z darkwyrm $"
 
 /* Copyright 1982, 1988, 1989 Walter Tichy
    Copyright 1990, 1991, 1992, 1993, 1994, 1995 Paul Eggert

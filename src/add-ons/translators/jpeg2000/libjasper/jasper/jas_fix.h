@@ -113,7 +113,7 @@
 /*
  * Fixed-Point Number Class
  *
- * $Id$
+ * $Id: jas_fix.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JAS_FIX_H

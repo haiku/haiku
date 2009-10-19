@@ -4,7 +4,7 @@
 " Last change:	Mon May 21 04:51:01 SAMST 2001
 " Filenames:	named.conf
 " URL:	http://rnd.web-drive.ru/vim/syntax/named.vim
-" $Id: named.vim,v 1.1 2004/07/13 23:27:57 korli Exp $
+" $Id: named.vim 8393 2004-07-13 23:28:30Z korli $
 "
 " NOTE
 "    it was not widely tested, i just tried it on my simple

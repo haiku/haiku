@@ -4,7 +4,7 @@
 "		Author and previous maintainer:
 "		Gautam H. Mudunuri <gmudunur@informatica.com>
 " Last Change:	Tue, 27 Apr 2004 14:54:59 CEST
-" $Id: xdefaults.vim,v 1.1 2004/07/13 23:27:59 korli Exp $
+" $Id: xdefaults.vim 8393 2004-07-13 23:28:30Z korli $
 "
 " REFERENCES:
 "   xrdb manual page

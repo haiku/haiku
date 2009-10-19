@@ -25,7 +25,7 @@
 /************************************************************************/
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char m_s_map_id[] = "@(#) 102.1 $Id$";
+static char m_s_map_id[] = "@(#) 102.1 $Id: multi.c 14875 2005-11-12 21:25:31Z bonefish $";
 #endif /* lint */
 
 #include "canna.h"

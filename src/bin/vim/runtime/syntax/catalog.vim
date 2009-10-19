@@ -3,7 +3,7 @@
 " Maintainer:	Johannes Zellner <johannes@zellner.org>
 " Last Change:	Tue, 27 Apr 2004 14:54:59 CEST
 " Filenames:	/etc/sgml.catalog
-" $Id: catalog.vim,v 1.1 2004/07/13 23:27:57 korli Exp $
+" $Id: catalog.vim 8393 2004-07-13 23:28:30Z korli $
 
 " Quit when a syntax file was already loaded
 if exists("b:current_syntax")

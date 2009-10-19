@@ -16,7 +16,7 @@
  */
 
 /*
- * $Id$
+ * $Id: misc.h 15585 2005-12-19 13:26:54Z wkornew $
  */
 
 #ifndef _ISC_MISC_H

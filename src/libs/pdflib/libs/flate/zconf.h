@@ -4,9 +4,9 @@
  */
 
 
-/* $Id$ */
+/* $Id: zconf.h 20092 2007-02-07 08:00:01Z axeld $ */
 
-/* @(#) $Id$ */
+/* @(#) $Id: zconf.h 20092 2007-02-07 08:00:01Z axeld $ */
 
 #ifndef _ZCONF_H
 #define _ZCONF_H

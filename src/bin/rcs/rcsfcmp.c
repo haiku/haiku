@@ -122,7 +122,7 @@ Report problems and direct all questions to:
 
 #include  "rcsbase.h"
 
-libId(fcmpId, "$Id: rcsfcmp.c,v 1.1 2003/06/11 15:56:09 darkwyrm Exp $")
+libId(fcmpId, "$Id: rcsfcmp.c 3476 2003-06-11 15:56:10Z darkwyrm $")
 
 	static int discardkeyval P((int,RILE*));
 	static int

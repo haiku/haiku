@@ -1,5 +1,5 @@
 /*
-	$Id: ConcurrencyTest1.h,v 1.2 2002/07/18 05:32:00 tylerdauwalder Exp $
+	$Id: ConcurrencyTest1.h 301 2002-07-18 05:32:00Z tylerdauwalder $
 	
 	This file defines a class for performing one test of BLocker
 	functionality.

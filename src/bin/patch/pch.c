@@ -1,6 +1,6 @@
 /* reading patches */
 
-/* $Id: pch.c,v 1.1 2004/06/16 21:22:10 korli Exp $ */
+/* $Id: pch.c 8008 2004-06-16 21:22:10Z korli $ */
 
 /* Copyright 1986, 1987, 1988 Larry Wall
    Copyright 1990, 1991-1993, 1997-1998, 1999 Free Software Foundation, Inc.

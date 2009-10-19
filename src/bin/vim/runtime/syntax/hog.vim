@@ -1,7 +1,7 @@
 " Snort syntax file
 " Language:	  Snort Configuration File (see: http://www.snort.org)
 " Maintainer:	  Phil Wood, cornett@arpa.net
-" Last Change:	  $Date: 2004/07/13 23:27:58 $
+" Last Change:	  $Date: 2004-07-14 01:28:30 +0200 (Mi, 14. Jul 2004) $
 " Filenames:	  *.hog *.rules snort.conf vision.conf
 " URL:		  http://home.lanl.gov/cpw/vim/syntax/hog.vim
 " Snort Version:  1.8 By Martin Roesch (roesch@clark.net, www.snort.org)

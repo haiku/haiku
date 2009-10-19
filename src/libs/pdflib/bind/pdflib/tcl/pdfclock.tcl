@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id$
+# $Id: pdfclock.tcl 14574 2005-10-29 16:27:43Z bonefish $
 #
 # PDFlib client: pdfclock example in Tcl
 #

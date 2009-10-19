@@ -113,7 +113,7 @@
 /*
  * Primitive Types
  *
- * $Id$
+ * $Id: jas_types.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JAS_TYPES_H

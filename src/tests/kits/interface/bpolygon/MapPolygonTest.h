@@ -1,5 +1,5 @@
 /*
-	$Id: MapPolygonTest.h,v 1.1 2002/12/03 04:07:21 jrand Exp $
+	$Id: MapPolygonTest.h 2136 2002-12-03 04:07:21Z jrand $
 	
 	This file contains the definition of a class for testing the
 	mapping of BPolygon objects.

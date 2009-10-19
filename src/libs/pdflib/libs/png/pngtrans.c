@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id$ */
+/* PDFlib GmbH cvsid: $Id: pngtrans.c 14574 2005-10-29 16:27:43Z bonefish $ */
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *

@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:	Microsoft Module-Definition (.def) File
 " Maintainer:	Rob Brady <robb@datatone.com>
-" Last Change:	$Date: 2004/07/13 23:27:57 $
+" Last Change:	$Date: 2004-07-14 01:28:30 +0200 (Mi, 14. Jul 2004) $
 " URL: http://www.datatone.com/~robb/vim/syntax/def.vim
 " $Revision: 1.1 $
 

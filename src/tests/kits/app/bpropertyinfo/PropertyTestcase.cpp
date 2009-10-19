@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyTestcase.cpp,v 1.4 2004/11/21 20:59:09 shatty Exp $
+	$Id: PropertyTestcase.cpp 10130 2004-11-21 21:03:29Z shatty $
 	
 	This file implements the first test for the OpenBeOS BPropertyInfo code.
 	It tests the Construction use cases.  It does so by doing the following:

@@ -1,6 +1,6 @@
 /* utility functions for `patch' */
 
-/* $Id: util.c,v 1.1 2004/06/16 21:22:10 korli Exp $ */
+/* $Id: util.c 8008 2004-06-16 21:22:10Z korli $ */
 
 /* Copyright 1986 Larry Wall
    Copyright 1992, 1993, 1997-1998, 1999 Free Software Foundation, Inc.

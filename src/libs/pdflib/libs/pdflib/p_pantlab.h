@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id$
+/* $Id: p_pantlab.h 14574 2005-10-29 16:27:43Z bonefish $
  *
  * PDFlib PANTONE spot LAB color table derived from
  * PANTONE MATCHING SYSTEM

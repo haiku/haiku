@@ -33,7 +33,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static const char sccsid[] = "@(#)inet_ntoa.c	8.1 (Berkeley) 6/4/93";
-static const char rcsid[] = "$Id$";
+static const char rcsid[] = "$Id: inet_ntoa.c 18891 2006-09-19 16:17:02Z korli $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "port_before.h"

@@ -16,7 +16,7 @@
  */
 
 /*
- * $Id$
+ * $Id: irp_p.h 15570 2005-12-16 22:38:13Z wkornew $
  */
 
 #ifndef _IRP_P_H_INCLUDED

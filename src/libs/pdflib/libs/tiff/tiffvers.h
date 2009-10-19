@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id$ */
+/* PDFlib GmbH cvsid: $Id: tiffvers.h 14574 2005-10-29 16:27:43Z bonefish $ */
 
 #define TIFFLIB_VERSION_STR "LIBTIFF, Version 3.5.7\n\
 Copyright (c) 1988-1996 Sam Leffler\n\

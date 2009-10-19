@@ -16,7 +16,7 @@
  */
 
 /*
- *	$Id$
+ *	$Id: res_update.h 15585 2005-12-19 13:26:54Z wkornew $
  */
 
 #ifndef __RES_UPDATE_H

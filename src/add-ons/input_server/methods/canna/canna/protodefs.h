@@ -20,7 +20,7 @@
  * PERFORMANCE OF THIS SOFTWARE. 
  */
 
-/* $Id: protodefs.h,v 1.1 2004/12/23 22:08:39 korli Exp $ */
+/* $Id: protodefs.h 10527 2004-12-23 22:08:39Z korli $ */
 
 #define canna_version(majv, minv) ((majv) * 1024 + (minv))
 

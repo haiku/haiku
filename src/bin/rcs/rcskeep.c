@@ -102,7 +102,7 @@ Report problems and direct all questions to:
 
 #include  "rcsbase.h"
 
-libId(keepId, "$Id: rcskeep.c,v 1.1 2003/06/11 15:56:10 darkwyrm Exp $")
+libId(keepId, "$Id: rcskeep.c 3476 2003-06-11 15:56:10Z darkwyrm $")
 
 static int badly_terminated P((void));
 static int checknum P((char const*));

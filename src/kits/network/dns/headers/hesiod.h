@@ -20,7 +20,7 @@
  */
 
 /*
- * $Id$
+ * $Id: hesiod.h 17965 2006-06-29 17:45:22Z axeld $
  */
 
 #ifndef _HESIOD_H_INCLUDED

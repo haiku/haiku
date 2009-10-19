@@ -113,7 +113,7 @@
 /*
  * Tier 1 Decoder
  *
- * $Id$
+ * $Id: jpc_t1dec.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JPC_T1DEC_H

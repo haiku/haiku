@@ -6,7 +6,7 @@
  *        by the gnu dirutils.
  *
  *  DATE: Tue Oct  1 20:48:28 EDT 1996
- *   $Id: pathname.c,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $
+ *   $Id: pathname.c 10 2002-07-09 12:24:59Z ejakowatz $
  *
  *  Copyright (c) 1996-1998  Michael John Radwin
  *
@@ -35,7 +35,7 @@
 #define PATH_SEPARATOR_CHAR '/'
 #endif
 
-static const char rcsid[] = "$Id: pathname.c,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $";
+static const char rcsid[] = "$Id: pathname.c 10 2002-07-09 12:24:59Z ejakowatz $";
 
 static void
 strip_trailing_slashes(char *path)

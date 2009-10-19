@@ -28,7 +28,7 @@ Report problems and direct all questions to:
 
 #include "rcsbase.h"
 
-libId(mergerId, "$Id: merger.c,v 1.1 2003/06/11 15:56:09 darkwyrm Exp $")
+libId(mergerId, "$Id: merger.c 3476 2003-06-11 15:56:10Z darkwyrm $")
 
 	static char const *normalize_arg P((char const*,char**));
 	static char const *

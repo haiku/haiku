@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id$
+# $Id: chartab.tcl 14574 2005-10-29 16:27:43Z bonefish $
 #
 # PDFlib client: character table example in Tcl
 #

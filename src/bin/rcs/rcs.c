@@ -279,7 +279,7 @@ static struct delrevpair delrev;
 static struct hshentry *cuthead, *cuttail, *delstrt;
 static struct hshentries *gendeltas;
 
-mainProg(rcsId, "rcs", "$Id: rcs.c,v 1.1 2003/06/11 15:56:09 darkwyrm Exp $")
+mainProg(rcsId, "rcs", "$Id: rcs.c 3476 2003-06-11 15:56:10Z darkwyrm $")
 {
 	static char const cmdusage[] =
 		"\nrcs usage: rcs -{ae}logins -Afile -{blu}[rev] -cstring -{iILqTU} -ksubst -mrev:msg -{nN}name[:[rev]] -orange -sstate[:rev] -t[text] -Vn -xsuff -zzone file ...";

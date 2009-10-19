@@ -1,5 +1,5 @@
 /*
-	$Id: DestructionTest2.cpp,v 1.2 2002/07/18 05:32:00 tylerdauwalder Exp $
+	$Id: DestructionTest2.cpp 301 2002-07-18 05:32:00Z tylerdauwalder $
 	
 	This file implements a test class for testing BLocker functionality.
 	It tests use cases "Destruction" and "Locking 4".

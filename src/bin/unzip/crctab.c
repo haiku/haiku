@@ -11,7 +11,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* $Id: crctab.c,v 1.1 2002/09/21 14:54:45 darkwyrm Exp $ */
+/* $Id: crctab.c 1101 2002-09-21 14:54:45Z darkwyrm $ */
 
 /*
   Generate a table for a byte-wise 32-bit CRC calculation on the polynomial:

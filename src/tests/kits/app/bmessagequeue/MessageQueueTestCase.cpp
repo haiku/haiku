@@ -1,5 +1,5 @@
 /*
-	$Id: MessageQueueTestCase.cpp,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
+	$Id: MessageQueueTestCase.cpp 383 2002-07-22 09:28:00Z tylerdauwalder $
 	
 	This file implements a base class for testing BMessageQueue functionality.
 	

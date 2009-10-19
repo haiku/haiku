@@ -20,7 +20,7 @@
  * PERFORMANCE OF THIS SOFTWARE. 
  */
 
-/* $Id: RK.h,v 1.1 2004/12/23 22:08:39 korli Exp $ */
+/* $Id: RK.h 10527 2004-12-23 22:08:39Z korli $ */
 
 /************************************************************************/
 /* THIS SOURCE CODE IS MODIFIED FOR TKO BY T.MURAI 1997

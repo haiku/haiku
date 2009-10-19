@@ -1,4 +1,4 @@
-// $Id$
+// $Id: pdfclock.cpp 14574 2005-10-29 16:27:43Z bonefish $
 // A little PDFlib application to draw an analog clock.
 //
 //

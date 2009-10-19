@@ -113,7 +113,7 @@
 /*
  * Quadrature Mirror-Image Filter Bank (QMFB) Library
  *
- * $Id$
+ * $Id: jpc_qmfb.c 14449 2005-10-20 12:15:56Z stippi $
  */
 
 /******************************************************************************\

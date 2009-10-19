@@ -9,7 +9,7 @@
  */
 
 
-/* $Id$ */
+/* $Id: infutil.h 14574 2005-10-29 16:27:43Z bonefish $ */
 
 #ifndef _INFUTIL_H
 #define _INFUTIL_H

@@ -1,6 +1,6 @@
 /* example RCS compile-time configuration */
 
-	/* $Id$ */
+	/* $Id: conf.heg 28305 2008-10-23 21:46:26Z bonefish $ */
 
 /*
  * This example RCS compile-time configuration describes a host that conforms

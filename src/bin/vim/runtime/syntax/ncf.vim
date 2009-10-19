@@ -2,7 +2,7 @@
 " Language:     Novell "NCF" Batch File
 " Maintainer:   Jonathan J. Miner <miner@doit.wisc.edu>
 " Last Change:	Tue, 04 Sep 2001 16:20:33 CDT
-" $Id: ncf.vim,v 1.1 2004/07/13 23:27:57 korli Exp $
+" $Id: ncf.vim 8393 2004-07-13 23:28:30Z korli $
 
 " Remove any old syntax stuff hanging around
 if version < 600

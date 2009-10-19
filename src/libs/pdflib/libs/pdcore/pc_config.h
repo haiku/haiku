@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id$
+/* $Id: pc_config.h 29803 2009-03-30 14:48:57Z bonefish $
  *
  * PDFlib portability and configuration definitions
  *

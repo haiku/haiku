@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:	TADS
 " Maintainer:	Amir Karger <karger@post.harvard.edu>
-" $Date: 2004/07/13 23:28:00 $
+" $Date: 2004-07-14 01:28:30 +0200 (Mi, 14. Jul 2004) $
 " $Revision: 1.1 $
 " Stolen from: Bram Moolenaar's C language file
 " Newest version at: http://www.hec.utah.edu/~karger/vim/syntax/tads.vim

@@ -1,5 +1,5 @@
 /*
-	$Id: DummyPolygon.h,v 1.1 2002/11/23 04:42:57 jrand Exp $
+	$Id: DummyPolygon.h 2067 2002-11-23 04:42:57Z jrand $
 	
 	This file contains the definition of a dummy BPolygon class.
 	It is used in order to get access to the private points of the

@@ -1,5 +1,5 @@
 /*
-	$Id: MapPolygonTest.cpp,v 1.1 2002/12/03 04:07:20 jrand Exp $
+	$Id: MapPolygonTest.cpp 2136 2002-12-03 04:07:21Z jrand $
 	
 	This file contains the implementation of the tests which show
 	that BPolygons can be created successfully a number of 

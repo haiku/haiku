@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id$
+ * $Id: SpamFilterConfig.cpp 19449 2006-12-09 03:38:11Z darkwyrm $
  *
  * SpamFilter's configuration view.  Lets the user change various settings
  * related to the add-on, but not the spamdbm server.

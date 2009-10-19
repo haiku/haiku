@@ -1,6 +1,6 @@
 /* reading patches */
 
-/* $Id: pch.h,v 1.1 2004/06/16 21:22:10 korli Exp $ */
+/* $Id: pch.h 8008 2004-06-16 21:22:10Z korli $ */
 
 LINENUM pch_end PARAMS ((void));
 LINENUM pch_first PARAMS ((void));

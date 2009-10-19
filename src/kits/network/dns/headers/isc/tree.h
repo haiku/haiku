@@ -3,7 +3,7 @@
  * vix 22jan93 [revisited; uses RCS, ANSI, POSIX; has bug fixes]
  * vix 27jun86 [broken out of tree.c]
  *
- * $Id$
+ * $Id: tree.h 14574 2005-10-29 16:27:43Z bonefish $
  */
 
 

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# $Id$
+# $Id: image.py 14574 2005-10-29 16:27:43Z bonefish $
 #
 # PDFlib client: image example in Python
 #

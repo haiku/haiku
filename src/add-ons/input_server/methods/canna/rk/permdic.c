@@ -21,7 +21,7 @@
  */
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcs_id[] = "$Id$";
+static char rcs_id[] = "$Id: permdic.c 14875 2005-11-12 21:25:31Z bonefish $";
 #endif
 
 #include	<unistd.h>

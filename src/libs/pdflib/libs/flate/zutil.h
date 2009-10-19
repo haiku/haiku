@@ -9,9 +9,9 @@
  */
 
 
-/* $Id$ */
+/* $Id: zutil.h 14574 2005-10-29 16:27:43Z bonefish $ */
 
-/* @(#) $Id$ */
+/* @(#) $Id: zutil.h 14574 2005-10-29 16:27:43Z bonefish $ */
 
 #ifndef _Z_UTIL_H
 #define _Z_UTIL_H

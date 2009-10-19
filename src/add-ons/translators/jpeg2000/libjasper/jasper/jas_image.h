@@ -113,7 +113,7 @@
 /*
  * Image Class
  *
- * $Id$
+ * $Id: jas_image.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JAS_IMAGE_H

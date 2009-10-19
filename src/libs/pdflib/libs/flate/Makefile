@@ -1,6 +1,6 @@
 # Makefile for zlib
 # This generates a libtool convenience library
-# $Id$
+# $Id: Makefile 14574 2005-10-29 16:27:43Z bonefish $
 
 top_builddir	= ../..
 

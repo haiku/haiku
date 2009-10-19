@@ -144,7 +144,7 @@ Report problems and direct all questions to:
 
 #include "rcsbase.h"
 
-libId(genId, "$Id: rcsgen.c,v 1.1 2003/06/11 15:56:09 darkwyrm Exp $")
+libId(genId, "$Id: rcsgen.c 3476 2003-06-11 15:56:10Z darkwyrm $")
 
 int interactiveflag;  /* Should we act as if stdin is a tty?  */
 struct buf curlogbuf;  /* buffer for current log message */

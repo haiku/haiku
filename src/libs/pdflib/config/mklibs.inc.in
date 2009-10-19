@@ -1,5 +1,5 @@
 # Template to be included from every makefile that creates libs
-# $Id$
+# $Id: mklibs.inc.in 14574 2005-10-29 16:27:43Z bonefish $
 #
 
 all::	$(LIBNAME)

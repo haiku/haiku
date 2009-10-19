@@ -3,8 +3,8 @@
  * For conditions of distribution and use, see copyright notice in zlib.h 
  */
 
-/* $Id$ */
-/* @(#) $Id$ */
+/* $Id: zutil.c 14574 2005-10-29 16:27:43Z bonefish $ */
+/* @(#) $Id: zutil.c 14574 2005-10-29 16:27:43Z bonefish $ */
 
 #include "zutil.h"
 

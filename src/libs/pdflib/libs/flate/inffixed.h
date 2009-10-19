@@ -8,7 +8,7 @@
  */
 
 
-/* $Id$ */
+/* $Id: inffixed.h 14574 2005-10-29 16:27:43Z bonefish $ */
 
 local uInt fixed_bl = 9;
 local uInt fixed_bd = 5;

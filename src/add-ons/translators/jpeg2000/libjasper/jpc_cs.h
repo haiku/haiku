@@ -113,7 +113,7 @@
 /*
  * JPEG-2000 Code Stream Library
  *
- * $Id$
+ * $Id: jpc_cs.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JPC_CS_H

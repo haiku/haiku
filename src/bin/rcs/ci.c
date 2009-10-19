@@ -278,7 +278,7 @@ static struct hshentry newdelta;	/* new delta to be inserted	*/
 static struct stat workstat;
 static struct Symrev *assoclst, **nextassoc;
 
-mainProg(ciId, "ci", "$Id: ci.c,v 1.1 2003/06/11 15:56:09 darkwyrm Exp $")
+mainProg(ciId, "ci", "$Id: ci.c 3476 2003-06-11 15:56:10Z darkwyrm $")
 {
 	static char const cmdusage[] =
 		"\nci usage: ci -{fIklMqru}[rev] -d[date] -mmsg -{nN}name -sstate -ttext -T -Vn -wwho -xsuff -zzone file ...";

@@ -36,7 +36,7 @@ require 5.0;
 #--##############################################################################
 
 # CVS version:
-# $Id: texi2html,v 1.1 2004/06/07 09:07:25 korli Exp $
+# $Id: texi2html 7792 2004-06-07 09:07:27Z korli $
 
 # Homepage:
 $T2H_HOMEPAGE = <<EOT;
@@ -92,7 +92,7 @@ eval { ($T2H_USER = (getpwuid ($<))[6]) =~ s/,.*//;}; # Who am i
 # Copy this file and make changes to it, if you like.
 # Afterwards, either, load it with command-line option -init_file <your_init_file>
 #
-# $Id: texi2html,v 1.1 2004/06/07 09:07:25 korli Exp $
+# $Id: texi2html 7792 2004-06-07 09:07:27Z korli $
 
 ######################################################################
 # stuff which can also be set by command-line options
@@ -1510,7 +1510,7 @@ package Getopt::MySimple;
 
 # --------------------------------------------------------------------------
 # Locally modified by obachman (Display type instead of env, order by cmp)
-# $Id: texi2html,v 1.1 2004/06/07 09:07:25 korli Exp $
+# $Id: texi2html 7792 2004-06-07 09:07:27Z korli $
 
 # use strict;
 # no strict 'refs';

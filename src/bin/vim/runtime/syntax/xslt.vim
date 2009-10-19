@@ -3,7 +3,7 @@
 " Maintainer:	Johannes Zellner <johannes@zellner.org>
 " Last Change:	Sun, 28 Oct 2001 21:22:24 +0100
 " Filenames:	*.xsl
-" $Id: xslt.vim,v 1.1 2004/07/13 23:27:58 korli Exp $
+" $Id: xslt.vim 8393 2004-07-13 23:28:30Z korli $
 
 " REFERENCES:
 "   [1] http://www.w3.org/TR/xslt

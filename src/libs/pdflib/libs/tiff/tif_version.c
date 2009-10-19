@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id$ */
+/* PDFlib GmbH cvsid: $Id: tif_version.c 14574 2005-10-29 16:27:43Z bonefish $ */
 /*
  * Copyright (c) 1992-1997 Sam Leffler
  * Copyright (c) 1992-1997 Silicon Graphics, Inc.

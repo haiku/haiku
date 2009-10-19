@@ -9,15 +9,36 @@
 "
 " Written by: Lennart Schultz <les@dmi.min.dk>
 
-imenu Stmts.for	for  in dodoneki	kk0elli
-imenu Stmts.case	case  in) ;;esacbki	k0elli
-imenu Stmts.if	if   thenfiki	kk0elli
-imenu Stmts.if-else	if   thenelsefiki	kki	kk0elli
-imenu Stmts.elif	elif   thenki	kk0elli
-imenu Stmts.while	while   dodoneki	kk0elli
+imenu Stmts.for	for  in 
+do
+
+doneki	kk0elli
+imenu Stmts.case	case  in
+) ;;
+esacbki	k0elli
+imenu Stmts.if	if   
+then
+
+fiki	kk0elli
+imenu Stmts.if-else	if   
+then
+
+else
+
+fiki	kki	kk0elli
+imenu Stmts.elif	elif   
+then
+
+ki	kk0elli
+imenu Stmts.while	while   
+do
+
+doneki	kk0elli
 imenu Stmts.break	break 
 imenu Stmts.continue	continue 
-imenu Stmts.function	() {}ki	k0i
+imenu Stmts.function	() {
+
+}ki	k0i
 imenu Stmts.return	return 
 imenu Stmts.return-true	return 0
 imenu Stmts.return-false	return 1

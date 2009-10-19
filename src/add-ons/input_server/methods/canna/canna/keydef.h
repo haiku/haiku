@@ -20,7 +20,7 @@
  * PERFORMANCE OF THIS SOFTWARE. 
  */
 
-/* @(#) 102.1 $Id: keydef.h,v 1.1 2004/12/23 22:08:39 korli Exp $ */
+/* @(#) 102.1 $Id: keydef.h 10527 2004-12-23 22:08:39Z korli $ */
 /* normal function keys */
      
 #define CANNA_KEY_Nfer		0x80

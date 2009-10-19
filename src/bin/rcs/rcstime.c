@@ -30,7 +30,7 @@ Report problems and direct all questions to:
 #include "partime.h"
 #include "maketime.h"
 
-libId(rcstimeId, "$Id: rcstime.c,v 1.1 2003/06/11 15:56:10 darkwyrm Exp $")
+libId(rcstimeId, "$Id: rcstime.c 3476 2003-06-11 15:56:10Z darkwyrm $")
 
 static long zone_offset; /* seconds east of UTC, or TM_LOCAL_ZONE */
 static int use_zone_offset; /* if zero, use UTC without zone indication */

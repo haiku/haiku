@@ -113,7 +113,7 @@
 /*
  * Tier-2 Coding Library
  *
- * $Id$
+ * $Id: jpc_t2cod.c 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #include "jasper/jas_math.h"

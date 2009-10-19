@@ -1,5 +1,5 @@
 /*
-	$Id: AddMessageTest2.h,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
+	$Id: AddMessageTest2.h 383 2002-07-22 09:28:00Z tylerdauwalder $
 	
 	This file defines a class for performing one test of BMessageQueue
 	functionality.

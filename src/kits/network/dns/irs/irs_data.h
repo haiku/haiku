@@ -16,7 +16,7 @@
  */
 
 /*
- * $Id$
+ * $Id: irs_data.h 15570 2005-12-16 22:38:13Z wkornew $
  */
 
 #ifndef __BIND_NOSTATIC

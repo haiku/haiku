@@ -1,4 +1,4 @@
-# $Id$
+# $Id: pdflib_pl.pm 14574 2005-10-29 16:27:43Z bonefish $
 package pdflib_pl;
 require Exporter;
 require DynaLoader;

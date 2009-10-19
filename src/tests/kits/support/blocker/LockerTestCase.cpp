@@ -1,5 +1,5 @@
 /*
-	$Id: LockerTestCase.cpp,v 1.2 2002/07/18 05:32:00 tylerdauwalder Exp $
+	$Id: LockerTestCase.cpp 301 2002-07-18 05:32:00Z tylerdauwalder $
 	
 	This file implements a base class for testing BLocker functionality.
 	

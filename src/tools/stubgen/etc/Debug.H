@@ -3,7 +3,7 @@
 //    AUTHOR: bmc
 //     DESCR: Debug header for FallOS
 //
-// $Id: Debug.H,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $
+// $Id: Debug.H 10 2002-07-09 12:24:59Z ejakowatz $
 //
 
 #ifdef _ASSERT_H 

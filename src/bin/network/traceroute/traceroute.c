@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1991, 1994, 1995, 1996, 1997, 1998, 1999, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#)$Id$ (LBL)";
+    "@(#)$Id: traceroute.c 20492 2007-04-01 11:51:14Z axeld $ (LBL)";
 #endif
 
 /*

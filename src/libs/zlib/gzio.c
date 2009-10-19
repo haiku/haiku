@@ -5,7 +5,7 @@
  * Compile this file with -DNO_GZCOMPRESS to avoid the compression code.
  */
 
-/* @(#) $Id$ */
+/* @(#) $Id: gzio.c 14421 2005-10-19 08:31:31Z korli $ */
 
 #include <stdio.h>
 

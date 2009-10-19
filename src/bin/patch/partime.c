@@ -75,7 +75,7 @@
 #include <partime.h>
 
 char const partime_id[] =
-  "$Id: partime.c,v 1.1 2004/06/16 21:22:10 korli Exp $";
+  "$Id: partime.c 8008 2004-06-16 21:22:10Z korli $";
 
 
 /* Lookup tables for names of months, weekdays, time zones.  */

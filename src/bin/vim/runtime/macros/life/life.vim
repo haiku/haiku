@@ -142,7 +142,8 @@ map ,Iaa o=AB =BC =CD =DE =EF =FG =GH =HI =IJ =JK =KL =LM =MN =NO =OP =PQ =QR
 map ,Iab o=RS =ST =TU =UV =VW =WX =XY =YZ =Z 
 "
 " Insert the searched patterns above the board
-map ,IIN G?^top,Il8,Id8,Il7,Id7,Il6,Id6,Il5,Id5,Il4,Id4,Il3,Id3,Il2,Id2,Il1,Id1,Il0,Id0,Iaa,Iab
+map ,IIN G?^top
+,Il8,Id8,Il7,Id7,Il6,Id6,Il5,Id5,Il4,Id4,Il3,Id3,Il2,Id2,Il1,Id1,Il0,Id0,Iaa,Iab
 "
 "  ----- END of Initialisation -----
 "
@@ -204,7 +205,8 @@ map ,3 3y G$p
 " line, and then run the edit command. (used by work out square).
 " Leaves the cursor on the next character to be processed.
 "
-map ( ,s,i,X0i?^#A 0,df.l,Y21h
+map ( ,s,i,X0i?^#A 
+0,df.l,Y21h
 "
 " Delete 's'paces (deads);
 " The number of remaining characters is the number of living neighbours.
@@ -232,7 +234,8 @@ map ,m p
 map ,n x
 "
 " Replace a character by it's next, A --> B,  B --> C, etc.
-map ,a `a,jGi?=,ma0,dll,j`a21l,ml,nh
+map ,a `a,jGi?=,ma
+0,dll,j`a21l,ml,nh
 "
 "  ----- END of Work out one germ -----
 "
@@ -240,8 +243,10 @@ map ,a `a,jGi?=,ma0,dll,j`a21l,ml,nh
 "
 " Get current date (used by time a generation)
 map << :r!date
-map <1 G?^topO<<
-map <2 G?^topk<<
+map <1 G?^top
+O<<
+map <2 G?^top
+k<<
 "
 "
 " Turn number on current line into edit command (used by time N generations)

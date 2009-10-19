@@ -37,7 +37,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
  */
 
-/* RCS_ID("$Id$ FAU") */
+/* RCS_ID("$Id: pty.c 28305 2008-10-23 21:46:26Z bonefish $ FAU") */
 
 #include "vim.h"
 

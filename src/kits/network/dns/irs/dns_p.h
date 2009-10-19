@@ -16,7 +16,7 @@
  */
 
 /*
- * $Id$
+ * $Id: dns_p.h 15570 2005-12-16 22:38:13Z wkornew $
  */
 
 #ifndef _DNS_P_H_INCLUDED

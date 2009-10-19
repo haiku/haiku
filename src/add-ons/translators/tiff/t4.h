@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: t4.h 14449 2005-10-20 12:15:56Z stippi $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler

@@ -5,7 +5,7 @@
  *  DESC: two important functions from libgen
  *
  *  DATE: Tue Oct  1 20:47:55 EDT 1996
- *   $Id: pathname.h,v 1.1 2002/07/09 12:24:59 ejakowatz Exp $ 
+ *   $Id: pathname.h 10 2002-07-09 12:24:59Z ejakowatz $ 
  *
  *  Copyright (c) 1996-1998  Michael John Radwin
  *

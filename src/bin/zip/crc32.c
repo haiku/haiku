@@ -11,7 +11,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* $Id$ */
+/* $Id: crc32.c 22782 2007-11-01 01:27:31Z korli $ */
 
 #define __CRC32_C       /* identifies this source module */
 

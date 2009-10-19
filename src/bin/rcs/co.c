@@ -195,7 +195,7 @@ static struct hshentries *gendeltas;	/* deltas to be generated	*/
 static struct hshentry *targetdelta;	/* final delta to be generated	*/
 static struct stat workstat;
 
-mainProg(coId, "co", "$Id: co.c,v 1.1 2003/06/11 15:56:09 darkwyrm Exp $")
+mainProg(coId, "co", "$Id: co.c 3476 2003-06-11 15:56:10Z darkwyrm $")
 {
 	static char const cmdusage[] =
 		"\nco usage: co -{fIlMpqru}[rev] -ddate -jjoins -ksubst -sstate -T -w[who] -Vn -xsuff -zzone file ...";

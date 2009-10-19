@@ -5,7 +5,12 @@ set wrapscan
 " two lines to the height you want (select from 1 to 9)
 map t 7
 map! t 7
-map L 1G/tX/^0$P1GJ$An$BGC0e$X0E0F$X/T@f@h$A1GJ@f0l$Xn$PU
+map L 1G/t
+X/^0
+$P1GJ$An$BGC0e$X0E0F$X/T
+@f
+@h
+$A1GJ@f0l$Xn$PU
 map g IL
 
 map J /^0[^t]*$
@@ -58,7 +63,10 @@ map R $rn
 map S $r$
 
 "insert two lines containing a zero
-map T ko00
+map T ko0
+0
+
+
 
 "add a backslash at the end
 map V Go/

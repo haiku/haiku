@@ -1,6 +1,6 @@
 <%@page import="java.io.*, javax.servlet.*, com.pdflib.pdflib" %><%
 
-   /* $Id$
+   /* $Id: chartab.jsp 14574 2005-10-29 16:27:43Z bonefish $
     *
     * chartab.jsp
     */

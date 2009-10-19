@@ -111,7 +111,7 @@
 /*
  * Tag/Value Parser
  *
- * $Id$
+ * $Id: jas_tvp.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JAS_TVP_H

@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id$ */
+/* PDFlib GmbH cvsid: $Id: pngmem.c 14574 2005-10-29 16:27:43Z bonefish $ */
 
 /* pngmem.c - stub functions for memory allocation
  *

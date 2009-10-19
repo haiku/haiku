@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id$
+ * $Id: SpamFilter.cpp 29284 2009-02-22 13:45:40Z bga $
  *
  * SpamFilter - Uses Bayesian statistics to evaluate the spaminess of a
  * message.  The evaluation is done by a separate server, this add-on just gets

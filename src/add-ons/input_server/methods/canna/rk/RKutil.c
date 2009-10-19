@@ -25,7 +25,7 @@
 /************************************************************************/
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[]="@(#)$Id: RKutil.c,v 1.1 2004/12/23 21:23:50 korli Exp $ $Author: korli $ $Revision: 1.1 $ $Data$";
+static char rcsid[]="@(#)$Id: RKutil.c 10525 2004-12-23 21:23:50Z korli $ $Author: korli $ $Revision: 1.1 $ $Data$";
 #endif
 
 #include <stdio.h>

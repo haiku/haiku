@@ -4,7 +4,7 @@
 " Last Change: Son 22 Jun 2003 20:43:14 CEST
 " Filenames:   *.ab,*.am
 " URL:	       http://www.cvjb.de/comp/vim/elf.vim
-" $Id: elf.vim,v 1.1 2004/07/13 23:27:58 korli Exp $
+" $Id: elf.vim 8393 2004-07-13 23:28:30Z korli $
 "
 " ELF: Extensible Language Facility
 "      This is the Applix Inc., Macro and Builder programming language.

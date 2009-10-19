@@ -5,7 +5,7 @@
 
 // Next default values for new objects
 // 
-/* $Id$ */
+/* $Id: resource.h 14574 2005-10-29 16:27:43Z bonefish $ */
 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS

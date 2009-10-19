@@ -26,7 +26,7 @@
 
 
 #if !defined(lint) && !defined(__CODECENTER__)
-static char rcsid[]="$Id$";
+static char rcsid[]="$Id: ngram.c 14875 2005-11-12 21:25:31Z bonefish $";
 #endif
 
 #include	<stdio.h>

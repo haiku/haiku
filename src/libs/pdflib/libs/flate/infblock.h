@@ -9,7 +9,7 @@
  */
 
 
-/* $Id$ */
+/* $Id: infblock.h 14574 2005-10-29 16:27:43Z bonefish $ */
 
 /* struct inflate_blocks_state; */
 typedef struct inflate_blocks_state FAR inflate_blocks_statef;

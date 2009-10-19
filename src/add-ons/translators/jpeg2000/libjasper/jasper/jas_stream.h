@@ -113,7 +113,7 @@
 /*
  * I/O Stream Class
  *
- * $Id$
+ * $Id: jas_stream.h 14449 2005-10-20 12:15:56Z stippi $
  */
 
 #ifndef JAS_STREAM_H

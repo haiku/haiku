@@ -1,4 +1,4 @@
-/* PDFlib GmbH cvsid: $Id$ */
+/* PDFlib GmbH cvsid: $Id: port.h 28305 2008-10-23 21:46:26Z bonefish $ */
 
 #ifndef TIFF_PORT_H
 #define TIFF_PORT_H 1

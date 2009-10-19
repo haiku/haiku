@@ -1,5 +1,5 @@
 /*
-	$Id: MessageQueueTestCase.h,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
+	$Id: MessageQueueTestCase.h 383 2002-07-22 09:28:00Z tylerdauwalder $
 	
 	This file defines a set of classes for testing BMessageQueue
 	functionality.

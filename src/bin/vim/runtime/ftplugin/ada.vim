@@ -2,7 +2,7 @@
 " Language:	Ada
 " Maintainer:	Neil Bird <neil@fnxweb.com>
 " Last Change:	2003 May 11
-" Version:	$Id: ada.vim,v 1.1 2004/07/13 23:28:05 korli Exp $
+" Version:	$Id: ada.vim 8393 2004-07-13 23:28:30Z korli $
 " Look for the latest version at http://vim.sourceforge.net/
 "
 " Perform Ada specific completion & tagging.

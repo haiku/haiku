@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id$
+/* $Id: pdfimpose.c 14574 2005-10-29 16:27:43Z bonefish $
  *
  * Impose multiple PDF documents on a single sheet,
  * or concatenate multiple PDFs (if no -g option is supplied)

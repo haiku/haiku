@@ -3,7 +3,7 @@
 " Maintainer:	Johannes Zellner <johannes@zellner.org>
 " Last Change:	Tue, 09 Mar 2004 14:32:13 CET
 " Filenames:	*.cs
-" $Id: cs.vim,v 1.1 2004/07/13 23:27:57 korli Exp $
+" $Id: cs.vim 8393 2004-07-13 23:28:30Z korli $
 "
 " REFERENCES:
 " [1] ECMA TC39: C# Language Specification (WD13Oct01.doc)
