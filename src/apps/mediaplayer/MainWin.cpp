@@ -205,8 +205,11 @@ MainWin::~MainWin()
 
 	Settings::Default()->RemoveListener(&fGlobalSettingsListener);
 	fPlaylist->RemoveListener(fPlaylistObserver);
+	fController->Lock();
 	fController->RemoveListener(fControllerObserver);
 	fController->SetPeakListener(NULL);
+	fController->SetVideoTarget(NULL);
+	fController->Unlock();
 
 	// give the views a chance to detach from any notifiers
 	// before we delete them
@@ -363,13 +366,23 @@ MainWin::MessageReceived(BMessage *msg)
 			break;
 
 		case M_MEDIA_SERVER_STARTED:
+		{
 			printf("TODO: implement M_MEDIA_SERVER_STARTED\n");
-			// fController->...
+//
+//			BAutolock _(fPlaylist);
+//			BMessage fakePlaylistMessage(MSG_PLAYLIST_CURRENT_ITEM_CHANGED);
+//			fakePlaylistMessage.AddInt32("index",
+//				fPlaylist->CurrentItemIndex());
+//			PostMessage(&fakePlaylistMessage);
 			break;
+		}
 
 		case M_MEDIA_SERVER_QUIT:
 			printf("TODO: implement M_MEDIA_SERVER_QUIT\n");
-			// fController->...
+//			if (fController->Lock()) {
+//				fController->CleanupNodes();
+//				fController->Unlock();
+//			}
 			break;
 
 		// PlaylistObserver messages

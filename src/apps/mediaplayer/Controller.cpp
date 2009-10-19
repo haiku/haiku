@@ -121,10 +121,7 @@ Controller::Controller()
 Controller::~Controller()
 {
 	Settings::Default()->RemoveListener(&fGlobalSettingsListener);
-
-	if (fMediaFile)
-		fMediaFile->ReleaseAllTracks();
-	delete fMediaFile;
+	SetTo(NULL);
 }
 
 
