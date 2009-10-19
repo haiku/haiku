@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (SVN 1.05, Rudolf)</h1></p>
+<p><h1>head (SVN 1.06, Rudolf)</h1></p>
 <ul>
 <li>Fixed driver assuming enabling AGP mode succeeded on some occasions if it did not block it itself. Blocking AGP mode completely via the AGP busmanager (option 'block_agp') resulted in a crashing acceleration engine because it was setup for AGP transfers instead of using PCI transfers. Error was solved with help from user kraton.
 <li>Fixed shared_info struct problem occuring when 3D 'accelerant' is used (tested Alpha 4.1): the TVencoder type definition list apparantly gets some memory assigned these days when done inside the definition of shared_info. Moved encoder list outside the shared_info definition.
@@ -30,7 +30,8 @@
 <li>Fixed shivering display on some systems (confirmed a Geforce 5200 laptop): Pixelclocks should <strong>never</strong> be setup for spread spectrum on analog connections;
 <li>Added full HDTV mode (1920x1080p) to exported modelist: Haiku's Screen preflet allows you to set this mode now if your screen supports it;
 <li>Improved modeline scaling for digitally connected screens: this fixes missing SYNC pulses on some setups. The screen nolonger shows shifted pictures (this happened mostly on 640x480 resolution);
-<li>Modified head selection code on NV40 architecture cards except for NV40, NV41 and NV45. The cards affected have differently behaving BIOSes. This should fix black or disabled screens if the secondary connector was used for VGA while the first one was not connected.
+<li>Modified head selection code on NV40 architecture cards except for NV40, NV41 and NV45. The cards affected have differently behaving BIOSes. This should fix black or disabled screens if the secondary connector was used for VGA while the first one was not connected;
+<li>Added dithering for laptop panels (if they are connected to DAC1 only for now). Gradients should now display much more fluently on 18bit depth panels (no more 'colorbands').
 </ul>
 <p><h1>nv_driver 0.80 (Rudolf)</h1></p>
 <ul>

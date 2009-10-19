@@ -50,6 +50,7 @@ void dump_pins(void);
 /* DAC functions */
 bool nv_dac_crt_connected(void);
 status_t nv_dac_mode(int,float);
+status_t nv_dac_dither(bool dither);
 status_t nv_dac_palette(uint8*,uint8*,uint8*);
 status_t nv_dac_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
 status_t nv_dac_set_pix_pll(display_mode target);

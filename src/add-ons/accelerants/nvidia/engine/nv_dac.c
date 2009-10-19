@@ -1,6 +1,6 @@
 /* program the DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003-9/2009
+   Rudolf Cornelissen 12/2003-10/2009
 */
 
 #define MODULE_BIT 0x00010000
@@ -99,6 +99,47 @@ status_t nv_dac_mode(int mode,float brightness)
 	/* disable palette RAM adressing mask */
 	NV_REG8(NV8_PALMASK) = 0xff;
 	LOG(2,("DAC: PAL pixrdmsk readback $%02x\n", NV_REG8(NV8_PALMASK)));
+
+	return B_OK;
+}
+
+/* enable/disable dithering */
+status_t nv_dac_dither(bool dither)
+{
+	/* older cards can't do dithering */
+	if ((si->ps.card_type != NV11) && !si->ps.secondary_head) return B_ERROR;
+
+	if (dither) {
+		LOG(4,("DAC: enabling dithering\n"));
+
+		if (si->ps.card_type == NV11) {
+			/* NV11 apparantly has a fixed dithering pattern */
+
+			/* enable dithering */
+			DACW(NV11_DITHER, (DACR(NV11_DITHER) | 0x00010000));
+		} else {
+			/* setup dithering pattern */
+			DACW(FP_DITH_PATT1, 0xe4e4e4e4);
+			DACW(FP_DITH_PATT2, 0xe4e4e4e4);
+			DACW(FP_DITH_PATT3, 0xe4e4e4e4);
+			DACW(FP_DITH_PATT4, 0x44444444);
+			DACW(FP_DITH_PATT5, 0x44444444);
+			DACW(FP_DITH_PATT6, 0x44444444);
+
+			/* enable dithering */
+			DACW(FP_DITHER, (DACR(FP_DITHER) | 0x00000001));
+		}
+	} else {
+		LOG(4,("DAC: disabling dithering\n"));
+
+		if (si->ps.card_type == NV11) {
+			/* disable dithering */
+			DACW(NV11_DITHER, (DACR(NV11_DITHER) & ~0x00010000));
+		} else {
+			/* disable dithering */
+			DACW(FP_DITHER, (DACR(FP_DITHER) & ~0x00000001));
+		}
+	}
 
 	return B_OK;
 }

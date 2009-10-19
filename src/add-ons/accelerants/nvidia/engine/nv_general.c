@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-9/2009
+   Rudolf Cornelissen 10/2002-10/2009
    tst..
 */
 
@@ -92,7 +92,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 1.05 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 1.06 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -1829,6 +1829,12 @@ static status_t nv_general_bios_to_powergraphics()
 		/* clear b15: some framebuffer config item (unknown) */
 		NV_REG32(NV32_PFB_CLS_PAGE2) &= 0xffff7fff;
 	}
+
+	/* enable dithering for internal laptop panels only (those have only 18bit colordepth sometimes)
+	 * note:
+	 * dithering is only supported on digitally connected flatpanels. */
+	//fixme: how about DAC2?? (still implement and test..)
+	if (si->ps.laptop && (si->ps.monitors & CRTC1_TMDS)) nv_dac_dither(true);
 
 	/* tweak card GPU-core and RAM speeds if requested (hoping we'll survive)... */
 	if (si->settings.gpu_clk)

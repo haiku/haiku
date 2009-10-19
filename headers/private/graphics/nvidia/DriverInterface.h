@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-8/2009.
+	Rudolf Cornelissen 10/2002-10/2009.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -89,12 +89,9 @@ enum {
 	NV06,
 	NV10,
 	NV11,
-	NV11M,
 	NV15,
 	NV17,
-	NV17M,
 	NV18,
-	NV18M,
 	NV20,
 	NV25,
 	NV28,
