@@ -24,6 +24,7 @@
 #include <Autolock.h>
 #include <Entry.h>
 #include <FilePanel.h>
+#include <MediaDefs.h>
 #include <MediaRoster.h>
 #include <Path.h>
 #include <Roster.h>
@@ -40,7 +41,7 @@
 MainApp* gMainApp;
 const char* kAppSig = "application/x-vnd.Haiku-MediaPlayer";
 
-static const char* kMediaServerSig = "application/x-vnd.Be.media-server";
+static const char* kMediaServerSig = B_MEDIA_SERVER_SIGNATURE;
 static const char* kMediaServerAddOnSig = "application/x-vnd.Be.addon-host";
 
 
