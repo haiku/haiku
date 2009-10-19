@@ -58,6 +58,8 @@ typedef enum {
 #define NOARROW -1
 
 
+static const bigtime_t kRepeatDelay = 300000;
+
 // Because the R5 version kept a lot of data on server-side, we need to kludge
 // our way into binary compatibility
 class BScrollBar::Private {
@@ -68,6 +70,7 @@ public:
 		fEnabled(true),
 		fRepeaterThread(-1),
 		fExitRepeater(false),
+		fRepeaterDelay(0),
 		fThumbFrame(0.0, 0.0, -1.0, -1.0),
 		fDoRepeat(false),
 		fClickOffset(0.0, 0.0),
@@ -114,6 +117,7 @@ public:
 
 	thread_id			fRepeaterThread;
 	volatile bool		fExitRepeater;
+	bigtime_t			fRepeaterDelay;
 
 	BRect				fThumbFrame;
 	volatile bool		fDoRepeat;
@@ -144,8 +148,13 @@ BScrollBar::Private::button_repeater_thread(void *data)
 int32
 BScrollBar::Private::ButtonRepeaterThread()
 {
-	// wait a bit before auto scrolling starts
-	snooze(500000);
+	// Wait a bit before auto scrolling starts. As long as the user releases
+	// and presses the button again while the repeat delay has not yet
+	// triggered, the value is pushed into the future, so we need to loop such
+	// that repeating starts at exactly the correct delay after the last
+	// button press.
+	while (fRepeaterDelay > system_time() && !fExitRepeater)
+		snooze_until(fRepeaterDelay, B_SYSTEM_TIMEBASE);
 
 	// repeat loop
 	while (!fExitRepeater) {
@@ -713,12 +722,17 @@ BScrollBar::MouseDown(BPoint where)
 		// launch the repeat thread
 		if (fPrivateData->fRepeaterThread == -1) {
 			fPrivateData->fExitRepeater = false;
+			fPrivateData->fRepeaterDelay = system_time() + kRepeatDelay;
 			fPrivateData->fThumbInc = scrollValue;
 			fPrivateData->fDoRepeat = true;
 			fPrivateData->fRepeaterThread
 				= spawn_thread(fPrivateData->button_repeater_thread,
 							   "scroll repeater", B_NORMAL_PRIORITY, fPrivateData);
 			resume_thread(fPrivateData->fRepeaterThread);
+		} else {
+			fPrivateData->fExitRepeater = false;
+			fPrivateData->fRepeaterDelay = system_time() + kRepeatDelay;
+			fPrivateData->fDoRepeat = true;
 		}
 	}
 }
