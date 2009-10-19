@@ -497,7 +497,7 @@ FT_BEGIN_HEADER
   /*   define it for certain configurations only.                          */
   /*                                                                       */
 #if HAIKU_INCLUDE_PATENTED_CODE
-#	define FT_CONFIG_OPTION_SUBPIXEL_RENDERING
+#	define TT_CONFIG_OPTION_BYTECODE_INTERPRETER
 #endif
 
   /*************************************************************************/
