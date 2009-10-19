@@ -435,6 +435,14 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 	mode.virtual_width = (value >> 16) + 1;
 	mode.virtual_height = (value & 0xffff) + 1;
 
+	// using virtual size based on image size is the 'proper' way to do it,
+	// however the bios appears to be suggesting scaling or somesuch, so ignore
+	// the proper virtual dimension for now if they'd suggest a smaller size.
+	if (mode.virtual_width < mode.timing.h_display)
+		mode.virtual_width = mode.timing.h_display;
+	if (mode.virtual_height < mode.timing.v_display)
+		mode.virtual_height = mode.timing.v_display;
+
 	value = read32(controlRegister);
 	switch (value & DISPLAY_CONTROL_COLOR_MASK) {
 		case DISPLAY_CONTROL_RGB32:
