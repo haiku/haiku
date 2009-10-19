@@ -88,9 +88,7 @@ struct acpi_object_type {
 			uint32 count;
 			acpi_object_type *objects;
 		} package;
-		struct
-	    {
-	        uint32 type;
+		struct {
 	        uint32 actual_type;
 	        acpi_handle handle;
 	    } reference;
@@ -126,7 +124,7 @@ enum {
 	ACPI_ALLOCATE_BUFFER = -1,
 };
 
-    
+
 #endif	// __ACTYPES_H__
 
 
@@ -148,7 +146,7 @@ struct acpi_module_info {
 
 	status_t	(*get_handle)(acpi_handle parent, char *pathname,
 					acpi_handle *retHandle);
-    
+
 	/* Global Lock */
 
 	status_t	(*acquire_global_lock)(uint16 timeout, uint32 *handle);
@@ -163,7 +161,7 @@ struct acpi_module_info {
     				uint32 handlerType, acpi_notify_handler handler);
 
 	/* GPE Handler */
-	
+
 	status_t	(*enable_gpe)(acpi_handle handle, uint32 gpeNumber,
 					uint32 flags);
 	status_t	(*set_gpe_type)(acpi_handle handle, uint32 gpeNumber,
@@ -174,7 +172,7 @@ struct acpi_module_info {
 					acpi_event_handler address);
 
 	/* Address Space Handler */
-	
+
 	status_t	(*install_address_space_handler)(acpi_handle handle,
 					uint32 spaceId,
 					acpi_adr_space_handler handler,
