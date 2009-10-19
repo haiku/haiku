@@ -28,8 +28,8 @@
 
 /* UART */
 #define UART0_BASE    0x50000000
-#define UART0_BASE    0x50004000
-#define UART0_BASE    0x50008000
+#define UART1_BASE    0x50004000
+#define UART2_BASE    0x50008000
 
 /* XXX:FIXME below! */
 
