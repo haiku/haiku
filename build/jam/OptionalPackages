@@ -537,8 +537,8 @@ if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package LibXML2 available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage libxml2-2.7.3-r1a1-x86-gcc2-2009-09-08
-			: $(baseURL)/libxml2-2.7.3-r1a1-x86-gcc2-2009-09-08.zip
+		InstallOptionalHaikuImagePackage libxml2-2.7.6-x86-gcc2-2009-10-19
+			: $(baseURL)/libxml2-2.7.6-x86-gcc2-2009-10-19.zip
 			:
 			: true
 		;
