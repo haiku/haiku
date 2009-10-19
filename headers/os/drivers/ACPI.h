@@ -209,6 +209,8 @@ struct acpi_module_info {
 					acpi_object_type **_returnValue);
 	status_t	(*get_object_typed)(const char *path,
 					acpi_object_type **_returnValue, uint32 objectType);
+	status_t	(*ns_handle_to_pathname)(acpi_handle targetHandle,
+					acpi_data *buffer);
 
 	/* Control method execution and data acquisition */
 

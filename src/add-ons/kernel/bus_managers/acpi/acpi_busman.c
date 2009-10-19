@@ -110,13 +110,13 @@ acpi_std_ops(int32 op,...)
 				ERROR("ACPI disabled\n");
 				return ENOSYS;
 			}
-			
+
 			if (gDPC->new_dpc_queue(&gDPCHandle, "acpi_task",
 				B_NORMAL_PRIORITY) != B_OK) {
 				ERROR("failed to create os execution queue\n");
 				return B_ERROR;
 			}
-			
+
 
 			AcpiGbl_EnableInterpreterSlack = true;
 //			AcpiGbl_CreateOSIMethod = true;
@@ -146,7 +146,7 @@ acpi_std_ops(int32 op,...)
 					AcpiFormatException(status));
 				goto err;
 			}
-			
+
 			/* Install the default address space handlers. */
 			status = AcpiInstallAddressSpaceHandler(ACPI_ROOT_OBJECT,
 				ACPI_ADR_SPACE_SYSTEM_MEMORY, ACPI_DEFAULT_HANDLER, NULL, NULL);
@@ -155,7 +155,7 @@ acpi_std_ops(int32 op,...)
 					AcpiFormatException(status));
 				goto err;
 			}
-			
+
 			status = AcpiInstallAddressSpaceHandler(ACPI_ROOT_OBJECT,
 				ACPI_ADR_SPACE_SYSTEM_IO, ACPI_DEFAULT_HANDLER, NULL, NULL);
 			if (ACPI_FAILURE(status)) {
@@ -172,10 +172,10 @@ acpi_std_ops(int32 op,...)
 				goto err;
 			}
 
-			flags = acpiAvoidFullInit ? 
+			flags = acpiAvoidFullInit ?
 					ACPI_NO_DEVICE_INIT | ACPI_NO_OBJECT_INIT :
 					ACPI_FULL_INITIALIZATION;
-			
+
 			// FreeBSD seems to pass in the above flags here as
 			// well but specs don't define ACPI_NO_DEVICE_INIT
 			// and ACPI_NO_OBJECT_INIT here.
@@ -185,7 +185,7 @@ acpi_std_ops(int32 op,...)
 					AcpiFormatException(status));
 				goto err;
 			}
-	
+
 			status = AcpiInitializeObjects(flags);
 			if (ACPI_FAILURE(status)) {
 				ERROR("AcpiInitializeObjects failed (%s)\n",
@@ -258,17 +258,17 @@ remove_notify_handler(acpi_handle device, uint32 handlerType,
 		(ACPI_NOTIFY_HANDLER)handler) == AE_OK ? B_OK : B_ERROR;
 }
 
-    
+
 status_t
 enable_gpe(acpi_handle handle, uint32 gpeNumber, uint32 flags)
-{	
+{
 	return AcpiEnableGpe(handle, gpeNumber, flags) == AE_OK ? B_OK : B_ERROR;
 }
 
 
 status_t
 set_gpe_type(acpi_handle handle, uint32 gpeNumber, uint8 type)
-{	
+{
 	return AcpiSetGpeType(handle, gpeNumber, type) == AE_OK ? B_OK : B_ERROR;
 }
 
@@ -276,7 +276,7 @@ set_gpe_type(acpi_handle handle, uint32 gpeNumber, uint8 type)
 status_t
 install_gpe_handler(acpi_handle handle, uint32 gpeNumber, uint32 type,
 	acpi_event_handler handler, void *data)
-{		
+{
 	return AcpiInstallGpeHandler(handle, gpeNumber, type,
 		(ACPI_EVENT_HANDLER)handler, data) == AE_OK ? B_OK : B_ERROR;
 }
@@ -290,11 +290,11 @@ remove_gpe_handler(acpi_handle handle, uint32 gpeNumber,
 		== AE_OK ? B_OK : B_ERROR;
 }
 
-	
+
 status_t
 install_address_space_handler(acpi_handle handle, uint32 spaceId,
 	acpi_adr_space_handler handler, acpi_adr_space_setup setup,	void *data)
-{	
+{
 	return AcpiInstallAddressSpaceHandler(handle, spaceId,
 		(ACPI_ADR_SPACE_HANDLER)handler, (ACPI_ADR_SPACE_SETUP)setup, data)
 		== AE_OK ? B_OK : B_ERROR;
@@ -304,11 +304,11 @@ install_address_space_handler(acpi_handle handle, uint32 spaceId,
 status_t
 remove_address_space_handler(acpi_handle handle, uint32 spaceId,
 	acpi_adr_space_handler handler)
-{	
+{
 	return AcpiRemoveAddressSpaceHandler(handle, spaceId,
 		(ACPI_ADR_SPACE_HANDLER)handler) == AE_OK ? B_OK : B_ERROR;
 }
-					
+
 
 void
 enable_fixed_event(uint32 event)
@@ -425,7 +425,7 @@ get_device_hid(const char *path, char *hid, size_t bufferLength)
 
 	if (bufferLength < ACPI_DEVICE_ID_LENGTH)
 		return B_BUFFER_OVERFLOW;
-		
+
 	infoBuffer.Pointer = &info;
 	infoBuffer.Length = sizeof(ACPI_OBJECT);
 	info.String.Pointer = hid;
@@ -511,6 +511,14 @@ get_object_typed(const char* path, acpi_object_type** _returnValue,
 
 
 status_t
+ns_handle_to_pathname(acpi_handle targetHandle, acpi_data *buffer)
+{
+	status_t status = AcpiNsHandleToPathname(targetHandle, buffer);
+	return status == AE_OK ? B_OK : B_ERROR;
+}
+
+
+status_t
 evaluate_object(const char* object, acpi_object_type* returnValue,
 	size_t bufferLength)
 {
@@ -524,7 +532,7 @@ evaluate_object(const char* object, acpi_object_type* returnValue,
 		returnValue != NULL ? &buffer : NULL);
 	if (status == AE_BUFFER_OVERFLOW)
 		dprintf("evaluate_object: the passed buffer is too small!\n");
- 
+
 	return status == AE_OK ? B_OK : B_ERROR;
 }
 
@@ -534,12 +542,12 @@ evaluate_method(acpi_handle handle, const char* method,
 	acpi_objects *args, acpi_data *returnValue)
 {
 	ACPI_STATUS status;
-	
+
 	status = AcpiEvaluateObject(handle, (ACPI_STRING)method,
 		(ACPI_OBJECT_LIST*)args, (ACPI_BUFFER*)returnValue);
 	if (status == AE_BUFFER_OVERFLOW)
 		dprintf("evaluate_method: the passed buffer is too small!\n");
-		
+
 	return status == AE_OK ? B_OK : B_ERROR;
 }
 
@@ -605,14 +613,14 @@ reboot(void)
 		return B_UNSUPPORTED;
 
 	status = AcpiWrite(AcpiGbl_FADT.ResetValue, &AcpiGbl_FADT.ResetRegister);
-	
+
 	if (status != AE_OK) {
 		ERROR("Reset failed, status = %d\n", status);
 		return B_ERROR;
 	}
-	
+
 	snooze(1000000);
-	ERROR("Reset failed, timeout\n");	
+	ERROR("Reset failed, timeout\n");
 	return B_ERROR;
 }
 
@@ -647,6 +655,7 @@ struct acpi_module_info gACPIModule = {
 	get_object_type,
 	get_object,
 	get_object_typed,
+	ns_handle_to_pathname,
 	evaluate_object,
 	evaluate_method,
 	prepare_sleep_state,

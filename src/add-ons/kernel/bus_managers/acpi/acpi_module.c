@@ -91,14 +91,14 @@ acpi_enumerate_child_devices(device_node *node, const char *root)
 				device_attr attrs[] = {
 					// info about device
 					{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
-	
+
 					// location on ACPI bus
 					{ ACPI_DEVICE_PATH_ITEM, B_STRING_TYPE, { string: result }},
-	
+
 					// info about the device
 					{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { string: hid }},
 					{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: type }},
-	
+
 					// consumer specification
 					/*{ B_DRIVER_MAPPING, B_STRING_TYPE, { string:
 						"hid_%" ACPI_DEVICE_HID_ITEM "%" }},
@@ -107,14 +107,14 @@ acpi_enumerate_child_devices(device_node *node, const char *root)
 					{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: /*B_FIND_CHILD_ON_DEMAND|*/B_FIND_MULTIPLE_CHILDREN }},
 					{ NULL }
 				};
-	
+
 				if (type == ACPI_TYPE_DEVICE)
 					get_device_hid(result, hid, sizeof(hid));
-	
+
 				if (gDeviceManager->register_node(node, ACPI_DEVICE_MODULE_NAME, attrs,
 						NULL, &deviceNode) == B_OK)
 	                		acpi_enumerate_child_devices(deviceNode, result);
-	
+
 				break;
 			}
 			default:
@@ -216,6 +216,7 @@ static struct acpi_root_info sACPIRootModule = {
 	get_object_type,
 	get_object,
 	get_object_typed,
+	ns_handle_to_pathname,
 	evaluate_object,
 	evaluate_method,
 };

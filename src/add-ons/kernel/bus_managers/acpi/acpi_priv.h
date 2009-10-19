@@ -29,7 +29,7 @@ extern device_manager_info *gDeviceManager;
 typedef struct acpi_device_cookie {
 	char			*path;			// path
 	acpi_handle		handle;
-	uint32			type;			// type	
+	uint32			type;			// type
 	device_node		*node;
 	char			name[32];		// name (for fast log)
 } acpi_device_cookie;
@@ -38,10 +38,10 @@ typedef struct acpi_device_cookie {
 // ACPI root.
 typedef struct acpi_root_info {
 	driver_module_info info;
-	
+
 	status_t	(*get_handle)(acpi_handle parent, char *pathname,
 					acpi_handle *retHandle);
-	
+
 	/* Global Lock */
 	status_t	(*acquire_global_lock)(uint16 timeout, uint32 *handle);
 	status_t	(*release_global_lock)(uint32 handle);
@@ -74,7 +74,7 @@ typedef struct acpi_root_info {
 	status_t	(*remove_address_space_handler)(acpi_handle handle,
 					uint32 spaceId,
 					acpi_adr_space_handler handler);
-				
+
 	/* Fixed Event Management */
 
 	void		(*enable_fixed_event) (uint32 event);
@@ -102,6 +102,8 @@ typedef struct acpi_root_info {
 					acpi_object_type **_returnValue);
 	status_t	(*get_object_typed)(const char *path,
 					acpi_object_type **_returnValue, uint32 objectType);
+	status_t	(*ns_handle_to_pathname)(acpi_handle targetHandle,
+					acpi_data *buffer);
 
 	/* Control method execution and data acquisition */
 
@@ -128,14 +130,14 @@ status_t install_notify_handler(acpi_handle device,	uint32 handlerType,
 	acpi_notify_handler handler, void *context);
 status_t remove_notify_handler(acpi_handle device, uint32 handlerType,
 	acpi_notify_handler handler);
-    				
+
 status_t enable_gpe(acpi_handle handle, uint32 gpeNumber, uint32 flags);
 status_t set_gpe_type(acpi_handle handle, uint32 gpeNumber, uint8 type);
 status_t install_gpe_handler(acpi_handle handle, uint32 gpeNumber, uint32 type,
 	acpi_event_handler handler, void *data);
 status_t remove_gpe_handler(acpi_handle handle, uint32 gpeNumber,
 	acpi_event_handler address);
-	
+
 status_t install_address_space_handler(acpi_handle handle, uint32 spaceId,
 	acpi_adr_space_handler handler, acpi_adr_space_setup setup, void *data);
 status_t remove_address_space_handler(acpi_handle handle, uint32 spaceId,
@@ -161,6 +163,7 @@ uint32 get_object_type(const char *path);
 status_t get_object(const char *path, acpi_object_type **return_value);
 status_t get_object_typed(const char *path, acpi_object_type **return_value,
 	uint32 object_type);
+status_t ns_handle_to_pathname(acpi_handle targetHandle, acpi_data *buffer);
 
 status_t evaluate_object(const char* object, acpi_object_type *returnValue,
 	size_t bufferLength);
