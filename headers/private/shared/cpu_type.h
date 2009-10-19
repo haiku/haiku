@@ -191,10 +191,9 @@ get_cpu_model_string(system_info *info)
 			get_cpuid_model_string(cpuidName);
 			if (strcasestr(cpuidName, "Celeron") != NULL)
 				return "Core 2 Celeron";
-			if (strcasestr(cpuidName, "Duo") != NULL)
-				return "Core 2 Duo";
-			if (strcasestr(cpuidName, "Quad") != NULL)
-				return "Core 2 Quad";
+			if (strcasestr(cpuidName, "Duo") != NULL
+				|| strcasestr(cpuidName, "Quad") != NULL)
+				return "Core 2";
 			if (strcasestr(cpuidName, "Xeon") != NULL)
 				return "Core 2 Xeon";
 			return "Core 2 Extreme";
