@@ -164,10 +164,6 @@ rw_lock_wait(rw_lock* lock, bool writer)
 
 	lock->waiters->last = &waiter;
 
-	InterruptsSpinLocker locker(gThreadSpinlock);
-
-	_mutex_unlock(&lock->lock, true);
-
 	// block
 	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_RW_LOCK, lock);
 	return thread_block_locked(waiter.thread);
@@ -194,7 +190,6 @@ rw_lock_unblock(rw_lock* lock)
 			lock->holder = waiter->thread->id;
 
 			// unblock thread
-			InterruptsSpinLocker locker(gThreadSpinlock);
 			thread_unblock_locked(waiter->thread, B_OK);
 		}
 		return;
@@ -210,7 +205,6 @@ rw_lock_unblock(rw_lock* lock)
 		lock->reader_count++;
 
 		// unblock thread
-		InterruptsSpinLocker locker(gThreadSpinlock);
 		thread_unblock_locked(waiter->thread, B_OK);
 	}
 }
@@ -226,8 +220,6 @@ rw_lock_init(rw_lock* lock, const char* name)
 	lock->writer_count = 0;
 	lock->owner_count = 0;
 	lock->flags = 0;
-
-	mutex_init(&lock->lock, name);
 
 	T_SCHEDULING_ANALYSIS(InitRWLock(lock, name));
 	NotifyWaitObjectListeners(&WaitObjectListener::RWLockInitialized, lock);
@@ -245,8 +237,6 @@ rw_lock_init_etc(rw_lock* lock, const char* name, uint32 flags)
 	lock->owner_count = 0;
 	lock->flags = flags & RW_LOCK_FLAG_CLONE_NAME;
 
-	mutex_init(&lock->lock, lock->name);
-
 	T_SCHEDULING_ANALYSIS(InitRWLock(lock, name));
 	NotifyWaitObjectListeners(&WaitObjectListener::RWLockInitialized, lock);
 }
@@ -262,8 +252,8 @@ rw_lock_destroy(rw_lock* lock)
 	InterruptsSpinLocker locker(gThreadSpinlock);
 
 #if KDEBUG
-	if (lock->waiters != NULL
-		&& thread_get_current_thread_id() != lock->holder) {
+	if (lock->waiters != NULL && thread_get_current_thread_id()
+		!= lock->holder) {
 		panic("rw_lock_destroy(): there are blocking threads, but the caller "
 			"doesn't hold the write lock (%p)", lock);
 
@@ -285,7 +275,6 @@ rw_lock_destroy(rw_lock* lock)
 	lock->name = NULL;
 
 	locker.Unlock();
-	mutex_destroy(&lock->lock);
 
 	free(name);
 }
@@ -297,7 +286,7 @@ rw_lock_read_lock(rw_lock* lock)
 #if KDEBUG_RW_LOCK_DEBUG
 	return rw_lock_write_lock(lock);
 #else
-	MutexLocker locker(lock->lock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 	if (lock->writer_count == 0) {
 		lock->reader_count++;
@@ -307,8 +296,6 @@ rw_lock_read_lock(rw_lock* lock)
 		lock->owner_count++;
 		return B_OK;
 	}
-
-	locker.Detach();
 
 	return rw_lock_wait(lock, false);
 #endif
@@ -321,7 +308,7 @@ rw_lock_read_unlock(rw_lock* lock)
 #if KDEBUG_RW_LOCK_DEBUG
 	return rw_lock_write_unlock(lock);
 #else
-	MutexLocker locker(lock->lock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 	if (lock->holder == thread_get_current_thread_id()) {
 		if (--lock->owner_count > 0)
@@ -351,7 +338,7 @@ rw_lock_read_unlock(rw_lock* lock)
 status_t
 rw_lock_write_lock(rw_lock* lock)
 {
-	MutexLocker locker(lock->lock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 	if (lock->reader_count == 0 && lock->writer_count == 0) {
 		lock->writer_count++;
@@ -365,7 +352,6 @@ rw_lock_write_lock(rw_lock* lock)
 	}
 
 	lock->writer_count++;
-	locker.Detach();
 
 	status_t status = rw_lock_wait(lock, true);
 	if (status == B_OK) {
@@ -379,7 +365,7 @@ rw_lock_write_lock(rw_lock* lock)
 status_t
 rw_lock_write_unlock(rw_lock* lock)
 {
-	MutexLocker locker(lock->lock);
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
 	if (thread_get_current_thread_id() != lock->holder) {
 		panic("rw_lock_write_unlock(): lock %p not write-locked by this thread",

@@ -42,7 +42,6 @@ struct rw_lock_waiter;
 
 typedef struct rw_lock {
 	const char*				name;
-	mutex					lock;
 	struct rw_lock_waiter*	waiters;
 	thread_id				holder;
 	int32					reader_count;
@@ -86,8 +85,7 @@ typedef struct rw_lock {
 #	define RECURSIVE_LOCK_INITIALIZER(name)	{ MUTEX_INITIALIZER(name), -1, 0 }
 #endif
 
-#define RW_LOCK_INITIALIZER(name)			{ name, MUTEX_INITIALIZER(name), \
-												NULL, -1, 0, 0, 0 }
+#define RW_LOCK_INITIALIZER(name)			{ name, NULL, -1, 0, 0, 0 }
 
 
 #if KDEBUG
