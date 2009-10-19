@@ -352,7 +352,7 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 		hTotalRegister = INTEL_DISPLAY_A_HTOTAL;
 		vTotalRegister = INTEL_DISPLAY_A_VTOTAL;
 		hSyncRegister = INTEL_DISPLAY_A_HSYNC;
-		vSyncRegister = INTEL_DISPLAY_A_VSYNC; 
+		vSyncRegister = INTEL_DISPLAY_A_VSYNC;
 		imageSizeRegister = INTEL_DISPLAY_A_IMAGE_SIZE;
 		controlRegister = INTEL_DISPLAY_A_CONTROL;
 	} else if (pllRegister == INTEL_DISPLAY_B_PLL) {
@@ -362,7 +362,7 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 		hTotalRegister = INTEL_DISPLAY_B_HTOTAL;
 		vTotalRegister = INTEL_DISPLAY_B_VTOTAL;
 		hSyncRegister = INTEL_DISPLAY_B_HSYNC;
-		vSyncRegister = INTEL_DISPLAY_B_VSYNC; 
+		vSyncRegister = INTEL_DISPLAY_B_VSYNC;
 		imageSizeRegister = INTEL_DISPLAY_B_IMAGE_SIZE;
 		controlRegister = INTEL_DISPLAY_B_CONTROL;
 	} else {
@@ -385,10 +385,15 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 		divisors.post1 = (pll & DISPLAY_PLL_9xx_POST1_DIVISOR_MASK)
 			>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
 
-		if ((pll & DISPLAY_PLL_DIVIDE_HIGH) != 0)
-			divisors.post2 = limits.max.post2;
-		else
-			divisors.post2 = limits.min.post2;
+		if (pllRegister == INTEL_DISPLAY_B_PLL) {
+			// TODO: Fix this? Need to support dual channel LVDS.
+			divisors.post2 = LVDS_POST2_RATE_SLOW;
+		} else {
+			if ((pll & DISPLAY_PLL_DIVIDE_HIGH) != 0)
+				divisors.post2 = limits.max.post2;
+			else
+				divisors.post2 = limits.min.post2;
+		}
 	} else {
 		// 8xx
 		divisors.post1 = (pll & DISPLAY_PLL_POST1_DIVISOR_MASK)
