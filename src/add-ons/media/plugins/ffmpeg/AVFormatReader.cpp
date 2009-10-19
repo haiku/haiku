@@ -19,6 +19,7 @@
 #include <MediaFormats.h>
 
 extern "C" {
+	#include "avcodec.h"
 	#include "avformat.h"
 }
 
@@ -59,6 +60,13 @@ avformat_to_beos_format(SampleFormat format)
 			break;
 	}
 	return 0;
+}
+
+
+uint32
+avformat_to_beos_byte_order(SampleFormat format)
+{
+	return B_MEDIA_HOST_ENDIAN;
 }
 
 
@@ -285,6 +293,30 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 	AVCodecContext* codecContext = fStream->codec;
 	AVStream* stream = fStream;
 
+#if 0
+// stippi: Here I was experimenting with the question if some fields of the
+// AVCodecContext change (or get filled out at all), if the AVCodec is opened.
+	class CodecOpener {
+	public:
+		CodecOpener(AVCodecContext* context)
+		{
+			fCodecContext = context;
+			AVCodec* codec = avcodec_find_decoder(context->codec_id);
+			fCodecOpen = avcodec_open(context, codec) >= 0;
+			if (!fCodecOpen)
+				TRACE("  failed to open the codec!\n");
+		}
+		~CodecOpener()
+		{
+			if (fCodecOpen)
+				avcodec_close(fCodecContext);
+		}
+	private:
+		AVCodecContext*		fCodecContext;
+		bool				fCodecOpen;
+	} codecOpener(codecContext);
+#endif
+
 	// initialize the media_format for this stream
 	media_format* format = &fFormat;
 	memset(format, 0, sizeof(media_format));
@@ -461,7 +493,9 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 		case B_MEDIA_RAW_AUDIO:
 			format->u.raw_audio.frame_rate = (float)codecContext->sample_rate;
 			format->u.raw_audio.channel_count = codecContext->channels;
-			format->u.encoded_audio.output.format
+			format->u.raw_audio.byte_order
+				= avformat_to_beos_byte_order(codecContext->sample_fmt);
+			format->u.raw_audio.format
 				= avformat_to_beos_format(codecContext->sample_fmt);
 			format->u.raw_audio.buffer_size = 0;
 
@@ -484,9 +518,19 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 				= (float)codecContext->sample_rate;
 			format->u.encoded_audio.output.channel_count
 				= codecContext->channels;
+			format->u.encoded_audio.output.byte_order
+				= avformat_to_beos_byte_order(codecContext->sample_fmt);
 			format->u.encoded_audio.output.format
 				= avformat_to_beos_format(codecContext->sample_fmt);
-			format->u.raw_audio.buffer_size = codecContext->block_align;
+			if (codecContext->block_align > 0) {
+				format->u.encoded_audio.output.buffer_size
+					= codecContext->block_align;
+			} else {
+				format->u.encoded_audio.output.buffer_size
+					= codecContext->frame_size * codecContext->channels
+						* (format->u.encoded_audio.output.format
+							& media_raw_audio_format::B_AUDIO_SIZE_MASK);
+			}
 			break;
 
 		case B_MEDIA_ENCODED_VIDEO:
@@ -729,6 +773,25 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
 		*time = (bigtime_t)(*frame * 1000000LL / FrameRate());
+
+#if 0
+	// This happens in ffplay.c:
+
+	int64_t pos = get_master_clock(cur_stream);
+		// The master clock seems to be the current system time
+		// with an offset for the current PTS value of the respective
+		// stream.
+	pos += incr;
+		// depends on the seek direction...
+
+	pos = (int64_t)(pos * AV_TIME_BASE);
+	uint32_t seekFlags = incr < 0 ? AVSEEK_FLAG_BACKWARD : 0;
+
+	pos = av_rescale_q(pos, AV_TIME_BASE_Q, fStream->time_base);
+	
+	ret = av_seek_frame(fContext, Index(), pos, seekFlags);
+#endif
+
 
 	int64_t timeStamp;
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
@@ -1228,10 +1291,6 @@ AVFormatReader::GetStreamInfo(void* _cookie, int64* frameCount,
 	bigtime_t* duration, media_format* format, const void** infoBuffer,
 	size_t* infoSize)
 {
-	TRACE("AVFormatReader::GetStreamInfo()\n");
-
-//	BAutolock _(fStreamLock);
-
 	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
 	return cookie->GetStreamInfo(frameCount, duration, format, infoBuffer,
 		infoSize);
@@ -1242,10 +1301,6 @@ status_t
 AVFormatReader::Seek(void* _cookie, uint32 seekTo, int64* frame,
 	bigtime_t* time)
 {
-	TRACE_SEEK("AVFormatReader::Seek()\n");
-
-//	BAutolock _(fStreamLock);
-
 	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
 	return cookie->Seek(seekTo, frame, time);
 }
@@ -1255,10 +1310,6 @@ status_t
 AVFormatReader::FindKeyFrame(void* _cookie, uint32 flags, int64* frame,
 	bigtime_t* time)
 {
-	TRACE_SEEK("AVFormatReader::FindKeyFrame()\n");
-
-//	BAutolock _(fStreamLock);
-
 	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
 	return cookie->FindKeyFrame(flags, frame, time);
 }
@@ -1268,10 +1319,6 @@ status_t
 AVFormatReader::GetNextChunk(void* _cookie, const void** chunkBuffer,
 	size_t* chunkSize, media_header* mediaHeader)
 {
-	TRACE_PACKET("AVFormatReader::GetNextChunk()\n");
-
-//	BAutolock _(fStreamLock);
-
 	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
 	return cookie->GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
 }
