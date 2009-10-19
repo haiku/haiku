@@ -54,7 +54,7 @@ AudioAdapter::AudioAdapter(AudioReader* source, const media_format& format)
 		}
 
 		if (fFormat.u.raw_audio.channel_count
-			!= source->Format().u.raw_audio.channel_count) {
+				!= source->Format().u.raw_audio.channel_count) {
 			TRACE("AudioAdapter() - using channel converter\n");
 			fChannelConverter = new (nothrow) AudioChannelConverter(source,
 				fFormat);
