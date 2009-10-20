@@ -5,6 +5,7 @@
 
 #include <locks.h>
 #include <syscalls.h>
+#include <user_thread.h>
 
 #include <OS.h>
 
@@ -77,6 +78,7 @@ rw_lock_wait(rw_lock *lock, bool writer)
 	lock->last_waiter = &waiter;
 
 	// the rw_lock is locked when entering, release it before blocking
+	get_user_thread()->wait_status = 1;
 	mutex_unlock(&lock->lock);
 
 	status_t result;
