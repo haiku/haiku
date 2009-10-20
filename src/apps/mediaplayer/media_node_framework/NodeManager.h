@@ -40,10 +40,9 @@ class NodeManager : public PlaybackManager {
 
 			status_t			Init(BRect videoBounds, float videoFrameRate,
 									color_space preferredVideoFormat,
-									int32 loopingMode,
-									bool loopingEnabled,
-									float speed,
-									uint32 enabledNodes,
+									float audioFrameRate, uint32 audioChannels,
+									int32 loopingMode, bool loopingEnabled,
+									float speed, uint32 enabledNodes,
 									bool useOverlays);
 			status_t			InitCheck();
 								// only call this if the
@@ -53,9 +52,11 @@ class NodeManager : public PlaybackManager {
 			status_t			FormatChanged(BRect videoBounds,
 									float videoFrameRate,
 									color_space preferredVideoFormat,
+									float audioFrameRate, uint32 audioChannels,
 									uint32 enabledNodes,
 									bool useOverlays,
 									bool force = false);
+
 	virtual	void				SetPlayMode(int32 mode,
 									bool continuePlaying = true);
 									
@@ -76,11 +77,14 @@ class NodeManager : public PlaybackManager {
 
  private:
 			status_t			_SetUpNodes(color_space preferredVideoFormat,
-									uint32 enabledNodes, bool useOverlays);
+									uint32 enabledNodes, bool useOverlays,
+									float audioFrameRate,
+									uint32 audioChannels);
 			status_t			_SetUpVideoNodes(
 									color_space preferredVideoFormat,
 									bool useOverlays);
-			status_t			_SetUpAudioNodes();
+			status_t			_SetUpAudioNodes(float audioFrameRate,
+									uint32 audioChannels);
 			status_t			_TearDownNodes(bool disconnect = true);
 			status_t			_StartNodes();
 			void				_StopNodes();

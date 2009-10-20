@@ -66,8 +66,9 @@ NodeManager::~NodeManager()
 // Init
 status_t
 NodeManager::Init(BRect videoBounds, float videoFrameRate,
-	color_space preferredVideoFormat, int32 loopingMode,
-	bool loopingEnabled, float speed, uint32 enabledNodes, bool useOverlays)
+	color_space preferredVideoFormat, float audioFrameRate,
+	uint32 audioChannels, int32 loopingMode, bool loopingEnabled,
+	float speed, uint32 enabledNodes, bool useOverlays)
 {
 	// init base class
 	PlaybackManager::Init(videoFrameRate, loopingMode, loopingEnabled, speed);
@@ -83,7 +84,7 @@ NodeManager::Init(BRect videoBounds, float videoFrameRate,
 		fAudioSupplier = CreateAudioSupplier();
 
 	return FormatChanged(videoBounds, videoFrameRate, preferredVideoFormat,
-		enabledNodes, useOverlays, true);
+		audioFrameRate, audioChannels, enabledNodes, useOverlays, true);
 }
 
 // InitCheck
@@ -118,8 +119,8 @@ NodeManager::CleanupNodes()
 // FormatChanged
 status_t
 NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate,
-	color_space preferredVideoFormat, uint32 enabledNodes, bool useOverlays,
-	bool force)
+	color_space preferredVideoFormat, float audioFrameRate,
+	uint32 audioChannels, uint32 enabledNodes, bool useOverlays, bool force)
 {
 	TRACE("NodeManager::FormatChanged()\n");
 
@@ -144,7 +145,7 @@ NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate,
 	SetVideoBounds(videoBounds);
 
 	status_t ret = _SetUpNodes(preferredVideoFormat, enabledNodes,
-		useOverlays);
+		useOverlays, audioFrameRate, audioChannels);
 	if (ret == B_OK)
 		_StartNodes();
 	else
@@ -253,7 +254,7 @@ NodeManager::SetPeakListener(BHandler* handler)
 // _SetUpNodes
 status_t
 NodeManager::_SetUpNodes(color_space preferredVideoFormat, uint32 enabledNodes,
-	bool useOverlays)
+	bool useOverlays, float audioFrameRate, uint32 audioChannels)
 {
 	TRACE("NodeManager::_SetUpNodes()\n");
 
@@ -289,7 +290,7 @@ NodeManager::_SetUpNodes(color_space preferredVideoFormat, uint32 enabledNodes,
 	
 	// setup the audio nodes
 	if (enabledNodes != VIDEO_ONLY) {
-		fStatus = _SetUpAudioNodes();
+		fStatus = _SetUpAudioNodes(audioFrameRate, audioChannels);
 		if (fStatus != B_OK) {
 			print_error("Error setting up audio nodes", fStatus);
 			fMediaRoster->Unlock();
@@ -445,7 +446,7 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat,
 
 // _SetUpAudioNodes
 status_t
-NodeManager::_SetUpAudioNodes()
+NodeManager::_SetUpAudioNodes(float audioFrameRate, uint32 audioChannels)
 {
 	fAudioProducer = new AudioProducer("MediaPlayer Audio Out", fAudioSupplier);
 	fAudioProducer->SetPeakListener(fPeakListener);
@@ -489,11 +490,13 @@ NodeManager::_SetUpAudioNodes()
 	}
 
 	// got the endpoints; now we connect it!
-	media_format audio_format;
-	audio_format.type = B_MEDIA_RAW_AUDIO;	
-	audio_format.u.raw_audio = media_raw_audio_format::wildcard;
+	media_format audioFormat;
+	audioFormat.type = B_MEDIA_RAW_AUDIO;
+	audioFormat.u.raw_audio = media_raw_audio_format::wildcard;
+	audioFormat.u.raw_audio.frame_rate = audioFrameRate;
+	audioFormat.u.raw_audio.channel_count = audioChannels;
 	fStatus = fMediaRoster->Connect(soundOutput.source, mixerInput.destination,
-		&audio_format, &soundOutput, &mixerInput);
+		&audioFormat, &soundOutput, &mixerInput);
 	if (fStatus != B_OK) {
 		print_error("unable to connect audio nodes", fStatus);
 		return fStatus;
@@ -502,7 +505,7 @@ NodeManager::_SetUpAudioNodes()
 	// the inputs and outputs might have been reassigned during the
 	// nodes' negotiation of the Connect().  That's why we wait until
 	// after Connect() finishes to save their contents.
-	fAudioConnection.format = audio_format;
+	fAudioConnection.format = audioFormat;
 	fAudioConnection.source = soundOutput.source;
 	fAudioConnection.destination = mixerInput.destination;
 	fAudioConnection.connected = true;
@@ -694,7 +697,6 @@ printf("performance time for %lld: %lld\n", real + latency
 	}
 
 	if (fAudioProducer) {
-		fAudioProducer->SetRunning(true);
 		status = fMediaRoster->StartNode(fAudioConnection.producer, perf);
 		if (status != B_OK) {
 			print_error("Can't start the audio producer", status);
@@ -715,27 +717,19 @@ void
 NodeManager::_StopNodes()
 {
 	TRACE("NodeManager::_StopNodes()\n");
-//	if (PlayMode() == MODE_PLAYING_PAUSED_FORWARD
-//		|| PlayMode() == MODE_PLAYING_PAUSED_FORWARD)
-//		return;
 	fMediaRoster = BMediaRoster::Roster();
-	if (!fMediaRoster) {
-		if (fAudioProducer)
-			fAudioProducer->SetRunning(false);
-		return;
-	} else if (fMediaRoster->Lock()) {
+	if (fMediaRoster != NULL && fMediaRoster->Lock()) {
 		// begin mucking with the media roster
-		if (fVideoProducer) {
+		if (fVideoProducer != NULL) {
 			TRACE("  stopping video producer...\n");
 			fMediaRoster->StopNode(fVideoConnection.producer, 0, true);
 		}
-		if (fAudioProducer) {
+		if (fAudioProducer != NULL) {
 			TRACE("  stopping audio producer...\n");
-			fAudioProducer->SetRunning(false);
 			fMediaRoster->StopNode(fAudioConnection.producer, 0, true);
 				// synchronous stop
 		}
-		if (fVideoConsumer) {
+		if (fVideoConsumer != NULL) {
 			TRACE("  stopping video consumer...\n");
 			fMediaRoster->StopNode(fVideoConnection.consumer, 0, true);
 		}

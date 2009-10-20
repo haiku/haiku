@@ -1,10 +1,12 @@
-/*	Copyright (c) 1998-99, Be Incorporated, All Rights Reserved.
- *	Distributed under the terms of the Be Sample Code license.
+/*
+ * Copyright (c) 1998-99, Be Incorporated, All Rights Reserved.
+ * Distributed under the terms of the Be Sample Code license.
  *
- *	Copyright (c) 2000-2008, Ingo Weinhold <ingo_weinhold@gmx.de>,
- *	Copyright (c) 2000-2008, Stephan Aßmus <superstippi@gmx.de>,
- *	All Rights Reserved. Distributed under the terms of the MIT license.
+ * Copyright (c) 2000-2008, Ingo Weinhold <ingo_weinhold@gmx.de>,
+ * Copyright (c) 2000-2008, Stephan Aßmus <superstippi@gmx.de>,
+ * All Rights Reserved. Distributed under the terms of the MIT license.
  */
+
 #include "AudioProducer.h"
 
 #include <math.h>
@@ -32,13 +34,15 @@
 
 
 // debugging
-//#define TRACE_AUDIO_PRODUCER
+#define TRACE_AUDIO_PRODUCER
 #ifdef TRACE_AUDIO_PRODUCER
-# define TRACE(x...)	printf(x)
-# define ERROR(x...)	fprintf(stderr, x)
+# define TRACE(x...)		printf(x)
+# define TRACE_BUFFER(x...)
+# define ERROR(x...)		fprintf(stderr, x)
 #else
 # define TRACE(x...)
-# define ERROR(x...)	fprintf(stderr, x)
+# define TRACE_BUFFER(x...)
+# define ERROR(x...)		fprintf(stderr, x)
 #endif
 
 
@@ -96,7 +100,6 @@ AudioProducer::AudioProducer(const char* name, AudioSupplier* supplier,
 	  fFramesSent(0),
 	  fStartTime(0),
 	  fSupplier(supplier),
-	  fRunning(false),
 
 	  fPeakListener(NULL)
 {
@@ -175,15 +178,12 @@ AudioProducer::FormatSuggestionRequested(media_type type, int32 quality,
 	if (!_format)
 		return B_BAD_VALUE;
 
-	// this is the format we'll be returning (our preferred format)
+	// This is the format we'll be returning (our preferred format)
 	*_format = fPreferredFormat;
 
-	// a wildcard type is okay; we can specialize it
-	if (type == B_MEDIA_UNKNOWN_TYPE)
-		type = B_MEDIA_RAW_AUDIO;
-
-	// we only support raw audio
-	if (type != B_MEDIA_RAW_AUDIO)
+	// A wildcard type is okay; we can specialize it, otherwise only raw audio
+	// is supported
+	if (type != B_MEDIA_UNKNOWN_TYPE && type != B_MEDIA_RAW_AUDIO)
 		return B_MEDIA_BAD_FORMAT;
 
 	return B_OK;
@@ -200,19 +200,27 @@ AudioProducer::FormatProposal(const media_source& output, media_format* format)
 		return B_MEDIA_BAD_SOURCE;
 	}
 
-	// TODO: we might want to support different audio formats
-	// we only support floating-point raw audio, so we always return that, but
-	// we supply an error code depending on whether we found the proposal
-	// acceptable.
-	media_type requestedType = format->type;
-	*format = fPreferredFormat;
-
-	// raw audio or wildcard type, either is okay by us
-	if (requestedType != B_MEDIA_UNKNOWN_TYPE
-		&& requestedType != B_MEDIA_RAW_AUDIO) {
+	// Raw audio or wildcard type, either is okay by us. If the format is
+	// anything else, overwrite it with our preferred format. Also, we only support
+	// floating point audio in the host native byte order at the moment.
+	if ((format->type != B_MEDIA_UNKNOWN_TYPE
+			&& format->type != B_MEDIA_RAW_AUDIO)
+		|| (format->u.raw_audio.format
+				!= media_raw_audio_format::wildcard.format
+			&& format->u.raw_audio.format
+				!= fPreferredFormat.u.raw_audio.format)
+		|| (format->u.raw_audio.byte_order
+				!= media_raw_audio_format::wildcard.byte_order
+			&& format->u.raw_audio.byte_order
+				!= fPreferredFormat.u.raw_audio.byte_order)) {
 		TRACE("  -> B_MEDIA_BAD_FORMAT\n");
+		*format = fPreferredFormat;
 		return B_MEDIA_BAD_FORMAT;
 	}
+
+	format->type = B_MEDIA_RAW_AUDIO;
+	format->u.raw_audio.format = fPreferredFormat.u.raw_audio.format;
+	format->u.raw_audio.byte_order = fPreferredFormat.u.raw_audio.byte_order;
 
 	return B_OK;
 }
@@ -235,13 +243,10 @@ AudioProducer::FormatChangeRequested(const media_source& source,
 		return B_MEDIA_BAD_SOURCE;
 	}
 
-	fOutput.format = *ioFormat;
-	
-	// notify our audio supplier of the format change
-	if (fSupplier)
-		fSupplier->SetFormat(fOutput.format);
+// TODO: Maybe we are supposed to specialize here only and not actually change yet?
+//	status_t ret = _SpecializeFormat(ioFormat);
 
-	return _AllocateBuffers(ioFormat);
+	return ChangeFormat(ioFormat);
 }
 
 
@@ -333,52 +338,19 @@ AudioProducer::PrepareToConnect(const media_source& what,
 		return B_MEDIA_ALREADY_CONNECTED;
 	}
 
-	// the format may not yet be fully specialized (the consumer might have
-	// passed back some wildcards).  Finish specializing it now, and return an
-	// error if we don't support the requested format.
-	if (format->type != B_MEDIA_RAW_AUDIO) {
-		TRACE("  -> B_MEDIA_BAD_FORMAT\n");
-		return B_MEDIA_BAD_FORMAT;
-// TODO: we might want to support different audio formats
-	} else if (format->u.raw_audio.format
-			!= fPreferredFormat.u.raw_audio.format) {
-		TRACE("  -> B_MEDIA_BAD_FORMAT\n");
-		return B_MEDIA_BAD_FORMAT;
-	}
-
-	if (format->u.raw_audio.channel_count
-		== media_raw_audio_format::wildcard.channel_count) {
-		format->u.raw_audio.channel_count = 2;
-		TRACE("  -> adjusting channel count, it was wildcard\n");
-	}
-	if (format->u.raw_audio.frame_rate
-		== media_raw_audio_format::wildcard.frame_rate) {
-		format->u.raw_audio.frame_rate = 44100.0;
-		TRACE("  -> adjusting frame rate, it was wildcard\n");
-	}
-
-	// check the buffer size, which may still be wildcarded
-	if (format->u.raw_audio.buffer_size
-		== media_raw_audio_format::wildcard.buffer_size) {
-		// pick something comfortable to suggest
-		TRACE("  -> adjusting buffer size, it was wildcard\n");
-
-		// NOTE: the (buffer_size * 1000000) needs to be dividable by
-		// format->u.raw_audio.frame_rate! (We assume frame rate is a multiple of
-		// 25, which it usually is.)
-		format->u.raw_audio.buffer_size
-			= uint32(format->u.raw_audio.frame_rate / 25.0)
-				* (format->u.raw_audio.format
-					& media_raw_audio_format::B_AUDIO_SIZE_MASK);
-	
-		if (!fLowLatency)
-			format->u.raw_audio.buffer_size *= 3;
-
+	status_t ret = _SpecializeFormat(format);
+	if (ret != B_OK) {
+		TRACE("  -> format error: %s\n", strerror(ret));
+		return ret;
 	}
 
 	// Now reserve the connection, and return information about it
 	fOutput.destination = where;
 	fOutput.format = *format;
+
+	if (fSupplier != NULL)
+		fSupplier->SetFormat(fOutput.format);
+
 	*_source = fOutput.source;
 	strncpy(_name, fOutput.name, B_MEDIA_NAME_LENGTH);
 	TRACE("  -> B_OK\n");
@@ -479,8 +451,8 @@ AudioProducer::Connect(status_t error, const media_source& source,
 	// us a buffer group (via SetBufferGroup()) prior to this.  That can
 	// happen, for example, if the consumer calls SetOutputBuffersFor() on
 	// us from within its Connected() method.
-	if (!fBufferGroup)
-		_AllocateBuffers(&fOutput.format);
+	if (fBufferGroup == NULL)
+		_AllocateBuffers(fOutput.format);
 
 	TRACE("AudioProducer::Connect() done\n");
 }
@@ -615,7 +587,7 @@ void
 AudioProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 	bool realTimeEvent)
 {
-	TRACE("%p->AudioProducer::HandleEvent()\n", this);
+	TRACE_BUFFER("%p->AudioProducer::HandleEvent()\n", this);
 
 	switch (event->type) {
 		case BTimedEventQueue::B_START:
@@ -639,7 +611,7 @@ printf("B_START: start time: %lld\n", fStartTime);
 			break;
 	
 		case BTimedEventQueue::B_HANDLE_BUFFER: {
-			TRACE("AudioProducer::HandleEvent(B_HANDLE_BUFFER)\n");
+			TRACE_BUFFER("AudioProducer::HandleEvent(B_HANDLE_BUFFER)\n");
 			if ((RunState() == BMediaEventLooper::B_STARTED)
 				&& (fOutput.destination != media_destination::null)) {
 				BBuffer* buffer = _FillNextBuffer(event->event_time);
@@ -665,23 +637,14 @@ printf("B_START: start time: %lld\n", fStartTime);
 					BTimedEventQueue::B_HANDLE_BUFFER);
 				EventQueue()->AddEvent(nextBufferEvent);
 			} else {
-				fprintf(stderr, "B_HANDLE_BUFFER, but not started!\n");
+				ERROR("B_HANDLE_BUFFER, but not started!\n");
 			}
-			TRACE("AudioProducer::HandleEvent(B_HANDLE_BUFFER) done\n");
+			TRACE_BUFFER("AudioProducer::HandleEvent(B_HANDLE_BUFFER) done\n");
 			break;
 		}
 		default:
 			break;
 	}
-}
-
-
-void
-AudioProducer::SetRunning(bool running)
-{
-	TRACE("%p->AudioProducer::SetRunning(%d)\n", this, running);
-
-	fRunning = running;
 }
 
 
@@ -692,11 +655,104 @@ AudioProducer::SetPeakListener(BHandler* handler)
 }
 
 
+status_t
+AudioProducer::ChangeFormat(media_format* format)
+{
+	TRACE("AudioProducer::ChangeFormat()\n");
+
+	format->u.raw_audio.buffer_size = media_raw_audio_format::wildcard.buffer_size;
+
+	status_t ret = _SpecializeFormat(format);
+	if (ret != B_OK) {
+		TRACE("  _SpecializeFormat(): %s\n", strerror(ret));
+		return ret;
+	}
+
+	ret = BBufferProducer::ProposeFormatChange(format, fOutput.destination);
+	if (ret != B_OK) {
+		TRACE("  ProposeFormatChange(): %s\n", strerror(ret));
+		return ret;
+	}
+
+	ret = BBufferProducer::ChangeFormat(fOutput.source, fOutput.destination, format);
+	if (ret != B_OK) {
+		TRACE("  ChangeFormat(): %s\n", strerror(ret));
+		return ret;
+	}
+
+	return _ChangeFormat(*format);
+}
+
+
 // #pragma mark -
 
 
 status_t
-AudioProducer::_AllocateBuffers(media_format* format)
+AudioProducer::_SpecializeFormat(media_format* format)
+{
+	// the format may not yet be fully specialized (the consumer might have
+	// passed back some wildcards).  Finish specializing it now, and return an
+	// error if we don't support the requested format.
+	if (format->type != B_MEDIA_RAW_AUDIO) {
+		TRACE("  not raw audio\n");
+		return B_MEDIA_BAD_FORMAT;
+// TODO: we might want to support different audio formats
+	} else if (format->u.raw_audio.format
+			!= fPreferredFormat.u.raw_audio.format) {
+		TRACE("  format does not match\n");
+		return B_MEDIA_BAD_FORMAT;
+	}
+
+	if (format->u.raw_audio.channel_count
+		== media_raw_audio_format::wildcard.channel_count) {
+		format->u.raw_audio.channel_count = 2;
+		TRACE("  -> adjusting channel count, it was wildcard\n");
+	}
+
+	if (format->u.raw_audio.frame_rate
+		== media_raw_audio_format::wildcard.frame_rate) {
+		format->u.raw_audio.frame_rate = 44100.0;
+		TRACE("  -> adjusting frame rate, it was wildcard\n");
+	}
+
+	// check the buffer size, which may still be wildcarded
+	if (format->u.raw_audio.buffer_size
+		== media_raw_audio_format::wildcard.buffer_size) {
+		// pick something comfortable to suggest
+		TRACE("  -> adjusting buffer size, it was wildcard\n");
+
+		// NOTE: the (buffer_size * 1000000) needs to be dividable by
+		// format->u.raw_audio.frame_rate! (We assume frame rate is a multiple of
+		// 25, which it usually is.)
+		format->u.raw_audio.buffer_size
+			= uint32(format->u.raw_audio.frame_rate / 25.0)
+				* (format->u.raw_audio.format
+					& media_raw_audio_format::B_AUDIO_SIZE_MASK);
+	
+		if (!fLowLatency)
+			format->u.raw_audio.buffer_size *= 3;
+
+	}
+
+	return B_OK;
+}
+
+
+status_t
+AudioProducer::_ChangeFormat(const media_format& format)
+{
+	fOutput.format = format;
+
+	// notify our audio supplier of the format change
+	if (fSupplier)
+		fSupplier->SetFormat(format);
+
+	return _AllocateBuffers(format);
+}
+
+
+status_t
+AudioProducer::_AllocateBuffers(const media_format& format)
 {
 	TRACE("%p->AudioProducer::_AllocateBuffers()\n", this);
 
@@ -704,7 +760,7 @@ AudioProducer::_AllocateBuffers(media_format* format)
 		delete fBufferGroup;
 		fBufferGroup = NULL;
 	}
-	size_t size = format->u.raw_audio.buffer_size;
+	size_t size = format.u.raw_audio.buffer_size;
 	int32 bufferDuration = BufferDuration();
 	int32 count = 0;
 	if (bufferDuration > 0) {

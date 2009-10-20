@@ -98,13 +98,15 @@ public:
 									bigtime_t lateness,
 									bool realTimeEvent = false);
 
-			void				SetRunning(bool running);
-
 	// AudioProducer
 			void				SetPeakListener(BHandler* handler);
 
+			status_t			ChangeFormat(media_format* format);
+
 private:
-			status_t			_AllocateBuffers(media_format* format);
+			status_t			_SpecializeFormat(media_format* format);
+			status_t			_ChangeFormat(const media_format& format);
+			status_t			_AllocateBuffers(const media_format& format);
 			BBuffer*			_FillNextBuffer(bigtime_t eventTime);
 
 			void				_FillSampleBuffer(float* data,
@@ -123,7 +125,6 @@ private:
 			bigtime_t			fStartTime;
 
 			AudioSupplier*		fSupplier;
-	volatile bool				fRunning;
 
 			BHandler*			fPeakListener;
 };

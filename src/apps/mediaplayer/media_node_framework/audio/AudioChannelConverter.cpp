@@ -40,6 +40,8 @@ convert(Type* inBuffer, Type* outBuffer, int32 inChannels, int32 outChannels,
 {
 	// TODO: more conversions!
 	switch (inChannels) {
+		case 0:
+			break;
 		case 1:
 			switch (outChannels) {
 				case 2:
@@ -61,13 +63,13 @@ convert(Type* inBuffer, Type* outBuffer, int32 inChannels, int32 outChannels,
 					break;
 			}
 			break;
-		case 5:
+		default:
 			switch (outChannels) {
 				case 2:
 					for (int32 i = 0; i < frames; i++) {
 						outBuffer[0] = inBuffer[0];
 						outBuffer[1] = inBuffer[1];
-						inBuffer += 5;
+						inBuffer += outChannels;
 						outBuffer += 2;
 					}
 					break;

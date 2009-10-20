@@ -295,7 +295,7 @@ Controller::SetTo(const PlaylistItemRef& item)
 	int height;
 	GetSize(&width, &height);
 	color_space preferredVideoFormat = B_NO_COLOR_SPACE;
-	if (fVideoTrackSupplier) {
+	if (fVideoTrackSupplier != NULL) {
 		const media_format& format = fVideoTrackSupplier->Format();
 		preferredVideoFormat = format.u.raw_video.display.format;
 	}
@@ -308,13 +308,22 @@ Controller::SetTo(const PlaylistItemRef& item)
 	else
 		enabledNodes = AUDIO_AND_VIDEO;
 
+	float audioFrameRate = 44100.0f;
+	uint32 audioChannels = 2;
+	if (fAudioTrackSupplier != NULL) {
+		const media_format& audioTrackFormat = fAudioTrackSupplier->Format();
+		audioFrameRate = audioTrackFormat.u.raw_audio.frame_rate;
+		audioChannels = audioTrackFormat.u.raw_audio.channel_count;
+	}
+
 	if (InitCheck() != B_OK) {
 		Init(BRect(0, 0, width - 1, height - 1), fVideoFrameRate,
-			preferredVideoFormat, LOOPING_ALL, false, 1.0, enabledNodes,
-			useOverlays);
+			preferredVideoFormat, audioFrameRate, audioChannels, LOOPING_ALL,
+			false, 1.0, enabledNodes, useOverlays);
 	} else {
 		FormatChanged(BRect(0, 0, width - 1, height - 1), fVideoFrameRate,
-			preferredVideoFormat, enabledNodes, useOverlays);
+			preferredVideoFormat, audioFrameRate, audioChannels, enabledNodes,
+			useOverlays);
 	}
 
 	_NotifyFileChanged();
