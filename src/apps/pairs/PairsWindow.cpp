@@ -38,6 +38,8 @@ PairsWindow::PairsWindow()
 		"PairsView", B_FOLLOW_NONE);
 	fPairsView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(fPairsView);
+
+	CenterOnScreen();
 }
 
 
