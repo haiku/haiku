@@ -1635,7 +1635,7 @@ Query::LiveUpdate(Inode* inode, const char* attribute, int32 type,
 	} else {
 		// The entry stays in the query - only notify in case the name of the
 		// inode was changed
-		if (oldKey == NULL || strcmp(attribute, "name"))
+		if (oldKey == NULL || strcmp(attribute, "name") != 0 || newKey == NULL)
 			return;
 
 		notify_query_entry_removed(fPort, fToken, fVolume->ID(),
