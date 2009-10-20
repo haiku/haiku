@@ -5,7 +5,7 @@ UsePrivateHeaders shared ;
 
 AddResources Bluetooth : bluetooth-pref.rdef ;
 
-Preference Bluetooth : 
+Preference Bluetooth :
 	BluetoothDeviceView.cpp
 	BluetoothMain.cpp
 	BluetoothSettingsView.cpp
@@ -28,6 +28,6 @@ DoCatalogs Bluetooth :
 	InquiryPanel.cpp
 	RemoteDevicesView.cpp
 	: en.catalog
-	: fi.catkeys fr.catkeys ru.catkeys de.catkeys sv.catkeys
+	: fi.catkeys fr.catkeys ru.catkeys de.catkeys sv.catkeys ua.catkeys
 	;
 

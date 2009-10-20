@@ -7,8 +7,8 @@ Year (4 digits)	TimeFormatSettings		Année (4 chiffres)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La liste des langages disponibles est introuvable, ce preflet est donc inutilisable !
 After	TimeFormatSettings		Après
 Long format:	TimeFormatSettings		Format long:
-Currency	TimeFormatSettings		Devise
 Before	TimeFormatSettings		Avant
+Currency	TimeFormatSettings		Devise
 Year	TimeFormatSettings		Année
 Short format:	TimeFormatSettings		Format court:
 Currency symbol:	TimeFormatSettings		Symbole monétaire:

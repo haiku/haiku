@@ -1,0 +1,48 @@
+1	ukrainian	x-vnd.Haiku-Locale	2750813901
+day of week (short name)	TimeFormatSettings		день тижня (скорочено)
+Available languages	Locale Preflet Window		Доступні мови
+Decimal separator	TimeFormatSettings		Десятковий розділювач 
+Separator:	TimeFormatSettings		Розділювач:
+Year (4 digits)	TimeFormatSettings		Рік (4 цифри)
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Неможливо знайти доступні мови! Ви не можете  використовувати цю функцію!
+After	TimeFormatSettings		Після
+Long format:	TimeFormatSettings		Звичний  формат:
+Before	TimeFormatSettings		До
+Currency	TimeFormatSettings		Біжучий
+Year	TimeFormatSettings		Рік
+Short format:	TimeFormatSettings		Скорочений формат:
+Currency symbol:	TimeFormatSettings		Біжучий символ:
+Space	TimeFormatSettings		Простір
+Language	Locale Preflet Window		Мова
+Thousand separator	TimeFormatSettings		Розділювач тисяч
+24 Hour	TimeFormatSettings		24 Heures
+Year (2 digits)	TimeFormatSettings		Рік (2 цифри)
+Preferred languages	Locale Preflet Window		Preferred languages
+Symbol position	TimeFormatSettings		Позиція символа
+month number	TimeFormatSettings		номер місяця
+month number (2 digits)	TimeFormatSettings		номер місяця  (2 цифри)
+Numbers	TimeFormatSettings		Номери
+ (unknown format)	TimeFormatSettings		 (невідомий формат)
+Negative marker:	TimeFormatSettings		Негативний маркер:
+12 Hour	TimeFormatSettings		12 Heures
+Defaults	Locale Preflet Window		По замовчуванню
+Separator	TimeFormatSettings		Розділювач
+Country	Locale Preflet Window		Країна
+Revert	Locale Preflet Window		Повернути
+day in month	TimeFormatSettings		день місяця
+day of week in month	TimeFormatSettings		день тижня в місяці
+Negative marker	TimeFormatSettings		Негативний маркер
+Ok	Locale Preflet Window		Ok
+Time	TimeFormatSettings		Час
+Date	TimeFormatSettings		Дата
+List separator	TimeFormatSettings		Розділювач листів
+day of week	TimeFormatSettings		день тижня
+Locale	Locale Preflet		Locale
+None	TimeFormatSettings		жоден
+day in month (2 digits)	TimeFormatSettings		день в місяці (2 цифри)
+Clock	TimeFormatSettings		Час
+Example:	TimeFormatSettings		Приклад:
+day of week (name)	TimeFormatSettings		день тижня (назва)
+month name	TimeFormatSettings		назва місяця
+Day	TimeFormatSettings		День
+Leading 0	TimeFormatSettings		інтервал між стрічками 0
