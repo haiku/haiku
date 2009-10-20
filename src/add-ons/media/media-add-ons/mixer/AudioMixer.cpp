@@ -475,10 +475,13 @@ AudioMixer::FormatChanged(const media_source &producer,
 
 	if (fCore->Settings()->RefuseInputFormatChange()) {
 		TRACE("AudioMixer::FormatChanged: input format change refused\n");
-		return B_ERROR;
+		return B_NOT_ALLOWED;
 	}
 
-	// XXX we should not apply the format change at this point
+	// TODO: We should not apply the format change at this point
+	// TODO: At the moment, this is not implemented at the moment and will just
+	// crash the media_server.
+	return B_NOT_SUPPORTED;
 
 	// tell core about format change
 	fCore->Lock();
