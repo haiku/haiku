@@ -1,0 +1,12 @@
+1	Bulgarian	x-vnd.Haiku-Fonts	3656873675
+Defaults	Main window		По подразбиране
+Plain Font:	Font view		Прост шрифт:
+Fonts	Main window		Fonts
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fonts\n\tCopyright 2004-2005, Haiku.\n\n
+Revert	Main window		Върни
+Size:	Font Selection view		Размер:
+Menu Font:	Font view		Меню шрифт:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	The quick brown fox jumps over the lazy dog.
+Bold Font:	Font view		Удебелен шрифт:
+Fixed Font:	Font view		Фиксиран шрифт:
+Ok	main		Ок

@@ -28,7 +28,7 @@ DoCatalogs Bluetooth :
 	InquiryPanel.cpp
 	RemoteDevicesView.cpp
 	: en.catalog
-	: fi.catkeys fr.catkeys it.catkeys ru.catkeys de.catkeys sv.catkeys
-	ua.catkeys
+	: bg.catkeys fi.catkeys fr.catkeys it.catkeys ru.catkeys de.catkeys
+	sv.catkeys ua.catkeys
 	;
 
