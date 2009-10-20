@@ -890,6 +890,8 @@ BWindow::DispatchMessage(BMessage* msg, BHandler* target)
 			msg->FindInt32("delta_x", &deltaX);
 			int32 deltaY = 0;
 			msg->FindInt32("delta_y", &deltaY);
+			bool takeMeThere = false;
+			msg->FindBool("take_me_there", &takeMeThere);
 
 			if (deltaX == 0 && deltaY == 0)
 				break;
@@ -920,8 +922,25 @@ BWindow::DispatchMessage(BMessage* msg, BHandler* target)
 				nextRow = 0;
 
 			int32 next = nextColumn + nextRow * columns;
-			if (next != current)
+			if (next != current) {
+				uint32 workspaces;
+				if (takeMeThere) {
+					workspaces = Workspaces() | (1 << next);
+
+					// add the next workspaces to the workspaces
+					if (workspaces != Workspaces())
+						SetWorkspaces(workspaces);
+				}
+
+				// switch to it
 				activate_workspace(next);
+
+				if (takeMeThere	&& (workspaces != B_ALL_WORKSPACES)) {
+					workspaces &= ~(1 << current);
+					SetWorkspaces(workspaces);
+				}
+					
+			}
 			break;
 		}
 
@@ -2692,7 +2711,8 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 		new BMessage(B_HIDE_APPLICATION), NULL);
 
 	// Workspace modifier keys
-	BMessage* message = new BMessage(_SWITCH_WORKSPACE_);
+	BMessage* message;
+	message = new BMessage(_SWITCH_WORKSPACE_);
 	message->AddInt32("delta_x", -1);
 	AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY, message, NULL);
 
@@ -2707,6 +2727,26 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	message = new BMessage(_SWITCH_WORKSPACE_);
 	message->AddInt32("delta_y", 1);
 	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_CONTROL_KEY, message, NULL);
+
+	message = new BMessage(_SWITCH_WORKSPACE_);
+	message->AddBool("take_me_there", true);
+	message->AddInt32("delta_x", -1);
+	AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY, message, NULL);
+
+	message = new BMessage(_SWITCH_WORKSPACE_);
+	message->AddBool("take_me_there", true);
+	message->AddInt32("delta_x", 1);
+	AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY, message, NULL);
+
+	message = new BMessage(_SWITCH_WORKSPACE_);
+	message->AddBool("take_me_there", true);
+	message->AddInt32("delta_y", -1);
+	AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY, message, NULL);
+
+	message = new BMessage(_SWITCH_WORKSPACE_);
+	message->AddBool("take_me_there", true);
+	message->AddInt32("delta_y", 1);
+	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_CONTROL_KEY | B_SHIFT_KEY, message, NULL);
 
 	// We set the default pulse rate, but we don't start the pulse
 	fPulseRate = 500000;
