@@ -40,6 +40,8 @@ static status_t device_write(void *cookie, off_t pos, const void *data, size_t *
 #define TS	10 // was 4 /* 4 ms buffers */
 #define NB	2
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
+
 int qs_out = QS_OUT;
 
 typedef struct audiodev audiodev;
