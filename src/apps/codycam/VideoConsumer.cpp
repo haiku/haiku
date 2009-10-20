@@ -606,9 +606,13 @@ VideoConsumer::FtpRun(void* data)
 void
 VideoConsumer::FtpThread()
 {
+	char fullPath[B_PATH_NAME_LENGTH];
 	FUNCTION("VideoConsumer::FtpThread\n");
-
-	if (LocalSave(fFileNameText, fFtpBitmap) == B_OK)
+	if (fUploadClient == 2) {
+		// 64 + 64 = 128 max
+		snprintf(fullPath, B_PATH_NAME_LENGTH, "%s/%s", fDirectoryText, fFileNameText);
+		LocalSave(fullPath, fFtpBitmap);
+	} else if (LocalSave(fFileNameText, fFtpBitmap) == B_OK)
 		FtpSave(fFileNameText);
 
 #if 0
@@ -688,6 +692,8 @@ VideoConsumer::FtpSave(char* filename)
 		case 1:
 			ftp = new SftpClient;
 			break;
+		case 2:
+			return B_OK;
 		default:
 			fprintf(stderr, "invalid upload client %ld\n", fUploadClient);
 			return EINVAL;

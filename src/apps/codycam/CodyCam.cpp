@@ -155,12 +155,9 @@ CodyCam::ReadyToRun()
 		(const char*) "CodyCam", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, &fPort);
 
-	status_t status = _SetUpNodes();
-	if (status != B_OK)
-		return;
+	_SetUpNodes();
 
 	((VideoWindow*)fWindow)->ApplyControls();
-	
 }
 
 
@@ -414,9 +411,10 @@ CodyCam::_TearDownNodes()
 //	#pragma mark - Video Window Class
 
 
-VideoWindow::VideoWindow (BRect frame, const char* title, window_type type, uint32 flags,
-	port_id* consumerPort)
-	: BWindow(frame,title,type,flags),
+VideoWindow::VideoWindow(BRect frame, const char* title, window_type type,
+		uint32 flags, port_id* consumerPort)
+	:
+	BWindow(frame, title, type, flags),
 	fPortPtr(consumerPort),
 	fView(NULL),
 	fVideoView(NULL)
@@ -469,12 +467,12 @@ VideoWindow::VideoWindow (BRect frame, const char* title, window_type type, uint
 	menuBar->AddItem(menu);
 
 	/* give it a gray background view */
-	fView = new BView("Background View", B_WILL_DRAW, NULL);
+	fView = new BView("Background View", B_WILL_DRAW);
  	fView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	/* add some controls */
 	_BuildCaptureControls(fView);
-	
+
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	AddChild(menuBar);
 	AddChild(fView);
@@ -502,9 +500,7 @@ VideoWindow::QuitRequested()
 void
 VideoWindow::MessageReceived(BMessage* message)
 {
-	BControl* control;
-
-	control = NULL;
+	BControl* control = NULL;
 	message->FindPointer((const char*)"source", (void **)&control);
 
 	switch (message->what) {
@@ -586,10 +582,9 @@ VideoWindow::MessageReceived(BMessage* message)
 			break;
 
 		case msg_upl_client:
-			if (control != NULL) {
-				message->FindInt32("client", &(fFtpInfo.uploadClient));
-				FTPINFO("upl client = %ld\n", fFtpInfo.uploadClient);
-			}
+			message->FindInt32("client", &(fFtpInfo.uploadClient));
+			FTPINFO("upl client = %ld\n", fFtpInfo.uploadClient);
+			_UploadClientChanged();
 			break;
 
 		case msg_server:
@@ -677,9 +672,11 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	AddTranslationItems(fImageFormatMenu, B_TRANSLATOR_BITMAP);
 	fImageFormatMenu->SetTargetForItems(this);
 
-	if (fImageFormatSettings->Value() && fImageFormatMenu->FindItem(fImageFormatSettings->Value()) != NULL)
-		fImageFormatMenu->FindItem(fImageFormatSettings->Value())->SetMarked(true);
-	else if (fImageFormatMenu->FindItem("JPEG Image") != NULL)
+	if (fImageFormatSettings->Value()
+		&& fImageFormatMenu->FindItem(fImageFormatSettings->Value()) != NULL) {
+		fImageFormatMenu->FindItem(
+			fImageFormatSettings->Value())->SetMarked(true);
+	} else if (fImageFormatMenu->FindItem("JPEG Image") != NULL)
 		fImageFormatMenu->FindItem("JPEG Image")->SetMarked(true);
 	else if (fImageFormatMenu->FindItem("JPEG image") != NULL)
 		fImageFormatMenu->FindItem("JPEG image")->SetMarked(true);
@@ -690,19 +687,32 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 		fImageFormatMenu, NULL);
 	
 	fCaptureRateMenu = new BPopUpMenu("Capture Rate Menu");
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 15 seconds", new BMessage(msg_rate_15s)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 30 seconds", new BMessage(msg_rate_30s)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every minute", new BMessage(msg_rate_1m)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 5 minutes", new BMessage(msg_rate_5m)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 10 minutes", new BMessage(msg_rate_10m)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 15 minutes", new BMessage(msg_rate_15m)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 30 minutes", new BMessage(msg_rate_30m)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every hour", new BMessage(msg_rate_1h)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 2 hours", new BMessage(msg_rate_2h)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 4 hours", new BMessage(msg_rate_4h)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 8 hours", new BMessage(msg_rate_8h)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 24 hours", new BMessage(msg_rate_24h)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Never", new BMessage(msg_rate_never)));
+	fCaptureRateMenu->AddItem(new BMenuItem("Every 15 seconds",
+		new BMessage(msg_rate_15s)));
+	fCaptureRateMenu->AddItem(new BMenuItem("Every 30 seconds",
+		new BMessage(msg_rate_30s)));
+	fCaptureRateMenu->AddItem(new BMenuItem("Every minute",
+		new BMessage(msg_rate_1m)));
+	fCaptureRateMenu->AddItem(new BMenuItem("Every 5 minutes",
+		new BMessage(msg_rate_5m)));
+	fCaptureRateMenu->AddItem(new BMenuItem("Every 10 minutes",
+		new BMessage(msg_rate_10m)));
+	fCaptureRateMenu->AddItem(new BMenuItem("Every 15 minutes",
+		new BMessage(msg_rate_15m)));
+	fCaptureRateMenu->AddItem(new BMenuItem("Every 30 minutes",
+		new BMessage(msg_rate_30m)));
+	fCaptureRateMenu->AddItem(new BMenuItem("Every hour",
+		new BMessage(msg_rate_1h)));
+	fCaptureRateMenu->AddItem(new BMenuItem("Every 2 hours",
+		new BMessage(msg_rate_2h)));
+	fCaptureRateMenu->AddItem(new BMenuItem("Every 4 hours",
+		new BMessage(msg_rate_4h)));
+	fCaptureRateMenu->AddItem(new BMenuItem("Every 8 hours",
+		new BMessage(msg_rate_8h)));
+	fCaptureRateMenu->AddItem(new BMenuItem("Every 24 hours",
+		new BMessage(msg_rate_24h)));
+	fCaptureRateMenu->AddItem(new BMenuItem("Never",
+		new BMessage(msg_rate_never)));
 	fCaptureRateMenu->SetTargetForItems(this);
 	fCaptureRateMenu->FindItem(fCaptureRateSetting->Value())->SetMarked(true);
 	fCaptureRateSelector = new BMenuField("Rate", "Rate:",
@@ -730,10 +740,10 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	fUploadClientSelector = new BMenuField("UploadClient", NULL,
 		fUploadClientMenu, NULL);
 
-	fFtpSetupBox->SetLabel("FTP");
+	fFtpSetupBox->SetLabel("Output");
 	// this doesn't work with the layout manager
-//	fFtpSetupBox->SetLabel(fUploadClientSelector);
-fUploadClientSelector->SetLabel("Type:");
+	// fFtpSetupBox->SetLabel(fUploadClientSelector);
+	fUploadClientSelector->SetLabel("Type:");
 
 	BGridLayout *ftpLayout = new BGridLayout(kXBuffer, 0);
 	ftpLayout->SetInsets(10, 15, 5, 5);
@@ -801,8 +811,11 @@ fUploadClientSelector->SetLabel("Type:");
 void
 VideoWindow::ApplyControls()
 {
+	if (!Lock())
+		return;
+
 	// apply controls
-	fFileName->Invoke();		
+	fFileName->Invoke();
 	PostMessage(fImageFormatMenu->FindMarked()->Message());
 	PostMessage(fCaptureRateMenu->FindMarked()->Message());
 	PostMessage(fUploadClientMenu->FindMarked()->Message());
@@ -811,6 +824,8 @@ VideoWindow::ApplyControls()
 	fPassword->Invoke();
 	fDirectory->Invoke();
 	fPassiveFtp->Invoke();
+
+	Unlock();
 }
 
 
@@ -850,6 +865,18 @@ VideoWindow::_SetUpSettings(const char* filename, const char* dirname)
 	fSettings->Add(fUploadClientSetting);
 
 	fSettings->TryReadingSettings();
+}
+
+
+void
+VideoWindow::_UploadClientChanged()
+{
+	bool enableServerControls = fFtpInfo.uploadClient < 2;
+	fServerName->SetEnabled(enableServerControls);
+	fLoginId->SetEnabled(enableServerControls);
+	fPassword->SetEnabled(enableServerControls);
+	fDirectory->SetEnabled(enableServerControls);
+	fPassiveFtp->SetEnabled(enableServerControls);
 }
 
 

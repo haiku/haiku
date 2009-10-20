@@ -79,6 +79,7 @@ const char* kCaptureRate[] = {
 const char* kUploadClient[] = {
 	"FTP",
 	"SFTP",
+	"Local",
 	0
 };
 
@@ -128,6 +129,7 @@ private:
 
 			void			_SetUpSettings(const char* filename,
 								const char* dirname);
+			void			_UploadClientChanged();
 			void			_QuitSettings();
 
 private:
