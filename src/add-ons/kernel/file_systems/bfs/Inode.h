@@ -220,7 +220,8 @@ private:
 								block_run* array, uint32 arrayLength,
 								off_t size, off_t& offset, off_t& max);
 			status_t		_AllocateBlockArray(Transaction& transaction,
-								block_run& run, size_t length);
+								block_run& run, size_t length,
+								bool variableSize = false);
 			status_t		_GrowStream(Transaction& transaction, off_t size);
 			status_t		_ShrinkStream(Transaction& transaction, off_t size);
 

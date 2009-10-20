@@ -1583,12 +1583,13 @@ Inode::FillGapWithZeros(off_t pos, off_t newSize)
 */
 status_t
 Inode::_AllocateBlockArray(Transaction& transaction, block_run& run,
-	size_t length)
+	size_t length, bool variableSize)
 {
 	if (!run.IsZero())
 		return B_BAD_VALUE;
 
-	status_t status = fVolume->Allocate(transaction, this, length, run, length);
+	status_t status = fVolume->Allocate(transaction, this, length, run,
+		variableSize ? 1 : length);
 	if (status != B_OK)
 		return status;
 
@@ -1708,9 +1709,6 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 		// okay, we have the needed blocks, so just distribute them to the
 		// different ranges of the stream (direct, indirect & double indirect)
 
-		// TODO: if anything goes wrong here, we probably want to free the
-		// blocks that couldn't be distributed into the stream!
-
 		blocksNeeded -= run.Length();
 		// don't preallocate if the first allocation was already too small
 		blocksRequested = blocksNeeded;
@@ -1720,9 +1718,10 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 		if (data->Size() <= data->MaxDirectRange()) {
 			// let's try to put them into the direct block range
 			int32 free = 0;
-			for (; free < NUM_DIRECT_BLOCKS; free++)
+			for (; free < NUM_DIRECT_BLOCKS; free++) {
 				if (data->direct[free].IsZero())
 					break;
+			}
 
 			if (free < NUM_DIRECT_BLOCKS) {
 				// can we merge the last allocated run with the new one?
@@ -1754,7 +1753,7 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 			// if there is no indirect block yet, create one
 			if (data->indirect.IsZero()) {
 				status = _AllocateBlockArray(transaction, data->indirect,
-					NUM_ARRAY_BLOCKS);
+					NUM_ARRAY_BLOCKS, true);
 				if (status != B_OK)
 					return status;
 
@@ -1875,8 +1874,12 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 			while (run.length != 0) {
 				// get the indirect array block
 				if (array == NULL) {
+					uint32 block = indirectIndex / runsPerBlock;
+					if (block >= minimum)
+						return EFBIG;
+
 					array = (block_run*)cached.SetTo(fVolume->ToBlock(
-						data->double_indirect) + indirectIndex / runsPerBlock);
+						data->double_indirect) + block);
 					if (array == NULL)
 						return B_IO_ERROR;
 				}
@@ -1903,13 +1906,13 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 						// insert the block_run into the array
 						runs[index % runsPerBlock] = run;
 						runs[index % runsPerBlock].length
-							= HOST_ENDIAN_TO_BFS_INT16(NUM_ARRAY_BLOCKS);
+							= HOST_ENDIAN_TO_BFS_INT16(minimum);
 
 						// alter the remaining block_run
 						run.start = HOST_ENDIAN_TO_BFS_INT16(run.Start()
-							+ NUM_ARRAY_BLOCKS);
+							+ minimum);
 						run.length = HOST_ENDIAN_TO_BFS_INT16(run.Length()
-							- NUM_ARRAY_BLOCKS);
+							- minimum);
 					} while ((++index % runsPerBlock) != 0 && run.length);
 				} while ((index % runsPerArray) != 0 && run.length);
 
