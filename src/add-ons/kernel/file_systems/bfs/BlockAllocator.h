@@ -21,6 +21,7 @@ struct check_cookie;
 
 
 //#define DEBUG_ALLOCATION_GROUPS
+//#define DEBUG_FRAGMENTER
 
 
 class BlockAllocator {
@@ -62,6 +63,9 @@ public:
 
 #ifdef BFS_DEBUGGER_COMMANDS
 			void			Dump(int32 index);
+#endif
+#ifdef DEBUG_FRAGMENTER
+			void			Fragment();
 #endif
 
 private:

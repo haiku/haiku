@@ -682,6 +682,16 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, ulong cmd,
 
 			return volume->WriteSuperBlock();
 		}
+
+#ifdef DEBUG_FRAGMENTER
+		case 56741:
+		{
+			BlockAllocator& allocator = volume->Allocator();
+			allocator.Fragment();
+			return B_OK;
+		}
+#endif
+
 #ifdef DEBUG
 		case 56742:
 		{

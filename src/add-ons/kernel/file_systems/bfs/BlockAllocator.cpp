@@ -1062,6 +1062,37 @@ BlockAllocator::BitmapSize() const
 }
 
 
+#ifdef DEBUG_FRAGMENTER
+void
+BlockAllocator::Fragment()
+{
+	AllocationBlock cached(fVolume);
+	MutexLocker lock(fLock);
+
+	// only leave 4 block holes
+	static const uint32 kMask = 0x0f0f0f0f;
+	uint32 valuesPerBlock = fVolume->BlockSize() / 4;
+
+	for (int32 i = 0; i < fNumGroups; i++) {
+		AllocationGroup& group = fGroups[i];
+
+		for (uint32 block = 0; block < group.NumBlocks(); block++) {
+			Transaction transaction(fVolume, 0);
+
+			if (cached.SetToWritable(transaction, group, block) != B_OK)
+				return;
+
+			for (int32 index = 0; index < valuesPerBlock; index++) {
+				cached.Block(index) |= HOST_ENDIAN_TO_BFS_INT32(kMask);
+			}
+
+			transaction.Done();
+		}
+	}
+}
+#endif	// DEBUG_FRAGMENTER
+
+
 #ifdef DEBUG_ALLOCATION_GROUPS
 void
 BlockAllocator::_CheckGroup(int32 groupIndex) const
