@@ -1180,6 +1180,28 @@ command_sync(int argc, const char* const* argv)
 }
 
 
+static fssh_status_t
+command_ioctl(int argc, const char* const* argv)
+{
+	if (argc != 2) {
+		fprintf(stderr, "Usage: %s <opcode>\n", argv[0]);
+		return FSSH_B_BAD_VALUE;
+	}
+
+	int rootDir = _kern_open_dir(-1, "/myfs");
+	if (rootDir < 0)
+		return rootDir;
+
+	fssh_status_t status = _kern_ioctl(rootDir, atoi(argv[1]), NULL, 0);
+	if (status != FSSH_B_OK) {
+		fprintf(stderr, "Error: ioctl failed: %s\n", fssh_strerror(status));
+		return status;
+	}
+
+	return FSSH_B_OK;
+}
+
+
 static void
 register_commands()
 {
@@ -1189,6 +1211,7 @@ register_commands()
 		command_cp,			"cp",			"copy files and directories",
 		command_help,		"help",			"list supported commands",
 		command_info,		"info",			"prints volume informations",
+		command_ioctl,		"ioctl",		"ioctl() on root, for FS debugging only",
 		command_ln,			"ln",			"create a hard or symbolic link",
 		command_ls,			"ls",			"list files or directories",
 		command_mkdir,		"mkdir",		"create directories",
