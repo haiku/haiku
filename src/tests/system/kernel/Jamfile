@@ -11,6 +11,11 @@ SimpleTest fibo_load_image : fibo_load_image.cpp ;
 SimpleTest fibo_fork : fibo_fork.cpp ;
 SimpleTest fibo_exec : fibo_exec.cpp ;
 
+SimpleTest live_query :
+	live_query.cpp
+	: be
+;
+
 SimpleTest lock_node_test :
 	lock_node_test.cpp
 	: be
