@@ -124,7 +124,7 @@ EntryListBase::InitCheck() const
 dirent *
 EntryListBase::Next(dirent *ent)
 {
-	return (dirent *)((char *)ent + ent->d_reclen + sizeof(dirent));
+	return (dirent *)((char *)ent + ent->d_reclen);
 }
 
 
@@ -251,7 +251,7 @@ CachedEntryIterator::GetNextDirents(struct dirent *ent, size_t size,
 	if (fIndex >= fNumEntries) {
 		// we are out of stock, cache em up
 		fCurrentDirent = fDirentBuffer;
-		uint32 bufferRemain = kDirentBufferSize;
+		int32 bufferRemain = kDirentBufferSize;
 		for (fNumEntries = 0; fNumEntries < fCacheSize; ) {
 			int32 count = fIterator->GetNextDirents(fCurrentDirent,
 				bufferRemain, 1);
@@ -261,10 +261,11 @@ CachedEntryIterator::GetNextDirents(struct dirent *ent, size_t size,
 
 			fNumEntries += count;
 
-			int32 currentDirentSize = fCurrentDirent->d_reclen
-				+ (ssize_t)sizeof(dirent);
+			int32 currentDirentSize = fCurrentDirent->d_reclen;
 			bufferRemain -= currentDirentSize;
-			if (bufferRemain < (sizeof(dirent) + B_FILE_NAME_LENGTH)) {
+			ASSERT(bufferRemain >= 0);
+
+			if ((size_t)bufferRemain < (sizeof(dirent) + B_FILE_NAME_LENGTH)) {
 				// cant fit a big entryRef in the buffer, just bail
 				// and start from scratch
 				break;
@@ -298,7 +299,7 @@ CachedEntryIterator::GetNextDirents(struct dirent *ent, size_t size,
 		fCurrentDirent = fSortedList->ItemAt(fIndex);
 
 	fIndex++;
-	uint32 currentDirentSize = fCurrentDirent->d_reclen + sizeof(dirent);
+	uint32 currentDirentSize = fCurrentDirent->d_reclen;
 	ASSERT(currentDirentSize <= size);
 	if (currentDirentSize > size)
 		return 0;
