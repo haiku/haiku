@@ -1436,26 +1436,21 @@ TBox::Draw(BRect update)
 void
 TBox::DrawIconScrollers(bool force)
 {
-	bool updateLeft = false;
-	bool updateRight = false;
-	rgb_color leftc = {0, 0, 0, 255};
-	rgb_color rightc = {0, 0, 0, 255};
-	rgb_color bkg = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+	rgb_color backgroundColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 		B_DARKEN_1_TINT);
 	rgb_color dark = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 		B_DARKEN_4_TINT);
+	bool updateLeft = false;
+	bool updateRight = false;
 
 	BRect rect = fIconView->Bounds();
 	if (rect.left > (kSlotSize * kCenterSlot)) {
 		updateLeft = true;
 		fLeftScroller = true;
-		leftc = dark;
 	} else {
 		fLeftScroller = false;
-		if (force) {
+		if (force)
 			updateLeft = true;
-			leftc = bkg;
-		}
 	}
 
 	int32 maxIndex = fManager->GroupList()->CountItems() - 1;
@@ -1465,115 +1460,138 @@ TBox::DrawIconScrollers(bool force)
 	if (lastFrame.right > rect.right) {
 		updateRight = true;
 		fRightScroller = true;
-		rightc = dark;
 	} else {
 		fRightScroller = false;
-		if (force) {
+		if (force)
 			updateRight = true;
-			rightc = bkg;
-		}
 	}
+
+	PushState();
+	SetDrawingMode(B_OP_COPY);
 
 	rect = fIconView->Frame();
 	if (updateLeft) {
-		SetHighColor(leftc);
-		BPoint	pt1, pt2, pt3;
+		BPoint pt1, pt2, pt3;
 		pt1.x = rect.left - 5;
 		pt1.y = floorf((rect.bottom + rect.top) / 2);
 		pt2.x = pt3.x = pt1.x + 3;
 		pt2.y = pt1.y - 3;
 		pt3.y = pt1.y + 3;
-		FillTriangle(pt1, pt2, pt3);
+
+		if (fLeftScroller) {
+			SetHighColor(dark);
+			FillTriangle(pt1, pt2, pt3);
+		} else if (force) {
+			SetHighColor(backgroundColor);
+			FillRect(BRect(pt1.x, pt2.y, pt3.x, pt3.y));
+		}
 	}
 	if (updateRight) {
-		SetHighColor(rightc);
-		BPoint	pt1, pt2, pt3;
+		BPoint pt1, pt2, pt3;
 		pt1.x = rect.right + 4;
 		pt1.y = rintf((rect.bottom + rect.top) / 2);
 		pt2.x = pt3.x = pt1.x - 4;
 		pt2.y = pt1.y - 4;
 		pt3.y = pt1.y + 4;
-		FillTriangle(pt1, pt2, pt3);
+
+		if (fRightScroller) {
+			SetHighColor(dark);
+			FillTriangle(pt1, pt2, pt3);
+		} else if (force) {
+			SetHighColor(backgroundColor);
+			FillRect(BRect(pt3.x, pt2.y, pt1.x, pt3.y));
+		}
 	}
+
+	PopState();
 }
 
 
 void
 TBox::DrawWindowScrollers(bool force)
 {
+	rgb_color backgroundColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color dark = tint_color(backgroundColor, B_DARKEN_4_TINT);
 	bool updateUp = false;
 	bool updateDown = false;
-	rgb_color upColor = {0, 0, 0, 255};
-	rgb_color downColor = {0, 0, 0, 255};
-	rgb_color bkg = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color dark = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_4_TINT);
 
 	BRect rect = fWindow->WindowView()->Bounds();
 	if (rect.top != 0) {
 		updateUp = true;
 		fUpScroller = true;
-		upColor = dark;
 	} else {
 		fUpScroller = false;
-		if (force) {
+		if (force)
 			updateUp = true;
-			upColor = bkg;
-		}
 	}
 
 	int32 groupIndex = fManager->CurrentIndex();
 	int32 maxIndex = fManager->CountWindows(groupIndex) - 1;
 
 	BRect lastFrame(0, 0, 0, 0);
-	if (maxIndex >= 0) {
+	if (maxIndex >= 0)
 		lastFrame = fWindow->WindowView()->FrameOf(maxIndex);
-	}
+
 	if (maxIndex >= 0 && lastFrame.bottom > rect.bottom) {
 		updateDown = true;
 		fDownScroller = true;
-		downColor = dark;
 	} else {
 		fDownScroller = false;
-		if (force) {
+		if (force)
 			updateDown = true;
-			downColor = bkg;
-		}
 	}
+
+	PushState();
+	SetDrawingMode(B_OP_COPY);
 
 	rect = fWindow->WindowView()->Frame();
 	rect.InsetBy(-3, 0);
 	if (updateUp) {
-		SetHighColor(upColor);
-		BPoint	pt1, pt2, pt3;
-		pt1.x = rect.left - 6;
-		pt1.y = rect.top + 3;
-		pt2.y = pt3.y = pt1.y + 4;
-		pt2.x = pt1.x - 4;
-		pt3.x = pt1.x + 4;
-		FillTriangle(pt1, pt2, pt3);
+		if (fUpScroller) {
+			SetHighColor(dark);
+			BPoint pt1, pt2, pt3;
+			pt1.x = rect.left - 6;
+			pt1.y = rect.top + 3;
+			pt2.y = pt3.y = pt1.y + 4;
+			pt2.x = pt1.x - 4;
+			pt3.x = pt1.x + 4;
+			FillTriangle(pt1, pt2, pt3);
 
-		pt1.x += rect.Width() + 12;
-		pt2.x += rect.Width() + 12;
-		pt3.x += rect.Width() + 12;
-		FillTriangle(pt1, pt2, pt3);
+			pt1.x += rect.Width() + 12;
+			pt2.x += rect.Width() + 12;
+			pt3.x += rect.Width() + 12;
+			FillTriangle(pt1, pt2, pt3);
+		} else if (force) {
+			FillRect(BRect(rect.left - 10, rect.top + 3, rect.left - 2,
+				rect.top + 7), B_SOLID_LOW);
+			FillRect(BRect(rect.right + 2, rect.top + 3, rect.right + 10,
+				rect.top + 7), B_SOLID_LOW);
+		}
 	}
 	if (updateDown) {
-		SetHighColor(downColor);
-		BPoint	pt1, pt2, pt3;
-		pt1.x = rect.left - 6;
-		pt1.y = rect.bottom - 3;
-		pt2.y = pt3.y = pt1.y - 4;
-		pt2.x = pt1.x - 4;
-		pt3.x = pt1.x + 4;
-		FillTriangle(pt1, pt2, pt3);
+		if (fDownScroller) {
+			SetHighColor(dark);
+			BPoint pt1, pt2, pt3;
+			pt1.x = rect.left - 6;
+			pt1.y = rect.bottom - 3;
+			pt2.y = pt3.y = pt1.y - 4;
+			pt2.x = pt1.x - 4;
+			pt3.x = pt1.x + 4;
+			FillTriangle(pt1, pt2, pt3);
 
-		pt1.x += rect.Width() + 12;
-		pt2.x += rect.Width() + 12;
-		pt3.x += rect.Width() + 12;
-		FillTriangle(pt1, pt2, pt3);
-
+			pt1.x += rect.Width() + 12;
+			pt2.x += rect.Width() + 12;
+			pt3.x += rect.Width() + 12;
+			FillTriangle(pt1, pt2, pt3);
+		} else if (force) {
+			FillRect(BRect(rect.left - 10, rect.bottom - 7, rect.left - 2,
+				rect.bottom - 3), B_SOLID_LOW);
+			FillRect(BRect(rect.right + 2, rect.bottom - 7, rect.right + 10,
+				rect.bottom - 3), B_SOLID_LOW);
+		}
 	}
+
+	PopState();
 	Sync();
 }
 
