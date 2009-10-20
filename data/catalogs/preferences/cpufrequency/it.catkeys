@@ -1,0 +1,18 @@
+1	italiano	x-vnd.Haiku-CPUFrequencyPref	2623066734
+Ok	Status view		Ok
+Integration Time [ms]	CPU Frequency View		Tempo di intervento	 [ms]
+High Performance	Status view		Massima potenza
+Defaults	Pref Window		Predefinito
+CPU Frequency Status View	CPU Frequency View		Frequenza della CPU
+Dynamic Performance	Status view		Potenza dinamica
+Step up by CPU usage:	Color Step View		Variazione della potenza in base all'uso della CPU:
+Stepping Policy	CPU Frequency View		Stepping Policy	CPU Frequency
+Open Speedstep Preferences…	Status view		Apri le preferenze di Speestep…
+Set State	Status view		Set State
+Launching the CPU Frequency preflet failed.\n\nError: 	Status view		Impossibile far partire la preferenza del CPU Frequency.\n\nErreur: 
+Install Replicant into Deskbar	CPU Frequency View		Installa il replicante con la frequenza della CPU nella Deskbar
+Low Energy	Status view		Bassi consumi
+Revert	Pref Window		Predefinito
+Dynamic Stepping	CPU Frequency View		Accelerazione dinamica
+CPU Frequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU Frequency\n\tscritto da Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPU Frequency	Main window		Frequenza della CPU

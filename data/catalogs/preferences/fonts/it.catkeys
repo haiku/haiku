@@ -1,0 +1,12 @@
+1	italiano	x-vnd.Haiku-Fonts	3656873675
+Defaults	Main window		Predefinito
+Plain Font:	Font view		Font base :
+Fonts	Main window		Fonts
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fonts\n\tCopyright 2004-2005, Haiku.\n\n
+Revert	Main window		Ripristina
+Size:	Font Selection view		Altezza :
+Menu Font:	Font view		Font Menu :
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Portez ce vieux whisky au juge blond qui fume.
+Bold Font:	Font view		Font grassetto :
+Fixed Font:	Font view		Font con spaziatura fissa :
+Ok	main		Ok
