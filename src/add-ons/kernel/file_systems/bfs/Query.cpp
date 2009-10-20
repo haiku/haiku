@@ -1620,7 +1620,6 @@ Query::LiveUpdate(Inode* inode, const char* attribute, int32 type,
 	status_t newStatus = fExpression->Root()->Match(inode, attribute, type,
 		newKey, newLength);
 
-	const char* name = NULL;
 	bool entryCreated;
 
 	if (oldStatus != MATCH_OK) {
@@ -1633,31 +1632,22 @@ Query::LiveUpdate(Inode* inode, const char* attribute, int32 type,
 		// entry got removed
 		entryCreated = false;
 	} else {
-		// The entry stays in the query - only notify in case the name of the
-		// inode was changed
-		if (oldKey == NULL || strcmp(attribute, "name") != 0 || newKey == NULL)
-			return;
-
-		notify_query_entry_removed(fPort, fToken, fVolume->ID(),
-			fVolume->ToVnode(inode->Parent()), (const char*)oldKey,
-			inode->ID());
-		name = (const char*)newKey;
-		entryCreated = true;
+		// The entry stays in the query
+		return;
 	}
 
 	// we may need to get the name of the inode
 
 	char nameBuffer[B_FILE_NAME_LENGTH];
+	const char* name;
 
-	if (name == NULL) {
-		if (strcmp(attribute, "name")) {
-			if (inode->GetName(nameBuffer) != B_OK)
-				nameBuffer[0] = '\0';
-			name = nameBuffer;
-		} else {
-			// a shortcut to prevent having to scan the attribute section
-			name = (const char*)newKey;
-		}
+	if (strcmp(attribute, "name")) {
+		if (inode->GetName(nameBuffer) != B_OK)
+			nameBuffer[0] = '\0';
+		name = nameBuffer;
+	} else {
+		// a shortcut to prevent having to scan the attribute section
+		name = (const char*)newKey;
 	}
 
 	// notify query listeners
