@@ -881,15 +881,15 @@ dbg_dump_cbuf_freelists(int argc, char **argv)
 {
 	cbuf *buffer;
 
-	dprintf("sFreeBufferList:\n");
+	kprintf("sFreeBufferList:\n");
 	for (buffer = sFreeBufferList; buffer; buffer = buffer->next)
-		dprintf("%p ", buffer);
-	dprintf("\n");
+		kprintf("%p ", buffer);
+	kprintf("\n");
 
-	dprintf("sFreeBufferNoBlockList:\n");
+	kprintf("sFreeBufferNoBlockList:\n");
 	for (buffer = sFreeBufferNoBlockList; buffer; buffer = buffer->next)
-		dprintf("%p ", buffer);
-	dprintf("\n");
+		kprintf("%p ", buffer);
+	kprintf("\n");
 
 	return 0;
 }
