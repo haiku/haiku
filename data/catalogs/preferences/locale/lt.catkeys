@@ -1,0 +1,48 @@
+1	Lithuanian	x-vnd.Haiku-Locale	1910872713
+day of week (short name)	TimeFormatSettings		savaitės diena (sutrumpintai)
+Available languages	Locale Preflet Window		Galimos kalbos
+Decimal separator	TimeFormatSettings		Dešimtainis skirtukas
+Separator:	TimeFormatSettings		Skirtukas:
+Year (4 digits)	TimeFormatSettings		Metai (4 skaitmenys)
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Neprieinamos kalbos! Nepavyks pasinaudoti šia savybe!
+After	TimeFormatSettings		Po
+Long format:	TimeFormatSettings		Pilnai:
+Before	TimeFormatSettings		Iki
+Currency	TimeFormatSettings		Valiuta
+Year	TimeFormatSettings		Metai
+Short format:	TimeFormatSettings		Trumpai:
+Currency symbol:	TimeFormatSettings		Valiutos ženklas:
+Space	TimeFormatSettings		Tarpas
+Language	Locale Preflet Window		Kalba
+Thousand separator	TimeFormatSettings		Tūkstančių skirtukas
+24 Hour	TimeFormatSettings		24 valnados
+Year (2 digits)	TimeFormatSettings		Metai (2 skaitmenys)
+Preferred languages	Locale Preflet Window		Pageidautinos kalbos
+Symbol position	TimeFormatSettings		Ženkliuko vieta
+month number	TimeFormatSettings		mėnesio skaitmuo 
+month number (2 digits)	TimeFormatSettings		mėnesio skaitmuo (2 skaitmenys)
+Numbers	TimeFormatSettings		Skaitmenys
+ (unknown format)	TimeFormatSettings		 (nežinomas)
+Negative marker:	TimeFormatSettings		Neigiamumo ženkliukas:
+12 Hour	TimeFormatSettings		12 Valandos
+Defaults	Locale Preflet Window		Įprastai
+Locale\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n\n	Locale Preflet		Locale\n\tsukurtas Axel'io Dörfler'io\n\tCopyright 2009, Haiku.\n\n
+Separator	TimeFormatSettings		Skirtukas
+Country	Locale Preflet Window		Šalis
+Revert	Locale Preflet Window		Grįžti
+day in month	TimeFormatSettings		diena mėnesyje
+day of week in month	TimeFormatSettings		savaitės diena mėnesyje
+Negative marker	TimeFormatSettings		Neigiamumo ženkliukas
+Ok	Locale Preflet Window		Gerai
+Time	TimeFormatSettings		Laikas
+Date	TimeFormatSettings		Data
+List separator	TimeFormatSettings		Sarašo skirtukas
+day of week	TimeFormatSettings		savaitės diena
+None	TimeFormatSettings		Nieko
+day in month (2 digits)	TimeFormatSettings		diena mėnesyje (2 skaitmenys)
+Clock	TimeFormatSettings		Laikrodis
+Example:	TimeFormatSettings		Pavyzdys:
+day of week (name)	TimeFormatSettings		savaitės diena (pavadinimas)
+month name	TimeFormatSettings		mėnesio pavadinimas
+Day	TimeFormatSettings		Diena
+Leading 0	TimeFormatSettings		Priekiniai 0
