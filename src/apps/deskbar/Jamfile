@@ -25,7 +25,6 @@ Application Deskbar :
 	BarView.cpp
 	BarWindow.cpp
 	BeMenu.cpp
-	CalendarMenuItem.cpp
 	DeskBarUtils.cpp
 	ExpandoMenuBar.cpp
 	PreferencesWindow.cpp
