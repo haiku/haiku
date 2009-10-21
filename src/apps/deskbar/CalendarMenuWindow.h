@@ -31,7 +31,7 @@ public:
 	virtual	void	MessageReceived(BMessage* message);
 
 private:
-	void			_UpdateUi(const BDate& date);
+	void			_UpdateUI(const BDate& date);
 	BButton*		_SetupButton(const char* label, uint32 what, float height);
 
 private:

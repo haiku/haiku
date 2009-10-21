@@ -2,8 +2,9 @@
  * Copyright Karsten Heimrich, host.haiku@gmx.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#include "CalendarMenuWindow.h"
 
+
+#include "CalendarMenuWindow.h"
 
 #include <Button.h>
 #include <CalendarView.h>
@@ -12,9 +13,9 @@
 #include <GroupLayoutBuilder.h>
 #include <GroupView.h>
 #include <Screen.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 #include <StringView.h>
-#include <SpaceLayoutItem.h>
 
 
 using BPrivate::BCalendarView;
@@ -127,7 +128,7 @@ CalendarMenuWindow::CalendarMenuWindow(BPoint where, bool euroDate)
 	AddChild(groupView);
 
 	MoveTo(where);
-	_UpdateUi(BDate::CurrentDate(B_LOCAL_TIME));
+	_UpdateUI(BDate::CurrentDate(B_LOCAL_TIME));
 }
 
 
@@ -178,7 +179,8 @@ CalendarMenuWindow::WindowActivated(bool active)
 			PostMessage(B_QUIT_REQUESTED);
 	} else {
 		if (fSuppressFirstClose && !active) {
-			fSuppressFirstClose = false; return;
+			fSuppressFirstClose = false;
+			return;
 		}
 
 		if (!fSuppressFirstClose && !active)
@@ -191,17 +193,20 @@ void
 CalendarMenuWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kInvokationMessage: {
+		case kInvokationMessage:
+		{
 			int32 day, month, year;
 			message->FindInt32("day", &day);
 			message->FindInt32("month", &month);
 			message->FindInt32("year", &year);
 
-			_UpdateUi(BDate(year, month, day));
-		}	break;
+			_UpdateUI(BDate(year, month, day));
+			break;
+		}
 
-		case kMonthDownMessage: {
+		case kMonthDownMessage:
 		case kMonthUpMessage:
+		{
 			BDate date = fCalendarView->Date();
 
 			int32 day = date.Day();
@@ -221,25 +226,28 @@ CalendarMenuWindow::MessageReceived(BMessage* message)
 			if (day > date.DaysInMonth())
 				day = date.DaysInMonth();
 
-			_UpdateUi(BDate(year, month, day));
-		}	break;
+			_UpdateUI(BDate(year, month, day));
+			break;
+		}
 
-		case kYearDownMessage: {
+		case kYearDownMessage:
 		case kYearUpMessage:
+		{
 			BDate date = fCalendarView->Date();
 			int32 i = kYearDownMessage == message->what ? -1 : 1;
-			_UpdateUi(BDate(date.Year() + i, date.Month(), date.Day()));
-		}	break;
+			_UpdateUI(BDate(date.Year() + i, date.Month(), date.Day()));
+			break;
+		}
 
-		default: {
+		default:
 			BWindow::MessageReceived(message);
-		}	break;
+			break;
 	}
 }
 
 
 void
-CalendarMenuWindow::_UpdateUi(const BDate& date)
+CalendarMenuWindow::_UpdateUI(const BDate& date)
 {
 	if (!date.IsValid())
 		return;
@@ -259,7 +267,7 @@ CalendarMenuWindow::_SetupButton(const char* label, uint32 what, float height)
 {
 	FlatButton* button = new FlatButton(label, what);
 	button->SetExplicitMinSize(BSize(height, height));
-	button->SetFontSize(10.0);
+	button->SetFontSize(be_plain_font->Size() * 0.8);
 
 	return button;
 }
