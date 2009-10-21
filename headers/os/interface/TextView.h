@@ -292,6 +292,7 @@ private:
 									const rgb_color* initialColor);
 
 			void				_ValidateLayoutData();
+			void				_ResetTextRect();
 
 			void				_HandleBackspace();
 			void				_HandleArrowKey(uint32 inArrowKey);
@@ -301,12 +302,12 @@ private:
 									int32 numBytes);
 
 			void				_Refresh(int32 fromOffset, int32 toOffset,
-									bool erase, bool scroll);
+									bool scroll);
 			void				_RecalculateLineBreaks(int32* startLine,
 									int32* endLine);
 			int32				_FindLineBreak(int32 fromOffset,
 									float* outAscent, float* outDescent,
-									float* ioWidth);
+									float* inOutWidth);
 
 			float				_StyledWidth(int32 fromOffset, int32 length,
 									float* outAscent = NULL,
@@ -333,8 +334,7 @@ private:
 									int32 startOffset = -1,
 									bool erase = false);
 			void				_RequestDrawLines(int32 startLine,
-									int32 endLine, int32 startOffset = -1,
-									bool erase = false);
+									int32 endLine);
 
 			void				_DrawCaret(int32 offset);
 			void				_ShowCaret();
