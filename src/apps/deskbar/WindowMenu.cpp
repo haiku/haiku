@@ -143,7 +143,8 @@ TWindowMenu::AttachedToWindow()
 					if (dragging)
 						item->SetEnabled(false);
 
-					AddItem(item, addIndex);
+					AddItem(item,
+						TWindowMenuItem::InsertIndexFor(this, 0, item));
 				} else {
 					TTeamMenuItem* parentItem
 						= static_cast<TTeamMenuItem*>(Superitem());

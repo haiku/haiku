@@ -56,7 +56,8 @@ const BRect	kIconRect(1.0f, 1.0f, 13.0f, 14.0f);
 
 TWindowMenuItem::TWindowMenuItem(const char* title, int32 id, bool mini,
 		bool currentWorkspace, bool dragging)
-	: BMenuItem(title, NULL),
+	:
+	BMenuItem(title, NULL),
 	fID(id),
 	fMini(mini),
 	fCurrentWorkSpace(currentWorkspace),
@@ -85,6 +86,7 @@ TWindowMenuItem::Initialize(const char* title)
 
 	BFont font(be_plain_font);
 	fTitleWidth = ceilf(font.StringWidth(title));
+	fFullTitle = title;
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);
 	fTitleAscent = ceilf(fontHeight.ascent);
@@ -131,6 +133,27 @@ TWindowMenuItem::SetLabel(const char* string)
 
 	if (strcmp(Label(), truncatedTitle.String()) != 0)
 		BMenuItem::SetLabel(truncatedTitle.String());
+}
+
+
+const char*
+TWindowMenuItem::FullTitle() const
+{
+	return fFullTitle.String();
+}
+
+
+/*static*/ int32
+TWindowMenuItem::InsertIndexFor(BMenu* menu, int32 startIndex,
+	TWindowMenuItem* newItem)
+{
+	for (int32 index = startIndex;; index++) {
+		TWindowMenuItem* item
+			= dynamic_cast<TWindowMenuItem*>(menu->ItemAt(index));
+		if (item == NULL
+			|| strcasecmp(item->FullTitle(), newItem->FullTitle()) > 0)
+			return index;
+	}
 }
 
 

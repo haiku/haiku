@@ -31,13 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-//	individual windows of an application
-//	item for WindowMenu, sub of TeamMenuItem
-//	all DB positions
-
 #ifndef WINDOWMENUITEM_H
 #define WINDOWMENUITEM_H
+
 
 #include <MenuItem.h>
 #include <String.h>
@@ -47,43 +43,51 @@ All rights reserved.
 class BBitmap;
 
 
+/*!	Individual windows of an application item for WindowMenu,
+	sub of TeamMenuItem all DB positions
+*/
 class TWindowMenuItem : public BMenuItem {
-	public:
-		TWindowMenuItem(const char* title, int32 id, bool mini,
-			bool currentWorkSpace, bool dragging = false);
+public:
+								TWindowMenuItem(const char* title, int32 id,
+									bool mini, bool currentWorkSpace,
+									bool dragging = false);
 
-		void ExpandedItem(bool state);
-		void SetTo(const char* title, int32 id, bool mini,
-			bool currentWorkSpace, bool dragging = false);
-		int32 ID();
-		void SetRequireUpdate();
-		bool RequiresUpdate();
-		bool ChangedState();
+			void				ExpandedItem(bool state);
+			void				SetTo(const char* title, int32 id, bool mini,
+									bool currentWorkSpace,
+									bool dragging = false);
+			int32				ID();
+			void				SetRequireUpdate();
+			bool				RequiresUpdate();
+			bool				ChangedState();
 
-	virtual	void	SetLabel(const char* string);
+	virtual	void				SetLabel(const char* string);
+			const char*			FullTitle() const;
 
-	protected:
-		void Initialize(const char* title);
-		virtual	void GetContentSize(float* width, float* height);
-		virtual void DrawContent();
-		virtual status_t Invoke(BMessage* message = NULL);
-		virtual void Draw();
+	static	int32				InsertIndexFor(BMenu* menu, int32 startIndex,
+									TWindowMenuItem* item);
 
-	private:
-		int32			fID;
-		bool			fMini;
-		bool			fCurrentWorkSpace;
-		const BBitmap*	fBitmap;
-		float			fTitleWidth;
-		float			fTitleAscent;
-		float			fTitleDescent;
-		bool			fDragging;
-		bool			fExpanded;
-		bool			fRequireUpdate;
-		bool			fModified;
-		BString			fFullTitle;
+protected:
+			void				Initialize(const char* title);
+	virtual	void				GetContentSize(float* width, float* height);
+	virtual void				DrawContent();
+	virtual status_t			Invoke(BMessage* message = NULL);
+	virtual void				Draw();
+
+private:
+			int32				fID;
+			bool				fMini;
+			bool				fCurrentWorkSpace;
+			const BBitmap*		fBitmap;
+			float				fTitleWidth;
+			float				fTitleAscent;
+			float				fTitleDescent;
+			bool				fDragging;
+			bool				fExpanded;
+			bool				fRequireUpdate;
+			bool				fModified;
+			BString				fFullTitle;
 };
 
 
 #endif	/* WINDOWMENUITEM_H */
-

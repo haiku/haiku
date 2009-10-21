@@ -739,10 +739,9 @@ TExpandoMenuBar::DrawBackground(BRect)
 }
 
 
-/**	Something to help determine if we are showing too many apps
- *	need to add in scrolling functionality.
- */
-
+/*!	Something to help determine if we are showing too many apps
+	need to add in scrolling functionality.
+*/
 void
 TExpandoMenuBar::CheckForSizeOverrun()
 {
@@ -833,7 +832,9 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 										((1 << current_workspace())
 											& wInfo->workspaces) != 0, false);
 									item->ExpandedItem(true);
-									teamMenu->AddItem(item, i + 1);
+									teamMenu->AddItem(item,
+										TWindowMenuItem::InsertIndexFor(
+											teamMenu, i + 1, item));
 									resize = true;
 								}
 							}
