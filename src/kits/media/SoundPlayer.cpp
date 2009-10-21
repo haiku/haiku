@@ -609,6 +609,7 @@ BSoundPlayer::StartPlaying(BSound *sound, bigtime_t atTime, float withVolume)
 		return B_ERROR;
 	}
 
+	sound->AcquireRef();
 	item->next = fPlayingSounds;
 	fPlayingSounds = item;
 	fLocker.Unlock();
@@ -676,6 +677,7 @@ BSoundPlayer::StopPlaying(play_id id)
 		if (item->id == id) {
 			*link = item->next;
 			sem_id waitSem = item->wait_sem;
+			item->sound->ReleaseRef();
 			free(item);
 			fLocker.Unlock();
 
