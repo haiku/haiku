@@ -105,3 +105,20 @@ BTextView::LineBuffer::BumpOffset(int32 delta, int32 index)
 	for (long i = index; i < fItemCount; i++)
 		fBuffer[i].offset += delta;
 }
+
+
+float
+BTextView::LineBuffer::MaxWidth() const
+{
+	if (fItemCount == 0)
+		return 0;
+
+	float maxWidth = 0;
+	STELine* line = &fBuffer[0];
+	for (int32 i = 0; i < fItemCount; i++) {
+		if (maxWidth < line->width)
+			maxWidth = line->width;
+		line++;
+	}
+	return maxWidth;
+}

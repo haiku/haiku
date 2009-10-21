@@ -15,7 +15,7 @@ struct STELine {
 	long		offset;		// offset of first character of line
 	float		origin;		// pixel position of top of line
 	float		ascent;		// maximum ascent for line
-	float		width;		// not used for now, but could be
+	float		width;		// cached width of line in pixels
 };
 
 
@@ -31,11 +31,12 @@ virtual					~LineBuffer();
 
 		int32			OffsetToLine(int32 offset) const;
 		int32			PixelToLine(float pixel) const;
-			
+
 		void			BumpOrigin(float delta, int32 index);
 		void			BumpOffset(int32 delta, int32 index);
 
 		long			NumLines() const;
+		float			MaxWidth() const;
 		STELine *		operator[](int32 index) const;
 };
 
