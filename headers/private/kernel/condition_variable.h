@@ -32,7 +32,9 @@ public:
 			status_t			Wait(const void* object, uint32 flags = 0,
 									bigtime_t timeout = 0);
 
-	inline	ConditionVariable* Variable() const		{ return fVariable; }
+	inline	status_t			WaitStatus() const { return fWaitStatus; }
+
+	inline	ConditionVariable*	Variable() const { return fVariable; }
 
 private:
 	inline	void				AddToVariable(ConditionVariable* variable);
@@ -56,8 +58,10 @@ public:
 									const char* objectType);
 			void				Unpublish(bool threadsLocked = false);
 
-	inline	void				NotifyOne(bool threadsLocked = false);
-	inline	void				NotifyAll(bool threadsLocked = false);
+	inline	void				NotifyOne(bool threadsLocked = false,
+									status_t result = B_OK);
+	inline	void				NotifyAll(bool threadsLocked = false,
+									status_t result = B_OK);
 
 			void				Add(ConditionVariableEntry* entry);
 
@@ -72,8 +76,9 @@ public:
 			void				Dump() const;
 
 private:
-			void				_Notify(bool all, bool threadsLocked);
-			void				_NotifyChecked(bool all, status_t result);
+			void				_Notify(bool all, bool threadsLocked,
+									status_t result);
+			void				_NotifyLocked(bool all, status_t result);
 
 protected:
 			typedef DoublyLinkedList<ConditionVariableEntry> EntryList;
@@ -109,16 +114,16 @@ ConditionVariableEntry::~ConditionVariableEntry()
 
 
 inline void
-ConditionVariable::NotifyOne(bool threadsLocked)
+ConditionVariable::NotifyOne(bool threadsLocked, status_t result)
 {
-	_Notify(false, threadsLocked);
+	_Notify(false, threadsLocked, result);
 }
 
 
 inline void
-ConditionVariable::NotifyAll(bool threadsLocked)
+ConditionVariable::NotifyAll(bool threadsLocked, status_t result)
 {
-	_Notify(true, threadsLocked);
+	_Notify(true, threadsLocked, result);
 }
 
 
