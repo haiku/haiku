@@ -312,8 +312,8 @@ private:
 			float				_StyledWidth(int32 fromOffset, int32 length,
 									float* outAscent = NULL,
 									float* outDescent = NULL) const;
-			float				_StyledWidthUTF8Safe(int32 fromOffset,
-									int32 numChars, float* outAscent = NULL,
+			float				_TabExpandedStyledWidth(int32 offset,
+									int32 length, float* outAscent = NULL,
 									float* outDescent = NULL) const;
 
 			float				_ActualTabWidth(float location) const;

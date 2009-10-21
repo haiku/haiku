@@ -1781,24 +1781,9 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 			fStyles->SyncNullStyle(inOffset);
 			height = _NullStyleHeight();
 		} else {
-			int32 offset = line->offset;
 			int32 length = inOffset - line->offset;
-			int32 numBytes = length;
-			bool foundTab = false;
-			do {
-				foundTab = fText->FindChar(B_TAB, offset, &numBytes);
-				float width = _StyledWidth(offset, numBytes);
-				result.x += width;
+			result.x += _TabExpandedStyledWidth(line->offset, length);
 
-				if (foundTab) {
-					result.x += _ActualTabWidth(result.x);
-					numBytes++;
-				}
-
-				offset += numBytes;
-				length -= numBytes;
-				numBytes = length;
-			} while (foundTab && length > 0);
 		}
 	}
 
@@ -1993,7 +1978,7 @@ BTextView::LineWidth(int32 lineNum) const
 	if (ByteAt((line + 1)->offset - 1) == B_ENTER)
 		length--;
 
-	return _StyledWidth(line->offset, length);
+	return _TabExpandedStyledWidth(line->offset, length);
 }
 
 
@@ -3839,8 +3824,8 @@ BTextView::_FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent,
 		offset += fromOffset;
 		int32 toOffset = (offset < limit) ? offset : limit;
 
-		*inOutWidth = _StyledWidth(fromOffset, toOffset - fromOffset, outAscent,
-			outDescent);
+		*inOutWidth = _TabExpandedStyledWidth(fromOffset, toOffset - fromOffset,
+			outAscent, outDescent);
 
 		return offset < limit ? offset + 1 : limit;
 	}
@@ -4037,6 +4022,49 @@ BTextView::_NextWordBoundary(int32 offset)
 }
 
 
+/*! \brief Returns the width used by the characters starting at the given
+		offset with the given length, expanding all tab characters as needed.
+*/
+float
+BTextView::_TabExpandedStyledWidth(int32 offset, int32 length, float* outAscent,
+	float* outDescent) const
+{
+	float ascent = 0.0;
+	float descent = 0.0;
+	float maxAscent = 0.0;
+	float maxDescent = 0.0;
+
+	float width = 0.0;
+	int32 numBytes = length;
+	bool foundTab = false;
+	do {
+		foundTab = fText->FindChar(B_TAB, offset, &numBytes);
+		width += _StyledWidth(offset, numBytes, &ascent, &descent);
+
+		if (maxAscent < ascent)
+			maxAscent = ascent;
+		if (maxDescent < descent)
+			maxDescent = descent;
+
+		if (foundTab) {
+			width += _ActualTabWidth(width);
+			numBytes++;
+		}
+
+		offset += numBytes;
+		length -= numBytes;
+		numBytes = length;
+	} while (foundTab && length > 0);
+
+	if (outAscent != NULL)
+		*outAscent = maxAscent;
+	if (outDescent != NULL)
+		*outDescent = maxDescent;
+
+	return width;
+}
+
+
 /*! \brief Calculate the width of the text within the given limits.
 	\param fromOffset The offset where to start.
 	\param length The length of the text to examine.
@@ -4047,8 +4075,8 @@ BTextView::_NextWordBoundary(int32 offset)
 	\return The width for the text within the given limits.
 */
 float
-BTextView::_StyledWidth(int32 fromOffset, int32 length, float *outAscent,
-	float *outDescent) const
+BTextView::_StyledWidth(int32 fromOffset, int32 length, float* outAscent,
+	float* outDescent) const
 {
 	if (length == 0) {
 		// determine height of char at given offset, but return empty width
@@ -4095,21 +4123,6 @@ BTextView::_StyledWidth(int32 fromOffset, int32 length, float *outAscent,
 		*outDescent = maxDescent;
 
 	return result;
-}
-
-
-// Unlike the _StyledWidth method, this one takes as parameter
-// the number of chars, not the number of bytes.
-float
-BTextView::_StyledWidthUTF8Safe(int32 fromOffset, int32 numChars,
-	float *outAscent, float *outDescent) const
-{
-	int32 toOffset = fromOffset;
-	while (numChars--)
-		toOffset = _NextInitialByte(toOffset);
-
-	const int32 length = toOffset - fromOffset;
-	return _StyledWidth(fromOffset, length, outAscent, outDescent);
 }
 
 
@@ -4741,24 +4754,25 @@ BTextView::_PerformAutoScrolling()
 	BRect bounds = Bounds();
 	BPoint scrollBy(B_ORIGIN);
 
-	BPoint constraint = fWhere;
-	constraint.ConstrainTo(bounds);
-	// Scroll char by char horizontally
-	// TODO: Check how BeOS R5 behaves
-	float value = _StyledWidthUTF8Safe(OffsetAt(constraint), 1);
+	// R5 does a pretty soft auto-scroll, we try to do the same by
+	// simply scrolling the distance between cursor and border
 	if (fWhere.x > bounds.right) {
-		if (bounds.right + value <= fTextRect.Width())
-			scrollBy.x = value;
+		scrollBy.x = fWhere.x - bounds.right;
 	} else if (fWhere.x < bounds.left) {
-		if (bounds.left - value >= 0)
-			scrollBy.x = -value;
+		scrollBy.x = fWhere.x - bounds.left; // negative value
+	}
+
+	// prevent from scrolling out of view
+	if (scrollBy.x != 0.0) {
+		float rightMax = floorf(fTextRect.right + fLayoutData->rightInset);
+		if (bounds.right + scrollBy.x > rightMax)
+			scrollBy.x = rightMax - bounds.right;
+		if (bounds.left + scrollBy.x < 0)
+			scrollBy.x = -bounds.left;
 	}
 
 	if (CountLines() > 1) {
 		// scroll in Y only if multiple lines!
-
-		// R5 does a pretty soft auto-scroll, we try to do the same by
-		// simply scrolling the distance between cursor and border
 		if (fWhere.y > bounds.bottom) {
 			scrollBy.y = fWhere.y - bounds.bottom;
 		} else if (fWhere.y < bounds.top) {
