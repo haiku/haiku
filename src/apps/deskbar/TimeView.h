@@ -34,8 +34,11 @@ All rights reserved.
 #ifndef TIME_VIEW_H
 #define TIME_VIEW_H
 
+
 #include <OS.h>
+#include <Messenger.h>
 #include <View.h>
+
 
 const uint32 kShowSeconds = 'ShSc';
 const uint32 kMilTime = 'MilT';
@@ -128,8 +131,9 @@ class TTimeView : public BView {
 		bool		fOrientation;		// vertical = true
 		BPoint		fTimeLocation;
 		BPoint		fDateLocation;
-		
-		BMessageRunner*	fLongClickMessageRunner;		
+
+		BMessenger	fCalendarWindow;
+		BMessageRunner*	fLongClickMessageRunner;
 };
 
 

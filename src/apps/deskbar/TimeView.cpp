@@ -35,23 +35,17 @@ All rights reserved.
 
 #include "TimeView.h"
 
-#ifdef _SHOW_CALENDAR_MENU_ITEM
-#	include "CalendarMenuItem.h"
-#endif
-
-#ifdef _SHOW_CALENDAR_MENU_WINDOW
-#	include "CalendarMenuWindow.h"
-#endif
+#include <string.h>
 
 #include <Debug.h>
 #include <MenuItem.h>
 #include <MessageRunner.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
-#include <Window.h>
 #include <Screen.h>
+#include <Window.h>
 
-#include <string.h>
+#include "CalendarMenuWindow.h"
 
 
 const char* kShortDateFormat = "%m/%d/%y";
@@ -237,7 +231,7 @@ TTimeView::MessageReceived(BMessage* message)
 		case 'time':
 			Window()->PostMessage(message, Parent());
 			break;
-			
+
 		case kLongClick:
 		{
 			StopLongClickNotifier();
@@ -246,7 +240,7 @@ TTimeView::MessageReceived(BMessage* message)
 			ShowCalendar(where);
 			break;
 		}
-		
+
 		case kShowCalendar:
 		{
 			BRect bounds(Bounds());
@@ -255,7 +249,7 @@ TTimeView::MessageReceived(BMessage* message)
 			ShowCalendar(center);
 			break;
 		}
-		
+
 		default:
 			BView::MessageReceived(message);
 	}
@@ -265,30 +259,15 @@ TTimeView::MessageReceived(BMessage* message)
 void
 TTimeView::ShowCalendar(BPoint where)
 {
-	//TODO: do nothing if the calendar is already shown			
+	if (fCalendarWindow.IsValid()) {
+		// If the calendar is already shown, just activate it
+		BMessage activate(B_SET_PROPERTY);
+		activate.AddSpecifier("Active");
+		activate.AddBool("data", true);
 
-#ifdef _SHOW_CALENDAR_MENU_ITEM
-
-	BPopUpMenu* menu = new BPopUpMenu("", false, false);
-	menu->SetFont(be_plain_font);
-
-	menu->AddItem(new CalendarMenuItem());
-	menu->ResizeToPreferred();			
-	
-	BPoint point = where;
-	BScreen screen;
-	where.y = Bounds().bottom + 4;
-
-	// make sure the menu is visible and doesn't hide the date
-	ConvertToScreen(&where);
-	if (where.y + menu->Bounds().Height() > screen.Frame().bottom)
-		where.y -= menu->Bounds().Height() + 2 * Bounds().Height();
-
-	ConvertToScreen(&point);
-	menu->Go(where, true, true, BRect(point.x - 4, point.y - 4,
-		point.x + 4, point.y + 4), true);
-		
-#elif _SHOW_CALENDAR_MENU_WINDOW
+		if (fCalendarWindow.SendMessage(&activate) == B_OK)
+			return;
+	}
 
 	where.y = Bounds().bottom + 4.0;
 	ConvertToScreen(&where);
@@ -297,8 +276,9 @@ TTimeView::ShowCalendar(BPoint where)
 		where.y -= (Bounds().Height() + 4.0);
 
 	CalendarMenuWindow* window = new CalendarMenuWindow(where, fEuroDate);
-	window->Show();			
-#endif	
+	fCalendarWindow = BMessenger(window);
+
+	window->Show();
 }
 
 
@@ -306,16 +286,16 @@ void
 TTimeView::StartLongClickNotifier(BPoint where)
 {
 	StopLongClickNotifier();
-	
+
 	BMessage longClickMessage(kLongClick);
 	longClickMessage.AddPoint("where", where);
-	
+
 	bigtime_t longClickThreshold;
 	get_click_speed(&longClickThreshold);
 		// use the doubleClickSpeed as a threshold
-		
+
 	fLongClickMessageRunner = new BMessageRunner(BMessenger(this),
-		 &longClickMessage, longClickThreshold, 1);	
+		 &longClickMessage, longClickThreshold, 1);
 }
 
 
@@ -323,7 +303,7 @@ void
 TTimeView::StopLongClickNotifier()
 {
 	delete fLongClickMessageRunner;
-	fLongClickMessageRunner = NULL;		
+	fLongClickMessageRunner = NULL;
 }
 
 
@@ -406,7 +386,7 @@ TTimeView::MouseDown(BPoint point)
 	if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 		ShowClockOptions(ConvertToScreen(point));
 		return;
-	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {		
+	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {
 		StartLongClickNotifier(point);
 	}
 
@@ -585,12 +565,10 @@ TTimeView::ShowClockOptions(BPoint point)
 	item = new BMenuItem("Hide Time", new BMessage('time'));
 	menu->AddItem(item);
 
-#if defined(_SHOW_CALENDAR_MENU_ITEM) || defined(_SHOW_CALENDAR_MENU_WINDOW)
 	item = new BMenuItem("Show Calendar" B_UTF8_ELLIPSIS,
 		new BMessage(kShowCalendar));
 	menu->AddItem(item);
-#endif
-	
+
 	menu->SetTargetForItems(this);
 	// Changed to accept screen coord system point;
 	// not constrained to this view now
