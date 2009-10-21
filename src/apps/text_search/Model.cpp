@@ -1,24 +1,9 @@
 /*
  * Copyright (c) 1998-2007 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * Distributed under the terms of the MIT License.
  */
+
+
 #include "Model.h"
 
 #include <new>
@@ -42,25 +27,26 @@ using std::nothrow;
 
 
 Model::Model()
-	: fDirectory(),
-	  fSelectedFiles(0UL),
+	:
+	fDirectory(),
+	fSelectedFiles(0UL),
 
-	  fRecurseDirs(true),
-	  fRecurseLinks(false),
-	  fSkipDotDirs(true),
-	  fCaseSensitive(false),
-	  fEscapeText(true),
-	  fTextOnly(true),
-	  fInvokePe(false),
-	  fShowContents(false),
+	fRecurseDirs(true),
+	fRecurseLinks(false),
+	fSkipDotDirs(true),
+	fCaseSensitive(false),
+	fEscapeText(true),
+	fTextOnly(true),
+	fInvokePe(false),
+	fShowContents(false),
 
-	  fFrame(100, 100, 500, 400),
+	fFrame(100, 100, 500, 400),
 
-	  fState(STATE_IDLE),
+	fState(STATE_IDLE),
 
-	  fFilePanelPath(""),
+	fFilePanelPath(""),
 
-	  fEncoding(0)
+	fEncoding(0)
 {
 	BPath path;
 	if (find_directory(B_USER_DIRECTORY, &path) == B_OK)
@@ -106,16 +92,13 @@ Model::LoadPrefs()
 			sizeof(int32)) > 0)
 		fCaseSensitive = (value != 0);
 
-	if (file.ReadAttr("EscapeText", B_INT32_TYPE, 0, &value,
-			sizeof(int32)) > 0)
+	if (file.ReadAttr("EscapeText", B_INT32_TYPE, 0, &value, sizeof(int32)) > 0)
 		fEscapeText = (value != 0);
 
-	if (file.ReadAttr("TextOnly", B_INT32_TYPE, 0, &value,
-			sizeof(int32)) > 0)
+	if (file.ReadAttr("TextOnly", B_INT32_TYPE, 0, &value, sizeof(int32)) > 0)
 		fTextOnly = (value != 0);
 
-	if (file.ReadAttr("InvokePe", B_INT32_TYPE, 0, &value,
-			sizeof(int32)) > 0)
+	if (file.ReadAttr("InvokePe", B_INT32_TYPE, 0, &value, sizeof(int32)) > 0)
 		fInvokePe = (value != 0);
 
 	if (file.ReadAttr("ShowContents", B_INT32_TYPE, 0, &value,
@@ -174,15 +157,15 @@ Model::SavePrefs()
 
 	value = fTextOnly ? 1 : 0;
 	file.WriteAttr("TextOnly", B_INT32_TYPE, 0, &value, sizeof(int32));
-	
+
 	value = fInvokePe ? 1 : 0;
 	file.WriteAttr("InvokePe", B_INT32_TYPE, 0, &value, sizeof(int32));
-	
+
 	value = fShowContents ? 1 : 0;
 	file.WriteAttr("ShowContents", B_INT32_TYPE, 0, &value, sizeof(int32));
-	
+
 	file.WriteAttr("WindowFrame", B_RECT_TYPE, 0, &fFrame, sizeof(BRect));
-	
+
 	file.WriteAttr("FilePanelPath", B_STRING_TYPE, 0, fFilePanelPath.String(),
 		fFilePanelPath.Length() + 1);
 
@@ -196,11 +179,10 @@ Model::SavePrefs()
 
 
 void
-Model::AddToHistory(const char* text) 
+Model::AddToHistory(const char* text)
 {
 	BList items;
-	if (!_LoadHistory(items))
-		return;
+	_LoadHistory(items);
 
 	BString* string = new (nothrow) BString(text);
 	if (string == NULL || !items.AddItem(string)) {
@@ -257,7 +239,7 @@ Model::_LoadHistory(BList& items) const
 	status_t status = _OpenFile(&file, PREFS_FILE);
 	if (status != B_OK)
 		return false;
-	
+
 	status = file.Lock();
 	if (status != B_OK)
 		return false;
@@ -286,17 +268,16 @@ status_t
 Model::_SaveHistory(const BList& items) const
 {
 	BFile file;
-	status_t status = _OpenFile(&file, PREFS_FILE, 
-		B_CREATE_FILE | B_WRITE_ONLY, 
+	status_t status = _OpenFile(&file, PREFS_FILE,
+		B_CREATE_FILE | B_WRITE_ONLY | B_ERASE_FILE,
 		B_USER_SETTINGS_DIRECTORY, NULL);
-	
 	if (status != B_OK)
 		return status;
 
 	status = file.Lock();
 	if (status != B_OK)
 		return status;
-	
+
 	BMessage message;
 	int32 count = items.CountItems();
 	for (int32 i = 0; i < count; i++) {
@@ -310,7 +291,7 @@ Model::_SaveHistory(const BList& items) const
 	file.SetSize(message.FlattenedSize());
 	file.Sync();
 	file.Unlock();
-	
+
 	return status;
 }
 
@@ -324,7 +305,7 @@ Model::_FreeHistory(const BList& items) const
 
 
 status_t
-Model::_OpenFile(BFile* file, const char* name, uint32 openMode, 
+Model::_OpenFile(BFile* file, const char* name, uint32 openMode,
 	directory_which which, BVolume* volume) const
 {
 	if (file == NULL)
