@@ -2170,8 +2170,12 @@ BTextView::SetTextRect(BRect rect)
 	if (rect == fTextRect)
 		return;
 
-	if (fWrap)
-		fLayoutData->UpdateInsets(Bounds().OffsetToCopy(B_ORIGIN), rect);
+	if (!fWrap) {
+		rect.right = Bounds().right - fLayoutData->rightInset;
+		rect.bottom = Bounds().bottom - fLayoutData->bottomInset;
+	}
+
+	fLayoutData->UpdateInsets(Bounds().OffsetToCopy(B_ORIGIN), rect);
 
 	_ResetTextRect();
 }
