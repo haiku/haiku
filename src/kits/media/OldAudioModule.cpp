@@ -364,6 +364,8 @@ BAudioFileStream::Channel()
 
 BADCSource::BADCSource(BMediaChannel *channel,
 					   mk_time start)
+	:
+	fEventLock("BADCSource lock")
 {
 	UNIMPLEMENTED();
 }

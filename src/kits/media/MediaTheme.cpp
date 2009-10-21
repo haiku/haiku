@@ -19,7 +19,7 @@
 #include <string.h>
 
 
-static BLocker sLock;
+static BLocker sLock("media theme lock");
 
 BMediaTheme* BMediaTheme::sDefaultTheme;
 
