@@ -96,6 +96,7 @@ usage(char *pname, int error)
 	fprintf(stderr, "-d\t--directory\topen at <folder>\n");
 	fprintf(stderr, "-l\t--load\tuse a load FilePanel (default)\n");
 	fprintf(stderr, "-s\t--save\tuse a save FilePanel\n");
+	fprintf(stderr, "-n\t--name\tset the default name for saving\n");
 	fprintf(stderr, "-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n");
 	fprintf(stderr, "-t\t--title\tset the FilePanel window title\n");
 	fprintf(stderr, "-1\t--single\tallow only 1 file to be selected\n");
@@ -120,6 +121,7 @@ main(int argc, char **argv)
 	char *windowTitle = NULL;
 	bool allowMultiSelect = true;
 	bool makeModal = false;
+	const char *defaultName = NULL;
 
 	for (i = 1; i < argc; i++) {
 		if (strncmp(argv[i], "--", 2) && ((*(argv[i]) == '-' && strlen(argv[i]) != 2) || *(argv[i]) != '-')) {
@@ -138,6 +140,12 @@ main(int argc, char **argv)
 			fpMode = B_OPEN_PANEL;
 		} else if (!strcmp(argv[i], "--save") || !strcmp(argv[i], "-s")) {
 			fpMode = B_SAVE_PANEL;
+		} else if (!strcmp(argv[i], "--name") || !strcmp(argv[i], "-n")) {
+			if (++i >= argc) {
+				fprintf(stderr, "%s: this option requires a parameter\n", argv[i-1]);
+				return usage(argv[0], 2);
+			}
+			defaultName = (const char *)argv[i];
 		} else if (!strcmp(argv[i], "--kind") || !strcmp(argv[i], "-k")) {
 			if (++i >= argc) {
 				fprintf(stderr, "%s: this option requires a parameter\n", argv[i-1]);
@@ -182,6 +190,8 @@ main(int argc, char **argv)
 		fPanel->SetPanelDirectory(openAt);
 	if (windowTitle)
 		fPanel->Window()->SetTitle(windowTitle);
+	if (fpMode == B_SAVE_PANEL && defaultName)
+		fPanel->SetSaveText(defaultName);
 	
 	fPanel->Show();
 /**/
