@@ -108,10 +108,7 @@ class TExpandoMenuBar : public BMenuBar {
 		TTeamMenuItem* fSeparatorItem;
 		TTeamMenuItem* fPreviousDragTargetItem;
 
-#ifdef DOUBLECLICKBRINGSTOFRONT
-		int32 fLastClickItem;
-		bigtime_t fLastClickTime;
-#endif
+		BMenuItem*			fLastClickItem;
 
 		static bool			sDoMonitor;
 		static thread_id	sMonThread;

@@ -93,7 +93,7 @@ TShowHideMenuItem::Invoke(BMessage*)
 	BRect zoomRect(0, 0, 0, 0);
 	BMenuItem* item = Menu()->Superitem();
 
-	if (item->Menu()->Window() != NULL) { 
+	if (item->Menu()->Window() != NULL) {
 		zoomRect = item->Menu()->ConvertToScreen(item->Frame());
 		doZoom = true;
 	}
@@ -102,8 +102,8 @@ TShowHideMenuItem::Invoke(BMessage*)
 }
 
 
-status_t 
-TShowHideMenuItem::TeamShowHideCommon(int32 action, const BList* teamList, 
+status_t
+TShowHideMenuItem::TeamShowHideCommon(int32 action, const BList* teamList,
 	BRect zoomRect, bool doZoom)
 {
 	if (teamList == NULL)
@@ -128,10 +128,10 @@ TShowHideMenuItem::TeamShowHideCommon(int32 action, const BList* teamList,
 					uint32 command = B_QUIT_REQUESTED;
 					app_info aInfo;
 					be_roster->GetRunningAppInfo(team, &aInfo);
-	
+
 					if (strcasecmp(aInfo.signature, kTrackerSignature) == 0)
 						command = 'Tall';
-					
+
 					messenger.SendMessage(command);
 					break;
 				}

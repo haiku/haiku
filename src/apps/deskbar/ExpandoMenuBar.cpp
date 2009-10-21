@@ -72,8 +72,9 @@ BLocker TExpandoMenuBar::sMonLocker("expando monitor");
 
 TExpandoMenuBar::TExpandoMenuBar(TBarView* bar, BRect frame, const char* name,
 	bool vertical, bool drawLabel)
-	: BMenuBar(frame, name, B_FOLLOW_NONE,
-			vertical ? B_ITEMS_IN_COLUMN : B_ITEMS_IN_ROW, vertical),
+	:
+	BMenuBar(frame, name, B_FOLLOW_NONE,
+		vertical ? B_ITEMS_IN_COLUMN : B_ITEMS_IN_ROW, vertical),
 	fVertical(vertical),
 	fOverflow(false),
 	fDrawLabel(drawLabel),
@@ -83,13 +84,9 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* bar, BRect frame, const char* name,
 	fBeMenuWidth(kDefaultBeMenuWidth),
 	fBarView(bar),
 	fFirstApp(0),
-	fPreviousDragTargetItem(NULL)
+	fPreviousDragTargetItem(NULL),
+	fLastClickItem(NULL)
 {
-#ifdef DOUBLECLICKBRINGSTOFRONT
-	fLastClickItem = -1;
-	fLastClickTime = 0;
-#endif
-
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 	SetFont(be_plain_font);
 	SetMaxContentWidth(sMinimumWindowWidth);
@@ -301,6 +298,8 @@ void
 TExpandoMenuBar::MouseDown(BPoint where)
 {
 	BMessage* message = Window()->CurrentMessage();
+	BMenuItem* menuItem;
+	TTeamMenuItem* item = TeamItemAtPoint(where, &menuItem);
 
 	// check for three finger salute, a.k.a. Vulcan Death Grip
 	if (message != NULL) {
@@ -310,86 +309,65 @@ TExpandoMenuBar::MouseDown(BPoint where)
 		if ((modifiers & B_COMMAND_KEY) != 0
 			&& (modifiers & B_OPTION_KEY) != 0
 			&& (modifiers & B_SHIFT_KEY) != 0
-			&& !fBarView->Dragging()) {
-			TTeamMenuItem* item = TeamItemAtPoint(where);
+			&& !fBarView->Dragging()
+			&& item != NULL) {
+			const BList	*teams = item->Teams();
+			int32 teamCount = teams->CountItems();
 
-			if (item != NULL) {
-				const BList	*teams = item->Teams();
-				int32 teamCount = teams->CountItems();
-
-				team_id teamID;
-				for (int32 team = 0; team < teamCount; team++) {
-					teamID = (team_id)teams->ItemAt(team);
-					kill_team(teamID);
-					//	remove the team immediately
-					//	from display
-					RemoveTeam(teamID, false);
-				}
-
-				return;
+			team_id teamID;
+			for (int32 team = 0; team < teamCount; team++) {
+				teamID = (team_id)teams->ItemAt(team);
+				kill_team(teamID);
+				// remove the team immediately from display
+				RemoveTeam(teamID, false);
 			}
+
+			return;
 		}
 	}
 
-// This feature is broken because the menu bar never receives
-// the second click
-#ifdef DOUBLECLICKBRINGSTOFRONT
-	// doubleclick on an item brings all to front
-	for (int32 i = fFirstApp; i < count; i++) {
-		TTeamMenuItem* item = (TTeamMenuItem*)ItemAt(i);
-		if (item->Frame().Contains(where)) {
-			bigtime_t clickSpeed = 0;
-			get_click_speed(&clickSpeed);
-			if (fLastClickItem == i
-				&& clickSpeed > system_time() - fLastClickTime) {
-				// bring this team's window to the front
-				BMessage showMessage(kBringTeamToFront);
-				showMessage.AddInt32("itemIndex", i);
-				Window()->PostMessage(&showMessage, this);
-				return;
-			}
-
-			fLastClickItem = i;
-			fLastClickTime = system_time();
-			break;
+	// double-click on an item brings the team to front
+	int32 clicks;
+	if (message != NULL && message->FindInt32("clicks", &clicks) == B_OK
+		&& clicks > 1) {
+		if (item == menuItem && item == fLastClickItem) {
+			// bring this team's window to the front
+			BMessage showMessage(kBringTeamToFront);
+			showMessage.AddInt32("itemIndex", IndexOf(item));
+			Window()->PostMessage(&showMessage, this);
+			return;
 		}
-	}
-#endif
+	} else
+		fLastClickItem = item;
 
 	// control click - show all/hide all shortcut
-	if (message != NULL) {
-		int32 modifiers = 0;
-		message->FindInt32("modifiers", &modifiers);
-		if ((modifiers & B_CONTROL_KEY) != 0
-			&& ! fBarView->Dragging()) {
-			TTeamMenuItem* item = TeamItemAtPoint(where);
-			if (item != NULL) {
-				// show/hide item's teams
-				BMessage showMessage((modifiers & B_SHIFT_KEY) != 0
-					? kMinimizeTeam : kBringTeamToFront);
-				showMessage.AddInt32("itemIndex", IndexOf(item));
-				Window()->PostMessage(&showMessage, this);
-				return;
-			}
-		}
+	int32 modifiers;
+	if (message != NULL && message->FindInt32("modifiers", &modifiers) == B_OK
+		&& (modifiers & B_CONTROL_KEY) != 0
+		&& !fBarView->Dragging()
+		&& item != NULL) {
+		// show/hide item's teams
+		BMessage showMessage((modifiers & B_SHIFT_KEY) != 0
+			? kMinimizeTeam : kBringTeamToFront);
+		showMessage.AddInt32("itemIndex", IndexOf(item));
+		Window()->PostMessage(&showMessage, this);
+		return;
 	}
 
 	// Check the bounds of the expand Team icon
-	if (fShowTeamExpander && fVertical && !fBarView->Dragging()) {
-		TTeamMenuItem* item = TeamItemAtPoint(where);
-		if (item != NULL) {
-			BRect expanderRect = item->ExpanderBounds();
-			if (expanderRect.Contains(where)) {
-				// Let the update thread wait...
-				BAutolock locker(sMonLocker);
+	if (fShowTeamExpander && fVertical && !fBarView->Dragging()
+		&& item != NULL) {
+		BRect expanderRect = item->ExpanderBounds();
+		if (expanderRect.Contains(where)) {
+			// Let the update thread wait...
+			BAutolock locker(sMonLocker);
 
-				// Toggle the item
-				item->ToggleExpandState(true);
-				item->Draw();
+			// Toggle the item
+			item->ToggleExpandState(true);
+			item->Draw();
 
-				// Absorb the message.
-				return;
-			}
+			// Absorb the message.
+			return;
 		}
 	}
 
@@ -492,12 +470,11 @@ TExpandoMenuBar::InBeMenu(BPoint loc) const
 }
 
 
-/**	Returns the team menu item that belongs to the item under the
- *	specified \a point.
- *	If \a _item is given, it will return the exact menu item under
- *	that point (which might be a window item when the expander is on).
- */
-
+/*!	Returns the team menu item that belongs to the item under the
+	specified \a point.
+	If \a _item is given, it will return the exact menu item under
+	that point (which might be a window item when the expander is on).
+*/
 TTeamMenuItem*
 TExpandoMenuBar::TeamItemAtPoint(BPoint point, BMenuItem** _item)
 {
