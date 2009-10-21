@@ -17,6 +17,7 @@ AddResources hey : hey.rdef ;
 AddResources mimeset : mimeset.rdef ;
 AddResources mountvolume : mountvolume.rdef ;
 AddResources urlwrapper : urlwrapper.rdef ;
+AddResources checkitout : checkitout.rdef ;
 
 # standard commands that don't need any additional library
 StdBinCommands
@@ -109,6 +110,7 @@ StdBinCommands
 # standard commands that need libbe.so and libsupc++.so
 StdBinCommands
 	alert.cpp
+	checkitout.cpp
 	dstcheck.cpp
 	hey.cpp
 	reindex.cpp
