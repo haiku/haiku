@@ -923,7 +923,7 @@ BWindow::DispatchMessage(BMessage* msg, BHandler* target)
 
 			int32 next = nextColumn + nextRow * columns;
 			if (next != current) {
-				uint32 workspaces;
+				uint32 workspaces = 0;
 				if (takeMeThere) {
 					workspaces = Workspaces() | (1 << next);
 
@@ -935,11 +935,10 @@ BWindow::DispatchMessage(BMessage* msg, BHandler* target)
 				// switch to it
 				activate_workspace(next);
 
-				if (takeMeThere	&& (workspaces != B_ALL_WORKSPACES)) {
+				if (takeMeThere && workspaces != B_ALL_WORKSPACES) {
 					workspaces &= ~(1 << current);
 					SetWorkspaces(workspaces);
 				}
-					
 			}
 			break;
 		}
