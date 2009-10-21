@@ -74,7 +74,7 @@ class KeyboardFilter : public EventFilter {
 		virtual void RemoveTarget(EventTarget* target);
 
 	private:
-		void _UpdateFocus(int32 key, EventTarget** _target);
+		void _UpdateFocus(int32 key, uint32 modifiers, EventTarget** _target);
 
 		Desktop*		fDesktop;
 		EventTarget*	fLastFocus;
@@ -106,12 +106,14 @@ KeyboardFilter::KeyboardFilter(Desktop* desktop)
 
 
 void
-KeyboardFilter::_UpdateFocus(int32 key, EventTarget** _target)
+KeyboardFilter::_UpdateFocus(int32 key, uint32 modifiers, EventTarget** _target)
 {
 	if (!fDesktop->LockSingleWindow())
 		return;
 
 	EventTarget* focus = fDesktop->KeyboardEventTarget();
+
+#if 0
 	bigtime_t now = system_time();
 
 	// TODO: this is a try to not steal focus from the current window
@@ -123,20 +125,26 @@ KeyboardFilter::_UpdateFocus(int32 key, EventTarget** _target)
 
 	if (fLastFocus == NULL || (focus != fLastFocus && now - fTimestamp > 100000)) {
 		// if the time span between the key presses is very short
-		// we keep our previous focus alive - this is save even
+		// we keep our previous focus alive - this is safe even
 		// if the target doesn't exist anymore, as we don't reset
 		// it, and the event focus passed in is always valid (or NULL)
 		*_target = focus;
 		fLastFocus = focus;
 	}
+#endif
+	*_target = focus;
+	fLastFocus = focus;
 
 	fDesktop->UnlockSingleWindow();
 
+#if 0
 	// we always allow to switch focus after the enter key has pressed
-	if (key == B_ENTER)
+	if (key == B_ENTER || modifiers == B_COMMAND_KEY
+		|| modifiers == B_CONTROL_KEY || modifiers == B_OPTION_KEY)
 		fTimestamp = 0;
 	else
 		fTimestamp = now;
+#endif
 }
 
 
@@ -182,7 +190,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 		|| message->what == B_MODIFIERS_CHANGED
 		|| message->what == B_UNMAPPED_KEY_DOWN
 		|| message->what == B_INPUT_METHOD_EVENT)
-		_UpdateFocus(key, _target);
+		_UpdateFocus(key, modifiers, _target);
 
 	return B_DISPATCH_MESSAGE;
 }
@@ -3043,11 +3051,13 @@ Desktop::_SetWorkspace(int32 index)
 				// But only normal windows are following
 				uint32 oldWorkspaces = fMouseEventWindow->Workspaces();
 
-				_Windows(index).AddWindow(fMouseEventWindow);
 				_Windows(previousIndex).RemoveWindow(fMouseEventWindow);
+				_Windows(index).AddWindow(fMouseEventWindow,
+					fMouseEventWindow->Frontmost(_Windows(index).FirstWindow(),
+					index));
 
-				_UpdateSubsetWorkspaces(fMouseEventWindow, previousIndex,
-					index);
+				// TODO: subset windows will always flicker this way
+
 				movedMouseEventWindow = true;
 
 				// send B_WORKSPACES_CHANGED message
