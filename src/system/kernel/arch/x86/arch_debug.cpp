@@ -330,7 +330,7 @@ print_iframe(struct iframe *frame)
 }
 
 
-static void
+static bool
 setup_for_thread(char *arg, struct thread **_thread, uint32 *_ebp,
 	uint32 *_oldPageDirectory)
 {
@@ -341,7 +341,7 @@ setup_for_thread(char *arg, struct thread **_thread, uint32 *_ebp,
 		thread = thread_get_thread_struct_locked(id);
 		if (thread == NULL) {
 			kprintf("could not find thread %ld\n", id);
-			return;
+			return false;
 		}
 
 		if (id != thread_get_current_thread_id()) {
@@ -368,6 +368,7 @@ setup_for_thread(char *arg, struct thread **_thread, uint32 *_ebp,
 	}
 
 	*_thread = thread;
+	return true;
 }
 
 
@@ -541,8 +542,9 @@ stack_trace(int argc, char **argv)
 	uint32 ebp = x86_read_ebp();
 	int32 num = 0, last = 0;
 
-	setup_for_thread(argc == threadIndex + 1 ? argv[threadIndex] : NULL,
-		&thread, &ebp, &oldPageDirectory);
+	if (!setup_for_thread(argc == threadIndex + 1 ? argv[threadIndex] : NULL,
+			&thread, &ebp, &oldPageDirectory))
+		return 0;
 
 	if (thread != NULL) {
 		kprintf("stack trace for thread %ld \"%s\"\n", thread->id,
@@ -712,8 +714,9 @@ show_call(int argc, char **argv)
 		return 0;
 	}
 
-	setup_for_thread(argc == 3 ? argv[1] : NULL, &thread, &ebp,
-		&oldPageDirectory);
+	if (!setup_for_thread(argc == 3 ? argv[1] : NULL, &thread, &ebp,
+			&oldPageDirectory))
+		return 0;
 
 	int32 callIndex = strtoul(argv[argc == 3 ? 2 : 1], NULL, 0);
 
