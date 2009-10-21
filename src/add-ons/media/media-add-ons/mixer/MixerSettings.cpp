@@ -24,7 +24,7 @@
 #define SETTINGS_VERSION ((int32)0x94251601)
 
 MixerSettings::MixerSettings()
- :	fLocker(new BLocker),
+ :	fLocker(new BLocker("mixer settings lock")),
  	fSettingsFile(0),
 	fSettingsDirty(false),
 	fSettingsLastChange(0),

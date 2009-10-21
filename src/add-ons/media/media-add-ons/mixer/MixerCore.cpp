@@ -44,7 +44,7 @@
 
 
 MixerCore::MixerCore(AudioMixer *node)
- :	fLocker(new BLocker),
+ :	fLocker(new BLocker("mixer core lock")),
 	fInputs(new BList),
 	fOutput(0),
 	fNextInputID(1),
