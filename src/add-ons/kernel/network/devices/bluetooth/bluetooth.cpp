@@ -41,9 +41,9 @@
 
 struct bluetooth_device : net_device, DoublyLinkedListLinkImpl<bluetooth_device> {
 	DoublyLinkedList<HciConnection> sConnectionList;
-	int		fd;
-	uint16	frame_size;
-	uint16	mtu;
+	int fd;
+	uint16 frame_size;
+	uint16 mtu;
 };
 
 /* Modules references */
@@ -60,8 +60,7 @@ static sem_id sLinkChangeSemaphore;
 bluetooth_device*
 FindDeviceByID(hci_id hid)
 {
-
-	bluetooth_device*	device;
+	bluetooth_device* device;
 
 	DoublyLinkedList<bluetooth_device>::Iterator iterator = sDeviceList.GetIterator();
 	while (iterator.HasNext()) {
@@ -78,7 +77,7 @@ FindDeviceByID(hci_id hid)
 void
 RegisterConnection(hci_id hid, uint16 handle)
 {
-	bluetooth_device*	device = FindDeviceByID(hid);
+	bluetooth_device* device = FindDeviceByID(hid);
 	HciConnection* conn = btCoreData->ConnectionByHandle(handle, hid);
 
 	if (device != NULL && conn != NULL) {
@@ -94,7 +93,7 @@ void
 unRegisterConnection(hci_id hid, uint16 handle)
 {
 
-	bluetooth_device*	device;
+	bluetooth_device* device;
 	device = FindDeviceByID(hid);
 
 	if (device != NULL) {
@@ -216,10 +215,10 @@ status_t
 bluetooth_send_data(net_device *_device, net_buffer* buffer)
 {
 	bluetooth_device* device = (bluetooth_device*)_device;
-	net_buffer*	curr_frame = NULL;
-	net_buffer*	next_frame = buffer;
-	uint16 		handle = buffer->type; //TODO: net_routes??
-	uint8		  flag = HCI_ACL_PACKET_START;
+	net_buffer* curr_frame = NULL;
+	net_buffer* next_frame = buffer;
+	uint16 handle = buffer->type; //TODO: net_routes??
+	uint8 flag = HCI_ACL_PACKET_START;
 
 	debugf("index %ld try to send bt packet of %lu bytes (flags %ld):\n",device->index, buffer->size, buffer->flags);
 
