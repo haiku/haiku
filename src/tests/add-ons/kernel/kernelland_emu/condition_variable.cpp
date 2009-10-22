@@ -173,7 +173,7 @@ ConditionVariable::Unpublish(bool threadsLocked)
 	fObjectType = NULL;
 
 	if (!fEntries.IsEmpty())
-		_NotifyChecked(true, B_ENTRY_NOT_FOUND);
+		_NotifyLocked(true, B_ENTRY_NOT_FOUND);
 }
 
 
@@ -194,12 +194,18 @@ ConditionVariable::Wait(uint32 flags, bigtime_t timeout)
 
 
 void
-ConditionVariable::_Notify(bool all, bool threadsLocked)
+ConditionVariable::_Notify(bool all, bool threadsLocked, status_t result)
 {
 	MutexLocker locker(sConditionVariablesLock);
 
-	if (!fEntries.IsEmpty())
-		_NotifyChecked(all, B_OK);
+	if (!fEntries.IsEmpty()) {
+		if (result > B_OK) {
+			panic("tried to notify with invalid result %ld\n", result);
+			result = B_ERROR;
+		}
+
+		_NotifyLocked(all, result);
+	}
 }
 
 
@@ -207,7 +213,7 @@ ConditionVariable::_Notify(bool all, bool threadsLocked)
 	thread lock held.
 */
 void
-ConditionVariable::_NotifyChecked(bool all, status_t result)
+ConditionVariable::_NotifyLocked(bool all, status_t result)
 {
 	// dequeue and wake up the blocked threads
 	while (ConditionVariableEntry* entry = fEntries.RemoveHead()) {
