@@ -944,7 +944,7 @@ accept_first_click()
 	if (link.FlushWithReply(code) == B_OK && code == B_OK)
 		link.Read<bool>(&acceptFirstClick);
 
-	return accept_first_click;
+	return acceptFirstClick;
 }
 
 rgb_color
