@@ -6,6 +6,7 @@
  *		Jérôme Duval,
  *		Axel Dörfler (axeld@pinc-software.de)
  *		Andrew McCall (mccall@digitalparadise.co.uk)
+ *		Brecht Machiels (brecht@mos6581.org)
  */
 #ifndef MOUSE_CONSTANTS_H
 #define MOUSE_CONSTANTS_H
@@ -17,6 +18,8 @@ const uint32 kMsgRevert				= 'BTre';
 
 const uint32 kMsgMouseType			= 'PUmt';
 const uint32 kMsgMouseFocusMode		= 'PUmf';
+const uint32 kMsgFollowsMouseMode	= 'PUff';
+const uint32 kMsgAcceptFirstClick	= 'PUaf';
 const uint32 kMsgMouseMap			= 'PUmm';
 
 const uint32 kMsgDoubleClickSpeed	= 'SLdc';

@@ -7,9 +7,10 @@
  *		Adrian Oanca <adioanca@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
- *		Axel Dörfler, axeld@pinc-software.de
+ *		Axel Dörfler <axeld@pinc-software.de>
  *		Artur Wyszynski <harakash@gmail.com>
- *		Philippe Saint-Pierre, stpere@gmail.com
+ *		Philippe Saint-Pierre <stpere@gmail.com>
+ *		Brecht Machiels <brecht@mos6581.org>
  */
 
 
@@ -648,7 +649,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			fDesktop->UnlockSingleWindow();
 
 			if (activate)
-				fDesktop->ActivateWindow(fWindow);
+				fDesktop->SelectWindow(fWindow);
 			else
 				fDesktop->SendWindowBehind(fWindow, NULL);
 

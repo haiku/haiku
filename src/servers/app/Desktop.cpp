@@ -5,8 +5,9 @@
  * Authors:
  *		Adrian Oanca <adioanca@cotty.iren.ro>
  *		Stephan Aßmus <superstippi@gmx.de>
- *		Axel Dörfler, axeld@pinc-software.de
- *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
+ *		Axel Dörfler <axeld@pinc-software.de>
+ *		Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>
+ *		Brecht Machiels <brecht@mos6581.org>
  */
 
 
@@ -123,7 +124,8 @@ KeyboardFilter::_UpdateFocus(int32 key, uint32 modifiers, EventTarget** _target)
 	//	be done differently, though (using something like B_LOCK_WINDOW_FOCUS)
 	//	(at least B_WINDOW_ACTIVATED must be postponed)
 
-	if (fLastFocus == NULL || (focus != fLastFocus && now - fTimestamp > 100000)) {
+	if (fLastFocus == NULL
+		|| (focus != fLastFocus && now - fTimestamp > 100000)) {
 		// if the time span between the key presses is very short
 		// we keep our previous focus alive - this is safe even
 		// if the target doesn't exist anymore, as we don't reset
@@ -215,8 +217,8 @@ MouseFilter::MouseFilter(Desktop* desktop)
 
 
 filter_result
-MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
-	BMessage* latestMouseMoved)
+MouseFilter::Filter(BMessage* message, EventTarget** _target,
+	int32* _viewToken, BMessage* latestMouseMoved)
 {
 	BPoint where;
 	if (message->FindPoint("where", &where) != B_OK)
@@ -244,7 +246,8 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 
 			case B_MOUSE_UP:
 				window->MouseUp(message, where, &viewToken);
-				fDesktop->SetMouseEventWindow(NULL);
+				if (buttons == 0)
+					fDesktop->SetMouseEventWindow(NULL);
 				break;
 
 			case B_MOUSE_MOVED:
@@ -388,7 +391,8 @@ Desktop::Init()
 		return B_ERROR;
 	}
 
-	fVirtualScreen.HWInterface()->MoveCursorTo(fVirtualScreen.Frame().Width() / 2,
+	fVirtualScreen.HWInterface()->MoveCursorTo(
+		fVirtualScreen.Frame().Width() / 2,
 		fVirtualScreen.Frame().Height() / 2);
 
 #if TEST_MODE
@@ -843,6 +847,24 @@ Desktop::RemoveWorkspacesView(WorkspacesView* view)
 //	#pragma mark - Methods for Window manipulation
 
 
+/*!	\brief Activates or focusses the window based on the pointer position.
+*/
+void
+Desktop::SelectWindow(Window* window)
+{
+	if (fSettings->MouseMode() != B_NORMAL_MOUSE) {
+		// Only bring the window to front when it is not the window under the
+		// mouse pointer. This should result in sensible behaviour.
+		if (window != fWindowUnderMouse
+			|| (window == fWindowUnderMouse && window != FocusWindow()))
+			ActivateWindow(window);
+		else
+			SetFocusWindow(window);
+	} else
+		ActivateWindow(window);
+}
+
+
 /*!	\brief Tries to move the specified window to the front of the screen,
 		and make it the focus window.
 
@@ -853,7 +875,8 @@ Desktop::RemoveWorkspacesView(WorkspacesView* view)
 void
 Desktop::ActivateWindow(Window* window)
 {
-	STRACE(("ActivateWindow(%p, %s)\n", window, window ? window->Title() : "<none>"));
+	STRACE(("ActivateWindow(%p, %s)\n", window, window
+		? window->Title() : "<none>"));
 
 	if (window == NULL) {
 		fBack = NULL;
@@ -1003,8 +1026,10 @@ Desktop::SendWindowBehind(Window* window, Window* behindOf)
 	MarkDirty(dirty);
 
 	_UpdateFronts();
-	SetFocusWindow(fSettings->FocusFollowsMouse() ?
-		WindowAt(fLastMousePosition) : NULL);
+	if (fSettings->MouseMode() == B_FOCUS_FOLLOWS_MOUSE)
+		SetFocusWindow(WindowAt(fLastMousePosition));
+	else if (fSettings->MouseMode() == B_NORMAL_MOUSE)
+		SetFocusWindow(NULL);
 
 	bool sendFakeMouseMoved = false;
 	if (FocusWindow() != window)
@@ -1413,7 +1438,8 @@ Desktop::SetWindowFeel(Window* window, window_feel newFeel)
 	// adopt the window's current workspaces
 
 	if (!window->IsNormal())
-		_ChangeWindowWorkspaces(window, window->Workspaces(), window->SubsetWorkspaces());
+		_ChangeWindowWorkspaces(window, window->Workspaces(),
+			window->SubsetWorkspaces());
 
 	// make sure the window has the correct position in the window lists
 	//	(ie. all floating windows have to be on the top, ...)
@@ -2083,7 +2109,8 @@ Desktop::_LaunchInputServer()
 	if (entryStatus == B_OK)
 		entryStatus = roster.Launch(&ref);
 	if (entryStatus == B_OK || entryStatus == B_ALREADY_RUNNING) {
-		syslog(LOG_ERR, "Failed to launch the input server by signature: %s!\n",
+		syslog(LOG_ERR,
+			"Failed to launch the input server by signature: %s!\n",
 			strerror(status));
 		return;
 	}
@@ -2119,7 +2146,8 @@ Desktop::_PrepareQuit()
 
 	// wait for the last app to die
 	if (count > 0)
-		acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT, 250000);
+		acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT,
+			250000);
 
 	fApplicationsLock.Unlock();
 }
@@ -2135,7 +2163,8 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			// Attached data:
 			// 1) port_id - receiver port of a regular app
-			// 2) port_id - client looper port - for sending messages to the client
+			// 2) port_id - client looper port - for sending messages to the
+			//					client
 			// 2) team_id - app's team ID
 			// 3) int32 - handler token of the regular app
 			// 4) char * - signature of the regular app
@@ -2179,8 +2208,8 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_DELETE_APP:
 		{
-			// Delete a ServerApp. Received only from the respective ServerApp when a
-			// BApplication asks it to quit.
+			// Delete a ServerApp. Received only from the respective ServerApp
+			// when a BApplication asks it to quit.
 
 			// Attached Data:
 			// 1) thread_id - thread ID of the ServerApp to be deleted
@@ -2213,7 +2242,8 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			if (fQuitting && count <= 1) {
 				// wait for the last app to die
-				acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT, 500000);
+				acquire_sem_etc(fShutdownSemaphore, fShutdownCount,
+					B_RELATIVE_TIMEOUT, 500000);
 				PostMessage(kMsgQuitLooper);
 			}
 			break;
@@ -2268,8 +2298,8 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case B_QUIT_REQUESTED:
 			// We've been asked to quit, so (for now) broadcast to all
-			// test apps to quit. This situation will occur only when the server
-			// is compiled as a regular Be application.
+			// test apps to quit. This situation will occur only when the
+			// server is compiled as a regular Be application.
 
 			fApplicationsLock.Lock();
 			fShutdownSemaphore = create_sem(0, "desktop shutdown");
@@ -2313,7 +2343,8 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 
 		default:
-			printf("Desktop %d:%s received unexpected code %ld\n", 0, "baron", code);
+			printf("Desktop %d:%s received unexpected code %ld\n", 0, "baron",
+				code);
 
 			if (link.NeedsReply()) {
 				// the client is now blocking and waiting for a reply!
@@ -2425,8 +2456,10 @@ Desktop::_UpdateFront(bool updateFloating)
 	fFront = NULL;
 
 	for (Window* window = _CurrentWindows().LastWindow();
-			window != NULL; window = window->PreviousWindow(fCurrentWorkspace)) {
-		if (window->IsHidden() || window->IsFloating() || !window->SupportsFront())
+			window != NULL;
+			window = window->PreviousWindow(fCurrentWorkspace)) {
+		if (window->IsHidden() || window->IsFloating()
+			|| !window->SupportsFront())
 			continue;
 
 		fFront = window;
@@ -2564,7 +2597,8 @@ void
 Desktop::_UpdateSubsetWorkspaces(Window* window, int32 previousIndex,
 	int32 newIndex)
 {
-	STRACE(("_UpdateSubsetWorkspaces(window %p, %s)\n", window, window->Title()));
+	STRACE(("_UpdateSubsetWorkspaces(window %p, %s)\n", window,
+		window->Title()));
 
 	// if the window is hidden, the subset windows are up-to-date already
 	if (!window->IsNormal() || window->IsHidden())
@@ -2720,7 +2754,8 @@ Desktop::_LastFocusSubsetWindow(Window* window)
 
 	for (Window* front = fFocusList.LastWindow(); front != NULL;
 			front = front->PreviousWindow(kFocusList)) {
-		if (front != window && !front->IsHidden() && window->HasInSubset(front))
+		if (front != window && !front->IsHidden()
+			&& window->HasInSubset(front))
 			return front;
 	}
 
@@ -3142,7 +3177,8 @@ Desktop::_SetWorkspace(int32 index)
 		}
 
 		if (window->Frame().LeftTop() != position) {
-			// the window was visible before, but its on-screen location changed
+			// the window was visible before, but its on-screen location
+			//	changed
 			BPoint offset = position - window->Frame().LeftTop();
 			MoveWindowBy(window, offset.x, offset.y);
 				// TODO: be a bit smarter than this...

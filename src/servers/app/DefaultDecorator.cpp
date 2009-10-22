@@ -13,6 +13,16 @@
 
 #include "DefaultDecorator.h"
 
+#include <new>
+#include <stdio.h>
+
+#include <Autolock.h>
+#include <GradientLinear.h>
+#include <Rect.h>
+#include <View.h>
+
+#include <WindowPrivate.h>
+
 #include "BitmapDrawingEngine.h"
 #include "DesktopSettings.h"
 #include "DrawingEngine.h"
@@ -21,15 +31,6 @@
 #include "PatternHandler.h"
 #include "ServerBitmap.h"
 
-#include <WindowPrivate.h>
-
-#include <Autolock.h>
-#include <GradientLinear.h>
-#include <Rect.h>
-#include <View.h>
-
-#include <new>
-#include <stdio.h>
 
 //#define DEBUG_DECORATOR
 #ifdef DEBUG_DECORATOR
@@ -576,7 +577,7 @@ DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 		// NOTE: On R5, windows are not moved to back if clicked inside the
 		// resize area with the second mouse button. So we check this after
 		// the check above
-		if (buttons == B_SECONDARY_MOUSE_BUTTON)
+		if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
 			return DEC_MOVETOBACK;
 
 		if (fWasDoubleClick && !(fFlags & B_NOT_MINIMIZABLE))

@@ -44,7 +44,9 @@ class DesktopSettings {
 		void			GetMenuInfo(menu_info& info) const;
 
 		mode_mouse		MouseMode() const;
+		mode_focus_follows_mouse	FocusFollowsMouseMode() const;
 		bool			FocusFollowsMouse() const;
+		bool			AcceptFirstClick() const;
 
 		bool			ShowAllDraggers() const;
 
@@ -77,6 +79,9 @@ class LockedDesktopSettings : public DesktopSettings {
 		void			SetMenuInfo(const menu_info& info);
 
 		void			SetMouseMode(mode_mouse mode);
+		void			SetFocusFollowsMouseMode(
+							const mode_focus_follows_mouse mode);
+		void			SetAcceptFirstClick(bool accept_first_click);
 
 		void			SetShowAllDraggers(bool show);
 

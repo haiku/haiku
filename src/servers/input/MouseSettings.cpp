@@ -15,19 +15,23 @@
 //
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
+
+#include "MouseSettings.h"
+
+#include <stdio.h>
+
 #include <FindDirectory.h>
 #include <File.h>
 #include <Path.h>
 #include <View.h>
 
-#include <stdio.h>
-
-#include "MouseSettings.h"
 
 static const bigtime_t kDefaultClickSpeed = 500000;
 static const int32 kDefaultMouseSpeed = 65536;
 static const int32 kDefaultMouseType = 3;	// 3 button mouse
 static const int32 kDefaultAccelerationFactor = 65536;
+static const bool kDefaultAcceptFirstClick = false;
+
 
 
 MouseSettings::MouseSettings()
@@ -41,6 +45,8 @@ MouseSettings::MouseSettings()
 
 	fOriginalSettings = fSettings;
 	fOriginalMode = fMode;
+	fOriginalFocusFollowsMouseMode = fFocusFollowsMouseMode;
+	fOriginalAcceptFirstClick = fAcceptFirstClick;
 }
 
 
@@ -68,6 +74,7 @@ MouseSettings::RetrieveSettings()
 	// retrieve current values
 
 	fMode = mouse_mode();
+	fAcceptFirstClick = accept_first_click();
 	Defaults();
 	
 	// also try to load the window position from disk
@@ -85,12 +92,16 @@ MouseSettings::RetrieveSettings()
 	
 	if ((file.Read(&fSettings.type, sizeof(int32)) != sizeof(int32))
 		|| (file.Read(&fSettings.map, sizeof(int32) * 3) != sizeof(int32) * 3)
-		|| (file.Read(&fSettings.accel, sizeof(mouse_accel)) != sizeof(mouse_accel))
-		|| (file.Read(&fSettings.click_speed, sizeof(bigtime_t)) != sizeof(bigtime_t))) {
+		|| (file.Read(&fSettings.accel, sizeof(mouse_accel))
+			!= sizeof(mouse_accel))
+		|| (file.Read(&fSettings.click_speed, sizeof(bigtime_t))
+			.282
+			!= sizeof(bigtime_t))) {
 		Defaults();
 	}
 #else
-	if (file.ReadAt(0, &fSettings, sizeof(mouse_settings)) != sizeof(mouse_settings)) {
+	if (file.ReadAt(0, &fSettings, sizeof(mouse_settings))
+		!= sizeof(mouse_settings)) {
 		Defaults();
 	}
 #endif
@@ -128,7 +139,7 @@ MouseSettings::SaveSettings()
 	file.Write(&fSettings, sizeof(fSettings));
 #endif
 
-	// who is responsible for saving the mouse mode?
+	// who is responsible for saving the mouse mode and accept_first_click?
 
 	return B_OK;
 }
@@ -139,28 +150,44 @@ void
 MouseSettings::Dump()
 {
 	printf("type:\t\t%ld button mouse\n", fSettings.type);
-	printf("map:\t\tleft = %lu : middle = %lu : right = %lu\n", fSettings.map.button[0], fSettings.map.button[2], fSettings.map.button[1]);
+	printf("map:\t\tleft = %lu : middle = %lu : right = %lu\n",
+		fSettings.map.button[0], fSettings.map.button[2],
+		fSettings.map.button[1]);
 	printf("click speed:\t%Ld\n", fSettings.click_speed);
-	printf("accel:\t\t%s\n", fSettings.accel.enabled ? "enabled" : "disabled");
+	printf("accel:\t\t%s\n", fSettings.accel.enabled
+		? "enabled" : "disabled");
 	printf("accel factor:\t%ld\n", fSettings.accel.accel_factor);
 	printf("speed:\t\t%ld\n", fSettings.accel.speed);
 
 	char *mode = "unknown";
 	switch (fMode) {
 		case B_NORMAL_MOUSE:
-			mode = "normal";
+			mode = "activate";
+			break;
+		case B_CLICK_TO_FOCUS_MOUSE:
+			mode = "focus";
 			break;
 		case B_FOCUS_FOLLOWS_MOUSE:
-			mode = "focus follows mouse";
-			break;
-		case B_WARP_MOUSE:
-			mode = "warp mouse";
-			break;
-		case B_INSTANT_WARP_MOUSE:
-			mode = "instant warp mouse";
+			mode = "auto-focus";
 			break;
 	}
-	printf("mode:\t\t%s\n", mode);
+	printf("mouse mode:\t%s\n", mode);
+
+	char *focus_follows_mouse_mode = "unknown";
+	switch (fMode) {
+		case B_NORMAL_FOCUS_FOLLOWS_MOUSE:
+			focus_follows_mouse_mode = "normal";
+			break;
+		case B_WARP_FOCUS_FOLLOWS_MOUSE:
+			focus_follows_mouse_mode = "warp";
+			break;
+		case B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE:
+			focus_follows_mouse_mode = "instant warp";
+			break;
+	}
+	printf("focus follows mouse mode:\t%s\n", focus_follows_mouse_mode);
+	printf("accept first click:\t%s\n", fAcceptFirstClick
+		? "enabled" : "disabled");
 }
 #endif
 
@@ -176,6 +203,8 @@ MouseSettings::Defaults()
 	SetMouseType(kDefaultMouseType);
 	SetAccelerationFactor(kDefaultAccelerationFactor);
 	SetMouseMode(B_NORMAL_MOUSE);
+	SetFocusFollowsMouseMode(B_NORMAL_FOCUS_FOLLOWS_MOUSE);
+	SetAcceptFirstClick(kDefaultAcceptFirstClick);
 
 	fSettings.map.button[0] = B_PRIMARY_MOUSE_BUTTON;
 	fSettings.map.button[1] = B_SECONDARY_MOUSE_BUTTON;
@@ -252,4 +281,19 @@ MouseSettings::SetMouseMode(mode_mouse mode)
 {
 	fMode = mode;
 }
+
+
+void
+MouseSettings::SetFocusFollowsMouseMode(mode_focus_follows_mouse mode)
+{
+	fFocusFollowsMouseMode = mode;	
+}
+
+
+void 
+MouseSettings::SetAcceptFirstClick(bool acceptFirstClick)
+{
+	fAcceptFirstClick = acceptFirstClick;	
+}
+
 

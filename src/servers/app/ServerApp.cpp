@@ -379,8 +379,8 @@ ServerApp::_MessageLooper()
 
 			case AS_QUIT_APP:
 			{
-				// This message is received only when the app_server is asked to
-				// shut down in test/debug mode. Of course, if we are testing
+				// This message is received only when the app_server is asked 
+				// to shut down in test/debug mode. Of course, if we are testing
 				// while using AccelerantDriver, we do NOT want to shut down
 				// client applications. The server can be quit in this fashion
 				// through the driver's interface, such as closing the
@@ -1159,10 +1159,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_SET_MOUSE_MODE:
 		{
-			STRACE(("ServerApp %s: Set Focus Follows Mouse mode\n",
+			STRACE(("ServerApp %s: Set Mouse Focus mode\n",
 				Signature()));
 			// Attached Data:
-			// 1) enum mode_mouse FFM mouse mode
+			// 1) enum mode_mouse mouse focus mode
 			mode_mouse mouseMode;
 			if (link.Read<mode_mouse>(&mouseMode) == B_OK) {
 				LockedDesktopSettings settings(fDesktop);
@@ -1172,7 +1172,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 		case AS_GET_MOUSE_MODE:
 		{
-			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n",
+			STRACE(("ServerApp %s: Get Mouse Focus mode\n",
 				Signature()));
 
 			if (fDesktop->LockSingleWindow()) {
@@ -1180,6 +1180,65 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 				fLink.StartMessage(B_OK);
 				fLink.Attach<mode_mouse>(settings.MouseMode());
+
+				fDesktop->UnlockSingleWindow();
+			} else
+				fLink.StartMessage(B_ERROR);
+
+			fLink.Flush();
+			break;
+		}
+		case AS_SET_FOCUS_FOLLOWS_MOUSE_MODE:
+		{
+			STRACE(("ServerApp %s: Set Focus Follows Mouse mode\n", Signature()));
+			// Attached Data:
+			// 1) enum mode_focus_follows_mouse FFM mouse mode
+			mode_focus_follows_mouse focusFollowsMousMode;
+			if (link.Read<mode_focus_follows_mouse>(&focusFollowsMousMode) == B_OK) {
+				LockedDesktopSettings settings(fDesktop);
+				settings.SetFocusFollowsMouseMode(focusFollowsMousMode);
+			}
+			break;
+		}
+		case AS_GET_FOCUS_FOLLOWS_MOUSE_MODE:
+		{
+			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n", Signature()));
+
+			if (fDesktop->LockSingleWindow()) {
+				DesktopSettings settings(fDesktop);
+
+				fLink.StartMessage(B_OK);
+				fLink.Attach<mode_focus_follows_mouse>(
+					settings.FocusFollowsMouseMode());
+
+				fDesktop->UnlockSingleWindow();
+			} else
+				fLink.StartMessage(B_ERROR);
+
+			fLink.Flush();
+			break;
+		}
+		case AS_SET_ACCEPT_FIRST_CLICK:
+		{
+			STRACE(("ServerApp %s: Set Accept First Click\n", Signature()));
+			// Attached Data:
+			// 1) bool accept_first_click
+			bool acceptFirstClick;
+			if (link.Read<bool>(&acceptFirstClick) == B_OK) {
+				LockedDesktopSettings settings(fDesktop);
+				settings.SetAcceptFirstClick(acceptFirstClick);
+			}
+			break;
+		}
+		case AS_GET_ACCEPT_FIRST_CLICK:
+		{
+			STRACE(("ServerApp %s: Get Accept First Click\n", Signature()));
+
+			if (fDesktop->LockSingleWindow()) {
+				DesktopSettings settings(fDesktop);
+
+				fLink.StartMessage(B_OK);
+				fLink.Attach<bool>(settings.AcceptFirstClick());
 
 				fDesktop->UnlockSingleWindow();
 			} else

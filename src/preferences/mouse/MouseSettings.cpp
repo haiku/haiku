@@ -6,8 +6,8 @@
  *		Jérôme Duval,
  *		Axel Dörfler (axeld@pinc-software.de)
  *		Andrew McCall (mccall@digitalparadise.co.uk)
+ *		Brecht Machiels (brecht@mos6581.org)
  */
-
 
 #include <FindDirectory.h>
 #include <File.h>
@@ -18,7 +18,6 @@
 
 #include "MouseSettings.h"
 
-
 // The R5 settings file differs from that of OpenBeOS;
 // the latter maps 16 different mouse buttons
 #define R5_COMPATIBLE 1
@@ -27,6 +26,7 @@ static const bigtime_t kDefaultClickSpeed = 500000;
 static const int32 kDefaultMouseSpeed = 65536;
 static const int32 kDefaultMouseType = 3;	// 3 button mouse
 static const int32 kDefaultAccelerationFactor = 65536;
+static const bool kDefaultAcceptFirstClick = false;
 
 
 MouseSettings::MouseSettings()
@@ -37,6 +37,8 @@ MouseSettings::MouseSettings()
 
 	fOriginalSettings = fSettings;
 	fOriginalMode = fMode;
+	fOriginalFocusFollowsMouseMode = fFocusFollowsMouseMode;
+	fOriginalAcceptFirstClick = fAcceptFirstClick;
 }
 
 
@@ -75,6 +77,8 @@ MouseSettings::_RetrieveSettings()
 		fprintf(stderr, "error when get_mouse_type\n");
 
 	fMode = mouse_mode();
+	fFocusFollowsMouseMode = focus_follows_mouse_mode();
+	fAcceptFirstClick = accept_first_click();
 
 	// also try to load the window position from disk
 
@@ -151,19 +155,32 @@ MouseSettings::Dump()
 	char *mode = "unknown";
 	switch (fMode) {
 		case B_NORMAL_MOUSE:
-			mode = "normal";
+			mode = "click to activate";
+			break;
+		case B_CLICK_TO_FOCUS_MOUSE:
+			mode = "click to focus";
 			break;
 		case B_FOCUS_FOLLOWS_MOUSE:
 			mode = "focus follows mouse";
 			break;
-		case B_WARP_MOUSE:
-			mode = "warp mouse";
+	}
+	printf("mouse mode:\t%s\n", mode);
+
+	char *focus_follows_mouse_mode = "unknown";
+	switch (fMode) {
+		case B_NORMAL_FOCUS_FOLLOWS_MOUSE:
+			focus_follows_mouse_mode = "normal";
 			break;
-		case B_INSTANT_WARP_MOUSE:
-			mode = "instant warp mouse";
+		case B_WARP_FOCUS_FOLLOWS_MOUSE:
+			focus_follows_mouse_mode = "warp";
+			break;
+		case B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE:
+			focus_follows_mouse_mode = "instant warp";
 			break;
 	}
-	printf("mode:\t\t%s\n", mode);
+	printf("focus follows mouse mode:\t%s\n", focus_follows_mouse_mode);
+	printf("accept first click:\t%s\n", 
+		fAcceptFirstClick ? "enabled" : "disabled");
 }
 #endif
 
@@ -177,6 +194,8 @@ MouseSettings::Defaults()
 	SetMouseType(kDefaultMouseType);
 	SetAccelerationFactor(kDefaultAccelerationFactor);
 	SetMouseMode(B_NORMAL_MOUSE);
+	SetFocusFollowsMouseMode(B_NORMAL_FOCUS_FOLLOWS_MOUSE);
+	SetAcceptFirstClick(kDefaultAcceptFirstClick);
 
 	mouse_map map;
 	if (get_mouse_map(&map) == B_OK) {
@@ -197,6 +216,8 @@ MouseSettings::IsDefaultable()
 		|| fSettings.type != kDefaultMouseType
 		|| fSettings.accel.accel_factor != kDefaultAccelerationFactor
 		|| fMode != B_NORMAL_MOUSE
+		|| fFocusFollowsMouseMode != B_NORMAL_FOCUS_FOLLOWS_MOUSE
+		|| fAcceptFirstClick != kDefaultAcceptFirstClick
 		|| fSettings.map.button[0] != B_PRIMARY_MOUSE_BUTTON
 		|| fSettings.map.button[1] != B_SECONDARY_MOUSE_BUTTON
 		|| fSettings.map.button[2] != B_TERTIARY_MOUSE_BUTTON;
@@ -212,6 +233,9 @@ MouseSettings::Revert()
 	SetMouseType(fOriginalSettings.type);
 	SetAccelerationFactor(fOriginalSettings.accel.accel_factor);
 	SetMouseMode(fOriginalMode);
+	SetFocusFollowsMouseMode(fOriginalFocusFollowsMouseMode);
+	SetAcceptFirstClick(fOriginalAcceptFirstClick);
+	
 	SetMapping(fOriginalSettings.map);
 }
 
@@ -311,5 +335,21 @@ MouseSettings::SetMouseMode(mode_mouse mode)
 {
 	set_mouse_mode(mode);
 	fMode = mode;
+}
+
+
+void
+MouseSettings::SetFocusFollowsMouseMode(mode_focus_follows_mouse mode)
+{
+	set_focus_follows_mouse_mode(mode);
+	fFocusFollowsMouseMode = mode;	
+}
+
+
+void 
+MouseSettings::SetAcceptFirstClick(bool accept_first_click)
+{
+	set_accept_first_click(accept_first_click);
+	fAcceptFirstClick = accept_first_click;	
 }
 

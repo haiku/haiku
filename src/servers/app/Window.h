@@ -6,7 +6,8 @@
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Adi Oanca <adioanca@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de>
- *		Axel Dörfler, axeld@pinc-software.de
+ *		Axel Dörfler <axeld@pinc-software.de>
+ *		Brecht Machiels <brecht@mos6581.org>
  */
 #ifndef WINDOW_H
 #define WINDOW_H

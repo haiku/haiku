@@ -100,7 +100,8 @@ namespace BPrivate {
 	Returns \c true if the mode is known.
 */
 bool
-get_mode_parameter(uint32 mode, int32& width, int32& height, uint32& colorSpace)
+get_mode_parameter(uint32 mode, int32& width, int32& height,
+	uint32& colorSpace)
 {
 	switch (mode) {
 		case B_8_BIT_640x480:
@@ -456,7 +457,8 @@ set_mouse_map(mouse_map *map)
 	BMessage command(IS_SET_MOUSE_MAP);
 	BMessage reply;
 
-	status_t err = command.AddData("mousemap", B_RAW_TYPE, map, sizeof(mouse_map));
+	status_t err = command.AddData("mousemap", B_RAW_TYPE, map,
+		sizeof(mouse_map));
 	if (err != B_OK)
 		return err;
 	return _control_input_server_(&command, &reply);
@@ -652,12 +654,14 @@ _get_key_map(key_map **map, char **key_buffer, ssize_t *key_buffer_size)
 
 	_control_input_server_(&command, &reply);
 
-	if (reply.FindData("keymap", B_ANY_TYPE, &map_array, &map_count) != B_OK) {
+	if (reply.FindData("keymap", B_ANY_TYPE, &map_array, &map_count)
+		!= B_OK) {
 		*map = 0; *key_buffer = 0;
 		return;
 	}
 
-	if (reply.FindData("key_buffer", B_ANY_TYPE, &key_array, key_buffer_size) != B_OK) {
+	if (reply.FindData("key_buffer", B_ANY_TYPE, &key_array, key_buffer_size)
+		!= B_OK) {
 		*map = 0; *key_buffer = 0;
 		return;
 	}
@@ -852,14 +856,14 @@ void
 set_focus_follows_mouse(bool follow)
 {
 	// obviously deprecated API
-	set_mouse_mode(B_WARP_MOUSE);
+	set_mouse_mode(B_FOCUS_FOLLOWS_MOUSE);
 }
 
 
 bool
 focus_follows_mouse()
 {
-	return mouse_mode() != B_NORMAL_MOUSE;
+	return mouse_mode() == B_FOCUS_FOLLOWS_MOUSE;
 }
 
 
@@ -876,7 +880,8 @@ set_mouse_mode(mode_mouse mode)
 mode_mouse
 mouse_mode()
 {
-	// Gets the focus-follows-mouse style, such as normal, B_WARP_MOUSE, etc.
+	// Gets the mouse focus style, such as activate to click,
+	// focus to click, ...
 	mode_mouse mode = B_NORMAL_MOUSE;
 
 	BPrivate::AppServerLink link;
@@ -890,6 +895,58 @@ mouse_mode()
 }
 
 
+void
+set_focus_follows_mouse_mode(mode_focus_follows_mouse mode)
+{
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_SET_FOCUS_FOLLOWS_MOUSE_MODE);
+	link.Attach<mode_focus_follows_mouse>(mode);
+	link.Flush();
+}
+
+
+mode_focus_follows_mouse
+focus_follows_mouse_mode()
+{
+	mode_focus_follows_mouse mode = B_NORMAL_FOCUS_FOLLOWS_MOUSE;
+
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_FOCUS_FOLLOWS_MOUSE_MODE);
+
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == B_OK)
+		link.Read<mode_focus_follows_mouse>(&mode);
+
+	return mode;
+}
+
+
+void
+set_accept_first_click(bool acceptFirstClick)
+{
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_SET_ACCEPT_FIRST_CLICK);
+	link.Attach<bool>(acceptFirstClick);
+	link.Flush();
+}
+
+
+bool
+accept_first_click()
+{
+	// Gets the accept first click status
+	bool acceptFirstClick = false;
+
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_ACCEPT_FIRST_CLICK);
+
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == B_OK)
+		link.Read<bool>(&acceptFirstClick);
+
+	return accept_first_click;
+}
+
 rgb_color
 ui_color(color_which which)
 {
@@ -900,7 +957,8 @@ ui_color(color_which which)
 	}
 
 	if (be_app) {
-		server_read_only_memory* shared = BApplication::Private::ServerReadOnlyMemory();
+		server_read_only_memory* shared
+			= BApplication::Private::ServerReadOnlyMemory();
 		return shared->colors[index];
 	}
 
@@ -1079,7 +1137,8 @@ get_decorator(void)
 
 
 /*!
-	\brief queries the server for the name of the decorator with a certain index
+	\brief queries the server for the name of the decorator with a certain
+			index
 	\param index The index of the decorator to get the name for
 	\param name BString to receive the name of the decorator
 	\return B_OK if successful, B_ERROR if not
@@ -1323,8 +1382,8 @@ truncate_end(const char* source, char* dest, uint32 numChars,
 	const float* escapementArray, float width, float ellipsisWidth, float size)
 {
 	float currentWidth = 0.0;
-	ellipsisWidth /= size;	// test if this is as accurate as escapementArray * size
-	width /= size;
+	ellipsisWidth /= size;	// test if this is as accurate
+	width /= size;			//    as escapementArray * size
 	uint32 lastFit = 0, c;
 
 	for (c = 0; c < numChars; c++) {
@@ -1378,7 +1437,8 @@ copy_from_end(const char* src, char* dst, uint32 numChars, uint32 length,
 			currentWidth += ellipsisWidth;
 			// go forward again until ellipsis fits (already beyond the target)
 			for (uint32 c2 = c; c2 < numChars; c2++) {
-//printf(" backward: %c (%ld) (%.1f - %.1f = %.1f)\n", *dst, c2, currentWidth, escapementArray[c2] * size, currentWidth - escapementArray[c2] * size);
+//printf(" backward: %c (%ld) (%.1f - %.1f = %.1f)\n", *dst, c2, currentWidth, escapementArray[c2] * size,
+//	currentWidth - escapementArray[c2] * size);
 				currentWidth -= escapementArray[c2] * size;
 				do {
 					src++;
@@ -1411,7 +1471,8 @@ truncate_middle(const char* source, char* dest, uint32 numChars,
 
 	uint32 left = 0;
 	float leftWidth = 0.0;
-	while (left < numChars && (leftWidth + (escapementArray[left] * size)) < mid)
+	while (left < numChars && (leftWidth + (escapementArray[left] * size))
+		< mid)
 		leftWidth += (escapementArray[left++] * size);
 
 	if (left == numChars)
@@ -1419,7 +1480,8 @@ truncate_middle(const char* source, char* dest, uint32 numChars,
 
 	float rightWidth = 0.0;
 	uint32 right = numChars;
-	while (right > left && (rightWidth + (escapementArray[right - 1] * size)) < mid)
+	while (right > left && (rightWidth + (escapementArray[right - 1] * size))
+		< mid)
 		rightWidth += (escapementArray[--right] * size);
 
 	if (left >= right)
@@ -1490,7 +1552,8 @@ truncate_string(const char* string, uint32 mode, float width,
 	char* result, const float* escapementArray, float fontSize,
 	float ellipsisWidth, int32 length, int32 numChars)
 {
-	// TODO: that's actually not correct: the string could be smaller than ellipsisWidth
+	// TODO: that's actually not correct: the string could be smaller than
+	//       ellipsisWidth
 	if (string == NULL /*|| width < ellipsisWidth*/) {
 		// we don't have room for a single glyph
 		strcpy(result, "");
@@ -1540,8 +1603,8 @@ truncate_string(const char* string, uint32 mode, float width,
 			// FALL THROUGH (at least do something)
 		case B_TRUNCATE_MIDDLE:
 		default:
-			truncated = truncate_middle(source, dest, numChars, escapementArray,
-				width, ellipsisWidth, fontSize);
+			truncated = truncate_middle(source, dest, numChars,
+				escapementArray, width, ellipsisWidth, fontSize);
 			break;
 	}
 

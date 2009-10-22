@@ -10,8 +10,10 @@
 #define DEFAULT_DECORATOR_H
 
 
-#include "Decorator.h"
 #include <Region.h>
+
+#include "Decorator.h"
+
 
 class Desktop;
 class ServerBitmap;

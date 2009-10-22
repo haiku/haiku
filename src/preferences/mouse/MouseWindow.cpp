@@ -6,20 +6,22 @@
  *		Jérôme Duval,
  *		Axel Dörfler (axeld@pinc-software.de)
  *		Andrew McCall (mccall@digitalparadise.co.uk)
+ *		Brecht Machiels (brecht@mos6581.org)
  */
-
 
 #include <Alert.h>
 #include <Application.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <Button.h>
+#include <CheckBox.h>
+#include <Debug.h>
+#include <Menu.h>
+#include <MenuField.h>
+#include <MenuItem.h>
 #include <Message.h>
 #include <Screen.h>
 #include <Slider.h>
-#include <Button.h>
-#include <Menu.h>
-#include <MenuItem.h>
-#include <MenuField.h>
-#include <Debug.h>
-#include <string.h>
 
 #include "MouseWindow.h"
 #include "MouseConstants.h"
@@ -29,44 +31,41 @@
 MouseWindow::MouseWindow(BRect _rect)
 	: 
 		BWindow(_rect, "Mouse", B_TITLED_WINDOW, 
-			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS |
+				B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BView* view = new BView(Bounds(), "view", B_FOLLOW_ALL, 0);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(view);
-
 	// Add the main settings view
-	fSettingsView = new SettingsView(Bounds().InsetBySelf(kBorderSpace, 
-		kBorderSpace), fSettings);
-	view->AddChild(fSettingsView);
+	fSettingsView = new SettingsView(fSettings);
+	fSettingsBox = new BBox("main box");
+	fSettingsBox->AddChild(fSettingsView);
 
 	// Add the "Default" button
-	BRect rect(kBorderSpace, fSettingsView->Frame().bottom + kItemSpace + 2,
-		kBorderSpace + 75, fSettingsView->Frame().bottom + 20);
-	fDefaultsButton = new BButton(rect, "defaults", "Defaults", 
-		new BMessage(kMsgDefaults));
-	fDefaultsButton->ResizeToPreferred();
+	fDefaultsButton = new BButton("Defaults", new BMessage(kMsgDefaults));
 	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
-	view->AddChild(fDefaultsButton);
 
 	// Add the "Revert" button
-	rect.OffsetBy(fDefaultsButton->Bounds().Width() + kItemSpace, 0);
-	fRevertButton = new BButton(rect, "revert", "Revert", 
-		new BMessage(kMsgRevert));
+	fRevertButton = new BButton("Revert", new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
-	fRevertButton->ResizeToPreferred();
-	view->AddChild(fRevertButton);
 
 	SetPulseRate(100000);
 		// we are using the pulse rate to scan pressed mouse
 		// buttons and draw the selected imagery
 
-	ResizeTo(fSettingsView->Frame().right + kBorderSpace,
-		fRevertButton->Frame().bottom + kBorderSpace - 1);
+	// Build the layout
+	SetLayout(new BGroupLayout(B_VERTICAL));
+
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+		.Add(fSettingsBox)
+		.AddGroup(B_HORIZONTAL, 5)
+			.Add(fDefaultsButton)
+			.Add(fRevertButton)
+			.AddGlue()
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
 
 	// check if the window is on screen
-
-	rect = BScreen().Frame();
+	BRect rect = BScreen().Frame();
 	rect.InsetBySelf(20, 20);
 
 	BPoint position = fSettings.WindowPosition();
@@ -135,6 +134,41 @@ MouseWindow::MessageReceived(BMessage* message)
 			int32 mode;
 			if (message->FindInt32("mode", &mode) == B_OK) {
 				fSettings.SetMouseMode((mode_mouse)mode);
+				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+				fRevertButton->SetEnabled(true);
+				fSettingsView->fFocusFollowsMouseMenu->SetEnabled(
+					mode == B_FOCUS_FOLLOWS_MOUSE);
+				fSettingsView->fAcceptFirstClickBox->SetEnabled(
+					mode != B_FOCUS_FOLLOWS_MOUSE);
+			}
+			break;
+		}
+		
+		case kMsgFollowsMouseMode:
+		{
+			int32 mode;
+			if (message->FindInt32("mode_focus_follows_mouse", &mode)
+				== B_OK) {
+				fSettings.SetFocusFollowsMouseMode(
+					(mode_focus_follows_mouse)mode);
+				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+				fRevertButton->SetEnabled(true);
+			}
+			break;
+		}
+		
+		case kMsgAcceptFirstClick:
+		{
+			BHandler *handler;
+			if (message->FindPointer("source",
+				reinterpret_cast<void**>(&handler)) == B_OK) {
+				bool acceptFirstClick = false;
+				BCheckBox *acceptFirstClickBox =
+					dynamic_cast<BCheckBox*>(handler);
+				if (acceptFirstClickBox)
+					acceptFirstClick = acceptFirstClickBox->Value()
+						== B_CONTROL_ON;
+				fSettings.SetAcceptFirstClick(acceptFirstClick);
 				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
 				fRevertButton->SetEnabled(true);
 			}

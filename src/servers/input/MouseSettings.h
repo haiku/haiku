@@ -18,9 +18,10 @@
 #ifndef MOUSE_SETTINGS_H_
 #define MOUSE_SETTINGS_H_
 
-#include <SupportDefs.h>
 #include <InterfaceDefs.h>
 #include <kb_mouse_settings.h>
+#include <Path.h>
+#include <SupportDefs.h>
 
 
 class MouseSettings {
@@ -40,7 +41,8 @@ class MouseSettings {
 		int32 MouseSpeed() const { return fSettings.accel.speed; }
 		void SetMouseSpeed(int32 speed);
 
-		int32 AccelerationFactor() const { return fSettings.accel.accel_factor; }
+		int32 AccelerationFactor() const
+			{ return fSettings.accel.accel_factor; }
 		void SetAccelerationFactor(int32 factor);
 
 		uint32 Mapping(int32 index) const;
@@ -51,6 +53,13 @@ class MouseSettings {
 		mode_mouse MouseMode() const { return fMode; }
 		void SetMouseMode(mode_mouse mode);
 
+		mode_focus_follows_mouse FocusFollowsMouseMode() const
+			{ return fFocusFollowsMouseMode; }
+		void SetFocusFollowsMouseMode(mode_focus_follows_mouse mode);
+
+		bool AcceptFirstClick() const { return fAcceptFirstClick; }
+		void SetAcceptFirstClick(bool acceptFirstClick);
+
 		status_t SaveSettings();
 
 	private:
@@ -59,6 +68,10 @@ class MouseSettings {
 
 		mouse_settings	fSettings, fOriginalSettings;
 		mode_mouse		fMode, fOriginalMode;
+		mode_focus_follows_mouse	fFocusFollowsMouseMode;
+		mode_focus_follows_mouse	fOriginalFocusFollowsMouseMode;
+		bool			fAcceptFirstClick;
+		bool			fOriginalAcceptFirstClick;
 };
 
 #endif

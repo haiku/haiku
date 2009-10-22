@@ -11,9 +11,11 @@
 
 
 #include "DesktopSettings.h"
-#include "ServerFont.h"
 
 #include <Locker.h>
+
+#include "ServerFont.h"
+
 
 struct server_read_only_memory;
 
@@ -43,7 +45,12 @@ public:
 
 			void				SetMouseMode(mode_mouse mode);
 			mode_mouse			MouseMode() const;
+			void				SetFocusFollowsMouseMode(
+									mode_focus_follows_mouse mode);
+			mode_focus_follows_mouse		FocusFollowsMouseMode() const;
 			bool				FocusFollowsMouse() const;
+			void				SetAcceptFirstClick(bool accept_first_click);
+			bool				AcceptFirstClick() const;
 
 			void				SetShowAllDraggers(bool show);
 			bool				ShowAllDraggers() const;
@@ -85,6 +92,8 @@ private:
 			scroll_bar_info		fScrollBarInfo;
 			menu_info			fMenuInfo;
 			mode_mouse			fMouseMode;
+			mode_focus_follows_mouse	fFocusFollowsMouseMode;
+			bool				fAcceptFirstClick;
 			bool				fShowAllDraggers;
 			int32				fWorkspacesColumns;
 			int32				fWorkspacesRows;

@@ -5,8 +5,9 @@
  * Authors:
  *		Adrian Oanca <adioanca@cotty.iren.ro>
  *		Stephan Aßmus <superstippi@gmx.de>
- *		Axel Dörfler, axeld@pinc-software.de
+ *		Axel Dörfler <axeld@pinc-software.de>
  *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
+ *		Brecht Machiels <brecht@mos6581.org>
  */
 #ifndef DESKTOP_H
 #define DESKTOP_H
@@ -161,6 +162,7 @@ public:
 
 	// Window methods
 
+			void				SelectWindow(Window* window);
 			void				ActivateWindow(Window* window);
 			void				SendWindowBehind(Window* window,
 									Window* behindOf = NULL);

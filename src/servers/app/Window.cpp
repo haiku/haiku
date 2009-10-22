@@ -6,7 +6,8 @@
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Adi Oanca <adioanca@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de>
- *		Axel Dörfler, axeld@pinc-software.de
+ *		Axel Dörfler <axeld@pinc-software.de>
+ *		Brecht Machiels <brecht@mos6581.org>
  */
 
 
@@ -774,6 +775,8 @@ static const bigtime_t kWindowActivationTimeout = 500000LL;
 void
 Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 {
+	DesktopSettings desktopSettings(fDesktop);
+
 	// TODO: move into Decorator
 	if (!fBorderRegionValid)
 		GetBorderRegion(&fBorderRegion);
@@ -800,11 +803,13 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 				action = DEC_DRAG;
 		}
 
-		// ignore clicks on decorator buttons if the
-		// non-floating window doesn't have focus
-		if (!IsFocus() && !IsFloating() && action != DEC_MOVETOBACK
-			&& action != DEC_RESIZE && action != DEC_SLIDETAB)
-			action = DEC_DRAG;
+		if (!desktopSettings.AcceptFirstClick()) {
+			// ignore clicks on decorator buttons if the
+			// non-floating window doesn't have focus
+			if (!IsFocus() && !IsFloating() && action != DEC_MOVETOBACK
+				&& action != DEC_RESIZE && action != DEC_SLIDETAB)
+				action = DEC_DRAG;
+		}
 
 		// set decorator internals
 		switch (action) {
@@ -869,20 +874,30 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		}
 
 		if (action == DEC_MOVETOBACK) {
-			fDesktop->SendWindowBehind(this);
+			if (desktopSettings.MouseMode() == B_CLICK_TO_FOCUS_MOUSE) {
+				bool covered = true;
+				BRegion fullRegion;
+				GetFullRegion(&fullRegion);
+				if (fullRegion == VisibleRegion()) {
+    				// window is overlapped.
+    				covered = false;
+				}
+				if (this != fDesktop->FrontWindow() && covered)
+					fDesktop->ActivateWindow(this);
+				else
+					fDesktop->SendWindowBehind(this);
+			} else
+				fDesktop->SendWindowBehind(this);
 		} else {
 			fDesktop->SetMouseEventWindow(this);
 
-			// activate window if not in FFM mode
-			DesktopSettings desktopSettings(fDesktop);
-			if (!desktopSettings.FocusFollowsMouse()) {
+			// activate window if in click to activate mode, else only focus it
+			if (desktopSettings.MouseMode() == B_NORMAL_MOUSE)
 				fDesktop->ActivateWindow(this);
-			} else {
-				// actually, the window should already be
-				// focused since the mouse would have to
-				// be over it, but just for completeness...
+			else {
 				fDesktop->SetFocusWindow(this);
-				if (action == DEC_DRAG) {
+				if (desktopSettings.MouseMode() == B_FOCUS_FOLLOWS_MOUSE
+					&& action == DEC_DRAG) {
 					fActivateOnMouseUp = true;
 					fMouseMoveDistance = 0.0f;
 					fLastMoveTime = system_time();
@@ -897,13 +912,17 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 
 			// clicking a simple View
 			if (!IsFocus()) {
-				DesktopSettings desktopSettings(fDesktop);
+				bool acceptFirstClick = desktopSettings.AcceptFirstClick()
+					|| ((Flags() & B_WILL_ACCEPT_FIRST_CLICK) != 0);
+				bool avoidFocus = (Flags() & B_AVOID_FOCUS) != 0;
 
-				// Activate window in case it doesn't accept first click, and
-				// we're not in FFM mode
-				if ((Flags() & B_WILL_ACCEPT_FIRST_CLICK) == 0
-					&& !desktopSettings.FocusFollowsMouse())
+				// Activate or focus the window in case it doesn't accept first
+				// click, depending on the mouse mode
+				if (desktopSettings.MouseMode() == B_NORMAL_MOUSE
+					&& !acceptFirstClick)
 					fDesktop->ActivateWindow(this);
+				else if (!avoidFocus)
+					fDesktop->SetFocusWindow(this);
 
 				// Eat the click if we don't accept first click
 				// (B_AVOID_FOCUS never gets the focus, so they always accept
@@ -911,8 +930,7 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 				// TODO: the latter is unlike BeOS - if we really wanted to
 				// imitate this behaviour, we would need to check if we're
 				// the front window instead of the focus window
-				if ((Flags() & (B_WILL_ACCEPT_FIRST_CLICK
-						| B_AVOID_FOCUS)) == 0)
+				if (!acceptFirstClick && !avoidFocus)
 					return;
 			}
 
@@ -968,6 +986,18 @@ Window::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 		engine->UnlockParallelAccess();
 
 		fRegionPool.Recycle(visibleBorder);
+
+		int32 buttons;
+		if (message->FindInt32("buttons", &buttons) != B_OK)
+			buttons = 0;
+
+		// if the primary mouse button is released, stop
+		// dragging/resizing/sliding
+		if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0) {
+			fIsDragging = false;
+			fIsResizing = false;
+			fIsSlidingTab = false;
+		}
 	}
 
 	// in FFM mode, activate the window and bring it
@@ -980,10 +1010,6 @@ Window::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 		if (system_time() - fLastMoveTime < kWindowActivationTimeout)
 			fDesktop->ActivateWindow(this);
 	}
-
-	fIsDragging = false;
-	fIsResizing = false;
-	fIsSlidingTab = false;
 
 	if (View* view = ViewAt(where)) {
 		if (HasModal())

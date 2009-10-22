@@ -6,18 +6,20 @@
  *		Jérôme Duval,
  *		Axel Dörfler (axeld@pinc-software.de)
  *		Andrew McCall (mccall@digitalparadise.co.uk)
+ *		Brecht Machiels (brecht@mos6581.org)
  */
 #ifndef MOUSE_WINDOW_H
 #define MOUSE_WINDOW_H
 
 
-#include <Window.h>
+#include <Box.h>
 #include <Button.h>
+#include <Window.h>
 
 #include "MouseSettings.h"
 
-class SettingsView;
 
+class SettingsView;
 
 class MouseWindow : public BWindow {
 public:
@@ -31,6 +33,7 @@ private:
 		BButton			*fDefaultsButton;
 		BButton			*fRevertButton;
 		SettingsView	*fSettingsView;
+		BBox			*fSettingsBox;
 };
 
 #endif	/* MOUSE_WINDOW_H */

@@ -11,20 +11,21 @@
 
 #include "DesktopSettings.h"
 #include "DesktopSettingsPrivate.h"
+
+#include <Directory.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <Path.h>
+
+#include <DefaultColors.h>
+#include <ServerReadOnlyMemory.h>
+
 #include "Desktop.h"
 #include "FontCache.h"
 #include "FontCacheEntry.h"
 #include "FontManager.h"
 #include "GlobalSubpixelSettings.h"
 #include "ServerConfig.h"
-
-#include <DefaultColors.h>
-#include <ServerReadOnlyMemory.h>
-
-#include <Directory.h>
-#include <File.h>
-#include <FindDirectory.h>
-#include <Path.h>
 
 
 DesktopSettingsPrivate::DesktopSettingsPrivate(server_read_only_memory* shared)
@@ -50,6 +51,8 @@ DesktopSettingsPrivate::_SetDefaults()
 	fFixedFont = *gFontManager->DefaultFixedFont();
 
 	fMouseMode = B_NORMAL_MOUSE;
+	fFocusFollowsMouseMode = B_NORMAL_FOCUS_FOLLOWS_MOUSE;
+	fAcceptFirstClick = false;
 	fShowAllDraggers = true;
 
 	// init scrollbar info
@@ -194,9 +197,18 @@ DesktopSettingsPrivate::_Load()
 		status = settings.Unflatten(&file);
 		if (status == B_OK) {
 			int32 mode;
-			if (settings.FindInt32("mode", &mode) == B_OK) {
+			if (settings.FindInt32("mode", &mode) == B_OK)
 				fMouseMode = (mode_mouse)mode;
+			int32 focusFollowsMouseMode;
+			if (settings.FindInt32("focus follows mouse mode",
+				&focusFollowsMouseMode) == B_OK) {
+				fFocusFollowsMouseMode =
+					(mode_focus_follows_mouse)focusFollowsMouseMode;
 			}
+			bool acceptFirstClick;
+			if (settings.FindBool("accept first click", &acceptFirstClick)
+				== B_OK)
+				fAcceptFirstClick = acceptFirstClick;
 		}
 	}
 
@@ -235,8 +247,8 @@ DesktopSettingsPrivate::_Load()
 				fMenuInfo.click_to_open = clickToOpen;
 
 			bool triggersAlwaysShown;
-			if (settings.FindBool("triggers always shown", &triggersAlwaysShown)
-					== B_OK) {
+			if (settings.FindBool("triggers always shown",
+				&triggersAlwaysShown) == B_OK) {
 				fMenuInfo.triggers_always_shown = triggersAlwaysShown;
 			}
 
@@ -350,6 +362,9 @@ DesktopSettingsPrivate::Save(uint32 mask)
 		if (path.Append("mouse") == B_OK) {
 			BMessage settings('asms');
 			settings.AddInt32("mode", (int32)fMouseMode);
+			settings.AddInt32("focus follows mouse mode",
+				(int32)fFocusFollowsMouseMode);
+			settings.AddBool("accept first click", fAcceptFirstClick);
 
 			BFile file;
 			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE
@@ -498,6 +513,15 @@ DesktopSettingsPrivate::SetMouseMode(const mode_mouse mode)
 }
 
 
+void
+DesktopSettingsPrivate::SetFocusFollowsMouseMode(
+	const mode_focus_follows_mouse mode)
+{
+	fFocusFollowsMouseMode = mode;
+	Save(kMouseSettings);
+}
+
+
 mode_mouse
 DesktopSettingsPrivate::MouseMode() const
 {
@@ -505,10 +529,32 @@ DesktopSettingsPrivate::MouseMode() const
 }
 
 
+mode_focus_follows_mouse
+DesktopSettingsPrivate::FocusFollowsMouseMode() const
+{
+	return fFocusFollowsMouseMode;
+}
+
+
+void
+DesktopSettingsPrivate::SetAcceptFirstClick(const bool acceptFirstClick)
+{
+	fAcceptFirstClick = acceptFirstClick;
+	Save(kMouseSettings);
+}
+
+
+bool
+DesktopSettingsPrivate::AcceptFirstClick() const
+{
+	return fAcceptFirstClick;
+}
+
+
 bool
 DesktopSettingsPrivate::FocusFollowsMouse() const
 {
-	return MouseMode() != B_NORMAL_MOUSE;
+	return MouseMode() == B_FOCUS_FOLLOWS_MOUSE;
 }
 
 
@@ -740,10 +786,24 @@ DesktopSettings::MouseMode() const
 }
 
 
+mode_focus_follows_mouse
+DesktopSettings::FocusFollowsMouseMode() const
+{
+	return fSettings->FocusFollowsMouseMode();
+}
+
+
 bool
 DesktopSettings::FocusFollowsMouse() const
 {
 	return fSettings->FocusFollowsMouse();
+}
+
+
+bool
+DesktopSettings::AcceptFirstClick() const
+{
+	return fSettings->AcceptFirstClick();
 }
 
 
@@ -879,6 +939,21 @@ void
 LockedDesktopSettings::SetMouseMode(const mode_mouse mode)
 {
 	fSettings->SetMouseMode(mode);
+}
+
+
+void
+LockedDesktopSettings::SetFocusFollowsMouseMode(
+	const mode_focus_follows_mouse mode)
+{
+	fSettings->SetFocusFollowsMouseMode(mode);
+}
+
+
+void
+LockedDesktopSettings::SetAcceptFirstClick(const bool acceptFirstClick)
+{
+	fSettings->SetAcceptFirstClick(acceptFirstClick);
 }
 
 

@@ -30,7 +30,6 @@
 #include "MouseSettings.h"
 #include "MouseWindow.h"
 
-
 static const int32 kButtonTop = 6;
 static const int32 kMouseDownWidth = 72;
 static const int32 kMouseDownHeight = 30;
@@ -86,9 +85,9 @@ getMappingNumber(int32 mapping)
 //	#pragma mark -
 
 
-MouseView::MouseView(BRect rect, const MouseSettings &settings)
+MouseView::MouseView(const MouseSettings &settings)
 	:
-	BView(rect, "mouse_view", B_FOLLOW_ALL, B_PULSE_NEEDED | B_WILL_DRAW),
+	BView("mouse_view", B_PULSE_NEEDED | B_WILL_DRAW),
 	fSettings(settings),
 	fType(-1),
 	fButtons(0),

@@ -6,18 +6,20 @@
  *		Jérôme Duval,
  *		Axel Dörfler (axeld@pinc-software.de)
  *		Andrew McCall (mccall@digitalparadise.co.uk)
+ *		Brecht Machiels (brecht@mos6581.org)
  */
 #ifndef MOUSE_SETTINGS_H
 #define MOUSE_SETTINGS_H
 
 
+#include <InterfaceDefs.h>
+#include <Point.h>
+#include <SupportDefs.h>
+
 #include "kb_mouse_settings.h"
 
-#include <SupportDefs.h>
-#include <InterfaceDefs.h>
 
 class BPath;
-
 
 class MouseSettings {
 public:
@@ -52,6 +54,14 @@ public:
 		mode_mouse MouseMode() const { return fMode; }
 		void SetMouseMode(mode_mouse mode);
 
+		mode_focus_follows_mouse FocusFollowsMouseMode() const {
+			return fFocusFollowsMouseMode;
+		}
+		void SetFocusFollowsMouseMode(mode_focus_follows_mouse mode);
+
+		bool AcceptFirstClick() const { return fAcceptFirstClick; }
+		void SetAcceptFirstClick(bool accept_first_click);
+
 private:
 		static status_t _GetSettingsPath(BPath &path);
 		void _RetrieveSettings();
@@ -59,6 +69,9 @@ private:
 
 		mouse_settings	fSettings, fOriginalSettings;
 		mode_mouse		fMode, fOriginalMode;
+		mode_focus_follows_mouse	fFocusFollowsMouseMode;
+		mode_focus_follows_mouse	fOriginalFocusFollowsMouseMode;
+		bool			fAcceptFirstClick, fOriginalAcceptFirstClick;
 		BPoint			fWindowPosition;
 };
 

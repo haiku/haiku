@@ -24,6 +24,7 @@
 #include <binary_compatibility/Interface.h>
 #include <MenuPrivate.h>
 #include <TokenSpace.h>
+#include <InterfaceDefs.h>
 
 #include "BMCPrivate.h"
 
@@ -337,10 +338,17 @@ BMenuBar::MouseDown(BPoint where)
 	if (fTracking)
 		return;
 
-	BWindow* window = Window();
-	if (!window->IsActive() || !window->IsFront()) {
-		window->Activate();
-		window->UpdateIfNeeded();
+	uint32 buttons;
+	GetMouse(&where, &buttons);
+ 
+  	BWindow* window = Window();
+  	if (!window->IsActive() || !window->IsFront()) {
+		if ((mouse_mode() == B_FOCUS_FOLLOWS_MOUSE)
+			|| ((mouse_mode() == B_CLICK_TO_FOCUS_MOUSE)
+				&& ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0))) {
+			window->Activate();
+			window->UpdateIfNeeded();
+		}
 	}
 
 	StartMenuBar(-1, false, false);

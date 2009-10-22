@@ -160,9 +160,14 @@ struct mouse_map {
 
 enum mode_mouse {
 	B_NORMAL_MOUSE 			= 0,
-	B_FOCUS_FOLLOWS_MOUSE	= 1,
-	B_WARP_MOUSE			= 3,
-	B_INSTANT_WARP_MOUSE	= 7
+	B_CLICK_TO_FOCUS_MOUSE	= -1,
+	B_FOCUS_FOLLOWS_MOUSE	= 1
+};
+
+enum mode_focus_follows_mouse {
+	B_NORMAL_FOCUS_FOLLOWS_MOUSE		= 0,
+	B_WARP_FOCUS_FOLLOWS_MOUSE			= 1,
+	B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE	= 2
 };
 
 
@@ -371,6 +376,12 @@ bool			focus_follows_mouse();
 
 void			set_mouse_mode(mode_mouse mode);
 mode_mouse		mouse_mode();
+
+void			set_focus_follows_mouse_mode(mode_focus_follows_mouse mode);
+mode_focus_follows_mouse	focus_follows_mouse_mode();
+
+void			set_accept_first_click(bool acceptFirstClick);
+bool			accept_first_click();
 
 rgb_color		ui_color(color_which which);
 void			set_ui_color(const color_which& which, const rgb_color& color);
