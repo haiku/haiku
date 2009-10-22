@@ -6,7 +6,9 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 /*!	Ports for IPC */
+
 
 #include <port.h>
 
@@ -24,6 +26,7 @@
 #include <sem.h>
 #include <syscall_restart.h>
 #include <team.h>
+#include <tracing.h>
 #include <util/AutoLock.h>
 #include <util/list.h>
 #include <wait_for_objects.h>
@@ -70,7 +73,181 @@ public:
 			void			Notify(uint32 opcode, port_id team);
 };
 
+
+#if PORT_TRACING
+namespace PortTracing {
+
+class Create : public AbstractTraceEntry {
+public:
+	Create(port_entry& port)
+		:
+		fID(port.id),
+		fOwner(port.owner),
+		fCapacity(port.capacity)
+	{
+		fName = alloc_tracing_buffer_strcpy(port.lock.name, B_OS_NAME_LENGTH,
+			false);
+
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("port %ld created, name \"%s\", owner %ld, capacity %ld",
+			fID, fName, fOwner, fCapacity);
+	}
+
+private:
+	port_id				fID;
+	char*				fName;
+	team_id				fOwner;
+	int32		 		fCapacity;
+};
+
+
+class Delete : public AbstractTraceEntry {
+public:
+	Delete(port_entry& port)
+		:
+		fID(port.id)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("port %ld deleted", fID);
+	}
+
+private:
+	port_id				fID;
+};
+
+
+class Read : public AbstractTraceEntry {
+public:
+	Read(port_entry& port, int32 code, ssize_t result)
+		:
+		fID(port.id),
+		fReadCount(port.read_count),
+		fWriteCount(port.write_count),
+		fCode(code),
+		fResult(result)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("port %ld read, read %ld, write %ld, code %lx: %ld",
+			fID, fReadCount, fWriteCount, fCode, fResult);
+	}
+
+private:
+	port_id				fID;
+	int32				fReadCount;
+	int32				fWriteCount;
+	int32				fCode;
+	ssize_t				fResult;
+};
+
+
+class Write : public AbstractTraceEntry {
+public:
+	Write(port_entry& port, int32 code, size_t bufferSize, ssize_t result)
+		:
+		fID(port.id),
+		fReadCount(port.read_count),
+		fWriteCount(port.write_count),
+		fCode(code),
+		fBufferSize(bufferSize),
+		fResult(result)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("port %ld write, read %ld, write %ld, code %lx, size %ld: %ld",
+			fID, fReadCount, fWriteCount, fCode, fBufferSize, fResult);
+	}
+
+private:
+	port_id				fID;
+	int32				fReadCount;
+	int32				fWriteCount;
+	int32				fCode;
+	size_t				fBufferSize;
+	ssize_t				fResult;
+};
+
+
+class Info : public AbstractTraceEntry {
+public:
+	Info(port_entry& port, int32 code, ssize_t result)
+		:
+		fID(port.id),
+		fReadCount(port.read_count),
+		fWriteCount(port.write_count),
+		fCode(code),
+		fResult(result)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("port %ld info, read %ld, write %ld, code %lx: %ld",
+			fID, fReadCount, fWriteCount, fCode, fResult);
+	}
+
+private:
+	port_id				fID;
+	int32				fReadCount;
+	int32				fWriteCount;
+	int32				fCode;
+	ssize_t				fResult;
+};
+
+
+class OwnerChange : public AbstractTraceEntry {
+public:
+	OwnerChange(port_entry& port, team_id newOwner, status_t status)
+		:
+		fID(port.id),
+		fOldOwner(port.owner),
+		fNewOwner(newOwner),
+		fStatus(status)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("port %ld owner change from %ld to %ld: %s", fID, fOldOwner,
+			fNewOwner, strerror(fStatus));
+	}
+
+private:
+	port_id				fID;
+	team_id				fOldOwner;
+	team_id				fNewOwner;
+	status_t	 		fStatus;
+};
+
+}	// namespace PortTracing
+
+#	define T(x) new(std::nothrow) PortTracing::x;
+#else
+#	define T(x) ;
+#endif
+
+
 static const size_t kInitialPortBufferSize = 4 * 1024 * 1024;
+static const size_t kTotalSpaceLimit = 64 * 1024 * 1024;
+static const size_t kTeamSpaceLimit = 8 * 1024 * 1024;
+static const size_t kBufferGrowRate = kInitialPortBufferSize;
+
 #define MAX_QUEUE_LENGTH 4096
 #define PORT_MAX_MESSAGE_SIZE (256 * 1024)
 
@@ -81,6 +258,10 @@ static int32 sUsedPorts = 0;
 static struct port_entry* sPorts;
 static area_id sPortArea;
 static heap_allocator* sPortAllocator;
+static ConditionVariable sNoSpaceCondition;
+static vint32 sTotalSpaceInUse;
+static vint32 sAreaChangeCounter;
+static vint32 sAllocatingArea;
 static bool sPortsActive = false;
 static port_id sNextPort = 1;
 static int32 sFirstFreeSlot = 1;
@@ -161,6 +342,15 @@ _dump_port_info(struct port_entry* port)
 	kprintf(" write_count:     %ld\n", port->write_count);
 	kprintf(" total count:     %ld\n", port->total_count);
 
+	if (!port->messages.IsEmpty()) {
+		kprintf("messages:\n");
+
+		MessageList::Iterator iterator = port->messages.GetIterator();
+		while (port_message* message = iterator.Next()) {
+			kprintf(" %p  %08lx  %ld\n", message, message->code, message->size);
+		}
+	}
+
 	set_debug_variable("_port", (addr_t)port);
 	set_debug_variable("_portID", port->id);
 	set_debug_variable("_owner", port->owner);
@@ -170,9 +360,8 @@ _dump_port_info(struct port_entry* port)
 static int
 dump_port_info(int argc, char** argv)
 {
-	const char* name = NULL;
 	ConditionVariable* condition = NULL;
-	int i;
+	const char* name = NULL;
 
 	if (argc < 2) {
 		print_debugger_command_usage(argv[0]);
@@ -181,17 +370,17 @@ dump_port_info(int argc, char** argv)
 
 	if (argc > 2) {
 		if (!strcmp(argv[1], "address")) {
-			_dump_port_info((struct port_entry*)strtoul(argv[2], NULL, 0));
+			_dump_port_info((struct port_entry*)parse_expression(argv[2]));
 			return 0;
 		} else if (!strcmp(argv[1], "condition"))
-			condition = (ConditionVariable*)strtoul(argv[2], NULL, 0);
+			condition = (ConditionVariable*)parse_expression(argv[2]);
 		else if (!strcmp(argv[1], "name"))
 			name = argv[2];
-	} else if (isdigit(argv[1][0])) {
+	} else if (parse_expression(argv[1]) > 0) {
 		// if the argument looks like a number, treat it as such
-		uint32 num = strtoul(argv[1], NULL, 0);
-		uint32 slot = num % sMaxPorts;
-		if (sPorts[slot].id != (int)num) {
+		int32 num = parse_expression(argv[1]);
+		int32 slot = num % sMaxPorts;
+		if (sPorts[slot].id != num) {
 			kprintf("port %ld (%#lx) doesn't exist!\n", num, num);
 			return 0;
 		}
@@ -201,7 +390,7 @@ dump_port_info(int argc, char** argv)
 		name = argv[1];
 
 	// walk through the ports list, trying to match name
-	for (i = 0; i < sMaxPorts; i++) {
+	for (int32 i = 0; i < sMaxPorts; i++) {
 		if ((name != NULL && sPorts[i].lock.name != NULL
 				&& !strcmp(name, sPorts[i].lock.name))
 			|| (condition != NULL && (&sPorts[i].read_condition == condition
@@ -226,24 +415,97 @@ notify_port_select_events(int slot, uint16 events)
 static void
 put_port_message(port_message* message)
 {
+	size_t size = sizeof(port_message) + message->size;
 	heap_free(sPortAllocator, message);
+
+	atomic_add(&sTotalSpaceInUse, -size);
+	sNoSpaceCondition.NotifyAll();
 }
 
 
-static port_message*
-get_port_message(int32 code, size_t bufferSize)
+static status_t
+get_port_message(int32 code, size_t bufferSize, uint32 flags, bigtime_t timeout,
+	port_message** _message)
 {
-	port_message* message = (port_message*)heap_memalign(sPortAllocator,
-		0, sizeof(port_message) + bufferSize);
-	if (message == NULL) {
-		// TODO: add another heap area until we ran into some limit
-		return NULL;
+	size_t size = sizeof(port_message) + bufferSize;
+	bool limitReached = false;
+
+	while (true) {
+		if (atomic_add(&sTotalSpaceInUse, size)
+				> int32(kTotalSpaceLimit - size)) {
+			// TODO: add per team limit
+			// We are not allowed to create another heap area, as our
+			// space limit has been reached - just wait until we get
+			// some free space again.
+			limitReached = true;
+
+		wait:
+			MutexLocker locker(sPortsLock);
+
+			atomic_add(&sTotalSpaceInUse, -size);
+
+			// TODO: we don't want to wait - but does that also mean we
+			// shouldn't wait for the area creation?
+			if (limitReached && (flags & B_RELATIVE_TIMEOUT) != 0
+				&& timeout <= 0)
+				return B_WOULD_BLOCK;
+
+			ConditionVariableEntry entry;
+			sNoSpaceCondition.Add(&entry);
+
+			locker.Unlock();
+
+			status_t status = entry.Wait(flags, timeout);
+			if (status == B_TIMED_OUT)
+				return B_TIMED_OUT;
+
+			// just try again
+			limitReached = false;
+			continue;
+		}
+
+		int32 areaChangeCounter = atomic_get(&sAreaChangeCounter);
+
+		// Quota is fulfilled, try to allocate the buffer
+
+		port_message* message
+			= (port_message*)heap_memalign(sPortAllocator, 0, size);
+		if (message != NULL) {
+			message->code = code;
+			message->size = bufferSize;
+
+			*_message = message;
+			return B_OK;
+		}
+
+		if (atomic_or(&sAllocatingArea, 1) != 0) {
+			// Just wait for someone else to create an area for us
+			goto wait;
+		}
+
+		if (areaChangeCounter != atomic_get(&sAreaChangeCounter)) {
+			atomic_add(&sTotalSpaceInUse, -size);
+			continue;
+		}
+
+		// Create a new area for the heap to use
+
+		addr_t base;
+		area_id area = create_area("port grown buffer", (void**)&base,
+			B_ANY_KERNEL_ADDRESS, kBufferGrowRate, B_NO_LOCK,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		if (area < 0) {
+			// it's time to let the userland feel our pain
+			sNoSpaceCondition.NotifyAll();
+			return B_NO_MEMORY;
+		}
+
+		heap_add_area(sPortAllocator, area, base, kBufferGrowRate);
+
+		atomic_add(&sAreaChangeCounter, 1);
+		sNoSpaceCondition.NotifyAll();
+		atomic_and(&sAllocatingArea, 0);
 	}
-
-	message->code = code;
-	message->size = bufferSize;
-
-	return message;
 }
 
 
@@ -385,6 +647,12 @@ port_init(kernel_args *args)
 		sizeof(port_message), 8, 4, 64};
 	sPortAllocator = heap_create_allocator("port buffer", base,
 		kInitialPortBufferSize, &kBufferHeapClass, true);
+	if (sPortAllocator == NULL) {
+		panic("unable to create port heap");
+		return B_NO_MEMORY;
+	}
+
+	sNoSpaceCondition.Init(sPorts, "port space");
 
 	// add debugger commands
 	add_debugger_command_etc("ports", &dump_port_list,
@@ -396,12 +664,12 @@ port_init(kernel_args *args)
 		"  <name>             - Part of the name of the ports.\n", 0);
 	add_debugger_command_etc("port", &dump_port_info,
 		"Dump info about a particular port",
-		"([ \"address\" ] <address>) | ([ \"name\" ] <name>) "
-			"| (\"sem\" <sem>)\n"
+		"(<id> | [ \"address\" ] <address>) | ([ \"name\" ] <name>) "
+			"| (\"condition\" <address>)\n"
 		"Prints info about the specified port.\n"
-		"  <address>  - Pointer to the port structure.\n"
-		"  <name>     - Name of the port.\n"
-		"  <sem>      - ID of the port's read or write semaphore.\n", 0);
+		"  <address>   - Pointer to the port structure.\n"
+		"  <name>      - Name of the port.\n"
+		"  <condition> - address of the port's read or write condition.\n", 0);
 
 	new(&sNotificationService) PortNotificationService();
 	sPortsActive = true;
@@ -463,6 +731,8 @@ create_port(int32 queueLength, const char* name)
 			sPorts[i].select_infos = NULL;
 
 			port_id id = sPorts[i].id;
+
+			T(Create(sPorts[i]));
 			portLocker.Unlock();
 
 			TRACE(("create_port() done: port created %ld\n", id));
@@ -527,6 +797,8 @@ delete_port(port_id id)
 		TRACE(("delete_port: invalid port_id %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
+
+	T(Delete(sPorts[slot]));
 
 	// mark port as invalid
 	sPorts[slot].id	= -1;
@@ -748,12 +1020,15 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
 
+	flags &= B_CAN_INTERRUPT | B_KILL_CAN_INTERRUPT | B_RELATIVE_TIMEOUT
+		| B_ABSOLUTE_TIMEOUT;
 	int32 slot = id % sMaxPorts;
 
 	MutexLocker locker(sPorts[slot].lock);
 
 	if (sPorts[slot].id != id
 		|| (is_port_closed(slot) && sPorts[slot].messages.IsEmpty())) {
+		T(Info(sPorts[slot], 0, B_BAD_PORT_ID));
 		TRACE(("port_buffer_size_etc(): %s port %ld\n",
 			sPorts[slot].id == id ? "closed" : "invalid", id));
 		return B_BAD_PORT_ID;
@@ -761,6 +1036,9 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 
 	if (sPorts[slot].read_count <= 0) {
 		// We need to wait for a message to appear
+		if ((flags & B_RELATIVE_TIMEOUT) != 0 && timeout <= 0)
+			return B_WOULD_BLOCK;
+
 		ConditionVariableEntry entry;
 		sPorts[slot].read_condition.Add(&entry);
 
@@ -768,10 +1046,13 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 
 		// block if no message, or, if B_TIMEOUT flag set, block with timeout
 		status_t status = entry.Wait(flags, timeout);
-		if (status != B_OK)
+		if (status == B_OK && entry.WaitStatus() != B_OK)
+			status = entry.WaitStatus();
+
+		if (status != B_OK) {
+			T(Info(sPorts[slot], 0, status));
 			return status;
-		if (entry.WaitStatus() != B_OK)
-			return entry.WaitStatus();
+		}
 
 		locker.Lock();
 	}
@@ -792,6 +1073,8 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 	info->sender = message->sender;
 	info->sender_group = message->sender_group;
 	info->sender_team = message->sender_team;
+
+	T(Info(sPorts[slot], message->code, B_OK));
 
 	// notify next one, as we haven't read from the port
 	sPorts[slot].read_condition.NotifyOne();
@@ -854,12 +1137,18 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 
 	if (sPorts[slot].id != id
 		|| (is_port_closed(slot) && sPorts[slot].messages.IsEmpty())) {
+		T(Read(sPorts[slot], 0, B_BAD_PORT_ID));
 		TRACE(("read_port_etc(): %s port %ld\n",
 			sPorts[slot].id == id ? "closed" : "invalid", id));
 		return B_BAD_PORT_ID;
 	}
 
-	if (sPorts[slot].read_count-- <= 0) {
+	if (sPorts[slot].read_count <= 0) {
+		if ((flags & B_RELATIVE_TIMEOUT) != 0 && timeout <= 0)
+			return B_WOULD_BLOCK;
+
+		sPorts[slot].read_count--;
+
 		// We need to wait for a message to appear
 		ConditionVariableEntry entry;
 		sPorts[slot].read_condition.Add(&entry);
@@ -873,14 +1162,18 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 
 		if (sPorts[slot].id != id) {
 			// the port is no longer there
+			T(Read(sPorts[slot], 0, B_BAD_PORT_ID));
 			return B_BAD_PORT_ID;
 		}
 
 		if (status != B_OK || entry.WaitStatus() != B_OK) {
+			T(Read(sPorts[slot], 0,
+				status != B_OK ? status : entry.WaitStatus()));
 			sPorts[slot].read_count++;
 			return status != B_OK ? status : entry.WaitStatus();
 		}
-	}
+	} else
+		sPorts[slot].read_count--;
 
 	// determine tail & get the length of the message
 	port_message* message = sPorts[slot].messages.Head();
@@ -892,6 +1185,8 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 	if (peekOnly) {
 		size_t size = copy_port_message(message, _code, buffer, bufferSize,
 			userCopy);
+
+		T(Read(sPorts[slot], message->code, size));
 
 		sPorts[slot].read_count++;
 		sPorts[slot].read_condition.NotifyOne();
@@ -911,6 +1206,7 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 
 	size_t size = copy_port_message(message, _code, buffer, bufferSize,
 		userCopy);
+	T(Read(sPorts[slot], message->code, size));
 
 	put_port_message(message);
 	return size;
@@ -948,9 +1244,18 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 	// mask irrelevant flags (for acquire_sem() usage)
 	flags &= B_CAN_INTERRUPT | B_KILL_CAN_INTERRUPT | B_RELATIVE_TIMEOUT
 		| B_ABSOLUTE_TIMEOUT;
+	if ((flags & B_RELATIVE_TIMEOUT) != 0
+		&& timeout != B_INFINITE_TIMEOUT && timeout > 0) {
+		// Make the timeout absolute, since we have more than one step where
+		// we might have to wait
+		flags = (flags & ~B_RELATIVE_TIMEOUT) | B_ABSOLUTE_TIMEOUT;
+		timeout += system_time();
+	}
+
 	bool userCopy = (flags & PORT_FLAG_USE_USER_MEMCPY) > 0;
 
 	int32 slot = id % sMaxPorts;
+	status_t status;
 
 	MutexLocker locker(sPorts[slot].lock);
 
@@ -963,35 +1268,41 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 		return B_BAD_PORT_ID;
 	}
 
-	if (sPorts[slot].write_count-- <= 0) {
+	if (sPorts[slot].write_count <= 0) {
+		if ((flags & B_RELATIVE_TIMEOUT) != 0 && timeout <= 0)
+			return B_WOULD_BLOCK;
+
+		sPorts[slot].write_count--;
+
 		// We need to block in order to wait for a free message slot
 		ConditionVariableEntry entry;
 		sPorts[slot].write_condition.Add(&entry);
 
 		locker.Unlock();
 
-		status_t status = entry.Wait(flags, timeout);
+		status = entry.Wait(flags, timeout);
 
 		locker.Lock();
 
 		if (sPorts[slot].id != id) {
 			// the port is no longer there
+			T(Write(sPorts[slot], 0, 0, B_BAD_PORT_ID));
 			return B_BAD_PORT_ID;
 		}
 
 		if (status != B_OK || entry.WaitStatus() != B_OK) {
-			sPorts[slot].write_count++;
-			return status != B_OK ? status : entry.WaitStatus();
+			if (status == B_OK)
+				status = entry.WaitStatus();
+			goto error;
 		}
-	}
+	} else
+		sPorts[slot].write_count--;
 
-	port_message* message = get_port_message(msgCode, bufferSize);
-	if (message == NULL) {
-		// Give up our slot in the queue again, and let someone else
-		// try and fail
-		sPorts[slot].write_condition.NotifyOne();
-		return B_NO_MEMORY;
-	}
+	port_message* message;
+	status = get_port_message(msgCode, bufferSize, flags, timeout,
+		&message);
+	if (status != B_OK)
+		goto error;
 
 	// sender credentials
 	message->sender = geteuid();
@@ -1011,7 +1322,7 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 					msgVecs[i].iov_base, bytes);
 				if (status != B_OK) {
 					put_port_message(message);
-					return status;
+					goto error;
 				}
 
 				bufferSize -= bytes;
@@ -1037,10 +1348,21 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 	sPorts[slot].messages.Add(message);
 	sPorts[slot].read_count++;
 
+	T(Write(sPorts[slot], message->code, message->size, B_OK));
+
 	notify_port_select_events(slot, B_EVENT_READ);
 	sPorts[slot].read_condition.NotifyOne();
-
 	return B_OK;
+
+error:
+	// Give up our slot in the queue again, and let someone else
+	// try and fail
+	T(Write(sPorts[slot], 0, 0, status));
+	sPorts[slot].write_count++;
+	notify_port_select_events(slot, B_EVENT_WRITE);
+	sPorts[slot].write_condition.NotifyOne();
+
+	return status;
 }
 
 
@@ -1060,8 +1382,12 @@ set_port_owner(port_id id, team_id team)
 		TRACE(("set_port_owner: invalid port_id %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
-	if (!team_is_valid(team))
+	if (!team_is_valid(team)) {
+		T(OwnerChange(sPorts[slot], team, B_BAD_TEAM_ID));
 		return B_BAD_TEAM_ID;
+	}
+
+	T(OwnerChange(sPorts[slot], team, B_OK));
 
 	// transfer ownership to other team
 	sPorts[slot].owner = team;

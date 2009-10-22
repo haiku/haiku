@@ -43,10 +43,10 @@ extern "C" {
 
 // malloc- and memalign_nogrow disallow waiting for a grow to happen - only to
 // be used by vm functions that may deadlock on a triggered area creation.
-void *memalign_nogrow(size_t alignment, size_t size);
-void *malloc_nogrow(size_t size);
+void* memalign_nogrow(size_t alignment, size_t size);
+void* malloc_nogrow(size_t size);
 
-void *memalign(size_t alignment, size_t size);
+void* memalign(size_t alignment, size_t size);
 
 void deferred_free(void* block);
 
@@ -54,6 +54,8 @@ void* malloc_referenced(size_t size);
 void* malloc_referenced_acquire(void* data);
 void malloc_referenced_release(void* data);
 
+void heap_add_area(heap_allocator* heap, area_id areaID, addr_t base,
+	size_t size);
 heap_allocator*	heap_create_allocator(const char* name, addr_t base,
 	size_t size, const heap_class* heapClass, bool allocateOnHeap);
 void* heap_memalign(heap_allocator* heap, size_t alignment, size_t size);

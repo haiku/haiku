@@ -973,7 +973,7 @@ heap_validate_heap(heap_allocator *heap)
 // #pragma mark - Heap functions
 
 
-static void
+void
 heap_add_area(heap_allocator *heap, area_id areaID, addr_t base, size_t size)
 {
 	heap_area *area = (heap_area *)base;
