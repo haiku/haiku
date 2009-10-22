@@ -2512,6 +2512,7 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	bool releaseDebugInfoLock = true;
 	port_id oldDebuggerPort = -1;
 	port_id nubPort = -1;
+	bool handOverPort = false;
 
 	cpu_status state = disable_interrupts();
 	GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
@@ -2546,16 +2547,7 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 				releaseDebugInfoLock = false;
 				handOver = true;
 				done = true;
-
-				// finally set the new port owner
-				if (set_port_owner(nubPort, debuggerTeam) != B_OK) {
-					// The old debugger must just have died. Just proceed as
-					// if there was no debugger installed. We may still be too
-					// early, in which case we'll fail, but this race condition
-					// should be unbelievably rare and relatively harmless.
-					handOver = false;
-					done = false;
-				}
+				handOverPort = true;
 			}
 		} else {
 			// there's already a debugger installed
@@ -2575,6 +2567,15 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 		RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 
 	restore_interrupts(state);
+
+	if (handOverPort && set_port_owner(nubPort, debuggerTeam) != B_OK) {
+		// The old debugger must just have died. Just proceed as
+		// if there was no debugger installed. We may still be too
+		// early, in which case we'll fail, but this race condition
+		// should be unbelievably rare and relatively harmless.
+		handOver = false;
+		done = false;
+	}
 
 	if (handOver) {
 		// prepare the handed-over message
