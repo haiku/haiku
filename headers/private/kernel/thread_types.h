@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku Inc.
+ * Copyright 2004-2009, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Thread definition and structures
@@ -7,9 +7,9 @@
 #ifndef _KERNEL_THREAD_TYPES_H
 #define _KERNEL_THREAD_TYPES_H
 
+
 #ifndef _ASSEMBLER
 
-#include <cbuf.h>
 #include <smp.h>
 #include <signal.h>
 #include <thread_defs.h>
@@ -274,7 +274,7 @@ struct thread {
 		thread_id	sender;
 		int32		code;
 		size_t		size;
-		cbuf		*buffer;
+		void*		buffer;
 	} msg;
 
 	union {

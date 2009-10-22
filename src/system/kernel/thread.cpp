@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -698,7 +698,6 @@ send_data_etc(thread_id id, int32 code, const void *buffer, size_t bufferSize,
 	sem_id cachedSem;
 	cpu_status state;
 	status_t status;
-	cbuf *data;
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
@@ -725,14 +724,14 @@ send_data_etc(thread_id id, int32 code, const void *buffer, size_t bufferSize,
 		return B_BAD_THREAD_ID;
 	}
 
+	void* data;
 	if (bufferSize > 0) {
-		data = cbuf_get_chain(bufferSize);
+		data = malloc(bufferSize);
 		if (data == NULL)
 			return B_NO_MEMORY;
-		status = cbuf_user_memcpy_to_chain(data, 0, buffer, bufferSize);
-		if (status < B_OK) {
-			cbuf_free_chain(data);
-			return B_NO_MEMORY;
+		if (user_memcpy(data, buffer, bufferSize) != B_OK) {
+			free(data);
+			return B_BAD_DATA;
 		}
 	} else
 		data = NULL;
@@ -745,7 +744,7 @@ send_data_etc(thread_id id, int32 code, const void *buffer, size_t bufferSize,
 	if (target == NULL) {
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
-		cbuf_free_chain(data);
+		free(data);
 		return B_BAD_THREAD_ID;
 	}
 
@@ -784,10 +783,9 @@ receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize,
 
 	if (buffer != NULL && bufferSize != 0 && thread->msg.buffer != NULL) {
 		size = min_c(bufferSize, thread->msg.size);
-		status = cbuf_user_memcpy_from_chain(buffer, thread->msg.buffer,
-			0, size);
-		if (status < B_OK) {
-			cbuf_free_chain(thread->msg.buffer);
+		status = user_memcpy(buffer, thread->msg.buffer, size);
+		if (status != B_OK) {
+			free(thread->msg.buffer);
 			release_sem(thread->msg.write_sem);
 			return status;
 		}
@@ -796,7 +794,7 @@ receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize,
 	*_sender = thread->msg.sender;
 	code = thread->msg.code;
 
-	cbuf_free_chain(thread->msg.buffer);
+	free(thread->msg.buffer);
 	release_sem(thread->msg.write_sem);
 
 	return code;
