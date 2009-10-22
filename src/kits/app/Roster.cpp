@@ -2154,8 +2154,8 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 	char signature[B_MIME_TYPE_LENGTH];
 	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
 	bool wasDocument = true;
-	status_t error = _ResolveApp(mimeType, docRef, &appRef, signature, &appFlags,
-			&wasDocument);
+	status_t error = _ResolveApp(mimeType, docRef, &appRef, signature,
+		&appFlags, &wasDocument);
 	DBG(OUT("  find app: %s (%lx)\n", strerror(error), error));
 
 	// build an argument vector
@@ -2600,7 +2600,8 @@ BRoster::_TranslateType(const char* mimeType, BMimeType* appMeta,
 	status_t primaryError = B_OK;
 
 	for (int32 tries = 0; tries < 2; tries++) {
-		const char* signature = tries == 0 ? primarySignature : secondarySignature;
+		const char* signature = tries == 0
+			? primarySignature : secondarySignature;
 		if (signature[0] == '\0')
 			continue;
 
@@ -2618,8 +2619,8 @@ BRoster::_TranslateType(const char* mimeType, BMimeType* appMeta,
 				appMeta->SetAppHint(NULL);	// bad app hint -- remove it
 		}
 
-		// in case there is no app hint or it is invalid, we need to query for the
-		// app
+		// In case there is no app hint or it is invalid, we need to query for
+		// the app
 		if (error == B_OK && !appFound)
 			error = query_for_app(appMeta->Type(), appRef);
 		if (error == B_OK)
@@ -2820,8 +2821,10 @@ BRoster::_AddToRecentApps(const char* appSig) const
 		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	status_t result;
-	if (error == B_OK)
-		error = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
+	if (error == B_OK) {
+		error = reply.what == B_REG_RESULT
+			? (status_t)B_OK : (status_t)B_BAD_REPLY;
+	}
 	if (error == B_OK)
 		error = reply.FindInt32("result", &result);
 	if (error == B_OK)
