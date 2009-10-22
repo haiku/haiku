@@ -1395,7 +1395,7 @@ vip_io_request_allocator_init()
 	}
 
 	sVIPHeap = heap_create_allocator("VIP I/O heap", (addr_t)address,
-		VIP_HEAP_SIZE, &heapClass);
+		VIP_HEAP_SIZE, &heapClass, false);
 	if (sVIPHeap == NULL) {
 		panic("vip_io_request_allocator_init(): failed to create VIP I/O "
 			"heap\n");

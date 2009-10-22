@@ -55,7 +55,7 @@ void* malloc_referenced_acquire(void* data);
 void malloc_referenced_release(void* data);
 
 heap_allocator*	heap_create_allocator(const char* name, addr_t base,
-	size_t size, const heap_class* heapClass);
+	size_t size, const heap_class* heapClass, bool allocateOnHeap);
 void* heap_memalign(heap_allocator* heap, size_t alignment, size_t size);
 status_t heap_free(heap_allocator* heap, void* address);
 
