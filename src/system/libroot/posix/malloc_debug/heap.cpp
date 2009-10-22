@@ -925,13 +925,15 @@ heap_allocate_contiguous_pages(heap_allocator *heap, uint32 pageCount)
 				continue;
 			}
 
-			if (first > 0) {
+			if (first < 0)
+				first = i;
+
+			if (first >= 0) {
 				if ((i + 1 - first) == pageCount) {
 					found = true;
 					break;
 				}
-			} else
-				first = i;
+			}
 		}
 
 		if (!found) {
