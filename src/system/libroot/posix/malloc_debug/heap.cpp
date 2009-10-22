@@ -1689,6 +1689,7 @@ realloc(void *address, size_t newSize)
 				// there is enough room available for the newSize
 				INFO(("realloc(): new size %ld fits in old area %ld with %ld "
 					"available\n", newSize, area, available));
+				info->allocation_size = newSize;
 				return address;
 			}
 
