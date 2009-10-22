@@ -303,12 +303,17 @@ CharacterView::MouseMoved(BPoint where, uint32 transit,
 
 		// Update character - we want to drag the one we originally clicked
 		// on, not the one the mouse might be over now.
-		_GetCharacterAt(fClickPoint, character, &frame);
+		if (!_GetCharacterAt(fClickPoint, character, &frame))
+			return;
 
 		BPoint offset = fClickPoint - frame.LeftTop();
 		frame.OffsetTo(B_ORIGIN);
 
 		BBitmap* bitmap = new BBitmap(frame, B_BITMAP_ACCEPTS_VIEWS, B_RGBA32);
+		if (bitmap->InitCheck() != B_OK) {
+			delete bitmap;
+			return;
+		}
 		bitmap->Lock();
 
 		BView* view = new BView(frame, "drag", 0, 0);
