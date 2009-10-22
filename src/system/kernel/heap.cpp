@@ -1,8 +1,6 @@
 /*
  * Copyright 2008-2009, Michael Lotz, mmlr@mlotz.ch.
- * Distributed under the terms of the MIT License.
- *
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -361,26 +359,35 @@ dump_allocator(heap_allocator *heap, bool areas, bool bins)
 static int
 dump_heap_list(int argc, char **argv)
 {
-	if (argc == 2) {
-		uint64 heapAddress;
-
-		if (strcmp(argv[1], "grow") == 0) {
-			// only dump dedicated grow heap info
-			kprintf("dedicated grow heap:\n");
-			dump_allocator(sGrowHeap, true, true);
-		} else if (strcmp(argv[1], "stats") == 0) {
-			for (uint32 i = 0; i < sHeapCount; i++)
-				dump_allocator(sHeaps[i], false, false);
-		} else if (evaluate_debug_expression(argv[1], &heapAddress, true)) {
-			dump_allocator((heap_allocator*)(addr_t)heapAddress, true, true);
-		} else
-			print_debugger_command_usage(argv[0]);
-
+	if (argc == 2 && strcmp(argv[1], "grow") == 0) {
+		// only dump dedicated grow heap info
+		kprintf("dedicated grow heap:\n");
+		dump_allocator(sGrowHeap, true, true);
 		return 0;
 	}
 
-	for (uint32 i = 0; i < sHeapCount; i++)
-		dump_allocator(sHeaps[i], true, true);
+	bool stats = false;
+	int i = 1;
+
+	if (strcmp(argv[1], "stats") == 0) {
+		stats = true;
+		i++;
+	}
+
+	uint64 heapAddress = 0;
+	if (i < argc && !evaluate_debug_expression(argv[i], &heapAddress, true)) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	if (heapAddress == 0) {
+		// dump default kernel heaps
+		for (uint32 i = 0; i < sHeapCount; i++)
+			dump_allocator(sHeaps[i], !stats, !stats);
+	} else {
+		// dump specified heap
+		dump_allocator((heap_allocator*)(addr_t)heapAddress, !stats, !stats);
+	}
 
 	return 0;
 }
@@ -1121,7 +1128,7 @@ heap_create_allocator(const char *name, addr_t base, size_t size,
 	heap->page_size = heapClass->page_size;
 	heap->total_pages = heap->total_free_pages = heap->empty_areas = 0;
 	heap->areas = heap->all_areas = NULL;
-	heap->bins = (heap_bin *)base;
+	heap->bins = (heap_bin *)((addr_t)heap + sizeof(heap_allocator));
 
 #if KERNEL_HEAP_LEAK_CHECK
 	heap->get_caller = &get_caller;
@@ -1131,6 +1138,9 @@ heap_create_allocator(const char *name, addr_t base, size_t size,
 	size_t binSize = 0, lastSize = 0;
 	uint32 count = heap->page_size / heapClass->min_bin_size;
 	for (; count >= heapClass->min_count_per_page; count--, lastSize = binSize) {
+		if (heap->bin_count >= MAX_BIN_COUNT)
+			panic("heap configuration invalid - max bin count reached\n");
+
 		binSize = (heap->page_size / count) & ~(heapClass->bin_alignment - 1);
 		if (binSize == lastSize)
 			continue;
@@ -1143,13 +1153,12 @@ heap_create_allocator(const char *name, addr_t base, size_t size,
 		bin->max_free_count = heap->page_size / binSize;
 		bin->page_list = NULL;
 		heap->bin_count++;
-
-		if (heap->bin_count > MAX_BIN_COUNT)
-			panic("heap configuration invalid - max bin count reached\n");
 	};
 
-	base += heap->bin_count * sizeof(heap_bin);
-	size -= heap->bin_count * sizeof(heap_bin);
+	if (!allocateOnHeap) {
+		base += heap->bin_count * sizeof(heap_bin);
+		size -= heap->bin_count * sizeof(heap_bin);
+	}
 
 	rw_lock_init(&heap->area_lock, "heap area rw lock");
 	mutex_init(&heap->page_lock, "heap page lock");
