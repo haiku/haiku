@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -18,7 +18,6 @@
 #include <boot_device.h>
 #include <boot_item.h>
 #include <boot_splash.h>
-#include <cbuf.h>
 #include <commpage.h>
 #include <condition_variable.h>
 #include <cpu.h>
@@ -163,21 +162,13 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("init generic syscall\n");
 		generic_syscall_init();
 		smp_init_post_generic_syscalls();
-		TRACE("init cbuf\n");
-		cbuf_init();
 		TRACE("init scheduler\n");
 		scheduler_init();
 		TRACE("init threads\n");
 		thread_init(&sKernelArgs);
-		TRACE("init ports\n");
-		port_init(&sKernelArgs);
 		TRACE("init kernel daemons\n");
 		kernel_daemon_init();
 		arch_platform_init_post_thread(&sKernelArgs);
-		TRACE("init POSIX semaphores\n");
-		realtime_sem_init();
-		xsi_sem_init();
-		xsi_msg_init();
 
 		TRACE("init VM threads\n");
 		vm_init_post_thread(&sKernelArgs);
@@ -188,6 +179,10 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("init swap support\n");
 		swap_init();
 #endif
+		TRACE("init POSIX semaphores\n");
+		realtime_sem_init();
+		xsi_sem_init();
+		xsi_msg_init();
 
 		// Start a thread to finish initializing the rest of the system. Note,
 		// it won't be scheduled before calling scheduler_start() (on any CPU).
@@ -250,6 +245,9 @@ main2(void *unused)
 	boot_splash_init(sKernelArgs.boot_splash);
 
 	commpage_init_post_cpus();
+
+	TRACE("init ports\n");
+	port_init(&sKernelArgs);
 
 	TRACE("Init modules\n");
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_1_INIT_MODULES);
