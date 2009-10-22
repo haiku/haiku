@@ -36,7 +36,7 @@
 	dereference	:= "*" [ "{" expression "}" ] unary
 	atom		:= variable | ( "(" expression ")" ) | ( "[" command "]" )
 	variable	:= identifier
-	identifier	:= ( "$" | "_" | "a" - "z" | "A" - "Z" )
+	identifier	:= ( "$" | "@" | "_" | "a" - "z" | "A" - "Z" )
 				   ( "_" | "a" - "z" | "A" - "Z" | "0" - "9" )*
 	commandPipe	:= command ( "|" command )*
 	command		:= identifier argument*
@@ -251,7 +251,7 @@ public:
 			fCurrentToken.value = strtoull(fCurrentToken.string, NULL, 0);
 
 		} else if (isalpha(*fCurrentChar) || *fCurrentChar == '_'
-				|| *fCurrentChar == '$') {
+				|| *fCurrentChar == '$' || *fCurrentChar == '@') {
 			// identifier
 			const char* begin = fCurrentChar;
 			fCurrentChar++;

@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "debug_variables.h"
 
 #include <string.h>
@@ -11,6 +12,7 @@
 
 #include <arch/debug.h>
 #include <debug.h>
+#include <elf.h>
 #include <util/DoublyLinkedList.h>
 
 
@@ -18,6 +20,7 @@ static const int kVariableCount				= 64;
 static const int kTemporaryVariableCount	= 32;
 static const char kTemporaryVariablePrefix	= '_';
 static const char kArchSpecificVariablePrefix = '$';
+static const char kSymbolVariablePrefix = '@';
 static const char* const kCommandReturnValueVariable = "_";
 
 
@@ -67,6 +70,13 @@ static inline bool
 is_arch_specific_variable(const char* variableName)
 {
 	return variableName[0] == kArchSpecificVariablePrefix;
+}
+
+
+static inline bool
+is_symbol_variable(const char* variableName)
+{
+	return variableName[0] == kSymbolVariablePrefix;
 }
 
 
@@ -239,6 +249,9 @@ is_debug_variable_defined(const char* variableName)
 	if (get_variable(variableName, false) != NULL)
 		return true;
 
+	if (is_symbol_variable(variableName))
+		return elf_debug_lookup_symbol(variableName + 1) != 0;
+
 	return is_arch_specific_variable(variableName)
 		&& arch_is_debug_variable_defined(variableName + 1);
 }
@@ -272,6 +285,12 @@ get_debug_variable(const char* variableName, uint64 defaultValue)
 	if (is_arch_specific_variable(variableName)
 		&& arch_get_debug_variable(variableName + 1, &value) == B_OK) {
 		return value;
+	}
+
+	if (is_symbol_variable(variableName)) {
+		addr_t value = elf_debug_lookup_symbol(variableName + 1);
+		if (value != 0)
+			return value;
 	}
 
 	return defaultValue;

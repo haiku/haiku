@@ -1695,6 +1695,47 @@ elf_debug_lookup_user_symbol_address(struct team* team, addr_t address,
 }
 
 
+/*!	Looks up a symbol in all kernel images. Note, this function is thought to
+	be used in the kernel debugger, and therefore doesn't perform any locking.
+*/
+addr_t
+elf_debug_lookup_symbol(const char* searchName)
+{
+	struct elf_image_info *image = NULL;
+	struct hash_iterator iterator;
+
+	hash_open(sImagesHash, &iterator);
+	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator))
+			!= NULL) {
+		if (image->num_debug_symbols > 0) {
+			// search extended debug symbol table (contains static symbols)
+			for (uint32 i = 0; i < image->num_debug_symbols; i++) {
+				struct Elf32_Sym *symbol = &image->debug_symbols[i];
+				const char *name = image->debug_string_table + symbol->st_name;
+
+				if (symbol->st_value > 0 && !strcmp(name, searchName))
+					return symbol->st_value + image->text_region.delta;
+			}
+		} else {
+			// search standard symbol lookup table
+			for (uint32 i = 0; i < HASHTABSIZE(image); i++) {
+				for (uint32 j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
+						j = HASHCHAINS(image)[j]) {
+					struct Elf32_Sym *symbol = &image->syms[j];
+					const char *name = SYMNAME(image, symbol);
+
+					if (symbol->st_value > 0 && !strcmp(name, searchName))
+						return symbol->st_value + image->text_region.delta;
+				}
+			}
+		}
+	}
+	hash_close(sImagesHash, &iterator, false);
+
+	return 0;
+}
+
+
 status_t
 elf_load_user_image(const char *path, struct team *team, int flags,
 	addr_t *entry)
