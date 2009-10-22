@@ -385,7 +385,8 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 		divisors.post1 = (pll & DISPLAY_PLL_9xx_POST1_DIVISOR_MASK)
 			>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
 
-		if (pllRegister == INTEL_DISPLAY_B_PLL) {
+		if (pllRegister == INTEL_DISPLAY_B_PLL
+			&& gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x)) {
 			// TODO: Fix this? Need to support dual channel LVDS.
 			divisors.post2 = LVDS_POST2_RATE_SLOW;
 		} else {
