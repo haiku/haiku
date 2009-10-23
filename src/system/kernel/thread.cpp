@@ -6,6 +6,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 /*! Threading routines */
 
 
@@ -2453,49 +2454,50 @@ err:
 
 
 status_t
-_get_next_thread_info(team_id team, int32 *_cookie, thread_info *info,
+_get_next_thread_info(team_id teamID, int32 *_cookie, thread_info *info,
 	size_t size)
 {
-	status_t status = B_BAD_VALUE;
-	struct thread *thread = NULL;
-	cpu_status state;
-	int slot;
-	thread_id lastThreadID;
-
-	if (info == NULL || size != sizeof(thread_info) || team < B_OK)
+	if (info == NULL || size != sizeof(thread_info) || teamID < 0)
 		return B_BAD_VALUE;
 
-	if (team == B_CURRENT_TEAM)
-		team = team_get_current_team_id();
-	else if (!team_is_valid(team))
-		return B_BAD_VALUE;
+	int32 lastID = *_cookie;
 
-	slot = *_cookie;
+	InterruptsSpinLocker teamLocker(gTeamSpinlock);
 
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
+	struct team* team;
+	if (teamID == B_CURRENT_TEAM)
+		team = thread_get_current_thread()->team;
+	else
+		team = team_get_team_struct_locked(teamID);
 
-	lastThreadID = peek_next_thread_id();
-	if (slot >= lastThreadID)
-		goto err;
+	struct thread* thread = NULL;
 
-	while (slot < lastThreadID
-		&& (!(thread = thread_get_thread_struct_locked(slot))
-			|| thread->team->id != team))
-		slot++;
+	if (lastID == 0) {
+		// We start with the main thread
+		thread = team->main_thread;
+	} else {
+		// Find the one thread with an ID higher than ours
+		// (as long as the IDs don't overlap they are always sorted from
+		// highest to lowest).
+		for (struct thread* next = team->thread_list; next != NULL;
+				next = next->team_next) {
+			if (next->id <= lastID)
+				break;
 
-	if (thread != NULL && thread->team->id == team) {
-		fill_thread_info(thread, info, size);
-
-		*_cookie = slot + 1;
-		status = B_OK;
+			thread = next;
+		}
 	}
 
-err:
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
+	if (thread == NULL)
+		return B_BAD_VALUE;
 
-	return status;
+	lastID = thread->id;
+	*_cookie = lastID;
+
+	SpinLocker threadLocker(gThreadSpinlock);
+	fill_thread_info(thread, info, size);
+
+	return B_OK;
 }
 
 
