@@ -5080,7 +5080,13 @@ BPoseView::EntryCreated(const node_ref *dirNode, const node_ref *itemNode,
 		// have to node monitor ahead of time because Model will
 		// cache up the file type and preferred app
 	Model *model = new Model(dirNode, itemNode, name, true);
-	if (model->InitCheck() != B_OK) {
+	
+	if (model->InitCheck() == B_ENTRY_NOT_FOUND) {
+		// might happen if the file was deleted shortly after creation and we
+		// were too busy to create the model in time see #4130
+		delete model;
+		return NULL;
+	} else if (model->InitCheck() != B_OK) {
 		// if we have trouble setting up model then we stuff it into
 		// a zombie list in a half-alive state until we can properly awaken it
 		PRINT(("2 adding model %s to zombie list, error %s\n", model->Name(),
