@@ -1,11 +1,12 @@
 /*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
+
 
 /*! Semaphore code */
 
@@ -70,18 +71,17 @@ struct queued_thread : DoublyLinkedListLinkImpl<queued_thread> {
 typedef DoublyLinkedList<queued_thread> ThreadQueue;
 
 struct sem_entry {
-	sem_id		id;
-	spinlock	lock;	// protects only the id field when unused
 	union {
 		// when slot in use
 		struct {
+			struct list_link	team_link;
 			int32				count;
 			int32				net_count;
 									// count + acquisition count of all blocked
 									// threads
-			char				*name;
-			team_id				owner;	// if set to -1, means owned by a port
-			select_info			*select_infos;
+			char*				name;
+			team_id				owner;
+			select_info*		select_infos;
 			thread_id			last_acquirer;
 #if DEBUG_SEM_LAST_ACQUIRER
 			int32				last_acquire_count;
@@ -93,10 +93,12 @@ struct sem_entry {
 		// when slot unused
 		struct {
 			sem_id				next_id;
-			struct sem_entry	*next;
+			struct sem_entry*	next;
 		} unused;
 	} u;
 
+	sem_id				id;
+	spinlock			lock;	// protects only the id field when unused
 	ThreadQueue			queue;	// should be in u.used, but has a constructor
 };
 
@@ -289,13 +291,49 @@ notify_sem_select_events(struct sem_entry* sem, uint16 events)
 	The thread lock must be held when called.
 */
 static void
-fill_sem_info(struct sem_entry *sem, sem_info *info, size_t size)
+fill_sem_info(struct sem_entry* sem, sem_info* info, size_t size)
 {
 	info->sem = sem->id;
 	info->team = sem->u.used.owner;
 	strlcpy(info->name, sem->u.used.name, sizeof(info->name));
 	info->count = sem->u.used.count;
 	info->latest_holder = sem->u.used.last_acquirer;
+}
+
+
+/*!	You must call this function with interrupts disabled, and the semaphore's
+	spinlock held. Note that it will unlock the spinlock itself.
+	Since it cannot free() the semaphore's name with interrupts turned off, it
+	will return that one in \a name.
+*/
+static void
+uninit_sem_locked(struct sem_entry& sem, char** _name)
+{
+	KTRACE("delete_sem(sem: %ld)", sem.u.used.id);
+
+	notify_sem_select_events(&sem, B_EVENT_INVALID);
+	sem.u.used.select_infos = NULL;
+
+	// free any threads waiting for this semaphore
+	GRAB_THREAD_LOCK();
+	while (queued_thread* entry = sem.queue.RemoveHead()) {
+		entry->queued = false;
+		thread_unblock_locked(entry->thread, B_BAD_SEM_ID);
+	}
+	RELEASE_THREAD_LOCK();
+
+	int32 id = sem.id;
+	sem.id = -1;
+	*_name = sem.u.used.name;
+	sem.u.used.name = NULL;
+
+	RELEASE_SEM_LOCK(sem);
+
+	// append slot to the free list
+	GRAB_SEM_LIST_LOCK();
+	free_sem_slot(id % sMaxSems, id + sMaxSems);
+	atomic_add(&sUsedSems, -1);
+	RELEASE_SEM_LIST_LOCK();
 }
 
 
@@ -310,10 +348,12 @@ delete_sem_internal(sem_id id, bool checkPermission)
 	int32 slot = id % sMaxSems;
 
 	cpu_status state = disable_interrupts();
+	GRAB_TEAM_LOCK();
 	GRAB_SEM_LOCK(sSems[slot]);
 
 	if (sSems[slot].id != id) {
 		RELEASE_SEM_LOCK(sSems[slot]);
+		RELEASE_TEAM_LOCK();
 		restore_interrupts(state);
 		TRACE(("delete_sem: invalid sem_id %ld\n", id));
 		return B_BAD_SEM_ID;
@@ -322,41 +362,27 @@ delete_sem_internal(sem_id id, bool checkPermission)
 	if (checkPermission
 		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
 		RELEASE_SEM_LOCK(sSems[slot]);
+		RELEASE_TEAM_LOCK();
 		restore_interrupts(state);
 		dprintf("thread %ld tried to delete kernel semaphore %ld.\n",
 			thread_get_current_thread_id(), id);
 		return B_NOT_ALLOWED;
 	}
 
-	KTRACE("delete_sem(sem: %ld)", id);
+	struct team* team = team_get_team_struct_locked(sSems[slot].u.used.owner);
+	if (team != NULL)
+		list_remove_link(&sSems[slot].u.used.team_link);
+	else
+		panic("team missing");
 
-	notify_sem_select_events(&sSems[slot], B_EVENT_INVALID);
-	sSems[slot].u.used.select_infos = NULL;
+	RELEASE_TEAM_LOCK();
 
-	// free any threads waiting for this semaphore
-	GRAB_THREAD_LOCK();
-	while (queued_thread* entry = sSems[slot].queue.RemoveHead()) {
-		entry->queued = false;
-		thread_unblock_locked(entry->thread, B_BAD_SEM_ID);
-	}
-	RELEASE_THREAD_LOCK();
-
-	sSems[slot].id = -1;
-	char *name = sSems[slot].u.used.name;
-	sSems[slot].u.used.name = NULL;
-
-	RELEASE_SEM_LOCK(sSems[slot]);
-
-	// append slot to the free list
-	GRAB_SEM_LIST_LOCK();
-	free_sem_slot(slot, id + sMaxSems);
-	atomic_add(&sUsedSems, -1);
-	RELEASE_SEM_LIST_LOCK();
+	char* name;
+	uninit_sem_locked(sSems[slot], &name);
 
 	restore_interrupts(state);
 
 	free(name);
-
 	return B_OK;
 }
 
@@ -364,6 +390,7 @@ delete_sem_internal(sem_id id, bool checkPermission)
 //	#pragma mark - Private Kernel API
 
 
+// TODO: Name clash with POSIX sem_init()... (we could just use C++)
 status_t
 haiku_sem_init(kernel_args *args)
 {
@@ -421,40 +448,21 @@ haiku_sem_init(kernel_args *args)
 
 
 /*!	Creates a semaphore with the given parameters.
-	Note, the team_id is not checked, it must be correct, or else
-	that semaphore might not be deleted.
+
 	This function is only available from within the kernel, and
 	should not be made public - if possible, we should remove it
 	completely (and have only create_sem() exported).
 */
 sem_id
-create_sem_etc(int32 count, const char *name, team_id owner)
+create_sem_etc(int32 count, const char* name, team_id owner)
 {
-	struct sem_entry *sem = NULL;
+	struct sem_entry* sem = NULL;
 	cpu_status state;
 	sem_id id = B_NO_MORE_SEMS;
-	char *tempName;
+	char* tempName;
 	size_t nameLength;
 
-	if (sSemsActive == false)
-		return B_NO_MORE_SEMS;
-
-#if 0
-	// TODO: the code below might cause unwanted deadlocks,
-	// we need an asynchronously running low resource handler.
-	if (sUsedSems == sMaxSems) {
-		// The vnode cache may have collected lots of semaphores.
-		// Freeing some unused vnodes should improve our situation.
-		// TODO: maybe create a generic "low resources" handler, instead
-		//	of only the specialised low memory thing?
-		vfs_free_unused_vnodes(B_LOW_MEMORY_WARNING);
-	}
-	if (sUsedSems == sMaxSems) {
-		// try again with more enthusiasm
-		vfs_free_unused_vnodes(B_LOW_MEMORY_CRITICAL);
-	}
-#endif
-	if (sUsedSems == sMaxSems)
+	if (sSemsActive == false || sUsedSems == sMaxSems)
 		return B_NO_MORE_SEMS;
 
 	if (name == NULL)
@@ -462,12 +470,31 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 
 	nameLength = strlen(name) + 1;
 	nameLength = min_c(nameLength, B_OS_NAME_LENGTH);
-	tempName = (char *)malloc(nameLength);
+	tempName = (char*)malloc(nameLength);
 	if (tempName == NULL)
 		return B_NO_MEMORY;
+
 	strlcpy(tempName, name, nameLength);
 
+	struct team* team = NULL;
+	bool teamsLocked = false;
 	state = disable_interrupts();
+
+	if (owner != team_get_kernel_team_id()
+		&& owner == team_get_current_team_id()) {
+		// We need to hold the team lock to make sure this one exists (and
+		// won't go away.
+		GRAB_TEAM_LOCK();
+
+		team = team_get_team_struct_locked(owner);
+		if (team == NULL) {
+			RELEASE_TEAM_LOCK();
+			restore_interrupts(state);
+			return B_BAD_TEAM_ID;
+		}
+
+		teamsLocked = true;
+	}
 	GRAB_SEM_LIST_LOCK();
 
 	// get the first slot from the free list
@@ -488,6 +515,12 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 		sem->u.used.owner = owner;
 		sem->u.used.select_infos = NULL;
 		id = sem->id;
+
+		if (teamsLocked) {
+			// insert now
+			list_add_item(&team->sem_list, &sem->u.used.team_link);
+		}
+
 		RELEASE_SEM_LOCK(*sem);
 
 		atomic_add(&sUsedSems, 1);
@@ -501,9 +534,27 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 	}
 
 	RELEASE_SEM_LIST_LOCK();
+
+	int32 slot = id % sMaxSems;
+	if (sem != NULL && !teamsLocked) {
+		GRAB_TEAM_LOCK();
+		GRAB_SEM_LOCK(sSems[slot]);
+
+		if (owner == team_get_kernel_team_id())
+			team = team_get_kernel_team();
+		else
+			team = thread_get_current_thread()->team;
+
+		list_add_item(&team->sem_list, &sem->u.used.team_link);
+		RELEASE_SEM_LOCK(sSems[slot]);
+		teamsLocked = true;
+	}
+
+	if (teamsLocked)
+		RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
-	if (!sem)
+	if (sem == NULL)
 		free(tempName);
 
 	return id;
@@ -633,44 +684,27 @@ remove_thread_from_sem(queued_thread *entry, struct sem_entry *sem)
 }
 
 
-/*!	This function cycles through the sem table, deleting all the sems
-	that are owned by the specified team.
+/*!	This function deletes all semaphores belonging to a particular team.
 */
-int
-sem_delete_owned_sems(team_id owner)
+void
+sem_delete_owned_sems(struct team* team)
 {
-	int state;
-	int i;
-	int count = 0;
+	while (true) {
+		char* name;
 
-	// ToDo: that looks horribly inefficient - maybe it would be better
-	//	to have them in a list in the team
+		{
+			InterruptsSpinLocker locker(gTeamSpinlock);
 
-	if (owner < 0)
-		return B_BAD_TEAM_ID;
+			sem_entry* sem = (sem_entry*)list_remove_head_item(&team->sem_list);
+			if (sem == NULL)
+				break;
 
-	state = disable_interrupts();
-	GRAB_SEM_LIST_LOCK();
-
-	for (i = 0; i < sMaxSems; i++) {
-		if (sSems[i].id != -1 && sSems[i].u.used.owner == owner) {
-			sem_id id = sSems[i].id;
-
-			RELEASE_SEM_LIST_LOCK();
-			restore_interrupts(state);
-
-			delete_sem(id);
-			count++;
-
-			state = disable_interrupts();
-			GRAB_SEM_LIST_LOCK();
+			GRAB_SEM_LOCK(*sem);
+			uninit_sem_locked(*sem, &name);
 		}
+
+		free(name);
 	}
-
-	RELEASE_SEM_LIST_LOCK();
-	restore_interrupts(state);
-
-	return count;
 }
 
 
@@ -692,7 +726,7 @@ sem_used_sems(void)
 
 
 sem_id
-create_sem(int32 count, const char *name)
+create_sem(int32 count, const char* name)
 {
 	return create_sem_etc(count, name, team_get_kernel_team_id());
 }
@@ -1117,41 +1151,35 @@ _get_next_sem_info(team_id team, int32 *_cookie, struct sem_info *info,
 
 
 status_t
-set_sem_owner(sem_id id, team_id team)
+set_sem_owner(sem_id id, team_id newTeamID)
 {
-	int state;
-	int slot;
-
 	if (sSemsActive == false)
 		return B_NO_MORE_SEMS;
 	if (id < 0)
 		return B_BAD_SEM_ID;
-	if (team < 0 || !team_is_valid(team))
+	if (newTeamID < 0)
 		return B_BAD_TEAM_ID;
 
-	slot = id % sMaxSems;
+	int32 slot = id % sMaxSems;
 
-	state = disable_interrupts();
-	GRAB_SEM_LOCK(sSems[slot]);
+	InterruptsSpinLocker teamLocker(gTeamSpinlock);
+
+	struct team* newTeam = team_get_team_struct_locked(newTeamID);
+	if (newTeam == NULL)
+		return B_BAD_TEAM_ID;
+
+	SpinLocker semLocker(sSems[slot].lock);
 
 	if (sSems[slot].id != id) {
-		RELEASE_SEM_LOCK(sSems[slot]);
-		restore_interrupts(state);
 		TRACE(("set_sem_owner: invalid sem_id %ld\n", id));
 		return B_BAD_SEM_ID;
 	}
 
-	// ToDo: this is a small race condition: the team ID could already
-	// be invalid at this point - we would lose one semaphore slot in
-	// this case!
-	// The only safe way to do this is to prevent either team (the new
-	// or the old owner) from dying until we leave the spinlock.
-	sSems[slot].u.used.owner = team;
+	list_remove_link(&sSems[slot].u.used.team_link);
+	list_add_item(&newTeam->sem_list, &sSems[slot].u.used.team_link);
 
-	RELEASE_SEM_LOCK(sSems[slot]);
-	restore_interrupts(state);
-
-	return B_NO_ERROR;
+	sSems[slot].u.used.owner = newTeamID;
+	return B_OK;
 }
 
 

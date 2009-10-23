@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -12,6 +12,7 @@
 #include <OS.h>
 #include <thread.h>
 
+
 struct kernel_args;
 struct select_info;
 
@@ -21,7 +22,7 @@ extern "C" {
 #endif
 
 extern status_t haiku_sem_init(struct kernel_args *args);
-extern int sem_delete_owned_sems(team_id owner);
+extern void sem_delete_owned_sems(struct team* team);
 extern int32 sem_used_sems(void);
 extern int32 sem_max_sems(void);
 

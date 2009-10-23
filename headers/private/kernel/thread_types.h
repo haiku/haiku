@@ -193,6 +193,7 @@ struct team {
 	struct team_loading_info *loading_info;
 	struct list		image_list;
 	struct list		watcher_list;
+	struct list		sem_list;
 	struct arch_team arch_info;
 
 	addr_t			user_data;

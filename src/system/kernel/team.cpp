@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -797,6 +797,7 @@ create_team_struct(const char *name, bool kernel)
 	team->job_control_entry->thread = team->id;
 	team->job_control_entry->team = team;
 
+	list_init(&team->sem_list);
 	list_init(&team->image_list);
 	list_init(&team->watcher_list);
 
@@ -1392,7 +1393,7 @@ exec_team(const char *path, char**& _flatArgs, size_t flatArgsSize,
 	vm_delete_areas(team->address_space);
 	xsi_sem_undo(team);
 	delete_owned_ports(team->id);
-	sem_delete_owned_sems(team->id);
+	sem_delete_owned_sems(team);
 	remove_images(team);
 	vfs_exec_io_context(team->io_context);
 	delete_realtime_sem_context(team->realtime_sem_context);
@@ -2463,7 +2464,7 @@ team_delete_team(struct team *team)
 	delete_realtime_sem_context(team->realtime_sem_context);
 	xsi_sem_undo(team);
 	delete_owned_ports(teamID);
-	sem_delete_owned_sems(teamID);
+	sem_delete_owned_sems(team);
 	remove_images(team);
 	vm_delete_address_space(team->address_space);
 
