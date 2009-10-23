@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Colin Günther, coling@gmx.de.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -11,6 +12,12 @@
 
 #define	PCI_RF_DENSE	0x10000
 	// ignored on x86
+
+#define	PCI_POWERSTATE_D0	0
+#define	PCI_POWERSTATE_D1	1
+#define	PCI_POWERSTATE_D2	2
+#define	PCI_POWERSTATE_D3	3
+#define	PCI_POWERSTATE_UNKNOWN	-1
 
 
 int pci_enable_busmaster(device_t dev);
@@ -44,10 +51,25 @@ int pci_release_msi(device_t dev);
 int pci_msix_count(device_t dev);
 int pci_alloc_msix(device_t dev, int *count);
 
+
 static inline int
 pci_get_vpd_ident(device_t dev, const char **identptr)
 {
     return -1;
+}
+
+
+static inline int
+pci_set_powerstate(device_t dev, int state)
+{
+    return PCI_POWERSTATE_UNKNOWN;
+}
+
+
+static inline int
+pci_get_powerstate(device_t dev)
+{
+    return PCI_POWERSTATE_D0;
 }
 
 #endif	/* _FBSD_COMPAT_DEV_PCI_PCIVAR_H_ */

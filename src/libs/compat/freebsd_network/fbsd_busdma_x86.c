@@ -23,7 +23,6 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/sys/i386/i386/busdma_machdep.c,v 1.74.2.4 2006/10/21 16:26:53 hrs Exp $");
 
@@ -51,7 +50,6 @@ __FBSDID("$FreeBSD: src/sys/i386/i386/busdma_machdep.c,v 1.74.2.4 2006/10/21 16:
 #define free(a, b)							kernel_free(a, b)
 #define contigmalloc(a, b, c, d, e, f, g)	kernel_contigmalloc(a, b, c, d, e, f, g)
 #define contigfree(a, b, c)					kernel_contigfree(a, b, c)
-#define __unused
 void busdma_swi(void);
 void init_bounce_pages(void);
 void uninit_bounce_pages(void);
@@ -149,7 +147,8 @@ static __inline int run_filter(bus_dma_tag_t dmat, bus_addr_t paddr);
  * If paddr is within the bounds of the dma tag then call the filter callback
  * to check for a match, if there is no filter callback then assume a match.
  */
-static __inline int
+static __inline
+int
 run_filter(bus_dma_tag_t dmat, bus_addr_t paddr)
 {
 	int retval;
@@ -198,7 +197,8 @@ busdma_lock_mutex(void *arg, bus_dma_lock_op_t op)
  * with the tag are meant to never be defered.
  * XXX Should have a way to identify which driver is responsible here.
  */
-static void
+static
+void
 dflt_lock(void *arg, bus_dma_lock_op_t op)
 {
 	panic("driver error: busdma dflt_lock called");
@@ -206,6 +206,7 @@ dflt_lock(void *arg, bus_dma_lock_op_t op)
 
 #define BUS_DMA_COULD_BOUNCE	BUS_DMA_BUS3
 #define BUS_DMA_MIN_ALLOC_COMP	BUS_DMA_BUS4
+
 /*
  * Allocate a device specific dma_tag.
  */
@@ -463,7 +464,6 @@ bus_dmamap_destroy(bus_dma_tag_t dmat, bus_dmamap_t map)
 	CTR2(KTR_BUSDMA, "%s: tag %p error 0", __func__, dmat);
 	return (0);
 }
-
 
 /*
  * Allocate a piece of memory that can be efficiently mapped into
@@ -742,7 +742,6 @@ bus_dmamap_load(bus_dma_tag_t dmat, bus_dmamap_t map, void *buf,
 	return (0);
 }
 
-
 /*
  * Like _bus_dmamap_load(), but for mbufs.
  */
@@ -937,7 +936,6 @@ _bus_dmamap_sync(bus_dma_tag_t dmat, bus_dmamap_t map, bus_dmasync_op_t op)
 	}
 }
 
-
 void
 init_bounce_pages()
 {
@@ -949,7 +947,6 @@ init_bounce_pages()
 	mtx_init(&bounce_lock, "bounce pages lock", NULL, MTX_DEF);
 }
 
-
 /* Haiku extension */
 void
 uninit_bounce_pages()
@@ -958,7 +955,6 @@ uninit_bounce_pages()
 
 	mtx_destroy(&bounce_lock);
 }
-
 
 static struct sysctl_ctx_list *
 busdma_sysctl_tree(struct bounce_zone *bz)

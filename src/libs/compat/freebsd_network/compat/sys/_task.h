@@ -1,8 +1,14 @@
+/*
+ * Copyright 2007 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _FBSD_COMPAT_SYS__TASK_H_
 #define _FBSD_COMPAT_SYS__TASK_H_
 
+
 /* Haiku's list management */
 #include <util/list.h>
+
 
 typedef void (*task_handler_t)(void *context, int pending);
 

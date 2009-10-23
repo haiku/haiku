@@ -2,9 +2,9 @@
  * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Copyright 2004, Marcus Overhagen. All Rights Reserved.
- *
  * Distributed under the terms of the MIT License.
  */
+
 
 #include "device.h"
 
@@ -19,6 +19,7 @@
 #include <compat/sys/bus.h>
 #include <compat/sys/mbuf.h>
 #include <compat/net/ethernet.h>
+#include <compat/net/if_media.h>
 
 
 static status_t
@@ -36,9 +37,6 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	if (i == MAX_DEVICES)
 		return B_ERROR;
 
-	if (get_module(NET_STACK_MODULE_NAME, (module_info **)&gStack) != B_OK)
-		return B_ERROR;
-
 	ifp = gDevices[i];
 	if_printf(ifp, "compat_open(0x%lx)\n", flags);
 
@@ -49,8 +47,10 @@ compat_open(const char *name, uint32 flags, void **cookie)
 
 	ifp->if_init(ifp->if_softc);
 
-	ifp->if_flags &= ~IFF_UP;
-	ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
+	if (!HAIKU_DRIVER_REQUIRES(FBSD_WLAN)) {
+		ifp->if_flags &= ~IFF_UP;
+		ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
+	}
 
 	memset(&ifr, 0, sizeof(ifr));
 	ifr.ifr_media = IFM_MAKEWORD(IFM_ETHER, IFM_AUTO, 0, 0);
@@ -71,9 +71,12 @@ compat_close(void *cookie)
 
 	if_printf(ifp, "compat_close()\n");
 
-	atomic_or(&ifp->flags, DEVICE_CLOSED);
+	atomic_or(&ifp->flags, DEVICE_CLOSED);	
+
+	wlan_close(cookie);
 
 	release_sem_etc(ifp->receive_sem, 1, B_RELEASE_ALL);
+
 	return B_OK;
 }
 
@@ -277,7 +280,7 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 			return B_OK;
 	}
 
-	return B_BAD_VALUE;
+	return wlan_control(cookie, op, arg, length);
 }
 
 
@@ -289,4 +292,3 @@ device_hooks gDeviceHooks = {
 	compat_read,
 	compat_write,
 };
-

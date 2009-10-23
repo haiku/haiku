@@ -30,8 +30,8 @@
  * $FreeBSD: src/sys/net/if_arp.h,v 1.22 2005/06/10 16:49:18 brooks Exp $
  */
 
-#ifndef _NET_IF_ARP_H_
-#define	_NET_IF_ARP_H_
+#ifndef _FBSD_COMPAT_NET_IF_ARP_H_
+#define	_FBSD_COMPAT_NET_IF_ARP_H_
 
 /*
  * Address Resolution Protocol.
@@ -112,4 +112,4 @@ struct	arpcom {
 
 #endif
 
-#endif /* !_NET_IF_ARP_H_ */
+#endif /* _FBSD_COMPAT_NET_IF_ARP_H_ */

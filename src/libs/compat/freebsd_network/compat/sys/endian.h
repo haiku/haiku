@@ -25,7 +25,6 @@
  *
  * $FreeBSD: src/sys/sys/endian.h,v 1.6 2003/10/15 20:05:57 obrien Exp $
  */
-
 #ifndef _FBSD_COMPAT_SYS_ENDIAN_H_
 #define _FBSD_COMPAT_SYS_ENDIAN_H_
 
@@ -34,18 +33,17 @@
 
 #include <support/ByteOrder.h>
 
+#include <sys/cdefs.h>
+#include <sys/_types.h>
 #include <machine/endian.h>
-
 
 #define _BYTE_ORDER		BYTE_ORDER
 #define _LITTLE_ENDIAN	LITTLE_ENDIAN
 #define _BIG_ENDIAN		BIG_ENDIAN
 
-
 #define __bswap16(x)	__swap_int16(x)
 #define __bswap32(x)	__swap_int32(x)
 #define __bswap64(x)	__swap_int64(x)
-
 
 /*
  * General byte order swapping functions.

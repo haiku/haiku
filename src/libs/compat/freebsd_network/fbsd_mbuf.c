@@ -28,8 +28,8 @@
  *
  *	@(#)uipc_mbuf.c	8.2 (Berkeley) 1/4/94
  */
-
 #include <sys/kernel.h>
+#include <sys/malloc.h>
 #include <sys/mbuf.h>
 
 /*
@@ -61,7 +61,6 @@ m_copydata(const struct mbuf *m, int off, int len, caddr_t cp)
 	}
 }
 
-
 /*
  * Concatenate mbuf chain n to m.
  * Both chains must be of the same type (e.g. MT_DATA).
@@ -87,7 +86,6 @@ m_cat(struct mbuf *m, struct mbuf *n)
 	}
 }
 
-
 u_int
 m_length(struct mbuf *m0, struct mbuf **last)
 {
@@ -105,7 +103,6 @@ m_length(struct mbuf *m0, struct mbuf **last)
 	return (len);
 }
 
-
 u_int
 m_fixhdr(struct mbuf *m0)
 {
@@ -116,32 +113,22 @@ m_fixhdr(struct mbuf *m0)
 	return (len);
 }
 
-
-static int
-m_tag_copy_chain(struct mbuf *to, struct mbuf *from, int how)
-{
-	return 1;
-}
-
-
 /*
  * Duplicate "from"'s mbuf pkthdr in "to".
  * "from" must have M_PKTHDR set, and "to" must be empty.
  * In particular, this does a deep copy of the packet tags.
  */
-static int
+int
 m_dup_pkthdr(struct mbuf *to, struct mbuf *from, int how)
 {
 	MBUF_CHECKSLEEP(how);
-	/* to->m_flags = (from->m_flags & M_COPYFLAGS) | (to->m_flags & M_EXT); */
-	to->m_flags = (to->m_flags & M_EXT);
+	to->m_flags = (from->m_flags & M_COPYFLAGS) | (to->m_flags & M_EXT);
 	if ((to->m_flags & M_EXT) == 0)
 		to->m_data = to->m_pktdat;
 	to->m_pkthdr = from->m_pkthdr;
-	/* SLIST_INIT(&to->m_pkthdr.tags); */
+	SLIST_INIT(&to->m_pkthdr.tags);
 	return (m_tag_copy_chain(to, from, MBTOM(how)));
 }
-
 
 /*
  * Defragment a mbuf chain, returning the shortest possible
@@ -209,7 +196,6 @@ nospace:
 		m_freem(m_final);
 	return (NULL);
 }
-
 
 void
 m_adj(struct mbuf *mp, int req_len)
@@ -285,7 +271,6 @@ m_adj(struct mbuf *mp, int req_len)
 	}
 }
 
-
 /*
  * Rearange an mbuf chain so that len bytes are contiguous
  * and in the data area of an mbuf (so that mtod and dtom
@@ -348,7 +333,6 @@ bad:
 	return (NULL);
 }
 
-
 /*
  * Lesser-used path for M_PREPEND:
  * allocate new mbuf to prepend to chain,
@@ -377,7 +361,6 @@ m_prepend(struct mbuf *m, int len, int how)
 	return (m);
 }
 
-
 /*
  * "Move" mbuf pkthdr from "from" to "to".
  * "from" must have M_PKTHDR set, and "to" must be empty.
@@ -392,16 +375,11 @@ m_move_pkthdr(struct mbuf *to, struct mbuf *from)
 	if (to->m_flags & M_PKTHDR)
 		m_tag_delete_chain(to, NULL);
 #endif
-	/* to->m_flags = (from->m_flags & M_COPYFLAGS) | (to->m_flags & M_EXT); */
-	/* we don't have M_COPYFLAGS -hugo */
-	to->m_flags = to->m_flags & M_EXT;
+	to->m_flags = (from->m_flags & M_COPYFLAGS) | (to->m_flags & M_EXT);
 	if ((to->m_flags & M_EXT) == 0)
 		to->m_data = to->m_pktdat;
 	to->m_pkthdr = from->m_pkthdr;		/* especially tags */
-	/* we don't have tags -hugo */
-#if 0
 	SLIST_INIT(&from->m_pkthdr.tags);	/* purge tags from src */
-#endif
 	from->m_flags &= ~M_PKTHDR;
 }
 
@@ -605,4 +583,390 @@ again:
 	 */
 bad:
 	return NULL;
+}
+
+/*
+ * Attach the the cluster from *m to *n, set up m_ext in *n
+ * and bump the refcount of the cluster.
+ */
+static void
+mb_dupcl(struct mbuf *n, struct mbuf *m)
+{
+	KASSERT((m->m_flags & M_EXT) == M_EXT, ("%s: M_EXT not set", __func__));
+	KASSERT((n->m_flags & M_EXT) == 0, ("%s: M_EXT set", __func__));
+
+	n->m_ext.ext_buf = m->m_ext.ext_buf;
+	n->m_ext.ext_size = m->m_ext.ext_size;
+	n->m_ext.ext_type = m->m_ext.ext_type;
+	n->m_flags |= M_EXT;
+}
+
+/*
+ * Partition an mbuf chain in two pieces, returning the tail --
+ * all but the first len0 bytes.  In case of failure, it returns NULL and
+ * attempts to restore the chain to its original state.
+ *
+ * Note that the resulting mbufs might be read-only, because the new
+ * mbuf can end up sharing an mbuf cluster with the original mbuf if
+ * the "breaking point" happens to lie within a cluster mbuf. Use the
+ * M_WRITABLE() macro to check for this case.
+ */
+struct mbuf *
+m_split(struct mbuf *m0, int len0, int wait)
+{
+	struct mbuf *m, *n;
+	u_int len = len0, remain;
+
+	MBUF_CHECKSLEEP(wait);
+	for (m = m0; m && len > m->m_len; m = m->m_next)
+		len -= m->m_len;
+	if (m == NULL)
+		return (NULL);
+	remain = m->m_len - len;
+	if (m0->m_flags & M_PKTHDR) {
+		MGETHDR(n, wait, m0->m_type);
+		if (n == NULL)
+			return (NULL);
+		n->m_pkthdr.rcvif = m0->m_pkthdr.rcvif;
+		n->m_pkthdr.len = m0->m_pkthdr.len - len0;
+		m0->m_pkthdr.len = len0;
+		if (m->m_flags & M_EXT)
+			goto extpacket;
+		if (remain > MHLEN) {
+			/* m can't be the lead packet */
+			MH_ALIGN(n, 0);
+			n->m_next = m_split(m, len, wait);
+			if (n->m_next == NULL) {
+				(void) m_free(n);
+				return (NULL);
+			} else {
+				n->m_len = 0;
+				return (n);
+			}
+		} else
+			MH_ALIGN(n, remain);
+	} else if (remain == 0) {
+		n = m->m_next;
+		m->m_next = NULL;
+		return (n);
+	} else {
+		MGET(n, wait, m->m_type);
+		if (n == NULL)
+			return (NULL);
+		M_ALIGN(n, remain);
+	}
+extpacket:
+	if (m->m_flags & M_EXT) {
+		n->m_data = m->m_data + len;
+		mb_dupcl(n, m);
+	} else {
+		bcopy(mtod(m, caddr_t) + len, mtod(n, caddr_t), remain);
+	}
+	n->m_len = remain;
+	m->m_len = len;
+	n->m_next = m->m_next;
+	m->m_next = NULL;
+	return (n);
+}
+
+/*
+ * Copy a packet header mbuf chain into a completely new chain, including
+ * copying any mbuf clusters.  Use this instead of m_copypacket() when
+ * you need a writable copy of an mbuf chain.
+ */
+struct mbuf *
+m_dup(struct mbuf *m, int how)
+{
+	struct mbuf **p, *top = NULL;
+	int remain, moff, nsize;
+
+	MBUF_CHECKSLEEP(how);
+	/* Sanity check */
+	if (m == NULL)
+		return (NULL);
+	M_ASSERTPKTHDR(m);
+
+	/* While there's more data, get a new mbuf, tack it on, and fill it */
+	remain = m->m_pkthdr.len;
+	moff = 0;
+	p = &top;
+	while (remain > 0 || top == NULL) {	/* allow m->m_pkthdr.len == 0 */
+		struct mbuf *n;
+
+		/* Get the next new mbuf */
+		if (remain >= MINCLSIZE) {
+			n = m_getcl(how, m->m_type, 0);
+			nsize = MCLBYTES;
+		} else {
+			n = m_get(how, m->m_type);
+			nsize = MLEN;
+		}
+		if (n == NULL)
+			goto nospace;
+
+		if (top == NULL) {		/* First one, must be PKTHDR */
+			if (!m_dup_pkthdr(n, m, how)) {
+				m_free(n);
+				goto nospace;
+			}
+			if ((n->m_flags & M_EXT) == 0)
+				nsize = MHLEN;
+		}
+		n->m_len = 0;
+
+		/* Link it into the new chain */
+		*p = n;
+		p = &n->m_next;
+
+		/* Copy data from original mbuf(s) into new mbuf */
+		while (n->m_len < nsize && m != NULL) {
+			int chunk = min(nsize - n->m_len, m->m_len - moff);
+
+			bcopy(m->m_data + moff, n->m_data + n->m_len, chunk);
+			moff += chunk;
+			n->m_len += chunk;
+			remain -= chunk;
+			if (moff == m->m_len) {
+				m = m->m_next;
+				moff = 0;
+			}
+		}
+
+		/* Check correct total mbuf length */
+		KASSERT((remain > 0 && m != NULL) || (remain == 0 && m == NULL),
+		    	("%s: bogus m_pkthdr.len", __func__));
+	}
+	return (top);
+
+nospace:
+	m_freem(top);
+	return (NULL);
+}
+
+/*
+ * Create a writable copy of the mbuf chain.  While doing this
+ * we compact the chain with a goal of producing a chain with
+ * at most two mbufs.  The second mbuf in this chain is likely
+ * to be a cluster.  The primary purpose of this work is to create
+ * a writable packet for encryption, compression, etc.  The
+ * secondary goal is to linearize the data so the data can be
+ * passed to crypto hardware in the most efficient manner possible.
+ */
+struct mbuf *
+m_unshare(struct mbuf *m0, int how)
+{
+	struct mbuf *m, *mprev;
+	struct mbuf *n, *mfirst, *mlast;
+	int len, off;
+
+	mprev = NULL;
+	for (m = m0; m != NULL; m = mprev->m_next) {
+		/*
+		 * Regular mbufs are ignored unless there's a cluster
+		 * in front of it that we can use to coalesce.  We do
+		 * the latter mainly so later clusters can be coalesced
+		 * also w/o having to handle them specially (i.e. convert
+		 * mbuf+cluster -> cluster).  This optimization is heavily
+		 * influenced by the assumption that we're running over
+		 * Ethernet where MCLBYTES is large enough that the max
+		 * packet size will permit lots of coalescing into a
+		 * single cluster.  This in turn permits efficient
+		 * crypto operations, especially when using hardware.
+		 */
+		if ((m->m_flags & M_EXT) == 0) {
+			if (mprev && (mprev->m_flags & M_EXT) &&
+			    m->m_len <= M_TRAILINGSPACE(mprev)) {
+				/* XXX: this ignores mbuf types */
+				memcpy(mtod(mprev, caddr_t) + mprev->m_len,
+				       mtod(m, caddr_t), m->m_len);
+				mprev->m_len += m->m_len;
+				mprev->m_next = m->m_next;	/* unlink from chain */
+				m_free(m);			/* reclaim mbuf */
+#if 0
+				newipsecstat.ips_mbcoalesced++;
+#endif
+			} else {
+				mprev = m;
+			}
+			continue;
+		}
+		/*
+		 * Writable mbufs are left alone (for now).
+		 */
+		if (M_WRITABLE(m)) {
+			mprev = m;
+			continue;
+		}
+
+		/*
+		 * Not writable, replace with a copy or coalesce with
+		 * the previous mbuf if possible (since we have to copy
+		 * it anyway, we try to reduce the number of mbufs and
+		 * clusters so that future work is easier).
+		 */
+		KASSERT(m->m_flags & M_EXT, ("m_flags 0x%x", m->m_flags));
+		/* NB: we only coalesce into a cluster or larger */
+		if (mprev != NULL && (mprev->m_flags & M_EXT) &&
+		    m->m_len <= M_TRAILINGSPACE(mprev)) {
+			/* XXX: this ignores mbuf types */
+			memcpy(mtod(mprev, caddr_t) + mprev->m_len,
+			       mtod(m, caddr_t), m->m_len);
+			mprev->m_len += m->m_len;
+			mprev->m_next = m->m_next;	/* unlink from chain */
+			m_free(m);			/* reclaim mbuf */
+#if 0
+			newipsecstat.ips_clcoalesced++;
+#endif
+			continue;
+		}
+
+		/*
+		 * Allocate new space to hold the copy...
+		 */
+		/* XXX why can M_PKTHDR be set past the first mbuf? */
+		if (mprev == NULL && (m->m_flags & M_PKTHDR)) {
+			/*
+			 * NB: if a packet header is present we must
+			 * allocate the mbuf separately from any cluster
+			 * because M_MOVE_PKTHDR will smash the data
+			 * pointer and drop the M_EXT marker.
+			 */
+			MGETHDR(n, how, m->m_type);
+			if (n == NULL) {
+				m_freem(m0);
+				return (NULL);
+			}
+			M_MOVE_PKTHDR(n, m);
+			MCLGET(n, how);
+			if ((n->m_flags & M_EXT) == 0) {
+				m_free(n);
+				m_freem(m0);
+				return (NULL);
+			}
+		} else {
+			n = m_getcl(how, m->m_type, m->m_flags);
+			if (n == NULL) {
+				m_freem(m0);
+				return (NULL);
+			}
+		}
+		/*
+		 * ... and copy the data.  We deal with jumbo mbufs
+		 * (i.e. m_len > MCLBYTES) by splitting them into
+		 * clusters.  We could just malloc a buffer and make
+		 * it external but too many device drivers don't know
+		 * how to break up the non-contiguous memory when
+		 * doing DMA.
+		 */
+		len = m->m_len;
+		off = 0;
+		mfirst = n;
+		mlast = NULL;
+		for (;;) {
+			int cc = min(len, MCLBYTES);
+			memcpy(mtod(n, caddr_t), mtod(m, caddr_t) + off, cc);
+			n->m_len = cc;
+			if (mlast != NULL)
+				mlast->m_next = n;
+			mlast = n;
+#if 0
+			newipsecstat.ips_clcopied++;
+#endif
+
+			len -= cc;
+			if (len <= 0)
+				break;
+			off += cc;
+
+			n = m_getcl(how, m->m_type, m->m_flags);
+			if (n == NULL) {
+				m_freem(mfirst);
+				m_freem(m0);
+				return (NULL);
+			}
+		}
+		n->m_next = m->m_next;
+		if (mprev == NULL)
+			m0 = mfirst;		/* new head of chain */
+		else
+			mprev->m_next = mfirst;	/* replace old mbuf */
+		m_free(m);			/* release old mbuf */
+		mprev = mfirst;
+	}
+	return (m0);
+}
+
+/*
+ * Set the m_data pointer of a newly-allocated mbuf
+ * to place an object of the specified size at the
+ * end of the mbuf, longword aligned.
+ */
+void
+m_align(struct mbuf *m, int len)
+{
+	int adjust;
+
+	if (m->m_flags & M_EXT)
+		adjust = m->m_ext.ext_size - len;
+	else if (m->m_flags & M_PKTHDR)
+		adjust = MHLEN - len;
+	else
+		adjust = MLEN - len;
+	m->m_data += adjust &~ (sizeof(long)-1);
+}
+
+/*
+ * Copy an entire packet, including header (which must be present).
+ * An optimization of the common case `m_copym(m, 0, M_COPYALL, how)'.
+ * Note that the copy is read-only, because clusters are not copied,
+ * only their reference counts are incremented.
+ * Preserve alignment of the first mbuf so if the creator has left
+ * some room at the beginning (e.g. for inserting protocol headers)
+ * the copies still have the room available.
+ */
+struct mbuf *
+m_copypacket(struct mbuf *m, int how)
+{
+	struct mbuf *top, *n, *o;
+
+	MBUF_CHECKSLEEP(how);
+	MGET(n, how, m->m_type);
+	top = n;
+	if (n == NULL)
+		goto nospace;
+
+	if (!m_dup_pkthdr(n, m, how))
+		goto nospace;
+	n->m_len = m->m_len;
+	if (m->m_flags & M_EXT) {
+		n->m_data = m->m_data;
+		mb_dupcl(n, m);
+	} else {
+		n->m_data = n->m_pktdat + (m->m_data - m->m_pktdat );
+		bcopy(mtod(m, char *), mtod(n, char *), n->m_len);
+	}
+
+	m = m->m_next;
+	while (m) {
+		MGET(o, how, m->m_type);
+		if (o == NULL)
+			goto nospace;
+
+		n->m_next = o;
+		n = n->m_next;
+
+		n->m_len = m->m_len;
+		if (m->m_flags & M_EXT) {
+			n->m_data = m->m_data;
+			mb_dupcl(n, m);
+		} else {
+			bcopy(mtod(m, char *), mtod(n, char *), n->m_len);
+		}
+
+		m = m->m_next;
+	}
+	return top;
+nospace:
+	m_freem(top);
+	return (NULL);
 }

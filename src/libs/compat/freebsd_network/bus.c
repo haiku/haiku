@@ -1,9 +1,9 @@
 /*
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Copyright 2004, Marcus Overhagen. All Rights Reserved.
- *
  * Distributed under the terms of the MIT License.
  */
+
 
 #include "device.h"
 
@@ -14,11 +14,14 @@
 #include <compat/dev/pci/pcireg.h>
 #include <compat/dev/pci/pcivar.h>
 #include <compat/machine/resource.h>
-#include <compat/sys/bus.h>
+#include <compat/sys/mutex.h>
+#include <compat/machine/bus.h>
 #include <compat/sys/rman.h>
+#include <compat/sys/bus.h>
 
 // private kernel header to get B_NO_HANDLED_INFO
 #include <int.h>
+
 
 //#define DEBUG_BUS_SPACE_RW
 #ifdef DEBUG_BUS_SPACE_RW
@@ -37,9 +40,6 @@
 
 #define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
 
-// TODO: x86 specific!
-#define I386_BUS_SPACE_IO			0
-#define I386_BUS_SPACE_MEM			1
 
 struct internal_intr {
 	device_t		dev;
@@ -53,7 +53,6 @@ struct internal_intr {
 	sem_id			sem;
 	int32			handling;
 };
-
 
 static int32 intr_wrapper(void *data);
 
@@ -457,6 +456,15 @@ BUS_SPACE_WRITE(1, uint8_t, out8)
 BUS_SPACE_WRITE(2, uint16_t, out16)
 BUS_SPACE_WRITE(4, uint32_t, out32)
 
+int
+bus_child_present(device_t child)
+{
+	device_t parent = device_get_parent(child);
+	if (parent == NULL)
+		return 0;
+
+	return bus_child_present(parent);
+}
 
 //	#pragma mark - PCI functions
 

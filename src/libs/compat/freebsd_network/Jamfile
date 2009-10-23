@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src libs compat freebsd_network ;
 
-
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
 UseHeaders [ FDirName $(SUBDIR) compat ] : true ;
 UsePrivateHeaders net ;
@@ -12,7 +11,10 @@ SubDirCcFlags [ FDefines _KERNEL=1 ] ;
 KernelStaticLibrary libfreebsd_network.a :
 	bus.c
 	callout.c
+	clock.c
 	compat.c
+	condvar.c
+	Condvar.cpp
 	device.c
 	driver.c
 	eventhandler.c
@@ -20,13 +22,23 @@ KernelStaticLibrary libfreebsd_network.a :
 	fbsd_ether.c
 	fbsd_if_media.c
 	fbsd_mbuf.c
+	fbsd_mbuf2.c
 	fbsd_mii.c
 	fbsd_mii_physubr.c
+	fbsd_time.c
+	firmware.c
 	if.c
+	libkern.c
 	mbuf.c
 	mii.c
 	mutex.c
+	priv.c
+	sleepqueue.c
+	synch.c
 	taskqueue.c
+	timeout.c
+	unit.c
+	Unit.cpp
 	;
 
 rule MIIHeaderGen
@@ -46,4 +58,3 @@ actions MIIHeaderGen1
 }
 
 MIIHeaderGen [ FGristFiles miidevs.h ] : miidevs : miidevs2h.awk ;
-

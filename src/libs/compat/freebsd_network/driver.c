@@ -2,9 +2,9 @@
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
  * Copyright 2004, Marcus Overhagen. All Rights Reserved.
- *
  * Distributed under the terms of the MIT License.
  */
+
 
 /*!	Driver functions that adapt the FreeBSD driver to Haiku's driver API.
 	The actual driver functions are exported by the HAIKU_FBSD_DRIVER_GLUE
@@ -26,7 +26,8 @@
 #include <compat/sys/mbuf.h>
 #include <compat/net/ethernet.h>
 
-#define TRACE_DRIVER
+
+//#define TRACE_DRIVER
 #ifdef TRACE_DRIVER
 #	define TRACE(x) dprintf x
 #else
@@ -158,11 +159,19 @@ _fbsd_init_driver(driver_t *driver)
 
 	init_bounce_pages();
 
+	status = init_condition_variables();
+	if (status < B_OK)
+		goto err3;
+
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES)) {
 		status = init_taskqueues();
 		if (status < B_OK)
-			goto err3;
+			goto err4;
 	}
+
+	status = init_wlan_stack();
+	if (status < B_OK)
+		goto err5;
 
 	while (gDeviceCount < MAX_DEVICES) {
 		device_t root, device;
@@ -198,8 +207,13 @@ _fbsd_init_driver(driver_t *driver)
 	if (status == B_OK)
 		status = B_ERROR;
 
+	uninit_wlan_stack();
+
+err5:
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))
 		uninit_taskqueues();
+err4:
+	uninit_condition_variables();
 err3:
 	uninit_mbufs();
 err2:
@@ -221,6 +235,8 @@ _fbsd_uninit_driver(driver_t *driver)
 		device_delete_child(NULL, gDevices[i]->root_device);
 	}
 
+	uninit_wlan_stack();
+	uninit_condition_variables();
 	uninit_bounce_pages();
 	uninit_mbufs();
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))

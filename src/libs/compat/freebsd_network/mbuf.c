@@ -1,9 +1,9 @@
 /*
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Copyright 2004, Marcus Overhagen. All Rights Reserved.
- *
  * Distributed under the terms of the MIT License.
  */
+
 
 #include "device.h"
 
@@ -11,6 +11,7 @@
 #include <string.h>
 #include <slab/Slab.h>
 
+#include <compat/sys/malloc.h>
 #include <compat/sys/mbuf.h>
 #include <compat/sys/kernel.h>
 
@@ -26,6 +27,9 @@ int max_protohdr = 40 + 20; /* ip6 + tcp */
 /* max_linkhdr + max_protohdr, but that's not allowed by gcc. */
 int max_hdr = 16 + 40 + 20;
 
+/* MHLEN - max_hdr */
+int max_datalen = MHLEN - (16 + 40 + 20);
+
 
 static int
 m_to_oc_flags(int how)
@@ -38,20 +42,20 @@ m_to_oc_flags(int how)
 
 
 static int
-construct_mbuf(struct mbuf *mb, short type, int flags)
+construct_mbuf(struct mbuf *memoryBuffer, short type, int flags)
 {
-	mb->m_next = NULL;
-	mb->m_nextpkt = NULL;
-	mb->m_len = 0;
-	mb->m_flags = flags;
-	mb->m_type = type;
+	memoryBuffer->m_next = NULL;
+	memoryBuffer->m_nextpkt = NULL;
+	memoryBuffer->m_len = 0;
+	memoryBuffer->m_flags = flags;
+	memoryBuffer->m_type = type;
 
 	if (flags & M_PKTHDR) {
-		mb->m_data = mb->m_pktdat;
-		memset(&mb->m_pkthdr, 0, sizeof(mb->m_pkthdr));
-		/* SLIST_INIT(&m->m_pkthdr.tags); */
+		memoryBuffer->m_data = memoryBuffer->m_pktdat;
+		memset(&memoryBuffer->m_pkthdr, 0, sizeof(memoryBuffer->m_pkthdr));
+		SLIST_INIT(&memoryBuffer->m_pkthdr.tags);
 	} else {
-		mb->m_data = mb->m_dat;
+		memoryBuffer->m_data = memoryBuffer->m_dat;
 	}
 
 	return 0;
@@ -59,7 +63,7 @@ construct_mbuf(struct mbuf *mb, short type, int flags)
 
 
 static int
-construct_ext_sized_mbuf(struct mbuf *mb, int how, int size)
+construct_ext_sized_mbuf(struct mbuf *memoryBuffer, int how, int size)
 {
 	object_cache *cache;
 	int extType;
@@ -73,16 +77,16 @@ construct_ext_sized_mbuf(struct mbuf *mb, int how, int size)
 		cache = sJumbo9ChunkCache;
 		extType = EXT_JUMBO9;
 	}
-	mb->m_ext.ext_buf = object_cache_alloc(cache, m_to_oc_flags(how));
-	if (mb->m_ext.ext_buf == NULL)
+	memoryBuffer->m_ext.ext_buf = object_cache_alloc(cache, m_to_oc_flags(how));
+	if (memoryBuffer->m_ext.ext_buf == NULL)
 		return B_NO_MEMORY;
 
-	mb->m_data = mb->m_ext.ext_buf;
-	mb->m_flags |= M_EXT;
+	memoryBuffer->m_data = memoryBuffer->m_ext.ext_buf;
+	memoryBuffer->m_flags |= M_EXT;
 	/* mb->m_ext.ext_free = NULL; */
 	/* mb->m_ext.ext_args = NULL; */
-	mb->m_ext.ext_size = size;
-	mb->m_ext.ext_type = extType;
+	memoryBuffer->m_ext.ext_size = size;
+	memoryBuffer->m_ext.ext_type = extType;
 	/* mb->m_ext.ref_cnt = NULL; */
 
 	return 0;
@@ -90,38 +94,38 @@ construct_ext_sized_mbuf(struct mbuf *mb, int how, int size)
 
 
 static inline int
-construct_ext_mbuf(struct mbuf *mb, int how)
+construct_ext_mbuf(struct mbuf *memoryBuffer, int how)
 {
-	return construct_ext_sized_mbuf(mb, how, MCLBYTES);
+	return construct_ext_sized_mbuf(memoryBuffer, how, MCLBYTES);
 }
 
 
 static int
-construct_pkt_mbuf(int how, struct mbuf *mb, short type, int flags)
+construct_pkt_mbuf(int how, struct mbuf *memoryBuffer, short type, int flags)
 {
-	construct_mbuf(mb, type, flags);
-	if (construct_ext_mbuf(mb, how) < 0)
+	construct_mbuf(memoryBuffer, type, flags);
+	if (construct_ext_mbuf(memoryBuffer, how) < 0)
 		return -1;
-	mb->m_ext.ext_type |= EXT_PACKET;
+	memoryBuffer->m_ext.ext_type |= EXT_PACKET;
 	return 0;
 }
 
 
 static void
-destruct_pkt_mbuf(struct mbuf *mb)
+destruct_pkt_mbuf(struct mbuf *memoryBuffer)
 {
 	object_cache *cache;
-	if ((mb->m_ext.ext_type & EXT_CLUSTER) != 0)
+	if ((memoryBuffer->m_ext.ext_type & EXT_CLUSTER) != 0)
 		cache = sChunkCache;
-	else if ((mb->m_ext.ext_type & EXT_JUMBO9) != 0)
+	else if ((memoryBuffer->m_ext.ext_type & EXT_JUMBO9) != 0)
 		cache = sJumbo9ChunkCache;
 	else {
 		panic("unknown cache");
 		return;
 	}
 
-	object_cache_free(cache, mb->m_ext.ext_buf);
-	mb->m_ext.ext_buf = NULL;
+	object_cache_free(cache, memoryBuffer->m_ext.ext_buf);
+	memoryBuffer->m_ext.ext_buf = NULL;
 }
 
 
@@ -187,82 +191,92 @@ m_getjcl(int how, short type, int flags, int size)
 
 
 void
-m_clget(struct mbuf *m, int how)
+m_clget(struct mbuf *memoryBuffer, int how)
 {
-	m->m_ext.ext_buf = NULL;
+	memoryBuffer->m_ext.ext_buf = NULL;
 	/* called checks for errors by looking for M_EXT */
-	construct_ext_mbuf(m, how);
+	construct_ext_mbuf(memoryBuffer, how);
 }
 
 
 void *
-m_cljget(struct mbuf *m, int how, int size)
+m_cljget(struct mbuf *memoryBuffer, int how, int size)
 {
-	if (m == NULL)
+	if (memoryBuffer == NULL)
 		panic("m_cljget doesn't support allocate mbuf");
-	m->m_ext.ext_buf = NULL;
-	construct_ext_sized_mbuf(m, how, size);
+	memoryBuffer->m_ext.ext_buf = NULL;
+	construct_ext_sized_mbuf(memoryBuffer, how, size);
 	/* shouldn't be used */
 	return NULL;
 }
 
 
 void
-m_freem(struct mbuf *mb)
+m_freem(struct mbuf *memoryBuffer)
 {
-	while (mb)
-		mb = m_free(mb);
+	while (memoryBuffer)
+		memoryBuffer = m_free(memoryBuffer);
 }
 
 
 static void
-mb_free_ext(struct mbuf *m)
+mb_free_ext(struct mbuf *memoryBuffer)
 {
 	/*
 	if (m->m_ext.ref_count != NULL)
 		panic("unsupported");
 	*/
 
-	if (m->m_ext.ext_type == EXT_PACKET)
-		destruct_pkt_mbuf(m);
-	else if (m->m_ext.ext_type == EXT_CLUSTER) {
-		object_cache_free(sChunkCache, m->m_ext.ext_buf);
-		m->m_ext.ext_buf = NULL;
-	} else if (m->m_ext.ext_type == EXT_JUMBO9) {
-		object_cache_free(sJumbo9ChunkCache, m->m_ext.ext_buf);
-		m->m_ext.ext_buf = NULL;
+	if (memoryBuffer->m_ext.ext_type == EXT_PACKET)
+		destruct_pkt_mbuf(memoryBuffer);
+	else if (memoryBuffer->m_ext.ext_type == EXT_CLUSTER) {
+		object_cache_free(sChunkCache, memoryBuffer->m_ext.ext_buf);
+		memoryBuffer->m_ext.ext_buf = NULL;
+	} else if (memoryBuffer->m_ext.ext_type == EXT_JUMBO9) {
+		object_cache_free(sJumbo9ChunkCache, memoryBuffer->m_ext.ext_buf);
+		memoryBuffer->m_ext.ext_buf = NULL;
 	} else
 		panic("unknown type");
 
-	object_cache_free(sMBufCache, m);
+	object_cache_free(sMBufCache, memoryBuffer);
 }
 
 
 struct mbuf *
-m_free(struct mbuf *m)
+m_free(struct mbuf *memoryBuffer)
 {
-	struct mbuf *next = m->m_next;
+	struct mbuf *next = memoryBuffer->m_next;
 
-	if (m->m_flags & M_EXT)
-		mb_free_ext(m);
+	if (memoryBuffer->m_flags & M_EXT)
+		mb_free_ext(memoryBuffer);
 	else
-		object_cache_free(sMBufCache, m);
+		object_cache_free(sMBufCache, memoryBuffer);
 
 	return next;
 }
 
 
+// TODO once all driver are updated to FreeBSD 8 this can be changed
+#if __FreeBSD_version__ >= 8
+m_extadd(struct mbuf *memoryBuffer, caddr_t buffer, u_int size,
+    void (*freeHook)(void *, void *), void *arg1, void *arg2, int flags, int type)
+{
+	// TODO: implement?
+	panic("m_extadd() called.");
+}
+#else
 void
-m_extadd(struct mbuf *m, caddr_t buffer, u_int size,
+m_extadd(struct mbuf *memoryBuffer, caddr_t buffer, u_int size,
     void (*freeHook)(void *, void *), void *args, int flags, int type)
 {
 	// TODO: implement?
 	panic("m_extadd() called.");
 }
+#endif
 
 
 status_t
-init_mbufs(void)
+init_mbufs()
 {
 	sMBufCache = create_object_cache("mbufs", MSIZE, 8, NULL, NULL, NULL);
 	if (sMBufCache == NULL)
@@ -287,10 +301,9 @@ clean:
 
 
 void
-uninit_mbufs(void)
+uninit_mbufs()
 {
 	delete_object_cache(sMBufCache);
 	delete_object_cache(sChunkCache);
 	delete_object_cache(sJumbo9ChunkCache);
 }
-

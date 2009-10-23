@@ -1,5 +1,13 @@
+/*
+ * Copyright 2009 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _FBSD_COMPAT_SYS_SYSCTL_H_
 #define _FBSD_COMPAT_SYS_SYSCTL_H_
+
+
+#include <sys/queue.h>
+
 
 #ifdef _KERNEL
 
@@ -70,6 +78,8 @@ static inline int sysctl_handle_int(SYSCTL_HANDLER_ARGS) { return -1; }
 static inline int sysctl_handle_string(SYSCTL_HANDLER_ARGS) { return -1; }
 
 
+#define SYSCTL_OUT(r, p, l) -1
+
 #define __DESCR(x) ""
 
 #define SYSCTL_ADD_OID(ctx, parent, nbr, name, kind, a1, a2, handler, fmt, descr) \
@@ -115,16 +125,22 @@ static inline int sysctl_handle_string(SYSCTL_HANDLER_ARGS) { return -1; }
 	sysctl_add_oid(ctx, parent, nbr, name, (access),			    \
 	ptr, arg, handler, fmt, __DESCR(descr))
 
+
 static inline void *
 SYSCTL_CHILDREN(void *ptr)
 {
 	return NULL;
 }
 
+
 #define SYSCTL_STATIC_CHILDREN(...)	NULL
+
+#define SYSCTL_DECL(name)					\
+	extern struct sysctl_oid_list sysctl_##name##_children
 
 #define SYSCTL_NODE(...)
 #define SYSCTL_INT(...)
+#define SYSCTL_PROC(...)
 
 #endif
 

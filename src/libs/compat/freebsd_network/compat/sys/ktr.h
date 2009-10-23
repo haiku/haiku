@@ -32,7 +32,6 @@
 /*
  *	Wraparound kernel trace buffer support.
  */
-
 #ifndef _SYS_KTR_H_
 #define _SYS_KTR_H_
 

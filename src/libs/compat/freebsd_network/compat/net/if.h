@@ -6,15 +6,20 @@
 #define _FBSD_COMPAT_NET_IF_H_
 
 
+// Rename the ifreq structure provided by posix/net/if.h
+// so that we can add FreeBSD based ifreq parts.
+#define ifreq ifreq_haiku_unused
 #include <posix/net/if.h>
+#undef ifreq
 
+#include <sys/cdefs.h>
+#include <sys/queue.h>
 #include <sys/time.h>
 
 
 #define IF_Kbps(x)		((x) * 1000)
 #define IF_Mbps(x)		(IF_Kbps((x) * 1000))
 #define IF_Gbps(x)		(IF_Mbps((x) * 1000))
-
 
 /* Capabilities that interfaces can advertise. */
 #define IFCAP_RXCSUM		0x0001  /* can offload checksum on RX */
@@ -26,24 +31,52 @@
 #define	IFCAP_POLLING		0x0040	/* driver supports polling */
 #define	IFCAP_VLAN_HWCSUM	0x0080
 #define	IFCAP_TSO4			0x0100	/* supports TCP segmentation offload */
+#define	IFCAP_WOL_UCAST		0x00800	/* wake on any unicast frame */
+#define	IFCAP_WOL_MCAST		0x01000	/* wake on any multicast frame */
+#define	IFCAP_WOL_MAGIC		0x02000	/* wake on any Magic Packet */
 #define	IFCAP_VLAN_HWFILTER	0x10000 /* interface hw can filter vlan tag */
 
 #define IFCAP_HWCSUM		(IFCAP_RXCSUM | IFCAP_TXCSUM)
+#define	IFCAP_WOL	(IFCAP_WOL_UCAST | IFCAP_WOL_MCAST | IFCAP_WOL_MAGIC)
 
 
-#define IFF_DRV_RUNNING		0x10000
-#define IFF_DRV_OACTIVE		0x20000
-#define IFF_LINK0			0x40000
-#define IFF_DEBUG			0x80000
-
+#define IFF_DRV_RUNNING		0x00010000
+#define IFF_DRV_OACTIVE		0x00020000
+#define IFF_LINK0			0x00040000		/* per link layer defined bit */
+#define	IFF_LINK1			0x00080000		/* per link layer defined bit */
+#define	IFF_LINK2			0x00100000		/* per link layer defined bit */
+#define IFF_DEBUG			0x00200000
+#define	IFF_MONITOR			0x00400000		/* (n) user-requested monitor mode */
 
 #define LINK_STATE_UNKNOWN	0
 #define LINK_STATE_DOWN		1
 #define LINK_STATE_UP		2
 
-
 #define IFQ_MAXLEN			50
 
+
+struct	ifreq {
+	char	ifr_name[IFNAMSIZ];		/* if name, e.g. "en0" */
+	union {
+		struct sockaddr ifr_addr;
+		struct sockaddr ifr_dstaddr;
+		struct sockaddr ifr_broadaddr;
+		struct sockaddr ifr_mask;
+		struct ifreq_parameter ifr_parameter;
+		struct ifreq_stats ifr_stats;
+		struct route_entry ifr_route;
+		int		ifr_flags;
+		int		ifr_index;
+		int		ifr_metric;
+		int		ifr_mtu;
+		int		ifr_media;
+		int		ifr_type;
+		int		ifr_reqcap;
+
+		// FreeBSD specific Part
+		caddr_t	ifr_data;
+	};
+};
 
 struct ifmediareq {
 	char	ifm_name[IFNAMSIZ];	/* if name, e.g. "en0" */
@@ -91,5 +124,17 @@ struct if_data {
 #endif
 	struct	timeval ifi_lastchange;	/* time of last administrative change */
 };
+
+struct  ifdrv {
+	char            ifd_name[IFNAMSIZ];     /* if name, e.g. "en0" */
+	unsigned long   ifd_cmd;
+	size_t          ifd_len;
+	void            *ifd_data;
+};
+
+#ifdef _KERNEL
+/* XXX - this should go away soon. */
+#include <net/if_var.h>
+#endif
 
 #endif

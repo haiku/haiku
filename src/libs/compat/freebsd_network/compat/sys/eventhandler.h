@@ -25,7 +25,6 @@
  *
  * $FreeBSD: src/sys/sys/eventhandler.h,v 1.33.2.1 2006/05/16 07:27:49 ps Exp $
  */
-
 #ifndef SYS_EVENTHANDLER_H
 #define SYS_EVENTHANDLER_H
 

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Colin Günther, coling@gmx.de.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -6,8 +7,9 @@
 #define _FBSD_COMPAT_SYS_MBUF_H_
 
 
-#include <sys/malloc.h>
-#include <sys/param.h>
+#include <sys/queue.h>
+#include <sys/systm.h>
+#include <vm/uma.h>
 
 
 #define MLEN		((int)(MSIZE - sizeof(struct m_hdr)))
@@ -15,9 +17,16 @@
 
 #define MINCLSIZE	(MHLEN + 1)
 
+
+extern int max_linkhdr;
+extern int max_protohdr;
+extern int max_hdr;
+extern int max_datalen;	/* MHLEN - max_hdr */
+
+
 struct m_hdr {
-	struct mbuf *	mh_next;
-	struct mbuf *	mh_nextpkt;
+	struct mbuf*	mh_next;
+	struct mbuf*	mh_nextpkt;
 	caddr_t			mh_data;
 	int				mh_len;
 	int				mh_flags;
@@ -25,12 +34,21 @@ struct m_hdr {
 };
 
 struct pkthdr {
-	struct ifnet *	rcvif;
-	int				len;
-	int				csum_flags;
-	int				csum_data;
-	uint16_t		tso_segsz;
-	uint16_t		ether_vtag;
+	struct ifnet*					rcvif;
+	int								len;
+	int								csum_flags;
+	int								csum_data;
+	uint16_t						tso_segsz;
+	uint16_t						ether_vtag;
+	SLIST_HEAD(packet_tags, m_tag)	tags;
+};
+
+struct m_tag {
+	SLIST_ENTRY(m_tag)	m_tag_link;	/* List of packet tags */
+	u_int16_t		m_tag_id;	/* Tag ID */
+	u_int16_t		m_tag_len;	/* Length of data */
+	u_int32_t		m_tag_cookie;	/* ABI/Module ID */
+	void			(*m_tag_free)(struct m_tag *);
 };
 
 struct m_ext {
@@ -65,28 +83,41 @@ struct mbuf {
 #define m_pktdat    M_dat.MH.MH_dat.MH_databuf
 #define m_dat       M_dat.M_databuf
 
-
 #define M_DONTWAIT		M_NOWAIT
 #define M_TRYWAIT		M_WAITOK
 #define M_WAIT			M_WAITOK
 
 #define MT_DATA			1
 
-#define M_EXT			0x0001
-#define M_PKTHDR		0x0002
-#define	M_RDONLY		0x0008
-
-#define EXT_CLUSTER		1
-#define EXT_PACKET		3
-#define EXT_JUMBO9		4
-#define	EXT_NET_DRV		100
-
+#define M_EXT			0x00000001
+#define M_PKTHDR		0x00000002
+#define	M_RDONLY		0x00000008
+#define	M_PROTO1		0x00000010 /* protocol-specific */
+#define	M_PROTO2		0x00000020 /* protocol-specific */
+#define	M_PROTO3		0x00000040 /* protocol-specific */
+#define	M_PROTO4		0x00000080 /* protocol-specific */
+#define	M_PROTO5		0x00000100 /* protocol-specific */
 #define M_BCAST			0x00000200
 #define M_MCAST			0x00000400
 #define M_FRAG			0x00000800
 #define M_FIRSTFRAG		0x00001000
 #define M_LASTFRAG		0x00002000
 #define	M_VLANTAG		0x00010000
+#define	M_PROTO6		0x00080000 /* protocol-specific */
+#define	M_PROTO7		0x00100000 /* protocol-specific */
+#define	M_PROTO8		0x00200000 /* protocol-specific */
+
+/*
+ * Flags preserved when copying m_pkthdr.
+ */
+#define	M_COPYFLAGS \
+    (M_PKTHDR|M_RDONLY|M_BCAST|M_MCAST|\
+     M_FRAG|M_FIRSTFRAG|M_LASTFRAG|M_VLANTAG)
+
+#define EXT_CLUSTER		1
+#define EXT_PACKET		3
+#define EXT_JUMBO9		4
+#define	EXT_NET_DRV		100
 
 #define CSUM_IP			0x0001
 #define CSUM_TCP		0x0002
@@ -102,44 +133,8 @@ struct mbuf {
 #define MGET(m, how, type)		((m) = m_get((how), (type)))
 #define MGETHDR(m, how, type)	((m) = m_gethdr((how), (type)))
 #define MCLGET(m, how)			m_clget((m), (how))
-#define	MEXTADD(m, buf, size, free, args, flags, type) \
-    m_extadd((m), (caddr_t)(buf), (size), (free), (args), (flags), (type))
-
-
-struct mbuf *m_getcl(int how, short type, int flags);
-void m_freem(struct mbuf *mbuf);
-struct mbuf *m_free(struct mbuf *m);
-struct mbuf *m_defrag(struct mbuf *m, int);
-void m_adj(struct mbuf *m, int);
-struct mbuf *m_pullup(struct mbuf *m, int len);
-struct mbuf *m_prepend(struct mbuf *m, int, int);
-void m_move_pkthdr(struct mbuf *, struct mbuf *);
-
-u_int m_length(struct mbuf *m, struct mbuf **last);
-u_int m_fixhdr(struct mbuf *m);
-void m_cat(struct mbuf *m, struct mbuf *n);
-struct mbuf *m_collapse(struct mbuf *m, int how, int maxfrags);
-void m_copydata(const struct mbuf *m, int off, int len, caddr_t cp);
-
-struct ifnet;
-struct mbuf *m_devget(char *, int, int, struct ifnet *,
-	void (*)(char *, caddr_t, u_int));
-void m_copyback(struct mbuf *, int, int, caddr_t);
-
-struct mbuf *m_get(int how, short type);
-struct mbuf *m_gethdr(int how, short type);
-struct mbuf *m_getjcl(int how, short type, int flags, int size);
-void m_clget(struct mbuf *m, int how);
-void *m_cljget(struct mbuf *m, int how, int size);
-
-void m_extadd(struct mbuf *m, caddr_t buffer, u_int size,
-    void (*freeHook)(void *, void *), void *args, int flags, int type);
-
 
 #define mtod(m, type)	((type)((m)->m_data))
-
-#define m_tag_delete(mb, tag) \
-	panic("m_tag_delete unsupported.");
 
 /* Check if the supplied mbuf has a packet header, or else panic. */
 #define	M_ASSERTPKTHDR(m)						\
@@ -149,9 +144,102 @@ void m_extadd(struct mbuf *m, caddr_t buffer, u_int size,
 #define MBUF_CHECKSLEEP(how) do { } while (0)
 #define MBTOM(how) (how)
 
-extern int max_linkhdr;
-extern int max_protohdr;
-extern int max_hdr;
+#define	MTAG_PERSISTENT				0x800
+
+// TODO After all network driver are updated to the FreeBSD 8 version this can
+// changed
+#if __FreeBSD_version__ >= 8
+#define	MEXTADD(m, buf, size, free, arg1, arg2, flags, type)		\
+    m_extadd((m), (caddr_t)(buf), (size), (free),(arg1),(arg2),(flags), (type))
+#else
+#define	MEXTADD(m, buf, size, free, args, flags, type)		\
+    m_extadd((m), (caddr_t)(buf), (size), (free),(args),(flags), (type))
+#endif
+
+void			m_adj(struct mbuf*, int);
+void			m_align(struct mbuf*, int);
+void			m_cat(struct mbuf*, struct mbuf*);
+void 			m_clget(struct mbuf*, int);
+void*			m_cljget(struct mbuf*, int, int);
+struct mbuf* 	m_collapse(struct mbuf*, int, int);
+void 			m_copyback(struct mbuf*, int, int, caddr_t);
+void 			m_copydata(const struct mbuf*, int, int, caddr_t);
+struct mbuf*	m_copypacket(struct mbuf*, int);
+struct mbuf* 	m_defrag(struct mbuf*, int);
+struct mbuf*	m_devget(char*, int, int, struct ifnet*,
+					void(*) (char*, caddr_t, u_int));
+struct mbuf*	m_dup(struct mbuf*, int);
+int	 			m_dup_pkthdr(struct mbuf*, struct mbuf*, int);
+
+// TODO After all network driver are updated to the FreeBSD 8 version this can
+// changed
+#if __FreeBSD_version__ >= 8
+void 			m_extadd(struct mbuf*, caddr_t, u_int,
+					void(*) (void*, void*), void*, void*, int, int);
+#else
+void 			m_extadd(struct mbuf*, caddr_t, u_int,
+					void(*) (void*, void*), void*, int, int);
+#endif
+
+u_int 			m_fixhdr(struct mbuf*);
+struct mbuf* 	m_free(struct mbuf*);
+void 			m_freem(struct mbuf*);
+struct mbuf*	m_get(int, short);
+struct mbuf*	m_gethdr(int, short);
+struct mbuf*	m_getjcl(int, short, int, int);
+u_int 			m_length(struct mbuf*, struct mbuf**);
+struct mbuf* 	m_getcl(int, short, int);
+void 			m_move_pkthdr(struct mbuf*, struct mbuf*);
+struct mbuf*	m_prepend(struct mbuf *, int, int);
+struct mbuf*	m_pulldown(struct mbuf*, int, int, int*);
+struct mbuf*	m_pullup(struct mbuf*, int);
+struct mbuf*	m_split(struct mbuf*, int, int);
+struct mbuf*	m_unshare(struct mbuf*, int);
+
+/* Packet tag routines. */
+struct m_tag*	m_tag_alloc(u_int32_t, int, int, int);
+void		 	m_tag_delete(struct mbuf*, struct m_tag*);
+void		 	m_tag_delete_chain(struct mbuf*, struct m_tag*);
+void		 	m_tag_free_default(struct m_tag*);
+struct m_tag* 	m_tag_locate(struct mbuf*, u_int32_t, int, struct m_tag*);
+struct m_tag* 	m_tag_copy(struct m_tag*, int);
+int		 		m_tag_copy_chain(struct mbuf*, struct mbuf*, int);
+void		 	m_tag_delete_nonpersistent(struct mbuf*);
+
+
+static __inline void
+m_tag_setup(struct m_tag* tagPointer, u_int32_t cookie, int type, int length)
+{
+
+	tagPointer->m_tag_id = type;
+	tagPointer->m_tag_len = length;
+	tagPointer->m_tag_cookie = cookie;
+}
+
+
+static __inline void
+m_tag_free(struct m_tag* tag)
+{
+
+	(*tag->m_tag_free)(tag);
+}
+
+
+static __inline void
+m_tag_prepend(struct mbuf* memoryBuffer, struct m_tag* tag)
+{
+
+	SLIST_INSERT_HEAD(&memoryBuffer->m_pkthdr.tags, tag, m_tag_link);
+}
+
+
+static __inline void
+m_tag_unlink(struct mbuf* memoryBuffer, struct m_tag* tag)
+{
+
+	SLIST_REMOVE(&memoryBuffer->m_pkthdr.tags, tag, m_tag, m_tag_link);
+}
+
 
 #include <sys/mbuf-fbsd.h>
 

@@ -9,12 +9,14 @@
 #include <stdint.h>
 #include <KernelExport.h>
 
-// for 32 bit machines
+
+// TODO at the moment for 32 bit machines only
 
 typedef uint32_t vm_offset_t;
 typedef uint32_t vm_paddr_t;
 
 typedef void *pmap_t;
+
 
 #define vmspace_pmap(...)	NULL
 #define pmap_extract(...)	NULL

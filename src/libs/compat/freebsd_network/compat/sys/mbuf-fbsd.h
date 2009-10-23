@@ -48,7 +48,6 @@
 	(m)->m_data += (MHLEN - (len)) & ~(sizeof(long) - 1);		\
 } while (0)
 
-
 /*
 #define	MEXT_IS_REF(m)	(((m)->m_ext.ref_cnt != NULL)			\
     && (*((m)->m_ext.ref_cnt) > 1))

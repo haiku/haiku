@@ -49,6 +49,7 @@ $FreeBSD$
  * mangled accordingly to compensate.
  */
 
+
 oui AGERE			0x00a0bc	Agere Systems
 oui ALTIMA			0x0010a9	Altima Communications
 oui AMD				0x00001a	Advanced Micro Devices

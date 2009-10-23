@@ -6,6 +6,7 @@
  *      Hugo Santos, hugosantos@gmail.com
  */
 
+
 #include "device.h"
 
 #include <compat/sys/bus.h>
@@ -15,44 +16,44 @@
 
 
 int
-__haiku_miibus_readreg(device_t dev, int phy, int reg)
+__haiku_miibus_readreg(device_t device, int phy, int reg)
 {
-	if (dev->methods.miibus_readreg == NULL)
+	if (device->methods.miibus_readreg == NULL)
 		panic("miibus_readreg, no support");
 
-	return dev->methods.miibus_readreg(dev, phy, reg);
+	return device->methods.miibus_readreg(device, phy, reg);
 }
 
 
 int
-__haiku_miibus_writereg(device_t dev, int phy, int reg, int data)
+__haiku_miibus_writereg(device_t device, int phy, int reg, int data)
 {
-	if (dev->methods.miibus_writereg == NULL)
+	if (device->methods.miibus_writereg == NULL)
 		panic("miibus_writereg, no support");
 
-	return dev->methods.miibus_writereg(dev, phy, reg, data);
+	return device->methods.miibus_writereg(device, phy, reg, data);
 }
 
 
 void
-__haiku_miibus_statchg(device_t dev)
+__haiku_miibus_statchg(device_t device)
 {
-	if (dev->methods.miibus_statchg)
-		dev->methods.miibus_statchg(dev);
+	if (device->methods.miibus_statchg)
+		device->methods.miibus_statchg(device);
 }
 
 
 void
-__haiku_miibus_linkchg(device_t dev)
+__haiku_miibus_linkchg(device_t device)
 {
-	if (dev->methods.miibus_linkchg)
-		dev->methods.miibus_linkchg(dev);
+	if (device->methods.miibus_linkchg)
+		device->methods.miibus_linkchg(device);
 }
 
 
 void
-__haiku_miibus_mediainit(device_t dev)
+__haiku_miibus_mediainit(device_t device)
 {
-	if (dev->methods.miibus_mediainit)
-		dev->methods.miibus_mediainit(dev);
+	if (device->methods.miibus_mediainit)
+		device->methods.miibus_mediainit(device);
 }

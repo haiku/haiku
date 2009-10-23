@@ -45,12 +45,14 @@
  * Many thanks to Matt Thomas for providing the information necessary
  * to implement this interface.
  */
+#include <string.h>
 
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/socket.h>
 #include <sys/sockio.h>
 #include <sys/malloc.h>
+#include <sys/sysctl.h>
 
 #include <net/if.h>
 #include <net/if_media.h>

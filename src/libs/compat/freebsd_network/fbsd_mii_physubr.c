@@ -36,7 +36,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/sys/dev/mii/mii_physubr.c,v 1.22.2.2 2006/07/29 08:30:12 oleg Exp $");
 
@@ -51,7 +50,6 @@ __FBSDID("$FreeBSD: src/sys/dev/mii/mii_physubr.c,v 1.22.2.2 2006/07/29 08:30:12
 #include <sys/errno.h>
 #include <sys/module.h>
 #include <sys/bus.h>
-
 
 #include <net/if.h>
 #include <net/if_media.h>
@@ -394,9 +392,6 @@ mii_add_media(struct mii_softc *sc)
 		    BMCR_AUTOEN);
 		PRINT("auto");
 	}
-
-
-
 #undef ADD
 #undef PRINT
 }
@@ -530,6 +525,7 @@ mii_phy_detach(device_t dev)
 
 	return(0);
 }
+
 
 const struct mii_phydesc *
 mii_phy_match(const struct mii_attach_args *ma, const struct mii_phydesc *mpd)

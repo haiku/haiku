@@ -29,7 +29,6 @@
  *	@(#)if_ethersubr.c	8.1 (Berkeley) 6/10/93
  * $FreeBSD: src/sys/net/if_ethersubr.c,v 1.193.2.12 2006/08/28 02:54:14 thompsa Exp $
  */
-
 #include <stdio.h>
 #include <sys/types.h>
 #include <net/ethernet.h>
@@ -106,7 +105,6 @@ ether_crc32_be(const uint8_t *buf, size_t len)
 
 	return (crc);
 }
-
 
 char *
 ether_sprintf(const u_char *ap)

@@ -26,7 +26,6 @@
  * $FreeBSD: src/sys/sys/_bus_dma.h,v 1.1 2006/09/03 00:26:17 jmg Exp $
  *
  */
-
 #ifndef _SYS__BUS_DMA_H_
 #define _SYS__BUS_DMA_H_
 

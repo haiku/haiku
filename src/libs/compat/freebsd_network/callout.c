@@ -1,7 +1,9 @@
 /*
+ * Copyright 2009, Colin Günther, coling@gmx.de.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include "device.h"
 
@@ -33,11 +35,7 @@ handle_callout(struct net_timer *timer, void *data)
 void
 callout_init_mtx(struct callout *c, struct mtx *mtx, int flags)
 {
-	// we must manually initialize the timer, since the networking
-	// stack might not be loaded yet
-	c->c_timer.hook = handle_callout;
-	c->c_timer.data = c;
-	c->c_timer.due = 0;
+	gStack->init_timer(&c->c_timer, handle_callout, c);
 
 	c->c_arg = NULL;
 	c->c_func = NULL;

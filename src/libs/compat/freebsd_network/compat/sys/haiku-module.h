@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Colin Günther. All Rights Reserved.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -11,6 +12,7 @@
 
 #include <kernel/lock.h>
 #include <net_stack.h>
+
 
 #undef ASSERT
 	/* private/kernel/debug.h sets it */
@@ -52,12 +54,52 @@ extern const char *gDriverName;
 driver_t *__haiku_select_miibus_driver(device_t dev);
 driver_t *__haiku_probe_miibus(device_t dev, driver_t *drivers[]);
 
+status_t init_wlan_stack(void);
+void uninit_wlan_stack(void);
+status_t start_wlan(device_t);
+status_t stop_wlan(device_t);
+status_t wlan_control(void*, uint32, void*, size_t);
+status_t wlan_close(void*);
+
 /* we define the driver methods with HAIKU_FBSD_DRIVER_GLUE to
  * force the rest of the stuff to be linked back with the driver.
  * While gcc 2.95 packs everything from the static library onto
  * the final binary, gcc 4.x rightfuly doesn't. */
 
 #define HAIKU_FBSD_DRIVER_GLUE(publicname, name, busname)				\
+	extern const char *gDeviceNameList[];								\
+	extern device_hooks gDeviceHooks;									\
+	extern driver_t *DRIVER_MODULE_NAME(name, busname);					\
+	const char *gDriverName = #publicname;								\
+	int32 api_version = B_CUR_DRIVER_API_VERSION;						\
+	status_t init_hardware()											\
+	{																	\
+		return _fbsd_init_hardware(DRIVER_MODULE_NAME(name, busname));	\
+	}																	\
+	status_t init_driver()												\
+	{																	\
+		return _fbsd_init_driver(DRIVER_MODULE_NAME(name, busname));	\
+	}																	\
+	void uninit_driver()												\
+		{ _fbsd_uninit_driver(DRIVER_MODULE_NAME(name, busname)); }		\
+	const char **publish_devices()										\
+		{ return gDeviceNameList; }										\
+	device_hooks *find_device(const char *name)							\
+		{ return &gDeviceHooks; }										\
+	status_t init_wlan_stack(void)										\
+		{ return B_OK; } 												\
+	void uninit_wlan_stack(void) {}										\
+	status_t start_wlan(device_t dev)									\
+		{ return B_OK; }												\
+	status_t stop_wlan(device_t dev)									\
+		{ return B_OK; }												\
+	status_t wlan_control(void *cookie, uint32 op, void *arg, 			\
+			size_t length)												\
+		{ return B_BAD_VALUE; }											\
+	status_t wlan_close(void* cookie)									\
+		{ return B_OK; }
+
+#define HAIKU_FBSD_WLAN_DRIVER_GLUE(publicname, name, busname)			\
 	extern const char *gDeviceNameList[];								\
 	extern device_hooks gDeviceHooks;									\
 	extern driver_t *DRIVER_MODULE_NAME(name, busname);					\
@@ -120,12 +162,18 @@ enum {
 	FBSD_TASKQUEUES		= 1 << 0,
 	FBSD_FAST_TASKQUEUE	= 1 << 1,
 	FBSD_SWI_TASKQUEUE	= 1 << 2,
+	FBSD_WLAN			= 1 << 3,
 };
 
 #define HAIKU_DRIVER_REQUIREMENTS(flags) \
 	int __haiku_driver_requirements = (flags)
 
 #define HAIKU_DRIVER_REQUIRES(flag) (__haiku_driver_requirements & (flag))
+
+extern const uint __haiku_firmware_version;
+
+#define HAIKU_FIRMWARE_VERSION(version) \
+	const uint __haiku_firmware_version = (version)
 
 #define HAIKU_INTR_REGISTER_STATE \
 	cpu_status __haiku_cpu_state = 0

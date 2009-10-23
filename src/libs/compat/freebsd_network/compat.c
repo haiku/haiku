@@ -6,6 +6,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "device.h"
 
 #include <stdio.h>
@@ -16,6 +17,8 @@
 #include <compat/machine/resource.h>
 #include <compat/dev/mii/mii.h>
 #include <compat/sys/bus.h>
+#include <compat/sys/malloc.h>
+#include <compat/net/if_media.h>
 
 #include <compat/dev/mii/miivar.h>
 
@@ -27,7 +30,6 @@ pci_module_info *gPci;
 
 static struct list sRootDevices;
 static int sNextUnit;
-
 
 //	#pragma mark - private functions
 
@@ -71,7 +73,7 @@ find_own_image()
 	while (get_next_image_info(B_SYSTEM_TEAM, &cookie, &info) == B_OK) {
 		if (((uint32)info.text <= (uint32)find_own_image
 			&& (uint32)info.text + (uint32)info.text_size
-					> (uint32)find_own_image)) {
+				> (uint32)find_own_image)) {
 			// found our own image
 			return info.id;
 		}
@@ -373,9 +375,18 @@ device_attach(device_t device)
 		|| device->methods.attach == NULL)
 		return B_ERROR;
 
+	if (get_module(NET_STACK_MODULE_NAME, (module_info **)&gStack) != B_OK)
+		return B_ERROR;
+
 	result = device->methods.attach(device);
-	if (result == 0)
+
+	if (result == 0) {
 		atomic_or(&device->flags, DEVICE_ATTACHED);
+	}
+
+	if (result == 0) {
+		result = start_wlan(device);
+	}
 
 	return result;
 }
@@ -389,7 +400,15 @@ device_detach(device_t device)
 
 	if ((atomic_and(&device->flags, ~DEVICE_ATTACHED) & DEVICE_ATTACHED) != 0
 		&& device->methods.detach != NULL) {
-		int result = device->methods.detach(device);
+		int result = B_OK;
+
+		result = stop_wlan(device);
+		if (result != 0) {
+			atomic_or(&device->flags, DEVICE_ATTACHED);
+			return result;
+		}
+
+		result = device->methods.detach(device);
 		if (result != 0) {
 			atomic_or(&device->flags, DEVICE_ATTACHED);
 			return result;
@@ -523,7 +542,8 @@ ffs(int value)
 }
 
 
-int resource_int_value(const char *name, int unit, const char *resname,
+int
+resource_int_value(const char *name, int unit, const char *resname,
 	int *result)
 {
 	/* no support for hints */
@@ -599,4 +619,3 @@ pmap_kextract(vm_offset_t virtualAddress)
 
 	return (vm_paddr_t)entry.address;
 }
-

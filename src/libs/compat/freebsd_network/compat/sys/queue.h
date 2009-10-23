@@ -29,7 +29,6 @@
  *	@(#)queue.h	8.5 (Berkeley) 8/20/94
  * $FreeBSD: src/sys/sys/queue.h,v 1.60.2.1 2005/08/16 22:41:39 phk Exp $
  */
-
 #ifndef _SYS_QUEUE_H_
 #define	_SYS_QUEUE_H_
 

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2009, Colin Günther, coling@gmx.de.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -6,12 +7,19 @@
  *      Hugo Santos, hugosantos@gmail.com
  */
 
+
 #include "device.h"
 
 #include <stdio.h>
 
 #include <compat/sys/taskqueue.h>
 #include <compat/sys/haiku-module.h>
+
+
+#define	TQ_FLAGS_ACTIVE		(1 << 0)
+#define	TQ_FLAGS_BLOCKED	(1 << 1)
+#define	TQ_FLAGS_PENDING	(1 << 2)
+
 
 struct taskqueue {
 	char tq_name[64];
@@ -25,8 +33,8 @@ struct taskqueue {
 	thread_id *tq_threads;
 	thread_id tq_thread_storage;
 	int tq_threadcount;
+	int tq_flags;
 };
-
 
 struct taskqueue *taskqueue_fast = NULL;
 struct taskqueue *taskqueue_swi = NULL;
@@ -34,7 +42,7 @@ struct taskqueue *taskqueue_swi = NULL;
 
 static struct taskqueue *
 _taskqueue_create(const char *name, int mflags, int fast,
-	taskqueue_enqueue_fn enqueue, void *context)
+	taskqueue_enqueue_fn enqueueFunction, void *context)
 {
 	struct taskqueue *tq = malloc(sizeof(struct taskqueue));
 	if (tq == NULL)
@@ -50,46 +58,47 @@ _taskqueue_create(const char *name, int mflags, int fast,
 
 	strlcpy(tq->tq_name, name, sizeof(tq->tq_name));
 	list_init_etc(&tq->tq_list, offsetof(struct task, ta_link));
-	tq->tq_enqueue = enqueue;
+	tq->tq_enqueue = enqueueFunction;
 	tq->tq_arg = context;
 
 	tq->tq_sem = -1;
 	tq->tq_threads = NULL;
 	tq->tq_threadcount = 0;
+	tq->tq_flags = TQ_FLAGS_ACTIVE;
 
 	return tq;
 }
 
 
 static void
-tq_lock(struct taskqueue *tq, cpu_status *status)
+tq_lock(struct taskqueue *taskQueue, cpu_status *status)
 {
-	if (tq->tq_fast) {
+	if (taskQueue->tq_fast) {
 		*status = disable_interrupts();
-		acquire_spinlock(&tq->tq_spinlock);
+		acquire_spinlock(&taskQueue->tq_spinlock);
 	} else {
-		mutex_lock(&tq->tq_mutex);
+		mutex_lock(&taskQueue->tq_mutex);
 	}
 }
 
 
 static void
-tq_unlock(struct taskqueue *tq, cpu_status status)
+tq_unlock(struct taskqueue *taskQueue, cpu_status status)
 {
-	if (tq->tq_fast) {
-		release_spinlock(&tq->tq_spinlock);
+	if (taskQueue->tq_fast) {
+		release_spinlock(&taskQueue->tq_spinlock);
 		restore_interrupts(status);
 	} else {
-		mutex_unlock(&tq->tq_mutex);
+		mutex_unlock(&taskQueue->tq_mutex);
 	}
 }
 
 
 struct taskqueue *
-taskqueue_create(const char *name, int mflags, taskqueue_enqueue_fn enqueue,
-	void *context, void **unused)
+taskqueue_create(const char *name, int mflags,
+	taskqueue_enqueue_fn enqueueFunction, void *context)
 {
-	return _taskqueue_create(name, mflags, 0, enqueue, context);
+	return _taskqueue_create(name, mflags, 0, enqueueFunction, context);
 }
 
 
@@ -126,10 +135,10 @@ tq_handle_thread(void *data)
 
 
 static int
-_taskqueue_start_threads(struct taskqueue **tqp, int count, int prio,
+_taskqueue_start_threads(struct taskqueue **taskQueue, int count, int priority,
 	const char *name)
 {
-	struct taskqueue *tq = (*tqp);
+	struct taskqueue *tq = (*taskQueue);
 	int i, j;
 
 	if (count == 0)
@@ -156,7 +165,7 @@ _taskqueue_start_threads(struct taskqueue **tqp, int count, int prio,
 
 	for (i = 0; i < count; i++) {
 		tq->tq_threads[i] = spawn_kernel_thread(tq_handle_thread, tq->tq_name,
-			prio, tq);
+			priority, tq);
 		if (tq->tq_threads[i] < B_OK) {
 			status_t status = tq->tq_threads[i];
 			for (j = 0; j < i; j++)
@@ -179,7 +188,7 @@ _taskqueue_start_threads(struct taskqueue **tqp, int count, int prio,
 
 
 int
-taskqueue_start_threads(struct taskqueue **tqp, int count, int prio,
+taskqueue_start_threads(struct taskqueue **taskQueue, int count, int priority,
 	const char *format, ...)
 {
 	/* we assume that start_threads is called in a sane place, and thus
@@ -197,7 +206,7 @@ taskqueue_start_threads(struct taskqueue **tqp, int count, int prio,
 	va_end(vl);
 
 	/*tq_lock(*tqp, &state);*/
-	result = _taskqueue_start_threads(tqp, count, prio, name);
+	result = _taskqueue_start_threads(taskQueue, count, priority, name);
 	/*tq_unlock(*tqp, state);*/
 
 	return result;
@@ -205,55 +214,62 @@ taskqueue_start_threads(struct taskqueue **tqp, int count, int prio,
 
 
 void
-taskqueue_free(struct taskqueue *tq)
+taskqueue_free(struct taskqueue *taskQueue)
 {
 	/* lock and  drain list? */
-	if (!tq->tq_fast)
-		mutex_destroy(&tq->tq_mutex);
-	if (tq->tq_sem != -1) {
+	taskQueue->tq_flags &= ~TQ_FLAGS_ACTIVE;
+	if (!taskQueue->tq_fast)
+		mutex_destroy(&taskQueue->tq_mutex);
+	if (taskQueue->tq_sem != -1) {
 		int i;
 
-		delete_sem(tq->tq_sem);
+		delete_sem(taskQueue->tq_sem);
 
-		for (i = 0; i < tq->tq_threadcount; i++) {
+		for (i = 0; i < taskQueue->tq_threadcount; i++) {
 			status_t status;
-			wait_for_thread(tq->tq_threads[i], &status);
+			wait_for_thread(taskQueue->tq_threads[i], &status);
 		}
 
-		if (tq->tq_threadcount > 1)
-			free(tq->tq_threads);
+		if (taskQueue->tq_threadcount > 1)
+			free(taskQueue->tq_threads);
 	}
 
-	free(tq);
+	free(taskQueue);
 }
 
 
 void
-taskqueue_drain(struct taskqueue *tq, struct task *task)
+taskqueue_drain(struct taskqueue *taskQueue, struct task *task)
 {
 	cpu_status status;
 
-	tq_lock(tq, &status);
-	if (task->ta_pending != 0)
-		UNIMPLEMENTED();
-	tq_unlock(tq, status);
+	tq_lock(taskQueue, &status);
+	while (task->ta_pending != 0) {
+		tq_unlock(taskQueue, status);
+		snooze(0);
+		tq_lock(taskQueue, &status);
+	}
+	tq_unlock(taskQueue, status);
 }
 
 
 int
-taskqueue_enqueue(struct taskqueue *tq, struct task *task)
+taskqueue_enqueue(struct taskqueue *taskQueue, struct task *task)
 {
 	cpu_status status;
-	tq_lock(tq, &status);
+	tq_lock(taskQueue, &status);
 	/* we don't really support priorities */
 	if (task->ta_pending) {
 		task->ta_pending++;
 	} else {
-		list_add_item(&tq->tq_list, task);
+		list_add_item(&taskQueue->tq_list, task);
 		task->ta_pending = 1;
-		tq->tq_enqueue(tq->tq_arg);
+		if ((taskQueue->tq_flags & TQ_FLAGS_BLOCKED) == 0)
+			taskQueue->tq_enqueue(taskQueue->tq_arg);
+		else
+			taskQueue->tq_flags |= TQ_FLAGS_PENDING;
 	}
-	tq_unlock(tq, status);
+	tq_unlock(taskQueue, status);
 	return 0;
 }
 
@@ -267,27 +283,27 @@ taskqueue_thread_enqueue(void *context)
 
 
 int
-taskqueue_enqueue_fast(struct taskqueue *tq, struct task *task)
+taskqueue_enqueue_fast(struct taskqueue *taskQueue, struct task *task)
 {
-	return taskqueue_enqueue(tq, task);
+	return taskqueue_enqueue(taskQueue, task);
 }
 
 
 struct taskqueue *
 taskqueue_create_fast(const char *name, int mflags,
-	taskqueue_enqueue_fn enqueue, void *context)
+	taskqueue_enqueue_fn enqueueFunction, void *context)
 {
-	return _taskqueue_create(name, mflags, 1, enqueue, context);
+	return _taskqueue_create(name, mflags, 1, enqueueFunction, context);
 }
 
 
 void
-task_init(struct task *t, int prio, task_handler_t handler, void *context)
+task_init(struct task *task, int prio, task_handler_t handler, void *context)
 {
-	t->ta_priority = prio;
-	t->ta_handler = handler;
-	t->ta_argument = context;
-	t->ta_pending = 0;
+	task->ta_priority = prio;
+	task->ta_handler = handler;
+	task->ta_argument = context;
+	task->ta_pending = 0;
 }
 
 
@@ -344,4 +360,30 @@ uninit_taskqueues()
 
 	if (HAIKU_DRIVER_REQUIRES(FBSD_FAST_TASKQUEUE))
 		taskqueue_free(taskqueue_fast);
+}
+
+
+void
+taskqueue_block(struct taskqueue *taskQueue)
+{
+	cpu_status status;
+
+	tq_lock(taskQueue, &status);
+	taskQueue->tq_flags |= TQ_FLAGS_BLOCKED;
+	tq_unlock(taskQueue, status);
+}
+
+
+void
+taskqueue_unblock(struct taskqueue *taskQueue)
+{
+	cpu_status status;
+
+	tq_lock(taskQueue, &status);
+	taskQueue->tq_flags &= ~TQ_FLAGS_BLOCKED;
+	if (taskQueue->tq_flags & TQ_FLAGS_PENDING) {
+		taskQueue->tq_flags &= ~TQ_FLAGS_PENDING;
+		taskQueue->tq_enqueue(taskQueue->tq_arg);
+	}
+	tq_unlock(taskQueue, status);
 }

@@ -4,11 +4,9 @@
  * $FreeBSD: src/sys/net/ethernet.h,v 1.32 2007/05/29 12:40:45 yar Exp $
  *
  */
-
 #ifndef _FBSD_COMPAT_NET_ETHERNET_H_
 #define _FBSD_COMPAT_NET_ETHERNET_H_
 
-#include <sys/kernel.h>
 
 /*
  * Somce basic Ethernet constants.
@@ -55,6 +53,9 @@
  */
 #define	ETHER_IS_VALID_LEN(foo)	\
 	((foo) >= ETHER_MIN_LEN && (foo) <= ETHER_MAX_LEN)
+
+static const u_char etherbroadcastaddr[ETHER_ADDR_LEN] =
+	{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
 /*
  * Structure of a 10Mb/s Ethernet header.
@@ -365,7 +366,7 @@ CTASSERT(sizeof (struct ether_addr) == ETHER_ADDR_LEN);
 
 struct ifnet;
 struct mbuf;
-struct rtentry;
+struct route;
 struct sockaddr;
 struct bpf_if;
 
@@ -376,7 +377,7 @@ extern	void ether_ifattach(struct ifnet *, const u_int8_t *);
 extern	void ether_ifdetach(struct ifnet *);
 extern	int  ether_ioctl(struct ifnet *, u_long, caddr_t);
 extern	int  ether_output(struct ifnet *,
-		   struct mbuf *, struct sockaddr *, struct rtentry *);
+		   struct mbuf *, struct sockaddr *, struct route *);
 extern	int  ether_output_frame(struct ifnet *, struct mbuf *);
 extern	char *ether_sprintf(const u_int8_t *);
 void	ether_vlan_mtap(struct bpf_if *, struct mbuf *,

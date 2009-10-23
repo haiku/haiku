@@ -9,6 +9,9 @@
 #include <stdint.h>
 
 
+#define in_cksum(m, len)	in_cksum_skip(m, len, 0)
+
+
 static inline u_short
 in_pseudo(u_int sum, u_int b, u_int c)
 {
@@ -17,7 +20,6 @@ in_pseudo(u_int sum, u_int b, u_int c)
 	return 0;
 }
 
-#define in_cksum(m, len)	in_cksum_skip(m, len, 0)
 
 static inline u_short
 in_cksum_skip(struct mbuf* m, int len, int skip)

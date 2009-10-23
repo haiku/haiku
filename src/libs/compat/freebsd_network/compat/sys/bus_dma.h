@@ -68,11 +68,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /* $FreeBSD: src/sys/sys/bus_dma.h,v 1.30 2006/09/03 00:26:17 jmg Exp $ */
-
 #ifndef _BUS_DMA_H_
 #define _BUS_DMA_H_
 
 #include <sys/_bus_dma.h>
+
 
 /*
  * Machine independent interface for mapping physical addresses to peripheral

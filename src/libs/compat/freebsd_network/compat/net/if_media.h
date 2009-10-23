@@ -35,8 +35,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _NET_IF_MEDIA_H_
-#define _NET_IF_MEDIA_H_
+#ifndef _FBSD_COMPAT_NET_IF_MEDIA_H_
+#define _FBSD_COMPAT_NET_IF_MEDIA_H_
 
 /*
  * Prototypes and definitions for BSD/OS-compatible network interface
@@ -211,6 +211,7 @@ uint64_t	ifmedia_baudrate(int);
 #define	IFM_IEEE80211_WDS	0x00000800	/* Operate in WDS mode */
 #define	IFM_IEEE80211_TURBO	0x00001000	/* Operate in turbo mode */
 #define	IFM_IEEE80211_MONITOR	0x00002000	/* Operate in monitor mode */
+#define	IFM_IEEE80211_MBSS	0x00004000	/* Operate in MBSS mode */
 
 /* operating mode for multi-mode devices */
 #define	IFM_IEEE80211_11A	0x00010000	/* 5Ghz, OFDM mode */
@@ -662,4 +663,4 @@ struct ifmedia_status_description {
 	{ 0,			0,		0,			\
 	    { NULL, NULL } }						\
 }
-#endif	/* _NET_IF_MEDIA_H_ */
+#endif	/* _FBSD_COMPAT_NET_IF_MEDIA_H_ */

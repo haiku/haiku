@@ -1,13 +1,14 @@
 /*
+ * Copyright 2009, Colin Günther, coling@gmx.de.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FBSD_COMPAT_SYS_CALLOUT_H_
 #define _FBSD_COMPAT_SYS_CALLOUT_H_
 
+
 #include <sys/haiku-module.h>
 
-#include <sys/mutex.h>
 #include <sys/queue.h>
 
 
@@ -19,7 +20,9 @@ struct callout {
 	int					c_flags;
 };
 
+
 #define CALLOUT_MPSAFE	0x0001
+
 
 void callout_init_mtx(struct callout *c, struct mtx *mutex, int flags);
 int	callout_reset(struct callout *c, int, void (*func)(void *), void *arg);
@@ -30,14 +33,9 @@ int callout_active(struct callout *c);
 #define	callout_stop(c)		_callout_stop_safe(c, 0)
 int	_callout_stop_safe(struct callout *, int);
 
+inline void
+callout_init(struct callout *c, int mpsafe);
 
-static inline void
-callout_init(struct callout *c, int mpsafe)
-{
-	if (mpsafe)
-		callout_init_mtx(c, NULL, 0);
-	else
-		callout_init_mtx(c, &Giant, 0);
-}
+int	callout_schedule(struct callout *, int);
 
 #endif	/* _FBSD_COMPAT_SYS_CALLOUT_H_ */
