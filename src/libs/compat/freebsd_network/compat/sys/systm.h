@@ -55,14 +55,16 @@ void wakeup(void *);
 
 static inline int
 copyin(const void * __restrict udaddr, void * __restrict kaddr,
-	    size_t len) __nonnull(1) __nonnull(2) {
+	size_t len)
+{
 	return user_memcpy(kaddr, udaddr, len);
 }
 
 
 static inline int
 copyout(const void * __restrict kaddr, void * __restrict udaddr,
-	    size_t len) __nonnull(1) __nonnull(2) {
+	size_t len)
+{
 	return user_memcpy(udaddr, kaddr, len);
 }
 
