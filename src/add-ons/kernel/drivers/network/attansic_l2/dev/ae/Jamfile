@@ -1,9 +1,10 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network attansic_l2 dev ae ;
 
-UsePrivateHeaders kernel net ;
-
 UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
 
 SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 

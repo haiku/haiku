@@ -3,12 +3,19 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include <dev/pci/pcivar.h>
 #include <sys/bus.h>
+#include <sys/malloc.h>
 #include <sys/rman.h>
+#include <sys/systm.h>
+
+#include <machine/bus.h>
+
+#include <net/if.h>
+#include <net/if_media.h>
 
 #include "if_bgereg.h"
+
 
 HAIKU_FBSD_DRIVER_GLUE(broadcom570x, bge, pci);
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_SWI_TASKQUEUE);

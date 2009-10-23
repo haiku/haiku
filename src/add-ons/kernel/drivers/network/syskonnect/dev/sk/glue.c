@@ -6,7 +6,12 @@
 
 
 #include <sys/bus.h>
+#include <sys/mutex.h>
 #include <sys/rman.h>
+#include <sys/systm.h>
+
+#include <machine/bus.h>
+
 #include "if_skreg.h"
 
 #include "xmaciireg.h"

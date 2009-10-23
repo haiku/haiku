@@ -1,4 +1,10 @@
 #include <sys/bus.h>
+#include <sys/mutex.h>
+#include <sys/systm.h>
+#include <sys/taskqueue.h>
+
+#include <machine/bus.h>
+
 #include <pci/if_rlreg.h>
 
 HAIKU_FBSD_DRIVER_GLUE(rtl81xx, re, pci);

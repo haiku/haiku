@@ -4,8 +4,13 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include <sys/bus.h>
+#include <sys/systm.h>
+
+#include <machine/bus.h>
+
+#include <net/if.h>
+#include <net/if_media.h>
 
 #include "if_xlreg.h"
 

@@ -5,7 +5,14 @@
 
 
 #include <sys/bus.h>
+#include <sys/mutex.h>
 #include <sys/rman.h>
+#include <sys/systm.h>
+
+#include <machine/bus.h>
+
+#include <net/if.h>
+#include <net/if_media.h>
 
 #include "if_fxpreg.h"
 #include "if_fxpvar.h"

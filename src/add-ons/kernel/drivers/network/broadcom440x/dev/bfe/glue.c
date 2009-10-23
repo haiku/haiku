@@ -3,11 +3,17 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include <sys/bus.h>
+#include <sys/malloc.h>
 #include <sys/rman.h>
+#include <sys/systm.h>
+
+#include <machine/bus.h>
+
+#include <net/if.h>
 
 #include "if_bfereg.h"
+
 
 HAIKU_FBSD_DRIVER_GLUE(broadcom440x, bfe, pci);
 
