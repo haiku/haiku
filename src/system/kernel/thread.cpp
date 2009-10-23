@@ -2470,6 +2470,9 @@ _get_next_thread_info(team_id teamID, int32 *_cookie, thread_info *info,
 	else
 		team = team_get_team_struct_locked(teamID);
 
+	if (team == NULL)
+		return B_BAD_VALUE;
+
 	struct thread* thread = NULL;
 
 	if (lastID == 0) {
