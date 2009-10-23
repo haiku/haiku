@@ -130,7 +130,8 @@ set_frame_buffer_base()
 		surfaceRegister = INTEL_DISPLAY_B_SURFACE;
 	}
 
-	if (sharedInfo.device_type.InGroup(INTEL_TYPE_96x)) {
+	if (sharedInfo.device_type.InGroup(INTEL_TYPE_96x)
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_G4x)) {
 		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
 			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
 		read32(baseRegister);
@@ -217,7 +218,17 @@ get_pll_limits(pll_limits &limits)
 	// Note, the limits are taken from the X driver; they have not yet been
 	// tested
 
-	if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_G4x)) {
+		// single LVDS output
+		// NOTE: not sure these will work with CRT displays
+		static const pll_limits kLimits = {
+			// p, p1, p2, high,   n,   m, m1, m2
+			{ 28,  2, 14, false,  1, 104, 17,  5},	// min
+			{112,  8,  0, true,   3, 138, 23, 11},	// max
+			200000, 1750000, 3500000
+		};
+		limits = kLimits;
+	} else if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
 		// TODO: support LVDS output limits as well
 		// (Update: Output limits are adjusted in the computation (post2=7/14))
 		// Should move them here!

@@ -238,11 +238,25 @@ intel_extreme_init(intel_info &info)
 		primary.offset = (addr_t)primary.base - info.aperture_base;
 	}
 
+	// Clock gating
 	// Fix some problems on certain chips (taken from X driver)
 	// TODO: clean this up
 	if (info.pci->device_id == 0x2a02 || info.pci->device_id == 0x2a12) {
 		dprintf("i965GM/i965GME quirk\n");
 		write32(info.registers + 0x6204, (1L << 29));
+	} else if (info.device_type.InGroup(INTEL_TYPE_G4x)) {
+		dprintf("G4x clock gating\n");
+		write32(info.registers + 0x6204, 0);
+		write32(info.registers + 0x6208, BIT(9) | BIT(7) | BIT(6));
+		write32(info.registers + 0x6210, 0);
+
+		uint32 dspclk_gate_val = BIT(28) | BIT(3) | BIT(2);
+		if ((info.device_type.type & INTEL_TYPE_MOBILE) == INTEL_TYPE_MOBILE) {
+			dprintf("G4x mobile clock gating\n");
+		    dspclk_gate_val |= BIT(18);
+		}
+		write32(info.registers + 0x6200, dspclk_gate_val)	;	
+
 	} else {
 		dprintf("i965 quirk\n");
 		write32(info.registers + 0x6204, (1L << 29) | (1L << 23));

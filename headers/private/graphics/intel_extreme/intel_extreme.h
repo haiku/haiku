@@ -9,6 +9,7 @@
 #define INTEL_EXTREME_H
 
 
+#include "binary-utils.h"
 #include "lock.h"
 
 #include <Accelerant.h>
@@ -32,6 +33,7 @@
 #define INTEL_TYPE_94x			(INTEL_TYPE_9xx | 0x0080)
 #define INTEL_TYPE_96x			(INTEL_TYPE_9xx | 0x0100)
 #define INTEL_TYPE_Gxx			(INTEL_TYPE_9xx | 0x0200)
+#define INTEL_TYPE_G4x			(INTEL_TYPE_9xx | 0x0400)
 // models
 #define INTEL_TYPE_MOBILE		0x0008
 #define INTEL_TYPE_915			(INTEL_TYPE_91x)
@@ -40,6 +42,8 @@
 #define INTEL_TYPE_965			(INTEL_TYPE_96x)
 #define INTEL_TYPE_965M			(INTEL_TYPE_96x | INTEL_TYPE_MOBILE)
 #define INTEL_TYPE_G33			(INTEL_TYPE_Gxx)
+#define INTEL_TYPE_G45			(INTEL_TYPE_G4x)
+#define INTEL_TYPE_GM45			(INTEL_TYPE_G4x | INTEL_TYPE_MOBILE)
 
 #define DEVICE_NAME				"intel_extreme"
 #define INTEL_ACCELERANT_NAME	"intel_extreme.accelerant"
@@ -179,12 +183,32 @@ struct intel_free_graphics_memory {
 // Register definitions, taken from X driver
 
 // PCI bridge memory management
-#define INTEL_GRAPHICS_MEMORY_CONTROL	0x52
+#define INTEL_GRAPHICS_MEMORY_CONTROL	0x52	// GGC - (G)MCH Graphics Control Register
 #define MEMORY_CONTROL_ENABLED			0x0004
 #define MEMORY_MASK						0x0001
 #define STOLEN_MEMORY_MASK				0x0070
 #define i965_GTT_MASK					0x000e
 #define G33_GTT_MASK					0x0300
+
+#define G4X_GGC_GGMS_MASK				BITMASK(11,8)
+#define G4X_GGC_GMS_MASK				BITMASK(7,4)	// also for G33, but
+														//   probably not for
+													 	//    older chips
+#define G4X_GGMS_NONE					(BINARY(0000) << 8)
+#define G4X_GGMS_NO_IVT_1M				(BINARY(0001) << 8)
+#define G4X_GGMS_NO_IVT_2M				(BINARY(0011) << 8)
+#define G4X_GGMS_IVT_2M					(BINARY(1001) << 8)
+#define G4X_GGMS_IVT_3M					(BINARY(1010) << 8)
+#define G4X_GGMS_IVT_4M					(BINARY(1011) << 8)
+
+#define G4X_GMS_32MB					(BINARY(0101) << 4)
+#define G4X_GMS_64MB					(BINARY(0111) << 4)
+#define G4X_GMS_128MB					(BINARY(1000) << 4)
+#define G4X_GMS_256MB					(BINARY(1001) << 4)
+#define G4X_GMS_96MB					(BINARY(1010) << 4)
+#define G4X_GMS_160MB					(BINARY(1011) << 4)
+#define G4X_GMS_224MB					(BINARY(1100) << 4)
+#define G4X_GMS_352MB					(BINARY(1101) << 4)
 
 // models i830 and up
 #define i830_LOCAL_MEMORY_ONLY			0x10
@@ -220,6 +244,24 @@ struct intel_free_graphics_memory {
 #define i965_GTT_512K					(0 << 1)
 #define G33_GTT_1M						(1 << 8)
 #define G33_GTT_2M						(2 << 8)
+
+#define G4X_GTTMMADR					0x10
+#define G4X_GTTMMADR_MBA_MASK			BITMASK(35,22)
+#define G4X_GTTMMADR_MT_MASK			BITMASK(2,2)
+#define G4X_MMIO_SIZE					(512ULL << 10)
+
+#define G4X_GMADR						0x18
+#define G4X_GMADR_MBA_512MB_MASK		BITMASK(35,29)
+#define G4X_GMADR_MBA_256MB_MASK		BITMASK(35,28)
+#define G4X_GMADR_AM_512MB_MASK			BITMASK(28,4)
+#define G4X_GMADR_AM_256MB_MASK			BITMASK(27,4)
+#define G4X_GMADR_MT_MASK				BITMASK(2,2)
+
+#define G4X_MSAC						0x66
+#define G4X_MSAC_LHSAS_MASK				BITMASK(2,1)
+#define G4X_LHSAS_512MB					(BINARY(11) << 1)
+#define G4X_LHSAS_256MB					(BINARY(01) << 1)
+
 #define GTT_ENTRY_VALID					0x01
 #define GTT_ENTRY_LOCAL_MEMORY			0x02
 #define GTT_PAGE_SHIFT					12

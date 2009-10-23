@@ -68,6 +68,8 @@ const struct supported_device {
 	{0x29b0, 0x29b2, INTEL_TYPE_G33, "G33"},
 	{0x29c0, 0x29c2, INTEL_TYPE_G33, "Q35"},
 	{0x29d0, 0x29d2, INTEL_TYPE_G33, "Q33"},
+
+	{0x2a40, 0x2a42, INTEL_TYPE_GM45, "GM45"},
 };
 
 struct intel_info {
@@ -146,6 +148,27 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				gttSize = 2 << 20;
 				break;
 		}
+	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x) {
+		switch (memoryConfig & G4X_GGC_GGMS_MASK) {
+			case G4X_GGMS_NONE:
+				gttSize = 0;
+				break;
+			case G4X_GGMS_NO_IVT_1M:
+				gttSize = 1 << 20;
+				break;
+			case G4X_GGMS_NO_IVT_2M:
+				gttSize = 2 << 20;
+				break;
+			case G4X_GGMS_IVT_2M:
+				gttSize = 2 << 20;
+				break;
+			case G4X_GGMS_IVT_3M:
+				gttSize = 3 << 20;
+				break;
+			case G4X_GGMS_IVT_4M:
+				gttSize = 4 << 20;
+				break;			
+		}
 	} else {
 		// older models have the GTT as large as their frame buffer mapping
 		// TODO: check if the i9xx version works with the i8xx chips as well
@@ -159,12 +182,14 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 		} else if ((info.type & INTEL_TYPE_9xx) != 0)
 			frameBufferSize = info.display.u.h0.base_register_sizes[2];
 
+		TRACE(("frame buffer size %lu MB\n", frameBufferSize >> 20));
 		gttSize = frameBufferSize / 1024;
 	}
 
 	// TODO: test with different models!
 
 	if (info.type == INTEL_TYPE_83x) {
+		// Older chips
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i830_LOCAL_MEMORY_ONLY:
 				// TODO: determine its size!
@@ -173,12 +198,42 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 			case i830_STOLEN_512K:
 				memorySize >>= 1;
 				break;
+			case i830_STOLEN_1M:
+				// default case
+				break;
 			case i830_STOLEN_8M:
 				memorySize *= 8;
 				break;
 		}
+	} else if (info.type == INTEL_TYPE_G4x) {
+		switch (memoryConfig & G4X_GGC_GMS_MASK) {
+			case G4X_GMS_32MB:
+				memorySize *= 32;
+				break;
+			case G4X_GMS_64MB:
+				memorySize *= 64;
+				break;
+			case G4X_GMS_128MB:
+				memorySize *= 128;
+				break;
+			case G4X_GMS_256MB:
+				memorySize *= 256;
+				break;
+			case G4X_GMS_96MB:
+				memorySize *= 96;
+				break;
+			case G4X_GMS_160MB:
+				memorySize *= 160;
+				break;
+			case G4X_GMS_224MB:
+				memorySize *= 224;
+				break;
+			case G4X_GMS_352MB:
+				memorySize *= 352;
+				break;
+		}
 	} else if (info.type == INTEL_TYPE_85x
-		|| (info.type & INTEL_TYPE_9xx) != 0) {
+		|| (info.type & INTEL_TYPE_9xx) == INTEL_TYPE_9xx) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i855_STOLEN_MEMORY_4M:
 				memorySize *= 4;
@@ -205,6 +260,9 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				memorySize *= 256;
 				break;
 		}
+	} else {
+		// TODO: error out!
+		memorySize = 4096;
 	}
 
 	stolenSize = memorySize - 4096;
@@ -241,7 +299,7 @@ intel_map(intel_info &info)
 		mmioIndex = 0;
 		fbIndex = 2;
 	}
-
+	
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("intel GMCH mmio",
 		(void *)info.display.u.h0.base_registers[mmioIndex],
@@ -271,7 +329,10 @@ intel_map(intel_info &info)
 	if (get_memory_map(scratchAddress, B_PAGE_SIZE, &entry, 1) != B_OK)
 		return B_ERROR;
 
-	if ((info.type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx)
+	if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x)
+		info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
+				+ (2UL << 20);
+	else if ((info.type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx)
 		info.gtt_physical_base = get_pci_config(info.display, i915_GTT_BASE, 4);
 	else {
 		info.gtt_physical_base = read32(info.registers
@@ -307,10 +368,14 @@ intel_map(intel_info &info)
 	info.aperture_stolen_size = stolenSize;
 	if (info.aperture_size == 0)
 		info.aperture_size = info.display.u.h0.base_register_sizes[fbIndex];
-
+	
 	dprintf("intel_gart: detected %ld MB of stolen memory, aperture "
 		"size %ld MB, GTT size %ld KB\n", (stolenSize + (1023 << 10)) >> 20,
 		info.aperture_size >> 20, gttSize >> 10);
+
+	dprintf("intel_gart: GTT base = 0x%lx\n", info.gtt_physical_base);
+	dprintf("intel_gart: MMIO base = 0x%lx\n", info.display.u.h0.base_registers[mmioIndex]);
+	dprintf("intel_gart: GMR base = 0x%lx\n", info.aperture_physical_base);
 
 	AreaKeeper apertureMapper;
 	info.aperture_area = apertureMapper.Map("intel graphics aperture",

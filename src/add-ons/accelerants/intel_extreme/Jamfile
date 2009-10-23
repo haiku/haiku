@@ -5,6 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics intel_extreme ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders shared ;
 
 Addon intel_extreme.accelerant :
 	accelerant.cpp
