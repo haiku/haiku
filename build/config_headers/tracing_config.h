@@ -28,9 +28,9 @@
 #define BMESSAGE_TRACING						0
 #define KERNEL_HEAP_TRACING						0
 #define KTRACE_PRINTF_STACK_TRACE				0	/* stack trace depth */
-#define OBJECT_CACHE_TRACING					0
 #define NET_BUFFER_TRACING						0
 #define NET_BUFFER_TRACING_STACK_TRACE			0	/* stack trace depth */
+#define OBJECT_CACHE_TRACING					0
 #define PAGE_ALLOCATION_TRACING					0
 #define PAGE_DAEMON_TRACING						0
 #define PAGE_WRITER_TRACING						0
