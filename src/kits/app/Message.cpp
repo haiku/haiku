@@ -192,7 +192,7 @@ BMessage::operator=(const BMessage &other)
 	// apply to the clone.
 	fHeader->flags &= ~(MESSAGE_FLAG_REPLY_REQUIRED | MESSAGE_FLAG_REPLY_DONE
 		| MESSAGE_FLAG_IS_REPLY | MESSAGE_FLAG_WAS_DELIVERED
-		| MESSAGE_FLAG_WAS_DROPPED | MESSAGE_FLAG_PASS_BY_AREA);
+		| MESSAGE_FLAG_PASS_BY_AREA);
 	// Note, that BeOS R5 seems to keep the reply info.
 
 	if (fHeader->field_count > 0) {
