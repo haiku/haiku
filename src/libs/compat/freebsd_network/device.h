@@ -24,6 +24,9 @@
 
 #include "shared.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct root_device_softc {
 	struct pci_info	pci_info;
@@ -82,5 +85,9 @@ void device_sprintf_name(device_t dev, const char *format, ...)
 
 void ifq_init(struct ifqueue *, const char *);
 void ifq_uninit(struct ifqueue *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* DEVICE_H */
