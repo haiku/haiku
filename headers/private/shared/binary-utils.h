@@ -47,6 +47,7 @@ template<const unsigned long long N> struct Binary
 };
 
 
+template<>
 struct Binary<0>
 {
 	enum { value = 0ULL } ;
