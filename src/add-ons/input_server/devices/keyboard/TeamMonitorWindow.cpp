@@ -142,7 +142,7 @@ TeamMonitorWindow::TeamMonitorWindow()
 	SetSizeLimits(Bounds().Width(), Bounds().Width() * 2,
 		Bounds().Height(), screenFrame.Height());
 
-	AddShortcut('T', B_COMMAND_KEY | B_SHIFT_KEY,
+	AddShortcut('T', B_COMMAND_KEY | B_OPTION_KEY,
 		new BMessage(kMsgLaunchTerminal));
 }
 
