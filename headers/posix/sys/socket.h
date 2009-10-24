@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_SOCKET_H
@@ -43,6 +43,7 @@ typedef uint32_t socklen_t;
 #define	SOCK_STREAM	1
 #define	SOCK_DGRAM	2
 #define	SOCK_RAW	3
+#define	SOCK_SEQPACKET	5
 #define SOCK_MISC	255
 
 /* Socket options for SOL_SOCKET level */
