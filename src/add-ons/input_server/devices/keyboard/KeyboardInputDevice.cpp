@@ -706,7 +706,7 @@ KeyboardDevice::_ControlThread()
 		}
 
 		uint8 newDeadKey = 0;
-		if (activeDeadKey == 0)
+		if (activeDeadKey == 0 || !isKeyDown)
 			newDeadKey = fKeymap.IsDeadKey(keycode, fModifiers);
 
 		if (newDeadKey == 0) {
@@ -757,11 +757,16 @@ KeyboardDevice::_ControlThread()
 
 			delete[] rawString;
 
-			if (isKeyDown && !modifiers && activeDeadKey != 0
-				&& fInputMethodStarted) {
+			if (isKeyDown && !modifiers && activeDeadKey != 0) {
 				// a dead key was completed
-				_EnqueueInlineInputMethod(B_INPUT_METHOD_CHANGED,
-					string, true, msg);
+				activeDeadKey = 0;
+				if (fInputMethodStarted) {
+					_EnqueueInlineInputMethod(B_INPUT_METHOD_CHANGED,
+						string, true, msg);
+					_EnqueueInlineInputMethod(B_INPUT_METHOD_STOPPED);
+					fInputMethodStarted = false;
+				} else if (fOwner->EnqueueMessage(msg) != B_OK)
+					delete msg;
 			} else if (fOwner->EnqueueMessage(msg) != B_OK)
 				delete msg;
 		} else if (isKeyDown) {
@@ -773,16 +778,8 @@ KeyboardDevice::_ControlThread()
 
 				if (_EnqueueInlineInputMethod(B_INPUT_METHOD_CHANGED, string) == B_OK)
 					fInputMethodStarted = true;
+				activeDeadKey = newDeadKey;
 			}
-		}
-
-		if (!isKeyDown && !modifiers) {
-			if (activeDeadKey != 0) {
-				_EnqueueInlineInputMethod(B_INPUT_METHOD_STOPPED);
-				fInputMethodStarted = false;
-			}
-
-			activeDeadKey = newDeadKey;
 		}
 
 		lastKeyCode = isKeyDown ? keycode : 0;
