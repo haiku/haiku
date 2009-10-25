@@ -21,6 +21,10 @@ public:
 									uint32 resizeMask = B_FOLLOW_LEFT
 										| B_FOLLOW_TOP,
 									uint32 flags = B_WILL_DRAW);
+								BOptionControl(const char* name,
+									const char* label, BMessage* message,
+									uint32 flags = B_WILL_DRAW);
+
 	virtual						~BOptionControl();
 
 	virtual	void				MessageReceived(BMessage* message);

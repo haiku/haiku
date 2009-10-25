@@ -30,6 +30,14 @@ BOptionControl::BOptionControl(BRect frame, const char *name, const char *label,
 }
 
 
+BOptionControl::BOptionControl(const char *name, const char *label,
+								BMessage *message, uint32 flags)
+	:
+	BControl(name, label, message, flags)
+{
+}
+
+
 /*! \brief Destructor
 	It does nothing.
 */
