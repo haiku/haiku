@@ -37,6 +37,6 @@ DoCatalogs Appearance :
 	ColorWhichItem.cpp
 	: en.catalog
 	: bg.catkeys de.catkeys fi.catkeys fr.catkeys it.catkeys ja.catkeys
-	lt.catkeys ru.catkeys sv.catkeys ua.catkeys
+	lt.catkeys ru.catkeys sv.catkeys uk.catkeys
 	;
 
