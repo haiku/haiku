@@ -95,15 +95,15 @@ ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_BEHAVIOUR);
-	msg->AddInt32(AR_BEHAVIOUR, B_WARP_MOUSE);
+	msg->AddInt32(AR_BEHAVIOUR, B_WARP_FOCUS_FOLLOWS_MOUSE);
 	tmpi = new BMenuItem("Warping (ffm)", msg);
-	tmpi->SetMarked(tv->fNormalMM == B_WARP_MOUSE);
+	tmpi->SetMarked(tv->fNormalMM == B_WARP_FOCUS_FOLLOWS_MOUSE);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_BEHAVIOUR);
-	msg->AddInt32(AR_BEHAVIOUR, B_INSTANT_WARP_MOUSE);
+	msg->AddInt32(AR_BEHAVIOUR, B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE);
 	tmpi = new BMenuItem("Instant warping (ffm)", msg);
-	tmpi->SetMarked(tv->fNormalMM == B_INSTANT_WARP_MOUSE);
+	tmpi->SetMarked(tv->fNormalMM == B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE);
 	tmpm->AddItem(tmpi);
 
 	tmpm->SetTargetForItems(tv);
