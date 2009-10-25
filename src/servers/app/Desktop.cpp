@@ -217,8 +217,8 @@ MouseFilter::MouseFilter(Desktop* desktop)
 
 
 filter_result
-MouseFilter::Filter(BMessage* message, EventTarget** _target,
-	int32* _viewToken, BMessage* latestMouseMoved)
+MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
+	BMessage* latestMouseMoved)
 {
 	BPoint where;
 	if (message->FindPoint("where", &where) != B_OK)
@@ -1437,12 +1437,13 @@ Desktop::SetWindowFeel(Window* window, window_feel newFeel)
 	// A normal window that was once a floating or modal window will
 	// adopt the window's current workspaces
 
-	if (!window->IsNormal())
+	if (!window->IsNormal()) {
 		_ChangeWindowWorkspaces(window, window->Workspaces(),
 			window->SubsetWorkspaces());
+	}
 
 	// make sure the window has the correct position in the window lists
-	//	(ie. all floating windows have to be on the top, ...)
+	// (ie. all floating windows have to be on the top, ...)
 
 	for (int32 i = 0; i < kMaxWorkspaces; i++) {
 		if (!workspace_in_workspaces(i, window->Workspaces()))
@@ -2109,8 +2110,7 @@ Desktop::_LaunchInputServer()
 	if (entryStatus == B_OK)
 		entryStatus = roster.Launch(&ref);
 	if (entryStatus == B_OK || entryStatus == B_ALREADY_RUNNING) {
-		syslog(LOG_ERR,
-			"Failed to launch the input server by signature: %s!\n",
+		syslog(LOG_ERR, "Failed to launch the input server by signature: %s!\n",
 			strerror(status));
 		return;
 	}
@@ -2145,9 +2145,10 @@ Desktop::_PrepareQuit()
 	}
 
 	// wait for the last app to die
-	if (count > 0)
+	if (count > 0) {
 		acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT,
 			250000);
+	}
 
 	fApplicationsLock.Unlock();
 }
@@ -2164,7 +2165,7 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// Attached data:
 			// 1) port_id - receiver port of a regular app
 			// 2) port_id - client looper port - for sending messages to the
-			//					client
+			//		client
 			// 2) team_id - app's team ID
 			// 3) int32 - handler token of the regular app
 			// 4) char * - signature of the regular app
@@ -2432,8 +2433,8 @@ Desktop::_UpdateBack()
 {
 	fBack = NULL;
 
-	for (Window* window = _CurrentWindows().FirstWindow();
-			window != NULL; window = window->NextWindow(fCurrentWorkspace)) {
+	for (Window* window = _CurrentWindows().FirstWindow(); window != NULL;
+			window = window->NextWindow(fCurrentWorkspace)) {
 		if (window->IsHidden() || window->Feel() == kDesktopWindowFeel)
 			continue;
 
@@ -2455,8 +2456,7 @@ Desktop::_UpdateFront(bool updateFloating)
 {
 	fFront = NULL;
 
-	for (Window* window = _CurrentWindows().LastWindow();
-			window != NULL;
+	for (Window* window = _CurrentWindows().LastWindow(); window != NULL;
 			window = window->PreviousWindow(fCurrentWorkspace)) {
 		if (window->IsHidden() || window->IsFloating()
 			|| !window->SupportsFront())
@@ -3177,8 +3177,7 @@ Desktop::_SetWorkspace(int32 index)
 		}
 
 		if (window->Frame().LeftTop() != position) {
-			// the window was visible before, but its on-screen location
-			//	changed
+			// the window was visible before, but its on-screen location changed
 			BPoint offset = position - window->Frame().LeftTop();
 			MoveWindowBy(window, offset.x, offset.y);
 				// TODO: be a bit smarter than this...

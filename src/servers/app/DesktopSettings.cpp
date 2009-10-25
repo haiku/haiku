@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Haiku.
+ * Copyright 2005-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -199,16 +199,19 @@ DesktopSettingsPrivate::_Load()
 			int32 mode;
 			if (settings.FindInt32("mode", &mode) == B_OK)
 				fMouseMode = (mode_mouse)mode;
+
 			int32 focusFollowsMouseMode;
 			if (settings.FindInt32("focus follows mouse mode",
-				&focusFollowsMouseMode) == B_OK) {
-				fFocusFollowsMouseMode =
-					(mode_focus_follows_mouse)focusFollowsMouseMode;
+					&focusFollowsMouseMode) == B_OK) {
+				fFocusFollowsMouseMode
+					= (mode_focus_follows_mouse)focusFollowsMouseMode;
 			}
+
 			bool acceptFirstClick;
 			if (settings.FindBool("accept first click", &acceptFirstClick)
-				== B_OK)
+					== B_OK) {
 				fAcceptFirstClick = acceptFirstClick;
+			}
 		}
 	}
 
@@ -247,8 +250,8 @@ DesktopSettingsPrivate::_Load()
 				fMenuInfo.click_to_open = clickToOpen;
 
 			bool triggersAlwaysShown;
-			if (settings.FindBool("triggers always shown",
-				&triggersAlwaysShown) == B_OK) {
+			if (settings.FindBool("triggers always shown", &triggersAlwaysShown)
+					 == B_OK) {
 				fMenuInfo.triggers_always_shown = triggersAlwaysShown;
 			}
 
@@ -514,8 +517,7 @@ DesktopSettingsPrivate::SetMouseMode(const mode_mouse mode)
 
 
 void
-DesktopSettingsPrivate::SetFocusFollowsMouseMode(
-	const mode_focus_follows_mouse mode)
+DesktopSettingsPrivate::SetFocusFollowsMouseMode(mode_focus_follows_mouse mode)
 {
 	fFocusFollowsMouseMode = mode;
 	Save(kMouseSettings);
@@ -943,8 +945,7 @@ LockedDesktopSettings::SetMouseMode(const mode_mouse mode)
 
 
 void
-LockedDesktopSettings::SetFocusFollowsMouseMode(
-	const mode_focus_follows_mouse mode)
+LockedDesktopSettings::SetFocusFollowsMouseMode(mode_focus_follows_mouse mode)
 {
 	fSettings->SetFocusFollowsMouseMode(mode);
 }

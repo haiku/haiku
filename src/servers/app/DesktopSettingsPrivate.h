@@ -47,9 +47,9 @@ public:
 			mode_mouse			MouseMode() const;
 			void				SetFocusFollowsMouseMode(
 									mode_focus_follows_mouse mode);
-			mode_focus_follows_mouse		FocusFollowsMouseMode() const;
+			mode_focus_follows_mouse FocusFollowsMouseMode() const;
 			bool				FocusFollowsMouse() const;
-			void				SetAcceptFirstClick(bool accept_first_click);
+			void				SetAcceptFirstClick(bool acceptFirstClick);
 			bool				AcceptFirstClick() const;
 
 			void				SetShowAllDraggers(bool show);

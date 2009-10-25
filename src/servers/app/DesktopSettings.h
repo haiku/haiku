@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,7 +44,7 @@ class DesktopSettings {
 		void			GetMenuInfo(menu_info& info) const;
 
 		mode_mouse		MouseMode() const;
-		mode_focus_follows_mouse	FocusFollowsMouseMode() const;
+		mode_focus_follows_mouse FocusFollowsMouseMode() const;
 		bool			FocusFollowsMouse() const;
 		bool			AcceptFirstClick() const;
 
@@ -80,8 +80,8 @@ class LockedDesktopSettings : public DesktopSettings {
 
 		void			SetMouseMode(mode_mouse mode);
 		void			SetFocusFollowsMouseMode(
-							const mode_focus_follows_mouse mode);
-		void			SetAcceptFirstClick(bool accept_first_click);
+							mode_focus_follows_mouse mode);
+		void			SetAcceptFirstClick(bool acceptFirstClick);
 
 		void			SetShowAllDraggers(bool show);
 
