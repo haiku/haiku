@@ -193,7 +193,7 @@ BOutlineListView::KeyDown(const char* bytes, int32 numBytes)
 			{
 				BListItem* item = ItemAt(currentSel);
 				if (item && item->fHasSubitems) {
-					if (!IsExpanded(currentSel)) 
+					if (!IsExpanded(currentSel))
 						Expand(item);
 					else
 						Select(currentSel + 1);
@@ -480,108 +480,14 @@ BOutlineListView::Superitem(const BListItem* item)
 void
 BOutlineListView::Expand(BListItem* item)
 {
-	if (item->IsExpanded() || !FullListHasItem(item))
-		return;
-
-	item->fExpanded = true;
-
-	uint32 level = item->fLevel;
-	int32 fullIndex = FullListIndexOf(item);
-	int32 index = IndexOf(item) + 1;
-	int32 startIndex = index;
-	int32 count = FullListCountItems() - fullIndex - 1;
-	BListItem** items = (BListItem**)fFullList.Items() + fullIndex + 1;
-
-	BFont font;
-	GetFont(&font);
-	while (count-- > 0) {
-		item = items[0];
-		if (item->fLevel <= level)
-			break;
-
-		if (!item->IsItemVisible()) {
-			// fix selection hints
-			if (index <= fFirstSelected)
-				fFirstSelected++;
-			if (index <= fLastSelected)
-				fLastSelected++;
-
-			fList.AddItem(item, index++);
-			item->Update(this, &font);
-			item->SetItemVisible(true);
-		}
-
-		if (item->HasSubitems() && !item->IsExpanded()) {
-			// Skip hidden children
-			uint32 subLevel = item->fLevel;
-			items++;
-
-			while (--count > 0 && items[0]->fLevel > subLevel)
-				items++;
-		} else
-			items++;
-	}
-	_RecalcItemTops(startIndex);
-	_FixupScrollBar();
-	Invalidate();
+	ExpandOrCollapse(item, true);
 }
 
 
 void
 BOutlineListView::Collapse(BListItem* item)
 {
-	if (!item->IsExpanded() || !FullListHasItem(item))
-		return;
-
-	item->fExpanded = false;
-
-	uint32 level = item->fLevel;
-	int32 fullIndex = FullListIndexOf(item);
-	int32 index = IndexOf(item);
-	int32 startIndex = index;
-	int32 max = FullListCountItems() - fullIndex - 1;
-	int32 count = 0;
-	bool selectionChanged = false;
-	
-	BListItem** items = (BListItem**)fFullList.Items() + fullIndex + 1;
-
-	while (max-- > 0) {
-		item = items[0];
-		if (item->fLevel <= level)
-			break;
-
-		if (item->IsItemVisible()) {
-			fList.RemoveItem(item);
-			item->SetItemVisible(false);
-			if (item->IsSelected()) {
-				selectionChanged = true;
-				item->Deselect();
-			}
-			count++;
-		}
-
-		items++;
-	}
-
-	_RecalcItemTops(startIndex);
-	// fix selection hints
-	if (index < fFirstSelected && index + count < fFirstSelected) {
-		// all items removed were higher than the selection range,
-		// adjust the indexes to correspond to their new visible positions
-		fFirstSelected -= count;
-		fLastSelected -= count;
-	}
-
-	int32 maxIndex = fList.CountItems() - 1;
-	if (fFirstSelected > maxIndex) 
-		fFirstSelected = maxIndex;
-	if (fLastSelected > maxIndex)
-		fLastSelected = maxIndex;
-	if (selectionChanged)
-		SelectionChanged();
-	
-	_FixupScrollBar();
-	Invalidate();
+	ExpandOrCollapse(item, false);
 }
 
 
@@ -869,8 +775,103 @@ void BOutlineListView::_ReservedOutlineListView4() {}
 
 
 void
-BOutlineListView::ExpandOrCollapse(BListItem* underItem, bool expand)
+BOutlineListView::ExpandOrCollapse(BListItem* item, bool expand)
 {
+	if (item->IsExpanded() == expand || !FullListHasItem(item))
+		return;
+
+	item->fExpanded = expand;
+
+	// TODO: merge these cases together, they are pretty similar
+
+	if (expand) {
+		uint32 level = item->fLevel;
+		int32 fullIndex = FullListIndexOf(item);
+		int32 index = IndexOf(item) + 1;
+		int32 startIndex = index;
+		int32 count = FullListCountItems() - fullIndex - 1;
+		BListItem** items = (BListItem**)fFullList.Items() + fullIndex + 1;
+
+		BFont font;
+		GetFont(&font);
+		while (count-- > 0) {
+			item = items[0];
+			if (item->fLevel <= level)
+				break;
+
+			if (!item->IsItemVisible()) {
+				// fix selection hints
+				if (index <= fFirstSelected)
+					fFirstSelected++;
+				if (index <= fLastSelected)
+					fLastSelected++;
+
+				fList.AddItem(item, index++);
+				item->Update(this, &font);
+				item->SetItemVisible(true);
+			}
+
+			if (item->HasSubitems() && !item->IsExpanded()) {
+				// Skip hidden children
+				uint32 subLevel = item->fLevel;
+				items++;
+
+				while (--count > 0 && items[0]->fLevel > subLevel)
+					items++;
+			} else
+				items++;
+		}
+		_RecalcItemTops(startIndex);
+	} else {
+		// collapse
+		uint32 level = item->fLevel;
+		int32 fullIndex = FullListIndexOf(item);
+		int32 index = IndexOf(item);
+		int32 startIndex = index;
+		int32 max = FullListCountItems() - fullIndex - 1;
+		int32 count = 0;
+		bool selectionChanged = false;
+
+		BListItem** items = (BListItem**)fFullList.Items() + fullIndex + 1;
+
+		while (max-- > 0) {
+			item = items[0];
+			if (item->fLevel <= level)
+				break;
+
+			if (item->IsItemVisible()) {
+				fList.RemoveItem(item);
+				item->SetItemVisible(false);
+				if (item->IsSelected()) {
+					selectionChanged = true;
+					item->Deselect();
+				}
+				count++;
+			}
+
+			items++;
+		}
+
+		_RecalcItemTops(startIndex);
+		// fix selection hints
+		if (index < fFirstSelected && index + count < fFirstSelected) {
+			// all items removed were higher than the selection range,
+			// adjust the indexes to correspond to their new visible positions
+			fFirstSelected -= count;
+			fLastSelected -= count;
+		}
+
+		int32 maxIndex = fList.CountItems() - 1;
+		if (fFirstSelected > maxIndex)
+			fFirstSelected = maxIndex;
+		if (fLastSelected > maxIndex)
+			fLastSelected = maxIndex;
+		if (selectionChanged)
+			SelectionChanged();
+	}
+
+	_FixupScrollBar();
+	Invalidate();
 }
 
 
@@ -893,7 +894,7 @@ BOutlineListView::DrawLatch(BRect itemRect, int32 level, bool collapsed,
 	if (collapsed) {
 		SetHighColor(192, 192, 192);
 
-		FillTriangle(itemRect.LeftTop() + BPoint(left + 4.0f, 
+		FillTriangle(itemRect.LeftTop() + BPoint(left + 4.0f,
 				halfHeight - kLatchHeight / 2.0f),
 			itemRect.LeftTop() + BPoint(left + 4.0f,
 				halfHeight + kLatchHeight / 2.0f),
