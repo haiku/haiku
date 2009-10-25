@@ -8,7 +8,9 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+
 /*!	Global functions and variables for the Interface Kit */
+
 
 #include <InterfaceDefs.h>
 
@@ -94,8 +96,8 @@ const rgb_color* BPrivate::kDefaultColors = &_kDefaultColors[0];
 
 namespace BPrivate {
 
-/*!
-	Fills the \a width, \a height, and \a colorSpace parameters according
+
+/*!	Fills the \a width, \a height, and \a colorSpace parameters according
 	to the window screen's mode.
 	Returns \c true if the mode is known.
 */
@@ -654,14 +656,13 @@ _get_key_map(key_map **map, char **key_buffer, ssize_t *key_buffer_size)
 
 	_control_input_server_(&command, &reply);
 
-	if (reply.FindData("keymap", B_ANY_TYPE, &map_array, &map_count)
-		!= B_OK) {
+	if (reply.FindData("keymap", B_ANY_TYPE, &map_array, &map_count) != B_OK) {
 		*map = 0; *key_buffer = 0;
 		return;
 	}
 
 	if (reply.FindData("key_buffer", B_ANY_TYPE, &key_array, key_buffer_size)
-		!= B_OK) {
+			!= B_OK) {
 		*map = 0; *key_buffer = 0;
 		return;
 	}
@@ -947,6 +948,7 @@ accept_first_click()
 	return acceptFirstClick;
 }
 
+
 rgb_color
 ui_color(color_which which)
 {
@@ -1074,8 +1076,7 @@ _fini_interface_kit_()
 //	#pragma mark -
 
 
-/*!
-	\brief private function used by Deskbar to set window decor
+/*!	\brief private function used by Deskbar to set window decor
 	Note, we don't have to be compatible here, and could just change
 	the Deskbar not to use this anymore
 	\param theme The theme to choose
@@ -1097,8 +1098,8 @@ __set_window_decor(int32 theme)
 
 namespace BPrivate {
 
-/*!
-	\brief queries the server for the number of available decorators
+
+/*!	\brief queries the server for the number of available decorators
 	\return the number of available decorators
 */
 int32
@@ -1115,8 +1116,8 @@ count_decorators(void)
 	return count;
 }
 
-/*!
-	\brief queries the server for the index of the current decorators
+
+/*!	\brief queries the server for the index of the current decorators
 	\return the current decorator's index
 
 	If for some bizarre reason this function fails, it returns -1
@@ -1136,9 +1137,7 @@ get_decorator(void)
 }
 
 
-/*!
-	\brief queries the server for the name of the decorator with a certain
-			index
+/*!	\brief queries the server for the name of the decorator with a certain index
 	\param index The index of the decorator to get the name for
 	\param name BString to receive the name of the decorator
 	\return B_OK if successful, B_ERROR if not
@@ -1163,8 +1162,8 @@ get_decorator_name(const int32 &index, BString &name)
 	return B_ERROR;
 }
 
-/*!
-	\brief asks the server to draw a decorator preview into a BBitmap
+
+/*!	\brief asks the server to draw a decorator preview into a BBitmap
 	\param index The index of the decorator to get the name for
 	\param bitmap BBitmap to receive the preview
 	\return B_OK if successful, B_ERROR if not.
@@ -1179,8 +1178,7 @@ get_decorator_preview(const int32 &index, BBitmap *bitmap)
 }
 
 
-/*!
-	\brief Private function which sets the window decorator for the system.
+/*!	\brief Private function which sets the window decorator for the system.
 	\param index Index of the decorator to set
 
 	If the index is invalid, this function and the server do nothing
@@ -1382,8 +1380,9 @@ truncate_end(const char* source, char* dest, uint32 numChars,
 	const float* escapementArray, float width, float ellipsisWidth, float size)
 {
 	float currentWidth = 0.0;
-	ellipsisWidth /= size;	// test if this is as accurate
-	width /= size;			//    as escapementArray * size
+	ellipsisWidth /= size;
+		// test if this is as accurate as escapementArray * size
+	width /= size;
 	uint32 lastFit = 0, c;
 
 	for (c = 0; c < numChars; c++) {
@@ -1472,8 +1471,9 @@ truncate_middle(const char* source, char* dest, uint32 numChars,
 	uint32 left = 0;
 	float leftWidth = 0.0;
 	while (left < numChars && (leftWidth + (escapementArray[left] * size))
-		< mid)
+			< mid) {
 		leftWidth += (escapementArray[left++] * size);
+	}
 
 	if (left == numChars)
 		return false;
@@ -1481,8 +1481,9 @@ truncate_middle(const char* source, char* dest, uint32 numChars,
 	float rightWidth = 0.0;
 	uint32 right = numChars;
 	while (right > left && (rightWidth + (escapementArray[right - 1] * size))
-		< mid)
+			< mid) {
 		rightWidth += (escapementArray[--right] * size);
+	}
 
 	if (left >= right)
 		return false;
@@ -1505,18 +1506,16 @@ truncate_middle(const char* source, char* dest, uint32 numChars,
 	float gap = width - (leftWidth + ellipsisWidth + rightWidth);
 	if (left > numChars - right) {
 		// try right letter first
-		if (optional_char_fits(escapementArray[right - 1], size, gap)) {
+		if (optional_char_fits(escapementArray[right - 1], size, gap))
 			right--;
-		} else if (optional_char_fits(escapementArray[left], size, gap)) {
+		else if (optional_char_fits(escapementArray[left], size, gap))
 			left++;
-		}
 	} else {
 		// try left letter first
-		if (optional_char_fits(escapementArray[left], size, gap)) {
+		if (optional_char_fits(escapementArray[left], size, gap))
 			left++;
-		} else if (optional_char_fits(escapementArray[right - 1], size, gap)) {
+		else if (optional_char_fits(escapementArray[right - 1], size, gap))
 			right--;
-		}
 	}
 
 	// copy characters
@@ -1553,7 +1552,7 @@ truncate_string(const char* string, uint32 mode, float width,
 	float ellipsisWidth, int32 length, int32 numChars)
 {
 	// TODO: that's actually not correct: the string could be smaller than
-	//       ellipsisWidth
+	// ellipsisWidth
 	if (string == NULL /*|| width < ellipsisWidth*/) {
 		// we don't have room for a single glyph
 		strcpy(result, "");
