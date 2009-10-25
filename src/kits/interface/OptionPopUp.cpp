@@ -6,7 +6,7 @@
  *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
  */
 
-
+#include <GroupLayout.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <OptionPopUp.h>
@@ -67,6 +67,10 @@ BOptionPopUp::BOptionPopUp(const char* name, const char* label,
 		BMessage* message, uint32 flags)
 	: BOptionControl(name, label, message, flags)
 {
+	// TODO: Is this really needed ? Without this, the view
+	// doesn't get layoutted properly
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	
 	BPopUpMenu *popUp = new BPopUpMenu(label, true, true);
 	fMenuField = new BMenuField("_menu", label, popUp);
 	AddChild(fMenuField);
@@ -274,35 +278,21 @@ BOptionPopUp::SetEnabled(bool state)
 void
 BOptionPopUp::GetPreferredSize(float* _width, float* _height)
 {
-	// Calculate control's height, looking at the BMenuField font's height
+	float width, height;
+	fMenuField->GetPreferredSize(&width, &height);
+		
 	if (_height != NULL) {
 		font_height fontHeight;
-		fMenuField->GetFontHeight(&fontHeight);
-
-		*_height = fontHeight.ascent + fontHeight.descent
-			+ fontHeight.leading + kHeightModifier;
+		GetFontHeight(&fontHeight);
+		
+		*_height = max_c(height, fontHeight.ascent + fontHeight.descent
+			+ fontHeight.leading + kHeightModifier);
 	}
 
 	if (_width != NULL) {
-		float maxWidth = 0;
-		BMenu *menu = fMenuField->Menu();
-		if (menu == NULL)
-			return;
-
-		// Iterate over all the entries in the control,
-		// and take the maximum width.
-		// TODO: Should we call BMenuField::GetPreferredSize() instead ?
-		int32 numItems = menu->CountItems();	
-		for (int32 i = 0; i < numItems; i++) {
-			BMenuItem *item = menu->ItemAt(i);
-			if (item != NULL) {		
-				float stringWidth = menu->StringWidth(item->Label());
-				maxWidth = max_c(maxWidth, stringWidth);
-			}	
-		}
-
-		maxWidth += fMenuField->StringWidth(BControl::Label()) + kLabelSpace + kWidthModifier;
-		*_width = maxWidth;
+		width += fMenuField->StringWidth(BControl::Label())
+			+ kLabelSpace + kWidthModifier;
+		*_width = width;
 	}
 }
 
@@ -312,9 +302,6 @@ BOptionPopUp::GetPreferredSize(float* _width, float* _height)
 void
 BOptionPopUp::ResizeToPreferred()
 {
-	// TODO: Some more work is needed either here or in GetPreferredSize(),
-	// since the control doesn't always resize as it should.
-	// It looks like if the font height is too big, the control gets "cut".
 	float width, height;
 	GetPreferredSize(&width, &height);
 	ResizeTo(width, height);
