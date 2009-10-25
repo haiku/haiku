@@ -692,13 +692,18 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package P7zip available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
-		Echo "No optional package P7zip available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage p7zip-9.04-r1a1-x86-gcc2-2009-08-30
-			: $(baseURL)/p7zip-9.04-r1a1-x86-gcc2-2009-08-30.zip
-			:
-		;
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage p7zip-9.04-x86-gcc4-2009-10-25
+				: $(baseURL)/p7zip-9.04-x86-gcc4-2009-10-25.zip
+				:
+			;
+		} else {
+			InstallOptionalHaikuImagePackage p7zip-9.04-x86-gcc2-2009-10-25
+				: $(baseURL)/p7zip-9.04-x86-gcc2-2009-10-25.zip
+				:
+			;
+		}
 
 		actions BuildHaikuImageExpanderRules
 		{
