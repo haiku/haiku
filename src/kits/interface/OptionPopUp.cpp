@@ -63,6 +63,16 @@ BOptionPopUp::BOptionPopUp(BRect frame, const char *name, const char *label,
 }
 
 
+BOptionPopUp::BOptionPopUp(const char* name, const char* label,
+		BMessage* message, uint32 flags)
+	: BOptionControl(name, label, message, flags)
+{
+	BPopUpMenu *popUp = new BPopUpMenu(label, true, true);
+	fMenuField = new BMenuField("_menu", label, popUp);
+	AddChild(fMenuField);
+}
+								
+								
 BOptionPopUp::~BOptionPopUp()
 {
 }
