@@ -107,10 +107,11 @@ main(int argc, char **argv)
 				arg.Truncate(i);
 
 				status = entry.SetTo(arg.String());
-				if (status == B_OK && entry.Exists())
+				if (status == B_OK && entry.Exists()) {
 					status = open_file(openWith, entry, line);
-				if (status == B_OK)
-					continue;
+					if (status == B_OK)
+						continue;
+				}
 
 				// get the column
 				col = line;
