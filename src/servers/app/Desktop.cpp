@@ -852,7 +852,7 @@ Desktop::RemoveWorkspacesView(WorkspacesView* view)
 void
 Desktop::SelectWindow(Window* window)
 {
-	if (fSettings->MouseMode() != B_NORMAL_MOUSE) {
+	if (fSettings->MouseMode() == B_CLICK_TO_FOCUS_MOUSE) {
 		// Only bring the window to front when it is not the window under the
 		// mouse pointer. This should result in sensible behaviour.
 		if (window != fWindowUnderMouse
