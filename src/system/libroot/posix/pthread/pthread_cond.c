@@ -82,9 +82,11 @@ cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex, bigtime_t timeout)
 		// Note, this is thread-safe, since another thread would be required to
 		// hold the same mutex.
 		sem_id sem = create_sem(0, "pthread_cond");
-		if (cond->sem < 0)
+		if (sem < 0)
 			return EAGAIN;
-		cond->sem = sem;
+
+		if (atomic_test_and_set((vint32*)&cond->sem, sem, -42) != -42)
+			delete_sem(sem);
 	}
 
 	if (cond->mutex && cond->mutex != mutex)
