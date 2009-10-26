@@ -5080,13 +5080,8 @@ BPoseView::EntryCreated(const node_ref *dirNode, const node_ref *itemNode,
 		// have to node monitor ahead of time because Model will
 		// cache up the file type and preferred app
 	Model *model = new Model(dirNode, itemNode, name, true);
-	
-	if (model->InitCheck() == B_ENTRY_NOT_FOUND) {
-		// might happen if the file was deleted shortly after creation and we
-		// were too busy to create the model in time see #4130
-		delete model;
-		return NULL;
-	} else if (model->InitCheck() != B_OK) {
+
+	if (model->InitCheck() != B_OK) {
 		// if we have trouble setting up model then we stuff it into
 		// a zombie list in a half-alive state until we can properly awaken it
 		PRINT(("2 adding model %s to zombie list, error %s\n", model->Name(),
@@ -5095,17 +5090,28 @@ BPoseView::EntryCreated(const node_ref *dirNode, const node_ref *itemNode,
 		return NULL;
 	}
 
-	// get saved pose info out of attribute
 	PoseInfo poseInfo;
 	ReadPoseInfo(model, &poseInfo);
-	if (!ShouldShowPose(model, &poseInfo)
-		// filter out undesired poses
-		|| (model->IsSymLink() && !CreateSymlinkPoseTarget(model))) {
-		// model is a symlink, cache up the symlink target or scrap
-		// everything if target is invisible
-		fZombieList->AddItem(model);
+
+	// filter out undesired poses
+	if (!ShouldShowPose(model, &poseInfo)) {
+		watch_node(model->NodeRef(), B_STOP_WATCHING, this);
+		delete model;
+		// TODO: take special care for fRefFilter'ed models, don't stop
+		// watching them and add the model to a "FilteredModels" list so that
+		// they can have a second chance of passing the filter on attribute
+		// (name) change. cf. r31307
 		return NULL;
 	}
+
+	// model is a symlink, cache up the symlink target or scrap
+	// everything if target is invisible
+	if (model->IsSymLink() && !CreateSymlinkPoseTarget(model)) {
+		watch_node(model->NodeRef(), B_STOP_WATCHING, this);
+		delete model;
+		return NULL;
+	}
+
 	return CreatePose(model, &poseInfo, true, indexPtr);
 }
 
@@ -5308,27 +5314,16 @@ BPoseView::AttributeChanged(const BMessage *message)
 		if (!attrName || attrHash == PrimarySort() || attrHash == SecondarySort())
 			CheckPoseSortOrder(pose, index);
 	} else {
-		// pose might be in zombie state if we're copying...
+		// we received an attr changed notification for a zombie model, it means
+		// that although we couldn't open the node the first time, it seems
+		// to be fine now since we're receiving notifications about it, it might
+		// be a good time to convert it to a non-zombie state. cf. test in #4130
 		Model *zombie = FindZombie(&itemNode, &index);
 		if (zombie) {
-			if (attrName) {
-				zombie->AttrChanged(attrName);
-				if (strcmp(attrName, kAttrMIMEType) == 0) {
-					zombie->Node()->GetAttrInfo(attrName, &info);
-					struct stat_beos statBeOS;
-					convert_to_stat_beos(zombie->StatBuf(), &statBeOS);
-					if (fRefFilter->Filter(zombie->EntryRef(), zombie->Node(), &statBeOS,
-						zombie->MimeType())) {
-					PRINT(("converting model %s from a zombie\n", zombie->Name()));
-						ConvertZombieToPose(zombie, index);
-					}
-				}
-			} else {
-				zombie->StatChanged();
-			}
+			PRINT(("converting model %s from a zombie\n", zombie->Name()));
+			return ConvertZombieToPose(zombie, index) != NULL;
 		} else {
-			// did not find a pose, probably not entered yet
-			// PRINT(("failed to deliver attr change node monitor - pose not found\n"));
+			PRINT(("model has no pose but is not a zombie either!\n"));
 			return false;
 		}
 	}
