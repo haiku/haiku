@@ -62,7 +62,6 @@ typedef struct usbmidi_device_info
 	struct usbmidi_device_info* next;
 
 	/* maintain device */
-	sem_id sem_cb;
 	sem_id sem_lock;
 	sem_id sem_send;
 	area_id buffer_area;
@@ -77,7 +76,7 @@ typedef struct usbmidi_device_info
 
 	bool active;
 	int open;
-	struct driver_cookie* open_fds;
+	struct driver_cookie* open_fd;
 
 	/* work area for transfer */
 	int usbd_status, bus_status, cmd_status;

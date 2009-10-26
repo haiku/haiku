@@ -3,7 +3,7 @@
  * usb_midi.c
  *
  * Copyright 2006-2009 Haiku Inc.  All rights reserved.
- * Distributed under the terms of the MIT Licence.
+ * Distributed under tthe terms of the MIT Licence.
  *
  * Authors:
  *		Jérôme Duval
@@ -17,10 +17,10 @@
  */
 
 
-/*#define DEBUG 1*/	/* Define this to enable DPRINTF_INFO statements */
+/* #define DEBUG 1 */	/* Define this to enable DPRINTF_INFO statements */
 #include "usb_midi.h"
 
-#include <support/Debug.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -31,7 +31,6 @@
 
 static int midi_device_number = 0;
 const char* midi_base_name = "midi/usb/";
-
 
 usbmidi_device_info* 
 create_device(const usb_device* dev, const usb_interface_info* ii, uint16 ifno)
@@ -52,17 +51,9 @@ create_device(const usb_device* dev, const usb_interface_info* ii, uint16 ifno)
 	if (my_dev == NULL)
 		return NULL;
 
-	my_dev->sem_cb = sem = create_sem(0, DRIVER_NAME "_cb");
-	if (sem < 0) {
-		DPRINTF_ERR((MY_ID "create_sem() failed %d\n", (int)sem));
-		free(my_dev);
-		return NULL;
-	}
-
 	my_dev->sem_lock = sem = create_sem(1, DRIVER_NAME "_lock");
 	if (sem < 0) {
 		DPRINTF_ERR((MY_ID "create_sem() failed %d\n", (int)sem));
-		delete_sem(my_dev->sem_cb);
 		free(my_dev);
 		return NULL;
 	}
@@ -73,7 +64,6 @@ create_device(const usb_device* dev, const usb_interface_info* ii, uint16 ifno)
 		B_PAGE_SIZE, B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (area < 0) {
 		DPRINTF_ERR((MY_ID "create_area() failed %d\n", (int)area));
-		delete_sem(my_dev->sem_cb);
 		delete_sem(my_dev->sem_lock);
 		free(my_dev);
 		return NULL;
@@ -83,7 +73,6 @@ create_device(const usb_device* dev, const usb_interface_info* ii, uint16 ifno)
 	my_dev->sem_send =  sem = create_sem(1, DRIVER_NAME "_send");
 	if (sem < 0) {
 		DPRINTF_ERR((MY_ID "create_sem() failed %d\n", (int)sem));
-		delete_sem(my_dev->sem_cb);
 		delete_sem(my_dev->sem_lock);
 		delete_area(area);
 		free(my_dev);
@@ -92,7 +81,7 @@ create_device(const usb_device* dev, const usb_interface_info* ii, uint16 ifno)
 	{
 		int32 bc;
 		get_sem_count(sem, &bc);
-		DPRINTF_INFO((MY_ID "Allocated %d write buffers\n", bc));
+		DPRINTF_INFO((MY_ID "Allocated %ld write buffers\n", bc));
 	}
 
 
@@ -100,11 +89,12 @@ create_device(const usb_device* dev, const usb_interface_info* ii, uint16 ifno)
 	my_dev->dev = dev;
 	my_dev->ifno = ifno;
 	my_dev->open = 0;
-	my_dev->open_fds = NULL;
+	my_dev->open_fd = NULL;
 	my_dev->active = true;
 	my_dev->flags = 0;
 	my_dev->rbuf = create_ring_buffer(1024);
 	my_dev->buffer_size = B_PAGE_SIZE/2;
+	DPRINTF_INFO((MY_ID "Created device %p\n", my_dev);)
 	  	
 	return my_dev;
 }
@@ -118,21 +108,22 @@ remove_device(usbmidi_device_info* my_dev)
 		delete_ring_buffer(my_dev->rbuf);
 		my_dev->rbuf = NULL;
 	}
+	DPRINTF_INFO((MY_ID "remove_device %p\n", my_dev);)
   
 	delete_area(my_dev->buffer_area);
-	delete_sem(my_dev->sem_cb);
 	delete_sem(my_dev->sem_lock);
 	delete_sem(my_dev->sem_send);
 	free(my_dev);
 }
 
 
-/* driver cookie (per open) */
+/* driver cookie (per open -- but only one open allowed!) */
 
 typedef struct driver_cookie
 {
 	struct driver_cookie	*next;
 	usbmidi_device_info			*my_dev;
+	sem_id sem_cb;
 } driver_cookie;
 
 	
@@ -174,7 +165,7 @@ interpret_midi_buffer(usbmidi_device_info* my_dev)
 		DPRINTF_INFO((MY_ID "received packet %x:%d %x %x %x\n", packet->cin, packet->cn,
 			packet->midi[0], packet->midi[1], packet->midi[2]));
 		ring_buffer_write(my_dev->rbuf, packet->midi, pktlen);
-		release_sem_etc(my_dev->sem_cb, pktlen, B_DO_NOT_RESCHEDULE);
+		release_sem_etc(my_dev->open_fd->sem_cb, pktlen, B_DO_NOT_RESCHEDULE);
 		packet++;
 		bytes_left -= sizeof(usb_midi_event_packet);
 	}
@@ -193,19 +184,23 @@ midi_usb_read_callback(void* cookie, status_t status,
 	usbmidi_device_info* my_dev = cookie;
 
 	assert(cookie != NULL);
-	DPRINTF_INFO((MY_ID "midi_usb_read_callback() -- packet length %d\n", actual_len));
+	DPRINTF_INFO((MY_ID "midi_usb_read_callback() -- packet length %ld\n", actual_len));
 
 	acquire_sem(my_dev->sem_lock);
 	my_dev->actual_length = actual_len;
 	my_dev->bus_status = status;	/* B_USB_STATUS_* */
 	if (status != B_OK) {
 		/* request failed */
-		release_sem(my_dev->sem_lock);
-		DPRINTF_ERR((MY_ID "bus status %d\n", (int)status));
-		if (status == B_CANCELED) {
+		DPRINTF_INFO((MY_ID "bus status %d\n", (int)status)); /* previously DPRINTF_ERR */
+		if (status == B_CANCELED || !my_dev->active) {
 			/* cancelled: device is unplugged */
+			DPRINTF_INFO((MY_ID "midi_usb_read_callback: cancelled (status=%lx active=%d -- deleting sem_cb\n",
+				status, my_dev->active));
+			delete_sem(my_dev->open_fd->sem_cb);	/* done here to ensure read is freed */
+			release_sem(my_dev->sem_lock);
 			return;
 		}
+		release_sem(my_dev->sem_lock);
 	} else {
 		/* got a report */
 #if 0
@@ -244,7 +239,7 @@ midi_usb_write_callback(void* cookie, status_t status,
 #endif
 
 	assert(cookie != NULL);
-	DPRINTF_INFO((MY_ID "midi_usb_write_callback() status %ld length %d  pkt %p cin %x\n",
+	DPRINTF_INFO((MY_ID "midi_usb_write_callback() status %ld length %ld  pkt %p cin %x\n",
 		status, actual_len, pkt, pkt->cin));
 	release_sem(my_dev->sem_send); /* done with buffer */
 }
@@ -266,7 +261,7 @@ usb_midi_added(const usb_device* dev, void** cookie)
 	int alt;
 	
 	assert(dev != NULL && cookie != NULL);
-	DPRINTF_INFO((MY_ID "device_added()\n"));
+	DPRINTF_INFO((MY_ID "usb_midi_added(%p, %p)\n", dev, cookie));
 
 	dev_desc = usb->get_device_descriptor(dev);
 
@@ -348,7 +343,7 @@ got_one:
 	add_device_info(my_dev);
 
 	*cookie = my_dev;
-	DPRINTF_INFO((MY_ID "added %s\n", my_dev->name));
+	DPRINTF_INFO((MY_ID "usb_midi_added: added %s\n", my_dev->name));
 
 	return B_OK;
 }
@@ -361,16 +356,19 @@ usb_midi_removed(void* cookie)
 
 	assert(cookie != NULL);
 
-	DPRINTF_INFO((MY_ID "device_removed(%s)\n", my_dev->name));
+	DPRINTF_INFO((MY_ID "usb_midi_removed(%s)\n", my_dev->name));
+	acquire_sem(usbmidi_device_list_lock);	/* convenient mutex for safety */
+	my_dev->active = false;
+	if (my_dev->open_fd) {
+		my_dev->open_fd->my_dev = NULL;
+		delete_sem(my_dev->open_fd->sem_cb);	/* done here to ensure read is freed */
+	}
+	release_sem(usbmidi_device_list_lock);
 	usb->cancel_queued_transfers(my_dev->ept_in->handle);
 	usb->cancel_queued_transfers(my_dev->ept_out->handle);
+	DPRINTF_INFO((MY_ID "usb_midi_removed: removing info & device: %s\n", my_dev->name));
 	remove_device_info(my_dev);
-	if (my_dev->open == 0) {
-		remove_device(my_dev);
-	} else {
-		DPRINTF_INFO((MY_ID "%s still open\n", my_dev->name));
-		my_dev->active = false;
-	}
+	remove_device(my_dev);
 	return B_OK;
 }
 
@@ -400,22 +398,30 @@ usb_midi_open(const char* name, uint32 flags,
 
 	assert(name != NULL);
 	assert(out_cookie != NULL);
-	DPRINTF_INFO((MY_ID "open(%s)\n", name));
+	DPRINTF_INFO((MY_ID "usb_midi_open(%s)\n", name));
 
 	if ((my_dev = search_device_info(name)) == NULL)
 		return B_ENTRY_NOT_FOUND;
+	if (my_dev->open_fd != NULL)
+		return B_BUSY;	/* there can only be one open channel to the device */
 	if ((cookie = malloc(sizeof(driver_cookie))) == NULL)
 		return B_NO_MEMORY;
 
-	acquire_sem(my_dev->sem_lock);
+	cookie->sem_cb = create_sem(0, DRIVER_NAME "_cb");
+	if (cookie->sem_cb < 0) {
+		DPRINTF_ERR((MY_ID "create_sem() failed %d\n", (int)cookie->sem_cb));
+		free(cookie);
+		return B_ERROR;
+	}
+
+	acquire_sem(usbmidi_device_list_lock);	/* use global mutex now */
 	cookie->my_dev = my_dev;
-	cookie->next = my_dev->open_fds;
-	my_dev->open_fds = cookie;
+	my_dev->open_fd = cookie;
 	my_dev->open++;
-	release_sem(my_dev->sem_lock);
+	release_sem(usbmidi_device_list_lock);
 
 	*out_cookie = cookie;
-	DPRINTF_INFO((MY_ID "device %s open (%d)\n", name, my_dev->open));
+	DPRINTF_INFO((MY_ID "usb_midi_open: device %s open (%d)\n", name, my_dev->open));
 	return B_OK;
 }
 
@@ -433,22 +439,35 @@ usb_midi_read(driver_cookie* cookie, off_t position,
 
 	assert(cookie != NULL);
 	my_dev = cookie->my_dev;
-	assert(my_dev != NULL);
 	
-	if (!my_dev->active)
-		return B_ERROR;		/* already unplugged */
+	if (!my_dev || !my_dev->active)
+		return B_ERROR;	/* already unplugged */
 		
-	DPRINTF_INFO((MY_ID "MIDI read (%d byte buffer at %ld cookie %p)\n",
+	DPRINTF_INFO((MY_ID "usb_midi_read: (%ld byte buffer at %ld cookie %p)\n",
 		*num_bytes, (int32)position, cookie));
-	err = acquire_sem_etc(my_dev->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
-	if (err != B_OK)
-		return err;
-	acquire_sem(my_dev->sem_lock);
-	ring_buffer_user_read(my_dev->rbuf, buf, 1);
-	release_sem(my_dev->sem_lock);
-	*num_bytes = 1;
-	DPRINTF_INFO((MY_ID "read byte %x -- cookie %p)\n", *(uint8*)buf, cookie));
-	return err;
+	while (my_dev && my_dev->active) {
+		DPRINTF_INFOZ((MY_ID "waiting on acquire_sem_etc\n");)
+		err = acquire_sem_etc(cookie->sem_cb, 1,
+			 B_RELATIVE_TIMEOUT, 1000000);
+		if (err == B_TIMED_OUT) {
+			DPRINTF_INFOZ((MY_ID "acquire_sem_etc timed out\n");)
+			continue;	/* see if we're still active */
+		}
+		if (err != B_OK) {
+			*num_bytes = 0;
+			DPRINTF_INFO((MY_ID "acquire_sem_etc aborted\n");)
+			break;
+		}
+		DPRINTF_INFO((MY_ID "reading from ringbuffer\n");)
+		acquire_sem(my_dev->sem_lock);
+		ring_buffer_user_read(my_dev->rbuf, buf, 1);
+		release_sem(my_dev->sem_lock);
+		*num_bytes = 1;
+		DPRINTF_INFO((MY_ID "read byte %x -- cookie %p)\n", *(uint8*)buf, cookie));
+		return B_OK;
+	}
+	DPRINTF_INFO((MY_ID "usb_midi_read: loop terminated -- Device no longer active\n");)
+	return B_CANCELED;
 }
 
 
@@ -491,14 +510,13 @@ usb_midi_write(driver_cookie* cookie, off_t position,
 
 	assert(cookie != NULL);
 	my_dev = cookie->my_dev;
-	assert(my_dev != NULL);
 
-	if (!my_dev->active)
+	if (!my_dev || !my_dev->active)
 		return B_ERROR;		/* already unplugged */
 		
 	buff_lim = my_dev->buffer_size * 3 / 4;	/* max MIDI bytes buffer space */
 	
-	DPRINTF_INFO((MY_ID "MIDI write (%d bytes at %ld)\n", *num_bytes, position));
+	DPRINTF_INFO((MY_ID "MIDI write (%ld bytes at %Ld)\n", *num_bytes, position));
 	if (*num_bytes > 3 && midicode != 0xF0) {
 		DPRINTF_ERR((MY_ID "Non-SysEx packet of %ld bytes -- too big to handle\n",
 			*num_bytes));
@@ -563,26 +581,20 @@ usb_midi_close(driver_cookie* cookie)
 {
 	usbmidi_device_info* my_dev;
 
-	assert(cookie != NULL && cookie->my_dev != NULL);
+	assert(cookie != NULL);
+	delete_sem(cookie->sem_cb);
 	my_dev = cookie->my_dev;
-	DPRINTF_INFO((MY_ID "close(%s)\n", my_dev->name));
+	DPRINTF_INFO((MY_ID "usb_midi_close(%p device=%p)\n", cookie, my_dev));
 
-	/* detach the cookie from list */
 
-	acquire_sem(my_dev->sem_lock);
-	if (my_dev->open_fds == cookie)
-		my_dev->open_fds = cookie->next;
-	else {
-		driver_cookie* p;
-		for (p = my_dev->open_fds; p != NULL; p = p->next) {
-			if (p->next == cookie) {
-				p->next = cookie->next;
-				break;
-			}
-		}
+	acquire_sem(usbmidi_device_list_lock);
+	if (my_dev) {
+		/* detach the cookie from device */
+		my_dev->open_fd = NULL;
+		--my_dev->open;
 	}
-	--my_dev->open;
-	release_sem(my_dev->sem_lock);
+	release_sem(usbmidi_device_list_lock);
+	DPRINTF_INFO((MY_ID "usb_midi_close: complete\n");)
 
 	return B_OK;
 }
@@ -598,17 +610,11 @@ usb_midi_free(driver_cookie* cookie)
 {
 	usbmidi_device_info* my_dev;
 
-	assert(cookie != NULL && cookie->my_dev != NULL);
+	assert(cookie != NULL);
 	my_dev = cookie->my_dev;
-	DPRINTF_INFO((MY_ID "free(%s)\n", my_dev->name));
+	DPRINTF_INFO((MY_ID "usb_midi_free(%p device=%p)\n", cookie, my_dev));
 
 	free(cookie);
-	if (my_dev->open > 0)
-		DPRINTF_INFO((MY_ID "%d opens left\n", my_dev->open));
-	else if (!my_dev->active) {
-		DPRINTF_INFO((MY_ID "removed %s\n", my_dev->name));
-		remove_device(my_dev);
-	}
 
 	return B_OK;
 }
@@ -683,6 +689,7 @@ uninit_driver(void)
 	delete_sem(usbmidi_device_list_lock);
 	put_module(B_USB_MODULE_NAME);
 	free_device_names();
+	DPRINTF_INFO((MY_ID "uninit complete\n"));
 }
 
 

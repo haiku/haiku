@@ -8,7 +8,6 @@
  *		Philippe Houdoin
  */
 
-
 #include "debug.h"
 #include "DeviceWatcher.h"
 #include "PortDrivers.h"
@@ -32,8 +31,8 @@ using namespace BPrivate;
 using BPrivate::HashMap;
 using BPrivate::HashString;
 
+
 const char *kDevicesRoot = "/dev/midi";
-// const char *kDevicesRoot = "/Data/tmp";
 
 
 class DeviceEndpoints {
@@ -185,12 +184,13 @@ DeviceWatcher::_AddDevice(const char* path)
 
 	if (fDeviceEndpointsMap.ContainsKey(path)) {
 		// Already known
+		TRACE(("already known...!\n"));
 		return;
 	}
 		
 	BEntry entry(path);
 	if (entry.IsDirectory())
-		// Invalid path !
+		// Invalid path!
 		return;
 		
 	if (entry.IsSymLink()) {
@@ -203,8 +203,11 @@ DeviceWatcher::_AddDevice(const char* path)
 
 	int fd = open(path, O_RDWR | O_EXCL);
 	if (fd < 0)
-		return;	
+		return;
+		
 	
+	TRACE(("Doing _AddDevice(\"%s\"); fd=%d\n", path, fd));
+
 	MidiPortConsumer* consumer = new MidiPortConsumer(fd, path);
 	_SetIcons(consumer);
 	TRACE(("Register %s MidiPortConsumer\n", consumer->Name()));
@@ -217,6 +220,7 @@ DeviceWatcher::_AddDevice(const char* path)
 
 	DeviceEndpoints* deviceEndpoints = new DeviceEndpoints(fd, consumer, producer);
 	fDeviceEndpointsMap.Put(path, deviceEndpoints);	
+	TRACE(("Done _AddDevice(\"%s\")\n", path));
 }
 
 
@@ -226,18 +230,23 @@ DeviceWatcher::_RemoveDevice(const char* path)
 	TRACE(("DeviceWatcher::_RemoveDevice(\"%s\");\n", path));
 		
 	DeviceEndpoints* deviceEndpoints = fDeviceEndpointsMap.Get(path);
-	if (!deviceEndpoints)
+	if (!deviceEndpoints) {
+		TRACE(("_RemoveDevice(\"%s\") didn't find endpoint in map!!\n", path));
 		return;
+	}
 		
-	close(deviceEndpoints->fFD);
 
+	TRACE((" _RemoveDevice(\"%s\") unregistering\n", path));
 	deviceEndpoints->fConsumer->Unregister();
 	deviceEndpoints->fProducer->Unregister();
 
+	TRACE((" _RemoveDevice(\"%s\") releasing\n", path));
 	deviceEndpoints->fConsumer->Release();
 	deviceEndpoints->fProducer->Release();
 
+	TRACE((" _RemoveDevice(\"%s\") removing from map\n", path));
 	fDeviceEndpointsMap.Remove(path);
+	TRACE(("Done _RemoveDevice(\"%s\")\n", path));
 }
 
 

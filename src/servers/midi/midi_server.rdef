@@ -10,7 +10,7 @@ resource app_version {
 	variety    = B_APPV_ALPHA,
 	internal   = 0,
 	short_info = "midi_server",
-	long_info  = "midi_server ©2002-2006 Haiku"
+	long_info  = "midi_server ©2002-2009 Haiku"
 };
 
 resource vector_icon array {

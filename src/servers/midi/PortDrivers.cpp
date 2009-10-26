@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include <String.h>
 
@@ -90,7 +91,10 @@ MidiPortProducer::GetData()
 
 	while (fKeepRunning) {
 		if (read(fFileDescriptor, &next, 1) != 1) {
-			perror("Error reading data from driver");
+			if (errno == B_CANCELED) 
+				fKeepRunning = false;
+			else 
+				perror("Error reading data from driver");
 			break;
 		}
 
@@ -234,5 +238,5 @@ MidiPortProducer::GetData()
 	if (haveSysEx)
 		free(sysexBuf);
 
-	return fKeepRunning ? B_ERROR : B_OK;
+	return fKeepRunning ? errno : B_OK;
 }
