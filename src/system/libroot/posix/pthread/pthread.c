@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2006, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -48,7 +48,7 @@ pthread_destroy_thread(void *data)
 
 	__pthread_key_call_destructors(thread);
 
-	if (atomic_or(&thread->flags, THREAD_DEAD) & THREAD_DETACHED)
+	if ((atomic_or(&thread->flags, THREAD_DEAD) & THREAD_DETACHED) != 0)
 		free(thread);
 }
 
@@ -80,16 +80,19 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 	struct thread_creation_attributes attributes;
 
 	if (_thread == NULL)
-		return B_BAD_VALUE;
+		return EINVAL;
 
 	if (_attr == NULL)
 		attr = &pthread_attr_default;
-	else
+	else {
 		attr = *_attr;
+		if (attr == NULL)
+			return EINVAL;
+	}
 
 	thread = (pthread_thread *)malloc(sizeof(pthread_thread));
 	if (thread == NULL)
-		return B_WOULD_BLOCK;
+		return EAGAIN;
 
 	thread->entry = startRoutine;
 	thread->entry_argument = arg;
@@ -118,9 +121,9 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 
 	thread->id = _kern_spawn_thread(&attributes);
 	if (thread->id < 0) {
-		// stupid error code (EAGAIN) but demanded by POSIX
+		// stupid error code but demanded by POSIX
 		free(thread);
-		return B_WOULD_BLOCK;
+		return EAGAIN;
 	}
 
 	resume_thread(thread->id);
@@ -163,7 +166,7 @@ pthread_join(pthread_t thread, void **_value)
 	if (_value != NULL)
 		*_value = thread->exit_value;
 
-	if (atomic_or(&thread->flags, THREAD_DETACHED) & THREAD_DEAD)
+	if ((atomic_or(&thread->flags, THREAD_DETACHED) & THREAD_DEAD) != 0)
 		free(thread);
 
 	return error;
@@ -181,17 +184,22 @@ pthread_exit(void *value)
 int
 pthread_kill(pthread_t thread, int sig)
 {
-	status_t err =  kill(thread->id, sig);
-	if (err == B_BAD_THREAD_ID)
-		return ESRCH;
-	return err;
+	status_t status = send_signal(thread->id, (uint)sig);
+	if (status != B_OK) {
+		if (status == B_BAD_THREAD_ID)
+			status = ESRCH;
+
+		return status;
+	}
+
+	return 0;
 }
 
 
 int
 pthread_detach(pthread_t thread)
 {
-	if (atomic_or(&thread->flags, THREAD_DETACHED) & THREAD_DEAD)
+	if ((atomic_or(&thread->flags, THREAD_DETACHED) & THREAD_DEAD) != 0)
 		free(thread);
 
 	return 0;
