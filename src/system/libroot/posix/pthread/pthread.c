@@ -64,7 +64,7 @@ pthread_thread_entry(thread_func _unused, void *_thread)
 	on_exit_thread(pthread_destroy_thread, NULL);
 
 	pthread_exit(thread->entry(thread->entry_argument));
-	return B_OK;
+	return 0;
 }
 
 
@@ -129,7 +129,7 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 	resume_thread(thread->id);
 	*_thread = thread;
 
-	return B_OK;
+	return 0;
 }
 
 
@@ -155,6 +155,7 @@ pthread_equal(pthread_t t1, pthread_t t2)
 	return t1 != NULL && t2 != NULL && t1 == t2;
 }
 
+
 int
 pthread_join(pthread_t thread, void **_value)
 {
@@ -169,7 +170,7 @@ pthread_join(pthread_t thread, void **_value)
 	if ((atomic_or(&thread->flags, THREAD_DETACHED) & THREAD_DEAD) != 0)
 		free(thread);
 
-	return error;
+	return B_TO_POSIX_ERROR(error);
 }
 
 
@@ -187,9 +188,9 @@ pthread_kill(pthread_t thread, int sig)
 	status_t status = send_signal(thread->id, (uint)sig);
 	if (status != B_OK) {
 		if (status == B_BAD_THREAD_ID)
-			status = ESRCH;
+			return ESRCH;
 
-		return status;
+		return B_TO_POSIX_ERROR(status);
 	}
 
 	return 0;
@@ -199,7 +200,16 @@ pthread_kill(pthread_t thread, int sig)
 int
 pthread_detach(pthread_t thread)
 {
-	if ((atomic_or(&thread->flags, THREAD_DETACHED) & THREAD_DEAD) != 0)
+	int32 flags;
+
+	if (thread == NULL)
+		return EINVAL;
+
+	flags = atomic_or(&thread->flags, THREAD_DETACHED);
+	if ((flags & THREAD_DETACHED) != 0)
+		return 0;
+
+	if ((flags & THREAD_DEAD) != 0)
 		free(thread);
 
 	return 0;
