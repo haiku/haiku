@@ -269,5 +269,7 @@ SettingsView::UpdateFromSettings()
 	
 	fAcceptFirstClickBox->SetValue(fSettings.AcceptFirstClick()
 		? B_CONTROL_ON : B_CONTROL_OFF);
+	fAcceptFirstClickBox->SetEnabled(fSettings.MouseMode()
+		!= B_FOCUS_FOLLOWS_MOUSE);
 }
 
