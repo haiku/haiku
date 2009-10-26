@@ -80,7 +80,7 @@ struct sem_entry {
 									// count + acquisition count of all blocked
 									// threads
 			char*				name;
-			team_id				owner;
+			struct team*		owner;
 			select_info*		select_infos;
 			thread_id			last_acquirer;
 #if DEBUG_SEM_LAST_ACQUIRER
@@ -102,7 +102,7 @@ struct sem_entry {
 	ThreadQueue			queue;	// should be in u.used, but has a constructor
 };
 
-static const int32 kMaxSemaphores = 131072;
+static const int32 kMaxSemaphores = 65536;
 static int32 sMaxSems = 4096;
 	// Final value is computed based on the amount of available memory
 static int32 sUsedSems = 0;
@@ -120,9 +120,9 @@ static spinlock sSemsSpinlock = B_SPINLOCK_INITIALIZER;
 
 
 static int
-dump_sem_list(int argc, char **argv)
+dump_sem_list(int argc, char** argv)
 {
-	const char *name = NULL;
+	const char* name = NULL;
 	team_id owner = -1;
 	thread_id last = -1;
 	int32 i;
@@ -140,17 +140,19 @@ dump_sem_list(int argc, char **argv)
 	kprintf("sem            id count   team   last  name\n");
 
 	for (i = 0; i < sMaxSems; i++) {
-		struct sem_entry *sem = &sSems[i];
+		struct sem_entry* sem = &sSems[i];
 		if (sem->id < 0
 			|| (last != -1 && sem->u.used.last_acquirer != last)
 			|| (name != NULL && strstr(sem->u.used.name, name) == NULL)
-			|| (owner != -1 && sem->u.used.owner != owner))
+			|| (owner != -1
+				&& (sem->u.used.owner == NULL
+					|| sem->u.used.owner->id != owner)))
 			continue;
 
 		kprintf("%p %6ld %5ld %6ld "
 			"%6ld "
 			" %s\n", sem, sem->id, sem->u.used.count,
-			sem->u.used.owner,
+			sem->u.used.owner != NULL ? sem->u.used.owner->id : -1,
 			sem->u.used.last_acquirer > 0 ? sem->u.used.last_acquirer : 0,
 			sem->u.used.name);
 	}
@@ -160,13 +162,14 @@ dump_sem_list(int argc, char **argv)
 
 
 static void
-dump_sem(struct sem_entry *sem)
+dump_sem(struct sem_entry* sem)
 {
 	kprintf("SEM: %p\n", sem);
 	kprintf("id:      %ld (%#lx)\n", sem->id, sem->id);
 	if (sem->id >= 0) {
 		kprintf("name:    '%s'\n", sem->u.used.name);
-		kprintf("owner:   %ld\n", sem->u.used.owner);
+		kprintf("owner:   %ld\n",
+			sem->u.used.owner != NULL ? sem->u.used.owner->id : -1);
 		kprintf("count:   %ld\n", sem->u.used.count);
 		kprintf("queue:  ");
 		if (!sem->queue.IsEmpty()) {
@@ -179,13 +182,14 @@ dump_sem(struct sem_entry *sem)
 
 		set_debug_variable("_sem", (addr_t)sem);
 		set_debug_variable("_semID", sem->id);
-		set_debug_variable("_owner", sem->u.used.owner);
+		set_debug_variable("_owner",
+			sem->u.used.owner != NULL ? sem->u.used.owner->id : -1);
 
 #if DEBUG_SEM_LAST_ACQUIRER
-		kprintf("last acquired by: %ld, count: %ld\n", sem->u.used.last_acquirer,
-			sem->u.used.last_acquire_count);
-		kprintf("last released by: %ld, count: %ld\n", sem->u.used.last_releaser,
-			sem->u.used.last_release_count);
+		kprintf("last acquired by: %ld, count: %ld\n",
+			sem->u.used.last_acquirer, sem->u.used.last_acquire_count);
+		kprintf("last released by: %ld, count: %ld\n",
+			sem->u.used.last_releaser, sem->u.used.last_release_count);
 
 		if (sem->u.used.last_releaser != 0)
 			set_debug_variable("_releaser", sem->u.used.last_releaser);
@@ -199,7 +203,6 @@ dump_sem(struct sem_entry *sem)
 			set_debug_variable("_acquirer", sem->u.used.last_acquirer);
 		else
 			unset_debug_variable("_acquirer");
-
 	} else {
 		kprintf("next:    %p\n", sem->u.unused.next);
 		kprintf("next_id: %ld\n", sem->u.unused.next_id);
@@ -294,7 +297,7 @@ static void
 fill_sem_info(struct sem_entry* sem, sem_info* info, size_t size)
 {
 	info->sem = sem->id;
-	info->team = sem->u.used.owner;
+	info->team = sem->u.used.owner != NULL ? sem->u.used.owner->id : -1;
 	strlcpy(info->name, sem->u.used.name, sizeof(info->name));
 	info->count = sem->u.used.count;
 	info->latest_holder = sem->u.used.last_acquirer;
@@ -360,7 +363,7 @@ delete_sem_internal(sem_id id, bool checkPermission)
 	}
 
 	if (checkPermission
-		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
+		&& sSems[slot].u.used.owner == team_get_kernel_team()) {
 		RELEASE_SEM_LOCK(sSems[slot]);
 		RELEASE_TEAM_LOCK();
 		restore_interrupts(state);
@@ -369,11 +372,11 @@ delete_sem_internal(sem_id id, bool checkPermission)
 		return B_NOT_ALLOWED;
 	}
 
-	struct team* team = team_get_team_struct_locked(sSems[slot].u.used.owner);
-	if (team != NULL)
+	if (sSems[slot].u.used.owner != NULL) {
 		list_remove_link(&sSems[slot].u.used.team_link);
-	else
-		panic("team %ld missing", sSems[slot].u.used.owner);
+		sSems[slot].u.used.owner = NULL;
+	} else
+		panic("sem %ld has no owner", id);
 
 	RELEASE_TEAM_LOCK();
 
@@ -402,8 +405,7 @@ haiku_sem_init(kernel_args *args)
 	// compute maximal number of semaphores depending on the available memory
 	// 128 MB -> 16384 semaphores, 448 kB fixed array size
 	// 256 MB -> 32768, 896 kB
-	// 512 MB -> 65536, 1.75 MB
-	// 1024 MB and more -> 131072, 3.5 MB
+	// 512 MB and more-> 65536, 1.75 MB
 	i = vm_page_num_pages() / 2;
 	while (sMaxSems < i && sMaxSems < kMaxSemaphores)
 		sMaxSems <<= 1;
@@ -477,11 +479,15 @@ create_sem_etc(int32 count, const char* name, team_id owner)
 	strlcpy(tempName, name, nameLength);
 
 	struct team* team = NULL;
+	if (owner == team_get_kernel_team_id())
+		team = team_get_kernel_team();
+	else if (owner == team_get_current_team_id())
+		team = thread_get_current_thread()->team;
+
 	bool teamsLocked = false;
 	state = disable_interrupts();
 
-	if (owner != team_get_kernel_team_id()
-		&& owner == team_get_current_team_id()) {
+	if (team == NULL) {
 		// We need to hold the team lock to make sure this one exists (and
 		// won't go away.
 		GRAB_TEAM_LOCK();
@@ -512,7 +518,7 @@ create_sem_etc(int32 count, const char* name, team_id owner)
 		sem->u.used.net_count = count;
 		new(&sem->queue) ThreadQueue;
 		sem->u.used.name = tempName;
-		sem->u.used.owner = owner;
+		sem->u.used.owner = team;
 		sem->u.used.select_infos = NULL;
 		id = sem->id;
 
@@ -540,12 +546,8 @@ create_sem_etc(int32 count, const char* name, team_id owner)
 		GRAB_TEAM_LOCK();
 		GRAB_SEM_LOCK(sSems[slot]);
 
-		if (owner == team_get_kernel_team_id())
-			team = team_get_kernel_team();
-		else
-			team = thread_get_current_thread()->team;
-
 		list_add_item(&team->sem_list, &sem->u.used.team_link);
+
 		RELEASE_SEM_LOCK(sSems[slot]);
 		teamsLocked = true;
 	}
@@ -580,7 +582,7 @@ select_sem(int32 id, struct select_info* info, bool kernel)
 		// bad sem ID
 		error = B_BAD_SEM_ID;
 	} else if (!kernel
-		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
+		&& sSems[slot].u.used.owner == team_get_kernel_team()) {
 		// kernel semaphore, but call from userland
 		error = B_NOT_ALLOWED;
 	} else {
@@ -799,7 +801,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 	// TODO: the B_CHECK_PERMISSION flag should be made private, as it
 	//	doesn't have any use outside the kernel
 	if ((flags & B_CHECK_PERMISSION) != 0
-		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
+		&& sSems[slot].u.used.owner == team_get_kernel_team()) {
 		dprintf("thread %ld tried to acquire kernel semaphore %ld.\n",
 			thread_get_current_thread_id(), id);
 		status = B_NOT_ALLOWED;
@@ -948,7 +950,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	// ToDo: the B_CHECK_PERMISSION flag should be made private, as it
 	//	doesn't have any use outside the kernel
 	if ((flags & B_CHECK_PERMISSION) != 0
-		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
+		&& sSems[slot].u.used.owner == team_get_kernel_team()) {
 		dprintf("thread %ld tried to release kernel semaphore.\n",
 			thread_get_current_thread_id());
 		return B_NOT_ALLOWED;
@@ -1100,54 +1102,68 @@ _get_sem_info(sem_id id, struct sem_info *info, size_t size)
 
 /*!	Called by the get_next_sem_info() macro. */
 status_t
-_get_next_sem_info(team_id team, int32 *_cookie, struct sem_info *info,
+_get_next_sem_info(team_id teamID, int32 *_cookie, struct sem_info *info,
 	size_t size)
 {
-	int state;
-	int slot;
-	bool found = false;
-
 	if (!sSemsActive)
 		return B_NO_MORE_SEMS;
 	if (_cookie == NULL || info == NULL || size != sizeof(sem_info))
 		return B_BAD_VALUE;
-
-	if (team == B_CURRENT_TEAM)
-		team = team_get_current_team_id();
-	/* prevents sSems[].owner == -1 >= means owned by a port */
-	if (team < 0 || !team_is_valid(team))
+	if (teamID < 0)
 		return B_BAD_TEAM_ID;
 
-	slot = *_cookie;
-	if (slot >= sMaxSems)
-		return B_BAD_VALUE;
+	InterruptsSpinLocker locker(gTeamSpinlock);
 
-	state = disable_interrupts();
-	GRAB_SEM_LIST_LOCK();
+	struct team* team;
+	if (teamID == B_CURRENT_TEAM)
+		team = thread_get_current_thread()->team;
+	else
+		team = team_get_team_struct_locked(teamID);
 
-	while (slot < sMaxSems) {
-		if (sSems[slot].id != -1 && sSems[slot].u.used.owner == team) {
-			GRAB_SEM_LOCK(sSems[slot]);
-			if (sSems[slot].id != -1 && sSems[slot].u.used.owner == team) {
-				// found one!
-				fill_sem_info(&sSems[slot], info, size);
+	if (team == NULL)
+		return B_BAD_TEAM_ID;
 
-				RELEASE_SEM_LOCK(sSems[slot]);
-				slot++;
-				found = true;
-				break;
-			}
-			RELEASE_SEM_LOCK(sSems[slot]);
-		}
-		slot++;
+	int32 id = *_cookie;
+	sem_entry* sem = NULL;
+
+	if (id != 0) {
+		// shortcut to the first entry
+		sem = &sSems[id % sMaxSems];
+		GRAB_SEM_LOCK(*sem);
+
+		// Check if the semaphore got deleted or reused in the mean time
+		if (sem->id != id)
+			sem = NULL;
+
+		RELEASE_SEM_LOCK(*sem);
 	}
-	RELEASE_SEM_LIST_LOCK();
-	restore_interrupts(state);
+	if (sem == NULL)
+		sem = (sem_entry*)list_get_first_item(&team->sem_list);
+
+	bool found = false;
+
+	while (!found) {
+		// find the next entry to be returned
+		while (sem != NULL && id >= sem->id)
+			sem = (sem_entry*)list_get_next_item(&team->sem_list, sem);
+
+		if (sem == NULL)
+			return B_BAD_VALUE;
+
+		GRAB_SEM_LOCK(*sem);
+		if (sem->id != -1 && sem->u.used.owner == team) {
+			// found one!
+			fill_sem_info(sem, info, size);
+			id = sem->id;
+			found = true;
+		}
+		RELEASE_SEM_LOCK(*sem);
+	}
 
 	if (!found)
 		return B_BAD_VALUE;
 
-	*_cookie = slot;
+	*_cookie = id;
 	return B_OK;
 }
 
@@ -1180,7 +1196,7 @@ set_sem_owner(sem_id id, team_id newTeamID)
 	list_remove_link(&sSems[slot].u.used.team_link);
 	list_add_item(&newTeam->sem_list, &sSems[slot].u.used.team_link);
 
-	sSems[slot].u.used.owner = newTeamID;
+	sSems[slot].u.used.owner = newTeam;
 	return B_OK;
 }
 
