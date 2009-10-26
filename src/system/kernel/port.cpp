@@ -1380,9 +1380,9 @@ error:
 
 
 status_t
-set_port_owner(port_id id, team_id team)
+set_port_owner(port_id id, team_id newTeamID)
 {
-	TRACE(("set_port_owner(id = %ld, team = %ld)\n", id, team));
+	TRACE(("set_port_owner(id = %ld, team = %ld)\n", id, newTeamID));
 
 	if (id < 0)
 		return B_BAD_PORT_ID;
@@ -1395,16 +1395,21 @@ set_port_owner(port_id id, team_id team)
 		TRACE(("set_port_owner: invalid port_id %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
-	if (!team_is_valid(team)) {
-		T(OwnerChange(sPorts[slot], team, B_BAD_TEAM_ID));
+
+	InterruptsSpinLocker teamLocker(gTeamSpinlock);
+
+	struct team* team = team_get_team_struct_locked(newTeamID);
+	if (team == NULL) {
+		T(OwnerChange(sPorts[slot], newTeamID, B_BAD_TEAM_ID));
 		return B_BAD_TEAM_ID;
 	}
 
-	T(OwnerChange(sPorts[slot], team, B_OK));
-
 	// transfer ownership to other team
-	sPorts[slot].owner = team;
+	list_remove_link(&sPorts[slot].team_link);
+	list_add_item(&team->port_list, &sPorts[slot].team_link);
+	sPorts[slot].owner = newTeamID;
 
+	T(OwnerChange(sPorts[slot], newTeamID, B_OK));
 	return B_OK;
 }
 
