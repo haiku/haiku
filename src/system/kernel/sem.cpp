@@ -373,7 +373,7 @@ delete_sem_internal(sem_id id, bool checkPermission)
 	if (team != NULL)
 		list_remove_link(&sSems[slot].u.used.team_link);
 	else
-		panic("team missing");
+		panic("team %ld missing", sSems[slot].u.used.owner);
 
 	RELEASE_TEAM_LOCK();
 
@@ -689,16 +689,18 @@ remove_thread_from_sem(queued_thread *entry, struct sem_entry *sem)
 void
 sem_delete_owned_sems(struct team* team)
 {
-	while (true) {
+	struct list queue;
+
+	{
+		InterruptsSpinLocker locker(gTeamSpinlock);
+		list_move_to_list(&team->sem_list, &queue);
+	}
+
+	while (sem_entry* sem = (sem_entry*)list_remove_head_item(&queue)) {
 		char* name;
 
 		{
-			InterruptsSpinLocker locker(gTeamSpinlock);
-
-			sem_entry* sem = (sem_entry*)list_remove_head_item(&team->sem_list);
-			if (sem == NULL)
-				break;
-
+			InterruptsLocker locker;
 			GRAB_SEM_LOCK(*sem);
 			uninit_sem_locked(*sem, &name);
 		}
