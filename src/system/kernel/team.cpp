@@ -7,7 +7,9 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 /*!	Team functions */
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -798,6 +800,7 @@ create_team_struct(const char *name, bool kernel)
 	team->job_control_entry->team = team;
 
 	list_init(&team->sem_list);
+	list_init(&team->port_list);
 	list_init(&team->image_list);
 	list_init(&team->watcher_list);
 
@@ -1392,7 +1395,7 @@ exec_team(const char *path, char**& _flatArgs, size_t flatArgsSize,
 	delete_team_user_data(team);
 	vm_delete_areas(team->address_space);
 	xsi_sem_undo(team);
-	delete_owned_ports(team->id);
+	delete_owned_ports(team);
 	sem_delete_owned_sems(team);
 	remove_images(team);
 	vfs_exec_io_context(team->io_context);
@@ -2463,7 +2466,7 @@ team_delete_team(struct team *team)
 	vfs_put_io_context(team->io_context);
 	delete_realtime_sem_context(team->realtime_sem_context);
 	xsi_sem_undo(team);
-	delete_owned_ports(teamID);
+	delete_owned_ports(team);
 	sem_delete_owned_sems(team);
 	remove_images(team);
 	vm_delete_address_space(team->address_space);

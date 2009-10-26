@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 status_t port_init(struct kernel_args *args);
-int delete_owned_ports(team_id owner);
+void delete_owned_ports(struct team* team);
 int32 port_max_ports(void);
 int32 port_used_ports(void);
 
@@ -41,11 +41,8 @@ status_t deselect_port(int32 object, struct select_info *info, bool kernel);
 
 // currently private API
 status_t writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
-			size_t vecCount, size_t bufferSize, uint32 flags,
-			bigtime_t timeout);
-
-// temp: test
-void port_test(void);
+				size_t vecCount, size_t bufferSize, uint32 flags,
+				bigtime_t timeout);
 
 // user syscalls
 port_id		_user_create_port(int32 queueLength, const char *name);

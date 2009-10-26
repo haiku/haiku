@@ -52,6 +52,7 @@ struct port_message : DoublyLinkedListLinkImpl<port_message> {
 typedef DoublyLinkedList<port_message> MessageList;
 
 struct port_entry {
+	struct list_link	team_link;
 	port_id				id;
 	team_id				owner;
 	int32		 		capacity;
@@ -563,38 +564,52 @@ copy_port_message(port_message* message, int32* _code, void* buffer,
 }
 
 
+static void
+uninit_port_locked(struct port_entry& port)
+{
+	int32 id = port.id;
+
+	// mark port as invalid
+	port.id = -1;
+	free((char*)port.lock.name);
+	port.lock.name = NULL;
+
+	while (port_message* message = port.messages.RemoveHead()) {
+		put_port_message(message);
+	}
+
+	notify_port_select_events(id % sMaxPorts, B_EVENT_INVALID);
+	port.select_infos = NULL;
+
+	// Release the threads that were blocking on this port.
+	// read_port() will see the B_BAD_PORT_ID return value, and act accordingly
+	port.read_condition.NotifyAll(B_BAD_PORT_ID);
+	port.write_condition.NotifyAll(B_BAD_PORT_ID);
+	sNotificationService.Notify(PORT_REMOVED, id);
+}
+
+
 //	#pragma mark - private kernel API
 
 
-/*! This function cycles through the ports table, deleting all
-	the ports that are owned by the passed team_id
+/*! This function delets all the ports that are owned by the passed team.
 */
-int
-delete_owned_ports(team_id owner)
+void
+delete_owned_ports(struct team* team)
 {
-	// TODO: investigate maintaining a list of ports in the team
-	//	to make this simpler and more efficient.
+	TRACE(("delete_owned_ports(owner = %ld)\n", team->id));
 
-	TRACE(("delete_owned_ports(owner = %ld)\n", owner));
+	struct list queue;
 
-	MutexLocker locker(sPortsLock);
-
-	int32 count = 0;
-
-	for (int32 i = 0; i < sMaxPorts; i++) {
-		if (sPorts[i].id != -1 && sPorts[i].owner == owner) {
-			port_id id = sPorts[i].id;
-
-			locker.Unlock();
-
-			delete_port(id);
-			count++;
-
-			locker.Lock();
-		}
+	{
+		InterruptsSpinLocker locker(gTeamSpinlock);
+		list_move_to_list(&team->port_list, &queue);
 	}
 
-	return count;
+	while (port_entry* port = (port_entry*)list_remove_head_item(&queue)) {
+		MutexLocker locker(port->lock);
+		uninit_port_locked(*port);
+	}
 }
 
 
@@ -693,6 +708,10 @@ create_port(int32 queueLength, const char* name)
 	if (queueLength < 1 || queueLength > MAX_QUEUE_LENGTH)
 		return B_BAD_VALUE;
 
+	struct team* team = thread_get_current_thread()->team;
+	if (team == NULL)
+		return B_BAD_TEAM_ID;
+
 	MutexLocker locker(sPortsLock);
 
 	// check early on if there are any free port slots to use
@@ -729,6 +748,11 @@ create_port(int32 queueLength, const char* name)
 			sPorts[i].write_count = queueLength;
 			sPorts[i].total_count = 0;
 			sPorts[i].select_infos = NULL;
+
+			{
+				InterruptsSpinLocker teamLocker(gTeamSpinlock);
+				list_add_item(&team->port_list, &sPorts[i].team_link);
+			}
 
 			port_id id = sPorts[i].id;
 
@@ -800,23 +824,12 @@ delete_port(port_id id)
 
 	T(Delete(sPorts[slot]));
 
-	// mark port as invalid
-	sPorts[slot].id	= -1;
-	free((char*)sPorts[slot].lock.name);
-	sPorts[slot].lock.name = NULL;
-
-	while (port_message* message = sPorts[slot].messages.RemoveHead()) {
-		put_port_message(message);
+	{
+		InterruptsSpinLocker teamLocker(gTeamSpinlock);
+		list_remove_link(&sPorts[slot].team_link);
 	}
 
-	notify_port_select_events(slot, B_EVENT_INVALID);
-	sPorts[slot].select_infos = NULL;
-
-	// Release the threads that were blocking on this port.
-	// read_port() will see the B_BAD_PORT_ID return value, and act accordingly
-	sPorts[slot].read_condition.NotifyAll(B_BAD_PORT_ID);
-	sPorts[slot].write_condition.NotifyAll(B_BAD_PORT_ID);
-	sNotificationService.Notify(PORT_REMOVED, id);
+	uninit_port_locked(sPorts[slot]);
 
 	locker.Unlock();
 

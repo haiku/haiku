@@ -194,6 +194,7 @@ struct team {
 	struct list		image_list;
 	struct list		watcher_list;
 	struct list		sem_list;
+	struct list		port_list;
 	struct arch_team arch_info;
 
 	addr_t			user_data;
