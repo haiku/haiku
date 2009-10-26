@@ -229,13 +229,13 @@ extern int pthread_attr_getscope(const pthread_attr_t *attr,
 	int *contentionScope);
 extern int pthread_attr_setscope(pthread_attr_t *attr, int contentionScope);
 
-#if 0	/* Unimplemented attribute functions: */
-
 /* mandatory! */
 extern int pthread_attr_getschedparam(const pthread_attr_t *attr,
 	struct sched_param *param);
 extern int pthread_attr_setschedparam(pthread_attr_t *attr,
 	const struct sched_param *param);
+
+#if 0   /* Unimplemented attribute functions: */
 
 /* [TPS] */
 extern int pthread_attr_getinheritsched(const pthread_attr_t *attr,

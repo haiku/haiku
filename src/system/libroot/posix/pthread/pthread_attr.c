@@ -13,7 +13,6 @@
 
 #include <thread_defs.h>
 
-
 int
 pthread_attr_init(pthread_attr_t *_attr)
 {
@@ -134,3 +133,26 @@ pthread_attr_setscope(pthread_attr_t *attr, int contentionScope)
 
 	return 0;
 }
+
+int 
+pthread_attr_setschedparam(pthread_attr_t *attr, const struct sched_param *param)
+{
+        if (attr == NULL || param == NULL)
+                return EINVAL;
+
+	(*attr)->sched_priority = param->sched_priority;
+
+	return 0;
+}
+
+int
+pthread_attr_getschedparam(const pthread_attr_t *attr, struct sched_param *param)
+{
+        if (attr == NULL || param == NULL)
+                return EINVAL;
+
+        param->sched_priority = (*attr)->sched_priority;
+
+        return 0;
+}
+
