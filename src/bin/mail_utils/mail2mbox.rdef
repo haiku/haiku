@@ -3,7 +3,7 @@
 
 resource app_flags B_SINGLE_LAUNCH | B_ARGV_ONLY;
 
-resource app_signature "application/x-vnd.agmsmith.bemailtombox";
+resource app_signature "application/x-vnd.Haiku-mail2mbox";
 
 resource app_version {
 	major  = 1,
