@@ -157,7 +157,7 @@ ACPI_MODULE_NAME("Haiku ACPI Module")
 		dprintf("acpi[%ld]: %s\n", find_thread(NULL), __PRETTY_FUNCTION__);
 #	define DEBUG_FUNCTION_F(x, y...) \
 		dprintf("acpi[%ld]: %s(" x ")\n", find_thread(NULL), __PRETTY_FUNCTION__, y);
-#	if DEBUG_OSHAIKU = 1
+#	if DEBUG_OSHAIKU == 1
 // No verbose debugging, do nothing
 #		define DEBUG_FUNCTION_V()
 #		define DEBUG_FUNCTION_VF(x, y...)
@@ -243,7 +243,6 @@ AcpiOsGetRootPointer()
 		if (status == AE_OK)
 			sACPIRoot = address;
 	}
-	dprintf("AcpiOsGetRootPointer returning %p\n", (void *)sACPIRoot);
 	return sACPIRoot;
 #else
 	return AeLocalGetRootPointer();
@@ -445,14 +444,14 @@ AcpiOsMapMemory(ACPI_PHYSICAL_ADDRESS where, ACPI_SIZE length)
 #ifdef _KERNEL_MODE
 	void *there;
 	area_id area = map_physical_memory("acpi_physical_mem_area", (void *)where,
-		length, B_ANY_KERNEL_ADDRESS, 0, &there);
+		length, B_ANY_KERNEL_BLOCK_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &there);
+
 	DEBUG_FUNCTION_F("addr: 0x%08lx; length: %lu; mapped: %p; area: %ld",
 		(addr_t)where, (size_t)length, there, area);
 	if (area < 0) {
 		dprintf("ACPI: cannot map memory at 0x%08x, length %d\n", where, length);
 		return NULL;
 	}
-
 	return there;
 #else
 	return NULL;
@@ -611,7 +610,8 @@ AcpiOsWaitSemaphore(ACPI_SEMAPHORE handle, UINT32 units, UINT16 timeout)
 				break;
 		}		
 	}
-	DEBUG_FUNCTION_VF("result: %lu", (uint32)result);
+	DEBUG_FUNCTION_VF("sem: %ld; count: %lu; timeout: %u result: %lu",
+		handle, units, timeout, (uint32)result);
     return result;
 }
 
@@ -890,22 +890,19 @@ ACPI_STATUS
 AcpiOsReadPciConfiguration(ACPI_PCI_ID *pciId, UINT32 reg, void *value,
 		UINT32 width)
 {
+	uint32 *val;
+	val = value;
 #ifdef _KERNEL_MODE
-	UINT32 val = gPCIManager->read_pci_config(
-		pciId->Bus, pciId->Device, pciId->Function, reg, width / 8);
 	DEBUG_FUNCTION();
+
 	switch (width) {
 		case 8:
-			*(UINT8 *) value = val;
-			break;
 		case 16:
-			*(UINT16 *) value = val;
-			break;
 		case 32:
-			*(UINT32 *) value = val;
+			*val = gPCIManager->read_pci_config(
+				pciId->Bus, pciId->Device, pciId->Function, reg, width / 8);
 			break;
 		default:
-			dprintf("AcpiOsReadPciConfiguration unhandled width: %u\n", width);
 			return AE_ERROR;
 	}
 	return AE_OK;
@@ -983,7 +980,6 @@ AcpiOsReadPort(ACPI_IO_ADDRESS address, UINT32 *value, UINT32 width)
 			break;
 
 		default:
-			dprintf("AcpiOsReadPort: unhandeld width: %u\n", width);
 			return AE_ERROR;
 	}
 
@@ -1027,7 +1023,6 @@ AcpiOsWritePort(ACPI_IO_ADDRESS address, UINT32 value, UINT32 width)
 			break;
 
 		default:
-			dprintf("AcpiOsWritePort: unhandeld width: %u\n", width);
 			return AE_ERROR;
 	}
 
@@ -1107,11 +1102,19 @@ AcpiOsWriteMemory(ACPI_PHYSICAL_ADDRESS address, UINT32 value, UINT32 width)
  *
  *****************************************************************************/
 BOOLEAN
-AcpiOsReadable(void *pointer, ACPI_SIZE Length)
+AcpiOsReadable(void *pointer, ACPI_SIZE length)
 {
-	//TODO: Look if this is really ok.
+	area_id id;
+	area_info info;
 	DEBUG_FUNCTION_F("addr: %p; length: %lu", pointer, (size_t)length);
-    return TRUE;
+	
+	id = area_for(pointer);
+	if (id == B_ERROR)
+		return false;
+	if (get_area_info(id, &info) != B_OK)
+		return false;
+	return info.protection & B_KERNEL_READ_AREA &&
+		(pointer + length) <= (info.address + info.ram_size);
 }
 
 
@@ -1130,9 +1133,17 @@ AcpiOsReadable(void *pointer, ACPI_SIZE Length)
 BOOLEAN
 AcpiOsWritable(void *pointer, ACPI_SIZE length)
 {
-	//TODO: Look if this is really ok.
+	area_id id;
+	area_info info;
 	DEBUG_FUNCTION_F("addr: %p; length: %lu", pointer, (size_t)length);
-    return TRUE;
+
+	id = area_for(pointer);
+	if (id == B_ERROR)
+		return false;
+	if (get_area_info(id, &info) != B_OK)
+		return false;
+	return info.protection & (B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA) && 
+		(pointer + length) <= (info.address + info.ram_size);
 }
 
 
@@ -1154,12 +1165,11 @@ ACPI_THREAD_ID
 AcpiOsGetThreadId()
 {
 	thread_id thread = find_thread(NULL);
-	return thread;
 
-	//TODO: Look if this is needed.
+	//TODO: Handle if thread_id is 0.
 	// ACPI treats a 0 return as an error,
 	// but we are thread 0 in early boot
-	//return thread == 0 ? 1 : thread;
+	return thread == 0 ? 1 : thread;
 }
 
 
@@ -1179,6 +1189,7 @@ ACPI_STATUS
 AcpiOsSignal(UINT32 function, void *info)
 {
 	DEBUG_FUNCTION();
+
 	switch (function) {
 		case ACPI_SIGNAL_FATAL:
 #ifdef _KERNEL_MODE
@@ -1194,4 +1205,57 @@ AcpiOsSignal(UINT32 function, void *info)
 	}
 
 	return AE_OK;
+}
+
+/*
+ * Adapted from FreeBSD since the documentation of its intended impl
+ * is lacking.
+ *  Section 5.2.10.1: global lock acquire/release functions */
+#define GL_ACQUIRED     (-1)
+#define GL_BUSY         0
+#define GL_BIT_PENDING  0x01
+#define GL_BIT_OWNED    0x02
+#define GL_BIT_MASK     (GL_BIT_PENDING | GL_BIT_OWNED)
+
+/*
+ * Adapted from FreeBSD since the documentation of its intended impl
+ * is lacking.
+ * Acquire the global lock.  If busy, set the pending bit.  The caller
+ * will wait for notification from the BIOS that the lock is available
+ * and then attempt to acquire it again.
+ */
+int
+AcpiOsAcquireGlobalLock(uint32 *lock)
+{
+	uint32 new;
+	uint32 old;
+
+	do {
+		old = *lock;
+		new = ((old & ~GL_BIT_MASK) | GL_BIT_OWNED) |
+				((old >> 1) & GL_BIT_PENDING);
+		atomic_test_and_set(lock, new, old);		
+	} while (*lock == old);
+	return ((new < GL_BIT_MASK) ? GL_ACQUIRED : GL_BUSY);
+}
+
+/*
+ * Adapted from FreeBSD since the documentation of its intended impl
+ * is lacking.
+ * Release the global lock, returning whether there is a waiter pending.
+ * If the BIOS set the pending bit, OSPM must notify the BIOS when it
+ * releases the lock.
+ */
+int
+AcpiOsReleaseGlobalLock(uint32 *lock)
+{
+	uint32 new;
+	uint32 old;
+
+	do {
+		old = *lock;
+		new = old & ~GL_BIT_MASK;
+		atomic_test_and_set(lock, new, old);
+	} while (*lock == old);
+	return (old & GL_BIT_PENDING);
 }

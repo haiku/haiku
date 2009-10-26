@@ -160,37 +160,16 @@
 
 #define ACPI_FLUSH_CPU_CACHE() __asm __volatile("wbinvd");
 
-#define	ACPI_ACQUIRE_GLOBAL_LOCK(GLptr, Acq) \
-do { \
-	__asm __volatile( \
-	"1:	movl %1,%%eax		;" \
-	"	movl %%eax,%%edx	;" \
-	"	andl %2,%%edx		;" \
-	"	btsl $0x1,%%edx		;" \
-	"	adcl $0x0,%%edx		;" \
-	"	lock			;" \
-	"	cmpxchgl %%edx,%1	;" \
-	"	jnz 1b			;" \
-	"	andb $0x3,%%dl		;" \
-	"	cmpb $0x3,%%dl		;" \
-	"	sbbl %%eax,%%eax	;" \
-	: "=&a" (Acq), "+m" (*GLptr) \
-	: "i" (~1L) \
-	: "edx"); \
+/* Based on FreeBSD's due to lack of documentation */
+extern int AcpiOsAcquireGlobalLock(uint32 *lock);
+extern int AcpiOsReleaseGlobalLock(uint32 *lock);
+
+#define ACPI_ACQUIRE_GLOBAL_LOCK(GLptr, Acq)    do {                    \
+        (Acq) = AcpiOsAcquireGlobalLock(&((GLptr)->GlobalLock));       \
 } while (0)
 
-#define ACPI_RELEASE_GLOBAL_LOCK(GLptr, Acq) \
-do { \
-	__asm __volatile( \
-	"1:	movl %1,%%eax		;" \
-	"	andl %2,%%edx		;" \
-	"	lock			;" \
-	"	cmpxchgl %%edx,%1	;" \
-	"	jnz 1b			;" \
-	"	andl $0x1,%%eax		;" \
-	: "=&a" (Acq), "+m" (*GLptr) \
-	: "i" (~3L) \
-	: "edx"); \
+#define ACPI_RELEASE_GLOBAL_LOCK(GLptr, Acq)    do {                    \
+        (Acq) = AcpiOsReleaseGlobalLock(&((GLptr)->GlobalLock));       \
 } while (0)
 
 #else /* _KERNEL_MODE */
