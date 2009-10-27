@@ -1,0 +1,22 @@
+1	Russian	x-vnd-Haiku-Keymap	3527348353
+Select Dead Keys	Keymap window		Выбор мертвых клавиш
+Tilde Trigger	Keymap window		Тильда
+Grave Trigger	Keymap window		Апостроф
+Quit	Keymap window		Выйти
+Circumflex Trigger	Keymap window		Циркумфлекс
+Open…	Keymap window		Открыть…
+System:	Keymap window		Системные:
+Diaeresis Trigger	Keymap window		Диерезис
+User:	Keymap window		Пользовательские:
+Sample and Clipboard:	Keymap window		Выборка и буфер обмена:
+Keymap	Keymap window		Keymap
+Switch Shortcut Keys	Keymap window		Переключение сочетания клавиш
+Switch Shortcut Keys To Windows/Linux Mode	Keymap window		Переключение сочетания клавиш для Windows/Linux режима
+Layout	Keymap window		Макет
+Revert	Keymap window		Вернуть
+Save As…	Keymap window		Сохранить как…
+Switch Shortcut Keys To Haiku Mode	Keymap window		Переключение сочетания клавиш в Haiku режим
+File	Keymap window		Файл
+(Current)	Keymap window		(Текущий)
+Font	Keymap window		Шрифт
+Acute Trigger	Keymap window		Аксант эгю
