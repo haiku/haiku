@@ -496,9 +496,7 @@ FT_BEGIN_HEADER
   /*   Do not #undef this macro here, since the build system might         */
   /*   define it for certain configurations only.                          */
   /*                                                                       */
-#if HAIKU_INCLUDE_PATENTED_CODE
-#	define TT_CONFIG_OPTION_BYTECODE_INTERPRETER
-#endif
+#define TT_CONFIG_OPTION_BYTECODE_INTERPRETER
 
   /*************************************************************************/
   /*                                                                       */
