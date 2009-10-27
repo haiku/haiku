@@ -4,7 +4,7 @@
 
 	Other authors for MGA driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-5/2006
+	Rudolf Cornelissen 9/2002-10/2009
 */
 
 #include <string.h>
@@ -18,35 +18,42 @@
 #define MODE_FLAGS 0
 #define MODE_COUNT (sizeof (mode_list) / sizeof (display_mode))
 
-/*some monitors only handle a fixed set of modes*/
-#include "valid_mode_list"
-
-/*Standard VESA modes*/
+/* Standard VESA modes,
+ * plus panel specific resolution modes which are internally modified during run-time depending on the requirements of the actual
+ * panel connected. The modes as listed here, should timing-wise be as compatible with analog (CRT) monitors as can be... */
+//fixme: if EDID monitor found create list via common EDID code...
 static const display_mode mode_list[] = {
+/* 4:3 modes; 307.2k pixels */
 { { 25175, 640, 656, 752, 800, 480, 490, 492, 525, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(640X480X8.Z1) */
 { { 27500, 640, 672, 768, 864, 480, 488, 494, 530, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* 640X480X60Hz */
 { { 30500, 640, 672, 768, 864, 480, 517, 523, 588, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* SVGA_640X480X60HzNI */
 { { 31500, 640, 664, 704, 832, 480, 489, 492, 520, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70-72Hz_(640X480X8.Z1) */
 { { 31500, 640, 656, 720, 840, 480, 481, 484, 500, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(640X480X8.Z1) */
 { { 36000, 640, 696, 752, 832, 480, 481, 484, 509, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(640X480X8.Z1) */
+/* 4:3 modes; 480k pixels */
 { { 36000, 800, 824, 896, 1024, 600, 601, 603, 625, 0}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@56Hz_(800X600) from Be, Inc. driver + XFree86 */
 { { 38100, 800, 832, 960, 1088, 600, 602, 606, 620, 0}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* SVGA_800X600X56HzNI */
 { { 40000, 800, 840, 968, 1056, 600, 601, 605, 628, T_POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(800X600X8.Z1) + XFree86 */
 { { 49500, 800, 816, 896, 1056, 600, 601, 604, 625, T_POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(800X600X8.Z1) + XFree86 */
 { { 50000, 800, 856, 976, 1040, 600, 637, 643, 666, T_POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70-72Hz_(800X600X8.Z1) + XFree86 */
 { { 56250, 800, 832, 896, 1048, 600, 601, 604, 631, T_POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(800X600X8.Z1) + XFree86 */
+/* 4:3 modes; 786.432k pixels */
 { { 65000, 1024, 1048, 1184, 1344, 768, 771, 777, 806, 0}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1024X768X8.Z1) + XFree86 */
 { { 75000, 1024, 1048, 1184, 1328, 768, 771, 777, 806, 0}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70-72Hz_(1024X768X8.Z1) + XFree86 */
 { { 78750, 1024, 1040, 1136, 1312, 768, 769, 772, 800, T_POSITIVE_SYNC}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1024X768X8.Z1) + XFree86 */
 { { 94500, 1024, 1072, 1168, 1376, 768, 769, 772, 808, T_POSITIVE_SYNC}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1024X768X8.Z1) + XFree86 */
+/* 4:3 modes; 995.328k pixels */
 { { 94200, 1152, 1184, 1280, 1472, 864, 865, 868, 914, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70Hz_(1152X864X8.Z1) */
 { { 97800, 1152, 1216, 1344, 1552, 864, 865, 868, 900, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70Hz_(1152X864X8.Z1) */
 { { 108000, 1152, 1216, 1344, 1600, 864, 865, 868, 900, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1152X864X8.Z1) + XFree86 */
 { { 121500, 1152, 1216, 1344, 1568, 864, 865, 868, 911, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1152X864X8.Z1) */
+/* 5:4 modes; 1.311M pixels */
 { { 108000, 1280, 1328, 1440, 1688, 1024, 1025, 1028, 1066, T_POSITIVE_SYNC}, B_CMAP8, 1280, 1024, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X1024) from Be, Inc. driver + XFree86 */
 { { 135000, 1280, 1296, 1440, 1688, 1024, 1025, 1028, 1066, T_POSITIVE_SYNC}, B_CMAP8, 1280, 1024, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1280X1024X8.Z1) + XFree86 */
 { { 157500, 1280, 1344, 1504, 1728, 1024, 1025, 1028, 1072, T_POSITIVE_SYNC}, B_CMAP8, 1280, 1024, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1280X1024X8.Z1) + XFree86 */
+/* 4:3 panel mode; 1.47M pixels */
 { { 122600, 1400, 1488, 1640, 1880, 1050, 1051, 1054, 1087, T_POSITIVE_SYNC}, B_CMAP8, 1400, 1050, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1400X1050) */
+/* 4:3 modes; 1.92M pixels */
 { { 162000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1600X1200X8.Z1) + XFree86 */
 /* identical lines to above one, apart from refreshrate.. */
 { { 175500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@65Hz_(1600X1200X8.Z1) + XFree86 */
@@ -55,14 +62,39 @@ static const display_mode mode_list[] = {
 { { 216000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@80Hz_(1600X1200X8.Z1) */
 { { 229500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS},  /* Vesa_Monitor_@85Hz_(1600X1200X8.Z1) + XFree86 */
 /* end identical lines. */
-{ { 147100, 1680, 1784, 1968, 2256, 1050, 1051, 1054, 1087, T_POSITIVE_SYNC}, B_CMAP8, 1680, 1050, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1680X1050) */
+/* 4:3 modes; 2.408M pixels */
 { { 204750, 1792, 1920, 2120, 2448, 1344, 1345, 1348, 1394, B_POSITIVE_VSYNC}, B_CMAP8, 1792, 1344, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1792X1344) from Be, Inc. driver + XFree86 */
 { { 261000, 1792, 1888, 2104, 2456, 1344, 1345, 1348, 1417, B_POSITIVE_VSYNC}, B_CMAP8, 1792, 1344, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1792X1344) from Be, Inc. driver + XFree86 */
+/* 4:3 modes; 2.584M pixels */
 { { 218250, 1856, 1952, 2176, 2528, 1392, 1393, 1396, 1439, B_POSITIVE_VSYNC}, B_CMAP8, 1856, 1392, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1856X1392) from Be, Inc. driver + XFree86 */
 { { 288000, 1856, 1984, 2208, 2560, 1392, 1393, 1396, 1500, B_POSITIVE_VSYNC}, B_CMAP8, 1856, 1392, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1856X1392) from Be, Inc. driver + XFree86 */
+/* 4:3 modes; 2.765M pixels */
 { { 234000, 1920, 2048, 2256, 2600, 1440, 1441, 1444, 1500, B_POSITIVE_VSYNC}, B_CMAP8, 1920, 1440, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1440) from Be, Inc. driver + XFree86 */
 { { 297000, 1920, 2064, 2288, 2640, 1440, 1441, 1444, 1500, B_POSITIVE_VSYNC}, B_CMAP8, 1920, 1440, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1920X1440) from Be, Inc. driver + XFree86 */
+/* 4:3 modes; 3.146M pixels */
 { { 266950, 2048, 2200, 2424, 2800, 1536, 1537, 1540, 1589, B_POSITIVE_VSYNC}, B_CMAP8, 2048, 1536, 0, 0, MODE_FLAGS}, /* From XFree86 posting @60Hz + XFree86 */
+/* 16:10 panel mode; 400k pixels */
+{ { 31300, 800, 848, 928, 1008, 500, 501, 504, 518, T_POSITIVE_SYNC}, B_CMAP8, 800, 500, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(800X500) */
+/* 16:10 panel mode; 655.36k pixels */
+{ { 52800, 1024, 1072, 1176, 1328, 640, 641, 644, 663, T_POSITIVE_SYNC}, B_CMAP8, 1024, 640, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1024X640) */
+/* 16:10 panel-TV mode; 983.04k pixels */
+{ { 80135, 1280, 1344, 1480, 1680, 768, 769, 772, 795, T_POSITIVE_SYNC}, B_CMAP8, 1280, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X768) */
+/* 16:10 panel mode; 1.024M pixels */
+{ { 83500, 1280, 1344, 1480, 1680, 800, 801, 804, 828, T_POSITIVE_SYNC}, B_CMAP8, 1280, 800, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X800) */
+/* 16:10 panel mode; 1.296M pixels */
+{ { 106500, 1440, 1520, 1672, 1904, 900, 901, 904, 932, T_POSITIVE_SYNC}, B_CMAP8, 1440, 900, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1440X900) */
+/* 16:10 panel mode; 1.764M pixels */
+{ { 147100, 1680, 1784, 1968, 2256, 1050, 1051, 1054, 1087, T_POSITIVE_SYNC}, B_CMAP8, 1680, 1050, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1680X1050) */
+/* 16:10 panel mode; 2.304M pixels */
+{ { 193160, 1920, 2048, 2256, 2592, 1200, 1201, 1204, 1242, T_POSITIVE_SYNC}, B_CMAP8, 1920, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1200) */
+//{ { 160000, 1920, 2010, 2060, 2110, 1200, 1202, 1208, 1235, T_POSITIVE_SYNC}, B_CMAP8, 1920, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1200) */
+/* 16:9 panel mode; 1280x720 (HDTV 1280x720p) */
+{ { 74520, 1280, 1368, 1424, 1656, 720, 724, 730, 750, T_POSITIVE_SYNC}, B_CMAP8, 1280, 720, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X720) */
+/* 16:9 panel mode; 1366x768 (HDTV '1280x720p')
+   note: horizontal CRTC timing must be a multiple of 8! (hardware restriction) */
+{ { 85500, 1368, 1440, 1576, 1792, 768, 771, 774, 798, T_POSITIVE_SYNC}, B_CMAP8, 1368, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1366X768) */
+/* 16:9 panel mode; 1920x1080 (HDTV 1920x1080p) */
+{ { 148500, 1920, 2008, 2052, 2200, 1080, 1084, 1089, 1125, T_POSITIVE_SYNC}, B_CMAP8, 1920, 1080, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1080) */
 };
 
 /*
@@ -103,62 +135,6 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 
 	LOG(1, ("PROPOSEMODE: (ENTER) requested virtual_width %d, virtual_height %d\n",
 									target->virtual_width, target->virtual_height));
-
-	/*check valid list:
-		if (VALID_REQUIRED is set)
-		{
-			if (find modes with same size)
-			{
-				pick one with nearest pixel clock
-			}
-			else
-			{
-				pick next largest with nearest pixel clock and modify visible portion as far as possible
-			}
-		}
-	*/
-	#ifdef VALID_MODE_REQUIRED
-	{
-		int i;
-		int closest_mode_ptr;
-		uint32 closest_mode_clock;
-
-		LOG(1, ("PROPOSEMODE: valid mode required!\n"));
-
-		closest_mode_ptr = 0xbad;
-		closest_mode_clock = 0;
-		for (i=0;i<VALID_MODES;i++)
-		{
-			/*check size is ok and clock is better than any found before*/
-			if(
-				target->timing.h_display==valid_mode_list[i].h_display &&
-				target->timing.v_display==valid_mode_list[i].v_display
-			)
-			{
-				if (
-					abs(valid_mode_list[i].pixel_clock-target->timing.pixel_clock)<
-					abs(closest_mode_clock-target->timing.pixel_clock)
-				)
-				{
-					closest_mode_clock=valid_mode_list[i].pixel_clock;
-					closest_mode_ptr=i;
-				}
-			}
-		}
-
-		if (closest_mode_ptr==0xbad)/*if no modes of correct size*/
-		{
-			LOG(4, ("PROPOSEMODE: no valid mode found, aborted.\n"));
-			return B_ERROR;
-		}
-		else
-		{
-			target->timing=valid_mode_list[closest_mode_ptr];
-			target_refresh = ((double)target->timing.pixel_clock * 1000.0) /  /*I require this refresh*/
-			((double)target->timing.h_total * (double)target->timing.v_total);
-		}
-	}	
-	#endif
 
 	/* check colorspace versus requested dualhead mode */
 	switch (target->space)
