@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Colin Günther, coling@gmx.de
+ * Copyright 2009 Colin Günther, coling@gmx.de
  * All Rights Reserved. Distributed under the terms of the MIT License.
  */
 
@@ -29,7 +29,7 @@ status_t
 init_condition_variables()
 {
 	sConditionVariableCache = create_object_cache("condition variables",
-			sizeof (ConditionVariable), 0, NULL, NULL, NULL);
+		sizeof (ConditionVariable), 0, NULL, NULL, NULL);
 	if (sConditionVariableCache == NULL)
 		return B_NO_MEMORY;
 
@@ -49,8 +49,8 @@ uninit_condition_variables()
 void
 _cv_init(struct cv* conditionVariable, const char* description)
 {
-	conditionVariable->condVar =
-			(ConditionVariable*)object_cache_alloc(sConditionVariableCache, 0);
+	conditionVariable->condVar
+		= (ConditionVariable*)object_cache_alloc(sConditionVariableCache, 0);
 	conditionVariable->condVar->Init(NULL, description);
 }
 

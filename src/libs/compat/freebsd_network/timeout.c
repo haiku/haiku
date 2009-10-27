@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Colin Günther, coling@gmx.de.
+ * Copyright 2009, Colin Günther, coling@gmx.de
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */

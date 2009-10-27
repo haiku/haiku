@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Colin Günther, coling@gmx.de
+ * Copyright 2009 Colin Günther, coling@gmx.de
  * All Rights Reserved. Distributed under the terms of the MIT License.
  */
 #ifndef UNIT_H_
@@ -21,12 +21,10 @@ struct unrhdr {
 extern "C" {
 #endif
 
-
 status_t _new_unrhdr_buffer(struct unrhdr*, uint32);
 void _delete_unrhdr_buffer_locked(struct unrhdr*);
 int _alloc_unr_locked(struct unrhdr*);
 void _free_unr_locked(struct unrhdr*, u_int);
-
 
 #ifdef __cplusplus
 }

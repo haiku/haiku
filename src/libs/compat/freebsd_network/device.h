@@ -67,8 +67,8 @@ void uninit_taskqueues(void);
 status_t init_condition_variables(void);
 void uninit_condition_variables(void);
 
-status_t init_clock(void);
-void uninit_clock(void);
+status_t init_hard_clock(void);
+void uninit_hard_clock(void);
 
 device_t find_root_device(int);
 

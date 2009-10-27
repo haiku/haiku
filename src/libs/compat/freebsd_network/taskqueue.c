@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Colin Günther, coling@gmx.de.
+ * Copyright 2009, Colin Günther, coling@gmx.de
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -16,9 +16,9 @@
 #include <compat/sys/haiku-module.h>
 
 
-#define	TQ_FLAGS_ACTIVE		(1 << 0)
-#define	TQ_FLAGS_BLOCKED	(1 << 1)
-#define	TQ_FLAGS_PENDING	(1 << 2)
+#define TQ_FLAGS_ACTIVE		(1 << 0)
+#define TQ_FLAGS_BLOCKED	(1 << 1)
+#define TQ_FLAGS_PENDING	(1 << 2)
 
 
 struct taskqueue {

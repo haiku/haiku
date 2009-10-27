@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Colin Günther, coling@gmx.de
+ * Copyright 2009 Colin Günther, coling@gmx.de
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -9,7 +9,7 @@
 #include <compat/sys/sleepqueue.h>
 
 
-#define	ticks_to_msecs(t)	(1000 * (t) / hz)
+#define ticks_to_msecs(t) (1000 * (t) / hz)
 
 
 int
