@@ -25,6 +25,7 @@ public:
 
 	bool Lock();
 	void Unlock();
+	void DestroyLock();
 private:
 	ring_buffer *fBuffer;
 	sem_id fLock;
@@ -141,23 +142,22 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 		written = 0;
 		RingBuffer &ringBuffer = *device->buffer;
 		size_t toWrite = strlen(output);
-		if (toWrite > 0) {
-			strlcat(output, "\n", sizeof(output));
-			toWrite++;
-			if (ringBuffer.Lock()) {
-				if (ringBuffer.WritableAmount() < toWrite) {
-					if (!make_space(device, toWrite)) {
-						panic("couldn't make space");
-						exit_thread(0);
-					}
-				}
+		
+		if (toWrite <= 0)
+			break;
 
-				written = ringBuffer.Write(output, toWrite);
-				ringBuffer.Unlock();
-			}
+		strlcat(output, "\n", sizeof(output));
+		toWrite++;
+		if (!ringBuffer.Lock()) 
+			break;
 
-			dump_acpi_namespace(device, result, indenting + 1);
-		}
+		if (ringBuffer.WritableAmount() < toWrite &&
+			!make_space(device, toWrite))
+			break;
+
+		written = ringBuffer.Write(output, toWrite);
+		ringBuffer.Unlock();
+		dump_acpi_namespace(device, result, indenting + 1);
 	}
 }
 
@@ -288,14 +288,15 @@ acpi_namespace_control(void* cookie, uint32 op, void* arg, size_t len)
 static status_t
 acpi_namespace_close(void* cookie)
 {
+	status_t status;
 	acpi_ns_device_info *device = (acpi_ns_device_info *)cookie;
 	dprintf("acpi_ns_dump: device_close\n");
 
 	if (device->read_sem >= 0)
 		delete_sem(device->read_sem);
-	
-	kill_thread(device->thread);
 
+	device->buffer->DestroyLock();
+	wait_for_thread(device->thread, &status);
 	delete device->buffer;
 
 	return B_OK;
@@ -310,7 +311,7 @@ static status_t
 acpi_namespace_free(void* cookie)
 {
 	dprintf("acpi_ns_dump: device_free\n");
-	
+
 	return B_OK;
 }
 
@@ -323,7 +324,7 @@ acpi_namespace_init_device(void *_cookie, void **cookie)
 {
 	device_node *node = (device_node *)_cookie;
 	status_t err;
-	
+
 	acpi_ns_device_info *device = (acpi_ns_device_info *)calloc(1, sizeof(*device));
 	if (device == NULL)
 		return B_NO_MEMORY;
@@ -335,7 +336,7 @@ acpi_namespace_init_device(void *_cookie, void **cookie)
 		free(device);
 		return err;
 	}
-	
+
 	*cookie = device;
 	return B_OK;
 }
@@ -360,7 +361,7 @@ struct device_module_info acpi_ns_dump_module = {
 	acpi_namespace_init_device,
 	acpi_namespace_uninit_device,
 	NULL,
-		
+
 	acpi_namespace_open,
 	acpi_namespace_close,
 	acpi_namespace_free,
@@ -383,7 +384,6 @@ RingBuffer::RingBuffer(size_t size)
 
 RingBuffer::~RingBuffer()
 {
-	delete_sem(fLock);
 	delete_ring_buffer(fBuffer);
 }
 
@@ -432,4 +432,9 @@ RingBuffer::Unlock()
 }
 
 
+void
+RingBuffer::DestroyLock()
+{
+	delete_sem(fLock);
+}
 
