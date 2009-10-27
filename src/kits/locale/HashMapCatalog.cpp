@@ -22,10 +22,6 @@
  */
 
 
-extern "C" uint32 adler32(uint32 adler, const uint8 *buf, uint32 len);
-	// definition lives in adler32.c
-
-
 CatKey::CatKey(const char *str, const char *ctx, const char *cmt)
 	:
 	fString(str),

@@ -14,7 +14,9 @@
 #include "KeymapWindow.h"
 
 #include <Application.h>
+#include <Catalog.h>
 #include <Entry.h>
+#include <Locale.h>
 
 
 class KeymapApplication : public BApplication {
@@ -26,6 +28,7 @@ class KeymapApplication : public BApplication {
 
 	private:
 		KeymapWindow* fWindow;
+		BCatalog fCatalog;
 };
 
 #endif // KEYMAP_APPLICATION_H

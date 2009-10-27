@@ -12,6 +12,13 @@ Preference Keymap :
 	KeymapListItem.cpp
 	KeymapWindow.cpp
 
-	: be tracker $(TARGET_LIBSTDC++)
+	: be tracker liblocale.so $(TARGET_LIBSTDC++)
 	: Keymap.rdef
 ;
+
+DoCatalogs Keymap :
+	x-vnd.Haiku-Keymap
+	: KeymapWindow.cpp
+	: en.catalog
+	: fr.catkeys
+	;
