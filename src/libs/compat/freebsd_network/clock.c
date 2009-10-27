@@ -41,8 +41,8 @@ init_hard_clock()
 
 	ticks = 0;
 	status = add_timer(&sHardClockTimer, hardClock,
-				CONVERT_HZ_TO_USECS(FREEBSD_CLOCK_FREQUENCY_IN_HZ),
-				B_PERIODIC_TIMER);
+		CONVERT_HZ_TO_USECS(FREEBSD_CLOCK_FREQUENCY_IN_HZ),
+		B_PERIODIC_TIMER);
 
 	return status;
 }
