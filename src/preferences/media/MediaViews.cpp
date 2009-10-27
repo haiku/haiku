@@ -15,21 +15,26 @@
 
 
 // Includes -------------------------------------------------------------------------------------------------- //
+#include <stdio.h>
+
 #include <Box.h>
 #include <Button.h>
-#include <MenuField.h>
-#include <PopUpMenu.h>
-#include <MediaRoster.h>
+#include <Catalog.h>
 #include <Deskbar.h>
 #include <Entry.h>
-#include <stdio.h>
+#include <GroupView.h>
+#include <Locale.h>
 #include <MediaAddOn.h>
+#include <MediaRoster.h>
+#include <MenuField.h>
+#include <PopUpMenu.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 #include <TextView.h>
-#include <GroupView.h>
-#include <SpaceLayoutItem.h>
 
 #include "MediaViews.h"
+
+#define TR_CONTEXT "Media views"
 
 BarView::BarView() 
  : BView ("barView", B_WILL_DRAW ),
@@ -63,7 +68,7 @@ SettingsView::SettingsView (bool isVideo)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BBox *defaultsBox = new BBox("defaults");
-	defaultsBox->SetLabel(fIsVideo ? "Default Nodes" : "Defaults");
+	defaultsBox->SetLabel(fIsVideo ? TR("Default Nodes") : TR("Defaults"));
 	
 	// create the default box
 	BGroupLayout* defaultBoxLayout = new BGroupLayout(B_VERTICAL, 5);
@@ -76,17 +81,18 @@ SettingsView::SettingsView (bool isVideo)
 	defaultsBox->GetLayout()->AddView(inputField);
 	defaultsBox->GetLayout()->AddView(outputField);
 
-	float divider = StringWidth(fIsVideo ? "Video Output:" : "Audio Output:") + 5;
+	float divider = StringWidth(fIsVideo ? TR("Video Output:")
+		: TR("Audio Output:")) + 5;
 	fMenu1 = new BPopUpMenu("<none>");
 	fMenu1->SetLabelFromMarked(true);
 	BMenuField *menuField1 = new BMenuField("menuField1",
-		fIsVideo ? "Video Input:" : "Audio Input:", fMenu1, NULL);
+		fIsVideo ? TR("Video Input:") : TR("Audio Input:"), fMenu1, NULL);
 	menuField1->SetDivider(divider);
 	
 	fMenu2 = new BPopUpMenu("<none>");
 	fMenu2->SetLabelFromMarked(true);
 	BMenuField *menuField2 = new BMenuField("menuField2",
-		fIsVideo ? "Video Output:" : "Audio Output:", fMenu2, NULL);
+		fIsVideo ? TR("Video Output:") : TR("Audio Output:"), fMenu2, NULL);
 	menuField2->SetDivider(divider);
 	
 	inputField->GroupLayout()->AddView(menuField1);
@@ -97,26 +103,26 @@ SettingsView::SettingsView (bool isVideo)
 		fMenu3 = new BPopUpMenu("<none>");
 		fMenu3->SetLabelFromMarked(true);
 		menuField3 = new BMenuField("menuField3",
-			"Channel:", fMenu3, NULL);
+			TR("Channel:"), fMenu3, NULL);
 		outputField->GroupLayout()->AddView(menuField3);
-		menuField3->SetDivider(StringWidth("Channel:")+5);
+		menuField3->SetDivider(StringWidth(TR("Channel:"))+5);
 	}
 	
 	rgb_color red_color = {222, 32, 33};
-	fRestartView = new BStringView("restartStringView", 
-		"Restart the Media Server to apply changes.");
+	fRestartView = new BStringView("restartStringView",
+		TR("Restart the Media Server to apply changes."));
 	fRestartView->SetHighColor(red_color);
 	defaultsBox->AddChild(fRestartView);
 	fRestartView->Hide();
 	
 	// create the realtime box
 	BBox *realtimeBox = new BBox("realtime");
-	realtimeBox->SetLabel("Real-Time");
+	realtimeBox->SetLabel(TR("Real-Time"));
 	
 	BMessage *message = new BMessage(ML_ENABLE_REAL_TIME);
 	message->AddBool("isVideo", fIsVideo);
 	fRealtimeCheckBox = new BCheckBox("realtimeCheckBox",
-		fIsVideo ? "Enable Real-Time Video" : "Enable Real-Time Audio", 
+		fIsVideo ? TR("Enable Real-Time Video") : TR("Enable Real-Time Audio"),
 		message);
 	
 	uint32 flags;
@@ -125,10 +131,13 @@ SettingsView::SettingsView (bool isVideo)
 		fRealtimeCheckBox->SetValue(B_CONTROL_ON);
 		
 	BTextView *textView = new BTextView("stringView");
-	textView->Insert(fIsVideo ? "Enabling Real-Time Video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM."
-		"\n\nOnly enable this feature if you need the lowest latency possible."
-		: "Enabling Real-time Audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM."
-		"\n\nOnly enable this feature if you need the lowest latency possible.");
+	textView->Insert(fIsVideo ? TR("Enabling Real-Time Video allows system to "
+		"perform video operations as fast and smoothly as possible.  It "
+		"achieves optimum performance by using more RAM."
+		"\n\nOnly enable this feature if you need the lowest latency possible.")
+		: TR("Enabling Real-time Audio allows system to record and play audio "
+		"as fast as possible.  It achieves this performance by using more CPU and RAM."
+		"\n\nOnly enable this feature if you need the lowest latency possible."));
 	textView->MakeEditable(false);
 	textView->MakeSelectable(false);
 	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -144,11 +153,11 @@ SettingsView::SettingsView (bool isVideo)
 	// create the bottom line: volumen in deskbar checkbox and restart button
 	BGroupView* bottomView = new BGroupView(B_HORIZONTAL);
 	BButton *restartButton = new BButton("restartButton", 
-		"Restart Media Services", new BMessage(ML_RESTART_MEDIA_SERVER));
+		TR("Restart Media Services"), new BMessage(ML_RESTART_MEDIA_SERVER));
 	
 	if (!fIsVideo) {
 		fVolumeCheckBox = new BCheckBox("volumeCheckBox", 
-			"Show Volume Control on Deskbar", new BMessage(ML_SHOW_VOLUME_CONTROL));
+			TR("Show Volume Control on Deskbar"), new BMessage(ML_SHOW_VOLUME_CONTROL));
 		bottomView->GroupLayout()->AddView(fVolumeCheckBox);
 		if (BDeskbar().HasItem("MediaReplicant"))
 			fVolumeCheckBox->SetValue(B_CONTROL_ON);	

@@ -15,7 +15,14 @@ Preference Media :
 	MediaViews.cpp
 	MediaListItem.cpp
 	MediaAlert.cpp 
-	: media be $(TARGET_LIBSUPC++)
+	: media be liblocale.so $(TARGET_LIBSUPC++)
 	: media.rdef 
 	;
 
+DoCatalogs Media
+	: x-vnd.Haiku-Media
+	: MediaViews.cpp
+	  MediaWindow.cpp
+	: en.catalog
+	: fr.catkeys
+	;

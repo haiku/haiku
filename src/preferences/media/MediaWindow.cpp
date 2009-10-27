@@ -7,35 +7,41 @@
  */
 
 
+#include <stdio.h>
+
+#include <Alert.h>
+#include <Application.h>
+#include <Autolock.h>
+#include <Bitmap.h>
+#include <Button.h>
+#include <Catalog.h>
+#include <Debug.h>
+#include <Deskbar.h>
+#include <GroupView.h>
+#include <Locale.h>
 #include <MediaTheme.h>
 #include <MediaRoster.h>
-#include <Alert.h>
-#include <ScrollView.h>
-#include <Bitmap.h>
-#include <stdio.h>
-#include <Screen.h>
-#include <Application.h>
-#include <StorageKit.h>
-#include <Deskbar.h>
-#include <Button.h>
-#include <TextView.h>
 #include <Roster.h>
-#include <String.h>
-#include <Debug.h>
-#include <Autolock.h>
-#include <GroupView.h>
+#include <Screen.h>
+#include <ScrollView.h>
 #include <SpaceLayoutItem.h>
+#include <StorageKit.h>
+#include <String.h>
+#include <TextView.h>
 #include "MediaWindow.h"
 
 // Images
 #include "iconfile.h"
 
+#define TR_CONTEXT "Media Window"
+
 const uint32 ML_SELECTED_NODE = 'MlSN';
 const uint32 ML_INIT_MEDIA = 'MlIM';
 
 // MediaWindow - Constructor
-MediaWindow::MediaWindow(BRect frame) 
-: BWindow (frame, "Media", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+MediaWindow::MediaWindow(BRect frame)
+: BWindow (frame, TR("Media"), B_TITLED_WINDOW,
+	B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fCurrentNode(NULL),
 	fParamWeb(NULL),
 	fAlert(NULL),
@@ -55,13 +61,13 @@ MediaWindow::InitCheck()
 // MediaWindow - Destructor
 MediaWindow::~MediaWindow()
 {
-	for (int i=0; i<fAudioOutputs.CountItems(); i++)
+	for (int i = 0; i<fAudioOutputs.CountItems(); i++)
 		delete static_cast<dormant_node_info *>(fAudioOutputs.ItemAt(i));
-	for (int i=0; i<fAudioInputs.CountItems(); i++)
+	for (int i = 0; i<fAudioInputs.CountItems(); i++)
 		delete static_cast<dormant_node_info *>(fAudioInputs.ItemAt(i));
-	for (int i=0; i<fVideoOutputs.CountItems(); i++)
+	for (int i = 0; i<fVideoOutputs.CountItems(); i++)
 		delete static_cast<dormant_node_info *>(fVideoOutputs.ItemAt(i));
-	for (int i=0; i<fVideoInputs.CountItems(); i++)
+	for (int i = 0; i<fVideoInputs.CountItems(); i++)
 		delete static_cast<dormant_node_info *>(fVideoInputs.ItemAt(i));
 	
 	BMediaRoster *roster = BMediaRoster::Roster();
@@ -71,7 +77,8 @@ MediaWindow::~MediaWindow()
 	char buffer[512];
 	BRect rect = Frame();
 	PRINT_OBJECT(rect);
-	sprintf(buffer, "# MediaPrefs Settings\n rect = %i,%i,%i,%i\n", int(rect.left), int(rect.top), int(rect.right), int(rect.bottom));
+	sprintf(buffer, "# MediaPrefs Settings\n rect = %i,%i,%i,%i\n",
+		int(rect.left), int(rect.top), int(rect.right), int(rect.bottom));
 	
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
@@ -98,16 +105,17 @@ MediaWindow::FindNodes(media_type type, uint64 kind, BList &list)
 		format1 = &format;
 	else if (kind & B_PHYSICAL_INPUT)
 		format2 = &format;
-	else 
+	else
 		return;
 	
-	if (roster->GetDormantNodes(node_info, &node_info_count, format1, format2, NULL, kind)!=B_OK) {
+	if (roster->GetDormantNodes(node_info, &node_info_count, format1, format2,
+			NULL, kind)!=B_OK) {
 		fprintf(stderr, "error\n");
 		return;
 	}
 	
-	for (int32 i=0; i<node_info_count; i++) {
-		PRINT(("node : %s, media_addon %i, flavor_id %i\n", 
+	for (int32 i = 0; i<node_info_count; i++) {
+		PRINT(("node : %s, media_addon %i, flavor_id %i\n",
 			node_info[i].name, node_info[i].addon, node_info[i].flavor_id));
 		dormant_node_info *info = new dormant_node_info();
 		strcpy(info->name, node_info[i].name);
@@ -121,9 +129,11 @@ MediaWindow::FindNodes(media_type type, uint64 kind, BList &list)
 MediaListItem *
 MediaWindow::FindMediaListItem(dormant_node_info *info)
 {
-	for (int32 j=0; j<fListView->CountItems(); j++) {
-		MediaListItem *item = static_cast<MediaListItem *>(fListView->ItemAt(j));
-		if (item->fInfo && item->fInfo->addon == info->addon && item->fInfo->flavor_id == info->flavor_id) {
+	for (int32 j = 0; j<fListView->CountItems(); j++) {
+		MediaListItem *item
+			= static_cast<MediaListItem *>(fListView->ItemAt(j));
+		if (item->fInfo && item->fInfo->addon == info->addon
+				&& item->fInfo->flavor_id == info->flavor_id) {
 			return item;
 			break;
 		}
@@ -135,8 +145,9 @@ MediaWindow::FindMediaListItem(dormant_node_info *info)
 void
 MediaWindow::AddNodes(BList &list, bool isVideo)
 {
-	for (int32 i=0; i<list.CountItems(); i++) {
-		dormant_node_info *info = static_cast<dormant_node_info *>(list.ItemAt(i));
+	for (int32 i = 0; i<list.CountItems(); i++) {
+		dormant_node_info *info
+			= static_cast<dormant_node_info *>(list.ItemAt(i));
 		if (!FindMediaListItem(info))
 			fListView->AddItem(new MediaListItem(info, 1, isVideo, &fIcons));
 	}
@@ -144,31 +155,31 @@ MediaWindow::AddNodes(BList &list, bool isVideo)
 
 
 // MediaWindow::InitWindow -- Initialization Commands here
-void 
+void
 MediaWindow::InitWindow(void)
 {
 	// Bitmaps
 	BRect iconRect(0, 0, 15, 15);
 	BBitmap *icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kDevicesBits, kDevicesWidth*kDevicesHeight, 0,
+	icon->SetBits(kDevicesBits, kDevicesWidth * kDevicesHeight, 0,
 			kDevicesColorSpace);
 	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kMixerBits, kMixerWidth*kMixerHeight, 0,
+	icon->SetBits(kMixerBits, kMixerWidth * kMixerHeight, 0,
 			kMixerColorSpace);
 	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kMicBits, kMicWidth*kMicHeight, 0, kMicColorSpace);
+	icon->SetBits(kMicBits, kMicWidth * kMicHeight, 0, kMicColorSpace);
 	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kSpeakerBits, kSpeakerWidth*kSpeakerHeight, 0,
+	icon->SetBits(kSpeakerBits, kSpeakerWidth * kSpeakerHeight, 0,
 			kSpeakerColorSpace);
 	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kCamBits, kCamWidth*kCamHeight, 0, kCamColorSpace);
+	icon->SetBits(kCamBits, kCamWidth * kCamHeight, 0, kCamColorSpace);
 	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kTVBits, kTVWidth*kTVHeight, 0, kTVColorSpace);
+	icon->SetBits(kTVBits, kTVWidth * kTVHeight, 0, kTVColorSpace);
 	fIcons.AddItem(icon);
 
 	const float scrollWidth = 9 * be_plain_font->Size() + 30;
@@ -183,19 +194,19 @@ MediaWindow::InitWindow(void)
 	scrollView->SetExplicitMaxSize(BSize(scrollWidth, B_SIZE_UNSET));
 
 	// Create the Views
-	fBox = new BBox("background", B_WILL_DRAW | B_FRAME_EVENTS, 
+	fBox = new BBox("background", B_WILL_DRAW | B_FRAME_EVENTS,
 		B_PLAIN_BORDER);
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	GetLayout()->AddView(fBox);
 	
 	// StringViews
-	rgb_color titleFontColor = { 0,0,0,0 };
+	rgb_color titleFontColor = { 0, 0, 0, 0 };
 	fTitleView = new BStringView("AudioSettings",
-		"Audio Settings", B_WILL_DRAW);
+		TR("Audio Settings"), B_WILL_DRAW);
 	fTitleView->SetFont(be_bold_font);
 	fTitleView->SetHighColor(titleFontColor);
 	
-	fContentView = new BBox("contentView", B_WILL_DRAW | B_FRAME_EVENTS, 
+	fContentView = new BBox("contentView", B_WILL_DRAW | B_FRAME_EVENTS,
 		B_NO_BORDER);
 	
 	fAudioView = new SettingsView(false);
@@ -242,15 +253,16 @@ MediaWindow::InitMedia(bool first)
 	BMediaRoster *roster = BMediaRoster::Roster(&err);
 	
 	if (first && err != B_OK) {
-		BAlert *alert = new BAlert("start_media_server", 
-			"Could not connect to the Media Server.\n"
-			"Would you like to start it ?", "Quit", "Start Media Server", NULL,
+		BAlert *alert = new BAlert("start_media_server",
+			TR("Could not connect to the Media Server.\n"
+			"Would you like to start it ?"), TR("Quit"),
+			TR("Start Media Server"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (alert->Go()==0)
 			return B_ERROR;
 		
-		fAlert = new MediaAlert(BRect(0, 0, 300, 60), 
-			"restart_alert", "Restarting Media Services\nStarting Media Server" B_UTF8_ELLIPSIS "\n");
+		fAlert = new MediaAlert(BRect(0, 0, 300, 60),
+			"restart_alert", TR("Restarting Media Services\nStarting Media Server" B_UTF8_ELLIPSIS "\n"));
 		fAlert->Show();
 		
 		Show();
@@ -267,7 +279,7 @@ MediaWindow::InitMedia(bool first)
 	if ((!first || (first && err) ) && fAlert) {
 		BAutolock locker(fAlert);
 		if (locker.IsLocked())
-			fAlert->TextView()->SetText("Ready For Use" B_UTF8_ELLIPSIS);
+			fAlert->TextView()->SetText(TR("Ready For Use" B_UTF8_ELLIPSIS));
 	}
 	
 	void *listItem;
@@ -393,7 +405,7 @@ MediaWindow::QuitRequested()
 
 
 // MediaWindow::FrameResized -- When the main frame is resized fix up the other views
-void 
+void
 MediaWindow::FrameResized (float width, float height)
 {
 	// This makes sure our SideBar colours down to the bottom when resized
@@ -403,10 +415,10 @@ MediaWindow::FrameResized (float width, float height)
 // ---------------------------------------------------------------------------------------------------------- //
 
 // ErrorAlert -- Displays a BAlert Box with a Custom Error or Debug Message
-void 
+void
 ErrorAlert(char* errorMessage) {
 	printf("%s\n", errorMessage);
-	BAlert *alert = new BAlert("BAlert", errorMessage, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
+	BAlert *alert = new BAlert("BAlert", errorMessage, TR("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
 	alert->Go();
 	exit(1);
 }
@@ -414,7 +426,7 @@ ErrorAlert(char* errorMessage) {
 
 
 // MediaWindow::MessageReceived -- receives messages
-void 
+void
 MediaWindow::MessageReceived (BMessage *message)
 {
 	switch(message->what)
@@ -435,7 +447,7 @@ MediaWindow::MessageReceived (BMessage *message)
 					
 					if (fAudioView->fRestartView->IsHidden())
 						fAudioView->fRestartView->Show();
-				} else 
+				} else
 					fprintf(stderr, "Settings2Item not found\n");
 			}
 			break;
@@ -472,9 +484,9 @@ MediaWindow::MessageReceived (BMessage *message)
 					}
 					
 					MediaListItem *oldListItem = NULL;
-					for (int32 j=0; j<fListView->CountItems(); j++) {
+					for (int32 j = 0; j<fListView->CountItems(); j++) {
 						oldListItem = static_cast<MediaListItem *>(fListView->ItemAt(j));
-						if (oldListItem->fInfo && oldListItem->IsVideo() == isVideo 
+						if (oldListItem->fInfo && oldListItem->IsVideo() == isVideo
 							&& oldListItem->IsDefault(isInput))
 							break;
 					}
@@ -486,13 +498,13 @@ MediaWindow::MessageReceived (BMessage *message)
 					MediaListItem *listItem = FindMediaListItem(item->fInfo);
 					if (listItem) {
 						listItem->SetDefault(true, isInput);
-					} else 
+					} else
 						fprintf(stderr, "MediaListItem not found\n");
 					fListView->Invalidate();
 					
 					if (settingsView->fRestartView->IsHidden())
 						settingsView->fRestartView->Show();
-				} else 
+				} else
 					fprintf(stderr, "SettingsItem not found\n");
 			}
 			break;
@@ -518,13 +530,13 @@ MediaWindow::MessageReceived (BMessage *message)
 					status = deskbar.AddItem(&ref, &id);
 
 				if (status != B_OK) {
-					fprintf(stderr, "Couldn't add Volume control in Deskbar: %s\n",
+					fprintf(stderr, TR("Couldn't add Volume control in Deskbar: %s\n"),
 						strerror(status));
 				}
 			} else {
 				status_t status = deskbar.RemoveItem("MediaReplicant");
 				if (status != B_OK) {
-					fprintf(stderr, "Couldn't remove Volume control in Deskbar: %s\n",
+					fprintf(stderr, TR("Couldn't remove Volume control in Deskbar: %s\n"),
 						strerror(status));
 				}
 			}
@@ -602,7 +614,7 @@ MediaWindow::MessageReceived (BMessage *message)
 						fParamWeb = NULL;
 						BRect bounds = fContentView->Bounds();
 						BStringView* stringView = new BStringView(bounds, 
-							"noControls", "This hardware has no controls.", B_FOLLOW_V_CENTER | B_FOLLOW_H_CENTER);
+							"noControls", TR("This hardware has no controls."), B_FOLLOW_V_CENTER | B_FOLLOW_H_CENTER);
 						stringView->ResizeToPreferred();
 						fContentView->AddChild(stringView);
 						stringView->MoveBy((bounds.Width()-stringView->Bounds().Width())/2, 
@@ -625,7 +637,7 @@ MediaWindow::MessageReceived (BMessage *message)
 					&& (strcmp(mimeSig, "application/x-vnd.Be.addon-host")==0 
 						|| strcmp(mimeSig, "application/x-vnd.Be.media-server")==0)) {
 					fAlert->Lock();
-					fAlert->TextView()->SetText("Starting Media Server" B_UTF8_ELLIPSIS);
+					fAlert->TextView()->SetText(TR("Starting Media Server" B_UTF8_ELLIPSIS));
 					fAlert->Unlock();
 				}
 			}
@@ -656,7 +668,7 @@ MediaWindow::RestartMediaServices(void *data)
 {
 	MediaWindow *window = (MediaWindow *)data;
 	window->fAlert = new MediaAlert(BRect(0, 0, 300, 60), 
-		"restart_alert", "Restarting Media Services\nShutting down Media Server\n");
+		"restart_alert", TR("Restarting Media Services\nShutting down Media Server\n"));
 	
 	window->fAlert->Show();
 	
@@ -665,7 +677,7 @@ MediaWindow::RestartMediaServices(void *data)
 	{
 		BAutolock locker(window->fAlert);
 		if (locker.IsLocked())
-			window->fAlert->TextView()->SetText("Starting Media Server" B_UTF8_ELLIPSIS);
+			window->fAlert->TextView()->SetText(TR("Starting Media Server" B_UTF8_ELLIPSIS));
 	}
 	launch_media_server();
 	
@@ -677,22 +689,22 @@ MediaWindow::UpdateProgress(int stage, const char * message, void * cookie)
 {
 	MediaAlert *alert = static_cast<MediaAlert*>(cookie);
 	PRINT(("stage : %i\n", stage));
-	const char *string = "Unknown stage"; 
+	const char *string = "Unknown stage";
 	switch (stage) {
 		case 10:
-			string = "Stopping Media Server" B_UTF8_ELLIPSIS;
+			string = TR("Stopping Media Server" B_UTF8_ELLIPSIS);
 			break;
 		case 20:
-			string = "Telling media_addon_server to quit.";
+			string = TR("Telling media_addon_server to quit.");
 			break;
 		case 40:
-			string = "Waiting for media_server to quit.";
+			string = TR("Waiting for media_server to quit.");
 			break;
 		case 70:
-			string = "Cleaning Up.";
+			string = TR("Cleaning Up.");
 			break;
 		case 100:
-			string = "Done Shutting Down.";
+			string = TR("Done Shutting Down.");
 			break;
 	}
 	

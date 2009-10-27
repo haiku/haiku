@@ -13,6 +13,8 @@
 #include "MediaWindow.h"
 
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 
 class Media : public BApplication {
@@ -25,6 +27,7 @@ class Media : public BApplication {
 
 	private:
 		MediaWindow* fWindow;
+		BCatalog fCatalog;
 };
 
 #endif	// MEDIA_H

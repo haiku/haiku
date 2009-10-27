@@ -10,16 +10,21 @@
 
 #include "Media.h"
 
-#include <StorageKit.h>
-#include <Roster.h>
-#include <String.h>
 #include <stdio.h>
+
+#include <Catalog.h>
+#include <Locale.h>
+#include <Roster.h>
+#include <StorageKit.h>
+#include <String.h>
 
 
 Media::Media() 
 	: BApplication("application/x-vnd.Haiku-Media")
 {
 	BRect rect(32,64,637,462);
+
+	be_locale->GetAppCatalog(&fCatalog);
 
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
