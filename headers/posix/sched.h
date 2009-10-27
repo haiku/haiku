@@ -5,17 +5,20 @@
 #ifndef _SCHED_H_
 #define _SCHED_H_
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define SCHED_OTHER 	1
-#define SCHED_RR	2
-#define SCHED_FIFO	4
+
+#define SCHED_OTHER		1
+#define SCHED_RR		2
+#define SCHED_FIFO		4
 
 struct sched_param {
 	int sched_priority;
 };
+
 
 extern int sched_yield(void);
 extern int sched_get_priority_min(int);
