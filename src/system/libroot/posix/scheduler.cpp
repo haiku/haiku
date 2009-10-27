@@ -27,6 +27,7 @@ sched_get_priority_min(int policy)
 	switch (policy) {
 		case SCHED_FIFO:
 		case SCHED_RR:
+		case SCHED_SPORADIC:
 		case SCHED_OTHER:
 			return B_LOW_PRIORITY;
 
@@ -43,6 +44,7 @@ sched_get_priority_max(int policy)
 	switch (policy) {
 		case SCHED_FIFO:
 		case SCHED_RR:
+		case SCHED_SPORADIC:
 		case SCHED_OTHER:
 			return B_URGENT_DISPLAY_PRIORITY;
 

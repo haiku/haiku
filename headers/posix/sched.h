@@ -11,9 +11,10 @@ extern "C" {
 #endif
 
 
-#define SCHED_OTHER		1
+#define SCHED_FIFO		1
 #define SCHED_RR		2
-#define SCHED_FIFO		4
+#define SCHED_SPORADIC	3
+#define SCHED_OTHER		4
 
 struct sched_param {
 	int sched_priority;
