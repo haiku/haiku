@@ -7,22 +7,23 @@
 #ifndef	AREA_H
 #define	AREA_H
 
-#include "Constraint.h"
-
 #include <Alignment.h>
 #include <List.h>
 #include <Size.h>
 #include <SupportDefs.h>
 #include <View.h>
 
+#include "XTab.h"
+#include "YTab.h"
+#include "Area.h"
+#include "Row.h"
+#include "Column.h"
+#include "Constraint.h"
+
 
 namespace BALM {
 
-class Column;
 class BALMLayout;
-class Row;
-class XTab;
-class YTab;
 
 /**
  * Rectangular area in the GUI, defined by a tab on each side.
@@ -30,9 +31,6 @@ class YTab;
 class Area {
 	
 public:
-	bool				AutoPrefContentSize() const;
-	void				SetAutoPrefContentSize(bool value);
-	
 	XTab*				Left() const;
 	void				SetLeft(XTab* left);
 	XTab*				Right() const;
@@ -57,18 +55,21 @@ public:
 	void				SetMinContentSize(BSize min);
 	BSize				MaxContentSize() const;
 	void				SetMaxContentSize(BSize max);
-	BSize				PrefContentSize() const;
-	void				SetPrefContentSize(BSize pref);
-	BSize				ShrinkRigidity() const;
-	void				SetShrinkRigidity(BSize shrink);
-	BSize				ExpandRigidity() const;
-	void				SetExpandRigidity(BSize expand);
+	BSize				PreferredContentSize() const;
+	void				SetPreferredContentSize(BSize preferred);
 	double				ContentAspectRatio() const;
 	void				SetContentAspectRatio(double ratio);
+
+	BSize				ShrinkPenalties() const;
+	void				SetShrinkPenalties(BSize shrink);
+	BSize				GrowPenalties() const;
+	void				SetGrowPenalties(BSize grow);
+
 	BAlignment			Alignment() const;
 	void				SetAlignment(BAlignment alignment);
-	void				SetHAlignment(alignment horizontal);
-	void				SetVAlignment(vertical_alignment vertical);
+	void				SetHorizontalAlignment(alignment horizontal);
+	void				SetVerticalAlignment(vertical_alignment vertical);
+
 	int32				LeftInset() const;
 	void				SetLeftInset(int32 left);
 	int32				TopInset() const;
@@ -77,12 +78,18 @@ public:
 	void				SetRightInset(int32 right);
 	int32				BottomInset() const;
 	void				SetBottomInset(int32 bottom);
-	void				SetDefaultPrefContentSize();
-	//~ string			ToString();
+
+	void				SetDefaultBehavior();
+	bool				AutoPreferredContentSize() const;
+	void				SetAutoPreferredContentSize(bool value);
+
+	BString*			ToBString();
+	const char*			ToString();
 
 	Constraint*			HasSameWidthAs(Area* area);
 	Constraint*			HasSameHeightAs(Area* area);
-	BList*				HasSameSizetAs(Area* area);
+	BList*				HasSameSizeAs(Area* area);
+
 						~Area();
 	
 protected:
@@ -127,14 +134,14 @@ private:
 	Constraint*			fMaxContentWidth;
 	Constraint*			fMinContentHeight;
 	Constraint*			fMaxContentHeight;
-	BSize				fPrefContentSize;
-	BSize				fShrinkRigidity;
-	BSize				fExpandRigidity;
+	BSize				fPreferredContentSize;
+	BSize				fShrinkPenalties;
+	BSize				fGrowPenalties;
 	double				fContentAspectRatio;
 	Constraint*			fContentAspectRatioC;
-	bool				fAutoPrefContentSize;
-	Constraint*			fPrefContentWidth;
-	Constraint*			fPrefContentHeight;
+	bool				fAutoPreferredContentSize;
+	Constraint*			fPreferredContentWidth;
+	Constraint*			fPreferredContentHeight;
 	Area*				fChildArea;
 	BAlignment			fAlignment;
 	int32				fLeftInset;
@@ -147,7 +154,7 @@ private:
 	Constraint*			fBottomConstraint;
 	
 public:
-	friend class			BALMLayout;
+	friend class		BALMLayout;
 
 };
 

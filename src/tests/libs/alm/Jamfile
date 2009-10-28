@@ -4,26 +4,32 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseLibraryHeaders lp_solve linprog alm ;
 
-Application ALMTableTest :
-	TableTest.cpp
+Application ALMHelloWorld :
+	HelloWorld.cpp
 	:
 	be liblpsolve55.so liblinprog.so libalm.so $(TARGET_LIBSUPC++)
 ;
 
-Application ALMTest1 :
-	Test1.cpp
+Application ALMTwoViews :
+	TwoViews.cpp
 	:
 	be liblpsolve55.so be liblinprog.so libalm.so $(TARGET_LIBSUPC++)
 ;
 
-Application ALMTest2 :
-	Test2.cpp
+Application ALMPinwheel :
+	Pinwheel.cpp
 	:
 	be liblpsolve55.so be liblinprog.so libalm.so $(TARGET_LIBSUPC++)
 ;
 
-Application ALMSimpleTest :
-	SimpleTest.cpp
+Application ALMAreas :
+	Areas.cpp
+	:
+	be liblpsolve55.so be liblinprog.so libalm.so $(TARGET_LIBSUPC++)
+;
+
+Application ALMTableDemo :
+	TableDemo.cpp
 	:
 	be liblpsolve55.so be liblinprog.so libalm.so $(TARGET_LIBSUPC++)
 ;

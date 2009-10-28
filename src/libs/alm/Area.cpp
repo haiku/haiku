@@ -34,9 +34,9 @@ BSize Area::kUndefinedSize(-1, -1);
  * @return the auto preferred content size
  */
 bool
-Area::AutoPrefContentSize() const
+Area::AutoPreferredContentSize() const
 {
-	return fAutoPrefContentSize;
+	return fAutoPreferredContentSize;
 }
 
 
@@ -46,9 +46,9 @@ Area::AutoPrefContentSize() const
  * @param value	the auto preferred content size
  */
 void
-Area::SetAutoPrefContentSize(bool value)
+Area::SetAutoPreferredContentSize(bool value)
 {
-	fAutoPrefContentSize = value;
+	fAutoPreferredContentSize = value;
 }
 
 
@@ -360,38 +360,42 @@ Area::SetMaxContentSize(BSize max)
  * Gets Preferred size of the area's content.
  */
 BSize
-Area::PrefContentSize() const
+Area::PreferredContentSize() const
 {
-	return (fChildArea == NULL) ? fPrefContentSize : fChildArea->fPrefContentSize;
+	return (fChildArea == NULL) ? fPreferredContentSize
+		: fChildArea->fPreferredContentSize;
 }
 
 
 /**
  * Sets Preferred size of the area's content.
  * May be different from the preferred size of the area.
- * Manual changes of PrefContentSize are ignored unless autoPrefContentSize is set to false.
+ * Manual changes of PreferredContentSize are ignored unless 
+ * autoPreferredContentSize is set to false.
  */
 void
-Area::SetPrefContentSize(BSize pref)
+Area::SetPreferredContentSize(BSize preferred)
 {
 	if (fChildArea == NULL) {
-		fPrefContentSize = pref;
-		if (fPrefContentWidth == NULL) {
-			fPrefContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, OperatorType(EQ),
-					fPrefContentSize.Width(), fShrinkRigidity.Width(),
-					fExpandRigidity.Width());
-			fConstraints->AddItem(fPrefContentWidth);
+		fPreferredContentSize = preferred;
+		if (fPreferredContentWidth == NULL) {
+			fPreferredContentWidth = fLS->AddConstraint(
+				-1.0, fLeft, 1.0, fRight, OperatorType(EQ),
+				fPreferredContentSize.Width(), fShrinkPenalties.Width(),
+				fGrowPenalties.Width());
+			fConstraints->AddItem(fPreferredContentWidth);
 			
-			fPrefContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom, OperatorType(EQ),
-					fPrefContentSize.Height(), fShrinkRigidity.Height(),
-					fExpandRigidity.Height());
-			fConstraints->AddItem(fPrefContentHeight);
+			fPreferredContentHeight = fLS->AddConstraint(
+				-1.0, fTop, 1.0, fBottom, OperatorType(EQ),
+				fPreferredContentSize.Height(), fShrinkPenalties.Height(),
+				fGrowPenalties.Height());
+			fConstraints->AddItem(fPreferredContentHeight);
 		} else {
-			fPrefContentWidth->SetRightSide(pref.Width());
-			fPrefContentHeight->SetRightSide(pref.Height());
+			fPreferredContentWidth->SetRightSide(preferred.Width());
+			fPreferredContentHeight->SetRightSide(preferred.Height());
 		}
 	} else
-		fChildArea->SetPrefContentSize(pref);
+		fChildArea->SetPreferredContentSize(preferred);
 	fLS->InvalidateLayout();
 }
 
@@ -401,47 +405,47 @@ Area::SetPrefContentSize(BSize pref)
  * The bigger the less likely is such shrinking.
  */
 BSize
-Area::ShrinkRigidity() const
+Area::ShrinkPenalties() const
 {
-	return (fChildArea == NULL) ? fShrinkRigidity : fChildArea->fShrinkRigidity;
+	return (fChildArea == NULL) ? fShrinkPenalties : fChildArea->fShrinkPenalties;
 }
 
 
-void Area::SetShrinkRigidity(BSize shrink) {
+void Area::SetShrinkPenalties(BSize shrink) {
 	if (fChildArea == NULL) {
-		fShrinkRigidity = shrink;
-		if (fPrefContentWidth != NULL) {
-			fPrefContentWidth->SetPenaltyNeg(shrink.Width());
-			fPrefContentHeight->SetPenaltyNeg(shrink.Height());
+		fShrinkPenalties = shrink;
+		if (fPreferredContentWidth != NULL) {
+			fPreferredContentWidth->SetPenaltyNeg(shrink.Width());
+			fPreferredContentHeight->SetPenaltyNeg(shrink.Height());
 		}
 	} else 
-		fChildArea->SetShrinkRigidity(shrink);
+		fChildArea->SetShrinkPenalties(shrink);
 	fLS->InvalidateLayout();
 }
 
 
 /**
- * The reluctance with which the area's content expands over its preferred size.
- * The bigger the less likely is such expansion.
+ * The reluctance with which the area's content grows over its preferred size.
+ * The bigger the less likely is such growth.
  */
 BSize
-Area::ExpandRigidity() const
+Area::GrowPenalties() const
 {
-	return (fChildArea == NULL) ? fExpandRigidity : fChildArea->fExpandRigidity;
+	return (fChildArea == NULL) ? fGrowPenalties : fChildArea->fGrowPenalties;
 }
 
 
 void
-Area::SetExpandRigidity(BSize expand)
+Area::SetGrowPenalties(BSize grow)
 {
 	if (fChildArea == NULL) {
-		fExpandRigidity = expand;
-		if (fPrefContentWidth != NULL) {
-			fPrefContentWidth->SetPenaltyPos(expand.Width());
-			fPrefContentHeight->SetPenaltyPos(expand.Height());
+		fGrowPenalties = grow;
+		if (fPreferredContentWidth != NULL) {
+			fPreferredContentWidth->SetPenaltyPos(grow.Width());
+			fPreferredContentHeight->SetPenaltyPos(grow.Height());
 		}
 	} else 
-		fChildArea->SetExpandRigidity(expand);
+		fChildArea->SetGrowPenalties(grow);
 	fLS->InvalidateLayout();
 }
 
@@ -506,7 +510,7 @@ Area::SetAlignment(BAlignment alignment)
 /**
  * Sets horizontal alignment of the content in its area.
  */
-void Area::SetHAlignment(alignment horizontal) {
+void Area::SetHorizontalAlignment(alignment horizontal) {
 	fAlignment.SetHorizontal(horizontal);
 	UpdateHorizontal();
 	fLS->InvalidateLayout();
@@ -517,7 +521,7 @@ void Area::SetHAlignment(alignment horizontal) {
  * Sets vertical alignment of the content in its area.
  */
 void
-Area::SetVAlignment(vertical_alignment vertical)
+Area::SetVerticalAlignment(vertical_alignment vertical)
 {
 	fAlignment.SetVertical(vertical);
 	UpdateVertical();
@@ -613,20 +617,20 @@ Area::SetBottomInset(int32 bottom)
 
 /**
  * Sets the preferred size according to the content's PreferredSize method, 
- * and the rigidities according to heuristics.
+ * and the penalties according to heuristics.
  */
 void
-Area::SetDefaultPrefContentSize()
+Area::SetDefaultBehavior()
 {
 	if (Content() == NULL) {
-		SetPrefContentSize(BSize(0, 0));
-		SetShrinkRigidity(BSize(0, 0));
-		SetExpandRigidity(BSize(0, 0));
+		SetPreferredContentSize(BSize(0, 0));
+		SetShrinkPenalties(BSize(0, 0));
+		SetGrowPenalties(BSize(0, 0));
 		return;
 	}
 	
-	if (PrefContentSize() != Content()->PreferredSize()){
-		SetPrefContentSize(Content()->PreferredSize());
+	if (PreferredContentSize() != Content()->PreferredSize()){
+		SetPreferredContentSize(Content()->PreferredSize());
 		fLS->InvalidateLayout();
 	}
 	
@@ -636,21 +640,44 @@ Area::SetDefaultPrefContentSize()
 		|| dynamic_cast<BStringView*>(Content()) != NULL
 		|| dynamic_cast<BPictureButton*>(Content()) != NULL
 		|| dynamic_cast<BStatusBar*>(Content()) != NULL) {
-		//~ || Content is LinkLabel
-		//~ || Content is NumericUpDown) {
-		fShrinkRigidity = BSize(4, 4);
-		fExpandRigidity = BSize(3, 3);
+		fShrinkPenalties = BSize(4, 4);
+		fGrowPenalties = BSize(3, 3);
 	} else {
-		fShrinkRigidity = BSize(2, 2);
-		fExpandRigidity = BSize(1, 1);
+		fShrinkPenalties = BSize(2, 2);
+		fGrowPenalties = BSize(1, 1);
 	}
 }
 
 
-//~ string Area::ToString() {
-	//~ return "Area(" + fLeft->ToString() + "," + fTop->ToString() + ","
-			//~ + fRight->ToString() + "," + fBottom->ToString() + ")";
-//~ }
+BString*
+Area::ToBString()
+{
+	BString* str = new BString();
+	BString* leftStr = fLeft->ToBString();
+	BString* topStr = fTop->ToBString();
+	BString* rightStr = fRight->ToBString();
+	BString* bottomStr = fBottom->ToBString();
+	*str << "Area(" << *leftStr << ", "
+		<< *topStr << ", "
+		<< *rightStr << ", "
+		<< *bottomStr << ")";
+	delete leftStr;
+	delete topStr;
+	delete rightStr;
+	delete bottomStr;
+	return str;
+}
+
+
+const char*
+Area::ToString()
+{
+	BString* str = new BString();
+	char* result = (char*) malloc(str->Length() + 1);
+	str->CopyInto(result, 0, str->Length());
+	delete str;
+	return result;
+}
 
 
 /**
@@ -690,7 +717,7 @@ Area::HasSameHeightAs(Area* area)
  * @return a list containing a same-width and same-height constraint
  */
 BList*
-Area::HasSameSizetAs(Area* area)
+Area::HasSameSizeAs(Area* area)
 {
 	BList* constraints = new BList(2);
 	constraints->AddItem(this->HasSameWidthAs(area));
@@ -752,16 +779,16 @@ Area::Init(BALMLayout* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 	fMaxContentWidth = NULL;
 	fMaxContentHeight = NULL;
 			
-	fPrefContentSize = kUndefinedSize;
-	fShrinkRigidity = BSize(2, 2);
-	fExpandRigidity = BSize(1, 1);
+	fPreferredContentSize = kUndefinedSize;
+	fShrinkPenalties = BSize(2, 2);
+	fGrowPenalties = BSize(1, 1);
 	fContentAspectRatio = 0;
 	fContentAspectRatioC = NULL;
 			
-	fAutoPrefContentSize = false;
+	fAutoPreferredContentSize = false;
 			
-	fPrefContentWidth = NULL;
-	fPrefContentHeight = NULL;
+	fPreferredContentWidth = NULL;
+	fPreferredContentHeight = NULL;
 	
 	fChildArea = NULL;
 	
@@ -855,25 +882,29 @@ Area::InitChildArea()
 		fChildArea->fMaxContentSize = fMaxContentSize;
 		
 		fChildArea->fMaxContentWidth = fMaxContentWidth;
-		fMaxContentWidth->SetLeftSide(-1.0, fChildArea->Left(), 1.0, fChildArea->Right());
+		fMaxContentWidth->SetLeftSide(
+			-1.0, fChildArea->Left(), 1.0, fChildArea->Right());
 		
 		fChildArea->fMaxContentHeight = fMaxContentHeight;
-		fMaxContentHeight->SetLeftSide(-1.0, fChildArea->Top(), 1.0, fChildArea->Bottom());
+		fMaxContentHeight->SetLeftSide(
+			-1.0, fChildArea->Top(), 1.0, fChildArea->Bottom());
 	}
 	
 	// if there are preferred content size constraints on this area, 
 	// change them so that they refer to the tabs of the childArea 
 	// and copy the preferred content size settings to the childArea
-	if (fPrefContentHeight != NULL) {
-		fChildArea->fPrefContentSize = fPrefContentSize;
-		fChildArea->fShrinkRigidity = fShrinkRigidity;
-		fChildArea->fExpandRigidity = fExpandRigidity;
+	if (fPreferredContentHeight != NULL) {
+		fChildArea->fPreferredContentSize = fPreferredContentSize;
+		fChildArea->fShrinkPenalties = fShrinkPenalties;
+		fChildArea->fGrowPenalties = fGrowPenalties;
 		
-		fChildArea->fPrefContentWidth = fPrefContentWidth;
-		fPrefContentWidth->SetLeftSide(-1.0, fChildArea->Left(), 1.0, fChildArea->Right());
+		fChildArea->fPreferredContentWidth = fPreferredContentWidth;
+		fPreferredContentWidth->SetLeftSide(
+			-1.0, fChildArea->Left(), 1.0, fChildArea->Right());
 		
-		fChildArea->fPrefContentHeight = fPrefContentHeight;
-		fPrefContentHeight->SetLeftSide(-1.0, fChildArea->Top(), 1.0, fChildArea->Bottom());
+		fChildArea->fPreferredContentHeight = fPreferredContentHeight;
+		fPreferredContentHeight->SetLeftSide(
+			-1.0, fChildArea->Top(), 1.0, fChildArea->Bottom());
 	}
 }
 

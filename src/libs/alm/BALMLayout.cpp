@@ -52,14 +52,14 @@ BALMLayout::BALMLayout()
 void
 BALMLayout::SolveLayout()
 {
-	// if autoPrefContentSize is set on an area, readjust its prefContentSize and 
-	// rigidity settings
+	// if autoPreferredContentSize is set on an area,
+	// readjust its preferredContentSize and penalties settings
 	int32 sizeAreas = fAreas->CountItems();
 	Area* currentArea;
 	for (int32 i = 0; i < sizeAreas; i++) {
 		currentArea = (Area*)fAreas->ItemAt(i);
-		if (currentArea->AutoPrefContentSize())
-			currentArea->SetDefaultPrefContentSize();
+		if (currentArea->AutoPreferredContentSize())
+			currentArea->SetDefaultBehavior();
 	}
 	
 	// try to solve the layout until the result is OPTIMAL or INFEASIBLE, maximally 
@@ -229,8 +229,8 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 	if (content != NULL)
 		View()->AddChild(content);
 	Area* area = new Area(this, left, top, right, bottom, content, BSize(0, 0));
-	area->SetDefaultPrefContentSize();
-	area->SetAutoPrefContentSize(false);
+	area->SetDefaultBehavior();
+	area->SetAutoPreferredContentSize(false);
 	fAreas->AddItem(area);
 	return area;
 }
@@ -251,8 +251,8 @@ BALMLayout::AddArea(Row* row, Column* column, BView* content)
 	if (content != NULL)
 		View()->AddChild(content);
 	Area* area = new Area(this, row, column, content, BSize(0, 0));
-	area->SetDefaultPrefContentSize();
-	area->SetAutoPrefContentSize(false);
+	area->SetDefaultBehavior();
+	area->SetAutoPreferredContentSize(false);
 	fAreas->AddItem(area);
 	return area;
 }

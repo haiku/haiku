@@ -15,16 +15,16 @@
 #include <View.h>
 
 #include "LayoutStyleType.h"
+#include "XTab.h"
+#include "YTab.h"
+#include "Area.h"
+#include "Row.h"
+#include "Column.h"
+#include "Constraint.h"
 #include "LinearSpec.h"
 
 
 namespace BALM {
-
-class Area;
-class Column;
-class Row;
-class XTab;
-class YTab;
 	
 /**
  * A GUI layout engine using the ALM.
