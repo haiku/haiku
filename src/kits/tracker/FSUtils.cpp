@@ -290,6 +290,17 @@ GetWritableNode(BEntry *entry, StatStruct *statBuf = 0)
 }
 
 
+bool
+CheckDevicesEqual(const entry_ref *srcRef, const Model *targetModel)
+{
+	BDirectory destDir (targetModel->EntryRef());
+	struct stat deststat;
+	destDir.GetStat(&deststat);
+
+	return srcRef->device == deststat.st_dev;
+}
+
+
 status_t
 FSSetPoseLocation(ino_t destDirInode, BNode *destNode, BPoint point)
 {

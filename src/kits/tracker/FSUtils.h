@@ -229,6 +229,8 @@ bool FSIsDeskDir(const BEntry *, dev_t);
 bool ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 	bool dontAsk = false, int32 *confirmedAlready = NULL);
 
+bool CheckDevicesEqual(const entry_ref *entry, const Model *targetModel);
+
 // Deprecated calls use newer calls above instead
 _IMPEXP_TRACKER void FSLaunchItem(const entry_ref *, BMessage * = NULL, int32 workspace = -1);
 _IMPEXP_TRACKER status_t FSLaunchItem(const entry_ref *, BMessage *,

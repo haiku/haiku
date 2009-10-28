@@ -4518,17 +4518,6 @@ CopySelectionListToBListAsEntryRefs(const PoseList *original, BObjectList<entry_
 }
 
 
-static bool
-CheckDevicesEqual(const entry_ref *srcRef, Model *targetModel)
-{
-	BDirectory destDir (targetModel->EntryRef());
-	struct stat deststat;
-	destDir.GetStat(&deststat);
-
-	return srcRef->device == deststat.st_dev;
-}
-
-
 void
 BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 	bool forceCopy, bool forceMove, bool createLink, bool relativeLink)
