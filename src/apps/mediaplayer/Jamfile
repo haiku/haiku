@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # for BRecentItems
 UsePublicHeaders [ FDirName be_apps Tracker ] ;
-UsePrivateHeaders shared ;
+UsePrivateHeaders interface shared ;
 
 # source directories
 local sourceDirs =
@@ -27,6 +27,7 @@ Application MediaPlayer :
 	# interface
 	DrawingTidbits.cpp
 	PeakView.cpp
+	PositionToolTip.cpp
 	SeekSlider.cpp
 	TransportButton.cpp
 	VolumeSlider.cpp

@@ -3,9 +3,11 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 // NOTE: Based on my code in the BeOS interface for the VLC media player
 // that I did during the VLC 0.4.3 - 0.4.6 times. Code not written by me
 // removed. -Stephan Aßmus
+
 
 #include "TransportControlGroup.h"
 
@@ -17,6 +19,7 @@
 #include "ButtonBitmaps.h"
 #include "PeakView.h"
 #include "PlaybackState.h"
+#include "PositionToolTip.h"
 #include "SeekSlider.h"
 #include "TransportButton.h"
 #include "VolumeSlider.h"
@@ -67,6 +70,9 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 		0, kPositionFactor);
 	fSeekSlider->ResizeToPreferred();
 	AddChild(fSeekSlider);
+
+	fPositionToolTip = new PositionToolTip();
+	fSeekSlider->SetToolTip(fPositionToolTip);
 
     // Buttons
 	if (useSkipButtons) {
@@ -162,6 +168,8 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 
 TransportControlGroup::~TransportControlGroup()
 {
+	if (!fSeekSlider->IsEnabled())
+		delete fPositionToolTip;
 }
 
 
@@ -342,6 +350,8 @@ TransportControlGroup::SetEnabled(uint32 buttons)
 		return;
 
 	fSeekSlider->SetEnabled(buttons & SEEK_ENABLED);
+	fSeekSlider->SetToolTip((buttons & SEEK_ENABLED) != 0
+		? fPositionToolTip : NULL);
 
 	fVolumeSlider->SetEnabled(buttons & VOLUME_ENABLED);
 	fMute->SetEnabled(buttons & VOLUME_ENABLED);
@@ -443,11 +453,13 @@ TransportControlGroup::SetVolume(float value)
 
 
 void
-TransportControlGroup::SetPosition(float value)
+TransportControlGroup::SetPosition(float value, bigtime_t position,
+	bigtime_t duration)
 {
 	if (fSeekSlider->IsTracking())
 		return;
 
+	fPositionToolTip->Update(position, duration);
 	fSeekSlider->SetPosition(value);
 }
 

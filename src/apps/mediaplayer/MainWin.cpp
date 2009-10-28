@@ -480,8 +480,10 @@ MainWin::MessageReceived(BMessage *msg)
 		case MSG_CONTROLLER_POSITION_CHANGED:
 		{
 			float position;
-			if (msg->FindFloat("position", &position) == B_OK)
-				fControls->SetPosition(position);
+			if (msg->FindFloat("position", &position) == B_OK) {
+				fControls->SetPosition(position, fController->TimePosition(),
+					fController->TimeDuration());
+			}
 			break;
 		}
 		case MSG_CONTROLLER_VOLUME_CHANGED:

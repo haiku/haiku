@@ -16,6 +16,7 @@
 
 class PeakView;
 class PlayPauseButton;
+class PositionToolTip;
 class TransportButton;
 class SeekSlider;
 class VolumeSlider;
@@ -65,7 +66,8 @@ public:
 			void				SetMuted(bool mute);
 
 			void				SetVolume(float value);
-			void				SetPosition(float value);
+			void				SetPosition(float value, bigtime_t position,
+									bigtime_t duration);
 
 			PeakView*			GetPeakView() const
 									{ return fPeakView; }
@@ -93,6 +95,7 @@ private:
 			float				_GainToDb(float gain);
 
 			SeekSlider*			fSeekSlider;
+			PositionToolTip*	fPositionToolTip;
 			PeakView*			fPeakView;
 			VolumeSlider*		fVolumeSlider;
 
