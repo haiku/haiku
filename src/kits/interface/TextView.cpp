@@ -140,10 +140,20 @@ struct BTextView::LayoutData {
 
 	void UpdateInsets(const BRect& bounds, const BRect& textRect)
 	{
-		leftInset = textRect.left - bounds.left;
-		topInset = textRect.top - bounds.top;
-		rightInset = bounds.right - textRect.right;
-		bottomInset = bounds.bottom - textRect.bottom;
+		// we disallow negative insets, as they would cause parts of the
+		// text to be hidden
+		leftInset = textRect.left >= bounds.left
+			? textRect.left - bounds.left
+			: 0;
+		topInset = textRect.top >= bounds.top
+			? textRect.top - bounds.top
+			: 0;
+		rightInset = bounds.right >= textRect.right
+			? bounds.right - textRect.right
+			: leftInset;
+		bottomInset = bounds.bottom >= textRect.bottom
+			? bounds.bottom - textRect.bottom
+			: topInset;
 	}
 
 	float				leftInset;
@@ -2235,16 +2245,14 @@ void
 BTextView::GetInsets(float* _left, float* _top, float* _right,
 	float* _bottom) const
 {
-	BRect bounds = Bounds().OffsetToCopy(B_ORIGIN);
-
 	if (_left)
-		*_left = fTextRect.left - bounds.left;
+		*_left = fLayoutData->leftInset;
 	if (_top)
-		*_top = fTextRect.top - bounds.top;
+		*_top = fLayoutData->topInset;
 	if (_right)
-		*_right = bounds.right - fTextRect.right;
+		*_right = fLayoutData->rightInset;
 	if (_bottom)
-		*_bottom = bounds.bottom - fTextRect.bottom;
+		*_bottom = fLayoutData->bottomInset;
 }
 
 
@@ -2570,6 +2578,11 @@ BTextView::MakeResizable(bool resize, BView *resizeView)
 					_HideCaret();
 			}
 		}
+		// We need to reset the right inset, as otherwise the auto-resize would
+		// get confused about just how wide the textview needs to be.
+		// This seems to be an artefact of how Tracker creates the textview
+		// during a rename action.
+		fLayoutData->rightInset = fLayoutData->leftInset;
 	} else {
 		fResizable = false;
 		fContainerView = NULL;
@@ -4881,12 +4894,9 @@ BTextView::_AutoResize(bool redraw)
 		return;
 
 	BRect bounds = Bounds();
-	float oldWidth = fTextRect.Width();
-	float minWidth = fContainerView != NULL ? 3.0 : fMinTextRectWidth;
-	float newWidth = max_c(minWidth, ceilf(fLines->MaxWidth()));
-
-	if (newWidth == oldWidth)
-		return;
+	float oldWidth = bounds.Width();
+	float newWidth = ceilf(fLayoutData->leftInset + fTextRect.Width()
+		+ fLayoutData->rightInset);
 
 	if (fContainerView != NULL) {
 		// NOTE: This container view thing is only used by Tracker.
@@ -4902,7 +4912,6 @@ BTextView::_AutoResize(bool redraw)
 		fContainerView->ResizeBy(ceilf(newWidth - oldWidth), 0);
 	}
 
-	fTextRect.right = fTextRect.left + newWidth;
 
 	if (redraw)
 		_RequestDrawLines(0, 0);
