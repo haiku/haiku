@@ -20,5 +20,5 @@ DoCatalogs Keymap :
 	x-vnd.Haiku-Keymap
 	: KeymapWindow.cpp
 	: en.catalog
-	: fr.catkeys ru.catkeys
+	: fr.catkeys lt.catkeys ru.catkeys
 	;

@@ -1,0 +1,34 @@
+1	Lithuanian	x-vnd.Haiku-Media	1721947718
+Show Volume Control on Deskbar	Media views		Rodyti garso valdiklį Deskbare
+Audio Input:	Media views		Garso įvadas:
+Restarting Media Services\nStarting Media Server…\n	Media Window		Perleidžiamos medija tarnybos (serveriai)\nPaleidžiamas medija serveris…\n
+Video Input:	Media views		Vaizdo įvadas:
+Waiting for media_server to quit.	Media Window		Laikiama medija serverio išsijungimo.
+Defaults	Media views		Įprastai
+Stopping Media Server…	Media Window		Stabdomas medija serveris…
+Video Output:	Media views		Vaizdo išvadas:
+Enable Real-Time Audio	Media views		Tikralaikis garsas
+Quit	Media Window		Baigti
+OK	Media Window		Gerai
+Enabling Real-Time Video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Tikralaikio vaizdo įjungimas leidžia sistemai atlikti veiksmus su vaizdu kiek įmanoma sklandžiau. Tam pasiekti išnaudojama daugiau kompiuterio atminties.\n\nĮjunkitę šią savybę, jei jums reikia mažesnės delsos.
+Default Nodes	Media views		Įprasti mazgai
+Starting Media Server…	Media Window		Startuoja medija serveris…
+Restart the Media Server to apply changes.	Media views		Perleisti medija serverį pakeitimų įsigaliojimui.
+Done Shutting Down.	Media Window		Išjungta.
+Cleaning Up.	Media Window		Valymas.
+Telling media_addon_server to quit.	Media Window		Išjungiamas medija priedėlių serveris.
+Enable Real-Time Video	Media views		Įjugti tikralaikį vaizdą
+This hardware has no controls.	Media Window		Ši įranga neturi valdiklių.
+Restarting Media Services\nShutting down Media Server\n	Media Window		Perkraunamos medija tarnybos\n
+Audio Output:	Media views		Garso išvadas:
+Start Media Server	Media Window		Medija serverio paleistis
+Audio Settings	Media Window		Garso nustatymai
+Could not connect to the Media Server.\nWould you like to start it ?	Media Window		Neprisijungiama prie medija serverio.\nGal jį paleisti ?
+Ready For Use…	Media Window		Parengiama…
+Real-Time	Media views		Tikralaikis
+Restart Media Services	Media views		Perkrauti medija tarnybas
+Enabling Real-time Audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Tikralaikio garso įjungimas leidžia sistemai atlikti veiksmus su garsu kiek įmanoma sklandžiau. Tam pasiekti išnaudojama daugiau kompiuterio atminties.\n\nĮjunkitę šią savybę, jei jums reikia mažesnės delsos.
+Couldn't remove Volume control in Deskbar: %s\n	Media Window		Garso valdiklio pašalinimas iš deskbaro negalimas : %s\n
+Couldn't add Volume control in Deskbar: %s\n	Media Window		Garso valdiklio įdėjimas deskbaran negalimas: %s\n
+Media	Media Window		Garsas ir vaizdas
+Channel:	Media views		Kanalas :
