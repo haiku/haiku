@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-5/2006
+   Rudolf Cornelissen 10/2002-10/2009
 */
 
 #define MODULE_BIT 0x00008000
@@ -54,7 +54,7 @@ status_t gx00_general_powerup()
 	status_t status;
 	uint8 card_class;
 
-	LOG(1,("POWERUP: Haiku Matrox Accelerant 0.31 running.\n"));
+	LOG(1,("POWERUP: Haiku Matrox Accelerant 0.32 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -720,8 +720,14 @@ status_t g450_general_powerup()
 	}
 
 	/* create positive flank to generate memory reset */
-	ACCW(MACCESS, (maccess & 0xffff7fff));
-	ACCW(MACCESS, (maccess | 0x00008000));
+	//fixme: G550 is still noted as a G450, fix upon trouble..
+	if (si->ps.card_type == G450) {
+		ACCW(MACCESS, (maccess & 0xffff3fff));
+		ACCW(MACCESS, (maccess | 0x0000c000));
+	} else { //G550
+		ACCW(MACCESS, (maccess & 0xffff7fff));
+		ACCW(MACCESS, (maccess | 0x00008000));
+	}
 	snooze(250);
 
 	/* start memory refresh */
