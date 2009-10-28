@@ -858,6 +858,7 @@ AboutView::_CreateCreditsView()
 		"Ulrich Wimboeck\n"
 		"Johannes Wischert\n"
 		"James Woodcock\n"
+		"Hong Yul Yang\n"
 		"Gerald Zajac\n"
 		"Łukasz Zemczak\n"
 		"JiSheng Zhang\n"
