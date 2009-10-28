@@ -174,7 +174,7 @@ CalendarMenuWindow::WindowActivated(bool active)
 	if (active)
 		return;
 
-	if (mouse_mode() == 0) {
+	if (mouse_mode() != B_FOCUS_FOLLOWS_MOUSE) {
 		if (!active)
 			PostMessage(B_QUIT_REQUESTED);
 	} else {
