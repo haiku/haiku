@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Locale	2750813901
+1	Ukrainian	 x-vnd.Haiku-Locale	2750813901
 day of week (short name)	TimeFormatSettings		день тижня (скорочено)
 Available languages	Locale Preflet Window		Доступні мови
 Decimal separator	TimeFormatSettings		Десятковий розділювач 
@@ -8,23 +8,23 @@ Unable to find the available languages! You can't use this preflet!	Locale Prefl
 After	TimeFormatSettings		Після
 Long format:	TimeFormatSettings		Звичний  формат:
 Before	TimeFormatSettings		До
-Currency	TimeFormatSettings		Біжучий
+Currency	TimeFormatSettings		Валюта
 Year	TimeFormatSettings		Рік
 Short format:	TimeFormatSettings		Скорочений формат:
-Currency symbol:	TimeFormatSettings		Біжучий символ:
+Currency symbol:	TimeFormatSettings		Символ валюти:
 Space	TimeFormatSettings		Простір
 Language	Locale Preflet Window		Мова
 Thousand separator	TimeFormatSettings		Розділювач тисяч
-24 Hour	TimeFormatSettings		24 Heures
+24 Hour	TimeFormatSettings		24 години
 Year (2 digits)	TimeFormatSettings		Рік (2 цифри)
-Preferred languages	Locale Preflet Window		Preferred languages
+Preferred languages	Locale Preflet Window		Мови ,що переважають
 Symbol position	TimeFormatSettings		Позиція символа
 month number	TimeFormatSettings		номер місяця
 month number (2 digits)	TimeFormatSettings		номер місяця  (2 цифри)
 Numbers	TimeFormatSettings		Номери
  (unknown format)	TimeFormatSettings		 (невідомий формат)
 Negative marker:	TimeFormatSettings		Негативний маркер:
-12 Hour	TimeFormatSettings		12 Heures
+12 Hour	TimeFormatSettings		12 годин
 Defaults	Locale Preflet Window		По замовчуванню
 Separator	TimeFormatSettings		Розділювач
 Country	Locale Preflet Window		Країна

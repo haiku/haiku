@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Appearance	959674221
+1	ukrainian 	x-vnd.Haiku-Appearance	959674221
 Navigation Pulse	Colors tab		Навігація Pulse
 Shadow	Colors tab		Тінь
 On	AntialiasingSettingsView		Увімкнути
@@ -23,12 +23,12 @@ Document Text	Colors tab		Текст документа
 Navigation Base	Colors tab		Основи навігації
 Menu Background	Colors tab		Тло меню
 Appearance	APRWindow		Вигляд
-Control Background	Colors tab		Тло управління
+Control Background	Colors tab		Керування тлом
 Colors	APRWindow		Кольори
-Panel Background	Colors tab		Панель тла
-Window Tab	Colors tab		Вікно табуляції
+Panel Background	Colors tab		Панель 
+Window Tab	Colors tab		Табуляція вікна
 Reduce colored edges filter strength:	AntialiasingSettingsView		Зменшити силу фільтра зафарбування межі:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Базове субпіксельне зглажування з гліфом недоступне в цій зборці ,щоб отримати цю можливість зберіть Haiku  самостійно з увімкненим заголовком в опції libfreetype
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Базове субпіксельне зглажування з гліфом недоступне в цій зборці ,щоб отримати таку можливість зберіть Haiku  самостійно з увімкненим заголовком в опції libfreetype
 Menu Item Text	Colors tab		Текст пункта меню
 Monospaced Fonts Only	AntialiasingSettingsView		Тільки моноширинні шрифти
 LCD subpixel	AntialiasingSettingsView		Субпіксель LCD
