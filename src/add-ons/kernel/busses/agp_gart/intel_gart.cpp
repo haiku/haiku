@@ -149,23 +149,21 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				break;
 		}
 	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x) {
-		switch (memoryConfig & G4X_GGC_GGMS_MASK) {
-			case G4X_GGMS_NONE:
+		switch (memoryConfig & G4X_GTT_MASK) {
+			case G4X_GTT_NONE:
 				gttSize = 0;
 				break;
-			case G4X_GGMS_NO_IVT_1M:
+			case G4X_GTT_1M_NO_IVT:
 				gttSize = 1 << 20;
 				break;
-			case G4X_GGMS_NO_IVT_2M:
+			case G4X_GTT_2M_NO_IVT:
+			case G4X_GTT_2M_IVT:
 				gttSize = 2 << 20;
 				break;
-			case G4X_GGMS_IVT_2M:
-				gttSize = 2 << 20;
-				break;
-			case G4X_GGMS_IVT_3M:
+			case G4X_GTT_3M_IVT:
 				gttSize = 3 << 20;
 				break;
-			case G4X_GGMS_IVT_4M:
+			case G4X_GTT_4M_IVT:
 				gttSize = 4 << 20;
 				break;			
 		}
@@ -205,33 +203,6 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				memorySize *= 8;
 				break;
 		}
-	} else if (info.type == INTEL_TYPE_G4x) {
-		switch (memoryConfig & G4X_GGC_GMS_MASK) {
-			case G4X_GMS_32MB:
-				memorySize *= 32;
-				break;
-			case G4X_GMS_64MB:
-				memorySize *= 64;
-				break;
-			case G4X_GMS_128MB:
-				memorySize *= 128;
-				break;
-			case G4X_GMS_256MB:
-				memorySize *= 256;
-				break;
-			case G4X_GMS_96MB:
-				memorySize *= 96;
-				break;
-			case G4X_GMS_160MB:
-				memorySize *= 160;
-				break;
-			case G4X_GMS_224MB:
-				memorySize *= 224;
-				break;
-			case G4X_GMS_352MB:
-				memorySize *= 352;
-				break;
-		}
 	} else if (info.type == INTEL_TYPE_85x
 		|| (info.type & INTEL_TYPE_9xx) == INTEL_TYPE_9xx) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
@@ -258,6 +229,18 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				break;
 			case i855_STOLEN_MEMORY_256M:
 				memorySize *= 256;
+				break;
+			case G4X_STOLEN_MEMORY_96MB:
+				memorySize *= 96;
+				break;
+			case G4X_STOLEN_MEMORY_160MB:
+				memorySize *= 160;
+				break;
+			case G4X_STOLEN_MEMORY_224MB:
+				memorySize *= 224;
+				break;
+			case G4X_STOLEN_MEMORY_352MB:
+				memorySize *= 352;
 				break;
 		}
 	} else {
@@ -329,12 +312,13 @@ intel_map(intel_info &info)
 	if (get_memory_map(scratchAddress, B_PAGE_SIZE, &entry, 1) != B_OK)
 		return B_ERROR;
 
-	if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x)
-		info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
-				+ (2UL << 20);
-	else if ((info.type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx)
-		info.gtt_physical_base = get_pci_config(info.display, i915_GTT_BASE, 4);
-	else {
+	if ((info.type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx) {
+		if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x) {
+			info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
+					+ (2UL << 20);
+		} else
+			info.gtt_physical_base = get_pci_config(info.display, i915_GTT_BASE, 4);
+	} else {
 		info.gtt_physical_base = read32(info.registers
 			+ INTEL_PAGE_TABLE_CONTROL) & ~PAGE_TABLE_ENABLED;
 		if (info.gtt_physical_base == 0) {

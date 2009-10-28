@@ -5,7 +5,6 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders [ FDirName graphics intel_extreme ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders graphics kernel ;
-UsePrivateHeaders shared ;
 
 KernelAddon intel_extreme :
 	driver.cpp

@@ -247,13 +247,13 @@ intel_extreme_init(intel_info &info)
 	} else if (info.device_type.InGroup(INTEL_TYPE_G4x)) {
 		dprintf("G4x clock gating\n");
 		write32(info.registers + 0x6204, 0);
-		write32(info.registers + 0x6208, BIT(9) | BIT(7) | BIT(6));
+		write32(info.registers + 0x6208, (1L << 9) | (1L << 7) | (1L << 6));
 		write32(info.registers + 0x6210, 0);
 
-		uint32 dspclk_gate_val = BIT(28) | BIT(3) | BIT(2);
+		uint32 dspclk_gate_val = (1L << 28) | (1L << 3) | (1L << 2);
 		if ((info.device_type.type & INTEL_TYPE_MOBILE) == INTEL_TYPE_MOBILE) {
 			dprintf("G4x mobile clock gating\n");
-		    dspclk_gate_val |= BIT(18);
+		    dspclk_gate_val |= 1L << 18;
 		}
 		write32(info.registers + 0x6200, dspclk_gate_val)	;	
 

@@ -7,7 +7,6 @@ UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) ] ;
 UsePrivateHeaders [ FDirName graphics intel_extreme ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders drivers graphics kernel ;
-UsePrivateHeaders shared ;
 
 KernelAddon <agp_gart>intel :
 	intel_gart.cpp
