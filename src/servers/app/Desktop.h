@@ -34,6 +34,7 @@
 #include <Region.h>
 #include <Window.h>
 
+#include "LinearSpec.h"
 
 #define USE_MULTI_LOCKER 1
 
@@ -241,6 +242,15 @@ public:
 			void				WriteWindowOrder(int32 workspace,
 									BPrivate::LinkSender& sender);
 
+			WindowList&				GetWindows();
+			bool					HighlightTab(Window* window, bool active);
+			bool					HighlightBorders(Window* window, bool active);
+			void					FinishStackingAndSnapping();
+			Window*					FindWindow(int32 windowId);
+
+			bool					fIsStackingAndSnapping;
+			LinearSpec*				fStackAndTileSpec;
+
 private:
 			void				_LaunchInputServer();
 			void				_GetLooperName(char* name, size_t size);
@@ -293,6 +303,9 @@ private:
 			void				_ScreenChanged(Screen* screen);
 			void				_SetCurrentWorkspaceConfiguration();
 			void				_SetWorkspace(int32 index);
+
+			bool				_AddWindowsByIdsToList(BList* windowIdsToAdd,
+									BList* windows);
 
 private:
 	friend class DesktopSettings;

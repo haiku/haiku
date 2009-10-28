@@ -23,6 +23,8 @@
 #include <Region.h>
 #include <String.h>
 
+#include "LinearSpec.h"
+
 namespace BPrivate {
 	class PortLink;
 };
@@ -43,6 +45,10 @@ enum {
 	UPDATE_EXPOSE		= 0x02,
 };
 
+// Used for Stack & Tile
+enum SnapOrientation {
+	SNAP_LEFT, SNAP_RIGHT, SNAP_TOP, SNAP_BOTTOM
+};
 
 class Window {
 public:
@@ -244,6 +250,59 @@ public:
 	static	uint32				ValidWindowFlags();
 	static	uint32				ValidWindowFlags(window_feel feel);
 
+			bool				HighlightTab(bool active, BRegion& dirty);
+			bool				HighlightBorders(bool active, BRegion& dirty);
+			bool				IsTabHighlighted();
+			bool				IsBordersHighlighted();
+
+			void				StackAndTile();
+			void				StackWindowBefore(Window* window);
+			void				FinishStackingAndSnapping();
+			BList*				StackedWindows() const
+									{ return fStackedWindows; }
+			int32				WindowId();
+			void				SetWindowId(int32 windowId);
+			BList*				StackedWindowIds() const
+									{ return fStackedWindowIds; }
+			void				InitStackedWindowIds();
+
+			Constraint*			SnapToWindow(Window* otherWindow,
+									SnapOrientation thisSnap,
+									SnapOrientation otherSnap);
+
+			void				AddToSnappingList(int32 windowId,
+									SnapOrientation thisSnapOrientation,
+									SnapOrientation otherSnapOrientation);
+			void				AddToSnappingList(Window* window,
+									SnapOrientation thisSnapOrientation,
+									SnapOrientation otherSnapOrientation);
+			void				RemoveFromSnappingList(int32 windowId,
+									SnapOrientation thisSnapOrientation,
+									SnapOrientation otherSnapOrientation);
+			BList*				GetSnappingList(
+									SnapOrientation thisSnapOrientation,
+									SnapOrientation otherSnapOrientation,
+									bool createIfNull);
+
+			BList*				Left2LeftSnappingWindowIds() const
+									{ return fLeft2LeftSnappingWindowIds; }
+			BList*				Left2RightSnappingWindowIds() const
+									{ return fLeft2RightSnappingWindowIds; }
+			BList*				Right2RightSnappingWindowIds() const
+									{ return fRight2RightSnappingWindowIds; }
+			BList*				Right2LeftSnappingWindowIds() const
+									{ return fRight2LeftSnappingWindowIds; }
+			BList*				Top2TopSnappingWindowIds() const
+									{ return fTop2TopSnappingWindowIds; }
+			BList*				Top2BottomSnappingWindowIds() const
+									{ return fTop2BottomSnappingWindowIds; }
+			BList*				Bottom2BottomSnappingWindowIds() const
+									{ return fBottom2BottomSnappingWindowIds; }
+			BList*				Bottom2TopSnappingWindowIds() const
+									{ return fBottom2TopSnappingWindowIds; }
+
+			bool				ForceActivate() { return fForceActivate; }
+
 protected:
 			void				_ShiftPartOfRegion(BRegion* region,
 									BRegion* regionToShift, int32 xOffset,
@@ -393,6 +452,78 @@ protected:
 			int32				fMaxHeight;
 
 			int32				fWorkspacesViewCount;
+
+			// Stack & Tile specific members
+			void				_InitStackingAndSnapping();
+			void				_RemoveStackingAndSnapping();
+
+			void				_CheckIfReadyToStack();
+			void				_StackWindow();
+			void				_ArrangeStackedWindowTabs();
+
+			void 				_CheckIfReadyToSnap();
+			void				_SnapWindow();
+			BRect				_BoundingRectAndWindows(BList* windows,
+									Window** leftmostWindow,
+									Window** topmostWindow,
+									Window** rightmostWindow,
+									Window** bottommostWindow);
+
+			void				_BoundWindowByWorkspace();
+			void				_UnboundWindowByWorkspace();
+
+			void				_RemoveStackingPersistently();
+			void				_RemoveSnappingPersistently();
+
+			void				_FreeUpSnappingList(SnapOrientation thisSnap,
+									SnapOrientation otherSnap,
+									bool deleteFromOtherWindowsList);
+			BList**				_GetSnappingListRef(
+									SnapOrientation thisSnapOrientation,
+									SnapOrientation otherSnapOrientation,
+									bool createIfNull);
+
+			void				_EnsureWindowWithinScreenBounds(Window* window, Window* detached);
+
+			Variable*			fLeftVar;
+			Variable*			fTopVar;
+			Variable*			fRightVar;
+			Variable*			fBottomVar;
+			Constraint*			fLeftConstraint;
+			Constraint*			fTopConstraint;
+			Constraint*			fMinWidthConstraint;
+			Constraint*			fMinHeightConstraint;
+			Constraint*			fWidthConstraint;
+			Constraint*			fHeightConstraint;
+
+			BList*				fLeftAdjacentWindows;
+			BList*				fTopAdjacentWindows;
+			BList*				fRightAdjacentWindows;
+			BList*				fBottomAdjacentWindows;
+			BList*				fSnappingConstraints;
+
+			BList*				fLeft2LeftSnappingWindowIds;
+			BList*				fLeft2RightSnappingWindowIds;
+			BList*				fRight2RightSnappingWindowIds;
+			BList*				fRight2LeftSnappingWindowIds;
+			BList*				fTop2TopSnappingWindowIds;
+			BList*				fTop2BottomSnappingWindowIds;
+			BList*				fBottom2BottomSnappingWindowIds;
+			BList*				fBottom2TopSnappingWindowIds;
+
+			//True means activate this window even if it's already at the front
+			bool				fForceActivate;
+
+			Window* 			fWindowUnder;
+			BList*				fStackedWindows;
+			BList*				fPrevStackedWindows;
+			Constraint*			fLeftStackingConstraint;
+			Constraint*			fTopStackingConstraint;
+			Constraint*			fRightStackingConstraint;
+			Constraint*			fBottomStackingConstraint;
+
+			int32				fId;
+			BList*				fStackedWindowIds;
 };
 
 #endif // WINDOW_H

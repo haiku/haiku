@@ -568,6 +568,10 @@ WorkspacesView::MouseMoved(BMessage* message, BPoint where)
 	if (fHasMoved) {
 		Window()->Desktop()->MoveWindowBy(fSelectedWindow, left - leftTop.x,
 			top - leftTop.y, fSelectedWorkspace);
+		//TODO Re-apply stack & tile constraints so that any other windows
+		//that are stacked/snapped against this window can be re-adjusted.
+		//Must smartly call stack and tile after workspace shifting has
+		//finalised. How?
 	}
 }
 

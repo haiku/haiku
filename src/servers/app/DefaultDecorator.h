@@ -10,10 +10,9 @@
 #define DEFAULT_DECORATOR_H
 
 
-#include <Region.h>
-
 #include "Decorator.h"
-
+#include "Desktop.h"
+#include <Region.h>
 
 class Desktop;
 class ServerBitmap;
@@ -58,6 +57,9 @@ public:
 	virtual	click_type			Clicked(BPoint pt, int32 buttons,
 									int32 modifiers);
 
+	virtual void 				HighlightTab(bool active, BRegion* dirty);
+	virtual void 				HighlightBorders(bool active, BRegion* dirty);
+
 protected:
 	virtual void				_DoLayout();
 
@@ -92,6 +94,7 @@ private:
 			rgb_color			fTabColor;
 			rgb_color			fFocusTabColor;
 			rgb_color			fNonFocusTabColor;
+			rgb_color			fHighlightTabColor;
 			rgb_color			fTextColor;
 			rgb_color			fFocusTextColor;
 			rgb_color			fNonFocusTextColor;
@@ -103,6 +106,8 @@ private:
 			rgb_color			fFrameColors[6];
 			rgb_color			fFocusFrameColors[2];
 			rgb_color			fNonFocusFrameColors[2];
+			rgb_color			fNonHighlightFrameColors[4];
+			rgb_color			fHighlightFrameColors[6];
 
 			bool				fButtonFocus;
 			ServerBitmap*		fCloseBitmaps[4];
@@ -128,6 +133,14 @@ private:
 
 			bigtime_t			fLastClicked;
 			bool				fWasDoubleClick;
+
+			//Stack & Tile specific private methods
+			bool				_StoreIntsInSettings(const char* label,
+									BList* ids, BMessage* settings) const;
+			void				_SnapWindowFromSettings(const char* label,
+									SnapOrientation thisSnapOrientation,
+									SnapOrientation otherSnapOrientation,
+									const BMessage* settings);
 };
 
 #endif	// DEFAULT_DECORATOR_H
