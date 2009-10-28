@@ -24,6 +24,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
 #	Clockwerk			- native audio/video compositing
 #	CLucene				- indexed file search
 #	Curl				- a client that groks URLs
+#	CMake				- cross platform make
 #	CVS					- the version control system
 #	Development			- more complete dev environment (including autotools)
 #	DevelopmentBase		- basic development environment (gcc, headers, libs,...)
@@ -239,6 +240,20 @@ if [ IsOptionalHaikuImagePackageAdded CLucene ] {
 		InstallOptionalHaikuImagePackage
 			clucene-0.9.21svn-x86-gcc4-haiku-2009-08-11
 			: $(baseURL)/clucene-0.9.21-x86-gcc4-haiku-2009-08-11.zip
+			:
+			: true
+		;
+	}
+}
+
+
+# CMake
+if [ IsOptionalHaikuImagePackageAdded CMake ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package CMake available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage cmake-2.8.0-rc3-x86-gcc2-2009-10-27
+			: $(baseURL)/cmake-2.8.0-rc3-x86-gcc2-2009-10-27.zip
 			:
 			: true
 		;
