@@ -97,9 +97,11 @@ static const char* sCurrentKernelDebuggerMessage;
 #define DEFAULT_SYSLOG_BUFFER_SIZE 65536
 #define OUTPUT_BUFFER_SIZE 1024
 static char sOutputBuffer[OUTPUT_BUFFER_SIZE];
+static char sInterruptOutputBuffer[OUTPUT_BUFFER_SIZE];
 static char sLastOutputBuffer[OUTPUT_BUFFER_SIZE];
 static DebugOutputFilter* sDebugOutputFilter = NULL;
 DefaultDebugOutputFilter gDefaultDebugOutputFilter;
+static mutex sOutputLock = MUTEX_INITIALIZER("debug output");
 
 static void flush_pending_repeats(bool syslogOutput);
 static void check_pending_repeats(void* data, int iter);
@@ -174,9 +176,9 @@ DefaultDebugOutputFilter::PrintString(const char* string)
 void
 DefaultDebugOutputFilter::Print(const char* format, va_list args)
 {
-	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
+	vsnprintf(sInterruptOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
 	flush_pending_repeats(sInDebugger == 0);
-	PrintString(sOutputBuffer);
+	PrintString(sInterruptOutputBuffer);
 }
 
 
@@ -1219,7 +1221,130 @@ call_modules_hook(bool enter)
 }
 
 
-//	#pragma mark - private kernel API
+//!	Must be called with the sSpinlock held.
+static void
+debug_output(const char* string, int32 length, bool syslogOutput)
+{
+	if (length >= OUTPUT_BUFFER_SIZE)
+		length = OUTPUT_BUFFER_SIZE - 1;
+
+	if (length > 1 && string[length - 1] == '\n'
+		&& strncmp(string, sLastOutputBuffer, length) == 0) {
+		sMessageRepeatCount++;
+		sMessageRepeatLastTime = system_time();
+		if (sMessageRepeatFirstTime == 0)
+			sMessageRepeatFirstTime = sMessageRepeatLastTime;
+	} else {
+		flush_pending_repeats(syslogOutput);
+
+		if (sSerialDebugEnabled)
+			arch_debug_serial_puts(string);
+		if (sSyslogOutputEnabled && syslogOutput)
+			syslog_write(string, length);
+		if (sBlueScreenEnabled || sDebugScreenEnabled)
+			blue_screen_puts(string);
+		if (sSerialDebugEnabled) {
+			for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
+				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
+					sDebuggerModules[i]->debugger_puts(string, length);
+			}
+		}
+
+		memcpy(sLastOutputBuffer, string, length);
+		sLastOutputBuffer[length] = 0;
+	}
+}
+
+
+//!	Must be called with the sSpinlock held.
+static void
+flush_pending_repeats(bool syslogOutput)
+{
+	if (sMessageRepeatCount <= 0)
+		return;
+
+	if (sMessageRepeatCount > 1) {
+		static char temp[40];
+		size_t length = snprintf(temp, sizeof(temp),
+			"Last message repeated %ld times.\n", sMessageRepeatCount);
+
+		if (sSerialDebugEnabled)
+			arch_debug_serial_puts(temp);
+		if (sSyslogOutputEnabled && syslogOutput)
+			syslog_write(temp, length);
+		if (sBlueScreenEnabled || sDebugScreenEnabled)
+			blue_screen_puts(temp);
+		if (sSerialDebugEnabled) {
+			for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
+				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
+					sDebuggerModules[i]->debugger_puts(temp, length);
+			}
+		}
+	} else {
+		// if we only have one repeat just reprint the last buffer
+		size_t length = strlen(sLastOutputBuffer);
+
+		if (sSerialDebugEnabled)
+			arch_debug_serial_puts(sLastOutputBuffer);
+		if (sSyslogOutputEnabled && syslogOutput)
+			syslog_write(sLastOutputBuffer, length);
+		if (sBlueScreenEnabled || sDebugScreenEnabled)
+			blue_screen_puts(sLastOutputBuffer);
+		if (sSerialDebugEnabled) {
+			for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
+				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts) {
+					sDebuggerModules[i]->debugger_puts(sLastOutputBuffer,
+						length);
+				}
+			}
+		}
+	}
+
+	sMessageRepeatFirstTime = 0;
+	sMessageRepeatCount = 0;
+}
+
+
+static void
+check_pending_repeats(void* /*data*/, int /*iteration*/)
+{
+	if (sMessageRepeatCount > 0
+		&& (system_time() - sMessageRepeatLastTime > 1000000
+			|| system_time() - sMessageRepeatFirstTime > 3000000)) {
+		cpu_status state = disable_interrupts();
+		acquire_spinlock(&sSpinlock);
+
+		flush_pending_repeats(true);
+
+		release_spinlock(&sSpinlock);
+		restore_interrupts(state);
+	}
+}
+
+
+static void
+dprintf_args(const char* format, va_list args, bool syslogOutput)
+{
+	if (are_interrupts_enabled()) {
+		MutexLocker locker(sOutputLock);
+
+		int32 length = vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE,
+			format, args);
+
+		InterruptsSpinLocker _(sSpinlock);
+		debug_output(sOutputBuffer, length, syslogOutput);
+	} else {
+		InterruptsSpinLocker _(sSpinlock);
+
+		int32 length = vsnprintf(sInterruptOutputBuffer, OUTPUT_BUFFER_SIZE,
+			format, args);
+
+		debug_output(sInterruptOutputBuffer, length, syslogOutput);
+	}
+}
+
+
+// #pragma mark - private kernel API
 
 
 bool
@@ -1246,41 +1371,8 @@ debug_debugger_running(void)
 void
 debug_puts(const char* string, int32 length)
 {
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sSpinlock);
-
-	if (length >= OUTPUT_BUFFER_SIZE)
-		length = OUTPUT_BUFFER_SIZE - 1;
-
-	// TODO: Code duplication! Cf. dprintf_args()!
-	if (length > 1 && string[length - 1] == '\n'
-		&& strncmp(string, sLastOutputBuffer, length) == 0) {
-		sMessageRepeatCount++;
-		sMessageRepeatLastTime = system_time();
-		if (sMessageRepeatFirstTime == 0)
-			sMessageRepeatFirstTime = sMessageRepeatLastTime;
-	} else {
-		flush_pending_repeats(true);
-
-		if (sSerialDebugEnabled)
-			arch_debug_serial_puts(string);
-		if (sSyslogOutputEnabled)
-			syslog_write(string, length);
-		if (sBlueScreenEnabled || sDebugScreenEnabled)
-			blue_screen_puts(string);
-		if (sSerialDebugEnabled) {
-			for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
-				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
-					sDebuggerModules[i]->debugger_puts(string, length);
-			}
-		}
-
-		memcpy(sLastOutputBuffer, string, length);
-		sLastOutputBuffer[length] = 0;
-	}
-
-	release_spinlock(&sSpinlock);
-	restore_interrupts(state);
+	InterruptsSpinLocker _(sSpinlock);
+	debug_output(string, length, sSyslogOutputEnabled);
 }
 
 
@@ -1580,14 +1672,14 @@ debug_strlcpy(char* to, const char* from, size_t size)
 }
 
 
-//	#pragma mark - public API
+// #pragma mark - public API
 
 
 uint64
 parse_expression(const char* expression)
 {
 	uint64 result;
-	return (evaluate_debug_expression(expression, &result, true) ? result : 0);
+	return evaluate_debug_expression(expression, &result, true) ? result : 0;
 }
 
 
@@ -1623,120 +1715,6 @@ set_dprintf_enabled(bool newState)
 	sSerialDebugEnabled = newState;
 
 	return oldState;
-}
-
-
-//!	Must be called with the sSpinlock held.
-static void
-flush_pending_repeats(bool syslogOutput)
-{
-	if (sMessageRepeatCount <= 0)
-		return;
-
-	if (sMessageRepeatCount > 1) {
-		static char temp[40];
-		size_t length = snprintf(temp, sizeof(temp),
-			"Last message repeated %ld times.\n", sMessageRepeatCount);
-
-		if (sSerialDebugEnabled)
-			arch_debug_serial_puts(temp);
-		if (sSyslogOutputEnabled && syslogOutput)
-			syslog_write(temp, length);
-		if (sBlueScreenEnabled || sDebugScreenEnabled)
-			blue_screen_puts(temp);
-		if (sSerialDebugEnabled) {
-			for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
-				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
-					sDebuggerModules[i]->debugger_puts(temp, length);
-			}
-		}
-	} else {
-		// if we only have one repeat just reprint the last buffer
-		size_t length = strlen(sLastOutputBuffer);
-
-		if (sSerialDebugEnabled)
-			arch_debug_serial_puts(sLastOutputBuffer);
-		if (sSyslogOutputEnabled && syslogOutput)
-			syslog_write(sLastOutputBuffer, length);
-		if (sBlueScreenEnabled || sDebugScreenEnabled)
-			blue_screen_puts(sLastOutputBuffer);
-		if (sSerialDebugEnabled) {
-			for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
-				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts) {
-					sDebuggerModules[i]->debugger_puts(sLastOutputBuffer,
-						length);
-				}
-			}
-		}
-	}
-
-	sMessageRepeatFirstTime = 0;
-	sMessageRepeatCount = 0;
-}
-
-
-static void
-check_pending_repeats(void* /*data*/, int /*iteration*/)
-{
-	if (sMessageRepeatCount > 0
-		&& (system_time() - sMessageRepeatLastTime > 1000000
-			|| system_time() - sMessageRepeatFirstTime > 3000000)) {
-		cpu_status state = disable_interrupts();
-		acquire_spinlock(&sSpinlock);
-
-		flush_pending_repeats(true);
-
-		release_spinlock(&sSpinlock);
-		restore_interrupts(state);
-	}
-}
-
-
-static void
-dprintf_args(const char* format, va_list args, bool syslogOutput)
-{
-	cpu_status state;
-	int32 length;
-	uint32 i;
-
-	// ToDo: maybe add a non-interrupt buffer and path that only
-	//	needs to acquire a semaphore instead of needing to disable
-	//	interrupts?
-
-	state = disable_interrupts();
-	acquire_spinlock(&sSpinlock);
-
-	length = vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
-
-	if (length >= OUTPUT_BUFFER_SIZE)
-		length = OUTPUT_BUFFER_SIZE - 1;
-
-	if (length > 1 && sOutputBuffer[length - 1] == '\n'
-		&& strncmp(sOutputBuffer, sLastOutputBuffer, length) == 0) {
-		sMessageRepeatCount++;
-		sMessageRepeatLastTime = system_time();
-		if (sMessageRepeatFirstTime == 0)
-			sMessageRepeatFirstTime = sMessageRepeatLastTime;
-	} else {
-		flush_pending_repeats(syslogOutput);
-
-		if (sSerialDebugEnabled)
-			arch_debug_serial_puts(sOutputBuffer);
-		if (syslogOutput)
-			syslog_write(sOutputBuffer, length);
-		if (sBlueScreenEnabled || sDebugScreenEnabled)
-			blue_screen_puts(sOutputBuffer);
-		for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++) {
-			if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
-				sDebuggerModules[i]->debugger_puts(sOutputBuffer, length);
-		}
-
-		memcpy(sLastOutputBuffer, sOutputBuffer, length);
-		sLastOutputBuffer[length] = 0;
-	}
-
-	release_spinlock(&sSpinlock);
-	restore_interrupts(state);
 }
 
 
