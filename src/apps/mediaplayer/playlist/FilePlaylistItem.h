@@ -50,6 +50,8 @@ public:
 	// playback
 	virtual	BMediaFile*			CreateMediaFile() const;
 
+			const entry_ref&	Ref() const { return fRef; }
+
 private:
 			entry_ref			fRef;
 			BString				fNameInTrash;

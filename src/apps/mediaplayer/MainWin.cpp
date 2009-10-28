@@ -31,6 +31,7 @@
 #include <Application.h>
 #include <Autolock.h>
 #include <Debug.h>
+#include <fs_attr.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -44,6 +45,7 @@
 
 #include "AudioProducer.h"
 #include "ControllerObserver.h"
+#include "FilePlaylistItem.h"
 #include "MainApp.h"
 #include "PeakView.h"
 #include "PlaylistItem.h"
@@ -442,6 +444,7 @@ MainWin::MessageReceived(BMessage *msg)
 			// TODO: move all other GUI changes as a reaction to this
 			// notification
 //			_UpdatePlaylistMenu();
+			_SetFileAttributes();
 			break;
 		case MSG_CONTROLLER_VIDEO_TRACK_CHANGED:
 		{
@@ -1675,6 +1678,35 @@ MainWin::_ToggleNoInterface()
 
 
 // #pragma mark -
+
+
+/*!	Sets some standard attributes of the currently played file.
+	This should only be a temporary solution.
+*/
+void
+MainWin::_SetFileAttributes()
+{
+	const FilePlaylistItem* item
+		= dynamic_cast<const FilePlaylistItem*>(fController->Item());
+
+	if (!fHasVideo && fHasAudio) {
+		BNode node(&item->Ref());
+		if (node.InitCheck())
+			return;
+
+		attr_info info;
+		status_t status = node.GetAttrInfo("Audio:Length", &info);
+		if (status != B_OK || info.size == 0) {
+			time_t duration = fController->TimeDuration() / 1000000L;
+
+			char text[256];
+			snprintf(text, sizeof(text), "%02ld:%02ld", duration / 60,
+				duration % 60);
+			node.WriteAttr("Audio:Length", B_STRING_TYPE, 0, text,
+				strlen(text) + 1);
+		}
+	}
+}
 
 
 void

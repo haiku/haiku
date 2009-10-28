@@ -102,6 +102,7 @@ private:
 			void				_ToggleAlwaysOnTop();
 			void				_ToggleNoInterface();
 
+			void				_SetFileAttributes();
 			void				_UpdateControlsEnabledStatus();
 			void				_UpdatePlaylistMenu();
 			void				_AddPlaylistItem(PlaylistItem* item,
