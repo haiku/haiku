@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
+ * Copyright 2007-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,10 @@
 #ifndef CONTROLLER_OBSERVER_H
 #define CONTROLLER_OBSERVER_H
 
+
 #include "AbstractLOAdapter.h"
 #include "Controller.h"
+
 
 enum {
 	MSG_CONTROLLER_FILE_FINISHED			= 'cnff',
@@ -38,9 +40,10 @@ enum {
 	OBSERVE_ALL_CHANGES						= 0xffff
 };
 
-class ControllerObserver : public Controller::Listener,
-						   public AbstractLOAdapter {
- public:
+
+class ControllerObserver
+	: public Controller::Listener, public AbstractLOAdapter {
+public:
 						ControllerObserver(BHandler* target,
 							uint32 observeFlags = OBSERVE_ALL_CHANGES);
 	virtual				~ControllerObserver();
@@ -60,7 +63,7 @@ class ControllerObserver : public Controller::Listener,
 	virtual	void		VolumeChanged(float volume);
 	virtual	void		MutedChanged(bool muted);
 
- private:
+private:
 			uint32		fObserveFlags;
 };
 

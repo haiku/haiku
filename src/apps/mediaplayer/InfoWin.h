@@ -20,6 +20,7 @@
 #ifndef __FILE_INFO_WIN_H
 #define __FILE_INFO_WIN_H
 
+
 #include <Window.h>
 
 
@@ -28,7 +29,7 @@ class BTextView;
 class Controller;
 class ControllerObserver;
 class InfoView;
- 
+
 
 #define INFO_STATS		0x00000001
 #define INFO_TRANSPORT	0x00000002
@@ -45,7 +46,7 @@ public:
 								InfoWin(BPoint leftTop,
 									Controller* controller);
 	virtual						~InfoWin();
-		
+
 	virtual	void				FrameResized(float newWidth, float newHeight);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
@@ -54,10 +55,10 @@ public:
 			void				ResizeToPreferred();
 			void				Update(uint32 which = INFO_ALL);
 
-private:			
+private:
 			Controller*			fController;
 			ControllerObserver*	fControllerObserver;
-		
+
 			InfoView*			fInfoView;
 			BStringView*		fFilenameView;
 			BTextView*			fLabelsView;

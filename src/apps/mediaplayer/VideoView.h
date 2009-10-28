@@ -1,5 +1,5 @@
 /*
- * Copyright © 2006-2009 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #ifndef VIDEO_VIEW_H

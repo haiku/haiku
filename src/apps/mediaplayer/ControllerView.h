@@ -19,9 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  */
-
 #ifndef __CONTROLLER_VIEW_H
 #define __CONTROLLER_VIEW_H
+
 
 #include "TransportControlGroup.h"
 
@@ -30,8 +30,8 @@ class Controller;
 class Playlist;
 class PlaylistObserver;
 
-class ControllerView : public TransportControlGroup
-{
+
+class ControllerView : public TransportControlGroup {
 public:
 						ControllerView(BRect frame, Controller* controller,
 							Playlist* playlist);
@@ -63,4 +63,4 @@ private:
 	PlaylistObserver*	fPlaylistObserver;
 };
 
-#endif
+#endif	// __CONTROLLER_VIEW_H

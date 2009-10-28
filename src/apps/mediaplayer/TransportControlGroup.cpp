@@ -49,14 +49,14 @@ enum {
 #define kVolumeFactor	1000
 #define kPositionFactor	3000
 
-// constructor
+
 TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 		bool usePeakView, bool useWindButtons)
-	: BView(frame, "transport control group",
-			B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-			B_WILL_DRAW | B_FRAME_EVENTS)
-	, fBottomControlHeight(0.0)
-	, fPeakViewMinWidth(0.0)
+	:
+	BView(frame, "transport control group", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_FRAME_EVENTS),
+	fBottomControlHeight(0.0),
+	fPeakViewMinWidth(0.0)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -141,7 +141,7 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 
 	// Volume Slider
 	fVolumeSlider = new VolumeSlider(BRect(0.0, 0.0, VOLUME_MIN_WIDTH,
-		kVolumeSliderBitmapHeight - 1.0), "volume slider", 
+		kVolumeSliderBitmapHeight - 1.0), "volume slider",
 		_DbToGain(_ExponentialToLinear(kVolumeDbMin)) * kVolumeFactor,
 		_DbToGain(_ExponentialToLinear(kVolumeDbMax)) * kVolumeFactor,
 		new BMessage(MSG_SET_VOLUME));
@@ -159,12 +159,12 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 	}
 }
 
-// destructor
+
 TransportControlGroup::~TransportControlGroup()
 {
 }
 
-// AttachedToWindow
+
 void
 TransportControlGroup::AttachedToWindow()
 {
@@ -188,7 +188,7 @@ TransportControlGroup::AttachedToWindow()
 	FrameResized(Bounds().Width(), Bounds().Height());
 }
 
-// FrameResized
+
 void
 TransportControlGroup::FrameResized(float width, float height)
 {
@@ -198,7 +198,7 @@ TransportControlGroup::FrameResized(float width, float height)
 	_LayoutControls(r);
 }
 
-// GetPreferredSize
+
 void
 TransportControlGroup::GetPreferredSize(float* width, float* height)
 {
@@ -210,7 +210,7 @@ TransportControlGroup::GetPreferredSize(float* width, float* height)
 		*height = r.Height();
 }
 
-// MessageReceived
+
 void
 TransportControlGroup::MessageReceived(BMessage* message)
 {
@@ -253,55 +253,67 @@ TransportControlGroup::MessageReceived(BMessage* message)
 	}
 }
 
-// #pragma mark -
 
-// default implementation for the virtuals
-uint32 TransportControlGroup::EnabledButtons()			{ return 0; }
-void TransportControlGroup::TogglePlaying()				{}
-void TransportControlGroup::Stop()						{}
-void TransportControlGroup::Rewind()					{}
-void TransportControlGroup::Forward()					{}
-void TransportControlGroup::SkipBackward()				{}
-void TransportControlGroup::SkipForward()				{}
-void TransportControlGroup::VolumeChanged(float value)	{}
-void TransportControlGroup::ToggleMute()				{}
-void TransportControlGroup::PositionChanged(float value){}
+// #pragma mark - default implementation for the virtuals
+
+
+uint32
+TransportControlGroup::EnabledButtons()
+{
+	return 0;
+}
+
+
+void TransportControlGroup::TogglePlaying() {}
+void TransportControlGroup::Stop() {}
+void TransportControlGroup::Rewind() {}
+void TransportControlGroup::Forward() {}
+void TransportControlGroup::SkipBackward() {}
+void TransportControlGroup::SkipForward() {}
+void TransportControlGroup::VolumeChanged(float value) {}
+void TransportControlGroup::ToggleMute() {}
+void TransportControlGroup::PositionChanged(float value) {}
+
 
 // #pragma mark -
 
 
 float
-TransportControlGroup::_LinearToExponential(float db_in)
+TransportControlGroup::_LinearToExponential(float dbIn)
 {
-	float db = db_in;
+	float db = dbIn;
 	if (db >= 0) {
-		db = db * (pow(fabs(kVolumeDbMax), (1.0 / kVolumeDbExpPositive)) / fabs(kVolumeDbMax));
+		db = db * (pow(fabs(kVolumeDbMax), (1.0 / kVolumeDbExpPositive))
+			/ fabs(kVolumeDbMax));
 		db = pow(db, kVolumeDbExpPositive);
 	} else {
 		db = -db;
-		db = db * (pow(fabs(kVolumeDbMin), (1.0 / kVolumeDbExpNegative)) / fabs(kVolumeDbMin));
+		db = db * (pow(fabs(kVolumeDbMin), (1.0 / kVolumeDbExpNegative))
+			/ fabs(kVolumeDbMin));
 		db = pow(db, kVolumeDbExpNegative);
 		db = -db;
 	}
-	printf("_LinearToExponential %.4f => %.4f\n", db_in, db);
+	printf("_LinearToExponential %.4f => %.4f\n", dbIn, db);
 	return db;
 }
 
 
 float
-TransportControlGroup::_ExponentialToLinear(float db_in)
+TransportControlGroup::_ExponentialToLinear(float dbIn)
 {
-	float db = db_in;
+	float db = dbIn;
 	if (db >= 0) {
 		db = pow(db, (1.0 / kVolumeDbExpPositive));
-		db = db * (fabs(kVolumeDbMax) / pow(fabs(kVolumeDbMax), (1.0 / kVolumeDbExpPositive)));
+		db = db * (fabs(kVolumeDbMax) / pow(fabs(kVolumeDbMax),
+			(1.0 / kVolumeDbExpPositive)));
 	} else {
 		db = -db;
 		db = pow(db, (1.0 / kVolumeDbExpNegative));
-		db = db * (fabs(kVolumeDbMin) / pow(fabs(kVolumeDbMin), (1.0 / kVolumeDbExpNegative)));
+		db = db * (fabs(kVolumeDbMin) / pow(fabs(kVolumeDbMin),
+			(1.0 / kVolumeDbExpNegative)));
 		db = -db;
 	}
-	//printf("_ExponentialToLinear %.4f => %.4f\n", db_in, db);
+	//printf("_ExponentialToLinear %.4f => %.4f\n", dbIn, db);
 	return db;
 }
 
@@ -322,7 +334,7 @@ TransportControlGroup::_GainToDb(float gain)
 
 // #pragma mark -
 
-// SetEnabled
+
 void
 TransportControlGroup::SetEnabled(uint32 buttons)
 {
@@ -349,9 +361,10 @@ TransportControlGroup::SetEnabled(uint32 buttons)
 	UnlockLooper();
 }
 
+
 // #pragma mark -
 
-// SetPlaybackState
+
 void
 TransportControlGroup::SetPlaybackState(uint32 state)
 {
@@ -373,7 +386,7 @@ TransportControlGroup::SetPlaybackState(uint32 state)
 	UnlockLooper();
 }
 
-// SetSkippable
+
 void
 TransportControlGroup::SetSkippable(bool backward, bool forward)
 {
@@ -388,9 +401,10 @@ TransportControlGroup::SetSkippable(bool backward, bool forward)
 	UnlockLooper();
 }
 
+
 // #pragma mark -
 
-// SetAudioEnabled
+
 void
 TransportControlGroup::SetAudioEnabled(bool enabled)
 {
@@ -403,7 +417,7 @@ TransportControlGroup::SetAudioEnabled(bool enabled)
 	UnlockLooper();
 }
 
-// SetMuted
+
 void
 TransportControlGroup::SetMuted(bool mute)
 {
@@ -440,7 +454,7 @@ TransportControlGroup::SetPosition(float value)
 
 // #pragma mark -
 
-// _LayoutControls
+
 void
 TransportControlGroup::_LayoutControls(BRect frame) const
 {
@@ -535,8 +549,8 @@ TransportControlGroup::_LayoutControls(BRect frame) const
 	}
 }
 
-// _MinFrame
-BRect           
+
+BRect
 TransportControlGroup::_MinFrame() const
 {
 	// add up width of controls along bottom (seek slider will likely adopt)
@@ -563,7 +577,7 @@ TransportControlGroup::_MinFrame() const
 	return BRect(0.0, 0.0, minWidth - 1.0, minHeight - 1.0);
 }
 
-// _LayoutControl
+
 void
 TransportControlGroup::_LayoutControl(BView* view, BRect frame,
 	bool resizeWidth, bool resizeHeight) const
@@ -581,14 +595,14 @@ TransportControlGroup::_LayoutControl(BView* view, BRect frame,
 		view->ResizeTo(width, height);
 }
 
-// _TogglePlaying
+
 void
 TransportControlGroup::_TogglePlaying()
 {
 	TogglePlaying();
 }
 
-// _Stop
+
 void
 TransportControlGroup::_Stop()
 {
@@ -596,33 +610,34 @@ TransportControlGroup::_Stop()
 	Stop();
 }
 
-// _Rewind
+
 void
 TransportControlGroup::_Rewind()
 {
 	Rewind();
 }
 
-// _Forward
+
 void
 TransportControlGroup::_Forward()
 {
 	Forward();
 }
 
-// _SkipBackward
+
 void
 TransportControlGroup::_SkipBackward()
 {
 	SkipBackward();
 }
 
-// _SkipForward
+
 void
 TransportControlGroup::_SkipForward()
 {
 	SkipForward();
 }
+
 
 void
 TransportControlGroup::_UpdateVolume()
@@ -634,7 +649,7 @@ TransportControlGroup::_UpdateVolume()
 	VolumeChanged(gain);
 }
 
-// _ToggleMute
+
 void
 TransportControlGroup::_ToggleMute()
 {
@@ -648,5 +663,3 @@ TransportControlGroup::_UpdatePosition()
 {
 	PositionChanged(fSeekSlider->Value() / (float)kPositionFactor);
 }
-
-

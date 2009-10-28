@@ -1,34 +1,38 @@
 /*
- * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>. All rights reserved.
- *
+ * Copyright 2006 Marcus Overhagen <marcus@overhagen.de>. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#include <stdio.h>
-#include <string.h>
-#include <Window.h>
-#include <TimeSource.h>
-#include <MediaRoster.h>
-#include <BufferGroup.h>
-#include <Buffer.h>
-#include <Bitmap.h>
-#include <Locker.h>
-#include <Debug.h>
+
 
 #include "VideoNode.h"
+
+#include <stdio.h>
+#include <string.h>
+
+#include <Bitmap.h>
+#include <Buffer.h>
+#include <BufferGroup.h>
+#include <Debug.h>
+#include <Locker.h>
+#include <MediaRoster.h>
+#include <TimeSource.h>
+#include <Window.h>
+
 #include "VideoView.h"
 
 
 VideoNode::VideoNode(const char *name, VideoView *view)
- :	BMediaNode(name)
- ,	BMediaEventLooper()
- ,	BBufferConsumer(B_MEDIA_RAW_VIDEO)
- ,	fVideoView(view)
- ,	fInput()
- ,	fOverlayEnabled(true)
- ,	fOverlayActive(false)
- ,	fDirectOverlayBuffer(false)
- ,	fBitmap(0)
- ,	fBitmapLocker(new BLocker("Video Node Locker"))
+	:
+	BMediaNode(name),
+	BMediaEventLooper(),
+	BBufferConsumer(B_MEDIA_RAW_VIDEO),
+	fVideoView(view),
+	fInput(),
+	fOverlayEnabled(true),
+	fOverlayActive(false),
+	fDirectOverlayBuffer(false),
+	fBitmap(0),
+	fBitmapLocker(new BLocker("Video Node Locker"))
 {
 }
 
@@ -129,7 +133,7 @@ VideoNode::HandleEvent(const media_timed_event *event,
 		default:
 			printf("VideoNode::HandleEvent unknown event");
 			break;
-	}			
+	}
 }
 
 
@@ -149,7 +153,7 @@ VideoNode::GetLatencyFor(const media_destination &dst,
 {
 	if (dst != fInput.destination)
 		return B_MEDIA_BAD_DESTINATION;
-	
+
 	*out_latency = 10000;
 	*out_id = TimeSource()->ID();
 	return B_OK;
@@ -166,18 +170,18 @@ VideoNode::AcceptFormat(const media_destination &dst,
 	 *                BBufferConsumer::Connected
 	 *                BBufferProducer::Connect
 	 */
-	
+
 	if (dst != fInput.destination)
-		return B_MEDIA_BAD_DESTINATION;	
-	
+		return B_MEDIA_BAD_DESTINATION;
+
 	if (format->type == B_MEDIA_NO_TYPE)
 		format->type = B_MEDIA_RAW_VIDEO;
-	
+
 	if (format->type != B_MEDIA_RAW_VIDEO)
 		return B_MEDIA_BAD_FORMAT;
 
 
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -213,12 +217,12 @@ VideoNode::Connected(const media_source &src,
 	if (err) {
 		printf("VideoNode::Connected failed, fOverlayEnabled = %d\n", fOverlayEnabled);
 		return err;
-	}	
+	}
 
 	*out_input = fInput;
 
 	return B_OK;
-	
+
 }
 
 
@@ -268,12 +272,12 @@ VideoNode::FormatChanged(const media_source &src,
 	if (err) {
 		printf("VideoNode::FormatChanged failed (lost buffer group!)\n");
 		return B_MEDIA_BAD_FORMAT;
-	}	
+	}
 
 	fInput.format = format;
 
 	//printf("VideoNode::FormatChanged leave\n");
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -281,7 +285,7 @@ void
 VideoNode::HandleBuffer(BBuffer *buffer)
 {
 //	printf("VideoNode::HandleBuffer\n");
-	
+
 	LockBitmap();
 	if (fBitmap) {
 //		bigtime_t start = system_time();
@@ -341,7 +345,7 @@ VideoNode::IsOverlayActive()
 status_t
 VideoNode::CreateBuffers(BRect frame, color_space cspace, bool overlay)
 {
-	printf("VideoNode::CreateBuffers: frame %d,%d,%d,%d colorspace 0x%08x, overlay %d\n", 
+	printf("VideoNode::CreateBuffers: frame %d,%d,%d,%d colorspace 0x%08x, overlay %d\n",
 		int(frame.left), int(frame.top), int(frame.right), int(frame.bottom), int(cspace), overlay);
 
 	LockBitmap();

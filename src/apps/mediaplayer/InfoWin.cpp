@@ -17,6 +17,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  */
+
+
 #include "InfoWin.h"
 
 #include <math.h>
@@ -155,11 +157,12 @@ InfoView::SetGenericIcon()
 
 
 InfoWin::InfoWin(BPoint leftTop, Controller* controller)
-	: BWindow(BRect(leftTop.x, leftTop.y, leftTop.x + MIN_WIDTH - 1,
+	:
+	BWindow(BRect(leftTop.x, leftTop.y, leftTop.x + MIN_WIDTH - 1,
 		leftTop.y + 300), NAME, B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
-	, fController(controller)
-	, fControllerObserver(new ControllerObserver(this,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+	fController(controller),
+	fControllerObserver(new ControllerObserver(this,
 		OBSERVE_FILE_CHANGES | OBSERVE_TRACK_CHANGES | OBSERVE_STAT_CHANGES))
 {
 	BRect rect = Bounds();
@@ -175,10 +178,9 @@ InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 	bigFont.SetSize(bigFont.Size() + 6);
 	font_height fh;
 	bigFont.GetHeight(&fh);
-	fFilenameView = new BStringView(BRect(div + 10, 20,
-										  rect.right - 10,
-										  20 + fh.ascent + 5),
-									"filename", "");
+	fFilenameView = new BStringView(
+		BRect(div + 10, 20, rect.right - 10, 20 + fh.ascent + 5),
+		"filename", "");
 	AddChild(fFilenameView);
 	fFilenameView->SetFont(&bigFont);
 	fFilenameView->SetViewColor(fInfoView->ViewColor());
@@ -219,9 +221,6 @@ InfoWin::~InfoWin()
 {
 	fController->RemoveListener(fControllerObserver);
 	delete fControllerObserver;
-
-	//fInfoListView->MakeEmpty();
-	//delete [] fInfoItems;
 }
 
 
@@ -229,13 +228,13 @@ InfoWin::~InfoWin()
 
 
 void
-InfoWin::FrameResized(float new_width, float new_height)
+InfoWin::FrameResized(float newWidth, float newHeight)
 {
 }
 
 
 void
-InfoWin::MessageReceived(BMessage *msg)
+InfoWin::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case MSG_CONTROLLER_FILE_FINISHED:
@@ -283,13 +282,6 @@ InfoWin::Pulse()
 void
 InfoWin::ResizeToPreferred()
 {
-#if 0
-	float height = BASE_HEIGHT;
-	for (int i = 0; BListItem *li = fInfoListView->ItemAt(i); i++) {
-		height += li->Height();
-	}
-	ResizeTo(Bounds().Width(), height);
-#endif
 }
 
 
@@ -469,7 +461,6 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 	}
 
 	if ((which & INFO_COPYRIGHT) && fController->HasFile()) {
-
 		BString s;
 		if (fController->GetCopyright(&s) == B_OK && s.Length() > 0) {
 			fLabelsView->Insert("Copyright\n\n");

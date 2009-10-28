@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  */
+
+
 #include "MainApp.h"
 
 #include <Alert.h>
@@ -46,17 +48,18 @@ static const char* kMediaServerAddOnSig = "application/x-vnd.Be.addon-host";
 
 
 MainApp::MainApp()
-	: BApplication(kAppSig),
-	  fPlayerCount(0),
-	  fFirstWindow(NULL),
-	  fSettingsWindow(NULL),
+	:
+	BApplication(kAppSig),
+	fPlayerCount(0),
+	fFirstWindow(NULL),
+	fSettingsWindow(NULL),
 
-	  fOpenFilePanel(NULL),
-	  fSaveFilePanel(NULL),
-	  fLastFilePanelFolder(),
+	fOpenFilePanel(NULL),
+	fSaveFilePanel(NULL),
+	fLastFilePanelFolder(),
 
-	  fMediaServerRunning(false),
-	  fMediaAddOnServerRunning(false)
+	fMediaServerRunning(false),
+	fMediaAddOnServerRunning(false)
 {
 	mpSettings settings = Settings::CurrentSettings();
 	fLastFilePanelFolder = settings.filePanelFolder;
@@ -136,7 +139,7 @@ MainApp::ReadyToRun()
 	fMediaAddOnServerRunning = be_roster->IsRunning(kMediaServerAddOnSig);
 
 	if (!fMediaServerRunning || !fMediaAddOnServerRunning) {
-		BAlert* alert = new BAlert("start_media_server", 
+		BAlert* alert = new BAlert("start_media_server",
 			"It appears the Media Server is not running.\n"
 			"Would you like to start it ?", "Quit", "Start Media Server", NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -181,12 +184,12 @@ MainApp::RefsReceived(BMessage* message)
 
 
 void
-MainApp::ArgvReceived(int32 argc, char **argv)
+MainApp::ArgvReceived(int32 argc, char** argv)
 {
 	char cwd[B_PATH_NAME_LENGTH];
 	getcwd(cwd, sizeof(cwd));
 
-	BMessage m(B_REFS_RECEIVED);
+	BMessage message(B_REFS_RECEIVED);
 
 	for (int i = 1; i < argc; i++) {
 		printf("MainApp::ArgvReceived %s\n", argv[i]);
@@ -200,13 +203,13 @@ MainApp::ArgvReceived(int32 argc, char **argv)
 			continue;
 
 		entry_ref ref;
-		if (B_OK == entry.GetRef(&ref))
-			m.AddRef("refs", &ref);
+		if (entry.GetRef(&ref) == B_OK)
+			message.AddRef("refs", &ref);
 	}
 
-	if (m.HasRef("refs")) {
+	if (message.HasRef("refs")) {
 		printf("MainApp::ArgvReceived calling RefsReceived\n");
-		RefsReceived(&m);
+		RefsReceived(&message);
 	}
 }
 
@@ -391,7 +394,7 @@ MainApp::_ShowFilePanel(BFilePanel* panel, uint32 command,
 		BMessage targetMessage;
 		if (message->FindMessage("message", &targetMessage) == B_OK)
 			panelMessage.AddMessage("message", &targetMessage);
-	
+
 		BMessenger target;
 		if (message->FindMessenger("target", &target) == B_OK)
 			panelMessage.AddMessenger("target", target);

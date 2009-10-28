@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  */
+
+
 #include "ControllerView.h"
 
 #include <Autolock.h>
@@ -30,12 +32,14 @@
 #include "Playlist.h"
 #include "PlaylistObserver.h"
 
+
 ControllerView::ControllerView(BRect frame, Controller* controller,
 		Playlist* playlist)
- :	TransportControlGroup(frame, true, true, false)
- ,	fController(controller)
- ,	fPlaylist(playlist)
- ,	fPlaylistObserver(new PlaylistObserver(this))
+	:
+	TransportControlGroup(frame, true, true, false),
+	fController(controller),
+	fPlaylist(playlist),
+	fPlaylistObserver(new PlaylistObserver(this))
 {
 	fPlaylist->AddListener(fPlaylistObserver);
 }
@@ -77,6 +81,7 @@ ControllerView::MessageReceived(BMessage* message)
 			TransportControlGroup::MessageReceived(message);
 	}
 }
+
 
 // #pragma mark -
 

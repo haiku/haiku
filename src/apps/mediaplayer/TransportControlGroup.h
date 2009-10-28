@@ -1,16 +1,18 @@
 /*
- * Copyright © 2006-2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2008 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+#ifndef TRANSPORT_CONTROL_GROUP_H
+#define TRANSPORT_CONTROL_GROUP_H
+
 
 // NOTE: Based on my code in the BeOS interface for the VLC media player
 // that I did during the VLC 0.4.3 - 0.4.6 times. Code not written by me
 // removed. -Stephan Aßmus
 
-#ifndef TRANSPORT_CONTROL_GROUP_H
-#define TRANSPORT_CONTROL_GROUP_H
 
 #include <View.h>
+
 
 class PeakView;
 class PlayPauseButton;
@@ -28,11 +30,11 @@ enum {
 	SEEK_ENABLED			= 1 << 6,
 };
 
+
 class TransportControlGroup : public BView {
- public:
+public:
 								TransportControlGroup(BRect frame,
-									bool useSkipButtons,
-									bool usePeakView,
+									bool useSkipButtons, bool usePeakView,
 									bool useWindButtons);
 	virtual						~TransportControlGroup();
 
@@ -56,9 +58,8 @@ class TransportControlGroup : public BView {
 
 			void				SetEnabled(uint32 whichButtons);
 
-			void				SetPlaybackState(uint32 state); 
-			void				SetSkippable(bool backward,
-											 bool forward);
+			void				SetPlaybackState(uint32 state);
+			void				SetSkippable(bool backward, bool forward);
 
 			void				SetAudioEnabled(bool enable);
 			void				SetMuted(bool mute);
@@ -69,13 +70,12 @@ class TransportControlGroup : public BView {
 			PeakView*			GetPeakView() const
 									{ return fPeakView; }
 
- private:
+private:
 			void				_LayoutControls(BRect frame) const;
 			BRect				_MinFrame() const;
-			void				_LayoutControl(BView* view,
-											   BRect frame,
-											   bool resizeWidth = false,
-											   bool resizeHeight = false) const;
+			void				_LayoutControl(BView* view, BRect frame,
+								   bool resizeWidth = false,
+								   bool resizeHeight = false) const;
 
 			void				_TogglePlaying();
 			void				_Stop();

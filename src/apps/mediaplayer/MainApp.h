@@ -21,6 +21,7 @@
 #ifndef __MAIN_APP_H
 #define __MAIN_APP_H
 
+
 #include <Application.h>
 #include <Entry.h>
 
@@ -100,4 +101,4 @@ private:
 extern MainApp* gMainApp;
 extern const char* kAppSig;
 
-#endif
+#endif	// __MAIN_APP_H

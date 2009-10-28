@@ -1,7 +1,9 @@
 /*
- * Copyright © 2006-2009 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2009 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
+
+
 #include "VideoView.h"
 
 #include <stdio.h>
@@ -25,13 +27,14 @@
 
 
 VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
-	: BView(frame, name, resizeMask, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
+	:
+	BView(frame, name, resizeMask, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
 		| B_PULSE_NEEDED),
-	  fOverlayMode(false),
-	  fIsPlaying(false),
-	  fIsFullscreen(false),
-	  fLastMouseMove(system_time()),
-	  fGlobalSettingsListener(this)
+	fOverlayMode(false),
+	fIsPlaying(false),
+	fIsFullscreen(false),
+	fLastMouseMove(system_time()),
+	fGlobalSettingsListener(this)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 		// might be reset to overlay key color if overlays are used

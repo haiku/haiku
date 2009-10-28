@@ -21,6 +21,7 @@
 #ifndef __CONTROLLER_H
 #define __CONTROLLER_H
 
+
 #include <Entry.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
@@ -33,6 +34,7 @@
 #include "NodeManager.h"
 #include "PlaylistItem.h"
 
+
 class AudioTrackSupplier;
 class BBitmap;
 class BMediaFile;
@@ -44,9 +46,9 @@ class SoundOutput;
 class VideoTrackSupplier;
 class VideoView;
 
+
 class Controller : public NodeManager {
 public:
-
 	class Listener {
 	public:
 								Listener();
@@ -203,5 +205,4 @@ private:
 };
 
 
-#endif
-
+#endif	// __CONTROLLER_H

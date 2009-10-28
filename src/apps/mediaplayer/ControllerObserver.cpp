@@ -1,10 +1,11 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
+ * Copyright 2007-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
+
 
 #include "ControllerObserver.h"
 
@@ -12,9 +13,9 @@
 
 
 ControllerObserver::ControllerObserver(BHandler* target, uint32 observeFlags)
-	: Controller::Listener()
-	, AbstractLOAdapter(target)
-	, fObserveFlags(observeFlags)
+	:
+	AbstractLOAdapter(target),
+	fObserveFlags(observeFlags)
 {
 }
 
@@ -148,5 +149,3 @@ ControllerObserver::MutedChanged(bool muted)
 
 	DeliverMessage(message);
 }
-
-
