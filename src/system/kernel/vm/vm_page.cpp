@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -77,7 +77,7 @@ static vint32 sPageDeficit;
 static size_t sModifiedTemporaryPages;
 
 static ConditionVariable sFreePageCondition;
-static spinlock sPageLock;
+static mutex sPageLock = MUTEX_INITIALIZER("pages");
 
 static sem_id sWriterWaitSem;
 
@@ -851,7 +851,7 @@ page_scrubber(void *unused)
 		if (sFreePageQueue.count == 0)
 			continue;
 
-		InterruptsSpinLocker locker(sPageLock);
+		MutexLocker locker(sPageLock);
 
 		// Since we temporarily remove pages from the free pages reserve,
 		// we must make sure we don't cause a violation of the page
@@ -933,7 +933,7 @@ remove_page_marker(struct vm_page &marker)
 			return;
 	}
 
-	InterruptsSpinLocker locker(sPageLock);
+	MutexLocker locker(sPageLock);
 	remove_page_from_queue(queue, &marker);
 
 	marker.state = PAGE_STATE_UNUSED;
@@ -943,7 +943,7 @@ remove_page_marker(struct vm_page &marker)
 static vm_page *
 next_modified_page(struct vm_page &marker)
 {
-	InterruptsSpinLocker locker(sPageLock);
+	MutexLocker locker(sPageLock);
 	vm_page *page;
 
 	if (marker.state == PAGE_STATE_MODIFIED) {
@@ -1327,7 +1327,7 @@ PageWriterRun::Go()
 				fWrappers[checkIndex++].CheckRemoveFromShrunkenCache();
 		}
 
-		InterruptsSpinLocker locker(sPageLock);
+		MutexLocker locker(sPageLock);
 		for (uint32 j = 0; j < transfer.PageCount(); j++)
 			fWrappers[wrapperIndex++].Done(transfer.Status());
 
@@ -1461,7 +1461,7 @@ page_writer(void* /*unused*/)
 				continue;
 			}
 
-			InterruptsSpinLocker locker(sPageLock);
+			MutexLocker locker(sPageLock);
 
 			// state might have changed while we were locking the cache
 			if (page->state != PAGE_STATE_MODIFIED) {
@@ -1518,7 +1518,7 @@ page_writer(void* /*unused*/)
 static vm_page *
 find_page_candidate(struct vm_page &marker, bool stealActive)
 {
-	InterruptsSpinLocker locker(sPageLock);
+	MutexLocker locker(sPageLock);
 	page_queue *queue;
 	vm_page *page;
 
@@ -1605,7 +1605,7 @@ steal_page(vm_page *page, bool stealActive)
 
 	page->cache->RemovePage(page);
 
-	InterruptsSpinLocker _(sPageLock);
+	MutexLocker _(sPageLock);
 	remove_page_from_queue(page->state == PAGE_STATE_ACTIVE
 		? &sActivePageQueue : &sInactivePageQueue, page);
 	return true;
@@ -1633,7 +1633,7 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 
 			if (steal_page(page, false)) {
 				if (reserve || stolen >= maxCount) {
-					InterruptsSpinLocker _(sPageLock);
+					MutexLocker _(sPageLock);
 					enqueue_page(&sFreePageQueue, page);
 					page->state = PAGE_STATE_FREE;
 
@@ -1649,7 +1649,7 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 
 		remove_page_marker(marker);
 
-		InterruptsSpinLocker locker(sPageLock);
+		MutexLocker locker(sPageLock);
 
 		if ((reserve && sReservedPages <= free_page_queue_count())
 			|| count == 0
@@ -1743,7 +1743,7 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 		bool dequeuedPage = false;
 		if (page != NULL) {
 			if (page->state == PAGE_STATE_MODIFIED) {
-				InterruptsSpinLocker locker(&sPageLock);
+				MutexLocker locker(&sPageLock);
 				remove_page_from_queue(&sModifiedPageQueue, page);
 				dequeuedPage = true;
 			} else if (page->state == PAGE_STATE_BUSY
@@ -1787,7 +1787,7 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 				wrappers[i]->CheckRemoveFromShrunkenCache();
 		}
 
-		InterruptsSpinLocker locker(&sPageLock);
+		MutexLocker locker(&sPageLock);
 
 		for (int32 i = 0; i < usedWrappers; i++)
 			wrappers[i]->Done(status);
@@ -2001,8 +2001,7 @@ vm_mark_page_range_inuse(addr_t startPage, addr_t length)
 		return B_BAD_VALUE;
 	}
 
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sPageLock);
+	MutexLocker _(sPageLock);
 
 	for (addr_t i = 0; i < length; i++) {
 		vm_page *page = &sPages[startPage + i];
@@ -2026,9 +2025,6 @@ vm_mark_page_range_inuse(addr_t startPage, addr_t length)
 		}
 	}
 
-	release_spinlock(&sPageLock);
-	restore_interrupts(state);
-
 	return B_OK;
 }
 
@@ -2044,7 +2040,7 @@ vm_page_unreserve_pages(uint32 count)
 	if (count == 0)
 		return;
 
-	InterruptsSpinLocker locker(sPageLock);
+	MutexLocker locker(sPageLock);
 	ASSERT(sReservedPages >= count);
 
 	T(UnreservePages(count));
@@ -2067,7 +2063,7 @@ vm_page_reserve_pages(uint32 count)
 	if (count == 0)
 		return;
 
-	InterruptsSpinLocker locker(sPageLock);
+	MutexLocker locker(sPageLock);
 
 	T(ReservePages(count));
 
@@ -2091,7 +2087,7 @@ vm_page_try_reserve_pages(uint32 count)
 	if (count == 0)
 		return true;
 
-	InterruptsSpinLocker locker(sPageLock);
+	MutexLocker locker(sPageLock);
 
 	T(ReservePages(count));
 
@@ -2125,7 +2121,7 @@ vm_page_allocate_page(int pageState, bool reserved)
 			return NULL; // invalid
 	}
 
-	InterruptsSpinLocker locker(sPageLock);
+	MutexLocker locker(sPageLock);
 
 	T(AllocatePage(reserved));
 
@@ -2210,7 +2206,7 @@ vm_page_allocate_page_run(int pageState, addr_t base, addr_t length)
 	vm_page *firstPage = NULL;
 	uint32 start = base >> PAGE_SHIFT;
 
-	InterruptsSpinLocker locker(sPageLock);
+	MutexLocker locker(sPageLock);
 
 	if (free_page_queue_count() - sReservedPages < length) {
 		// TODO: add more tries, ie. free some inactive, ...
@@ -2266,7 +2262,7 @@ vm_page_allocate_page_run(int pageState, addr_t base, addr_t length)
 vm_page *
 vm_page_allocate_page_run_no_base(int pageState, addr_t count)
 {
-	InterruptsSpinLocker locker(sPageLock);
+	MutexLocker locker(sPageLock);
 
 	if (free_page_queue_count() - sReservedPages < count) {
 		// TODO: add more tries, ie. free some inactive, ...
@@ -2370,7 +2366,7 @@ vm_lookup_page(addr_t pageNumber)
 void
 vm_page_free(vm_cache *cache, vm_page *page)
 {
-	InterruptsSpinLocker _(sPageLock);
+	MutexLocker _(sPageLock);
 
 	if (page->cache == NULL && page->state == PAGE_STATE_MODIFIED
 		&& cache->temporary) {
@@ -2384,7 +2380,7 @@ vm_page_free(vm_cache *cache, vm_page *page)
 status_t
 vm_page_set_state(vm_page *page, int pageState)
 {
-	InterruptsSpinLocker _(sPageLock);
+	MutexLocker _(sPageLock);
 
 	return set_page_state_nolock(page, pageState);
 }
@@ -2396,7 +2392,7 @@ vm_page_set_state(vm_page *page, int pageState)
 void
 vm_page_requeue(struct vm_page *page, bool tail)
 {
-	InterruptsSpinLocker _(sPageLock);
+	MutexLocker _(sPageLock);
 	page_queue *queue = NULL;
 
 	switch (page->state) {
