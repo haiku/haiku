@@ -108,8 +108,6 @@ KeymapWindow::KeymapWindow()
 	fKeyboardLayoutView->SetTarget(fTextControl->TextView());
 	fTextControl->MakeFocus();
 
-	_UpdateButtons();
-
 	// Make sure the user keymap directory exists
 	BPath path;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
@@ -119,9 +117,8 @@ KeymapWindow::KeymapWindow()
 	get_ref_for_path(path.Path(), &ref);
 
 	BDirectory userKeymapsDir(&ref);
-	if (userKeymapsDir.InitCheck() != B_OK) {
+	if (userKeymapsDir.InitCheck() != B_OK)
 		create_directory(path.Path(), S_IRWXU | S_IRWXG | S_IRWXO);
-	}
 
 	BMessenger messenger(this);
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messenger, &ref,
@@ -153,6 +150,8 @@ KeymapWindow::KeymapWindow()
 	fPreviousMap = fCurrentMap;
 	fAppliedMap = fCurrentMap;
 	fCurrentMap.SetTarget(this, new BMessage(kMsgKeymapUpdated));
+
+	_UpdateButtons();
 
 	_UpdateDeadKeyMenu();
 	_UpdateSwitchShortcutButton();
