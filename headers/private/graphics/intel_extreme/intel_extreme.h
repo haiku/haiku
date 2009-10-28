@@ -9,7 +9,6 @@
 #define INTEL_EXTREME_H
 
 
-#include "binary-utils.h"
 #include "lock.h"
 
 #include <Accelerant.h>
@@ -186,29 +185,10 @@ struct intel_free_graphics_memory {
 #define INTEL_GRAPHICS_MEMORY_CONTROL	0x52	// GGC - (G)MCH Graphics Control Register
 #define MEMORY_CONTROL_ENABLED			0x0004
 #define MEMORY_MASK						0x0001
-#define STOLEN_MEMORY_MASK				0x0070
+#define STOLEN_MEMORY_MASK				0x00f0
 #define i965_GTT_MASK					0x000e
 #define G33_GTT_MASK					0x0300
-
-#define G4X_GGC_GGMS_MASK				BITMASK(11,8)
-#define G4X_GGC_GMS_MASK				BITMASK(7,4)	// also for G33, but
-														//   probably not for
-													 	//    older chips
-#define G4X_GGMS_NONE					(BINARY(0000) << 8)
-#define G4X_GGMS_NO_IVT_1M				(BINARY(0001) << 8)
-#define G4X_GGMS_NO_IVT_2M				(BINARY(0011) << 8)
-#define G4X_GGMS_IVT_2M					(BINARY(1001) << 8)
-#define G4X_GGMS_IVT_3M					(BINARY(1010) << 8)
-#define G4X_GGMS_IVT_4M					(BINARY(1011) << 8)
-
-#define G4X_GMS_32MB					(BINARY(0101) << 4)
-#define G4X_GMS_64MB					(BINARY(0111) << 4)
-#define G4X_GMS_128MB					(BINARY(1000) << 4)
-#define G4X_GMS_256MB					(BINARY(1001) << 4)
-#define G4X_GMS_96MB					(BINARY(1010) << 4)
-#define G4X_GMS_160MB					(BINARY(1011) << 4)
-#define G4X_GMS_224MB					(BINARY(1100) << 4)
-#define G4X_GMS_352MB					(BINARY(1101) << 4)
+#define G4X_GTT_MASK					0x0f00	// GGMS (GSM Memory Size) mask
 
 // models i830 and up
 #define i830_LOCAL_MEMORY_ONLY			0x10
@@ -229,6 +209,12 @@ struct intel_free_graphics_memory {
 #define i855_STOLEN_MEMORY_128M			0x80
 #define i855_STOLEN_MEMORY_256M			0x90
 
+#define G4X_STOLEN_MEMORY_96MB			0xa0	// GMS - Graphics Mode Select
+#define G4X_STOLEN_MEMORY_160MB			0xb0
+#define G4X_STOLEN_MEMORY_224MB			0xc0
+#define G4X_STOLEN_MEMORY_352MB			0xd0
+
+
 // graphics page translation table
 #define INTEL_PAGE_TABLE_CONTROL		0x02020
 #define PAGE_TABLE_ENABLED				0x00000001
@@ -244,23 +230,13 @@ struct intel_free_graphics_memory {
 #define i965_GTT_512K					(0 << 1)
 #define G33_GTT_1M						(1 << 8)
 #define G33_GTT_2M						(2 << 8)
+#define G4X_GTT_NONE					0x000	// GGMS - GSM Memory Size
+#define G4X_GTT_1M_NO_IVT				0x100	// no Intel Virtualization Tech.
+#define G4X_GTT_2M_NO_IVT				0x300
+#define G4X_GTT_2M_IVT					0x900	// with Intel Virt. Tech.
+#define G4X_GTT_3M_IVT					0xa00
+#define G4X_GTT_4M_IVT					0xb00
 
-#define G4X_GTTMMADR					0x10
-#define G4X_GTTMMADR_MBA_MASK			BITMASK(35,22)
-#define G4X_GTTMMADR_MT_MASK			BITMASK(2,2)
-#define G4X_MMIO_SIZE					(512ULL << 10)
-
-#define G4X_GMADR						0x18
-#define G4X_GMADR_MBA_512MB_MASK		BITMASK(35,29)
-#define G4X_GMADR_MBA_256MB_MASK		BITMASK(35,28)
-#define G4X_GMADR_AM_512MB_MASK			BITMASK(28,4)
-#define G4X_GMADR_AM_256MB_MASK			BITMASK(27,4)
-#define G4X_GMADR_MT_MASK				BITMASK(2,2)
-
-#define G4X_MSAC						0x66
-#define G4X_MSAC_LHSAS_MASK				BITMASK(2,1)
-#define G4X_LHSAS_512MB					(BINARY(11) << 1)
-#define G4X_LHSAS_256MB					(BINARY(01) << 1)
 
 #define GTT_ENTRY_VALID					0x01
 #define GTT_ENTRY_LOCAL_MEMORY			0x02
