@@ -50,6 +50,7 @@ enum SnapOrientation {
 	SNAP_LEFT, SNAP_RIGHT, SNAP_TOP, SNAP_BOTTOM
 };
 
+
 class Window {
 public:
 								Window(const BRect& frame, const char *name,
@@ -191,7 +192,7 @@ public:
 			float				TabLocation() const;
 
 			bool				SetDecoratorSettings(const BMessage& settings,
-													 BRegion& dirty);
+									BRegion& dirty);
 			bool				GetDecoratorSettings(BMessage* settings);
 
 			void				HighlightDecorator(bool active);
@@ -333,6 +334,39 @@ protected:
 			void				_AlterDeltaForSnap(BPoint& delta,
 									bigtime_t now);
 
+			// Stack & Tile specific members
+			void				_InitStackingAndSnapping();
+			void				_RemoveStackingAndSnapping();
+
+			void				_CheckIfReadyToStack();
+			void				_StackWindow();
+			void				_ArrangeStackedWindowTabs();
+
+			void 				_CheckIfReadyToSnap();
+			void				_SnapWindow();
+			BRect				_BoundingRectAndWindows(BList* windows,
+									Window** leftmostWindow,
+									Window** topmostWindow,
+									Window** rightmostWindow,
+									Window** bottommostWindow);
+
+			void				_BoundWindowByWorkspace();
+			void				_UnboundWindowByWorkspace();
+
+			void				_RemoveStackingPersistently();
+			void				_RemoveSnappingPersistently();
+
+			void				_FreeUpSnappingList(SnapOrientation thisSnap,
+									SnapOrientation otherSnap,
+									bool deleteFromOtherWindowsList);
+			BList**				_GetSnappingListRef(
+									SnapOrientation thisSnapOrientation,
+									SnapOrientation otherSnapOrientation,
+									bool createIfNull);
+
+			void				_EnsureWindowWithinScreenBounds(Window* window, Window* detached);
+
+protected:
 			BString				fTitle;
 			// TODO: no fp rects anywhere
 			BRect				fFrame;
@@ -454,37 +488,6 @@ protected:
 			int32				fWorkspacesViewCount;
 
 			// Stack & Tile specific members
-			void				_InitStackingAndSnapping();
-			void				_RemoveStackingAndSnapping();
-
-			void				_CheckIfReadyToStack();
-			void				_StackWindow();
-			void				_ArrangeStackedWindowTabs();
-
-			void 				_CheckIfReadyToSnap();
-			void				_SnapWindow();
-			BRect				_BoundingRectAndWindows(BList* windows,
-									Window** leftmostWindow,
-									Window** topmostWindow,
-									Window** rightmostWindow,
-									Window** bottommostWindow);
-
-			void				_BoundWindowByWorkspace();
-			void				_UnboundWindowByWorkspace();
-
-			void				_RemoveStackingPersistently();
-			void				_RemoveSnappingPersistently();
-
-			void				_FreeUpSnappingList(SnapOrientation thisSnap,
-									SnapOrientation otherSnap,
-									bool deleteFromOtherWindowsList);
-			BList**				_GetSnappingListRef(
-									SnapOrientation thisSnapOrientation,
-									SnapOrientation otherSnapOrientation,
-									bool createIfNull);
-
-			void				_EnsureWindowWithinScreenBounds(Window* window, Window* detached);
-
 			Variable*			fLeftVar;
 			Variable*			fTopVar;
 			Variable*			fRightVar;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Philippe Saint-Pierre, stpere@gmail.com
  */
+
 
 /*!	Default and fallback decorator for the app_server - the yellow tabs */
 
@@ -458,8 +459,8 @@ DefaultDecorator::SetSettings(const BMessage& settings, BRegion* updateRegion)
 	if (typeFound == B_INT32_TYPE && countFound > 0) {
 		Window* windowToStackUnder = NULL;
 
-		//This list contains all window id's that are supposed to be
-		//stacked with current window but aren't open
+		// This list contains all window id's that are supposed to be
+		// stacked with current window but aren't open
 		BList* persistentIdsToAdd = new BList();
 
 		for (int i = 0; i < countFound; i++) {
@@ -475,21 +476,20 @@ DefaultDecorator::SetSettings(const BMessage& settings, BRegion* updateRegion)
 			Window* window = fWindow->Desktop()->FindWindow(id);
 			if (window && window != fWindow && window->StackedWindowIds()) {
 				bool idExists = false;
-				for (int j = 0; !idExists &&
-						j < window->StackedWindowIds()->CountItems(); j++) {
-					int32* stackedId =
-						static_cast<int32*>(window->StackedWindowIds()->ItemAt(j));
+				for (int j = 0; !idExists
+						&& j < window->StackedWindowIds()->CountItems(); j++) {
+					int32* stackedId = static_cast<int32*>(
+						window->StackedWindowIds()->ItemAt(j));
 					idExists = windowId == *stackedId;
 				}
+
 				if (idExists) {
 					if (!windowToStackUnder) {
 						//note this will execute only once during loop
 						windowToStackUnder = window;
 					}
-				}
-				else {
+				} else
 					persist = false;
-				}
 			}
 
 			if (persist) {
@@ -502,39 +502,37 @@ DefaultDecorator::SetSettings(const BMessage& settings, BRegion* updateRegion)
 		if (windowToStackUnder) {
 			fWindow->StackWindowBefore(windowToStackUnder);
 			windowToStackUnder->StackAndTile();
-		}
-		else {
+		} else
 			fWindow->InitStackedWindowIds();
-		}
 
+#ifdef DEBUG_STACK_AND_TILE
 		for (int i = 0; i < fWindow->StackedWindowIds()->CountItems(); i++) {
-			int32* stackedId =
-				static_cast<int32*>(fWindow->StackedWindowIds()->ItemAt(i));
+			int32* stackedId
+				= static_cast<int32*>(fWindow->StackedWindowIds()->ItemAt(i));
 			STRACE_SAT(("\tstackedWindowIds[%d]=%x\n", i, *stackedId));
 		}
+#endif
 
-		//Add the remaining window id's to the persistent stacking list
-		//These are the ones that belong to currently unopened windows
+		// Add the remaining window id's to the persistent stacking list
+		// These are the ones that belong to currently unopened windows
 		for (int i = 0; i < persistentIdsToAdd->CountItems(); i++) {
-			int32* idRef =
-				static_cast<int32*>(persistentIdsToAdd->ItemAt(i));
+			int32* idRef = static_cast<int32*>(persistentIdsToAdd->ItemAt(i));
 			bool idExists = false;
-			for (int j = 0; !idExists &&
-					j < fWindow->StackedWindowIds()->CountItems(); j++) {
-				int32* stackedId =
-					static_cast<int32*>(fWindow->StackedWindowIds()->ItemAt(j));
+			for (int j = 0; !idExists
+					&& j < fWindow->StackedWindowIds()->CountItems(); j++) {
+				int32* stackedId = static_cast<int32*>(
+					fWindow->StackedWindowIds()->ItemAt(j));
 				idExists = *idRef == *stackedId;
 			}
 			if (!idExists) {
 				STRACE_SAT(("\t** window %x isn't open - but stacked\n",
-						*idRef));
+					*idRef));
 				fWindow->StackedWindowIds()->AddItem(idRef);
 			}
 		}
 	}
 
-	_SnapWindowFromSettings("snap left2left", SNAP_LEFT, SNAP_LEFT,
-		&settings);
+	_SnapWindowFromSettings("snap left2left", SNAP_LEFT, SNAP_LEFT, &settings);
 	_SnapWindowFromSettings("snap left2right", SNAP_LEFT, SNAP_RIGHT,
 		&settings);
 	_SnapWindowFromSettings("snap right2left", SNAP_RIGHT, SNAP_LEFT,
@@ -559,9 +557,8 @@ DefaultDecorator::SetSettings(const BMessage& settings, BRegion* updateRegion)
 
 void
 DefaultDecorator::_SnapWindowFromSettings(const char* label,
-		SnapOrientation thisSnapOrientation,
-		SnapOrientation otherSnapOrientation,
-		const BMessage* settings)
+	SnapOrientation thisSnapOrientation, SnapOrientation otherSnapOrientation,
+	const BMessage* settings)
 {
 	type_code typeFound;
 	int32 countFound;
@@ -572,43 +569,43 @@ DefaultDecorator::_SnapWindowFromSettings(const char* label,
 			settings->FindInt32(label, i, &id);
 
 			Window* window = fWindow->Desktop()->FindWindow(id);
-			if (window == fWindow) {
+			if (window == fWindow)
 				continue;
-			}
 
-			char* debug_suffix = "... NOT!";
+			char* debugSuffix = "... NOT!";
 
-			if (window) {
-				//There can be cases where the other window to which this
-				//window's snapped doesn't contain a reference to this window
-				//in its snapping list. This would happen when the other window
-				//was de-snapped while this window was hidden. So only add the
-				//other window to this window's snapping list when such is not
-				//the case.
+			if (window != NULL) {
+				// There can be cases where the other window to which this
+				// window's snapped doesn't contain a reference to this window
+				// in its snapping list. This would happen when the other window
+				// was de-snapped while this window was hidden. So only add the
+				// other window to this window's snapping list when such is not
+				// the case.
 				BList* otherList = window->GetSnappingList(otherSnapOrientation,
-						thisSnapOrientation, false);
+					thisSnapOrientation, false);
 				if (!otherList) {
-					debug_suffix = "\n";
+					debugSuffix = "\n";
 					continue;
 				}
+
 				for (int i = 0; i < otherList->CountItems(); i++) {
-					int32* snappedId = static_cast<int32*>(otherList->ItemAt(i));
+					int32* snappedId
+						= static_cast<int32*>(otherList->ItemAt(i));
 					if (*snappedId == fWindow->WindowId()) {
 						fWindow->SnapToWindow(window, thisSnapOrientation,
-								otherSnapOrientation);
-						debug_suffix = "";
+							otherSnapOrientation);
+						debugSuffix = "";
 						break;
 					}
 				}
-			}
-			else { //window isn't open - still retain snap id
+			} else { //window isn't open - still retain snap id
 				fWindow->AddToSnappingList(id, thisSnapOrientation,
 					otherSnapOrientation);
-				debug_suffix = "... ?";
+				debugSuffix = "... ?";
 			}
 
 			STRACE_SAT(("\t%s[%d]=%x", label, i, id));
-			STRACE_SAT(("%s\n", debug_suffix));
+			STRACE_SAT(("%s\n", debugSuffix));
 		}
 	}
 }
@@ -619,19 +616,11 @@ DefaultDecorator::GetSettings(BMessage* settings) const
 {
 	STRACE_SAT(("DefaultDecorator::GetSettings() on %s\n", fWindow->Title()));
 
-	if (!fTabRect.IsValid())
-		return false;
-
-	if (settings->AddRect("tab frame", fTabRect) != B_OK)
-		return false;
-
-	if (settings->AddFloat("border width", fBorderWidth) != B_OK)
-		return false;
-
-	if (settings->AddFloat("tab location", (float)fTabOffset) != B_OK)
-		return false;
-
-	if (settings->AddInt32("window id", fWindow->WindowId()) != B_OK)
+	if (!fTabRect.IsValid()
+		|| settings->AddRect("tab frame", fTabRect) != B_OK
+		|| settings->AddFloat("border width", fBorderWidth) != B_OK
+		|| settings->AddFloat("tab location", (float)fTabOffset) != B_OK
+		|| settings->AddInt32("window id", fWindow->WindowId()) != B_OK)
 		return false;
 
 	// store id's of stacked windows
@@ -641,27 +630,20 @@ DefaultDecorator::GetSettings(BMessage* settings) const
 
 	// store id's of snapped windows
 	if (!_StoreIntsInSettings("snap left2left",
-			fWindow->Left2LeftSnappingWindowIds(), settings))
-		return false;
-	if (!_StoreIntsInSettings("snap left2right",
-			fWindow->Left2RightSnappingWindowIds(), settings))
-		return false;
-	if (!_StoreIntsInSettings("snap right2right",
-			fWindow->Right2RightSnappingWindowIds(), settings))
-		return false;
-	if (!_StoreIntsInSettings("snap right2left",
-			fWindow->Right2LeftSnappingWindowIds(), settings))
-		return false;
-	if (!_StoreIntsInSettings("snap top2top",
-			fWindow->Top2TopSnappingWindowIds(), settings))
-		return false;
-	if (!_StoreIntsInSettings("snap top2bottom",
-			fWindow->Top2BottomSnappingWindowIds(), settings))
-		return false;
-	if (!_StoreIntsInSettings("snap bottom2top",
-			fWindow->Bottom2TopSnappingWindowIds(), settings))
-		return false;
-	if (!_StoreIntsInSettings("snap bottom2bottom",
+			fWindow->Left2LeftSnappingWindowIds(), settings)
+		|| !_StoreIntsInSettings("snap left2right",
+			fWindow->Left2RightSnappingWindowIds(), settings)
+		|| !_StoreIntsInSettings("snap right2right",
+			fWindow->Right2RightSnappingWindowIds(), settings)
+		|| !_StoreIntsInSettings("snap right2left",
+			fWindow->Right2LeftSnappingWindowIds(), settings)
+		|| !_StoreIntsInSettings("snap top2top",
+			fWindow->Top2TopSnappingWindowIds(), settings)
+		|| !_StoreIntsInSettings("snap top2bottom",
+			fWindow->Top2BottomSnappingWindowIds(), settings)
+		|| !_StoreIntsInSettings("snap bottom2top",
+			fWindow->Bottom2TopSnappingWindowIds(), settings)
+		|| !_StoreIntsInSettings("snap bottom2bottom",
 			fWindow->Bottom2BottomSnappingWindowIds(), settings))
 		return false;
 
@@ -675,7 +657,7 @@ bool
 DefaultDecorator::_StoreIntsInSettings(const char* label,
 	BList* ids, BMessage* settings) const
 {
-	if (ids) {
+	if (ids != NULL) {
 		for (int i = 0; i < ids->CountItems(); i++) {
 			int32* id = static_cast<int32*>(ids->ItemAt(i));
 			if (settings->AddInt32(label, *id) != B_OK)
@@ -688,6 +670,7 @@ DefaultDecorator::_StoreIntsInSettings(const char* label,
 
 
 // #pragma mark -
+
 
 void
 DefaultDecorator::Draw(BRect update)
@@ -1632,6 +1615,7 @@ DefaultDecorator::HighlightTab(bool active, BRegion* dirty)
 		fTabColor = fFocusTabColor;
 	else
 		fTabColor = fNonFocusTabColor;
+
 	dirty->Include(fTabRect);
 	fTabHighlighted = active;
 }
@@ -1641,12 +1625,7 @@ void
 DefaultDecorator::HighlightBorders(bool active, BRegion* dirty)
 {
 	if (active) {
-		fFrameColors[0] = fHighlightFrameColors[0];
-		fFrameColors[1] = fHighlightFrameColors[1];
-		fFrameColors[2] = fHighlightFrameColors[2];
-		fFrameColors[3] = fHighlightFrameColors[3];
-		fFrameColors[4] = fHighlightFrameColors[4];
-		fFrameColors[5] = fHighlightFrameColors[5];
+		fFrameColors = fHighlightFrameColors;
 	} else if (IsFocus()) {
 		fFrameColors[0] = fNonHighlightFrameColors[0];
 		fFrameColors[1] = fNonHighlightFrameColors[1];

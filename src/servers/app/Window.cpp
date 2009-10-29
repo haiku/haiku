@@ -229,7 +229,7 @@ Window::~Window()
 	// clean up the stackedWindowIds (they are not used by other windows
 	// anymore)
 	if (fStackedWindowIds
-		&& (!fStackedWindows  || fStackedWindows->CountItems()==1)) {
+		&& (!fStackedWindows || fStackedWindows->CountItems() == 1)) {
 		for (int i = 0; i < fStackedWindowIds->CountItems(); i++) {
 			int32* id = static_cast<int32*>(fStackedWindowIds->ItemAt(i));
 			free(id);
@@ -2467,6 +2467,9 @@ Window::UpdateSession::Exclude(BRegion* dirtyInNextSession)
 }
 
 
+// #pragma mark - Stack & Tile
+
+
 bool
 Window::HighlightTab(bool active, BRegion& dirty)
 {
@@ -2526,8 +2529,8 @@ Window::_EnsureWindowWithinScreenBounds(Window* window, Window* detached)
 			|| windowsToRight->CountItems() == 1
 				&& *static_cast<int32*>(windowsToRight->ItemAt(0))
 					== detached->WindowId())) {
-		//If window is off-screen to the left and there's no window tiled
-		//to its right that can still "save" it from going totally off-screen
+		// If window is off-screen to the left and there's no window tiled
+		// to its right that can still "save" it from going totally off-screen
 		deltaX = 6 - window->Frame().left;
 	}
 	else if (window->Frame().right > screenFrame.right
@@ -2536,8 +2539,8 @@ Window::_EnsureWindowWithinScreenBounds(Window* window, Window* detached)
 			|| windowsToLeft->CountItems() == 1
 				&& *static_cast<int32*>(windowsToLeft->ItemAt(0))
 					== detached->WindowId())) {
-		//If window is off-screen to the right and there's no window tiled
-		//to its left that can still "save" it from going totally off-screen
+		// If window is off-screen to the right and there's no window tiled
+		// to its left that can still "save" it from going totally off-screen
 		deltaX = screenFrame.right - window->Frame().right - 6;
 	}
 	if (window->Frame().top < 0
@@ -2546,8 +2549,8 @@ Window::_EnsureWindowWithinScreenBounds(Window* window, Window* detached)
 			|| windowsToTop->CountItems() == 1
 				&& *static_cast<int32*>(windowsToTop->ItemAt(0))
 					== detached->WindowId())) {
-		//If window is off-screen to the top and there's no window tiled
-		//to its bottom that can still "save" it from going totally off-screen
+		// If window is off-screen to the top and there's no window tiled
+		// to its bottom that can still "save" it from going totally off-screen
 		deltaY = 27 - window->Frame().top;
 	}
 	else if (window->Frame().bottom > screenFrame.bottom
@@ -2556,8 +2559,8 @@ Window::_EnsureWindowWithinScreenBounds(Window* window, Window* detached)
 			|| windowsToBottom->CountItems() == 1
 				&& *static_cast<int32*>(windowsToBottom->ItemAt(0))
 					== detached->WindowId())) {
-		//If window is off-screen to the bottom and there's no window tiled
-		//to its top that can still "save" it from going totally off-screen
+		// If window is off-screen to the bottom and there's no window tiled
+		// to its top that can still "save" it from going totally off-screen
 		deltaY = screenFrame.bottom - window->Frame().bottom - 6;
 	}
 	if (deltaX != 0 || deltaY != 0)
@@ -2610,11 +2613,11 @@ Window::_InitStackingAndSnapping()
 	fRightVar->SetRange(-DBL_MAX, DBL_MAX);
 	fBottomVar->SetRange(-DBL_MAX, DBL_MAX);
 
-	fLeftConstraint  = fDesktop->fStackAndTileSpec
-		->AddConstraint(1.0, fLeftVar,
+	fLeftConstraint
+		= fDesktop->fStackAndTileSpec->AddConstraint(1.0, fLeftVar,
 			OperatorType(EQ), fFrame.left, 1, 1);
-	fTopConstraint  = fDesktop->fStackAndTileSpec
-		->AddConstraint(1.0, fTopVar,
+	fTopConstraint
+		= fDesktop->fStackAndTileSpec->AddConstraint(1.0, fTopVar,
 			OperatorType(EQ), fFrame.top, 1, 1);
 	label = Title();
 	label << ".fLeftConstraint";
@@ -2625,12 +2628,12 @@ Window::_InitStackingAndSnapping()
 
 	int32 minWidth, maxWidth, minHeight, maxHeight;
 	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-	fMinWidthConstraint = fDesktop->fStackAndTileSpec
-		->AddConstraint(1.0, fLeftVar, -1.0, fRightVar,
-			OperatorType(LE), -minWidth);
-	fMinHeightConstraint = fDesktop->fStackAndTileSpec
-		->AddConstraint(1.0, fTopVar, -1.0, fBottomVar,
-			OperatorType(LE), -minHeight);
+	fMinWidthConstraint
+		= fDesktop->fStackAndTileSpec->AddConstraint(1.0, fLeftVar, -1.0,
+			fRightVar, OperatorType(LE), -minWidth);
+	fMinHeightConstraint
+		= fDesktop->fStackAndTileSpec->AddConstraint(1.0, fTopVar, -1.0,
+			fBottomVar, OperatorType(LE), -minHeight);
 	label = Title();
 	label << ".fMinWidthConstraint";
 	fMinWidthConstraint->SetLabel(label.String());
@@ -2641,12 +2644,12 @@ Window::_InitStackingAndSnapping()
 	// The width and height constraints have higher penalties than the
 	// position constraints (left, top), so a window will keep its size
 	// unless explicitly resized.
-	fWidthConstraint = fDesktop->fStackAndTileSpec
-		->AddConstraint(-1.0, fLeftVar, 1.0, fRightVar,
-			OperatorType(EQ), fFrame.Width(), 10, 10);
-	fHeightConstraint = fDesktop->fStackAndTileSpec
-		->AddConstraint(-1.0, fTopVar, 1.0, fBottomVar,
-			OperatorType(EQ), fFrame.Height(), 10, 10);
+	fWidthConstraint
+		= fDesktop->fStackAndTileSpec->AddConstraint(-1.0, fLeftVar, 1.0,
+			fRightVar, OperatorType(EQ), fFrame.Width(), 10, 10);
+	fHeightConstraint
+		= fDesktop->fStackAndTileSpec->AddConstraint(-1.0, fTopVar, 1.0,
+			fBottomVar, OperatorType(EQ), fFrame.Height(), 10, 10);
 	label = Title();
 	label << ".fWidthConstraint";
 	fWidthConstraint->SetLabel(label.String());
@@ -2871,14 +2874,17 @@ Window::_CheckIfReadyToStack()
 	}
 
 	// if the stacking candidate has changed, change tab highlights
-	if(prevWindowUnder != fWindowUnder) {
-		if(!prevWindowUnder) { // candidate found for the first time
+	if (prevWindowUnder != fWindowUnder) {
+		if (!prevWindowUnder) {
+			// candidate found for the first time
 			fDesktop->HighlightTab(this, true);
 			fDesktop->HighlightTab(fWindowUnder, true);
-		} else if(!fWindowUnder) { // no candidate after there was one
+		} else if (!fWindowUnder) {
+			// no candidate after there was one
 			fDesktop->HighlightTab(this, false);
 			fDesktop->HighlightTab(prevWindowUnder, false);
-		} else { // changing from one to another candidate
+		} else {
+			// changing from one to another candidate
 			fDesktop->HighlightTab(prevWindowUnder, false);
 			fDesktop->HighlightTab(fWindowUnder, true);
 		}
@@ -3181,7 +3187,8 @@ Window::_CheckIfReadyToSnap()
 /*!	\brief Snaps this window to the current candidate windows for snapping
 	on each side. Afterwards snapping candidates are cleared.
 */
-void Window::_SnapWindow()
+void
+Window::_SnapWindow()
 {
 	BRect bounds;
 	Window* leftmostWindow;
@@ -3216,8 +3223,8 @@ void Window::_SnapWindow()
 			topmostWindow->AddToSnappingList(this, SNAP_RIGHT, SNAP_LEFT);
 
 			STRACE_SAT(("Adding %s[%d] to %s[%d]'s T2T & L2R list\n",
-						topmostWindow->Title(), topmostWindow->WindowId(),
-						Title(), WindowId()));
+				topmostWindow->Title(), topmostWindow->WindowId(),
+				Title(), WindowId()));
 		}
 
 		// adjust bottom border
@@ -3236,8 +3243,8 @@ void Window::_SnapWindow()
 			bottommostWindow->AddToSnappingList(this, SNAP_RIGHT, SNAP_LEFT);
 
 			STRACE_SAT(("Adding %s[%d] to %s[%d]'s B2B & L2R list\n",
-						bottommostWindow->Title(), bottommostWindow->WindowId(),
-						Title(), WindowId()));
+				bottommostWindow->Title(), bottommostWindow->WindowId(),
+				Title(), WindowId()));
 		}
 
 		// adjust other windows
@@ -3258,8 +3265,7 @@ void Window::_SnapWindow()
 			window->AddToSnappingList(this, SNAP_RIGHT, SNAP_LEFT);
 
 			STRACE_SAT(("Adding %s[%d] to %s[%d]'s L2R list\n",
-						window->Title(), window->WindowId(), Title(),
-						WindowId()));
+				window->Title(), window->WindowId(), Title(), WindowId()));
 		}
 	}
 
@@ -3291,8 +3297,8 @@ void Window::_SnapWindow()
 			leftmostWindow->AddToSnappingList(this, SNAP_BOTTOM, SNAP_TOP);
 
 			STRACE_SAT(("Adding %s[%d] to %s[%d]'s L2L & T2B list\n",
-						leftmostWindow->Title(), leftmostWindow->WindowId(),
-						Title(), WindowId()));
+				leftmostWindow->Title(), leftmostWindow->WindowId(),
+				Title(), WindowId()));
 		}
 
 		// adjust right border
@@ -3311,8 +3317,8 @@ void Window::_SnapWindow()
 			rightmostWindow->AddToSnappingList(this, SNAP_BOTTOM, SNAP_TOP);
 
 			STRACE_SAT(("Adding %s[%d] to %s[%d]'s R2R & T2B list\n",
-						rightmostWindow->Title(), rightmostWindow->WindowId(),
-						Title(), WindowId()));
+				rightmostWindow->Title(), rightmostWindow->WindowId(),
+				Title(), WindowId()));
 		}
 
 		// adjust other windows
@@ -3320,10 +3326,9 @@ void Window::_SnapWindow()
 			Window* window = static_cast<Window*>(
 				fTopAdjacentWindows->ItemAt(i));
 			window->_InitStackingAndSnapping();
-			Constraint* topSnapping =
-				fDesktop->fStackAndTileSpec->AddConstraint(
-					-1, window->fBottomVar, 1, fTopVar,
-					OperatorType(EQ), 32);
+			Constraint* topSnapping
+				= fDesktop->fStackAndTileSpec->AddConstraint(
+					-1, window->fBottomVar, 1, fTopVar, OperatorType(EQ), 32);
 			BString label("topSnapping of ");
 			label << Title();
 			topSnapping->SetLabel(label.String());
@@ -3333,8 +3338,7 @@ void Window::_SnapWindow()
 			window->AddToSnappingList(this, SNAP_BOTTOM, SNAP_TOP);
 
 			STRACE_SAT(("Adding %s[%d] to %s[%d]'s T2B list\n",
-						window->Title(), window->WindowId(), Title(),
-						WindowId()));
+				window->Title(), window->WindowId(), Title(), WindowId()));
 		}
 	}
 
@@ -3366,8 +3370,8 @@ void Window::_SnapWindow()
 			topmostWindow->AddToSnappingList(this, SNAP_LEFT, SNAP_RIGHT);
 
 			STRACE_SAT(("Adding %s[%d] to %s[%d]'s T2T & R2L list\n",
-						topmostWindow->Title(), topmostWindow->WindowId(),
-						Title(), WindowId()));
+				topmostWindow->Title(), topmostWindow->WindowId(),
+				Title(), WindowId()));
 		}
 
 		// adjust bottom border
@@ -3386,8 +3390,8 @@ void Window::_SnapWindow()
 			bottommostWindow->AddToSnappingList(this, SNAP_LEFT, SNAP_RIGHT);
 
 			STRACE_SAT(("Adding %s[%d] to %s[%d]'s B2B & R2L list\n",
-						bottommostWindow->Title(), bottommostWindow->WindowId(),
-						Title(), WindowId()));
+				bottommostWindow->Title(), bottommostWindow->WindowId(),
+				Title(), WindowId()));
 		}
 
 		// adjust other windows
@@ -3395,10 +3399,9 @@ void Window::_SnapWindow()
 			Window* window = static_cast<Window*>(
 				fRightAdjacentWindows->ItemAt(i));
 			window->_InitStackingAndSnapping();
-			Constraint* rightSnapping =
-				fDesktop->fStackAndTileSpec->AddConstraint(
-					-1, fRightVar, 1, window->fLeftVar,
-					OperatorType(EQ), 11);
+			Constraint* rightSnapping
+				= fDesktop->fStackAndTileSpec->AddConstraint(
+					-1, fRightVar, 1, window->fLeftVar, OperatorType(EQ), 11);
 			BString label("rightSnapping of ");
 			label << Title();
 			rightSnapping->SetLabel(label.String());
@@ -3408,8 +3411,7 @@ void Window::_SnapWindow()
 			window->AddToSnappingList(this, SNAP_LEFT, SNAP_RIGHT);
 
 			STRACE_SAT(("Adding %s[%d] to %s[%d]'s R2L list\n",
-						window->Title(), window->WindowId(), Title(),
-						WindowId()));
+				window->Title(), window->WindowId(), Title(), WindowId()));
 		}
 	}
 
@@ -3441,8 +3443,8 @@ void Window::_SnapWindow()
 			leftmostWindow->AddToSnappingList(this, SNAP_TOP, SNAP_BOTTOM);
 
 			STRACE_SAT(("Adding %s[%d] to %s[%d]'s L2L & B2T list\n",
-						leftmostWindow->Title(), leftmostWindow->WindowId(),
-						Title(), WindowId()));
+				leftmostWindow->Title(), leftmostWindow->WindowId(),
+				Title(), WindowId()));
 		}
 
 		// adjust right border
@@ -3461,8 +3463,8 @@ void Window::_SnapWindow()
 			rightmostWindow->AddToSnappingList(this, SNAP_TOP, SNAP_BOTTOM);
 
 			STRACE_SAT(("Adding %s[%d] to %s[%d]'s R2R & B2T list\n",
-						rightmostWindow->Title(), rightmostWindow->WindowId(),
-						Title(), WindowId()));
+				rightmostWindow->Title(), rightmostWindow->WindowId(),
+				Title(), WindowId()));
 		}
 
 		// adjust other windows
@@ -3470,10 +3472,9 @@ void Window::_SnapWindow()
 			Window* window = static_cast<Window*>(
 				fBottomAdjacentWindows->ItemAt(i));
 			window->_InitStackingAndSnapping();
-			Constraint* bottomSnapping =
-				fDesktop->fStackAndTileSpec->AddConstraint(
-					-1, fBottomVar, 1, window->fTopVar,
-					OperatorType(EQ), 32);
+			Constraint* bottomSnapping
+				= fDesktop->fStackAndTileSpec->AddConstraint(
+					-1, fBottomVar, 1, window->fTopVar, OperatorType(EQ), 32);
 			BString label("bottomSnapping of ");
 			label << Title();
 			bottomSnapping->SetLabel(label.String());
@@ -3483,8 +3484,7 @@ void Window::_SnapWindow()
 			window->AddToSnappingList(this, SNAP_TOP, SNAP_BOTTOM);
 
 			STRACE_SAT(("Adding %s[%d] to %s[%d]'s B2T list\n",
-						window->Title(), window->WindowId(), Title(),
-						WindowId()));
+				window->Title(), window->WindowId(), Title(), WindowId()));
 		}
 	}
 
@@ -3501,11 +3501,11 @@ void Window::_SnapWindow()
 
 
 void
-Window::AddToSnappingList(Window* window,
-		SnapOrientation thisSnapOrientation,
-		SnapOrientation otherSnapOrientation) {
+Window::AddToSnappingList(Window* window, SnapOrientation thisSnapOrientation,
+	SnapOrientation otherSnapOrientation)
+{
 	AddToSnappingList(window->WindowId(), thisSnapOrientation,
-			otherSnapOrientation);
+		otherSnapOrientation);
 }
 
 
@@ -3519,18 +3519,17 @@ Window::AddToSnappingList(Window* window,
 	\param otherSnapOrientation snapping orientation for given window
  */
 void
-Window::AddToSnappingList(int32 windowId,
-		SnapOrientation thisSnapOrientation,
-		SnapOrientation otherSnapOrientation) {
-
+Window::AddToSnappingList(int32 windowId, SnapOrientation thisSnapOrientation,
+	SnapOrientation otherSnapOrientation)
+{
 	BList* windowIdList = GetSnappingList(thisSnapOrientation,
 		otherSnapOrientation, true);
-	//This may be the case if invalid snap orientation combo is given
-	//(e.g. top to left)
+	// This may be the case if invalid snap orientation combo is given
+	// (e.g. top to left)
 	if (!windowIdList)
 		return;
 
-	//don't add id if already contained
+	// don't add id if already contained
 	for (int i = 0; i < windowIdList->CountItems(); i++) {
 		int32* id = static_cast<int32*>(windowIdList->ItemAt(i));
 		if (*id == windowId) {
@@ -3541,11 +3540,12 @@ Window::AddToSnappingList(int32 windowId,
 	*id = windowId;
 	windowIdList->AddItem(id);
 
+#ifdef DEBUG_STACK_AND_TILE
 	char snapStr[][7] = {"left", "right", "top", "bottom"};
 	STRACE_SAT(("\tAdded %s to %s's %s 2 %s list\n",
-				windowId, Title(),
-				snapStr[thisSnapOrientation],
-				snapStr[otherSnapOrientation]));
+		windowId, Title(), snapStr[thisSnapOrientation],
+		snapStr[otherSnapOrientation]));
+#endif
 }
 
 
@@ -3559,8 +3559,8 @@ Window::AddToSnappingList(int32 windowId,
  */
 void
 Window::RemoveFromSnappingList(int32 windowId,
-		SnapOrientation thisSnapOrientation,
-		SnapOrientation otherSnapOrientation) {
+	SnapOrientation thisSnapOrientation, SnapOrientation otherSnapOrientation)
+{
 	BList* windowIdList = GetSnappingList(thisSnapOrientation,
 		otherSnapOrientation, false);
 
@@ -3575,11 +3575,13 @@ Window::RemoveFromSnappingList(int32 windowId,
 			windowIdList->RemoveItem(i);
 			free(id);
 
+#ifdef DEBUG_STACK_AND_TILE
 			char snapStr[][7] = {"left", "right", "top", "bottom"};
 			STRACE_SAT(("\tRemoved %x from %s's %s 2 %s list\n",
 						windowId, Title(),
 						snapStr[thisSnapOrientation],
 						snapStr[otherSnapOrientation]));
+#endif
 			return;
 		}
 	}
@@ -3597,11 +3599,10 @@ Window::RemoveFromSnappingList(int32 windowId,
  */
 BList*
 Window::GetSnappingList(SnapOrientation thisSnapOrientation,
-		SnapOrientation otherSnapOrientation,
-		bool createIfNull)
+	SnapOrientation otherSnapOrientation, bool createIfNull)
 {
 	BList** windowIdListRef = _GetSnappingListRef(thisSnapOrientation,
-			otherSnapOrientation, createIfNull);
+		otherSnapOrientation, createIfNull);
 
 	if (windowIdListRef)
 		return *windowIdListRef;
@@ -3611,8 +3612,7 @@ Window::GetSnappingList(SnapOrientation thisSnapOrientation,
 
 BList**
 Window::_GetSnappingListRef(SnapOrientation thisSnapOrientation,
-		SnapOrientation otherSnapOrientation,
-		bool createIfNull)
+	SnapOrientation otherSnapOrientation, bool createIfNull)
 {
 	BList** windowIdListRef = NULL;
 	if (thisSnapOrientation == SNAP_LEFT
@@ -3640,13 +3640,13 @@ Window::_GetSnappingListRef(SnapOrientation thisSnapOrientation,
 		&& otherSnapOrientation == SNAP_BOTTOM)
 		windowIdListRef = &fBottom2BottomSnappingWindowIds;
 
-	//This will be the case if invalid snap orientation combo is given
-	//(e.g. top to left)
+	// This will be the case if invalid snap orientation combo is given
+	// (e.g. top to left)
 	if (!windowIdListRef) {
 		return NULL;
 	}
 
-	//Create snapping list if not already initialised.
+	// Create snapping list if not already initialised.
 	if (!(*windowIdListRef) && createIfNull) {
 		*windowIdListRef = new BList();
 	}
@@ -3660,16 +3660,15 @@ Window::_GetSnappingListRef(SnapOrientation thisSnapOrientation,
 		according to given orientation). Returns the object representing
 		this snapping constraint.
 
-		TODO some of the logic is duplicative w.r.t _SnapWindow - consider
-		refactoring
+	TODO some of the logic is duplicative w.r.t _SnapWindow - consider
+	refactoring
 
 	\param otherWindow the window to snap to
 	\param thisSnap snapping orientation for current window
 	\param otherSnap snapping orientation for given window
 */
 Constraint*
-Window::SnapToWindow(Window* otherWindow,
-	SnapOrientation thisSnap,
+Window::SnapToWindow(Window* otherWindow, SnapOrientation thisSnap,
 	SnapOrientation otherSnap)
 {
 	Variable* thisSnappingVar;
@@ -3688,75 +3687,80 @@ Window::SnapToWindow(Window* otherWindow,
 
 	//For each possible pair of snapping orientations, work out the
 	//necessary updates to make to the linear constraints
-	switch(thisSnap) {
-	case SNAP_LEFT:
-		thisSnappingVar = fLeftVar;
-		snappingLabel << "leftSnapping of ";
-		switch(otherSnap) {
+	switch (thisSnap) {
 		case SNAP_LEFT:
-			moveDeltaX = otherFrame.left - thisFrame.left;
-			otherSnappingVar = otherWindow->fLeftVar;
+			thisSnappingVar = fLeftVar;
+			snappingLabel << "leftSnapping of ";
+			switch (otherSnap) {
+				case SNAP_LEFT:
+					moveDeltaX = otherFrame.left - thisFrame.left;
+					otherSnappingVar = otherWindow->fLeftVar;
+					break;
+				case SNAP_RIGHT:
+					snapDistance = -11;
+					moveDeltaX
+						= otherFrame.right - thisFrame.left - snapDistance;
+					otherSnappingVar = otherWindow->fRightVar;
+					break;
+				default:
+					return NULL;
+			}
 			break;
 		case SNAP_RIGHT:
-			snapDistance = -11;
-			moveDeltaX = otherFrame.right - thisFrame.left - snapDistance;
-			otherSnappingVar = otherWindow->fRightVar;
+			thisSnappingVar = fRightVar;
+			snappingLabel << "rightSnapping of ";
+
+			switch (otherSnap) {
+				case SNAP_LEFT:
+					snapDistance = 11;
+					moveDeltaX
+						= otherFrame.left - thisFrame.right - snapDistance;
+					otherSnappingVar = otherWindow->fLeftVar;
+					break;
+				case SNAP_RIGHT:
+					moveDeltaX = otherFrame.right - thisFrame.right;
+					otherSnappingVar = otherWindow->fRightVar;
+					break;
+				default:
+					return NULL;
+			}
 			break;
-		default:
-			return NULL;
-		}
-		break;
-	case SNAP_RIGHT:
-		thisSnappingVar = fRightVar;
-		snappingLabel << "rightSnapping of ";
-		switch(otherSnap) {
-		case SNAP_LEFT:
-			snapDistance = 11;
-			moveDeltaX = otherFrame.left - thisFrame.right - snapDistance;
-			otherSnappingVar = otherWindow->fLeftVar;
-			break;
-		case SNAP_RIGHT:
-			moveDeltaX = otherFrame.right - thisFrame.right;
-			otherSnappingVar = otherWindow->fRightVar;
-			break;
-		default:
-			return NULL;
-		}
-		break;
-	case SNAP_TOP:
-		thisSnappingVar = fTopVar;
-		snappingLabel << "topSnapping of ";
-		switch(otherSnap) {
 		case SNAP_TOP:
-			moveDeltaY = otherFrame.top - thisFrame.top;
-			otherSnappingVar = otherWindow->fTopVar;
+			thisSnappingVar = fTopVar;
+			snappingLabel << "topSnapping of ";
+			switch (otherSnap) {
+				case SNAP_TOP:
+					moveDeltaY = otherFrame.top - thisFrame.top;
+					otherSnappingVar = otherWindow->fTopVar;
+					break;
+				case SNAP_BOTTOM:
+					snapDistance = -32;
+					moveDeltaY
+						= otherFrame.bottom - thisFrame.top - snapDistance;
+					otherSnappingVar = otherWindow->fBottomVar;
+					break;
+				default:
+					return NULL;
+			}
 			break;
-		case SNAP_BOTTOM:
-			snapDistance = -32;
-			moveDeltaY = otherFrame.bottom - thisFrame.top - snapDistance;
-			otherSnappingVar = otherWindow->fBottomVar;
+		default: // SNAP_BOTTOM
+			thisSnappingVar = fBottomVar;
+			snappingLabel << "bottomSnapping of ";
+			switch (otherSnap) {
+				case SNAP_TOP:
+					snapDistance = 32;
+					moveDeltaY
+						= otherFrame.top - thisFrame.bottom - snapDistance;
+					otherSnappingVar = otherWindow->fTopVar;
+					break;
+				case SNAP_BOTTOM:
+					moveDeltaY = otherFrame.bottom - thisFrame.bottom;
+					otherSnappingVar = otherWindow->fBottomVar;
+					break;
+				default:
+					return NULL;
+			}
 			break;
-		default:
-			return NULL;
-		}
-		break;
-	default: //SNAP_BOTTOM
-		thisSnappingVar = fBottomVar;
-		snappingLabel << "bottomSnapping of ";
-		switch(otherSnap) {
-		case SNAP_TOP:
-			snapDistance = 32;
-			moveDeltaY = otherFrame.top - thisFrame.bottom - snapDistance;
-			otherSnappingVar = otherWindow->fTopVar;
-			break;
-		case SNAP_BOTTOM:
-			moveDeltaY = otherFrame.bottom - thisFrame.bottom;
-			otherSnappingVar = otherWindow->fBottomVar;
-			break;
-		default:
-			return NULL;
-		}
-		break;
 	}
 
 	fDesktop->MoveWindowBy(this, moveDeltaX, moveDeltaY, 0);
@@ -3764,10 +3768,11 @@ Window::SnapToWindow(Window* otherWindow,
 	Constraint* snappingConstraint;
 	if (snapDistance == 0)
 		snappingConstraint = thisSnappingVar->IsEqual(otherSnappingVar);
-	else
+	else {
 		snappingConstraint = fDesktop->fStackAndTileSpec->AddConstraint(
-				-1, thisSnappingVar, 1, otherSnappingVar,
-				OperatorType(EQ), snapDistance);
+			-1, thisSnappingVar, 1, otherSnappingVar, OperatorType(EQ),
+			snapDistance);
+	}
 
 	snappingLabel << Title();
 	snappingConstraint->SetLabel(snappingLabel.String());
@@ -3795,9 +3800,8 @@ Window::SnapToWindow(Window* otherWindow,
 			should be stored.
 */
 BRect
-Window::_BoundingRectAndWindows(BList* windows,
-	Window** leftmostWindow, Window** topmostWindow,
-	Window** rightmostWindow, Window** bottommostWindow)
+Window::_BoundingRectAndWindows(BList* windows, Window** leftmostWindow,
+	Window** topmostWindow, Window** rightmostWindow, Window** bottommostWindow)
 {
 	ASSERT(!windows->IsEmpty());
 
@@ -3916,10 +3920,8 @@ Window::StackAndTile()
 	}
 
 	// set window locations and sizes
-	for (Window* window = fDesktop->GetWindows().LastWindow();
-		window;
-		window = window->PreviousWindow(fCurrentWorkspace)) {
-
+	for (Window* window = fDesktop->GetWindows().LastWindow(); window != NULL;
+			window = window->PreviousWindow(fCurrentWorkspace)) {
 		if (window->fLeftVar) {
 			fDesktop->MoveWindowBy(window,
 				window->fLeftVar->Value() - window->fFrame.left,
@@ -3942,7 +3944,7 @@ Window::StackAndTile()
 
 	_ArrangeStackedWindowTabs();
 
-	#ifdef DEBUG_STACK_AND_TILE
+#ifdef DEBUG_STACK_AND_TILE
 	// debug_printf crashes if given too large strings
 	// therefore we cut our specification string up into smaller chunks
 	BString* specStr = fDesktop->fStackAndTileSpec->ToBString();
@@ -3972,8 +3974,8 @@ Window::StackAndTile()
 	}
 	debug_printf("\n");
 	delete specStr;
-	#endif
 	STRACE_SAT(("Finished Window::StackAndTile() on %s\n", Title()));
+#endif
 }
 
 
@@ -4009,7 +4011,7 @@ Window::_UnboundWindowByWorkspace()
 int32
 Window::WindowId()
 {
-	if(!fId)
+	if (!fId)
 		fId = rand() + 1;
 
 	return fId;
@@ -4030,8 +4032,8 @@ Window::SetWindowId(int32 windowId)
 void
 Window::_RemoveStackingPersistently()
 {
-	STRACE_SAT(("Window::_RemoveStackingPersistently() on %s, fStackedWindowIds=%x\n",
-		Title(), fStackedWindowIds));
+	STRACE_SAT(("Window::_RemoveStackingPersistently() on %s, "
+		"fStackedWindowIds=%x\n", Title(), fStackedWindowIds));
 	if (!fStackedWindowIds)
 		return;
 
@@ -4083,9 +4085,9 @@ Window::_RemoveSnappingPersistently()
 		id from the snapping list of other relevant windows
 */
 void
-Window::_FreeUpSnappingList(SnapOrientation thisSnap,
-		SnapOrientation otherSnap,
-		bool deleteFromOtherWindowsList) {
+Window::_FreeUpSnappingList(SnapOrientation thisSnap, SnapOrientation otherSnap,
+	bool deleteFromOtherWindowsList)
+{
 	BList** idListRef = _GetSnappingListRef(thisSnap, otherSnap, false);
 
 	if (!idListRef)
@@ -4099,10 +4101,12 @@ Window::_FreeUpSnappingList(SnapOrientation thisSnap,
 		int32* id = static_cast<int32*>(idList->ItemAt(i));
 		if (deleteFromOtherWindowsList) {
 			Window* otherWindow = fDesktop->FindWindow(*id);
-			//Remove this window from the other window's snapping list.
-			//Note the order of orientation is reversed.
-			if (otherWindow)
-				otherWindow->RemoveFromSnappingList(WindowId(), otherSnap, thisSnap);
+			// Remove this window from the other window's snapping list.
+			// Note the order of orientation is reversed.
+			if (otherWindow) {
+				otherWindow->RemoveFromSnappingList(WindowId(), otherSnap,
+					thisSnap);
+			}
 		}
 		free(id);
 	}
@@ -4134,5 +4138,3 @@ Window::UpdateSession::AddCause(uint8 cause)
 {
 	fCause |= cause;
 }
-
-

@@ -12,10 +12,14 @@
 
 #include "Decorator.h"
 #include "Desktop.h"
+#include "Window.h"
+
 #include <Region.h>
+
 
 class Desktop;
 class ServerBitmap;
+
 
 class DefaultDecorator: public Decorator {
 public:
@@ -89,6 +93,15 @@ private:
 									bool focus, int32 width, int32 height,
 									DefaultDecorator* object);
 
+			// Stack & Tile specific private methods
+			bool				_StoreIntsInSettings(const char* label,
+									BList* ids, BMessage* settings) const;
+			void				_SnapWindowFromSettings(const char* label,
+									SnapOrientation thisSnapOrientation,
+									SnapOrientation otherSnapOrientation,
+									const BMessage* settings);
+
+private:
 			rgb_color			fButtonHighColor;
 			rgb_color			fButtonLowColor;
 			rgb_color			fTabColor;
@@ -133,14 +146,6 @@ private:
 
 			bigtime_t			fLastClicked;
 			bool				fWasDoubleClick;
-
-			//Stack & Tile specific private methods
-			bool				_StoreIntsInSettings(const char* label,
-									BList* ids, BMessage* settings) const;
-			void				_SnapWindowFromSettings(const char* label,
-									SnapOrientation thisSnapOrientation,
-									SnapOrientation otherSnapOrientation,
-									const BMessage* settings);
 };
 
 #endif	// DEFAULT_DECORATOR_H

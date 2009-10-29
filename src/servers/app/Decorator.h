@@ -45,7 +45,6 @@ enum click_type {
 	CLICK_RESIZE_RB
 };
 
-#include "Window.h"
 
 class Decorator {
 public:

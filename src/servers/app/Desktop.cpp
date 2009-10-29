@@ -50,22 +50,6 @@
 #include "Workspace.h"
 #include "WorkspacesView.h"
 
-#include <ViewPrivate.h>
-#include <WindowInfo.h>
-#include <ServerProtocol.h>
-
-#include <Debug.h>
-#include <DirectWindow.h>
-#include <Entry.h>
-#include <Message.h>
-#include <MessageFilter.h>
-#include <Region.h>
-#include <Roster.h>
-
-#include <stdio.h>
-#include <string.h>
-#include <syslog.h>
-
 #if TEST_MODE
 #	include "EventStream.h"
 #endif
@@ -81,6 +65,7 @@
 #if !USE_MULTI_LOCKER
 #	define AutoWriteLocker BAutolock
 #endif
+
 
 class KeyboardFilter : public EventFilter {
 	public:
@@ -204,23 +189,23 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 		}
 
 		// switch between stacked windows
-		if (modifiers & B_OPTION_KEY) {
+		if ((modifiers & B_OPTION_KEY) != 0) {
 			BList* stackedWindows = fDesktop->FocusWindow()->StackedWindows();
 			if (key == 0x61 && stackedWindows) {
-				int32 oldIndex =
-					stackedWindows->IndexOf(fDesktop->FocusWindow());
-				int32 newIndex =
-					(oldIndex - 1 >= 0)?
-					oldIndex - 1 : stackedWindows->CountItems() - 1;
+				// option key + cursor left
+				int32 oldIndex
+					= stackedWindows->IndexOf(fDesktop->FocusWindow());
+				int32 newIndex = (oldIndex - 1 >= 0)
+					? oldIndex - 1 : stackedWindows->CountItems() - 1;
 				fDesktop->ActivateWindow(
 					static_cast<Window*>(stackedWindows->ItemAt(newIndex)));
 				return B_SKIP_MESSAGE;
 			} else if (key == 0x63 && stackedWindows) {
-				int32 oldIndex =
-					stackedWindows->IndexOf(fDesktop->FocusWindow());
-				int32 newIndex =
-					(oldIndex + 1 < stackedWindows->CountItems())?
-					oldIndex + 1 : 0;
+				// option key + cursor right
+				int32 oldIndex
+					= stackedWindows->IndexOf(fDesktop->FocusWindow());
+				int32 newIndex = (oldIndex + 1 < stackedWindows->CountItems())
+					? oldIndex + 1 : 0;
 				fDesktop->ActivateWindow(
 					static_cast<Window*>(stackedWindows->ItemAt(newIndex)));
 				return B_SKIP_MESSAGE;
@@ -240,7 +225,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 		// disable highlights if the stacking and snapping mode was just left
 		if (fDesktop->fIsStackingAndSnapping && !(modifiers & B_OPTION_KEY))
 			fDesktop->FinishStackingAndSnapping();
-		fDesktop->fIsStackingAndSnapping = modifiers & B_OPTION_KEY;
+		fDesktop->fIsStackingAndSnapping = (modifiers & B_OPTION_KEY) != 0;
 	}
 
 	return B_DISPATCH_MESSAGE;
@@ -1016,7 +1001,7 @@ Desktop::ActivateWindow(Window* window)
 
 	BList* stackedAndTiledWindows = new BList();
 
-	//Prepare to move tiled windows to the front as well
+	// Prepare to move tiled windows to the front as well
 	_AddWindowsByIdsToList(window->Left2LeftSnappingWindowIds(),
 		stackedAndTiledWindows);
 	_AddWindowsByIdsToList(window->Left2RightSnappingWindowIds(),
@@ -1036,29 +1021,30 @@ Desktop::ActivateWindow(Window* window)
 
 	bool forceDirty = false;
 
-	//And then prepare to move stacked windows to the front
+	// And then prepare to move stacked windows to the front
 	BList* stackedWindows = window->StackedWindows();
-	if (stackedWindows) {
+	if (stackedWindows != NULL) {
 		for (int i = 0; i < stackedWindows->CountItems(); i++) {
-			Window* stackedWindow =
-				static_cast<Window*>(stackedWindows->ItemAt(i));
+			Window* stackedWindow
+				= static_cast<Window*>(stackedWindows->ItemAt(i));
 			if (stackedWindow != window
 				&& !stackedAndTiledWindows->HasItem(stackedWindow)) {
 				stackedAndTiledWindows->AddItem(stackedWindow);
 
-				//Basically if there are any stacked windows associated with
-				//this window, then designate this window as "dirty" so it is
-				//forced to repaint
+				// Basically if there are any stacked windows associated with
+				// this window, then designate this window as "dirty" so it is
+				// forced to repaint
 				forceDirty = true;
 			}
 		}
 	}
 
-	//Do the actual moving here
+	// Do the actual moving here
 	for (int i = 0; i < stackedAndTiledWindows->CountItems(); i ++) {
-		Window* win = static_cast<Window*>(stackedAndTiledWindows->ItemAt(i));
-		_CurrentWindows().RemoveWindow(win);
-		windows.AddWindow(win);
+		Window* window
+			= static_cast<Window*>(stackedAndTiledWindows->ItemAt(i));
+		_CurrentWindows().RemoveWindow(window);
+		windows.AddWindow(window);
 	}
 
 	delete stackedAndTiledWindows;
@@ -1098,6 +1084,7 @@ Desktop::_AddWindowsByIdsToList(BList* windowIdsToAdd, BList* windows)
 {
 	if (!windowIdsToAdd || !windows)
 		return false;
+
 	bool added = false;
 	for (int i = 0; i < windowIdsToAdd->CountItems(); i++) {
 		int32* id = static_cast<int32*>(windowIdsToAdd->ItemAt(i));

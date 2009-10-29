@@ -895,8 +895,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				fDesktop->ResizeWindowBy(fWindow,
 					xResizeTo - fWindow->Frame().Width(),
 					yResizeTo - fWindow->Frame().Height());
-				//Re-apply stack & tile constraints so that any other windows
-				//that are stacked/snapped against this window can be re-adjusted
+				// Re-apply stack & tile constraints so that any other windows
+				// that are stacked/snapped against this window can be
+				// re-adjusted
 				fWindow->StackAndTile();
 				fLink.StartMessage(B_OK);
 //			}
@@ -922,8 +923,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			} else {
 				fDesktop->MoveWindowBy(fWindow, xMoveTo - fWindow->Frame().left,
 					yMoveTo - fWindow->Frame().top);
-				//Re-apply stack & tile constraints so that any other windows
-				//that are stacked/snapped against this window can be re-adjusted
+				// Re-apply stack & tile constraints so that any other windows
+				// that are stacked/snapped against this window can be
+				// re-adjusted
 				fWindow->StackAndTile();
 				fLink.StartMessage(B_OK);
 			}
