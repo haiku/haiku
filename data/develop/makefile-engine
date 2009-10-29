@@ -202,7 +202,7 @@ endef
 	ifeq ($(RSRCS), )
 		DO_RSRCS :=
 	else
-		DO_RSRCS := $(XRES) -o "$(TARGET)" $(RSRCS)
+		DO_RSRCS := $(XRES) -o $(TARGET) $(RSRCS)
 	endif
 
 
@@ -284,7 +284,7 @@ clean :: FORCE
 
 #	remove just the application from the object folder
 rmapp ::
-	-rm -f "$(TARGET)"
+	-rm -f $(TARGET)
 
 # make it easy to install drivers for testing
 USER_BIN_PATH = /boot/home/config/add-ons/kernel/drivers/bin
@@ -302,5 +302,5 @@ ifeq ($(INSTALL_DIR), )
 	@echo "No install directory specified for \"$(NAME)\" (INSTALL_DIR is empty)" >&2
 else
 	mkdir -p "$(INSTALL_DIR)"
-	cp "$(TARGET)" "$(INSTALL_DIR)/$(NAME)"
+	cp $(TARGET) $(INSTALL_DIR)/$(NAME)
 endif
