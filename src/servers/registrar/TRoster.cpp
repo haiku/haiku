@@ -3,9 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 /*!	TRoster is the incarnation of The Roster. It manages the running
 	applications.
 */
+
 
 #include "TRoster.h"
 
@@ -16,14 +18,16 @@
 #include <string.h>
 
 #include <Application.h>
-#include <AppMisc.h>
 #include <AutoDeleter.h>
 #include <Autolock.h>
+#include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Path.h>
+
+#include <AppMisc.h>
 #include <MessagePrivate.h>
 #include <MessengerPrivate.h>
-#include <Path.h>
 #include <ServerProtocol.h>
 #include <storage_support.h>
 
@@ -76,21 +80,23 @@ static const char* const kSystemServerPath = "/boot/system/servers";
 
 
 /*!	\brief Returns the path to the default roster settings.
+
 	\param path BPath to be set to the roster settings path.
+	\param createDirectory makes sure the target directory exists if \c true.
+
 	\return the settings path as C string (\code path.Path() \endcode).
 */
 static const char*
-get_default_roster_settings_file(BPath& path)
+get_default_roster_settings_path(BPath& path, bool createDirectory)
 {
 	// get the path of the settings dir and append the subpath of our file
 	status_t error = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	if (error == B_OK)
-		error = path.Append("Roster/HaikuRosterSettings");
-
-	// If some error occurred, set the standard path (can only fail, if there's
-	// insufficient memory, which can't be helped anyway).
-	if (error != B_OK)
-		path.SetTo("/boot/home/config/settings/Roster/HaikuRosterSettings");
+		error = path.Append("system/registrar");
+	if (error == B_OK && createDirectory)
+		error = create_directory(path.Path(), 0777);
+	if (error == B_OK)
+		error = path.Append("RosterSettings");
 
 	return path.Path();
 }
@@ -1343,6 +1349,9 @@ TRoster::SetShuttingDown(bool shuttingDown)
 	BAutolock _(fLock);
 
 	fShuttingDown = shuttingDown;
+
+	if (shuttingDown)
+		_SaveRosterSettings();
 }
 
 
@@ -1816,7 +1825,7 @@ TRoster::_LoadRosterSettings(const char* path)
 {
 	BPath _path;
 	const char* settingsPath
-		= path ? path : get_default_roster_settings_file(_path);
+		= path ? path : get_default_roster_settings_path(_path, false);
 
 	RosterSettingsCharStream stream;
 	status_t error;
@@ -1984,7 +1993,7 @@ TRoster::_SaveRosterSettings(const char* path)
 {
 	BPath _path;
 	const char* settingsPath
-		= path != NULL ? path : get_default_roster_settings_file(_path);
+		= path != NULL ? path : get_default_roster_settings_path(_path, true);
 
 	status_t error;
 	FILE* file;
