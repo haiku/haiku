@@ -2247,6 +2247,7 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 	BMenuItem* superItem = Superitem();
 
 	bool scroll = false;
+
 	// TODO: Horrible hack:
 	// When added to a BMenuField, a BPopUpMenu is the child of
 	// a _BMCMenuBar_ to "fake" the menu hierarchy
@@ -2264,10 +2265,8 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 		else if (frame.left < screenFrame.left)
 			frame.OffsetBy(-frame.left, 0);
 	} else if (superMenu->Layout() == B_ITEMS_IN_COLUMN) {
-		if (frame.right > screenFrame.right) {
-			frame.OffsetBy(-superItem->Frame().Width() - frame.Width() - 2,
-				0);
-		}
+		if (frame.right > screenFrame.right)
+			frame.OffsetBy(-superItem->Frame().Width() - frame.Width() - 2, 0);
 
 		if (frame.left < 0)
 			frame.OffsetBy(-frame.left + 6, 0);
@@ -2703,14 +2702,14 @@ BMenu::_UpdateWindowViewSize(bool updatePosition)
 
 			// If we need scrolling, resize the window to fit the screen and
 			// attach scrollers to our cached BMenuWindow.
-			if (dynamic_cast<BMenuBar*>(Supermenu()) == NULL) {
-				window->ResizeTo(Bounds().Width(), screen.Frame().bottom);
+			if (dynamic_cast<BMenuBar*>(Supermenu()) == NULL || frame.top < 0) {
+				window->ResizeTo(Bounds().Width(), screen.Frame().Height());
 				frame.top = 0;
 			} else {
 				// Or, in case our parent was a BMenuBar enable scrolling with
 				// normal size.
-				window->ResizeTo(Bounds().Width(), screen.Frame().bottom
-					- frame.top);
+				window->ResizeTo(Bounds().Width(),
+					screen.Frame().bottom - frame.top);
 			}
 
 			window->AttachScrollers();
