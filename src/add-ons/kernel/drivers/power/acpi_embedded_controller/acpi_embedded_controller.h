@@ -285,26 +285,6 @@ static status_t			EcRead(struct acpi_ec_cookie *sc, uint8 address,
                                 uint8 *readData);
 static status_t			EcWrite(struct acpi_ec_cookie *sc, uint8 address,
                                 uint8 *writeData);
-                                
-                                
-/*
- * XXX njl
- * I couldn't find it in the spec but other implementations also use a
- * value of 1 ms for the time to acquire global lock.
- */
-#define EC_LOCK_TIMEOUT 1000
-
-/* Default delay in microseconds between each run of the status polling loop. */
-#define EC_POLL_DELAY   5
-
-/* Total time in ms spent waiting for a response from EC. */
-#define EC_TIMEOUT      750
-
-#define EVENT_READY(event, status)                      \
-        (((event) == EC_EVENT_OUTPUT_BUFFER_FULL &&     \
-         ((status) & EC_FLAG_OUTPUT_BUFFER) != 0) ||    \
-         ((event) == EC_EVENT_INPUT_BUFFER_EMPTY &&     \
-         ((status) & EC_FLAG_INPUT_BUFFER) == 0))
 
 
 #endif	// ACPI_EMBEDDED_CONTROLLER_H
