@@ -183,6 +183,8 @@ Attribute::Stat(struct stat& stat)
 		// overwrite some data to suit our needs
 		stat.st_type = fSmall->Type();
 		stat.st_size = fSmall->DataSize();
+		stat.st_mtim = stat.st_ctim;
+			// attribute changes cause status_change updates
 	}
 
 	if (fAttribute != NULL)
