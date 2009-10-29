@@ -178,7 +178,7 @@ LDFLAGS += $(LINKER_FLAGS)
 ifeq ($(TYPE), STATIC)
 	BUILD_LINE = ar -cru "$(TARGET)" $(OBJS)
 else
-	BUILD_LINE = $(LD) -o $@ $(OBJS) $(LDFLAGS)
+	BUILD_LINE = $(LD) -o "$@" $(OBJS) $(LDFLAGS)
 endif
 
 # pseudo-function for converting a list of resource definition files in RDEFS
@@ -212,7 +212,7 @@ default: $(TARGET)
 $(TARGET):	$(OBJ_DIR) $(OBJS) $(RSRCS)
 		$(BUILD_LINE)
 		$(DO_RSRCS)
-		$(MIMESET) -f $@
+		$(MIMESET) -f "$@"
 
 
 #	rule to create the object file directory if needed
@@ -222,58 +222,58 @@ $(OBJ_DIR)::
 # rules to make the dependency files
 $(OBJ_DIR)/%.d : %.c
 	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) > /dev/null 2>&1; \
-	mkdepend $(LOC_INCLUDES) -p .c:$(OBJ_DIR)/%n.o -m -f $@ $<
+	mkdepend $(LOC_INCLUDES) -p .c:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.cpp
 	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) > /dev/null 2>&1; \
-	mkdepend $(LOC_INCLUDES) -p .cpp:$(OBJ_DIR)/%n.o -m -f $@ $<
+	mkdepend $(LOC_INCLUDES) -p .cpp:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.cp
 	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) > /dev/null 2>&1; \
-	mkdepend $(LOC_INCLUDES) -p .cp:$(OBJ_DIR)/%n.o -m -f $@ $<
+	mkdepend $(LOC_INCLUDES) -p .cp:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.cc
 	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) > /dev/null 2>&1; \
-	mkdepend $(LOC_INCLUDES) -p .cc:$(OBJ_DIR)/%n.o -m -f $@ $<
+	mkdepend $(LOC_INCLUDES) -p .cc:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.C
 	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) > /dev/null 2>&1; \
-	mkdepend $(LOC_INCLUDES) -p .C:$(OBJ_DIR)/%n.o -m -f $@ $<
+	mkdepend $(LOC_INCLUDES) -p .C:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.CC
 	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) > /dev/null 2>&1; \
-	mkdepend $(LOC_INCLUDES) -p .CC:$(OBJ_DIR)/%n.o -m -f $@ $<
+	mkdepend $(LOC_INCLUDES) -p .CC:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.CPP
 	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) > /dev/null 2>&1; \
-	mkdepend $(LOC_INCLUDES) -p .CPP:$(OBJ_DIR)/%n.o -m -f $@ $<
+	mkdepend $(LOC_INCLUDES) -p .CPP:$(OBJ_DIR)/%n.o -m -f "$@" $<
 
 -include $(DEPENDS)
 
 # rules to make the object files
 $(OBJ_DIR)/%.o : %.c
-	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
+	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.cpp
-	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o $@
+	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.cp
-	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
+	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.cc
-	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o $@
+	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.C
-	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
+	$(CC) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.CC
-	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o $@
+	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 $(OBJ_DIR)/%.o : %.CPP
-	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o $@
+	$(C++) -c $< $(INCLUDES) $(CFLAGS) -o "$@"
 
 # rules to compile resource definition files
 $(OBJ_DIR)/%.rsrc : %.rdef
-	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -v '^#' | $(RESCOMP) -o $@ -
+	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -v '^#' | $(RESCOMP) -o "$@" -
 $(OBJ_DIR)/%.rsrc : %.RDEF
-	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -v '^#' | $(RESCOMP) -o $@ -
+	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -v '^#' | $(RESCOMP) -o "$@" -
 
 #	rules to handle lex/flex and yacc/bison files
 
 $(OBJ_DIR)/%.o: %.l
 	flex $<
-	$(CC) -c $(INCLUDES) $(CFLAGS) lex.yy.c -o $@
+	$(CC) -c $(INCLUDES) $(CFLAGS) lex.yy.c -o "$@"
 $(OBJ_DIR)/%.o: %.y
 	bison -d -y $<
-	$(CC) -c $(INCLUDES) $(CFLAGS) y.tab.c -o $@
+	$(CC) -c $(INCLUDES) $(CFLAGS) y.tab.c -o "$@"
 
 #	empty rule. Things that depend on this rule will always get triggered
 FORCE:
