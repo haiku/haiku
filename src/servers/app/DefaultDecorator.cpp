@@ -572,7 +572,7 @@ DefaultDecorator::_SnapWindowFromSettings(const char* label,
 			if (window == fWindow)
 				continue;
 
-			char* debugSuffix = "... NOT!";
+			const char* debugSuffix = "... NOT!";
 
 			if (window != NULL) {
 				// There can be cases where the other window to which this
@@ -1625,7 +1625,7 @@ void
 DefaultDecorator::HighlightBorders(bool active, BRegion* dirty)
 {
 	if (active) {
-		fFrameColors = fHighlightFrameColors;
+		memcpy(fFrameColors, fHighlightFrameColors, sizeof(fFrameColors));
 	} else if (IsFocus()) {
 		fFrameColors[0] = fNonHighlightFrameColors[0];
 		fFrameColors[1] = fNonHighlightFrameColors[1];
