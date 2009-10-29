@@ -1,5 +1,5 @@
 1	Russian	x-vnd.Haiku-BluetoothPrefs	406799883
-About…	Window		 О программе
+About…	Window		 О программе...
 Handheld	Settings view		Переносной
 Only from Trusted devices	Settings view		Только от доверенных устройств
 Add device to list	Inquiry panel		Добавить устройство в список
@@ -9,11 +9,11 @@ Smart Phone	Settings view		Smart Phone
 Remote Devices	Window		Удалённые устройства
 Server	Settings view		Сервер
 Default Inquiry time:	Settings view		По умолчанию:
-Identify host as:	Settings view		Индифицирует как :
+Identify host as:	Settings view		Идентифицирует как :
 View	Window		Вид
 Refresh…	Remote devices		Обновить
 Show Bluetooth console…	Window		Показать Bluetooth консоль
-Incoming connections policy:	Settings view		Входящая политика подключений:
+Incoming connections policy:	Settings view		Политика входящих подключений:
 From all devices	Settings view		От всех устройств
 Start Bluetooth Services…	Window		Запуск Bluetooth службы
 Server	Window		Сервер
@@ -22,8 +22,8 @@ Remove	Remote devices		Удалить
 15 secs	Settings view		15 сек
 Policy...	Settings view		Политика...
 61 secs	Settings view		61 сек
-Haiku Bluetooth System, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Système Bluetooth Haiku, (ARCE)\n\nCréé par Oliver Ruiz Dorantes\n\nAvec le soutien de :\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nMerci à toutes les personnes qui ont aidé...\n\nDons de matériel :\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFinancièrement :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nRustines :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTests:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nQui m'ont tout appris :\n\t- l'équipe yellowTAB
-Identify us as...	Settings view		Индифицировать нас как...
+Haiku Bluetooth System, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Система Bluetooth Haiku, (ARCE)\n\nРазработано Oliver Ruiz Dorantes\n\nПоддержка :\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nОтдельное спасибо за помощь...\n\nПожертвование комплектующих :\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nФинансовая поддержка :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nИсправления и доработка :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nТестирование:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nКто дал мне все знания :\n\t- компания yellowTAB
+Identify us as...	Settings view		Идентифицировать нас как...
 Remaining 	Inquiry panel		Оставаться 
 Connections & Channels list…	Window		Список подключений и каналов
 Pick LocalDevice...	Settings view		Выбор локального устройства...
@@ -31,7 +31,7 @@ Defaults	Window		По умолчанию
 Inquiry	Inquiry panel		Запрос
 Desktop	Settings view		Рабочий стол
 Revert	Window		Вернуться
-Laptop	Settings view		Ноутбук¿
+Laptop	Settings view		Ноутбук
 Retrieving name of 	Inquiry panel		Восстановление названия 
 Bluetooth	Window		Bluetooth
 Local Devices found on system:	Settings view		Локальные устройства найденные в системе:
@@ -49,6 +49,6 @@ Retrieving names...	Inquiry panel		Восстановление названий
 Help	Window		Помощь
 Ok	main		Ok
 Add…	Remote devices		Добавить
-There has not been found any bluetooth LocalDevice device registered on the system	Inquiry panel		Небыло найдено Bluetooth устройства, зарегистрированного в системе.
+There has not been found any bluetooth LocalDevice device registered on the system	Inquiry panel		Не было найдено Bluetooth устройства, зарегистрированного в системе.
 Stop Bluetooth Services…	Window		Остановить Bluetooth службу
 Show Name	Extended local device view		Показывать название

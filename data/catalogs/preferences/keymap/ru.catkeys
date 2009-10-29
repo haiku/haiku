@@ -10,12 +10,12 @@ Diaeresis Trigger	Keymap window		Диерезис
 User:	Keymap window		Пользовательские:
 Sample and Clipboard:	Keymap window		Выборка и буфер обмена:
 Keymap	Keymap window		Keymap
-Switch Shortcut Keys	Keymap window		Переключение сочетания клавиш
-Switch Shortcut Keys To Windows/Linux Mode	Keymap window		Переключение сочетания клавиш для Windows/Linux режима
+Switch Shortcut Keys	Keymap window		Переключение раскладки
+Switch Shortcut Keys To Windows/Linux Mode	Keymap window		Переключение раскладки для Windows/Linux режима
 Layout	Keymap window		Макет
 Revert	Keymap window		Вернуть
 Save As…	Keymap window		Сохранить как…
-Switch Shortcut Keys To Haiku Mode	Keymap window		Переключение сочетания клавиш в Haiku режим
+Switch Shortcut Keys To Haiku Mode	Keymap window		Переключение раскладки в Haiku режим
 File	Keymap window		Файл
 (Current)	Keymap window		(Текущий)
 Font	Keymap window		Шрифт
