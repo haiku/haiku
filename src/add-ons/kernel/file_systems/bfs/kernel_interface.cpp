@@ -43,15 +43,9 @@ fill_stat_time(const bfs_inode& node, struct stat& stat)
 	stat.st_crtim.tv_sec = bfs_inode::ToSecs(node.CreateTime());
 	stat.st_crtim.tv_nsec = bfs_inode::ToUsecs(node.CreateTime());
 
-	// if on-disk ctime is invalid (pointer value from previous [ab]use of
-	// the first 4 bytes) or 0, fall back to mtime:
-	// N.B.: This has the drawback that explicitly setting a ctime of 0
-	//       will not work, but I suppose no one will do that, since ctime
-	//       is usually just set to the current time whenever something happens
-	//       to the inode.
-	// TODO: find out if this sanity check should be dropped!
+	// For BeOS compatibility, if on-disk ctime is invalid, fall back to mtime:
 	bigtime_t changeTime = node.StatusChangeTime();
-	if (((uint64)changeTime & 0xFFFF00000000FFFFULL) != 0 || changeTime == 0)
+	if (changeTime < node.LastModifiedTime())
 		stat.st_ctim = stat.st_mtim;
 	else {
 		stat.st_ctim.tv_sec = bfs_inode::ToSecs(changeTime);
@@ -1196,11 +1190,10 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 				}
 			}
 
-			if (newDirectory != oldDirectory) {
-				oldDirectory->ContainerContentsChanged(transaction);
-				newDirectory->ContainerContentsChanged(transaction);
-			} else
-				newDirectory->ContainerContentsChanged(transaction);
+			if (status == B_OK && newDirectory != oldDirectory)
+				status = oldDirectory->ContainerContentsChanged(transaction);
+			if (status == B_OK)
+				status = newDirectory->ContainerContentsChanged(transaction);
 
 			if (status == B_OK)
 				status = inode->WriteBack(transaction);
@@ -1808,20 +1801,14 @@ bfs_write_attr(fs_volume* _volume, fs_vnode* _file, void* _cookie,
 	Transaction transaction(volume, inode->BlockNumber());
 	Attribute attribute(inode, cookie);
 
+	bool created;
 	status_t status = attribute.Write(transaction, cookie, pos,
-		(const uint8*)buffer, _length);
+		(const uint8*)buffer, _length, &created);
 	if (status == B_OK) {
-		// Update status time on attribute write
-		inode->Node().status_change_time = HOST_ENDIAN_TO_BFS_INT64(
-			bfs_inode::ToInode(real_time_clock_usecs()));
-		inode->WriteBack(transaction);
-
 		status = transaction.Done();
 		if (status == B_OK) {
 			notify_attribute_changed(volume->ID(), inode->ID(), cookie->name,
-				B_ATTR_CHANGED);
-				// TODO: B_ATTR_CREATED is not yet taken into account
-				// (we don't know what Attribute::Write() does exactly)
+				created ? B_ATTR_CREATED : B_ATTR_CHANGED);
 			notify_stat_changed(volume->ID(), inode->ID(), B_STAT_CHANGE_TIME);
 		}
 	}
@@ -1877,7 +1864,7 @@ bfs_remove_attr(fs_volume* _volume, fs_vnode* _node, const char* name)
 	Inode* inode = (Inode*)_node->private_node;
 
 	status_t status = inode->CheckPermissions(W_OK);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	Transaction transaction(volume, inode->BlockNumber());

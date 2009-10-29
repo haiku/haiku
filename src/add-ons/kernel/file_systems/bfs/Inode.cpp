@@ -650,8 +650,12 @@ Inode::_RemoveSmallData(Transaction& transaction, NodeGetter& nodeGetter,
 	nodeGetter.MakeWritable(transaction);
 
 	status_t status = _RemoveSmallData(node, item, index);
-	if (status == B_OK)
+	if (status == B_OK) {
+		Node().status_change_time = HOST_ENDIAN_TO_BFS_INT64(
+			bfs_inode::ToInode(real_time_clock_usecs()));
+
 		status = WriteBack(transaction);
+	}
 
 	return status;
 }
@@ -1033,7 +1037,7 @@ Inode::ReadAttribute(const char* name, int32 type, off_t pos, uint8* buffer,
 */
 status_t
 Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
-	off_t pos, const uint8* buffer, size_t* _length)
+	off_t pos, const uint8* buffer, size_t* _length, bool* _created)
 {
 	if (pos < 0)
 		return B_BAD_VALUE;
@@ -1042,6 +1046,7 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 	uint8 oldBuffer[BPLUSTREE_MAX_KEY_LENGTH];
 	uint8* oldData = NULL;
 	size_t oldLength = 0;
+	bool created = false;
 
 	// TODO: we actually depend on that the contents of "buffer" are constant.
 	// If they get changed during the write (hey, user programs), we may mess
@@ -1071,7 +1076,9 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 					oldLength = BPLUSTREE_MAX_KEY_LENGTH;
 				memcpy(oldData = oldBuffer, smallData->Data(), oldLength);
 			}
-		}
+		} else
+			created = true;
+
 		recursive_lock_unlock(&fSmallDataLock);
 
 		// if the attribute doesn't exist yet (as a file), try to put it in the
@@ -1091,8 +1098,15 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 				status = CreateAttribute(transaction, name, type, &attribute);
 			if (status != B_OK)
 				RETURN_ERROR(status);
-		} else if (status == B_OK)
+
+			created = true;
+		} else if (status == B_OK) {
+			// Update status time on attribute write
+			Node().status_change_time = HOST_ENDIAN_TO_BFS_INT64(
+				bfs_inode::ToInode(real_time_clock_usecs()));
+
 			status = WriteBack(transaction);
+		}
 	}
 
 	if (attribute != NULL) {
@@ -1127,6 +1141,14 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 						_length);
 				}
 			}
+
+			if (status == B_OK) {
+				// Update status time on attribute write
+				Node().status_change_time = HOST_ENDIAN_TO_BFS_INT64(
+					bfs_inode::ToInode(real_time_clock_usecs()));
+
+				status = WriteBack(transaction);
+			}
 		} else
 			status = B_ERROR;
 
@@ -1149,6 +1171,10 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 				length, this);
 		}
 	}
+
+	if (_created != NULL)
+		*_created = created;
+
 	return status;
 }
 
@@ -1182,7 +1208,13 @@ Inode::RemoveAttribute(Transaction& transaction, const char* name)
 	if (status == B_ENTRY_NOT_FOUND && !Attributes().IsZero()) {
 		// remove the attribute file if it exists
 		status = _RemoveAttribute(transaction, name, hasIndex, &index);
+		if (status == B_OK) {
+			Node().status_change_time = HOST_ENDIAN_TO_BFS_INT64(
+				bfs_inode::ToInode(real_time_clock_usecs()));
+			WriteBack(transaction);
+		}
 	}
+
 	return status;
 }
 

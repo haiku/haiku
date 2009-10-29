@@ -107,7 +107,8 @@ public:
 								off_t pos, uint8* buffer, size_t* _length);
 			status_t		WriteAttribute(Transaction& transaction,
 								const char* name, int32 type, off_t pos,
-								const uint8* buffer, size_t* _length);
+								const uint8* buffer, size_t* _length,
+								bool* _created);
 			status_t		RemoveAttribute(Transaction& transaction,
 								const char* name);
 

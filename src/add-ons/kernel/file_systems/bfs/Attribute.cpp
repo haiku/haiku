@@ -205,13 +205,13 @@ Attribute::Read(attr_cookie* cookie, off_t pos, uint8* buffer, size_t* _length)
 
 status_t
 Attribute::Write(Transaction& transaction, attr_cookie* cookie, off_t pos,
-	const uint8* buffer, size_t* _length)
+	const uint8* buffer, size_t* _length, bool* _created)
 {
 	if (!cookie->create && fSmall == NULL && fAttribute == NULL)
 		return B_NO_INIT;
 
 	return fInode->WriteAttribute(transaction, cookie->name, cookie->type,
-		pos, buffer, _length);
+		pos, buffer, _length, _created);
 }
 
 

@@ -39,8 +39,8 @@ public:
 			status_t		Read(attr_cookie* cookie, off_t pos, uint8* buffer,
 								size_t* _length);
 			status_t		Write(Transaction& transaction, attr_cookie* cookie,
-								off_t pos, const uint8* buffer,
-								size_t* _length);
+								off_t pos, const uint8* buffer, size_t* _length,
+								bool* _created);
 
 private:
 			status_t		_Truncate();
