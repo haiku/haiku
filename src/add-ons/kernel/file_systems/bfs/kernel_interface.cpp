@@ -3,6 +3,7 @@
  * This file may be used under the terms of the MIT License.
  */
 
+
 //!	file system interface to Haiku's vnode layer
 
 
@@ -1810,12 +1811,18 @@ bfs_write_attr(fs_volume* _volume, fs_vnode* _file, void* _cookie,
 	status_t status = attribute.Write(transaction, cookie, pos,
 		(const uint8*)buffer, _length);
 	if (status == B_OK) {
+		// Update status time on attribute write
+		inode->Node().status_change_time = HOST_ENDIAN_TO_BFS_INT64(
+			bfs_inode::ToInode(real_time_clock_usecs()));
+		inode->WriteBack(transaction);
+
 		status = transaction.Done();
 		if (status == B_OK) {
 			notify_attribute_changed(volume->ID(), inode->ID(), cookie->name,
 				B_ATTR_CHANGED);
 				// TODO: B_ATTR_CREATED is not yet taken into account
 				// (we don't know what Attribute::Write() does exactly)
+			notify_stat_changed(volume->ID(), inode->ID(), B_STAT_CHANGE_TIME);
 		}
 	}
 
