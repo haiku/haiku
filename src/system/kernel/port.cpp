@@ -606,10 +606,25 @@ delete_owned_ports(struct team* team)
 		list_move_to_list(&team->port_list, &queue);
 	}
 
+	int32 firstSlot = sMaxPorts;
+	int32 count = 0;
+
 	while (port_entry* port = (port_entry*)list_remove_head_item(&queue)) {
+		if (firstSlot > port->id % sMaxPorts)
+			firstSlot = port->id % sMaxPorts;
+		count++;
+
 		MutexLocker locker(port->lock);
 		uninit_port_locked(*port);
 	}
+
+	MutexLocker _(sPortsLock);
+
+	// update the first free slot hint in the array
+	if (firstSlot < sFirstFreeSlot)
+		sFirstFreeSlot = firstSlot;
+
+	sUsedPorts -= count;
 }
 
 
