@@ -359,9 +359,9 @@ private:
 };
 
 template<class T, class R>
-class PlainMemberFunctionObjectWitResult : public FunctionObjectWithResult<R> {
+class PlainMemberFunctionObjectWithResult : public FunctionObjectWithResult<R> {
 public:
-	PlainMemberFunctionObjectWitResult(R (T::*function)(), T *onThis)
+	PlainMemberFunctionObjectWithResult(R (T::*function)(), T *onThis)
 		:	function(function),
 			target(onThis)
 		{
@@ -420,9 +420,9 @@ protected:
 
 
 template<class T, class R, class Param1>
-class SingleParamMemberFunctionObjectWitResult : public FunctionObjectWithResult<R> {
+class SingleParamMemberFunctionObjectWithResult : public FunctionObjectWithResult<R> {
 public:
-	SingleParamMemberFunctionObjectWitResult(R (T::*function)(Param1), T *onThis,
+	SingleParamMemberFunctionObjectWithResult(R (T::*function)(Param1), T *onThis,
 		Param1 p1)
 		:	function(function),
 			target(onThis),
