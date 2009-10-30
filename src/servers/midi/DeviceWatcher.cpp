@@ -6,6 +6,7 @@
  *		Matthijs Hollemans
  *		Jerome Leveque
  *		Philippe Houdoin
+ *		Pete Goodeve
  */
 
 #include "debug.h"

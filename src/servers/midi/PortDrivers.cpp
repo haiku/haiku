@@ -7,6 +7,7 @@
  *		Christian Packmann
  *		Jerome Leveque
  *		Philippe Houdoin
+ *		Pete Goodeve
  */
 
 

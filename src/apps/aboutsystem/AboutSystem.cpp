@@ -803,6 +803,7 @@ AboutView::_CreateCreditsView()
 		"Marc Flerackers\n"
 		"Michele Frau (zuMi)\n"
 		"Matthijs Hollemans\n"
+		"Pete Goodeve\n"
 		"Mathew Hounsell\n"
 		"Morgan Howe\n"
 		"Ma Jie\n"
