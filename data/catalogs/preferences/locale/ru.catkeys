@@ -15,7 +15,7 @@ Currency symbol:	TimeFormatSettings		Символ валюты:
 Space	TimeFormatSettings		Пространство
 Language	Locale Preflet Window		Язык
 Thousand separator	TimeFormatSettings		Разделитель тысячи
-24 Hour	TimeFormatSettings		24 Heures
+24 Hour	TimeFormatSettings		24 Часа
 Year (2 digits)	TimeFormatSettings		Год (2 цифры)
 Preferred languages	Locale Preflet Window		Предпочтительные языки
 Symbol position	TimeFormatSettings		Символ позиции
@@ -24,9 +24,9 @@ month number (2 digits)	TimeFormatSettings		номер месяца (2 цифр�
 Numbers	TimeFormatSettings		Числа
  (unknown format)	TimeFormatSettings		 (неизвестный формат)
 Negative marker:	TimeFormatSettings		Отрицательный маркер:
-12 Hour	TimeFormatSettings		12 Heures
+12 Hour	TimeFormatSettings		12 Часов
 Defaults	Locale Preflet Window		По умолчанию
-Locale\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n\n	Locale Preflet		Locale\n\tразработан Axel Dörfler\n\tCopyright 2009, Haiku.\n\n
+Locale\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n\n	Locale Preflet		Locale\n\tразработал Axel Dörfler\n\tCopyright 2009, Haiku.\n\n
 Separator	TimeFormatSettings		Разделитель
 Country	Locale Preflet Window		Страна
 Revert	Locale Preflet Window		Вернуться
