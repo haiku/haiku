@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,7 +7,6 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Philippe Saint-Pierre, stpere@gmail.com
  */
-
 
 /*!	Default and fallback decorator for the app_server - the yellow tabs */
 
@@ -33,20 +32,11 @@
 #include "ServerBitmap.h"
 
 
-// Toggle debug output
 //#define DEBUG_DECORATOR
-//#define DEBUG_STACK_AND_TILE
-
 #ifdef DEBUG_DECORATOR
 #	define STRACE(x) printf x
 #else
 #	define STRACE(x) ;
-#endif
-
-#ifdef DEBUG_STACK_AND_TILE
-#	define STRACE_SAT(x) debug_printf x
-#else
-#	define STRACE_SAT(x) ;
 #endif
 
 
@@ -79,35 +69,22 @@ DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 {
 	_UpdateFont(settings);
 
-	// all colors are state based
-	fNonHighlightFrameColors[0] = (rgb_color){ 152, 152, 152, 255 };
-	fNonHighlightFrameColors[1] = (rgb_color){ 240, 240, 240, 255 };
-	fNonHighlightFrameColors[2] = (rgb_color){ 152, 152, 152, 255 };
-	fNonHighlightFrameColors[3] = (rgb_color){ 108, 108, 108, 255 };
+	// common colors to both focus and non focus state
+	fFrameColors[0] = (rgb_color){ 152, 152, 152, 255 };
+	fFrameColors[1] = (rgb_color){ 240, 240, 240, 255 };
+	fFrameColors[4] = (rgb_color){ 152, 152, 152, 255 };
+	fFrameColors[5] = (rgb_color){ 108, 108, 108, 255 };
 
+	// state based colors
 	fFocusFrameColors[0] = (rgb_color){ 224, 224, 224, 255 };
 	fFocusFrameColors[1] = (rgb_color){ 208, 208, 208, 255 };
 	fNonFocusFrameColors[0] = (rgb_color){ 232, 232, 232, 255 };
 	fNonFocusFrameColors[1] = (rgb_color){ 216, 216, 216, 255 };
 	fNonFocusFrameColors[1] = fNonFocusFrameColors[0];
 
-	fHighlightFrameColors[0] = (rgb_color){ 152, 0, 0, 255 };
-	fHighlightFrameColors[1] = (rgb_color){ 240, 0, 0, 255 };
-	fHighlightFrameColors[2] = (rgb_color){ 224, 0, 0, 255 };
-	fHighlightFrameColors[3] = (rgb_color){ 208, 0, 0, 255 };
-	fHighlightFrameColors[4] = (rgb_color){ 152, 0, 0, 255 };
-	fHighlightFrameColors[5] = (rgb_color){ 108, 0, 0, 255 };
-
-	// initial colors
-	fFrameColors[0] = fNonHighlightFrameColors[0];
-	fFrameColors[1] = fNonHighlightFrameColors[1];
-	fFrameColors[4] = fNonHighlightFrameColors[2];
-	fFrameColors[5] = fNonHighlightFrameColors[3];
-
 	fFocusTabColor = settings.UIColor(B_WINDOW_TAB_COLOR);
 	fFocusTextColor = settings.UIColor(B_WINDOW_TEXT_COLOR);
 	fNonFocusTabColor = settings.UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
-	fHighlightTabColor = (rgb_color){ 255, 0, 0, 255 };
 	fNonFocusTextColor = settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
 
 	fCloseBitmaps[0] = fCloseBitmaps[1] = fCloseBitmaps[2] = fCloseBitmaps[3]
@@ -436,236 +413,27 @@ DefaultDecorator::SetTabLocation(float location, BRegion* updateRegion)
 bool
 DefaultDecorator::SetSettings(const BMessage& settings, BRegion* updateRegion)
 {
-	STRACE_SAT(("DefaultDecorator::SetSettings() on %s\n", fWindow->Title()));
-
 	float tabLocation;
 	if (settings.FindFloat("tab location", &tabLocation) == B_OK)
-		SetTabLocation(tabLocation, updateRegion);
+		return SetTabLocation(tabLocation, updateRegion);
 
-	int32 windowId = 0;
-	if (settings.FindInt32("window id", &windowId) != B_OK)
-		return false;
-	fWindow->SetWindowId(windowId);
-
-	STRACE_SAT(("\twindow id = %x\n", windowId));
-
-	// find id's of stacked windows and do the stacking
-	type_code typeFound;
-	int32 countFound;
-	settings.GetInfo("window id", &typeFound, &countFound);
-	settings.GetInfo("stacked windows", &typeFound, &countFound);
-
-	// if stacked window ids are found, then use them to stack this window
-	if (typeFound == B_INT32_TYPE && countFound > 0) {
-		Window* windowToStackUnder = NULL;
-
-		// This list contains all window id's that are supposed to be
-		// stacked with current window but aren't open
-		BList* persistentIdsToAdd = new BList();
-
-		for (int i = 0; i < countFound; i++) {
-			int32 id;
-			settings.FindInt32("stacked windows", i, &id);
-
-			bool persist = true;
-
-			// find a window (W) from the stack with an id from the list.
-			// if it is not this window itself, then stack it with this window
-			// UNLESS the W's stacking list doesn't contain this window,
-			// which implies W's been unstacked while this window was hidden
-			Window* window = fWindow->Desktop()->FindWindow(id);
-			if (window && window != fWindow && window->StackedWindowIds()) {
-				bool idExists = false;
-				for (int j = 0; !idExists
-						&& j < window->StackedWindowIds()->CountItems(); j++) {
-					int32* stackedId = static_cast<int32*>(
-						window->StackedWindowIds()->ItemAt(j));
-					idExists = windowId == *stackedId;
-				}
-
-				if (idExists) {
-					if (!windowToStackUnder) {
-						//note this will execute only once during loop
-						windowToStackUnder = window;
-					}
-				} else
-					persist = false;
-			}
-
-			if (persist) {
-				int32* idRef = static_cast<int32*>(malloc(sizeof(int32)));
-				*idRef = id;
-				persistentIdsToAdd->AddItem(idRef);
-			}
-		}
-
-		if (windowToStackUnder) {
-			fWindow->StackWindowBefore(windowToStackUnder);
-			windowToStackUnder->StackAndTile();
-		} else
-			fWindow->InitStackedWindowIds();
-
-#ifdef DEBUG_STACK_AND_TILE
-		for (int i = 0; i < fWindow->StackedWindowIds()->CountItems(); i++) {
-			int32* stackedId
-				= static_cast<int32*>(fWindow->StackedWindowIds()->ItemAt(i));
-			STRACE_SAT(("\tstackedWindowIds[%d]=%x\n", i, *stackedId));
-		}
-#endif
-
-		// Add the remaining window id's to the persistent stacking list
-		// These are the ones that belong to currently unopened windows
-		for (int i = 0; i < persistentIdsToAdd->CountItems(); i++) {
-			int32* idRef = static_cast<int32*>(persistentIdsToAdd->ItemAt(i));
-			bool idExists = false;
-			for (int j = 0; !idExists
-					&& j < fWindow->StackedWindowIds()->CountItems(); j++) {
-				int32* stackedId = static_cast<int32*>(
-					fWindow->StackedWindowIds()->ItemAt(j));
-				idExists = *idRef == *stackedId;
-			}
-			if (!idExists) {
-				STRACE_SAT(("\t** window %x isn't open - but stacked\n",
-					*idRef));
-				fWindow->StackedWindowIds()->AddItem(idRef);
-			}
-		}
-	}
-
-	_SnapWindowFromSettings("snap left2left", SNAP_LEFT, SNAP_LEFT, &settings);
-	_SnapWindowFromSettings("snap left2right", SNAP_LEFT, SNAP_RIGHT,
-		&settings);
-	_SnapWindowFromSettings("snap right2left", SNAP_RIGHT, SNAP_LEFT,
-		&settings);
-	_SnapWindowFromSettings("snap right2right", SNAP_RIGHT, SNAP_RIGHT,
-		&settings);
-	_SnapWindowFromSettings("snap top2top", SNAP_TOP, SNAP_TOP, &settings);
-	_SnapWindowFromSettings("snap top2bottom", SNAP_TOP, SNAP_BOTTOM,
-		&settings);
-	_SnapWindowFromSettings("snap bottom2top", SNAP_BOTTOM, SNAP_TOP,
-		&settings);
-	_SnapWindowFromSettings("snap bottom2bottom", SNAP_BOTTOM, SNAP_BOTTOM,
-		&settings);
-
-	fWindow->StackAndTile();
-
-	STRACE_SAT(("Finished DefaultDecorator::SetSettings() on %s\n",
-		fWindow->Title()));
-	return true;
-}
-
-
-void
-DefaultDecorator::_SnapWindowFromSettings(const char* label,
-	SnapOrientation thisSnapOrientation, SnapOrientation otherSnapOrientation,
-	const BMessage* settings)
-{
-	type_code typeFound;
-	int32 countFound;
-	settings->GetInfo(label, &typeFound, &countFound);
-	if (typeFound == B_INT32_TYPE && countFound > 0) {
-		for (int i = 0; i < countFound; i++) {
-			int32 id;
-			settings->FindInt32(label, i, &id);
-
-			Window* window = fWindow->Desktop()->FindWindow(id);
-			if (window == fWindow)
-				continue;
-
-			const char* debugSuffix = "... NOT!";
-
-			if (window != NULL) {
-				// There can be cases where the other window to which this
-				// window's snapped doesn't contain a reference to this window
-				// in its snapping list. This would happen when the other window
-				// was de-snapped while this window was hidden. So only add the
-				// other window to this window's snapping list when such is not
-				// the case.
-				BList* otherList = window->GetSnappingList(otherSnapOrientation,
-					thisSnapOrientation, false);
-				if (!otherList) {
-					debugSuffix = "\n";
-					continue;
-				}
-
-				for (int i = 0; i < otherList->CountItems(); i++) {
-					int32* snappedId
-						= static_cast<int32*>(otherList->ItemAt(i));
-					if (*snappedId == fWindow->WindowId()) {
-						fWindow->SnapToWindow(window, thisSnapOrientation,
-							otherSnapOrientation);
-						debugSuffix = "";
-						break;
-					}
-				}
-			} else { //window isn't open - still retain snap id
-				fWindow->AddToSnappingList(id, thisSnapOrientation,
-					otherSnapOrientation);
-				debugSuffix = "... ?";
-			}
-
-			STRACE_SAT(("\t%s[%d]=%x", label, i, id));
-			STRACE_SAT(("%s\n", debugSuffix));
-		}
-	}
+	return false;
 }
 
 
 bool
 DefaultDecorator::GetSettings(BMessage* settings) const
 {
-	STRACE_SAT(("DefaultDecorator::GetSettings() on %s\n", fWindow->Title()));
-
-	if (!fTabRect.IsValid()
-		|| settings->AddRect("tab frame", fTabRect) != B_OK
-		|| settings->AddFloat("border width", fBorderWidth) != B_OK
-		|| settings->AddFloat("tab location", (float)fTabOffset) != B_OK
-		|| settings->AddInt32("window id", fWindow->WindowId()) != B_OK)
+	if (!fTabRect.IsValid())
 		return false;
 
-	// store id's of stacked windows
-	if (!_StoreIntsInSettings("stacked windows", fWindow->StackedWindowIds(),
-			settings))
+	if (settings->AddRect("tab frame", fTabRect) != B_OK)
 		return false;
 
-	// store id's of snapped windows
-	if (!_StoreIntsInSettings("snap left2left",
-			fWindow->Left2LeftSnappingWindowIds(), settings)
-		|| !_StoreIntsInSettings("snap left2right",
-			fWindow->Left2RightSnappingWindowIds(), settings)
-		|| !_StoreIntsInSettings("snap right2right",
-			fWindow->Right2RightSnappingWindowIds(), settings)
-		|| !_StoreIntsInSettings("snap right2left",
-			fWindow->Right2LeftSnappingWindowIds(), settings)
-		|| !_StoreIntsInSettings("snap top2top",
-			fWindow->Top2TopSnappingWindowIds(), settings)
-		|| !_StoreIntsInSettings("snap top2bottom",
-			fWindow->Top2BottomSnappingWindowIds(), settings)
-		|| !_StoreIntsInSettings("snap bottom2top",
-			fWindow->Bottom2TopSnappingWindowIds(), settings)
-		|| !_StoreIntsInSettings("snap bottom2bottom",
-			fWindow->Bottom2BottomSnappingWindowIds(), settings))
+	if (settings->AddFloat("border width", fBorderWidth) != B_OK)
 		return false;
 
-	STRACE_SAT(("Finished DefaultDecorator::GetSettings() on %s\n",
-		fWindow->Title()));
-	return true;
-}
-
-
-bool
-DefaultDecorator::_StoreIntsInSettings(const char* label,
-	BList* ids, BMessage* settings) const
-{
-	if (ids != NULL) {
-		for (int i = 0; i < ids->CountItems(); i++) {
-			int32* id = static_cast<int32*>(ids->ItemAt(i));
-			if (settings->AddInt32(label, *id) != B_OK)
-				return false;
-			STRACE_SAT(("\t%s[%d]=%x\n", label, i, *id));
-		}
-	}
-	return true;
+	return settings->AddFloat("tab location", (float)fTabOffset) == B_OK;
 }
 
 
@@ -1603,48 +1371,4 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 	entry->next = sBitmapList;
 	sBitmapList = entry;
 	return bitmap;
-}
-
-
-void
-DefaultDecorator::HighlightTab(bool active, BRegion* dirty)
-{
-	if (active)
-		fTabColor = fHighlightTabColor;
-	else if (IsFocus())
-		fTabColor = fFocusTabColor;
-	else
-		fTabColor = fNonFocusTabColor;
-
-	dirty->Include(fTabRect);
-	fTabHighlighted = active;
-}
-
-
-void
-DefaultDecorator::HighlightBorders(bool active, BRegion* dirty)
-{
-	if (active) {
-		memcpy(fFrameColors, fHighlightFrameColors, sizeof(fFrameColors));
-	} else if (IsFocus()) {
-		fFrameColors[0] = fNonHighlightFrameColors[0];
-		fFrameColors[1] = fNonHighlightFrameColors[1];
-		fFrameColors[2] = fFocusFrameColors[0];
-		fFrameColors[3] = fFocusFrameColors[1];
-		fFrameColors[4] = fNonHighlightFrameColors[2];
-		fFrameColors[5] = fNonHighlightFrameColors[3];
-	} else {
-		fFrameColors[0] = fNonHighlightFrameColors[0];
-		fFrameColors[1] = fNonHighlightFrameColors[1];
-		fFrameColors[2] = fNonFocusFrameColors[0];
-		fFrameColors[3] = fNonFocusFrameColors[1];
-		fFrameColors[4] = fNonHighlightFrameColors[2];
-		fFrameColors[5] = fNonHighlightFrameColors[3];
-	}
-	dirty->Include(fLeftBorder);
-	dirty->Include(fRightBorder);
-	dirty->Include(fTopBorder);
-	dirty->Include(fBottomBorder);
-	dirty->Include(fResizeRect);
-	fBordersHighlighted = active;
 }

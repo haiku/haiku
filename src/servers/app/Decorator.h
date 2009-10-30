@@ -21,7 +21,6 @@ class DesktopSettings;
 class DrawingEngine;
 class ServerFont;
 class BRegion;
-class Window;
 
 
 enum click_type {
@@ -44,7 +43,6 @@ enum click_type {
 	CLICK_RESIZE_LB,
 	CLICK_RESIZE_RB
 };
-
 
 class Decorator {
 public:
@@ -69,14 +67,6 @@ public:
 
 	virtual	void			SetTitle(const char* string,
 								BRegion* updateRegion = NULL);
-
-	virtual void 			HighlightTab(bool active, BRegion* dirty);
-	virtual void 			HighlightBorders(bool active, BRegion* dirty);
-			bool			IsTabHighlighted()
-								{ return fTabHighlighted; }
-			bool			IsBordersHighlighted()
-								{ return fBordersHighlighted; }
-
 
 			window_look		Look() const;
 			uint32			Flags() const;
@@ -131,8 +121,6 @@ public:
 
 			rgb_color		UIColor(color_which which);
 
-			void			SetWindow(Window* window);
-
 protected:
 			int32			_TitleWidth() const
 								{ return fTitle.CountChars(); }
@@ -162,11 +150,6 @@ protected:
 			BRect			fFrame;
 			BRect			fResizeRect;
 			BRect			fBorderRect;
-
-			bool			fTabHighlighted;
-			bool			fBordersHighlighted;
-
-			Window*			fWindow;
 
 private:
 			bool			fClosePressed : 1;

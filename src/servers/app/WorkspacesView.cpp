@@ -135,7 +135,8 @@ WorkspacesView::_WorkspaceAt(BPoint where, int32& index)
 
 BRect
 WorkspacesView::_WindowFrame(const BRect& workspaceFrame,
-	const BRect& screenFrame, const BRect& windowFrame, BPoint windowPosition)
+	const BRect& screenFrame, const BRect& windowFrame,
+	BPoint windowPosition)
 {
 	BRect frame = windowFrame;
 	frame.OffsetTo(windowPosition);
@@ -567,10 +568,6 @@ WorkspacesView::MouseMoved(BMessage* message, BPoint where)
 	if (fHasMoved) {
 		Window()->Desktop()->MoveWindowBy(fSelectedWindow, left - leftTop.x,
 			top - leftTop.y, fSelectedWorkspace);
-		// TODO: Re-apply stack & tile constraints so that any other windows
-		// that are stacked/snapped against this window can be re-adjusted.
-		// Must smartly call stack and tile after workspace shifting has
-		// finalised. How?
 	}
 }
 

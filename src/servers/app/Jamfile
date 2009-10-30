@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src servers app ;
 
-UseLibraryHeaders agg lp_solve linprog ;
+UseLibraryHeaders agg ;
 UsePrivateHeaders app graphics input interface kernel shared storage ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
@@ -66,7 +66,6 @@ Server app_server :
 	libtranslation.so libbe.so libbnetapi.so
 	libasdrawing.a libasremote.a libpainter.a libagg.a libfreetype.so
 	libtextencoding.so libshared.a $(TARGET_LIBSTDC++)
-	liblpsolve55.so liblinprog.so
 
 	: app_server.rdef
 ;

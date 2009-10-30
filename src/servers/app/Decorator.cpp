@@ -44,10 +44,6 @@ Decorator::Decorator(DesktopSettings& settings, BRect rect, window_look look,
 	fFrame(rect),
 	fResizeRect(),
 	fBorderRect(),
-	fTabHighlighted(false),
-	fBordersHighlighted(false),
-
-	fWindow(NULL),
 
 	fClosePressed(false),
 	fZoomPressed(false),
@@ -583,23 +579,4 @@ Decorator::_DrawMinimize(BRect rect)
 void
 Decorator::_SetFocus()
 {
-}
-
-
-void
-Decorator::HighlightTab(bool active, BRegion* dirty)
-{
-}
-
-
-void
-Decorator::HighlightBorders(bool active, BRegion* dirty)
-{
-}
-
-
-void
-Decorator::SetWindow(Window* window)
-{
-	fWindow = window;
 }

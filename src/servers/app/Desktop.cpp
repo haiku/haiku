@@ -66,7 +66,6 @@
 #	define AutoWriteLocker BAutolock
 #endif
 
-
 class KeyboardFilter : public EventFilter {
 	public:
 		KeyboardFilter(Desktop* desktop);
@@ -187,30 +186,6 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 			fDesktop->SetWorkspaceAsync(-1);
 			return B_SKIP_MESSAGE;
 		}
-
-		// switch between stacked windows
-		if ((modifiers & B_OPTION_KEY) != 0) {
-			BList* stackedWindows = fDesktop->FocusWindow()->StackedWindows();
-			if (key == 0x61 && stackedWindows) {
-				// option key + cursor left
-				int32 oldIndex
-					= stackedWindows->IndexOf(fDesktop->FocusWindow());
-				int32 newIndex = (oldIndex - 1 >= 0)
-					? oldIndex - 1 : stackedWindows->CountItems() - 1;
-				fDesktop->ActivateWindow(
-					static_cast<Window*>(stackedWindows->ItemAt(newIndex)));
-				return B_SKIP_MESSAGE;
-			} else if (key == 0x63 && stackedWindows) {
-				// option key + cursor right
-				int32 oldIndex
-					= stackedWindows->IndexOf(fDesktop->FocusWindow());
-				int32 newIndex = (oldIndex + 1 < stackedWindows->CountItems())
-					? oldIndex + 1 : 0;
-				fDesktop->ActivateWindow(
-					static_cast<Window*>(stackedWindows->ItemAt(newIndex)));
-				return B_SKIP_MESSAGE;
-			}
-		}
 	}
 
 	if (message->what == B_KEY_DOWN
@@ -218,15 +193,6 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 		|| message->what == B_UNMAPPED_KEY_DOWN
 		|| message->what == B_INPUT_METHOD_EVENT)
 		_UpdateFocus(key, modifiers, _target);
-
-	// switch to and from stacking and snapping mode
-	if (message->what == B_MODIFIERS_CHANGED
-		&& message->FindInt32("modifiers", &modifiers) == B_OK) {
-		// disable highlights if the stacking and snapping mode was just left
-		if (fDesktop->fIsStackingAndSnapping && !(modifiers & B_OPTION_KEY))
-			fDesktop->FinishStackingAndSnapping();
-		fDesktop->fIsStackingAndSnapping = (modifiers & B_OPTION_KEY) != 0;
-	}
 
 	return B_DISPATCH_MESSAGE;
 }
@@ -339,9 +305,6 @@ Desktop::Desktop(uid_t userID, const char* targetScreen)
 	:
 	MessageLooper("desktop"),
 
-	fIsStackingAndSnapping(false),
-	fStackAndTileSpec(new LinearSpec()),
-
 	fUserID(userID),
 	fTargetScreen(strdup(targetScreen)),
 	fSettings(NULL),
@@ -385,7 +348,6 @@ Desktop::Desktop(uid_t userID, const char* targetScreen)
 
 Desktop::~Desktop()
 {
-	delete fStackAndTileSpec;
 	delete fSettings;
 
 	delete_area(fSharedReadOnlyArea);
@@ -975,7 +937,7 @@ Desktop::ActivateWindow(Window* window)
 		ShowWindow(window);
 	}
 
-	if (window == FrontWindow() && !window->ForceActivate()) {
+	if (window == FrontWindow()) {
 		// see if there is a normal B_AVOID_FRONT window still in front of us
 		Window* avoidsFront = window->NextWindow(fCurrentWorkspace);
 		while (avoidsFront && avoidsFront->IsNormal()
@@ -998,56 +960,6 @@ Desktop::ActivateWindow(Window* window)
 	WindowList windows(kWorkingList);
 
 	Window* frontmost = window->Frontmost();
-
-	BList* stackedAndTiledWindows = new BList();
-
-	// Prepare to move tiled windows to the front as well
-	_AddWindowsByIdsToList(window->Left2LeftSnappingWindowIds(),
-		stackedAndTiledWindows);
-	_AddWindowsByIdsToList(window->Left2RightSnappingWindowIds(),
-		stackedAndTiledWindows);
-	_AddWindowsByIdsToList(window->Right2RightSnappingWindowIds(),
-		stackedAndTiledWindows);
-	_AddWindowsByIdsToList(window->Right2LeftSnappingWindowIds(),
-		stackedAndTiledWindows);
-	_AddWindowsByIdsToList(window->Top2TopSnappingWindowIds(),
-		stackedAndTiledWindows);
-	_AddWindowsByIdsToList(window->Top2BottomSnappingWindowIds(),
-		stackedAndTiledWindows);
-	_AddWindowsByIdsToList(window->Bottom2TopSnappingWindowIds(),
-		stackedAndTiledWindows);
-	_AddWindowsByIdsToList(window->Bottom2BottomSnappingWindowIds(),
-		stackedAndTiledWindows);
-
-	bool forceDirty = false;
-
-	// And then prepare to move stacked windows to the front
-	BList* stackedWindows = window->StackedWindows();
-	if (stackedWindows != NULL) {
-		for (int i = 0; i < stackedWindows->CountItems(); i++) {
-			Window* stackedWindow
-				= static_cast<Window*>(stackedWindows->ItemAt(i));
-			if (stackedWindow != window
-				&& !stackedAndTiledWindows->HasItem(stackedWindow)) {
-				stackedAndTiledWindows->AddItem(stackedWindow);
-
-				// Basically if there are any stacked windows associated with
-				// this window, then designate this window as "dirty" so it is
-				// forced to repaint
-				forceDirty = true;
-			}
-		}
-	}
-
-	// Do the actual moving here
-	for (int i = 0; i < stackedAndTiledWindows->CountItems(); i ++) {
-		Window* window
-			= static_cast<Window*>(stackedAndTiledWindows->ItemAt(i));
-		_CurrentWindows().RemoveWindow(window);
-		windows.AddWindow(window);
-	}
-
-	delete stackedAndTiledWindows;
 
 	_CurrentWindows().RemoveWindow(window);
 	windows.AddWindow(window);
@@ -1072,27 +984,10 @@ Desktop::ActivateWindow(Window* window)
 		}
 	}
 
-	_BringWindowsToFront(windows, kWorkingList, !forceDirty);
+	_BringWindowsToFront(windows, kWorkingList, true);
 
 	if ((window->Flags() & B_AVOID_FOCUS) == 0)
 		SetFocusWindow(window);
-}
-
-
-bool
-Desktop::_AddWindowsByIdsToList(BList* windowIdsToAdd, BList* windows)
-{
-	if (!windowIdsToAdd || !windows)
-		return false;
-
-	bool added = false;
-	for (int i = 0; i < windowIdsToAdd->CountItems(); i++) {
-		int32* id = static_cast<int32*>(windowIdsToAdd->ItemAt(i));
-		Window* windowToAdd = FindWindow(*id);
-		if (windowToAdd && !windows->HasItem(windowToAdd))
-			windows->AddItem(windowToAdd);
-	}
-	return added;
 }
 
 
@@ -3361,70 +3256,4 @@ Desktop::_SetWorkspace(int32 index)
 
 	if (previousColor != fWorkspaces[fCurrentWorkspace].Color())
 		RedrawBackground();
-}
-
-
-WindowList&
-Desktop::GetWindows()
-{
-	return _CurrentWindows();
-}
-
-
-bool
-Desktop::HighlightTab(Window* window, bool active)
-{
-	AutoWriteLocker _(fWindowLock);
-
-	if (window->IsTabHighlighted() == active)
-		return false;
-
-	BRegion dirty;
-	bool changed = window->HighlightTab(active, dirty);
-	if (changed)
-		_RebuildAndRedrawAfterWindowChange(window, dirty);
-
-	return changed;
-}
-
-
-bool
-Desktop::HighlightBorders(Window* window, bool active)
-{
-	AutoWriteLocker _(fWindowLock);
-
-	if (window->IsBordersHighlighted() == active)
-		return false;
-
-	BRegion dirty;
-	bool changed = window->HighlightBorders(active, dirty);
-	if (changed)
-		_RebuildAndRedrawAfterWindowChange(window, dirty);
-
-	return changed;
-}
-
-
-void
-Desktop::FinishStackingAndSnapping()
-{
-	for (Window* window = _CurrentWindows().LastWindow(); window != NULL;
-		window = window->PreviousWindow(fCurrentWorkspace)) {
-		HighlightTab(window, false);
-		HighlightBorders(window, false);
-		window->FinishStackingAndSnapping();
-	}
-	fIsStackingAndSnapping = false;
-}
-
-
-Window*
-Desktop::FindWindow(int32 windowId)
-{
-	for (Window* window = _CurrentWindows().LastWindow(); window != NULL;
-		window = window->PreviousWindow(fCurrentWorkspace)) {
-		if (window->WindowId() == windowId)
-			return window;
-	}
-	return NULL;
 }
