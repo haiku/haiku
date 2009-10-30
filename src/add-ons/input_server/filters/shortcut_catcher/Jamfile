@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src add-ons input_server filters shortcut_catcher ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+#	Common files used here and in the app
+StaticLibrary libshortcuts_shared.a :
+	BitFieldTesters.cpp
+	CommandActuators.cpp
+	KeyInfos.cpp
+	ParseCommandLine.cpp
+;
+
+Addon shortcut_catcher : 
+	CommandExecutor.cpp
+	KeyCommandMap.cpp
+	ShortcutsServerFilter.cpp
+	: be game input_server libshortcuts_shared.a $(TARGET_LIBSUPC++) ;
