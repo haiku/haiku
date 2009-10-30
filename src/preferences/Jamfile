@@ -21,6 +21,7 @@ SubInclude HAIKU_TOP src preferences opengl ;
 SubInclude HAIKU_TOP src preferences print ;
 SubInclude HAIKU_TOP src preferences screen ;
 SubInclude HAIKU_TOP src preferences screensaver ;
+SubInclude HAIKU_TOP src preferences shortcuts ;
 SubInclude HAIKU_TOP src preferences sounds ;
 SubInclude HAIKU_TOP src preferences time ;
 SubInclude HAIKU_TOP src preferences touchpad ;
