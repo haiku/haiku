@@ -327,8 +327,9 @@ AVFormatWriter::~AVFormatWriter()
     for(unsigned i = 0; i < fContext->nb_streams; i++) {
 #if OPEN_CODEC_CONTEXT
 		// We only need to close the AVCodecContext when we opened it.
-		// This is experimental, see WriteHeader().
-		avcodec_close(fContext->streams[i]->codec);
+		// This is experimental, see CommitHeader().
+		if (fHeaderWritten)
+			avcodec_close(fContext->streams[i]->codec);
 #endif
 		av_freep(&fContext->streams[i]->codec);
 		av_freep(&fContext->streams[i]);
