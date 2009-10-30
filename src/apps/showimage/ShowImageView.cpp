@@ -1646,7 +1646,7 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 		return;
 	}
 
-	bool shiftKeyDown = (modifiers() & B_SHIFT_KEY) > 0;
+	bool shiftKeyDown = (modifiers() & B_SHIFT_KEY) != 0;
 
 	switch (*bytes) {
 		case B_DOWN_ARROW:
@@ -1714,6 +1714,12 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 			break;
 		case '-':
 			ZoomOut();
+			break;
+		case '[':
+			Rotate(270);
+			break;
+		case ']':
+			Rotate(90);
 			break;
 	}
 }
