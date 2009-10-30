@@ -70,8 +70,8 @@ SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc Devices
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
 	<preference>Deskbar E-mail FileTypes Fonts Keyboard Keymap Locale Media
-	Mouse Network OpenGL Printers Screen ScreenSaver Sounds Time Touchpad
-	<preference>Tracker VirtualMemory
+	Mouse Network OpenGL Printers Screen ScreenSaver Shortcuts Sounds Time 
+	Touchpad <preference>Tracker VirtualMemory
 ;
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 	GLTeapot Haiku3d Mandelbrot Pairs Playground Pulse Sudoku Gradients
@@ -508,7 +508,8 @@ AddSymlinkToHaikuImage system add-ons Tracker
 	: /boot/system/apps/DiskUsage : DiskUsage-I ;
 AddFilesToHaikuImage system add-ons input_server devices
 	: <input>keyboard <input>mouse <input>wacom ;
-AddFilesToHaikuImage system add-ons input_server filters : screen_saver ;
+AddFilesToHaikuImage system add-ons input_server filters 
+	: screen_saver shortcut_catcher ;
 AddFilesToHaikuImage system add-ons kernel network
 	: <net>notifications stack ;
 AddFilesToHaikuImage system add-ons kernel network devices
