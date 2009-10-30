@@ -69,6 +69,7 @@ private:
 	P p;
 };
 
+
 template<>
 class ParameterBinder<const BEntry *> {
 public:
@@ -85,6 +86,7 @@ public:
 private:
 	BEntry p;
 };
+
 
 template<>
 class ParameterBinder<const entry_ref *> {
@@ -105,6 +107,7 @@ private:
 	entry_ref p;
 };
 
+
 template<>
 class ParameterBinder<const node_ref *> {
 public:
@@ -121,6 +124,7 @@ public:
 private:
 	node_ref p;
 };
+
 
 template<>
 class ParameterBinder<const BMessage *> {
@@ -149,11 +153,13 @@ private:
 	BMessage *p;
 };
 
+
 class FunctionObject {
 public:
 	virtual void operator()() = 0;
 	virtual ~FunctionObject() {}
 };
+
 
 template<class R>
 class FunctionObjectWithResult : public FunctionObject {
@@ -164,6 +170,7 @@ public:
 protected:
 	R result;
 };
+
 
 template <class Param1>
 class SingleParamFunctionObject : public FunctionObject {
@@ -184,6 +191,7 @@ private:
 	ParameterBinder<Param1> p1;
 };
 
+
 template <class Result, class Param1>
 class SingleParamFunctionObjectWithResult : public FunctionObjectWithResult<Result> {
 public:
@@ -201,6 +209,7 @@ private:
 	Result (*function)(Param1);
 	ParameterBinder<Param1> p1;
 };
+
 
 template <class Param1, class Param2>
 class TwoParamFunctionObject : public FunctionObject {
@@ -246,6 +255,7 @@ private:
 	ParameterBinder<Param3> p3;
 };
 
+
 template <class Result, class Param1, class Param2, class Param3>
 class ThreeParamFunctionObjectWithResult : public FunctionObjectWithResult<Result> {
 public:
@@ -268,6 +278,7 @@ private:
 	ParameterBinder<Param2> p2;
 	ParameterBinder<Param3> p3;
 };
+
 
 template <class Param1, class Param2, class Param3, class Param4>
 class FourParamFunctionObject : public FunctionObject {
@@ -292,6 +303,7 @@ private:
 	ParameterBinder<Param3> p3;
 	ParameterBinder<Param4> p4;
 };
+
 
 template <class Result, class Param1, class Param2, class Param3, class Param4>
 class FourParamFunctionObjectWithResult : public FunctionObjectWithResult<Result>  {
@@ -318,6 +330,7 @@ private:
 	ParameterBinder<Param4> p4;
 };
 
+
 template<class T>
 class PlainMemberFunctionObject : public FunctionObject {
 public:
@@ -334,6 +347,7 @@ private:
 	void (T::*function)();
 	T *target;
 };
+
 
 template<class T>
 class PlainLockingMemberFunctionObject : public FunctionObject {
@@ -358,6 +372,7 @@ private:
 	BMessenger messenger;
 };
 
+
 template<class T, class R>
 class PlainMemberFunctionObjectWithResult : public FunctionObjectWithResult<R> {
 public:
@@ -375,6 +390,7 @@ private:
 	R (T::*function)();
 	T *target;
 };
+
 
 template<class T, class Param1>
 class SingleParamMemberFunctionObject : public FunctionObject {
@@ -394,6 +410,7 @@ private:
 	T *target;
 	ParameterBinder<Param1> p1;
 };
+
 
 template<class T, class Param1, class Param2>
 class TwoParamMemberFunctionObject : public FunctionObject {
@@ -439,6 +456,7 @@ protected:
 	ParameterBinder<Param1> p1;
 };
 
+
 template<class T, class R, class Param1, class Param2>
 class TwoParamMemberFunctionObjectWithResult : public FunctionObjectWithResult<R> {
 public:
@@ -462,6 +480,7 @@ protected:
 	ParameterBinder<Param2> p2;
 };
 
+
 // convenience factory functions
 // NewFunctionObject
 // NewMemberFunctionObject
@@ -477,12 +496,14 @@ NewFunctionObject(void (*function)(Param1), Param1 p1)
 	return new SingleParamFunctionObject<Param1>(function, p1);
 }
 
+
 template<class Param1, class Param2>
 TwoParamFunctionObject<Param1, Param2> *
 NewFunctionObject(void (*function)(Param1, Param2), Param1 p1, Param2 p2)
 {
 	return new TwoParamFunctionObject<Param1, Param2>(function, p1, p2);
 }
+
 
 template<class Param1, class Param2, class Param3>
 ThreeParamFunctionObject<Param1, Param2, Param3> *
@@ -492,6 +513,7 @@ NewFunctionObject(void (*function)(Param1, Param2, Param3),
 	return new ThreeParamFunctionObject<Param1, Param2, Param3>(function, p1, p2, p3);
 }
 
+
 template<class T>
 PlainMemberFunctionObject<T> *
 NewMemberFunctionObject(void (T::*function)(), T *onThis)
@@ -499,12 +521,14 @@ NewMemberFunctionObject(void (T::*function)(), T *onThis)
 	return new PlainMemberFunctionObject<T>(function, onThis);
 }
 
+
 template<class T, class Param1>
 SingleParamMemberFunctionObject<T, Param1> *
 NewMemberFunctionObject(void (T::*function)(Param1), T *onThis, Param1 p1)
 {
 	return new SingleParamMemberFunctionObject<T, Param1>(function, onThis, p1);
 }
+
 
 template<class T, class Param1, class Param2>
 TwoParamMemberFunctionObject<T, Param1, Param2> *
@@ -515,6 +539,7 @@ NewMemberFunctionObject(void (T::*function)(Param1, Param2), T *onThis,
 		p1, p2);
 }
 
+
 template<class T, class R, class Param1, class Param2>
 TwoParamMemberFunctionObjectWithResult<T, R, Param1, Param2> *
 NewMemberFunctionObjectWithResult(R (T::*function)(Param1, Param2),
@@ -523,6 +548,7 @@ NewMemberFunctionObjectWithResult(R (T::*function)(Param1, Param2),
 	return new TwoParamMemberFunctionObjectWithResult<T, R, Param1, Param2>
 		(function, onThis, p1, p2);
 }
+
 
 template<class HandlerOrSubclass>
 PlainLockingMemberFunctionObject<HandlerOrSubclass> *
