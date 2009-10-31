@@ -471,8 +471,8 @@ BDirectWindow::_DirectDaemon()
 		} while (status == B_INTERRUPTED);
 
 		if (status != B_OK) {
-			fprintf(stderr, "DirectDaemon: failed to acquire direct sem: %s\n",
-				 strerror(status));
+			//fprintf(stderr, "DirectDaemon: failed to acquire direct sem: %s\n",
+				// strerror(status));
 			return -1;
 		}
 
@@ -500,8 +500,8 @@ BDirectWindow::_DirectDaemon()
 		// If we aren't quick enough to release this sem, our app
 		// will be terminated by the app_server
 		if ((status = release_sem(fDisableSemAck)) != B_OK) {
-			fprintf(stderr, "DirectDaemon: failed to release sem: %s\n",
-				strerror(status));
+			//fprintf(stderr, "DirectDaemon: failed to release sem: %s\n",
+				//strerror(status));
 			return -1;
 		}
 	}
