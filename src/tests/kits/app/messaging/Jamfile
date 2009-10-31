@@ -23,3 +23,8 @@ SEARCH on [ FGristFiles PortLink.cpp LinkReceiver.cpp LinkSender.cpp ]
 
 SEARCH on [ FGristFiles Shape.cpp Region.cpp RegionSupport.cpp ]
 	= [ FDirName $(HAIKU_TOP) src kits interface ] ;
+
+SimpleTest HandlerLooperMessageTest :
+	HandlerLooperMessageTest.cpp
+	: be $(TARGET_LIBSTDC++)
+	; 
