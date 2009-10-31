@@ -413,8 +413,12 @@ struct ieee80211req_sta_info {
 	uint16_t	isi_len;		/* total length (mult of 4) */
 	uint16_t	isi_ie_off;		/* offset to IE data */
 	uint16_t	isi_ie_len;		/* IE length */
+#ifdef __HAIKU__
+	struct ieee80211_channel	isi_chan;	/* Handing out the conmplete channel info */
+#else
 	uint16_t	isi_freq;		/* MHz */
 	uint32_t	isi_flags;		/* channel flags */
+#endif
 	uint32_t	isi_state;		/* state flags */
 	uint8_t		isi_authmode;		/* authentication algorithm */
 	int8_t		isi_rssi;		/* receive signal strength */
@@ -786,7 +790,12 @@ struct ieee80211req_scan_result {
 	uint16_t					isr_len;		/* total length (mult of 4) */
 	uint16_t					isr_ie_off;		/* offset to SSID+IE data */
 	uint16_t					isr_ie_len;		/* IE length */
+#ifdef __HAIKU__
 	struct ieee80211_channel	isr_chan;	/* Handing out the conmplete channel info */
+#else
+	uint16_t	isr_freq;		/* MHz */
+	uint16_t	isr_flags;		/* channel flags */
+#endif
 	int8_t						isr_noise;
 	int8_t						isr_rssi;
 	uint8_t						isr_intval;		/* beacon interval */
