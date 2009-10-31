@@ -12,6 +12,9 @@
  
 #include <stdio.h>
 
+#define NOTE "NotFieldTester : "
+#define MINI "MinMatchFieldTester : "
+
 BitFieldTester::BitFieldTester()
 {
 	// empty
@@ -154,14 +157,13 @@ NotFieldTester::NotFieldTester(BMessage* from)
 		if (slaveObj) {
 			fSlave = dynamic_cast<BitFieldTester*>(slaveObj);
 			if (fSlave == NULL) {
-				printf("NotFieldTester: 
-					Error casting slaveObj to BitFieldTester!\n");
+				printf(NOTE "Error casting slaveObj to BitFieldTester!\n");
 				delete slaveObj;
 			}
 		} else
-			printf("NotFieldTester: instantiate_object returned NULL!\n");
+			printf(NOTE "instantiate_object returned NULL!\n");
 	} else
-		printf("NotFieldTester: Couldn't unarchive NotFieldTester slave!\n");
+		printf(NOTE "Couldn't unarchive NotFieldTester slave!\n");
 }
 
 
@@ -234,16 +236,15 @@ MinMatchFieldTester::MinMatchFieldTester(BMessage* from)
 			if (nextSlave)
 				fSlaves.AddItem(nextSlave);
 			else {
-				printf("MinMatchFieldTester:
-					Error casting slaveObj to BitFieldTester!\n");
+				printf(MINI "Error casting slaveObj to BitFieldTester!\n");
 				delete slaveObj;
 			}
 		} else
-			printf("MinMatchFieldTester: instantiate_object returned NULL!\n");
+			printf(MINI "instantiate_object returned NULL!\n");
 	}
 
 	if (from->FindInt32("mMin", (int32*) &fMinNum) != B_NO_ERROR)
-		printf("MinMatchFieldTester: Error getting mMin!\n");
+		printf(MINI "Error getting mMin!\n");
 }
 
 
