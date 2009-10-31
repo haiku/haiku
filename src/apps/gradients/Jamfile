@@ -1,7 +1,10 @@
 SubDir HAIKU_TOP src apps gradients ;
 
 Application Gradients :
-	Gradients.cpp
+#	Gradients.cpp
+	GradientsApp.cpp
+	GradientsWindow.cpp
+	GradientsView.cpp
 	: be $(TARGET_LIBSUPC++)
 	: Gradients.rdef
 ;
