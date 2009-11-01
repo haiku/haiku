@@ -10,7 +10,6 @@
 
 #include "unit.h"
 
-// TODO Update Headercomment about count of code users
 #include <util/RadixBitmap.h>
 
 
