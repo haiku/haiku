@@ -35,12 +35,9 @@ extern "C" {
 #define DRIVER_NAME		"pc_serial"		// driver name for debug output
 #define DEVICES_COUNT	20				// max simultaneously open devices
 
-#ifdef HANDLE_ISA_COM
-#define DEVFS_BASE		"ports/my_serial"
-#else
 // avoid clashing with BeOS zz driver
 #define DEVFS_BASE		"ports/pc_serial"
-#endif
+//#define DEVFS_BASE		"ports/serial"
 
 
 // no user serviceable part beyond this point

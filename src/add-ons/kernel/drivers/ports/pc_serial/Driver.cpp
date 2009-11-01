@@ -24,6 +24,7 @@ pci_module_info *gPCIModule = NULL;
 tty_module_info *gTTYModule = NULL;
 struct ddomain gSerialDomain;
 sem_id gDriverLock = -1;
+bool gHandleISA = false;
 
 // 24 MHz clock
 static const uint32 sDefaultRates[] = {
@@ -89,25 +90,21 @@ static const struct serial_support_descriptor sSupportedDevices[] = {
 	  { PCI_simple_communications, PCI_serial, PCI_serial_16550,
 		PCI_INVAL, PCI_INVAL } },
 
-//XXX
+	{ B_PCI_BUS, "Generic 16650 Serial Port", sDefaultRates, NULL, { 8, 8, 8 },
+	  { PCI_simple_communications, PCI_serial, PCI_serial_16650,
+		PCI_INVAL, PCI_INVAL } },
+
+	{ B_PCI_BUS, "Generic 16750 Serial Port", sDefaultRates, NULL, { 8, 8, 8 },
+	  { PCI_simple_communications, PCI_serial, PCI_serial_16750,
+		PCI_INVAL, PCI_INVAL } },
+
+	{ B_PCI_BUS, "Generic 16850 Serial Port", sDefaultRates, NULL, { 8, 8, 8 },
+	  { PCI_simple_communications, PCI_serial, PCI_serial_16850,
+		PCI_INVAL, PCI_INVAL } },
 
 	{ B_PCI_BUS, "Generic 16950 Serial Port", sDefaultRates, NULL, { 8, 8, 8 },
 	  { PCI_simple_communications, PCI_serial, PCI_serial_16950,
 		PCI_INVAL, PCI_INVAL } },
-
-//XXX DEBUG! HACK HACK HACK 
-//XXX for testing probing
-#if 0
-	{ B_PCI_BUS, "My BadIDE controller", sDefaultRates, NULL, { 8, 32, 8 },
-	  { 1, 1, 0x8a,
-		0x1002, 0x434a } },
-	{ B_PCI_BUS, "My GoodIDE controller", sDefaultRates, NULL, { 8, 32, 8 },
-	  { 1, 1, 0x8a,
-		0x1002, 0x4349 } },
-	{ B_PCI_BUS, "My IDE controller", sDefaultRates, NULL, { 8, 32, 8 },
-	  { 1, 1, 0x8a,
-		PCI_INVAL, PCI_INVAL } },
-#endif
 
 	// non PCI_serial devices
 
