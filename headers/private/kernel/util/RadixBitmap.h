@@ -26,8 +26,7 @@
  */
 
 /*
- * The radix bitmap structure is ported from FreeBSD and is only used
- * in swap system at the time.
+ * The radix bitmap structure is ported from FreeBSD.
  */
 
 
