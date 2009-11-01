@@ -86,6 +86,8 @@ http://blognux.free.fr/sources/EasyCam2/04032006_19:49/
 http://www.wifi.com.ar/english/doc/webcam/ov511cameras.html
 http://mxhaard.free.fr/spca5xx.html
 
+http://lkml.indiana.edu/hypermail/linux/kernel/0904.0/03427.html
+
 * CMOS Sensor datasheets (rather, marketing buzz):
 http://mxhaard.free.fr/spca50x/Doc/ many
 http://www.tascorp.com.tw/product_file/TAS5110C1B_Brief_V0.3.pdf

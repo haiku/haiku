@@ -31,7 +31,12 @@ for sourceDir in $(sourceDirs) {
 
 ## addon sources
 local addonSources ;
-addonSources = QuickCamDevice.cpp SonixCamDevice.cpp NW80xCamDevice.cpp UVCCamDevice.cpp ;
+addonSources =
+	QuickCamDevice.cpp
+	SonixCamDevice.cpp
+	NW80xCamDevice.cpp
+	UVCCamDevice.cpp
+;
 
 ## colorspace transforms sources
 local csTransformsSources ;
@@ -39,8 +44,14 @@ csTransformsSources = Bayer.cpp ;
 
 ## sensors sources
 local sensorsSources ;
-sensorsSources = hdcs1000.cpp hv7131e1.cpp pas106b.cpp pb0100.cpp 
-	tas5110c1b.cpp tas5130d1b.cpp ;
+sensorsSources =
+	hdcs1000.cpp
+	hv7131e1.cpp
+	pas106b.cpp
+	pb0100.cpp
+	tas5110c1b.cpp
+	tas5130d1b.cpp
+;
 
 ## how to build header files from sources to include the list of built-in addons.
 # but it doesn't seem to work for some reason...
