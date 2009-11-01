@@ -42,13 +42,13 @@ def renderHtml(text, highlights, sourceFileName, outputFileName):
     count = 0
     for slice in splittedText:
         if count % 2 == 0:
-            temp += escape(slice) + '<highlight class="tooltip">'
+            temp += escape(slice) + '<span class="highlight tooltip">'
         else:
             temp += escape(slice) + "<em>" + highlights[(count - 1) / 2][2] \
-                + "</em></highlight>"
+                + "</em></span>"
         count += 1
 
-    temp += "</highlight>" # close the superfluous last highlight
+    temp += "</span>" # close the superfluous last highlight
 
     count = 1
     for line in temp.split('\n'):
@@ -131,7 +131,7 @@ def checkHighlights(highlights):
 
 def cssStyle():
 	return """
-    highlight {
+    .highlight {
         background: #ffff00;
         color: #000000;
     }
@@ -140,18 +140,18 @@ def cssStyle():
         font-family: monospace;
     }
 
-    highlight.tooltip em {
+    .tooltip em {
         display:none;
     }
 
-    highlight.tooltip:hover {
+    .tooltip:hover {
         border: 0;
         position: relative;
         z-index: 500;
         text-decoration:none;
     }
 
-    highlight.tooltip:hover em {
+    .tooltip:hover em {
         font-style: normal;
         display: block;
         position: absolute;
