@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05-2002/4-2006 */
+/* Written by Rudolf Cornelissen 05-2002/11-2009 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -175,24 +175,44 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		}
 
 		/* check if the requested buffer width is supported */
-		if (si->overlay.myBuffer[offset].width > 1024)
-		{
-			LOG(4,("Overlay: Sorry, requested buffer width not supported, aborted\n"));
+		if (si->ps.card_type < G450) {
+			if (si->overlay.myBuffer[offset].width > 1024) {
+				LOG(4,("Overlay: Sorry, requested buffer width not supported, aborted\n"));
 
-			/* release the shared benaphore */
-			RELEASE_BEN(si->overlay.lock)
+				/* release the shared benaphore */
+				RELEASE_BEN(si->overlay.lock)
 
-			return NULL;
-		}
-		/* check if the requested buffer height is supported */
-		if (height > 1024)
-		{
-			LOG(4,("Overlay: Sorry, requested buffer height not supported, aborted\n"));
+				return NULL;
+			}
 
-			/* release the shared benaphore */
-			RELEASE_BEN(si->overlay.lock)
+			/* check if the requested buffer height is supported */
+			if (height > 1024) {
+				LOG(4,("Overlay: Sorry, requested buffer height not supported, aborted\n"));
 
-			return NULL;
+				/* release the shared benaphore */
+				RELEASE_BEN(si->overlay.lock)
+
+				return NULL;
+			}
+		} else {
+			if (si->overlay.myBuffer[offset].width > 1920) {
+				LOG(4,("Overlay: Sorry, requested buffer width not supported, aborted\n"));
+
+				/* release the shared benaphore */
+				RELEASE_BEN(si->overlay.lock)
+
+				return NULL;
+			}
+
+			/* check if the requested buffer height is supported */
+			if (height > 1080) {
+				LOG(4,("Overlay: Sorry, requested buffer height not supported, aborted\n"));
+
+				/* release the shared benaphore */
+				RELEASE_BEN(si->overlay.lock)
+
+				return NULL;
+			}
 		}
 
 		/* store slopspace (in pixels) for each bitmap for use by 'overlay unit' (BES) */

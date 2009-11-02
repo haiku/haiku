@@ -1,5 +1,5 @@
 /* G200-G550 Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-12/2005 */
+/* Written by Rudolf Cornelissen 05/2002-11/2009 */
 
 #define MODULE_BIT 0x00000200
 
@@ -207,7 +207,7 @@ static void gx00_bes_calc_move_overlay(move_overlay_info *moi)
 	/* take zoom into account */
 	moi->hsrcstv += ((uint32)si->overlay.my_ov.h_start) << 16;
 	/* AND below required by hardware */
-	moi->hsrcstv &= 0x03fffffc;
+	moi->hsrcstv &= 0x07fffffc;
 	LOG(4,("Overlay: first hor. (sub)pixel of input bitmap contributing %f\n", moi->hsrcstv / (float)65536));
 
 	/* Setup horizontal source end: last (sub)pixel contributing to output picture */
@@ -247,7 +247,7 @@ static void gx00_bes_calc_move_overlay(move_overlay_info *moi)
 		moi->hsrcendv = (((uint32)((si->overlay.my_ov.h_start + si->overlay.my_ov.width) - 1)) << 16);
 	}
 	/* AND below required by hardware */
-	moi->hsrcendv &= 0x03fffffc;
+	moi->hsrcendv &= 0x07fffffc;
 	LOG(4,("Overlay: last horizontal (sub)pixel of input bitmap contributing %f\n", moi->hsrcendv / (float)65536));
 
 
@@ -581,13 +581,13 @@ status_t gx00_configure_bes
 	 * this is the last pixel that will be used for calculating interpolated pixels */
 	hsrclstv = ((ob->width - 1) - si->overlay.myBufInfo[offset].slopspace) << 16; 
 	/* AND below required by hardware */
-	hsrclstv &= 0x03ff0000;
+	hsrclstv &= 0x07ff0000;
 
 	/* setup field 1 (is our complete frame) vertical source last position.
 	 * this is the last pixel that will be used for calculating interpolated pixels */
 	v1srclstv = (ob->height - 1);
 	/* AND below required by hardware */
-	v1srclstv &= 0x000003ff;
+	v1srclstv &= 0x000007ff;
 
 
 	/*****************************
@@ -670,13 +670,10 @@ status_t gx00_configure_bes
 		LOG(6,("Overlay: using horizontal dropping or replication on scaling\n"));
 	}
 	/* enable vertical filtering on scaling if asked for: if we are *upscaling* only */
-	if ((ow->flags & B_OVERLAY_VERTICAL_FILTERING) && (viscalv < (0x01 << 16)))
-	{
+	if ((ow->flags & B_OVERLAY_VERTICAL_FILTERING) && (viscalv < (0x01 << 16)) && (ob->width <= 1024))	{
 		ctlv |= 1 << 11;
 		LOG(6,("Overlay: using vertical interpolation on scaling\n"));
-	}
-	else
-	{
+	} else {
 		ctlv |= 0 << 11;
 		LOG(6,("Overlay: using vertical dropping or replication on scaling\n"));
 	}
