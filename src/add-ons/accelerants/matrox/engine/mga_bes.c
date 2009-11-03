@@ -246,7 +246,7 @@ static void gx00_bes_calc_move_overlay(move_overlay_info *moi)
 		/* set last contributing pixel to last used pixel in (zoomed) inputbuffer, aligned to BES */
 		moi->hsrcendv = (((uint32)((si->overlay.my_ov.h_start + si->overlay.my_ov.width) - 1)) << 16);
 	}
-	/* AND below required by hardware */
+	/* AND below required by hardware (confirmed G200 can do upto 1024 pixels, G450 and G550 can do above.) */
 	moi->hsrcendv &= 0x07fffffc;
 	LOG(4,("Overlay: last horizontal (sub)pixel of input bitmap contributing %f\n", moi->hsrcendv / (float)65536));
 
