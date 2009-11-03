@@ -607,6 +607,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 
 		rect.InsetBy(1, 1);
 
+		_GetAbbreviatedKeyLabelIfNeeded(view, rect, key, text, sizeof(text));
 		be_control_look->DrawLabel(view, text, rect, updateRect,
 			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
 	} else if (key->shape == kEnterKeyShape) {
@@ -626,6 +627,8 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 		_DrawKeyButton(view, rect, updateRect, base, background, pressed);
 
 		rect.left = missingRect.right;
+		_GetAbbreviatedKeyLabelIfNeeded(view, rect, key, text, sizeof(text));
+
 		be_control_look->DrawLabel(view, text, rect, updateRect,
 			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
 
@@ -701,22 +704,23 @@ KeyboardLayoutView::_DrawIndicator(BView* view, BRect updateRect,
 
 
 const char*
-KeyboardLayoutView::_SpecialKeyLabel(const key_map& map, uint32 code)
+KeyboardLayoutView::_SpecialKeyLabel(const key_map& map, uint32 code,
+	bool abbreviated)
 {
 	if (code == map.caps_key)
-		return "CAPS LOCK";
+		return abbreviated ? "CAPS" : "CAPS LOCK";
 	if (code == map.scroll_key)
 		return "SCROLL";
 	if (code == map.num_key)
-		return "NUM LOCK";
+		return abbreviated ? "NUM" : "NUM LOCK";
 	if (code == map.left_shift_key || code == map.right_shift_key)
 		return "SHIFT";
 	if (code == map.left_command_key || code == map.right_command_key)
-		return "COMMAND";
+		return abbreviated ? "CMD" : "COMMAND";
 	if (code == map.left_control_key || code == map.right_control_key)
-		return "CONTROL";
+		return abbreviated ? "CTRL" : "CONTROL";
 	if (code == map.left_option_key || code == map.right_option_key)
-		return "OPTION";
+		return abbreviated ? "OPT" : "OPTION";
 	if (code == map.menu_key)
 		return "MENU";
 	if (code == B_PRINT_KEY)
@@ -755,7 +759,8 @@ KeyboardLayoutView::_SpecialMappedKeySymbol(const char* bytes, size_t numBytes)
 
 
 const char*
-KeyboardLayoutView::_SpecialMappedKeyLabel(const char* bytes, size_t numBytes)
+KeyboardLayoutView::_SpecialMappedKeyLabel(const char* bytes, size_t numBytes,
+	bool abbreviated)
 {
 	if (numBytes != 1)
 		return NULL;
@@ -772,9 +777,9 @@ KeyboardLayoutView::_SpecialMappedKeyLabel(const char* bytes, size_t numBytes)
 	if (bytes[0] == B_END)
 		return "END";
 	if (bytes[0] == B_PAGE_UP)
-		return "PAGE \xe2\x86\x91";
+		return abbreviated ? "PG \xe2\x86\x91" : "PAGE \xe2\x86\x91";
 	if (bytes[0] == B_PAGE_DOWN)
-		return "PAGE \xe2\x86\x93";
+		return abbreviated ? "PG \xe2\x86\x93" : "PAGE \xe2\x86\x93";
 
 	return NULL;
 }
@@ -789,6 +794,36 @@ KeyboardLayoutView::_FunctionKeyLabel(uint32 code, char* text, size_t textSize)
 	}
 
 	return false;
+}
+
+
+void
+KeyboardLayoutView::_GetAbbreviatedKeyLabelIfNeeded(BView* view, BRect rect,
+	const Key* key, char* text, size_t textSize)
+{
+	if (floorf(rect.Width()) > ceilf(view->StringWidth(text)))
+		return;
+
+	// Check if we have a shorter version of this key
+
+	const key_map& map = fKeymap->Map();
+
+	const char* special = _SpecialKeyLabel(map, key->code, true);
+	if (special != NULL) {
+		strlcpy(text, special, textSize);
+		return;
+	}
+
+	char* bytes = NULL;
+	int32 numBytes;
+	fKeymap->GetChars(key->code, fModifiers, fDeadKey, &bytes, &numBytes);
+	if (bytes != NULL) {
+		special = _SpecialMappedKeyLabel(bytes, numBytes, true);
+		if (special != NULL)
+			strlcpy(text, special, textSize);
+
+		delete[] bytes;
+	}
 }
 
 
@@ -814,27 +849,24 @@ KeyboardLayoutView::_GetKeyLabel(const Key* key, char* text, size_t textSize,
 
 	char* bytes = NULL;
 	int32 numBytes;
-	fKeymap->GetChars(key->code, fModifiers, fDeadKey, &bytes,
-		&numBytes);
+	fKeymap->GetChars(key->code, fModifiers, fDeadKey, &bytes, &numBytes);
 	if (bytes != NULL) {
 		special = _SpecialMappedKeyLabel(bytes, numBytes);
 		if (special != NULL) {
 			strlcpy(text, special, textSize);
 			keyKind = kSpecialKey;
-			return;
+		} else {
+			special = _SpecialMappedKeySymbol(bytes, numBytes);
+			if (special != NULL) {
+				strlcpy(text, special, textSize);
+				keyKind = kSymbolKey;
+			} else {
+				bool hasGlyphs;
+				fFont.GetHasGlyphs(bytes, 1, &hasGlyphs);
+				if (hasGlyphs)
+					strlcpy(text, bytes, sizeof(text));
+			}
 		}
-
-		special = _SpecialMappedKeySymbol(bytes, numBytes);
-		if (special != NULL) {
-			strlcpy(text, special, textSize);
-			keyKind = kSymbolKey;
-			return;
-		}
-
-		bool hasGlyphs;
-		fFont.GetHasGlyphs(bytes, 1, &hasGlyphs);
-		if (hasGlyphs)
-			strlcpy(text, bytes, sizeof(text));
 
 		delete[] bytes;
 	}

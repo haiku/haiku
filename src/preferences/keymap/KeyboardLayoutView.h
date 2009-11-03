@@ -63,12 +63,16 @@ private:
 			void			_DrawIndicator(BView* view, BRect updateRect,
 								const Indicator* indicator, BRect rect,
 								bool lit);
-			const char*		_SpecialKeyLabel(const key_map& map, uint32 code);
+			const char*		_SpecialKeyLabel(const key_map& map, uint32 code,
+								bool abbreviated = false);
 			const char*		_SpecialMappedKeySymbol(const char* bytes,
 								size_t numBytes);
 			const char*		_SpecialMappedKeyLabel(const char* bytes,
-								size_t numBytes);
+								size_t numBytes, bool abbreviated = false);
 			bool			_FunctionKeyLabel(uint32 code, char* text,
+								size_t textSize);
+			void			_GetAbbreviatedKeyLabelIfNeeded(BView* view,
+								BRect rect, const Key* key, char* text,
 								size_t textSize);
 			void			_GetKeyLabel(const Key* key, char* text,
 								size_t textSize, key_kind& keyKind);
