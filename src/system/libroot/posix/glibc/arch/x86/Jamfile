@@ -53,7 +53,7 @@ local genericSources =
 	s_csqrt.c s_csqrtf.c #s_csqrtl.c
 	s_ctan.c s_ctanf.c #s_ctanl.c
 	s_ctanh.c s_ctanhf.c #s_ctanhl.c
-	s_erf.c s_erff.c # s_erfl.c
+	s_erf.c s_erff.c s_erfl.c
 	s_fpclassify.c s_fpclassifyf.c # s_fpclassifyl.c
 	s_isinf.c s_isinff.c
 	s_isnan.c s_isnanf.c
@@ -62,7 +62,7 @@ local genericSources =
 	s_lround.c s_lroundf.c s_lroundl.c
 	s_matherr.c
 	s_modf.c s_modff.c # s_modfl.c
-	s_nan.c s_nanf.c
+	s_nan.c s_nanf.c s_nanl.c
 	s_nextafter.c s_nextafterf.c
 	s_nexttowardl.c
 	s_signbit.c s_signbitf.c s_signbitl.c
