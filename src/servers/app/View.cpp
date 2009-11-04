@@ -127,7 +127,7 @@ View::View(IntRect frame, IntPoint scrollingOffset, const char* name,
 View::~View()
 {
 	if (fViewBitmap != NULL)
-		gBitmapManager->DeleteBitmap(fViewBitmap);
+		fViewBitmap->ReleaseReference();
 
 	delete fScreenAndUserClipping;
 	delete fUserClipping;
@@ -137,7 +137,7 @@ View::~View()
 //		fWindow->SetTopView(NULL);
 
 	if (fCursor)
-		fCursor->Release();
+		fCursor->ReleaseReference();
 
 	// iterate over children and delete each one
 	View* view = fFirstChild;
@@ -522,12 +522,12 @@ View::SetViewBitmap(ServerBitmap* bitmap, IntRect sourceRect,
 		} else if (overlay != NULL)
 			overlay->Hide();
 
-		gBitmapManager->DeleteBitmap(fViewBitmap);
+		fViewBitmap->ReleaseReference();
 	}
 
 	// the caller is allowed to delete the bitmap after setting the background
 	if (bitmap != NULL)
-		bitmap->Acquire();
+		bitmap->AcquireReference();
 
 	fViewBitmap = bitmap;
 	fBitmapSource = sourceRect;
@@ -1297,12 +1297,12 @@ View::SetCursor(ServerCursor* cursor)
 		return;
 
 	if (fCursor)
-		fCursor->Release();
+		fCursor->ReleaseReference();
 
 	fCursor = cursor;
 
 	if (fCursor)
-		fCursor->Acquire();
+		fCursor->AcquireReference();
 }
 
 

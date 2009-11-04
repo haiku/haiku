@@ -24,7 +24,7 @@ OffscreenServerWindow::OffscreenServerWindow(const char *title, ServerApp *app,
 
 OffscreenServerWindow::~OffscreenServerWindow()
 {
-	fBitmap->Release();
+	fBitmap->ReleaseReference();
 }
 
 

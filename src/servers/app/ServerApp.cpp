@@ -195,7 +195,7 @@ ServerApp::~ServerApp()
 		ServerBitmap* bitmap = fBitmapMap.begin()->second;
 
 		fBitmapMap.erase(fBitmapMap.begin());
-		bitmap->Release();
+		bitmap->ReleaseReference();
 	}
 
 	while (!fPictureMap.empty()) {
@@ -302,12 +302,12 @@ ServerApp::SetCurrentCursor(ServerCursor* cursor)
 		return;
 
 	if (fViewCursor)
-		fViewCursor->Release();
+		fViewCursor->ReleaseReference();
 
 	fViewCursor = cursor;
 
 	if (fViewCursor)
-		fViewCursor->Acquire();
+		fViewCursor->AcquireReference();
 
 	fDesktop->SetCursor(CurrentCursor());
 }
@@ -413,7 +413,7 @@ ServerApp::GetBitmap(int32 token) const
 	if (bitmap == NULL)
 		return NULL;
 
-	bitmap->Acquire();
+	bitmap->AcquireReference();
 
 	return bitmap;
 }
@@ -757,7 +757,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					fLink.Attach<int32>(bitmap->BytesPerRow());
 			} else {
 				if (bitmap != NULL)
-					bitmap->Release();
+					bitmap->ReleaseReference();
 
 				fLink.StartMessage(B_NO_MEMORY);
 			}
@@ -784,7 +784,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", Signature(),
 					token));
 
-				bitmap->Release();
+				bitmap->ReleaseReference();
 			}
 
 			fMapLocker.Unlock();
@@ -807,7 +807,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				status = fDesktop->HWInterface()->GetOverlayRestrictions(
 					bitmap->Overlay(), &restrictions);
 
-				bitmap->Release();
+				bitmap->ReleaseReference();
 			}
 
 			fLink.StartMessage(status);
@@ -1031,13 +1031,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			ServerCursor* oldCursor = fAppCursor;
 			fAppCursor = fDesktop->GetCursorManager().FindCursor(token);
 			if (fAppCursor != NULL)
-				fAppCursor->Acquire();
+				fAppCursor->AcquireReference();
 
 			if (_HasWindowUnderMouse())
 				fDesktop->SetCursor(CurrentCursor());
 
 			if (oldCursor != NULL)
-				oldCursor->Release();
+				oldCursor->ReleaseReference();
 
 			fDesktop->GetCursorManager().Unlock();
 
@@ -1063,7 +1063,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				// get a NULL cursor, it probably means we are supposed to use
 				// the system default cursor.
 				if (cursor != NULL)
-					cursor->Acquire();
+					cursor->AcquireReference();
 
 				fDesktop->GetCursorManager().Unlock();
 
@@ -1094,7 +1094,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 				// Release the temporary reference.
 				if (cursor != NULL)
-					cursor->Release();
+					cursor->ReleaseReference();
 			}
 
 			if (info.sync) {
@@ -1164,7 +1164,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			ServerCursor* cursor
 				= fDesktop->GetCursorManager().FindCursor(token);
 			if (cursor != NULL)
-				cursor->Acquire();
+				cursor->AcquireReference();
 
 			fDesktop->GetCursorManager().Unlock();
 
@@ -1185,7 +1185,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			ServerCursor* cursor
 				= fDesktop->GetCursorManager().FindCursor(token);
 			if (cursor != NULL)
-				cursor->Release();
+				cursor->ReleaseReference();
 
 			fDesktop->GetCursorManager().Unlock();
 
@@ -2861,7 +2861,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				} else
 					fLink.StartMessage(B_BAD_VALUE);
 
-				gBitmapManager->DeleteBitmap(bitmap);
+				bitmap->ReleaseReference();
 			} else
 				fLink.StartMessage(B_BAD_VALUE);
 

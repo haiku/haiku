@@ -14,6 +14,9 @@
 #include <Rect.h>
 #include <OS.h>
 
+#include <Referenceable.h>
+
+
 class BitmapManager;
 class ClientMemoryAllocator;
 class HWInterface;
@@ -28,13 +31,10 @@ class ServerApp;
 	managed by the BitmapManager class. It is also the base class for
 	all cursors. Every BBitmap has a shadow ServerBitmap object.
 */
-class ServerBitmap {
+class ServerBitmap : public Referenceable {
 public:
 	inline	bool			IsValid() const
 								{ return fBuffer != NULL; }
-
-			void			Acquire();
-			void			Release();
 
 	inline	uint8*			Bits() const
 								{ return fBuffer; }
@@ -93,10 +93,11 @@ protected:
 							ServerBitmap(const ServerBitmap* bmp);
 	virtual					~ServerBitmap();
 
-			bool			_Release();
+	virtual	void			LastReferenceReleased();
 
-			void			_AllocateBuffer();
+			void			AllocateBuffer();
 
+protected:
 			ClientMemoryAllocator* fAllocator;
 			void*			fAllocationCookie;
 			::Overlay*		fOverlay;

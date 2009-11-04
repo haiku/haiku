@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,12 +8,15 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/*!
-	Although descended from ServerBitmaps, ServerCursors are not handled by
-	the BitmapManager - they are allocated like any other object. Unlike BeOS
-	R5, cursors can be any size or color space, and this class accomodates and
-	expands the R5 API.
+
+/*!	Although descended from ServerBitmaps, ServerCursors are not handled by
+	the BitmapManager, but the CursorManager instead. Until they have been
+	attached to a CursorManager, you can delete cursors like any other object.
+
+	Unlike BeOS, cursors can be any size or color space, and this class
+	accomodates and expands the BeOS API.
 */
+
 
 #include "CursorManager.h"
 #include "ServerCursor.h"
@@ -26,13 +29,15 @@
 
 using std::nothrow;
 
-/*!
-	\brief Constructor
+
+/*!	\brief Constructor
+
 	\param r Size of the cursor
 	\param cspace Color space of the cursor
 	\param flags ServerBitmap flags. See Bitmap.h.
 	\param hotspot Hotspot of the cursor
-	\param bytesperline Bytes per row for the cursor. See ServerBitmap::ServerBitmap()
+	\param bytesperline Bytes per row for the cursor. See
+		ServerBitmap::ServerBitmap()
 
 */
 ServerCursor::ServerCursor(BRect r, color_space format, int32 flags,
@@ -41,37 +46,36 @@ ServerCursor::ServerCursor(BRect r, color_space format, int32 flags,
 	ServerBitmap(r, format, flags, bytesPerRow, screen),
 	fHotSpot(hotspot),
 	fOwningTeam(-1),
-	fReferenceCount(1),
 	fCursorData(NULL),
 	fManager(NULL)
 {
 	fHotSpot.ConstrainTo(Bounds());
-	_AllocateBuffer();
+	AllocateBuffer();
 }
 
 
-/*!
-	\brief Constructor
-	\param data Pointer to 68-byte cursor data array. See BeBook entry for BCursor for details
+/*!	\brief Constructor
+	\param data Pointer to 68-byte cursor data array. See BeBook entry for
+		BCursor for details
 */
 ServerCursor::ServerCursor(const uint8* data)
 	:
 	ServerBitmap(BRect(0, 0, 15, 15), B_RGBA32, 0),
 	fHotSpot(0, 0),
 	fOwningTeam(-1),
-	fReferenceCount(1),
 	fCursorData(NULL),
 	fManager(NULL)
 {
-	// 68-byte array used in R5 for holding cursors.
-	// This API has serious problems and should be deprecated(but supported) in R2
+	// 68-byte array used in BeOS for holding cursors.
+	// This API has serious problems and should be deprecated (but supported)
+	// in R2
 
 	// Now that we have all the setup, we're going to map (for now) the cursor
 	// to RGBA32 (little endian). Eventually, there will be support for 16 and
 	// 8-bit depths
 	// NOTE: review this once we have working PPC graphics cards (big endian).
 	if (data) {
-		_AllocateBuffer();
+		AllocateBuffer();
 		uint8* buffer = Bits();
 		if (!buffer)
 			return;
@@ -116,8 +120,7 @@ ServerCursor::ServerCursor(const uint8* data)
 }
 
 
-/*!
-	\brief Constructor
+/*!	\brief Constructor
 	\param data Pointer to bitmap data in memory,
 	the padding bytes should be contained when format less than 32 bpp.
 */
@@ -127,18 +130,16 @@ ServerCursor::ServerCursor(const uint8* alreadyPaddedData, uint32 width,
 	ServerBitmap(BRect(0, 0, width - 1, height - 1), format, 0),
 	fHotSpot(0, 0),
 	fOwningTeam(-1),
-	fReferenceCount(1),
 	fCursorData(NULL),
 	fManager(NULL)
 {
-	_AllocateBuffer();
+	AllocateBuffer();
 	if (Bits())
 		memcpy(Bits(), alreadyPaddedData, BitsLength());
 }
 
 
-/*!
-	\brief Copy constructor
+/*!	\brief Copy constructor
 	\param cursor cursor to copy
 */
 ServerCursor::ServerCursor(const ServerCursor* cursor)
@@ -146,13 +147,12 @@ ServerCursor::ServerCursor(const ServerCursor* cursor)
 	ServerBitmap(cursor),
 	fHotSpot(0, 0),
 	fOwningTeam(-1),
-	fReferenceCount(1),
 	fCursorData(NULL),
 	fManager(NULL)
 {
 	// TODO: Hm. I don't move this into the if clause,
 	// because it might break code elsewhere.
-	_AllocateBuffer();
+	AllocateBuffer();
 
 	if (cursor) {
 		if (Bits() && cursor->Bits())
@@ -174,8 +174,7 @@ ServerCursor::~ServerCursor()
 }
 
 
-/*!
-	\brief Sets the cursor's hotspot
+/*!	\brief Sets the cursor's hotspot
 	\param pt New location of hotspot, constrained to the cursor's boundaries.
 */
 void
@@ -186,23 +185,17 @@ ServerCursor::SetHotSpot(BPoint hotSpot)
 }
 
 
-bool
-ServerCursor::Release()
-{
-	if (atomic_add(&fReferenceCount, -1) == 1) {
-		if (fManager && !fManager->RemoveCursor(this))
-			return false;
-
-		delete this;
-		return true;
-	}
-	return false;
-}
-
-
 void
 ServerCursor::AttachedToManager(CursorManager* manager)
 {
 	fManager = manager;
+}
+
+
+void
+ServerCursor::LastReferenceReleased()
+{
+	if (fManager != NULL && fManager->RemoveCursor(this))
+		delete this;
 }
 

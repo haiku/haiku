@@ -123,42 +123,18 @@ ServerBitmap::~ServerBitmap()
 }
 
 
-void
-ServerBitmap::Acquire()
-{
-	atomic_add(&fReferenceCount, 1);
-}
-
-
-void
-ServerBitmap::Release()
-{
-	gBitmapManager->DeleteBitmap(this);
-}
-
-
-bool
-ServerBitmap::_Release()
-{
-	if (atomic_add(&fReferenceCount, -1) == 1)
-		return true;
-
-	return false;
-}
-
-
 /*!	\brief Internal function used by subclasses
 
 	Subclasses should call this so the buffer can automagically
 	be allocated on the heap.
 */
 void
-ServerBitmap::_AllocateBuffer(void)
+ServerBitmap::AllocateBuffer()
 {
 	uint32 length = BitsLength();
 	if (length > 0) {
 		delete[] fBuffer;
-		fBuffer = new(nothrow) uint8[length];
+		fBuffer = new(std::nothrow) uint8[length];
 	}
 }
 
@@ -252,6 +228,17 @@ ServerBitmap::PrintToStream()
 }
 
 
+void
+ServerBitmap::LastReferenceReleased()
+{
+	if (fOwner != NULL)
+		fOwner->BitmapRemoved(this);
+
+	gBitmapManager->BitmapRemoved(this);
+	delete this;
+}
+
+
 //	#pragma mark -
 
 
@@ -259,14 +246,14 @@ UtilityBitmap::UtilityBitmap(BRect rect, color_space space, uint32 flags,
 		int32 bytesperline, screen_id screen)
 	: ServerBitmap(rect, space, flags, bytesperline, screen)
 {
-	_AllocateBuffer();
+	AllocateBuffer();
 }
 
 
 UtilityBitmap::UtilityBitmap(const ServerBitmap* bitmap)
 	: ServerBitmap(bitmap)
 {
-	_AllocateBuffer();
+	AllocateBuffer();
 
 	if (bitmap->Bits())
 		memcpy(Bits(), bitmap->Bits(), bitmap->BitsLength());
@@ -277,7 +264,7 @@ UtilityBitmap::UtilityBitmap(const uint8* alreadyPaddedData, uint32 width,
 		uint32 height, color_space format)
 	: ServerBitmap(BRect(0, 0, width - 1, height - 1), format, 0)
 {
-	_AllocateBuffer();
+	AllocateBuffer();
 	if (Bits())
 		memcpy(Bits(), alreadyPaddedData, BitsLength());
 }

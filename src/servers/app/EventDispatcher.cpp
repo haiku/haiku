@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -606,17 +606,18 @@ EventDispatcher::SetDragMessage(BMessage& message,
 
 	if (fLastButtons == 0) {
 		// mouse buttons has already been released or was never pressed
-		gBitmapManager->DeleteBitmap(bitmap);
+		bitmap->ReleaseReference();
 		return;
 	}
 
 	if (fDragBitmap != bitmap) {
 		if (fDragBitmap)
-			gBitmapManager->DeleteBitmap(fDragBitmap);
+			fDragBitmap->ReleaseReference();
+
 		fDragBitmap = bitmap;
 
 		if (fDragBitmap != NULL)
-			fDragBitmap->Acquire();
+			fDragBitmap->AcquireReference();
 	}
 
 	fHWInterface->SetDragBitmap(bitmap, offsetFromCursor);
@@ -749,8 +750,10 @@ EventDispatcher::_DeliverDragMessage()
 	fDraggingMessage = false;
 
 	fHWInterface->SetDragBitmap(NULL, B_ORIGIN);
-	gBitmapManager->DeleteBitmap(fDragBitmap);
-	fDragBitmap = NULL;
+	if (fDragBitmap != NULL) {
+		fDragBitmap->ReleaseReference();
+		fDragBitmap = NULL;
+	}
 }
 
 

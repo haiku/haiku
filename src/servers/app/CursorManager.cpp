@@ -1,12 +1,14 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  */
 
-/**	Handles the system's cursor infrastructure */
+
+/*!	Handles the system's cursor infrastructure */
+
 
 #include "CursorManager.h"
 
@@ -25,7 +27,8 @@
 
 
 CursorManager::CursorManager()
-	: BLocker("CursorManager")
+	:
+	BLocker("CursorManager")
 {
 	// Set system cursors to "unassigned"
 	// ToDo: decide about default cursor
@@ -74,6 +77,7 @@ CursorManager::~CursorManager()
 	}
 }
 
+
 ServerCursor*
 CursorManager::CreateCursor(team_id clientTeam, const uint8* cursorData)
 {
@@ -92,17 +96,16 @@ CursorManager::CreateCursor(team_id clientTeam, const uint8* cursorData)
 			}
 		}
 	} else {
-		cursor->Acquire();
+		cursor->AcquireReference();
 	}
 
 	Unlock();
-	
+
 	return cursor;
 }
 
 
-/*!
-	\brief Registers a cursor with the manager.
+/*!	\brief Registers a cursor with the manager.
 	\param cursor ServerCursor object to register
 	\return The token assigned to the cursor or B_ERROR if cursor is NULL
 */
@@ -132,8 +135,7 @@ CursorManager::AddCursor(ServerCursor* cursor, int32 token)
 }
 
 
-/*!
-	\brief Removes a cursor if it's not referenced anymore.
+/*!	\brief Removes a cursor if it's not referenced anymore.
 
 	If this was the last reference to this cursor, it will be deleted.
 	Only if the cursor is deleted, \c true is returned.
@@ -145,7 +147,7 @@ CursorManager::RemoveCursor(ServerCursor* cursor)
 		return false;
 
 	// TODO: this doesn't work as it looks like, and it's not safe!
-	if (cursor->ReferenceCount() > 0) {
+	if (cursor->CountReferences() > 0) {
 		// cursor has been referenced again in the mean time
 		Unlock();
 		return false;
@@ -158,8 +160,7 @@ CursorManager::RemoveCursor(ServerCursor* cursor)
 }
 
 
-/*!
-	\brief Removes and deletes all of an application's cursors
+/*!	\brief Removes and deletes all of an application's cursors
 	\param signature Signature to which the cursors belong
 */
 void
@@ -171,17 +172,16 @@ CursorManager::DeleteCursors(team_id team)
 	for (int32 index = fCursorList.CountItems(); index-- > 0;) {
 		ServerCursor *cursor = (ServerCursor*)fCursorList.ItemAtFast(index);
 		if (cursor->OwningTeam() == team)
-			cursor->Release();
+			cursor->ReleaseReference();
 	}
 
 	Unlock();
 }
 
 
-/*!
-	\brief Sets all the cursors from a specified CursorSet
+/*!	\brief Sets all the cursors from a specified CursorSet
 	\param path Path to the cursor set
-	
+
 	All cursors in the set will be assigned. If the set does not specify a
 	cursor for a particular cursor specifier, it will remain unchanged.
 	This function will fail if passed a NULL path, an invalid path, or the
@@ -200,65 +200,55 @@ CursorManager::SetCursorSet(const char *path)
 	ServerCursor *cursor = NULL;
 
 	if (cursorSet.FindCursor(B_CURSOR_DEFAULT, &cursor) == B_OK) {
-		if (fDefaultCursor)
-			delete fDefaultCursor;
+		delete fDefaultCursor;
 		fDefaultCursor = cursor;
 	}
 
 	if (cursorSet.FindCursor(B_CURSOR_TEXT, &cursor) == B_OK) {
-		if (fTextCursor)
-			delete fTextCursor;
+		delete fTextCursor;
 		fTextCursor = cursor;
 	}
 
 	if (cursorSet.FindCursor(B_CURSOR_MOVE, &cursor) == B_OK) {
-		if (fMoveCursor)
-			delete fMoveCursor;
+		delete fMoveCursor;
 		fMoveCursor = cursor;
 	}
 
 	if (cursorSet.FindCursor(B_CURSOR_DRAG, &cursor) == B_OK) {
-		if (fDragCursor)
-			delete fDragCursor;
+		delete fDragCursor;
 		fDragCursor = cursor;
 	}
 
 	if (cursorSet.FindCursor(B_CURSOR_RESIZE, &cursor) == B_OK) {
-		if (fResizeCursor)
-			delete fResizeCursor;
+		delete fResizeCursor;
 		fResizeCursor = cursor;
 	}
 
 	if (cursorSet.FindCursor(B_CURSOR_RESIZE_NWSE, &cursor) == B_OK) {
-		if (fNWSECursor)
-			delete fNWSECursor;
+		delete fNWSECursor;
 		fNWSECursor = cursor;
 	}
 
 	if (cursorSet.FindCursor(B_CURSOR_RESIZE_NESW, &cursor) == B_OK) {
-		if (fNESWCursor)
-			delete fNESWCursor;
+		delete fNESWCursor;
 		fNESWCursor = cursor;
 	}
 
 	if (cursorSet.FindCursor(B_CURSOR_RESIZE_NS, &cursor) == B_OK) {
-		if (fNSCursor)
-			delete fNSCursor;
+		delete fNSCursor;
 		fNSCursor = cursor;
 	}
 
 	if (cursorSet.FindCursor(B_CURSOR_RESIZE_EW, &cursor) == B_OK) {
-		if (fEWCursor)
-			delete fEWCursor;
+		delete fEWCursor;
 		fEWCursor = cursor;
 	}
 }
 
 
-/*!
-	\brief Acquire the cursor which is used for a particular system cursor
+/*!	\brief Acquire the cursor which is used for a particular system cursor
 	\param which Which system cursor to get
-	\return Pointer to the particular cursor used or NULL if which is 
+	\return Pointer to the particular cursor used or NULL if which is
 	invalid or the cursor has not been assigned
 */
 ServerCursor *
@@ -292,8 +282,7 @@ CursorManager::GetCursor(cursor_which which)
 }
 
 
-/*!
-	\brief Gets the current system cursor value
+/*!	\brief Gets the current system cursor value
 	\return The current cursor value or CURSOR_OTHER if some non-system cursor
 */
 cursor_which
@@ -310,11 +299,10 @@ CursorManager::GetCursorWhich()
 }
 
 
-/*!
-	\brief Sets the specified system cursor to the a particular cursor
+/*!	\brief Sets the specified system cursor to the a particular cursor
 	\param which Which system cursor to change
 	\param token The ID of the cursor to become the new one
-	
+
 	A word of warning: once a cursor has been assigned to the system, the
 	system will take ownership of the cursor and deleting the cursor
 	will have no effect on the system.
@@ -420,8 +408,7 @@ CursorManager::SetDefaults()
 }
 
 
-/*!
-	\brief Internal function which finds the cursor with a particular ID
+/*!	\brief Internal function which finds the cursor with a particular ID
 	\param token ID of the cursor to find
 	\return The cursor or NULL if not found
 */
@@ -464,16 +451,3 @@ CursorManager::_RemoveCursor(ServerCursor* cursor)
 	fCursorList.RemoveItem(cursor);
 	fTokenSpace.RemoveToken(cursor->fToken);
 }
-
-
-//ServerCursor*
-//CursorManager::_RemoveCursor(int32 index)
-//{
-//	ServerCursor* cursor = (ServerCursor*)fCursorList.RemoveItem(index);
-//	if (cursor != NULL)
-//		fTokenSpace.RemoveToken(cursor->fToken);
-//
-//	return cursor;
-//}
-
-

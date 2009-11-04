@@ -201,18 +201,11 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 }
 
 
-/*!	\brief Deletes a ServerBitmap.
-	\param bitmap The bitmap to delete
+/*!	\brief Called when a ServerBitmap is deleted.
 */
 void
-BitmapManager::DeleteBitmap(ServerBitmap* bitmap)
+BitmapManager::BitmapRemoved(ServerBitmap* bitmap)
 {
-	if (bitmap == NULL || !bitmap->_Release()) {
-		// there are other references to this bitmap, we don't have to delete
-		// it yet
-		return;
-	}
-
 	BAutolock locker(fLock);
 	if (!locker.IsLocked())
 		return;
@@ -220,11 +213,7 @@ BitmapManager::DeleteBitmap(ServerBitmap* bitmap)
 	if (bitmap->Overlay() != NULL)
 		fOverlays.RemoveItem(bitmap);
 
-	if (bitmap->Owner() != NULL)
-		bitmap->Owner()->BitmapRemoved(bitmap);
-
-	if (fBitmapList.RemoveItem(bitmap))
-		delete bitmap;
+	fBitmapList.RemoveItem(bitmap);
 }
 
 

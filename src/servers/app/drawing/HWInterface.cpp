@@ -152,12 +152,12 @@ HWInterface::SetCursor(ServerCursor* cursor)
 		}
 
 		if (fCursor)
-			fCursor->Release();
+			fCursor->ReleaseReference();
 
 		fCursor = cursor;
 
 		if (fCursor)
-			fCursor->Acquire();
+			fCursor->AcquireReference();
 
 		Invalidate(oldFrame);
 

@@ -1820,7 +1820,7 @@ fDesktop->LockSingleWindow();
 						colorKey = bitmap->Overlay()->Color();
 					}
 
-					bitmap->Release();
+					bitmap->ReleaseReference();
 				} else
 					status = B_BAD_VALUE;
 			}
@@ -1999,7 +1999,7 @@ fDesktop->UnlockSingleWindow();
 						fDesktop->EventDispatcher().SetDragMessage(dragMessage,
 							bitmap, offset);
 fDesktop->LockSingleWindow();
-						bitmap->Release();
+						bitmap->ReleaseReference();
 				}
 				delete[] buffer;
 			}
@@ -2283,7 +2283,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				drawingEngine->DrawBitmap(bitmap, info.bitmapRect,
 					info.viewRect, info.options);
 
-				bitmap->Release();
+				bitmap->ReleaseReference();
 			}
 			break;
 		}
@@ -3128,7 +3128,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 				bitmap->ColorSpace(), info.options, bitmap->Bits(),
 				bitmap->BitsLength());
 
-			bitmap->Release();
+			bitmap->ReleaseReference();
 			break;
 		}
 
