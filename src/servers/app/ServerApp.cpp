@@ -97,6 +97,7 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	fClientTeam(clientTeam),
 	fWindowListLock("window list"),
 	fTemporaryDisplayModeChange(0),
+	fMapLocker("server app maps"),
 	fAppCursor(NULL),
 	fViewCursor(NULL),
 	fCursorHideLevel(0),
@@ -188,12 +189,20 @@ ServerApp::~ServerApp()
 		fWindowListLock.Lock();
 	}
 
-	for (int32 i = fBitmapList.CountItems(); i-- > 0;) {
-		gBitmapManager->DeleteBitmap((ServerBitmap*)fBitmapList.ItemAt(i));
+	fMapLocker.Lock();
+
+	while (!fBitmapMap.empty()) {
+		ServerBitmap* bitmap = fBitmapMap.begin()->second;
+
+		fBitmapMap.erase(fBitmapMap.begin());
+		bitmap->Release();
 	}
 
-	for (int32 i = fPictureList.CountItems(); i-- > 0;) {
-		delete fPictureList.ItemAt(i);
+	while (!fPictureMap.empty()) {
+		ServerPicture* picture = fPictureMap.begin()->second;
+
+		fPictureMap.erase(fPictureMap.begin());
+		picture->ReleaseReference();
 	}
 
 	fDesktop->GetCursorManager().DeleteCursors(fClientTeam);
@@ -243,37 +252,6 @@ ServerApp::Quit(sem_id shutdownSemaphore)
 }
 
 
-/*!	\brief Send a message to the ServerApp's BApplication
-	\param message The message to send
-*/
-void
-ServerApp::SendMessageToClient(BMessage* message) const
-{
-	status_t status = fHandlerMessenger.SendMessage(message, (BHandler*)NULL,
-		100000);
-	if (status != B_OK) {
-		syslog(LOG_ERR, "app %s send to client failed: %s\n", Signature(),
-			strerror(status));
-	}
-}
-
-
-bool
-ServerApp::_HasWindowUnderMouse()
-{
-	BAutolock locker(fWindowListLock);
-
-	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
-		ServerWindow* serverWindow = fWindowList.ItemAt(i);
-
-		if (fDesktop->ViewUnderMouse(serverWindow->Window()) != B_NULL_TOKEN)
-			return true;
-	}
-
-	return false;
-}
-
-
 /*!	\brief Sets the ServerApp's active status
 	\param value The new status of the ServerApp.
 
@@ -298,6 +276,21 @@ ServerApp::Activate(bool value)
 			fDesktop->SetCursor(CurrentCursor());
 		}
 		fDesktop->HWInterface()->SetCursorVisible(fCursorHideLevel == 0);
+	}
+}
+
+
+/*!	\brief Send a message to the ServerApp's BApplication
+	\param message The message to send
+*/
+void
+ServerApp::SendMessageToClient(BMessage* message) const
+{
+	status_t status = fHandlerMessenger.SendMessage(message, (BHandler*)NULL,
+		100000);
+	if (status != B_OK) {
+		syslog(LOG_ERR, "app %s send to client failed: %s\n", Signature(),
+			strerror(status));
 	}
 }
 
@@ -330,92 +323,189 @@ ServerApp::CurrentCursor() const
 }
 
 
+bool
+ServerApp::AddWindow(ServerWindow* window)
+{
+	BAutolock locker(fWindowListLock);
+
+	return fWindowList.AddItem(window);
+}
+
+
+void
+ServerApp::RemoveWindow(ServerWindow* window)
+{
+	BAutolock locker(fWindowListLock);
+
+	fWindowList.RemoveItem(window);
+}
+
+
+bool
+ServerApp::InWorkspace(int32 index) const
+{
+	BAutolock locker(fWindowListLock);
+
+	// we could cache this, but then we'd have to recompute the cached
+	// value everytime a window has closed or changed workspaces
+
+	// TODO: support initial application workspace!
+
+	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
+		ServerWindow* serverWindow = fWindowList.ItemAt(i);
+
+		const Window* window = serverWindow->Window();
+		if (window == NULL || window->IsOffscreenWindow())
+			continue;
+
+		// only normal and unhidden windows count
+
+		if (window->IsNormal() && !window->IsHidden()
+			&& window->InWorkspace(index))
+			return true;
+	}
+
+	return false;
+}
+
+
+uint32
+ServerApp::Workspaces() const
+{
+	uint32 workspaces = 0;
+
+	BAutolock locker(fWindowListLock);
+
+	// we could cache this, but then we'd have to recompute the cached
+	// value everytime a window has closed or changed workspaces
+
+	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
+		ServerWindow* serverWindow = fWindowList.ItemAt(i);
+
+		const Window* window = serverWindow->Window();
+		if (window == NULL || window->IsOffscreenWindow())
+			continue;
+
+		// only normal and unhidden windows count
+
+		if (window->IsNormal() && !window->IsHidden())
+			workspaces |= window->Workspaces();
+	}
+
+	// TODO: add initial application workspace!
+	return workspaces;
+}
+
+
+/*!	\brief Acquires a reference of the desired bitmap, if available.
+	\param token ID token of the bitmap to find
+	\return The bitmap having that ID or NULL if not found
+*/
+ServerBitmap*
+ServerApp::GetBitmap(int32 token) const
+{
+	if (token < 1)
+		return NULL;
+
+	BAutolock _(fMapLocker);
+
+	ServerBitmap* bitmap = _FindBitmap(token);
+	if (bitmap == NULL)
+		return NULL;
+
+	bitmap->Acquire();
+
+	return bitmap;
+}
+
+
+bool
+ServerApp::BitmapAdded(ServerBitmap* bitmap)
+{
+	BAutolock _(fMapLocker);
+
+	try {
+		fBitmapMap.insert(std::make_pair(bitmap->Token(), bitmap));
+	} catch (std::bad_alloc& exception) {
+		return false;
+	}
+
+	return true;
+}
+
+
+void
+ServerApp::BitmapRemoved(ServerBitmap* bitmap)
+{
+	BAutolock _(fMapLocker);
+	fBitmapMap.erase(bitmap->Token());
+}
+
+
+ServerPicture*
+ServerApp::CreatePicture(const ServerPicture* original)
+{
+	ServerPicture* picture;
+	if (original != NULL)
+		picture = new(std::nothrow) ServerPicture(*original);
+	else
+		picture = new(std::nothrow) ServerPicture();
+
+	if (picture != NULL && !picture->SetOwner(this))
+		picture->ReleaseReference();
+
+	return picture;
+}
+
+
+ServerPicture*
+ServerApp::GetPicture(int32 token) const
+{
+	if (token < 1)
+		return NULL;
+
+	BAutolock _(fMapLocker);
+
+	ServerPicture* picture = _FindPicture(token);
+	if (picture == NULL)
+		return NULL;
+
+	picture->AcquireReference();
+
+	return picture;
+}
+
+
+bool
+ServerApp::PictureAdded(ServerPicture* picture)
+{
+	BAutolock _(fMapLocker);
+
+	try {
+		fPictureMap.insert(std::make_pair(picture->Token(), picture));
+	} catch (std::bad_alloc& exception) {
+		return false;
+	}
+
+	return true;
+}
+
+
+void
+ServerApp::PictureRemoved(ServerPicture* picture)
+{
+	BAutolock _(fMapLocker);
+	fPictureMap.erase(picture->Token());
+}
+
+
+// #pragma mark - private methods
+
+
 void
 ServerApp::_GetLooperName(char* name, size_t length)
 {
 	snprintf(name, length, "a:%ld:%s", ClientTeam(), SignatureLeaf());
-}
-
-
-/*!	\brief The thread function ServerApps use to monitor messages
-*/
-void
-ServerApp::_MessageLooper()
-{
-	// Message-dispatching loop for the ServerApp
-
-	// First let's tell the client how to talk with us.
-	fLink.StartMessage(B_OK);
-	fLink.Attach<port_id>(fMessagePort);
-	fLink.Attach<area_id>(fDesktop->SharedReadOnlyArea());
-	fLink.Flush();
-
-	BPrivate::LinkReceiver &receiver = fLink.Receiver();
-
-	int32 code;
-	status_t err = B_OK;
-
-	while (!fQuitting) {
-		STRACE(("info: ServerApp::_MessageLooper() listening on port %ld.\n",
-			fMessagePort));
-
-		err = receiver.GetNextMessage(code, B_INFINITE_TIMEOUT);
-		if (err != B_OK || code == B_QUIT_REQUESTED) {
-			STRACE(("ServerApp: application seems to be gone...\n"));
-
-			// Tell desktop to quit us
-			BPrivate::LinkSender link(fDesktop->MessagePort());
-			link.StartMessage(AS_DELETE_APP);
-			link.Attach<thread_id>(Thread());
-			link.Flush();
-			break;
-		}
-
-		switch (code) {
-			case kMsgAppQuit:
-				// we receive this from our destructor on quit
-				fQuitting = true;
-				break;
-
-			case AS_QUIT_APP:
-			{
-				// This message is received only when the app_server is asked
-				// to shut down in test/debug mode. Of course, if we are testing
-				// while using AccelerantDriver, we do NOT want to shut down
-				// client applications. The server can be quit in this fashion
-				// through the driver's interface, such as closing the
-				// ViewDriver's window.
-
-				STRACE(("ServerApp %s:Server shutdown notification received\n",
-					Signature()));
-
-				// If we are using the real, accelerated version of the
-				// DrawingEngine, we do NOT want the user to be able shut down
-				// the server. The results would NOT be pretty
-#if TEST_MODE
-				BMessage pleaseQuit(B_QUIT_REQUESTED);
-				SendMessageToClient(&pleaseQuit);
-#endif
-				break;
-			}
-
-			default:
-				STRACE(("ServerApp %s: Got a Message to dispatch\n",
-					Signature()));
-				_DispatchMessage(code, receiver);
-				break;
-		}
-	}
-
-	// Quit() will send us a message; we're handling the exiting procedure
-	thread_id sender;
-	sem_id shutdownSemaphore;
-	receive_data(&sender, &shutdownSemaphore, sizeof(sem_id));
-
-	delete this;
-
-	if (shutdownSemaphore >= B_OK)
-		release_sem(shutdownSemaphore);
 }
 
 
@@ -653,9 +743,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: Create Bitmap (%.1fx%.1f)\n",
 				Signature(), frame.Width() + 1, frame.Height() + 1));
 
-			if (bitmap != NULL && fBitmapList.AddItem(bitmap)) {
-				bitmap->SetOwner(this);
-
+			if (bitmap != NULL && bitmap->SetOwner(this)) {
 				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(bitmap->Token());
 				fLink.Attach<uint8>(allocationFlags);
@@ -665,11 +753,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.Attach<int32>(
 					fMemoryAllocator.AreaOffset(bitmap->AllocationCookie()));
 
-				if (allocationFlags & kFramebuffer)
+				if ((allocationFlags & kFramebuffer) != 0)
 					fLink.Attach<int32>(bitmap->BytesPerRow());
 			} else {
 				if (bitmap != NULL)
-					gBitmapManager->DeleteBitmap(bitmap);
+					bitmap->Release();
 
 				fLink.StartMessage(B_NO_MEMORY);
 			}
@@ -689,13 +777,17 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 token;
 			link.Read<int32>(&token);
 
-			ServerBitmap *bitmap = FindBitmap(token);
-			if (bitmap && fBitmapList.RemoveItem(bitmap)) {
+			fMapLocker.Lock();
+
+			ServerBitmap* bitmap = _FindBitmap(token);
+			if (bitmap != NULL) {
 				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", Signature(),
 					token));
 
-				gBitmapManager->DeleteBitmap(bitmap);
+				bitmap->Release();
 			}
+
+			fMapLocker.Unlock();
 			break;
 		}
 		case AS_GET_BITMAP_OVERLAY_RESTRICTIONS:
@@ -707,13 +799,15 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.Read<int32>(&token) != B_OK)
 				break;
 
-			ServerBitmap *bitmap = FindBitmap(token);
+			ServerBitmap* bitmap = GetBitmap(token);
 			if (bitmap != NULL) {
 				STRACE(("ServerApp %s: Get overlay restrictions for bitmap "
 					"%ld\n", Signature(), token));
 
 				status = fDesktop->HWInterface()->GetOverlayRestrictions(
 					bitmap->Overlay(), &restrictions);
+
+				bitmap->Release();
 			}
 
 			fLink.StartMessage(status);
@@ -752,7 +846,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				for (int32 i = 0; i < subPicturesCount; i++) {
 					int32 token = -1;
 					link.Read<int32>(&token);
-					if (ServerPicture* subPicture = FindPicture(token))
+
+					// TODO: do we actually need another reference here?
+					if (ServerPicture* subPicture = GetPicture(token))
 						picture->NestPicture(subPicture);
 				}
 				status = picture->ImportData(link);
@@ -771,8 +867,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			STRACE(("ServerApp %s: Delete Picture\n", Signature()));
 			int32 token;
-			if (link.Read<int32>(&token) == B_OK)
-				DeletePicture(token);
+			if (link.Read<int32>(&token) == B_OK) {
+				BAutolock _(fMapLocker);
+
+				ServerPicture* picture = _FindPicture(token);
+				if (picture != NULL)
+					picture->ReleaseReference();
+			}
 			break;
 		}
 
@@ -782,7 +883,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 token;
 			ServerPicture* original = NULL;
 			if (link.Read<int32>(&token) == B_OK)
-				original = FindPicture(token);
+				original = GetPicture(token);
 
 			if (original != NULL) {
 				ServerPicture* cloned = CreatePicture(original);
@@ -791,6 +892,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					fLink.Attach<int32>(cloned->Token());
 				} else
 					fLink.StartMessage(B_NO_MEMORY);
+
+				original->ReleaseReference();
 			} else
 				fLink.StartMessage(B_BAD_VALUE);
 
@@ -803,10 +906,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: Download Picture\n", Signature()));
 			int32 token;
 			link.Read<int32>(&token);
-			ServerPicture* picture = FindPicture(token);
+			ServerPicture* picture = GetPicture(token);
 			if (picture != NULL) {
 				picture->ExportData(fLink);
 					// ExportData() calls StartMessage() already
+				picture->ReleaseReference();
 			} else
 				fLink.StartMessage(B_ERROR);
 
@@ -2740,8 +2844,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_READ_BITMAP:
 		{
 			STRACE(("ServerApp %s: AS_READ_BITMAP\n", Signature()));
-			int32 bitmapToken;
-			link.Read<int32>(&bitmapToken);
+			int32 token;
+			link.Read<int32>(&token);
 
 			bool drawCursor = true;
 			link.Read<bool>(&drawCursor);
@@ -2749,13 +2853,15 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			BRect bounds;
 			link.Read<BRect>(&bounds);
 
-			ServerBitmap *bitmap = FindBitmap(bitmapToken);
+			ServerBitmap* bitmap = GetBitmap(token);
 			if (bitmap != NULL) {
 				if (fDesktop->GetDrawingEngine()->ReadBitmap(bitmap,
-					drawCursor, bounds) == B_OK) {
+						drawCursor, bounds) == B_OK) {
 					fLink.StartMessage(B_OK);
 				} else
 					fLink.StartMessage(B_BAD_VALUE);
+
+				gBitmapManager->DeleteBitmap(bitmap);
 			} else
 				fLink.StartMessage(B_BAD_VALUE);
 
@@ -2910,6 +3016,88 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 }
 
 
+/*!	\brief The thread function ServerApps use to monitor messages
+*/
+void
+ServerApp::_MessageLooper()
+{
+	// Message-dispatching loop for the ServerApp
+
+	// First let's tell the client how to talk with us.
+	fLink.StartMessage(B_OK);
+	fLink.Attach<port_id>(fMessagePort);
+	fLink.Attach<area_id>(fDesktop->SharedReadOnlyArea());
+	fLink.Flush();
+
+	BPrivate::LinkReceiver &receiver = fLink.Receiver();
+
+	int32 code;
+	status_t err = B_OK;
+
+	while (!fQuitting) {
+		STRACE(("info: ServerApp::_MessageLooper() listening on port %ld.\n",
+			fMessagePort));
+
+		err = receiver.GetNextMessage(code, B_INFINITE_TIMEOUT);
+		if (err != B_OK || code == B_QUIT_REQUESTED) {
+			STRACE(("ServerApp: application seems to be gone...\n"));
+
+			// Tell desktop to quit us
+			BPrivate::LinkSender link(fDesktop->MessagePort());
+			link.StartMessage(AS_DELETE_APP);
+			link.Attach<thread_id>(Thread());
+			link.Flush();
+			break;
+		}
+
+		switch (code) {
+			case kMsgAppQuit:
+				// we receive this from our destructor on quit
+				fQuitting = true;
+				break;
+
+			case AS_QUIT_APP:
+			{
+				// This message is received only when the app_server is asked
+				// to shut down in test/debug mode. Of course, if we are testing
+				// while using AccelerantDriver, we do NOT want to shut down
+				// client applications. The server can be quit in this fashion
+				// through the driver's interface, such as closing the
+				// ViewDriver's window.
+
+				STRACE(("ServerApp %s:Server shutdown notification received\n",
+					Signature()));
+
+				// If we are using the real, accelerated version of the
+				// DrawingEngine, we do NOT want the user to be able shut down
+				// the server. The results would NOT be pretty
+#if TEST_MODE
+				BMessage pleaseQuit(B_QUIT_REQUESTED);
+				SendMessageToClient(&pleaseQuit);
+#endif
+				break;
+			}
+
+			default:
+				STRACE(("ServerApp %s: Got a Message to dispatch\n",
+					Signature()));
+				_DispatchMessage(code, receiver);
+				break;
+		}
+	}
+
+	// Quit() will send us a message; we're handling the exiting procedure
+	thread_id sender;
+	sem_id shutdownSemaphore;
+	receive_data(&sender, &shutdownSemaphore, sizeof(sem_id));
+
+	delete this;
+
+	if (shutdownSemaphore >= B_OK)
+		release_sem(shutdownSemaphore);
+}
+
+
 status_t
 ServerApp::_CreateWindow(int32 code, BPrivate::LinkReceiver& link,
 	port_id& clientReplyPort)
@@ -2960,7 +3148,7 @@ ServerApp::_CreateWindow(int32 code, BPrivate::LinkReceiver& link,
 	ServerWindow *window = NULL;
 
 	if (code == AS_CREATE_OFFSCREEN_WINDOW) {
-		ServerBitmap* bitmap = FindBitmap(bitmapToken);
+		ServerBitmap* bitmap = GetBitmap(bitmapToken);
 
 		if (bitmap != NULL) {
 			window = new (nothrow) OffscreenServerWindow(title, this,
@@ -2996,44 +3184,14 @@ ServerApp::_CreateWindow(int32 code, BPrivate::LinkReceiver& link,
 
 
 bool
-ServerApp::AddWindow(ServerWindow* window)
+ServerApp::_HasWindowUnderMouse()
 {
 	BAutolock locker(fWindowListLock);
-
-	return fWindowList.AddItem(window);
-}
-
-
-void
-ServerApp::RemoveWindow(ServerWindow* window)
-{
-	BAutolock locker(fWindowListLock);
-
-	fWindowList.RemoveItem(window);
-}
-
-
-bool
-ServerApp::InWorkspace(int32 index) const
-{
-	BAutolock locker(fWindowListLock);
-
-	// we could cache this, but then we'd have to recompute the cached
-	// value everytime a window has closed or changed workspaces
-
-	// TODO: support initial application workspace!
 
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
 		ServerWindow* serverWindow = fWindowList.ItemAt(i);
 
-		const Window* window = serverWindow->Window();
-		if (window == NULL || window->IsOffscreenWindow())
-			continue;
-
-		// only normal and unhidden windows count
-
-		if (window->IsNormal() && !window->IsHidden()
-			&& window->InWorkspace(index))
+		if (fDesktop->ViewUnderMouse(serverWindow->Window()) != B_NULL_TOKEN)
 			return true;
 	}
 
@@ -3041,110 +3199,27 @@ ServerApp::InWorkspace(int32 index) const
 }
 
 
-uint32
-ServerApp::Workspaces() const
-{
-	uint32 workspaces = 0;
-
-	BAutolock locker(fWindowListLock);
-
-	// we could cache this, but then we'd have to recompute the cached
-	// value everytime a window has closed or changed workspaces
-
-	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
-		ServerWindow* serverWindow = fWindowList.ItemAt(i);
-
-		const Window* window = serverWindow->Window();
-		if (window == NULL || window->IsOffscreenWindow())
-			continue;
-
-		// only normal and unhidden windows count
-
-		if (window->IsNormal() && !window->IsHidden())
-			workspaces |= window->Workspaces();
-	}
-
-	// TODO: add initial application workspace!
-	return workspaces;
-}
-
-
-int32
-ServerApp::CountBitmaps() const
-{
-	return fBitmapList.CountItems();
-}
-
-
-/*!	\brief Looks up a ServerApp's ServerBitmap in its list
-	\param token ID token of the bitmap to find
-	\return The bitmap having that ID or NULL if not found
-*/
 ServerBitmap*
-ServerApp::FindBitmap(int32 token) const
+ServerApp::_FindBitmap(int32 token) const
 {
-	// TODO: we need to make sure the bitmap is ours?!
-	ServerBitmap* bitmap;
-	if (gTokenSpace.GetToken(token, kBitmapToken, (void**)&bitmap) == B_OK)
-		return bitmap;
+	ASSERT(fMapLock.IsLocked());
 
-	return NULL;
-}
+	BitmapMap::const_iterator iterator = fBitmapMap.find(token);
+	if (iterator == fBitmapMap.end())
+		return NULL;
 
-
-int32
-ServerApp::CountPictures() const
-{
-	return fPictureList.CountItems();
+	return iterator->second;
 }
 
 
 ServerPicture*
-ServerApp::CreatePicture(const ServerPicture* original)
+ServerApp::_FindPicture(int32 token) const
 {
-	ServerPicture* picture;
-	if (original != NULL)
-		picture = new(std::nothrow) ServerPicture(*original);
-	else
-		picture = new(std::nothrow) ServerPicture();
+	ASSERT(fMapLock.IsLocked());
 
-	if (picture != NULL)
-		fPictureList.AddItem(picture);
+	PictureMap::const_iterator iterator = fPictureMap.find(token);
+	if (iterator == fPictureMap.end())
+		return NULL;
 
-	return picture;
-}
-
-
-ServerPicture*
-ServerApp::FindPicture(int32 token) const
-{
-	// TODO: we need to make sure the picture is ours?!
-	ServerPicture* picture;
-	if (gTokenSpace.GetToken(token, kPictureToken, (void**)&picture) == B_OK)
-		return picture;
-
-	return NULL;
-}
-
-
-bool
-ServerApp::DeletePicture(int32 token)
-{
-	ServerPicture* picture = FindPicture(token);
-	if (picture == NULL)
-		return false;
-
-	if (!fPictureList.RemoveItem(picture))
-		return false;
-
-	delete picture;
-
-	return true;
-}
-
-
-team_id
-ServerApp::ClientTeam() const
-{
-	return fClientTeam;
+	return iterator->second;
 }

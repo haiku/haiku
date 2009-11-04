@@ -64,7 +64,7 @@ public:
 			void				SetCurrentCursor(ServerCursor* cursor);
 			ServerCursor*		CurrentCursor() const;
 
-			team_id				ClientTeam() const;
+			team_id				ClientTeam() const { return fClientTeam; }
 
 			const char*			Signature() const
 									{ return fSignature.String(); }
@@ -78,14 +78,15 @@ public:
 			int32				InitialWorkspace() const
 									{ return fInitialWorkspace; }
 
-			int32				CountBitmaps() const;
-			ServerBitmap*		FindBitmap(int32 token) const;
+			ServerBitmap*		GetBitmap(int32 token) const;
+			bool				BitmapAdded(ServerBitmap* bitmap);
+			void				BitmapRemoved(ServerBitmap* bitmap);
 
-			int32				CountPictures() const;
 			ServerPicture*		CreatePicture(
 									const ServerPicture* original = NULL);
-			ServerPicture*		FindPicture(int32 token) const;
-			bool				DeletePicture(int32 token);
+			ServerPicture*		GetPicture(int32 token) const;
+			bool				PictureAdded(ServerPicture* picture);
+			void				PictureRemoved(ServerPicture* picture);
 
 			Desktop*			GetDesktop() const { return fDesktop; }
 
@@ -94,17 +95,23 @@ public:
 			BPrivate::BTokenSpace& ViewTokens() { return fViewTokens; }
 
 private:
+	virtual	void				_GetLooperName(char* name, size_t size);
 	virtual	void				_DispatchMessage(int32 code,
 									BPrivate::LinkReceiver& link);
 	virtual	void				_MessageLooper();
-	virtual	void				_GetLooperName(char* name, size_t size);
 			status_t			_CreateWindow(int32 code,
 									BPrivate::LinkReceiver& link,
 									port_id& clientReplyPort);
 
 			bool				_HasWindowUnderMouse();
 
+			ServerBitmap*		_FindBitmap(int32 token) const;
+			ServerPicture*		_FindPicture(int32 token) const;
+
 private:
+	typedef std::map<int32, ServerBitmap*> BitmapMap;
+	typedef std::map<int32, ServerPicture*> PictureMap;
+
 			port_id				fMessagePort;
 			port_id				fClientReplyPort;
 									// our BApplication's event port
@@ -133,8 +140,9 @@ private:
 			// NOTE: Bitmaps and Pictures are stored globally, but ServerApps
 			// remember which ones they own so that they can destroy them when
 			// they quit.
-			BList				fBitmapList;
-			BObjectList<ServerPicture> fPictureList;
+	mutable	BLocker				fMapLocker;
+			BitmapMap			fBitmapMap;
+			PictureMap			fPictureMap;
 
 			ServerCursor*		fAppCursor;
 			ServerCursor*		fViewCursor;

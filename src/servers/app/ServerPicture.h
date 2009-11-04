@@ -14,6 +14,7 @@
 
 #include <ObjectList.h>
 #include <PictureDataWriter.h>
+#include <Referenceable.h>
 
 
 class ServerApp;
@@ -27,7 +28,7 @@ namespace BPrivate {
 class BList;
 
 
-class ServerPicture : public PictureDataWriter {
+class ServerPicture : public Referenceable, public PictureDataWriter {
 public:
 								ServerPicture();
 								ServerPicture(const ServerPicture& other);
@@ -36,6 +37,7 @@ public:
 								~ServerPicture();
 
 			int32				Token() { return fToken; }
+			bool				SetOwner(ServerApp* owner);
 
 			void				EnterStateChange();
 			void				ExitStateChange();
@@ -55,6 +57,9 @@ public:
 			status_t			ImportData(BPrivate::LinkReceiver& link);
 			status_t			ExportData(BPrivate::PortLink& link);
 
+protected:
+	virtual	void				LastReferenceReleased();
+
 private:
 	typedef BObjectList<ServerPicture> PictureList;
 
@@ -63,6 +68,7 @@ private:
 			BPositionIO*		fData;
 			PictureList*		fPictures;
 			ServerPicture*		fUsurped;
+			ServerApp*			fOwner;
 };
 
 #endif	// SERVER_PICTURE_H

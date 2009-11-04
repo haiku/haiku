@@ -29,11 +29,12 @@ class ServerApp;
 	all cursors. Every BBitmap has a shadow ServerBitmap object.
 */
 class ServerBitmap {
- public:
+public:
 	inline	bool			IsValid() const
 								{ return fBuffer != NULL; }
 
 			void			Acquire();
+			void			Release();
 
 	inline	uint8*			Bits() const
 								{ return fBuffer; }
@@ -68,7 +69,7 @@ class ServerBitmap {
 			void			SetOverlay(::Overlay* overlay);
 			::Overlay*		Overlay() const;
 
-			void			SetOwner(ServerApp* owner);
+			bool			SetOwner(ServerApp* owner);
 			ServerApp*		Owner() const;
 
 	//! Does a shallow copy of the bitmap passed to it
@@ -113,7 +114,7 @@ protected:
 };
 
 class UtilityBitmap : public ServerBitmap {
- public:
+public:
 							UtilityBitmap(BRect rect, color_space space,
 								uint32 flags, int32 bytesperline = -1,
 								screen_id screen = B_MAIN_SCREEN_ID);

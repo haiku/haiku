@@ -154,7 +154,7 @@ View::InitCheck() const
 {
 	if (fDrawState == NULL)
 		return B_NO_MEMORY;
-	
+
 	return B_OK;
 }
 
@@ -1291,7 +1291,7 @@ View::SetEventMask(uint32 eventMask, uint32 options)
 
 
 void
-View::SetCursor(ServerCursor *cursor)
+View::SetCursor(ServerCursor* cursor)
 {
 	if (cursor == fCursor)
 		return;
@@ -1307,9 +1307,18 @@ View::SetCursor(ServerCursor *cursor)
 
 
 void
-View::SetPicture(ServerPicture *picture)
+View::SetPicture(ServerPicture* picture)
 {
+	if (picture == fPicture)
+		return;
+
+	if (fPicture != NULL)
+		fPicture->ReleaseReference();
+
 	fPicture = picture;
+
+	if (fPicture != NULL)
+		fPicture->AcquireReference();
 }
 
 

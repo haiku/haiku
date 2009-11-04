@@ -220,6 +220,9 @@ BitmapManager::DeleteBitmap(ServerBitmap* bitmap)
 	if (bitmap->Overlay() != NULL)
 		fOverlays.RemoveItem(bitmap);
 
+	if (bitmap->Owner() != NULL)
+		bitmap->Owner()->BitmapRemoved(bitmap);
+
 	if (fBitmapList.RemoveItem(bitmap))
 		delete bitmap;
 }

@@ -460,12 +460,14 @@ static void
 draw_picture(View* view, BPoint where, int32 token)
 {
 	ServerPicture* picture
-		= view->Window()->ServerWindow()->App()->FindPicture(token);
+		= view->Window()->ServerWindow()->App()->GetPicture(token);
 	if (picture != NULL) {
 		view->SetDrawingOrigin(where);
 		view->PushState();
 		picture->Play(view);
 		view->PopState();
+
+		picture->ReleaseReference();
 	}
 }
 
@@ -781,7 +783,8 @@ ServerPicture::ServerPicture()
 	:
 	fFile(NULL),
 	fPictures(NULL),
-	fUsurped(NULL)
+	fUsurped(NULL),
+	fOwner(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 	fData = new(std::nothrow) BMallocIO();
@@ -795,7 +798,8 @@ ServerPicture::ServerPicture(const ServerPicture& picture)
 	fFile(NULL),
 	fData(NULL),
 	fPictures(NULL),
-	fUsurped(NULL)
+	fUsurped(NULL),
+	fOwner(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
@@ -821,7 +825,8 @@ ServerPicture::ServerPicture(const char* fileName, int32 offset)
 	fFile(NULL),
 	fData(NULL),
 	fPictures(NULL),
-	fUsurped(NULL)
+	fUsurped(NULL),
+	fOwner(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
@@ -848,10 +853,27 @@ ServerPicture::~ServerPicture()
 	delete fFile;
 	gTokenSpace.RemoveToken(fToken);
 
-	// We only delete the subpictures list, not the subpictures
-	// themselves, since the ServerApp keeps them in a list and
-	// will delete them on quit.
-	delete fPictures;
+	if (fPictures != NULL) {
+		for (int32 i = fPictures->CountItems(); i-- > 0;)
+			fPictures->ItemAt(i)->ReleaseReference();
+
+		delete fPictures;
+	}
+}
+
+
+bool
+ServerPicture::SetOwner(ServerApp* owner)
+{
+	if (fOwner != NULL)
+		fOwner->PictureRemoved(this);
+
+	if (owner != NULL && owner->PictureAdded(this)) {
+		fOwner = owner;
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -1081,4 +1103,14 @@ ServerPicture::ExportData(BPrivate::PortLink& link)
 
 	fData->Seek(oldPosition, SEEK_SET);
 	return status;
+}
+
+
+void
+ServerPicture::LastReferenceReleased()
+{
+	if (fOwner != NULL)
+		fOwner->PictureRemoved(this);
+
+	delete this;
 }

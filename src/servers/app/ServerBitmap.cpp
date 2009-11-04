@@ -15,11 +15,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "BitmapManager.h"
 #include "ClientMemoryAllocator.h"
 #include "ColorConversion.h"
 #include "HWInterface.h"
 #include "InterfacePrivate.h"
 #include "Overlay.h"
+#include "ServerApp.h"
+
 
 using std::nothrow;
 using namespace BPrivate;
@@ -127,6 +130,13 @@ ServerBitmap::Acquire()
 }
 
 
+void
+ServerBitmap::Release()
+{
+	gBitmapManager->DeleteBitmap(this);
+}
+
+
 bool
 ServerBitmap::_Release()
 {
@@ -212,10 +222,18 @@ ServerBitmap::Overlay() const
 }
 
 
-void
+bool
 ServerBitmap::SetOwner(ServerApp* owner)
 {
-	fOwner = owner;
+	if (fOwner != NULL)
+		fOwner->BitmapRemoved(this);
+
+	if (owner != NULL && owner->BitmapAdded(this)) {
+		fOwner = owner;
+		return true;
+	}
+
+	return false;
 }
 
 
