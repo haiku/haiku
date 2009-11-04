@@ -1949,7 +1949,9 @@ BTextView::CanEndLine(int32 offset)
 {
 	// TODO: This should be improved using the LocaleKit.
 	uint32 classification = _CharClassification(offset);
-	if (classification == CHAR_CLASS_END_OF_TEXT)
+
+	// wrapping is always allowed at end of text and at newlines
+	if (classification == CHAR_CLASS_END_OF_TEXT || ByteAt(offset) == B_ENTER)
 		return true;
 
 	uint32 nextClassification = _CharClassification(offset + 1);
