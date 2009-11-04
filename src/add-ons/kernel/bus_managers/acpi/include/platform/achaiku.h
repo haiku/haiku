@@ -127,12 +127,12 @@
 #define ACPI_USE_SYSTEM_CLIBRARY
 #define ACPI_USE_STANDARD_HEADERS
 
-/* TODO: add mutex or benaphore code 
-#define ACPI_MUTEX_TYPE				ACPI_OSL_MUTEX
-#define ACPI_MUTEX					sem_id				
+/* TODO: add mutex or benaphore code
+ we don't use mutex atm as it doesn't support timeout.
+ define ACPI_MUTEX_TYPE				ACPI_OSL_MUTEX
+ define ACPI_MUTEX					mutex *				
 */
-
-//#define ACPI_MUTEX_DEBUG				
+	
 #define ACPI_USE_NATIVE_DIVIDE
 
 #define ACPI_THREAD_ID				thread_id
@@ -152,11 +152,8 @@
 
 #include <KernelExport.h>
 
+/* ACPI's own impl is adequate. */
 #define ACPI_USE_LOCAL_CACHE
-
-
-/* TODO: Use Haiku's slab code */
-//#define ACPI_CACHE_T                struct kmem_cache
 
 #define ACPI_FLUSH_CPU_CACHE() __asm __volatile("wbinvd");
 
