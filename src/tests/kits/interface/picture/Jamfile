@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src tests kits interface picture ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 # libicon.a source directories
 local iconSourceDirs =
 	icon
@@ -22,4 +24,9 @@ SimpleTest PictureTest :
 	PictureTest.cpp
 	SVGViewView.cpp
 	: be translation libexpat.a $(TARGET_LIBSUPC++)
-	;	
+	;
+
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : PictureTest
+		: tests!apps ;
+}
