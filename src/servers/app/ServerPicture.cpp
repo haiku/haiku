@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,11 +9,12 @@
  */
 
 
+#include "ServerPicture.h"
+
 #include "DrawingEngine.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
 #include "ServerFont.h"
-#include "ServerPicture.h"
 #include "ServerTokenSpace.h"
 #include "View.h"
 #include "Window.h"
@@ -35,21 +36,23 @@
 #include <stdio.h>
 #include <stack>
 
+
 using std::stack;
+
 
 class ShapePainter : public BShapeIterator {
 public:
 	ShapePainter();
 	virtual ~ShapePainter();
 
-	status_t Iterate(const BShape *shape);
+	status_t Iterate(const BShape* shape);
 
-	virtual status_t IterateMoveTo(BPoint *point);
-	virtual status_t IterateLineTo(int32 lineCount, BPoint *linePts);
-	virtual status_t IterateBezierTo(int32 bezierCount, BPoint *bezierPts);
+	virtual status_t IterateMoveTo(BPoint* point);
+	virtual status_t IterateLineTo(int32 lineCount, BPoint* linePts);
+	virtual status_t IterateBezierTo(int32 bezierCount, BPoint* bezierPts);
 	virtual status_t IterateClose();
 
-	void Draw(View *view, BRect frame, bool filled);
+	void Draw(View* view, BRect frame, bool filled);
 
 private:
 	stack<uint32> fOpStack;
@@ -58,7 +61,6 @@ private:
 
 
 ShapePainter::ShapePainter()
-	:	BShapeIterator()
 {
 }
 
@@ -69,15 +71,15 @@ ShapePainter::~ShapePainter()
 
 
 status_t
-ShapePainter::Iterate(const BShape *shape)
+ShapePainter::Iterate(const BShape* shape)
 {
 	// this class doesn't modify the shape data
-	return BShapeIterator::Iterate(const_cast<BShape *>(shape));
+	return BShapeIterator::Iterate(const_cast<BShape*>(shape));
 }
 
 
 status_t
-ShapePainter::IterateMoveTo(BPoint *point)
+ShapePainter::IterateMoveTo(BPoint* point)
 {
 	fOpStack.push(OP_MOVETO);
 	fPtStack.push(*point);
@@ -87,7 +89,7 @@ ShapePainter::IterateMoveTo(BPoint *point)
 
 
 status_t
-ShapePainter::IterateLineTo(int32 lineCount, BPoint *linePts)
+ShapePainter::IterateLineTo(int32 lineCount, BPoint* linePts)
 {
 	fOpStack.push(OP_LINETO | lineCount);
 	for (int32 i = 0; i < lineCount; i++)
@@ -98,7 +100,7 @@ ShapePainter::IterateLineTo(int32 lineCount, BPoint *linePts)
 
 
 status_t
-ShapePainter::IterateBezierTo(int32 bezierCount, BPoint *bezierPts)
+ShapePainter::IterateBezierTo(int32 bezierCount, BPoint* bezierPts)
 {
 	bezierCount *= 3;
 	fOpStack.push(OP_BEZIERTO | bezierCount);
@@ -119,7 +121,7 @@ ShapePainter::IterateClose(void)
 
 
 void
-ShapePainter::Draw(View *view, BRect frame, bool filled)
+ShapePainter::Draw(View* view, BRect frame, bool filled)
 {
 	// We're going to draw the currently iterated shape.
 	int32 opCount = fOpStack.size();
@@ -127,17 +129,17 @@ ShapePainter::Draw(View *view, BRect frame, bool filled)
 
 	if (opCount > 0 && ptCount > 0) {
 		int32 i;
-		uint32 *opList = new (std::nothrow) uint32[opCount];
+		uint32* opList = new(std::nothrow) uint32[opCount];
 		if (opList == NULL)
 			return;
 
-		BPoint *ptList = new (std::nothrow) BPoint[ptCount];
+		BPoint* ptList = new(std::nothrow) BPoint[ptCount];
 		if (ptList == NULL) {
 			delete[] opList;
 			return;
 		}
 
-		for (i = (opCount - 1); i >= 0; i--) {
+		for (i = opCount - 1; i >= 0; i--) {
 			opList[i] = fOpStack.top();
 			fOpStack.pop();
 		}
@@ -157,12 +159,14 @@ ShapePainter::Draw(View *view, BRect frame, bool filled)
 }
 
 
-// drawing functions
+// #pragma mark - drawing functions
+
+
 static void
-get_polygon_frame(const BPoint *points, int32 numPoints, BRect *_frame)
+get_polygon_frame(const BPoint* points, int32 numPoints, BRect* _frame)
 {
 	ASSERT(numPoints > 0);
-	
+
 	float left = points->x;
 	float top = points->y;
 	float right = left;
@@ -194,7 +198,7 @@ nop()
 
 
 static void
-move_pen_by(View *view, BPoint delta)
+move_pen_by(View* view, BPoint delta)
 {
 	view->CurrentState()->SetPenLocation(
 		view->CurrentState()->PenLocation() + delta);
@@ -202,7 +206,7 @@ move_pen_by(View *view, BPoint delta)
 
 
 static void
-stroke_line(View *view, BPoint start, BPoint end)
+stroke_line(View* view, BPoint start, BPoint end)
 {
 	BPoint penPos = end;
 
@@ -218,7 +222,7 @@ stroke_line(View *view, BPoint start, BPoint end)
 
 
 static void
-stroke_rect(View *view, BRect rect)
+stroke_rect(View* view, BRect rect)
 {
 	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->StrokeRect(rect);
@@ -226,7 +230,7 @@ stroke_rect(View *view, BRect rect)
 
 
 static void
-fill_rect(View *view, BRect rect)
+fill_rect(View* view, BRect rect)
 {
 	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->FillRect(rect);
@@ -234,7 +238,7 @@ fill_rect(View *view, BRect rect)
 
 
 static void
-stroke_round_rect(View *view, BRect rect, BPoint radii)
+stroke_round_rect(View* view, BRect rect, BPoint radii)
 {
 	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x,
@@ -243,7 +247,7 @@ stroke_round_rect(View *view, BRect rect, BPoint radii)
 
 
 static void
-fill_round_rect(View *view, BRect rect, BPoint radii)
+fill_round_rect(View* view, BRect rect, BPoint radii)
 {
 	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x,
@@ -252,7 +256,7 @@ fill_round_rect(View *view, BRect rect, BPoint radii)
 
 
 static void
-stroke_bezier(View *view, const BPoint *viewPoints)
+stroke_bezier(View* view, const BPoint* viewPoints)
 {
 	BPoint points[4];
 	view->ConvertToScreenForDrawing(points, viewPoints, 4);
@@ -262,7 +266,7 @@ stroke_bezier(View *view, const BPoint *viewPoints)
 
 
 static void
-fill_bezier(View *view, const BPoint *viewPoints)
+fill_bezier(View* view, const BPoint* viewPoints)
 {
 	BPoint points[4];
 	view->ConvertToScreenForDrawing(points, viewPoints, 4);
@@ -272,7 +276,7 @@ fill_bezier(View *view, const BPoint *viewPoints)
 
 
 static void
-stroke_arc(View *view, BPoint center, BPoint radii, float startTheta,
+stroke_arc(View* view, BPoint center, BPoint radii, float startTheta,
 	float arcTheta)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
@@ -284,7 +288,7 @@ stroke_arc(View *view, BPoint center, BPoint radii, float startTheta,
 
 
 static void
-fill_arc(View *view, BPoint center, BPoint radii, float startTheta,
+fill_arc(View* view, BPoint center, BPoint radii, float startTheta,
 	float arcTheta)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
@@ -296,7 +300,7 @@ fill_arc(View *view, BPoint center, BPoint radii, float startTheta,
 
 
 static void
-stroke_ellipse(View *view, BPoint center, BPoint radii)
+stroke_ellipse(View* view, BPoint center, BPoint radii)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
@@ -306,7 +310,7 @@ stroke_ellipse(View *view, BPoint center, BPoint radii)
 
 
 static void
-fill_ellipse(View *view, BPoint center, BPoint radii)
+fill_ellipse(View* view, BPoint center, BPoint radii)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
@@ -316,7 +320,7 @@ fill_ellipse(View *view, BPoint center, BPoint radii)
 
 
 static void
-stroke_polygon(View *view, int32 numPoints, const BPoint *viewPoints,
+stroke_polygon(View* view, int32 numPoints, const BPoint* viewPoints,
 	bool isClosed)
 {
 	if (numPoints <= 0)
@@ -326,7 +330,7 @@ stroke_polygon(View *view, int32 numPoints, const BPoint *viewPoints,
 		// fast path: no malloc/free, also avoid
 		// constructor/destructor calls
 		char data[200 * sizeof(BPoint)];
-		BPoint *points = (BPoint *)data;
+		BPoint* points = (BPoint*)data;
 
 		view->ConvertToScreenForDrawing(points, viewPoints, numPoints);
 
@@ -338,8 +342,8 @@ stroke_polygon(View *view, int32 numPoints, const BPoint *viewPoints,
 	} else {
 		 // avoid constructor/destructor calls by
 		 // using malloc instead of new []
-		BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint));
-		if (!points)
+		BPoint* points = (BPoint*)malloc(numPoints * sizeof(BPoint));
+		if (points == NULL)
 			return;
 
 		view->ConvertToScreenForDrawing(points, viewPoints, numPoints);
@@ -355,7 +359,7 @@ stroke_polygon(View *view, int32 numPoints, const BPoint *viewPoints,
 
 
 static void
-fill_polygon(View *view, int32 numPoints, const BPoint *viewPoints)
+fill_polygon(View* view, int32 numPoints, const BPoint* viewPoints)
 {
 	if (numPoints <= 0)
 		return;
@@ -364,7 +368,7 @@ fill_polygon(View *view, int32 numPoints, const BPoint *viewPoints)
 		// fast path: no malloc/free, also avoid
 		// constructor/destructor calls
 		char data[200 * sizeof(BPoint)];
-		BPoint *points = (BPoint *)data;
+		BPoint* points = (BPoint*)data;
 
 		view->ConvertToScreenForDrawing(points, viewPoints, numPoints);
 
@@ -376,8 +380,8 @@ fill_polygon(View *view, int32 numPoints, const BPoint *viewPoints)
 	} else {
 		 // avoid constructor/destructor calls by
 		 // using malloc instead of new []
-		BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint));
-		if (!points)
+		BPoint* points = (BPoint*)malloc(numPoints * sizeof(BPoint));
+		if (points == NULL)
 			return;
 
 		view->ConvertToScreenForDrawing(points, viewPoints, numPoints);
@@ -393,7 +397,7 @@ fill_polygon(View *view, int32 numPoints, const BPoint *viewPoints)
 
 
 static void
-stroke_shape(View *view, const BShape *shape)
+stroke_shape(View* view, const BShape* shape)
 {
 	ShapePainter drawShape;
 
@@ -403,7 +407,7 @@ stroke_shape(View *view, const BShape *shape)
 
 
 static void
-fill_shape(View *view, const BShape *shape)
+fill_shape(View* view, const BShape* shape)
 {
 	ShapePainter drawShape;
 
@@ -413,7 +417,7 @@ fill_shape(View *view, const BShape *shape)
 
 
 static void
-draw_string(View *view, const char *string, float deltaSpace,
+draw_string(View* view, const char* string, float deltaSpace,
 	float deltaNonSpace)
 {
 	// NOTE: the picture data was recorded with a "set pen location"
@@ -435,9 +439,9 @@ draw_string(View *view, const char *string, float deltaSpace,
 
 
 static void
-draw_pixels(View *view, BRect src, BRect dest, int32 width,
+draw_pixels(View* view, BRect src, BRect dest, int32 width,
 	int32 height, int32 bytesPerRow, int32 pixelFormat, int32 options,
-	const void *data)
+	const void* data)
 {
 	UtilityBitmap bitmap(BRect(0, 0, width - 1, height - 1),
 		(color_space)pixelFormat, 0, bytesPerRow);
@@ -448,17 +452,15 @@ draw_pixels(View *view, BRect src, BRect dest, int32 width,
 	memcpy(bitmap.Bits(), data, height * bytesPerRow);
 
 	view->ConvertToScreenForDrawing(&dest);
-
-	view->Window()->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest,
-		options);
+	view->Window()->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest, options);
 }
 
 
 static void
-draw_picture(View *view, BPoint where, int32 token)
+draw_picture(View* view, BPoint where, int32 token)
 {
-	ServerPicture *picture =
-		view->Window()->ServerWindow()->App()->FindPicture(token);
+	ServerPicture* picture
+		= view->Window()->ServerWindow()->App()->FindPicture(token);
 	if (picture != NULL) {
 		view->SetDrawingOrigin(where);
 		view->PushState();
@@ -469,7 +471,7 @@ draw_picture(View *view, BPoint where, int32 token)
 
 
 static void
-set_clipping_rects(View *view, const BRect *rects, uint32 numRects)
+set_clipping_rects(View* view, const BRect* rects, uint32 numRects)
 {
 	// TODO: This might be too slow, we should copy the rects
 	// directly to BRegion's internal data
@@ -482,23 +484,22 @@ set_clipping_rects(View *view, const BRect *rects, uint32 numRects)
 
 
 static void
-clip_to_picture(View *view, BPicture *picture, BPoint pt,
-	bool clip_to_inverse_picture)
+clip_to_picture(View* view, BPicture* picture, BPoint pt, bool clipToInverse)
 {
 	printf("ClipToPicture(picture, BPoint(%.2f, %.2f), %s)\n",
-		pt.x, pt.y, clip_to_inverse_picture ? "inverse" : "");
+		pt.x, pt.y, clipToInverse ? "inverse" : "");
 }
 
 
 static void
-push_state(View *view)
+push_state(View* view)
 {
 	view->PushState();
 }
 
 
 static void
-pop_state(View *view)
+pop_state(View* view)
 {
 	view->PopState();
 
@@ -512,26 +513,26 @@ pop_state(View *view)
 // TODO: Be smart and actually take advantage of these methods:
 // only apply state changes when they are called
 static void
-enter_state_change(View *view)
+enter_state_change(View* view)
 {
 }
 
 
 static void
-exit_state_change(View *view)
+exit_state_change(View* view)
 {
 	view->Window()->ServerWindow()->ResyncDrawState();
 }
 
 
 static void
-enter_font_state(View *view)
+enter_font_state(View* view)
 {
 }
 
 
 static void
-exit_font_state(View *view)
+exit_font_state(View* view)
 {
 	view->Window()->GetDrawingEngine()->SetFont(
 		view->CurrentState()->Font());
@@ -539,14 +540,14 @@ exit_font_state(View *view)
 
 
 static void
-set_origin(View *view, BPoint pt)
+set_origin(View* view, BPoint pt)
 {
 	view->CurrentState()->SetOrigin(pt);
 }
 
 
 static void
-set_pen_location(View *view, BPoint pt)
+set_pen_location(View* view, BPoint pt)
 {
 	view->CurrentState()->SetPenLocation(pt);
 	// the DrawingEngine/Painter does not need to be updated, since this
@@ -556,7 +557,7 @@ set_pen_location(View *view, BPoint pt)
 
 
 static void
-set_drawing_mode(View *view, drawing_mode mode)
+set_drawing_mode(View* view, drawing_mode mode)
 {
 	view->CurrentState()->SetDrawingMode(mode);
 	view->Window()->GetDrawingEngine()->SetDrawingMode(mode);
@@ -564,10 +565,10 @@ set_drawing_mode(View *view, drawing_mode mode)
 
 
 static void
-set_line_mode(View *view, cap_mode capMode, join_mode joinMode,
+set_line_mode(View* view, cap_mode capMode, join_mode joinMode,
 	float miterLimit)
 {
-	DrawState *state = view->CurrentState();
+	DrawState* state = view->CurrentState();
 	state->SetLineCapMode(capMode);
 	state->SetLineJoinMode(joinMode);
 	state->SetMiterLimit(miterLimit);
@@ -577,7 +578,7 @@ set_line_mode(View *view, cap_mode capMode, join_mode joinMode,
 
 
 static void
-set_pen_size(View *view, float size)
+set_pen_size(View* view, float size)
 {
 	view->CurrentState()->SetPenSize(size);
 	view->Window()->GetDrawingEngine()->SetPenSize(
@@ -588,7 +589,7 @@ set_pen_size(View *view, float size)
 
 
 static void
-set_fore_color(View *view, rgb_color color)
+set_fore_color(View* view, rgb_color color)
 {
 	view->CurrentState()->SetHighColor(color);
 	view->Window()->GetDrawingEngine()->SetHighColor(color);
@@ -596,7 +597,7 @@ set_fore_color(View *view, rgb_color color)
 
 
 static void
-set_back_color(View *view, rgb_color color)
+set_back_color(View* view, rgb_color color)
 {
 	view->CurrentState()->SetLowColor(color);
 	view->Window()->GetDrawingEngine()->SetLowColor(color);
@@ -604,7 +605,7 @@ set_back_color(View *view, rgb_color color)
 
 
 static void
-set_stipple_pattern(View *view, pattern p)
+set_stipple_pattern(View* view, pattern p)
 {
 	view->CurrentState()->SetPattern(Pattern(p));
 	view->Window()->GetDrawingEngine()->SetPattern(p);
@@ -612,7 +613,7 @@ set_stipple_pattern(View *view, pattern p)
 
 
 static void
-set_scale(View *view, float scale)
+set_scale(View* view, float scale)
 {
 	view->CurrentState()->SetScale(scale);
 	view->Window()->ServerWindow()->ResyncDrawState();
@@ -623,29 +624,29 @@ set_scale(View *view, float scale)
 
 
 static void
-set_font_family(View *view, const char *family)
+set_font_family(View* view, const char* family)
 {
-	FontStyle *fontStyle = gFontManager->GetStyleByIndex(family, 0);
+	FontStyle* fontStyle = gFontManager->GetStyleByIndex(family, 0);
 	ServerFont font;
-	font.SetStyle(fontStyle);
-	view->CurrentState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);	
-}
-
-
-static void
-set_font_style(View *view, const char *style)
-{
-	ServerFont font(view->CurrentState()->Font());
-	
-	FontStyle *fontStyle = gFontManager->GetStyle(font.Family(), style);
-	
 	font.SetStyle(fontStyle);
 	view->CurrentState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
 }
 
 
 static void
-set_font_spacing(View *view, int32 spacing)
+set_font_style(View* view, const char* style)
+{
+	ServerFont font(view->CurrentState()->Font());
+
+	FontStyle* fontStyle = gFontManager->GetStyle(font.Family(), style);
+
+	font.SetStyle(fontStyle);
+	view->CurrentState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
+}
+
+
+static void
+set_font_spacing(View* view, int32 spacing)
 {
 	ServerFont font;
 	font.SetSpacing(spacing);
@@ -654,7 +655,7 @@ set_font_spacing(View *view, int32 spacing)
 
 
 static void
-set_font_size(View *view, float size)
+set_font_size(View* view, float size)
 {
 	ServerFont font;
 	font.SetSize(size);
@@ -663,7 +664,7 @@ set_font_size(View *view, float size)
 
 
 static void
-set_font_rotate(View *view, float rotation)
+set_font_rotate(View* view, float rotation)
 {
 	ServerFont font;
 	font.SetRotation(rotation);
@@ -672,7 +673,7 @@ set_font_rotate(View *view, float rotation)
 
 
 static void
-set_font_encoding(View *view, int32 encoding)
+set_font_encoding(View* view, int32 encoding)
 {
 	ServerFont font;
 	font.SetEncoding(encoding);
@@ -681,7 +682,7 @@ set_font_encoding(View *view, int32 encoding)
 
 
 static void
-set_font_flags(View *view, int32 flags)
+set_font_flags(View* view, int32 flags)
 {
 	ServerFont font;
 	font.SetFlags(flags);
@@ -690,7 +691,7 @@ set_font_flags(View *view, int32 flags)
 
 
 static void
-set_font_shear(View *view, float shear)
+set_font_shear(View* view, float shear)
 {
 	ServerFont font;
 	font.SetShear(shear);
@@ -699,7 +700,7 @@ set_font_shear(View *view, float shear)
 
 
 static void
-set_font_face(View *view, int32 face)
+set_font_face(View* view, int32 face)
 {
 	ServerFont font;
 	font.SetFace(face);
@@ -708,7 +709,7 @@ set_font_face(View *view, int32 face)
 
 
 static void
-set_blending_mode(View *view, int16 alphaSrcMode, int16 alphaFncMode)
+set_blending_mode(View* view, int16 alphaSrcMode, int16 alphaFncMode)
 {
 	view->CurrentState()->SetBlendingMode((source_alpha)alphaSrcMode,
 		(alpha_function)alphaFncMode);
@@ -721,77 +722,76 @@ reserved()
 }
 
 
-const static void *kTableEntries[] = {
-	(const void *)nop,					//	0
-	(const void *)move_pen_by,			
-	(const void *)stroke_line,
-	(const void *)stroke_rect,
-	(const void *)fill_rect,
-	(const void *)stroke_round_rect,	//	5
-	(const void *)fill_round_rect,
-	(const void *)stroke_bezier,
-	(const void *)fill_bezier,
-	(const void *)stroke_arc,
-	(const void *)fill_arc,				//	10
-	(const void *)stroke_ellipse,
-	(const void *)fill_ellipse,
-	(const void *)stroke_polygon,
-	(const void *)fill_polygon,
-	(const void *)stroke_shape,			//	15
-	(const void *)fill_shape,
-	(const void *)draw_string,
-	(const void *)draw_pixels,
-	(const void *)draw_picture,
-	(const void *)set_clipping_rects,	//	20
-	(const void *)clip_to_picture,
-	(const void *)push_state,
-	(const void *)pop_state,
-	(const void *)enter_state_change,
-	(const void *)exit_state_change,	//	25
-	(const void *)enter_font_state,
-	(const void *)exit_font_state,
-	(const void *)set_origin,
-	(const void *)set_pen_location,
-	(const void *)set_drawing_mode,		//	30
-	(const void *)set_line_mode,
-	(const void *)set_pen_size,
-	(const void *)set_fore_color,
-	(const void *)set_back_color,
-	(const void *)set_stipple_pattern,	//	35
-	(const void *)set_scale,
-	(const void *)set_font_family,
-	(const void *)set_font_style,
-	(const void *)set_font_spacing,
-	(const void *)set_font_size,		//	40
-	(const void *)set_font_rotate,
-	(const void *)set_font_encoding,
-	(const void *)set_font_flags,
-	(const void *)set_font_shear,
-	(const void *)reserved,				//	45
-	(const void *)set_font_face,
-	(const void *)set_blending_mode		//	47
+const static void* kTableEntries[] = {
+	(const void*)nop,					//	0
+	(const void*)move_pen_by,
+	(const void*)stroke_line,
+	(const void*)stroke_rect,
+	(const void*)fill_rect,
+	(const void*)stroke_round_rect,	//	5
+	(const void*)fill_round_rect,
+	(const void*)stroke_bezier,
+	(const void*)fill_bezier,
+	(const void*)stroke_arc,
+	(const void*)fill_arc,				//	10
+	(const void*)stroke_ellipse,
+	(const void*)fill_ellipse,
+	(const void*)stroke_polygon,
+	(const void*)fill_polygon,
+	(const void*)stroke_shape,			//	15
+	(const void*)fill_shape,
+	(const void*)draw_string,
+	(const void*)draw_pixels,
+	(const void*)draw_picture,
+	(const void*)set_clipping_rects,	//	20
+	(const void*)clip_to_picture,
+	(const void*)push_state,
+	(const void*)pop_state,
+	(const void*)enter_state_change,
+	(const void*)exit_state_change,	//	25
+	(const void*)enter_font_state,
+	(const void*)exit_font_state,
+	(const void*)set_origin,
+	(const void*)set_pen_location,
+	(const void*)set_drawing_mode,		//	30
+	(const void*)set_line_mode,
+	(const void*)set_pen_size,
+	(const void*)set_fore_color,
+	(const void*)set_back_color,
+	(const void*)set_stipple_pattern,	//	35
+	(const void*)set_scale,
+	(const void*)set_font_family,
+	(const void*)set_font_style,
+	(const void*)set_font_spacing,
+	(const void*)set_font_size,		//	40
+	(const void*)set_font_rotate,
+	(const void*)set_font_encoding,
+	(const void*)set_font_flags,
+	(const void*)set_font_shear,
+	(const void*)reserved,				//	45
+	(const void*)set_font_face,
+	(const void*)set_blending_mode		//	47
 };
 
 
-// ServerPicture
+// #pragma mark - ServerPicture
+
+
 ServerPicture::ServerPicture()
 	:
-	PictureDataWriter(),
 	fFile(NULL),
-	fData(NULL),
 	fPictures(NULL),
 	fUsurped(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
-	fData = new (std::nothrow) BMallocIO();
+	fData = new(std::nothrow) BMallocIO();
 
 	PictureDataWriter::SetTo(fData);
 }
 
 
-ServerPicture::ServerPicture(const ServerPicture &picture)
+ServerPicture::ServerPicture(const ServerPicture& picture)
 	:
-	PictureDataWriter(),
 	fFile(NULL),
 	fData(NULL),
 	fPictures(NULL),
@@ -799,7 +799,7 @@ ServerPicture::ServerPicture(const ServerPicture &picture)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
-	BMallocIO *mallocIO = new (std::nothrow) BMallocIO();
+	BMallocIO* mallocIO = new(std::nothrow) BMallocIO();
 	if (mallocIO == NULL)
 		return;
 
@@ -809,16 +809,15 @@ ServerPicture::ServerPicture(const ServerPicture &picture)
 	if (mallocIO->SetSize(size) < B_OK)
 		return;
 
-	picture.fData->ReadAt(0, const_cast<void *>(mallocIO->Buffer()),
+	picture.fData->ReadAt(0, const_cast<void*>(mallocIO->Buffer()),
 		size);
 
 	PictureDataWriter::SetTo(fData);
 }
 
 
-ServerPicture::ServerPicture(const char *fileName, const int32 &offset)
+ServerPicture::ServerPicture(const char* fileName, int32 offset)
 	:
-	PictureDataWriter(),
 	fFile(NULL),
 	fData(NULL),
 	fPictures(NULL),
@@ -826,13 +825,12 @@ ServerPicture::ServerPicture(const char *fileName, const int32 &offset)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
-	fFile = new (std::nothrow) BFile(fileName, B_READ_WRITE);
+	fFile = new(std::nothrow) BFile(fileName, B_READ_WRITE);
 	if (fFile == NULL)
 		return;
 
-	BPrivate::Storage::OffsetFile *offsetFile =
-		new (std::nothrow) BPrivate::Storage::OffsetFile(fFile,
-			(off_t)offset);
+	BPrivate::Storage::OffsetFile* offsetFile
+		= new(std::nothrow) BPrivate::Storage::OffsetFile(fFile, offset);
 	if (offsetFile == NULL || offsetFile->InitCheck() != B_OK) {
 		delete offsetFile;
 		return;
@@ -872,7 +870,7 @@ ServerPicture::ExitStateChange()
 
 
 void
-ServerPicture::SyncState(View *view)
+ServerPicture::SyncState(View* view)
 {
 	// TODO: Finish this
 	EnterStateChange();
@@ -882,8 +880,8 @@ ServerPicture::SyncState(View *view)
 	WriteSetPenSize(view->CurrentState()->PenSize());
 	WriteSetScale(view->CurrentState()->Scale());
 	WriteSetLineMode(view->CurrentState()->LineCapMode(),
-			view->CurrentState()->LineJoinMode(),
-			view->CurrentState()->MiterLimit());
+		view->CurrentState()->LineJoinMode(),
+		view->CurrentState()->MiterLimit());
 	//WriteSetPattern(*view->CurrentState()->GetPattern().GetInt8());
 	WriteSetDrawingMode(view->CurrentState()->GetDrawingMode());
 
@@ -892,6 +890,7 @@ ServerPicture::SyncState(View *view)
 
 	ExitStateChange();
 }
+
 
 void
 ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
@@ -963,46 +962,44 @@ ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
 
 
 void
-ServerPicture::Play(View *view)
+ServerPicture::Play(View* view)
 {
 	// TODO: for now: then change PicturePlayer
 	// to accept a BPositionIO object
-	BMallocIO *mallocIO = dynamic_cast<BMallocIO *>(fData);
-	if (mallocIO == NULL) {
+	BMallocIO* mallocIO = dynamic_cast<BMallocIO*>(fData);
+	if (mallocIO == NULL)
 		return;
-	}
 
 	BPrivate::PicturePlayer player(mallocIO->Buffer(),
-		mallocIO->BufferLength(), fPictures);
-	player.Play(const_cast<void **>(kTableEntries),
-		sizeof(kTableEntries) / sizeof(void *), view);
+		mallocIO->BufferLength(), fPictures->AsBList());
+	player.Play(const_cast<void**>(kTableEntries),
+		sizeof(kTableEntries) / sizeof(void*), view);
 }
 
 
 void
-ServerPicture::Usurp(ServerPicture *picture)
+ServerPicture::Usurp(ServerPicture* picture)
 {
 	fUsurped = picture;
 }
 
 
-ServerPicture *
+ServerPicture*
 ServerPicture::StepDown()
 {
-	ServerPicture *old = fUsurped;
+	ServerPicture* old = fUsurped;
 	fUsurped = NULL;
 	return old;
 }
 
 
 bool
-ServerPicture::NestPicture(ServerPicture *picture)
+ServerPicture::NestPicture(ServerPicture* picture)
 {
 	if (fPictures == NULL)
-		fPictures = new (std::nothrow) BList;
+		fPictures = new(std::nothrow) PictureList;
 
-	if (fPictures == NULL
-		|| !fPictures->AddItem(picture))
+	if (fPictures == NULL || !fPictures->AddItem(picture))
 		return false;
 
 	return true;
@@ -1021,7 +1018,7 @@ ServerPicture::DataLength() const
 
 
 status_t
-ServerPicture::ImportData(BPrivate::LinkReceiver &link)
+ServerPicture::ImportData(BPrivate::LinkReceiver& link)
 {
 	int32 size = 0;
 	link.Read<int32>(&size);
@@ -1045,7 +1042,7 @@ ServerPicture::ImportData(BPrivate::LinkReceiver &link)
 
 
 status_t
-ServerPicture::ExportData(BPrivate::PortLink &link)
+ServerPicture::ExportData(BPrivate::PortLink& link)
 {
 	link.StartMessage(B_OK);
 
@@ -1058,9 +1055,8 @@ ServerPicture::ExportData(BPrivate::PortLink &link)
 	link.Attach<int32>(subPicturesCount);
 	if (subPicturesCount > 0) {
 		for (int32 i = 0; i < subPicturesCount; i++) {
-			ServerPicture *subPic =
-				static_cast<ServerPicture *>(fPictures->ItemAtFast(i));
-			link.Attach<int32>(subPic->Token());
+			ServerPicture* subPicture = fPictures->ItemAt(i);
+			link.Attach<int32>(subPicture->Token());
 		}
 	}
 
@@ -1078,7 +1074,7 @@ ServerPicture::ExportData(BPrivate::PortLink &link)
 		delete [] buffer;
 	}
 
-	if (status < B_OK) {
+	if (status != B_OK) {
 		link.CancelMessage();
 		link.StartMessage(B_ERROR);
 	}

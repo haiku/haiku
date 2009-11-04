@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,8 +9,10 @@
 #ifndef SERVER_PICTURE_H
 #define SERVER_PICTURE_H
 
+
 #include <DataIO.h>
 
+#include <ObjectList.h>
 #include <PictureDataWriter.h>
 
 
@@ -24,42 +26,43 @@ namespace BPrivate {
 }
 class BList;
 
-class ServerPicture : public PictureDataWriter {
-public:	
-		int32		Token() { return fToken; }
-		
-		void		EnterStateChange();
-		void		ExitStateChange();
-		
-		void		SyncState(View *view);
-		void		SetFontFromLink(BPrivate::LinkReceiver& link);	
-		
-		void		Play(View *view);
-		
-		void 		Usurp(ServerPicture *newPicture);
-		ServerPicture*	StepDown();		
-		
-		bool		NestPicture(ServerPicture *picture);
 
-		off_t		DataLength() const;
-		
-		status_t	ImportData(BPrivate::LinkReceiver &link);
-		status_t	ExportData(BPrivate::PortLink &link);
+class ServerPicture : public PictureDataWriter {
+public:
+								ServerPicture();
+								ServerPicture(const ServerPicture& other);
+								ServerPicture(const char* fileName,
+									int32 offset);
+								~ServerPicture();
+
+			int32				Token() { return fToken; }
+
+			void				EnterStateChange();
+			void				ExitStateChange();
+
+			void				SyncState(View* view);
+			void				SetFontFromLink(BPrivate::LinkReceiver& link);
+
+			void				Play(View* view);
+
+			void 				Usurp(ServerPicture* newPicture);
+			ServerPicture*		StepDown();
+
+			bool				NestPicture(ServerPicture* picture);
+
+			off_t				DataLength() const;
+
+			status_t			ImportData(BPrivate::LinkReceiver& link);
+			status_t			ExportData(BPrivate::PortLink& link);
 
 private:
-friend class	ServerApp;
-	
-		ServerPicture();
-		ServerPicture(const ServerPicture &);
-		ServerPicture(const char *fileName, const int32 &offset);
-		~ServerPicture();
+	typedef BObjectList<ServerPicture> PictureList;
 
-		int32		fToken;
-		BFile		*fFile;
-		BPositionIO	*fData;
-		// DrawState	*fState;
-		BList		*fPictures;
-		ServerPicture	*fUsurped;
+			int32				fToken;
+			BFile*				fFile;
+			BPositionIO*		fData;
+			PictureList*		fPictures;
+			ServerPicture*		fUsurped;
 };
 
 #endif	// SERVER_PICTURE_H
