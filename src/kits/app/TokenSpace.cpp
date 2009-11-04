@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2009, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,9 +38,15 @@ BTokenSpace::NewToken(int16 type, void* object)
 	BAutolock locker(this);
 
 	token_info tokenInfo = { type, object, NULL };
-	int32 token = fTokenCount++;
+	int32 token = fTokenCount;
 
-	fTokenMap[token] = tokenInfo;
+	try {
+		fTokenMap[token] = tokenInfo;
+	} catch (std::bad_alloc& exception) {
+		return -1;
+	}
+
+	fTokenCount++;
 
 	return token;
 }
@@ -52,17 +58,24 @@ BTokenSpace::NewToken(int16 type, void* object)
 	Don't mix NewToken() and this method unless you know what you're
 	doing.
 */
-void
+bool
 BTokenSpace::SetToken(int32 token, int16 type, void* object)
 {
 	BAutolock locker(this);
 
 	token_info tokenInfo = { type, object, NULL };
-	fTokenMap[token] = tokenInfo;
+
+	try {
+		fTokenMap[token] = tokenInfo;
+	} catch (std::bad_alloc& exception) {
+		return false;
+	}
 
 	// this makes sure SetToken() plays more or less nice with NewToken()
 	if (token >= fTokenCount)
 		fTokenCount = token + 1;
+
+	return true;
 }
 
 

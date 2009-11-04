@@ -39,7 +39,7 @@ class BTokenSpace : public BLocker {
 		~BTokenSpace();
 
 		int32		NewToken(int16 type, void* object);
-		void		SetToken(int32 token, int16 type, void* object);
+		bool		SetToken(int32 token, int16 type, void* object);
 
 		bool		RemoveToken(int32 token);
 		bool		CheckToken(int32 token, int16 type) const;
