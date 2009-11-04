@@ -6,6 +6,14 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
+
+/*!	The SmartTabView class is a BTabView descendant that hides the tab bar
+	as long as there is only a single tab.
+	Furthermore, it provides a tab context menu, as well as allowing you to
+	close buttons with the middle mouse button.
+*/
+
+
 #include "SmartTabView.h"
 
 #include <MenuItem.h>
@@ -17,10 +25,12 @@
 
 #include <stdio.h>
 
+
 const static uint32 kCloseTab = 'ClTb';
 
-SmartTabView::SmartTabView(BRect frame, const char *name, button_width width, 
-				uint32 resizingMode, uint32 flags)
+
+SmartTabView::SmartTabView(BRect frame, const char* name, button_width width,
+		uint32 resizingMode, uint32 flags)
 	:
 	BTabView(frame, name, width, resizingMode, flags),
 	fInsets(0, 0, 0, 0)
@@ -56,30 +66,29 @@ SmartTabView::MouseDown(BPoint point)
 
 	if (CountTabs() > 1) {
 		int32 tabIndex = _ClickedTabIndex(point);
-		if (tabIndex >= 0) {		
+		if (tabIndex >= 0) {
 			int32 buttons;
 			Window()->CurrentMessage()->FindInt32("buttons", &buttons);
-			if (buttons & B_SECONDARY_MOUSE_BUTTON) {	
-				BMessage *message = new BMessage(kCloseTab);
+			if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+				BMessage* message = new BMessage(kCloseTab);
 				message->AddInt32("index", tabIndex);
-				
-				BPopUpMenu *popUpMenu = new BPopUpMenu("tab menu");
+
+				BPopUpMenu* popUpMenu = new BPopUpMenu("tab menu");
 				popUpMenu->AddItem(new BMenuItem("Close Tab", message));
 				popUpMenu->SetAsyncAutoDestruct(true);
 				popUpMenu->SetTargetForItems(BMessenger(this));
 				popUpMenu->Go(ConvertToScreen(point), true, true, true);
-								
-				handled = true;		
-			} else if (buttons & B_TERTIARY_MOUSE_BUTTON) {
+
+				handled = true;
+			} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
 				RemoveAndDeleteTab(tabIndex);
 				handled = true;
 			}
-		}	
+		}
 	}
 
 	if (!handled)
 		BTabView::MouseDown(point);
-		
 }
 
 
@@ -107,10 +116,10 @@ SmartTabView::MessageReceived(BMessage *message)
 			if (message->FindInt32("index", &tabIndex) == B_OK)
 				RemoveAndDeleteTab(tabIndex);
 			break;
-		}		
+		}
 		default:
 			BTabView::MessageReceived(message);
-			break;	
+			break;
 	}
 }
 
@@ -138,30 +147,32 @@ SmartTabView::RemoveAndDeleteTab(int32 index)
 			Select(index - 1);
 		else if (index < CountTabs())
 			Select(index + 1);
-	}	
+	}
 	delete RemoveTab(index);
 }
 
 
 void
-SmartTabView::AddTab(BView *target, BTab *tab)
+SmartTabView::AddTab(BView* target, BTab* tab)
 {
 	if (target == NULL)
 		return;
 
 	BTabView::AddTab(target, tab);
-	
+
 	if (CountTabs() == 1) {
 		// Call select on the tab, since
 		// we're resizing the contained view
 		// inside that function
 		Select(0);
 	} else if (CountTabs() == 2) {
-		// Need to resize the view, since we're
-		// switching from "normal" to tabbed mode
+		// Need to resize the view, since we're switching from "normal"
+		// to tabbed mode
 		ContainerView()->ResizeBy(0, -TabHeight());
-		ContainerView()->MoveBy(0, TabHeight());	
+		ContainerView()->MoveBy(0, TabHeight());
 
+		// Make sure the content size stays the same, but take special care
+		// of full screen mode
 		BScreen screen(Window());
 		if (Window()->DecoratorFrame().Height() + 2 * TabHeight()
 				< screen.Frame().Height()) {
@@ -169,11 +180,11 @@ SmartTabView::AddTab(BView *target, BTab *tab)
 				> screen.Frame().bottom - 5) {
 				Window()->MoveBy(0, -TabHeight());
 			}
-	
+
 			Window()->ResizeBy(0, TabHeight());
 		}
 	}
-	
+
 	Invalidate(TabFrame(CountTabs() - 1).InsetByCopy(-2, -2));
 }
 
@@ -182,7 +193,10 @@ BTab *
 SmartTabView::RemoveTab(int32 index)
 {
 	if (CountTabs() == 2) {
-		// see AddTab()
+		// Hide the tab bar again by resizing the container view
+
+		// Make sure the content size stays the same, but take special care
+		// of full screen mode
 		BScreen screen(Window());
 		if (Window()->DecoratorFrame().Height() + 2 * TabHeight()
 				< screen.Frame().Height()) {
@@ -193,9 +207,10 @@ SmartTabView::RemoveTab(int32 index)
 			Window()->ResizeBy(0, -TabHeight());
 		}
 
-		ContainerView()->MoveBy(0, -TabHeight());		
-		ContainerView()->ResizeBy(0, TabHeight());	
+		ContainerView()->MoveBy(0, -TabHeight());
+		ContainerView()->ResizeBy(0, TabHeight());
 	}
+
 	return BTabView::RemoveTab(index);
 }
 
@@ -205,12 +220,13 @@ SmartTabView::DrawTabs()
 {
 	if (CountTabs() > 1)
 		return BTabView::DrawTabs();
+
 	return BRect();
 }
 
 
 int32
-SmartTabView::_ClickedTabIndex(const BPoint &point)
+SmartTabView::_ClickedTabIndex(const BPoint& point)
 {
 	if (point.y <= TabHeight()) {
 		for (int32 i = 0; i < CountTabs(); i++) {

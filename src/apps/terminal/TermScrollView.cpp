@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 // NOTE: Nasty hack to get access to BScrollView's private parts.
 #include <ScrollBar.h>
 #define private	protected
@@ -11,9 +12,6 @@
 
 #include "TermScrollView.h"
 
-#ifndef __HAIKU__
-#define fVerticalScrollBar fVSB
-#endif
 
 class TermScrollBar : public BScrollBar {
 public:
