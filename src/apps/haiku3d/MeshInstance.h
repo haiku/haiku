@@ -26,8 +26,8 @@ public:
 	void		Render();
 
 protected:
-	Reference<Mesh>		fMeshReference;
-	Reference<Texture>	fTextureReference;
+	BReference<Mesh>	fMeshReference;
+	BReference<Texture>	fTextureReference;
 
 	Vector3		fPosition;
 	Quaternion	fOrientation;

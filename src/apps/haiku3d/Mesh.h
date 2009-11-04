@@ -27,7 +27,7 @@ struct Face {
 };
 
 
-class Mesh : public Referenceable {
+class Mesh : public BReferenceable {
 public:
 	virtual			~Mesh();
 

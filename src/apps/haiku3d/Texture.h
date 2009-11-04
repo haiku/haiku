@@ -13,7 +13,7 @@
 #include <opengl/GL/gl.h>
 
 
-class Texture : public Referenceable {
+class Texture : public BReferenceable {
 public:
 					Texture();
 	virtual			~Texture();
