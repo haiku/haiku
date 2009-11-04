@@ -13,6 +13,7 @@
 
 
 class BPopUpMenu;
+class BScrollView;
 
 
 class SmartTabView : public BTabView {
@@ -44,11 +45,14 @@ public:
 
 	virtual BRect				DrawTabs();
 
+			void				SetScrollView(BScrollView* scrollView);
+
 private:
 			int32				_ClickedTabIndex(const BPoint& point);
 
 private:
 			BRect				fInsets;
+			BScrollView*		fScrollView;
 };
 
 #endif // SMART_TAB_VIEW_H

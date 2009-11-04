@@ -425,10 +425,11 @@ TermWindow::MessageReceived(BMessage *message)
 				_ActiveTermView()->GetSelection(fFindString);
 
 			if (fFindString.Length() == 0) {
-				const char *errorMsg = (!fFindSelection) ? "No search string was entered." : "Nothing is selected.";
-				BAlert *alert = new BAlert("Find failed", errorMsg, "Ok", NULL,
+				const char* errorMsg = !fFindSelection
+					? "No search string was entered." : "Nothing is selected.";
+				BAlert* alert = new BAlert("Find failed", errorMsg, "Ok", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-				
+
 				alert->Go();
 				fFindPreviousMenuItem->SetEnabled(false);
 				fFindNextMenuItem->SetEnabled(false);
@@ -752,21 +753,25 @@ TermWindow::_AddTab(Arguments *args)
 
 		TermViewContainerView *containerView = new TermViewContainerView(view);
 		BScrollView *scrollView = new TermScrollView("scrollView",
-			containerView, view);
+			containerView, view, fSessions.IsEmpty());
+
+		if (fSessions.IsEmpty())
+			fTabView->SetScrollView(scrollView);
 
 		Session* session = new Session(_NewSessionID(), containerView);
 		session->windowTitle = fInitialTitle;
 		fSessions.AddItem(session);
 
 		BTab *tab = new BTab;
-		// TODO: Use a better name. For example, do like MacOsX's Terminal
-		// and update the title using the last executed command ?
-		// Or like Gnome's Terminal and use the current path ?
 		fTabView->AddTab(scrollView, tab);
 		tab->SetLabel(session->name.String());
+			// TODO: Use a better name. For example, do like MacOS X's Terminal
+			// and update the title using the last executed command ?
+			// Or like Gnome's Terminal and use the current path ?
 		view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
 
-		view->SetEncoding(EncodingID(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
+		view->SetEncoding(EncodingID(
+			PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
 
 		BFont font;
 		_GetPreferredFont(font);
@@ -811,6 +816,11 @@ TermWindow::_RemoveTab(int32 index)
 {
 	if (fSessions.CountItems() > 1) {
 		if (Session* session = (Session*)fSessions.RemoveItem(index)) {
+			if (fSessions.CountItems() == 1) {
+				fTabView->SetScrollView(dynamic_cast<BScrollView*>(
+					((Session*)fSessions.ItemAt(0))->containerView->Parent()));
+			}
+
 			delete session;
 			delete fTabView->RemoveTab(index);
 			if (fFullScreen)

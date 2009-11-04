@@ -11,9 +11,9 @@
 class TermScrollView : public BScrollView {
 public:
 								TermScrollView(const char* name, BView* child,
-									BView* target,
+									BView* target, bool overlapTop,
 									uint32 resizingMode = B_FOLLOW_ALL);
-								~TermScrollView();
+	virtual						~TermScrollView();
 };
 
 

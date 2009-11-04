@@ -21,6 +21,7 @@
 #include <Messenger.h>
 #include <PopUpMenu.h>
 #include <Screen.h>
+#include <ScrollView.h>
 #include <Window.h>
 
 #include <stdio.h>
@@ -33,7 +34,8 @@ SmartTabView::SmartTabView(BRect frame, const char* name, button_width width,
 		uint32 resizingMode, uint32 flags)
 	:
 	BTabView(frame, name, width, resizingMode, flags),
-	fInsets(0, 0, 0, 0)
+	fInsets(0, 0, 0, 0),
+	fScrollView(NULL)
 {
 	// Resize the container view to fill the complete tab view for single-tab
 	// mode. Later, when more than one tab is added, we shrink the container
@@ -183,13 +185,22 @@ SmartTabView::AddTab(BView* target, BTab* tab)
 
 			Window()->ResizeBy(0, TabHeight());
 		}
+
+		// Adapt scroll bar if there is one
+		if (fScrollView != NULL) {
+			BScrollBar* bar = fScrollView->ScrollBar(B_VERTICAL);
+			if (bar != NULL) {
+				bar->ResizeBy(0, -1);
+				bar->MoveBy(0, 1);
+			}
+		}
 	}
 
 	Invalidate(TabFrame(CountTabs() - 1).InsetByCopy(-2, -2));
 }
 
 
-BTab *
+BTab*
 SmartTabView::RemoveTab(int32 index)
 {
 	if (CountTabs() == 2) {
@@ -207,6 +218,15 @@ SmartTabView::RemoveTab(int32 index)
 			Window()->ResizeBy(0, -TabHeight());
 		}
 
+		// Adapt scroll bar if there is one
+		if (fScrollView != NULL) {
+			BScrollBar* bar = fScrollView->ScrollBar(B_VERTICAL);
+			if (bar != NULL) {
+				bar->ResizeBy(0, 1);
+				bar->MoveBy(0, -1);
+			}
+		}
+
 		ContainerView()->MoveBy(0, -TabHeight());
 		ContainerView()->ResizeBy(0, TabHeight());
 	}
@@ -222,6 +242,16 @@ SmartTabView::DrawTabs()
 		return BTabView::DrawTabs();
 
 	return BRect();
+}
+
+
+/*!	If you have a vertical scroll view that overlaps with the menu bar, it will
+	be resized automatically when the tabs are hidden/shown.
+*/
+void
+SmartTabView::SetScrollView(BScrollView* scrollView)
+{
+	fScrollView = scrollView;
 }
 
 
