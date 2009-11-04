@@ -134,7 +134,7 @@ private:
 			// remember which ones they own so that they can destroy them when
 			// they quit.
 			BList				fBitmapList;
-			BList				fPictureList;
+			BObjectList<ServerPicture> fPictureList;
 
 			ServerCursor*		fAppCursor;
 			ServerCursor*		fViewCursor;

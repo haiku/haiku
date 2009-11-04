@@ -193,7 +193,7 @@ ServerApp::~ServerApp()
 	}
 
 	for (int32 i = fPictureList.CountItems(); i-- > 0;) {
-		delete (ServerPicture*)fPictureList.ItemAtFast(i);
+		delete fPictureList.ItemAt(i);
 	}
 
 	fDesktop->GetCursorManager().DeleteCursors(fClientTeam);
@@ -379,7 +379,7 @@ ServerApp::_MessageLooper()
 
 			case AS_QUIT_APP:
 			{
-				// This message is received only when the app_server is asked 
+				// This message is received only when the app_server is asked
 				// to shut down in test/debug mode. Of course, if we are testing
 				// while using AccelerantDriver, we do NOT want to shut down
 				// client applications. The server can be quit in this fashion
@@ -743,15 +743,16 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			// TODO: Maybe rename this to AS_UPLOAD_PICTURE ?
 			STRACE(("ServerApp %s: Create Picture\n", Signature()));
-			status_t status = B_ERROR;
-			ServerPicture *picture = CreatePicture();
+			status_t status = B_NO_MEMORY;
+
+			ServerPicture* picture = CreatePicture();
 			if (picture != NULL) {
 				int32 subPicturesCount = 0;
 				link.Read<int32>(&subPicturesCount);
-				for (int32 c = 0; c < subPicturesCount; c++) {
+				for (int32 i = 0; i < subPicturesCount; i++) {
 					int32 token = -1;
 					link.Read<int32>(&token);
-					if (ServerPicture *subPicture = FindPicture(token))
+					if (ServerPicture* subPicture = FindPicture(token))
 						picture->NestPicture(subPicture);
 				}
 				status = picture->ImportData(link);
@@ -760,7 +761,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(picture->Token());
 			} else
-				fLink.StartMessage(B_ERROR);
+				fLink.StartMessage(status);
 
 			fLink.Flush();
 			break;
@@ -772,7 +773,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 token;
 			if (link.Read<int32>(&token) == B_OK)
 				DeletePicture(token);
-
 			break;
 		}
 
@@ -780,19 +780,19 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			STRACE(("ServerApp %s: Clone Picture\n", Signature()));
 			int32 token;
-			ServerPicture *original = NULL;
+			ServerPicture* original = NULL;
 			if (link.Read<int32>(&token) == B_OK)
 				original = FindPicture(token);
 
-			ServerPicture *cloned = NULL;
-			if (original != NULL)
-				cloned = CreatePicture(original);
-
-			if (cloned != NULL) {
-				fLink.StartMessage(B_OK);
-				fLink.Attach<int32>(cloned->Token());
+			if (original != NULL) {
+				ServerPicture* cloned = CreatePicture(original);
+				if (cloned != NULL) {
+					fLink.StartMessage(B_OK);
+					fLink.Attach<int32>(cloned->Token());
+				} else
+					fLink.StartMessage(B_NO_MEMORY);
 			} else
-				fLink.StartMessage(B_ERROR);
+				fLink.StartMessage(B_BAD_VALUE);
 
 			fLink.Flush();
 			break;
@@ -803,7 +803,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: Download Picture\n", Signature()));
 			int32 token;
 			link.Read<int32>(&token);
-			ServerPicture *picture = FindPicture(token);
+			ServerPicture* picture = FindPicture(token);
 			if (picture != NULL) {
 				picture->ExportData(fLink);
 					// ExportData() calls StartMessage() already
@@ -811,7 +811,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.StartMessage(B_ERROR);
 
 			fLink.Flush();
-
 			break;
 		}
 
@@ -3105,9 +3104,9 @@ ServerApp::CreatePicture(const ServerPicture* original)
 {
 	ServerPicture* picture;
 	if (original != NULL)
-		picture = new (std::nothrow) ServerPicture(*original);
+		picture = new(std::nothrow) ServerPicture(*original);
 	else
-		picture = new (std::nothrow) ServerPicture();
+		picture = new(std::nothrow) ServerPicture();
 
 	if (picture != NULL)
 		fPictureList.AddItem(picture);
