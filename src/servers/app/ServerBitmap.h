@@ -31,7 +31,7 @@ class ServerApp;
 	managed by the BitmapManager class. It is also the base class for
 	all cursors. Every BBitmap has a shadow ServerBitmap object.
 */
-class ServerBitmap : public Referenceable {
+class ServerBitmap : public BReferenceable {
 public:
 	inline	bool			IsValid() const
 								{ return fBuffer != NULL; }

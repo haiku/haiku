@@ -28,7 +28,7 @@ namespace BPrivate {
 class BList;
 
 
-class ServerPicture : public Referenceable, public PictureDataWriter {
+class ServerPicture : public BReferenceable, public PictureDataWriter {
 public:
 								ServerPicture();
 								ServerPicture(const ServerPicture& other);

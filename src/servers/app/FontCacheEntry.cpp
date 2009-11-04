@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
+ * Copyright 2007-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,19 +30,17 @@
 
 #include <new>
 
-#include <agg_array.h>
-
-#include <util/OpenHashTable.h>
-
 #include <Autolock.h>
 
-#include "utf8_functions.h"
+#include <agg_array.h>
+#include <utf8_functions.h>
+#include <util/OpenHashTable.h>
 
 #include "GlobalSubpixelSettings.h"
 
 
-BLocker
-FontCacheEntry::sUsageUpdateLock("FontCacheEntry usage lock");
+BLocker FontCacheEntry::sUsageUpdateLock("FontCacheEntry usage lock");
+
 
 class FontCacheEntry::GlyphCachePool {
 public:
@@ -131,7 +129,6 @@ private:
 FontCacheEntry::FontCacheEntry()
 	:
 	MultiLocker("FontCacheEntry lock"),
-	Referenceable(),
 	fGlyphCache(new(std::nothrow) GlyphCachePool()),
 	fEngine(),
 	fLastUsedTime(LONGLONG_MIN),

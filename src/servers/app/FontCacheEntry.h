@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
+ * Copyright 2007-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -77,7 +77,7 @@ struct GlyphCache {
 
 class FontCache;
 
-class FontCacheEntry : public MultiLocker, public Referenceable {
+class FontCacheEntry : public MultiLocker, public BReferenceable {
  public:
 	typedef FontEngine::PathAdapter					GlyphPathAdapter;
 	typedef FontEngine::Gray8Adapter				GlyphGray8Adapter;
