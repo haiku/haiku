@@ -3289,7 +3289,7 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 			else {
 				fCaretOffset
 					= ctrlDown
-						? _PreviousWordBoundary(fCaretOffset - 1)
+						? _PreviousWordStart(fCaretOffset - 1)
 						: _PreviousInitialByte(fCaretOffset);
 				if (shiftDown && fCaretOffset != lastClickOffset) {
 					if (fCaretOffset < fSelStart) {
@@ -3315,7 +3315,7 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 			else {
 				fCaretOffset
 					= ctrlDown
-						? _NextWordBoundary(fCaretOffset)
+						? _NextWordStart(fCaretOffset)
 						: _NextInitialByte(fCaretOffset);
 				if (shiftDown && fCaretOffset != lastClickOffset) {
 					if (fCaretOffset > fSelEnd) {
@@ -4054,6 +4054,59 @@ BTextView::_NextWordBoundary(int32 offset)
 	while (offset < textLen) {
 		offset = _NextInitialByte(offset);
 		if (_CharClassification(offset) != charType)
+			break;
+	}
+
+	return offset;
+}
+
+
+int32
+BTextView::_PreviousWordStart(int32 offset)
+{
+	if (offset <= 1)
+		return 0;
+
+	--offset;	// need to look at previous char
+	if (_CharClassification(offset) == CHAR_CLASS_WHITESPACE) {
+		// skip whitespace
+		while (offset > 0) {
+			offset = _PreviousInitialByte(offset);
+			if (_CharClassification(offset) != CHAR_CLASS_WHITESPACE)
+				break;
+		}
+	}
+	while (offset > 0) {
+		// find preceeding whitespace char.
+		int32 previous = _PreviousInitialByte(offset);
+		if (_CharClassification(previous) == CHAR_CLASS_WHITESPACE)
+			break;
+		offset = previous;
+	}
+
+	return offset;
+}
+
+
+int32
+BTextView::_NextWordStart(int32 offset)
+{
+	int32 textLen = TextLength();
+	if (offset >= textLen)
+		return textLen;
+
+	if (_CharClassification(offset) != CHAR_CLASS_WHITESPACE) {
+		// skip until the next whitespace
+		while (offset < textLen) {
+			offset = _NextInitialByte(offset);
+			if (_CharClassification(offset) == CHAR_CLASS_WHITESPACE)
+				break;
+		}
+	}
+	while (offset < textLen) {
+		// find next non-white char
+		offset = _NextInitialByte(offset);
+		if (_CharClassification(offset) != CHAR_CLASS_WHITESPACE)
 			break;
 	}
 
