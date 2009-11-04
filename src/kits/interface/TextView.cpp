@@ -1809,8 +1809,8 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	result.x += fTextRect.left;
 
 	// round up
-	result.x = ceilf(result.x);
-	result.y = ceilf(result.y);
+	result.x = lroundf(result.x);
+	result.y = lroundf(result.y);
 	if (outHeight != NULL)
 		*outHeight = height;
 
@@ -3792,7 +3792,7 @@ BTextView::_RecalculateLineBreaks(int32 *startLine, int32 *endLine)
 	fTextRect.bottom = fTextRect.top + newHeight;
 	if (!fWrap) {
 		fMinTextRectWidth = fLines->MaxWidth();
-		fTextRect.right = fTextRect.left + fMinTextRectWidth;
+		fTextRect.right = ceilf(fTextRect.left + fMinTextRectWidth);
 	}
 
 	*endLine = lineIndex - 1;
