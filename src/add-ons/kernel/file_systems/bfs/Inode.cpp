@@ -335,11 +335,7 @@ Inode::Inode(Volume* volume, ino_t id)
 
 	UpdateNodeFromDisk();
 
-	char lockName[B_OS_NAME_LENGTH];
-	snprintf(lockName, sizeof(lockName), "bfs inode %d.%d",
-		(int)BlockRun().AllocationGroup(), BlockRun().Start());
-	rw_lock_init_etc(&fLock, lockName, RW_LOCK_FLAG_CLONE_NAME);
-
+	rw_lock_init(&fLock, "bfs inode");
 	recursive_lock_init(&fSmallDataLock, "bfs inode small data");
 
 	// these two will help to maintain the indices
@@ -368,11 +364,7 @@ Inode::Inode(Volume* volume, Transaction& transaction, ino_t id, mode_t mode,
 	PRINT(("Inode::Inode(volume = %p, transaction = %p, id = %Ld) @ %p\n",
 		volume, &transaction, id, this));
 
-	char lockName[B_OS_NAME_LENGTH];
-	snprintf(lockName, sizeof(lockName), "bfs inode+%d.%d",
-		(int)run.AllocationGroup(), run.Start());
-	rw_lock_init_etc(&fLock, lockName, RW_LOCK_FLAG_CLONE_NAME);
-
+	rw_lock_init(&fLock, "bfs inode");
 	recursive_lock_init(&fSmallDataLock, "bfs inode small data");
 
 	NodeGetter node(volume, transaction, this, true);
