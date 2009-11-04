@@ -956,6 +956,9 @@ Journal::Lock(Transaction* owner, bool separateSubTransactions)
 	if (separateSubTransactions)
 		fSeparateSubTransactions = true;
 
+	if (owner != NULL)
+		owner->SetParent(fOwner);
+
 	fOwner = owner;
 
 	// TODO: we need a way to find out how big the current transaction is;
@@ -992,7 +995,7 @@ Journal::Unlock(Transaction* owner, bool success)
 		// we only end the transaction if we would really unlock it
 		// TODO: what about failing transactions that do not unlock?
 		// (they must make the parent fail, too)
-		if (fOwner != NULL) {
+		if (owner != NULL) {
 			status_t status = _TransactionDone(success);
 			if (status != B_OK)
 				return status;
@@ -1002,12 +1005,14 @@ Journal::Unlock(Transaction* owner, bool success)
 			// closed.
 			bool separateSubTransactions = fSeparateSubTransactions;
 			fSeparateSubTransactions = true;
-			fOwner->UnlockInodes(success);
+			owner->UnlockInodes(success);
 			fSeparateSubTransactions = separateSubTransactions;
-		}
+
+			fOwner = owner->Parent();
+		} else
+			fOwner = NULL;
 
 		fTimestamp = system_time();
-		fOwner = NULL;
 
 		if (fSeparateSubTransactions
 			&& recursive_lock_get_recursion(&fLock) == 1)

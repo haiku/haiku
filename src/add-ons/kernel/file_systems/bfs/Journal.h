@@ -90,21 +90,24 @@ class Transaction {
 public:
 	Transaction(Volume* volume, off_t refBlock)
 		:
-		fJournal(NULL)
+		fJournal(NULL),
+		fParent(NULL)
 	{
 		Start(volume, refBlock);
 	}
 
 	Transaction(Volume* volume, block_run refRun)
 		:
-		fJournal(NULL)
+		fJournal(NULL),
+		fParent(NULL)
 	{
 		Start(volume, volume->ToBlock(refRun));
 	}
 
 	Transaction()
 		:
-		fJournal(NULL)
+		fJournal(NULL),
+		fParent(NULL)
 	{
 	}
 
@@ -130,10 +133,7 @@ public:
 
 	bool HasParent() const
 	{
-		if (fJournal != NULL)
-			return fJournal->CurrentTransaction() == this;
-
-		return false;
+		return fParent != NULL;
 	}
 
 	bool IsTooLarge() const
@@ -182,13 +182,19 @@ public:
 	void UnlockInodes(bool success);
 	void MoveInodesTo(Transaction* transaction);
 
+	void SetParent(Transaction* parent)
+		{ fParent = parent; }
+	Transaction* Parent() const
+		{ return fParent; }
+
 private:
 	Transaction(const Transaction& other);
 	Transaction& operator=(const Transaction& other);
 		// no implementation
 
-	Journal*	fJournal;
-	InodeList	fLockedInodes;
+	Journal*		fJournal;
+	InodeList		fLockedInodes;
+	Transaction*	fParent;
 };
 
 #ifdef BFS_DEBUGGER_COMMANDS
