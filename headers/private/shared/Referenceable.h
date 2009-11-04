@@ -9,16 +9,14 @@
 #include <SupportDefs.h>
 
 
-namespace BPrivate {
-
-class Referenceable {
+class BReferenceable {
 public:
-								Referenceable(
+								BReferenceable(
 									bool deleteWhenUnreferenced = true);
 										// TODO: The parameter is deprecated.
 										// Override LastReferenceReleased()
 										// instead!
-	virtual						~Referenceable();
+	virtual						~BReferenceable();
 
 			void				AcquireReference();
 			bool				ReleaseReference();
@@ -42,21 +40,116 @@ protected:
 
 
 void
-Referenceable::AddReference()
+BReferenceable::AddReference()
 {
 	AcquireReference();
 }
 
 
 bool
-Referenceable::RemoveReference()
+BReferenceable::RemoveReference()
 {
 	return ReleaseReference();
 }
 
 
+// BReference
+template<typename Type = BReferenceable>
+class BReference {
+public:
+	BReference()
+		: fObject(NULL)
+	{
+	}
+
+	BReference(Type* object, bool alreadyHasReference = false)
+		: fObject(NULL)
+	{
+		SetTo(object, alreadyHasReference);
+	}
+
+	BReference(const BReference<Type>& other)
+		: fObject(NULL)
+	{
+		SetTo(other.fObject);
+	}
+
+	~BReference()
+	{
+		Unset();
+	}
+
+	void SetTo(Type* object, bool alreadyHasReference = false)
+	{
+		if (object != NULL && !alreadyHasReference)
+			object->AddReference();
+
+		Unset();
+
+		fObject = object;
+	}
+
+	void Unset()
+	{
+		if (fObject) {
+			fObject->RemoveReference();
+			fObject = NULL;
+		}
+	}
+
+	Type* Get() const
+	{
+		return fObject;
+	}
+
+	Type* Detach()
+	{
+		Type* object = fObject;
+		fObject = NULL;
+		return object;
+	}
+
+	Type& operator*() const
+	{
+		return *fObject;
+	}
+
+	Type* operator->() const
+	{
+		return fObject;
+	}
+
+	BReference& operator=(const BReference<Type>& other)
+	{
+		SetTo(other.fObject);
+		return *this;
+	}
+
+	bool operator==(const BReference<Type>& other) const
+	{
+		return (fObject == other.fObject);
+	}
+
+	bool operator!=(const BReference<Type>& other) const
+	{
+		return (fObject != other.fObject);
+	}
+
+private:
+	Type*	fObject;
+};
+
+
+// #pragma mark Obsolete API
+
+// TODO: To be phased out!
+
+
+namespace BPrivate {
+
+
 // Reference
-template<typename Type = BPrivate::Referenceable>
+template<typename Type = BReferenceable>
 class Reference {
 public:
 	Reference()
@@ -141,12 +234,13 @@ private:
 	Type*	fObject;
 };
 
+
+typedef BReferenceable Referenceable;
+
 }	// namespace BPrivate
 
 using BPrivate::Referenceable;
 using BPrivate::Reference;
-
-typedef BPrivate::Referenceable BReferenceable;
 
 
 #endif	// _REFERENCEABLE_H

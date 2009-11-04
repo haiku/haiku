@@ -6,20 +6,20 @@
 #include <Referenceable.h>
 
 
-Referenceable::Referenceable(bool deleteWhenUnreferenced)
+BReferenceable::BReferenceable(bool deleteWhenUnreferenced)
 	: fReferenceCount(1),
 	  fDeleteWhenUnreferenced(deleteWhenUnreferenced)
 {
 }
 
 
-Referenceable::~Referenceable()
+BReferenceable::~BReferenceable()
 {
 }
 
 
 void
-Referenceable::AcquireReference()
+BReferenceable::AcquireReference()
 {
 	if (atomic_add(&fReferenceCount, 1) == 0)
 		FirstReferenceAcquired();
@@ -27,7 +27,7 @@ Referenceable::AcquireReference()
 
 
 bool
-Referenceable::ReleaseReference()
+BReferenceable::ReleaseReference()
 {
 	bool unreferenced = (atomic_add(&fReferenceCount, -1) == 1);
 	if (unreferenced)
@@ -37,13 +37,13 @@ Referenceable::ReleaseReference()
 
 
 void
-Referenceable::FirstReferenceAcquired()
+BReferenceable::FirstReferenceAcquired()
 {
 }
 
 
 void
-Referenceable::LastReferenceReleased()
+BReferenceable::LastReferenceReleased()
 {
 	if (fDeleteWhenUnreferenced)
 		delete this;
