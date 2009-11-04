@@ -98,11 +98,16 @@ struct flattened_text_run_array {
 static const uint32 kFlattenedTextRunArrayMagic = 'Ali!';
 static const uint32 kFlattenedTextRunArrayVersion = 0;
 
+
 enum {
-	B_SEPARATOR_CHARACTER,
-	B_PUNCTUATION_CHARACTER,
-	B_OTHER_CHARACTER,
-	B_END_OF_TEXT
+	CHAR_CLASS_DEFAULT,
+	CHAR_CLASS_WHITESPACE,
+	CHAR_CLASS_GRAPHICAL,
+	CHAR_CLASS_QUOTE,
+	CHAR_CLASS_PUNCTUATION,
+	CHAR_CLASS_PARENS_OPEN,
+	CHAR_CLASS_PARENS_CLOSE,
+	CHAR_CLASS_END_OF_TEXT
 };
 
 
@@ -1942,28 +1947,45 @@ BTextView::FindWord(int32 inOffset, int32 *outFromOffset, int32 *outToOffset)
 bool
 BTextView::CanEndLine(int32 offset)
 {
-	// TODO: This has to be improved a lot, but also the wrapping code.
-	// It should use the forthcomming LocalKit.
+	// TODO: This should be improved using the LocaleKit.
 	uint32 classification = _CharClassification(offset);
-	if (classification == B_END_OF_TEXT
-		|| classification == B_SEPARATOR_CHARACTER) {
+	if (classification == CHAR_CLASS_END_OF_TEXT)
 		return true;
-	}
 
 	uint32 nextClassification = _CharClassification(offset + 1);
-	if (nextClassification == B_END_OF_TEXT
-		|| nextClassification == B_SEPARATOR_CHARACTER)
+	if (nextClassification == CHAR_CLASS_END_OF_TEXT)
 		return true;
 
-	if (classification == B_PUNCTUATION_CHARACTER
-		&& nextClassification == B_OTHER_CHARACTER) {
+	// never separate a punctuation char from its preceeding word
+	if (classification == CHAR_CLASS_DEFAULT
+		&& nextClassification == CHAR_CLASS_PUNCTUATION) {
+		return false;
+	}
+
+	// allow wrapping after whitespace, unless more whitespace (except for
+	// newline) follows
+	if (classification == CHAR_CLASS_WHITESPACE
+		&& (nextClassification != CHAR_CLASS_WHITESPACE
+			|| ByteAt(offset + 1) == B_ENTER)) {
 		return true;
 	}
 
-	uint32 nextNextClassification = _CharClassification(offset + 2);
-	if (classification == B_OTHER_CHARACTER
-		&& nextClassification == B_PUNCTUATION_CHARACTER
-		&& nextClassification == nextNextClassification) {
+	// allow wrapping after punctuation chars, unless more punctuation, closing
+	// parens or quotes follow
+	if (classification == CHAR_CLASS_PUNCTUATION
+		&& nextClassification != CHAR_CLASS_PUNCTUATION
+		&& nextClassification != CHAR_CLASS_PARENS_CLOSE
+		&& nextClassification != CHAR_CLASS_QUOTE) {
+		return true;
+	}
+
+	// allow wrapping after quotes, graphical chars and closing parens only if
+	// whitespace follows (not perfect, but seems to do the right thing most
+	// of the time)
+	if ((classification == CHAR_CLASS_QUOTE
+			|| classification == CHAR_CLASS_GRAPHICAL
+			|| classification == CHAR_CLASS_PARENS_CLOSE)
+		&& nextClassification == CHAR_CLASS_WHITESPACE) {
 		return true;
 	}
 
@@ -5081,31 +5103,55 @@ BTextView::_CharClassification(int32 offset) const
 	// Andrew suggested to have a look at UnicodeBlockObject.h
 	switch (fText->RealCharAt(offset)) {
 		case '\0':
-			return B_END_OF_TEXT;
+			return CHAR_CLASS_END_OF_TEXT;
 
 		case B_SPACE:
-		case '_':
 		case B_TAB:
 		case B_ENTER:
+			return CHAR_CLASS_WHITESPACE;
+
+		case '=':
+		case '+':
+		case '@':
+		case '#':
+		case '$':
+		case '%':
+		case '^':
 		case '&':
 		case '*':
-		case '+':
-		case '-':
-		case '/':
-		case '<':
-		case '=':
-		case '>':
 		case '\\':
-		case '^':
 		case '|':
-			return B_SEPARATOR_CHARACTER;
+		case '<':
+		case '>':
+		case '/':
+		case '~':
+			return CHAR_CLASS_GRAPHICAL;
 
-		case '.':
+		case '\'':
+		case '"':
+			return CHAR_CLASS_QUOTE;
+
 		case ',':
-			return B_PUNCTUATION_CHARACTER;
+		case '.':
+		case '?':
+		case '!':
+		case ';':
+		case ':':
+		case '-':
+			return CHAR_CLASS_PUNCTUATION;
+
+		case '(':
+		case '[':
+		case '{':
+			return CHAR_CLASS_PARENS_OPEN;
+
+		case ')':
+		case ']':
+		case '}':
+			return CHAR_CLASS_PARENS_CLOSE;
 
 		default:
-			return B_OTHER_CHARACTER;
+			return CHAR_CLASS_DEFAULT;
 	}
 }
 
