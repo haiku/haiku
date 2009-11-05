@@ -13,6 +13,7 @@
 #include <fs_interface.h>
 #include <KernelExport.h>
 #include <Mime.h>
+#include <NodeMonitor.h>
 #include <TypeConstants.h>
 
 #include <util/kernel_cpp.h>
@@ -80,7 +81,9 @@ public:
 							~Volume();
 
 			status_t		InitCheck();
+
 			fs_volume*		FSVolume() const { return fFSVolume; }
+			dev_t			ID() const { return fFSVolume->id; }
 			uint32			DiscID() const { return fDiscID; }
 			Inode&			RootNode() const { return *fRootNode; }
 
@@ -102,6 +105,8 @@ public:
 			size_t			BufferSize() const { return 32 * kFrameSize; }
 								// TODO: for now
 
+			void			DisableCDDBLookUps();
+
 	static	void			DetermineName(uint32 cddbId, int device, char* name,
 								size_t length);
 
@@ -119,7 +124,6 @@ private:
 			Semaphore		fLock;
 			fs_volume*		fFSVolume;
 			int				fDevice;
-			dev_t			fID;
 			uint32			fDiscID;
 			Inode*			fRootNode;
 			ino_t			fNextID;
@@ -274,8 +278,7 @@ extern fs_vnode_ops gCDDAVnodeOps;
 //	#pragma mark helper functions
 
 
-/*!
-	Determines if the attribute is shared among all devices or among
+/*!	Determines if the attribute is shared among all devices or among
 	all CDs in a specific device.
 	We use this to share certain Tracker attributes.
 */
@@ -861,8 +864,16 @@ Volume::SetName(const char* name)
 }
 
 
-/*!
-	Opens the file that contains the volume and inode titles as well as all
+void
+Volume::DisableCDDBLookUps()
+{
+	bool doLookup = false;
+	RootNode().AddAttribute(kDoLookupAttribute, B_BOOL_TYPE, true,
+		(const uint8*)&doLookup, sizeof(bool));
+}
+
+
+/*!	Opens the file that contains the volume and inode titles as well as all
 	of their attributes.
 	The attributes are stored in files below B_USER_SETTINGS_DIRECTORY/cdda.
 */
@@ -873,8 +884,7 @@ Volume::_OpenAttributes(int mode, enum attr_mode attrMode)
 }
 
 
-/*!
-	Reads the attributes, if any, that belong to the CD currently being
+/*!	Reads the attributes, if any, that belong to the CD currently being
 	mounted.
 */
 void
@@ -938,8 +948,7 @@ Volume::_StoreAttributes()
 }
 
 
-/*!
-	Restores the attributes, if any, that are shared between CDs; some are
+/*!	Restores the attributes, if any, that are shared between CDs; some are
 	stored per device, others are stored for all CDs no matter which device.
 */
 void
@@ -1041,8 +1050,7 @@ Attribute::ReadAt(off_t offset, uint8* buffer, size_t* _length)
 }
 
 
-/*!
-	Writes to the attribute and enlarges it as needed.
+/*!	Writes to the attribute and enlarges it as needed.
 	An attribute has a maximum size of 65536 bytes for now.
 */
 status_t
@@ -1095,8 +1103,7 @@ Attribute::Truncate()
 }
 
 
-/*!
-	Resizes the data part of an attribute to the requested amount \a size.
+/*!	Resizes the data part of an attribute to the requested amount \a size.
 	An attribute has a maximum size of 65536 bytes for now.
 */
 status_t
@@ -1492,9 +1499,7 @@ cdda_write_fs_stat(fs_volume* _volume, const struct fs_info* info, uint32 mask)
 			// add-on. Disable CDDB lookups. Note this will usually mean that
 			// the user manually renamed the volume or that cddblinkd (or other
 			// program) did this so we do not want to do it again.
-			bool doLookup = false;
-			volume->RootNode().AddAttribute(kDoLookupAttribute, B_BOOL_TYPE,
-				true, (const uint8*)&doLookup, sizeof(bool));
+			volume->DisableCDDBLookUps();
 		}
 	}
 
@@ -1738,7 +1743,7 @@ status_t
 cdda_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	fs_vnode* _newDir, const char* newName)
 {
-	if (_oldDir != _newDir)
+	if (_oldDir->private_node != _newDir->private_node)
 		return B_BAD_VALUE;
 
 	// we only have a single directory which simplifies things a bit :-)
@@ -1753,18 +1758,19 @@ cdda_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	if (volume->Find(newName) != NULL)
 		return B_NAME_IN_USE;
 
-	status_t result = inode->SetName(newName);
-	if (result == B_OK) {
+	status_t status = inode->SetName(newName);
+	if (status == B_OK) {
 		// One of the tracks had its name edited from outside the filesystem
 		// add-on. Disable CDDB lookups. Note this will usually mean that the
 		// user manually renamed a track or that cddblinkd (or other program)
 		// did this so we do not want to do it again.
-		bool doLookup = false;
-		volume->RootNode().AddAttribute(kDoLookupAttribute, B_BOOL_TYPE, true,
-			(const uint8*)&doLookup, sizeof(bool));
+		volume->DisableCDDBLookUps();
+
+		notify_entry_moved(volume->ID(), volume->RootNode().ID(), oldName,
+			volume->RootNode().ID(), newName, inode->ID());
 	}
 
-	return result;
+	return status;
 }
 
 
@@ -2005,8 +2011,11 @@ cdda_create_attr(fs_volume* _volume, fs_vnode* _node, const char* name,
 		if (Attribute::IsProtectedNamespace(name))
 			return B_NOT_ALLOWED;
 		status_t status = inode->AddAttribute(name, type, true, NULL, 0);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
+
+		notify_attribute_changed(volume->ID(), inode->ID(), name,
+			B_ATTR_CREATED);
 	} else if ((openMode & O_EXCL) == 0) {
 		if (attribute->IsProtectedNamespace())
 			return B_NOT_ALLOWED;
@@ -2093,7 +2102,12 @@ cdda_write_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	if (attribute->IsProtectedNamespace())
 		return B_NOT_ALLOWED;
 
-	return attribute->WriteAt(offset, (uint8*)buffer, _length);
+	status_t status = attribute->WriteAt(offset, (uint8*)buffer, _length);
+	if (status == B_OK) {
+		notify_attribute_changed(volume->ID(), inode->ID(), attribute->Name(),
+			B_ATTR_CHANGED);
+	}
+	return status;
 }
 
 
@@ -2134,7 +2148,13 @@ cdda_remove_attr(fs_volume* _volume, fs_vnode* _node, const char* name)
 
 	Locker _(volume->Lock());
 
-	return inode->RemoveAttribute(name, true);
+	status_t status = inode->RemoveAttribute(name, true);
+	if (status == B_OK) {
+		notify_attribute_changed(volume->ID(), inode->ID(), name,
+			B_ATTR_REMOVED);
+	}
+
+	return status;
 }
 
 
