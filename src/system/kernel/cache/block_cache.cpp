@@ -988,6 +988,12 @@ block_cache::Free(void* buffer)
 void*
 block_cache::Allocate()
 {
+	if (low_resource_state(B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY)
+			!= B_NO_LOW_RESOURCE) {
+		// recycle existing before allocating a new one
+		RemoveUnusedBlocks(1, 2);
+	}
+
 	return object_cache_alloc(buffer_cache, 0);
 }
 
@@ -1014,18 +1020,27 @@ block_cache::FreeBlock(cached_block* block)
 cached_block*
 block_cache::NewBlock(off_t blockNumber)
 {
-	cached_block* block = (cached_block*)object_cache_alloc(sBlockCache, 0);
-	if (block == NULL) {
-		TB(Error(this, blockNumber, "allocation failed"));
-		dprintf("block allocation failed, unused list is %sempty.\n",
-			unused_blocks.IsEmpty() ? "" : "not ");
+	cached_block* block = NULL;
 
-		// allocation failed, try to reuse an unused block
+	if (low_resource_state(B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY)
+			!= B_NO_LOW_RESOURCE) {
+		// recycle existing instead of allocating a new one
 		block = _GetUnusedBlock();
+	}
+	if (block == NULL) {
+		block = (cached_block*)object_cache_alloc(sBlockCache, 0);
 		if (block == NULL) {
-			TB(Error(this, blockNumber, "get unused failed"));
-			FATAL(("could not allocate block!\n"));
-			return NULL;
+			TB(Error(this, blockNumber, "allocation failed"));
+			dprintf("block allocation failed, unused list is %sempty.\n",
+				unused_blocks.IsEmpty() ? "" : "not ");
+
+			// allocation failed, try to reuse an unused block
+			block = _GetUnusedBlock();
+			if (block == NULL) {
+				TB(Error(this, blockNumber, "get unused failed"));
+				FATAL(("could not allocate block!\n"));
+				return NULL;
+			}
 		}
 	}
 
