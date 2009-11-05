@@ -11,6 +11,7 @@
 #include "BackgroundsView.h"
 
 #include <Application.h>
+#include <LayoutBuilder.h>
 #include <TrackerAddOnAppLaunch.h>
 #include <Window.h>
 
@@ -18,22 +19,27 @@
 static const char *kSignature = "application/x-vnd.Haiku-Backgrounds";
 
 
-class BackgroundsApplication : public BApplication {
-	public:
-		BackgroundsApplication();
-		virtual void RefsReceived(BMessage* message);
-};
-
 class BackgroundsWindow : public BWindow {
 	public:
-		BackgroundsWindow(BRect frame, bool standalone = true);
+		BackgroundsWindow();
+
+				void RefsReceived(BMessage* message);
 
 	protected:
 		virtual	bool QuitRequested();
 		virtual void WorkspaceActivated(int32 oldWorkspaces, bool active);
 
 		BackgroundsView *fBackgroundsView;
-		bool fIsStandalone;
+};
+
+
+class BackgroundsApplication : public BApplication {
+	public:
+		BackgroundsApplication();
+		virtual void RefsReceived(BMessage* message);
+
+	private:
+		BackgroundsWindow* fWindow;
 };
 
 
@@ -41,34 +47,46 @@ class BackgroundsWindow : public BWindow {
 
 
 BackgroundsApplication::BackgroundsApplication()
-	: BApplication(kSignature)
+	:
+	BApplication(kSignature),
+	fWindow(new BackgroundsWindow())
 {
-	BWindow* window = new BackgroundsWindow(BRect(100, 100, 570, 325));
-	window->Show();
+	fWindow->Show();
 }
 
 
 void
 BackgroundsApplication::RefsReceived(BMessage* message)
 {
-	if (CountWindows() > 0) {
-		BWindow* window = WindowAt(0);
-		BMessenger(window->ChildAt(0)).SendMessage(message);
-	}
-
+	fWindow->RefsReceived(message);
 }
 
 //	#pragma mark -
 
 
-BackgroundsWindow::BackgroundsWindow(BRect frame, bool standalone)
-	: BWindow(frame, "Backgrounds", B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES),
-	fIsStandalone(standalone)
+BackgroundsWindow::BackgroundsWindow()
+	:
+	BWindow(BRect(0, 0, 0, 0), "Backgrounds", B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
+		B_ALL_WORKSPACES)
 {
-	fBackgroundsView = new BackgroundsView(Bounds(), "BackgroundsView",
-		B_FOLLOW_ALL, B_WILL_DRAW);
-	AddChild(fBackgroundsView);
+	fBackgroundsView = new BackgroundsView();
+
+	BLayoutBuilder::Group<>(this)
+		.AddGroup(B_HORIZONTAL, 0)
+			.Add(fBackgroundsView)
+			.End()
+		.End();
+
+	if (!fBackgroundsView->FoundPositionSetting())
+		CenterOnScreen();
+}
+
+
+void
+BackgroundsWindow::RefsReceived(BMessage* message)
+{
+	fBackgroundsView->RefsReceived(message);
 }
 
 
@@ -76,8 +94,7 @@ bool
 BackgroundsWindow::QuitRequested()
 {
 	fBackgroundsView->SaveSettings();
-	if (fIsStandalone)
-		be_app->PostMessage(B_QUIT_REQUESTED);
+	be_app->PostMessage(B_QUIT_REQUESTED);
 
 	return true;
 }
@@ -97,8 +114,6 @@ int
 main(int argc, char** argv)
 {
 	BApplication* app = new BackgroundsApplication;
-
-	// This function doesn't return until the application quits
 	app->Run();
 	delete app;
 

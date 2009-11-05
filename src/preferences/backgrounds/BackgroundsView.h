@@ -35,6 +35,7 @@
 
 class ImageFilePanel;
 
+
 class BGImageMenuItem : public BMenuItem {
 	public:
 		BGImageMenuItem(const char *label, int32 imageIndex, BMessage *message,
@@ -47,22 +48,36 @@ class BGImageMenuItem : public BMenuItem {
 };
 
 
-class PreviewBox : public BBox {
+enum frame_parts {
+	FRAME_TOP_LEFT = 0,
+	FRAME_TOP,
+	FRAME_TOP_RIGHT,
+	FRAME_LEFT_SIDE,
+	FRAME_RIGHT_SIDE,
+	FRAME_BOTTOM_LEFT,
+	FRAME_BOTTOM,
+	FRAME_BOTTOM_RIGHT,
+};
+
+
+class FramePart : public BView {
 	public:
-		PreviewBox(BRect frame, const char *name, float _top);
+		FramePart(int32 part);
 
 		void Draw(BRect rect);
 		void SetDesktop(bool isDesktop);
 
-	protected:
+	private:
+		void _SetSizeAndAlignment();
+
+		int32 fFramePart;
 		bool fIsDesktop;
-		float fDrawingTop;
 };
 
 
 class PreView : public BControl {
 	public:
-		PreView(BRect frame, const char *name, int32 resize, int32 flags);
+		PreView();
 
 		BPoint fPoint;
 		BRect fImageBounds;
@@ -83,15 +98,17 @@ class PreView : public BControl {
 
 class BackgroundsView : public BBox {
 	public:
-		BackgroundsView(BRect frame, const char *name, int32 resize, int32 flags);
-		~BackgroundsView(void);
+		BackgroundsView();
+		~BackgroundsView();
+
+		void RefsReceived(BMessage* msg);
 
 		void SaveSettings();
 		void WorkspaceActivated(uint32 oldWorkspaces, bool active);
 		int32 AddImage(BPath path);
 		Image* GetImage(int32 imageIndex);
 
-		void GetPreferredSize(float* _width, float* _height);
+		bool FoundPositionSetting();
 
 	protected:
 		void Save();
@@ -106,7 +123,7 @@ class BackgroundsView : public BBox {
 		void UpdateWithCurrent();
 		void UpdatePreview();
 		void UpdateButtons();
-		void RefsReceived(BMessage *msg);
+		void SetDesktop(bool isDesktop);
 		int32 AddPath(BPath path);
 
 		static int32 NotifyThread(void *data);
@@ -122,7 +139,7 @@ class BackgroundsView : public BBox {
 		BMenu* fPlacementMenu, *fImageMenu, *fWorkspaceMenu;	// the three comboboxes
 		BTextControl *fXPlacementText, *fYPlacementText;		// x and y textboxes
 		PreView *fPreView;				// the view for previewing the result
-		PreviewBox *fPreview;			// the box which draws a computer/folder
+		BBox *fPreview;					// the box which draws a computer/folder
 		BFilePanel *fFolderPanel;		// the file panels for folders
 		ImageFilePanel *fPanel;			// the file panels for images
 
@@ -134,6 +151,18 @@ class BackgroundsView : public BBox {
 
 		BObjectList<BPath> fPathList;
 		BObjectList<Image> fImageList;
+
+		FramePart* fTopLeft;
+		FramePart* fTop;
+		FramePart* fTopRight;
+		FramePart* fLeft;
+		FramePart* fRight;
+		FramePart* fBottomLeft;
+		FramePart* fBottom;
+		FramePart* fBottomRight;
+
+		bool fFoundPositionSetting;
 };
 
 #endif	// BACKGROUNDS_VIEW_H
+

@@ -5,6 +5,7 @@
  * Authors:
  *		Jerome Duval (jerome.duval@free.fr)
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Jonas Sundström, jonas@kirilla.se
  */
 
 
@@ -14,15 +15,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <Debug.h>
-#include <OS.h>
-#include <MenuField.h>
-#include <StorageKit.h>
-#include <Window.h>
-#include <Messenger.h>
 #include <Bitmap.h>
+#include <Debug.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <LayoutBuilder.h>
+#include <MenuField.h>
+#include <Messenger.h>
+#include <MimeType.h>
 #include <Point.h>
-#include <TranslationKit.h>
 #include <PopUpMenu.h>
 
 #include <be_apps/Tracker/Background.h>
@@ -90,75 +91,39 @@ const uint8 kHandCursorData[68] = {
 };
 
 
-BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
-	int32 flags)
-	: BBox(frame, name, resize, flags | B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER),
+BackgroundsView::BackgroundsView()
+	:
+	BBox("BackgroundsView"),
 	fCurrent(NULL),
 	fCurrentInfo(NULL),
 	fLastImageIndex(-1),
 	fPathList(1, true),
-	fImageList(1, true)
+	fImageList(1, true),
+	fFoundPositionSetting(false)
 {
-	// we need the "Current Workspace" first to get its height
+	SetBorder(B_NO_BORDER);
 
-	BMenuItem *menuItem;
-	fWorkspaceMenu = new BPopUpMenu("pick one");
-	fWorkspaceMenu->AddItem(menuItem = new BMenuItem("All Workspaces",
-		new BMessage(kMsgAllWorkspaces)));
-	fWorkspaceMenu->AddItem(menuItem = new BMenuItem("Current Workspace",
-		new BMessage(kMsgCurrentWorkspace)));
-	menuItem->SetMarked(true);
-	fLastWorkspaceIndex = fWorkspaceMenu->IndexOf(fWorkspaceMenu->FindMarked());
-	fWorkspaceMenu->AddSeparatorItem();
-	fWorkspaceMenu->AddItem(menuItem = new BMenuItem("Default folder",
-		new BMessage(kMsgDefaultFolder)));
-	fWorkspaceMenu->AddItem(menuItem = new BMenuItem("Other folder" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgOtherFolder)));
-
-	BMenuField *workspaceMenuField = new BMenuField(BRect(0, 0, 130, 18),
-		"workspaceMenuField", NULL, fWorkspaceMenu, true);
-	workspaceMenuField->ResizeToPreferred();
-
-	/* the preview box */
-
-	BFont font(be_plain_font);
-	font_height fontHeight;
-	font.GetHeight(&fontHeight);
-
-	float preview_width = 120.0f;
-
-	// get aspect ratio
-	float aspect_ratio = BScreen().Frame().Width() / 
-		BScreen().Frame().Height();
-	
-	float preview_height = ceil(preview_width / aspect_ratio);
-
-	fPreview = new PreviewBox(BRect(10, 8.0 + workspaceMenuField->Bounds().Height() / 2.0f
-		- ceilf(fontHeight.ascent + fontHeight.descent) / 2.0f, 160, 180), "preview",
-		19 + 90 - preview_height);
-	fPreview->SetFont(&font);
+	fPreview = new BBox("preview");
 	fPreview->SetLabel("Preview");
-	AddChild(fPreview);
+	
+	fPreView = new PreView();
 
-	BRect rect(10, fPreview->Bounds().bottom - 30, 70, fPreview->Bounds().bottom - 10);
-	fXPlacementText = new BTextControl(rect, "xPlacementText", "X:", NULL,
-		new BMessage(kMsgImagePlacement), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	fXPlacementText->SetDivider(fXPlacementText->StringWidth(fXPlacementText->Label()) + 4.0f);
+	fTopLeft = new FramePart(FRAME_TOP_LEFT);
+	fTop = new FramePart(FRAME_TOP);
+	fTopRight = new FramePart(FRAME_TOP_RIGHT);
+	fLeft = new FramePart(FRAME_LEFT_SIDE);
+	fRight = new FramePart(FRAME_RIGHT_SIDE);
+	fBottomLeft = new FramePart(FRAME_BOTTOM_LEFT);
+	fBottom = new FramePart(FRAME_BOTTOM);
+	fBottomRight = new FramePart(FRAME_BOTTOM_RIGHT);
+
+	fXPlacementText = new BTextControl("X:", NULL,
+		new BMessage(kMsgImagePlacement));
+	fYPlacementText = new BTextControl("Y:", NULL,
+		new BMessage(kMsgImagePlacement));
+
 	fXPlacementText->TextView()->SetMaxBytes(5);
-	float width, height;
-	fXPlacementText->GetPreferredSize(&width, &height);
-	float delta = fXPlacementText->Bounds().Height() - height;
-	fXPlacementText->MoveBy(0, delta);
-	fXPlacementText->ResizeTo(fXPlacementText->Bounds().Width(), height);
-	fPreview->AddChild(fXPlacementText);
-
-	rect.OffsetBy(70, delta);
-	fYPlacementText = new BTextControl(rect, "yPlacementText", "Y:", NULL,
-		new BMessage(kMsgImagePlacement), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	fYPlacementText->SetDivider(fYPlacementText->StringWidth(fYPlacementText->Label()) + 4.0f);
 	fYPlacementText->TextView()->SetMaxBytes(5);
-	fXPlacementText->ResizeTo(fYPlacementText->Bounds().Width(), height);
-	fPreview->AddChild(fYPlacementText);
 
 	for (int32 i = 0; i < 256; i++) {
 		if ((i < '0' || i > '9') && i != '-') {
@@ -167,40 +132,67 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 		}
 	}
 
-	fPreView = new PreView(BRect((150 - preview_width) / 2, 25 + 90 - preview_height,
-		150 - (150 - preview_width) / 2, 25 + 90),
-		"preView",
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_SUBPIXEL_PRECISE);
-	fPreview->AddChild(fPreView);
+	BView* view = BLayoutBuilder::Group<>()
+		.AddGlue()
+		.AddGroup(B_VERTICAL, 20)
+			.AddGroup(B_HORIZONTAL, 0)
+				.AddGlue()
+				.AddGrid(0, 0)
+					.Add(fTopLeft, 0, 0)
+					.Add(fTop, 1, 0)
+					.Add(fTopRight, 2, 0)
+					.Add(fLeft, 0, 1)
+					.Add(fPreView, 1, 1)
+					.Add(fRight, 2, 1)
+					.Add(fBottomLeft, 0, 2)
+					.Add(fBottom, 1, 2)
+					.Add(fBottomRight, 2, 2)
+					.End()
+				.AddGlue()
+				.End()
+			.AddGroup(B_HORIZONTAL, 10)
+				.Add(fXPlacementText)
+				.Add(fYPlacementText)
+				.End()
+			.AddGlue()
+			.SetInsets(10, 10, 10, 10)
+			.End()
+		.AddGlue()
+		.View();
+	
+	fPreview->AddChild(view);
 
-	/* the right box */
+	BBox *rightbox = new BBox("rightbox");
 
-	BBox *rightbox = new BBox(BRect(fPreview->Frame().right + 10,
-		7, Frame().right - 10, fPreview->Frame().bottom),
-		"rightbox");
+	fWorkspaceMenu = new BPopUpMenu("pick one");
+	fWorkspaceMenu->AddItem(new BMenuItem("All Workspaces",
+		new BMessage(kMsgAllWorkspaces)));
+	BMenuItem* menuItem;
+	fWorkspaceMenu->AddItem(menuItem = new BMenuItem("Current Workspace",
+		new BMessage(kMsgCurrentWorkspace)));
+	menuItem->SetMarked(true);
+	fLastWorkspaceIndex = fWorkspaceMenu->IndexOf(fWorkspaceMenu->FindMarked());
+	fWorkspaceMenu->AddSeparatorItem();
+	fWorkspaceMenu->AddItem(new BMenuItem("Default folder",
+		new BMessage(kMsgDefaultFolder)));
+	fWorkspaceMenu->AddItem(new BMenuItem("Other folder" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgOtherFolder)));
+
+	BMenuField *workspaceMenuField = new BMenuField(BRect(0, 0, 130, 18),
+		"workspaceMenuField", NULL, fWorkspaceMenu, true);
+	workspaceMenuField->ResizeToPreferred();
 	rightbox->SetLabel(workspaceMenuField);
-	AddChild(rightbox);
-
-	float offset = be_plain_font->StringWidth("Placement:") + 5;
-	rect.Set(10, 0, rightbox->Bounds().right - 10, 30);
-#ifdef __HAIKU__
-	rect.top = 8 + rightbox->InnerFrame().top;
-#else
-	rect.top = 5 + workspaceMenuField->Bounds().Height();
-	rect.bottom = rect.top + workspaceMenuField->Bounds().Height();
-#endif
 
 	fImageMenu = new BPopUpMenu("pick one");
-	fImageMenu->AddItem(new BGImageMenuItem("None", -1, new BMessage(kMsgNoImage)));
+	fImageMenu->AddItem(new BGImageMenuItem("None", -1,
+		new BMessage(kMsgNoImage)));
 	fImageMenu->AddSeparatorItem();
-	fImageMenu->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS, new BMessage(kMsgOtherImage)));
+	fImageMenu->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgOtherImage)));
 
-	BMenuField *imageMenuField = new BMenuField(rect, "imageMenuField",
-		"Image:", fImageMenu);
-	imageMenuField->SetDivider(offset);
+	BMenuField *imageMenuField = new BMenuField(NULL, fImageMenu);
 	imageMenuField->SetAlignment(B_ALIGN_RIGHT);
 	imageMenuField->ResizeToPreferred();
-	rightbox->AddChild(imageMenuField);
 
 	fPlacementMenu = new BPopUpMenu("pick one");
 	fPlacementMenu->AddItem(new BMenuItem("Manual",
@@ -212,48 +204,66 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 	fPlacementMenu->AddItem(new BMenuItem("Tile",
 		new BMessage(kMsgTilePlacement)));
 
-	rect.OffsetBy(0, imageMenuField->Bounds().Height() + 5);
-	BMenuField *placementMenuField = new BMenuField(rect, "placementMenuField",
-		"Placement:", fPlacementMenu);
-	placementMenuField->SetDivider(offset);
+	BMenuField *placementMenuField = new BMenuField(NULL, fPlacementMenu);
 	placementMenuField->SetAlignment(B_ALIGN_RIGHT);
-	placementMenuField->ResizeToPreferred();
-	rightbox->AddChild(placementMenuField);
 
-	rect.OffsetBy(offset, placementMenuField->Bounds().Height() + 5);
-	fIconLabelOutline = new BCheckBox(rect, "iconLabelOutline",
-		"Icon label outline", new BMessage(kMsgIconLabelOutline));
+	fIconLabelOutline = new BCheckBox("Icon label outline",
+		new BMessage(kMsgIconLabelOutline));
 	fIconLabelOutline->SetValue(B_CONTROL_OFF);
-	fIconLabelOutline->ResizeToPreferred();
-	rightbox->AddChild(fIconLabelOutline);
 
-	rect.top += fIconLabelOutline->Bounds().Height() + 15;
-	fPicker = new BColorControl(BPoint(10, rect.top), B_CELLS_32x8, 7.0, "Picker",
+	fPicker = new BColorControl(BPoint(0, 0), B_CELLS_32x8, 7.0, "Picker",
 		new BMessage(kMsgUpdateColor));
-	rightbox->AddChild(fPicker);
 
-	float xDelta = max_c(fIconLabelOutline->Frame().right, fPicker->Frame().right)
-		+ 10.0f - rightbox->Bounds().Width();
-	delta = fPicker->Frame().bottom + 10.0f - rightbox->Bounds().Height();
+	BStringView* imageStringView = new BStringView(NULL, "Image:");
+	BStringView* placementStringView = new BStringView(NULL, "Placement:");
 
-	rightbox->ResizeBy(xDelta, delta);
-	fPreview->ResizeBy(0, delta);
+	imageStringView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
+		B_ALIGN_NO_VERTICAL));
+	placementStringView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
+		B_ALIGN_NO_VERTICAL));
 
-	// we're not yet attached to a view, so we need to move them manually
-	fXPlacementText->MoveBy(0, delta);
-	fYPlacementText->MoveBy(0, delta);
+	view = BLayoutBuilder::Group<>()
+		.AddGroup(B_VERTICAL, 10)
+			.AddGroup(B_VERTICAL, 10)
+				.AddGrid(10, 10)
+					.Add(imageStringView, 0, 0)
+					.Add(placementStringView, 0, 1)
+					.Add(imageMenuField, 1, 0)
+					.Add(placementMenuField, 1, 1)
+					.End()
+				.Add(fIconLabelOutline)
+				.End()
+			.Add(fPicker)
+			.SetInsets(10, 10, 10, 10)
+			.End()
+		.View();
+	
+	rightbox->AddChild(view);
+	
+	fRevert = new BButton("Revert", new BMessage(kMsgRevertSettings));
+	fApply = new BButton("Apply", new BMessage(kMsgApplySettings));
 
-	rect = fPreview->Frame();
-	rect.top = rect.bottom + 10.0;
-	fRevert = new BButton(rect, "revert", "Revert", new BMessage(kMsgRevertSettings));
-	AddChild(fRevert);
-	fRevert->ResizeToPreferred();
+	fRevert->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_NO_VERTICAL));
+	fApply->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
+		B_ALIGN_NO_VERTICAL));
 
-	rect.left = rightbox->Frame().right;
-	fApply = new BButton(rect, "apply", "Apply", new BMessage(kMsgApplySettings));
-	AddChild(fApply);
-	fApply->ResizeToPreferred();
-	fApply->MoveBy(-fApply->Bounds().Width(), 0);
+	view = BLayoutBuilder::Group<>()
+		.AddGroup(B_VERTICAL, 10)
+			.AddGroup(B_HORIZONTAL, 10)
+				.Add(fPreview)
+				.Add(rightbox)
+				.End()
+			.AddGroup(B_HORIZONTAL, 0)
+				.Add(fRevert)
+				.Add(fApply)
+				.End()
+			.SetInsets(10, 10, 10, 10)
+			.End()
+		.View();
+
+	AddChild(view);
+
 	fApply->MakeDefault(true);
 }
 
@@ -262,16 +272,6 @@ BackgroundsView::~BackgroundsView()
 {
 	delete fPanel;
 	delete fFolderPanel;
-}
-
-
-void
-BackgroundsView::GetPreferredSize(float* _width, float* _height)
-{
-	if (_width)
-		*_width = fApply->Frame().right + 10;
-	if (_height)
-		*_height = fApply->Frame().bottom + 10;
 }
 
 
@@ -307,18 +307,11 @@ BackgroundsView::AllAttached()
 	LoadSettings();
 	LoadDesktopFolder();
 
-	float width, height;
-	GetPreferredSize(&width, &height);
-
 	BPoint point;
-	if (fSettings.FindPoint("pos", &point) != B_OK) {
-		BRect frame(BScreen().Frame());
-		point.Set((frame.right - width) / 2, (frame.bottom - height) / 2);
+	if (fSettings.FindPoint("pos", &point) == B_OK) {
+		fFoundPositionSetting = true;
+		Window()->MoveTo(point);
 	}
-
-	ResizeTo(width, height);
-	Window()->MoveTo(point);
-	Window()->ResizeTo(width, height);
 
 	fApply->SetEnabled(false);
 	fRevert->SetEnabled(false);
@@ -376,7 +369,7 @@ BackgroundsView::MessageReceived(BMessage *msg)
 			if (fCurrent && fCurrent->IsDesktop()) {
 				UpdateButtons();
 			} else {
-				fPreview->SetDesktop(true);
+				SetDesktop(true);
 				LoadDesktopFolder();
 			}
 			break;
@@ -385,7 +378,7 @@ BackgroundsView::MessageReceived(BMessage *msg)
 			fImageMenu->FindItem(kMsgNoImage)->SetLabel("None");
 			fLastWorkspaceIndex = fWorkspaceMenu->IndexOf(
 				fWorkspaceMenu->FindMarked());
-			fPreview->SetDesktop(false);
+			SetDesktop(false);
 			LoadDefaultFolder();
 			break;
 
@@ -409,14 +402,16 @@ BackgroundsView::MessageReceived(BMessage *msg)
 					fImageMenu->ItemAt(0)->SetMarked(true);
 			} else if (pointer == fFolderPanel) {
 				if (fLastWorkspaceIndex >= 0)
-					fWorkspaceMenu->ItemAt(fLastWorkspaceIndex)->SetMarked(true);
+					fWorkspaceMenu->ItemAt(fLastWorkspaceIndex)
+						->SetMarked(true);
 			}
 			break;
 		}
 
 		case kMsgImageSelected:
 		case kMsgNoImage:
-			fLastImageIndex = ((BGImageMenuItem*)fImageMenu->FindMarked())->ImageIndex();
+			fLastImageIndex = ((BGImageMenuItem*)fImageMenu->FindMarked())
+				->ImageIndex();
 			UpdatePreview();
 			UpdateButtons();
 			break;
@@ -425,7 +420,8 @@ BackgroundsView::MessageReceived(BMessage *msg)
 			fImageMenu->FindItem(kMsgNoImage)->SetLabel("Default");
 			fLastWorkspaceIndex = fWorkspaceMenu->IndexOf(
 				fWorkspaceMenu->FindMarked());
-			fPreview->SetDesktop(false);
+			SetDesktop(false);
+
 			LoadRecentFolder(*fPathList.ItemAt(fWorkspaceMenu->IndexOf(
 				fWorkspaceMenu->FindMarked()) - 6));
 			break;
@@ -436,8 +432,8 @@ BackgroundsView::MessageReceived(BMessage *msg)
 
 			//NotifyServer();
 			thread_id notify_thread;
-			notify_thread = spawn_thread(BackgroundsView::NotifyThread, "notifyServer",
-				B_NORMAL_PRIORITY, this);
+			notify_thread = spawn_thread(BackgroundsView::NotifyThread,
+				"notifyServer", B_NORMAL_PRIORITY, this);
 			resume_thread(notify_thread);
 			UpdateButtons();
 			break;
@@ -516,8 +512,10 @@ BackgroundsView::UpdateWithCurrent(void)
 	if (fCurrent == NULL)
 		return;
 
-	fPlacementMenu->FindItem(kMsgScalePlacement)->SetEnabled(fCurrent->IsDesktop());
-	fPlacementMenu->FindItem(kMsgCenterPlacement)->SetEnabled(fCurrent->IsDesktop());
+	fPlacementMenu->FindItem(kMsgScalePlacement)
+		->SetEnabled(fCurrent->IsDesktop());
+	fPlacementMenu->FindItem(kMsgCenterPlacement)
+		->SetEnabled(fCurrent->IsDesktop());
 
 	if (fWorkspaceMenu->IndexOf(fWorkspaceMenu->FindMarked()) > 5)
 		fImageMenu->FindItem(kMsgNoImage)->SetLabel("Default");
@@ -604,8 +602,9 @@ BackgroundsView::Save()
 
 	if (!fCurrent->IsDesktop()) {
 		if (fCurrentInfo == NULL) {
-			fCurrentInfo = new BackgroundImage::BackgroundImageInfo(B_ALL_WORKSPACES,
-				fLastImageIndex, mode, offset, textWidgetLabelOutline, 0, 0);
+			fCurrentInfo = new BackgroundImage::BackgroundImageInfo(
+				B_ALL_WORKSPACES, fLastImageIndex, mode, offset,
+				textWidgetLabelOutline, 0, 0);
 			fCurrent->Add(fCurrentInfo);
 		} else {
 			fCurrentInfo->fTextWidgetLabelOutline = textWidgetLabelOutline;
@@ -694,7 +693,8 @@ BackgroundsView::NotifyServer()
 		int32 err;
 		BEntry currentEntry(&fCurrentRef);
 		BPath currentPath(&currentEntry);
-		bool isCustomFolder = !fWorkspaceMenu->FindItem(kMsgDefaultFolder)->IsMarked();
+		bool isCustomFolder
+			= !fWorkspaceMenu->FindItem(kMsgDefaultFolder)->IsMarked();
 
 		do {
 			BMessage msg(B_GET_PROPERTY);
@@ -867,7 +867,8 @@ BackgroundsView::UpdatePreview()
 	if (fPlacementMenu->IsEnabled() ^ imageEnabled)
 		fPlacementMenu->SetEnabled(imageEnabled);
 
-	bool textEnabled = (fPlacementMenu->FindItem(kMsgManualPlacement)->IsMarked())
+	bool textEnabled
+		= (fPlacementMenu->FindItem(kMsgManualPlacement)->IsMarked())
 		&& imageEnabled;
 	if (fXPlacementText->IsEnabled() ^ textEnabled)
 		fXPlacementText->SetEnabled(textEnabled);
@@ -933,14 +934,6 @@ BackgroundsView::FindPlacementMode()
 
 	return mode;
 }
-
-
-#ifndef __HAIKU__
-inline bool operator!=(const rgb_color& x, const rgb_color& y)
-{
-	return (x.red != y.red || x.blue != y.blue || x.green != y.green);
-}
-#endif
 
 
 void
@@ -1053,7 +1046,8 @@ BackgroundsView::RefsReceived(BMessage *msg)
 					fWorkspaceMenu->AddSeparatorItem();
 				BString s;
 				s << "Folder: " << path.Leaf();
-				item = new BMenuItem(s.String(), new BMessage(kMsgFolderSelected));
+				item = new BMenuItem(s.String(),
+					new BMessage(kMsgFolderSelected));
 				fWorkspaceMenu->AddItem(item, -index - 1 + 6);
 				item->SetTarget(this);
 				fLastWorkspaceIndex = -index - 1 + 6;
@@ -1145,13 +1139,44 @@ BackgroundsView::AddItem(BGImageMenuItem *item)
 }
 
 
+void
+BackgroundsView::SetDesktop(bool isDesktop)
+{
+	fTopLeft->SetDesktop(isDesktop);
+	fTop->SetDesktop(isDesktop);
+	fTopRight->SetDesktop(isDesktop);
+	fLeft->SetDesktop(isDesktop);
+	fRight->SetDesktop(isDesktop);
+	fBottomLeft->SetDesktop(isDesktop);
+	fBottom->SetDesktop(isDesktop);
+	fBottomRight->SetDesktop(isDesktop);
+
+	Invalidate();
+}
+
+
+bool
+BackgroundsView::FoundPositionSetting()
+{
+	return fFoundPositionSetting;
+}
+
+
 //	#pragma mark -
 
 
-PreView::PreView(BRect frame, const char *name, int32 resize, int32 flags)
-	: BControl(frame, name, NULL, NULL, resize, flags),
+PreView::PreView()
+	:
+	BControl("PreView", NULL, NULL, B_WILL_DRAW | B_SUBPIXEL_PRECISE),
 	fMoveHandCursor(kHandCursorData)
 {
+	float aspectRatio = BScreen().Frame().Width() / BScreen().Frame().Height();
+	float previewWidth = 120.0f;	
+	float previewHeight = ceil(previewWidth / aspectRatio);
+
+	ResizeTo(previewWidth, previewHeight);
+	SetExplicitMinSize(BSize(previewWidth, previewHeight));
+	SetExplicitMaxSize(BSize(previewWidth, previewHeight));
 }
 
 
@@ -1254,80 +1279,355 @@ PreView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 //	#pragma mark -
 
 
-PreviewBox::PreviewBox(BRect frame, const char *name, float _top)
-	:
-	BBox(frame, name),
-	fDrawingTop(_top)
-{
-	fIsDesktop = true;
-}
-
-
-void
-PreviewBox::Draw(BRect rect)
-{
-	rgb_color color = HighColor();
-
-	SetHighColor(LowColor());
-	FillRect(BRect(9, 19, 141, 127));
-
-	if (fIsDesktop) {
-		BPoint points[] = {
-			BPoint(11, fDrawingTop), BPoint(139, fDrawingTop), 
-			BPoint(141, fDrawingTop + 2),
-			BPoint(141, 119), BPoint(139, 121), BPoint(118, 121),
-			BPoint(118, 126), BPoint(117, 127), BPoint(33, 127),
-			BPoint(32, 126), BPoint(32, 121), BPoint(11, 121),
-			BPoint(9, 119), BPoint(9, fDrawingTop + 2), 
-			BPoint(11, fDrawingTop)
-		};
-		SetHighColor(184, 184, 184);
-		FillPolygon(points, 15);
-		SetHighColor(96, 96, 96);
-		StrokePolygon(points, 15);
-		FillRect(BRect(107, 121, 111, 123));
-		SetHighColor(0, 0, 0);
-		StrokeRect(BRect(14, fDrawingTop + 5, 136, 116));
-		SetHighColor(0, 255, 0);
-		FillRect(BRect(101, 122, 103, 123));
-	} else {
-		SetHighColor(152, 152, 152);
-		StrokeLine(BPoint(11, 13), BPoint(67, 13));
-		StrokeLine(BPoint(67, 21));
-		StrokeLine(BPoint(139, 21));
-		StrokeLine(BPoint(139, 119));
-		StrokeLine(BPoint(11, 119));
-		StrokeLine(BPoint(11, 13));
-		StrokeRect(BRect(14, 24, 136, 116));
-		SetHighColor(255, 203, 0);
-		FillRect(BRect(12, 14, 66, 21));
-		SetHighColor(240, 240, 240);
-		StrokeRect(BRect(12, 22, 137, 117));
-		StrokeLine(BPoint(138, 22), BPoint(138, 22));
-		StrokeLine(BPoint(12, 118), BPoint(12, 118));
-		SetHighColor(200, 200, 200);
-		StrokeRect(BRect(13, 23, 138, 118));
-	}
-
-	SetHighColor(color);
-	BBox::Draw(rect);
-}
-
-
-void
-PreviewBox::SetDesktop(bool isDesktop)
-{
-	fIsDesktop = isDesktop;
-	Invalidate();
-}
-
-
-//	#pragma mark -
-
-
 BGImageMenuItem::BGImageMenuItem(const char *label, int32 imageIndex,
 	BMessage *message, char shortcut, uint32 modifiers)
 	: BMenuItem(label, message, shortcut, modifiers),
 	fImageIndex(imageIndex)
 {
 }
+
+
+//	#pragma mark -
+
+
+FramePart::FramePart(int32 part)
+	:
+	BView(NULL, B_WILL_DRAW | B_FRAME_EVENTS),
+	fFramePart(part),
+	fIsDesktop(true)
+{
+	_SetSizeAndAlignment();
+}
+
+
+void
+FramePart::Draw(BRect rect)
+{
+	rgb_color color = HighColor();
+	SetDrawingMode(B_OP_COPY);
+	SetHighColor(Parent()->ViewColor());
+
+	if (fIsDesktop) {
+		switch (fFramePart) {
+			case FRAME_TOP_LEFT:
+				FillRect(rect);
+				SetHighColor(160, 160, 160);
+				FillRoundRect(BRect(0, 0, 8, 8), 3, 3);
+				SetHighColor(96, 96, 96);
+				StrokeRoundRect(BRect(0, 0, 8, 8), 3, 3);
+				break;
+
+			case FRAME_TOP:
+				SetHighColor(160, 160, 160);
+				FillRect(BRect(0, 1, rect.right, 3));
+				SetHighColor(96, 96, 96);
+				StrokeLine(BPoint(0, 0), BPoint(rect.right, 0));
+				SetHighColor(0, 0, 0);
+				StrokeLine(BPoint(0, 4), BPoint(rect.right, 4));
+				break;
+
+			case FRAME_TOP_RIGHT:
+				FillRect(rect);
+				SetHighColor(160, 160, 160);
+				FillRoundRect(BRect(-4, 0, 4, 8), 3, 3);
+				SetHighColor(96, 96, 96);
+				StrokeRoundRect(BRect(-4, 0, 4, 8), 3, 3);
+				break;
+
+			case FRAME_LEFT_SIDE:
+				SetHighColor(160, 160, 160);
+				FillRect(BRect(1, 0, 3, rect.bottom));
+				SetHighColor(96, 96, 96);
+				StrokeLine(BPoint(0, 0), BPoint(0, rect.bottom));
+				SetHighColor(0, 0, 0);
+				StrokeLine(BPoint(4, 0), BPoint(4, rect.bottom));
+				break;
+
+			case FRAME_RIGHT_SIDE:
+				SetHighColor(160, 160, 160);
+				FillRect(BRect(1, 0, 3, rect.bottom));
+				SetHighColor(0, 0, 0);
+				StrokeLine(BPoint(0, 0), BPoint(0, rect.bottom));
+				SetHighColor(96, 96, 96);
+				StrokeLine(BPoint(4, 0), BPoint(4, rect.bottom));
+				break;
+
+			case FRAME_BOTTOM_LEFT:
+				FillRect(rect);
+				SetHighColor(160, 160, 160);
+				FillRoundRect(BRect(0, -4, 8, 4), 3, 3);
+				SetHighColor(96, 96, 96);
+				StrokeRoundRect(BRect(0, -4, 8, 4), 3, 3);
+				break;
+
+			case FRAME_BOTTOM:
+				SetHighColor(160, 160, 160);
+				FillRect(BRect(0, 1, rect.right, 3));
+				SetHighColor(0, 0, 0);
+				StrokeLine(BPoint(0, 0), BPoint(rect.right, 0));
+				SetHighColor(96, 96, 96);
+				StrokeLine(BPoint(0, 4), BPoint(rect.right, 4));
+				SetHighColor(228, 0, 0);
+				StrokeLine(BPoint(5, 2), BPoint(7, 2));
+				break;
+
+			case FRAME_BOTTOM_RIGHT:
+				FillRect(rect);
+				SetHighColor(160, 160, 160);
+				FillRoundRect(BRect(-4, -4, 4, 4), 3, 3);
+				SetHighColor(96, 96, 96);
+				StrokeRoundRect(BRect(-4, -4, 4, 4), 3, 3);
+				break;
+
+			default:
+				break;
+		}
+	} else {
+		switch (fFramePart) {
+			case FRAME_TOP_LEFT:
+				SetHighColor(152, 152, 152);
+				StrokeLine(BPoint(0, 0), BPoint(0, 12));
+				StrokeLine(BPoint(0, 0), BPoint(4, 0));
+				StrokeLine(BPoint(3, 12), BPoint(3, 12));
+				SetHighColor(255, 203, 0);
+				FillRect(BRect(1, 1, 3, 9));
+				SetHighColor(240, 240, 240);
+				StrokeLine(BPoint(1, 12), BPoint(1, 10));
+				StrokeLine(BPoint(2, 10), BPoint(3, 10));
+				SetHighColor(200, 200, 200);
+				StrokeLine(BPoint(2, 12), BPoint(2, 11));
+				StrokeLine(BPoint(3, 11), BPoint(3, 11));
+				break;
+
+			case FRAME_TOP:
+				FillRect(BRect(54, 0, rect.right, 8));
+				SetHighColor(255, 203, 0);
+				FillRect(BRect(0, 1, 52, 9));
+				SetHighColor(152, 152, 152);
+				StrokeLine(BPoint(0, 0), BPoint(53, 0));
+				StrokeLine(BPoint(53, 1), BPoint(53, 9));
+				StrokeLine(BPoint(54, 9), BPoint(rect.right, 9));
+				SetHighColor(240, 240, 240);
+				StrokeLine(BPoint(0, 10), BPoint(rect.right, 10));
+				SetHighColor(200, 200, 200);
+				StrokeLine(BPoint(0, 11), BPoint(rect.right, 11));
+				SetHighColor(152, 152, 152);
+				StrokeLine(BPoint(0, 12), BPoint(rect.right, 12));
+				break;
+
+			case FRAME_TOP_RIGHT:
+				FillRect(BRect(0, 0, 3, 8));
+				SetHighColor(152, 152, 152);
+				StrokeLine(BPoint(0, 12), BPoint(0, 12));
+				StrokeLine(BPoint(0, 9), BPoint(3, 9));
+				StrokeLine(BPoint(3, 12), BPoint(3, 9));
+				SetHighColor(240, 240, 240);
+				StrokeLine(BPoint(0, 10), BPoint(2, 10));
+				StrokeLine(BPoint(1, 12), BPoint(1, 12));
+				SetHighColor(200, 200, 200);
+				StrokeLine(BPoint(2, 12), BPoint(2, 12));
+				StrokeLine(BPoint(0, 11), BPoint(2, 11));
+				break;
+
+			case FRAME_LEFT_SIDE:
+			case FRAME_RIGHT_SIDE:
+				SetHighColor(152, 152, 152);
+				StrokeLine(BPoint(0, 0), BPoint(0, rect.bottom));
+				SetHighColor(240, 240, 240);
+				StrokeLine(BPoint(1, 0), BPoint(1, rect.bottom));
+				SetHighColor(200, 200, 200);
+				StrokeLine(BPoint(2, 0), BPoint(2, rect.bottom));
+				SetHighColor(152, 152, 152);
+				StrokeLine(BPoint(3, 0), BPoint(3, rect.bottom));
+				break;
+
+			case FRAME_BOTTOM_LEFT:
+				SetHighColor(152, 152, 152);
+				StrokeLine(BPoint(0, 0), BPoint(0, 3));
+				StrokeLine(BPoint(0, 3), BPoint(3, 3));
+				StrokeLine(BPoint(3, 0), BPoint(3, 0));
+				SetHighColor(240, 240, 240);
+				StrokeLine(BPoint(1, 0), BPoint(1, 2));
+				StrokeLine(BPoint(3, 1), BPoint(3, 1));
+				SetHighColor(200, 200, 200);
+				StrokeLine(BPoint(2, 0), BPoint(2, 2));
+				StrokeLine(BPoint(3, 2), BPoint(3, 2));
+				break;
+
+			case FRAME_BOTTOM:
+				SetHighColor(152, 152, 152);
+				StrokeLine(BPoint(0, 0), BPoint(rect.right, 0));
+				SetHighColor(240, 240, 240);
+				StrokeLine(BPoint(0, 1), BPoint(rect.right, 1));
+				SetHighColor(200, 200, 200);
+				StrokeLine(BPoint(0, 2), BPoint(rect.right, 2));
+				SetHighColor(152, 152, 152);
+				StrokeLine(BPoint(0, 3), BPoint(rect.right, 3));
+				break;
+
+			case FRAME_BOTTOM_RIGHT:
+				SetHighColor(152, 152, 152);
+				StrokeLine(BPoint(0, 0), BPoint(0, 0));
+				SetHighColor(240, 240, 240);
+				StrokeLine(BPoint(1, 0), BPoint(1, 1));
+				StrokeLine(BPoint(0, 1), BPoint(0, 1));
+				SetHighColor(200, 200, 200);
+				StrokeLine(BPoint(2, 0), BPoint(2, 2));
+				StrokeLine(BPoint(0, 2), BPoint(1, 2));
+				SetHighColor(152, 152, 152);
+				StrokeLine(BPoint(3, 0), BPoint(3, 3));
+				StrokeLine(BPoint(0, 3), BPoint(2, 3));
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	SetHighColor(color);
+}
+
+
+void
+FramePart::SetDesktop(bool isDesktop)
+{
+	fIsDesktop = isDesktop;
+
+	_SetSizeAndAlignment();
+	Invalidate();
+}
+
+
+void
+FramePart::_SetSizeAndAlignment()
+{
+	if (fIsDesktop) {
+		switch (fFramePart) {
+			case FRAME_TOP_LEFT:
+				SetExplicitMinSize(BSize(4, 4));
+				SetExplicitMaxSize(BSize(4, 4));
+				break;
+
+			case FRAME_TOP:
+				SetExplicitMinSize(BSize(1, 4));
+				SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 4));
+				break;
+
+			case FRAME_TOP_RIGHT:
+				SetExplicitMinSize(BSize(4, 4));
+				SetExplicitMaxSize(BSize(4, 4));
+				break;
+
+			case FRAME_LEFT_SIDE:
+				SetExplicitMinSize(BSize(4, 1));
+				SetExplicitMaxSize(BSize(4, B_SIZE_UNLIMITED));
+				break;
+
+			case FRAME_RIGHT_SIDE:
+				SetExplicitMinSize(BSize(4, 1));
+				SetExplicitMaxSize(BSize(4, B_SIZE_UNLIMITED));
+				break;
+
+			case FRAME_BOTTOM_LEFT:
+				SetExplicitMinSize(BSize(4, 4));
+				SetExplicitMaxSize(BSize(4, 4));
+				break;
+
+			case FRAME_BOTTOM:
+				SetExplicitMinSize(BSize(1, 4));
+				SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 4));
+				break;
+
+			case FRAME_BOTTOM_RIGHT:
+				SetExplicitMaxSize(BSize(4, 4));
+				SetExplicitMinSize(BSize(4, 4));
+				break;
+
+			default:
+				break;
+		}
+	} else {
+		switch (fFramePart) {
+			case FRAME_TOP_LEFT:
+				SetExplicitMinSize(BSize(3, 12));
+				SetExplicitMaxSize(BSize(3, 12));
+				break;
+
+			case FRAME_TOP:
+				SetExplicitMinSize(BSize(1, 12));
+				SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 12));
+				break;
+
+			case FRAME_TOP_RIGHT:
+				SetExplicitMinSize(BSize(3, 12));
+				SetExplicitMaxSize(BSize(3, 12));
+				break;
+
+			case FRAME_LEFT_SIDE:
+				SetExplicitMinSize(BSize(3, 1));
+				SetExplicitMaxSize(BSize(3, B_SIZE_UNLIMITED));
+				break;
+
+			case FRAME_RIGHT_SIDE:
+				SetExplicitMinSize(BSize(3, 1));
+				SetExplicitMaxSize(BSize(3, B_SIZE_UNLIMITED));
+				break;
+
+			case FRAME_BOTTOM_LEFT:
+				SetExplicitMinSize(BSize(3, 3));
+				SetExplicitMaxSize(BSize(3, 3));
+				break;
+
+			case FRAME_BOTTOM:
+				SetExplicitMinSize(BSize(1, 3));
+				SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 3));
+				break;
+
+			case FRAME_BOTTOM_RIGHT:
+				SetExplicitMaxSize(BSize(3, 3));
+				SetExplicitMinSize(BSize(3, 3));
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	switch (fFramePart) {
+		case FRAME_TOP_LEFT:
+			SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
+			break;
+
+		case FRAME_TOP:
+			SetExplicitAlignment(BAlignment(B_ALIGN_CENTER, B_ALIGN_BOTTOM));
+			break;
+
+		case FRAME_TOP_RIGHT:
+			SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_BOTTOM));
+			break;
+
+		case FRAME_LEFT_SIDE:
+			SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_MIDDLE));
+			break;
+
+		case FRAME_RIGHT_SIDE:
+			SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
+			break;
+
+		case FRAME_BOTTOM_LEFT:
+			SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_TOP));
+			break;
+
+		case FRAME_BOTTOM:
+			SetExplicitAlignment(BAlignment(B_ALIGN_CENTER, B_ALIGN_TOP));
+			break;
+
+		case FRAME_BOTTOM_RIGHT:
+			SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
+			break;
+
+		default:
+			break;
+	}
+}
+
