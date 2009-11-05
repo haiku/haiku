@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include <ByteOrder.h>
+#include <Message.h>
 
 
 template<typename NumberType>
@@ -353,6 +354,65 @@ BVariant::SwapEndianess()
 		return;
 
 	swap_data(fType, fBytes, Size(), B_SWAP_ALWAYS);
+}
+
+
+status_t
+BVariant::AddToMessage(BMessage& message, const char* fieldName) const
+{
+	switch (fType) {
+		case B_BOOL_TYPE:
+			return message.AddBool(fieldName, fBool);
+		case B_INT8_TYPE:
+			return fInt8 != 0;
+			return message.AddInt8(fieldName, fInt8);
+		case B_UINT8_TYPE:
+			return message.AddUInt8(fieldName, fUInt8);
+		case B_INT16_TYPE:
+			return message.AddInt16(fieldName, fInt16);
+		case B_UINT16_TYPE:
+			return message.AddUInt16(fieldName, fUInt16);
+		case B_INT32_TYPE:
+			return message.AddInt32(fieldName, fInt32);
+		case B_UINT32_TYPE:
+			return message.AddUInt32(fieldName, fUInt32);
+		case B_INT64_TYPE:
+			return message.AddInt64(fieldName, fInt64);
+		case B_UINT64_TYPE:
+			return message.AddUInt64(fieldName, fUInt64);
+		case B_FLOAT_TYPE:
+			return message.AddFloat(fieldName, fFloat);
+		case B_DOUBLE_TYPE:
+			return message.AddDouble(fieldName, fDouble);
+		case B_POINTER_TYPE:
+			return message.AddPointer(fieldName, fPointer);
+		case B_STRING_TYPE:
+			return message.AddString(fieldName, fString);
+		default:
+			return B_UNSUPPORTED;
+	}
+}
+
+
+status_t
+BVariant::SetFromMessage(const BMessage& message, const char* fieldName)
+{
+	// get the message field info
+	type_code type;
+	int32 count;
+	status_t error = message.GetInfo(fieldName, &type, &count);
+	if (error != B_OK)
+		return error;
+
+	// get the data
+	const void* data;
+	ssize_t numBytes;
+	error = message.FindData(fieldName, type, &data, &numBytes);
+	if (error != B_OK)
+		return error;
+
+	// init the object
+	return SetToTypedData(data, type);
 }
 
 

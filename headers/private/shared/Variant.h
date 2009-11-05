@@ -19,6 +19,9 @@ enum {
 };
 
 
+class BMessage;
+
+
 class BVariant {
 public:
 	inline						BVariant();
@@ -94,6 +97,11 @@ public:
 			void				SwapEndianess();
 									// has effect only on scalar types (pointer
 									// counting as scalar, not string, though)
+
+			status_t			AddToMessage(BMessage& message,
+									const char* fieldName) const;
+			status_t			SetFromMessage(const BMessage& message,
+									const char* fieldName);
 
 	static	size_t				SizeOfType(type_code type);
 	static	bool				TypeIsNumber(type_code type);
