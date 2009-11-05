@@ -525,21 +525,7 @@ ramfs_rename(fs_volume fs, fs_vnode _oldDir, const char *oldName,
 	Directory *newDir = dynamic_cast<Directory*>((Node*)_newDir);
 	status_t error = B_OK;
 
-	// check name
-	if (!oldName || *oldName == '\0'
-		|| !strcmp(oldName, ".")  || !strcmp(oldName, "..")
-		|| !newName || *newName == '\0'
-		|| !strcmp(newName, ".")  || !strcmp(newName, "..")) {
-		SET_ERROR(error, B_BAD_VALUE);
-
-	// check nodes
-	} else if (!oldDir || !newDir) {
-		SET_ERROR(error, B_BAD_VALUE);
-
-	// check if the entry isn't actually moved or renamed
-	} else if (oldDir == newDir && !strcmp(oldName, newName)) {
-		SET_ERROR(error, B_BAD_VALUE);
-	} else if (VolumeWriteLocker locker = volume) {
+	if (VolumeWriteLocker locker = volume) {
 FUNCTION(("old dir: %Ld, old name: `%s', new dir: %Ld, new name: `%s'\n",
 oldDir->GetID(), oldName, newDir->GetID(), newName));
 		NodeMTimeUpdater mTimeUpdater1(oldDir);

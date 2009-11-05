@@ -60,15 +60,15 @@ get_node_type(ntfs_inode* ni, int* _type)
 	} else {
 		// Regular or Interix (INTX) file
 		*_type = S_IFREG;
-				
+
 		if (ni->flags & FILE_ATTR_SYSTEM) {
 			na = ntfs_attr_open(ni, AT_DATA, NULL,0);
 			if (!na) {
 				return ENOENT;
 			}
 			// Check whether it's Interix symbolic link
-			if (na->data_size <= sizeof(INTX_FILE_TYPES) + 
-			    sizeof(ntfschar) * PATH_MAX && 
+			if (na->data_size <= sizeof(INTX_FILE_TYPES) +
+			    sizeof(ntfschar) * PATH_MAX &&
 			    na->data_size > sizeof(INTX_FILE_TYPES)) {
 				INTX_FILE *intx_file;
 
@@ -90,18 +90,18 @@ get_node_type(ntfs_inode* ni, int* _type)
 			ntfs_attr_close(na);
 		}
 	}
-		
+
 	return B_OK;
 }
 
-void 
+void
 fs_ntfs_update_times(fs_volume *vol, ntfs_inode *ni, ntfs_time_update_flags mask)
 {
 	nspace *ns = (nspace*)vol->private_volume;
-	
+
 	if (ns->noatime)
 		mask &= ~NTFS_UPDATE_ATIME;
-				
+
 	ntfs_inode_update_times(ni, mask);
 }
 
@@ -614,7 +614,7 @@ fs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *stbuf)
 		stbuf->st_size = ni->data_size;
 		stbuf->st_blocks = (ni->allocated_size + 511) >> 9;
 		stbuf->st_nlink = le16_to_cpu(ni->mrec->link_count);
-		
+
 		if (ni->flags & FILE_ATTR_SYSTEM) {
 			na = ntfs_attr_open(ni, AT_DATA, NULL,0);
 			if (!na) {
@@ -624,8 +624,8 @@ fs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *stbuf)
 			stbuf->st_size = na->data_size;
 			stbuf->st_blocks = na->allocated_size >> 9;
 			// Check whether it's Interix symbolic link
-			if (na->data_size <= sizeof(INTX_FILE_TYPES) + 
-			    sizeof(ntfschar) * PATH_MAX && 
+			if (na->data_size <= sizeof(INTX_FILE_TYPES) +
+			    sizeof(ntfschar) * PATH_MAX &&
 			    na->data_size > sizeof(INTX_FILE_TYPES)) {
 				INTX_FILE *intx_file;
 
@@ -654,14 +654,14 @@ fs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *stbuf)
 	if (ns->flags & B_FS_IS_READONLY) {
 		stbuf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 	}
-		
+
 	stbuf->st_uid = 0;
 	stbuf->st_gid = 0;
 	stbuf->st_ino = MREF(ni->mft_no);
 	stbuf->st_atime = ni->last_access_time;
 	stbuf->st_ctime = ni->last_mft_change_time;
-	stbuf->st_mtime = ni->last_data_change_time;	
-	
+	stbuf->st_mtime = ni->last_data_change_time;
+
 exit:
 	if (ni)
 		ntfs_inode_close(ni);
@@ -942,7 +942,7 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 			fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_MCTIME);
 
 			notify_entry_created(ns->id, MREF(bi->mft_no), name, *_vnid);
-			
+
 		} else
 			result = errno;
 	}
@@ -1033,7 +1033,7 @@ fs_read(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset, void *buf,
 
 	*len = total;
 	fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_ATIME);
-	
+
 exit:
 	if (na)
 		ntfs_attr_close(na);
@@ -1129,8 +1129,8 @@ fs_write(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset,
 
 	*len = total;
 	if (total > 0)
-		fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_MCTIME);	
-	
+		fs_ntfs_update_times(_vol, ni, NTFS_UPDATE_MCTIME);
+
 	ERRPRINT(("fs_write - OK\n"));
 
 exit:
@@ -1355,7 +1355,7 @@ fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name,
 	put_vnode(_vol, MREF(sym->mft_no));
 	fs_ntfs_update_times(_vol, sym, NTFS_UPDATE_CTIME);
 	fs_ntfs_update_times(_vol, bi, NTFS_UPDATE_MCTIME);
-	
+
 	notify_entry_created(ns->id, MREF( bi->mft_no ), name, MREF(sym->mft_no));
 
 exit:
@@ -1457,8 +1457,8 @@ exit:
 
 
 status_t
-fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname, fs_vnode *_ndir,
-	const char *newname)
+fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
+	fs_vnode *_ndir, const char *newname)
 {
 	nspace *ns = (nspace*)_vol->private_volume;
 	vnode *odir = (vnode*)_odir->private_node;
@@ -1488,20 +1488,6 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname, fs_vnode *_ndir
 	LOCK_VOL(ns);
 
 	ERRPRINT("fs_rename - oldname:%s newname:%s\n", oldname, newname);
-
-	if (_vol == NULL || _odir == NULL || _ndir == NULL
-		|| oldname == NULL || *oldname == '\0'
-		|| newname == NULL || *newname == '\0'
-		|| !strcmp(oldname, ".") || !strcmp(oldname, "..")
-		|| !strcmp(newname, ".") || !strcmp(newname, "..")
-		|| strchr(newname, '/') != NULL) {
-		result = EINVAL;
-		goto exit;
-	}
-
-	// stupid renaming check
-	if (odir == ndir && !strcmp(oldname, newname))
-		goto exit;
 
 	// convert names from utf8 to unicode string
 	unewnameLength = ntfs_mbstoucs(newname, &unewname);

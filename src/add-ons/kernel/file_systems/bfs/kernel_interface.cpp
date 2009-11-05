@@ -1040,12 +1040,6 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	FUNCTION_START(("oldDir = %p, oldName = \"%s\", newDir = %p, newName = "
 		"\"%s\"\n", _oldDir, oldName, _newDir, newName));
 
-	// there might be some more tests needed?!
-	if (!strcmp(oldName, ".") || !strcmp(oldName, "..")
-		|| !strcmp(newName, ".") || !strcmp(newName, "..")
-		|| strchr(newName, '/') != NULL)
-		RETURN_ERROR(B_BAD_VALUE);
-
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* oldDirectory = (Inode*)_oldDir->private_node;
 	Inode* newDirectory = (Inode*)_newDir->private_node;

@@ -2080,40 +2080,40 @@ get_dir_path_and_leaf(char* path, char* filename)
 	if (*path == '\0')
 		return B_ENTRY_NOT_FOUND;
 
-	char* p = strrchr(path, '/');
+	char* last = strrchr(path, '/');
 		// '/' are not allowed in file names!
 
 	FUNCTION(("get_dir_path_and_leaf(path = %s)\n", path));
 
-	if (!p) {
+	if (last == NULL) {
 		// this path is single segment with no '/' in it
 		// ex. "foo"
 		if (strlcpy(filename, path, B_FILE_NAME_LENGTH) >= B_FILE_NAME_LENGTH)
 			return B_NAME_TOO_LONG;
+
 		strcpy(path, ".");
 	} else {
-		p++;
-		if (p[0] == '\0') {
+		last++;
+		if (last[0] == '\0') {
 			// special case: the path ends in one or more '/' - remove them
-			while (*--p == '/' && p != path);
-			p[1] = '\0';
+			while (*--last == '/' && last != path);
+			last[1] = '\0';
 
-			if (p == path && p[0] == '/') {
+			if (last == path && last[0] == '/') {
 				// This path points to the root of the file system
 				strcpy(filename, ".");
 				return B_OK;
 			}
-			for (; p != path && *(p - 1) != '/'; p--);
+			for (; last != path && *(last - 1) != '/'; last--);
 				// rewind to the start of the leaf before the '/'
 		}
 
 		// normal leaf: replace the leaf portion of the path with a '.'
-		if (strlcpy(filename, p, B_FILE_NAME_LENGTH)
-				>= B_FILE_NAME_LENGTH) {
+		if (strlcpy(filename, last, B_FILE_NAME_LENGTH) >= B_FILE_NAME_LENGTH)
 			return B_NAME_TOO_LONG;
-		}
-		p[0] = '.';
-		p[1] = '\0';
+
+		last[0] = '.';
+		last[1] = '\0';
 	}
 	return B_OK;
 }
@@ -2645,7 +2645,7 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 	// we don't use get_vnode() here because this call is more
 	// efficient and does all we need from get_vnode()
 	inc_vnode_ref_count(vnode);
-	
+
 	if (vnode != ioContext->root) {
 		// we don't hit the IO context root
 		// resolve a volume root to its mount point
@@ -6083,6 +6083,14 @@ common_rename(int fd, char* path, int newFD, char* newPath, bool kernel)
 
 	if (fromVnode->device != toVnode->device) {
 		status = B_CROSS_DEVICE_LINK;
+		goto err2;
+	}
+
+	if (fromName[0] == '\0' || toName == '\0'
+		|| !strcmp(fromName, ".") || !strcmp(fromName, "..")
+		|| !strcmp(toName, ".") || !strcmp(toName, "..")
+		|| (fromVnode == toVnode && !strcmp(fromName, toName))) {
+		status = B_BAD_VALUE;
 		goto err2;
 	}
 

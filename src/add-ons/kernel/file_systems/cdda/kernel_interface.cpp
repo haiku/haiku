@@ -1738,12 +1738,7 @@ status_t
 cdda_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	fs_vnode* _newDir, const char* newName)
 {
-	if (_oldDir != _newDir
-		|| oldName == NULL || oldName[0] == '\0'
-		|| newName == NULL || newName[0] == '\0'
-		|| !strcmp(oldName, ".") || !strcmp(oldName, "..")
-		|| !strcmp(newName, ".") || !strcmp(newName, "..")
-		|| strchr(newName, '/') != NULL)
+	if (_oldDir != _newDir)
 		return B_BAD_VALUE;
 
 	// we only have a single directory which simplifies things a bit :-)
