@@ -131,6 +131,15 @@ public:
 									const TreeTablePath& path);
 	virtual	void				TreeTableNodeExpandedChanged(TreeTable* table,
 									const TreeTablePath& path, bool expanded);
+
+	virtual	void				TreeTableCellMouseDown(TreeTable* table,
+									const TreeTablePath& path,
+									int32 columnIndex, BPoint screenWhere,
+									uint32 buttons);
+	virtual	void				TreeTableCellMouseUp(TreeTable* table,
+									const TreeTablePath& path,
+									int32 columnIndex, BPoint screenWhere,
+									uint32 buttons);
 };
 
 
@@ -171,6 +180,13 @@ protected:
 	virtual	void				SelectionChanged();
 
 	virtual	AbstractColumn*		CreateColumn(TableColumn* column);
+
+	virtual	void				ColumnMouseDown(AbstractColumn* column,
+									BRow* row, BField* field,
+									BPoint screenWhere, uint32 buttons);
+	virtual	void				ColumnMouseUp(AbstractColumn* column,
+									BRow* row, BField* field,
+									BPoint screenWhere, uint32 buttons);
 
 private:
 	virtual	void				TableNodesAdded(TreeTableModel* model,

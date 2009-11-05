@@ -254,6 +254,22 @@ TreeTableListener::TreeTableNodeExpandedChanged(TreeTable* table,
 }
 
 
+void
+TreeTableListener::TreeTableCellMouseDown(TreeTable* table,
+	const TreeTablePath& path, int32 columnIndex, BPoint screenWhere,
+	uint32 buttons)
+{
+}
+
+
+void
+TreeTableListener::TreeTableCellMouseUp(TreeTable* table,
+	const TreeTablePath& path, int32 columnIndex, BPoint screenWhere,
+	uint32 buttons)
+{
+}
+
+
 // #pragma mark - Column
 
 
@@ -814,6 +830,56 @@ AbstractTable::AbstractColumn*
 TreeTable::CreateColumn(TableColumn* column)
 {
 	return new Column(fModel, column);
+}
+
+
+void
+TreeTable::ColumnMouseDown(AbstractColumn* column, BRow* _row, BField* field,
+	BPoint screenWhere, uint32 buttons)
+{
+	if (!fListeners.IsEmpty()) {
+		// get the table node and the column index
+		TreeTableRow* row = dynamic_cast<TreeTableRow*>(_row);
+		int32 columnIndex = column->LogicalFieldNum();
+		if (row == NULL || columnIndex < 0)
+			return;
+
+		// get the node path
+		TreeTablePath path;
+		_GetPathForNode(row->Node(), path);
+
+		// notify listeners
+		int32 listenerCount = fListeners.CountItems();
+		for (int32 i = listenerCount - 1; i >= 0; i--) {
+			fListeners.ItemAt(i)->TreeTableCellMouseDown(this, path,
+				columnIndex, screenWhere, buttons);
+		}
+	}
+}
+
+
+void
+TreeTable::ColumnMouseUp(AbstractColumn* column, BRow* _row, BField* field,
+	BPoint screenWhere, uint32 buttons)
+{
+	if (!fListeners.IsEmpty()) {
+		// get the table node and the column index
+		TreeTableRow* row = dynamic_cast<TreeTableRow*>(_row);
+		int32 columnIndex = column->LogicalFieldNum();
+		if (row == NULL || columnIndex < 0)
+			return;
+
+		// get the node path
+		TreeTablePath path;
+		_GetPathForNode(row->Node(), path);
+
+		// notify listeners
+		int32 listenerCount = fListeners.CountItems();
+		for (int32 i = listenerCount - 1; i >= 0; i--) {
+			fListeners.ItemAt(i)->TreeTableCellMouseUp(this, path, columnIndex,
+				screenWhere, buttons);
+		}
+	}
 }
 
 

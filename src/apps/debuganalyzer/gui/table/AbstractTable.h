@@ -47,11 +47,19 @@ public:
 
 protected:
 			class AbstractColumn;
+			friend class AbstractColumn;
 
 			typedef BObjectList<AbstractColumn>		ColumnList;
 
 protected:
 	virtual	AbstractColumn*		CreateColumn(TableColumn* column) = 0;
+
+	virtual	void				ColumnMouseDown(AbstractColumn* column,
+									BRow* row, BField* field, BPoint point,
+									uint32 buttons) = 0;
+	virtual	void				ColumnMouseUp(AbstractColumn* column,
+									BRow* row, BField* field, BPoint point,
+									uint32 buttons) = 0;
 
 			AbstractColumn*		GetColumn(TableColumn* column) const;
 
@@ -67,12 +75,21 @@ public:
 								AbstractColumn(TableColumn* tableColumn);
 	virtual						~AbstractColumn();
 
+			void				SetTable(AbstractTable* table);
+
 	virtual	void				SetModel(AbstractTableModelBase* model) = 0;
 
 			TableColumn*		GetTableColumn() const	{ return fTableColumn; }
 
+	virtual void				MouseDown(BColumnListView* parent, BRow* row,
+									BField* field, BRect fieldRect,
+									BPoint point, uint32 buttons);
+	virtual	void				MouseUp(BColumnListView* parent, BRow* row,
+									BField* field);
+
 protected:
 			TableColumn*		fTableColumn;
+			AbstractTable*		fTable;
 };
 
 

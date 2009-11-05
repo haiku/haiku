@@ -95,6 +95,13 @@ public:
 
 	virtual	void				TableSelectionChanged(Table* table);
 	virtual	void				TableRowInvoked(Table* table, int32 rowIndex);
+
+	virtual	void				TableCellMouseDown(Table* table, int32 rowIndex,
+									int32 columnIndex, BPoint screenWhere,
+									uint32 buttons);
+	virtual	void				TableCellMouseUp(Table* table, int32 rowIndex,
+									int32 columnIndex, BPoint screenWhere,
+									uint32 buttons);
 };
 
 
@@ -132,6 +139,13 @@ protected:
 	virtual	void				SelectionChanged();
 
 	virtual	AbstractColumn*		CreateColumn(TableColumn* column);
+
+	virtual	void				ColumnMouseDown(AbstractColumn* column,
+									BRow* row, BField* field,
+									BPoint screenWhere, uint32 buttons);
+	virtual	void				ColumnMouseUp(AbstractColumn* column,
+									BRow* row, BField* field,
+									BPoint screenWhere, uint32 buttons);
 
 private:
 	virtual	void				TableRowsAdded(TableModel* model,

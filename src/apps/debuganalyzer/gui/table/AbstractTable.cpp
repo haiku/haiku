@@ -7,6 +7,9 @@
 
 #include <new>
 
+#include <Looper.h>
+#include <Message.h>
+
 #include "table/TableColumn.h"
 
 
@@ -25,14 +28,77 @@ AbstractTable::AbstractColumn::AbstractColumn(TableColumn* tableColumn)
 	:
 	BColumn(tableColumn->Width(), tableColumn->MinWidth(),
 		tableColumn->MaxWidth(), tableColumn->Alignment()),
-	fTableColumn(tableColumn)
+	fTableColumn(tableColumn),
+	fTable(NULL)
 {
+	SetWantsEvents(true);
 }
 
 
 AbstractTable::AbstractColumn::~AbstractColumn()
 {
 	delete fTableColumn;
+}
+
+
+void
+AbstractTable::AbstractColumn::SetTable(AbstractTable* table)
+{
+	fTable = table;
+}
+
+
+void
+AbstractTable::AbstractColumn::MouseDown(BColumnListView* parent, BRow* row,
+	BField* field, BRect fieldRect, BPoint point, uint32 _buttons)
+{
+	if (fTable == NULL)
+		return;
+
+	if (fTable == NULL)
+		return;
+	BLooper* window = fTable->Looper();
+	if (window == NULL)
+		return;
+
+	BMessage* message = window->CurrentMessage();
+	if (message == NULL)
+		return;
+
+	int32 buttons;
+		// Note: The _buttons parameter cannot be trusted.
+	BPoint screenWhere;
+	if (message->FindInt32("buttons", &buttons) != B_OK
+		|| message->FindPoint("screen_where", &screenWhere) != B_OK) {
+		return;
+	}
+
+	fTable->ColumnMouseDown(this, row, field, screenWhere, buttons);
+}
+
+
+void
+AbstractTable::AbstractColumn::MouseUp(BColumnListView* parent, BRow* row,
+	BField* field)
+{
+	if (fTable == NULL)
+		return;
+	BLooper* window = fTable->Looper();
+	if (window == NULL)
+		return;
+
+	BMessage* message = window->CurrentMessage();
+	if (message == NULL)
+		return;
+
+	int32 buttons;
+	BPoint screenWhere;
+	if (message->FindInt32("buttons", &buttons) != B_OK
+		|| message->FindPoint("screen_where", &screenWhere) != B_OK) {
+		return;
+	}
+
+	fTable->ColumnMouseUp(this, row, field, screenWhere, buttons);
 }
 
 
@@ -60,6 +126,7 @@ AbstractTable::AddColumn(TableColumn* column)
 		return;
 
 	AbstractColumn* privateColumn = CreateColumn(column);
+	privateColumn->SetTable(this);
 
 	if (!fColumns.AddItem(privateColumn)) {
 		delete privateColumn;

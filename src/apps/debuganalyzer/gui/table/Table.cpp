@@ -222,6 +222,20 @@ TableListener::TableRowInvoked(Table* table, int32 rowIndex)
 }
 
 
+void
+TableListener::TableCellMouseDown(Table* table, int32 rowIndex,
+	int32 columnIndex, BPoint screenWhere, uint32 buttons)
+{
+}
+
+
+void
+TableListener::TableCellMouseUp(Table* table, int32 rowIndex, int32 columnIndex,
+	BPoint screenWhere, uint32 buttons)
+{
+}
+
+
 // #pragma mark - Column
 
 
@@ -509,6 +523,48 @@ AbstractTable::AbstractColumn*
 Table::CreateColumn(TableColumn* column)
 {
 	return new Column(fModel, column);
+}
+
+
+void
+Table::ColumnMouseDown(AbstractColumn* column, BRow* row, BField* field,
+	BPoint screenWhere, uint32 buttons)
+{
+	if (!fListeners.IsEmpty()) {
+		// get the table row and column indices
+		int32 rowIndex = _ModelIndexOfRow(row);
+		int32 columnIndex = column->LogicalFieldNum();
+		if (rowIndex < 0 || columnIndex < 0)
+			return;
+
+		// notify listeners
+		int32 listenerCount = fListeners.CountItems();
+		for (int32 i = listenerCount - 1; i >= 0; i--) {
+			fListeners.ItemAt(i)->TableCellMouseDown(this, rowIndex,
+				columnIndex, screenWhere, buttons);
+		}
+	}
+}
+
+
+void
+Table::ColumnMouseUp(AbstractColumn* column, BRow* row, BField* field,
+	BPoint screenWhere, uint32 buttons)
+{
+	if (!fListeners.IsEmpty()) {
+		// get the table row and column indices
+		int32 rowIndex = _ModelIndexOfRow(row);
+		int32 columnIndex = column->LogicalFieldNum();
+		if (rowIndex < 0 || columnIndex < 0)
+			return;
+
+		// notify listeners
+		int32 listenerCount = fListeners.CountItems();
+		for (int32 i = listenerCount - 1; i >= 0; i--) {
+			fListeners.ItemAt(i)->TableCellMouseUp(this, rowIndex, columnIndex,
+				screenWhere, buttons);
+		}
+	}
 }
 
 
