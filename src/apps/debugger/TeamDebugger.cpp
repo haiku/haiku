@@ -38,6 +38,8 @@
 #include "TeamDebugInfo.h"
 #include "TeamSettings.h"
 #include "Tracing.h"
+#include "ValueNode.h"
+#include "ValueNodeContainer.h"
 #include "Variable.h"
 
 // #pragma mark - ImageHandler
@@ -558,26 +560,29 @@ TeamDebugger::ImageDebugInfoRequested(Image* image)
 
 
 void
-TeamDebugger::StackFrameValueRequested(::Thread* thread, StackFrame* stackFrame,
-	Variable* variable, TypeComponentPath* path)
+TeamDebugger::ValueNodeValueRequested(CpuState* cpuState,
+	ValueNodeContainer* container, ValueNode* valueNode)
 {
-	// the team is already locked
+	AutoLocker<ValueNodeContainer> containerLocker(container);
+	if (valueNode->Container() != container)
+		return;
 
 	// check whether a job is already in progress
 	AutoLocker<Worker> workerLocker(fWorker);
-	GetStackFrameValueJobKey jobKey(stackFrame, variable, path);
+	SimpleJobKey jobKey(valueNode, JOB_TYPE_RESOLVE_VALUE_NODE_VALUE);
 	if (fWorker->GetJob(jobKey) != NULL)
 		return;
 	workerLocker.Unlock();
 
 	// schedule the job
-	if (fWorker->ScheduleJob(
-			new(std::nothrow) GetStackFrameValueJob(fDebuggerInterface,
-				fDebuggerInterface->GetArchitecture(), thread, stackFrame,
-				variable, path),
-			this) != B_OK) {
+	status_t error = fWorker->ScheduleJob(
+		new(std::nothrow) ResolveValueNodeValueJob(fDebuggerInterface,
+			fDebuggerInterface->GetArchitecture(), cpuState, container,
+			valueNode),
+		this);
+	if (error != B_OK) {
 		// scheduling failed -- set the value to invalid
-		stackFrame->Values()->SetValue(variable->ID(), path, BVariant());
+		valueNode->SetLocationAndValue(NULL, NULL, error);
 	}
 }
 

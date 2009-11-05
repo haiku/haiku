@@ -24,6 +24,9 @@ class Thread;
 class Type;
 class TypeComponentPath;
 class ValueLocation;
+class ValueNode;
+class ValueNodeChild;
+class ValueNodeContainer;
 class Variable;
 
 
@@ -34,7 +37,8 @@ enum {
 	JOB_TYPE_GET_STACK_TRACE,
 	JOB_TYPE_LOAD_IMAGE_DEBUG_INFO,
 	JOB_TYPE_LOAD_SOURCE_CODE,
-	JOB_TYPE_GET_STACK_FRAME_VALUE
+	JOB_TYPE_GET_STACK_FRAME_VALUE,
+	JOB_TYPE_RESOLVE_VALUE_NODE_VALUE
 };
 
 
@@ -143,63 +147,33 @@ private:
 };
 
 
-
-struct GetStackFrameValueJobKey : JobKey {
-	StackFrame*			stackFrame;
-	Variable*			variable;
-	TypeComponentPath*	path;
-
+class ResolveValueNodeValueJob : public Job {
 public:
-								GetStackFrameValueJobKey(
-									StackFrame* stackFrame,
-									Variable* variable,
-									TypeComponentPath* path);
-
-	virtual	uint32				HashValue() const;
-
-	virtual	bool				operator==(const JobKey& other) const;
-};
-
-
-class GetStackFrameValueJob : public Job {
-public:
-								GetStackFrameValueJob(
+								ResolveValueNodeValueJob(
 									DebuggerInterface* debuggerInterface,
 									Architecture* architecture,
-									Thread* thread, StackFrame* stackFrame,
-									Variable* variable,
-									TypeComponentPath* path);
-	virtual						~GetStackFrameValueJob();
+									CpuState* cpuState,
+									ValueNodeContainer*	container,
+									ValueNode* valueNode);
+	virtual						~ResolveValueNodeValueJob();
 
 	virtual	const JobKey&		Key() const;
 	virtual	status_t			Do();
 
 private:
-			struct ValueJobKey;
+			status_t			_ResolveNodeValue();
+			status_t			_ResolveNodeChildLocation(
+									ValueNodeChild* nodeChild);
+			status_t			_ResolveParentNodeValue(ValueNode* parentNode);
+
 
 private:
-			status_t			_GetValue();
-			status_t			_SetValue(const BVariant& value, Type* type,
-									ValueLocation* location);
-			status_t			_ResolveTypeAndLocation(Type*& _type,
-									ValueLocation*& _location,
-									bool& _valueResolved);
-									// returns references
-			status_t			_GetTypeLocationAndValue(
-									TypeComponentPath* parentPath,
-									Type*& _parentType,
-									ValueLocation*& _parentLocation,
-									BVariant& _parentValue);
-									// returns references
-
-private:
-			GetStackFrameValueJobKey fKey;
+			SimpleJobKey		fKey;
 			DebuggerInterface*	fDebuggerInterface;
 			Architecture*		fArchitecture;
-			Thread*				fThread;
-			StackFrame*			fStackFrame;
-			Variable*			fVariable;
-			TypeComponentPath*	fPath;
+			CpuState*			fCpuState;
+			ValueNodeContainer*	fContainer;
+			ValueNode*			fValueNode;
 };
 
 

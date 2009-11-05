@@ -23,6 +23,8 @@
 #include "MessageCodes.h"
 #include "SettingsManager.h"
 #include "TeamDebugger.h"
+#include "TypeHandlerRoster.h"
+#include "ValueHandlerRoster.h"
 
 
 extern const char* __progname;
@@ -178,10 +180,20 @@ public:
 
 	~Debugger()
 	{
+		ValueHandlerRoster::DeleteDefault();
+		TypeHandlerRoster::DeleteDefault();
 	}
 
 	status_t Init()
 	{
+		status_t error = TypeHandlerRoster::CreateDefault();
+		if (error != B_OK)
+			return error;
+
+		error = ValueHandlerRoster::CreateDefault();
+		if (error != B_OK)
+			return error;
+
 		return fSettingsManager.Init();
 	}
 

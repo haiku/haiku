@@ -10,6 +10,10 @@
 
 #include <new>
 
+#include <Looper.h>
+#include <PopUpMenu.h>
+
+#include <AutoDeleter.h>
 #include <AutoLocker.h>
 
 #include "table/TableColumns.h"
@@ -17,13 +21,23 @@
 #include "Architecture.h"
 #include "FunctionID.h"
 #include "FunctionInstance.h"
+#include "MessageCodes.h"
+#include "SettingsMenu.h"
 #include "StackFrame.h"
 #include "StackFrameValues.h"
+#include "TableCellValueRenderer.h"
 #include "Team.h"
 #include "Thread.h"
 #include "Tracing.h"
 #include "TypeComponentPath.h"
+#include "TypeHandlerRoster.h"
+#include "Value.h"
+#include "ValueHandler.h"
+#include "ValueHandlerRoster.h"
+#include "ValueNode.h"
+#include "ValueNodeContainer.h"
 #include "Variable.h"
+#include "VariableValueNodeChild.h"
 #include "VariablesViewState.h"
 #include "VariablesViewStateHistory.h"
 
@@ -36,75 +50,128 @@ enum {
 static const uint64 kMaxArrayElementCount = 10;
 
 
-class VariablesView::ValueNode : public Referenceable {
+class VariablesView::ContainerListener : public ValueNodeContainer::Listener {
 public:
-	ValueNode(ValueNode* parent, Variable* variable, TypeComponentPath* path,
-		const BString& name, Type* type, bool isPresentationNode)
+								ContainerListener(BHandler* indirectTarget);
+
+			void				SetModel(VariableTableModel* model);
+
+	virtual	void				ValueNodeChanged(ValueNodeChild* nodeChild,
+									ValueNode* oldNode, ValueNode* newNode);
+	virtual	void				ValueNodeChildrenCreated(ValueNode* node);
+	virtual	void				ValueNodeChildrenDeleted(ValueNode* node);
+	virtual	void				ValueNodeValueChanged(ValueNode* node);
+
+private:
+			BHandler*			fIndirectTarget;
+			VariableTableModel*	fModel;
+};
+
+
+class VariablesView::ModelNode : public Referenceable {
+public:
+	ModelNode(ModelNode* parent, ValueNodeChild* nodeChild,
+		bool isPresentationNode)
 		:
 		fParent(parent),
-		fVariable(variable),
-		fPath(path),
-		fName(name),
-		fType(type),
-		fRawType(type->ResolveRawType()),
-		fChildrenAdded(false),
-		fIsPresentationNode(isPresentationNode)
+		fNodeChild(nodeChild),
+		fValue(NULL),
+		fValueHandler(NULL),
+		fTableCellRenderer(NULL),
+		fIsPresentationNode(isPresentationNode),
+		fHidden(false)
 	{
-		fVariable->AcquireReference();
-		fPath->AcquireReference();
-		fType->AcquireReference();
-		fRawType->AcquireReference();
+		fNodeChild->AcquireReference();
 	}
 
-	~ValueNode()
+	~ModelNode()
 	{
-		for (int32 i = 0; ValueNode* child = fChildren.ItemAt(i); i++)
+		SetTableCellRenderer(NULL);
+		SetValueHandler(NULL);
+		SetValue(NULL);
+
+		for (int32 i = 0; ModelNode* child = fChildren.ItemAt(i); i++)
 			child->ReleaseReference();
 
-		fVariable->ReleaseReference();
-		fPath->ReleaseReference();
-		fType->ReleaseReference();
-		fRawType->ReleaseReference();
+		fNodeChild->ReleaseReference();
 	}
 
-	ValueNode* Parent() const
+	ModelNode* Parent() const
 	{
 		return fParent;
 	}
 
-	Variable* GetVariable() const
+	ValueNodeChild* NodeChild() const
 	{
-		return fVariable;
-	}
-
-	TypeComponentPath* Path() const
-	{
-		return fPath;
+		return fNodeChild;
 	}
 
 	const BString& Name() const
 	{
-		return fName;
+		return fNodeChild->Name();
 	}
 
 	Type* GetType() const
 	{
-		return fType;
+		return fNodeChild->GetType();
 	}
 
-	Type* RawType() const
-	{
-		return fRawType;
-	}
-
-	const BVariant& Value() const
+	Value* GetValue() const
 	{
 		return fValue;
 	}
 
-	void SetValue(const BVariant& value)
+	void SetValue(Value* value)
 	{
+		if (value == fValue)
+			return;
+
+		if (fValue != NULL)
+			fValue->ReleaseReference();
+
 		fValue = value;
+
+		if (fValue != NULL)
+			fValue->AcquireReference();
+	}
+
+	ValueHandler* GetValueHandler() const
+	{
+		return fValueHandler;
+	}
+
+	void SetValueHandler(ValueHandler* handler)
+	{
+		if (handler == fValueHandler)
+			return;
+
+		if (fValueHandler != NULL)
+			fValueHandler->ReleaseReference();
+
+		fValueHandler = handler;
+
+		if (fValueHandler != NULL)
+			fValueHandler->AcquireReference();
+	}
+
+
+	TableCellValueRenderer* TableCellRenderer() const
+	{
+		return fTableCellRenderer;
+	}
+
+	void SetTableCellRenderer(TableCellValueRenderer* renderer)
+	{
+		if (renderer == fTableCellRenderer)
+			return;
+
+		if (fTableCellRenderer != NULL)
+			fTableCellRenderer->ReleaseReference();
+
+		fTableCellRenderer = renderer;
+
+		if (fTableCellRenderer != NULL)
+			fTableCellRenderer->AcquireReference();
 	}
 
 	bool IsPresentationNode() const
@@ -112,22 +179,32 @@ public:
 		return fIsPresentationNode;
 	}
 
+	bool IsHidden() const
+	{
+		return fHidden;
+	}
+
+	void SetHidden(bool hidden)
+	{
+		fHidden = hidden;
+	}
+
 	int32 CountChildren() const
 	{
 		return fChildren.CountItems();
 	}
 
-	ValueNode* ChildAt(int32 index) const
+	ModelNode* ChildAt(int32 index) const
 	{
 		return fChildren.ItemAt(index);
 	}
 
-	int32 IndexOf(ValueNode* child) const
+	int32 IndexOf(ModelNode* child) const
 	{
 		return fChildren.IndexOf(child);
 	}
 
-	bool AddChild(ValueNode* child)
+	bool AddChild(ModelNode* child)
 	{
 		if (!fChildren.AddItem(child))
 			return false;
@@ -136,30 +213,21 @@ public:
 		return true;
 	}
 
-	bool ChildrenAdded() const
-	{
-		return fChildrenAdded;
-	}
-
-	void SetChildrenAdded(bool added)
-	{
-		fChildrenAdded = added;
-	}
+private:
+	typedef BObjectList<ModelNode> ChildList;
 
 private:
-	typedef BObjectList<ValueNode> ChildList;
+	ModelNode*				fParent;
+	ValueNodeChild*			fNodeChild;
+	Value*					fValue;
+	ValueHandler*			fValueHandler;
+	TableCellValueRenderer*	fTableCellRenderer;
+	ChildList				fChildren;
+	bool					fIsPresentationNode;
+	bool					fHidden;
 
-private:
-	ValueNode*			fParent;
-	Variable*			fVariable;
-	TypeComponentPath*	fPath;
-	BString				fName;
-	Type*				fType;
-	Type*				fRawType;
-	BVariant			fValue;
-	ChildList			fChildren;
-	bool				fChildrenAdded;
-	bool				fIsPresentationNode;
+public:
+	ModelNode*			fNext;
 };
 
 
@@ -178,104 +246,43 @@ public:
 	}
 
 protected:
+	void DrawValue(const BVariant& value, BRect rect, BView* targetView)
+	{
+		// draw the node's value with the designated renderer
+		if (value.Type() == VALUE_NODE_TYPE) {
+			ModelNode* node = dynamic_cast<ModelNode*>(value.ToReferenceable());
+			if (node != NULL && node->GetValue() != NULL
+				&& node->TableCellRenderer() != NULL) {
+				node->TableCellRenderer()->RenderValue(node->GetValue(), rect,
+					targetView);
+				return;
+			}
+		}
+
+		// fall back to drawing an empty string
+		fField.SetString("");
+		fField.SetWidth(Width());
+		fColumn.DrawField(&fField, rect, targetView);
+	}
+
+	float GetPreferredWidth(const BVariant& value, BView* targetView) const
+	{
+		// get the preferred width from the node's designated renderer
+		if (value.Type() == VALUE_NODE_TYPE) {
+			ModelNode* node = dynamic_cast<ModelNode*>(value.ToReferenceable());
+			if (node != NULL && node->GetValue() != NULL
+				&& node->TableCellRenderer() != NULL) {
+				return node->TableCellRenderer()->PreferredValueWidth(
+					node->GetValue(), targetView);
+			}
+		}
+
+		return fColumn.BTitledColumn::GetPreferredWidth(NULL, targetView);
+	}
+
 	virtual BField* PrepareField(const BVariant& _value) const
 	{
-		BVariant value = _ResolveValue(_value);
-
-		char buffer[64];
-		return StringTableColumn::PrepareField(
-			BVariant(_ToString(value, buffer, sizeof(buffer)),
-				B_VARIANT_DONT_COPY_DATA));
-	}
-
-	virtual int CompareValues(const BVariant& _a, const BVariant& _b)
-	{
-		BVariant a = _ResolveValue(_a);
-		BVariant b = _ResolveValue(_b);
-
-		// If neither value is a number, compare the strings. If only one value
-		// is a number, it is considered to be greater.
-		if (!a.IsNumber()) {
-			if (b.IsNumber())
-				return -1;
-			char bufferA[64];
-			char bufferB[64];
-			return StringTableColumn::CompareValues(
-				BVariant(_ToString(a, bufferA, sizeof(bufferA)),
-					B_VARIANT_DONT_COPY_DATA),
-				BVariant(_ToString(b, bufferB, sizeof(bufferB)),
-					B_VARIANT_DONT_COPY_DATA));
-		}
-
-		if (!b.IsNumber())
-			return 1;
-
-		// If either value is floating point, we compare floating point values.
-		if (a.IsFloat() || b.IsFloat()) {
-			double valueA = a.ToDouble();
-			double valueB = b.ToDouble();
-			return valueA < valueB ? -1 : (valueA == valueB ? 0 : 1);
-		}
-
-		uint64 valueA = a.ToUInt64();
-		uint64 valueB = b.ToUInt64();
-		return valueA < valueB ? -1 : (valueA == valueB ? 0 : 1);
-	}
-
-private:
-	BVariant _ResolveValue(const BVariant& nodeValue) const
-	{
-		BVariant value;
-		if (nodeValue.Type() != VALUE_NODE_TYPE)
-			return BVariant();
-
-		ValueNode* node = dynamic_cast<ValueNode*>(nodeValue.ToReferenceable());
-
-		// replace enumerations values with their names
-		if (node->RawType()->Kind() == TYPE_ENUMERATION) {
-			EnumerationValue* enumValue
-				= dynamic_cast<EnumerationType*>(node->RawType())
-					->ValueFor(node->Value());
-			if (enumValue != NULL)
-				return enumValue->Name();
-		}
-
-		return node->Value();
-	}
-
-	const char* _ToString(const BVariant& value, char* buffer,
-		size_t bufferSize) const
-	{
-		switch (value.Type()) {
-			case B_BOOL_TYPE:
-				return value.ToBool() ? "true" : "false";
-			case B_FLOAT_TYPE:
-			case B_DOUBLE_TYPE:
-				snprintf(buffer, bufferSize, "%g", value.ToDouble());
-				break;
-			case B_INT8_TYPE:
-			case B_UINT8_TYPE:
-				snprintf(buffer, bufferSize, "0x%02x", value.ToUInt8());
-				break;
-			case B_INT16_TYPE:
-			case B_UINT16_TYPE:
-				snprintf(buffer, bufferSize, "0x%04x", value.ToUInt16());
-				break;
-			case B_INT32_TYPE:
-			case B_UINT32_TYPE:
-				snprintf(buffer, bufferSize, "0x%08lx", value.ToUInt32());
-				break;
-			case B_INT64_TYPE:
-			case B_UINT64_TYPE:
-				snprintf(buffer, bufferSize, "0x%016llx", value.ToUInt64());
-				break;
-			case B_STRING_TYPE:
-				return value.ToString();
-			default:
-				return NULL;
-		}
-
-		return buffer;
+		return NULL;
 	}
 };
 
@@ -285,462 +292,883 @@ private:
 
 class VariablesView::VariableTableModel : public TreeTableModel {
 public:
-	VariableTableModel()
-		:
-		fStackFrame(NULL),
-		fNodes(20, true)
-	{
-	}
+								VariableTableModel();
+								~VariableTableModel();
 
-	~VariableTableModel()
-	{
-		SetStackFrame(NULL, NULL);
-	}
+			status_t			Init();
 
-	void SetStackFrame(Thread* thread, StackFrame* stackFrame)
-	{
-		if (!fNodes.IsEmpty()) {
-			int32 count = fNodes.CountItems();
-			fNodes.MakeEmpty();
-			NotifyNodesRemoved(TreeTablePath(), 0, count);
-		}
+			void				SetContainerListener(
+									ContainerListener* listener);
 
-		fStackFrame = stackFrame;
-		fThread = thread;
+			void				SetStackFrame(Thread* thread,
+									StackFrame* stackFrame);
 
-		if (fStackFrame != NULL) {
-			for (int32 i = 0; Variable* variable = fStackFrame->ParameterAt(i);
-					i++) {
-				_AddNode(variable);
-			}
+			void				ValueNodeChanged(ValueNodeChild* nodeChild,
+									ValueNode* oldNode, ValueNode* newNode);
+			void				ValueNodeChildrenCreated(ValueNode* node);
+			void				ValueNodeChildrenDeleted(ValueNode* node);
+			void				ValueNodeValueChanged(ValueNode* node);
 
-			for (int32 i = 0; Variable* variable
-					= fStackFrame->LocalVariableAt(i); i++) {
-				_AddNode(variable);
-			}
+	virtual	int32				CountColumns() const;
+	virtual	void*				Root() const;
+	virtual	int32				CountChildren(void* parent) const;
+	virtual	void*				ChildAt(void* parent, int32 index) const;
+	virtual	bool				GetValueAt(void* object, int32 columnIndex,
+									BVariant& _value);
 
-			if (!fNodes.IsEmpty())
-				NotifyNodesAdded(TreeTablePath(), 0, fNodes.CountItems());
-		}
-	}
+			void				NodeExpanded(ModelNode* node);
 
-	void StackFrameValueRetrieved(StackFrame* stackFrame, Variable* variable,
-		TypeComponentPath* path)
-	{
-		if (stackFrame != fStackFrame)
-			return;
-
-		// update the respective node's value
-		AutoLocker<Team> locker(fThread->GetTeam());
-		BVariant value;
-		if (fStackFrame->Values()->GetValue(variable->ID(), path, value)) {
-			ValueNode* node = _GetNode(variable, path);
-			TreeTablePath treePath;
-			if (node != NULL && _GetTreePath(node, treePath)) {
-				node->SetValue(value);
-				int32 index = treePath.RemoveLastComponent();
-				NotifyNodesChanged(treePath, index, 1);
-			}
-		}
-	}
-
-	virtual int32 CountColumns() const
-	{
-		return 2;
-	}
-
-	virtual void* Root() const
-	{
-		return (void*)this;
-	}
-
-	virtual int32 CountChildren(void* parent) const
-	{
-		if (parent == this)
-			return fNodes.CountItems();
-
-		return ((ValueNode*)parent)->CountChildren();
-	}
-
-	virtual void* ChildAt(void* parent, int32 index) const
-	{
-		if (parent == this)
-			return fNodes.ItemAt(index);
-
-		return ((ValueNode*)parent)->ChildAt(index);
-	}
-
-	virtual bool GetValueAt(void* object, int32 columnIndex, BVariant& _value)
-	{
-		ValueNode* node = (ValueNode*)object;
-
-		switch (columnIndex) {
-			case 0:
-				_value.SetTo(node->Name(), B_VARIANT_DONT_COPY_DATA);
-				return true;
-			case 1:
-				if (node->Value().Type() == 0)
-					return false;
-
-				_value.SetTo(node, VALUE_NODE_TYPE);
-				return true;
-			default:
-				return false;
-		}
-	}
-
-	void NodeExpanded(ValueNode* node)
-	{
-		// add children of all children
-		for (int32 i = 0; ValueNode* child = node->ChildAt(i); i++)
-			_AddChildNodes(child);
-	}
+			void				NotifyNodeChanged(ModelNode* node);
 
 private:
-	typedef BObjectList<ValueNode> ValueList;
+			struct NodeHashDefinition {
+				typedef ValueNodeChild*	KeyType;
+				typedef	ModelNode		ValueType;
 
-private:
-	void _AddNode(Variable* variable)
-	{
-		TypeComponentPath* path = new(std::nothrow) TypeComponentPath;
-		if (path == NULL)
-			return;
-		Reference<TypeComponentPath> pathReference(path, true);
-
-		ValueNode* node = new(std::nothrow) ValueNode(NULL, variable, path,
-			variable->Name(), variable->GetType(), false);
-		if (node == NULL || !fNodes.AddItem(node)) {
-			delete node;
-			return;
-		}
-
-		// automatically add child nodes for the top level nodes
-		_AddChildNodes(node);
-	}
-
-	void _AddChildNodes(ValueNode* node)
-	{
-		if (node == NULL || node->ChildrenAdded())
-			return;
-
-		_AddChildNodesInternal(node);
-		node->SetChildrenAdded(true);
-
-		// If the node is already known, notify the model listeners about the
-		// new child nodes. We assume that this holds true for the all but the
-		// top-level nodes.
-		TreeTablePath treePath;
-		if (node->Parent() != NULL && node->CountChildren() > 0
-			&& _GetTreePath(node, treePath)) {
-			NotifyNodesAdded(treePath, 0, node->CountChildren());
-		}
-	}
-
-	void _AddChildNodesInternal(ValueNode* node)
-	{
-		TRACE_LOCALS("_AddChildNodesInternal(%p)\n", node);
-
-		Type* type = node->GetType();
-		TypeComponentPath* path
-			= new(std::nothrow) TypeComponentPath(*node->Path());
-		if (path == NULL
-			|| path->CountComponents() != node->Path()->CountComponents()) {
-			delete path;
-			return;
-		}
-		Reference<TypeComponentPath> pathReference(path, true);
-
-		bool dereferencedType = false;
-		while (true) {
-			bool done = false;
-			TypeComponent component;
-
-			switch (type->Kind()) {
-				case TYPE_PRIMITIVE:
-					TRACE_LOCALS("TYPE_PRIMITIVE\n");
-					done = true;
-					break;
-				case TYPE_COMPOUND:
+				size_t HashKey(const ValueNodeChild* key) const
 				{
-					TRACE_LOCALS("TYPE_COMPOUND\n");
-					CompoundType* compoundType
-						= dynamic_cast<CompoundType*>(type);
-
-					// base types
-					for (int32 i = 0; BaseType* baseType
-							= compoundType->BaseTypeAt(i); i++) {
-						TRACE_LOCALS("  base %ld\n", i);
-
-						component.SetToBaseType(type->Kind(), i);
-						TypeComponentPath* baseTypePath
-							= new(std::nothrow) TypeComponentPath(*path);
-						if (baseTypePath == NULL
-							|| baseTypePath->CountComponents()
-								!= path->CountComponents()
-							|| !baseTypePath->AddComponent(component)) {
-							delete baseTypePath;
-							return;
-						}
-						Reference<TypeComponentPath> baseTypePathReference(
-							baseTypePath, true);
-						_AddChildNode(node, node->GetVariable(), baseTypePath,
-							baseType->GetType()->Name(), baseType->GetType());
-					}
-
-					// members
-					for (int32 i = 0; DataMember* member
-							= compoundType->DataMemberAt(i); i++) {
-						BString name = member->Name();
-
-						TRACE_LOCALS("  member %ld: \"%s\"\n", i, name.String());
-
-						component.SetToDataMember(type->Kind(), i, name);
-						TypeComponentPath* memberPath
-							= new(std::nothrow) TypeComponentPath(*path);
-						if (memberPath == NULL
-							|| memberPath->CountComponents()
-								!= path->CountComponents()
-							|| !memberPath->AddComponent(component)) {
-							delete memberPath;
-							return;
-						}
-						Reference<TypeComponentPath> memberPathReference(
-							memberPath, true);
-						_AddChildNode(node, node->GetVariable(), memberPath,
-							name, member->GetType());
-					}
-					return;
+					return (size_t)key;
 				}
-				case TYPE_MODIFIED:
-					TRACE_LOCALS("TYPE_MODIFIED\n");
-					component.SetToBaseType(type->Kind());
-					type = dynamic_cast<ModifiedType*>(type)->BaseType();
-					break;
-				case TYPE_TYPEDEF:
-					TRACE_LOCALS("TYPE_TYPEDEF\n");
-					component.SetToBaseType(type->Kind());
-					type = dynamic_cast<TypedefType*>(type)->BaseType();
-					break;
-				case TYPE_ADDRESS:
-					TRACE_LOCALS("TYPE_ADDRESS\n");
-					// don't dereference twice
-					if (dereferencedType) {
-						done = true;
-						break;
-					}
 
-					component.SetToBaseType(type->Kind());
-					type = dynamic_cast<AddressType*>(type)->BaseType();
-					dereferencedType = true;
-					break;
-				case TYPE_ARRAY:
+				size_t Hash(const ModelNode* value) const
 				{
-					TRACE_LOCALS("TYPE_ARRAY\n");
-					ArrayType* arrayType = dynamic_cast<ArrayType*>(type);
-					int32 dimensionCount = arrayType->CountDimensions();
-
-					// get the base array indices
-					ArrayIndexPath baseIndexPath;
-					int32 baseDimension = 0;
-					if (node->Parent() != NULL
-						&& node->Parent()->GetType() == type) {
-						TypeComponent arrayComponent
-							= path->ComponentAt(path->CountComponents() - 1);
-						if (arrayComponent.componentKind
-								!= TYPE_COMPONENT_ARRAY_ELEMENT) {
-							ERROR("Unexpected array type path component!\n");
-							return;
-						}
-
-						status_t error
-							= baseIndexPath.SetTo(arrayComponent.name.String());
-						if (error != B_OK)
-							return;
-
-						baseDimension = baseIndexPath.CountIndices();
-					}
-
-					if (baseDimension >= dimensionCount) {
-						ERROR("Unexpected array base dimension!\n");
-						return;
-					}
-					bool isFinalDimension = baseDimension + 1 == dimensionCount;
-
-					ArrayDimension* dimension = arrayType->DimensionAt(
-						baseDimension);
-					uint64 elementCount = dimension->CountElements();
-					if (elementCount == 0
-						|| elementCount > kMaxArrayElementCount) {
-						elementCount = kMaxArrayElementCount;
-					}
-
-					// create children for the array elements
-					for (int32 i = 0; i < (int32)elementCount; i++) {
-						ArrayIndexPath indexPath(baseIndexPath);
-						if (indexPath.CountIndices()
-								!= baseIndexPath.CountIndices()
-							|| !indexPath.AddIndex(i)) {
-							return;
-						}
-
-						component.SetToArrayElement(type->Kind(), indexPath);
-						TypeComponentPath* elementPath = path->CreateSubPath(
-							path->CountComponents()
-								- (baseDimension == 0 ? 0 : 1));
-						if (elementPath == NULL
-							|| !elementPath->AddComponent(component)) {
-							delete elementPath;
-							return;
-						}
-						Reference<TypeComponentPath> elementPathReference(
-							elementPath, true);
-
-						BString name(node->Name());
-						name << '[' << i << ']';
-
-						_AddChildNode(node, node->GetVariable(), elementPath,
-							name,
-							isFinalDimension ? arrayType->BaseType() : type,
-							!isFinalDimension);
-					}
-
-					return;
-				}
-				case TYPE_ENUMERATION:
-					TRACE_LOCALS("TYPE_ENUMERATION\n");
-					done = true;
-					break;
-				case TYPE_SUBRANGE:
-					TRACE_LOCALS("TYPE_SUBRANGE -> unsupported\n");
-					// TODO: Support!
-					return;
-				case TYPE_UNSPECIFIED:
-					// Should never get here -- we don't create nodes for
-					// unspecified types.
-					TRACE_LOCALS("TYPE_UNSPECIFIED\n");
-					return;
-				case TYPE_FUNCTION:
-					TRACE_LOCALS("TYPE_FUNCTION -> unsupported\n");
-					// TODO: Support!
-					return;
-				case TYPE_POINTER_TO_MEMBER:
-					TRACE_LOCALS("TYPE_POINTER_TO_MEMBER\n");
-					done = true;
-					break;
-			}
-
-			if (done) {
-				if (dereferencedType) {
-					_AddChildNode(node, node->GetVariable(), path,
-						BString("*") << node->Name(), type);
-				}
-				return;
-			}
-
-			if (!path->AddComponent(component))
-				return;
-		}
-	}
-
-	void _AddChildNode(ValueNode* parent, Variable* variable,
-		TypeComponentPath* path, const BString& name, Type* type,
-		bool isPresentationNode = false)
-	{
-		// Don't create nodes for unspecified types -- we can't get/show their
-		// value anyway.
-		if (type->Kind() == TYPE_UNSPECIFIED)
-			return;
-
-		ValueNode* node = new(std::nothrow) ValueNode(parent, variable, path,
-			name, type, isPresentationNode);
-		if (node == NULL || !parent->AddChild(node)) {
-			delete node;
-			return;
-		}
-	}
-
-	ValueNode* _GetNode(Variable* variable, TypeComponentPath* path) const
-	{
-		// find the variable node
-		ValueNode* node;
-		for (int32 i = 0; (node = fNodes.ItemAt(i)) != NULL; i++) {
-			if (node->GetVariable() == variable)
-				break;
-		}
-		if (node == NULL)
-			return NULL;
-
-		// Now walk along the path, finding the respective child node for each
-		// component (might be several components at once).
-		int32 componentCount = path->CountComponents();
-		for (int32 i = 0; i < componentCount;) {
-			ValueNode* childNode = NULL;
-
-			for (int32 k = 0; (childNode = node->ChildAt(k)) != NULL; k++) {
-				TypeComponentPath* childPath = childNode->Path();
-				int32 childComponentCount = childPath->CountComponents();
-				if (childComponentCount > componentCount)
-					continue;
-
-				for (int32 componentIndex = i;
-					componentIndex < childComponentCount; componentIndex++) {
-					TypeComponent childComponent
-						= childPath->ComponentAt(componentIndex);
-					TypeComponent pathComponent
-						= path->ComponentAt(componentIndex);
-					if (childComponent != pathComponent) {
-						if (componentIndex + 1 == childComponentCount
-							&& pathComponent.HasPrefix(childComponent)) {
-							// The last child component is a prefix of the
-							// corresponding path component. We consider this a
-							// match, but need to recheck the component with the
-							// next node level.
-							childComponentCount--;
-							break;
-						}
-
-						// mismatch -- skip the child
-						childNode = NULL;
-						break;
-					}
+					return HashKey(value->NodeChild());
 				}
 
-				if (childNode != NULL) {
-					// got a match -- skip the matched children components
-					i = childComponentCount;
-					break;
+				bool Compare(const ValueNodeChild* key,
+					const ModelNode* value) const
+				{
+					return value->NodeChild() == key;
 				}
-			}
 
-			if (childNode == NULL)
-				return NULL;
+				ModelNode*& GetLink(ModelNode* value) const
+				{
+					return value->fNext;
+				}
+			};
 
-			node = childNode;
-		}
-
-		return node;
-	}
-
-	bool _GetTreePath(ValueNode* node, TreeTablePath& _path) const
-	{
-		// recurse, if the node has a parent
-		if (ValueNode* parent = node->Parent()) {
-			if (!_GetTreePath(parent, _path))
-				return false;
-			return _path.AddComponent(parent->IndexOf(node));
-		}
-
-		// no parent -- get the index and start the path
-		int32 index = fNodes.IndexOf(node);
-		_path.Clear();
-		return index >= 0 && _path.AddComponent(index);
-	}
+			typedef BObjectList<ModelNode> NodeList;
+			typedef BOpenHashTable<NodeHashDefinition> NodeTable;
 
 private:
-	Thread*				fThread;
-	StackFrame*			fStackFrame;
-	ValueList			fNodes;
+			// container must be locked
+
+			status_t			_AddNode(ModelNode* parent,
+									ValueNodeChild* nodeChild,
+									bool isPresentationNode = false);
+			void				_AddNode(Variable* variable);
+			status_t			_CreateValueNode(ValueNodeChild* nodeChild);
+			status_t			_AddChildNodes(ValueNodeChild* nodeChild);
+
+//			ModelNode*			_GetNode(Variable* variable,
+//									TypeComponentPath* path) const;
+			bool				_GetTreePath(ModelNode* node,
+									TreeTablePath& _path) const;
+
+private:
+			Thread*				fThread;
+			StackFrame*			fStackFrame;
+			ValueNodeContainer*	fContainer;
+			ContainerListener*	fContainerListener;
+			NodeList			fNodes;
+			NodeTable			fNodeTable;
 };
+
+
+class VariablesView::ContextMenu : public BPopUpMenu {
+public:
+	ContextMenu(const BMessenger& parent, const char* name)
+		: BPopUpMenu(name, false, false),
+		  fParent(parent)
+	{
+	}
+
+	virtual void Hide()
+	{
+		BPopUpMenu::Hide();
+
+		BMessage message(MSG_VARIABLES_VIEW_CONTEXT_MENU_DONE);
+		message.AddPointer("menu", this);
+		fParent.SendMessage(&message);
+	}
+
+private:
+	BMessenger	fParent;
+};
+
+
+// #pragma mark - TableCellContextMenuTracker
+
+
+class VariablesView::TableCellContextMenuTracker : public BReferenceable,
+	Settings::Listener {
+public:
+	TableCellContextMenuTracker(ModelNode* node, BLooper* parentLooper,
+		const BMessenger& parent)
+		:
+		fNode(node),
+		fParentLooper(parentLooper),
+		fParent(parent),
+		fRendererSettings(NULL),
+		fRendererSettingsMenu(NULL),
+		fRendererMenuAdded(false),
+		fMenuPreparedToShow(false)
+	{
+		fNode->AcquireReference();
+	}
+
+	~TableCellContextMenuTracker()
+	{
+		FinishMenu(true);
+
+		if (fRendererSettingsMenu != NULL)
+			fRendererSettingsMenu->ReleaseReference();
+
+		if (fRendererSettings != NULL)
+			fRendererSettings->ReleaseReference();
+
+		fNode->ReleaseReference();
+	}
+
+	status_t Init(Settings* rendererSettings,
+		SettingsMenu* rendererSettingsMenu)
+	{
+		fRendererSettings = rendererSettings;
+		fRendererSettings->AcquireReference();
+
+		fRendererSettingsMenu = rendererSettingsMenu;
+		fRendererSettingsMenu->AcquireReference();
+
+		fContextMenu = new(std::nothrow) ContextMenu(fParent,
+			"table cell settings popup");
+		if (fContextMenu == NULL)
+			return B_NO_MEMORY;
+
+		status_t error = fRendererSettingsMenu->AddToMenu(fContextMenu, 0);
+		if (error != B_OK)
+			return error;
+
+		AutoLocker<Settings> settingsLocker(fRendererSettings);
+		fRendererSettings->AddListener(this);
+
+		fRendererMenuAdded = true;
+
+		return B_OK;
+	}
+
+	void ShowMenu(BPoint screenWhere)
+	{
+		fRendererSettingsMenu->PrepareToShow(fParentLooper);
+
+		fMenuPreparedToShow = true;
+
+		BRect mouseRect(screenWhere, screenWhere);
+		mouseRect.InsetBy(-4.0, -4.0);
+		fContextMenu->Go(screenWhere, true, false, mouseRect, true);
+	}
+
+	bool FinishMenu(bool force)
+	{
+		bool stillActive;
+
+		if (fMenuPreparedToShow) {
+			stillActive = fRendererSettingsMenu->Finish(fParentLooper, force);
+			fMenuPreparedToShow = stillActive;
+		}
+
+		if (fRendererMenuAdded) {
+			fRendererSettingsMenu->RemoveFromMenu();
+			fRendererSettings->RemoveListener(this);
+			fRendererMenuAdded = false;
+		}
+
+		if (fContextMenu != NULL) {
+			delete fContextMenu;
+			fContextMenu = NULL;
+		}
+
+		return stillActive;
+	}
+
+private:
+	// Settings::Listener
+
+	virtual void SettingValueChanged(Setting* setting)
+	{
+		BMessage message(MSG_VARIABLES_VIEW_NODE_SETTINGS_CHANGED);
+		fNode->AcquireReference();
+		if (message.AddPointer("node", fNode) != B_OK
+			|| fParent.SendMessage(&message) != B_OK) {
+			fNode->ReleaseReference();
+		}
+	}
+
+private:
+	ModelNode*		fNode;
+	BLooper*		fParentLooper;
+	BMessenger		fParent;
+	ContextMenu*	fContextMenu;
+	Settings*		fRendererSettings;
+	SettingsMenu*	fRendererSettingsMenu;
+	bool			fRendererMenuAdded;
+	bool			fMenuPreparedToShow;
+};
+
+
+// #pragma mark - ContainerListener
+
+
+VariablesView::ContainerListener::ContainerListener(BHandler* indirectTarget)
+	:
+	fIndirectTarget(indirectTarget),
+	fModel(NULL)
+{
+}
+
+
+void
+VariablesView::ContainerListener::SetModel(VariableTableModel* model)
+{
+	fModel = model;
+}
+
+
+void
+VariablesView::ContainerListener::ValueNodeChanged(ValueNodeChild* nodeChild,
+	ValueNode* oldNode, ValueNode* newNode)
+{
+	// If the looper is already locked, invoke the model's hook synchronously.
+	if (fIndirectTarget->Looper()->IsLocked()) {
+		fModel->ValueNodeChanged(nodeChild, oldNode, newNode);
+		return;
+	}
+
+	// looper not locked yet -- call asynchronously to avoid reverse locking
+	// order
+	BReference<ValueNodeChild> nodeChildReference(nodeChild);
+	BReference<ValueNode> oldNodeReference(oldNode);
+	BReference<ValueNode> newNodeReference(newNode);
+
+	BMessage message(MSG_VALUE_NODE_CHANGED);
+	if (message.AddPointer("nodeChild", nodeChild) == B_OK
+		&& message.AddPointer("oldNode", oldNode) == B_OK
+		&& message.AddPointer("newNode", newNode) == B_OK
+		&& fIndirectTarget->Looper()->PostMessage(&message, fIndirectTarget)
+			== B_OK) {
+		nodeChildReference.Detach();
+		oldNodeReference.Detach();
+		newNodeReference.Detach();
+	}
+}
+
+
+void
+VariablesView::ContainerListener::ValueNodeChildrenCreated(ValueNode* node)
+{
+	// If the looper is already locked, invoke the model's hook synchronously.
+	if (fIndirectTarget->Looper()->IsLocked()) {
+		fModel->ValueNodeChildrenCreated(node);
+		return;
+	}
+
+	// looper not locked yet -- call asynchronously to avoid reverse locking
+	// order
+	BReference<ValueNode> nodeReference(node);
+
+	BMessage message(MSG_VALUE_NODE_CHILDREN_CREATED);
+	if (message.AddPointer("node", node) == B_OK
+		&& fIndirectTarget->Looper()->PostMessage(&message, fIndirectTarget)
+			== B_OK) {
+		nodeReference.Detach();
+	}
+}
+
+
+void
+VariablesView::ContainerListener::ValueNodeChildrenDeleted(ValueNode* node)
+{
+	// If the looper is already locked, invoke the model's hook synchronously.
+	if (fIndirectTarget->Looper()->IsLocked()) {
+		fModel->ValueNodeChildrenDeleted(node);
+		return;
+	}
+
+	// looper not locked yet -- call asynchronously to avoid reverse locking
+	// order
+	BReference<ValueNode> nodeReference(node);
+
+	BMessage message(MSG_VALUE_NODE_CHILDREN_DELETED);
+	if (message.AddPointer("node", node) == B_OK
+		&& fIndirectTarget->Looper()->PostMessage(&message, fIndirectTarget)
+			== B_OK) {
+		nodeReference.Detach();
+	}
+}
+
+
+void
+VariablesView::ContainerListener::ValueNodeValueChanged(ValueNode* node)
+{
+	// If the looper is already locked, invoke the model's hook synchronously.
+	if (fIndirectTarget->Looper()->IsLocked()) {
+		fModel->ValueNodeValueChanged(node);
+		return;
+	}
+
+	// looper not locked yet -- call asynchronously to avoid reverse locking
+	// order
+	BReference<ValueNode> nodeReference(node);
+
+	BMessage message(MSG_VALUE_NODE_VALUE_CHANGED);
+	if (message.AddPointer("node", node) == B_OK
+		&& fIndirectTarget->Looper()->PostMessage(&message, fIndirectTarget)
+			== B_OK) {
+		nodeReference.Detach();
+	}
+}
+
+
+// #pragma mark - VariableTableModel
+
+
+VariablesView::VariableTableModel::VariableTableModel()
+	:
+	fStackFrame(NULL),
+	fContainer(NULL),
+	fContainerListener(NULL),
+	fNodeTable()
+{
+}
+
+
+VariablesView::VariableTableModel::~VariableTableModel()
+{
+	SetStackFrame(NULL, NULL);
+}
+
+
+status_t
+VariablesView::VariableTableModel::Init()
+{
+	return fNodeTable.Init();
+}
+
+
+void
+VariablesView::VariableTableModel::SetContainerListener(
+	ContainerListener* listener)
+{
+	if (listener == fContainerListener)
+		return;
+
+	if (fContainerListener != NULL) {
+		if (fContainer != NULL) {
+			AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+			fContainer->RemoveListener(fContainerListener);
+		}
+
+		fContainerListener->SetModel(NULL);
+	}
+
+	fContainerListener = listener;
+
+	if (fContainerListener != NULL) {
+		fContainerListener->SetModel(this);
+
+		if (fContainer != NULL) {
+			AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+			fContainer->AddListener(fContainerListener);
+		}
+	}
+}
+
+
+void
+VariablesView::VariableTableModel::SetStackFrame(Thread* thread,
+	StackFrame* stackFrame)
+{
+	if (fContainer != NULL) {
+		AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+
+		if (fContainerListener != NULL)
+			fContainer->RemoveListener(fContainerListener);
+
+		fContainer->RemoveAllChildren();
+		containerLocker.Unlock();
+		fContainer->ReleaseReference();
+		fContainer = NULL;
+	}
+
+	fNodeTable.Clear(true);
+
+	if (!fNodes.IsEmpty()) {
+		int32 count = fNodes.CountItems();
+		for (int32 i = 0; i < count; i++)
+			fNodes.ItemAt(i)->ReleaseReference();
+		fNodes.MakeEmpty();
+		NotifyNodesRemoved(TreeTablePath(), 0, count);
+	}
+
+	fStackFrame = stackFrame;
+	fThread = thread;
+
+	if (fStackFrame != NULL) {
+		fContainer = new(std::nothrow) ValueNodeContainer;
+		if (fContainer == NULL)
+			return;
+
+		status_t error = fContainer->Init();
+		if (error != B_OK) {
+			delete fContainer;
+			fContainer = NULL;
+			return;
+		}
+
+		AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+
+		if (fContainerListener != NULL)
+			fContainer->AddListener(fContainerListener);
+
+		for (int32 i = 0; Variable* variable = fStackFrame->ParameterAt(i);
+				i++) {
+			_AddNode(variable);
+		}
+
+		for (int32 i = 0; Variable* variable
+				= fStackFrame->LocalVariableAt(i); i++) {
+			_AddNode(variable);
+		}
+
+//		if (!fNodes.IsEmpty())
+//			NotifyNodesAdded(TreeTablePath(), 0, fNodes.CountItems());
+	}
+}
+
+
+void
+VariablesView::VariableTableModel::ValueNodeChanged(ValueNodeChild* nodeChild,
+	ValueNode* oldNode, ValueNode* newNode)
+{
+	if (fContainer == NULL)
+		return;
+
+	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+// TODO:...
+}
+
+
+void
+VariablesView::VariableTableModel::ValueNodeChildrenCreated(
+	ValueNode* valueNode)
+{
+	if (fContainer == NULL)
+		return;
+
+	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+
+	// check whether we know the node
+	ValueNodeChild* nodeChild = valueNode->NodeChild();
+	if (nodeChild == NULL)
+		return;
+
+	ModelNode* modelNode = fNodeTable.Lookup(nodeChild);
+	if (modelNode == NULL)
+		return;
+
+	// Iterate through the children and create model nodes for the ones we
+	// don't know yet.
+	int32 childCount = valueNode->CountChildren();
+	for (int32 i = 0; i < childCount; i++) {
+		ValueNodeChild* child = valueNode->ChildAt(i);
+		if (fNodeTable.Lookup(child) == NULL)
+			_AddNode(modelNode, child, child->IsInternal());
+	}
+}
+
+
+void
+VariablesView::VariableTableModel::ValueNodeChildrenDeleted(ValueNode* node)
+{
+	if (fContainer == NULL)
+		return;
+
+	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+// TODO:...
+}
+
+
+void
+VariablesView::VariableTableModel::ValueNodeValueChanged(ValueNode* valueNode)
+{
+	if (fContainer == NULL)
+		return;
+
+	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+
+	// check whether we know the node
+	ValueNodeChild* nodeChild = valueNode->NodeChild();
+	if (nodeChild == NULL)
+		return;
+
+	ModelNode* modelNode = fNodeTable.Lookup(nodeChild);
+	if (modelNode == NULL)
+		return;
+
+	// check whether the value actually changed
+	Value* value = valueNode->GetValue();
+	if (value == modelNode->GetValue())
+		return;
+
+	// get a value handler
+	ValueHandler* valueHandler;
+	status_t error = ValueHandlerRoster::Default()->FindValueHandler(value,
+		valueHandler);
+	if (error != B_OK)
+		return;
+	BReference<ValueHandler> handlerReference(valueHandler, true);
+
+	// create a table cell renderer for the value
+	TableCellValueRenderer* renderer = NULL;
+	error = valueHandler->GetTableCellValueRenderer(value, renderer);
+	if (error != B_OK)
+		return;
+
+	// set value/handler/renderer
+	modelNode->SetValue(value);
+	modelNode->SetValueHandler(valueHandler);
+	modelNode->SetTableCellRenderer(renderer);
+
+	// notify table model listeners
+	NotifyNodeChanged(modelNode);
+}
+
+
+int32
+VariablesView::VariableTableModel::CountColumns() const
+{
+	return 2;
+}
+
+
+void*
+VariablesView::VariableTableModel::Root() const
+{
+	return (void*)this;
+}
+
+
+int32
+VariablesView::VariableTableModel::CountChildren(void* parent) const
+{
+	if (parent == this)
+		return fNodes.CountItems();
+
+	// If the node only has a hidden child, pretend the node directly has the
+	// child's children.
+	ModelNode* modelNode = (ModelNode*)parent;
+	int32 childCount = modelNode->CountChildren();
+	if (childCount == 1) {
+		ModelNode* child = modelNode->ChildAt(0);
+		if (child->IsHidden())
+			return child->CountChildren();
+	}
+
+	return childCount;
+}
+
+
+void*
+VariablesView::VariableTableModel::ChildAt(void* parent, int32 index) const
+{
+	if (parent == this)
+		return fNodes.ItemAt(index);
+
+	// If the node only has a hidden child, pretend the node directly has the
+	// child's children.
+	ModelNode* modelNode = (ModelNode*)parent;
+	int32 childCount = modelNode->CountChildren();
+	if (childCount == 1) {
+		ModelNode* child = modelNode->ChildAt(0);
+		if (child->IsHidden())
+			return child->ChildAt(index);
+	}
+
+	return modelNode->ChildAt(index);
+}
+
+
+bool
+VariablesView::VariableTableModel::GetValueAt(void* object, int32 columnIndex,
+	BVariant& _value)
+{
+	ModelNode* node = (ModelNode*)object;
+
+	switch (columnIndex) {
+		case 0:
+			_value.SetTo(node->Name(), B_VARIANT_DONT_COPY_DATA);
+			return true;
+		case 1:
+			if (node->GetValue() == NULL)
+				return false;
+
+			_value.SetTo(node, VALUE_NODE_TYPE);
+			return true;
+		default:
+			return false;
+	}
+}
+
+
+void
+VariablesView::VariableTableModel::NodeExpanded(ModelNode* node)
+{
+	if (fContainer == NULL)
+		return;
+
+	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+
+	// add children of all children
+
+	// If the node only has a hidden child, add the child's children instead.
+	if (node->CountChildren() == 1) {
+		ModelNode* child = node->ChildAt(0);
+		if (child->IsHidden())
+			node = child;
+	}
+
+	// add the children
+	for (int32 i = 0; ModelNode* child = node->ChildAt(i); i++)
+		_AddChildNodes(child->NodeChild());
+}
+
+
+void
+VariablesView::VariableTableModel::NotifyNodeChanged(ModelNode* node)
+{
+	if (!node->IsHidden()) {
+		TreeTablePath treePath;
+		if (_GetTreePath(node, treePath)) {
+			int32 index = treePath.RemoveLastComponent();
+			NotifyNodesChanged(treePath, index, 1);
+		}
+	}
+}
+
+
+status_t
+VariablesView::VariableTableModel::_AddNode(ModelNode* parent,
+	ValueNodeChild* nodeChild, bool isPresentationNode)
+{
+	// Don't create nodes for unspecified types -- we can't get/show their
+	// value anyway.
+	Type* nodeChildRawType = nodeChild->GetType()->ResolveRawType(false);
+	if (nodeChildRawType->Kind() == TYPE_UNSPECIFIED)
+		return B_OK;
+
+	ModelNode* node = new(std::nothrow) ModelNode(parent, nodeChild,
+		isPresentationNode);
+	BReference<ModelNode> nodeReference(node, true);
+	if (node == NULL)
+		return B_NO_MEMORY;
+
+	int32 childIndex;
+
+	if (parent != NULL) {
+		childIndex = parent->CountChildren();
+
+		if (!parent->AddChild(node))
+			return B_NO_MEMORY;
+		// the parent has a reference, now
+	} else {
+		childIndex = fNodes.CountItems();
+
+		if (!fNodes.AddItem(node))
+			return B_NO_MEMORY;
+		nodeReference.Detach();
+			// the fNodes list has a reference, now
+	}
+
+	fNodeTable.Insert(node);
+
+	// mark a compound type child of a address type parent hidden
+	if (parent != NULL) {
+		ValueNode* parentValueNode = parent->NodeChild()->Node();
+		if (parentValueNode != NULL
+			&& parentValueNode->GetType()->ResolveRawType(false)->Kind()
+				== TYPE_ADDRESS
+			&& nodeChildRawType->Kind() == TYPE_COMPOUND) {
+			node->SetHidden(true);
+		}
+	}
+
+	// notify table model listeners
+	if (!node->IsHidden()) {
+		TreeTablePath path;
+		if (parent == NULL || _GetTreePath(parent, path))
+			NotifyNodesAdded(path, childIndex, 1);
+	}
+
+	// if the node is hidden, add its children
+	if (node->IsHidden())
+		_AddChildNodes(nodeChild);
+
+	return B_OK;
+}
+
+
+void
+VariablesView::VariableTableModel::_AddNode(Variable* variable)
+{
+	// create the node child for the variable
+	ValueNodeChild* nodeChild = new (std::nothrow) VariableValueNodeChild(
+		variable);
+	BReference<ValueNodeChild> nodeChildReference(nodeChild, true);
+	if (nodeChild == NULL || !fContainer->AddChild(nodeChild)) {
+		delete nodeChild;
+		return;
+	}
+
+	// create the model node
+	status_t error = _AddNode(NULL, nodeChild, false);
+	if (error != B_OK)
+		return;
+
+	// automatically add child nodes for the top level nodes
+	_AddChildNodes(nodeChild);
+}
+
+
+status_t
+VariablesView::VariableTableModel::_CreateValueNode(ValueNodeChild* nodeChild)
+{
+	if (nodeChild->Node() != NULL)
+		return B_OK;
+
+	// create the node
+	ValueNode* valueNode;
+	status_t error;
+	if (nodeChild->IsInternal()) {
+		error = nodeChild->CreateInternalNode(valueNode);
+	} else {
+		error = TypeHandlerRoster::Default()->CreateValueNode(nodeChild,
+			nodeChild->GetType(), valueNode);
+	}
+
+	if (error != B_OK)
+		return error;
+
+	nodeChild->SetNode(valueNode);
+	valueNode->ReleaseReference();
+
+	return B_OK;
+}
+
+
+status_t
+VariablesView::VariableTableModel::_AddChildNodes(ValueNodeChild* nodeChild)
+{
+	// create a value node for the value node child, if doesn't have one yet
+	ValueNode* valueNode = nodeChild->Node();
+	if (valueNode == NULL) {
+		status_t error = _CreateValueNode(nodeChild);
+		if (error != B_OK)
+			return error;
+		valueNode = nodeChild->Node();
+	}
+
+	// create the children, if not done yet
+	if (valueNode->ChildrenCreated())
+		return B_OK;
+
+	return valueNode->CreateChildren();
+}
+
+
+//VariablesView::ModelNode*
+//VariablesView::VariableTableModel::_GetNode(Variable* variable,
+//	TypeComponentPath* path) const
+//{
+//	// find the variable node
+//	ModelNode* node;
+//	for (int32 i = 0; (node = fNodes.ItemAt(i)) != NULL; i++) {
+//		if (node->GetVariable() == variable)
+//			break;
+//	}
+//	if (node == NULL)
+//		return NULL;
+//
+//	// Now walk along the path, finding the respective child node for each
+//	// component (might be several components at once).
+//	int32 componentCount = path->CountComponents();
+//	for (int32 i = 0; i < componentCount;) {
+//		ModelNode* childNode = NULL;
+//
+//		for (int32 k = 0; (childNode = node->ChildAt(k)) != NULL; k++) {
+//			TypeComponentPath* childPath = childNode->Path();
+//			int32 childComponentCount = childPath->CountComponents();
+//			if (childComponentCount > componentCount)
+//				continue;
+//
+//			for (int32 componentIndex = i;
+//				componentIndex < childComponentCount; componentIndex++) {
+//				TypeComponent childComponent
+//					= childPath->ComponentAt(componentIndex);
+//				TypeComponent pathComponent
+//					= path->ComponentAt(componentIndex);
+//				if (childComponent != pathComponent) {
+//					if (componentIndex + 1 == childComponentCount
+//						&& pathComponent.HasPrefix(childComponent)) {
+//						// The last child component is a prefix of the
+//						// corresponding path component. We consider this a
+//						// match, but need to recheck the component with the
+//						// next node level.
+//						childComponentCount--;
+//						break;
+//					}
+//
+//					// mismatch -- skip the child
+//					childNode = NULL;
+//					break;
+//				}
+//			}
+//
+//			if (childNode != NULL) {
+//				// got a match -- skip the matched children components
+//				i = childComponentCount;
+//				break;
+//			}
+//		}
+//
+//		if (childNode == NULL)
+//			return NULL;
+//
+//		node = childNode;
+//	}
+//
+//	return node;
+//}
+
+
+bool
+VariablesView::VariableTableModel::_GetTreePath(ModelNode* node,
+	TreeTablePath& _path) const
+{
+	// recurse, if the node has a parent
+	if (ModelNode* parent = node->Parent()) {
+		if (!_GetTreePath(parent, _path))
+			return false;
+
+		if (node->IsHidden())
+			return true;
+
+		return _path.AddComponent(parent->IndexOf(node));
+	}
+
+	// no parent -- get the index and start the path
+	int32 index = fNodes.IndexOf(node);
+	_path.Clear();
+	return index >= 0 && _path.AddComponent(index);
+}
 
 
 // #pragma mark - VariablesView
@@ -753,8 +1181,10 @@ VariablesView::VariablesView(Listener* listener)
 	fStackFrame(NULL),
 	fVariableTable(NULL),
 	fVariableTableModel(NULL),
+	fContainerListener(NULL),
 	fPreviousViewState(NULL),
 	fViewStateHistory(NULL),
+	fTableCellContextMenuTracker(NULL),
 	fListener(listener)
 {
 	SetName("Variables");
@@ -765,10 +1195,17 @@ VariablesView::~VariablesView()
 {
 	SetStackFrame(NULL, NULL);
 	fVariableTable->SetTreeTableModel(NULL);
+
 	if (fPreviousViewState != NULL)
 		fPreviousViewState->ReleaseReference();
 	delete fViewStateHistory;
-	delete fVariableTableModel;
+
+	if (fVariableTableModel != NULL) {
+		fVariableTableModel->SetContainerListener(NULL);
+		delete fVariableTableModel;
+	}
+
+	delete fContainerListener;
 }
 
 
@@ -794,7 +1231,9 @@ VariablesView::SetStackFrame(Thread* thread, StackFrame* stackFrame)
 	if (thread == fThread && stackFrame == fStackFrame)
 		return;
 
-	_SaveViewState();
+//	_SaveViewState();
+
+	_FinishContextMenu(true);
 
 	if (fThread != NULL)
 		fThread->ReleaseReference();
@@ -815,24 +1254,96 @@ VariablesView::SetStackFrame(Thread* thread, StackFrame* stackFrame)
 	if (fThread != NULL && fStackFrame != NULL) {
 		AutoLocker<Team> locker(fThread->GetTeam());
 
-		for (int32 i = 0; Variable* variable = fStackFrame->ParameterAt(i); i++)
-			_RequestVariableValue(variable);
-
-		for (int32 i = 0; Variable* variable = fStackFrame->LocalVariableAt(i);
-				i++) {
-			_RequestVariableValue(variable);
+		void* root = fVariableTableModel->Root();
+		int32 count = fVariableTableModel->CountChildren(root);
+		for (int32 i = 0; i < count; i++) {
+			ModelNode* node = (ModelNode*)fVariableTableModel->ChildAt(root, i);
+			_RequestNodeValue(node);
 		}
 	}
 
-	_RestoreViewState();
+//	_RestoreViewState();
 }
 
 
 void
-VariablesView::StackFrameValueRetrieved(StackFrame* stackFrame,
-	Variable* variable, TypeComponentPath* path)
+VariablesView::MessageReceived(BMessage* message)
 {
-	fVariableTableModel->StackFrameValueRetrieved(stackFrame, variable, path);
+	switch (message->what) {
+		case MSG_VALUE_NODE_CHANGED:
+		{
+			ValueNodeChild* nodeChild;
+			ValueNode* oldNode;
+			ValueNode* newNode;
+			if (message->FindPointer("nodeChild", (void**)&nodeChild) == B_OK
+				&& message->FindPointer("oldNode", (void**)&oldNode) == B_OK
+				&& message->FindPointer("newNode", (void**)&newNode) == B_OK) {
+				BReference<ValueNodeChild> nodeChildReference(nodeChild, true);
+				BReference<ValueNode> oldNodeReference(oldNode, true);
+				BReference<ValueNode> newNodeReference(newNode, true);
+
+				fVariableTableModel->ValueNodeChanged(nodeChild, oldNode,
+					newNode);
+			}
+
+			break;
+		}
+		case MSG_VALUE_NODE_CHILDREN_CREATED:
+		{
+			ValueNode* node;
+			if (message->FindPointer("node", (void**)&node) == B_OK) {
+				BReference<ValueNode> newNodeReference(node, true);
+				fVariableTableModel->ValueNodeChildrenCreated(node);
+			}
+
+			break;
+		}
+		case MSG_VALUE_NODE_CHILDREN_DELETED:
+		{
+			ValueNode* node;
+			if (message->FindPointer("node", (void**)&node) == B_OK) {
+				BReference<ValueNode> newNodeReference(node, true);
+				fVariableTableModel->ValueNodeChildrenDeleted(node);
+			}
+
+			break;
+		}
+		case MSG_VALUE_NODE_VALUE_CHANGED:
+		{
+			ValueNode* node;
+			if (message->FindPointer("node", (void**)&node) == B_OK) {
+				BReference<ValueNode> newNodeReference(node, true);
+				fVariableTableModel->ValueNodeValueChanged(node);
+			}
+
+			break;
+		}
+		case MSG_VARIABLES_VIEW_CONTEXT_MENU_DONE:
+		{
+			_FinishContextMenu(false);
+			break;
+		}
+		case MSG_VARIABLES_VIEW_NODE_SETTINGS_CHANGED:
+		{
+			ModelNode* node;
+			if (message->FindPointer("node", (void**)&node) != B_OK)
+				break;
+			BReference<ModelNode> nodeReference(node, true);
+
+			fVariableTableModel->NotifyNodeChanged(node);
+			break;
+		}
+		default:
+			BGroupView::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
+VariablesView::DetachedFromWindow()
+{
+	_FinishContextMenu(true);
 }
 
 
@@ -841,26 +1352,70 @@ VariablesView::TreeTableNodeExpandedChanged(TreeTable* table,
 	const TreeTablePath& path, bool expanded)
 {
 	if (expanded) {
-		ValueNode* node = (ValueNode*)fVariableTableModel->NodeForPath(path);
+		ModelNode* node = (ModelNode*)fVariableTableModel->NodeForPath(path);
 		if (node == NULL)
 			return;
 
 		fVariableTableModel->NodeExpanded(node);
 
 		// request the values of all children that don't have any yet
-		for (int32 i = 0; ValueNode* child = node->ChildAt(i); i++) {
+
+		// If the node only has a hidden child, directly load the child's
+		// children's values.
+		if (node->CountChildren() == 1) {
+			ModelNode* child = node->ChildAt(0);
+			if (child->IsHidden())
+				node = child;
+		}
+
+		// request the values
+		for (int32 i = 0; ModelNode* child = node->ChildAt(i); i++) {
 			if (child->IsPresentationNode())
 				continue;
 
-			Variable* variable = child->GetVariable();
-			TypeComponentPath* path = child->Path();
-			if (fStackFrame->Values()->HasValue(variable->ID(), *path))
-				continue;
-
-			fListener->StackFrameValueRequested(fThread, fStackFrame, variable,
-				path);
+			_RequestNodeValue(child);
 		}
 	}
+}
+
+
+void
+VariablesView::TreeTableCellMouseDown(TreeTable* table,
+	const TreeTablePath& path, int32 columnIndex, BPoint screenWhere,
+	uint32 buttons)
+{
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
+		return;
+
+	_FinishContextMenu(true);
+
+	ModelNode* node = (ModelNode*)fVariableTableModel->NodeForPath(path);
+	if (node == NULL)
+		return;
+
+	TableCellValueRenderer* cellRenderer = node->TableCellRenderer();
+	if (cellRenderer == NULL)
+		return;
+
+	Settings* settings = cellRenderer->GetSettings();
+	if (settings == NULL)
+		return;
+
+	SettingsMenu* settingsMenu;
+	status_t error = node->GetValueHandler()->CreateTableCellValueSettingsMenu(
+		node->GetValue(), settings, settingsMenu);
+	Reference<SettingsMenu> settingsMenuReference(settingsMenu, true);
+	if (error != B_OK)
+		return;
+
+	TableCellContextMenuTracker* tracker = new(std::nothrow)
+		TableCellContextMenuTracker(node, Looper(), this);
+	Reference<TableCellContextMenuTracker> trackerReference(tracker);
+	if (tracker == NULL || tracker->Init(settings, settingsMenu) != B_OK)
+		return;
+
+	fTableCellContextMenuTracker = trackerReference.Detach();
+	fTableCellContextMenuTracker->ShowMenu(screenWhere);
 }
 
 
@@ -878,7 +1433,12 @@ VariablesView::_Init()
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
 
 	fVariableTableModel = new VariableTableModel;
+	if (fVariableTableModel->Init() != B_OK)
+		throw std::bad_alloc();
 	fVariableTable->SetTreeTableModel(fVariableTableModel);
+
+	fContainerListener = new ContainerListener(this);
+	fVariableTableModel->SetContainerListener(fContainerListener);
 
 	fVariableTable->AddTreeTableListener(this);
 
@@ -889,21 +1449,48 @@ VariablesView::_Init()
 
 
 void
-VariablesView::_RequestVariableValue(Variable* variable)
+VariablesView::_RequestNodeValue(ModelNode* node)
 {
-	StackFrameValues* values = fStackFrame->Values();
-	if (values->HasValue(variable->ID(), TypeComponentPath()))
+	// get the node child and its container
+	ValueNodeChild* nodeChild = node->NodeChild();
+	ValueNodeContainer* container = nodeChild->Container();
+
+	Reference<ValueNodeContainer> containerReference(container);
+	AutoLocker<ValueNodeContainer> containerLocker(container);
+
+	if (container == NULL || nodeChild->Container() != container)
 		return;
 
-	TypeComponentPath* path = new(std::nothrow) TypeComponentPath;
-	if (path == NULL)
+	// get the value node and check whether its value has not yet been resolved
+	ValueNode* valueNode = nodeChild->Node();
+	if (valueNode == NULL
+		|| valueNode->LocationAndValueResolutionState()
+			!= VALUE_NODE_UNRESOLVED) {
 		return;
-	Reference<TypeComponentPath> pathReference(path, true);
+	}
 
-	fListener->StackFrameValueRequested(fThread, fStackFrame, variable, path);
+	Reference<ValueNode> valueNodeReference(valueNode);
+	containerLocker.Unlock();
+
+	// request resolution of the value
+	fListener->ValueNodeValueRequested(fStackFrame->GetCpuState(), container,
+		valueNode);
 }
 
 
+void
+VariablesView::_FinishContextMenu(bool force)
+{
+	if (fTableCellContextMenuTracker != NULL) {
+		if (!fTableCellContextMenuTracker->FinishMenu(force) || force) {
+			fTableCellContextMenuTracker->ReleaseReference();
+			fTableCellContextMenuTracker = NULL;
+		}
+	}
+}
+
+
+#if 0
 void
 VariablesView::_SaveViewState() const
 {
@@ -978,7 +1565,7 @@ VariablesView::_AddViewStateDescendentNodeInfos(VariablesViewState* viewState,
 {
 	int32 childCount = fVariableTableModel->CountChildren(parent);
 	for (int32 i = 0; i < childCount; i++) {
-		ValueNode* node = (ValueNode*)fVariableTableModel->ChildAt(parent, i);
+		ModelNode* node = (ModelNode*)fVariableTableModel->ChildAt(parent, i);
 		if (!path.AddComponent(i))
 			return B_NO_MEMORY;
 
@@ -1009,7 +1596,7 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 {
 	int32 childCount = fVariableTableModel->CountChildren(parent);
 	for (int32 i = 0; i < childCount; i++) {
-		ValueNode* node = (ValueNode*)fVariableTableModel->ChildAt(parent, i);
+		ModelNode* node = (ModelNode*)fVariableTableModel->ChildAt(parent, i);
 		if (!path.AddComponent(i))
 			return B_NO_MEMORY;
 
@@ -1031,6 +1618,7 @@ VariablesView::_ApplyViewStateDescendentNodeInfos(VariablesViewState* viewState,
 
 	return B_OK;
 }
+#endif	// 0
 
 
 // #pragma mark - Listener

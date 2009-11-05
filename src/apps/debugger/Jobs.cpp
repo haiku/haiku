@@ -29,7 +29,11 @@
 #include "Tracing.h"
 #include "Type.h"
 #include "TypeComponentPath.h"
+#include "Value.h"
+#include "ValueLoader.h"
 #include "ValueLocation.h"
+#include "ValueNode.h"
+#include "ValueNodeContainer.h"
 #include "Variable.h"
 
 
@@ -406,627 +410,211 @@ LoadSourceCodeJob::Do()
 }
 
 
-// #pragma mark - GetStackFrameValueJobKey
+// #pragma mark - ResolveValueNodeValueJob
 
 
-GetStackFrameValueJobKey::GetStackFrameValueJobKey(StackFrame* stackFrame,
-	Variable* variable, TypeComponentPath* path)
-	:
-	stackFrame(stackFrame),
-	variable(variable),
-	path(path)
-{
-}
-
-
-uint32
-GetStackFrameValueJobKey::HashValue() const
-{
-	uint32 hash = (uint32)(addr_t)stackFrame;
-	hash = hash * 13 + (uint32)(addr_t)variable;
-	return hash * 13 + path->HashValue();
-}
-
-
-bool
-GetStackFrameValueJobKey::operator==(const JobKey& other) const
-{
-	const GetStackFrameValueJobKey* otherKey
-		= dynamic_cast<const GetStackFrameValueJobKey*>(&other);
-	return otherKey != NULL && stackFrame == otherKey->stackFrame
-		&& variable == otherKey->variable && *path == *otherKey->path;
-}
-
-
-// #pragma mark - GetStackFrameValueJob
-
-
-GetStackFrameValueJob::GetStackFrameValueJob(
+ResolveValueNodeValueJob::ResolveValueNodeValueJob(
 	DebuggerInterface* debuggerInterface, Architecture* architecture,
-	Thread* thread, StackFrame* stackFrame, Variable* variable,
-	TypeComponentPath* path)
+	CpuState* cpuState, ValueNodeContainer*	container, ValueNode* valueNode)
 	:
-	fKey(stackFrame, variable, path),
+	fKey(valueNode, JOB_TYPE_RESOLVE_VALUE_NODE_VALUE),
 	fDebuggerInterface(debuggerInterface),
 	fArchitecture(architecture),
-	fThread(thread),
-	fStackFrame(stackFrame),
-	fVariable(variable),
-	fPath(path)
+	fCpuState(cpuState),
+	fContainer(container),
+	fValueNode(valueNode)
 {
-	fThread->AcquireReference();
-	fStackFrame->AcquireReference();
-	fVariable->AcquireReference();
-	fPath->AcquireReference();
+	if (fCpuState != NULL)
+		fCpuState->AcquireReference();
+	fContainer->AcquireReference();
+	fValueNode->AcquireReference();
 }
 
 
-GetStackFrameValueJob::~GetStackFrameValueJob()
+ResolveValueNodeValueJob::~ResolveValueNodeValueJob()
 {
-	fThread->ReleaseReference();
-	fStackFrame->ReleaseReference();
-	fVariable->ReleaseReference();
-	fPath->ReleaseReference();
+	if (fCpuState != NULL)
+		fCpuState->ReleaseReference();
+	fContainer->ReleaseReference();
+	fValueNode->ReleaseReference();
 }
 
 
 const JobKey&
-GetStackFrameValueJob::Key() const
+ResolveValueNodeValueJob::Key() const
 {
 	return fKey;
 }
 
 
 status_t
-GetStackFrameValueJob::Do()
+ResolveValueNodeValueJob::Do()
 {
-	status_t error = _GetValue();
-	if (error == B_OK)
-		return B_OK;
+	// check whether the node still belongs to the container
+	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+	if (fValueNode->Container() != fContainer)
+		return B_BAD_VALUE;
 
-	// in case of error, set the value to invalid to avoid triggering this job
-	// again
-	AutoLocker<Team> locker(fThread->GetTeam());
-	fStackFrame->Values()->SetValue(fVariable->ID(), fPath, BVariant());
+	// if already resolved, we're done
+	status_t nodeResolutionState
+		= fValueNode->LocationAndValueResolutionState();
+	if (nodeResolutionState != VALUE_NODE_UNRESOLVED)
+		return nodeResolutionState;
+
+	containerLocker.Unlock();
+
+	// resolve
+	status_t error = _ResolveNodeValue();
+	if (error != B_OK) {
+		nodeResolutionState = fValueNode->LocationAndValueResolutionState();
+		if (nodeResolutionState != VALUE_NODE_UNRESOLVED)
+			return nodeResolutionState;
+
+		containerLocker.Lock();
+		fValueNode->SetLocationAndValue(NULL, NULL, error);
+		containerLocker.Unlock();
+	}
 
 	return error;
 }
 
 
 status_t
-GetStackFrameValueJob::_GetValue()
+ResolveValueNodeValueJob::_ResolveNodeValue()
 {
-	TRACE_LOCALS_ONLY(
-		TRACE_LOCALS("GetStackFrameValueJob::_GetValue(): %s ",
-			fVariable->Name().String());
-		fPath->Dump();
-		TRACE_LOCALS("\n");
-	)
+	// get the node child and parent node
+	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+	ValueNodeChild* nodeChild = fValueNode->NodeChild();
+	Reference<ValueNodeChild> nodeChildReference(nodeChild);
 
-	Type* type;
+	ValueNode* parentNode = nodeChild->Parent();
+	Reference<ValueNode> parentNodeReference(parentNode);
+
+	// Check whether the node child location has been resolved already
+	// (successfully).
+	status_t nodeChildResolutionState = nodeChild->LocationResolutionState();
+	bool nodeChildDone = nodeChildResolutionState != VALUE_NODE_UNRESOLVED;
+	if (nodeChildDone && nodeChildResolutionState != B_OK)
+		return nodeChildResolutionState;
+
+	// If the child node location has not been resolved yet, check whether the
+	// parent node location and value have been resolved already (successfully).
+	bool parentDone = true;
+	if (!nodeChildDone && parentNode != NULL) {
+		status_t parentResolutionState
+			= parentNode->LocationAndValueResolutionState();
+		parentDone = parentResolutionState != VALUE_NODE_UNRESOLVED;
+		if (parentDone && parentResolutionState != B_OK)
+			return parentResolutionState;
+	}
+
+	containerLocker.Unlock();
+
+	// resolve the parent node location and value, if necessary
+	if (!parentDone) {
+		status_t error = _ResolveParentNodeValue(parentNode);
+		if (error != B_OK) {
+			TRACE_LOCALS("ResolveValueNodeValueJob::_ResolveNodeValue(): value "
+				"node: %p (\"%s\"): _ResolveParentNodeValue(%p) failed\n",
+				fValueNode, fValueNode->Name().String(), parentNode);
+			return error;
+		}
+	}
+
+	// resolve the node child location, if necessary
+	if (!nodeChildDone) {
+		status_t error = _ResolveNodeChildLocation(nodeChild);
+		if (error != B_OK) {
+			TRACE_LOCALS("ResolveValueNodeValueJob::_ResolveNodeValue(): value "
+				"node: %p (\"%s\"): _ResolveNodeChildLocation(%p) failed\n",
+				fValueNode, fValueNode->Name().String(), nodeChild);
+			return error;
+		}
+	}
+
+	// resolve the node location and value
+	ValueLoader valueLoader(fArchitecture, fDebuggerInterface, fCpuState);
 	ValueLocation* location;
-	bool valueResolved;
-	status_t error = _ResolveTypeAndLocation(type, location, valueResolved);
-	if (error != B_OK || valueResolved) {
-		TRACE_LOCALS("  -> error: %#lx, valueResolved: %d\n", error,
-			valueResolved);
-		return error;
-	}
-	Type* actualType = type;
-	Reference<Type> typeReference(type);
-	Reference<Type> actualTypeReference(actualType);
-	Reference<ValueLocation> locationReference(location);
-
-	// find out the type of the data we want to read
-	type_code valueType = 0;
-	bool shortValueIsFine = false;
-	while (valueType == 0) {
-		switch (type->Kind()) {
-			case TYPE_PRIMITIVE:
-				valueType = dynamic_cast<PrimitiveType*>(type)->TypeConstant();
-				shortValueIsFine = BVariant::TypeIsInteger(valueType)
-					|| valueType == B_BOOL_TYPE;
-
-				TRACE_LOCALS("  TYPE_PRIMITIVE: '%c%c%c%c'\n",
-					int(valueType >> 24), int(valueType >> 16),
-					int(valueType >> 8), int(valueType));
-
-				if (valueType == 0) {
-					TRACE_LOCALS("  -> unknown type constant\n");
-					return B_BAD_VALUE;
-				}
-				break;
-			case TYPE_MODIFIED:
-				TRACE_LOCALS("  TYPE_MODIFIED\n");
-				// ignore modifiers
-				type = dynamic_cast<ModifiedType*>(type)->BaseType();
-				break;
-			case TYPE_TYPEDEF:
-				TRACE_LOCALS("  TYPE_TYPEDEF\n");
-				type = dynamic_cast<TypedefType*>(type)->BaseType();
-				break;
-			case TYPE_ADDRESS:
-			case TYPE_POINTER_TO_MEMBER:
-				TRACE_LOCALS("  TYPE_ADDRESS/TYPE_POINTER_TO_MEMBER\n");
-				if (fArchitecture->AddressSize() == 4) {
-					valueType = B_UINT32_TYPE;
-					TRACE_LOCALS("    -> 32 bit\n");
-				} else {
-					valueType = B_UINT64_TYPE;
-					TRACE_LOCALS("    -> 64 bit\n");
-				}
-				break;
-			case TYPE_COMPOUND:
-			case TYPE_ARRAY:
-				TRACE_LOCALS("  TYPE_COMPOUND/TYPE_ARRAY\n");
-				// We can't retrieve the actual value of the compound object/
-				// array (just of its components/elements), but to make the
-				// recursion work smoothly, we have to set the type and
-				// location at least.
-				return _SetValue(BVariant(), actualType, location);
-			case TYPE_ENUMERATION:
-			{
-				TRACE_LOCALS("  TYPE_ENUMERATION\n");
-				// If a base type is known, use that.
-				EnumerationType* enumType
-					= dynamic_cast<EnumerationType*>(type);
-				if (enumType->BaseType() != NULL) {
-					type = enumType->BaseType();
-					break;
-				}
-
-				// get the value type constant
-				// TODO: This is C source language specific!
-				switch (enumType->ByteSize()) {
-					case 1:
-						valueType = B_INT8_TYPE;
-						break;
-					case 2:
-						valueType = B_INT16_TYPE;
-						break;
-					case 4:
-					default:
-						valueType = B_INT32_TYPE;
-						break;
-					case 8:
-						valueType = B_INT64_TYPE;
-						break;
-				}
-
-				shortValueIsFine = true;
-				break;
-			}
-			case TYPE_SUBRANGE:
-				TRACE_LOCALS("  TYPE_SUBRANGE -> unsupported\n");
-				return B_UNSUPPORTED;
-			case TYPE_UNSPECIFIED:
-				// Can't get the value for an unspecified type!
-				return B_BAD_VALUE;
-			case TYPE_FUNCTION:
-				TRACE_LOCALS("  TYPE_FUNCTION\n");
-				// Can't get the value for a function type!
-				return B_BAD_VALUE;
-		}
-	}
-
-	// update the reference in case the type has changed
-	typeReference.SetTo(type);
-
-	if (valueType == B_STRING_TYPE) {
-		TRACE_LOCALS("  -> B_STRING_TYPE: unsupported\n");
-		return B_UNSUPPORTED;
-			// TODO:...
-	}
-
-	// check whether we know the complete location
-	int32 count = location->CountPieces();
-
-	TRACE_LOCALS_ONLY(location->Dump();)
-
-	if (count == 0) {
-		TRACE_LOCALS("  -> no location\n");
-		return B_ENTRY_NOT_FOUND;
-	}
-
-	// If the source language implementation uses descriptors to point to
-	// objects, we need to resolve the object address to the data address.
-	if (count == 1) {
-		ValuePieceLocation piece = location->PieceAt(0);
-		if (piece.type == VALUE_PIECE_LOCATION_MEMORY) {
-			ValueLocation* dataLocation;
-			error = type->ResolveObjectDataLocation(*location, dataLocation);
-			if (error != B_OK)
-				return error;
-
-			location = dataLocation;
-			locationReference.SetTo(location, true);
-		}
-	}
-
-	static const size_t kMaxPieceSize = 16;
-	uint64 totalBitSize = 0;
-	for (int32 i = 0; i < count; i++) {
-		ValuePieceLocation piece = location->PieceAt(i);
-		switch (piece.type) {
-			case VALUE_PIECE_LOCATION_INVALID:
-			case VALUE_PIECE_LOCATION_UNKNOWN:
-				return B_ENTRY_NOT_FOUND;
-			case VALUE_PIECE_LOCATION_MEMORY:
-			case VALUE_PIECE_LOCATION_REGISTER:
-				break;
-		}
-
-		if (piece.size > kMaxPieceSize) {
-			TRACE_LOCALS("  -> overly long piece size (%llu bytes)\n",
-				piece.size);
-			return B_UNSUPPORTED;
-		}
-
-		totalBitSize += piece.bitSize;
-	}
-
-	TRACE_LOCALS("  -> totalBitSize: %llu\n", totalBitSize);
-
-	if (totalBitSize == 0) {
-		TRACE_LOCALS("  -> no size\n");
-		return B_ENTRY_NOT_FOUND;
-	}
-
-	if (totalBitSize > 64) {
-		TRACE_LOCALS("  -> longer than 64 bits: unsupported\n");
-		return B_UNSUPPORTED;
-	}
-
-	uint64 valueBitSize = BVariant::SizeOfType(valueType) * 8;
-	if (!shortValueIsFine && totalBitSize < valueBitSize) {
-		TRACE_LOCALS("  -> too short for value type (%llu vs. %llu bits)\n",
-			totalBitSize, valueBitSize);
-		return B_BAD_VALUE;
-	}
-
-	// Load the data. Since the BitBuffer class we're using only supports big
-	// endian bit semantics, we convert all data to big endian before pushing
-	// them to the buffer. For later conversion to BVariant we need to make sure
-	// the final buffer has the size of the value type, so we pad the most
-	// significant bits with zeros.
-	BitBuffer valueBuffer;
-	if (totalBitSize < valueBitSize)
-		valueBuffer.AddZeroBits(valueBitSize - totalBitSize);
-
-	bool bigEndian = fArchitecture->IsBigEndian();
-	const Register* registers = fArchitecture->Registers();
-	for (int32 i = 0; i < count; i++) {
-		ValuePieceLocation piece = location->PieceAt(
-			bigEndian ? i : count - i - 1);
-		uint32 bytesToRead = piece.size;
-		uint32 bitSize = piece.bitSize;
-		uint8 bitOffset = piece.bitOffset;
-
-		switch (piece.type) {
-			case VALUE_PIECE_LOCATION_INVALID:
-			case VALUE_PIECE_LOCATION_UNKNOWN:
-				return B_ENTRY_NOT_FOUND;
-			case VALUE_PIECE_LOCATION_MEMORY:
-			{
-				target_addr_t address = piece.address;
-
-				TRACE_LOCALS("  piece %ld: memory address: %#llx, bits: %lu\n",
-					i, address, bitSize);
-
-				uint8 pieceBuffer[kMaxPieceSize];
-				ssize_t bytesRead = fDebuggerInterface->ReadMemory(address,
-					pieceBuffer, bytesToRead);
-				if (bytesRead < 0)
-					return bytesRead;
-				if ((uint32)bytesRead != bytesToRead)
-					return B_BAD_ADDRESS;
-
-				TRACE_LOCALS_ONLY(
-					TRACE_LOCALS("  -> read: ");
-					for (ssize_t k = 0; k < bytesRead; k++)
-						TRACE_LOCALS("%02x", pieceBuffer[k]);
-					TRACE_LOCALS("\n");
-				)
-
-				// convert to big endian
-				if (!bigEndian) {
-					for (int32 k = bytesRead / 2 - 1; k >= 0; k--) {
-						std::swap(pieceBuffer[k],
-							pieceBuffer[bytesRead - k - 1]);
-					}
-				}
-
-				valueBuffer.AddBits(pieceBuffer, bitSize, bitOffset);
-				break;
-			}
-			case VALUE_PIECE_LOCATION_REGISTER:
-			{
-				TRACE_LOCALS("  piece %ld: register: %lu, bits: %lu\n", i,
-					piece.reg, bitSize);
-
-				BVariant registerValue;
-				if (!fStackFrame->GetCpuState()->GetRegisterValue(
-						registers + piece.reg, registerValue)) {
-					return B_ENTRY_NOT_FOUND;
-				}
-				if (registerValue.Size() < bytesToRead)
-					return B_ENTRY_NOT_FOUND;
-
-				if (!bigEndian)
-					registerValue.SwapEndianess();
-				valueBuffer.AddBits(registerValue.Bytes(), bitSize, bitOffset);
-				break;
-			}
-		}
-	}
-
-	// If we don't have enough bits in the buffer apparently adding some failed.
-	if (valueBuffer.BitSize() < valueBitSize)
-		return B_NO_MEMORY;
-
-	// convert the bits into something we can work with
-	BVariant value;
-	error = value.SetToTypedData(valueBuffer.Bytes(), valueType);
+	Value* value;
+	status_t error = fValueNode->ResolvedLocationAndValue(&valueLoader,
+		location, value);
 	if (error != B_OK) {
-		TRACE_LOCALS("  -> failed to set typed data: %s\n", strerror(error));
+		TRACE_LOCALS("ResolveValueNodeValueJob::_ResolveNodeValue(): value "
+			"node: %p (\"%s\"): fValueNode->ResolvedLocationAndValue() "
+			"failed\n", fValueNode, fValueNode->Name().String());
 		return error;
 	}
+	Reference<ValueLocation> locationReference(location, true);
+	Reference<Value> valueReference(value, true);
 
-	// convert to host endianess
-	#if B_HOST_IS_LENDIAN
-		value.SwapEndianess();
-	#endif
+	// set location and value on the node
+	containerLocker.Lock();
+	status_t nodeResolutionState
+		= fValueNode->LocationAndValueResolutionState();
+	if (nodeResolutionState != VALUE_NODE_UNRESOLVED)
+		return nodeResolutionState;
+	fValueNode->SetLocationAndValue(location, value, B_OK);
+	containerLocker.Unlock();
 
-	return _SetValue(value, actualType, location);
-}
-
-
-status_t
-GetStackFrameValueJob::_SetValue(const BVariant& value, Type* type,
-	ValueLocation* location)
-{
-	// set the value
-	AutoLocker<Team> locker(fThread->GetTeam());
-
-	status_t error = fStackFrame->Values()->SetValue(fVariable->ID(), fPath,
-		value);
-	if (error != B_OK) {
-		TRACE_LOCALS("  -> failed to set value: %s\n", strerror(error));
-		return error;
-	}
-
-	fStackFrame->ValueInfos()->SetInfo(fVariable->ID(), fPath, type, location);
-
-	fStackFrame->NotifyValueRetrieved(fVariable, fPath);
 	return B_OK;
 }
 
 
 status_t
-GetStackFrameValueJob::_ResolveTypeAndLocation(Type*& _type,
-	ValueLocation*& _location, bool& _valueResolved)
+ResolveValueNodeValueJob::_ResolveNodeChildLocation(ValueNodeChild* nodeChild)
 {
-	if (fPath->CountComponents() == 0) {
-		fVariable->GetType()->AcquireReference();
-		fVariable->Location()->AcquireReference();
-		_type = fVariable->GetType();
-		_location = fVariable->Location();
-		_valueResolved = false;
-		return B_OK;
-	}
+	// resolve the location
+	ValueLoader valueLoader(fArchitecture, fDebuggerInterface, fCpuState);
+	ValueLocation* location = NULL;
+	status_t error = nodeChild->ResolveLocation(&valueLoader, location);
+	Reference<ValueLocation> locationReference(location, true);
 
-	// get the parent value
-	int32 componentCount = fPath->CountComponents();
-	TypeComponentPath* parentPath = fPath->CreateSubPath(componentCount - 1);
-	if (parentPath == NULL)
-		return B_NO_MEMORY;
-	Reference<TypeComponentPath> parentPathReference(parentPath, true);
+	// set the location on the node child
+	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+	status_t nodeChildResolutionState = nodeChild->LocationResolutionState();
+	if (nodeChildResolutionState == VALUE_NODE_UNRESOLVED)
+		nodeChild->SetLocation(location, error);
+	else
+		error = nodeChildResolutionState;
 
-	Type* parentType;
-	ValueLocation* parentLocation;
-	BVariant parentValue;
-	status_t error = _GetTypeLocationAndValue(parentPath, parentType,
-		parentLocation, parentValue);
-	if (error != B_OK) {
-		TRACE_LOCALS("GetStackFrameValueJob::_ResolveTypeAndLocation(): "
-			"_GetTypeLocationAndValue() failed: %s\n", strerror(error));
-		return error;
-	}
-	Reference<Type> parentTypeReference(parentType, true);
-	Reference<ValueLocation> parentLocationReference(parentLocation, true);
-
-	// resolve the last component
-	TypeComponent component = fPath->ComponentAt(componentCount - 1);
-	switch (component.typeKind) {
-		case TYPE_PRIMITIVE:
-		case TYPE_ENUMERATION:
-		case TYPE_SUBRANGE:
-		case TYPE_UNSPECIFIED:
-		case TYPE_FUNCTION:
-		case TYPE_POINTER_TO_MEMBER:
-			// cannot happen
-			TRACE_LOCALS("GetStackFrameValueJob::_ResolveTypeAndLocation(): "
-				"TYPE_PRIMITIVE/TYPE_ENUMERATION/TYPE_SUBRANGE/"
-				"TYPE_UNSPECIFIED/TYPE_FUNCTION/TYPE_POINTER_TO_MEMBER "
-				"subcomponent!\n");
-			return B_BAD_VALUE;
-		case TYPE_COMPOUND:
-		{
-			CompoundType* compoundType
-				= dynamic_cast<CompoundType*>(parentType);
-
-			// base type
-			if (component.componentKind == TYPE_COMPONENT_BASE_TYPE) {
-				BaseType* baseType = compoundType->BaseTypeAt(
-					component.index);
-				if (baseType == NULL)
-					return B_BAD_VALUE;
-
-				// The parent's location refers to the location of the complete
-				// object. We want to extract the location of a member.
-				ValueLocation* location;
-				error = compoundType->ResolveBaseTypeLocation(baseType,
-					*parentLocation, location);
-				if (error != B_OK) {
-					TRACE_LOCALS("GetStackFrameValueJob::"
-						"_ResolveTypeAndLocation(): TYPE_COMPOUND: "
-						"ResolveBaseTypeLocation() failed: %s\n",
-						strerror(error));
-					return error;
-				}
-
-				baseType->GetType()->AcquireReference();
-				_type = baseType->GetType();
-				_location = location;
-				_valueResolved = false;
-
-				return B_OK;
-			}
-
-			// data member
-			if (component.componentKind == TYPE_COMPONENT_DATA_MEMBER) {
-				DataMember* dataMember = compoundType->DataMemberAt(
-					component.index);
-				if (dataMember == NULL)
-					return B_BAD_VALUE;
-
-				// The parent's location refers to the location of the complete
-				// object. We want to extract the location of a member.
-				ValueLocation* location;
-				error = compoundType->ResolveDataMemberLocation(dataMember,
-					*parentLocation, location);
-				if (error != B_OK) {
-					TRACE_LOCALS("GetStackFrameValueJob::"
-						"_ResolveTypeAndLocation(): TYPE_COMPOUND: "
-						"ResolveDataMemberLocation() failed: %s\n",
-						strerror(error));
-					return error;
-				}
-
-				dataMember->GetType()->AcquireReference();
-				_type = dataMember->GetType();
-				_location = location;
-				_valueResolved = false;
-
-				return B_OK;
-			}
-
-			return B_UNSUPPORTED;
-		}
-		case TYPE_MODIFIED:
-		case TYPE_TYPEDEF:
-		{
-			Type* type = component.typeKind == TYPE_MODIFIED
-				? dynamic_cast<ModifiedType*>(parentType)->BaseType()
-				: dynamic_cast<TypedefType*>(parentType)->BaseType();
-			_valueResolved = true;
-			return _SetValue(parentValue, type, parentLocation);
-		}
-		case TYPE_ADDRESS:
-		{
-			// The parent's value is an address pointing to this component.
-			// resolve the location
-			Type* type = dynamic_cast<AddressType*>(parentType)->BaseType();
-			ValueLocation* location;
-			error = type->ResolveObjectDataLocation(parentValue.ToUInt64(),
-				location);
-			if (error != B_OK) {
-				TRACE_LOCALS("GetStackFrameValueJob::"
-						"_ResolveTypeAndLocation(): "
-						"TYPE_ADDRESS/TYPE_POINTER_TO_MEMBER: "
-						"ResolveObjectDataLocation() failed: %s\n",
-					strerror(error));
-				return error;
-			}
-
-			type->AcquireReference();
-			_type = type;
-			_location = location;
-			_valueResolved = false;
-
-			return B_OK;
-		}
-		case TYPE_ARRAY:
-		{
-			ArrayType* arrayType = dynamic_cast<ArrayType*>(parentType);
-
-			if (component.componentKind != TYPE_COMPONENT_ARRAY_ELEMENT)
-				return B_UNSUPPORTED;
-
-			// get the index path
-			ArrayIndexPath indexPath;
-			error = indexPath.SetTo(component.name.String());
-			if (error != B_OK)
-				return error;
-
-			if (indexPath.CountIndices() != arrayType->CountDimensions())
-				return B_UNSUPPORTED;
-
-			// resolve the element location
-			ValueLocation* location;
-			error = arrayType->ResolveElementLocation(indexPath,
-				*parentLocation, location);
-			if (error != B_OK) {
-				TRACE_LOCALS("GetStackFrameValueJob::"
-					"_ResolveTypeAndLocation(): TYPE_ARRAY: "
-					"ResolveElementLocation() failed: %s\n",
-					strerror(error));
-				return error;
-			}
-
-			arrayType->BaseType()->AcquireReference();
-			_type = arrayType->BaseType();
-			_location = location;
-			_valueResolved = false;
-
-			return B_OK;
-		}
-	}
-
-	// Can never get here.
-	return B_UNSUPPORTED;
+	return error;
 }
 
 
 status_t
-GetStackFrameValueJob::_GetTypeLocationAndValue(TypeComponentPath* parentPath,
-	Type*& _parentType, ValueLocation*& _parentLocation, BVariant& _parentValue)
+ResolveValueNodeValueJob::_ResolveParentNodeValue(ValueNode* parentNode)
 {
-	AutoLocker<Team> teamLocker(fThread->GetTeam());
+	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
 
-	// If there's already a value for the parent path, we're done.
-	StackFrameValues* values = fStackFrame->Values();
-	StackFrameValueInfos* valueInfos = fStackFrame->ValueInfos();
-	if (values->HasValue(fVariable->ID(), parentPath)) {
-		if (!values->GetValue(fVariable->ID(), parentPath, _parentValue)
-			|| !valueInfos->GetInfo(fVariable->ID(), parentPath, &_parentType,
-					&_parentLocation)) {
-			return B_ERROR;
-		}
+	if (parentNode->Container() != fContainer)
+		return B_BAD_VALUE;
 
-		return B_OK;
-	}
+	// if the parent node already has a value, we're done
+	status_t nodeResolutionState
+		= parentNode->LocationAndValueResolutionState();
+	if (nodeResolutionState != VALUE_NODE_UNRESOLVED)
+		return nodeResolutionState;
 
 	// check whether a job is already in progress
 	AutoLocker<Worker> workerLocker(GetWorker());
-	GetStackFrameValueJobKey jobKey(fStackFrame, fVariable, parentPath);
+	SimpleJobKey jobKey(parentNode, JOB_TYPE_RESOLVE_VALUE_NODE_VALUE);
 	if (GetWorker()->GetJob(jobKey) == NULL) {
 		workerLocker.Unlock();
 
 		// schedule the job
 		status_t error = GetWorker()->ScheduleJob(
-			new(std::nothrow) GetStackFrameValueJob(fDebuggerInterface,
-				fArchitecture, fThread, fStackFrame, fVariable, parentPath));
+			new(std::nothrow) ResolveValueNodeValueJob(fDebuggerInterface,
+				fArchitecture, fCpuState, fContainer, parentNode));
 		if (error != B_OK) {
 			// scheduling failed -- set the value to invalid
-			values->SetValue(fVariable->ID(), parentPath, BVariant());
+			parentNode->SetLocationAndValue(NULL, NULL, error);
 			return error;
 		}
 	}
 
 	// wait for the job to finish
 	workerLocker.Unlock();
-	teamLocker.Unlock();
+	containerLocker.Unlock();
 
 	switch (WaitFor(jobKey)) {
 		case JOB_DEPENDENCY_SUCCEEDED:
@@ -1040,14 +628,10 @@ GetStackFrameValueJob::_GetTypeLocationAndValue(TypeComponentPath* parentPath,
 			return B_ERROR;
 	}
 
-	teamLocker.Lock();
+	containerLocker.Lock();
 
-	// now there should be a value for the path
-	if (!values->GetValue(fVariable->ID(), parentPath, _parentValue)
-		|| !valueInfos->GetInfo(fVariable->ID(), parentPath, &_parentType,
-				&_parentLocation)) {
-		return B_ERROR;
-	}
-
-	return B_OK;
+	// now there should be a value for the node
+	nodeResolutionState = parentNode->LocationAndValueResolutionState();
+	return nodeResolutionState != VALUE_NODE_UNRESOLVED
+		? nodeResolutionState : B_ERROR;
 }

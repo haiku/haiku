@@ -17,6 +17,12 @@ class BString;
 class Type;
 
 
+enum global_type_cache_scope {
+	GLOBAL_TYPE_CACHE_SCOPE_GLOBAL,
+	GLOBAL_TYPE_CACHE_SCOPE_COMPILATION_UNIT
+};
+
+
 class GlobalTypeCache : public Referenceable {
 public:
 								GlobalTypeCache();
@@ -29,21 +35,25 @@ public:
 
 			// cache must be locked
 			Type*				GetType(const BString& name) const;
-			status_t			AddType(const BString& name, Type* type);
-			void				RemoveType(const BString& name);
+			Type*				GetTypeByID(const BString& id) const;
+			status_t			AddType(Type* type);
+			void				RemoveType(Type* type);
 
 			// cache locked by method
 			void				RemoveTypes(image_id imageID);
 
 private:
 			struct TypeEntry;
-			struct TypeEntryHashDefinition;
+			struct TypeEntryHashDefinitionByName;
+			struct TypeEntryHashDefinitionByID;
 
-			typedef BOpenHashTable<TypeEntryHashDefinition> TypeTable;
+			typedef BOpenHashTable<TypeEntryHashDefinitionByName> NameTable;
+			typedef BOpenHashTable<TypeEntryHashDefinitionByID> IDTable;
 
 private:
 			BLocker				fLock;
-			TypeTable*			fTypes;
+			NameTable*			fTypesByName;
+			IDTable*			fTypesByID;
 };
 
 

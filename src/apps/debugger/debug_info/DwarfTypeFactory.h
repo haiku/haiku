@@ -32,7 +32,7 @@ class DwarfArrayType;
 class DwarfCompoundType;
 class DwarfDataMember;
 class DwarfEnumerationType;
-class DwarfEnumerationValue;
+class DwarfEnumeratorValue;
 class DwarfFile;
 class DwarfFunctionParameter;
 class DwarfFunctionType;

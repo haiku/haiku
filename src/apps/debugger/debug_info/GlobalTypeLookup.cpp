@@ -17,13 +17,12 @@
 
 
 struct GlobalTypeCache::TypeEntry {
-	BString		name;
 	Type*		type;
-	TypeEntry*	fNext;
+	TypeEntry*	fNextByName;
+	TypeEntry*	fNextByID;
 
-	TypeEntry(const BString& name, Type* type)
+	TypeEntry(Type* type)
 		:
-		name(name),
 		type(type)
 	{
 		type->AcquireReference();
@@ -36,7 +35,7 @@ struct GlobalTypeCache::TypeEntry {
 };
 
 
-struct GlobalTypeCache::TypeEntryHashDefinition {
+struct GlobalTypeCache::TypeEntryHashDefinitionByName {
 	typedef const BString	KeyType;
 	typedef	TypeEntry		ValueType;
 
@@ -47,17 +46,43 @@ struct GlobalTypeCache::TypeEntryHashDefinition {
 
 	size_t Hash(const TypeEntry* value) const
 	{
-		return HashKey(value->name);
+		return HashKey(value->type->Name());
 	}
 
 	bool Compare(const BString& key, const TypeEntry* value) const
 	{
-		return key == value->name;
+		return key == value->type->Name();
 	}
 
 	TypeEntry*& GetLink(TypeEntry* value) const
 	{
-		return value->fNext;
+		return value->fNextByName;
+	}
+};
+
+
+struct GlobalTypeCache::TypeEntryHashDefinitionByID {
+	typedef const BString	KeyType;
+	typedef	TypeEntry		ValueType;
+
+	size_t HashKey(const BString& key) const
+	{
+		return StringUtils::HashValue(key);
+	}
+
+	size_t Hash(const TypeEntry* value) const
+	{
+		return HashKey(value->type->ID());
+	}
+
+	bool Compare(const BString& key, const TypeEntry* value) const
+	{
+		return key == value->type->ID();
+	}
+
+	TypeEntry*& GetLink(TypeEntry* value) const
+	{
+		return value->fNextByID;
 	}
 };
 
@@ -67,19 +92,23 @@ struct GlobalTypeCache::TypeEntryHashDefinition {
 
 GlobalTypeCache::GlobalTypeCache()
 	:
-	fLock("global type lookup"),
-	fTypes(NULL)
+	fLock("global type cache"),
+	fTypesByName(NULL),
+	fTypesByID(NULL)
 {
 }
 
 
 GlobalTypeCache::~GlobalTypeCache()
 {
+	if (fTypesByName != NULL)
+		fTypesByName->Clear();
+
 	// release all cached type references
-	if (fTypes != NULL) {
-		TypeEntry* entry = fTypes->Clear(true);
+	if (fTypesByID != NULL) {
+		TypeEntry* entry = fTypesByID->Clear(true);
 		while (entry != NULL) {
-			TypeEntry* nextEntry = entry->fNext;
+			TypeEntry* nextEntry = entry->fNextByID;
 			delete entry;
 			entry = nextEntry;
 		}
@@ -90,48 +119,85 @@ GlobalTypeCache::~GlobalTypeCache()
 status_t
 GlobalTypeCache::Init()
 {
+	// check lock
 	status_t error = fLock.InitCheck();
 	if (error != B_OK)
 		return error;
 
-	fTypes = new(std::nothrow) TypeTable;
-	if (fTypes == NULL)
+	// create name table
+	fTypesByName = new(std::nothrow) NameTable;
+	if (fTypesByName == NULL)
 		return B_NO_MEMORY;
 
-	return fTypes->Init();
+	error = fTypesByName->Init();
+	if (error != B_OK)
+		return error;
+
+	// create ID table
+	fTypesByID = new(std::nothrow) IDTable;
+	if (fTypesByID == NULL)
+		return B_NO_MEMORY;
+
+	error = fTypesByID->Init();
+	if (error != B_OK)
+		return error;
+
+	return B_OK;
 }
 
 
 Type*
 GlobalTypeCache::GetType(const BString& name) const
 {
-	TypeEntry* typeEntry = fTypes->Lookup(name);
+	TypeEntry* typeEntry = fTypesByName->Lookup(name);
+	return typeEntry != NULL ? typeEntry->type : NULL;
+}
+
+
+Type*
+GlobalTypeCache::GetTypeByID(const BString& id) const
+{
+	TypeEntry* typeEntry = fTypesByID->Lookup(id);
 	return typeEntry != NULL ? typeEntry->type : NULL;
 }
 
 
 status_t
-GlobalTypeCache::AddType(const BString& name, Type* type)
+GlobalTypeCache::AddType(Type* type)
 {
-	TypeEntry* typeEntry = fTypes->Lookup(name);
-	if (typeEntry != NULL)
-		return B_BAD_VALUE;
+	const BString& id = type->ID();
+	const BString& name = type->Name();
 
-	typeEntry = new(std::nothrow) TypeEntry(name, type);
+	if (fTypesByID->Lookup(id) != NULL
+		|| (name.Length() > 0 && fTypesByID->Lookup(name) != NULL)) {
+		return B_BAD_VALUE;
+	}
+
+	TypeEntry* typeEntry = new(std::nothrow) TypeEntry(type);
 	if (typeEntry == NULL)
 		return B_NO_MEMORY;
 
-	fTypes->Insert(typeEntry);
+	fTypesByID->Insert(typeEntry);
+
+	if (name.Length() > 0)
+		fTypesByName->Insert(typeEntry);
+
 	return B_OK;
 }
 
 
 void
-GlobalTypeCache::RemoveType(const BString& name)
+GlobalTypeCache::RemoveType(Type* type)
 {
-	if (TypeEntry* typeEntry = fTypes->Lookup(name)) {
-		fTypes->Remove(typeEntry);
-		delete typeEntry;
+	if (TypeEntry* typeEntry = fTypesByID->Lookup(type->ID())) {
+		if (typeEntry->type == type) {
+			fTypesByID->Remove(typeEntry);
+
+			if (type->Name().Length() > 0)
+				fTypesByName->Remove(typeEntry);
+
+			delete typeEntry;
+		}
 	}
 }
 
@@ -141,10 +207,14 @@ GlobalTypeCache::RemoveTypes(image_id imageID)
 {
 	AutoLocker<GlobalTypeCache> locker(this);
 
-	for (TypeTable::Iterator it = fTypes->GetIterator();
+	for (IDTable::Iterator it = fTypesByID->GetIterator();
 			TypeEntry* typeEntry = it.Next();) {
 		if (typeEntry->type->ImageID() == imageID) {
-			fTypes->RemoveUnchecked(typeEntry);
+			fTypesByID->RemoveUnchecked(typeEntry);
+
+			if (typeEntry->type->Name().Length() > 0)
+				fTypesByName->Remove(typeEntry);
+
 			delete typeEntry;
 		}
 	}

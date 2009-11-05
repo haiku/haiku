@@ -211,24 +211,6 @@ TeamWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case MSG_STACK_FRAME_VALUE_RETRIEVED:
-		{
-			void* _stackFrame;
-			void* _variable;
-			void* _path;
-			if (message->FindPointer("stackFrame", &_stackFrame) == B_OK
-				&& message->FindPointer("variable", &_variable) == B_OK
-				&& message->FindPointer("path", &_path) == B_OK) {
-				StackFrame* stackFrame = (StackFrame*)_stackFrame;
-				Variable* variable = (Variable*)_variable;
-				TypeComponentPath* path = (TypeComponentPath*)_path;
-				_HandleStackFrameValueRetrieved(stackFrame, variable, path);
-				path->ReleaseReference();
-				variable->ReleaseReference();
-				stackFrame->ReleaseReference();
-			}
-		}
-
 		case MSG_IMAGE_DEBUG_INFO_CHANGED:
 		{
 			int32 imageID;
@@ -339,10 +321,10 @@ TeamWindow::ClearBreakpointRequested(target_addr_t address)
 
 
 void
-TeamWindow::StackFrameValueRequested(::Thread* thread, StackFrame* stackFrame,
-	Variable* variable, TypeComponentPath* path)
+TeamWindow::ValueNodeValueRequested(CpuState* cpuState,
+	ValueNodeContainer* container, ValueNode* valueNode)
 {
-	fListener->StackFrameValueRequested(thread, stackFrame, variable, path);
+	fListener->ValueNodeValueRequested(cpuState, container, valueNode);
 }
 
 
@@ -402,22 +384,6 @@ TeamWindow::FunctionSourceCodeChanged(Function* function)
 		function->SourceCodeState());
 
 	PostMessage(MSG_FUNCTION_SOURCE_CODE_CHANGED);
-}
-
-
-void
-TeamWindow::StackFrameValueRetrieved(StackFrame* stackFrame, Variable* variable,
-	TypeComponentPath* path)
-{
-	BMessage message(MSG_STACK_FRAME_VALUE_RETRIEVED);
-	if (message.AddPointer("stackFrame", stackFrame) == B_OK
-		&& message.AddPointer("variable", variable) == B_OK
-		&& message.AddPointer("path", path) == B_OK
-		&& PostMessage(&message) == B_OK) {
-		stackFrame->AcquireReference();
-		variable->AcquireReference();
-		path->AcquireReference();
-	}
 }
 
 
@@ -903,17 +869,6 @@ TeamWindow::_HandleStackTraceChanged(thread_id threadID)
 	locker.Unlock();
 
 	_SetActiveStackTrace(stackTrace);
-}
-
-
-void
-TeamWindow::_HandleStackFrameValueRetrieved(StackFrame* stackFrame,
-	Variable* variable, TypeComponentPath* path)
-{
-	if (stackFrame != fActiveStackFrame)
-		return;
-
-	fVariablesView->StackFrameValueRetrieved(stackFrame, variable, path);
 }
 
 

@@ -193,6 +193,13 @@ DwarfTypeFactory::CreateType(DIEType* typeEntry, DwarfType*& _type)
 	AutoLocker<GlobalTypeCache> cacheLocker(fTypeCache);
 	Type* globalType = name.Length() > 0
 		? fTypeCache->GetType(name) : NULL;
+	if (globalType == NULL) {
+		// lookup by name failed -- try lookup by ID
+		BString id;
+		if (DwarfType::GetTypeID(typeEntry, id))
+			globalType = fTypeCache->GetTypeByID(id);
+	}
+
 	if (globalType != NULL) {
 		DwarfType* globalDwarfType = dynamic_cast<DwarfType*>(globalType);
 		if (globalDwarfType != NULL) {
@@ -228,15 +235,15 @@ DwarfTypeFactory::CreateType(DIEType* typeEntry, DwarfType*& _type)
 
 	// Insert the type into the cache. Re-check, as the type may already
 	// have been inserted (e.g. in the compound type case).
-	if (name.Length() > 0) {
-		cacheLocker.Lock();
-		if (fTypeCache->GetType(name) == NULL) {
-			error = fTypeCache->AddType(name, type);
-			if (error != B_OK)
-				return error;
-		}
-		cacheLocker.Unlock();
+	cacheLocker.Lock();
+	if (name.Length() > 0
+			? fTypeCache->GetType(name) == NULL
+			: fTypeCache->GetTypeByID(type->ID()) == NULL) {
+		error = fTypeCache->AddType(type);
+		if (error != B_OK)
+			return error;
 	}
+	cacheLocker.Unlock();
 
 	// try to get the type's size
 	uint64 size;
@@ -354,9 +361,12 @@ DwarfTypeFactory::_CreateCompoundType(const BString& name,
 // incomplete type could become visible to other threads. Hence we keep the
 // context locked, but that essentially kills multi-threading for this context.
 	AutoLocker<GlobalTypeCache> cacheLocker(fTypeCache);
-	status_t error = fTypeCache->AddType(name, type);
+	status_t error = fTypeCache->AddType(type);
 	if (error != B_OK)
+{
+printf("  -> failed to add type to cache\n");
 		return error;
+}
 //	cacheLocker.Unlock();
 
 	// find the abstract origin or specification that defines the data members
@@ -388,7 +398,7 @@ DwarfTypeFactory::_CreateCompoundType(const BString& name,
 			Reference<DwarfDataMember> memberReference(member, true);
 			if (member == NULL || !type->AddDataMember(member)) {
 				cacheLocker.Lock();
-				fTypeCache->RemoveType(name);
+				fTypeCache->RemoveType(type);
 				return B_NO_MEMORY;
 			}
 		}
@@ -423,7 +433,7 @@ DwarfTypeFactory::_CreateCompoundType(const BString& name,
 					true);
 				if (inheritance == NULL || !type->AddInheritance(inheritance)) {
 					cacheLocker.Lock();
-					fTypeCache->RemoveType(name);
+					fTypeCache->RemoveType(type);
 					return B_NO_MEMORY;
 				}
 			}
@@ -808,10 +818,10 @@ DwarfTypeFactory::_CreateEnumerationType(const BString& name,
 			}
 
 			// create and add the enumeration value object
-			DwarfEnumerationValue* enumValue
-				= new(std::nothrow) DwarfEnumerationValue(enumeratorEntry,
+			DwarfEnumeratorValue* enumValue
+				= new(std::nothrow) DwarfEnumeratorValue(enumeratorEntry,
 					enumeratorEntry->Name(), value);
-			Reference<DwarfEnumerationValue> enumValueReference(enumValue, true);
+			Reference<DwarfEnumeratorValue> enumValueReference(enumValue, true);
 			if (enumValue == NULL || !type->AddValue(enumValue))
 				return B_NO_MEMORY;
 		}

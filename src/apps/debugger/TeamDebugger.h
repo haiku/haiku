@@ -47,9 +47,9 @@ private:
 	virtual	void				FunctionSourceCodeRequested(
 									FunctionInstance* function);
 	virtual	void				ImageDebugInfoRequested(Image* image);
-	virtual	void				StackFrameValueRequested(::Thread* thread,
-									StackFrame* stackFrame, Variable* variable,
-									TypeComponentPath* path);
+	virtual	void				ValueNodeValueRequested(CpuState* cpuState,
+									ValueNodeContainer* container,
+									ValueNode* valueNode);
 	virtual	void				ThreadActionRequested(thread_id threadID,
 									uint32 action);
 	virtual	void				SetBreakpointRequested(target_addr_t address,

@@ -13,6 +13,7 @@
 #include "Types.h"
 
 
+class CpuState;
 class FunctionInstance;
 class Image;
 class StackFrame;
@@ -21,6 +22,8 @@ class Thread;
 class TypeComponentPath;
 class UserBreakpoint;
 class UserInterfaceListener;
+class ValueNode;
+class ValueNodeContainer;
 class Variable;
 
 
@@ -59,10 +62,9 @@ public:
 	virtual	void				FunctionSourceCodeRequested(
 									FunctionInstance* function) = 0;
 	virtual	void				ImageDebugInfoRequested(Image* image) = 0;
-	virtual	void				StackFrameValueRequested(Thread* thread,
-									StackFrame* stackFrame, Variable* variable,
-									TypeComponentPath* path) = 0;
-									// called with team locked
+	virtual	void				ValueNodeValueRequested(CpuState* cpuState,
+									ValueNodeContainer* container,
+									ValueNode* valueNode) = 0;
 	virtual	void				ThreadActionRequested(thread_id threadID,
 									uint32 action) = 0;
 

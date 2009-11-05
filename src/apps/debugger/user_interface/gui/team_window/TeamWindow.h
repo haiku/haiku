@@ -89,9 +89,9 @@ private:
 	virtual	void				ClearBreakpointRequested(target_addr_t address);
 
 	// VariablesView::Listener
-	virtual	void				StackFrameValueRequested(::Thread* thread,
-									StackFrame* stackFrame, Variable* variable,
-									TypeComponentPath* path);
+	virtual	void				ValueNodeValueRequested(CpuState* cpuState,
+									ValueNodeContainer* container,
+									ValueNode* valueNode);
 
 	// Team::Listener
 	virtual	void				ThreadStateChanged(
@@ -107,11 +107,6 @@ private:
 
 	// Function::Listener
 	virtual	void				FunctionSourceCodeChanged(Function* function);
-
-	// StackFrame::Listener
-	virtual	void				StackFrameValueRetrieved(StackFrame* stackFrame,
-									Variable* variable,
-									TypeComponentPath* path);
 
 			void				_Init();
 
@@ -130,9 +125,6 @@ private:
 			void				_HandleThreadStateChanged(thread_id threadID);
 			void				_HandleCpuStateChanged(thread_id threadID);
 			void				_HandleStackTraceChanged(thread_id threadID);
-			void				_HandleStackFrameValueRetrieved(
-									StackFrame* stackFrame, Variable* variable,
-									TypeComponentPath* path);
 			void				_HandleImageDebugInfoChanged(image_id imageID);
 			void				_HandleSourceCodeChanged();
 			void				_HandleUserBreakpointChanged(

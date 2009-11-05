@@ -23,10 +23,10 @@ DataMember::~DataMember()
 }
 
 
-// #pragma mark - EnumerationValue
+// #pragma mark - EnumeratorValue
 
 
-EnumerationValue::~EnumerationValue()
+EnumeratorValue::~EnumeratorValue()
 {
 }
 
@@ -81,7 +81,7 @@ Type::~Type()
 
 
 Type*
-Type::ResolveRawType() const
+Type::ResolveRawType(bool nextOneOnly) const
 {
 	return const_cast<Type*>(this);
 }
@@ -133,9 +133,10 @@ ModifiedType::Kind() const
 
 
 Type*
-ModifiedType::ResolveRawType() const
+ModifiedType::ResolveRawType(bool nextOneOnly) const
 {
-	return BaseType();
+	Type* baseType = BaseType();
+	return nextOneOnly ? baseType : baseType->ResolveRawType(true);
 }
 
 
@@ -155,9 +156,10 @@ TypedefType::Kind() const
 
 
 Type*
-TypedefType::ResolveRawType() const
+TypedefType::ResolveRawType(bool nextOneOnly) const
 {
-	return BaseType();
+	Type* baseType = BaseType();
+	return nextOneOnly ? baseType : baseType->ResolveRawType(true);
 }
 
 
@@ -191,11 +193,11 @@ EnumerationType::Kind() const
 }
 
 
-EnumerationValue*
+EnumeratorValue*
 EnumerationType::ValueFor(const BVariant& value) const
 {
 	// TODO: Optimize?
-	for (int32 i = 0; EnumerationValue* enumValue = ValueAt(i); i++) {
+	for (int32 i = 0; EnumeratorValue* enumValue = ValueAt(i); i++) {
 		if (enumValue->Value() == value)
 			return enumValue;
 	}

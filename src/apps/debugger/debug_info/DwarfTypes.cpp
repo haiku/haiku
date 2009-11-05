@@ -85,19 +85,36 @@ DwarfTypeContext::~DwarfTypeContext()
 // #pragma mark - DwarfType
 
 
-DwarfType::DwarfType(DwarfTypeContext* typeContext, const BString& name)
+DwarfType::DwarfType(DwarfTypeContext* typeContext, const BString& name,
+	const DIEType* entry)
 	:
 	fTypeContext(typeContext),
 	fName(name),
 	fByteSize(0)
 {
 	fTypeContext->AcquireReference();
+
+	GetTypeID(entry, fID);
 }
 
 
 DwarfType::~DwarfType()
 {
 	fTypeContext->ReleaseReference();
+}
+
+
+/*static*/ bool
+DwarfType::GetTypeID(const DIEType* entry, BString& _id)
+{
+	char buffer[32];
+	snprintf(buffer, sizeof(buffer), "dwarf:%p", entry);
+	BString id = buffer;
+	if (id.Length() == 0)
+		return false;
+
+	_id = id;
+	return true;
 }
 
 
@@ -108,10 +125,17 @@ DwarfType::ImageID() const
 }
 
 
-const char*
+const BString&
+DwarfType::ID() const
+{
+	return fID;
+}
+
+
+const BString&
 DwarfType::Name() const
 {
-	return fName.Length() > 0 ? fName.String() : NULL;
+	return fName;
 }
 
 
@@ -308,10 +332,10 @@ DwarfDataMember::GetType() const
 }
 
 
-// #pragma mark - DwarfEnumerationValue
+// #pragma mark - DwarfEnumeratorValue
 
 
-DwarfEnumerationValue::DwarfEnumerationValue(DIEEnumerator* entry,
+DwarfEnumeratorValue::DwarfEnumeratorValue(DIEEnumerator* entry,
 	const BString& name, const BVariant& value)
 	:
 	fEntry(entry),
@@ -321,19 +345,19 @@ DwarfEnumerationValue::DwarfEnumerationValue(DIEEnumerator* entry,
 }
 
 
-DwarfEnumerationValue::~DwarfEnumerationValue()
+DwarfEnumeratorValue::~DwarfEnumeratorValue()
 {
 }
 
 const char*
-DwarfEnumerationValue::Name() const
+DwarfEnumeratorValue::Name() const
 {
 	return fName.Length() > 0 ? fName.String() : NULL;
 }
 
 
 BVariant
-DwarfEnumerationValue::Value() const
+DwarfEnumeratorValue::Value() const
 {
 	return fValue;
 }
@@ -403,7 +427,7 @@ DwarfFunctionParameter::GetType() const
 DwarfPrimitiveType::DwarfPrimitiveType(DwarfTypeContext* typeContext,
 	const BString& name, DIEBaseType* entry, uint32 typeConstant)
 	:
-	DwarfType(typeContext, name),
+	DwarfType(typeContext, name, entry),
 	fEntry(entry),
 	fTypeConstant(typeConstant)
 {
@@ -430,7 +454,7 @@ DwarfPrimitiveType::TypeConstant() const
 DwarfCompoundType::DwarfCompoundType(DwarfTypeContext* typeContext,
 	const BString& name, DIECompoundType* entry)
 	:
-	DwarfType(typeContext, name),
+	DwarfType(typeContext, name, entry),
 	fEntry(entry)
 {
 }
@@ -684,7 +708,7 @@ DwarfCompoundType::_ResolveDataMemberLocation(DwarfType* memberType,
 DwarfArrayType::DwarfArrayType(DwarfTypeContext* typeContext,
 	const BString& name, DIEArrayType* entry, DwarfType* baseType)
 	:
-	DwarfType(typeContext, name),
+	DwarfType(typeContext, name, entry),
 	fEntry(entry),
 	fBaseType(baseType)
 {
@@ -908,7 +932,7 @@ DwarfModifiedType::DwarfModifiedType(DwarfTypeContext* typeContext,
 	const BString& name, DIEModifiedType* entry, uint32 modifiers,
 	DwarfType* baseType)
 	:
-	DwarfType(typeContext, name),
+	DwarfType(typeContext, name, entry),
 	fEntry(entry),
 	fModifiers(modifiers),
 	fBaseType(baseType)
@@ -950,7 +974,7 @@ DwarfModifiedType::GetDIEType() const
 DwarfTypedefType::DwarfTypedefType(DwarfTypeContext* typeContext,
 	const BString& name, DIETypedef* entry, DwarfType* baseType)
 	:
-	DwarfType(typeContext, name),
+	DwarfType(typeContext, name, entry),
 	fEntry(entry),
 	fBaseType(baseType)
 {
@@ -985,7 +1009,7 @@ DwarfAddressType::DwarfAddressType(DwarfTypeContext* typeContext,
 	const BString& name, DIEAddressingType* entry,
 	address_type_kind addressKind, DwarfType* baseType)
 	:
-	DwarfType(typeContext, name),
+	DwarfType(typeContext, name, entry),
 	fEntry(entry),
 	fAddressKind(addressKind),
 	fBaseType(baseType)
@@ -1027,7 +1051,7 @@ DwarfAddressType::GetDIEType() const
 DwarfEnumerationType::DwarfEnumerationType(DwarfTypeContext* typeContext,
 	const BString& name, DIEEnumerationType* entry, DwarfType* baseType)
 	:
-	DwarfType(typeContext, name),
+	DwarfType(typeContext, name, entry),
 	fEntry(entry),
 	fBaseType(baseType)
 {
@@ -1038,7 +1062,7 @@ DwarfEnumerationType::DwarfEnumerationType(DwarfTypeContext* typeContext,
 
 DwarfEnumerationType::~DwarfEnumerationType()
 {
-	for (int32 i = 0; DwarfEnumerationValue* value = fValues.ItemAt(i); i++)
+	for (int32 i = 0; DwarfEnumeratorValue* value = fValues.ItemAt(i); i++)
 		value->ReleaseReference();
 
 	if (fBaseType != NULL)
@@ -1060,7 +1084,7 @@ DwarfEnumerationType::CountValues() const
 }
 
 
-EnumerationValue*
+EnumeratorValue*
 DwarfEnumerationType::ValueAt(int32 index) const
 {
 	return fValues.ItemAt(index);
@@ -1075,7 +1099,7 @@ DwarfEnumerationType::GetDIEType() const
 
 
 bool
-DwarfEnumerationType::AddValue(DwarfEnumerationValue* value)
+DwarfEnumerationType::AddValue(DwarfEnumeratorValue* value)
 {
 	if (!fValues.AddItem(value))
 		return false;
@@ -1092,7 +1116,7 @@ DwarfSubrangeType::DwarfSubrangeType(DwarfTypeContext* typeContext,
 	const BString& name, DIESubrangeType* entry, DwarfType* baseType,
 	const BVariant& lowerBound, const BVariant& upperBound)
 	:
-	DwarfType(typeContext, name),
+	DwarfType(typeContext, name, entry),
 	fEntry(entry),
 	fBaseType(baseType),
 	fLowerBound(lowerBound),
@@ -1142,7 +1166,7 @@ DwarfSubrangeType::UpperBound() const
 DwarfUnspecifiedType::DwarfUnspecifiedType(DwarfTypeContext* typeContext,
 	const BString& name, DIEUnspecifiedType* entry)
 	:
-	DwarfType(typeContext, name),
+	DwarfType(typeContext, name, entry),
 	fEntry(entry)
 {
 }
@@ -1166,7 +1190,7 @@ DwarfUnspecifiedType::GetDIEType() const
 DwarfFunctionType::DwarfFunctionType(DwarfTypeContext* typeContext,
 	const BString& name, DIESubroutineType* entry, DwarfType* returnType)
 	:
-	DwarfType(typeContext, name),
+	DwarfType(typeContext, name, entry),
 	fEntry(entry),
 	fReturnType(returnType),
 	fHasVariableArguments(false)
@@ -1249,7 +1273,7 @@ DwarfPointerToMemberType::DwarfPointerToMemberType(
 	DIEPointerToMemberType* entry, DwarfCompoundType* containingType,
 	DwarfType* baseType)
 	:
-	DwarfType(typeContext, name),
+	DwarfType(typeContext, name, entry),
 	fEntry(entry),
 	fContainingType(containingType),
 	fBaseType(baseType)

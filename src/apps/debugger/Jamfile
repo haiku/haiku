@@ -12,17 +12,23 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) files ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) ids ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) settings ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) settings generic ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui team_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui util ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) ids ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) settings ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui value ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) value ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) value value_handlers ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) value value_nodes ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) value values ] ;
 
 local debugAnalyzerSources
 	= [ FDirName $(HAIKU_TOP) src apps debuganalyzer ] ;
@@ -96,31 +102,6 @@ Application Debugger :
 	LocatableFile.cpp
 	SourceFile.cpp
 
-	# user_interface
-	UserInterface.cpp
-
-	# user_interface/gui
-	GraphicalUserInterface.cpp
-
-	# user_interface/gui/model
-	VariablesViewState.cpp
-	VariablesViewStateHistory.cpp
-
-	# user_interface/gui/team_window
-	BreakpointListView.cpp
-	BreakpointsView.cpp
-	ImageFunctionsView.cpp
-	ImageListView.cpp
-	RegistersView.cpp
-	SourceView.cpp
-	StackTraceView.cpp
-	TeamWindow.cpp
-	ThreadListView.cpp
-	VariablesView.cpp
-
-	# user_interface/gui/util
-	TargetAddressTableColumn.cpp
-
 	# ids
 	FunctionID.cpp
 	LocalVariableID.cpp
@@ -154,6 +135,11 @@ Application Debugger :
 	TeamSettings.cpp
 	SettingsManager.cpp
 
+	# settings/generic
+	Setting.cpp
+	Settings.cpp
+	SettingsDescription.cpp
+
 	# source_language
 	CLanguage.cpp
 	CLanguageFamily.cpp
@@ -168,10 +154,79 @@ Application Debugger :
 	TargetAddressRangeList.cpp
 	ValueLocation.cpp
 
+	# user_interface
+	UserInterface.cpp
+
+	# user_interface/gui
+	GraphicalUserInterface.cpp
+
+	# user_interface/gui/model
+	VariablesViewState.cpp
+	VariablesViewStateHistory.cpp
+
+	# user_interface/gui/team_window
+	BreakpointListView.cpp
+	BreakpointsView.cpp
+	ImageFunctionsView.cpp
+	ImageListView.cpp
+	RegistersView.cpp
+	SourceView.cpp
+	StackTraceView.cpp
+	TeamWindow.cpp
+	ThreadListView.cpp
+	VariablesView.cpp
+
+	# user_interface/gui/util
+	SettingsMenu.cpp
+	TargetAddressTableColumn.cpp
+
+	# user_interface/gui/value
+	TableCellBoolRenderer.cpp
+	TableCellEnumerationRenderer.cpp
+	TableCellFloatRenderer.cpp
+	TableCellIntegerRenderer.cpp
+	TableCellStringRenderer.cpp
+	TableCellValueRenderer.cpp
+	TableCellValueRendererUtils.cpp
+
 	# util
 	ArchivingUtils.cpp
 	BitBuffer.cpp
+	IntegerFormatter.cpp
 	StringUtils.cpp
+
+	# value
+	TypeHandler.cpp
+	TypeHandlerRoster.cpp
+	Value.cpp
+	ValueHandler.cpp
+	ValueHandlerRoster.cpp
+	ValueLoader.cpp
+	ValueNode.cpp
+	ValueNodeContainer.cpp
+
+	# value/value_handlers
+	AddressValueHandler.cpp
+	BoolValueHandler.cpp
+	EnumerationValueHandler.cpp
+	FloatValueHandler.cpp
+	IntegerValueHandler.cpp
+
+	# value/value_nodes
+	AddressValueNode.cpp
+	ArrayValueNode.cpp
+	CompoundValueNode.cpp
+	EnumerationValueNode.cpp
+	PointerToMemberValueNode.cpp
+	PrimitiveValueNode.cpp
+	VariableValueNodeChild.cpp
+
+	# value/values
+	AddressValue.cpp
+	BoolValue.cpp
+	EnumerationValue.cpp
+	FloatValue.cpp
+	IntegerValue.cpp
 
 	:
 	<nogrist>Debugger_demangler.o

@@ -11,9 +11,13 @@
 #include "table/TreeTable.h"
 
 
+class CpuState;
+class SettingsMenu;
 class StackFrame;
 class Thread;
 class TypeComponentPath;
+class ValueNode;
+class ValueNodeContainer;
 class Variable;
 class VariablesViewState;
 class VariablesViewStateHistory;
@@ -32,41 +36,53 @@ public:
 
 			void				SetStackFrame(Thread* thread,
 									StackFrame* stackFrame);
-			void				StackFrameValueRetrieved(StackFrame* stackFrame,
-									Variable* variable,
-									TypeComponentPath* path);
+
+	virtual	void				MessageReceived(BMessage* message);
+
+	virtual	void				DetachedFromWindow();
 
 private:
 	// TreeTableListener
 	virtual	void				TreeTableNodeExpandedChanged(TreeTable* table,
 									const TreeTablePath& path, bool expanded);
 
+	virtual	void				TreeTableCellMouseDown(TreeTable* table,
+									const TreeTablePath& path,
+									int32 columnIndex, BPoint screenWhere,
+									uint32 buttons);
+
 private:
-			class ValueNode;
+			class ContainerListener;
+			class ModelNode;
 			class VariableValueColumn;
 			class VariableTableModel;
+			class ContextMenu;
+			class TableCellContextMenuTracker;
 
 private:
 			void				_Init();
 
-			void				_RequestVariableValue(Variable* variable);
+			void				_RequestNodeValue(ModelNode* node);
+			void				_FinishContextMenu(bool force);
 
-			void				_SaveViewState() const;
-			void				_RestoreViewState();
-			status_t			_AddViewStateDescendentNodeInfos(
-									VariablesViewState* viewState, void* parent,
-									TreeTablePath& path) const;
-			status_t			_ApplyViewStateDescendentNodeInfos(
-									VariablesViewState* viewState, void* parent,
-									TreeTablePath& path);
+//			void				_SaveViewState() const;
+//			void				_RestoreViewState();
+//			status_t			_AddViewStateDescendentNodeInfos(
+//									VariablesViewState* viewState, void* parent,
+//									TreeTablePath& path) const;
+//			status_t			_ApplyViewStateDescendentNodeInfos(
+//									VariablesViewState* viewState, void* parent,
+//									TreeTablePath& path);
 
 private:
 			Thread*				fThread;
 			StackFrame*			fStackFrame;
 			TreeTable*			fVariableTable;
 			VariableTableModel*	fVariableTableModel;
+			ContainerListener*	fContainerListener;
 			VariablesViewState*	fPreviousViewState;
 			VariablesViewStateHistory* fViewStateHistory;
+			TableCellContextMenuTracker* fTableCellContextMenuTracker;
 			Listener*			fListener;
 };
 
@@ -75,10 +91,9 @@ class VariablesView::Listener {
 public:
 	virtual						~Listener();
 
-	virtual	void				StackFrameValueRequested(Thread* thread,
-									StackFrame* stackFrame, Variable* variable,
-									TypeComponentPath* path) = 0;
-									// called with team locked
+	virtual	void				ValueNodeValueRequested(CpuState* cpuState,
+									ValueNodeContainer* container,
+									ValueNode* valueNode) = 0;
 };
 
 

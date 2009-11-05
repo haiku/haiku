@@ -88,11 +88,14 @@ private:
 class DwarfType : public virtual Type {
 public:
 								DwarfType(DwarfTypeContext* typeContext,
-									const BString& name);
+									const BString& name, const DIEType* entry);
 								~DwarfType();
 
+	static	bool				GetTypeID(const DIEType* entry, BString& _id);
+
 	virtual	image_id			ImageID() const;
-	virtual	const char*			Name() const;
+	virtual	const BString&		ID() const;
+	virtual	const BString&		Name() const;
 	virtual	target_size_t		ByteSize() const;
 
 	virtual	status_t			ResolveObjectDataLocation(
@@ -118,6 +121,7 @@ public:
 private:
 			DwarfTypeContext*	fTypeContext;
 			BString				fName;
+			BString				fID;
 			target_size_t		fByteSize;
 };
 
@@ -162,11 +166,11 @@ private:
 };
 
 
-class DwarfEnumerationValue : public EnumerationValue {
+class DwarfEnumeratorValue : public EnumeratorValue {
 public:
-								DwarfEnumerationValue(DIEEnumerator* entry,
+								DwarfEnumeratorValue(DIEEnumerator* entry,
 									const BString& name, const BVariant& value);
-								~DwarfEnumerationValue();
+								~DwarfEnumeratorValue();
 
 	virtual	const char*			Name() const;
 	virtual	BVariant			Value() const;
@@ -396,17 +400,17 @@ public:
 	virtual	Type*				BaseType() const;
 
 	virtual	int32				CountValues() const;
-	virtual	EnumerationValue*	ValueAt(int32 index) const;
+	virtual	EnumeratorValue*	ValueAt(int32 index) const;
 
 	virtual	DIEType*			GetDIEType() const;
 
-			bool				AddValue(DwarfEnumerationValue* value);
+			bool				AddValue(DwarfEnumeratorValue* value);
 
 			DIEEnumerationType*	Entry() const
 									{ return fEntry; }
 
 private:
-			typedef BObjectList<DwarfEnumerationValue> ValueList;
+			typedef BObjectList<DwarfEnumeratorValue> ValueList;
 
 private:
 			DIEEnumerationType*	fEntry;

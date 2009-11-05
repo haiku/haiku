@@ -45,6 +45,7 @@ enum {
 
 
 class ArrayIndexPath;
+class BString;
 class Type;
 class ValueLocation;
 
@@ -66,9 +67,9 @@ public:
 };
 
 
-class EnumerationValue : public Referenceable {
+class EnumeratorValue : public Referenceable {
 public:
-	virtual						~EnumerationValue();
+	virtual						~EnumeratorValue();
 
 	virtual	const char*			Name() const = 0;
 	virtual	BVariant			Value() const = 0;
@@ -100,11 +101,13 @@ public:
 	virtual						~Type();
 
 	virtual	image_id			ImageID() const = 0;
-	virtual	const char*			Name() const = 0;
+	virtual	const BString&		ID() const = 0;
+	virtual	const BString&		Name() const = 0;
 	virtual	type_kind			Kind() const = 0;
 	virtual	target_size_t		ByteSize() const = 0;
-	virtual	Type*				ResolveRawType() const;
-									// strips modifiers and typedefs
+	virtual	Type*				ResolveRawType(bool nextOneOnly) const;
+									// strips modifiers and typedefs (only one,
+									// if requested)
 
 	virtual	status_t			ResolveObjectDataLocation(
 									const ValueLocation& objectLocation,
@@ -158,7 +161,7 @@ public:
 
 	virtual	uint32				Modifiers() const = 0;
 	virtual	Type*				BaseType() const = 0;
-	virtual	Type*				ResolveRawType() const;
+	virtual	Type*				ResolveRawType(bool nextOneOnly) const;
 };
 
 
@@ -169,7 +172,7 @@ public:
 	virtual	type_kind			Kind() const;
 
 	virtual	Type*				BaseType() const = 0;
-	virtual	Type*				ResolveRawType() const;
+	virtual	Type*				ResolveRawType(bool nextOneOnly) const;
 };
 
 
@@ -194,8 +197,8 @@ public:
 									// may return NULL
 
 	virtual	int32				CountValues() const = 0;
-	virtual	EnumerationValue*	ValueAt(int32 index) const = 0;
-	virtual	EnumerationValue*	ValueFor(const BVariant& value) const;
+	virtual	EnumeratorValue*	ValueAt(int32 index) const = 0;
+	virtual	EnumeratorValue*	ValueFor(const BVariant& value) const;
 };
 
 
