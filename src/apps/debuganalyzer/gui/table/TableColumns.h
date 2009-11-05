@@ -11,14 +11,14 @@
 #include "table/TableColumn.h"
 
 
-class DelagateBasedTableColumn : public TableColumn {
+class DelegateBasedTableColumn : public TableColumn {
 public:
-								DelagateBasedTableColumn(
+								DelegateBasedTableColumn(
 									BColumn* columnDelegate,
 									int32 modelIndex, float width,
 									float minWidth, float maxWidth,
 									alignment align);
-	virtual						~DelagateBasedTableColumn();
+	virtual						~DelegateBasedTableColumn();
 
 protected:
 	virtual	void				DrawTitle(BRect rect, BView* targetView);
@@ -36,7 +36,7 @@ protected:
 };
 
 
-class StringTableColumn : public DelagateBasedTableColumn {
+class StringTableColumn : public DelegateBasedTableColumn {
 public:
 								StringTableColumn(int32 modelIndex,
 									const char* title, float width,
@@ -51,7 +51,7 @@ protected:
 	virtual	int					CompareValues(const BVariant& a,
 									const BVariant& b);
 
-private:
+protected:
 			BStringColumn		fColumn;
 	mutable	BStringField		fField;
 };

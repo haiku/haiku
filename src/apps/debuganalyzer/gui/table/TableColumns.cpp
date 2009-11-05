@@ -9,10 +9,10 @@
 #include <stdio.h>
 
 
-// #pragma mark - DelagateBasedTableColumn
+// #pragma mark - DelegateBasedTableColumn
 
 
-DelagateBasedTableColumn::DelagateBasedTableColumn(BColumn* columnDelegate,
+DelegateBasedTableColumn::DelegateBasedTableColumn(BColumn* columnDelegate,
 	int32 modelIndex, float width, float minWidth, float maxWidth,
 	alignment align)
 	:
@@ -22,27 +22,27 @@ DelagateBasedTableColumn::DelagateBasedTableColumn(BColumn* columnDelegate,
 }
 
 
-DelagateBasedTableColumn::~DelagateBasedTableColumn()
+DelegateBasedTableColumn::~DelegateBasedTableColumn()
 {
 }
 
 
 void
-DelagateBasedTableColumn::DrawTitle(BRect rect, BView* targetView)
+DelegateBasedTableColumn::DrawTitle(BRect rect, BView* targetView)
 {
 	fColumnDelegate->DrawTitle(rect, targetView);
 }
 
 
 void
-DelagateBasedTableColumn::GetColumnName(BString* into) const
+DelegateBasedTableColumn::GetColumnName(BString* into) const
 {
 	fColumnDelegate->GetColumnName(into);
 }
 
 
 void
-DelagateBasedTableColumn::DrawValue(const BVariant& value, BRect rect,
+DelegateBasedTableColumn::DrawValue(const BVariant& value, BRect rect,
 	BView* targetView)
 {
 	fColumnDelegate->DrawField(PrepareField(value), rect, targetView);
@@ -50,7 +50,7 @@ DelagateBasedTableColumn::DrawValue(const BVariant& value, BRect rect,
 
 
 float
-DelagateBasedTableColumn::GetPreferredWidth(const BVariant& value,
+DelegateBasedTableColumn::GetPreferredWidth(const BVariant& value,
 	BView* parent) const
 {
 	return fColumnDelegate->GetPreferredWidth(PrepareField(value), parent);
@@ -64,7 +64,7 @@ StringTableColumn::StringTableColumn(int32 modelIndex, const char* title,
 	float width, float minWidth, float maxWidth, uint32 truncate,
 	alignment align)
 	:
-	DelagateBasedTableColumn(&fColumn, modelIndex, width, minWidth, maxWidth,
+	DelegateBasedTableColumn(&fColumn, modelIndex, width, minWidth, maxWidth,
 		align),
 	fColumn(title, width, minWidth, maxWidth, truncate, align),
 	fField("")
