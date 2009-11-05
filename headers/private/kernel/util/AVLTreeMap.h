@@ -74,7 +74,7 @@ private:
 				NO_MEMORY		= -1,
 				OK				= 0,
 				HEIGHT_CHANGED	= 1,
-	
+
 				LEFT			= -1,
 				BALANCED		= 0,
 				RIGHT			= 1,
@@ -288,7 +288,7 @@ protected:
 	// strategy shortcuts
 	inline	Node*				_Allocate(const Key& key, const Value& value);
 	inline	void				_Free(Node* node);
-	inline	Key&				_GetKey(Node* node) const;
+	inline	const Key&			_GetKey(Node* node) const;
 	inline	Value&				_GetValue(Node* node) const;
 	inline	AVLTreeNode*		_GetAVLTreeNode(const Node* node) const;
 	inline	Node*				_GetNode(const AVLTreeNode* node) const;
@@ -311,12 +311,12 @@ public:
 			: ConstIterator()
 		{
 		}
-	
+
 		inline Iterator(const Iterator& other)
 			: ConstIterator(other)
 		{
 		}
-	
+
 		inline void Remove()
 		{
 			if (AVLTreeNode* node = ConstIterator::fTreeIterator.Remove()) {
@@ -326,14 +326,14 @@ public:
 				parent->_Free(parent->_GetNode(node));
 			}
 		}
-	
+
 	private:
 		inline Iterator(_AVL_TREE_MAP_CLASS_NAME* parent,
 			const AVLTreeIterator& treeIterator)
 			: ConstIterator(parent, treeIterator)
 		{
 		}
-	
+
 		friend class _AVL_TREE_MAP_CLASS_NAME;
 	};
 };
@@ -391,6 +391,13 @@ public:
 		if (AVLTreeNode* node = fTreeIterator.Next())
 			return fParent->_GetValue(fParent->_GetNode(node));
 		return Value();
+	}
+
+	inline Value* NextValuePointer()
+	{
+		if (AVLTreeNode* node = fTreeIterator.Next())
+			return &fParent->_GetValue(fParent->_GetNode(node));
+		return NULL;
 	}
 
 	inline Value Previous()
@@ -597,7 +604,7 @@ _AVL_TREE_MAP_CLASS_NAME::_Free(Node* node)
 
 // _GetKey
 _AVL_TREE_MAP_TEMPLATE_LIST
-inline Key&
+inline const Key&
 _AVL_TREE_MAP_CLASS_NAME::_GetKey(Node* node) const
 {
 	return fStrategy.GetKey(node);
