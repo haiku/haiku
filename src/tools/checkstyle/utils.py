@@ -15,29 +15,43 @@ def printMatch(name, match, source):
         + "): '" + match.group().replace('\n','\\n') + "'"
 
 
-# render in html, the file style.css is embedded
-def renderHtml(text, highlights, sourceFileName, outputFileName):
-    splittedText = highlightSplit(text, highlights)
-
-    #styleFile = open("style.css")
-    #style = styleFile.read()
-    #styleFile.close()
-
+def openHtml(fileList, outputFileName):
     file = open(outputFileName, 'w')
     file.write("""
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
-        <title>Style violations in """ + sourceFileName.split('/')[-1] \
-         + """</title>
+        <title>Style violations</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <style type="text/css">""" + cssStyle() + """</style>
     </head>
     <body>
-        <p>""" + sourceFileName + """</p>
-        <pre class="code">""")
+        <p><b>File list:</b><br>""")
+    for fileName in fileList:
+        file.write(fileName + "<br>")
+    file.write("</p>")
+    file.close()
 
+
+def closeHtml(outputFileName):
+    file = open(outputFileName, 'a')
+    file.write("""
+        </pre>
+    </body>
+    </html>""")
+
+    file.close()
+
+
+# render in html
+def renderHtml(text, highlights, sourceFileName, outputFileName):
+    splittedText = highlightSplit(text, highlights)
+
+    file = open(outputFileName, 'a')
+    file.write("<hr/><p><b>" + sourceFileName + "</b></p>")
+
+    # insert highlight tags in a temp buffer
     temp = ""
     count = 0
     for slice in splittedText:
@@ -50,15 +64,19 @@ def renderHtml(text, highlights, sourceFileName, outputFileName):
 
     temp += "</span>" # close the superfluous last highlight
 
+    file.write('<table><tr><td><pre class="code"><span class="linenumber">')
     count = 1
     for line in temp.split('\n'):
-        file.write(str(count).rjust(4) + ' |' + line + '<br>')
+        file.write(str(count).rjust(4)+"<br>")
         count += 1
 
-    file.write("""
-        </pre>
-    </body>
-    </html>""")
+    file.write('</span></pre></td><td><pre class="code">')
+
+    for line in temp.split('\n'):
+        file.write('<span class="linehead"> </span>' + line.replace('\r', ' ') \
+             + '<br>')
+
+    file.write("</pre></td></tr></table>")
 
     file.close()
 
@@ -130,10 +148,34 @@ def checkHighlights(highlights):
 
 
 def cssStyle():
-	return """
+    return """
     .highlight {
         background: #ffff00;
         color: #000000;
+    }
+
+    .linehead {
+        background: #ddd;
+        font-size: 1px;
+    }
+
+    .highlight .linehead {
+        background: #ffff00;;
+        color: #999;
+        text-align: right;
+        font-size: 8px;
+    }
+
+    .linenumber {
+        background: #eee;
+        color: #999;
+        text-align: right;
+    }
+
+    td {
+        border-spacing: 0px;
+        border-width: 0px;
+        padding: 0px
     }
 
     div.code pre {
