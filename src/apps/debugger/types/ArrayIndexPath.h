@@ -27,7 +27,7 @@ public:
 	inline	int32				CountIndices() const;
 	inline	int64				IndexAt(int32 index) const;
 	inline	bool				AddIndex(int64 index);
-
+	inline	void				SetIndexAt(int32 at, int64 newIndex);
 
 			ArrayIndexPath&		operator=(const ArrayIndexPath& other);
 
@@ -58,6 +58,14 @@ bool
 ArrayIndexPath::AddIndex(int64 index)
 {
 	return fIndices.Add(index);
+}
+
+
+void
+ArrayIndexPath::SetIndexAt(int32 at, int64 newIndex)
+{
+	if (at >= 0 && at < fIndices.Count())
+		fIndices[at] = newIndex;
 }
 
 
