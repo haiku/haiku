@@ -4185,6 +4185,8 @@ BView::MessageReceived(BMessage* msg)
 				BToolTip* tip;
 				if (GetToolTipAt(where, &tip))
 					ShowToolTip(tip);
+				else
+					BHandler::MessageReceived(msg);
 				break;
 			}
 
