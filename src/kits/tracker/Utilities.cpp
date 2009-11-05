@@ -91,7 +91,7 @@ HashString(const char *string, uint32 seed)
 {
 	char ch;
 	uint32 result = seed;
-	
+
 	while((ch = *string++) != 0) {
 		result = (result << 7) ^ (result >> 24);
 		result ^= ch;
@@ -129,7 +129,7 @@ ValidateStream(BMallocIO *stream, uint32 key, int32 version)
 	int32 testVersion;
 
 	if (stream->Read(&testKey, sizeof(uint32)) <= 0
-		|| stream->Read(&testVersion, sizeof(int32)) <=0) 
+		|| stream->Read(&testVersion, sizeof(int32)) <=0)
 		return false;
 
 	return testKey == key && testVersion == version;
@@ -139,7 +139,6 @@ ValidateStream(BMallocIO *stream, uint32 key, int32 version)
 void
 DisallowFilenameKeys(BTextView *textView)
 {
-	textView->DisallowChar(':');
 	textView->DisallowChar('/');
 }
 
@@ -473,7 +472,7 @@ namespace BPrivate {
  *	"from" is always transparent, "to" opaque.
  */
 
-void 
+void
 FadeRGBA32Horizontal(uint32 *bits, int32 width, int32 height, int32 from, int32 to)
 {
 	// check parameters
@@ -507,7 +506,7 @@ FadeRGBA32Horizontal(uint32 *bits, int32 width, int32 height, int32 from, int32 
  *	"from" is always transparent, "to" opaque.
  */
 
-void 
+void
 FadeRGBA32Vertical(uint32 *bits, int32 width, int32 height, int32 from, int32 to)
 {
 	// check parameters
@@ -723,7 +722,7 @@ FlickerFreeStringView::Draw(BRect)
 				loc.x = bounds.left + (2 - eInfo.left);
 				break;
 			}
-				
+
 			case B_ALIGN_CENTER:
 			{
 				float width = StringWidth(Text());
@@ -731,7 +730,7 @@ FlickerFreeStringView::Draw(BRect)
 				loc.x = center - (width/2);
 				break;
 			}
-				
+
 			case B_ALIGN_RIGHT:
 			{
 				float width = StringWidth(Text());
@@ -906,7 +905,7 @@ TitledSeparatorItem::Draw()
 	parent->DrawString(truncatedLabel.String());
 
 	parent->MovePenTo(loc);
-	parent->SetHighColor(ShiftMenuBackgroundColor(B_DISABLED_LABEL_TINT));	
+	parent->SetHighColor(ShiftMenuBackgroundColor(B_DISABLED_LABEL_TINT));
 	parent->DrawString(truncatedLabel.String());
 
 	parent->PopState();
@@ -1390,7 +1389,7 @@ GetAppSignatureFromAttr(BFile *file, char *result)
 	// avoids using the BAppFileInfo API when retrieving the
 	// app signature -- the call is expensive because by default
 	// the resource fork is scanned to read the attribute
-	
+
 #ifdef B_APP_FILE_INFO_IS_FAST
 	BAppFileInfo appFileInfo(file);
 	return appFileInfo.GetSignature(result);
@@ -1436,7 +1435,7 @@ GetAppIconFromAttr(BFile *file, BBitmap *result, icon_size size)
 //		}
 //	}
 //
-//	// try again with R5 icons	
+//	// try again with R5 icons
 //	attrName = size == B_LARGE_ICON ? kAttrLargeIcon : kAttrMiniIcon;
 //	type = size == B_LARGE_ICON ? LARGE_ICON_TYPE : MINI_ICON_TYPE;
 //
@@ -1533,7 +1532,7 @@ PositionPassingMenuItem::PositionPassingMenuItem(BMenu *menu,
 }
 
 
-status_t 
+status_t
 PositionPassingMenuItem::Invoke(BMessage *message)
 {
 	if (!Menu())
@@ -1612,7 +1611,7 @@ ComputeTypeAheadScore(const char *text, const char *match, size_t matchLength,
 				score = 0;
 				break;
 			}
-	
+
 			bool wordStart = k == 0 || isspace(text[k - 1]);
 			if (wordStart)
 				score++;
@@ -1623,7 +1622,7 @@ ComputeTypeAheadScore(const char *text, const char *match, size_t matchLength,
 				if (match[j - 1] == text[k - 1])
 					score += 0.7;
 			}
-	
+
 			score += 1.f / (k + 1);
 			k++;
 		}

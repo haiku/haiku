@@ -1853,16 +1853,19 @@ AttributeView::BeginEditingTitle()
 	fTitleEditView = new BTextView(textFrame, "text_editor",
 		textRect, &font, 0, B_FOLLOW_ALL, B_WILL_DRAW);
 	fTitleEditView->SetText(fModel->Name());
+	DisallowFilenameKeys(fTitleEditView);
+
 	// Reset the width of the text rect
 	textRect = fTitleEditView->TextRect();
 	textRect.right = fTitleEditView->LineWidth() + 20;
 	fTitleEditView->SetTextRect(textRect);
 	fTitleEditView->SetWordWrap(false);
 	// Add filter for catching B_RETURN and B_ESCAPE key's
-	fTitleEditView->AddFilter(new BMessageFilter(B_KEY_DOWN, AttributeView::TextViewFilter));
+	fTitleEditView->AddFilter(
+		new BMessageFilter(B_KEY_DOWN, AttributeView::TextViewFilter));
 
-	BScrollView *scrollView = new BScrollView("BorderView",
-		fTitleEditView, 0, 0, false, false, B_PLAIN_BORDER);
+	BScrollView *scrollView = new BScrollView("BorderView", fTitleEditView,
+		0, 0, false, false, B_PLAIN_BORDER);
 	AddChild(scrollView);
 	fTitleEditView->SelectAll();
 	fTitleEditView->MakeFocus();
