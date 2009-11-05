@@ -35,6 +35,9 @@
 #include "ElfFile.h"
 
 class BList;
+
+namespace SymbolPatcher {
+
 class ElfSection;
 class ElfSymbol;
 
@@ -64,5 +67,10 @@ private:
 			uint8*				fDataAddress;
 			uint8*				fGotAddress;
 };
+
+} // namespace SymbolPatcher
+
+using namespace SymbolPatcher;
+
 
 #endif	// ELF_IMAGE_H

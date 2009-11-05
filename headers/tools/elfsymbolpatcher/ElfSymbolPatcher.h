@@ -39,6 +39,9 @@
 #include <List.h>
 #include <String.h>
 
+
+namespace SymbolPatcher {
+
 class ElfImage;
 class ElfSymbolPatcher;
 class ElfSymbolPatchGroup;
@@ -158,5 +161,10 @@ private:
 			bool				fOwnsPatcher;
 			bool				fPatched;
 };
+
+} // namespace SymbolPatcher
+
+using namespace SymbolPatcher;
+
 
 #endif	// ELF_SYMBOL_PATCHER_H

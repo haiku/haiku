@@ -33,7 +33,64 @@
 
 #include <List.h>
 
+#include <debug/debug_support.h>
+
 #include "ElfImage.h"
+
+
+static status_t
+get_static_image_symbol(image_id image, const char* name, int32 symbolType,
+	void** _address)
+{
+	// try standard lookup first
+	status_t error =  get_image_symbol(image, name, symbolType, _address);
+	if (error == B_OK)
+		return B_OK;
+
+	// get an image info
+	image_info imageInfo;
+	error = get_image_info(image, &imageInfo);
+	if (error != B_OK)
+		return error;
+
+	// get a symbol iterator
+	debug_symbol_iterator* iterator;
+	error = debug_create_file_symbol_iterator(imageInfo.name, &iterator);
+	if (error != B_OK)
+		return error;
+
+	// get the unrelocated image info
+	image_info unrelocatedImageInfo;
+	error = debug_get_symbol_iterator_image_info(iterator,
+		&unrelocatedImageInfo);
+	if (error != B_OK) {
+		debug_delete_symbol_iterator(iterator);
+		return error;
+	}
+
+	// iterate through the symbols
+	int32 nameLength = strlen(name);
+	while (true) {
+		char foundName[nameLength + 1];
+		int32 foundType;
+		void* foundAddress;
+		size_t foundSize;
+		if (debug_next_image_symbol(iterator, foundName, nameLength + 1,
+				&foundType, &foundAddress, &foundSize) != B_OK) {
+			debug_delete_symbol_iterator(iterator);
+			return B_ENTRY_NOT_FOUND;
+		}
+
+		if (strcmp(foundName, name) == 0
+			&& (symbolType == B_SYMBOL_TYPE_ANY || foundType == symbolType)) {
+			*_address = (void*)((addr_t)foundAddress + (addr_t)imageInfo.text
+				- (addr_t)unrelocatedImageInfo.text);
+			debug_delete_symbol_iterator(iterator);
+			return B_OK;
+		}
+	}
+}
+
 
 // ElfImage
 
@@ -122,6 +179,7 @@ ElfImage::GetSymbolRelocations(const char* symbolName, BList* relocations)
 	return error;
 }
 
+
 // _SetTo
 status_t
 ElfImage::_SetTo(image_id image)
@@ -133,8 +191,8 @@ ElfImage::_SetTo(image_id image)
 		return error;
 	fImage = imageInfo.id;
 	// get the address of global offset table
-	error = get_image_symbol(image, "_GLOBAL_OFFSET_TABLE_",
-							 B_SYMBOL_TYPE_ANY, (void**)&fGotAddress);
+	error = get_static_image_symbol(image, "_GLOBAL_OFFSET_TABLE_",
+		B_SYMBOL_TYPE_ANY, (void**)&fGotAddress);
 	if (error != B_OK)
 		return error;
 	fTextAddress = (uint8*)imageInfo.text;

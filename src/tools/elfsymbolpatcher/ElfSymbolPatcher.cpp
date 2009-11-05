@@ -343,7 +343,7 @@ ElfSymbolPatcher::Update(UpdateAdapter* updateAdapter)
 		ElfImage* image = _ImageForID(info.id);
 		if (image)
 			continue;
-		image = new(nothrow) ElfImage;
+		image = new(std::nothrow) ElfImage;
 		if (!image)
 			return B_NO_MEMORY;
 		if (!fImages.AddItem(image)) {
@@ -398,6 +398,8 @@ ElfSymbolPatcher::GetSymbolPatchInfo(const char* symbolName,
 			if (info->GetOriginalAddress()) {
 				// A symbol with that name lives in at least two images.
 				// Better bail out.
+// TODO: That doesn't work so well (on gcc 4). E.g. the libsupc++ symbols might
+// appear in several images.
 //printf("Found the symbol in more than one image!\n");
 				error = B_ERROR;
 				break;
@@ -441,7 +443,7 @@ ElfSymbolPatcher::_Init()
 	image_info info;
 	int32 cookie = 0;
 	while (get_next_image_info(0, &cookie, &info) == B_OK) {
-		ElfImage* image = new(nothrow) ElfImage;
+		ElfImage* image = new(std::nothrow) ElfImage;
 		if (!image)
 			return B_NO_MEMORY;
 		if (!fImages.AddItem(image)) {
@@ -494,7 +496,7 @@ ElfSymbolPatchGroup::ElfSymbolPatchGroup(ElfSymbolPatcher* patcher)
 {
 	// create a patcher if none has been supplied
 	if (!fPatcher) {
-		fPatcher = new(nothrow) ElfSymbolPatcher;
+		fPatcher = new(std::nothrow) ElfSymbolPatcher;
 		if (fPatcher) {
 			if (fPatcher->InitCheck() == B_OK)
 				fOwnsPatcher = true;
@@ -525,7 +527,7 @@ ElfSymbolPatchGroup::AddPatch(const char* symbolName, void* newAddress,
 	if (!symbolName || !originalAddress)
 		return B_BAD_VALUE;
 	// allocate patch info
-	PatchInfo* patchInfo = new(nothrow) PatchInfo;
+	PatchInfo* patchInfo = new(std::nothrow) PatchInfo;
 	if (!patchInfo)
 		return B_NO_MEMORY;
 	// init and add the patch info

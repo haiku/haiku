@@ -57,7 +57,7 @@ read_exactly(BPositionIO &file, off_t position, void *buffer, size_t size,
 
 // ElfSection
 
-class ElfSection {
+class SymbolPatcher::ElfSection {
 public:
 								ElfSection();
 								~ElfSection();
@@ -671,7 +671,7 @@ ElfFile::_SetTo(const char *filename)
 		return B_BAD_VALUE;
 	}
 	// allocate memory for the section header table and read it
-	fSectionHeaders = new(nothrow) uint8[sectionHeaderTableSize];
+	fSectionHeaders = new(std::nothrow) uint8[sectionHeaderTableSize];
 	fSectionCount = sectionHeaderCount;
 	fSectionHeaderSize = sectionHeaderSize;
 	if (!fSectionHeaders)
@@ -682,7 +682,7 @@ ElfFile::_SetTo(const char *filename)
 	if (error != B_OK)
 		return error;
 	// allocate memory for the section pointers
-	fSections = new(nothrow) ElfSection[fSectionCount];
+	fSections = new(std::nothrow) ElfSection[fSectionCount];
 	if (!fSections)
 		return B_NO_MEMORY;
 	// init the sections

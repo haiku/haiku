@@ -34,6 +34,9 @@
 
 #include "Elf.h"
 
+
+namespace SymbolPatcher {
+
 class ElfFile;
 class ElfSection;
 
@@ -133,5 +136,10 @@ private:
 			int32				fSectionCount;
 			size_t				fSectionHeaderSize;
 };
+
+} // namespace SymbolPatcher
+
+using namespace SymbolPatcher;
+
 
 #endif	// ELF_FILE_H
