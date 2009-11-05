@@ -453,7 +453,7 @@ SwapSpaceDataSource::Primary() const
 
 BlockCacheDataSource::BlockCacheDataSource()
 {
-	fColor = (rgb_color){0, 120, 0};
+	fColor = (rgb_color){0, 0, 120};
 }
 
 
