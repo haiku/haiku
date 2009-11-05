@@ -9,22 +9,30 @@
 
 /*
  *
- * This is a refactored and stripped down version of bullet-2.66 src\LinearMath\btVector3.h
- * The dependancies on base class btQuadWord have been removed for simplification.
+ * This is a refactored and stripped down version of bullet-2.66
+ * src\LinearMath\btVector3.h
+ * The dependancies on base class btQuadWord have been removed for
+ * simplification.
  *
  */
 
 /*
-Copyright (c) 2003-2006 Gino van den Bergen / Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2006 Gino van den Bergen / Erwin Coumans
+	http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
-In no event will the authors be held liable for any damages arising from the use of this software.
+In no event will the authors be held liable for any damages arising from the
+use of this software.
 Permission is granted to anyone to use this software for any purpose,
 including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
-1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
-2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+1. The origin of this software must not be misrepresented; you must not claim
+ that you wrote the original software. If you use this software in a product,
+ an acknowledgment in the product documentation would be appreciated but is
+ not required.
+2. Altered source versions must be plainly marked as such, and must not be
+ misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -70,9 +78,9 @@ public:
 
 	inline  void 	setValue(const float& x, const float& y, const float& z)
 	{
-		m_x=x;
-		m_y=y;
-		m_z=z;
+		m_x = x;
+		m_y = y;
+		m_z = z;
 	}
 
 	inline Vector3& operator+=(const Vector3& v)
@@ -167,9 +175,9 @@ public:
 
 	inline float triple(const Vector3& v1, const Vector3& v2) const
 	{
-		return m_x * (v1.y() * v2.z() - v1.z() * v2.y()) +
-			m_y * (v1.z() * v2.x() - v1.x() * v2.z()) +
-			m_z * (v1.x() * v2.y() - v1.y() * v2.x());
+		return m_x * (v1.y() * v2.z() - v1.z() * v2.y())
+			+ m_y * (v1.z() * v2.x() - v1.x() * v2.z())
+			+ m_z * (v1.x() * v2.y() - v1.y() * v2.x());
 	}
 
 
@@ -203,7 +211,7 @@ public:
 		m_x = s * v0.x() + rt * v1.x();
 		m_y = s * v0.y() + rt * v1.y();
 		m_z = s * v0.z() + rt * v1.z();
-		//don't do the unused w component
+		// don't do the unused w component
 		//		m_co[3] = s * v0[3] + rt * v1[3];
 	}
 
@@ -224,11 +232,13 @@ public:
 
 };
 
+
 inline Vector3
 operator+(const Vector3& v1, const Vector3& v2)
 {
 	return Vector3(v1.x() + v2.x(), v1.y() + v2.y(), v1.z() + v2.z());
 }
+
 
 inline Vector3
 operator*(const Vector3& v1, const Vector3& v2)
@@ -236,11 +246,13 @@ operator*(const Vector3& v1, const Vector3& v2)
 	return Vector3(v1.x() * v2.x(), v1.y() * v2.y(), v1.z() * v2.z());
 }
 
+
 inline Vector3
 operator-(const Vector3& v1, const Vector3& v2)
 {
 	return Vector3(v1.x() - v2.x(), v1.y() - v2.y(), v1.z() - v2.z());
 }
+
 
 inline Vector3
 operator-(const Vector3& v)
@@ -248,17 +260,20 @@ operator-(const Vector3& v)
 	return Vector3(-v.x(), -v.y(), -v.z());
 }
 
+
 inline Vector3
 operator*(const Vector3& v, const float& s)
 {
 	return Vector3(v.x() * s, v.y() * s, v.z() * s);
 }
 
+
 inline Vector3
 operator*(const float& s, const Vector3& v)
 {
 	return v * s;
 }
+
 
 inline Vector3
 operator/(const Vector3& v, const float& s)
@@ -267,17 +282,20 @@ operator/(const Vector3& v, const float& s)
 	return v * (1.0f / s);
 }
 
+
 inline Vector3
 operator/(const Vector3& v1, const Vector3& v2)
 {
 	return Vector3(v1.x() / v2.x(),v1.y() / v2.y(),v1.z() / v2.z());
 }
 
+
 inline float
 dot(const Vector3& v1, const Vector3& v2)
 {
 	return v1.dot(v2);
 }
+
 
 inline float
 distance2(const Vector3& v1, const Vector3& v2)
@@ -292,11 +310,13 @@ distance(const Vector3& v1, const Vector3& v2)
 	return v1.distance(v2);
 }
 
+
 inline float
 angle(const Vector3& v1, const Vector3& v2)
 {
 	return v1.angle(v2);
 }
+
 
 inline Vector3
 cross(const Vector3& v1, const Vector3& v2)
@@ -304,11 +324,13 @@ cross(const Vector3& v1, const Vector3& v2)
 	return v1.cross(v2);
 }
 
+
 inline float
 triple(const Vector3& v1, const Vector3& v2, const Vector3& v3)
 {
 	return v1.triple(v2, v3);
 }
+
 
 inline Vector3
 lerp(const Vector3& v1, const Vector3& v2, const float& t)
@@ -317,27 +339,36 @@ lerp(const Vector3& v1, const Vector3& v2, const float& t)
 }
 
 
-inline bool operator==(const Vector3& p1, const Vector3& p2)
+inline bool
+operator==(const Vector3& p1, const Vector3& p2)
 {
 	return p1.x() == p2.x() && p1.y() == p2.y() && p1.z() == p2.z();
 }
 
-inline float Vector3::distance2(const Vector3& v) const
+
+inline float
+Vector3::distance2(const Vector3& v) const
 {
 	return (v - *this).length2();
 }
 
-inline float Vector3::distance(const Vector3& v) const
+
+inline float
+Vector3::distance(const Vector3& v) const
 {
 	return (v - *this).length();
 }
 
-inline Vector3 Vector3::normalized() const
+
+inline Vector3
+Vector3::normalized() const
 {
 	return *this / length();
 }
 
-inline Vector3 Vector3::rotate( const Vector3& wAxis, const float angle )
+
+inline Vector3
+Vector3::rotate( const Vector3& wAxis, const float angle )
 {
 	// wAxis must be a unit lenght vector
 

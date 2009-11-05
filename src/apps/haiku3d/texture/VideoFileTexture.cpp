@@ -91,8 +91,8 @@ VideoFileTexture::_Load(const char* fileName)
 			format.u.raw_video.display.format = fVideoBitmap->ColorSpace();
 			format.u.raw_video.display.line_width = (int32) bounds.Width();
 			format.u.raw_video.display.line_count = (int32) bounds.Height();
-			format.u.raw_video.display.bytes_per_row =
-				fVideoBitmap->BytesPerRow();
+			format.u.raw_video.display.bytes_per_row
+				= fVideoBitmap->BytesPerRow();
 
 			err = fVideoTrack->DecodedFormat(&format);
 			if (err != B_OK) {
@@ -102,14 +102,14 @@ VideoFileTexture::_Load(const char* fileName)
 			}
 
 			// Create Texture
-    		glGenTextures(1, &fId);
-   			glBindTexture(GL_TEXTURE_2D, fId);
-   		    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  		    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  		    glTexImage2D(GL_TEXTURE_2D, 0, 4,
-  		    	(int) fVideoBitmap->Bounds().Width() + 1,
-  		    	(int) fVideoBitmap->Bounds().Height() + 1,
-  		    	0, GL_BGRA, GL_UNSIGNED_BYTE, fVideoBitmap->Bits());
+			glGenTextures(1, &fId);
+			glBindTexture(GL_TEXTURE_2D, fId);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexImage2D(GL_TEXTURE_2D, 0, 4,
+				(int) fVideoBitmap->Bounds().Width() + 1,
+				(int) fVideoBitmap->Bounds().Height() + 1,
+				0, GL_BGRA, GL_UNSIGNED_BYTE, fVideoBitmap->Bits());
 		}
 	}
 }
@@ -120,8 +120,8 @@ VideoFileTexture::Update(float /*dt*/) {
 	// TODO loop
 	int64 frameCount = 0;
 	media_header mh;
-	status_t err =
-		fVideoTrack->ReadFrames(fVideoBitmap->Bits(), &frameCount, &mh);
+	status_t err
+		= fVideoTrack->ReadFrames(fVideoBitmap->Bits(), &frameCount, &mh);
 	if (err) {
 		printf("BMediaTrack::ReadFrames error -- %s\n", strerror(err));
 		return;

@@ -9,30 +9,38 @@
 
 /*
  *
- * This is a refactored and stripped down version of bullet-2.66 src\LinearMath\btQuaternion.h
- * The dependancies on base class btQuadWord have been removed for simplification.
+ * This is a refactored and stripped down version of
+ * bullet-2.66 src\LinearMath\btQuaternion.h
+ * The dependancies on base class btQuadWord have been removed for
+ * simplification.
  * Added gl matrix conversion method.
  *
  */
 
 /*
-Copyright (c) 2003-2006 Gino van den Bergen / Erwin Coumans  http://continuousphysics.com/Bullet/
+Copyright (c) 2003-2006 Gino van den Bergen / Erwin Coumans
+	http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
-In no event will the authors be held liable for any damages arising from the use of this software.
+In no event will the authors be held liable for any damages arising from the
+use of this software.
 Permission is granted to anyone to use this software for any purpose,
 including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
-1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
-2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+1. The origin of this software must not be misrepresented; you must not claim
+ that you wrote the original software. If you use this software in a product,
+ an acknowledgment in the product documentation would be appreciated but is
+ not required.
+2. Altered source versions must be plainly marked as such, and must not be
+ misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
 #ifndef __QUATERNION_H__
 #define __QUATERNION_H__
 
 #include "Vector3.h"
-#include <SupportDefs.h> //pout FLT_EPSILON
+#include <SupportDefs.h>
 
 class Quaternion {
 protected:
@@ -48,7 +56,7 @@ public:
 		*((Quaternion*)this) = q;
 	}
 
-	Quaternion(const float& x, const float& y, const float& z,const float& w)
+	Quaternion(const float& x, const float& y, const float& z, const float& w)
 	{
 		m_x = x, m_y = y, m_z = z, m_w = w;
 	}
@@ -77,19 +85,19 @@ public:
 
 	void setValue(const float& x, const float& y, const float& z)
 	{
-		m_x=x;
-		m_y=y;
-		m_z=z;
+		m_x = x;
+		m_y = y;
+		m_z = z;
 		m_w = 0.f;
 	}
 
 
-	void setValue(const float& x, const float& y, const float& z,const float& w)
+	void setValue(const float& x, const float& y, const float& z, const float& w)
 	{
-		m_x=x;
-		m_y=y;
-		m_z=z;
-		m_w=w;
+		m_x = x;
+		m_y = y;
+		m_z = z;
+		m_w = w;
 	}
 
 
@@ -228,7 +236,8 @@ public:
 	operator+(const Quaternion& q2) const
 	{
 		const Quaternion& q1 = *this;
-		return Quaternion(q1.x() + q2.x(), q1.y() + q2.y(), q1.z() + q2.z(), q1.m_w + q2.m_w);
+		return Quaternion(q1.x() + q2.x(), q1.y() + q2.y(), q1.z() + q2.z(),
+			q1.m_w + q2.m_w);
 	}
 
 
@@ -236,7 +245,8 @@ public:
 	operator-(const Quaternion& q2) const
 	{
 		const Quaternion& q1 = *this;
-		return Quaternion(q1.x() - q2.x(), q1.y() - q2.y(), q1.z() - q2.z(), q1.m_w - q2.m_w);
+		return Quaternion(q1.x() - q2.x(), q1.y() - q2.y(), q1.z() - q2.z(),
+			q1.m_w - q2.m_w);
 	}
 
 
@@ -249,10 +259,10 @@ public:
 
 	inline Quaternion farthest( const Quaternion& qd) const
 	{
-		Quaternion diff,sum;
+		Quaternion diff, sum;
 		diff = *this - qd;
 		sum = *this + qd;
-		if( diff.dot(diff) > sum.dot(sum) )
+		if (diff.dot(diff) > sum.dot(sum))
 			return qd;
 		return (-qd);
 	}
@@ -261,8 +271,7 @@ public:
 	Quaternion slerp(const Quaternion& q, const float& t) const
 	{
 		float theta = angle(q);
-		if (theta != 0.0f)
-		{
+		if (theta != 0.0f) {
 			float d = 1.0f / sin(theta);
 			float s0 = sin((1.0f - t) * theta);
 			float s1 = sin(t * theta);
@@ -270,39 +279,37 @@ public:
 				(m_y * s0 + q.y() * s1) * d,
 				(m_z * s0 + q.z() * s1) * d,
 				(m_w * s0 + q.m_w * s1) * d);
-		}
-		else
-		{
+		} else {
 			return *this;
 		}
 	}
 
 
-	void toOpenGLMatrix(float m[4][4]){
+	void toOpenGLMatrix(float m[4][4])
+	{
+		float wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
 
-	    float wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
-
-	    // calculate coefficients
-	    x2 = m_x + m_x; y2 = m_y + m_y;
-	    z2 = m_z + m_z;
-	    xx = m_x * x2; xy = m_x * y2; xz = m_x * z2;
-	    yy = m_y * y2; yz = m_y * z2; zz = m_z * z2;
-	    wx = m_w * x2; wy = m_w * y2; wz = m_w * z2;
-
-
-	    m[0][0] = 1.0 - (yy + zz); m[1][0] = xy - wz;
-	    m[2][0] = xz + wy; m[3][0] = 0.0;
-
-	    m[0][1] = xy + wz; m[1][1] = 1.0 - (xx + zz);
-	    m[2][1] = yz - wx; m[3][1] = 0.0;
+		// calculate coefficients
+		x2 = m_x + m_x; y2 = m_y + m_y;
+		z2 = m_z + m_z;
+		xx = m_x * x2; xy = m_x * y2; xz = m_x * z2;
+		yy = m_y * y2; yz = m_y * z2; zz = m_z * z2;
+		wx = m_w * x2; wy = m_w * y2; wz = m_w * z2;
 
 
-	    m[0][2] = xz - wy; m[1][2] = yz + wx;
-	    m[2][2] = 1.0 - (xx + yy); m[3][2] = 0.0;
+		m[0][0] = 1.0 - (yy + zz); m[1][0] = xy - wz;
+		m[2][0] = xz + wy; m[3][0] = 0.0;
+
+		m[0][1] = xy + wz; m[1][1] = 1.0 - (xx + zz);
+		m[2][1] = yz - wx; m[3][1] = 0.0;
 
 
-	    m[0][3] = 0; m[1][3] = 0;
-	    m[2][3] = 0; m[3][3] = 1;
+		m[0][2] = xz - wy; m[1][2] = yz + wx;
+		m[2][2] = 1.0 - (xx + yy); m[3][2] = 0.0;
+
+
+		m[0][3] = 0; m[1][3] = 0;
+		m[2][3] = 0; m[3][3] = 1;
 	}
 };
 
@@ -316,7 +323,8 @@ operator-(const Quaternion& q)
 
 inline Quaternion
 operator*(const Quaternion& q1, const Quaternion& q2) {
-	return Quaternion(q1.w() * q2.x() + q1.x() * q2.w() + q1.y() * q2.z() - q1.z() * q2.y(),
+	return Quaternion(
+		q1.w() * q2.x() + q1.x() * q2.w() + q1.y() * q2.z() - q1.z() * q2.y(),
 		q1.w() * q2.y() + q1.y() * q2.w() + q1.z() * q2.x() - q1.x() * q2.z(),
 		q1.w() * q2.z() + q1.z() * q2.w() + q1.x() * q2.y() - q1.y() * q2.x(),
 		q1.w() * q2.w() - q1.x() * q2.x() - q1.y() * q2.y() - q1.z() * q2.z());
@@ -378,8 +386,9 @@ slerp(const Quaternion& q1, const Quaternion& q2, const float& t)
 }
 
 
+// Game Programming Gems 2.10. make sure v0,v1 are normalized
 inline Quaternion
-shortestArcQuat(const Vector3& v0, const Vector3& v1) // Game Programming Gems 2.10. make sure v0,v1 are normalized
+shortestArcQuat(const Vector3& v0, const Vector3& v1)
 {
 	Vector3 c = v0.cross(v1);
 	float  d = v0.dot(v1);

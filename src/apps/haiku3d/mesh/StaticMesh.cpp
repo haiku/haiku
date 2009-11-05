@@ -43,11 +43,11 @@ StaticMesh::~StaticMesh()
 void
 StaticMesh::_ReadText(const char* fileName)
 {
-    FILE* f = fopen(fileName, "r");
-    if (f == NULL) {
-    	printf("Mesh::_ReadText, error accessing %s\n", fileName);
-    	return;
-    }
+	FILE* f = fopen(fileName, "r");
+	if (f == NULL) {
+		printf("Mesh::_ReadText, error accessing %s\n", fileName);
+		return;
+	}
 
 	fscanf(f, "%lu", &fFaceCount);
 	fFaces = new Face[fFaceCount];
@@ -98,10 +98,10 @@ StaticMesh::_ReadBinary(const char* fileName)
 {
 	BFile file(fileName, B_READ_ONLY);
 
-    if (file.InitCheck() != B_OK) {
-    	printf("Mesh::_ReadBinary, error accessing %s\n", fileName);
-    	return;
-    }
+	if (file.InitCheck() != B_OK) {
+		printf("Mesh::_ReadBinary, error accessing %s\n", fileName);
+		return;
+	}
 
 	file.Read(&fFaceCount, sizeof(uint32));
 	fFaces = new Face[fFaceCount];
@@ -119,7 +119,7 @@ void
 StaticMesh::_ReadResource(const char* resourceName)
 {
 	// TODO: factorize with _ReadBinary
-    app_info info;
+	app_info info;
 	be_app->GetAppInfo(&info);
 	BFile file(&info.ref, B_READ_ONLY);
 

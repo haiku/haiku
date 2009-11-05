@@ -15,43 +15,47 @@
 
 
 float
-MathUtils::EaseInOutCubic(float t /*time*/, float b /*begin*/, float c /*distance*/, float d /*duration*/)
+MathUtils::EaseInOutCubic(float time, float start, float distance,
+	float duration)
 {
-	t /= d / 2.0;
-	if (t < 1.0)
-		return c / 2.0 * t * t * t + b;
-	t -= 2.0;
-	return c / 2.0 * (t * t * t + 2.0) + b;
+	time /= duration  / 2.0;
+	if (time < 1.0)
+		return distance / 2.0 * time * time * time + start;
+	time -= 2.0;
+	return distance / 2.0 * (time * time * time + 2.0) + start;
 }
 
 
 float
-MathUtils::EaseInOutQuart(float t /*time*/, float b /*begin*/, float c /*distance*/, float d /*duration*/)
+MathUtils::EaseInOutQuart(float time, float start, float distance,
+	float duration)
 {
-	t /= d / 2;
+	time /= duration  / 2;
 
-	if (t < 1)
-		return c / 2 * t * t * t * t + b;
+	if (time < 1)
+		return distance / 2 * time * time * time * time + start;
 
-	t -= 2;
+	time -= 2;
 
-	return -c / 2 * (t * t * t * t - 2) + b;
+	return -distance / 2 * (time * time * time * time - 2) + start;
 }
 
 
 float
-MathUtils::EaseInOutQuint(float t /*time*/, float b /*begin*/, float c /*distance*/, float d /*duration*/)
+MathUtils::EaseInOutQuint(float time, float start, float distance,
+	float duration)
 {
-	t /= d / 2;
-	if (t < 1)
-		return c / 2 * t * t * t * t * t + b;
-	t -= 2;
-	return c / 2 *(t * t * t * t * t + 2) + b;
+	time /= duration  / 2;
+	if (time < 1)
+		return distance / 2 * time * time * time * time * time + start;
+	time -= 2;
+	return distance / 2 *(time * time * time * time * time + 2) + start;
 }
 
 
 float
-MathUtils::EaseInOutSine(float t /*time*/, float b /*begin*/, float c /*distance*/, float d /*duration*/)
+MathUtils::EaseInOutSine(float time, float start, float distance,
+	float duration)
 {
-	return -c / 2 * (cos(3.14159 * t / d) - 1) + b;
+	return -distance / 2 * (cos(3.14159 * time / distance) - 1) + start;
 }

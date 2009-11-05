@@ -186,7 +186,7 @@ void
 RenderView::_DeleteScene()
 {
 	MeshInstanceList::iterator it = fMeshInstances.begin();
-	for(; it != fMeshInstances.end(); it++) {
+	for (; it != fMeshInstances.end(); it++) {
 		delete (*it);
 	}
 	fMeshInstances.clear();
@@ -231,7 +231,7 @@ RenderView::_Render()
 	fLastFrameTime = time;
 
 	MeshInstanceList::iterator it = fMeshInstances.begin();
-	for(; it != fMeshInstances.end(); it++) {
+	for (; it != fMeshInstances.end(); it++) {
 		(*it)->Update(deltaTime);
 		(*it)->Render();
 	}

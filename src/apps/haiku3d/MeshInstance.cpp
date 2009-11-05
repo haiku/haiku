@@ -76,9 +76,8 @@ MeshInstance::Render()
 	glBindTexture(GL_TEXTURE_2D, fTextureReference->Id());
 
 	int lastVertexCount = 0;
-	//int batchCount = 0;
 
-	for(uint32 i = 0; i < fMeshReference->FaceCount(); i++) {
+	for (uint32 i = 0; i < fMeshReference->FaceCount(); i++) {
 
 		const Face& face = fMeshReference->GetFace(i);
 
@@ -91,8 +90,6 @@ MeshInstance::Render()
 				glBegin(GL_TRIANGLES);
 			else
 				glBegin(GL_QUADS);
-
-			//batchCount++;
 		}
 
 		// calculate normal
@@ -144,11 +141,10 @@ MeshInstance::Render()
 		lastVertexCount = face.vertexCount;
 	}
 	glEnd();
-	//printf("batchCount %d\n", batchCount);
 
 	if (fDrawNormals) {
 		glBegin(GL_LINES);
-		for(uint32 i = 0; i < fMeshReference->FaceCount(); i++) {
+		for (uint32 i = 0; i < fMeshReference->FaceCount(); i++) {
 
 			const Face& face = fMeshReference->GetFace(i);
 
@@ -174,7 +170,7 @@ MeshInstance::Render()
 
 				glVertex3f(g.x(), g.y(), g.z());
 				glVertex3f(h.x(), h.y(), h.z());
-	    	}
+			}
 		}
 		glEnd();
 	}

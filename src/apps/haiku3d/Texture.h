@@ -18,7 +18,7 @@ public:
 					Texture();
 	virtual			~Texture();
 
-	GLuint		 	Id();
+	GLuint			Id();
 
 	virtual	void	Update(float dt);
 
