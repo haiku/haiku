@@ -41,8 +41,9 @@
 #define BUFFER_SIZE 2048
 	// maximum implementation derived buffer size is 65536
 
-//#define ENABLE_DEBUGGER_COMMANDS	1
-#define PARANOID_BUFFER_CHECK	NET_BUFFER_PARANOIA
+#define ENABLE_DEBUGGER_COMMANDS	1
+//#define ENABLE_STATS				1
+#define PARANOID_BUFFER_CHECK		NET_BUFFER_PARANOIA
 
 #define COMPONENT_PARANOIA_LEVEL	NET_BUFFER_PARANOIA
 #include <debug_paranoia.h>
@@ -156,7 +157,7 @@ static status_t read_data(net_buffer* _buffer, size_t offset, void* data,
 					size_t size);
 
 
-#if ENABLE_DEBUGGER_COMMANDS
+#if ENABLE_STATS
 static vint32 sAllocatedDataHeaderCount = 0;
 static vint32 sAllocatedNetBufferCount = 0;
 static vint32 sEverAllocatedDataHeaderCount = 0;
@@ -571,7 +572,6 @@ private:
 #endif	// NET_BUFFER_TRACING
 
 
-#if 1
 static void
 dump_buffer(net_buffer* _buffer)
 {
@@ -588,10 +588,24 @@ dump_buffer(net_buffer* _buffer)
 		dump_block((char*)node->start, min_c(node->used, 32), "    ");
 	}
 }
-#endif
-
 
 #if ENABLE_DEBUGGER_COMMANDS
+
+static int
+dump_net_buffer(int argc, char** argv)
+{
+	if (argc != 2) {
+		kprintf("usage: %s [address]\n", argv[0]);
+		return 0;
+	}
+
+	dump_buffer((net_buffer*)parse_expression(argv[1]));
+	return 0;
+}
+
+#endif	// ENABLE_DEBUGGER_COMMANDS
+
+#if ENABLE_STATS
 
 static int
 dump_net_buffer_stats(int argc, char** argv)
@@ -603,8 +617,7 @@ dump_net_buffer_stats(int argc, char** argv)
 	return 0;
 }
 
-#endif	// ENABLE_DEBUGGER_COMMANDS
-
+#endif	// ENABLE_STATS
 
 #if PARANOID_BUFFER_CHECK
 
@@ -691,7 +704,7 @@ check_buffer_contents(net_buffer* buffer, size_t offset, net_buffer* source,
 static inline data_header*
 allocate_data_header()
 {
-#if ENABLE_DEBUGGER_COMMANDS
+#if ENABLE_STATS
 	atomic_add(&sAllocatedDataHeaderCount, 1);
 	atomic_add(&sEverAllocatedDataHeaderCount, 1);
 #endif
@@ -702,7 +715,7 @@ allocate_data_header()
 static inline net_buffer_private*
 allocate_net_buffer()
 {
-#if ENABLE_DEBUGGER_COMMANDS
+#if ENABLE_STATS
 	atomic_add(&sAllocatedNetBufferCount, 1);
 	atomic_add(&sEverAllocatedNetBufferCount, 1);
 #endif
@@ -714,7 +727,7 @@ allocate_net_buffer()
 static inline void
 free_data_header(data_header* header)
 {
-#if ENABLE_DEBUGGER_COMMANDS
+#if ENABLE_STATS
 	if (header != NULL)
 		atomic_add(&sAllocatedDataHeaderCount, -1);
 #endif
@@ -725,7 +738,7 @@ free_data_header(data_header* header)
 static inline void
 free_net_buffer(net_buffer_private* buffer)
 {
-#if ENABLE_DEBUGGER_COMMANDS
+#if ENABLE_STATS
 	if (buffer != NULL)
 		atomic_add(&sAllocatedNetBufferCount, -1);
 #endif
@@ -2113,17 +2126,24 @@ std_ops(int32 op, ...)
 				return B_NO_MEMORY;
 			}
 
-#if ENABLE_DEBUGGER_COMMANDS
+#if ENABLE_STATS
 			add_debugger_command_etc("net_buffer_stats", &dump_net_buffer_stats,
 				"Print net buffer statistics",
 				"\nPrint net buffer statistics.\n", 0);
 #endif
-
+#if ENABLE_DEBUGGER_COMMANDS
+			add_debugger_command_etc("net_buffer", &dump_net_buffer,
+				"Dump net buffer",
+				"\nDump the net buffer's internal structures.\n", 0);
+#endif
 			return B_OK;
 
 		case B_MODULE_UNINIT:
-#if ENABLE_DEBUGGER_COMMANDS
+#if ENABLE_STATS
 			remove_debugger_command("net_buffer_stats", &dump_net_buffer_stats);
+#endif
+#if ENABLE_DEBUGGER_COMMANDS
+			remove_debugger_command("net_buffer", &dump_net_buffer);
 #endif
 			delete_object_cache(sNetBufferCache);
 			delete_object_cache(sDataNodeCache);
