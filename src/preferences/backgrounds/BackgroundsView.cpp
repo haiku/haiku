@@ -10,7 +10,6 @@
 
 
 #include "BackgroundsView.h"
-#include "ImageFilePanel.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +26,8 @@
 #include <PopUpMenu.h>
 
 #include <be_apps/Tracker/Background.h>
+
+#include "ImageFilePanel.h"
 
 
 static const uint32 kMsgApplySettings = 'aply';
@@ -162,7 +163,7 @@ BackgroundsView::BackgroundsView()
 	
 	fPreview->AddChild(view);
 
-	BBox *rightbox = new BBox("rightbox");
+	BBox* rightbox = new BBox("rightbox");
 
 	fWorkspaceMenu = new BPopUpMenu("pick one");
 	fWorkspaceMenu->AddItem(new BMenuItem("All Workspaces",
@@ -178,7 +179,7 @@ BackgroundsView::BackgroundsView()
 	fWorkspaceMenu->AddItem(new BMenuItem("Other folder" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgOtherFolder)));
 
-	BMenuField *workspaceMenuField = new BMenuField(BRect(0, 0, 130, 18),
+	BMenuField* workspaceMenuField = new BMenuField(BRect(0, 0, 130, 18),
 		"workspaceMenuField", NULL, fWorkspaceMenu, true);
 	workspaceMenuField->ResizeToPreferred();
 	rightbox->SetLabel(workspaceMenuField);
@@ -190,7 +191,7 @@ BackgroundsView::BackgroundsView()
 	fImageMenu->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgOtherImage)));
 
-	BMenuField *imageMenuField = new BMenuField(NULL, fImageMenu);
+	BMenuField* imageMenuField = new BMenuField(NULL, fImageMenu);
 	imageMenuField->SetAlignment(B_ALIGN_RIGHT);
 	imageMenuField->ResizeToPreferred();
 
@@ -204,7 +205,7 @@ BackgroundsView::BackgroundsView()
 	fPlacementMenu->AddItem(new BMenuItem("Tile",
 		new BMessage(kMsgTilePlacement)));
 
-	BMenuField *placementMenuField = new BMenuField(NULL, fPlacementMenu);
+	BMenuField* placementMenuField = new BMenuField(NULL, fPlacementMenu);
 	placementMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	fIconLabelOutline = new BCheckBox("Icon label outline",
@@ -319,7 +320,7 @@ BackgroundsView::AllAttached()
 
 
 void
-BackgroundsView::MessageReceived(BMessage *msg)
+BackgroundsView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case B_SIMPLE_DATA:
@@ -527,7 +528,7 @@ BackgroundsView::UpdateWithCurrent(void)
 	}
 
 	for (int32 i = fImageList.CountItems() - 1; i >= 0; i--) {
-		BMessage *message = new BMessage(kMsgImageSelected);
+		BMessage* message = new BMessage(kMsgImageSelected);
 		AddItem(new BGImageMenuItem(GetImage(i)->GetName(), i, message));
 	}
 
@@ -594,8 +595,8 @@ BackgroundsView::UpdateWithCurrent(void)
 void
 BackgroundsView::Save()
 {
-	bool textWidgetLabelOutline =
-		fIconLabelOutline->Value() == B_CONTROL_ON;
+	bool textWidgetLabelOutline
+		= fIconLabelOutline->Value() == B_CONTROL_ON;
 
 	BackgroundImage::Mode mode = FindPlacementMode();
 	BPoint offset(atoi(fXPlacementText->Text()), atoi(fYPlacementText->Text()));
@@ -631,8 +632,8 @@ BackgroundsView::Save()
 						fCurrentInfo->fCacheMode);
 					fCurrent->Add(fCurrentInfo);
 				} else if (fCurrentInfo->fWorkspace == workspaceMask) {
-					fCurrentInfo->fTextWidgetLabelOutline =
-						textWidgetLabelOutline;
+					fCurrentInfo->fTextWidgetLabelOutline
+						= textWidgetLabelOutline;
 					fCurrentInfo->fMode = mode;
 					if (fCurrentInfo->fMode == BackgroundImage::kAtOffset)
 						fCurrentInfo->fOffset = offset;
@@ -759,9 +760,9 @@ BackgroundsView::NotifyServer()
 
 
 int32
-BackgroundsView::NotifyThread(void *data)
+BackgroundsView::NotifyThread(void* data)
 {
-	BackgroundsView *view = (BackgroundsView*)data;
+	BackgroundsView* view = (BackgroundsView*)data;
 
 	view->NotifyServer();
 	return B_OK;
@@ -842,7 +843,7 @@ BackgroundsView::LoadSettings()
 		int32 i = AddPath(path);
 		BString s;
 		s << "Folder: " << path.Leaf();
-		BMenuItem *item = new BMenuItem(s.String(),
+		BMenuItem* item = new BMenuItem(s.String(),
 			new BMessage(kMsgFolderSelected));
 		fWorkspaceMenu->AddItem(item, -i - 1 + 6);
 		index++;
@@ -893,10 +894,10 @@ BackgroundsView::UpdatePreview()
 
 	int32 index = ((BGImageMenuItem*)fImageMenu->FindMarked())->ImageIndex();
 	if (index >= 0) {
-		BBitmap *bitmap = GetImage(index)->GetBitmap();
+		BBitmap* bitmap = GetImage(index)->GetBitmap();
 		if (bitmap) {
-			BackgroundImage::BackgroundImageInfo *info =
-				new BackgroundImage::BackgroundImageInfo(0, index,
+			BackgroundImage::BackgroundImageInfo* info
+				= new BackgroundImage::BackgroundImageInfo(0, index,
 					FindPlacementMode(), BPoint(atoi(fXPlacementText->Text()),
 						atoi(fYPlacementText->Text())),
 					fIconLabelOutline->Value() == B_CONTROL_ON, 0, 0);
@@ -944,20 +945,21 @@ BackgroundsView::UpdateButtons()
 		&& fPicker->ValueAsColor() != BScreen().DesktopColor()) {
 		hasChanged = true;
 	} else if (fCurrentInfo) {
-		if ((fIconLabelOutline->Value() == B_CONTROL_ON) ^
-			fCurrentInfo->fTextWidgetLabelOutline) {
+		if ((fIconLabelOutline->Value() == B_CONTROL_ON)
+			^ fCurrentInfo->fTextWidgetLabelOutline) {
 			hasChanged = true;
 		} else if (FindPlacementMode() != fCurrentInfo->fMode) {
 			hasChanged = true;
-		} else if (fCurrentInfo->fImageIndex !=
-			((BGImageMenuItem*)fImageMenu->FindMarked())->ImageIndex()) {
+		} else if (fCurrentInfo->fImageIndex
+			!= ((BGImageMenuItem*)fImageMenu->FindMarked())->ImageIndex()) {
 			hasChanged = true;
 		} else if (fCurrent->IsDesktop()
 			&& ((fCurrentInfo->fWorkspace != B_ALL_WORKSPACES)
-				^ (fWorkspaceMenu->FindItem(kMsgCurrentWorkspace)->IsMarked()))) {
+				^ (fWorkspaceMenu->FindItem(kMsgCurrentWorkspace)->IsMarked())))
+		{
 			hasChanged = true;
-		} else if (fCurrentInfo->fImageIndex > -1 &&
-			fCurrentInfo->fMode == BackgroundImage::kAtOffset) {
+		} else if (fCurrentInfo->fImageIndex > -1
+			&& fCurrentInfo->fMode == BackgroundImage::kAtOffset) {
 			BString oldString, newString;
 			oldString << (int)fCurrentInfo->fOffset.x;
 			if (oldString != BString(fXPlacementText->Text())) {
@@ -981,7 +983,7 @@ BackgroundsView::UpdateButtons()
 
 
 void
-BackgroundsView::RefsReceived(BMessage *msg)
+BackgroundsView::RefsReceived(BMessage* msg)
 {
 	if (!msg->HasRef("refs") && msg->HasRef("dir_ref")) {
 		entry_ref dirRef;
@@ -1007,7 +1009,7 @@ BackgroundsView::RefsReceived(BMessage *msg)
 			if (!imageType.Contains(&refType))
 				continue;
 
-			BGImageMenuItem *item;
+			BGImageMenuItem* item;
 			int32 index = AddImage(path);
 			if (index >= 0) {
 				item = FindImageItem(index);
@@ -1036,7 +1038,7 @@ BackgroundsView::RefsReceived(BMessage *msg)
 				BMessenger(this).SendMessage(kMsgCurrentWorkspace);
 				break;
 			}
-			BMenuItem *item;
+			BMenuItem* item;
 			int32 index = AddPath(path);
 			if (index >= 0) {
 				item = fWorkspaceMenu->ItemAt(index + 6);
@@ -1066,7 +1068,7 @@ BackgroundsView::AddPath(BPath path)
 	int32 count = fPathList.CountItems();
 	int32 index = 0;
 	for (; index < count; index++) {
-		BPath *p = fPathList.ItemAt(index);
+		BPath* p = fPathList.ItemAt(index);
 		int c = BString(p->Path()).ICompare(path.Path());
 		if (c == 0)
 			return index;
@@ -1085,7 +1087,7 @@ BackgroundsView::AddImage(BPath path)
 	int32 count = fImageList.CountItems();
 	int32 index = 0;
 	for (; index < count; index++) {
-		Image *image = fImageList.ItemAt(index);
+		Image* image = fImageList.ItemAt(index);
 		if (image->GetPath() == path)
 			return index;
 	}
@@ -1106,12 +1108,12 @@ BGImageMenuItem*
 BackgroundsView::FindImageItem(const int32 imageIndex)
 {
 	if (imageIndex < 0)
-		return (BGImageMenuItem *)fImageMenu->ItemAt(0);
+		return (BGImageMenuItem*)fImageMenu->ItemAt(0);
 
 	int32 count = fImageMenu->CountItems() - 2;
 	int32 index = 2;
 	for (; index < count; index++) {
-		BGImageMenuItem *image = (BGImageMenuItem *)fImageMenu->ItemAt(index);
+		BGImageMenuItem* image = (BGImageMenuItem*)fImageMenu->ItemAt(index);
 		if (image->ImageIndex() == imageIndex)
 			return image;
 	}
@@ -1120,7 +1122,7 @@ BackgroundsView::FindImageItem(const int32 imageIndex)
 
 
 bool
-BackgroundsView::AddItem(BGImageMenuItem *item)
+BackgroundsView::AddItem(BGImageMenuItem* item)
 {
 	int32 count = fImageMenu->CountItems() - 2;
 	int32 index = 2;
@@ -1130,7 +1132,7 @@ BackgroundsView::AddItem(BGImageMenuItem *item)
 	}
 
 	for (; index < count; index++) {
-		BGImageMenuItem* image = (BGImageMenuItem *)fImageMenu->ItemAt(index);
+		BGImageMenuItem* image = (BGImageMenuItem*)fImageMenu->ItemAt(index);
 		int c = (BString(image->Label()).ICompare(BString(item->Label())));
 		if (c > 0)
 			break;
@@ -1217,7 +1219,7 @@ PreView::MouseUp(BPoint point)
 
 
 void
-PreView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+PreView::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
 	if (IsEnabled())
 		SetViewCursor(&fMoveHandCursor);
@@ -1279,8 +1281,8 @@ PreView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 //	#pragma mark -
 
 
-BGImageMenuItem::BGImageMenuItem(const char *label, int32 imageIndex,
-	BMessage *message, char shortcut, uint32 modifiers)
+BGImageMenuItem::BGImageMenuItem(const char* label, int32 imageIndex,
+	BMessage* message, char shortcut, uint32 modifiers)
 	: BMenuItem(label, message, shortcut, modifiers),
 	fImageIndex(imageIndex)
 {

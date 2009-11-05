@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,6 @@
 #ifndef BACKGROUNDS_VIEW_H
 #define BACKGROUNDS_VIEW_H
 
-
-#include "BackgroundImage.h"
 
 #include <View.h>
 #include <ColorControl.h>
@@ -31,20 +29,25 @@
 #include <StringView.h>
 #include <Cursor.h>
 
-#define SETTINGS_FILE					"Backgrounds_settings"
+#include "BackgroundImage.h"
+
+
+#define SETTINGS_FILE		"Backgrounds_settings"
+
 
 class ImageFilePanel;
 
 
 class BGImageMenuItem : public BMenuItem {
-	public:
-		BGImageMenuItem(const char *label, int32 imageIndex, BMessage *message,
-			char shortcut = 0, uint32 modifiers = 0);
+public:
+							BGImageMenuItem(const char* label, int32 imageIndex,
+								BMessage* message, char shortcut = 0,
+								uint32 modifiers = 0);
 
-		int32 ImageIndex() { return fImageIndex; }
+			int32			ImageIndex() { return fImageIndex; }
 
-	private:
-		int32 fImageIndex;
+private:
+			int32			fImageIndex;
 };
 
 
@@ -61,107 +64,118 @@ enum frame_parts {
 
 
 class FramePart : public BView {
-	public:
-		FramePart(int32 part);
+public:
+							FramePart(int32 part);
 
-		void Draw(BRect rect);
-		void SetDesktop(bool isDesktop);
+			void			Draw(BRect rect);
+			void			SetDesktop(bool isDesktop);
 
-	private:
-		void _SetSizeAndAlignment();
+private:
+			void			_SetSizeAndAlignment();
 
-		int32 fFramePart;
-		bool fIsDesktop;
+			int32			fFramePart;
+			bool			fIsDesktop;
 };
 
 
 class PreView : public BControl {
-	public:
-		PreView();
+public:
+							PreView();
 
-		BPoint fPoint;
-		BRect fImageBounds;
+			BPoint			fPoint;
+			BRect			fImageBounds;
 
-	protected:
-		void MouseDown(BPoint point);
-		void MouseUp(BPoint point);
-		void MouseMoved(BPoint point, uint32 transit, const BMessage *message);
-		void AttachedToWindow();
+protected:
+			void			MouseDown(BPoint point);
+			void			MouseUp(BPoint point);
+			void			MouseMoved(BPoint point, uint32 transit,
+								const BMessage* message);
+			void			AttachedToWindow();
 
-		BPoint fOldPoint;
-		float x_ratio, y_ratio;
-		display_mode mode;
+			BPoint			fOldPoint;
+			float			x_ratio;
+			float			y_ratio;
+			display_mode	mode;
 
-		BCursor fMoveHandCursor;
+			BCursor			fMoveHandCursor;
 };
 
 
 class BackgroundsView : public BBox {
-	public:
-		BackgroundsView();
-		~BackgroundsView();
+public:
+							BackgroundsView();
+							~BackgroundsView();
 
-		void RefsReceived(BMessage* msg);
+			void			RefsReceived(BMessage* msg);
 
-		void SaveSettings();
-		void WorkspaceActivated(uint32 oldWorkspaces, bool active);
-		int32 AddImage(BPath path);
-		Image* GetImage(int32 imageIndex);
+			void			SaveSettings();
+			void			WorkspaceActivated(uint32 oldWorkspaces,
+								bool active);
+			int32			AddImage(BPath path);
+			Image*			GetImage(int32 imageIndex);
 
-		bool FoundPositionSetting();
+			bool			FoundPositionSetting();
 
-	protected:
-		void Save();
-		void NotifyServer();
-		void LoadSettings();
-		void AllAttached();
-		void MessageReceived(BMessage *msg);
-		void LoadDesktopFolder();
-		void LoadDefaultFolder();
-		void LoadFolder(bool isDesktop);
-		void LoadRecentFolder(BPath path);
-		void UpdateWithCurrent();
-		void UpdatePreview();
-		void UpdateButtons();
-		void SetDesktop(bool isDesktop);
-		int32 AddPath(BPath path);
+protected:
+			void			Save();
+			void			NotifyServer();
+			void			LoadSettings();
+			void			AllAttached();
+			void			MessageReceived(BMessage* msg);
+			void			LoadDesktopFolder();
+			void			LoadDefaultFolder();
+			void			LoadFolder(bool isDesktop);
+			void			LoadRecentFolder(BPath path);
+			void			UpdateWithCurrent();
+			void			UpdatePreview();
+			void			UpdateButtons();
+			void			SetDesktop(bool isDesktop);
+			int32			AddPath(BPath path);
 
-		static int32 NotifyThread(void *data);
+	static	int32			NotifyThread(void* data);
 
-		BGImageMenuItem *FindImageItem(const int32 imageIndex);
-		bool AddItem(BGImageMenuItem *item);
+			BGImageMenuItem*	FindImageItem(const int32 imageIndex);
 
-		BackgroundImage::Mode FindPlacementMode();
+			bool			AddItem(BGImageMenuItem* item);
 
-		BColorControl *fPicker;			// color picker
-		BButton *fApply, *fRevert;		// apply and revert buttons
-		BCheckBox *fIconLabelOutline;	// label ckeckbox
-		BMenu* fPlacementMenu, *fImageMenu, *fWorkspaceMenu;	// the three comboboxes
-		BTextControl *fXPlacementText, *fYPlacementText;		// x and y textboxes
-		PreView *fPreView;				// the view for previewing the result
-		BBox *fPreview;					// the box which draws a computer/folder
-		BFilePanel *fFolderPanel;		// the file panels for folders
-		ImageFilePanel *fPanel;			// the file panels for images
+			BackgroundImage::Mode	FindPlacementMode();
 
-		BackgroundImage *fCurrent;		// the current BackgroundImage object
-		BackgroundImage::BackgroundImageInfo *fCurrentInfo;//the current BackgroundImageInfo object
-		entry_ref fCurrentRef;			// the entry for the node which holds current
-		int32 fLastImageIndex, fLastWorkspaceIndex;		// last indexes for cancel
-		BMessage fSettings;				// settings loaded from settings directory
+			BColorControl*	fPicker;
+			BButton*		fApply;
+			BButton*		fRevert;
+			BCheckBox*		fIconLabelOutline;
+			BMenu*			fPlacementMenu;
+			BMenu*			fImageMenu;
+			BMenu*			fWorkspaceMenu;
+			BTextControl*	fXPlacementText;
+			BTextControl*	fYPlacementText;
+			PreView*		fPreView;
+			BBox*			fPreview;
+			BFilePanel*		fFolderPanel;
+			ImageFilePanel*	fPanel;
 
-		BObjectList<BPath> fPathList;
-		BObjectList<Image> fImageList;
+			BackgroundImage*	fCurrent;
 
-		FramePart* fTopLeft;
-		FramePart* fTop;
-		FramePart* fTopRight;
-		FramePart* fLeft;
-		FramePart* fRight;
-		FramePart* fBottomLeft;
-		FramePart* fBottom;
-		FramePart* fBottomRight;
+			BackgroundImage::BackgroundImageInfo*	fCurrentInfo;
 
-		bool fFoundPositionSetting;
+			entry_ref		fCurrentRef;
+			int32			fLastImageIndex;
+			int32			fLastWorkspaceIndex;
+			BMessage		fSettings;
+
+			BObjectList<BPath>	fPathList;
+			BObjectList<Image>	fImageList;
+
+			FramePart*		fTopLeft;
+			FramePart*		fTop;
+			FramePart*		fTopRight;
+			FramePart*		fLeft;
+			FramePart*		fRight;
+			FramePart*		fBottomLeft;
+			FramePart*		fBottom;
+			FramePart*		fBottomRight;
+
+			bool			fFoundPositionSetting;
 };
 
 #endif	// BACKGROUNDS_VIEW_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,15 +8,15 @@
  */
 
 
-#include "BackgroundsView.h"
-
 #include <Application.h>
 #include <LayoutBuilder.h>
 #include <TrackerAddOnAppLaunch.h>
 #include <Window.h>
 
+#include "BackgroundsView.h"
 
-static const char *kSignature = "application/x-vnd.Haiku-Backgrounds";
+
+static const char* kSignature = "application/x-vnd.Haiku-Backgrounds";
 
 
 class BackgroundsWindow : public BWindow {
@@ -29,7 +29,7 @@ class BackgroundsWindow : public BWindow {
 		virtual	bool QuitRequested();
 		virtual void WorkspaceActivated(int32 oldWorkspaces, bool active);
 
-		BackgroundsView *fBackgroundsView;
+		BackgroundsView* fBackgroundsView;
 };
 
 
@@ -60,6 +60,7 @@ BackgroundsApplication::RefsReceived(BMessage* message)
 {
 	fWindow->RefsReceived(message);
 }
+
 
 //	#pragma mark -
 

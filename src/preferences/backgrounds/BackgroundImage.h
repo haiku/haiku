@@ -38,12 +38,13 @@ All rights reserved.
 #ifndef __BACKGROUND_IMAGE__
 #define __BACKGROUND_IMAGE__
 
-#include "String.h"
-#include "ObjectList.h"
 
 #include <GraphicsDefs.h>
 #include <Node.h>
 #include <Path.h>
+
+#include "ObjectList.h"
+#include "String.h"
 
 
 class BView;
@@ -53,14 +54,14 @@ class BackgroundImage;
 class Image;
 class BackgroundsView;
 
-extern const char *kBackgroundImageInfo;
-extern const char *kBackgroundImageInfoOffset;
-extern const char *kBackgroundImageInfoEraseText;
-extern const char *kBackgroundImageInfoMode;
-extern const char *kBackgroundImageInfoWorkspaces;
-extern const char *kBackgroundImageInfoPath;
-extern const char *kBackgroundImageInfoSet;
-extern const char *kBackgroundImageInfoSetPeriod;
+extern const char* kBackgroundImageInfo;
+extern const char* kBackgroundImageInfoOffset;
+extern const char* kBackgroundImageInfoEraseText;
+extern const char* kBackgroundImageInfoMode;
+extern const char* kBackgroundImageInfoWorkspaces;
+extern const char* kBackgroundImageInfoPath;
+extern const char* kBackgroundImageInfoSet;
+extern const char* kBackgroundImageInfoSetPeriod;
 
 const uint32 kRestoreBackgroundImage = 'Tbgr';
 const uint32 kChangeBackgroundImage = 'Cbgr';
@@ -99,50 +100,50 @@ public:
 		uint32 fCacheMode;		// image cache strategy (0 cache , 1 no cache)
 	};
 
-	static BackgroundImage *GetBackgroundImage(const BNode *node,
+	static BackgroundImage* GetBackgroundImage(const BNode* node,
 		bool isDesktop, BackgroundsView* view);
 		// create a BackgroundImage object by reading it from a node
 
 	virtual ~BackgroundImage();
 
-	void Show(BView *view, int32 workspace);
+	void Show(BView* view, int32 workspace);
 		// display the right background for a given workspace
 	void Remove();
 		// remove the background from it's current view
 
-	void WorkspaceActivated(BView *view, int32 workspace, bool state);
+	void WorkspaceActivated(BView* view, int32 workspace, bool state);
 		// respond to a workspace change
 	void ScreenChanged(BRect rect, color_space space);
 		// respond to a screen size change
-	/*static BackgroundImage *Refresh(BackgroundImage *oldBackgroundImage,
-		const BNode *fromNode, bool desktop, BPoseView *poseView);
+	/*static BackgroundImage* Refresh(BackgroundImage* oldBackgroundImage,
+		const BNode* fromNode, bool desktop, BPoseView* poseView);
 		// respond to a background image setting change
-	void ChangeImageSet(BPoseView *poseView);
+	void ChangeImageSet(BPoseView* poseView);
 		// change to the next imageSet if any, no refresh*/
-	BackgroundImageInfo *ImageInfoForWorkspace(int32) const;
+	BackgroundImageInfo* ImageInfoForWorkspace(int32) const;
 
 	bool IsDesktop() { return fIsDesktop;}
 
-	status_t SetBackgroundImage(BNode *node);
+	status_t SetBackgroundImage(BNode* node);
 
-	void Show(BackgroundImageInfo *, BView *view);
+	void Show(BackgroundImageInfo*, BView* view);
 
 	uint32 GetShowingImageSet() { return fShowingImageSet; }
 
-	void Add(BackgroundImageInfo *);
-	void Remove(BackgroundImageInfo *);
+	void Add(BackgroundImageInfo*);
+	void Remove(BackgroundImageInfo*);
 	void RemoveAll();
 
 private:
-	BackgroundImage(const BNode *node, bool isDesktop, BackgroundsView* view);
+	BackgroundImage(const BNode* node, bool isDesktop, BackgroundsView* view);
 		// no public constructor, GetBackgroundImage factory function is
 		// used instead
 
 	bool fIsDesktop;
 	BNode fDefinedByNode;
-	BView *fView;
+	BView* fView;
 	BackgroundsView* fBackgroundsView;
-	BackgroundImageInfo *fShowingBitmap;
+	BackgroundImageInfo* fShowingBitmap;
 
 	BObjectList<BackgroundImageInfo> fBitmapForWorkspaceList;
 
@@ -164,9 +165,10 @@ public:
 	BBitmap* GetBitmap();
 	BPath GetPath() {return fPath;}
 private:
-	BBitmap *fBitmap;
+	BBitmap* fBitmap;
 	BPath fPath;
 	BString name;
 };
 
 #endif
+

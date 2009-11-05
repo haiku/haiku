@@ -35,8 +35,14 @@ All rights reserved.
 //  Classes used for setting up and managing background images
 //
 
+#include "BackgroundImage.h"
+
+#include <new>
+#include <stdlib.h>
+
 #include <Bitmap.h>
 #include <Debug.h>
+#include <fs_attr.h>
 #include <Node.h>
 #include <TranslationKit.h>
 #include <View.h>
@@ -47,43 +53,37 @@ All rights reserved.
 #include <Screen.h>
 #include <String.h>
 
-#include <fs_attr.h>
-#include <stdlib.h>
-
-#include "BackgroundImage.h"
 #include "BackgroundsView.h"
 
-#include <new>
 
-
-const char *kBackgroundImageInfo 			= "be:bgndimginfo";
-const char *kBackgroundImageInfoOffset 		= "be:bgndimginfooffset";
-//const char *kBackgroundImageInfoTextOutline	= "be:bgndimginfotextoutline";
-const char *kBackgroundImageInfoTextOutline	= "be:bgndimginfoerasetext";
+const char* kBackgroundImageInfo 			= "be:bgndimginfo";
+const char* kBackgroundImageInfoOffset 		= "be:bgndimginfooffset";
+// const char* kBackgroundImageInfoTextOutline	= "be:bgndimginfotextoutline";
+const char* kBackgroundImageInfoTextOutline	= "be:bgndimginfoerasetext";
 // NOTE: the attribute keeps the old name for backwards compatibility,
 // just in case some users spend time configuring a few windows with
 // this feature on or off...
-const char *kBackgroundImageInfoMode 		= "be:bgndimginfomode";
-const char *kBackgroundImageInfoWorkspaces 	= "be:bgndimginfoworkspaces";
-const char *kBackgroundImageInfoPath 		= "be:bgndimginfopath";
-const char *kBackgroundImageInfoSet 		= "be:bgndimginfoset";
-const char *kBackgroundImageInfoCacheMode	= "be:bgndimginfocachemode";
-const char *kBackgroundImageSetPeriod		= "be:bgndimgsetperiod";
-const char *kBackgroundImageRandomChange	= "be:bgndimgrandomchange";
-const char *kBackgroundImageCacheMode		= "be:bgndimgcachemode";
+const char* kBackgroundImageInfoMode 		= "be:bgndimginfomode";
+const char* kBackgroundImageInfoWorkspaces 	= "be:bgndimginfoworkspaces";
+const char* kBackgroundImageInfoPath 		= "be:bgndimginfopath";
+const char* kBackgroundImageInfoSet 		= "be:bgndimginfoset";
+const char* kBackgroundImageInfoCacheMode	= "be:bgndimginfocachemode";
+const char* kBackgroundImageSetPeriod		= "be:bgndimgsetperiod";
+const char* kBackgroundImageRandomChange	= "be:bgndimgrandomchange";
+const char* kBackgroundImageCacheMode		= "be:bgndimgcachemode";
 
 
-BackgroundImage *
-BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop,
+BackgroundImage*
+BackgroundImage::GetBackgroundImage(const BNode* node, bool isDesktop,
 	BackgroundsView* view)
 {
-	BackgroundImage *result = new BackgroundImage(node, isDesktop, view);
+	BackgroundImage* result = new BackgroundImage(node, isDesktop, view);
 	attr_info info;
 	if (node->GetAttrInfo(kBackgroundImageInfo, &info) != B_OK)
 		return result;
 
 	BMessage container;
-	char *buffer = new char [info.size];
+	char* buffer = new char [info.size];
 
 	status_t error = node->ReadAttr(kBackgroundImageInfo, info.type, 0, buffer,
 		(size_t)info.size);
@@ -103,13 +103,14 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop,
 	uint32 maxImageSet = 0;
 
 	if (isDesktop) {
-		container.FindInt32(kBackgroundImageSetPeriod, (int32 *)&imageSetPeriod);
-		container.FindInt32(kBackgroundImageCacheMode, (int32 *)&globalCacheMode);
+		container.FindInt32(kBackgroundImageSetPeriod, (int32*)&imageSetPeriod);
+		container.FindInt32(kBackgroundImageCacheMode,
+			(int32*)&globalCacheMode);
 		container.FindBool(kBackgroundImageRandomChange, &randomChange);
 	}
 
 	for (int32 index = 0; ; index++) {
-		const char *path;
+		const char* path;
 		uint32 workspaces = B_ALL_WORKSPACES;
 		Mode mode = kTiled;
 		bool textWidgetLabelOutline = false;
@@ -118,7 +119,8 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop,
 		uint32 cacheMode = 0;
 		int32 imageIndex = -1;
 
-		if (container.FindString(kBackgroundImageInfoPath, index, &path) == B_OK) {
+		if (container.FindString(kBackgroundImageInfoPath, index, &path)
+			== B_OK) {
 			if (strcmp(path, "")) {
 				BPath bpath(path);
 				imageIndex = view->AddImage(bpath);
@@ -130,24 +132,24 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop,
 			break;
 
 		container.FindInt32(kBackgroundImageInfoWorkspaces, index,
-			(int32 *)&workspaces);
-		container.FindInt32(kBackgroundImageInfoMode, index, (int32 *)&mode);
+			(int32*)&workspaces);
+		container.FindInt32(kBackgroundImageInfoMode, index, (int32*)&mode);
 		container.FindBool(kBackgroundImageInfoTextOutline, index,
 			&textWidgetLabelOutline);
 		container.FindPoint(kBackgroundImageInfoOffset, index, &offset);
 
 		if (isDesktop) {
 			container.FindInt32(kBackgroundImageInfoSet, index,
-				(int32 *)&imageSet);
+				(int32*)&imageSet);
 			container.FindInt32(kBackgroundImageInfoCacheMode, index,
-				(int32 *)&cacheMode);
+				(int32*)&cacheMode);
 		}
 
-		BackgroundImage::BackgroundImageInfo *imageInfo = new
+		BackgroundImage::BackgroundImageInfo* imageInfo = new
 			BackgroundImage::BackgroundImageInfo(workspaces, imageIndex,
 				mode, offset, textWidgetLabelOutline, imageSet, cacheMode);
 
-		//imageInfo->UnloadBitmap(globalCacheMode);
+		// imageInfo->UnloadBitmap(globalCacheMode);
 
 		if (imageSet > maxImageSet)
 			maxImageSet = imageSet;
@@ -191,7 +193,8 @@ BackgroundImage::BackgroundImageInfo::~BackgroundImageInfo()
 //	#pragma mark -
 
 
-BackgroundImage::BackgroundImage(const BNode *node, bool desktop, BackgroundsView* view)
+BackgroundImage::BackgroundImage(const BNode* node, bool desktop,
+	BackgroundsView* view)
 	:
 	fIsDesktop(desktop),
 	fDefinedByNode(*node),
@@ -214,14 +217,14 @@ BackgroundImage::~BackgroundImage()
 
 
 void
-BackgroundImage::Add(BackgroundImageInfo *info)
+BackgroundImage::Add(BackgroundImageInfo* info)
 {
 	fBitmapForWorkspaceList.AddItem(info);
 }
 
 
 void
-BackgroundImage::Remove(BackgroundImageInfo *info)
+BackgroundImage::Remove(BackgroundImageInfo* info)
 {
 	fBitmapForWorkspaceList.RemoveItem(info);
 }
@@ -231,7 +234,7 @@ void
 BackgroundImage::RemoveAll()
 {
 	for (int32 index = 0; index < fBitmapForWorkspaceList.CountItems();) {
-		BackgroundImageInfo *info = fBitmapForWorkspaceList.ItemAt(index);
+		BackgroundImageInfo* info = fBitmapForWorkspaceList.ItemAt(index);
 		if (info->fImageSet != fShowingImageSet)
 			index++;
 		else
@@ -241,24 +244,26 @@ BackgroundImage::RemoveAll()
 
 
 void
-BackgroundImage::Show(BView *view, int32 workspace)
+BackgroundImage::Show(BView* view, int32 workspace)
 {
 	fView = view;
 
-	BackgroundImageInfo *info = ImageInfoForWorkspace(workspace);
+	BackgroundImageInfo* info = ImageInfoForWorkspace(workspace);
 	if (info) {
-		/*BPoseView *poseView = dynamic_cast<BPoseView *>(fView);
+		/*BPoseView* poseView = dynamic_cast<BPoseView*>(fView);
 		if (poseView)
-			poseView->SetEraseWidgetTextBackground(info->fTextWidgetLabelOutline);*/
+			poseView
+				->SetEraseWidgetTextBackground(info->fTextWidgetLabelOutline);*/
 		Show(info, fView);
 	}
 }
 
 
 void
-BackgroundImage::Show(BackgroundImageInfo *info, BView *view)
+BackgroundImage::Show(BackgroundImageInfo* info, BView* view)
 {
-	BBitmap *bitmap = fBackgroundsView->GetImage(info->fImageIndex)->GetBitmap();
+	BBitmap* bitmap
+		= fBackgroundsView->GetImage(info->fImageIndex)->GetBitmap();
 
 	if (!bitmap)
 		return;
@@ -287,7 +292,8 @@ BackgroundImage::Show(BackgroundImageInfo *info, BView *view)
 			if (fIsDesktop) {
 				destinationBitmapBounds.OffsetBy(
 					(viewBounds.Width() - destinationBitmapBounds.Width()) / 2,
-					(viewBounds.Height() - destinationBitmapBounds.Height()) / 2);
+					(viewBounds.Height() - destinationBitmapBounds.Height())
+					/ 2);
 				break;
 			}
 			// else fall thru
@@ -304,7 +310,8 @@ BackgroundImage::Show(BackgroundImageInfo *info, BView *view)
 			break;
 		}
 		case kTiled:
-			// Original Backgrounds Preferences center the tiled paper but the Tracker don't do that
+			// Original Backgrounds Preferences center the tiled paper
+			// but Tracker doesn't do that
 			//if (fIsDesktop) {
 			destinationBitmapBounds.OffsetBy(
 				(viewBounds.Width() - destinationBitmapBounds.Width()) / 2,
@@ -333,7 +340,7 @@ BackgroundImage::Remove()
 	if (fShowingBitmap) {
 		fView->ClearViewBitmap();
 		fView->Invalidate();
-		/*BPoseView *poseView = dynamic_cast<BPoseView *>(fView);
+		/*BPoseView* poseView = dynamic_cast<BPoseView*>(fView);
 		// make sure text widgets draw the default way, erasing their background
 		if (poseView)
 			poseView->SetEraseWidgetTextBackground(true);*/
@@ -342,7 +349,7 @@ BackgroundImage::Remove()
 }
 
 
-BackgroundImage::BackgroundImageInfo *
+BackgroundImage::BackgroundImageInfo*
 BackgroundImage::ImageInfoForWorkspace(int32 workspace) const
 {
 	uint32 workspaceMask = 1;
@@ -355,9 +362,9 @@ BackgroundImage::ImageInfoForWorkspace(int32 workspace) const
 	// do a simple lookup for the most likely candidate bitmap -
 	// pick the imageInfo that is only defined for this workspace over one
 	// that supports multiple workspaces
-	BackgroundImageInfo *result = NULL;
+	BackgroundImageInfo* result = NULL;
 	for (int32 index = 0; index < count; index++) {
-		BackgroundImageInfo *info = fBitmapForWorkspaceList.ItemAt(index);
+		BackgroundImageInfo* info = fBitmapForWorkspaceList.ItemAt(index);
 		if (info->fImageSet != fShowingImageSet)
 			continue;
 
@@ -375,7 +382,7 @@ BackgroundImage::ImageInfoForWorkspace(int32 workspace) const
 
 
 void
-BackgroundImage::WorkspaceActivated(BView *view, int32 workspace, bool state)
+BackgroundImage::WorkspaceActivated(BView* view, int32 workspace, bool state)
 {
 	if (!fIsDesktop) {
 		// we only care for desktop bitmaps
@@ -387,12 +394,12 @@ BackgroundImage::WorkspaceActivated(BView *view, int32 workspace, bool state)
 		return;
 	}
 
-	BackgroundImageInfo *info = ImageInfoForWorkspace(workspace);
+	BackgroundImageInfo* info = ImageInfoForWorkspace(workspace);
 	if (info != fShowingBitmap) {
 		if (info)
 			Show(info, view);
 		else {
-			/*if (BPoseView *poseView = dynamic_cast<BPoseView *>(view))
+			/*if (BPoseView* poseView = dynamic_cast<BPoseView*>(view))
 				poseView->SetEraseWidgetTextBackground(true);*/
 			view->ClearViewBitmap();
 			view->Invalidate();
@@ -416,28 +423,29 @@ BackgroundImage::ScreenChanged(BRect, color_space)
 			(viewBounds.Width() - bitmapBounds.Width()) / 2,
 			(viewBounds.Height() - bitmapBounds.Height()) / 2);
 
-		fView->SetViewBitmap(fShowingBitmap->fBitmap, bitmapBounds, destinationBitmapBounds,
-			B_FOLLOW_NONE, 0);
+		fView->SetViewBitmap(fShowingBitmap->fBitmap, bitmapBounds,
+			destinationBitmapBounds, B_FOLLOW_NONE, 0);
 		fView->Invalidate();
 	}*/
 }
 
 
 status_t
-BackgroundImage::SetBackgroundImage(BNode *node)
+BackgroundImage::SetBackgroundImage(BNode* node)
 {
 	status_t err;
 	BMessage container;
 	int32 count = fBitmapForWorkspaceList.CountItems();
 
 	for (int32 index = 0; index < count; index++) {
-		BackgroundImageInfo *info = fBitmapForWorkspaceList.ItemAt(index);
+		BackgroundImageInfo* info = fBitmapForWorkspaceList.ItemAt(index);
 
 		container.AddBool(kBackgroundImageInfoTextOutline,
 			info->fTextWidgetLabelOutline);
 		if (fBackgroundsView->GetImage(info->fImageIndex) != NULL) {
 			container.AddString(kBackgroundImageInfoPath,
-				fBackgroundsView->GetImage(info->fImageIndex)->GetPath().Path());
+				fBackgroundsView
+					->GetImage(info->fImageIndex)->GetPath().Path());
 		} else 
 			container.AddString(kBackgroundImageInfoPath, "");
 
@@ -473,16 +481,16 @@ BackgroundImage::SetBackgroundImage(BNode *node)
 }
 
 
-/*BackgroundImage *
-BackgroundImage::Refresh(BackgroundImage *oldBackgroundImage,
-	const BNode *fromNode, bool desktop, BPoseView *poseView)
+/*BackgroundImage*
+BackgroundImage::Refresh(BackgroundImage* oldBackgroundImage,
+	const BNode* fromNode, bool desktop, BPoseView* poseView)
 {
 	if (oldBackgroundImage) {
 		oldBackgroundImage->Remove();
 		delete oldBackgroundImage;
 	}
 
-	BackgroundImage *result = GetBackgroundImage(fromNode, desktop);
+	BackgroundImage* result = GetBackgroundImage(fromNode, desktop);
 	if (result && poseView->ViewMode() != kListMode)
 		result->Show(poseView, current_workspace());
 	return result;
@@ -490,12 +498,12 @@ BackgroundImage::Refresh(BackgroundImage *oldBackgroundImage,
 
 
 void
-BackgroundImage::ChangeImageSet(BPoseView *poseView)
+BackgroundImage::ChangeImageSet(BPoseView* poseView)
 {
 	if (fRandomChange) {
 		if (fImageSetCount > 1) {
 			uint32 oldShowingImageSet = fShowingImageSet;
-			while(oldShowingImageSet == fShowingImageSet)
+			while (oldShowingImageSet == fShowingImageSet)
 				fShowingImageSet = random()%fImageSetCount;
 		} else
 			fShowingImageSet = 0;
@@ -535,3 +543,4 @@ Image::GetBitmap()
 
 	return fBitmap;
 }
+
