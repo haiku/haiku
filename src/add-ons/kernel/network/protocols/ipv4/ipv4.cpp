@@ -330,6 +330,7 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer* buffer,
 
 		return B_OK;
 	} else if (next != NULL && next->fragment.start == end) {
+		net_buffer* afterNext = (net_buffer*)next->link.next;
 		fFragments.Remove(next);
 
 		buffer->fragment.start = start;
@@ -339,18 +340,11 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer* buffer,
 		TRACE("    merge next: %s", strerror(status));
 		if (status != B_OK) {
 			// Insert "next" at its previous position
-			if (previous != NULL)
-				fFragments.Insert((net_buffer*)previous->link.next, next);
-			else
-				fFragments.Insert(next);
-
+			fFragments.Insert(afterNext, next);
 			return status;
 		}
 
-		if (previous != NULL)
-			fFragments.Insert((net_buffer*)previous->link.next, buffer);
-		else
-			fFragments.Insert(buffer);
+		fFragments.Insert(afterNext, buffer);
 
 		// cut down existing hole
 		fBytesLeft -= end - start;
