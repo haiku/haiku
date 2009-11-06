@@ -35,32 +35,24 @@ def run(fileSet, rules, outputFileName):
     closeHtml(outputFileName)
 
 
-# make a flat list of files recursively from the arg list
-def makeFileSet(args):
-    files = []
+def visit(result, dir, names):
     extensions = [".cpp", ".h"]
-    for arg in args:
-        if os.path.isfile(arg) and os.path.splitext(arg)[1] in extensions:
-            files.append(arg)
-        elif os.path.isdir(arg):
-            for content in os.listdir(arg):
-                path = os.path.join(arg, content)
-                if os.path.isfile(path) \
-                    and os.path.splitext(path)[1] in extensions:
-                    files.append(path)
-                elif os.path.isdir(path) and os.path.basename(path) != ".svn":
-                    files.extend(makeFileSet([path]))
-    return files
+    names.remove(".svn")
+    for name in names:
+        path = os.path.join(dir, name)
+        if os.path.isfile(path) and os.path.splitext(name)[1] in extensions:
+            print "adding", path
+            result.append(path)
 
 
 cppRules = {}
 cppRules["Line over 80 char"] = re.compile('[^\n]{81,}')
 cppRules["Spaces instead of tabs"] = re.compile('   ')
-cppRules["Missing space after for/if/select/while"] \
-    = re.compile('(for|if|select|while)\(')
-cppRules["Missing space at comment start"] = re.compile('//[a-zA-Z0-9]')
+cppRules["Missing space after control statement"] \
+    = re.compile('(for|if|while|switch)\(')
+cppRules["Missing space at comment start"] = re.compile('//\w')
 cppRules["Missing space after operator"] \
-    = re.compile('[a-zA-Z0-9](==|[,=>/+\-*;\|])[a-zA-Z0-9]')
+    = re.compile('\w(==|[,=>/+\-*;\|])\w')
 cppRules["Operator at line end"] = re.compile('([*=/+\-\|\&\?]|\&&|\|\|)(?=\n)')
 cppRules["Missing space"] = re.compile('\){')
 cppRules["Mixed tabs/spaces"] = re.compile('( \t]|\t )+')
@@ -70,6 +62,8 @@ cppRules["Lines between functions > 2"] \
 cppRules["Lines between functions < 2"] \
     = re.compile('(?<=\n})([ \t]*\n){0,2}(?=.)')
 cppRules["Windows Line Ending"] = re.compile('\r')
+cppRules["Bad pointer/reference style"] \
+    = re.compile('(?<=\w) [*&](?=(\w|[,\)]))')
 
 # TODO: ignore some rules in comments
 #cppRules["-Comment 1"] = re.compile('[^/]/\*(.|[\r\n])*?\*/')
@@ -77,7 +71,13 @@ cppRules["Windows Line Ending"] = re.compile('\r')
 
 
 if len(sys.argv) >= 2 and sys.argv[1] != "--help":
-    run(makeFileSet(sys.argv[1:]), cppRules, "styleviolations.html")
+    files = []
+    for arg in sys.argv[1:]:
+        if os.path.isfile(arg):
+            files.append(arg)
+        else:
+            os.path.walk(arg, visit, files)
+    run(files, cppRules, "styleviolations.html")
 else:
     print "Usage: python checkstyle.py file.cpp [file2.cpp] [directory]\n"
     print "Checks c++ source files against the Haiku Coding Guidelines."
