@@ -1031,7 +1031,7 @@ DwarfTypeFactory::_CreateSubrangeType(const BString& name,
 	}
 
 	// create the base type
-	Type* baseType;
+	Type* baseType = NULL;
 	status_t error;
 	if (baseTypeEntry != NULL) {
 		DwarfType* dwarfBaseType;
