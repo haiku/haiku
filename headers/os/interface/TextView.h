@@ -385,7 +385,7 @@ private:
 			int32				_NextWordBoundary(int32 offset);
 
 			int32				_PreviousWordStart(int32 offset);
-			int32				_NextWordStart(int32 offset);
+			int32				_NextWordEnd(int32 offset);
 
 			bool				_GetProperty(BMessage* specifier, int32 form,
 									const char* property, BMessage* reply);
