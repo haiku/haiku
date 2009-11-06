@@ -38,6 +38,10 @@ private:
 			class BaseTypeChild;
 			class MemberChild;
 
+			// for GCC2
+			friend class BaseTypeChild;
+			friend class MemberChild;
+
 			typedef BObjectList<Child> ChildList;
 
 private:

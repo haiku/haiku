@@ -469,7 +469,7 @@ public:
 
 	bool FinishMenu(bool force)
 	{
-		bool stillActive;
+		bool stillActive = false;
 
 		if (fMenuPreparedToShow) {
 			stillActive = fRendererSettingsMenu->Finish(fParentLooper, force);
