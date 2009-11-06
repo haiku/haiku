@@ -1113,7 +1113,7 @@ DwarfEnumerationType::AddValue(DwarfEnumeratorValue* value)
 
 
 DwarfSubrangeType::DwarfSubrangeType(DwarfTypeContext* typeContext,
-	const BString& name, DIESubrangeType* entry, DwarfType* baseType,
+	const BString& name, DIESubrangeType* entry, Type* baseType,
 	const BVariant& lowerBound, const BVariant& upperBound)
 	:
 	DwarfType(typeContext, name, entry),

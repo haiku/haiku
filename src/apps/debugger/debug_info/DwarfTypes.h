@@ -423,7 +423,7 @@ class DwarfSubrangeType : public SubrangeType, public DwarfType {
 public:
 								DwarfSubrangeType(DwarfTypeContext* typeContext,
 									const BString& name, DIESubrangeType* entry,
-									DwarfType* baseType,
+									Type* baseType,
 									const BVariant& lowerBound,
 									const BVariant& upperBound);
 								~DwarfSubrangeType();
@@ -440,7 +440,7 @@ public:
 
 private:
 			DIESubrangeType*	fEntry;
-			DwarfType*			fBaseType;
+			Type*				fBaseType;
 			BVariant			fLowerBound;
 			BVariant			fUpperBound;
 };
