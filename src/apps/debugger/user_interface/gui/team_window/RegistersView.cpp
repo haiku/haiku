@@ -9,6 +9,8 @@
 
 #include <new>
 
+#include <ControlLook.h>
+
 #include "table/TableColumns.h"
 
 #include "Architecture.h"
@@ -237,9 +239,13 @@ RegistersView::_Init()
 	AddChild(fRegisterTable->ToView());
 
 	// columns
-	fRegisterTable->AddColumn(new StringTableColumn(0, "Register", 80, 40, 1000,
+	fRegisterTable->AddColumn(new StringTableColumn(0, "Register",
+		be_plain_font->StringWidth("Register")
+			+ be_control_look->DefaultLabelSpacing() * 2 + 5, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
-	fRegisterTable->AddColumn(new RegisterValueColumn(1, "Value", 80, 40, 1000,
+	fRegisterTable->AddColumn(new RegisterValueColumn(1, "Value",
+		be_plain_font->StringWidth("0x00000000")
+			+ be_control_look->DefaultLabelSpacing() * 2 + 5, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
 
 	fRegisterTableModel = new RegisterTableModel(fArchitecture);

@@ -10,6 +10,8 @@
 
 #include <new>
 
+#include <ControlLook.h>
+
 #include "table/TableColumns.h"
 
 #include "FunctionInstance.h"
@@ -214,11 +216,14 @@ StackTraceView::_Init()
 	AddChild(fFramesTable->ToView());
 	fFramesTable->SetSortingEnabled(false);
 
+	float addressWidth = be_plain_font->StringWidth("0x00000000")
+		+ be_control_look->DefaultLabelSpacing() * 2 + 5;
+
 	// columns
-	fFramesTable->AddColumn(new TargetAddressTableColumn(0, "Frame", 80, 40,
-		1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
-	fFramesTable->AddColumn(new TargetAddressTableColumn(1, "IP", 80, 40, 1000,
-		B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fFramesTable->AddColumn(new TargetAddressTableColumn(0, "Frame",
+		addressWidth, 40, 1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
+	fFramesTable->AddColumn(new TargetAddressTableColumn(1, "IP", addressWidth,
+		40, 1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
 	fFramesTable->AddColumn(new StringTableColumn(2, "Function", 300, 100, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 
