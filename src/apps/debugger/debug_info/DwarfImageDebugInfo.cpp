@@ -482,8 +482,10 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	CompilationUnit* unit = function->GetCompilationUnit();
 	error = fFile->UnwindCallFrame(unit, function->SubprogramEntry(),
 		instructionPointer, inputInterface, outputInterface, framePointer);
-	if (error != B_OK)
+	if (error != B_OK) {
+		TRACE_CFI("Failed to unwind call frame: %s\n", strerror(error));
 		return B_UNSUPPORTED;
+	}
 
 	TRACE_CFI_ONLY(
 		TRACE_CFI("unwound registers:\n");
