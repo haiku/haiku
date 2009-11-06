@@ -31,8 +31,11 @@
 
 const char* kAppSig = "application/x-vnd.Haiku-checkitout";
 const char* kTrackerSig = "application/x-vnd.Be-TRAK";
+#if __HAIKU__
 const char* kTerminalSig = "application/x-vnd.Haiku-Terminal";
-
+#else
+const char* kTerminalSig = "application/x-vnd.Be-SHEL";
+#endif
 
 CheckItOut::CheckItOut() : BApplication(kAppSig)
 {
@@ -74,7 +77,7 @@ CheckItOut::_FilePanel(uint32 nodeFlavors, BString &name)
 			bool modal = false, bool hideWhenDone = true);
 	*/
 	panel->Window()->SetTitle("Check It Out to...");
-	panel->SetSaveText(name);
+	panel->SetSaveText(name.String());
 	panel->Show();
 	return B_OK;
 }
@@ -97,7 +100,7 @@ CheckItOut::MessageReceived(BMessage* msg)
 			BString name;
 			msg->FindRef("directory", &ref);
 			msg->FindString("name", &name);
-			_DoCheckItOut(&ref, name);
+			_DoCheckItOut(&ref, name.String());
 			break;
 		}
 		case B_CANCEL:
@@ -110,8 +113,10 @@ CheckItOut::MessageReceived(BMessage* msg)
 void
 CheckItOut::ArgvReceived(int32 argc, char** argv)
 {
-	if (argc <= 1)
+	if (argc <= 1) {
+		exit(1);
 		return;
+	}
 	
 	BPrivate::Support::BUrl url(argv[1]);
 	fUrlString = url;
@@ -152,7 +157,7 @@ CheckItOut::_DoCheckItOut(entry_ref *ref, const char *name)
 	const char* pausec = " ; read -p 'Press any key'";
 	char* args[] = { (char *)"/bin/sh", (char *)"-c", NULL, NULL};
 
-	BPrivate::Support::BUrl url(fUrlString);
+	BPrivate::Support::BUrl url(fUrlString.String());
 	BString full = url.Full();
 	BString proto = url.Proto();
 	BString host = url.Host();
@@ -175,7 +180,19 @@ printf("url %s\n", url.String());
 		be_roster->Launch(kTerminalSig, 3, args);
 		return B_OK;
 	}
-	return B_OK;
+	if (proto == "svn" || proto == "svn+ssh") {
+		BString cmd("svn checkout ");
+		cmd << url;
+		cmd << " '" << refPath.Path() << "/" << name << "'";
+		PRINT(("CMD='%s'\n", cmd.String()));
+		cmd << " && open '" << refPath.Path() << "/" << name << "'";
+		cmd << failc;
+		PRINT(("CMD='%s'\n", cmd.String()));
+		args[2] = (char*)cmd.String();
+		be_roster->Launch(kTerminalSig, 3, args);
+		return B_OK;
+	}
+	return B_ERROR;
 }
 
 
