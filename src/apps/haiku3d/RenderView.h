@@ -35,7 +35,7 @@ protected:
 	bool			_Render();
 	uint32			_CreateRenderThread();
 	void			_StopRenderThread();
-	static int32	_RenderThreadEntry(void *pointer);
+	static int32	_RenderThreadEntry(void* pointer);
 	int32			_RenderLoop();
 
 	Camera*			fMainCamera;

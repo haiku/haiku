@@ -81,7 +81,7 @@ RenderView::_StopRenderThread()
 
 
 int32
-RenderView::_RenderThreadEntry(void *pointer)
+RenderView::_RenderThreadEntry(void* pointer)
 {
 	return reinterpret_cast<RenderView*>(pointer)->_RenderLoop();
 }
@@ -134,7 +134,7 @@ void RenderView::_InitGL(void)
 void
 RenderView::_CreateScene()
 {
-	Texture *texture = new BitmapTexture(
+	Texture* texture = new BitmapTexture(
 		BTranslationUtils::GetBitmap(B_PNG_FORMAT, "texture"));
 
 	float spacing = 1.6f;
@@ -143,7 +143,7 @@ RenderView::_CreateScene()
 	float zOffset = -16;
 
 	Mesh* mesh = new StaticMesh("LetterH");
-	MeshInstance *instance = new MeshInstance(mesh, texture,
+	MeshInstance* instance = new MeshInstance(mesh, texture,
 		Vector3(-3.6 * spacing, yOffset, zOffset),
 		Quaternion(0, 0, 0, 1), 0.0f);
 	fMeshInstances.push_back(instance);
