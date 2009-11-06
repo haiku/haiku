@@ -3317,7 +3317,7 @@ BTextView::_HandleArrowKey(uint32 inArrowKey)
 			else {
 				fCaretOffset
 					= ctrlDown
-						? _NextWordStart(fCaretOffset)
+						? _NextWordEnd(fCaretOffset)
 						: _NextInitialByte(fCaretOffset);
 				if (shiftDown && fCaretOffset != lastClickOffset) {
 					if (fCaretOffset > fSelEnd) {
@@ -4070,18 +4070,18 @@ BTextView::_PreviousWordStart(int32 offset)
 		return 0;
 
 	--offset;	// need to look at previous char
-	if (_CharClassification(offset) == CHAR_CLASS_WHITESPACE) {
-		// skip whitespace
+	if (_CharClassification(offset) != CHAR_CLASS_DEFAULT) {
+		// skip non-word characters
 		while (offset > 0) {
 			offset = _PreviousInitialByte(offset);
-			if (_CharClassification(offset) != CHAR_CLASS_WHITESPACE)
+			if (_CharClassification(offset) == CHAR_CLASS_DEFAULT)
 				break;
 		}
 	}
 	while (offset > 0) {
-		// find preceeding whitespace char.
+		// skip to start of word
 		int32 previous = _PreviousInitialByte(offset);
-		if (_CharClassification(previous) == CHAR_CLASS_WHITESPACE)
+		if (_CharClassification(previous) != CHAR_CLASS_DEFAULT)
 			break;
 		offset = previous;
 	}
@@ -4091,24 +4091,24 @@ BTextView::_PreviousWordStart(int32 offset)
 
 
 int32
-BTextView::_NextWordStart(int32 offset)
+BTextView::_NextWordEnd(int32 offset)
 {
 	int32 textLen = TextLength();
 	if (offset >= textLen)
 		return textLen;
 
-	if (_CharClassification(offset) != CHAR_CLASS_WHITESPACE) {
-		// skip until the next whitespace
+	if (_CharClassification(offset) != CHAR_CLASS_DEFAULT) {
+		// skip non-word characters
 		while (offset < textLen) {
 			offset = _NextInitialByte(offset);
-			if (_CharClassification(offset) == CHAR_CLASS_WHITESPACE)
+			if (_CharClassification(offset) == CHAR_CLASS_DEFAULT)
 				break;
 		}
 	}
 	while (offset < textLen) {
-		// find next non-white char
+		// skip to end of word
 		offset = _NextInitialByte(offset);
-		if (_CharClassification(offset) != CHAR_CLASS_WHITESPACE)
+		if (_CharClassification(offset) != CHAR_CLASS_DEFAULT)
 			break;
 	}
 
