@@ -633,11 +633,13 @@ DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 				} else if (opcode >= DW_OP_reg0 && opcode <= DW_OP_reg31) {
 					TRACE_EXPR("  DW_OP_reg%u\n", opcode - DW_OP_reg0);
 					if (_piece == NULL) {
-						throw EvaluationException(
-							"DW_OP_reg* in non-location expression");
+						// NOTE: Using these opcodes is actually only allowed in
+						// location expression, but gcc 2.95.3 does otherwise.
+						_PushRegister(opcode - DW_OP_reg0, 0);
+					} else {
+						_piece->SetToRegister(opcode - DW_OP_reg0);
+						return B_OK;
 					}
-					_piece->SetToRegister(opcode - DW_OP_reg0);
-					return B_OK;
 				} else if (opcode >= DW_OP_breg0 && opcode <= DW_OP_breg31) {
 					int64 offset = fDataReader.ReadSignedLEB128(0);
 					TRACE_EXPR("  DW_OP_breg%u(%lld)\n", opcode - DW_OP_breg0,
