@@ -18,7 +18,7 @@ class CalcView;
 
 class CalcWindow : public BWindow {
  public:
-								CalcWindow(BRect frame, BMessage *settings);
+								CalcWindow(BRect frame, BMessage* settings);
 	virtual						~CalcWindow();
 
 	virtual	void				Show();
@@ -27,7 +27,7 @@ class CalcWindow : public BWindow {
 			status_t			SaveSettings(BMessage* archive) const;
 
 			void				SetFrame(BRect frame,
-										 bool forceCenter = false);
+									bool forceCenter = false);
 
  private:
 			CalcView*			fCalcView;

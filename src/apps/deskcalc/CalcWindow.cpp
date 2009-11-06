@@ -24,7 +24,7 @@
 static const char* kWindowTitle		= "DeskCalc";
 
 
-CalcWindow::CalcWindow(BRect frame, BMessage *settings)
+CalcWindow::CalcWindow(BRect frame, BMessage* settings)
 	: BWindow(frame, kWindowTitle, B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	// create calculator view with calculator description and
@@ -36,14 +36,14 @@ CalcWindow::CalcWindow(BRect frame, BMessage *settings)
 
 	frame.OffsetTo(B_ORIGIN);
 	fCalcView = new CalcView(frame, baseColor, settings);
-	
+
 	// create replicant dragger
 	BRect replicantFrame(frame);
 	replicantFrame.top = replicantFrame.bottom - 7.0f;
 	replicantFrame.left = replicantFrame.right - 7.0f;
 	BDragger* dragger = new BDragger(replicantFrame, fCalcView,
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	
+
 	// attach views
 	AddChild(fCalcView);
 	fCalcView->AddChild(dragger);

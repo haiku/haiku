@@ -80,7 +80,8 @@ struct CalcView::CalcKey {
 };
 
 
-CalcView *CalcView::Instantiate(BMessage *archive)
+CalcView*
+CalcView::Instantiate(BMessage* archive)
 {
 	if (!validate_instantiation(archive, "CalcView"))
 		return NULL;
@@ -89,7 +90,7 @@ CalcView *CalcView::Instantiate(BMessage *archive)
 }
 
 
-CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage *settings)
+CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	:
 	BView(frame, "DeskCalc", B_FOLLOW_ALL_SIDES,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
@@ -241,7 +242,7 @@ CalcView::MessageReceived(BMessage* message)
 			case B_PASTE:
 				// access system clipboard
 				if (be_clipboard->Lock()) {
-					BMessage *clipper = be_clipboard->Data();
+					BMessage* clipper = be_clipboard->Data();
 					//clipper->PrintToStream();
 					Paste(clipper);
 					be_clipboard->Unlock();
@@ -400,7 +401,7 @@ CalcView::Draw(BRect updateRect)
 	SetFontSize(min_c(sizeRow * kFontScaleY, sizeCol * kFontScaleX));
 
 	if (be_control_look != NULL) {
-		CalcKey *key = fKeypad;
+		CalcKey* key = fKeypad;
 		for (int row = 0; row < fRows; row++) {
 			for (int col = 0; col < fColums; col++) {
 				BRect frame;
@@ -486,7 +487,7 @@ CalcView::Draw(BRect updateRect)
 
 	float baselineOffset = ((fHeight - sizeDisp) / (float)fRows)
 							* (1.0 - kFontScaleY) * 0.5;
-	CalcKey *key = fKeypad;
+	CalcKey* key = fKeypad;
 	for (int row = 0; row < fRows; row++) {
 		for (int col = 0; col < fColums; col++) {
 			float halfSymbolWidth = StringWidth(key->label) * 0.5f;
@@ -545,8 +546,8 @@ CalcView::MouseDown(BPoint point)
 	int gridRow = (int)floorf((point.y - sizeDisp) / sizeRow);
 
 	// check limits
-	if ((gridCol >= 0) && (gridCol < fColums) &&
-		(gridRow >= 0) && (gridRow < fRows)) {
+	if ((gridCol >= 0) && (gridCol < fColums)
+		&& (gridRow >= 0) && (gridRow < fRows)) {
 
 		// process key press
 		int key = gridRow * fColums + gridCol;
@@ -576,7 +577,7 @@ CalcView::MouseUp(BPoint point)
 
 
 void
-CalcView::KeyDown(const char *bytes, int32 numBytes)
+CalcView::KeyDown(const char* bytes, int32 numBytes)
 {
  	// if single byte character...
 	if (numBytes == 1) {
@@ -702,8 +703,8 @@ CalcView::Archive(BMessage* archive, bool deep) const
 	const_cast<CalcView*>(this)->AddChild(fExpressionTextView);
 
 	// save app signature for replicant add-on loading
-    if (ret == B_OK)
-    	ret = archive->AddString("add_on", kAppSig);
+	if (ret == B_OK)
+		ret = archive->AddString("add_on", kAppSig);
 
 	// save all the options
 	if (ret == B_OK)
@@ -731,14 +732,12 @@ CalcView::Copy()
 	// access system clipboard
 	if (be_clipboard->Lock()) {
 		be_clipboard->Clear();
-		BMessage *clipper = be_clipboard->Data();
+		BMessage* clipper = be_clipboard->Data();
 		clipper->what = B_MIME_DATA;
 		// TODO: should check return for errors!
 		BString expression = fExpressionTextView->Text();
-		clipper->AddData("text/plain",
-						 B_MIME_TYPE,
-						 expression.String(),
-						 expression.Length());
+		clipper->AddData("text/plain", B_MIME_TYPE,
+			expression.String(), expression.Length());
 		//clipper->PrintToStream();
 		be_clipboard->Commit();
 		be_clipboard->Unlock();
@@ -747,16 +746,14 @@ CalcView::Copy()
 
 
 void
-CalcView::Paste(BMessage *message)
+CalcView::Paste(BMessage* message)
 {
 	// handle color drops first
 	// read incoming color
 	const rgb_color* dropColor = NULL;
 	ssize_t dataSize;
-	if (message->FindData("RGBColor",
-						  B_RGB_COLOR_TYPE,
-						  (const void**)&dropColor,
-						  &dataSize) == B_OK
+	if (message->FindData("RGBColor", B_RGB_COLOR_TYPE,
+			(const void**)&dropColor, &dataSize) == B_OK
 		&& dataSize == sizeof(rgb_color)) {
 
 		// calculate view relative drop point
@@ -778,10 +775,8 @@ CalcView::Paste(BMessage *message)
 		// look for text/plain MIME data
 		const char* text;
 		ssize_t numBytes;
-		if (message->FindData("text/plain",
-							  B_MIME_TYPE,
-							  (const void**)&text,
-							  &numBytes) == B_OK) {
+		if (message->FindData("text/plain", B_MIME_TYPE,
+				(const void**)&text, &numBytes) == B_OK) {
 			BString temp;
 			temp.Append(text, numBytes);
 			fExpressionTextView->Insert(temp.String());
@@ -815,8 +810,8 @@ CalcView::_LoadSettings(BMessage* archive)
 	const rgb_color* color;
 	ssize_t size;
 	if (archive->FindData("rgbBaseColor", B_RGB_COLOR_TYPE,
-						  (const void**)&color, &size) < B_OK
-						  || size != sizeof(rgb_color)) {
+			(const void**)&color, &size) < B_OK
+		|| size != sizeof(rgb_color)) {
 		fBaseColor = (rgb_color){ 128, 128, 128, 255 };
 		puts("Missing rgbBaseColor from CalcView archive!\n");
 	} else {
@@ -824,8 +819,8 @@ CalcView::_LoadSettings(BMessage* archive)
 	}
 
 	if (archive->FindData("rgbDisplay", B_RGB_COLOR_TYPE,
-						  (const void**)&color, &size) < B_OK
-						  || size != sizeof(rgb_color)) {
+			(const void**)&color, &size) < B_OK
+		|| size != sizeof(rgb_color)) {
 		fExpressionBGColor = (rgb_color){ 0, 0, 0, 255 };
 		puts("Missing rgbBaseColor from CalcView archive!\n");
 	} else {
@@ -871,10 +866,10 @@ CalcView::SaveSettings(BMessage* archive) const
 	// record color scheme
 	if (ret == B_OK)
 		ret = archive->AddData("rgbBaseColor", B_RGB_COLOR_TYPE,
-							   &fBaseColor, sizeof(rgb_color));
+			&fBaseColor, sizeof(rgb_color));
 	if (ret == B_OK)
 		ret = archive->AddData("rgbDisplay", B_RGB_COLOR_TYPE,
-							   &fExpressionBGColor, sizeof(rgb_color));
+			&fExpressionBGColor, sizeof(rgb_color));
 
 	// record current options
 	if (ret == B_OK)
@@ -947,12 +942,12 @@ CalcView::_ParseCalcDesc(const char* keypadDescription)
 	fKeypad = new CalcKey[fRows * fColums];
 
 	// scan through calculator description and assemble keypad
-	CalcKey *key = fKeypad;
-	const char *p = keypadDescription;
+	CalcKey* key = fKeypad;
+	const char* p = keypadDescription;
 
 	while (*p != 0) {
 		// copy label
-		char *l = key->label;
+		char* l = key->label;
 		while (!isspace(*p))
 			*l++ = *p++;
 		*l = '\0';
@@ -1010,7 +1005,7 @@ CalcView::_PressKey(int key)
 
 
 void
-CalcView::_PressKey(const char *label)
+CalcView::_PressKey(const char* label)
 {
 	int32 key = _KeyForLabel(label);
 	if (key >= 0)
@@ -1019,7 +1014,7 @@ CalcView::_PressKey(const char *label)
 
 
 int32
-CalcView::_KeyForLabel(const char *label) const
+CalcView::_KeyForLabel(const char* label) const
 {
 	int keys = fRows * fColums;
 	for (int i = 0; i < keys; i++) {
@@ -1090,8 +1085,8 @@ CalcView::_Colorize()
 		fButtonTextColor = (rgb_color){ 255, 255, 255, 255 };
 
 	// expression text color
-	lightness = (fExpressionBGColor.red +
-				 fExpressionBGColor.green + fExpressionBGColor.blue) / 3;
+	lightness = (fExpressionBGColor.red
+		+ fExpressionBGColor.green + fExpressionBGColor.blue) / 3;
 	if (lightness > 200)
 		fExpressionTextColor = (rgb_color){ 0, 0, 0, 255 };
 	else
@@ -1164,8 +1159,8 @@ CalcView::_ShowKeypad(bool show)
 	if (fShowKeypadItem && fShowKeypadItem->IsMarked() ^ fShowKeypad)
 		fShowKeypadItem->SetMarked(fShowKeypad);
 
-	float height = fShowKeypad ? fHeight / kDisplayScaleY
-							   : fHeight * kDisplayScaleY;
+	float height
+		= fShowKeypad ? fHeight / kDisplayScaleY : fHeight * kDisplayScaleY;
 
 	BWindow* window = Window();
 	if (window) {

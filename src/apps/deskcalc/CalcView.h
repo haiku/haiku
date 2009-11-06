@@ -23,13 +23,13 @@ class ExpressionTextView;
 _EXPORT
 class CalcView : public BView {
  public:
-		
+
 	static	CalcView*			Instantiate(BMessage* archive);
-		
-		
+
+
 								CalcView(BRect frame,
-										rgb_color rgbBaseColor,
-										BMessage *settings);
+									rgb_color rgbBaseColor,
+									BMessage* settings);
 
 								CalcView(BMessage* archive);
 
@@ -57,7 +57,7 @@ class CalcView : public BView {
 			void				Copy();
 
 			// Paste contents of system clipboard to view.
-			void				Paste(BMessage *message);
+			void				Paste(BMessage* message);
 
 			// Save current settings
 			status_t			SaveSettings(BMessage* archive) const;
@@ -68,7 +68,7 @@ class CalcView : public BView {
 
  private:
 			void				_ParseCalcDesc(const char* keypadDescription);
-			
+
 			void				_PressKey(int key);
 			void				_PressKey(const char* label);
 			int32				_KeyForLabel(const char* label) const;

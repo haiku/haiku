@@ -19,7 +19,7 @@ class CalcView;
 class ExpressionTextView : public InputTextView {
  public:
 								ExpressionTextView(BRect frame,
-												   CalcView* calcView);
+									CalcView* calcView);
 	virtual						~ExpressionTextView();
 
 	// BView

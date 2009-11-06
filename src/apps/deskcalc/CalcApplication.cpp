@@ -30,8 +30,9 @@ static const float kDefaultWindowHeight	= 140.0;
 
 
 CalcApplication::CalcApplication()
-	: BApplication(kAppSig),
-	  fCalcWindow(NULL)
+	:
+	BApplication(kAppSig),
+	fCalcWindow(NULL)
 {
 }
 
@@ -77,7 +78,7 @@ CalcApplication::QuitRequested()
 
 
 void
-CalcApplication::_LoadSettings(BMessage &archive)
+CalcApplication::_LoadSettings(BMessage& archive)
 {
 	// locate preferences file
 	BFile prefsFile;
@@ -128,10 +129,11 @@ CalcApplication::_SaveSettings()
 	}
 }
 
+
 status_t
 CalcApplication::_InitSettingsFile(BFile* file, bool write)
 {
-	// find user settings directory	
+	// find user settings directory
 	BPath prefsPath;
 	status_t ret = find_directory(B_USER_SETTINGS_DIRECTORY, &prefsPath);
 	if (ret < B_OK)
@@ -141,9 +143,10 @@ CalcApplication::_InitSettingsFile(BFile* file, bool write)
 	if (ret < B_OK)
 		return ret;
 
-	if (write)
-		ret = file->SetTo(prefsPath.Path(), B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
-	else
+	if (write) {
+		ret = file->SetTo(prefsPath.Path(),
+			B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
+	} else
 		ret = file->SetTo(prefsPath.Path(), B_READ_ONLY);
 
 	return ret;

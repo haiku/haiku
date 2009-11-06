@@ -28,7 +28,7 @@ class CalcApplication : public BApplication {
 	virtual	bool				QuitRequested();
 
  private:
-			void				_LoadSettings(BMessage &settings);
+			void				_LoadSettings(BMessage& settings);
 			void				_SaveSettings();
 			status_t			_InitSettingsFile(BFile* file, bool write);
 

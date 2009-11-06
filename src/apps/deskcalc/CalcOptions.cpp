@@ -17,9 +17,10 @@
 
 
 CalcOptions::CalcOptions()
-	: auto_num_lock(false),
-	  audio_feedback(false),
-	  show_keypad(true)
+	:
+	auto_num_lock(false),
+	audio_feedback(false),
+	show_keypad(true)
 {
 }
 

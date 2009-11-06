@@ -257,9 +257,9 @@ ExpressionTextView::LoadSettings(const BMessage* archive)
 {
 	const char* oldExpression;
 	for (int32 i = 0;
-		 archive->FindString("previous expression", i, &oldExpression) == B_OK;
-		 i++) {
-		 AddExpressionToHistory(oldExpression);
+		archive->FindString("previous expression", i, &oldExpression) == B_OK;
+		i++) {
+		AddExpressionToHistory(oldExpression);
 	}
 }
 

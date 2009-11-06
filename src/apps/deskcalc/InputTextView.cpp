@@ -13,23 +13,22 @@
 
 #include <String.h>
 
-// constructor
-InputTextView::InputTextView(BRect frame, const char* name,
-							 BRect textRect,
-							 uint32 resizingMode,
-							 uint32 flags)
-	: BTextView(frame, name, textRect, resizingMode, flags),
-	  fWasFocus(false)
+
+InputTextView::InputTextView(BRect frame, const char* name, BRect textRect,
+	uint32 resizingMode, uint32 flags)
+	:
+	BTextView(frame, name, textRect, resizingMode, flags),
+	fWasFocus(false)
 {
 	SetWordWrap(false);
 }
 
-// destructor
+
 InputTextView::~InputTextView()
 {
 }
 
-// MouseDown
+
 void
 InputTextView::MouseDown(BPoint where)
 {
@@ -47,7 +46,7 @@ InputTextView::MouseDown(BPoint where)
 	}
 }
 
-// MouseUp
+
 void
 InputTextView::MouseUp(BPoint where)
 {
@@ -58,7 +57,7 @@ InputTextView::MouseUp(BPoint where)
 		BTextView::MouseUp(where);
 }
 
-// KeyDown
+
 void
 InputTextView::KeyDown(const char* bytes, int32 numBytes)
 {
@@ -85,7 +84,7 @@ InputTextView::KeyDown(const char* bytes, int32 numBytes)
 		BTextView::KeyDown(bytes, numBytes);
 }
 
-// MakeFocus
+
 void
 InputTextView::MakeFocus(bool focus)
 {
@@ -98,7 +97,7 @@ InputTextView::MakeFocus(bool focus)
 	}
 }
 
-// Invoke
+
 status_t
 InputTextView::Invoke(BMessage* message)
 {
@@ -114,9 +113,10 @@ InputTextView::Invoke(BMessage* message)
 	return B_BAD_VALUE;
 }
 
+
 // #pragma mark -
 
-// Select
+
 void
 InputTextView::Select(int32 start, int32 finish)
 {
@@ -125,17 +125,17 @@ InputTextView::Select(int32 start, int32 finish)
 	_CheckTextRect();
 }
 
-// InsertText
+
 void
 InputTextView::InsertText(const char* inText, int32 inLength, int32 inOffset,
-						  const text_run_array* inRuns)
+	const text_run_array* inRuns)
 {
 	BTextView::InsertText(inText, inLength, inOffset, inRuns);
 
 	_CheckTextRect();
 }
 
-// DeleteText
+
 void
 InputTextView::DeleteText(int32 fromOffset, int32 toOffset)
 {
@@ -144,9 +144,10 @@ InputTextView::DeleteText(int32 fromOffset, int32 toOffset)
 	_CheckTextRect();
 }
 
+
 // #pragma mark -
 
-// _CheckTextRect
+
 void
 InputTextView::_CheckTextRect()
 {

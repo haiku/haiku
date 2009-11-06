@@ -12,14 +12,13 @@
 #include <Invoker.h>
 #include <TextView.h>
 
-class InputTextView : public BTextView,
-					  public BInvoker {
+class InputTextView : public BTextView, public BInvoker {
  public:
 								InputTextView(BRect frame,
-											  const char* name,
-											  BRect textRect,
-											  uint32 resizingMode,
-											  uint32 flags);
+									const char* name,
+									BRect textRect,
+									uint32 resizingMode,
+									uint32 flags);
 	virtual						~InputTextView();
 
 	// BTextView interface
@@ -41,11 +40,11 @@ protected:
 	virtual	void				Select(int32 start, int32 finish);
 
 	virtual	void				InsertText(const char* inText,
-										   int32 inLength,
-										   int32 inOffset,
-										   const text_run_array* inRuns);
+									int32 inLength,
+									int32 inOffset,
+									const text_run_array* inRuns);
 	virtual	void				DeleteText(int32 fromOffset,
-										   int32 toOffset);
+									int32 toOffset);
 
 			void				_CheckTextRect();
 
