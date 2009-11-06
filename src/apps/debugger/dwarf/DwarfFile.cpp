@@ -1395,8 +1395,23 @@ DwarfFile::_ParseCIE(CompilationUnit* unit, CfaContext& context,
 
 	uint8 version = dataReader.Read<uint8>(0);
 	const char* augmentation = dataReader.ReadString();
-	if (version != 1 || augmentation == NULL || *augmentation != '\0')
+	if (version != 1) {
+		TRACE_CFI("  cie: length: %llu, version: %u -- unsupported\n",
+			length, version);
 		return B_UNSUPPORTED;
+	}
+
+	if (augmentation == NULL || *augmentation != '\0') {
+		if (strcmp(augmentation, "eh") == 0) {
+			// the augmentation consists of the exception table pointer -- just
+			// ignore it
+			dataReader.ReadAddress(0);
+		} else {
+			TRACE_CFI("  cie: length: %llu, version: %u, augmentation: \"%s\" "
+				"-- unsupported\n", length, version, augmentation);
+			return B_UNSUPPORTED;
+		}
+	}
 
 	context.SetCodeAlignment(dataReader.ReadUnsignedLEB128(0));
 	context.SetDataAlignment(dataReader.ReadSignedLEB128(0));
