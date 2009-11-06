@@ -153,6 +153,7 @@ private:
 			DebugInfoEntryFactory fDebugInfoFactory;
 			CompilationUnitList	fCompilationUnits;
 			CompilationUnit*	fCurrentCompilationUnit;
+			bool				fUsingEHFrameSection;
 			bool				fFinished;
 			status_t			fFinishError;
 };

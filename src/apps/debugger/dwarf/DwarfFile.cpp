@@ -166,6 +166,7 @@ DwarfFile::DwarfFile()
 	fDebugPublicTypesSection(NULL),
 	fCompilationUnits(20, true),
 	fCurrentCompilationUnit(NULL),
+	fUsingEHFrameSection(false),
 	fFinished(false),
 	fFinishError(B_OK)
 {
@@ -223,6 +224,10 @@ DwarfFile::Load(const char* fileName)
 	fDebugRangesSection = fElfFile->GetSection(".debug_ranges");
 	fDebugLineSection = fElfFile->GetSection(".debug_line");
 	fDebugFrameSection = fElfFile->GetSection(".debug_frame");
+	if (fDebugFrameSection == NULL) {
+		fDebugFrameSection = fElfFile->GetSection(".eh_frame");
+		fUsingEHFrameSection = fDebugFrameSection != NULL;
+	}
 	fDebugLocationSection = fElfFile->GetSection(".debug_loc");
 	fDebugPublicTypesSection = fElfFile->GetSection(".debug_pubtypes");
 
@@ -419,9 +424,11 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 	DataReader dataReader((uint8*)fDebugFrameSection->Data(),
 		fDebugFrameSection->Size(), unit->AddressSize());
 
+	uint64 previousCIE = 0;
 	while (dataReader.BytesRemaining() > 0) {
 		// length
 		bool dwarf64;
+		off_t entryOffset = dataReader.Offset();
 		uint64 length = dataReader.ReadInitialLength(dwarf64);
 		if (length > (uint64)dataReader.BytesRemaining())
 			return B_BAD_DATA;
@@ -430,8 +437,13 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 		// CIE ID/CIE pointer
 		uint64 cieID = dwarf64
 			? dataReader.Read<uint64>(0) : dataReader.Read<uint32>(0);
-		if (dwarf64 ? cieID == 0xffffffffffffffffULL : cieID == 0xffffffff) {
+		if (fUsingEHFrameSection
+				? cieID == 0
+				: (dwarf64
+					? cieID == 0xffffffffffffffffULL
+					: cieID == 0xffffffff)) {
 			// this is a CIE -- skip it
+			previousCIE = entryOffset;
 		} else {
 			// this is a FDE
 			target_addr_t initialLocation = dataReader.ReadAddress(0);
@@ -447,6 +459,12 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 					- (dataReader.Offset() - lengthOffset);
 				if (remaining < 0)
 					return B_BAD_DATA;
+
+				// For some reason gcc 2.95.3 doesn't write the CIE offset, but
+				// always the offset of this entry's CIE pointer field. We fix
+				// it.
+				if (fUsingEHFrameSection && cieID == (uint64)lengthOffset)
+					cieID = previousCIE;
 
 				TRACE_CFI("  found fde: length: %llu (%lld), CIE offset: %llu, "
 					"location: %#llx, range: %#llx\n", length, remaining, cieID,
@@ -1367,8 +1385,13 @@ DwarfFile::_ParseCIE(CompilationUnit* unit, CfaContext& context,
 	// CIE ID/CIE pointer
 	uint64 cieID = dwarf64
 		? dataReader.Read<uint64>(0) : dataReader.Read<uint32>(0);
-	if (dwarf64 ? cieID != 0xffffffffffffffffULL : cieID != 0xffffffff)
-		return B_BAD_DATA;
+	if (fUsingEHFrameSection) {
+		if (cieID != 0)
+			return B_BAD_DATA;
+	} else {
+		if (dwarf64 ? cieID != 0xffffffffffffffffULL : cieID != 0xffffffff)
+			return B_BAD_DATA;
+	}
 
 	uint8 version = dataReader.Read<uint8>(0);
 	const char* augmentation = dataReader.ReadString();
