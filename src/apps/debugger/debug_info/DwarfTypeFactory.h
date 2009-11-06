@@ -108,6 +108,9 @@ private:
 									uint64& _size);
 
 private:
+			class ArtificialIntegerType;
+
+private:
 			DwarfTypeContext*	fTypeContext;
 			GlobalTypeLookup*	fTypeLookup;
 			GlobalTypeCache*	fTypeCache;

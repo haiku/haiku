@@ -160,6 +160,107 @@ struct HasContainingTypePredicate {
 }	// unnamed namespace
 
 
+// #pragma mark - ArtificialIntegerType
+
+
+class DwarfTypeFactory::ArtificialIntegerType : public PrimitiveType {
+public:
+	ArtificialIntegerType(const BString& id, const BString& name,
+		target_size_t byteSize, uint32 typeConstant)
+		:
+		fID(id),
+		fName(name),
+		fByteSize(byteSize),
+		fTypeConstant(typeConstant)
+	{
+	}
+
+	static status_t Create(target_size_t byteSize, bool isSigned, Type*& _type)
+	{
+		// get the matching type constant
+		uint32 typeConstant;
+		switch (byteSize) {
+			case 1:
+				typeConstant = isSigned ? B_INT8_TYPE : B_UINT8_TYPE;
+				break;
+			case 2:
+				typeConstant = isSigned ? B_INT16_TYPE : B_UINT16_TYPE;
+				break;
+			case 4:
+				typeConstant = isSigned ? B_INT32_TYPE : B_UINT32_TYPE;
+				break;
+			case 8:
+				typeConstant = isSigned ? B_INT64_TYPE : B_UINT64_TYPE;
+				break;
+			default:
+				return B_BAD_VALUE;
+		}
+
+		// name and ID
+		char buffer[16];
+		snprintf(buffer, sizeof(buffer), isSigned ? "int%d" : "uint%d",
+			(int)byteSize * 8);
+		BString id(buffer);
+		if (id.Length() == 0)
+			return B_NO_MEMORY;
+
+		// create the type
+		ArtificialIntegerType* type = new(std::nothrow) ArtificialIntegerType(
+			id, id, byteSize, typeConstant);
+		if (type == NULL)
+			return B_NO_MEMORY;
+
+		_type = type;
+		return B_OK;
+	}
+
+	virtual image_id ImageID() const
+	{
+		return -1;
+	}
+
+	virtual const BString& ID() const
+	{
+		return fID;
+	}
+
+	virtual const BString& Name() const
+	{
+		return fName;
+	}
+
+	virtual target_size_t ByteSize() const
+	{
+		return fByteSize;
+	}
+
+	virtual status_t ResolveObjectDataLocation(
+		const ValueLocation& objectLocation, ValueLocation*& _location)
+	{
+		// TODO: Implement!
+		return B_UNSUPPORTED;
+	}
+
+	virtual status_t ResolveObjectDataLocation(target_addr_t objectAddress,
+		ValueLocation*& _location)
+	{
+		// TODO: Implement!
+		return B_UNSUPPORTED;
+	}
+
+	virtual uint32 TypeConstant() const
+	{
+		return fTypeConstant;
+	}
+
+private:
+	BString	fID;
+	BString	fName;
+	uint32	fByteSize;
+	uint32	fTypeConstant;
+};
+
+
 // #pragma mark - DwarfTypeFactory
 
 
@@ -929,18 +1030,20 @@ DwarfTypeFactory::_CreateSubrangeType(const BString& name,
 		}
 	}
 
-	// If we still don't have a base type yet, the base type is supposed to be
-	// the a signed integer type with the same size as an address for that
-	// compilation unit.
-	if (baseTypeEntry == NULL) {
-		// TODO: Implement!
-		WARNING("Base type fallback for subrange type not implemented yet!\n");
-		return B_UNSUPPORTED;
-	}
-
 	// create the base type
-	DwarfType* baseType;
-	status_t error = CreateType(baseTypeEntry, baseType);
+	Type* baseType;
+	status_t error;
+	if (baseTypeEntry != NULL) {
+		DwarfType* dwarfBaseType;
+		error = CreateType(baseTypeEntry, dwarfBaseType);
+		baseType = dwarfBaseType;
+	} else {
+		// We still don't have a base type yet. In this case the base type is
+		// supposed to be a signed integer type with the same size as an address
+		// for that compilation unit.
+		error = ArtificialIntegerType::Create(
+			fTypeContext->GetCompilationUnit()->AddressSize(), true, baseType);
+	}
 	if (error != B_OK)
 		return error;
 	Reference<Type> baseTypeReference(baseType, true);
