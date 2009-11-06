@@ -305,8 +305,8 @@ BackgroundsView::AllAttached()
 		B_DIRECTORY_NODE, false, NULL, new CustomRefFilter(false));
 	fFolderPanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
 
-	LoadSettings();
-	LoadDesktopFolder();
+	_LoadSettings();
+	_LoadDesktopFolder();
 
 	BPoint point;
 	if (fSettings.FindPoint("pos", &point) == B_OK) {
@@ -335,31 +335,31 @@ BackgroundsView::MessageReceived(BMessage* msg)
 			ystring << (int)fPreView->fPoint.y;
 			fXPlacementText->SetText(xstring.String());
 			fYPlacementText->SetText(ystring.String());
-			UpdatePreview();
-			UpdateButtons();
+			_UpdatePreview();
+			_UpdateButtons();
 			break;
 		}
 
 		case kMsgManualPlacement:
-			UpdatePreview();
-			UpdateButtons();
+			_UpdatePreview();
+			_UpdateButtons();
 			break;
 
 		case kMsgTilePlacement:
 		case kMsgScalePlacement:
 		case kMsgCenterPlacement:
-			UpdatePreview();
-			UpdateButtons();
+			_UpdatePreview();
+			_UpdateButtons();
 			break;
 
 		case kMsgIconLabelOutline:
-			UpdateButtons();
+			_UpdateButtons();
 			break;
 
 		case kMsgUpdateColor:
 		case kMsgImagePlacement:
-			UpdatePreview();
-			UpdateButtons();
+			_UpdatePreview();
+			_UpdateButtons();
 			break;
 
 		case kMsgCurrentWorkspace:
@@ -368,10 +368,10 @@ BackgroundsView::MessageReceived(BMessage* msg)
 			fLastWorkspaceIndex = fWorkspaceMenu->IndexOf(
 				fWorkspaceMenu->FindMarked());
 			if (fCurrent && fCurrent->IsDesktop()) {
-				UpdateButtons();
+				_UpdateButtons();
 			} else {
-				SetDesktop(true);
-				LoadDesktopFolder();
+				_SetDesktop(true);
+				_LoadDesktopFolder();
 			}
 			break;
 
@@ -379,8 +379,8 @@ BackgroundsView::MessageReceived(BMessage* msg)
 			fImageMenu->FindItem(kMsgNoImage)->SetLabel("None");
 			fLastWorkspaceIndex = fWorkspaceMenu->IndexOf(
 				fWorkspaceMenu->FindMarked());
-			SetDesktop(false);
-			LoadDefaultFolder();
+			_SetDesktop(false);
+			_LoadDefaultFolder();
 			break;
 
 		case kMsgOtherFolder:
@@ -398,7 +398,7 @@ BackgroundsView::MessageReceived(BMessage* msg)
 			msg->FindPointer("source", &pointer);
 			if (pointer == fPanel) {
 				if (fLastImageIndex >= 0)
-					FindImageItem(fLastImageIndex)->SetMarked(true);
+					_FindImageItem(fLastImageIndex)->SetMarked(true);
 				else
 					fImageMenu->ItemAt(0)->SetMarked(true);
 			} else if (pointer == fFolderPanel) {
@@ -413,34 +413,34 @@ BackgroundsView::MessageReceived(BMessage* msg)
 		case kMsgNoImage:
 			fLastImageIndex = ((BGImageMenuItem*)fImageMenu->FindMarked())
 				->ImageIndex();
-			UpdatePreview();
-			UpdateButtons();
+			_UpdatePreview();
+			_UpdateButtons();
 			break;
 
 		case kMsgFolderSelected:
 			fImageMenu->FindItem(kMsgNoImage)->SetLabel("Default");
 			fLastWorkspaceIndex = fWorkspaceMenu->IndexOf(
 				fWorkspaceMenu->FindMarked());
-			SetDesktop(false);
+			_SetDesktop(false);
 
-			LoadRecentFolder(*fPathList.ItemAt(fWorkspaceMenu->IndexOf(
+			_LoadRecentFolder(*fPathList.ItemAt(fWorkspaceMenu->IndexOf(
 				fWorkspaceMenu->FindMarked()) - 6));
 			break;
 
 		case kMsgApplySettings:
 		{
-			Save();
+			_Save();
 
-			//NotifyServer();
+			//_NotifyServer();
 			thread_id notify_thread;
-			notify_thread = spawn_thread(BackgroundsView::NotifyThread,
+			notify_thread = spawn_thread(BackgroundsView::_NotifyThread,
 				"notifyServer", B_NORMAL_PRIORITY, this);
 			resume_thread(notify_thread);
-			UpdateButtons();
+			_UpdateButtons();
 			break;
 		}
 		case kMsgRevertSettings:
-			UpdateWithCurrent();
+			_UpdateWithCurrent();
 			break;
 
 		default:
@@ -451,7 +451,7 @@ BackgroundsView::MessageReceived(BMessage* msg)
 
 
 void
-BackgroundsView::LoadDesktopFolder()
+BackgroundsView::_LoadDesktopFolder()
 {
 	BPath path;
 	if (find_directory(B_DESKTOP_DIRECTORY, &path) == B_OK) {
@@ -459,13 +459,13 @@ BackgroundsView::LoadDesktopFolder()
 		err = get_ref_for_path(path.Path(), &fCurrentRef);
 		if (err != B_OK)
 			printf("error in LoadDesktopSettings\n");
-		LoadFolder(true);
+		_LoadFolder(true);
 	}
 }
 
 
 void
-BackgroundsView::LoadDefaultFolder()
+BackgroundsView::_LoadDefaultFolder()
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
@@ -475,24 +475,24 @@ BackgroundsView::LoadDefaultFolder()
 		err = get_ref_for_path(pathString.String(), &fCurrentRef);
 		if (err != B_OK)
 			printf("error in LoadDefaultFolderSettings\n");
-		LoadFolder(false);
+		_LoadFolder(false);
 	}
 }
 
 
 void
-BackgroundsView::LoadRecentFolder(BPath path)
+BackgroundsView::_LoadRecentFolder(BPath path)
 {
 	status_t err;
 	err = get_ref_for_path(path.Path(), &fCurrentRef);
 	if (err != B_OK)
 		printf("error in LoadRecentFolder\n");
-	LoadFolder(false);
+	_LoadFolder(false);
 }
 
 
 void
-BackgroundsView::LoadFolder(bool isDesktop)
+BackgroundsView::_LoadFolder(bool isDesktop)
 {
 	if (fCurrent) {
 		delete fCurrent;
@@ -503,12 +503,12 @@ BackgroundsView::LoadFolder(bool isDesktop)
 	if (node.InitCheck() == B_OK)
 		fCurrent = BackgroundImage::GetBackgroundImage(&node, isDesktop, this);
 
-	UpdateWithCurrent();
+	_UpdateWithCurrent();
 }
 
 
 void
-BackgroundsView::UpdateWithCurrent(void)
+BackgroundsView::_UpdateWithCurrent(void)
 {
 	if (fCurrent == NULL)
 		return;
@@ -529,7 +529,7 @@ BackgroundsView::UpdateWithCurrent(void)
 
 	for (int32 i = fImageList.CountItems() - 1; i >= 0; i--) {
 		BMessage* message = new BMessage(kMsgImageSelected);
-		AddItem(new BGImageMenuItem(GetImage(i)->GetName(), i, message));
+		_AddItem(new BGImageMenuItem(GetImage(i)->GetName(), i, message));
 	}
 
 	fImageMenu->SetTargetForItems(this);
@@ -545,7 +545,7 @@ BackgroundsView::UpdateWithCurrent(void)
 			? B_CONTROL_ON : B_CONTROL_OFF);
 		
 		fLastImageIndex = fCurrentInfo->fImageIndex;
-		FindImageItem(fLastImageIndex)->SetMarked(true);
+		_FindImageItem(fLastImageIndex)->SetMarked(true);
 
 		if (fLastImageIndex > -1) {
 
@@ -587,18 +587,18 @@ BackgroundsView::UpdateWithCurrent(void)
 
 	fPicker->SetValue(color);
 
-	UpdatePreview();
-	UpdateButtons();
+	_UpdatePreview();
+	_UpdateButtons();
 }
 
 
 void
-BackgroundsView::Save()
+BackgroundsView::_Save()
 {
 	bool textWidgetLabelOutline
 		= fIconLabelOutline->Value() == B_CONTROL_ON;
 
-	BackgroundImage::Mode mode = FindPlacementMode();
+	BackgroundImage::Mode mode = _FindPlacementMode();
 	BPoint offset(atoi(fXPlacementText->Text()), atoi(fYPlacementText->Text()));
 
 	if (!fCurrent->IsDesktop()) {
@@ -682,7 +682,7 @@ BackgroundsView::Save()
 
 
 void
-BackgroundsView::NotifyServer()
+BackgroundsView::_NotifyServer()
 {
 	BMessenger tracker("application/x-vnd.Be-TRAK");
 
@@ -760,11 +760,11 @@ BackgroundsView::NotifyServer()
 
 
 int32
-BackgroundsView::NotifyThread(void* data)
+BackgroundsView::_NotifyThread(void* data)
 {
 	BackgroundsView* view = (BackgroundsView*)data;
 
-	view->NotifyServer();
+	view->_NotifyServer();
 	return B_OK;
 }
 
@@ -807,7 +807,7 @@ BackgroundsView::SaveSettings(void)
 
 
 void
-BackgroundsView::LoadSettings()
+BackgroundsView::_LoadSettings()
 {
 	fSettings.MakeEmpty();
 
@@ -840,7 +840,7 @@ BackgroundsView::LoadSettings()
 			fWorkspaceMenu->AddSeparatorItem();
 
 		path.SetTo(string.String());
-		int32 i = AddPath(path);
+		int32 i = _AddPath(path);
 		BString s;
 		s << "Folder: " << path.Leaf();
 		BMenuItem* item = new BMenuItem(s.String(),
@@ -857,12 +857,12 @@ BackgroundsView::LoadSettings()
 void
 BackgroundsView::WorkspaceActivated(uint32 oldWorkspaces, bool active)
 {
-	UpdateWithCurrent();
+	_UpdateWithCurrent();
 }
 
 
 void
-BackgroundsView::UpdatePreview()
+BackgroundsView::_UpdatePreview()
 {
 	bool imageEnabled = !(fImageMenu->FindItem(kMsgNoImage)->IsMarked());
 	if (fPlacementMenu->IsEnabled() ^ imageEnabled)
@@ -898,7 +898,7 @@ BackgroundsView::UpdatePreview()
 		if (bitmap) {
 			BackgroundImage::BackgroundImageInfo* info
 				= new BackgroundImage::BackgroundImageInfo(0, index,
-					FindPlacementMode(), BPoint(atoi(fXPlacementText->Text()),
+					_FindPlacementMode(), BPoint(atoi(fXPlacementText->Text()),
 						atoi(fYPlacementText->Text())),
 					fIconLabelOutline->Value() == B_CONTROL_ON, 0, 0);
 			if (info->fMode == BackgroundImage::kAtOffset) {
@@ -920,7 +920,7 @@ BackgroundsView::UpdatePreview()
 
 
 BackgroundImage::Mode
-BackgroundsView::FindPlacementMode()
+BackgroundsView::_FindPlacementMode()
 {
 	BackgroundImage::Mode mode = BackgroundImage::kAtOffset;
 
@@ -938,7 +938,7 @@ BackgroundsView::FindPlacementMode()
 
 
 void
-BackgroundsView::UpdateButtons()
+BackgroundsView::_UpdateButtons()
 {
 	bool hasChanged = false;
 	if (fPicker->IsEnabled()
@@ -948,7 +948,7 @@ BackgroundsView::UpdateButtons()
 		if ((fIconLabelOutline->Value() == B_CONTROL_ON)
 			^ fCurrentInfo->fTextWidgetLabelOutline) {
 			hasChanged = true;
-		} else if (FindPlacementMode() != fCurrentInfo->fMode) {
+		} else if (_FindPlacementMode() != fCurrentInfo->fMode) {
 			hasChanged = true;
 		} else if (fCurrentInfo->fImageIndex
 			!= ((BGImageMenuItem*)fImageMenu->FindMarked())->ImageIndex()) {
@@ -1012,13 +1012,13 @@ BackgroundsView::RefsReceived(BMessage* msg)
 			BGImageMenuItem* item;
 			int32 index = AddImage(path);
 			if (index >= 0) {
-				item = FindImageItem(index);
+				item = _FindImageItem(index);
 				fLastImageIndex = index;
 			} else {
 				const char* name = GetImage(-index - 1)->GetName();
 				item = new BGImageMenuItem(name, -index - 1,
 					new BMessage(kMsgImageSelected));
-				AddItem(item);
+				_AddItem(item);
 				item->SetTarget(this);
 				fLastImageIndex = -index - 1;
 			}
@@ -1039,7 +1039,7 @@ BackgroundsView::RefsReceived(BMessage* msg)
 				break;
 			}
 			BMenuItem* item;
-			int32 index = AddPath(path);
+			int32 index = _AddPath(path);
 			if (index >= 0) {
 				item = fWorkspaceMenu->ItemAt(index + 6);
 				fLastWorkspaceIndex = index + 6;
@@ -1063,7 +1063,7 @@ BackgroundsView::RefsReceived(BMessage* msg)
 
 
 int32
-BackgroundsView::AddPath(BPath path)
+BackgroundsView::_AddPath(BPath path)
 {
 	int32 count = fPathList.CountItems();
 	int32 index = 0;
@@ -1105,7 +1105,7 @@ BackgroundsView::GetImage(int32 imageIndex)
 
 
 BGImageMenuItem*
-BackgroundsView::FindImageItem(const int32 imageIndex)
+BackgroundsView::_FindImageItem(const int32 imageIndex)
 {
 	if (imageIndex < 0)
 		return (BGImageMenuItem*)fImageMenu->ItemAt(0);
@@ -1122,7 +1122,7 @@ BackgroundsView::FindImageItem(const int32 imageIndex)
 
 
 bool
-BackgroundsView::AddItem(BGImageMenuItem* item)
+BackgroundsView::_AddItem(BGImageMenuItem* item)
 {
 	int32 count = fImageMenu->CountItems() - 2;
 	int32 index = 2;
@@ -1142,7 +1142,7 @@ BackgroundsView::AddItem(BGImageMenuItem* item)
 
 
 void
-BackgroundsView::SetDesktop(bool isDesktop)
+BackgroundsView::_SetDesktop(bool isDesktop)
 {
 	fTopLeft->SetDesktop(isDesktop);
 	fTop->SetDesktop(isDesktop);
@@ -1200,9 +1200,9 @@ PreView::MouseDown(BPoint point)
 		if (buttons & B_PRIMARY_MOUSE_BUTTON) {
 			fOldPoint = point;
 			SetTracking(true);
-			BScreen().GetMode(&mode);
-			x_ratio = Bounds().Width() / mode.virtual_width;
-			y_ratio = Bounds().Height() / mode.virtual_height;
+			BScreen().GetMode(&fMode);
+			fXRatio = Bounds().Width() / fMode.virtual_width;
+			fYRatio = Bounds().Height() / fMode.virtual_height;
 			SetMouseEventMask(B_POINTER_EVENTS,
 				B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
 		}
@@ -1228,11 +1228,11 @@ PreView::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 
 	if (IsTracking()) {
 		float x, y;
-		x = fPoint.x + (point.x - fOldPoint.x) / x_ratio;
-		y = fPoint.y + (point.y - fOldPoint.y) / y_ratio;
+		x = fPoint.x + (point.x - fOldPoint.x) / fXRatio;
+		y = fPoint.y + (point.y - fOldPoint.y) / fYRatio;
 		bool min, max, mustSend = false;
 		min = (x > -fImageBounds.Width());
-		max = (x < mode.virtual_width);
+		max = (x < fMode.virtual_width);
 		if (min && max) {
 			fOldPoint.x = point.x;
 			fPoint.x = x;
@@ -1240,18 +1240,18 @@ PreView::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 		} else {
 			if (!min && fPoint.x > -fImageBounds.Width()) {
 				fPoint.x = -fImageBounds.Width();
-				fOldPoint.x = point.x - (x - fPoint.x) * x_ratio;
+				fOldPoint.x = point.x - (x - fPoint.x) * fXRatio;
 				mustSend = true;
 			}
-			if (!max && fPoint.x < mode.virtual_width) {
-				fPoint.x = mode.virtual_width;
-				fOldPoint.x = point.x - (x - fPoint.x) * x_ratio;
+			if (!max && fPoint.x < fMode.virtual_width) {
+				fPoint.x = fMode.virtual_width;
+				fOldPoint.x = point.x - (x - fPoint.x) * fXRatio;
 				mustSend = true;
 			}
 		}
 
 		min = (y > -fImageBounds.Height());
-		max = (y < mode.virtual_height);
+		max = (y < fMode.virtual_height);
 		if (min && max) {
 			fOldPoint.y = point.y;
 			fPoint.y = y;
@@ -1259,12 +1259,12 @@ PreView::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 		} else {
 			if (!min && fPoint.y > -fImageBounds.Height()) {
 				fPoint.y = -fImageBounds.Height();
-				fOldPoint.y = point.y - (y - fPoint.y) * y_ratio;
+				fOldPoint.y = point.y - (y - fPoint.y) * fYRatio;
 				mustSend = true;
 			}
-			if (!max && fPoint.y < mode.virtual_height) {
-				fPoint.y = mode.virtual_height;
-				fOldPoint.y = point.y - (y - fPoint.y) * y_ratio;
+			if (!max && fPoint.y < fMode.virtual_height) {
+				fPoint.y = fMode.virtual_height;
+				fOldPoint.y = point.y - (y - fPoint.y) * fYRatio;
 				mustSend = true;
 			}
 		}

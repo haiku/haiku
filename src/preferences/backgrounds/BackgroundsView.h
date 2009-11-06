@@ -93,9 +93,9 @@ protected:
 			void			AttachedToWindow();
 
 			BPoint			fOldPoint;
-			float			x_ratio;
-			float			y_ratio;
-			display_mode	mode;
+			float			fXRatio;
+			float			fYRatio;
+			display_mode	fMode;
 
 			BCursor			fMoveHandCursor;
 };
@@ -105,6 +105,9 @@ class BackgroundsView : public BBox {
 public:
 							BackgroundsView();
 							~BackgroundsView();
+
+			void			AllAttached();
+			void			MessageReceived(BMessage* msg);
 
 			void			RefsReceived(BMessage* msg);
 
@@ -117,28 +120,26 @@ public:
 			bool			FoundPositionSetting();
 
 protected:
-			void			Save();
-			void			NotifyServer();
-			void			LoadSettings();
-			void			AllAttached();
-			void			MessageReceived(BMessage* msg);
-			void			LoadDesktopFolder();
-			void			LoadDefaultFolder();
-			void			LoadFolder(bool isDesktop);
-			void			LoadRecentFolder(BPath path);
-			void			UpdateWithCurrent();
-			void			UpdatePreview();
-			void			UpdateButtons();
-			void			SetDesktop(bool isDesktop);
-			int32			AddPath(BPath path);
+			void			_Save();
+			void			_NotifyServer();
+			void			_LoadSettings();
+			void			_LoadDesktopFolder();
+			void			_LoadDefaultFolder();
+			void			_LoadFolder(bool isDesktop);
+			void			_LoadRecentFolder(BPath path);
+			void			_UpdateWithCurrent();
+			void			_UpdatePreview();
+			void			_UpdateButtons();
+			void			_SetDesktop(bool isDesktop);
+			int32			_AddPath(BPath path);
 
-	static	int32			NotifyThread(void* data);
+	static	int32			_NotifyThread(void* data);
 
-			BGImageMenuItem*	FindImageItem(const int32 imageIndex);
+			BGImageMenuItem*	_FindImageItem(const int32 imageIndex);
 
-			bool			AddItem(BGImageMenuItem* item);
+			bool			_AddItem(BGImageMenuItem* item);
 
-			BackgroundImage::Mode	FindPlacementMode();
+			BackgroundImage::Mode	_FindPlacementMode();
 
 			BColorControl*	fPicker;
 			BButton*		fApply;
