@@ -461,9 +461,11 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 					return B_BAD_DATA;
 
 				// For some reason gcc 2.95.3 doesn't write the CIE offset, but
-				// always the offset of this entry's CIE pointer field. We fix
-				// it.
-				if (fUsingEHFrameSection && cieID == (uint64)lengthOffset)
+				// always the offset of this entry's CIE pointer field
+				// (probably even relative to the start of the data for the
+				// respective compilation unit). We simply assume the previous
+				// CIE we encountered is the right one.
+				if (fUsingEHFrameSection)
 					cieID = previousCIE;
 
 				TRACE_CFI("  found fde: length: %llu (%lld), CIE offset: %llu, "
