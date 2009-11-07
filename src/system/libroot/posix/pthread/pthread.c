@@ -232,3 +232,13 @@ pthread_setconcurrency(int newLevel)
 	sConcurrencyLevel = newLevel;
 	return 0;
 }
+
+
+// #pragma mark - Haiku thread API bridge
+
+
+thread_id
+get_pthread_thread_id(pthread_t thread)
+{
+	return thread->id;
+}
