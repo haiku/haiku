@@ -590,7 +590,7 @@ fDesktop->LockAllWindows();
 	don't need a valid fCurrentView (ie. view creation).
 */
 void
-ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
+ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 {
 	switch (code) {
 		case AS_SHOW_WINDOW:
@@ -1806,11 +1806,13 @@ fDesktop->LockSingleWindow();
 						resizingMode, options);
 
 					// TODO: if we revert the view color overlay handling
-					//	in View::Draw() to the R5 version, we never
+					//	in View::Draw() to the BeOS version, we never
 					//	need to invalidate the view for overlays.
 
-					// invalidate view - but only if this is a non-overlay switch
-					if (bitmap == NULL || bitmap->Overlay() == NULL || !wasOverlay) {
+					// Invalidate view - but only if this is a non-overlay
+					// switch
+					if (bitmap == NULL || bitmap->Overlay() == NULL
+						|| !wasOverlay) {
 						BRegion dirty((BRect)fCurrentView->Bounds());
 						fWindow->InvalidateView(fCurrentView, dirty);
 					}
@@ -1820,7 +1822,8 @@ fDesktop->LockSingleWindow();
 						colorKey = bitmap->Overlay()->Color();
 					}
 
-					bitmap->ReleaseReference();
+					if (bitmap != NULL)
+						bitmap->ReleaseReference();
 				} else
 					status = B_BAD_VALUE;
 			}
@@ -3359,7 +3362,6 @@ ServerWindow::_MessageLooper()
 #endif
 			}
 
-
 #ifdef PROFILE_MESSAGE_LOOP
 			bigtime_t dispatchStart = system_time();
 #endif
@@ -3394,7 +3396,7 @@ ServerWindow::_MessageLooper()
 
 			// next message
 			status_t status = receiver.GetNextMessage(code);
-			if (status < B_OK) {
+			if (status != B_OK) {
 				// that shouldn't happen, it's our port
 				printf("Someone deleted our message port!\n");
 				if (lockedDesktop)
