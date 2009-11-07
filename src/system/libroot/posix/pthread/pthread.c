@@ -4,6 +4,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "pthread_private.h"
 
 #include <signal.h>
@@ -32,13 +33,13 @@ static int sConcurrencyLevel;
 
 
 static void
-pthread_destroy_thread(void *data)
+pthread_destroy_thread(void* data)
 {
-	pthread_thread *thread = pthread_self();
+	pthread_thread* thread = pthread_self();
 
 	// call cleanup handlers
 	while (true) {
-		struct __pthread_cleanup_handler *handler
+		struct __pthread_cleanup_handler* handler
 			= __pthread_cleanup_pop_handler();
 		if (handler == NULL)
 			break;
@@ -54,9 +55,9 @@ pthread_destroy_thread(void *data)
 
 
 static int32
-pthread_thread_entry(thread_func _unused, void *_thread)
+pthread_thread_entry(thread_func _unused, void* _thread)
 {
-	pthread_thread *thread = (pthread_thread *)_thread;
+	pthread_thread* thread = (pthread_thread*)_thread;
 
 	// store thread data in TLS
 	*tls_address(sPthreadSlot) = thread;
@@ -68,15 +69,15 @@ pthread_thread_entry(thread_func _unused, void *_thread)
 }
 
 
-//	#pragma mark - public API
+// #pragma mark - public API
 
 
 int
-pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
-		void *(*startRoutine)(void*), void *arg)
+pthread_create(pthread_t* _thread, const pthread_attr_t* _attr,
+	void* (*startRoutine)(void*), void* arg)
 {
-	const pthread_attr *attr = NULL;
-	pthread_thread *thread;
+	const pthread_attr* attr = NULL;
+	pthread_thread* thread;
 	struct thread_creation_attributes attributes;
 
 	if (_thread == NULL)
@@ -90,7 +91,7 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 			return EINVAL;
 	}
 
-	thread = (pthread_thread *)malloc(sizeof(pthread_thread));
+	thread = (pthread_thread*)malloc(sizeof(pthread_thread));
 	if (thread == NULL)
 		return EAGAIN;
 
@@ -136,12 +137,12 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 pthread_t
 pthread_self(void)
 {
-	pthread_thread *thread;
+	pthread_thread* thread;
 
 	if (sPthreadSlot == -1)
 		return &sMainThread;
 
-	thread = (pthread_thread *)tls_get(sPthreadSlot);
+	thread = (pthread_thread*)tls_get(sPthreadSlot);
 	if (thread == NULL)
 		return &sMainThread;
 
@@ -157,7 +158,7 @@ pthread_equal(pthread_t t1, pthread_t t2)
 
 
 int
-pthread_join(pthread_t thread, void **_value)
+pthread_join(pthread_t thread, void** _value)
 {
 	status_t dummy;
 	status_t error = wait_for_thread(thread->id, &dummy);
@@ -175,7 +176,7 @@ pthread_join(pthread_t thread, void **_value)
 
 
 void
-pthread_exit(void *value)
+pthread_exit(void* value)
 {
 	pthread_self()->exit_value = value;
 	exit_thread(B_OK);
