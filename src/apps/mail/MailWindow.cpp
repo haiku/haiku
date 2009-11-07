@@ -2194,10 +2194,6 @@ TMailWindow::Send(bool now)
 		return status;
 	}
 
-	Hide();
-		// depending on the system (and I/O) load, this could take a while
-		// but the user shouldn't be left waiting
-
 	if (fHeaderView != NULL)
 		characterSetToUse = fHeaderView->fCharacterSetUserSees;
 
@@ -2245,17 +2241,20 @@ TMailWindow::Send(bool now)
 			// Check for any characters which don't fit in a 7 bit encoding.
 			int i;
 			bool has8Bit = false;
-			for (i = 0; i < tempStringLength; i++)
+			for (i = 0; i < tempStringLength; i++) {
 				if (tempString[i] == 0 || (tempString[i] & 0x80)) {
 					has8Bit = true;
 					break;
 				}
+			}
 			if (!has8Bit)
 				encodingForBody = seven_bit;
 			tempString.UnlockBuffer (tempStringLength);
 
 			// Count up the number of unencoded characters and warn the user about them.
 			if (fApp->WarnAboutUnencodableCharacters()) {
+				// TODO: ideally, the encoding should be silently changed to
+				// one that can express this character
 				int32 offset = 0;
 				int count = 0;
 				while (offset >= 0) {
@@ -2283,17 +2282,23 @@ TMailWindow::Send(bool now)
 							"その場合、代用文字がUnicode化可能な文字に代わって使われます。"
 							"文字セットを変更する場合は「中止」ボタンを押して下さい。"
 						);
-					userAnswer = (new BAlert ("Question", messageString.String(),
+					userAnswer = (new BAlert("Question", messageString.String(),
 						MDR_DIALECT_CHOICE ("Send","送信"),
-						MDR_DIALECT_CHOICE ("Cancel","中止"), // Default is cancel.
-						NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT))
-						->Go();
-					if (userAnswer == 1)
-						return -1; // Cancel was picked.
+						MDR_DIALECT_CHOICE ("Cancel","中止"),
+						NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
+						B_WARNING_ALERT))->Go();
+					if (userAnswer == 1) {
+						// Cancel was picked.
+						return -1;
+					}
 				}
 			}
 		}
 	}
+
+	Hide();
+		// depending on the system (and I/O) load, this could take a while
+		// but the user shouldn't be left waiting
 
 	status_t result;
 
@@ -2394,7 +2399,7 @@ TMailWindow::Send(bool now)
 	char errorMessage[256];
 
 	switch (result) {
-		case B_NO_ERROR:
+		case B_OK:
 			close = true;
 			fSent = true;
 
@@ -2452,6 +2457,10 @@ TMailWindow::Send(bool now)
 	}
 	if (close)
 		PostMessage(B_QUIT_REQUESTED);
+	else {
+		// The window was hidden earlier
+		Show();
+	}
 
 	return result;
 }
