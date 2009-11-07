@@ -1401,7 +1401,7 @@ DwarfFile::_ParseCIE(CompilationUnit* unit, CfaContext& context,
 		return B_UNSUPPORTED;
 	}
 
-	if (augmentation == NULL || *augmentation != '\0') {
+	if (augmentation != NULL && *augmentation != '\0') {
 		if (strcmp(augmentation, "eh") == 0) {
 			// the augmentation consists of the exception table pointer -- just
 			// ignore it
