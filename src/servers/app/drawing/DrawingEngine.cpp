@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2008, Haiku, Inc.
+ * Copyright 2001-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
+
 
 #include "DrawingEngine.h"
 
@@ -22,13 +23,18 @@
 
 #include "drawing_support.h"
 
-#define CRASH_IF_NOT_LOCKED
-//#define CRASH_IF_NOT_LOCKED if (!IsParallelAccessLocked()) debugger("not parallel locked!");
 
-#define CRASH_IF_NOT_EXCLUSIVE_LOCKED
-//#define CRASH_IF_NOT_EXCLUSIVE_LOCKED if (!IsExclusiveAccessLocked()) debugger("not exclusive locked!");
+#if DEBUG
+#	define ASSERT_PARALLEL_LOCKED() \
+	{ if (!IsParallelAccessLocked()) debugger("not parallel locked!"); }
+#	define ASSERT_EXCLUSIVE_LOCKED() \
+	{ if (!IsExclusiveAccessLocked()) debugger("not exclusive locked!"); }
+#else
+#	define ASSERT_PARALLEL_LOCKED()
+#	define ASSERT_EXCLUSIVE_LOCKED()
+#endif
 
-// make_rect_valid
+
 static inline void
 make_rect_valid(BRect& rect)
 {
@@ -44,7 +50,7 @@ make_rect_valid(BRect& rect)
 	}
 }
 
-// extend_by_stroke_width
+
 static inline void
 extend_by_stroke_width(BRect& rect, float penSize)
 {
@@ -57,14 +63,16 @@ extend_by_stroke_width(BRect& rect, float penSize)
 class AutoFloatingOverlaysHider {
 	public:
 		AutoFloatingOverlaysHider(HWInterface* interface, const BRect& area)
-			: fInterface(interface)
-			, fHidden(interface->HideFloatingOverlays(area))
+			:
+			fInterface(interface),
+			fHidden(interface->HideFloatingOverlays(area))
 		{
 		}
 
 		AutoFloatingOverlaysHider(HWInterface* interface)
-			: fInterface(interface)
-			, fHidden(fInterface->HideFloatingOverlays())
+			:
+			fInterface(interface),
+			fHidden(fInterface->HideFloatingOverlays())
 		{
 		}
 
@@ -90,11 +98,12 @@ class AutoFloatingOverlaysHider {
 
 
 DrawingEngine::DrawingEngine(HWInterface* interface)
-	: fPainter(new Painter()),
-	  fGraphicsCard(NULL),
-	  fAvailableHWAccleration(0),
-	  fSuspendSyncLevel(0),
-	  fCopyToFront(true)
+	:
+	fPainter(new Painter()),
+	fGraphicsCard(NULL),
+	fAvailableHWAccleration(0),
+	fSuspendSyncLevel(0),
+	fCopyToFront(true)
 {
 	SetHWInterface(interface);
 }
@@ -144,7 +153,9 @@ DrawingEngine::UnlockExclusiveAccess()
 	fGraphicsCard->UnlockExclusiveAccess();
 }
 
+
 // #pragma mark -
+
 
 void
 DrawingEngine::FrameBufferChanged()
@@ -200,18 +211,20 @@ DrawingEngine::CopyToFront(/*const*/ BRegion& region)
 
 // #pragma mark -
 
+
 //! the DrawingEngine needs to be locked!
 void
 DrawingEngine::ConstrainClippingRegion(const BRegion* region)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	fPainter->ConstrainClipping(region);
 }
 
 
 void
-DrawingEngine::SetDrawState(const DrawState* state, int32 xOffset, int32 yOffset)
+DrawingEngine::SetDrawState(const DrawState* state, int32 xOffset,
+	int32 yOffset)
 {
 	fPainter->SetDrawState(state, xOffset, yOffset);
 }
@@ -240,7 +253,7 @@ DrawingEngine::SetPenSize(float size)
 
 void
 DrawingEngine::SetStrokeMode(cap_mode lineCap, join_mode joinMode,
-								float miterLimit)
+	float miterLimit)
 {
 	fPainter->SetStrokeMode(lineCap, joinMode, miterLimit);
 }
@@ -295,7 +308,7 @@ DrawingEngine::SetFont(const DrawState* state)
 void
 DrawingEngine::SuspendAutoSync()
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	fSuspendSyncLevel++;
 }
@@ -304,14 +317,16 @@ DrawingEngine::SuspendAutoSync()
 void
 DrawingEngine::Sync()
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	fSuspendSyncLevel--;
 	if (fSuspendSyncLevel == 0)
 		fGraphicsCard->Sync();
 }
 
+
 // #pragma mark -
+
 
 // CopyRegion() does a topological sort of the rects in the
 // region. The algorithm was suggested by Ingo Weinhold.
@@ -368,42 +383,46 @@ DrawingEngine::Sync()
 // and don't share the actual edge either (as is the case in BRegions).
 
 struct node {
-			node()
-			{
-				pointers = NULL;
-			}
-			node(const BRect& r, int32 maxPointers)
-			{
-				init(r, maxPointers);
-			}
-			~node()
-			{
-				delete [] pointers;
-			}
+	node()
+	{
+		pointers = NULL;
+	}
 
-	void	init(const BRect& r, int32 maxPointers)
-			{
-				rect = r;
-				pointers = new node*[maxPointers];
-				in_degree = 0;
-				next_pointer = 0;
-			}
+	node(const BRect& r, int32 maxPointers)
+	{
+		init(r, maxPointers);
+	}
 
-	void	push(node* node)
-			{
-				pointers[next_pointer] = node;
-				next_pointer++;
-			}
-	node*	top()
-			{
-				return pointers[next_pointer];
-			}
-	node*	pop()
-			{
-				node* ret = top();
-				next_pointer--;
-				return ret;
-			}
+	~node()
+	{
+		delete [] pointers;
+	}
+
+	void init(const BRect& r, int32 maxPointers)
+	{
+		rect = r;
+		pointers = new node*[maxPointers];
+		in_degree = 0;
+		next_pointer = 0;
+	}
+
+	void push(node* node)
+	{
+		pointers[next_pointer] = node;
+		next_pointer++;
+	}
+
+	node* top()
+	{
+		return pointers[next_pointer];
+	}
+
+	node* pop()
+	{
+		node* ret = top();
+		next_pointer--;
+		return ret;
+	}
 
 	BRect	rect;
 	int32	in_degree;
@@ -411,23 +430,26 @@ struct node {
 	int32	next_pointer;
 };
 
+
 static bool
 is_left_of(const BRect& a, const BRect& b)
 {
 	return (a.right < b.left);
 }
+
+
 static bool
 is_above(const BRect& a, const BRect& b)
 {
 	return (a.bottom < b.top);
 }
 
-// CopyRegion
+
 void
-DrawingEngine::CopyRegion(/*const*/ BRegion* region,
-						  int32 xOffset, int32 yOffset)
+DrawingEngine::CopyRegion(/*const*/ BRegion* region, int32 xOffset,
+	int32 yOffset)
 {
-	CRASH_IF_NOT_EXCLUSIVE_LOCKED
+	ASSERT_EXCLUSIVE_LOCKED();
 
 	BRect frame = region->Frame();
 	frame = frame | frame.OffsetByCopy(xOffset, yOffset);
@@ -542,11 +564,11 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 	delete[] sortedRectList;
 }
 
-// InvertRect
+
 void
 DrawingEngine::InvertRect(BRect r)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
 	r = fPainter->ClipRect(r);
@@ -567,12 +589,12 @@ DrawingEngine::InvertRect(BRect r)
 	_CopyToFront(r);
 }
 
-// DrawBitmap
+
 void
 DrawingEngine::DrawBitmap(ServerBitmap* bitmap, const BRect& bitmapRect,
 	const BRect& viewRect, uint32 options)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	BRect clipped = fPainter->ClipRect(viewRect);
 	if (clipped.IsValid()) {
@@ -584,12 +606,12 @@ DrawingEngine::DrawBitmap(ServerBitmap* bitmap, const BRect& bitmapRect,
 	}
 }
 
-// DrawArc
+
 void
 DrawingEngine::DrawArc(BRect r, const float& angle, const float& span,
 	bool filled)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
 	fPainter->AlignEllipseRect(&r, filled);
@@ -617,11 +639,12 @@ DrawingEngine::DrawArc(BRect r, const float& angle, const float& span,
 	}
 }
 
+
 void
 DrawingEngine::FillArc(BRect r, const float& angle, const float& span,
 	const BGradient& gradient)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
 	fPainter->AlignEllipseRect(&r, true);
@@ -647,7 +670,7 @@ DrawingEngine::FillArc(BRect r, const float& angle, const float& span,
 void
 DrawingEngine::DrawBezier(BPoint* pts, bool filled)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	// TODO: figure out bounds and hide cursor depending on that
 	AutoFloatingOverlaysHider _(fGraphicsCard);
@@ -661,7 +684,7 @@ DrawingEngine::DrawBezier(BPoint* pts, bool filled)
 void
 DrawingEngine::FillBezier(BPoint* pts, const BGradient& gradient)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	// TODO: figure out bounds and hide cursor depending on that
 	AutoFloatingOverlaysHider _(fGraphicsCard);
@@ -675,7 +698,7 @@ DrawingEngine::FillBezier(BPoint* pts, const BGradient& gradient)
 void
 DrawingEngine::DrawEllipse(BRect r, bool filled)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
 	BRect clipped = r;
@@ -704,7 +727,7 @@ DrawingEngine::DrawEllipse(BRect r, bool filled)
 void
 DrawingEngine::FillEllipse(BRect r, const BGradient& gradient)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
 	BRect clipped = r;
@@ -731,7 +754,7 @@ void
 DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
 	bool filled, bool closed)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(bounds);
 	if (!filled)
@@ -751,7 +774,7 @@ void
 DrawingEngine::FillPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
 	const BGradient& gradient, bool closed)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(bounds);
 	bounds = fPainter->ClipRect(bounds);
@@ -774,15 +797,15 @@ DrawingEngine::StrokePoint(const BPoint& pt, const rgb_color& color)
 	StrokeLine(pt, pt, color);
 }
 
-// StrokeLine
-//
-// * this function is only used by Decorators
-// * it assumes a one pixel wide line
+
+/*!	This function is only used by Decorators,
+	it assumes a one pixel wide line
+*/
 void
 DrawingEngine::StrokeLine(const BPoint& start, const BPoint& end,
 	const rgb_color& color)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	BRect touched(start, end);
 	make_rect_valid(touched);
@@ -804,11 +827,12 @@ DrawingEngine::StrokeLine(const BPoint& start, const BPoint& end,
 	_CopyToFront(touched);
 }
 
-// this function is used to draw a one pixel wide rect
+
+//!	This function is used to draw a one pixel wide rect
 void
-DrawingEngine::StrokeRect(BRect r, const rgb_color &color)
+DrawingEngine::StrokeRect(BRect r, const rgb_color& color)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
 	BRect clipped = fPainter->ClipRect(r);
@@ -825,7 +849,7 @@ DrawingEngine::StrokeRect(BRect r, const rgb_color &color)
 void
 DrawingEngine::FillRect(BRect r, const rgb_color& color)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
@@ -854,7 +878,7 @@ DrawingEngine::FillRect(BRect r, const rgb_color& color)
 void
 DrawingEngine::FillRegion(BRegion& r, const rgb_color& color)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	// NOTE: region expected to be already clipped correctly!!
 	BRect frame = r.Frame();
@@ -889,12 +913,14 @@ DrawingEngine::FillRegion(BRegion& r, const rgb_color& color)
 	_CopyToFront(frame);
 }
 
+
 // #pragma mark - DrawState
+
 
 void
 DrawingEngine::StrokeRect(BRect r)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	// support invalid rects
 	make_rect_valid(r);
@@ -914,7 +940,7 @@ DrawingEngine::StrokeRect(BRect r)
 void
 DrawingEngine::FillRect(BRect r)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
 	r = fPainter->AlignAndClipRect(r);
@@ -934,24 +960,22 @@ DrawingEngine::FillRect(BRect r)
 				BRegion region(r);
 				region.IntersectWith(fPainter->ClippingRegion());
 				fGraphicsCard->FillRegion(region, fPainter->HighColor(),
-										  fSuspendSyncLevel == 0
-										  || overlaysHider.WasHidden());
+					fSuspendSyncLevel == 0 || overlaysHider.WasHidden());
 				doInSoftware = false;
 			} else if (fPainter->Pattern() == B_SOLID_LOW
 					&& fPainter->DrawingMode() == B_OP_COPY) {
 				BRegion region(r);
 				region.IntersectWith(fPainter->ClippingRegion());
 				fGraphicsCard->FillRegion(region, fPainter->LowColor(),
-										  fSuspendSyncLevel == 0
-										  || overlaysHider.WasHidden());
+					fSuspendSyncLevel == 0 || overlaysHider.WasHidden());
 				doInSoftware = false;
 			}
 		}
 	}
 
-	if (doInSoftware && fAvailableHWAccleration & HW_ACC_INVERT_REGION
-			&& fPainter->Pattern() == B_SOLID_HIGH
-			&& fPainter->DrawingMode() == B_OP_INVERT) {
+	if (doInSoftware && (fAvailableHWAccleration & HW_ACC_INVERT_REGION) != 0
+		&& fPainter->Pattern() == B_SOLID_HIGH
+		&& fPainter->DrawingMode() == B_OP_INVERT) {
 		BRegion region(r);
 		region.IntersectWith(fPainter->ClippingRegion());
 		fGraphicsCard->InvertRegion(region);
@@ -968,7 +992,7 @@ DrawingEngine::FillRect(BRect r)
 void
 DrawingEngine::FillRect(BRect r, const BGradient& gradient)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
 	r = fPainter->AlignAndClipRect(r);
@@ -986,7 +1010,7 @@ DrawingEngine::FillRect(BRect r, const BGradient& gradient)
 void
 DrawingEngine::FillRegion(BRegion& r)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	BRect clipped = fPainter->ClipRect(r.Frame());
 	if (!clipped.IsValid())
@@ -1002,29 +1026,26 @@ DrawingEngine::FillRegion(BRegion& r)
 				|| fPainter->DrawingMode() == B_OP_OVER)) {
 			r.IntersectWith(fPainter->ClippingRegion());
 			fGraphicsCard->FillRegion(r, fPainter->HighColor(),
-									  fSuspendSyncLevel == 0
-									  || overlaysHider.WasHidden());
+				fSuspendSyncLevel == 0 || overlaysHider.WasHidden());
 			doInSoftware = false;
 		} else if (fPainter->Pattern() == B_SOLID_LOW
-				&& fPainter->DrawingMode() == B_OP_COPY) {
+			&& fPainter->DrawingMode() == B_OP_COPY) {
 			r.IntersectWith(fPainter->ClippingRegion());
 			fGraphicsCard->FillRegion(r, fPainter->LowColor(),
-									  fSuspendSyncLevel == 0
-									  || overlaysHider.WasHidden());
+				fSuspendSyncLevel == 0 || overlaysHider.WasHidden());
 			doInSoftware = false;
 		}
 	}
 
-	if (doInSoftware && fAvailableHWAccleration & HW_ACC_INVERT_REGION
-			&& fPainter->Pattern() == B_SOLID_HIGH
-			&& fPainter->DrawingMode() == B_OP_INVERT) {
+	if (doInSoftware && (fAvailableHWAccleration & HW_ACC_INVERT_REGION) != 0
+		&& fPainter->Pattern() == B_SOLID_HIGH
+		&& fPainter->DrawingMode() == B_OP_INVERT) {
 		r.IntersectWith(fPainter->ClippingRegion());
 		fGraphicsCard->InvertRegion(r);
 		doInSoftware = false;
 	}
 
 	if (doInSoftware) {
-
 		BRect touched = fPainter->FillRect(r.RectAt(0));
 
 		int32 count = r.CountRects();
@@ -1039,7 +1060,7 @@ DrawingEngine::FillRegion(BRegion& r)
 void
 DrawingEngine::FillRegion(BRegion& r, const BGradient& gradient)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	BRect clipped = fPainter->ClipRect(r.Frame());
 	if (!clipped.IsValid())
@@ -1060,7 +1081,7 @@ DrawingEngine::FillRegion(BRegion& r, const BGradient& gradient)
 void
 DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad, bool filled)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	// NOTE: the stroke does not extend past "r" in R5,
 	// though I consider this unexpected behaviour.
@@ -1076,7 +1097,7 @@ DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad, bool filled)
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
 		BRect touched = filled ? fPainter->FillRoundRect(r, xrad, yrad)
-							   : fPainter->StrokeRoundRect(r, xrad, yrad);
+			: fPainter->StrokeRoundRect(r, xrad, yrad);
 
 		_CopyToFront(touched);
 	}
@@ -1087,7 +1108,7 @@ void
 DrawingEngine::FillRoundRect(BRect r, float xrad, float yrad,
 	const BGradient& gradient)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	// NOTE: the stroke does not extend past "r" in R5,
 	// though I consider this unexpected behaviour.
@@ -1113,15 +1134,14 @@ void
 DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 	const uint32* opList, int32 ptCount, const BPoint* ptList, bool filled)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	// NOTE: hides cursor regardless of if and where
 	// shape is drawn on screen, TODO: optimize
 	AutoFloatingOverlaysHider _(fGraphicsCard);
 
-	BRect touched = fPainter->DrawShape(opCount, opList,
-										ptCount, ptList,
-										filled);
+	BRect touched = fPainter->DrawShape(opCount, opList, ptCount, ptList,
+		filled);
 
 	_CopyToFront(touched);
 }
@@ -1132,14 +1152,14 @@ DrawingEngine::FillShape(const BRect& bounds, int32 opCount,
 	const uint32* opList, int32 ptCount, const BPoint* ptList,
 	const BGradient& gradient)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	// NOTE: hides cursor regardless of if and where
 	// shape is drawn on screen, TODO: optimize
 	AutoFloatingOverlaysHider _(fGraphicsCard);
 
-	BRect touched = fPainter->FillShape(opCount, opList, ptCount,
-												ptList, gradient);
+	BRect touched = fPainter->FillShape(opCount, opList, ptCount, ptList,
+		gradient);
 
 	_CopyToFront(touched);
 }
@@ -1148,7 +1168,7 @@ DrawingEngine::FillShape(const BRect& bounds, int32 opCount,
 void
 DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds, bool filled)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	BRect clipped(bounds);
 	if (!filled)
@@ -1166,11 +1186,12 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds, bool filled)
 	}
 }
 
+
 void
 DrawingEngine::FillTriangle(BPoint* pts, const BRect& bounds,
 	const BGradient& gradient)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	BRect clipped(bounds);
 	clipped = fPainter->ClipRect(clipped);
@@ -1183,11 +1204,11 @@ DrawingEngine::FillTriangle(BPoint* pts, const BRect& bounds,
 	}
 }
 
-// StrokeLine
+
 void
-DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end)
+DrawingEngine::StrokeLine(const BPoint& start, const BPoint& end)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	BRect touched(start, end);
 	make_rect_valid(touched);
@@ -1202,29 +1223,29 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end)
 	}
 }
 
-// StrokeLineArray
+
 void
 DrawingEngine::StrokeLineArray(int32 numLines,
 	const ViewLineArrayInfo *lineData)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	if (!lineData || numLines <= 0)
 		return;
 
 	// figure out bounding box for line array
-	const ViewLineArrayInfo* data = (const ViewLineArrayInfo*)&(lineData[0]);
+	const ViewLineArrayInfo* data = (const ViewLineArrayInfo*)&lineData[0];
 	BRect touched(min_c(data->startPoint.x, data->endPoint.x),
-				  min_c(data->startPoint.y, data->endPoint.y),
-				  max_c(data->startPoint.x, data->endPoint.x),
-				  max_c(data->startPoint.y, data->endPoint.y));
+		min_c(data->startPoint.y, data->endPoint.y),
+		max_c(data->startPoint.x, data->endPoint.x),
+		max_c(data->startPoint.y, data->endPoint.y));
 
 	for (int32 i = 1; i < numLines; i++) {
-		data = (const ViewLineArrayInfo*)&(lineData[i]);
+		data = (const ViewLineArrayInfo*)&lineData[i];
 		BRect box(min_c(data->startPoint.x, data->endPoint.x),
-				  min_c(data->startPoint.y, data->endPoint.y),
-				  max_c(data->startPoint.x, data->endPoint.x),
-				  max_c(data->startPoint.y, data->endPoint.y));
+			min_c(data->startPoint.y, data->endPoint.y),
+			max_c(data->startPoint.x, data->endPoint.x),
+			max_c(data->startPoint.y, data->endPoint.y));
 		touched = touched | box;
 	}
 	extend_by_stroke_width(touched, fPainter->PenSize());
@@ -1257,13 +1278,15 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 	}
 }
 
+
 // #pragma mark -
+
 
 BPoint
 DrawingEngine::DrawString(const char* string, int32 length,
-						  const BPoint& pt, escapement_delta* delta)
+	const BPoint& pt, escapement_delta* delta)
 {
-	CRASH_IF_NOT_LOCKED
+	ASSERT_PARALLEL_LOCKED();
 
 	BPoint penLocation = pt;
 
@@ -1310,15 +1333,15 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	return penLocation;
 }
 
-// StringWidth
+
 float
 DrawingEngine::StringWidth(const char* string, int32 length,
-						   escapement_delta* delta)
+	escapement_delta* delta)
 {
 	return fPainter->StringWidth(string, length, delta);
 }
 
-// StringWidth
+
 float
 DrawingEngine::StringWidth(const char* string, int32 length,
 	const ServerFont& font, escapement_delta* delta)
@@ -1326,22 +1349,24 @@ DrawingEngine::StringWidth(const char* string, int32 length,
 	return font.StringWidth(string, length, delta);
 }
 
+
 // #pragma mark -
 
-// DumpToBitmap
+
 ServerBitmap*
 DrawingEngine::DumpToBitmap()
 {
 	return NULL;
 }
 
-status_t
-DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
-{
-	CRASH_IF_NOT_EXCLUSIVE_LOCKED
 
-	RenderingBuffer *buffer = fGraphicsCard->FrontBuffer();
-	if (!buffer)
+status_t
+DrawingEngine::ReadBitmap(ServerBitmap* bitmap, bool drawCursor, BRect bounds)
+{
+	ASSERT_EXCLUSIVE_LOCKED();
+
+	RenderingBuffer* buffer = fGraphicsCard->FrontBuffer();
+	if (buffer == NULL)
 		return B_ERROR;
 
 	BRect clip(0, 0, buffer->Width() - 1, buffer->Height() - 1);
@@ -1372,8 +1397,8 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 			cursorPosition,	BPoint(0, 0),
 			cursorWidth, cursorHeight);
 
-		uint8 *bits = (uint8 *)cursorArea.Bits();
-		uint8 *cursorBits = (uint8 *)cursor->Bits();
+		uint8* bits = (uint8*)cursorArea.Bits();
+		uint8* cursorBits = (uint8*)cursor->Bits();
 		for (int32 i = 0; i < cursorHeight; i++) {
 			for (int32 j = 0; j < cursorWidth; j++) {
 				uint8 alpha = 255 - cursorBits[3];
@@ -1394,7 +1419,9 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 	return result;
 }
 
+
 // #pragma mark -
+
 
 BRect
 DrawingEngine::CopyRect(BRect src, int32 xOffset, int32 yOffset) const
@@ -1505,5 +1532,3 @@ DrawingEngine::_CopyToFront(const BRect& frame)
 	if (fCopyToFront)
 		fGraphicsCard->Invalidate(frame);
 }
-
-
