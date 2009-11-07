@@ -229,7 +229,6 @@ extern int pthread_attr_getscope(const pthread_attr_t *attr,
 	int *contentionScope);
 extern int pthread_attr_setscope(pthread_attr_t *attr, int contentionScope);
 
-/* mandatory! */
 extern int pthread_attr_getschedparam(const pthread_attr_t *attr,
 	struct sched_param *param);
 extern int pthread_attr_setschedparam(pthread_attr_t *attr,
