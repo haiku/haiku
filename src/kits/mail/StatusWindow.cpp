@@ -1,9 +1,10 @@
 /*
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
- * Copyright 2004-2007, Haiku Inc. All rights reserved.
+ * Copyright 2004-2009, Haiku Inc. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
+
 
 //! The status window while fetching/sending mails
 
@@ -35,10 +36,11 @@
 static BLocker sLock;
 
 
-BMailStatusWindow::BMailStatusWindow(BRect rect, const char *name, uint32 showMode)
+BMailStatusWindow::BMailStatusWindow(BRect rect, const char *name,
+		uint32 showMode)
 	: BWindow(rect, name, B_MODAL_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-          B_NOT_CLOSABLE | B_NO_WORKSPACE_ACTIVATION | B_NOT_V_RESIZABLE
-          | B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE),
+		B_NOT_CLOSABLE | B_NO_WORKSPACE_ACTIVATION | B_NOT_V_RESIZABLE
+			| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AVOID_FRONT),
 	fShowMode(showMode),
 	fWindowMoved(0L)
 {
@@ -464,7 +466,7 @@ void
 BMailStatusView::AddProgress(int32 how_much)
 {
 	AddSelfToWindow();
-	
+
 	if (LockLooper()) {
 		if (status->CurrentValue() == 0)
 			strcpy(pre_text,status->TrailingText());
@@ -566,7 +568,7 @@ BMailStatusView::AddSelfToWindow()
 {
 	if (Window() != NULL)
 		return;
-	
+
 	window->ActuallyAddStatusView(this);
 }
 
