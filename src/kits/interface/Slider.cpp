@@ -27,7 +27,7 @@
 #include <binary_compatibility/Interface.h>
 
 
-#define USE_OFF_SCREEN_VIEW 1 
+#define USE_OFF_SCREEN_VIEW 1
 
 
 BSlider::BSlider(BRect frame, const char* name, const char* label,
@@ -89,7 +89,7 @@ BSlider::BSlider(BRect frame, const char *name, const char *label,
 }
 
 
-BSlider::BSlider(const char *name, const char *label, BMessage *message, 
+BSlider::BSlider(const char *name, const char *label, BMessage *message,
 			int32 minValue, int32 maxValue, orientation posture,
 			thumb_style thumbType, uint32 flags)
 	: BControl(name, label, message, flags),
@@ -127,7 +127,7 @@ BSlider::BSlider(BMessage *archive)
 		BMessage* message = new BMessage;
 
 		archive->FindMessage("_mod_msg", message);
-		
+
 		SetModificationMessage(message);
 	}
 
@@ -284,7 +284,7 @@ BSlider::Archive(BMessage *archive, bool deep) const
 		ret = archive->AddInt32("_hashcount", fHashMarkCount);
 	if (ret == B_OK)
 		ret = archive->AddInt16("_hashloc", fHashMarks);
-	if (ret == B_OK)	
+	if (ret == B_OK)
 		ret = archive->AddInt16("_sstyle", fStyle);
 	if (ret == B_OK)
 		ret = archive->AddInt32("_orient", fOrientation);
@@ -460,7 +460,7 @@ BSlider::FrameResized(float w,float h)
 		delete fOffScreenBits;
 
 		fOffScreenView->ResizeTo(bounds.Width(), bounds.Height());
-	
+
 		fOffScreenBits = new BBitmap(Bounds(), B_RGBA32, true, false);
 		fOffScreenBits->AddChild(fOffScreenView);
 	}
@@ -855,7 +855,7 @@ BSlider::DrawSlider()
 #if USE_OFF_SCREEN_VIEW
 			fOffScreenView->Sync();
 			fOffScreenBits->Unlock();
-	
+
 			DrawBitmap(fOffScreenBits, B_ORIGIN);
 		}
 #endif
@@ -1646,7 +1646,7 @@ BSlider::SetLimits(int32 minimum, int32 maximum)
 	if (minimum <= maximum) {
 		fMinValue = minimum;
 		fMaxValue = maximum;
-	
+
 		int32 value = Value();
 		value = max_c(minimum, value);
 		value = min_c(maximum, value);
@@ -1699,7 +1699,7 @@ BSize
 BSlider::MaxSize()
 {
 	BSize maxSize = _ValidateMinSize();
-	if (fOrientation == B_HORIZONTAL)	
+	if (fOrientation == B_HORIZONTAL)
 		maxSize.width = B_SIZE_UNLIMITED;
 	else
 		maxSize.height = B_SIZE_UNLIMITED;
@@ -1711,7 +1711,7 @@ BSize
 BSlider::PreferredSize()
 {
 	BSize preferredSize = _ValidateMinSize();
-	if (fOrientation == B_HORIZONTAL)	
+	if (fOrientation == B_HORIZONTAL)
 		preferredSize.width = max_c(100.0, preferredSize.width);
 	else
 		preferredSize.height = max_c(100.0, preferredSize.height);
@@ -2053,7 +2053,7 @@ BSlider::_ValidateMinSize()
 
 		height += rows * (ceilf(fontHeight.ascent)
 			+ ceilf(fontHeight.descent) + 4.0);
-	} else { 
+	} else {
 		// B_VERTICAL
 		width = 12.0 + fBarThickness;
 		height = 32.0;
