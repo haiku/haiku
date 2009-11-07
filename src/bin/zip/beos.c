@@ -13,6 +13,8 @@
 
 */
 
+#include <OS.h>
+
 #include "zip.h"
 
 #ifndef UTIL    /* the companion #endif is a bit of ways down ... */
