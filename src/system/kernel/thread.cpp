@@ -313,9 +313,10 @@ err2:
 err1:
 	// ToDo: put them in the dead queue instead?
 	if (inthread == NULL) {
-		free(thread);
 		scheduler_on_thread_destroy(thread);
+		free(thread);
 	}
+
 	return NULL;
 }
 
