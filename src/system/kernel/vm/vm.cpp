@@ -5580,9 +5580,9 @@ user_memcpy(void* to, const void* from, size_t size)
 ssize_t
 user_strlcpy(char* to, const char* from, size_t size)
 {
-	if (size == 0)
-		return 0;
-	if (from == NULL || to == NULL)
+	if (to == NULL && size != 0)
+		return B_BAD_VALUE;
+	if (from == NULL)
 		return B_BAD_ADDRESS;
 
 	// limit size to avoid address overflows
