@@ -64,7 +64,7 @@ BackgroundsApplication::MessageReceived(BMessage* message)
 		case B_SILENT_RELAUNCH:
 			fWindow->Activate();
 			break;
-		default;
+		default:
 			BApplication::MessageReceived(message);
 			break;
 	}
