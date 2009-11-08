@@ -102,20 +102,22 @@ ExpanderRules::~ExpanderRules()
 status_t
 ExpanderRules::Open(BFile *file)
 {
-	BPath path;
-	if (find_directory(B_USER_CONFIG_DIRECTORY, &path) != B_OK)
-		return B_ERROR;
+	directory_which which[] = {
+		B_USER_DATA_DIRECTORY,
+		B_COMMON_DATA_DIRECTORY
+	};
 
-	path.Append("etc/expander.rules");
-	if (file->SetTo(path.Path(), B_READ_ONLY) == B_OK)
-		return B_OK;
+	for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
+		BPath path;
+		if (find_directory(which[i], &path) != B_OK)
+			continue;
 
-	if (find_directory(B_COMMON_ETC_DIRECTORY, &path) != B_OK)
-		return B_ERROR;
+		path.Append("expander.rules");
+		if (file->SetTo(path.Path(), B_READ_ONLY) == B_OK)
+			return B_OK;
+	}
 
-	path.Append("expander.rules");
-
-	return file->SetTo(path.Path(), B_READ_ONLY);
+	return B_ENTRY_NOT_FOUND;
 }
 
 
