@@ -35,6 +35,7 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_ROWS,				"25" },
 
 	{ PREF_HALF_FONT_FAMILY,	"Courier10 BT" },
+	{ PREF_HALF_FONT_STYLE,		"Regular" },
 	{ PREF_HALF_FONT_SIZE,		"12" },
 
 	{ PREF_TEXT_FORE_COLOR,		"  0,   0,   0" },

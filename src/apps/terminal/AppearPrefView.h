@@ -29,7 +29,8 @@ class AppearancePrefView : public PrefView {
 		virtual void	GetPreferredSize(float *_width, float *_height);
 
 	private:
-		BMenu*			_MakeFontMenu(uint32 command, const char *defaultFont);
+		BMenu*			_MakeFontMenu(uint32 command, const char *defaultFamily,
+						const char *defaultStyle);
 		BMenu*			_MakeSizeMenu(uint32 command, uint8 defaultSize);
 
 		BMenuField		*fFont;

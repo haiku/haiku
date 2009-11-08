@@ -61,7 +61,8 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 	BRect r(5, 5, 261, 25);
 
 	BMenu *menu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,
-		PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY));
+		PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY),
+		PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE));
 	fFont = new BMenuField(r, "font", "Font:", menu);
 	fFont->SetDivider(colorDividerSize);
 	fFont->SetAlignment(B_ALIGN_RIGHT);
@@ -227,7 +228,8 @@ IsFontUsable(const BFont &font)
 
 
 BMenu *
-AppearancePrefView::_MakeFontMenu(uint32 command, const char *defaultFontName)
+AppearancePrefView::_MakeFontMenu(uint32 command,
+	const char *defaultFamily, const char *defaultStyle)
 {
 	BPopUpMenu *menu = new BPopUpMenu("");
 	int32 numFamilies = count_font_families();
@@ -252,7 +254,8 @@ AppearancePrefView::_MakeFontMenu(uint32 command, const char *defaultFontName)
 						BMenuItem *item = new BMenuItem(itemLabel,
 							message);
 						menu->AddItem(item);
-						if (!strcmp(defaultFontName, family))
+						if (!strcmp(defaultFamily, family)
+							&& !strcmp(defaultStyle, style))
 							item->SetMarked(true);
 					}
 				}
