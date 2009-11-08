@@ -338,14 +338,18 @@ TermWindow::_SetupMenu()
 void
 TermWindow::_GetPreferredFont(BFont &font)
 {
+	// Default to be_fixed_font
+	font = be_fixed_font;
+	
 	const char *family = PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
-
-	font.SetFamilyAndStyle(family, NULL);
+	const char *style = PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE);
+	
+	font.SetFamilyAndStyle(family, style);
+			
 	float size = PrefHandler::Default()->getFloat(PREF_HALF_FONT_SIZE);
 	if (size < 6.0f)
 		size = 6.0f;
 	font.SetSize(size);
-	font.SetSpacing(B_FIXED_SPACING);
 }
 
 
@@ -614,7 +618,6 @@ TermWindow::MessageReceived(BMessage *message)
 		case kIncreaseFontSize:
 		case kDecreaseFontSize:
 		{
-			message->PrintToStream();
 			TermView *view = _ActiveTermView();
 			BFont font;
 			view->GetTermFont(&font);
