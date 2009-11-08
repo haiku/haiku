@@ -20,26 +20,28 @@ static const char* kSignature = "application/x-vnd.Haiku-Backgrounds";
 
 
 class BackgroundsWindow : public BWindow {
-	public:
-		BackgroundsWindow();
+public:
+							BackgroundsWindow();
 
-				void RefsReceived(BMessage* message);
+			void			RefsReceived(BMessage* message);
 
-	protected:
-		virtual	bool QuitRequested();
-		virtual void WorkspaceActivated(int32 oldWorkspaces, bool active);
+protected:
+	virtual	bool			QuitRequested();
+	virtual	void			WorkspaceActivated(int32 oldWorkspaces,
+								bool active);
 
-		BackgroundsView* fBackgroundsView;
+			BackgroundsView*	fBackgroundsView;
 };
 
 
 class BackgroundsApplication : public BApplication {
-	public:
-		BackgroundsApplication();
-		virtual void RefsReceived(BMessage* message);
+public:
+							BackgroundsApplication();
+	virtual	void			MessageReceived(BMessage* message);
+	virtual	void			RefsReceived(BMessage* message);
 
-	private:
-		BackgroundsWindow* fWindow;
+private:
+			BackgroundsWindow*	fWindow;
 };
 
 
@@ -52,6 +54,20 @@ BackgroundsApplication::BackgroundsApplication()
 	fWindow(new BackgroundsWindow())
 {
 	fWindow->Show();
+}
+
+
+void
+BackgroundsApplication::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case B_SILENT_RELAUNCH:
+			fWindow->Activate();
+			break;
+		default;
+			BApplication::MessageReceived(message);
+			break;
+	}
 }
 
 
@@ -88,6 +104,7 @@ void
 BackgroundsWindow::RefsReceived(BMessage* message)
 {
 	fBackgroundsView->RefsReceived(message);
+	Activate();
 }
 
 
