@@ -75,6 +75,8 @@
 // available.
 #define DEBUG_SPINLOCKS					KDEBUG_LEVEL_2
 
+#define DEBUG_SPINLOCK_LATENCIES		0
+
 
 // VM
 

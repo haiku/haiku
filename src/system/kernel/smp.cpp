@@ -1,13 +1,15 @@
 /*
  * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
-/* Functionality for symetrical multi-processors */
+
+/*! Functionality for symetrical multi-processors */
+
 
 #include <smp.h>
 
@@ -23,17 +25,20 @@
 #include <int.h>
 #include <spinlock_contention.h>
 #include <thread.h>
+#if DEBUG_SPINLOCK_LATENCIES
+#	include <safemode.h>
+#endif
 
 #include "kernel_debug_config.h"
 
 
 //#define TRACE_SMP
-
 #ifdef TRACE_SMP
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
+
 
 #define MSG_POOL_SIZE (SMP_MAX_CPUS * 4)
 
@@ -145,6 +150,61 @@ dump_spinlock(int argc, char** argv)
 #endif	// DEBUG_SPINLOCKS
 
 
+#if DEBUG_SPINLOCK_LATENCIES
+
+
+#define NUM_LATENCY_LOCKS	4
+#define DEBUG_LATENCY		200
+
+
+static struct {
+	spinlock	*lock;
+	bigtime_t	timestamp;
+} sLatency[B_MAX_CPU_COUNT][NUM_LATENCY_LOCKS];
+
+static int32 sLatencyIndex[B_MAX_CPU_COUNT];
+static bool sEnableLatencyCheck;
+
+
+static void
+push_latency(spinlock* lock)
+{
+	if (!sEnableLatencyCheck)
+		return;
+
+	int32 cpu = smp_get_current_cpu();
+	int32 index = (++sLatencyIndex[cpu]) % NUM_LATENCY_LOCKS;
+
+	sLatency[cpu][index].lock = lock;
+	sLatency[cpu][index].timestamp = system_time();
+}
+
+
+static void
+test_latency(spinlock* lock)
+{
+	if (!sEnableLatencyCheck)
+		return;
+
+	int32 cpu = smp_get_current_cpu();
+
+	for (int32 i = 0; i < NUM_LATENCY_LOCKS; i++) {
+		if (sLatency[cpu][i].lock == lock) {
+			bigtime_t diff = system_time() - sLatency[cpu][i].timestamp;
+			if (diff > DEBUG_LATENCY && diff < 500000) {
+				panic("spinlock %p were held for %lld usecs (%d allowed)\n",
+					lock, diff, DEBUG_LATENCY);
+			}
+
+			sLatency[cpu][i].lock = NULL;
+		}
+	}
+}
+
+
+#endif	// DEBUG_SPINLOCK_LATENCIES
+
+
 int
 dump_ici_messages(int argc, char** argv)
 {
@@ -253,9 +313,9 @@ acquire_spinlock(spinlock *lock)
 				break;
 		}
 
-#if DEBUG_SPINLOCKS
+#	if DEBUG_SPINLOCKS
 		push_lock_caller(arch_debug_get_caller(), lock);
-#endif
+#	endif
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
@@ -270,6 +330,9 @@ acquire_spinlock(spinlock *lock)
 		push_lock_caller(arch_debug_get_caller(), lock);
 #endif
 	}
+#if DEBUG_SPINLOCK_LATENCIES
+	push_latency(lock);
+#endif
 }
 
 
@@ -347,9 +410,9 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 				break;
 		}
 
-#if DEBUG_SPINLOCKS
+#	if DEBUG_SPINLOCKS
 		push_lock_caller(arch_debug_get_caller(), lock);
-#endif
+#	endif
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
@@ -370,6 +433,10 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 void
 release_spinlock(spinlock *lock)
 {
+#if DEBUG_SPINLOCK_LATENCIES
+	test_latency(lock);
+#endif
+
 	if (sNumCPUs > 1) {
 		if (are_interrupts_enabled())
 			panic("release_spinlock: attempt to release lock %p with interrupts enabled\n", lock);
@@ -391,12 +458,15 @@ release_spinlock(spinlock *lock)
 			panic("release_spinlock: lock %p was already released\n", lock);
 #endif
 	} else {
-		#if DEBUG_SPINLOCKS
-			if (are_interrupts_enabled())
-				panic("release_spinlock: attempt to release lock %p with interrupts enabled\n", lock);
-			if (atomic_set((int32 *)lock, 0) != 1)
-				panic("release_spinlock: lock %p was already released\n", lock);
-		#endif
+#if DEBUG_SPINLOCKS
+		if (are_interrupts_enabled())
+			panic("release_spinlock: attempt to release lock %p with interrupts enabled\n", lock);
+		if (atomic_set((int32 *)lock, 0) != 1)
+			panic("release_spinlock: lock %p was already released\n", lock);
+#endif
+#if DEBUG_SPINLOCK_LATENCIES
+		test_latency(lock);
+#endif
 	}
 }
 
@@ -1002,10 +1072,12 @@ smp_cpu_rendezvous(volatile uint32 *var, int current_cpu)
 status_t
 smp_init(kernel_args *args)
 {
-	struct smp_msg *msg;
-	int i;
-
 	TRACE(("smp_init: entry\n"));
+
+#if DEBUG_SPINLOCK_LATENCIES
+	sEnableLatencyCheck
+		= !get_safemode_boolean(B_SAFEMODE_DISABLE_LATENCY_CHECK, false);
+#endif
 
 #if DEBUG_SPINLOCKS
 	add_debugger_command_etc("spinlock", &dump_spinlock,
@@ -1025,8 +1097,9 @@ smp_init(kernel_args *args)
 	if (args->num_cpus > 1) {
 		sFreeMessages = NULL;
 		sFreeMessageCount = 0;
-		for (i = 0; i < MSG_POOL_SIZE; i++) {
-			msg = (struct smp_msg *)malloc(sizeof(struct smp_msg));
+		for (int i = 0; i < MSG_POOL_SIZE; i++) {
+			struct smp_msg *msg
+				= (struct smp_msg *)malloc(sizeof(struct smp_msg));
 			if (msg == NULL) {
 				panic("error creating smp mailboxes\n");
 				return B_ERROR;
