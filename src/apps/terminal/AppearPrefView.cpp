@@ -262,6 +262,9 @@ AppearancePrefView::_MakeFontMenu(uint32 command,
 			}
 		}
 	}
+	
+	if (menu->FindMarked() == NULL)
+		menu->ItemAt(0)->SetMarked(true);
 
 	return menu;
 }
