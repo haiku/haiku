@@ -1,11 +1,12 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
+
 
 #include <cpu.h>
 #include <int.h>
@@ -41,6 +42,7 @@
 #else
 #	define TRACE(x) ;
 #endif
+
 
 // Definitions for the PIC 8259 controller
 // (this is not a complete list, only what we're actually using)
@@ -143,8 +145,7 @@ typedef struct interrupt_controller_s {
 	void	(*end_of_interrupt)(int32 num);
 } interrupt_controller;
 
-static interrupt_controller *sCurrentPIC = NULL;
-
+static const interrupt_controller *sCurrentPIC = NULL;
 
 static const char *kInterruptNames[] = {
 	/*  0 */ "Divide Error Exception",
@@ -250,11 +251,13 @@ x86_get_idt(int32 cpu)
 }
 
 
-/**	Tests if the interrupt in-service register of the responsible
- *	PIC is set for interrupts 7 and 15, and if that's not the case,
- *	it must assume it's a spurious interrupt.
- */
+// #pragma mark - PIC
 
+
+/*!	Tests if the interrupt in-service register of the responsible
+	PIC is set for interrupts 7 and 15, and if that's not the case,
+	it must assume it's a spurious interrupt.
+*/
 static bool
 pic_is_spurious_interrupt(int32 num)
 {
@@ -275,11 +278,10 @@ pic_is_spurious_interrupt(int32 num)
 }
 
 
-/**	Sends a non-specified EOI (end of interrupt) notice to the PIC in
- *	question (or both of them).
- *	This clears the PIC interrupt in-service bit.
- */
-
+/*!	Sends a non-specified EOI (end of interrupt) notice to the PIC in
+	question (or both of them).
+	This clears the PIC interrupt in-service bit.
+*/
 static void
 pic_end_of_interrupt(int32 num)
 {
@@ -415,6 +417,9 @@ pic_init(void)
 }
 
 
+// #pragma mark - I/O APIC
+
+
 static inline uint32
 ioapic_read_32(uint8 registerSelect)
 {
@@ -540,13 +545,7 @@ ioapic_configure_io_interrupt(int32 num, uint32 config)
 static void
 ioapic_init(kernel_args *args)
 {
-	uint32 i;
-	uint32 version;
-	uint64 targetAPIC;
-	void *settings;
-	acpi_module_info *acpi;
-
-	static interrupt_controller ioapicController = {
+	static const interrupt_controller ioapicController = {
 		"82093AA IOAPIC",
 		&ioapic_enable_io_interrupt,
 		&ioapic_disable_io_interrupt,
@@ -560,18 +559,12 @@ ioapic_init(kernel_args *args)
 		return;
 	}
 
-	bool disableAPIC = false;	
-	void *handle = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
-	if (handle != NULL) {
-		disableAPIC = get_driver_boolean_parameter(handle, B_SAFEMODE_DISABLE_APIC,
-			disableAPIC, disableAPIC);
-		unload_driver_settings(handle);
-	}
-	
+	bool disableAPIC = get_safemode_boolean(B_SAFEMODE_DISABLE_APIC, false);
 	if (disableAPIC) {
 		args->arch_args.apic = NULL;
 		return;
 	}
+
 	// always map the local apic as it can be used for timers even if we
 	// don't end up using the io apic
 	sLocalAPIC = args->arch_args.apic;
@@ -581,23 +574,22 @@ ioapic_init(kernel_args *args)
 		panic("mapping the local apic failed");
 		return;
 	}
-	
+
 	if (args->arch_args.ioapic == NULL) {
 		dprintf("no ioapic available, not using ioapics for interrupt routing\n");
 		return;
 	}
 
-	settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
-	if (settings != NULL && get_driver_boolean_parameter(settings,
-		B_SAFEMODE_DISABLE_IOAPIC, false, false)) {
-		dprintf("ioapic explicitly disabled, not using ioapics for interrupt routing\n");
-		unload_driver_settings(settings);
+	if (!get_safemode_boolean(B_SAFEMODE_DISABLE_IOAPIC, false)) {
+		dprintf("ioapic explicitly disabled, not using ioapics for interrupt "
+			"routing\n");
 		return;
-	} else if (settings != NULL)
-		unload_driver_settings(settings);
+	}
 
 	// TODO: remove when the PCI IRQ routing through ACPI is available below
 	return;
+
+	acpi_module_info *acpi;
 	if (get_module(B_ACPI_MODULE_NAME, (module_info **)&acpi) != B_OK) {
 		dprintf("acpi module not available, not configuring ioapic\n");
 		return;
@@ -606,13 +598,13 @@ ioapic_init(kernel_args *args)
 	// map in the ioapic
 	sIOAPIC = (ioapic *)args->arch_args.ioapic;
 	if (map_physical_memory("ioapic", (void *)args->arch_args.ioapic_phys,
-		B_PAGE_SIZE, B_EXACT_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-		(void **)&sIOAPIC) < B_OK) {
+			B_PAGE_SIZE, B_EXACT_ADDRESS,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&sIOAPIC) < 0) {
 		panic("mapping the ioapic failed");
 		return;
 	}
 
-	version = ioapic_read_32(IO_APIC_VERSION);
+	uint32 version = ioapic_read_32(IO_APIC_VERSION);
 	if (version == 0xffffffff) {
 		dprintf("ioapic seems inaccessible, not using it\n");
 		return;
@@ -621,13 +613,13 @@ ioapic_init(kernel_args *args)
 	sLevelTriggeredInterrupts = 0;
 	sIOAPICMaxRedirectionEntry
 		= ((version >> IO_APIC_MAX_REDIRECTION_ENTRY_SHIFT)
-		& IO_APIC_MAX_REDIRECTION_ENTRY_MASK);
+			& IO_APIC_MAX_REDIRECTION_ENTRY_MASK);
 
 	// use the boot CPU as the target for all interrupts
-	targetAPIC = args->arch_args.cpu_apic_id[0];
+	uint64 targetAPIC = args->arch_args.cpu_apic_id[0];
 
 	// program the interrupt vectors of the ioapic
-	for (i = 0; i <= sIOAPICMaxRedirectionEntry; i++) {
+	for (uint32 i = 0; i <= sIOAPICMaxRedirectionEntry; i++) {
 		// initialize everything to deliver to the boot CPU in physical mode
 		// and masked until explicitly enabled through enable_io_interrupt()
 		uint64 entry = (targetAPIC << IO_APIC_DESTINATION_FIELD_SHIFT)
@@ -657,7 +649,7 @@ ioapic_init(kernel_args *args)
 	}
 
 	// setup default 1:1 mapping
-	for (i = 0; i < 256; i++)
+	for (uint32 i = 0; i < 256; i++)
 		sIRQToIOAPICPin[i] = i;
 
 	// TODO: here ACPI needs to be used to properly set up the PCI IRQ
@@ -669,6 +661,9 @@ ioapic_init(kernel_args *args)
 	sCurrentPIC = &ioapicController;
 	gUsingIOAPIC = true;
 }
+
+
+// #pragma mark -
 
 
 void
@@ -713,9 +708,9 @@ arch_int_disable_interrupts(void)
 
 
 void
-arch_int_restore_interrupts(int oldstate)
+arch_int_restore_interrupts(int oldState)
 {
-	arch_int_restore_interrupts_inline(oldstate);
+	arch_int_restore_interrupts_inline(oldState);
 }
 
 
