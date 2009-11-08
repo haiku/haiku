@@ -41,7 +41,7 @@ usage(char *progname, int error)
 {
 	FILE *outstr;
 	outstr = error?stderr:stdout;
-	fprintf(outstr, "Usage: %s [-help] [-/+][[|l|r][shift|control|command|option]|capslock|scrolllock|numlock|menu]\n", progname);
+	fprintf(outstr, "Usage: %s [-help] [-list] [-/+][[|l|r][shift|control|command|option]|capslock|scrolllock|numlock|menu]\n", progname);
 	fprintf(outstr, "\t- asserts unpressed modifier,\n");
 	fprintf(outstr, "\t+ asserts pressed modifier,\n");
 	return error;
