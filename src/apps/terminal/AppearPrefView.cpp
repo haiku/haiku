@@ -140,16 +140,25 @@ AppearancePrefView::MessageReceived(BMessage *msg)
 
 	switch (msg->what) {
 		case MSG_HALF_FONT_CHANGED:
-			if (strcmp(
-					PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY),
-					fFont->Menu()->FindMarked()->Label())) {
-
-				PrefHandler::Default()->setString(PREF_HALF_FONT_FAMILY,
-					fFont->Menu()->FindMarked()->Label());
+		{
+			const char *family = NULL;
+			const char *style = NULL;
+			msg->FindString("font_family", &family);
+			msg->FindString("font_style", &style);
+			
+			PrefHandler *pref = PrefHandler::Default();
+			const char *currentFamily 
+				= pref->getString(PREF_HALF_FONT_FAMILY);
+			const char *currentStyle
+				= pref->getString(PREF_HALF_FONT_STYLE);
+			if (currentFamily == NULL || strcmp(currentFamily, family)
+				|| currentStyle == NULL || strcmp(currentStyle, style)) {
+				pref->setString(PREF_HALF_FONT_FAMILY, family);
+				pref->setString(PREF_HALF_FONT_STYLE, style);		
 				modified = true;
 			}
 			break;
-
+		}
 		case MSG_HALF_SIZE_CHANGED:
 			if (strcmp(PrefHandler::Default()->getString(PREF_HALF_FONT_SIZE),
 					fFontSize->Menu()->FindMarked()->Label())) {
@@ -223,17 +232,30 @@ AppearancePrefView::_MakeFontMenu(uint32 command, const char *defaultFontName)
 	BPopUpMenu *menu = new BPopUpMenu("");
 	int32 numFamilies = count_font_families();
 	uint32 flags;
-
+	
 	for (int32 i = 0; i < numFamilies; i++) {
 		font_family family;
 		if (get_font_family(i, &family, &flags) == B_OK) {
-			BFont font;	
-			font.SetFamilyAndStyle(family, NULL);
-			if (IsFontUsable(font)) {
-				BMenuItem *item = new BMenuItem(family, new BMessage(command));
-				menu->AddItem(item);
-				if (!strcmp(defaultFontName, family))
-					item->SetMarked(true);
+			BFont font;
+			font_style style;
+			int32 numStyles = count_font_styles(family);
+			for (int32 j = 0; j < numStyles; j++) {
+				if (get_font_style(family, j, &style) == B_OK) {
+					font.SetFamilyAndStyle(family, style);
+					if (IsFontUsable(font)) {
+						BMessage *message = new BMessage(command);
+						message->AddString("font_family", family);
+						message->AddString("font_style", style);
+						char itemLabel[134];
+						snprintf(itemLabel, sizeof(itemLabel),
+							"%s - %s", family, style);
+						BMenuItem *item = new BMenuItem(itemLabel,
+							message);
+						menu->AddItem(item);
+						if (!strcmp(defaultFontName, family))
+							item->SetMarked(true);
+					}
+				}
 			}
 		}
 	}
