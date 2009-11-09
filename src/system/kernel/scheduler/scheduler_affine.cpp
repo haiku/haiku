@@ -9,6 +9,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 /*! The thread scheduler */
 
 
@@ -49,6 +50,7 @@ const int32 kMaxTrackingQuantums = 5;
 const bigtime_t kMinThreadQuantum = 3000;
 const bigtime_t kMaxThreadQuantum = 10000;
 
+
 struct scheduler_thread_data {
 	scheduler_thread_data(void)
 	{
@@ -63,7 +65,7 @@ struct scheduler_thread_data {
 		fLastQueue = -1;
 		memset(fLastThreadQuantums, 0, sizeof(fLastThreadQuantums));
 	}
-	
+
 	inline void SetQuantum(int32 quantum)
 	{
 		fQuantumAverage -= fLastThreadQuantums[fLastQuantumSlot];
@@ -74,7 +76,7 @@ struct scheduler_thread_data {
 		else
 			fLastQuantumSlot = 0;
 	}
-	
+
 	inline int32 GetAverageQuantumUsage() const
 	{
 		return fQuantumAverage / kMaxTrackingQuantums;
@@ -198,10 +200,13 @@ affine_enqueue_in_run_queue(struct thread *thread)
 				SMP_MSG_FLAG_ASYNC);
 		}
 	}
-	
+
 	return false;
 }
 
+
+/*!	Dequeues the thread after the given \a prevThread from the run queue.
+*/
 static inline struct thread *
 dequeue_from_run_queue(struct thread *prevThread, int32 currentCPU)
 {
@@ -218,6 +223,7 @@ dequeue_from_run_queue(struct thread *prevThread, int32 currentCPU)
 
 	return resultThread;
 }
+
 
 /*!	Looks for a possible thread to grab/run from another CPU.
 	Note: thread lock must be held when entering this function
@@ -393,17 +399,30 @@ affine_reschedule(void)
 			if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
 				break;
 
-			// skip normal threads sometimes (roughly 20%)
-			if (_rand() > 0x1a00)
+			// find next thread with lower priority
+			struct thread *lowerNextThread = nextThread->queue_next;
+			struct thread *lowerPrevThread = nextThread;
+			int32 priority = nextThread->priority;
+
+			while (lowerNextThread != NULL
+				&& priority == lowerNextThread->priority) {
+				lowerPrevThread = lowerNextThread;
+				lowerNextThread = lowerNextThread->queue_next;
+			}
+			if (lowerNextThread == NULL)
 				break;
 
-			// skip until next lower priority
-			int32 priority = nextThread->priority;
-			do {
-				prevThread = nextThread;
-				nextThread = nextThread->queue_next;
-			} while (nextThread->queue_next != NULL
-				&& priority == nextThread->queue_next->priority);
+			int32 priorityDiff = priority - lowerNextThread->priority;
+			if (priorityDiff > 15)
+				break;
+
+			// skip normal threads sometimes
+			// (twice as probable per priority level)
+			if ((_rand() >> (15 - priorityDiff)) != 0)
+				break;
+
+			nextThread = lowerNextThread;
+			prevThread = lowerPrevThread;
 		}
 
 		TRACE(("dequeuing thread %ld from cpu %ld\n", nextThread->id,
