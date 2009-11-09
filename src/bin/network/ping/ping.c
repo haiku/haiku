@@ -190,7 +190,7 @@ int main(int argc, char **argv)
 	int i;
 	int ch, hold = 1, packlen, preload;
 	int maxsize, fdmasks;
-	size_t maxsizelen;
+	socklen_t maxsizelen;
 	u_char *datap, *packet;
 	char *target, hnamebuf[MAXHOSTNAMELEN];
 	u_char ttl = MAXTTL, loop = 1, df = 0;
@@ -376,7 +376,7 @@ int main(int argc, char **argv)
 		    sizeof(hold));
 
 	if (options & F_TTL) {
-		if (IN_MULTICAST(ntohl(to->sin_addr.s_addr))) 
+		if (IN_MULTICAST(ntohl(to->sin_addr.s_addr)))
 		    moptions |= MULTICAST_TTL;
 		else
 		    options |= F_HDRINCL;
@@ -393,7 +393,7 @@ int main(int argc, char **argv)
 		ip->ip_v = IPVERSION;
 		ip->ip_hl = sizeof(struct ip) >> 2;
 		ip->ip_tos = tos;
-		ip->ip_id = 0;  
+		ip->ip_id = 0;
 		ip->ip_off = htons(df?IP_DF:0);
 		ip->ip_ttl = ttl;
 		ip->ip_p = proto->p_proto;
@@ -432,7 +432,7 @@ int main(int argc, char **argv)
 		       sizeof(saddr)) < 0)
 		err(1, "setsockopt IP_MULTICAST_IF");
 
-	/* 
+	/*
 	 * When trying to send large packets, you must increase the
 	 * size of both the send and receive buffers...
 	 */
@@ -660,7 +660,7 @@ void pr_pack(char *buf, int cc, struct sockaddr_in *from)
 			return;			/* 'Twas not our ECHO */
 		++nreceived;
 		if (timing) {
-			bigtime_t tvi; 
+			bigtime_t tvi;
 
 #ifndef icmp_data
 			pkttime = (char *)&icp->icmp_ip;
@@ -725,7 +725,7 @@ void pr_pack(char *buf, int cc, struct sockaddr_in *from)
 		if (!(options & F_VERBOSE))
 			return;
 		ip2 = (struct ip *) (buf + hlen + sizeof (struct icmp));
-		hlen2 = ip2->ip_hl << 2; 
+		hlen2 = ip2->ip_hl << 2;
 		if (cc >= hlen2 + 8 && check_icmph((struct ip *)(icp +
 		    sizeof (struct icmp))) != 1)
 			return;
@@ -931,7 +931,7 @@ void finish(int sig)
 {
 	(void)signal(SIGINT, SIG_IGN);
 	(void)signal(SIGALRM, SIG_IGN);
-	
+
 	summary(1);
 	exit(nreceived ? 0 : 1);
 }
@@ -983,7 +983,7 @@ pr_icmph(icp)
 			if (icp->icmp_nextmtu != 0)
 				(void)printf("frag needed and DF set (MTU %d)\n",
 					ntohs(icp->icmp_nextmtu));
-			else 
+			else
 				(void)printf("frag needed and DF set\n");
 			break;
 		case ICMP_UNREACH_SRCFAIL:
@@ -1143,7 +1143,7 @@ pr_icmph(icp)
 #ifdef ICMP_MASKREPLY
 	case ICMP_MASKREPLY:
 		(void)printf("Address Mask Reply (Mask 0x%08ld)\n",
-		    ntohl(icp->icmp_mask));
+		    (long)ntohl(icp->icmp_mask));
 		break;
 #endif
 	default:
@@ -1253,7 +1253,7 @@ fill(bp, patp)
 	}
 }
 
-/* 
+/*
  * when we get types of ICMP message with parts of the orig. datagram
  * we want to try to assure ourselves that it is from this instance
  * of ping, and not say, a refused finger connection or something
