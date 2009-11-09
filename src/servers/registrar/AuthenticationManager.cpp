@@ -180,7 +180,7 @@ public:
 
 		if (message.FindInt32("uid", &intValue) == B_OK)
 			fUID = intValue;
-			
+
 		if (message.FindInt32("gid", &intValue) == B_OK)
 			fGID = intValue;
 
@@ -207,22 +207,22 @@ public:
 
 		if (message.FindInt32("last changed", &intValue) == B_OK)
 			fLastChanged = intValue;
-			
+
 		if (message.FindInt32("min", &intValue) == B_OK)
 			fMin = intValue;
-			
+
 		if (message.FindInt32("max", &intValue) == B_OK)
 			fMax = intValue;
-			
+
 		if (message.FindInt32("warn", &intValue) == B_OK)
 			fWarn = intValue;
-			
+
 		if (message.FindInt32("inactive", &intValue) == B_OK)
 			fInactive = intValue;
-			
+
 		if (message.FindInt32("expiration", &intValue) == B_OK)
 			fExpiration = intValue;
-			
+
 		if (message.FindInt32("flags", &intValue) == B_OK)
 			fFlags = intValue;
 	}
@@ -654,7 +654,7 @@ AuthenticationManager::Init()
 		return fRequestPort;
 
 	fRequestThread = spawn_thread(&_RequestThreadEntry,
-		"authentication manager", B_NORMAL_PRIORITY, this);
+		"authentication manager", B_NORMAL_PRIORITY + 1, this);
 	if (fRequestThread < 0)
 		return fRequestThread;
 
@@ -947,7 +947,7 @@ AuthenticationManager::_RequestThread()
 							}
 						}
 
-						// replace the old user and write DBs to disk 
+						// replace the old user and write DBs to disk
 						if (error == B_OK) {
 							fUserDB->AddUser(user);
 							fUserDB->WriteToDisk();

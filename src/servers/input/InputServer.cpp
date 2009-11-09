@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -163,6 +163,9 @@ InputServer::InputServer()
 {
 	CALLED();
 	gInputServer = this;
+
+	set_thread_priority(find_thread(NULL), B_URGENT_DISPLAY_PRIORITY);
+		// elevate priority for client interaction
 
 	_StartEventLoop();
 

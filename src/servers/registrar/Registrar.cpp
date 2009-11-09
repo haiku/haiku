@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,7 +54,8 @@ static const bigtime_t kRosterSanityEventInterval = 1000000LL;
 		   error code.
 */
 Registrar::Registrar(status_t *error)
-	: BServer(kRegistrarSignature, false, error),
+	:
+	BServer(kRegistrarSignature, false, error),
 	fRoster(NULL),
 	fClipboardHandler(NULL),
 	fMIMEManager(NULL),
@@ -65,9 +66,11 @@ Registrar::Registrar(status_t *error)
 	fAuthenticationManager(NULL)
 {
 	FUNCTION_START();
+
+	set_thread_priority(find_thread(NULL), B_NORMAL_PRIORITY + 1);
 }
 
-// destructor
+
 /*!	\brief Frees all resources associated with the registrar.
 
 	All registrar services, that haven't been shut down earlier, are
@@ -93,7 +96,7 @@ Registrar::~Registrar()
 	FUNCTION_END();
 }
 
-// MessageReceived
+
 /*!	\brief Overrides the super class version to dispatch roster specific
 		   messages.
 	\param message The message to be handled
@@ -114,7 +117,7 @@ Registrar::MessageReceived(BMessage *message)
 	}
 }
 
-// ReadyToRun
+
 /*!	\brief Overrides the super class version to initialize the registrar
 		   services.
 */
@@ -164,14 +167,14 @@ Registrar::ReadyToRun()
 
 	// create and schedule the sanity message event
 	fSanityEvent = new MessageEvent(system_time() + kRosterSanityEventInterval,
-									this, B_REG_ROSTER_SANITY_EVENT);
+		this, B_REG_ROSTER_SANITY_EVENT);
 	fSanityEvent->SetAutoDelete(false);
 	fEventQueue->AddEvent(fSanityEvent);
 
 	FUNCTION_END();
 }
 
-// QuitRequested
+
 /*!	\brief Overrides the super class version to avoid termination of the
 		   registrar until the system shutdown.
 */
@@ -183,7 +186,7 @@ Registrar::QuitRequested()
 	return BApplication::QuitRequested();
 }
 
-// GetEventQueue
+
 /*!	\brief Returns the registrar's event queue.
 	\return The registrar's event queue.
 */
@@ -193,7 +196,7 @@ Registrar::GetEventQueue() const
 	return fEventQueue;
 }
 
-// App
+
 /*!	\brief Returns the Registrar application object.
 	\return The Registrar application object.
 */
@@ -203,7 +206,7 @@ Registrar::App()
 	return dynamic_cast<Registrar*>(be_app);
 }
 
-// _MessageReceived
+
 void
 Registrar::_MessageReceived(BMessage *message)
 {
@@ -283,7 +286,7 @@ Registrar::_MessageReceived(BMessage *message)
 			break;
 		case B_REG_STOP_WATCHING:
 			fRoster->HandleStopWatching(message);
-			break;	
+			break;
 		case B_REG_GET_RECENT_DOCUMENTS:
 			fRoster->HandleGetRecentDocuments(message);
 			break;
@@ -352,7 +355,7 @@ Registrar::_MessageReceived(BMessage *message)
 	}
 }
 
-// _HandleShutDown
+
 /*!	\brief Handle a shut down request message.
 	\param request The request to be handled.
 */
@@ -414,7 +417,7 @@ main()
 	// rename the main thread
 	rename_thread(find_thread(NULL), kRosterThreadName);
 
-PRINT(("app->Run()...\n"));
+	PRINT(("app->Run()...\n"));
 
 	try {
 		app->Run();
@@ -427,7 +430,7 @@ PRINT(("app->Run()...\n"));
 		debugger("registrar main() caught unknown exception");
 	}
 
-PRINT(("delete app...\n"));
+	PRINT(("delete app...\n"));
 	delete app;
 
 	FUNCTION_END();

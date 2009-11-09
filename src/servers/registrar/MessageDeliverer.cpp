@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -298,12 +298,12 @@ public:
 		fMessage = other.fMessage;
 		return *this;
 	}
-	
+
 	bool operator==(const TargetMessageHandle &other) const
 	{
 		return (fMessage == other.fMessage);
 	}
-	
+
 	bool operator!=(const TargetMessageHandle &other) const
 	{
 		return (fMessage != other.fMessage);
@@ -321,7 +321,7 @@ public:
 	}
 
 private:
-	TargetMessage	*fMessage;	
+	TargetMessage	*fMessage;
 };
 
 // TargetPort
@@ -509,7 +509,7 @@ MessageDeliverer::Init()
 
 	// spawn the deliverer thread
 	fDelivererThread = spawn_thread(MessageDeliverer::_DelivererThreadEntry,
-		"message deliverer", B_NORMAL_PRIORITY, this);
+		"message deliverer", B_NORMAL_PRIORITY + 1, this);
 	if (fDelivererThread < 0)
 		return fDelivererThread;
 
@@ -573,7 +573,7 @@ MessageDeliverer::Default()
 	\return
 	- \c B_OK, if sending the message succeeded or if the target port was
 	  full and the message has been queued,
-	- another error code otherwise.		
+	- another error code otherwise.
 */
 status_t
 MessageDeliverer::DeliverMessage(BMessage *message, BMessenger target,
@@ -597,7 +597,7 @@ MessageDeliverer::DeliverMessage(BMessage *message, BMessenger target,
 	\return
 	- \c B_OK, if for each of the given targets sending the message succeeded
 	  or if the target port was full and the message has been queued,
-	- another error code otherwise.		
+	- another error code otherwise.
 */
 status_t
 MessageDeliverer::DeliverMessage(BMessage *message, MessagingTargetSet &targets,
@@ -632,7 +632,7 @@ MessageDeliverer::DeliverMessage(BMessage *message, MessagingTargetSet &targets,
 	\return
 	- \c B_OK, if for each of the given targets sending the message succeeded
 	  or if the target port was full and the message has been queued,
-	- another error code otherwise.		
+	- another error code otherwise.
 */
 status_t
 MessageDeliverer::DeliverMessage(const void *messageData, int32 messageSize,
@@ -706,7 +706,7 @@ MessageDeliverer::_GetTargetPort(port_id portID, bool create)
 
 	if (!create)
 		return NULL;
-	
+
 	// create a port
 	TargetPort *port = new(nothrow) TargetPort(portID);
 	if (!port)

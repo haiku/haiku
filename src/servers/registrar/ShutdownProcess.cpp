@@ -695,8 +695,8 @@ ShutdownProcess::Init(BMessage* request)
 	}
 
 	// start the worker thread
-	fWorker = spawn_thread(_WorkerEntry, "shutdown worker", B_NORMAL_PRIORITY,
-		this);
+	fWorker = spawn_thread(_WorkerEntry, "shutdown worker",
+		B_NORMAL_PRIORITY + 1, this);
 	if (fWorker < 0) {
 		fRoster->RemoveWatcher(this);
 		fRoster->SetShuttingDown(false);

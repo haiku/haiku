@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -182,14 +182,14 @@ IOScheduler::Init(const char* name)
 	strlcpy(buffer, name, sizeof(buffer));
 	strlcat(buffer, " scheduler", sizeof(buffer));
 	fSchedulerThread = spawn_kernel_thread(&_SchedulerThread, buffer,
-		B_NORMAL_PRIORITY, (void *)this);
+		B_NORMAL_PRIORITY + 2, (void *)this);
 	if (fSchedulerThread < B_OK)
 		return fSchedulerThread;
 
 	strlcpy(buffer, name, sizeof(buffer));
 	strlcat(buffer, " notifier", sizeof(buffer));
 	fRequestNotifierThread = spawn_kernel_thread(&_RequestNotifierThread,
-		buffer, B_NORMAL_PRIORITY, (void *)this);
+		buffer, B_NORMAL_PRIORITY + 2, (void *)this);
 	if (fRequestNotifierThread < B_OK)
 		return fRequestNotifierThread;
 

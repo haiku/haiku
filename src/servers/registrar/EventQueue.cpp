@@ -1,42 +1,25 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		EventQueue.cpp
-//	Author:			Ingo Weinhold (bonefish@users.sf.net)
-//					YellowBites (http://www.yellowbites.com)
-//	Description:	A class providing a mechanism for executing events at
-//					specified times.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2009, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold (bonefish@users.sf.net)
+ */
+
+
+#include "EventQueue.h"
 
 #include <stdio.h>
 
 #include <String.h>
 
 #include "Event.h"
-#include "EventQueue.h"
+
 
 static const char *kDefaultEventQueueName = "event looper";
 
-/*!
-	\class EventQueue
+
+/*!	\class EventQueue
 	\brief A class providing a mechanism for executing events at specified
 		   times.
 
@@ -51,7 +34,7 @@ static const char *kDefaultEventQueueName = "event looper";
 	method return \c true, the event object is deleted after execution. In
 	any case the event is removed from the list before it is executed. The
 	queue is not locked while an event is executed.
-	
+
 	The event list (\a fEvents) is ordered ascendingly by time. The thread
 	uses a semaphore (\a fLooperControl) to wait (time out) for the next
 	event. This semaphore is released to indicate changes to the event list.
@@ -88,7 +71,6 @@ static const char *kDefaultEventQueueName = "event looper";
 */
 
 
-// constructor
 /*!	\brief Creates a new event queue.
 
 	The status of the initialization can and should be check with InitCheck().
@@ -97,12 +79,13 @@ static const char *kDefaultEventQueueName = "event looper";
 		   a default name is used.
 */
 EventQueue::EventQueue(const char *name)
-	: fEvents(100),
-	  fEventLooper(-1),
-	  fLooperControl(-1),
-	  fNextEventTime(0),
-	  fStatus(B_ERROR),
-	  fTerminating(false)
+	:
+	fEvents(100),
+	fEventLooper(-1),
+	fLooperControl(-1),
+	fNextEventTime(0),
+	fStatus(B_ERROR),
+	fTerminating(false)
 {
 	if (!name)
 		name = kDefaultEventQueueName;
@@ -112,8 +95,8 @@ EventQueue::EventQueue(const char *name)
 	else
 		fStatus = fLooperControl;
 	if (fStatus == B_OK) {
-		fEventLooper = spawn_thread(_EventLooperEntry, name, B_NORMAL_PRIORITY,
-									this);
+		fEventLooper = spawn_thread(_EventLooperEntry, name,
+			B_DISPLAY_PRIORITY + 1, this);
 		if (fEventLooper >= B_OK) {
 			fStatus = B_OK;
 			resume_thread(fEventLooper);
@@ -122,7 +105,7 @@ EventQueue::EventQueue(const char *name)
 	}
 }
 
-// destructor
+
 /*!	\brief Frees all resources associated by this object.
 
 	Die() is called to terminate the queue's thread and all events whose
@@ -137,7 +120,7 @@ EventQueue::~EventQueue()
 	}
 }
 
-// InitCheck
+
 /*!	\brief Returns the initialization status of the event queue.
 	\return \c B_OK, if everything went fine, an error code otherwise.
 */
@@ -147,7 +130,7 @@ EventQueue::InitCheck()
 	return fStatus;
 }
 
-// Die
+
 /*!	\brief Terminates the queue's thread.
 
 	If an event is currently executed, it is allowed to finish its task
@@ -165,7 +148,7 @@ EventQueue::Die()
 	}
 }
 
-// AddEvent
+
 /*!	\brief Adds a new event to the queue.
 
 	The event's time must be set, before adding it. Afterwards ModifyEvent()
@@ -188,7 +171,7 @@ EventQueue::AddEvent(Event *event)
 	return result;
 }
 
-// RemoveEvent
+
 /*!	\brief Removes an event from the queue.
 	\param event The event to be removed.
 	\return \c true, if the event has been removed successfully, \c false, if
@@ -205,7 +188,7 @@ EventQueue::RemoveEvent(Event *event)
 	return result;
 }
 
-// ModifyEvent
+
 /*!	\brief Modifies an event's time.
 
 	The event must be in the queue.
@@ -228,7 +211,7 @@ EventQueue::ModifyEvent(Event *event, bigtime_t newTime)
 	Unlock();
 }
 
-// _AddEvent
+
 /*!	\brief Adds an event to the event list.
 
 	\note The object must be locked when this method is invoked.
@@ -244,7 +227,7 @@ EventQueue::_AddEvent(Event *event)
 	return fEvents.AddItem(event, index);
 }
 
-// _RemoveEvent
+
 /*!	\brief Removes an event from the event list.
 
 	\note The object must be locked when this method is invoked.
@@ -260,7 +243,7 @@ EventQueue::_RemoveEvent(Event *event)
 	return (index >= 0 && fEvents.RemoveItem(index));
 }
 
-// _EventAt
+
 /*!	\brief Returns an event from the event list.
 
 	\note The object must be locked when this method is invoked.
@@ -274,7 +257,7 @@ EventQueue::_EventAt(int32 index) const
 	return (Event*)fEvents.ItemAt(index);
 }
 
-// _IndexOfEvent
+
 /*!	\brief Returns the event list index of the supplied event.
 
 	\note The object must be locked when this method is invoked.
@@ -299,7 +282,7 @@ EventQueue::_IndexOfEvent(Event *event) const
 	return -1;
 }
 
-// _FindInsertionIndex
+
 /*!	\brief Finds the event list index at which an event with the supplied
 		   has to be added.
 
@@ -330,7 +313,7 @@ EventQueue::_FindInsertionIndex(bigtime_t time) const
 	return lower;
 }
 
-// _EventLooperEntry
+
 /*!	\brief Entry point from the queue's thread.
 	\param data The queue's \c this pointer.
 	\return The thread's result. Of no relevance in this case.
@@ -341,7 +324,7 @@ EventQueue::_EventLooperEntry(void *data)
 	return ((EventQueue*)data)->_EventLooper();
 }
 
-// _EventLooper
+
 /*!	\brief Method with the main loop of the queue's thread.
 	\return The thread's result. Of no relevance in this case.
 */
@@ -385,7 +368,7 @@ EventQueue::_EventLooper()
 	return 0;
 }
 
-// _Reschedule
+
 /*!	\brief To be called, when an event has been added or removed.
 
 	Checks whether the queue's thread has to recalculate the time when it
@@ -402,4 +385,3 @@ EventQueue::_Reschedule()
 			release_sem(fLooperControl);
 	}
 }
-

@@ -1,4 +1,12 @@
-// MIMEManager.cpp
+/*
+ * Copyright 2002-2009, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold (bonefish@users.sf.net)
+ *		Tyler Dauwalder
+ */
+
 
 #include "MIMEManager.h"
 
@@ -19,23 +27,25 @@
 #include "TextSnifferAddon.h"
 #include "UpdateMimeInfoThread.h"
 
+
 using namespace std;
 using namespace BPrivate;
 
-/*!
-	\class MIMEManager
+
+/*!	\class MIMEManager
 	\brief MIMEManager handles communication between BMimeType and the system-wide
 	MimeDatabase object for BMimeType's write and non-atomic read functions.
 
 */
 
-// constructor
+
 /*!	\brief Creates and initializes a MIMEManager.
 */
 MIMEManager::MIMEManager()
-		   : BLooper("main_mime")
-		   , fDatabase()
-		   , fThreadManager()
+	:
+	BLooper("main_mime"),
+	fDatabase(),
+	fThreadManager()
 {
 	AddHandler(&fThreadManager);
 
@@ -48,14 +58,14 @@ MIMEManager::MIMEManager()
 	}
 }
 
-// destructor
+
 /*!	\brief Frees all resources associate with this object.
 */
 MIMEManager::~MIMEManager()
 {
 }
 
-// MessageReceived
+
 /*!	\brief Overrides the super class version to handle the MIME specific
 		   messages.
 	\param message The message to be handled
@@ -70,66 +80,65 @@ MIMEManager::MessageReceived(BMessage *message)
 		case B_REG_MIME_SET_PARAM:
 			HandleSetParam(message);
 			break;
-			
+
 		case B_REG_MIME_DELETE_PARAM:
 			HandleDeleteParam(message);
 			break;
-		
+
 		case B_REG_MIME_START_WATCHING:
 		case B_REG_MIME_STOP_WATCHING:
 		{
 			BMessenger messenger;
 			err = message->FindMessenger("target", &messenger);
 			if (!err) {
-				err = message->what == B_REG_MIME_START_WATCHING 
-					    ? fDatabase.StartWatching(messenger)
-					      : fDatabase.StopWatching(messenger);
+				err = message->what == B_REG_MIME_START_WATCHING
+					? fDatabase.StartWatching(messenger)
+					: fDatabase.StopWatching(messenger);
 			}
-			
+
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", err);
-			message->SendReply(&reply, this);				
+			message->SendReply(&reply, this);
 			break;
 		}
-		
+
 		case B_REG_MIME_INSTALL:
 		case B_REG_MIME_DELETE:
 		{
-			const char *type;			
+			const char *type;
 			err = message->FindString("type", &type);
 			if (!err)
 				err = message->what == B_REG_MIME_INSTALL
-					    ? fDatabase.Install(type)
-					      : fDatabase.Delete(type);
-					      
+					? fDatabase.Install(type) : fDatabase.Delete(type);
+
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", err);
-			message->SendReply(&reply, this);				
+			message->SendReply(&reply, this);
 			break;
 		}
-		
+
 		case B_REG_MIME_GET_INSTALLED_TYPES:
 		{
 			const char *supertype;
 			err = message->FindString("supertype", &supertype);
-			if (err == B_NAME_NOT_FOUND) 
+			if (err == B_NAME_NOT_FOUND)
 				err = fDatabase.GetInstalledTypes(&reply);
-			else if (!err) 
+			else if (!err)
 				err = fDatabase.GetInstalledTypes(supertype, &reply);
-				
+
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", err);
-			message->SendReply(&reply, this);				
+			message->SendReply(&reply, this);
 			break;
 		}
-		
+
 		case B_REG_MIME_GET_INSTALLED_SUPERTYPES:
 		{
 			err = fDatabase.GetInstalledSupertypes(&reply);
-				
+
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", err);
-			message->SendReply(&reply, this);				
+			message->SendReply(&reply, this);
 			break;
 		}
 
@@ -137,28 +146,28 @@ MIMEManager::MessageReceived(BMessage *message)
 		{
 			const char *type;
 			err = message->FindString("type", &type);
-			if (!err) 
+			if (!err)
 				err = fDatabase.GetSupportingApps(type, &reply);
-				
+
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", err);
-			message->SendReply(&reply, this);				
+			message->SendReply(&reply, this);
 			break;
 		}
-		
+
 		case B_REG_MIME_GET_ASSOCIATED_TYPES:
 		{
 			const char *extension;
 			err = message->FindString("extension", &extension);
 			if (!err)
 				err = fDatabase.GetAssociatedTypes(extension, &reply);
-				
+
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", err);
-			message->SendReply(&reply, this);				
+			message->SendReply(&reply, this);
 			break;
 		}
-		
+
 		case B_REG_MIME_SNIFF:
 		{
 			BString str;
@@ -182,31 +191,31 @@ MIMEManager::MessageReceived(BMessage *message)
 			}
 			if (!err)
 				err = reply.AddString("mime type", str);
-								
+
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", err);
-			message->SendReply(&reply, this);				
-			break;		
+			message->SendReply(&reply, this);
+			break;
 		}
-		
+
 		case B_REG_MIME_CREATE_APP_META_MIME:
 		case B_REG_MIME_UPDATE_MIME_INFO:
 		{
 			using BPrivate::Storage::Mime::MimeUpdateThread;
 			using BPrivate::Storage::Mime::CreateAppMetaMimeThread;
 			using BPrivate::Storage::Mime::UpdateMimeInfoThread;
-			
+
 			entry_ref root;
 			bool recursive;
 			bool synchronous = false;
 			int32 force;
-			
+
 			MimeUpdateThread *thread = NULL;
-			
+
 			status_t threadStatus = B_NO_INIT;
 			bool messageIsDetached = false;
 			bool stillOwnsThread = true;
-			
+
 			// Gather our arguments
 			err = message->FindRef("entry", &root);
 			if (!err)
@@ -215,13 +224,13 @@ MIMEManager::MessageReceived(BMessage *message)
 				err = message->FindBool("synchronous", &synchronous);
 			if (!err)
 				err = message->FindInt32("force", &force);
-			
-			// Detach the message for synchronous calls	
+
+			// Detach the message for synchronous calls
 			if (!err && synchronous) {
 				DetachCurrentMessage();
 				messageIsDetached = true;
 			}
-			
+
 			// Create the appropriate flavor of mime update thread
 			if (!err) {
 				switch (message->what) {
@@ -229,30 +238,30 @@ MIMEManager::MessageReceived(BMessage *message)
 						thread = new(nothrow) CreateAppMetaMimeThread(
 							synchronous ? "create_app_meta_mime (s)"
 								: "create_app_meta_mime (a)",
-							B_NORMAL_PRIORITY, &fDatabase,
+							B_NORMAL_PRIORITY + 1, &fDatabase,
 							BMessenger(&fThreadManager), &root, recursive,
 							force, synchronous ? message : NULL);
 						break;
-					
+
 					case B_REG_MIME_UPDATE_MIME_INFO:
 						thread = new(nothrow) UpdateMimeInfoThread(synchronous
 								? "update_mime_info (s)"
 								: "update_mime_info (a)",
-							B_NORMAL_PRIORITY, &fDatabase,
+							B_NORMAL_PRIORITY + 1, &fDatabase,
 							BMessenger(&fThreadManager), &root, recursive,
 							force, synchronous ? message : NULL);
 						break;
-						
+
 					default:
 						err = B_BAD_VALUE;
-						break;					
+						break;
 				}
 			}
 			if (!err)
-				err = thread ? B_OK : B_NO_MEMORY;			
+				err = thread ? B_OK : B_NO_MEMORY;
 			if (!err)
 				err = threadStatus = thread->InitCheck();
-				
+
 			// Launch the thread
 			if (!err) {
 				err = fThreadManager.LaunchThread(thread);
@@ -260,7 +269,7 @@ MIMEManager::MessageReceived(BMessage *message)
 					stillOwnsThread = false;
 				}
 			}
-				
+
 			// If something went wrong, we need to notify the sender regardless. However,
 			// if this is a synchronous call, we've already detached the message, and must
 			// be careful that it gets deleted once and only once. Thus, if the MimeUpdateThread
@@ -280,7 +289,7 @@ MIMEManager::MessageReceived(BMessage *message)
 				delete thread;
 			break;
 		}
-		
+
 		default:
 			printf("MIMEMan: msg->what == %lx (%.4s)\n", message->what,
 				(char*)&(message->what));
@@ -289,7 +298,7 @@ MIMEManager::MessageReceived(BMessage *message)
 	}
 }
 
-// HandleSetParam 
+
 //! Handles all B_REG_MIME_SET_PARAM messages
 void
 MIMEManager::HandleSetParam(BMessage *message)
@@ -297,7 +306,7 @@ MIMEManager::HandleSetParam(BMessage *message)
 	status_t err;
 	int32 which;
 	const char *type;
-	
+
 	err = message->FindString("type", &type);
 	if (!err)
 		err = message->FindInt32("which", &which);
@@ -311,7 +320,7 @@ MIMEManager::HandleSetParam(BMessage *message)
 					err = fDatabase.SetAppHint(type, &ref);
 				break;
 			}
-		
+
 			case B_REG_MIME_ATTR_INFO:
 			{
 				BMessage info;
@@ -320,7 +329,7 @@ MIMEManager::HandleSetParam(BMessage *message)
 					err = fDatabase.SetAttrInfo(type, &info);
 				break;
 			}
-		
+
 			case B_REG_MIME_DESCRIPTION:
 			{
 				bool isLong;
@@ -328,13 +337,14 @@ MIMEManager::HandleSetParam(BMessage *message)
 				err = message->FindBool("long", &isLong);
 				if (!err)
 					err = message->FindString("description", &description);
-				if (!err) 
-					err = (isLong
-						     ? fDatabase.SetLongDescription(type, description)
-						       : fDatabase.SetShortDescription(type, description));
+				if (!err) {
+					err = isLong
+						? fDatabase.SetLongDescription(type, description)
+						: fDatabase.SetShortDescription(type, description);
+				}
 				break;
 			}
-			
+
 			case B_REG_MIME_FILE_EXTENSIONS:
 			{
 				BMessage extensions;
@@ -343,32 +353,35 @@ MIMEManager::HandleSetParam(BMessage *message)
 					err = fDatabase.SetFileExtensions(type, &extensions);
 				break;
 			}
-		
+
 			case B_REG_MIME_ICON:
 			case B_REG_MIME_ICON_FOR_TYPE:
 			{
 				const void *data;
 				ssize_t dataSize;
 				int32 size;
-				err = message->FindData("icon data", B_RAW_TYPE, &data, &dataSize);
+				err = message->FindData("icon data", B_RAW_TYPE, &data,
+					&dataSize);
 				if (!err)
 					err = message->FindInt32("icon size", &size);
 				if (which == B_REG_MIME_ICON_FOR_TYPE) {
 					const char *fileType;
 					if (!err)
 						err = message->FindString("file type", &fileType);
-					if (!err)
-						err = size == -1 ?
-							fDatabase.SetIconForType(type, fileType, data,
-								dataSize) :
-							fDatabase.SetIconForType(type, fileType, data,
+					if (!err) {
+						err = size == -1
+							? fDatabase.SetIconForType(type, fileType, data,
+								dataSize)
+							: fDatabase.SetIconForType(type, fileType, data,
 								dataSize, (icon_size)size);
+					}
 				} else {
-					if (!err) 
-						err = size == -1 ?
-							fDatabase.SetIcon(type, data, dataSize) :
-							fDatabase.SetIcon(type, data, dataSize,
+					if (!err) {
+						err = size == -1
+							? fDatabase.SetIcon(type, data, dataSize)
+							: fDatabase.SetIcon(type, data, dataSize,
 								(icon_size)size);
+					}
 				}
 				break;
 				// End temporary fix code
@@ -381,11 +394,13 @@ MIMEManager::HandleSetParam(BMessage *message)
 				err = message->FindString("signature", &signature);
 				if (!err)
 					err = message->FindInt32("app verb", &verb);
-				if (!err)
-					err = fDatabase.SetPreferredApp(type, signature, (app_verb)verb);			
+				if (!err) {
+					err = fDatabase.SetPreferredApp(type, signature,
+						(app_verb)verb);
+				}
 				break;
 			}
-			
+
 			case B_REG_MIME_SNIFFER_RULE:
 			{
 				const char *rule;
@@ -394,7 +409,7 @@ MIMEManager::HandleSetParam(BMessage *message)
 					err = fDatabase.SetSnifferRule(type, rule);
 				break;
 			}
-				
+
 			case B_REG_MIME_SUPPORTED_TYPES:
 			{
 				BMessage types;
@@ -406,29 +421,27 @@ MIMEManager::HandleSetParam(BMessage *message)
 					err = fDatabase.SetSupportedTypes(type, &types, fullSync);
 				break;
 			}
-		
+
 			default:
 				err = B_BAD_VALUE;
-				break;				
-		}		
+				break;
+		}
 	}
 
 	BMessage reply(B_REG_RESULT);
 	reply.AddInt32("result", err);
-	message->SendReply(&reply, this);				
+	message->SendReply(&reply, this);
 }
 
-// HandleSetParam 
+
 //! Handles all B_REG_MIME_SET_PARAM messages
 void
 MIMEManager::HandleDeleteParam(BMessage *message)
 {
-//	using BPrivate::MimeDatabase;
-
 	status_t err;
 	int32 which;
 	const char *type;
-	
+
 	err = message->FindString("type", &type);
 	if (!err)
 		err = message->FindInt32("which", &which);
@@ -441,21 +454,22 @@ MIMEManager::HandleDeleteParam(BMessage *message)
 			case B_REG_MIME_ATTR_INFO:
 				err = fDatabase.DeleteAttrInfo(type);
 				break;
-		
+
 			case B_REG_MIME_DESCRIPTION:
 			{
 				bool isLong;
 				err = message->FindBool("long", &isLong);
-				if (!err) 
+				if (!err) {
 					err = isLong
-						    ? fDatabase.DeleteLongDescription(type)
-						      : fDatabase.DeleteShortDescription(type);
+						? fDatabase.DeleteLongDescription(type)
+						: fDatabase.DeleteShortDescription(type);
+				}
 				break;
 			}
-			
+
 			case B_REG_MIME_FILE_EXTENSIONS:
 				err = fDatabase.DeleteFileExtensions(type);
-				break;			
+				break;
 
 			case B_REG_MIME_ICON:
 			case B_REG_MIME_ICON_FOR_TYPE:
@@ -466,19 +480,22 @@ MIMEManager::HandleDeleteParam(BMessage *message)
 					const char *fileType;
 					if (!err)
 						err = message->FindString("file type", &fileType);
-					if (!err)
-						err = (size == -1) ?
-							fDatabase.DeleteIconForType(type, fileType) :
-							fDatabase.DeleteIconForType(type, fileType, (icon_size)size);
+					if (!err) {
+						err = size == -1
+							? fDatabase.DeleteIconForType(type, fileType)
+							: fDatabase.DeleteIconForType(type, fileType,
+								(icon_size)size);
+					}
 				} else {
-					if (!err) 
-						err = (size == -1) ?
-							fDatabase.DeleteIcon(type) :
-							fDatabase.DeleteIcon(type, (icon_size)size);
+					if (!err) {
+						err = size == -1
+							? fDatabase.DeleteIcon(type)
+							: fDatabase.DeleteIcon(type, (icon_size)size);
+					}
 				}
 				break;
 			}
-				
+
 			case B_REG_MIME_PREFERRED_APP:
 			{
 				int32 verb;
@@ -487,10 +504,10 @@ MIMEManager::HandleDeleteParam(BMessage *message)
 					err = fDatabase.DeletePreferredApp(type, (app_verb)verb);
 				break;
 			}
-			
+
 			case B_REG_MIME_SNIFFER_RULE:
 				err = fDatabase.DeleteSnifferRule(type);
-				break;			
+				break;
 
 			case B_REG_MIME_SUPPORTED_TYPES:
 			{
@@ -499,16 +516,16 @@ MIMEManager::HandleDeleteParam(BMessage *message)
 				if (!err)
 					err = fDatabase.DeleteSupportedTypes(type, fullSync);
 				break;
-			}	
+			}
 
 			default:
 				err = B_BAD_VALUE;
-				break;				
-		}		
+				break;
+		}
 	}
 
 	BMessage reply(B_REG_RESULT);
 	reply.AddInt32("result", err);
-	message->SendReply(&reply, this);				
+	message->SendReply(&reply, this);
 }
 
