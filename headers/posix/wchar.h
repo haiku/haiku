@@ -1,12 +1,14 @@
 /*
- * Copyright 2008 Haiku Inc. All Rights Reserved.
+ * Copyright 2008-2009 Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _WCHAR_H
 #define _WCHAR_H
 
+
 #include <stddef.h>
 #include <stdio.h>
+
 
 /* stddef.h is not supposed to define wint_t, but gcc 2.95.3's one does.
  * In all other cases we will do that. */
@@ -109,12 +111,11 @@ extern wchar_t	*wcsstr(const wchar_t *, const wchar_t *);
 extern double	wcstod(const wchar_t *, wchar_t **);
 extern float	wcstof(const wchar_t *, wchar_t **);
 extern wchar_t	*wcstok(wchar_t *, const wchar_t *, wchar_t **);
-extern long int	wcstol(const wchar_t *, wchar_t **, int);
+extern long		wcstol(const wchar_t *, wchar_t **, int);
 extern long double			wcstold(const wchar_t *, wchar_t **);
 extern long long			wcstoll(const wchar_t *, wchar_t **, int);
 extern unsigned long		wcstoul(const wchar_t *, wchar_t **, int);
 extern unsigned long long	wcstoull(const wchar_t *, wchar_t **, int);
-extern unsigned long int	wcstoul(const wchar_t *, wchar_t **, int);
 extern wchar_t	*wcswcs(const wchar_t *, const wchar_t *);
 extern int		wcswidth(const wchar_t *, size_t);
 extern size_t	wcsxfrm(wchar_t *, const wchar_t *, size_t);
