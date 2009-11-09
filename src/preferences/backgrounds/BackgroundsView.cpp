@@ -15,10 +15,12 @@
 #include <stdlib.h>
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <Messenger.h>
 #include <MimeType.h>
@@ -28,6 +30,9 @@
 #include <be_apps/Tracker/Background.h>
 
 #include "ImageFilePanel.h"
+
+
+#define TR_CONTEXT "Main View"
 
 
 static const uint32 kMsgApplySettings = 'aply';
@@ -105,7 +110,7 @@ BackgroundsView::BackgroundsView()
 	SetBorder(B_NO_BORDER);
 
 	fPreview = new BBox("preview");
-	fPreview->SetLabel("Preview");
+	fPreview->SetLabel(TR("Preview"));
 	
 	fPreView = new PreView();
 
@@ -118,9 +123,9 @@ BackgroundsView::BackgroundsView()
 	fBottom = new FramePart(FRAME_BOTTOM);
 	fBottomRight = new FramePart(FRAME_BOTTOM_RIGHT);
 
-	fXPlacementText = new BTextControl("X:", NULL,
+	fXPlacementText = new BTextControl(TR("X:"), NULL,
 		new BMessage(kMsgImagePlacement));
-	fYPlacementText = new BTextControl("Y:", NULL,
+	fYPlacementText = new BTextControl(TR("Y:"), NULL,
 		new BMessage(kMsgImagePlacement));
 
 	fXPlacementText->TextView()->SetMaxBytes(5);
@@ -165,18 +170,18 @@ BackgroundsView::BackgroundsView()
 
 	BBox* rightbox = new BBox("rightbox");
 
-	fWorkspaceMenu = new BPopUpMenu("pick one");
-	fWorkspaceMenu->AddItem(new BMenuItem("All Workspaces",
+	fWorkspaceMenu = new BPopUpMenu(TR("pick one"));
+	fWorkspaceMenu->AddItem(new BMenuItem(TR("All Workspaces"),
 		new BMessage(kMsgAllWorkspaces)));
 	BMenuItem* menuItem;
-	fWorkspaceMenu->AddItem(menuItem = new BMenuItem("Current Workspace",
+	fWorkspaceMenu->AddItem(menuItem = new BMenuItem(TR("Current Workspace"),
 		new BMessage(kMsgCurrentWorkspace)));
 	menuItem->SetMarked(true);
 	fLastWorkspaceIndex = fWorkspaceMenu->IndexOf(fWorkspaceMenu->FindMarked());
 	fWorkspaceMenu->AddSeparatorItem();
-	fWorkspaceMenu->AddItem(new BMenuItem("Default folder",
+	fWorkspaceMenu->AddItem(new BMenuItem(TR("Default folder"),
 		new BMessage(kMsgDefaultFolder)));
-	fWorkspaceMenu->AddItem(new BMenuItem("Other folder" B_UTF8_ELLIPSIS,
+	fWorkspaceMenu->AddItem(new BMenuItem(TR("Other folder" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOtherFolder)));
 
 	BMenuField* workspaceMenuField = new BMenuField(BRect(0, 0, 130, 18),
@@ -184,39 +189,39 @@ BackgroundsView::BackgroundsView()
 	workspaceMenuField->ResizeToPreferred();
 	rightbox->SetLabel(workspaceMenuField);
 
-	fImageMenu = new BPopUpMenu("pick one");
-	fImageMenu->AddItem(new BGImageMenuItem("None", -1,
+	fImageMenu = new BPopUpMenu(TR("pick one"));
+	fImageMenu->AddItem(new BGImageMenuItem(TR("None"), -1,
 		new BMessage(kMsgNoImage)));
 	fImageMenu->AddSeparatorItem();
-	fImageMenu->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS,
+	fImageMenu->AddItem(new BMenuItem(TR("Other" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOtherImage)));
 
 	BMenuField* imageMenuField = new BMenuField(NULL, fImageMenu);
 	imageMenuField->SetAlignment(B_ALIGN_RIGHT);
 	imageMenuField->ResizeToPreferred();
 
-	fPlacementMenu = new BPopUpMenu("pick one");
-	fPlacementMenu->AddItem(new BMenuItem("Manual",
+	fPlacementMenu = new BPopUpMenu(TR("pick one"));
+	fPlacementMenu->AddItem(new BMenuItem(TR("Manual"),
 		new BMessage(kMsgManualPlacement)));
-	fPlacementMenu->AddItem(new BMenuItem("Center",
+	fPlacementMenu->AddItem(new BMenuItem(TR("Center"),
 		new BMessage(kMsgCenterPlacement)));
-	fPlacementMenu->AddItem(new BMenuItem("Scale to fit",
+	fPlacementMenu->AddItem(new BMenuItem(TR("Scale to fit"),
 		new BMessage(kMsgScalePlacement)));
-	fPlacementMenu->AddItem(new BMenuItem("Tile",
+	fPlacementMenu->AddItem(new BMenuItem(TR("Tile"),
 		new BMessage(kMsgTilePlacement)));
 
 	BMenuField* placementMenuField = new BMenuField(NULL, fPlacementMenu);
 	placementMenuField->SetAlignment(B_ALIGN_RIGHT);
 
-	fIconLabelOutline = new BCheckBox("Icon label outline",
+	fIconLabelOutline = new BCheckBox(TR("Icon label outline"),
 		new BMessage(kMsgIconLabelOutline));
 	fIconLabelOutline->SetValue(B_CONTROL_OFF);
 
 	fPicker = new BColorControl(BPoint(0, 0), B_CELLS_32x8, 7.0, "Picker",
 		new BMessage(kMsgUpdateColor));
 
-	BStringView* imageStringView = new BStringView(NULL, "Image:");
-	BStringView* placementStringView = new BStringView(NULL, "Placement:");
+	BStringView* imageStringView = new BStringView(NULL, TR("Image:"));
+	BStringView* placementStringView = new BStringView(NULL, TR("Placement:"));
 
 	imageStringView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
 		B_ALIGN_NO_VERTICAL));
@@ -241,8 +246,8 @@ BackgroundsView::BackgroundsView()
 	
 	rightbox->AddChild(view);
 	
-	fRevert = new BButton("Revert", new BMessage(kMsgRevertSettings));
-	fApply = new BButton("Apply", new BMessage(kMsgApplySettings));
+	fRevert = new BButton(TR("Revert"), new BMessage(kMsgRevertSettings));
+	fApply = new BButton(TR("Apply"), new BMessage(kMsgApplySettings));
 
 	fRevert->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_NO_VERTICAL));
@@ -299,11 +304,11 @@ BackgroundsView::AllAttached()
 	BMessenger messenger(this);
 	fPanel = new ImageFilePanel(B_OPEN_PANEL, &messenger, &ref,
 		B_FILE_NODE, false, NULL, new CustomRefFilter(true));
-	fPanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
+	fPanel->SetButtonLabel(B_DEFAULT_BUTTON, TR("Select"));
 
 	fFolderPanel = new BFilePanel(B_OPEN_PANEL, &messenger, NULL,
 		B_DIRECTORY_NODE, false, NULL, new CustomRefFilter(false));
-	fFolderPanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
+	fFolderPanel->SetButtonLabel(B_DEFAULT_BUTTON, TR("Select"));
 
 	_LoadSettings();
 	_LoadDesktopFolder();
@@ -364,7 +369,7 @@ BackgroundsView::MessageReceived(BMessage* msg)
 
 		case kMsgCurrentWorkspace:
 		case kMsgAllWorkspaces:
-			fImageMenu->FindItem(kMsgNoImage)->SetLabel("None");
+			fImageMenu->FindItem(kMsgNoImage)->SetLabel(TR("None"));
 			fLastWorkspaceIndex = fWorkspaceMenu->IndexOf(
 				fWorkspaceMenu->FindMarked());
 			if (fCurrent && fCurrent->IsDesktop()) {
@@ -376,7 +381,7 @@ BackgroundsView::MessageReceived(BMessage* msg)
 			break;
 
 		case kMsgDefaultFolder:
-			fImageMenu->FindItem(kMsgNoImage)->SetLabel("None");
+			fImageMenu->FindItem(kMsgNoImage)->SetLabel(TR("None"));
 			fLastWorkspaceIndex = fWorkspaceMenu->IndexOf(
 				fWorkspaceMenu->FindMarked());
 			_SetDesktop(false);
@@ -418,7 +423,7 @@ BackgroundsView::MessageReceived(BMessage* msg)
 			break;
 
 		case kMsgFolderSelected:
-			fImageMenu->FindItem(kMsgNoImage)->SetLabel("Default");
+			fImageMenu->FindItem(kMsgNoImage)->SetLabel(TR("Default"));
 			fLastWorkspaceIndex = fWorkspaceMenu->IndexOf(
 				fWorkspaceMenu->FindMarked());
 			_SetDesktop(false);
@@ -519,9 +524,9 @@ BackgroundsView::_UpdateWithCurrent(void)
 		->SetEnabled(fCurrent->IsDesktop());
 
 	if (fWorkspaceMenu->IndexOf(fWorkspaceMenu->FindMarked()) > 5)
-		fImageMenu->FindItem(kMsgNoImage)->SetLabel("Default");
+		fImageMenu->FindItem(kMsgNoImage)->SetLabel(TR("Default"));
 	else
-		fImageMenu->FindItem(kMsgNoImage)->SetLabel("None");
+		fImageMenu->FindItem(kMsgNoImage)->SetLabel(TR("None"));
 
 	for (int32 i = fImageMenu->CountItems() - 5; i >= 0; i--) {
 		fImageMenu->RemoveItem(2);
@@ -842,7 +847,7 @@ BackgroundsView::_LoadSettings()
 		path.SetTo(string.String());
 		int32 i = _AddPath(path);
 		BString s;
-		s << "Folder: " << path.Leaf();
+		s << TR("Folder: ") << path.Leaf();
 		BMenuItem* item = new BMenuItem(s.String(),
 			new BMessage(kMsgFolderSelected));
 		fWorkspaceMenu->AddItem(item, -i - 1 + 6);
@@ -1047,7 +1052,7 @@ BackgroundsView::RefsReceived(BMessage* msg)
 				if (fWorkspaceMenu->CountItems() <= 5)
 					fWorkspaceMenu->AddSeparatorItem();
 				BString s;
-				s << "Folder: " << path.Leaf();
+				s << TR("Folder: ") << path.Leaf();
 				item = new BMenuItem(s.String(),
 					new BMessage(kMsgFolderSelected));
 				fWorkspaceMenu->AddItem(item, -index - 1 + 6);

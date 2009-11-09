@@ -10,11 +10,16 @@
 #include "ImageFilePanel.h"
 
 #include <Bitmap.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <NodeInfo.h>
 #include <String.h>
 #include <StringView.h>
 #include <TranslationUtils.h>
 #include <Window.h>
+
+
+#define TR_CONTEXT "Image Filepanel"
 
 
 ImageFilePanel::ImageFilePanel(file_panel_mode mode, BMessenger* target,
@@ -126,7 +131,7 @@ ImageFilePanel::SelectionChanged()
 					B_FOLLOW_LEFT | B_FOLLOW_TOP, 0);
 
 				BString resolution;
-				resolution << "Resolution: "
+				resolution << TR("Resolution: ")
 					<< (int)(bitmap->Bounds().Width() + 1)
 					<< "x" << (int)(bitmap->Bounds().Height() + 1);
 				fResolutionView->SetText(resolution.String());

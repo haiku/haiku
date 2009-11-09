@@ -9,11 +9,16 @@
 
 
 #include <Application.h>
+#include <Catalog.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <TrackerAddOnAppLaunch.h>
 #include <Window.h>
 
 #include "BackgroundsView.h"
+
+
+#define TR_CONTEXT "Main Window"
 
 
 static const char* kSignature = "application/x-vnd.Haiku-Backgrounds";
@@ -83,7 +88,7 @@ BackgroundsApplication::RefsReceived(BMessage* message)
 
 BackgroundsWindow::BackgroundsWindow()
 	:
-	BWindow(BRect(0, 0, 0, 0), "Backgrounds", B_TITLED_WINDOW,
+	BWindow(BRect(0, 0, 0, 0), TR("Backgrounds"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
 		B_ALL_WORKSPACES)
 {
@@ -131,10 +136,10 @@ BackgroundsWindow::WorkspaceActivated(int32 oldWorkspaces, bool active)
 int
 main(int argc, char** argv)
 {
-	BApplication* app = new BackgroundsApplication;
-	app->Run();
-	delete app;
-
+	BackgroundsApplication app;
+	BCatalog cat;
+	be_locale->GetAppCatalog(&cat);
+	app.Run();
 	return 0;
 }
 

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src preferences backgrounds ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared ;
 
 Preference Backgrounds : 
@@ -9,7 +7,17 @@ Preference Backgrounds :
 	Backgrounds.cpp
 	BackgroundsView.cpp
 	ImageFilePanel.cpp
-	: be tracker translation $(TARGET_LIBSUPC++)
+	: be tracker translation $(TARGET_LIBSUPC++) liblocale.so
 	: Backgrounds.rdef
+	;
+
+DoCatalogs Backgrounds :
+	x-vnd.Haiku-Backgrounds
+	:
+	Backgrounds.cpp
+	BackgroundsView.cpp
+	ImageFilePanel.cpp
+	: en.catalog
+	: #sv.catkeys
 	;
 
