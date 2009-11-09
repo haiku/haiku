@@ -4,6 +4,8 @@
  */
 
 
+#include <new>
+
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
