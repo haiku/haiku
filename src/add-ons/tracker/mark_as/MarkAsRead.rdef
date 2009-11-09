@@ -1,7 +1,3 @@
-/*
- * MarkAsRead.rdef
- */
-
 resource app_signature "application/x-vnd.Haiku-MarkAsRead";
 
 resource file_types message {
@@ -19,8 +15,8 @@ resource app_version {
 
 	internal = 1,
 
-	short_info = "Marks email as Read",
-	long_info = "MarkAsRead, Copyright 2006-2009 Haiku, Inc. A Tracker Add-on which marks the status of emails as Read."
+	short_info = "MarkAsRead, Copyright 2006-2009 Haiku, Inc.",
+	long_info = "A Tracker Add-on which marks the status of emails as Read."
 };
 
 resource vector_icon {
