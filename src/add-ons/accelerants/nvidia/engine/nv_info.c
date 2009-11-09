@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-9/2009
+   Rudolf Cornelissen 7/2003-11/2009
 */
 
 #define MODULE_BIT 0x00002000
@@ -2783,13 +2783,26 @@ static void setup_output_matrix()
 						LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
 						si->ps.crtc2_prim = true;
 						break;
+					case NV44:
+						/* NV44 is a special case in this situation (confirmed Geforce 6200LE):
+						 * It's hardware behaves as a NV40/41/45 but there's some unknown extra bit
+						 * which needs to be programmed now to get CRTC2/DAC2 displaying anything
+						 * else than blackness (with monitor ON @ correct refresh and resolution).
+						 * We are therefore forced to use CRTC1/DAC1 instead (as these are presetup
+						 * fully by the card's BIOS at POST in this situation). */
+						LOG(2,("INFO: head 1 has nothing connected;\n"));
+						LOG(2,("INFO: head 2 has an analog panel or CRT:\n"));
+						LOG(2,("INFO: cross-switching outputs for NV44!\n"));
+						nv_general_output_select(true);
+						LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+						break;
 					default:
 						/* newer NV40 architecture cards contains (an) additional switch(es)
 						 * to connect a CRTC/DAC combination to a connector. The BIOSes of
 						 * these cards connect head1 to connectors 1 and 2 simultaneously if
 						 * only one VGA screen is found being on connector 2. Which is the
 						 * case here.
-						 * Confirmed on NV43, NV44, G71 and G73. */
+						 * Confirmed on NV43, G71 and G73. */
 						LOG(2,("INFO: Both card outputs are connected to head 1;\n"));
 						LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
 						break;

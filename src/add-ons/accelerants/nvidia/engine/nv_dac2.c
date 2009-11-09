@@ -24,6 +24,7 @@ bool nv_dac2_crt_connected()
 	/* (It DOES have a secondary palette RAM and pixelclock PLL though.) */
 	case NV11:
 	/* on NV40 arch (confirmed NV43, G71, G73) this routine doesn't work. */
+	/* (on NV44 (confirmed Geforce 6200LE) this routine *does* work.) */
 	case NV43:
 	case G71:
 	case G73:
