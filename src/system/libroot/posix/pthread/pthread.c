@@ -14,6 +14,7 @@
 
 #include <syscalls.h>
 #include <thread_defs.h>
+#include <tls.h>
 
 
 #define THREAD_DETACHED	0x01
@@ -28,12 +29,27 @@ static const pthread_attr pthread_attr_default = {
 
 
 static pthread_thread sMainThread;
-static int32 sPthreadSlot = -1;
 static int sConcurrencyLevel;
 
 
-static void
-pthread_destroy_thread(void* data)
+static status_t
+pthread_thread_entry(thread_func _unused, void* _thread)
+{
+	pthread_thread* thread = (pthread_thread*)_thread;
+
+	// store thread data in TLS
+	*tls_address(TLS_PTHREAD_SLOT) = thread;
+
+	pthread_exit(thread->entry(thread->entry_argument));
+	return 0;
+}
+
+
+// #pragma mark - private API
+
+
+void
+__pthread_destroy_thread(void)
 {
 	pthread_thread* thread = pthread_self();
 
@@ -54,18 +70,23 @@ pthread_destroy_thread(void* data)
 }
 
 
-static int32
-pthread_thread_entry(thread_func _unused, void* _thread)
+pthread_thread*
+__allocate_pthread(void *data)
 {
-	pthread_thread* thread = (pthread_thread*)_thread;
+	pthread_thread* thread = (pthread_thread*)malloc(sizeof(pthread_thread));
+	if (thread == NULL)
+		return NULL;
 
-	// store thread data in TLS
-	*tls_address(sPthreadSlot) = thread;
+	thread->entry = NULL;
+	thread->entry_argument = data;
+	thread->exit_value = NULL;
+	thread->cancel_state = PTHREAD_CANCEL_ENABLE;
+	thread->cancel_type = PTHREAD_CANCEL_DEFERRED;
+	thread->cancelled = false;
+	thread->cleanup_handlers = NULL;
+	thread->flags = 0;
 
-	on_exit_thread(pthread_destroy_thread, NULL);
-
-	pthread_exit(thread->entry(thread->entry_argument));
-	return 0;
+	return thread;
 }
 
 
@@ -91,26 +112,14 @@ pthread_create(pthread_t* _thread, const pthread_attr_t* _attr,
 			return EINVAL;
 	}
 
-	thread = (pthread_thread*)malloc(sizeof(pthread_thread));
+	thread = __allocate_pthread(arg);
 	if (thread == NULL)
 		return EAGAIN;
 
 	thread->entry = startRoutine;
-	thread->entry_argument = arg;
-	thread->exit_value = NULL;
-	thread->cancel_state = PTHREAD_CANCEL_ENABLE;
-	thread->cancel_type = PTHREAD_CANCEL_DEFERRED;
-	thread->cancelled = false;
-	thread->cleanup_handlers = NULL;
-	thread->flags = 0;
 
 	if (attr->detach_state == PTHREAD_CREATE_DETACHED)
 		thread->flags |= THREAD_DETACHED;
-
-	if (sPthreadSlot == -1) {
-		// In a clean pthread environment, this is even thread-safe!
-		sPthreadSlot = tls_allocate();
-	}
 
 	attributes.entry = pthread_thread_entry;
 	attributes.name = "pthread func";
@@ -139,10 +148,7 @@ pthread_self(void)
 {
 	pthread_thread* thread;
 
-	if (sPthreadSlot == -1)
-		return &sMainThread;
-
-	thread = (pthread_thread*)tls_get(sPthreadSlot);
+	thread = (pthread_thread*)tls_get(TLS_PTHREAD_SLOT);
 	if (thread == NULL)
 		return &sMainThread;
 

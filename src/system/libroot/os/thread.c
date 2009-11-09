@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 #include <libroot_private.h>
+#include <pthread_private.h>
 #include <thread_defs.h>
 #include <tls.h>
 #include <syscalls.h>
@@ -29,10 +30,15 @@ typedef struct callback_node {
 void _thread_do_exit_notification(void);
 
 
-static int32
-thread_entry(thread_func entry, void *data)
+static status_t
+thread_entry(thread_func entry, void* _thread)
 {
-	int32 returnCode = entry(data);
+	pthread_thread* thread = (pthread_thread*)_thread;
+	status_t returnCode;
+
+	*tls_address(TLS_PTHREAD_SLOT) = thread;
+
+	returnCode = entry(thread->entry_argument);
 
 	_thread_do_exit_notification();
 
@@ -40,10 +46,39 @@ thread_entry(thread_func entry, void *data)
 }
 
 
+void
+_thread_do_exit_notification(void)
+{
+	callback_node *node = tls_get(TLS_ON_EXIT_THREAD_SLOT);
+	callback_node *next;
+
+	while (node != NULL) {
+		next = node->next;
+
+		node->function(node->argument);
+		free(node);
+
+		node = next;
+	}
+
+	tls_set(TLS_ON_EXIT_THREAD_SLOT, NULL);
+
+	__pthread_destroy_thread();
+}
+
+
+// #pragma mark -
+
+
 thread_id
 spawn_thread(thread_func entry, const char *name, int32 priority, void *data)
 {
 	struct thread_creation_attributes attributes;
+	pthread_thread* thread;
+
+	thread = __allocate_pthread(data);
+	if (thread == NULL)
+		return B_NO_MEMORY;
 
 	_single_threaded = false;
 		// used for I/O locking - BeOS compatibility issue
@@ -52,7 +87,7 @@ spawn_thread(thread_func entry, const char *name, int32 priority, void *data)
 	attributes.name = name;
 	attributes.priority = priority;
 	attributes.args1 = entry;
-	attributes.args2 = data;
+	attributes.args2 = thread;
 	attributes.stack_address = NULL;
 	attributes.stack_size = 0;
 
@@ -107,25 +142,6 @@ status_t
 wait_for_thread(thread_id thread, status_t *_returnCode)
 {
 	return _kern_wait_for_thread(thread, _returnCode);
-}
-
-
-void
-_thread_do_exit_notification(void)
-{
-	callback_node *node = tls_get(TLS_ON_EXIT_THREAD_SLOT);
-	callback_node *next;
-
-	while (node != NULL) {
-		next = node->next;
-
-		node->function(node->argument);
-		free(node);
-
-		node = next;
-	}
-
-	tls_set(TLS_ON_EXIT_THREAD_SLOT, NULL);
 }
 
 

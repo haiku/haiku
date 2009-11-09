@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2007, Ryan Leavengood, leavengood@gmail.com.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -60,7 +60,6 @@ typedef struct _pthread_thread {
 	bool		cancelled;
 	struct pthread_key_data specific[PTHREAD_KEYS_MAX];
 	struct __pthread_cleanup_handler *cleanup_handlers;
-	// TODO: move pthread keys in here, too
 } pthread_thread;
 
 
@@ -69,6 +68,8 @@ extern "C" {
 #endif
 
 void __pthread_key_call_destructors(pthread_thread *thread);
+void __pthread_destroy_thread(void);
+pthread_thread *__allocate_pthread(void *data);
 
 #ifdef __cplusplus
 }
