@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2009, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,7 +8,9 @@
  *		Jérôme Duval
  */
 
+
 //! Manager for input_server add-ons (devices, filters, methods)
+
 
 #include "AddOnManager.h"
 
@@ -184,7 +186,7 @@ AddOnManager::_RegisterAddOns()
 	// when safemode, only B_BEOS_ADDONS_DIRECTORY is used
 	for (uint32 i = fSafeMode ? 2 : 0;
 			i < sizeof(directories) / sizeof(directory_which); i++) {
-		for (uint32 j = 0; j < subDirectoryCount; j++) {
+		for (int32 j = 0; j < subDirectoryCount; j++) {
 			if (find_directory(directories[i], &path) == B_OK
 				&& path.Append(subDirectories[j]) == B_OK
 				&& directory.SetTo(path.Path()) == B_OK
