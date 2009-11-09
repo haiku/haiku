@@ -11,19 +11,19 @@ SharedLibrary libnetwork.so :
 	r5_compatibility.cpp
 	:
 	be
-	<libnetwork_dns>dns_dst.o
-	<libnetwork_dns>dns_inet.o
-	<libnetwork_dns>dns_irs.o
-	<libnetwork_dns>dns_isc.o
-	<libnetwork_dns>dns_nameser.o
-	<libnetwork_dns>dns_resolv.o
-	<libnetwork_dns>dns_private.o
+	<libbind>libbind_dst.o
+	<libbind>libbind_inet.o
+	<libbind>libbind_irs.o
+	<libbind>libbind_isc.o
+	<libbind>libbind_nameser.o
+	<libbind>libbind_resolv.o
+	<libbind>libbind_private.o
 	$(TARGET_LIBSUPC++)
 ;
 
 local services = [ FGristFiles services ] ;
-SEARCH on $(services) = [ FDirName $(SUBDIR) dns defaults ] ;
+SEARCH on $(services) = [ FDirName $(SUBDIR) libbind defaults ] ;
 AddFileDataAttribute libnetwork.so : services : string : $(services) ;
 
-SubInclude HAIKU_TOP src kits network dns ;
+SubInclude HAIKU_TOP src kits network libbind ;
 SubInclude HAIKU_TOP src kits network libnetapi ;

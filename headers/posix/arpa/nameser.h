@@ -1,12 +1,29 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
+ */
+
+/*
+ * Portions Copyright (C) 2004, 2005, 2008, 2009  Internet Systems Consortium, Inc. ("ISC")
+ * Portions Copyright (C) 1996-2003  Internet Software Consortium.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES WITH
+ * REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR ANY SPECIAL, DIRECT,
+ * INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+ * LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
+ * OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*
  * Copyright (c) 1983, 1989, 1993
  *    The Regents of the University of California.  All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -22,7 +39,7 @@
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,23 +51,6 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- */
-
-/*
- * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
- * Copyright (c) 1996-1999 by Internet Software Consortium.
- *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #ifndef _ARPA_NAMESER_H_
 #define _ARPA_NAMESER_H_
@@ -69,7 +69,7 @@
  * compare for equality; rather, use it to determine whether your libbind.a
  * contains a new enough lib/nameser/ to support the feature you need.
  */
-#define __NAMESER	19991006	/* New interface version stamp. */
+#define __NAMESER	20090302	/* New interface version stamp. */
 
 /*
  * Define constants based on RFC 883, RFC 1034, RFC 1035
@@ -79,6 +79,9 @@
 #define NS_MAXMSG		65535	/* maximum message size */
 #define NS_MAXCDNAME	255		/* maximum compressed domain name */
 #define NS_MAXLABEL		63		/* maximum length of domain label */
+#define NS_MAXLABELS	128		/* theoretical max #/labels per domain name */
+#define NS_MAXNNAME		256		/* maximum uncompressed (binary) domain name */
+#define NS_MAXPADDR		40
 #define NS_HFIXEDSZ		12		/* #/bytes of fixed data in header */
 #define NS_QFIXEDSZ		4		/* #/bytes of fixed data in query */
 #define NS_RRFIXEDSZ	10		/* #/bytes of fixed data in r record */
@@ -106,6 +109,18 @@ typedef enum __ns_sect {
 } ns_sect;
 
 /*
+ * Network name (compressed or not) type. Equivalent to a pointer when used
+ * in a function prototype. Can be const'd.
+ */
+typedef u_char ns_nname[NS_MAXNNAME];
+typedef const u_char *ns_nname_ct;
+typedef u_char *ns_nname_t;
+
+struct ns_namemap { ns_nname_ct base; int len; };
+typedef struct ns_namemap *ns_namemap_t;
+typedef const struct ns_namemap *ns_namemap_ct;
+
+/*
  * This is a message handle.  It is caller allocated and has no dynamic data.
  * This structure is intended to be opaque to all but ns_parse.c, thus the
  * leading _'s on the member names.  Use the accessor functions, not the _'s.
@@ -121,6 +136,17 @@ typedef struct __ns_msg {
 	int				_rrnum;
 	const u_char	*_msg_ptr;
 } ns_msg;
+
+/*
+ * This is a newmsg handle, used when constructing new messages with
+ * ns_newmsg_init(), et al.
+ */
+struct ns_newmsg {
+	ns_msg			msg;
+	const u_char	*dnptrs[25];
+	const u_char	**lastdnptr;
+};
+typedef struct ns_newmsg ns_newmsg;
 
 /* Private data structure - do not use from outside library. */
 struct _ns_flagdata {  int mask, shift;  };
@@ -146,8 +172,23 @@ typedef	struct __ns_rr {
 	const u_char	*rdata;
 } ns_rr;
 
+/*
+ * Same thing, but using uncompressed network binary names, and real C types.
+ */
+typedef struct __ns_rr2 {
+	ns_nname		nname;
+	size_t			nnamel;
+	int				type;
+	int				rr_class;
+	u_int			ttl;
+	int				rdlength;
+	const u_char	*rdata;
+} ns_rr2;
+
 /* Accessor macros - this is part of the public interface. */
 #define ns_rr_name(rr)	(((rr).name[0] != '\0') ? (rr).name : ".")
+#define ns_rr_nname(rr)	((const ns_nname_t)(rr).nname)
+#define ns_rr_nnamel(rr) ((rr).nnamel + 0)
 #define ns_rr_type(rr)	((ns_type)((rr).type + 0))
 #define ns_rr_class(rr)	((ns_class)((rr).rr_class + 0))
 #define ns_rr_ttl(rr)	((rr).ttl + 0)
@@ -296,6 +337,17 @@ typedef enum __ns_type {
 	ns_t_sink = 40,		/* Kitchen sink (experimentatl) */
 	ns_t_opt = 41,		/* EDNS0 option (meta-RR) */
 	ns_t_apl = 42,		/* Address prefix list (RFC 3123) */
+	ns_t_ds = 43,		/* Delegation Signer */
+	ns_t_sshfp = 44,	/* SSH Fingerprint */
+	ns_t_ipseckey = 45,	/* IPSEC Key */
+	ns_t_rrsig = 46,	/* RRset Signature */
+	ns_t_nsec = 47,		/* Negative security */
+	ns_t_dnskey = 48,	/* DNS Key */
+	ns_t_dhcid = 49,	/* Dynamic host configuratin identifier */
+	ns_t_nsec3 = 50,	/* Negative security type 3 */
+	ns_t_nsec3param = 51, /* Negative security type 3 parameters */
+	ns_t_hip = 55,		/* Host Identity Protocol */
+	ns_t_spf = 99,		/* Sender Policy Framework */
 	ns_t_tkey = 249,	/* Transaction key */
 	ns_t_tsig = 250,	/* Transaction signature. */
 	ns_t_ixfr = 251,	/* Incremental zone transfer. */
@@ -304,6 +356,7 @@ typedef enum __ns_type {
 	ns_t_maila = 254,	/* Transfer mail agent records. */
 	ns_t_any = 255,		/* Wildcard match. */
 	ns_t_zxfr = 256,	/* BIND-specific, nonstandard. */
+	ns_t_dlv = 32769,	/* DNSSEC look-aside validatation. */
 	ns_t_max = 65536
 } ns_type;
 
@@ -373,13 +426,9 @@ typedef enum __ns_cert_types {
 #define	NS_KEY_RESERVED10	0x0020  /* reserved - must be zero */
 #define	NS_KEY_RESERVED11	0x0010  /* reserved - must be zero */
 #define	NS_KEY_SIGNATORYMASK	0x000F	/* key can sign RR's of same name */
-#define	NS_KEY_RESERVED_BITMASK ( NS_KEY_RESERVED2 | \
-				  NS_KEY_RESERVED4 | \
-				  NS_KEY_RESERVED5 | \
-				  NS_KEY_RESERVED8 | \
-				  NS_KEY_RESERVED9 | \
-				  NS_KEY_RESERVED10 | \
-				  NS_KEY_RESERVED11 )
+#define	NS_KEY_RESERVED_BITMASK (NS_KEY_RESERVED2 | NS_KEY_RESERVED4 \
+	| NS_KEY_RESERVED5 | NS_KEY_RESERVED8 | NS_KEY_RESERVED9 \
+	| NS_KEY_RESERVED10 | NS_KEY_RESERVED11)
 #define NS_KEY_RESERVED_BITMASK2 0xFFFF /* no bits defined here */
 
 /* The Algorithm field of the KEY and SIG RR's is an integer, {1..254} */
@@ -433,6 +482,7 @@ typedef enum __ns_cert_types {
  * EDNS0 extended flags, host order.
  */
 #define NS_OPT_DNSSEC_OK	0x8000U
+#define NS_OPT_NSID			3
 
 /*
  * Inline versions of get/put short/long.  Pointer is advanced.
@@ -484,6 +534,7 @@ typedef enum __ns_cert_types {
 #define ns_initparse		__ns_initparse
 #define ns_skiprr			__ns_skiprr
 #define ns_parserr			__ns_parserr
+#define ns_parserr2			__ns_parserr2
 #define	ns_sprintrr			__ns_sprintrr
 #define	ns_sprintrrf		__ns_sprintrrf
 #define	ns_format_ttl		__ns_format_ttl
@@ -492,12 +543,19 @@ typedef enum __ns_cert_types {
 #define	ns_name_ntol		__ns_name_ntol
 #define	ns_name_ntop		__ns_name_ntop
 #define	ns_name_pton		__ns_name_pton
+#define	ns_name_pton2		__ns_name_pton2
 #define	ns_name_unpack		__ns_name_unpack
+#define	ns_name_unpack2		__ns_name_unpack2
 #define	ns_name_pack		__ns_name_pack
 #define	ns_name_compress	__ns_name_compress
 #define	ns_name_uncompress	__ns_name_uncompress
 #define	ns_name_skip		__ns_name_skip
 #define	ns_name_rollback	__ns_name_rollback
+#define ns_name_length		__ns_name_length
+#define ns_name_eq			__ns_name_eq
+#define ns_name_owned		__ns_name_owned
+#define ns_name_map			__ns_name_map
+#define ns_name_labels		__ns_name_labels
 #define	ns_sign				__ns_sign
 #define	ns_sign2			__ns_sign2
 #define	ns_sign_tcp			__ns_sign_tcp
@@ -511,6 +569,17 @@ typedef enum __ns_cert_types {
 #define	ns_subdomain		__ns_subdomain
 #define	ns_makecanon		__ns_makecanon
 #define	ns_samename			__ns_samename
+#define ns_newmsg_init		__ns_newmsg_init
+#define ns_newmsg_copy		__ns_newmsg_copy
+#define ns_newmsg_id		__ns_newmsg_id
+#define ns_newmsg_flag		__ns_newmsg_flag
+#define ns_newmsg_q			__ns_newmsg_q
+#define ns_newmsg_rr		__ns_newmsg_rr
+#define ns_newmsg_done		__ns_newmsg_done
+#define ns_rdata_unpack		__ns_rdata_unpack
+#define ns_rdata_equal		__ns_rdata_equal
+#define ns_rdata_refers		__ns_rdata_refers
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -524,6 +593,7 @@ void	ns_put32(u_long, u_char *);
 int		ns_initparse(const u_char *, int, ns_msg *);
 int		ns_skiprr(const u_char *, const u_char *, ns_sect, int);
 int		ns_parserr(ns_msg *, ns_sect, int, ns_rr *);
+int		ns_parserr2(ns_msg *, ns_sect, int, ns_rr2 *);
 int		ns_sprintrr(const ns_msg *, const ns_rr *,
 			const char *, const char *, char *, size_t);
 int		ns_sprintrrf(const u_char *, size_t, const char *,
@@ -536,8 +606,11 @@ u_int32_t ns_datetosecs(const char *cp, int *errp);
 int		ns_name_ntol(const u_char *, u_char *, size_t);
 int		ns_name_ntop(const u_char *, char *, size_t);
 int		ns_name_pton(const char *, u_char *, size_t);
+int		ns_name_pton2(const char *, u_char *, size_t, size_t *);
 int		ns_name_unpack(const u_char *, const u_char *,
 			const u_char *, u_char *, size_t);
+int		ns_name_unpack2(const u_char *, const u_char *,
+			const u_char *, u_char *, size_t, size_t *);
 int		ns_name_pack(const u_char *, u_char *, int,
 			const u_char **, const u_char **);
 int		ns_name_uncompress(const u_char *, const u_char *,
@@ -545,8 +618,15 @@ int		ns_name_uncompress(const u_char *, const u_char *,
 int		ns_name_compress(const char *, u_char *, size_t,
 			 const u_char **, const u_char **);
 int		ns_name_skip(const u_char **, const u_char *);
-void	ns_name_rollback(const u_char *, const u_char **,
-			const u_char **);
+void	ns_name_rollback(const u_char *, const u_char **, const u_char **);
+ssize_t	ns_name_length(ns_nname_ct nname, size_t nameSize);
+int		ns_name_eq(ns_nname_ct a, size_t aLength, ns_nname_ct b,
+			size_t bLength);
+int		ns_name_owned(ns_namemap_ct a, int aLength, ns_namemap_ct b,
+			int bLength);
+int		ns_name_map(ns_nname_ct nname, size_t nameLength, ns_namemap_t map,
+			int mapSize);
+int		ns_name_labels(ns_nname_ct, size_t);
 int		ns_sign(u_char *, int *, int, int, void *,
 			const u_char *, int, u_char *, int *, time_t);
 int		ns_sign2(u_char *, int *, int, int, void *,
@@ -570,6 +650,20 @@ int		ns_samedomain(const char *, const char *);
 int		ns_subdomain(const char *, const char *);
 int		ns_makecanon(const char *, char *, size_t);
 int		ns_samename(const char *, const char *);
+int		ns_newmsg_init(u_char *buffer, size_t bufsiz, ns_newmsg *);
+int		ns_newmsg_copy(ns_newmsg *, ns_msg *);
+void	ns_newmsg_id(ns_newmsg *handle, u_int16_t id);
+void	ns_newmsg_flag(ns_newmsg *handle, ns_flag flag, u_int value);
+int		ns_newmsg_q(ns_newmsg *handle, ns_nname_ct qname, ns_type qtype,
+			ns_class qclass);
+int		ns_newmsg_rr(ns_newmsg *handle, ns_sect sect, ns_nname_ct name,
+			ns_type type, ns_class rr_class, u_int32_t ttl, u_int16_t rdlen,
+			const u_char *rdata);
+size_t	ns_newmsg_done(ns_newmsg *handle);
+ssize_t	ns_rdata_unpack(const u_char *, const u_char *, ns_type, const u_char *,
+			size_t, u_char *, size_t);
+int		ns_rdata_equal(ns_type, const u_char *, size_t, const u_char *, size_t);
+int		ns_rdata_refers(ns_type, const u_char *, size_t, const u_char *);
 
 #ifdef __cplusplus
 }
