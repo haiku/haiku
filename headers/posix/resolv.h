@@ -53,20 +53,11 @@
  * SUCH DAMAGE.
  */
 
-/*%
- *	@(#)resolv.h	8.1 (Berkeley) 6/2/93
- *	$Id: resolv.h,v 1.30 2009/03/03 01:52:48 each Exp $
- */
-
 #ifndef _RESOLV_H_
 #define	_RESOLV_H_
 
 #include <sys/param.h>
-#if (!defined(BSD)) || (BSD < 199306)
-# include <sys/bitypes.h>
-#else
-# include <sys/types.h>
-#endif
+#include <sys/types.h>
 #include <sys/cdefs.h>
 #include <sys/socket.h>
 #include <stdio.h>
@@ -107,15 +98,6 @@ __BEGIN_DECLS
 void __h_errno_set(struct __res_state *res, int err);
 __END_DECLS
 
-/*%
- * Resolver configuration file.
- * Normally not present, but may contain the address of the
- * initial name server(s) to query and the domain search list.
- */
-
-#ifndef _PATH_RESCONF
-#define _PATH_RESCONF        "/etc/resolv.conf"
-#endif
 
 typedef enum { res_goahead, res_nextns, res_modified, res_done, res_error }
 	res_sendhookact;

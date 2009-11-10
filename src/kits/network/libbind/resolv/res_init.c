@@ -68,11 +68,6 @@
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static const char sccsid[] = "@(#)res_init.c	8.1 (Berkeley) 6/7/93";
-static const char rcsid[] = "$Id: res_init.c,v 1.26 2008/12/11 09:59:00 marka Exp $";
-#endif /* LIBC_SCCS and not lint */
-
 #include "port_before.h"
 
 #include <sys/types.h>
@@ -106,6 +101,8 @@ static const char rcsid[] = "$Id: res_init.c,v 1.26 2008/12/11 09:59:00 marka Ex
 
 /* ensure that sockaddr_in6 and IN6ADDR_ANY_INIT are declared / defined */
 #include <resolv.h>
+
+#include <FindDirectory.h>
 
 #include "res_private.h"
 
@@ -167,6 +164,7 @@ __res_vinit(res_state statp, int preinit) {
 	register FILE *fp;
 	register char *cp, **pp;
 	register int n;
+	char path[PATH_MAX];
 	char buf[BUFSIZ];
 	int nserv = 0;    /*%< number of nameserver records read from file */
 	int haveenv = 0;
@@ -313,8 +311,12 @@ __res_vinit(res_state statp, int preinit) {
 	(line[sizeof(name) - 1] == ' ' || \
 	 line[sizeof(name) - 1] == '\t'))
 
+	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, -1, false, path,
+			sizeof(path)) == B_OK)
+		strlcat(path, "/network/resolv.conf", sizeof(path));
+
 	nserv = 0;
-	if ((fp = fopen(_PATH_RESCONF, "r")) != NULL) {
+	if ((fp = fopen(path, "r")) != NULL) {
 	    /* read the config file */
 	    while (fgets(buf, sizeof(buf), fp) != NULL) {
 		/* skip comments */

@@ -10,8 +10,10 @@
 #include "DHCPClient.h"
 #include "NetServer.h"
 
+#include <FindDirectory.h>
 #include <Message.h>
 #include <MessageRunner.h>
+#include <Path.h>
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -628,8 +630,14 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				break;
 			case OPTION_DOMAIN_NAME_SERVER:
 			{
-				// TODO: for now, we write it just out to /etc/resolv.conf
-				FILE* file = fopen("/etc/resolv.conf", "w");
+				// TODO: for now, we write it just out to resolv.conf
+				BPath path;
+				if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK)
+					break;
+				
+				path.Append("network/resolv.conf");
+
+				FILE* file = fopen(path.Path(), "w");
 				for (uint32 i = 0; i < size / 4; i++) {
 					syslog(LOG_INFO, "DNS: %s\n",
 						_ToString(&data[i * 4]).String());
