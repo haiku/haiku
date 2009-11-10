@@ -105,14 +105,15 @@ struct stat {
 extern "C" {
 #endif
 
-extern int    chmod(const char *path, mode_t mode);
-extern int 	  fchmod(int fd, mode_t mode);
-extern int    stat(const char *path, struct stat *st);
-extern int    fstat(int fd, struct stat *st);
-extern int    lstat(const char *path, struct stat *st);
-extern int    mkdir(const char *path, mode_t mode);
-extern int    mkfifo(const char *path, mode_t mode);
-extern mode_t umask(mode_t cmask);
+extern int		chmod(const char *path, mode_t mode);
+extern int		fchmod(int fd, mode_t mode);
+extern int		stat(const char *path, struct stat *st);
+extern int		fstat(int fd, struct stat *st);
+extern int		lstat(const char *path, struct stat *st);
+extern int		fstatat(int fd, const char *path, struct stat *st, int flag);
+extern int		mkdir(const char *path, mode_t mode);
+extern int		mkfifo(const char *path, mode_t mode);
+extern mode_t	umask(mode_t cmask);
 
 #ifdef __cplusplus
 }

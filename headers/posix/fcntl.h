@@ -66,6 +66,9 @@
 
 #define AT_FDCWD		(-1)		/* CWD FD for the *at() functions */
 
+#define AT_SYMLINK_NOFOLLOW	0x1		/* fstatat(), fchmodat(), fchownat(),
+										utimensat() */
+#define AT_SYMLINK_FOLLOW	0x2		/* linkat() */
 
 /* advisory file locking */
 
