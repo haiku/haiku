@@ -1,3 +1,5 @@
 SubDir HAIKU_TOP src data ;
 
-SubInclude HAIKU_TOP src data etc ;
+HaikuSubInclude etc ;
+HaikuSubInclude keymaps ;
+HaikuSubInclude timezones ;

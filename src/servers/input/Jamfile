@@ -25,8 +25,7 @@ actions MkKeymapHeader1 {
 
 MkKeymapHeader [ FGristFiles SystemKeymap.h ] : US-International.keymap ;
 
-SEARCH on US-International.keymap
-	  += [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) data etc keymaps ] ;
+SEARCH on US-International.keymap += [ FDirName $(HAIKU_TOP) src data keymaps ] ;
 
 AddResources input_server : input_server.rdef ;
 

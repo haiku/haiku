@@ -109,7 +109,7 @@ rule FTimeZoneBinaries
 		local binaries = [ on $(source) return $(TZ_OBJECTS) ] ;
 
 		local targetDir = [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR)
-			data etc timezones ] ;
+			data timezones ] ;
 
 		local binary ;
 		for binary in $(binaries) {

@@ -12,7 +12,3 @@ local sysless = <etc>sysless ;
 MakeLocateArch $(sysless) ;
 Depends $(sysless) : $(syslessIn) ;
 LessKey $(sysless) : $(syslessIn) ;
-
-
-SubInclude HAIKU_TOP src data etc keymaps ;
-SubInclude HAIKU_TOP src data etc timezones ;

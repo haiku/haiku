@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src data etc timezones ;
+SubDir HAIKU_TOP src data timezones ;
 
 NotFile timezone_files ;
 Depends files : timezone_files ;
