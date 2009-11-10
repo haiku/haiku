@@ -14,7 +14,6 @@ MergeObject posix_unistd.o :
 	dup.c
 	exec.cpp
 	_exit.c
-	fcntl.c
 	fork.c
 	getlogin.c
 	getpagesize.c
@@ -25,7 +24,6 @@ MergeObject posix_unistd.o :
 	lseek.c
 	mknod.c
 	mount.c
-	open.c
 	pause.c
 	pipe.c
 	process.c

@@ -16,6 +16,7 @@ MergeObject posix_main.o :
  	dlfcn.c
  	dirent.c
  	errno.c
+	fcntl.cpp
  	fnmatch.c
  	glob.c
  	inttypes.c

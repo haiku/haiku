@@ -64,6 +64,8 @@
 #define O_SHLOCK		0x01000000	/* obtain shared lock */
 #define O_EXLOCK		0x02000000	/* obtain exclusive lock */
 
+#define AT_FDCWD		(-1)		/* CWD FD for the *at() functions */
+
 
 /* advisory file locking */
 
@@ -81,9 +83,10 @@ extern "C" {
 #endif
 
 extern int	creat(const char *path, mode_t mode);
-extern int	open(const char *pathname, int oflags, ...);
+extern int	open(const char *path, int openMode, ...);
 	/* the third argument is the permissions of the created file when O_CREAT
 	   is passed in oflags */
+extern int	openat(int fd, const char *path, int openMode, ...);
 
 extern int	fcntl(int fd, int op, ...);
 
