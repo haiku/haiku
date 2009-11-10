@@ -784,7 +784,7 @@ rule AddEntryToHaikuImageUserGroupFile file : entry
 		Always $(file) ;
 		MakeLocate $(file) : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
 		BuildHaikuImageUserGroupFile $(file) ;
-		AddFilesToHaikuImage system etc : $(file) ;
+		AddFilesToHaikuImage common etc : $(file) ;
 	}
 
 	HAIKU_IMAGE_USER_GROUP_ENTRIES on $(file) = $(allEntries) ;

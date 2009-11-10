@@ -1,6 +1,6 @@
 /*
  * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -47,7 +47,7 @@ static struct {
 } sPredefinedLinks[] = {
 	{"/system", "/boot/system"},
 	{"/bin", "/boot/system/bin"},
-	{"/etc", "/boot/system/etc"},
+	{"/etc", "/boot/common/etc"},
 	{"/var", "/boot/var"},
 	{"/tmp", "/boot/var/tmp"},
 	{NULL}

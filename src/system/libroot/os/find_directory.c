@@ -44,7 +44,7 @@ static const char *kSystemDirectories[] = {
 	SYSTEM "/servers",
 	SYSTEM "/apps",
 	SYSTEM "/bin",
-	SYSTEM "/etc",
+	"common/etc",
 	SYSTEM "/documentation",
 	SYSTEM "/preferences",
 	SYSTEM "/add-ons/Translators",
@@ -216,7 +216,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_SYSTEM_SERVERS_DIRECTORY:
 		case B_SYSTEM_APPS_DIRECTORY:
 		case B_SYSTEM_BIN_DIRECTORY:
-		case B_SYSTEM_ETC_DIRECTORY:
+		case B_BEOS_ETC_DIRECTORY:
 		case B_SYSTEM_DOCUMENTATION_DIRECTORY:
 		case B_SYSTEM_PREFERENCES_DIRECTORY:
 		case B_SYSTEM_TRANSLATORS_DIRECTORY:

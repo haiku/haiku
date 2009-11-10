@@ -381,7 +381,7 @@ local spellFiles = words geekspeak ;
 spellFiles = $(spellFiles:G=spell) ;
 SEARCH on $(spellFiles)
 	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
-AddFilesToHaikuImage system etc word_dictionary : $(spellFiles) ;
+AddFilesToHaikuImage common etc word_dictionary : $(spellFiles) ;
 
 # Locale kit language files
 local languageDir = [ FDirName $(HAIKU_TOP) src data locale languages ] ;
@@ -392,14 +392,14 @@ local etcFiles = bash_completion inputrc profile ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
 etcFiles += <etc>termcap <etc>sysless <etc>sysless.in ;
-AddFilesToHaikuImage system etc : $(etcFiles) ;
+AddFilesToHaikuImage common etc : $(etcFiles) ;
 
 SEARCH on <bash_completion>subversion =
 	[ FDirName $(HAIKU_TOP) data etc bash_completion.d ] ;
-AddFilesToHaikuImage system etc bash_completion.d : <bash_completion>subversion ;
+AddFilesToHaikuImage common etc bash_completion.d : <bash_completion>subversion ;
 
 SEARCH on <etc>vimrc = [ FDirName $(HAIKU_TOP) data etc vim ] ;
-AddFilesToHaikuImage system etc vim : <etc>vimrc ;
+AddFilesToHaikuImage common etc vim : <etc>vimrc ;
 
 local dataFiles = teapot.data ;
 dataFiles = $(dataFiles:G=data) ;

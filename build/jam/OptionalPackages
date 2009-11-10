@@ -148,7 +148,7 @@ if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 		AddSymlinkToHaikuImage beos : ../system/apps ;
 		AddSymlinkToHaikuImage beos : ../system/bin ;
 		AddSymlinkToHaikuImage beos : ../system/documentation ;
-		AddSymlinkToHaikuImage beos : ../system/etc ;
+		AddSymlinkToHaikuImage beos : ../common/etc ;
 		AddSymlinkToHaikuImage beos : ../system/preferences ;
 		AddSymlinkToHaikuImage beos : ../system ;
 	}
