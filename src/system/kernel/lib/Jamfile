@@ -37,6 +37,7 @@ KernelMergeObject kernel_lib_posix.o :
 	# main
  	kernel_errno.c
  	dirent.c
+	fcntl.cpp
  	poll.c
  	utime.c
  	# locale
@@ -73,12 +74,10 @@ KernelMergeObject kernel_lib_posix.o :
 	#conf.c
 	directory.c
 	dup.c
-	fcntl.c
 	ioctl.c
 	link.c
 	lseek.c
 	mount.c
-	open.c
 	read.c
 	sync.c
 	truncate.c
