@@ -479,7 +479,8 @@ TMailApp::ReadyToRun()
 	BEntry entry;
 
 	// Locate user settings directory
-	find_directory(B_BEOS_ETC_DIRECTORY, &indexDir, true);
+	find_directory(B_SYSTEM_DATA_DIRECTORY, &indexDir, true);
+	indexDir.Append("spell_check");
 	dictionaryDir = indexDir;
 
 	// Setup directory paths
