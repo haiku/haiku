@@ -39,7 +39,7 @@ static const char *kSystemDirectories[] = {
 	SYSTEM,										// B_BEOS_SYSTEM_DIRECTORY
 	SYSTEM "/add-ons",
 	SYSTEM "/boot",
-	SYSTEM "/fonts",
+	SYSTEM "/data/fonts",
 	SYSTEM "/lib",
 	SYSTEM "/servers",
 	SYSTEM "/apps",
@@ -64,7 +64,7 @@ static const char *kCommonDirectories[] = {
 	COMMON "",								// B_COMMON_SYSTEM_DIRECTORY
 	COMMON "/add-ons",
 	COMMON "/boot",
-	COMMON "/fonts",
+	COMMON "/data/fonts",
 	COMMON "/lib",
 	COMMON "/servers",
 	COMMON "/bin",
@@ -91,7 +91,7 @@ static const char *kUserDirectories[] = {
 	HOME "/config",							// B_USER_CONFIG_DIRECTORY
 	HOME "/config/add-ons",
 	HOME "/config/boot",
-	HOME "/config/fonts",
+	HOME "/config/data/fonts",
 	HOME "/config/lib",
 	HOME "/config/settings",
 	HOME "/config/be",

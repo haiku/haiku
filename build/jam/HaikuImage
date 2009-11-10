@@ -414,11 +414,11 @@ fortuneFiles = $(fortuneFiles:G=etc!fortunes) ;
 SEARCH on $(fortuneFiles) = [ FDirName $(HAIKU_TOP) data etc fortunes ] ;
 AddFilesToHaikuImage system etc fortunes : $(fortuneFiles) ;
 
-local fontDir = [ FDirName $(HAIKU_TOP) data etc fonts ] ;
+local fontDir = [ FDirName $(HAIKU_TOP) data system data fonts ] ;
 local psFonts = [ Glob $(fontDir)/psfonts : *.afm *.pfb ] ;
 local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
-AddFilesToHaikuImage system fonts psfonts : $(psFonts) ;
-AddFilesToHaikuImage system fonts ttfonts : $(ttFonts) ;
+AddFilesToHaikuImage system data fonts psfonts : $(psFonts) ;
+AddFilesToHaikuImage system data fonts ttfonts : $(ttFonts) ;
 
 local cannaDir = [ FDirName $(HAIKU_TOP) data system data Canna ] ;
 local cannaDefault = [ Glob $(cannaDir)/default : *.canna *.gz ] ;
