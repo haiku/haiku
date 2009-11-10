@@ -388,7 +388,7 @@ local languageDir = [ FDirName $(HAIKU_TOP) src data etc locale languages ] ;
 local languages = [ Glob $(languageDir) : *.language ] ;
 AddFilesToHaikuImage system data locale languages : $(languages) ;
 
-local etcFiles = bash_completion inputrc profile teapot.data ;
+local etcFiles = bash_completion inputrc profile ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
 etcFiles += <etc>termcap <etc>sysless <etc>sysless.in ;
@@ -400,6 +400,11 @@ AddFilesToHaikuImage system etc bash_completion.d : <bash_completion>subversion 
 
 SEARCH on <etc>vimrc = [ FDirName $(HAIKU_TOP) data etc vim ] ;
 AddFilesToHaikuImage system etc vim : <etc>vimrc ;
+
+local dataFiles = teapot.data ;
+dataFiles = $(dataFiles:G=data) ;
+SEARCH on $(dataFiles) = [ FDirName $(HAIKU_TOP) data ] ;
+AddFilesToHaikuImage system data : $(dataFiles) ;
 
 local fortuneFiles =  Art Computers Education Food Fortunes Goedel Haiku
 	Humorists Kids Law "Linux cookies" Love Magic Medicine Miscellaneous

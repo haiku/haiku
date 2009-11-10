@@ -75,7 +75,7 @@ signalEvent(sem_id event)
 	get_sem_count(event,&c);
 	if (c < 0)
 		release_sem_etc(event,-c,0);
-	
+
 	return 0;
 }
 
@@ -101,7 +101,7 @@ waitEvent(sem_id event)
 	get_sem_count(event,&c);
 	if (c > 0)
 		acquire_sem_etc(event,c,0,0);
-	
+
 	return 0;
 }
 
@@ -151,7 +151,7 @@ ObjectView::ObjectView(BRect rect, char *name, ulong resizingMode, ulong options
 	fForceRedraw(false),
 	fLastYXRatio(1),
 	fYxRatio(1)
-{	
+{
 	fTrackingInfo.isTracking = false;
 	fTrackingInfo.pickedObject = NULL;
 	fTrackingInfo.buttons = 0;
@@ -159,13 +159,13 @@ ObjectView::ObjectView(BRect rect, char *name, ulong resizingMode, ulong options
 	fTrackingInfo.lastY = 0.0f;
 	fTrackingInfo.lastDx = 0.0f;
 	fTrackingInfo.lastDy = 0.0f;
-		
+
 	fLastObjectDistance = fObjectDistance = depthOfView / 8;
 	quittingSem = create_sem(1, "quitting sem");
 	drawEvent = create_sem(0, "draw event");
 
 	char findDir[PATH_MAX];
-	find_directory(B_BEOS_ETC_DIRECTORY, -1, true, findDir, PATH_MAX);
+	find_directory(B_SYSTEM_DATA_DIRECTORY, -1, true, findDir, PATH_MAX);
 	sprintf(teapotPath, "%s/%s", findDir, teapotData);
 	fObjListLock.Lock();
 	fObjects.AddItem(new TriangleObject(this, teapotPath));
@@ -195,7 +195,7 @@ ObjectView::AttachedToWindow()
 
 	BGLView::AttachedToWindow();
 	Window()->SetPulseRate(100000);
-	
+
 	LockGL();
 
 	glEnable(GL_DITHER);
@@ -204,7 +204,7 @@ ObjectView::AttachedToWindow()
 	glDepthFunc(GL_LESS);
 
 	glShadeModel(GL_SMOOTH);
-	
+
 	glLightfv(GL_LIGHT0, GL_POSITION, position);
 	glLightfv(GL_LIGHT0 + 1, GL_POSITION, position1);
 	glLightfv(GL_LIGHT0 + 2, GL_POSITION, position2);
@@ -218,23 +218,23 @@ ObjectView::AttachedToWindow()
 	glLightfv(GL_LIGHT1, GL_SPECULAR, lights[lightBlue].specular);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE,lights[lightBlue].diffuse);
 	glLightfv(GL_LIGHT1, GL_AMBIENT,lights[lightBlue].ambient);
-		
+
 	glFrontFace(GL_CW);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_AUTO_NORMAL);
 	glEnable(GL_NORMALIZE);
-	
+
 	glMaterialf(GL_FRONT, GL_SHININESS, 0.6 * 128.0);
 
 	glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0);
 	glColor3f(1.0, 1.0, 1.0);
-		
+
 	glViewport(0, 0, (GLint)bounds.IntegerWidth() + 1,
 				(GLint)bounds.IntegerHeight() + 1);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	
-	float scale = displayScale;	
+
+	float scale = displayScale;
 	glOrtho(-scale, scale, -scale, scale, -scale * depthOfView,
 			scale * depthOfView);
 	glMatrixMode(GL_MODELVIEW);
@@ -256,12 +256,12 @@ ObjectView::DetachedFromWindow()
 
 	long dummy;
 	long locks = 0;
-	
+
 	while (Window()->IsLocked()) {
 		locks++;
 		Window()->Unlock();
 	}
-	
+
 	acquire_sem(quittingSem);
 	release_sem(drawEvent);
 	wait_for_thread(fDrawThread, &dummy);
@@ -320,7 +320,7 @@ ObjectView::MessageReceived(BMessage* msg)
 				if (i != index)
 					menu->ItemAt(i)->SetMarked(false);
 			}
-			
+
 			LockGL();
 			if (color != lightNone) {
 				glEnable(GL_LIGHT0 + lightNum - 1);
@@ -367,12 +367,12 @@ ObjectView::MessageReceived(BMessage* msg)
 			toggleItem = true;
 			break;
 	}
-	
+
 	if (toggleItem && msg->FindPointer("source", reinterpret_cast<void**>(&item)) == B_OK){
 		item->SetMarked(!item->IsMarked());
 		setEvent(drawEvent);
 	}
-	
+
 	BGLView::MessageReceived(msg);
 }
 
@@ -412,7 +412,7 @@ ObjectView::ObjectAtPoint(const BPoint &point)
 void
 ObjectView::MouseDown(BPoint point)
 {
-	GLObject* object = NULL;	
+	GLObject* object = NULL;
 
 	BMessage *msg = Window()->CurrentMessage();
 	uint32 buttons = msg->FindInt32("buttons");
@@ -427,16 +427,16 @@ ObjectView::MouseDown(BPoint point)
 			fTrackingInfo.lastY = point.y;
 			fTrackingInfo.lastDx = 0.0f;
 			fTrackingInfo.lastDy = 0.0f;
-			fTrackingInfo.pickedObject->Spin(0.0f, 0.0f);		
-					
-			
+			fTrackingInfo.pickedObject->Spin(0.0f, 0.0f);
+
+
 			SetMouseEventMask(B_POINTER_EVENTS,
-						B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);	
-		} else {				
-			ConvertToScreen(&point);			
-			object->MenuInvoked(point);		
+						B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
+		} else {
+			ConvertToScreen(&point);
+			object->MenuInvoked(point);
 		}
-	}	
+	}
 }
 
 
@@ -444,18 +444,18 @@ void
 ObjectView::MouseUp(BPoint point)
 {
 	if (fTrackingInfo.isTracking) {
-		
+
 		//spin the teapot on release, TODO: use a marching sum and divide by time
-		if (fTrackingInfo.buttons == B_PRIMARY_MOUSE_BUTTON 
-			&& fTrackingInfo.pickedObject != NULL 
-			&& (fabs(fTrackingInfo.lastDx) > 1.0f 
-				|| fabs(fTrackingInfo.lastDy) > 1.0f) ) {	
-			
-			fTrackingInfo.pickedObject->Spin(0.5f * fTrackingInfo.lastDy, 0.5f * fTrackingInfo.lastDx);		
-						
-			setEvent(drawEvent);				
+		if (fTrackingInfo.buttons == B_PRIMARY_MOUSE_BUTTON
+			&& fTrackingInfo.pickedObject != NULL
+			&& (fabs(fTrackingInfo.lastDx) > 1.0f
+				|| fabs(fTrackingInfo.lastDy) > 1.0f) ) {
+
+			fTrackingInfo.pickedObject->Spin(0.5f * fTrackingInfo.lastDy, 0.5f * fTrackingInfo.lastDx);
+
+			setEvent(drawEvent);
 		}
-		
+
 		//stop tracking
 		fTrackingInfo.isTracking = false;
 		fTrackingInfo.buttons = 0;
@@ -464,7 +464,7 @@ ObjectView::MouseUp(BPoint point)
 		fTrackingInfo.lastY = 0.0f;
 		fTrackingInfo.lastDx = 0.0f;
 		fTrackingInfo.lastDy = 0.0f;
-	}	
+	}
 }
 
 
@@ -472,43 +472,43 @@ void
 ObjectView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 {
 	if (fTrackingInfo.isTracking && fTrackingInfo.pickedObject != NULL) {
-		
+
 		float dx = point.x - fTrackingInfo.lastX;
 		float dy = point.y - fTrackingInfo.lastY;
 		fTrackingInfo.lastX = point.x;
 		fTrackingInfo.lastY = point.y;
-				
+
 		if (fTrackingInfo.buttons == B_PRIMARY_MOUSE_BUTTON) {
-								
+
 			fTrackingInfo.pickedObject->Spin(0.0f, 0.0f);
 			fTrackingInfo.pickedObject->RotateWorldSpace(dx,dy);
 			fTrackingInfo.lastDx = dx;
-			fTrackingInfo.lastDy = dy;			
-			
-			setEvent(drawEvent);	
-			
-		} else if (fTrackingInfo.buttons == B_SECONDARY_MOUSE_BUTTON) {			
-			
+			fTrackingInfo.lastDy = dy;
+
+			setEvent(drawEvent);
+
+		} else if (fTrackingInfo.buttons == B_SECONDARY_MOUSE_BUTTON) {
+
 			float xinc = (dx * 2 * displayScale / Bounds().Width());
 			float yinc = (-dy * 2 * displayScale / Bounds().Height());
 			float zinc = 0;
-			
+
 			if (fPersp) {
 				zinc = yinc * (fTrackingInfo.pickedObject->z / displayScale);
 				xinc *= -(fTrackingInfo.pickedObject->z * 4 / zRatio);
 				yinc *= -(fTrackingInfo.pickedObject->z * 4 / zRatio);
 			}
-			
+
 			fTrackingInfo.pickedObject->x += xinc;
 			if (modifiers() & B_SHIFT_KEY)
 				fTrackingInfo.pickedObject->z += zinc;
 			else
 	  			fTrackingInfo.pickedObject->y += yinc;
-	  						
+
 			fForceRedraw = true;
-			setEvent(drawEvent);									
-		} 
-	}	
+			setEvent(drawEvent);
+		}
+	}
 }
 
 
@@ -518,7 +518,7 @@ ObjectView::FrameResized(float width, float height)
 	LockGL();
 
 	BGLView::FrameResized(width, height);
-	
+
 	width = Bounds().Width();
 	height = Bounds().Height();
 	fYxRatio = height / width;
@@ -538,17 +538,17 @@ ObjectView::FrameResized(float width, float height)
 			glOrtho(-scale / fYxRatio, scale / fYxRatio, -scale, scale, -1.0,
 				depthOfView * 4);
 		} else {
-			glOrtho(-scale, scale, -scale * fYxRatio, scale * fYxRatio, -1.0, 
+			glOrtho(-scale, scale, -scale * fYxRatio, scale * fYxRatio, -1.0,
 				depthOfView * 4);
 		}
 	}
 
 	fLastYXRatio = fYxRatio;
-	
+
 	glMatrixMode(GL_MODELVIEW);
-	
+
 	UnlockGL();
-	
+
 	fForceRedraw = true;
 	setEvent(drawEvent);
 }
@@ -584,7 +584,7 @@ ObjectView::RepositionView()
 	glMatrixMode(GL_MODELVIEW);
 
 	UnlockGL();
-	
+
 	fLastObjectDistance = fObjectDistance;
 	fLastPersp = fPersp;
 	fLastYXRatio = fYxRatio;
@@ -596,27 +596,27 @@ void
 ObjectView::EnforceState()
 {
 	glShadeModel(fGouraud ? GL_SMOOTH : GL_FLAT);
-		
+
 	if (fZbuf)
 		glEnable(GL_DEPTH_TEST);
 	else
 		glDisable(GL_DEPTH_TEST);
-		
+
 	if (fCulling)
 		glEnable(GL_CULL_FACE);
 	else
 		glDisable(GL_CULL_FACE);
-		
+
 	if (fLighting)
 		glEnable(GL_LIGHTING);
 	else
 		glDisable(GL_LIGHTING);
-	
+
 	if (fFilled)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	else
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);	
-	
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	if (fFog) {
 		glFogf(GL_FOG_START, 10.0);
 		glFogf(GL_FOG_DENSITY, 0.2);
@@ -645,7 +645,7 @@ ObjectView::SpinIt()
 		fLastGouraud = fGouraud;
 		changed = true;
 	}
-	
+
 	if (fZbuf != fLastZbuf) {
 		LockGL();
 		if (fZbuf)
@@ -656,7 +656,7 @@ ObjectView::SpinIt()
 		fLastZbuf = fZbuf;
 		changed = true;
 	}
-	
+
 	if (fCulling != fLastCulling) {
 		LockGL();
 		if (fCulling)
@@ -667,9 +667,9 @@ ObjectView::SpinIt()
 		fLastCulling = fCulling;
 		changed = true;
 	}
-	
+
 	if (fLighting != fLastLighting) {
-		LockGL();	
+		LockGL();
 		if (fLighting)
 			glEnable(GL_LIGHTING);
 		else
@@ -678,7 +678,7 @@ ObjectView::SpinIt()
 		fLastLighting = fLighting;
 		changed = true;
 	}
-	
+
 	if (fFilled != fLastFilled) {
 		LockGL();
 		if (fFilled) {
@@ -690,7 +690,7 @@ ObjectView::SpinIt()
 		fLastFilled = fFilled;
 		changed = true;
 	}
-	
+
 	if (fFog != fLastFog) {
 		if (fFog) {
 			glFogf(GL_FOG_START, 1.0);
@@ -708,7 +708,7 @@ ObjectView::SpinIt()
 		fLastFog = fFog;
 		changed = true;
 	}
-	
+
 	changed = changed || RepositionView();
 	changed = changed || fForceRedraw;
 	fForceRedraw = false;
@@ -759,14 +759,14 @@ ObjectView::DrawFrame(bool noPause)
 		}
 
 		fFpsHistory[entry] = fps;
-	  
+
 		if (fHistEntries > 5) {
 			fps = 0;
 			for (int i = 0; i < fHistEntries; i++)
 				fps += fFpsHistory[(fOldestEntry + i) % HISTSIZE];
-				
+
 			fps /= fHistEntries;
-			
+
 			if (fFps) {
 				glPushAttrib(GL_ENABLE_BIT | GL_LIGHTING_BIT);
 				glPushMatrix();
@@ -781,7 +781,7 @@ ObjectView::DrawFrame(bool noPause)
 				glPushMatrix();
 				glLoadIdentity();
 				glMatrixMode(GL_MODELVIEW);
-				
+
 				FPS::drawCounter(fps);
 
 				glMatrixMode(GL_PROJECTION);
