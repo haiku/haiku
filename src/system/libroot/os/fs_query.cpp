@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <dirent_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 
@@ -33,7 +34,7 @@ open_query_etc(dev_t device, const char *query,
 	}
 
 	// allocate the DIR structure
-	DIR *dir = fdopendir(fd);
+	DIR *dir = __create_dir_struct(fd);
 	if (dir == NULL) {
 		_kern_close(fd);
 		return NULL;

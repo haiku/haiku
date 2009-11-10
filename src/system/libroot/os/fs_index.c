@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
+#include <dirent_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 
@@ -64,7 +65,7 @@ fs_open_index_dir(dev_t device)
 	}
 
 	// allocate the DIR structure
-	if ((dir = fdopendir(fd)) == NULL) {
+	if ((dir = __create_dir_struct(fd)) == NULL) {
 		_kern_close(fd);
 		return NULL;
 	}

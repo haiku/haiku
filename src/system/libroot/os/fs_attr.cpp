@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
+#include <dirent_private.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 
@@ -31,7 +32,7 @@ open_attr_dir(int file, const char *path)
 	}
 
 	// allocate the DIR structure
-	if ((dir = fdopendir(fd)) == NULL) {
+	if ((dir = __create_dir_struct(fd)) == NULL) {
 		_kern_close(fd);
 		return NULL;
 	}

@@ -6,6 +6,7 @@
 
 
 #include <dirent.h>
+#include <dirent_private.h>
 
 #include <errno.h>
 #include <limits.h>
@@ -93,11 +94,11 @@ do_seek_dir(DIR* dir)
 }
 
 
-// #pragma mark -
+// #pragma mark - private API
 
 
 DIR*
-fdopendir(int fd)
+__create_dir_struct(int fd)
 {
 	DIR* dir;
 
@@ -116,6 +117,39 @@ fdopendir(int fd)
 }
 
 
+
+// #pragma mark - public API
+
+
+DIR*
+fdopendir(int fd)
+{
+	DIR* dir;
+
+	// Since our standard file descriptors can't be used as directory file
+	// descriptors, we have to open a fresh one explicitly.
+	int dirFD = _kern_open_dir(fd, NULL);
+	if (dirFD < 0) {
+		errno = dirFD;
+		return NULL;
+	}
+
+	dir = __create_dir_struct(dirFD);
+	if (dir == NULL) {
+		close(dirFD);
+		return NULL;
+	}
+
+	// According to the spec, "the file descriptor is under the control of the
+	// system" now. It's not quite clear whether we're allowed to close it now,
+	// though. We could dup2() the new FD over the old one and close the new
+	// one, if it turns out to be a problem.
+	close(fd);
+
+	return dir;
+}
+
+
 DIR*
 opendir(const char* path)
 {
@@ -128,7 +162,7 @@ opendir(const char* path)
 	}
 
 	// allocate the DIR structure
-	if ((dir = fdopendir(fd)) == NULL) {
+	if ((dir = __create_dir_struct(fd)) == NULL) {
 		_kern_close(fd);
 		return NULL;
 	}
