@@ -138,6 +138,8 @@ extern int		unlink(const char *name);
 extern int		rmdir(const char *path);
 
 extern ssize_t  readlink(const char *path, char *buffer, size_t bufferSize);
+extern ssize_t	readlinkat(int fd, const char *path, char *buffer,
+					size_t bufferSize);
 extern int      symlink(const char *from, const char *to);
 
 extern int      ftruncate(int fd, off_t newSize);

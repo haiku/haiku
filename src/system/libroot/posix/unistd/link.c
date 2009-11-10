@@ -20,8 +20,15 @@
 ssize_t
 readlink(const char *path, char *buffer, size_t bufferSize)
 {
+	return readlinkat(AT_FDCWD, path, buffer, bufferSize);
+}
+
+
+ssize_t
+readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
+{
 	size_t linkLen = bufferSize;
-	status_t status = _kern_read_link(-1, path, buffer, &linkLen);
+	status_t status = _kern_read_link(fd, path, buffer, &linkLen);
 	if (status < B_OK) {
 		errno = status;
 		return -1;
@@ -49,7 +56,7 @@ int
 unlink(const char *path)
 {
 	int status = _kern_unlink(-1, path);
-	
+
 	RETURN_AND_SET_ERRNO(status);
 }
 
