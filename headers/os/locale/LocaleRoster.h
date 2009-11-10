@@ -11,6 +11,7 @@ class BCollator;
 class BCountry;
 class BCatalog;
 class BCatalogAddOn;
+class BMessage;
 
 struct entry_ref;
 

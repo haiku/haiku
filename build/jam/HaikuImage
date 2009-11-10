@@ -384,7 +384,7 @@ SEARCH on $(spellFiles)
 AddFilesToHaikuImage system etc word_dictionary : $(spellFiles) ;
 
 # Locale kit language files
-local languageDir = [ FDirName $(HAIKU_TOP) src data etc locale languages ] ;
+local languageDir = [ FDirName $(HAIKU_TOP) src data locale languages ] ;
 local languages = [ Glob $(languageDir) : *.language ] ;
 AddFilesToHaikuImage system data locale languages : $(languages) ;
 
@@ -491,17 +491,21 @@ AddFilesToHaikuImage system add-ons opengl
 	: Mesa\ Software\ Renderer ;
 AddFilesToHaikuHybridImage system add-ons Translators
 	: $(SYSTEM_ADD_ONS_TRANSLATORS) : : true ;
-AddFilesToHaikuImage system add-ons locale catalogs : $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
+AddFilesToHaikuImage system add-ons locale catalogs
+	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
 AddFilesToHaikuImage system add-ons mail_daemon inbound_protocols : POP3 IMAP ;
 AddFilesToHaikuImage system add-ons mail_daemon outbound_protocols : SMTP ;
-AddFilesToHaikuImage system add-ons mail_daemon inbound_filters : Match\ Header Spam\ Filter R5\ Daemon\ Filter ;
+AddFilesToHaikuImage system add-ons mail_daemon inbound_filters
+	: Match\ Header Spam\ Filter R5\ Daemon\ Filter ;
 AddFilesToHaikuImage system add-ons mail_daemon outbound_filters : Fortune ;
-AddFilesToHaikuImage system add-ons mail_daemon system_filters : Inbox New\ Mail\ Notification Outbox Message\ Parser ;
+AddFilesToHaikuImage system add-ons mail_daemon system_filters
+	: Inbox New\ Mail\ Notification Outbox Message\ Parser ;
 AddFilesToHaikuImage system add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToHaikuImage system add-ons media plugins
 	: $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
 AddFilesToHaikuImage system add-ons Tracker
-	: FileType-F Mark\ as… Mark\ as\ Read-R Open\ Target\ Folder-O OpenTerminal-T ZipOMatic-Z ;
+	: FileType-F Mark\ as… Mark\ as\ Read-R Open\ Target\ Folder-O OpenTerminal-T
+	ZipOMatic-Z ;
 AddSymlinkToHaikuImage system add-ons Tracker
 	: /boot/system/preferences/Backgrounds : Background-B ;
 AddSymlinkToHaikuImage system add-ons Tracker

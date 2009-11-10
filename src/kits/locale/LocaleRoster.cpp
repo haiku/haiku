@@ -1,10 +1,14 @@
 /*
-** Distributed under the terms of the OpenBeOS License.
-** Copyright 2003-2004. All rights reserved.
-**
-** Authors:	Axel Dörfler, axeld@pinc-software.de
-**			Oliver Tappe, zooey@hirschkaefer.de
-*/
+ * Copyright 2003-2004, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Oliver Tappe, zooey@hirschkaefer.de
+ */
+
+
+#include <LocaleRoster.h>
 
 #include <set>
 
@@ -23,7 +27,6 @@
 #include <FindDirectory.h>
 #include <Language.h>
 #include <Locale.h>
-#include <LocaleRoster.h>
 #include <Node.h>
 #include <Path.h>
 #include <String.h>
@@ -177,7 +180,7 @@ RosterData::RosterData()
 
 	InitializeCatalogAddOns();
 
-	// Load preferences to get the preffered languages
+	// Load preferences to get the preferred languages
 	BPath path;
 	BFile file;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {

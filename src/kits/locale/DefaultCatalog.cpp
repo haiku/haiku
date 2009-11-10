@@ -36,11 +36,10 @@ using std::max;
 using std::pair;
 
 
-/*
- *	This file implements the default catalog-type for the opentracker locale
- *	kit. Alternatively, this could be used as a full add-on, but currently this
- *  is provided as part of liblocale.so.
- */
+/*!	This file implements the default catalog-type for the opentracker locale
+	kit. Alternatively, this could be used as a full add-on, but currently this
+	is provided as part of liblocale.so.
+*/
 
 
 static const char *kCatFolder = "catalogs";
@@ -52,13 +51,15 @@ const char *DefaultCatalog::kCatMimeType
 static int16 kCatArchiveVersion = 1;
 	// version of the catalog archive structure, bump this if you change it!
 
+const uint8 DefaultCatalog::kDefaultCatalogAddOnPriority = 1;
+	// give highest priority to our embedded catalog-add-on
 
-/*
- * constructs a DefaultCatalog with given signature and language and reads
- * the catalog from disk.
- * InitCheck() will be B_OK if catalog could be loaded successfully, it will
- * give an appropriate error-code otherwise.
- */
+
+/*!	Constructs a DefaultCatalog with given signature and language and reads
+	the catalog from disk.
+	InitCheck() will be B_OK if catalog could be loaded successfully, it will
+	give an appropriate error-code otherwise.
+*/
 DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
 	uint32 fingerprint)
 	:
@@ -80,30 +81,26 @@ DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
 	status_t status = ReadFromFile(catalogPath.Path());
 
 	if (status != B_OK) {
-		// look in common-etc folder (/boot/home/config/etc):
-		BPath commonEtcPath;
-		find_directory(B_COMMON_ETC_DIRECTORY, &commonEtcPath);
-		if (commonEtcPath.InitCheck() == B_OK) {
-			catalogName = BString(commonEtcPath.Path())
-							<< "/locale/" << kCatFolder
-							<< "/" << fSignature
-							<< "/" << fLanguageName
-							<< kCatExtension;
-			status = ReadFromFile(catalogName.String());
-		}
-	}
+		// search in data folders
 
-	if (status != B_OK) {
-		// look in system-etc folder (/boot/beos/etc):
-		BPath systemEtcPath;
-		find_directory(B_BEOS_ETC_DIRECTORY, &systemEtcPath);
-		if (systemEtcPath.InitCheck() == B_OK) {
-			catalogName = BString(systemEtcPath.Path())
-							<< "/locale/" << kCatFolder
-							<< "/" << fSignature
-							<< "/" << fLanguageName
-							<< kCatExtension;
-			status = ReadFromFile(catalogName.String());
+		directory_which which[] = {
+			B_USER_DATA_DIRECTORY,
+			B_COMMON_DATA_DIRECTORY,
+			B_SYSTEM_DATA_DIRECTORY
+		};
+
+		for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
+			BPath path;
+			if (find_directory(which[i], &path) == B_OK) {
+				catalogName = BString(path.Path())
+					<< "/locale/" << kCatFolder
+					<< "/" << fSignature
+					<< "/" << fLanguageName
+					<< kCatExtension;
+				status = ReadFromFile(catalogName.String());
+				if (status == B_OK)
+					break;
+			}
 		}
 	}
 
@@ -114,12 +111,11 @@ DefaultCatalog::DefaultCatalog(const char *signature, const char *language,
 }
 
 
-/*
- * constructs a DefaultCatalog and reads it from the resources of the
- * given entry-ref (which usually is an app- or add-on-file).
- * InitCheck() will be B_OK if catalog could be loaded successfully, it will
- * give an appropriate error-code otherwise.
- */
+/*!	Constructs a DefaultCatalog and reads it from the resources of the
+	given entry-ref (which usually is an app- or add-on-file).
+	InitCheck() will be B_OK if catalog could be loaded successfully, it will
+	give an appropriate error-code otherwise.
+*/
 DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 	:
 	BHashMapCatalog("", "", 0)
@@ -131,11 +127,10 @@ DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 }
 
 
-/*
- * constructs an empty DefaultCatalog with given sig and language.
- * This is used for editing/testing purposes.
- * InitCheck() will always be B_OK.
- */
+/*!	Constructs an empty DefaultCatalog with given sig and language.
+	This is used for editing/testing purposes.
+	InitCheck() will always be B_OK.
+*/
 DefaultCatalog::DefaultCatalog(const char *path, const char *signature,
 	const char *language)
 	:
@@ -387,10 +382,9 @@ DefaultCatalog::WriteToResource(entry_ref *appOrAddOnRef)
 }
 
 
-/*
- * writes mimetype, language-name and signature of catalog into the
- * catalog-file.
- */
+/*!	Writes mimetype, language-name and signature of catalog into the
+	catalog-file.
+*/
 void
 DefaultCatalog::UpdateAttributes(BFile& catalogFile)
 {
@@ -581,7 +575,3 @@ DefaultCatalog::Create(const char *signature, const char *language)
 	}
 	return catalog;
 }
-
-
-const uint8 DefaultCatalog::kDefaultCatalogAddOnPriority = 1;
-	// give highest priority to our embedded catalog-add-on

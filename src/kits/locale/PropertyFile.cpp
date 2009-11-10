@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "PropertyFile.h"
@@ -10,18 +10,13 @@
 #include <Path.h>
 #include <FindDirectory.h>
 
-#if B_BEOS_VERSION <= B_BEOS_VERSION_5 && !defined(__HAIKU__)
-// B_BAD_DATA was introduced with DANO, so we define it for R5:
-#	define B_BAD_DATA -2147483632L
-#endif
-
 
 status_t
 PropertyFile::SetTo(const char *directory, const char *name)
 {
 	BPath path;
-	status_t status = find_directory(B_BEOS_ETC_DIRECTORY, &path);
-	if (status < B_OK)
+	status_t status = find_directory(B_BEOS_DATA_DIRECTORY, &path);
+	if (status != B_OK)
 		return status;
 
 	path.Append(directory);

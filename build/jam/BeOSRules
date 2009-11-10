@@ -276,7 +276,7 @@ actions ResAttr1
 # linkcatkeys.
 rule ExtractCatalogEntries target : source : signature
 {
-# get compiler and defines for the platform
+	# get compiler and defines for the platform
 	local headers ;
 	local sysHeaders ;
 	local cc ;
@@ -381,6 +381,6 @@ rule DoCatalogs appName	# Application name
 			: $(signature) : $(catalog:B) ;
 	}
 	
-	AddFilesToHaikuImage system etc locale catalogs $(signature) :
+	AddFilesToHaikuImage system data locale catalogs $(signature) :
 		$(genCat) $(trans:S=.catalog) ;
 }
