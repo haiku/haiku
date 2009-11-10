@@ -403,16 +403,13 @@ AddFilesToHaikuImage system etc vim : <etc>vimrc ;
 
 local dataFiles = teapot.data ;
 dataFiles = $(dataFiles:G=data) ;
-SEARCH on $(dataFiles) = [ FDirName $(HAIKU_TOP) data ] ;
+SEARCH on $(dataFiles) = [ FDirName $(HAIKU_TOP) data system data ] ;
 AddFilesToHaikuImage system data : $(dataFiles) ;
 
-local fortuneFiles =  Art Computers Education Food Fortunes Goedel Haiku
-	Humorists Kids Law "Linux cookies" Love Magic Medicine Miscellaneous
-	News "One Liners" "OS Fortunes" Pets Platitudes Riddles "Songs & Poems"
-	Sports "Tech Support Excuses" ;
-fortuneFiles = $(fortuneFiles:G=etc!fortunes) ;
-SEARCH on $(fortuneFiles) = [ FDirName $(HAIKU_TOP) data etc fortunes ] ;
-AddFilesToHaikuImage system etc fortunes : $(fortuneFiles) ;
+local fortuneFiles = [ Glob $(HAIKU_TOP)/data/system/data/fortunes
+	: [a-zA-Z0-9]* ] ;
+fortuneFiles = $(fortuneFiles:G=data!fortunes) ;
+AddFilesToHaikuImage system data fortunes : $(fortuneFiles) ;
 
 local fontDir = [ FDirName $(HAIKU_TOP) data system data fonts ] ;
 local psFonts = [ Glob $(fontDir)/psfonts : *.afm *.pfb ] ;

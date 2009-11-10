@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku. All rights reserved.
+ * Copyright 2002-2009, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,10 +13,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <FindDirectory.h>
 #include <OS.h>
-
-
-#define FORTUNES "/etc/fortunes"
 
 
 static int
@@ -38,6 +36,9 @@ choose_file(const char *path)
 
 		count++;
 	}
+
+	if (count == 0)
+		return -1;
 
 	// choose and open entry
 
@@ -75,7 +76,8 @@ choose_file(const char *path)
 int
 main(int argc, char **argv)
 {
-	char *file = FORTUNES;
+	char path[PATH_MAX] = {'\0'};
+	const char *file = path;
 	int fd;
 	char *buffer;
 	unsigned start, i;
@@ -87,6 +89,9 @@ main(int argc, char **argv)
 	if (argc > 1) {
 		// if there are arguments, choose one randomly
 		file = argv[1 + (rand() % (argc - 1))];
+	} else if (find_directory(B_SYSTEM_DATA_DIRECTORY, -1, false, path,
+			sizeof(path)) == B_OK) {
+		strlcat(path, "/fortunes", sizeof(path));
 	}
 
 	fd = open(file, O_RDONLY, 0);
