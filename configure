@@ -534,7 +534,7 @@ HAIKU_TIME_ZONE_SOURCES = ${timezoneSources} ;
 EOF
 
 for source in ${timezoneSources}; do
-	f=$sourceDir/src/data/etc/timezones/$source
+	f=$sourceDir/src/data/timezones/$source
 
 TZOBJECTS=`gawk '/^Zone/ { print $2 } /^Link/ { print $3 } ' "$f" `
 

@@ -428,7 +428,7 @@ AddFilesToHaikuImage system data Canna dic canna : $(cannaDicCanna) ;
 AddDirectoryToHaikuImage system data Canna dic group ;
 AddDirectoryToHaikuImage system data Canna dic user ;
 
-local keymapFiles = [ Glob [ FDirName $(HAIKU_TOP) src data etc keymaps ]
+local keymapFiles = [ Glob [ FDirName $(HAIKU_TOP) src data keymaps ]
 	: *.keymap ] ;
 keymapFiles = $(keymapFiles:BG=keymap) ;
 AddFilesToHaikuImage system data Keymaps : $(keymapFiles) ;
