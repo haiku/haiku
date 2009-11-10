@@ -47,6 +47,7 @@ public:
 
 private:
 			BackgroundsWindow*	fWindow;
+			BCatalog			fCatalog;
 };
 
 
@@ -56,8 +57,10 @@ private:
 BackgroundsApplication::BackgroundsApplication()
 	:
 	BApplication(kSignature),
-	fWindow(new BackgroundsWindow())
+	fWindow(NULL)
 {
+	be_locale->GetAppCatalog(&fCatalog);
+	fWindow = new BackgroundsWindow();
 	fWindow->Show();
 }
 
@@ -137,8 +140,6 @@ int
 main(int argc, char** argv)
 {
 	BackgroundsApplication app;
-	BCatalog cat;
-	be_locale->GetAppCatalog(&cat);
 	app.Run();
 	return 0;
 }
