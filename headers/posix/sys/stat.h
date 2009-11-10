@@ -110,7 +110,9 @@ extern int		fchmod(int fd, mode_t mode);
 extern int		stat(const char *path, struct stat *st);
 extern int		fstat(int fd, struct stat *st);
 extern int		lstat(const char *path, struct stat *st);
+#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
 extern int		fstatat(int fd, const char *path, struct stat *st, int flag);
+#endif
 extern int		mkdir(const char *path, mode_t mode);
 extern int		mkfifo(const char *path, mode_t mode);
 extern mode_t	umask(mode_t cmask);

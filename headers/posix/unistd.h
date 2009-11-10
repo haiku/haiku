@@ -138,8 +138,10 @@ extern int		unlink(const char *name);
 extern int		rmdir(const char *path);
 
 extern ssize_t  readlink(const char *path, char *buffer, size_t bufferSize);
+#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
 extern ssize_t	readlinkat(int fd, const char *path, char *buffer,
 					size_t bufferSize);
+#endif
 extern int      symlink(const char *from, const char *to);
 
 extern int      ftruncate(int fd, off_t newSize);

@@ -7,6 +7,9 @@
  */
 
 
+#define B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT 1
+	// make the *at() functions and AT_* macros visible
+
 #include <stdarg.h>
 #include <unistd.h>
 #include <fcntl.h>

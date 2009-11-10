@@ -64,11 +64,13 @@
 #define O_SHLOCK		0x01000000	/* obtain shared lock */
 #define O_EXLOCK		0x02000000	/* obtain exclusive lock */
 
+#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
 #define AT_FDCWD		(-1)		/* CWD FD for the *at() functions */
 
 #define AT_SYMLINK_NOFOLLOW	0x1		/* fstatat(), fchmodat(), fchownat(),
 										utimensat() */
 #define AT_SYMLINK_FOLLOW	0x2		/* linkat() */
+#endif
 
 /* advisory file locking */
 
@@ -89,7 +91,9 @@ extern int	creat(const char *path, mode_t mode);
 extern int	open(const char *path, int openMode, ...);
 	/* the third argument is the permissions of the created file when O_CREAT
 	   is passed in oflags */
+#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
 extern int	openat(int fd, const char *path, int openMode, ...);
+#endif
 
 extern int	fcntl(int fd, int op, ...);
 
