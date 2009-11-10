@@ -1879,7 +1879,7 @@ BlockAllocator::CheckInode(Inode* inode, check_control* control)
 void
 BlockAllocator::Dump(int32 index)
 {
-	kprintf("allocation groups: %ld\n", fNumGroups);
+	kprintf("allocation groups: %ld (base %p)\n", fNumGroups, fGroups);
 	kprintf("blocks per group: %ld\n", fBlocksPerGroup);
 
 	for (int32 i = 0; i < fNumGroups; i++) {
@@ -1888,7 +1888,8 @@ BlockAllocator::Dump(int32 index)
 
 		AllocationGroup& group = fGroups[i];
 
-		kprintf("[%3ld] num bits:       %lu\n", i, group.NumBits());
+		kprintf("[%3ld] num bits:       %lu  (%p)\n", i, group.NumBits(),
+			&group);
 		kprintf("      num blocks:     %lu\n", group.NumBlocks());
 		kprintf("      start:          %ld\n", group.Start());
 		kprintf("      first free:     %ld\n", group.fFirstFree);
