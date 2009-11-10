@@ -8554,6 +8554,9 @@ _user_open_dir_entry_ref(dev_t device, ino_t inode, const char* userName)
 int
 _user_open_dir(int fd, const char* userPath)
 {
+	if (userPath == NULL)
+		return dir_open(fd, NULL, false);
+
 	KPath path(B_PATH_NAME_LENGTH + 1);
 	if (path.InitCheck() != B_OK)
 		return B_NO_MEMORY;
