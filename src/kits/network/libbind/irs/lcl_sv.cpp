@@ -85,6 +85,7 @@ extern "C" {
 #include <string.h>
 #include <stdlib.h>
 
+#include <FindDirectory.h>
 #include <fs_attr.h>
 #include <image.h>
 #include <TypeConstants.h>
@@ -147,7 +148,8 @@ sv_close(struct irs_sv *sv)
 static void
 sv_rewind(struct irs_sv *sv)
 {
-	struct service_private *service = (struct service_private *)sv->private_data;
+	struct service_private *service
+		= (struct service_private *)sv->private_data;
 
 	if (service->file) {
 		if (fseek(service->file, 0L, SEEK_SET) == 0)
@@ -156,12 +158,18 @@ sv_rewind(struct irs_sv *sv)
 		service->file = NULL;
 	}
 
-	if ((service->file = fopen(_PATH_SERVICES, "r")) != NULL) {
-		if (fcntl(fileno(service->file), F_SETFD, FD_CLOEXEC) == 0)
-			return;
+	char path[PATH_MAX];
+	if (find_directory(B_COMMON_DATA_DIRECTORY, -1, false, path, sizeof(path))
+			== B_OK) {
+		strlcat(path, "/network/services", sizeof(path));
 
-		fclose(service->file);
-		service->file = NULL;
+		if ((service->file = fopen(path, "r")) != NULL) {
+			if (fcntl(fileno(service->file), F_SETFD, FD_CLOEXEC) == 0)
+				return;
+
+			fclose(service->file);
+			service->file = NULL;
+		}
 	}
 
 	// opening the standard file has file has failed, use the attribute

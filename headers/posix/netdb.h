@@ -55,7 +55,7 @@
  * -
  * Portions Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -71,7 +71,7 @@
  * 4. Neither the name of the project nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -87,6 +87,7 @@
 #ifndef _NETDB_H_
 #define _NETDB_H_
 
+
 #include <sys/param.h>
 #include <sys/types.h>
 #include <sys/cdefs.h>
@@ -94,21 +95,11 @@
 #include <netinet/in.h>
 #include <stdio.h>
 
-#ifndef _PATH_HEQUIV
-#define _PATH_HEQUIV	"/etc/hosts.equiv"
-#endif
-#ifndef _PATH_HOSTS
-#define	_PATH_HOSTS	"/etc/hosts"
-#endif
+
 #ifndef _PATH_NETWORKS
 #define	_PATH_NETWORKS	"/etc/networks"
 #endif
-#ifndef _PATH_PROTOCOLS
-#define	_PATH_PROTOCOLS	"/etc/protocols"
-#endif
-#ifndef _PATH_SERVICES
-#define	_PATH_SERVICES	"/etc/services"
-#endif
+
 
 __BEGIN_DECLS
 extern int * __h_errno(void);
@@ -121,12 +112,12 @@ __END_DECLS
  * use in system calls).
  */
 struct hostent {
-	char	*h_name;			/* official name of host */
-	char	**h_aliases;		/* alias list */
-	int		h_addrtype;			/* host address type */
-	int		h_length;			/* length of address */
-	char	**h_addr_list;		/* list of addresses from name server */
-#define	h_addr	h_addr_list[0]	/* address, for backward compatiblity */
+	char		*h_name;			/* official name of host */
+	char		**h_aliases;		/* alias list */
+	int			h_addrtype;			/* host address type */
+	int			h_length;			/* length of address */
+	char		**h_addr_list;		/* list of addresses from name server */
+#define	h_addr	h_addr_list[0]		/* address, for backward compatiblity */
 };
 
 /*
@@ -134,34 +125,34 @@ struct hostent {
  * fits in an unsigned long -- probably a poor one.
  */
 struct netent {
-	char	*n_name;			/* official name of net */
-	char	**n_aliases;		/* alias list */
-	int		n_addrtype;			/* net address type */
-	unsigned long n_net;		/* network # */
+	char		*n_name;			/* official name of net */
+	char		**n_aliases;		/* alias list */
+	int			n_addrtype;			/* net address type */
+	unsigned long n_net;			/* network # */
 };
 
 struct servent {
-	char	*s_name;			/* official service name */
-	char	**s_aliases;		/* alias list */
-	int		s_port;				/* port # */
-	char	*s_proto;			/* protocol to use */
+	char		*s_name;			/* official service name */
+	char		**s_aliases;		/* alias list */
+	int			s_port;				/* port # */
+	char		*s_proto;			/* protocol to use */
 };
 
 struct protoent {
-	char	*p_name;			/* official protocol name */
-	char	**p_aliases;		/* alias list */
-	int		p_proto;			/* protocol # */
+	char		*p_name;			/* official protocol name */
+	char		**p_aliases;		/* alias list */
+	int			p_proto;			/* protocol # */
 };
 
 struct addrinfo {
-	int		ai_flags;			/* AI_PASSIVE, AI_CANONNAME */
-	int		ai_family;			/* PF_xxx */
-	int		ai_socktype;		/* SOCK_xxx */
-	int		ai_protocol;		/* 0 or IPPROTO_xxx for IPv4 and IPv6 */
-	size_t	ai_addrlen;			/* length of ai_addr */
-	char	*ai_canonname;		/* canonical name for hostname */
-	struct sockaddr	*ai_addr; 	/* binary address */
-	struct addrinfo	*ai_next; 	/* next structure in linked list */
+	int			ai_flags;			/* AI_PASSIVE, AI_CANONNAME */
+	int			ai_family;			/* PF_xxx */
+	int			ai_socktype;		/* SOCK_xxx */
+	int			ai_protocol;		/* 0 or IPPROTO_xxx for IPv4 and IPv6 */
+	socklen_t	ai_addrlen;			/* length of ai_addr */
+	char		*ai_canonname;		/* canonical name for hostname */
+	struct sockaddr	*ai_addr; 		/* binary address */
+	struct addrinfo	*ai_next; 		/* next structure in linked list */
 };
 
 /*

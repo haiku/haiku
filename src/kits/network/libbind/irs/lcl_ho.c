@@ -77,6 +77,8 @@
 
 #include "port_after.h"
 
+#include <FindDirectory.h>
+
 #include "irs_p.h"
 #include "dns_p.h"
 #include "lcl_p.h"
@@ -439,15 +441,22 @@ ho_next(struct irs_ho *this) {
 static void
 ho_rewind(struct irs_ho *this) {
 	struct pvt *pvt = (struct pvt *)this->private;
+	char path[PATH_MAX];
 
 	if (pvt->fp) {
 		if (fseek(pvt->fp, 0L, SEEK_SET) == 0)
 			return;
 		(void)fclose(pvt->fp);
 	}
-	if (!(pvt->fp = fopen(_PATH_HOSTS, "r"))) {
-		pvt->index = 0;
-		return;
+
+	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, -1, false, path,
+			sizeof(path)) == B_OK) {
+		strlcat(path, "/network/hosts", sizeof(path));
+
+		if (!(pvt->fp = fopen(path, "r"))) {
+			pvt->index = 0;
+			return;
+		}
 	}
 	if (fcntl(fileno(pvt->fp), F_SETFD, 1) < 0) {
 		(void)fclose(pvt->fp);
