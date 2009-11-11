@@ -1,10 +1,12 @@
 SubDir HAIKU_TOP src tests kits media nodetest ;
 
 SimpleTest NodeTest
-	: main.cpp
-	  misc.cpp
-	  ConsumerNode.cpp
-	  ProducerNode.cpp
-	: libmedia.so be root
+	:
+	main.cpp
+	misc.cpp
+	ConsumerNode.cpp
+	ProducerNode.cpp
+
+	: be media
 ;
 
