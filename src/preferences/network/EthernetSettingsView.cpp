@@ -12,7 +12,7 @@
 
 
 #include "EthernetSettingsView.h"
-#include "settings.h"
+#include "Settings.h"
 
 #include <Application.h>
 #include <Alert.h>
@@ -295,13 +295,13 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 
 	if (settings) {
 		BMenuItem* item = fDeviceMenuField->Menu()->FindItem(
-			settings->GetName());
+			settings->Name());
 		if (item)
 			item->SetMarked(true);
 
-		fIPTextControl->SetText(settings->GetIP());
-		fGatewayTextControl->SetText(settings->GetGateway());
-		fNetMaskTextControl->SetText(settings->GetNetmask());
+		fIPTextControl->SetText(settings->IP());
+		fGatewayTextControl->SetText(settings->Gateway());
+		fNetMaskTextControl->SetText(settings->Netmask());
 
 		if (settings->AutoConfigure() == true)
 			item = fTypeMenuField->Menu()->FindItem("DHCP");
@@ -369,7 +369,7 @@ EthernetSettingsView::_SaveConfiguration()
 	_SaveDNSConfiguration();
 	_SaveAdaptersConfiguration();
 	if (fCurrentSettings->AutoConfigure())
-		_TriggerAutoConfig(fCurrentSettings->GetName());
+		_TriggerAutoConfig(fCurrentSettings->Name());
 }
 
 
@@ -431,14 +431,14 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 		}
 
 		fprintf(fp, "interface %s {\n\t\taddress {\n",
-			fSettings.ItemAt(i)->GetName());
+			fSettings.ItemAt(i)->Name());
 		fprintf(fp, "\t\t\tfamily\tinet\n");
 		fprintf(fp, "\t\t\taddress\t%s\n",
-			fSettings.ItemAt(i)->GetIP());
+			fSettings.ItemAt(i)->IP());
 		fprintf(fp, "\t\t\tgateway\t%s\n",
-			fSettings.ItemAt(i)->GetGateway());
+			fSettings.ItemAt(i)->Gateway());
 		fprintf(fp, "\t\t\tmask\t%s\n",
-			fSettings.ItemAt(i)->GetNetmask());
+			fSettings.ItemAt(i)->Netmask());
 		fprintf(fp, "\t\t}\n}\n\n");
 	}
 	if (fp) {
@@ -550,7 +550,7 @@ EthernetSettingsView::MessageReceived(BMessage* message)
 				break;
 			for (int32 i = 0; i < fSettings.CountItems(); i++) {
 				Settings* settings = fSettings.ItemAt(i);
-				if (strcmp(settings->GetName(), name) == 0) {
+				if (strcmp(settings->Name(), name) == 0) {
 					_ShowConfiguration(settings);
 					break;
 				}

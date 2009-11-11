@@ -24,10 +24,10 @@ public:
 			void				SetAutoConfigure(bool autoConfigure)
 									{ fAuto = autoConfigure; }
 
-			const char*			GetIP()  { return fIP.String(); }
-			const char*			GetGateway()  { return fGateway.String(); }
-			const char*			GetNetmask()  { return fNetmask.String(); }
-			const char*			GetName()  { return fName.String(); }
+			const char*			IP()  { return fIP.String(); }
+			const char*			Gateway()  { return fGateway.String(); }
+			const char*			Netmask()  { return fNetmask.String(); }
+			const char*			Name()  { return fName.String(); }
 			bool				AutoConfigure() { return fAuto; }
 
 			BObjectList<BString>& NameServers() { return fNameServers; }

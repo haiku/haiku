@@ -8,7 +8,7 @@
  */
 
 
-#include "settings.h"
+#include "Settings.h"
 
 #include <arpa/inet.h>
 #include <errno.h>
