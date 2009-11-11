@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007 Haiku Inc. All rights reserved.
+ * Copyright 2004-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
@@ -8,37 +8,42 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+
 #include <ObjectList.h>
 #include <String.h>
 
+
 class Settings {
-	public:
-		Settings(const char* name);
-		virtual ~Settings();
+public:
+								Settings(const char* name);
+	virtual						~Settings();
 
-		void SetName(BString name);
-		void SetIP(BString ip) {fIP = ip; }
-		void SetGateway(BString ip) {fGateway = ip; }
-		void SetNetmask(BString ip) {fNetmask = ip; }
-		void SetAutoConfigure(bool t) {fAuto = t; }
-		
-		const char* GetIP()  {return fIP.String(); }
-		const char* GetGateway()  {return fGateway.String(); }		
-		const char* GetNetmask()  {return fNetmask.String(); }
-		const char* GetName()  {return fName.String(); }
-		bool GetAutoConfigure() {return fAuto; }
-		BObjectList<BString> fNameservers;
-		void ReadConfiguration();
+			void				SetIP(BString ip) { fIP = ip; }
+			void				SetGateway(BString ip) { fGateway = ip; }
+			void				SetNetmask(BString ip) { fNetmask = ip; }
+			void				SetAutoConfigure(bool autoConfigure)
+									{ fAuto = autoConfigure; }
 
-		
-	private:
-		bool _PrepareRequest(struct ifreq& request);
-		BString fIP;
-		BString fGateway;
-		BString fNetmask;
-		BString fName;
-		int fSocket;
-		bool fAuto;
+			const char*			GetIP()  { return fIP.String(); }
+			const char*			GetGateway()  { return fGateway.String(); }
+			const char*			GetNetmask()  { return fNetmask.String(); }
+			const char*			GetName()  { return fName.String(); }
+			bool				AutoConfigure() { return fAuto; }
+
+			BObjectList<BString>& NameServers() { return fNameServers; }
+
+			void				ReadConfiguration();
+
+private:
+			bool				_PrepareRequest(struct ifreq& request);
+
+			BString				fIP;
+			BString				fGateway;
+			BString				fNetmask;
+			BString				fName;
+			int					fSocket;
+			bool				fAuto;
+			BObjectList<BString> fNameServers;
 };
 
 #endif /* SETTINGS_H */

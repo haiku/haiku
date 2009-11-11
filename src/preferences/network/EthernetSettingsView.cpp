@@ -303,23 +303,23 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 		fGatewayTextControl->SetText(settings->GetGateway());
 		fNetMaskTextControl->SetText(settings->GetNetmask());
 
-		if (settings->GetAutoConfigure() == true)
+		if (settings->AutoConfigure() == true)
 			item = fTypeMenuField->Menu()->FindItem("DHCP");
 		else
 			item = fTypeMenuField->Menu()->FindItem("Static");
 		if (item)
 			item->SetMarked(true);
 
-		enableControls = settings->GetAutoConfigure() == false;
+		enableControls = settings->AutoConfigure() == false;
 
-		if (settings->fNameservers.CountItems() >= 2) {
+		if (settings->NameServers().CountItems() >= 2) {
 			fSecondaryDNSTextControl->SetText(
-				settings->fNameservers.ItemAt(1)->String());
+				settings->NameServers().ItemAt(1)->String());
 		}
 
-		if (settings->fNameservers.CountItems() >= 1) {
+		if (settings->NameServers().CountItems() >= 1) {
 			fPrimaryDNSTextControl->SetText(
-					settings->fNameservers.ItemAt(0)->String());
+				settings->NameServers().ItemAt(0)->String());
 		}
 	}
 
@@ -351,10 +351,10 @@ EthernetSettingsView::_ApplyControlsToConfiguration()
 	fCurrentSettings->SetAutoConfigure(
 		strcmp(fTypeMenuField->Menu()->FindMarked()->Label(), "DHCP") == 0);
 
-	fCurrentSettings->fNameservers.MakeEmpty();
-	fCurrentSettings->fNameservers.AddItem(new BString(
+	fCurrentSettings->NameServers().MakeEmpty();
+	fCurrentSettings->NameServers().AddItem(new BString(
 		fPrimaryDNSTextControl->Text()));
-	fCurrentSettings->fNameservers.AddItem(new BString(
+	fCurrentSettings->NameServers().AddItem(new BString(
 		fSecondaryDNSTextControl->Text()));
 
 	fApplyButton->SetEnabled(false);
@@ -368,7 +368,7 @@ EthernetSettingsView::_SaveConfiguration()
 	_ApplyControlsToConfiguration();
 	_SaveDNSConfiguration();
 	_SaveAdaptersConfiguration();
-	if (fCurrentSettings->GetAutoConfigure())
+	if (fCurrentSettings->AutoConfigure())
 		_TriggerAutoConfig(fCurrentSettings->GetName());
 }
 
@@ -393,10 +393,10 @@ EthernetSettingsView::_SaveDNSConfiguration()
 	// loop over all adapters
 	for (int i = 0; i < fSettings.CountItems(); i++) {
 		Settings* settings = fSettings.ItemAt(i);
-		for (int j = 0; j < settings->fNameservers.CountItems(); j++) {
-			if (settings->fNameservers.ItemAt(j)->Length() > 0) {
+		for (int j = 0; j < settings->NameServers().CountItems(); j++) {
+			if (settings->NameServers().ItemAt(j)->Length() > 0) {
 				content << "nameserver\t"
-					<< settings->fNameservers.ItemAt(j)->String()
+					<< settings->NameServers().ItemAt(j)->String()
 					<< "\n";
 			}
 		}
@@ -418,7 +418,7 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 	// loop over all adapters. open the settings file only once,
 	// append the settins of each non-autoconfiguring adapter
 	for (int i = 0; i < fSettings.CountItems(); i++) {
-		if (fSettings.ItemAt(i)->GetAutoConfigure())
+		if (fSettings.ItemAt(i)->AutoConfigure())
 			continue;
 
 		if (fp == NULL) {

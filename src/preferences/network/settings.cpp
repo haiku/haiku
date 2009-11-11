@@ -13,9 +13,6 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <net/if.h>
-#include <net/if_dl.h>
-#include <net/if_media.h>
-#include <net/if_types.h>
 #include <netinet/in.h>
 #include <resolv.h>
 #include <stdio.h>
@@ -32,12 +29,14 @@
 #include <AutoDeleter.h>
 
 
-Settings::Settings(const char *name)
+Settings::Settings(const char* name)
 	:
-	fAuto(true)
+	fAuto(true),
+	fNameServers(5, true)
 {
 	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
 	fName = name;
+
 	ReadConfiguration();
 }
 
@@ -88,10 +87,8 @@ Settings::ReadConfiguration()
 	fIP = address;
 
 	// Obtain netmask.
-	if (ioctl(fSocket, SIOCGIFNETMASK, &request,
-			sizeof(request)) < 0) {
+	if (ioctl(fSocket, SIOCGIFNETMASK, &request, sizeof(request)) < 0)
 		return;
-	}
 
 	inetAddress = (sockaddr_in*)&request.ifr_mask;
 	if (inet_ntop(AF_INET, &inetAddress->sin_addr, address,
@@ -111,7 +108,7 @@ Settings::ReadConfiguration()
 	if (size == 0)
 		return;
 
-	void *buffer = malloc(size);
+	void* buffer = malloc(size);
 	if (buffer == NULL)
 		return;
 
@@ -122,13 +119,13 @@ Settings::ReadConfiguration()
 	if (ioctl(fSocket, SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0)
 		return;
 
-	ifreq *interface = (ifreq *)buffer;
-	ifreq *end = (ifreq *)((uint8 *)buffer + size);
+	ifreq* interface = (ifreq*)buffer;
+	ifreq* end = (ifreq*)((uint8*)buffer + size);
 
 	while (interface < end) {
 		route_entry& route = interface->ifr_route;
 
-		if (route.flags & RTF_GATEWAY) {
+		if ((route.flags & RTF_GATEWAY) != 0) {
 			inetAddress = (sockaddr_in*)route.gateway;
 			fGateway = inet_ntoa(inetAddress->sin_addr);
 		}
@@ -141,8 +138,8 @@ Settings::ReadConfiguration()
 		if (route.gateway != NULL)
 			addressSize += route.gateway->sa_len;
 
-		interface = (ifreq *)((addr_t)interface +
-			IF_NAMESIZE + sizeof(route_entry) + addressSize);
+		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
+			+ sizeof(route_entry) + addressSize);
 	}
 
 	uint32 flags = 0;
@@ -152,14 +149,14 @@ Settings::ReadConfiguration()
 	fAuto = (flags & IFF_AUTO_CONFIGURED) != 0;
 
 	// read resolv.conf for the dns.
-	fNameservers.MakeEmpty();
+	fNameServers.MakeEmpty();
 
 	res_init();
 	res_state state = __res_state();
 
 	if (state != NULL) {
 		for (int i = 0; i < state->nscount; i++) {
-			fNameservers.AddItem(
+			fNameServers.AddItem(
 				new BString(inet_ntoa(state->nsaddr_list[i].sin_addr)));
 		}
 	}
