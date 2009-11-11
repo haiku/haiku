@@ -74,8 +74,8 @@ class FontStyle : public ReferenceCounting, public Hashable {
 	\return true if fixed, false if not
 */
 		bool			IsFixedWidth() const
-							{ return fFreeTypeFace->face_flags
-								& FT_FACE_FLAG_FIXED_WIDTH; }
+							{ return FT_IS_FIXED_WIDTH(	fFreeTypeFace); }
+
 
 /*	\fn bool FontStyle::IsFullAndHalfFixed()
 	\brief Determines whether the font has 2 different, fixed, widths.
@@ -90,23 +90,21 @@ class FontStyle : public ReferenceCounting, public Hashable {
 	\return true if scalable, false if not
 */
 		bool			IsScalable() const
-							{ return fFreeTypeFace->face_flags
-								& FT_FACE_FLAG_SCALABLE; }
+							{ return FT_IS_SCALABLE(fFreeTypeFace); }
 /*!
 	\fn bool FontStyle::HasKerning(void)
 	\brief Determines whether the font has kerning information
 	\return true if kerning info is available, false if not
 */
 		bool			HasKerning() const
-							{ return fFreeTypeFace->face_flags
-								& FT_FACE_FLAG_KERNING; }
+							{ return FT_HAS_KERNING(fFreeTypeFace); }
 /*!
 	\fn bool FontStyle::HasTuned(void)
 	\brief Determines whether the font contains strikes
 	\return true if it has strikes included, false if not
 */
 		bool			HasTuned() const
-							{ return fFreeTypeFace->num_fixed_sizes > 0; }
+							{ return FT_HAS_FIXED_SIZES(fFreeTypeFace); }
 /*!
 	\fn bool FontStyle::TunedCount(void)
 	\brief Returns the number of strikes the style contains
