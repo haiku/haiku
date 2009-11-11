@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 Haiku Inc. All rights reserved.
+ * Copyright 2004-2009 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,6 +9,7 @@
  *		Hugo Santos
  *		Philippe Saint-Pierre
  */
+
 
 #include "EthernetSettingsView.h"
 #include "settings.h"
@@ -375,9 +376,14 @@ EthernetSettingsView::_SaveConfiguration()
 void
 EthernetSettingsView::_SaveDNSConfiguration()
 {
-	BFile file("/etc/resolv.conf",
-		B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
-	if (file.InitCheck() < B_OK) {
+	BPath path;
+	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK)
+		return;
+
+	path.Append("network/resolv.conf");
+
+	BFile file(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
+	if (file.InitCheck() != B_OK) {
 		fprintf(stderr, "failed to open /etc/resolv.conf for writing: %s\n",
 			strerror(file.InitCheck()));
 		return;
