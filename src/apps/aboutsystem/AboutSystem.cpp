@@ -998,9 +998,14 @@ AboutView::_CreateCreditsView()
 			NULL));
 			// TODO: License!
 
-	// Konatu font
-	_AddPackageCredit(PackageCredit("Konatu font")
-		.SetCopyright(COPYRIGHT_STRING "2002- MASUDA mitiya.\n"
+	// VL-Gothic font
+	_AddPackageCredit(PackageCredit("VL-Gothic font")
+		.SetCopyrights(COPYRIGHT_STRING "1990-2003 Wada Laboratory,"
+			" the University of Tokyo", COPYRIGHT_STRING
+			"2003-2004 Electronic Font Open Laboratory (/efont/)",
+			COPYRIGHT_STRING "2003-2008 M+ FONTS PROJECT",
+			COPYRIGHT_STRING "2006-2009 Daisuke SUZUKI",
+			COPYRIGHT_STRING "2006-2009 Project Vine",
 			"MIT license. All rights reserved."));
 			// TODO: License!
 
