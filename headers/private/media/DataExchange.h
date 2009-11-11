@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2002, Marcus Overhagen. All rights reserved.
  * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
  *
@@ -6,6 +6,7 @@
  */
 #ifndef _DATA_EXCHANGE_H
 #define _DATA_EXCHANGE_H
+
 
 #include <string.h>
 
@@ -60,6 +61,11 @@ struct reply_data {
 // The base struct used for all raw commands (asynchronous, no answer)
 struct command_data {
 	// yes, it's empty ;)
+
+#if __GNUC__ == 4
+	int32 _padding;
+		// GCC 2 and GCC 4 treat empty structures differently
+#endif
 };
 
 // The base struct used for all requests using an area
@@ -137,7 +143,7 @@ enum {
 	SERVER_GET_ENCODER_FOR_CODEC_INFO,
 	SERVER_MESSAGE_END,
 	NODE_MESSAGE_START = 0x200,
-	
+
 	NODE_START,
 	NODE_STOP,
 	NODE_SEEK,
@@ -148,7 +154,7 @@ enum {
 	NODE_GET_TIMESOURCE,
 	NODE_REQUEST_COMPLETED,
 	NODE_FINAL_RELEASE,
-	
+
 	NODE_MESSAGE_END,
 	CONSUMER_MESSAGE_START = 0x300,
 	CONSUMER_GET_NEXT_INPUT,
@@ -156,13 +162,13 @@ enum {
 	CONSUMER_ACCEPT_FORMAT,
 	CONSUMER_CONNECTED,
 	CONSUMER_DISCONNECTED,
-	
+
 	CONSUMER_BUFFER_RECEIVED,
 	CONSUMER_PRODUCER_DATA_STATUS,
 	CONSUMER_GET_LATENCY_FOR,
 	CONSUMER_FORMAT_CHANGED,
 	CONSUMER_SEEK_TAG_REQUESTED,
-	
+
 	CONSUMER_MESSAGE_END,
 	PRODUCER_MESSAGE_START = 0x400,
 	PRODUCER_GET_NEXT_OUTPUT,
@@ -171,7 +177,7 @@ enum {
 	PRODUCER_PREPARE_TO_CONNECT,
 	PRODUCER_CONNECT,
 	PRODUCER_DISCONNECT,
-	
+
 	PRODUCER_LATE_NOTICE_RECEIVED,
 	PRODUCER_LATENCY_CHANGED,
 	PRODUCER_ADDITIONAL_BUFFER_REQUESTED,
@@ -184,7 +190,7 @@ enum {
 	PRODUCER_SET_PLAY_RATE,
 	PRODUCER_ENABLE_OUTPUT,
 	PRODUCER_SET_RUN_MODE_DELAY,
-	
+
 	PRODUCER_MESSAGE_END,
 	FILEINTERFACE_MESSAGE_START = 0x500,
 	FILEINTERFACE_SET_REF,
@@ -198,12 +204,12 @@ enum {
 	CONTROLLABLE_START_CONTROL_PANEL,
 	CONTROLLABLE_MESSAGE_END,
 	TIMESOURCE_MESSAGE_START = 0x700,
-	
+
 	TIMESOURCE_OP, // datablock is a struct time_source_op_info
 	TIMESOURCE_ADD_SLAVE_NODE,
 	TIMESOURCE_REMOVE_SLAVE_NODE,
 	TIMESOURCE_GET_START_LATENCY,
-	
+
 	TIMESOURCE_MESSAGE_END,
 };
 
@@ -246,15 +252,15 @@ private:
 };
 
 // used by SERVER_GET_NODE and SERVER_SET_NODE
-enum node_type { 
-	VIDEO_INPUT, 
-	AUDIO_INPUT, 
-	VIDEO_OUTPUT, 
-	AUDIO_MIXER, 
-	AUDIO_OUTPUT, 
-	AUDIO_OUTPUT_EX, 
-	TIME_SOURCE, 
-	SYSTEM_TIME_SOURCE 
+enum node_type {
+	VIDEO_INPUT,
+	AUDIO_INPUT,
+	VIDEO_OUTPUT,
+	AUDIO_MIXER,
+	AUDIO_OUTPUT,
+	AUDIO_OUTPUT_EX,
+	TIME_SOURCE,
+	SYSTEM_TIME_SOURCE
 };
 
 // used by SERVER_PUBLISH_INPUTS and SERVER_PUBLISH_OUTPUTS
@@ -654,7 +660,7 @@ struct server_get_live_nodes_reply : area_reply_data {
 	int32					count;
 		// if count > MAX_LIVE_INFO, live_node_infos are in the area
 		// area is created in the server, but deleted in the library
-	live_node_info			live_info[MAX_LIVE_INFO]; 
+	live_node_info			live_info[MAX_LIVE_INFO];
 };
 
 struct server_node_id_for_request : request_data {
@@ -862,11 +868,11 @@ struct node_request_completed_command : command_data {
 };
 
 struct node_start_command : command_data {
-	bigtime_t				performance_time;	
+	bigtime_t				performance_time;
 };
 
 struct node_stop_command : command_data {
-	bigtime_t				performance_time;	
+	bigtime_t				performance_time;
 	bool					immediate;
 };
 
