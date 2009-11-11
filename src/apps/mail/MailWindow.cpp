@@ -200,7 +200,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	msg = new BMessage(M_NEW);
 	msg->AddInt32("type", M_NEW);
 	menu->AddItem(item = new BMenuItem(MDR_DIALECT_CHOICE (
-		"New Mail Message", "N) 新規メッセージ作成"), msg, 'N'));
+		"New Mail Message", "N) 新規メッセージ作成") B_UTF8_ELLIPSIS, msg, 'N'));
 	item->SetTarget(be_app);
 
 	// Cheap hack - only show the drafts menu when composing messages.  Insert
