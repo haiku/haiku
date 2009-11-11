@@ -65,4 +65,5 @@ inet_makeaddr(net, host)
 	return (a);
 }
 
-/*! \file */
+#undef inet_makeaddr
+#pragma weak inet_makeaddr = __inet_makeaddr

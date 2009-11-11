@@ -220,4 +220,5 @@ inet_pton6(src, dst)
 	return (1);
 }
 
-/*! \file */
+#undef inet_pton
+#pragma weak inet_pton = __inet_pton

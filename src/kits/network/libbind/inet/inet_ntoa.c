@@ -61,4 +61,5 @@ inet_ntoa(struct in_addr in) {
 	return (ret);
 }
 
-/*! \file */
+#undef inet_ntoa
+#pragma weak inet_ntoa = __inet_ntoa

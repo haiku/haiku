@@ -86,4 +86,5 @@ inet_neta(src, dst, size)
 	return (NULL);
 }
 
-/*! \file */
+#undef inet_neta
+#pragma weak inet_neta = __inet_neta

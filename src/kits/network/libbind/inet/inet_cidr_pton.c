@@ -255,7 +255,7 @@ static int
 getbits(const char *src, int ipv6) {
 	int bits = 0;
 	char *cp, ch;
-	
+
 	if (*src == '\0')			/*%< syntax */
 		return (-2);
 	do {
@@ -274,4 +274,5 @@ getbits(const char *src, int ipv6) {
 	return (bits);
 }
 
-/*! \file */
+#undef inet_cidr_pton
+#pragma weak inet_cidr_pton = __inet_cidr_pton

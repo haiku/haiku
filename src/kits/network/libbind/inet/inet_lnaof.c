@@ -62,4 +62,5 @@ inet_lnaof(in)
 		return ((i)&IN_CLASSC_HOST);
 }
 
-/*! \file */
+#undef inet_lnaof
+#pragma weak inet_lnaof = __inet_lnaof
