@@ -14,6 +14,8 @@
 
 #include "FontManager.h"
 
+#include <FontPrivate.h>
+
 
 const uint32 kInvalidFamilyFlags = ~0UL;
 
@@ -287,6 +289,8 @@ FontFamily::Flags()
 
 			if (style->IsFixedWidth())
 				fFlags |= B_IS_FIXED;
+			if (style->IsFullAndHalfFixed())
+				fFlags |= B_PRIVATE_FONT_IS_FULL_AND_HALF_FIXED;
 			if (style->TunedCount() > 0)
 				fFlags |= B_HAS_TUNED_FONT;
 		}
