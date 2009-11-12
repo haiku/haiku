@@ -1006,7 +1006,8 @@ AboutView::_CreateCreditsView()
 			COPYRIGHT_STRING "2003-2008 M+ FONTS PROJECT",
 			COPYRIGHT_STRING "2006-2009 Daisuke SUZUKI",
 			COPYRIGHT_STRING "2006-2009 Project Vine",
-			"MIT license. All rights reserved."));
+			"MIT license. All rights reserved.",
+			NULL));
 			// TODO: License!
 
 	// expat copyrights
