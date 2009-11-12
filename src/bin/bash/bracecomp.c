@@ -4,25 +4,26 @@
 
 /* Original version by tromey@cns.caltech.edu,  Fri Feb  7 1992. */
 
-/* Copyright (C) 1993 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "config.h"
+
 #if defined (BRACE_EXPANSION) && defined (READLINE)
 
 #include <stdio.h>
@@ -35,9 +36,12 @@
 #endif
 
 #include "bashansi.h"
+#include "shmbutil.h"
 
 #include "shell.h"
 #include <readline/readline.h>
+
+static int _strcompare __P((char **, char **));
 
 /* Find greatest common prefix of two strings. */
 static int
@@ -146,13 +150,30 @@ really_munge_braces (array, real_start, real_end, gcd_zero)
 }
 
 static int
+_strcompare (s1, s2)
+     char **s1, **s2;
+{
+  int result;
+
+  result = **s1 - **s2;
+  if (result == 0)
+    result = strcmp (*s1, *s2);
+
+  return result;
+}
+
+static int
 hack_braces_completion (names)
      char **names;
 {
   register int i;
   char *temp;
 
-  temp = really_munge_braces (names, 1, strvec_len (names), 0);
+  i = strvec_len (names);
+  if (MB_CUR_MAX > 1 && i > 2)
+    qsort (names+1, i-1, sizeof (char *), (QSFUNC *)_strcompare);
+      
+  temp = really_munge_braces (names, 1, i, 0);
 
   for (i = 0; names[i]; ++i)
     {

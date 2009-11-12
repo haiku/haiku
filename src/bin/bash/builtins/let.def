@@ -1,33 +1,34 @@
 This file is let.def, from which is created let.c.
 It implements the builtin "let" in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $BUILTIN let
 $FUNCTION let_builtin
 $PRODUCES let.c
 $SHORT_DOC let arg [arg ...]
-Each ARG is an arithmetic expression to be evaluated.  Evaluation
-is done in fixed-width integers with no check for overflow, though
-division by 0 is trapped and flagged as an error.  The following
-list of operators is grouped into levels of equal-precedence operators.
-The levels are listed in order of decreasing precedence.
+Evaluate arithmetic expressions.
+
+Evaluate each ARG as an arithmetic expression.  Evaluation is done in
+fixed-width integers with no check for overflow, though division by 0
+is trapped and flagged as an error.  The following list of operators is
+grouped into levels of equal-precedence operators.  The levels are listed
+in order of decreasing precedence.
 
 	id++, id--	variable post-increment, post-decrement
 	++id, --id	variable pre-increment, pre-decrement
@@ -45,7 +46,7 @@ The levels are listed in order of decreasing precedence.
 	&&		logical AND
 	||		logical OR
 	expr ? expr : expr
-			conditional expression
+			conditional operator
 	=, *=, /=, %=,
 	+=, -=, <<=, >>=,
 	&=, ^=, |=	assignment
@@ -59,8 +60,8 @@ Operators are evaluated in order of precedence.  Sub-expressions in
 parentheses are evaluated first and may override the precedence
 rules above.
 
-If the last ARG evaluates to 0, let returns 1; 0 is returned
-otherwise.
+Exit Status:
+If the last ARG evaluates to 0, let returns 1; let returns 0 otherwise..
 $END
 
 #include <config.h>
@@ -71,6 +72,8 @@ $END
 #  endif
 #  include <unistd.h>
 #endif
+
+#include "../bashintl.h"
 
 #include "../shell.h"
 #include "common.h"
@@ -89,7 +92,7 @@ let_builtin (list)
 
   if (list == 0)
     {
-      builtin_error ("expression expected");
+      builtin_error (_("expression expected"));
       return (EXECUTION_FAILURE);
     }
 
@@ -114,7 +117,7 @@ exp_builtin (list)
 
   if (list == 0)
     {
-      builtin_error ("expression expected");
+      builtin_error (_("expression expected"));
       return (EXECUTION_FAILURE);
     }
 

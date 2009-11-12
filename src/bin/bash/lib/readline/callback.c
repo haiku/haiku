@@ -1,24 +1,24 @@
 /* callback.c -- functions to use readline as an X `callback' mechanism. */
 
-/* Copyright (C) 1987, 1989, 1992 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
-   This file is part of the GNU Readline Library, a library for
-   reading lines of text with interactive input and history editing.
+   This file is part of the GNU Readline Library (Readline), a library
+   for reading lines of text with interactive input and history editing.
 
-   The GNU Readline Library is free software; you can redistribute it
-   and/or modify it under the terms of the GNU General Public License
-   as published by the Free Software Foundation; either version 2, or
+   Readline is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
-   The GNU Readline Library is distributed in the hope that it will be
-   useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   Readline is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   The GNU General Public License is often shipped with GNU software, and
-   is generally kept in a file called COPYING or LICENSE.  If you do not
-   have a copy of the license, write to the Free Software Foundation,
-   59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Readline.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #define READLINE_LIBRARY
 
 #if defined (HAVE_CONFIG_H)
@@ -43,10 +43,16 @@
 #include "rldefs.h"
 #include "readline.h"
 #include "rlprivate.h"
+#include "xmalloc.h"
+
+/* Private data for callback registration functions.  See comments in
+   rl_callback_read_char for more details. */
+_rl_callback_func_t *_rl_callback_func = 0;
+_rl_callback_generic_arg *_rl_callback_data = 0;
 
 /* **************************************************************** */
 /*								    */
-/*			Callback Readline Functions                 */
+/*			Callback Readline Functions		 */
 /*								    */
 /* **************************************************************** */
 
@@ -72,7 +78,8 @@ _rl_callback_newline ()
     {
       in_handler = 1;
 
-      (*rl_prep_term_function) (_rl_meta_flag);
+      if (rl_prep_term_function)
+	(*rl_prep_term_function) (_rl_meta_flag);
 
 #if defined (HANDLE_SIGNALS)
       rl_set_signals ();
@@ -80,6 +87,7 @@ _rl_callback_newline ()
     }
 
   readline_internal_setup ();
+  RL_CHECK_SIGNALS ();
 }
 
 /* Install a readline handler, set up the terminal, and issue the prompt. */
@@ -89,6 +97,7 @@ rl_callback_handler_install (prompt, linefunc)
      rl_vcpfunc_t *linefunc;
 {
   rl_set_prompt (prompt);
+  RL_SETSTATE (RL_STATE_CALLBACK);
   rl_linefunc = linefunc;
   _rl_callback_newline ();
 }
@@ -98,24 +107,100 @@ void
 rl_callback_read_char ()
 {
   char *line;
-  int eof;
+  int eof, jcode;
+  static procenv_t olevel;
 
   if (rl_linefunc == NULL)
     {
-      fprintf (stderr, "readline: readline_callback_read_char() called with no handler!\r\n");
+      _rl_errmsg ("readline_callback_read_char() called with no handler!");
       abort ();
     }
 
-  eof = readline_internal_char ();
-
-  /* We loop in case some function has pushed input back with rl_execute_next. */
-  for (;;)
+  memcpy ((void *)olevel, (void *)_rl_top_level, sizeof (procenv_t));
+  jcode = setjmp (_rl_top_level);
+  if (jcode)
     {
+      (*rl_redisplay_function) ();
+      _rl_want_redisplay = 0;
+      memcpy ((void *)_rl_top_level, (void *)olevel, sizeof (procenv_t));
+      return;
+    }
+
+  do
+    {
+      RL_CHECK_SIGNALS ();
+      if  (RL_ISSTATE (RL_STATE_ISEARCH))
+	{
+	  eof = _rl_isearch_callback (_rl_iscxt);
+	  if (eof == 0 && (RL_ISSTATE (RL_STATE_ISEARCH) == 0) && RL_ISSTATE (RL_STATE_INPUTPENDING))
+	    rl_callback_read_char ();
+
+	  return;
+	}
+      else if  (RL_ISSTATE (RL_STATE_NSEARCH))
+	{
+	  eof = _rl_nsearch_callback (_rl_nscxt);
+	  return;
+	}
+      else if (RL_ISSTATE (RL_STATE_NUMERICARG))
+	{
+	  eof = _rl_arg_callback (_rl_argcxt);
+	  if (eof == 0 && (RL_ISSTATE (RL_STATE_NUMERICARG) == 0) && RL_ISSTATE (RL_STATE_INPUTPENDING))
+	    rl_callback_read_char ();
+	  /* XXX - this should handle _rl_last_command_was_kill better */
+	  else if (RL_ISSTATE (RL_STATE_NUMERICARG) == 0)
+	    _rl_internal_char_cleanup ();
+
+	  return;
+	}
+      else if (RL_ISSTATE (RL_STATE_MULTIKEY))
+	{
+	  eof = _rl_dispatch_callback (_rl_kscxt);	/* For now */
+	  while ((eof == -1 || eof == -2) && RL_ISSTATE (RL_STATE_MULTIKEY) && _rl_kscxt && (_rl_kscxt->flags & KSEQ_DISPATCHED))
+	    eof = _rl_dispatch_callback (_rl_kscxt);
+	  if (RL_ISSTATE (RL_STATE_MULTIKEY) == 0)
+	    {
+	      _rl_internal_char_cleanup ();
+	      _rl_want_redisplay = 1;
+	    }
+	}
+      else if (_rl_callback_func)
+	{
+	  /* This allows functions that simply need to read an additional
+	     character (like quoted-insert) to register a function to be
+	     called when input is available.  _rl_callback_data is simply a
+	     pointer to a struct that has the argument count originally
+	     passed to the registering function and space for any additional
+	     parameters.  */
+	  eof = (*_rl_callback_func) (_rl_callback_data);
+	  /* If the function `deregisters' itself, make sure the data is
+	     cleaned up. */
+	  if (_rl_callback_func == 0)
+	    {
+	      if (_rl_callback_data) 	
+		{
+		  _rl_callback_data_dispose (_rl_callback_data);
+		  _rl_callback_data = 0;
+		}
+	      _rl_internal_char_cleanup ();
+	    }
+	}
+      else
+	eof = readline_internal_char ();
+
+      RL_CHECK_SIGNALS ();
+      if (rl_done == 0 && _rl_want_redisplay)
+	{
+	  (*rl_redisplay_function) ();
+	  _rl_want_redisplay = 0;
+	}
+
       if (rl_done)
 	{
 	  line = readline_internal_teardown (eof);
 
-	  (*rl_deprep_term_function) ();
+	  if (rl_deprep_term_function)
+	    (*rl_deprep_term_function) ();
 #if defined (HANDLE_SIGNALS)
 	  rl_clear_signals ();
 #endif
@@ -131,11 +216,8 @@ rl_callback_read_char ()
 	  if (in_handler == 0 && rl_linefunc)
 	    _rl_callback_newline ();
 	}
-      if (rl_pending_input)
-	eof = readline_internal_char ();
-      else
-        break;
     }
+  while (rl_pending_input || _rl_pushed_input_available () || RL_ISSTATE (RL_STATE_MACROINPUT));
 }
 
 /* Remove the handler, and make sure the terminal is in its normal state. */
@@ -143,14 +225,37 @@ void
 rl_callback_handler_remove ()
 {
   rl_linefunc = NULL;
+  RL_UNSETSTATE (RL_STATE_CALLBACK);
+  RL_CHECK_SIGNALS ();
   if (in_handler)
     {
       in_handler = 0;
-      (*rl_deprep_term_function) ();
+      if (rl_deprep_term_function)
+	(*rl_deprep_term_function) ();
 #if defined (HANDLE_SIGNALS)
       rl_clear_signals ();
 #endif
     }
+}
+
+_rl_callback_generic_arg *
+_rl_callback_data_alloc (count)
+     int count;
+{
+  _rl_callback_generic_arg *arg;
+
+  arg = (_rl_callback_generic_arg *)xmalloc (sizeof (_rl_callback_generic_arg));
+  arg->count = count;
+
+  arg->i1 = arg->i2 = 0;
+
+  return arg;
+}
+
+void _rl_callback_data_dispose (arg)
+     _rl_callback_generic_arg *arg;
+{
+  xfree (arg);
 }
 
 #endif

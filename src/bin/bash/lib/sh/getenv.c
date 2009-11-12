@@ -5,19 +5,19 @@
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <config.h>
 
@@ -115,7 +115,7 @@ putenv (str)
       return -1;
     }
 
-  offset = assignment (str);
+  offset = assignment (str, 0);
   if (str[offset] != '=')
     {
       errno = EINVAL;
@@ -127,7 +127,7 @@ putenv (str)
   value = name + offset + 1;
 
   /* XXX - should we worry about readonly here? */
-  var = bind_variable (name, value);
+  var = bind_variable (name, value, 0);
   if (var == 0)
     {
       errno = EINVAL;
@@ -169,13 +169,13 @@ setenv (name, value, rewrite)
     }
 
   var = 0;
-  v = value;
+  v = (char *)value;	/* some compilers need explicit cast */
   /* XXX - should we worry about readonly here? */
   if (rewrite == 0)
     var = find_variable (name);
 
   if (var == 0)
-    var = bind_variable (name, v);
+    var = bind_variable (name, v, 0);
 
   if (var == 0)
     return -1;

@@ -6,19 +6,19 @@
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT
-   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
-   License for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Bash; see the file COPYING.  If not, write to the Free
-   Software Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <config.h>
 
@@ -47,6 +47,9 @@ extern int errno;
 
 extern pid_t dollar_dollar_pid;
 
+static char *get_sys_tmpdir __P((void));
+static char *get_tmpdir __P((int));
+
 static char *sys_tmpdir = (char *)NULL;
 static int ntmpfiles;
 static int tmpnamelen = -1;
@@ -55,27 +58,25 @@ static unsigned long filenum = 1L;
 static char *
 get_sys_tmpdir ()
 {
-  struct stat sb;
-
   if (sys_tmpdir)
     return sys_tmpdir;
 
 #ifdef P_tmpdir
   sys_tmpdir = P_tmpdir;
-  if (stat (sys_tmpdir, &sb) == 0)
+  if (file_iswdir (sys_tmpdir))
     return sys_tmpdir;
 #endif
 
   sys_tmpdir = "/tmp";
-  if (stat (sys_tmpdir, &sb) == 0)
+  if (file_iswdir (sys_tmpdir))
     return sys_tmpdir;
 
   sys_tmpdir = "/var/tmp";
-  if (stat (sys_tmpdir, &sb) == 0)
+  if (file_iswdir (sys_tmpdir))
     return sys_tmpdir;
 
   sys_tmpdir = "/usr/tmp";
-  if (stat (sys_tmpdir, &sb) == 0)
+  if (file_iswdir (sys_tmpdir))
     return sys_tmpdir;
 
   sys_tmpdir = DEFAULT_TMPDIR;
@@ -90,6 +91,9 @@ get_tmpdir (flags)
   char *tdir;
 
   tdir = (flags & MT_USETMPDIR) ? get_string_value ("TMPDIR") : (char *)NULL;
+  if (tdir && (file_iswdir (tdir) == 0 || strlen (tdir) > PATH_MAX))
+    tdir = 0;
+
   if (tdir == 0)
     tdir = get_sys_tmpdir ();
 

@@ -15,9 +15,16 @@ SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 StaticLibrary libsh.a : 
 	clktck.c
 	clock.c
+	getcwd.c
 	getenv.c
 	oslib.c
 	setlinebuf.c
+	strcasecmp.c
+	strerror.c
+	strtod.c
+	strtol.c
+	strtoul.c
+	vprint.c
 	itos.c
 	rename.c
 	zread.c
@@ -25,7 +32,8 @@ StaticLibrary libsh.a :
 	shtty.c
 	inet_aton.c
 	netconn.c
-#	netopen.c
+	netopen.c
+	strpbrk.c
 	timeval.c
 	makepath.c
 	pathcanon.c
@@ -34,15 +42,36 @@ StaticLibrary libsh.a :
 	stringlist.c
 	stringvec.c
 	spell.c
-	shquote.c 
-	strtrans.c 
-	strindex.c 
-	snprintf.c 
+	shquote.c
+	strtrans.c
+	strindex.c
+	snprintf.c
 	mailstat.c
-	fmtulong.c 
-	fmtullong.c 
-	fmtumax.c 
-	mktime.c 
-	xstrchr.c 
-	zcatfd.c 
+	fmtulong.c
+	fmtullong.c
+	fmtumax.c
+	shmatch.c
+	strnlen.c
+	strtoll.c
+	strtoull.c
+	strtoimax.c
+	strtoumax.c
+	memset.c
+	strstr.c
+	mktime.c
+	strftime.c
+	xstrchr.c
+	zcatfd.c
+	zmapfd.c
+	winsize.c
+	eaccess.c
+	wcsdup.c
+	fpurge.c
+	zgetline.c
+	mbscmp.c
+	uconvert.c
+	ufuncs.c
+	casemod.c
+	fdprintf.c
+	input_avail.c
 ;

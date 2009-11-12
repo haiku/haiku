@@ -1,60 +1,63 @@
 This file is fc.def, from which is created fc.c.
 It implements the builtin "fc" in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES fc.c
 
 $BUILTIN fc
 $FUNCTION fc_builtin
 $DEPENDS_ON HISTORY
-$SHORT_DOC fc [-e ename] [-nlr] [first] [last] or fc -s [pat=rep] [cmd]
+$SHORT_DOC fc [-e ename] [-lnr] [first] [last] or fc -s [pat=rep] [command]
+Display or execute commands from the history list.
 
 fc is used to list or edit and re-execute commands from the history list.
 FIRST and LAST can be numbers specifying the range, or FIRST can be a
 string, which means the most recent command beginning with that
 string.
 
-   -e ENAME selects which editor to use.  Default is FCEDIT, then EDITOR,
-      then vi.
+Options:
+  -e ENAME	select which editor to use.  Default is FCEDIT, then EDITOR,
+		then vi
+  -l 	list lines instead of editing
+  -n	omit line numbers when listing
+  -r	reverse the order of the lines (newest listed first)
 
-   -l means list lines instead of editing.
-   -n means no line numbers listed.
-   -r means reverse the order of the lines (making it newest listed first).
-
-With the `fc -s [pat=rep ...] [command]' format, the command is
+With the `fc -s [pat=rep ...] [command]' format, COMMAND is
 re-executed after the substitution OLD=NEW is performed.
 
 A useful alias to use with this is r='fc -s', so that typing `r cc'
 runs the last command beginning with `cc' and typing `r' re-executes
 the last command.
+
+Exit Status:
+Returns success or status of executed command; non-zero if an error occurs.
 $END
 
 #include <config.h>
 
 #if defined (HISTORY)
-#if defined (HAVE_SYS_PARAM_H)
+#ifndef _MINIX
 #  include <sys/param.h>
 #endif
 #include "../bashtypes.h"
 #include "posixstat.h"
-#if defined (HAVE_SYS_FILE_H)
+#if ! defined(_MINIX) && defined (HAVE_SYS_FILE_H)
 #  include <sys/file.h>
 #endif
 
@@ -66,6 +69,7 @@ $END
 #include <chartypes.h>
 
 #include "../bashansi.h"
+#include "../bashintl.h"
 #include <errno.h>
 
 #include "../shell.h"
@@ -81,9 +85,9 @@ $END
 extern int errno;
 #endif /* !errno */
 
-extern int echo_input_at_read;
 extern int current_command_line_count;
 extern int literal_history;
+extern int posixly_correct;
 
 extern int unlink __P((const char *));
 
@@ -155,6 +159,11 @@ static void fc_addhist __P((char *));
 
 /* String to execute on a file that we want to edit. */
 #define FC_EDIT_COMMAND "${FCEDIT:-${EDITOR:-vi}}"
+#if defined (STRICT_POSIX)
+#  define POSIX_FC_EDIT_COMMAND "${FCEDIT:-ed}"
+#else
+#  define POSIX_FC_EDIT_COMMAND "${FCEDIT:-${EDITOR:-ed}}"
+#endif
 
 int
 fc_builtin (list)
@@ -166,7 +175,7 @@ fc_builtin (list)
   int histbeg, histend, last_hist, retval, opt;
   FILE *stream;
   REPL *rlist, *rl;
-  char *ename, *command, *newcom;
+  char *ename, *command, *newcom, *fcedit;
   HIST_ENTRY **hlist;
   char *fn;
 
@@ -249,7 +258,7 @@ fc_builtin (list)
 
       if (command == NULL)
 	{
-	  builtin_error ("no command found");
+	  builtin_error (_("no command found"));
 	  if (rlist)
 	    FREE_RLIST ();
 
@@ -284,7 +293,7 @@ fc_builtin (list)
      line was actually added (HISTIGNORE may have caused it to not be),
      so we check hist_last_line_added. */
 
-  last_hist = i - 1 - hist_last_line_added;
+  last_hist = i - remember_on_history - hist_last_line_added;
 
   if (list)
     {
@@ -302,7 +311,7 @@ fc_builtin (list)
       if (listing)
 	{
 	  histend = last_hist;
-	  histbeg = histend - 16;
+	  histbeg = histend - 16 + 1;	/* +1 because loop below uses >= */
 	  if (histbeg < 0)
 	    histbeg = 0;
 	}
@@ -311,10 +320,25 @@ fc_builtin (list)
 	histbeg = histend = last_hist;
     }
 
+  /* "When not listing, the fc command that caused the editing shall not be
+     entered into the history list." */
+  if (listing == 0 && hist_last_line_added)
+    {
+      bash_delete_last_history ();
+      /* If we're editing a single command -- the last command in the
+	 history -- and we just removed the dummy command added by
+	 edit_and_execute_command (), we need to check whether or not we
+	 just removed the last command in the history and need to back
+	 the pointer up.  remember_on_history is off because we're running
+	 in parse_and_execute(). */
+      if (histbeg == histend && histend == last_hist && hlist[last_hist] == 0)
+	last_hist = histbeg = --histend;
+    }
+
   /* We print error messages for line specifications out of range. */
   if ((histbeg < 0) || (histend < 0))
     {
-      sh_erange ((char *)NULL, "history specification");
+      sh_erange ((char *)NULL, _("history specification"));
       return (EXECUTION_FAILURE);
     }
 
@@ -335,7 +359,7 @@ fc_builtin (list)
       stream = sh_mktmpfp ("bash-fc", MT_USERANDOM|MT_USETMPDIR, &fn);
       if (stream == 0)
 	{
-	  builtin_error ("cannot open temp file %s", fn ? fn : "");
+	  builtin_error (_("%s: cannot open temp file: %s"), fn ? fn : "", strerror (errno));
 	  FREE (fn);
 	  return (EXECUTION_FAILURE);
 	}
@@ -347,13 +371,25 @@ fc_builtin (list)
       if (numbering)
 	fprintf (stream, "%d", i + history_base);
       if (listing)
-	fprintf (stream, "\t%c", histdata (i) ? '*' : ' ');
+	{
+	  if (posixly_correct)
+	    fputs ("\t", stream);
+	  else
+	    fprintf (stream, "\t%c", histdata (i) ? '*' : ' ');
+	}
       fprintf (stream, "%s\n", histline (i));
     }
 
   if (listing)
-    return (EXECUTION_SUCCESS);
+    return (sh_chkwrite (EXECUTION_SUCCESS));
 
+  fflush (stream);
+  if (ferror (stream))
+    {
+      sh_wrerror ();
+      fclose (stream);
+      return (EXECUTION_FAILURE);
+    }
   fclose (stream);
 
   /* Now edit the file of commands. */
@@ -364,8 +400,9 @@ fc_builtin (list)
     }
   else
     {
-      command = (char *)xmalloc (3 + strlen (FC_EDIT_COMMAND) + strlen (fn));
-      sprintf (command, "%s %s", FC_EDIT_COMMAND, fn);
+      fcedit = posixly_correct ? POSIX_FC_EDIT_COMMAND : FC_EDIT_COMMAND;
+      command = (char *)xmalloc (3 + strlen (fcedit) + strlen (fn));
+      sprintf (command, "%s %s", fcedit, fn);
     }
   retval = parse_and_execute (command, "fc", SEVAL_NOHIST);
   if (retval != EXECUTION_SUCCESS)
@@ -419,10 +456,11 @@ fc_gethnum (command, hlist)
      char *command;
      HIST_ENTRY **hlist;
 {
-  int sign = 1, n, clen;
+  int sign, n, clen;
   register int i, j;
   register char *s;
 
+  sign = 1;
   /* Count history elements. */
   for (i = 0; hlist[i]; i++);
 
@@ -432,8 +470,9 @@ fc_gethnum (command, hlist)
      and makes the last command that this deals with be the last command
      the user entered before the fc.  We need to check whether the
      line was actually added (HISTIGNORE may have caused it to not be),
-     so we check hist_last_line_added. */
-  i -= 1 + hist_last_line_added;
+     so we check hist_last_line_added.  This needs to agree with the
+     calculation of last_hist in fc_builtin above. */
+  i -= remember_on_history + hist_last_line_added;
 
   /* No specification defaults to most recent command. */
   if (command == NULL)
@@ -489,7 +528,7 @@ fc_gethist (command, hlist)
 {
   int i;
 
-  if (!hlist)
+  if (hlist == 0)
     return ((char *)NULL);
 
   i = fc_gethnum (command, hlist);
@@ -573,41 +612,18 @@ static void
 fc_replhist (command)
      char *command;
 {
-  register int i;
-  HIST_ENTRY **hlist, *histent, *discard;
   int n;
 
   if (command == 0 || *command == '\0')
     return;
 
-  hlist = history_list ();
-
-  if (hlist == NULL)
-    return;
-
-  for (i = 0; hlist[i]; i++);
-  i--;
-
-  /* History_get () takes a parameter that should be
-     offset by history_base. */
-
-  histent = history_get (history_base + i);	/* Don't free this */
-  if (histent == NULL)
-    return;
-
   n = strlen (command);
-
   if (command[n - 1] == '\n')
     command[n - 1] = '\0';
 
   if (command && *command)
     {
-      discard = remove_history (i);
-      if (discard)
-	{
-	  FREE (discard->line);
-	  free ((char *) discard);
-	}
+      bash_delete_last_history ();
       maybe_add_history (command);	/* Obeys HISTCONTROL setting. */
     }
 }
@@ -620,13 +636,16 @@ fc_addhist (line)
 {
   register int n;
 
+  if (line == 0 || *line == 0)
+    return;
+
   n = strlen (line);
 
   if (line[n - 1] == '\n')
     line[n - 1] = '\0';
 
   if (line && *line)
-    maybe_add_history (line);
+    maybe_add_history (line);		/* Obeys HISTCONTROL setting. */
 }
 #endif
 

@@ -1,25 +1,23 @@
 /* rltty.h - tty driver-related definitions used by some library files. */
 
-/* Copyright (C) 1995 Free Software Foundation, Inc.
+/* Copyright (C) 1995-2009 Free Software Foundation, Inc.
 
-   This file contains the Readline Library (the Library), a set of
-   routines for providing Emacs style line input to programs that ask
-   for it.
+   This file is part of the GNU Readline Library (Readline), a library
+   for reading lines of text with interactive input and history editing.      
 
-   The Library is free software; you can redistribute it and/or modify
+   Readline is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   The Library is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
+   Readline is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   The GNU General Public License is often shipped with GNU software, and
-   is generally kept in a file called COPYING or LICENSE.  If you do not
-   have a copy of the license, write to the Free Software Foundation,
-   59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Readline.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #if !defined (_RLTTY_H_)
 #define _RLTTY_H_
@@ -61,22 +59,22 @@
 #endif /* !NEW_TTY_DRIVER && !_POSIX_VDISABLE */
 
 typedef struct _rl_tty_chars {
-  char t_eof;
-  char t_eol;
-  char t_eol2;
-  char t_erase;
-  char t_werase;
-  char t_kill;
-  char t_reprint;
-  char t_intr;
-  char t_quit;
-  char t_susp;
-  char t_dsusp;
-  char t_start;
-  char t_stop;
-  char t_lnext;
-  char t_flush;
-  char t_status;
+  unsigned char t_eof;
+  unsigned char t_eol;
+  unsigned char t_eol2;
+  unsigned char t_erase;
+  unsigned char t_werase;
+  unsigned char t_kill;
+  unsigned char t_reprint;
+  unsigned char t_intr;
+  unsigned char t_quit;
+  unsigned char t_susp;
+  unsigned char t_dsusp;
+  unsigned char t_start;
+  unsigned char t_stop;
+  unsigned char t_lnext;
+  unsigned char t_flush;
+  unsigned char t_status;
 } _RL_TTY_CHARS;
 
 #endif /* _RLTTY_H_ */

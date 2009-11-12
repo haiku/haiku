@@ -1,23 +1,23 @@
 /* tilde.c -- Tilde expansion code (~/foo := $HOME/foo). */
 
-/* Copyright (C) 1988,1989 Free Software Foundation, Inc.
+/* Copyright (C) 1988-2009 Free Software Foundation, Inc.
 
-   This file is part of GNU Readline, a library for reading lines
-   of text with interactive input and history editing.
+   This file is part of the GNU Readline Library (Readline), a library
+   for reading lines of text with interactive input and history editing.
 
-   Readline is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+   Readline is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Readline is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
+   Readline is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Readline; see the file COPYING.  If not, write to the Free
-   Software Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   along with Readline.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #if defined (HAVE_CONFIG_H)
 #  include <config.h>
@@ -43,7 +43,9 @@
 #endif /* HAVE_STDLIB_H */
 
 #include <sys/types.h>
+#if defined (HAVE_PWD_H)
 #include <pwd.h>
+#endif
 
 #include "tilde.h"
 
@@ -54,8 +56,12 @@ static void *xmalloc (), *xrealloc ();
 #endif /* TEST || STATIC_MALLOC */
 
 #if !defined (HAVE_GETPW_DECLS)
+#  if defined (HAVE_GETPWUID)
 extern struct passwd *getpwuid PARAMS((uid_t));
+#  endif
+#  if defined (HAVE_GETPWNAM)
 extern struct passwd *getpwnam PARAMS((const char *));
+#  endif
 #endif /* !HAVE_GETPW_DECLS */
 
 #if !defined (savestring)
@@ -230,7 +236,7 @@ tilde_expand (string)
       string += end;
 
       expansion = tilde_expand_word (tilde_word);
-      free (tilde_word);
+      xfree (tilde_word);
 
       len = strlen (expansion);
 #ifdef __CYGWIN__
@@ -245,7 +251,7 @@ tilde_expand (string)
 	  strcpy (result + result_index, expansion);
 	  result_index += len;
 	}
-      free (expansion);
+      xfree (expansion);
     }
 
   result[result_index] = '\0';
@@ -276,6 +282,39 @@ isolate_tilde_prefix (fname, lenp)
     *lenp = i;
   return ret;
 }
+
+#if 0
+/* Public function to scan a string (FNAME) beginning with a tilde and find
+   the portion of the string that should be passed to the tilde expansion
+   function.  Right now, it just calls tilde_find_suffix and allocates new
+   memory, but it can be expanded to do different things later. */
+char *
+tilde_find_word (fname, flags, lenp)
+     const char *fname;
+     int flags, *lenp;
+{
+  int x;
+  char *r;
+
+  x = tilde_find_suffix (fname);
+  if (x == 0)
+    {
+      r = savestring (fname);
+      if (lenp)
+	*lenp = 0;
+    }
+  else
+    {
+      r = (char *)xmalloc (1 + x);
+      strncpy (r, fname, x);
+      r[x] = '\0';
+      if (lenp)
+	*lenp = x;
+    }
+
+  return r;
+}
+#endif
 
 /* Return a string that is PREFIX concatenated with SUFFIX starting at
    SUFFIND. */
@@ -338,7 +377,7 @@ tilde_expand_word (filename)
       if (expansion)
 	{
 	  dirname = glue_prefix_and_suffix (expansion, filename, user_len);
-	  free (username);
+	  xfree (username);
 	  free (expansion);
 	  return (dirname);
 	}
@@ -347,7 +386,11 @@ tilde_expand_word (filename)
   /* No preexpansion hook, or the preexpansion hook failed.  Look in the
      password database. */
   dirname = (char *)NULL;
+#if defined (HAVE_GETPWNAM)
   user_entry = getpwnam (username);
+#else
+  user_entry = 0;
+#endif
   if (user_entry == 0)
     {
       /* If the calling program has a special syntax for expanding tildes,
@@ -361,19 +404,20 @@ tilde_expand_word (filename)
 	      free (expansion);
 	    }
 	}
-      free (username);
       /* If we don't have a failure hook, or if the failure hook did not
 	 expand the tilde, return a copy of what we were passed. */
       if (dirname == 0)
 	dirname = savestring (filename);
     }
+#if defined (HAVE_GETPWENT)
   else
-    {
-      free (username);
-      dirname = glue_prefix_and_suffix (user_entry->pw_dir, filename, user_len);
-    }
+    dirname = glue_prefix_and_suffix (user_entry->pw_dir, filename, user_len);
+#endif
 
+  xfree (username);
+#if defined (HAVE_GETPWENT)
   endpwent ();
+#endif
   return (dirname);
 }
 

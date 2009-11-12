@@ -1,57 +1,68 @@
 This file is ulimit.def, from which is created ulimit.c.
 It implements the builtin "ulimit" in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES ulimit.c
 
 $BUILTIN ulimit
 $FUNCTION ulimit_builtin
 $DEPENDS_ON !_MINIX
-$SHORT_DOC ulimit [-SHacdflmnpstuv] [limit]
-Ulimit provides control over the resources available to processes
-started by the shell, on systems that allow such control.  If an
-option is given, it is interpreted as follows:
+$SHORT_DOC ulimit [-SHacdefilmnpqrstuvx] [limit]
+Modify shell resource limits.
 
-    -S	use the `soft' resource limit
-    -H	use the `hard' resource limit
-    -a	all current limits are reported
-    -c	the maximum size of core files created
-    -d	the maximum size of a process's data segment
-    -f	the maximum size of files created by the shell
-    -l	the maximum size a process may lock into memory
-    -m	the maximum resident set size
-    -n	the maximum number of open file descriptors
-    -p	the pipe buffer size
-    -s	the maximum stack size
-    -t	the maximum amount of cpu time in seconds
-    -u	the maximum number of user processes
-    -v	the size of virtual memory 
+Provides control over the resources available to the shell and processes
+it creates, on systems that allow such control.
 
-If LIMIT is given, it is the new value of the specified resource;
-the special LIMIT values `soft', `hard', and `unlimited' stand for
-the current soft limit, the current hard limit, and no limit, respectively.
-Otherwise, the current value of the specified resource is printed.
-If no option is given, then -f is assumed.  Values are in 1024-byte
-increments, except for -t, which is in seconds, -p, which is in
-increments of 512 bytes, and -u, which is an unscaled number of
-processes.
+Options:
+  -S	use the `soft' resource limit
+  -H	use the `hard' resource limit
+  -a	all current limits are reported
+  -b	the socket buffer size
+  -c	the maximum size of core files created
+  -d	the maximum size of a process's data segment
+  -e	the maximum scheduling priority (`nice')
+  -f	the maximum size of files written by the shell and its children
+  -i	the maximum number of pending signals
+  -l	the maximum size a process may lock into memory
+  -m	the maximum resident set size
+  -n	the maximum number of open file descriptors
+  -p	the pipe buffer size
+  -q	the maximum number of bytes in POSIX message queues
+  -r	the maximum real-time scheduling priority
+  -s	the maximum stack size
+  -t	the maximum amount of cpu time in seconds
+  -u	the maximum number of user processes
+  -v	the size of virtual memory
+  -x	the maximum number of file locks
+
+If LIMIT is given, it is the new value of the specified resource; the
+special LIMIT values `soft', `hard', and `unlimited' stand for the
+current soft limit, the current hard limit, and no limit, respectively.
+Otherwise, the current value of the specified resource is printed.  If
+no option is given, then -f is assumed.
+
+Values are in 1024-byte increments, except for -t, which is in seconds,
+-p, which is in increments of 512 bytes, and -u, which is an unscaled
+number of processes.
+
+Exit Status:
+Returns success unless an invalid option is supplied or an error occurs.
 $END
 
 #if !defined (_MINIX)
@@ -69,6 +80,8 @@ $END
 
 #include <stdio.h>
 #include <errno.h>
+
+#include "../bashintl.h"
 
 #include "../shell.h"
 #include "common.h"
@@ -91,7 +104,7 @@ extern int errno;
 #  if defined (HPUX) && defined (RLIMIT_NEEDS_KERNEL)
 #    undef _KERNEL
 #  endif
-#else
+#elif defined (HAVE_SYS_TIMES_H)
 #  include <sys/times.h>
 #endif
 
@@ -165,6 +178,14 @@ extern int errno;
 #define LIMIT_HARD 0x01
 #define LIMIT_SOFT 0x02
 
+/* "Blocks" are defined as 512 bytes when in Posix mode and 1024 bytes
+   otherwise. */
+#define POSIXBLK	-2
+
+#define BLOCKSIZE(x)	(((x) == POSIXBLK) ? (posixly_correct ? 512 : 1024) : (x))
+
+extern int posixly_correct;
+
 static int _findlim __P((int));
 
 static int ulimit_internal __P((int, char *, int, int));
@@ -186,18 +207,30 @@ typedef struct {
   int  option;			/* The ulimit option for this limit. */
   int  parameter;		/* Parameter to pass to get_limit (). */
   int  block_factor;		/* Blocking factor for specific limit. */
-  char *description;		/* Descriptive string to output. */
-  char *units;			/* scale */
+  const char * const description;	/* Descriptive string to output. */
+  const char * const units;	/* scale */
 } RESOURCE_LIMITS;
 
 static RESOURCE_LIMITS limits[] = {
+#ifdef RLIMIT_PTHREAD
+  { 'T',	RLIMIT_PTHREAD,  1,	"number of threads",	(char *)NULL },
+#endif
+#ifdef RLIMIT_SBSIZE
+  { 'b',	RLIMIT_SBSIZE,  1,	"socket buffer size",	"bytes" },
+#endif
 #ifdef RLIMIT_CORE
-  { 'c',	RLIMIT_CORE,  1024,	"core file size",	"blocks" },
+  { 'c',	RLIMIT_CORE,  POSIXBLK,	"core file size",	"blocks" },
 #endif
 #ifdef RLIMIT_DATA
   { 'd',	RLIMIT_DATA,  1024,	"data seg size",	"kbytes" },
 #endif
-  { 'f',	RLIMIT_FILESIZE, 1024,	"file size",		"blocks" },
+#ifdef RLIMIT_NICE
+  { 'e',	RLIMIT_NICE,  1,	"scheduling priority",	(char *)NULL },
+#endif
+  { 'f',	RLIMIT_FILESIZE, POSIXBLK,	"file size",		"blocks" },
+#ifdef RLIMIT_SIGPENDING
+  { 'i',	RLIMIT_SIGPENDING, 1,	"pending signals",	(char *)NULL },
+#endif
 #ifdef RLIMIT_MEMLOCK
   { 'l',	RLIMIT_MEMLOCK, 1024,	"max locked memory",	"kbytes" },
 #endif
@@ -206,6 +239,12 @@ static RESOURCE_LIMITS limits[] = {
 #endif /* RLIMIT_RSS */
   { 'n',	RLIMIT_OPENFILES, 1,	"open files",		(char *)NULL},
   { 'p',	RLIMIT_PIPESIZE, 512,	"pipe size", 		"512 bytes" },
+#ifdef RLIMIT_MSGQUEUE
+  { 'q',	RLIMIT_MSGQUEUE, 1,	"POSIX message queues",	"bytes" },
+#endif
+#ifdef RLIMIT_RTPRIO
+  { 'r',	RLIMIT_RTPRIO,  1,	"real-time priority",	(char *)NULL },
+#endif
 #ifdef RLIMIT_STACK
   { 's',	RLIMIT_STACK, 1024,	"stack size",		"kbytes" },
 #endif
@@ -218,6 +257,9 @@ static RESOURCE_LIMITS limits[] = {
 #endif
 #ifdef RLIMIT_SWAP
   { 'w',	RLIMIT_SWAP,	1024,	"swap size",		"kbytes" },
+#endif
+#ifdef RLIMIT_LOCKS
+  { 'x',	RLIMIT_LOCKS,	1,	"file locks",		(char *)NULL },
 #endif
   { -1, -1, -1, (char *)NULL, (char *)NULL }
 };
@@ -330,14 +372,14 @@ ulimit_builtin (list)
         {
           if (STREQ (list->word->word, "unlimited") == 0)
             {
-              builtin_error ("%s: invalid limit argument", list->word->word);
+              builtin_error (_("%s: invalid limit argument"), list->word->word);
               return (EXECUTION_FAILURE);
             }
           return (set_all_limits (mode == 0 ? LIMIT_SOFT|LIMIT_HARD : mode, RLIM_INFINITY));
         }
 #endif
       print_all_limits (mode == 0 ? LIMIT_SOFT : mode);
-      return (EXECUTION_SUCCESS);
+      return (sh_chkwrite (EXECUTION_SUCCESS));
     }
 
   /* default is `ulimit -f' */
@@ -356,7 +398,7 @@ ulimit_builtin (list)
       limind = _findlim (cmdlist[c].cmd);
       if (limind == -1)
 	{
-	  builtin_error ("`%c': bad command", cmdlist[c].cmd);
+	  builtin_error (_("`%c': bad command"), cmdlist[c].cmd);
 	  return (EX_USAGE);
 	}
     }
@@ -385,7 +427,7 @@ ulimit_internal (cmd, cmdarg, mode, multiple)
   opt = get_limit (limind, &soft_limit, &hard_limit);
   if (opt < 0)
     {
-      builtin_error ("%s: cannot get limit: %s", limits[limind].description,
+      builtin_error (_("%s: cannot get limit: %s"), limits[limind].description,
 						 strerror (errno));
       return (EXECUTION_FAILURE);
     }
@@ -406,12 +448,12 @@ ulimit_internal (cmd, cmdarg, mode, multiple)
   else if (all_digits (cmdarg))
     {
       limit = string_to_rlimtype (cmdarg);
-      block_factor = limits[limind].block_factor;
+      block_factor = BLOCKSIZE(limits[limind].block_factor);
       real_limit = limit * block_factor;
 
       if ((real_limit / block_factor) != limit)
 	{
-	  sh_erange (cmdarg, "limit");
+	  sh_erange (cmdarg, _("limit"));
 	  return (EXECUTION_FAILURE);
 	}
     }
@@ -423,7 +465,7 @@ ulimit_internal (cmd, cmdarg, mode, multiple)
 
   if (set_limit (limind, real_limit, mode) < 0)
     {
-      builtin_error ("%s: cannot modify limit: %s", limits[limind].description,
+      builtin_error (_("%s: cannot modify limit: %s"), limits[limind].description,
 						    strerror (errno));
       return (EXECUTION_FAILURE);
     }
@@ -606,14 +648,19 @@ pipesize (valuep)
   *valuep = (RLIMTYPE) PIPE_BUF;
   return 0;
 #else
-#  if defined (PIPESIZE)
+#  if defined (_POSIX_PIPE_BUF)
+  *valuep = (RLIMTYPE) _POSIX_PIPE_BUF;
+  return 0;
+#  else
+#    if defined (PIPESIZE)
   /* This is defined by running a program from the Makefile. */
   *valuep = (RLIMTYPE) PIPESIZE;
   return 0;
-#  else
+#    else
   errno = EINVAL;
   return -1;  
-#  endif /* PIPESIZE */
+#    endif /* PIPESIZE */
+#  endif /* _POSIX_PIPE_BUF */
 #endif /* PIPE_BUF */
 }
 
@@ -648,11 +695,11 @@ print_all_limits (mode)
 
   for (i = 0; limits[i].option > 0; i++)
     {
-      if (get_limit (i, &softlim, &hardlim) < 0)
+      if (get_limit (i, &softlim, &hardlim) == 0)
+	printone (i, (mode & LIMIT_SOFT) ? softlim : hardlim, 1);
+      else if (errno != EINVAL)
 	builtin_error ("%s: cannot get limit: %s", limits[i].description,
 						   strerror (errno));
-      else
-	printone (i, (mode & LIMIT_SOFT) ? softlim : hardlim, 1);
     }
 }
 
@@ -663,7 +710,9 @@ printone (limind, curlim, pdesc)
      int pdesc;
 {
   char unitstr[64];
+  int factor;
 
+  factor = BLOCKSIZE(limits[limind].block_factor);
   if (pdesc)
     {
       if (limits[limind].units)
@@ -671,7 +720,7 @@ printone (limind, curlim, pdesc)
       else
         sprintf (unitstr, "(-%c) ", limits[limind].option);
 
-      printf ("%-18s %16s", limits[limind].description, unitstr);
+      printf ("%-20s %16s", limits[limind].description, unitstr);
     }
   if (curlim == RLIM_INFINITY)
     puts ("unlimited");
@@ -680,7 +729,7 @@ printone (limind, curlim, pdesc)
   else if (curlim == RLIM_SAVED_CUR)
     puts ("soft");
   else
-    print_rlimtype ((curlim / limits[limind].block_factor), 1);
+    print_rlimtype ((curlim / factor), 1);
 }
 
 /* Set all limits to NEWLIM.  NEWLIM currently must be RLIM_INFINITY, which
@@ -716,7 +765,7 @@ set_all_limits (mode, newlim)
   for (retval = i = 0; limits[i].option > 0; i++)
     if (set_limit (i, newlim, mode) < 0)
       {
-	builtin_error ("%s: cannot modify limit: %s", limits[i].description,
+	builtin_error (_("%s: cannot modify limit: %s"), limits[i].description,
 						      strerror (errno));
 	retval = 1;
       }

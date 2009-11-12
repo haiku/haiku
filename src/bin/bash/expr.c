@@ -1,22 +1,22 @@
 /* expr.c -- arithmetic expression evaluation. */
 
-/* Copyright (C) 1990-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1990-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT
-   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
-   License for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Bash; see the file COPYING.  If not, write to the Free
-   Software Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /*
  All arithmetic is done as intmax_t integers with no checking for overflow
@@ -42,6 +42,7 @@
 	"||"
 	"expr ? expr : expr"
 	"=", "*=", "/=", "%=", "+=", "-=", "<<=", ">>=", "&=", "^=", "|="
+	,			[comma]
 
  (Note that most of these operators have special meaning to bash, and an
  entire expression should be quoted, e.g. "a=$a+1" or "a=a+1" to ensure
@@ -78,6 +79,7 @@
 #endif
 
 #include "chartypes.h"
+#include "bashintl.h"
 
 #include "shell.h"
 
@@ -146,15 +148,17 @@ static intmax_t	tokval;		/* current token value */
 static int	noeval;		/* set to 1 if no assignment to be done */
 static procenv_t evalbuf;
 
+static int	_is_arithop __P((int));
 static void	readtok __P((void));	/* lexical analyzer */
 
 static intmax_t	expr_streval __P((char *, int));
 static intmax_t	strlong __P((char *));
-static void	evalerror __P((char *));
+static void	evalerror __P((const char *));
 
 static void	pushexp __P((void));
 static void	popexp __P((void));
 static void	expr_unwind __P((void));
+static void	expr_bind_variable __P((char *, char *));
 
 static intmax_t subexpr __P((char *));
 
@@ -200,6 +204,10 @@ static int expr_stack_size;	   /* Number of slots already allocated. */
 extern char *this_command_name;
 extern int unbound_vars_is_error;
 
+#if defined (ARRAY_VARS)
+extern const char * const bash_badsub_errmsg;
+#endif
+
 #define SAVETOK(X) \
   do { \
     (X)->curtok = curtok; \
@@ -230,7 +238,7 @@ pushexp ()
   EXPR_CONTEXT *context;
 
   if (expr_depth >= MAX_EXPR_RECURSION_LEVEL)
-    evalerror ("expression recursion level exceeded");
+    evalerror (_("expression recursion level exceeded"));
 
   if (expr_depth >= expr_stack_size)
     {
@@ -254,7 +262,7 @@ popexp ()
   EXPR_CONTEXT *context;
 
   if (expr_depth == 0)
-    evalerror ("recursion stack underflow");
+    evalerror (_("recursion stack underflow"));
 
   context = expr_stack[--expr_depth];
 
@@ -278,6 +286,16 @@ expr_unwind ()
       free (expr_stack[expr_depth]);
     }
   free (expr_stack[expr_depth]);	/* free the allocated EXPR_CONTEXT */
+
+  noeval = 0;	/* XXX */
+}
+
+static void
+expr_bind_variable (lhs, rhs)
+     char *lhs, *rhs;
+{
+  (void)bind_int_variable (lhs, rhs);
+  stupidly_hack_special_variables (lhs);
 }
 
 /* Evaluate EXPR, and return the arithmetic result.  If VALIDP is
@@ -299,10 +317,17 @@ evalexp (expr, validp)
      int *validp;
 {
   intmax_t val;
+  int c;
+  procenv_t oevalbuf;
 
   val = 0;
+  noeval = 0;
 
-  if (setjmp (evalbuf))
+  FASTCOPY (evalbuf, oevalbuf, sizeof (evalbuf));
+
+  c = setjmp (evalbuf);
+
+  if (c)
     {
       FREE (tokstr);
       FREE (expression);
@@ -319,6 +344,8 @@ evalexp (expr, validp)
 
   if (validp)
     *validp = 1;
+
+  FASTCOPY (oevalbuf, evalbuf, sizeof (evalbuf));
 
   return (val);
 }
@@ -349,7 +376,7 @@ subexpr (expr)
   val = EXP_HIGHEST ();
 
   if (curtok != 0)
-    evalerror ("syntax error in expression");
+    evalerror (_("syntax error in expression"));
 
   FREE (tokstr);
   FREE (expression);
@@ -389,7 +416,7 @@ expassign ()
       special = curtok == OP_ASSIGN;
 
       if (lasttok != STR)
-	evalerror ("attempted assignment to non-variable");
+	evalerror (_("attempted assignment to non-variable"));
 
       if (special)
 	{
@@ -410,12 +437,12 @@ expassign ()
 	      break;
 	    case DIV:
 	      if (value == 0)
-		evalerror ("division by 0");
+		evalerror (_("division by 0"));
 	      lvalue /= value;
 	      break;
 	    case MOD:
 	      if (value == 0)
-		evalerror ("division by 0");
+		evalerror (_("division by 0"));
 	      lvalue %= value;
 	      break;
 	    case PLUS:
@@ -441,7 +468,7 @@ expassign ()
 	      break;
 	    default:
 	      free (lhs);
-	      evalerror ("bug: bad expassign token");
+	      evalerror (_("bug: bad expassign token"));
 	      break;
 	    }
 	  value = lvalue;
@@ -449,7 +476,7 @@ expassign ()
 
       rhs = itos (value);
       if (noeval == 0)
-	(void)bind_int_variable (lhs, rhs);
+	expr_bind_variable (lhs, rhs);
       free (rhs);
       free (lhs);
       FREE (tokstr);
@@ -471,7 +498,7 @@ expcond ()
     {
       readtok ();
       if (curtok == 0 || curtok == COL)
-	evalerror ("expression expected");
+	evalerror (_("expression expected"));
       if (cval == 0)
 	{
 	  set_noeval = 1;
@@ -483,17 +510,18 @@ expcond ()
       if (set_noeval)
 	noeval--;
       if (curtok != COL)
-	evalerror ("`:' expected for conditional expression");
+	evalerror (_("`:' expected for conditional expression"));
       readtok ();
       if (curtok == 0)
-	evalerror ("expression expected");
+	evalerror (_("expression expected"));
       set_noeval = 0;
       if (cval)
  	{
  	  set_noeval = 1;
 	  noeval++;
  	}
-      val2 = explor ();
+
+      val2 = expcond ();
       if (set_noeval)
 	noeval--;
       rval = cval ? val1 : val2;
@@ -725,7 +753,7 @@ exp2 ()
       val2 = exppower ();
 
       if (((op == DIV) || (op == MOD)) && (val2 == 0))
-	evalerror ("division by 0");
+	evalerror (_("division by 0"));
 
       if (op == MUL)
 	val1 *= val2;
@@ -743,14 +771,14 @@ exppower ()
   register intmax_t val1, val2, c;
 
   val1 = exp1 ();
-  if (curtok == POWER)
+  while (curtok == POWER)
     {
       readtok ();
-      val2 = exp1 ();
+      val2 = exppower ();	/* exponentiation is right-associative */
       if (val2 == 0)
 	return (1);
       if (val2 < 0)
-	evalerror ("exponent less than 0");
+	evalerror (_("exponent less than 0"));
       for (c = 1; val2--; c *= val1)
 	;
       val1 = c;
@@ -785,6 +813,7 @@ exp0 ()
   register intmax_t val = 0, v2;
   char *vincdec;
   int stok;
+  EXPR_CONTEXT ec;
 
   /* XXX - might need additional logic here to decide whether or not
 	   pre-increment or pre-decrement is legal at this point. */
@@ -794,12 +823,12 @@ exp0 ()
       readtok ();
       if (curtok != STR)
 	/* readtok() catches this */
-	evalerror ("identifier expected after pre-increment or pre-decrement");
+	evalerror (_("identifier expected after pre-increment or pre-decrement"));
 
       v2 = tokval + ((stok == PREINC) ? 1 : -1);
       vincdec = itos (v2);
       if (noeval == 0)
-	(void)bind_int_variable (tokstr, vincdec);
+	expr_bind_variable (tokstr, vincdec);
       free (vincdec);
       val = v2;
 
@@ -821,8 +850,8 @@ exp0 ()
       readtok ();
       val = EXP_HIGHEST ();
 
-      if (curtok != RPAR)
-	evalerror ("missing `)'");
+      if (curtok != RPAR) /* ( */
+	evalerror (_("missing `)'"));
 
       /* Skip over closing paren. */
       readtok ();
@@ -830,23 +859,42 @@ exp0 ()
   else if ((curtok == NUM) || (curtok == STR))
     {
       val = tokval;
-      if (curtok == STR && (*tp == '+' || *tp == '-') && tp[1] == *tp &&
-		(tp[2] == '\0' || (ISALNUM ((unsigned char)tp[2]) == 0)))
+      if (curtok == STR)
 	{
+	  SAVETOK (&ec);
+	  tokstr = (char *)NULL;	/* keep it from being freed */
+          noeval = 1;
+          readtok ();
+          stok = curtok;
+
 	  /* post-increment or post-decrement */
-	  v2 = val + ((*tp == '+') ? 1 : -1);
-	  vincdec = itos (v2);
-	  if (noeval == 0)
-	    (void)bind_int_variable (tokstr, vincdec);
-	  free (vincdec);
-	  tp += 2;
-	  curtok = NUM;	/* make sure x++=7 is flagged as an error */
+ 	  if (stok == POSTINC || stok == POSTDEC)
+ 	    {
+ 	      /* restore certain portions of EC */
+ 	      tokstr = ec.tokstr;
+ 	      noeval = ec.noeval;
+ 	      lasttok = STR;	/* ec.curtok */
+
+	      v2 = val + ((stok == POSTINC) ? 1 : -1);
+	      vincdec = itos (v2);
+	      if (noeval == 0)
+		expr_bind_variable (tokstr, vincdec);
+	      free (vincdec);
+	      curtok = NUM;	/* make sure x++=7 is flagged as an error */
+ 	    }
+ 	  else
+ 	    {
+	      if (stok == STR)	/* free new tokstr before old one is restored */
+		FREE (tokstr);
+	      RESTORETOK (&ec);
+ 	    }
+
 	}
 	  
       readtok ();
     }
   else
-    evalerror ("syntax error: operand expected");
+    evalerror (_("syntax error: operand expected"));
 
   return (val);
 }
@@ -885,6 +933,7 @@ expr_streval (tok, e)
       if (interactive_shell)
 	{
 	  expr_unwind ();
+	  top_level_cleanup ();
 	  jump_to_top_level (DISCARD);
 	}
       else
@@ -906,6 +955,64 @@ expr_streval (tok, e)
   return (tval);
 }
 
+static int
+_is_multiop (c)
+     int c;
+{
+  switch (c)
+    {
+    case EQEQ:
+    case NEQ:
+    case LEQ:
+    case GEQ:
+    case LAND:
+    case LOR:
+    case LSH:
+    case RSH:
+    case OP_ASSIGN:
+    case COND:
+    case POWER:
+    case PREINC:
+    case PREDEC:
+    case POSTINC:
+    case POSTDEC:
+      return 1;
+    default:
+      return 0;
+    }
+}
+
+static int
+_is_arithop (c)
+     int c;
+{
+  switch (c)
+    {
+    case EQ:
+    case GT:
+    case LT:
+    case PLUS:
+    case MINUS:
+    case MUL:
+    case DIV:
+    case MOD:
+    case NOT:
+    case LPAR:
+    case RPAR:
+    case BAND:
+    case BOR:
+    case BXOR:
+    case BNOT:
+      return 1;		/* operator tokens */
+    case QUES:
+    case COL:
+    case COMMA:
+      return 1;		/* questionable */
+    default:
+      return 0;		/* anything else is invalid */
+    }
+}
+
 /* Lexical analyzer/token reader for the expression evaluator.  Reads the
    next token and puts its value into curtok, while advancing past it.
    Updates value of tp.  May also set tokval (for number) or tokstr (for
@@ -913,7 +1020,7 @@ expr_streval (tok, e)
 static void
 readtok ()
 {
-  register char *cp;
+  register char *cp, *xp;
   register unsigned char c, c1;
   register int e;
 
@@ -926,8 +1033,6 @@ readtok ()
   if (c)
     cp++;
 
-  lasttp = tp = cp - 1;
-
   if (c == '\0')
     {
       lasttok = curtok;
@@ -935,6 +1040,7 @@ readtok ()
       tp = cp;
       return;
     }
+  lasttp = tp = cp - 1;
 
   if (legal_variable_starter (c))
     {
@@ -959,7 +1065,7 @@ readtok ()
 	      e = ']';
 	    }
 	  else
-	    evalerror ("bad array subscript");
+	    evalerror (bash_badsub_errmsg);
 	}
 #endif /* ARRAY_VARS */
 
@@ -972,6 +1078,7 @@ readtok ()
       tokstr = (char *)NULL;	/* keep it from being freed */
       tp = savecp = cp;
       noeval = 1;
+      curtok = STR;
       readtok ();
       peektok = curtok;
       if (peektok == STR)	/* free new tokstr before old one is restored */
@@ -1041,17 +1148,41 @@ readtok ()
 	c = LOR;
       else if ((c == '*') && (c1 == '*'))
 	c = POWER;
-      else if ((c == '-') && (c1 == '-') && legal_variable_starter ((unsigned char)*cp))
-	c = PREDEC;
-      else if ((c == '+') && (c1 == '+') && legal_variable_starter ((unsigned char)*cp))
-	c = PREINC;
+      else if ((c == '-' || c == '+') && c1 == c && curtok == STR)
+	c = (c == '-') ? POSTDEC : POSTINC;
+      else if ((c == '-' || c == '+') && c1 == c)
+	{
+	  /* Quickly scan forward to see if this is followed by optional
+	     whitespace and an identifier. */
+	  xp = cp;
+	  while (xp && *xp && cr_whitespace (*xp))
+	    xp++;
+	  if (legal_variable_starter ((unsigned char)*xp))
+	    c = (c == '-') ? PREDEC : PREINC;
+	  else
+	    cp--;	/* not preinc or predec, so unget the character */
+	}
       else if (c1 == EQ && member (c, "*/%+-&^|"))
 	{
 	  assigntok = c;	/* a OP= b */
 	  c = OP_ASSIGN;
 	}
+      else if (_is_arithop (c) == 0)
+	{
+	  cp--;
+	  /* use curtok, since it hasn't been copied to lasttok yet */
+	  if (curtok == 0 || _is_arithop (curtok) || _is_multiop (curtok))
+	    evalerror (_("syntax error: operand expected"));
+	  else
+	    evalerror (_("syntax error: invalid arithmetic operator"));
+	}
       else
 	cp--;			/* `unget' the character */
+
+      /* Should check here to make sure that the current character is one
+	 of the recognized operators and flag an error if not.  Could create
+	 a character map the first time through and check it on subsequent
+	 calls. */
       lasttok = curtok;
       curtok = c;
     }
@@ -1060,14 +1191,14 @@ readtok ()
 
 static void
 evalerror (msg)
-     char *msg;
+     const char *msg;
 {
   char *name, *t;
 
   name = this_command_name;
   for (t = expression; whitespace (*t); t++)
     ;
-  internal_error ("%s%s%s: %s (error token is \"%s\")",
+  internal_error (_("%s%s%s: %s (error token is \"%s\")"),
 		   name ? name : "", name ? ": " : "", t,
 		   msg, (lasttp && *lasttp) ? lasttp : "");
   longjmp (evalbuf, 1);
@@ -1081,7 +1212,7 @@ evalerror (msg)
    Base may be >=2 and <=64.  If base is <= 36, the numbers are drawn
    from [0-9][a-zA-Z], and lowercase and uppercase letters may be used
    interchangably.  If base is > 36 and <= 64, the numbers are drawn
-   from [0-9][a-z][A-Z]_@ (a = 10, z = 35, A = 36, Z = 61, _ = 62, @ = 63 --
+   from [0-9][a-z][A-Z]_@ (a = 10, z = 35, A = 36, Z = 61, @ = 62, _ = 63 --
    you get the picture). */
 
 static intmax_t
@@ -1121,11 +1252,11 @@ strlong (num)
       if (c == '#')
 	{
 	  if (foundbase)
-	    evalerror ("bad number");
+	    evalerror (_("invalid number"));
 
 	  /* Illegal base specifications raise an evaluation error. */
 	  if (val < 2 || val > 64)
-	    evalerror ("illegal arithmetic base");
+	    evalerror (_("invalid arithmetic base"));
 
 	  base = val;
 	  val = 0;
@@ -1145,13 +1276,14 @@ strlong (num)
 	    c = 63;
 
 	  if (c >= base)
-	    evalerror ("value too great for base");
+	    evalerror (_("value too great for base"));
 
 	  val = (val * base) + c;
 	}
       else
 	break;
     }
+
   return (val);
 }
 
@@ -1193,7 +1325,7 @@ main (argc, argv)
     {
       v = evalexp (argv[i], &expok);
       if (expok == 0)
-	fprintf (stderr, "%s: expression error\n", argv[i]);
+	fprintf (stderr, _("%s: expression error\n"), argv[i]);
       else
 	printf ("'%s' -> %ld\n", argv[i], v);
     }

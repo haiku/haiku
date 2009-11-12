@@ -1,22 +1,22 @@
 /* dispose_command.c -- dispose of a COMMAND structure. */
 
-/* Copyright (C) 1987,1991 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT
-   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
-   License for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Bash; see the file COPYING.  If not, write to the Free
-   Software Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "config.h"
 
@@ -89,6 +89,14 @@ dispose_command (command)
       {
 	dispose_command (command->value.Subshell->command);
 	free (command->value.Subshell);
+	break;
+      }
+
+    case cm_coproc:
+      {
+	free (command->value.Coproc->name);
+	dispose_command (command->value.Coproc->command);
+	free (command->value.Coproc);
 	break;
       }
 
@@ -186,9 +194,7 @@ dispose_command (command)
 	register FUNCTION_DEF *c;
 
 	c = command->value.Function_def;
-	dispose_word (c->name);
-	dispose_command (c->command);
-	free (c);
+	dispose_function_def (c);
 	break;
       }
 
@@ -218,17 +224,39 @@ dispose_cond_node (cond)
 }
 #endif /* COND_COMMAND */
 
+void
+dispose_function_def_contents (c)
+     FUNCTION_DEF *c;
+{
+  dispose_word (c->name);
+  dispose_command (c->command);
+  FREE (c->source_file);
+}
+
+void
+dispose_function_def (c)
+     FUNCTION_DEF *c;
+{
+  dispose_function_def_contents (c);
+  free (c);
+}
+
 /* How to free a WORD_DESC. */
 void
 dispose_word (w)
      WORD_DESC *w;
 {
   FREE (w->word);
-#if 0
-  free (w);
-#else
   ocache_free (wdcache, WORD_DESC, w);
-#endif
+}
+
+/* Free a WORD_DESC, but not the word contained within. */
+void
+dispose_word_desc (w)
+     WORD_DESC *w;
+{
+  w->word = 0;
+  ocache_free (wdcache, WORD_DESC, w);
 }
 
 /* How to get rid of a linked list of words.  A WORD_LIST. */
@@ -293,6 +321,7 @@ dispose_redirects (list)
 	case r_inputa_direction:
 	case r_appending_to:
 	case r_err_and_out:
+	case r_append_err_and_out:
 	case r_input_output:
 	case r_output_force:
 	case r_duplicating_input_word:

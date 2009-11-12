@@ -1,21 +1,22 @@
-/* getopt for BASH.
+/* getopt.c - getopt for Bash.  Used by the getopt builtin. */
 
-   Copyright (C) 1993, 1994
-   	Free Software Foundation, Inc.
+/* Copyright (C) 1993-2009 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+   This file is part of GNU Bash, the Bourne Again SHell.
 
-   This program is distributed in the hope that it will be useful,
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   Bash is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.  */
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <config.h>
 
@@ -28,6 +29,7 @@
 
 #include <stdio.h>
 #include "memalloc.h"
+#include "../bashintl.h"
 #include "../shell.h"
 #include "getopt.h"
 
@@ -105,8 +107,8 @@ int sh_badopt = 0;
    ARGV-element, is returned in `sh_optarg'. */
 
 /* 1003.2 specifies the format of this message.  */
-#define BADOPT(x)  fprintf (stderr, "%s: illegal option -- %c\n", argv[0], x)
-#define NEEDARG(x) fprintf (stderr, "%s: option requires an argument -- %c\n", argv[0], x)
+#define BADOPT(x)  fprintf (stderr, _("%s: illegal option -- %c\n"), argv[0], x)
+#define NEEDARG(x) fprintf (stderr, _("%s: option requires an argument -- %c\n"), argv[0], x)
 
 int
 sh_getopt (argc, argv, optstring)

@@ -1,0 +1,5276 @@
+# Esperanto language file for GNU Bash.
+# Copyright (C) 1996 Free Software Foundation, Inc.
+# Sergio Pokrovskij <sergio.pokrovskij@gmail.com>, 1998, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: GNU bash 3.2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-02-19 14:53-0500\n"
+"PO-Revision-Date: 2006-11-24 09:19+0600\n"
+"Last-Translator: Sergio Pokrovskij <sergio.pokrovskij@gmail.com>\n"
+"Language-Team: Esperanto <translation-team-eo@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8-bit\n"
+
+#: arrayfunc.c:50
+msgid "bad array subscript"
+msgstr "Misa tabel-indico"
+
+#: arrayfunc.c:313 builtins/declare.def:474
+#, c-format
+msgid "%s: cannot convert indexed to associative array"
+msgstr ""
+
+#: arrayfunc.c:479
+#, fuzzy, c-format
+msgid "%s: invalid associative array key"
+msgstr "%s: Misa nomo de ago"
+
+#: arrayfunc.c:481
+#, c-format
+msgid "%s: cannot assign to non-numeric index"
+msgstr "%s: Valorizato havu nombran indicon"
+
+#: arrayfunc.c:517
+#, c-format
+msgid "%s: %s: must use subscript when assigning associative array"
+msgstr ""
+
+#: bashhist.c:379
+#, c-format
+msgid "%s: cannot create: %s"
+msgstr "%s: Ne prosperis krei: %s"
+
+# XXX: internal_error
+#: bashline.c:3413
+msgid "bash_execute_unix_command: cannot find keymap for command"
+msgstr "bash_execute_unix_command: Mankas klavartabelo por komando"
+
+#: bashline.c:3491
+#, c-format
+msgid "%s: first non-whitespace character is not `\"'"
+msgstr "%s: La unua ne-blankspaca signo ne estas „\"‟"
+
+#: bashline.c:3520
+#, c-format
+msgid "no closing `%c' in %s"
+msgstr "Mankas ferma „%c‟ en %s"
+
+#: bashline.c:3554
+#, c-format
+msgid "%s: missing colon separator"
+msgstr "%s: Mankas disiga dupunkto"
+
+#: builtins/bind.def:120 builtins/bind.def:123
+msgid "line editing not enabled"
+msgstr ""
+
+#: builtins/bind.def:206
+#, c-format
+msgid "`%s': invalid keymap name"
+msgstr "„%s‟: Misa nomo por klavartabelo"
+
+#: builtins/bind.def:245
+#, c-format
+msgid "%s: cannot read: %s"
+msgstr "%s: Ne eblas legi: %s"
+
+#: builtins/bind.def:260
+#, c-format
+msgid "`%s': cannot unbind"
+msgstr "%s: Ne eblas malligi"
+
+#: builtins/bind.def:295 builtins/bind.def:325
+#, c-format
+msgid "`%s': unknown function name"
+msgstr "%s: Nekonata funkcinomo"
+
+#: builtins/bind.def:303
+#, c-format
+msgid "%s is not bound to any keys.\n"
+msgstr "%s malhavas klavligon\n"
+
+#: builtins/bind.def:307
+#, c-format
+msgid "%s can be invoked via "
+msgstr "%s vokeblas per "
+
+#: builtins/break.def:77 builtins/break.def:117
+msgid "loop count"
+msgstr ""
+
+#: builtins/break.def:137
+msgid "only meaningful in a `for', `while', or `until' loop"
+msgstr "Sencas nur en iteracio „for‟, „while‟ aŭ „until‟"
+
+#: builtins/caller.def:133
+#, fuzzy
+msgid ""
+"Returns the context of the current subroutine call.\n"
+"    \n"
+"    Without EXPR, returns "
+msgstr "Liveras la kuntekston de la kuranta procedurvoko."
+
+#: builtins/cd.def:215
+msgid "HOME not set"
+msgstr "HOME malhavas valoron"
+
+#: builtins/cd.def:227
+msgid "OLDPWD not set"
+msgstr "OLDPWD malhavas valoron"
+
+#: builtins/common.c:101
+#, c-format
+msgid "line %d: "
+msgstr ""
+
+#: builtins/common.c:139 error.c:260
+#, fuzzy, c-format
+msgid "warning: "
+msgstr "%s: Averto: "
+
+#: builtins/common.c:153
+#, fuzzy, c-format
+msgid "%s: usage: "
+msgstr "%s: Averto: "
+
+#: builtins/common.c:166 test.c:822
+msgid "too many arguments"
+msgstr "Tro multe da argumentoj"
+
+#: builtins/common.c:191 shell.c:493 shell.c:774
+#, c-format
+msgid "%s: option requires an argument"
+msgstr "%s: La opcio bezonas argumenton"
+
+#: builtins/common.c:198
+#, c-format
+msgid "%s: numeric argument required"
+msgstr "%s: Necesas nombra argumento"
+
+#: builtins/common.c:205
+#, c-format
+msgid "%s: not found"
+msgstr "%s: Ne trovita"
+
+#: builtins/common.c:214 shell.c:787
+#, c-format
+msgid "%s: invalid option"
+msgstr "%s: Misa opcio"
+
+#: builtins/common.c:221
+#, c-format
+msgid "%s: invalid option name"
+msgstr "%s: Misa opcinomo"
+
+#: builtins/common.c:228 general.c:231 general.c:236
+#, c-format
+msgid "`%s': not a valid identifier"
+msgstr "„%s‟ ne estas taŭga nomo"
+
+#: builtins/common.c:238
+#, fuzzy
+msgid "invalid octal number"
+msgstr "Misa signalnumero"
+
+#: builtins/common.c:240
+#, fuzzy
+msgid "invalid hex number"
+msgstr "Misa nombro"
+
+#: builtins/common.c:242 expr.c:1255
+msgid "invalid number"
+msgstr "Misa nombro"
+
+#: builtins/common.c:250
+#, c-format
+msgid "%s: invalid signal specification"
+msgstr "%s: Misa signalindiko"
+
+#: builtins/common.c:257
+#, c-format
+msgid "`%s': not a pid or valid job spec"
+msgstr "„%s‟: Nek proceznumero, nek taŭga laborindiko"
+
+#: builtins/common.c:264 error.c:453
+#, c-format
+msgid "%s: readonly variable"
+msgstr "%s: Nurlega variablo"
+
+#: builtins/common.c:272
+#, c-format
+msgid "%s: %s out of range"
+msgstr "%s: %s estas ekster sia variejo"
+
+#: builtins/common.c:272 builtins/common.c:274
+msgid "argument"
+msgstr "argumento"
+
+#: builtins/common.c:274
+#, c-format
+msgid "%s out of range"
+msgstr "%s estas ekster sia variejo"
+
+#: builtins/common.c:282
+#, c-format
+msgid "%s: no such job"
+msgstr "%s: Ne estas tia laboro"
+
+#: builtins/common.c:290
+#, c-format
+msgid "%s: no job control"
+msgstr "%s: Ĉi tiu ŝelo ne disponigas laborregadon"
+
+#: builtins/common.c:292
+msgid "no job control"
+msgstr "Laborregado ne disponeblas"
+
+#: builtins/common.c:302
+#, c-format
+msgid "%s: restricted"
+msgstr "%s: Limigita"
+
+#: builtins/common.c:304
+msgid "restricted"
+msgstr "limigita"
+
+#: builtins/common.c:312
+#, c-format
+msgid "%s: not a shell builtin"
+msgstr "„%s‟ ne estas primitiva komando ŝela"
+
+#: builtins/common.c:321
+#, c-format
+msgid "write error: %s"
+msgstr "Eraro ĉe skribo: %s"
+
+#: builtins/common.c:329
+#, c-format
+msgid "error setting terminal attributes: %s"
+msgstr ""
+
+#: builtins/common.c:331
+#, c-format
+msgid "error getting terminal attributes: %s"
+msgstr ""
+
+#: builtins/common.c:563
+#, c-format
+msgid "%s: error retrieving current directory: %s: %s\n"
+msgstr "%s: Eraro ĉe provo determini la kurantan dosierujon: %s: %s\n"
+
+#: builtins/common.c:629 builtins/common.c:631
+#, c-format
+msgid "%s: ambiguous job spec"
+msgstr "%s: Ambigua laborindiko"
+
+#: builtins/complete.def:270
+#, c-format
+msgid "%s: invalid action name"
+msgstr "%s: Misa nomo de ago"
+
+#: builtins/complete.def:430 builtins/complete.def:615
+#: builtins/complete.def:813
+#, c-format
+msgid "%s: no completion specification"
+msgstr "%s: Kompletigo ne estas specifita"
+
+#: builtins/complete.def:667
+msgid "warning: -F option may not work as you expect"
+msgstr "Averto: La opcio -F povas funkcii alie ol vi eble supozas"
+
+#: builtins/complete.def:669
+msgid "warning: -C option may not work as you expect"
+msgstr "Averto: La opcio -C povas funkcii alie ol vi eble supozas"
+
+#: builtins/complete.def:786
+msgid "not currently executing completion function"
+msgstr ""
+
+#: builtins/declare.def:122
+msgid "can only be used in a function"
+msgstr "Uzeblas nur ene de funkcio"
+
+#: builtins/declare.def:353
+msgid "cannot use `-f' to make functions"
+msgstr "„-f‟ ne estas uzebla por fari funkciojn"
+
+#: builtins/declare.def:365 execute_cmd.c:4818
+#, c-format
+msgid "%s: readonly function"
+msgstr "%s: Nurlega funkcio"
+
+#: builtins/declare.def:461
+#, c-format
+msgid "%s: cannot destroy array variables in this way"
+msgstr "$%s: ĉi tiel ne eblas neniigi variablojn"
+
+#: builtins/declare.def:468
+#, c-format
+msgid "%s: cannot convert associative to indexed array"
+msgstr ""
+
+#: builtins/enable.def:137 builtins/enable.def:145
+msgid "dynamic loading not available"
+msgstr "Rultempa ŝargo ne disponeblas"
+
+#: builtins/enable.def:312
+#, c-format
+msgid "cannot open shared object %s: %s"
+msgstr "Ne malfermiĝis dinamika biblioteko %s: %s"
+
+#: builtins/enable.def:335
+#, c-format
+msgid "cannot find %s in shared object %s: %s"
+msgstr "Mankas %s en la dinamika biblioteko%s: %s"
+
+#: builtins/enable.def:459
+#, c-format
+msgid "%s: not dynamically loaded"
+msgstr "%s: Ne ŝargita dinamike"
+
+#: builtins/enable.def:474
+#, c-format
+msgid "%s: cannot delete: %s"
+msgstr "%s: Ne eblas forigi: %s"
+
+#: builtins/evalfile.c:134 builtins/hash.def:169 execute_cmd.c:4675
+#: shell.c:1439
+#, c-format
+msgid "%s: is a directory"
+msgstr "%s estas dosierujo"
+
+#: builtins/evalfile.c:139
+#, c-format
+msgid "%s: not a regular file"
+msgstr "%s: Ne ordinara dosiero"
+
+#: builtins/evalfile.c:147
+#, c-format
+msgid "%s: file is too large"
+msgstr "%s: Tro granda dosiero"
+
+#: builtins/evalfile.c:185 execute_cmd.c:4745 shell.c:1449
+#, c-format
+msgid "%s: cannot execute binary file"
+msgstr "%s: Neplenumebla duuma dosiero"
+
+#: builtins/exec.def:212
+#, c-format
+msgid "%s: cannot execute: %s"
+msgstr "%s: Maleblas plenumi: %s"
+
+#: builtins/exit.def:65
+#, c-format
+msgid "logout\n"
+msgstr ""
+
+#: builtins/exit.def:88
+msgid "not login shell: use `exit'"
+msgstr "La ŝelo ne estas saluta; eliru per «exit»"
+
+#: builtins/exit.def:120
+#, c-format
+msgid "There are stopped jobs.\n"
+msgstr "Restas haltigitaj laboroj.\n"
+
+#: builtins/exit.def:122
+#, fuzzy, c-format
+msgid "There are running jobs.\n"
+msgstr "Restas haltigitaj laboroj.\n"
+
+#: builtins/fc.def:261
+msgid "no command found"
+msgstr "Komando ne trovita"
+
+#: builtins/fc.def:341
+msgid "history specification"
+msgstr "Historia indiko"
+
+#: builtins/fc.def:362
+#, c-format
+msgid "%s: cannot open temp file: %s"
+msgstr "%s: Ne malfermiĝis labordosiero: %s"
+
+#: builtins/fg_bg.def:149 builtins/jobs.def:282
+msgid "current"
+msgstr ""
+
+#: builtins/fg_bg.def:158
+#, c-format
+msgid "job %d started without job control"
+msgstr "La laboro %d estas lanĉita sen laborregado"
+
+#: builtins/getopt.c:110
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: Misa opcio -- %c\n"
+
+#: builtins/getopt.c:111
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: La opcio bezonas argumenton -- %c\n"
+
+#: builtins/hash.def:92
+msgid "hashing disabled"
+msgstr "Nomkonservado (haketado, «hashing») estas malŝaltita"
+
+#: builtins/hash.def:138
+#, c-format
+msgid "%s: hash table empty\n"
+msgstr "%s: Hakettabelo estas malplena\n"
+
+#: builtins/hash.def:244
+#, fuzzy, c-format
+msgid "hits\tcommand\n"
+msgstr "La ĵusa komando: %s\n"
+
+# ZZZ: aĉaj citiloj
+#: builtins/help.def:130
+#, fuzzy, c-format
+msgid "Shell commands matching keyword `"
+msgid_plural "Shell commands matching keywords `"
+msgstr[0] "Ŝelaj komandoj kongruaj kun la ŝlosilvorto `"
+msgstr[1] "Ŝelaj komandoj kongruaj kun la ŝlosilvorto `"
+
+#: builtins/help.def:168
+#, c-format
+msgid ""
+"no help topics match `%s'.  Try `help help' or `man -k %s' or `info %s'."
+msgstr ""
+"Helpaĵo pri „%s‟ malestas.\n"
+"Provu «help help» aŭ «man -k %s» aŭ «info %s»."
+
+#: builtins/help.def:185
+#, c-format
+msgid "%s: cannot open: %s"
+msgstr "%s: Fiaskis malfermo de %s"
+
+#: builtins/help.def:337
+#, c-format
+msgid ""
+"These shell commands are defined internally.  Type `help' to see this list.\n"
+"Type `help name' to find out more about the function `name'.\n"
+"Use `info bash' to find out more about the shell in general.\n"
+"Use `man -k' or `info' to find out more about commands not in this list.\n"
+"\n"
+"A star (*) next to a name means that the command is disabled.\n"
+"\n"
+msgstr ""
+"Jenaj komandoj estas enkonstruitaj.  Tajpu „help‟ por eligi la liston.\n"
+"Tajpu «help NOMO» por informoj pri la funkcio NOMO.\n"
+"Uzu «info bash» por la ĝenerala informo pri la ŝelo.\n"
+"Uzu «man -k» aŭ «info» por informo pri komandoj ĉi tie ne listigitaj.\n"
+"\n"
+"Steleto (*) tuj post nomo indikas, ke la komando estas malebligita.\n"
+"\n"
+
+#: builtins/history.def:154
+msgid "cannot use more than one of -anrw"
+msgstr "Ne pli ol unu el -anrw estas uzebla"
+
+#: builtins/history.def:186
+msgid "history position"
+msgstr "pozicio en la historio"
+
+#: builtins/history.def:365
+#, c-format
+msgid "%s: history expansion failed"
+msgstr "%s: Historia malvolvo fiaskis"
+
+#: builtins/inlib.def:71
+#, fuzzy, c-format
+msgid "%s: inlib failed"
+msgstr "%s: Historia malvolvo fiaskis"
+
+#: builtins/jobs.def:109
+msgid "no other options allowed with `-x'"
+msgstr "La uzo de „-x‟ malebligas aliajn opciojn"
+
+#: builtins/kill.def:197
+#, c-format
+msgid "%s: arguments must be process or job IDs"
+msgstr "%s: Argumento estu proceznumero aŭ laborindiko"
+
+#: builtins/kill.def:260
+msgid "Unknown error"
+msgstr "Nekonata eraro"
+
+#: builtins/let.def:95 builtins/let.def:120 expr.c:501 expr.c:516
+msgid "expression expected"
+msgstr "Mankas esprimo"
+
+#: builtins/mapfile.def:241 builtins/read.def:272
+#, c-format
+msgid "%s: invalid file descriptor specification"
+msgstr "%s: Misa indiko de dosiernumero"
+
+#: builtins/mapfile.def:249 builtins/read.def:279
+#, c-format
+msgid "%d: invalid file descriptor: %s"
+msgstr "„%d‟: Misa dosiernumero: %s"
+
+#: builtins/mapfile.def:258 builtins/mapfile.def:296
+#, fuzzy, c-format
+msgid "%s: invalid line count"
+msgstr "%s: Misa opcio"
+
+#: builtins/mapfile.def:269
+#, fuzzy, c-format
+msgid "%s: invalid array origin"
+msgstr "%s: Misa opcio"
+
+#: builtins/mapfile.def:286
+#, fuzzy, c-format
+msgid "%s: invalid callback quantum"
+msgstr "%s: Misa nomo de ago"
+
+#: builtins/mapfile.def:318
+#, fuzzy
+msgid "empty array variable name"
+msgstr "%s: Ne tabela variablo"
+
+#: builtins/mapfile.def:339
+msgid "array variable support required"
+msgstr ""
+
+#: builtins/printf.def:367
+#, c-format
+msgid "`%s': missing format character"
+msgstr "„%s‟: Mankas formata signo"
+
+#: builtins/printf.def:544
+#, c-format
+msgid "`%c': invalid format character"
+msgstr "„%c‟: Misa signo formata"
+
+#: builtins/printf.def:571
+#, fuzzy, c-format
+msgid "warning: %s: %s"
+msgstr "%s: Averto: "
+
+#: builtins/printf.def:750
+msgid "missing hex digit for \\x"
+msgstr "Mankas 16uma cifero por \\x"
+
+#: builtins/pushd.def:195
+msgid "no other directory"
+msgstr "Ne estas alia dosierujo"
+
+#: builtins/pushd.def:462
+msgid "<no current directory>"
+msgstr "<mankas kuranta dosierujo>"
+
+#: builtins/pushd.def:506
+msgid "directory stack empty"
+msgstr ""
+
+#: builtins/pushd.def:508
+#, fuzzy
+msgid "directory stack index"
+msgstr "Rekursistako elĉerpita"
+
+# dirs [-clpv] [+N] [-N]
+#: builtins/pushd.def:683
+#, fuzzy
+msgid ""
+"Display the list of currently remembered directories.  Directories\n"
+"    find their way onto the list with the `pushd' command; you can get\n"
+"    back up through the list with the `popd' command.\n"
+"    \n"
+"    Options:\n"
+"      -c\tclear the directory stack by deleting all of the elements\n"
+"      -l\tdo not print tilde-prefixed versions of directories relative\n"
+"    \tto your home directory\n"
+"      -p\tprint the directory stack with one entry per line\n"
+"      -v\tprint the directory stack with one entry per line prefixed\n"
+"    \twith its position in the stack\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tDisplays the Nth entry counting from the left of the list shown "
+"by\n"
+"    \tdirs when invoked without options, starting with zero.\n"
+"    \n"
+"      -N\tDisplays the Nth entry counting from the right of the list shown "
+"by\n"
+"\tdirs when invoked without options, starting with zero."
+msgstr ""
+"Listigu la kurantan dosierujstakon. La dosierujoj trafas en\n"
+"    la stakon per la komando „pushd‟ kaj estas forigeblaj per la\n"
+"    komando „popd‟.\n"
+"\n"
+"    La opcio -l indikas ke „dirs‟ ne eligu mallongajn formojn de\n"
+"    dosierujnomoj relative al via hejma dosierujo.  T.e. anstataŭ\n"
+"    «~/bin» aperos nomo kun absoluta vojo, ekz-e «/homes/bfox/bin».\n"
+"    La opcio -v igas komandon „dirs‟ eligi po unu eron de la dosierujstako\n"
+"    en linio, metante antaŭ la dosierujnomo ĝian numeron en la stako.\n"
+"    La opcio -p faras simile, tamen ne numeras la poziciojn.\n"
+"    La opcio -c malplenigas la dosierujstakon forigante el ĝi ĉiujn erojn.\n"
+"\n"
+"    +N\teligu la Nan eron nombrante de maldekstre en la listo eligebla\n"
+"\tper „dirs‟ sen opcioj, numerante ekde 0.\n"
+"\n"
+"    -N\teligu la Nan eron nombrante de dekstre en la listo eligebla\n"
+"\tper „dirs‟ sen opcioj, numerante ekde 0."
+
+# pushd [dir | +N | -N] [-n]
+#: builtins/pushd.def:705
+#, fuzzy
+msgid ""
+"Adds a directory to the top of the directory stack, or rotates\n"
+"    the stack, making the new top of the stack the current working\n"
+"    directory.  With no arguments, exchanges the top two directories.\n"
+"    \n"
+"    Options:\n"
+"      -n\tSuppresses the normal change of directory when adding\n"
+"    \tdirectories to the stack, so only the stack is manipulated.\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tRotates the stack so that the Nth directory (counting\n"
+"    \tfrom the left of the list shown by `dirs', starting with\n"
+"    \tzero) is at the top.\n"
+"    \n"
+"      -N\tRotates the stack so that the Nth directory (counting\n"
+"    \tfrom the right of the list shown by `dirs', starting with\n"
+"    \tzero) is at the top.\n"
+"    \n"
+"      dir\tAdds DIR to the directory stack at the top, making it the\n"
+"    \tnew current working directory.\n"
+"    \n"
+"    The `dirs' builtin displays the directory stack."
+msgstr ""
+"Surstakigu dosierujon sur la stakon da dosierujoj, aŭ cikle ŝovu\n"
+"    la stakon tiel, ke la nova stakpinto iĝu la kuranta dosierujo.\n"
+"    Senargumente, permutu la du plej suprajn dosierujojn de la stako.\n"
+"\n"
+"    +N\tCikle ŝovu la stakon tiel ke la Na dosierujo (nombrante de\n"
+"    \tmaldekstre en la listo eligebla per „dirs‟, numerante de 0)\n"
+"        iĝu la pinta.\n"
+"\n"
+"    -N\tCikle ŝovu la stakon tiel ke la Na dosierujo (nombrante de\n"
+"    \tdekstre en la listo eligebla per „dirs‟, numerante de 0) iĝu\n"
+"        la pinta.\n"
+"\n"
+"    -n\tNe ŝanĝu la kurantan dosierujon surstakigante dosierujon sur\n"
+"    \tla stakon; do, nur la stakon ŝanĝu.\n"
+"\n"
+"    dir\tsurstakigu la dosierujon dir kaj faru ĝin la nova kuranta\n"
+"    \tdosierujo labora.\n"
+"\n"
+"    Vi povas vidigi la stakon da dosierujoj per la komando „dirs‟."
+
+# popd [+N | -N] [-n]
+#: builtins/pushd.def:730
+#, fuzzy
+msgid ""
+"Removes entries from the directory stack.  With no arguments, removes\n"
+"    the top directory from the stack, and changes to the new top directory.\n"
+"    \n"
+"    Options:\n"
+"      -n\tSuppresses the normal change of directory when removing\n"
+"    \tdirectories from the stack, so only the stack is manipulated.\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tRemoves the Nth entry counting from the left of the list\n"
+"    \tshown by `dirs', starting with zero.  For example: `popd +0'\n"
+"    \tremoves the first directory, `popd +1' the second.\n"
+"    \n"
+"      -N\tRemoves the Nth entry counting from the right of the list\n"
+"    \tshown by `dirs', starting with zero.  For example: `popd -0'\n"
+"    \tremoves the last directory, `popd -1' the next to last.\n"
+"    \n"
+"    The `dirs' builtin displays the directory stack."
+msgstr ""
+"Elstakigu erojn el la stako de dosierujoj.  Senargumente, forigu la\n"
+"    pintan dosierujon kaj iru (cd) en la novan pintan dosierujon.\n"
+"\n"
+"    +N\tforigu la Nan eron de maldekstre de la listo eligebla per\n"
+"\t„dirs‟, numerante ekde 0.  Ekz-e: «popd +0» forigas la plej\n"
+"\tmaldekstran dosierujon; «popd +1», ĝian najbaron.\n"
+"\n"
+"    -N\tforigu la Nan eron de dekstre de la listo eligebla per „dirs‟,\n"
+"\tnumerante ekde 0.  Ekz-e: «popd -0» forigas la lastan\n"
+"\tdosierujon; «popd -1», la antaŭlastan.\n"
+"\n"
+"    -n\tNe ŝanĝu la kurantan dosierujon demetante dosierujon el la\n"
+"\tstako; do, nur la stakon ŝanĝu.\n"
+"\n"
+"    Vi povas vidigi la stakon da dosierujoj per la komando „dirs‟."
+
+#: builtins/read.def:248
+#, c-format
+msgid "%s: invalid timeout specification"
+msgstr "%s: Misa indiko de atendotempo"
+
+#: builtins/read.def:574
+#, c-format
+msgid "read error: %d: %s"
+msgstr "Lega (read) eraro: %d: %s"
+
+#: builtins/return.def:73
+msgid "can only `return' from a function or sourced script"
+msgstr ""
+"„return‟ sencas nur en funkcio aŭ punkte vokita („.‟, „source‟) skripto"
+
+#: builtins/set.def:768
+msgid "cannot simultaneously unset a function and a variable"
+msgstr "Ne eblas samtempe malaktivigi funkcion kaj variablon"
+
+#: builtins/set.def:805
+#, c-format
+msgid "%s: cannot unset"
+msgstr "%s: Malaktivigo fiaskis"
+
+#: builtins/set.def:812
+#, c-format
+msgid "%s: cannot unset: readonly %s"
+msgstr "%s: Malaktivigo fiaskis: nurlega %s"
+
+#: builtins/set.def:823
+#, c-format
+msgid "%s: not an array variable"
+msgstr "%s: Ne tabela variablo"
+
+#: builtins/setattr.def:186
+#, c-format
+msgid "%s: not a function"
+msgstr "%s: Ne funkcio"
+
+#: builtins/shift.def:71 builtins/shift.def:77
+msgid "shift count"
+msgstr "Nombrilo de „shift‟"
+
+#: builtins/shopt.def:254
+msgid "cannot set and unset shell options simultaneously"
+msgstr "Maleblas samtempe ŝalti kaj malŝalti ŝelan opcion"
+
+#: builtins/shopt.def:319
+#, c-format
+msgid "%s: invalid shell option name"
+msgstr "%s: Misa nomo de ŝela opcio"
+
+#: builtins/source.def:128
+msgid "filename argument required"
+msgstr "Necesas dosiernoma argumento"
+
+#: builtins/source.def:153
+#, c-format
+msgid "%s: file not found"
+msgstr "%s: Dosiero ne trovita"
+
+#: builtins/suspend.def:101
+msgid "cannot suspend"
+msgstr "Ne eblas halteti"
+
+#: builtins/suspend.def:111
+msgid "cannot suspend a login shell"
+msgstr "Ne eblas haltetigi salutan ŝelon"
+
+#: builtins/type.def:234
+#, c-format
+msgid "%s is aliased to `%s'\n"
+msgstr "„%s‟ alinomas jenon: «%s»\n"
+
+#: builtins/type.def:255
+#, c-format
+msgid "%s is a shell keyword\n"
+msgstr "„%s‟ estas ŝlosilvorto de la ŝelo\n"
+
+#: builtins/type.def:274
+#, c-format
+msgid "%s is a function\n"
+msgstr "%s estas funkcio\n"
+
+#: builtins/type.def:296
+#, c-format
+msgid "%s is a shell builtin\n"
+msgstr "„%s‟ estas primitiva komando de la ŝelo\n"
+
+#: builtins/type.def:317 builtins/type.def:391
+#, c-format
+msgid "%s is %s\n"
+msgstr "„%s‟ estas „%s‟\n"
+
+#: builtins/type.def:337
+#, c-format
+msgid "%s is hashed (%s)\n"
+msgstr "„%s‟ estas metita en hakettabelon (%s)\n"
+
+#: builtins/ulimit.def:372
+#, c-format
+msgid "%s: invalid limit argument"
+msgstr "%s: Maltaŭga argumento por limo"
+
+#: builtins/ulimit.def:398
+#, c-format
+msgid "`%c': bad command"
+msgstr "„%c‟: Misa komando"
+
+#: builtins/ulimit.def:427
+#, c-format
+msgid "%s: cannot get limit: %s"
+msgstr "%s: Fiaskis provo legi limon: %s"
+
+#: builtins/ulimit.def:453
+msgid "limit"
+msgstr ""
+
+#: builtins/ulimit.def:465 builtins/ulimit.def:765
+#, c-format
+msgid "%s: cannot modify limit: %s"
+msgstr "%s: Malprosperis ŝanĝi limon: %s"
+
+#: builtins/umask.def:118
+msgid "octal number"
+msgstr "Okuma nombro"
+
+# Misa modifilo: «umask Z-w» aŭ «umask aZw»
+#: builtins/umask.def:231
+#, c-format
+msgid "`%c': invalid symbolic mode operator"
+msgstr "„%c‟: Maltaŭga simbolo por atingorajta modifilo"
+
+# Misa kategorio: ne [rw] ktp
+#: builtins/umask.def:286
+#, c-format
+msgid "`%c': invalid symbolic mode character"
+msgstr "„%c‟: La signo ne estas simbolo de atingorajta kategorio"
+
+#: error.c:89 error.c:320 error.c:322 error.c:324
+msgid " line "
+msgstr ""
+
+#: error.c:164
+#, c-format
+msgid "last command: %s\n"
+msgstr "La ĵusa komando: %s\n"
+
+#: error.c:172
+#, c-format
+msgid "Aborting..."
+msgstr "Ĉesigado ..."
+
+#: error.c:405
+msgid "unknown command error"
+msgstr "Nekonata komand-eraro"
+
+#: error.c:406
+msgid "bad command type"
+msgstr "Misa komandotipo"
+
+#: error.c:407
+msgid "bad connector"
+msgstr "Misa stir-operacio"
+
+#: error.c:408
+msgid "bad jump"
+msgstr "Misa salto"
+
+#: error.c:446
+#, c-format
+msgid "%s: unbound variable"
+msgstr "%s: Neligita variablo"
+
+#: eval.c:181
+#, c-format
+msgid "\atimed out waiting for input: auto-logout\n"
+msgstr "\aTro longe sen enigo: Aŭtomata seancofino\n"
+
+# XXX: internal error:
+#: execute_cmd.c:491
+#, c-format
+msgid "cannot redirect standard input from /dev/null: %s"
+msgstr "Fiaskis provo nomumi la disponaĵon «/dev/null» ĉefenigujo: %s"
+
+# XXX: internal error:
+#: execute_cmd.c:1112
+#, c-format
+msgid "TIMEFORMAT: `%c': invalid format character"
+msgstr "TIMEFORMAT: „%c‟: Misa formatsigno"
+
+#: execute_cmd.c:2011
+#, fuzzy
+msgid "pipe error"
+msgstr "Eraro ĉe skribo: %s"
+
+#: execute_cmd.c:4363
+#, c-format
+msgid "%s: restricted: cannot specify `/' in command names"
+msgstr "%s: Malpermesitas uzi „/‟ en komandonomoj"
+
+#: execute_cmd.c:4454
+#, c-format
+msgid "%s: command not found"
+msgstr "%s: Komando ne trovita"
+
+#: execute_cmd.c:4708
+#, c-format
+msgid "%s: %s: bad interpreter"
+msgstr "%s: %s: Misa interpretilo"
+
+#: execute_cmd.c:4857
+#, c-format
+msgid "cannot duplicate fd %d to fd %d"
+msgstr "Ne eblas kunnomumi al dosiernumero %d la dosiernumeron %d"
+
+#: expr.c:241
+msgid "expression recursion level exceeded"
+msgstr "Tro profunda rekursio en esprimo"
+
+#: expr.c:265
+msgid "recursion stack underflow"
+msgstr "Rekursistako elĉerpita"
+
+#: expr.c:379
+msgid "syntax error in expression"
+msgstr "Sintaksa eraro en esprimo"
+
+#: expr.c:419
+msgid "attempted assignment to non-variable"
+msgstr "Provo valorizi ne-variablon"
+
+#: expr.c:440 expr.c:445 expr.c:756
+msgid "division by 0"
+msgstr "Divido per 0"
+
+#: expr.c:471
+msgid "bug: bad expassign token"
+msgstr "CIMO: Misa operacisigno en kombinita valorizsimbolo"
+
+#: expr.c:513
+msgid "`:' expected for conditional expression"
+msgstr "„:‟ mankas kondiĉa esprimo"
+
+#: expr.c:781
+msgid "exponent less than 0"
+msgstr "Negativa eksponento"
+
+#: expr.c:826
+msgid "identifier expected after pre-increment or pre-decrement"
+msgstr "Post antaŭkremento aperu nomo de variablo"
+
+#: expr.c:854
+msgid "missing `)'"
+msgstr "Mankas „)‟"
+
+#: expr.c:897 expr.c:1175
+msgid "syntax error: operand expected"
+msgstr "Sintaksa eraro: Mankas operando"
+
+#: expr.c:1177
+msgid "syntax error: invalid arithmetic operator"
+msgstr "Sintaksa eraro: Misa operacisimbolo aritmetika"
+
+#: expr.c:1201
+#, c-format
+msgid "%s%s%s: %s (error token is \"%s\")"
+msgstr ""
+
+#: expr.c:1259
+msgid "invalid arithmetic base"
+msgstr "Maltaŭga bazo nombrosistema"
+
+#: expr.c:1279
+msgid "value too great for base"
+msgstr "Tro granda valoro por bazo de nombrosistemo"
+
+#: expr.c:1328
+#, fuzzy, c-format
+msgid "%s: expression error\n"
+msgstr "%s: Mankas entjera esprimo"
+
+#: general.c:61
+msgid "getcwd: cannot access parent directories"
+msgstr "getwd: Ne eblas atingi patrajn dosierujojn"
+
+#: input.c:94 subst.c:4559
+#, fuzzy, c-format
+msgid "cannot reset nodelay mode for fd %d"
+msgstr "Ne eblas reŝalti senprokrastan reĝimon por dosiero n-ro %d"
+
+#: input.c:258
+#, c-format
+msgid "cannot allocate new file descriptor for bash input from fd %d"
+msgstr "Maleblas disponigi novan dosiernumeron por Baŝa enigo el n-ro %d"
+
+#: input.c:266
+#, c-format
+msgid "save_bash_input: buffer already exists for new fd %d"
+msgstr "save_bash_input: La nova dosiernumero (fd %d) jam havas bufron"
+
+#: jobs.c:466
+msgid "start_pipeline: pgrp pipe"
+msgstr ""
+
+#: jobs.c:887
+#, c-format
+msgid "forked pid %d appears in running job %d"
+msgstr "Forke farita proceznumero %d aperas en rulata laboro %d"
+
+#: jobs.c:1005
+#, c-format
+msgid "deleting stopped job %d with process group %ld"
+msgstr "Haltigita laboro %d kun procezgrupo %ld estas forigata"
+
+#: jobs.c:1110
+#, c-format
+msgid "add_process: process %5ld (%s) in the_pipeline"
+msgstr ""
+
+#: jobs.c:1113
+#, c-format
+msgid "add_process: pid %5ld (%s) marked as still alive"
+msgstr ""
+
+#: jobs.c:1401
+#, c-format
+msgid "describe_pid: %ld: no such pid"
+msgstr "describe_pid: Ne estas tia proceznumero (%ld)!"
+
+#: jobs.c:1416
+#, c-format
+msgid "Signal %d"
+msgstr ""
+
+#: jobs.c:1430 jobs.c:1455
+msgid "Done"
+msgstr ""
+
+#: jobs.c:1435 siglist.c:122
+msgid "Stopped"
+msgstr ""
+
+#: jobs.c:1439
+#, c-format
+msgid "Stopped(%s)"
+msgstr ""
+
+#: jobs.c:1443
+msgid "Running"
+msgstr ""
+
+#: jobs.c:1457
+#, c-format
+msgid "Done(%d)"
+msgstr ""
+
+#: jobs.c:1459
+#, c-format
+msgid "Exit %d"
+msgstr ""
+
+#: jobs.c:1462
+msgid "Unknown status"
+msgstr ""
+
+#: jobs.c:1549
+#, c-format
+msgid "(core dumped) "
+msgstr ""
+
+#: jobs.c:1568
+#, c-format
+msgid "  (wd: %s)"
+msgstr ""
+
+#: jobs.c:1771
+#, c-format
+msgid "child setpgid (%ld to %ld)"
+msgstr ""
+
+#: jobs.c:2099 nojobs.c:585
+#, c-format
+msgid "wait: pid %ld is not a child of this shell"
+msgstr "wait: La procezo %ld ne estas ido de ĉi tiu ŝelo"
+
+#: jobs.c:2326
+#, c-format
+msgid "wait_for: No record of process %ld"
+msgstr "wait_for: Malestas informoj pri procezo %ld"
+
+#: jobs.c:2598
+#, c-format
+msgid "wait_for_job: job %d is stopped"
+msgstr "wait_for_job: La laboro %d estas haltigita"
+
+#: jobs.c:2820
+#, c-format
+msgid "%s: job has terminated"
+msgstr "%s: La laboro finiĝis"
+
+#: jobs.c:2829
+#, c-format
+msgid "%s: job %d already in background"
+msgstr "%s: La laboro %d jam estas fona"
+
+#: jobs.c:3492
+#, fuzzy, c-format
+msgid "%s: line %d: "
+msgstr "%s: Averto: "
+
+#: jobs.c:3506 nojobs.c:814
+#, c-format
+msgid " (core dumped)"
+msgstr ""
+
+#: jobs.c:3518 jobs.c:3531
+#, c-format
+msgid "(wd now: %s)\n"
+msgstr ""
+
+#: jobs.c:3563
+msgid "initialize_job_control: getpgrp failed"
+msgstr ""
+
+#: jobs.c:3623
+msgid "initialize_job_control: line discipline"
+msgstr ""
+
+#: jobs.c:3633
+msgid "initialize_job_control: setpgid"
+msgstr ""
+
+#: jobs.c:3661
+#, c-format
+msgid "cannot set terminal process group (%d)"
+msgstr ""
+
+#: jobs.c:3666
+msgid "no job control in this shell"
+msgstr "Ĉi tiu ŝelo ne disponigas laborregadon"
+
+#: lib/malloc/malloc.c:296
+#, c-format
+msgid "malloc: failed assertion: %s\n"
+msgstr "malloc: Malveras la aserto: %s\n"
+
+# XXX: debug?
+#: lib/malloc/malloc.c:312
+#, c-format
+msgid ""
+"\r\n"
+"malloc: %s:%d: assertion botched\r\n"
+msgstr ""
+"\r\n"
+"malloc: %s:%d: aserto sufokita\r\n"
+
+# XXX: internal error
+#: lib/malloc/malloc.c:313
+#, fuzzy
+msgid "unknown"
+msgstr "%s: Nekonata retnodo"
+
+# XXX: debug?
+#: lib/malloc/malloc.c:797
+msgid "malloc: block on free list clobbered"
+msgstr "malloc: Skribdifektita bloko en malokupa listo (free list)"
+
+# XXX: debug?
+#: lib/malloc/malloc.c:874
+msgid "free: called with already freed block argument"
+msgstr "free: La argumento montras blokon jam malokupitan"
+
+# XXX: debug?
+#: lib/malloc/malloc.c:877
+msgid "free: called with unallocated block argument"
+msgstr "free: La argumento ne montras generitan memoron"
+
+# XXX: debug?
+#: lib/malloc/malloc.c:896
+msgid "free: underflow detected; mh_nbytes out of range"
+msgstr "free: Okazis maltroo; mh_nbytes estas ekster sia variejo"
+
+# XXX: debug?
+#: lib/malloc/malloc.c:902
+msgid "free: start and end chunk sizes differ"
+msgstr "free: La ĉapa kaj vosta longoj de memorpeco ne estas egalaj"
+
+# XXX: debug?
+#: lib/malloc/malloc.c:1001
+msgid "realloc: called with unallocated block argument"
+msgstr "realloc: La argumento ne montras generitan memoron"
+
+# XXX: debug?
+#: lib/malloc/malloc.c:1016
+msgid "realloc: underflow detected; mh_nbytes out of range"
+msgstr "realloc: Okazis maltroo; mh_nbytes estas ekster sia variejo"
+
+# XXX: debug?
+#: lib/malloc/malloc.c:1022
+msgid "realloc: start and end chunk sizes differ"
+msgstr "realloc: La ĉapa kaj vosta longoj de memorpeco ne estas egalaj"
+
+# XXX: debug?
+#: lib/malloc/table.c:177
+#, c-format
+msgid "register_alloc: alloc table is full with FIND_ALLOC?\n"
+msgstr "register_alloc: „alloc‟-tabelo elĉerpiĝis je FIND_ALLOC?\n"
+
+# XXX: debug?
+#: lib/malloc/table.c:184
+#, c-format
+msgid "register_alloc: %p already in table as allocated?\n"
+msgstr "register_alloc: %p jam en la tabelo kvazaŭ kreita (?)\n"
+
+# XXX: debug?
+#: lib/malloc/table.c:220
+#, c-format
+msgid "register_free: %p already in table as free?\n"
+msgstr "register_free: %p jam en la tabelo kvazaŭ malokupita (?)\n"
+
+#: lib/sh/fmtulong.c:101
+msgid "invalid base"
+msgstr "Misa bazo nombrosistema"
+
+# XXX: internal error
+#: lib/sh/netopen.c:168
+#, c-format
+msgid "%s: host unknown"
+msgstr "%s: Nekonata retnodo"
+
+#  XXX: internal error
+#: lib/sh/netopen.c:175
+#, c-format
+msgid "%s: invalid service"
+msgstr "%s: Misa servo-indiko"
+
+# XXX: internal error
+#: lib/sh/netopen.c:306
+#, c-format
+msgid "%s: bad network path specification"
+msgstr "%s: Misa retvojo-indiko"
+
+# XXX: internal error
+#: lib/sh/netopen.c:346
+msgid "network operations not supported"
+msgstr "Reta funkciado ne disponeblas"
+
+#: mailcheck.c:433
+msgid "You have mail in $_"
+msgstr "Vi havas poŝton en $_"
+
+#: mailcheck.c:458
+msgid "You have new mail in $_"
+msgstr "Nova poŝto en $_"
+
+#: mailcheck.c:474
+#, c-format
+msgid "The mail in %s has been read\n"
+msgstr "La poŝto en %s estas jam legita\n"
+
+#: make_cmd.c:322
+msgid "syntax error: arithmetic expression required"
+msgstr "Sintaksa eraro: Necesas aritmetika esprimo"
+
+#: make_cmd.c:324
+msgid "syntax error: `;' unexpected"
+msgstr "Sintaksa eraro: Neatendita „;‟"
+
+#: make_cmd.c:325
+#, c-format
+msgid "syntax error: `((%s))'"
+msgstr "Sintaksa eraro: „((%s))‟"
+
+#: make_cmd.c:567
+#, c-format
+msgid "make_here_document: bad instruction type %d"
+msgstr "make_here_document: Misa ordontipo %d"
+
+#: make_cmd.c:651
+#, c-format
+msgid "here-document at line %d delimited by end-of-file (wanted `%s')"
+msgstr ""
+
+# XXX: programming_error
+#: make_cmd.c:746
+#, c-format
+msgid "make_redirection: redirection instruction `%d' out of range"
+msgstr "make_redirection: Alidirektada komando „%d‟ ekster sia variejo"
+
+#: parse.y:2986 parse.y:3218
+#, c-format
+msgid "unexpected EOF while looking for matching `%c'"
+msgstr "Neatendita dosierfino dum serĉo de responda „%c‟"
+
+#: parse.y:3722
+msgid "unexpected EOF while looking for `]]'"
+msgstr "Neatendita dosierfino dum serĉo de „]]‟"
+
+#: parse.y:3727
+#, c-format
+msgid "syntax error in conditional expression: unexpected token `%s'"
+msgstr "Sintaksa eraro en kondiĉa esprimo: Neatendita simbolo „%s‟"
+
+#: parse.y:3731
+msgid "syntax error in conditional expression"
+msgstr "Sintaksa eraro en kondiĉa esprimo"
+
+#: parse.y:3809
+#, c-format
+msgid "unexpected token `%s', expected `)'"
+msgstr "Nekonvena simbolo „%s‟ anstataŭ „)‟"
+
+#: parse.y:3813
+msgid "expected `)'"
+msgstr "Mankas „)‟"
+
+#: parse.y:3841
+#, c-format
+msgid "unexpected argument `%s' to conditional unary operator"
+msgstr "La argumento „%s‟ ne konvenas por unuloka kondiĉa operacisimbolo"
+
+#: parse.y:3845
+msgid "unexpected argument to conditional unary operator"
+msgstr "Maltaŭga argumento por unuloka kondiĉa operacisimbolo"
+
+#: parse.y:3885
+#, c-format
+msgid "unexpected token `%s', conditional binary operator expected"
+msgstr "Misa simbolo „%s‟ anstataŭ duloka kondiĉa operacisigno"
+
+#: parse.y:3889
+msgid "conditional binary operator expected"
+msgstr "ĉi tie devas esti duloka kondiĉa operacisigno"
+
+#: parse.y:3906
+#, c-format
+msgid "unexpected argument `%s' to conditional binary operator"
+msgstr "La argumento „%s‟ ne konvenas por duloka kondiĉa operacisimbolo"
+
+#: parse.y:3910
+msgid "unexpected argument to conditional binary operator"
+msgstr "<maltaŭga argumento por duloka kondiĉa operacisimbolo"
+
+#: parse.y:3921
+#, c-format
+msgid "unexpected token `%c' in conditional command"
+msgstr "Misa simbolo „%c‟ en kondiĉa komando"
+
+#: parse.y:3924
+#, c-format
+msgid "unexpected token `%s' in conditional command"
+msgstr "Misa simbolo „%s‟ en kondiĉa komando"
+
+#: parse.y:3928
+#, c-format
+msgid "unexpected token %d in conditional command"
+msgstr "Misa simbolo „%d‟ en kondiĉa komando"
+
+#: parse.y:5195
+#, c-format
+msgid "syntax error near unexpected token `%s'"
+msgstr "Sintaksa eraro apud neatendita simbolo „%s‟"
+
+#: parse.y:5213
+#, c-format
+msgid "syntax error near `%s'"
+msgstr "Sintaksa eraro apud „%s‟"
+
+#: parse.y:5223
+msgid "syntax error: unexpected end of file"
+msgstr "Sintaksa eraro: Neatendita dosierfino"
+
+#: parse.y:5223
+msgid "syntax error"
+msgstr "Sintaksa eraro"
+
+#: parse.y:5285
+#, c-format
+msgid "Use \"%s\" to leave the shell.\n"
+msgstr "Uzu «%s» por eliri el la ŝelo.\n"
+
+#: parse.y:5447
+msgid "unexpected EOF while looking for matching `)'"
+msgstr "Neatendita dosierfino dum serĉo de responda „)‟"
+
+# XXX: internal_error
+#: pcomplete.c:1018
+#, c-format
+msgid "completion: function `%s' not found"
+msgstr "Kompletigo: Funkcio „%s‟ ne trovita"
+
+# XXX: programming_error
+#: pcomplib.c:179
+#, c-format
+msgid "progcomp_insert: %s: NULL COMPSPEC"
+msgstr "progcomp_insert: %s: NULL COMPSPEC"
+
+#: print_cmd.c:285
+#, c-format
+msgid "print_command: bad connector `%d'"
+msgstr "print_command: Misa stir-operacio „%d‟"
+
+# XXX: programming_error
+#: print_cmd.c:1348
+#, c-format
+msgid "cprintf: `%c': invalid format character"
+msgstr "cprintf: „%c‟: Misa formatsigno"
+
+#: redir.c:105
+msgid "file descriptor out of range"
+msgstr "Ekstervarieja dosiernomo"
+
+# XXX: internal_error
+#: redir.c:148
+#, c-format
+msgid "%s: ambiguous redirect"
+msgstr "%s: Ambigua alidirektado"
+
+# XXX: internal_error
+#: redir.c:152
+#, c-format
+msgid "%s: cannot overwrite existing file"
+msgstr "%s: Maleblas surskribi ekzistantan dosieron"
+
+# XXX: internal_error
+#: redir.c:157
+#, c-format
+msgid "%s: restricted: cannot redirect output"
+msgstr "%s: Limigita ŝelo: malpermesitas alidirekti eligon"
+
+# XXX: internal_error
+#: redir.c:162
+#, fuzzy, c-format
+msgid "cannot create temp file for here-document: %s"
+msgstr "Ne eblas krei labordosieron por ĉi-dokumento: %s"
+
+# XXX: internal_warning
+#: redir.c:517
+msgid "/dev/(tcp|udp)/host/port not supported without networking"
+msgstr "«/dev/(tcp|udp)/host/port» ne disponeblas ekster retumado"
+
+#: redir.c:1023
+msgid "redirection error: cannot duplicate fd"
+msgstr "Alidirektada eraro: Fiaskis kunnomumo al dosiernumero"
+
+#: shell.c:328
+msgid "could not find /tmp, please create!"
+msgstr "Mankas «/tmp», bv krei ĝin!"
+
+#: shell.c:332
+msgid "/tmp must be a valid directory name"
+msgstr "«/tmp» devas esti valida dosierujo"
+
+#: shell.c:876
+#, c-format
+msgid "%c%c: invalid option"
+msgstr "%c%c: Misa opcio"
+
+#: shell.c:1638
+msgid "I have no name!"
+msgstr "Mi ne havas nomon!"
+
+#: shell.c:1778
+#, c-format
+msgid "GNU bash, version %s-(%s)\n"
+msgstr ""
+
+#: shell.c:1779
+#, c-format
+msgid ""
+"Usage:\t%s [GNU long option] [option] ...\n"
+"\t%s [GNU long option] [option] script-file ...\n"
+msgstr ""
+"Uzo:\t%s [GNUa opcio longforma] [opcio] ...\n"
+"\t%s [GNUa opcio longforma] [opcio] SKRIPTODOSIERO ...\n"
+
+#: shell.c:1781
+msgid "GNU long options:\n"
+msgstr "GNUaj opcioj longformaj:\n"
+
+#: shell.c:1785
+msgid "Shell options:\n"
+msgstr "Ŝelaj opcioj:\n"
+
+#: shell.c:1786
+msgid "\t-irsD or -c command or -O shopt_option\t\t(invocation only)\n"
+msgstr "\t-irsD aŭ -c komando aŭ -O shopt_opcio\t\t(nur voko)\n"
+
+#: shell.c:1801
+#, c-format
+msgid "\t-%s or -o option\n"
+msgstr "\t-%s aŭ -o opcio\n"
+
+# bash --help
+#: shell.c:1807
+#, c-format
+msgid "Type `%s -c \"help set\"' for more information about shell options.\n"
+msgstr "Por pluaj informoj pri la opcioj tajpu: «%s -c \"help set\"»\n"
+
+#: shell.c:1808
+#, c-format
+msgid "Type `%s -c help' for more information about shell builtin commands.\n"
+msgstr "Por scii pli pri la primitivaj ŝelkomandoj tajpu: „%s -c help‟\n"
+
+#: shell.c:1809
+#, c-format
+msgid "Use the `bashbug' command to report bugs.\n"
+msgstr "Por raporti pri eraroj uzu la komandon „bashbug‟\n"
+
+# XXX: internal_error
+#: sig.c:583
+#, c-format
+msgid "sigprocmask: %d: invalid operation"
+msgstr "sigprocmask: %d: Misa operacio"
+
+#: siglist.c:47
+msgid "Bogus signal"
+msgstr ""
+
+#: siglist.c:50
+msgid "Hangup"
+msgstr ""
+
+#: siglist.c:54
+msgid "Interrupt"
+msgstr ""
+
+#: siglist.c:58
+msgid "Quit"
+msgstr ""
+
+#: siglist.c:62
+msgid "Illegal instruction"
+msgstr ""
+
+#: siglist.c:66
+msgid "BPT trace/trap"
+msgstr ""
+
+#: siglist.c:74
+msgid "ABORT instruction"
+msgstr ""
+
+#: siglist.c:78
+msgid "EMT instruction"
+msgstr ""
+
+#: siglist.c:82
+msgid "Floating point exception"
+msgstr ""
+
+#: siglist.c:86
+msgid "Killed"
+msgstr ""
+
+#: siglist.c:90
+#, fuzzy
+msgid "Bus error"
+msgstr "Sintaksa eraro"
+
+#: siglist.c:94
+msgid "Segmentation fault"
+msgstr ""
+
+#: siglist.c:98
+msgid "Bad system call"
+msgstr ""
+
+#: siglist.c:102
+msgid "Broken pipe"
+msgstr ""
+
+#: siglist.c:106
+msgid "Alarm clock"
+msgstr ""
+
+#: siglist.c:110
+#, fuzzy
+msgid "Terminated"
+msgstr "limigita"
+
+#: siglist.c:114
+msgid "Urgent IO condition"
+msgstr ""
+
+#: siglist.c:118
+msgid "Stopped (signal)"
+msgstr ""
+
+#: siglist.c:126
+msgid "Continue"
+msgstr ""
+
+#: siglist.c:134
+msgid "Child death or stop"
+msgstr ""
+
+#: siglist.c:138
+msgid "Stopped (tty input)"
+msgstr ""
+
+#: siglist.c:142
+msgid "Stopped (tty output)"
+msgstr ""
+
+#: siglist.c:146
+msgid "I/O ready"
+msgstr ""
+
+#: siglist.c:150
+msgid "CPU limit"
+msgstr ""
+
+#: siglist.c:154
+msgid "File limit"
+msgstr ""
+
+#: siglist.c:158
+msgid "Alarm (virtual)"
+msgstr ""
+
+#: siglist.c:162
+msgid "Alarm (profile)"
+msgstr ""
+
+#: siglist.c:166
+msgid "Window changed"
+msgstr ""
+
+#: siglist.c:170
+msgid "Record lock"
+msgstr ""
+
+#: siglist.c:174
+msgid "User signal 1"
+msgstr ""
+
+#: siglist.c:178
+msgid "User signal 2"
+msgstr ""
+
+#: siglist.c:182
+msgid "HFT input data pending"
+msgstr ""
+
+#: siglist.c:186
+msgid "power failure imminent"
+msgstr ""
+
+#: siglist.c:190
+msgid "system crash imminent"
+msgstr ""
+
+#: siglist.c:194
+msgid "migrate process to another CPU"
+msgstr ""
+
+#: siglist.c:198
+msgid "programming error"
+msgstr ""
+
+#: siglist.c:202
+msgid "HFT monitor mode granted"
+msgstr ""
+
+#: siglist.c:206
+msgid "HFT monitor mode retracted"
+msgstr ""
+
+#: siglist.c:210
+msgid "HFT sound sequence has completed"
+msgstr ""
+
+#: siglist.c:214
+msgid "Information request"
+msgstr ""
+
+#: siglist.c:222
+msgid "Unknown Signal #"
+msgstr ""
+
+#: siglist.c:224
+#, c-format
+msgid "Unknown Signal #%d"
+msgstr ""
+
+#: subst.c:1181 subst.c:1302
+#, c-format
+msgid "bad substitution: no closing `%s' in %s"
+msgstr "Misa anstataŭigo: Mankas ferma „%s‟ en %s"
+
+#: subst.c:2458
+#, c-format
+msgid "%s: cannot assign list to array member"
+msgstr "%s: Maleblas valorizi tabelanon per listo"
+
+#: subst.c:4456 subst.c:4472
+msgid "cannot make pipe for process substitution"
+msgstr "Ne prosperis fari dukton por proceza anstataŭigo"
+
+#: subst.c:4504
+msgid "cannot make child for process substitution"
+msgstr "Ne prosperis krei idon por proceza anstataŭigo"
+
+#: subst.c:4549
+#, c-format
+msgid "cannot open named pipe %s for reading"
+msgstr "Ne prosperis malfermi nomitan dukton %s porlegan"
+
+#: subst.c:4551
+#, c-format
+msgid "cannot open named pipe %s for writing"
+msgstr "Ne prosperis malfermi nomitan dukton %s por skribado"
+
+#: subst.c:4569
+#, c-format
+msgid "cannot duplicate named pipe %s as fd %d"
+msgstr "Ne prosperis kunnomumi nomhavan dukton %s kiel dosiernumeron %d"
+
+#: subst.c:4765
+msgid "cannot make pipe for command substitution"
+msgstr "Ne prosperis fari dukton por komanda anstataŭigo"
+
+#: subst.c:4799
+msgid "cannot make child for command substitution"
+msgstr "Ne prosperis krei procezidon por komanda anstataŭigo"
+
+#: subst.c:4816
+msgid "command_substitute: cannot duplicate pipe as fd 1"
+msgstr "command_substitute: Ne prosperis kunnomumi la dosiernumeron 1 al dukto"
+
+#: subst.c:5318
+#, c-format
+msgid "%s: parameter null or not set"
+msgstr "%s: Parametro estas NUL aŭ malaktiva"
+
+#: subst.c:5608
+#, c-format
+msgid "%s: substring expression < 0"
+msgstr "%s: subĉeno-esprimo < 0"
+
+#: subst.c:6660
+#, c-format
+msgid "%s: bad substitution"
+msgstr "%s: Misa anstataŭigo"
+
+#: subst.c:6740
+#, c-format
+msgid "$%s: cannot assign in this way"
+msgstr "$%s: ĉi tiel ne valorizebla"
+
+#: subst.c:7499
+#, fuzzy, c-format
+msgid "bad substitution: no closing \"`\" in %s"
+msgstr "Misa anstataŭigo: Mankas ferma „%s‟ en %s"
+
+#: subst.c:8375
+#, c-format
+msgid "no match: %s"
+msgstr "Nenio kongrua: %s"
+
+#: test.c:145
+msgid "argument expected"
+msgstr "Mankas argumento"
+
+#: test.c:154
+#, c-format
+msgid "%s: integer expression expected"
+msgstr "%s: Mankas entjera esprimo"
+
+#: test.c:262
+msgid "`)' expected"
+msgstr "Mankas „)‟"
+
+#: test.c:264
+#, c-format
+msgid "`)' expected, found %s"
+msgstr "Anstataŭ „)‟ troviĝas %s"
+
+#: test.c:279 test.c:688 test.c:691
+#, c-format
+msgid "%s: unary operator expected"
+msgstr "%s: Tie devas esti unuloka operacisigno"
+
+#: test.c:444 test.c:731
+#, c-format
+msgid "%s: binary operator expected"
+msgstr "%s: Tie devas esti duloka operacisigno"
+
+#: test.c:806
+msgid "missing `]'"
+msgstr "Mankas „]‟"
+
+#: trap.c:201
+msgid "invalid signal number"
+msgstr "Misa signalnumero"
+
+# XXX: internal_warning
+#: trap.c:324
+#, c-format
+msgid "run_pending_traps: bad value in trap_list[%d]: %p"
+msgstr "run_pending_traps: Misa valoro en trap_list[%d]: %p"
+
+# XXX: internal_warning
+#: trap.c:328
+#, c-format
+msgid ""
+"run_pending_traps: signal handler is SIG_DFL, resending %d (%s) to myself"
+msgstr "run_pending_traps: Signaltraktilo SIG_DFL resendas %d (%s) al mi mem"
+
+#: trap.c:372
+#, c-format
+msgid "trap_handler: bad signal %d"
+msgstr "trap_handler: Misa signalnumero %d"
+
+#: variables.c:358
+#, c-format
+msgid "error importing function definition for `%s'"
+msgstr "Eraro ĉe importo de funkcidifino por „%s‟"
+
+# XXX: internal_warning
+#: variables.c:736
+#, c-format
+msgid "shell level (%d) too high, resetting to 1"
+msgstr "%d estas tro granda ŝelnivelo; mallevita ĝis 1"
+
+# XXX: internal_error
+#: variables.c:1898
+msgid "make_local_variable: no function context at current scope"
+msgstr "make_local_variable: Malestas funkcia kunteksto en ĉi-regiono"
+
+# XXX: internal_error
+#: variables.c:3127
+msgid "all_local_variables: no function context at current scope"
+msgstr "all_local_variables: Malestas funkcia kunteksto en ĉi-regiono"
+
+# XXX: internal_error
+#: variables.c:3344 variables.c:3353
+#, c-format
+msgid "invalid character %d in exportstr for %s"
+msgstr "Misa signo %d en eksporta signoĉeno por „%s‟"
+
+# XXX: internal_error
+#: variables.c:3359
+#, c-format
+msgid "no `=' in exportstr for %s"
+msgstr "Mankas „=‟ en eksporta signoĉeno por „%s‟"
+
+# XXX: internal_error
+#: variables.c:3794
+msgid "pop_var_context: head of shell_variables not a function context"
+msgstr ""
+"pop_var_context: La kapo de „shell_variables‟ ne estas funkcia kunteksto"
+
+# XXX: internal_error
+#: variables.c:3807
+msgid "pop_var_context: no global_variables context"
+msgstr "pop_var_context: Mankas kunteksto de „global_variables‟"
+
+# XXX: internal_error
+#: variables.c:3881
+msgid "pop_scope: head of shell_variables not a temporary environment scope"
+msgstr "pop_scope: La kapo de „shell_variables‟ ne estas provizora regiono"
+
+#: version.c:46
+#, fuzzy
+msgid "Copyright (C) 2009 Free Software Foundation, Inc."
+msgstr "(C) 2006 ĉe «Free Software Foundation, Inc.»\n"
+
+#: version.c:47
+msgid ""
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+msgstr ""
+
+#: version.c:86
+#, c-format
+msgid "GNU bash, version %s (%s)\n"
+msgstr ""
+
+#: version.c:91
+#, c-format
+msgid "This is free software; you are free to change and redistribute it.\n"
+msgstr ""
+
+#: version.c:92
+#, c-format
+msgid "There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: xmalloc.c:92
+#, c-format
+msgid "xmalloc: cannot allocate %lu bytes (%lu bytes allocated)"
+msgstr "xmalloc(): Ne povas okupi %lu bajtojn (%lu bajtoj disponigitaj)"
+
+#: xmalloc.c:94
+#, c-format
+msgid "xmalloc: cannot allocate %lu bytes"
+msgstr "xmalloc: Ne prosperis okupi %lu bajtojn"
+
+#: xmalloc.c:114
+#, c-format
+msgid "xrealloc: cannot reallocate %lu bytes (%lu bytes allocated)"
+msgstr "xrealloc(): Ne povas reokupi %lu bajtojn (%lu bajtoj disponigitaj)."
+
+#: xmalloc.c:116
+#, c-format
+msgid "xrealloc: cannot allocate %lu bytes"
+msgstr "xrealloc: Ne eblas reokupi %lu bajtojn."
+
+# XXX: fatal_error
+#: xmalloc.c:150
+#, c-format
+msgid "xmalloc: %s:%d: cannot allocate %lu bytes (%lu bytes allocated)"
+msgstr "xmalloc: %s:%d: ne eblas okupi %lu bajtojn (%lu bajtoj disponigitaj)"
+
+# XXX: fatal_error
+#: xmalloc.c:152
+#, c-format
+msgid "xmalloc: %s:%d: cannot allocate %lu bytes"
+msgstr "xmalloc: %s:%d: ne eblas okupi %lu bajtojn"
+
+# XXX: fatal_error
+#: xmalloc.c:174
+#, c-format
+msgid "xrealloc: %s:%d: cannot reallocate %lu bytes (%lu bytes allocated)"
+msgstr ""
+"xrealloc: %s:%d: ne eblas reokupi %lu bajtojn (%lu bajtoj disponigitaj)"
+
+# XXX: fatal_error
+#: xmalloc.c:176
+#, c-format
+msgid "xrealloc: %s:%d: cannot allocate %lu bytes"
+msgstr "xrealloc: %s:%d: ne eblas reokupi %lu bajtojn"
+
+#: builtins.c:43
+msgid "alias [-p] [name[=value] ... ]"
+msgstr ""
+
+#: builtins.c:47
+msgid "unalias [-a] name [name ...]"
+msgstr ""
+
+#: builtins.c:51
+msgid ""
+"bind [-lpvsPVS] [-m keymap] [-f filename] [-q name] [-u name] [-r keyseq] [-"
+"x keyseq:shell-command] [keyseq:readline-function or readline-command]"
+msgstr ""
+
+#: builtins.c:54
+msgid "break [n]"
+msgstr ""
+
+#: builtins.c:56
+msgid "continue [n]"
+msgstr ""
+
+#: builtins.c:58
+msgid "builtin [shell-builtin [arg ...]]"
+msgstr ""
+
+#: builtins.c:61
+msgid "caller [expr]"
+msgstr ""
+
+#: builtins.c:64
+msgid "cd [-L|-P] [dir]"
+msgstr ""
+
+#: builtins.c:66
+msgid "pwd [-LP]"
+msgstr ""
+
+#: builtins.c:68
+msgid ":"
+msgstr ""
+
+#: builtins.c:70
+msgid "true"
+msgstr ""
+
+#: builtins.c:72
+msgid "false"
+msgstr ""
+
+#: builtins.c:74
+msgid "command [-pVv] command [arg ...]"
+msgstr ""
+
+#: builtins.c:76
+msgid "declare [-aAfFilrtux] [-p] [name[=value] ...]"
+msgstr ""
+
+#: builtins.c:78
+msgid "typeset [-aAfFilrtux] [-p] name[=value] ..."
+msgstr ""
+
+#: builtins.c:80
+msgid "local [option] name[=value] ..."
+msgstr ""
+
+#: builtins.c:83
+msgid "echo [-neE] [arg ...]"
+msgstr ""
+
+#: builtins.c:87
+msgid "echo [-n] [arg ...]"
+msgstr ""
+
+#: builtins.c:90
+msgid "enable [-a] [-dnps] [-f filename] [name ...]"
+msgstr ""
+
+#: builtins.c:92
+msgid "eval [arg ...]"
+msgstr ""
+
+#: builtins.c:94
+msgid "getopts optstring name [arg]"
+msgstr ""
+
+#: builtins.c:96
+msgid "exec [-cl] [-a name] [command [arguments ...]] [redirection ...]"
+msgstr ""
+
+#: builtins.c:98
+msgid "exit [n]"
+msgstr ""
+
+#: builtins.c:100
+msgid "logout [n]"
+msgstr ""
+
+#: builtins.c:103
+msgid "fc [-e ename] [-lnr] [first] [last] or fc -s [pat=rep] [command]"
+msgstr ""
+
+#: builtins.c:107
+msgid "fg [job_spec]"
+msgstr ""
+
+#: builtins.c:111
+msgid "bg [job_spec ...]"
+msgstr ""
+
+#: builtins.c:114
+msgid "hash [-lr] [-p pathname] [-dt] [name ...]"
+msgstr ""
+
+#: builtins.c:117
+msgid "help [-ds] [pattern ...]"
+msgstr ""
+
+#: builtins.c:121
+msgid ""
+"history [-c] [-d offset] [n] or history -anrw [filename] or history -ps arg "
+"[arg...]"
+msgstr ""
+
+#: builtins.c:125
+msgid "jobs [-lnprs] [jobspec ...] or jobs -x command [args]"
+msgstr ""
+
+#: builtins.c:129
+msgid "disown [-h] [-ar] [jobspec ...]"
+msgstr ""
+
+#: builtins.c:132
+msgid ""
+"kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l "
+"[sigspec]"
+msgstr ""
+
+#: builtins.c:134
+msgid "let arg [arg ...]"
+msgstr ""
+
+#: builtins.c:136
+msgid ""
+"read [-ers] [-a array] [-d delim] [-i text] [-n nchars] [-p prompt] [-t "
+"timeout] [-u fd] [name ...]"
+msgstr ""
+
+#: builtins.c:138
+msgid "return [n]"
+msgstr ""
+
+#: builtins.c:140
+msgid "set [--abefhkmnptuvxBCHP] [-o option-name] [arg ...]"
+msgstr ""
+
+#: builtins.c:142
+msgid "unset [-f] [-v] [name ...]"
+msgstr ""
+
+#: builtins.c:144
+msgid "export [-fn] [name[=value] ...] or export -p"
+msgstr ""
+
+#: builtins.c:146
+msgid "readonly [-af] [name[=value] ...] or readonly -p"
+msgstr ""
+
+#: builtins.c:148
+#, fuzzy
+msgid "shift [n]"
+msgstr "Nombrilo de „shift‟"
+
+#: builtins.c:150
+#, fuzzy
+msgid "source filename [arguments]"
+msgstr "Necesas dosiernoma argumento"
+
+#: builtins.c:152
+#, fuzzy
+msgid ". filename [arguments]"
+msgstr "Necesas dosiernoma argumento"
+
+#: builtins.c:155
+msgid "suspend [-f]"
+msgstr ""
+
+#: builtins.c:158
+msgid "test [expr]"
+msgstr ""
+
+#: builtins.c:160
+msgid "[ arg... ]"
+msgstr ""
+
+#: builtins.c:162
+msgid "times"
+msgstr ""
+
+#: builtins.c:164
+msgid "trap [-lp] [[arg] signal_spec ...]"
+msgstr ""
+
+#: builtins.c:166
+msgid "type [-afptP] name [name ...]"
+msgstr ""
+
+#: builtins.c:169
+msgid "ulimit [-SHacdefilmnpqrstuvx] [limit]"
+msgstr ""
+
+#: builtins.c:172
+msgid "umask [-p] [-S] [mode]"
+msgstr ""
+
+#: builtins.c:175
+msgid "wait [id]"
+msgstr ""
+
+#: builtins.c:179
+msgid "wait [pid]"
+msgstr ""
+
+#: builtins.c:182
+msgid "for NAME [in WORDS ... ] ; do COMMANDS; done"
+msgstr ""
+
+#: builtins.c:184
+msgid "for (( exp1; exp2; exp3 )); do COMMANDS; done"
+msgstr ""
+
+#: builtins.c:186
+msgid "select NAME [in WORDS ... ;] do COMMANDS; done"
+msgstr ""
+
+#: builtins.c:188
+msgid "time [-p] pipeline"
+msgstr ""
+
+#: builtins.c:190
+msgid "case WORD in [PATTERN [| PATTERN]...) COMMANDS ;;]... esac"
+msgstr ""
+
+#: builtins.c:192
+msgid ""
+"if COMMANDS; then COMMANDS; [ elif COMMANDS; then COMMANDS; ]... [ else "
+"COMMANDS; ] fi"
+msgstr ""
+
+#: builtins.c:194
+msgid "while COMMANDS; do COMMANDS; done"
+msgstr ""
+
+#: builtins.c:196
+msgid "until COMMANDS; do COMMANDS; done"
+msgstr ""
+
+#: builtins.c:198
+msgid "coproc [NAME] command [redirections]"
+msgstr ""
+
+#: builtins.c:200
+msgid "function name { COMMANDS ; } or name () { COMMANDS ; }"
+msgstr ""
+
+#: builtins.c:202
+msgid "{ COMMANDS ; }"
+msgstr ""
+
+#: builtins.c:204
+msgid "job_spec [&]"
+msgstr ""
+
+#: builtins.c:206
+#, fuzzy
+msgid "(( expression ))"
+msgstr "Mankas esprimo"
+
+#: builtins.c:208
+#, fuzzy
+msgid "[[ expression ]]"
+msgstr "Mankas esprimo"
+
+#: builtins.c:210
+msgid "variables - Names and meanings of some shell variables"
+msgstr ""
+
+#: builtins.c:213
+msgid "pushd [-n] [+N | -N | dir]"
+msgstr ""
+
+#: builtins.c:217
+msgid "popd [-n] [+N | -N]"
+msgstr ""
+
+#: builtins.c:221
+msgid "dirs [-clpv] [+N] [-N]"
+msgstr ""
+
+#: builtins.c:224
+msgid "shopt [-pqsu] [-o] [optname ...]"
+msgstr ""
+
+#: builtins.c:226
+msgid "printf [-v var] format [arguments]"
+msgstr ""
+
+#: builtins.c:229
+msgid ""
+"complete [-abcdefgjksuv] [-pr] [-o option] [-A action] [-G globpat] [-W "
+"wordlist]  [-F function] [-C command] [-X filterpat] [-P prefix] [-S suffix] "
+"[name ...]"
+msgstr ""
+
+#: builtins.c:233
+msgid ""
+"compgen [-abcdefgjksuv] [-o option]  [-A action] [-G globpat] [-W wordlist]  "
+"[-F function] [-C command] [-X filterpat] [-P prefix] [-S suffix] [word]"
+msgstr ""
+
+#: builtins.c:237
+msgid "compopt [-o|+o option] [name ...]"
+msgstr ""
+
+#: builtins.c:240
+msgid ""
+"mapfile [-n count] [-O origin] [-s count] [-t] [-u fd] [-C callback] [-c "
+"quantum] [array]"
+msgstr ""
+
+#: builtins.c:242
+msgid ""
+"readarray [-n count] [-O origin] [-s count] [-t] [-u fd] [-C callback] [-c "
+"quantum] [array]"
+msgstr ""
+
+#: builtins.c:254
+#, fuzzy
+msgid ""
+"Define or display aliases.\n"
+"    \n"
+"    Without arguments, `alias' prints the list of aliases in the reusable\n"
+"    form `alias NAME=VALUE' on standard output.\n"
+"    \n"
+"    Otherwise, an alias is defined for each NAME whose VALUE is given.\n"
+"    A trailing space in VALUE causes the next word to be checked for\n"
+"    alias substitution when the alias is expanded.\n"
+"    \n"
+"    Options:\n"
+"      -p\tPrint all defined aliases in a reusable format\n"
+"    \n"
+"    Exit Status:\n"
+"    alias returns true unless a NAME is supplied for which no alias has "
+"been\n"
+"    defined."
+msgstr ""
+"Sen argumento aŭ kun la opcio  -p  „alias‟ eligas la liston\n"
+"    da alinomoj en la formo «alias NOMO=VALORO» en la ĉefeligujon.\n"
+"    Alie, ĉiu NOMO iĝas difinita kiel alinomo por indikita VALORO.\n"
+"    Vosta spaceto en la VALORO kaŭzas teston, ĉu la sekva vorto estas\n"
+"    alinome anstataŭigenda ĉe la komputo de la alinomo. La komando\n"
+"    „alias‟ liveras „true‟ krom se aperas NOMO ne difinita alinome."
+
+# unalias [-a] name [name ...]
+#: builtins.c:276
+#, fuzzy
+msgid ""
+"Remove each NAME from the list of defined aliases.\n"
+"    \n"
+"    Options:\n"
+"      -a\tremove all alias definitions.\n"
+"    \n"
+"    Return success unless a NAME is not an existing alias."
+msgstr ""
+"Forigu la nomojn name ... el la listo de difinitaj alinomoj.\n"
+"    Se enestas la opcio „-a‟, ĉiujn alinomojn forigu."
+
+#: builtins.c:289
+#, fuzzy
+msgid ""
+"Set Readline key bindings and variables.\n"
+"    \n"
+"    Bind a key sequence to a Readline function or a macro, or set a\n"
+"    Readline variable.  The non-option argument syntax is equivalent to\n"
+"    that found in ~/.inputrc, but must be passed as a single argument:\n"
+"    e.g., bind '\"\\C-x\\C-r\": re-read-init-file'.\n"
+"    \n"
+"    Options:\n"
+"      -m  keymap         Use KEYMAP as the keymap for the duration of this\n"
+"                         command.  Acceptable keymap names are emacs,\n"
+"                         emacs-standard, emacs-meta, emacs-ctlx, vi, vi-"
+"move,\n"
+"                         vi-command, and vi-insert.\n"
+"      -l                 List names of functions.\n"
+"      -P                 List function names and bindings.\n"
+"      -p                 List functions and bindings in a form that can be\n"
+"                         reused as input.\n"
+"      -S                 List key sequences that invoke macros and their "
+"values\n"
+"      -s                 List key sequences that invoke macros and their "
+"values\n"
+"                         in a form that can be reused as input.\n"
+"      -V                 List variable names and values\n"
+"      -v                 List variable names and values in a form that can\n"
+"                         be reused as input.\n"
+"      -q  function-name  Query about which keys invoke the named function.\n"
+"      -u  function-name  Unbind all keys which are bound to the named "
+"function.\n"
+"      -r  keyseq         Remove the binding for KEYSEQ.\n"
+"      -f  filename       Read key bindings from FILENAME.\n"
+"      -x  keyseq:shell-command\tCause SHELL-COMMAND to be executed when\n"
+"    \t\t\t\tKEYSEQ is entered.\n"
+"    \n"
+"    Exit Status:\n"
+"    bind returns 0 unless an unrecognized option is given or an error occurs."
+msgstr ""
+"Ligu klavosekvencon al linilega funkcio, aŭ al makroo, aŭ valorizu\n"
+"    linilegan variablon.  La sintakso de ne-opcia argumento estas tiu\n"
+"    de «~/.inputrc», tamen la ligon endas esprimi unuargumente; ekz-e:\n"
+"    bind '\"\\C-x\\C-r\": re-read-init-file'.\n"
+"    „bind‟ akceptas la sekvajn opciojn:\n"
+"    -m KLAVARTABELO   Uzu KLAVARTABELOn dum la daŭro de ĉi tiu komando.\n"
+"                      La eblaj nomoj de klavartabelo estas: „emacs‟,\n"
+"                      „emacs-standard‟, „emacs-meta‟, „emacs-ctlx‟,\n"
+"                      „vi‟, „vi-move‟, „vi-command‟ kaj „vi-insert‟.\n"
+"    -l                Listigu funkcinomojn.\n"
+"    -P                Listigu funkcinomojn kaj klavligojn.\n"
+"    -p                Listigu funkcinomojn kaj klavligojn en formo\n"
+"                      reuzebla por enigo.\n"
+"    -r KLAVAĴO        Forigu la ligon de la klavsekvenco KLAVAĴO\n"
+"    -x KLAVAĴO:ŜKOM   La ŝelkomandon ŜKOM plenumiĝu ĉe enigo de\n"
+"                      la klavsekvenco KLAVAĴO.   \n"
+"    -f DOSIERNOMO     Legu klavligojn el DOSIERNOMO\n"
+"    -q FUNKCINOMO     Demando pri la klavoj ligitaj al la FUNKCINOMO.\n"
+"    -u FUNKCINOMO     Malfaru ĉiujn klavligojn de la FUNKCINOMO.\n"
+"    -V                Listigu variablonomojn kaj ilian valoron\n"
+"    -v                Listigu variablonomojn kaj ilian valoron en formo\n"
+"                      reuzebla por enigo.\n"
+"    -S                Listigu makroajn klavsekvencojn kaj ilian valoron.\n"
+"    -s                Listigu makroajn klavsekvencojn kaj ilian valoron\n"
+"                      en formo reuzebla por enigo."
+
+#: builtins.c:326
+#, fuzzy
+msgid ""
+"Exit for, while, or until loops.\n"
+"    \n"
+"    Exit a FOR, WHILE or UNTIL loop.  If N is specified, break N enclosing\n"
+"    loops.\n"
+"    \n"
+"    Exit Status:\n"
+"    The exit status is 0 unless N is not greater than or equal to 1."
+msgstr ""
+"Pasu al la sekva iteraciero de  FOR, WHILE aŭ UNTIL. Se N estas\n"
+"donita, pasu je la nivelo de la Na inganta iteraciordono."
+
+#: builtins.c:338
+#, fuzzy
+msgid ""
+"Resume for, while, or until loops.\n"
+"    \n"
+"    Resumes the next iteration of the enclosing FOR, WHILE or UNTIL loop.\n"
+"    If N is specified, resumes the Nth enclosing loop.\n"
+"    \n"
+"    Exit Status:\n"
+"    The exit status is 0 unless N is not greater than or equal to 1."
+msgstr ""
+"Pasu al la sekva iteraciero de  FOR, WHILE aŭ UNTIL. Se N estas\n"
+"donita, pasu je la nivelo de la Na inganta iteraciordono."
+
+#: builtins.c:350
+msgid ""
+"Execute shell builtins.\n"
+"    \n"
+"    Execute SHELL-BUILTIN with arguments ARGs without performing command\n"
+"    lookup.  This is useful when you wish to reimplement a shell builtin\n"
+"    as a shell function, but need to execute the builtin within the "
+"function.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the exit status of SHELL-BUILTIN, or false if SHELL-BUILTIN is\n"
+"    not a shell builtin.."
+msgstr ""
+
+#: builtins.c:365
+#, fuzzy
+msgid ""
+"Return the context of the current subroutine call.\n"
+"    \n"
+"    Without EXPR, returns \"$line $filename\".  With EXPR, returns\n"
+"    \"$line $subroutine $filename\"; this extra information can be used to\n"
+"    provide a stack trace.\n"
+"    \n"
+"    The value of EXPR indicates how many call frames to go back before the\n"
+"    current one; the top frame is frame 0.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns 0 unless the shell is not executing a shell function or EXPR\n"
+"    is invalid."
+msgstr ""
+"Liveras la kuntekston de la kuranta procedurvoko.\n"
+"\n"
+"    Se EXPR malestas, liveriĝas «$line $filename».  Se EXPR ĉeestas,\n"
+"    liveriĝas «$line $subroutine $filename»; ĉi tiu krominformo\n"
+"    uzeblas por vidigi la vok-stakon.\n"
+"\n"
+"    La valoro de EXPR indikas, kiom da vokkadroj retroiri disde la\n"
+"    kuranta; la pinta kadro havas la numeron 0."
+
+#: builtins.c:383
+#, fuzzy
+msgid ""
+"Change the shell working directory.\n"
+"    \n"
+"    Change the current directory to DIR.  The default DIR is the value of "
+"the\n"
+"    HOME shell variable.\n"
+"    \n"
+"    The variable CDPATH defines the search path for the directory "
+"containing\n"
+"    DIR.  Alternative directory names in CDPATH are separated by a colon "
+"(:).\n"
+"    A null directory name is the same as the current directory.  If DIR "
+"begins\n"
+"    with a slash (/), then CDPATH is not used.\n"
+"    \n"
+"    If the directory is not found, and the shell option `cdable_vars' is "
+"set,\n"
+"    the word is assumed to be  a variable name.  If that variable has a "
+"value,\n"
+"    its value is used for DIR.\n"
+"    \n"
+"    Options:\n"
+"        -L\tforce symbolic links to be followed\n"
+"        -P\tuse the physical directory structure without following symbolic\n"
+"    \tlinks\n"
+"    \n"
+"    The default is to follow symbolic links, as if `-L' were specified.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns 0 if the directory is changed; non-zero otherwise."
+msgstr ""
+"La kuranta dosierujo estu dir aŭ, se dir malestas, la valoro\n"
+"    de la variablo $HOME. La variablo $CDPATH difinas la serĉvojon\n"
+"    por la dosierujo entenanta dir-on.  En $CDPATH, dupunkto  „:‟\n"
+"    apartigas alternativajn dosierujojn, vakua dosiernomo egalas la\n"
+"    kurantan (t.e. „.‟).  Se dir komenciĝas per „/‟, la variablo\n"
+"    $CDPATH ne estas uzata.  Se la dosierujo ne troviĝas, kaj la\n"
+"    ŝela opcio  „cdable_vars‟  estas ŝaltita, la vorto estas\n"
+"    interpretata kiel variablo.  Se la variablo havas valoron,\n"
+"    plenumiĝas  „cd‟  al tiu valoro.\n"
+"    La opcio  -P  igas uzi la fizikan strukturon de dosierujoj\n"
+"    anstataŭ iri laŭ simbolaj ligiloj; la opcio  -L  igas sekvi\n"
+"    simbolajn ligilojn."
+
+#: builtins.c:411
+msgid ""
+"Print the name of the current working directory.\n"
+"    \n"
+"    Options:\n"
+"      -L\tprint the value of $PWD if it names the current working\n"
+"    \tdirectory\n"
+"      -P\tprint the physical directory, without any symbolic links\n"
+"    \n"
+"    By default, `pwd' behaves as if `-L' were specified.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns 0 unless an invalid option is given or the current directory\n"
+"    cannot be read."
+msgstr ""
+
+#: builtins.c:428
+#, fuzzy
+msgid ""
+"Null command.\n"
+"    \n"
+"    No effect; the command does nothing.\n"
+"    \n"
+"    Exit Status:\n"
+"    Always succeeds."
+msgstr "Senefika: La komando nenion faras. Elirstato 0 estas liverata."
+
+#: builtins.c:439
+msgid ""
+"Return a successful result.\n"
+"    \n"
+"    Exit Status:\n"
+"    Always succeeds."
+msgstr ""
+
+#: builtins.c:448
+#, fuzzy
+msgid ""
+"Return an unsuccessful result.\n"
+"    \n"
+"    Exit Status:\n"
+"    Always fails."
+msgstr "Liveru malsukcesan rezulton."
+
+#: builtins.c:457
+msgid ""
+"Execute a simple command or display information about commands.\n"
+"    \n"
+"    Runs COMMAND with ARGS suppressing  shell function lookup, or display\n"
+"    information about the specified COMMANDs.  Can be used to invoke "
+"commands\n"
+"    on disk when a function with the same name exists.\n"
+"    \n"
+"    Options:\n"
+"      -p\tuse a default value for PATH that is guaranteed to find all of\n"
+"    \tthe standard utilities\n"
+"      -v\tprint a description of COMMAND similar to the `type' builtin\n"
+"      -V\tprint a more verbose description of each COMMAND\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns exit status of COMMAND, or failure if COMMAND is not found."
+msgstr ""
+
+# declare [-afFirtx] [-p] [name[=value] ...]
+#: builtins.c:476
+#, fuzzy
+msgid ""
+"Set variable values and attributes.\n"
+"    \n"
+"    Declare variables and give them attributes.  If no NAMEs are given,\n"
+"    display the attributes and values of all variables.\n"
+"    \n"
+"    Options:\n"
+"      -f\trestrict action or display to function names and definitions\n"
+"      -F\trestrict display to function names only (plus line number and\n"
+"    \tsource file when debugging)\n"
+"      -p\tdisplay the attributes and value of each NAME\n"
+"    \n"
+"    Options which set attributes:\n"
+"      -a\tto make NAMEs indexed arrays (if supported)\n"
+"      -A\tto make NAMEs associative arrays (if supported)\n"
+"      -i\tto make NAMEs have the `integer' attribute\n"
+"      -l\tto convert NAMEs to lower case on assignment\n"
+"      -r\tto make NAMEs readonly\n"
+"      -t\tto make NAMEs have the `trace' attribute\n"
+"      -u\tto convert NAMEs to upper case on assignment\n"
+"      -x\tto make NAMEs export\n"
+"    \n"
+"    Using `+' instead of `-' turns off the given attribute.\n"
+"    \n"
+"    Variables with the integer attribute have arithmetic evaluation (see\n"
+"    the `let' command) performed when the variable is assigned a value.\n"
+"    \n"
+"    When used in a function, `declare' makes NAMEs local, as with the "
+"`local'\n"
+"    command.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+"Deklaru variablojn aŭ valorizu ilin per atributoj.  Se nomoj name\n"
+"    mankas, anstataŭe eligu la valoron de la variabloj.  La opcio -p\n"
+"    eligas la atributojn kaj la valorojn de ĉiu nomo name.\n"
+"\n"
+"    La opcioj estas:\n"
+"\n"
+"    -a  faru la nomojn tabeloj (se realigite)\n"
+"    -f  elektu nur inter funkcinomoj\n"
+"    -F  eligu funkcinomojn (ĉe erarserĉo, ankaŭ lininumeron kaj\n"
+"        fontodosieran nomon) sen difinoj\n"
+"    -i  havigu al la variabloj name la atributon „integer‟ (entjera)\n"
+"    -r  faru la variablojn name nurlegaj\n"
+"    -t  havigu al la nomoj name la atributon „trace‟ (spurata)\n"
+"    -x  eksportu la variablojn name\n"
+"\n"
+"    Ĉe valorizo de variablo havanta atributon „integer‟ (entjera)\n"
+"    okazas aritmetika komputado (vd „let‟).\n"
+"\n"
+"    Ĉe eligo de variablovaloroj, la opcio  -f  igas eligi funkcinomon\n"
+"    funkcidifinon. La opcio -F reduktas la eligon al nuraj funkcinomoj.\n"
+"\n"
+"    La uzo de „+‟ anstataŭ „-‟ malŝaltas la koncernan attributon.\n"
+"    Uzite en funkcio, „declare‟ faras la nomojn name lokaj, samkiel la\n"
+"    komando „local‟."
+
+#: builtins.c:512
+msgid ""
+"Set variable values and attributes.\n"
+"    \n"
+"    Obsolete.  See `help declare'."
+msgstr ""
+
+#: builtins.c:520
+msgid ""
+"Define local variables.\n"
+"    \n"
+"    Create a local variable called NAME, and give it VALUE.  OPTION can\n"
+"    be any option accepted by `declare'.\n"
+"    \n"
+"    Local variables can only be used within a function; they are visible\n"
+"    only to the function where they are defined and its children.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied, an error occurs,\n"
+"    or the shell is not executing a function."
+msgstr ""
+
+#: builtins.c:537
+#, fuzzy
+msgid ""
+"Write arguments to the standard output.\n"
+"    \n"
+"    Display the ARGs on the standard output followed by a newline.\n"
+"    \n"
+"    Options:\n"
+"      -n\tdo not append a newline\n"
+"      -e\tenable interpretation of the following backslash escapes\n"
+"      -E\texplicitly suppress interpretation of backslash escapes\n"
+"    \n"
+"    `echo' interprets the following backslash-escaped characters:\n"
+"      \\a\talert (bell)\n"
+"      \\b\tbackspace\n"
+"      \\c\tsuppress further output\n"
+"      \\e\tescape character\n"
+"      \\f\tform feed\n"
+"      \\n\tnew line\n"
+"      \\r\tcarriage return\n"
+"      \\t\thorizontal tab\n"
+"      \\v\tvertical tab\n"
+"      \\\\\tbackslash\n"
+"      \\0nnn\tthe character whose ASCII code is NNN (octal).  NNN can be\n"
+"    \t0 to 3 octal digits\n"
+"      \\xHH\tthe eight-bit character whose value is HH (hexadecimal).  HH\n"
+"    \tcan be one or two hex digits\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless a write error occurs."
+msgstr ""
+"Eligu la ARGojn.  Se ĉeestas la opcio  -n, la fina linirompo\n"
+"    ne okazas.\tLa opcio  -e  aktivigas interpretadon de la sekvaj\n"
+"    deklivaĵoj:\n"
+"\t\\a\tpepo (sonsignalo)\n"
+"\t\\b\tretropaŝo\n"
+"\t\\c\tsen la fina linirompo\n"
+"\t\\E\teskapsigno\n"
+"\t\\f\tpaĝ-avanco\n"
+"\t\\n\tlinifino\n"
+"\t\\r\tĉaretreveno\n"
+"\t\\t\thorizontala tabo\n"
+"\t\\v\tvertikala tabo\n"
+"\t\\\\\tdeklivo „\\‟\n"
+"\t\\0CCC\tla signo kies Askia kodono estas CCC (okume).  CCC\n"
+"\t\tpovas enteni de 0 ĝis 3 okumajn ciferojn.\n"
+"    La opcio  -E  abolas la supre indikitan signifon de ĉi tiuj specialaj\n"
+"    signoj."
+
+#: builtins.c:571
+msgid ""
+"Write arguments to the standard output.\n"
+"    \n"
+"    Display the ARGs on the standard output followed by a newline.\n"
+"    \n"
+"    Options:\n"
+"      -n\tdo not append a newline\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless a write error occurs."
+msgstr ""
+
+#: builtins.c:586
+msgid ""
+"Enable and disable shell builtins.\n"
+"    \n"
+"    Enables and disables builtin shell commands.  Disabling allows you to\n"
+"    execute a disk command which has the same name as a shell builtin\n"
+"    without using a full pathname.\n"
+"    \n"
+"    Options:\n"
+"      -a\tprint a list of builtins showing whether or not each is enabled\n"
+"      -n\tdisable each NAME or display a list of disabled builtins\n"
+"      -p\tprint the list of builtins in a reusable format\n"
+"      -s\tprint only the names of Posix `special' builtins\n"
+"    \n"
+"    Options controlling dynamic loading:\n"
+"      -f\tLoad builtin NAME from shared object FILENAME\n"
+"      -d\tRemove a builtin loaded with -f\n"
+"    \n"
+"    Without options, each NAME is enabled.\n"
+"    \n"
+"    To use the `test' found in $PATH instead of the shell builtin\n"
+"    version, type `enable -n test'.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless NAME is not a shell builtin or an error occurs."
+msgstr ""
+
+#: builtins.c:614
+msgid ""
+"Execute arguments as a shell command.\n"
+"    \n"
+"    Combine ARGs into a single string, use the result as input to the "
+"shell,\n"
+"    and execute the resulting commands.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns exit status of command or success if command is null."
+msgstr ""
+
+# getopts optstring name [arg]
+#: builtins.c:626
+#, fuzzy
+msgid ""
+"Parse option arguments.\n"
+"    \n"
+"    Getopts is used by shell procedures to parse positional parameters\n"
+"    as options.\n"
+"    \n"
+"    OPTSTRING contains the option letters to be recognized; if a letter\n"
+"    is followed by a colon, the option is expected to have an argument,\n"
+"    which should be separated from it by white space.\n"
+"    \n"
+"    Each time it is invoked, getopts will place the next option in the\n"
+"    shell variable $name, initializing name if it does not exist, and\n"
+"    the index of the next argument to be processed into the shell\n"
+"    variable OPTIND.  OPTIND is initialized to 1 each time the shell or\n"
+"    a shell script is invoked.  When an option requires an argument,\n"
+"    getopts places that argument into the shell variable OPTARG.\n"
+"    \n"
+"    getopts reports errors in one of two ways.  If the first character\n"
+"    of OPTSTRING is a colon, getopts uses silent error reporting.  In\n"
+"    this mode, no error messages are printed.  If an invalid option is\n"
+"    seen, getopts places the option character found into OPTARG.  If a\n"
+"    required argument is not found, getopts places a ':' into NAME and\n"
+"    sets OPTARG to the option character found.  If getopts is not in\n"
+"    silent mode, and an invalid option is seen, getopts places '?' into\n"
+"    NAME and unsets OPTARG.  If a required argument is not found, a '?'\n"
+"    is placed in NAME, OPTARG is unset, and a diagnostic message is\n"
+"    printed.\n"
+"    \n"
+"    If the shell variable OPTERR has the value 0, getopts disables the\n"
+"    printing of error messages, even if the first character of\n"
+"    OPTSTRING is not a colon.  OPTERR has the value 1 by default.\n"
+"    \n"
+"    Getopts normally parses the positional parameters ($0 - $9), but if\n"
+"    more arguments are given, they are parsed instead.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success if an option is found; fails if the end of options is\n"
+"    encountered or an error occurs."
+msgstr ""
+"La funkcion „getopts‟ uzas ŝelproceduroj por analizi poziciajn\n"
+"    parametrojn.\n"
+"\n"
+"    La argumento optstring entenas la rekonendajn opciliterojn; se\n"
+"    literon sekvas dupunkto, la opcio postulas argumenton, de ĝi\n"
+"    apartigendan per spaceto.\n"
+"\n"
+"    Ĉe ĉiu voko „getopts‟ liveros la vican opcion en la ŝelvariablon\n"
+"    $name, valorizante la variablon se ĝi ne ekzistas, kaj la indicon\n"
+"    de la sekve traktota argumento en la ŝelvariablon OPTIND.  OPTIND\n"
+"    ricevas la komencan valoron 1 ĉe ĉiu voko de la ŝelo aŭ ŝela skripto.\n"
+"    Kiam opcio bezonas argumenton,  „getopts‟  liveras tiun argumenton\n"
+"    en la ŝelvariablon  OPTARG.\n"
+"\n"
+"    La funkcio „getopts‟ raportas pri eraroj dumaniere. Se la unua signo\n"
+"    de optstring estas dupunkto,  „getopts‟  prisilentas erarojn. En\n"
+"    tiu reĝimo, nenia erarmesaĝo estas eligata. Se troviĝas misa opcio,\n"
+"    „getopts‟  metas la trovitan opciliteron en  OPTARG.  Se mankas\n"
+"    bezonata argumento, la ŝelvariablo  NOMO  ricevas la valoron  ':',\n"
+"    la variablo OPTARG,  la trovitan opcion. Se „getopts‟ ne estas\n"
+"    en silenta reĝimo kaj trovas misan opcion, tiam name ricevas la\n"
+"    valoron '?' kaj OPTARG senvaloriĝas. Se mankas bezonata opcio,\n"
+"    NOMO ricevas la valoron '?', OPTARG senvaloriĝas kaj erarmesaĝo\n"
+"    estas eligata.\n"
+"\n"
+"    Se la ŝelvariablo  OPTERR  havas la valoron  0,  „getopts‟\n"
+"    malaktivigas la eligon de erarmesaĝoj, eĉ se la unua signo de\n"
+"    optstring ne estas dupunkto.  La apriora valoro de OPTERR estas 1.\n"
+"\n"
+"    Normale „getopts‟ analizas la poziciajn parametrojn ($0 - $9), sed\n"
+"    se estas pli da argumentoj, „getopts‟ anstataŭe analizas ilin."
+
+#: builtins.c:668
+msgid ""
+"Replace the shell with the given command.\n"
+"    \n"
+"    Execute COMMAND, replacing this shell with the specified program.\n"
+"    ARGUMENTS become the arguments to COMMAND.  If COMMAND is not "
+"specified,\n"
+"    any redirections take effect in the current shell.\n"
+"    \n"
+"    Options:\n"
+"      -a name\tpass NAME as the zeroth argument to COMMAND\n"
+"      -c\t\texecute COMMAND with an empty environment\n"
+"      -l\t\tplace a dash in the zeroth argument to COMMAND\n"
+"    \n"
+"    If the command cannot be executed, a non-interactive shell exits, "
+"unless\n"
+"    the shell option `execfail' is set.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless COMMAND is not found or a redirection error "
+"occurs."
+msgstr ""
+
+#: builtins.c:689
+#, fuzzy
+msgid ""
+"Exit the shell.\n"
+"    \n"
+"    Exits the shell with a status of N.  If N is omitted, the exit status\n"
+"    is that of the last command executed."
+msgstr ""
+"Forlasu la ŝelon kun elirstato N.  Se  N  mankas, la elirstato estas\n"
+"    tiu de la plej ĵuse plenumita komando."
+
+#: builtins.c:698
+msgid ""
+"Exit a login shell.\n"
+"    \n"
+"    Exits a login shell with exit status N.  Returns an error if not "
+"executed\n"
+"    in a login shell."
+msgstr ""
+
+# ZZZ: fc [-e ename] [-nlr] [first] [last] or
+#      fc -s [pat=rep] [cmd]
+#: builtins.c:708
+#, fuzzy
+msgid ""
+"Display or execute commands from the history list.\n"
+"    \n"
+"    fc is used to list or edit and re-execute commands from the history "
+"list.\n"
+"    FIRST and LAST can be numbers specifying the range, or FIRST can be a\n"
+"    string, which means the most recent command beginning with that\n"
+"    string.\n"
+"    \n"
+"    Options:\n"
+"      -e ENAME\tselect which editor to use.  Default is FCEDIT, then "
+"EDITOR,\n"
+"    \t\tthen vi\n"
+"      -l \tlist lines instead of editing\n"
+"      -n\tomit line numbers when listing\n"
+"      -r\treverse the order of the lines (newest listed first)\n"
+"    \n"
+"    With the `fc -s [pat=rep ...] [command]' format, COMMAND is\n"
+"    re-executed after the substitution OLD=NEW is performed.\n"
+"    \n"
+"    A useful alias to use with this is r='fc -s', so that typing `r cc'\n"
+"    runs the last command beginning with `cc' and typing `r' re-executes\n"
+"    the last command.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success or status of executed command; non-zero if an error "
+"occurs."
+msgstr ""
+"„fc‟ servas por listigi aŭ redakti kaj replenumi komandojn el la\n"
+"    historilisto.  first  kaj  last  povas esti numeroj, indikantaj\n"
+"    intervalon da numeroj; aŭ, se  first  estas signoĉeno, ĝi indikas\n"
+"    la plej ĵusan komandon komenciĝantan per tiu signoĉeno.\n"
+"\n"
+"    -e REDAKTILO\tla uzota redaktilo.  Defaŭlte FCEDIT, poste\n"
+"\tEDITOR, poste „vi‟.\n"
+"    -l\tnur eligu la liniojn sen redakti ilin.\n"
+"    -n\teligu nur la liniojn (sennumere).\n"
+"    -r\tinversigu la ordon de la linioj (komencu per la plej ĵusaj).\n"
+"\n"
+"    Per «fc -s [ŜABLONO=ANSTATAŬAĴO ...] [KOMANDO]» la komando estas\n"
+"    replenumota post la anstataŭigo de ĉiu apero de ŜABLONO je ANSTATAŬAĴO.\n"
+"\n"
+"    Oportuna alinomo por tio estas «alias r='fc -s'», tiel ke ekz-e per\n"
+"    «r cc» oni rulos la lastan komandon komenciĝantan per «cc», kaj per\n"
+"    «r» replenumigas la ĵusan komandon."
+
+# fg [job_spec]
+#: builtins.c:738
+#, fuzzy
+msgid ""
+"Move job to the foreground.\n"
+"    \n"
+"    Place the job identified by JOB_SPEC in the foreground, making it the\n"
+"    current job.  If JOB_SPEC is not present, the shell's notion of the\n"
+"    current job is used.\n"
+"    \n"
+"    Exit Status:\n"
+"    Status of command placed in foreground, or failure if an error occurs."
+msgstr ""
+"Faru la laboron  job_spec  dialoga kaj la kuranta. Se  job_spec\n"
+"    malestas, apliku la ŝelan koncepton pri la kuranta laboro."
+
+# bg [job_spec]
+#: builtins.c:753
+#, fuzzy
+msgid ""
+"Move jobs to the background.\n"
+"    \n"
+"    Place the jobs identified by each JOB_SPEC in the background, as if "
+"they\n"
+"    had been started with `&'.  If JOB_SPEC is not present, the shell's "
+"notion\n"
+"    of the current job is used.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless job control is not enabled or an error occurs."
+msgstr ""
+"Forŝovu la laboron  job_spec  en la fonon, faru ĝin kvazaŭ lanĉita\n"
+"    kun „&‟.  Se nenia laboro estas indikita, apliku la ŝelan koncepton\n"
+"    pri la kuranta laboro."
+
+#: builtins.c:767
+msgid ""
+"Remember or display program locations.\n"
+"    \n"
+"    Determine and remember the full pathname of each command NAME.  If\n"
+"    no arguments are given, information about remembered commands is "
+"displayed.\n"
+"    \n"
+"    Options:\n"
+"      -d\t\tforget the remembered location of each NAME\n"
+"      -l\t\tdisplay in a format that may be reused as input\n"
+"      -p pathname\tuse PATHNAME is the full pathname of NAME\n"
+"      -r\t\tforget all remembered locations\n"
+"      -t\t\tprint the remembered location of each NAME, preceding\n"
+"    \t\teach location with the corresponding NAME if multiple\n"
+"    \t\tNAMEs are given\n"
+"    Arguments:\n"
+"      NAME\t\tEach NAME is searched for in $PATH and added to the list\n"
+"    \t\tof remembered commands.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless NAME is not found or an invalid option is given."
+msgstr ""
+
+#: builtins.c:792
+msgid ""
+"Display information about builtin commands.\n"
+"    \n"
+"    Displays brief summaries of builtin commands.  If PATTERN is\n"
+"    specified, gives detailed help on all commands matching PATTERN,\n"
+"    otherwise the list of help topics is printed.\n"
+"    \n"
+"    Options:\n"
+"      -d\toutput short description for each topic\n"
+"      -m\tdisplay usage in pseudo-manpage format\n"
+"      -s\toutput only a short usage synopsis for each topic matching\n"
+"    \tPATTERN\n"
+"    \n"
+"    Arguments:\n"
+"      PATTERN\tPattern specifiying a help topic\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless PATTERN is not found or an invalid option is "
+"given."
+msgstr ""
+
+# ZZZ history [-c] [-d offset] [n] or
+#     history -awrn [filename] or
+#     history -ps arg [arg...]
+#: builtins.c:816
+#, fuzzy
+msgid ""
+"Display or manipulate the history list.\n"
+"    \n"
+"    Display the history list with line numbers, prefixing each modified\n"
+"    entry with a `*'.  An argument of N lists only the last N entries.\n"
+"    \n"
+"    Options:\n"
+"      -c\tclear the history list by deleting all of the entries\n"
+"      -d offset\tdelete the history entry at offset OFFSET.\n"
+"    \n"
+"      -a\tappend history lines from this session to the history file\n"
+"      -n\tread all history lines not already read from the history file\n"
+"      -r\tread the history file and append the contents to the history\n"
+"    \tlist\n"
+"      -w\twrite the current history to the history file\n"
+"    \tand append them to the history list\n"
+"    \n"
+"      -p\tperform history expansion on each ARG and display the result\n"
+"    \twithout storing it in the history list\n"
+"      -s\tappend the ARGs to the history list as a single entry\n"
+"    \n"
+"    If FILENAME is given, it is used as the history file.  Otherwise,\n"
+"    if $HISTFILE has a value, that is used, else ~/.bash_history.\n"
+"    \n"
+"    If the $HISTTIMEFORMAT variable is set and not null, its value is used\n"
+"    as a format string for strftime(3) to print the time stamp associated\n"
+"    with each displayed history entry.  No time stamps are printed "
+"otherwise.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or an error occurs."
+msgstr ""
+"Eligu la liston de enigitaj komandoj kun lininumeroj. La ŝanĝitajn\n"
+"    liniojn marku per  „*‟.  Kun argumento  n,  eligu nur la ĵusajn\n"
+"    n  liniojn.\n"
+"\n"
+"    La opcio  -c  forviŝas la tutan historion.  La opcio  -d  forviŝas\n"
+"    la linion kies numero estas  offset.  La opcio  -w  ebligas konservi\n"
+"    la kurantan historion en la historidosiero; inverse, la opcio\n"
+"    -r  igas legi la dosieron kaj aldoni ĝian enhavon al la kuranta\n"
+"    historio.  La opcio  -a  aldonigas la historiajn liniojn de la\n"
+"    kuranta seanco al la historidosiero.  La opcio  -n  igas legi\n"
+"    ĉiujn ankoraŭ ne legitajn liniojn el la historidosiero kaj aldoni\n"
+"    ilin en la liston de la historio.\n"
+"\n"
+"    Se dosiernomo  filename  ĉeestas, ĝi estas uzata kiel nomo de\n"
+"    historidosiero; alie, se la variablo $HISTFILE havas valoron,\n"
+"    ĉi tiu estas uzata; alie uziĝas «~/.bash_history».\n"
+"\n"
+"    La opcio  -s  enŝovigas la neopciajn argumentojn  arg  en la\n"
+"    historion kiel unu apartan linion.  La opcio  -p  igas la ŝelon\n"
+"    plenumi historian anstataŭigon por ĉiu el la argumentoj  arg  kaj\n"
+"    eligi la rezulton sen konservi ion en la historio.\n"
+"\n"
+"    Se la variablo $HISTTIMEFORMAT havas valoron kaj se ĉi tiu ne\n"
+"    estas null, tiam ĝi servas kiel formata ĉeno en  strftime(3)  por\n"
+"    tempostampi ĉiun linion en eligaĵoj de historio.  Aliokaze nenia\n"
+"    tempostampo estas eligata."
+
+# ZZZ jobs [-lnprs] [jobspec ...] or
+#     jobs -x command [args]
+#: builtins.c:852
+#, fuzzy
+msgid ""
+"Display status of jobs.\n"
+"    \n"
+"    Lists the active jobs.  JOBSPEC restricts output to that job.\n"
+"    Without options, the status of all active jobs is displayed.\n"
+"    \n"
+"    Options:\n"
+"      -l\tlists process IDs in addition to the normal information\n"
+"      -n\tlist only processes that have changed status since the last\n"
+"    \tnotification\n"
+"      -p\tlists process IDs only\n"
+"      -r\trestrict output to running jobs\n"
+"      -s\trestrict output to stopped jobs\n"
+"    \n"
+"    If -x is supplied, COMMAND is run after all job specifications that\n"
+"    appear in ARGS have been replaced with the process ID of that job's\n"
+"    process group leader.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or an error occurs.\n"
+"    If -x is used, returns the exit status of COMMAND."
+msgstr ""
+"Eligu la liston da aktivaj laboroj.  Ĉe la opcio  -l  eligu, krome,\n"
+"    la proceznumerojn; ĉe la opcio -p eligu nur la proceznumerojn.\n"
+"    La opcio -n indikas, ke nur la procezoj kies stato ŝanĝiĝis post\n"
+"    la lasta informmendo estu listigitaj.  Se laborindiko  jobspec\n"
+"    estas donita, nur pri tiu laboro informu.\n"
+"\n"
+"    Ĉe la opcioj  -r  kaj  -s  informu, resp., nur pri la laboroj\n"
+"    aktivaj (rulataj) kaj haltigitaj.  Senopcie, eligu la staton de\n"
+"    la aktivaj laboroj.\n"
+"\n"
+"    La opcio -x lanĉas la komandon  command,  antaŭe ŝanĝinte ĉiujn\n"
+"    laborindikojn aperantajn en la argumentoj  args  je la proceznumero\n"
+"    de la ĉefprocezo de la grupo."
+
+#: builtins.c:879
+msgid ""
+"Remove jobs from current shell.\n"
+"    \n"
+"    Removes each JOBSPEC argument from the table of active jobs.  Without\n"
+"    any JOBSPECs, the shell uses its notion of the current job.\n"
+"    \n"
+"    Options:\n"
+"      -a\tremove all jobs if JOBSPEC is not supplied\n"
+"      -h\tmark each JOBSPEC so that SIGHUP is not sent to the job if the\n"
+"    \tshell receives a SIGHUP\n"
+"      -r\tremove only running jobs\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option or JOBSPEC is given."
+msgstr ""
+
+# ZZZ: kill [-s sigspec | -n signum | -sigspec] [pid | job]... or
+#      kill -l [sigspec]
+#: builtins.c:898
+#, fuzzy
+msgid ""
+"Send a signal to a job.\n"
+"    \n"
+"    Send the processes identified by PID or JOBSPEC the signal named by\n"
+"    SIGSPEC or SIGNUM.  If neither SIGSPEC nor SIGNUM is present, then\n"
+"    SIGTERM is assumed.\n"
+"    \n"
+"    Options:\n"
+"      -s sig\tSIG is a signal name\n"
+"      -n sig\tSIG is a signal number\n"
+"      -l\tlist the signal names; if arguments follow `-l' they are\n"
+"    \tassumed to be signal numbers for which names should be listed\n"
+"    \n"
+"    Kill is a shell builtin for two reasons: it allows job IDs to be used\n"
+"    instead of process IDs, and allows processes to be killed if the limit\n"
+"    on processes that you can create is reached.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or an error occurs."
+msgstr ""
+"Sendu al la procezoj, indikitaj per sia proceznumero  pid  (aŭ\n"
+"    per la laborindiko job) la signalon sigspec.  Se  sigspec\n"
+"    malestas, sendu  SIGTERM.\n"
+"\n"
+"    La opcio  -l  servas por listigi signalnomojn; ĝin povas sekvi\n"
+"    entjeraj argumentoj, signalnumeroj, ĉeeste de kiuj nur la al\n"
+"    ili respondaj signalnomoj estas eligataj.\n"
+"\n"
+"    kill estas primitiva ŝelkomando pro du kaŭzoj: unue, ĝi ebligas\n"
+"    uzi laborindikojn anstataŭ proceznumerojn; kaj due, se la\n"
+"    maksimuma nombro de kreeblaj estas atingita, ne necesas lanĉi\n"
+"    kroman procezon por ĉesigi iun alian."
+
+# let arg [arg ...]
+#: builtins.c:921
+#, fuzzy
+msgid ""
+"Evaluate arithmetic expressions.\n"
+"    \n"
+"    Evaluate each ARG as an arithmetic expression.  Evaluation is done in\n"
+"    fixed-width integers with no check for overflow, though division by 0\n"
+"    is trapped and flagged as an error.  The following list of operators is\n"
+"    grouped into levels of equal-precedence operators.  The levels are "
+"listed\n"
+"    in order of decreasing precedence.\n"
+"    \n"
+"    \tid++, id--\tvariable post-increment, post-decrement\n"
+"    \t++id, --id\tvariable pre-increment, pre-decrement\n"
+"    \t-, +\t\tunary minus, plus\n"
+"    \t!, ~\t\tlogical and bitwise negation\n"
+"    \t**\t\texponentiation\n"
+"    \t*, /, %\t\tmultiplication, division, remainder\n"
+"    \t+, -\t\taddition, subtraction\n"
+"    \t<<, >>\t\tleft and right bitwise shifts\n"
+"    \t<=, >=, <, >\tcomparison\n"
+"    \t==, !=\t\tequality, inequality\n"
+"    \t&\t\tbitwise AND\n"
+"    \t^\t\tbitwise XOR\n"
+"    \t|\t\tbitwise OR\n"
+"    \t&&\t\tlogical AND\n"
+"    \t||\t\tlogical OR\n"
+"    \texpr ? expr : expr\n"
+"    \t\t\tconditional operator\n"
+"    \t=, *=, /=, %=,\n"
+"    \t+=, -=, <<=, >>=,\n"
+"    \t&=, ^=, |=\tassignment\n"
+"    \n"
+"    Shell variables are allowed as operands.  The name of the variable\n"
+"    is replaced by its value (coerced to a fixed-width integer) within\n"
+"    an expression.  The variable need not have its integer attribute\n"
+"    turned on to be used in an expression.\n"
+"    \n"
+"    Operators are evaluated in order of precedence.  Sub-expressions in\n"
+"    parentheses are evaluated first and may override the precedence\n"
+"    rules above.\n"
+"    \n"
+"    Exit Status:\n"
+"    If the last ARG evaluates to 0, let returns 1; let returns 0 otherwise.."
+msgstr ""
+"Ĉiu  arg  estas komputenda aritmetika esprimo. La komputado uzas\n"
+"    longajn entjerojn sen kontrolo pri trooj; tamen divido per  0\n"
+"    estas kaptata kaj raportata kiel eraro.  En la sekvanta listo\n"
+"    da operacioj la samprioritataj operacisimboloj aperas kune.\n"
+"    La grupoj estas aranĝitaj laŭ malkresko de prioritato.\n"
+"\n"
+"\tnomo++, nomo--\tpostkrementoj de variablo\n"
+"\t-, +\t\tunulokaj minus, plus\n"
+"\t!, ~\t\tlogika kaj laŭbita negoj\n"
+"\t*, /, %\t\tmultipliko, divido, resto\n"
+"\t+, -\t\tadicio, subtraho\n"
+"\t<<, >>\t\tlaŭbitaj ŝovoj maldekstren kaj dekstren\n"
+"\t<=, >=, <, >\tkomparaj operacioj\n"
+"\t==, !=\t\tegalo, neegalo\n"
+"\t&\t\tlaŭbita KAJ\n"
+"\t^\t\tlaŭbita DISAŬ\n"
+"\t|\t\tlaŭbita AŬ\n"
+"\t&&\t\tlogika KAJ\n"
+"\t||\t\tlogika AŬ\n"
+"\tesprimo ? esprimo : esprimo\n"
+"\t\t\tkondiĉa esprimo\n"
+"\t=, *=, /=, %=,\n"
+"\t+=, -=, <<=, >>=,\n"
+"\t&=, ^=, |=\tvalorizo\n"
+"\n"
+"    La ŝelvariabloj uzeblas kiel operandoj.  En esprimo la nomon de\n"
+"    variablo anstataŭas ĝia valoro (altipigita al longa entjero).\n"
+"    Por tia uzo en esprimo variablo ne bezonas havi ŝaltita sian\n"
+"    atributon integer (entjera).\n"
+"\n"
+"    La operacioj plenumiĝas laŭ siaj prioritatoj.  La enkrampigitaj\n"
+"    subesprimoj plenumiĝas unue, kaj tio ebligas ĉirkaŭiri la supre\n"
+"    priskribitajn regulojn pri la prioritatoj.\n"
+"\n"
+"    Se la komputo de la lasta  arg  donas  0,  la komando „let‟\n"
+"    liveras  1;  alie ĝi liveras  0."
+
+# read [-ers] [-u fd] [-t timeout] [-p prompt] [-a array] [-n nchars]
+#      [-d delim] [name ...]
+#: builtins.c:966
+#, fuzzy
+msgid ""
+"Read a line from the standard input and split it into fields.\n"
+"    \n"
+"    Reads a single line from the standard input, or from file descriptor FD\n"
+"    if the -u option is supplied.  The line is split into fields as with "
+"word\n"
+"    splitting, and the first word is assigned to the first NAME, the second\n"
+"    word to the second NAME, and so on, with any leftover words assigned to\n"
+"    the last NAME.  Only the characters found in $IFS are recognized as "
+"word\n"
+"    delimiters.\n"
+"    \n"
+"    If no NAMEs are supplied, the line read is stored in the REPLY "
+"variable.\n"
+"    \n"
+"    Options:\n"
+"      -a array\tassign the words read to sequential indices of the array\n"
+"    \t\tvariable ARRAY, starting at zero\n"
+"      -d delim\tcontinue until the first character of DELIM is read, rather\n"
+"    \t\tthan newline\n"
+"      -e\t\tuse Readline to obtain the line in an interactive shell\n"
+"      -i text\tUse TEXT as the initial text for Readline\n"
+"      -n nchars\treturn after reading NCHARS characters rather than waiting\n"
+"    \t\tfor a newline\n"
+"      -p prompt\toutput the string PROMPT without a trailing newline before\n"
+"    \t\tattempting to read\n"
+"      -r\t\tdo not allow backslashes to escape any characters\n"
+"      -s\t\tdo not echo input coming from a terminal\n"
+"      -t timeout\ttime out and return failure if a complete line of input "
+"is\n"
+"    \t\tnot read withint TIMEOUT seconds.  The value of the TMOUT\n"
+"    \t\tvariable is the default timeout.  TIMEOUT may be a\n"
+"    \t\tfractional number.  If TIMEOUT is 0, read returns success only\n"
+"    \t\tif input is available on the specified file descriptor.  The\n"
+"    \t\texit status is greater than 128 if the timeout is exceeded\n"
+"      -u fd\t\tread from file descriptor FD instead of the standard input\n"
+"    \n"
+"    Exit Status:\n"
+"    The return code is zero, unless end-of-file is encountered, read times "
+"out,\n"
+"    or an invalid file descriptor is supplied as the argument to -u."
+msgstr ""
+"Legu unu linion el la ĉefenigujo, aŭ el la dosiero indikita\n"
+"    per dosiernumero fd, se la opcio -u estas donita; la unuan\n"
+"    vorton ricevu la unua argumento name; la duan, la dua name ktp;\n"
+"    la lasta name ricevu ĉiujn restantajn vortojn.  Nur la signoj\n"
+"    troveblaj en la variablo $IFS rolas kiel vortodisigiloj.  Se\n"
+"    nenia name estas donita, konservu la legitan linion en la\n"
+"    variablo REPLY.\n"
+"\n"
+"    La opcio -r indikas «krudan legadon», ke la deklivo „\\‟ estas\n"
+"    ordinara signo kiu ne rolas kiel eskapsigno.\n"
+"    La opcio  -d  enkondukas finilon  delim,  ĉe kies unua signo la\n"
+"    legado ĉesu (anstataŭ ĉe la normala linifinilo).\n"
+"    La opcio -p kaŭzas eligon de la invitĉeno  prompt  sen liniavanco\n"
+"    antaŭ la atendata enigo.\n"
+"    La opcio  -a  igas konservi la legatajn vortojn en sinsekvaj\n"
+"    elementoj de tabelo array, komencante per la nula.\n"
+"    Se la opcio  -e  estas donita kaj la ŝelo estas dialoga, la\n"
+"    linio estas legata per la funkcio readline().\n"
+"    Se la opcio  -n  estas donita kun argumento nchars ne egala al 0,\n"
+"    read finiĝas leginte  nchars  da signoj.\n"
+"    La opcio  -s  silentigas la eĥon de la terminala enigo.\n"
+"\n"
+"    La opcio -t igas la komandon read ĉesiĝi kun fiaska elirstato se\n"
+"    kompleta linio da enigaĵo ne estas ricevita dum  timeout  da\n"
+"    sekundoj.  Se la variablo  TMOUT  havas valoron, ĉi tiu estas\n"
+"    uzata kiel defaŭlta atendolimo.  La elirstato estas 0, krom se\n"
+"    renkontiĝas dosierfino, atendolimo estas atingita, aŭ nevalida\n"
+"    dosiernumero estas indikita ĉe -u."
+
+#: builtins.c:1006
+msgid ""
+"Return from a shell function.\n"
+"    \n"
+"    Causes a function or sourced script to exit with the return value\n"
+"    specified by N.  If N is omitted, the return status is that of the\n"
+"    last command executed within the function or script.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns N, or failure if the shell is not executing a function or script."
+msgstr ""
+
+# set [--abefhkmnptuvxBCHP] [-o option] [arg ...]
+#: builtins.c:1019
+#, fuzzy
+msgid ""
+"Set or unset values of shell options and positional parameters.\n"
+"    \n"
+"    Change the value of shell attributes and positional parameters, or\n"
+"    display the names and values of shell variables.\n"
+"    \n"
+"    Options:\n"
+"      -a  Mark variables which are modified or created for export.\n"
+"      -b  Notify of job termination immediately.\n"
+"      -e  Exit immediately if a command exits with a non-zero status.\n"
+"      -f  Disable file name generation (globbing).\n"
+"      -h  Remember the location of commands as they are looked up.\n"
+"      -k  All assignment arguments are placed in the environment for a\n"
+"          command, not just those that precede the command name.\n"
+"      -m  Job control is enabled.\n"
+"      -n  Read commands but do not execute them.\n"
+"      -o option-name\n"
+"          Set the variable corresponding to option-name:\n"
+"              allexport    same as -a\n"
+"              braceexpand  same as -B\n"
+"              emacs        use an emacs-style line editing interface\n"
+"              errexit      same as -e\n"
+"              errtrace     same as -E\n"
+"              functrace    same as -T\n"
+"              hashall      same as -h\n"
+"              histexpand   same as -H\n"
+"              history      enable command history\n"
+"              ignoreeof    the shell will not exit upon reading EOF\n"
+"              interactive-comments\n"
+"                           allow comments to appear in interactive commands\n"
+"              keyword      same as -k\n"
+"              monitor      same as -m\n"
+"              noclobber    same as -C\n"
+"              noexec       same as -n\n"
+"              noglob       same as -f\n"
+"              nolog        currently accepted but ignored\n"
+"              notify       same as -b\n"
+"              nounset      same as -u\n"
+"              onecmd       same as -t\n"
+"              physical     same as -P\n"
+"              pipefail     the return value of a pipeline is the status of\n"
+"                           the last command to exit with a non-zero status,\n"
+"                           or zero if no command exited with a non-zero "
+"status\n"
+"              posix        change the behavior of bash where the default\n"
+"                           operation differs from the Posix standard to\n"
+"                           match the standard\n"
+"              privileged   same as -p\n"
+"              verbose      same as -v\n"
+"              vi           use a vi-style line editing interface\n"
+"              xtrace       same as -x\n"
+"      -p  Turned on whenever the real and effective user ids do not match.\n"
+"          Disables processing of the $ENV file and importing of shell\n"
+"          functions.  Turning this option off causes the effective uid and\n"
+"          gid to be set to the real uid and gid.\n"
+"      -t  Exit after reading and executing one command.\n"
+"      -u  Treat unset variables as an error when substituting.\n"
+"      -v  Print shell input lines as they are read.\n"
+"      -x  Print commands and their arguments as they are executed.\n"
+"      -B  the shell will perform brace expansion\n"
+"      -C  If set, disallow existing regular files to be overwritten\n"
+"          by redirection of output.\n"
+"      -E  If set, the ERR trap is inherited by shell functions.\n"
+"      -H  Enable ! style history substitution.  This flag is on\n"
+"          by default when the shell is interactive.\n"
+"      -P  If set, do not follow symbolic links when executing commands\n"
+"          such as cd which change the current directory.\n"
+"      -T  If set, the DEBUG trap is inherited by shell functions.\n"
+"      -   Assign any remaining arguments to the positional parameters.\n"
+"          The -x and -v options are turned off.\n"
+"    \n"
+"    Using + rather than - causes these flags to be turned off.  The\n"
+"    flags can also be used upon invocation of the shell.  The current\n"
+"    set of flags may be found in $-.  The remaining n ARGs are positional\n"
+"    parameters and are assigned, in order, to $1, $2, .. $n.  If no\n"
+"    ARGs are given, all shell variables are printed.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given."
+msgstr ""
+"-a\tMarku eksportendaj la variablojn ŝanĝitajn aŭ kreitajn.\n"
+"    -b\tTuj sciigu pri finiĝo de fonaj laboroj.\n"
+"    -e\tEliru tuj se iu komando finiĝis kun elirstato alia ol 0.\n"
+"    -f\tNe malvolvu ĵokerojn en dosiernomoj.\n"
+"    -h\tRegistru en hakettabelo la situon de komandoj serĉataj.\n"
+"    -k\tĈiujn valorizojn en ajna parto de komandolinio rigardu\n"
+"        kiel valorizojn de ŝelvariabloj por la medio de la komando,\n"
+"\tne nur la valorizojn antaŭantajn la komandonomon.\n"
+"    -m\tAktivigu la laborregadon.\n"
+"    -n\tLegu la komandojn sen plenumi ilin.\n"
+"    -o option\n"
+"\tAktivigu la variablon respondan al la opcionomo option:\n"
+"\t    allexport\tsame kiel -a\n"
+"\t    braceexpand\tsame kiel -B\n"
+"\t    emacs\tuzu emakseskan interfacon por liniredaktado\n"
+"\t    errexit\tsame kiel -e\n"
+"\t    errtrace\tsame kiel -E\n"
+"\t    functrace\tsame kiel -T\n"
+"\t    hashall\tsame kiel -h\n"
+"\t    histexpand\tsame kiel -H\n"
+"\t    history\tebligu komandohistorion\n"
+"\t    ignoreeof\tla ŝelo ne finiĝos leginte dosierfinilon\n"
+"\t    interactive-comments\n"
+"\t\t\ttoleru komentojn en dialogaj komandoj\n"
+"\t    keyword\tsame kiel -k\n"
+"\t    monitor\tsame kiel -m\n"
+"\t    noclobber\tsame kiel -C\n"
+"\t    noexec\tsame kiel -n\n"
+"\t    noglob\tsame kiel -f\n"
+"\t    notify\tsame kiel -b\n"
+"\t    nounset\tsame kiel -u\n"
+"\t    onecmd\tsame kiel -t\n"
+"\t    physical\tsame kiel -P\n"
+"\t    pipefail\tla elirstato de dukto estu la elirstato\n"
+"\t\t\tde la lasta komando finiĝinta nenule, aŭ\n"
+"\t\t\t0, se neniu komando alie finiĝis\n"
+"\t    posix\tŝanĝu la konduton de Baŝo ĉie kie ĝia defaŭlta\n"
+"\t\t\tfunkciado devias disde Pozikso 1003.2 tiel\n"
+"\t\t\tke ĝi konformu al tiu normo\n"
+"\t    privileged\tsame kiel -p\n"
+"\t    verbose\tsame kiel -v\n"
+"\t    vi\t\tuzu vi-eskan interfacon por liniredaktado\n"
+"\t    xtrace\tsame kiel -x\n"
+"    -p\tPrivilegia reĝimo, aktiviĝas meme kiam la reala kaj efektiva\n"
+"\tidentoj de la uzanto malkongruas.  La dosiero $ENV ne estas\n"
+"\ttraktata nek la ŝelfunkcioj, importataj el la medio.\n"
+"\tMalaktivigo de tiu opcio ŝanĝas la efektivajn uid kaj gid\n"
+"\tlaŭ la realaj uid kaj gid.\n"
+"    -t\tFinu la ŝelon leginte kaj plenuminte unu komandon.\n"
+"    -u\tProvo anstataŭigi senvaloran variablon estu eraro.\n"
+"    -v\tEligu la komandoliniojn legatajn.\n"
+"    -x\tEligu la plenumotajn komandojn kaj iliajn argumentojn.\n"
+"    -B\tLa ŝelo faru vinkulmalvolvon\n"
+"    -C\tSe aktiva, malebligu skribdifekti ekzistantajn ordinarajn\n"
+"\tdosierojn per alidirektado de la eligo.\n"
+"    -E\tSe aktiva, la ERR-kaptilon (ERR trap) heredas la ŝelaj\n"
+"\tfunkcioj\n"
+"    -H\tEbligu atingi la protokolon !-stile. Defaŭlte la opcio estas\n"
+"\taktiva en la dialogaj ŝeloj.\n"
+"    -P\tNe sekvu simbolajn ligilojn plenumante tiajn komandojn, kiel\n"
+"\t„cd‟ por ŝanĝi la kurantan dosierujon.\n"
+"    -T\tSe aktiva, la DEBUG-kaptilon (DEBUG trap) heredas la ŝelaj\n"
+"\tfunkcioj\n"
+"    -\tLa restantajn argumentojn uzu por valorizi la poziciajn\n"
+"\tparametrojn.  La opcioj -x kaj -v malaktiviĝas.\n"
+"\n"
+"    Uzante la signon + anstataŭ - vi povas malŝalti la opcion. La opciojn\n"
+"    ankaŭ eblas uzi ĉe la voko de la ŝelo. La kuranta aro da aktivaj\n"
+"    opcioj troveblas en $-.  La restantaj  n  argumentoj  arg  estas\n"
+"    poziciaj, kaj per ili estas valorizataj, respektive, $1, $2 ... $n.\n"
+"    Se nenia  arg  estas donita, ĉiuj ŝelvariabloj estas eligataj."
+
+#: builtins.c:1101
+msgid ""
+"Unset values and attributes of shell variables and functions.\n"
+"    \n"
+"    For each NAME, remove the corresponding variable or function.\n"
+"    \n"
+"    Options:\n"
+"      -f\ttreat each NAME as a shell function\n"
+"      -v\ttreat each NAME as a shell variable\n"
+"    \n"
+"    Without options, unset first tries to unset a variable, and if that "
+"fails,\n"
+"    tries to unset a function.\n"
+"    \n"
+"    Some variables cannot be unset; also see `readonly'.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or a NAME is read-only."
+msgstr ""
+
+#: builtins.c:1121
+msgid ""
+"Set export attribute for shell variables.\n"
+"    \n"
+"    Marks each NAME for automatic export to the environment of subsequently\n"
+"    executed commands.  If VALUE is supplied, assign VALUE before "
+"exporting.\n"
+"    \n"
+"    Options:\n"
+"      -f\trefer to shell functions\n"
+"      -n\tremove the export property from each NAME\n"
+"      -p\tdisplay a list of all exported variables and functions\n"
+"    \n"
+"    An argument of `--' disables further option processing.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or NAME is invalid."
+msgstr ""
+
+#: builtins.c:1140
+msgid ""
+"Mark shell variables as unchangeable.\n"
+"    \n"
+"    Mark each NAME as read-only; the values of these NAMEs may not be\n"
+"    changed by subsequent assignment.  If VALUE is supplied, assign VALUE\n"
+"    before marking as read-only.\n"
+"    \n"
+"    Options:\n"
+"      -a\trefer to indexed array variables\n"
+"      -A\trefer to associative array variables\n"
+"      -f\trefer to shell functions\n"
+"      -p\tdisplay a list of all readonly variables and functions\n"
+"    \n"
+"    An argument of `--' disables further option processing.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or NAME is invalid."
+msgstr ""
+
+#: builtins.c:1161
+msgid ""
+"Shift positional parameters.\n"
+"    \n"
+"    Rename the positional parameters $N+1,$N+2 ... to $1,$2 ...  If N is\n"
+"    not given, it is assumed to be 1.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless N is negative or greater than $#."
+msgstr ""
+
+# source filename [arguments]
+#: builtins.c:1173 builtins.c:1188
+#, fuzzy
+msgid ""
+"Execute commands from a file in the current shell.\n"
+"    \n"
+"    Read and execute commands from FILENAME in the current shell.  The\n"
+"    entries in $PATH are used to find the directory containing FILENAME.\n"
+"    If any ARGUMENTS are supplied, they become the positional parameters\n"
+"    when FILENAME is executed.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed in FILENAME; fails if\n"
+"    FILENAME cannot be read."
+msgstr ""
+"Legu kaj plenumu la komandojn el dosiernomo  filename  kaj\n"
+"    revenu. La vojoj el la variablo  $PATH  estas uzataj por trovi\n"
+"    la dosierujon de  filename.  La eventualaj argumentoj\n"
+"    arguments iĝas la poziciaj parametroj por plenumo de filename."
+
+#: builtins.c:1204
+msgid ""
+"Suspend shell execution.\n"
+"    \n"
+"    Suspend the execution of this shell until it receives a SIGCONT signal.\n"
+"    Unless forced, login shells cannot be suspended.\n"
+"    \n"
+"    Options:\n"
+"      -f\tforce the suspend, even if the shell is a login shell\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless job control is not enabled or an error occurs."
+msgstr ""
+
+# test [expr]
+#: builtins.c:1220
+#, fuzzy
+msgid ""
+"Evaluate conditional expression.\n"
+"    \n"
+"    Exits with a status of 0 (true) or 1 (false) depending on\n"
+"    the evaluation of EXPR.  Expressions may be unary or binary.  Unary\n"
+"    expressions are often used to examine the status of a file.  There\n"
+"    are string operators as well, and numeric comparison operators.\n"
+"    \n"
+"    File operators:\n"
+"    \n"
+"      -a FILE        True if file exists.\n"
+"      -b FILE        True if file is block special.\n"
+"      -c FILE        True if file is character special.\n"
+"      -d FILE        True if file is a directory.\n"
+"      -e FILE        True if file exists.\n"
+"      -f FILE        True if file exists and is a regular file.\n"
+"      -g FILE        True if file is set-group-id.\n"
+"      -h FILE        True if file is a symbolic link.\n"
+"      -L FILE        True if file is a symbolic link.\n"
+"      -k FILE        True if file has its `sticky' bit set.\n"
+"      -p FILE        True if file is a named pipe.\n"
+"      -r FILE        True if file is readable by you.\n"
+"      -s FILE        True if file exists and is not empty.\n"
+"      -S FILE        True if file is a socket.\n"
+"      -t FD          True if FD is opened on a terminal.\n"
+"      -u FILE        True if the file is set-user-id.\n"
+"      -w FILE        True if the file is writable by you.\n"
+"      -x FILE        True if the file is executable by you.\n"
+"      -O FILE        True if the file is effectively owned by you.\n"
+"      -G FILE        True if the file is effectively owned by your group.\n"
+"      -N FILE        True if the file has been modified since it was last "
+"read.\n"
+"    \n"
+"      FILE1 -nt FILE2  True if file1 is newer than file2 (according to\n"
+"                       modification date).\n"
+"    \n"
+"      FILE1 -ot FILE2  True if file1 is older than file2.\n"
+"    \n"
+"      FILE1 -ef FILE2  True if file1 is a hard link to file2.\n"
+"    \n"
+"    String operators:\n"
+"    \n"
+"      -z STRING      True if string is empty.\n"
+"    \n"
+"      -n STRING\n"
+"         STRING      True if string is not empty.\n"
+"    \n"
+"      STRING1 = STRING2\n"
+"                     True if the strings are equal.\n"
+"      STRING1 != STRING2\n"
+"                     True if the strings are not equal.\n"
+"      STRING1 < STRING2\n"
+"                     True if STRING1 sorts before STRING2 "
+"lexicographically.\n"
+"      STRING1 > STRING2\n"
+"                     True if STRING1 sorts after STRING2 lexicographically.\n"
+"    \n"
+"    Other operators:\n"
+"    \n"
+"      -o OPTION      True if the shell option OPTION is enabled.\n"
+"      ! EXPR         True if expr is false.\n"
+"      EXPR1 -a EXPR2 True if both expr1 AND expr2 are true.\n"
+"      EXPR1 -o EXPR2 True if either expr1 OR expr2 is true.\n"
+"    \n"
+"      arg1 OP arg2   Arithmetic tests.  OP is one of -eq, -ne,\n"
+"                     -lt, -le, -gt, or -ge.\n"
+"    \n"
+"    Arithmetic binary operators return true if ARG1 is equal, not-equal,\n"
+"    less-than, less-than-or-equal, greater-than, or greater-than-or-equal\n"
+"    than ARG2.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success if EXPR evaluates to true; fails if EXPR evaluates to\n"
+"    false or an invalid argument is given."
+msgstr ""
+"Liveru elirstaton 0 (vera) aŭ 1 (malvera) laŭ la rezulto de\n"
+"    komputado de la esprimo expr.  La esprimoj povas esti unulokaj\n"
+"    aŭ dulokaj.  La unulokaj plejparte servas por determini la\n"
+"    staton de dosiero.  Krome, estas operacioj super ĉenoj kaj la\n"
+"    nombrokomparaj operacioj.\n"
+"\n"
+"    Operacioj super dosieroj:\n"
+"\n"
+"\t-a DOSIERO\tVera se DOSIERO ekzistas.\n"
+"\t-b DOSIERO\tVera se DOSIERO estas por bloka eneligo.\n"
+"\t-c DOSIERO\tVera se DOSIERO estas por bajta eneligo.\n"
+"\t-d DOSIERO\tVera se DOSIERO estas dosierujo.\n"
+"\t-e DOSIERO\tVera se DOSIERO ekzistas.\n"
+"\t-f DOSIERO\tVera se DOSIERO ekzistas kaj estas ordinara.\n"
+"\t-g DOSIERO\tVera se DOSIERO havas set-group-id = 1.\n"
+"\t-h DOSIERO\tVera se DOSIERO estas simbola ligilo.\n"
+"\t-L DOSIERO\tVera se DOSIERO estas simbola ligilo.\n"
+"\t-k DOSIERO\tVera se la DOSIERO havas sticky = 1.\n"
+"\t-p DOSIERO\tVera se DOSIERO estas nomhava dukto.\n"
+"\t-r DOSIERO\tVera se vi rajtas legi DOSIEROn.\n"
+"\t-s DOSIERO\tVera se DOSIERO ekzistas kaj longas pli ol 0.\n"
+"\t-S DOSIERO\tVera se DOSIERO estas kontaktingo („socket‟).\n"
+"\t-t DNUMERO\tVera se la dosiero DNUMERO estas terminala.\n"
+"\t-u DOSIERO\tVera se DOSIERO havas set-user-id = 1.\n"
+"\t-w DOSIERO\tVera se vi rajtas skribi en DOSIEROn.\n"
+"\t-x DOSIERO\tVera se vi rajtas lanĉi DOSIEROn.\n"
+"\t-O DOSIERO\tVera se DOSIERO estas via dosiero.\n"
+"\t-G DOSIERO\tVera se DOSIERO apartenas al via grupo.\n"
+"\t-N DOSIERO\tVera se DOSIERO ŝanĝiĝis post la lasta lego.\n"
+"\n"
+"\tD_RO1 -nt D_RO2\tVera se la dosiero D_RO1 estas pli freŝa\n"
+"\t\t\t(laŭ la ŝanĝodato) ol la dosiero D_RO2.\n"
+"\tD_RO1 -ot D_RO2\tVera se D_RO1 estas malpli freŝas ol D_RO2.\n"
+"\tD_RO1 -ef D_RO2\tVera se D_RO1 estas rekta ligilo al D_RO2.\n"
+"\n"
+"    Operacioj super ĉenoj:\n"
+"\n"
+"\t-z ĈENO\t\tVera se la ĈENO estas vakua.\n"
+"\t-n ĈENO\t\tVera se la ĈENO ne estas vakua\n"
+"\tĈENO\t\tVera se la ĈENO ne estas vakua\n"
+"\tĈENO1 = ĈENO2\tVera se la ĉenoj estas egalaj.\n"
+"\tĈENO1 != ĈENO2\tVera se la ĉenoj ne estas egalaj.\n"
+"\tĈENO1 < ĈENO2\tVera se ĈENO1 leksikografie antaŭas la\n"
+"\t\t\tĉenon ĈENO2.\n"
+"\tĈENO1 > ĈENO2\tVera se ĈENO1 leksikografie sekvas la\n"
+"\t\t\tĉenon ĈENO2.\n"
+"\n"
+"    Diversaj operacioj:\n"
+"\n"
+"\t! ESPR\t\tVera se la esprimo ESPR estas falsa.\n"
+"\tESPR1 -a ESPR2\tVera se ambaŭ esprimoj estas veraj.\n"
+"\tESPR1 -o ESPR2\tVera se ajna el la esprimoj estas vera.\n"
+"\n"
+"\targ1 KP arg2\tAritmetikaj komparoj.  KP estas iu el la\n"
+"\t\t\trilatoj -eq, -ne, -lt, -le, -gt, -ge.\n"
+"\n"
+"    La aritmetikaj komparoj liveras veron se arg1 estas respektive\n"
+"    egala, neegala, malplia ol, malplia aŭ egala al, plia ol,\n"
+"    plia aŭ egala al arg2."
+
+# [ arg... ]
+#: builtins.c:1296
+#, fuzzy
+msgid ""
+"Evaluate conditional expression.\n"
+"    \n"
+"    This is a synonym for the \"test\" builtin, but the last argument must\n"
+"    be a literal `]', to match the opening `['."
+msgstr ""
+"Ĉi tiu estas sinonimo de la primitivo „test‟; tamen la lasta\n"
+"    argumento devas esti „]‟ fermanta la esprimon komencitan per „[‟."
+
+#: builtins.c:1305
+msgid ""
+"Display process times.\n"
+"    \n"
+"    Prints the accumulated user and system times for the shell and all of "
+"its\n"
+"    child processes.\n"
+"    \n"
+"    Exit Status:\n"
+"    Always succeeds."
+msgstr ""
+
+# ZZZ: trap [arg] [signal_spec ...] or
+#      trap -l
+#: builtins.c:1317
+#, fuzzy
+msgid ""
+"Trap signals and other events.\n"
+"    \n"
+"    Defines and activates handlers to be run when the shell receives "
+"signals\n"
+"    or other conditions.\n"
+"    \n"
+"    ARG is a command to be read and executed when the shell receives the\n"
+"    signal(s) SIGNAL_SPEC.  If ARG is absent (and a single SIGNAL_SPEC\n"
+"    is supplied) or `-', each specified signal is reset to its original\n"
+"    value.  If ARG is the null string each SIGNAL_SPEC is ignored by the\n"
+"    shell and by the commands it invokes.\n"
+"    \n"
+"    If a SIGNAL_SPEC is EXIT (0) ARG is executed on exit from the shell.  "
+"If\n"
+"    a SIGNAL_SPEC is DEBUG, ARG is executed before every simple command.\n"
+"    \n"
+"    If no arguments are supplied, trap prints the list of commands "
+"associated\n"
+"    with each signal.\n"
+"    \n"
+"    Options:\n"
+"      -l\tprint a list of signal names and their corresponding numbers\n"
+"      -p\tdisplay the trap commands associated with each SIGNAL_SPEC\n"
+"    \n"
+"    Each SIGNAL_SPEC is either a signal name in <signal.h> or a signal "
+"number.\n"
+"    Signal names are case insensitive and the SIG prefix is optional.  A\n"
+"    signal may be sent to the shell with \"kill -signal $$\".\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless a SIGSPEC is invalid or an invalid option is "
+"given."
+msgstr ""
+"La komando arg estas legota kaj plenumota kiam la ŝelo ricevos\n"
+"    (iun) signalon signal_spec.  Se nenia arg estas donita, ĉiuj\n"
+"    sian komencan valoron. Se ARG estas vakua ĉeno, ĉiuj signaloj\n"
+"    signal_spec estos malatentataj de la ŝelo kaj de la komandoj\n"
+"    kiujn ĝi vokas.\n"
+"\n"
+"    Se inter la signaloj signal_spec estas „EXIT‟ (0), tiam arg de\n"
+"    la komando plenumiĝos ĉe la eliro el la ŝelo.\n"
+"    Se signal_spec estas DEBUG, arg plenumiĝos post ĉiu komando.\n"
+"    La opcio „-p‟ ebligas eligi la komandojn plenumotajn laŭ ĉiu\n"
+"    signalo signal_spec. Se estas donita neniu argumento aŭ nura\n"
+"    „-p‟, trap listigas la komandojn por trakti ĉiun kaptendan\n"
+"    signalon.\n"
+"\n"
+"    Ĉiu signal_spec estas aŭ signalnomo el <signal.h>, aŭ\n"
+"    signalnumero.  „trap -l‟ listigas la signalnomojn kun la numeroj.\n"
+"    Signalon  signalindiko  eblas sendi al la ŝelo per la komando\n"
+"    «kill -signalindiko $$»."
+
+#: builtins.c:1349
+msgid ""
+"Display information about command type.\n"
+"    \n"
+"    For each NAME, indicate how it would be interpreted if used as a\n"
+"    command name.\n"
+"    \n"
+"    Options:\n"
+"      -a\tdisplay all locations containing an executable named NAME;\n"
+"    \tincludes aliases, builtins, and functions, if and only if\n"
+"    \tthe `-p' option is not also used\n"
+"      -f\tsuppress shell function lookup\n"
+"      -P\tforce a PATH search for each NAME, even if it is an alias,\n"
+"    \tbuiltin, or function, and returns the name of the disk file\n"
+"    \tthat would be executed\n"
+"      -p\treturns either the name of the disk file that would be executed,\n"
+"    \tor nothing if `type -t NAME' would not return `file'.\n"
+"      -t\toutput a single word which is one of `alias', `keyword',\n"
+"    \t`function', `builtin', `file' or `', if NAME is an alias, shell\n"
+"    \treserved word, shell function, shell builtin, disk file, or not\n"
+"    \tfound, respectively\n"
+"    \n"
+"    Arguments:\n"
+"      NAME\tCommand name to be interpreted.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success if all of the NAMEs are found; fails if any are not "
+"found."
+msgstr ""
+
+# ulimit [-SHacdflmnpstuv] [limit]
+#: builtins.c:1380
+#, fuzzy
+msgid ""
+"Modify shell resource limits.\n"
+"    \n"
+"    Provides control over the resources available to the shell and "
+"processes\n"
+"    it creates, on systems that allow such control.\n"
+"    \n"
+"    Options:\n"
+"      -S\tuse the `soft' resource limit\n"
+"      -H\tuse the `hard' resource limit\n"
+"      -a\tall current limits are reported\n"
+"      -b\tthe socket buffer size\n"
+"      -c\tthe maximum size of core files created\n"
+"      -d\tthe maximum size of a process's data segment\n"
+"      -e\tthe maximum scheduling priority (`nice')\n"
+"      -f\tthe maximum size of files written by the shell and its children\n"
+"      -i\tthe maximum number of pending signals\n"
+"      -l\tthe maximum size a process may lock into memory\n"
+"      -m\tthe maximum resident set size\n"
+"      -n\tthe maximum number of open file descriptors\n"
+"      -p\tthe pipe buffer size\n"
+"      -q\tthe maximum number of bytes in POSIX message queues\n"
+"      -r\tthe maximum real-time scheduling priority\n"
+"      -s\tthe maximum stack size\n"
+"      -t\tthe maximum amount of cpu time in seconds\n"
+"      -u\tthe maximum number of user processes\n"
+"      -v\tthe size of virtual memory\n"
+"      -x\tthe maximum number of file locks\n"
+"    \n"
+"    If LIMIT is given, it is the new value of the specified resource; the\n"
+"    special LIMIT values `soft', `hard', and `unlimited' stand for the\n"
+"    current soft limit, the current hard limit, and no limit, respectively.\n"
+"    Otherwise, the current value of the specified resource is printed.  If\n"
+"    no option is given, then -f is assumed.\n"
+"    \n"
+"    Values are in 1024-byte increments, except for -t, which is in seconds,\n"
+"    -p, which is in increments of 512 bytes, and -u, which is an unscaled\n"
+"    number of processes.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+"La komando „ulimit‟ ebligas mastrumi la risurcojn disponeblajn al la\n"
+"    procezoj lanĉataj el la ŝelo (se la operaciumo ebligas tian\n"
+"    mastrumadon).  Se opcio estas donita, ĝi havas jenan sencon:\n"
+"\n"
+"\t-S  ŝanĝebla („soft‟) limo\n"
+"\t-H  firma („hard‟) limo\n"
+"\t-a  eligu ĉiujn kurantajn risurcolimaĵojn\n"
+"\t-c  maksimuma longo de nekropsia dosiero („core‟)\n"
+"\t-d  maksimuma longo de datumsegmento de procezo\n"
+"\t-e  maksimuma viciga prioritato („nice‟)\n"
+"\t-f  maksimuma longo de dosieroj skribataj de la ŝelo kaj ĝiaj idoj\n"
+"\t-l  maksimuma longo de ŝlosebla procezmemoro (mlock)\n"
+"\t-m  maksimuma longo de rezida procezmemoro\n"
+"\t-n  maksimuma nombro de malfermitaj dosiernumeroj\n"
+"\t-p  longo de dukta bufro (pipe)\n"
+"\t-q  maksimuma nombro da bajtoj en atendovicoj de Poziksaj mesaĝoj\n"
+"\t-s  maksimuma longo de stako\n"
+"\t-t  maksimuma tempo ĉefprocesora (en sekundoj)\n"
+"\t-u  maksimuma nombro de procezoj de la uzanto\n"
+"\t-v  longo de la virtuala memoro\n"
+"\t-x  maksimuma nombro de dosierŝlosoj\n"
+"\n"
+"    Se limo limit estas indikita, ĝia valoro limigas la koncernan\n"
+"    risurcon; la specialaj vortoj por limit: „soft‟, „hard‟,\n"
+"    „unlimited‟ signifas, respektive: «la kuranta ŝanĝebla limo»,\n"
+"    «la kuranta firma limo», «sen limo».\n"
+"\n"
+"    Alie estas eligata la kuranta valoro de la koncerna risurco.\n"
+"    Manko de opcioj implicas -f. La valoroj estas en obloj de\n"
+"    1024 bajtoj, krom por la opcio -t kiu estas en sekundoj;\n"
+"    por -p kiu estas en obloj de 512 bajtoj; kaj por -u, kiu estas\n"
+"    sendimensia nombro de procezoj."
+
+#: builtins.c:1425
+msgid ""
+"Display or set file mode mask.\n"
+"    \n"
+"    Sets the user file-creation mask to MODE.  If MODE is omitted, prints\n"
+"    the current value of the mask.\n"
+"    \n"
+"    If MODE begins with a digit, it is interpreted as an octal number;\n"
+"    otherwise it is a symbolic mode string like that accepted by chmod(1).\n"
+"    \n"
+"    Options:\n"
+"      -p\tif MODE is omitted, output in a form that may be reused as input\n"
+"      -S\tmakes the output symbolic; otherwise an octal number is output\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless MODE is invalid or an invalid option is given."
+msgstr ""
+
+#: builtins.c:1445
+msgid ""
+"Wait for job completion and return exit status.\n"
+"    \n"
+"    Waits for the process identified by ID, which may be a process ID or a\n"
+"    job specification, and reports its termination status.  If ID is not\n"
+"    given, waits for all currently active child processes, and the return\n"
+"    status is zero.  If ID is a a job specification, waits for all "
+"processes\n"
+"    in the job's pipeline.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of ID; fails if ID is invalid or an invalid option "
+"is\n"
+"    given."
+msgstr ""
+
+# wait [n]
+#: builtins.c:1463
+#, fuzzy
+msgid ""
+"Wait for process completion and return exit status.\n"
+"    \n"
+"    Waits for the specified process and reports its termination status.  If\n"
+"    PID is not given, all currently active child processes are waited for,\n"
+"    and the return code is zero.  PID must be a process ID.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of ID; fails if ID is invalid or an invalid option "
+"is\n"
+"    given."
+msgstr ""
+"Atendu finiĝon de la indikita procezo kaj liveru ĝian elirstaton.\n"
+"    Se n malestas, atendu ĉiujn aktivajn procezidojn, kaj liveru\n"
+"    la elirstaton 0.  n povas esti proceznumero aŭ laborindiko;\n"
+"    se ĝi estas laborindiko, la atendo koncernas ĉiujn procezojn de la\n"
+"    dukto de la laboro."
+
+# for NAME [in WORDS ... ;] do COMMANDS; done
+#: builtins.c:1478
+#, fuzzy
+msgid ""
+"Execute commands for each member in a list.\n"
+"    \n"
+"    The `for' loop executes a sequence of commands for each member in a\n"
+"    list of items.  If `in WORDS ...;' is not present, then `in \"$@\"' is\n"
+"    assumed.  For each element in WORDS, NAME is set to that element, and\n"
+"    the COMMANDS are executed.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"La iteracio „for‟ plenumas la komandojn COMMANDS por ĉiu ero\n"
+"    de sia listo.  Se la parto «in WORDS ...;» malestas, «in \"$@\"»\n"
+"    estas uzata anstataŭe.  Por ĉiu ero aperanta en WORDS, la nomo\n"
+"    NAME estas valorizata per tiu ero kaj la komandoj COMMANDS\n"
+"    estas plenumataj."
+
+# for ((: for (( exp1; exp2; exp3 )); do COMMANDS; done
+#: builtins.c:1492
+#, fuzzy
+msgid ""
+"Arithmetic for loop.\n"
+"    \n"
+"    Equivalent to\n"
+"    \t(( EXP1 ))\n"
+"    \twhile (( EXP2 )); do\n"
+"    \t\tCOMMANDS\n"
+"    \t\t(( EXP3 ))\n"
+"    \tdone\n"
+"    EXP1, EXP2, and EXP3 are arithmetic expressions.  If any expression is\n"
+"    omitted, it behaves as if it evaluates to 1.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"Ekvivalentas al\n"
+"\t(( EXP1 ))\n"
+"\twhile (( EXP2 )); do\n"
+"\t   COMMANDS\n"
+"\t   (( EXP3 ))\n"
+"\tdone\n"
+"    kie EXP1, EXP2 kaj EXP3 estas aritmetikaj esprimoj.  Se iu el\n"
+"    ili malestas, 1 estas uzata anstataŭe."
+
+# select NAME [in WORDS ... ;] do COMMANDS; done
+#: builtins.c:1510
+#, fuzzy
+msgid ""
+"Select words from a list and execute commands.\n"
+"    \n"
+"    The WORDS are expanded, generating a list of words.  The\n"
+"    set of expanded words is printed on the standard error, each\n"
+"    preceded by a number.  If `in WORDS' is not present, `in \"$@\"'\n"
+"    is assumed.  The PS3 prompt is then displayed and a line read\n"
+"    from the standard input.  If the line consists of the number\n"
+"    corresponding to one of the displayed words, then NAME is set\n"
+"    to that word.  If the line is empty, WORDS and the prompt are\n"
+"    redisplayed.  If EOF is read, the command completes.  Any other\n"
+"    value read causes NAME to be set to null.  The line read is saved\n"
+"    in the variable REPLY.  COMMANDS are executed after each selection\n"
+"    until a break command is executed.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"WORDS ... estas malvolvataj, generante liston da vortoj.  Tiuj\n"
+"    vortoj estas eligataj en la ĉeferarujon, ĉiu antaŭate de sia\n"
+"    numero.  Se „in WORDS‟ ne estas indikita, la enhavo de \"$@\"\n"
+"    estas uzata anstataŭe.  La invito entenata en la variablo PS3\n"
+"    estas eligata kaj linio estas legata el la ĉefenigujo.  Se linio\n"
+"    konsistas el numero responda al iu el la vortoj eligataj, la\n"
+"    nomo NAME ricevas ĝin kiel sian valoron.  Se la linio entenas\n"
+"    nenion, WORDS kaj la invito ripetiĝas.  Ĉe la dosierfino la\n"
+"    komando finiĝas.  Ajna alia enigaĵo vakuigas la variablon NAME.\n"
+"    La legita linio konserviĝas en la variablo REPLY.  COMMANDS\n"
+"    estas plenumataj post ĉiu elekto, ĝis renkontiĝos komando de\n"
+"    eliro (break)."
+
+# time [-p] PIPELINE
+#: builtins.c:1531
+#, fuzzy
+msgid ""
+"Report time consumed by pipeline's execution.\n"
+"    \n"
+"    Execute PIPELINE and print a summary of the real time, user CPU time,\n"
+"    and system CPU time spent executing PIPELINE when it terminates.\n"
+"    \n"
+"    Options:\n"
+"      -p\tprint the timing summary in the portable Posix format\n"
+"    \n"
+"    The value of the TIMEFORMAT variable is used as the output format.\n"
+"    \n"
+"    Exit Status:\n"
+"    The return status is the return status of PIPELINE."
+msgstr ""
+"Plenumu la dukton PIPELINE kaj poste eligu tabelon el la reala tempo,\n"
+"    la ĉefprocesora tempo de la uzanto, kaj la ĉefprocesora tempo\n"
+"    sistema, konsumitaj por plenumo de PIPELINE.\n"
+"    La opcio „-p‟ iom ŝanĝas la prezenton de la tabelo.\n"
+"    La variablo TIMEFORMAT difinas la formaton de la eligaĵo."
+
+# case WORD in [PATTERN [| PATTERN]...) COMMANDS ;;]... esac
+#: builtins.c:1548
+#, fuzzy
+msgid ""
+"Execute commands based on pattern matching.\n"
+"    \n"
+"    Selectively execute COMMANDS based upon WORD matching PATTERN.  The\n"
+"    `|' is used to separate multiple patterns.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"Plenumu komandojn COMMANDS kondiĉe ke WORD kongruas kun ŝablono PATTERN.\n"
+"    La streko „|‟ servas por disigi ŝablonojn (se pluraj)."
+
+# if COMMANDS; then COMMANDS; [ elif COMMANDS; then COMMANDS; ]...
+# [ else COMMANDS; ] fi
+#: builtins.c:1560
+#, fuzzy
+msgid ""
+"Execute commands based on conditional.\n"
+"    \n"
+"    The `if COMMANDS' list is executed.  If its exit status is zero, then "
+"the\n"
+"    `then COMMANDS' list is executed.  Otherwise, each `elif COMMANDS' list "
+"is\n"
+"    executed in turn, and if its exit status is zero, the corresponding\n"
+"    `then COMMANDS' list is executed and the if command completes.  "
+"Otherwise,\n"
+"    the `else COMMANDS' list is executed, if present.  The exit status of "
+"the\n"
+"    entire construct is the exit status of the last command executed, or "
+"zero\n"
+"    if no condition tested true.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"La komandoj el «if COMMANDS» estas plenumataj. Se la elirstato estas 0,\n"
+"    tiam la komandoj el «then COMMANDS» estas plenumataj. Alie, laŭvice,\n"
+"    komandoj el «elif COMMANDS» estas plenumataj, kaj se la elirstato\n"
+"    estas 0, la komandoj de ties «elif COMMANDS» iĝas plenumataj post kio\n"
+"    la komando „if‟ finiĝas.  Alie, la komandoj el «else COMMANDS» iĝas\n"
+"    plenumataj (se tiuj enestas).  La elirstato estas tiu de la lasta\n"
+"    komando plenumita, aŭ 0 se neniu el la kondiĉoj estis vera."
+
+# while COMMANDS; do COMMANDS; done
+#: builtins.c:1577
+#, fuzzy
+msgid ""
+"Execute commands as long as a test succeeds.\n"
+"    \n"
+"    Expand and execute COMMANDS as long as the final command in the\n"
+"    `while' COMMANDS has an exit status of zero.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"Ripete malvolvu kaj plenumu la komandojn dum la lasta el la komandoj\n"
+"    COMMANDS de la „while‟-parto liveras elirstaton 0."
+
+# until COMMANDS; do COMMANDS; done
+#: builtins.c:1589
+#, fuzzy
+msgid ""
+"Execute commands as long as a test does not succeed.\n"
+"    \n"
+"    Expand and execute COMMANDS as long as the final command in the\n"
+"    `until' COMMANDS has an exit status which is not zero.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"Ripete malvolvu kaj plenumu la komandojn dum la lasta el la komandoj\n"
+"    COMMANDS de la „until‟-parto liveras elirstaton alian ol 0."
+
+#: builtins.c:1601
+msgid ""
+"Create a coprocess named NAME.\n"
+"    \n"
+"    Execute COMMAND asynchronously, with the standard output and standard\n"
+"    input of the command connected via a pipe to file descriptors assigned\n"
+"    to indices 0 and 1 of an array variable NAME in the executing shell.\n"
+"    The default NAME is \"COPROC\".\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the exit status of COMMAND."
+msgstr ""
+
+#: builtins.c:1615
+msgid ""
+"Define shell function.\n"
+"    \n"
+"    Create a shell function named NAME.  When invoked as a simple command,\n"
+"    NAME runs COMMANDs in the calling shell's context.  When NAME is "
+"invoked,\n"
+"    the arguments are passed to the function as $1...$n, and the function's\n"
+"    name is in $FUNCNAME.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless NAME is readonly."
+msgstr ""
+
+# grouping_braces: { COMMANDS ; }
+#: builtins.c:1629
+#, fuzzy
+msgid ""
+"Group commands as a unit.\n"
+"    \n"
+"    Run a set of commands in a group.  This is one way to redirect an\n"
+"    entire set of commands.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"Plenumu la komandojn grupe.  Tiel eblas apliki alidirektadon al\n"
+"    tuta grupo da komandoj."
+
+#: builtins.c:1641
+#, fuzzy
+msgid ""
+"Resume job in foreground.\n"
+"    \n"
+"    Equivalent to the JOB_SPEC argument to the `fg' command.  Resume a\n"
+"    stopped or background job.  JOB_SPEC can specify either a job name\n"
+"    or a job number.  Following JOB_SPEC with a `&' places the job in\n"
+"    the background, as if the job specification had been supplied as an\n"
+"    argument to `bg'.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the resumed job."
+msgstr ""
+"Samkiel la argumento JOB_SPEC en komando „fg‟.  Reaktivigu\n"
+"    haltigitan aŭ fonan laboron.  JOB_SPEC povas esti labornomo aŭ\n"
+"    labornumero.  Postmetita „&‟ sendas la laboron en la fonon,\n"
+"    samkiel se la komando „bg‟ estus aplikita al laborindiko."
+
+#: builtins.c:1656
+#, fuzzy
+msgid ""
+"Evaluate arithmetic expression.\n"
+"    \n"
+"    The EXPRESSION is evaluated according to the rules for arithmetic\n"
+"    evaluation.  Equivalent to \"let EXPRESSION\".\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns 1 if EXPRESSION evaluates to 0; returns 0 otherwise."
+msgstr ""
+"La esprimo EXPRESSION komputiĝas laŭ la aritmetikaj reguloj.\n"
+"    Ekvivalenta al «let EXPRESSION»."
+
+# [[ expression ]]
+#: builtins.c:1668
+#, fuzzy
+msgid ""
+"Execute conditional command.\n"
+"    \n"
+"    Returns a status of 0 or 1 depending on the evaluation of the "
+"conditional\n"
+"    expression EXPRESSION.  Expressions are composed of the same primaries "
+"used\n"
+"    by the `test' builtin, and may be combined using the following "
+"operators:\n"
+"    \n"
+"      ( EXPRESSION )\tReturns the value of EXPRESSION\n"
+"      ! EXPRESSION\t\tTrue if EXPRESSION is false; else false\n"
+"      EXPR1 && EXPR2\tTrue if both EXPR1 and EXPR2 are true; else false\n"
+"      EXPR1 || EXPR2\tTrue if either EXPR1 or EXPR2 is true; else false\n"
+"    \n"
+"    When the `==' and `!=' operators are used, the string to the right of\n"
+"    the operator is used as a pattern and pattern matching is performed.\n"
+"    When the `=~' operator is used, the string to the right of the operator\n"
+"    is matched as a regular expression.\n"
+"    \n"
+"    The && and || operators do not evaluate EXPR2 if EXPR1 is sufficient to\n"
+"    determine the expression's value.\n"
+"    \n"
+"    Exit Status:\n"
+"    0 or 1 depending on value of EXPRESSION."
+msgstr ""
+"Liveras elirstaton 0 aŭ 1 laŭ la rezulto de komputado de kondiĉa\n"
+"    esprimo expression.  Esprimoj konsistas el bazaj esprimoj, kiajn\n"
+"    uzas la primitivaĵo „test‟, kaj komponiĝas per sekvaj operacioj:\n"
+"\n"
+"\t( ESPRIMO )\tLiveras la valoron de ESPRIMO\n"
+"\t! ESPRIMO\tVera, se ESPRIMO estas malvera; alie malvera\n"
+"\tESP1 && ESP2\tVera, se veras ambaŭ ESP1 kaj ESP2; alie malvera\n"
+"\tESP1 || ESP2\tVera, se veras ajna el ESP1 kaj ESP2; alie malvera\n"
+"\n"
+"    En la operacioj „==‟ kaj „!=‟ la signoĉeno dekstre de la operacisigno\n"
+"    rolas kiel ŝablono, kongrueco al kiu estas testata.  En la operacioj\n"
+"    && kaj || la duaj subesprimoj ESP2 ne estas komputataj se ESP1 jam\n"
+"    sufiĉas por determini la rezulton."
+
+# help var
+#: builtins.c:1694
+#, fuzzy
+msgid ""
+"Common shell variable names and usage.\n"
+"    \n"
+"    BASH_VERSION\tVersion information for this Bash.\n"
+"    CDPATH\tA colon-separated list of directories to search\n"
+"    \t\tfor directories given as arguments to `cd'.\n"
+"    GLOBIGNORE\tA colon-separated list of patterns describing filenames to\n"
+"    \t\tbe ignored by pathname expansion.\n"
+"    HISTFILE\tThe name of the file where your command history is stored.\n"
+"    HISTFILESIZE\tThe maximum number of lines this file can contain.\n"
+"    HISTSIZE\tThe maximum number of history lines that a running\n"
+"    \t\tshell can access.\n"
+"    HOME\tThe complete pathname to your login directory.\n"
+"    HOSTNAME\tThe name of the current host.\n"
+"    HOSTTYPE\tThe type of CPU this version of Bash is running under.\n"
+"    IGNOREEOF\tControls the action of the shell on receipt of an EOF\n"
+"    \t\tcharacter as the sole input.  If set, then the value\n"
+"    \t\tof it is the number of EOF characters that can be seen\n"
+"    \t\tin a row on an empty line before the shell will exit\n"
+"    \t\t(default 10).  When unset, EOF signifies the end of input.\n"
+"    MACHTYPE\tA string describing the current system Bash is running on.\n"
+"    MAILCHECK\tHow often, in seconds, Bash checks for new mail.\n"
+"    MAILPATH\tA colon-separated list of filenames which Bash checks\n"
+"    \t\tfor new mail.\n"
+"    OSTYPE\tThe version of Unix this version of Bash is running on.\n"
+"    PATH\tA colon-separated list of directories to search when\n"
+"    \t\tlooking for commands.\n"
+"    PROMPT_COMMAND\tA command to be executed before the printing of each\n"
+"    \t\tprimary prompt.\n"
+"    PS1\t\tThe primary prompt string.\n"
+"    PS2\t\tThe secondary prompt string.\n"
+"    PWD\t\tThe full pathname of the current directory.\n"
+"    SHELLOPTS\tA colon-separated list of enabled shell options.\n"
+"    TERM\tThe name of the current terminal type.\n"
+"    TIMEFORMAT\tThe output format for timing statistics displayed by the\n"
+"    \t\t`time' reserved word.\n"
+"    auto_resume\tNon-null means a command word appearing on a line by\n"
+"    \t\titself is first looked for in the list of currently\n"
+"    \t\tstopped jobs.  If found there, that job is foregrounded.\n"
+"    \t\tA value of `exact' means that the command word must\n"
+"    \t\texactly match a command in the list of stopped jobs.  A\n"
+"    \t\tvalue of `substring' means that the command word must\n"
+"    \t\tmatch a substring of the job.  Any other value means that\n"
+"    \t\tthe command must be a prefix of a stopped job.\n"
+"    histchars\tCharacters controlling history expansion and quick\n"
+"    \t\tsubstitution.  The first character is the history\n"
+"    \t\tsubstitution character, usually `!'.  The second is\n"
+"    \t\tthe `quick substitution' character, usually `^'.  The\n"
+"    \t\tthird is the `history comment' character, usually `#'.\n"
+"    HISTIGNORE\tA colon-separated list of patterns used to decide which\n"
+"    \t\tcommands should be saved on the history list.\n"
+msgstr ""
+"BASH_VERSION\tInformo pri la versio de ĉi tiu Baŝo.\n"
+"    CDPATH\tListo da dosierujoj (disigitaj per dupunkto) en\n"
+"\t\tkiuj argumenta dosierujo de „cd‟ estu serĉata.\n"
+"    GLOBIGNORE\tListo da ŝablonoj (disigitaj per dupunkto) difinanta\n"
+"\t\tdosiernomojn ignorendajn ĉe malvolvo de dosierindikoj.\n"
+"    HISTFILE\tNomo de la dosiero por via komandohistorio.\n"
+"    HISTFILESIZE  Maksimuma nombro de linioj konserveblaj en HISTFILE.\n"
+"    HISTSIZE\tMaksimuma nombro de linioj el komandohistorio\n"
+"\t\tatingeblaj el plenumata ŝelo.\n"
+"    HOME\tPlena dosierindiko pri via hejma dosierujo.\n"
+"    HOSTNAME\tNomo de la rulanta komputilo.\n"
+"    HOSTTYPE\tTipo de la ĉefprocesoro rulanta ĉi tiun Baŝon.\n"
+"    IGNOREEOF\tDeterminas la konduton de la ŝelo kiam ĝi ricevas\n"
+"\t\tdosierfinilon (^D, \\004) kiel nuran enigaĵon.  Se ĝi\n"
+"\t\tekzistas kaj havas nombran valoron, tiam ĉi tiu\n"
+"\t\tindikas, kiom da sinsekvaj dosierfinilojn toleri\n"
+"\t\tantaŭ ol la ŝelo finiĝu (defaŭlte, 10).  Se la\n"
+"\t\tvariablo ne ekzistas, ^D signifas finon de enigo.\n"
+"    MACHTYPE\tSignoĉeno priskribanta la komputosistemon rulantan\n"
+"\t\tĉi tiun Baŝon.\n"
+"    MAILCHECK\tKiom ofte (post kiom da sekundoj) Baŝo kontrolu\n"
+"\t\tricevon de nova retpoŝta mesaĝo.\n"
+"    MAILPATH\tListo da dosiernomoj (disigitaj per dupunkto) kiujn\n"
+"\t\tBaŝo testu pri nova retpoŝtaĵo.\n"
+"    OSTYPE\tVersio de Unikso sur kiu ĉi tiu Baŝo ruliĝas.\n"
+"    PATH\tListo da dosierujoj (disigitaj per dupunkto) kie serĉi\n"
+"\t\tkomandojn.\n"
+"    PROMPT_COMMAND  Komando plenumenda antaŭ ĉiu unuaranga invito.\n"
+"    PS1\t\tSignoĉeno de la unuaranga invito.\n"
+"    PS2\t\tSignoĉeno de la duaranga invito.\n"
+"    PWD\t\tPlena dosierindiko de la kuranta dosierujo.\n"
+"    SHELLOPTS\tListo da aktivaj ŝelaj opcioj (disigitaj per dupunktoj).\n"
+"    TERM\tTipo de la uzata terminalo.\n"
+"    TIMEFORMAT\tFormato por eligi tempostatistikon per la komando „time‟.\n"
+"    auto_resume\tSe ne vakua, indikas ke komandan vorton sole aperanta\n"
+"\t\ten linio la ŝelo unue serĉu en la listo de haltetintaj\n"
+"\t\tlaboroj. Se trovita tie, la laboro iĝu dialoga.\n"
+"\t\tLa valoro „exact‟ postulas ekzaktan kongruon de la\n"
+"\t\tkomanda vorto kun la komando el la laborlisto. La valoro\n"
+"\t\t„substring‟ indikas ke la komanda vorto kongruu kun\n"
+"\t\tsubĉeno de la laboro. Ĉia alia valoro indikas ke la\n"
+"\t\tkomando estu komenca parto de la labornomo.\n"
+"    histchars\tSignoj regantaj reuzon de komandohistorio kaj rapidan\n"
+"\t\tanstataŭigon. Unue estas la reuziga signo, kutime „!‟.\n"
+"\t\tDue estas la signo de „rapida anstataŭigo‟, kutime „^‟.\n"
+"\t\tTrie estas la signo de „historia komentilo‟,\n"
+"\t\tkutime „#‟.\n"
+"    HISTIGNORE\tListo da ŝablonoj (disigitaj per dupunkto) difinanta\n"
+"\t\tkiujn komandojn konservi en la historilisto.\n"
+
+# pushd [dir | +N | -N] [-n]
+#: builtins.c:1751
+#, fuzzy
+msgid ""
+"Add directories to stack.\n"
+"    \n"
+"    Adds a directory to the top of the directory stack, or rotates\n"
+"    the stack, making the new top of the stack the current working\n"
+"    directory.  With no arguments, exchanges the top two directories.\n"
+"    \n"
+"    Options:\n"
+"      -n\tSuppresses the normal change of directory when adding\n"
+"    \tdirectories to the stack, so only the stack is manipulated.\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tRotates the stack so that the Nth directory (counting\n"
+"    \tfrom the left of the list shown by `dirs', starting with\n"
+"    \tzero) is at the top.\n"
+"    \n"
+"      -N\tRotates the stack so that the Nth directory (counting\n"
+"    \tfrom the right of the list shown by `dirs', starting with\n"
+"    \tzero) is at the top.\n"
+"    \n"
+"      dir\tAdds DIR to the directory stack at the top, making it the\n"
+"    \tnew current working directory.\n"
+"    \n"
+"    The `dirs' builtin displays the directory stack.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid argument is supplied or the directory\n"
+"    change fails."
+msgstr ""
+"Surstakigu dosierujon sur la stakon da dosierujoj, aŭ cikle ŝovu\n"
+"    la stakon tiel, ke la nova stakpinto iĝu la kuranta dosierujo.\n"
+"    Senargumente, permutu la du plej suprajn dosierujojn de la stako.\n"
+"\n"
+"    +N\tCikle ŝovu la stakon tiel ke la Na dosierujo (nombrante de\n"
+"    \tmaldekstre en la listo eligebla per „dirs‟, numerante de 0)\n"
+"        iĝu la pinta.\n"
+"\n"
+"    -N\tCikle ŝovu la stakon tiel ke la Na dosierujo (nombrante de\n"
+"    \tdekstre en la listo eligebla per „dirs‟, numerante de 0) iĝu\n"
+"        la pinta.\n"
+"\n"
+"    -n\tNe ŝanĝu la kurantan dosierujon surstakigante dosierujon sur\n"
+"    \tla stakon; do, nur la stakon ŝanĝu.\n"
+"\n"
+"    dir\tsurstakigu la dosierujon dir kaj faru ĝin la nova kuranta\n"
+"    \tdosierujo labora.\n"
+"\n"
+"    Vi povas vidigi la stakon da dosierujoj per la komando „dirs‟."
+
+# popd [+N | -N] [-n]
+#: builtins.c:1785
+#, fuzzy
+msgid ""
+"Remove directories from stack.\n"
+"    \n"
+"    Removes entries from the directory stack.  With no arguments, removes\n"
+"    the top directory from the stack, and changes to the new top directory.\n"
+"    \n"
+"    Options:\n"
+"      -n\tSuppresses the normal change of directory when removing\n"
+"    \tdirectories from the stack, so only the stack is manipulated.\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tRemoves the Nth entry counting from the left of the list\n"
+"    \tshown by `dirs', starting with zero.  For example: `popd +0'\n"
+"    \tremoves the first directory, `popd +1' the second.\n"
+"    \n"
+"      -N\tRemoves the Nth entry counting from the right of the list\n"
+"    \tshown by `dirs', starting with zero.  For example: `popd -0'\n"
+"    \tremoves the last directory, `popd -1' the next to last.\n"
+"    \n"
+"    The `dirs' builtin displays the directory stack.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid argument is supplied or the directory\n"
+"    change fails."
+msgstr ""
+"Elstakigu erojn el la stako de dosierujoj.  Senargumente, forigu la\n"
+"    pintan dosierujon kaj iru (cd) en la novan pintan dosierujon.\n"
+"\n"
+"    +N\tforigu la Nan eron de maldekstre de la listo eligebla per\n"
+"\t„dirs‟, numerante ekde 0.  Ekz-e: «popd +0» forigas la plej\n"
+"\tmaldekstran dosierujon; «popd +1», ĝian najbaron.\n"
+"\n"
+"    -N\tforigu la Nan eron de dekstre de la listo eligebla per „dirs‟,\n"
+"\tnumerante ekde 0.  Ekz-e: «popd -0» forigas la lastan\n"
+"\tdosierujon; «popd -1», la antaŭlastan.\n"
+"\n"
+"    -n\tNe ŝanĝu la kurantan dosierujon demetante dosierujon el la\n"
+"\tstako; do, nur la stakon ŝanĝu.\n"
+"\n"
+"    Vi povas vidigi la stakon da dosierujoj per la komando „dirs‟."
+
+# dirs [-clpv] [+N] [-N]
+#: builtins.c:1815
+#, fuzzy
+msgid ""
+"Display directory stack.\n"
+"    \n"
+"    Display the list of currently remembered directories.  Directories\n"
+"    find their way onto the list with the `pushd' command; you can get\n"
+"    back up through the list with the `popd' command.\n"
+"    \n"
+"    Options:\n"
+"      -c\tclear the directory stack by deleting all of the elements\n"
+"      -l\tdo not print tilde-prefixed versions of directories relative\n"
+"    \tto your home directory\n"
+"      -p\tprint the directory stack with one entry per line\n"
+"      -v\tprint the directory stack with one entry per line prefixed\n"
+"    \twith its position in the stack\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tDisplays the Nth entry counting from the left of the list shown "
+"by\n"
+"    \tdirs when invoked without options, starting with zero.\n"
+"    \n"
+"      -N\tDisplays the Nth entry counting from the right of the list shown "
+"by\n"
+"    \tdirs when invoked without options, starting with zero.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+"Listigu la kurantan dosierujstakon. La dosierujoj trafas en\n"
+"    la stakon per la komando „pushd‟ kaj estas forigeblaj per la\n"
+"    komando „popd‟.\n"
+"\n"
+"    La opcio -l indikas ke „dirs‟ ne eligu mallongajn formojn de\n"
+"    dosierujnomoj relative al via hejma dosierujo.  T.e. anstataŭ\n"
+"    «~/bin» aperos nomo kun absoluta vojo, ekz-e «/homes/bfox/bin».\n"
+"    La opcio -v igas komandon „dirs‟ eligi po unu eron de la dosierujstako\n"
+"    en linio, metante antaŭ la dosierujnomo ĝian numeron en la stako.\n"
+"    La opcio -p faras simile, tamen ne numeras la poziciojn.\n"
+"    La opcio -c malplenigas la dosierujstakon forigante el ĝi ĉiujn erojn.\n"
+"\n"
+"    +N\teligu la Nan eron nombrante de maldekstre en la listo eligebla\n"
+"\tper „dirs‟ sen opcioj, numerante ekde 0.\n"
+"\n"
+"    -N\teligu la Nan eron nombrante de dekstre en la listo eligebla\n"
+"\tper „dirs‟ sen opcioj, numerante ekde 0."
+
+#: builtins.c:1844
+msgid ""
+"Set and unset shell options.\n"
+"    \n"
+"    Change the setting of each shell option OPTNAME.  Without any option\n"
+"    arguments, list all shell options with an indication of whether or not "
+"each\n"
+"    is set.\n"
+"    \n"
+"    Options:\n"
+"      -o\trestrict OPTNAMEs to those defined for use with `set -o'\n"
+"      -p\tprint each shell option with an indication of its status\n"
+"      -q\tsuppress output\n"
+"      -s\tenable (set) each OPTNAME\n"
+"      -u\tdisable (unset) each OPTNAME\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success if OPTNAME is enabled; fails if an invalid option is\n"
+"    given or OPTNAME is disabled."
+msgstr ""
+
+# printf [-v var] format [arguments]
+#: builtins.c:1865
+#, fuzzy
+msgid ""
+"Formats and prints ARGUMENTS under control of the FORMAT.\n"
+"    \n"
+"    Options:\n"
+"      -v var\tassign the output to shell variable VAR rather than\n"
+"    \t\tdisplay it on the standard output\n"
+"    \n"
+"    FORMAT is a character string which contains three types of objects: "
+"plain\n"
+"    characters, which are simply copied to standard output; character "
+"escape\n"
+"    sequences, which are converted and copied to the standard output; and\n"
+"    format specifications, each of which causes printing of the next "
+"successive\n"
+"    argument.\n"
+"    \n"
+"    In addition to the standard format specifications described in printf"
+"(1)\n"
+"    and printf(3), printf interprets:\n"
+"    \n"
+"      %b\texpand backslash escape sequences in the corresponding argument\n"
+"      %q\tquote the argument in a way that can be reused as shell input\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or a write or "
+"assignment\n"
+"    error occurs."
+msgstr ""
+"„printf‟ aranĝas kaj eligas la argumentojn arguments laŭ la formato\n"
+"    format.  Ci tiu estas signoĉeno entenanta 3 tipojn da objektoj:\n"
+"    ordinaraj signoj, simple kopiataj en la ĉefeligujon;\n"
+"    eskapsekvencoj por signo, konvertataj kaj kopiataj en la ĉefeligujon; \n"
+"    kaj formataj specifoj, ĉiu el kiuj kaŭzas eligon de vica argumento.\n"
+"    Aldone al la normaj specifiloj laŭ „printf(1)‟,\n"
+"    „%b‟ igas malvolvi deklivajn (\\) eskapsekvencojn en sia argumento, kaj\n"
+"    „%q‟ ordonas ke la argumento eliĝu en formo taŭga por ŝela re-enigo.\n"
+"    Se ĉeestas la opcio „-v‟, la eligo trafas en ties variablon var kaj\n"
+"    ne en la ĉefeligujon."
+
+#: builtins.c:1892
+msgid ""
+"Specify how arguments are to be completed by Readline.\n"
+"    \n"
+"    For each NAME, specify how arguments are to be completed.  If no "
+"options\n"
+"    are supplied, existing completion specifications are printed in a way "
+"that\n"
+"    allows them to be reused as input.\n"
+"    \n"
+"    Options:\n"
+"      -p\tprint existing completion specifications in a reusable format\n"
+"      -r\tremove a completion specification for each NAME, or, if no\n"
+"    \tNAMEs are supplied, all completion specifications\n"
+"    \n"
+"    When completion is attempted, the actions are applied in the order the\n"
+"    uppercase-letter options are listed above.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+
+# compgen [-abcdefgjksuv] [-o option] [-A action] [-G globpat]
+# 	[-W wordlist] [-P prefix] [-S suffix] [-X filterpat]
+# 	[-F function] [-C command] [word]
+#: builtins.c:1915
+#, fuzzy
+msgid ""
+"Display possible completions depending on the options.\n"
+"    \n"
+"    Intended to be used from within a shell function generating possible\n"
+"    completions.  If the optional WORD argument is supplied, matches "
+"against\n"
+"    WORD are generated.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+"Montru la eblajn kompletigojn depende je la opcioj.  Destinita\n"
+"    por uzo en ŝelfunkcio generanta eblajn kompletigojn.\n"
+"    Se eventuala argumento word estas donita, generu ĝiajn kongruaĵojn."
+
+#: builtins.c:1930
+msgid ""
+"Modify or display completion options.\n"
+"    \n"
+"    Modify the completion options for each NAME, or, if no NAMEs are "
+"supplied,\n"
+"    the completion currently begin executed.  If no OPTIONs are givenm, "
+"print\n"
+"    the completion options for each NAME or the current completion "
+"specification.\n"
+"    \n"
+"    Options:\n"
+"    \t-o option\tSet completion option OPTION for each NAME\n"
+"    \n"
+"    Using `+o' instead of `-o' turns off the specified option.\n"
+"    \n"
+"    Arguments:\n"
+"    \n"
+"    Each NAME refers to a command for which a completion specification must\n"
+"    have previously been defined using the `complete' builtin.  If no NAMEs\n"
+"    are supplied, compopt must be called by a function currently generating\n"
+"    completions, and the options for that currently-executing completion\n"
+"    generator are modified.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or NAME does not\n"
+"    have a completion specification defined."
+msgstr ""
+
+#: builtins.c:1958
+msgid ""
+"Read lines from the standard input into an array variable.\n"
+"    \n"
+"    Read lines from the standard input into the array variable ARRAY, or "
+"from\n"
+"    file descriptor FD if the -u option is supplied.  The variable MAPFILE "
+"is\n"
+"    the default ARRAY.\n"
+"    \n"
+"    Options:\n"
+"      -n count\tCopy at most COUNT lines.  If COUNT is 0, all lines are "
+"copied.\n"
+"      -O origin\tBegin assigning to ARRAY at index ORIGIN.  The default "
+"index is 0.\n"
+"      -s count \tDiscard the first COUNT lines read.\n"
+"      -t\t\tRemove a trailing newline from each line read.\n"
+"      -u fd\t\tRead lines from file descriptor FD instead of the standard "
+"input.\n"
+"      -C callback\tEvaluate CALLBACK each time QUANTUM lines are read.\n"
+"      -c quantum\tSpecify the number of lines read between each call to "
+"CALLBACK.\n"
+"    \n"
+"    Arguments:\n"
+"      ARRAY\t\tArray variable name to use for file data.\n"
+"    \n"
+"    If -C is supplied without -c, the default quantum is 5000.  When\n"
+"    CALLBACK is evaluated, it is supplied the index of the next array\n"
+"    element to be assigned as an additional argument.\n"
+"    \n"
+"    If not supplied with an explicit origin, mapfile will clear ARRAY "
+"before\n"
+"    assigning to it.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or ARRAY is readonly."
+msgstr ""
+
+#: builtins.c:1990
+msgid ""
+"Read lines from a file into an array variable.\n"
+"    \n"
+"    A synonym for `mapfile'."
+msgstr ""
+
+#~ msgid " "
+#~ msgstr " "
+
+# caller [EXPR]
+#~ msgid "Without EXPR, returns returns \"$line $filename\".  With EXPR,"
+#~ msgstr "Se EXPR malestas, liveriĝas «$line $filename».  Se EXPR ĉeestas,"
+
+#~ msgid "returns \"$line $subroutine $filename\"; this extra information"
+#~ msgstr "Liveriĝas «$line $subroutine $filename»; ĉi tiu krominformo"
+
+#~ msgid "can be used used to provide a stack trace."
+#~ msgstr "Uzeblas por vidigi la vok-stakon."
+
+#~ msgid ""
+#~ "The value of EXPR indicates how many call frames to go back before the"
+#~ msgstr "La valoro de EXPR indikas, kiom da vokkadroj retroiri disde la"
+
+#~ msgid "current one; the top frame is frame 0."
+#~ msgstr "kuranta; la pinta kadro havas la numeron 0."
+
+#~ msgid "%s: invalid number"
+#~ msgstr "%s: Misa nombro aŭ numero"
+
+#~ msgid "Shell commands matching keywords `"
+#~ msgstr "Ŝelaj komandoj kongruaj kun la ŝlosilvortoj `"
+
+# dirs
+#~ msgid "Display the list of currently remembered directories.  Directories"
+#~ msgstr "Listigu la kurantan dosierujstakon. La dosierujoj trafas en"
+
+#~ msgid "find their way onto the list with the `pushd' command; you can get"
+#~ msgstr "la stakon per la komando „pushd‟ kaj estas forigeblaj per la"
+
+#~ msgid "back up through the list with the `popd' command."
+#~ msgstr "komando „popd‟."
+
+#~ msgid ""
+#~ "The -l flag specifies that `dirs' should not print shorthand versions"
+#~ msgstr ""
+#~ "La opcio -l indikas ke la komando „dirs‟ ne eligu mallongajn formojn"
+
+#~ msgid ""
+#~ "of directories which are relative to your home directory.  This means"
+#~ msgstr "de dosierujnomoj rilate al via hejma dosierujo. T.e. anstataŭ ~/bin"
+
+#~ msgid "that `~/bin' might be displayed as `/homes/bfox/bin'.  The -v flag"
+#~ msgstr "aperos nomo kun absoluta vojo, ekz-e „/homes/bfox/bin‟. La opcio -v"
+
+#~ msgid "causes `dirs' to print the directory stack with one entry per line,"
+#~ msgstr "igas „dirs‟ eligi po unu eron de la dosierujstako en linio,"
+
+#~ msgid ""
+#~ "prepending the directory name with its position in the stack.  The -p"
+#~ msgstr "metante antaŭ la dosierujnomo ĝian numeron en la stako. La opcio -p"
+
+#~ msgid "flag does the same thing, but the stack position is not prepended."
+#~ msgstr "faras la samon sed sen numeri la poziciojn."
+
+#~ msgid ""
+#~ "The -c flag clears the directory stack by deleting all of the elements."
+#~ msgstr ""
+#~ "La opcio -c malplenigas la dosierujstakon forigante el ĝi ĉiujn erojn."
+
+#~ msgid ""
+#~ "+N   displays the Nth entry counting from the left of the list shown by"
+#~ msgstr "+N\teligu la Nan eron nombrante de maldekstre en la listo"
+
+#~ msgid "     dirs when invoked without options, starting with zero."
+#~ msgstr "\teligebla per „dirs‟ sen opcioj, komencante per 0."
+
+#~ msgid ""
+#~ "-N   displays the Nth entry counting from the right of the list shown by"
+#~ msgstr "-N\teligu la Nan eron nombrante de dekstre en la listo"
+
+# pushd
+#~ msgid "Adds a directory to the top of the directory stack, or rotates"
+#~ msgstr "Surstakigu dosierujon sur la stakon de dosierujoj, aŭ cikle ŝovu"
+
+#~ msgid "the stack, making the new top of the stack the current working"
+#~ msgstr "la stakon tiel, ke la nova stakpinto iĝu la kuranta dosierujo."
+
+#~ msgid "directory.  With no arguments, exchanges the top two directories."
+#~ msgstr "Senargumente, permutu la du plej suprajn dosierujojn de la stako."
+
+#~ msgid "+N   Rotates the stack so that the Nth directory (counting"
+#~ msgstr "+N\tCikle ŝovu la stakon tiel ke la Na dosierujo (nombrante de"
+
+#~ msgid "     from the left of the list shown by `dirs', starting with"
+#~ msgstr "\tmaldekstre en la listo eligebla per „dirs‟, numerante ekde"
+
+#~ msgid "     zero) is at the top."
+#~ msgstr "\t0) iĝu la pinta."
+
+#~ msgid "-N   Rotates the stack so that the Nth directory (counting"
+#~ msgstr "-N\tCikle ŝovu la stakon tiel ke la Na dosierujo (nombrante de"
+
+#~ msgid "     from the right of the list shown by `dirs', starting with"
+#~ msgstr "\tmaldekstre en la listo eligebla per „dirs‟, numerante ekde"
+
+#~ msgid "-n   suppress the normal change of directory when adding directories"
+#~ msgstr "-n\tNe ŝanĝu la kurantan dosierujon surstakigante dosierujon sur"
+
+#~ msgid "     to the stack, so only the stack is manipulated."
+#~ msgstr "\tla stakon; do, nur la stakon ŝanĝu."
+
+#~ msgid "dir  adds DIR to the directory stack at the top, making it the"
+#~ msgstr "dir\tSurstakigu la dosierujon dir kaj faru ĝin la"
+
+#~ msgid "     new current working directory."
+#~ msgstr "\tnova kuranta dosierujo labora."
+
+#~ msgid "You can see the directory stack with the `dirs' command."
+#~ msgstr "Vi povas vidigi la stakon de dosierujoj per la komando „dirs‟."
+
+# popd
+#~ msgid "Removes entries from the directory stack.  With no arguments,"
+#~ msgstr "Elstakigu erojn el la stako de dosierujoj. Senargumente,"
+
+#~ msgid "removes the top directory from the stack, and cd's to the new"
+#~ msgstr "forigu la pintan dosierujon kaj iru (cd) en la novan pintan"
+
+#~ msgid "top directory."
+#~ msgstr "dosierujon."
+
+#~ msgid "+N   removes the Nth entry counting from the left of the list"
+#~ msgstr "+N\tforigu la Nan eron nombrante de maldekstre de la listo"
+
+#~ msgid "     shown by `dirs', starting with zero.  For example: `popd +0'"
+#~ msgstr "\teligebla per „dirs‟, numerante ekde 0.  Ekz-e: „popd +0‟"
+
+#~ msgid "     removes the first directory, `popd +1' the second."
+#~ msgstr "\tforigas la plej maldekstran dosierujon; „popd +1‟, ĝian najbaron."
+
+#~ msgid "-N   removes the Nth entry counting from the right of the list"
+#~ msgstr "-N\tforigu la Nan eron nombrante de dekstre de la listo"
+
+#~ msgid "     shown by `dirs', starting with zero.  For example: `popd -0'"
+#~ msgstr "\teligebla per „dirs‟, nombrante ekde 0.  Ekz-e: «popd -0»"
+
+#~ msgid "     removes the last directory, `popd -1' the next to last."
+#~ msgstr "\tforigas la lastan dosierujon; «popd -1», ĝian najbaron."
+
+#~ msgid ""
+#~ "-n   suppress the normal change of directory when removing directories"
+#~ msgstr "-n\tNe ŝanĝu la kurantan dosierujon demetante dosierujon"
+
+#~ msgid "     from the stack, so only the stack is manipulated."
+#~ msgstr "\tel la stako; do, nur la stakon ŝanĝu."
+
+# XXX: stat? debug?
+#~ msgid "allocated"
+#~ msgstr "okupita"
+
+# XXX: stat? debug?
+#~ msgid "freed"
+#~ msgstr "malokupita"
+
+# XXX: stat??
+#~ msgid "requesting resize"
+#~ msgstr "bezonas retranĉon"
+
+# XXX: debug? Ĉu «ĵus» aŭ «ĝuste»?  Pri kio temas??
+#~ msgid "just resized"
+#~ msgstr "ĵus retranĉita"
+
+# XXX: debug?
+#~ msgid "bug: unknown operation"
+#~ msgstr "cimo: Nekonata operacio"
+
+#  XXX: debug?
+#~ msgid "malloc: watch alert: %p %s "
+#~ msgstr "malloc: Gvat-raporto: %p %s "
+
+#~ msgid ""
+#~ "Exit from within a FOR, WHILE or UNTIL loop.  If N is specified,\n"
+#~ "    break N levels."
+#~ msgstr ""
+#~ "Eliru ekster iteracion FOR, WHILE aŭ UNTIL. Se N estas indikita,\n"
+#~ "    iru N nivelojn eksteren."
+
+#~ msgid ""
+#~ "Run a shell builtin.  This is useful when you wish to rename a\n"
+#~ "    shell builtin to be a function, but need the functionality of the\n"
+#~ "    builtin within the function itself."
+#~ msgstr ""
+#~ "Rulu primitivan ŝelkomandon. Tio utilas se oni volas uzi la nomon\n"
+#~ "    de ŝelaĵo por nomi funkcion, sed bezonas la koncernan\n"
+#~ "    primitivon en la funkcio mem."
+
+#~ msgid ""
+#~ "Print the current working directory.  With the -P option, pwd prints\n"
+#~ "    the physical directory, without any symbolic links; the -L option\n"
+#~ "    makes pwd follow symbolic links."
+#~ msgstr ""
+#~ "Eligu la nomon de kuranta dosierujo.  Kun la opcio  -P,  la komando\n"
+#~ "    „pwd‟ eligas la nomon de la fizika dosierujo, sen ajna eventuala "
+#~ "simbola\n"
+#~ "    ligilo; la opcio  -L  igas la komandon pwd sekvi simbolajn ligojn."
+
+#~ msgid "Return a successful result."
+#~ msgstr "Liveru sukcesan rezulton."
+
+# ZZZ: command [-pVv] command [arg ...]
+#~ msgid ""
+#~ "Runs COMMAND with ARGS ignoring shell functions.  If you have a shell\n"
+#~ "    function called `ls', and you wish to call the command `ls', you can\n"
+#~ "    say \"command ls\".  If the -p option is given, a default value is "
+#~ "used\n"
+#~ "    for PATH that is guaranteed to find all of the standard utilities.  "
+#~ "If\n"
+#~ "    the -V or -v option is given, a string is printed describing "
+#~ "COMMAND.\n"
+#~ "    The -V option produces a more verbose description."
+#~ msgstr ""
+#~ "Plenumu komandon kun ARGoj sen atenti la ŝelajn funkciojn.  Ekz-e se,\n"
+#~ "    havante ŝelan funkcion „ls‟, oni volas voki la komandon „ls‟, oni\n"
+#~ "    povas fari tion per «command ls».  La opcio  -p  neprigas uzi la\n"
+#~ "    norman valoron de la de la variablo $PATH, ebliganta trovi ĉiujn\n"
+#~ "    normajn utilaĵojn.\n"
+#~ "    La opcio -V aŭ -v provizas eligon de ĉeno priskribanta la komandon;\n"
+#~ "    la opcio -V provizas pli detalan priskribon."
+
+#~ msgid "Obsolete.  See `declare'."
+#~ msgstr "Arkaika. Vd „declare‟."
+
+#~ msgid ""
+#~ "Create a local variable called NAME, and give it VALUE.  LOCAL\n"
+#~ "    can only be used within a function; it makes the variable NAME\n"
+#~ "    have a visible scope restricted to that function and its children."
+#~ msgstr ""
+#~ "Kreu lokan variablon NOMO kaj ĝin valorizu per VALORO.\n"
+#~ "    „local‟ uzeblas nur ene de funkcio; ĝi igas la variablon NOMO\n"
+#~ "    videbla en la regiono konstistanta el la funkcio kaj ties idoj."
+
+#~ msgid ""
+#~ "Output the ARGs.  If -n is specified, the trailing newline is suppressed."
+#~ msgstr "Eligu la ARGojn.  La opcio  -n  evitigas la postan liniavancon."
+
+# enable [-pnds] [-a] [-f filename] [name ...]
+#~ msgid ""
+#~ "Enable and disable builtin shell commands.  This allows\n"
+#~ "    you to use a disk command which has the same name as a shell\n"
+#~ "    builtin without specifying a full pathname.  If -n is used, the\n"
+#~ "    NAMEs become disabled; otherwise NAMEs are enabled.  For example,\n"
+#~ "    to use the `test' found in $PATH instead of the shell builtin\n"
+#~ "    version, type `enable -n test'.  On systems supporting dynamic\n"
+#~ "    loading, the -f option may be used to load new builtins from the\n"
+#~ "    shared object FILENAME.  The -d option will delete a builtin\n"
+#~ "    previously loaded with -f.  If no non-option names are given, or\n"
+#~ "    the -p option is supplied, a list of builtins is printed.  The\n"
+#~ "    -a option means to print every builtin with an indication of whether\n"
+#~ "    or not it is enabled.  The -s option restricts the output to the "
+#~ "POSIX.2\n"
+#~ "    `special' builtins.  The -n option displays a list of all disabled "
+#~ "builtins."
+#~ msgstr ""
+#~ "Aktivigu aŭ malaktivigu primitivajn ŝelkomandojn.  Tio ebligas\n"
+#~ "    uzi eksteran komandon, samnoman kun primitivaĵo, sen indiki\n"
+#~ "    ĝian plenan vojon.\n"
+#~ "    La opcio  -n  malaktivigas la nomojn name ..., sen ĝi la nomoj\n"
+#~ "    aktiviĝas.  Ekz-e, por uzi la „test‟on troveblan en  $PATH  anstataŭ\n"
+#~ "    la samnoman primitivan ŝelkomandon, diru: «enable -n test».\n"
+#~ "    En sistemo ebliganta dinamikan ŝargadon, la opcio  -f  uzeblas\n"
+#~ "    por ŝargi novajn primitivaĵojn el la dinamika biblioteko  filename.\n"
+#~ "    La opcio  -d  forigos ŝelkomandon dinamike ŝargitan per  -f.\n"
+#~ "    Se malestas neopciaj nomoj, aŭ ĉeestas la opcio -p, eligu la\n"
+#~ "    liston de primitivaĵoj.\n"
+#~ "    La opcio -a donas liston de ĉiuj primitivaĵoj kun indiko, ĉu ili\n"
+#~ "    estas aktivaj aŭ ne.  La opcio  -s  eligas nur la «specialajn»\n"
+#~ "    ŝelfunkciojn de Posix.2.  La opcio  -n  montras la liston de ĉiuj\n"
+#~ "    malaktivaj primitivaĵoj."
+
+#~ msgid ""
+#~ "Read ARGs as input to the shell and execute the resulting command(s)."
+#~ msgstr ""
+#~ "Legu la ARGojn kiel enigaĵon de la ŝelo kaj plenumu la\n"
+#~ "    legita(j)n komando(j)n."
+
+# exec [-cl] [-a name] file [redirection ...]
+#~ msgid ""
+#~ "Exec FILE, replacing this shell with the specified program.\n"
+#~ "    If FILE is not specified, the redirections take effect in this\n"
+#~ "    shell.  If the first argument is `-l', then place a dash in the\n"
+#~ "    zeroth arg passed to FILE, as login does.  If the `-c' option\n"
+#~ "    is supplied, FILE is executed with a null environment.  The `-a'\n"
+#~ "    option means to make set argv[0] of the executed process to NAME.\n"
+#~ "    If the file cannot be executed and the shell is not interactive,\n"
+#~ "    then the shell exits, unless the shell option `execfail' is set."
+#~ msgstr ""
+#~ "Plenumu la dosieron file anstataŭigante la ŝelon je la donita\n"
+#~ "    programo.  Se file ne estas indikita, la alidirektadoj okazu en\n"
+#~ "    la kuranta ŝelo.  Se la unua argumento estas „-l‟, minuso\n"
+#~ "    enŝoviĝas antaŭ la nula argumento pasigata al  file  (kiel\n"
+#~ "    ĉe „login‟).  Ĉe la opcio  -c,  la plenumo de  file  estu en\n"
+#~ "    vakua medio.  Per la opcio  -a  la argumento  argv[0]  de la\n"
+#~ "    plenumota procezo ricevas la valoron  name.  Se la dosieron ne\n"
+#~ "    eblas plenumi kaj la ŝelo ne estas dialoga, tiam la ŝelo finiĝas,\n"
+#~ "    krom se la opcio „execfail‟ estas aktiva."
+
+#~ msgid "Logout of a login shell."
+#~ msgstr "Adiaŭ, saluta ŝelo!"
+
+# hash [-lr] [-p pathname] [-dt] [name ...]
+#~ msgid ""
+#~ "For each NAME, the full pathname of the command is determined and\n"
+#~ "    remembered.  If the -p option is supplied, PATHNAME is used as the\n"
+#~ "    full pathname of NAME, and no path search is performed.  The -r\n"
+#~ "    option causes the shell to forget all remembered locations.  The -d\n"
+#~ "    option causes the shell to forget the remembered location of each "
+#~ "NAME.\n"
+#~ "    If the -t option is supplied the full pathname to which each NAME\n"
+#~ "    corresponds is printed.  If multiple NAME arguments are supplied "
+#~ "with\n"
+#~ "    -t, the NAME is printed before the hashed full pathname.  The -l "
+#~ "option\n"
+#~ "    causes output to be displayed in a format that may be reused as "
+#~ "input.\n"
+#~ "    If no arguments are given, information about remembered commands is "
+#~ "displayed."
+#~ msgstr ""
+#~ "Por ĉiu nomo name, trovu kaj registru en hakettabelo la kompletan\n"
+#~ "    vojon al tiu komando (komanda dosiero).\n"
+#~ "    Se ĉeestas la opcio -p, la vojo pathname servas kiel kompleta vojo\n"
+#~ "    por la nomoj, sen plua vojserĉo.\n"
+#~ "    La opcio  -r  forgesigas ĉiujn registritajn vojojn.\n"
+#~ "    La opcio  -d  forgesigas la registritajn vojojn por ĉiu nomo name.\n"
+#~ "    La opcio  -t  kaŭzas eligon de kompleta vojo responda al ĉiu name.\n"
+#~ "    Se pluraj nomoj aperas kun  -t, la koncerna nomo aperos antaŭ ĝia\n"
+#~ "    kompleta serĉvojo registrita.  La opcio  -l  donas al la eligaĵo\n"
+#~ "    la formon reuzeblan por enigo.  Se nenia opcio estas donita, eligu\n"
+#~ "    la informojn pri la memorataj komandoj."
+
+# help [-s] [pattern ...]
+#~ msgid ""
+#~ "Display helpful information about builtin commands.  If PATTERN is\n"
+#~ "    specified, gives detailed help on all commands matching PATTERN,\n"
+#~ "    otherwise a list of the builtins is printed.  The -s option\n"
+#~ "    restricts the output for each builtin command matching PATTERN to\n"
+#~ "    a short usage synopsis."
+#~ msgstr ""
+#~ "Eligu helpan informon pri primitivaj komandoj.  Se la ŝablono\n"
+#~ "    pattern  estas donita, eligu detalan helpon pri la komandoj\n"
+#~ "    kongruaj kun la ŝablono; alie eligu nur liston de la primitivaj\n"
+#~ "    komandoj.  La opcio  -s  reduktas la eligaĵon pri ĉiu trovita\n"
+#~ "    kongruaĵo ĝis mallonga resumo."
+
+# disown [-h] [-ar] [jobspec ...]
+#~ msgid ""
+#~ "By default, removes each JOBSPEC argument from the table of active jobs.\n"
+#~ "    If the -h option is given, the job is not removed from the table, but "
+#~ "is\n"
+#~ "    marked so that SIGHUP is not sent to the job if the shell receives a\n"
+#~ "    SIGHUP.  The -a option, when JOBSPEC is not supplied, means to remove "
+#~ "all\n"
+#~ "    jobs from the job table; the -r option means to remove only running "
+#~ "jobs."
+#~ msgstr ""
+#~ "Senopcie: forigu ĉiun laboron indikitan per argumento  jobspec  el\n"
+#~ "    la tabelo de aktivaj laboroj.\n"
+#~ "\n"
+#~ "    Ĉe la opcio -h, anstataŭ forigi la laboron el la tabelo, marku ĝin\n"
+#~ "    tiel, ke la signalo SIGHUP ne estu plusendita al la laboro(j) kiam\n"
+#~ "    tian signalon ricevas la ŝelo.\n"
+#~ "\n"
+#~ "    Se nenia laboro  jobspec  estas indikita, la opcio  -a  preskribas\n"
+#~ "    forigi ĉiujn laborojn el la labortabelo; la opcio  -r  preskribas\n"
+#~ "    forigi nur la rulatajn laborojn."
+
+# return [n]
+#~ msgid ""
+#~ "Causes a function to exit with the return value specified by N.  If N\n"
+#~ "    is omitted, the return status is that of the last command."
+#~ msgstr ""
+#~ "Igas la funkcion finiĝi kaj liveri la donitan valoron  n  kiel\n"
+#~ "    elirstaton.  Se  n  mankas, la elirstato estas tiu de la ĵusa\n"
+#~ "    komando."
+
+# unset [-f] [-v] [name ...]
+#~ msgid ""
+#~ "For each NAME, remove the corresponding variable or function.  Given\n"
+#~ "    the `-v', unset will only act on variables.  Given the `-f' flag,\n"
+#~ "    unset will only act on functions.  With neither flag, unset first\n"
+#~ "    tries to unset a variable, and if that fails, then tries to unset a\n"
+#~ "    function.  Some variables cannot be unset; also see readonly."
+#~ msgstr ""
+#~ "Por ĉiu nomo name, forigu la respondan variablon aŭ funkcion.\n"
+#~ "    Ĉe la opcio „-v‟ forigu nur la variablojn.\n"
+#~ "    Ĉe la opcio „-f‟ forigu nur la funkciojn.\n"
+#~ "    Se neniu el la du opcioj estas indikita, „unset‟ unue provos\n"
+#~ "    forigi variablon, kaj se tia ne troviĝos, funkcion. Iujn\n"
+#~ "    variablojn ne eblas forigi. Vd ankaŭ la helpon pri „readonly‟."
+
+# ZZZ: export [-nf] [name[=value] ...] or
+#      export -p
+#~ msgid ""
+#~ "NAMEs are marked for automatic export to the environment of\n"
+#~ "    subsequently executed commands.  If the -f option is given,\n"
+#~ "    the NAMEs refer to functions.  If no NAMEs are given, or if `-p'\n"
+#~ "    is given, a list of all names that are exported in this shell is\n"
+#~ "    printed.  An argument of `-n' says to remove the export property\n"
+#~ "    from subsequent NAMEs.  An argument of `--' disables further option\n"
+#~ "    processing."
+#~ msgstr ""
+#~ "Marku la nomojn  name  por aŭtomata eksporto en la medion de\n"
+#~ "    la plenumotaj komandoj.\n"
+#~ "    Se la opcio -f estas donita, la nomoj rilatas al funkcioj.\n"
+#~ "    Se nenia nomo  name  ĉeestas, aŭ se la opcio „-p‟ estas donita, \n"
+#~ "    eligu la liston de ĉiuj nomoj eksportataj de ĉi tiu ŝelo.\n"
+#~ "    La opcio -n forviŝas la eksportomarkon de la ĝin sekvantaj nomoj.\n"
+#~ "    La opcio „--‟ ĉesigas pluan opcitraktadon en sia linio."
+
+# ZZZ: readonly [-af] [name[=value] ...] or
+#      readonly -p
+#~ msgid ""
+#~ "The given NAMEs are marked readonly and the values of these NAMEs may\n"
+#~ "    not be changed by subsequent assignment.  If the -f option is given,\n"
+#~ "    then functions corresponding to the NAMEs are so marked.  If no\n"
+#~ "    arguments are given, or if `-p' is given, a list of all readonly "
+#~ "names\n"
+#~ "    is printed.  The `-a' option means to treat each NAME as\n"
+#~ "    an array variable.  An argument of `--' disables further option\n"
+#~ "    processing."
+#~ msgstr ""
+#~ "La donitaj nomoj  name  iĝas nurlegaj kaj la valorojn de tiuj nomoj\n"
+#~ "    ne povas ŝanĝi posta valorizo.  Se la opcio „-f‟ estas donita,\n"
+#~ "    tio aplikiĝas nur al la funkcioj respondaj al la nomoj.  Se\n"
+#~ "    argumentoj mankas, aŭ se la opcio „-p‟ estas uzita, la listo de\n"
+#~ "    ĉiuj nurlegaj nomoj estas eligata.  La opcio „-a‟ indikas, ke\n"
+#~ "    ĉiun nomon  name  oni rigardu tabela variablo.\n"
+#~ "    La opcio „--‟ ĉesigas pluan opcitraktadon."
+
+# shift [n]
+#~ msgid ""
+#~ "The positional parameters from $N+1 ... are renamed to $1 ...  If N is\n"
+#~ "    not given, it is assumed to be 1."
+#~ msgstr ""
+#~ "La poziciaj parametroj ekde  $n+1  renomiĝas  $1 ...  ktp.\n"
+#~ "    Se  n  ne estas indikita,  1  estas uzata anstataŭe."
+
+# suspend [-f]
+#~ msgid ""
+#~ "Suspend the execution of this shell until it receives a SIGCONT\n"
+#~ "    signal.  The `-f' if specified says not to complain about this\n"
+#~ "    being a login shell if it is; just suspend anyway."
+#~ msgstr ""
+#~ "Haltetigu la plenumon de la ŝelo ĝis ĝi ricevos la signalon SIGCONT.\n"
+#~ "    Se la ŝelo estas saluta, la opcio „-f‟ silentigas la averton ke\n"
+#~ "    ĝi estas saluta ŝelo; la ŝelo simple haltetas."
+
+# times
+#~ msgid ""
+#~ "Print the accumulated user and system times for processes run from\n"
+#~ "    the shell."
+#~ msgstr ""
+#~ "Eligu la tempojn akumulitajn de la uzanto kaj de la kerno\n"
+#~ "    por la procezoj lanĉitaj el la ŝelo."
+
+# type [-afptP] name [name ...]
+#~ msgid ""
+#~ "For each NAME, indicate how it would be interpreted if used as a\n"
+#~ "    command name.\n"
+#~ "    \n"
+#~ "    If the -t option is used, `type' outputs a single word which is one "
+#~ "of\n"
+#~ "    `alias', `keyword', `function', `builtin', `file' or `', if NAME is "
+#~ "an\n"
+#~ "    alias, shell reserved word, shell function, shell builtin, disk "
+#~ "file,\n"
+#~ "    or unfound, respectively.\n"
+#~ "    \n"
+#~ "    If the -p flag is used, `type' either returns the name of the disk\n"
+#~ "    file that would be executed, or nothing if `type -t NAME' would not\n"
+#~ "    return `file'.\n"
+#~ "    \n"
+#~ "    If the -a flag is used, `type' displays all of the places that "
+#~ "contain\n"
+#~ "    an executable named `file'.  This includes aliases, builtins, and\n"
+#~ "    functions, if and only if the -p flag is not also used.\n"
+#~ "    \n"
+#~ "    The -f flag suppresses shell function lookup.\n"
+#~ "    \n"
+#~ "    The -P flag forces a PATH search for each NAME, even if it is an "
+#~ "alias,\n"
+#~ "    builtin, or function, and returns the name of the disk file that "
+#~ "would\n"
+#~ "    be executed."
+#~ msgstr ""
+#~ "Por ĉiu nomo name, montru kion ĝi signifus en la pozicio de\n"
+#~ "    komadonomo.\n"
+#~ "\n"
+#~ "    Kun la opcio -t eligu unu vorton, iun el la sekvaj:\n"
+#~ "    „alias‟, „keyword‟, „function‟, „builtin‟, „file‟ aŭ „‟ -- se\n"
+#~ "    name  estas, respektive, alinomo, ŝela ŝlosilvorto, ŝelfunkcio,\n"
+#~ "    ŝela primitivo, dosiero aŭ nenio konata.\n"
+#~ "\n"
+#~ "    Kun la opcio -p eligu la nomon de dosiero kiu iĝus plenumata;\n"
+#~ "    aŭ nenion, se la «type -t name» ne eligus „file‟.\n"
+#~ "\n"
+#~ "    Ĉe  -a  listigu ĉiujn lokojn entenantajn plenumeblan dosieron\n"
+#~ "    kun koncerna nomo name.  La listo inkludas alinomojn kaj\n"
+#~ "    funkciojn, se kaj nur se malestas la opcio -p.\n"
+#~ "\n"
+#~ "    La opcio  -f  ekskludas el la serĉo la ŝelfunkciojn.\n"
+#~ "\n"
+#~ "    La opcio -f igas serĉi ĉiun nomon name laŭ PATH, eĉ se ekzistas\n"
+#~ "    alinomo, primitiva komando aŭ funkcio name, kaj eligi la nomon de\n"
+#~ "    koncerna plenumebla dosiero."
+
+# umask [-p] [-S] [mode]
+#~ msgid ""
+#~ "The user file-creation mask is set to MODE.  If MODE is omitted, or if\n"
+#~ "    `-S' is supplied, the current value of the mask is printed.  The `-"
+#~ "S'\n"
+#~ "    option makes the output symbolic; otherwise an octal number is "
+#~ "output.\n"
+#~ "    If `-p' is supplied, and MODE is omitted, the output is in a form\n"
+#~ "    that may be used as input.  If MODE begins with a digit, it is\n"
+#~ "    interpreted as an octal number, otherwise it is a symbolic mode "
+#~ "string\n"
+#~ "    like that accepted by chmod(1)."
+#~ msgstr ""
+#~ "La dosierkrea masko de la uzanto havu la valoron de la argumento\n"
+#~ "    mode.  Se  mode  mankas aŭ se ĉeestas la opcio -S, eligu la\n"
+#~ "    kurantan valoron de la masko.  Kun la opcio -S la eligo estas\n"
+#~ "    simbola, alie ĝi estas okuma.  Se estas donita „-p‟ sen\n"
+#~ "    argumento mode, la eligaĵo havos formon taŭgan por enigo.\n"
+#~ "    Se la argumento  mode  komenciĝas per cifero, ĝi estas\n"
+#~ "    interpretata kiel okuma nombro, alie kiel simbola signoĉeno\n"
+#~ "    laŭ chmod(1)."
+
+#~ msgid ""
+#~ "Wait for the specified process and report its termination status.  If\n"
+#~ "    N is not given, all currently active child processes are waited for,\n"
+#~ "    and the return code is zero.  N is a process ID; if it is not given,\n"
+#~ "    all child processes of the shell are waited for."
+#~ msgstr ""
+#~ "Atendu finiĝon de la indikita procezo kaj liveru ĝian elirstaton.\n"
+#~ "    Se  n  malestas, atendu ĉiujn aktivajn procezidojn, kaj liveru\n"
+#~ "    la elirstaton 0.  n estas proceznumero;  se ĝi malestas, atendu\n"
+#~ "    ĉiujn procezidojn de la ŝelo."
+
+# ZZZ: function NAME { COMMANDS ; } or
+#      NAME () { COMMANDS ; }
+#~ msgid ""
+#~ "Create a simple command invoked by NAME which runs COMMANDS.\n"
+#~ "    Arguments on the command line along with NAME are passed to the\n"
+#~ "    function as $0 .. $n."
+#~ msgstr ""
+#~ "Kreu simplan komandon vokeblan per la nomo NAME, plenumantan la\n"
+#~ "    komandojn COMMANDS.  La nomo kaj la komandoliniaj argumentoj\n"
+#~ "    estas pasigataj al tiu funkcio jene: $0 ... $n."
+
+# shopt [-pqsu] [-o long-option] optname [optname...]
+#~ msgid ""
+#~ "Toggle the values of variables controlling optional behavior.\n"
+#~ "    The -s flag means to enable (set) each OPTNAME; the -u flag\n"
+#~ "    unsets each OPTNAME.  The -q flag suppresses output; the exit\n"
+#~ "    status indicates whether each OPTNAME is set or unset.  The -o\n"
+#~ "    option restricts the OPTNAMEs to those defined for use with\n"
+#~ "    `set -o'.  With no options, or with the -p option, a list of all\n"
+#~ "    settable options is displayed, with an indication of whether or\n"
+#~ "    not each is set."
+#~ msgstr ""
+#~ "Ŝanĝu la valoron de variabloj regantaj la konduton de ŝelaj opcioj.\n"
+#~ "    La opcio -s aktivigas (set) ĉiun opcinomon  optname.\n"
+#~ "    La opcio -u malaktivigas (unset) ĉiun opcinomon  optname.\n"
+#~ "    La opcio -q silentigas eligon de normalaj mesaĝoj; se ĝin akompanas\n"
+#~ "    pluraj opcinomoj, la elirstato indikas, ĉu ĉiuj donitaj  optname\n"
+#~ "    estas aktivaj.\n"
+#~ "    La opcio  -o  limigas la opcinomojn ĝis tiuj uzeblaj ĉe „set -o‟.\n"
+#~ "    Senopcie aŭ kun la opcio  -p  la listo de ĉiuj ŝalteblaj opcioj\n"
+#~ "    estas eligata, kun indiko ĉu ĉiu el ili estas ŝaltita aŭ ne."
+
+# complete [-abcdefgjksuv] [-pr] [-o option] [-A action] [-G globpat]
+# 	 [-W wordlist] [-P prefix] [-S suffix] [-X filterpat]
+# 	 [-F function] [-C command] [name ...]
+#~ msgid ""
+#~ "For each NAME, specify how arguments are to be completed.\n"
+#~ "    If the -p option is supplied, or if no options are supplied, "
+#~ "existing\n"
+#~ "    completion specifications are printed in a way that allows them to "
+#~ "be\n"
+#~ "    reused as input.  The -r option removes a completion specification "
+#~ "for\n"
+#~ "    each NAME, or, if no NAMEs are supplied, all completion "
+#~ "specifications."
+#~ msgstr ""
+#~ "Por ĉiu nomo name difinu, kiel la argumentoj estu kompletigotaj.\n"
+#~ "    Se ĉeestas la opcio -p, aŭ senopcie, eligu la ekzistantajn\n"
+#~ "    kompletigajn specifojn en formo reuzebla por enigo en la ŝelon.\n"
+#~ "    La opcio -r forigas la kompletigajn specifojn por ĉiu nomo name,\n"
+#~ "    aŭ, se nenia tia nomo estas donita, ĉiujn kompletigajn specifojn."

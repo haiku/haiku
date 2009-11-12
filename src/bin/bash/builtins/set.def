@@ -1,23 +1,22 @@
 This file is set.def, from which is created set.c.
 It implements the "set" and "unset" builtins in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES set.c
 
@@ -33,6 +32,7 @@ $PRODUCES set.c
 #include <stdio.h>
 
 #include "../bashansi.h"
+#include "../bashintl.h"
 
 #include "../shell.h"
 #include "../flags.h"
@@ -59,78 +59,96 @@ extern int no_line_editing;
 
 $BUILTIN set
 $FUNCTION set_builtin
-$SHORT_DOC set [--abefhkmnptuvxBCHP] [-o option] [arg ...]
-    -a  Mark variables which are modified or created for export.
-    -b  Notify of job termination immediately.
-    -e  Exit immediately if a command exits with a non-zero status.
-    -f  Disable file name generation (globbing).
-    -h  Remember the location of commands as they are looked up.
-    -k  All assignment arguments are placed in the environment for a
-        command, not just those that precede the command name.
-    -m  Job control is enabled.
-    -n  Read commands but do not execute them.
-    -o option-name
-        Set the variable corresponding to option-name:
-            allexport    same as -a
-            braceexpand  same as -B
+$SHORT_DOC set [--abefhkmnptuvxBCHP] [-o option-name] [arg ...]
+Set or unset values of shell options and positional parameters.
+
+Change the value of shell attributes and positional parameters, or
+display the names and values of shell variables.
+
+Options:
+  -a  Mark variables which are modified or created for export.
+  -b  Notify of job termination immediately.
+  -e  Exit immediately if a command exits with a non-zero status.
+  -f  Disable file name generation (globbing).
+  -h  Remember the location of commands as they are looked up.
+  -k  All assignment arguments are placed in the environment for a
+      command, not just those that precede the command name.
+  -m  Job control is enabled.
+  -n  Read commands but do not execute them.
+  -o option-name
+      Set the variable corresponding to option-name:
+          allexport    same as -a
+          braceexpand  same as -B
 #if defined (READLINE)
-            emacs        use an emacs-style line editing interface
+          emacs        use an emacs-style line editing interface
 #endif /* READLINE */
-            errexit      same as -e
-            hashall      same as -h
+          errexit      same as -e
+          errtrace     same as -E
+          functrace    same as -T
+          hashall      same as -h
 #if defined (BANG_HISTORY)
-            histexpand   same as -H
+          histexpand   same as -H
 #endif /* BANG_HISTORY */
 #if defined (HISTORY)
-            history      enable command history
+          history      enable command history
 #endif
-            ignoreeof    the shell will not exit upon reading EOF
-            interactive-comments
-                         allow comments to appear in interactive commands
-            keyword      same as -k
-            monitor      same as -m
-            noclobber    same as -C
-            noexec       same as -n
-            noglob       same as -f
-            nolog        currently accepted but ignored
-            notify       same as -b
-            nounset      same as -u
-            onecmd       same as -t
-            physical     same as -P
-            posix        change the behavior of bash where the default
-                         operation differs from the 1003.2 standard to
-                         match the standard
-            privileged   same as -p
-            verbose      same as -v
+          ignoreeof    the shell will not exit upon reading EOF
+          interactive-comments
+                       allow comments to appear in interactive commands
+          keyword      same as -k
+          monitor      same as -m
+          noclobber    same as -C
+          noexec       same as -n
+          noglob       same as -f
+          nolog        currently accepted but ignored
+          notify       same as -b
+          nounset      same as -u
+          onecmd       same as -t
+          physical     same as -P
+          pipefail     the return value of a pipeline is the status of
+                       the last command to exit with a non-zero status,
+                       or zero if no command exited with a non-zero status
+          posix        change the behavior of bash where the default
+                       operation differs from the Posix standard to
+                       match the standard
+          privileged   same as -p
+          verbose      same as -v
 #if defined (READLINE)
-            vi           use a vi-style line editing interface
+          vi           use a vi-style line editing interface
 #endif /* READLINE */
-            xtrace       same as -x
-    -p  Turned on whenever the real and effective user ids do not match.
-        Disables processing of the $ENV file and importing of shell
-        functions.  Turning this option off causes the effective uid and
-        gid to be set to the real uid and gid.
-    -t  Exit after reading and executing one command.
-    -u  Treat unset variables as an error when substituting.
-    -v  Print shell input lines as they are read.
-    -x  Print commands and their arguments as they are executed.
+          xtrace       same as -x
+  -p  Turned on whenever the real and effective user ids do not match.
+      Disables processing of the $ENV file and importing of shell
+      functions.  Turning this option off causes the effective uid and
+      gid to be set to the real uid and gid.
+  -t  Exit after reading and executing one command.
+  -u  Treat unset variables as an error when substituting.
+  -v  Print shell input lines as they are read.
+  -x  Print commands and their arguments as they are executed.
 #if defined (BRACE_EXPANSION)
-    -B  the shell will perform brace expansion
+  -B  the shell will perform brace expansion
 #endif /* BRACE_EXPANSION */
-    -C  If set, disallow existing regular files to be overwritten
-        by redirection of output.
+  -C  If set, disallow existing regular files to be overwritten
+      by redirection of output.
+  -E  If set, the ERR trap is inherited by shell functions.
 #if defined (BANG_HISTORY)
-    -H  Enable ! style history substitution.  This flag is on
-        by default.
+  -H  Enable ! style history substitution.  This flag is on
+      by default when the shell is interactive.
 #endif /* BANG_HISTORY */
-    -P  If set, do not follow symbolic links when executing commands
-        such as cd which change the current directory.
+  -P  If set, do not follow symbolic links when executing commands
+      such as cd which change the current directory.
+  -T  If set, the DEBUG trap is inherited by shell functions.
+  -   Assign any remaining arguments to the positional parameters.
+      The -x and -v options are turned off.
 
 Using + rather than - causes these flags to be turned off.  The
 flags can also be used upon invocation of the shell.  The current
 set of flags may be found in $-.  The remaining n ARGs are positional
 parameters and are assigned, in order, to $1, $2, .. $n.  If no
 ARGs are given, all shell variables are printed.
+
+Exit Status:
+Returns success unless an invalid option is given.
 $END
 
 typedef int setopt_set_func_t __P((int, char *));
@@ -151,13 +169,13 @@ static int get_edit_mode __P((char *));
 static int bash_set_history __P((int, char *));
 #endif
 
-static char *on = "on";
-static char *off = "off";
+static const char * const on = "on";
+static const char * const off = "off";
 
 /* A struct used to match long options for set -o to the corresponding
    option letter or internal variable.  The functions can be called to
    dynamically generate values. */
-struct {
+const struct {
   char *name;
   int letter;
   int *variable;
@@ -172,12 +190,14 @@ struct {
   { "emacs",     '\0', (int *)NULL, set_edit_mode, get_edit_mode },
 #endif
   { "errexit",	  'e', (int *)NULL, (setopt_set_func_t *)NULL, (setopt_get_func_t *)NULL  },
+  { "errtrace",	  'E', (int *)NULL, (setopt_set_func_t *)NULL, (setopt_get_func_t *)NULL  },
+  { "functrace",  'T', (int *)NULL, (setopt_set_func_t *)NULL, (setopt_get_func_t *)NULL  },
   { "hashall",    'h', (int *)NULL, (setopt_set_func_t *)NULL, (setopt_get_func_t *)NULL  },
 #if defined (BANG_HISTORY)
   { "histexpand", 'H', (int *)NULL, (setopt_set_func_t *)NULL, (setopt_get_func_t *)NULL  },
 #endif /* BANG_HISTORY */
 #if defined (HISTORY)
-  { "history",   '\0', &remember_on_history, bash_set_history, (setopt_get_func_t *)NULL },
+  { "history",   '\0', &enable_history_list, bash_set_history, (setopt_get_func_t *)NULL },
 #endif
   { "ignoreeof", '\0', &ignoreeof, set_ignoreeof, (setopt_get_func_t *)NULL },
   { "interactive-comments", '\0', &interactive_comments, (setopt_set_func_t *)NULL, (setopt_get_func_t *)NULL },
@@ -195,6 +215,7 @@ struct {
   { "nounset",	  'u', (int *)NULL, (setopt_set_func_t *)NULL, (setopt_get_func_t *)NULL  },
   { "onecmd",	  't', (int *)NULL, (setopt_set_func_t *)NULL, (setopt_get_func_t *)NULL },
   { "physical",   'P', (int *)NULL, (setopt_set_func_t *)NULL, (setopt_get_func_t *)NULL  },
+  { "pipefail",  '\0', &pipefail_opt, (setopt_set_func_t *)NULL, (setopt_get_func_t *)NULL  },
   { "posix",     '\0', &posixly_correct, set_posix_mode, (setopt_get_func_t *)NULL },
   { "privileged", 'p', (int *)NULL, (setopt_set_func_t *)NULL, (setopt_get_func_t *)NULL  },
   { "verbose",	  'v', (int *)NULL, (setopt_set_func_t *)NULL, (setopt_get_func_t *)NULL  },
@@ -300,7 +321,7 @@ set_ignoreeof (on_or_off, option_name)
   ignoreeof = on_or_off == FLAG_ON;
   unbind_variable ("ignoreeof");
   if (ignoreeof)
-    bind_variable ("IGNOREEOF", "10"); 
+    bind_variable ("IGNOREEOF", "10", 0); 
   else
     unbind_variable ("IGNOREEOF");
   sv_ignoreeof ("IGNOREEOF");
@@ -316,7 +337,7 @@ set_posix_mode (on_or_off, option_name)
   if (posixly_correct == 0)
     unbind_variable ("POSIXLY_CORRECT");
   else
-    bind_variable ("POSIXLY_CORRECT", "y");
+    bind_variable ("POSIXLY_CORRECT", "y", 0);
   sv_strict_posix ("POSIXLY_CORRECT");
   return (0);
 }
@@ -368,13 +389,17 @@ bash_set_history (on_or_off, option_name)
 {
   if (on_or_off == FLAG_ON)
     {
+      enable_history_list = 1;
       bash_history_enable ();
       if (history_lines_this_session == 0)
 	load_history ();
     }
   else
-    bash_history_disable ();
-  return (1 - remember_on_history);
+    {
+      enable_history_list = 0;
+      bash_history_disable ();
+    }
+  return (1 - enable_history_list);
 }
 #endif
 
@@ -409,7 +434,7 @@ set_minus_o_option (on_or_off, option_name)
     }
 
   sh_invalidoptname (option_name);
-  return (EXECUTION_FAILURE);
+  return (EX_USAGE);
 }
 
 static void
@@ -492,7 +517,7 @@ set_shellopts ()
   else
     exported = 0;
 
-  v = bind_variable ("SHELLOPTS", value);
+  v = bind_variable ("SHELLOPTS", value, 0);
 
   /* Turn the read-only attribute back on, and turn off the export attribute
      if it was set implicitly by mark_modified_vars and SHELLOPTS was not
@@ -532,7 +557,7 @@ initialize_shell_options (no_shellopts)
       /* set up any shell options we may have inherited. */
       if (var && imported_p (var))
 	{
-	  temp = (array_p (var)) ? (char *)NULL : savestring (value_cell (var));
+	  temp = (array_p (var) || assoc_p (var)) ? (char *)NULL : savestring (value_cell (var));
 	  if (temp)
 	    {
 	      parse_shellopts (temp);
@@ -552,7 +577,7 @@ void
 reset_shell_options ()
 {
 #if defined (HISTORY)
-  remember_on_history = 1;
+  remember_on_history = enable_history_list = 1;
 #endif
   ignoreeof = 0;
 }
@@ -564,18 +589,18 @@ int
 set_builtin (list)
      WORD_LIST *list;
 {
-  int on_or_off, flag_name, force_assignment, opts_changed;
-  WORD_LIST *l;
+  int on_or_off, flag_name, force_assignment, opts_changed, rv, r;
   register char *arg;
   char s[3];
 
   if (list == 0)
     {
       print_all_shell_variables ();
-      return (EXECUTION_SUCCESS);
+      return (sh_chkwrite (EXECUTION_SUCCESS));
     }
 
   /* Check validity of flag arguments. */
+  rv = EXECUTION_SUCCESS;
   reset_internal_getopt ();
   while ((flag_name = internal_getopt (list, optflags)) != -1)
     {
@@ -638,6 +663,7 @@ set_builtin (list)
 		  if (opt == 0)
 		    {
 		      list_minus_o_opts (-1, (on_or_off == '+'));
+		      rv = sh_chkwrite (rv);
 		      continue;
 		    }
 
@@ -652,10 +678,10 @@ set_builtin (list)
 		  list = list->next; /* Skip over option name. */
 
 		  opts_changed = 1;
-		  if (set_minus_o_option (on_or_off, option_name) != EXECUTION_SUCCESS)
+		  if ((r = set_minus_o_option (on_or_off, option_name)) != EXECUTION_SUCCESS)
 		    {
 		      set_shellopts ();
-		      return (EXECUTION_FAILURE);
+		      return (r);
 		    }
 		}
 	      else if (change_flag (flag_name, on_or_off) == FLAG_ERROR)
@@ -684,17 +710,27 @@ set_builtin (list)
   /* Set up new value of $SHELLOPTS */
   if (opts_changed)
     set_shellopts ();
-  return (EXECUTION_SUCCESS);
+  return (rv);
 }
 
 $BUILTIN unset
 $FUNCTION unset_builtin
 $SHORT_DOC unset [-f] [-v] [name ...]
-For each NAME, remove the corresponding variable or function.  Given
-the `-v', unset will only act on variables.  Given the `-f' flag,
-unset will only act on functions.  With neither flag, unset first
-tries to unset a variable, and if that fails, then tries to unset a
-function.  Some variables cannot be unset; also see readonly.
+Unset values and attributes of shell variables and functions.
+
+For each NAME, remove the corresponding variable or function.
+
+Options:
+  -f	treat each NAME as a shell function
+  -v	treat each NAME as a shell variable
+
+Without options, unset first tries to unset a variable, and if that fails,
+tries to unset a function.
+
+Some variables cannot be unset; also see `readonly'.
+
+Exit Status:
+Returns success unless an invalid option is given or a NAME is read-only.
 $END
 
 #define NEXT_VARIABLE()	any_failed++; list = list->next; continue;
@@ -729,7 +765,7 @@ unset_builtin (list)
 
   if (unset_function && unset_variable)
     {
-      builtin_error ("cannot simultaneously unset a function and a variable");
+      builtin_error (_("cannot simultaneously unset a function and a variable"));
       return (EXECUTION_FAILURE);
     }
 
@@ -766,14 +802,14 @@ unset_builtin (list)
 
       if (var && !unset_function && non_unsettable_p (var))
 	{
-	  builtin_error ("%s: cannot unset", name);
+	  builtin_error (_("%s: cannot unset"), name);
 	  NEXT_VARIABLE ();
 	}
 
       /* Posix.2 says that unsetting readonly variables is an error. */
       if (var && readonly_p (var))
 	{
-	  builtin_error ("%s: cannot unset: readonly %s",
+	  builtin_error (_("%s: cannot unset: readonly %s"),
 			 name, unset_function ? "function" : "variable");
 	  NEXT_VARIABLE ();
 	}
@@ -782,9 +818,9 @@ unset_builtin (list)
 #if defined (ARRAY_VARS)
       if (var && unset_array)
 	{
-	  if (array_p (var) == 0)
+	  if (array_p (var) == 0 && assoc_p (var) == 0)
 	    {
-	      builtin_error ("%s: not an array variable", name);
+	      builtin_error (_("%s: not an array variable"), name);
 	      NEXT_VARIABLE ();
 	    }
 	  else

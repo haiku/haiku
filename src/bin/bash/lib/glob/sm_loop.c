@@ -1,29 +1,30 @@
-/* Copyright (C) 1991-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2006 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
    
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
-	      
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
-			 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-static int FCT __P((CHAR *, CHAR *, int));
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+int FCT __P((CHAR *, CHAR *, int));
+
 static int GMATCH __P((CHAR *, CHAR *, CHAR *, CHAR *, int));
 static CHAR *PARSE_COLLSYM __P((CHAR *, INT *));
 static CHAR *BRACKMATCH __P((CHAR *, U_CHAR, int));
 static int EXTMATCH __P((INT, CHAR *, CHAR *, CHAR *, CHAR *, int));
 static CHAR *PATSCAN __P((CHAR *, CHAR *, INT));
 
-static int
+int
 FCT (pattern, string, flags)
      CHAR *pattern;
      CHAR *string;
@@ -134,6 +135,19 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 	      if ((flags & FNM_PATHNAME) && sc == L('/'))
 		/* A slash does not match a wildcard under FNM_PATHNAME. */
 		return FNM_NOMATCH;
+#ifdef EXTENDED_GLOB
+	      else if ((flags & FNM_EXTMATCH) && c == L('?') && *p == L('(')) /* ) */
+		{
+		  CHAR *newn;
+		  for (newn = n; newn < se; ++newn)
+		    {
+		      if (EXTMATCH (c, newn, se, p, pe, flags) == 0)
+			return (0);
+		    }
+		  /* We didn't match.  If we have a `?(...)', that's failure. */
+		  return FNM_NOMATCH;
+		}
+#endif
 	      else if (c == L('?'))
 		{
 		  if (sc == L('\0'))
@@ -344,7 +358,7 @@ BRACKMATCH (p, test, flags)
 		{
 		  bcopy (p + 1, ccname, (close - p - 1) * sizeof (CHAR));
 		  *(ccname + (close - p - 1)) = L('\0');
-		  pc = IS_CCLASS (test, ccname);
+		  pc = IS_CCLASS (test, (XCHAR *)ccname);
 		}
 	      if (pc == -1)
 		pc = 0;
@@ -508,11 +522,11 @@ PATSCAN (string, end, delim)
      CHAR *string, *end;
      INT delim;
 {
-  int pnest, bnest;
+  int pnest, bnest, skip;
   INT cchar;
   CHAR *s, c, *bfirst;
 
-  pnest = bnest = 0;
+  pnest = bnest = skip = 0;
   cchar = 0;
   bfirst = NULL;
 
@@ -520,8 +534,17 @@ PATSCAN (string, end, delim)
     {
       if (s >= end)
 	return (s);
+      if (skip)
+	{
+	  skip = 0;
+	  continue;
+	}
       switch (c)
 	{
+	case L('\\'):
+	  skip = 1;
+	  break;
+
 	case L('\0'):
 	  return ((CHAR *)NULL);
 
@@ -615,12 +638,13 @@ EXTMATCH (xc, s, se, p, pe, flags)
   CHAR *psub;			/* pointer to sub-pattern */
   CHAR *pnext;			/* pointer to next sub-pattern */
   CHAR *srest;			/* pointer to rest of string */
-  int m1, m2;
+  int m1, m2, xflags;		/* xflags = flags passed to recursive matches */
 
 #if DEBUG_MATCHING
 fprintf(stderr, "extmatch: xc = %c\n", xc);
 fprintf(stderr, "extmatch: s = %s; se = %s\n", s, se);
 fprintf(stderr, "extmatch: p = %s; pe = %s\n", p, pe);
+fprintf(stderr, "extmatch: flags = %d\n", flags);
 #endif
 
   prest = PATSCAN (p + (*p == L('(')), pe, 0); /* ) */
@@ -654,8 +678,12 @@ fprintf(stderr, "extmatch: p = %s; pe = %s\n", p, pe);
 		 string matches the rest of the pattern.  Also handle
 		 multiple matches of the pattern. */
 	      if (m1)
-		m2 = (GMATCH (srest, se, prest, pe, flags) == 0) ||
-		      (s != srest && GMATCH (srest, se, p - 1, pe, flags) == 0);
+		{
+		  /* if srest > s, we are not at start of string */
+		  xflags = (srest > s) ? (flags & ~FNM_PERIOD) : flags;
+		  m2 = (GMATCH (srest, se, prest, pe, xflags) == 0) ||
+			(s != srest && GMATCH (srest, se, p - 1, pe, xflags) == 0);
+		}
 	      if (m1 && m2)
 		return (0);
 	    }
@@ -665,7 +693,7 @@ fprintf(stderr, "extmatch: p = %s; pe = %s\n", p, pe);
       return (FNM_NOMATCH);
 
     case L('?'):		/* match zero or one of the patterns */
-    case L('@'):		/* match exactly one of the patterns */
+    case L('@'):		/* match one (or more) of the patterns */
       /* If we can get away with no matches, don't even bother.  Just
 	 call gmatch on the rest of the pattern and return success if
 	 it succeeds. */
@@ -681,8 +709,10 @@ fprintf(stderr, "extmatch: p = %s; pe = %s\n", p, pe);
 	  srest = (prest == pe) ? se : s;
 	  for ( ; srest <= se; srest++)
 	    {
+	      /* if srest > s, we are not at start of string */
+	      xflags = (srest > s) ? (flags & ~FNM_PERIOD) : flags;
 	      if (GMATCH (s, srest, psub, pnext - 1, flags) == 0 &&
-		  GMATCH (srest, se, prest, pe, flags) == 0)
+		  GMATCH (srest, se, prest, pe, xflags) == 0)
 		return (0);
 	    }
 	  if (pnext == prest)
@@ -703,7 +733,9 @@ fprintf(stderr, "extmatch: p = %s; pe = %s\n", p, pe);
 	      if (pnext == prest)
 		break;
 	    }
-	  if (m1 == 0 && GMATCH (srest, se, prest, pe, flags) == 0)
+	  /* if srest > s, we are not at start of string */
+	  xflags = (srest > s) ? (flags & ~FNM_PERIOD) : flags;
+	  if (m1 == 0 && GMATCH (srest, se, prest, pe, xflags) == 0)
 	    return (0);
 	}
       return (FNM_NOMATCH);

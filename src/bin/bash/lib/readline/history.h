@@ -1,23 +1,23 @@
-/* History.h -- the names of functions that you can call in history. */
-/* Copyright (C) 1989, 1992 Free Software Foundation, Inc.
+/* history.h -- the names of functions that you can call in history. */
 
-   This file contains the GNU History Library (the Library), a set of
+/* Copyright (C) 1989-2009 Free Software Foundation, Inc.
+
+   This file contains the GNU History Library (History), a set of
    routines for managing the text of previously typed lines.
 
-   The Library is free software; you can redistribute it and/or modify
+   History is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   The Library is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
+   History is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   The GNU General Public License is often shipped with GNU software, and
-   is generally kept in a file called COPYING or LICENSE.  If you do not
-   have a copy of the license, write to the Free Software Foundation,
-   59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with History.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef _HISTORY_H_
 #define _HISTORY_H_
@@ -25,6 +25,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <time.h>		/* XXX - for history timestamp code */
 
 #if defined READLINE_LIBRARY
 #  include "rlstdc.h"
@@ -43,8 +45,12 @@ typedef char *histdata_t;
 /* The structure used to store a history entry. */
 typedef struct _hist_entry {
   char *line;
+  char *timestamp;		/* char * rather than time_t for read/write */
   histdata_t data;
 } HIST_ENTRY;
+
+/* Size of the history-library-managed space in history entry HS. */
+#define HISTENT_BYTES(hs)	(strlen ((hs)->line) + strlen ((hs)->timestamp))
 
 /* A structure used to pass the current state of the history stuff around. */
 typedef struct _hist_state {
@@ -76,10 +82,18 @@ extern void history_set_history_state PARAMS((HISTORY_STATE *));
    The associated data field (if any) is set to NULL. */
 extern void add_history PARAMS((const char *));
 
+/* Change the timestamp associated with the most recent history entry to
+   STRING. */
+extern void add_history_time PARAMS((const char *));
+
 /* A reasonably useless function, only here for completeness.  WHICH
    is the magic number that tells us which element to delete.  The
    elements are numbered from 0. */
 extern HIST_ENTRY *remove_history PARAMS((int));
+
+/* Free the history entry H and return any application-specific data
+   associated with it. */
+extern histdata_t free_history_entry PARAMS((HIST_ENTRY *));
 
 /* Make the history entry at WHICH have LINE and DATA.  This returns
    the old entry so you can dispose of the data.  In the case of an
@@ -118,6 +132,10 @@ extern HIST_ENTRY *current_history PARAMS((void));
 /* Return the history entry which is logically at OFFSET in the history
    array.  OFFSET is relative to history_base. */
 extern HIST_ENTRY *history_get PARAMS((int));
+
+/* Return the timestamp associated with the HIST_ENTRY * passed as an
+   argument */
+extern time_t history_get_time PARAMS((HIST_ENTRY *));
 
 /* Return the number of bytes that the primary history entries are using.
    This just adds up the lengths of the_history->lines. */
@@ -230,6 +248,8 @@ extern char history_comment_char;
 extern char *history_no_expand_chars;
 extern char *history_search_delimiter_chars;
 extern int history_quotes_inhibit_expansion;
+
+extern int history_write_timestamps;
 
 /* Backwards compatibility */
 extern int max_input_history;

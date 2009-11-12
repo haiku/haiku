@@ -1,42 +1,55 @@
 This file is trap.def, from which is created trap.c.
 It implements the builtin "trap" in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES trap.c
 
 $BUILTIN trap
 $FUNCTION trap_builtin
-$SHORT_DOC trap [arg] [signal_spec ...] or trap -l
-The command ARG is to be read and executed when the shell receives
-signal(s) SIGNAL_SPEC.  If ARG is absent all specified signals are
-reset to their original values.  If ARG is the null string each
-SIGNAL_SPEC is ignored by the shell and by the commands it invokes.
-If a SIGNAL_SPEC is EXIT (0) the command ARG is executed on exit from
-the shell.  If a SIGNAL_SPEC is DEBUG, ARG is executed after every
-command.  If ARG is `-p' then the trap commands associated with
-each SIGNAL_SPEC are displayed.  If no arguments are supplied or if
-only `-p' is given, trap prints the list of commands associated with
-each signal number.  Each SIGNAL_SPEC is either a signal name in <signal.h>
-or a signal number.  `trap -l' prints a list of signal names and their
-corresponding numbers.  Note that a signal can be sent to the shell
-with "kill -signal $$".
+$SHORT_DOC trap [-lp] [[arg] signal_spec ...]
+Trap signals and other events.
+
+Defines and activates handlers to be run when the shell receives signals
+or other conditions.
+
+ARG is a command to be read and executed when the shell receives the
+signal(s) SIGNAL_SPEC.  If ARG is absent (and a single SIGNAL_SPEC
+is supplied) or `-', each specified signal is reset to its original
+value.  If ARG is the null string each SIGNAL_SPEC is ignored by the
+shell and by the commands it invokes.
+
+If a SIGNAL_SPEC is EXIT (0) ARG is executed on exit from the shell.  If
+a SIGNAL_SPEC is DEBUG, ARG is executed before every simple command.
+
+If no arguments are supplied, trap prints the list of commands associated
+with each signal.
+
+Options:
+  -l	print a list of signal names and their corresponding numbers
+  -p	display the trap commands associated with each SIGNAL_SPEC
+
+Each SIGNAL_SPEC is either a signal name in <signal.h> or a signal number.
+Signal names are case insensitive and the SIG prefix is optional.  A
+signal may be sent to the shell with "kill -signal $$".
+
+Exit Status:
+Returns success unless a SIGSPEC is invalid or an invalid option is given.
 $END
 
 #include <config.h>
@@ -108,24 +121,43 @@ trap_builtin (list)
     }
   list = loptend;
 
+  opt = DSIG_NOCASE|DSIG_SIGPREFIX;	/* flags for decode_signal */
+
   if (list_signal_names)
-    return (display_signal_list ((WORD_LIST *)NULL, 1));
+    return (sh_chkwrite (display_signal_list ((WORD_LIST *)NULL, 1)));
   else if (display || list == 0)
-    return (display_traps (list));
+    return (sh_chkwrite (display_traps (list)));
   else
     {
       char *first_arg;
-      int operation, sig;
+      int operation, sig, first_signal;
 
       operation = SET;
       first_arg = list->word->word;
-      if (first_arg && *first_arg && (*first_arg != '-' || first_arg[1]) &&
-		signal_object_p (first_arg))
+      first_signal = first_arg && *first_arg && all_digits (first_arg) && signal_object_p (first_arg, opt);
+
+      /* Backwards compatibility.  XXX - question about whether or not we
+	 should throw an error if an all-digit argument doesn't correspond
+	 to a valid signal number (e.g., if it's `50' on a system with only
+	 32 signals).  */
+      if (first_signal)
+	operation = REVERT;
+      /* When in posix mode, the historical behavior of looking for a
+	 missing first argument is disabled.  To revert to the original
+	 signal handling disposition, use `-' as the first argument. */
+      else if (posixly_correct == 0 && first_arg && *first_arg &&
+		(*first_arg != '-' || first_arg[1]) &&
+		signal_object_p (first_arg, opt) && list->next == 0)
 	operation = REVERT;
       else
 	{
 	  list = list->next;
-	  if (*first_arg == '\0')
+	  if (list == 0)
+	    {
+	      builtin_usage ();
+	      return (EX_USAGE);
+	    }
+	  else if (*first_arg == '\0')
 	    operation = IGNORE;
 	  else if (first_arg[0] == '-' && !first_arg[1])
 	    operation = REVERT;
@@ -133,7 +165,7 @@ trap_builtin (list)
 
       while (list)
 	{
-	  sig = decode_signal (list->word->word);
+	  sig = decode_signal (list->word->word, opt);
 
 	  if (sig == NO_SIG)
 	    {
@@ -159,7 +191,7 @@ trap_builtin (list)
 			if (interactive)
 			  set_signal_handler (SIGINT, sigint_sighandler);
 			else
-			  set_signal_handler (SIGINT, termination_unwind_protect);
+			  set_signal_handler (SIGINT, termsig_sighandler);
 			break;
 
 		      case SIGQUIT:
@@ -197,7 +229,6 @@ showtrap (i)
   char *t, *p, *sn;
 
   p = trap_list[i];
-
   if (p == (char *)DEFAULT_SIG)
     return;
 
@@ -235,7 +266,7 @@ display_traps (list)
 
   for (result = EXECUTION_SUCCESS; list; list = list->next)
     {
-      i = decode_signal (list->word->word);
+      i = decode_signal (list->word->word, DSIG_NOCASE|DSIG_SIGPREFIX);
       if (i == NO_SIG)
 	{
 	  sh_invalidsig (list->word->word);

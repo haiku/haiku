@@ -1,20 +1,22 @@
-/* Convert string representation of a number into an uintmax_t value.
-   Copyright 1999, 2001 Free Software Foundation, Inc.
+/* strtoumax - convert string representation of a number into an uintmax_t value. */
 
-   This program is free software; you can redistribute it and/or modify
+/* Copyright 1999-2005 Free Software Foundation, Inc.
+
+   This file is part of GNU Bash, the Bourne Again SHell.
+
+   Bash is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   Bash is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
-
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /* Written by Paul Eggert.  Modified by Chet Ramey for Bash. */
 
 #if HAVE_CONFIG_H
@@ -46,6 +48,10 @@ extern unsigned long strtoul __P((const char *, char **, int));
 #endif
 #if !HAVE_DECL_STRTOULL && HAVE_UNSIGNED_LONG_LONG
 extern unsigned long long strtoull __P((const char *, char **, int));
+#endif
+
+#ifdef strtoumax
+#undef strtoumax
 #endif
 
 uintmax_t

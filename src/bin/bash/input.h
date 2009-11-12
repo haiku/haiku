@@ -1,21 +1,22 @@
 /* input.h -- Structures and unions used for reading input. */
-/* Copyright (C) 1993 Free Software Foundation, Inc.
+
+/* Copyright (C) 1993-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #if !defined (_INPUT_H_)
 #define _INPUT_H_
@@ -100,7 +101,7 @@ extern int stream_on_stack __P((enum stream_type));
 extern char *read_secondary_line __P((int));
 extern int find_reserved_word __P((char *));
 extern void gather_here_documents __P((void));
-extern void execute_prompt_command __P((char *));
+extern void execute_variable_command __P((char *, char *));
 
 extern int *save_token_state __P((void));
 extern void restore_token_state __P((int *));

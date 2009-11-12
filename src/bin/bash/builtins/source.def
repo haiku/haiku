@@ -1,47 +1,62 @@
 This file is source.def, from which is created source.c.
 It implements the builtins "." and  "source" in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES source.c
 
 $BUILTIN source
 $FUNCTION source_builtin
-$SHORT_DOC source filename
-Read and execute commands from FILENAME and return.  The pathnames
-in $PATH are used to find the directory containing FILENAME.
+$SHORT_DOC source filename [arguments]
+Execute commands from a file in the current shell.
+
+Read and execute commands from FILENAME in the current shell.  The
+entries in $PATH are used to find the directory containing FILENAME.
+If any ARGUMENTS are supplied, they become the positional parameters
+when FILENAME is executed.
+
+Exit Status:
+Returns the status of the last command executed in FILENAME; fails if
+FILENAME cannot be read.
 $END
+
 $BUILTIN .
 $DOCNAME dot
 $FUNCTION source_builtin
-$SHORT_DOC . filename
-Read and execute commands from FILENAME and return.  The pathnames
-in $PATH are used to find the directory containing FILENAME.
+$SHORT_DOC . filename [arguments]
+Execute commands from a file in the current shell.
+
+Read and execute commands from FILENAME in the current shell.  The
+entries in $PATH are used to find the directory containing FILENAME.
+If any ARGUMENTS are supplied, they become the positional parameters
+when FILENAME is executed.
+
+Exit Status:
+Returns the status of the last command executed in FILENAME; fails if
+FILENAME cannot be read.
 $END
-/* source.c - Implements the `.' and `source' builtins. */
 
 #include <config.h>
 
 #include "../bashtypes.h"
 #include "posixstat.h"
 #include "filecntl.h"
-#if defined (HAVE_SYS_FILE_H) 
+#if ! defined(_MINIX) && defined (HAVE_SYS_FILE_H)
 #  include <sys/file.h>
 #endif
 #include <errno.h>
@@ -51,19 +66,22 @@ $END
 #endif
 
 #include "../bashansi.h"
+#include "../bashintl.h"
 
 #include "../shell.h"
+#include "../flags.h"
 #include "../findcmd.h"
 #include "common.h"
 #include "bashgetopt.h"
+#include "../trap.h"
 
 #if !defined (errno)
 extern int errno;
 #endif /* !errno */
 
-#if defined (RESTRICTED_SHELL)
-extern int restricted;
-#endif
+extern int posixly_correct;
+
+static void maybe_pop_dollar_vars __P((void));
 
 /* If non-zero, `.' uses $PATH to look up the script to be sourced. */
 int source_uses_path = 1;
@@ -85,6 +103,8 @@ maybe_pop_dollar_vars ()
     dispose_saved_dollar_vars ();
   else
     pop_dollar_vars ();
+  if (debugging_mode)
+    pop_args ();	/* restore BASH_ARGC and BASH_ARGV */
   set_dollar_vars_unchanged ();
 }
 
@@ -97,7 +117,7 @@ source_builtin (list)
      WORD_LIST *list;
 {
   int result;
-  char *filename;
+  char *filename, *debug_trap;
 
   if (no_options (list))
     return (EX_USAGE);
@@ -105,7 +125,7 @@ source_builtin (list)
 
   if (list == 0)
     {
-      builtin_error ("filename argument required");
+      builtin_error (_("filename argument required"));
       builtin_usage ();
       return (EX_USAGE);
     }
@@ -119,13 +139,18 @@ source_builtin (list)
 #endif
 
   filename = (char *)NULL;
-  if (source_uses_path)
+  /* XXX -- should this be absolute_pathname? */
+  if (posixly_correct && strchr (list->word->word, '/'))
+    filename = savestring (list->word->word);
+  else if (absolute_pathname (list->word->word))
+    filename = savestring (list->word->word);
+  else if (source_uses_path)
     filename = find_path_file (list->word->word);
   if (filename == 0)
     {
       if (source_searches_cwd == 0)
 	{
-	  builtin_error ("%s: file not found", list->word->word);
+	  builtin_error (_("%s: file not found"), list->word->word);
 	  return (EXECUTION_FAILURE);
 	}
       else
@@ -140,10 +165,24 @@ source_builtin (list)
       push_dollar_vars ();
       add_unwind_protect ((Function *)maybe_pop_dollar_vars, (char *)NULL);
       remember_args (list->next, 1);
+      if (debugging_mode)
+	push_args (list->next);	/* Update BASH_ARGV and BASH_ARGC */
     }
   set_dollar_vars_unchanged ();
 
-  result = source_file (filename);
+  /* Don't inherit the DEBUG trap unless function_trace_mode (overloaded)
+     is set.  XXX - should sourced files inherit the RETURN trap?  Functions
+     don't. */
+  debug_trap = TRAP_STRING (DEBUG_TRAP);
+  if (debug_trap && function_trace_mode == 0)
+    {
+      debug_trap = savestring (debug_trap);
+      add_unwind_protect (xfree, debug_trap);
+      add_unwind_protect (set_debug_trap, debug_trap);
+      restore_default_signal (DEBUG_TRAP);
+    }
+
+  result = source_file (filename, (list && list->next));
 
   run_unwind_frame ("source");
 

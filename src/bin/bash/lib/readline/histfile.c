@@ -1,29 +1,33 @@
 /* histfile.c - functions to manipulate the history file. */
 
-/* Copyright (C) 1989, 1992 Free Software Foundation, Inc.
+/* Copyright (C) 1989-2009 Free Software Foundation, Inc.
 
-   This file contains the GNU History Library (the Library), a set of
+   This file contains the GNU History Library (History), a set of
    routines for managing the text of previously typed lines.
 
-   The Library is free software; you can redistribute it and/or modify
+   History is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   The Library is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
+   History is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   The GNU General Public License is often shipped with GNU software, and
-   is generally kept in a file called COPYING or LICENSE.  If you do not
-   have a copy of the license, write to the Free Software Foundation,
-   59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with History.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /* The goal is to make the implementation transparent, so that you
    don't have to know what data types are used, just what functions
    you can call.  I think I have done that. */
+
 #define READLINE_LIBRARY
+
+#if defined (__TANDEM)
+#  include <floss.h>
+#endif
 
 #if defined (HAVE_CONFIG_H)
 #  include <config.h>
@@ -32,7 +36,7 @@
 #include <stdio.h>
 
 #include <sys/types.h>
-#if defined (HAVE_SYS_FILE_H)
+#if ! defined (_MINIX) && defined (HAVE_SYS_FILE_H)
 #  include <sys/file.h>
 #endif
 #include "posixstat.h"
@@ -48,11 +52,13 @@
 #  include <unistd.h>
 #endif
 
-#if defined (__EMX__) || defined (__CYGWIN__)
+#include <ctype.h>
+
+#if defined (__EMX__)
 #  undef HAVE_MMAP
 #endif
 
-#ifdef HAVE_MMAP
+#ifdef HISTORY_USE_MMAP
 #  include <sys/mman.h>
 
 #  ifdef MAP_FILE
@@ -67,7 +73,7 @@
 #    define MAP_FAILED	((void *)-1)
 #  endif
 
-#endif /* HAVE_MMAP */
+#endif /* HISTORY_USE_MMAP */
 
 /* If we're compiling for __EMX__ (OS/2) or __CYGWIN__ (cygwin32 environment
    on win 95/98/nt), we want to open files with O_BINARY mode so that there
@@ -92,6 +98,13 @@ extern int errno;
 
 #include "rlshell.h"
 #include "xmalloc.h"
+
+/* If non-zero, we write timestamps to the history file in history_do_write() */
+int history_write_timestamps = 0;
+
+/* Does S look like the beginning of a history timestamp entry?  Placeholder
+   for more extensive tests. */
+#define HIST_TIMESTAMP_START(s)		(*(s) == history_comment_char && isdigit ((s)[1]) )
 
 /* Return the string that should be used in the place of this
    filename.  This only matters when you don't specify the
@@ -151,13 +164,20 @@ read_history_range (filename, from, to)
      const char *filename;
      int from, to;
 {
-  register char *line_start, *line_end;
-  char *input, *buffer, *bufend;
+  register char *line_start, *line_end, *p;
+  char *input, *buffer, *bufend, *last_ts;
   int file, current_line, chars_read;
   struct stat finfo;
   size_t file_size;
+#if defined (EFBIG)
+  int overflow_errno = EFBIG;
+#elif defined (EOVERFLOW)
+  int overflow_errno = EOVERFLOW;
+#else
+  int overflow_errno = EIO;
+#endif
 
-  buffer = (char *)NULL;
+  buffer = last_ts = (char *)NULL;
   input = history_filename (filename);
   file = open (input, O_RDONLY|O_BINARY, 0666);
 
@@ -169,37 +189,42 @@ read_history_range (filename, from, to)
   /* check for overflow on very large files */
   if (file_size != finfo.st_size || file_size + 1 < file_size)
     {
-#if defined (EFBIG)
-      errno = EFBIG;
-#elif defined (EOVERFLOW)
-      errno = EOVERFLOW;
-#endif
+      errno = overflow_errno;
       goto error_and_exit;
     }
 
-#ifdef HAVE_MMAP
+#ifdef HISTORY_USE_MMAP
   /* We map read/write and private so we can change newlines to NULs without
      affecting the underlying object. */
   buffer = (char *)mmap (0, file_size, PROT_READ|PROT_WRITE, MAP_RFLAGS, file, 0);
   if ((void *)buffer == MAP_FAILED)
-    goto error_and_exit;
+    {
+      errno = overflow_errno;
+      goto error_and_exit;
+    }
   chars_read = file_size;
 #else
   buffer = (char *)malloc (file_size + 1);
   if (buffer == 0)
-    goto error_and_exit;
+    {
+      errno = overflow_errno;
+      goto error_and_exit;
+    }
 
   chars_read = read (file, buffer, file_size);
 #endif
   if (chars_read < 0)
     {
   error_and_exit:
-      chars_read = errno;
+      if (errno != 0)
+	chars_read = errno;
+      else
+	chars_read = EIO;
       if (file >= 0)
 	close (file);
 
       FREE (input);
-#ifndef HAVE_MMAP
+#ifndef HISTORY_USE_MMAP
       FREE (buffer);
 #endif
 
@@ -220,18 +245,41 @@ read_history_range (filename, from, to)
   for (line_start = line_end = buffer; line_end < bufend && current_line < from; line_end++)
     if (*line_end == '\n')
       {
-	current_line++;
-	line_start = line_end + 1;
+      	p = line_end + 1;
+      	/* If we see something we think is a timestamp, continue with this
+	   line.  We should check more extensively here... */
+	if (HIST_TIMESTAMP_START(p) == 0)
+	  current_line++;
+	line_start = p;
       }
 
   /* If there are lines left to gobble, then gobble them now. */
   for (line_end = line_start; line_end < bufend; line_end++)
     if (*line_end == '\n')
       {
-	*line_end = '\0';
+	/* Change to allow Windows-like \r\n end of line delimiter. */
+	if (line_end > line_start && line_end[-1] == '\r')
+	  line_end[-1] = '\0';
+	else
+	  *line_end = '\0';
 
 	if (*line_start)
-	  add_history (line_start);
+	  {
+	    if (HIST_TIMESTAMP_START(line_start) == 0)
+	      {
+		add_history (line_start);
+		if (last_ts)
+		  {
+		    add_history_time (last_ts);
+		    last_ts = NULL;
+		  }
+	      }
+	    else
+	      {
+		last_ts = line_start;
+		current_line--;
+	      }
+	  }
 
 	current_line++;
 
@@ -242,7 +290,7 @@ read_history_range (filename, from, to)
       }
 
   FREE (input);
-#ifndef HAVE_MMAP
+#ifndef HISTORY_USE_MMAP
   FREE (buffer);
 #else
   munmap (buffer, file_size);
@@ -259,7 +307,7 @@ history_truncate_file (fname, lines)
      const char *fname;
      int lines;
 {
-  char *buffer, *filename, *bp;
+  char *buffer, *filename, *bp, *bp1;		/* bp1 == bp+1 */
   int file, chars_read, rv;
   struct stat finfo;
   size_t file_size;
@@ -322,11 +370,14 @@ history_truncate_file (fname, lines)
     }
 
   /* Count backwards from the end of buffer until we have passed
-     LINES lines. */
-  for (bp = buffer + chars_read - 1; lines && bp > buffer; bp--)
+     LINES lines.  bp1 is set funny initially.  But since bp[1] can't
+     be a comment character (since it's off the end) and *bp can't be
+     both a newline and the history comment character, it should be OK. */
+  for (bp1 = bp = buffer + chars_read - 1; lines && bp > buffer; bp--)
     {
-      if (*bp == '\n')
+      if (*bp == '\n' && HIST_TIMESTAMP_START(bp1) == 0)
 	lines--;
+      bp1 = bp;
     }
 
   /* If this is the first line, then the file contains exactly the
@@ -335,11 +386,14 @@ history_truncate_file (fname, lines)
      the current value of i and 0.  Otherwise, write from the start of
      this line until the end of the buffer. */
   for ( ; bp > buffer; bp--)
-    if (*bp == '\n')
-      {
-	bp++;
-	break;
-      }
+    {
+      if (*bp == '\n' && HIST_TIMESTAMP_START(bp1) == 0)
+        {
+	  bp++;
+	  break;
+        }
+      bp1 = bp;
+    }
 
   /* Write only if there are more lines in the file than we want to
      truncate to. */
@@ -368,9 +422,9 @@ history_do_write (filename, nelements, overwrite)
   register int i;
   char *output;
   int file, mode, rv;
+#ifdef HISTORY_USE_MMAP
   size_t cursize;
 
-#ifdef HAVE_MMAP
   mode = overwrite ? O_RDWR|O_CREAT|O_TRUNC|O_BINARY : O_RDWR|O_APPEND|O_BINARY;
 #else
   mode = overwrite ? O_WRONLY|O_CREAT|O_TRUNC|O_BINARY : O_WRONLY|O_APPEND|O_BINARY;
@@ -384,7 +438,7 @@ history_do_write (filename, nelements, overwrite)
       return (errno);
     }
 
-#ifdef HAVE_MMAP
+#ifdef HISTORY_USE_MMAP
   cursize = overwrite ? 0 : lseek (file, 0, SEEK_END);
 #endif
 
@@ -402,10 +456,18 @@ history_do_write (filename, nelements, overwrite)
     the_history = history_list ();
     /* Calculate the total number of bytes to write. */
     for (buffer_size = 0, i = history_length - nelements; i < history_length; i++)
-      buffer_size += 1 + strlen (the_history[i]->line);
+#if 0
+      buffer_size += 2 + HISTENT_BYTES (the_history[i]);
+#else
+      {
+	if (history_write_timestamps && the_history[i]->timestamp && the_history[i]->timestamp[0])
+	  buffer_size += strlen (the_history[i]->timestamp) + 1;
+	buffer_size += strlen (the_history[i]->line) + 1;
+      }
+#endif
 
     /* Allocate the buffer, and fill it. */
-#ifdef HAVE_MMAP
+#ifdef HISTORY_USE_MMAP
     if (ftruncate (file, buffer_size+cursize) == -1)
       goto mmap_error;
     buffer = (char *)mmap (0, buffer_size, PROT_READ|PROT_WRITE, MAP_WFLAGS, file, cursize);
@@ -430,12 +492,18 @@ mmap_error:
 
     for (j = 0, i = history_length - nelements; i < history_length; i++)
       {
+	if (history_write_timestamps && the_history[i]->timestamp && the_history[i]->timestamp[0])
+	  {
+	    strcpy (buffer + j, the_history[i]->timestamp);
+	    j += strlen (the_history[i]->timestamp);
+	    buffer[j++] = '\n';
+	  }
 	strcpy (buffer + j, the_history[i]->line);
 	j += strlen (the_history[i]->line);
 	buffer[j++] = '\n';
       }
 
-#ifdef HAVE_MMAP
+#ifdef HISTORY_USE_MMAP
     if (msync (buffer, buffer_size, 0) != 0 || munmap (buffer, buffer_size) != 0)
       rv = errno;
 #else

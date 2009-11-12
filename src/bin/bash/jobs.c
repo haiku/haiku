@@ -1,25 +1,25 @@
-/* The thing that makes children, remembers them, and contains wait loops. */
+/* jobs.c - functions that make children, remember them, and handle their termination. */
 
 /* This file works with both POSIX and BSD systems.  It implements job
    control. */
 
-/* Copyright (C) 1989, 1992 Free Software Foundation, Inc.
+/* Copyright (C) 1989-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "config.h"
 
@@ -39,9 +39,10 @@
 #  include <sys/resource.h>
 #endif /* !_POSIX_VERSION && HAVE_SYS_RESOURCE_H && HAVE_WAIT3 && !RLIMTYPE */
 
-#ifdef HAVE_SYS_FILE_H
+#if defined (HAVE_SYS_FILE_H)
 #  include <sys/file.h>
 #endif
+
 #include "filecntl.h"
 #include <sys/ioctl.h>
 #include <sys/param.h>
@@ -62,20 +63,11 @@
 #  include <bsdtty.h>
 #endif /* hpux && !TERMIOS_TTY_DRIVER */
 
-#if !defined (STRUCT_WINSIZE_IN_SYS_IOCTL)
-/* For struct winsize on SCO */
-/*   sys/ptem.h has winsize but needs mblk_t from sys/stream.h */
-#  if defined (HAVE_SYS_PTEM_H) && defined (TIOCGWINSZ) && defined (SIGWINCH)
-#    if defined (HAVE_SYS_STREAM_H)
-#      include <sys/stream.h>
-#    endif
-#    include <sys/ptem.h>
-#  endif /* HAVE_SYS_PTEM_H && TIOCGWINSZ && SIGWINCH */
-#endif /* !STRUCT_WINSIZE_IN_SYS_IOCTL */
-
 #include "bashansi.h"
+#include "bashintl.h"
 #include "shell.h"
 #include "jobs.h"
+#include "execute_cmd.h"
 #include "flags.h"
 
 #include "builtins/builtext.h"
@@ -86,7 +78,15 @@ extern int errno;
 #endif /* !errno */
 
 #define DEFAULT_CHILD_MAX 32
-#define MAX_JOBS_IN_ARRAY 4096		/* testing */
+#if !defined (DEBUG)
+#define MAX_JOBS_IN_ARRAY 4096		/* production */
+#else
+#define MAX_JOBS_IN_ARRAY 128		/* testing */
+#endif
+
+/* Flag values for second argument to delete_job */
+#define DEL_WARNSTOPPED		1	/* warn about deleting stopped jobs */
+#define DEL_NOBGPID		2	/* don't add pgrp leader to bgpids */
 
 /* Take care of system dependencies that must be handled when waiting for
    children.  The arguments to the WAITPID macro match those to the Posix.1
@@ -127,8 +127,11 @@ extern int errno;
 #endif /* !MUST_REINSTALL_SIGHANDLERS */
 
 /* Some systems let waitpid(2) tell callers about stopped children. */
-#if !defined (WCONTINUED)
+#if !defined (WCONTINUED) || defined (WCONTINUED_BROKEN)
+#  undef WCONTINUED
 #  define WCONTINUED 0
+#endif
+#if !defined (WIFCONTINUED)
 #  define WIFCONTINUED(s)	(0)
 #endif
 
@@ -137,16 +140,14 @@ extern int errno;
 
 typedef int sh_job_map_func_t __P((JOB *, int, int, int));
 
-#if defined (READLINE)
-extern void rl_set_screen_size __P((int, int));
-#endif
-
 /* Variables used here but defined in other files. */
 extern int subshell_environment, line_number;
 extern int posixly_correct, shell_level;
-extern int interrupt_immediately, last_command_exit_value;
+extern int last_command_exit_value, last_command_exit_signal;
 extern int loop_level, breaking;
+extern int executing_list;
 extern int sourcelevel;
+extern int running_trap;
 extern sh_builtin_func_t *this_shell_builtin;
 extern char *shell_name, *this_command_name;
 extern sigset_t top_level_mask;
@@ -154,11 +155,18 @@ extern procenv_t wait_intr_buf;
 extern int wait_signal_received;
 extern WORD_LIST *subst_assign_varlist;
 
+static struct jobstats zerojs = { -1L, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NO_JOB, NO_JOB, 0, 0 };
+struct jobstats js = { -1L, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NO_JOB, NO_JOB, 0, 0 };
+
+struct bgpids bgpids = { 0, 0, 0 };
+
 /* The array of known jobs. */
 JOB **jobs = (JOB **)NULL;
 
+#if 0
 /* The number of slots currently allocated to JOBS. */
 int job_slots = 0;
+#endif
 
 /* The controlling tty for this shell. */
 int shell_tty = -1;
@@ -182,11 +190,13 @@ pid_t pipeline_pgrp = (pid_t)0;
 int pgrp_pipe[2] = { -1, -1 };
 #endif
 
+#if 0
 /* The job which is current; i.e. the one that `%+' stands for. */
 int current_job = NO_JOB;
 
 /* The previous job; i.e. the one that `%-' stands for. */
 int previous_job = NO_JOB;
+#endif
 
 /* Last child made by the shell.  */
 pid_t last_made_pid = NO_PID;
@@ -209,24 +219,22 @@ int check_window_size;
 
 /* Functions local to this file. */
 
-static void get_new_window_size __P((int));
-
-static void run_sigchld_trap __P((int));
-
 static sighandler wait_sigint_handler __P((int));
 static sighandler sigchld_handler __P((int));
-static sighandler sigwinch_sighandler __P((int));
 static sighandler sigcont_sighandler __P((int));
 static sighandler sigstop_sighandler __P((int));
 
 static int waitchld __P((pid_t, int));
 
 static PROCESS *find_pipeline __P((pid_t, int, int *));
+static PROCESS *find_process __P((pid_t, int, int *));
 
 static char *current_working_directory __P((void));
 static char *job_working_directory __P((void));
+static char *j_strsignal __P((int));
 static char *printable_job_status __P((int, PROCESS *, int));
 
+static PROCESS *find_last_proc __P((int, int));
 static pid_t find_last_pid __P((int, int));
 
 static int set_new_line_discipline __P((int));
@@ -234,18 +242,24 @@ static int map_over_jobs __P((sh_job_map_func_t *, int, int));
 static int job_last_stopped __P((int));
 static int job_last_running __P((int));
 static int most_recent_job_in_state __P((int, JOB_STATE));
-static int find_job __P((pid_t, int));
+static int find_job __P((pid_t, int, PROCESS **));
 static int print_job __P((JOB *, int, int, int));
 static int process_exit_status __P((WAIT));
+static int process_exit_signal __P((WAIT));
 static int job_exit_status __P((int));
+static int job_exit_signal __P((int));
 static int set_job_status_and_cleanup __P((int));
 
+static WAIT job_signal_status __P((int));
 static WAIT raw_job_exit_status __P((int));
 
 static void notify_of_job_status __P((void));
+static void reset_job_indices __P((void));
 static void cleanup_dead_jobs __P((void));
+static int processes_in_job __P((int));
+static void realloc_jobs_list __P((void));
 static int compact_jobs_list __P((int));
-static void discard_pipeline __P((PROCESS *));
+static int discard_pipeline __P((PROCESS *));
 static void add_process __P((char *, pid_t));
 static void print_pipeline __P((PROCESS *, int, int, FILE *));
 static void pretty_print_job __P((int, int, FILE *));
@@ -253,13 +267,20 @@ static void set_current_job __P((int));
 static void reset_current __P((void));
 static void set_job_running __P((int));
 static void setjstatus __P((int));
+static int maybe_give_terminal_to __P((pid_t, pid_t, int));
 static void mark_all_jobs_as_dead __P((void));
 static void mark_dead_jobs_as_notified __P((int));
 static void restore_sigint_handler __P((void));
 #if defined (PGRP_PIPE)
 static void pipe_read __P((int *));
-static void pipe_close __P((int *));
 #endif
+
+static struct pidstat *bgp_alloc __P((pid_t, int));
+static struct pidstat *bgp_add __P((pid_t, int));
+static int bgp_delete __P((pid_t));
+static void bgp_clear __P((void));
+static int bgp_search __P((pid_t));
+static void bgp_prune __P((void));
 
 #if defined (ARRAY_VARS)
 static int *pstatuses;		/* list of pipeline statuses */
@@ -283,10 +304,6 @@ static int queue_sigchld;
 static SigHandler *old_tstp, *old_ttou, *old_ttin;
 static SigHandler *old_cont = (SigHandler *)SIG_DFL;
 
-#if defined (TIOCGWINSZ) && defined (SIGWINCH)
-static SigHandler *old_winch = (SigHandler *)SIG_DFL;
-#endif
-
 /* A place to temporarily save the current pipeline. */
 static PROCESS *saved_pipeline;
 static int saved_already_making_children;
@@ -299,7 +316,9 @@ static int jobs_list_frozen;
 
 static char retcode_name_buffer[64];
 
-static long child_max = -1L;
+/* flags to detect pid wraparound */
+static pid_t first_pid = NO_PID;
+static int pid_wrap = -1;
 
 #if !defined (_POSIX_VERSION)
 
@@ -321,6 +340,15 @@ tcgetpgrp (fd)
 }
 
 #endif /* !_POSIX_VERSION */
+
+/* Initialize the global job stats structure and other bookkeeping variables */
+void
+init_job_stats ()
+{
+  js = zerojs;
+  first_pid = NO_PID;
+  pid_wrap = -1;
+}
 
 /* Return the working directory for the current process.  Unlike
    job_working_directory, this does not call malloc (), nor do any
@@ -383,11 +411,16 @@ stop_making_children ()
 void
 cleanup_the_pipeline ()
 {
-  if (the_pipeline)
-    {
-      discard_pipeline (the_pipeline);
-      the_pipeline = (PROCESS *)NULL;
-    }
+  PROCESS *disposer;
+  sigset_t set, oset;
+
+  BLOCK_CHILD (set, oset);
+  disposer = the_pipeline;
+  the_pipeline = (PROCESS *)NULL;
+  UNBLOCK_CHILD (oset);
+
+  if (disposer)
+    discard_pipeline (disposer);
 }
 
 void
@@ -395,9 +428,9 @@ save_pipeline (clear)
      int clear;
 {
   saved_pipeline = the_pipeline;
-  saved_already_making_children = already_making_children;
   if (clear)
     the_pipeline = (PROCESS *)NULL;
+  saved_already_making_children = already_making_children;
 }
 
 void
@@ -422,7 +455,7 @@ start_pipeline ()
       cleanup_the_pipeline ();
       pipeline_pgrp = 0;
 #if defined (PGRP_PIPE)
-      pipe_close (pgrp_pipe);
+      sh_closepipe (pgrp_pipe);
 #endif
     }
 
@@ -430,7 +463,7 @@ start_pipeline ()
   if (job_control)
     {
       if (pipe (pgrp_pipe) == -1)
-	sys_error ("start_pipeline: pgrp pipe");
+	sys_error (_("start_pipeline: pgrp pipe"));
     }
 #endif
 }
@@ -452,53 +485,66 @@ stop_pipeline (async, deferred)
 
 #if defined (PGRP_PIPE)
   /* The parent closes the process group synchronization pipe. */
-  pipe_close (pgrp_pipe);
+  sh_closepipe (pgrp_pipe);
 #endif
 
   cleanup_dead_jobs ();
 
-  if (job_slots == 0)
+  if (js.j_jobslots == 0)
     {
-      job_slots = JOB_SLOTS;
-      jobs = (JOB **)xmalloc (job_slots * sizeof (JOB *));
+      js.j_jobslots = JOB_SLOTS;
+      jobs = (JOB **)xmalloc (js.j_jobslots * sizeof (JOB *));
 
       /* Now blank out these new entries. */
-      for (i = 0; i < job_slots; i++)
+      for (i = 0; i < js.j_jobslots; i++)
 	jobs[i] = (JOB *)NULL;
+
+      js.j_firstj = js.j_lastj = js.j_njobs = 0;
     }
 
   /* Scan from the last slot backward, looking for the next free one. */
+  /* XXX - revisit this interactive assumption */
+  /* XXX - this way for now */
   if (interactive)
     {
-      for (i = job_slots; i; i--)
+      for (i = js.j_jobslots; i; i--)
 	if (jobs[i - 1])
 	  break;
     }
   else
     {
-      /* If we're not interactive, we don't need to monotonically increase
-	 the job number (in fact, we don't care about the job number at all),
-	 so we can simply scan for the first free slot.  This helps to keep
-	 us from continuously reallocating the jobs array when running
-	 certain kinds of shell loops, and saves time spent searching. */
-      for (i = 0; i < job_slots; i++)
+#if 0
+      /* This wraps around, but makes it inconvenient to extend the array */
+      for (i = js.j_lastj+1; i != js.j_lastj; i++)
+	{
+	  if (i >= js.j_jobslots)
+	    i = 0;
+	  if (jobs[i] == 0)
+	    break;
+	}	
+      if (i == js.j_lastj)
+        i = js.j_jobslots;
+#else
+      /* This doesn't wrap around yet. */
+      for (i = js.j_lastj ? js.j_lastj + 1 : js.j_lastj; i < js.j_jobslots; i++)
 	if (jobs[i] == 0)
 	  break;
+#endif
     }
 
   /* Do we need more room? */
 
   /* First try compaction */
-  if (subshell_environment && interactive_shell && i == job_slots && job_slots >= MAX_JOBS_IN_ARRAY)
+  if ((interactive_shell == 0 || subshell_environment) && i == js.j_jobslots && js.j_jobslots >= MAX_JOBS_IN_ARRAY)
     i = compact_jobs_list (0);
 
   /* If we can't compact, reallocate */
-  if (i == job_slots)
+  if (i == js.j_jobslots)
     {
-      job_slots += JOB_SLOTS;
-      jobs = (JOB **)xrealloc (jobs, ((1 + job_slots) * sizeof (JOB *)));
+      js.j_jobslots += JOB_SLOTS;
+      jobs = (JOB **)xrealloc (jobs, (js.j_jobslots * sizeof (JOB *)));
 
-      for (j = i; j < job_slots; j++)
+      for (j = i; j < js.j_jobslots; j++)
 	jobs[j] = (JOB *)NULL;
     }
 
@@ -506,11 +552,11 @@ stop_pipeline (async, deferred)
   if (the_pipeline)
     {
       register PROCESS *p;
-      int any_alive, any_stopped;
+      int any_running, any_stopped, n;
 
       newjob = (JOB *)xmalloc (sizeof (JOB));
 
-      for (p = the_pipeline; p->next != the_pipeline; p = p->next)
+      for (n = 1, p = the_pipeline; p->next != the_pipeline; n++, p = p->next)
 	;
       p->next = (PROCESS *)NULL;
       newjob->pipe = REVERSE_LIST (the_pipeline, PROCESS *);
@@ -530,16 +576,16 @@ stop_pipeline (async, deferred)
 
       /* Set the state of this pipeline. */
       p = newjob->pipe;
-      any_alive = any_stopped = 0;
+      any_running = any_stopped = 0;
       do
 	{
-	  any_alive |= p->running;
-	  any_stopped |= WIFSTOPPED (p->status);
+	  any_running |= PRUNNING (p);
+	  any_stopped |= PSTOPPED (p);
 	  p = p->next;
 	}
       while (p != newjob->pipe);
 
-      newjob->state = any_alive ? JRUNNING : (any_stopped ? JSTOPPED : JDEAD);
+      newjob->state = any_running ? JRUNNING : (any_stopped ? JSTOPPED : JDEAD);
       newjob->wd = job_working_directory ();
       newjob->deferred = deferred;
 
@@ -549,14 +595,30 @@ stop_pipeline (async, deferred)
       jobs[i] = newjob;
       if (newjob->state == JDEAD && (newjob->flags & J_FOREGROUND))
 	setjstatus (i);
+      if (newjob->state == JDEAD)
+	{
+	  js.c_reaped += n;	/* wouldn't have been done since this was not part of a job */
+	  js.j_ndead++;
+	}
+      js.c_injobs += n;
+
+      js.j_lastj = i;
+      js.j_njobs++;
     }
   else
     newjob = (JOB *)NULL;
 
+  if (newjob)
+    js.j_lastmade = newjob;
+
   if (async)
     {
       if (newjob)
-	newjob->flags &= ~J_FOREGROUND;
+	{
+	  newjob->flags &= ~J_FOREGROUND;
+	  newjob->flags |= J_ASYNC;
+	  js.j_lastasync = newjob;
+	}
       reset_current ();
     }
   else
@@ -572,17 +634,187 @@ stop_pipeline (async, deferred)
 	   * once in the parent and once in each child.  This is where
 	   * the parent gives it away.
 	   *
+	   * Don't give the terminal away if this shell is an asynchronous
+	   * subshell.
+	   *
 	   */
-	  if (job_control && newjob->pgrp)
-	    give_terminal_to (newjob->pgrp, 0);
+	  if (job_control && newjob->pgrp && (subshell_environment&SUBSHELL_ASYNC) == 0)
+	    maybe_give_terminal_to (shell_pgrp, newjob->pgrp, 0);
 	}
     }
 
   stop_making_children ();
   UNBLOCK_CHILD (oset);
-  return (current_job);
+  return (js.j_current);
 }
 
+/* Functions to manage the list of exited background pids whose status has
+   been saved. */
+
+static struct pidstat *
+bgp_alloc (pid, status)
+     pid_t pid;
+     int status;
+{
+  struct pidstat *ps;
+
+  ps = (struct pidstat *)xmalloc (sizeof (struct pidstat));
+  ps->pid = pid;
+  ps->status = status;
+  ps->next = (struct pidstat *)0;
+  return ps;
+}
+
+static struct pidstat *
+bgp_add (pid, status)
+     pid_t pid;
+     int status;
+{
+  struct pidstat *ps;
+
+  ps = bgp_alloc (pid, status);
+
+  if (bgpids.list == 0)
+    {
+      bgpids.list = bgpids.end = ps;
+      bgpids.npid = 0;			/* just to make sure */
+    }
+  else
+    {
+      bgpids.end->next = ps;
+      bgpids.end = ps;
+    }
+  bgpids.npid++;
+
+  if (bgpids.npid > js.c_childmax)
+    bgp_prune ();
+
+  return ps;
+}
+
+static int
+bgp_delete (pid)
+     pid_t pid;
+{
+  struct pidstat *prev, *p;
+
+  for (prev = p = bgpids.list; p; prev = p, p = p->next)
+    if (p->pid == pid)
+      {
+        prev->next = p->next;	/* remove from list */
+        break;
+      }
+
+  if (p == 0)
+    return 0;		/* not found */
+
+#if defined (DEBUG)
+  itrace("bgp_delete: deleting %d", pid);
+#endif
+
+  /* Housekeeping in the border cases. */
+  if (p == bgpids.list)
+    bgpids.list = bgpids.list->next;
+  else if (p == bgpids.end)
+    bgpids.end = prev;
+
+  bgpids.npid--;
+  if (bgpids.npid == 0)
+    bgpids.list = bgpids.end = 0;
+  else if (bgpids.npid == 1)
+    bgpids.end = bgpids.list;		/* just to make sure */
+
+  free (p);
+  return 1;
+}
+
+/* Clear out the list of saved statuses */
+static void
+bgp_clear ()
+{
+  struct pidstat *ps, *p;
+
+  for (ps = bgpids.list; ps; )
+    {
+      p = ps;
+      ps = ps->next;
+      free (p);
+    }
+  bgpids.list = bgpids.end = 0;
+  bgpids.npid = 0;
+}
+
+/* Search for PID in the list of saved background pids; return its status if
+   found.  If not found, return -1. */
+static int
+bgp_search (pid)
+     pid_t pid;
+{
+  struct pidstat *ps;
+
+  for (ps = bgpids.list ; ps; ps = ps->next)
+    if (ps->pid == pid)
+      return ps->status;
+  return -1;
+}
+
+static void
+bgp_prune ()
+{
+  struct pidstat *ps;
+
+  while (bgpids.npid > js.c_childmax)
+    {
+      ps = bgpids.list;
+      bgpids.list = bgpids.list->next;
+      free (ps);
+      bgpids.npid--;
+    }
+}
+
+/* Reset the values of js.j_lastj and js.j_firstj after one or both have
+   been deleted.  The caller should check whether js.j_njobs is 0 before
+   calling this.  This wraps around, but the rest of the code does not.  At
+   this point, it should not matter. */
+static void
+reset_job_indices ()
+{
+  int old;
+
+  if (jobs[js.j_firstj] == 0)
+    {
+      old = js.j_firstj++;
+      if (old >= js.j_jobslots)
+	old = js.j_jobslots - 1;
+      while (js.j_firstj != old)
+	{
+	  if (js.j_firstj >= js.j_jobslots)
+	    js.j_firstj = 0;
+	  if (jobs[js.j_firstj] || js.j_firstj == old)	/* needed if old == 0 */
+	    break;
+	  js.j_firstj++;
+	}
+      if (js.j_firstj == old)
+        js.j_firstj = js.j_lastj = js.j_njobs = 0;
+    }
+  if (jobs[js.j_lastj] == 0)
+    {
+      old = js.j_lastj--;
+      if (old < 0)
+	old = 0;
+      while (js.j_lastj != old)
+	{
+	  if (js.j_lastj < 0)
+	    js.j_lastj = js.j_jobslots - 1;
+	  if (jobs[js.j_lastj] || js.j_lastj == old)	/* needed if old == js.j_jobslots */
+	    break;
+	  js.j_lastj--;
+	}
+      if (js.j_lastj == old)
+        js.j_firstj = js.j_lastj = js.j_njobs = 0;
+    }
+}
+      
 /* Delete all DEAD jobs that the user had received notification about. */
 static void
 cleanup_dead_jobs ()
@@ -590,113 +822,235 @@ cleanup_dead_jobs ()
   register int i;
   int os;
 
-  if (job_slots == 0 || jobs_list_frozen)
+  if (js.j_jobslots == 0 || jobs_list_frozen)
     return;
 
   QUEUE_SIGCHLD(os);
 
-  for (i = 0; i < job_slots; i++)
-    if (jobs[i] && DEADJOB (i) && IS_NOTIFIED (i))
-      delete_job (i, 0);
+  /* XXX could use js.j_firstj and js.j_lastj here */
+  for (i = 0; i < js.j_jobslots; i++)
+    {
+#if defined (DEBUG)
+      if (i < js.j_firstj && jobs[i])
+	itrace("cleanup_dead_jobs: job %d non-null before js.j_firstj (%d)", i, js.j_firstj);
+      if (i > js.j_lastj && jobs[i])
+	itrace("cleanup_dead_jobs: job %d non-null after js.j_lastj (%d)", i, js.j_lastj);
+#endif
+
+      if (jobs[i] && DEADJOB (i) && IS_NOTIFIED (i))
+	delete_job (i, 0);
+    }
+
+#if defined (COPROCESS_SUPPORT)
+  coproc_reap ();
+#endif
 
   UNQUEUE_SIGCHLD(os);
+}
+
+static int
+processes_in_job (job)
+     int job;
+{
+  int nproc;
+  register PROCESS *p;
+
+  nproc = 0;
+  p = jobs[job]->pipe;
+  do
+    {
+      p = p->next;
+      nproc++;
+    }
+  while (p != jobs[job]->pipe);
+
+  return nproc;
+}
+
+static void
+delete_old_job (pid)
+     pid_t pid;
+{
+  PROCESS *p;
+  int job;
+
+  job = find_job (pid, 0, &p);
+  if (job != NO_JOB)
+    {
+#ifdef DEBUG
+      itrace ("delete_old_job: found pid %d in job %d with state %d", pid, job, jobs[job]->state);
+#endif
+      if (JOBSTATE (job) == JDEAD)
+	delete_job (job, DEL_NOBGPID);
+      else
+	{
+	  internal_warning (_("forked pid %d appears in running job %d"), pid, job);
+	  if (p)
+	    p->pid = 0;
+	}
+    }
+}
+
+/* Reallocate and compress the jobs list.  This returns with a jobs array
+   whose size is a multiple of JOB_SLOTS and can hold the current number of
+   jobs.  Heuristics are used to minimize the number of new reallocs. */
+static void
+realloc_jobs_list ()
+{
+  sigset_t set, oset;
+  int nsize, i, j, ncur, nprev;
+  JOB **nlist;
+
+  ncur = nprev = NO_JOB;
+  nsize = ((js.j_njobs + JOB_SLOTS - 1) / JOB_SLOTS);
+  nsize *= JOB_SLOTS;
+  i = js.j_njobs % JOB_SLOTS;
+  if (i == 0 || i > (JOB_SLOTS >> 1))
+    nsize += JOB_SLOTS;
+
+  BLOCK_CHILD (set, oset);
+  nlist = (js.j_jobslots == nsize) ? jobs : (JOB **) xmalloc (nsize * sizeof (JOB *));
+
+  js.c_reaped = js.j_ndead = 0;
+  for (i = j = 0; i < js.j_jobslots; i++)
+    if (jobs[i])
+      {
+	if (i == js.j_current)
+	  ncur = j;
+	if (i == js.j_previous)
+	  nprev = j;
+	nlist[j++] = jobs[i];
+	if (jobs[i]->state == JDEAD)
+	  {
+	    js.j_ndead++;
+	    js.c_reaped += processes_in_job (i);
+	  }
+      }
+
+#if defined (DEBUG)
+  itrace ("realloc_jobs_list: resize jobs list from %d to %d", js.j_jobslots, nsize);
+  itrace ("realloc_jobs_list: j_lastj changed from %d to %d", js.j_lastj, (j > 0) ? j - 1 : 0);
+  itrace ("realloc_jobs_list: j_njobs changed from %d to %d", js.j_njobs, j);
+  itrace ("realloc_jobs_list: js.j_ndead %d js.c_reaped %d", js.j_ndead, js.c_reaped);
+#endif
+
+  js.j_firstj = 0;
+  js.j_lastj = (j > 0) ? j - 1 : 0;
+  js.j_njobs = j;
+  js.j_jobslots = nsize;
+
+  /* Zero out remaining slots in new jobs list */
+  for ( ; j < nsize; j++)
+    nlist[j] = (JOB *)NULL;
+
+  if (jobs != nlist)
+    {
+      free (jobs);
+      jobs = nlist;
+    }
+
+  if (ncur != NO_JOB)
+    js.j_current = ncur;
+  if (nprev != NO_JOB)
+    js.j_previous = nprev;
+
+  /* Need to reset these */
+  if (js.j_current == NO_JOB || js.j_previous == NO_JOB || js.j_current > js.j_lastj || js.j_previous > js.j_lastj)
+    reset_current ();
+
+#ifdef DEBUG
+  itrace ("realloc_jobs_list: reset js.j_current (%d) and js.j_previous (%d)", js.j_current, js.j_previous);
+#endif
+
+  UNBLOCK_CHILD (oset);
 }
 
 /* Compact the jobs list by removing dead jobs.  Assumed that we have filled
    the jobs array to some predefined maximum.  Called when the shell is not
    the foreground process (subshell_environment != 0).  Returns the first
-   available slot in the compacted list.  If that value is job_slots, then
-   the list needs to be reallocated.  The jobs array is in new memory if
-   this returns > 0 and < job_slots.  FLAGS is reserved for future use. */
+   available slot in the compacted list.  If that value is js.j_jobslots, then
+   the list needs to be reallocated.  The jobs array may be in new memory if
+   this returns > 0 and < js.j_jobslots.  FLAGS is reserved for future use. */
 static int
 compact_jobs_list (flags)
      int flags;
 {
-  sigset_t set, oset;
-  register int i, j;
-  int nremove, ndel;
-  JOB **newlist;
+  if (js.j_jobslots == 0 || jobs_list_frozen)
+    return js.j_jobslots;
 
-  if (job_slots == 0 || jobs_list_frozen)
-    return job_slots;
+  reap_dead_jobs ();
+  realloc_jobs_list ();
 
-  if (child_max < 0)
-    child_max = getmaxchild ();
+#ifdef DEBUG
+  itrace("compact_jobs_list: returning %d", (js.j_lastj || jobs[js.j_lastj]) ? js.j_lastj + 1 : 0);
+#endif
 
-  /* Take out at most a quarter of the jobs in the jobs array, but leave at
-     least child_max */
-  nremove = job_slots >> 2;
-  if ((job_slots - nremove) < child_max)
-    nremove = job_slots - child_max;
-
-  /* need to increase jobs list to at least CHILD_MAX entries */
-  if (nremove < 0)
-    return job_slots;
-
-  BLOCK_CHILD (set, oset);  
-
-  for (ndel = i = 0; i < job_slots; i++)
-    if (jobs[i])
-      {
-	if (DEADJOB (i) && (find_last_pid (i, 0) != last_asynchronous_pid))
-	  {
-	    delete_job (i, 0);
-	    ndel++;
-	    if (ndel == nremove)
-	      break;
-	  }
-      }
-
-  if (ndel == 0)
-    {
-      UNBLOCK_CHILD (oset);
-      return job_slots;
-    }
-
-  newlist = (JOB **)xmalloc ((1 + job_slots) * sizeof (JOB *));
-  for (i = j = 0; i < job_slots; i++)
-    if (jobs[i])
-      newlist[j++] = jobs[i];
-
-  ndel = j;
-  for ( ; j < job_slots; j++)
-    newlist[j] = (JOB *)NULL;
-
-  free (jobs);
-  jobs = newlist;
-
-  UNBLOCK_CHILD (oset);
-
-  return ndel;
+  return ((js.j_lastj || jobs[js.j_lastj]) ? js.j_lastj + 1 : 0);
 }
 
 /* Delete the job at INDEX from the job list.  Must be called
    with SIGCHLD blocked. */
 void
-delete_job (job_index, warn_stopped)
-     int job_index, warn_stopped;
+delete_job (job_index, dflags)
+     int job_index, dflags;
 {
   register JOB *temp;
+  PROCESS *proc;
+  int ndel;
 
-  if (job_slots == 0 || jobs_list_frozen)
+  if (js.j_jobslots == 0 || jobs_list_frozen)
     return;
 
-  if (warn_stopped && subshell_environment == 0 && STOPPED (job_index))
-    internal_warning ("deleting stopped job %d with process group %ld", job_index+1, (long)jobs[job_index]->pgrp);
-
+  if ((dflags & DEL_WARNSTOPPED) && subshell_environment == 0 && STOPPED (job_index))
+    internal_warning (_("deleting stopped job %d with process group %ld"), job_index+1, (long)jobs[job_index]->pgrp);
   temp = jobs[job_index];
-  if (job_index == current_job || job_index == previous_job)
-    reset_current ();
+  if (temp == 0)
+    return;
+
+  if ((dflags & DEL_NOBGPID) == 0)
+    {
+      proc = find_last_proc (job_index, 0);
+      /* Could do this just for J_ASYNC jobs, but we save all. */
+      if (proc)
+	bgp_add (proc->pid, process_exit_status (proc->status));
+    }
 
   jobs[job_index] = (JOB *)NULL;
+  if (temp == js.j_lastmade)
+    js.j_lastmade = 0;
+  else if (temp == js.j_lastasync)
+    js.j_lastasync = 0;
 
   free (temp->wd);
-  discard_pipeline (temp->pipe);
+  ndel = discard_pipeline (temp->pipe);
+
+  js.c_injobs -= ndel;
+  if (temp->state == JDEAD)
+    {
+      js.c_reaped -= ndel;
+      js.j_ndead--;
+      if (js.c_reaped < 0)
+	{
+#ifdef DEBUG
+	  itrace("delete_job (%d pgrp %d): js.c_reaped (%d) < 0 ndel = %d js.j_ndead = %d", job_index, temp->pgrp, js.c_reaped, ndel, js.j_ndead);
+#endif
+	  js.c_reaped = 0;
+	}
+    }
 
   if (temp->deferred)
     dispose_command (temp->deferred);
 
   free (temp);
+
+  js.j_njobs--;
+  if (js.j_njobs == 0)
+    js.j_firstj = js.j_lastj = 0;
+  else if (jobs[js.j_firstj] == 0 || jobs[js.j_lastj] == 0)
+    reset_job_indices ();
+
+  if (job_index == js.j_current || job_index == js.j_previous)
+    reset_current ();
 }
 
 /* Must be called with SIGCHLD blocked. */
@@ -706,7 +1060,7 @@ nohup_job (job_index)
 {
   register JOB *temp;
 
-  if (job_slots == 0)
+  if (js.j_jobslots == 0)
     return;
 
   if (temp = jobs[job_index])
@@ -714,21 +1068,26 @@ nohup_job (job_index)
 }
 
 /* Get rid of the data structure associated with a process chain. */
-static void
+static int
 discard_pipeline (chain)
      register PROCESS *chain;
 {
   register PROCESS *this, *next;
+  int n;
 
   this = chain;
+  n = 0;
   do
     {
       next = this->next;
       FREE (this->command);
       free (this);
+      n++;
       this = next;
     }
   while (this != chain);
+
+  return n;
 }
 
 /* Add this process to the chain being built in the_pipeline.
@@ -740,6 +1099,21 @@ add_process (name, pid)
      pid_t pid;
 {
   PROCESS *t, *p;
+
+#if defined (RECYCLES_PIDS)
+  int j;
+  p = find_process (pid, 0, &j);
+  if (p)
+    {
+#  ifdef DEBUG
+      if (j == NO_JOB)
+	internal_warning (_("add_process: process %5ld (%s) in the_pipeline"), (long)p->pid, p->command);
+#  endif
+      if (PALIVE (p))
+        internal_warning (_("add_process: pid %5ld (%s) marked as still alive"), (long)p->pid, p->command);
+      p->running = PS_RECYCLED;		/* mark as recycled */
+    }
+#endif
 
   t = (PROCESS *)xmalloc (sizeof (PROCESS));
   t->next = the_pipeline;
@@ -811,13 +1185,20 @@ map_over_jobs (func, arg1, arg2)
   int result;
   sigset_t set, oset;
 
-  if (job_slots == 0)
+  if (js.j_jobslots == 0)
     return 0;
 
   BLOCK_CHILD (set, oset);
 
-  for (i = result = 0; i < job_slots; i++)
+  /* XXX could use js.j_firstj here */
+  for (i = result = 0; i < js.j_jobslots; i++)
     {
+#if defined (DEBUG)
+      if (i < js.j_firstj && jobs[i])
+	itrace("map_over_jobs: job %d non-null before js.j_firstj (%d)", i, js.j_firstj);
+      if (i > js.j_lastj && jobs[i])
+	itrace("map_over_jobs: job %d non-null after js.j_lastj (%d)", i, js.j_lastj);
+#endif
       if (jobs[i])
 	{
 	  result = (*func)(jobs[i], arg1, arg2, i);
@@ -848,7 +1229,8 @@ terminate_stopped_jobs ()
 {
   register int i;
 
-  for (i = 0; i < job_slots; i++)
+  /* XXX could use js.j_firstj here */
+  for (i = 0; i < js.j_jobslots; i++)
     {
       if (jobs[i] && STOPPED (i))
 	{
@@ -865,12 +1247,14 @@ hangup_all_jobs ()
 {
   register int i;
 
-  for (i = 0; i < job_slots; i++)
+  /* XXX could use js.j_firstj here */
+  for (i = 0; i < js.j_jobslots; i++)
     {
       if (jobs[i])
 	{
-	  if  ((jobs[i]->flags & J_NOHUP) == 0)
-	    killpg (jobs[i]->pgrp, SIGHUP);
+	  if  (jobs[i]->flags & J_NOHUP)
+	    continue;
+	  killpg (jobs[i]->pgrp, SIGHUP);
 	  if (STOPPED (i))
 	    killpg (jobs[i]->pgrp, SIGCONT);
 	}
@@ -885,15 +1269,16 @@ kill_current_pipeline ()
 }
 
 /* Return the pipeline that PID belongs to.  Note that the pipeline
-   doesn't have to belong to a job.  Must be called with SIGCHLD blocked. */
+   doesn't have to belong to a job.  Must be called with SIGCHLD blocked.
+   If JOBP is non-null, return the index of the job containing PID.  */
 static PROCESS *
-find_pipeline (pid, running_only, jobp)
+find_pipeline (pid, alive_only, jobp)
      pid_t pid;
-     int running_only;
+     int alive_only;
      int *jobp;		/* index into jobs list or NO_JOB */
 {
   int job;
-  register PROCESS *p;
+  PROCESS *p;
 
   /* See if this process is in the pipeline that we are building. */
   if (jobp)
@@ -903,46 +1288,69 @@ find_pipeline (pid, running_only, jobp)
       p = the_pipeline;
       do
 	{
-	  /* Return it if we found it. */
-	  if (p->pid == pid)
-	    {
-	      if ((running_only && PRUNNING(p)) || (running_only == 0))
-		return (p);
-	    }
+	  /* Return it if we found it.  Don't ever return a recycled pid. */
+	  if (p->pid == pid && ((alive_only == 0 && PRECYCLED(p) == 0) || PALIVE(p)))
+	    return (p);
 
 	  p = p->next;
 	}
       while (p != the_pipeline);
     }
 
-  job = find_job (pid, running_only);
+  job = find_job (pid, alive_only, &p);
   if (jobp)
     *jobp = job;
   return (job == NO_JOB) ? (PROCESS *)NULL : jobs[job]->pipe;
 }
 
+/* Return the PROCESS * describing PID.  If JOBP is non-null return the index
+   into the jobs array of the job containing PID.  Must be called with
+   SIGCHLD blocked. */
+static PROCESS *
+find_process (pid, alive_only, jobp)
+     pid_t pid;
+     int alive_only;
+     int *jobp;		/* index into jobs list or NO_JOB */
+{
+  PROCESS *p;
+
+  p = find_pipeline (pid, alive_only, jobp);
+  while (p && p->pid != pid)
+    p = p->next;
+  return p;
+}
+
 /* Return the job index that PID belongs to, or NO_JOB if it doesn't
    belong to any job.  Must be called with SIGCHLD blocked. */
 static int
-find_job (pid, running_only)
+find_job (pid, alive_only, procp)
      pid_t pid;
-     int running_only;
+     int alive_only;
+     PROCESS **procp;
 {
   register int i;
-  register PROCESS *p;
+  PROCESS *p;
 
-  for (i = 0; i < job_slots; i++)
+  /* XXX could use js.j_firstj here, and should check js.j_lastj */
+  for (i = 0; i < js.j_jobslots; i++)
     {
+#if defined (DEBUG)
+      if (i < js.j_firstj && jobs[i])
+	itrace("find_job: job %d non-null before js.j_firstj (%d)", i, js.j_firstj);
+      if (i > js.j_lastj && jobs[i])
+	itrace("find_job: job %d non-null after js.j_lastj (%d)", i, js.j_lastj);
+#endif
       if (jobs[i])
 	{
 	  p = jobs[i]->pipe;
 
 	  do
 	    {
-	      if (p->pid == pid)
+	      if (p->pid == pid && ((alive_only == 0 && PRECYCLED(p) == 0) || PALIVE(p)))
 		{
-		  if ((running_only && PRUNNING(p)) || (running_only == 0))
-		    return (i);
+		  if (procp)
+		    *procp = p;
+		  return (i);
 		}
 
 	      p = p->next;
@@ -967,7 +1375,7 @@ get_job_by_pid (pid, block)
   if (block)
     BLOCK_CHILD (set, oset);
 
-  job = find_job (pid, 0);
+  job = find_job (pid, 0, NULL);
 
   if (block)
     UNBLOCK_CHILD (oset);
@@ -985,14 +1393,29 @@ describe_pid (pid)
 
   BLOCK_CHILD (set, oset);
 
-  job = find_job (pid, 0);
+  job = find_job (pid, 0, NULL);
 
   if (job != NO_JOB)
-    printf ("[%d] %ld\n", job + 1, (long)pid);
+    fprintf (stderr, "[%d] %ld\n", job + 1, (long)pid);
   else
-    programming_error ("describe_pid: %ld: no such pid", (long)pid);
+    programming_error (_("describe_pid: %ld: no such pid"), (long)pid);
 
   UNBLOCK_CHILD (oset);
+}
+
+static char *
+j_strsignal (s)
+     int s;
+{
+  char *x;
+
+  x = strsignal (s);
+  if (x == 0)
+    {
+      x = retcode_name_buffer;
+      sprintf (x, _("Signal %d"), s);
+    }
+  return x;
 }
 
 static char *
@@ -1004,39 +1427,39 @@ printable_job_status (j, p, format)
   static char *temp;
   int es;
 
-  temp = "Done";
+  temp = _("Done");
 
   if (STOPPED (j) && format == 0)
     {
       if (posixly_correct == 0 || p == 0 || (WIFSTOPPED (p->status) == 0))
-	temp = "Stopped";
+	temp = _("Stopped");
       else
 	{
 	  temp = retcode_name_buffer;
-	  sprintf (temp, "Stopped(%s)", signal_name (WSTOPSIG (p->status)));
+	  sprintf (temp, _("Stopped(%s)"), signal_name (WSTOPSIG (p->status)));
 	}
     }
   else if (RUNNING (j))
-    temp = "Running";
+    temp = _("Running");
   else
     {
       if (WIFSTOPPED (p->status))
-	temp = strsignal (WSTOPSIG (p->status));
+	temp = j_strsignal (WSTOPSIG (p->status));
       else if (WIFSIGNALED (p->status))
-	temp = strsignal (WTERMSIG (p->status));
+	temp = j_strsignal (WTERMSIG (p->status));
       else if (WIFEXITED (p->status))
 	{
 	  temp = retcode_name_buffer;
 	  es = WEXITSTATUS (p->status);
 	  if (es == 0)
-	    strcpy (temp, "Done");
+	    strcpy (temp, _("Done"));
 	  else if (posixly_correct)
-	    sprintf (temp, "Done(%d)", es);
+	    sprintf (temp, _("Done(%d)"), es);
 	  else
-	    sprintf (temp, "Exit %d", es);
+	    sprintf (temp, _("Exit %d"), es);
 	}
       else
-	temp = "Unknown status";
+	temp = _("Unknown status");
     }
 
   return temp;
@@ -1123,7 +1546,7 @@ print_pipeline (p, job_index, format, stream)
 	      if ((WIFSTOPPED (show->status) == 0) &&
 		  (WIFCONTINUED (show->status) == 0) &&
 		  WIFCORED (show->status))
-		fprintf (stream, "(core dumped) ");
+		fprintf (stream, _("(core dumped) "));
 	    }
 	}
 
@@ -1142,7 +1565,7 @@ print_pipeline (p, job_index, format, stream)
 
 	  if (strcmp (temp, jobs[job_index]->wd) != 0)
 	    fprintf (stream,
-	      "  (wd: %s)", polite_directory_format (jobs[job_index]->wd));
+	      _("  (wd: %s)"), polite_directory_format (jobs[job_index]->wd));
 	}
 
       if (format || (p == last))
@@ -1190,8 +1613,8 @@ pretty_print_job (job_index, format, stream)
 
   if (format != JLIST_NONINTERACTIVE)
     fprintf (stream, "[%d]%c ", job_index + 1,
-	      (job_index == current_job) ? '+':
-		(job_index == previous_job) ? '-' : ' ');
+	      (job_index == js.j_current) ? '+':
+		(job_index == js.j_previous) ? '-' : ' ');
 
   if (format == JLIST_NONINTERACTIVE)
     format = JLIST_LONG;
@@ -1258,6 +1681,7 @@ make_child (command, async_p)
      char *command;
      int async_p;
 {
+  int forksleep;
   sigset_t set, oset;
   pid_t pid;
 
@@ -1269,6 +1693,8 @@ make_child (command, async_p)
 
   making_children ();
 
+  forksleep = 1;
+
 #if defined (BUFFERED_INPUT)
   /* If default_buffered_input is active, we are reading a script.  If
      the command is asynchronous, we have already duplicated /dev/null
@@ -1279,8 +1705,16 @@ make_child (command, async_p)
     sync_buffered_stream (default_buffered_input);
 #endif /* BUFFERED_INPUT */
 
-  /* Create the child, handle severe errors. */
-  if ((pid = fork ()) < 0)
+  /* Create the child, handle severe errors.  Retry on EAGAIN. */
+  while ((pid = fork ()) < 0 && errno == EAGAIN && forksleep < FORKSLEEP_MAX)
+    {
+      sys_error ("fork: retry");
+      if (sleep (forksleep) != 0)
+	break;
+      forksleep <<= 1;
+    }
+
+  if (pid < 0)
     {
       sys_error ("fork");
 
@@ -1334,23 +1768,20 @@ make_child (command, async_p)
 	     B.4.3.3, p. 237 also covers this, in the context of job control
 	     shells. */
 	  if (setpgid (mypid, pipeline_pgrp) < 0)
-	    sys_error ("child setpgid (%ld to %ld)", (long)mypid, (long)pipeline_pgrp);
-#if defined (PGRP_PIPE)
-	  if (pipeline_pgrp == mypid)
-	    {
-#endif
-	      /* By convention (and assumption above), if
-		 pipeline_pgrp == shell_pgrp, we are making a child for
-		 command substitution.
-		 In this case, we don't want to give the terminal to the
-		 shell's process group (we could be in the middle of a
-		 pipeline, for example). */
-	      if (async_p == 0 && pipeline_pgrp != shell_pgrp)
-		give_terminal_to (pipeline_pgrp, 0);
+	    sys_error (_("child setpgid (%ld to %ld)"), (long)mypid, (long)pipeline_pgrp);
+
+	  /* By convention (and assumption above), if
+	     pipeline_pgrp == shell_pgrp, we are making a child for
+	     command substitution.
+	     In this case, we don't want to give the terminal to the
+	     shell's process group (we could be in the middle of a
+	     pipeline, for example). */
+	  if (async_p == 0 && pipeline_pgrp != shell_pgrp && ((subshell_environment&SUBSHELL_ASYNC) == 0))
+	    give_terminal_to (pipeline_pgrp, 0);
 
 #if defined (PGRP_PIPE)
-	      pipe_read (pgrp_pipe);
-	    }
+	  if (pipeline_pgrp == mypid)
+	    pipe_read (pgrp_pipe);
 #endif
 	}
       else			/* Without job control... */
@@ -1370,17 +1801,33 @@ make_child (command, async_p)
 
 #if defined (PGRP_PIPE)
       /* Release the process group pipe, since our call to setpgid ()
-	 is done.  The last call to pipe_close is done in stop_pipeline. */
-      pipe_close (pgrp_pipe);
+	 is done.  The last call to sh_closepipe is done in stop_pipeline. */
+      sh_closepipe (pgrp_pipe);
 #endif /* PGRP_PIPE */
 
+#if 0
+      /* Don't set last_asynchronous_pid in the child */
       if (async_p)
-	last_asynchronous_pid = getpid ();
+	last_asynchronous_pid = mypid;		/* XXX */
+      else
+#endif
+#if defined (RECYCLES_PIDS)
+      if (last_asynchronous_pid == mypid)
+        /* Avoid pid aliasing.  1 seems like a safe, unusual pid value. */
+	last_asynchronous_pid = 1;
+#endif
     }
   else
     {
       /* In the parent.  Remember the pid of the child just created
 	 as the proper pgrp if this is the first child. */
+
+      if (first_pid == NO_PID)
+	first_pid = pid;
+      else if (pid_wrap == -1 && pid < first_pid)
+	pid_wrap = 0;
+      else if (pid_wrap == 0 && pid >= first_pid)
+	pid_wrap = 1;
 
       if (job_control)
 	{
@@ -1409,10 +1856,31 @@ make_child (command, async_p)
 
       if (async_p)
 	last_asynchronous_pid = pid;
+#if defined (RECYCLES_PIDS)
+      else if (last_asynchronous_pid == pid)
+        /* Avoid pid aliasing.  1 seems like a safe, unusual pid value. */
+	last_asynchronous_pid = 1;
+#endif
+
+      if (pid_wrap > 0)
+	delete_old_job (pid);
+
+#if !defined (RECYCLES_PIDS)
+      /* Only check for saved status if we've saved more than CHILD_MAX
+	 statuses, unless the system recycles pids. */
+      if ((js.c_reaped + bgpids.npid) >= js.c_childmax)
+#endif
+	bgp_delete (pid);		/* new process, discard any saved status */
 
       last_made_pid = pid;
 
-      /* Unblock SIGINT and SIGCHLD. */
+      /* keep stats */
+      js.c_totforked++;
+      js.c_living++;
+
+      /* Unblock SIGINT and SIGCHLD unless creating a pipeline, in which case
+	 SIGCHLD remains blocked until all commands in the pipeline have been
+	 created. */
       sigprocmask (SIG_SETMASK, &oset, (sigset_t *)NULL);
     }
 
@@ -1519,13 +1987,13 @@ get_tty_state ()
 	  /* Only print an error message if we're really interactive at
 	     this time. */
 	  if (interactive)
-	    sys_error ("[%ld: %d] tcgetattr", (long)getpid (), shell_level);
+	    sys_error ("[%ld: %d (%d)] tcgetattr", (long)getpid (), shell_level, tty);
 #endif
 	  return -1;
 	}
 #endif /* TERMIOS_TTY_DRIVER */
       if (check_window_size)
-	get_new_window_size (0);
+	get_new_window_size (0, (int *)0, (int *)0);
     }
   return 0;
 }
@@ -1558,7 +2026,7 @@ set_tty_state ()
 	  /* Only print an error message if we're really interactive at
 	     this time. */
 	  if (interactive)
-	    sys_error ("[%ld: %d] tcsetattr", (long)getpid (), shell_level);
+	    sys_error ("[%ld: %d (%d)] tcsetattr", (long)getpid (), shell_level, tty);
 	  return -1;
 	}
 #endif /* TERMIOS_TTY_DRIVER */
@@ -1566,11 +2034,11 @@ set_tty_state ()
   return 0;
 }
 
-/* Given an index into the jobs array JOB, return the pid of the last
+/* Given an index into the jobs array JOB, return the PROCESS struct of the last
    process in that job's pipeline.  This is the one whose exit status
    counts.  Must be called with SIGCHLD blocked or queued. */
-static pid_t
-find_last_pid (job, block)
+static PROCESS *
+find_last_proc (job, block)
      int job;
      int block;
 {
@@ -1581,14 +2049,26 @@ find_last_pid (job, block)
     BLOCK_CHILD (set, oset);
 
   p = jobs[job]->pipe;
-  while (p->next != jobs[job]->pipe)
+  while (p && p->next != jobs[job]->pipe)
     p = p->next;
 
   if (block)
     UNBLOCK_CHILD (oset);
 
-  return (p->pid);
+  return (p);
 }
+
+static pid_t
+find_last_pid (job, block)
+     int job;
+     int block;
+{
+  PROCESS *p;
+
+  p = find_last_proc (job, block);
+  /* Possible race condition here. */
+  return p->pid;
+}     
 
 /* Wait for a particular child of the shell to finish executing.
    This low-level function prints an error message if PID is not
@@ -1609,7 +2089,14 @@ wait_for_single_pid (pid)
 
   if (child == 0)
     {
-      internal_error ("wait: pid %ld is not a child of this shell", (long)pid);
+      r = bgp_search (pid);
+      if (r >= 0)
+	return r;
+    }
+
+  if (child == 0)
+    {
+      internal_error (_("wait: pid %ld is not a child of this shell"), (long)pid);
       return (127);
     }
 
@@ -1618,10 +2105,17 @@ wait_for_single_pid (pid)
   /* POSIX.2: if we just waited for a job, we can remove it from the jobs
      table. */
   BLOCK_CHILD (set, oset);
-  job = find_job (pid, 0);
+  job = find_job (pid, 0, NULL);
   if (job != NO_JOB && jobs[job] && DEADJOB (job))
     jobs[job]->flags |= J_NOTIFIED;
   UNBLOCK_CHILD (oset);
+
+  /* If running in posix mode, remove the job from the jobs table immediately */
+  if (posixly_correct)
+    {
+      cleanup_dead_jobs ();
+      bgp_delete (pid);
+    }
 
   return r;
 }
@@ -1639,11 +2133,19 @@ wait_for_background_pids ()
       BLOCK_CHILD (set, oset);
 
       /* find first running job; if none running in foreground, break */
-      for (i = 0; i < job_slots; i++)
-	if (jobs[i] && RUNNING (i) && IS_FOREGROUND (i) == 0)
-	  break;
-
-      if (i == job_slots)
+      /* XXX could use js.j_firstj and js.j_lastj here */
+      for (i = 0; i < js.j_jobslots; i++)
+	{
+#if defined (DEBUG)
+	  if (i < js.j_firstj && jobs[i])
+	    itrace("wait_for_background_pids: job %d non-null before js.j_firstj (%d)", i, js.j_firstj);
+	  if (i > js.j_lastj && jobs[i])
+	    itrace("wait_for_background_pids: job %d non-null after js.j_lastj (%d)", i, js.j_lastj);
+#endif
+	  if (jobs[i] && RUNNING (i) && IS_FOREGROUND (i) == 0)
+	    break;
+	}
+      if (i == js.j_jobslots)
 	{
 	  UNBLOCK_CHILD (oset);
 	  break;
@@ -1669,6 +2171,7 @@ wait_for_background_pids ()
      `wait' is called with no arguments. */
   mark_dead_jobs_as_notified (1);
   cleanup_dead_jobs ();
+  bgp_clear ();
 }
 
 /* Make OLD_SIGINT_HANDLER the SIGINT signal handler. */
@@ -1727,6 +2230,13 @@ wait_sigint_handler (sig)
 }
 
 static int
+process_exit_signal (status)
+     WAIT status;
+{
+  return (WIFSIGNALED (status) ? WTERMSIG (status) : 0);
+}
+
+static int
 process_exit_status (status)
      WAIT status;
 {
@@ -1738,6 +2248,26 @@ process_exit_status (status)
     return (EXECUTION_SUCCESS);
 }
 
+static WAIT
+job_signal_status (job)
+     int job;
+{
+  register PROCESS *p;
+  WAIT s;
+
+  p = jobs[job]->pipe;
+  do
+    {
+      s = p->status;
+      if (WIFSIGNALED(s) || WIFSTOPPED(s))
+	break;
+      p = p->next;
+    }
+  while (p != jobs[job]->pipe);
+
+  return s;
+}
+  
 /* Return the exit status of the last process in the pipeline for job JOB.
    This is the exit status of the entire job. */
 static WAIT
@@ -1745,6 +2275,24 @@ raw_job_exit_status (job)
      int job;
 {
   register PROCESS *p;
+  int fail;
+  WAIT ret;
+
+  if (pipefail_opt)
+    {
+      fail = 0;
+      p = jobs[job]->pipe;
+      do
+	{
+	  if (WSTATUS (p->status) != EXECUTION_SUCCESS)
+	    fail = WSTATUS(p->status);
+	  p = p->next;
+	}
+      while (p != jobs[job]->pipe);
+      WSTATUS (ret) = fail;
+      return ret;
+    }
+
   for (p = jobs[job]->pipe; p->next != jobs[job]->pipe; p = p->next)
     ;
   return (p->status);
@@ -1760,6 +2308,13 @@ job_exit_status (job)
   return (process_exit_status (raw_job_exit_status (job)));
 }
 
+static int
+job_exit_signal (job)
+     int job;
+{
+  return (process_exit_signal (raw_job_exit_status (job)));
+}
+
 #define FIND_CHILD(pid, child) \
   do \
     { \
@@ -1768,7 +2323,7 @@ job_exit_status (job)
 	{ \
 	  give_terminal_to (shell_pgrp, 0); \
 	  UNBLOCK_CHILD (oset); \
-	  internal_error ("wait_for: No record of process %ld", (long)pid); \
+	  internal_error (_("wait_for: No record of process %ld"), (long)pid); \
 	  restore_sigint_handler (); \
 	  return (termination_state = 127); \
 	} \
@@ -1798,12 +2353,19 @@ wait_for (pid)
      to finish.  We don't want the shell to exit if an interrupt is
      received, only if one of the jobs run is killed via SIGINT.  If
      job control is not set, the job will be run in the same pgrp as
-     the shell, and the shell will see any signals the job gets. */
+     the shell, and the shell will see any signals the job gets.  In
+     fact, we want this set every time the waiting shell and the waited-
+     for process are in the same process group, including command
+     substitution. */
 
   /* This is possibly a race condition -- should it go in stop_pipeline? */
   wait_sigint_received = 0;
-  if (job_control == 0)
-    old_sigint_handler = set_signal_handler (SIGINT, wait_sigint_handler);
+  if (job_control == 0 || (subshell_environment&SUBSHELL_COMSUB))
+    {
+      old_sigint_handler = set_signal_handler (SIGINT, wait_sigint_handler);
+      if (old_sigint_handler == SIG_IGN)
+	set_signal_handler (SIGINT, old_sigint_handler);
+    }
 
   termination_state = last_command_exit_value;
 
@@ -1823,13 +2385,13 @@ wait_for (pid)
 	 We check for JDEAD in case the job state has been set by waitchld
 	 after receipt of a SIGCHLD. */
       if (job == NO_JOB)
-	job = find_job (pid, 0);
+	job = find_job (pid, 0, NULL);
 
       /* waitchld() takes care of setting the state of the job.  If the job
 	 has already exited before this is called, sigchld_handler will have
 	 called waitchld and the state will be set to JDEAD. */
 
-      if (child->running || (job != NO_JOB && RUNNING (job)))
+      if (PRUNNING(child) || (job != NO_JOB && RUNNING (job)))
 	{
 #if defined (WAITPID_BROKEN)    /* SCOv4 */
 	  sigset_t suspend_set;
@@ -1869,9 +2431,14 @@ wait_for (pid)
 	  if (r == -1 && errno == ECHILD)
 	    {
 	      child->running = PS_DONE;
-	      child->status = 0;	/* XXX -- can't find true status */
+	      WSTATUS (child->status) = 0;	/* XXX -- can't find true status */
+	      js.c_living = 0;		/* no living child processes */
 	      if (job != NO_JOB)
-		jobs[job]->state = JDEAD;
+		{
+		  jobs[job]->state = JDEAD;
+		  js.c_reaped++;
+		  js.j_ndead++;
+		}
 	    }
 #endif /* WAITPID_BROKEN */
 	}
@@ -1883,15 +2450,20 @@ wait_for (pid)
       if (interactive && job_control == 0)
 	QUIT;
     }
-  while (child->running || (job != NO_JOB && RUNNING (job)));
+  while (PRUNNING (child) || (job != NO_JOB && RUNNING (job)));
 
   /* The exit state of the command is either the termination state of the
      child, or the termination state of the job.  If a job, the status
-     of the last child in the pipeline is the significant one. */
-  if (job != NO_JOB)
-    termination_state = job_exit_status (job);
-  else
-    termination_state = process_exit_status (child->status);
+     of the last child in the pipeline is the significant one.  If the command
+     or job was terminated by a signal, note that value also. */
+  termination_state = (job != NO_JOB) ? job_exit_status (job)
+				      : process_exit_status (child->status);
+  last_command_exit_signal = (job != NO_JOB) ? job_exit_signal (job)
+					     : process_exit_signal (child->status);
+
+  /* XXX */
+  if ((job != NO_JOB && JOBSTATE (job) == JSTOPPED) || WIFSTOPPED (child->status))
+    termination_state = 128 + WSTOPSIG (child->status);
 
   if (job == NO_JOB || IS_JOBCONTROL (job))
     {
@@ -1912,7 +2484,6 @@ wait_for (pid)
 if (job == NO_JOB)
   itrace("wait_for: job == NO_JOB, giving the terminal to shell_pgrp (%ld)", (long)shell_pgrp);
 #endif
-
       give_terminal_to (shell_pgrp, 0);
     }
 
@@ -1935,15 +2506,7 @@ if (job == NO_JOB)
 	     to a signal.  We might want to change this later to just check
 	     the last process in the pipeline.  If no process exits due to a
 	     signal, S is left as the status of the last job in the pipeline. */
-	  p = jobs[job]->pipe;
-	  do
-	    {
-	      s = p->status;
-	      if (WIFSIGNALED(s) || WIFSTOPPED(s))
-		break;
-	      p = p->next;
-	    }
-	  while (p != jobs[job]->pipe);
+	  s = job_signal_status (job);
 
 	  if (WIFSIGNALED (s) || WIFSTOPPED (s))
 	    {
@@ -1951,8 +2514,8 @@ if (job == NO_JOB)
 
 	      /* If the current job was stopped or killed by a signal, and
 		 the user has requested it, get a possibly new window size */
-	      if (check_window_size && job == current_job)
-		get_new_window_size (0);
+	      if (check_window_size && (job == js.j_current || IS_FOREGROUND (job)))
+		get_new_window_size (0, (int *)0, (int *)0);
 	    }
 	  else
 	    get_tty_state ();
@@ -1968,13 +2531,31 @@ if (job == NO_JOB)
 		 or until loop, act as if the shell received SIGINT as
 		 well, so the loop can be broken.  This doesn't call the
 		 SIGINT signal handler; maybe it should. */
-	      if (signal_is_trapped (SIGINT) == 0 && loop_level)
+	      if (signal_is_trapped (SIGINT) == 0 && (loop_level || (shell_compatibility_level > 32 && executing_list)))
 		ADDINTERRUPT;
 	      else
 		{
 		  putchar ('\n');
 		  fflush (stdout);
 		}
+	    }
+	}
+      else if ((subshell_environment & SUBSHELL_COMSUB) && wait_sigint_received)
+	{
+	  /* If waiting for a job in a subshell started to do command
+	     substitution, simulate getting and being killed by the SIGINT to
+	     pass the status back to our parent. */
+	  s = job_signal_status (job);
+	
+	  if (WIFSIGNALED (s) && WTERMSIG (s) == SIGINT && signal_is_trapped (SIGINT) == 0)
+	    {
+	      UNBLOCK_CHILD (oset);
+	      restore_sigint_handler ();
+	      old_sigint_handler = set_signal_handler (SIGINT, SIG_DFL);
+	      if (old_sigint_handler == SIG_IGN)
+		restore_sigint_handler ();
+	      else
+		kill (getpid (), SIGINT);
 	    }
 	}
 
@@ -2014,7 +2595,7 @@ wait_for_job (job)
 
   BLOCK_CHILD(set, oset);
   if (JOBSTATE (job) == JSTOPPED)
-    internal_warning ("wait_for_job: job %d is stopped", job+1);
+    internal_warning (_("wait_for_job: job %d is stopped"), job+1);
 
   pid = find_last_pid (job, 0);
   UNBLOCK_CHILD(oset);
@@ -2108,29 +2689,29 @@ set_current_job (job)
 {
   int candidate;
 
-  if (current_job != job)
+  if (js.j_current != job)
     {
-      previous_job = current_job;
-      current_job = job;
+      js.j_previous = js.j_current;
+      js.j_current = job;
     }
 
-  /* First choice for previous_job is the old current_job. */
-  if (previous_job != current_job &&
-      previous_job != NO_JOB &&
-      jobs[previous_job] &&
-      STOPPED (previous_job))
+  /* First choice for previous job is the old current job. */
+  if (js.j_previous != js.j_current &&
+      js.j_previous != NO_JOB &&
+      jobs[js.j_previous] &&
+      STOPPED (js.j_previous))
     return;
 
   /* Second choice:  Newest stopped job that is older than
      the current job. */
   candidate = NO_JOB;
-  if (STOPPED (current_job))
+  if (STOPPED (js.j_current))
     {
-      candidate = job_last_stopped (current_job);
+      candidate = job_last_stopped (js.j_current);
 
       if (candidate != NO_JOB)
 	{
-	  previous_job = candidate;
+	  js.j_previous = candidate;
 	  return;
 	}
     }
@@ -2139,27 +2720,27 @@ set_current_job (job)
      the current job and the previous job should be set to the newest running
      job, or there are only running jobs and the previous job should be set to
      the newest running job older than the current job.  We decide on which
-     alternative to use based on whether or not JOBSTATE(current_job) is
+     alternative to use based on whether or not JOBSTATE(js.j_current) is
      JSTOPPED. */
 
-  candidate = RUNNING (current_job) ? job_last_running (current_job)
-				    : job_last_running (job_slots);
+  candidate = RUNNING (js.j_current) ? job_last_running (js.j_current)
+				    : job_last_running (js.j_jobslots);
 
   if (candidate != NO_JOB)
     {
-      previous_job = candidate;
+      js.j_previous = candidate;
       return;
     }
 
   /* There is only a single job, and it is both `+' and `-'. */
-  previous_job = current_job;
+  js.j_previous = js.j_current;
 }
 
 /* Make current_job be something useful, if it isn't already. */
 
 /* Here's the deal:  The newest non-running job should be `+', and the
    next-newest non-running job should be `-'.  If there is only a single
-   stopped job, the previous_job is the newest non-running job.  If there
+   stopped job, the js.j_previous is the newest non-running job.  If there
    are only running jobs, the newest running job is `+' and the
    next-newest running job is `-'.  Must be called with SIGCHLD blocked. */
 
@@ -2168,23 +2749,23 @@ reset_current ()
 {
   int candidate;
 
-  if (job_slots && current_job != NO_JOB && jobs[current_job] && STOPPED (current_job))
-    candidate = current_job;
+  if (js.j_jobslots && js.j_current != NO_JOB && jobs[js.j_current] && STOPPED (js.j_current))
+    candidate = js.j_current;
   else
     {
       candidate = NO_JOB;
 
       /* First choice: the previous job. */
-      if (previous_job != NO_JOB && jobs[previous_job] && STOPPED (previous_job))
-	candidate = previous_job;
+      if (js.j_previous != NO_JOB && jobs[js.j_previous] && STOPPED (js.j_previous))
+	candidate = js.j_previous;
 
       /* Second choice: the most recently stopped job. */
       if (candidate == NO_JOB)
-	candidate = job_last_stopped (job_slots);
+	candidate = job_last_stopped (js.j_jobslots);
 
       /* Third choice: the newest running job. */
       if (candidate == NO_JOB)
-	candidate = job_last_running (job_slots);
+	candidate = job_last_running (js.j_jobslots);
     }
 
   /* If we found a job to use, then use it.  Otherwise, there
@@ -2192,7 +2773,7 @@ reset_current ()
   if (candidate != NO_JOB)
     set_current_job (candidate);
   else
-    current_job = previous_job = NO_JOB;
+    js.j_current = js.j_previous = NO_JOB;
 }
 
 /* Set up the job structures so we know the job and its processes are
@@ -2229,14 +2810,14 @@ start_job (job, foreground)
   register PROCESS *p;
   int already_running;
   sigset_t set, oset;
-  char *wd;
+  char *wd, *s;
   static TTYSTRUCT save_stty;
 
   BLOCK_CHILD (set, oset);
 
   if (DEADJOB (job))
     {
-      internal_error ("%s: job has terminated", this_command_name);
+      internal_error (_("%s: job has terminated"), this_command_name);
       UNBLOCK_CHILD (oset);
       return (-1);
     }
@@ -2245,9 +2826,9 @@ start_job (job, foreground)
 
   if (foreground == 0 && already_running)
     {
-      internal_error ("%s: bg background job?", this_command_name);
+      internal_error (_("%s: job %d already in background"), this_command_name, job + 1);
       UNBLOCK_CHILD (oset);
-      return (-1);
+      return (0);		/* XPG6/SUSv3 says this is not an error */
     }
 
   wd = current_working_directory ();
@@ -2265,12 +2846,19 @@ start_job (job, foreground)
   p = jobs[job]->pipe;
 
   if (foreground == 0)
-    fprintf (stderr, "[%d]%c ", job + 1,
-	   (job == current_job) ? '+': ((job == previous_job) ? '-' : ' '));
+    {
+      /* POSIX.2 says `bg' doesn't give any indication about current or
+	 previous job. */
+      if (posixly_correct == 0)
+	s = (job == js.j_current) ? "+ ": ((job == js.j_previous) ? "- " : " ");       
+      else
+	s = " ";
+      printf ("[%d]%s", job + 1, s);
+    }
 
   do
     {
-      fprintf (stderr, "%s%s",
+      printf ("%s%s",
 	       p->command ? p->command : "",
 	       p->next != jobs[job]->pipe? " | " : "");
       p = p->next;
@@ -2278,12 +2866,12 @@ start_job (job, foreground)
   while (p != jobs[job]->pipe);
 
   if (foreground == 0)
-    fprintf (stderr, " &");
+    printf (" &");
 
   if (strcmp (wd, jobs[job]->wd) != 0)
-    fprintf (stderr, "	(wd: %s)", polite_directory_format (jobs[job]->wd));
+    printf ("	(wd: %s)", polite_directory_format (jobs[job]->wd));
 
-  fprintf (stderr, "\n");
+  printf ("\n");
 
   /* Run the job. */
   if (already_running == 0)
@@ -2311,14 +2899,14 @@ start_job (job, foreground)
   if (foreground)
     {
       pid_t pid;
-      int s;
+      int st;
 
       pid = find_last_pid (job, 0);
       UNBLOCK_CHILD (oset);
-      s = wait_for (pid);
+      st = wait_for (pid);
       shell_tty_info = save_stty;
       set_tty_state ();
-      return (s);
+      return (st);
     }
   else
     {
@@ -2338,8 +2926,16 @@ kill_pid (pid, sig, group)
      int sig, group;
 {
   register PROCESS *p;
-  int job, result;
+  int job, result, negative;
   sigset_t set, oset;
+
+  if (pid < -1)
+    {
+      pid = -pid;
+      group = negative = 1;
+    }
+  else
+    negative = 0;
 
   result = EXECUTION_SUCCESS;
   if (group)
@@ -2352,18 +2948,25 @@ kill_pid (pid, sig, group)
 	  jobs[job]->flags &= ~J_NOTIFIED;
 
 	  /* Kill process in backquotes or one started without job control? */
-	  if (jobs[job]->pgrp == shell_pgrp)
+
+	  /* If we're passed a pid < -1, just call killpg and see what happens  */
+	  if (negative && jobs[job]->pgrp == shell_pgrp)
+	    result = killpg (pid, sig);
+	  /* If we're killing using job control notification, for example,
+	     without job control active, we have to do things ourselves. */
+	  else if (jobs[job]->pgrp == shell_pgrp)
 	    {
 	      p = jobs[job]->pipe;
-
 	      do
 		{
+		  if (PALIVE (p) == 0)
+		    continue;		/* avoid pid recycling problem */
 		  kill (p->pid, sig);
-		  if (p->running == PS_DONE && (sig == SIGTERM || sig == SIGHUP))
+		  if (PEXITED (p) && (sig == SIGTERM || sig == SIGHUP))
 		    kill (p->pid, SIGCONT);
 		  p = p->next;
 		}
-	      while (p != jobs[job]->pipe);
+	      while  (p != jobs[job]->pipe);
 	    }
 	  else
 	    {
@@ -2425,6 +3028,7 @@ waitchld (wpid, block)
   PROCESS *child;
   pid_t pid;
   int call_set_current, last_stopped_job, job, children_exited, waitpid_flags;
+  static int wcontinued = WCONTINUED;	/* run-time fix for glibc problem */
 
   call_set_current = children_exited = 0;
   last_stopped_job = NO_JOB;
@@ -2434,11 +3038,20 @@ waitchld (wpid, block)
       /* We don't want to be notified about jobs stopping if job control
 	 is not active.  XXX - was interactive_shell instead of job_control */
       waitpid_flags = (job_control && subshell_environment == 0)
-			? (WUNTRACED|WCONTINUED)
+			? (WUNTRACED|wcontinued)
 			: 0;
       if (sigchld || block == 0)
 	waitpid_flags |= WNOHANG;
+      CHECK_TERMSIG;
+
       pid = WAITPID (-1, &status, waitpid_flags);
+
+      /* WCONTINUED may be rejected by waitpid as invalid even when defined */
+      if (wcontinued && pid < 0 && errno == EINVAL)
+	{
+	  wcontinued = 0;
+	  continue;	/* jump back to the test and retry without WCONTINUED */
+	}
 
       /* The check for WNOHANG is to make sure we decrement sigchld only
 	 if it was non-zero before we called waitpid. */
@@ -2457,31 +3070,47 @@ waitchld (wpid, block)
 
       /* If waitpid returns 0, there are running children.  If it returns -1,
 	 the only other error POSIX says it can return is EINTR. */
+      CHECK_TERMSIG;
       if (pid <= 0)
 	continue;	/* jumps right to the test */
 
       /* children_exited is used to run traps on SIGCHLD.  We don't want to
          run the trap if a process is just being continued. */
       if (WIFCONTINUED(status) == 0)
-	children_exited++;
+	{
+	  children_exited++;
+	  js.c_living--;
+	}
 
       /* Locate our PROCESS for this pid. */
-      child = find_pipeline (pid, 1, &job);	/* want running procs only */
+      child = find_process (pid, 1, &job);	/* want living procs only */
+
+#if defined (COPROCESS_SUPPORT)
+      coproc_pidchk (pid, status);
+#endif
 
       /* It is not an error to have a child terminate that we did
 	 not have a record of.  This child could have been part of
 	 a pipeline in backquote substitution.  Even so, I'm not
 	 sure child is ever non-zero. */
       if (child == 0)
-	continue;
-
-      while (child->pid != pid)
-	child = child->next;
+	{
+	  if (WIFEXITED (status) || WIFSIGNALED (status))
+	    js.c_reaped++;
+	  continue;
+	}
 
       /* Remember status, and whether or not the process is running. */
       child->status = status;
       child->running = WIFCONTINUED(status) ? PS_RUNNING : PS_DONE;
 
+      if (PEXITED (child))
+	{
+	  js.c_totreaped++;
+	  if (job != NO_JOB)
+	    js.c_reaped++;
+	}
+        
       if (job == NO_JOB)
 	continue;
 
@@ -2507,7 +3136,17 @@ waitchld (wpid, block)
   /* Call a SIGCHLD trap handler for each child that exits, if one is set. */
   if (job_control && signal_is_trapped (SIGCHLD) && children_exited &&
       trap_list[SIGCHLD] != (char *)IGNORE_SIG)
-    run_sigchld_trap (children_exited);
+    {
+      if (this_shell_builtin && this_shell_builtin == wait_builtin)
+	{
+	  interrupt_immediately = 0;
+	  trap_handler (SIGCHLD);	/* set pending_traps[SIGCHLD] */
+	  wait_signal_received = SIGCHLD;
+	  longjmp (wait_intr_buf, 1);
+	}
+
+      run_sigchld_trap (children_exited);
+    }
 
   /* We have successfully recorded the useful information about this process
      that has just changed state.  If we notify asynchronously, and the job
@@ -2546,8 +3185,13 @@ set_job_status_and_cleanup (job)
   job_state = any_stopped = any_tstped = 0;
   do
     {
-      job_state |= child->running;
-      if (child->running == PS_DONE && (WIFSTOPPED (child->status)))
+      job_state |= PRUNNING (child);
+#if 0
+      if (PEXITED (child) && (WIFSTOPPED (child->status)))
+#else
+      /* Only checking for WIFSTOPPED now, not for PS_DONE */
+      if (PSTOPPED (child))
+#endif
 	{
 	  any_stopped = 1;
 	  any_tstped |= interactive && job_control &&
@@ -2585,6 +3229,7 @@ set_job_status_and_cleanup (job)
   else
     {
       jobs[job]->state = JDEAD;
+      js.j_ndead++;
 
 #if 0
       if (IS_FOREGROUND (job))
@@ -2609,7 +3254,7 @@ set_job_status_and_cleanup (job)
    * for a foreground job to complete
    */
 
-  if (jobs[job]->state == JDEAD)
+  if (JOBSTATE (job) == JDEAD)
     {
       /* If we're running a shell script and we get a SIGINT with a
 	 SIGINT trap handler, but the foreground job handles it and
@@ -2677,10 +3322,10 @@ set_job_status_and_cleanup (job)
 	      if (temp_handler == trap_handler && signal_is_trapped (SIGINT) == 0)
 		  temp_handler = trap_to_sighandler (SIGINT);
 		restore_sigint_handler ();
-		if (temp_handler == SIG_DFL)
-		  termination_unwind_protect (SIGINT);
-		else if (temp_handler != SIG_IGN)
-		  (*temp_handler) (SIGINT);
+	      if (temp_handler == SIG_DFL)
+		termsig_handler (SIGINT);
+	      else if (temp_handler != SIG_IGN)
+		(*temp_handler) (SIGINT);
 	    }
 	}
     }
@@ -2720,7 +3365,7 @@ setjstatus (j)
 #endif
 }
 
-static void
+void
 run_sigchld_trap (nchild)
      int nchild;
 {
@@ -2735,6 +3380,7 @@ run_sigchld_trap (nchild)
 
   begin_unwind_frame ("SIGCHLD trap");
   unwind_protect_int (last_command_exit_value);
+  unwind_protect_int (last_command_exit_signal);
   unwind_protect_var (last_made_pid);
   unwind_protect_int (interrupt_immediately);
   unwind_protect_int (jobs_list_frozen);
@@ -2744,18 +3390,18 @@ run_sigchld_trap (nchild)
   /* We have to add the commands this way because they will be run
      in reverse order of adding.  We don't want maybe_set_sigchld_trap ()
      to reference freed memory. */
-  add_unwind_protect ((Function *)xfree, trap_command);
-  add_unwind_protect ((Function *)maybe_set_sigchld_trap, trap_command);
+  add_unwind_protect (xfree, trap_command);
+  add_unwind_protect (maybe_set_sigchld_trap, trap_command);
 
   subst_assign_varlist = (WORD_LIST *)NULL;
   the_pipeline = (PROCESS *)NULL;
 
-  restore_default_signal (SIGCHLD);
+  set_impossible_sigchld_trap ();
   jobs_list_frozen = 1;
   for (i = 0; i < nchild; i++)
     {
       interrupt_immediately = 1;
-      parse_and_execute (savestring (trap_command), "trap", SEVAL_NOHIST);
+      parse_and_execute (savestring (trap_command), "trap", SEVAL_NOHIST|SEVAL_RESETLINE);
     }
 
   run_unwind_frame ("SIGCHLD trap");
@@ -2773,7 +3419,7 @@ notify_of_job_status ()
   sigset_t set, oset;
   WAIT s;
 
-  if (jobs == 0 || job_slots == 0)
+  if (jobs == 0 || js.j_jobslots == 0)
     return;
 
   if (old_ttou != 0)
@@ -2787,7 +3433,8 @@ notify_of_job_status ()
   else
     queue_sigchld++;
 
-  for (job = 0, dir = (char *)NULL; job < job_slots; job++)
+  /* XXX could use js.j_firstj here */
+  for (job = 0, dir = (char *)NULL; job < js.j_jobslots; job++)
     {
       if (jobs[job] && IS_NOTIFIED (job) == 0)
 	{
@@ -2796,17 +3443,28 @@ notify_of_job_status ()
 
 	  /* POSIX.2 says we have to hang onto the statuses of at most the
 	     last CHILD_MAX background processes if the shell is running a
-	     script.  If the shell is not interactive, don't print anything
-	     unless the job was killed by a signal. */
+	     script.  If the shell is running a script, either from a file
+	     or standard input, don't print anything unless the job was
+	     killed by a signal. */
 	  if (startup_state == 0 && WIFSIGNALED (s) == 0 &&
 		((DEADJOB (job) && IS_FOREGROUND (job) == 0) || STOPPED (job)))
 	    continue;
 	  
+#if 0
 	  /* If job control is disabled, don't print the status messages.
 	     Mark dead jobs as notified so that they get cleaned up.  If
 	     startup_state == 2, we were started to run `-c command', so
 	     don't print anything. */
 	  if ((job_control == 0 && interactive_shell) || startup_state == 2)
+#else
+	  /* If job control is disabled, don't print the status messages.
+	     Mark dead jobs as notified so that they get cleaned up.  If
+	     startup_state == 2 and subshell_environment has the
+	     SUBSHELL_COMSUB bit turned on, we were started to run a command
+	     substitution, so don't print anything. */
+	  if ((job_control == 0 && interactive_shell) ||
+	      (startup_state == 2 && (subshell_environment & SUBSHELL_COMSUB)))
+#endif
 	    {
 	      /* POSIX.2 compatibility:  if the shell is not interactive,
 		 hang onto the job corresponding to the last asynchronous
@@ -2830,7 +3488,8 @@ notify_of_job_status ()
 #endif
 		  signal_is_trapped (termsig) == 0)
 		{
-		  fprintf (stderr, "%s: line %d: ", get_name_for_error (), line_number);
+		  /* Don't print `0' for a line number. */
+		  fprintf (stderr, _("%s: line %d: "), get_name_for_error (), (line_number == 0) ? 1 : line_number);
 		  pretty_print_job (job, JLIST_NONINTERACTIVE, stderr);
 		}
 	      else if (IS_FOREGROUND (job))
@@ -2841,22 +3500,22 @@ notify_of_job_status ()
 		  if (termsig && WIFSIGNALED (s) && termsig != SIGINT && termsig != SIGPIPE)
 #endif
 		    {
-		      fprintf (stderr, "%s", strsignal (termsig));
+		      fprintf (stderr, "%s", j_strsignal (termsig));
 
 		      if (WIFCORED (s))
-			fprintf (stderr, " (core dumped)");
+			fprintf (stderr, _(" (core dumped)"));
 
 		      fprintf (stderr, "\n");
 		    }
 		}
-	      else
+	      else if (job_control)	/* XXX job control test added */
 		{
 		  if (dir == 0)
 		    dir = current_working_directory ();
 		  pretty_print_job (job, JLIST_STANDARD, stderr);
 		  if (dir && strcmp (dir, jobs[job]->wd) != 0)
 		    fprintf (stderr,
-			     "(wd now: %s)\n", polite_directory_format (dir));
+			     _("(wd now: %s)\n"), polite_directory_format (dir));
 		}
 
 	      jobs[job]->flags |= J_NOTIFIED;
@@ -2869,7 +3528,7 @@ notify_of_job_status ()
 	      pretty_print_job (job, JLIST_STANDARD, stderr);
 	      if (dir && (strcmp (dir, jobs[job]->wd) != 0))
 		fprintf (stderr,
-			 "(wd now: %s)\n", polite_directory_format (dir));
+			 _("(wd now: %s)\n"), polite_directory_format (dir));
 	      jobs[job]->flags |= J_NOTIFIED;
 	      break;
 
@@ -2893,11 +3552,15 @@ int
 initialize_job_control (force)
      int force;
 {
+  pid_t t;
+  int t_errno;
+
+  t_errno = -1;
   shell_pgrp = getpgid (0);
 
   if (shell_pgrp == -1)
     {
-      sys_error ("initialize_job_control: getpgrp failed");
+      sys_error (_("initialize_job_control: getpgrp failed"));
       exit (1);
     }
 
@@ -2910,10 +3573,21 @@ initialize_job_control (force)
     }
   else
     {
+      shell_tty = -1;
+
+      /* If forced_interactive is set, we skip the normal check that stderr
+	 is attached to a tty, so we need to check here.  If it's not, we
+	 need to see whether we have a controlling tty by opening /dev/tty,
+	 since trying to use job control tty pgrp manipulations on a non-tty
+	 is going to fail. */
+      if (forced_interactive && isatty (fileno (stderr)) == 0)
+	shell_tty = open ("/dev/tty", O_RDWR|O_NONBLOCK);
+
       /* Get our controlling terminal.  If job_control is set, or
 	 interactive is set, then this is an interactive shell no
 	 matter where fd 2 is directed. */
-      shell_tty = dup (fileno (stderr));	/* fd 2 */
+      if (shell_tty == -1)
+	shell_tty = dup (fileno (stderr));	/* fd 2 */
 
       shell_tty = move_to_high_fd (shell_tty, 1, -1);
 
@@ -2940,10 +3614,13 @@ initialize_job_control (force)
 	  break;
 	}
 
+      if (terminal_pgrp == -1)
+	t_errno = errno;
+
       /* Make sure that we are using the new line discipline. */
       if (set_new_line_discipline (shell_tty) < 0)
 	{
-	  sys_error ("initialize_job_control: line discipline");
+	  sys_error (_("initialize_job_control: line discipline"));
 	  job_control = 0;
 	}
       else
@@ -2953,7 +3630,7 @@ initialize_job_control (force)
 
 	  if ((original_pgrp != shell_pgrp) && (setpgid (0, shell_pgrp) < 0))
 	    {
-	      sys_error ("initialize_job_control: setpgid");
+	      sys_error (_("initialize_job_control: setpgid"));
 	      shell_pgrp = original_pgrp;
 	    }
 
@@ -2970,14 +3647,23 @@ initialize_job_control (force)
 	    {
 	      if (give_terminal_to (shell_pgrp, 0) < 0)
 		{
+		  t_errno = errno;
 		  setpgid (0, original_pgrp);
 		  shell_pgrp = original_pgrp;
 		  job_control = 0;
 		}
 	    }
+
+	  if (job_control && ((t = tcgetpgrp (shell_tty)) == -1 || t != shell_pgrp))
+	    {
+	      if (t_errno != -1)
+		errno = t_errno;
+	      sys_error (_("cannot set terminal process group (%d)"), t);
+	      job_control = 0;
+	    }
 	}
       if (job_control == 0)
-	internal_error ("no job control in this shell");
+	internal_error (_("no job control in this shell"));
     }
 
   if (shell_tty != fileno (stderr))
@@ -2989,6 +3675,11 @@ initialize_job_control (force)
 
   if (interactive)
     get_tty_state ();
+
+  if (js.c_childmax < 0)
+    js.c_childmax = getmaxchild ();
+  if (js.c_childmax < 0)
+    js.c_childmax = DEFAULT_CHILD_MAX;
 
   return job_control;
 }
@@ -3061,60 +3752,6 @@ set_new_line_discipline (tty)
 #endif
 }
 
-#if defined (TIOCGWINSZ) && defined (SIGWINCH)
-static void
-get_new_window_size (from_sig)
-     int from_sig;
-{
-  struct winsize win;
-
-  if ((ioctl (shell_tty, TIOCGWINSZ, &win) == 0) &&
-      win.ws_row > 0 && win.ws_col > 0)
-    {
-#if defined (aixpc)
-      shell_tty_info.c_winsize = win;	/* structure copying */
-#endif
-      sh_set_lines_and_columns (win.ws_row, win.ws_col);
-#if defined (READLINE)
-      rl_set_screen_size (win.ws_row, win.ws_col);
-#endif
-    }
-}
-
-static sighandler
-sigwinch_sighandler (sig)
-     int sig;
-{
-#if defined (MUST_REINSTALL_SIGHANDLERS)
-  set_signal_handler (SIGWINCH, sigwinch_sighandler);
-#endif /* MUST_REINSTALL_SIGHANDLERS */
-  get_new_window_size (1);
-  SIGRETURN (0);
-}
-#else
-static void
-get_new_window_size (from_sig)
-     int from_sig;
-{
-}
-#endif /* TIOCGWINSZ && SIGWINCH */
-
-void
-set_sigwinch_handler ()
-{
-#if defined (TIOCGWINSZ) && defined (SIGWINCH)
- old_winch = set_signal_handler (SIGWINCH, sigwinch_sighandler);
-#endif
-}
-
-void
-unset_sigwinch_handler ()
-{
-#if defined (TIOCGWINSZ) && defined (SIGWINCH)
-  set_signal_handler (SIGWINCH, old_winch);
-#endif
-}
-
 /* Setup this shell to handle C-C, etc. */
 void
 initialize_job_signals ()
@@ -3125,7 +3762,6 @@ initialize_job_signals ()
       set_signal_handler (SIGTSTP, SIG_IGN);
       set_signal_handler (SIGTTOU, SIG_IGN);
       set_signal_handler (SIGTTIN, SIG_IGN);
-      set_sigwinch_handler ();
     }
   else if (job_control)
     {
@@ -3174,7 +3810,7 @@ give_terminal_to (pgrp, force)
      int force;
 {
   sigset_t set, oset;
-  int r;
+  int r, e;
 
   r = 0;
   if (job_control || force)
@@ -3195,13 +3831,45 @@ give_terminal_to (pgrp, force)
 	    shell_tty, (long)getpid(), (long)pgrp);
 #endif
 	  r = -1;
+	  e = errno;
 	}
       else
 	terminal_pgrp = pgrp;
       sigprocmask (SIG_SETMASK, &oset, (sigset_t *)NULL);
     }
 
+  if (r == -1)
+    errno = e;
+
   return r;
+}
+
+/* Give terminal to NPGRP iff it's currently owned by OPGRP.  FLAGS are the
+   flags to pass to give_terminal_to(). */
+static int
+maybe_give_terminal_to (opgrp, npgrp, flags)
+     pid_t opgrp, npgrp;
+     int flags;
+{
+  int tpgrp;
+
+  tpgrp = tcgetpgrp (shell_tty);
+  if (tpgrp < 0 && errno == ENOTTY)
+    return -1;
+  if (tpgrp == npgrp)
+    {
+      terminal_pgrp = npgrp;
+      return 0;
+    }
+  else if (tpgrp != opgrp)
+    {
+#if defined (DEBUG)
+      internal_warning ("maybe_give_terminal_to: terminal pgrp == %d shell pgrp = %d new pgrp = %d", tpgrp, opgrp, npgrp);
+#endif
+      return -1;
+    }
+  else
+    return (give_terminal_to (npgrp, flags));     
 }
 
 /* Clear out any jobs in the job array.  This is intended to be used by
@@ -3218,20 +3886,33 @@ delete_all_jobs (running_only)
 
   BLOCK_CHILD (set, oset);
 
-  if (job_slots)
+  /* XXX - need to set j_lastj, j_firstj appropriately if running_only != 0. */
+  if (js.j_jobslots)
     {
-      current_job = previous_job = NO_JOB;
+      js.j_current = js.j_previous = NO_JOB;
 
-      for (i = 0; i < job_slots; i++)
-	if (jobs[i] && (running_only == 0 || (running_only && RUNNING(i))))
-	  delete_job (i, 1);
-
+      /* XXX could use js.j_firstj here */
+      for (i = 0; i < js.j_jobslots; i++)
+	{
+#if defined (DEBUG)
+	  if (i < js.j_firstj && jobs[i])
+	    itrace("delete_all_jobs: job %d non-null before js.j_firstj (%d)", i, js.j_firstj);
+	  if (i > js.j_lastj && jobs[i])
+	    itrace("delete_all_jobs: job %d non-null after js.j_lastj (%d)", i, js.j_lastj);
+#endif
+	  if (jobs[i] && (running_only == 0 || (running_only && RUNNING(i))))
+	    delete_job (i, DEL_WARNSTOPPED);
+	}
       if (running_only == 0)
 	{
 	  free ((char *)jobs);
-	  job_slots = 0;
+	  js.j_jobslots = 0;
+	  js.j_firstj = js.j_lastj = js.j_njobs = 0;
 	}
     }
+
+  if (running_only == 0)
+    bgp_clear ();
 
   UNBLOCK_CHILD (oset);
 }
@@ -3247,9 +3928,10 @@ nohup_all_jobs (running_only)
 
   BLOCK_CHILD (set, oset);
 
-  if (job_slots)
+  if (js.j_jobslots)
     {
-      for (i = 0; i < job_slots; i++)
+      /* XXX could use js.j_firstj here */
+      for (i = 0; i < js.j_jobslots; i++)
 	if (jobs[i] && (running_only == 0 || (running_only && RUNNING(i))))
 	  nohup_job (i);
     }
@@ -3263,10 +3945,20 @@ count_all_jobs ()
   int i, n;
   sigset_t set, oset;
 
+  /* This really counts all non-dead jobs. */
   BLOCK_CHILD (set, oset);
-  for (i = n = 0; i < job_slots; i++)
-    if (jobs[i] && DEADJOB(i) == 0)
-      n++;
+  /* XXX could use js.j_firstj here */
+  for (i = n = 0; i < js.j_jobslots; i++)
+    {
+#if defined (DEBUG)
+      if (i < js.j_firstj && jobs[i])
+	itrace("count_all_jobs: job %d non-null before js.j_firstj (%d)", i, js.j_firstj);
+      if (i > js.j_lastj && jobs[i])
+	itrace("count_all_jobs: job %d non-null after js.j_lastj (%d)", i, js.j_lastj);
+#endif
+      if (jobs[i] && DEADJOB(i) == 0)
+	n++;
+    }
   UNBLOCK_CHILD (oset);
   return n;
 }
@@ -3277,14 +3969,18 @@ mark_all_jobs_as_dead ()
   register int i;
   sigset_t set, oset;
 
-  if (job_slots == 0)
+  if (js.j_jobslots == 0)
     return;
 
   BLOCK_CHILD (set, oset);
 
-  for (i = 0; i < job_slots; i++)
+  /* XXX could use js.j_firstj here */
+  for (i = 0; i < js.j_jobslots; i++)
     if (jobs[i])
-      jobs[i]->state = JDEAD;
+      {
+	jobs[i]->state = JDEAD;
+	js.j_ndead++;
+      }
 
   UNBLOCK_CHILD (oset);
 }
@@ -3297,10 +3993,10 @@ static void
 mark_dead_jobs_as_notified (force)
      int force;
 {
-  register int i, ndead;
+  register int i, ndead, ndeadproc;
   sigset_t set, oset;
 
-  if (job_slots == 0)
+  if (js.j_jobslots == 0)
     return;
 
   BLOCK_CHILD (set, oset);
@@ -3309,7 +4005,8 @@ mark_dead_jobs_as_notified (force)
      around; just run through the array. */
   if (force)
     {
-      for (i = 0; i < job_slots; i++)
+    /* XXX could use js.j_firstj here */
+      for (i = 0; i < js.j_jobslots; i++)
 	{
 	  if (jobs[i] && DEADJOB (i) && (interactive_shell || (find_last_pid (i, 0) != last_asynchronous_pid)))
 	    jobs[i]->flags |= J_NOTIFIED;
@@ -3318,40 +4015,82 @@ mark_dead_jobs_as_notified (force)
       return;
     }
 
-  /* Mark enough dead jobs as notified to keep CHILD_MAX jobs left in the
-     array not marked as notified. */
+  /* Mark enough dead jobs as notified to keep CHILD_MAX processes left in the
+     array with the corresponding not marked as notified.  This is a better
+     way to avoid pid aliasing and reuse problems than keeping the POSIX-
+     mandated CHILD_MAX jobs around.  delete_job() takes care of keeping the
+     bgpids list regulated. */
           
   /* Count the number of dead jobs */
-  for (i = ndead = 0; i < job_slots; i++)
+  /* XXX could use js.j_firstj here */
+  for (i = ndead = ndeadproc = 0; i < js.j_jobslots; i++)
     {
+#if defined (DEBUG)
+      if (i < js.j_firstj && jobs[i])
+	itrace("mark_dead_jobs_as_notified: job %d non-null before js.j_firstj (%d)", i, js.j_firstj);
+      if (i > js.j_lastj && jobs[i])
+	itrace("mark_dead_jobs_as_notified: job %d non-null after js.j_lastj (%d)", i, js.j_lastj);
+#endif
       if (jobs[i] && DEADJOB (i))
-	ndead++;
+	{
+	  ndead++;
+	  ndeadproc += processes_in_job (i);
+	}
     }
 
-  if (child_max < 0)
-    child_max = getmaxchild ();
-  if (child_max < 0)
-    child_max = DEFAULT_CHILD_MAX;
+#ifdef DEBUG
+  if (ndeadproc != js.c_reaped)
+    itrace("mark_dead_jobs_as_notified: ndeadproc (%d) != js.c_reaped (%d)", ndeadproc, js.c_reaped);
+  if (ndead != js.j_ndead)
+    itrace("mark_dead_jobs_as_notified: ndead (%d) != js.j_ndead (%d)", ndead, js.j_ndead);
+#endif
 
-  /* Don't do anything if the number of dead jobs is less than CHILD_MAX and
-     we're not forcing a cleanup. */
-  if (ndead <= child_max)
+  if (js.c_childmax < 0)
+    js.c_childmax = getmaxchild ();
+  if (js.c_childmax < 0)
+    js.c_childmax = DEFAULT_CHILD_MAX;
+
+  /* Don't do anything if the number of dead processes is less than CHILD_MAX
+     and we're not forcing a cleanup. */
+  if (ndeadproc <= js.c_childmax)
     {
       UNBLOCK_CHILD (oset);
       return;
     }
 
+#if 0
+itrace("mark_dead_jobs_as_notified: child_max = %d ndead = %d ndeadproc = %d", js.c_childmax, ndead, ndeadproc);
+#endif
+
   /* Mark enough dead jobs as notified that we keep CHILD_MAX jobs in
      the list.  This isn't exactly right yet; changes need to be made
      to stop_pipeline so we don't mark the newer jobs after we've
-     created CHILD_MAX slots in the jobs array. */
-  for (i = 0; i < job_slots; i++)
+     created CHILD_MAX slots in the jobs array.  This needs to be
+     integrated with a way to keep the jobs array from growing without
+     bound.  Maybe we wrap back around to 0 after we reach some max
+     limit, and there are sufficient job slots free (keep track of total
+     size of jobs array (js.j_jobslots) and running count of number of jobs
+     in jobs array.  Then keep a job index corresponding to the `oldest job'
+     and start this loop there, wrapping around as necessary.  In effect,
+     we turn the list into a circular buffer. */
+  /* XXX could use js.j_firstj here */
+  for (i = 0; i < js.j_jobslots; i++)
     {
       if (jobs[i] && DEADJOB (i) && (interactive_shell || (find_last_pid (i, 0) != last_asynchronous_pid)))
 	{
-	  jobs[i]->flags |= J_NOTIFIED;
-	  if (--ndead <= child_max)
+#if defined (DEBUG)
+	  if (i < js.j_firstj && jobs[i])
+	    itrace("mark_dead_jobs_as_notified: job %d non-null before js.j_firstj (%d)", i, js.j_firstj);
+	  if (i > js.j_lastj && jobs[i])
+	    itrace("mark_dead_jobs_as_notified: job %d non-null after js.j_lastj (%d)", i, js.j_lastj);
+#endif
+	  /* If marking this job as notified would drop us down below
+	     child_max, don't mark it so we can keep at least child_max
+	     statuses.  XXX -- need to check what Posix actually says
+	     about keeping statuses. */
+	  if ((ndeadproc -= processes_in_job (i)) <= js.c_childmax)
 	    break;
+	  jobs[i]->flags |= J_NOTIFIED;
 	}
     }
 
@@ -3376,6 +4115,12 @@ set_job_control (arg)
 
   old = job_control;
   job_control = arg;
+
+  /* If we're turning on job control, reset pipeline_pgrp so make_child will
+     put new child processes into the right pgrp */
+  if (job_control != old && job_control)
+    pipeline_pgrp = 0;
+
   return (old);
 }
 
@@ -3386,6 +4131,9 @@ without_job_control ()
 {
   stop_making_children ();
   start_pipeline ();
+#if defined (PGRP_PIPE)
+  sh_closepipe (pgrp_pipe);
+#endif
   delete_all_jobs (0);
   set_job_control (0);
 }
@@ -3447,25 +4195,11 @@ pipe_read (pp)
     }
 }
 
-/* Close the read and write ends of PP, an array of file descriptors. */
-static void
-pipe_close (pp)
-     int *pp;
-{
-  if (pp[0] >= 0)
-    close (pp[0]);
-
-  if (pp[1] >= 0)
-    close (pp[1]);
-
-  pp[0] = pp[1] = -1;
-}
-
 /* Functional interface closes our local-to-job-control pipes. */
 void
 close_pgrp_pipe ()
 {
-  pipe_close (pgrp_pipe);
+  sh_closepipe (pgrp_pipe);
 }
 
 #endif /* PGRP_PIPE */

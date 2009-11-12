@@ -1,23 +1,24 @@
 /* shell.c -- GNU's idea of the POSIX shell specification. */
 
-/* Copyright (C) 1987-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT
-   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
-   License for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Bash; see the file COPYING.  If not, write to the Free
-   Software Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
+/*
   Birthdate:
   Sunday, January 10th, 1988.
   Initial author: Brian Fox
@@ -27,7 +28,7 @@
 #include "config.h"
 
 #include "bashtypes.h"
-#ifdef HAVE_SYS_FILE_H
+#if !defined (_MINIX) && defined (HAVE_SYS_FILE_H)
 #  include <sys/file.h>
 #endif
 #include "posixstat.h"
@@ -42,6 +43,8 @@
 #if defined (HAVE_UNISTD_H)
 #  include <unistd.h>
 #endif
+
+#include "bashintl.h"
 
 #define NEED_SH_SETLINEBUF_DECL		/* used in externs.h */
 
@@ -69,6 +72,10 @@
 #  include <readline/history.h>
 #endif
 
+#if defined (READLINE)
+#  include "bashline.h"
+#endif
+
 #include <tilde/tilde.h>
 #include <glob/strmatch.h>
 
@@ -94,10 +101,11 @@ extern int shell_level;
 extern int subshell_environment;
 extern int last_command_exit_value;
 extern int line_number;
-extern char *primary_prompt, *secondary_prompt;
 extern int expand_aliases;
-extern char *this_command_name;
 extern int array_needs_making;
+extern int gnu_error_format;
+extern char *primary_prompt, *secondary_prompt;
+extern char *this_command_name;
 
 /* Non-zero means that this shell has already been run; i.e. you should
    call shell_reinitialize () if you need to start afresh. */
@@ -136,6 +144,12 @@ int interactive_shell = 0;
    shell exits. */
 int hup_on_exit = 0;
 
+/* Non-zero means to list status of running and stopped jobs at shell exit */
+int check_jobs_at_exit = 0;
+
+/* Non-zero means to change to a directory name supplied as a command name */
+int autocd = 0;
+
 /* Tells what state the shell was in when it started:
 	0 = non-interactive shell script
 	1 = interactive
@@ -169,6 +183,13 @@ time_t shell_start_time;
 /* Are we running in an emacs shell window? */
 int running_under_emacs;
 
+/* Do we have /dev/fd? */
+#ifdef HAVE_DEV_FD
+int have_devfd = HAVE_DEV_FD;
+#else
+int have_devfd = 0;
+#endif
+
 /* The name of the .(shell)rc file. */
 static char *bashrc_file = "~/.bashrc";
 
@@ -192,22 +213,33 @@ static int do_version;			/* Display interesting version info. */
 static int make_login_shell;		/* Make this shell be a `-bash' shell. */
 static int want_initial_help;		/* --help option */
 
+int debugging_mode = 0;		/* In debugging mode with --debugger */
 int no_line_editing = 0;	/* Don't do fancy line editing. */
-int posixly_correct = 0;	/* Non-zero means posix.2 superset. */
 int dump_translatable_strings;	/* Dump strings in $"...", don't execute. */
 int dump_po_strings;		/* Dump strings in $"..." in po format */
 int wordexp_only = 0;		/* Do word expansion only */
+int protected_mode = 0;		/* No command substitution with --wordexp */
+
+#if defined (STRICT_POSIX)
+int posixly_correct = 1;	/* Non-zero means posix.2 superset. */
+#else
+int posixly_correct = 0;	/* Non-zero means posix.2 superset. */
+#endif
+
 
 /* Some long-winded argument names.  These are obviously new. */
 #define Int 1
 #define Charp 2
-struct {
-  char *name;
+static const struct {
+  const char *name;
   int type;
   int *int_value;
   char **char_value;
 } long_args[] = {
   { "debug", Int, &debugging, (char **)0x0 },
+#if defined (DEBUGGER)
+  { "debugger", Int, &debugging_mode, (char **)0x0 },
+#endif
   { "dump-po-strings", Int, &dump_po_strings, (char **)0x0 },
   { "dump-strings", Int, &dump_translatable_strings, (char **)0x0 },
   { "help", Int, &want_initial_help, (char **)0x0 },
@@ -217,6 +249,7 @@ struct {
   { "noprofile", Int, &no_profile, (char **)0x0 },
   { "norc", Int, &no_rc, (char **)0x0 },
   { "posix", Int, &posixly_correct, (char **)0x0 },
+  { "protected", Int, &protected_mode, (char **)0x0 },
   { "rcfile", Charp, (int *)0x0, &bashrc_file },
 #if defined (RESTRICTED_SHELL)
   { "restricted", Int, &restricted, (char **)0x0 },
@@ -245,10 +278,12 @@ int default_buffered_input = -1;
 int read_from_stdin;		/* -s flag supplied */
 int want_pending_command;	/* -c flag supplied */
 
+/* This variable is not static so it can be bound to $BASH_EXECUTION_STRING */
+char *command_execution_string;	/* argument to -c option */
+
 int malloc_trace_at_exit = 0;
 
 static int shell_reinitialized = 0;
-static char *local_pending_command;
 
 static FILE *default_input;
 
@@ -258,6 +293,8 @@ static int shopt_ind = 0, shopt_len = 0;
 static int parse_long_options __P((char **, int, int));
 static int parse_shell_options __P((char **, int, int));
 static int bind_args __P((char **, int, int, int));
+
+static void start_debugger __P((void));
 
 static void add_shopt_to_alist __P((char *, int));
 static void run_shopt_alist __P((void));
@@ -273,6 +310,7 @@ static int uidget __P((void));
 
 static void init_interactive __P((void));
 static void init_noninteractive __P((void));
+static void init_interactive_script __P((void));
 
 static void set_shell_name __P((char *));
 static void shell_initialize __P((void));
@@ -287,11 +325,11 @@ _cygwin32_check_tmp ()
   struct stat sb;
 
   if (stat ("/tmp", &sb) < 0)
-    internal_warning ("could not find /tmp, please create!");
+    internal_warning (_("could not find /tmp, please create!"));
   else
     {
       if (S_ISDIR (sb.st_mode) == 0)
-	internal_warning ("/tmp must be a valid directory name");
+	internal_warning (_("/tmp must be a valid directory name"));
     }
 }
 #endif /* __CYGWIN__ */
@@ -349,7 +387,7 @@ main (argc, argv, env)
 #endif /* __CYGWIN__ */
 
   /* Wait forever if we are debugging a login shell. */
-  while (debugging_login_shell);
+  while (debugging_login_shell) sleep (3);
 
   set_default_locale ();
 
@@ -374,7 +412,9 @@ main (argc, argv, env)
 
   /* Initialize `local' variables for all `invocations' of main (). */
   arg_index = 1;
-  local_pending_command = (char *)NULL;
+  if (arg_index > argc)
+    arg_index = argc;
+  command_execution_string = (char *)NULL;
   want_pending_command = locally_skip_execution = read_from_stdin = 0;
   default_input = stdin;
 #if defined (BUFFERED_INPUT)
@@ -447,11 +487,11 @@ main (argc, argv, env)
      following args are $0...$n respectively. */
   if (want_pending_command)
     {
-      local_pending_command = argv[arg_index];
-      if (local_pending_command == 0)
+      command_execution_string = argv[arg_index];
+      if (command_execution_string == 0)
 	{
-	  report_error ("-c: option requires an argument");
-	  exit (EX_USAGE);
+	  report_error (_("%s: option requires an argument"), "-c");
+	  exit (EX_BADUSAGE);
 	}
       arg_index++;
     }
@@ -465,16 +505,16 @@ main (argc, argv, env)
 	no -c command
 	no arguments remaining or the -s flag given
 	standard input is a terminal
-	standard output is a terminal
+	standard error is a terminal
      Refer to Posix.2, the description of the `sh' utility. */
 
   if (forced_interactive ||		/* -i flag */
-      (!local_pending_command &&	/* No -c command and ... */
+      (!command_execution_string &&	/* No -c command and ... */
        wordexp_only == 0 &&		/* No --wordexp and ... */
        ((arg_index == argc) ||		/*   no remaining args or... */
 	read_from_stdin) &&		/*   -s flag with args, and */
        isatty (fileno (stdin)) &&	/* Input is a terminal and */
-       isatty (fileno (stdout))))	/* output is a terminal. */
+       isatty (fileno (stderr))))	/* error output is a terminal. */
     init_interactive ();
   else
     init_noninteractive ();
@@ -499,7 +539,7 @@ main (argc, argv, env)
      alias expansion in non-interactive shells, and other Posix.2 things. */
   if (posixly_correct)
     {
-      bind_variable ("POSIXLY_CORRECT", "y");
+      bind_variable ("POSIXLY_CORRECT", "y", 0);
       sv_strict_posix ("POSIXLY_CORRECT");
     }
 
@@ -511,18 +551,31 @@ main (argc, argv, env)
      Variables from the environment are expected to be set, etc. */
   shell_initialize ();
 
+  set_default_lang ();
   set_default_locale_vars ();
 
+  /*
+   * M-x term -> TERM=eterm EMACS=22.1 (term:0.96)	(eterm)
+   * M-x shell -> TERM=dumb EMACS=t			(no line editing)
+   * M-x terminal -> TERM=emacs-em7955 EMACS=		(line editing)
+   */
   if (interactive_shell)
     {
-      char *term;
+      char *term, *emacs;
 
-      term = getenv ("TERM");
+      term = get_string_value ("TERM");
+      emacs = get_string_value ("EMACS");
+
+      /* Not sure any emacs terminal emulator sets TERM=emacs any more */
       no_line_editing |= term && (STREQ (term, "emacs"));
-      term = getenv ("EMACS");
-      running_under_emacs = term ? ((strmatch ("*term*", term, 0) == 0) ? 2 : 1)
-				 : 0;
-      no_line_editing |= term && term[0] == 't' && term[1] == '\0';
+      no_line_editing |= emacs && emacs[0] == 't' && emacs[1] == '\0' && STREQ (term, "dumb");
+
+      /* running_under_emacs == 2 for `eterm' */
+      running_under_emacs = (emacs != 0) || (term && STREQN (term, "emacs", 5));
+      running_under_emacs += term && STREQN (term, "eterm", 5) && strstr (emacs, "term");
+
+      if (running_under_emacs)
+	gnu_error_format = 1;
     }
 
   top_level_arg_index = arg_index;
@@ -534,7 +587,7 @@ main (argc, argv, env)
   code = setjmp (top_level);
   if (code)
     {
-      if (code == EXITPROG)
+      if (code == EXITPROG || code == ERREXIT)
 	exit_shell (last_command_exit_value);
       else
 	{
@@ -594,7 +647,7 @@ main (argc, argv, env)
   /* If we are invoked as `sh', turn on Posix mode. */
   if (act_like_sh)
     {
-      bind_variable ("POSIXLY_CORRECT", "y");
+      bind_variable ("POSIXLY_CORRECT", "y", 0);
       sv_strict_posix ("POSIXLY_CORRECT");
     }
 
@@ -614,16 +667,20 @@ main (argc, argv, env)
       exit_shell (last_command_exit_value);
     }
 
-  if (local_pending_command)
+  if (command_execution_string)
     {
       arg_index = bind_args (argv, arg_index, argc, 0);
       startup_state = 2;
+
+      if (debugging_mode)
+	start_debugger ();
+
 #if defined (ONESHOT)
       executing = 1;
-      run_one_command (local_pending_command);
+      run_one_command (command_execution_string);
       exit_shell (last_command_exit_value);
 #else /* ONESHOT */
-      with_input_from_string (local_pending_command, "-c");
+      with_input_from_string (command_execution_string, "-c");
       goto read_and_execute;
 #endif /* !ONESHOT */
     }
@@ -648,12 +705,16 @@ main (argc, argv, env)
 
   /* Bind remaining args to $1 ... $n */
   arg_index = bind_args (argv, arg_index, argc, 1);
+
+  if (debugging_mode && locally_skip_execution == 0 && running_setuid == 0)
+    start_debugger ();
+
   /* Do the things that should be done only for interactive shells. */
   if (interactive_shell)
     {
       /* Set up for checking for presence of mail. */
-      remember_mail_dates ();
       reset_mail_timer ();
+      init_mail_dates ();
 
 #if defined (HISTORY)
       /* Initialize the interactive history stuff. */
@@ -710,8 +771,8 @@ parse_long_options (argv, arg_start, arg_end)
 		*long_args[i].int_value = 1;
 	      else if (argv[++arg_index] == 0)
 		{
-		  report_error ("%s: option requires an argument", long_args[i].name);
-		  exit (EX_USAGE);
+		  report_error (_("%s: option requires an argument"), long_args[i].name);
+		  exit (EX_BADUSAGE);
 		}
 	      else
 		*long_args[i].char_value = argv[arg_index];
@@ -723,9 +784,9 @@ parse_long_options (argv, arg_start, arg_end)
 	{
 	  if (longarg)
 	    {
-	      report_error ("%s: invalid option", argv[arg_index]);
+	      report_error (_("%s: invalid option"), argv[arg_index]);
 	      show_shell_usage (stderr, 0);
-	      exit (EX_USAGE);
+	      exit (EX_BADUSAGE);
 	    }
 	  break;		/* No such argument.  Maybe flag arg. */
 	}
@@ -786,7 +847,7 @@ parse_shell_options (argv, arg_start, arg_end)
 		  break;
 		}
 	      if (set_minus_o_option (on_or_off, o_option) != EXECUTION_SUCCESS)
-		exit (EX_USAGE);
+		exit (EX_BADUSAGE);
 	      next_arg++;
 	      break;
 
@@ -812,9 +873,9 @@ parse_shell_options (argv, arg_start, arg_end)
 	    default:
 	      if (change_flag (arg_character, on_or_off) == FLAG_ERROR)
 		{
-		  report_error ("%c%c: invalid option", on_or_off, arg_character);
+		  report_error (_("%c%c: invalid option"), on_or_off, arg_character);
 		  show_shell_usage (stderr, 0);
-		  exit (EX_USAGE);
+		  exit (EX_BADUSAGE);
 		}
 	    }
 	}
@@ -844,6 +905,10 @@ exit_shell (s)
   if (interactive_shell)
     maybe_save_shell_history ();
 #endif /* HISTORY */
+
+#if defined (COPROCESS_SUPPORT)
+  coproc_flush ();
+#endif
 
 #if defined (JOB_CONTROL)
   /* If the user has run `shopt -s huponexit', hangup all jobs when we exit
@@ -929,7 +994,7 @@ run_startup_files ()
 
   /* get the rshd/sshd case out of the way first. */
   if (interactive_shell == 0 && no_rc == 0 && login_shell == 0 &&
-      act_like_sh == 0 && local_pending_command)
+      act_like_sh == 0 && command_execution_string)
     {
 #ifdef SSH_SOURCE_BASHRC
       run_by_ssh = (find_variable ("SSH_CLIENT") != (SHELL_VAR *)0) ||
@@ -1065,6 +1130,8 @@ shell_is_restricted (name)
   if (restricted)
     return 1;
   temp = base_pathname (name);
+  if (*temp == '-')
+    temp++;
   return (STREQ (temp, RESTRICTED_SHELL_NAME));
 }
 
@@ -1082,6 +1149,8 @@ maybe_make_restricted (name)
   char *temp;
 
   temp = base_pathname (name);
+  if (*temp == '-')
+    temp++;
   if (restricted || (STREQ (temp, RESTRICTED_SHELL_NAME)))
     {
       set_var_read_only ("PATH");
@@ -1133,7 +1202,7 @@ run_wordexp (words)
      char *words;
 {
   int code, nw, nb;
-  WORD_LIST *wl, *result;
+  WORD_LIST *wl, *tl, *result;
 
   code = setjmp (top_level);
 
@@ -1144,6 +1213,7 @@ run_wordexp (words)
 	  /* Some kind of throw to top_level has occured. */
 	case FORCE_EOF:
 	  return last_command_exit_value = 127;
+	case ERREXIT:
 	case EXITPROG:
 	  return last_command_exit_value;
 	case DISCARD:
@@ -1167,6 +1237,9 @@ run_wordexp (words)
       if (global_command->type != cm_simple)
 	return (126);
       wl = global_command->value.Simple->words;
+      if (protected_mode)
+	for (tl = wl; tl; tl = tl->next)
+	  tl->word->flags |= W_NOCOMSUB|W_NOPROCSUB;
       result = wl ? expand_words_no_vars (wl) : (WORD_LIST *)0;
     }
   else
@@ -1217,6 +1290,7 @@ run_one_command (command)
 	  /* Some kind of throw to top_level has occured. */
 	case FORCE_EOF:
 	  return last_command_exit_value = 127;
+	case ERREXIT:
 	case EXITPROG:
 	  return last_command_exit_value;
 	case DISCARD:
@@ -1237,7 +1311,7 @@ bind_args (argv, arg_start, arg_end, start_index)
   register int i;
   WORD_LIST *args;
 
-  for (i = arg_start, args = (WORD_LIST *)NULL; i != arg_end; i++)
+  for (i = arg_start, args = (WORD_LIST *)NULL; i < arg_end; i++)
     args = make_word_list (make_word (argv[i]), args);
   if (args)
     {
@@ -1250,9 +1324,13 @@ bind_args (argv, arg_start, arg_end, start_index)
 	  FREE (dollar_vars[0]);
 	  dollar_vars[0] = savestring (args->word->word);
 	  remember_args (args->next, 1);
+	  push_args (args->next);	/* BASH_ARGV and BASH_ARGC */
 	}
       else			/* bind to $1...$n for shell script */
-	remember_args (args, 1);
+        {
+	  remember_args (args, 1);
+	  push_args (args);		/* BASH_ARGV and BASH_ARGC */
+        }
 
       dispose_words (args);
     }
@@ -1264,6 +1342,23 @@ void
 unbind_args ()
 {
   remember_args ((WORD_LIST *)NULL, 1);
+  pop_args ();				/* Reset BASH_ARGV and BASH_ARGC */
+}
+
+static void
+start_debugger ()
+{
+#if defined (DEBUGGER) && defined (DEBUGGER_START_FILE)
+  int old_errexit;
+
+  old_errexit = exit_immediately_on_error;
+  exit_immediately_on_error = 0;
+
+  maybe_execute_file (DEBUGGER_START_FILE, 1);
+  function_trace_mode = 1;
+
+  exit_immediately_on_error += old_errexit;
+#endif
 }
 
 static int
@@ -1271,13 +1366,15 @@ open_shell_script (script_name)
      char *script_name;
 {
   int fd, e, fd_is_tty;
-  char *filename, *path_filename;
+  char *filename, *path_filename, *t;
   char sample[80];
   int sample_len;
   struct stat sb;
+#if defined (ARRAY_VARS)
+  SHELL_VAR *funcname_v, *bash_source_v, *bash_lineno_v;
+  ARRAY *funcname_a, *bash_source_a, *bash_lineno_a;
+#endif
 
-  free (dollar_vars[0]);
-  dollar_vars[0] = savestring (script_name);
   filename = savestring (script_name);
 
   fd = open (filename, O_RDONLY);
@@ -1304,6 +1401,24 @@ open_shell_script (script_name)
       exit ((e == ENOENT) ? EX_NOTFOUND : EX_NOINPUT);
     }
 
+  free (dollar_vars[0]);
+  dollar_vars[0] = savestring (script_name);
+
+#if defined (ARRAY_VARS)
+  GET_ARRAY_FROM_VAR ("FUNCNAME", funcname_v, funcname_a);
+  GET_ARRAY_FROM_VAR ("BASH_SOURCE", bash_source_v, bash_source_a);
+  GET_ARRAY_FROM_VAR ("BASH_LINENO", bash_lineno_v, bash_lineno_a);
+
+  array_push (bash_source_a, filename);
+  if (bash_lineno_a)
+    {
+      t = itos (executing_line_number ());
+      array_push (bash_lineno_a, t);
+      free (t);
+    }
+  array_push (funcname_a, "main");
+#endif
+
 #ifdef HAVE_DEV_FD
   fd_is_tty = isatty (fd);
 #else
@@ -1321,7 +1436,7 @@ open_shell_script (script_name)
 	{
 	  e = errno;
 	  if ((fstat (fd, &sb) == 0) && S_ISDIR (sb.st_mode))
-	    internal_error ("%s: is a directory", filename);
+	    internal_error (_("%s: is a directory"), filename);
 	  else
 	    {
 	      errno = e;
@@ -1331,7 +1446,7 @@ open_shell_script (script_name)
 	}
       else if (sample_len > 0 && (check_binary_file (sample, sample_len)))
 	{
-	  internal_error ("%s: cannot execute binary file", filename);
+	  internal_error (_("%s: cannot execute binary file"), filename);
 	  exit (EX_BINARY_FILE);
 	}
       /* Now rewind the file back to the beginning. */
@@ -1341,7 +1456,7 @@ open_shell_script (script_name)
   /* Open the script.  But try to move the file descriptor to a randomly
      large one, in the hopes that any descriptors used by the script will
      not match with ours. */
-  fd = move_to_high_fd (fd, 0, -1);
+  fd = move_to_high_fd (fd, 1, -1);
 
 #if defined (__CYGWIN__) && defined (O_TEXT)
   setmode (fd, O_TEXT);
@@ -1382,7 +1497,7 @@ open_shell_script (script_name)
     /* But if a script is called with something like `bash -i scriptname',
        we need to do a non-interactive setup here, since we didn't do it
        before. */
-    init_noninteractive ();
+    init_interactive_script ();
 
   free (filename);
   return (fd);
@@ -1404,17 +1519,12 @@ set_bash_input ()
   /* with_input_from_stdin really means `with_input_from_readline' */
   if (interactive && no_line_editing == 0)
     with_input_from_stdin ();
-  else
 #if defined (BUFFERED_INPUT)
-    {
-      if (interactive == 0)
-	with_input_from_buffered_stream (default_buffered_input, dollar_vars[0]);
-      else
-	with_input_from_stream (default_input, dollar_vars[0]);
-    }
-#else /* !BUFFERED_INPUT */
+  else if (interactive == 0)
+    with_input_from_buffered_stream (default_buffered_input, dollar_vars[0]);
+#endif /* BUFFERED_INPUT */
+  else
     with_input_from_stream (default_input, dollar_vars[0]);
-#endif /* !BUFFERED_INPUT */
 }
 
 /* Close the current shell script input source and forget about it.  This is
@@ -1431,6 +1541,7 @@ unset_bash_input (check_zero)
     {
       close_buffered_fd (default_buffered_input);
       default_buffered_input = bash_input.location.buffered_fd = -1;
+      bash_input.type = st_none;		/* XXX */
     }
 #else /* !BUFFERED_INPUT */
   if (default_input)
@@ -1452,11 +1563,12 @@ set_shell_name (argv0)
 {
   /* Here's a hack.  If the name of this shell is "sh", then don't do
      any startup files; just try to be more like /bin/sh. */
-  shell_name = base_pathname (argv0);
+  shell_name = argv0 ? base_pathname (argv0) : PROGRAM;
 
-  if (*shell_name == '-')
+  if (argv0 && *argv0 == '-')
     {
-      shell_name++;
+      if (*shell_name == '-')
+	shell_name++;
       login_shell++;
     }
 
@@ -1465,7 +1577,7 @@ set_shell_name (argv0)
   if (shell_name[0] == 's' && shell_name[1] == 'u' && shell_name[2] == '\0')
     su_shell++;
 
-  shell_name = argv0;
+  shell_name = argv0 ? argv0 : PROGRAM;
   FREE (dollar_vars[0]);
   dollar_vars[0] = savestring (shell_name);
 
@@ -1479,8 +1591,8 @@ set_shell_name (argv0)
 static void
 init_interactive ()
 {
-  interactive_shell = startup_state = interactive = 1;
-  expand_aliases = 1;
+  expand_aliases = interactive_shell = startup_state = 1;
+  interactive = 1;
 }
 
 static void
@@ -1495,6 +1607,13 @@ init_noninteractive ()
 #if defined (JOB_CONTROL)
   set_job_control (0);
 #endif /* JOB_CONTROL */
+}
+
+static void
+init_interactive_script ()
+{
+  init_noninteractive ();
+  expand_aliases = interactive_shell = startup_state = 1;
 }
 
 void
@@ -1516,7 +1635,8 @@ get_current_user_info ()
 	}
       else
 	{
-	  current_user.user_name = savestring ("I have no name!");
+	  current_user.user_name = _("I have no name!");
+	  current_user.user_name = savestring (current_user.user_name);
 	  current_user.shell = savestring ("/bin/sh");
 	  current_user.home_dir = savestring ("/");
 	}
@@ -1637,6 +1757,12 @@ shell_reinitialize ()
   delete_all_contexts (shell_variables);
   delete_all_variables (shell_functions);
 
+  reinit_special_variables ();
+
+#if defined (READLINE)
+  bashline_reinitialize ();
+#endif
+
   shell_reinitialized = 1;
 }
 
@@ -1649,15 +1775,15 @@ show_shell_usage (fp, extra)
   char *set_opts, *s, *t;
 
   if (extra)
-    fprintf (fp, "GNU bash, version %s-(%s)\n", shell_version_string (), MACHTYPE);
-  fprintf (fp, "Usage:\t%s [GNU long option] [option] ...\n\t%s [GNU long option] [option] script-file ...\n",
+    fprintf (fp, _("GNU bash, version %s-(%s)\n"), shell_version_string (), MACHTYPE);
+  fprintf (fp, _("Usage:\t%s [GNU long option] [option] ...\n\t%s [GNU long option] [option] script-file ...\n"),
 	     shell_name, shell_name);
-  fputs ("GNU long options:\n", fp);
+  fputs (_("GNU long options:\n"), fp);
   for (i = 0; long_args[i].name; i++)
     fprintf (fp, "\t--%s\n", long_args[i].name);
 
-  fputs ("Shell options:\n", fp);
-  fputs ("\t-irsD or -c command or -O shopt_option\t\t(invocation only)\n", fp);
+  fputs (_("Shell options:\n"), fp);
+  fputs (_("\t-irsD or -c command or -O shopt_option\t\t(invocation only)\n"), fp);
 
   for (i = 0, set_opts = 0; shell_builtins[i].name; i++)
     if (STREQ (shell_builtins[i].name, "set"))
@@ -1672,15 +1798,15 @@ show_shell_usage (fp, extra)
       t = xstrchr (s, ']');
       if (t)
 	*t = '\0';
-      fprintf (fp, "\t-%s or -o option\n", s);
+      fprintf (fp, _("\t-%s or -o option\n"), s);
       free (set_opts);
     }
 
   if (extra)
     {
-      fprintf (fp, "Type `%s -c \"help set\"' for more information about shell options.\n", shell_name);
-      fprintf (fp, "Type `%s -c help' for more information about shell builtin commands.\n", shell_name);
-      fprintf (fp, "Use the `bashbug' command to report bugs.\n");
+      fprintf (fp, _("Type `%s -c \"help set\"' for more information about shell options.\n"), shell_name);
+      fprintf (fp, _("Type `%s -c help' for more information about shell builtin commands.\n"), shell_name);
+      fprintf (fp, _("Use the `bashbug' command to report bugs.\n"));
     }
 }
 
@@ -1706,7 +1832,7 @@ run_shopt_alist ()
 
   for (i = 0; i < shopt_ind; i++)
     if (shopt_setopt (shopt_alist[i].word, (shopt_alist[i].token == '-')) != EXECUTION_SUCCESS)
-      exit (EX_USAGE);
+      exit (EX_BADUSAGE);
   free (shopt_alist);
   shopt_alist = 0;
   shopt_ind = shopt_len = 0;

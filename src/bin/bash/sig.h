@@ -1,22 +1,22 @@
 /* sig.h -- header file for signal handler definitions. */
 
-/* Copyright (C) 1994 Free Software Foundation, Inc.
+/* Copyright (C) 1994-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /* Make sure that this is included *after* config.h! */
 
@@ -108,14 +108,26 @@ do { \
 
 #endif /* JOB_CONTROL */
 
+/* Extern variables */
+extern volatile int sigwinch_received;
+
+extern int interrupt_immediately;
+extern int terminate_immediately;
+
 /* Functions from sig.c. */
-extern sighandler termination_unwind_protect __P((int));
+extern sighandler termsig_sighandler __P((int));
+extern void termsig_handler __P((int));
 extern sighandler sigint_sighandler __P((int));
 extern void initialize_signals __P((int));
 extern void initialize_terminating_signals __P((void));
 extern void reset_terminating_signals __P((void));
+extern void top_level_cleanup __P((void));
 extern void throw_to_top_level __P((void));
 extern void jump_to_top_level __P((int)) __attribute__((__noreturn__));
+
+extern sighandler sigwinch_sighandler __P((int));
+extern void set_sigwinch_handler __P((void));
+extern void unset_sigwinch_handler __P((void));
 
 /* Functions defined in trap.c. */
 extern SigHandler *set_sigint_handler __P((void));

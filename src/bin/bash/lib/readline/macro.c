@@ -1,24 +1,24 @@
 /* macro.c -- keyboard macros for readline. */
 
-/* Copyright (C) 1994 Free Software Foundation, Inc.
+/* Copyright (C) 1994-2009 Free Software Foundation, Inc.
 
-   This file is part of the GNU Readline Library, a library for
-   reading lines of text with interactive input and history editing.
+   This file is part of the GNU Readline Library (Readline), a library
+   for reading lines of text with interactive input and history editing.      
 
-   The GNU Readline Library is free software; you can redistribute it
-   and/or modify it under the terms of the GNU General Public License
-   as published by the Free Software Foundation; either version 2, or
+   Readline is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
-   The GNU Readline Library is distributed in the hope that it will be
-   useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   Readline is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   The GNU General Public License is often shipped with GNU software, and
-   is generally kept in a file called COPYING or LICENSE.  If you do not
-   have a copy of the license, write to the Free Software Foundation,
-   59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Readline.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #define READLINE_LIBRARY
 
 #if defined (HAVE_CONFIG_H)
@@ -100,6 +100,8 @@ _rl_with_macro_input (string)
 int
 _rl_next_macro_key ()
 {
+  int c;
+
   if (rl_executing_macro == 0)
     return (0);
 
@@ -109,7 +111,14 @@ _rl_next_macro_key ()
       return (_rl_next_macro_key ());
     }
 
+#if defined (READLINE_CALLBACKS)
+  c = rl_executing_macro[executing_macro_index++];
+  if (RL_ISSTATE (RL_STATE_CALLBACK) && RL_ISSTATE (RL_STATE_READCMD|RL_STATE_MOREINPUT) && rl_executing_macro[executing_macro_index] == 0)
+      _rl_pop_executing_macro ();
+  return c;
+#else
   return (rl_executing_macro[executing_macro_index++]);
+#endif
 }
 
 /* Save the currently executing macro on a stack of saved macros. */
@@ -143,7 +152,7 @@ _rl_pop_executing_macro ()
       rl_executing_macro = macro_list->string;
       executing_macro_index = macro_list->sindex;
       macro_list = macro_list->next;
-      free (macro);
+      xfree (macro);
     }
 
   if (rl_executing_macro == 0)
@@ -172,7 +181,7 @@ _rl_kill_kbd_macro ()
 {
   if (current_macro)
     {
-      free (current_macro);
+      xfree (current_macro);
       current_macro = (char *) NULL;
     }
   current_macro_size = current_macro_index = 0;

@@ -102,6 +102,10 @@
 
 static char location_base[NULL_TERMINATED(MED_STR_MAX)] = "";
 
+static char th_page_and_sec[128] = { '\0' };
+static char th_datestr[128] = { '\0' };
+static char th_version[128] = { '\0' };
+
 char   *signature = "<HR>\nThis document was created by man2html from %s.<BR>\nTime: %s\n";
 
 /* timeformat for signature */
@@ -2148,6 +2152,26 @@ skip_till_newline(char *c)
 	return c;
 }
 
+static void
+outputPageHeader(char *l, char *c, char *r)
+{
+	out_html("<TABLE WIDTH=100%>\n<TR>\n");
+	out_html("<TH ALIGN=LEFT width=33%>");
+	out_html(l);
+	out_html("<TH ALIGN=CENTER width=33%>");
+	out_html(c);
+	out_html("<TH ALIGN=RIGHT width=33%>");
+	out_html(r);
+	out_html("\n</TR>\n</TABLE>\n");
+}
+
+static void
+outputPageFooter(char *l, char *c, char *r)
+{
+	out_html("<HR>\n");
+	outputPageHeader(l, c, r);
+}
+
 static int ifelseval = 0;
 
 static char *
@@ -2836,15 +2860,15 @@ scan_request(char *c)
 			out_html(label);
 			/* &nbsp; for mosaic users */
 			if (mode)
-				out_html("\">&nbsp;</A>\n<H3>");
+				out_html("\">&nbsp;</A>\n<H4>");
 			else
-				out_html("\">&nbsp;</A>\n<H2>");
+				out_html("\">&nbsp;</A>\n<H3>");
 			mandoc_synopsis = strncmp(c, "SYNOPSIS", 8) == 0;
 			c = mandoc_command ? scan_troff_mandoc(c, 1, NULL) : scan_troff(c, 1, NULL);
 			if (mode)
-				out_html("</H3>\n");
+				out_html("</H4>\n");
 			else
-				out_html("</H2>\n");
+				out_html("</H3>\n");
 			curpos = 0;
 			break;
 		case V('T', 'S'):
@@ -2856,25 +2880,31 @@ scan_request(char *c)
 			if (!output_possible) {
 				sl = fill_words(c + j, wordlist, &words);
 				if (words > 1) {
-					char    page_and_sec[128];
-
+					char	*t;
 					for (i = 1; i < words; i++)
 						wordlist[i][-1] = '\0';
 					*sl = '\0';
 					output_possible = 1;
-					sprintf(page_and_sec, "%s(%s)", wordlist[0], wordlist[1]);
+					sprintf(th_page_and_sec, "%s(%s)", wordlist[0], wordlist[1]);
+					if (words > 2) {
+						t = unescape(wordlist[2]);
+						strncpy(th_datestr, t, sizeof(th_datestr));
+						th_datestr[sizeof(th_datestr) - 1] = '\0';
+					} else
+						th_datestr[0] = '\0';
+					if (words > 3) {
+						t = unescape(wordlist[3]);
+						strncpy(th_version, t, sizeof(th_version));
+						th_version[sizeof(th_version) - 1] = '\0';
+					} else
+						th_version[0] = '\0';
 					out_html("<HTML><HEAD>\n<TITLE>");
-					out_html(page_and_sec);
+					out_html(th_page_and_sec);
 					out_html(" Manual Page");
 					out_html("</TITLE>\n</HEAD>\n<BODY>");
-					out_html("<TABLE WIDTH=100%>\n");
-					out_html("<TH ALIGN=LEFT>");
-					out_html(page_and_sec);
-					out_html("<TH ALIGN=CENTER>");
-					out_html(unescape(wordlist[2]));
-					out_html("<TH ALIGN=RIGHT>");
-					out_html(page_and_sec);
-					out_html("\n</TABLE>\n");
+
+					outputPageHeader(th_page_and_sec, th_datestr, th_page_and_sec);
+					
 					out_html("<BR><A HREF=\"#index\">Index</A>\n");
 					*sl = '\n';
 					out_html("<HR>\n");
@@ -4023,6 +4053,7 @@ main(int argc, char **argv)
 	out_html(NEWLINE);
 
 	if (output_possible) {
+		outputPageFooter(th_version, th_datestr, th_page_and_sec);
 		/* &nbsp; for mosaic users */
 		fputs("<HR>\n<A NAME=\"index\">&nbsp;</A><H2>Index</H2>\n<DL>\n", stdout);
 		manidx[mip] = 0;

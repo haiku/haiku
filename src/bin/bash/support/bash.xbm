@@ -21,6 +21,7 @@ Icons {
 
         Simon.
 
+Copyright (C) 1992 Simon Marshall
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #define bash_width 64
 #define bash_height 48

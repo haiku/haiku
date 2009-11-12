@@ -1,23 +1,22 @@
 This file is bind.def, from which is created bind.c.
 It implements the builtin "bind" in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES bind.c
 
@@ -27,12 +26,15 @@ $BUILTIN bind
 $DEPENDS_ON READLINE
 $FUNCTION bind_builtin
 $SHORT_DOC bind [-lpvsPVS] [-m keymap] [-f filename] [-q name] [-u name] [-r keyseq] [-x keyseq:shell-command] [keyseq:readline-function or readline-command]
-Bind a key sequence to a Readline function or a macro, or set
-a Readline variable.  The non-option argument syntax is equivalent
-to that found in ~/.inputrc, but must be passed as a single argument:
-bind '"\C-x\C-r": re-read-init-file'.
-bind accepts the following options:
-  -m  keymap         Use `keymap' as the keymap for the duration of this
+Set Readline key bindings and variables.
+
+Bind a key sequence to a Readline function or a macro, or set a
+Readline variable.  The non-option argument syntax is equivalent to
+that found in ~/.inputrc, but must be passed as a single argument:
+e.g., bind '"\C-x\C-r": re-read-init-file'.
+
+Options:
+  -m  keymap         Use KEYMAP as the keymap for the duration of this
                      command.  Acceptable keymap names are emacs,
                      emacs-standard, emacs-meta, emacs-ctlx, vi, vi-move,
                      vi-command, and vi-insert.
@@ -40,18 +42,21 @@ bind accepts the following options:
   -P                 List function names and bindings.
   -p                 List functions and bindings in a form that can be
                      reused as input.
-  -r  keyseq         Remove the binding for KEYSEQ.
-  -x  keyseq:shell-command	Cause SHELL-COMMAND to be executed when
-				KEYSEQ is entered.
-  -f  filename       Read key bindings from FILENAME.
-  -q  function-name  Query about which keys invoke the named function.
-  -u  function-name  Unbind all keys which are bound to the named function.
-  -V                 List variable names and values
-  -v                 List variable names and values in a form that can
-                     be reused as input.
   -S                 List key sequences that invoke macros and their values
   -s                 List key sequences that invoke macros and their values
                      in a form that can be reused as input.
+  -V                 List variable names and values
+  -v                 List variable names and values in a form that can
+                     be reused as input.
+  -q  function-name  Query about which keys invoke the named function.
+  -u  function-name  Unbind all keys which are bound to the named function.
+  -r  keyseq         Remove the binding for KEYSEQ.
+  -f  filename       Read key bindings from FILENAME.
+  -x  keyseq:shell-command	Cause SHELL-COMMAND to be executed when
+				KEYSEQ is entered.
+
+Exit Status:
+bind returns 0 unless an unrecognized option is given or an error occurs.
 $END
 
 #if defined (READLINE)
@@ -71,6 +76,8 @@ extern int errno;
 
 #include <readline/readline.h>
 #include <readline/history.h>
+
+#include "../bashintl.h"
 
 #include "../shell.h"
 #include "../bashline.h"
@@ -108,14 +115,21 @@ bind_builtin (list)
   char *initfile, *map_name, *fun_name, *unbind_name, *remove_seq, *cmd_seq;
 
   if (no_line_editing)
-    return (EXECUTION_FAILURE);
+    {
+#if 0
+      builtin_error (_("line editing not enabled"));
+      return (EXECUTION_FAILURE);
+#else
+      builtin_warning (_("line editing not enabled"));
+#endif
+    }
 
   kmap = saved_keymap = (Keymap) NULL;
   flags = 0;
   initfile = map_name = fun_name = unbind_name = remove_seq = (char *)NULL;
   return_code = EXECUTION_SUCCESS;
 
-  if (!bash_readline_initialized)
+  if (bash_readline_initialized == 0)
     initialize_readline ();
 
   begin_unwind_frame ("bind_builtin");
@@ -189,7 +203,7 @@ bind_builtin (list)
       kmap = rl_get_keymap_by_name (map_name);
       if (!kmap)
 	{
-	  builtin_error ("`%s': invalid keymap name", map_name);
+	  builtin_error (_("`%s': invalid keymap name"), map_name);
 	  BIND_RETURN (EXECUTION_FAILURE);
 	}
     }
@@ -228,7 +242,7 @@ bind_builtin (list)
     {
       if (rl_read_init_file (initfile) != 0)
 	{
-	  builtin_error ("%s: cannot read: %s", initfile, strerror (errno));
+	  builtin_error (_("%s: cannot read: %s"), initfile, strerror (errno));
 	  BIND_RETURN (EXECUTION_FAILURE);
 	}
     }
@@ -243,7 +257,7 @@ bind_builtin (list)
     {
       if (rl_set_key (remove_seq, (rl_command_func_t *)NULL, rl_get_keymap ()) != 0)
 	{
-	  builtin_error ("`%s': cannot unbind", remove_seq);
+	  builtin_error (_("`%s': cannot unbind"), remove_seq);
 	  BIND_RETURN (EXECUTION_FAILURE);
 	}
     }
@@ -264,7 +278,7 @@ bind_builtin (list)
 
   run_unwind_frame ("bind_builtin");
 
-  return (return_code);
+  return (sh_chkwrite (return_code));
 }
 
 static int
@@ -278,7 +292,7 @@ query_bindings (name)
   function = rl_named_function (name);
   if (function == 0)
     {
-      builtin_error ("`%s': unknown function name", name);
+      builtin_error (_("`%s': unknown function name"), name);
       return EXECUTION_FAILURE;
     }
 
@@ -286,11 +300,11 @@ query_bindings (name)
 
   if (!keyseqs)
     {
-      printf ("%s is not bound to any keys.\n", name);
+      printf (_("%s is not bound to any keys.\n"), name);
       return EXECUTION_FAILURE;
     }
 
-  printf ("%s can be invoked via ", name);
+  printf (_("%s can be invoked via "), name);
   for (j = 0; j < 5 && keyseqs[j]; j++)
     printf ("\"%s\"%s", keyseqs[j], keyseqs[j + 1] ? ", " : ".\n");
   if (keyseqs[j])
@@ -308,7 +322,7 @@ unbind_command (name)
   function = rl_named_function (name);
   if (function == 0)
     {
-      builtin_error ("`%s': unknown function name", name);
+      builtin_error (_("`%s': unknown function name"), name);
       return EXECUTION_FAILURE;
     }
 

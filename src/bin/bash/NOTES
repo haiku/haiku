@@ -261,6 +261,10 @@ Platform-Specific Configuration and Operation Notes
     I have received word that adding -L/etc/lib (or the equivalent
     -Wl,-L/etc/lib) might also be necessary, in addition to the -R/etc/lib.
 
+    On later versions of Solaris, it may be necessary to add -lnsl before
+    -ldl; statically-linked versions of bash using libnsl are not guaranteed
+    to work correctly on future versions of Solaris.
+
 12. Configuring bash to build it in a cross environment.  Currently only
     two native versions can be compiled this way, cygwin32 and x86 BeOS.
     For BeOS, you would configure it like this:
@@ -324,3 +328,20 @@ Platform-Specific Configuration and Operation Notes
 
 15.  Configure with `CC=xlc' if you don't have gcc on AIX 4.2 and later
      versions.  `xlc' running in `cc' mode has trouble compiling error.c.
+
+16.  Configure --disable-multibyte on NetBSD versions (1.4 through at least
+     1.6.1) that include wctype.h but do not define wctype_t.
+
+17.  Do NOT use bison-1.75.  It builds a non-working parser.  The most
+     obvious effect is that constructs like "for i; do echo $i; done" don't
+     loop over the positional parameters.
+
+18.  I have received reports that using -O2 with the MIPSpro results in a
+     binary that fails in strange ways.  Using -O1 seems to work.
+
+19.  There is special handling to ensure the shell links against static
+     versions of the included readline and history libraries on Mac OS X;
+     Apple ships inadequate dynamic libreadline and libhistory "replacements"
+     as standard libraries.
+
+  

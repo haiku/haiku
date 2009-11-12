@@ -1,22 +1,22 @@
 /* siglist.c -- signal list for those machines that don't have one. */
 
-/* Copyright (C) 1989 Free Software Foundation, Inc.
+/* Copyright (C) 1989-2009 Free Software Foundation, Inc.
 
-This file is part of GNU Bash, the Bourne Again SHell.
+   This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "config.h"
 
@@ -44,26 +44,26 @@ initialize_siglist ()
   for (i = 0; i < NSIG; i++)
     sys_siglist[i] = (char *)0x0;
 
-  sys_siglist[0] = "Bogus signal";
+  sys_siglist[0] = _("Bogus signal");
 
 #if defined (SIGHUP)
-  sys_siglist[SIGHUP] = "Hangup";
+  sys_siglist[SIGHUP] = _("Hangup");
 #endif
 
 #if defined (SIGINT)
-  sys_siglist[SIGINT] = "Interrupt";
+  sys_siglist[SIGINT] = _("Interrupt");
 #endif
 
 #if defined (SIGQUIT)
-  sys_siglist[SIGQUIT] = "Quit";
+  sys_siglist[SIGQUIT] = _("Quit");
 #endif
 
 #if defined (SIGILL)
-  sys_siglist[SIGILL] = "Illegal instruction";
+  sys_siglist[SIGILL] = _("Illegal instruction");
 #endif
 
 #if defined (SIGTRAP)
-  sys_siglist[SIGTRAP] = "BPT trace/trap";
+  sys_siglist[SIGTRAP] = _("BPT trace/trap");
 #endif
 
 #if defined (SIGIOT) && !defined (SIGABRT)
@@ -71,59 +71,59 @@ initialize_siglist ()
 #endif
 
 #if defined (SIGABRT)
-  sys_siglist[SIGABRT] = "ABORT instruction";
+  sys_siglist[SIGABRT] = _("ABORT instruction");
 #endif
 
 #if defined (SIGEMT)
-  sys_siglist[SIGEMT] = "EMT instruction";
+  sys_siglist[SIGEMT] = _("EMT instruction");
 #endif
 
 #if defined (SIGFPE)
-  sys_siglist[SIGFPE] = "Floating point exception";
+  sys_siglist[SIGFPE] = _("Floating point exception");
 #endif
 
 #if defined (SIGKILL)
-  sys_siglist[SIGKILL] = "Killed";
+  sys_siglist[SIGKILL] = _("Killed");
 #endif
 
 #if defined (SIGBUS)
-  sys_siglist[SIGBUS] = "Bus error";
+  sys_siglist[SIGBUS] = _("Bus error");
 #endif
 
 #if defined (SIGSEGV)
-  sys_siglist[SIGSEGV] = "Segmentation fault";
+  sys_siglist[SIGSEGV] = _("Segmentation fault");
 #endif
 
 #if defined (SIGSYS)
-  sys_siglist[SIGSYS] = "Bad system call";
+  sys_siglist[SIGSYS] = _("Bad system call");
 #endif
 
 #if defined (SIGPIPE)
-  sys_siglist[SIGPIPE] = "Broken pipe";
+  sys_siglist[SIGPIPE] = _("Broken pipe");
 #endif
 
 #if defined (SIGALRM)
-  sys_siglist[SIGALRM] = "Alarm clock";
+  sys_siglist[SIGALRM] = _("Alarm clock");
 #endif
 
 #if defined (SIGTERM)
-  sys_siglist[SIGTERM] = "Terminated";
+  sys_siglist[SIGTERM] = _("Terminated");
 #endif
 
 #if defined (SIGURG)
-  sys_siglist[SIGURG] = "Urgent IO condition";
+  sys_siglist[SIGURG] = _("Urgent IO condition");
 #endif
 
 #if defined (SIGSTOP)
-  sys_siglist[SIGSTOP] = "Stopped (signal)";
+  sys_siglist[SIGSTOP] = _("Stopped (signal)");
 #endif
 
 #if defined (SIGTSTP)
-  sys_siglist[SIGTSTP] = "Stopped";
+  sys_siglist[SIGTSTP] = _("Stopped");
 #endif
 
 #if defined (SIGCONT)
-  sys_siglist[SIGCONT] = "Continue";
+  sys_siglist[SIGCONT] = _("Continue");
 #endif
 
 #if !defined (SIGCHLD) && defined (SIGCLD)
@@ -131,87 +131,87 @@ initialize_siglist ()
 #endif
 
 #if defined (SIGCHLD)
-  sys_siglist[SIGCHLD] = "Child death or stop";
+  sys_siglist[SIGCHLD] = _("Child death or stop");
 #endif
 
 #if defined (SIGTTIN)
-  sys_siglist[SIGTTIN] = "Stopped (tty input)";
+  sys_siglist[SIGTTIN] = _("Stopped (tty input)");
 #endif
 
 #if defined (SIGTTOU)
-  sys_siglist[SIGTTOU] = "Stopped (tty output)";
+  sys_siglist[SIGTTOU] = _("Stopped (tty output)");
 #endif
 
 #if defined (SIGIO)
-  sys_siglist[SIGIO] = "I/O ready";
+  sys_siglist[SIGIO] = _("I/O ready");
 #endif
 
 #if defined (SIGXCPU)
-  sys_siglist[SIGXCPU] = "CPU limit";
+  sys_siglist[SIGXCPU] = _("CPU limit");
 #endif
 
 #if defined (SIGXFSZ)
-  sys_siglist[SIGXFSZ] = "File limit";
+  sys_siglist[SIGXFSZ] = _("File limit");
 #endif
 
 #if defined (SIGVTALRM)
-  sys_siglist[SIGVTALRM] = "Alarm (virtual)";
+  sys_siglist[SIGVTALRM] = _("Alarm (virtual)");
 #endif
 
 #if defined (SIGPROF)
-  sys_siglist[SIGPROF] = "Alarm (profile)";
+  sys_siglist[SIGPROF] = _("Alarm (profile)");
 #endif
 
 #if defined (SIGWINCH)
-  sys_siglist[SIGWINCH] = "Window changed";
+  sys_siglist[SIGWINCH] = _("Window changed");
 #endif
 
 #if defined (SIGLOST)
-  sys_siglist[SIGLOST] = "Record lock";
+  sys_siglist[SIGLOST] = _("Record lock");
 #endif
 
 #if defined (SIGUSR1)
-  sys_siglist[SIGUSR1] = "User signal 1";
+  sys_siglist[SIGUSR1] = _("User signal 1");
 #endif
 
 #if defined (SIGUSR2)
-  sys_siglist[SIGUSR2] = "User signal 2";
+  sys_siglist[SIGUSR2] = _("User signal 2");
 #endif
 
 #if defined (SIGMSG)
-  sys_siglist[SIGMSG] = "HFT input data pending";
+  sys_siglist[SIGMSG] = _("HFT input data pending");
 #endif
 
 #if defined (SIGPWR)
-  sys_siglist[SIGPWR] = "power failure imminent";
+  sys_siglist[SIGPWR] = _("power failure imminent");
 #endif
 
 #if defined (SIGDANGER)
-  sys_siglist[SIGDANGER] = "system crash imminent";
+  sys_siglist[SIGDANGER] = _("system crash imminent");
 #endif
 
 #if defined (SIGMIGRATE)
-  sys_siglist[SIGMIGRATE] = "migrate process to another CPU";
+  sys_siglist[SIGMIGRATE] = _("migrate process to another CPU");
 #endif
 
 #if defined (SIGPRE)
-  sys_siglist[SIGPRE] = "programming error";
+  sys_siglist[SIGPRE] = _("programming error");
 #endif
 
 #if defined (SIGGRANT)
-  sys_siglist[SIGGRANT] = "HFT monitor mode granted";
+  sys_siglist[SIGGRANT] = _("HFT monitor mode granted");
 #endif
 
 #if defined (SIGRETRACT)
-  sys_siglist[SIGRETRACT] = "HFT monitor mode retracted";
+  sys_siglist[SIGRETRACT] = _("HFT monitor mode retracted");
 #endif
 
 #if defined (SIGSOUND)
-  sys_siglist[SIGSOUND] = "HFT sound sequence has completed";
+  sys_siglist[SIGSOUND] = _("HFT sound sequence has completed");
 #endif
 
 #if defined (SIGINFO)
-  sys_siglist[SIGINFO] = "Information request";
+  sys_siglist[SIGINFO] = _("Information request");
 #endif
 
   for (i = 0; i < NSIG; i++)
@@ -219,9 +219,9 @@ initialize_siglist ()
       if (!sys_siglist[i])
 	{
 	  sys_siglist[i] =
-	    (char *)xmalloc (10 + strlen ("Unknown Signal #"));
+	    (char *)xmalloc (10 + strlen (_("Unknown Signal #")));
 
-	  sprintf (sys_siglist[i], "Unknown Signal #%d", i);
+	  sprintf (sys_siglist[i], _("Unknown Signal #%d"), i);
 	}
     }
 }

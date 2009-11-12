@@ -1,23 +1,23 @@
 /* strmatch.c -- ksh-like extended pattern matching for the shell and filename
 		globbing. */
 
-/* Copyright (C) 1991-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2005 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
    
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
-	      
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
-			 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <config.h>
 
@@ -93,14 +93,16 @@ collequiv (c1, c2)
 
 static int
 collsym (s, len)
-     char *s;
+     CHAR *s;
      int len;
 {
   register struct _collsym *csp;
+  char *x;
 
+  x = (char *)s;
   for (csp = posix_collsyms; csp->name; csp++)
     {
-      if (STREQN(csp->name, s, len) && csp->name[len] == '\0')
+      if (STREQN(csp->name, x, len) && csp->name[len] == '\0')
 	return (csp->code);
     }
   if (len == 1)
@@ -245,7 +247,6 @@ rangecmp_wc (c1, c2)
 {
   static wchar_t s1[2] = { L' ', L'\0' };
   static wchar_t s2[2] = { L' ', L'\0' };
-  int ret;
 
   if (c1 == c2)
     return 0;
@@ -362,44 +363,25 @@ xstrmatch (pattern, string, flags)
 {
 #if HANDLE_MULTIBYTE
   int ret;
-  mbstate_t ps;
   size_t n;
-  char *pattern_bak;
   wchar_t *wpattern, *wstring;
 
   if (MB_CUR_MAX == 1)
-    return (internal_strmatch (pattern, string, flags));
+    return (internal_strmatch ((unsigned char *)pattern, (unsigned char *)string, flags));
 
-  pattern_bak = (char *)xmalloc (strlen (pattern) + 1);
-  strcpy (pattern_bak, pattern);
-
-  memset (&ps, '\0', sizeof (mbstate_t));
-  n = xmbsrtowcs (NULL, (const char **)&pattern, 0, &ps);
+  n = xdupmbstowcs (&wpattern, NULL, pattern);
   if (n == (size_t)-1 || n == (size_t)-2)
-    {
-      free (pattern_bak);
-      return (internal_strmatch ((unsigned char *)pattern, (unsigned char *)string, flags));
-    }
+    return (internal_strmatch ((unsigned char *)pattern, (unsigned char *)string, flags));
 
-  wpattern = (wchar_t *)xmalloc ((n + 1) * sizeof (wchar_t));
-  (void) xmbsrtowcs (wpattern, (const char **)&pattern, n + 1, &ps);
-
-  memset (&ps, '\0', sizeof (mbstate_t));
-  n = xmbsrtowcs (NULL, (const char **)&string, 0, &ps);
+  n = xdupmbstowcs (&wstring, NULL, string);
   if (n == (size_t)-1 || n == (size_t)-2)
     {
       free (wpattern);
-      ret = internal_strmatch (pattern_bak, string, flags);
-      free (pattern_bak);
-      return ret;
+      return (internal_strmatch ((unsigned char *)pattern, (unsigned char *)string, flags));
     }
-
-  wstring = (wchar_t *)xmalloc ((n + 1) * sizeof (wchar_t));
-  (void) xmbsrtowcs (wstring, (const char **)&string, n + 1, &ps);
 
   ret = internal_wstrmatch (wpattern, wstring, flags);
 
-  free (pattern_bak);
   free (wpattern);
   free (wstring);
 

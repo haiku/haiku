@@ -1,23 +1,22 @@
 This file is setattr.def, from which is created setattr.c.
 It implements the builtins "export" and "readonly", in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES setattr.c
 
@@ -32,6 +31,7 @@ $PRODUCES setattr.c
 
 #include <stdio.h>
 #include "../bashansi.h"
+#include "../bashintl.h"
 
 #include "../shell.h"
 #include "common.h"
@@ -51,14 +51,21 @@ extern int declare_builtin __P((WORD_LIST *));
 
 $BUILTIN export
 $FUNCTION export_builtin
-$SHORT_DOC export [-nf] [name[=value] ...] or export -p
-NAMEs are marked for automatic export to the environment of
-subsequently executed commands.  If the -f option is given,
-the NAMEs refer to functions.  If no NAMEs are given, or if `-p'
-is given, a list of all names that are exported in this shell is
-printed.  An argument of `-n' says to remove the export property
-from subsequent NAMEs.  An argument of `--' disables further option
-processing.
+$SHORT_DOC export [-fn] [name[=value] ...] or export -p
+Set export attribute for shell variables.
+
+Marks each NAME for automatic export to the environment of subsequently
+executed commands.  If VALUE is supplied, assign VALUE before exporting.
+
+Options:
+  -f	refer to shell functions
+  -n	remove the export property from each NAME
+  -p	display a list of all exported variables and functions
+
+An argument of `--' disables further option processing.
+
+Exit Status:
+Returns success unless an invalid option is given or NAME is invalid.
 $END
 
 /* For each variable name in LIST, make that variable appear in the
@@ -75,15 +82,23 @@ export_builtin (list)
 
 $BUILTIN readonly
 $FUNCTION readonly_builtin
-$SHORT_DOC readonly [-anf] [name[=value] ...] or readonly -p
-The given NAMEs are marked readonly and the values of these NAMEs may
-not be changed by subsequent assignment.  If the -f option is given,
-then functions corresponding to the NAMEs are so marked.  If no
-arguments are given, or if `-p' is given, a list of all readonly names
-is printed.  An argument of `-n' says to remove the readonly property
-from subsequent NAMEs.  The `-a' option means to treat each NAME as
-an array variable.  An argument of `--' disables further option
-processing.
+$SHORT_DOC readonly [-af] [name[=value] ...] or readonly -p
+Mark shell variables as unchangeable.
+
+Mark each NAME as read-only; the values of these NAMEs may not be
+changed by subsequent assignment.  If VALUE is supplied, assign VALUE
+before marking as read-only.
+
+Options:
+  -a	refer to indexed array variables
+  -A	refer to associative array variables
+  -f	refer to shell functions
+  -p	display a list of all readonly variables and functions
+
+An argument of `--' disables further option processing.
+
+Exit Status:
+Returns success unless an invalid option is given or NAME is invalid.
 $END
 
 /* For each variable name in LIST, make that variable readonly.  Given an
@@ -96,28 +111,31 @@ readonly_builtin (list)
 }
 
 #if defined (ARRAY_VARS)
-#  define ATTROPTS	"afnp"
+#  define ATTROPTS	"aAfnp"
 #else
 #  define ATTROPTS	"fnp"
 #endif
 
 /* For each variable name in LIST, make that variable have the specified
    ATTRIBUTE.  An arg of `-n' says to remove the attribute from the the
-   remaining names in LIST. */
+   remaining names in LIST (doesn't work for readonly). */
 int
 set_or_show_attributes (list, attribute, nodefs)
      register WORD_LIST *list;
      int attribute, nodefs;
 {
   register SHELL_VAR *var;
-  int assign, undo, functions_only, arrays_only, any_failed, assign_error, opt;
+  int assign, undo, any_failed, assign_error, opt;
+  int functions_only, arrays_only, assoc_only;
+  int aflags;
   char *name;
 #if defined (ARRAY_VARS)
   WORD_LIST *nlist, *tlist;
   WORD_DESC *w;
 #endif
 
-  undo = functions_only = arrays_only = any_failed = assign_error = 0;
+  functions_only = arrays_only = assoc_only = 0;
+  undo = any_failed = assign_error = 0;
   /* Read arguments from the front of the list. */
   reset_internal_getopt ();
   while ((opt = internal_getopt (list, ATTROPTS)) != -1)
@@ -132,8 +150,11 @@ set_or_show_attributes (list, attribute, nodefs)
 	    break;
 #if defined (ARRAY_VARS)
 	  case 'a':
-	     arrays_only = 1;
-	     break;
+	    arrays_only = 1;
+	    break;
+	  case 'A':
+	    assoc_only = 1;
+	    break;
 #endif
 	  case 'p':
 	    break;
@@ -162,7 +183,7 @@ set_or_show_attributes (list, attribute, nodefs)
 	      var = find_function (name);
 	      if (var == 0)
 		{
-		  builtin_error ("%s: not a function", name);
+		  builtin_error (_("%s: not a function"), name);
 		  any_failed++;
 		}
 	      else
@@ -173,10 +194,18 @@ set_or_show_attributes (list, attribute, nodefs)
 	    }
 
 	  /* xxx [-np] name[=value] */
-	  assign = assignment (name);
+	  assign = assignment (name, 0);
 
+	  aflags = 0;
 	  if (assign)
-	    name[assign] = '\0';
+	    {
+	      name[assign] = '\0';
+	      if (name[assign - 1] == '+')
+		{
+		  aflags |= ASS_APPEND;
+		  name[assign - 1] = '\0';
+		}
+	    }
 
 	  if (legal_identifier (name) == 0)
 	    {
@@ -192,14 +221,16 @@ set_or_show_attributes (list, attribute, nodefs)
 	  if (assign)	/* xxx [-np] name=value */
 	    {
 	      name[assign] = '=';
+	      if (aflags & ASS_APPEND)
+		name[assign - 1] = '+';
 #if defined (ARRAY_VARS)
 	      /* Let's try something here.  Turn readonly -a xxx=yyy into
 		 declare -ra xxx=yyy and see what that gets us. */
-	      if (arrays_only)
+	      if (arrays_only || assoc_only)
 		{
 		  tlist = list->next;
 		  list->next = (WORD_LIST *)NULL;
-		  w = make_word ("-ra");
+		  w = arrays_only ? make_word ("-ra") : make_word ("-rA");
 		  nlist = make_word_list (w, list);
 		  opt = declare_builtin (nlist);
 		  if (opt != EXECUTION_SUCCESS)
@@ -217,6 +248,8 @@ set_or_show_attributes (list, attribute, nodefs)
 	      if (do_assignment_no_expand (name) == 0)
 		assign_error++;
 	      name[assign] = '\0';
+	      if (aflags & ASS_APPEND)
+		name[assign - 1] = '\0';
 	    }
 
 	  set_var_attribute (name, attribute, undo);
@@ -244,6 +277,12 @@ set_or_show_attributes (list, attribute, nodefs)
 	  if (attribute != att_array)
 	    attribute &= ~att_array;
 	}
+      else if (attribute & att_assoc)
+	{
+	  assoc_only++;
+	  if (attribute != att_assoc)
+	    attribute &= ~att_assoc;
+	}
 #endif
 
       if (variable_list)
@@ -253,9 +292,15 @@ set_or_show_attributes (list, attribute, nodefs)
 #if defined (ARRAY_VARS)
 	      if (arrays_only && array_p (var) == 0)
 		continue;
+	      else if (assoc_only && assoc_p (var) == 0)
+		continue;
 #endif
 	      if ((var->attributes & attribute))
-		show_var_attributes (var, READONLY_OR_EXPORT, nodefs);
+		{
+		  show_var_attributes (var, READONLY_OR_EXPORT, nodefs);
+		  if (any_failed = sh_chkwrite (any_failed))
+		    break;
+		}
 	    }
 	  free (variable_list);
 	}
@@ -264,6 +309,30 @@ set_or_show_attributes (list, attribute, nodefs)
   return (assign_error ? EX_BADASSIGN
 		       : ((any_failed == 0) ? EXECUTION_SUCCESS
   					    : EXECUTION_FAILURE));
+}
+
+/* Show all variable variables (v == 1) or functions (v == 0) with
+   attributes. */
+int
+show_all_var_attributes (v, nodefs)
+     int v, nodefs;
+{
+  SHELL_VAR **variable_list, *var;
+  int any_failed;
+  register int i;
+
+  variable_list = v ? all_shell_variables () : all_shell_functions ();
+  if (variable_list == 0)  
+    return (EXECUTION_SUCCESS);
+
+  for (i = any_failed = 0; var = variable_list[i]; i++)
+    {
+      show_var_attributes (var, READONLY_OR_EXPORT, nodefs);
+      if (any_failed = sh_chkwrite (any_failed))
+        break;
+    }
+  free (variable_list);
+  return (any_failed == 0 ? EXECUTION_SUCCESS : EXECUTION_FAILURE);
 }
 
 /* Show the attributes for shell variable VAR.  If NODEFS is non-zero,
@@ -277,7 +346,7 @@ show_var_attributes (var, pattr, nodefs)
      SHELL_VAR *var;
      int pattr, nodefs;
 {
-  char flags[8], *x;
+  char flags[16], *x;
   int i;
 
   i = 0;
@@ -288,6 +357,9 @@ show_var_attributes (var, pattr, nodefs)
 #if defined (ARRAY_VARS)
       if (array_p (var))
 	flags[i++] = 'a';
+
+      if (assoc_p (var))
+	flags[i++] = 'A';
 #endif
 
       if (function_p (var))
@@ -304,12 +376,24 @@ show_var_attributes (var, pattr, nodefs)
 
       if (exported_p (var))
 	flags[i++] = 'x';
+
+      if (capcase_p (var))
+	flags[i++] = 'c';
+
+      if (lowercase_p (var))
+	flags[i++] = 'l';
+
+      if (uppercase_p (var))
+	flags[i++] = 'u';
     }
   else
     {
 #if defined (ARRAY_VARS)
       if (array_p (var))
 	flags[i++] = 'a';
+
+      if (assoc_p (var))
+	flags[i++] = 'A';
 #endif
 
       if (function_p (var))
@@ -323,7 +407,7 @@ show_var_attributes (var, pattr, nodefs)
      reused as input to recreate the current state. */
   if (function_p (var) && nodefs == 0 && (pattr == 0 || posixly_correct == 0))
     {
-      printf ("%s\n", named_function_string (var->name, function_cell (var), 1));
+      printf ("%s\n", named_function_string (var->name, function_cell (var), FUNC_MULTILINE|FUNC_EXTERNAL));
       nodefs++;
       if (pattr == 0 && i == 1 && flags[0] == 'f')
 	return 0;		/* don't print `declare -f name' */
@@ -337,8 +421,10 @@ show_var_attributes (var, pattr, nodefs)
     printf ("%s ", this_command_name);
 
 #if defined (ARRAY_VARS)
- if (array_p (var))
+  if (array_p (var))
     print_array_assignment (var, 1);
+  else if (assoc_p (var))
+    print_assoc_assignment (var, 1);
   else
 #endif
   /* force `readonly' and `export' to not print out function definitions
@@ -346,7 +432,7 @@ show_var_attributes (var, pattr, nodefs)
   if (nodefs || (function_p (var) && pattr != 0 && posixly_correct))
     printf ("%s\n", var->name);
   else if (function_p (var))
-    printf ("%s\n", named_function_string (var->name, function_cell (var), 1));
+    printf ("%s\n", named_function_string (var->name, function_cell (var), FUNC_MULTILINE|FUNC_EXTERNAL));
   else if (invisible_p (var))
     printf ("%s\n", var->name);
   else
@@ -396,12 +482,14 @@ set_var_attribute (name, attribute, undo)
 	{
 	  tvalue = var_isset (tv) ? savestring (value_cell (tv)) : savestring ("");
 
-	  var = bind_variable (tv->name, tvalue);
+	  var = bind_variable (tv->name, tvalue, 0);
 	  var->attributes |= tv->attributes & ~att_tempvar;
 	  VSETATTR (tv, att_propagate);
 	  if (var->context != 0)
 	    VSETATTR (var, att_propagate);
 	  SETVARATTR (tv, attribute, undo);	/* XXX */
+
+	  stupidly_hack_special_variables (tv->name);
 
 	  free (tvalue);
 	}
@@ -410,7 +498,7 @@ set_var_attribute (name, attribute, undo)
 	  var = find_variable_internal (name, 0);
 	  if (var == 0)
 	    {
-	      var = bind_variable (name, (char *)NULL);
+	      var = bind_variable (name, (char *)NULL, 0);
 	      VSETATTR (var, att_invisible);
 	    }
 	  else if (var->context != 0)

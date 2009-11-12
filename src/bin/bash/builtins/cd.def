@@ -1,23 +1,22 @@
 This file is cd.def, from which is created cd.c.  It implements the
 builtins "cd" and "pwd" in Bash.
 
-Copyright (C) 1987, 1989, 1991 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES cd.c
 #include <config.h>
@@ -39,6 +38,7 @@ $PRODUCES cd.c
 #include <stdio.h>
 
 #include "../bashansi.h"
+#include "../bashintl.h"
 
 #include <errno.h>
 #include <tilde/tilde.h>
@@ -55,12 +55,12 @@ extern int errno;
 
 extern int posixly_correct;
 extern int array_needs_making;
-extern char *bash_getcwd_errstr;
+extern const char * const bash_getcwd_errstr;
 
 static int bindpwd __P((int));
+static void setpwd __P((char *));
+static char *resetpwd __P((char *));
 static int change_to_directory __P((char *, int));
-
-static char *cdspell __P((char *));
 
 /* Change this to 1 to get cd spelling correction by default. */
 int cdspelling = 0;
@@ -70,26 +70,57 @@ int cdable_vars;
 $BUILTIN cd
 $FUNCTION cd_builtin
 $SHORT_DOC cd [-L|-P] [dir]
-Change the current directory to DIR.  The variable $HOME is the
-default DIR.  The variable CDPATH defines the search path for
-the directory containing DIR.  Alternative directory names in CDPATH
-are separated by a colon (:).  A null directory name is the same as
-the current directory, i.e. `.'.  If DIR begins with a slash (/),
-then CDPATH is not used.  If the directory is not found, and the
-shell option `cdable_vars' is set, then try the word as a variable
-name.  If that variable has a value, then cd to the value of that
-variable.  The -P option says to use the physical directory structure
-instead of following symbolic links; the -L option forces symbolic links
-to be followed.
+Change the shell working directory.
+
+Change the current directory to DIR.  The default DIR is the value of the
+HOME shell variable.
+
+The variable CDPATH defines the search path for the directory containing
+DIR.  Alternative directory names in CDPATH are separated by a colon (:).
+A null directory name is the same as the current directory.  If DIR begins
+with a slash (/), then CDPATH is not used.
+
+If the directory is not found, and the shell option `cdable_vars' is set,
+the word is assumed to be  a variable name.  If that variable has a value,
+its value is used for DIR.
+
+Options:
+    -L	force symbolic links to be followed
+    -P	use the physical directory structure without following symbolic
+	links
+
+The default is to follow symbolic links, as if `-L' were specified.
+
+Exit Status:
+Returns 0 if the directory is changed; non-zero otherwise.
 $END
+
+/* Just set $PWD, don't change OLDPWD.  Used by `pwd -P' in posix mode. */
+static void
+setpwd (dirname)
+     char *dirname;
+{
+  int old_anm;
+  SHELL_VAR *tvar;
+
+  old_anm = array_needs_making;
+  tvar = bind_variable ("PWD", dirname ? dirname : "", 0);
+  if (old_anm == 0 && array_needs_making && exported_p (tvar))
+    {
+      update_export_env_inplace ("PWD=", 4, dirname ? dirname : "");
+      array_needs_making = 0;
+    }
+}
 
 static int
 bindpwd (no_symlinks)
      int no_symlinks;
 {
   char *dirname, *pwdvar;
-  int old_anm;
+  int old_anm, r;
   SHELL_VAR *tvar;
+
+  r = sh_chkwrite (EXECUTION_SUCCESS);
 
 #define tcwd the_current_working_directory
   dirname = tcwd ? (no_symlinks ? sh_physpath (tcwd, 0) : tcwd)
@@ -99,35 +130,32 @@ bindpwd (no_symlinks)
   old_anm = array_needs_making;
   pwdvar = get_string_value ("PWD");
 
-  tvar = bind_variable ("OLDPWD", pwdvar);
+  tvar = bind_variable ("OLDPWD", pwdvar, 0);
   if (old_anm == 0 && array_needs_making && exported_p (tvar))
     {
       update_export_env_inplace ("OLDPWD=", 7, pwdvar);
       array_needs_making = 0;
     }
 
-  tvar = bind_variable ("PWD", dirname);
-  if (old_anm == 0 && array_needs_making && exported_p (tvar))
-    {
-      update_export_env_inplace ("PWD=", 4, dirname);
-      array_needs_making = 0;
-    }
+  setpwd (dirname);
 
   if (dirname && dirname != the_current_working_directory)
     free (dirname);
-  return (EXECUTION_SUCCESS);
+
+  return (r);
 }
 
 /* Call get_working_directory to reset the value of
    the_current_working_directory () */
 static char *
-resetpwd ()
+resetpwd (caller)
+     char *caller;
 {
   char *tdir;
       
   FREE (the_current_working_directory);
   the_current_working_directory = (char *)NULL;
-  tdir = get_working_directory ("cd");
+  tdir = get_working_directory (caller);
   return (tdir);
 }
 
@@ -184,7 +212,7 @@ cd_builtin (list)
 
       if (dirname == 0)
 	{
-	  builtin_error ("HOME not set");
+	  builtin_error (_("HOME not set"));
 	  return (EXECUTION_FAILURE);
 	}
       lflag = 0;
@@ -196,14 +224,18 @@ cd_builtin (list)
 
       if (dirname == 0)
 	{
-	  builtin_error ("OLDPWD not set");
+	  builtin_error (_("OLDPWD not set"));
 	  return (EXECUTION_FAILURE);
 	}
+#if 0
       lflag = interactive ? LCD_PRINTPATH : 0;
+#else
+      lflag = LCD_PRINTPATH;		/* According to SUSv3 */
+#endif
     }
   else if (absolute_pathname (list->word->word))
     dirname = list->word->word;
-  else if (cdpath = get_string_value ("CDPATH"))
+  else if (privileged_mode == 0 && (cdpath = get_string_value ("CDPATH")))
     {
       dirname = list->word->word;
 
@@ -222,13 +254,17 @@ cd_builtin (list)
 		 is used to find the directory to change to, the new
 		 directory name is echoed to stdout, whether or not
 		 the shell is interactive. */
-	      if (opt)
-		printf ("%s\n", no_symlinks ? temp : the_current_working_directory);
+	      if (opt && (path = no_symlinks ? temp : the_current_working_directory))
+		printf ("%s\n", path);
 
 	      free (temp);
+#if 0
 	      /* Posix.2 says that after using CDPATH, the resultant
 		 value of $PWD will not contain `.' or `..'. */
 	      return (bindpwd (posixly_correct || no_symlinks));
+#else
+	      return (bindpwd (no_symlinks));
+#endif
 	    }
 	  else
 	    free (temp);
@@ -275,7 +311,7 @@ cd_builtin (list)
      typo.  This is similar to the UNIX 8th and 9th Edition shells. */
   if (lflag & LCD_DOSPELL)
     {
-      temp = cdspell (dirname);
+      temp = dirspell (dirname);
       if (temp && change_to_directory (temp, no_symlinks))
 	{
 	  printf ("%s\n", temp);
@@ -291,10 +327,19 @@ cd_builtin (list)
 
 $BUILTIN pwd
 $FUNCTION pwd_builtin
-$SHORT_DOC pwd [-PL]
-Print the current working directory.  With the -P option, pwd prints
-the physical directory, without any symbolic links; the -L option
-makes pwd follow symbolic links.
+$SHORT_DOC pwd [-LP]
+Print the name of the current working directory.
+
+Options:
+  -L	print the value of $PWD if it names the current working
+	directory
+  -P	print the physical directory, without any symbolic links
+
+By default, `pwd' behaves as if `-L' were specified.
+
+Exit Status:
+Returns 0 unless an invalid option is given or the current directory
+cannot be read.
 $END
 
 /* Non-zero means that pwd always prints the physical directory, without
@@ -307,16 +352,17 @@ pwd_builtin (list)
      WORD_LIST *list;
 {
   char *directory;
-  int opt;
+  int opt, pflag;
 
   verbatim_pwd = no_symbolic_links;
+  pflag = 0;
   reset_internal_getopt ();
   while ((opt = internal_getopt (list, "LP")) != -1)
     {
       switch (opt)
 	{
 	case 'P':
-	  verbatim_pwd = 1;
+	  verbatim_pwd = pflag = 1;
 	  break;
 	case 'L':
 	  verbatim_pwd = 0;
@@ -332,20 +378,24 @@ pwd_builtin (list)
 
   directory = tcwd ? (verbatim_pwd ? sh_physpath (tcwd, 0) : tcwd)
 		   : get_working_directory ("pwd");
+
+  /* Try again using getcwd() if canonicalization fails (for instance, if
+     the file system has changed state underneath bash). */
+  if ((tcwd && directory == 0) ||
+      (posixly_correct && same_file (".", tcwd, (struct stat *)0, (struct stat *)0) == 0))
+    directory = resetpwd ("pwd");
+
 #undef tcwd
 
   if (directory)
     {
       printf ("%s\n", directory);
+      /* This is dumb but posix-mandated. */
+      if (posixly_correct && pflag)
+	setpwd (directory);
       if (directory != the_current_working_directory)
 	free (directory);
-      fflush (stdout);
-      if (ferror (stdout))
-	{
-	  builtin_error ("write error: %s", strerror (errno));
-	  return (EXECUTION_FAILURE);
-	}
-      return (EXECUTION_SUCCESS);
+      return (sh_chkwrite (EXECUTION_SUCCESS));
     }
   else
     return (EXECUTION_FAILURE);
@@ -363,7 +413,7 @@ change_to_directory (newdir, nolinks)
      int nolinks;
 {
   char *t, *tdir;
-  int err, canon_failed;
+  int err, canon_failed, r, ndlen, dlen;
 
   tdir = (char *)NULL;
 
@@ -381,6 +431,9 @@ change_to_directory (newdir, nolinks)
   tdir = nolinks ? sh_physpath (t, 0)
 		 : sh_canonpath (t, PATH_CHECKDOTDOT|PATH_CHECKEXISTS);
 
+  ndlen = strlen (newdir);
+  dlen = strlen (t);
+
   /* Use the canonicalized version of NEWDIR, or, if canonicalization
      failed, use the non-canonical form. */
   canon_failed = 0;
@@ -396,10 +449,15 @@ change_to_directory (newdir, nolinks)
   /* In POSIX mode, if we're resolving symlinks logically and sh_canonpath
      returns NULL (because it checks the path, it will return NULL if the
      resolved path doesn't exist), fail immediately. */
-  if (posixly_correct && nolinks == 0 && canon_failed)
+  if (posixly_correct && nolinks == 0 && canon_failed && (errno != ENAMETOOLONG || ndlen > PATH_MAX))
     {
+#if defined ENAMETOOLONG
+      if (errno != ENOENT && errno != ENAMETOOLONG)
+#else
       if (errno != ENOENT)
+#endif
 	errno = ENOTDIR;
+      free (tdir);
       return (0);
     }
 
@@ -409,62 +467,47 @@ change_to_directory (newdir, nolinks)
       /* If canonicalization failed, but the chdir succeeded, reset the
 	 shell's idea of the_current_working_directory. */
       if (canon_failed)
-	resetpwd ();
-      else
 	{
-	  FREE (the_current_working_directory);
-	  the_current_working_directory = tdir;
+	  t = resetpwd ("cd");
+	  if (t == 0)
+	    set_working_directory (tdir);
 	}
+      else
+	set_working_directory (tdir);
 
+      free (tdir);
       return (1);
     }
 
   /* We failed to change to the appropriate directory name.  If we tried
      what the user passed (nolinks != 0), punt now. */
   if (nolinks)
-    return (0);
+    {
+      free (tdir);
+      return (0);
+    }
 
   err = errno;
-  free (tdir);
 
   /* We're not in physical mode (nolinks == 0), but we failed to change to
      the canonicalized directory name (TDIR).  Try what the user passed
      verbatim. If we succeed, reinitialize the_current_working_directory. */
   if (chdir (newdir) == 0)
     {
-      tdir = resetpwd ();
-      FREE (tdir);
+      t = resetpwd ("cd");
+      if (t == 0)
+	set_working_directory (tdir);
+      else
+	free (t);
 
-      return (1);
+      r = 1;
     }
   else
     {
       errno = err;
-      return (0);
+      r = 0;
     }
-}
 
-/* Code for cd spelling correction.  Original patch submitted by
-   Neil Russel (caret@c-side.com). */
-
-static char *
-cdspell (dirname)
-     char *dirname;
-{
-  int n;
-  char *guess;
-
-  n = (strlen (dirname) * 3 + 1) / 2 + 1;
-  guess = (char *)xmalloc (n);
-
-  switch (spname (dirname, guess))
-    {
-    case -1:
-    default:
-      free (guess);
-      return (char *)NULL;
-    case 0:
-    case 1:
-      return guess;
-    }
+  free (tdir);
+  return r;
 }

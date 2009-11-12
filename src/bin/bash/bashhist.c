@@ -1,22 +1,22 @@
 /* bashhist.c -- bash interface to the GNU history library. */
 
-/* Copyright (C) 1993 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "config.h"
 
@@ -36,6 +36,8 @@
 #include "posixstat.h"
 #include "filecntl.h"
 
+#include "bashintl.h"
+
 #include "shell.h"
 #include "flags.h"
 #include "input.h"
@@ -50,6 +52,7 @@
 
 #if defined (READLINE)
 #  include "bashline.h"
+extern int rl_done, rl_dispatching;	/* should really include readline.h */
 #endif
 
 #if !defined (errno)
@@ -58,6 +61,7 @@ extern int errno;
 
 static int histignore_item_func __P((struct ign *));
 static int check_history_control __P((char *));
+static void hc_erasedups __P((char *));
 static void really_add_history __P((char *));
 
 static struct ignorevar histignore =
@@ -76,8 +80,12 @@ static struct ignorevar histignore =
    list.  This is different than the user-controlled behaviour; this
    becomes zero when we read lines from a file, for example. */
 int remember_on_history = 1;
+int enable_history_list = 1;	/* value for `set -o history' */
 
-/* The number of lines that Bash has added to this history session. */
+/* The number of lines that Bash has added to this history session.  The
+   difference between the number of the top element in the history list
+   (offset from history_base) and the number of lines in the history file.
+   Appending this session's history to the history file resets this to 0. */
 int history_lines_this_session;
 
 /* The number of lines that Bash has read from the history file. */
@@ -134,16 +142,24 @@ int literal_history;
    exit, even if the history has been stifled. */
 int force_append_history;
 
-/* A nit for picking at history saving.
-   Value of 0 means save all lines parsed by the shell on the history.
-   Value of 1 means save all lines that do not start with a space.
-   Value of 2 means save all lines that do not match the last line saved. */
+/* A nit for picking at history saving.  Flags have the following values:
+
+   Value == 0 means save all lines parsed by the shell on the history.
+   Value & HC_IGNSPACE means save all lines that do not start with a space.
+   Value & HC_IGNDUPS means save all lines that do not match the last
+   line saved.
+   Value & HC_ERASEDUPS means to remove all other matching lines from the
+   history list before saving the latest line. */
 int history_control;
 
 /* Set to 1 if the last command was added to the history list successfully
    as a separate history entry; set to 0 if the line was ignored or added
    to a previous entry as part of command-oriented-history processing. */
 int hist_last_line_added;
+
+/* Set to 1 if builtins/history.def:push_history added the last history
+   entry. */
+int hist_last_line_pushed;
 
 #if defined (READLINE)
 /* If non-zero, and readline is being used, the user is offered the
@@ -206,6 +222,9 @@ bash_initialize_history ()
   history_quotes_inhibit_expansion = 1;
   history_search_delimiter_chars = ";&()|<>";
   history_inhibit_expansion_function = bash_history_inhibit_expansion;
+#if defined (BANG_HISTORY)
+  sv_histchars ("histchars");
+#endif
 }
 
 void
@@ -216,7 +235,7 @@ bash_history_reinit (interact)
   history_expansion = interact != 0;
   history_expansion_inhibited = 1;
 #endif
-  remember_on_history = interact != 0;
+  remember_on_history = enable_history_list = interact != 0;
   history_inhibit_expansion_function = bash_history_inhibit_expansion;
 }
 
@@ -246,24 +265,76 @@ void
 load_history ()
 {
   char *hf;
-  struct stat buf;
 
   /* Truncate history file for interactive shells which desire it.
      Note that the history file is automatically truncated to the
      size of HISTSIZE if the user does not explicitly set the size
      differently. */
+  set_if_not ("HISTSIZE", "500");
+  sv_histsize ("HISTSIZE");
+
   set_if_not ("HISTFILESIZE", get_string_value ("HISTSIZE"));
   sv_histsize ("HISTFILESIZE");
 
   /* Read the history in HISTFILE into the history list. */
   hf = get_string_value ("HISTFILE");
 
-  if (hf && *hf && stat (hf, &buf) == 0)
+  if (hf && *hf && file_exists (hf))
     {
       read_history (hf);
       using_history ();
       history_lines_in_file = where_history ();
     }
+}
+
+void
+bash_clear_history ()
+{
+  clear_history ();
+  history_lines_this_session = 0;
+}
+
+/* Delete and free the history list entry at offset I. */
+int
+bash_delete_histent (i)
+     int i;
+{
+  HIST_ENTRY *discard;
+
+  discard = remove_history (i);
+  if (discard)
+    free_history_entry (discard);
+  history_lines_this_session--;
+
+  return 1;
+}
+
+int
+bash_delete_last_history ()
+{
+  register int i;
+  HIST_ENTRY **hlist, *histent;
+  int r;
+
+  hlist = history_list ();
+  if (hlist == NULL)
+    return 0;
+
+  for (i = 0; hlist[i]; i++)
+    ;
+  i--;
+
+  /* History_get () takes a parameter that must be offset by history_base. */
+  histent = history_get (history_base + i);	/* Don't free this */
+  if (histent == NULL)
+    return 0;
+
+  r = bash_delete_histent (i);
+
+  if (where_history () > history_length)
+    history_set_pos (history_length);
+
+  return r;
 }
 
 #ifdef INCLUDE_UNUSED
@@ -272,10 +343,9 @@ void
 save_history ()
 {
   char *hf;
-  struct stat buf;
 
   hf = get_string_value ("HISTFILE");
-  if (hf && *hf && stat (hf, &buf) == 0)
+  if (hf && *hf && file_exists (hf))
     {
       /* Append only the lines that occurred this session to
 	 the history file. */
@@ -285,7 +355,6 @@ save_history ()
 	append_history (history_lines_this_session, hf);
       else
 	write_history (hf);
-
       sv_histsize ("HISTFILESIZE");
     }
 }
@@ -307,7 +376,7 @@ maybe_append_history (filename)
 	  fd = open (filename, O_WRONLY|O_CREAT, 0600);
 	  if (fd < 0)
 	    {
-	      builtin_error ("%s: cannot create: %s", filename, strerror (errno));
+	      builtin_error (_("%s: cannot create: %s"), filename, strerror (errno));
 	      return (EXECUTION_FAILURE);
 	    }
 	  close (fd);
@@ -326,7 +395,6 @@ maybe_save_shell_history ()
 {
   int result;
   char *hf;
-  struct stat buf;
 
   result = 0;
   if (history_lines_this_session)
@@ -336,7 +404,7 @@ maybe_save_shell_history ()
       if (hf && *hf)
 	{
 	  /* If the file doesn't exist, then create it. */
-	  if (stat (hf, &buf) == -1)
+	  if (file_exists (hf) == 0)
 	    {
 	      int file;
 	      file = open (hf, O_CREAT | O_TRUNC | O_WRONLY, 0600);
@@ -433,12 +501,19 @@ pre_process_line (line, print_changes, addit)
 	  /* If there was an error, return NULL. */
 	  if (expanded < 0 || expanded == 2)	/* 2 == print only */
 	    {
+#    if defined (READLINE)
+	      if (expanded == 2 && rl_dispatching == 0 && *history_value)
+#    else	      
+	      if (expanded == 2 && *history_value)
+#    endif /* !READLINE */
+		maybe_add_history (history_value);
+
 	      free (history_value);
 
 #    if defined (READLINE)
 	      /* New hack.  We can allow the user to edit the
 		 failed history expansion. */
-	      if (history_reediting && expanded < 0)
+	      if (history_reediting && expanded < 0 && rl_done)
 		re_edit (line);
 #    endif /* READLINE */
 	      return ((char *)NULL);
@@ -511,27 +586,49 @@ check_history_control (line)
   HIST_ENTRY *temp;
   int r;
 
-  switch (history_control)
+  if (history_control == 0)
+    return 1;
+
+  /* ignorespace or ignoreboth */
+  if ((history_control & HC_IGNSPACE) && *line == ' ')
+    return 0;
+
+  /* ignoredups or ignoreboth */
+  if (history_control & HC_IGNDUPS)
     {
-    case 0:			/* nothing */
-      return 1;
-    case 1:			/* ignorespace */
-      return (*line != ' ');
-    case 3:			/* ignoreboth */
-      if (*line == ' ')
-	return 0;
-      /* FALLTHROUGH if case == 3 (`ignoreboth') */
-    case 2:			/* ignoredups */
       using_history ();
       temp = previous_history ();
 
       r = (temp == 0 || STREQ (temp->line, line) == 0);
 
       using_history ();
-      return r;
+
+      if (r == 0)
+	return r;
     }
 
-  return 0;
+  return 1;
+}
+
+/* Remove all entries matching LINE from the history list.  Triggered when
+   HISTCONTROL includes `erasedups'. */
+static void
+hc_erasedups (line)
+     char *line;
+{
+  HIST_ENTRY *temp;
+  int r;
+
+  using_history ();
+  while (temp = previous_history ())
+    {
+      if (STREQ (temp->line, line))
+	{
+	  r = where_history ();
+	  remove_history (r);
+	}
+    }
+  using_history ();
 }
 
 /* Add LINE to the history list, handling possibly multi-line compound
@@ -577,6 +674,11 @@ check_add_history (line, force)
 {
   if (check_history_control (line) && history_should_ignore (line) == 0)
     {
+      /* We're committed to saving the line.  If the user has requested it,
+	 remove other matching lines from the history. */
+      if (history_control & HC_ERASEDUPS)
+	hc_erasedups (line);
+        
       if (force)
 	{
 	  really_add_history (line);
@@ -635,10 +737,8 @@ bash_add_history (line)
 	  free (new_line);
 
 	  if (old)
-	    {
-	      FREE (old->line);
-	      free (old);
-	    }
+	    free_history_entry (old);
+
 	  add_it = 0;
 	}
     }
@@ -654,6 +754,7 @@ really_add_history (line)
      char *line;
 {
   hist_last_line_added = 1;
+  hist_last_line_pushed = 0;
   add_history (line);
   history_lines_this_session++;
 }
@@ -662,7 +763,7 @@ int
 history_number ()
 {
   using_history ();
-  return (get_string_value ("HISTSIZE") ? history_base + where_history () : 1);
+  return (remember_on_history ? history_base + where_history () : 1);
 }
 
 static int

@@ -2,19 +2,19 @@
 
 /* This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /*
  * shtty.h -- include the correct system-dependent files to manipulate the
@@ -91,6 +91,17 @@ extern int tt_setcbreak __P((TTYSTRUCT *));
    course), the right thing will happen, but more system calls will be
    executed than absolutely necessary.  You can do all of this yourself
    with the other functions; these are only conveniences. */
+
+/* These functions work with a given file descriptor and set terminal
+   attributes */
+extern int ttfd_onechar __P((int, TTYSTRUCT *));
+extern int ttfd_noecho __P((int, TTYSTRUCT *));
+extern int ttfd_eightbit __P((int, TTYSTRUCT *));
+extern int ttfd_nocanon __P((int, TTYSTRUCT *));
+
+extern int ttfd_cbreak __P((int, TTYSTRUCT *));
+
+/* These functions work with fd 0 and the TTYSTRUCT saved with ttsave () */
 extern int ttonechar __P((void));
 extern int ttnoecho __P((void));
 extern int tteightbit __P((void));

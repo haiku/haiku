@@ -1,22 +1,22 @@
 /* general.c -- Stuff that is used by all files. */
 
-/* Copyright (C) 1987-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "config.h"
 
@@ -36,7 +36,11 @@
 #include "chartypes.h"
 #include <errno.h>
 
+#include "bashintl.h"
+
 #include "shell.h"
+#include "test.h"
+
 #include <tilde/tilde.h>
 
 #if !defined (errno)
@@ -44,7 +48,6 @@ extern int errno;
 #endif /* !errno */
 
 extern int expand_aliases;
-extern int interrupt_immediately;
 extern int interactive_comments;
 extern int check_hashed_filenames;
 extern int source_uses_path;
@@ -55,7 +58,7 @@ static int unquoted_tilde_word __P((const char *));
 static void initialize_group_array __P((void));
 
 /* A standard error message to use when getcwd() returns NULL. */
-char *bash_getcwd_errstr = "getcwd: cannot access parent directories";
+const char * const bash_getcwd_errstr = N_("getcwd: cannot access parent directories");
 
 /* Do whatever is necessary to initialize `Posix mode'. */
 void
@@ -66,6 +69,7 @@ posix_initialize (on)
   if (on != 0)
     {
       interactive_comments = source_uses_path = expand_aliases = 1;
+      source_searches_cwd = 0;
     }
 
   /* Things that should be turned on when posix mode is disabled. */
@@ -158,7 +162,7 @@ all_digits (string)
    not null. */
 int
 legal_number (string, result)
-     char *string;
+     const char *string;
      intmax_t *result;
 {
   intmax_t value;
@@ -169,7 +173,7 @@ legal_number (string, result)
 
   errno = 0;
   value = strtoimax (string, &ep, 10);
-  if (errno)
+  if (errno || ep == string)
     return 0;	/* errno is set on overflow or underflow */
 
   /* Skip any trailing whitespace, since strtoimax does not. */
@@ -224,30 +228,51 @@ check_identifier (word, check_word)
 {
   if ((word->flags & (W_HASDOLLAR|W_QUOTED)) || all_digits (word->word))
     {
-      internal_error ("`%s': not a valid identifier", word->word);
+      internal_error (_("`%s': not a valid identifier"), word->word);
       return (0);
     }
   else if (check_word && legal_identifier (word->word) == 0)
     {
-      internal_error ("`%s': not a valid identifier", word->word);
+      internal_error (_("`%s': not a valid identifier"), word->word);
       return (0);
     }
   else
     return (1);
 }
 
+/* Return 1 if STRING comprises a valid alias name.  The shell accepts
+   essentially all characters except those which must be quoted to the
+   parser (which disqualifies them from alias expansion anyway) and `/'. */
+int
+legal_alias_name (string, flags)
+     char *string;
+     int flags;
+{
+  register char *s;
+
+  for (s = string; *s; s++)
+    if (shellbreak (*s) || shellxquote (*s) || shellexp (*s) || (*s == '/'))
+      return 0;
+  return 1;
+}
+
 /* Returns non-zero if STRING is an assignment statement.  The returned value
    is the index of the `=' sign. */
 int
-assignment (string)
+assignment (string, flags)
      const char *string;
+     int flags;
 {
   register unsigned char c;
   register int newi, indx;
 
   c = string[indx = 0];
 
+#if defined (ARRAY_VARS)
+  if ((legal_variable_starter (c) == 0) && (flags == 0 || c != '[')) /* ] */
+#else
   if (legal_variable_starter (c) == 0)
+#endif
     return (0);
 
   while (c = string[indx])
@@ -263,9 +288,15 @@ assignment (string)
 	  newi = skipsubscript (string, indx);
 	  if (string[newi++] != ']')
 	    return (0);
+	  if (string[newi] == '+' && string[newi+1] == '=')
+	    return (newi + 1);
 	  return ((string[newi] == '=') ? newi : 0);
 	}
 #endif /* ARRAY_VARS */
+
+      /* Check for `+=' */
+      if (c == '+' && string[indx+1] == '=')
+	return (indx + 1);
 
       /* Variable names in assignment statements may contain only letters,
 	 digits, and `_'. */
@@ -445,8 +476,7 @@ check_binary_file (sample, sample_len)
       c = sample[i];
       if (c == '\n')
 	return (0);
-
-      if (ISSPACE (c) == 0 && ISPRINT (c) == 0)
+      if (c == '\0')
 	return (1);
     }
 
@@ -455,26 +485,68 @@ check_binary_file (sample, sample_len)
 
 /* **************************************************************** */
 /*								    */
-/*		    Functions to manipulate pathnames		    */
+/*		    Functions to manipulate pipes		    */
 /*								    */
 /* **************************************************************** */
 
-/* Turn STRING (a pathname) into an absolute pathname, assuming that
-   DOT_PATH contains the symbolic location of `.'.  This always
-   returns a new string, even if STRING was an absolute pathname to
-   begin with. */
-char *
-make_absolute (string, dot_path)
-     char *string, *dot_path;
+int
+sh_openpipe (pv)
+     int *pv;
 {
-  char *result;
+  int r;
 
-  if (dot_path == 0 || ABSPATH(string))
-    result = savestring (string);
-  else
-    result = sh_makepath (dot_path, string, 0);
+  if ((r = pipe (pv)) < 0)
+    return r;
 
-  return (result);
+  pv[0] = move_to_high_fd (pv[0], 1, 64);
+  pv[1] = move_to_high_fd (pv[1], 1, 64);
+
+  return 0;  
+}
+
+int
+sh_closepipe (pv)
+     int *pv;
+{
+  if (pv[0] >= 0)
+    close (pv[0]);
+
+  if (pv[1] >= 0)
+    close (pv[1]);
+
+  pv[0] = pv[1] = -1;
+  return 0;
+}
+
+/* **************************************************************** */
+/*								    */
+/*		    Functions to inspect pathnames		    */
+/*								    */
+/* **************************************************************** */
+
+int
+file_exists (fn)
+     char *fn;
+{
+  struct stat sb;
+
+  return (stat (fn, &sb) == 0);
+}
+
+int
+file_isdir (fn)
+     char *fn;
+{
+  struct stat sb;
+
+  return ((stat (fn, &sb) == 0) && S_ISDIR (sb.st_mode));
+}
+
+int
+file_iswdir (fn)
+     char *fn;
+{
+  return (file_isdir (fn) && sh_eaccess (fn, W_OK) == 0);
 }
 
 /* Return 1 if STRING contains an absolute pathname, else 0.  Used by `cd'
@@ -508,15 +580,53 @@ absolute_program (string)
   return ((char *)xstrchr (string, '/') != (char *)NULL);
 }
 
+/* **************************************************************** */
+/*								    */
+/*		    Functions to manipulate pathnames		    */
+/*								    */
+/* **************************************************************** */
+
+/* Turn STRING (a pathname) into an absolute pathname, assuming that
+   DOT_PATH contains the symbolic location of `.'.  This always
+   returns a new string, even if STRING was an absolute pathname to
+   begin with. */
+char *
+make_absolute (string, dot_path)
+     char *string, *dot_path;
+{
+  char *result;
+
+  if (dot_path == 0 || ABSPATH(string))
+#ifdef __CYGWIN__
+    {
+      char pathbuf[PATH_MAX + 1];
+
+      cygwin_conv_to_full_posix_path (string, pathbuf);
+      result = savestring (pathbuf);
+    }
+#else
+    result = savestring (string);
+#endif
+  else
+    result = sh_makepath (dot_path, string, 0);
+
+  return (result);
+}
+
 /* Return the `basename' of the pathname in STRING (the stuff after the
-   last '/').  If STRING is not a full pathname, simply return it. */
+   last '/').  If STRING is `/', just return it. */
 char *
 base_pathname (string)
      char *string;
 {
   char *p;
 
+#if 0
   if (absolute_pathname (string) == 0)
+    return (string);
+#endif
+
+  if (string[0] == '/' && string[1] == 0)
     return (string);
 
   p = (char *)strrchr (string, '/');
@@ -568,6 +678,72 @@ polite_directory_format (name)
     }
   else
     return (name);
+}
+
+/* Trim NAME.  If NAME begins with `~/', skip over tilde prefix.  Trim to
+   keep any tilde prefix and PROMPT_DIRTRIM trailing directory components
+   and replace the intervening characters with `...' */
+char *
+trim_pathname (name, maxlen)
+     char *name;
+     int maxlen;
+{
+  int nlen, ndirs;
+  intmax_t nskip;
+  char *nbeg, *nend, *ntail, *v;
+
+  if (name == 0 || (nlen = strlen (name)) == 0)
+    return name;
+  nend = name + nlen;
+
+  v = get_string_value ("PROMPT_DIRTRIM");
+  if (v == 0 || *v == 0)
+    return name;
+  if (legal_number (v, &nskip) == 0 || nskip <= 0)
+    return name;
+
+  /* Skip over tilde prefix */
+  nbeg = name;
+  if (name[0] == '~')
+    for (nbeg = name; *nbeg; nbeg++)
+      if (*nbeg == '/')
+	{
+	  nbeg++;
+	  break;
+	}
+  if (*nbeg == 0)
+    return name;
+
+  for (ndirs = 0, ntail = nbeg; *ntail; ntail++)
+    if (*ntail == '/')
+      ndirs++;
+  if (ndirs <= nskip)
+    return name;
+
+  for (ntail = (*nend == '/') ? nend : nend - 1; ntail > nbeg; ntail--)
+    {
+      if (*ntail == '/')
+	nskip--;
+      if (nskip == 0)
+	break;
+    }
+  if (ntail == nbeg)
+    return name;
+
+  /* Now we want to return name[0..nbeg]+"..."+ntail, modifying name in place */
+  nlen = ntail - nbeg;
+  if (nlen <= 3)
+    return name;
+
+  *nbeg++ = '.';
+  *nbeg++ = '.';
+  *nbeg++ = '.';
+
+  nlen = nend - ntail;
+  memcpy (nbeg, ntail, nlen);
+  nbeg[nlen] = '\0';
+
+  return name;
 }
 
 /* Given a string containing units of information separated by colons,
@@ -628,7 +804,9 @@ extern char *get_dirstack_from_string __P((char *));
 #endif
 
 static char **bash_tilde_prefixes;
+static char **bash_tilde_prefixes2;
 static char **bash_tilde_suffixes;
+static char **bash_tilde_suffixes2;
 
 /* If tilde_expand hasn't been able to expand the text, perhaps it
    is a special shell expansion.  This function is installed as the
@@ -676,6 +854,10 @@ tilde_initialize ()
       bash_tilde_prefixes[1] = ":~";
       bash_tilde_prefixes[2] = (char *)NULL;
 
+      bash_tilde_prefixes2 = strvec_create (2);
+      bash_tilde_prefixes2[0] = ":~";
+      bash_tilde_prefixes2[1] = (char *)NULL;
+
       tilde_additional_prefixes = bash_tilde_prefixes;
 
       bash_tilde_suffixes = strvec_create (3);
@@ -684,6 +866,10 @@ tilde_initialize ()
       bash_tilde_suffixes[2] = (char *)NULL;
 
       tilde_additional_suffixes = bash_tilde_suffixes;
+
+      bash_tilde_suffixes2 = strvec_create (2);
+      bash_tilde_suffixes2[0] = ":";
+      bash_tilde_suffixes2[1] = (char *)NULL;
     }
 }
 
@@ -715,23 +901,70 @@ unquoted_tilde_word (s)
   return 1;
 }
 
+/* Find the end of the tilde-prefix starting at S, and return the tilde
+   prefix in newly-allocated memory.  Return the length of the string in
+   *LENP.  FLAGS tells whether or not we're in an assignment context --
+   if so, `:' delimits the end of the tilde prefix as well. */
+char *
+bash_tilde_find_word (s, flags, lenp)
+     const char *s;
+     int flags, *lenp;
+{
+  const char *r;
+  char *ret;
+  int l;
+
+  for (r = s; *r && *r != '/'; r++)
+    {
+      /* Short-circuit immediately if we see a quote character.  Even though
+	 POSIX says that `the first unquoted slash' (or `:') terminates the
+	 tilde-prefix, in practice, any quoted portion of the tilde prefix
+	 will cause it to not be expanded. */
+      if (*r == '\\' || *r == '\'' || *r == '"')  
+	{
+	  ret = savestring (s);
+	  if (lenp)
+	    *lenp = 0;
+	  return ret;
+	}
+      else if (flags && *r == ':')
+	break;
+    }
+  l = r - s;
+  ret = xmalloc (l + 1);
+  strncpy (ret, s, l);
+  ret[l] = '\0';
+  if (lenp)
+    *lenp = l;
+  return ret;
+}
+    
 /* Tilde-expand S by running it through the tilde expansion library.
    ASSIGN_P is 1 if this is a variable assignment, so the alternate
-   tilde prefixes should be enabled (`=~' and `:~', see above). */
+   tilde prefixes should be enabled (`=~' and `:~', see above).  If
+   ASSIGN_P is 2, we are expanding the rhs of an assignment statement,
+   so `=~' is not valid. */
 char *
 bash_tilde_expand (s, assign_p)
      const char *s;
      int assign_p;
 {
-  int old_immed, r;
+  int old_immed, old_term, r;
   char *ret;
 
   old_immed = interrupt_immediately;
-  interrupt_immediately = 1;
-  tilde_additional_prefixes = assign_p ? bash_tilde_prefixes : (char **)0;
+  old_term = terminate_immediately;
+  interrupt_immediately = terminate_immediately = 1;
+
+  tilde_additional_prefixes = assign_p == 0 ? (char **)0
+  					    : (assign_p == 2 ? bash_tilde_prefixes2 : bash_tilde_prefixes);
+  if (assign_p == 2)
+    tilde_additional_suffixes = bash_tilde_suffixes2;
+
   r = (*s == '~') ? unquoted_tilde_word (s) : 1;
   ret = r ? tilde_expand (s) : savestring (s);
   interrupt_immediately = old_immed;
+  terminate_immediately = old_term;
   return (ret);
 }
 

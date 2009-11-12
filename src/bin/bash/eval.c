@@ -1,22 +1,22 @@
 /* eval.c -- reading and evaluating commands. */
 
-/* Copyright (C) 1996 Free Software Foundation, Inc.
+/* Copyright (C) 1996-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT
-   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
-   License for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Bash; see the file COPYING.  If not, write to the Free
-   Software Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "config.h"
 
@@ -29,6 +29,8 @@
 
 #include "bashansi.h"
 #include <stdio.h>
+
+#include "bashintl.h"
 
 #include "shell.h"
 #include "flags.h"
@@ -43,7 +45,7 @@
 #  include "bashhist.h"
 #endif
 
-extern int EOF_Reached;
+extern int EOF_reached;
 extern int indirection_level;
 extern int posixly_correct;
 extern int subshell_environment, running_under_emacs;
@@ -61,9 +63,11 @@ int
 reader_loop ()
 {
   int our_indirection_level;
-  COMMAND *current_command = (COMMAND *)NULL;
+  COMMAND * volatile current_command;
 
   USE_VAR(current_command);
+
+  current_command = (COMMAND *)NULL;
 
   our_indirection_level = ++indirection_level;
 
@@ -88,6 +92,7 @@ reader_loop ()
 	    {
 	      /* Some kind of throw to top_level has occured. */
 	    case FORCE_EOF:
+	    case ERREXIT:
 	    case EXITPROG:
 	      current_command = (COMMAND *)NULL;
 	      if (exit_immediately_on_error)
@@ -96,7 +101,11 @@ reader_loop ()
 	      goto exec_done;
 
 	    case DISCARD:
-	      last_command_exit_value = 1;
+	      /* Make sure the exit status is reset to a non-zero value, but
+		 leave existing non-zero values (e.g., > 128 on signal)
+		 alone. */
+	      if (last_command_exit_value == 0)
+		last_command_exit_value = EXECUTION_FAILURE;
 	      if (subshell_environment)
 		{
 		  current_command = (COMMAND *)NULL;
@@ -143,13 +152,13 @@ reader_loop ()
 	      execute_command (current_command);
 
 	    exec_done:
+	      QUIT;
+
 	      if (current_command)
 		{
 		  dispose_command (current_command);
 		  current_command = (COMMAND *)NULL;
 		}
-
-	      QUIT;
 	    }
 	}
       else
@@ -169,7 +178,9 @@ static sighandler
 alrm_catcher(i)
      int i;
 {
-  printf ("\007timed out waiting for input: auto-logout\n");
+  printf (_("\007timed out waiting for input: auto-logout\n"));
+  fflush (stdout);
+  bash_logout ();	/* run ~/.bash_logout if this is a login shell */
   jump_to_top_level (EXITPROG);
   SIGRETURN (0);
 }
@@ -207,7 +218,7 @@ parse_command ()
     {
       command_to_execute = get_string_value ("PROMPT_COMMAND");
       if (command_to_execute)
-	execute_prompt_command (command_to_execute);
+	execute_variable_command (command_to_execute, "PROMPT_COMMAND");
 
       if (running_under_emacs == 2)
 	send_pwd_to_eterm ();	/* Yuck */

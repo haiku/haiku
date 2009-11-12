@@ -1,0 +1,5489 @@
+# Bulgarian translation of bash po-file.
+# Copyright (C) 2007 Free Software Foundation, Inc.
+# This file is distributed under the same license as the bash package.
+# Alexander Shopov <ash@contact.bg>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: bash 3.2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-02-19 14:53-0500\n"
+"PO-Revision-Date: 2007-07-26 07:18+0300\n"
+"Last-Translator: Alexander Shopov <ash@contact.bg>\n"
+"Language-Team: Bulgarian <dict@fsa-bg.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: arrayfunc.c:50
+msgid "bad array subscript"
+msgstr "неправилен индекс на масив"
+
+#: arrayfunc.c:313 builtins/declare.def:474
+#, c-format
+msgid "%s: cannot convert indexed to associative array"
+msgstr ""
+
+#: arrayfunc.c:479
+#, fuzzy, c-format
+msgid "%s: invalid associative array key"
+msgstr "%s: грешно име на действие"
+
+#: arrayfunc.c:481
+#, c-format
+msgid "%s: cannot assign to non-numeric index"
+msgstr "%s: не може да се присвоява на нецифров индекс"
+
+#: arrayfunc.c:517
+#, c-format
+msgid "%s: %s: must use subscript when assigning associative array"
+msgstr ""
+
+#: bashhist.c:379
+#, c-format
+msgid "%s: cannot create: %s"
+msgstr "%s: не може да се създаде: %s"
+
+#: bashline.c:3413
+msgid "bash_execute_unix_command: cannot find keymap for command"
+msgstr ""
+"изпълнение на команда на Юникс от bash: не може да се открие подредбата на\n"
+"функциите на клавишите за командата"
+
+#: bashline.c:3491
+#, c-format
+msgid "%s: first non-whitespace character is not `\"'"
+msgstr "%s: първият непразен знак не е „\"“"
+
+#: bashline.c:3520
+#, c-format
+msgid "no closing `%c' in %s"
+msgstr "в %2$s липсва затварящ знак „%1$c“"
+
+#: bashline.c:3554
+#, c-format
+msgid "%s: missing colon separator"
+msgstr "%s: разделителят двоеточие липсва"
+
+#: builtins/bind.def:120 builtins/bind.def:123
+msgid "line editing not enabled"
+msgstr ""
+
+#: builtins/bind.def:206
+#, c-format
+msgid "`%s': invalid keymap name"
+msgstr "„%s“: грешно име на подредбата на функциите на клавишите"
+
+#: builtins/bind.def:245
+#, c-format
+msgid "%s: cannot read: %s"
+msgstr "%s: не може да се прочете: %s"
+
+#: builtins/bind.def:260
+#, c-format
+msgid "`%s': cannot unbind"
+msgstr "„%s“: не може да се премахне присвояване"
+
+#: builtins/bind.def:295 builtins/bind.def:325
+#, c-format
+msgid "`%s': unknown function name"
+msgstr "„%s“: непознато име на функция"
+
+#: builtins/bind.def:303
+#, c-format
+msgid "%s is not bound to any keys.\n"
+msgstr "%s не може да се зададе на никой клавиш.\n"
+
+#: builtins/bind.def:307
+#, c-format
+msgid "%s can be invoked via "
+msgstr "%s може да се извика чрез "
+
+#: builtins/break.def:77 builtins/break.def:117
+msgid "loop count"
+msgstr ""
+
+#: builtins/break.def:137
+msgid "only meaningful in a `for', `while', or `until' loop"
+msgstr "валидно само за циклите с „for“, „while“ и „until“"
+
+#: builtins/caller.def:133
+#, fuzzy
+msgid ""
+"Returns the context of the current subroutine call.\n"
+"    \n"
+"    Without EXPR, returns "
+msgstr "Връща контекста на текущото извикване на подпрограма."
+
+#: builtins/cd.def:215
+msgid "HOME not set"
+msgstr "Променливата $HOME не зададена"
+
+#: builtins/cd.def:227
+msgid "OLDPWD not set"
+msgstr "Променливата $OLDPWD не е зададена"
+
+#: builtins/common.c:101
+#, c-format
+msgid "line %d: "
+msgstr ""
+
+#: builtins/common.c:139 error.c:260
+#, fuzzy, c-format
+msgid "warning: "
+msgstr "%s: предупреждение: "
+
+#: builtins/common.c:153
+#, fuzzy, c-format
+msgid "%s: usage: "
+msgstr "%s: предупреждение: "
+
+#: builtins/common.c:166 test.c:822
+msgid "too many arguments"
+msgstr "прекалено много аргументи"
+
+#: builtins/common.c:191 shell.c:493 shell.c:774
+#, c-format
+msgid "%s: option requires an argument"
+msgstr "%s: опцията изисква аргумент"
+
+#: builtins/common.c:198
+#, c-format
+msgid "%s: numeric argument required"
+msgstr "%s: изисква се числов аргумент"
+
+#: builtins/common.c:205
+#, c-format
+msgid "%s: not found"
+msgstr "%s: не е открит"
+
+#: builtins/common.c:214 shell.c:787
+#, c-format
+msgid "%s: invalid option"
+msgstr "%s: грешна опция"
+
+#: builtins/common.c:221
+#, c-format
+msgid "%s: invalid option name"
+msgstr "%s: грешно име на опция"
+
+#: builtins/common.c:228 general.c:231 general.c:236
+#, c-format
+msgid "`%s': not a valid identifier"
+msgstr "„%s“: грешен идентификатор"
+
+#: builtins/common.c:238
+#, fuzzy
+msgid "invalid octal number"
+msgstr "неправилен номер на сигнал"
+
+#: builtins/common.c:240
+#, fuzzy
+msgid "invalid hex number"
+msgstr "грешно число"
+
+#: builtins/common.c:242 expr.c:1255
+msgid "invalid number"
+msgstr "грешно число"
+
+#: builtins/common.c:250
+#, c-format
+msgid "%s: invalid signal specification"
+msgstr "%s: грешно указване на сигнал"
+
+#: builtins/common.c:257
+#, c-format
+msgid "`%s': not a pid or valid job spec"
+msgstr "„%s“: неправилен идентификатор на процес или задача"
+
+#: builtins/common.c:264 error.c:453
+#, c-format
+msgid "%s: readonly variable"
+msgstr "%s: променлива с права само за четене"
+
+#: builtins/common.c:272
+#, c-format
+msgid "%s: %s out of range"
+msgstr "%s: %s е извън допустимия диапазон"
+
+#: builtins/common.c:272 builtins/common.c:274
+msgid "argument"
+msgstr "аргументът"
+
+#: builtins/common.c:274
+#, c-format
+msgid "%s out of range"
+msgstr "%s е извън допустимия диапазон"
+
+#: builtins/common.c:282
+#, c-format
+msgid "%s: no such job"
+msgstr "%s: няма такава задача"
+
+#: builtins/common.c:290
+#, c-format
+msgid "%s: no job control"
+msgstr "%s: няма управление на задачите"
+
+#: builtins/common.c:292
+msgid "no job control"
+msgstr "няма управление на задачите"
+
+#: builtins/common.c:302
+#, c-format
+msgid "%s: restricted"
+msgstr "%s: ограничена обвивка"
+
+#: builtins/common.c:304
+msgid "restricted"
+msgstr "ограничена обвивка"
+
+#: builtins/common.c:312
+#, c-format
+msgid "%s: not a shell builtin"
+msgstr "%s: не е команда вградена в обвивката"
+
+#: builtins/common.c:321
+#, c-format
+msgid "write error: %s"
+msgstr "грешка при запис: %s"
+
+#: builtins/common.c:329
+#, c-format
+msgid "error setting terminal attributes: %s"
+msgstr ""
+
+#: builtins/common.c:331
+#, c-format
+msgid "error getting terminal attributes: %s"
+msgstr ""
+
+#: builtins/common.c:563
+#, c-format
+msgid "%s: error retrieving current directory: %s: %s\n"
+msgstr "%s: грешка при получаването на текущата директория: %s: %s\n"
+
+#: builtins/common.c:629 builtins/common.c:631
+#, c-format
+msgid "%s: ambiguous job spec"
+msgstr "%s: нееднозначно указана задача"
+
+#: builtins/complete.def:270
+#, c-format
+msgid "%s: invalid action name"
+msgstr "%s: грешно име на действие"
+
+#: builtins/complete.def:430 builtins/complete.def:615
+#: builtins/complete.def:813
+#, c-format
+msgid "%s: no completion specification"
+msgstr "%s: не е указано дописване"
+
+#: builtins/complete.def:667
+msgid "warning: -F option may not work as you expect"
+msgstr "предупреждение: опцията „-F“ може да не работи според очакванията ви"
+
+#: builtins/complete.def:669
+msgid "warning: -C option may not work as you expect"
+msgstr "предупреждение: опцията „-C“ може да не работи според очакванията ви"
+
+#: builtins/complete.def:786
+msgid "not currently executing completion function"
+msgstr ""
+
+#: builtins/declare.def:122
+msgid "can only be used in a function"
+msgstr "може да се използва само във функция"
+
+#: builtins/declare.def:353
+msgid "cannot use `-f' to make functions"
+msgstr "„-f“ не може да се използва за създаването на функции"
+
+#: builtins/declare.def:365 execute_cmd.c:4818
+#, c-format
+msgid "%s: readonly function"
+msgstr "%s: функция с права само за четене"
+
+#: builtins/declare.def:461
+#, c-format
+msgid "%s: cannot destroy array variables in this way"
+msgstr "%s: променливите за масиви не могат да се унищожават така"
+
+#: builtins/declare.def:468
+#, c-format
+msgid "%s: cannot convert associative to indexed array"
+msgstr ""
+
+#: builtins/enable.def:137 builtins/enable.def:145
+msgid "dynamic loading not available"
+msgstr "липсва възможност за динамично зареждане"
+
+#: builtins/enable.def:312
+#, c-format
+msgid "cannot open shared object %s: %s"
+msgstr "споделеният обект %s не може да бъде зареден: %s"
+
+#: builtins/enable.def:335
+#, c-format
+msgid "cannot find %s in shared object %s: %s"
+msgstr "не може да се открие %s в споделения обект %s: %s"
+
+#: builtins/enable.def:459
+#, c-format
+msgid "%s: not dynamically loaded"
+msgstr "%s: не е зареден динамично"
+
+#: builtins/enable.def:474
+#, c-format
+msgid "%s: cannot delete: %s"
+msgstr "%s: не може да се изтрие: %s"
+
+#: builtins/evalfile.c:134 builtins/hash.def:169 execute_cmd.c:4675
+#: shell.c:1439
+#, c-format
+msgid "%s: is a directory"
+msgstr "%s: е директория"
+
+#: builtins/evalfile.c:139
+#, c-format
+msgid "%s: not a regular file"
+msgstr "%s: не е обикновен файл"
+
+#: builtins/evalfile.c:147
+#, c-format
+msgid "%s: file is too large"
+msgstr "%s: файлът е прекалено голям"
+
+#: builtins/evalfile.c:185 execute_cmd.c:4745 shell.c:1449
+#, c-format
+msgid "%s: cannot execute binary file"
+msgstr "%s: двоичният файл не може да бъде изпълнен"
+
+#: builtins/exec.def:212
+#, c-format
+msgid "%s: cannot execute: %s"
+msgstr "%s: не може да се изпълни: %s"
+
+#: builtins/exit.def:65
+#, c-format
+msgid "logout\n"
+msgstr ""
+
+#: builtins/exit.def:88
+msgid "not login shell: use `exit'"
+msgstr "това не е входна обвивка: използвайте „exit“"
+
+#: builtins/exit.def:120
+#, c-format
+msgid "There are stopped jobs.\n"
+msgstr "Има спрени задачи.\n"
+
+#: builtins/exit.def:122
+#, fuzzy, c-format
+msgid "There are running jobs.\n"
+msgstr "Има спрени задачи.\n"
+
+#: builtins/fc.def:261
+msgid "no command found"
+msgstr "не е открита команда"
+
+#: builtins/fc.def:341
+msgid "history specification"
+msgstr "указване на историята"
+
+#: builtins/fc.def:362
+#, c-format
+msgid "%s: cannot open temp file: %s"
+msgstr "%s: не може да се отвори временен файл: %s"
+
+#: builtins/fg_bg.def:149 builtins/jobs.def:282
+msgid "current"
+msgstr ""
+
+#: builtins/fg_bg.def:158
+#, c-format
+msgid "job %d started without job control"
+msgstr "задача %d е стартирана без управление на задачите"
+
+#: builtins/getopt.c:110
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: непозволена опция -- %c\n"
+
+#: builtins/getopt.c:111
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: опцията изисква аргумент -- %c\n"
+
+#: builtins/hash.def:92
+msgid "hashing disabled"
+msgstr "хеширането е изключено"
+
+#: builtins/hash.def:138
+#, c-format
+msgid "%s: hash table empty\n"
+msgstr "%s: таблицата с хешове е празна\n"
+
+#: builtins/hash.def:244
+#, fuzzy, c-format
+msgid "hits\tcommand\n"
+msgstr "последна команда: %s\n"
+
+#: builtins/help.def:130
+#, fuzzy, c-format
+msgid "Shell commands matching keyword `"
+msgid_plural "Shell commands matching keywords `"
+msgstr[0] "Команди на обвивката, които напасват на ключовата дума „"
+msgstr[1] "Команди на обвивката, които напасват на ключовата дума „"
+
+#: builtins/help.def:168
+#, c-format
+msgid ""
+"no help topics match `%s'.  Try `help help' or `man -k %s' or `info %s'."
+msgstr ""
+"няма теми в помощта, които да отговарят на „%s“.  Опитайте с\n"
+"„help help“, „man -k %s“ или „info %s“."
+
+#: builtins/help.def:185
+#, c-format
+msgid "%s: cannot open: %s"
+msgstr "%s: не може да се отвори: %s"
+
+#: builtins/help.def:337
+#, c-format
+msgid ""
+"These shell commands are defined internally.  Type `help' to see this list.\n"
+"Type `help name' to find out more about the function `name'.\n"
+"Use `info bash' to find out more about the shell in general.\n"
+"Use `man -k' or `info' to find out more about commands not in this list.\n"
+"\n"
+"A star (*) next to a name means that the command is disabled.\n"
+"\n"
+msgstr ""
+"Тези команди на интерпретатора са дефинирани вътрешно.\n"
+"Напишете „help“, за да видите списъка.\n"
+"Напишете „help ИМЕ_НА_ФУНКЦИЯ“ за повече информация за съответната функция.\n"
+"Напишете „info bash“ за повече информация за обвивката като цяло.\n"
+"Напишете „man -k“ или „info“ за повече информация за командите извън "
+"списъка.\n"
+"\n"
+"Знакът звездичка „*“ до името на команда означава, че тя е изключена.\n"
+"\n"
+
+#: builtins/history.def:154
+msgid "cannot use more than one of -anrw"
+msgstr "не може да се ползва едновременно повече от една от опциите -anrw"
+
+#: builtins/history.def:186
+msgid "history position"
+msgstr "позиция в историята"
+
+#: builtins/history.def:365
+#, c-format
+msgid "%s: history expansion failed"
+msgstr "%s: неуспешно заместване чрез историята"
+
+#: builtins/inlib.def:71
+#, fuzzy, c-format
+msgid "%s: inlib failed"
+msgstr "%s: неуспешно заместване чрез историята"
+
+#: builtins/jobs.def:109
+msgid "no other options allowed with `-x'"
+msgstr "не е позволена друга опция с „-x“"
+
+#: builtins/kill.def:197
+#, c-format
+msgid "%s: arguments must be process or job IDs"
+msgstr "%s: аргументите трябва да са идентификатори на процеси или задачи"
+
+#: builtins/kill.def:260
+msgid "Unknown error"
+msgstr "Неизвестна грешка"
+
+#: builtins/let.def:95 builtins/let.def:120 expr.c:501 expr.c:516
+msgid "expression expected"
+msgstr "очаква се израз"
+
+#: builtins/mapfile.def:241 builtins/read.def:272
+#, c-format
+msgid "%s: invalid file descriptor specification"
+msgstr "%s: грешно указване на файловия дескриптор"
+
+#: builtins/mapfile.def:249 builtins/read.def:279
+#, c-format
+msgid "%d: invalid file descriptor: %s"
+msgstr "%d: грешен файлов дескриптор: %s"
+
+#: builtins/mapfile.def:258 builtins/mapfile.def:296
+#, fuzzy, c-format
+msgid "%s: invalid line count"
+msgstr "%s: грешна опция"
+
+#: builtins/mapfile.def:269
+#, fuzzy, c-format
+msgid "%s: invalid array origin"
+msgstr "%s: грешна опция"
+
+#: builtins/mapfile.def:286
+#, fuzzy, c-format
+msgid "%s: invalid callback quantum"
+msgstr "%s: грешно име на действие"
+
+#: builtins/mapfile.def:318
+#, fuzzy
+msgid "empty array variable name"
+msgstr "%s: не е променлива за масив"
+
+#: builtins/mapfile.def:339
+msgid "array variable support required"
+msgstr ""
+
+#: builtins/printf.def:367
+#, c-format
+msgid "`%s': missing format character"
+msgstr "„%s“: липсва форматиращ знак"
+
+#: builtins/printf.def:544
+#, c-format
+msgid "`%c': invalid format character"
+msgstr "„%c“: грешен форматиращ знак"
+
+#: builtins/printf.def:571
+#, fuzzy, c-format
+msgid "warning: %s: %s"
+msgstr "%s: предупреждение: "
+
+#: builtins/printf.def:750
+msgid "missing hex digit for \\x"
+msgstr "липсва шестнадесетична цифра за \\x"
+
+#: builtins/pushd.def:195
+msgid "no other directory"
+msgstr "няма друга директория"
+
+#: builtins/pushd.def:462
+msgid "<no current directory>"
+msgstr "«няма текуща директория»"
+
+#: builtins/pushd.def:506
+msgid "directory stack empty"
+msgstr ""
+
+#: builtins/pushd.def:508
+#, fuzzy
+msgid "directory stack index"
+msgstr "отрицателно препълване на стека за рекурсии"
+
+#: builtins/pushd.def:683
+#, fuzzy
+msgid ""
+"Display the list of currently remembered directories.  Directories\n"
+"    find their way onto the list with the `pushd' command; you can get\n"
+"    back up through the list with the `popd' command.\n"
+"    \n"
+"    Options:\n"
+"      -c\tclear the directory stack by deleting all of the elements\n"
+"      -l\tdo not print tilde-prefixed versions of directories relative\n"
+"    \tto your home directory\n"
+"      -p\tprint the directory stack with one entry per line\n"
+"      -v\tprint the directory stack with one entry per line prefixed\n"
+"    \twith its position in the stack\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tDisplays the Nth entry counting from the left of the list shown "
+"by\n"
+"    \tdirs when invoked without options, starting with zero.\n"
+"    \n"
+"      -N\tDisplays the Nth entry counting from the right of the list shown "
+"by\n"
+"\tdirs when invoked without options, starting with zero."
+msgstr ""
+" Показва списъка с текущо запомнените директории.  Списъкът се попълва чрез\n"
+"    командата „pushd“.  Можете да вадите директории от списъка с командата\n"
+"    „popd“.\n"
+"    \n"
+"    Опцията „-l“ кара командата „dirs“ да извежда пълните имена на "
+"директориите,\n"
+"    а не съкратените спрямо домашната директория имена.  Това означава, че\n"
+"    „~/bin“ може да се покаже като „/homes/pesho/bin“.  Опцията „-v“ води "
+"до\n"
+"    отпечатване на стека на директориите, като всеки елемент се извежда на "
+"нов\n"
+"    ред и се предхожда от номера си в стека.  Опцията „-p“ също води до "
+"поредово\n"
+"    отпечатване, но без поредния номер в стека.  Опцията „-c“ изчиства стека "
+"на\n"
+"    директориите като изтрива всички елементи.\n"
+"    \n"
+"    +N  показва N-тия елемент отляво в списъка показван от\n"
+"        командата „dirs“, когато е стартирана без опции.  Брои се от 0.\n"
+"    \n"
+"    -N  показва N-тия елемент отдясно в списъка показван от\n"
+"        командата „dirs“, когато е стартирана без опции.  Брои се от 0."
+
+#: builtins/pushd.def:705
+#, fuzzy
+msgid ""
+"Adds a directory to the top of the directory stack, or rotates\n"
+"    the stack, making the new top of the stack the current working\n"
+"    directory.  With no arguments, exchanges the top two directories.\n"
+"    \n"
+"    Options:\n"
+"      -n\tSuppresses the normal change of directory when adding\n"
+"    \tdirectories to the stack, so only the stack is manipulated.\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tRotates the stack so that the Nth directory (counting\n"
+"    \tfrom the left of the list shown by `dirs', starting with\n"
+"    \tzero) is at the top.\n"
+"    \n"
+"      -N\tRotates the stack so that the Nth directory (counting\n"
+"    \tfrom the right of the list shown by `dirs', starting with\n"
+"    \tzero) is at the top.\n"
+"    \n"
+"      dir\tAdds DIR to the directory stack at the top, making it the\n"
+"    \tnew current working directory.\n"
+"    \n"
+"    The `dirs' builtin displays the directory stack."
+msgstr ""
+" Добавя директория в стека на директориите или превърта стека\n"
+"    като най-горна директория става текущата директория.  Без\n"
+"    аргументи сменя най-горните две директории.\n"
+"    \n"
+"    +N  Превърта стека, така че N-тата директория (като се брои\n"
+"     от лявата страна на списъка, показан от командата „dirs“\n"
+"     като се почва от 0) да е най-отгоре.\n"
+"    \n"
+"    -N  Превърта стека, така че N-тата директория (като се брои\n"
+"     от дясната страна на списъка, показан от командата „dirs“\n"
+"     като се почва от 0) да е най-отгоре.\n"
+"    \n"
+"    -n  подтискане на нормалното преминаване към директория при\n"
+"    добавянето на директории към стека, така че се променя само той.\n"
+"\n"
+"    dir  добавя ДИР най-отгоре в стека на директориите, като я прави\n"
+"    новата текуща работна директория.\n"
+"    \n"
+"    Можете да изведете стека на директорията с командата „dirs“."
+
+#: builtins/pushd.def:730
+#, fuzzy
+msgid ""
+"Removes entries from the directory stack.  With no arguments, removes\n"
+"    the top directory from the stack, and changes to the new top directory.\n"
+"    \n"
+"    Options:\n"
+"      -n\tSuppresses the normal change of directory when removing\n"
+"    \tdirectories from the stack, so only the stack is manipulated.\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tRemoves the Nth entry counting from the left of the list\n"
+"    \tshown by `dirs', starting with zero.  For example: `popd +0'\n"
+"    \tremoves the first directory, `popd +1' the second.\n"
+"    \n"
+"      -N\tRemoves the Nth entry counting from the right of the list\n"
+"    \tshown by `dirs', starting with zero.  For example: `popd -0'\n"
+"    \tremoves the last directory, `popd -1' the next to last.\n"
+"    \n"
+"    The `dirs' builtin displays the directory stack."
+msgstr ""
+" Маха директории от стека с тях. Без аргументи\n"
+"    премахва последната директория в стека и влиза в новата\n"
+"    последна директория.\n"
+"    \n"
+"    +N  премахва N-тия елемент като се брои отляво в списъка\n"
+"        показван от командата „dirs“, като се брои от 0.  Напр.: „popd +0“\n"
+"        премахва първата директория, „popd +1“ - втората.\n"
+"\n"
+"    -N  премахва N-тия елемент като се брои отдясно в списъка\n"
+"        показван от командата „dirs“, като се брои от 0.  Напр.: „popd -0“\n"
+"        премахва последната директория, „popd -1“ - предпоследната.\n"
+"\n"
+"    -n  подтискане на нормалното преминаване към директория при добавянето "
+"на\n"
+"        директории към стека, така че се променя само той.\n"
+"\n"
+"    Стекът с директориите се визуализира с командата „dirs“."
+
+#: builtins/read.def:248
+#, c-format
+msgid "%s: invalid timeout specification"
+msgstr "%s: грешно указване на изтичането на времето"
+
+#: builtins/read.def:574
+#, c-format
+msgid "read error: %d: %s"
+msgstr "грешка при четене: %d: %s"
+
+#: builtins/return.def:73
+msgid "can only `return' from a function or sourced script"
+msgstr ""
+"„return“ е възможен само от функция или изпълнен в текущата обвивка скрипт"
+
+#: builtins/set.def:768
+msgid "cannot simultaneously unset a function and a variable"
+msgstr ""
+"не може едновременно да се премахват задаванията на функция и променлива"
+
+#: builtins/set.def:805
+#, c-format
+msgid "%s: cannot unset"
+msgstr "%s: не може да се премахне"
+
+#: builtins/set.def:812
+#, c-format
+msgid "%s: cannot unset: readonly %s"
+msgstr "%s: не може да се премахне: %s е само за четене"
+
+#: builtins/set.def:823
+#, c-format
+msgid "%s: not an array variable"
+msgstr "%s: не е променлива за масив"
+
+#: builtins/setattr.def:186
+#, c-format
+msgid "%s: not a function"
+msgstr "%s: не е функция"
+
+#: builtins/shift.def:71 builtins/shift.def:77
+msgid "shift count"
+msgstr "брой на преместванията"
+
+#: builtins/shopt.def:254
+msgid "cannot set and unset shell options simultaneously"
+msgstr ""
+"не може едновременно да се задават и да се премахват опции на обвивката"
+
+#: builtins/shopt.def:319
+#, c-format
+msgid "%s: invalid shell option name"
+msgstr "%s: грешно име на опция на обвивката"
+
+#: builtins/source.def:128
+msgid "filename argument required"
+msgstr "изисква се аргумент име на файл"
+
+#: builtins/source.def:153
+#, c-format
+msgid "%s: file not found"
+msgstr "%s: файлът не е открит"
+
+#: builtins/suspend.def:101
+msgid "cannot suspend"
+msgstr "не може да бъде временно спряна"
+
+#: builtins/suspend.def:111
+msgid "cannot suspend a login shell"
+msgstr "входната обвивка не може да бъде временно спряна"
+
+#: builtins/type.def:234
+#, c-format
+msgid "%s is aliased to `%s'\n"
+msgstr "%s е синоним на „%s“\n"
+
+#: builtins/type.def:255
+#, c-format
+msgid "%s is a shell keyword\n"
+msgstr "%s в ключова дума на обвивката\n"
+
+#: builtins/type.def:274
+#, c-format
+msgid "%s is a function\n"
+msgstr "%s е функция\n"
+
+#: builtins/type.def:296
+#, c-format
+msgid "%s is a shell builtin\n"
+msgstr "%s е вградена команда в обвивката\n"
+
+#: builtins/type.def:317 builtins/type.def:391
+#, c-format
+msgid "%s is %s\n"
+msgstr "%s е %s\n"
+
+#: builtins/type.def:337
+#, c-format
+msgid "%s is hashed (%s)\n"
+msgstr "%s е хеширан (%s)\n"
+
+#: builtins/ulimit.def:372
+#, c-format
+msgid "%s: invalid limit argument"
+msgstr "%s: неправилен аргумент за ограничение"
+
+#: builtins/ulimit.def:398
+#, c-format
+msgid "`%c': bad command"
+msgstr "„%c“: неправилна команда"
+
+#: builtins/ulimit.def:427
+#, c-format
+msgid "%s: cannot get limit: %s"
+msgstr "%s: ограничението не може да бъде получено: %s"
+
+#: builtins/ulimit.def:453
+msgid "limit"
+msgstr ""
+
+#: builtins/ulimit.def:465 builtins/ulimit.def:765
+#, c-format
+msgid "%s: cannot modify limit: %s"
+msgstr "%s: ограничението не може да бъде променено: %s"
+
+#: builtins/umask.def:118
+msgid "octal number"
+msgstr "осмично число"
+
+#: builtins/umask.def:231
+#, c-format
+msgid "`%c': invalid symbolic mode operator"
+msgstr "„%c“: неправилен оператор за описателен режим"
+
+#: builtins/umask.def:286
+#, c-format
+msgid "`%c': invalid symbolic mode character"
+msgstr "„%c“: неправилен знак за описателен режим"
+
+#: error.c:89 error.c:320 error.c:322 error.c:324
+msgid " line "
+msgstr ""
+
+#: error.c:164
+#, c-format
+msgid "last command: %s\n"
+msgstr "последна команда: %s\n"
+
+#: error.c:172
+#, c-format
+msgid "Aborting..."
+msgstr "Преустановяване…"
+
+#: error.c:405
+msgid "unknown command error"
+msgstr "неизвестна грешка в команда"
+
+#: error.c:406
+msgid "bad command type"
+msgstr "неправилен вид команда"
+
+#: error.c:407
+msgid "bad connector"
+msgstr "лоша връзка"
+
+#: error.c:408
+msgid "bad jump"
+msgstr "неправилен преход"
+
+#: error.c:446
+#, c-format
+msgid "%s: unbound variable"
+msgstr "%s: променлива без стойност"
+
+#: eval.c:181
+#, c-format
+msgid "\atimed out waiting for input: auto-logout\n"
+msgstr ""
+"^Gвремето за изчакване на вход изтече: следва автоматично излизане от "
+"системата\n"
+
+#: execute_cmd.c:491
+#, c-format
+msgid "cannot redirect standard input from /dev/null: %s"
+msgstr "стандартният вход от /dev/null не може да бъде пренасочен: %s"
+
+#: execute_cmd.c:1112
+#, c-format
+msgid "TIMEFORMAT: `%c': invalid format character"
+msgstr "в променливата $TIMEFORMAT: „%c“: грешен форматиращ знак"
+
+#: execute_cmd.c:2011
+#, fuzzy
+msgid "pipe error"
+msgstr "грешка при запис: %s"
+
+#: execute_cmd.c:4363
+#, c-format
+msgid "%s: restricted: cannot specify `/' in command names"
+msgstr ""
+"%s: ограничение: в имената на командите не може да присъства знакът „/“"
+
+#: execute_cmd.c:4454
+#, c-format
+msgid "%s: command not found"
+msgstr "%s: командата не е открита"
+
+#: execute_cmd.c:4708
+#, c-format
+msgid "%s: %s: bad interpreter"
+msgstr "%s: %s: лош интерпретатор"
+
+#: execute_cmd.c:4857
+#, c-format
+msgid "cannot duplicate fd %d to fd %d"
+msgstr "файловият дескриптор %d не може да се дублира като дескриптор %d"
+
+#: expr.c:241
+msgid "expression recursion level exceeded"
+msgstr "максималният брой нива за рекурсия в израз бяха преминати"
+
+#: expr.c:265
+msgid "recursion stack underflow"
+msgstr "отрицателно препълване на стека за рекурсии"
+
+#: expr.c:379
+msgid "syntax error in expression"
+msgstr "синтактична грешка в израз"
+
+#: expr.c:419
+msgid "attempted assignment to non-variable"
+msgstr "опит за присвояване на стойност на нещо, което не е променлива"
+
+#: expr.c:440 expr.c:445 expr.c:756
+msgid "division by 0"
+msgstr "деление на 0"
+
+#: expr.c:471
+msgid "bug: bad expassign token"
+msgstr "програмна грешка: неправилна лексема за присвояване на израз"
+
+#: expr.c:513
+msgid "`:' expected for conditional expression"
+msgstr "за условен израз се изисква „:“"
+
+#: expr.c:781
+msgid "exponent less than 0"
+msgstr "степента е по-малка от 0"
+
+#: expr.c:826
+msgid "identifier expected after pre-increment or pre-decrement"
+msgstr "очаква се идентификатор след предварително увеличаване или намаляване"
+
+#: expr.c:854
+msgid "missing `)'"
+msgstr "липсва „)“"
+
+#: expr.c:897 expr.c:1175
+msgid "syntax error: operand expected"
+msgstr "синтактична грешка: очаква се оператор"
+
+#: expr.c:1177
+#, fuzzy
+msgid "syntax error: invalid arithmetic operator"
+msgstr "синтактична грешка: изисква се аритметичен израз"
+
+#: expr.c:1201
+#, c-format
+msgid "%s%s%s: %s (error token is \"%s\")"
+msgstr ""
+
+#: expr.c:1259
+msgid "invalid arithmetic base"
+msgstr "грешна аритметична основа на бройна система"
+
+#: expr.c:1279
+msgid "value too great for base"
+msgstr "стойността е прекалено голяма за основата"
+
+#: expr.c:1328
+#, fuzzy, c-format
+msgid "%s: expression error\n"
+msgstr "%s: очаква се целочислен израз"
+
+#: general.c:61
+msgid "getcwd: cannot access parent directories"
+msgstr "getcwd: родителските директории не могат да бъдат достъпени"
+
+#: input.c:94 subst.c:4559
+#, c-format
+msgid "cannot reset nodelay mode for fd %d"
+msgstr "не може да се изчисти режимът без забавяне на файловия дескриптор %d"
+
+#: input.c:258
+#, c-format
+msgid "cannot allocate new file descriptor for bash input from fd %d"
+msgstr ""
+"не може да се задели нов файлов дескриптор за вход на bash от дескриптор %d"
+
+#: input.c:266
+#, c-format
+msgid "save_bash_input: buffer already exists for new fd %d"
+msgstr ""
+"запазване на входа на bash: вече съществува буфер за новия файлов дескриптор "
+"%d"
+
+#: jobs.c:466
+msgid "start_pipeline: pgrp pipe"
+msgstr ""
+
+#: jobs.c:887
+#, c-format
+msgid "forked pid %d appears in running job %d"
+msgstr ""
+
+#: jobs.c:1005
+#, c-format
+msgid "deleting stopped job %d with process group %ld"
+msgstr "изтриване на спряната задача %d в групата процеси %ld"
+
+#: jobs.c:1110
+#, c-format
+msgid "add_process: process %5ld (%s) in the_pipeline"
+msgstr ""
+
+#: jobs.c:1113
+#, c-format
+msgid "add_process: pid %5ld (%s) marked as still alive"
+msgstr ""
+
+#: jobs.c:1401
+#, c-format
+msgid "describe_pid: %ld: no such pid"
+msgstr ""
+"описателен идентификатор на процес: %ld: няма такъв идентификатор на процес"
+
+#: jobs.c:1416
+#, c-format
+msgid "Signal %d"
+msgstr ""
+
+#: jobs.c:1430 jobs.c:1455
+msgid "Done"
+msgstr ""
+
+#: jobs.c:1435 siglist.c:122
+msgid "Stopped"
+msgstr ""
+
+#: jobs.c:1439
+#, c-format
+msgid "Stopped(%s)"
+msgstr ""
+
+#: jobs.c:1443
+msgid "Running"
+msgstr ""
+
+#: jobs.c:1457
+#, c-format
+msgid "Done(%d)"
+msgstr ""
+
+#: jobs.c:1459
+#, c-format
+msgid "Exit %d"
+msgstr ""
+
+#: jobs.c:1462
+msgid "Unknown status"
+msgstr ""
+
+#: jobs.c:1549
+#, c-format
+msgid "(core dumped) "
+msgstr ""
+
+#: jobs.c:1568
+#, c-format
+msgid "  (wd: %s)"
+msgstr ""
+
+#: jobs.c:1771
+#, c-format
+msgid "child setpgid (%ld to %ld)"
+msgstr ""
+
+#: jobs.c:2099 nojobs.c:585
+#, c-format
+msgid "wait: pid %ld is not a child of this shell"
+msgstr "изчакване: процесът с идентификатор %ld не е дъщерен на тази обвивка"
+
+#: jobs.c:2326
+#, c-format
+msgid "wait_for: No record of process %ld"
+msgstr "изчакване: липсват данни за процес с идентификатор %ld"
+
+#: jobs.c:2598
+#, c-format
+msgid "wait_for_job: job %d is stopped"
+msgstr "изчакване на задача: задачата %d е спряна"
+
+#: jobs.c:2820
+#, c-format
+msgid "%s: job has terminated"
+msgstr "%s: задачата е приключила"
+
+#: jobs.c:2829
+#, c-format
+msgid "%s: job %d already in background"
+msgstr "%s: задача %d вече е във фонов режим"
+
+#: jobs.c:3492
+#, fuzzy, c-format
+msgid "%s: line %d: "
+msgstr "%s: предупреждение: "
+
+#: jobs.c:3506 nojobs.c:814
+#, c-format
+msgid " (core dumped)"
+msgstr ""
+
+#: jobs.c:3518 jobs.c:3531
+#, c-format
+msgid "(wd now: %s)\n"
+msgstr ""
+
+#: jobs.c:3563
+msgid "initialize_job_control: getpgrp failed"
+msgstr ""
+
+#: jobs.c:3623
+msgid "initialize_job_control: line discipline"
+msgstr ""
+
+#: jobs.c:3633
+msgid "initialize_job_control: setpgid"
+msgstr ""
+
+#: jobs.c:3661
+#, c-format
+msgid "cannot set terminal process group (%d)"
+msgstr ""
+
+#: jobs.c:3666
+msgid "no job control in this shell"
+msgstr "в тази обвивка няма управление на задачите"
+
+#: lib/malloc/malloc.c:296
+#, c-format
+msgid "malloc: failed assertion: %s\n"
+msgstr "заделяне на памет: грешно предположение: %s\n"
+
+#: lib/malloc/malloc.c:312
+#, c-format
+msgid ""
+"\r\n"
+"malloc: %s:%d: assertion botched\r\n"
+msgstr ""
+"\r\n"
+"заделяне на памет: %s:%d: предположението е отпечатано\r\n"
+
+#: lib/malloc/malloc.c:313
+#, fuzzy
+msgid "unknown"
+msgstr "%s: непознат хост"
+
+#: lib/malloc/malloc.c:797
+msgid "malloc: block on free list clobbered"
+msgstr ""
+"заделяне на памет: блок в списъка със свободни блокове е зает или неподходящ"
+
+#: lib/malloc/malloc.c:874
+msgid "free: called with already freed block argument"
+msgstr ""
+"изчистване на памет: извикано е с блоков аргумент, който вече е изчистен"
+
+#: lib/malloc/malloc.c:877
+msgid "free: called with unallocated block argument"
+msgstr "изчистване на памет: извикано е с незаделен блоков аргумент"
+
+#: lib/malloc/malloc.c:896
+msgid "free: underflow detected; mh_nbytes out of range"
+msgstr ""
+"изчистване на памет: открито е отрицателно препълване с mh_nbytes извън\n"
+"допустимия диапазон"
+
+#: lib/malloc/malloc.c:902
+msgid "free: start and end chunk sizes differ"
+msgstr ""
+"изчистване на памет: късовете на началната и крайната области се различават"
+
+#: lib/malloc/malloc.c:1001
+msgid "realloc: called with unallocated block argument"
+msgstr "презаделяне: извикано е с аргумент с незаделен блок"
+
+#: lib/malloc/malloc.c:1016
+msgid "realloc: underflow detected; mh_nbytes out of range"
+msgstr ""
+"презаделяне: открито е отрицателно препълване с mh_nbytes извън допустимия\n"
+"диапазон"
+
+#: lib/malloc/malloc.c:1022
+msgid "realloc: start and end chunk sizes differ"
+msgstr "презаделяне: късовете на началната и крайната области се различават"
+
+#: lib/malloc/table.c:177
+#, c-format
+msgid "register_alloc: alloc table is full with FIND_ALLOC?\n"
+msgstr ""
+"регистриране на презаделяне: таблицата за заделянията е пълна с FIND_ALLOC?\n"
+
+#: lib/malloc/table.c:184
+#, c-format
+msgid "register_alloc: %p already in table as allocated?\n"
+msgstr "регистриране на презаделяне: %p вече е в таблицата като заделен?\n"
+
+#: lib/malloc/table.c:220
+#, c-format
+msgid "register_free: %p already in table as free?\n"
+msgstr "регистриране на свободни: %p вече е в таблицата като свободен?\n"
+
+#: lib/sh/fmtulong.c:101
+msgid "invalid base"
+msgstr "грешна основа на бройна система"
+
+#: lib/sh/netopen.c:168
+#, c-format
+msgid "%s: host unknown"
+msgstr "%s: непознат хост"
+
+#: lib/sh/netopen.c:175
+#, c-format
+msgid "%s: invalid service"
+msgstr "%s: неправилна услуга"
+
+#: lib/sh/netopen.c:306
+#, c-format
+msgid "%s: bad network path specification"
+msgstr "%s: неправилно указан мрежов път"
+
+#: lib/sh/netopen.c:346
+msgid "network operations not supported"
+msgstr "не се поддържат мрежови операции"
+
+#: mailcheck.c:433
+msgid "You have mail in $_"
+msgstr "Имате поща в $_"
+
+#: mailcheck.c:458
+msgid "You have new mail in $_"
+msgstr "Имате нова поща в $_"
+
+#: mailcheck.c:474
+#, c-format
+msgid "The mail in %s has been read\n"
+msgstr "Пощата в %s вече е прочетена\n"
+
+#: make_cmd.c:322
+msgid "syntax error: arithmetic expression required"
+msgstr "синтактична грешка: изисква се аритметичен израз"
+
+#: make_cmd.c:324
+msgid "syntax error: `;' unexpected"
+msgstr "синтактична грешка: неочакван знак „;“"
+
+#: make_cmd.c:325
+#, c-format
+msgid "syntax error: `((%s))'"
+msgstr "синтактична грешка: „((%s))“"
+
+#: make_cmd.c:567
+#, c-format
+msgid "make_here_document: bad instruction type %d"
+msgstr "вътрешен документ с „<<“: неправилен вид инструкция %d"
+
+#: make_cmd.c:651
+#, c-format
+msgid "here-document at line %d delimited by end-of-file (wanted `%s')"
+msgstr ""
+
+#: make_cmd.c:746
+#, c-format
+msgid "make_redirection: redirection instruction `%d' out of range"
+msgstr ""
+"пренасочване: инструкцията за пренасочване „%d“ е извън допустимия диапазон"
+
+#: parse.y:2986 parse.y:3218
+#, c-format
+msgid "unexpected EOF while looking for matching `%c'"
+msgstr ""
+"неочакван знак за край на файл „EOF“, а се очакваше съответстващ знак „%c“"
+
+#: parse.y:3722
+msgid "unexpected EOF while looking for `]]'"
+msgstr "неочакван знак за край на файл „EOF“, а се очакваше „]]“"
+
+#: parse.y:3727
+#, c-format
+msgid "syntax error in conditional expression: unexpected token `%s'"
+msgstr "синтактична грешка в условен израз: неочаквана лексема „%s“"
+
+#: parse.y:3731
+msgid "syntax error in conditional expression"
+msgstr "синтактична грешка в условен израз"
+
+#: parse.y:3809
+#, c-format
+msgid "unexpected token `%s', expected `)'"
+msgstr "неочаквана лексема „%s“, а се очакваше знакът „)“"
+
+#: parse.y:3813
+msgid "expected `)'"
+msgstr "очакваше се „)“"
+
+#: parse.y:3841
+#, c-format
+msgid "unexpected argument `%s' to conditional unary operator"
+msgstr "неочакван аргумент „%s“ за унарен условен оператор"
+
+#: parse.y:3845
+msgid "unexpected argument to conditional unary operator"
+msgstr "неочакван аргумент за унарен условен оператор"
+
+#: parse.y:3885
+#, c-format
+msgid "unexpected token `%s', conditional binary operator expected"
+msgstr "неочаквана лексема „%s“, очакваше се бинарен условен оператор"
+
+#: parse.y:3889
+msgid "conditional binary operator expected"
+msgstr "очакваше се бинарен условен оператор"
+
+#: parse.y:3906
+#, c-format
+msgid "unexpected argument `%s' to conditional binary operator"
+msgstr "неочакван аргумент „%s“ за бинарен условен оператор"
+
+#: parse.y:3910
+msgid "unexpected argument to conditional binary operator"
+msgstr "неочакван аргумент за бинарен условен оператор"
+
+#: parse.y:3921
+#, c-format
+msgid "unexpected token `%c' in conditional command"
+msgstr "неочаквана лексема „%c“ в условна команда"
+
+#: parse.y:3924
+#, c-format
+msgid "unexpected token `%s' in conditional command"
+msgstr "неочаквана лексема „%s“ в условна команда"
+
+#: parse.y:3928
+#, c-format
+msgid "unexpected token %d in conditional command"
+msgstr "неочаквана лексема %d в условна команда"
+
+#: parse.y:5195
+#, c-format
+msgid "syntax error near unexpected token `%s'"
+msgstr "синтактична грешка в близост до неочакваната лексема „%s“"
+
+#: parse.y:5213
+#, c-format
+msgid "syntax error near `%s'"
+msgstr "синтактична грешка в близост до „%s“"
+
+#: parse.y:5223
+msgid "syntax error: unexpected end of file"
+msgstr "синтактична грешка: неочакван край на файл"
+
+#: parse.y:5223
+msgid "syntax error"
+msgstr "синтактична грешка"
+
+#: parse.y:5285
+#, c-format
+msgid "Use \"%s\" to leave the shell.\n"
+msgstr "Използвайте „%s“, за да излезете от обвивката.\n"
+
+#: parse.y:5447
+msgid "unexpected EOF while looking for matching `)'"
+msgstr "неочакван знак за край на файл „EOF“, очакваше се знакът „)“"
+
+#: pcomplete.c:1018
+#, c-format
+msgid "completion: function `%s' not found"
+msgstr "дописване: функцията „%s“ не е открита"
+
+#: pcomplib.c:179
+#, c-format
+msgid "progcomp_insert: %s: NULL COMPSPEC"
+msgstr ""
+"вмъкване на завършване на команда: %s указване на команда, което е NULL"
+
+#: print_cmd.c:285
+#, c-format
+msgid "print_command: bad connector `%d'"
+msgstr "команда за печат: лош конектор „%d“"
+
+#: print_cmd.c:1348
+#, c-format
+msgid "cprintf: `%c': invalid format character"
+msgstr "отпечатване: „%c“: неправилен форматиращ знак"
+
+#: redir.c:105
+msgid "file descriptor out of range"
+msgstr "файловият дескриптор е извън допустимия диапазон"
+
+#: redir.c:148
+#, c-format
+msgid "%s: ambiguous redirect"
+msgstr "%s: двусмислено пренасочване"
+
+#: redir.c:152
+#, c-format
+msgid "%s: cannot overwrite existing file"
+msgstr "%s: не може да се презапише съществуващ файл"
+
+#: redir.c:157
+#, c-format
+msgid "%s: restricted: cannot redirect output"
+msgstr "%s: поради ограничение изходът не може да се пренасочи"
+
+#: redir.c:162
+#, fuzzy, c-format
+msgid "cannot create temp file for here-document: %s"
+msgstr "не може да се създаде временен файл за вътрешен документ с „<<“: %s"
+
+#: redir.c:517
+msgid "/dev/(tcp|udp)/host/port not supported without networking"
+msgstr "/dev/(tcp|udp)/host/port не се поддържа, ако няма поддръжка на мрежа"
+
+#: redir.c:1023
+msgid "redirection error: cannot duplicate fd"
+msgstr "грешка при пренасочване: файловият дескриптор не може да бъде дублиран"
+
+#: shell.c:328
+msgid "could not find /tmp, please create!"
+msgstr "не е открита директорията /tmp. Създайте я!"
+
+#: shell.c:332
+msgid "/tmp must be a valid directory name"
+msgstr "/tmp трябва да е директория"
+
+#: shell.c:876
+#, c-format
+msgid "%c%c: invalid option"
+msgstr "%c%c: неправилна опция"
+
+#: shell.c:1638
+msgid "I have no name!"
+msgstr "Не може да се получи името на текущия потребител!"
+
+#: shell.c:1778
+#, c-format
+msgid "GNU bash, version %s-(%s)\n"
+msgstr ""
+
+#: shell.c:1779
+#, c-format
+msgid ""
+"Usage:\t%s [GNU long option] [option] ...\n"
+"\t%s [GNU long option] [option] script-file ...\n"
+msgstr ""
+"Употреба:    %s [дълга опция на GNU] [опция] …\n"
+"             %s [дълга опция на GNU] [опция] файл-скрипт …\n"
+
+#: shell.c:1781
+msgid "GNU long options:\n"
+msgstr "Дълги опции на GNU:\n"
+
+#: shell.c:1785
+msgid "Shell options:\n"
+msgstr "Опции на обвивката:\n"
+
+#: shell.c:1786
+msgid "\t-irsD or -c command or -O shopt_option\t\t(invocation only)\n"
+msgstr ""
+"    -irsD или -c команда, или -O къса_опция        (само при стартиране)\n"
+
+#: shell.c:1801
+#, c-format
+msgid "\t-%s or -o option\n"
+msgstr "    -%s или -o опция\n"
+
+#: shell.c:1807
+#, c-format
+msgid "Type `%s -c \"help set\"' for more information about shell options.\n"
+msgstr ""
+"За повече информация за опциите на обвивката въведете „%s -c \"help set\"“.\n"
+
+#: shell.c:1808
+#, c-format
+msgid "Type `%s -c help' for more information about shell builtin commands.\n"
+msgstr ""
+"За повече информация за вградените в обвивката команди въведете „%s -c "
+"help“.\n"
+
+#: shell.c:1809
+#, c-format
+msgid "Use the `bashbug' command to report bugs.\n"
+msgstr "За да докладвате грешки използвайте командата „bashbug“.\n"
+
+#: sig.c:583
+#, c-format
+msgid "sigprocmask: %d: invalid operation"
+msgstr "маска за обработката на сигнали: %d: невалидна операция"
+
+#: siglist.c:47
+msgid "Bogus signal"
+msgstr ""
+
+#: siglist.c:50
+msgid "Hangup"
+msgstr ""
+
+#: siglist.c:54
+msgid "Interrupt"
+msgstr ""
+
+#: siglist.c:58
+msgid "Quit"
+msgstr ""
+
+#: siglist.c:62
+msgid "Illegal instruction"
+msgstr ""
+
+#: siglist.c:66
+msgid "BPT trace/trap"
+msgstr ""
+
+#: siglist.c:74
+msgid "ABORT instruction"
+msgstr ""
+
+#: siglist.c:78
+msgid "EMT instruction"
+msgstr ""
+
+#: siglist.c:82
+msgid "Floating point exception"
+msgstr ""
+
+#: siglist.c:86
+msgid "Killed"
+msgstr ""
+
+#: siglist.c:90
+#, fuzzy
+msgid "Bus error"
+msgstr "синтактична грешка"
+
+#: siglist.c:94
+msgid "Segmentation fault"
+msgstr ""
+
+#: siglist.c:98
+msgid "Bad system call"
+msgstr ""
+
+#: siglist.c:102
+msgid "Broken pipe"
+msgstr ""
+
+#: siglist.c:106
+msgid "Alarm clock"
+msgstr ""
+
+#: siglist.c:110
+#, fuzzy
+msgid "Terminated"
+msgstr "ограничена обвивка"
+
+#: siglist.c:114
+msgid "Urgent IO condition"
+msgstr ""
+
+#: siglist.c:118
+msgid "Stopped (signal)"
+msgstr ""
+
+#: siglist.c:126
+msgid "Continue"
+msgstr ""
+
+#: siglist.c:134
+msgid "Child death or stop"
+msgstr ""
+
+#: siglist.c:138
+msgid "Stopped (tty input)"
+msgstr ""
+
+#: siglist.c:142
+msgid "Stopped (tty output)"
+msgstr ""
+
+#: siglist.c:146
+msgid "I/O ready"
+msgstr ""
+
+#: siglist.c:150
+msgid "CPU limit"
+msgstr ""
+
+#: siglist.c:154
+msgid "File limit"
+msgstr ""
+
+#: siglist.c:158
+msgid "Alarm (virtual)"
+msgstr ""
+
+#: siglist.c:162
+msgid "Alarm (profile)"
+msgstr ""
+
+#: siglist.c:166
+msgid "Window changed"
+msgstr ""
+
+#: siglist.c:170
+msgid "Record lock"
+msgstr ""
+
+#: siglist.c:174
+msgid "User signal 1"
+msgstr ""
+
+#: siglist.c:178
+msgid "User signal 2"
+msgstr ""
+
+#: siglist.c:182
+msgid "HFT input data pending"
+msgstr ""
+
+#: siglist.c:186
+msgid "power failure imminent"
+msgstr ""
+
+#: siglist.c:190
+msgid "system crash imminent"
+msgstr ""
+
+#: siglist.c:194
+msgid "migrate process to another CPU"
+msgstr ""
+
+#: siglist.c:198
+msgid "programming error"
+msgstr ""
+
+#: siglist.c:202
+msgid "HFT monitor mode granted"
+msgstr ""
+
+#: siglist.c:206
+msgid "HFT monitor mode retracted"
+msgstr ""
+
+#: siglist.c:210
+msgid "HFT sound sequence has completed"
+msgstr ""
+
+#: siglist.c:214
+msgid "Information request"
+msgstr ""
+
+#: siglist.c:222
+msgid "Unknown Signal #"
+msgstr ""
+
+#: siglist.c:224
+#, c-format
+msgid "Unknown Signal #%d"
+msgstr ""
+
+#: subst.c:1181 subst.c:1302
+#, c-format
+msgid "bad substitution: no closing `%s' in %s"
+msgstr "лошо заместване: липсва затварящ знак „%s“ в %s"
+
+#: subst.c:2458
+#, c-format
+msgid "%s: cannot assign list to array member"
+msgstr "%s: на член от масив не може да се присвои списък"
+
+#: subst.c:4456 subst.c:4472
+msgid "cannot make pipe for process substitution"
+msgstr "не може да се създаде програмен канал за заместване на процеси"
+
+#: subst.c:4504
+msgid "cannot make child for process substitution"
+msgstr "не може да се създаде дъщерен процес за заместване на процеси"
+
+#: subst.c:4549
+#, c-format
+msgid "cannot open named pipe %s for reading"
+msgstr "именуваният програмен канал %s не може да се отвори за четене"
+
+#: subst.c:4551
+#, c-format
+msgid "cannot open named pipe %s for writing"
+msgstr "именуваният програмен канал %s не може да се отвори за запис"
+
+#: subst.c:4569
+#, c-format
+msgid "cannot duplicate named pipe %s as fd %d"
+msgstr ""
+"именуваният програмен канал %s не може да се\n"
+"дублира като файловия дескриптор %d"
+
+#: subst.c:4765
+msgid "cannot make pipe for command substitution"
+msgstr "не може да се създаде програмен канал за заместване на команди"
+
+#: subst.c:4799
+msgid "cannot make child for command substitution"
+msgstr "не може да се създаде дъщерен процес за заместване на команди"
+
+#: subst.c:4816
+msgid "command_substitute: cannot duplicate pipe as fd 1"
+msgstr "заместване на команди: каналът не може да се дублира като fd 1"
+
+#: subst.c:5318
+#, c-format
+msgid "%s: parameter null or not set"
+msgstr "%s: аргументът е null или не е зададен"
+
+#: subst.c:5608
+#, c-format
+msgid "%s: substring expression < 0"
+msgstr "%s: изразът от подниза е < 0"
+
+#: subst.c:6660
+#, c-format
+msgid "%s: bad substitution"
+msgstr "%s: лошо заместване"
+
+#: subst.c:6740
+#, c-format
+msgid "$%s: cannot assign in this way"
+msgstr "$%s: не може да се задава по този начин"
+
+#: subst.c:7499
+#, fuzzy, c-format
+msgid "bad substitution: no closing \"`\" in %s"
+msgstr "лошо заместване: липсва затварящ знак „%s“ в %s"
+
+#: subst.c:8375
+#, c-format
+msgid "no match: %s"
+msgstr "няма съвпадение: %s"
+
+#: test.c:145
+msgid "argument expected"
+msgstr "очаква се аргумент"
+
+#: test.c:154
+#, c-format
+msgid "%s: integer expression expected"
+msgstr "%s: очаква се целочислен израз"
+
+#: test.c:262
+msgid "`)' expected"
+msgstr "очаква се „)“"
+
+#: test.c:264
+#, c-format
+msgid "`)' expected, found %s"
+msgstr "очаква се „)“, а е получено %s"
+
+#: test.c:279 test.c:688 test.c:691
+#, c-format
+msgid "%s: unary operator expected"
+msgstr "%s: очаква се унарен оператор"
+
+#: test.c:444 test.c:731
+#, c-format
+msgid "%s: binary operator expected"
+msgstr "%s: очаква се бинарен оператор"
+
+#: test.c:806
+msgid "missing `]'"
+msgstr "липсва „]“"
+
+#: trap.c:201
+msgid "invalid signal number"
+msgstr "неправилен номер на сигнал"
+
+#: trap.c:324
+#, c-format
+msgid "run_pending_traps: bad value in trap_list[%d]: %p"
+msgstr ""
+"стартиране на предстоящите капани: неправилна стойност в trap_list[%d]: %p"
+
+#: trap.c:328
+#, c-format
+msgid ""
+"run_pending_traps: signal handler is SIG_DFL, resending %d (%s) to myself"
+msgstr ""
+"стартиране на предстоящите капани: обработката на сигнали е SIG_DFL.\n"
+"%d (%s) е преизпратено на текущата обвивка"
+
+#: trap.c:372
+#, c-format
+msgid "trap_handler: bad signal %d"
+msgstr "обработка на капани: неправилен сигнал %d"
+
+#: variables.c:358
+#, c-format
+msgid "error importing function definition for `%s'"
+msgstr "грешка при внасянето на дефиницията на функция за „%s“"
+
+#: variables.c:736
+#, c-format
+msgid "shell level (%d) too high, resetting to 1"
+msgstr "нивото на обвивката (%d) е прекалено голямо. Задава се да е 1"
+
+#: variables.c:1898
+msgid "make_local_variable: no function context at current scope"
+msgstr ""
+"създаване на локална променлива: липсва контекст на функция в текущата "
+"област\n"
+"на видимост"
+
+#: variables.c:3127
+msgid "all_local_variables: no function context at current scope"
+msgstr ""
+"всички локални променливи: липсва контекст на функция в текущата област на\n"
+"видимост"
+
+#: variables.c:3344 variables.c:3353
+#, c-format
+msgid "invalid character %d in exportstr for %s"
+msgstr "неправилен знак на позиция %d в низа за изнасяне за %s"
+
+#: variables.c:3359
+#, c-format
+msgid "no `=' in exportstr for %s"
+msgstr "липсва „=“ в низа за изнасяне за %s"
+
+#: variables.c:3794
+msgid "pop_var_context: head of shell_variables not a function context"
+msgstr ""
+"изваждане на контекст на променливи: в началото на структурата за променливи "
+"на\n"
+"обвивката (shell_variables) е нещо, което не е контекст на функция"
+
+#: variables.c:3807
+msgid "pop_var_context: no global_variables context"
+msgstr ""
+"изваждане на контекст на променливи: липсва контекст за глобални променливи\n"
+"(global_variables)"
+
+#: variables.c:3881
+msgid "pop_scope: head of shell_variables not a temporary environment scope"
+msgstr ""
+"изваждане на област: последният елемент структурата за променливи на "
+"обвивката\n"
+"(shell_variables) не е временна област в обкръжението"
+
+#: version.c:46
+#, fuzzy
+msgid "Copyright (C) 2009 Free Software Foundation, Inc."
+msgstr "Авторски права (C) 2005 Free Software Foundation, Inc.\n"
+
+#: version.c:47
+msgid ""
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+msgstr ""
+
+#: version.c:86
+#, c-format
+msgid "GNU bash, version %s (%s)\n"
+msgstr ""
+
+#: version.c:91
+#, c-format
+msgid "This is free software; you are free to change and redistribute it.\n"
+msgstr ""
+
+#: version.c:92
+#, c-format
+msgid "There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: xmalloc.c:92
+#, c-format
+msgid "xmalloc: cannot allocate %lu bytes (%lu bytes allocated)"
+msgstr ""
+"заделяне на памет: %lu байта не могат да се заделят (заделени са\n"
+"%lu байта)"
+
+#: xmalloc.c:94
+#, c-format
+msgid "xmalloc: cannot allocate %lu bytes"
+msgstr "заделяне на памет: %lu байта не могат да се заделят"
+
+#: xmalloc.c:114
+#, c-format
+msgid "xrealloc: cannot reallocate %lu bytes (%lu bytes allocated)"
+msgstr ""
+"презаделяне на памет: %lu байта не могат да се заделят наново (заделени са\n"
+"%lu байта)"
+
+#: xmalloc.c:116
+#, c-format
+msgid "xrealloc: cannot allocate %lu bytes"
+msgstr "презаделяне на памет: %lu байта не могат да се заделят"
+
+#: xmalloc.c:150
+#, c-format
+msgid "xmalloc: %s:%d: cannot allocate %lu bytes (%lu bytes allocated)"
+msgstr ""
+"заделяне на памет: %s:%d: %lu байта не могат да се заделят (заделени са\n"
+"%lu байта)"
+
+#: xmalloc.c:152
+#, c-format
+msgid "xmalloc: %s:%d: cannot allocate %lu bytes"
+msgstr "заделяне на памет: %s:%d: %lu байта не могат да се заделят"
+
+#: xmalloc.c:174
+#, c-format
+msgid "xrealloc: %s:%d: cannot reallocate %lu bytes (%lu bytes allocated)"
+msgstr ""
+"презаделяне на памет: %s:%d: %lu байта не могат да се заделят (заделени са %"
+"lu байта)"
+
+#: xmalloc.c:176
+#, c-format
+msgid "xrealloc: %s:%d: cannot allocate %lu bytes"
+msgstr "презаделяне на памет: %s:%d: %lu байта не могат да се заделят"
+
+#: builtins.c:43
+msgid "alias [-p] [name[=value] ... ]"
+msgstr ""
+
+#: builtins.c:47
+msgid "unalias [-a] name [name ...]"
+msgstr ""
+
+#: builtins.c:51
+msgid ""
+"bind [-lpvsPVS] [-m keymap] [-f filename] [-q name] [-u name] [-r keyseq] [-"
+"x keyseq:shell-command] [keyseq:readline-function or readline-command]"
+msgstr ""
+
+#: builtins.c:54
+msgid "break [n]"
+msgstr ""
+
+#: builtins.c:56
+msgid "continue [n]"
+msgstr ""
+
+#: builtins.c:58
+msgid "builtin [shell-builtin [arg ...]]"
+msgstr ""
+
+#: builtins.c:61
+msgid "caller [expr]"
+msgstr ""
+
+#: builtins.c:64
+msgid "cd [-L|-P] [dir]"
+msgstr ""
+
+#: builtins.c:66
+msgid "pwd [-LP]"
+msgstr ""
+
+#: builtins.c:68
+msgid ":"
+msgstr ""
+
+#: builtins.c:70
+msgid "true"
+msgstr ""
+
+#: builtins.c:72
+msgid "false"
+msgstr ""
+
+#: builtins.c:74
+msgid "command [-pVv] command [arg ...]"
+msgstr ""
+
+#: builtins.c:76
+msgid "declare [-aAfFilrtux] [-p] [name[=value] ...]"
+msgstr ""
+
+#: builtins.c:78
+msgid "typeset [-aAfFilrtux] [-p] name[=value] ..."
+msgstr ""
+
+#: builtins.c:80
+msgid "local [option] name[=value] ..."
+msgstr ""
+
+#: builtins.c:83
+msgid "echo [-neE] [arg ...]"
+msgstr ""
+
+#: builtins.c:87
+msgid "echo [-n] [arg ...]"
+msgstr ""
+
+#: builtins.c:90
+msgid "enable [-a] [-dnps] [-f filename] [name ...]"
+msgstr ""
+
+#: builtins.c:92
+msgid "eval [arg ...]"
+msgstr ""
+
+#: builtins.c:94
+msgid "getopts optstring name [arg]"
+msgstr ""
+
+#: builtins.c:96
+msgid "exec [-cl] [-a name] [command [arguments ...]] [redirection ...]"
+msgstr ""
+
+#: builtins.c:98
+msgid "exit [n]"
+msgstr ""
+
+#: builtins.c:100
+msgid "logout [n]"
+msgstr ""
+
+#: builtins.c:103
+msgid "fc [-e ename] [-lnr] [first] [last] or fc -s [pat=rep] [command]"
+msgstr ""
+
+#: builtins.c:107
+msgid "fg [job_spec]"
+msgstr ""
+
+#: builtins.c:111
+msgid "bg [job_spec ...]"
+msgstr ""
+
+#: builtins.c:114
+msgid "hash [-lr] [-p pathname] [-dt] [name ...]"
+msgstr ""
+
+#: builtins.c:117
+msgid "help [-ds] [pattern ...]"
+msgstr ""
+
+#: builtins.c:121
+msgid ""
+"history [-c] [-d offset] [n] or history -anrw [filename] or history -ps arg "
+"[arg...]"
+msgstr ""
+
+#: builtins.c:125
+msgid "jobs [-lnprs] [jobspec ...] or jobs -x command [args]"
+msgstr ""
+
+#: builtins.c:129
+msgid "disown [-h] [-ar] [jobspec ...]"
+msgstr ""
+
+#: builtins.c:132
+msgid ""
+"kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l "
+"[sigspec]"
+msgstr ""
+
+#: builtins.c:134
+msgid "let arg [arg ...]"
+msgstr ""
+
+#: builtins.c:136
+msgid ""
+"read [-ers] [-a array] [-d delim] [-i text] [-n nchars] [-p prompt] [-t "
+"timeout] [-u fd] [name ...]"
+msgstr ""
+
+#: builtins.c:138
+msgid "return [n]"
+msgstr ""
+
+#: builtins.c:140
+msgid "set [--abefhkmnptuvxBCHP] [-o option-name] [arg ...]"
+msgstr ""
+
+#: builtins.c:142
+msgid "unset [-f] [-v] [name ...]"
+msgstr ""
+
+#: builtins.c:144
+msgid "export [-fn] [name[=value] ...] or export -p"
+msgstr ""
+
+#: builtins.c:146
+msgid "readonly [-af] [name[=value] ...] or readonly -p"
+msgstr ""
+
+#: builtins.c:148
+#, fuzzy
+msgid "shift [n]"
+msgstr "брой на преместванията"
+
+#: builtins.c:150
+#, fuzzy
+msgid "source filename [arguments]"
+msgstr "изисква се аргумент име на файл"
+
+#: builtins.c:152
+#, fuzzy
+msgid ". filename [arguments]"
+msgstr "изисква се аргумент име на файл"
+
+#: builtins.c:155
+msgid "suspend [-f]"
+msgstr ""
+
+#: builtins.c:158
+msgid "test [expr]"
+msgstr ""
+
+#: builtins.c:160
+msgid "[ arg... ]"
+msgstr ""
+
+#: builtins.c:162
+msgid "times"
+msgstr ""
+
+#: builtins.c:164
+msgid "trap [-lp] [[arg] signal_spec ...]"
+msgstr ""
+
+#: builtins.c:166
+msgid "type [-afptP] name [name ...]"
+msgstr ""
+
+#: builtins.c:169
+msgid "ulimit [-SHacdefilmnpqrstuvx] [limit]"
+msgstr ""
+
+#: builtins.c:172
+msgid "umask [-p] [-S] [mode]"
+msgstr ""
+
+#: builtins.c:175
+msgid "wait [id]"
+msgstr ""
+
+#: builtins.c:179
+msgid "wait [pid]"
+msgstr ""
+
+#: builtins.c:182
+msgid "for NAME [in WORDS ... ] ; do COMMANDS; done"
+msgstr ""
+
+#: builtins.c:184
+msgid "for (( exp1; exp2; exp3 )); do COMMANDS; done"
+msgstr ""
+
+#: builtins.c:186
+msgid "select NAME [in WORDS ... ;] do COMMANDS; done"
+msgstr ""
+
+#: builtins.c:188
+msgid "time [-p] pipeline"
+msgstr ""
+
+#: builtins.c:190
+msgid "case WORD in [PATTERN [| PATTERN]...) COMMANDS ;;]... esac"
+msgstr ""
+
+#: builtins.c:192
+msgid ""
+"if COMMANDS; then COMMANDS; [ elif COMMANDS; then COMMANDS; ]... [ else "
+"COMMANDS; ] fi"
+msgstr ""
+
+#: builtins.c:194
+msgid "while COMMANDS; do COMMANDS; done"
+msgstr ""
+
+#: builtins.c:196
+msgid "until COMMANDS; do COMMANDS; done"
+msgstr ""
+
+#: builtins.c:198
+msgid "coproc [NAME] command [redirections]"
+msgstr ""
+
+#: builtins.c:200
+msgid "function name { COMMANDS ; } or name () { COMMANDS ; }"
+msgstr ""
+
+#: builtins.c:202
+msgid "{ COMMANDS ; }"
+msgstr ""
+
+#: builtins.c:204
+msgid "job_spec [&]"
+msgstr ""
+
+#: builtins.c:206
+#, fuzzy
+msgid "(( expression ))"
+msgstr "очаква се израз"
+
+#: builtins.c:208
+#, fuzzy
+msgid "[[ expression ]]"
+msgstr "очаква се израз"
+
+#: builtins.c:210
+msgid "variables - Names and meanings of some shell variables"
+msgstr ""
+
+#: builtins.c:213
+msgid "pushd [-n] [+N | -N | dir]"
+msgstr ""
+
+#: builtins.c:217
+msgid "popd [-n] [+N | -N]"
+msgstr ""
+
+#: builtins.c:221
+msgid "dirs [-clpv] [+N] [-N]"
+msgstr ""
+
+#: builtins.c:224
+msgid "shopt [-pqsu] [-o] [optname ...]"
+msgstr ""
+
+#: builtins.c:226
+msgid "printf [-v var] format [arguments]"
+msgstr ""
+
+#: builtins.c:229
+msgid ""
+"complete [-abcdefgjksuv] [-pr] [-o option] [-A action] [-G globpat] [-W "
+"wordlist]  [-F function] [-C command] [-X filterpat] [-P prefix] [-S suffix] "
+"[name ...]"
+msgstr ""
+
+#: builtins.c:233
+msgid ""
+"compgen [-abcdefgjksuv] [-o option]  [-A action] [-G globpat] [-W wordlist]  "
+"[-F function] [-C command] [-X filterpat] [-P prefix] [-S suffix] [word]"
+msgstr ""
+
+#: builtins.c:237
+msgid "compopt [-o|+o option] [name ...]"
+msgstr ""
+
+#: builtins.c:240
+msgid ""
+"mapfile [-n count] [-O origin] [-s count] [-t] [-u fd] [-C callback] [-c "
+"quantum] [array]"
+msgstr ""
+
+#: builtins.c:242
+msgid ""
+"readarray [-n count] [-O origin] [-s count] [-t] [-u fd] [-C callback] [-c "
+"quantum] [array]"
+msgstr ""
+
+#: builtins.c:254
+#, fuzzy
+msgid ""
+"Define or display aliases.\n"
+"    \n"
+"    Without arguments, `alias' prints the list of aliases in the reusable\n"
+"    form `alias NAME=VALUE' on standard output.\n"
+"    \n"
+"    Otherwise, an alias is defined for each NAME whose VALUE is given.\n"
+"    A trailing space in VALUE causes the next word to be checked for\n"
+"    alias substitution when the alias is expanded.\n"
+"    \n"
+"    Options:\n"
+"      -p\tPrint all defined aliases in a reusable format\n"
+"    \n"
+"    Exit Status:\n"
+"    alias returns true unless a NAME is supplied for which no alias has "
+"been\n"
+"    defined."
+msgstr ""
+" „alias“ без аргументи или с опцията „-p“ отпечатва списъка със синонимите "
+"във\n"
+"    формат ИМЕ=СТОЙНОСТ на стандартния изход.  В противен случай за всяко "
+"ИМЕ,\n"
+"    за което е зададена стойност, се дефинира синоним.  Интервал в края на\n"
+"    стойност предизвиква синонимно заместване на следващата дума при\n"
+"    заместването на синонима.  Командата „alias“ връща истина, освен в "
+"случаите,\n"
+"    когато се зададе ИМЕ, за което не е дефиниран синоним."
+
+#: builtins.c:276
+#, fuzzy
+msgid ""
+"Remove each NAME from the list of defined aliases.\n"
+"    \n"
+"    Options:\n"
+"      -a\tremove all alias definitions.\n"
+"    \n"
+"    Return success unless a NAME is not an existing alias."
+msgstr ""
+" ИМЕната се премахват от списъка с дефинираните синоними.  Ако е е дадена и\n"
+"    опцията „-a“ тогава се премахват всички синоними."
+
+#: builtins.c:289
+#, fuzzy
+msgid ""
+"Set Readline key bindings and variables.\n"
+"    \n"
+"    Bind a key sequence to a Readline function or a macro, or set a\n"
+"    Readline variable.  The non-option argument syntax is equivalent to\n"
+"    that found in ~/.inputrc, but must be passed as a single argument:\n"
+"    e.g., bind '\"\\C-x\\C-r\": re-read-init-file'.\n"
+"    \n"
+"    Options:\n"
+"      -m  keymap         Use KEYMAP as the keymap for the duration of this\n"
+"                         command.  Acceptable keymap names are emacs,\n"
+"                         emacs-standard, emacs-meta, emacs-ctlx, vi, vi-"
+"move,\n"
+"                         vi-command, and vi-insert.\n"
+"      -l                 List names of functions.\n"
+"      -P                 List function names and bindings.\n"
+"      -p                 List functions and bindings in a form that can be\n"
+"                         reused as input.\n"
+"      -S                 List key sequences that invoke macros and their "
+"values\n"
+"      -s                 List key sequences that invoke macros and their "
+"values\n"
+"                         in a form that can be reused as input.\n"
+"      -V                 List variable names and values\n"
+"      -v                 List variable names and values in a form that can\n"
+"                         be reused as input.\n"
+"      -q  function-name  Query about which keys invoke the named function.\n"
+"      -u  function-name  Unbind all keys which are bound to the named "
+"function.\n"
+"      -r  keyseq         Remove the binding for KEYSEQ.\n"
+"      -f  filename       Read key bindings from FILENAME.\n"
+"      -x  keyseq:shell-command\tCause SHELL-COMMAND to be executed when\n"
+"    \t\t\t\tKEYSEQ is entered.\n"
+"    \n"
+"    Exit Status:\n"
+"    bind returns 0 unless an unrecognized option is given or an error occurs."
+msgstr ""
+" Присвояване на последователност от клавиши на функция или макрос от "
+"readline\n"
+"    или задаване на променлива на readline.  Синтаксисът с аргументи без "
+"опции\n"
+"    е еквивалентен на този във файла „~/.inputrc“, но трябва да се подаде "
+"като\n"
+"    единствен аргумент:\n"
+"    bind '\"\\C-x\\C-r\": re-read-init-file'.\n"
+"\n"
+"    bind приема следните опции:\n"
+"      -m  ПОДРЕДБА    Използване на ПОДРЕДБАта като подредба на функциите "
+"на\n"
+"                          клавишите докато командата се изпълнява.  Валидни "
+"са\n"
+"                          следните имена: „emacs“, „emacs-standard“,\n"
+"                          „emacs-meta“, „emacs-ctlx“, „vi“, „vi-move“,\n"
+"                          „vi-command“ и „vi-insert“.\n"
+"      -l              Списък с имената на функциите.\n"
+"      -P              Списък с имената на функциите и присвояванията.\n"
+"      -p              Списък с имената на функциите и присвояванията във "
+"вид,\n"
+"                          който може да се използва за вход.\n"
+"      -r  КЛАВИШНА_ПОСЛЕДОВАТЕЛНОСТ\n"
+"                      Премахване на присвоената функция от\n"
+"                          КЛАВИШНАта_ПОСЛЕДОВАТЕЛНОСТ.\n"
+"      -x  КЛАВИШНА_ПОСЛЕДОВАТЕЛНОСТ:КОМАНДА_НА_ОБВИВКАТА\n"
+"                      Изпълнение на КОМАНДАта_НА_ОБВИВКАТА при въвеждането "
+"на\n"
+"                          КЛАВИШНАта_ПОСЛЕДОВАТЕЛНОСТ.\n"
+"      -f  ФАЙЛ        Прочитане на присвояванията на клавиши от ФАЙЛа.\n"
+"      -q  ИМЕ_НА_ФУНКЦИЯ\n"
+"                      Проверка кои клавиши извикват функцията с това име.\n"
+"      -u  ИМЕ_НА_ФУНКЦИЯ\n"
+"                      Премахване на присвояванията към всички клавиши на\n"
+"                          функцията с това име.\n"
+"      -V              Списък с имената на променливите и стойностите им.\n"
+"      -v              Списък с имената на променливите и стойностите им във "
+"вид,\n"
+"                          който може да се използва за вход.\n"
+"      -S              Списък с клавишните последователности, които извикват\n"
+"                           макроси и стойностите им.\n"
+"      -s              Списък с клавишните последователности, които извикват\n"
+"                           макроси и стойностите им във вид, който може да "
+"се\n"
+"                           използва за вход."
+
+#: builtins.c:326
+#, fuzzy
+msgid ""
+"Exit for, while, or until loops.\n"
+"    \n"
+"    Exit a FOR, WHILE or UNTIL loop.  If N is specified, break N enclosing\n"
+"    loops.\n"
+"    \n"
+"    Exit Status:\n"
+"    The exit status is 0 unless N is not greater than or equal to 1."
+msgstr ""
+" Продължение със следващата итерация от цикъл ползващ FOR, WHILE или UNTIL.\n"
+"    Ако е указан N, се продължава от N-тия обхващащ цикъл."
+
+#: builtins.c:338
+#, fuzzy
+msgid ""
+"Resume for, while, or until loops.\n"
+"    \n"
+"    Resumes the next iteration of the enclosing FOR, WHILE or UNTIL loop.\n"
+"    If N is specified, resumes the Nth enclosing loop.\n"
+"    \n"
+"    Exit Status:\n"
+"    The exit status is 0 unless N is not greater than or equal to 1."
+msgstr ""
+" Продължение със следващата итерация от цикъл ползващ FOR, WHILE или UNTIL.\n"
+"    Ако е указан N, се продължава от N-тия обхващащ цикъл."
+
+#: builtins.c:350
+msgid ""
+"Execute shell builtins.\n"
+"    \n"
+"    Execute SHELL-BUILTIN with arguments ARGs without performing command\n"
+"    lookup.  This is useful when you wish to reimplement a shell builtin\n"
+"    as a shell function, but need to execute the builtin within the "
+"function.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the exit status of SHELL-BUILTIN, or false if SHELL-BUILTIN is\n"
+"    not a shell builtin.."
+msgstr ""
+
+#: builtins.c:365
+#, fuzzy
+msgid ""
+"Return the context of the current subroutine call.\n"
+"    \n"
+"    Without EXPR, returns \"$line $filename\".  With EXPR, returns\n"
+"    \"$line $subroutine $filename\"; this extra information can be used to\n"
+"    provide a stack trace.\n"
+"    \n"
+"    The value of EXPR indicates how many call frames to go back before the\n"
+"    current one; the top frame is frame 0.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns 0 unless the shell is not executing a shell function or EXPR\n"
+"    is invalid."
+msgstr ""
+" Връща контекста на текущото извикване на подпрограма.\n"
+"    \n"
+"    Без ИЗРАЗ връща „$line $filename“.  С ИЗРАЗ връща\n"
+"    „$line $subroutine $filename“.  Допълнителната информация може да се\n"
+"    използва за получаване на информация за състоянието на стека.\n"
+"    \n"
+"    Стойността на ИЗРАЗа показва за колко рамки спрямо текущата да се "
+"изведе\n"
+"    информация.  Най-горната рамка е 0."
+
+#: builtins.c:383
+#, fuzzy
+msgid ""
+"Change the shell working directory.\n"
+"    \n"
+"    Change the current directory to DIR.  The default DIR is the value of "
+"the\n"
+"    HOME shell variable.\n"
+"    \n"
+"    The variable CDPATH defines the search path for the directory "
+"containing\n"
+"    DIR.  Alternative directory names in CDPATH are separated by a colon "
+"(:).\n"
+"    A null directory name is the same as the current directory.  If DIR "
+"begins\n"
+"    with a slash (/), then CDPATH is not used.\n"
+"    \n"
+"    If the directory is not found, and the shell option `cdable_vars' is "
+"set,\n"
+"    the word is assumed to be  a variable name.  If that variable has a "
+"value,\n"
+"    its value is used for DIR.\n"
+"    \n"
+"    Options:\n"
+"        -L\tforce symbolic links to be followed\n"
+"        -P\tuse the physical directory structure without following symbolic\n"
+"    \tlinks\n"
+"    \n"
+"    The default is to follow symbolic links, as if `-L' were specified.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns 0 if the directory is changed; non-zero otherwise."
+msgstr ""
+" Смяна на текущата директория да е ДИРЕКТОРИЯ.  Променливата $HOME е\n"
+"    стандартната директория.  Променливата $CDPATH определя пътя за търсене\n"
+"    на директории, които могат да съдържат ДИРЕКТОРИЯта.  Директориите в "
+"$CDPATH\n"
+"    са разделени с „:“.  Липсващо име на директория означава текущата\n"
+"    директория, т.е. „.“. Ако името на ДИРЕКТОРИЯта започва с наклонена "
+"черта\n"
+"    „/“, $CDPATH не се ползва.  Ако директорията не е открита, но е "
+"зададена\n"
+"    опцията на обвивката „cdable_vars“, то думата се пробва като име на\n"
+"    променлива.  Ако променливата има стойност, то директорията се сменя\n"
+"    към стойността на таи променлива.  Опцията „-P“ налага използването на\n"
+"    фактическата подредба на директориите, вместо да се следват символните\n"
+"    връзки.  Опцията „-L“ налага следването на символните връзки."
+
+#: builtins.c:411
+msgid ""
+"Print the name of the current working directory.\n"
+"    \n"
+"    Options:\n"
+"      -L\tprint the value of $PWD if it names the current working\n"
+"    \tdirectory\n"
+"      -P\tprint the physical directory, without any symbolic links\n"
+"    \n"
+"    By default, `pwd' behaves as if `-L' were specified.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns 0 unless an invalid option is given or the current directory\n"
+"    cannot be read."
+msgstr ""
+
+#: builtins.c:428
+#, fuzzy
+msgid ""
+"Null command.\n"
+"    \n"
+"    No effect; the command does nothing.\n"
+"    \n"
+"    Exit Status:\n"
+"    Always succeeds."
+msgstr " Без ефект - командата нищо не прави.  Връща се изходен код 0."
+
+#: builtins.c:439
+msgid ""
+"Return a successful result.\n"
+"    \n"
+"    Exit Status:\n"
+"    Always succeeds."
+msgstr ""
+
+#: builtins.c:448
+msgid ""
+"Return an unsuccessful result.\n"
+"    \n"
+"    Exit Status:\n"
+"    Always fails."
+msgstr ""
+
+#: builtins.c:457
+msgid ""
+"Execute a simple command or display information about commands.\n"
+"    \n"
+"    Runs COMMAND with ARGS suppressing  shell function lookup, or display\n"
+"    information about the specified COMMANDs.  Can be used to invoke "
+"commands\n"
+"    on disk when a function with the same name exists.\n"
+"    \n"
+"    Options:\n"
+"      -p\tuse a default value for PATH that is guaranteed to find all of\n"
+"    \tthe standard utilities\n"
+"      -v\tprint a description of COMMAND similar to the `type' builtin\n"
+"      -V\tprint a more verbose description of each COMMAND\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns exit status of COMMAND, or failure if COMMAND is not found."
+msgstr ""
+
+#: builtins.c:476
+#, fuzzy
+msgid ""
+"Set variable values and attributes.\n"
+"    \n"
+"    Declare variables and give them attributes.  If no NAMEs are given,\n"
+"    display the attributes and values of all variables.\n"
+"    \n"
+"    Options:\n"
+"      -f\trestrict action or display to function names and definitions\n"
+"      -F\trestrict display to function names only (plus line number and\n"
+"    \tsource file when debugging)\n"
+"      -p\tdisplay the attributes and value of each NAME\n"
+"    \n"
+"    Options which set attributes:\n"
+"      -a\tto make NAMEs indexed arrays (if supported)\n"
+"      -A\tto make NAMEs associative arrays (if supported)\n"
+"      -i\tto make NAMEs have the `integer' attribute\n"
+"      -l\tto convert NAMEs to lower case on assignment\n"
+"      -r\tto make NAMEs readonly\n"
+"      -t\tto make NAMEs have the `trace' attribute\n"
+"      -u\tto convert NAMEs to upper case on assignment\n"
+"      -x\tto make NAMEs export\n"
+"    \n"
+"    Using `+' instead of `-' turns off the given attribute.\n"
+"    \n"
+"    Variables with the integer attribute have arithmetic evaluation (see\n"
+"    the `let' command) performed when the variable is assigned a value.\n"
+"    \n"
+"    When used in a function, `declare' makes NAMEs local, as with the "
+"`local'\n"
+"    command.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+" Обявяване на променливи и/или задаване на техните атрибути.  Ако не са "
+"зададени\n"
+"    ИМЕна, то се показват стойностите на променливите.  Опцията „-p“ "
+"показва\n"
+"    стойността и атрибутите за всяко ИМЕ.\n"
+"    \n"
+"    Опциите са:\n"
+"    \n"
+"        -a    да се създадат масиви с тези ИМЕна (ако това се поддържа)\n"
+"        -f    да се избира само измежду имената на функциите\n"
+"        -F    да се изведат имената на функциите (с номер на реда и име на "
+"файла\n"
+"              с изходния код при изчистване на грешки) без дефинициите.\n"
+"        -i    на ИМЕто се дава атрибут „цяло число“\n"
+"        -r    маха се възможността за промяна на ИМЕната\n"
+"        -t    на ИМЕто се дава атрибут „проследяване“\n"
+"        -x    ИМЕто да бъде изнасяно\n"
+"\n"
+"    При променливите с атрибут за цяло число се извършва аритметично "
+"заместване\n"
+"    (вижте командата „let“) при първоначално присвояване.\n"
+"    \n"
+"    При извеждането на стойностите на променливите „-f“ извежда имената и\n"
+"    дефинициите на функциите.  Опцията „-F“ ограничава изведената "
+"информация\n"
+"    до имената.\n"
+"\n"
+"    Използването на „+“ вместо „-“ премахва атрибута.  При използването във\n"
+"    функция ИМЕната стават локални, както при използването на командата "
+"„local“."
+
+#: builtins.c:512
+msgid ""
+"Set variable values and attributes.\n"
+"    \n"
+"    Obsolete.  See `help declare'."
+msgstr ""
+
+#: builtins.c:520
+msgid ""
+"Define local variables.\n"
+"    \n"
+"    Create a local variable called NAME, and give it VALUE.  OPTION can\n"
+"    be any option accepted by `declare'.\n"
+"    \n"
+"    Local variables can only be used within a function; they are visible\n"
+"    only to the function where they are defined and its children.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied, an error occurs,\n"
+"    or the shell is not executing a function."
+msgstr ""
+
+#: builtins.c:537
+#, fuzzy
+msgid ""
+"Write arguments to the standard output.\n"
+"    \n"
+"    Display the ARGs on the standard output followed by a newline.\n"
+"    \n"
+"    Options:\n"
+"      -n\tdo not append a newline\n"
+"      -e\tenable interpretation of the following backslash escapes\n"
+"      -E\texplicitly suppress interpretation of backslash escapes\n"
+"    \n"
+"    `echo' interprets the following backslash-escaped characters:\n"
+"      \\a\talert (bell)\n"
+"      \\b\tbackspace\n"
+"      \\c\tsuppress further output\n"
+"      \\e\tescape character\n"
+"      \\f\tform feed\n"
+"      \\n\tnew line\n"
+"      \\r\tcarriage return\n"
+"      \\t\thorizontal tab\n"
+"      \\v\tvertical tab\n"
+"      \\\\\tbackslash\n"
+"      \\0nnn\tthe character whose ASCII code is NNN (octal).  NNN can be\n"
+"    \t0 to 3 octal digits\n"
+"      \\xHH\tthe eight-bit character whose value is HH (hexadecimal).  HH\n"
+"    \tcan be one or two hex digits\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless a write error occurs."
+msgstr ""
+" Извеждане на АРГУМЕНТите.  Когато е зададена опцията „-n“, не се извежда "
+"знак\n"
+"    за нов ред.  Ако е зададена опцията „-e“, се включва интерпретирането "
+"на\n"
+"    следните знаци екранирани с обратна наклонена черта - „\\“:\n"
+"        \\a    системен звънец\n"
+"        \\b    триене назад\n"
+"        \\c    пропускане на знака за нов ред\n"
+"        \\E    знак за екраниране\n"
+"        \\f    знак „Завършване на формуляра“ (form feed)\n"
+"        \\n    знак за нов ред\n"
+"        \\r    знак „Връщане на каретката“ (carriage return)\n"
+"        \\t    хоризонтална табулация\n"
+"        \\v    вертикална табулация\n"
+"        \\\\    обратно наклонена черта\n"
+"        \\НМР  знакът с код в ASCII - НоМеР (в осмична бройна система).\n"
+"\n"
+"    Можете изрично да спрете интерпретирането на горните знаци с опцията „-"
+"E“."
+
+#: builtins.c:571
+msgid ""
+"Write arguments to the standard output.\n"
+"    \n"
+"    Display the ARGs on the standard output followed by a newline.\n"
+"    \n"
+"    Options:\n"
+"      -n\tdo not append a newline\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless a write error occurs."
+msgstr ""
+
+#: builtins.c:586
+msgid ""
+"Enable and disable shell builtins.\n"
+"    \n"
+"    Enables and disables builtin shell commands.  Disabling allows you to\n"
+"    execute a disk command which has the same name as a shell builtin\n"
+"    without using a full pathname.\n"
+"    \n"
+"    Options:\n"
+"      -a\tprint a list of builtins showing whether or not each is enabled\n"
+"      -n\tdisable each NAME or display a list of disabled builtins\n"
+"      -p\tprint the list of builtins in a reusable format\n"
+"      -s\tprint only the names of Posix `special' builtins\n"
+"    \n"
+"    Options controlling dynamic loading:\n"
+"      -f\tLoad builtin NAME from shared object FILENAME\n"
+"      -d\tRemove a builtin loaded with -f\n"
+"    \n"
+"    Without options, each NAME is enabled.\n"
+"    \n"
+"    To use the `test' found in $PATH instead of the shell builtin\n"
+"    version, type `enable -n test'.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless NAME is not a shell builtin or an error occurs."
+msgstr ""
+
+#: builtins.c:614
+msgid ""
+"Execute arguments as a shell command.\n"
+"    \n"
+"    Combine ARGs into a single string, use the result as input to the "
+"shell,\n"
+"    and execute the resulting commands.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns exit status of command or success if command is null."
+msgstr ""
+
+#: builtins.c:626
+#, fuzzy
+msgid ""
+"Parse option arguments.\n"
+"    \n"
+"    Getopts is used by shell procedures to parse positional parameters\n"
+"    as options.\n"
+"    \n"
+"    OPTSTRING contains the option letters to be recognized; if a letter\n"
+"    is followed by a colon, the option is expected to have an argument,\n"
+"    which should be separated from it by white space.\n"
+"    \n"
+"    Each time it is invoked, getopts will place the next option in the\n"
+"    shell variable $name, initializing name if it does not exist, and\n"
+"    the index of the next argument to be processed into the shell\n"
+"    variable OPTIND.  OPTIND is initialized to 1 each time the shell or\n"
+"    a shell script is invoked.  When an option requires an argument,\n"
+"    getopts places that argument into the shell variable OPTARG.\n"
+"    \n"
+"    getopts reports errors in one of two ways.  If the first character\n"
+"    of OPTSTRING is a colon, getopts uses silent error reporting.  In\n"
+"    this mode, no error messages are printed.  If an invalid option is\n"
+"    seen, getopts places the option character found into OPTARG.  If a\n"
+"    required argument is not found, getopts places a ':' into NAME and\n"
+"    sets OPTARG to the option character found.  If getopts is not in\n"
+"    silent mode, and an invalid option is seen, getopts places '?' into\n"
+"    NAME and unsets OPTARG.  If a required argument is not found, a '?'\n"
+"    is placed in NAME, OPTARG is unset, and a diagnostic message is\n"
+"    printed.\n"
+"    \n"
+"    If the shell variable OPTERR has the value 0, getopts disables the\n"
+"    printing of error messages, even if the first character of\n"
+"    OPTSTRING is not a colon.  OPTERR has the value 1 by default.\n"
+"    \n"
+"    Getopts normally parses the positional parameters ($0 - $9), but if\n"
+"    more arguments are given, they are parsed instead.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success if an option is found; fails if the end of options is\n"
+"    encountered or an error occurs."
+msgstr ""
+" getopts се използва от процедурите на обвивката за анализа на позиционните\n"
+"    аргументи.\n"
+"    \n"
+"    НИЗът_С_ОПЦИИ съдържа знаците, които трябва да се разпознават като "
+"опции.\n"
+"    Ако буквата е следвана от двоеточие, очаква се опцията да получава "
+"аргумент,\n"
+"    който да е разделен от нея с интервал(и).\n"
+"    \n"
+"    При всяко извикване, „getopts“ поставя следващата опция в променливата "
+"на\n"
+"    обвивката $name, като я инициализира, ако тя не съществува, а индексът "
+"на\n"
+"    следващия аргумент, който трябва да се обработи, в променливата на "
+"обвивката\n"
+"    $OPTIND.  $OPTIND се инициализира да е 1 при всяко извикване на обвивка "
+"или\n"
+"    скрипт.  Когато опцията се нуждае от аргумент, той се поставя в "
+"променливата\n"
+"    на обвивката $OPTARG.\n"
+"    \n"
+"    „getopts“ докладва грешки по един от два начина.  Ако първият знак на\n"
+"    $OPTSTRING е двоеточие, „getopts“ използва тихо докладване.  В този "
+"режим\n"
+"    не се извеждат никакви съобщения за грешка.  Ако се срещне неправилна "
+"опция,\n"
+"    „getopts“ слага „:“ в $NAME, а в $OPTARG - срещнатия знак за опция.  "
+"Ако\n"
+"    „getopts“ не е в режим на тихо докладване, в $NAME се слага „?“, $OPTARG "
+"се\n"
+"    премахва и се изписва диагностично съобщение.\n"
+"    \n"
+"    Ако променливата на обвивката $OPTERR е със стойност 0, „getopts“ "
+"изключва\n"
+"    извеждането на диагностични съобщения, дори първият знак в $OPTSTRING да "
+"не\n"
+"    е двоеточие.  По подразбиране $OPTERR е със стойност 1.\n"
+"    \n"
+"    „getopts“ по принцип анализира позиционните аргументи ($0 - $9), но ако "
+"са\n"
+"    дадени повече аргументи, те биват анализирани вместо това."
+
+#: builtins.c:668
+msgid ""
+"Replace the shell with the given command.\n"
+"    \n"
+"    Execute COMMAND, replacing this shell with the specified program.\n"
+"    ARGUMENTS become the arguments to COMMAND.  If COMMAND is not "
+"specified,\n"
+"    any redirections take effect in the current shell.\n"
+"    \n"
+"    Options:\n"
+"      -a name\tpass NAME as the zeroth argument to COMMAND\n"
+"      -c\t\texecute COMMAND with an empty environment\n"
+"      -l\t\tplace a dash in the zeroth argument to COMMAND\n"
+"    \n"
+"    If the command cannot be executed, a non-interactive shell exits, "
+"unless\n"
+"    the shell option `execfail' is set.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless COMMAND is not found or a redirection error "
+"occurs."
+msgstr ""
+
+#: builtins.c:689
+#, fuzzy
+msgid ""
+"Exit the shell.\n"
+"    \n"
+"    Exits the shell with a status of N.  If N is omitted, the exit status\n"
+"    is that of the last command executed."
+msgstr ""
+" Изход от обвивката с код N.  Ако N е изпуснат, то изходният код е този на\n"
+"     последната изпълнена команда."
+
+#: builtins.c:698
+msgid ""
+"Exit a login shell.\n"
+"    \n"
+"    Exits a login shell with exit status N.  Returns an error if not "
+"executed\n"
+"    in a login shell."
+msgstr ""
+
+#: builtins.c:708
+#, fuzzy
+msgid ""
+"Display or execute commands from the history list.\n"
+"    \n"
+"    fc is used to list or edit and re-execute commands from the history "
+"list.\n"
+"    FIRST and LAST can be numbers specifying the range, or FIRST can be a\n"
+"    string, which means the most recent command beginning with that\n"
+"    string.\n"
+"    \n"
+"    Options:\n"
+"      -e ENAME\tselect which editor to use.  Default is FCEDIT, then "
+"EDITOR,\n"
+"    \t\tthen vi\n"
+"      -l \tlist lines instead of editing\n"
+"      -n\tomit line numbers when listing\n"
+"      -r\treverse the order of the lines (newest listed first)\n"
+"    \n"
+"    With the `fc -s [pat=rep ...] [command]' format, COMMAND is\n"
+"    re-executed after the substitution OLD=NEW is performed.\n"
+"    \n"
+"    A useful alias to use with this is r='fc -s', so that typing `r cc'\n"
+"    runs the last command beginning with `cc' and typing `r' re-executes\n"
+"    the last command.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success or status of executed command; non-zero if an error "
+"occurs."
+msgstr ""
+" „fc“ се използва, за изброяването или редактирането и повторното изпълнение "
+"на\n"
+"    команди от списъка на историята.  ПЪРВИ и ПОСЛЕДЕН са номера, които "
+"могат да\n"
+"    указват допустимия диапазон.  Ако е зададен само ПЪРВИят аргумент,  той\n"
+"    задава низ, който е началото на команда.\n"
+"    \n"
+"       -e РЕДАКТОР    показва редактора, който да се използва.  Стандартно "
+"е\n"
+"                          $FCEDIT, след това се проверява $EDITOR и накрая "
+"„vi“.\n"
+"       -l             означава редовете да се покажат вместо редактират.\n"
+"       -n             означава номерата на редовете да не се показват.\n"
+"       -r             означава обратна подредба (отпред да е най-новият "
+"ред).\n"
+"    \n"
+"    При варианта „fc -s [ШАБЛ=ЗАМЕСТ …] [КОМАНДА]“ командата се изпълнява, "
+"като\n"
+"    всяка поява на ШАБЛона се заменя със ЗАМЕСТителя.\n"
+"    \n"
+"    Удобен за използване синоним е „r='fc -s'“.  По такъв начин, ако "
+"напишете\n"
+"    „r cc“, ще се изпълни последната команда, която започва с „cc“, а "
+"когато\n"
+"    се въведе само „-r“, ще се изпълни последната команда."
+
+#: builtins.c:738
+#, fuzzy
+msgid ""
+"Move job to the foreground.\n"
+"    \n"
+"    Place the job identified by JOB_SPEC in the foreground, making it the\n"
+"    current job.  If JOB_SPEC is not present, the shell's notion of the\n"
+"    current job is used.\n"
+"    \n"
+"    Exit Status:\n"
+"    Status of command placed in foreground, or failure if an error occurs."
+msgstr ""
+" Изважда ЗАДАЧА от фонов режим и я прави текуща задача.  Ако липсва\n"
+"    аргумент ЗАДАЧА, се използва текущата задача според обвивката."
+
+#: builtins.c:753
+#, fuzzy
+msgid ""
+"Move jobs to the background.\n"
+"    \n"
+"    Place the jobs identified by each JOB_SPEC in the background, as if "
+"they\n"
+"    had been started with `&'.  If JOB_SPEC is not present, the shell's "
+"notion\n"
+"    of the current job is used.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless job control is not enabled or an error occurs."
+msgstr ""
+" Поставя всяка ЗАДАЧА във фонов режим, все едно е била стартирана с „&“.\n"
+"    Ако липсва аргумент ЗАДАЧА, се използва текущата задача според обвивката."
+
+#: builtins.c:767
+msgid ""
+"Remember or display program locations.\n"
+"    \n"
+"    Determine and remember the full pathname of each command NAME.  If\n"
+"    no arguments are given, information about remembered commands is "
+"displayed.\n"
+"    \n"
+"    Options:\n"
+"      -d\t\tforget the remembered location of each NAME\n"
+"      -l\t\tdisplay in a format that may be reused as input\n"
+"      -p pathname\tuse PATHNAME is the full pathname of NAME\n"
+"      -r\t\tforget all remembered locations\n"
+"      -t\t\tprint the remembered location of each NAME, preceding\n"
+"    \t\teach location with the corresponding NAME if multiple\n"
+"    \t\tNAMEs are given\n"
+"    Arguments:\n"
+"      NAME\t\tEach NAME is searched for in $PATH and added to the list\n"
+"    \t\tof remembered commands.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless NAME is not found or an invalid option is given."
+msgstr ""
+
+#: builtins.c:792
+msgid ""
+"Display information about builtin commands.\n"
+"    \n"
+"    Displays brief summaries of builtin commands.  If PATTERN is\n"
+"    specified, gives detailed help on all commands matching PATTERN,\n"
+"    otherwise the list of help topics is printed.\n"
+"    \n"
+"    Options:\n"
+"      -d\toutput short description for each topic\n"
+"      -m\tdisplay usage in pseudo-manpage format\n"
+"      -s\toutput only a short usage synopsis for each topic matching\n"
+"    \tPATTERN\n"
+"    \n"
+"    Arguments:\n"
+"      PATTERN\tPattern specifiying a help topic\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless PATTERN is not found or an invalid option is "
+"given."
+msgstr ""
+
+#: builtins.c:816
+#, fuzzy
+msgid ""
+"Display or manipulate the history list.\n"
+"    \n"
+"    Display the history list with line numbers, prefixing each modified\n"
+"    entry with a `*'.  An argument of N lists only the last N entries.\n"
+"    \n"
+"    Options:\n"
+"      -c\tclear the history list by deleting all of the entries\n"
+"      -d offset\tdelete the history entry at offset OFFSET.\n"
+"    \n"
+"      -a\tappend history lines from this session to the history file\n"
+"      -n\tread all history lines not already read from the history file\n"
+"      -r\tread the history file and append the contents to the history\n"
+"    \tlist\n"
+"      -w\twrite the current history to the history file\n"
+"    \tand append them to the history list\n"
+"    \n"
+"      -p\tperform history expansion on each ARG and display the result\n"
+"    \twithout storing it in the history list\n"
+"      -s\tappend the ARGs to the history list as a single entry\n"
+"    \n"
+"    If FILENAME is given, it is used as the history file.  Otherwise,\n"
+"    if $HISTFILE has a value, that is used, else ~/.bash_history.\n"
+"    \n"
+"    If the $HISTTIMEFORMAT variable is set and not null, its value is used\n"
+"    as a format string for strftime(3) to print the time stamp associated\n"
+"    with each displayed history entry.  No time stamps are printed "
+"otherwise.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or an error occurs."
+msgstr ""
+" Показване на списъка на историята с номера на ред.  Редовете, които са\n"
+"    отбелязани със знака „*“, са били променени.  Аргументът N указва да се\n"
+"    извеждат само N на брой реда.  Опцията „-c“ предизвиква изчистването на\n"
+"    списъка, като се изтриват всички елементи от него.  Опцията „-d“ "
+"изтрива\n"
+"    елемента в историята намиращ се посочената ПОЗИЦИЯ.  Опцията „-w“ "
+"записва\n"
+"    текущата история във файла за историята.  Опцията „-r“ означава същият "
+"файл\n"
+"    да се прочете, а съдържанието му да се добави към историята.  Опцията „-"
+"a“\n"
+"    добавя историята от текущата сесия към файла с историята.  Опцията „-n“\n"
+"    предизвиква всички редове от файла с историята, които все още не са\n"
+"    прочетени от файла с историята, да се прочетат и добавят към текущата\n"
+"    история на командите.\n"
+"    \n"
+"    Ако аргументът ИМЕ_НА_ФАЙЛ е зададен, той се използва като файл за\n"
+"    историята. Ако той липсва, се използва файлът сочен в променливата на\n"
+"    средата $HISTFILE. В противен случай се ползва „~/.bash_history“. Ако е\n"
+"    зададена опцията „-s“, аргументите, които не са опции, се добавят като "
+"един\n"
+"    елемент към файла с историята.  Опцията „-p“ означава да се извърши\n"
+"    историческо заместване за всеки АРГУМЕНТ, а резултатът да се изведе, "
+"без\n"
+"    нищо да се записва в историята на командите.\n"
+"    \n"
+"    Ако променливата $HISTTIMEFORMAT е зададена и не е „null“, стойността ѝ "
+"се\n"
+"    използва като форматиращия низ за функцията „strftime“, за да се "
+"отбелязва\n"
+"    времето свързано с всеки елемент от историята.  В противен случай "
+"времето не\n"
+"    се записва."
+
+#: builtins.c:852
+#, fuzzy
+msgid ""
+"Display status of jobs.\n"
+"    \n"
+"    Lists the active jobs.  JOBSPEC restricts output to that job.\n"
+"    Without options, the status of all active jobs is displayed.\n"
+"    \n"
+"    Options:\n"
+"      -l\tlists process IDs in addition to the normal information\n"
+"      -n\tlist only processes that have changed status since the last\n"
+"    \tnotification\n"
+"      -p\tlists process IDs only\n"
+"      -r\trestrict output to running jobs\n"
+"      -s\trestrict output to stopped jobs\n"
+"    \n"
+"    If -x is supplied, COMMAND is run after all job specifications that\n"
+"    appear in ARGS have been replaced with the process ID of that job's\n"
+"    process group leader.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or an error occurs.\n"
+"    If -x is used, returns the exit status of COMMAND."
+msgstr ""
+" Извежда списък с активните задачи.  Опцията „-l“ включва и идентификатора "
+"на\n"
+"    процесите в добавка към стандартната информация.  Опцията „-p“ извежда "
+"само\n"
+"    идентификаторите на процесите.  Ако е зададена опцията „-n“ се извеждат "
+"само\n"
+"    процесите с променено състояние от последното извеждане на тази "
+"информация.\n"
+"    ЗАДАЧАта ограничава информацията до себе си.  Опциите „-r“ и „-s“\n"
+"    ограничават съответно изхода само до работещите и спрени задачи.  Без "
+"опции\n"
+"    се отпечатва състоянието на всички активни задачи.  Ако е зададена "
+"опцията\n"
+"    „-x“, КОМАНДАта се изпълнява, след като всички ЗАДАЧи, които се появяват "
+"като\n"
+"    аргументи, се заменят с идентификатора на водача на групата процеси."
+
+#: builtins.c:879
+msgid ""
+"Remove jobs from current shell.\n"
+"    \n"
+"    Removes each JOBSPEC argument from the table of active jobs.  Without\n"
+"    any JOBSPECs, the shell uses its notion of the current job.\n"
+"    \n"
+"    Options:\n"
+"      -a\tremove all jobs if JOBSPEC is not supplied\n"
+"      -h\tmark each JOBSPEC so that SIGHUP is not sent to the job if the\n"
+"    \tshell receives a SIGHUP\n"
+"      -r\tremove only running jobs\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option or JOBSPEC is given."
+msgstr ""
+
+#: builtins.c:898
+#, fuzzy
+msgid ""
+"Send a signal to a job.\n"
+"    \n"
+"    Send the processes identified by PID or JOBSPEC the signal named by\n"
+"    SIGSPEC or SIGNUM.  If neither SIGSPEC nor SIGNUM is present, then\n"
+"    SIGTERM is assumed.\n"
+"    \n"
+"    Options:\n"
+"      -s sig\tSIG is a signal name\n"
+"      -n sig\tSIG is a signal number\n"
+"      -l\tlist the signal names; if arguments follow `-l' they are\n"
+"    \tassumed to be signal numbers for which names should be listed\n"
+"    \n"
+"    Kill is a shell builtin for two reasons: it allows job IDs to be used\n"
+"    instead of process IDs, and allows processes to be killed if the limit\n"
+"    on processes that you can create is reached.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or an error occurs."
+msgstr ""
+" Изпращане на сигнала SIGSPEC на процеса с идентификатор ИдП (или ЗАДАЧА).\n"
+"    Ако сигналът SIGSPEC не съществува, се използва SIGTERM.\n"
+"    Опцията „-l“ изброява имената на сигналите.  Ако към нея са добавени\n"
+"    аргументи, те се интерпретират като номера на сигналите чиито имена\n"
+"    да се изброят.  „kill“ е команда вградена в обвивката поради две\n"
+"    причини: позволява да се използват и идентификатори на задачи освен\n"
+"    идентификатори на процеси, а и ако сте пуснали максимално разрешения\n"
+"    за вас брой процеси, няма да ви се налага да пуснете още един процес,\n"
+"    за да убиете друг."
+
+#: builtins.c:921
+#, fuzzy
+msgid ""
+"Evaluate arithmetic expressions.\n"
+"    \n"
+"    Evaluate each ARG as an arithmetic expression.  Evaluation is done in\n"
+"    fixed-width integers with no check for overflow, though division by 0\n"
+"    is trapped and flagged as an error.  The following list of operators is\n"
+"    grouped into levels of equal-precedence operators.  The levels are "
+"listed\n"
+"    in order of decreasing precedence.\n"
+"    \n"
+"    \tid++, id--\tvariable post-increment, post-decrement\n"
+"    \t++id, --id\tvariable pre-increment, pre-decrement\n"
+"    \t-, +\t\tunary minus, plus\n"
+"    \t!, ~\t\tlogical and bitwise negation\n"
+"    \t**\t\texponentiation\n"
+"    \t*, /, %\t\tmultiplication, division, remainder\n"
+"    \t+, -\t\taddition, subtraction\n"
+"    \t<<, >>\t\tleft and right bitwise shifts\n"
+"    \t<=, >=, <, >\tcomparison\n"
+"    \t==, !=\t\tequality, inequality\n"
+"    \t&\t\tbitwise AND\n"
+"    \t^\t\tbitwise XOR\n"
+"    \t|\t\tbitwise OR\n"
+"    \t&&\t\tlogical AND\n"
+"    \t||\t\tlogical OR\n"
+"    \texpr ? expr : expr\n"
+"    \t\t\tconditional operator\n"
+"    \t=, *=, /=, %=,\n"
+"    \t+=, -=, <<=, >>=,\n"
+"    \t&=, ^=, |=\tassignment\n"
+"    \n"
+"    Shell variables are allowed as operands.  The name of the variable\n"
+"    is replaced by its value (coerced to a fixed-width integer) within\n"
+"    an expression.  The variable need not have its integer attribute\n"
+"    turned on to be used in an expression.\n"
+"    \n"
+"    Operators are evaluated in order of precedence.  Sub-expressions in\n"
+"    parentheses are evaluated first and may override the precedence\n"
+"    rules above.\n"
+"    \n"
+"    Exit Status:\n"
+"    If the last ARG evaluates to 0, let returns 1; let returns 0 otherwise.."
+msgstr ""
+" Всеки аргумент е аритметичен израз, който се бъде изчислен.  Изчисленията\n"
+"    се извършват в аритметика с целочислени стойности с постоянна широчина\n"
+"    без проверка за препълване.  Делението на 0 се прихваща и се отбелязва\n"
+"    грешка.  Следващият списък на оператори е разделен на групи според\n"
+"    приоритета на операциите.  Подредбата е с намаляващ приоритет.\n"
+"    \n"
+"        id++, id--      последващо увеличаване/намаляване на променлива\n"
+"        ++id, --id      предварително увеличаване/намаляване на променлива\n"
+"        -, +            унарни минус, плюс\n"
+"        !, ~            логическо и побитово отрицания\n"
+"        **              вдигане на степен\n"
+"        *, /, %         умножение, деление, целочислен остатък\n"
+"        +, -            събиране, изваждане\n"
+"        <<, >>          побитово местене наляво и надясно\n"
+"        <=, >=, <, >    сравнение\n"
+"        ==, !=          равно, различно\n"
+"        &               побитово И\n"
+"        ^               побитово ИЛИ, ИЛИ\n"
+"        |               побитово ИЛИ\n"
+"        &&              логическо И\n"
+"        ||              логическо ИЛИ\n"
+"        expr ? expr : expr\n"
+"                        условен оператор\n"
+"        =, *=, /=, %=,\n"
+"        +=, -=, <<=, >>=,\n"
+"        &=, ^=, |=      присвояване\n"
+"    \n"
+"    Разрешено е ползването на променливи на обвивката като операнди.\n"
+"    Името на променлива се замества с нейната стойност (която се\n"
+"    преобразува до цяло число с постоянна широчина) в израза.  Не\n"
+"    е необходимо за променливата да е с атрибут за целочисленост, за\n"
+"    да се използва в израз.\n"
+"    \n"
+"    Операторите се изчисляват по приоритет.  Подизразите в скоби се\n"
+"    изчисляват първи и могат да променят приоритета.\n"
+"    \n"
+"    Ако последният АРГУМЕНТ се изчислява като 0, „let“ връща 1. В\n"
+"    противен случай - връща 0."
+
+#: builtins.c:966
+#, fuzzy
+msgid ""
+"Read a line from the standard input and split it into fields.\n"
+"    \n"
+"    Reads a single line from the standard input, or from file descriptor FD\n"
+"    if the -u option is supplied.  The line is split into fields as with "
+"word\n"
+"    splitting, and the first word is assigned to the first NAME, the second\n"
+"    word to the second NAME, and so on, with any leftover words assigned to\n"
+"    the last NAME.  Only the characters found in $IFS are recognized as "
+"word\n"
+"    delimiters.\n"
+"    \n"
+"    If no NAMEs are supplied, the line read is stored in the REPLY "
+"variable.\n"
+"    \n"
+"    Options:\n"
+"      -a array\tassign the words read to sequential indices of the array\n"
+"    \t\tvariable ARRAY, starting at zero\n"
+"      -d delim\tcontinue until the first character of DELIM is read, rather\n"
+"    \t\tthan newline\n"
+"      -e\t\tuse Readline to obtain the line in an interactive shell\n"
+"      -i text\tUse TEXT as the initial text for Readline\n"
+"      -n nchars\treturn after reading NCHARS characters rather than waiting\n"
+"    \t\tfor a newline\n"
+"      -p prompt\toutput the string PROMPT without a trailing newline before\n"
+"    \t\tattempting to read\n"
+"      -r\t\tdo not allow backslashes to escape any characters\n"
+"      -s\t\tdo not echo input coming from a terminal\n"
+"      -t timeout\ttime out and return failure if a complete line of input "
+"is\n"
+"    \t\tnot read withint TIMEOUT seconds.  The value of the TMOUT\n"
+"    \t\tvariable is the default timeout.  TIMEOUT may be a\n"
+"    \t\tfractional number.  If TIMEOUT is 0, read returns success only\n"
+"    \t\tif input is available on the specified file descriptor.  The\n"
+"    \t\texit status is greater than 128 if the timeout is exceeded\n"
+"      -u fd\t\tread from file descriptor FD instead of the standard input\n"
+"    \n"
+"    Exit Status:\n"
+"    The return code is zero, unless end-of-file is encountered, read times "
+"out,\n"
+"    or an invalid file descriptor is supplied as the argument to -u."
+msgstr ""
+" От стандартния вход или от файловия дескриптор ФД, ако е използвана опцията "
+"„-u“,\n"
+"    се прочита един ред и първата дума се присвоява на първото ИМЕ, втората "
+"дума\n"
+"    на второто ИМЕ и т.н., а на последното ИМЕ се присвояват оставащите "
+"думи.\n"
+"    Като разделители на думи се използват само знаците указани в $IFS.  Ако "
+"не са\n"
+"    дадени ИМЕна, прочетеният ред се запазва в променливата $REPLY. Когато "
+"е\n"
+"    използвана опцията „-r“, входът не се обработва и заместването на\n"
+"    екранираните с „\\“ знаци се изключва. Опцията „-d“ кара „read“ да\n"
+"    продължи до прочитането на първия знак, който присъства в променливата\n"
+"    $DELIM, а не до минаването на нов ред.  Ако е зададена опцията „-p“, се\n"
+"    извежда низът ПОДСКАЗКА без минаване на нов ред, преди да се четат знаци "
+"на\n"
+"    входа.  Когато е зададена опцията „-a“, прочетените уми се присвояват\n"
+"    последователно на елементите на МАСИВа, като индексът му започва от 0.  "
+"Ако\n"
+"    присъства опцията „-e“, а обвивката е интерактивна, за четене на реда "
+"се\n"
+"    използва „readline“.  Когато опцията „-n“ има аргумент БРОЙ_ЗНАЦИ, то "
+"„read“\n"
+"    свършва след прочитането на този БРОЙ_ЗНАЦИ.  С опцията „-s“ входът от\n"
+"    терминал не се отпечатва на екрана.\n"
+"    \n"
+"    Опцията „-t“ задава ИНТЕРВАЛ, в който трябва да се въведе цял ред.  В\n"
+"    противен случай „read“ завършва с грешка.  Ако е зададена, стойността "
+"на\n"
+"    променливата $TMOUT обозначава времето, за което трябва да се въведе "
+"редът.\n"
+"    Изходният код е 0, освен ако не се срещне знак за край на файл „EOF“, "
+"мине\n"
+"    ИНТЕРВАЛът за въвеждане или е зададен неправилен файлов дескриптор като\n"
+"    аргумент на „-u“."
+
+#: builtins.c:1006
+msgid ""
+"Return from a shell function.\n"
+"    \n"
+"    Causes a function or sourced script to exit with the return value\n"
+"    specified by N.  If N is omitted, the return status is that of the\n"
+"    last command executed within the function or script.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns N, or failure if the shell is not executing a function or script."
+msgstr ""
+
+#: builtins.c:1019
+#, fuzzy
+msgid ""
+"Set or unset values of shell options and positional parameters.\n"
+"    \n"
+"    Change the value of shell attributes and positional parameters, or\n"
+"    display the names and values of shell variables.\n"
+"    \n"
+"    Options:\n"
+"      -a  Mark variables which are modified or created for export.\n"
+"      -b  Notify of job termination immediately.\n"
+"      -e  Exit immediately if a command exits with a non-zero status.\n"
+"      -f  Disable file name generation (globbing).\n"
+"      -h  Remember the location of commands as they are looked up.\n"
+"      -k  All assignment arguments are placed in the environment for a\n"
+"          command, not just those that precede the command name.\n"
+"      -m  Job control is enabled.\n"
+"      -n  Read commands but do not execute them.\n"
+"      -o option-name\n"
+"          Set the variable corresponding to option-name:\n"
+"              allexport    same as -a\n"
+"              braceexpand  same as -B\n"
+"              emacs        use an emacs-style line editing interface\n"
+"              errexit      same as -e\n"
+"              errtrace     same as -E\n"
+"              functrace    same as -T\n"
+"              hashall      same as -h\n"
+"              histexpand   same as -H\n"
+"              history      enable command history\n"
+"              ignoreeof    the shell will not exit upon reading EOF\n"
+"              interactive-comments\n"
+"                           allow comments to appear in interactive commands\n"
+"              keyword      same as -k\n"
+"              monitor      same as -m\n"
+"              noclobber    same as -C\n"
+"              noexec       same as -n\n"
+"              noglob       same as -f\n"
+"              nolog        currently accepted but ignored\n"
+"              notify       same as -b\n"
+"              nounset      same as -u\n"
+"              onecmd       same as -t\n"
+"              physical     same as -P\n"
+"              pipefail     the return value of a pipeline is the status of\n"
+"                           the last command to exit with a non-zero status,\n"
+"                           or zero if no command exited with a non-zero "
+"status\n"
+"              posix        change the behavior of bash where the default\n"
+"                           operation differs from the Posix standard to\n"
+"                           match the standard\n"
+"              privileged   same as -p\n"
+"              verbose      same as -v\n"
+"              vi           use a vi-style line editing interface\n"
+"              xtrace       same as -x\n"
+"      -p  Turned on whenever the real and effective user ids do not match.\n"
+"          Disables processing of the $ENV file and importing of shell\n"
+"          functions.  Turning this option off causes the effective uid and\n"
+"          gid to be set to the real uid and gid.\n"
+"      -t  Exit after reading and executing one command.\n"
+"      -u  Treat unset variables as an error when substituting.\n"
+"      -v  Print shell input lines as they are read.\n"
+"      -x  Print commands and their arguments as they are executed.\n"
+"      -B  the shell will perform brace expansion\n"
+"      -C  If set, disallow existing regular files to be overwritten\n"
+"          by redirection of output.\n"
+"      -E  If set, the ERR trap is inherited by shell functions.\n"
+"      -H  Enable ! style history substitution.  This flag is on\n"
+"          by default when the shell is interactive.\n"
+"      -P  If set, do not follow symbolic links when executing commands\n"
+"          such as cd which change the current directory.\n"
+"      -T  If set, the DEBUG trap is inherited by shell functions.\n"
+"      -   Assign any remaining arguments to the positional parameters.\n"
+"          The -x and -v options are turned off.\n"
+"    \n"
+"    Using + rather than - causes these flags to be turned off.  The\n"
+"    flags can also be used upon invocation of the shell.  The current\n"
+"    set of flags may be found in $-.  The remaining n ARGs are positional\n"
+"    parameters and are assigned, in order, to $1, $2, .. $n.  If no\n"
+"    ARGs are given, all shell variables are printed.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given."
+msgstr ""
+"    -a    Отбелязване на променливите, които са създадени или променени, да\n"
+"              бъдат изнесени.\n"
+"    -b    Незабавно известяване на спиране на задача.\n"
+"    -e    Незабавен изход, ако команда приключи команда с код, който не е "
+"0.\n"
+"    -f    Изключване на генерирането на имена на файлове (чрез „*“, „?“ и т."
+"н.).\n"
+"    -h    Запомняне на местоположението на команди при търсенето им.\n"
+"    -k    Всички аргументи за присвояване се поместват в средата на команда, "
+"не\n"
+"              само тези, които предхождат името на команда.\n"
+"    -m    Включване на управлението на задачи.\n"
+"    -n    Прочитане на команди, без да се изпълняват.\n"
+"    -o ИМЕ_НА_ОПЦИЯ\n"
+"          Задаване на променливата, която отговаря на ИМЕто_НА_ОПЦИЯ:\n"
+"        allexport    същото като „-a“\n"
+"        braceexpand  същото като „-B“\n"
+"        emacs        използване на интерфейс за редактиране подобен на "
+"„emacs“\n"
+"        errexit      същото като „-e“\n"
+"        errtrace     същото като „-E“\n"
+"        functrace    същото като „-T“\n"
+"        hashall      същото като „-h“\n"
+"        histexpand   същото като „-H“\n"
+"        history      включване на историята на командите\n"
+"        ignoreeof    обвивката няма да излезе при откриване на знак за край "
+"на\n"
+"                         файл „EOF“.\n"
+"        interactive-comments\n"
+"                     позволяване на коментари в интерактивните команди\n"
+"        keyword      същото като „-k“\n"
+"        monitor      същото като „-m“\n"
+"        noclobber    същото като „-C“\n"
+"        noexec       същото като „-n“\n"
+"        noglob       същото като „-f“\n"
+"        nolog        тази опция се приема в момента, но се игнорира\n"
+"        notify       същото като „-b“\n"
+"        nounset      същото като „-u“\n"
+"        onecmd       същото като „-t“\n"
+"        physical     същото като „-P“\n"
+"        pipefail     изходният код на програмния канал е този на последната\n"
+"                         команда, която завършва с код различен от 0\n"
+"        posix        промяна на поведението на „bash“ да отговаря на "
+"стандарт\n"
+"                         1003.2\n"
+"        privileged   същото като „-p“\n"
+"        verbose      същото като „-v“\n"
+"        vi           използване на интерфейс за редактиране подобен на „vi“\n"
+"        xtrace       същото като „-x“\n"
+"    -p    Опцията включена. когато реалният и ефективният идентификатори "
+"процеси\n"
+"              не съвпадат.  Изключва обработката на файла $ENV и внасянето "
+"на\n"
+"              функции на обвивката.  Изключването на тази опция води до "
+"това\n"
+"              ефективните идентификатори за потребител и група да станат "
+"равни\n"
+"              на реалните.\n"
+"    -t    Изход след прочитането и изпълнението на една команда.\n"
+"    -u    Незададените променливи да се третират като грешки при "
+"заместването.\n"
+"    -v    Отпечатване на входните редове към обвивката при прочитането им.\n"
+"    -x    Отпечатване на командите и аргументите им при изпълнението им.\n"
+"    -B    Обвивката ще извършва заместване на изразите с фигурни скоби.\n"
+"    -C    Предотвратяване на презаписването на съществуващите обикновени "
+"файлове\n"
+"              чрез пренасочване на изхода.\n"
+"    -E    Капанът за „ERR“ да се наследява от функциите на обвивката.\n"
+"    -H    Включване на заместването чрез историята с „!“.  Стандартно тази "
+"опция\n"
+"          е налична за интерактивните обвивки.\n"
+"    -P    Да не се следват символните връзки при изпълнението на команди "
+"като\n"
+"              „cd“, които променят текущата директория.\n"
+"    -T    Капанът за „DEBUG“ да се наследява от функциите на обвивката.\n"
+"    -     Оставащите аргументи да се тълкуват като позиционни.  Опциите „-x“ "
+"и\n"
+"              са изключени.\n"
+"    \n"
+"    Използването на „+“ вместо „-“ изключва опциите.  Тези опции могат да "
+"се\n"
+"    използват и при стартирането на обвивката.  Текущото им състояние се "
+"намира\n"
+"    в „$-“.  Останалите n на брой АРГументи са позиционни и се присвояват\n"
+"    съответно на $1, $2,… $n.  Ако не са зададени АРГументи, се извеждат\n"
+"    всички променливи на средата."
+
+#: builtins.c:1101
+msgid ""
+"Unset values and attributes of shell variables and functions.\n"
+"    \n"
+"    For each NAME, remove the corresponding variable or function.\n"
+"    \n"
+"    Options:\n"
+"      -f\ttreat each NAME as a shell function\n"
+"      -v\ttreat each NAME as a shell variable\n"
+"    \n"
+"    Without options, unset first tries to unset a variable, and if that "
+"fails,\n"
+"    tries to unset a function.\n"
+"    \n"
+"    Some variables cannot be unset; also see `readonly'.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or a NAME is read-only."
+msgstr ""
+
+#: builtins.c:1121
+msgid ""
+"Set export attribute for shell variables.\n"
+"    \n"
+"    Marks each NAME for automatic export to the environment of subsequently\n"
+"    executed commands.  If VALUE is supplied, assign VALUE before "
+"exporting.\n"
+"    \n"
+"    Options:\n"
+"      -f\trefer to shell functions\n"
+"      -n\tremove the export property from each NAME\n"
+"      -p\tdisplay a list of all exported variables and functions\n"
+"    \n"
+"    An argument of `--' disables further option processing.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or NAME is invalid."
+msgstr ""
+
+#: builtins.c:1140
+msgid ""
+"Mark shell variables as unchangeable.\n"
+"    \n"
+"    Mark each NAME as read-only; the values of these NAMEs may not be\n"
+"    changed by subsequent assignment.  If VALUE is supplied, assign VALUE\n"
+"    before marking as read-only.\n"
+"    \n"
+"    Options:\n"
+"      -a\trefer to indexed array variables\n"
+"      -A\trefer to associative array variables\n"
+"      -f\trefer to shell functions\n"
+"      -p\tdisplay a list of all readonly variables and functions\n"
+"    \n"
+"    An argument of `--' disables further option processing.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or NAME is invalid."
+msgstr ""
+
+#: builtins.c:1161
+msgid ""
+"Shift positional parameters.\n"
+"    \n"
+"    Rename the positional parameters $N+1,$N+2 ... to $1,$2 ...  If N is\n"
+"    not given, it is assumed to be 1.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless N is negative or greater than $#."
+msgstr ""
+
+#: builtins.c:1173 builtins.c:1188
+#, fuzzy
+msgid ""
+"Execute commands from a file in the current shell.\n"
+"    \n"
+"    Read and execute commands from FILENAME in the current shell.  The\n"
+"    entries in $PATH are used to find the directory containing FILENAME.\n"
+"    If any ARGUMENTS are supplied, they become the positional parameters\n"
+"    when FILENAME is executed.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed in FILENAME; fails if\n"
+"    FILENAME cannot be read."
+msgstr ""
+" Изчитане и изпълнение на командите от ФАЙЛа и изход.  Директориите описани "
+"в\n"
+"    променливата $PATH се използват за изпълнението на командите от ФАЙЛа.  "
+"Ако\n"
+"    са зададени АРГУМЕНТИ, те се превръщат в позиционни аргументи при\n"
+"    изпълнението на ФАЙЛа."
+
+#: builtins.c:1204
+msgid ""
+"Suspend shell execution.\n"
+"    \n"
+"    Suspend the execution of this shell until it receives a SIGCONT signal.\n"
+"    Unless forced, login shells cannot be suspended.\n"
+"    \n"
+"    Options:\n"
+"      -f\tforce the suspend, even if the shell is a login shell\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless job control is not enabled or an error occurs."
+msgstr ""
+
+#: builtins.c:1220
+#, fuzzy
+msgid ""
+"Evaluate conditional expression.\n"
+"    \n"
+"    Exits with a status of 0 (true) or 1 (false) depending on\n"
+"    the evaluation of EXPR.  Expressions may be unary or binary.  Unary\n"
+"    expressions are often used to examine the status of a file.  There\n"
+"    are string operators as well, and numeric comparison operators.\n"
+"    \n"
+"    File operators:\n"
+"    \n"
+"      -a FILE        True if file exists.\n"
+"      -b FILE        True if file is block special.\n"
+"      -c FILE        True if file is character special.\n"
+"      -d FILE        True if file is a directory.\n"
+"      -e FILE        True if file exists.\n"
+"      -f FILE        True if file exists and is a regular file.\n"
+"      -g FILE        True if file is set-group-id.\n"
+"      -h FILE        True if file is a symbolic link.\n"
+"      -L FILE        True if file is a symbolic link.\n"
+"      -k FILE        True if file has its `sticky' bit set.\n"
+"      -p FILE        True if file is a named pipe.\n"
+"      -r FILE        True if file is readable by you.\n"
+"      -s FILE        True if file exists and is not empty.\n"
+"      -S FILE        True if file is a socket.\n"
+"      -t FD          True if FD is opened on a terminal.\n"
+"      -u FILE        True if the file is set-user-id.\n"
+"      -w FILE        True if the file is writable by you.\n"
+"      -x FILE        True if the file is executable by you.\n"
+"      -O FILE        True if the file is effectively owned by you.\n"
+"      -G FILE        True if the file is effectively owned by your group.\n"
+"      -N FILE        True if the file has been modified since it was last "
+"read.\n"
+"    \n"
+"      FILE1 -nt FILE2  True if file1 is newer than file2 (according to\n"
+"                       modification date).\n"
+"    \n"
+"      FILE1 -ot FILE2  True if file1 is older than file2.\n"
+"    \n"
+"      FILE1 -ef FILE2  True if file1 is a hard link to file2.\n"
+"    \n"
+"    String operators:\n"
+"    \n"
+"      -z STRING      True if string is empty.\n"
+"    \n"
+"      -n STRING\n"
+"         STRING      True if string is not empty.\n"
+"    \n"
+"      STRING1 = STRING2\n"
+"                     True if the strings are equal.\n"
+"      STRING1 != STRING2\n"
+"                     True if the strings are not equal.\n"
+"      STRING1 < STRING2\n"
+"                     True if STRING1 sorts before STRING2 "
+"lexicographically.\n"
+"      STRING1 > STRING2\n"
+"                     True if STRING1 sorts after STRING2 lexicographically.\n"
+"    \n"
+"    Other operators:\n"
+"    \n"
+"      -o OPTION      True if the shell option OPTION is enabled.\n"
+"      ! EXPR         True if expr is false.\n"
+"      EXPR1 -a EXPR2 True if both expr1 AND expr2 are true.\n"
+"      EXPR1 -o EXPR2 True if either expr1 OR expr2 is true.\n"
+"    \n"
+"      arg1 OP arg2   Arithmetic tests.  OP is one of -eq, -ne,\n"
+"                     -lt, -le, -gt, or -ge.\n"
+"    \n"
+"    Arithmetic binary operators return true if ARG1 is equal, not-equal,\n"
+"    less-than, less-than-or-equal, greater-than, or greater-than-or-equal\n"
+"    than ARG2.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success if EXPR evaluates to true; fails if EXPR evaluates to\n"
+"    false or an invalid argument is given."
+msgstr ""
+" Изход с код 0 (истина) или 1 (лъжа) в зависимост от стойността на ИЗРАЗа.\n"
+"    Изразите могат да бъдат унарни или бинарни.  Унарните най-често се "
+"използват\n"
+"    за проверка на състоянието на файл.  Освен тях има и оператори за "
+"числови\n"
+"    сравнения и низови оператори.\n"
+"    \n"
+"    Файлови оператори:\n"
+"    \n"
+"        -a ФАЙЛ    Истина, ако ФАЙЛът съществува.\n"
+"        -b ФАЙЛ    Истина, ако ФАЙЛът е блоково устройство.\n"
+"        -c ФАЙЛ    Истина, ако ФАЙЛът е знаково устройство.\n"
+"        -d ФАЙЛ    Истина, ако ФАЙЛът е директория.\n"
+"        -e ФАЙЛ    Истина, ако ФАЙЛът съществува.\n"
+"        -f ФАЙЛ    Истина, ако ФАЙЛът съществува и е обикновен файл.\n"
+"        -g ФАЙЛ    Истина, ако ФАЙЛът е със зададен бит за смяна на група\n"
+"                       при изпълнение.\n"
+"        -h ФАЙЛ    Истина, ако ФАЙЛът е символна връзка.\n"
+"        -L ФАЙЛ    Истина, ако ФАЙЛът е символна връзка.\n"
+"        -k ФАЙЛ    Истина, ако ФАЙЛът е със зададен лепкав бит.\n"
+"        -p ФАЙЛ    Истина, ако ФАЙЛът е именуван програмен канал.\n"
+"        -r ФАЙЛ    Истина, ако ФАЙЛът може да бъде прочетен от вас.\n"
+"        -s ФАЙЛ    Истина, ако ФАЙЛът може да бъде записван от вас.\n"
+"        -S ФАЙЛ    Истина, ако ФАЙЛът е програмно гнездо.\n"
+"        -t ФДСК    Истина, ако Файловият_ДеСКриптор е отворен на терминал.\n"
+"        -u ФАЙЛ    Истина, ако ФАЙЛът е със зададен бит за смяна на "
+"потребител\n"
+"                       при изпълнение.\n"
+"        -w ФАЙЛ    Истина, ако ФАЙЛът може да бъде записван от вас.\n"
+"        -x ФАЙЛ    Истина, ако ФАЙЛът може да бъде изпълняван от вас.\n"
+"        -O ФАЙЛ    Истина, ако ФАЙЛът може да бъде ефективно притежаван от "
+"вас.\n"
+"        -G ФАЙЛ    Истина, ако ФАЙЛът може да бъде ефективно притежаван от "
+"вашата\n"
+"                       група.\n"
+"        -N ФАЙЛ    Истина, ако ФАЙЛът е бил променян от последното му "
+"прочитане.\n"
+"    \n"
+"         ФАЙЛ_1 -nt ФАЙЛ_2    Истина, ако ФАЙЛ_1 е по-нов от ФАЙЛ_2 (според\n"
+"                                  датата на промяна).\n"
+"         ФАЙЛ_1 -ot ФАЙЛ_2    Истина, ако ФАЙЛ_1 е по-стар от ФАЙЛ_2 "
+"(според\n"
+"                                  датата на промяна).    \n"
+"         ФАЙЛ_1 -ef ФАЙЛ_2    Истина, ако ФАЙЛ_1 е твърда връзка към "
+"ФАЙЛ_2.\n"
+"    \n"
+"    Низови оператори:\n"
+"    \n"
+"        -z НИЗ     Истина, ако НИЗът е празен.\n"
+"        -n НИЗ     Истина, ако НИЗът не е празен.\n"
+"         НИЗ       Истина, ако НИЗът не е празен.\n"
+"    \n"
+"        НИЗ_1  = НИЗ_2    Истина, ако низовете са равни.\n"
+"        НИЗ_1 != НИЗ_2    Истина, ако низовете не са равни.\n"
+"        НИЗ_1  < НИЗ_2    Истина, ако НИЗ_1 е лексикографски преди НИЗ_2.\n"
+"        НИЗ_1  > НИЗ_2    Истина, ако НИЗ_1 е лексикографски след НИЗ_2.\n"
+"    \n"
+"    Други оператори:\n"
+"    \n"
+"        -o ОПЦИЯ                Истина, ако ОПЦИЯта на обвивката е "
+"зададена.\n"
+"        !  ИЗРАЗ                Истина, ако ИЗРАЗът е лъжа.\n"
+"        ИЗРАЗ_1 -a ИЗРАЗ_2      Истина, ако и двата ИЗРАЗа са истина.\n"
+"        ИЗРАЗ_1 -o ИЗРАЗ_2      Истина, ако поне един от ИЗРАЗите е истина.\n"
+"    \n"
+"        АРГ_1 ОПЕРАТОР АРГ_2    Аритметични тестове.  Те връщат истина, ако "
+"се\n"
+"                                изпълнява математическото условие на "
+"ОПЕРАТОРа,\n"
+"                                който е един от следните (значението е в "
+"скоби):\n"
+"                                    „-eq“ (=),  „-ne“ (!=), „-lt“ (<),\n"
+"                                    „-le“ (<=), „-gt“ (>) , „-ge“ (>=)."
+
+#: builtins.c:1296
+#, fuzzy
+msgid ""
+"Evaluate conditional expression.\n"
+"    \n"
+"    This is a synonym for the \"test\" builtin, but the last argument must\n"
+"    be a literal `]', to match the opening `['."
+msgstr ""
+" Това е синоним на вградената команда „test“, но последният аргумент трябва\n"
+"    задължително да е знакът „]“, който да съответства на отварящата скоба "
+"„[“."
+
+#: builtins.c:1305
+msgid ""
+"Display process times.\n"
+"    \n"
+"    Prints the accumulated user and system times for the shell and all of "
+"its\n"
+"    child processes.\n"
+"    \n"
+"    Exit Status:\n"
+"    Always succeeds."
+msgstr ""
+
+#: builtins.c:1317
+#, fuzzy
+msgid ""
+"Trap signals and other events.\n"
+"    \n"
+"    Defines and activates handlers to be run when the shell receives "
+"signals\n"
+"    or other conditions.\n"
+"    \n"
+"    ARG is a command to be read and executed when the shell receives the\n"
+"    signal(s) SIGNAL_SPEC.  If ARG is absent (and a single SIGNAL_SPEC\n"
+"    is supplied) or `-', each specified signal is reset to its original\n"
+"    value.  If ARG is the null string each SIGNAL_SPEC is ignored by the\n"
+"    shell and by the commands it invokes.\n"
+"    \n"
+"    If a SIGNAL_SPEC is EXIT (0) ARG is executed on exit from the shell.  "
+"If\n"
+"    a SIGNAL_SPEC is DEBUG, ARG is executed before every simple command.\n"
+"    \n"
+"    If no arguments are supplied, trap prints the list of commands "
+"associated\n"
+"    with each signal.\n"
+"    \n"
+"    Options:\n"
+"      -l\tprint a list of signal names and their corresponding numbers\n"
+"      -p\tdisplay the trap commands associated with each SIGNAL_SPEC\n"
+"    \n"
+"    Each SIGNAL_SPEC is either a signal name in <signal.h> or a signal "
+"number.\n"
+"    Signal names are case insensitive and the SIG prefix is optional.  A\n"
+"    signal may be sent to the shell with \"kill -signal $$\".\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless a SIGSPEC is invalid or an invalid option is "
+"given."
+msgstr ""
+" Командата АРГУМЕНТ ще бъде прочетена и изпълнена, когато обвивката получи\n"
+"    УКАЗАНия_СИГНАЛ(и).  Ако АРГУМЕНТът липсва (и се подава единичен\n"
+"    УКАЗАН_СИГНАЛ) или е „-“, то всеки УКАЗАН_СИГНАЛ се връща към "
+"първоначалната\n"
+"    си стойност.  Ако АРГУМЕНТът е нулевия низ, всеки УКАЗАН_СИГНАЛ се\n"
+"    пренебрегва от обвивката и командите, които се стартират през нея.  Ако\n"
+"    УКАЗАНият_СИГНАЛ е „EXIT (0)“, то командата АРГУМЕНТ се изпълнява от\n"
+"    обвивката при изход.  Ако УКАЗАНият_СИГНАЛ е „DEBUG“, АРГУМЕНТът се\n"
+"    изпълнява след всяка проста команда.  Ако е дадена опцията „-p“, то\n"
+"    се извеждат командите свързани с всеки УКАЗАН_СИГНАЛ.  Всеки "
+"УКАЗАН_СИГНАЛ\n"
+"    е или име на сигнал от файла „signal.h“ или номер на сигнал.  Няма "
+"разлика\n"
+"    между главни и малки букви в имената на сигнали, а представката „SIG“ не "
+"е\n"
+"    задължителна.  „trap -l“ отпечатва списъка с имената на сигналите и\n"
+"    съответстващите им номера.  Забележете, че сигнал може да бъде изпратен "
+"на\n"
+"    обвивката с командата „kill -signal $$“."
+
+#: builtins.c:1349
+msgid ""
+"Display information about command type.\n"
+"    \n"
+"    For each NAME, indicate how it would be interpreted if used as a\n"
+"    command name.\n"
+"    \n"
+"    Options:\n"
+"      -a\tdisplay all locations containing an executable named NAME;\n"
+"    \tincludes aliases, builtins, and functions, if and only if\n"
+"    \tthe `-p' option is not also used\n"
+"      -f\tsuppress shell function lookup\n"
+"      -P\tforce a PATH search for each NAME, even if it is an alias,\n"
+"    \tbuiltin, or function, and returns the name of the disk file\n"
+"    \tthat would be executed\n"
+"      -p\treturns either the name of the disk file that would be executed,\n"
+"    \tor nothing if `type -t NAME' would not return `file'.\n"
+"      -t\toutput a single word which is one of `alias', `keyword',\n"
+"    \t`function', `builtin', `file' or `', if NAME is an alias, shell\n"
+"    \treserved word, shell function, shell builtin, disk file, or not\n"
+"    \tfound, respectively\n"
+"    \n"
+"    Arguments:\n"
+"      NAME\tCommand name to be interpreted.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success if all of the NAMEs are found; fails if any are not "
+"found."
+msgstr ""
+
+#: builtins.c:1380
+#, fuzzy
+msgid ""
+"Modify shell resource limits.\n"
+"    \n"
+"    Provides control over the resources available to the shell and "
+"processes\n"
+"    it creates, on systems that allow such control.\n"
+"    \n"
+"    Options:\n"
+"      -S\tuse the `soft' resource limit\n"
+"      -H\tuse the `hard' resource limit\n"
+"      -a\tall current limits are reported\n"
+"      -b\tthe socket buffer size\n"
+"      -c\tthe maximum size of core files created\n"
+"      -d\tthe maximum size of a process's data segment\n"
+"      -e\tthe maximum scheduling priority (`nice')\n"
+"      -f\tthe maximum size of files written by the shell and its children\n"
+"      -i\tthe maximum number of pending signals\n"
+"      -l\tthe maximum size a process may lock into memory\n"
+"      -m\tthe maximum resident set size\n"
+"      -n\tthe maximum number of open file descriptors\n"
+"      -p\tthe pipe buffer size\n"
+"      -q\tthe maximum number of bytes in POSIX message queues\n"
+"      -r\tthe maximum real-time scheduling priority\n"
+"      -s\tthe maximum stack size\n"
+"      -t\tthe maximum amount of cpu time in seconds\n"
+"      -u\tthe maximum number of user processes\n"
+"      -v\tthe size of virtual memory\n"
+"      -x\tthe maximum number of file locks\n"
+"    \n"
+"    If LIMIT is given, it is the new value of the specified resource; the\n"
+"    special LIMIT values `soft', `hard', and `unlimited' stand for the\n"
+"    current soft limit, the current hard limit, and no limit, respectively.\n"
+"    Otherwise, the current value of the specified resource is printed.  If\n"
+"    no option is given, then -f is assumed.\n"
+"    \n"
+"    Values are in 1024-byte increments, except for -t, which is in seconds,\n"
+"    -p, which is in increments of 512 bytes, and -u, which is an unscaled\n"
+"    number of processes.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+" ulimit осъществява контрол върху ресурсите, които са достъпни на процесите\n"
+"    стартирани през обвивката върху системите, които поддържат такова\n"
+"    управление.  Ако са зададени опции, те означават следното:\n"
+"    \n"
+"        -S    използване на „мекото“ ограничение на ресурс\n"
+"        -H    използване на „твърдото“ ограничение на ресурс\n"
+"        -a    извеждат се всички текущи ограничения\n"
+"        -c    максималният размер на създадените файлове със съдържание на\n"
+"                  паметта (core)\n"
+"        -d    максималният размер на сегмента на процес за данни\n"
+"        -f    максималният размер на файловете създадени от обвивката\n"
+"        -i    максималният брой на изчакващите сигнали\n"
+"        -l    максималният размер памет, която процес може да заключи\n"
+"        -m    максималният постоянно зареден в паметта сегмент\n"
+"        -n    максималният брой дескриптори на отворени файлове\n"
+"        -p    размер на буфера за конвейери\n"
+"        -q    максималният брой байтове в опашките за съобщения по POSIX\n"
+"        -s    максималният размер на стека\n"
+"        -t    максималното процесорно време в секунди\n"
+"        -u    максималният брой потребителски процеси\n"
+"        -v    размерът на виртуалната памет\n"
+"        -x    максималният брой заключвания на файлове\n"
+"    \n"
+"    Ако е зададено ОГРАНИЧЕНИЕ, то това е новата стойност на указания "
+"ресурс.\n"
+"    Специалните стойности „soft“, „hard“ и „unlimited“ означават текущите "
+"меко,\n"
+"    твърдо и никакво ограничение съответно.  В противен случай се извежда\n"
+"    текущата стойност на указания ресурс.  Стойностите са в блокове от по "
+"1024\n"
+"    байта, с изключение на:\n"
+"        - опцията „-p“, при която блоковете са от по 512 байта;\n"
+"        - опцията „-t“, при която стойността е в секунди;\n"
+"        - опцията „-u“, при която стойността е точният брой процеси."
+
+#: builtins.c:1425
+msgid ""
+"Display or set file mode mask.\n"
+"    \n"
+"    Sets the user file-creation mask to MODE.  If MODE is omitted, prints\n"
+"    the current value of the mask.\n"
+"    \n"
+"    If MODE begins with a digit, it is interpreted as an octal number;\n"
+"    otherwise it is a symbolic mode string like that accepted by chmod(1).\n"
+"    \n"
+"    Options:\n"
+"      -p\tif MODE is omitted, output in a form that may be reused as input\n"
+"      -S\tmakes the output symbolic; otherwise an octal number is output\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless MODE is invalid or an invalid option is given."
+msgstr ""
+
+#: builtins.c:1445
+msgid ""
+"Wait for job completion and return exit status.\n"
+"    \n"
+"    Waits for the process identified by ID, which may be a process ID or a\n"
+"    job specification, and reports its termination status.  If ID is not\n"
+"    given, waits for all currently active child processes, and the return\n"
+"    status is zero.  If ID is a a job specification, waits for all "
+"processes\n"
+"    in the job's pipeline.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of ID; fails if ID is invalid or an invalid option "
+"is\n"
+"    given."
+msgstr ""
+
+#: builtins.c:1463
+#, fuzzy
+msgid ""
+"Wait for process completion and return exit status.\n"
+"    \n"
+"    Waits for the specified process and reports its termination status.  If\n"
+"    PID is not given, all currently active child processes are waited for,\n"
+"    and the return code is zero.  PID must be a process ID.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of ID; fails if ID is invalid or an invalid option "
+"is\n"
+"    given."
+msgstr ""
+" Изчакване на указания процес и докладване за изходния код.  Ако не е "
+"зададен N,\n"
+"    всички текущо активни дъщерни процеси се изчакват и изходният код е 0.  "
+"N\n"
+"    може да е идентификатор на процес или задача.  Ако е задача, изчакват "
+"се\n"
+"    всички процеси в програмния канал на задачата."
+
+#: builtins.c:1478
+#, fuzzy
+msgid ""
+"Execute commands for each member in a list.\n"
+"    \n"
+"    The `for' loop executes a sequence of commands for each member in a\n"
+"    list of items.  If `in WORDS ...;' is not present, then `in \"$@\"' is\n"
+"    assumed.  For each element in WORDS, NAME is set to that element, and\n"
+"    the COMMANDS are executed.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+" Цикълът „for“ изпълнява последователност от команди за всеки член в списък "
+"от\n"
+"    елементи.  Ако блокът „в ДУМИ …“ не присъства, използва се „in \"$@\"“.  "
+"За\n"
+"    всеки елемент в ДУМИте, ИМЕто се задава да е елементът и се изпълняват\n"
+"    КОМАНДИте."
+
+#: builtins.c:1492
+#, fuzzy
+msgid ""
+"Arithmetic for loop.\n"
+"    \n"
+"    Equivalent to\n"
+"    \t(( EXP1 ))\n"
+"    \twhile (( EXP2 )); do\n"
+"    \t\tCOMMANDS\n"
+"    \t\t(( EXP3 ))\n"
+"    \tdone\n"
+"    EXP1, EXP2, and EXP3 are arithmetic expressions.  If any expression is\n"
+"    omitted, it behaves as if it evaluates to 1.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+" Еквивалентно на:\n"
+"        (( ИЗРАЗ_1 ))\n"
+"        while (( ИЗРАЗ_2 )); do\n"
+"                КОМАНДИ\n"
+"                (( EXP_3 ))\n"
+"        done\n"
+"    ИЗРАЗ_1, ИЗРАЗ_2, и ИЗРАЗ_3 са аритметични изрази.  Всеки изпуснат израз "
+"се\n"
+"    изчислява да е 1."
+
+#: builtins.c:1510
+#, fuzzy
+msgid ""
+"Select words from a list and execute commands.\n"
+"    \n"
+"    The WORDS are expanded, generating a list of words.  The\n"
+"    set of expanded words is printed on the standard error, each\n"
+"    preceded by a number.  If `in WORDS' is not present, `in \"$@\"'\n"
+"    is assumed.  The PS3 prompt is then displayed and a line read\n"
+"    from the standard input.  If the line consists of the number\n"
+"    corresponding to one of the displayed words, then NAME is set\n"
+"    to that word.  If the line is empty, WORDS and the prompt are\n"
+"    redisplayed.  If EOF is read, the command completes.  Any other\n"
+"    value read causes NAME to be set to null.  The line read is saved\n"
+"    in the variable REPLY.  COMMANDS are executed after each selection\n"
+"    until a break command is executed.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+" ДУМИте биват замествани, което води до създаването на списък с думи.\n"
+"    Наборът от заместените думи бива отпечатан на изхода за стандартната\n"
+"    грешка, като всяка от тях се предшества от номер.  Ако клаузата „in "
+"ДУМИ“\n"
+"    липсва, използва се „in \"$@\"“.  В такива случа се отпечатва "
+"подсказката PS3\n"
+"    и от стандартния вход се прочита ред.  Ако редът се състои от номера, "
+"който\n"
+"    съответства на някоя от показаните думи, ИМЕто се задава да е тази "
+"дума.\n"
+"    Ако редът е празен, отново се отпечатват ДУМИте и подсказката.  Ако се\n"
+"    прочете „EOF“, командата завършва.  Всяка друга стойност присвоява "
+"„null“ на\n"
+"    ИМЕ.  Прочетеният ред „null“ се запазва в променливата REPLY.  КОМАНДИте "
+"се\n"
+"    изпълняват след всеки избор до изпълняването на команда за прекъсване\n"
+"    (break)."
+
+#: builtins.c:1531
+#, fuzzy
+msgid ""
+"Report time consumed by pipeline's execution.\n"
+"    \n"
+"    Execute PIPELINE and print a summary of the real time, user CPU time,\n"
+"    and system CPU time spent executing PIPELINE when it terminates.\n"
+"    \n"
+"    Options:\n"
+"      -p\tprint the timing summary in the portable Posix format\n"
+"    \n"
+"    The value of the TIMEFORMAT variable is used as the output format.\n"
+"    \n"
+"    Exit Status:\n"
+"    The return status is the return status of PIPELINE."
+msgstr ""
+" Изпълнение на ПРОГРАМНия_КАНАЛ и отпечатване на обобщение за реалното,\n"
+"    потребителското и системно процесорни времена, които изпълнението на\n"
+"    ПРОГРАМНия_КАНАЛ отнема.  Изходният код е този на ПРОГРАМНия_КАНАЛ.  "
+"Опцията\n"
+"    „-p“ води до извеждане на статистиката за времето в различен формат - "
+"според\n"
+"    стойността на променливата на средата $TIMEFORMAT."
+
+#: builtins.c:1548
+#, fuzzy
+msgid ""
+"Execute commands based on pattern matching.\n"
+"    \n"
+"    Selectively execute COMMANDS based upon WORD matching PATTERN.  The\n"
+"    `|' is used to separate multiple patterns.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+" Избирателно се изпълняват КОМАНДИ на база ДУМА, която напасва на ШАБЛОН.\n"
+"    Шаблоните се разделят със знака „|“."
+
+#: builtins.c:1560
+#, fuzzy
+msgid ""
+"Execute commands based on conditional.\n"
+"    \n"
+"    The `if COMMANDS' list is executed.  If its exit status is zero, then "
+"the\n"
+"    `then COMMANDS' list is executed.  Otherwise, each `elif COMMANDS' list "
+"is\n"
+"    executed in turn, and if its exit status is zero, the corresponding\n"
+"    `then COMMANDS' list is executed and the if command completes.  "
+"Otherwise,\n"
+"    the `else COMMANDS' list is executed, if present.  The exit status of "
+"the\n"
+"    entire construct is the exit status of the last command executed, or "
+"zero\n"
+"    if no condition tested true.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+" Първо се изпълняват командите в блока „if КОМАНДИ“.  Ако изходният код е 0, "
+"то\n"
+"    се изпълнява блокът „then КОМАНДИ“.  В противен случай последователно "
+"се\n"
+"    изпълнява всеки блок „elif КОМАНДИ“ - ако изходният код е 0, то се "
+"изпълнява\n"
+"    съответния блок „then КОМАНДИ“, след което завършва изпълнението на "
+"целия\n"
+"    блок „if“.  Ако изходният код на никой от блоковете „if“ и „elif“ не е "
+"бил 0,\n"
+"    изпълнява се блока „else КОМАНДИ“, стига такъв да присъства.  Изходният "
+"код\n"
+"    от цялата конструкция е този на последната изпълнена команда или е 0, "
+"ако\n"
+"    никое тестово условие, не се е оценило като истина."
+
+#: builtins.c:1577
+#, fuzzy
+msgid ""
+"Execute commands as long as a test succeeds.\n"
+"    \n"
+"    Expand and execute COMMANDS as long as the final command in the\n"
+"    `while' COMMANDS has an exit status of zero.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+" Заместване и изпълнение на КОМАНДИте докато последната команда в блока "
+"„while“\n"
+"    е с изходен код, който е 0."
+
+#: builtins.c:1589
+#, fuzzy
+msgid ""
+"Execute commands as long as a test does not succeed.\n"
+"    \n"
+"    Expand and execute COMMANDS as long as the final command in the\n"
+"    `until' COMMANDS has an exit status which is not zero.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+" Заместване и изпълнение на КОМАНДИте докато последната команда в блока "
+"„until“\n"
+"    е с изходен код, който не е 0."
+
+#: builtins.c:1601
+msgid ""
+"Create a coprocess named NAME.\n"
+"    \n"
+"    Execute COMMAND asynchronously, with the standard output and standard\n"
+"    input of the command connected via a pipe to file descriptors assigned\n"
+"    to indices 0 and 1 of an array variable NAME in the executing shell.\n"
+"    The default NAME is \"COPROC\".\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the exit status of COMMAND."
+msgstr ""
+
+#: builtins.c:1615
+msgid ""
+"Define shell function.\n"
+"    \n"
+"    Create a shell function named NAME.  When invoked as a simple command,\n"
+"    NAME runs COMMANDs in the calling shell's context.  When NAME is "
+"invoked,\n"
+"    the arguments are passed to the function as $1...$n, and the function's\n"
+"    name is in $FUNCNAME.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless NAME is readonly."
+msgstr ""
+
+#: builtins.c:1629
+#, fuzzy
+msgid ""
+"Group commands as a unit.\n"
+"    \n"
+"    Run a set of commands in a group.  This is one way to redirect an\n"
+"    entire set of commands.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+" Изпълняване на цял набор от команди в група.  Това е един от начините да "
+"се\n"
+"    цял набор от команди."
+
+#: builtins.c:1641
+#, fuzzy
+msgid ""
+"Resume job in foreground.\n"
+"    \n"
+"    Equivalent to the JOB_SPEC argument to the `fg' command.  Resume a\n"
+"    stopped or background job.  JOB_SPEC can specify either a job name\n"
+"    or a job number.  Following JOB_SPEC with a `&' places the job in\n"
+"    the background, as if the job specification had been supplied as an\n"
+"    argument to `bg'.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the resumed job."
+msgstr ""
+" Еквивалентно на аргумента ЗАДАЧА на командата „fg“.  Възобновява спряна\n"
+"    задача или такава на заден фон.  ЗАДАЧАта може да указва или име, или\n"
+"    номер на задача.  Ако след ЗАДАЧАта се въведе знакът „&“, задачата\n"
+"    се изпълнява във фонов режим, все едно е била подадена като аргумент\n"
+"    на командата „bg“."
+
+#: builtins.c:1656
+#, fuzzy
+msgid ""
+"Evaluate arithmetic expression.\n"
+"    \n"
+"    The EXPRESSION is evaluated according to the rules for arithmetic\n"
+"    evaluation.  Equivalent to \"let EXPRESSION\".\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns 1 if EXPRESSION evaluates to 0; returns 0 otherwise."
+msgstr ""
+" ИЗРАЗът се изчислява според правилата на аритметичното оценяване.\n"
+"    Еквивалентно на „let ИЗРАЗ“."
+
+#: builtins.c:1668
+#, fuzzy
+msgid ""
+"Execute conditional command.\n"
+"    \n"
+"    Returns a status of 0 or 1 depending on the evaluation of the "
+"conditional\n"
+"    expression EXPRESSION.  Expressions are composed of the same primaries "
+"used\n"
+"    by the `test' builtin, and may be combined using the following "
+"operators:\n"
+"    \n"
+"      ( EXPRESSION )\tReturns the value of EXPRESSION\n"
+"      ! EXPRESSION\t\tTrue if EXPRESSION is false; else false\n"
+"      EXPR1 && EXPR2\tTrue if both EXPR1 and EXPR2 are true; else false\n"
+"      EXPR1 || EXPR2\tTrue if either EXPR1 or EXPR2 is true; else false\n"
+"    \n"
+"    When the `==' and `!=' operators are used, the string to the right of\n"
+"    the operator is used as a pattern and pattern matching is performed.\n"
+"    When the `=~' operator is used, the string to the right of the operator\n"
+"    is matched as a regular expression.\n"
+"    \n"
+"    The && and || operators do not evaluate EXPR2 if EXPR1 is sufficient to\n"
+"    determine the expression's value.\n"
+"    \n"
+"    Exit Status:\n"
+"    0 or 1 depending on value of EXPRESSION."
+msgstr ""
+" Връща състояние 0 или 1 в зависимост от оценката на условния ИЗРАЗ.  "
+"Изразите\n"
+"    са съставени от същите примитиви, както вградената команда „test“ и "
+"могат да\n"
+"    се съчетават чрез следните оператори:\n"
+"    \n"
+"        ( ИЗРАЗ )        Връща стойността на ИЗРАЗа\n"
+"        ! ИЗРАЗ          Истина, ако ИЗРАЗ се оценя на лъжа, в останалите "
+"случаи\n"
+"                         е лъжа\n"
+"        ИЗРАЗ1 && ИЗРАЗ2 Истина, ако едновременно ИЗРАЗ1 и ИЗРАЗ2 са "
+"истина,\n"
+"                         в останалите случаи е лъжа.\n"
+"        ИЗРАЗ1 || ИЗРАЗ2 Истина, ако поне единият от ИЗРАЗ1 и ИЗРАЗ2 е "
+"истина,\n"
+"                         в останалите случаи е лъжа.\n"
+"    \n"
+"    Когато се използват операторите „==“ и „!=“, низът от дясната страна на\n"
+"    оператора се използва като шаблон и се извършва напасване.  Операторите\n"
+"    „&&“ и „||“ не оценят ИЗРАЗ2, ако ИЗРАЗ1 е достатъчен за определяне на\n"
+"    стойността на израза."
+
+#: builtins.c:1694
+#, fuzzy
+msgid ""
+"Common shell variable names and usage.\n"
+"    \n"
+"    BASH_VERSION\tVersion information for this Bash.\n"
+"    CDPATH\tA colon-separated list of directories to search\n"
+"    \t\tfor directories given as arguments to `cd'.\n"
+"    GLOBIGNORE\tA colon-separated list of patterns describing filenames to\n"
+"    \t\tbe ignored by pathname expansion.\n"
+"    HISTFILE\tThe name of the file where your command history is stored.\n"
+"    HISTFILESIZE\tThe maximum number of lines this file can contain.\n"
+"    HISTSIZE\tThe maximum number of history lines that a running\n"
+"    \t\tshell can access.\n"
+"    HOME\tThe complete pathname to your login directory.\n"
+"    HOSTNAME\tThe name of the current host.\n"
+"    HOSTTYPE\tThe type of CPU this version of Bash is running under.\n"
+"    IGNOREEOF\tControls the action of the shell on receipt of an EOF\n"
+"    \t\tcharacter as the sole input.  If set, then the value\n"
+"    \t\tof it is the number of EOF characters that can be seen\n"
+"    \t\tin a row on an empty line before the shell will exit\n"
+"    \t\t(default 10).  When unset, EOF signifies the end of input.\n"
+"    MACHTYPE\tA string describing the current system Bash is running on.\n"
+"    MAILCHECK\tHow often, in seconds, Bash checks for new mail.\n"
+"    MAILPATH\tA colon-separated list of filenames which Bash checks\n"
+"    \t\tfor new mail.\n"
+"    OSTYPE\tThe version of Unix this version of Bash is running on.\n"
+"    PATH\tA colon-separated list of directories to search when\n"
+"    \t\tlooking for commands.\n"
+"    PROMPT_COMMAND\tA command to be executed before the printing of each\n"
+"    \t\tprimary prompt.\n"
+"    PS1\t\tThe primary prompt string.\n"
+"    PS2\t\tThe secondary prompt string.\n"
+"    PWD\t\tThe full pathname of the current directory.\n"
+"    SHELLOPTS\tA colon-separated list of enabled shell options.\n"
+"    TERM\tThe name of the current terminal type.\n"
+"    TIMEFORMAT\tThe output format for timing statistics displayed by the\n"
+"    \t\t`time' reserved word.\n"
+"    auto_resume\tNon-null means a command word appearing on a line by\n"
+"    \t\titself is first looked for in the list of currently\n"
+"    \t\tstopped jobs.  If found there, that job is foregrounded.\n"
+"    \t\tA value of `exact' means that the command word must\n"
+"    \t\texactly match a command in the list of stopped jobs.  A\n"
+"    \t\tvalue of `substring' means that the command word must\n"
+"    \t\tmatch a substring of the job.  Any other value means that\n"
+"    \t\tthe command must be a prefix of a stopped job.\n"
+"    histchars\tCharacters controlling history expansion and quick\n"
+"    \t\tsubstitution.  The first character is the history\n"
+"    \t\tsubstitution character, usually `!'.  The second is\n"
+"    \t\tthe `quick substitution' character, usually `^'.  The\n"
+"    \t\tthird is the `history comment' character, usually `#'.\n"
+"    HISTIGNORE\tA colon-separated list of patterns used to decide which\n"
+"    \t\tcommands should be saved on the history list.\n"
+msgstr ""
+" BASHVERSION   Информация за версията на bash.\n"
+"    CDPATH          Списък с директории разделени с двоеточие, които да се\n"
+"                        търсят като аргументи за командата „cd“.\n"
+"    GLOBIGNORE      Списък с шаблони на файлови имена, разделени с "
+"двоеточие,\n"
+"                        които да се игнорират от заместването на пътя.\n"
+"    HISTFILE        Името на файла, в който се съхранява историята на "
+"командите.\n"
+"    HISTFILESIZE    Максималният брой редове, които горният файл може да\n"
+"                        съдържа.\n"
+"    HISTSIZE        Максималният брой редове, които една работеща обвивка "
+"може да\n"
+"                        достъпи.\n"
+"    HOME            Пълният път до домашната ви директория.\n"
+"    HOSTNAME        Името на текущата машина.\n"
+"    HOSTTYPE        Видът на процесора, под който работи текущата обвивка.\n"
+"    IGNOREEOF       Управлява действието на обвивката при срещането на "
+"единичен\n"
+"                        знак за край на файл „EOF“.  Ако променливата е "
+"зададена,\n"
+"                        тя указва броя на знаците „EOF“, който могат да се\n"
+"                        срещнат самостоятелно на един ред, преди обвивката "
+"да\n"
+"                        завърши работа и излезе (стандартно е 10).  Когато\n"
+"                        променливата не е зададена, един „EOF“ означава край "
+"на\n"
+"                        входящите данни.\n"
+"    MACHTYPE        Низ, който описва текущата система, на която работи "
+"bash.\n"
+"    MAILCHECK       Колко често, в секунди, да проверява bash за нови "
+"писма.\n"
+"    MAILPATH        Списък с файлове, които bash проверява за нови писма.\n"
+"    OSTYPE          Версията на Юникс, на която работи bash.\n"
+"    PATH            Списък с директории, които да се претърсват за команди.\n"
+"    PROMPTCOMMAND  Команда, която да се изпълнява преди отпечатването на\n"
+"                        основната подсказка на командния ред.\n"
+"    PS1             Низ за основната подсказка.\n"
+"    PS2             Низ за втората подсказка.\n"
+"    PWD             Пълният път и име на текущата директория.\n"
+"    SHELLOPTS       Списък с включените опции на обвивката, разделени с\n"
+"                        двоеточие.\n"
+"    TERM            Името на текущия вид терминал.\n"
+"    TIMEFORMAT      Изходният формат за статистиката за времето за "
+"изпълнение\n"
+"                        на команда, който се използва от запазената дума "
+"„time“.\n"
+"    autoresume     Стойност, която не е „null“, означава, че командна дума, "
+"която\n"
+"                        се появява самостоятелно на ред, първо се проверява "
+"в\n"
+"                        списъка с текущо спрените задачи.  Ако бъде открита "
+"там,\n"
+"                        задачата се пуска и се слага на преден план.  "
+"Стойност\n"
+"                        „exact“ (строго съвпадение) означава, че командната\n"
+"                        дума, трябва точно да съвпада с името на команда в\n"
+"                        списъка със спрени задачи.  Стойност „substring“\n"
+"                        (съвпадение на подниз) означава, че командната дума\n"
+"                        трябва да е подниз на задачата.  Всяка друга "
+"стойност\n"
+"                        означава, че командата думата трябва да е началото "
+"на\n"
+"                        спряна задача.\n"
+"    histchars       Знаци, които определят бързото заместване и това по "
+"история.\n"
+"                        Първият знак е за заместването по история, "
+"обикновено е\n"
+"                        „!“.  Вторият е за бързото заместване, обикновено е "
+"„^“.\n"
+"                        Третият е за коментарите в историята,  обикновено е "
+"„#“.\n"
+"    HISTIGNORE      Списък с шаблони, разделени с двоеточие, които указват "
+"кои\n"
+"                        команди да не се запазват в историята.\n"
+
+#: builtins.c:1751
+#, fuzzy
+msgid ""
+"Add directories to stack.\n"
+"    \n"
+"    Adds a directory to the top of the directory stack, or rotates\n"
+"    the stack, making the new top of the stack the current working\n"
+"    directory.  With no arguments, exchanges the top two directories.\n"
+"    \n"
+"    Options:\n"
+"      -n\tSuppresses the normal change of directory when adding\n"
+"    \tdirectories to the stack, so only the stack is manipulated.\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tRotates the stack so that the Nth directory (counting\n"
+"    \tfrom the left of the list shown by `dirs', starting with\n"
+"    \tzero) is at the top.\n"
+"    \n"
+"      -N\tRotates the stack so that the Nth directory (counting\n"
+"    \tfrom the right of the list shown by `dirs', starting with\n"
+"    \tzero) is at the top.\n"
+"    \n"
+"      dir\tAdds DIR to the directory stack at the top, making it the\n"
+"    \tnew current working directory.\n"
+"    \n"
+"    The `dirs' builtin displays the directory stack.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid argument is supplied or the directory\n"
+"    change fails."
+msgstr ""
+" Добавя директория в стека на директориите или превърта стека\n"
+"    като най-горна директория става текущата директория.  Без\n"
+"    аргументи сменя най-горните две директории.\n"
+"    \n"
+"    +N  Превърта стека, така че N-тата директория (като се брои\n"
+"     от лявата страна на списъка, показан от командата „dirs“\n"
+"     като се почва от 0) да е най-отгоре.\n"
+"    \n"
+"    -N  Превърта стека, така че N-тата директория (като се брои\n"
+"     от дясната страна на списъка, показан от командата „dirs“\n"
+"     като се почва от 0) да е най-отгоре.\n"
+"    \n"
+"    -n  подтискане на нормалното преминаване към директория при\n"
+"    добавянето на директории към стека, така че се променя само той.\n"
+"\n"
+"    dir  добавя ДИР най-отгоре в стека на директориите, като я прави\n"
+"    новата текуща работна директория.\n"
+"    \n"
+"    Можете да изведете стека на директорията с командата „dirs“."
+
+#: builtins.c:1785
+#, fuzzy
+msgid ""
+"Remove directories from stack.\n"
+"    \n"
+"    Removes entries from the directory stack.  With no arguments, removes\n"
+"    the top directory from the stack, and changes to the new top directory.\n"
+"    \n"
+"    Options:\n"
+"      -n\tSuppresses the normal change of directory when removing\n"
+"    \tdirectories from the stack, so only the stack is manipulated.\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tRemoves the Nth entry counting from the left of the list\n"
+"    \tshown by `dirs', starting with zero.  For example: `popd +0'\n"
+"    \tremoves the first directory, `popd +1' the second.\n"
+"    \n"
+"      -N\tRemoves the Nth entry counting from the right of the list\n"
+"    \tshown by `dirs', starting with zero.  For example: `popd -0'\n"
+"    \tremoves the last directory, `popd -1' the next to last.\n"
+"    \n"
+"    The `dirs' builtin displays the directory stack.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid argument is supplied or the directory\n"
+"    change fails."
+msgstr ""
+" Маха директории от стека с тях. Без аргументи\n"
+"    премахва последната директория в стека и влиза в новата\n"
+"    последна директория.\n"
+"    \n"
+"    +N  премахва N-тия елемент като се брои отляво в списъка\n"
+"        показван от командата „dirs“, като се брои от 0.  Напр.: „popd +0“\n"
+"        премахва първата директория, „popd +1“ - втората.\n"
+"\n"
+"    -N  премахва N-тия елемент като се брои отдясно в списъка\n"
+"        показван от командата „dirs“, като се брои от 0.  Напр.: „popd -0“\n"
+"        премахва последната директория, „popd -1“ - предпоследната.\n"
+"\n"
+"    -n  подтискане на нормалното преминаване към директория при добавянето "
+"на\n"
+"        директории към стека, така че се променя само той.\n"
+"\n"
+"    Стекът с директориите се визуализира с командата „dirs“."
+
+#: builtins.c:1815
+#, fuzzy
+msgid ""
+"Display directory stack.\n"
+"    \n"
+"    Display the list of currently remembered directories.  Directories\n"
+"    find their way onto the list with the `pushd' command; you can get\n"
+"    back up through the list with the `popd' command.\n"
+"    \n"
+"    Options:\n"
+"      -c\tclear the directory stack by deleting all of the elements\n"
+"      -l\tdo not print tilde-prefixed versions of directories relative\n"
+"    \tto your home directory\n"
+"      -p\tprint the directory stack with one entry per line\n"
+"      -v\tprint the directory stack with one entry per line prefixed\n"
+"    \twith its position in the stack\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tDisplays the Nth entry counting from the left of the list shown "
+"by\n"
+"    \tdirs when invoked without options, starting with zero.\n"
+"    \n"
+"      -N\tDisplays the Nth entry counting from the right of the list shown "
+"by\n"
+"    \tdirs when invoked without options, starting with zero.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+" Показва списъка с текущо запомнените директории.  Списъкът се попълва чрез\n"
+"    командата „pushd“.  Можете да вадите директории от списъка с командата\n"
+"    „popd“.\n"
+"    \n"
+"    Опцията „-l“ кара командата „dirs“ да извежда пълните имена на "
+"директориите,\n"
+"    а не съкратените спрямо домашната директория имена.  Това означава, че\n"
+"    „~/bin“ може да се покаже като „/homes/pesho/bin“.  Опцията „-v“ води "
+"до\n"
+"    отпечатване на стека на директориите, като всеки елемент се извежда на "
+"нов\n"
+"    ред и се предхожда от номера си в стека.  Опцията „-p“ също води до "
+"поредово\n"
+"    отпечатване, но без поредния номер в стека.  Опцията „-c“ изчиства стека "
+"на\n"
+"    директориите като изтрива всички елементи.\n"
+"    \n"
+"    +N  показва N-тия елемент отляво в списъка показван от\n"
+"        командата „dirs“, когато е стартирана без опции.  Брои се от 0.\n"
+"    \n"
+"    -N  показва N-тия елемент отдясно в списъка показван от\n"
+"        командата „dirs“, когато е стартирана без опции.  Брои се от 0."
+
+#: builtins.c:1844
+msgid ""
+"Set and unset shell options.\n"
+"    \n"
+"    Change the setting of each shell option OPTNAME.  Without any option\n"
+"    arguments, list all shell options with an indication of whether or not "
+"each\n"
+"    is set.\n"
+"    \n"
+"    Options:\n"
+"      -o\trestrict OPTNAMEs to those defined for use with `set -o'\n"
+"      -p\tprint each shell option with an indication of its status\n"
+"      -q\tsuppress output\n"
+"      -s\tenable (set) each OPTNAME\n"
+"      -u\tdisable (unset) each OPTNAME\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success if OPTNAME is enabled; fails if an invalid option is\n"
+"    given or OPTNAME is disabled."
+msgstr ""
+
+#: builtins.c:1865
+#, fuzzy
+msgid ""
+"Formats and prints ARGUMENTS under control of the FORMAT.\n"
+"    \n"
+"    Options:\n"
+"      -v var\tassign the output to shell variable VAR rather than\n"
+"    \t\tdisplay it on the standard output\n"
+"    \n"
+"    FORMAT is a character string which contains three types of objects: "
+"plain\n"
+"    characters, which are simply copied to standard output; character "
+"escape\n"
+"    sequences, which are converted and copied to the standard output; and\n"
+"    format specifications, each of which causes printing of the next "
+"successive\n"
+"    argument.\n"
+"    \n"
+"    In addition to the standard format specifications described in printf"
+"(1)\n"
+"    and printf(3), printf interprets:\n"
+"    \n"
+"      %b\texpand backslash escape sequences in the corresponding argument\n"
+"      %q\tquote the argument in a way that can be reused as shell input\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or a write or "
+"assignment\n"
+"    error occurs."
+msgstr ""
+" printf форматира и отпечатва АРГУМЕНТИте според управлението на ФОРМАТа.\n"
+"    ФОРМАТът е последователност от знаци, която съдържа три вида обекти:\n"
+"    обикновени знаци, които биват отпечатани директно на стандартния изход;\n"
+"    екраниращи знакови последователности, които биват преобразувани и "
+"отпечатани\n"
+"    на стандартния изход; и форматиращи знакови последователности, всяка от\n"
+"    които предизвиква отпечатването на следващ аргумент.  Освен "
+"стандартните\n"
+"    форматирания описани в ръководството на printf, „%b“ предизвиква "
+"заместването\n"
+"    на екраниранията с обратно наклонени черти в съответния аргумент, а „%"
+"q“\n"
+"    предизвиква цитирането на аргумента, така че да може да бъде използван "
+"като\n"
+"    вход за обвивката. Ако е включена опцията „-v“, изходът се поставя в\n"
+"    променливата на обвивката VAR, вместо да се извежда на стандартния изход."
+
+#: builtins.c:1892
+msgid ""
+"Specify how arguments are to be completed by Readline.\n"
+"    \n"
+"    For each NAME, specify how arguments are to be completed.  If no "
+"options\n"
+"    are supplied, existing completion specifications are printed in a way "
+"that\n"
+"    allows them to be reused as input.\n"
+"    \n"
+"    Options:\n"
+"      -p\tprint existing completion specifications in a reusable format\n"
+"      -r\tremove a completion specification for each NAME, or, if no\n"
+"    \tNAMEs are supplied, all completion specifications\n"
+"    \n"
+"    When completion is attempted, the actions are applied in the order the\n"
+"    uppercase-letter options are listed above.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+
+#: builtins.c:1915
+#, fuzzy
+msgid ""
+"Display possible completions depending on the options.\n"
+"    \n"
+"    Intended to be used from within a shell function generating possible\n"
+"    completions.  If the optional WORD argument is supplied, matches "
+"against\n"
+"    WORD are generated.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+" Показване на възможните дописвания на базата на възможностите.  Целта е да "
+"се\n"
+"    ползва в рамките функция на обвивката, която генерира възможните "
+"дописвания.\n"
+"    Ако е зададен незадължителният аргумент ДУМА, генерират се напасванията "
+"с\n"
+"    него."
+
+#: builtins.c:1930
+msgid ""
+"Modify or display completion options.\n"
+"    \n"
+"    Modify the completion options for each NAME, or, if no NAMEs are "
+"supplied,\n"
+"    the completion currently begin executed.  If no OPTIONs are givenm, "
+"print\n"
+"    the completion options for each NAME or the current completion "
+"specification.\n"
+"    \n"
+"    Options:\n"
+"    \t-o option\tSet completion option OPTION for each NAME\n"
+"    \n"
+"    Using `+o' instead of `-o' turns off the specified option.\n"
+"    \n"
+"    Arguments:\n"
+"    \n"
+"    Each NAME refers to a command for which a completion specification must\n"
+"    have previously been defined using the `complete' builtin.  If no NAMEs\n"
+"    are supplied, compopt must be called by a function currently generating\n"
+"    completions, and the options for that currently-executing completion\n"
+"    generator are modified.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or NAME does not\n"
+"    have a completion specification defined."
+msgstr ""
+
+#: builtins.c:1958
+msgid ""
+"Read lines from the standard input into an array variable.\n"
+"    \n"
+"    Read lines from the standard input into the array variable ARRAY, or "
+"from\n"
+"    file descriptor FD if the -u option is supplied.  The variable MAPFILE "
+"is\n"
+"    the default ARRAY.\n"
+"    \n"
+"    Options:\n"
+"      -n count\tCopy at most COUNT lines.  If COUNT is 0, all lines are "
+"copied.\n"
+"      -O origin\tBegin assigning to ARRAY at index ORIGIN.  The default "
+"index is 0.\n"
+"      -s count \tDiscard the first COUNT lines read.\n"
+"      -t\t\tRemove a trailing newline from each line read.\n"
+"      -u fd\t\tRead lines from file descriptor FD instead of the standard "
+"input.\n"
+"      -C callback\tEvaluate CALLBACK each time QUANTUM lines are read.\n"
+"      -c quantum\tSpecify the number of lines read between each call to "
+"CALLBACK.\n"
+"    \n"
+"    Arguments:\n"
+"      ARRAY\t\tArray variable name to use for file data.\n"
+"    \n"
+"    If -C is supplied without -c, the default quantum is 5000.  When\n"
+"    CALLBACK is evaluated, it is supplied the index of the next array\n"
+"    element to be assigned as an additional argument.\n"
+"    \n"
+"    If not supplied with an explicit origin, mapfile will clear ARRAY "
+"before\n"
+"    assigning to it.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or ARRAY is readonly."
+msgstr ""
+
+#: builtins.c:1990
+msgid ""
+"Read lines from a file into an array variable.\n"
+"    \n"
+"    A synonym for `mapfile'."
+msgstr ""
+
+#~ msgid " "
+#~ msgstr " "
+
+#~ msgid "Without EXPR, returns returns \"$line $filename\".  With EXPR,"
+#~ msgstr "Без ИЗРАЗ връща „$ред $име_на_файл“.  С ИЗРАЗ връща"
+
+#~ msgid "returns \"$line $subroutine $filename\"; this extra information"
+#~ msgstr "„$ред $функция $име_на_файл“. Тази допълнителна информация"
+
+#~ msgid "can be used used to provide a stack trace."
+#~ msgstr "може да се използва да получаването на информация за стека."
+
+#~ msgid ""
+#~ "The value of EXPR indicates how many call frames to go back before the"
+#~ msgstr "Стойността на ИЗРАЗа показва колко извиквания преди текущото"
+
+#~ msgid "current one; the top frame is frame 0."
+#~ msgstr "трябва да се върнат. Последното извикване е 0."
+
+#~ msgid "%s: invalid number"
+#~ msgstr "%s: грешно число"
+
+#~ msgid "Shell commands matching keywords `"
+#~ msgstr "Команди на обвивката, които напасват на ключовите думи „"
+
+#~ msgid "Display the list of currently remembered directories.  Directories"
+#~ msgstr ""
+#~ "Показване на списъка с текущо запомнените директории.  Те биват запомнени "
+#~ "чрез"
+
+#~ msgid "find their way onto the list with the `pushd' command; you can get"
+#~ msgstr ""
+#~ "командата „pushd“.  Можете да преминете в обратен ред в списъка чрез "
+#~ "командата"
+
+#~ msgid "back up through the list with the `popd' command."
+#~ msgstr "„popd“."
+
+#~ msgid ""
+#~ "The -l flag specifies that `dirs' should not print shorthand versions"
+#~ msgstr ""
+#~ "Опцията „-l“ указва, че командата „dirs“ не трябва да извежда кратката "
+#~ "версия на"
+
+#~ msgid ""
+#~ "of directories which are relative to your home directory.  This means"
+#~ msgstr ""
+#~ "на директориите, които са относителни спрямо домашната ви директория.  "
+#~ "Това"
+
+#~ msgid "that `~/bin' might be displayed as `/homes/bfox/bin'.  The -v flag"
+#~ msgstr ""
+#~ "означава, че вместо „~/bin“ ще бъде изведено нещо подобно на „/homes/geek/"
+#~ "bin“."
+
+#~ msgid "causes `dirs' to print the directory stack with one entry per line,"
+#~ msgstr ""
+#~ "Опцията „-v“ кара „dirs“ да извежда стека с директориите по една на ред, "
+#~ "като"
+
+#~ msgid ""
+#~ "prepending the directory name with its position in the stack.  The -p"
+#~ msgstr ""
+#~ "пред всяка се отпечатва мястото ѝ в стека.  Опцията „-p“ прави същото, "
+#~ "без да"
+
+#~ msgid "flag does the same thing, but the stack position is not prepended."
+#~ msgstr ""
+#~ "включва мястото на директорията в стека.  Опцията „-c“ изчиства стека с"
+
+#~ msgid ""
+#~ "The -c flag clears the directory stack by deleting all of the elements."
+#~ msgstr "директориите като изтрива всичките му елементи."
+
+#~ msgid ""
+#~ "+N   displays the Nth entry counting from the left of the list shown by"
+#~ msgstr "+N    показва N-тия елемент отляво в списъка показван от"
+
+#~ msgid "     dirs when invoked without options, starting with zero."
+#~ msgstr ""
+#~ "      командата „dirs“, когато е стартирана без опции.  Брои се от 0."
+
+#~ msgid ""
+#~ "-N   displays the Nth entry counting from the right of the list shown by"
+#~ msgstr "-N    показва N-тия елемент отдясно в списъка показван от"
+
+#~ msgid "Adds a directory to the top of the directory stack, or rotates"
+#~ msgstr "Добавя директория в стека на директориите или превърта стека,"
+
+#~ msgid "the stack, making the new top of the stack the current working"
+#~ msgstr "като най-горна директория става текущата директория.  Без"
+
+#~ msgid "directory.  With no arguments, exchanges the top two directories."
+#~ msgstr "аргументи сменя най-горните две директории."
+
+#~ msgid "+N   Rotates the stack so that the Nth directory (counting"
+#~ msgstr "+N    Превърта стека, така че N-тата директория (като се брои"
+
+#~ msgid "     from the left of the list shown by `dirs', starting with"
+#~ msgstr "      от лявата страна на списъка, показан от командата „dirs“"
+
+#~ msgid "     zero) is at the top."
+#~ msgstr "       като се почва от 0) да е най-отгоре."
+
+#~ msgid "-N   Rotates the stack so that the Nth directory (counting"
+#~ msgstr "-N    Превърта стека, така че N-тата директория (като се брои"
+
+#~ msgid "     from the right of the list shown by `dirs', starting with"
+#~ msgstr "      от дясната страна на списъка, показан от командата „dirs“"
+
+#~ msgid "-n   suppress the normal change of directory when adding directories"
+#~ msgstr "-n    подтискане на нормалното преминаване към директория при"
+
+#~ msgid "     to the stack, so only the stack is manipulated."
+#~ msgstr ""
+#~ "       добавянето на директории към стека, така че се променя само той."
+
+#~ msgid "dir  adds DIR to the directory stack at the top, making it the"
+#~ msgstr "dir   добавя ДИР най-отгоре в стека на директориите, като я прави"
+
+#~ msgid "     new current working directory."
+#~ msgstr "      новата текуща работна директория."
+
+#~ msgid "You can see the directory stack with the `dirs' command."
+#~ msgstr "Можете да изведете стека на директорията с командата „dirs“."
+
+#~ msgid "Removes entries from the directory stack.  With no arguments,"
+#~ msgstr "Маха директории от стека с тях. Без аргументи"
+
+#~ msgid "removes the top directory from the stack, and cd's to the new"
+#~ msgstr "премахва последната директория в стека и влиза в новата"
+
+#~ msgid "top directory."
+#~ msgstr "последна директория."
+
+#~ msgid "+N   removes the Nth entry counting from the left of the list"
+#~ msgstr "+N    премахва N-тия елемент като се брои отляво в списъка"
+
+#~ msgid "     shown by `dirs', starting with zero.  For example: `popd +0'"
+#~ msgstr ""
+#~ "      показван от командата „dirs“, като се брои от 0.  Напр.: „popd +0“"
+
+#~ msgid "     removes the first directory, `popd +1' the second."
+#~ msgstr "      премахва първата директория, „popd +1“ - втората."
+
+#~ msgid "-N   removes the Nth entry counting from the right of the list"
+#~ msgstr "-N    премахва N-тия елемент като се брои отдясно в списъка"
+
+#~ msgid "     shown by `dirs', starting with zero.  For example: `popd -0'"
+#~ msgstr ""
+#~ "      показван от командата „dirs“, като се брои от 0.  Напр.: „popd -0“"
+
+#~ msgid "     removes the last directory, `popd -1' the next to last."
+#~ msgstr "      премахва последната директория, „popd -1“ - предпоследната."
+
+#~ msgid ""
+#~ "-n   suppress the normal change of directory when removing directories"
+#~ msgstr ""
+#~ "-n    подтискане на нормалното преминаване към директория при "
+#~ "премахването на"
+
+#~ msgid "     from the stack, so only the stack is manipulated."
+#~ msgstr "      директории от стека, така че се променя само той."
+
+#~ msgid "allocated"
+#~ msgstr "заделени"
+
+#~ msgid "freed"
+#~ msgstr "освободени"
+
+#~ msgid "requesting resize"
+#~ msgstr "изисква се преоразмераване"
+
+#~ msgid "just resized"
+#~ msgstr "току що преораземерени"
+
+#~ msgid "bug: unknown operation"
+#~ msgstr "грешка: непозната операция"
+
+#~ msgid "malloc: watch alert: %p %s "
+#~ msgstr "заделяне на памет: предупреждение при наблюдение: %p %s "
+
+#~ msgid ""
+#~ " Exit from within a FOR, WHILE or UNTIL loop.  If N is specified,\n"
+#~ "    break N levels."
+#~ msgstr ""
+#~ " Изход от цикъл ползващ FOR, WHILE или UNTIL.  Ако е указан N, се излиза "
+#~ "от N\n"
+#~ "    обхващащи цикъла."
+
+#~ msgid ""
+#~ " Run a shell builtin.  This is useful when you wish to rename a\n"
+#~ "    shell builtin to be a function, but need the functionality of the\n"
+#~ "    builtin within the function itself."
+#~ msgstr ""
+#~ " Изпълнение на команда вградена в обвивката.  Това е полезно, когато "
+#~ "искате да\n"
+#~ "    използвате името на команда вградена в обвивката за име на функция, "
+#~ "но във\n"
+#~ "    функцията се нуждаете от командата."
+
+#~ msgid ""
+#~ " Print the current working directory.  With the -P option, pwd prints\n"
+#~ "    the physical directory, without any symbolic links; the -L option\n"
+#~ "    makes pwd follow symbolic links."
+#~ msgstr ""
+#~ " Отпечатва текущата работна директория.  С опцията „-P“ командата „pwd“ "
+#~ "извежда\n"
+#~ "    физическата директория - без символни връзки.  Опцията „-L“ кара "
+#~ "командата\n"
+#~ "    „pwd“ да следва физическите връзки."
+
+#~ msgid " Return a successful result."
+#~ msgstr " Връща успешен резултат."
+
+#~ msgid " Return an unsuccessful result."
+#~ msgstr " Връща неуспешен резултат."
+
+#~ msgid ""
+#~ " Runs COMMAND with ARGS ignoring shell functions.  If you have a shell\n"
+#~ "    function called `ls', and you wish to call the command `ls', you can\n"
+#~ "    say \"command ls\".  If the -p option is given, a default value is "
+#~ "used\n"
+#~ "    for PATH that is guaranteed to find all of the standard utilities.  "
+#~ "If\n"
+#~ "    the -V or -v option is given, a string is printed describing "
+#~ "COMMAND.\n"
+#~ "    The -V option produces a more verbose description."
+#~ msgstr ""
+#~ " Изпълнение на КОМАНДА с АРГументи като се пренебрегват функциите в "
+#~ "обвивката.\n"
+#~ "    Ако съществува функция на обвивката наречена „ls“, можете да "
+#~ "извикате\n"
+#~ "    командата чрез „command ls“.  Ако е зададена опцията „-p“ се "
+#~ "използва\n"
+#~ "    стандартна стойност на променливата $PATH, която гарантирано открива "
+#~ "всички\n"
+#~ "    стандартни програми.  Ако е зададена някоя от опциите „-V“ или „-v“, "
+#~ "се\n"
+#~ "\t    отпечатва описание на КОМАНДАта.  Опцията „-V“ води до по-подробен "
+#~ "изход."
+
+#~ msgid " Obsolete.  See `declare'."
+#~ msgstr " Остаряло, да не се използва.  Виж „declare“."
+
+#~ msgid ""
+#~ " Create a local variable called NAME, and give it VALUE.  LOCAL\n"
+#~ "    can only be used within a function; it makes the variable NAME\n"
+#~ "    have a visible scope restricted to that function and its children."
+#~ msgstr ""
+#~ " Създаване на локална променлива с ИМЕ и присвояване на СТОЙНОСТ.  "
+#~ "ЛОКАЛНАта може\n"
+#~ "    да се използва само във функция.  Тя кара променливата на ИМЕ да е с "
+#~ "област\n"
+#~ "    на видимост, която е ограничена до тази функция и наследниците ѝ."
+
+#~ msgid ""
+#~ " Output the ARGs.  If -n is specified, the trailing newline is suppressed."
+#~ msgstr ""
+#~ " АРГУМЕНТите се извеждат.  Ако е дадена опцията „-n“, се подтиска "
+#~ "извеждането\n"
+#~ "на нов ред."
+
+#~ msgid ""
+#~ " Enable and disable builtin shell commands.  This allows\n"
+#~ "    you to use a disk command which has the same name as a shell\n"
+#~ "    builtin without specifying a full pathname.  If -n is used, the\n"
+#~ "    NAMEs become disabled; otherwise NAMEs are enabled.  For example,\n"
+#~ "    to use the `test' found in $PATH instead of the shell builtin\n"
+#~ "    version, type `enable -n test'.  On systems supporting dynamic\n"
+#~ "    loading, the -f option may be used to load new builtins from the\n"
+#~ "    shared object FILENAME.  The -d option will delete a builtin\n"
+#~ "    previously loaded with -f.  If no non-option names are given, or\n"
+#~ "    the -p option is supplied, a list of builtins is printed.  The\n"
+#~ "    -a option means to print every builtin with an indication of whether\n"
+#~ "    or not it is enabled.  The -s option restricts the output to the "
+#~ "POSIX.2\n"
+#~ "    `special' builtins.  The -n option displays a list of all disabled "
+#~ "builtins."
+#~ msgstr ""
+#~ " Включване или изключване на вградените в обвивката команди.  Това ви "
+#~ "позволява\n"
+#~ "    да използвате външна команда, която има същото име като вградена в "
+#~ "обвивката\n"
+#~ "    команда, без да указвате име съдържащо път.  Ако използвате опцията „-"
+#~ "n“\n"
+#~ "    ИМЕната се изключват, в противен случай се включват.  Например, за "
+#~ "да\n"
+#~ "    използвате командата „test“, която се намира в пътищата указани с "
+#~ "$PATH, а\n"
+#~ "    не версията вградена в обвивката, използвайте „enable -n test“.  При\n"
+#~ "    системите, които разполагат с динамично зареждане, опцията „-f“ може "
+#~ "да се\n"
+#~ "    използва за зареждането на нова команда вградена в обвивката от "
+#~ "споделен\n"
+#~ "    обект със съответното ИМЕ_НА_ФАЙЛ.  Опцията „-d“ изтрива ресурса "
+#~ "зареден с\n"
+#~ "    „-f“.  Ако не са зададени имена, които да не са опции, или се "
+#~ "използва\n"
+#~ "    опцията „-p“, се извеждат имената на вградените команди.  Опцията „-"
+#~ "a“\n"
+#~ "    означава всяка вградена команда да се изведе заедно с това дали е "
+#~ "включена\n"
+#~ "    или изключена.  Опцията „-s“ ограничава изхода до „специалните“ "
+#~ "вградени\n"
+#~ "    команди на POSIX.2.  Опцията „-s“ извежда списъка на всички "
+#~ "изключени\n"
+#~ "    вградени команди."
+
+#~ msgid ""
+#~ " Read ARGs as input to the shell and execute the resulting command(s)."
+#~ msgstr ""
+#~ " Изчитане на АРГУМЕНТите като вход за обвивката и изпълнение на "
+#~ "получените\n"
+#~ "команди."
+
+#~ msgid ""
+#~ " Exec FILE, replacing this shell with the specified program.\n"
+#~ "    If FILE is not specified, the redirections take effect in this\n"
+#~ "    shell.  If the first argument is `-l', then place a dash in the\n"
+#~ "    zeroth arg passed to FILE, as login does.  If the `-c' option\n"
+#~ "    is supplied, FILE is executed with a null environment.  The `-a'\n"
+#~ "    option means to make set argv[0] of the executed process to NAME.\n"
+#~ "    If the file cannot be executed and the shell is not interactive,\n"
+#~ "    then the shell exits, unless the shell option `execfail' is set."
+#~ msgstr ""
+#~ " Изпълнение на ФАЙЛ, като обвивката бива заменена с указаната програма.  "
+#~ "Ако\n"
+#~ "    ФАЙЛът не е указан, пренасочването се извършва в тази обвивка.  Ако "
+#~ "първата\n"
+#~ "    опция е „-l“, нулевият аргумент подаден на ФАЙЛа e тире - подобно на "
+#~ "това,\n"
+#~ "    което се случва при влизане в системата.   При подаването на опцията "
+#~ "„-c“\n"
+#~ "    ФАЙЛът се изпълнява с празно обкръжение.  Опцията „-a“ означава "
+#~ "нулевият\n"
+#~ "    елемент от масива с аргументи (argv[0]) да е ИМЕ.  Ако ФАЙЛът не може "
+#~ "да се\n"
+#~ "    изпълни и обвивката не е интерактивна, обвивката завършва работа, "
+#~ "освен ако\n"
+#~ "    не е зададена опцията на обвивката „execfail“."
+
+#~ msgid " Logout of a login shell."
+#~ msgstr " Изход от входна обвивка"
+
+#~ msgid ""
+#~ " For each NAME, the full pathname of the command is determined and\n"
+#~ "    remembered.  If the -p option is supplied, PATHNAME is used as the\n"
+#~ "    full pathname of NAME, and no path search is performed.  The -r\n"
+#~ "    option causes the shell to forget all remembered locations.  The -d\n"
+#~ "    option causes the shell to forget the remembered location of each "
+#~ "NAME.\n"
+#~ "    If the -t option is supplied the full pathname to which each NAME\n"
+#~ "    corresponds is printed.  If multiple NAME arguments are supplied "
+#~ "with\n"
+#~ "    -t, the NAME is printed before the hashed full pathname.  The -l "
+#~ "option\n"
+#~ "    causes output to be displayed in a format that may be reused as "
+#~ "input.\n"
+#~ "    If no arguments are given, information about remembered commands is "
+#~ "displayed."
+#~ msgstr ""
+#~ " За всяко ИМЕ се определя и запомня пълното име с пътя на командата.\n"
+#~ "    Когато е указана опцията „-p“, ПЪТят се използва като пълен път за "
+#~ "името и\n"
+#~ "    не се търси в нормалния път.  Опцията „-r“ кара обвивката да забрави "
+#~ "всички\n"
+#~ "    запомнени места.  Опцията „-d“ кара обвивката да забрави запомненото "
+#~ "място\n"
+#~ "    на обекта със съответното ИМЕ.  Ако е зададена опцията „-t“, извежда "
+#~ "се\n"
+#~ "    цялото име с пътя на съответното ИМЕ.  Ако на опцията „-t“ са "
+#~ "подадени\n"
+#~ "    множество ИМЕна, те се отпечатват преди хешираното пълно име.  "
+#~ "Опцията „-l“\n"
+#~ "    форматира изхода по начин, който го прави удобен за вход.  Ако не са\n"
+#~ "    подадени аргументи, се извежда информация за запомнените команди."
+
+#~ msgid ""
+#~ " Display helpful information about builtin commands.  If PATTERN is\n"
+#~ "    specified, gives detailed help on all commands matching PATTERN,\n"
+#~ "    otherwise a list of the builtins is printed.  The -s option\n"
+#~ "    restricts the output for each builtin command matching PATTERN to\n"
+#~ "    a short usage synopsis."
+#~ msgstr ""
+#~ " Извеждане на полезна информация за вградените команди.  Ако е указан "
+#~ "ШАБЛОН,\n"
+#~ "    се извежда информация само за командите, които напасват, в противен "
+#~ "случай\n"
+#~ "    се извежда информация за всички команди.  Опцията „-s“  ограничава\n"
+#~ "    информацията за всяка вградена команда до кратко съобщение за\n"
+#~ "    предназначението ѝ."
+
+#~ msgid ""
+#~ " By default, removes each JOBSPEC argument from the table of active "
+#~ "jobs.\n"
+#~ "    If the -h option is given, the job is not removed from the table, but "
+#~ "is\n"
+#~ "    marked so that SIGHUP is not sent to the job if the shell receives a\n"
+#~ "    SIGHUP.  The -a option, when JOBSPEC is not supplied, means to remove "
+#~ "all\n"
+#~ "    jobs from the job table; the -r option means to remove only running "
+#~ "jobs."
+#~ msgstr ""
+#~ " По подразбиране премахва всеки аргумент ЗАДАЧА от таблицата на "
+#~ "активните\n"
+#~ "    задачи.  Когато е зададена опцията „-h“, задачата не се премахва от\n"
+#~ "    таблицата, но се отбелязва да не получава сигнал „SIGHUP“, когато "
+#~ "обвивката\n"
+#~ "    получи такъв сигнал.  Опцията „-а“, когато не е указана ЗАДАЧА, "
+#~ "означава\n"
+#~ "    всички задачи да се извадят от таблицата със задачи.  Опцията „-r“ "
+#~ "кара да\n"
+#~ "    се махнат само вървящите задачи."
+
+#~ msgid ""
+#~ " Causes a function to exit with the return value specified by N.  If N\n"
+#~ "    is omitted, the return status is that of the last command."
+#~ msgstr ""
+#~ " Води до изход от функция с върнат код N.  Ако не е указан N, връща се "
+#~ "изходния\n"
+#~ "    код на последната команда."
+
+#~ msgid ""
+#~ " For each NAME, remove the corresponding variable or function.  Given\n"
+#~ "    the `-v', unset will only act on variables.  Given the `-f' flag,\n"
+#~ "    unset will only act on functions.  With neither flag, unset first\n"
+#~ "    tries to unset a variable, and if that fails, then tries to unset a\n"
+#~ "    function.  Some variables cannot be unset; also see readonly."
+#~ msgstr ""
+#~ " За всяко ИМЕ се премахва съответната променлива или име.  Когато е "
+#~ "зададена\n"
+#~ "    опцията „-v“, „unset“ действа само на променливи.  Когато е зададена "
+#~ "опцията\n"
+#~ "    „-f“, „unset“ действа само на функции.  Когато командата се използва "
+#~ "без\n"
+#~ "    опции, първо се прави опита за премахване на променлива и след това "
+#~ "на\n"
+#~ "    функция.  Някои променливи не могат да се премахнат.  Вижте "
+#~ "вградената\n"
+#~ "    команда „readonly“."
+
+#~ msgid ""
+#~ " NAMEs are marked for automatic export to the environment of\n"
+#~ "    subsequently executed commands.  If the -f option is given,\n"
+#~ "    the NAMEs refer to functions.  If no NAMEs are given, or if `-p'\n"
+#~ "    is given, a list of all names that are exported in this shell is\n"
+#~ "    printed.  An argument of `-n' says to remove the export property\n"
+#~ "    from subsequent NAMEs.  An argument of `--' disables further option\n"
+#~ "    processing."
+#~ msgstr ""
+#~ " ИМЕната се маркират за автоматично изнасяне към средата на последвалите\n"
+#~ "    команди.  Ако е зададена опцията „-f“, ИМЕната са на функции.  Ако не "
+#~ "са\n"
+#~ "    дадени ИМЕна, или е използвана опцията „-p“, се извежда списък с "
+#~ "всички\n"
+#~ "    имена, които са изнесени от тази обвивка.  Опцията „-n“ указва "
+#~ "следващите\n"
+#~ "    ИМЕна повече да не са изнесени.  Аргументът „--“ изключва третирането "
+#~ "на\n"
+#~ "    следващите аргументи като опции."
+
+#~ msgid ""
+#~ " The given NAMEs are marked readonly and the values of these NAMEs may\n"
+#~ "    not be changed by subsequent assignment.  If the -f option is given,\n"
+#~ "    then functions corresponding to the NAMEs are so marked.  If no\n"
+#~ "    arguments are given, or if `-p' is given, a list of all readonly "
+#~ "names\n"
+#~ "    is printed.  The `-a' option means to treat each NAME as\n"
+#~ "    an array variable.  An argument of `--' disables further option\n"
+#~ "    processing."
+#~ msgstr ""
+#~ " Премахва възможността за промяна на дадените ИМЕна при последващи "
+#~ "присвоявания.\n"
+#~ "    Когато е използвана опцията „-f“, се премахва възможността за промяна "
+#~ "на\n"
+#~ "    функциите с тези ИМЕна.  Ако не са дадени аргументи или е използвана "
+#~ "опцията\n"
+#~ "    „-p“, се извеждат имената, които са без възможност за промяна.  "
+#~ "Опцията „-a“\n"
+#~ "    означава всяко име да се интерпретира като променлива за масив.  "
+#~ "Аргументът\n"
+#~ "    „--“ изключва третирането на следващите аргументи като опции."
+
+#~ msgid ""
+#~ " The positional parameters from $N+1 ... are renamed to $1 ...  If N is\n"
+#~ "    not given, it is assumed to be 1."
+#~ msgstr ""
+#~ " Позиционните аргументи от $N+1 и нагоре съответно се преименуват на $1 "
+#~ "и\n"
+#~ "    нагоре.  Ако N не е зададен, приема се, че е 1."
+
+#~ msgid ""
+#~ " Suspend the execution of this shell until it receives a SIGCONT\n"
+#~ "    signal.  The `-f' if specified says not to complain about this\n"
+#~ "    being a login shell if it is; just suspend anyway."
+#~ msgstr ""
+#~ " Временно спиране на изпълнението на текущата обвивка до получаването на "
+#~ "сигнала\n"
+#~ "    „SIGCONT“.  Ако е зададена опцията „-f“, се подтиска "
+#~ "предупреждението, че\n"
+#~ "    това е входна обвивка, изпълнението ѝ просто се спира."
+
+#~ msgid ""
+#~ " Print the accumulated user and system times for processes run from\n"
+#~ "    the shell."
+#~ msgstr ""
+#~ " Отпечатване на натрупаното потребителско и системно време за процеси, "
+#~ "които са\n"
+#~ "    стартирани през обвивката."
+
+#~ msgid ""
+#~ " For each NAME, indicate how it would be interpreted if used as a\n"
+#~ "    command name.\n"
+#~ "    \n"
+#~ "    If the -t option is used, `type' outputs a single word which is one "
+#~ "of\n"
+#~ "    `alias', `keyword', `function', `builtin', `file' or `', if NAME is "
+#~ "an\n"
+#~ "    alias, shell reserved word, shell function, shell builtin, disk "
+#~ "file,\n"
+#~ "    or unfound, respectively.\n"
+#~ "    \n"
+#~ "    If the -p flag is used, `type' either returns the name of the disk\n"
+#~ "    file that would be executed, or nothing if `type -t NAME' would not\n"
+#~ "    return `file'.\n"
+#~ "    \n"
+#~ "    If the -a flag is used, `type' displays all of the places that "
+#~ "contain\n"
+#~ "    an executable named `file'.  This includes aliases, builtins, and\n"
+#~ "    functions, if and only if the -p flag is not also used.\n"
+#~ "    \n"
+#~ "    The -f flag suppresses shell function lookup.\n"
+#~ "    \n"
+#~ "    The -P flag forces a PATH search for each NAME, even if it is an "
+#~ "alias,\n"
+#~ "    builtin, or function, and returns the name of the disk file that "
+#~ "would\n"
+#~ "    be executed."
+#~ msgstr ""
+#~ " За всяко ИМЕ се отпечатва как ще се интерпретира, ако се използва за име "
+#~ "на\n"
+#~ "    команда.\n"
+#~ "        \n"
+#~ "    Ако се използва опцията „-t“, командата „type“ извежда единствена "
+#~ "дума,\n"
+#~ "    която е някоя от „alias“,  „keyword“, „function“, „builtin“, „file“ "
+#~ "или „“,\n"
+#~ "    ако ИМЕто съответно е синоним, запазена дума на обвивката, функция "
+#~ "на\n"
+#~ "    обвивката, вградена команда в обвивката, файл или не е намерено.\n"
+#~ "    \n"
+#~ "    Ако се използва опцията „-p“, командата „type“ или извежда името на "
+#~ "файла,\n"
+#~ "    който ще се изпълни, или не извежда в нищо, в случаите, когато „type -"
+#~ "t ИМЕ“\n"
+#~ "    не връща „file“.\n"
+#~ "    \n"
+#~ "    Ако се използва опцията „-a“, командата „type“ извежда всички места, "
+#~ "които\n"
+#~ "    съдържат изпълним обект с такова ИМЕ.  Това включва синонимите, "
+#~ "вградените\n"
+#~ "    команди и функции, но само ако не се използва и опцията „-p“.\n"
+#~ "    \n"
+#~ "    Опцията „-f“ подтиска търсенето във функциите на обвивката.\n"
+#~ "    \n"
+#~ "    Опцията „-P“ кара ИМЕто да се търси в пътя $PATH, дори ИМЕто да е\n"
+#~ "    синоним, вградена команда или функция, и да се изведе името на файла, "
+#~ "който\n"
+#~ "    би се изпълнил."
+
+#~ msgid ""
+#~ " The user file-creation mask is set to MODE.  If MODE is omitted, or if\n"
+#~ "    `-S' is supplied, the current value of the mask is printed.  The `-"
+#~ "S'\n"
+#~ "    option makes the output symbolic; otherwise an octal number is "
+#~ "output.\n"
+#~ "    If `-p' is supplied, and MODE is omitted, the output is in a form\n"
+#~ "    that may be used as input.  If MODE begins with a digit, it is\n"
+#~ "    interpreted as an octal number, otherwise it is a symbolic mode "
+#~ "string\n"
+#~ "    like that accepted by chmod(1)."
+#~ msgstr ""
+#~ " Маската за създадените от потребителя файлове е зададена да е РЕЖИМ.  "
+#~ "Ако той\n"
+#~ "    е пропуснат или е дадена опцията „-S“, отпечатва се текущата стойност "
+#~ "на\n"
+#~ "    маската.  Опцията „-S“ води до описателен изход, в противен случай "
+#~ "се\n"
+#~ "    отпечатва число в осмична бройна система.  Ако е дадена опцията „-p“, "
+#~ "а\n"
+#~ "    режимът е пропуснат, изходът може да се използва като вход.  Ако "
+#~ "РЕЖИМът\n"
+#~ "    започва с цифра, то той се интерпретира като осмично число, в "
+#~ "противен\n"
+#~ "    случай е описателен низ, който се приема от командата „chmod“."
+
+#~ msgid ""
+#~ " Wait for the specified process and report its termination status.  If\n"
+#~ "    N is not given, all currently active child processes are waited for,\n"
+#~ "    and the return code is zero.  N is a process ID; if it is not given,\n"
+#~ "    all child processes of the shell are waited for."
+#~ msgstr ""
+#~ " Изчакване на указания процес и докладване за изходния код.  Ако не е "
+#~ "зададен N,\n"
+#~ "    всички текущо активни дъщерни процеси се изчакват и изходният код е "
+#~ "0.  N\n"
+#~ "    е идентификатор на процес.  Ако не е задача, изчакват се всички "
+#~ "процеси в\n"
+#~ "    програмния канал на задачата."
+
+#~ msgid ""
+#~ " Create a simple command invoked by NAME which runs COMMANDS.\n"
+#~ "    Arguments on the command line along with NAME are passed to the\n"
+#~ "    function as $0 .. $n."
+#~ msgstr ""
+#~ " Създаване на проста команда, която се извиква чрез ИМЕ, която стартира "
+#~ "КОМАНДИ.\n"
+#~ "    Аргументите на командния ред, заедно с ИМЕто, се предават на "
+#~ "функцията като\n"
+#~ "    $0 … $n."
+
+#~ msgid ""
+#~ " Toggle the values of variables controlling optional behavior.\n"
+#~ "    The -s flag means to enable (set) each OPTNAME; the -u flag\n"
+#~ "    unsets each OPTNAME.  The -q flag suppresses output; the exit\n"
+#~ "    status indicates whether each OPTNAME is set or unset.  The -o\n"
+#~ "    option restricts the OPTNAMEs to those defined for use with\n"
+#~ "    `set -o'.  With no options, or with the -p option, a list of all\n"
+#~ "    settable options is displayed, with an indication of whether or\n"
+#~ "    not each is set."
+#~ msgstr ""
+#~ " Превключва стойностите на променливите, които управляват допълнителното\n"
+#~ "    поведение.  Опцията „-s“ позволява задаването на всяка ОПЦИЯ.  "
+#~ "Опцията „-q“\n"
+#~ "    премахва всяка ОПЦИЯ.  Опцията „-q“ предотвратява извеждането на "
+#~ "информация.\n"
+#~ "    Върнатият код показва дали всяка опция е зададена или премахната. "
+#~ "Опцията\n"
+#~ "    „-o“ ограничава ОПЦИите до тези, които са дефинирани да се използват "
+#~ "със\n"
+#~ "    „set -o“.  Без опции или с опцията „-p“ се извежда списъка на всички "
+#~ "опции\n"
+#~ "    като се показва дали са зададени или не."
+
+#~ msgid ""
+#~ " For each NAME, specify how arguments are to be completed.\n"
+#~ "    If the -p option is supplied, or if no options are supplied, "
+#~ "existing\n"
+#~ "    completion specifications are printed in a way that allows them to "
+#~ "be\n"
+#~ "    reused as input.  The -r option removes a completion specification "
+#~ "for\n"
+#~ "    each NAME, or, if no NAMEs are supplied, all completion "
+#~ "specifications."
+#~ msgstr ""
+#~ " За всяко ИМЕ посочва как да се дописват аргументите.\n"
+#~ "    Ако е зададена опцията -p или не са зададени никакви опции, "
+#~ "съществуващите\n"
+#~ "    класове дописвания се отпечатват по начин, който позволява да се "
+#~ "използват\n"
+#~ "    повторно за вход.  Опцията -r премахва клас дописвания за всяко "
+#~ "посочено\n"
+#~ "    ИМЕ, а ако не е дадено такова -  махат се всички класове."

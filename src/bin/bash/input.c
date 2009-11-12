@@ -1,27 +1,27 @@
 /* input.c -- functions to perform buffered input with synchronization. */
 
-/* Copyright (C) 1992 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "config.h"
 
 #include "bashtypes.h"
-#ifdef HAVE_SYS_FILE_H
+#if !defined (_MINIX) && defined (HAVE_SYS_FILE_H)
 #  include <sys/file.h>
 #endif
 #include "filecntl.h"
@@ -34,21 +34,38 @@
 #endif
 
 #include "bashansi.h"
+#include "bashintl.h"
+
 #include "command.h"
 #include "general.h"
 #include "input.h"
 #include "error.h"
 #include "externs.h"
+#include "quit.h"
 
 #if !defined (errno)
 extern int errno;
 #endif /* !errno */
 
+#if defined (EAGAIN)
+#  define X_EAGAIN EAGAIN
+#else
+#  define X_EAGAIN -99
+#endif
+
+#if defined (EWOULDBLOCK)
+#  define X_EWOULDBLOCK EWOULDBLOCK
+#else
+#  define X_EWOULDBLOCK -99
+#endif
+
+extern void termsig_handler __P((int));
+
 /* Functions to handle reading input on systems that don't restart read(2)
    if a signal is received. */
 
 static char localbuf[128];
-static int local_index, local_bufused;
+static int local_index = 0, local_bufused = 0;
 
 /* Posix and USG systems do not guarantee to restart read () if it is
    interrupted by a signal.  We do the read ourselves, and restart it
@@ -59,14 +76,26 @@ getc_with_restart (stream)
 {
   unsigned char uc;
 
+  CHECK_TERMSIG;
+
   /* Try local buffering to reduce the number of read(2) calls. */
   if (local_index == local_bufused || local_bufused == 0)
     {
       while (1)
 	{
+	  CHECK_TERMSIG;
 	  local_bufused = read (fileno (stream), localbuf, sizeof(localbuf));
 	  if (local_bufused > 0)
 	    break;
+	  else if (errno == X_EAGAIN || errno == X_EWOULDBLOCK)
+	    {
+	      if (sh_unset_nodelay_mode (fileno (stream)) < 0)
+		{
+		  sys_error (_("cannot reset nodelay mode for fd %d"), fileno (stream));
+		  return EOF;
+		}
+	      continue;
+	    }
 	  else if (local_bufused == 0 || errno != EINTR)
 	    {
 	      local_index = 0;
@@ -226,7 +255,7 @@ save_bash_input (fd, new_fd)
   if (nfd == -1)
     {
       if (fcntl (fd, F_GETFD, 0) == 0)
-	sys_error ("cannot allocate new file descriptor for bash input from fd %d", fd);
+	sys_error (_("cannot allocate new file descriptor for bash input from fd %d"), fd);
       return -1;
     }
 
@@ -234,7 +263,7 @@ save_bash_input (fd, new_fd)
     {
       /* What's this?  A stray buffer without an associated open file
 	 descriptor?  Free up the buffer and report the error. */
-      internal_error ("check_bash_input: buffer already exists for new fd %d", nfd);
+      internal_error (_("save_bash_input: buffer already exists for new fd %d"), nfd);
       free_buffered_stream (buffers[nfd]);
     }
 
@@ -276,8 +305,13 @@ int
 check_bash_input (fd)
      int fd;
 {
-  if (fd > 0 && fd_is_bash_input (fd))
-    return ((save_bash_input (fd, -1) == -1) ? -1 : 0);
+  if (fd_is_bash_input (fd))
+    {
+      if (fd > 0)
+	return ((save_bash_input (fd, -1) == -1) ? -1 : 0);
+      else if (fd == 0)
+        return ((sync_buffered_stream (fd) == -1) ? -1 : 0);
+    }
   return 0;
 }
       
@@ -305,7 +339,13 @@ duplicate_buffered_stream (fd1, fd2)
 		  (bash_input.location.buffered_fd == fd2);
 
   if (buffers[fd2])
-    free_buffered_stream (buffers[fd2]);
+    {
+      /* If the two objects share the same b_buffer, don't free it. */
+      if (buffers[fd1] && buffers[fd1]->b_buffer && buffers[fd1]->b_buffer == buffers[fd2]->b_buffer)
+	buffers[fd2] = (BUFFERED_STREAM *)NULL;
+      else
+	free_buffered_stream (buffers[fd2]);
+    }
   buffers[fd2] = copy_buffered_stream (buffers[fd1]);
   if (buffers[fd2])
     buffers[fd2]->b_fd = fd2;
@@ -433,6 +473,7 @@ b_fill_buffer (bp)
 {
   ssize_t nr;
 
+  CHECK_TERMSIG;
   nr = zread (bp->b_fd, bp->b_buffer, bp->b_size);
   if (nr <= 0)
     {
@@ -500,6 +541,8 @@ sync_buffered_stream (bfd)
 int
 buffered_getchar ()
 {
+  CHECK_TERMSIG;
+
 #if !defined (DJGPP)
   return (bufstream_getc (buffers[bash_input.location.buffered_fd]));
 #else

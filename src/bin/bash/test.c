@@ -1,24 +1,24 @@
-/* GNU test program (ksb and mjb) */
+/* test.c - GNU test program (ksb and mjb) */
 
 /* Modified to run with the GNU shell Apr 25, 1988 by bfox. */
 
-/* Copyright (C) 1987-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /* Define PATTERN_MATCHING to get the csh-like =~ and !~ pattern-matching
    binary operators. */
@@ -45,11 +45,13 @@
 extern int errno;
 #endif /* !errno */
 
-#ifdef HAVE_SYS_FILE_H
+#if !defined (_POSIX_VERSION) && defined (HAVE_SYS_FILE_H)
 #  include <sys/file.h>
-#endif
+#endif /* !_POSIX_VERSION */
 #include "posixstat.h"
 #include "filecntl.h"
+
+#include "bashintl.h"
 
 #include "shell.h"
 #include "pathexp.h"
@@ -99,14 +101,7 @@ static int test_error_return;
 #define test_exit(val) \
 	do { test_error_return = val; longjmp (test_exit_buf, 1); } while (0)
 
-/* We have to use access(2) for machines running AFS, because it's
-   not a Unix file system.  This may produce incorrect answers for
-   non-AFS files.  I hate AFS. */
-#if defined (AFS)
-#  define EACCESS(path, mode)	access(path, mode)
-#else
-#  define EACCESS(path, mode)	test_eaccess(path, mode)
-#endif /* AFS */
+extern int sh_stat __P((const char *, struct stat *));
 
 static int pos;		/* The offset of the current argument in ARGV. */
 static int argc;	/* The number of arguments present in ARGV. */
@@ -116,8 +111,6 @@ static int noeval;
 static void test_syntax_error __P((char *, char *)) __attribute__((__noreturn__));
 static void beyond __P((void)) __attribute__((__noreturn__));
 static void integer_expected_error __P((char *)) __attribute__((__noreturn__));
-
-static int test_stat __P((char *, struct stat *));
 
 static int unary_operator __P((void));
 static int binary_operator __P((void));
@@ -149,7 +142,7 @@ test_syntax_error (format, arg)
 static void
 beyond ()
 {
-  test_syntax_error ("argument expected", (char *)NULL);
+  test_syntax_error (_("argument expected"), (char *)NULL);
 }
 
 /* Syntax error for when an integer argument was expected, but
@@ -158,97 +151,7 @@ static void
 integer_expected_error (pch)
      char *pch;
 {
-  test_syntax_error ("%s: integer expression expected", pch);
-}
-
-/* A wrapper for stat () which disallows pathnames that are empty strings
-   and handles /dev/fd emulation on systems that don't have it. */
-static int
-test_stat (path, finfo)
-     char *path;
-     struct stat *finfo;
-{
-  if (*path == '\0')
-    {
-      errno = ENOENT;
-      return (-1);
-    }
-  if (path[0] == '/' && path[1] == 'd' && strncmp (path, "/dev/fd/", 8) == 0)
-    {
-#if !defined (HAVE_DEV_FD)
-      intmax_t fd;
-      int r;
-
-      if (legal_number (path + 8, &fd) && fd == (int)fd)
-        {
-          r = fstat ((int)fd, finfo);
-          if (r == 0 || errno != EBADF)
-            return (r);
-        }
-      errno = ENOENT;
-      return (-1);
-#else
-  /* If HAVE_DEV_FD is defined, DEV_FD_PREFIX is defined also, and has a
-     trailing slash.  Make sure /dev/fd/xx really uses DEV_FD_PREFIX/xx.
-     On most systems, with the notable exception of linux, this is
-     effectively a no-op. */
-      char pbuf[32];
-      strcpy (pbuf, DEV_FD_PREFIX);
-      strcat (pbuf, path + 8);
-      return (stat (pbuf, finfo));
-#endif /* !HAVE_DEV_FD */
-    }
-#if !defined (HAVE_DEV_STDIN)
-  else if (STREQN (path, "/dev/std", 8))
-    {
-      if (STREQ (path+8, "in"))
-	return (fstat (0, finfo));
-      else if (STREQ (path+8, "out"))
-	return (fstat (1, finfo));
-      else if (STREQ (path+8, "err"))
-	return (fstat (2, finfo));
-      else
-	return (stat (path, finfo));
-    }
-#endif /* !HAVE_DEV_STDIN */
-  return (stat (path, finfo));
-}
-
-/* Do the same thing access(2) does, but use the effective uid and gid,
-   and don't make the mistake of telling root that any file is
-   executable. */
-int
-test_eaccess (path, mode)
-     char *path;
-     int mode;
-{
-  struct stat st;
-
-  if (test_stat (path, &st) < 0)
-    return (-1);
-
-  if (current_user.euid == 0)
-    {
-      /* Root can read or write any file. */
-      if (mode != X_OK)
-	return (0);
-
-      /* Root can execute any file that has any one of the execute
-	 bits set. */
-      if (st.st_mode & S_IXUGO)
-	return (0);
-    }
-
-  if (st.st_uid == current_user.euid)	/* owner */
-    mode <<= 6;
-  else if (group_member (st.st_gid))
-    mode <<= 3;
-
-  if (st.st_mode & mode)
-    return (0);
-
-  errno = EACCES;
-  return (-1);
+  test_syntax_error (_("%s: integer expression expected"), pch);
 }
 
 /* Increment our position in the argument list.  Check that we're not
@@ -351,14 +254,14 @@ term ()
     }
 
   /* A paren-bracketed argument. */
-  if (argv[pos][0] == '(' && argv[pos][1] == '\0')
+  if (argv[pos][0] == '(' && argv[pos][1] == '\0') /* ) */
     {
       advance (1);
       value = expr ();
-      if (argv[pos] == 0)
-	test_syntax_error ("`)' expected", (char *)NULL);
-      else if (argv[pos][0] != ')' || argv[pos][1])
-	test_syntax_error ("`)' expected, found %s", argv[pos]);
+      if (argv[pos] == 0) /* ( */
+	test_syntax_error (_("`)' expected"), (char *)NULL);
+      else if (argv[pos][0] != ')' || argv[pos][1]) /* ( */
+	test_syntax_error (_("`)' expected, found %s"), argv[pos]);
       advance (0);
       return (value);
     }
@@ -373,7 +276,7 @@ term ()
       if (test_unop (argv[pos]))
 	value = unary_operator ();
       else
-	test_syntax_error ("%s: unary operator expected", argv[pos]);
+	test_syntax_error (_("%s: unary operator expected"), argv[pos]);
     }
   else
     {
@@ -392,12 +295,12 @@ filecomp (s, t, op)
   struct stat st1, st2;
   int r1, r2;
 
-  if ((r1 = test_stat (s, &st1)) < 0)
+  if ((r1 = sh_stat (s, &st1)) < 0)
     {
       if (op == EF)
 	return (FALSE);
     }
-  if ((r2 = test_stat (t, &st2)) < 0)
+  if ((r2 = sh_stat (t, &st2)) < 0)
     {
       if (op == EF)
 	return (FALSE);
@@ -407,7 +310,7 @@ filecomp (s, t, op)
     {
     case OT: return (r1 < r2 || (r2 == 0 && st1.st_mtime < st2.st_mtime));
     case NT: return (r1 > r2 || (r1 == 0 && st1.st_mtime > st2.st_mtime));
-    case EF: return ((st1.st_dev == st2.st_dev) && (st1.st_ino == st2.st_ino));
+    case EF: return (same_file (s, t, &st1, &st2));
     }
   return (FALSE);
 }
@@ -457,7 +360,7 @@ patcomp (string, pat, op)
 {
   int m;
 
-  m = strmatch (pat, string, FNMATCH_EXTFLAG);
+  m = strmatch (pat, string, FNMATCH_EXTFLAG|FNMATCH_IGNCASE);
   return ((op == EQ) ? (m == 0) : (m != 0));
 }
 
@@ -538,7 +441,7 @@ binary_operator ()
 
   if ((w[0] != '-' || w[3] != '\0') || test_binop (w) == 0)
     {
-      test_syntax_error ("%s: binary operator expected", w);
+      test_syntax_error (_("%s: binary operator expected"), w);
       /* NOTREACHED */
       return (FALSE);
     }
@@ -595,31 +498,31 @@ unary_test (op, arg)
     {
     case 'a':			/* file exists in the file system? */
     case 'e':
-      return (test_stat (arg, &stat_buf) == 0);
+      return (sh_stat (arg, &stat_buf) == 0);
 
     case 'r':			/* file is readable? */
-      return (EACCESS (arg, R_OK) == 0);
+      return (sh_eaccess (arg, R_OK) == 0);
 
     case 'w':			/* File is writeable? */
-      return (EACCESS (arg, W_OK) == 0);
+      return (sh_eaccess (arg, W_OK) == 0);
 
     case 'x':			/* File is executable? */
-      return (EACCESS (arg, X_OK) == 0);
+      return (sh_eaccess (arg, X_OK) == 0);
 
     case 'O':			/* File is owned by you? */
-      return (test_stat (arg, &stat_buf) == 0 &&
+      return (sh_stat (arg, &stat_buf) == 0 &&
 	      (uid_t) current_user.euid == (uid_t) stat_buf.st_uid);
 
     case 'G':			/* File is owned by your group? */
-      return (test_stat (arg, &stat_buf) == 0 &&
+      return (sh_stat (arg, &stat_buf) == 0 &&
 	      (gid_t) current_user.egid == (gid_t) stat_buf.st_gid);
 
     case 'N':
-      return (test_stat (arg, &stat_buf) == 0 &&
+      return (sh_stat (arg, &stat_buf) == 0 &&
 	      stat_buf.st_atime <= stat_buf.st_mtime);
 
     case 'f':			/* File is a file? */
-      if (test_stat (arg, &stat_buf) < 0)
+      if (sh_stat (arg, &stat_buf) < 0)
 	return (FALSE);
 
       /* -f is true if the given file exists and is a regular file. */
@@ -630,29 +533,29 @@ unary_test (op, arg)
 #endif /* !S_IFMT */
 
     case 'd':			/* File is a directory? */
-      return (test_stat (arg, &stat_buf) == 0 && (S_ISDIR (stat_buf.st_mode)));
+      return (sh_stat (arg, &stat_buf) == 0 && (S_ISDIR (stat_buf.st_mode)));
 
     case 's':			/* File has something in it? */
-      return (test_stat (arg, &stat_buf) == 0 && stat_buf.st_size > (off_t) 0);
+      return (sh_stat (arg, &stat_buf) == 0 && stat_buf.st_size > (off_t) 0);
 
     case 'S':			/* File is a socket? */
 #if !defined (S_ISSOCK)
       return (FALSE);
 #else
-      return (test_stat (arg, &stat_buf) == 0 && S_ISSOCK (stat_buf.st_mode));
+      return (sh_stat (arg, &stat_buf) == 0 && S_ISSOCK (stat_buf.st_mode));
 #endif /* S_ISSOCK */
 
     case 'c':			/* File is character special? */
-      return (test_stat (arg, &stat_buf) == 0 && S_ISCHR (stat_buf.st_mode));
+      return (sh_stat (arg, &stat_buf) == 0 && S_ISCHR (stat_buf.st_mode));
 
     case 'b':			/* File is block special? */
-      return (test_stat (arg, &stat_buf) == 0 && S_ISBLK (stat_buf.st_mode));
+      return (sh_stat (arg, &stat_buf) == 0 && S_ISBLK (stat_buf.st_mode));
 
     case 'p':			/* File is a named pipe? */
 #ifndef S_ISFIFO
       return (FALSE);
 #else
-      return (test_stat (arg, &stat_buf) == 0 && S_ISFIFO (stat_buf.st_mode));
+      return (sh_stat (arg, &stat_buf) == 0 && S_ISFIFO (stat_buf.st_mode));
 #endif /* S_ISFIFO */
 
     case 'L':			/* Same as -h  */
@@ -665,17 +568,17 @@ unary_test (op, arg)
 #endif /* S_IFLNK && HAVE_LSTAT */
 
     case 'u':			/* File is setuid? */
-      return (test_stat (arg, &stat_buf) == 0 && (stat_buf.st_mode & S_ISUID) != 0);
+      return (sh_stat (arg, &stat_buf) == 0 && (stat_buf.st_mode & S_ISUID) != 0);
 
     case 'g':			/* File is setgid? */
-      return (test_stat (arg, &stat_buf) == 0 && (stat_buf.st_mode & S_ISGID) != 0);
+      return (sh_stat (arg, &stat_buf) == 0 && (stat_buf.st_mode & S_ISGID) != 0);
 
     case 'k':			/* File has sticky bit set? */
 #if !defined (S_ISVTX)
       /* This is not Posix, and is not defined on some Posix systems. */
       return (FALSE);
 #else
-      return (test_stat (arg, &stat_buf) == 0 && (stat_buf.st_mode & S_ISVTX) != 0);
+      return (sh_stat (arg, &stat_buf) == 0 && (stat_buf.st_mode & S_ISVTX) != 0);
 #endif
 
     case 't':	/* File fd is a terminal? */
@@ -756,7 +659,7 @@ int
 test_unop (op)
      char *op;
 {
-  if (op[0] != '-')
+  if (op[0] != '-' || op[2] != 0)
     return (0);
 
   switch (op[1])
@@ -782,10 +685,10 @@ two_arguments ()
       if (test_unop (argv[pos]))
 	return (unary_operator ());
       else
-	test_syntax_error ("%s: unary operator expected", argv[pos]);
+	test_syntax_error (_("%s: unary operator expected"), argv[pos]);
     }
   else
-    test_syntax_error ("%s: unary operator expected", argv[pos]);
+    test_syntax_error (_("%s: unary operator expected"), argv[pos]);
 
   return (0);
 }
@@ -825,7 +728,7 @@ three_arguments ()
       pos = argc;
     }
   else
-    test_syntax_error ("%s: binary operator expected", argv[pos+1]);
+    test_syntax_error (_("%s: binary operator expected"), argv[pos+1]);
 
   return (value);
 }
@@ -900,7 +803,7 @@ test_command (margc, margv)
       --margc;
 
       if (margv[margc] && (margv[margc][0] != ']' || margv[margc][1]))
-	test_syntax_error ("missing `]'", (char *)NULL);
+	test_syntax_error (_("missing `]'"), (char *)NULL);
 
       if (margc < 2)
 	test_exit (SHELL_BOOLEAN (FALSE));
@@ -916,7 +819,7 @@ test_command (margc, margv)
   value = posixtest ();
 
   if (pos != argc)
-    test_syntax_error ("too many arguments", (char *)NULL);
+    test_syntax_error (_("too many arguments"), (char *)NULL);
 
   test_exit (SHELL_BOOLEAN (value));
 }

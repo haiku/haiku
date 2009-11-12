@@ -1,74 +1,50 @@
 /* shmbutil.h -- utility functions for multibyte characters. */
 
-/* Copyright (C) 2002 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2004 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
                                  
 #if !defined (_SH_MBUTIL_H_)
 #define _SH_MBUTIL_H_
 
 #include "stdc.h"
 
-/************************************************/
-/* check multibyte capability for I18N code     */
-/************************************************/
-
-/* For platforms which support the ISO C amendement 1 functionality we
-   support user defined character classes.  */
-   /* Solaris 2.5 has a bug: <wchar.h> must be included before <wctype.h>.  */
-#if defined (HAVE_WCTYPE_H) && defined (HAVE_WCHAR_H)
-#  include <wchar.h>
-#  include <wctype.h>
-#  if defined (HAVE_MBSRTOWCS) /* system is supposed to support XPG5 */
-#    define HANDLE_MULTIBYTE      1
-#  endif
-#endif /* HAVE_WCTYPE_H && HAVE_WCHAR_H */
-
-/* Some systems, like BeOS, have multibyte encodings but lack mbstate_t.  */
-#if HANDLE_MULTIBYTE && !defined (HAVE_MBSTATE_T)
-#  define wcsrtombs(dest, src, len, ps) (wcsrtombs) (dest, src, len, 0)
-#  define mbsrtowcs(dest, src, len, ps) (mbsrtowcs) (dest, src, len, 0)
-#  define wcrtomb(s, wc, ps) (wcrtomb) (s, wc, 0)
-#  define mbrtowc(pwc, s, n, ps) (mbrtowc) (pwc, s, n, 0)
-#  define mbrlen(s, n, ps) (mbrlen) (s, n, 0)
-#  define mbstate_t int
-#endif /* HANDLE_MULTIBYTE && !HAVE_MBSTATE_T */
-
-/* Make sure MB_LEN_MAX is at least 16 on systems that claim to be able to
-   handle multibyte chars (some systems define MB_LEN_MAX as 1) */
-#ifdef HANDLE_MULTIBYTE
-#  include <limits.h>
-#  if defined(MB_LEN_MAX) && (MB_LEN_MAX < 16)
-#    undef MB_LEN_MAX
-#  endif
-#  if !defined (MB_LEN_MAX)
-#    define MB_LEN_MAX 16
-#  endif
-#endif /* HANDLE_MULTIBYTE */
-
-/************************************************/
-/* end of multibyte capability checks for I18N  */
-/************************************************/
+/* Include config.h for HANDLE_MULTIBYTE */
+#include <config.h>
 
 #if defined (HANDLE_MULTIBYTE)
 
 extern size_t xmbsrtowcs __P((wchar_t *, const char **, size_t, mbstate_t *));
+extern size_t xdupmbstowcs __P((wchar_t **, char ***, const char *));
+
+extern size_t mbstrlen __P((const char *));
 
 extern char *xstrchr __P((const char *, int));
+
+#ifndef MB_INVALIDCH
+#define MB_INVALIDCH(x)		((x) == (size_t)-1 || (x) == (size_t)-2)
+#define MB_NULLWCH(x)		((x) == 0)
+#endif
+
+#define MBSLEN(s)	(((s) && (s)[0]) ? ((s)[1] ? mbstrlen (s) : 1) : 0)
+#define MB_STRLEN(s)	((MB_CUR_MAX > 1) ? MBSLEN (s) : STRLEN (s))
+
+#define MBLEN(s, n)	((MB_CUR_MAX > 1) ? mblen ((s), (n)) : 1)
+#define MBRLEN(s, n, p)	((MB_CUR_MAX > 1) ? mbrlen ((s), (n), (p)) : 1)
 
 #else /* !HANDLE_MULTIBYTE */
 
@@ -80,6 +56,20 @@ extern char *xstrchr __P((const char *, int));
 
 #undef xstrchr
 #define xstrchr(s, c)	strchr(s, c)
+
+#ifndef MB_INVALIDCH
+#define MB_INVALIDCH(x)		(0)
+#define MB_NULLWCH(x)		(0)
+#endif
+
+#define MB_STRLEN(s)		(STRLEN(s))
+
+#define MBLEN(s, n)		1
+#define MBRLEN(s, n, p)		1
+
+#ifndef wchar_t
+#  define wchar_t	int
+#endif
 
 #endif /* !HANDLE_MULTIBYTE */
 
@@ -120,6 +110,8 @@ extern char *xstrchr __P((const char *, int));
 		state = state_bak; \
 		(_i)++; \
 	      } \
+	    else if (mblength == 0) \
+	      (_i)++; \
 	    else \
 	      (_i) += mblength; \
 	  } \
@@ -158,6 +150,89 @@ extern char *xstrchr __P((const char *, int));
     while (0)
 #else
 #  define ADVANCE_CHAR_P(_str, _strsize)
+#endif  /* !HANDLE_MULTIBYTE */
+
+/* Back up one (possibly multi-byte) character in string _STR of length
+   _STRSIZE, starting at index _I.  STATE must have already been declared. */
+#if defined (HANDLE_MULTIBYTE)
+#  define BACKUP_CHAR(_str, _strsize, _i) \
+    do \
+      { \
+	if (MB_CUR_MAX > 1) \
+	  { \
+	    mbstate_t state_bak; \
+	    size_t mblength; \
+	    int _x, _p; /* _x == temp index into string, _p == prev index */ \
+\
+	    _x = _p = 0; \
+	    while (_x < (_i)) \
+	      { \
+	        state_bak = state; \
+	        mblength = mbrlen ((_str) + (_x), (_strsize) - (_x), &state); \
+\
+		if (mblength == (size_t)-2 || mblength == (size_t)-1) \
+		  { \
+		    state = state_bak; \
+		    _x++; \
+		  } \
+		else if (mblength == 0) \
+		  _x++; \
+		else \
+		  { \
+		    _p = _x; /* _p == start of prev mbchar */ \
+		    _x += mblength; \
+		  } \
+	      } \
+	    (_i) = _p; \
+	  } \
+	else \
+	  (_i)--; \
+      } \
+    while (0)
+#else
+#  define BACKUP_CHAR(_str, _strsize, _i)	(_i)--
+#endif  /* !HANDLE_MULTIBYTE */
+
+/* Back up one (possibly multibyte) character in the string _BASE of length
+   _STRSIZE starting at _STR (_BASE <= _STR <= (_BASE + _STRSIZE) ).
+   SPECIAL: DO NOT assume that _STR will be decremented by 1 after this call. */
+#if defined (HANDLE_MULTIBYTE)
+#  define BACKUP_CHAR_P(_base, _strsize, _str) \
+    do \
+      { \
+	if (MB_CUR_MAX > 1) \
+	  { \
+	    mbstate_t state_bak; \
+	    size_t mblength; \
+	    char *_x, _p; /* _x == temp pointer into string, _p == prev pointer */ \
+\
+	    _x = _p = _base; \
+	    while (_x < (_str)) \
+	      { \
+	        state_bak = state; \
+	        mblength = mbrlen (_x, (_strsize) - _x, &state); \
+\
+		if (mblength == (size_t)-2 || mblength == (size_t)-1) \
+		  { \
+		    state = state_bak; \
+		    _x++; \
+		  } \
+		else if (mblength == 0) \
+		  _x++; \
+		else \
+		  { \
+		    _p = _x; /* _p == start of prev mbchar */ \
+		    _x += mblength; \
+		  } \
+	      } \
+	    (_str) = _p; \
+	  } \
+	else \
+	  (_str)--; \
+      } \
+    while (0)
+#else
+#  define BACKUP_CHAR_P(_base, _strsize, _str) (_str)--
 #endif  /* !HANDLE_MULTIBYTE */
 
 /* Copy a single character from the string _SRC to the string _DST.
@@ -344,4 +419,31 @@ extern char *xstrchr __P((const char *, int));
 #  define SADD_MBCHAR(_dst, _src, _si, _srcsize)
 #endif
 
+/* Watch out when using this -- it's just straight textual subsitution */
+#if defined (HANDLE_MULTIBYTE)
+#  define SADD_MBQCHAR_BODY(_dst, _src, _si, _srcsize) \
+\
+	    int i; \
+	    mbstate_t state_bak; \
+	    size_t mblength; \
+\
+	    state_bak = state; \
+	    mblength = mbrlen ((_src) + (_si), (_srcsize) - (_si), &state); \
+	    if (mblength == (size_t)-1 || mblength == (size_t)-2) \
+	      { \
+		state = state_bak; \
+		mblength = 1; \
+	      } \
+	    if (mblength < 1) \
+	      mblength = 1; \
+\
+	    (_dst) = (char *)xmalloc (mblength + 2); \
+	    (_dst)[0] = CTLESC; \
+	    for (i = 0; i < mblength; i++) \
+	      (_dst)[i+1] = (_src)[(_si)++]; \
+	    (_dst)[mblength+1] = '\0'; \
+\
+	    goto add_string
+
+#endif /* HANDLE_MULTIBYTE */
 #endif /* _SH_MBUTIL_H_ */

@@ -2,23 +2,23 @@
    primarily for making function definitions, but I'm not sure
    that anyone else will need it.  */
 
-/* Copyright (C) 1987,1991 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT
-   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
-   License for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Bash; see the file COPYING.  If not, write to the Free
-   Software Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "config.h"
 
@@ -40,6 +40,7 @@ static ARITH_FOR_COM *copy_arith_for_command __P((ARITH_FOR_COM *));
 #endif
 static GROUP_COM *copy_group_command __P((GROUP_COM *));
 static SUBSHELL_COM *copy_subshell_command __P((SUBSHELL_COM *));
+static COPROC_COM *copy_coproc_command __P((COPROC_COM *));
 static CASE_COM *copy_case_command __P((CASE_COM *));
 static WHILE_COM *copy_while_command __P((WHILE_COM *));
 static IF_COM *copy_if_command __P((IF_COM *));
@@ -50,7 +51,6 @@ static ARITH_COM *copy_arith_command __P((ARITH_COM *));
 static COND_COM *copy_cond_command __P((COND_COM *));
 #endif
 static SIMPLE_COM *copy_simple_command __P((SIMPLE_COM *));
-static FUNCTION_DEF *copy_function_def __P((FUNCTION_DEF *));
 
 WORD_DESC *
 copy_word (w)
@@ -86,6 +86,7 @@ copy_case_clause (clause)
   new_clause = (PATTERN_LIST *)xmalloc (sizeof (PATTERN_LIST));
   new_clause->patterns = copy_word_list (clause->patterns);
   new_clause->action = copy_command (clause->action);
+  new_clause->flags = clause->flags;
   return (new_clause);
 }
 
@@ -125,6 +126,7 @@ copy_redirect (redirect)
     case r_input_direction:
     case r_inputa_direction:
     case r_err_and_out:
+    case r_append_err_and_out:
     case r_input_output:
     case r_output_force:
     case r_duplicating_input_word:
@@ -166,6 +168,7 @@ copy_for_command (com)
 
   new_for = (FOR_COM *)xmalloc (sizeof (FOR_COM));
   new_for->flags = com->flags;
+  new_for->line = com->line;
   new_for->name = copy_word (com->name);
   new_for->map_list = copy_word_list (com->map_list);
   new_for->action = copy_command (com->action);
@@ -213,6 +216,19 @@ copy_subshell_command (com)
   return (new_subshell);
 }
 
+static COPROC_COM *
+copy_coproc_command (com)
+     COPROC_COM *com;
+{
+  COPROC_COM *new_coproc;
+
+  new_coproc = (COPROC_COM *)xmalloc (sizeof (COPROC_COM));
+  new_coproc->name = savestring (com->name);
+  new_coproc->command = copy_command (com->command);
+  new_coproc->flags = com->flags;
+  return (new_coproc);
+}
+
 static CASE_COM *
 copy_case_command (com)
      CASE_COM *com;
@@ -221,6 +237,7 @@ copy_case_command (com)
 
   new_case = (CASE_COM *)xmalloc (sizeof (CASE_COM));
   new_case->flags = com->flags;
+  new_case->line = com->line;
   new_case->word = copy_word (com->word);
   new_case->clauses = copy_case_clauses (com->clauses);
   return (new_case);
@@ -302,17 +319,26 @@ copy_simple_command (com)
   return (new_simple);
 }
 
-static FUNCTION_DEF *
+FUNCTION_DEF *
+copy_function_def_contents (old, new_def)
+     FUNCTION_DEF *old, *new_def;
+{
+  new_def->name = copy_word (old->name);
+  new_def->command = old->command ? copy_command (old->command) : old->command;
+  new_def->flags = old->flags;
+  new_def->line = old->line;
+  new_def->source_file = old->source_file ? savestring (old->source_file) : old->source_file;
+  return (new_def);
+}
+
+FUNCTION_DEF *
 copy_function_def (com)
      FUNCTION_DEF *com;
 {
   FUNCTION_DEF *new_def;
 
   new_def = (FUNCTION_DEF *)xmalloc (sizeof (FUNCTION_DEF));
-  new_def->name = copy_word (com->name);
-  new_def->command = copy_command (com->command);
-  new_def->flags = com->flags;
-  new_def->line = com->line;
+  new_def = copy_function_def_contents (com, new_def);
   return (new_def);
 }
 
@@ -361,6 +387,10 @@ copy_command (command)
 
       case cm_subshell:
 	new_command->value.Subshell = copy_subshell_command (command->value.Subshell);
+	break;
+
+      case cm_coproc:
+	new_command->value.Coproc = copy_coproc_command (command->value.Coproc);
 	break;
 
       case cm_case:

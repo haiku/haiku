@@ -1,11 +1,12 @@
-This document details the incompatibilites between this version of bash,
-bash-2.05b, and the previous widely-available version, bash-1.14 (which
-is still the `standard' version for many Linux distributions).  These
-were discovered by users of bash-2.x, so this list is not comprehensive.
-Some of these incompatibilities occur between the current version and
-versions 2.0 and above.
+This document details the incompatibilities between this version of bash,
+bash-4.0, and the previous widely-available versions, bash-1.14 (which is
+still the `standard' version for a few Linux distributions) and bash-2.x. 
+These were discovered by users of bash-2.x and 3.x, so this list is not
+comprehensive.  Some of these incompatibilities occur between the current
+version and versions 2.0 and above.  (The differences between bash-1.14 and
+bash-2.0 were significant.)
 
-1.  Bash now uses a new quoting syntax, $"...", to do locale-specific
+1.  Bash uses a new quoting syntax, $"...", to do locale-specific
     string translation.  Users who have relied on the (undocumented)
     behavior of bash-1.14 will have to change their scripts.  For
     instance, if you are doing something like this to get the value of
@@ -183,28 +184,137 @@ versions 2.0 and above.
     with `z' and still allow individual users to change the collation order.
     Users may put the above command into their own profiles as well, of course.
 
-14.  Bash versions up to 1.14.7 included an undocumented `-l' operator to
-     the `test/[' builtin.  It was a unary operator that expanded to the
-     length of its string argument.  This let you do things like
+14. Bash versions up to 1.14.7 included an undocumented `-l' operator to
+    the `test/[' builtin.  It was a unary operator that expanded to the
+    length of its string argument.  This let you do things like
 
 	test -l $variable -lt 20
 
-     for example.
+    for example.
 
-     This was included for backwards compatibility with old versions of the
-     Bourne shell, which did not provide an easy way to obtain the length of
-     the value of a shell variable.
+    This was included for backwards compatibility with old versions of the
+    Bourne shell, which did not provide an easy way to obtain the length of
+    the value of a shell variable.
 
-     This operator is not part of the POSIX standard, because one can (and
-     should) use ${#variable} to get the length of a variable's value.
-     Bash-2.x does not support it.
+    This operator is not part of the POSIX standard, because one can (and
+    should) use ${#variable} to get the length of a variable's value.
+    Bash-2.x does not support it.
 
-15.  Bash no longer auto-exports the HOME, PATH, SHELL, TERM, HOSTNAME,
-     HOSTTYPE, MACHTYPE, or OSTYPE variables.
+15. Bash no longer auto-exports the HOME, PATH, SHELL, TERM, HOSTNAME,
+    HOSTTYPE, MACHTYPE, or OSTYPE variables.  If they appear in the initial
+    environment, the export attribute will be set, but if bash provides a
+    default value, they will remain local to the current shell.
 
-16.  Bash no longer initializes the FUNCNAME, GROUPS, or DIRSTACK variables
-     to have special behavior if they appear in the initial environment.
+16. Bash no longer initializes the FUNCNAME, GROUPS, or DIRSTACK variables
+    to have special behavior if they appear in the initial environment.
 
-17.  Bash no longer removes the export attribute from the SSH_CLIENT or
-     SSH2_CLIENT variables, and no longer attempts to discover whether or
-     not it has been invoked by sshd in order to run the startup files.
+17. Bash no longer removes the export attribute from the SSH_CLIENT or
+    SSH2_CLIENT variables, and no longer attempts to discover whether or
+    not it has been invoked by sshd in order to run the startup files.
+
+18. Bash no longer requires that the body of a function be a group command;
+    any compound command is accepted.
+
+19. As of bash-3.0, the pattern substitution operators no longer perform
+    quote removal on the pattern before attempting the match.  This is the
+    way the pattern removal functions behave, and is more consistent.
+
+20. After bash-3.0 was released, I reimplemented tilde expansion, incorporating
+    it into the mainline word expansion code.  This fixes the bug that caused
+    the results of tilde expansion to be re-expanded.  There is one
+    incompatibility:  a ${paramOPword} expansion within double quotes will not
+    perform tilde expansion on WORD.  This is consistent with the other
+    expansions, and what POSIX specifies.
+
+21. A number of variables have the integer attribute by default, so the +=
+    assignment operator returns expected results: RANDOM, LINENO, MAILCHECK,
+    HISTCMD, OPTIND.
+
+22. Bash-3.x is much stricter about $LINENO correctly reflecting the line
+    number in a script; assignments to LINENO have little effect.
+
+23. By default, readline binds the terminal special characters to their
+    readline equivalents.  As of bash-3.1/readline-5.1, this is optional and
+    controlled by the bind-tty-special-chars readline variable.
+
+24. The \W prompt string expansion abbreviates $HOME as `~'.  The previous
+    behavior is available with ${PWD##/*/}.
+
+25. The arithmetic exponentiation operator is right-associative as of bash-3.1.
+
+26. The rules concerning valid alias names are stricter, as per POSIX.2.
+
+27. The Readline key binding functions now obey the convert-meta setting active
+    when the binding takes place, as the dispatch code does when characters
+    are read and processed.
+
+28. The historical behavior of `trap' reverting signal disposition to the
+    original handling in the absence of a valid first argument is implemented
+    only if the first argument is a valid signal number.
+
+29. In versions of bash after 3.1, the ${parameter//pattern/replacement}
+    expansion does not interpret `%' or `#' specially.  Those anchors don't
+    have any real meaning when replacing every match.
+
+30. Beginning with bash-3.1, the combination of posix mode and enabling the
+    `xpg_echo' option causes echo to ignore all options, not looking for `-n'
+
+31. Beginning with bash-3.2, bash follows the Bourne-shell-style (and POSIX-
+    style) rules for parsing the contents of old-style backquoted command
+    substitutions.  Previous versions of bash attempted to recursively parse
+    embedded quoted strings and shell constructs; bash-3.2 uses strict POSIX
+    rules to find the closing backquote and simply passes the contents of the
+    command substitution to a subshell for parsing and execution.
+
+32. Beginning with bash-3.2, bash uses access(2) when executing primaries for
+    the test builtin and the [[ compound command, rather than looking at the
+    file permission bits obtained with stat(2).  This obeys restrictions of
+    the file system (e.g., read-only or noexec mounts) not available via stat.
+
+33. Bash-3.2 adopts the convention used by other string and pattern matching
+    operators for the `[[' compound command, and matches any quoted portion
+    of the right-hand-side argument to the =~ operator as a string rather
+    than a regular expression.
+
+34. Bash-4.0 allows the behavior in the previous item to be modified using
+    the notion of a shell `compatibility level'.
+
+35. Bash-3.2 (patched) and Bash-4.0 fix a bug that leaves the shell in an
+    inconsistent internal state following an assignment error.  One of the
+    changes means that compound commands or { ... } grouping commands are
+    aborted under some circumstances in which they previously were not.
+    This is what Posix specifies.
+
+36. Bash-4.0 now allows process substitution constructs to pass unchanged
+    through brace expansion, so any expansion of the contents will have to be
+    separately specified, and each process subsitution will have to be
+    separately entered.
+
+37. Bash-4.0 now allows SIGCHLD to interrupt the wait builtin, as Posix
+    specifies, so the SIGCHLD trap is no longer always invoked once per
+    exiting child if you are using `wait' to wait for all children.
+
+38. Since bash-4.0 now follows Posix rules for finding the closing delimiter
+    of a $() command substitution, it will not behave as previous versions
+    did, but will catch more syntax and parsing errors before spawning a
+    subshell to evaluate the command substitution.
+
+39. The programmable completion code uses the same set of delimiting characters
+    as readline when breaking the command line into words, rather than the
+    set of shell metacharacters, so programmable completion and readline
+    should be more consistent.
+
+40. When the read builtin times out, it attempts to assign any input read to
+    specified variables, which also causes variables to be set to the empty
+    string if there is not enough input.  Previous versions discarded the
+    characters read.
+
+41. Beginning with bash-4.0, when one of the commands in a pipeline is killed
+    by a SIGINT while executing a command list, the shell acts as if it
+    received the interrupt.
+
+42. Bash-4.0 changes the handling of the set -e option so that the shell exits
+    if a pipeline fails (and not just if the last command in the failing
+    pipeline is a simple command).  This is not as Posix specifies.  There is
+    work underway to update this portion of the standard; the bash-4.0
+    behavior attempts to capture the consensus at the time of release.

@@ -1,30 +1,32 @@
 dnl
-dnl Configure script for bash-2.05
+dnl Configure script for bash-4.0
 dnl
 dnl report bugs to chet@po.cwru.edu
 dnl
 dnl Process this file with autoconf to produce a configure script.
 
-# Copyright (C) 1987-2002 Free Software Foundation, Inc.
+# Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2, or (at your option)
-# any later version.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+AC_REVISION([for Bash 4.0, version 4.013])dnl
 
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.
+define(bashvers, 4.0)
+define(relstatus, release)
 
-AC_REVISION([for Bash 2.05b, version 2.144, from autoconf version] AC_ACVERSION)dnl
-
-AC_INIT(bash, 2.05b, bug-bash@gnu.org)
+AC_INIT([bash], bashvers-relstatus, [bug-bash@gnu.org])
 
 dnl make sure we are using a recent autoconf version
 AC_PREREQ(2.50)
@@ -35,12 +37,12 @@ AC_CONFIG_AUX_DIR(./support)
 AC_CONFIG_HEADERS(config.h)
 
 dnl checks for version info
-BASHVERS=2.05b
-RELSTATUS=release
+BASHVERS=bashvers
+RELSTATUS=relstatus
 
 dnl defaults for debug settings
 case "$RELSTATUS" in
-alp*|bet*|dev*|rc*)	DEBUG='-DDEBUG' MALLOC_DEBUG='-DMALLOC_DEBUG' ;;
+alp*|bet*|dev*|rc*|maint*)	DEBUG='-DDEBUG' MALLOC_DEBUG='-DMALLOC_DEBUG' ;;
 *)	DEBUG= MALLOC_DEBUG= ;;
 esac
 
@@ -70,6 +72,7 @@ sparc-netbsd*)	opt_bash_malloc=no ;;	# needs 8-byte alignment
 mips-irix6*)	opt_bash_malloc=no ;;	# needs 8-byte alignment
 m68k-sysv)	opt_bash_malloc=no ;;	# fixes file descriptor leak in closedir
 sparc-linux*)	opt_bash_malloc=no ;;	# sparc running linux; requires ELF
+#*-freebsd*-gnu)	opt_bash_malloc=no ;;	# there's some undetermined problem here
 #*-freebsd*)	opt_bash_malloc=no ;;	# they claim it's better; I disagree
 *-openbsd*)	opt_bash_malloc=no ;;	# they claim it needs eight-bit alignment
 *-aix*)		opt_bash_malloc=no ;;	# AIX machines
@@ -78,7 +81,7 @@ sparc-linux*)	opt_bash_malloc=no ;;	# sparc running linux; requires ELF
 *-rhapsody*)	opt_bash_malloc=no ;;	# Apple Rhapsody (MacOS X)
 *-darwin*)	opt_bash_malloc=no ;;	# Apple Darwin (MacOS X)
 *-dgux*)	opt_bash_malloc=no ;;	# DG/UX machines
-*-qnx*)		opt_bash_malloc=no ;;	# QNX 4.2
+*-qnx*)		opt_bash_malloc=no ;;	# QNX 4.2, QNX 6.x
 *-machten4)	opt_bash_malloc=no ;;	# MachTen 4.x
 *-bsdi2.1|*-bsdi3.?)	opt_bash_malloc=no ; : ${CC:=shlicc2} ;; # for loadable builtins
 *-beos*)	opt_bash_malloc=no ;;	# they say it's suitable
@@ -91,6 +94,12 @@ case "${host_os}" in
 sco3.2v5*|sco3.2v4*)	opt_memscramble=no ;;
 *)			opt_memscramble=yes ;;
 esac
+
+dnl
+dnl macros for the bash debugger
+dnl
+AM_PATH_LISPDIR
+AC_ARG_VAR(DEBUGGER_START_FILE, [location of bash debugger initialization file])
 
 dnl arguments to configure
 dnl packages
@@ -138,6 +147,10 @@ if test "$opt_curses" = yes; then
 	prefer_curses=yes
 fi
 
+if test -z "${DEBUGGER_START_FILE}"; then
+	DEBUGGER_START_FILE='${datadir}/bashdb/bashdb-main.inc'
+fi
+
 dnl optional shell features in config.h.in
 opt_minimal_config=no
 
@@ -159,11 +172,19 @@ opt_brace_expansion=yes
 opt_disabled_builtins=no
 opt_command_timing=yes
 opt_xpg_echo=no
+opt_strict_posix=no
 opt_cond_command=yes
+opt_cond_regexp=yes
+opt_coproc=yes
 opt_arith_for_command=yes
 opt_net_redirs=yes
 opt_progcomp=yes
 opt_separate_help=no
+opt_multibyte=yes
+opt_debugger=yes
+opt_single_longdoc_strings=yes
+opt_casemod_attrs=yes
+opt_casemod_expansions=yes
 
 dnl options that affect how bash is compiled and linked
 opt_static_link=no
@@ -182,6 +203,8 @@ if test $opt_minimal_config = yes; then
 	opt_brace_expansion=no opt_disabled_builtins=no opt_command_timing=no
 	opt_extended_glob=no opt_cond_command=no opt_arith_for_command=no
 	opt_net_redirs=no opt_progcomp=no opt_separate_help=no
+	opt_multibyte=yes opt_cond_regexp=no opt_coproc=no
+	opt_casemod_attrs=no opt_casemod_expansions=no
 fi
 
 AC_ARG_ENABLE(alias, AC_HELP_STRING([--enable-alias], [enable shell aliases]), opt_alias=$enableval)
@@ -189,8 +212,13 @@ AC_ARG_ENABLE(arith-for-command, AC_HELP_STRING([--enable-arith-for-command], [e
 AC_ARG_ENABLE(array-variables, AC_HELP_STRING([--enable-array-variables], [include shell array variables]), opt_array_variables=$enableval)
 AC_ARG_ENABLE(bang-history, AC_HELP_STRING([--enable-bang-history], [turn on csh-style history substitution]), opt_bang_history=$enableval)
 AC_ARG_ENABLE(brace-expansion, AC_HELP_STRING([--enable-brace-expansion], [include brace expansion]), opt_brace_expansion=$enableval)
+AC_ARG_ENABLE(casemod-attributes, AC_HELP_STRING([--enable-casemod-attributes], [include case-modifying variable attributes]), opt_casemod_attrs=$enableval)
+AC_ARG_ENABLE(casemod-expansions, AC_HELP_STRING([--enable-casemod-expansions], [include case-modifying word expansions]), opt_casemod_expansions=$enableval)
 AC_ARG_ENABLE(command-timing, AC_HELP_STRING([--enable-command-timing], [enable the time reserved word and command timing]), opt_command_timing=$enableval)
 AC_ARG_ENABLE(cond-command, AC_HELP_STRING([--enable-cond-command], [enable the conditional command]), opt_cond_command=$enableval)
+AC_ARG_ENABLE(cond-regexp, AC_HELP_STRING([--enable-cond-regexp], [enable extended regular expression matching in conditional commands]), opt_cond_regexp=$enableval)
+AC_ARG_ENABLE(coprocesses, AC_HELP_STRING([--enable-coprocesses], [enable coprocess support and the coproc reserved word]), opt_coproc=$enableval)
+AC_ARG_ENABLE(debugger, AC_HELP_STRING([--enable-debugger], [enable support for bash debugger]), opt_debugger=$enableval)
 AC_ARG_ENABLE(directory-stack, AC_HELP_STRING([--enable-directory-stack], [enable builtins pushd/popd/dirs]), opt_dirstack=$enableval)
 AC_ARG_ENABLE(disabled-builtins, AC_HELP_STRING([--enable-disabled-builtins], [allow disabled builtins to still be invoked]), opt_disabled_builtins=$enableval)
 AC_ARG_ENABLE(dparen-arithmetic, AC_HELP_STRING([--enable-dparen-arithmetic], [include ((...)) command]), opt_dparen_arith=$enableval)
@@ -198,6 +226,7 @@ AC_ARG_ENABLE(extended-glob, AC_HELP_STRING([--enable-extended-glob], [include k
 AC_ARG_ENABLE(help-builtin, AC_HELP_STRING([--enable-help-builtin], [include the help builtin]), opt_help=$enableval)
 AC_ARG_ENABLE(history, AC_HELP_STRING([--enable-history], [turn on command history]), opt_history=$enableval)
 AC_ARG_ENABLE(job-control, AC_HELP_STRING([--enable-job-control], [enable job control features]), opt_job_control=$enableval)
+AC_ARG_ENABLE(multibyte, AC_HELP_STRING([--enable-multibyte], [enable multibyte characters if OS supports them]), opt_multibyte=$enableval)
 AC_ARG_ENABLE(net-redirections, AC_HELP_STRING([--enable-net-redirections], [enable /dev/tcp/host/port redirection]), opt_net_redirs=$enableval)
 AC_ARG_ENABLE(process-substitution, AC_HELP_STRING([--enable-process-substitution], [enable process substitution]), opt_process_subst=$enableval)
 AC_ARG_ENABLE(progcomp, AC_HELP_STRING([--enable-progcomp], [enable programmable completion and the complete builtin]), opt_progcomp=$enableval)
@@ -206,6 +235,8 @@ AC_ARG_ENABLE(readline, AC_HELP_STRING([--enable-readline], [turn on command lin
 AC_ARG_ENABLE(restricted, AC_HELP_STRING([--enable-restricted], [enable a restricted shell]), opt_restricted=$enableval)
 AC_ARG_ENABLE(select, AC_HELP_STRING([--enable-select], [include select command]), opt_select=$enableval)
 AC_ARG_ENABLE(separate-helpfiles, AC_HELP_STRING([--enable-separate-helpfiles], [use external files for help builtin documentation]), opt_separate_help=$enableval)
+AC_ARG_ENABLE(single-help-strings, AC_HELP_STRING([--enable-single-help-strings], [store help documentation as a single string to ease translation]), opt_single_longdoc_strings=$enableval)
+AC_ARG_ENABLE(strict-posix-default, AC_HELP_STRING([--enable-strict-posix-default], [configure bash to be posix-conformant by default]), opt_strict_posix=$enableval)
 AC_ARG_ENABLE(usg-echo-default, AC_HELP_STRING([--enable-usg-echo-default], [a synonym for --enable-xpg-echo-default]), opt_xpg_echo=$enableval)
 AC_ARG_ENABLE(xpg-echo-default, AC_HELP_STRING([--enable-xpg-echo-default], [make the echo builtin expand escape sequences by default]), opt_xpg_echo=$enableval)
 
@@ -259,11 +290,20 @@ fi
 if test $opt_xpg_echo = yes ; then
 AC_DEFINE(DEFAULT_ECHO_TO_XPG)
 fi
+if test $opt_strict_posix = yes; then
+AC_DEFINE(STRICT_POSIX)
+fi
 if test $opt_extended_glob = yes ; then
 AC_DEFINE(EXTENDED_GLOB)
 fi
 if test $opt_cond_command = yes ; then
 AC_DEFINE(COND_COMMAND)
+fi
+if test $opt_cond_regexp = yes ; then
+AC_DEFINE(COND_REGEXP)
+fi
+if test $opt_coproc = yes; then
+AC_DEFINE(COPROCESS_SUPPORT)
 fi
 if test $opt_arith_for_command = yes; then
 AC_DEFINE(ARITH_FOR_COMMAND)
@@ -273,6 +313,18 @@ AC_DEFINE(NETWORK_REDIRECTIONS)
 fi
 if test $opt_progcomp = yes; then
 AC_DEFINE(PROGRAMMABLE_COMPLETION)
+fi
+if test $opt_multibyte = no; then
+AC_DEFINE(NO_MULTIBYTE_SUPPORT)
+fi
+if test $opt_debugger = yes; then
+AC_DEFINE(DEBUGGER)
+fi
+if test $opt_casemod_attrs = yes; then
+AC_DEFINE(CASEMOD_ATTRS)
+fi
+if test $opt_casemod_expansions = yes; then
+AC_DEFINE(CASEMOD_EXPANSIONS)
 fi
 
 if test $opt_memscramble = yes; then
@@ -295,6 +347,10 @@ if test "$opt_separate_help" != no; then
 	HELPDIRDEFINE='-H ${HELPDIR}'
 	HELPINSTALL='install-help'
 fi
+HELPSTRINGS=
+if test "$opt_single_longdoc_strings" != "yes"; then
+	HELPSTRINGS='-S'
+fi
 
 dnl now substitute in the values generated by arguments
 AC_SUBST(TESTSCRIPT)
@@ -312,6 +368,7 @@ AC_SUBST(htmldir)
 AC_SUBST(HELPDIR)
 AC_SUBST(HELPDIRDEFINE)
 AC_SUBST(HELPINSTALL)
+AC_SUBST(HELPSTRINGS)
 
 echo ""
 echo "Beginning configuration for bash-$BASHVERS-$RELSTATUS for ${host_cpu}-${host_vendor}-${host_os}"
@@ -326,14 +383,12 @@ dnl test for Unix variants
 AC_ISC_POSIX
 AC_MINIX
 
-dnl test for non-Unix variants
-AC_CYGWIN
-AC_MINGW32
-
 AC_SYS_LARGEFILE
 
-dnl BEGIN changes for cross-building for cygwin and BeOS
+dnl BEGIN changes for cross-building (currently cygwin, minGW, and
+dnl (obsolete) BeOS)
 
+SIGNAMES_O=
 SIGNAMES_H=lsignames.h
 
 dnl load up the cross-building cache file -- add more cases and cache
@@ -343,15 +398,17 @@ dnl Note that host and target machine are the same, and different than the
 dnl build machine.
 dnl Set SIGNAMES_H based on whether or not we're cross-compiling.
 
+CROSS_COMPILE=
 if test "x$cross_compiling" = "xyes"; then
     case "${host}" in
     *-cygwin*)
 	cross_cache=${srcdir}/cross-build/cygwin32.cache
-	SIGNAMES_H='$(srcdir)/cross-build/win32sig.h'
+	;;
+    *-mingw*)
+	cross_cache=${srcdir}/cross-build/cygwin32.cache
 	;;
     i[[3456]]86-*-beos*)
 	cross_cache=${srcdir}/cross-build/x86-beos.cache
-	SIGNAMES_H='${srcdir}/cross-build/beos-sig.h'
 	;;
     *)	echo "configure: cross-compiling for $host is not supported" >&2
 	;;
@@ -361,8 +418,12 @@ if test "x$cross_compiling" = "xyes"; then
 	. ${cross_cache}
     fi
     unset cross_cache
+    SIGNAMES_O='signames.o'
+    CROSS_COMPILE='-DCROSS_COMPILING'
+    AC_SUBST(CROSS_COMPILE)
 fi
 AC_SUBST(SIGNAMES_H)
+AC_SUBST(SIGNAMES_O)
 
 if test -z "$CC_FOR_BUILD"; then
     if test "x$cross_compiling" = "xno"; then
@@ -403,7 +464,14 @@ if test "$opt_static_link" = yes; then
 	fi
 fi
 
-test -z "$CPPFLAGS_FOR_BUILD" && CPPFLAGS_FOR_BUILD="$CPPFLAGS"
+if test "X$cross_compiling" = "Xno"; then
+	CPPFLAGS_FOR_BUILD=${CPPFLAGS_FOR_BUILD-"$CPPFLAGS"}
+	LDFLAGS_FOR_BUILD=${LDFLAGS_FOR_BUILD-'$(LDFLAGS)'}
+else
+	CPPFLAGS_FOR_BUILD=${CPPFLAGS_FOR_BUILD-""}
+	LDFLAGS_FOR_BUILD=${LDFLAGS_FOR_BUILD-""}
+fi
+
 test -z "$CFLAGS_FOR_BUILD" && CFLAGS_FOR_BUILD="-g"
 
 AC_SUBST(CFLAGS)
@@ -430,7 +498,7 @@ then
 	RL_LIB_READLINE_VERSION
 
 	case "$ac_cv_rl_version" in
-	4.[[3-9]]*|5*|6*|7*|8*|9*)	;;
+	5*|6*|7*|8*|9*)	;;
 	*)	opt_with_installed_readline=no 
 		AC_MSG_WARN(installed readline library is too old to be linked with bash)
 		AC_MSG_WARN(using private bash version)
@@ -438,18 +506,36 @@ then
 	esac
 fi
 
+TILDE_LIB=-ltilde
 if test $opt_readline = yes; then
 	AC_DEFINE(READLINE)
-	READLINE_LIB=-lreadline
 	if test "$opt_with_installed_readline" != "no" ; then
-		case "$RL_INCLUDEDIR" in
-		/usr/include)	;;
-		*)		RL_INCLUDE='-I${RL_INCLUDEDIR}'
+		case "$opt_with_installed_readline" in
+		yes)	RL_INCLUDE= ;;
+		*)	case "$RL_INCLUDEDIR" in
+			/usr/include)	;;
+			*)		RL_INCLUDE='-I${RL_INCLUDEDIR}' ;;
+			esac
+			;;
 		esac
 		READLINE_DEP=
+		READLINE_LIB=-lreadline
+		# section for OS versions that don't allow unresolved symbols
+		# to be compiled into dynamic libraries.
+		case "$host_os" in
+		cygwin*)	TILDE_LIB= ;;
+		esac
 	else
 		RL_LIBDIR='$(dot)/$(LIBSUBDIR)/readline'
 		READLINE_DEP='$(READLINE_LIBRARY)'
+		# section for OS versions that ship an older/broken version of
+		# readline as a standard dynamic library and don't allow a
+		# static version specified as -llibname to override the
+		# dynamic version
+		case "${host_os}" in
+		darwin[[89]]*)	READLINE_LIB='${READLINE_LIBRARY}' ;;
+		*)		READLINE_LIB=-lreadline ;;
+		esac
 	fi
 else
 	RL_LIBDIR='$(dot)/$(LIBSUBDIR)/readline'
@@ -462,17 +548,29 @@ if test $opt_history = yes || test $opt_bang_history = yes; then
 	if test $opt_bang_history = yes; then
 		AC_DEFINE(BANG_HISTORY)
 	fi
-	HISTORY_LIB=-lhistory
  	if test "$opt_with_installed_readline" != "no"; then
 		HIST_LIBDIR=$RL_LIBDIR
 		HISTORY_DEP=
-		case "$RL_INCLUDEDIR" in
-		/usr/include)	;;
-		*)		RL_INCLUDE='-I${RL_INCLUDEDIR}'
+		HISTORY_LIB=-lhistory
+		case "$opt_with_installed_readline" in
+		yes)	RL_INCLUDE= ;;
+		*)	case "$RL_INCLUDEDIR" in
+			/usr/include)	;;
+			*)		RL_INCLUDE='-I${RL_INCLUDEDIR}' ;;
+			esac
+			;;
 		esac
 	else
 		HIST_LIBDIR='$(dot)/$(LIBSUBDIR)/readline'
 		HISTORY_DEP='$(HISTORY_LIBRARY)'
+		# section for OS versions that ship an older version of
+		# readline as a standard dynamic library and don't allow a
+		# static version specified as -llibname to override the
+		# dynamic version
+		case "${host_os}" in
+		darwin[[89]]*)	HISTORY_LIB='${HISTORY_LIBRARY}' ;;
+		*)		HISTORY_LIB=-lhistory ;;
+		esac
 	fi
 else
 	HIST_LIBDIR='$(dot)/$(LIBSUBDIR)/readline'
@@ -486,6 +584,7 @@ AC_SUBST(RL_INCLUDE)
 AC_SUBST(HISTORY_LIB)
 AC_SUBST(HISTORY_DEP)
 AC_SUBST(HIST_LIBDIR)
+AC_SUBST(TILDE_LIB)
 
 dnl END READLINE and HISTORY LIBRARY SECTION
 
@@ -505,6 +604,28 @@ opennt*|interix*)	MAKE_SHELL="$INTERIX_ROOT/bin/sh" ;;
 esac
 AC_SUBST(MAKE_SHELL)
 
+dnl this is similar to the expanded AC_PROG_RANLIB
+if test x$SIZE = x; then
+	if test x$ac_tool_prefix = x; then
+		SIZE=size
+	else
+		SIZE=${ac_tool_prefix}size
+		save_IFS=$IFS ; IFS=:
+		size_found=0
+		for dir in $PATH; do
+			if test -x $dir/$SIZE ; then
+				size_found=1
+				break
+			fi
+		done
+		if test $size_found -eq 0; then
+			SIZE=:
+		fi
+		IFS=$save_IFS
+	fi
+fi
+AC_SUBST(SIZE)
+
 dnl Turn on any extensions available in the GNU C library.
 AC_DEFINE(_GNU_SOURCE, 1)
 
@@ -516,6 +637,11 @@ AC_C_STRINGIZE
 AC_C_LONG_DOUBLE
 AC_C_PROTOTYPES
 AC_C_CHAR_UNSIGNED
+AC_C_VOLATILE
+AC_C_RESTRICT
+
+dnl initialize GNU gettext
+AM_GNU_GETTEXT([no-libtool], [need-ngettext], [lib/intl])
 
 dnl header files
 AC_HEADER_DIRENT
@@ -525,11 +651,19 @@ BASH_HEADER_INTTYPES
 
 AC_CHECK_HEADERS(unistd.h stdlib.h stdarg.h varargs.h limits.h string.h \
 		 memory.h locale.h termcap.h termio.h termios.h dlfcn.h \
-		 stddef.h stdint.h netdb.h grp.h strings.h)
-AC_CHECK_HEADERS(sys/ptem.h sys/pte.h sys/stream.h sys/select.h sys/file.h \
-		 sys/resource.h sys/param.h sys/socket.h \
-		 sys/time.h sys/times.h sys/wait.h)
+		 stddef.h stdint.h netdb.h pwd.h grp.h strings.h regex.h)
+AC_CHECK_HEADERS(sys/pte.h sys/stream.h sys/select.h sys/file.h \
+		 sys/resource.h sys/param.h sys/socket.h sys/stat.h \
+		 sys/time.h sys/times.h sys/types.h sys/wait.h)
 AC_CHECK_HEADERS(netinet/in.h arpa/inet.h)
+
+dnl sys/ptem.h requires definitions from sys/stream.h on systems where it
+dnl exists
+AC_CHECK_HEADER(sys/ptem.h, , ,[[
+#if HAVE_SYS_STREAM_H
+#  include <sys/stream.h>
+#endif
+]])
 
 dnl special checks for libc functions
 AC_FUNC_ALLOCA
@@ -572,33 +706,56 @@ dnl checks for certain version-specific system calls and libc functions
 AC_CHECK_FUNC(__setostype, AC_DEFINE(HAVE_SETOSTYPE))
 AC_CHECK_FUNC(wait3, AC_DEFINE(HAVE_WAIT3))
 AC_CHECK_FUNC(isinf, AC_DEFINE(HAVE_ISINF_IN_LIBC))
+AC_CHECK_FUNC(isnan, AC_DEFINE(HAVE_ISNAN_IN_LIBC))
 
 dnl checks for missing libc functions
 AC_CHECK_FUNC(mkfifo,AC_DEFINE(HAVE_MKFIFO),AC_DEFINE(MKFIFO_MISSING))
 
 dnl checks for system calls
-AC_CHECK_FUNCS(dup2 select getdtablesize getgroups gethostname \
-		setdtablesize getpagesize killpg lstat getpeername sbrk \
-		getrlimit getrusage gettimeofday waitpid tcgetpgrp \
-		readlink)
+AC_CHECK_FUNCS(dup2 eaccess fcntl getdtablesize getgroups gethostname \
+		getpagesize getpeername getrlimit getrusage gettimeofday \
+		kill killpg lstat readlink sbrk select setdtablesize \
+		setitimer tcgetpgrp uname ulimit waitpid)
 AC_REPLACE_FUNCS(rename)
 
 dnl checks for c library functions
-AC_CHECK_FUNCS(bcopy bzero confstr sysconf pathconf setenv putenv unsetenv \
-		setlinebuf setvbuf setlocale strchr tcgetattr uname \
-		ulimit tzset siginterrupt memmove ttyname times \
+AC_CHECK_FUNCS(bcopy bzero confstr fnmatch \
 		getaddrinfo gethostbyname getservbyname getservent inet_aton \
-		vsnprintf snprintf vasprintf asprintf fnmatch)
+		memmove pathconf putenv raise regcomp regexec \
+		setenv setlinebuf setlocale setvbuf siginterrupt strchr \
+		sysconf tcgetattr times ttyname tzset unsetenv)
+
+AC_CHECK_FUNCS(vsnprintf snprintf vasprintf asprintf)
 AC_CHECK_FUNCS(isascii isblank isgraph isprint isspace isxdigit)
-AC_REPLACE_FUNCS(getcwd strcasecmp strerror strftime strpbrk memset)
+AC_CHECK_FUNCS(getpwent getpwnam getpwuid)
+AC_REPLACE_FUNCS(getcwd memset strcasecmp strerror strftime strnlen strpbrk strstr)
 AC_REPLACE_FUNCS(strtod strtol strtoul strtoll strtoull strtoimax strtoumax)
+AC_REPLACE_FUNCS(fdprintf)
 
 AC_CHECK_DECLS([confstr])
 AC_CHECK_DECLS([printf])
 AC_CHECK_DECLS([sbrk])
+AC_CHECK_DECLS([setregid])
 AC_CHECK_DECLS([strcpy])
 AC_CHECK_DECLS([strsignal])
-AC_CHECK_DECLS([strtold])
+
+dnl Extra test to detect the horribly broken HP/UX 11.00 strtold(3)
+AC_CHECK_DECLS([strtold], [
+    AC_MSG_CHECKING([for broken strtold])
+    AC_CACHE_VAL(bash_cv_strtold_broken,
+	[AC_TRY_COMPILE(
+	    [#include <stdlib.h>],
+	    [int main() { long double r; char *foo, bar; r = strtold(foo, &bar);}],
+	    bash_cv_strtold_broken=no, bash_cv_strtold_broken=yes,
+	    [AC_MSG_WARN(cannot check for broken strtold if cross-compiling, defaulting to no)])
+	]
+    )
+    AC_MSG_RESULT($bash_cv_strtold_broken)
+    if test "$bash_cv_strtold_broken" = "yes" ; then
+	AC_DEFINE(STRTOLD_BROKEN)
+    fi
+])
+    
 
 BASH_CHECK_DECL(strtoimax)
 BASH_CHECK_DECL(strtol)
@@ -609,22 +766,31 @@ BASH_CHECK_DECL(strtoumax)
 
 AC_FUNC_MKTIME
 
-dnl checks for locale functions
-AC_CHECK_HEADERS(libintl.h)
-AC_CHECK_FUNCS(gettext textdomain bindtextdomain)
+dnl
+dnl Checks for lib/intl and related code (uses some of the output from
+dnl AM_GNU_GETTEXT)
+dnl
 
-dnl check for GNU libintl if gettext/textdomain/bindtextdomain
-dnl are not found in libc
-if test "$ac_cv_func_bindtextdomain" = "no"; then
-    AC_CHECK_LIB(intl,bindtextdomain)
-    if test "$ac_cv_lib_intl_bindtextdomain" = "yes"; then
-	dnl undo caching
-	unset ac_cv_func_gettext
-	unset ac_cv_func_textdomain
-	unset ac_cv_func_bindtextdomain
-	AC_CHECK_FUNCS(gettext textdomain bindtextdomain)
-    fi
+AC_CHECK_HEADERS([argz.h errno.h fcntl.h malloc.h stdio_ext.h])
+
+dnl AC_FUNC_MALLOC
+AC_FUNC_MMAP
+AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify dcgettext mempcpy \
+		munmap stpcpy strcspn strdup])
+
+INTL_DEP= INTL_INC= LIBINTL_H=
+if test "x$USE_INCLUDED_LIBINTL" = "xyes"; then
+	INTL_DEP='${INTL_LIBDIR}/libintl.a'
+	INTL_INC='-I${INTL_LIBSRC} -I${INTL_BUILDDIR}'
+	LIBINTL_H='${INTL_BUILDDIR}/libintl.h'
 fi
+AC_SUBST(INTL_DEP)
+AC_SUBST(INTL_INC)
+AC_SUBST(LIBINTL_H)
+
+dnl
+dnl End of checks needed by files in lib/intl
+dnl
 
 BASH_CHECK_MULTIBYTE
 
@@ -634,7 +800,7 @@ AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_FUNCS(dlopen dlclose dlsym)
 fi
 
-dnl this defines SYS_SIGLIST_DECLARED
+dnl this defines HAVE_DECL_SYS_SIGLIST
 AC_DECL_SYS_SIGLIST
 
 dnl libraries
@@ -673,6 +839,7 @@ BASH_TYPE_LONG_LONG
 BASH_TYPE_UNSIGNED_LONG_LONG
 
 AC_TYPE_SIGNAL
+BASH_TYPE_SIG_ATOMIC_T
 
 AC_CHECK_SIZEOF(char, 1)
 AC_CHECK_SIZEOF(short, 2)
@@ -708,6 +875,7 @@ BASH_FUNC_LSTAT
 fi
 
 dnl behavior of system calls and library functions
+BASH_FUNC_CTYPE_NONASCII
 BASH_FUNC_DUP2_CLOEXEC_CHECK
 BASH_SYS_PGRP_SYNC
 BASH_SYS_SIGNAL_VINTAGE
@@ -734,16 +902,19 @@ BASH_STRUCT_TERMIOS_LDISC
 BASH_STRUCT_TERMIO_LDISC
 BASH_STRUCT_DIRENT_D_INO
 BASH_STRUCT_DIRENT_D_FILENO
+BASH_STRUCT_DIRENT_D_NAMLEN
 BASH_STRUCT_WINSIZE
 BASH_STRUCT_TIMEVAL
 AC_CHECK_MEMBERS([struct stat.st_blocks])
 AC_STRUCT_TM
 AC_STRUCT_TIMEZONE
+BASH_STRUCT_TIMEZONE
 
 dnl presence and behavior of C library functions
 BASH_FUNC_STRSIGNAL
 BASH_FUNC_OPENDIR_CHECK
 BASH_FUNC_ULIMIT_MAXFDS
+BASH_FUNC_FPURGE
 BASH_FUNC_GETENV
 if test "$ac_cv_func_getcwd" = "yes"; then
 BASH_FUNC_GETCWD
@@ -765,18 +936,6 @@ else
 AC_DEFINE(HAVE_STD_UNSETENV)
 fi
 
-dnl I have removed this check.  The existing libc FNM_EXTMATCH implementation
-dnl (glibc-2.2.4) disagrees with bash on the matching of incorrectly-formed
-dnl patterns (bash treats them as strings or characters to be matched without
-dnl any special meaning) and has one outright bug:  a[X-]b should match
-dnl both a-b and aXb.
-dnl
-dnl Once Ulrich and I get together on this, the check can return
-dnl
-dnl chet 10/31/2001
-dnl
-dnl BASH_FUNC_FNMATCH_EXTMATCH
-
 BASH_FUNC_PRINTF_A_FORMAT
 
 dnl presence and behavior of OS functions
@@ -788,6 +947,8 @@ dnl presence of certain CPP defines
 AC_HEADER_TIOCGWINSZ
 BASH_HAVE_TIOCSTAT
 BASH_HAVE_FIONREAD
+
+BASH_CHECK_WCONTINUED
 
 dnl miscellaneous
 BASH_CHECK_SPEED_T
@@ -833,7 +994,7 @@ dnl like glob and readline
 LOCAL_DEFS=-DSHELL
 
 dnl use this section to possibly define more cpp variables, specify local
-dnl libraries, and specify any additional local cc flags
+dnl libraries, and specify any additional local cc or ld flags
 dnl
 dnl this should really go away someday
 
@@ -852,13 +1013,21 @@ sco3.2v5*)	LOCAL_CFLAGS="-b elf -DWAITPID_BROKEN -DPATH_MAX=1024" ;;
 sco3.2v4*)	LOCAL_CFLAGS="-DMUST_UNBLOCK_CHLD -DPATH_MAX=1024" ;;
 sco3.2*)	LOCAL_CFLAGS=-DMUST_UNBLOCK_CHLD ;;
 sunos4*)	LOCAL_CFLAGS=-DSunOS4 ;;
-solaris2.5*)	LOCAL_CFLAGS=-DSunOS5 ;;
+solaris2.5*)	LOCAL_CFLAGS="-DSunOS5 -DSOLARIS" ;;
+solaris2.8*)	LOCAL_CFLAGS=-DSOLARIS  ;;
+solaris2.9*)	LOCAL_CFLAGS=-DSOLARIS  ;;
+solaris2.10*)	LOCAL_CFLAGS=-DSOLARIS  ;;
+solaris2*)	LOCAL_CFLAGS=-DSOLARIS ;;
 lynxos*)	LOCAL_CFLAGS=-DRECYCLES_PIDS ;;
-linux*)		LOCAL_LDFLAGS=-rdynamic ;;	 # allow dynamic loading
+linux*)		LOCAL_LDFLAGS=-rdynamic		 # allow dynamic loading
+		case "`uname -r`" in
+		2.[[456789]]*|3*)	AC_DEFINE(PGRP_PIPE) ;;
+		esac ;;
+*qnx6*)		LOCAL_CFLAGS="-Dqnx -Dqnx6" LOCAL_LIBS="-lncurses" ;;
 *qnx*)		LOCAL_CFLAGS="-Dqnx -F -3s" LOCAL_LDFLAGS="-3s" LOCAL_LIBS="-lunix -lncurses" ;;
 powerux*)	LOCAL_LIBS="-lgen" ;;
-cygwin*)	LOCAL_LIBS="-luser32" ;;
-opennt*|interix*) LOCAL_CFLAGS="-DNO_MAIN_ENV_ARG -DBROKEN_DIRENT_D_INO" ;;
+cygwin*)	LOCAL_CFLAGS=-DRECYCLES_PIDS ;;
+opennt*|interix*) LOCAL_CFLAGS="-DNO_MAIN_ENV_ARG -DBROKEN_DIRENT_D_INO -D_POSIX_SOURCE" ;;
 esac
 
 dnl Stanza for OS/compiler pair-specific flags
@@ -875,6 +1044,7 @@ freebsd[[3-9]]*)
 			LOCAL_LDFLAGS=-rdynamic # allow dynamic loading
 		fi ;;
 freebsdelf*)	LOCAL_LDFLAGS=-rdynamic ;;	# allow dynamic loading
+dragonfly*)	LOCAL_LDFLAGS=-rdynamic ;;	# allow dynamic loading
 esac
 
 case "$host_cpu" in
@@ -924,11 +1094,26 @@ case "$srcdir" in
 esac
 
 BUILD_DIR=`pwd`
+case "$BUILD_DIR" in
+*\ *)	BUILD_DIR=`echo "$BUILD_DIR" | sed 's: :\\\\ :g'` ;;
+*)	;;
+esac
+
+if test -z "$localedir"; then
+	localedir='${datarootdir}/locale'
+fi
+if test -z "$datarootdir"; then
+	datarootdir='${prefix}/share'
+fi
 
 AC_SUBST(PROFILE_FLAGS)
 
 AC_SUBST(incdir)
 AC_SUBST(BUILD_DIR)
+
+# Some versions of autoconf don't substitute these automatically
+AC_SUBST(datarootdir)
+AC_SUBST(localedir)
 
 AC_SUBST(YACC)
 AC_SUBST(AR)
@@ -952,8 +1137,9 @@ AC_SUBST(LOCAL_DEFS)
 #AC_SUBST(ALLOCA_OBJECT)
 
 AC_OUTPUT([Makefile builtins/Makefile lib/readline/Makefile lib/glob/Makefile \
+	  lib/intl/Makefile \
 	  lib/malloc/Makefile lib/sh/Makefile lib/termcap/Makefile \
-	  lib/tilde/Makefile doc/Makefile support/Makefile \
+	  lib/tilde/Makefile doc/Makefile support/Makefile po/Makefile.in \
 	  examples/loadables/Makefile examples/loadables/perl/Makefile],
 [
 # Makefile uses this timestamp file to record whether config.h is up to date.

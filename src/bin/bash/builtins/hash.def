@@ -1,39 +1,47 @@
 This file is hash.def, from which is created hash.c.
 It implements the builtin "hash" in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES hash.c
 
 $BUILTIN hash
 $FUNCTION hash_builtin
 $SHORT_DOC hash [-lr] [-p pathname] [-dt] [name ...]
-For each NAME, the full pathname of the command is determined and
-remembered.  If the -p option is supplied, PATHNAME is used as the
-full pathname of NAME, and no path search is performed.  The -r
-option causes the shell to forget all remembered locations.  The -d
-option causes the shell to forget the remembered location of each NAME.
-If the -t option is supplied the full pathname to which each NAME
-corresponds is printed.  If multiple NAME arguments are supplied with
--t, the NAME is printed before the hashed full pathname.  The -l option
-causes output to be displayed in a format that may be reused as input.
-If no arguments are given, information about remembered commands is displayed.
+Remember or display program locations.
+
+Determine and remember the full pathname of each command NAME.  If
+no arguments are given, information about remembered commands is displayed.
+
+Options:
+  -d		forget the remembered location of each NAME
+  -l		display in a format that may be reused as input
+  -p pathname	use PATHNAME is the full pathname of NAME
+  -r		forget all remembered locations
+  -t		print the remembered location of each NAME, preceding
+		each location with the corresponding NAME if multiple
+		NAMEs are given
+Arguments:
+  NAME		Each NAME is searched for in $PATH and added to the list
+		of remembered commands.
+
+Exit Status:
+Returns success unless NAME is not found or an invalid option is given.
 $END
 
 #include <config.h>
@@ -49,6 +57,7 @@ $END
 #include <errno.h>
 
 #include "../bashansi.h"
+#include "../bashintl.h"
 
 #include "../shell.h"
 #include "../builtins.h"
@@ -58,6 +67,7 @@ $END
 #include "common.h"
 #include "bashgetopt.h"
 
+extern int posixly_correct;
 extern int dot_found_in_search;
 extern char *this_command_name;
 
@@ -79,7 +89,7 @@ hash_builtin (list)
 
   if (hashing_enabled == 0)
     {
-      builtin_error ("hashing disabled");
+      builtin_error (_("hashing disabled"));
       return (EXECUTION_FAILURE);
     }
 
@@ -123,8 +133,9 @@ hash_builtin (list)
      we test expunge_hash_table. */
   if (list == 0 && expunge_hash_table == 0)
     {
-      if (print_hashed_commands (list_portably) == 0)
-	printf ("%s: hash table empty\n", this_command_name);
+      opt = print_hashed_commands (list_portably);
+      if (opt == 0 && posixly_correct == 0)
+	printf (_("%s: hash table empty\n"), this_command_name);
 
       return (EXECUTION_SUCCESS);
     }
@@ -155,7 +166,7 @@ hash_builtin (list)
 #ifdef EISDIR
 	      builtin_error ("%s: %s", pathname, strerror (EISDIR));
 #else
-	      builtin_error ("%s: is a directory", pathname);
+	      builtin_error (_("%s: is a directory"), pathname);
 #endif
 	      opt = EXECUTION_FAILURE;
 	    }
@@ -164,10 +175,13 @@ hash_builtin (list)
 	}
       else if (absolute_program (w))
 	continue;
-      else if (delete && phash_remove (w))
+      else if (delete)
 	{
-	  sh_notfound (w);
-	  opt = EXECUTION_FAILURE;
+	  if (phash_remove (w))
+	    {
+	      sh_notfound (w);
+	      opt = EXECUTION_FAILURE;
+	    }
 	}
       else if (add_hashed_command (w, 0))
 	opt = EXECUTION_FAILURE;
@@ -227,7 +241,7 @@ print_hashed_commands (fmt)
     return (0);
 
   if (fmt == 0)
-    printf ("hits\tcommand\n");
+    printf (_("hits\tcommand\n"));
   hash_walk (hashed_filenames, fmt ? print_portable_hash_info : print_hash_info);
   return (1);
 }

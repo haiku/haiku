@@ -1,23 +1,23 @@
 /* flags.h -- a list of all the flags that the shell knows about.  You add
    a flag to this program by adding the name here, and in flags.c. */
 
-/* Copyright (C) 1993 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #if !defined (_FLAGS_H_)
 #define _FLAGS_H_
@@ -37,7 +37,7 @@ struct flags_alist {
   int *value;
 };
 
-extern struct flags_alist shell_flags[];
+extern const struct flags_alist shell_flags[];
 extern char optflags[];
 
 extern int
@@ -46,7 +46,8 @@ extern int
   just_one_command, unbound_vars_is_error, echo_input_at_read,
   echo_command_at_execute, no_invisible_vars, noclobber,
   hashing_enabled, forced_interactive, privileged_mode,
-  asynchronous_notification, interactive_comments, no_symbolic_links;
+  asynchronous_notification, interactive_comments, no_symbolic_links,
+  function_trace_mode, error_trace_mode, pipefail_opt;
 
 #if 0
 extern int lexical_scoping;

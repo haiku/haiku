@@ -1,25 +1,22 @@
-/* config-top.h */
+/* config-top.h - various user-settable options not under the control of autoconf. */
 
-/* This contains various user-settable options not under the control of
-   autoconf. */
-
-/* Copyright (C) 2002 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /* Define CONTINUE_AFTER_KILL_ERROR if you want the kill command to
    continue processing arguments after one of them fails.  This is
@@ -46,8 +43,13 @@
 #define V9_ECHO
 
 /* Define DONT_REPORT_SIGPIPE if you don't want to see `Broken pipe' messages
-   when a job like `cat jobs.c | exit 1' is executed. */
-/* #define DONT_REPORT_SIGPIPE */
+   when a job like `cat jobs.c | exit 1' terminates due to a SIGPIPE. */
+#define DONT_REPORT_SIGPIPE
+
+/* Define DONT_REPORT_BROKEN_PIPE_WRITE_ERRORS if you don't want builtins
+   like `echo' and `printf' to report errors when output does not succeed
+   due to EPIPE. */
+/* #define DONT_REPORT_BROKEN_PIPE_WRITE_ERRORS */
 
 /* The default value of the PATH variable. */
 #ifndef DEFAULT_PATH_VALUE
@@ -59,7 +61,7 @@
    the Posix.2 confstr () function, or CS_PATH define are not present. */
 #ifndef STANDARD_UTILS_PATH
 #define STANDARD_UTILS_PATH \
-  "/bin:/usr/bin:/usr/ucb:/sbin:/usr/sbin:/etc:/usr/etc"
+  "/bin:/usr/bin:/sbin:/usr/sbin:/etc:/usr/etc"
 #endif
 
 /* Default primary and secondary prompt strings. */
@@ -83,5 +85,16 @@
 /* #define NON_INTERACTIVE_LOGIN_SHELLS */
 
 /* Define this if you want bash to try to check whether it's being run by
-   sshd and source the .bashrc if so (like the rshd behavior). */
+   sshd and source the .bashrc if so (like the rshd behavior).  This checks
+   for the presence of SSH_CLIENT or SSH2_CLIENT in the initial environment,
+   which can be fooled under certain not-uncommon circumstances. */
 /* #define SSH_SOURCE_BASHRC */
+
+/* Define if you want the case-capitalizing operators (~[~]) and the
+   `capcase' variable attribute (declare -c). */
+#define  CASEMOD_CAPCASE
+
+/* This is used as the name of a shell function to call when a command
+   name is not found.  If you want to name it something other than the
+   default ("command_not_found_handle"), change it here. */
+/* #define NOTFOUND_HOOK "command_not_found_handle" */

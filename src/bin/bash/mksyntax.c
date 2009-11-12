@@ -2,23 +2,23 @@
  * mksyntax.c - construct shell syntax table for fast char attribute lookup.
  */
 
-/* Copyright (C) 2000 Free Software Foundation, Inc.
+/* Copyright (C) 2000-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "config.h"
 
@@ -62,6 +62,7 @@ struct wordflag {
 	{ CXQUOTE,	"CXQUOTE" },
 	{ CSPECVAR,	"CSPECVAR" },
 	{ CSUBSTOP,	"CSUBSTOP" },
+	{ CBLANK,	"CBLANK" },
 };
 	
 #define N_WFLAGS	(sizeof (wordflags) / sizeof (wordflags[0]))
@@ -78,6 +79,7 @@ char	preamble[] = "\
 \n";
 
 char	includes[] = "\
+#include \"config.h\"\n\
 #include \"stdc.h\"\n\
 #include \"syntax.h\"\n\n";
 
@@ -128,8 +130,13 @@ cdesc (i)
     
   switch (i)
     {
+#ifdef __STDC__
     case '\a': xbuf[1] = 'a'; break;
     case '\v': xbuf[1] = 'v'; break;
+#else
+    case '\007': xbuf[1] = 'a'; break;
+    case 0x0B: xbuf[1] = 'v'; break;
+#endif
     case '\b': xbuf[1] = 'b'; break;
     case '\f': xbuf[1] = 'f'; break;
     case '\n': xbuf[1] = 'n'; break;
@@ -190,6 +197,22 @@ addcchar (c, flag)
   lsyntax[c] |= flag;
 }
 
+static void
+addblanks ()
+{
+  register int i;
+  unsigned char uc;
+
+  for (i = 0; i < SYNSIZE; i++)
+    {
+      uc = i;
+      /* Since we don't call setlocale(), this defaults to the "C" locale, and
+	 the default blank characters will be space and tab. */
+      if (isblank (uc))
+	lsyntax[uc] |= CBLANK;
+    }
+}
+
 /* load up the correct flag values in lsyntax */
 static void
 load_lsyntax ()
@@ -224,6 +247,8 @@ load_lsyntax ()
   addcstr ("@*#?-$!", CSPECVAR);	/* omits $0...$9 and $_ */
 
   addcstr ("-=?+", CSUBSTOP);		/* OP in ${paramOPword} */
+
+  addblanks ();
 }
 
 static void
@@ -270,7 +295,8 @@ dump_lsyntax (fp)
 {
   int i;
 
-  fprintf (fp, "const int sh_syntaxtab[%d] = {\n", SYNSIZE);
+  fprintf (fp, "int sh_syntabsiz = %d;\n", SYNSIZE);
+  fprintf (fp, "int sh_syntaxtab[%d] = {\n", SYNSIZE);
 
   for (i = 0; i < SYNSIZE; i++)
     {

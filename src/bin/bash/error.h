@@ -1,22 +1,22 @@
 /* error.h -- External declarations of functions appearing in error.c. */
 
-/* Copyright (C) 1993 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #if !defined (_ERROR_H_)
 #define _ERROR_H_
@@ -50,8 +50,9 @@ extern void internal_error __P((const char *, ...))  __attribute__((__format__ (
 /* Report an internal warning. */
 extern void internal_warning __P((const char *, ...))  __attribute__((__format__ (printf, 1, 2)));
 
-/* Debugging function, not enabled in released version. */
+/* Debugging functions, not enabled in released version. */
 extern void itrace __P((const char *, ...)) __attribute__ ((__format__ (printf, 1, 2)));
+extern void trace __P((const char *, ...)) __attribute__ ((__format__ (printf, 1, 2)));
 
 /* Report an error having to do with command parsing or execution. */
 extern void command_error __P((const char *, int, int, int));

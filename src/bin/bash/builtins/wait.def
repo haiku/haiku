@@ -1,44 +1,54 @@
 This file is wait.def, from which is created wait.c.
 It implements the builtin "wait" in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $BUILTIN wait
 $FUNCTION wait_builtin
 $DEPENDS_ON JOB_CONTROL
 $PRODUCES wait.c
-$SHORT_DOC wait [n]
-Wait for the specified process and report its termination status.  If
-N is not given, all currently active child processes are waited for,
-and the return code is zero.  N may be a process ID or a job
-specification; if a job spec is given, all processes in the job's
-pipeline are waited for.
+$SHORT_DOC wait [id]
+Wait for job completion and return exit status.
+
+Waits for the process identified by ID, which may be a process ID or a
+job specification, and reports its termination status.  If ID is not
+given, waits for all currently active child processes, and the return
+status is zero.  If ID is a a job specification, waits for all processes
+in the job's pipeline.
+
+Exit Status:
+Returns the status of ID; fails if ID is invalid or an invalid option is
+given.
 $END
 
 $BUILTIN wait
 $FUNCTION wait_builtin
 $DEPENDS_ON !JOB_CONTROL
-$SHORT_DOC wait [n]
-Wait for the specified process and report its termination status.  If
-N is not given, all currently active child processes are waited for,
-and the return code is zero.  N is a process ID; if it is not given,
-all child processes of the shell are waited for.
+$SHORT_DOC wait [pid]
+Wait for process completion and return exit status.
+
+Waits for the specified process and reports its termination status.  If
+PID is not given, all currently active child processes are waited for,
+and the return code is zero.  PID must be a process ID.
+
+Exit Status:
+Returns the status of ID; fails if ID is invalid or an invalid option is
+given.
 $END
 
 #include <config.h>
@@ -59,7 +69,6 @@ $END
 #include "common.h"
 #include "bashgetopt.h"
 
-extern int interrupt_immediately;
 extern int wait_signal_received;
 
 procenv_t wait_intr_buf;
@@ -141,7 +150,7 @@ wait_builtin (list)
 	    }
 	}
 #if defined (JOB_CONTROL)
-      else if (job_control && *w)
+      else if (*w && *w == '%')
 	/* Must be a job spec.  Check it out. */
 	{
 	  int job;
@@ -150,7 +159,7 @@ wait_builtin (list)
 	  BLOCK_CHILD (set, oset);
 	  job = get_job_spec (list);
 
-	  if (job < 0 || job >= job_slots || !jobs[job])
+	  if (INVALID_JOB (job))
 	    {
 	      if (job != DUP_JOB)
 		sh_badjob (list->word->word);
@@ -163,12 +172,6 @@ wait_builtin (list)
 	  /* Job spec used.  Wait for the last pid in the pipeline. */
 	  UNBLOCK_CHILD (oset);
 	  status = wait_for_job (job);
-	}
-      else if (job_control == 0 && *w == '%')
-	{
-	  /* can't use jobspecs as arguments if job control is not active. */
-	  sh_nojobs ((char *)NULL);
-	  status = EXECUTION_FAILURE;
 	}
 #endif /* JOB_CONTROL */
       else

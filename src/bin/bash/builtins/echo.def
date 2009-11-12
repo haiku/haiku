@@ -1,23 +1,22 @@
 This file is echo.def, from which is created echo.c.
 It implements the builtin "echo" in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES echo.c
 #include <config.h>
@@ -31,34 +30,54 @@ $PRODUCES echo.c
 #include <stdio.h>
 #include "../shell.h"
 
+#include "common.h"
+
 $BUILTIN echo
 $FUNCTION echo_builtin
 $DEPENDS_ON V9_ECHO
 $SHORT_DOC echo [-neE] [arg ...]
-Output the ARGs.  If -n is specified, the trailing newline is
-suppressed.  If the -e option is given, interpretation of the
-following backslash-escaped characters is turned on:
-	\a	alert (bell)
-	\b	backspace
-	\c	suppress trailing newline
-	\E	escape character
-	\f	form feed
-	\n	new line
-	\r	carriage return
-	\t	horizontal tab
-	\v	vertical tab
-	\\	backslash
-	\num	the character whose ASCII code is NUM (octal).
+Write arguments to the standard output.
 
-You can explicitly turn off the interpretation of the above characters
-with the -E option.
+Display the ARGs on the standard output followed by a newline.
+
+Options:
+  -n	do not append a newline
+  -e	enable interpretation of the following backslash escapes
+  -E	explicitly suppress interpretation of backslash escapes
+
+`echo' interprets the following backslash-escaped characters:
+  \a	alert (bell)
+  \b	backspace
+  \c	suppress further output
+  \e	escape character
+  \f	form feed
+  \n	new line
+  \r	carriage return
+  \t	horizontal tab
+  \v	vertical tab
+  \\	backslash
+  \0nnn	the character whose ASCII code is NNN (octal).  NNN can be
+	0 to 3 octal digits
+  \xHH	the eight-bit character whose value is HH (hexadecimal).  HH
+	can be one or two hex digits
+
+Exit Status:
+Returns success unless a write error occurs.
 $END
 
 $BUILTIN echo
 $FUNCTION echo_builtin
 $DEPENDS_ON !V9_ECHO
 $SHORT_DOC echo [-n] [arg ...]
-Output the ARGs.  If -n is specified, the trailing newline is suppressed.
+Write arguments to the standard output.
+
+Display the ARGs on the standard output followed by a newline.
+
+Options:
+  -n	do not append a newline
+
+Exit Status:
+Returns success unless a write error occurs.
 $END
 
 #if defined (V9_ECHO)
@@ -72,11 +91,13 @@ $END
    existing system shells won't barf.  Regrettably, the SUS v2 has
    standardized the Sys V echo behavior.  This variable is external
    so that we can have a `shopt' variable to control it at runtime. */
-#if defined (DEFAULT_ECHO_TO_XPG)
+#if defined (DEFAULT_ECHO_TO_XPG) || defined (STRICT_POSIX)
 int xpg_echo = 1;
 #else
 int xpg_echo = 0;
 #endif /* DEFAULT_ECHO_TO_XPG */
+
+extern int posixly_correct;
 
 /* Print the words in LIST to standard output.  If the first word is
    `-n', then don't print a trailing newline.  We also support the
@@ -90,6 +111,9 @@ echo_builtin (list)
 
   do_v9 = xpg_echo;
   display_return = 1;
+
+  if (posixly_correct && xpg_echo)
+    goto just_echo;
 
   for (; list && (temp = list->word->word) && *temp == '-'; list = list->next)
     {
@@ -133,6 +157,9 @@ echo_builtin (list)
 
 just_echo:
 
+  clearerr (stdout);	/* clear error before writing and testing success */
+
+  terminate_immediately++;
   while (list)
     {
       i = len = 0;
@@ -165,11 +192,7 @@ just_echo:
 
   if (display_return)
     putchar ('\n');
-  fflush (stdout);
-  if (ferror (stdout))
-    {
-      clearerr (stdout);
-      return (EXECUTION_FAILURE);
-    }
-  return (EXECUTION_SUCCESS);
+
+  terminate_immediately--;
+  return (sh_chkwrite (EXECUTION_SUCCESS));
 }

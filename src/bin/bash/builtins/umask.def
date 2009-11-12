@@ -1,43 +1,49 @@
 This file is umask.def, from which is created umask.c.
 It implements the builtin "umask" in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES umask.c
 
 $BUILTIN umask
 $FUNCTION umask_builtin
 $SHORT_DOC umask [-p] [-S] [mode]
-The user file-creation mask is set to MODE.  If MODE is omitted, or if
-`-S' is supplied, the current value of the mask is printed.  The `-S'
-option makes the output symbolic; otherwise an octal number is output.
-If `-p' is supplied, and MODE is omitted, the output is in a form
-that may be used as input.  If MODE begins with a digit, it is
-interpreted as an octal number, otherwise it is a symbolic mode string
-like that accepted by chmod(1).
+Display or set file mode mask.
+
+Sets the user file-creation mask to MODE.  If MODE is omitted, prints
+the current value of the mask.
+
+If MODE begins with a digit, it is interpreted as an octal number;
+otherwise it is a symbolic mode string like that accepted by chmod(1).
+
+Options:
+  -p	if MODE is omitted, output in a form that may be reused as input
+  -S	makes the output symbolic; otherwise an octal number is output
+
+Exit Status:
+Returns success unless MODE is invalid or an invalid option is given.
 $END
 
 #include <config.h>
 
 #include "../bashtypes.h"
 #include "filecntl.h"
-#if defined (HAVE_SYS_FILE_H)
+#if ! defined(_MINIX) && defined (HAVE_SYS_FILE_H)
 #  include <sys/file.h>
 #endif
 
@@ -47,6 +53,8 @@ $END
 
 #include <stdio.h>
 #include <chartypes.h>
+
+#include "../bashintl.h"
 
 #include "../shell.h"
 #include "posixstat.h"
@@ -107,7 +115,7 @@ umask_builtin (list)
 	     is lousy. */
 	  if (umask_value == -1)
 	    {
-	      sh_erange (list->word->word, "octal number");
+	      sh_erange (list->word->word, _("octal number"));
 	      return (EXECUTION_FAILURE);
 	    }
 	}
@@ -135,8 +143,7 @@ umask_builtin (list)
 	printf ("%04lo\n", (unsigned long)umask_arg);
     }
 
-  fflush (stdout);
-  return (EXECUTION_SUCCESS);
+  return (sh_chkwrite (EXECUTION_SUCCESS));
 }
 
 /* Print the umask in a symbolic form.  In the output, a letter is
@@ -221,7 +228,7 @@ parse_symbolic_mode (mode, initial_bits)
 	case '=':
 	  break;
 	default:
-	  builtin_error ("`%c': invalid symbolic mode operator", op);
+	  builtin_error (_("`%c': invalid symbolic mode operator"), op);
 	  return (-1);
 	}
 
@@ -260,6 +267,8 @@ parse_symbolic_mode (mode, initial_bits)
 	      bits &= ~perm;
 	      break;
 	    case '=':
+	      if (who == 0)
+		who = S_IRWXU | S_IRWXG | S_IRWXO;
 	      bits &= ~who;
 	      bits |= perm;
 	      break;
@@ -274,7 +283,7 @@ parse_symbolic_mode (mode, initial_bits)
 	}
       else
 	{
-	  builtin_error ("`%c': invalid symbolic mode character", *s);
+	  builtin_error (_("`%c': invalid symbolic mode character"), *s);
 	  return (-1);
 	}
     }
@@ -298,7 +307,7 @@ symbolic_umask (list)
   /* All work is done with the complement of the umask -- it's
      more intuitive and easier to deal with.  It is complemented
      again before being returned. */
-  bits = parse_symbolic_mode (list->word->word, ~um);
+  bits = parse_symbolic_mode (list->word->word, ~um & 0777);
   if (bits == -1)
     return (-1);
 

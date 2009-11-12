@@ -1,5 +1,5 @@
-The Restricted Shell
-====================
+6.10 The Restricted Shell
+=========================
 
 If Bash is started with the name `rbash', or the `--restricted' or `-r'
 option is supplied at invocation, the shell becomes restricted.  A

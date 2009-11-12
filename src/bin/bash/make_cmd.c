@@ -1,29 +1,29 @@
 /* make_cmd.c -- Functions for making instances of the various
    parser constructs. */
 
-/* Copyright (C) 1989-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1989-2009 Free Software Foundation, Inc.
 
-This file is part of GNU Bash, the Bourne Again SHell.
+   This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "config.h"
 
 #include <stdio.h>
 #include "bashtypes.h"
-#ifdef HAVE_SYS_FILE_H
+#if !defined (_MINIX) && defined (HAVE_SYS_FILE_H)
 #  include <sys/file.h>
 #endif
 #include "filecntl.h"
@@ -31,6 +31,8 @@ Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
 #if defined (HAVE_UNISTD_H)
 #  include <unistd.h>
 #endif
+
+#include "bashintl.h"
 
 #include "syntax.h"
 #include "command.h"
@@ -61,7 +63,7 @@ sh_obj_cache_t wlcache = {0, 0, 0};
 #define WDCACHESIZE	60
 #define WLCACHESIZE	60
 
-static COMMAND *make_for_or_select __P((enum command_type, WORD_DESC *, WORD_LIST *, COMMAND *));
+static COMMAND *make_for_or_select __P((enum command_type, WORD_DESC *, WORD_LIST *, COMMAND *, int));
 #if defined (ARITH_FOR_COMMAND)
 static WORD_LIST *make_arith_for_expr __P((char *));
 #endif
@@ -75,15 +77,23 @@ cmd_init ()
 }
 
 WORD_DESC *
+alloc_word_desc ()
+{
+  WORD_DESC *temp;
+
+  ocache_alloc (wdcache, WORD_DESC, temp);
+  temp->flags = 0;
+  temp->word = 0;
+  return temp;
+}
+
+WORD_DESC *
 make_bare_word (string)
      const char *string;
 {
   WORD_DESC *temp;
-#if 0
-  temp = (WORD_DESC *)xmalloc (sizeof (WORD_DESC));
-#else
-  ocache_alloc (wdcache, WORD_DESC, temp);
-#endif
+
+  temp = alloc_word_desc ();
 
   if (*string)
     temp->word = savestring (string);
@@ -93,7 +103,6 @@ make_bare_word (string)
       temp->word[0] = '\0';
     }
 
-  temp->flags = 0;
   return (temp);
 }
 
@@ -159,11 +168,8 @@ make_word_list (word, wlink)
 {
   WORD_LIST *temp;
 
-#if 0
-  temp = (WORD_LIST *)xmalloc (sizeof (WORD_LIST));
-#else
   ocache_alloc (wlcache, WORD_LIST, temp);
-#endif
+
   temp->word = word;
   temp->next = wlink;
   return (temp);
@@ -199,39 +205,43 @@ command_connect (com1, com2, connector)
 }
 
 static COMMAND *
-make_for_or_select (type, name, map_list, action)
+make_for_or_select (type, name, map_list, action, lineno)
      enum command_type type;
      WORD_DESC *name;
      WORD_LIST *map_list;
      COMMAND *action;
+     int lineno;
 {
   FOR_COM *temp;
 
   temp = (FOR_COM *)xmalloc (sizeof (FOR_COM));
   temp->flags = 0;
   temp->name = name;
+  temp->line = lineno;
   temp->map_list = map_list;
   temp->action = action;
   return (make_command (type, (SIMPLE_COM *)temp));
 }
 
 COMMAND *
-make_for_command (name, map_list, action)
+make_for_command (name, map_list, action, lineno)
      WORD_DESC *name;
      WORD_LIST *map_list;
      COMMAND *action;
+     int lineno;
 {
-  return (make_for_or_select (cm_for, name, map_list, action));
+  return (make_for_or_select (cm_for, name, map_list, action, lineno));
 }
 
 COMMAND *
-make_select_command (name, map_list, action)
+make_select_command (name, map_list, action, lineno)
      WORD_DESC *name;
      WORD_LIST *map_list;
      COMMAND *action;
+     int lineno;
 {
 #if defined (SELECT_COMMAND)
-  return (make_for_or_select (cm_select, name, map_list, action));
+  return (make_for_or_select (cm_select, name, map_list, action, lineno));
 #else
   last_command_exit_value = 2;
   return ((COMMAND *)NULL);
@@ -244,14 +254,21 @@ make_arith_for_expr (s)
      char *s;
 {
   WORD_LIST *result;
+  WORD_DESC *wd;
 
   if (s == 0 || *s == '\0')
     return ((WORD_LIST *)NULL);
-  result = make_word_list (make_word (s), (WORD_LIST *)NULL);
+  wd = make_word (s);
+  wd->flags |= W_NOGLOB|W_NOSPLIT|W_QUOTED|W_DQUOTE;	/* no word splitting or globbing */
+  result = make_word_list (wd, (WORD_LIST *)NULL);
   return result;
 }
 #endif
 
+/* Note that this function calls dispose_words on EXPRS, since it doesn't
+   use the word list directly.  We free it here rather than at the caller
+   because no other function in this file requires that the caller free
+   any arguments. */
 COMMAND *
 make_arith_for_command (exprs, action, lineno)
      WORD_LIST *exprs;
@@ -302,10 +319,10 @@ make_arith_for_command (exprs, action, lineno)
   if (nsemi != 3)
     {
       if (nsemi < 3)
-	parser_error (lineno, "syntax error: arithmetic expression required");
+	parser_error (lineno, _("syntax error: arithmetic expression required"));
       else
-	parser_error (lineno, "syntax error: `;' unexpected");
-      parser_error (lineno, "syntax error: `((%s))'", exprs->word->word);
+	parser_error (lineno, _("syntax error: `;' unexpected"));
+      parser_error (lineno, _("syntax error: `((%s))'"), exprs->word->word);
       last_command_exit_value = 2;
       return ((COMMAND *)NULL);
     }
@@ -318,8 +335,10 @@ make_arith_for_command (exprs, action, lineno)
   temp->step = step ? step : make_arith_for_expr ("1");
   temp->action = action;
 
+  dispose_words (exprs);
   return (make_command (cm_arith_for, (SIMPLE_COM *)temp));
 #else
+  dispose_words (exprs);
   last_command_exit_value = 2;
   return ((COMMAND *)NULL);
 #endif /* ARITH_FOR_COMMAND */
@@ -337,14 +356,16 @@ make_group_command (command)
 }
 
 COMMAND *
-make_case_command (word, clauses)
+make_case_command (word, clauses, lineno)
      WORD_DESC *word;
      PATTERN_LIST *clauses;
+     int lineno;
 {
   CASE_COM *temp;
 
   temp = (CASE_COM *)xmalloc (sizeof (CASE_COM));
   temp->flags = 0;
+  temp->line = lineno;
   temp->word = word;
   temp->clauses = REVERSE_LIST (clauses, PATTERN_LIST *);
   return (make_command (cm_case, (SIMPLE_COM *)temp));
@@ -361,6 +382,7 @@ make_pattern_list (patterns, action)
   temp->patterns = REVERSE_LIST (patterns, WORD_LIST *);
   temp->action = action;
   temp->next = NULL;
+  temp->flags = 0;
   return (temp);
 }
 
@@ -511,7 +533,7 @@ make_simple_command (element, command)
 
   if (element.word)
     command->value.Simple->words = make_word_list (element.word, command->value.Simple->words);
-  else
+  else if (element.redirect)
     {
       REDIRECT *r = element.redirect;
       /* Due to the way <> is implemented, there may be more than a single
@@ -531,8 +553,9 @@ make_simple_command (element, command)
    the redirectee.word with the new input text.  If <<- is on,
    then remove leading TABS from each line. */
 void
-make_here_document (temp)
+make_here_document (temp, lineno)
      REDIRECT *temp;
+     int lineno;
 {
   int kill_leading, redir_len;
   char *redir_word, *document, *full_line;
@@ -541,7 +564,7 @@ make_here_document (temp)
   if (temp->instruction != r_deblank_reading_until &&
       temp->instruction != r_reading_until)
     {
-      internal_error ("make_here_document: bad instruction type %d", temp->instruction);
+      internal_error (_("make_here_document: bad instruction type %d"), temp->instruction);
       return;
     }
 
@@ -588,6 +611,11 @@ make_here_document (temp)
       line = full_line;
       line_number++;
 
+      /* If set -v is in effect, echo the line read.  read_secondary_line/
+	 read_a_line leaves the newline at the end, so don't print another. */
+      if (echo_input_at_read)
+	fprintf (stderr, "%s", line);
+
       if (kill_leading && *line)
 	{
 	  /* Hack:  To be compatible with some Bourne shells, we
@@ -618,6 +646,9 @@ make_here_document (temp)
       FASTCOPY (line, document + document_index, len);
       document_index += len;
     }
+
+  if (full_line == 0)
+    internal_warning (_("here-document at line %d delimited by end-of-file (wanted `%s')"), lineno, redir_word);
 
 document_done:
   if (document)
@@ -658,11 +689,12 @@ make_redirection (source, instruction, dest_and_filename)
 
     case r_output_direction:		/* >foo */
     case r_output_force:		/* >| foo */
-    case r_err_and_out:			/* command &>filename */
+    case r_err_and_out:			/* &>filename */
       temp->flags = O_TRUNC | O_WRONLY | O_CREAT;
       break;
 
     case r_appending_to:		/* >>foo */
+    case r_append_err_and_out:		/* &>> filename */
       temp->flags = O_APPEND | O_WRONLY | O_CREAT;
       break;
 
@@ -711,7 +743,7 @@ make_redirection (source, instruction, dest_and_filename)
       break;
 
     default:
-      programming_error ("make_redirection: redirection instruction `%d' out of range", instruction);
+      programming_error (_("make_redirection: redirection instruction `%d' out of range"), instruction);
       abort ();
       break;
     }
@@ -725,6 +757,10 @@ make_function_def (name, command, lineno, lstart)
      int lineno, lstart;
 {
   FUNCTION_DEF *temp;
+#if defined (ARRAY_VARS)
+  SHELL_VAR *bash_source_v;
+  ARRAY *bash_source_a;
+#endif
 
   temp = (FUNCTION_DEF *)xmalloc (sizeof (FUNCTION_DEF));
   temp->command = command;
@@ -732,6 +768,19 @@ make_function_def (name, command, lineno, lstart)
   temp->line = lineno;
   temp->flags = 0;
   command->line = lstart;
+
+  /* Information used primarily for debugging. */
+  temp->source_file = 0;
+#if defined (ARRAY_VARS)
+  GET_ARRAY_FROM_VAR ("BASH_SOURCE", bash_source_v, bash_source_a);
+  if (bash_source_a && array_num_elements (bash_source_a) > 0)
+    temp->source_file = array_reference (bash_source_a, 0);
+#endif
+#if defined (DEBUGGER)
+  bind_function_def (name->word, temp);
+#endif
+
+  temp->source_file = 0;
   return (make_command (cm_function_def, (SIMPLE_COM *)temp));
 }
 
@@ -745,6 +794,20 @@ make_subshell_command (command)
   temp->command = command;
   temp->flags = CMD_WANT_SUBSHELL;
   return (make_command (cm_subshell, (SIMPLE_COM *)temp));
+}
+
+COMMAND *
+make_coproc_command (name, command)
+     char *name;
+     COMMAND *command;
+{
+  COPROC_COM *temp;
+
+  temp = (COPROC_COM *)xmalloc (sizeof (COPROC_COM));
+  temp->name = savestring (name);
+  temp->command = command;
+  temp->flags = CMD_WANT_SUBSHELL|CMD_COPROC_SUBSHELL;
+  return (make_command (cm_coproc, (SIMPLE_COM *)temp));
 }
 
 /* Reverse the word list and redirection list in the simple command

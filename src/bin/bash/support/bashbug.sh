@@ -4,24 +4,23 @@
 #
 # The bug address depends on the release status of the shell.  Versions
 # with status `devel', `alpha', `beta', or `rc' mail bug reports to
-# chet@po.cwru.edu and, optionally, to bash-testers@po.cwru.edu.
+# chet@cwru.edu and, optionally, to bash-testers@cwru.edu.
 # Other versions send mail to bug-bash@gnu.org.
 #
-# Copyright (C) 1996-2002 Free Software Foundation, Inc.
+# Copyright (C) 1996-2004 Free Software Foundation, Inc.
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2, or (at your option)
-# any later version.
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #
 # configuration section:
@@ -39,35 +38,19 @@ MACHTYPE="!MACHTYPE!"
 PATH=/bin:/usr/bin:/usr/local/bin:$PATH
 export PATH
 
-# If the OS supplies a program to make temp files with semi-random names,
-# use it.
+# Check if TMPDIR is set, default to /tmp
 : ${TMPDIR:=/tmp}
-rm_tmp1=false
-rm_tmp2=false
 
-# if we don't have mktemp or tempfile, we don't want to see error messages
-# like `mktemp: not found', so temporarily redirect stderr using {...} while
-# trying to run them.  this may fail using old versions of the bourne shell
-# that run {...} blocks with redirections in subshells; in that case we're
-# no worse off than previous versions
+#Securely create a temporary directory for the temporary files
+TEMPDIR=$TMPDIR/bbug.$$
+(umask 077 && mkdir $TEMPDIR) || {
+	echo "$0: could not create temporary directory" >&2
+	exit 1
+}
 
-{ TEMPFILE1=`mktemp "$TMPDIR/bbug.XXXXXX" 2>/dev/null` ; } 2>/dev/null
-if [ -z "$TEMPFILE1" ]; then
-	{ TEMPFILE1=`tempfile --prefix bbug --mode 600 2>/dev/null`; } 2>/dev/null
-fi
-if [ -z "$TEMPFILE1" ]; then
-	TEMPFILE1=$TMPDIR/bbug.$$
-	rm_tmp1=true
-fi
-{ TEMPFILE2=`mktemp "$TMPDIR/bbug.XXXXXX" 2>/dev/null`; } 2>/dev/null
-if [ -z "$TEMPFILE2" ]; then
-	{ TEMPFILE2=`tempfile --prefix bbug --mode 600 2>/dev/null`; } 2>/dev/null
-fi
-if [ -z "$TEMPFILE2" ]; then
-	TEMPFILE2="$TMPDIR/bbug.$$.x"
-	rm_tmp2=true
-fi
-
+TEMPFILE1=$TEMPDIR/bbug1
+TEMPFILE2=$TEMPDIR/bbug2
+        
 USAGE="Usage: $0 [--help] [--version] [bug-report-email-address]"
 VERSTR="GNU bashbug, version ${RELEASE}.${PATCHLEVEL}-${RELSTATUS}"
 
@@ -116,10 +99,10 @@ case "$N" in
 *)	n= c='\c' ;;
 esac
 
-BASHTESTERS="bash-testers@po.cwru.edu"
+BASHTESTERS="bash-testers@cwru.edu"
 
 case "$RELSTATUS" in
-alpha*|beta*|devel*|rc*)	BUGBASH=chet@po.cwru.edu ;;
+alpha*|beta*|devel*|rc*)	BUGBASH=chet@cwru.edu ;;
 *)				BUGBASH=bug-bash@gnu.org ;;
 esac
 
@@ -166,8 +149,8 @@ fi
 
 : ${USER=${LOGNAME-`whoami`}}
 
-trap 'rm -f "$TEMPFILE1" "$TEMPFILE2"; exit 1' 1 2 3 13 15
-trap 'rm -f "$TEMPFILE1" "$TEMPFILE2"' 0
+trap 'rm -rf "$TEMPDIR"; exit 1' 1 2 3 13 15
+trap 'rm -rf "$TEMPDIR"' 0
 
 UN=
 if (uname) >/dev/null 2>&1; then
@@ -186,9 +169,6 @@ else
 fi
 
 INITIAL_SUBJECT='[50 character or so descriptive subject here (for reference)]'
-
-# this is raceable unless (hopefully) we used mktemp(1) or tempfile(1)
-$rm_tmp1 && rm -f "$TEMPFILE1"
 
 cat > "$TEMPFILE1" <<EOF
 From: ${USER}
@@ -218,9 +198,6 @@ Fix:
 	[Description of how to fix the problem.  If you don't know a
 	fix for the problem, don't include this section.]
 EOF
-
-# this is still raceable unless (hopefully) we used mktemp(1) or tempfile(1)
-$rm_tmp2 && rm -f "$TEMPFILE2"
 
 cp "$TEMPFILE1" "$TEMPFILE2"
 chmod u+w "$TEMPFILE1"
@@ -272,7 +249,7 @@ while [ $edstat -ne 0 ]; do
 
 done
 
-trap 'rm -f "$TEMPFILE1" "$TEMPFILE2"; exit 1' 2	# restore trap on SIGINT
+trap 'rm -rf "$TEMPDIR"; exit 1' 2	# restore trap on SIGINT
 
 if cmp -s "$TEMPFILE1" "$TEMPFILE2"
 then

@@ -1,24 +1,24 @@
 /* funmap.c -- attach names to functions. */
 
-/* Copyright (C) 1987, 1989, 1992 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
-   This file is part of the GNU Readline Library, a library for
-   reading lines of text with interactive input and history editing.
+   This file is part of the GNU Readline Library (Readline), a library
+   for reading lines of text with interactive input and history editing.      
 
-   The GNU Readline Library is free software; you can redistribute it
-   and/or modify it under the terms of the GNU General Public License
-   as published by the Free Software Foundation; either version 2, or
+   Readline is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
-   The GNU Readline Library is distributed in the hope that it will be
-   useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   Readline is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   The GNU General Public License is often shipped with GNU software, and
-   is generally kept in a file called COPYING or LICENSE.  If you do not
-   have a copy of the license, write to the Free Software Foundation,
-   59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Readline.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #define READLINE_LIBRARY
 
 #if defined (HAVE_CONFIG_H)
@@ -56,7 +56,7 @@ static int funmap_entry;
    program specific function. */
 int funmap_program_specific_entry_start;
 
-static FUNMAP default_funmap[] = {
+static const FUNMAP default_funmap[] = {
   { "abort", rl_abort },
   { "accept-line", rl_newline },
   { "arrow-key-prefix", rl_arrow_keys },
@@ -131,6 +131,7 @@ static FUNMAP default_funmap[] = {
   { "tty-status", rl_tty_status },
   { "undo", rl_undo_command },
   { "universal-argument", rl_universal_argument },
+  { "unix-filename-rubout", rl_unix_filename_rubout },
   { "unix-line-discard", rl_unix_line_discard },
   { "unix-word-rubout", rl_unix_word_rubout },
   { "upcase-word", rl_upcase_word },
@@ -175,6 +176,7 @@ static FUNMAP default_funmap[] = {
   { "vi-put", rl_vi_put },
   { "vi-redo", rl_vi_redo },
   { "vi-replace", rl_vi_replace },
+  { "vi-rubout", rl_vi_rubout },
   { "vi-search", rl_vi_search },
   { "vi-search-again", rl_vi_search_again },
   { "vi-set-mark", rl_vi_set_mark },

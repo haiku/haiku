@@ -1,22 +1,22 @@
-/* pathphys.c -- Return pathname with all symlinks expanded. */
+/* pathphys.c -- return pathname with all symlinks expanded. */
 
 /* Copyright (C) 2000 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <config.h>
 
@@ -68,7 +68,7 @@ _path_readlink (path, buf, bufsiz)
 
 /*
  * Return PATH with all symlinks expanded in newly-allocated memory.
- * This always gets a full pathname.
+ * This always gets an absolute pathname.
  */
 
 char *
@@ -80,11 +80,26 @@ sh_physpath (path, flags)
   char *result, *p, *q, *qsave, *qbase, *workpath;
   int double_slash_path, linklen, nlink;
 
+  linklen = strlen (path);
+
+#if 0
+  /* First sanity check -- punt immediately if the name is too long. */
+  if (linklen >= PATH_MAX)
+    return (savestring (path));
+#endif
+
   nlink = 0;
   q = result = (char *)xmalloc (PATH_MAX + 1);
 
-  workpath = (char *)xmalloc (PATH_MAX + 1);
-  strcpy (workpath, path);
+  /* Even if we get something longer than PATH_MAX, we might be able to
+     shorten it, so we try. */
+  if (linklen >= PATH_MAX)
+    workpath = savestring (path);
+  else
+    {
+      workpath = (char *)xmalloc (PATH_MAX + 1);
+      strcpy (workpath, path);
+    }
 
   /* This always gets an absolute pathname. */
 
@@ -133,7 +148,19 @@ sh_physpath (path, flags)
 	  if (q != qbase)
 	    *q++ = DIRSEP;
 	  while (*p && (ISDIRSEP(*p) == 0))
-	    *q++ = *p++;
+	    {
+	      if (q - result >= PATH_MAX)
+		{
+#ifdef ENAMETOOLONG
+		  errno = ENAMETOOLONG;
+#else
+		  errno = EINVAL;
+#endif
+		  goto error;
+		}
+		
+	      *q++ = *p++;
+	    }
 
 	  *q = '\0';
 
@@ -151,6 +178,8 @@ sh_physpath (path, flags)
 	    {
 #ifdef ELOOP
 	      errno = ELOOP;
+#else
+	      errno = EINVAL;
 #endif
 error:
 	      free (result);
@@ -159,6 +188,17 @@ error:
 	    }
 
 	  linkbuf[linklen] = '\0';
+
+	  /* If the new path length would overrun PATH_MAX, punt now. */
+	  if ((strlen (p) + linklen + 2) >= PATH_MAX)
+	    {
+#ifdef ENAMETOOLONG
+	      errno = ENAMETOOLONG;
+#else
+	      errno = EINVAL;
+#endif
+	      goto error;
+	    }
 
 	  /* Form the new pathname by copying the link value to a temporary
 	     buffer and appending the rest of `workpath'.  Reset p to point
@@ -245,6 +285,7 @@ sh_realpath (pathname, resolved)
     {
       strncpy (resolved, wd, PATH_MAX - 1);
       resolved[PATH_MAX - 1] = '\0';
+      free (wd);
       return resolved;
     }
   else

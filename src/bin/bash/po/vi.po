@@ -1,0 +1,5368 @@
+# Vietnamese translation for BASH (Bourne Again SHell).
+# Copyright © 2008 Free Software Foundation, Inc.
+# This file is distributed under the same license as the bash package.
+# Clytie Siddall <clytie@riverland.net.au>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: bash 4.0-pre1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-02-19 14:53-0500\n"
+"PO-Revision-Date: 2008-09-08 17:26+0930\n"
+"Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
+"Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: LocFactoryEditor 1.7b3\n"
+
+#: arrayfunc.c:50
+msgid "bad array subscript"
+msgstr "sai mảng in thấp"
+
+#: arrayfunc.c:313 builtins/declare.def:474
+#, c-format
+msgid "%s: cannot convert indexed to associative array"
+msgstr "%s: không thể chuyển đổi mảng theo số mũ sang mảng kết hợp"
+
+#: arrayfunc.c:479
+#, c-format
+msgid "%s: invalid associative array key"
+msgstr "%s: khoá màng kết hợp không hợp lệ"
+
+#: arrayfunc.c:481
+#, c-format
+msgid "%s: cannot assign to non-numeric index"
+msgstr "%s: không thể cấp phát cho chỉ số không thuộc số"
+
+#: arrayfunc.c:517
+#, c-format
+msgid "%s: %s: must use subscript when assigning associative array"
+msgstr "%s: %s: phải sử dụng chữ thấp khi gán mảng kết hợp"
+
+#: bashhist.c:379
+#, c-format
+msgid "%s: cannot create: %s"
+msgstr "%s: không thể tạo %s"
+
+#: bashline.c:3413
+msgid "bash_execute_unix_command: cannot find keymap for command"
+msgstr "bash_execute_unix_command: không tìm thấy sơ đồ phím cho câu lệnh"
+
+#: bashline.c:3491
+#, c-format
+msgid "%s: first non-whitespace character is not `\"'"
+msgstr ""
+"%s: ký tự khác khoảng trắng đầu tiên không phải là dấu sổ chéo ngược « / »"
+
+#: bashline.c:3520
+#, c-format
+msgid "no closing `%c' in %s"
+msgstr "thiếu « %c » đóng trong %s"
+
+#: bashline.c:3554
+#, c-format
+msgid "%s: missing colon separator"
+msgstr "%s: thiếu dấu hai chấm định giới"
+
+#: builtins/bind.def:120 builtins/bind.def:123
+msgid "line editing not enabled"
+msgstr ""
+
+#: builtins/bind.def:206
+#, c-format
+msgid "`%s': invalid keymap name"
+msgstr "« %s »: tên sơ đồ phím không hợp lệ"
+
+#: builtins/bind.def:245
+#, c-format
+msgid "%s: cannot read: %s"
+msgstr "%s: không thể đọc %s"
+
+#: builtins/bind.def:260
+#, c-format
+msgid "`%s': cannot unbind"
+msgstr "« %s »: không thể hủy tổ hợp"
+
+#: builtins/bind.def:295 builtins/bind.def:325
+#, c-format
+msgid "`%s': unknown function name"
+msgstr "« %s »: tên hàm không rõ"
+
+#: builtins/bind.def:303
+#, c-format
+msgid "%s is not bound to any keys.\n"
+msgstr "%s không được tổ hợp với phím.\n"
+
+#: builtins/bind.def:307
+#, c-format
+msgid "%s can be invoked via "
+msgstr "%s có thể được gọi thông qua "
+
+#: builtins/break.def:77 builtins/break.def:117
+msgid "loop count"
+msgstr "đếm vòng"
+
+#: builtins/break.def:137
+msgid "only meaningful in a `for', `while', or `until' loop"
+msgstr ""
+"chỉ có nghĩa trong vòng lặp:\n"
+" • for\ttrong\n"
+" • while\ttrong khi\n"
+" • until\tđến khi"
+
+#: builtins/caller.def:133
+msgid ""
+"Returns the context of the current subroutine call.\n"
+"    \n"
+"    Without EXPR, returns "
+msgstr ""
+
+#: builtins/cd.def:215
+msgid "HOME not set"
+msgstr "Chưa đặt biến môi trường HOME (nhà)"
+
+#: builtins/cd.def:227
+msgid "OLDPWD not set"
+msgstr "Chưa đặt biến môi trường OLDPWD (mật khẩu cũ)"
+
+#: builtins/common.c:101
+#, c-format
+msgid "line %d: "
+msgstr "dòng %d:"
+
+#: builtins/common.c:139 error.c:260
+#, c-format
+msgid "warning: "
+msgstr "cảnh báo :"
+
+#: builtins/common.c:153
+#, c-format
+msgid "%s: usage: "
+msgstr "%s: sử dụng:"
+
+#: builtins/common.c:166 test.c:822
+msgid "too many arguments"
+msgstr "quá nhiều đối số"
+
+#: builtins/common.c:191 shell.c:493 shell.c:774
+#, c-format
+msgid "%s: option requires an argument"
+msgstr "%s: tùy chọn cần thiết một đối số"
+
+#: builtins/common.c:198
+#, c-format
+msgid "%s: numeric argument required"
+msgstr "%s: cần thiết đối số thuộc số"
+
+#: builtins/common.c:205
+#, c-format
+msgid "%s: not found"
+msgstr "%s: không tìm thấy"
+
+#: builtins/common.c:214 shell.c:787
+#, c-format
+msgid "%s: invalid option"
+msgstr "%s: tùy chọn không hợp lệ"
+
+#: builtins/common.c:221
+#, c-format
+msgid "%s: invalid option name"
+msgstr "%s: tên tùy chọn không hợp lệ"
+
+#: builtins/common.c:228 general.c:231 general.c:236
+#, c-format
+msgid "`%s': not a valid identifier"
+msgstr "« %s »: không phải đồ nhận diện hợp lệ"
+
+#: builtins/common.c:238
+msgid "invalid octal number"
+msgstr "số bát phân không hợp lệ"
+
+#: builtins/common.c:240
+msgid "invalid hex number"
+msgstr "số thập lục không hợp lệ"
+
+#: builtins/common.c:242 expr.c:1255
+msgid "invalid number"
+msgstr "số không hợp lệ"
+
+#: builtins/common.c:250
+#, c-format
+msgid "%s: invalid signal specification"
+msgstr "%s: sai xác định tín hiệu"
+
+#: builtins/common.c:257
+#, c-format
+msgid "`%s': not a pid or valid job spec"
+msgstr "« %s »: không phải đặc tả hợp lệ cho PID hoặc công việc"
+
+#: builtins/common.c:264 error.c:453
+#, c-format
+msgid "%s: readonly variable"
+msgstr "%s: biến chỉ đọc"
+
+#: builtins/common.c:272
+#, c-format
+msgid "%s: %s out of range"
+msgstr "%s: %s ở ngoại phạm vi"
+
+#: builtins/common.c:272 builtins/common.c:274
+msgid "argument"
+msgstr "đối số"
+
+#: builtins/common.c:274
+#, c-format
+msgid "%s out of range"
+msgstr "%s ở ngoại phạm vi"
+
+#: builtins/common.c:282
+#, c-format
+msgid "%s: no such job"
+msgstr "%s: không có công việc như vậy"
+
+#: builtins/common.c:290
+#, c-format
+msgid "%s: no job control"
+msgstr "%s: không có điều khiển công việc"
+
+#: builtins/common.c:292
+msgid "no job control"
+msgstr "không có điều khiển công việc"
+
+#: builtins/common.c:302
+#, c-format
+msgid "%s: restricted"
+msgstr "%s: bị hạn chế"
+
+#: builtins/common.c:304
+msgid "restricted"
+msgstr "bị hạn chế"
+
+#: builtins/common.c:312
+#, c-format
+msgid "%s: not a shell builtin"
+msgstr "%s: không phải dựng sẵn trình bao"
+
+#: builtins/common.c:321
+#, c-format
+msgid "write error: %s"
+msgstr "lỗi ghi: %s"
+
+#: builtins/common.c:329
+#, c-format
+msgid "error setting terminal attributes: %s"
+msgstr ""
+
+#: builtins/common.c:331
+#, c-format
+msgid "error getting terminal attributes: %s"
+msgstr ""
+
+#: builtins/common.c:563
+#, c-format
+msgid "%s: error retrieving current directory: %s: %s\n"
+msgstr "%s: gặp lỗi khi lấy thư mục hiện thời: %s: %s\n"
+
+#: builtins/common.c:629 builtins/common.c:631
+#, c-format
+msgid "%s: ambiguous job spec"
+msgstr "%s: đặc tả công việc mơ hồ"
+
+#: builtins/complete.def:270
+#, c-format
+msgid "%s: invalid action name"
+msgstr "%s: tên hành vi không hợp lệ"
+
+#: builtins/complete.def:430 builtins/complete.def:615
+#: builtins/complete.def:813
+#, c-format
+msgid "%s: no completion specification"
+msgstr "%s: không có đặc tả điền nốt"
+
+#: builtins/complete.def:667
+msgid "warning: -F option may not work as you expect"
+msgstr "cảnh báo: tùy chọn « -F » có lẽ không hoạt động như mong đợi"
+
+#: builtins/complete.def:669
+msgid "warning: -C option may not work as you expect"
+msgstr "cảnh báo: tùy chọn « -C » có lẽ không hoạt động như mong đợi"
+
+#: builtins/complete.def:786
+msgid "not currently executing completion function"
+msgstr "hiện thời không thực thi chức năng điền nốt"
+
+#: builtins/declare.def:122
+msgid "can only be used in a function"
+msgstr "chỉ có thể được dùng trong một hàm"
+
+#: builtins/declare.def:353
+msgid "cannot use `-f' to make functions"
+msgstr "không thể dùng « -f » để tạo hàm"
+
+#: builtins/declare.def:365 execute_cmd.c:4818
+#, c-format
+msgid "%s: readonly function"
+msgstr "%s: hàm chỉ đọc"
+
+#: builtins/declare.def:461
+#, c-format
+msgid "%s: cannot destroy array variables in this way"
+msgstr "%s: không thể phá hủy biến mảng bằng cách này"
+
+#: builtins/declare.def:468
+#, c-format
+msgid "%s: cannot convert associative to indexed array"
+msgstr "%s: không thể chuyển đổi mảng kết hợp sang mảng theo số mũ"
+
+#: builtins/enable.def:137 builtins/enable.def:145
+msgid "dynamic loading not available"
+msgstr "không có sẵn chức năng nạp động"
+
+#: builtins/enable.def:312
+#, c-format
+msgid "cannot open shared object %s: %s"
+msgstr "không thể mở đối tượng dùng chung %s: %s"
+
+#: builtins/enable.def:335
+#, c-format
+msgid "cannot find %s in shared object %s: %s"
+msgstr "không tìm thấy %s trong đối tượng dùng chung %s: %s"
+
+#: builtins/enable.def:459
+#, c-format
+msgid "%s: not dynamically loaded"
+msgstr "%s không phải được nạp động"
+
+#: builtins/enable.def:474
+#, c-format
+msgid "%s: cannot delete: %s"
+msgstr "%s: không thể xoá: %s"
+
+#: builtins/evalfile.c:134 builtins/hash.def:169 execute_cmd.c:4675
+#: shell.c:1439
+#, c-format
+msgid "%s: is a directory"
+msgstr "%s: là thư mục"
+
+#: builtins/evalfile.c:139
+#, c-format
+msgid "%s: not a regular file"
+msgstr "%s: không phải là tập tin chuẩn"
+
+#: builtins/evalfile.c:147
+#, c-format
+msgid "%s: file is too large"
+msgstr "%s: tập tin quá lớn"
+
+#: builtins/evalfile.c:185 execute_cmd.c:4745 shell.c:1449
+#, c-format
+msgid "%s: cannot execute binary file"
+msgstr "%s: không thể thực hiện tập tin nhị phân"
+
+#: builtins/exec.def:212
+#, c-format
+msgid "%s: cannot execute: %s"
+msgstr "%s: không thể thực hiện: %s"
+
+#: builtins/exit.def:65
+#, c-format
+msgid "logout\n"
+msgstr "đăng xuất\n"
+
+#: builtins/exit.def:88
+msgid "not login shell: use `exit'"
+msgstr "không phải trình bao đăng nhập: hãy dùng lệnh « exit » (thoát)"
+
+#: builtins/exit.def:120
+#, c-format
+msgid "There are stopped jobs.\n"
+msgstr "Vẫn có công việc bị dừng.\n"
+
+#: builtins/exit.def:122
+#, c-format
+msgid "There are running jobs.\n"
+msgstr "Vẫn có công việc đang chạy.\n"
+
+#: builtins/fc.def:261
+msgid "no command found"
+msgstr "không tìm thấy lệnh"
+
+#: builtins/fc.def:341
+msgid "history specification"
+msgstr "đặc tả lịch sử"
+
+#: builtins/fc.def:362
+#, c-format
+msgid "%s: cannot open temp file: %s"
+msgstr "%s: không thể mở tập tin tạm thời: %s"
+
+#: builtins/fg_bg.def:149 builtins/jobs.def:282
+msgid "current"
+msgstr "hiện thời"
+
+#: builtins/fg_bg.def:158
+#, c-format
+msgid "job %d started without job control"
+msgstr "công việc %d đã khởi chạy mà không có điều khiển công việc"
+
+#: builtins/getopt.c:110
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: tùy chọn không được phép -- %c\n"
+
+#: builtins/getopt.c:111
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: tùy chọn cần thiết đối số -- %c\n"
+
+#: builtins/hash.def:92
+msgid "hashing disabled"
+msgstr "chức năng tạo ký hiệu lộn xộn bị tắt"
+
+#: builtins/hash.def:138
+#, c-format
+msgid "%s: hash table empty\n"
+msgstr "%s: bảng ký hiệu lộn xộn còn rỗng\n"
+
+#: builtins/hash.def:244
+#, c-format
+msgid "hits\tcommand\n"
+msgstr "gọi nhớ\tlệnh\n"
+
+#: builtins/help.def:130
+#, c-format
+msgid "Shell commands matching keyword `"
+msgid_plural "Shell commands matching keywords `"
+msgstr[0] "Câu lệnh trình bao tương ứng với từ khoá `"
+
+#: builtins/help.def:168
+#, c-format
+msgid ""
+"no help topics match `%s'.  Try `help help' or `man -k %s' or `info %s'."
+msgstr ""
+"không có chủ đề trợ giúp tương ứng với « %s ». Hãy thử câu lệnh:\n"
+" • help help\n"
+" • man -k %s\n"
+" • info %s"
+
+#: builtins/help.def:185
+#, c-format
+msgid "%s: cannot open: %s"
+msgstr "%s: không thể mở : %s"
+
+#: builtins/help.def:337
+#, c-format
+msgid ""
+"These shell commands are defined internally.  Type `help' to see this list.\n"
+"Type `help name' to find out more about the function `name'.\n"
+"Use `info bash' to find out more about the shell in general.\n"
+"Use `man -k' or `info' to find out more about commands not in this list.\n"
+"\n"
+"A star (*) next to a name means that the command is disabled.\n"
+"\n"
+msgstr ""
+"Những câu lệnh trình bao này được xác định nội bộ. Hãy gõ :\n"
+" • help\t\tđể xem danh sách này.\n"
+" • info bash\tđể tìm thêm thông tin chung về trình bao.\n"
+" • man -k\t} • info\t\t} để tìm thêm thông tin về lệnh không có trong danh "
+"sách này.\n"
+"\n"
+"Dấu sao « * » bên cạnh tên thì ngụ ý nó bị tắt.\n"
+"\n"
+
+#: builtins/history.def:154
+msgid "cannot use more than one of -anrw"
+msgstr "chỉ có thể dùng một của những tùy chọn « -a », « -n », « -r », « -w »"
+
+#: builtins/history.def:186
+msgid "history position"
+msgstr "vị trí lịch sử"
+
+#: builtins/history.def:365
+#, c-format
+msgid "%s: history expansion failed"
+msgstr "%s: lỗi mở rộng lịch sử"
+
+#: builtins/inlib.def:71
+#, c-format
+msgid "%s: inlib failed"
+msgstr "%s: inlib bị lỗi"
+
+#: builtins/jobs.def:109
+msgid "no other options allowed with `-x'"
+msgstr "không cho phép dùng tùy chọn thêm với « -x »"
+
+#: builtins/kill.def:197
+#, c-format
+msgid "%s: arguments must be process or job IDs"
+msgstr "%s: đối số phải là mã số của tiến trình (PID) hoặc công việc"
+
+#: builtins/kill.def:260
+msgid "Unknown error"
+msgstr "Lỗi không rõ"
+
+#: builtins/let.def:95 builtins/let.def:120 expr.c:501 expr.c:516
+msgid "expression expected"
+msgstr "đợi biểu thức"
+
+#: builtins/mapfile.def:241 builtins/read.def:272
+#, c-format
+msgid "%s: invalid file descriptor specification"
+msgstr "%s: sai xác định bộ mô tả tập tin"
+
+#: builtins/mapfile.def:249 builtins/read.def:279
+#, c-format
+msgid "%d: invalid file descriptor: %s"
+msgstr "%d: bộ mô tả tập tin không hợp lệ: %s"
+
+#: builtins/mapfile.def:258 builtins/mapfile.def:296
+#, c-format
+msgid "%s: invalid line count"
+msgstr "%s: sai đếm dòng"
+
+#: builtins/mapfile.def:269
+#, c-format
+msgid "%s: invalid array origin"
+msgstr "%s: gốc mảng không hợp lệ"
+
+#: builtins/mapfile.def:286
+#, c-format
+msgid "%s: invalid callback quantum"
+msgstr "%s: lượng gọi ngược không hợp lệ"
+
+#: builtins/mapfile.def:318
+msgid "empty array variable name"
+msgstr "%s: tên biến mảng vẫn trống"
+
+#: builtins/mapfile.def:339
+msgid "array variable support required"
+msgstr "cần thiết hỗ trợ biến mảng"
+
+#: builtins/printf.def:367
+#, c-format
+msgid "`%s': missing format character"
+msgstr "« %s »: thiếu ký tự định dạng"
+
+#: builtins/printf.def:544
+#, c-format
+msgid "`%c': invalid format character"
+msgstr "« %c »: ký tự định dạng không hợp lệ"
+
+#: builtins/printf.def:571
+#, c-format
+msgid "warning: %s: %s"
+msgstr "cảnh báo : %s: %s"
+
+#: builtins/printf.def:750
+msgid "missing hex digit for \\x"
+msgstr "thiếu chữ số thập phân cho \\x"
+
+#: builtins/pushd.def:195
+msgid "no other directory"
+msgstr "không có thư mục khác"
+
+#: builtins/pushd.def:462
+msgid "<no current directory>"
+msgstr "<không có thư mục hiện thời>"
+
+#: builtins/pushd.def:506
+msgid "directory stack empty"
+msgstr "đống thư mục vẫn trống"
+
+#: builtins/pushd.def:508
+msgid "directory stack index"
+msgstr "chỉ mục đống thư mục"
+
+#: builtins/pushd.def:683
+msgid ""
+"Display the list of currently remembered directories.  Directories\n"
+"    find their way onto the list with the `pushd' command; you can get\n"
+"    back up through the list with the `popd' command.\n"
+"    \n"
+"    Options:\n"
+"      -c\tclear the directory stack by deleting all of the elements\n"
+"      -l\tdo not print tilde-prefixed versions of directories relative\n"
+"    \tto your home directory\n"
+"      -p\tprint the directory stack with one entry per line\n"
+"      -v\tprint the directory stack with one entry per line prefixed\n"
+"    \twith its position in the stack\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tDisplays the Nth entry counting from the left of the list shown "
+"by\n"
+"    \tdirs when invoked without options, starting with zero.\n"
+"    \n"
+"      -N\tDisplays the Nth entry counting from the right of the list shown "
+"by\n"
+"\tdirs when invoked without options, starting with zero."
+msgstr ""
+"Hiển thị danh sách các thư mục được nhớ hiện thời.\n"
+"\tLệnh « pushd » thêm thư mục vào danh sách này;\n"
+"« popd » nâng thư mục lên danh sách.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-c\tgột đống thư mục bằng cách xoá mọi phần tử\n"
+"\t\t-l\tđừng in ra phiên bản thư mục có dấu ngã nằm trước\n"
+"\t\t\tmà tương ứng với thư mục chính của người dùng\n"
+"\t\t-p\tin ra đống thư mục mỗi dòng một mục\n"
+"\t\t-v\tin ra đống thư mục mỗi dòng một mục\n"
+"\t\t\tcó vị trí đống nằm trước\n"
+"\n"
+"\tĐối số :\n"
+"\t\t+N\thiển thị mục thứ N đếm từ bên trái danh sách\n"
+"\t\t\thiển thị theo thư mục khi không đưa ra tùy chọn,\n"
+"\t\t\tbắt đầu từ số không.\n"
+"\n"
+"\t\t-N\thiển thị mục thứ N đếm từ bên phải danh sách\n"
+"\t\t\thiển thị theo thư mục khi không đưa ra tùy chọn,\n"
+"\t\t\tbắt đầu từ số không."
+
+#: builtins/pushd.def:705
+msgid ""
+"Adds a directory to the top of the directory stack, or rotates\n"
+"    the stack, making the new top of the stack the current working\n"
+"    directory.  With no arguments, exchanges the top two directories.\n"
+"    \n"
+"    Options:\n"
+"      -n\tSuppresses the normal change of directory when adding\n"
+"    \tdirectories to the stack, so only the stack is manipulated.\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tRotates the stack so that the Nth directory (counting\n"
+"    \tfrom the left of the list shown by `dirs', starting with\n"
+"    \tzero) is at the top.\n"
+"    \n"
+"      -N\tRotates the stack so that the Nth directory (counting\n"
+"    \tfrom the right of the list shown by `dirs', starting with\n"
+"    \tzero) is at the top.\n"
+"    \n"
+"      dir\tAdds DIR to the directory stack at the top, making it the\n"
+"    \tnew current working directory.\n"
+"    \n"
+"    The `dirs' builtin displays the directory stack."
+msgstr ""
+"Thêm một thư mục vào đầu của đống thư mục, hoặc xoay đống,\n"
+"\tlàm cho thư mục mới đầu đống là thư mục làm việc hiện thời.\n"
+"\tKhông có đối số thì trao đổi hai thư mục đầu.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-n\tthu hồi chức năng chuyển đổi thư mục bình thường\n"
+"\tkhi thêm thư mục vào đống, thì chỉ thao tác đống chính nó.\n"
+"\n"
+"\tĐối số :\n"
+"\t\t+N\txoay đống để mà thư mục thứ N\n"
+"\t\t\t(đếm từ bên trái danh sách hiển thị theo thư mục,\n"
+"\t\t\tbắt đầu từ số không) nằm ở đầu.\n"
+"\n"
+"\t\t-N\txoay đống để mà thư mục thứ N\n"
+"\t\t\t(đếm từ bên phải danh sách hiển thị theo thư mục,\n"
+"\t\t\tbắt đầu từ số không) nằm ở đầu.\n"
+"\n"
+"\t\tdir\tthêm DIR vào đầu đống thư mục,\n"
+"\t\tthì làm cho nó thư mục làm việc hiện thời.\n"
+"\n"
+"\tDựng sẵn « dirs » hiển thị đống thư mục."
+
+#: builtins/pushd.def:730
+msgid ""
+"Removes entries from the directory stack.  With no arguments, removes\n"
+"    the top directory from the stack, and changes to the new top directory.\n"
+"    \n"
+"    Options:\n"
+"      -n\tSuppresses the normal change of directory when removing\n"
+"    \tdirectories from the stack, so only the stack is manipulated.\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tRemoves the Nth entry counting from the left of the list\n"
+"    \tshown by `dirs', starting with zero.  For example: `popd +0'\n"
+"    \tremoves the first directory, `popd +1' the second.\n"
+"    \n"
+"      -N\tRemoves the Nth entry counting from the right of the list\n"
+"    \tshown by `dirs', starting with zero.  For example: `popd -0'\n"
+"    \tremoves the last directory, `popd -1' the next to last.\n"
+"    \n"
+"    The `dirs' builtin displays the directory stack."
+msgstr ""
+"Gỡ bỏ thư mục khỏi đống thư mục.\n"
+"Không đưa ra đối số thì gỡ bỏ thư mục đầu khỏi đống,\n"
+"\tvà chuyển đổi sang thư mục đầu mới.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-n\tthu hồi chức năng chuyển đổi thư mục bình thường\n"
+"\t\tkhi gỡ bỏ thư mục khỏi đống, thì chỉ thao tác đống chính nó.\n"
+"\n"
+"\tĐối số :\n"
+"\t\t+N\tgỡ bỏ mục thứ N đếm từ bên trái danh sách\n"
+"\t\t\thiển thị bằng « dirs », bắt đầu từ số không.\n"
+"\tVí dụ : « popd +0 » sẽ gỡ bỏ thư mục đầu tiên,\n"
+"\t\t« popd +1 » gỡ bỏ thư mục thứ hai, v.v.\n"
+"\n"
+"\t\t-N\tgỡ bỏ mục thứ N đếm từ bên phải danh sách\n"
+"\t\t\thiển thị bằng « dirs », bắt đầu từ số không.\n"
+"\tVí dụ : « popd -0 » sẽ gỡ bỏ thư mục cuối cùng,\n"
+"\t\t« popd -1 » gỡ bỏ thư mục giáp cuối, v.v.\n"
+"\n"
+"\tDựng sẵn « dirs » sẽ hiển thị đống thư mục."
+
+#: builtins/read.def:248
+#, c-format
+msgid "%s: invalid timeout specification"
+msgstr "%s: sai xác định quá hạn"
+
+#: builtins/read.def:574
+#, c-format
+msgid "read error: %d: %s"
+msgstr "lỗi đọc: %d: %s"
+
+#: builtins/return.def:73
+msgid "can only `return' from a function or sourced script"
+msgstr ""
+"chỉ có thể « return » (trở về) từ một hàm hoặc văn lệnh được gọi từ nguồn"
+
+#: builtins/set.def:768
+msgid "cannot simultaneously unset a function and a variable"
+msgstr "không thể hủy đặt đồng thời một hàm VÀ một biến"
+
+#: builtins/set.def:805
+#, c-format
+msgid "%s: cannot unset"
+msgstr "%s: không thể hủy đặt"
+
+#: builtins/set.def:812
+#, c-format
+msgid "%s: cannot unset: readonly %s"
+msgstr "%s: không thể hủy đặt: %s chỉ đọc"
+
+#: builtins/set.def:823
+#, c-format
+msgid "%s: not an array variable"
+msgstr "%s: không phải biến mảng"
+
+#: builtins/setattr.def:186
+#, c-format
+msgid "%s: not a function"
+msgstr "%s: không phải hàm"
+
+#: builtins/shift.def:71 builtins/shift.def:77
+msgid "shift count"
+msgstr "đếm dời"
+
+#: builtins/shopt.def:254
+msgid "cannot set and unset shell options simultaneously"
+msgstr "không thể đồng thời đặt và hủy đặt các tùy chọn trình bao"
+
+#: builtins/shopt.def:319
+#, c-format
+msgid "%s: invalid shell option name"
+msgstr "%s: tên tùy chọn trình bao không hợp lệ"
+
+#: builtins/source.def:128
+msgid "filename argument required"
+msgstr "cần thiết đối số tên tập tin"
+
+#: builtins/source.def:153
+#, c-format
+msgid "%s: file not found"
+msgstr "%s: không tìm thấy tập tin"
+
+#: builtins/suspend.def:101
+msgid "cannot suspend"
+msgstr "không thể ngưng"
+
+#: builtins/suspend.def:111
+msgid "cannot suspend a login shell"
+msgstr "không thể ngưng trình bao đăng nhập"
+
+#: builtins/type.def:234
+#, c-format
+msgid "%s is aliased to `%s'\n"
+msgstr "%s có bí danh tới « %s »\n"
+
+#: builtins/type.def:255
+#, c-format
+msgid "%s is a shell keyword\n"
+msgstr "%s là từ khoá trình bao\n"
+
+#: builtins/type.def:274
+#, c-format
+msgid "%s is a function\n"
+msgstr "%s là hàm\n"
+
+#: builtins/type.def:296
+#, c-format
+msgid "%s is a shell builtin\n"
+msgstr "%s là dựng sẵn trình bao\n"
+
+#: builtins/type.def:317 builtins/type.def:391
+#, c-format
+msgid "%s is %s\n"
+msgstr "%s là %s\n"
+
+#: builtins/type.def:337
+#, c-format
+msgid "%s is hashed (%s)\n"
+msgstr "%s có ký hiệu lộn xộn (%s)\n"
+
+#: builtins/ulimit.def:372
+#, c-format
+msgid "%s: invalid limit argument"
+msgstr "%s: đối số giới hạn không hợp lệ"
+
+#: builtins/ulimit.def:398
+#, c-format
+msgid "`%c': bad command"
+msgstr "« %c »: câu lệnh sai"
+
+#: builtins/ulimit.def:427
+#, c-format
+msgid "%s: cannot get limit: %s"
+msgstr "%s: không thể lấy giới hạn: %s"
+
+#: builtins/ulimit.def:453
+msgid "limit"
+msgstr "giới hạn"
+
+#: builtins/ulimit.def:465 builtins/ulimit.def:765
+#, c-format
+msgid "%s: cannot modify limit: %s"
+msgstr "%s: không thể sửa đổi giới hạn: %s"
+
+#: builtins/umask.def:118
+msgid "octal number"
+msgstr "số bát phân"
+
+#: builtins/umask.def:231
+#, c-format
+msgid "`%c': invalid symbolic mode operator"
+msgstr "« %c »: toán từ chế độ tượng trưng không hợp lệ"
+
+#: builtins/umask.def:286
+#, c-format
+msgid "`%c': invalid symbolic mode character"
+msgstr "« %c »: ký tự chế độ tượng trưng không hợp lệ"
+
+#: error.c:89 error.c:320 error.c:322 error.c:324
+msgid " line "
+msgstr "dòng"
+
+#: error.c:164
+#, c-format
+msgid "last command: %s\n"
+msgstr "câu lệnh cuối cùng: %s\n"
+
+#: error.c:172
+#, c-format
+msgid "Aborting..."
+msgstr "Hủy bỏ..."
+
+#: error.c:405
+msgid "unknown command error"
+msgstr "lỗi lệnh không rõ"
+
+#: error.c:406
+msgid "bad command type"
+msgstr "kiểu lệnh sai"
+
+#: error.c:407
+msgid "bad connector"
+msgstr "bộ kết nối sai"
+
+#: error.c:408
+msgid "bad jump"
+msgstr "sai nhảy"
+
+#: error.c:446
+#, c-format
+msgid "%s: unbound variable"
+msgstr "%s: biến chưa tổ hợp"
+
+#: eval.c:181
+#, c-format
+msgid "\atimed out waiting for input: auto-logout\n"
+msgstr "\tquá hạn trong khi đợi dữ liệu nhập nên tự động đăng xuất\n"
+
+#: execute_cmd.c:491
+#, c-format
+msgid "cannot redirect standard input from /dev/null: %s"
+msgstr "không thể chuyển hướng đầu vào tiêu chuẩn từ « /dev/null »: %s"
+
+#: execute_cmd.c:1112
+#, c-format
+msgid "TIMEFORMAT: `%c': invalid format character"
+msgstr "ĐỊNH DẠNG THỜI GIAN: « %c »: ký tự định dạng không hợp lệ"
+
+#: execute_cmd.c:2011
+msgid "pipe error"
+msgstr "lỗi ống dẫn"
+
+#: execute_cmd.c:4363
+#, c-format
+msgid "%s: restricted: cannot specify `/' in command names"
+msgstr "%s: bị hạn chế: không thể ghi rõ dấu sổ chéo « / » trong tên câu lệnh"
+
+#: execute_cmd.c:4454
+#, c-format
+msgid "%s: command not found"
+msgstr "%s: không tìm thấy lệnh"
+
+#: execute_cmd.c:4708
+#, c-format
+msgid "%s: %s: bad interpreter"
+msgstr "%s: %s: bộ thông dịch sai"
+
+#: execute_cmd.c:4857
+#, c-format
+msgid "cannot duplicate fd %d to fd %d"
+msgstr "không thể nhân đôi fd %d tới fd %d"
+
+#: expr.c:241
+msgid "expression recursion level exceeded"
+msgstr "vượt quá giới hạn mức độ đệ quy của biểu thức"
+
+#: expr.c:265
+msgid "recursion stack underflow"
+msgstr "trán ngược đống đệ quy"
+
+#: expr.c:379
+msgid "syntax error in expression"
+msgstr "lỗi cú pháp trong biểu thức"
+
+#: expr.c:419
+msgid "attempted assignment to non-variable"
+msgstr "thử gán cho đồ không phải biến"
+
+#: expr.c:440 expr.c:445 expr.c:756
+msgid "division by 0"
+msgstr "chia cho không"
+
+#: expr.c:471
+msgid "bug: bad expassign token"
+msgstr "lỗi (bug): hiệu bài ấn định biểu thức sai"
+
+#: expr.c:513
+msgid "`:' expected for conditional expression"
+msgstr "đợi dấu hai chấm « : » cho biểu thức điều kiện"
+
+#: expr.c:781
+msgid "exponent less than 0"
+msgstr "số mũ nhỏ hơn 0"
+
+#: expr.c:826
+msgid "identifier expected after pre-increment or pre-decrement"
+msgstr "đợi đồ nhận diện đằng sau tăng/giảm dần sẵn"
+
+#: expr.c:854
+msgid "missing `)'"
+msgstr "thiếu dấu ngoặc đóng « ) »"
+
+#: expr.c:897 expr.c:1175
+msgid "syntax error: operand expected"
+msgstr "lỗi cú pháp: đợi toán hạng"
+
+#: expr.c:1177
+msgid "syntax error: invalid arithmetic operator"
+msgstr "lỗi cú pháp: toán tử số học không hợp lệ"
+
+#: expr.c:1201
+#, c-format
+msgid "%s%s%s: %s (error token is \"%s\")"
+msgstr "%s%s%s: %s (hiệu bài lỗi là « %s »)"
+
+#: expr.c:1259
+msgid "invalid arithmetic base"
+msgstr "cơ số (số học) không hợp lệ"
+
+#: expr.c:1279
+msgid "value too great for base"
+msgstr "cơ số có giá trị quá lớn"
+
+#: expr.c:1328
+#, c-format
+msgid "%s: expression error\n"
+msgstr "%s: lỗi biểu thức\n"
+
+#: general.c:61
+msgid "getcwd: cannot access parent directories"
+msgstr "getcwd: không thể truy cập thư mục cấp trên"
+
+#: input.c:94 subst.c:4559
+#, c-format
+msgid "cannot reset nodelay mode for fd %d"
+msgstr "không thể đặt lại chế độ nodelay (không hoãn) cho fd %d"
+
+#: input.c:258
+#, c-format
+msgid "cannot allocate new file descriptor for bash input from fd %d"
+msgstr "không thể cấp phát bộ mô tả tập tin mớ cho dữ liệu nhập bash từ fd %d"
+
+#: input.c:266
+#, c-format
+msgid "save_bash_input: buffer already exists for new fd %d"
+msgstr "save_bash_input: đã có bộ đệm cho fd mới %d"
+
+# Nghĩa chữ ?
+#: jobs.c:466
+msgid "start_pipeline: pgrp pipe"
+msgstr "start_pipeline: pgrp pipe"
+
+#: jobs.c:887
+#, c-format
+msgid "forked pid %d appears in running job %d"
+msgstr "tiến trình con đã tạo (PID %d) xuất hiện trong công việc đang chạy %d"
+
+#: jobs.c:1005
+#, c-format
+msgid "deleting stopped job %d with process group %ld"
+msgstr "đang xoá công việc bị dừng chạy %d với nhóm tiến trình %ld"
+
+#: jobs.c:1110
+#, c-format
+msgid "add_process: process %5ld (%s) in the_pipeline"
+msgstr "add_process: tiến trình %5ld (%s) trong the_pipeline"
+
+#: jobs.c:1113
+#, c-format
+msgid "add_process: pid %5ld (%s) marked as still alive"
+msgstr "add_process: pid %5ld (%s) được đánh dấu vẫn hoạt động"
+
+#: jobs.c:1401
+#, c-format
+msgid "describe_pid: %ld: no such pid"
+msgstr "describe_pid: %ld: không có PID (mã số tiến trình) như vậy"
+
+#: jobs.c:1416
+#, c-format
+msgid "Signal %d"
+msgstr "Tín hiệu %d"
+
+#: jobs.c:1430 jobs.c:1455
+msgid "Done"
+msgstr "Hoàn tất"
+
+#: jobs.c:1435 siglist.c:122
+msgid "Stopped"
+msgstr "Bị dừng"
+
+#: jobs.c:1439
+#, c-format
+msgid "Stopped(%s)"
+msgstr "Bị dừng(%s)"
+
+#: jobs.c:1443
+msgid "Running"
+msgstr "Đang chạy"
+
+#: jobs.c:1457
+#, c-format
+msgid "Done(%d)"
+msgstr "Hoàn tất(%d)"
+
+#: jobs.c:1459
+#, c-format
+msgid "Exit %d"
+msgstr "Thoát %d"
+
+#: jobs.c:1462
+msgid "Unknown status"
+msgstr "Không rõ trạng thái"
+
+#: jobs.c:1549
+#, c-format
+msgid "(core dumped) "
+msgstr "(lõi bị đổ)"
+
+#: jobs.c:1568
+#, c-format
+msgid "  (wd: %s)"
+msgstr "  (wd: %s)"
+
+#: jobs.c:1771
+#, c-format
+msgid "child setpgid (%ld to %ld)"
+msgstr "setpgid tiến trình con (%ld thành %ld)"
+
+#: jobs.c:2099 nojobs.c:585
+#, c-format
+msgid "wait: pid %ld is not a child of this shell"
+msgstr "wait: pid %ld không phải là tiến trình con của trình bao này"
+
+#: jobs.c:2326
+#, c-format
+msgid "wait_for: No record of process %ld"
+msgstr "wait_for: Không có mục ghi về tiến trình %ld"
+
+#: jobs.c:2598
+#, c-format
+msgid "wait_for_job: job %d is stopped"
+msgstr "wait_for_job: công việc %d bị dừng chạy"
+
+#: jobs.c:2820
+#, c-format
+msgid "%s: job has terminated"
+msgstr "%s: công việc bị chấm dứt"
+
+#: jobs.c:2829
+#, c-format
+msgid "%s: job %d already in background"
+msgstr "%s: công việc %d đã chạy trong nền"
+
+#: jobs.c:3492
+#, c-format
+msgid "%s: line %d: "
+msgstr "%s: dòng %d:"
+
+#: jobs.c:3506 nojobs.c:814
+#, c-format
+msgid " (core dumped)"
+msgstr " (lõi bị đổ)"
+
+#: jobs.c:3518 jobs.c:3531
+#, c-format
+msgid "(wd now: %s)\n"
+msgstr "(wd bây giờ: %s)\n"
+
+#: jobs.c:3563
+msgid "initialize_job_control: getpgrp failed"
+msgstr "initialize_job_control: getpgrp bị lỗi"
+
+#: jobs.c:3623
+msgid "initialize_job_control: line discipline"
+msgstr "initialize_job_control: kỷ luật dòng"
+
+# Nghĩa chữ : dừng dịch
+#: jobs.c:3633
+msgid "initialize_job_control: setpgid"
+msgstr "initialize_job_control: setpgid"
+
+#: jobs.c:3661
+#, c-format
+msgid "cannot set terminal process group (%d)"
+msgstr "không thể đặt nhóm tiến trình cuối cùng (%d)"
+
+#: jobs.c:3666
+msgid "no job control in this shell"
+msgstr "không có điều khiển công việc trong trình bao này"
+
+#: lib/malloc/malloc.c:296
+#, c-format
+msgid "malloc: failed assertion: %s\n"
+msgstr "malloc (cấp phát bộ nhớ): lỗi khẳng định: %s\n"
+
+#: lib/malloc/malloc.c:312
+#, c-format
+msgid ""
+"\r\n"
+"malloc: %s:%d: assertion botched\r\n"
+msgstr ""
+"\r\n"
+"malloc (cấp phát bộ nhớ): %s:%d: khẳng định bị hỏng\r\n"
+
+#: lib/malloc/malloc.c:313
+msgid "unknown"
+msgstr "không rõ"
+
+#: lib/malloc/malloc.c:797
+msgid "malloc: block on free list clobbered"
+msgstr ""
+"malloc (cấp phát bộ nhớ): khối bộ nhớ dành riêng trên danh sách các khối còn "
+"rảnh bị ghi vào"
+
+#: lib/malloc/malloc.c:874
+msgid "free: called with already freed block argument"
+msgstr "free: đã được gọi với đối số khối đã giải phỏng"
+
+#: lib/malloc/malloc.c:877
+msgid "free: called with unallocated block argument"
+msgstr "free: đã được gọi với đối số khối chưa cấp phát"
+
+#: lib/malloc/malloc.c:896
+msgid "free: underflow detected; mh_nbytes out of range"
+msgstr "free: phát hiện sự tràn ngược; mh_nbytes ở ngoại phạm vi"
+
+#: lib/malloc/malloc.c:902
+msgid "free: start and end chunk sizes differ"
+msgstr "free: kích cỡ đoạn đầu và cuối không trùng"
+
+#: lib/malloc/malloc.c:1001
+msgid "realloc: called with unallocated block argument"
+msgstr "realloc: đã được gọi với đối số khối chưa cấp phát"
+
+#: lib/malloc/malloc.c:1016
+msgid "realloc: underflow detected; mh_nbytes out of range"
+msgstr "realloc: phát hiện sự tràn ngược; mh_nbytes ở ngoại phạm vi"
+
+#: lib/malloc/malloc.c:1022
+msgid "realloc: start and end chunk sizes differ"
+msgstr "realloc: kích cỡ đoạn đầu và cuối không trùng"
+
+#: lib/malloc/table.c:177
+#, c-format
+msgid "register_alloc: alloc table is full with FIND_ALLOC?\n"
+msgstr "register_alloc: bảng cấp phát đầy với FIND_ALLOC?\n"
+
+#: lib/malloc/table.c:184
+#, c-format
+msgid "register_alloc: %p already in table as allocated?\n"
+msgstr "register_alloc: %p đã có trong bảng như được cấp phát ?\n"
+
+#: lib/malloc/table.c:220
+#, c-format
+msgid "register_free: %p already in table as free?\n"
+msgstr "register_free: %p đã có trong bảng như còn rảnh ?\n"
+
+#: lib/sh/fmtulong.c:101
+msgid "invalid base"
+msgstr "cơ số không hợp lệ"
+
+#: lib/sh/netopen.c:168
+#, c-format
+msgid "%s: host unknown"
+msgstr "%s: không rõ máy"
+
+#: lib/sh/netopen.c:175
+#, c-format
+msgid "%s: invalid service"
+msgstr "%s: dịch vụ không hợp lệ"
+
+#: lib/sh/netopen.c:306
+#, c-format
+msgid "%s: bad network path specification"
+msgstr "%s: đặc tả đường dẫn mạng sai"
+
+#: lib/sh/netopen.c:346
+msgid "network operations not supported"
+msgstr "không hỗ trợ thao tác mạng"
+
+#: mailcheck.c:433
+msgid "You have mail in $_"
+msgstr "Bạn có thư trong $_"
+
+#: mailcheck.c:458
+msgid "You have new mail in $_"
+msgstr "Bạn có thư mới trong $_"
+
+#: mailcheck.c:474
+#, c-format
+msgid "The mail in %s has been read\n"
+msgstr "Thư tín trong %s đã được đọc\n"
+
+#: make_cmd.c:322
+msgid "syntax error: arithmetic expression required"
+msgstr "lỗi cú pháp: cần thiết biểu thức số học"
+
+#: make_cmd.c:324
+msgid "syntax error: `;' unexpected"
+msgstr "lỗi cú pháp: dấu chấm phẩy « ; » bất thường"
+
+#: make_cmd.c:325
+#, c-format
+msgid "syntax error: `((%s))'"
+msgstr "lỗi cú pháp: `((%s))'"
+
+#: make_cmd.c:567
+#, c-format
+msgid "make_here_document: bad instruction type %d"
+msgstr "make_here_document: kiểu chỉ dẫn sai %d"
+
+#: make_cmd.c:651
+#, c-format
+msgid "here-document at line %d delimited by end-of-file (wanted `%s')"
+msgstr ""
+"tài liệu này ở dòng %d định giới bằng kết thúc tập tin (mong đợi « %s »)"
+
+#: make_cmd.c:746
+#, c-format
+msgid "make_redirection: redirection instruction `%d' out of range"
+msgstr "make_redirection: chỉ dẫn chuyển hướng « %d » ở ngoại phạm vi"
+
+#: parse.y:2986 parse.y:3218
+#, c-format
+msgid "unexpected EOF while looking for matching `%c'"
+msgstr "gặp kết thúc tập tin bất thường trong khi tìm « %c » tương ứng"
+
+#: parse.y:3722
+msgid "unexpected EOF while looking for `]]'"
+msgstr "gặp kết thúc tập tin bất thường trong khi tìm « ]] »"
+
+#: parse.y:3727
+#, c-format
+msgid "syntax error in conditional expression: unexpected token `%s'"
+msgstr "gặp lỗi cú pháp trong biểu thức điều kiện: hiệu bài bất thường « %s »"
+
+#: parse.y:3731
+msgid "syntax error in conditional expression"
+msgstr "gặp lỗi cú pháp trong biểu thức điều kiện"
+
+#: parse.y:3809
+#, c-format
+msgid "unexpected token `%s', expected `)'"
+msgstr "gặp hiệu bài bất thường « %s », còn mong đợi dấu ngoặc đóng « ) »"
+
+#: parse.y:3813
+msgid "expected `)'"
+msgstr "đợi dấu đóng ngoặc « ) »"
+
+#: parse.y:3841
+#, c-format
+msgid "unexpected argument `%s' to conditional unary operator"
+msgstr "đối số bất thường « %s » tới toán tử nguyên phân điều kiện"
+
+#: parse.y:3845
+msgid "unexpected argument to conditional unary operator"
+msgstr "đối số bất thường tới toán tử nguyên phân điều kiện"
+
+#: parse.y:3885
+#, c-format
+msgid "unexpected token `%s', conditional binary operator expected"
+msgstr "hiệu bài bất thường « %s » còn đợi toán tử nhị phân điều kiện"
+
+#: parse.y:3889
+msgid "conditional binary operator expected"
+msgstr "đợi toán tử nhị phân điều kiện"
+
+#: parse.y:3906
+#, c-format
+msgid "unexpected argument `%s' to conditional binary operator"
+msgstr "đối số bất thường « %s » tới toán tử nhị phân điều kiện"
+
+#: parse.y:3910
+msgid "unexpected argument to conditional binary operator"
+msgstr "đối số bất thường tới toán tử nhị phân điều kiện"
+
+#: parse.y:3921
+#, c-format
+msgid "unexpected token `%c' in conditional command"
+msgstr "gặp hiệu bài bất thường « %c » trong câu lệnh điều kiện"
+
+#: parse.y:3924
+#, c-format
+msgid "unexpected token `%s' in conditional command"
+msgstr "gặp hiệu bài bất thường « %s » trong câu lệnh điều kiện"
+
+#: parse.y:3928
+#, c-format
+msgid "unexpected token %d in conditional command"
+msgstr "gặp hiệu bài bất thường « %d » trong câu lệnh điều kiện"
+
+#: parse.y:5195
+#, c-format
+msgid "syntax error near unexpected token `%s'"
+msgstr "gặp lỗi cú pháp ở gần hiệu bài bất thường « %s »"
+
+#: parse.y:5213
+#, c-format
+msgid "syntax error near `%s'"
+msgstr "gặp lỗi cú pháp gần « %s »"
+
+#: parse.y:5223
+msgid "syntax error: unexpected end of file"
+msgstr "lỗi cú pháp: kết thúc tập tin bất thường"
+
+#: parse.y:5223
+msgid "syntax error"
+msgstr "lỗi cú pháp"
+
+#: parse.y:5285
+#, c-format
+msgid "Use \"%s\" to leave the shell.\n"
+msgstr "Dùng « %s » để rời trình bao.\n"
+
+#: parse.y:5447
+msgid "unexpected EOF while looking for matching `)'"
+msgstr ""
+"gặp kết thúc tập tin bất thường trong khi tìm dấu ngoặc đóng « ) » tương ứng"
+
+#: pcomplete.c:1018
+#, c-format
+msgid "completion: function `%s' not found"
+msgstr "completion: không tìm thấy hàm « %s »"
+
+#: pcomplib.c:179
+#, c-format
+msgid "progcomp_insert: %s: NULL COMPSPEC"
+msgstr "progcomp_insert: %s: NULL COMPSPEC"
+
+#: print_cmd.c:285
+#, c-format
+msgid "print_command: bad connector `%d'"
+msgstr "print_command: bộ kết nối sai « %d »"
+
+#: print_cmd.c:1348
+#, c-format
+msgid "cprintf: `%c': invalid format character"
+msgstr "cprintf: « %c »: ký tự định dạng không hợp lệ"
+
+#: redir.c:105
+msgid "file descriptor out of range"
+msgstr "bộ mô tả tập tin ở ngoại phạm vi"
+
+#: redir.c:148
+#, c-format
+msgid "%s: ambiguous redirect"
+msgstr "%s: lời chuyển hướng mơ hồ"
+
+#: redir.c:152
+#, c-format
+msgid "%s: cannot overwrite existing file"
+msgstr "%s: không thể ghi đè lên tập tin đã có"
+
+#: redir.c:157
+#, c-format
+msgid "%s: restricted: cannot redirect output"
+msgstr "%s: bị hạn chế: không thể chuyển hướng kết xuất"
+
+#: redir.c:162
+#, c-format
+msgid "cannot create temp file for here-document: %s"
+msgstr "không thể tạo tập tin tạm thời cho tài liệu này: %s"
+
+#: redir.c:517
+msgid "/dev/(tcp|udp)/host/port not supported without networking"
+msgstr ""
+"/dev/(tcp|udp)/host/port không được hỗ trợ khi không có chức năng chạy mạng"
+
+#: redir.c:1023
+msgid "redirection error: cannot duplicate fd"
+msgstr "gặp lỗi chuyển hướng nên không thể nhân đôi fd"
+
+#: shell.c:328
+msgid "could not find /tmp, please create!"
+msgstr "không tìm thấy « /tmp », hãy tạo."
+
+#: shell.c:332
+msgid "/tmp must be a valid directory name"
+msgstr "« /tmp » phải là tên thư mục hợp lệ"
+
+#: shell.c:876
+#, c-format
+msgid "%c%c: invalid option"
+msgstr "%c%c: tùy chọn không hợp lệ"
+
+#: shell.c:1638
+msgid "I have no name!"
+msgstr "Không có tên."
+
+#: shell.c:1778
+#, c-format
+msgid "GNU bash, version %s-(%s)\n"
+msgstr "bash của GNU, phiên bản %s-(%s)\n"
+
+#: shell.c:1779
+#, c-format
+msgid ""
+"Usage:\t%s [GNU long option] [option] ...\n"
+"\t%s [GNU long option] [option] script-file ...\n"
+msgstr ""
+"Sử dụng:\t%s [tùy chọn GNU dài] [tùy chọn] ...\n"
+"\t%s [tùy chọn GNU dài] [tùy chọn] tập-tin-văn-lệnh ...\n"
+
+#: shell.c:1781
+msgid "GNU long options:\n"
+msgstr "Tùy chọn GNU dài:\n"
+
+#: shell.c:1785
+msgid "Shell options:\n"
+msgstr "Tùy chọn trình bao :\n"
+
+#: shell.c:1786
+msgid "\t-irsD or -c command or -O shopt_option\t\t(invocation only)\n"
+msgstr "\t-irsD hoặc -c lệnh or -O shopt_option\t\t(chỉ cuộc gọi)\n"
+
+#: shell.c:1801
+#, c-format
+msgid "\t-%s or -o option\n"
+msgstr "\t-%s hoặc -o tùy chọn\n"
+
+#: shell.c:1807
+#, c-format
+msgid "Type `%s -c \"help set\"' for more information about shell options.\n"
+msgstr ""
+"Gõ câu lệnh trợ giúp « %s -c \"help set\" » để xem thêm thông tin về các tùy "
+"chọn trình bao.\n"
+
+#: shell.c:1808
+#, c-format
+msgid "Type `%s -c help' for more information about shell builtin commands.\n"
+msgstr ""
+"Gõ câu lệnh trợ giúp « %s -c help » để xem thêm thông tin về các câu lệnh "
+"trình bao dựng sẵn.\n"
+
+#: shell.c:1809
+#, c-format
+msgid "Use the `bashbug' command to report bugs.\n"
+msgstr "Dùng lệnh « bashbug » để thông báo lỗi.\n"
+
+#: sig.c:583
+#, c-format
+msgid "sigprocmask: %d: invalid operation"
+msgstr "sigprocmask: %d: thao tác không hợp lệ"
+
+#: siglist.c:47
+msgid "Bogus signal"
+msgstr "Tín hiệu giả"
+
+#: siglist.c:50
+msgid "Hangup"
+msgstr "Treo máy"
+
+#: siglist.c:54
+msgid "Interrupt"
+msgstr "Gián đoạn"
+
+#: siglist.c:58
+msgid "Quit"
+msgstr "Thoát"
+
+#: siglist.c:62
+msgid "Illegal instruction"
+msgstr "Câu lệnh không được phép"
+
+#: siglist.c:66
+msgid "BPT trace/trap"
+msgstr "Theo vết/đặt bẫy BPT"
+
+#: siglist.c:74
+msgid "ABORT instruction"
+msgstr "Câu lệnh HỦY BỎ"
+
+#: siglist.c:78
+msgid "EMT instruction"
+msgstr "Câu lệnh EMT"
+
+#: siglist.c:82
+msgid "Floating point exception"
+msgstr "Ngoại lệ chấm động"
+
+#: siglist.c:86
+msgid "Killed"
+msgstr "Bị giết"
+
+#: siglist.c:90
+msgid "Bus error"
+msgstr "lỗi mạch nối"
+
+#: siglist.c:94
+msgid "Segmentation fault"
+msgstr "Lỗi chia ra từng đoạn"
+
+#: siglist.c:98
+msgid "Bad system call"
+msgstr "Sai gọi hệ thống"
+
+#: siglist.c:102
+msgid "Broken pipe"
+msgstr "Ống dẫn bị hỏng"
+
+#: siglist.c:106
+msgid "Alarm clock"
+msgstr "Đồng hồ báo thức"
+
+#: siglist.c:110
+msgid "Terminated"
+msgstr "Bị chấm dứt"
+
+#: siglist.c:114
+msgid "Urgent IO condition"
+msgstr "Điều kiện VR gấp"
+
+#: siglist.c:118
+msgid "Stopped (signal)"
+msgstr "Bị dừng (tín hiệu)"
+
+#: siglist.c:126
+msgid "Continue"
+msgstr "Tiếp tục"
+
+#: siglist.c:134
+msgid "Child death or stop"
+msgstr "Tiến trình con đã giết hoặc dừng"
+
+#: siglist.c:138
+msgid "Stopped (tty input)"
+msgstr "Bị dừng (tty nhập)"
+
+#: siglist.c:142
+msgid "Stopped (tty output)"
+msgstr "Bị dừng (tty xuất)"
+
+#: siglist.c:146
+msgid "I/O ready"
+msgstr "V/R sẵn sàng"
+
+#: siglist.c:150
+msgid "CPU limit"
+msgstr "Giới hạn CPU"
+
+#: siglist.c:154
+msgid "File limit"
+msgstr "Giới hạn tập tin"
+
+#: siglist.c:158
+msgid "Alarm (virtual)"
+msgstr "Báo động (ảo)"
+
+#: siglist.c:162
+msgid "Alarm (profile)"
+msgstr "Báo động (hồ sơ)"
+
+#: siglist.c:166
+msgid "Window changed"
+msgstr "Cửa sổ bị thay đổi"
+
+#: siglist.c:170
+msgid "Record lock"
+msgstr "Mục ghi bị khoá"
+
+#: siglist.c:174
+msgid "User signal 1"
+msgstr "Tín hiệu người dùng 1"
+
+#: siglist.c:178
+msgid "User signal 2"
+msgstr "Tín hiệu người dùng 2"
+
+#: siglist.c:182
+msgid "HFT input data pending"
+msgstr "Dữ liệu nhập HFT bị hoãn"
+
+#: siglist.c:186
+msgid "power failure imminent"
+msgstr "sắp bị cúp điện đột ngột"
+
+#: siglist.c:190
+msgid "system crash imminent"
+msgstr "hệ thống sắp sụp đổ"
+
+#: siglist.c:194
+msgid "migrate process to another CPU"
+msgstr "chuyển tiến trình sang CPU khác"
+
+#: siglist.c:198
+msgid "programming error"
+msgstr "lỗi lập trình"
+
+#: siglist.c:202
+msgid "HFT monitor mode granted"
+msgstr "Có chế độ màn hình HFT"
+
+#: siglist.c:206
+msgid "HFT monitor mode retracted"
+msgstr "Không có chế độ màn hình HFT"
+
+#: siglist.c:210
+msgid "HFT sound sequence has completed"
+msgstr "Đã hoàn thành chuỗi âm thanh HFT"
+
+#: siglist.c:214
+msgid "Information request"
+msgstr "yêu cầu thông tin"
+
+#: siglist.c:222
+msgid "Unknown Signal #"
+msgstr "Không rõ tín hiệu #"
+
+#: siglist.c:224
+#, c-format
+msgid "Unknown Signal #%d"
+msgstr "Không rõ tín hiệu #%d"
+
+#: subst.c:1181 subst.c:1302
+#, c-format
+msgid "bad substitution: no closing `%s' in %s"
+msgstr "sai thay thế: không có « %s » đóng trong %s"
+
+#: subst.c:2458
+#, c-format
+msgid "%s: cannot assign list to array member"
+msgstr "%s: không thể gán danh sách cho bộ phận của mảng"
+
+#: subst.c:4456 subst.c:4472
+msgid "cannot make pipe for process substitution"
+msgstr "không thể tạo ống dẫn để thay thế tiến trình"
+
+#: subst.c:4504
+msgid "cannot make child for process substitution"
+msgstr "không thể tạo tiến trình con để thay thế tiến trình"
+
+#: subst.c:4549
+#, c-format
+msgid "cannot open named pipe %s for reading"
+msgstr "không thể mở ống dẫn đặt tên %s để đọc"
+
+#: subst.c:4551
+#, c-format
+msgid "cannot open named pipe %s for writing"
+msgstr "không thể mở ống dẫn đặt tên %s để ghi"
+
+#: subst.c:4569
+#, c-format
+msgid "cannot duplicate named pipe %s as fd %d"
+msgstr "không thể nhân đôi ống dẫn đặt tên %s thành fd %d"
+
+#: subst.c:4765
+msgid "cannot make pipe for command substitution"
+msgstr "không thể tạo ống dẫn để thay thế lệnh"
+
+#: subst.c:4799
+msgid "cannot make child for command substitution"
+msgstr "không thể tạo tiến trình con để thay thế lệnh"
+
+#: subst.c:4816
+msgid "command_substitute: cannot duplicate pipe as fd 1"
+msgstr "command_substitute: không thể nhân đôi ống dẫn thành fd 1"
+
+#: subst.c:5318
+#, c-format
+msgid "%s: parameter null or not set"
+msgstr "%s: tham số vô giá trị hoặc chưa được đặt"
+
+#: subst.c:5608
+#, c-format
+msgid "%s: substring expression < 0"
+msgstr "%s: biểu thức chuỗi phụ < 0"
+
+#: subst.c:6660
+#, c-format
+msgid "%s: bad substitution"
+msgstr "%s: sai thay thế"
+
+#: subst.c:6740
+#, c-format
+msgid "$%s: cannot assign in this way"
+msgstr "$%s: không thể gán bằng cách này"
+
+#: subst.c:7499
+#, c-format
+msgid "bad substitution: no closing \"`\" in %s"
+msgstr "sai thay thế: không có « ` » đóng trong %s"
+
+#: subst.c:8375
+#, c-format
+msgid "no match: %s"
+msgstr "không khớp: %s"
+
+#: test.c:145
+msgid "argument expected"
+msgstr "mong đợi đối số"
+
+#: test.c:154
+#, c-format
+msgid "%s: integer expression expected"
+msgstr "%s: đợi biểu thức số nguyên"
+
+#: test.c:262
+msgid "`)' expected"
+msgstr "đợi dấu ngoặc đóng « ) »"
+
+#: test.c:264
+#, c-format
+msgid "`)' expected, found %s"
+msgstr "đợi dấu ngoặc đóng « ) », còn tìm %s"
+
+#: test.c:279 test.c:688 test.c:691
+#, c-format
+msgid "%s: unary operator expected"
+msgstr "%s: đợi toán tử nguyên phân"
+
+#: test.c:444 test.c:731
+#, c-format
+msgid "%s: binary operator expected"
+msgstr "%s: đợi toán tử nhị phân"
+
+#: test.c:806
+msgid "missing `]'"
+msgstr "thiếu dấu ngoặc vụ đóng « ] »"
+
+#: trap.c:201
+msgid "invalid signal number"
+msgstr "số thứ tự tín hiệu không hợp lệ"
+
+#: trap.c:324
+#, c-format
+msgid "run_pending_traps: bad value in trap_list[%d]: %p"
+msgstr "run_pending_traps: giá trị sai trong danh sách trap_list[%d]: %p"
+
+#: trap.c:328
+#, c-format
+msgid ""
+"run_pending_traps: signal handler is SIG_DFL, resending %d (%s) to myself"
+msgstr ""
+"run_pending_traps: bộ xử lý tín hiệu là SIG_DFL, đang gửi lại %d (%s) cho "
+"mình"
+
+#: trap.c:372
+#, c-format
+msgid "trap_handler: bad signal %d"
+msgstr "trap_handler: tín hiệu sai %d"
+
+#: variables.c:358
+#, c-format
+msgid "error importing function definition for `%s'"
+msgstr "gặp lỗi khi nhập lời xác định hàm cho « %s »"
+
+#: variables.c:736
+#, c-format
+msgid "shell level (%d) too high, resetting to 1"
+msgstr "cấp trình bao (%d) quá cao nên đặt lại thành 1"
+
+#: variables.c:1898
+msgid "make_local_variable: no function context at current scope"
+msgstr "make_local_variable: không có ngữ cảnh hàm ở phạm vi hiện thời"
+
+#: variables.c:3127
+msgid "all_local_variables: no function context at current scope"
+msgstr "all_local_variables: không có ngữ cảnh hàm ở phạm vi hiện thời"
+
+#: variables.c:3344 variables.c:3353
+#, c-format
+msgid "invalid character %d in exportstr for %s"
+msgstr "sai ký tự %d trong chuỗi exportstr cho %s"
+
+#: variables.c:3359
+#, c-format
+msgid "no `=' in exportstr for %s"
+msgstr "không có dấu bằng « = » trong chuỗi exportstr cho %s"
+
+#: variables.c:3794
+msgid "pop_var_context: head of shell_variables not a function context"
+msgstr ""
+"pop_var_context: đầu của shell_variables (các biến trình bao) không phải là "
+"ngữ cảnh hàm"
+
+#: variables.c:3807
+msgid "pop_var_context: no global_variables context"
+msgstr ""
+"pop_var_context: không có ngữ cảnh global_variables (các biến toàn cục)"
+
+#: variables.c:3881
+msgid "pop_scope: head of shell_variables not a temporary environment scope"
+msgstr ""
+"pop_scope: đầu của shell_variables (các biến trình bao) không phải là phạm "
+"vi môi trường tạm thời"
+
+#: version.c:46
+#, fuzzy
+msgid "Copyright (C) 2009 Free Software Foundation, Inc."
+msgstr "Tác quyền © năm 2008 của Tổ chức Phần mềm Tự do."
+
+#: version.c:47
+msgid ""
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+msgstr ""
+"Giấy phép GPLv3+: Giấy Phép Công Cộng GNU phiên bản 3 hay sau <http://gnu."
+"org/licenses/gpl.html>\n"
+
+#: version.c:86
+#, c-format
+msgid "GNU bash, version %s (%s)\n"
+msgstr "bash của GNU, phiên bản %s (%s)\n"
+
+#: version.c:91
+#, c-format
+msgid "This is free software; you are free to change and redistribute it.\n"
+msgstr "Đây là phần mềm tự do thì bạn có quyền sửa đổi và phát hành lại nó.\n"
+
+#: version.c:92
+#, c-format
+msgid "There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr "KHÔNG BẢO ĐẢM GÌ CẢ, với điều kiện được pháp luật cho phép.\n"
+
+#: xmalloc.c:92
+#, c-format
+msgid "xmalloc: cannot allocate %lu bytes (%lu bytes allocated)"
+msgstr "xmalloc: không thể cấp phát %lu byte (%lu byte đã cấp phát)"
+
+#: xmalloc.c:94
+#, c-format
+msgid "xmalloc: cannot allocate %lu bytes"
+msgstr "xmalloc: không thể cấp phát %lu byte"
+
+#: xmalloc.c:114
+#, c-format
+msgid "xrealloc: cannot reallocate %lu bytes (%lu bytes allocated)"
+msgstr "xrealloc: không thể cấp phát lại %lu byte (%lu byte đã cấp phát)"
+
+#: xmalloc.c:116
+#, c-format
+msgid "xrealloc: cannot allocate %lu bytes"
+msgstr "xrealloc: không thể cấp phát %lu byte"
+
+#: xmalloc.c:150
+#, c-format
+msgid "xmalloc: %s:%d: cannot allocate %lu bytes (%lu bytes allocated)"
+msgstr "xmalloc: %s:%d: không thể cấp phát %lu byte (%lu byte đã cấp phát)"
+
+#: xmalloc.c:152
+#, c-format
+msgid "xmalloc: %s:%d: cannot allocate %lu bytes"
+msgstr "xmalloc: %s:%d: không thể cấp phát %lu byte"
+
+#: xmalloc.c:174
+#, c-format
+msgid "xrealloc: %s:%d: cannot reallocate %lu bytes (%lu bytes allocated)"
+msgstr ""
+"xrealloc: %s:%d: không thể cấp phát lại %lu byte (%lu byte đã cấp phát)"
+
+#: xmalloc.c:176
+#, c-format
+msgid "xrealloc: %s:%d: cannot allocate %lu bytes"
+msgstr "xrealloc: %s:%d: không thể cấp phát %lu byte"
+
+#: builtins.c:43
+msgid "alias [-p] [name[=value] ... ]"
+msgstr "alias [-p] [tên[=giá-trị] ... ]"
+
+#: builtins.c:47
+msgid "unalias [-a] name [name ...]"
+msgstr "unalias [-a] tên [tên ...]"
+
+#: builtins.c:51
+msgid ""
+"bind [-lpvsPVS] [-m keymap] [-f filename] [-q name] [-u name] [-r keyseq] [-"
+"x keyseq:shell-command] [keyseq:readline-function or readline-command]"
+msgstr ""
+"bind [-lpvsPVS] [-m sơ_đồ_phím] [-f tên_tập_tin] [-q tên] [-u tên] [-r "
+"dãy_phím] [-x dãy_phím:lệnh_trình_bao] [dãy_phím:chức_năng-readline hay lệnh-"
+"readline]"
+
+#: builtins.c:54
+msgid "break [n]"
+msgstr "break [n]"
+
+#: builtins.c:56
+msgid "continue [n]"
+msgstr "tiếp tục [n]"
+
+#: builtins.c:58
+msgid "builtin [shell-builtin [arg ...]]"
+msgstr "builtin [shell-builtin [arg ...]]"
+
+#: builtins.c:61
+msgid "caller [expr]"
+msgstr "caller [b_thức]"
+
+#: builtins.c:64
+msgid "cd [-L|-P] [dir]"
+msgstr "cd [-L|-P] [tmục]"
+
+#: builtins.c:66
+msgid "pwd [-LP]"
+msgstr "pwd [-LP]"
+
+#: builtins.c:68
+msgid ":"
+msgstr ":"
+
+#: builtins.c:70
+msgid "true"
+msgstr "đúng"
+
+#: builtins.c:72
+msgid "false"
+msgstr "sai"
+
+#: builtins.c:74
+msgid "command [-pVv] command [arg ...]"
+msgstr "command [-pVv] command [arg ...]"
+
+#: builtins.c:76
+msgid "declare [-aAfFilrtux] [-p] [name[=value] ...]"
+msgstr "declare [-aAfFilrtux] [-p] [tên[=giá_trị] ...]"
+
+#: builtins.c:78
+msgid "typeset [-aAfFilrtux] [-p] name[=value] ..."
+msgstr "typeset [-aAfFilrtux] [-p] tên[=giá_trị] ..."
+
+#: builtins.c:80
+msgid "local [option] name[=value] ..."
+msgstr "local [tùy_chọn] tên[=giá_trị] ..."
+
+#: builtins.c:83
+msgid "echo [-neE] [arg ...]"
+msgstr "echo [-neE] [đối_số ...]"
+
+#: builtins.c:87
+msgid "echo [-n] [arg ...]"
+msgstr "echo [-n] [đối_số ...]"
+
+#: builtins.c:90
+msgid "enable [-a] [-dnps] [-f filename] [name ...]"
+msgstr "enable [-a] [-dnps] [-f tên_tập_tin] [tên ...]"
+
+#: builtins.c:92
+msgid "eval [arg ...]"
+msgstr "eval [đối_số ...]"
+
+#: builtins.c:94
+msgid "getopts optstring name [arg]"
+msgstr "getopts chuỗi_tùy_chọn tên [đối_số]"
+
+#: builtins.c:96
+msgid "exec [-cl] [-a name] [command [arguments ...]] [redirection ...]"
+msgstr "exec [-cl] [-a tên] [lệnh [đối_số ...]] [chuyển_hướng ...]"
+
+#: builtins.c:98
+msgid "exit [n]"
+msgstr "exit [n]"
+
+#: builtins.c:100
+msgid "logout [n]"
+msgstr "đăng xuất [n]"
+
+#: builtins.c:103
+msgid "fc [-e ename] [-lnr] [first] [last] or fc -s [pat=rep] [command]"
+msgstr ""
+"fc [-e tên-e] [-lnr] [đầu] [cuối]\n"
+"\thay\n"
+"fc -s [mẫu=lập_lại] [lệnh]"
+
+#: builtins.c:107
+msgid "fg [job_spec]"
+msgstr "fg [đặc_tả_công_việc]"
+
+#: builtins.c:111
+msgid "bg [job_spec ...]"
+msgstr "bg [đặc_tả_công_việc ...]"
+
+#: builtins.c:114
+msgid "hash [-lr] [-p pathname] [-dt] [name ...]"
+msgstr "hash [-lr] [-p đường_dẫn] [-dt] [tên ...]"
+
+#: builtins.c:117
+msgid "help [-ds] [pattern ...]"
+msgstr "help [-ds] [mẫu ...]"
+
+#: builtins.c:121
+msgid ""
+"history [-c] [-d offset] [n] or history -anrw [filename] or history -ps arg "
+"[arg...]"
+msgstr ""
+"history [-c] [-d hiệu] [n]\n"
+"\thay\n"
+"history -anrw [tên_tập_tin]\n"
+"\thay\n"
+"history -ps đối_số [đối_số...]"
+
+#: builtins.c:125
+msgid "jobs [-lnprs] [jobspec ...] or jobs -x command [args]"
+msgstr ""
+"jobs [-lnprs] [đặc_tả_công_việc ...]\n"
+"\thoặc\n"
+"jobs -x lệnh [các_đối_số]"
+
+#: builtins.c:129
+msgid "disown [-h] [-ar] [jobspec ...]"
+msgstr "disown [-h] [-ar] [đặc_tả_công_việc ...]"
+
+#: builtins.c:132
+msgid ""
+"kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l "
+"[sigspec]"
+msgstr ""
+"kill [-s đặc_tả_tín_hiệu | -n số_tín_hiệu | -đặc_tả_tín_hiệu] pid | "
+"đặc_tả_công_việc ...\n"
+"\thay\n"
+"kill -l [đặc_tả_tín_hiệu]"
+
+#: builtins.c:134
+msgid "let arg [arg ...]"
+msgstr "let đối_số [đối_số ...]"
+
+#: builtins.c:136
+msgid ""
+"read [-ers] [-a array] [-d delim] [-i text] [-n nchars] [-p prompt] [-t "
+"timeout] [-u fd] [name ...]"
+msgstr ""
+"read [-ers] [-a mảng] [-d giới_hạn] [-i văn_bản] [-n số_ký_tự] [-p nhắc] [-t "
+"thời_hạn] [-u fd] [tên ...]"
+
+# nghĩa chữ
+#: builtins.c:138
+msgid "return [n]"
+msgstr "return [n]"
+
+#: builtins.c:140
+msgid "set [--abefhkmnptuvxBCHP] [-o option-name] [arg ...]"
+msgstr "set [--abefhkmnptuvxBCHP] [-o tùy_chọn] [đối_số ...]"
+
+#: builtins.c:142
+msgid "unset [-f] [-v] [name ...]"
+msgstr "unset [-f] [-v] [tên ...]"
+
+#: builtins.c:144
+msgid "export [-fn] [name[=value] ...] or export -p"
+msgstr ""
+"export [-fn] [tên[=giá_trị] ...]\n"
+"\thay\n"
+"export -p"
+
+#: builtins.c:146
+msgid "readonly [-af] [name[=value] ...] or readonly -p"
+msgstr ""
+"readonly [-af] [tên[=giá_trị] ...]\n"
+"\thay\n"
+"readonly -p"
+
+#: builtins.c:148
+msgid "shift [n]"
+msgstr "shift [n]"
+
+#: builtins.c:150
+msgid "source filename [arguments]"
+msgstr "nguồn tên_tập_tin [đối_số ...]"
+
+#: builtins.c:152
+msgid ". filename [arguments]"
+msgstr ". tên_tập_tin [đối_số ...]"
+
+#: builtins.c:155
+msgid "suspend [-f]"
+msgstr "ngưng [-f]"
+
+#: builtins.c:158
+msgid "test [expr]"
+msgstr "test [b_thức]"
+
+#: builtins.c:160
+msgid "[ arg... ]"
+msgstr "[ đối_số ... ]"
+
+#: builtins.c:162
+msgid "times"
+msgstr "lần"
+
+#: builtins.c:164
+msgid "trap [-lp] [[arg] signal_spec ...]"
+msgstr "trap [-lp] [[đối_số] đặc_tả_tín_hiệu ...]"
+
+#: builtins.c:166
+msgid "type [-afptP] name [name ...]"
+msgstr "type [-afptP] tên [tên ...]"
+
+#: builtins.c:169
+msgid "ulimit [-SHacdefilmnpqrstuvx] [limit]"
+msgstr "ulimit [-SHacdefilmnpqrstuvx] [giới_hạn]"
+
+#: builtins.c:172
+msgid "umask [-p] [-S] [mode]"
+msgstr "umask [-p] [-S] [chế_độ]"
+
+#: builtins.c:175
+msgid "wait [id]"
+msgstr "đợi [id]"
+
+#: builtins.c:179
+msgid "wait [pid]"
+msgstr "đợi [pid]"
+
+#: builtins.c:182
+msgid "for NAME [in WORDS ... ] ; do COMMANDS; done"
+msgstr "for TÊN [in CÁC-TỪ ... ;] do các_CÂU_LỆNH; done"
+
+#: builtins.c:184
+msgid "for (( exp1; exp2; exp3 )); do COMMANDS; done"
+msgstr "for (( exp1; exp2; exp3 )); do các_CÂU_LỆNH; done"
+
+#: builtins.c:186
+msgid "select NAME [in WORDS ... ;] do COMMANDS; done"
+msgstr "select TÊN [in CÁC-TỪ ... ;] do các_CÂU_LỆNH; done"
+
+#: builtins.c:188
+msgid "time [-p] pipeline"
+msgstr "thời hạn [-p] ống dẫn"
+
+#: builtins.c:190
+msgid "case WORD in [PATTERN [| PATTERN]...) COMMANDS ;;]... esac"
+msgstr "case TỪ in [MẪU [| MẪU]...) các_CÂU_LỆNH ;;]... esac"
+
+#: builtins.c:192
+msgid ""
+"if COMMANDS; then COMMANDS; [ elif COMMANDS; then COMMANDS; ]... [ else "
+"COMMANDS; ] fi"
+msgstr ""
+"if các_CÂU_LỆNH; then các_CÂU_LỆNH; [ elif các_CÂU_LỆNH; then "
+"các_CÂU_LỆNH; ]... [ else các_CÂU_LỆNH; ] fi"
+
+#: builtins.c:194
+msgid "while COMMANDS; do COMMANDS; done"
+msgstr "while các_CÂU_LỆNH; do các_CÂU_LỆNH; done"
+
+#: builtins.c:196
+msgid "until COMMANDS; do COMMANDS; done"
+msgstr "until các_CÂU_LỆNH; do các_CÂU_LỆNH; done"
+
+#: builtins.c:198
+msgid "coproc [NAME] command [redirections]"
+msgstr ""
+
+#: builtins.c:200
+msgid "function name { COMMANDS ; } or name () { COMMANDS ; }"
+msgstr ""
+"chức_năng tên { các_CÂU_LỆNH ; }\n"
+"\thay\n"
+"tên () { các_CÂU_LỆNH ; }"
+
+#: builtins.c:202
+msgid "{ COMMANDS ; }"
+msgstr "{ LỆNH ; }"
+
+#: builtins.c:204
+msgid "job_spec [&]"
+msgstr "đặc_tả_công_việc [&]"
+
+#: builtins.c:206
+msgid "(( expression ))"
+msgstr "(( biểu_thức ))"
+
+#: builtins.c:208
+msgid "[[ expression ]]"
+msgstr "[[ biểu_thức ]]"
+
+#: builtins.c:210
+msgid "variables - Names and meanings of some shell variables"
+msgstr "biến — tên và nghĩa của một số biến trình bao"
+
+#: builtins.c:213
+msgid "pushd [-n] [+N | -N | dir]"
+msgstr "pushd [-n] [+N | -N | tmục]"
+
+#: builtins.c:217
+msgid "popd [-n] [+N | -N]"
+msgstr "popd [-n] [+N | -N]"
+
+#: builtins.c:221
+msgid "dirs [-clpv] [+N] [-N]"
+msgstr "dirs [-clpv] [+N] [-N]"
+
+#: builtins.c:224
+msgid "shopt [-pqsu] [-o] [optname ...]"
+msgstr "shopt [-pqsu] [-o] [tùy_chọn ...]"
+
+#: builtins.c:226
+msgid "printf [-v var] format [arguments]"
+msgstr "printf [-v biến] định_dạng [đối_số]"
+
+#: builtins.c:229
+msgid ""
+"complete [-abcdefgjksuv] [-pr] [-o option] [-A action] [-G globpat] [-W "
+"wordlist]  [-F function] [-C command] [-X filterpat] [-P prefix] [-S suffix] "
+"[name ...]"
+msgstr ""
+"complete [-abcdefgjksuv] [-pr] [-o tùy_chọn] [-A hành_động] [-G mẫu_glob] [-"
+"W danh_sách_từ]  [-F hàm] [-C lệnh] [-X mẫu_lọc] [-P tiền_tố] [-S hậu_tố] "
+"[tên ...]"
+
+#: builtins.c:233
+msgid ""
+"compgen [-abcdefgjksuv] [-o option]  [-A action] [-G globpat] [-W wordlist]  "
+"[-F function] [-C command] [-X filterpat] [-P prefix] [-S suffix] [word]"
+msgstr ""
+"compgen [-abcdefgjksuv] [-o tùy_chọn]  [-A hành_động] [-G mẫu_glob] [-W "
+"danh_sách_từ]  [-F hàm] [-C lệnh] [-X mẫu_lọc] [-P tiền_tố] [-S hậu_tố] [từ]"
+
+#: builtins.c:237
+msgid "compopt [-o|+o option] [name ...]"
+msgstr "compopt [-o|+o tùy_chọn] [tên ...]"
+
+#: builtins.c:240
+msgid ""
+"mapfile [-n count] [-O origin] [-s count] [-t] [-u fd] [-C callback] [-c "
+"quantum] [array]"
+msgstr ""
+"mapfile [-n đếm] [-O gốc] [-s đếm] [-t] [-u fd] [-C gọi_ngược] [-c lượng] "
+"[mảng]"
+
+#: builtins.c:242
+#, fuzzy
+msgid ""
+"readarray [-n count] [-O origin] [-s count] [-t] [-u fd] [-C callback] [-c "
+"quantum] [array]"
+msgstr ""
+"mapfile [-n đếm] [-O gốc] [-s đếm] [-t] [-u fd] [-C gọi_ngược] [-c lượng] "
+"[mảng]"
+
+#: builtins.c:254
+msgid ""
+"Define or display aliases.\n"
+"    \n"
+"    Without arguments, `alias' prints the list of aliases in the reusable\n"
+"    form `alias NAME=VALUE' on standard output.\n"
+"    \n"
+"    Otherwise, an alias is defined for each NAME whose VALUE is given.\n"
+"    A trailing space in VALUE causes the next word to be checked for\n"
+"    alias substitution when the alias is expanded.\n"
+"    \n"
+"    Options:\n"
+"      -p\tPrint all defined aliases in a reusable format\n"
+"    \n"
+"    Exit Status:\n"
+"    alias returns true unless a NAME is supplied for which no alias has "
+"been\n"
+"    defined."
+msgstr ""
+"Xác định hoặc hiển thị bí danh.\n"
+"\n"
+"\tKhông đưa ra đối số thì « alias » in ra danh sách các bí danh\n"
+"\ttheo định dạng có thể dùng lại được « bí_danh TÊN=GIÁ_TRỊ »\n"
+"\ttrên đầu ra tiêu chuẩn.\n"
+"\n"
+"\tCó đối số thì một bí danh được xác định cho mỗi TÊN có giá trị đưa ra.\n"
+"\tMột dấu cách theo sau trong GIÁ_TRỊ thì gây ra từ kế tiếp được kiểm tra\n"
+"\tcó bí danh được thay thế khi bí danh được mở rộng.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-p\tin ra tất cả các bí danh đã xác định theo một định dạng\n"
+"\t\t\tcó thể dùng lại được\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tbí danh trả lại Đúng nếu không đưa ra TÊN chưa có bí danh được xác định."
+
+#: builtins.c:276
+msgid ""
+"Remove each NAME from the list of defined aliases.\n"
+"    \n"
+"    Options:\n"
+"      -a\tremove all alias definitions.\n"
+"    \n"
+"    Return success unless a NAME is not an existing alias."
+msgstr ""
+"Gỡ bỏ mỗi TÊN khỏi danh sách các bí danh đã xác định.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-a\tgỡ bỏ tất cả các lời xác định bí danh.\n"
+"\n"
+"Trả lại thành công nếu không có TÊN là một bí danh không tồn tại."
+
+#: builtins.c:289
+msgid ""
+"Set Readline key bindings and variables.\n"
+"    \n"
+"    Bind a key sequence to a Readline function or a macro, or set a\n"
+"    Readline variable.  The non-option argument syntax is equivalent to\n"
+"    that found in ~/.inputrc, but must be passed as a single argument:\n"
+"    e.g., bind '\"\\C-x\\C-r\": re-read-init-file'.\n"
+"    \n"
+"    Options:\n"
+"      -m  keymap         Use KEYMAP as the keymap for the duration of this\n"
+"                         command.  Acceptable keymap names are emacs,\n"
+"                         emacs-standard, emacs-meta, emacs-ctlx, vi, vi-"
+"move,\n"
+"                         vi-command, and vi-insert.\n"
+"      -l                 List names of functions.\n"
+"      -P                 List function names and bindings.\n"
+"      -p                 List functions and bindings in a form that can be\n"
+"                         reused as input.\n"
+"      -S                 List key sequences that invoke macros and their "
+"values\n"
+"      -s                 List key sequences that invoke macros and their "
+"values\n"
+"                         in a form that can be reused as input.\n"
+"      -V                 List variable names and values\n"
+"      -v                 List variable names and values in a form that can\n"
+"                         be reused as input.\n"
+"      -q  function-name  Query about which keys invoke the named function.\n"
+"      -u  function-name  Unbind all keys which are bound to the named "
+"function.\n"
+"      -r  keyseq         Remove the binding for KEYSEQ.\n"
+"      -f  filename       Read key bindings from FILENAME.\n"
+"      -x  keyseq:shell-command\tCause SHELL-COMMAND to be executed when\n"
+"    \t\t\t\tKEYSEQ is entered.\n"
+"    \n"
+"    Exit Status:\n"
+"    bind returns 0 unless an unrecognized option is given or an error occurs."
+msgstr ""
+"Đặt các tổ hợp phím và biến kiểu Readline.\n"
+"\n"
+"\tTổ hợp một dãy phím với một chức năng hay vĩ lệnh kiểu Readline,\n"
+"\t\thoặc đặt một biến Readline.\n"
+"\tCú pháp đối số khác tùy chọn cũng tương đương với cú pháp\n"
+"\t\ttrong « ~/.inputrc », nhưng phải được gửi dưới dạng\n"
+"\t\tmột đối số riêng lẻ.\n"
+"\t\tVí dụ : bind '\"\\C-x\\C-r\": re-read-init-file'.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-m sơ_đồ_phím\tdùng sơ đồ phím này làm sơ đồ phím\n"
+"\t\t\ttrong khoảng thời gian chạy câu lệnh này.\n"
+"\t\tTên sơ đồ phím hợp lệ:\n"
+"\t\t\temacs, emacs-standard, emacs-meta,\n"
+"\t\t\temacs-ctlx, vi, vi-move, vi-command,\n"
+"\t\t\tvi-insert\n"
+"\t\t-l\tliệt kê các tên chức năng\n"
+"\t\t-P\tliệt kê các tên và tổ hợp của chức năng\n"
+"\t\t-p\tliệt kê các chức năng và tổ hợp theo một định dạng\n"
+"\t\t\tcó thể dùng lại được làm dữ liệu nhập vào\n"
+"\t\t-S\tliệt kê các dãy phím mà gọi vĩ lệnh và giá trị tương ứng\n"
+"\t\t-S\tliệt kê các dãy phím mà gọi vĩ lệnh và giá trị tương ứng\n"
+"\t\t\ttheo một định dạng có thể dùng lại được\n"
+"\t\t\tlàm dữ liệu nhập vào\n"
+"\t\t-q tên_chức_năng\thỏi những phím nào gọi chức năng này\n"
+"\t\t-u tên_chức_năng\ttháo tổ hợp tất cả các phím tổ hợp\n"
+"\t\t\tvới chức năng này\n"
+"\t\t-r dãy_phím\tgỡ bỏ tổ hợp đối với dãy phím này\n"
+"\t\t-f tên_tập_tin\tđọc các tổ hợp phím từ tập tin này\n"
+"\t\t-x dãy_phím:lệnh_trình_bao\tchạy câu lệnh trình bào này\n"
+"\t\t\tkhi dãy phím này được nhập vào\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tbind trả lại 0 nếu không đưa ra tùy chọn không nhận ra hay gặp lỗi."
+
+#: builtins.c:326
+msgid ""
+"Exit for, while, or until loops.\n"
+"    \n"
+"    Exit a FOR, WHILE or UNTIL loop.  If N is specified, break N enclosing\n"
+"    loops.\n"
+"    \n"
+"    Exit Status:\n"
+"    The exit status is 0 unless N is not greater than or equal to 1."
+msgstr ""
+"Thoát khỏi vòng lặp kiểu trong, trong khi hay đến khi.\n"
+"\n"
+"\tThoát khỏi một vòng lặp kiểu TRONG, TRONG KHI hay ĐẾN KHI.\n"
+"\tCó ghi rõ N thì ngắt N vòng lặp bao bọc.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrạng thái thoát là 0 nếu N không nhỏ hơn hay bằng 1."
+
+#: builtins.c:338
+msgid ""
+"Resume for, while, or until loops.\n"
+"    \n"
+"    Resumes the next iteration of the enclosing FOR, WHILE or UNTIL loop.\n"
+"    If N is specified, resumes the Nth enclosing loop.\n"
+"    \n"
+"    Exit Status:\n"
+"    The exit status is 0 unless N is not greater than or equal to 1."
+msgstr ""
+"Tiếp tục lại chạy vòng lặp kiểu trong, trong khi hay đến khi.\n"
+"\n"
+"\tTiếp tục lại lần lặp lại kế tiếp của vòng lặp bao bọc\n"
+"\t\tkiểu TRONG, TRONG KHI hay ĐẾN KHI.\n"
+"\tĐưa ra N thì tiếp tục chạy vòng lặp bao bọc thứ N.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrạng thái thoát là 0 nếu N không nhỏ hơn hay bằng 1."
+
+#: builtins.c:350
+msgid ""
+"Execute shell builtins.\n"
+"    \n"
+"    Execute SHELL-BUILTIN with arguments ARGs without performing command\n"
+"    lookup.  This is useful when you wish to reimplement a shell builtin\n"
+"    as a shell function, but need to execute the builtin within the "
+"function.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the exit status of SHELL-BUILTIN, or false if SHELL-BUILTIN is\n"
+"    not a shell builtin.."
+msgstr ""
+"Chạy dựng sẵn trình bao.\n"
+"\n"
+"\tChạy SHELL-BUILTIN (dựng sẵn trình bao) với các ĐỐI_SỐ\n"
+"\tmà không thực thi chức năng dò tìm câu lệnh.\n"
+"\tCó ích khi bạn muốn thực thi lại một dựng sẵn trình bao\n"
+"\tdưới dạng một chức năng trình bao, nhưng cũng\n"
+"\tcần thực thi dựng sẵn bên trong chức năng.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại trạng thái thoát của SHELL-BUILTIN,\n"
+"\thoặc sai nếu SHELL-BUILTIN không phải là một\n"
+"\tdựng sẵn trình bao."
+
+#: builtins.c:365
+msgid ""
+"Return the context of the current subroutine call.\n"
+"    \n"
+"    Without EXPR, returns \"$line $filename\".  With EXPR, returns\n"
+"    \"$line $subroutine $filename\"; this extra information can be used to\n"
+"    provide a stack trace.\n"
+"    \n"
+"    The value of EXPR indicates how many call frames to go back before the\n"
+"    current one; the top frame is frame 0.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns 0 unless the shell is not executing a shell function or EXPR\n"
+"    is invalid."
+msgstr ""
+"Trả về ngữ cảnh của cuộc gọi hàm phụ hiện thời.\n"
+"\n"
+"\tKhông có B_THỨC thì trả lại « $line $filename ».\n"
+"\tCó B_THỨC thì trả lại « $line $subroutine $filename »;\n"
+"\tthông tin thêm này có thể được dùng để cung cấp vết đống.\n"
+"\n"
+"\tGiá trị của B_THỨC thì ngụ ý bao nhiêu khung gọi cần lùi lại\n"
+"đằng trước khung hiện tại; khung đầu là khung 0.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại 0 nếu trình bao đang chạy chức năng trình bao,\n"
+"\t\tB_THỨC cũng hợp lệ."
+
+#: builtins.c:383
+msgid ""
+"Change the shell working directory.\n"
+"    \n"
+"    Change the current directory to DIR.  The default DIR is the value of "
+"the\n"
+"    HOME shell variable.\n"
+"    \n"
+"    The variable CDPATH defines the search path for the directory "
+"containing\n"
+"    DIR.  Alternative directory names in CDPATH are separated by a colon "
+"(:).\n"
+"    A null directory name is the same as the current directory.  If DIR "
+"begins\n"
+"    with a slash (/), then CDPATH is not used.\n"
+"    \n"
+"    If the directory is not found, and the shell option `cdable_vars' is "
+"set,\n"
+"    the word is assumed to be  a variable name.  If that variable has a "
+"value,\n"
+"    its value is used for DIR.\n"
+"    \n"
+"    Options:\n"
+"        -L\tforce symbolic links to be followed\n"
+"        -P\tuse the physical directory structure without following symbolic\n"
+"    \tlinks\n"
+"    \n"
+"    The default is to follow symbolic links, as if `-L' were specified.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns 0 if the directory is changed; non-zero otherwise."
+msgstr ""
+"Chuyển đổi thư mục làm việc của trình bao.\n"
+"\n"
+"\tChuyển đổi thư mục hiện thời sang TMỤC.\n"
+"\tThư mục mặc định là giá trị của biến trình bao HOME.\n"
+"\n"
+"\tBiến CDPATH thì xác định đường dẫn tìm kiếm cho thư mục chứa TMỤC.\n"
+"\tCác tên thư mục xen kẽ trong CDPATH cũng định giới bằng dấu hai chấm « : "
+"».\n"
+"\tMột tên thư mục trống tương đương với thư mục hiện tại.\n"
+"\tNếu TMỤC bắt đầu với dấu chéo « / » thì không dùng CDPATH.\n"
+"\n"
+"\tNếu không tìm thấy thư mục, và đặt biến trình bao « cdable_vars »,\n"
+"\t\tthì giả sử từ là một tên biến.\n"
+"\tNếu biến đó có giá trị thì giá trị này được dùng cho TMỤC.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-L\tép buộc theo liên kết tượng trưng\n"
+"\t\t-P\tdùng cấu trúc thư mục vật lý mà không theo liên kết tượng trưng\n"
+"\n"
+"\tMặc định là theo liên kết tượng trưng, như là tùy chọn « -L » đưa ra.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại 0 nếu thư mục được chuyển đổi; không thì khác số không."
+
+#: builtins.c:411
+msgid ""
+"Print the name of the current working directory.\n"
+"    \n"
+"    Options:\n"
+"      -L\tprint the value of $PWD if it names the current working\n"
+"    \tdirectory\n"
+"      -P\tprint the physical directory, without any symbolic links\n"
+"    \n"
+"    By default, `pwd' behaves as if `-L' were specified.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns 0 unless an invalid option is given or the current directory\n"
+"    cannot be read."
+msgstr ""
+"In ra tên của thư mục hoạt động hiện thời.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-L\tin ra giá trị của $PWD nếu nó đặt tên\n"
+"\t\t\tcủa thư mục hoạt động hiện thời\n"
+"\t\t-P\tin ra thư mục vật lý, không có liên kết mềm\n"
+"\n"
+"\t\tMặc định là « pwd » hoạt động như là « -L » được ghi rõ.\n"
+"\n"
+"\t\tTrạng thái thoát:\n"
+"\t\tTrả lại 0 nếu không đưa ra tùy chọn sai\n"
+"\t\tvà nếu đọc được thư mục hiện thời."
+
+#: builtins.c:428
+msgid ""
+"Null command.\n"
+"    \n"
+"    No effect; the command does nothing.\n"
+"    \n"
+"    Exit Status:\n"
+"    Always succeeds."
+msgstr ""
+"Câu lệnh vô giá trị.\n"
+"\n"
+"\tKhông có hiệu ứng: câu lệnh không làm gì.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tLúc nào cũng thành công."
+
+#: builtins.c:439
+msgid ""
+"Return a successful result.\n"
+"    \n"
+"    Exit Status:\n"
+"    Always succeeds."
+msgstr ""
+"Trả lại một kết quả thành công.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tLúc nào cũng thành công."
+
+#: builtins.c:448
+msgid ""
+"Return an unsuccessful result.\n"
+"    \n"
+"    Exit Status:\n"
+"    Always fails."
+msgstr ""
+"Trả về kết quả không thành công.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tLúc nào cũng không thành công."
+
+#: builtins.c:457
+msgid ""
+"Execute a simple command or display information about commands.\n"
+"    \n"
+"    Runs COMMAND with ARGS suppressing  shell function lookup, or display\n"
+"    information about the specified COMMANDs.  Can be used to invoke "
+"commands\n"
+"    on disk when a function with the same name exists.\n"
+"    \n"
+"    Options:\n"
+"      -p\tuse a default value for PATH that is guaranteed to find all of\n"
+"    \tthe standard utilities\n"
+"      -v\tprint a description of COMMAND similar to the `type' builtin\n"
+"      -V\tprint a more verbose description of each COMMAND\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns exit status of COMMAND, or failure if COMMAND is not found."
+msgstr ""
+"Thực thi một câu lệnh đơn giản, hoặc hiển thị thông tin về các câu lệnh.\n"
+"\n"
+"Chạy LỆNH với các ĐỐI_SỐ thu hồi chức năng dò tìm chức năng trình bao,\n"
+"hoạc hiển thị thông tin về các câu LỆNH được ghi rõ.\n"
+"Có thể được dùng để gọi câu lệnh trên đĩa khi đã có một chức năng cùng tên.\n"
+"\n"
+"Tùy chọn:\n"
+"\t-p\tdùng một giá trị mặc định cho ĐƯỜNG_DẪN\n"
+"\t\tmà chắc chắn sẽ tìm mọi tiện ích tiêu chuẩn\n"
+"\t-v\tin ra mô tả về câu LỆNH mà tương tự với dựng sẵn « type » (kiểu)\n"
+"\t-V\tin ra mô tả chi tiết hơn về mỗi câu LỆNH\n"
+"\n"
+"Trạng thái thoát:\n"
+"Trả lại trạng thái thoát của câu LỆNH, hoặc bị lỗi nếu không tìm thấy câu "
+"LỆNH."
+
+#: builtins.c:476
+msgid ""
+"Set variable values and attributes.\n"
+"    \n"
+"    Declare variables and give them attributes.  If no NAMEs are given,\n"
+"    display the attributes and values of all variables.\n"
+"    \n"
+"    Options:\n"
+"      -f\trestrict action or display to function names and definitions\n"
+"      -F\trestrict display to function names only (plus line number and\n"
+"    \tsource file when debugging)\n"
+"      -p\tdisplay the attributes and value of each NAME\n"
+"    \n"
+"    Options which set attributes:\n"
+"      -a\tto make NAMEs indexed arrays (if supported)\n"
+"      -A\tto make NAMEs associative arrays (if supported)\n"
+"      -i\tto make NAMEs have the `integer' attribute\n"
+"      -l\tto convert NAMEs to lower case on assignment\n"
+"      -r\tto make NAMEs readonly\n"
+"      -t\tto make NAMEs have the `trace' attribute\n"
+"      -u\tto convert NAMEs to upper case on assignment\n"
+"      -x\tto make NAMEs export\n"
+"    \n"
+"    Using `+' instead of `-' turns off the given attribute.\n"
+"    \n"
+"    Variables with the integer attribute have arithmetic evaluation (see\n"
+"    the `let' command) performed when the variable is assigned a value.\n"
+"    \n"
+"    When used in a function, `declare' makes NAMEs local, as with the "
+"`local'\n"
+"    command.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+"Đặt các giá trị và thuộc tính của biến.\n"
+"\n"
+"\tTuyên bố mỗi biến và gán cho nó một số thuộc tính.\n"
+"\tKhông đưa ra TÊN thì hiển thị các thuộc tính và giá trị của mọi giá trị.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-f\thạn chế hành động, hoặc hiển thị đối với tên và mô tả của chức năng\n"
+"\t\t-F\thiển thị chỉ đối với tên chức năng\n"
+"\t\t\t(và số thứ tự dòng và tập tin nguồn khi gỡ lỗi)\n"
+"\t\t-p\thiển thị các thuộc tính và giá trị của mỗi TÊN\n"
+"\n"
+"\tTùy chọn cũng đặt thuộc tính:\n"
+"\t\t-a\tđặt TÊN là mảng theo số mũ (nếu được hỗ trợ)\n"
+"\t\t-A\tđặt TÊN là mảng kết hợp (nếu được hỗ trợ)\n"
+"\t\t-i\tđặt TÊN có thuộc tính « integer » (số nguyên)\n"
+"\t\t-l\tchuyển đổi TÊN sang chữ thường khi được gán\n"
+"\t\t-r\tđặt TÊN là chỉ đọc\n"
+"\t\t-t\tđặt TÊN có thuộc tính « trace » (theo vết)\n"
+"\t\t-u\tchuyển đổi TÊN sang chữ hoa khi được gán\n"
+"\t\t-x\tđặt TÊN xuất\n"
+"\n"
+"\tDùng « + » thay cho « - » thì tắt thuộc tính đưa ra.\n"
+"\n"
+"\tBiến có thuộc tính số nguyên thì định giá theo số học\n"
+"\t\t(xem câu lệnh « let ») khi biến có giá trị được gán.\n"
+"\n"
+"\tKhi dùng trong chức năng, « declare » (tuyên bố) đặt TÊN là cục bộ,\n"
+"\t\tnhư khi dùng câu lệnh « local » (cục bộ).\n"
+"\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai hoặc gặp lỗi."
+
+#: builtins.c:512
+msgid ""
+"Set variable values and attributes.\n"
+"    \n"
+"    Obsolete.  See `help declare'."
+msgstr ""
+"Đặt các giá trị và thuộc tính của biến.\n"
+"\n"
+"\tQuá cũ. Xem « help declare »."
+
+#: builtins.c:520
+msgid ""
+"Define local variables.\n"
+"    \n"
+"    Create a local variable called NAME, and give it VALUE.  OPTION can\n"
+"    be any option accepted by `declare'.\n"
+"    \n"
+"    Local variables can only be used within a function; they are visible\n"
+"    only to the function where they are defined and its children.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied, an error occurs,\n"
+"    or the shell is not executing a function."
+msgstr ""
+"Xác định các biến cục bộ.\n"
+"\n"
+"\tTạo một biến cục bộ tên TÊN, và gán cho nó GIÁ_TRỊ.\n"
+"\tTÙY_CHỌN có thể là bất cứ tùy chọn nào được « declare » chấp nhận.\n"
+"\n"
+"\tBiến cục bộ chỉ dùng được bên trong chức năng;\n"
+"\t\tchỉ chức năng trong đó nó được xác định\n"
+"\t\t(và các chức năng con) có khả năng phát hiện nó.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai hay gặp lỗi,\n"
+"\tvà nếu trình bao đang chạy chức năng."
+
+#: builtins.c:537
+msgid ""
+"Write arguments to the standard output.\n"
+"    \n"
+"    Display the ARGs on the standard output followed by a newline.\n"
+"    \n"
+"    Options:\n"
+"      -n\tdo not append a newline\n"
+"      -e\tenable interpretation of the following backslash escapes\n"
+"      -E\texplicitly suppress interpretation of backslash escapes\n"
+"    \n"
+"    `echo' interprets the following backslash-escaped characters:\n"
+"      \\a\talert (bell)\n"
+"      \\b\tbackspace\n"
+"      \\c\tsuppress further output\n"
+"      \\e\tescape character\n"
+"      \\f\tform feed\n"
+"      \\n\tnew line\n"
+"      \\r\tcarriage return\n"
+"      \\t\thorizontal tab\n"
+"      \\v\tvertical tab\n"
+"      \\\\\tbackslash\n"
+"      \\0nnn\tthe character whose ASCII code is NNN (octal).  NNN can be\n"
+"    \t0 to 3 octal digits\n"
+"      \\xHH\tthe eight-bit character whose value is HH (hexadecimal).  HH\n"
+"    \tcan be one or two hex digits\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless a write error occurs."
+msgstr ""
+"Ghi các đối số vào đầu ra tiêu chuẩn.\n"
+"\n"
+"\tHiển thị các ĐỐI_SỐ trên đầu ra tiêu chuẩn,\n"
+"\t\tvới một ký tự dòng mới theo sau.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-n\tđừng phụ thêm ký tự dòng mới\n"
+"\t\t-e\tbật đọc ký tự thoát kiểu gạch chéo ngược mà theo sau\n"
+"\t\t-E\tthu hồi dứt khoát đọc ký tự thoát kiểu gạch chéo ngược\n"
+"\n"
+"\t« echo » đọc những ký tự thoát này kiểu gạch chéo ngược:\n"
+"\t\t\\a\tchuông báo\n"
+"\t\t\\b\txoá lùi\n"
+"\t\t\\c\tthu hồi kết xuất thêm nữa\n"
+"\t\t\\e\tký tự thoát\n"
+"\t\t\\f\tnạp giấy\n"
+"\t\t\\n\tdòng mới\n"
+"\t\t\\r\txuống dòng\n"
+"\t\t\\0nnn\tký tự có mã ASCII NNN (1-3 chữ số bát phân)\n"
+"\t\t\\xHH\tký tự 8-bit có giá trị HH (1-2 chữ số thập lục)\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không gặp lỗi ghi.\t\t\\t\tkhoảng tab theo chiều "
+"ngang\n"
+"\t\t\\v\tkhoảng tab theo chiều dọc\n"
+"\t\t\\\\\tgạch chéo ngược"
+
+#: builtins.c:571
+msgid ""
+"Write arguments to the standard output.\n"
+"    \n"
+"    Display the ARGs on the standard output followed by a newline.\n"
+"    \n"
+"    Options:\n"
+"      -n\tdo not append a newline\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless a write error occurs."
+msgstr ""
+"Ghi các đối số vào đầu ra tiêu chuẩn\n"
+"\n"
+"\tHiển thị các ĐỐI_SỐ trên đầu ra tiêu chuẩn với một dòng mới theo sau.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-n\tđừng phụ thêm một dòng mới\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không gặp lỗi ghi."
+
+#: builtins.c:586
+msgid ""
+"Enable and disable shell builtins.\n"
+"    \n"
+"    Enables and disables builtin shell commands.  Disabling allows you to\n"
+"    execute a disk command which has the same name as a shell builtin\n"
+"    without using a full pathname.\n"
+"    \n"
+"    Options:\n"
+"      -a\tprint a list of builtins showing whether or not each is enabled\n"
+"      -n\tdisable each NAME or display a list of disabled builtins\n"
+"      -p\tprint the list of builtins in a reusable format\n"
+"      -s\tprint only the names of Posix `special' builtins\n"
+"    \n"
+"    Options controlling dynamic loading:\n"
+"      -f\tLoad builtin NAME from shared object FILENAME\n"
+"      -d\tRemove a builtin loaded with -f\n"
+"    \n"
+"    Without options, each NAME is enabled.\n"
+"    \n"
+"    To use the `test' found in $PATH instead of the shell builtin\n"
+"    version, type `enable -n test'.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless NAME is not a shell builtin or an error occurs."
+msgstr ""
+"Bật/tắt dựng sẵn trình bao.\n"
+"\b\tBật và tắt các dựng sẵn trình bao.\b\tChức năng tắt thì cho phép bạn "
+"thực thi một câu lệnh đĩa\n"
+"\tmà cùng tên với một dựng sẵn trình bao,\n"
+"\tkhông cần dùng tên đường dẫn đầy đủ.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-a\tin ra một danh sách các dựng sẳn, cũng hiển thị trạng thái bật/tắt\n"
+"\t\t-b\ttắt mỗi TÊN hoặc hiển thị danh sách các dựng sẵn bị tắt\n"
+"\t\t-p\tin ra danh sách các dựng sẵn theo một định dạng có thể dùng lại "
+"được\n"
+"\t\t-s\tin ra chỉ tên mỗi dựng sẵn Posix « đặc biệt »\n"
+"\n"
+"\tTùy chọn điều khiển chức năng nạp động:\n"
+"\t\t-f\tnạp dựng sẵn TÊN từ điều khiển dùng chung TÊN_TẬP_TIN\n"
+"\t\t-d\tgỡ bỏ một dựng sẵn được nạp dùng « -f »\n"
+"\n"
+"\tKhông có tùy chọn thì mỗi TÊN được bật lại.\n"
+"\n"
+"\tĐể sử dụng « test » (hàm thử) nằm trên đường dẫn mặc định $PATH\n"
+"\tthay cho phiên bản của dựng sẵn trình bao,\n"
+"\thãy gõ chuỗi « enable -n test ».\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu TÊN là một dựng sẵn trình bao, và không gặp lỗi."
+
+#: builtins.c:614
+msgid ""
+"Execute arguments as a shell command.\n"
+"    \n"
+"    Combine ARGs into a single string, use the result as input to the "
+"shell,\n"
+"    and execute the resulting commands.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns exit status of command or success if command is null."
+msgstr ""
+"Thực thi các đối số dưới dạng một câu lệnh trình bao.\n"
+"\n"
+"\tPhối hợp các ĐỐI_SỐ thành một chuỗi riêng lẻ,\n"
+"\tdùng kết quả làm dữ liệu nhập vào trình bao,\n"
+"\tvà thực thi các câu lệnh kết quả.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại trạng thái thoát của câu lệnh,\n"
+"\thay thành công nếu câu lệnh vô giá trị."
+
+#: builtins.c:626
+msgid ""
+"Parse option arguments.\n"
+"    \n"
+"    Getopts is used by shell procedures to parse positional parameters\n"
+"    as options.\n"
+"    \n"
+"    OPTSTRING contains the option letters to be recognized; if a letter\n"
+"    is followed by a colon, the option is expected to have an argument,\n"
+"    which should be separated from it by white space.\n"
+"    \n"
+"    Each time it is invoked, getopts will place the next option in the\n"
+"    shell variable $name, initializing name if it does not exist, and\n"
+"    the index of the next argument to be processed into the shell\n"
+"    variable OPTIND.  OPTIND is initialized to 1 each time the shell or\n"
+"    a shell script is invoked.  When an option requires an argument,\n"
+"    getopts places that argument into the shell variable OPTARG.\n"
+"    \n"
+"    getopts reports errors in one of two ways.  If the first character\n"
+"    of OPTSTRING is a colon, getopts uses silent error reporting.  In\n"
+"    this mode, no error messages are printed.  If an invalid option is\n"
+"    seen, getopts places the option character found into OPTARG.  If a\n"
+"    required argument is not found, getopts places a ':' into NAME and\n"
+"    sets OPTARG to the option character found.  If getopts is not in\n"
+"    silent mode, and an invalid option is seen, getopts places '?' into\n"
+"    NAME and unsets OPTARG.  If a required argument is not found, a '?'\n"
+"    is placed in NAME, OPTARG is unset, and a diagnostic message is\n"
+"    printed.\n"
+"    \n"
+"    If the shell variable OPTERR has the value 0, getopts disables the\n"
+"    printing of error messages, even if the first character of\n"
+"    OPTSTRING is not a colon.  OPTERR has the value 1 by default.\n"
+"    \n"
+"    Getopts normally parses the positional parameters ($0 - $9), but if\n"
+"    more arguments are given, they are parsed instead.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success if an option is found; fails if the end of options is\n"
+"    encountered or an error occurs."
+msgstr ""
+"Phân tích cú pháp của đối số tùy chọn.\n"
+"\n"
+"\tGetopts được thủ tục trình bao dùng để phân tích cú pháp\n"
+"\t\tcủa tham số thuộc ví trị dưới dạng tùy chọn.\n"
+"\n"
+"\tOPTSTRING chứa những chữ tùy chọn cần nhận ra;\n"
+"\tmột chữ có dấu hai chấm theo sau thì tùy chọn mong đợi một đối số,\n"
+"\tmà nên định giới bằng khoảng trắng.\n"
+"\n"
+"\tMỗi lần được gọi, getopts sẽ đặt tùy chọn kế tiếp\n"
+"\t\tvào biến trình bao $name\n"
+"\t\t(cũng khởi tạo tên đó nếu nó chưa tồn tại)\n"
+"\t\tvà đặt chỉ mục của đối số kế tiếp cần xử lý\n"
+"\t\tvào biến trình bao OPTIND.\n"
+"\tOPTIND được sơ khởi thành 1 mỗi lần trình bao\n"
+"\thay một văn lệnh trình bao được gọi.\n"
+"\tKhi một tùy chọn đòi hỏi một đối số,\n"
+"\tgetopts đặt đối số đó vào biến trình bao OPTARG.\n"
+"\n"
+"\tgetopts thông báo lỗi bằng một của hai cách.\n"
+"\tNếu ký tự đầu tiên của chuỗi OPTSTRING là dấu hai chấm,\n"
+"\tgetopts dùng chức năng thông báo lỗi một cách im.\n"
+"\tBằng chế độ này, không in ra thông điệp lỗi nào.\n"
+"\tNếu gặp tùy chọn sai thì getopts đặt vào OPTARG\n"
+"\tký tự tùy chọn được tìm. Không tìm thấy đối số cần thiết\n"
+"\tthì getopts đặt một dấu hai chấm vào TÊN\n"
+"\tvà đặt OPTARG thành ký tự tùy chọn được tìm.\n"
+"\tNếu getopts không phải ở chế độ im, và gặp tùy chọn sai,\n"
+"\tthì getopts đặt một dấu hỏi « ? » vào TÊN và bỏ đặt OPTARG.\n"
+"\tKhông tìm thấy tùy chọn cần thiết thì « ? » được đặt vào TÊN,\n"
+"\tOPTARG bị bỏ đặt, và in ra một thông điệp chẩn đoán.\n"
+"\n"
+"\tNếu biến trình bao OPTERR có giá trị 0,\n"
+"\tthì getopts tắt chức năng in ra thông điệp,\n"
+"\tthậm chí nếu ký tự đầu tiên của chuỗi OPTSTRING\n"
+"\tkhông phải là dấu hai chấm. OPTERR có giá trị 1 theo mặc định.\n"
+"\n"
+"Getopts bình thường phân tích cách tham số thuộc vị trí ($0 - $9),\n"
+"\tnhưng nếu đưa ra đối số bổ sung,\n"
+"\t(các) đối số này được phân tích để thay thế.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu tìm thấy một tùy chọn;\n"
+"\tkhông thành công nếu gặp kết thúc các tùy chọn,\n"
+"\thoặc nếu gặp lỗi."
+
+#: builtins.c:668
+msgid ""
+"Replace the shell with the given command.\n"
+"    \n"
+"    Execute COMMAND, replacing this shell with the specified program.\n"
+"    ARGUMENTS become the arguments to COMMAND.  If COMMAND is not "
+"specified,\n"
+"    any redirections take effect in the current shell.\n"
+"    \n"
+"    Options:\n"
+"      -a name\tpass NAME as the zeroth argument to COMMAND\n"
+"      -c\t\texecute COMMAND with an empty environment\n"
+"      -l\t\tplace a dash in the zeroth argument to COMMAND\n"
+"    \n"
+"    If the command cannot be executed, a non-interactive shell exits, "
+"unless\n"
+"    the shell option `execfail' is set.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless COMMAND is not found or a redirection error "
+"occurs."
+msgstr ""
+"Thay thế trình bao bằng câu lệnh đưa ra.\n"
+"\n"
+"\tThực thi câu LỆNH, cũng thay thế trình bao này bằng chương trình được ghi "
+"rõ.\n"
+"\tCác ĐỐI_SỐ trở thành các đối số đối với câu LỆNH.\n"
+"\tKhông đưa ra câu LỆNH thì bất cứ việc chuyển hướng nào\n"
+"\tsẽ xảy ra trong trình bao đang chạy.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-a tên\tgửi TÊN cho câu LỆNH dưới dạng đối số thứ không\n"
+"\t\t-c\tthực thi câu LỆNH với một môi trường trống\n"
+"\t\t-l\tđặt một dấu gạch vào đối số thứ không đối với câu LỆNH\n"
+"\n"
+"\tNếu câu LỆNH không thể thực thi được, một trình bao không tương tác\n"
+"\tsẽ thoát ra, nếu không đặt tùy chọn trình bao « execfail ».\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu tìm được câu LỆNH và không gặp lỗi chuyển hướng."
+
+#: builtins.c:689
+msgid ""
+"Exit the shell.\n"
+"    \n"
+"    Exits the shell with a status of N.  If N is omitted, the exit status\n"
+"    is that of the last command executed."
+msgstr ""
+"Thoát khỏi trình bao.\n"
+"\n"
+"\tThoát khỏi trình bao với trạng thái N.\n"
+"\tKhông đưa ra N thì trạng thái thoát\n"
+"\tlà trạng thái của câu lệnh cuối cùng được chạy."
+
+#: builtins.c:698
+msgid ""
+"Exit a login shell.\n"
+"    \n"
+"    Exits a login shell with exit status N.  Returns an error if not "
+"executed\n"
+"    in a login shell."
+msgstr ""
+"Thoát khỏi một trình bao đăng nhập.\n"
+"\n"
+"\tThoát khỏi một trình bao đăng nhập, với trạng thái thoát N.\n"
+"\tTrả lại lỗi nếu không được thực thi trong trình bao đăng nhập."
+
+#: builtins.c:708
+msgid ""
+"Display or execute commands from the history list.\n"
+"    \n"
+"    fc is used to list or edit and re-execute commands from the history "
+"list.\n"
+"    FIRST and LAST can be numbers specifying the range, or FIRST can be a\n"
+"    string, which means the most recent command beginning with that\n"
+"    string.\n"
+"    \n"
+"    Options:\n"
+"      -e ENAME\tselect which editor to use.  Default is FCEDIT, then "
+"EDITOR,\n"
+"    \t\tthen vi\n"
+"      -l \tlist lines instead of editing\n"
+"      -n\tomit line numbers when listing\n"
+"      -r\treverse the order of the lines (newest listed first)\n"
+"    \n"
+"    With the `fc -s [pat=rep ...] [command]' format, COMMAND is\n"
+"    re-executed after the substitution OLD=NEW is performed.\n"
+"    \n"
+"    A useful alias to use with this is r='fc -s', so that typing `r cc'\n"
+"    runs the last command beginning with `cc' and typing `r' re-executes\n"
+"    the last command.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success or status of executed command; non-zero if an error "
+"occurs."
+msgstr ""
+"Hiển thị hoặc thực thi các câu lệnh từ danh sách lược sử.\n"
+"\n"
+"\tfc được dùng để liệt kê hoặc chỉnh sửa và thực thi lại\n"
+"\tcâu lệnh từ danh sách lược sử.\n"
+"\tĐẦU và CUỐI có thể là số mà xác định phạm vi,\n"
+"hoặc ĐẦU có thể là một chuỗi đại diện câu lệnh\n"
+"\tvừa chạy nhất mà bắt đầu với chuỗi đó.\n"
+"\tTùy chọn:\n"
+"\t\t-e ENAME\tchọn trình soạn thảo nào cần dùng;\n"
+"\t\t\tmặc định là FCEDIT, sau đó EDITOR, sau đó vi\n"
+"\t\t-l\tliệt kê các dòng thay vào chỉnh sửa\n"
+"\t\t-n\tliệt kê mà không in ra số thứ tự dòng\n"
+"\t\t-r\tđảo ngược thứ tự các dòng (mới nhất trước)\n"
+"\n"
+"\tTùy theo định dạng « fc -s [mẫu=lần_lập_lại ...] [lệnh] »,\n"
+"\tcâu LỆNH được chạy lại sau khi thay thế CŨ bằng MỚI.\n"
+"\n"
+"\tCũng có thể sử dụng bí danh có ích « r='fc -s' »,\n"
+"\tvì thế việc gõ « r cc » sẽ chạy câu lệnh cuối cùng\n"
+"\tmà bắt đầu với « cc », và việc gõ « r »\n"
+"\tsẽ đơn giản chạy lại câu lệnh cuối cùng.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công hay trạng thái của câu lệnh được thực thi;\n"
+"\t\tgặp lỗi thì khác số không."
+
+#: builtins.c:738
+msgid ""
+"Move job to the foreground.\n"
+"    \n"
+"    Place the job identified by JOB_SPEC in the foreground, making it the\n"
+"    current job.  If JOB_SPEC is not present, the shell's notion of the\n"
+"    current job is used.\n"
+"    \n"
+"    Exit Status:\n"
+"    Status of command placed in foreground, or failure if an error occurs."
+msgstr ""
+"Nâng công việc lên trước.\n"
+"\n"
+"\tNâng lên trước công việc được ĐẶC_TẢ_CÔNG_VIỆC đại diện,\n"
+"\tthì làm cho nó là công việc hiện thời.\n"
+"\tKhông đưa ra ĐẶC_TẢ_CÔNG_VIỆC\n"
+"\tthì dùng công việc hiện thời tùy theo trình bao.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrạng thái của câu lệnh được nâng lên trước;\n"
+"\tgặp lỗi thì không thành công."
+
+#: builtins.c:753
+msgid ""
+"Move jobs to the background.\n"
+"    \n"
+"    Place the jobs identified by each JOB_SPEC in the background, as if "
+"they\n"
+"    had been started with `&'.  If JOB_SPEC is not present, the shell's "
+"notion\n"
+"    of the current job is used.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless job control is not enabled or an error occurs."
+msgstr ""
+"Gửi công việc ra sau.\n"
+"\n"
+"\tGửi ra sau các công việc được mỗi ĐẶC_TẢ_CÔNG_VIỆC đại diện,\n"
+"\tnhư là công việc được bắt đầu với « & ».\n"
+"\tKhông đưa ra ĐẶC_TẢ_CÔNG_VIỆC\n"
+"\tthì dùng công việc hiện thời tùy theo trình bao.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu chức năng điều khiển công việc được bật\n"
+"\tvà không gặp lỗi."
+
+#: builtins.c:767
+msgid ""
+"Remember or display program locations.\n"
+"    \n"
+"    Determine and remember the full pathname of each command NAME.  If\n"
+"    no arguments are given, information about remembered commands is "
+"displayed.\n"
+"    \n"
+"    Options:\n"
+"      -d\t\tforget the remembered location of each NAME\n"
+"      -l\t\tdisplay in a format that may be reused as input\n"
+"      -p pathname\tuse PATHNAME is the full pathname of NAME\n"
+"      -r\t\tforget all remembered locations\n"
+"      -t\t\tprint the remembered location of each NAME, preceding\n"
+"    \t\teach location with the corresponding NAME if multiple\n"
+"    \t\tNAMEs are given\n"
+"    Arguments:\n"
+"      NAME\t\tEach NAME is searched for in $PATH and added to the list\n"
+"    \t\tof remembered commands.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless NAME is not found or an invalid option is given."
+msgstr ""
+"Nhớ hoặc hiển thị vị trí của chương trình.\n"
+"\n"
+"\tXác định và ghi nhớ tên đường dẫn đầy đủ của mỗi TÊN câu lệnh.\n"
+"\tNếu không đưa ra đối số, hiển thị thông tin về các câu lệnh được ghi nhớ.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-d\tquên vị trí được ghi nhớ của mỗi TÊN\n"
+"\t\t-l\thiển thị theo một định dạng có thể được dùng lại\n"
+"\t\t\tdưới dạng dữ liệu nhập vào\n"
+"\t\t-p tên_đường_dẫn\tdùng TÊN_ĐƯỜNG_DẪN là tên đường dẫn đầy đủ của TÊN\n"
+"\t\t-r\tquên mọi vị trí được ghi nhớ\n"
+"\t\t-t\tin ra vị trí được ghi nhớ của mỗi TÊN,\n"
+"\t\t\tcó nhiều TÊN thì cũng in ra TÊN tương ứng ở trước vị trí\n"
+"\n"
+"\tĐối số:\n"
+"\t\tTÊN\tmỗi TÊN được tìm theo đường dẫn mặc định $PATH,\n"
+"\t\tvà được thêm vào danh sách các câu lệnh được ghi nhớ.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu tìm được TÊN và không đưa ra tùy chọn sai."
+
+#: builtins.c:792
+msgid ""
+"Display information about builtin commands.\n"
+"    \n"
+"    Displays brief summaries of builtin commands.  If PATTERN is\n"
+"    specified, gives detailed help on all commands matching PATTERN,\n"
+"    otherwise the list of help topics is printed.\n"
+"    \n"
+"    Options:\n"
+"      -d\toutput short description for each topic\n"
+"      -m\tdisplay usage in pseudo-manpage format\n"
+"      -s\toutput only a short usage synopsis for each topic matching\n"
+"    \tPATTERN\n"
+"    \n"
+"    Arguments:\n"
+"      PATTERN\tPattern specifiying a help topic\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless PATTERN is not found or an invalid option is "
+"given."
+msgstr ""
+"Hiển thị thông tin về các câu lệnh dựng sẵn.\n"
+"\n"
+"\tHiển thị bản tóm tắt ngắn về các câu lệnh dựng sẵn.\n"
+"\tNếu cũng ghi rõ MẪU thì in ra trợ giúp chi tiết\n"
+"\tvề tất cả các câu lệnh tương ứng với mẫu đó ;\n"
+"\tkhông thì in ra danh sách các chủ đề trợ giúp.\n"
+"\n"
+"\rTùy chọn:\n"
+"\t\t-d\txuất mô tả ngắn về mỗi chủ đề\n"
+"\t\t-m\thiển thị cách sử dụng theo định dạng\n"
+"\t\t\tkiểu trang hướng dẫn (man)\n"
+"\t\t-s\txuất chỉ một bản tóm tắt ngắn về cách sử dụng\n"
+"\t\t\tcho mỗi chủ đề tương ứng với MẪU\n"
+"\n"
+"\tĐối số :\n"
+"\t\tMẪU\tmẫu ghi rõ một chủ đề trợ giúp\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu tìm được MẪU và không đưa ra tùy chọn sai."
+
+#: builtins.c:816
+msgid ""
+"Display or manipulate the history list.\n"
+"    \n"
+"    Display the history list with line numbers, prefixing each modified\n"
+"    entry with a `*'.  An argument of N lists only the last N entries.\n"
+"    \n"
+"    Options:\n"
+"      -c\tclear the history list by deleting all of the entries\n"
+"      -d offset\tdelete the history entry at offset OFFSET.\n"
+"    \n"
+"      -a\tappend history lines from this session to the history file\n"
+"      -n\tread all history lines not already read from the history file\n"
+"      -r\tread the history file and append the contents to the history\n"
+"    \tlist\n"
+"      -w\twrite the current history to the history file\n"
+"    \tand append them to the history list\n"
+"    \n"
+"      -p\tperform history expansion on each ARG and display the result\n"
+"    \twithout storing it in the history list\n"
+"      -s\tappend the ARGs to the history list as a single entry\n"
+"    \n"
+"    If FILENAME is given, it is used as the history file.  Otherwise,\n"
+"    if $HISTFILE has a value, that is used, else ~/.bash_history.\n"
+"    \n"
+"    If the $HISTTIMEFORMAT variable is set and not null, its value is used\n"
+"    as a format string for strftime(3) to print the time stamp associated\n"
+"    with each displayed history entry.  No time stamps are printed "
+"otherwise.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or an error occurs."
+msgstr ""
+"Hiển thị hoặc thao tác danh sách lượd sử.\n"
+"\n"
+"\tHiển thị danh sách lược sử với các số thứ tự dòng,\n"
+"\tcũng đặt dấu sao « * » vào trước mỗi mục nhập bị sửa đổi.\n"
+"\tĐối số N thì liệt kê chỉ N mục nhập cuối cùng.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-c\txoá sạch danh sách lược sử bằng cách xoá mọi mục nhập\n"
+"\t\t-d hiệu\txoá mục nhập lược sử ở hiệu này\n"
+"\n"
+"\t\t-a\tphụ thêm vào tập tin lư ợc sử các dòng lược sử từ phiên chạy này\n"
+"\t\t-n\tđọc mọi dòng lược sử chưa đọc từ tập tin lược sử\n"
+"\t\t-r\tđọc tư lược sử và phụ thêm nội dung vào lược sử\n"
+"\t\t-w\tghi lược sử hiện thời vào tập tin lược sử\n"
+"\t\t\tcũng phụ thêm vào danh sách lược sử\n"
+"\n"
+"\t\t-p\tmở rộng lược sử với mỗi ĐỐI_SỐ, và hiển thị kết quả\n"
+"\t\t\tmà không ghi nhớ nó vào danh sách lược sử\n"
+"\t\t-s\tphụ thêm các ĐỐI_SỐ vào danh sách lược sử\n"
+"\t\t\tdưới dạng một mục nhập riêng lẻ\n"
+"\n"
+"\tĐưa ra TÊN_TẬP_TIN thì nó được dùng làm tập tin lược sử.\n"
+"\tNếu không, và nếu $HISTFILE có giá trị, thì nó được dùng;\n"
+"\tnếu $HISTFILE không có giá trị thì dùng « ~/.bash_history ».\n"
+"\n"
+"\tNếu biến $HISTTIMEFORMAT đã được đặt và có giá trị,\n"
+"\tthì giá trị đó được dùng làm chuỗi định dạng\n"
+"\tcho strftime(3) in ra nhãn thời gian tương ứng\n"
+"\tvới mỗi mục nhập lược sử được hiển thị.\n"
+"\tKhông thì không in ra nhãn thời gian.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không gặp tùy chọn sai hay gặp lỗi."
+
+#: builtins.c:852
+msgid ""
+"Display status of jobs.\n"
+"    \n"
+"    Lists the active jobs.  JOBSPEC restricts output to that job.\n"
+"    Without options, the status of all active jobs is displayed.\n"
+"    \n"
+"    Options:\n"
+"      -l\tlists process IDs in addition to the normal information\n"
+"      -n\tlist only processes that have changed status since the last\n"
+"    \tnotification\n"
+"      -p\tlists process IDs only\n"
+"      -r\trestrict output to running jobs\n"
+"      -s\trestrict output to stopped jobs\n"
+"    \n"
+"    If -x is supplied, COMMAND is run after all job specifications that\n"
+"    appear in ARGS have been replaced with the process ID of that job's\n"
+"    process group leader.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or an error occurs.\n"
+"    If -x is used, returns the exit status of COMMAND."
+msgstr ""
+"Hiển thị trạng thái của công việc.\n"
+"\n"
+"\tLiệt kê các công việc đang chạy.\n"
+"\tĐẶC_TẢ_CÔNG_VIỆC hạn chế kết xuất thành công việc đó.\n"
+"\tKhông đưa ra tùy chọn thì hiển thị trạng thái\n"
+"\tcủa mọi công việc đang chạy.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-l\tliệt kê các mã số tiến trình, thêm vào thông tin bình thường\n"
+"\t\t-n\tliệt kê chỉ những tiến trình đã thay đổi trạng thái\n"
+"\t\t\tkể từ lần thông báo cuối cùng\n"
+"\t\t-s\thạn chế kết xuất thành những công việc bị dừng chạy\n"
+"\n"
+"\tĐưa ra « -x » thì câu LỆNH được chạy sau khi tất cả các đặc tả công việc\n"
+"\tmà xuất hiện trong các ĐỐI_SỐ đã được thay thế bằng mã số tiến trình\n"
+"\tcủa trình dẫn đầu nhóm tiến trình của công việc đó.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không gặp tùy chọn sai hay gặp lỗi.\n"
+"\tĐưa ra « -x » thì trả lại trạng thái thoát của câu LỆNH."
+
+#: builtins.c:879
+msgid ""
+"Remove jobs from current shell.\n"
+"    \n"
+"    Removes each JOBSPEC argument from the table of active jobs.  Without\n"
+"    any JOBSPECs, the shell uses its notion of the current job.\n"
+"    \n"
+"    Options:\n"
+"      -a\tremove all jobs if JOBSPEC is not supplied\n"
+"      -h\tmark each JOBSPEC so that SIGHUP is not sent to the job if the\n"
+"    \tshell receives a SIGHUP\n"
+"      -r\tremove only running jobs\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option or JOBSPEC is given."
+msgstr ""
+"Gỡ bỏ công việc khỏi trình bao đang chạy.\n"
+"\n"
+"\tGỡ bỏ mỗi đối số JOBSPEC (đặc tả công việc) khỏi bảng các công việc đang "
+"chạy.\n"
+"\tKhông có JOBSPEC thì trình bao dùng thông tin riêng về công việc đang đang "
+"chạy.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-a\tgỡ bỏ mọi công việc nếu không đưa ra JOBSPEC\n"
+"\t\t-h\tđánh dấu mỗi JOBSPEC để không gửi tín hiệu ngưng kết nối SIGHUP\n"
+"\t\t\tcho công việc nếu trình bao nhận được SIGHUP\n"
+"\t\t-r\tgỡ bỏ chỉ những công việc đang chạy\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai hay JOBSPEC sai."
+
+#: builtins.c:898
+msgid ""
+"Send a signal to a job.\n"
+"    \n"
+"    Send the processes identified by PID or JOBSPEC the signal named by\n"
+"    SIGSPEC or SIGNUM.  If neither SIGSPEC nor SIGNUM is present, then\n"
+"    SIGTERM is assumed.\n"
+"    \n"
+"    Options:\n"
+"      -s sig\tSIG is a signal name\n"
+"      -n sig\tSIG is a signal number\n"
+"      -l\tlist the signal names; if arguments follow `-l' they are\n"
+"    \tassumed to be signal numbers for which names should be listed\n"
+"    \n"
+"    Kill is a shell builtin for two reasons: it allows job IDs to be used\n"
+"    instead of process IDs, and allows processes to be killed if the limit\n"
+"    on processes that you can create is reached.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or an error occurs."
+msgstr ""
+"Gửi một tín hiệu cho một công việc.\n"
+"\n"
+"\tGửi cho những tiến trình được mã số hay đặc tả công việc đại diện\n"
+"\ttín hiệu được SIGSPEC hay SIGNUM được đặt tên.\n"
+"\tKhông đưa ra SIGSPEC, cũng không đưa ra SIGNUM,\n"
+"\tthì giả sử SIGTERM.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-s TTH\tTTH là một tên tín hiệu\n"
+"\t\t-n STH\tSTH là một số thứ tự tín hiệu\n"
+"\t\t-l\tliệt kê các tên tín hiệu ;\n"
+"\t\t\tnếu có đối số theo sau « -l », thì giả sử mỗi đối số\n"
+"\t\t\tlà số thứ tự tin hiệu cho đó nên liệt kê tên\n"
+"\n"
+"\tKill là một dựng sẵn trình bao vì hai lý do :\n"
+"\tnó cho phép dùng mã số công việc thay cho mã số tiến trình,\n"
+"\tvà cho phép giết tiến trình nếu tới giới hạn số các tiến trình\n"
+"\tđược phép tạo.\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai hay gặp lỗi."
+
+#: builtins.c:921
+msgid ""
+"Evaluate arithmetic expressions.\n"
+"    \n"
+"    Evaluate each ARG as an arithmetic expression.  Evaluation is done in\n"
+"    fixed-width integers with no check for overflow, though division by 0\n"
+"    is trapped and flagged as an error.  The following list of operators is\n"
+"    grouped into levels of equal-precedence operators.  The levels are "
+"listed\n"
+"    in order of decreasing precedence.\n"
+"    \n"
+"    \tid++, id--\tvariable post-increment, post-decrement\n"
+"    \t++id, --id\tvariable pre-increment, pre-decrement\n"
+"    \t-, +\t\tunary minus, plus\n"
+"    \t!, ~\t\tlogical and bitwise negation\n"
+"    \t**\t\texponentiation\n"
+"    \t*, /, %\t\tmultiplication, division, remainder\n"
+"    \t+, -\t\taddition, subtraction\n"
+"    \t<<, >>\t\tleft and right bitwise shifts\n"
+"    \t<=, >=, <, >\tcomparison\n"
+"    \t==, !=\t\tequality, inequality\n"
+"    \t&\t\tbitwise AND\n"
+"    \t^\t\tbitwise XOR\n"
+"    \t|\t\tbitwise OR\n"
+"    \t&&\t\tlogical AND\n"
+"    \t||\t\tlogical OR\n"
+"    \texpr ? expr : expr\n"
+"    \t\t\tconditional operator\n"
+"    \t=, *=, /=, %=,\n"
+"    \t+=, -=, <<=, >>=,\n"
+"    \t&=, ^=, |=\tassignment\n"
+"    \n"
+"    Shell variables are allowed as operands.  The name of the variable\n"
+"    is replaced by its value (coerced to a fixed-width integer) within\n"
+"    an expression.  The variable need not have its integer attribute\n"
+"    turned on to be used in an expression.\n"
+"    \n"
+"    Operators are evaluated in order of precedence.  Sub-expressions in\n"
+"    parentheses are evaluated first and may override the precedence\n"
+"    rules above.\n"
+"    \n"
+"    Exit Status:\n"
+"    If the last ARG evaluates to 0, let returns 1; let returns 0 otherwise.."
+msgstr ""
+"Định giá biểu thức số học.\n"
+"\n"
+"\tĐịnh giá mỗi ĐỐI_SỐ như là một biểu thức số học.\n"
+"\tViệc định giá xảy ra theo số nguyên có độ rộng cố định\n"
+"\tmà không kiểm tra có tràn chưa,\n"
+"\tdù trường hợp chia cho không được bắt và đặt cờ là một lỗi.\n"
+"\tTheo đây có danh sách các toán tử được nhóm lại\n"
+"\ttheo cấp các toán tử cùng quyền đi trước.\n"
+"\tDanh sách các cấp có thứ tự quyền đi trước giảm.\n"
+"\n"
+"\tid++, id--\tbiến đổi sau khi tăng/giảm dần\n"
+"\t++id, --id\tbiến đổi trước khi tăng/giảm dần\n"
+"\t-, +\ttrừ, cộng nguyên phân\n"
+"\t!, ~\tphủ định lôgic và theo vị trí bit\n"
+"\t**\tmũ hoá\n"
+"\t*, /, %\tphép nhân, phép chia, số dư\n"
+"\t+, -\tphép công, phép trừ\n"
+"\t<<, >>\tdời theo vị trí bit bên trái/phải\n"
+"\t<=, >=, <, >\tso sánh\n"
+"\t==, !=\t bất đẳng thức, đẳng thức\n"
+"\t&\tAND (và) theo vị trí bit\n"
+"\t^\tXOR (hoặc loại từ) theo vị trí bit\n"
+"\t||\tOR (hoặc) theo vị trí bit\n"
+"\tb_thức ? b_thức : b_thức\ttoán từ điều kiện\n"
+"\t=, *=, /=, %=, +=, -=, <<=, >>=, &=, ^=, |=\tgán\n"
+"\n"
+"\tCho phép biến trình bao dưới dạng toán hạng.\n"
+"\tTên của biến được thay thế bằng giá trị của nó\n"
+"\t(bị ép buộc thành một số nguyên rộng cố định)\n"
+"\tbên trong một biểu thức.\n"
+"\tBiến không cần có thuộc tính số nguyên được bật\n"
+"\tđể được dùng làm biểu thức.\n"
+"\n"
+"\tCác toán tử được định giá theo thứ tự quyền đi trước.\n"
+"\tCác biểu thức con nằm trong dấu ngoặc vẫn còn được định giá trước tiên,\n"
+"\tthì có quyền cao hơn các quy tắc đi trước bên trên.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tNếu ĐỐI_SỐ cuối cùng được định giá thành 0 thì let trả lại 1;\n"
+"\tkhông thì let trả lại 0."
+
+#: builtins.c:966
+#, fuzzy
+msgid ""
+"Read a line from the standard input and split it into fields.\n"
+"    \n"
+"    Reads a single line from the standard input, or from file descriptor FD\n"
+"    if the -u option is supplied.  The line is split into fields as with "
+"word\n"
+"    splitting, and the first word is assigned to the first NAME, the second\n"
+"    word to the second NAME, and so on, with any leftover words assigned to\n"
+"    the last NAME.  Only the characters found in $IFS are recognized as "
+"word\n"
+"    delimiters.\n"
+"    \n"
+"    If no NAMEs are supplied, the line read is stored in the REPLY "
+"variable.\n"
+"    \n"
+"    Options:\n"
+"      -a array\tassign the words read to sequential indices of the array\n"
+"    \t\tvariable ARRAY, starting at zero\n"
+"      -d delim\tcontinue until the first character of DELIM is read, rather\n"
+"    \t\tthan newline\n"
+"      -e\t\tuse Readline to obtain the line in an interactive shell\n"
+"      -i text\tUse TEXT as the initial text for Readline\n"
+"      -n nchars\treturn after reading NCHARS characters rather than waiting\n"
+"    \t\tfor a newline\n"
+"      -p prompt\toutput the string PROMPT without a trailing newline before\n"
+"    \t\tattempting to read\n"
+"      -r\t\tdo not allow backslashes to escape any characters\n"
+"      -s\t\tdo not echo input coming from a terminal\n"
+"      -t timeout\ttime out and return failure if a complete line of input "
+"is\n"
+"    \t\tnot read withint TIMEOUT seconds.  The value of the TMOUT\n"
+"    \t\tvariable is the default timeout.  TIMEOUT may be a\n"
+"    \t\tfractional number.  If TIMEOUT is 0, read returns success only\n"
+"    \t\tif input is available on the specified file descriptor.  The\n"
+"    \t\texit status is greater than 128 if the timeout is exceeded\n"
+"      -u fd\t\tread from file descriptor FD instead of the standard input\n"
+"    \n"
+"    Exit Status:\n"
+"    The return code is zero, unless end-of-file is encountered, read times "
+"out,\n"
+"    or an invalid file descriptor is supplied as the argument to -u."
+msgstr ""
+"Đọc một dòng từ đầu vào tiêu chuẩn, sau đó chia nó ra nhiều trường.\n"
+"\n"
+"\tĐọc một dòng riêng lẻ từ đầu vào tiêu chuẩn,\n"
+"\thoặc từ bộ mô tả tập tin FD nếu đưa ra tùy chọn « -u ».\n"
+"\tDòng được chia ra nhiều trường giống như khi chia từ ra,\n"
+"\tvà từ đầu tiên được gán cho TÊN đầu tiên,\n"
+"\ttừ thứ hai cho TÊN thứ hai, v.v.,\n"
+"\tvà từ còn lại nào được gán cho TÊN cuối cùng.\n"
+"\tChỉ những ký tự được tìm trong $IFS được nhận ra là ký tự định giới từ.\n"
+"\n"
+"\tKhông đưa ra TÊN thì dòng được đọc sẽ được ghi nhớ vào biến REPLY (trả "
+"lời).\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-a MẢNG\tgán các từ được đọc cho những số mũ tuần tự\n"
+"\t\t\tcủa biến mảng MẢNG, bắt đầu từ số không.\n"
+"\t\t-d định_giới\ttiếp tục đến khi đọc ký tự đầu tiên của DELIM,\n"
+"\t\t\thơn là ký tự dòng mới\n"
+"\t\t-e\tdùng Readline để lấy dòng trong một trình bao tương tác\n"
+"\t\t-i chuỗi\tdùng chuỗi này như là văn bản đầu tiên cho Readline\n"
+"\t\t-n số_ky_tự\ttrở về sau khi đọc số các ký tự này,\n"
+"\t\t\thơn là đợi một ký tự dòng mới\n"
+"\t\t-p nhắc\txuất chuỗi NHẮC mà không có ký tự dòng mới theo sau,\n"
+"\t\t\ttrước khi thử đọc\n"
+"\t\t-r\tđừng cho phép gạch chéo ngược thoát ký tự\n"
+"\t\t-s\tđừng báo lai dữ liệu nhập vào đến từ thiết bị cuối\n"
+"\t\t-t thời_hạn\tquá thời và trả lại không thành công\n"
+"\t\t\tnếu chưa đọc một dòng dữ liệu nhập hoàn toàn trong số giấy này.\n"
+"\t\t\tGiá trị của biến TMOUT là thời hạn mặc định.\n"
+"\t\t\tThời hạn này có thể là một số thuộc phân số.\n"
+"\t\t\tTrạng thái thoát lớn hơn 128 nếu vượt quá thời hạn này.\n"
+"\t\t-u fd\tđọc từ bộ mô tả tập tin FD thay cho đầu vào tiêu chuẩn\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tMã trả lại là số không, nếu không gặp kết thúc tập tin,\n"
+"\tkhông quá thời khi đọc, và không đưa ra bộ mô tả tập tin sai\n"
+"\tlàm đối số tới « -u »."
+
+#: builtins.c:1006
+msgid ""
+"Return from a shell function.\n"
+"    \n"
+"    Causes a function or sourced script to exit with the return value\n"
+"    specified by N.  If N is omitted, the return status is that of the\n"
+"    last command executed within the function or script.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns N, or failure if the shell is not executing a function or script."
+msgstr ""
+"Trả lại từ một chức năng trình bao.\n"
+"\n"
+"\tGây ra một chức năng hay văn lệnh từ nguồn sẽ thoát\n"
+"\tvới giá trị trả lại được N ghi rõ.\n"
+"\tKhông đưa ra N thì trạng thái trả lại thuộc về câu lệnh cuối cùng\n"
+"\t\tđược chạy bên trong chức năng hay văn lệnh.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại N, hoặc bị lỗi nếu trình bao không đang chạy\n"
+"\t\tmột chức năng hay văn lệnh."
+
+#: builtins.c:1019
+msgid ""
+"Set or unset values of shell options and positional parameters.\n"
+"    \n"
+"    Change the value of shell attributes and positional parameters, or\n"
+"    display the names and values of shell variables.\n"
+"    \n"
+"    Options:\n"
+"      -a  Mark variables which are modified or created for export.\n"
+"      -b  Notify of job termination immediately.\n"
+"      -e  Exit immediately if a command exits with a non-zero status.\n"
+"      -f  Disable file name generation (globbing).\n"
+"      -h  Remember the location of commands as they are looked up.\n"
+"      -k  All assignment arguments are placed in the environment for a\n"
+"          command, not just those that precede the command name.\n"
+"      -m  Job control is enabled.\n"
+"      -n  Read commands but do not execute them.\n"
+"      -o option-name\n"
+"          Set the variable corresponding to option-name:\n"
+"              allexport    same as -a\n"
+"              braceexpand  same as -B\n"
+"              emacs        use an emacs-style line editing interface\n"
+"              errexit      same as -e\n"
+"              errtrace     same as -E\n"
+"              functrace    same as -T\n"
+"              hashall      same as -h\n"
+"              histexpand   same as -H\n"
+"              history      enable command history\n"
+"              ignoreeof    the shell will not exit upon reading EOF\n"
+"              interactive-comments\n"
+"                           allow comments to appear in interactive commands\n"
+"              keyword      same as -k\n"
+"              monitor      same as -m\n"
+"              noclobber    same as -C\n"
+"              noexec       same as -n\n"
+"              noglob       same as -f\n"
+"              nolog        currently accepted but ignored\n"
+"              notify       same as -b\n"
+"              nounset      same as -u\n"
+"              onecmd       same as -t\n"
+"              physical     same as -P\n"
+"              pipefail     the return value of a pipeline is the status of\n"
+"                           the last command to exit with a non-zero status,\n"
+"                           or zero if no command exited with a non-zero "
+"status\n"
+"              posix        change the behavior of bash where the default\n"
+"                           operation differs from the Posix standard to\n"
+"                           match the standard\n"
+"              privileged   same as -p\n"
+"              verbose      same as -v\n"
+"              vi           use a vi-style line editing interface\n"
+"              xtrace       same as -x\n"
+"      -p  Turned on whenever the real and effective user ids do not match.\n"
+"          Disables processing of the $ENV file and importing of shell\n"
+"          functions.  Turning this option off causes the effective uid and\n"
+"          gid to be set to the real uid and gid.\n"
+"      -t  Exit after reading and executing one command.\n"
+"      -u  Treat unset variables as an error when substituting.\n"
+"      -v  Print shell input lines as they are read.\n"
+"      -x  Print commands and their arguments as they are executed.\n"
+"      -B  the shell will perform brace expansion\n"
+"      -C  If set, disallow existing regular files to be overwritten\n"
+"          by redirection of output.\n"
+"      -E  If set, the ERR trap is inherited by shell functions.\n"
+"      -H  Enable ! style history substitution.  This flag is on\n"
+"          by default when the shell is interactive.\n"
+"      -P  If set, do not follow symbolic links when executing commands\n"
+"          such as cd which change the current directory.\n"
+"      -T  If set, the DEBUG trap is inherited by shell functions.\n"
+"      -   Assign any remaining arguments to the positional parameters.\n"
+"          The -x and -v options are turned off.\n"
+"    \n"
+"    Using + rather than - causes these flags to be turned off.  The\n"
+"    flags can also be used upon invocation of the shell.  The current\n"
+"    set of flags may be found in $-.  The remaining n ARGs are positional\n"
+"    parameters and are assigned, in order, to $1, $2, .. $n.  If no\n"
+"    ARGs are given, all shell variables are printed.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given."
+msgstr ""
+"Đặt hay bỏ đặt giá trị của tùy chọn trình bao và tham số thuộc vị trí.\n"
+"\n"
+"\tSửa đổi giá trị của thuộc tính trình bao và tham số thuộc vị trí,\n"
+"\thoặc hiển thị tên và giá trị của biến trình bao.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-a\tđánh dấu các biến được tạo hay sửa đổi để xuất ra\n"
+"\t\t-b\tthông báo ngay về công việc bị chấm dứt\n"
+"\t\t-e\tthoát ngay nếu câu lệnh thoát với trạng thái khác số không\n"
+"\t\t-f\ttắt chức năng tạo tên tập tin (glob)\n"
+"\t\t-h\tnhớ vị trí của mỗi câu lệnh khi nó được dò tìm\n"
+"\t\t-k\tmọi đối số gán được đặt vào môi trường cho một câu lệnh,\n"
+"\t\t\tkhông phải chỉ những đối số nằm trước tên câu lệnh\n"
+"\t\t-m\tbật chức năng điều khiển công việc\n"
+"\t\t-n\tđọc câu lệnh mà không thực thi\n"
+"\t\t-o tên_tùy_chọn\tđặt biến tương ứng với tùy chọn này:\n"
+"\t\t\t• allexport\tbằng -a\n"
+"\t\t\t• braceexpand\tbằng -B\n"
+"\t\t\t• emacs\tdùng một giao diện chỉnh sửa dòng kiểu emacs\n"
+"\t\t\t• errexit\tbằng -e\n"
+"\t\t\t• errtrace\tbằng -E\n"
+"\t\t\t• functrace\tbằng -T\n"
+"\t\t\t• hashall\tbằng -h\n"
+"\t\t\t• histexpand\tbằng -H\n"
+"\t\t\t• history\tbật lược sử câu lệnh\n"
+"\t\t\t• ignoreeof\ttrình bao sẽ không thoát khi đọc ký tự kết thúc tập tin\n"
+"\t\t\t• interactive-comments\tcho phép ghi chú trong câu lệnh tương tác\n"
+"\t\t\t• keyword\tbằng -k\n"
+"\t\t\t• monitor\tbằng -m\n"
+"\t\t\t• noclobber\tbằng -C\n"
+"\t\t\t• noexec\tbằng -n\n"
+"\t\t\t• noglob\tbằng -f\n"
+"\t\t\t• nolog\thiện thời được chấp nhận nhưng bị bỏ qua\n"
+"\t\t\t• notify\tbằng -b\n"
+"\t\t\t• nounset\tbằng -u\n"
+"\t\t\t• onecmd\tbằng -t\n"
+"\t\t\t• physical\tbằng -P\n"
+"\t\t\t• pipefail\tgiá trị trả lại của một ống dẫn\n"
+"\t\t\t\tlà trạng thái của câu lệnh cuối cùng\n"
+"\t\t\t\tthoát với trạng thái khác số không,\n"
+"\t\t\t\thay số không nếu không có câu lệnh\n"
+"\t\t\t\tthoát với trạng thái khác số không\n"
+"\t\t\t• posix\tthay đổi ứng xử của bash\n"
+"\t\t\t\tmà thao tác mặc định khác với tiêu chuẩn Posix,\n"
+"\t\t\t\tđể tùy theo tiêu chuẩn\n"
+"\t\t\t• privileged\tbằng -p\n"
+"\t\t\t• verbose\tbằng -v\n"
+"\t\t\t• vi\tdùng một giao diện chỉnh sửa kiểu vi\n"
+"\t\t\t• xtrace\tbằng -x\n"
+"\t\t-p\tbật khi nào mã số thật và mã số có kết quả\n"
+"\t\t\tkhông tương ứng với nhau.\n"
+"\t\t\tTắt tính năng xử lý tập tin $ENV\n"
+"\t\t\tvà nhập chức năng trình bao.\n"
+"\t\t\tViệc tắt tùy chọn này thì gêy ra UID và GID có kết quả\n"
+"\t\t\tđược đặt thành UID và GID thật.\n"
+"\t\t-t\tthoát sau khi đọc và thực thi một câu lệnh\n"
+"\t\t-u\txử lý biến chưa đặt là lỗi khi thay thế\n"
+"\t\t-v\tin ra mỗi dòng nhập vào trình bao khi nó được đọc\n"
+"\t\t-x\tin ra mỗi câu lệnh và đối số tương ứng\n"
+"\t\t\tkhi nó được thực thi\n"
+"\\t-B\ttrình bao sẽ mở rộng các dấu ngoặc móc\n"
+"\t\t-C\tđặt thì không cho phép ghi đề lên tập tin bình thường\n"
+"\t\t\tđã tồn tại bằng cách chuyển hướng kết xuất\n"
+"\t\t-E\tđặt thì bẫy ERR được chức năng trình bao kế thừa\n"
+"\t\t-H\tbật chức năng thay thế kiểu !\n"
+"\t\t\tCờ này được đặt theo mặc định khi trình bao tương tác\n"
+"\t\t-P\tđặt thì không theo liên kết tượng trưng\n"
+"\t\t\tkhi thực thi câu lệnh như cd mà chuyển đổi thư mục hiện tại\n"
+"\t\t-T\tđặt thì bẩy DEBUG (gỡ lỗi) được chức năng trình bao kế thừa\n"
+"\t\t-\tgán bất cứ đối số còn lại nào cho những tham số thuộc vị trí.\n"
+"\t\t\tHai tùy chọn « -x » và « -v » đều bị tắt.\n"
+"\n"
+"\tViệc dùng « + » hơn là « - » thì gây ra các cờ này bị tắt.\n"
+"\tCác cờ cũng có thể được dùng khi gọi trình bao.\n"
+"\tCũng có thể tìm thấy tập cờ hiện thời trong « $- ».\n"
+"\tCác đối số còn lại là tham số thuộc vị trí,\n"
+"\tvà được gán (theo thứ tự) cho $1, $2, .. $n.\n"
+"\tKhông đưa ra đối số thì in ra mọi biến trình bao.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không gặp tùy chọn sai."
+
+#: builtins.c:1101
+msgid ""
+"Unset values and attributes of shell variables and functions.\n"
+"    \n"
+"    For each NAME, remove the corresponding variable or function.\n"
+"    \n"
+"    Options:\n"
+"      -f\ttreat each NAME as a shell function\n"
+"      -v\ttreat each NAME as a shell variable\n"
+"    \n"
+"    Without options, unset first tries to unset a variable, and if that "
+"fails,\n"
+"    tries to unset a function.\n"
+"    \n"
+"    Some variables cannot be unset; also see `readonly'.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or a NAME is read-only."
+msgstr ""
+"Bỏ đặt giá trị và thuộc tính của biến và chức năng của trình bao.\n"
+"\n"
+"\tĐối với mỗi TÊN, gỡ bỏ biến hay chức năng mà tương ứng.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-f\tđọc mỗi TÊN dượi dạng một chức năng trình bao\n"
+"\t\t-v\tđọc mỗi TÊN dượi dạng một biến trình bao\n"
+"\n"
+"\tKhông có tùy chọn thì chức năng bỏ đặt sẽ thử bỏ đặt một biến,\n"
+"\tvà nếu không thành công, sau đó thử bỏ đặt một chức năng.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai, và TÊN không chỉ đọc."
+
+#: builtins.c:1121
+msgid ""
+"Set export attribute for shell variables.\n"
+"    \n"
+"    Marks each NAME for automatic export to the environment of subsequently\n"
+"    executed commands.  If VALUE is supplied, assign VALUE before "
+"exporting.\n"
+"    \n"
+"    Options:\n"
+"      -f\trefer to shell functions\n"
+"      -n\tremove the export property from each NAME\n"
+"      -p\tdisplay a list of all exported variables and functions\n"
+"    \n"
+"    An argument of `--' disables further option processing.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or NAME is invalid."
+msgstr ""
+"Đặt thuộc tính xuất khẩu cho biến trình bao.\n"
+"\n"
+"\tĐánh dấu mỗi TÊN để tự động xuất vào môi trường của câu lệnh được chạy về "
+"sau.\n"
+"\tĐưa ra GIÁ_TRỊ thì gán GIÁ_TRỊ trước khi xuất ra.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-f\ttham chiếu đến chức năng trình bao\n"
+"\t\t-n\tgỡ bỏ thuộc tính xuất khẩu khỏi mỗi TÊN\n"
+"\t\t-p\thiển thị danh sách các biến và chức năng đều được xuất ra\n"
+"\n"
+"\tĐối số « -- » thì tắt chức năng xử lý tùy chọn sau nữa.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai hay TÊN sai,"
+
+#: builtins.c:1140
+msgid ""
+"Mark shell variables as unchangeable.\n"
+"    \n"
+"    Mark each NAME as read-only; the values of these NAMEs may not be\n"
+"    changed by subsequent assignment.  If VALUE is supplied, assign VALUE\n"
+"    before marking as read-only.\n"
+"    \n"
+"    Options:\n"
+"      -a\trefer to indexed array variables\n"
+"      -A\trefer to associative array variables\n"
+"      -f\trefer to shell functions\n"
+"      -p\tdisplay a list of all readonly variables and functions\n"
+"    \n"
+"    An argument of `--' disables further option processing.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or NAME is invalid."
+msgstr ""
+"Đánh dấu biến trình bao không thể thay đổi được.\n"
+"\n"
+"\tĐánh dấu mỗi TÊN là chỉ đọc; những giá trị của TÊN như vậy\n"
+"\tthì không thay đổi được bất chấp việc gán theo sau.\n"
+"\tĐưa ra GIÁ_TRỊ thì gán GIÁ_TRỊ trước khi đánh dấu là chỉ đọc.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-a\ttham chiếu đến biến kiểu mảng theo số mũ\n"
+"\t\t-A\ttham chiếu đến biến kiểu mảng kết hợp\n"
+"\t\t-f\ttham chiếu đến chức năng trình bao\n"
+"\t\t-p\thiển thị danh sách các biến và chức năng vẫn chỉ đọc\n"
+"\n"
+"\tĐối số « -- » thì tắt chức năng xử lý tùy chọn sau nữa.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai hay TÊN sai."
+
+#: builtins.c:1161
+msgid ""
+"Shift positional parameters.\n"
+"    \n"
+"    Rename the positional parameters $N+1,$N+2 ... to $1,$2 ...  If N is\n"
+"    not given, it is assumed to be 1.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless N is negative or greater than $#."
+msgstr ""
+"Dời tham số thuộc vị trí.\n"
+"\n"
+"\tThay đổi tên của tham số thuộc vị trí $N+1,$N+2 ... đến $1,$2 ...\n"
+"\tKhông đưa ra N thì giả sử nó là 1.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu N không âm hay lớn hơn $#."
+
+#: builtins.c:1173 builtins.c:1188
+msgid ""
+"Execute commands from a file in the current shell.\n"
+"    \n"
+"    Read and execute commands from FILENAME in the current shell.  The\n"
+"    entries in $PATH are used to find the directory containing FILENAME.\n"
+"    If any ARGUMENTS are supplied, they become the positional parameters\n"
+"    when FILENAME is executed.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed in FILENAME; fails if\n"
+"    FILENAME cannot be read."
+msgstr ""
+"Thực thi các câu lệnh từ một tập tin trong trình bao đang chạy.\n"
+"\n"
+"\tĐọc và thực thi các câu lệnh từ TÊN_TẬP_TIN\n"
+"\ttrong trình bao đang chạy.\n"
+"\tNhững mục nhập trong $PATH được dùng\n"
+"\tđể tìm thư mục chứa tên tập tin này.\n"
+"\tĐưa ra đối số thì mỗi đối số trở thành tham số thuộc vị trí\n"
+"\tkhi TÊN_TẬP_TIN được thực thi.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại trạng thái của câu lệnh cuối cùng được thực thi trong "
+"TÊN_TẬP_TIN;\n"
+"\tkhông thành công nếu không thể đọc TÊN_TẬP_TIN."
+
+#: builtins.c:1204
+msgid ""
+"Suspend shell execution.\n"
+"    \n"
+"    Suspend the execution of this shell until it receives a SIGCONT signal.\n"
+"    Unless forced, login shells cannot be suspended.\n"
+"    \n"
+"    Options:\n"
+"      -f\tforce the suspend, even if the shell is a login shell\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless job control is not enabled or an error occurs."
+msgstr ""
+"Ngưng chạy trình bao.\n"
+"\n"
+"\tNgưng chạy trình bao này đến khi nó nhận tín hiệu tiếp tục (SIGCONT).\n"
+"\tNếu không ép buộc thì không thể ngưng chạy trình bao kiểu đăng nhập.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-f\tép buộc việc ngưng, thậm chí nếu trình bao có kiểu đăng nhập\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu chức năng điều khiển công việc đã được bật, và "
+"không gặp lỗi."
+
+#: builtins.c:1220
+msgid ""
+"Evaluate conditional expression.\n"
+"    \n"
+"    Exits with a status of 0 (true) or 1 (false) depending on\n"
+"    the evaluation of EXPR.  Expressions may be unary or binary.  Unary\n"
+"    expressions are often used to examine the status of a file.  There\n"
+"    are string operators as well, and numeric comparison operators.\n"
+"    \n"
+"    File operators:\n"
+"    \n"
+"      -a FILE        True if file exists.\n"
+"      -b FILE        True if file is block special.\n"
+"      -c FILE        True if file is character special.\n"
+"      -d FILE        True if file is a directory.\n"
+"      -e FILE        True if file exists.\n"
+"      -f FILE        True if file exists and is a regular file.\n"
+"      -g FILE        True if file is set-group-id.\n"
+"      -h FILE        True if file is a symbolic link.\n"
+"      -L FILE        True if file is a symbolic link.\n"
+"      -k FILE        True if file has its `sticky' bit set.\n"
+"      -p FILE        True if file is a named pipe.\n"
+"      -r FILE        True if file is readable by you.\n"
+"      -s FILE        True if file exists and is not empty.\n"
+"      -S FILE        True if file is a socket.\n"
+"      -t FD          True if FD is opened on a terminal.\n"
+"      -u FILE        True if the file is set-user-id.\n"
+"      -w FILE        True if the file is writable by you.\n"
+"      -x FILE        True if the file is executable by you.\n"
+"      -O FILE        True if the file is effectively owned by you.\n"
+"      -G FILE        True if the file is effectively owned by your group.\n"
+"      -N FILE        True if the file has been modified since it was last "
+"read.\n"
+"    \n"
+"      FILE1 -nt FILE2  True if file1 is newer than file2 (according to\n"
+"                       modification date).\n"
+"    \n"
+"      FILE1 -ot FILE2  True if file1 is older than file2.\n"
+"    \n"
+"      FILE1 -ef FILE2  True if file1 is a hard link to file2.\n"
+"    \n"
+"    String operators:\n"
+"    \n"
+"      -z STRING      True if string is empty.\n"
+"    \n"
+"      -n STRING\n"
+"         STRING      True if string is not empty.\n"
+"    \n"
+"      STRING1 = STRING2\n"
+"                     True if the strings are equal.\n"
+"      STRING1 != STRING2\n"
+"                     True if the strings are not equal.\n"
+"      STRING1 < STRING2\n"
+"                     True if STRING1 sorts before STRING2 "
+"lexicographically.\n"
+"      STRING1 > STRING2\n"
+"                     True if STRING1 sorts after STRING2 lexicographically.\n"
+"    \n"
+"    Other operators:\n"
+"    \n"
+"      -o OPTION      True if the shell option OPTION is enabled.\n"
+"      ! EXPR         True if expr is false.\n"
+"      EXPR1 -a EXPR2 True if both expr1 AND expr2 are true.\n"
+"      EXPR1 -o EXPR2 True if either expr1 OR expr2 is true.\n"
+"    \n"
+"      arg1 OP arg2   Arithmetic tests.  OP is one of -eq, -ne,\n"
+"                     -lt, -le, -gt, or -ge.\n"
+"    \n"
+"    Arithmetic binary operators return true if ARG1 is equal, not-equal,\n"
+"    less-than, less-than-or-equal, greater-than, or greater-than-or-equal\n"
+"    than ARG2.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success if EXPR evaluates to true; fails if EXPR evaluates to\n"
+"    false or an invalid argument is given."
+msgstr ""
+"Định giá biểu thức điều kiện.\n"
+"\n"
+"Thoát với trạng thái 0 (đúng) hoặc 1 (sai), phụ thuộc vào phép tính B_THỨC.\n"
+"Biểu thức kiểu nguyên phân hoặc nhị phân cũng được.\n"
+"Biểu thức nguyên phân thường dùng để kiểm tra trạng thái của tập tin.\n"
+"Cũng có đối số chuỗi, và toán tử so sánh thuộc số.\n"
+"    \n"
+"    Toán tử tập tin:\n"
+"    \n"
+"        -a TẬP_TIN        Đúng nếu tập tin có phải tồn tại.\n"
+"        -b TẬP_TIN        Đúng nếu tập tin là đặc biệt về khối.\n"
+"        -c TẬP_TIN        Đúng nếu tập tin là đặc biệt về ký tự.\n"
+"        -d TẬP_TIN        Đúng nếu tập tin là một thư mục.\n"
+"        -e TẬP_TIN        Đúng nếu tập tin có phải tồn tại.\n"
+"        -f TẬP_TIN        Đúng nếu tập tin có phải tồn tại\n"
+"\t\t\t\t\tcũng là một tập tin bình thường.\n"
+"        -g TẬP_TIN        Đúng nếu tập tin là set-group-id (đặt mã số "
+"nhóm).\n"
+"        -h TẬP_TIN        Đúng nếu tập tin là một liên kết tượng trưng.\n"
+"        -L TẬP_TIN        Đúng nếu tập tin là một liên kết tượng trưng.\n"
+"        -k TẬP_TIN        Đúng nếu tập tin có bit « dính » được đặt.\n"
+"        -p TẬP_TIN        Đúng nếu tập tin là một ống dẫn đặt tên.\n"
+"        -r TẬP_TIN        Đúng nếu tập tin cho bạn đọc được.\n"
+"        -s TẬP_TIN        Đúng nếu tập tin có phải tồn tại và không phải "
+"rỗng.\n"
+"        -S TẬP_TIN        Đúng nếu tập tin là một ổ cắm.\n"
+"        -t FD          Đúng nếu FD (bộ mô tả tập tin) được mở trên thiết bị "
+"cuối.\n"
+"        -u TẬP_TIN        Đúng nếu tập tin is set-user-id.\n"
+"        -w TẬP_TIN        Đúng nếu tập tin cho bạn ghi vào được.\n"
+"        -x TẬP_TIN        Đúng nếu tập tin cho bạn thực hiện được.\n"
+"        -O TẬP_TIN        Đúng nếu tập tin được bạn sở hữu một cách hiệu "
+"quả.\n"
+"        -G TẬP_TIN        Đúng nếu tập tin được nhóm của bạn sở hữu\n"
+"\t\t\t\t\tmột cách hiệu quả.\n"
+"        -N TẬP_TIN        Đúng nếu tập tin đã bị sửa đổi kể từ lần đọc cuối "
+"cùng.\n"
+"    \n"
+"      TẬP_TIN1 -nt TẬP_TIN2  Đúng nếu tập tin 1 mới hơn tập tin 2\n"
+"\t\t(tùy theo ngày sửa đổi)\n"
+"    \n"
+"      TẬP_TIN1 -ot TẬP_TIN2  Đúng nếu tập tin 1 cũ hơn tập tin 2.\n"
+"    \n"
+"      TẬP_TIN1 -ef TẬP_TIN2  Đúng nếu tập tin 1 là một liên kết cứng\n"
+"\t\t\t\t\t\ttới tập tin 2.\n"
+"    \n"
+"    Toán tử chuỗi:\n"
+"    \n"
+"        -z CHUỖI      Đúng nếu chuỗi rỗng.\n"
+"    \n"
+"        -n CHUỖI\n"
+"        CHUỖI         Đúng nếu chuỗi không rỗng.\n"
+"    \n"
+"        CHUỖI1 = CHUỖI2\t\tĐúng nếu hai chuỗi trùng nhau.\n"
+"        CHUỖI1 != CHUỖI2\tĐúng nếu hai chuỗi khác nhau.\n"
+"        CHUỖI1 < CHUỖI2\t\tĐúng nếu CHUỖI1 sắp xếp đằng trước CHUỖI2\n"
+"\t\t\t\t\t\ttheo thứ tự từ điển.\n"
+"        CHUỖI1 > CHUỖI2\t\tĐúng nếu CHUỖI1 sắp xếp đằng sau CHUỖI2\n"
+"\t\t\t\t\t\ttheo thứ tự từ điển.\n"
+"    \n"
+"    Toán tử khác:\n"
+"    \n"
+"        -o TÙY_CHỌN      Đúng nếu tùy chọn trình bao này đã được bật.\n"
+"        ! B_THỨC         Đúng nếu biểu thức này không đúng.\n"
+"        B_THỨC1 -a B_THỨC2 \t\tĐúng nếu cả hai biểu thức này là đúng.\n"
+"        B_THỨC1 -o B_THỨC2 \t\tĐúng nếu một của hai biểu thức này là đúng.\n"
+"    \n"
+"        đối_số1 OP đối_số2   \t\tPhép thử số học. OP là một của:\n"
+"\t\t-eq\t\tbằng\n"
+"\t\t-ne\t\tkhông bằng\n"
+"             \t-lt\t\tnhỏ hơn\n"
+"\t\t-le\t\tnhỏ hơn hoặc bằng\n"
+"\t\t-gt\t\tlớn hơn\n"
+"\t\t-ge\t\tlớn hơn hoặc bằng\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu B_THỨC định giá thành Đúng;\n"
+"\tkhông thành công nếu B_THỨC định giá thành Sai hay đưa ra đối số sai."
+
+#: builtins.c:1296
+msgid ""
+"Evaluate conditional expression.\n"
+"    \n"
+"    This is a synonym for the \"test\" builtin, but the last argument must\n"
+"    be a literal `]', to match the opening `['."
+msgstr ""
+"Định giá biểu thức điều kiện.\n"
+"\n"
+"\tĐây là một từ đồng nghĩa với dựng sẵn « test »,\n"
+"\tnhưng đối số cuối cùng phải là một « ] » nghĩa chữ,\n"
+"\tđổ tương ứng với « [ » mở."
+
+#: builtins.c:1305
+msgid ""
+"Display process times.\n"
+"    \n"
+"    Prints the accumulated user and system times for the shell and all of "
+"its\n"
+"    child processes.\n"
+"    \n"
+"    Exit Status:\n"
+"    Always succeeds."
+msgstr ""
+"Hiển thị thời lượng chạy tiến trình.\n"
+"\n"
+"\tIn ra thời lượng chạy trình bao (và các tiến trình con)\n"
+"\t\tđối với hệ thống và mỗi người dùng.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tLúc nào cũng thành công."
+
+#: builtins.c:1317
+msgid ""
+"Trap signals and other events.\n"
+"    \n"
+"    Defines and activates handlers to be run when the shell receives "
+"signals\n"
+"    or other conditions.\n"
+"    \n"
+"    ARG is a command to be read and executed when the shell receives the\n"
+"    signal(s) SIGNAL_SPEC.  If ARG is absent (and a single SIGNAL_SPEC\n"
+"    is supplied) or `-', each specified signal is reset to its original\n"
+"    value.  If ARG is the null string each SIGNAL_SPEC is ignored by the\n"
+"    shell and by the commands it invokes.\n"
+"    \n"
+"    If a SIGNAL_SPEC is EXIT (0) ARG is executed on exit from the shell.  "
+"If\n"
+"    a SIGNAL_SPEC is DEBUG, ARG is executed before every simple command.\n"
+"    \n"
+"    If no arguments are supplied, trap prints the list of commands "
+"associated\n"
+"    with each signal.\n"
+"    \n"
+"    Options:\n"
+"      -l\tprint a list of signal names and their corresponding numbers\n"
+"      -p\tdisplay the trap commands associated with each SIGNAL_SPEC\n"
+"    \n"
+"    Each SIGNAL_SPEC is either a signal name in <signal.h> or a signal "
+"number.\n"
+"    Signal names are case insensitive and the SIG prefix is optional.  A\n"
+"    signal may be sent to the shell with \"kill -signal $$\".\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless a SIGSPEC is invalid or an invalid option is "
+"given."
+msgstr ""
+"Bắt các tín hiệu và dữ kiện khác.\n"
+"\n"
+"\tXác định và kích hoạt các bộ xử lý cần chạy khi trình bao\n"
+"\tnhận được tín hiệu hay điều kiện khác.\n"
+"\n"
+"\tĐỐI_SỐ là một câu lệnh cần đọc và thực thi khi trình bao\n"
+"\tnhận được (các) tín hiệu ĐẶC_TẢ_TÍN_HIỆU.\n"
+"\tNếu không đưa ra ĐỐI_SỐ\n"
+"\t(và cung cấp chỉ một ĐẶC_TẢ_TÍN_HIỆU riêng lẻ),\n"
+"\thoặc đưa ra « - », mỗi tín hiệu được ghi rõ\n"
+"\tthì được đặt lại về giá trị gốc.\n"
+"\tNếu ĐỐI_SỐ là chuỗi vô giá trị\n"
+"\tthì mỗi ĐẶC_TẢ_TÍN_HIỆU bị bỏ qua\n"
+"\tbởi trình bao và những câu lệnh nó gọi.\n"
+"\n"
+"\tNếu đưa ra một ĐẶC_TẢ_TÍN_HIỆU là EXIT (0),\n"
+"\tthì ĐỐI_SỐ được thực thi khi thoát khỏi trình bao.\n"
+"\tNếu đưa ra một ĐẶC_TẢ_TÍN_HIỆU là DEBUG,\n"
+"\tĐỐI_SỐ được thực thi đằng trước mỗi câu lệnh đơn giản.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-l\tin ra danh sách các tên tín hiệu và số thứ tự tương ứng\n"
+"\t\t-p\thiển thị các câu lệnh bắt tương ứng với mỗi ĐẶC_TẢ_TÍN_HIỆU\n"
+"\n"
+"\tMỗi ĐẶC_TẢ_TÍN_HIỆU là hoặc một tên tín hiệu trong <signal.h>,\n"
+"\thoặc một số thứ tự tín hiệu.\n"
+"\tTên tín hiệu không phân biệt chữ hoa/thường,\n"
+"\tvà không bắt buộc phải dùng tiền tố « SIG ».\n"
+"\tCó thể gửi cho trình bao một tín hiệu,\n"
+"\tdùng « kill -signal $$ ».\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra ĐẶC_TẢ_TÍN_HIỆU sai\n"
+"\thay tùy chọn sai."
+
+#: builtins.c:1349
+msgid ""
+"Display information about command type.\n"
+"    \n"
+"    For each NAME, indicate how it would be interpreted if used as a\n"
+"    command name.\n"
+"    \n"
+"    Options:\n"
+"      -a\tdisplay all locations containing an executable named NAME;\n"
+"    \tincludes aliases, builtins, and functions, if and only if\n"
+"    \tthe `-p' option is not also used\n"
+"      -f\tsuppress shell function lookup\n"
+"      -P\tforce a PATH search for each NAME, even if it is an alias,\n"
+"    \tbuiltin, or function, and returns the name of the disk file\n"
+"    \tthat would be executed\n"
+"      -p\treturns either the name of the disk file that would be executed,\n"
+"    \tor nothing if `type -t NAME' would not return `file'.\n"
+"      -t\toutput a single word which is one of `alias', `keyword',\n"
+"    \t`function', `builtin', `file' or `', if NAME is an alias, shell\n"
+"    \treserved word, shell function, shell builtin, disk file, or not\n"
+"    \tfound, respectively\n"
+"    \n"
+"    Arguments:\n"
+"      NAME\tCommand name to be interpreted.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success if all of the NAMEs are found; fails if any are not "
+"found."
+msgstr ""
+"Hiển thị thông tin về kiểu câu lệnh.\n"
+"\n"
+"\tĐối với mỗi TÊN, ngụ ý nó sẽ được giải thích như thế nào\n"
+"\t\tnếu nó được dùng dưới dạng một tên câu lệnh.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-a\thiển thị mọi vị trí chứa tập tin thực thi được có TÊN;\n"
+"\t\t\tkhông đặt tùy chọn « -p » thì cũng bao gồm\n"
+"\t\t\tcác bí danh, dựng sẵn và chức năng.\n"
+"\t\t-f\tthu hồi tính năng dò tìm chức năng trình bao\n"
+"\t\t-P\tép buộc tìm kiếm ĐƯỜNG_DẪN đối với mỗi TÊN,\n"
+"\t\t\tthậm chí nếu nó là bí danh, dựng sẵn hay chức năng,\n"
+"\t\t\tvà trả lại tên của tập tin trên đĩa mà sẽ được thực thi\n"
+"\t\t-p\ttrả lại hoặc tên của tập tin trên đĩa mà sẽ được thực thi,\n"
+"\t\t\thoặc không trả lại gì nếu câu lệnh « type -t TÊN »\n"
+"\t\t\tsẽ không trả lại « file » (tập tin).\n"
+"\t\t-t\txuất một từ riêng lẻ mà một của:\n"
+"\t\t\t• alias\tbí danh\n"
+"\t\t\t• keyword\ttừ dành riêng của trình bao\n"
+"\t\t\t• function\tchức năng của trình bao\n"
+"\t\t\t• builtin\tdựng sẵn của trình bao\n"
+"\t\t\t• file\ttập tin trên đĩa\n"
+"\t\t\t• \t\t(không gì) không tìm thấy\n"
+"\n"
+"\tĐối số :\n"
+"\tTÊN\ttên câu lệnh cần giải thích.\n"
+"\n"
+"\tTráng thái thoát:\n"
+"\tTrả lại thành công nếu tìm thấy tất cả các TÊN; không thì bị lỗi."
+
+#: builtins.c:1380
+msgid ""
+"Modify shell resource limits.\n"
+"    \n"
+"    Provides control over the resources available to the shell and "
+"processes\n"
+"    it creates, on systems that allow such control.\n"
+"    \n"
+"    Options:\n"
+"      -S\tuse the `soft' resource limit\n"
+"      -H\tuse the `hard' resource limit\n"
+"      -a\tall current limits are reported\n"
+"      -b\tthe socket buffer size\n"
+"      -c\tthe maximum size of core files created\n"
+"      -d\tthe maximum size of a process's data segment\n"
+"      -e\tthe maximum scheduling priority (`nice')\n"
+"      -f\tthe maximum size of files written by the shell and its children\n"
+"      -i\tthe maximum number of pending signals\n"
+"      -l\tthe maximum size a process may lock into memory\n"
+"      -m\tthe maximum resident set size\n"
+"      -n\tthe maximum number of open file descriptors\n"
+"      -p\tthe pipe buffer size\n"
+"      -q\tthe maximum number of bytes in POSIX message queues\n"
+"      -r\tthe maximum real-time scheduling priority\n"
+"      -s\tthe maximum stack size\n"
+"      -t\tthe maximum amount of cpu time in seconds\n"
+"      -u\tthe maximum number of user processes\n"
+"      -v\tthe size of virtual memory\n"
+"      -x\tthe maximum number of file locks\n"
+"    \n"
+"    If LIMIT is given, it is the new value of the specified resource; the\n"
+"    special LIMIT values `soft', `hard', and `unlimited' stand for the\n"
+"    current soft limit, the current hard limit, and no limit, respectively.\n"
+"    Otherwise, the current value of the specified resource is printed.  If\n"
+"    no option is given, then -f is assumed.\n"
+"    \n"
+"    Values are in 1024-byte increments, except for -t, which is in seconds,\n"
+"    -p, which is in increments of 512 bytes, and -u, which is an unscaled\n"
+"    number of processes.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+"Sửa đổi các giới hạn tài nguyên trình bao.\n"
+"\n"
+"\tCung cấp điều khiển với các tài nguyên sẵn sàng\n"
+"\tcho trình bao và các tiến trình được nó tạo,\n"
+"\ttrên hệ thống cho phép điều khiển như vậy.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-S\tdùng giới hạn tài nguyên « soft » (mềm)\n"
+"\t\t-H\tdùng giới hạn tài nguyên « hard » (cứng)\n"
+"\t\t-a\tthông báo mọi giới hạn hiện thời\n"
+"\t\t-b\tkích cỡ của vùng đệm ổ cắm\n"
+"\t\t-c\tkích cỡ tối đa của tập tin lõi được tạo\n"
+"\t\t-d\tkích cỡ tối đa của từng đoạn dữ liệu của một tiến trình\n"
+"\t\t-e\tmức ưu tiên cao nhất khi định thời (« nice »)\n"
+"\t\t-f\tkích cỡ tối đa của của tập tin được ghi bởi trình bao\n"
+"\t\t\tvà các tiến trình con của nó\n"
+"\t\t-i\tsố tối đa các tín hiệu bị hoãn\n"
+"\t\t-l\tkích cỡ tối đa mà một tiến trình có thể khoá vào bộ nhớ\n"
+"\t\t-m\tkích cỡ tối đa của tập hợp nội trú\n"
+"\t\t-n\tsố tối đa các bộ mô tả tập tin còn mở\n"
+"\t\t-p\tkích cỡ của vùng đệm ống dẫn\n"
+"\t\t-q\tsố tối đa các byte trong hàng đợi thông điệp POSIX\n"
+"\t\t-r\tmức ưu tiên cao nhất khi định thời thật\n"
+"\t\t-s\tkích cỡ tối đa của đống\n"
+"\t\t-t\tthời gian CPU lâu nhất, theo giây\n"
+"\t\t-u\tsố tối đa các tiến trình của người dùng\n"
+"\t\t-v\tkích cỡ của bộ nhớ ảo\n"
+"\t\tsố tối đa các khoá tập tin\n"
+"\n"
+"\tNếu đưa ra GIỚI_HẠN thì nó là giá trị mới của tài nguyên được ghi rõ ;\n"
+"\tcũng có ba giá trị GIỚI_HẠN đặc biệt:\n"
+"\t\t• soft\tgiới hạn mềm hiện thời\n"
+"\t\t• hard\tgiới hạn cứng hiện thời\n"
+"\t\t• unlimited\tvô hạn\n"
+"\tKhông thì in ra giá trị hiện thời của tài nguyên được ghi rõ.\n"
+"\tKhông đưa ra tùy chọn thì giả sử « -f ».\n"
+"\n"
+"\tGiá trị được ghi rõ theo bước 1024-byte, trừ :\n"
+"\t\t• -t\ttheo giây\n"
+"\t\t• -p\ttheo bước 512-byte\n"
+"\t\t• -u\tsố các tiến trình không theo tỷ lệ\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai hay gặp lỗi."
+
+#: builtins.c:1425
+msgid ""
+"Display or set file mode mask.\n"
+"    \n"
+"    Sets the user file-creation mask to MODE.  If MODE is omitted, prints\n"
+"    the current value of the mask.\n"
+"    \n"
+"    If MODE begins with a digit, it is interpreted as an octal number;\n"
+"    otherwise it is a symbolic mode string like that accepted by chmod(1).\n"
+"    \n"
+"    Options:\n"
+"      -p\tif MODE is omitted, output in a form that may be reused as input\n"
+"      -S\tmakes the output symbolic; otherwise an octal number is output\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless MODE is invalid or an invalid option is given."
+msgstr ""
+"Hiển thị hoặc đặt mặt nạ chế độ tập tin.\n"
+"\n"
+"\tĐặt mặt nạ (bộ lọc) tạo tập tin của người dùng thành CHẾ_ĐỘ.\n"
+"\t\tKhông đưa ra CHẾ_ĐỘ thì in ra giá trị hiện thời của mặt nạ.\n"
+"\n"
+"\tNếu CHẾ_ĐỘ bắt đầu với một chữ số, nó được đọc là một số bát phân;\n"
+"\t\tkhông thì nó là một chuỗi chế độ tượng trưng\n"
+"\t\tgiống như chuỗi được chmod(1) chấp nhận.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-p\tkhông đưa ra CHẾ_ĐỘ thì xuất theo một định dạng\n"
+"\t\t\tcó thể được dùng lại làm dữ liệu nhập vào\n"
+"\t\t-S\tlàm cho kết xuất cũng tượng trưng,\n"
+"\t\t\tkhông thì xuất một số bát phân\n"
+"\n"
+"\tTráng thái thoát:\n"
+"\tTrả lại thành công nếu không có CHẾ_ĐỘ sai hay tùy chọn sai."
+
+#: builtins.c:1445
+msgid ""
+"Wait for job completion and return exit status.\n"
+"    \n"
+"    Waits for the process identified by ID, which may be a process ID or a\n"
+"    job specification, and reports its termination status.  If ID is not\n"
+"    given, waits for all currently active child processes, and the return\n"
+"    status is zero.  If ID is a a job specification, waits for all "
+"processes\n"
+"    in the job's pipeline.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of ID; fails if ID is invalid or an invalid option "
+"is\n"
+"    given."
+msgstr ""
+"Đợi công việc chạy xong, sau đó trả lại trạng thái thoát.\n"
+"\n"
+"\tĐợi tiến trình được ID nhận diện, mà có thể là một mã số tiến trình\n"
+"\t\thay một đặc tả công việc, sau đó trả lại trạng thái chấm dứt của nó.\n"
+"\t\tKhông đưa ra ID thì đợi tất cả các tiến trình con đang chạy,\n"
+"\t\tvà trạng thái trả lại là số không.\n"
+"\t\tNếu ID là một đặc tả công việc thì đợi tất cả các tiến trình\n"
+"\t\tvẫn nằm trong ống dẫn của công việc đó.\n"
+"\n"
+"\tTráng thái thoát:\n"
+"\tTrả lại trạng thái của ID; không thành công nếu ID sai\n"
+"\t\thoặc đưa ra tùy chọn sai."
+
+#: builtins.c:1463
+msgid ""
+"Wait for process completion and return exit status.\n"
+"    \n"
+"    Waits for the specified process and reports its termination status.  If\n"
+"    PID is not given, all currently active child processes are waited for,\n"
+"    and the return code is zero.  PID must be a process ID.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of ID; fails if ID is invalid or an invalid option "
+"is\n"
+"    given."
+msgstr ""
+"Đợi tiến trình chạy xong, sau đó thông báo trạng thái thoát của nó.\n"
+"\n"
+"\tĐợi tiến trình đã ghi rõ,\n"
+"\tsau đó thông báo trạng thái chấm dứt của nó.\n"
+"\tNếu không đưa ra PID (mã số tiến trình)\n"
+"\tthì đợi tất cả các tiến trình con đang chạy,\n"
+"\tvà mã trả lại là số không.\n"
+"\tPID phải là một mã số tiến trình.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại trạng thái của ID (mã số);\n"
+"\tkhông thành công nếu ID sai,\n"
+"\thoặc nếu đưa ra tùy chọn sai."
+
+#: builtins.c:1478
+msgid ""
+"Execute commands for each member in a list.\n"
+"    \n"
+"    The `for' loop executes a sequence of commands for each member in a\n"
+"    list of items.  If `in WORDS ...;' is not present, then `in \"$@\"' is\n"
+"    assumed.  For each element in WORDS, NAME is set to that element, and\n"
+"    the COMMANDS are executed.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"Thực thi câu lệnh cho mỗi bộ phận trong một danh sách.\n"
+"\n"
+"\tVòng lặp « for » (cho) thì thực thi câu lệnh\n"
+"\tcho mỗi bộ phận trong một danh sách các mục.\n"
+"\tKhông đưa ra « in CÁC_TỪ ... » thì giả sử « in \"$@\" ».\n"
+"\tĐối với mỗi phần tử trong CÁC_TỪ,\n"
+"\tTÊN được đặt thành phần tử đó,\n"
+"\tvà các câu LỆNH được thực thi.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại trạng thái của câu lệnh cuối cùng được chạy."
+
+#: builtins.c:1492
+msgid ""
+"Arithmetic for loop.\n"
+"    \n"
+"    Equivalent to\n"
+"    \t(( EXP1 ))\n"
+"    \twhile (( EXP2 )); do\n"
+"    \t\tCOMMANDS\n"
+"    \t\t(( EXP3 ))\n"
+"    \tdone\n"
+"    EXP1, EXP2, and EXP3 are arithmetic expressions.  If any expression is\n"
+"    omitted, it behaves as if it evaluates to 1.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"Số học cho vòng lặp.\n"
+"\n"
+"\tTương đương với:\n"
+"    \t(( EXP1 ))\n"
+"    \twhile (( EXP2 )); do\n"
+"    \t\tCOMMANDS\n"
+"    \t\t(( EXP3 ))\n"
+"    \tdone\n"
+"EXP1, EXP2, EXP3 là biểu thức số học.\n"
+"Bỏ sót biểu thức nào thì ứng xử như nó tính là 1.\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại trạng thái của câu lệnh cuối cùng được chạy."
+
+#: builtins.c:1510
+msgid ""
+"Select words from a list and execute commands.\n"
+"    \n"
+"    The WORDS are expanded, generating a list of words.  The\n"
+"    set of expanded words is printed on the standard error, each\n"
+"    preceded by a number.  If `in WORDS' is not present, `in \"$@\"'\n"
+"    is assumed.  The PS3 prompt is then displayed and a line read\n"
+"    from the standard input.  If the line consists of the number\n"
+"    corresponding to one of the displayed words, then NAME is set\n"
+"    to that word.  If the line is empty, WORDS and the prompt are\n"
+"    redisplayed.  If EOF is read, the command completes.  Any other\n"
+"    value read causes NAME to be set to null.  The line read is saved\n"
+"    in the variable REPLY.  COMMANDS are executed after each selection\n"
+"    until a break command is executed.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"Chọn từ trong một danh sách, và thực thi câu lệnh.\n"
+"\n"
+"WORDS được mở rộng, mà tạo một danh sách các từ.\n"
+"Tập hợp các từ đã mở rộng được in trên đầu lỗi tiêu chuẩn.\n"
+"\tmỗi từ có con số đi trước.\n"
+"Không có « in WORDS » thì giả sử « in \"$@\" ».\n"
+"Dấu nhắc PS3 thì được hiển thị, và một dòng được đọc\n"
+"\ttừ đầu vào tiêu chuẩn.\n"
+"Nếu dòng này là số tương ứng với một của những từ được hiển thị,\n"
+"\tTÊN sẽ được đặt thành từ đó.\n"
+"Dòng rỗng thì hiển thị lại WORDS và dấu nhắc.\n"
+"Đọc kết thúc tập tin thì chạy xong câu lệnh đó.\n"
+"Bất cứ giá trị khác nào được đọc sẽ gây ra TÊN được đặt thành vô giá trị.\n"
+"Dòng được đọc sẽ được lưu lại vào biến REPLY (trả lời).\n"
+"Các CÂU_LỆNH được thực hiện sau khi chọn mỗi đồ,\n"
+"\tđến khi một lệnh gián đoạn được thực hiện.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại trạng thái của câu lệnh cuối cùng được chạy."
+
+#: builtins.c:1531
+msgid ""
+"Report time consumed by pipeline's execution.\n"
+"    \n"
+"    Execute PIPELINE and print a summary of the real time, user CPU time,\n"
+"    and system CPU time spent executing PIPELINE when it terminates.\n"
+"    \n"
+"    Options:\n"
+"      -p\tprint the timing summary in the portable Posix format\n"
+"    \n"
+"    The value of the TIMEFORMAT variable is used as the output format.\n"
+"    \n"
+"    Exit Status:\n"
+"    The return status is the return status of PIPELINE."
+msgstr ""
+"Thông báo thời gian được chiếm khi ống dẫn thực thi.\n"
+"\n"
+"\tThực thi PIPELINE (ống dẫn) và in ra bản tóm tắt thời gian thật,\n"
+"\tthời gian CPU của người dùng, và thời gian CPU của hệ thống\n"
+"\t00 chiếm khi thực thi ống dẫn, khi ống dẫn chấm dứt.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-p\tin ra bản tóm tắt đếm thời gian\n"
+"\t\t\ttheo định dạng POSIX có thể mang theo\n"
+"\n"
+"\tGiá trị của biến TIMEFORMAT (định dạng thời gian)\n"
+"\tđược dùng làm định dạng kết xuất.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrạng thái trả lai là trạng thái trả lại của PIPELINE."
+
+#: builtins.c:1548
+msgid ""
+"Execute commands based on pattern matching.\n"
+"    \n"
+"    Selectively execute COMMANDS based upon WORD matching PATTERN.  The\n"
+"    `|' is used to separate multiple patterns.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"Thức thi câu lệnh dựa vào khớp mẫu.\n"
+"\n"
+"\tThực thi các câu LỆNH một cách chọn lọc,\n"
+"\tdựa vào TỪ tương ứng với MẪU.\n"
+"\tNhiều mẫu định giới bằng « | ».\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại trạng thái của câu lệnh cuối cùng được chạy."
+
+#: builtins.c:1560
+msgid ""
+"Execute commands based on conditional.\n"
+"    \n"
+"    The `if COMMANDS' list is executed.  If its exit status is zero, then "
+"the\n"
+"    `then COMMANDS' list is executed.  Otherwise, each `elif COMMANDS' list "
+"is\n"
+"    executed in turn, and if its exit status is zero, the corresponding\n"
+"    `then COMMANDS' list is executed and the if command completes.  "
+"Otherwise,\n"
+"    the `else COMMANDS' list is executed, if present.  The exit status of "
+"the\n"
+"    entire construct is the exit status of the last command executed, or "
+"zero\n"
+"    if no condition tested true.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"Thực thi câu lệnh dựa vào điều kiện.\n"
+"\n"
+"\tDanh sách « if LỆNH » được thực thi.\n"
+"\tNếu trạng thái thoát của nó là số không,\n"
+"\tthì danh sách « then LỆNH » được thực thi.\n"
+"\tKhông thì mỗi danh sách « elif LỆNH » được thực thi lần lượt,\n"
+"\tvà nếu trạng thái thoát của nó là số không,\n"
+"\tthì danh sách « then LỆNH » tương ứng được thực thi\n"
+"\tvà câu lệnh « nếu » (if) sẽ chạy xong.\n"
+"\tKhông thì danh sách « else LỆNH » được thực thi, nếu có.\n"
+"\tTrạng thái thoát của toàn bộ tạo dựng\n"
+"\tlà trạng thái của câu lệnh cuối cùng được chạy,\n"
+"\thoặc số không nếu không có điều kiện có kết quả là Đúng.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại trạng thái của câu lệnh cuối cùng được chạy."
+
+#: builtins.c:1577
+msgid ""
+"Execute commands as long as a test succeeds.\n"
+"    \n"
+"    Expand and execute COMMANDS as long as the final command in the\n"
+"    `while' COMMANDS has an exit status of zero.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"Thực thi câu lệnh miễn là một phép thử thành công.\n"
+"\n"
+"\tMở rộng và thực thi các câu LỆNH miễn là câu lệnh cuối cùng\n"
+"\ttrong những câu LỆNH « while » (trong khi)\n"
+"\tcó trạng thái thoát là số không.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại trạng thái của câu lệnh cuối cùng được chạy."
+
+#: builtins.c:1589
+msgid ""
+"Execute commands as long as a test does not succeed.\n"
+"    \n"
+"    Expand and execute COMMANDS as long as the final command in the\n"
+"    `until' COMMANDS has an exit status which is not zero.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"Thực thi câu lệnh miễn là một phép thử không thành công.\n"
+"\n"
+"\tMở rộng và thực thi các câu LỆNH miễn là câu lệnh cuối cùng\n"
+"\ttrong các câu LỆNH « until » (đến khi) có trạng thái thoát\n"
+"\tkhác số không.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại trạng thái của câu lệnh cuối cùng được chạy."
+
+#: builtins.c:1601
+msgid ""
+"Create a coprocess named NAME.\n"
+"    \n"
+"    Execute COMMAND asynchronously, with the standard output and standard\n"
+"    input of the command connected via a pipe to file descriptors assigned\n"
+"    to indices 0 and 1 of an array variable NAME in the executing shell.\n"
+"    The default NAME is \"COPROC\".\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the exit status of COMMAND."
+msgstr ""
+
+#: builtins.c:1615
+msgid ""
+"Define shell function.\n"
+"    \n"
+"    Create a shell function named NAME.  When invoked as a simple command,\n"
+"    NAME runs COMMANDs in the calling shell's context.  When NAME is "
+"invoked,\n"
+"    the arguments are passed to the function as $1...$n, and the function's\n"
+"    name is in $FUNCNAME.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless NAME is readonly."
+msgstr ""
+"Xác định chức năng trình bao.\n"
+"\n"
+"\tTạo một chức năng trình bao có TÊN.\n"
+"\tKhi được gọi dưới dạng một câu lệnh đơn giản,\n"
+"\tTÊN chạy các câu LỆNH theo ngữ cảnh của trình bao đang gọi.\n"
+"\tKhi TÊN được gọi, các đối số được gửi cho chức năng dưới dạng $1...$n,\n"
+"\tvà tên chức năng nằm trong $FUNCNAME.\n"
+"\n"
+"\tTráng thái thoát:\n"
+"\tTrả lại thành công nếu TÊN không phải chỉ đọc."
+
+#: builtins.c:1629
+msgid ""
+"Group commands as a unit.\n"
+"    \n"
+"    Run a set of commands in a group.  This is one way to redirect an\n"
+"    entire set of commands.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the last command executed."
+msgstr ""
+"Nhóm lại các câu lệnh làm cùng một đơn vị.\n"
+"\n"
+"\tChạy một tập hợp các câu lệnh trong cùng một nhóm.\n"
+"\tĐây là một phương pháp chuyển hướng\n"
+"\tmột tập hợp câu lệnh hoàn toàn.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại trạng thái của câu lệnh cuối cùng được chạy."
+
+#: builtins.c:1641
+msgid ""
+"Resume job in foreground.\n"
+"    \n"
+"    Equivalent to the JOB_SPEC argument to the `fg' command.  Resume a\n"
+"    stopped or background job.  JOB_SPEC can specify either a job name\n"
+"    or a job number.  Following JOB_SPEC with a `&' places the job in\n"
+"    the background, as if the job specification had been supplied as an\n"
+"    argument to `bg'.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns the status of the resumed job."
+msgstr ""
+"Tiếp tục lại công việc ở trước.\n"
+"\n"
+"\tTương đương với đối số ĐẶC_TẢ_CÔNG_VIỆC với câu lệnh « fg ».\n"
+"\tTiếp tục lai một công việc bị dừng chạy hay chạy về nền.\n"
+"\tĐẶC_TẢ_CÔNG_VIỆC có thể ghi rõ hoặc một tên công việc,\n"
+"\thoặc một số thứ tự công việc.\n"
+"\tĐặt một « & » theo sau ĐẶC_TẢ_CÔNG_VIỆC sẽ đặt công việc về nền,\n"
+"\tnhư là đặc tả công việc đã được cung cấp dưới dạng một đối số với « bg ».\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại trạng thái của công việc đã tiếp tục lại."
+
+#: builtins.c:1656
+msgid ""
+"Evaluate arithmetic expression.\n"
+"    \n"
+"    The EXPRESSION is evaluated according to the rules for arithmetic\n"
+"    evaluation.  Equivalent to \"let EXPRESSION\".\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns 1 if EXPRESSION evaluates to 0; returns 0 otherwise."
+msgstr ""
+"Định giá biểut thức số học.\n"
+"\n"
+"\tBIỂU_THỨC được tính tùy theo các quy tắc về định giá số học.\n"
+"\tTương đương với « let BIỂU_THỨC ».\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại 1 nếu BIỂU_THỨC tính là 0; không thì trả lại 0."
+
+#: builtins.c:1668
+msgid ""
+"Execute conditional command.\n"
+"    \n"
+"    Returns a status of 0 or 1 depending on the evaluation of the "
+"conditional\n"
+"    expression EXPRESSION.  Expressions are composed of the same primaries "
+"used\n"
+"    by the `test' builtin, and may be combined using the following "
+"operators:\n"
+"    \n"
+"      ( EXPRESSION )\tReturns the value of EXPRESSION\n"
+"      ! EXPRESSION\t\tTrue if EXPRESSION is false; else false\n"
+"      EXPR1 && EXPR2\tTrue if both EXPR1 and EXPR2 are true; else false\n"
+"      EXPR1 || EXPR2\tTrue if either EXPR1 or EXPR2 is true; else false\n"
+"    \n"
+"    When the `==' and `!=' operators are used, the string to the right of\n"
+"    the operator is used as a pattern and pattern matching is performed.\n"
+"    When the `=~' operator is used, the string to the right of the operator\n"
+"    is matched as a regular expression.\n"
+"    \n"
+"    The && and || operators do not evaluate EXPR2 if EXPR1 is sufficient to\n"
+"    determine the expression's value.\n"
+"    \n"
+"    Exit Status:\n"
+"    0 or 1 depending on value of EXPRESSION."
+msgstr ""
+"Thực thi câu lệnh điều kiện.\n"
+"\n"
+"Trả về trạng thái 0 hoặc 1, phụ thuộc vào phép tính\n"
+"\tbiểu thức điều kiện BIỂU_THỨC.\n"
+"Biểu thức chứa cùng những nguyên sơ được dùng bởi dựng sẵn « test »,\n"
+"\tvà có thể được tổ hợp dùng các toán tử theo đây:\n"
+"    \n"
+"    \t( BIỂU_THỨC )\tTrả về giá trị của BIỂU_THỨC\n"
+"    \t! BIỂU_THỨC\tĐúng nếu BIỂU_THỨC là không đúng; không thì sai\n"
+"    \tB_THỨC1 && B_THỨC2\n"
+"\tĐúng nếu cả hai B_THỨC1 và B_THỨC2 đều là đúng; không thì sai\n"
+"    \tB_THỨC1 || B_THỨC2\n"
+"\tĐúng nếu một của B_THỨC1 và B_THỨC2 là đúng; không thì sai\n"
+"    \n"
+"Khi dùng toán từ « == » và « != », chuỗi bên phải toán tử được dùng làm mẫu,\n"
+"\tvà thực hiện chức năng khớp mẫu.\n"
+"Toán tử « && » và « || » không tính B_THỨC2 nếu B_THỨC1 là đủ\n"
+"\tđể tính giá trị của biểu thức.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\t0 hay 1 phụ thuộc vào giá trị của BIỂU_THỨC."
+
+#: builtins.c:1694
+msgid ""
+"Common shell variable names and usage.\n"
+"    \n"
+"    BASH_VERSION\tVersion information for this Bash.\n"
+"    CDPATH\tA colon-separated list of directories to search\n"
+"    \t\tfor directories given as arguments to `cd'.\n"
+"    GLOBIGNORE\tA colon-separated list of patterns describing filenames to\n"
+"    \t\tbe ignored by pathname expansion.\n"
+"    HISTFILE\tThe name of the file where your command history is stored.\n"
+"    HISTFILESIZE\tThe maximum number of lines this file can contain.\n"
+"    HISTSIZE\tThe maximum number of history lines that a running\n"
+"    \t\tshell can access.\n"
+"    HOME\tThe complete pathname to your login directory.\n"
+"    HOSTNAME\tThe name of the current host.\n"
+"    HOSTTYPE\tThe type of CPU this version of Bash is running under.\n"
+"    IGNOREEOF\tControls the action of the shell on receipt of an EOF\n"
+"    \t\tcharacter as the sole input.  If set, then the value\n"
+"    \t\tof it is the number of EOF characters that can be seen\n"
+"    \t\tin a row on an empty line before the shell will exit\n"
+"    \t\t(default 10).  When unset, EOF signifies the end of input.\n"
+"    MACHTYPE\tA string describing the current system Bash is running on.\n"
+"    MAILCHECK\tHow often, in seconds, Bash checks for new mail.\n"
+"    MAILPATH\tA colon-separated list of filenames which Bash checks\n"
+"    \t\tfor new mail.\n"
+"    OSTYPE\tThe version of Unix this version of Bash is running on.\n"
+"    PATH\tA colon-separated list of directories to search when\n"
+"    \t\tlooking for commands.\n"
+"    PROMPT_COMMAND\tA command to be executed before the printing of each\n"
+"    \t\tprimary prompt.\n"
+"    PS1\t\tThe primary prompt string.\n"
+"    PS2\t\tThe secondary prompt string.\n"
+"    PWD\t\tThe full pathname of the current directory.\n"
+"    SHELLOPTS\tA colon-separated list of enabled shell options.\n"
+"    TERM\tThe name of the current terminal type.\n"
+"    TIMEFORMAT\tThe output format for timing statistics displayed by the\n"
+"    \t\t`time' reserved word.\n"
+"    auto_resume\tNon-null means a command word appearing on a line by\n"
+"    \t\titself is first looked for in the list of currently\n"
+"    \t\tstopped jobs.  If found there, that job is foregrounded.\n"
+"    \t\tA value of `exact' means that the command word must\n"
+"    \t\texactly match a command in the list of stopped jobs.  A\n"
+"    \t\tvalue of `substring' means that the command word must\n"
+"    \t\tmatch a substring of the job.  Any other value means that\n"
+"    \t\tthe command must be a prefix of a stopped job.\n"
+"    histchars\tCharacters controlling history expansion and quick\n"
+"    \t\tsubstitution.  The first character is the history\n"
+"    \t\tsubstitution character, usually `!'.  The second is\n"
+"    \t\tthe `quick substitution' character, usually `^'.  The\n"
+"    \t\tthird is the `history comment' character, usually `#'.\n"
+"    HISTIGNORE\tA colon-separated list of patterns used to decide which\n"
+"    \t\tcommands should be saved on the history list.\n"
+msgstr ""
+"Tên và sử dụng của mỗi biến trình bao thường dùng.\n"
+"\n"
+"BASH_VERSION\tThông tin phiên bản về phần mềm Bash này.\n"
+"    CDPATH\tDanh sách các thư mục định giới bằng dấu hai chấm,\n"
+"\tqua đó cần tìm kiếm thư mục được đưa ra dạng đối số với « cd ».\n"
+"    GLOBIGNORE\tDanh sách các mẫu định giới bằng dấu hai chấm,\n"
+"\tmà diễn tả các tên tập tin cần bỏ qua khi mở rộng tên đường dẫn.\n"
+"    HISTFILE\tTên của tập tin chứa lịch sử câu lệnh của bạn.\n"
+"    HISTFILESIZE\tSố tối đa các dòng có thể được tập tin này chứa.\n"
+"    HISTSIZE\tSố tối đa các dòng lịch sử mà trình bao đang chạy có thể truy "
+"cập.\n"
+"    HOME\tTên đường dẫn đầy đủ đến thư mục đăng nhập của bạn.\n"
+"    HOSTNAME\tTên của máy chủ hiện thời của bạn.\n"
+"    HOSTTYPE\tKiểu CPU dưới đó phiên bản Bash này đang chạy.\n"
+"    IGNOREEOF\tĐiều khiển ứng xử của trình bao khi nhận\n"
+"\tký tự kết thúc tập tin (EOF) là dữ liệu nhập độc nhất.\n"
+"\tĐặt thì giá trị của nó là số ký tự EOF có thể gặp liên tục\n"
+"\ttrên một dòng rỗng trước khi trình bao sẽ thoát (mặc định là 10).\n"
+"\tKhông đặt thì EOF sẽ cũng kết thúc nhập vào.\n"
+"    MACHTYPE\tMột chuỗi diễn tả hệ thống hiện thời trên đó Bash đang chạy.\n"
+"    MAILCHECK\tKhoảng thời gian, theo giây, giữa hai lần Bash kiểm tra\n"
+"\tcó thư mới chưa.\n"
+"    MAILPATH\tDanh sách các tên tập tin định giới bằng dấu hai chấm\n"
+"\ttrong đó Bash kiểm tra có thư mới chưa.\n"
+"    OSTYPE\tPhiên bản UNIX trên đó Bash này đang chạy.\n"
+"    PATH\tDanh sách các thư mục định giới bằng dấu hai chấm,\n"
+"\tqua đó cần tìm kiếm câu lệnh.\n"
+"    PROMPT_COMMAND\tMột câu lệnh cần thực hiện trước khi in ra\n"
+"\tmỗi chuỗi nhắc chính.\n"
+"    PS1\t\tChuỗi nhắc chính.\n"
+"    PS2\t\tChuỗi nhắc phụ.\n"
+"    PWD\t\tTên đường dẫn đầy đủ của thư mục hiện tại.\n"
+"    SHELLOPTS\tDanh sách các tùy chọn trình bao đã hiệu lực\n"
+"\tđịnh giới bằng dấu hai chấm.\n"
+"    TERM\tTên của kiểu thiết bị cuối hiện thời.\n"
+"    TIMEFORMAT\tĐịnh dạng kết xuất cho thống kê đếm thời gian\n"
+"\tđược hiển thị bởi từ dành riêng « time ».\n"
+"    auto_resume\tCó giá trị thì trước tiên tìm một từ lệnh xuất hiện một "
+"mình\n"
+"\ttrên một dòng, trong danh sách các công việc bị dừng chạy.\n"
+"\tTìm được thì đặt công việc đó vào trước.\n"
+"\tGiá trị « exact » (chính xác) có nghĩa là từ lệnh phải tương ứng\n"
+"\tchính xác với một câu lệnh trong danh sách các công việc bị dừng chạy.\n"
+"\tGiá trị « substring » (chuỗi phụ) có nghĩa là từ lệnh phải tương ứng\n"
+"\tvới một chuỗi phụ của công việc đó.\n"
+"    histchars\tCác ký tự điều khiển mở rộng và thay thế nhanh lịch sử.\n"
+"\tKý tự đầu tiên thường là ký tự thay thế lịch sử, thường là « ! ».\n"
+"\tKý tự thứ hai là ký tự thay thế nhanh, thường là « ^ ».\n"
+"\tKý tự thứ ba là ký tự ghi chú về lịch sử, thường là « # ».\n"
+"    HISTIGNORE\tDanh sách các mẫu định giới bằng dấu hai chấm,\n"
+"\tđược ùng để quyết định những câu lệnh nào nên được lưu\n"
+"\tvào danh sách lịch sử.\n"
+
+#: builtins.c:1751
+msgid ""
+"Add directories to stack.\n"
+"    \n"
+"    Adds a directory to the top of the directory stack, or rotates\n"
+"    the stack, making the new top of the stack the current working\n"
+"    directory.  With no arguments, exchanges the top two directories.\n"
+"    \n"
+"    Options:\n"
+"      -n\tSuppresses the normal change of directory when adding\n"
+"    \tdirectories to the stack, so only the stack is manipulated.\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tRotates the stack so that the Nth directory (counting\n"
+"    \tfrom the left of the list shown by `dirs', starting with\n"
+"    \tzero) is at the top.\n"
+"    \n"
+"      -N\tRotates the stack so that the Nth directory (counting\n"
+"    \tfrom the right of the list shown by `dirs', starting with\n"
+"    \tzero) is at the top.\n"
+"    \n"
+"      dir\tAdds DIR to the directory stack at the top, making it the\n"
+"    \tnew current working directory.\n"
+"    \n"
+"    The `dirs' builtin displays the directory stack.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid argument is supplied or the directory\n"
+"    change fails."
+msgstr ""
+"Thêm thư mục vào đống.\n"
+"\n"
+"Thêm một thư mục vào đầu của đống thư mục, hoặc xoay đống,\n"
+"\tlàm cho thư mục mới đầu đống là thư mục làm việc hiện thời.\n"
+"Không có đối số thì trao đổi hai thư mục đầu.\n"
+"\n"
+"+N\tXoay đống để thư mục thứ N (đếm từ bên trái danh sách\n"
+"\tđược hiển thị bằng « dirs », bắt đầu từ số không) dời lên đầu.\n"
+"\n"
+"-N\tXoay đống để thư mục thứ N (đếm từ bên phải danh sách\n"
+"\tđược hiển thị bằng « dirs », bắt đầu từ số không) dời lên đầu.\n"
+"\n"
+"-n\tThu hồi chức năng chuyển đổi bình thường khi thêm thư mục\n"
+"\tvào đống, để thao tác chỉ đống.\n"
+"\n"
+"dir\tThêm T_MỤC vào đầu đống thư mục, làm cho nó là thư mục\n"
+"\tlàm việc hiện thời mới.\n"
+"\n"
+"Dựng sẵn « dirs » thì hiển thị đống thư mục.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra đối số sai,\n"
+"\tcũng không sai chuyển đổi thư mục."
+
+#: builtins.c:1785
+msgid ""
+"Remove directories from stack.\n"
+"    \n"
+"    Removes entries from the directory stack.  With no arguments, removes\n"
+"    the top directory from the stack, and changes to the new top directory.\n"
+"    \n"
+"    Options:\n"
+"      -n\tSuppresses the normal change of directory when removing\n"
+"    \tdirectories from the stack, so only the stack is manipulated.\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tRemoves the Nth entry counting from the left of the list\n"
+"    \tshown by `dirs', starting with zero.  For example: `popd +0'\n"
+"    \tremoves the first directory, `popd +1' the second.\n"
+"    \n"
+"      -N\tRemoves the Nth entry counting from the right of the list\n"
+"    \tshown by `dirs', starting with zero.  For example: `popd -0'\n"
+"    \tremoves the last directory, `popd -1' the next to last.\n"
+"    \n"
+"    The `dirs' builtin displays the directory stack.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid argument is supplied or the directory\n"
+"    change fails."
+msgstr ""
+"Gỡ bỏ thư mục khỏi đống.\n"
+"\n"
+"Gỡ bỏ thư mục khỏi đống thư mục.\n"
+"Không có đối số thì gỡ bỏ thư mục đầu khỏi đống,\n"
+"\tvà cd (chuyển đổi thư mục) sang thư mục đầu mới.\n"
+"\n"
+"+N\tGỡ bỏ thư mục thứ N (đếm từ bên trái danh sách\n"
+"\tđược hiển thị bằng « dirs », bắt đầu từ số không).\n"
+"\tVí dụ :\n"
+"\t\tpopd +0\t\tgỡ bỏ thư mục cuối cùng\n"
+"\t\tpopd +1\t\tgỡ bỏ thư mục thứ hai.\n"
+"\n"
+"-N\tGỡ bỏ thư mục thứ N (đếm từ bên phải danh sách\n"
+"\tđược hiển thị bằng « dirs », bắt đầu từ số không).\n"
+"\tVí dụ :\n"
+"\t\tpopd -0\t\tgỡ bỏ thư mục cuối cùng\n"
+"\t\tpopd -1\t\tgỡ bỏ thư mục giáp cuối.\n"
+"\n"
+"-n\tThu hồi chức năng chuyển đổi bình thường khi gỡ bỏ thư mục\n"
+"\tkhỏi đống, để thao tác chỉ đống.\n"
+"\n"
+"Dựng sẵn « dirs » thì hiển thị đống thư mục.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra đối số sai,\n"
+"\tcũng không sai chuyển đổi thư mục."
+
+#: builtins.c:1815
+msgid ""
+"Display directory stack.\n"
+"    \n"
+"    Display the list of currently remembered directories.  Directories\n"
+"    find their way onto the list with the `pushd' command; you can get\n"
+"    back up through the list with the `popd' command.\n"
+"    \n"
+"    Options:\n"
+"      -c\tclear the directory stack by deleting all of the elements\n"
+"      -l\tdo not print tilde-prefixed versions of directories relative\n"
+"    \tto your home directory\n"
+"      -p\tprint the directory stack with one entry per line\n"
+"      -v\tprint the directory stack with one entry per line prefixed\n"
+"    \twith its position in the stack\n"
+"    \n"
+"    Arguments:\n"
+"      +N\tDisplays the Nth entry counting from the left of the list shown "
+"by\n"
+"    \tdirs when invoked without options, starting with zero.\n"
+"    \n"
+"      -N\tDisplays the Nth entry counting from the right of the list shown "
+"by\n"
+"    \tdirs when invoked without options, starting with zero.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+"Hiển thị đống thư mục.\n"
+"\n"
+"\tHiển thị danh sách các thư mục được nhớ hiện thời.\n"
+"\tCâu lệnh « pushd » sẽ thêm thư mục vào danh sách;\n"
+"\tcâu lệnh « popd » cũng nâng thư mục lên danh sách.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-c\tgột đống thư mục bằng cách xoá mọi phần tử\n"
+"\t\t₫l\tđừng in a phiên bản thư mục có dấu ngã\n"
+"\t\t\t(tương đối so với thư mục chính của người dùng)\n"
+"\t\t-p\tin ra đống thư mục, mỗi dòng một mục\n"
+"\t\t-v\tin ra đống thư mục, mỗi dòng một mục,\n"
+"\t\t\tvới tiền tố là vị trí trong đống\n"
+"\n"
+"\tĐối số :\n"
+"\t\t+N\thiển thị mục thứ N bắt đầu từ bên trái danh sách\n"
+"\t\t\tđược hiển thị bằng « dirs »\n"
+"\t\t\tkhi được gọi mà không đưa ra tùy chọn,\n"
+"\t\t\tbắt đầu từ số không.\n"
+"\n"
+"\t\t-N\thiển thị mục thứ N bắt đầu từ bên phải danh sách\n"
+"\t\t\tđược hiển thị bằng « dirs »\n"
+"\t\t\tkhi được gọi mà không đưa ra tùy chọn,\n"
+"\t\t\tbắt đầu từ số không.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai hay gặp lỗi."
+
+#: builtins.c:1844
+msgid ""
+"Set and unset shell options.\n"
+"    \n"
+"    Change the setting of each shell option OPTNAME.  Without any option\n"
+"    arguments, list all shell options with an indication of whether or not "
+"each\n"
+"    is set.\n"
+"    \n"
+"    Options:\n"
+"      -o\trestrict OPTNAMEs to those defined for use with `set -o'\n"
+"      -p\tprint each shell option with an indication of its status\n"
+"      -q\tsuppress output\n"
+"      -s\tenable (set) each OPTNAME\n"
+"      -u\tdisable (unset) each OPTNAME\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success if OPTNAME is enabled; fails if an invalid option is\n"
+"    given or OPTNAME is disabled."
+msgstr ""
+"Đặt và bỏ đặt các tùy chọn trình bao.\n"
+"\n"
+"\tThay đổi thiết lập của mỗi tùy chọn trình bao có TÊN_TÙY_CHỌN.\n"
+"\tKhông có đối số tùy chọn thì liệt kê tất cả các tùy chọn trình bao,\n"
+"\tcũng ngụ ý mỗi tùy chọn được đặt hay không.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-o\thạn chế TÊN_TÙY_CHỌN thành những tên được xác định\n"
+"\t\tđể sử dụng với « set -o »\n"
+"\t\t-p\tin ra mỗi tùy chọn trình bao, cũng ngụ ý trạng thái của nó\n"
+"\t\t-q\tthu hồi kết xuất\n"
+"\t\t-u\ttắt (bỏ đặt) mỗi TÊN_TÙY_CHỌN\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu TÊN_TÙY_CHỌN được bật;\n"
+"\tkhông thành công nếu đưa ra tùy chọn sai hay TÊN_TÙY_CHỌN bị tắt."
+
+#: builtins.c:1865
+msgid ""
+"Formats and prints ARGUMENTS under control of the FORMAT.\n"
+"    \n"
+"    Options:\n"
+"      -v var\tassign the output to shell variable VAR rather than\n"
+"    \t\tdisplay it on the standard output\n"
+"    \n"
+"    FORMAT is a character string which contains three types of objects: "
+"plain\n"
+"    characters, which are simply copied to standard output; character "
+"escape\n"
+"    sequences, which are converted and copied to the standard output; and\n"
+"    format specifications, each of which causes printing of the next "
+"successive\n"
+"    argument.\n"
+"    \n"
+"    In addition to the standard format specifications described in printf"
+"(1)\n"
+"    and printf(3), printf interprets:\n"
+"    \n"
+"      %b\texpand backslash escape sequences in the corresponding argument\n"
+"      %q\tquote the argument in a way that can be reused as shell input\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or a write or "
+"assignment\n"
+"    error occurs."
+msgstr ""
+"Định dạng và in ra các ĐỐI_SỐ tùy theo ĐỊNH_DẠNG.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-v BIẾN\tgán kết xuất cho biến trình bao này,\n"
+"\t\t\thơn là hiển thị nó trên đầu ra tiêu chuẩn\n"
+"\n"
+"\tĐỊNH_DẠNG là một chuỗi ký tự mà chứa ba kiểu đối tượng:\n"
+"\t\t• ký tự bình thường\tđược sao chép sang đầu ra tiêu chuẩn\n"
+"\t\t• dãy ký tự thoát\t00 chuyển đổi và sao chép sang đầu ra tiêu chuẩn\n"
+"\t\tđặc tả định dạng\tmỗi đặc tả gây ra in đối số kế tiếp.\n"
+"\n"
+"\tThêm vào đặc tả định dạng tiêu chuẩn được diễn tả\n"
+"\ttrong printf(1) và printf(3), printf đọc được:\n"
+"\n"
+"\t\t%b\tmở rộng dãy thoát kiểu gạch chéo ngược trong đối số tương ứng\n"
+"\t\t%q\ttrích dẫn đối số bằng một cách có thể dùng lại được\n"
+"\t\t\tlàm dữ liệu nhập vào trình bao\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai hay gặp lỗi kiểu ghi hay "
+"gán."
+
+#: builtins.c:1892
+msgid ""
+"Specify how arguments are to be completed by Readline.\n"
+"    \n"
+"    For each NAME, specify how arguments are to be completed.  If no "
+"options\n"
+"    are supplied, existing completion specifications are printed in a way "
+"that\n"
+"    allows them to be reused as input.\n"
+"    \n"
+"    Options:\n"
+"      -p\tprint existing completion specifications in a reusable format\n"
+"      -r\tremove a completion specification for each NAME, or, if no\n"
+"    \tNAMEs are supplied, all completion specifications\n"
+"    \n"
+"    When completion is attempted, the actions are applied in the order the\n"
+"    uppercase-letter options are listed above.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+"Ghi rõ Readline sẽ điền nốt các đối số như thế nào.\n"
+"\n"
+"\tĐối với mỗi TÊN, ghi rõ các đối số sẽ được điền nốt như thế nào.\n"
+"\tKhông đưa ra tùy chọn thì in ra các đặc tả điền nốt\n"
+"\tbằng một cách cho phép dùng lại đặc tả làm dữ liệu nhập vào.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-p\tin ra các đặc tả điền nốt đã tồn tại theo một định dạng\n"
+"\t\t\tcó thể dùng lại được\n"
+"\t\t-r\tgỡ bỏ một đặc tả điền nốt cho mỗi TÊN,\n"
+"\t\t\thoặc nếu không đưa ra TÊN thì gỡ bỏ tất cả các đặc tả điền nốt\n"
+"\n"
+"\tKhi chức năng điền nốt được thử, những hành động được làm\n"
+"\t\ttheo thứ tự của những tùy chọn chữ hoa bên trên.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai hay gặp lỗi."
+
+#: builtins.c:1915
+msgid ""
+"Display possible completions depending on the options.\n"
+"    \n"
+"    Intended to be used from within a shell function generating possible\n"
+"    completions.  If the optional WORD argument is supplied, matches "
+"against\n"
+"    WORD are generated.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or an error occurs."
+msgstr ""
+"Hiển thị các việc điền nốt có thể làm, phụ thuộc vào những tùy chọn.\n"
+"\n"
+"\tDự định dùng từ bên trong một chức năng trình bao\n"
+"\tmà tạo các việc điền nốt có thể làm.\n"
+"\tNếu đưa ra đối số TỪ vẫn tùy chọn,\n"
+"\tthì tạo các kết quả tương ứng với TỪ.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai hay gặp lỗi."
+
+#: builtins.c:1930
+msgid ""
+"Modify or display completion options.\n"
+"    \n"
+"    Modify the completion options for each NAME, or, if no NAMEs are "
+"supplied,\n"
+"    the completion currently begin executed.  If no OPTIONs are givenm, "
+"print\n"
+"    the completion options for each NAME or the current completion "
+"specification.\n"
+"    \n"
+"    Options:\n"
+"    \t-o option\tSet completion option OPTION for each NAME\n"
+"    \n"
+"    Using `+o' instead of `-o' turns off the specified option.\n"
+"    \n"
+"    Arguments:\n"
+"    \n"
+"    Each NAME refers to a command for which a completion specification must\n"
+"    have previously been defined using the `complete' builtin.  If no NAMEs\n"
+"    are supplied, compopt must be called by a function currently generating\n"
+"    completions, and the options for that currently-executing completion\n"
+"    generator are modified.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is supplied or NAME does not\n"
+"    have a completion specification defined."
+msgstr ""
+"Sửa đổi hoặc hiển thị các tùy chọn điền nốt.\n"
+"\n"
+"\tSửa đổi các tùy chọn điền nốt đối với mỗi TÊN,\n"
+"\thoặc nếu không đưa ra TÊN thì chức năng điền nốt đang chạy.\n"
+"\tKhông đưa ra tùy chọn thì in ra các tùy chọn điền nốt\n"
+"\tđối với mỗi TÊN hay đặc tả điền nốt hiện thời.\n"
+"\n"
+"\tTùy chọn\"\n"
+"\t\t-o tùy_chọn\tđặt tùy chọn điền nốt này đối với mỗi TÊN\n"
+"\n"
+"\tDùng « +o » thay cho « -o » thì tắt tùy chọn đưa ra.\n"
+"\n"
+"\tĐối số :\n"
+"\n"
+"\tMỗi TÊN tham chiếu đến một câu lệnh cho đó một đặc tả điền nốt\n"
+"\tphải được xác định trước dùng dựng sẵn « complete ».\n"
+"\tKhông đưa ra TÊN thì « compopt » phải được gọi\n"
+"\tbởi một chức năng đang tạo việc điền nốt,\n"
+"\tcác tùy chọn về hàm tạo việc điền nốt đang chạy cũng được sửa đổi.\n"
+"\n"
+"\tTrạng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai,\n"
+"\tvà TÊN có một đặc tả điền nốt được xác định."
+
+#: builtins.c:1958
+#, fuzzy
+msgid ""
+"Read lines from the standard input into an array variable.\n"
+"    \n"
+"    Read lines from the standard input into the array variable ARRAY, or "
+"from\n"
+"    file descriptor FD if the -u option is supplied.  The variable MAPFILE "
+"is\n"
+"    the default ARRAY.\n"
+"    \n"
+"    Options:\n"
+"      -n count\tCopy at most COUNT lines.  If COUNT is 0, all lines are "
+"copied.\n"
+"      -O origin\tBegin assigning to ARRAY at index ORIGIN.  The default "
+"index is 0.\n"
+"      -s count \tDiscard the first COUNT lines read.\n"
+"      -t\t\tRemove a trailing newline from each line read.\n"
+"      -u fd\t\tRead lines from file descriptor FD instead of the standard "
+"input.\n"
+"      -C callback\tEvaluate CALLBACK each time QUANTUM lines are read.\n"
+"      -c quantum\tSpecify the number of lines read between each call to "
+"CALLBACK.\n"
+"    \n"
+"    Arguments:\n"
+"      ARRAY\t\tArray variable name to use for file data.\n"
+"    \n"
+"    If -C is supplied without -c, the default quantum is 5000.  When\n"
+"    CALLBACK is evaluated, it is supplied the index of the next array\n"
+"    element to be assigned as an additional argument.\n"
+"    \n"
+"    If not supplied with an explicit origin, mapfile will clear ARRAY "
+"before\n"
+"    assigning to it.\n"
+"    \n"
+"    Exit Status:\n"
+"    Returns success unless an invalid option is given or ARRAY is readonly."
+msgstr ""
+"Đọc các dòng từ một tập tin vào một biến mảng.\n"
+"\n"
+"\tĐọc các dòng từ đầu vào tiêu chuẩn vào biến mảng MẢNG,\n"
+"\thoặc từ bộ mô tả tập tin FD nếu đưa ra tùy chọn « -u ».\n"
+"\tBiến TẬP_TIN_SƠ_ĐỒ là MẢNG mặc định.\n"
+"\n"
+"\tTùy chọn:\n"
+"\t\t-n SỐ\tsao chép nhiều nhất SỐ dòng. Nếu SỐ là 0 thì sao chép mọi dòng.\n"
+"\t\t-O GỐC\tbắt đầu gán cho MẢNG ở chỉ mục GỐC. Chỉ mục mặc định là 0.\n"
+"\t\t-s SỐ\thủy SỐ dòng đầu tiên được đọc.\n"
+"\t\t-t\tgỡ bỏ một ký tự dòng mới theo sau khỏi mỗi dòng được đọc.\n"
+"\t\t-u FD\tđọc các dòng từ bộ mô tả tập tin FD thay vào từ đầu vào tiêu "
+"chuẩn.\n"
+"\t\t-C GỌI_NGƯỢC\tđịnh giá GỌI_NGƯỢC mỗi lần đọc LƯỢNG dòng.\n"
+"\t\t-c LƯỢNG\tghi rõ số các dòng được đọc giữa hai lần gọi GỌI_NGƯỢC.\n"
+"\n"
+"\tĐối số :\n"
+"\tMẢNG\ttên biến mảg cần dùng cho dữ liệu tập tin.\n"
+"\n"
+"\tNếu đưa ra « -C » mà không có « -c » thì lượng mặc định là 5000.\n"
+"\n"
+"\tKhông đưa ra một GỐC dứt khoát thì mapfile (tập tin sơ đồ)\n"
+"\t\tsẽ xoá sạch MẢNG trước khi gán cho nó.\n"
+"\n"
+"\tTráng thái thoát:\n"
+"\tTrả lại thành công nếu không đưa ra tùy chọn sai và MẢNG không phải chỉ "
+"đọc."
+
+#: builtins.c:1990
+msgid ""
+"Read lines from a file into an array variable.\n"
+"    \n"
+"    A synonym for `mapfile'."
+msgstr ""

@@ -2,28 +2,26 @@
 # Simple Makefile for the support programs.
 #
 # documentation support: man2html
-# testing support: printenv recho zecho
+# testing support: printenv recho zecho xcase
 #
 # bashbug lives here but is created by the top-level makefile
 #
 # Currently only man2html is built
 #
-#
-# Copyright (C) 1998 Free Software Foundation, Inc.     
+# Copyright (C) 1998-2009 Free Software Foundation, Inc.     
 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2, or (at your option)
-# any later version.
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
 
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #
 # Boilerplate
@@ -36,6 +34,7 @@ BUILD_DIR = @BUILD_DIR@
 RM	= rm -f
 SHELL	= @MAKE_SHELL@
 CC = @CC@
+CC_FOR_BUILD = @CC_FOR_BUILD@
 
 EXEEXT = @EXEEXT@
 
@@ -52,10 +51,12 @@ LOCAL_CFLAGS = @LOCAL_CFLAGS@
 DEFS = @DEFS@
 LOCAL_DEFS = @LOCAL_DEFS@
 
-LOCAL_LDFLAGS = @LOCAL_LDFLAGS@
 LIBS = @LIBS@
+LIBS_FOR_BUILD = ${LIBS}		# XXX
+
+LOCAL_LDFLAGS = @LOCAL_LDFLAGS@
 LDFLAGS = @LDFLAGS@ $(LOCAL_LDFLAGS) $(CFLAGS)
-LDFLAGS_FOR_BUILD = $(LDFLAGS)
+LDFLAGS_FOR_BUILD = @LDFLAGS_FOR_BUILD@ $(LOCAL_LDFLAGS) $(CFLAGS_FOR_BUILD)
 
 INCLUDES = -I${BUILD_DIR} -I${topdir}
 
@@ -75,9 +76,12 @@ OBJ1 =	man2html.o
 all: man2html$(EXEEXT)
 
 man2html$(EXEEXT): $(OBJ1)
-	$(CC) $(CCFLAGS) $(OBJ1) -o $@ ${LIBS}
+	$(CC_FOR_BUILD) $(CCFLAGS_FOR_BUILD) $(OBJ1) -o $@ ${LIBS_FOR_BUILD}
 
 clean:
-	rm man2html
+	$(RM) man2html$(EXEEXT)
+
+distclean maintainer-clean mostlyclean: clean
+	$(RM) $(OBJ1)
 
 man2html.o: man2html.c

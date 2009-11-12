@@ -1,3 +1,5 @@
+/* inet_aton - convert string to numeric IP address */
+
 /* Snagged from GNU C library, version 2.0.3. */
 
 /*

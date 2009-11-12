@@ -1,29 +1,25 @@
-/* Copyright (C) 1991 Free Software Foundation, Inc.
-This file is part of the GNU C Library.
+/* Copyright (C) 1991-2004 Free Software Foundation, Inc.
 
-The GNU C Library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public License as
-published by the Free Software Foundation; either version 2 of the
-License, or (at your option) any later version.
+   This file is part of GNU Bash, the Bourne-Again SHell.
 
-The GNU C Library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-You should have received a copy of the GNU Library General Public
-License along with the GNU C Library; see the file COPYING.LIB.  If
-not, write to the Free Software Foundation, Inc.,
-59 Temple Place, Suite 330, Boston, MA 02111 USA.  */
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef	_STRMATCH_H
 #define	_STRMATCH_H	1
 
-#ifdef HAVE_LIBC_FNM_EXTMATCH
-
-#include <fnmatch.h>
-
-#else /* !HAVE_LIBC_FNM_EXTMATCH */
+#include <config.h>
 
 #include "stdc.h"
 
@@ -59,6 +55,8 @@ not, write to the Free Software Foundation, Inc.,
    returning zero if it matches, FNM_NOMATCH if not.  */
 extern int strmatch __P((char *, char *, int));
 
-#endif /* !HAVE_LIBC_FNM_EXTMATCH */
+#if HANDLE_MULTIBYTE
+extern int wcsmatch __P((wchar_t *, wchar_t *, int));
+#endif
 
 #endif /* _STRMATCH_H */

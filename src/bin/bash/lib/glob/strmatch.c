@@ -5,32 +5,28 @@
 
    This file is part of GNU Bash, the Bourne Again SHell.
    
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
-	      
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
-			 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <config.h>
 
 #include "stdc.h"
 #include "strmatch.h"
 
-/* Structured this way so that if HAVE_LIBC_FNM_EXTMATCH is defined, the
-   matching portion of the library (smatch.c) is not linked into the shell. */
-
-#ifndef HAVE_LIBC_FNM_EXTMATCH
 extern int xstrmatch __P((char *, char *, int));
-#else
-#  define xstrmatch fnmatch
+#if defined (HANDLE_MULTIBYTE)
+extern int internal_wstrmatch __P((wchar_t *, wchar_t *, int));
 #endif
 
 int
@@ -44,6 +40,20 @@ strmatch (pattern, string, flags)
 
   return (xstrmatch (pattern, string, flags));
 }
+
+#if defined (HANDLE_MULTIBYTE)
+int
+wcsmatch (wpattern, wstring, flags)
+     wchar_t *wpattern;
+     wchar_t *wstring;
+     int flags;
+{
+  if (wstring == 0 || wpattern == 0)
+    return (FNM_NOMATCH);
+
+  return (internal_wstrmatch (wpattern, wstring, flags));
+}
+#endif
 
 #ifdef TEST
 main (c, v)

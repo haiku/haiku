@@ -191,13 +191,14 @@ the Bash `configure' recognizes.
      Define if you are using the Andrew File System from Transarc.
 
 `--with-bash-malloc'
-     Use the Bash version of `malloc' in `lib/malloc/malloc.c'.  This
-     is not the same `malloc' that appears in GNU libc, but an older
-     version derived from the 4.2 BSD `malloc'.  This `malloc' is very
-     fast, but wastes some space on each allocation.  This option is
-     enabled by default.  The `NOTES' file contains a list of systems
-     for which this should be turned off, and `configure' disables this
-     option automatically for a number of systems.
+     Use the Bash version of `malloc' in the directory `lib/malloc'.
+     This is not the same `malloc' that appears in GNU libc, but an
+     older version originally derived from the 4.2 BSD `malloc'.  This
+     `malloc' is very fast, but wastes some space on each allocation.
+     This option is enabled by default.  The `NOTES' file contains a
+     list of systems for which this should be turned off, and
+     `configure' disables this option automatically for a number of
+     systems.
 
 `--with-curses'
      Use the curses library instead of the termcap library.  This should
@@ -210,7 +211,7 @@ the Bash `configure' recognizes.
 `--with-installed-readline[=PREFIX]'
      Define this to make Bash link with a locally-installed version of
      Readline rather than the version in `lib/readline'.  This works
-     only with Readline 4.3 and later versions.  If PREFIX is `yes' or
+     only with Readline 5.0 and later versions.  If PREFIX is `yes' or
      not supplied, `configure' uses the values of the make variables
      `includedir' and `libdir', which are subdirectories of `prefix' by
      default, to find the installed version of Readline if it is not in
@@ -274,7 +275,16 @@ does not provide the necessary support.
 
 `--enable-brace-expansion'
      Include `csh'-like brace expansion ( `b{a,b}c' ==> `bac bbc' ).
-     See *Note Brace Expansion::, for a complete description.
+     See *note Brace Expansion::, for a complete description.
+
+`--enable-casemod-attributes'
+     Include support for case-modifying attributes in the `declare'
+     builtin and assignment statements.  Variables with the UPPERCASE
+     attribute, for example, will have their values converted to
+     uppercase upon assignment.
+
+`--enable-casemod-expansion'
+     Include support for case-modifying word expansions.
 
 `--enable-command-timing'
      Include support for recognizing `time' as a reserved word and for
@@ -283,8 +293,20 @@ does not provide the necessary support.
      builtins and functions to be timed.
 
 `--enable-cond-command'
-     Include support for the `[[' conditional command (*note
+     Include support for the `[[' conditional command.  (*note
      Conditional Constructs::).
+
+`--enable-cond-regexp'
+     Include support for matching POSIX regular expressions using the
+     `=~' binary operator in the `[[' conditional command.  (*note
+     Conditional Constructs::).
+
+`--enable-coprocesses'
+     Include support for coprocesses and the `coproc' reserved word
+     (*note Pipelines::).
+
+`--enable-debugger'
+     Include support for the bash debugger (distributed separately).
 
 `--enable-directory-stack'
      Include support for a `csh'-like directory stack and the `pushd',
@@ -292,7 +314,7 @@ does not provide the necessary support.
 
 `--enable-disabled-builtins'
      Allow builtin commands to be invoked via `builtin xxx' even after
-     `xxx' has been disabled using `enable -n xxx'.  See *Note Bash
+     `xxx' has been disabled using `enable -n xxx'.  See *note Bash
      Builtins::, for details of the `builtin' and `enable' builtin
      commands.
 
@@ -302,7 +324,7 @@ does not provide the necessary support.
 
 `--enable-extended-glob'
      Include support for the extended pattern matching features
-     described above under *Note Pattern Matching::.
+     described above under *note Pattern Matching::.
 
 `--enable-help-builtin'
      Include the `help' builtin, which displays help on shell builtins
@@ -316,6 +338,10 @@ does not provide the necessary support.
      This enables the job control features (*note Job Control::), if
      the operating system supports them.
 
+`--enable-multibyte'
+     This enables support for multibyte characters if the operating
+     system provides the necessary support.
+
 `--enable-net-redirections'
      This enables the special handling of filenames of the form
      `/dev/tcp/HOST/PORT' and `/dev/udp/HOST/PORT' when used in
@@ -325,16 +351,16 @@ does not provide the necessary support.
      This enables process substitution (*note Process Substitution::) if
      the operating system provides the necessary support.
 
-`--enable-prompt-string-decoding'
-     Turn on the interpretation of a number of backslash-escaped
-     characters in the `$PS1', `$PS2', `$PS3', and `$PS4' prompt
-     strings.  See *Note Printing a Prompt::, for a complete list of
-     prompt string escape sequences.
-
 `--enable-progcomp'
      Enable the programmable completion facilities (*note Programmable
      Completion::).  If Readline is not enabled, this option has no
      effect.
+
+`--enable-prompt-string-decoding'
+     Turn on the interpretation of a number of backslash-escaped
+     characters in the `$PS1', `$PS2', `$PS3', and `$PS4' prompt
+     strings.  See *note Printing a Prompt::, for a complete list of
+     prompt string escape sequences.
 
 `--enable-readline'
      Include support for command-line editing and history with the Bash
@@ -342,12 +368,25 @@ does not provide the necessary support.
 
 `--enable-restricted'
      Include support for a "restricted shell".  If this is enabled,
-     Bash, when called as `rbash', enters a restricted mode.  See *Note
+     Bash, when called as `rbash', enters a restricted mode.  See *note
      The Restricted Shell::, for a description of restricted mode.
 
 `--enable-select'
      Include the `select' builtin, which allows the generation of simple
      menus (*note Conditional Constructs::).
+
+`--enable-separate-helpfiles'
+     Use external files for the documentation displayed by the `help'
+     builtin instead of storing the text internally.
+
+`--enable-single-help-strings'
+     Store the text displayed by the `help' builtin as a single string
+     for each help topic.  This aids in translating the text to
+     different languages.  You may need to disable this if your
+     compiler cannot handle very long string literals.
+
+`--enable-strict-posix-default'
+     Make Bash POSIX-conformant by default (*note Bash POSIX Mode::).
 
 `--enable-usg-echo-default'
      A synonym for `--enable-xpg-echo-default'.
@@ -357,7 +396,7 @@ does not provide the necessary support.
      default, without requiring the `-e' option.  This sets the default
      value of the `xpg_echo' shell option to `on', which makes the Bash
      `echo' behave more like the version specified in the Single Unix
-     Specification, version 2.  *Note Bash Builtins::, for a
+     Specification, version 3.  *Note Bash Builtins::, for a
      description of the escape sequences that `echo' recognizes.
 
 The file `config-top.h' contains C Preprocessor `#define' statements

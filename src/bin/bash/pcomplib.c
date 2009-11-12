@@ -1,22 +1,22 @@
 /* pcomplib.c - library functions for programmable completion. */
 
-/* Copyright (C) 1999-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1999-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <config.h>
 
@@ -31,6 +31,8 @@
 #  endif
 #  include <unistd.h>
 #endif
+
+#include "bashintl.h"
 
 #include "shell.h"
 #include "pcomplete.h"
@@ -174,18 +176,19 @@ progcomp_insert (cmd, cs)
   register BUCKET_CONTENTS *item;
 
   if (cs == NULL)
-    programming_error ("progcomp_insert: %s: NULL COMPSPEC", cmd);
+    programming_error (_("progcomp_insert: %s: NULL COMPSPEC"), cmd);
 
   if (prog_completes == 0)
     progcomp_create ();
 
+  cs->refcount++;
   item = hash_insert (cmd, prog_completes, 0);
   if (item->data)
     free_progcomp (item->data);
   else
     item->key = savestring (cmd);
   item->data = cs;
-  cs->refcount++;
+
   return 1;
 }
 

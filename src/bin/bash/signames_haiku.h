@@ -1,8 +1,8 @@
-/* This file was automatically created by /home/bonefish/develop/haiku/haiku/generated-gcc2/objects/linux/x86/release/bin/bash/mksignames.
-   Do not edit.  Edit support/mksignames.c instead. */
+/* This file was automatically created by ./mksignames.
+   Do not edit.  Edit support/signames.c instead. */
 
 /* A translation list so we can be polite to our users. */
-char *signal_names[NSIG + 3] = {
+char *signal_names[NSIG + 4] = {
     "EXIT",
     "SIGHUP",
     "SIGINT",
@@ -35,5 +35,9 @@ char *signal_names[NSIG + 3] = {
     "SIGXFSZ",
     "DEBUG",
     "ERR",
+    "RETURN",
     (char *)0x0
 };
+
+#define initialize_signames()
+

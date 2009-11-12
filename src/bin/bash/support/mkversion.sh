@@ -7,19 +7,19 @@
 
 # Copyright (C) 1996-2002 Free Software Foundation, Inc.
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2, or (at your option)
-# any later version.
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 PROGNAME=`basename $0`
 USAGE="$PROGNAME [-b] [-S srcdir] -d version -p patchlevel [-s status] [-o outfile]"
@@ -67,7 +67,7 @@ fi
 # increment the build version if that's what's required
 
 if [ -n "$inc_build" ]; then
-	build_ver=`expr $build_ver + 1`
+	build_ver=`expr 1 + $build_ver`
 fi
 
 # what's the patch level?
@@ -96,11 +96,11 @@ echo "/* Version control for the shell.  This file gets changed when you say"
 echo "   \`make version.h' to the Makefile.  It is created by mkversion. */"
 
 # Output the distribution version.  Single numbers are converted to x.00.
-# Allow, as a special case, `[:digit:].[:digit:][:digit:][:alpha:]' for
-# intermediate versions (e.g., `2.05a').
+# Allow, as a special case, `[:digit:].[:digit:][:alpha:]' for
+# intermediate versions (e.g., `2.5a').
 # Any characters other than digits and `.' are invalid.
 case "$dist_version" in
-[0-9].[0-9][0-9][a-z])	;;	# special case
+[0-9].[0-9][a-z])	;;	# special case
 *[!0-9.]*)	echo "mkversion.sh: ${dist_version}: bad distribution version" >&2
 		exit 1 ;;
 *.*)	;;
@@ -112,9 +112,9 @@ dist_major=`echo $dist_version | sed 's:\..*$::'`
 
 dist_minor=`echo $dist_version | sed 's:^.*\.::'`
 case "$dist_minor" in
-"")	dist_minor=00 ;;
-[a-z])	dist_minor=00${dist_minor} ;;
-?)	dist_minor=0${dist_minor} ;;
+"")	dist_minor=0 ;;
+[a-z])	dist_minor=0${dist_minor} ;;
+?)	dist_minor=${dist_minor} ;;
 *)	;;
 esac
 
@@ -140,6 +140,10 @@ echo
 echo "/* The release status of this shell. */"
 echo "#define RELSTATUS \"${rel_status}\""
 
+echo
+echo "/* The default shell compatibility-level (the current version) */"
+echo "#define DEFAULT_COMPAT_LEVEL ${dist_major}${dist_minor}"
+
 # Output the SCCS version string
 sccs_string="${float_dist}.${patch_level}(${build_ver}) ${rel_status} GNU"
 echo
@@ -147,10 +151,10 @@ echo "/* A version string for use by sccs and the what command. */"
 echo "#define SCCSVERSION \"@(#)Bash version ${sccs_string}\""
 
 # extern function declarations
-echo
-echo '/* Functions from version.c. */'
-echo 'extern char *shell_version_string __P((void));'
-echo 'extern void show_shell_version __P((int));'
+#echo
+#echo '/* Functions from version.c. */'
+#echo 'extern char *shell_version_string __P((void));'
+#echo 'extern void show_shell_version __P((int));'
 
 if [ -n "$inc_build" ]; then
 	# Make sure we can write to .build

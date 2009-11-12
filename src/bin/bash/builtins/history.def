@@ -1,53 +1,65 @@
 This file is history.def, from which is created history.c.
 It implements the builtin "history" in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES history.c
 
 $BUILTIN history
 $FUNCTION history_builtin
 $DEPENDS_ON HISTORY
-$SHORT_DOC history [-c] [-d offset] [n] or history -awrn [filename] or history -ps arg [arg...]
-Display the history list with line numbers.  Lines listed with
-with a `*' have been modified.  Argument of N says to list only
-the last N lines.  The `-c' option causes the history list to be
-cleared by deleting all of the entries.  The `-d' option deletes
-the history entry at offset OFFSET.  The `-w' option writes out the
-current history to the history file;  `-r' means to read the file and
-append the contents to the history list instead.  `-a' means
-to append history lines from this session to the history file.
-Argument `-n' means to read all history lines not already read
-from the history file and append them to the history list.  If
-FILENAME is given, then that is used as the history file else
+$SHORT_DOC history [-c] [-d offset] [n] or history -anrw [filename] or history -ps arg [arg...]
+Display or manipulate the history list.
+
+Display the history list with line numbers, prefixing each modified
+entry with a `*'.  An argument of N lists only the last N entries.
+
+Options:
+  -c	clear the history list by deleting all of the entries
+  -d offset	delete the history entry at offset OFFSET.
+
+  -a	append history lines from this session to the history file
+  -n	read all history lines not already read from the history file
+  -r	read the history file and append the contents to the history
+	list
+  -w	write the current history to the history file
+	and append them to the history list
+
+  -p	perform history expansion on each ARG and display the result
+	without storing it in the history list
+  -s	append the ARGs to the history list as a single entry
+
+If FILENAME is given, it is used as the history file.  Otherwise,
 if $HISTFILE has a value, that is used, else ~/.bash_history.
-If the -s option is supplied, the non-option ARGs are appended to
-the history list as a single entry.  The -p option means to perform
-history expansion on each ARG and display the result, without storing
-anything in the history list.
+
+If the $HISTTIMEFORMAT variable is set and not null, its value is used
+as a format string for strftime(3) to print the time stamp associated
+with each displayed history entry.  No time stamps are printed otherwise.
+
+Exit Status:
+Returns success unless an invalid option is given or an error occurs.
 $END
 
 #include <config.h>
 
 #if defined (HISTORY)
 #include "../bashtypes.h"
-#if defined (HAVE_SYS_FILE_H)
+#if ! defined(_MINIX) && defined (HAVE_SYS_FILE_H)
 #  include <sys/file.h>
 #endif
 #include "posixstat.h"
@@ -59,6 +71,7 @@ $END
 #endif
 
 #include "../bashansi.h"
+#include "../bashintl.h"
 
 #include "../shell.h"
 #include "../bashhist.h"
@@ -71,10 +84,10 @@ extern int errno;
 #endif
 
 extern int current_command_line_count;
+extern int force_append_history;	/* shopt -s histappend */
 
-static void display_history __P((WORD_LIST *));
-static int delete_histent __P((int));
-static int delete_last_history __P((void));
+static char *histtime __P((HIST_ENTRY *, const char *));
+static int display_history __P((WORD_LIST *));
 static void push_history __P((WORD_LIST *));
 static int expand_and_print_history __P((WORD_LIST *));
 
@@ -91,7 +104,7 @@ int
 history_builtin (list)
      WORD_LIST *list;
 {
-  int flags, opt, result, old_history_lines;
+  int flags, opt, result, old_history_lines, obase;
   char *filename, *delete_arg;
   intmax_t delete_offset;
 
@@ -138,14 +151,14 @@ history_builtin (list)
   opt = flags & (AFLAG|RFLAG|WFLAG|NFLAG);
   if (opt && opt != AFLAG && opt != RFLAG && opt != WFLAG && opt != NFLAG)
     {
-      builtin_error ("cannot use more than one of -anrw");
+      builtin_error (_("cannot use more than one of -anrw"));
       return (EXECUTION_FAILURE);
     }
 
   /* clear the history, but allow other arguments to add to it again. */
   if (flags & CFLAG)
     {
-      clear_history ();
+      bash_clear_history ();
       if (list == 0)
 	return (EXECUTION_SUCCESS);
     }
@@ -161,7 +174,7 @@ history_builtin (list)
     {
       if (list)
 	return (expand_and_print_history (list));
-      return (EXECUTION_SUCCESS);
+      return (sh_chkwrite (EXECUTION_SUCCESS));
     }
 #endif
   else if (flags & DFLAG)
@@ -170,11 +183,11 @@ history_builtin (list)
 	  || (delete_offset < history_base)
 	  || (delete_offset > (history_base + history_length)))
 	{
-	  sh_erange (delete_arg, "history position");
+	  sh_erange (delete_arg, _("history position"));
 	  return (EXECUTION_FAILURE);
 	}
       opt = delete_offset;
-      result = delete_histent (opt - history_base);
+      result = bash_delete_histent (opt - history_base);
       /* Since remove_history changes history_length, this can happen if
 	 we delete the last history entry. */
       if (where_history () > history_length)
@@ -183,8 +196,8 @@ history_builtin (list)
     }
   else if ((flags & (AFLAG|RFLAG|NFLAG|WFLAG|CFLAG)) == 0)
     {
-      display_history (list);
-      return (EXECUTION_SUCCESS);
+      result = display_history (list);
+      return (sh_chkwrite (result));
     }
 
   filename = list ? list->word->word : get_string_value ("HISTFILE");
@@ -200,11 +213,27 @@ history_builtin (list)
     {
       /* Read all of the lines in the file that we haven't already read. */
       old_history_lines = history_lines_in_file;
+      obase = history_base;
+
       using_history ();
       result = read_history_range (filename, history_lines_in_file, -1);
       using_history ();
+
       history_lines_in_file = where_history ();
-      history_lines_this_session += history_lines_in_file - old_history_lines;
+
+      /* If we're rewriting the history file at shell exit rather than just
+	 appending the lines from this session to it, the question is whether
+	 we reset history_lines_this_session to 0, losing any history entries
+	 we had before we read the new entries from the history file, or
+	 whether we count the new entries we just read from the file as
+	 history lines added during this session.
+	 Right now, we do the latter.  This will cause these history entries
+	 to be written to the history file along with any intermediate entries
+	 we add when we do a `history -a', but the alternative is losing
+	 them altogether. */
+      if (force_append_history == 0)
+	history_lines_this_session += history_lines_in_file - old_history_lines +
+				    history_base - obase;
     }
 
   return (result ? EXECUTION_FAILURE : EXECUTION_SUCCESS);
@@ -214,17 +243,36 @@ history_builtin (list)
 #define histline(i) (hlist[(i)]->line)
 #define histdata(i) (hlist[(i)]->data)
 
-static void
+static char *
+histtime (hlist, histtimefmt)
+     HIST_ENTRY *hlist;
+     const char *histtimefmt;
+{
+  static char timestr[128];
+  time_t t;
+
+  t = history_get_time (hlist);
+  if (t)
+    strftime (timestr, sizeof (timestr), histtimefmt, localtime (&t));
+  else
+    strcpy (timestr, "??");
+  return timestr;
+}
+
+static int
 display_history (list)
      WORD_LIST *list;
 {
   register int i;
   intmax_t limit;
   HIST_ENTRY **hlist;
+  char *histtimefmt, *timestr;
 
   if (list)
     {
-      limit = get_numeric_arg (list, 0);
+      if (get_numeric_arg (list, 0, &limit) == 0)
+	return (EXECUTION_FAILURE);
+
       if (limit < 0)
 	limit = -limit;
     }
@@ -243,54 +291,22 @@ display_history (list)
       else
 	i = 0;
 
+      histtimefmt = get_string_value ("HISTTIMEFORMAT");
+
       while (hlist[i])
 	{
 	  QUIT;
-	  printf ("%5d%c %s\n", i + history_base,
+
+	  timestr = (histtimefmt && *histtimefmt) ? histtime (hlist[i], histtimefmt) : (char *)NULL;
+	  printf ("%5d%c %s%s\n", i + history_base,
 		  histdata(i) ? '*' : ' ',
+		  ((timestr && *timestr) ? timestr : ""),
 		  histline(i));
 	  i++;
 	}
     }
-}
 
-/* Delete and free the history list entry at offset I. */
-static int
-delete_histent (i)
-     int i;
-{
-  HIST_ENTRY *discard;
-
-  discard = remove_history (i);
-  if (discard)
-    {
-      if (discard->line)
-	free (discard->line);
-      free ((char *) discard);
-    }
-  return 1;
-}
-
-static int
-delete_last_history ()
-{
-  register int i;
-  HIST_ENTRY **hlist, *histent;
-
-  hlist = history_list ();
-  if (hlist == NULL)
-    return 0;
-
-  for (i = 0; hlist[i]; i++)
-    ;
-  i--;
-
-  /* History_get () takes a parameter that must be offset by history_base. */
-  histent = history_get (history_base + i);	/* Don't free this */
-  if (histent == NULL)
-    return 0;
-
-  return (delete_histent (i));
+  return (EXECUTION_SUCCESS);
 }
 
 /* Remove the last entry in the history list and add each argument in
@@ -308,10 +324,12 @@ push_history (list)
      If you don't want history -s to remove the compound command from the
      history, change #if 0 to #if 1 below. */
 #if 0
-  if (hist_last_line_added && delete_last_history () == 0)
+  if (hist_last_line_pushed == 0 && hist_last_line_added && bash_delete_last_history () == 0)
 #else
-  if ((hist_last_line_added || (current_command_line_count > 0 && current_command_first_line_saved && command_oriented_history))
-      && delete_last_history () == 0)
+  if (hist_last_line_pushed == 0 &&
+	(hist_last_line_added ||
+	  (current_command_line_count > 0 && current_command_first_line_saved && command_oriented_history))
+      && bash_delete_last_history () == 0)
 #endif
       return;
 
@@ -323,6 +341,8 @@ push_history (list)
      entry.  Without FORCE=1, if current_command_line_count were > 1, the
      line would be appended to the entry before the just-deleted entry. */
   check_add_history (s, 1);	/* obeys HISTCONTROL, HISTIGNORE */
+
+  hist_last_line_pushed = 1;	/* XXX */
   free (s);
 }
 
@@ -334,7 +354,7 @@ expand_and_print_history (list)
   char *s;
   int r, result;
 
-  if (hist_last_line_added && delete_last_history () == 0)
+  if (hist_last_line_pushed == 0 && hist_last_line_added && bash_delete_last_history () == 0)
     return EXECUTION_FAILURE;
   result = EXECUTION_SUCCESS;
   while (list)
@@ -342,7 +362,7 @@ expand_and_print_history (list)
       r = history_expand (list->word->word, &s);
       if (r < 0)
 	{
-	  builtin_error ("%s: history expansion failed", list->word->word);
+	  builtin_error (_("%s: history expansion failed"), list->word->word);
 	  result = EXECUTION_FAILURE;
 	}
       else

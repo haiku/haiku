@@ -2,23 +2,23 @@
 
 /* Copyright (C) 1994 Free Software Foundation, Inc.
 
-   This file is part of the GNU Readline Library, a library for
-   reading lines of text with interactive input and history editing.
+   This file is part of the GNU Readline Library (Readline), a library
+   for reading lines of text with interactive input and history editing.      
 
-   The GNU Readline Library is free software; you can redistribute it
-   and/or modify it under the terms of the GNU General Public License
-   as published by the Free Software Foundation; either version 2, or
+   Readline is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
-   The GNU Readline Library is distributed in the hope that it will be
-   useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   Readline is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   The GNU General Public License is often shipped with GNU software, and
-   is generally kept in a file called COPYING or LICENSE.  If you do not
-   have a copy of the license, write to the Free Software Foundation,
-   59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Readline.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #define READLINE_LIBRARY
 
 #if defined (HAVE_CONFIG_H)
@@ -115,7 +115,7 @@ _rl_copy_to_kill_ring (text, append)
 	  if (slot == rl_max_kills)
 	    {
 	      register int i;
-	      free (rl_kill_ring[0]);
+	      xfree (rl_kill_ring[0]);
 	      for (i = 0; i < slot; i++)
 		rl_kill_ring[i] = rl_kill_ring[i + 1];
 	    }
@@ -146,7 +146,7 @@ _rl_copy_to_kill_ring (text, append)
 	  strcpy (new, text);
 	  strcat (new, old);
 	}
-      free (old);
+      xfree (old);
       free (text);
       rl_kill_ring[slot] = new;
     }
@@ -339,6 +339,47 @@ rl_unix_word_rubout (count, key)
       if (rl_editing_mode == emacs_mode)
 	rl_mark = rl_point;
     }
+
+  return 0;
+}
+
+/* This deletes one filename component in a Unix pathname.  That is, it
+   deletes backward to directory separator (`/') or whitespace.  */
+int
+rl_unix_filename_rubout (count, key)
+     int count, key;
+{
+  int orig_point, c;
+
+  if (rl_point == 0)
+    rl_ding ();
+  else
+    {
+      orig_point = rl_point;
+      if (count <= 0)
+	count = 1;
+
+      while (count--)
+	{
+	  c = rl_line_buffer[rl_point - 1];
+	  while (rl_point && (whitespace (c) || c == '/'))
+	    {
+	      rl_point--;
+	      c = rl_line_buffer[rl_point - 1];
+	    }
+
+	  while (rl_point && (whitespace (c) == 0) && c != '/')
+	    {
+	      rl_point--;
+	      c = rl_line_buffer[rl_point - 1];
+	    }
+	}
+
+      rl_kill_text (orig_point, rl_point);
+      if (rl_editing_mode == emacs_mode)
+	rl_mark = rl_point;
+    }
+
   return 0;
 }
 
@@ -541,6 +582,7 @@ rl_yank_nth_arg_internal (count, ignore, history_skip)
   if (!arg || !*arg)
     {
       rl_ding ();
+      FREE (arg);
       return -1;
     }
 
@@ -644,7 +686,7 @@ rl_paste_from_clipboard (count, key)
       _rl_set_mark_at_pos (rl_point);
       rl_insert_text (ptr);
       if (ptr != data)
-	free (ptr);
+	xfree (ptr);
       CloseClipboard ();
     }
   return (0);

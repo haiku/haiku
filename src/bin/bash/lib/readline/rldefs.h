@@ -2,26 +2,24 @@
    for readline.  This should be included after any files that define
    system-specific constants like _POSIX_VERSION or USG. */
 
-/* Copyright (C) 1987,1989 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
-   This file contains the Readline Library (the Library), a set of
-   routines for providing Emacs style line input to programs that ask
-   for it.
+   This file is part of the GNU Readline Library (Readline), a library
+   for reading lines of text with interactive input and history editing.      
 
-   The Library is free software; you can redistribute it and/or modify
+   Readline is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   The Library is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
+   Readline is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   The GNU General Public License is often shipped with GNU software, and
-   is generally kept in a file called COPYING or LICENSE.  If you do not
-   have a copy of the license, write to the Free Software Foundation,
-   59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Readline.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #if !defined (_RLDEFS_H_)
 #define _RLDEFS_H_
@@ -32,13 +30,21 @@
 
 #include "rlstdc.h"
 
+#if defined (STRCOLL_BROKEN)
+#  undef HAVE_STRCOLL
+#endif
+
 #if defined (_POSIX_VERSION) && !defined (TERMIOS_MISSING)
 #  define TERMIOS_TTY_DRIVER
 #else
 #  if defined (HAVE_TERMIO_H)
 #    define TERMIO_TTY_DRIVER
 #  else
-#    define NEW_TTY_DRIVER
+#    if !defined (__MINGW32__)
+#      define NEW_TTY_DRIVER
+#    else
+#      define NO_TTY_DRIVER
+#    endif
 #  endif
 #endif
 
@@ -77,7 +83,7 @@ extern int _rl_stricmp PARAMS((char *, char *));
 extern int _rl_strnicmp PARAMS((char *, char *, int));
 #endif
 
-#if defined (HAVE_STRPBRK)
+#if defined (HAVE_STRPBRK) && !defined (HAVE_MULTIBYTE)
 #  define _rl_strpbrk(a,b)	strpbrk((a),(b))
 #else
 extern char *_rl_strpbrk PARAMS((const char *, const char *));

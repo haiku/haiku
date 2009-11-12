@@ -1,6 +1,8 @@
 #
 # Master author manifest for bash
 #
+# The files in lib/intl were taken from the GNU gettext distribution.
+#
 # Any files appearing in the bash distribution not listed in this file
 # were created by Chet Ramey.
 #
@@ -100,6 +102,7 @@ builtins/alias.def	Brian Fox, Chet Ramey
 builtins/bind.def	Brian Fox, Chet Ramey
 builtins/break.def	Brian Fox, Chet Ramey
 builtins/builtin.def	Brian Fox, Chet Ramey
+builtins/caller.def	Rocky Bernstein, Chet Ramey
 builtins/cd.def		Brian Fox, Chet Ramey
 builtins/colon.def	Brian Fox, Chet Ramey
 builtins/command.def	Brian Fox, Chet Ramey
@@ -122,6 +125,7 @@ builtins/let.def	Chet Ramey, Brian Fox
 builtins/history.def	Brian Fox, Chet Ramey
 builtins/jobs.def	Brian Fox, Chet Ramey
 builtins/kill.def	Brian Fox, Chet Ramey
+builtins/mapfile.def	Rocky Bernstein
 builtins/mkbuiltins.c	Brian Fox, Chet Ramey
 builtins/pushd.def	Brian Fox, Chet Ramey
 builtins/read.def	Brian Fox, Chet Ramey
@@ -451,3 +455,7 @@ lib/sh/vprint.c		Chet Ramey, Brian Fox
 lib/sh/xstrchr.c	Chet Ramey, Mitsuru Chinen
 lib/sh/zread.c		Chet Ramey
 lib/sh/zwrite.c		Chet Ramey
+
+tests/posix-ifs.sh	Glenn Fowler
+
+support/checkbashisms	Julian Gilbey, Debian Linux team

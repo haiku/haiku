@@ -1,25 +1,29 @@
 /* bind.c -- key binding and startup file support for the readline library. */
 
-/* Copyright (C) 1987, 1989, 1992 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
-   This file is part of the GNU Readline Library, a library for
-   reading lines of text with interactive input and history editing.
+   This file is part of the GNU Readline Library (Readline), a library
+   for reading lines of text with interactive input and history editing.
 
-   The GNU Readline Library is free software; you can redistribute it
-   and/or modify it under the terms of the GNU General Public License
-   as published by the Free Software Foundation; either version 2, or
+   Readline is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
-   The GNU Readline Library is distributed in the hope that it will be
-   useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   Readline is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   The GNU General Public License is often shipped with GNU software, and
-   is generally kept in a file called COPYING or LICENSE.  If you do not
-   have a copy of the license, write to the Free Software Foundation,
-   59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Readline.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #define READLINE_LIBRARY
+
+#if defined (__TANDEM)
+#  include <floss.h>
+#endif
 
 #if defined (HAVE_CONFIG_H)
 #  include <config.h>
@@ -72,7 +76,10 @@ static char *_rl_read_file PARAMS((char *, size_t *));
 static void _rl_init_file_error PARAMS((const char *));
 static int _rl_read_init_file PARAMS((const char *, int));
 static int glean_key_from_name PARAMS((char *));
-static int substring_member_of_array PARAMS((char *, const char **));
+static int find_boolean_var PARAMS((const char *));
+
+static char *_rl_get_string_variable_value PARAMS((const char *));
+static int substring_member_of_array PARAMS((const char *, const char * const *));
 
 static int currently_reading_init_file;
 
@@ -148,6 +155,34 @@ rl_bind_key_in_map (key, function, map)
   return (result);
 }
 
+/* Bind key sequence KEYSEQ to DEFAULT_FUNC if KEYSEQ is unbound.  Right
+   now, this is always used to attempt to bind the arrow keys, hence the
+   check for rl_vi_movement_mode. */
+int
+rl_bind_key_if_unbound_in_map (key, default_func, kmap)
+     int key;
+     rl_command_func_t *default_func;
+     Keymap kmap;
+{
+  char keyseq[2];
+
+  keyseq[0] = (unsigned char)key;
+  keyseq[1] = '\0';
+  return (rl_bind_keyseq_if_unbound_in_map (keyseq, default_func, kmap));
+}
+
+int
+rl_bind_key_if_unbound (key, default_func)
+     int key;
+     rl_command_func_t *default_func;
+{
+  char keyseq[2];
+
+  keyseq[0] = (unsigned char)key;
+  keyseq[1] = '\0';
+  return (rl_bind_keyseq_if_unbound_in_map (keyseq, default_func, _rl_keymap));
+}
+
 /* Make KEY do nothing in the currently selected keymap.
    Returns non-zero in case of error. */
 int
@@ -200,8 +235,29 @@ rl_unbind_command_in_map (command, map)
 }
 
 /* Bind the key sequence represented by the string KEYSEQ to
+   FUNCTION, starting in the current keymap.  This makes new
+   keymaps as necessary. */
+int
+rl_bind_keyseq (keyseq, function)
+     const char *keyseq;
+     rl_command_func_t *function;
+{
+  return (rl_generic_bind (ISFUNC, keyseq, (char *)function, _rl_keymap));
+}
+
+/* Bind the key sequence represented by the string KEYSEQ to
    FUNCTION.  This makes new keymaps as necessary.  The initial
    place to do bindings is in MAP. */
+int
+rl_bind_keyseq_in_map (keyseq, function, map)
+     const char *keyseq;
+     rl_command_func_t *function;
+     Keymap map;
+{
+  return (rl_generic_bind (ISFUNC, keyseq, (char *)function, map));
+}
+
+/* Backwards compatibility; equivalent to rl_bind_keyseq_in_map() */
 int
 rl_set_key (keyseq, function, map)
      const char *keyseq;
@@ -209,6 +265,40 @@ rl_set_key (keyseq, function, map)
      Keymap map;
 {
   return (rl_generic_bind (ISFUNC, keyseq, (char *)function, map));
+}
+
+/* Bind key sequence KEYSEQ to DEFAULT_FUNC if KEYSEQ is unbound.  Right
+   now, this is always used to attempt to bind the arrow keys, hence the
+   check for rl_vi_movement_mode. */
+int
+rl_bind_keyseq_if_unbound_in_map (keyseq, default_func, kmap)
+     const char *keyseq;
+     rl_command_func_t *default_func;
+     Keymap kmap;
+{
+  rl_command_func_t *func;
+
+  if (keyseq)
+    {
+      func = rl_function_of_keyseq (keyseq, kmap, (int *)NULL);
+#if defined (VI_MODE)
+      if (!func || func == rl_do_lowercase_version || func == rl_vi_movement_mode)
+#else
+      if (!func || func == rl_do_lowercase_version)
+#endif
+	return (rl_bind_keyseq_in_map (keyseq, default_func, kmap));
+      else
+	return 1;
+    }
+  return 0;
+}
+
+int
+rl_bind_keyseq_if_unbound (keyseq, default_func)
+     const char *keyseq;
+     rl_command_func_t *default_func;
+{
+  return (rl_bind_keyseq_if_unbound_in_map (keyseq, default_func, _rl_keymap));
 }
 
 /* Bind the key sequence represented by the string KEYSEQ to
@@ -226,7 +316,7 @@ rl_macro_bind (keyseq, macro, map)
 
   if (rl_translate_keyseq (macro, macro_keys, &macro_keys_len))
     {
-      free (macro_keys);
+      xfree (macro_keys);
       return -1;
     }
   rl_generic_bind (ISMACR, keyseq, macro_keys, map);
@@ -253,10 +343,10 @@ rl_generic_bind (type, keyseq, data, map)
   k.function = 0;
 
   /* If no keys to bind to, exit right away. */
-  if (!keyseq || !*keyseq)
+  if (keyseq == 0 || *keyseq == 0)
     {
       if (type == ISMACR)
-	free (data);
+	xfree (data);
       return -1;
     }
 
@@ -267,7 +357,7 @@ rl_generic_bind (type, keyseq, data, map)
      KEYS into KEYS_LEN. */
   if (rl_translate_keyseq (keyseq, keys, &keys_len))
     {
-      free (keys);
+      xfree (keys);
       return -1;
     }
 
@@ -279,9 +369,12 @@ rl_generic_bind (type, keyseq, data, map)
 
       ic = uc;
       if (ic < 0 || ic >= KEYMAP_SIZE)
-	return -1;
+        {
+          xfree (keys);
+	  return -1;
+        }
 
-      if (_rl_convert_meta_chars_to_ascii && META_CHAR (ic))
+      if (META_CHAR (ic) && _rl_convert_meta_chars_to_ascii)
 	{
 	  ic = UNMETA (ic);
 	  if (map[ESC].type == ISKMAP)
@@ -320,7 +413,7 @@ rl_generic_bind (type, keyseq, data, map)
       else
 	{
 	  if (map[ic].type == ISMACR)
-	    free ((char *)map[ic].function);
+	    xfree ((char *)map[ic].function);
 	  else if (map[ic].type == ISKMAP)
 	    {
 	      map = FUNCTION_TO_KEYMAP (map, ic);
@@ -333,7 +426,7 @@ rl_generic_bind (type, keyseq, data, map)
 
       rl_binding_keymap = map;
     }
-  free (keys);
+  xfree (keys);
   return 0;
 }
 
@@ -371,8 +464,24 @@ rl_translate_keyseq (seq, array, len)
 		}
 	      else if (c == 'M')
 		{
-		  i++;
-		  array[l++] = ESC;	/* ESC is meta-prefix */
+		  i++;		/* seq[i] == '-' */
+		  /* XXX - obey convert-meta setting */
+		  if (_rl_convert_meta_chars_to_ascii && _rl_keymap[ESC].type == ISKMAP)
+		    array[l++] = ESC;	/* ESC is meta-prefix */
+		  else if (seq[i+1] == '\\' && seq[i+2] == 'C' && seq[i+3] == '-')
+		    {
+		      i += 4;
+		      temp = (seq[i] == '?') ? RUBOUT : CTRL (_rl_to_upper (seq[i]));
+		      array[l++] = META (temp);
+		    }
+		  else
+		    {
+		      /* This doesn't yet handle things like \M-\a, which may
+			 or may not have any reasonable meaning.  You're
+			 probably better off using straight octal or hex. */
+		      i++;
+		      array[l++] = META (seq[i]);
+		    }
 		}
 	      else if (c == 'C')
 		{
@@ -467,6 +576,11 @@ rl_untranslate_keyseq (seq)
       kseq[i++] = '-';
       c = UNMETA (c);
     }
+  else if (c == ESC)
+    {
+      kseq[i++] = '\\';
+      c = 'e';
+    }
   else if (CTRL_CHAR (c))
     {
       kseq[i++] = '\\';
@@ -515,7 +629,12 @@ _rl_untranslate_macro_value (seq)
 	  *r++ = '-';
 	  c = UNMETA (c);
 	}
-      else if (CTRL_CHAR (c) && c != ESC)
+      else if (c == ESC)
+	{
+	  *r++ = '\\';
+	  c = 'e';
+	}
+      else if (CTRL_CHAR (c))
 	{
 	  *r++ = '\\';
 	  *r++ = 'C';
@@ -574,7 +693,7 @@ rl_function_of_keyseq (keyseq, map, type)
 {
   register int i;
 
-  if (!map)
+  if (map == 0)
     map = _rl_keymap;
 
   for (i = 0; keyseq && keyseq[i]; i++)
@@ -583,17 +702,19 @@ rl_function_of_keyseq (keyseq, map, type)
 
       if (META_CHAR (ic) && _rl_convert_meta_chars_to_ascii)
 	{
-	  if (map[ESC].type != ISKMAP)
+	  if (map[ESC].type == ISKMAP)
+	    {
+	      map = FUNCTION_TO_KEYMAP (map, ESC);
+	      ic = UNMETA (ic);
+	    }
+	  /* XXX - should we just return NULL here, since this obviously
+	     doesn't match? */
+	  else
 	    {
 	      if (type)
 		*type = map[ESC].type;
 
 	      return (map[ESC].function);
-	    }
-	  else
-	    {
-	      map = FUNCTION_TO_KEYMAP (map, ESC);
-	      ic = UNMETA (ic);
 	    }
 	}
 
@@ -601,7 +722,7 @@ rl_function_of_keyseq (keyseq, map, type)
 	{
 	  /* If this is the last key in the key sequence, return the
 	     map. */
-	  if (!keyseq[i + 1])
+	  if (keyseq[i + 1] == '\0')
 	    {
 	      if (type)
 		*type = ISKMAP;
@@ -611,7 +732,12 @@ rl_function_of_keyseq (keyseq, map, type)
 	  else
 	    map = FUNCTION_TO_KEYMAP (map, ic);
 	}
-      else
+      /* If we're not at the end of the key sequence, and the current key
+	 is bound to something other than a keymap, then the entire key
+	 sequence is not bound. */
+      else if (map[ic].type != ISKMAP && keyseq[i+1])
+	return ((rl_command_func_t *)NULL);
+      else	/* map[ic].type != ISKMAP && keyseq[i+1] == 0 */
 	{
 	  if (type)
 	    *type = map[ic].type;
@@ -666,9 +792,11 @@ _rl_read_file (filename, sizep)
 
   if (i < 0)
     {
-      free (buffer);
+      xfree (buffer);
       return ((char *)NULL);
     }
+
+  RL_CHECK_SIGNALS ();
 
   buffer[i] = '\0';
   if (sizep)
@@ -693,6 +821,7 @@ rl_re_read_init_file (count, ignore)
      1. the filename used for the previous call
      2. the value of the shell variable `INPUTRC'
      3. ~/.inputrc
+     4. /etc/inputrc
    If the file existed and could be opened and read, 0 is returned,
    otherwise errno is returned. */
 int
@@ -703,16 +832,17 @@ rl_read_init_file (filename)
 
   /* Default the filename. */
   if (filename == 0)
+    filename = last_readline_init_file;
+  if (filename == 0)
+    filename = sh_get_env_value ("INPUTRC");
+  if (filename == 0 || *filename == 0)
     {
-      filename = last_readline_init_file;
-      if (filename == 0)
-        filename = sh_get_env_value ("INPUTRC");
-      if (filename == 0)
-	filename = DEFAULT_INPUTRC;
+      filename = DEFAULT_INPUTRC;
+      /* Try to read DEFAULT_INPUTRC; fall back to SYS_INPUTRC on failure */
+      if (_rl_read_init_file (filename, 0) == 0)
+	return 0;
+      filename = SYS_INPUTRC;
     }
-
-  if (*filename == 0)
-    filename = DEFAULT_INPUTRC;
 
 #if defined (__MSDOS__)
   if (_rl_read_init_file (filename, 0) == 0)
@@ -740,8 +870,9 @@ _rl_read_init_file (filename, include_level)
 
   openname = tilde_expand (filename);
   buffer = _rl_read_file (openname, &file_size);
-  free (openname);
+  xfree (openname);
 
+  RL_CHECK_SIGNALS ();
   if (buffer == 0)
     return (errno);
   
@@ -788,7 +919,7 @@ _rl_read_init_file (filename, include_level)
       current_readline_init_lineno++;
     }
 
-  free (buffer);
+  xfree (buffer);
   currently_reading_init_file = 0;
   return (0);
 }
@@ -798,10 +929,10 @@ _rl_init_file_error (msg)
      const char *msg;
 {
   if (currently_reading_init_file)
-    fprintf (stderr, "readline: %s: line %d: %s\n", current_readline_init_file,
+    _rl_errmsg ("%s: line %d: %s\n", current_readline_init_file,
 		     current_readline_init_lineno, msg);
   else
-    fprintf (stderr, "readline: %s\n", msg);
+    _rl_errmsg ("%s", msg);
 }
 
 /* **************************************************************** */
@@ -813,11 +944,11 @@ _rl_init_file_error (msg)
 typedef int _rl_parser_func_t PARAMS((char *));
 
 /* Things that mean `Control'. */
-const char *_rl_possible_control_prefixes[] = {
+const char * const _rl_possible_control_prefixes[] = {
   "Control-", "C-", "CTRL-", (const char *)NULL
 };
 
-const char *_rl_possible_meta_prefixes[] = {
+const char * const _rl_possible_meta_prefixes[] = {
   "Meta", "M-", (const char *)NULL
 };
 
@@ -879,7 +1010,7 @@ parser_if (args)
 	 `$if term=sun-cmd' into their .inputrc. */
       _rl_parsing_conditionalized_out = _rl_stricmp (args + 5, tname) &&
 					_rl_stricmp (args + 5, rl_terminal_name);
-      free (tname);
+      xfree (tname);
     }
 #if defined (VI_MODE)
   else if (_rl_strnicmp (args, "mode=", 5) == 0)
@@ -918,9 +1049,15 @@ parser_else (args)
       return 0;
     }
 
+#if 0
   /* Check the previous (n - 1) levels of the stack to make sure that
      we haven't previously turned off parsing. */
   for (i = 0; i < if_stack_depth - 1; i++)
+#else
+  /* Check the previous (n) levels of the stack to make sure that
+     we haven't previously turned off parsing. */
+  for (i = 0; i < if_stack_depth; i++)
+#endif
     if (if_stack[i] == 1)
       return 0;
 
@@ -970,8 +1107,8 @@ parser_include (args)
 }
   
 /* Associate textual names with actual functions. */
-static struct {
-  const char *name;
+static const struct {
+  const char * const name;
   _rl_parser_func_t *function;
 } parser_directives [] = {
   { "if", parser_if },
@@ -1097,9 +1234,9 @@ rl_parse_and_bind (string)
   /* If this is a command to set a variable, then do that. */
   if (_rl_stricmp (string, "set") == 0)
     {
-      char *var = string + i;
-      char *value;
+      char *var, *value, *e;
 
+      var = string + i;
       /* Make VAR point to start of variable name. */
       while (*var && whitespace (*var)) var++;
 
@@ -1109,6 +1246,20 @@ rl_parse_and_bind (string)
       if (*value)
 	*value++ = '\0';
       while (*value && whitespace (*value)) value++;
+
+      /* Strip trailing whitespace from values to boolean variables.  Temp
+	 fix until I get a real quoted-string parser here. */
+      i = find_boolean_var (var);
+      if (i >= 0)
+	{
+	  /* remove trailing whitespace */
+	  e = value + strlen (value) - 1;
+	  while (e >= value && whitespace (*e))
+	    e--;
+	  e++;		/* skip back to whitespace or EOS */
+	  if (*e && e >= value)
+	    *e = '\0';
+	}
 
       rl_variable_bind (var, value);
       return 0;
@@ -1130,8 +1281,9 @@ rl_parse_and_bind (string)
      the quoted string delimiter, like the shell. */
   if (*funname == '\'' || *funname == '"')
     {
-      int delimiter = string[i++], passc;
+      int delimiter, passc;
 
+      delimiter = string[i++];
       for (passc = 0; c = string[i]; i++)
 	{
 	  if (passc)
@@ -1167,7 +1319,7 @@ rl_parse_and_bind (string)
     }
 
   /* If this is a new-style key-binding, then do the binding with
-     rl_set_key ().  Otherwise, let the older code deal with it. */
+     rl_bind_keyseq ().  Otherwise, let the older code deal with it. */
   if (*string == '"')
     {
       char *seq;
@@ -1206,9 +1358,9 @@ rl_parse_and_bind (string)
 	  rl_macro_bind (seq, &funname[1], _rl_keymap);
 	}
       else
-	rl_set_key (seq, rl_named_function (funname), _rl_keymap);
+	rl_bind_keyseq (seq, rl_named_function (funname));
 
-      free (seq);
+      xfree (seq);
       return 0;
     }
 
@@ -1262,11 +1414,12 @@ rl_parse_and_bind (string)
 
 #define V_SPECIAL	0x1
 
-static struct {
-  const char *name;
+static const struct {
+  const char * const name;
   int *value;
   int flags;
 } boolean_varlist [] = {
+  { "bind-tty-special-chars",	&_rl_bind_stty_chars,		0 },
   { "blink-matching-paren",	&rl_blink_matching_paren,	V_SPECIAL },
   { "byte-oriented",		&rl_byte_oriented,		0 },
   { "completion-ignore-case",	&_rl_completion_case_fold,	0 },
@@ -1286,7 +1439,9 @@ static struct {
   { "page-completions",		&_rl_page_completions,		0 },
   { "prefer-visible-bell",	&_rl_prefer_visible_bell,	V_SPECIAL },
   { "print-completions-horizontally", &_rl_print_completions_horizontally, 0 },
+  { "revert-all-at-newline",	&_rl_revert_all_at_newline,	0 },
   { "show-all-if-ambiguous",	&_rl_complete_show_all,		0 },
+  { "show-all-if-unmodified",	&_rl_complete_show_unmodified,	0 },
 #if defined (VISIBLE_STATS)
   { "visible-stats",		&rl_visible_stats,		0 },
 #endif /* VISIBLE_STATS */
@@ -1343,20 +1498,24 @@ typedef int _rl_sv_func_t PARAMS((const char *));
 /* Forward declarations */
 static int sv_bell_style PARAMS((const char *));
 static int sv_combegin PARAMS((const char *));
+static int sv_dispprefix PARAMS((const char *));
 static int sv_compquery PARAMS((const char *));
 static int sv_editmode PARAMS((const char *));
+static int sv_histsize PARAMS((const char *));
 static int sv_isrchterm PARAMS((const char *));
 static int sv_keymap PARAMS((const char *));
 
-static struct {
-  const char *name;
+static const struct {
+  const char * const name;
   int flags;
   _rl_sv_func_t *set_func;
 } string_varlist[] = {
   { "bell-style",	V_STRING,	sv_bell_style },
   { "comment-begin",	V_STRING,	sv_combegin },
+  { "completion-prefix-display-length", V_INT,	sv_dispprefix },
   { "completion-query-items", V_INT,	sv_compquery },
   { "editing-mode",	V_STRING,	sv_editmode },
+  { "history-size",	V_INT,		sv_histsize },
   { "isearch-terminators", V_STRING,	sv_isrchterm },
   { "keymap",		V_STRING,	sv_keymap },
   { (char *)NULL,	0 }
@@ -1379,11 +1538,30 @@ find_string_var (name)
    values result in 0 (false). */
 static int
 bool_to_int (value)
-     char *value;
+     const char *value;
 {
   return (value == 0 || *value == '\0' ||
 		(_rl_stricmp (value, "on") == 0) ||
 		(value[0] == '1' && value[1] == '\0'));
+}
+
+char *
+rl_variable_value (name)
+     const char *name;
+{
+  register int i;
+
+  /* Check for simple variables first. */
+  i = find_boolean_var (name);
+  if (i >= 0)
+    return (*boolean_varlist[i].value ? "on" : "off");
+
+  i = find_string_var (name);
+  if (i >= 0)
+    return (_rl_get_string_variable_value (string_varlist[i].name));
+
+  /* Unknown variable names return NULL. */
+  return 0;
 }
 
 int
@@ -1449,6 +1627,22 @@ sv_combegin (value)
 }
 
 static int
+sv_dispprefix (value)
+     const char *value;
+{
+  int nval = 0;
+
+  if (value && *value)
+    {
+      nval = atoi (value);
+      if (nval < 0)
+	nval = 0;
+    }
+  _rl_completion_prefix_display_length = nval;
+  return 0;
+}
+
+static int
 sv_compquery (value)
      const char *value;
 {
@@ -1461,6 +1655,22 @@ sv_compquery (value)
 	nval = 0;
     }
   rl_completion_query_items = nval;
+  return 0;
+}
+
+static int
+sv_histsize (value)
+     const char *value;
+{
+  int nval = 500;
+
+  if (value && *value)
+    {
+      nval = atoi (value);
+      if (nval < 0)
+	return 1;
+    }
+  stifle_history (nval);
   return 0;
 }
 
@@ -1528,7 +1738,7 @@ sv_isrchterm (value)
   rl_translate_keyseq (v + beg, _rl_isearch_terminators, &end);
   _rl_isearch_terminators[end] = '\0';
 
-  free (v);
+  xfree (v);
   return 0;
 }
       
@@ -1536,11 +1746,11 @@ sv_isrchterm (value)
    For example, `Space' returns ' '. */
 
 typedef struct {
-  const char *name;
+  const char * const name;
   int value;
 } assoc_list;
 
-static assoc_list name_key_alist[] = {
+static const assoc_list name_key_alist[] = {
   { "DEL", 0x7f },
   { "ESC", '\033' },
   { "Escape", '\033' },
@@ -1569,8 +1779,8 @@ glean_key_from_name (name)
 }
 
 /* Auxiliary functions to manage keymaps. */
-static struct {
-  const char *name;
+static const struct {
+  const char * const name;
   Keymap map;
 } keymap_names[] = {
   { "emacs", emacs_standard_keymap },
@@ -1656,7 +1866,7 @@ rl_get_keymap_name_from_edit_mode ()
 /* Each of the following functions produces information about the
    state of keybindings and functions known to Readline.  The info
    is always printed to rl_outstream, and in such a way that it can
-   be read back in (i.e., passed to rl_parse_and_bind (). */
+   be read back in (i.e., passed to rl_parse_and_bind ()). */
 
 /* Print the names of functions known to Readline. */
 void
@@ -1673,7 +1883,7 @@ rl_list_funmap_names ()
   for (i = 0; funmap_names[i]; i++)
     fprintf (rl_outstream, "%s\n", funmap_names[i]);
 
-  free (funmap_names);
+  xfree (funmap_names);
 }
 
 static char *
@@ -1812,12 +2022,16 @@ rl_invoking_keyseqs_in_map (function, map)
 		char *keyname = (char *)xmalloc (6 + strlen (seqs[i]));
 
 		if (key == ESC)
-#if 0
-		  sprintf (keyname, "\\e");
-#else
-		/* XXX - experimental */
-		  sprintf (keyname, "\\M-");
-#endif
+		  {
+		    /* If ESC is the meta prefix and we're converting chars
+		       with the eighth bit set to ESC-prefixed sequences, then
+		       we can use \M-.  Otherwise we need to use the sequence
+		       for ESC. */
+		    if (_rl_convert_meta_chars_to_ascii && map[ESC].type == ISKMAP)
+		      sprintf (keyname, "\\M-");
+		    else
+		      sprintf (keyname, "\\e");
+		  }
 		else if (CTRL_CHAR (key))
 		  sprintf (keyname, "\\C-%c", _rl_to_lower (UNCTRL (key)));
 		else if (key == RUBOUT)
@@ -1835,7 +2049,7 @@ rl_invoking_keyseqs_in_map (function, map)
 		  }
 		
 		strcat (keyname, seqs[i]);
-		free (seqs[i]);
+		xfree (seqs[i]);
 
 		if (result_index + 2 > result_size)
 		  {
@@ -1847,7 +2061,7 @@ rl_invoking_keyseqs_in_map (function, map)
 		result[result_index] = (char *)NULL;
 	      }
 
-	    free (seqs);
+	    xfree (seqs);
 	  }
 	  break;
 	}
@@ -1899,10 +2113,10 @@ rl_function_dumper (print_readably)
 		{
 		  fprintf (rl_outstream, "\"%s\": %s\n",
 			   invokers[j], name);
-		  free (invokers[j]);
+		  xfree (invokers[j]);
 		}
 
-	      free (invokers);
+	      xfree (invokers);
 	    }
 	}
       else
@@ -1926,9 +2140,9 @@ rl_function_dumper (print_readably)
 		fprintf (rl_outstream, "...\n");
 
 	      for (j = 0; invokers[j]; j++)
-		free (invokers[j]);
+		xfree (invokers[j]);
 
-	      free (invokers);
+	      xfree (invokers);
 	    }
 	}
     }
@@ -1974,8 +2188,8 @@ _rl_macro_dumper_internal (print_readably, map, prefix)
 	    fprintf (rl_outstream, "%s%s outputs %s\n", prefix ? prefix : "",
 							keyname,
 							out ? out : "");
-	  free (keyname);
-	  free (out);
+	  xfree (keyname);
+	  xfree (out);
 	  break;
 	case ISFUNC:
 	  break;
@@ -1998,13 +2212,13 @@ _rl_macro_dumper_internal (print_readably, map, prefix)
 		  out = (char *)xmalloc (strlen (keyname) + prefix_len + 1);
 		  strcpy (out, prefix);
 		  strcpy (out + prefix_len, keyname);
-		  free (keyname);
+		  xfree (keyname);
 		  keyname = out;
 		}
 	    }
 
 	  _rl_macro_dumper_internal (print_readably, FUNCTION_TO_KEYMAP (map, key), keyname);
-	  free (keyname);
+	  xfree (keyname);
 	  break;
 	}
     }
@@ -2028,12 +2242,77 @@ rl_dump_macros (count, key)
   return (0);
 }
 
+static char *
+_rl_get_string_variable_value (name)
+     const char *name;
+{
+  static char numbuf[32];
+  char *ret;
+
+  if (_rl_stricmp (name, "bell-style") == 0)
+    {
+      switch (_rl_bell_preference)
+	{
+	  case NO_BELL:
+	    return "none";
+	  case VISIBLE_BELL:
+	    return "visible";
+	  case AUDIBLE_BELL:
+	  default:
+	    return "audible";
+	}
+    }
+  else if (_rl_stricmp (name, "comment-begin") == 0)
+    return (_rl_comment_begin ? _rl_comment_begin : RL_COMMENT_BEGIN_DEFAULT);
+  else if (_rl_stricmp (name, "completion-prefix-display-length") == 0)
+    {
+      sprintf (numbuf, "%d", _rl_completion_prefix_display_length);
+      return (numbuf);
+    }
+  else if (_rl_stricmp (name, "completion-query-items") == 0)
+    {
+      sprintf (numbuf, "%d", rl_completion_query_items);
+      return (numbuf);
+    }
+  else if (_rl_stricmp (name, "editing-mode") == 0)
+    return (rl_get_keymap_name_from_edit_mode ());
+  else if (_rl_stricmp (name, "history-size") == 0)
+    {
+      sprintf (numbuf, "%d", history_is_stifled() ? history_max_entries : 0);
+      return (numbuf);
+    }
+  else if (_rl_stricmp (name, "isearch-terminators") == 0)
+    {
+      if (_rl_isearch_terminators == 0)
+	return 0;
+      ret = _rl_untranslate_macro_value (_rl_isearch_terminators);
+      if (ret)
+	{
+	  strncpy (numbuf, ret, sizeof (numbuf) - 1);
+	  xfree (ret);
+	  numbuf[sizeof(numbuf) - 1] = '\0';
+	}
+      else
+	numbuf[0] = '\0';
+      return numbuf;
+    }
+  else if (_rl_stricmp (name, "keymap") == 0)
+    {
+      ret = rl_get_keymap_name (_rl_keymap);
+      if (ret == 0)
+	ret = rl_get_keymap_name_from_edit_mode ();
+      return (ret ? ret : "none");
+    }
+  else
+    return (0);
+}
+
 void
 rl_variable_dumper (print_readably)
      int print_readably;
 {
   int i;
-  const char *kname;
+  char *v;
 
   for (i = 0; boolean_varlist[i].name; i++)
     {
@@ -2045,63 +2324,16 @@ rl_variable_dumper (print_readably)
 			       *boolean_varlist[i].value ? "on" : "off");
     }
 
-  /* bell-style */
-  switch (_rl_bell_preference)
+  for (i = 0; string_varlist[i].name; i++)
     {
-    case NO_BELL:
-      kname = "none"; break;
-    case VISIBLE_BELL:
-      kname = "visible"; break;
-    case AUDIBLE_BELL:
-    default:
-      kname = "audible"; break;
-    }
-  if (print_readably)
-    fprintf (rl_outstream, "set bell-style %s\n", kname);
-  else
-    fprintf (rl_outstream, "bell-style is set to `%s'\n", kname);
-
-  /* comment-begin */
-  if (print_readably)
-    fprintf (rl_outstream, "set comment-begin %s\n", _rl_comment_begin ? _rl_comment_begin : RL_COMMENT_BEGIN_DEFAULT);
-  else
-    fprintf (rl_outstream, "comment-begin is set to `%s'\n", _rl_comment_begin ? _rl_comment_begin : RL_COMMENT_BEGIN_DEFAULT);
-
-  /* completion-query-items */
-  if (print_readably)
-    fprintf (rl_outstream, "set completion-query-items %d\n", rl_completion_query_items);
-  else
-    fprintf (rl_outstream, "completion-query-items is set to `%d'\n", rl_completion_query_items);
-
-  /* editing-mode */
-  if (print_readably)
-    fprintf (rl_outstream, "set editing-mode %s\n", (rl_editing_mode == emacs_mode) ? "emacs" : "vi");
-  else
-    fprintf (rl_outstream, "editing-mode is set to `%s'\n", (rl_editing_mode == emacs_mode) ? "emacs" : "vi");
-
-  /* isearch-terminators */
-  if (_rl_isearch_terminators)
-    {
-      char *disp;
-
-      disp = _rl_untranslate_macro_value (_rl_isearch_terminators);
-
+      v = _rl_get_string_variable_value (string_varlist[i].name);
+      if (v == 0)	/* _rl_isearch_terminators can be NULL */
+	continue;
       if (print_readably)
-	fprintf (rl_outstream, "set isearch-terminators \"%s\"\n", disp);
+        fprintf (rl_outstream, "set %s %s\n", string_varlist[i].name, v);
       else
-	fprintf (rl_outstream, "isearch-terminators is set to \"%s\"\n", disp);
-
-      free (disp);
+        fprintf (rl_outstream, "%s is set to `%s'\n", string_varlist[i].name, v);
     }
-
-  /* keymap */
-  kname = rl_get_keymap_name (_rl_keymap);
-  if (kname == 0)
-    kname = rl_get_keymap_name_from_edit_mode ();
-  if (print_readably)
-    fprintf (rl_outstream, "set keymap %s\n", kname ? kname : "none");
-  else
-    fprintf (rl_outstream, "keymap is set to `%s'\n", kname ? kname : "none");
 }
 
 /* Print all of the current variables and their values to
@@ -2118,33 +2350,11 @@ rl_dump_variables (count, key)
   return (0);
 }
 
-/* Bind key sequence KEYSEQ to DEFAULT_FUNC if KEYSEQ is unbound.  Right
-   now, this is always used to attempt to bind the arrow keys, hence the
-   check for rl_vi_movement_mode. */
-void
-_rl_bind_if_unbound (keyseq, default_func)
-     const char *keyseq;
-     rl_command_func_t *default_func;
-{
-  rl_command_func_t *func;
-
-  if (keyseq)
-    {
-      func = rl_function_of_keyseq (keyseq, _rl_keymap, (int *)NULL);
-#if defined (VI_MODE)
-      if (!func || func == rl_do_lowercase_version || func == rl_vi_movement_mode)
-#else
-      if (!func || func == rl_do_lowercase_version)
-#endif
-	rl_set_key (keyseq, default_func, _rl_keymap);
-    }
-}
-
 /* Return non-zero if any members of ARRAY are a substring in STRING. */
 static int
 substring_member_of_array (string, array)
-     char *string;
-     const char **array;
+     const char *string;
+     const char * const *array;
 {
   while (*array)
     {

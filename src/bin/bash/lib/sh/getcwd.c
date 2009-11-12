@@ -1,26 +1,34 @@
-/* getcwd.c -- stolen from the GNU C library and modified to work with bash. */
+/* getcwd.c -- get pathname of current directory */
 
 /* Copyright (C) 1991 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
 
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public License as
-   published by the Free Software Foundation; either version 2 of the
-   License, or (at your option) any later version.
+   This file is part of GNU Bash, the Bourne Again SHell.
 
-   The GNU C Library is distributed in the hope that it will be useful,
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   Bash is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with the GNU C Library; see the file COPYING.LIB.  If
-   not, write to the Free Software Foundation, Inc.,
-   59 Temple Place, Suite 330, Boston, MA 02111 USA.  */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <config.h>
 
 #if !defined (HAVE_GETCWD)
+
+#if !defined (__GNUC__) && !defined (HAVE_ALLOCA_H) && defined (_AIX)
+  #pragma alloca
+#endif /* _AIX && RISC6000 && !__GNUC__ */
+
+#if defined (__QNX__)
+#  undef HAVE_LSTAT
+#endif
 
 #include <bashtypes.h>
 #include <errno.h>
@@ -54,6 +62,33 @@ extern int errno;
 #  define NULL 0
 #endif
 
+/* If the d_fileno member of a struct dirent doesn't return anything useful,
+   we need to check inode number equivalence the hard way.  Return 1 if
+   the inode corresponding to PATH/DIR is identical to THISINO. */
+#if defined (BROKEN_DIRENT_D_INO)
+static int
+_path_checkino (dotp, name, thisino)
+     char *dotp;
+     char *name;
+     ino_t thisino;
+{
+  char *fullpath;
+  int r, e;
+  struct stat st;
+
+  e = errno;
+  fullpath = sh_makepath (dotp, name, MP_RMDOT);
+  if (stat (fullpath, &st) < 0)
+    {
+      errno = e;
+      return 0;
+    }
+  free (fullpath);
+  errno = e;
+  return (st.st_ino == thisino);
+}
+#endif
+    
 /* Get the pathname of the current working directory,
    and put it in SIZE bytes of BUF.  Returns NULL if the
    directory couldn't be determined or SIZE was too small.
@@ -165,7 +200,11 @@ getcwd (buf, size)
 	      (d->d_name[1] == '\0' ||
 		(d->d_name[1] == '.' && d->d_name[2] == '\0')))
 	    continue;
+#if !defined (BROKEN_DIRENT_D_INO)
 	  if (mount_point || d->d_fileno == thisino)
+#else
+	  if (mount_point || _path_checkino (dotp, d->d_name, thisino))
+#endif
 	    {
 	      char *name;
 
@@ -247,19 +286,21 @@ getcwd (buf, size)
 
   {
     size_t len = pathbuf + pathsize - pathp;
-    if (buf == NULL)
-      {
-	if (len < (size_t) size)
-	  len = size;
-	buf = (char *) malloc (len);
-	if (buf == NULL)
-	  goto lose2;
-      }
-    else if ((size_t) size < len)
+    if (buf == NULL && size <= 0)
+      size = len;
+
+    if ((size_t) size < len)
       {
 	errno = ERANGE;
 	goto lose2;
       }
+    if (buf == NULL)
+      {
+	buf = (char *) malloc (size);
+	if (buf == NULL)
+	  goto lose2;
+      }
+
     (void) memcpy((PTR_T) buf, (PTR_T) pathp, len);
   }
 

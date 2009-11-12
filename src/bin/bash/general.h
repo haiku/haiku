@@ -1,22 +1,22 @@
 /* general.h -- defines that everybody likes to use. */
 
-/* Copyright (C) 1993-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #if !defined (_GENERAL_H_)
 #define _GENERAL_H_
@@ -24,6 +24,7 @@
 #include "stdc.h"
 
 #include "bashtypes.h"
+#include "chartypes.h"
 
 #if defined (HAVE_SYS_RESOURCE_H) && defined (RLIMTYPE)
 #  if defined (HAVE_SYS_TIME_H)
@@ -129,16 +130,16 @@ typedef struct {
 			: (type)(list))
 
 #if __GNUC__ > 1
-#  define FASTCOPY(s, d, n)  __builtin_memcpy (d, s, n)
+#  define FASTCOPY(s, d, n)  __builtin_memcpy ((d), (s), (n))
 #else /* !__GNUC__ */
 #  if !defined (HAVE_BCOPY)
 #    if !defined (HAVE_MEMMOVE)
-#      define FASTCOPY(s, d, n)  memcpy (d, s, n)
+#      define FASTCOPY(s, d, n)  memcpy ((d), (s), (n))
 #    else
-#      define FASTCOPY(s, d, n)  memmove (d, s, n)
+#      define FASTCOPY(s, d, n)  memmove ((d), (s), (n))
 #    endif /* !HAVE_MEMMOVE */
 #  else /* HAVE_BCOPY */
-#    define FASTCOPY(s, d, n)  bcopy (s, d, n)
+#    define FASTCOPY(s, d, n)  bcopy ((s), (d), (n))
 #  endif /* HAVE_BCOPY */
 #endif /* !__GNUC__ */
 
@@ -216,6 +217,7 @@ typedef void sh_resetsig_func_t __P((int));	/* sh_vintfunc_t */
 typedef int sh_ignore_func_t __P((const char *));	/* sh_icpfunc_t */
 
 typedef int sh_assign_func_t __P((const char *));	/* sh_icpfunc_t */
+typedef int sh_wassign_func_t __P((WORD_DESC *));
 
 typedef int sh_builtin_func_t __P((WORD_LIST *)); /* sh_wlist_func_t */
 
@@ -230,6 +232,7 @@ typedef int sh_builtin_func_t __P((WORD_LIST *)); /* sh_wlist_func_t */
 #define FS_EXEC_ONLY	  0x8
 #define FS_DIRECTORY	  0x10
 #define FS_NODIRS	  0x20
+#define FS_READABLE	  0x40
 
 /* Default maximum for move_to_high_fd */
 #define HIGH_FD_MAX	256
@@ -248,14 +251,18 @@ typedef int QSFUNC ();
 #  define ABSPATH(x)	((x)[0] == '/')
 #  define RELPATH(x)	((x)[0] != '/')
 #else /* __CYGWIN__ */
-#  define ABSPATH(x)	(((x)[0] && ISALPHA((unsigned char)(x)[0]) && (x)[1] == ':' && (x)[2] == '/') || (x)[0] == '/')
-#  define RELPATH(x)	(!(x)[0] || ((x)[1] != ':' && (x)[0] != '/'))
+#  define ABSPATH(x)	(((x)[0] && ISALPHA((unsigned char)(x)[0]) && (x)[1] == ':') || ISDIRSEP((x)[0]))
+#  define RELPATH(x)	(ABSPATH(x) == 0)
 #endif /* __CYGWIN__ */
 
 #define ROOTEDPATH(x)	(ABSPATH(x))
 
 #define DIRSEP	'/'
-#define ISDIRSEP(c)	((c) == '/')
+#if !defined (__CYGWIN__)
+#  define ISDIRSEP(c)	((c) == '/')
+#else
+#  define ISDIRSEP(c)	((c) == '/' || (c) == '\\')
+#endif /* __CYGWIN__ */
 #define PATHSEP(c)	(ISDIRSEP(c) || (c) == 0)
 
 #if 0
@@ -274,10 +281,11 @@ extern void print_rlimtype __P((RLIMTYPE, int));
 #endif
 
 extern int all_digits __P((char *));
-extern int legal_number __P((char *, intmax_t *));
+extern int legal_number __P((const char *, intmax_t *));
 extern int legal_identifier __P((char *));
 extern int check_identifier __P((WORD_DESC *, int));
-extern int assignment __P((const char *));
+extern int legal_alias_name __P((char *, int));
+extern int assignment __P((const char *, int));
 
 extern int sh_unset_nodelay_mode __P((int));
 extern int sh_validfd __P((int));
@@ -289,16 +297,25 @@ extern int check_binary_file __P((char *, int));
 extern int same_file __P((char *, char *, struct stat *, struct stat *));
 #endif
 
-extern char *make_absolute __P((char *, char *));
+extern int sh_openpipe __P((int *));
+extern int sh_closepipe __P((int *));
+
+extern int file_exists __P((char *));
+extern int file_isdir __P((char  *));
+extern int file_iswdir __P((char  *));
 extern int absolute_pathname __P((const char *));
 extern int absolute_program __P((const char *));
+
+extern char *make_absolute __P((char *, char *));
 extern char *base_pathname __P((char *));
 extern char *full_pathname __P((char *));
 extern char *polite_directory_format __P((char *));
+extern char *trim_pathname __P((char *, int));
 
 extern char *extract_colon_unit __P((char *, int *));
 
 extern void tilde_initialize __P((void));
+extern char *bash_tilde_find_word __P((const char *, int, int *));
 extern char *bash_tilde_expand __P((const char *, int));
 
 extern int group_member __P((gid_t));

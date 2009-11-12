@@ -1,28 +1,29 @@
 /* variables.h -- data structures for shell variables. */
 
-/* Copyright (C) 1987-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT
-   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
-   License for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Bash; see the file COPYING.  If not, write to the Free
-   Software Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #if !defined (_VARIABLES_H_)
 #define _VARIABLES_H_
 
 #include "stdc.h"
 #include "array.h"
+#include "assoc.h"
 
 /* Shell variables and functions are stored in hash tables. */
 #include "hashlib.h"
@@ -61,7 +62,7 @@ typedef struct var_context {
 /* What a shell variable looks like. */
 
 typedef struct variable *sh_var_value_func_t __P((struct variable *));
-typedef struct variable *sh_var_assign_func_t __P((struct variable *, char *, arrayind_t));
+typedef struct variable *sh_var_assign_func_t __P((struct variable *, char *, arrayind_t, char *));
 
 /* For the future */
 union _value {
@@ -71,7 +72,11 @@ union _value {
   ARRAY *a;			/* array */
   HASH_TABLE *h;		/* associative array */
   double d;			/* floating point number */
-  void *v;			/* opaque data for future use */
+#if defined (HAVE_LONG_DOUBLE)
+  long double ld;		/* long double */
+#endif
+  struct variable *v;		/* possible indirect variable use */
+  void *opaque;			/* opaque data for future use */
 };
 
 typedef struct variable {
@@ -104,6 +109,11 @@ typedef struct _vlist {
 #define att_local	0x0000020	/* variable is local to a function */
 #define att_assoc	0x0000040	/* variable is an associative array */
 #define att_trace	0x0000080	/* function is traced with DEBUG trap */
+#define att_uppercase	0x0000100	/* word converted to uppercase on assignment */
+#define att_lowercase	0x0000200	/* word converted to lowercase on assignment */
+#define att_capcase	0x0000400	/* word capitalized on assignment */
+
+#define user_attrs	(att_exported|att_readonly|att_integer|att_local|att_trace|att_uppercase|att_lowercase|att_capcase)
 
 #define attmask_user	0x0000fff
 
@@ -113,6 +123,7 @@ typedef struct _vlist {
 #define att_noassign	0x0004000	/* assignment not allowed */
 #define att_imported	0x0008000	/* came from environment */
 #define att_special	0x0010000	/* requires special handling */
+#define att_nofree	0x0020000	/* do not free value on unset */
 
 #define	attmask_int	0x00ff000
 
@@ -130,12 +141,16 @@ typedef struct _vlist {
 #define local_p(var)		((((var)->attributes) & (att_local)))
 #define assoc_p(var)		((((var)->attributes) & (att_assoc)))
 #define trace_p(var)		((((var)->attributes) & (att_trace)))
+#define uppercase_p(var)	((((var)->attributes) & (att_uppercase)))
+#define lowercase_p(var)	((((var)->attributes) & (att_lowercase)))
+#define capcase_p(var)		((((var)->attributes) & (att_capcase)))
 
 #define invisible_p(var)	((((var)->attributes) & (att_invisible)))
 #define non_unsettable_p(var)	((((var)->attributes) & (att_nounset)))
 #define noassign_p(var)		((((var)->attributes) & (att_noassign)))
 #define imported_p(var)		((((var)->attributes) & (att_imported)))
 #define specialvar_p(var)	((((var)->attributes) & (att_special)))
+#define nofree_p(var)		((((var)->attributes) & (att_nofree)))
 
 #define tempvar_p(var)		((((var)->attributes) & (att_tempvar)))
 
@@ -143,6 +158,7 @@ typedef struct _vlist {
 #define value_cell(var)		((var)->value)
 #define function_cell(var)	(COMMAND *)((var)->value)
 #define array_cell(var)		(ARRAY *)((var)->value)
+#define assoc_cell(var)		(HASH_TABLE *)((var)->value)
 
 #define var_isnull(var)		((var)->value == 0)
 #define var_isset(var)		((var)->value != 0)
@@ -151,6 +167,7 @@ typedef struct _vlist {
 #define var_setvalue(var, str)	((var)->value = (str))
 #define var_setfunc(var, func)	((var)->value = (char *)(func))
 #define var_setarray(var, arr)	((var)->value = (char *)(arr))
+#define var_setassoc(var, arr)	((var)->value = (char *)(arr))
 
 /* Make VAR be auto-exported. */
 #define set_auto_export(var) \
@@ -214,13 +231,16 @@ extern void make_funcname_visible __P((int));
 extern SHELL_VAR *var_lookup __P((const char *, VAR_CONTEXT *));
 
 extern SHELL_VAR *find_function __P((const char *));
+extern FUNCTION_DEF *find_function_def __P((const char *));
 extern SHELL_VAR *find_variable __P((const char *));
 extern SHELL_VAR *find_variable_internal __P((const char *, int));
 extern SHELL_VAR *find_tempenv_variable __P((const char *));
 extern SHELL_VAR *copy_variable __P((SHELL_VAR *));
 extern SHELL_VAR *make_local_variable __P((const char *));
-extern SHELL_VAR *bind_variable __P((const char *, char *));
+extern SHELL_VAR *bind_variable __P((const char *, char *, int));
 extern SHELL_VAR *bind_function __P((const char *, COMMAND *));
+
+extern void bind_function_def __P((const char *, FUNCTION_DEF *));
 
 extern SHELL_VAR **map_over __P((sh_var_map_func_t *, VAR_CONTEXT *));
 SHELL_VAR **map_over_funcs __P((sh_var_map_func_t *));
@@ -243,15 +263,17 @@ extern char **add_or_supercede_exported_var __P((char *, int));
 extern char *get_variable_value __P((SHELL_VAR *));
 extern char *get_string_value __P((const char *));
 extern char *sh_get_env_value __P((const char *));
-extern char *make_variable_value __P((SHELL_VAR *, char *));
+extern char *make_variable_value __P((SHELL_VAR *, char *, int));
 
-extern SHELL_VAR *bind_variable_value __P((SHELL_VAR *, char *));
+extern SHELL_VAR *bind_variable_value __P((SHELL_VAR *, char *, int));
 extern SHELL_VAR *bind_int_variable __P((char *, char *));
 extern SHELL_VAR *bind_var_to_int __P((char *, intmax_t));
 
-extern int assign_in_env __P((const char *));
+extern int assign_in_env __P((WORD_DESC *));
+
 extern int unbind_variable __P((const char *));
 extern int unbind_func __P((const char *));
+extern int unbind_function_def __P((const char *));
 extern int makunbound __P((const char *, VAR_CONTEXT *));
 extern int kill_local_variable __P((const char *));
 extern void delete_all_variables __P((HASH_TABLE *));
@@ -269,6 +291,9 @@ extern void pop_context __P((void));
 extern void push_dollar_vars __P((void));
 extern void pop_dollar_vars __P((void));
 extern void dispose_saved_dollar_vars __P((void));
+
+extern void push_args __P((WORD_LIST *));
+extern void pop_args __P((void));
 
 extern void adjust_shell_level __P((int));
 extern void non_unsettable __P((char *));
@@ -302,6 +327,9 @@ extern void print_var_function __P((SHELL_VAR *));
 extern SHELL_VAR *make_new_array_variable __P((char *));
 extern SHELL_VAR *make_local_array_variable __P((char *));
 
+extern SHELL_VAR *make_new_assoc_variable __P((char *));
+extern SHELL_VAR *make_local_assoc_variable __P((char *));
+
 extern void set_pipestatus_array __P((int *, int));
 #endif
 
@@ -310,6 +338,10 @@ extern void set_pipestatus_from_exit __P((int));
 /* The variable in NAME has just had its state changed.  Check to see if it
    is one of the special ones where something special happens. */
 extern void stupidly_hack_special_variables __P((char *));
+
+/* Reinitialize some special variables that have external effects upon unset
+   when the shell reinitializes itself. */
+extern void reinit_special_variables __P((void));
 
 extern int get_random_number __P((void));
 
@@ -326,12 +358,14 @@ extern void sv_opterr __P((char *));
 extern void sv_locale __P((char *));
 
 #if defined (READLINE)
+extern void sv_comp_wordbreaks __P((char *));
 extern void sv_terminal __P((char *));
 extern void sv_hostfile __P((char *));
+extern void sv_winsize __P((char *));
 #endif
 
-#if defined (HAVE_TZSET) && defined (PROMPT_STRING_DECODE)
-extern void sv_tz __P((char *));
+#if defined (__CYGWIN__)
+extern void sv_home __P((char *));
 #endif
 
 #if defined (HISTORY)
@@ -341,6 +375,11 @@ extern void sv_history_control __P((char *));
 #  if defined (BANG_HISTORY)
 extern void sv_histchars __P((char *));
 #  endif
+extern void sv_histtimefmt __P((char *));
 #endif /* HISTORY */
+
+#if defined (HAVE_TZSET) && defined (PROMPT_STRING_DECODE)
+extern void sv_tz __P((char *));
+#endif
 
 #endif /* !_VARIABLES_H_ */

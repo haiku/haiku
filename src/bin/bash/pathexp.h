@@ -1,22 +1,22 @@
 /* pathexp.h -- The shell interface to the globbing library. */
 
-/* Copyright (C) 1987,1989 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #if !defined (_PATHEXP_H_)
 #define _PATHEXP_H_
@@ -32,6 +32,7 @@ extern char *glob_error_return;
 /* Flag values for quote_string_for_globbing */
 #define QGLOB_CVTNULL	0x01	/* convert QUOTED_NULL strings to '\0' */
 #define QGLOB_FILENAME	0x02	/* do correct quoting for matching filenames */
+#define QGLOB_REGEXP	0x04	/* quote an ERE for regcomp/regexec */
 
 #if defined (EXTENDED_GLOB)
 /* Flags to OR with other flag args to strmatch() to enabled the extended
@@ -41,8 +42,12 @@ extern char *glob_error_return;
 #  define FNMATCH_EXTFLAG	0
 #endif /* !EXTENDED_GLOB */
 
+#define FNMATCH_IGNCASE		(match_ignore_case ? FNM_CASEFOLD : 0)
+
 extern int glob_dot_filenames;
 extern int extended_glob;
+extern int glob_star;
+extern int match_ignore_case;	/* doesn't really belong here */
 
 extern int unquoted_glob_pattern_p __P((char *));
 
@@ -58,6 +63,7 @@ extern int unquoted_glob_pattern_p __P((char *));
    to match a filename should be performed. */
 extern char *quote_string_for_globbing __P((const char *, int));
 
+extern int glob_char_p __P((const char *));
 extern char *quote_globbing_chars __P((char *));
 
 /* Call the glob library to do globbing on PATHNAME. */

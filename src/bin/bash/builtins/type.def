@@ -1,50 +1,53 @@
 This file is type.def, from which is created type.c.
 It implements the builtin "type" in Bash.
 
-Copyright (C) 1987-2002 Free Software Foundation, Inc.
+Copyright (C) 1987-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES type.c
 
 $BUILTIN type
 $FUNCTION type_builtin
 $SHORT_DOC type [-afptP] name [name ...]
+Display information about command type.
+
 For each NAME, indicate how it would be interpreted if used as a
 command name.
 
-If the -t option is used, `type' outputs a single word which is one of
-`alias', `keyword', `function', `builtin', `file' or `', if NAME is an
-alias, shell reserved word, shell function, shell builtin, disk file,
-or unfound, respectively.
+Options:
+  -a	display all locations containing an executable named NAME;
+	includes aliases, builtins, and functions, if and only if
+	the `-p' option is not also used
+  -f	suppress shell function lookup
+  -P	force a PATH search for each NAME, even if it is an alias,
+	builtin, or function, and returns the name of the disk file
+	that would be executed
+  -p	returns either the name of the disk file that would be executed,
+	or nothing if `type -t NAME' would not return `file'.
+  -t	output a single word which is one of `alias', `keyword',
+	`function', `builtin', `file' or `', if NAME is an alias, shell
+	reserved word, shell function, shell builtin, disk file, or not 
+	found, respectively
 
-If the -p flag is used, `type' either returns the name of the disk
-file that would be executed, or nothing if `type -t NAME' would not
-return `file'.
+Arguments:
+  NAME	Command name to be interpreted.
 
-If the -a flag is used, `type' displays all of the places that contain
-an executable named `file'.  This includes aliases, builtins, and
-functions, if and only if the -p flag is not also used.
-
-The -f flag suppresses shell function lookup.
-
-The -P flag forces a PATH search for each NAME, even if it is an alias,
-builtin, or function, and returns the name of the disk file that would
-be executed.
+Exit Status:
+Returns success if all of the NAMEs are found; fails if any are not found.
 $END
 
 #include <config.h>
@@ -58,6 +61,7 @@ $END
 
 #include <stdio.h>
 #include "../bashansi.h"
+#include "../bashintl.h"
 
 #include "../shell.h"
 #include "../findcmd.h"
@@ -73,6 +77,7 @@ $END
 extern int find_reserved_word __P((char *));
 
 extern char *this_command_name;
+extern int expand_aliases, posixly_correct;
 
 /* For each word in LIST, find out what the shell is going to do with
    it as a simple command. i.e., which file would this shell use to
@@ -106,14 +111,14 @@ int
 type_builtin (list)
      WORD_LIST *list;
 {
-  int dflags, successful_finds, opt;
+  int dflags, any_failed, opt;
   WORD_LIST *this;
 
   if (list == 0)
     return (EXECUTION_SUCCESS);
 
   dflags = CDESC_SHORTDESC;	/* default */
-  successful_finds = 0;
+  any_failed = 0;
 
   /* Handle the obsolescent `-type', `-path', and `-all' by prescanning
      the arguments and converting those options to the form that
@@ -179,13 +184,12 @@ type_builtin (list)
       if (!found && (dflags & (CDESC_PATH_ONLY|CDESC_TYPE)) == 0)
 	sh_notfound (list->word->word);
 
-      successful_finds += found;
+      any_failed += found == 0;
       list = list->next;
     }
 
-  fflush (stdout);
-
-  return ((successful_finds != 0) ? EXECUTION_SUCCESS : EXECUTION_FAILURE);
+  opt = (any_failed == 0) ? EXECUTION_SUCCESS : EXECUTION_FAILURE;
+  return (sh_chkwrite (opt));
 }
 
 /*
@@ -199,6 +203,7 @@ type_builtin (list)
  *	CDESC_PATH_ONLY	print the path for type -p
  *	CDESC_FORCE_PATH	force a path search for type -P
  *	CDESC_NOFUNCS	skip function lookup for type -f
+ *	CDESC_ABSPATH	convert to absolute path, no ./ prefix
  *
  * CDESC_ALL says whether or not to look for all occurrences of COMMAND, or
  * return after finding it once.
@@ -221,12 +226,12 @@ describe_command (command, dflags)
 
 #if defined (ALIAS)
   /* Command is an alias? */
-  if (((dflags & CDESC_FORCE_PATH) == 0) && (alias = find_alias (command)))
+  if (((dflags & CDESC_FORCE_PATH) == 0) && expand_aliases && (alias = find_alias (command)))
     {
       if (dflags & CDESC_TYPE)
 	puts ("alias");
       else if (dflags & CDESC_SHORTDESC)
-	printf ("%s is aliased to `%s'\n", command, alias->value);
+	printf (_("%s is aliased to `%s'\n"), command, alias->value);
       else if (dflags & CDESC_REUSABLE)
 	{
 	  x = sh_single_quote (alias->value);
@@ -247,7 +252,7 @@ describe_command (command, dflags)
       if (dflags & CDESC_TYPE)
 	puts ("keyword");
       else if (dflags & CDESC_SHORTDESC)
-	printf ("%s is a shell keyword\n", command);
+	printf (_("%s is a shell keyword\n"), command);
       else if (dflags & CDESC_REUSABLE)
 	printf ("%s\n", command);
 
@@ -264,18 +269,14 @@ describe_command (command, dflags)
 	puts ("function");
       else if (dflags & CDESC_SHORTDESC)
 	{
-#define PRETTY_PRINT_FUNC 1
 	  char *result;
 
-	  printf ("%s is a function\n", command);
+	  printf (_("%s is a function\n"), command);
 
 	  /* We're blowing away THE_PRINTED_COMMAND here... */
 
-	  result = named_function_string (command,
-					  (COMMAND *) function_cell (func),
-					  PRETTY_PRINT_FUNC);
+	  result = named_function_string (command, function_cell (func), FUNC_MULTILINE|FUNC_EXTERNAL);
 	  printf ("%s\n", result);
-#undef PRETTY_PRINT_FUNC
 	}
       else if (dflags & CDESC_REUSABLE)
 	printf ("%s\n", command);
@@ -292,7 +293,7 @@ describe_command (command, dflags)
       if (dflags & CDESC_TYPE)
 	puts ("builtin");
       else if (dflags & CDESC_SHORTDESC)
-	printf ("%s is a shell builtin\n", command);
+	printf (_("%s is a shell builtin\n"), command);
       else if (dflags & CDESC_REUSABLE)
 	printf ("%s\n", command);
 
@@ -313,7 +314,7 @@ describe_command (command, dflags)
 	  if (dflags & CDESC_TYPE)
 	    puts ("file");
 	  else if (dflags & CDESC_SHORTDESC)
-	    printf ("%s is %s\n", command, command);
+	    printf (_("%s is %s\n"), command, command);
 	  else if (dflags & (CDESC_REUSABLE|CDESC_PATH_ONLY))
 	    printf ("%s\n", command);
 
@@ -333,7 +334,7 @@ describe_command (command, dflags)
 	  if (dflags & CDESC_TYPE)
 	    puts ("file");
 	  else if (dflags & CDESC_SHORTDESC)
-	    printf ("%s is hashed (%s)\n", command, full_path);
+	    printf (_("%s is hashed (%s)\n"), command, full_path);
 	  else if (dflags & (CDESC_REUSABLE|CDESC_PATH_ONLY))
 	    printf ("%s\n", full_path);
 
@@ -357,8 +358,9 @@ describe_command (command, dflags)
 
       /* If we found the command as itself by looking through $PATH, it
 	 probably doesn't exist.  Check whether or not the command is an
-	 executable file.  If it's not, don't report a match. */
-      if (STREQ (full_path, command))
+	 executable file.  If it's not, don't report a match.  This is
+	 the default posix mode behavior */
+      if (STREQ (full_path, command) || posixly_correct)
 	{
 	  f = file_status (full_path);
 	  if ((f & FS_EXECABLE) == 0)
@@ -368,9 +370,17 @@ describe_command (command, dflags)
 	      if (all == 0)
 		break;
 	    }
+	  else if (ABSPATH (full_path))
+	    ;	/* placeholder; don't need to do anything yet */
 	  else if (dflags & (CDESC_REUSABLE|CDESC_PATH_ONLY|CDESC_SHORTDESC))
-	    full_path = sh_makepath ((char *)NULL, full_path, MP_DOCWD);
+	    {
+	      f = MP_DOCWD | ((dflags & CDESC_ABSPATH) ? MP_RMDOT : 0);
+	      full_path = sh_makepath ((char *)NULL, full_path, f);
+	    }
 	}
+      /* If we require a full path and don't have one, make one */
+      else if ((dflags & CDESC_ABSPATH) && ABSPATH (full_path) == 0)
+	full_path = sh_makepath ((char *)NULL, full_path, MP_DOCWD|MP_RMDOT);
 
       found_file++;
       found = 1;
@@ -378,7 +388,7 @@ describe_command (command, dflags)
       if (dflags & CDESC_TYPE)
 	puts ("file");
       else if (dflags & CDESC_SHORTDESC)
-	printf ("%s is %s\n", command, full_path);
+	printf (_("%s is %s\n"), command, full_path);
       else if (dflags & (CDESC_REUSABLE|CDESC_PATH_ONLY))
 	printf ("%s\n", full_path);
 

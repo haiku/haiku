@@ -1,22 +1,22 @@
 /* syntax.h -- Syntax definitions for the shell */
 
-/* Copyright (C) 2000 Free Software Foundation, Inc.
+/* Copyright (C) 2000, 2001, 2005, 2008,2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef _SYNTAX_H_
 #define _SYNTAX_H_
@@ -62,13 +62,18 @@
 #define CXQUOTE		0x0400	/* cquote + backslash */
 #define CSPECVAR	0x0800	/* single-character shell variable name */
 #define CSUBSTOP	0x1000	/* values of OP for ${word[:]OPstuff} */
+#define CBLANK		0x2000	/* whitespace (blank) character */
 
 /* Defines for use by the rest of the shell. */
-extern const int sh_syntaxtab[];
+extern int sh_syntaxtab[];
+extern int sh_syntabsiz;
 
 #define shellmeta(c)	(sh_syntaxtab[(unsigned char)(c)] & CSHMETA)
 #define shellbreak(c)	(sh_syntaxtab[(unsigned char)(c)] & CSHBRK)
 #define shellquote(c)	(sh_syntaxtab[(unsigned char)(c)] & CQUOTE)
+#define shellxquote(c)	(sh_syntaxtab[(unsigned char)(c)] & CXQUOTE)
+
+#define shellblank(c)	(sh_syntaxtab[(unsigned char)(c)] & CBLANK)
 
 #define issyntype(c, t)	((sh_syntaxtab[(unsigned char)(c)] & (t)) != 0)
 #define notsyntype(c,t) ((sh_syntaxtab[(unsigned char)(c)] & (t)) == 0)
@@ -91,5 +96,9 @@ extern const int sh_syntaxtab[];
 
 #define CTLESC '\001'
 #define CTLNUL '\177'
+
+#if !defined (HAVE_ISBLANK) && !defined (isblank)
+#  define isblank(x)	((x) == ' ' || (x) == '\t')
+#endif
 
 #endif /* _SYNTAX_H_ */

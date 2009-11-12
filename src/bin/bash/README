@@ -1,7 +1,7 @@
 Introduction
 ============
 
-This is GNU Bash, version 2.05b.  Bash is the GNU Project's Bourne
+This is GNU Bash, version 4.0.  Bash is the GNU Project's Bourne
 Again SHell, a complete implementation of the POSIX.2 shell spec,
 but also with interactive command line editing, job control on
 architectures that support it, csh-like features such as history
@@ -11,17 +11,18 @@ type of shell, see the file `doc/bashref.texi'.  There is also a
 large Unix-style man page.  The man page is the definitive description
 of the shell's features. 
 
-See the file CWRU/POSIX.NOTES for a discussion of how Bash differs
+See the file POSIX for a discussion of how the Bash defaults differ
 from the POSIX.2 spec and a description of the Bash `posix mode'.
 
 There are some user-visible incompatibilities between this version
-of Bash and the previous widely-distributed version, bash-1.14.
-For details, see the file COMPAT.  The NEWS file tersely lists
-features that are new in this release. 
+of Bash and previous widely-distributed versions, bash-2.05b and
+bash-3.2.  For details, see the file COMPAT.  The NEWS file tersely
+lists features that are new in this release. 
 
-Bash is free software, distributed under the terms of the [GNU]
-General Public License, version 2.  For more information, see the
-file COPYING.
+Bash is free software, distributed under the terms of the [GNU] General
+Public License as published by the Free Software Foundation,
+version 3 of the License (or any later version).  For more information,
+see the file COPYING. 
 
 A number of frequently-asked questions are answered in the file
 `doc/FAQ'.
@@ -87,4 +88,4 @@ like this shell to be the best that we can make it.
 Enjoy!
 
 Chet Ramey
-chet@po.cwru.edu
+chet.ramey@case.edu

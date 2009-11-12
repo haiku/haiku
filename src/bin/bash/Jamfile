@@ -7,7 +7,7 @@ local cpuName = [ Match "([^-]*)-.*" : $(HAIKU_GCC_MACHINE) ] ;
 local vendorName = [ Match "[^-]*-([^-]*)" : $(HAIKU_GCC_MACHINE) ] ;
 local osName = [ Match "[^-]*-[^-]*-([^-]*)" : $(HAIKU_GCC_MACHINE) ] ;
 
-SubDirCcFlags -DHAVE_CONFIG_H -DPROGRAM='\"bash\"' -DSHELL ;
+SubDirCcFlags -DHAVE_CONFIG_H -DPROGRAM='\"bash\"' -DSHELL -DLOCALEDIR='\"/boot/common/share/locale\"' -DPACKAGE='\"bash\"' ;
 SubDirCcFlags -DCONF_MACHTYPE='\"$(HAIKU_GCC_MACHINE)\"' ;
 SubDirCcFlags -DCONF_HOSTTYPE='\"$(cpuName)\"' ;
 SubDirCcFlags -DCONF_VENDOR='\"$(vendorName)\"' ;
@@ -26,9 +26,9 @@ BuildPlatformMain mksyntax :
 	mksyntax.c ;
 
 BuildPlatformMain mksignames :
-	mksignames.c ;
+	mksignames.c signames.c ;
 
-SEARCH on [ FGristFiles mksignames.c ] = [ FDirName $(SUBDIR) support ] ;
+SEARCH on [ FGristFiles mksignames.c signames.c ] = [ FDirName $(SUBDIR) support ] ;
 
 rule MkSyntaxExt
 {
@@ -75,6 +75,7 @@ if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 }
 
 BinCommand bash :
+	assoc.c
 	parse.y shell.c eval.c general.c make_cmd.c print_cmd.c
 	dispose_cmd.c execute_cmd.c variables.c version.c
 	expr.c copy_cmd.c flags.c subst.c hashcmd.c hashlib.c mailcheck.c

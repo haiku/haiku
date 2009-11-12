@@ -1,35 +1,45 @@
 This file is complete.def, from which is created complete.c.
-It implements the builtins "complete" and "compgen" in Bash.
+It implements the builtins "complete", "compgen", and "compopt" in Bash.
 
-Copyright (C) 1999-2002 Free Software Foundation, Inc.
+Copyright (C) 1999-2009 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
-Bash is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along
-with Bash; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 
 $PRODUCES complete.c
 
 $BUILTIN complete
 $DEPENDS_ON PROGRAMMABLE_COMPLETION
 $FUNCTION complete_builtin
-$SHORT_DOC complete [-abcdefgjksuv] [-pr] [-o option] [-A action] [-G globpat] [-W wordlist] [-P prefix] [-S suffix] [-X filterpat] [-F function] [-C command] [name ...]
-For each NAME, specify how arguments are to be completed.
-If the -p option is supplied, or if no options are supplied, existing
-completion specifications are printed in a way that allows them to be
-reused as input.  The -r option removes a completion specification for
-each NAME, or, if no NAMEs are supplied, all completion specifications.
+$SHORT_DOC complete [-abcdefgjksuv] [-pr] [-o option] [-A action] [-G globpat] [-W wordlist]  [-F function] [-C command] [-X filterpat] [-P prefix] [-S suffix] [name ...]
+Specify how arguments are to be completed by Readline.
+
+For each NAME, specify how arguments are to be completed.  If no options
+are supplied, existing completion specifications are printed in a way that
+allows them to be reused as input.
+
+Options:
+  -p	print existing completion specifications in a reusable format
+  -r	remove a completion specification for each NAME, or, if no
+	NAMEs are supplied, all completion specifications
+
+When completion is attempted, the actions are applied in the order the
+uppercase-letter options are listed above.
+
+Exit Status:
+Returns success unless an invalid option is supplied or an error occurs.
 $END
 
 #include <config.h>
@@ -43,10 +53,12 @@ $END
 #endif
 
 #include "../bashansi.h"
+#include "../bashintl.h"
 
 #include "../shell.h"
 #include "../builtins.h"
 #include "../pcomplete.h"
+#include "../bashline.h"
 
 #include "common.h"
 #include "bashgetopt.h"
@@ -55,22 +67,31 @@ $END
 
 #define STRDUP(x)       ((x) ? savestring (x) : (char *)NULL)
 
+/* Structure containing all the non-action (binary) options; filled in by
+   build_actions(). */
+struct _optflags {
+  int pflag;
+  int rflag;
+  int Eflag;
+};
+
 static int find_compact __P((char *));
 static int find_compopt __P((char *));
 
-static int build_actions __P((WORD_LIST *, int *, int *, unsigned long *, unsigned long *));
+static int build_actions __P((WORD_LIST *, struct _optflags *, unsigned long *, unsigned long *));
 
 static int remove_cmd_completions __P((WORD_LIST *));
 
 static int print_one_completion __P((char *, COMPSPEC *));
 static int print_compitem __P((BUCKET_CONTENTS *));
+static void print_compopts __P((const char *, COMPSPEC *, int));
 static void print_all_completions __P((void));
 static int print_cmd_completions __P((WORD_LIST *));
 
 static char *Garg, *Warg, *Parg, *Sarg, *Xarg, *Farg, *Carg;
 
-static struct _compacts {
-  char *actname;
+static const struct _compacts {
+  const char * const actname;
   int actflag;
   int actopt;
 } compacts[] = {
@@ -102,14 +123,16 @@ static struct _compacts {
 };
 
 /* This should be a STRING_INT_ALIST */
-static struct _compopt {
-  char *optname;
+const static struct _compopt {
+  const char * const optname;
   int optflag;
 } compopts[] = {
+  { "bashdefault", COPT_BASHDEFAULT },
   { "default",	COPT_DEFAULT },
   { "dirnames", COPT_DIRNAMES },
   { "filenames",COPT_FILENAMES},
   { "nospace",	COPT_NOSPACE },
+  { "plusdirs", COPT_PLUSDIRS },
   { (char *)NULL, 0 },
 };
 
@@ -152,9 +175,9 @@ find_compopt (name)
 */
 
 static int
-build_actions (list, pp, rp, actp, optp)
+build_actions (list, flagp, actp, optp)
      WORD_LIST *list;
-     int *pp, *rp;
+     struct _optflags *flagp;
      unsigned long *actp, *optp;
 {
   int opt, ind, opt_given;
@@ -164,15 +187,15 @@ build_actions (list, pp, rp, actp, optp)
   opt_given = 0;
 
   reset_internal_getopt ();
-  while ((opt = internal_getopt (list, "abcdefgjko:prsuvA:G:W:P:S:X:F:C:")) != -1)
+  while ((opt = internal_getopt (list, "abcdefgjko:prsuvA:G:W:P:S:X:F:C:E")) != -1)
     {
       opt_given = 1;
       switch (opt)
 	{
 	case 'r':
-	  if (rp)
+	  if (flagp)
 	    {
-	      *rp = 1;
+	      flagp->rflag = 1;
 	      break;
 	    }
 	  else
@@ -183,9 +206,9 @@ build_actions (list, pp, rp, actp, optp)
 	    }
 
 	case 'p':
-	  if (pp)
+	  if (flagp)
 	    {
-	      *pp = 1;
+	      flagp->pflag = 1;
 	      break;
 	    }
 	  else
@@ -244,7 +267,7 @@ build_actions (list, pp, rp, actp, optp)
 	  ind = find_compact (list_optarg);
 	  if (ind < 0)
 	    {
-	      builtin_error ("%s: invalid action name", list_optarg);
+	      builtin_error (_("%s: invalid action name"), list_optarg);
 	      return (EX_USAGE);
 	    }
 	  acts |= compacts[ind].actflag;
@@ -252,6 +275,18 @@ build_actions (list, pp, rp, actp, optp)
 	case 'C':
 	  Carg = list_optarg;
 	  break;
+	case 'E':
+	  if (flagp)
+	    {
+	      flagp->Eflag = 1;
+	      break;
+	    }
+	  else
+	    {
+	      sh_invalidopt ("-E");
+	      builtin_usage ();
+	      return (EX_USAGE);
+	    }
 	case 'F':
 	  Farg = list_optarg;
 	  break;
@@ -287,9 +322,11 @@ int
 complete_builtin (list)
      WORD_LIST *list;
 {
-  int opt_given, pflag, rflag, rval;
+  int opt_given, rval;
   unsigned long acts, copts;
   COMPSPEC *cs;
+  struct _optflags oflags;
+  WORD_LIST *l, *wl;
 
   if (list == 0)
     {
@@ -297,24 +334,33 @@ complete_builtin (list)
       return (EXECUTION_SUCCESS);
     }
 
-  opt_given = pflag = rflag = 0;
+  opt_given = oflags.pflag = oflags.rflag = oflags.Eflag = 0;
+
   acts = copts = (unsigned long)0L;
   Garg = Warg = Parg = Sarg = Xarg = Farg = Carg = (char *)NULL;
   cs = (COMPSPEC *)NULL;
 
   /* Build the actions from the arguments.  Also sets the [A-Z]arg variables
      as a side effect if they are supplied as options. */
-  rval = build_actions (list, &pflag, &rflag, &acts, &copts);
+  rval = build_actions (list, &oflags, &acts, &copts);
   if (rval == EX_USAGE)
     return (rval);
   opt_given = rval != EXECUTION_FAILURE;
 
   list = loptend;
 
+  wl = oflags.Eflag ? make_word_list (make_bare_word ("_EmptycmD_"), (WORD_LIST *)NULL) : 0;
+
   /* -p overrides everything else */
-  if (pflag || (list == 0 && opt_given == 0))
+  if (oflags.pflag || (list == 0 && opt_given == 0))
     {
-      if (list == 0)
+      if (wl)
+	{
+	  rval = print_cmd_completions (wl);
+	  dispose_words (wl);
+	  return rval;
+	}
+      else if (list == 0)
 	{
 	  print_all_completions ();
 	  return (EXECUTION_SUCCESS);
@@ -323,9 +369,15 @@ complete_builtin (list)
     }
 
   /* next, -r overrides everything else. */
-  if (rflag)
+  if (oflags.rflag)
     {
-      if (list == 0)
+      if (wl)
+	{
+	  rval = remove_cmd_completions (wl);
+	  dispose_words (wl);
+	  return rval;
+	}
+      else if (list == 0)
 	{
 	  progcomp_flush ();
 	  return (EXECUTION_SUCCESS);
@@ -333,7 +385,7 @@ complete_builtin (list)
       return (remove_cmd_completions (list));
     }
 
-  if (list == 0 && opt_given)
+  if (wl == 0 && list == 0 && opt_given)
     {
       builtin_usage ();
       return (EX_USAGE);
@@ -353,13 +405,14 @@ complete_builtin (list)
   cs->command = STRDUP (Carg);
   cs->filterpat = STRDUP (Xarg);
 
-  for (rval = EXECUTION_SUCCESS ; list; list = list->next)
+  for (rval = EXECUTION_SUCCESS, l = wl ? wl : list ; l; l = l->next)
     {
       /* Add CS as the compspec for the specified commands. */
-      if (progcomp_insert (list->word->word, cs) == 0)
+      if (progcomp_insert (l->word->word, cs) == 0)
 	rval = EXECUTION_FAILURE;
     }
 
+  dispose_words (wl);
   return (rval);
 }
 
@@ -374,7 +427,7 @@ remove_cmd_completions (list)
     {
       if (progcomp_remove (l->word->word) == 0)
 	{
-	  builtin_error ("%s: no completion specification", l->word->word);
+	  builtin_error (_("%s: no completion specification"), l->word->word);
 	  ret = EXECUTION_FAILURE;
 	}
     }
@@ -415,6 +468,14 @@ remove_cmd_completions (list)
       printf ("-o %s ", f); \
   } while (0)
 
+#define XPRINTCOMPOPT(a, f) \
+  do { \
+    if (copts & a) \
+      printf ("-o %s ", f); \
+    else \
+      printf ("+o %s ", f); \
+  } while (0)
+
 static int
 print_one_completion (cmd, cs)
      char *cmd;
@@ -428,10 +489,12 @@ print_one_completion (cmd, cs)
   copts = cs->options;
 
   /* First, print the -o options. */
+  PRINTCOMPOPT (COPT_BASHDEFAULT, "bashdefault");
   PRINTCOMPOPT (COPT_DEFAULT, "default");
   PRINTCOMPOPT (COPT_DIRNAMES, "dirnames");
   PRINTCOMPOPT (COPT_FILENAMES, "filenames");
   PRINTCOMPOPT (COPT_NOSPACE, "nospace");
+  PRINTCOMPOPT (COPT_PLUSDIRS, "plusdirs");
 
   acts = cs->actions;
 
@@ -472,13 +535,47 @@ print_one_completion (cmd, cs)
   SQPRINTARG (cs->suffix, "-S");
   SQPRINTARG (cs->filterpat, "-X");
 
+  SQPRINTARG (cs->command, "-C");
+
   /* simple arguments that don't require quoting */
   PRINTARG (cs->funcname, "-F");
-  PRINTARG (cs->command, "-C");
 
   printf ("%s\n", cmd);
 
   return (0);
+}
+
+static void
+print_compopts (cmd, cs, full)
+     const char *cmd;
+     COMPSPEC *cs;
+     int full;
+{
+  int copts;
+
+  printf ("compopt ");
+  copts = cs->options;
+
+  if (full)
+    {
+      XPRINTCOMPOPT (COPT_BASHDEFAULT, "bashdefault");
+      XPRINTCOMPOPT (COPT_DEFAULT, "default");
+      XPRINTCOMPOPT (COPT_DIRNAMES, "dirnames");
+      XPRINTCOMPOPT (COPT_FILENAMES, "filenames");
+      XPRINTCOMPOPT (COPT_NOSPACE, "nospace");
+      XPRINTCOMPOPT (COPT_PLUSDIRS, "plusdirs");
+    }
+  else
+    {
+      PRINTCOMPOPT (COPT_BASHDEFAULT, "bashdefault");
+      PRINTCOMPOPT (COPT_DEFAULT, "default");
+      PRINTCOMPOPT (COPT_DIRNAMES, "dirnames");
+      PRINTCOMPOPT (COPT_FILENAMES, "filenames");
+      PRINTCOMPOPT (COPT_NOSPACE, "nospace");
+      PRINTCOMPOPT (COPT_PLUSDIRS, "plusdirs");
+    }
+
+  printf ("%s\n", cmd);
 }
 
 static int
@@ -515,21 +612,26 @@ print_cmd_completions (list)
 	print_one_completion (l->word->word, cs);
       else
 	{
-	  builtin_error ("%s: no completion specification", l->word->word);
+	  builtin_error (_("%s: no completion specification"), l->word->word);
 	  ret = EXECUTION_FAILURE;
 	}
     }
-  return (ret);
+
+  return (sh_chkwrite (ret));
 }
 
 $BUILTIN compgen
 $DEPENDS_ON PROGRAMMABLE_COMPLETION
 $FUNCTION compgen_builtin
-$SHORT_DOC compgen [-abcdefgjksuv] [-o option] [-A action] [-G globpat] [-W wordlist] [-P prefix] [-S suffix] [-X filterpat] [-F function] [-C command] [word]
-Display the possible completions depending on the options.  Intended
-to be used from within a shell function generating possible completions.
-If the optional WORD argument is supplied, matches against WORD are
-generated.
+$SHORT_DOC compgen [-abcdefgjksuv] [-o option]  [-A action] [-G globpat] [-W wordlist]  [-F function] [-C command] [-X filterpat] [-P prefix] [-S suffix] [word]
+Display possible completions depending on the options.
+
+Intended to be used from within a shell function generating possible
+completions.  If the optional WORD argument is supplied, matches against
+WORD are generated.
+
+Exit Status:
+Returns success unless an invalid option is supplied or an error occurs.
 $END
 
 int
@@ -540,7 +642,7 @@ compgen_builtin (list)
   unsigned long acts, copts;
   COMPSPEC *cs;
   STRINGLIST *sl;
-  char *word;
+  char *word, **matches;
 
   if (list == 0)
     return (EXECUTION_SUCCESS);
@@ -551,7 +653,7 @@ compgen_builtin (list)
 
   /* Build the actions from the arguments.  Also sets the [A-Z]arg variables
      as a side effect if they are supplied as options. */
-  rval = build_actions (list, (int *)NULL, (int *)NULL, &acts, &copts);
+  rval = build_actions (list, (struct _optflags *)NULL, &acts, &copts);
   if (rval == EX_USAGE)
     return (rval);
   if (rval == EXECUTION_FAILURE)
@@ -562,9 +664,9 @@ compgen_builtin (list)
   word = (list && list->word) ? list->word->word : "";
 
   if (Farg)
-    internal_warning ("compgen: -F option may not work as you expect");
+    builtin_error (_("warning: -F option may not work as you expect"));
   if (Carg)
-    internal_warning ("compgen: -C option may not work as you expect");
+    builtin_error (_("warning: -C option may not work as you expect"));
 
   /* If we get here, we need to build a compspec and evaluate it. */
   cs = compspec_create ();
@@ -583,12 +685,19 @@ compgen_builtin (list)
   rval = EXECUTION_FAILURE;
   sl = gen_compspec_completions (cs, "compgen", word, 0, 0);
 
+  /* If the compspec wants the bash default completions, temporarily
+     turn off programmable completion and call the bash completion code. */
+  if ((sl == 0 || sl->list_len == 0) && (copts & COPT_BASHDEFAULT))
+    {
+      matches = bash_default_completion (word, 0, 0, 0, 0);
+      sl = completions_to_stringlist (matches);
+      strvec_dispose (matches);
+    }
+
   /* This isn't perfect, but it's the best we can do, given what readline
      exports from its set of completion utility functions. */
   if ((sl == 0 || sl->list_len == 0) && (copts & COPT_DEFAULT))
     {
-      char **matches;
-
       matches = rl_completion_matches (word, rl_filename_completion_function);
       sl = completions_to_stringlist (matches);
       strvec_dispose (matches);
@@ -606,4 +715,115 @@ compgen_builtin (list)
 
   compspec_dispose (cs);
   return (rval);
+}
+
+$BUILTIN compopt
+$DEPENDS_ON PROGRAMMABLE_COMPLETION
+$FUNCTION compopt_builtin
+$SHORT_DOC compopt [-o|+o option] [name ...]
+Modify or display completion options.
+
+Modify the completion options for each NAME, or, if no NAMEs are supplied,
+the completion currently begin executed.  If no OPTIONs are givenm, print
+the completion options for each NAME or the current completion specification.
+
+Options:
+	-o option	Set completion option OPTION for each NAME
+
+Using `+o' instead of `-o' turns off the specified option.
+
+Arguments:
+
+Each NAME refers to a command for which a completion specification must
+have previously been defined using the `complete' builtin.  If no NAMEs
+are supplied, compopt must be called by a function currently generating
+completions, and the options for that currently-executing completion
+generator are modified.
+
+Exit Status:
+Returns success unless an invalid option is supplied or NAME does not
+have a completion specification defined.
+$END
+
+int
+compopt_builtin (list)
+     WORD_LIST *list;
+{
+  int opts_on, opts_off, *opts, opt, oind, ret, Eflag;
+  WORD_LIST *l;
+  COMPSPEC *cs;
+
+  opts_on = opts_off = 0;
+  ret = EXECUTION_SUCCESS;
+
+  reset_internal_getopt ();
+  while ((opt = internal_getopt (list, "+o:")) != EOF)
+    {
+      opts = (list_opttype == '-') ? &opts_on : &opts_off;
+
+      switch (opt)
+	{
+	case 'o':
+	  oind = find_compopt (list_optarg);
+	  if (oind < 0)
+	    {
+	      sh_invalidoptname (list_optarg);
+	      return (EX_USAGE);
+	    }
+	  *opts |= compopts[oind].optflag;
+	  break;
+	default:
+	  builtin_usage ();
+	  return (EX_USAGE);
+	}
+    }
+  list = loptend;
+
+  if (list == 0)
+    {
+      if (RL_ISSTATE (RL_STATE_COMPLETING) == 0 || pcomp_curcs == 0)
+	{
+	  builtin_error (_("not currently executing completion function"));
+	  return (EXECUTION_FAILURE);
+	}
+      cs = pcomp_curcs;
+
+      if (opts_on == 0 && opts_off == 0)
+	{
+	  print_compopts (pcomp_curcmd, cs, 1);
+          return (sh_chkwrite (ret));
+	}
+
+      /* Set the compspec options */
+      pcomp_set_compspec_options (cs, opts_on, 1);
+      pcomp_set_compspec_options (cs, opts_off, 0);
+
+      /* And change the readline variables the options control */
+      pcomp_set_readline_variables (opts_on, 1);
+      pcomp_set_readline_variables (opts_off, 0);
+
+      return (ret);
+    }
+
+  for (l = list; l; l = l->next)
+    {
+      cs = progcomp_search (l->word->word);
+      if (cs == 0)
+	{
+	  builtin_error (_("%s: no completion specification"), l->word->word);
+	  ret = EXECUTION_FAILURE;
+	  continue;
+	}
+      if (opts_on == 0 && opts_off == 0)
+	{
+	  print_compopts (l->word->word, cs, 1);
+	  continue;			/* XXX -- fill in later */
+	}
+
+      /* Set the compspec options */
+      pcomp_set_compspec_options (cs, opts_on, 1);
+      pcomp_set_compspec_options (cs, opts_off, 0);
+    }
+
+  return (ret);
 }

@@ -1,22 +1,22 @@
 /* pathexp.c -- The shell interface to the globbing library. */
 
-/* Copyright (C) 1995-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1995-2009 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "config.h"
 
@@ -34,6 +34,7 @@
 #include "flags.h"
 
 #include "shmbutil.h"
+#include "bashintl.h"
 
 #include <glob/strmatch.h>
 
@@ -52,6 +53,9 @@ int glob_dot_filenames;
 
 /* Control whether the extended globbing features are enabled. */
 int extended_glob = 0;
+
+/* Control enabling special handling of `**' */
+int glob_star = 0;
 
 /* Return nonzero if STRING has any unquoted special globbing chars in it.  */
 int
@@ -110,6 +114,55 @@ unquoted_glob_pattern_p (string)
   return (0);
 }
 
+/* Return 1 if C is a character that is `special' in a POSIX ERE and needs to
+   be quoted to match itself. */
+static inline int
+ere_char (c)
+     int c;
+{
+  switch (c)
+    {
+    case '.':
+    case '[':
+    case '\\':
+    case '(':
+    case ')':
+    case '*':
+    case '+':
+    case '?':
+    case '{':
+    case '|':
+    case '^':
+    case '$':
+      return 1;
+    default: 
+      return 0;
+    }
+  return (0);
+}
+
+int
+glob_char_p (s)
+     const char *s;
+{
+  switch (*s)
+    {
+    case '*':
+    case '[':
+    case ']':
+    case '?':
+    case '\\':
+      return 1;
+    case '+':
+    case '@':
+    case '!':
+      if (s[1] == '(')        /*(*/
+	return 1;
+      break;
+    }
+  return 0;
+}
+
 /* PATHNAME can contain characters prefixed by CTLESC; this indicates
    that the character is to be quoted.  We quote it here in the style
    that the glob library recognizes.  If flags includes QGLOB_CVTNULL,
@@ -142,6 +195,15 @@ quote_string_for_globbing (pathname, qflags)
 	{
 	  if ((qflags & QGLOB_FILENAME) && pathname[i+1] == '/')
 	    continue;
+	  if ((qflags & QGLOB_REGEXP) && ere_char (pathname[i+1]) == 0)
+	    continue;
+	  temp[j++] = '\\';
+	  i++;
+	  if (pathname[i] == '\0')
+	    break;
+	}
+      else if (pathname[i] == '\\')
+	{
 	  temp[j++] = '\\';
 	  i++;
 	  if (pathname[i] == '\0')
@@ -168,22 +230,8 @@ quote_globbing_chars (string)
   temp = (char *)xmalloc (slen * 2 + 1);
   for (t = temp, s = string; *s; )
     {
-      switch (*s)
-	{
-	case '*':
-	case '[':
-	case ']':
-	case '?':
-	case '\\':
-	  *t++ = '\\';
-	  break;
-	case '+':
-	case '@':
-	case '!':
-	  if (s[1] == '(')	/*(*/
-	    *t++ = '\\';
-	  break;
-	}
+      if (glob_char_p (s))
+	*t++ = '\\';
 
       /* Copy a single (possibly multibyte) character from s to t,
          incrementing both. */
@@ -251,7 +299,7 @@ shell_glob_filename (pathname)
   noglob_dot_filenames = glob_dot_filenames == 0;
 
   temp = quote_string_for_globbing (pathname, QGLOB_FILENAME);
-  results = glob_filename (temp, 0);
+  results = glob_filename (temp, glob_star ? GX_GLOBSTAR : 0);
   free (temp);
 
   if (results && ((GLOB_FAILED (results)) == 0))

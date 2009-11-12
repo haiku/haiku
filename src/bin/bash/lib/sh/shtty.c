@@ -1,24 +1,24 @@
+/*
+ * shtty.c -- abstract interface to the terminal, focusing on capabilities.
+ */
+
 /* Copyright (C) 1999 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
-   Bash is free software; you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
-   version.
+   Bash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-   Bash is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   for more details.
+   Bash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with Bash; see the file COPYING.  If not, write to the Free Software
-   Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
-
-/*
- * shtty.c -- abstract interface to the terminal, focusing on capabilities.
- */
+   You should have received a copy of the GNU General Public License
+   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #ifdef HAVE_CONFIG_H
 #  include <config.h>
@@ -85,7 +85,7 @@ ttrestore()
   ttsaved = 0;
 }
 
-/* Retrieve the attributes associated with tty fd FD. */
+/* Retrieve the internally-saved attributes associated with tty fd FD. */
 TTYSTRUCT *
 ttattr (fd)
      int fd;
@@ -149,6 +149,17 @@ tt_setonechar(ttp)
   return 0;
 }
 
+/* Set the tty associated with FD and TTP into one-character-at-a-time mode */
+int
+ttfd_onechar (fd, ttp)
+     int fd;
+     TTYSTRUCT *ttp;
+{
+  if (tt_setonechar(ttp) < 0)
+    return -1;
+  return (ttsetattr (fd, ttp));
+}
+
 /* Set the terminal into one-character-at-a-time mode */
 int
 ttonechar ()
@@ -158,9 +169,7 @@ ttonechar ()
   if (ttsaved == 0)
     return -1;
   tt = ttin;
-  if (tt_setonechar(&tt) < 0)
-    return -1;
-  return (ttsetattr (0, &tt));
+  return (ttfd_onechar (0, &tt));
 }
 
 /*
@@ -180,6 +189,17 @@ tt_setnoecho(ttp)
   return 0;
 }
 
+/* Set the tty associated with FD and TTP into no-echo mode */
+int
+ttfd_noecho (fd, ttp)
+     int fd;
+     TTYSTRUCT *ttp;
+{
+  if (tt_setnoecho (ttp) < 0)
+    return -1;
+  return (ttsetattr (fd, ttp));
+}
+
 /* Set the terminal into no-echo mode */
 int
 ttnoecho ()
@@ -189,9 +209,7 @@ ttnoecho ()
   if (ttsaved == 0)
     return -1;
   tt = ttin;
-  if (tt_setnoecho (&tt) < 0)
-    return -1;
-  return (ttsetattr (0, &tt));
+  return (ttfd_noecho (0, &tt));
 }
 
 /*
@@ -213,6 +231,17 @@ tt_seteightbit (ttp)
   return 0;
 }
 
+/* Set the tty associated with FD and TTP into eight-bit mode */
+int
+ttfd_eightbit (fd, ttp)
+     int fd;
+     TTYSTRUCT *ttp;
+{
+  if (tt_seteightbit (ttp) < 0)
+    return -1;
+  return (ttsetattr (fd, ttp));
+}
+
 /* Set the terminal into eight-bit mode */
 int
 tteightbit ()
@@ -222,9 +251,7 @@ tteightbit ()
   if (ttsaved == 0)
     return -1;
   tt = ttin;
-  if (tt_seteightbit (&tt) < 0)
-    return -1;
-  return (ttsetattr (0, &tt));
+  return (ttfd_eightbit (0, &tt));
 }
 
 /*
@@ -242,6 +269,17 @@ tt_setnocanon (ttp)
   return 0;
 }
 
+/* Set the tty associated with FD and TTP into non-canonical mode */
+int
+ttfd_nocanon (fd, ttp)
+     int fd;
+     TTYSTRUCT *ttp;
+{
+  if (tt_setnocanon (ttp) < 0)
+    return -1;
+  return (ttsetattr (fd, ttp));
+}
+
 /* Set the terminal into non-canonical mode */
 int
 ttnocanon ()
@@ -251,9 +289,7 @@ ttnocanon ()
   if (ttsaved == 0)
     return -1;
   tt = ttin;
-  if (tt_setnocanon (&tt) < 0)
-    return -1;
-  return (ttsetattr (0, &tt));
+  return (ttfd_nocanon (0, &tt));
 }
 
 /*
@@ -269,6 +305,18 @@ tt_setcbreak(ttp)
   return (tt_setnoecho (ttp));
 }
 
+/* Set the tty associated with FD and TTP into cbreak (no-echo,
+   one-character-at-a-time) mode */
+int
+ttfd_cbreak (fd, ttp)
+     int fd;
+     TTYSTRUCT *ttp;
+{
+  if (tt_setcbreak (ttp) < 0)
+    return -1;
+  return (ttsetattr (fd, ttp));
+}
+
 /* Set the terminal into cbreak (no-echo, one-character-at-a-time) mode */
 int
 ttcbreak ()
@@ -278,7 +326,5 @@ ttcbreak ()
   if (ttsaved == 0)
     return -1;
   tt = ttin;
-  if (tt_setcbreak (&tt) < 0)
-    return -1;
-  return (ttsetattr (0, &tt));
+  return (ttfd_cbreak (0, &tt));
 }
