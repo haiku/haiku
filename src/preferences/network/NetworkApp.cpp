@@ -15,6 +15,7 @@
 NetworkApp::NetworkApp()
 	: BApplication("application/x-vnd.Haiku-Network")
 {
+	be_locale->GetAppCatalog(&fCatalog);
 }
 
 NetworkApp::~NetworkApp()

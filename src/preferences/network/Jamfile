@@ -9,6 +9,15 @@ Preference Network :
 	EthernetSettingsView.cpp
 	Settings.cpp
 
-	: be $(HAIKU_NETWORK_LIBS) $(TARGET_LIBSUPC++)
+	: be $(HAIKU_NETWORK_LIBS) $(TARGET_LIBSUPC++) liblocale.so
 	: Network.rdef
 ;
+
+DoCatalogs Network :
+	x-vnd.Haiku-Network
+	:
+	EthernetSettingsView.cpp
+	NetworkWindow.cpp
+	: en.catalog
+	: fr.catkeys
+	;

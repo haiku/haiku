@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 #include "NetworkWindow.h"
 
@@ -26,6 +28,7 @@ class NetworkApp : public BApplication {
 		virtual void ReadyToRun();
 	private:
 		NetworkWindow	*fEthWindow;
+		BCatalog	fCatalog;
 };
 
 
