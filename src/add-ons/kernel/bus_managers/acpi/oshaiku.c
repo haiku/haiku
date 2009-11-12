@@ -645,7 +645,7 @@ AcpiOsCreateLock(ACPI_SPINLOCK *outHandle)
 	if (*outHandle == NULL)
 		return AE_NO_MEMORY;
 	
-	**outHandle = 0;
+	**outHandle = B_SPINLOCK_INITIALIZER;
 	return AE_OK;
 }
 
