@@ -139,6 +139,11 @@ struct termios {
 #define NOFLSH		0x80			/* Disable flush after int or quit */
 #define TOSTOP		0x100			/* stop bg processes that write to tty */
 #define IEXTEN		0x200			/* implementation defined extensions */
+#define ECHOCTL		0x400
+#define ECHOPRT		0x800
+#define ECHOKE		0x1000
+#define FLUSHO		0x2000
+#define PENDIN		0x4000
 
 /* options to tcsetattr() */
 #define TCSANOW		0x01			/* make change immediate */
