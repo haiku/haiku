@@ -398,9 +398,6 @@ Inode::~Inode()
 	file_map_delete(Map());
 	delete fTree;
 
-	if ((Flags() & INODE_DELETED) != 0)
-		fVolume->RemovedInodes().Remove(this);
-
 	rw_lock_destroy(&fLock);
 }
 
