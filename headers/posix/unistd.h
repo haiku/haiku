@@ -135,6 +135,9 @@ extern int		dup2(int fd1, int fd2);
 extern int		close(int fd);
 extern int		link(const char *name, const char *new_name);
 extern int		unlink(const char *name);
+#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
+extern int		unlinkat(int fd, const char *path, int flag);
+#endif
 extern int		rmdir(const char *path);
 
 extern ssize_t  readlink(const char *path, char *buffer, size_t bufferSize);
@@ -142,7 +145,10 @@ extern ssize_t  readlink(const char *path, char *buffer, size_t bufferSize);
 extern ssize_t	readlinkat(int fd, const char *path, char *buffer,
 					size_t bufferSize);
 #endif
-extern int      symlink(const char *from, const char *to);
+extern int      symlink(const char *toPath, const char *symlinkPath);
+#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
+extern int		symlinkat(const char *toPath, int fd, const char *symlinkPath);
+#endif
 
 extern int      ftruncate(int fd, off_t newSize);
 extern int      truncate(const char *path, off_t newSize);

@@ -101,6 +101,10 @@ struct stat {
 #define	DEFFILEMODE	(S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)
 	/* default file mode, everyone can read/write */
 
+/* special values for timespec::tv_nsec passed to utimensat(), futimens() */
+#define UTIME_NOW	1000000000
+#define UTIME_OMIT	1000000001
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -114,8 +118,17 @@ extern int		lstat(const char *path, struct stat *st);
 extern int		fstatat(int fd, const char *path, struct stat *st, int flag);
 #endif
 extern int		mkdir(const char *path, mode_t mode);
+#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
+extern int		mkdirat(int fd, const char *path, mode_t mode);
+#endif
 extern int		mkfifo(const char *path, mode_t mode);
 extern mode_t	umask(mode_t cmask);
+
+#ifdef B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT
+extern int		utimensat(int fd, const char *path,
+					const struct timespec times[2], int flag);
+#endif
+extern int		futimens(int fd, const struct timespec times[2]);
 
 #ifdef __cplusplus
 }

@@ -10,14 +10,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <syscalls.h>
-
-
-#define RETURN_AND_SET_ERRNO(err) \
-	if (err < 0) { \
-		errno = err; \
-		return -1; \
-	} \
-	return err;
+#include <syscall_utils.h>
 
 
 ssize_t
@@ -56,11 +49,28 @@ symlink(const char *toPath, const char *symlinkPath)
 
 
 int
+symlinkat(const char *toPath, int fd, const char *symlinkPath)
+{
+	RETURN_AND_SET_ERRNO(_kern_create_symlink(fd, symlinkPath, toPath, 0));
+}
+
+
+int
 unlink(const char *path)
 {
 	int status = _kern_unlink(-1, path);
 
 	RETURN_AND_SET_ERRNO(status);
+}
+
+
+int
+unlinkat(int fd, const char *path, int flag)
+{
+	if ((flag & AT_REMOVEDIR) != 0)
+		RETURN_AND_SET_ERRNO(_kern_remove_dir(fd, path));
+	else
+		RETURN_AND_SET_ERRNO(_kern_unlink(fd, path));
 }
 
 

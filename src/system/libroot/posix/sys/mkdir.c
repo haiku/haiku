@@ -4,25 +4,26 @@
  */
 
 
+#define B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT 1
+	// make the *at() functions and AT_* macros visible
+
 #include <sys/stat.h>
 #include <errno.h>
 
 #include <syscalls.h>
+#include <syscall_utils.h>
 #include <umask.h>
-
-
-#define RETURN_AND_SET_ERRNO(err) \
-	if (err < 0) { \
-		errno = err; \
-		return -1; \
-	} \
-	return err;
 
 
 int
 mkdir(const char* path, mode_t mode)
 {
-	status_t status = _kern_create_dir(-1, path, mode & ~__gUmask);
+	RETURN_AND_SET_ERRNO(_kern_create_dir(-1, path, mode & ~__gUmask));
+}
 
-	RETURN_AND_SET_ERRNO(status);
+
+int
+mkdirat(int fd, const char *path, mode_t mode)
+{
+	RETURN_AND_SET_ERRNO(_kern_create_dir(fd, path, mode & ~__gUmask));
 }

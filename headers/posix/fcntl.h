@@ -70,6 +70,7 @@
 #define AT_SYMLINK_NOFOLLOW	0x1		/* fstatat(), fchmodat(), fchownat(),
 										utimensat() */
 #define AT_SYMLINK_FOLLOW	0x2		/* linkat() */
+#define AT_REMOVEDIR		0x04	/* unlinkat() */
 #endif
 
 /* advisory file locking */
