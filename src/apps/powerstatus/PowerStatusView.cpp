@@ -359,19 +359,28 @@ PowerStatusView::Update(bool force)
 			char text[256];
 			const char* open = "";
 			const char* close = "";
-			if (!fOnline) {
+			if (fOnline) {
 				open = "(";
 				close = ")";
 			}
 			if (fHasBattery) {
-				size_t length = snprintf(text, sizeof(text), "%s%ld%%%s\n",
+				size_t length = snprintf(text, sizeof(text), "%s%ld%%%s",
 					open, fPercent, close);
 				if (fTimeLeft) {
 					length += snprintf(text + length, sizeof(text) - length,
-						"%ld:%02ld\n", fTimeLeft / 3600, (fTimeLeft / 60) % 60);
+						"\n%ld:%02ld", fTimeLeft / 3600, (fTimeLeft / 60) % 60);
 				}
-				length += snprintf(text + length, sizeof(text) - length, "%s",
-					!fOnline ? "charging" : "discharging");
+
+				const char* state = NULL;
+				if ((fBatteryInfo.state & BATTERY_CHARGING) != 0)
+					state = "charging";
+				else if ((fBatteryInfo.state & BATTERY_DISCHARGING) != 0)
+					state = "discharging";
+
+				if (state != NULL) {
+					snprintf(text + length, sizeof(text) - length, "\n%s",
+						state);
+				}
 			} else
 				strcpy(text, "no battery");
 			SetToolTip(text);
