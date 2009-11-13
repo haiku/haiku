@@ -655,7 +655,10 @@ void
 BListView::SetFont(const BFont* font, uint32 mask)
 {
 	BView::SetFont(font, mask);
-	_FontChanged();
+	//_FontChanged();
+		// TODO: this absolutely kills the performance, if a BListItem
+		// changes the font when drawing - if this should be called at all,
+		// it should only be done outside any updates!
 }
 
 
