@@ -218,6 +218,7 @@ SubInclude HAIKU_TOP src bin mkdepend ;
 SubInclude HAIKU_TOP src bin mkdos ;
 SubInclude HAIKU_TOP src bin mkfs ;
 SubInclude HAIKU_TOP src bin multiuser ;
+SubInclude HAIKU_TOP src bin package ;
 SubInclude HAIKU_TOP src bin patch ;
 SubInclude HAIKU_TOP src bin pc ;
 SubInclude HAIKU_TOP src bin pcmcia-cs ;

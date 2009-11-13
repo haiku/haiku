@@ -1,0 +1,25 @@
+SubDir HAIKU_TOP src bin package ;
+
+UsePrivateHeaders kernel shared ;
+UsePrivateHeaders haiku_package ;
+
+DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
+	# TODO: Remove when it is complete!
+
+BinCommand package :
+	command_create.cpp
+	command_dump.cpp
+	command_extract.cpp
+	command_list.cpp
+	DataReader.cpp
+	package.cpp
+	PackageData.cpp
+	PackageDataReader.cpp
+	PackageEntry.cpp
+	PackageEntryAttribute.cpp
+	PackageReader.cpp
+	PackageWriter.cpp
+	Strings.cpp
+	:
+	$(TARGET_LIBSUPC++)
+;
