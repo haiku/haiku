@@ -6,7 +6,6 @@
 #define _BTCOREDATA_H
 
 #include <module.h>
-#include <lock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/DoublyLinkedQueue.h>
 
@@ -31,9 +30,6 @@ typedef enum _connection_status {
 #ifdef __cplusplus
 
 struct HciConnection : DoublyLinkedListLinkImpl<HciConnection> {
-	HciConnection();
-	virtual ~HciConnection();
-
 	hci_id				Hid;
 	struct net_device*  ndevice;
 	net_buffer*			currentRxPacket;
@@ -48,8 +44,6 @@ struct HciConnection : DoublyLinkedListLinkImpl<HciConnection> {
 	DoublyLinkedList<L2capChannel> ChannelList;
 	DoublyLinkedList<L2capFrame> ExpectedResponses;
 	DoublyLinkedList<L2capFrame> OutGoingFrames;
-	mutex				fLock;
-	mutex				fLockExpected;
 };
 
 #else
@@ -90,7 +84,7 @@ struct L2capChannel : DoublyLinkedListLinkImpl<L2capChannel> {
 	uint16				psm;
 	uint8				ident;
 	uint8				cfgState;
-
+	
 	channel_status		state;
 	ChannelConfiguration*	configuration;
 	L2capEndpoint*		endpoint;
@@ -160,10 +154,9 @@ struct bluetooth_core_data_module_info {
 	struct L2capFrame*		(*SignalByIdent)(struct HciConnection* conn, uint8 ident);
 	status_t		(*TimeoutSignal)(struct L2capFrame* frame, uint32 timeo);
 	status_t		(*UnTimeoutSignal)(struct L2capFrame* frame);
-	struct L2capFrame*		(*SpawnFrame)(struct HciConnection* conn, struct L2capChannel* channel, net_buffer* buffer, frame_type frame);
+	struct L2capFrame*		(*SpawnFrame)(struct HciConnection* conn, net_buffer* buffer, frame_type frame);
 	struct L2capFrame*		(*SpawnSignal)(struct HciConnection* conn, struct L2capChannel* channel, net_buffer* buffer, uint8 ident, uint8 code);
 	status_t		(*AcknowledgeSignal)(struct L2capFrame* frame);
-	status_t		(*QueueSignal)(struct L2capFrame* frame);
 
 };
 
