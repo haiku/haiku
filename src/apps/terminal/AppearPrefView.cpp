@@ -211,13 +211,14 @@ IsFontUsable(const BFont &font)
 	if (font.IsFixed())
 		return true;
 	
-	//font_height fontHeight;
-	
 	// manually check if all applicable chars are the same width
 	char buffer[2] = { ' ', 0 };
 	int firstWidth = (int)ceilf(font.StringWidth(buffer));
+	
+	// TODO: Workaround for broken fonts/font_subsystem
 	if (firstWidth <= 0)
 		return false;
+		
 	for (int c = ' '+1; c <= 0x7e; c++) {
 		buffer[0] = c;
 		int width = (int)ceilf(font.StringWidth(buffer));
