@@ -371,7 +371,7 @@ PowerStatusView::Update(bool force)
 						"%ld:%02ld\n", fTimeLeft / 3600, (fTimeLeft / 60) % 60);
 				}
 				length += snprintf(text + length, sizeof(text) - length, "%s",
-					fOnline ? "charging" : "discharging");
+					!fOnline ? "charging" : "discharging");
 			} else
 				strcpy(text, "no battery");
 			SetToolTip(text);
