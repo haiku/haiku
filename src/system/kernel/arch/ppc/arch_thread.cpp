@@ -27,9 +27,9 @@
 static struct arch_thread sInitialState;
 
 // Helper function for thread creation, defined in arch_asm.S.
-extern void ppc_kernel_thread_root();
+extern "C" void ppc_kernel_thread_root();
 
-extern void ppc_switch_stack_and_call(addr_t newKstack, void (*func)(void *),
+extern "C" void ppc_switch_stack_and_call(addr_t newKstack, void (*func)(void *),
 	void *arg);
 
 
