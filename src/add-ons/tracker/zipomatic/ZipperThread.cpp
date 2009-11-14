@@ -12,9 +12,11 @@
 
 #include <errno.h>
 #include <signal.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <FindDirectory.h> 
+#include <Locker.h>
 #include <Message.h>
 #include <Path.h>
 #include <Volume.h>
@@ -34,9 +36,6 @@ ZipperThread::ZipperThread(BMessage* refsMessage, BWindow* window)
 	fOutputFile(NULL)
 {
 	fThreadDataStore = new BMessage(*refsMessage);
-		// leak?
-		// prevents bug with B_SIMPLE_DATA
-		// (drag&drop messages)
 }
 
 
@@ -48,9 +47,6 @@ ZipperThread::~ZipperThread()
 status_t
 ZipperThread::ThreadStartup()
 {
-	BString archiveName = "Archive.zip";
-
-	// do all refs have the same parent dir?
 	type_code type = B_REF_TYPE;
 	int32 refCount = 0;
 	entry_ref ref;
@@ -58,23 +54,17 @@ ZipperThread::ThreadStartup()
 	bool sameFolder = true;
 
 	status_t status = fThreadDataStore->GetInfo("refs", &type, &refCount);
-	if (status != B_OK)
-		return status;
+	if (status != B_OK || refCount < 1) {
+		_SendMessageToWindow(ZIPPO_THREAD_EXIT_ERROR);
+		Quit();
+		return B_ERROR;
+	}
 
 	for	(int index = 0; index < refCount; index++) {
 		fThreadDataStore->FindRef("refs", index, &ref);
 
 		if (index > 0) {
-			BEntry entry(&ref);
-			if (entry.IsSymLink()) {
-				entry.SetTo(&ref, true);
-				entry_ref target;
-				entry.GetRef(&target);
-				if (lastRef.directory != target.directory) {
-					sameFolder = false;
-					break;
-				}
-			} else if (lastRef.directory != ref.directory) {
+			if (lastRef.directory != ref.directory) {
 				sameFolder = false;
 				break;
 			}
@@ -82,8 +72,27 @@ ZipperThread::ThreadStartup()
 		lastRef = ref;
 	}
 
-	// change active dir
-	if (sameFolder) {
+	entry_ref dirRef;
+	bool gotDirRef = false;
+
+	status = fThreadDataStore->FindRef("dir_ref", 0, &dirRef);
+	if (status == B_OK) {
+		BEntry dirEntry(&dirRef);
+		BNode dirNode(&dirRef);
+
+		if (dirEntry.InitCheck() == B_OK
+			&& dirEntry.Exists()
+			&& dirNode.InitCheck() == B_OK
+			&& dirNode.IsDirectory())
+			gotDirRef = true;
+	}
+
+	if (gotDirRef) {
+		BEntry entry(&dirRef);
+		BPath path;
+		entry.GetPath(&path);
+		chdir(path.Path());
+	} else if (sameFolder) {
 		BEntry entry(&lastRef);
 		BPath path;
 		entry.GetParent(&entry);
@@ -95,10 +104,28 @@ ZipperThread::ThreadStartup()
 			chdir(path.Path());
 	}
 
-	// archive filename
-	if (refCount == 1) {
+	BString archiveName;
+
+	if (refCount > 1)
+		archiveName = "Archive";
+	else
 		archiveName = lastRef.name;
-		archiveName += ".zip";			
+
+	int index = 1;
+	for (;; index++) {
+		BString tryName = archiveName;
+
+		if (index != 1)
+			tryName << " " << index;
+
+		tryName << ".zip";
+
+		BEntry entry(tryName.String());
+		if (!entry.Exists()) {
+			archiveName = tryName;
+			entry.GetRef(&fOutputEntryRef);
+			break;
+		}
 	}
 
 	int32 argc = refCount + 3;
@@ -108,15 +135,12 @@ ZipperThread::ThreadStartup()
 	argv[1] = strdup("-ry");
 	argv[2] = strdup(archiveName.String());
 
-	// files to zip
 	for (int index = 0; index < refCount; index++) {
 		fThreadDataStore->FindRef("refs", index, &ref);
 
-		if (sameFolder) {
-			// just the file name
+		if (gotDirRef || sameFolder) {
 			argv[3 + index]	= strdup(ref.name);
 		} else {
-			// full path
 			BPath path(&ref);
 			BString file = path.Path();
 			argv[3 + index]	= strdup(path.Path());
@@ -138,8 +162,6 @@ ZipperThread::ThreadStartup()
 	if (fOutputFile == NULL)
 		return errno;
 
-	archiveName.Prepend("Creating archive: ");
-
 	_SendMessageToWindow(ZIPPO_TASK_DESCRIPTION, "archive_filename",
 		archiveName.String());
 	_SendMessageToWindow(ZIPPO_LINE_OF_STDOUT, "zip_output",
@@ -152,8 +174,6 @@ ZipperThread::ThreadStartup()
 status_t
 ZipperThread::ExecuteUnit()
 {
-	// read output from /bin/zip
-	// send it to window
 	char buffer[4096];
 
 	char* output = fgets(buffer, sizeof(buffer) - 1, fOutputFile);
@@ -185,6 +205,8 @@ ZipperThread::ThreadShutdown()
 	close(fStdOut); 
 	close(fStdErr);
 
+	// _SelectInTracker();
+
 	return B_OK;
 }
 
@@ -192,7 +214,6 @@ ZipperThread::ThreadShutdown()
 void
 ZipperThread::ThreadStartupFailed(status_t status)
 {
-	ErrorMessage("ZipperThread::ThreadStartupFailed() \n", status);
 	Quit();
 }
 
@@ -200,8 +221,6 @@ ZipperThread::ThreadStartupFailed(status_t status)
 void
 ZipperThread::ExecuteUnitFailed(status_t status)
 {
-	ErrorMessage("ZipperThread::ExecuteUnitFailed() \n", status);
-
 	if (status == EOF) {
 		// thread has finished, been quit or killed, we don't know
 		_SendMessageToWindow(ZIPPO_THREAD_EXIT);
@@ -217,7 +236,8 @@ ZipperThread::ExecuteUnitFailed(status_t status)
 void
 ZipperThread::ThreadShutdownFailed(status_t status)
 {
-	ErrorMessage("ZipperThread::ThreadShutdownFailed() \n", status);
+	fprintf(stderr, "ZipperThread::ThreadShutdownFailed(): %s\n",
+		strerror(status));
 }
 
 
@@ -234,68 +254,78 @@ thread_id
 ZipperThread::_PipeCommand(int argc, const char** argv, int& in, int& out,
 	int& err, const char** envp)
 {
-	// This function was originally written by Peter Folk <pfolk@uni.uiuc.edu>
-	// and published in the BeDevTalk FAQ
-	// http://www.abisoft.com/faq/BeDevTalk_FAQ.html#FAQ-209
+	static BLocker lock;
 
-	thread_id thread;
+	if (lock.Lock()) {
+		// This function was originally written by Peter Folk
+		// <pfolk@uni.uiuc.edu> and published in the BeDevTalk FAQ
+		// http://www.abisoft.com/faq/BeDevTalk_FAQ.html#FAQ-209
 
-	// Save current FDs
-	int oldIn = dup(STDIN_FILENO);
-	int oldOut = dup(STDOUT_FILENO);
-	int oldErr = dup(STDERR_FILENO);
+		thread_id thread;
 
-	int inPipe[2], outPipe[2], errPipe[2];
+		// Save current FDs
+		int oldIn = dup(STDIN_FILENO);
+		int oldOut = dup(STDOUT_FILENO);
+		int oldErr = dup(STDERR_FILENO);
 
-	// Create new pipe FDs as stdin, stdout, stderr
-	if (pipe(inPipe) < 0)
-		goto err1;
-	if (pipe(outPipe) < 0)
-		goto err2;
-	if (pipe(errPipe) < 0)
-		goto err3;
+		int inPipe[2], outPipe[2], errPipe[2];
 
-	errno = 0;
+		// Create new pipe FDs as stdin, stdout, stderr
+		if (pipe(inPipe) < 0)
+			goto err1;
+		if (pipe(outPipe) < 0)
+			goto err2;
+		if (pipe(errPipe) < 0)
+			goto err3;
 
-	// replace old stdin/stderr/stdout
-	dup2(inPipe[0], STDIN_FILENO);
-	close(inPipe[0]);
-	dup2(outPipe[1], STDOUT_FILENO);
-	close(outPipe[1]);
-	dup2(errPipe[1], STDERR_FILENO);
-	close(errPipe[1]);
+		errno = 0;
 
-	if (errno == 0) {
-		in = inPipe[1];		// Write to in, appears on cmd's stdin 
-		out = outPipe[0];	// Read from out, taken from cmd's stdout 
-		err = errPipe[0];	// Read from err, taken from cmd's stderr 
+		// replace old stdin/stderr/stdout
+		dup2(inPipe[0], STDIN_FILENO);
+		close(inPipe[0]);
+		dup2(outPipe[1], STDOUT_FILENO);
+		close(outPipe[1]);
+		dup2(errPipe[1], STDERR_FILENO);
+		close(errPipe[1]);
 
-		// execute command
-		thread = load_image(argc, argv, envp);
+		if (errno == 0) {
+			in = inPipe[1];		// Write to in, appears on cmd's stdin 
+			out = outPipe[0];	// Read from out, taken from cmd's stdout 
+			err = errPipe[0];	// Read from err, taken from cmd's stderr 
+
+			// execute command
+			thread = load_image(argc, argv, envp);
+		} else {
+			thread = errno;
+		}
+
+		// Restore old FDs
+		dup2(oldIn, STDIN_FILENO);
+		close(oldIn);
+		dup2(oldOut, STDOUT_FILENO);
+		close(oldOut);
+		dup2(oldErr, STDERR_FILENO);
+		close(oldErr);
+
+		lock.Unlock();
+		return thread;
+
+	err3:
+		close(outPipe[0]);
+		close(outPipe[1]);
+	err2:
+		close(inPipe[0]);
+		close(inPipe[1]);
+	err1:
+		close(oldIn);
+		close(oldOut);
+		close(oldErr);
+
+		lock.Unlock();
+		return errno;
 	} else {
-		thread = errno;
+		return B_ERROR;
 	}
-
-	// Restore old FDs
-	dup2(oldIn, STDIN_FILENO);
-	close(oldIn);
-	dup2(oldOut, STDOUT_FILENO);
-	close(oldOut);
-	dup2(oldErr, STDERR_FILENO);
-	close(oldErr);
-	return thread;
-
-err3:
-	close(outPipe[0]);
-	close(outPipe[1]);
-err2:
-	close(inPipe[0]);
-	close(inPipe[1]);
-err1:
-	close(oldIn);
-	close(oldOut);
-	close(oldErr);
-	return errno;
 }
 
 
@@ -362,6 +392,126 @@ ZipperThread::WaitOnExternalZip()
 
 	if (status == B_OK && !strcmp(info.name, "zip"))
 		return wait_for_thread(fZipProcess, &status);
+
+	return status;
+}
+
+
+status_t
+ZipperThread::_SelectInTracker(int32 tryNumber)
+{
+	// work in progress - unreliable - not ready to be used
+
+	entry_ref parentRef;
+	BEntry entry(&fOutputEntryRef);
+
+	if (!entry.Exists())
+		return B_FILE_NOT_FOUND;
+
+	entry.GetParent(&entry);
+	entry.GetRef(&parentRef);
+
+	BMessenger trackerMessenger("application/x-vnd.Be-TRAK");
+	if (!trackerMessenger.IsValid())
+		return B_ERROR;
+	
+	BMessage request;
+	BMessage reply;
+	status_t status;
+
+	if (tryNumber == 0) {
+		request.MakeEmpty();
+		request.what = B_REFS_RECEIVED;
+		request.AddRef("refs", &parentRef);
+		trackerMessenger.SendMessage(&request, &reply);
+	}
+
+	if (tryNumber > 20)
+		return B_ERROR;
+
+	snooze(200000);
+
+	// find out the number of Tracker windows
+	request.MakeEmpty();
+	request.what = B_COUNT_PROPERTIES;
+	request.AddSpecifier("Window");
+	reply.MakeEmpty();
+
+	status = trackerMessenger.SendMessage(&request, &reply);
+	if (status != B_OK)
+		return status;
+
+	int32 windowCount;
+	status = reply.FindInt32("result", &windowCount);
+	if (status != B_OK)
+		return status;
+
+	// find a likely parent window
+	bool foundWindow = false;
+	int32 index = 0;
+	for (; index < windowCount; index++) {
+		request.MakeEmpty();
+		request.what = B_GET_PROPERTY;
+		request.AddSpecifier("Path");
+		request.AddSpecifier("Poses");
+		request.AddSpecifier("Window", index);
+		reply.MakeEmpty();
+
+		status = trackerMessenger.SendMessage(&request, &reply);
+		if (status != B_OK)
+			continue;
+
+		entry_ref windowRef;
+		status = reply.FindRef("result", &windowRef);
+		if (status != B_OK)
+			continue;
+
+		if (windowRef == parentRef) {
+			foundWindow = true;
+			break;
+		}
+	}
+
+	if (!foundWindow)
+		return _SelectInTracker(tryNumber + 1);
+
+	// find entry_ref in window - a newly opened window might
+	// be filling and the entry_ref perhaps not there yet?
+	request.MakeEmpty();
+	request.what = B_GET_PROPERTY;
+	request.AddSpecifier("Entry");
+	request.AddSpecifier("Poses");
+	request.AddSpecifier("Window", index);
+	reply.MakeEmpty();
+
+	status = trackerMessenger.SendMessage(&request, &reply);
+	if (status != B_OK)
+		return _SelectInTracker(tryNumber + 1);
+
+	bool foundRef = false;
+	entry_ref ref;
+	for (int32 m = 0;; m++) {
+		status = reply.FindRef("result", m, &ref);
+		if (status != B_OK)
+			break;
+		if (ref == fOutputEntryRef)
+			foundRef = true;
+	}
+
+	// if entry_ref not found in window, start over
+	if (!foundRef)
+		return _SelectInTracker(tryNumber + 1);
+
+	// select archive file in Tracker window
+	request.MakeEmpty();
+	request.what = B_SET_PROPERTY;
+	request.AddRef("data", &fOutputEntryRef);
+	request.AddSpecifier("Selection");
+	request.AddSpecifier("Poses");
+	request.AddSpecifier("Window", index);
+	reply.MakeEmpty();
+
+	status = trackerMessenger.SendMessage(&request, &reply);
 
 	return status;
 }

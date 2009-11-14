@@ -21,6 +21,7 @@
 #include <LayoutBuilder.h>
 #include <Path.h>
 #include <Roster.h>
+#include <Screen.h>
 #include <SeparatorView.h>
 #include <String.h>
 
@@ -30,12 +31,13 @@
 #include "ZipperThread.h"
 
 
-ZippoWindow::ZippoWindow(BRect frame, BMessage* refs)
+ZippoWindow::ZippoWindow(BList windowList, bool keepOpen)
 	:
-	BWindow(frame, "Zip-O-Matic", B_TITLED_WINDOW,
+	BWindow(BRect(0, 0, 0, 0), "Zip-O-Matic", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE	| B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE),
+	fWindowList(windowList),
 	fThread(NULL),
-	fWindowGotRefs(false),
+	fKeepOpen(keepOpen),
 	fZippingWasStopped(false),
 	fFileCount(0),
 	fWindowInvoker(new BInvoker(new BMessage(ZIPPO_QUIT_OR_CONTINUE), NULL,
@@ -70,10 +72,7 @@ ZippoWindow::ZippoWindow(BRect frame, BMessage* refs)
 			.End()
 		.End();
 
-	if (refs != NULL) {
-		fWindowGotRefs = true;
-		_StartZipping(refs);
-	}
+	_FindBestPlacement();
 }
 
 
@@ -88,9 +87,6 @@ ZippoWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_REFS_RECEIVED:
-			_StartZipping(message);
-			break;
-
 		case B_SIMPLE_DATA:
 			if (IsZipping()) {	
 				message->what = B_REFS_RECEIVED;	
@@ -125,8 +121,11 @@ ZippoWindow::MessageReceived(BMessage* message)
 		case ZIPPO_TASK_DESCRIPTION:
 		{
 			BString string;
-			if (message->FindString("archive_filename", &string) == B_OK)
+			if (message->FindString("archive_filename", &string) == B_OK) {
+				fArchiveName = string;
+				string.Prepend("Creating archive: ");
 				fArchiveNameView->SetText(string.String());
+			}
 			break;
 		}
 
@@ -202,11 +201,14 @@ ZippoWindow::QuitRequested()
 		fThread->SuspendExternalZip();
 		fActivityView->Pause();
 
-		BAlert* alert = new BAlert("Stop or Continue",
-			"Are you sure you want to stop creating this archive?", "Stop",
+		BString message;
+		message << "Are you sure you want to stop creating this archive?\n\n";
+		message << "Filename: " << fArchiveName.String() << "\n";
+
+		BAlert* alert = new BAlert(NULL, message.String(), "Stop",
 			"Continue", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go(fWindowInvoker);
-		
+
 		return false;
 	}
 }
@@ -261,7 +263,155 @@ ZippoWindow::IsZipping()
 void
 ZippoWindow::_CloseWindowOrKeepOpen()
 {
-	if (fWindowGotRefs)
+	if (!fKeepOpen)
 		PostMessage(B_QUIT_REQUESTED);
+}
+
+
+void
+ZippoWindow::_FindBestPlacement()
+{
+	CenterOnScreen();
+
+	BScreen screen;
+	BRect centeredRect = Frame();
+	BRect tryRect = centeredRect;
+	BList tryRectList;
+
+	if (!screen.Frame().Contains(centeredRect))
+		return;
+
+	// build a list of possible locations
+	tryRectList.AddItem(new BRect(centeredRect));
+
+	// up and left
+	direction primaryDirection = up;
+	while (true) {
+		_OffsetRect(&tryRect, primaryDirection);
+
+		if (!screen.Frame().Contains(tryRect))
+			_OffscreenBounceBack(&tryRect, &primaryDirection, left);
+
+		if (!screen.Frame().Contains(tryRect))
+			break;
+
+		tryRectList.AddItem(new BRect(tryRect));
+	}
+
+	// down and right
+	primaryDirection = down;
+	tryRect = centeredRect;
+	while (true) {
+		_OffsetRect(&tryRect, primaryDirection);
+		
+		if (!screen.Frame().Contains(tryRect))
+			_OffscreenBounceBack(&tryRect, &primaryDirection, right);
+
+		if (!screen.Frame().Contains(tryRect))
+			break;
+
+		tryRectList.AddItem(new BRect(tryRect));
+	}
+
+	// remove rects that overlap an existing window
+	for (int32 i = 0;; i++) {
+		BWindow* win = static_cast<BWindow*>(fWindowList.ItemAt(i));
+		if (win == NULL)
+			break;
+
+		ZippoWindow* window = dynamic_cast<ZippoWindow*>(win);
+		if (window == NULL)
+			continue;
+	
+		if (window == this)
+			continue;
+
+		if (window->Lock()) {
+			BRect frame = window->Frame();
+			for (int32 m = 0;; m++) {
+				BRect* rect = static_cast<BRect*>(tryRectList.ItemAt(m));
+				if (rect == NULL)
+					break;
+
+				if (frame.Intersects(*rect)) {
+					tryRectList.RemoveItem(m);
+					delete rect;
+					m--;
+				}
+			}
+			window->Unlock();
+		}
+	}
+
+	// find nearest rect
+	bool gotRect = false;
+	BRect nearestRect(0, 0, 0, 0);
+	
+	while (true) {
+		BRect* rect = static_cast<BRect*>(tryRectList.RemoveItem((int32)0));
+		if (rect == NULL)
+			break;
+
+		nearestRect = _NearestRect(centeredRect, nearestRect, *rect);
+		gotRect = true;
+		delete rect;
+	}
+
+	if (gotRect)
+		MoveTo(nearestRect.LeftTop());
+}
+
+
+void
+ZippoWindow::_OffsetRect(BRect* rect, direction whereTo)
+{
+	float width = rect->Width();
+	float height = rect->Height();
+
+	switch (whereTo) {
+		case up:
+			rect->OffsetBy(0, -(height * 1.5));
+			break;
+
+		case down:
+			rect->OffsetBy(0, height * 1.5);
+			break;
+
+		case left:
+			rect->OffsetBy(-(width * 1.5), 0);
+			break;
+
+		case right:
+			rect->OffsetBy(width * 1.5, 0);
+			break;
+	}
+}
+
+
+void
+ZippoWindow::_OffscreenBounceBack(BRect* rect, direction* primaryDirection,
+	direction secondaryDirection)
+{
+	if (*primaryDirection == up) {
+		*primaryDirection = down;
+	} else {
+		*primaryDirection = up;
+	}
+
+	_OffsetRect(rect, *primaryDirection);
+	_OffsetRect(rect, secondaryDirection);
+}
+
+
+BRect
+ZippoWindow::_NearestRect(BRect goalRect, BRect a, BRect b)
+{
+	double aSum = fabs(goalRect.left - a.left) + fabs(goalRect.top - a.top);
+	double bSum = fabs(goalRect.left - b.left) + fabs(goalRect.top - b.top);
+
+	if (aSum < bSum)
+		return a;
+	else
+		return b;
 }
 

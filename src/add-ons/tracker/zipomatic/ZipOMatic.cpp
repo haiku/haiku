@@ -11,7 +11,6 @@
 
 #include <Alert.h>
 #include <Roster.h>
-#include <Screen.h>
 #include <TrackerAddOnAppLaunch.h>
 
 #include "ZipOMaticMisc.h"
@@ -31,45 +30,27 @@ main()
 ZipOMatic::ZipOMatic()
 	:
 	BApplication(ZIPOMATIC_APP_SIG),
-	fSettings(),
 	fGotRefs(false),
-	fInvoker(new BInvoker(new BMessage(ZIPPO_QUIT_OR_CONTINUE), NULL, this)),
-	fWindowFrame(200, 200, 430, 310)
+	fInvoker(new BInvoker(new BMessage(ZIPPO_QUIT_OR_CONTINUE), NULL, this))
 {
-	status_t status = _ReadSettings();
-	
-	if (status != B_OK)
-		ErrorMessage("_ReadSettings()", status);	
 }
 
 
 ZipOMatic::~ZipOMatic()
 {
-	status_t status = _WriteSettings();
-	
-	if (status != B_OK)
-		ErrorMessage("_WriteSettings()", status);
 }
 
 
 void 
 ZipOMatic::RefsReceived(BMessage* message)
 {
-	message->RemoveName("dir_ref");
-
 	entry_ref ref;
-	if (message->FindRef("refs", &ref) != B_OK) {
-		if (!IsLaunching())
-			PostMessage(B_SILENT_RELAUNCH);
-		return;
-	}
-
-	if (IsLaunching())
+	if (message->FindRef("refs", &ref) == B_OK) {
+		_UseExistingOrCreateNewWindow(message);
 		fGotRefs = true;
-	
-	BMessage* msg = new BMessage(*message);
-
-	_UseExistingOrCreateNewWindow(msg);
+	} else if (!IsLaunching()) {
+		PostMessage(B_SILENT_RELAUNCH);
+	}
 }
 
 
@@ -87,9 +68,6 @@ ZipOMatic::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case ZIPPO_WINDOW_QUIT:
 		{
-			BRect frame;
-			if (message->FindRect("frame", &frame) == B_OK)
-				fWindowFrame = frame;
 			snooze(200000);
 			if (CountWindows() == 0)
 				Quit();
@@ -105,7 +83,7 @@ ZipOMatic::MessageReceived(BMessage* message)
 			if (message->FindInt32("which", &button) == B_OK)
 				if (button == 0) {
 					_StopZipping();
-				} else  {
+				} else {
 					if (CountWindows() == 0)
 						Quit();
 				}
@@ -120,7 +98,7 @@ ZipOMatic::MessageReceived(BMessage* message)
 
 
 bool
-ZipOMatic::QuitRequested  (void)
+ZipOMatic::QuitRequested(void)
 {
 	if (CountWindows() <= 0)
 		return true;
@@ -208,43 +186,42 @@ void
 ZipOMatic::_UseExistingOrCreateNewWindow(BMessage* message)
 {
 	int32 windowCount = 0;
-	ZippoWindow* window;
-	bool foundNonBusyWindow = false;
+	BWindow* bWindow;
+	ZippoWindow* zWindow;
+	BList list;
 
 	while (1) {
-		window = dynamic_cast<ZippoWindow*>(WindowAt(windowCount++));
-		if (window == NULL)
+		bWindow = WindowAt(windowCount++);
+		if (bWindow == NULL)
 			break;
+
+		zWindow = dynamic_cast<ZippoWindow*>(bWindow);
+		if (zWindow == NULL)
+			continue;
+
+		list.AddItem(zWindow);
 		
-		if (window->Lock()) {
-			if (!window->IsZipping()) {
-				foundNonBusyWindow = true;
+		if (zWindow->Lock()) {
+			if (!zWindow->IsZipping()) {
 				if (message != NULL)
-					window->PostMessage(message);
-				window->SetWorkspaces(B_CURRENT_WORKSPACE);
-				window->Activate();
-				window->Unlock();
-				break;
+					zWindow->PostMessage(message);
+				zWindow->SetWorkspaces(B_CURRENT_WORKSPACE);
+				zWindow->Activate();
+				zWindow->Unlock();
+				return;
 			}
-			window->Unlock();
+			zWindow->Unlock();
 		}
 	}
-	
-	if (!foundNonBusyWindow)
-	{
-		BScreen screen;
-		fWindowFrame.OffsetBy(screen.Frame().LeftTop());
-		
-		_CascadeOnFrameCollision(&fWindowFrame);
-		if(!screen.Frame().Contains(fWindowFrame)) {
-			fWindowFrame.OffsetTo(screen.Frame().LeftTop());
-			fWindowFrame.OffsetBy(20,45);
-				// TODO: replace with CenterOnScreen()
-		}
-		
-		ZippoWindow * window = new ZippoWindow(fWindowFrame, message);
-		window->Show();
+
+	if (message) {
+		zWindow = new ZippoWindow(list);
+		zWindow->PostMessage(message);
+	} else {
+		zWindow = new ZippoWindow(list, true);
 	}
+
+	zWindow->Show();
 }
 
 
@@ -277,96 +254,6 @@ ZipOMatic::_StopZipping()
 				zippo->StopZipping();
 
 			zippo->PostMessage(B_QUIT_REQUESTED);
-			zippo->Unlock();
-		}
-	}	
-}
-
-
-status_t
-ZipOMatic::_ReadSettings()
-{
-	status_t status = B_OK;
-	
-	status = fSettings.SetTo("zipomatic.msg");
-	if (status != B_OK)
-		return status;
-
-	status = fSettings.InitCheck();
-	if (status != B_OK)
-		return status;
-
-	status = fSettings.InitCheck();
-	if (status != B_OK)
-		return status;
-
-	status = fSettings.ReadSettings();
-	if (status != B_OK)
-		return status;
-
-	BRect frame;
-	status = fSettings.FindRect("frame", &frame);
-	if (status != B_OK)
-		return status;
-	
-	fWindowFrame = frame;
-	
-	return B_OK;
-}
-
-
-status_t
-ZipOMatic::_WriteSettings()
-{
-	status_t status = B_OK;
-
-	status = fSettings.InitCheck();
-	if (status != B_OK)
-		return status;
-
-	status = fSettings.MakeEmpty();
-	if (status != B_OK)
-		return status;
-
-	status = fSettings.AddRect("frame", fWindowFrame);
-	if (status != B_OK)
-		return status;
-	
-	status = fSettings.WriteSettings();
-	if (status != B_OK)
-		return status;
-	
-	return B_OK;
-}
-
-
-void
-ZipOMatic::_CascadeOnFrameCollision(BRect* frame)
-{
-	BWindow* window;
-	ZippoWindow* zippo;
-	BList list;
-	
-	for (int32 i = 0;; i++) {
-		window = WindowAt(i);
-		if (window == NULL)
-			break;
-		
-		zippo = dynamic_cast<ZippoWindow*>(window);
-		if (zippo == NULL)
-			continue;
-		
-		list.AddItem(zippo);
-	}
-
-	for (int32 i = 0;; i++) {
-		zippo = static_cast<ZippoWindow*>(list.ItemAt(i));
-		if (zippo == NULL)
-			break;
-
-		if (zippo->Lock()) {
-			if (frame->LeftTop() == zippo->Frame().LeftTop())
-				frame->OffsetBy(20, 20);
 			zippo->Unlock();
 		}
 	}	

@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <Entry.h>
 #include <Message.h>
 #include <Messenger.h>
 #include <String.h>
@@ -48,8 +49,10 @@ private:
 								const char** envp = (const char**)environ);
 
 			void			_SendMessageToWindow(uint32 what,
-								const char* name  =  NULL,
+								const char* name = NULL,
 								const char* value = NULL);
+
+			status_t		_SelectInTracker(int32 tryNumber = 0);
 
 			BMessenger		fWindowMessenger;
 			thread_id		fZipProcess;
@@ -57,6 +60,7 @@ private:
 			int				fStdOut;
 			int				fStdErr;
 			FILE*			fOutputFile;
+			entry_ref		fOutputEntryRef;
 };
 
 #endif	// _ZIPPER_THREAD_H

@@ -88,7 +88,7 @@ Activity::Pulse()
 	uchar tmp = fPattern.data[7];
 
 	for (int j = 7; j > 0; --j)
-		fPattern.data[j] = fPattern.data[j-1];
+		fPattern.data[j] = fPattern.data[j - 1];
 	
 	fPattern.data[0] = tmp;
 	
@@ -103,10 +103,6 @@ Activity::Draw(BRect rect)
 	BRect bitmapRect = fBitmap->Bounds();
 
 	if (bitmapRect != viewRect) {
-		printf("Activity::Draw(): bitmapRect != viewRect\n");
-		bitmapRect.PrintToStream();
-		viewRect.PrintToStream();
-
 		delete fBitmap;
 		_CreateBitmap();
 	}
@@ -138,7 +134,7 @@ Activity::_DrawOnBitmap(bool running)
 		fBitmapView->SetHighColor(color);
 
 		// draw the pole
-		rect.InsetBy(2,2);
+		rect.InsetBy(2, 2);
 		fBitmapView->FillRect(rect, fPattern);	
 		
 		// draw frame
@@ -198,19 +194,19 @@ Activity::_DrawOnBitmap(bool running)
 		fBitmapView->SetDrawingMode(B_OP_SUBTRACT);
 		fBitmapView->StrokeRect(rect);
 	
-		rect.InsetBy(1,1);
+		rect.InsetBy(1, 1);
 		_LightenBitmapHighColor(& color);
 		fBitmapView->StrokeRect(rect);
 		
-		rect.InsetBy(1,1);
+		rect.InsetBy(1, 1);
 		_LightenBitmapHighColor(& color);
 		fBitmapView->StrokeRect(rect);
 		
-		rect.InsetBy(1,1);
+		rect.InsetBy(1, 1);
 		_LightenBitmapHighColor(& color);
 		fBitmapView->StrokeRect(rect);
 		
-		rect.InsetBy(1,1);
+		rect.InsetBy(1, 1);
 		_LightenBitmapHighColor(& color);
 		fBitmapView->StrokeRect(rect);
 		
