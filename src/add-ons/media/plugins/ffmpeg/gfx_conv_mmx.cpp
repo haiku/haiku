@@ -41,8 +41,11 @@ void gfx_conv_yuv420p_rgb32_mmx(AVFrame *in, AVFrame *out, int width, int height
 // Planar YUV420
 void gfx_conv_yuv420p_rgba32_sse2(AVFrame *in, AVFrame *out, int width, int height)
 {
-	// width must be divisibile by 8 and height divisible by 2
-	if (width % 8 == 0 && height % 2 == 0) {
+	// width must be divisible by 8 and height divisible by 2
+	// also in and out must be aligned to 32 bytes
+	if (width % 8 == 0 && height % 2 == 0 
+		&& (off_t)out->data[0] % 32 == 0 && (off_t)in->data[0] % 32 == 0 
+		&& (off_t)in->data[1] % 32 == 0 && (off_t)in->data[2] % 32 == 0) {
 	
 		uint8 *ybase = (uint8 *)in->data[0];
 		uint8 *ubase = (uint8 *)in->data[1];
@@ -69,7 +72,10 @@ void gfx_conv_yuv420p_rgba32_sse2(AVFrame *in, AVFrame *out, int width, int heig
 void gfx_conv_yuv422p_rgba32_sse2(AVFrame *in, AVFrame *out, int width, int height)
 {
 	// width must be divisibile by 8 
-	if (width % 8 == 0) {
+	// also in and out must be aligned to 32 bytes
+	if (width % 8 == 0
+		&& (off_t)out->data[0] % 32 == 0 && (off_t)in->data[0] % 32 == 0) {
+		
 		uint8 *ybase = (uint8 *)in->data[0];
 		uint8 *rgbbase = (uint8 *)out->data[0];
 
