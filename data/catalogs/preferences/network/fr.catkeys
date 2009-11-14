@@ -2,9 +2,9 @@
 Gateway:	EthernetSettingsView		Passerelle :
 Netmask:	EthernetSettingsView		Masque de sous-réseau :
 DHCP	EthernetSettingsView		DHCP
-DNS #2:	EthernetSettingsView		DNS #2:
+DNS #2:	EthernetSettingsView		DNS n°2 :
 Apply	EthernetSettingsView		Appliquer
-DNS #1:	EthernetSettingsView		DNS #1:
+DNS #1:	EthernetSettingsView		DNS n°1 :
 Network	NetworkWindow		Réseau
 Adapter:	EthernetSettingsView		Adaptateur :
 IP Address:	EthernetSettingsView		Adresse IP :
