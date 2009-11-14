@@ -1,7 +1,7 @@
 /* euidaccess -- check if effective user id can access file
 
-   Copyright (C) 1990, 1991, 1995, 1998, 2000, 2003, 2004, 2005, 2006, 2008
-   Free Software Foundation, Inc.
+   Copyright (C) 1990, 1991, 1995, 1998, 2000, 2003, 2004, 2005, 2006,
+   2008, 2009 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -25,6 +25,7 @@
 # include <config.h>
 #endif
 
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -77,7 +78,9 @@
 int
 euidaccess (const char *file, int mode)
 {
-#if defined EFF_ONLY_OK
+#if HAVE_FACCESSAT
+  return faccessat (AT_FDCWD, file, mode, AT_EACCESS);
+#elif defined EFF_ONLY_OK
   return access (file, mode | EFF_ONLY_OK);
 #elif defined ACC_SELF
   return accessx (file, mode, ACC_SELF);

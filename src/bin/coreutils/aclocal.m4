@@ -13,8 +13,8 @@
 
 m4_ifndef([AC_AUTOCONF_VERSION],
   [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
-m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.64.16-4cdf58],,
-[m4_warning([this file was generated for autoconf 2.64.16-4cdf58.
+m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.64.27-5b5d],,
+[m4_warning([this file was generated for autoconf 2.64.27-5b5d.
 You have another version of autoconf.  It may work, but is not guaranteed to.
 If you have problems, you may need to regenerate the build system entirely.
 To do so, use the procedure documented by the package, typically `autoreconf'.])])
@@ -804,22 +804,19 @@ AU_DEFUN([fp_C_PROTOTYPES], [AM_C_PROTOTYPES])
 
 # Check to make sure that the build environment is sane.    -*- Autoconf -*-
 
-# Copyright (C) 1996, 1997, 2000, 2001, 2003, 2005, 2008
+# Copyright (C) 1996, 1997, 2000, 2001, 2003, 2005, 2008, 2009
 # Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# serial 5
+# serial 6
 
 # AM_SANITY_CHECK
 # ---------------
 AC_DEFUN([AM_SANITY_CHECK],
 [AC_MSG_CHECKING([whether build environment is sane])
-# Just in case
-sleep 1
-echo timestamp > conftest.file
 # Reject unsafe characters in $srcdir or the absolute working directory
 # name.  Accept space and tab only in the latter.
 am_lf='
@@ -839,23 +836,30 @@ esac
 # (eg FreeBSD returns the mod time of the symlink's containing
 # directory).
 if (
-   set X `ls -Lt "$srcdir/configure" conftest.file 2> /dev/null`
-   if test "$[*]" = "X"; then
-      # -L didn't work.
-      set X `ls -t "$srcdir/configure" conftest.file`
-   fi
-   rm -f conftest.file
-   if test "$[*]" != "X $srcdir/configure conftest.file" \
-      && test "$[*]" != "X conftest.file $srcdir/configure"; then
+   for am_try in 1 2; do
+     echo timestamp > conftest.file
+     set X `ls -Lt "$srcdir/configure" conftest.file 2> /dev/null`
+     if test "$[*]" = "X"; then
+	# -L didn't work.
+	set X `ls -t "$srcdir/configure" conftest.file`
+     fi
+     rm -f conftest.file
+     if test "$[*]" != "X $srcdir/configure conftest.file" \
+	&& test "$[*]" != "X conftest.file $srcdir/configure"; then
 
-      # If neither matched, then we have a broken ls.  This can happen
-      # if, for instance, CONFIG_SHELL is bash and it inherits a
-      # broken ls alias from the environment.  This has actually
-      # happened.  Such a system could not be considered "sane".
-      AC_MSG_ERROR([ls -t appears to fail.  Make sure there is not a broken
-alias in your environment])
-   fi
-
+	# If neither matched, then we have a broken ls.  This can happen
+	# if, for instance, CONFIG_SHELL is bash and it inherits a
+	# broken ls alias from the environment.  This has actually
+	# happened.  Such a system could not be considered "sane".
+	AC_MSG_ERROR([ls -t appears to fail.  Make sure there is not a broken
+  alias in your environment])
+     fi
+     if test "$[2]" = conftest.file || test $am_try -eq 2; then
+       break
+     fi
+     # Just in case.
+     sleep 1
+   done
    test "$[2]" = conftest.file
    )
 then
@@ -1068,6 +1072,7 @@ m4_include([m4/config-h.m4])
 m4_include([m4/cycle-check.m4])
 m4_include([m4/d-ino.m4])
 m4_include([m4/d-type.m4])
+m4_include([m4/dirent-safer.m4])
 m4_include([m4/dirent_h.m4])
 m4_include([m4/dirfd.m4])
 m4_include([m4/dirname.m4])
@@ -1091,6 +1096,7 @@ m4_include([m4/fclose.m4])
 m4_include([m4/fcntl-safer.m4])
 m4_include([m4/fcntl_h.m4])
 m4_include([m4/fd-reopen.m4])
+m4_include([m4/fdopendir.m4])
 m4_include([m4/fflush.m4])
 m4_include([m4/file-type.m4])
 m4_include([m4/fileblocks.m4])
@@ -1099,6 +1105,7 @@ m4_include([m4/filenamecat.m4])
 m4_include([m4/flexmember.m4])
 m4_include([m4/float_h.m4])
 m4_include([m4/fnmatch.m4])
+m4_include([m4/fopen.m4])
 m4_include([m4/fpending.m4])
 m4_include([m4/fpieee.m4])
 m4_include([m4/fprintftime.m4])
@@ -1175,6 +1182,7 @@ m4_include([m4/lib-ld.m4])
 m4_include([m4/lib-link.m4])
 m4_include([m4/lib-prefix.m4])
 m4_include([m4/link-follow.m4])
+m4_include([m4/link.m4])
 m4_include([m4/localcharset.m4])
 m4_include([m4/locale-fr.m4])
 m4_include([m4/locale-ja.m4])

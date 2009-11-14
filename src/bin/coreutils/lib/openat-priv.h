@@ -1,6 +1,6 @@
 /* Internals for openat-like functions.
 
-   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,26 +22,6 @@
 
 #define OPENAT_BUFFER_SIZE 512
 char *openat_proc_name (char buf[OPENAT_BUFFER_SIZE], int fd, char const *file);
-
-/* Some systems don't have ENOSYS.  */
-#ifndef ENOSYS
-# ifdef ENOTSUP
-#  define ENOSYS ENOTSUP
-# else
-/* Some systems don't have ENOTSUP either.  */
-#  define ENOSYS EINVAL
-# endif
-#endif
-
-/* Some systems don't have EOPNOTSUPP.  */
-#ifndef EOPNOTSUPP
-# ifdef ENOTSUP
-#  define EOPNOTSUPP ENOTSUP
-# else
-/* Some systems don't have ENOTSUP either.  */
-#  define EOPNOTSUPP EINVAL
-# endif
-#endif
 
 /* Trying to access a BUILD_PROC_NAME file will fail on systems without
    /proc support, and even on systems *with* ProcFS support.  Return

@@ -1,7 +1,7 @@
 /* provide consistent interface to chown for systems that don't interpret
    an ID of -1 as meaning `don't change the corresponding ID'.
 
-   Copyright (C) 1997, 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 1997, 2004-2007, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -46,7 +46,8 @@
 int
 rpl_chown (const char *file, uid_t uid, gid_t gid)
 {
-#if CHOWN_FAILS_TO_HONOR_ID_OF_NEGATIVE_ONE
+#if HAVE_CHOWN
+# if CHOWN_FAILS_TO_HONOR_ID_OF_NEGATIVE_ONE
   if (gid == (gid_t) -1 || uid == (uid_t) -1)
     {
       struct stat file_stats;
@@ -61,9 +62,9 @@ rpl_chown (const char *file, uid_t uid, gid_t gid)
       if (uid == (uid_t) -1)
 	uid = file_stats.st_uid;
     }
-#endif
+# endif
 
-#if CHOWN_MODIFIES_SYMLINK
+# if CHOWN_MODIFIES_SYMLINK
   {
     /* Handle the case in which the system-supplied chown function
        does *not* follow symlinks.  Instead, it changes permissions
@@ -97,7 +98,12 @@ rpl_chown (const char *file, uid_t uid, gid_t gid)
     else if (errno != EACCES)
       return -1;
   }
-#endif
+# endif
 
   return chown (file, uid, gid);
+
+#else /* !HAVE_CHOWN */
+  errno = ENOSYS;
+  return -1;
+#endif
 }

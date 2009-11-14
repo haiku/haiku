@@ -33,7 +33,7 @@ rpl_close (int fd)
   int retval = close (fd);
 #endif
 
-#ifdef FCHDIR_REPLACEMENT
+#if REPLACE_FCHDIR
   if (retval >= 0)
     _gl_unregister_fd (fd);
 #endif

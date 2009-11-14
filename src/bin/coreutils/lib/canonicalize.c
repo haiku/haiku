@@ -1,5 +1,5 @@
 /* Return the canonical absolute name of a given file.
-   Copyright (C) 1996-2008 Free Software Foundation, Inc.
+   Copyright (C) 1996-2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,9 +38,6 @@
 #include "xalloc.h"
 #include "xgetcwd.h"
 
-#ifndef ELOOP
-# define ELOOP 0
-#endif
 #ifndef __set_errno
 # define __set_errno(Val) errno = (Val)
 #endif
@@ -199,7 +196,7 @@ canonicalize_filename_mode (const char *name, canonicalize_mode_t can_mode)
       dest = rname + 1;
     }
 
-  for (start = end = name; *start; start = end)
+  for (start = name; *start; start = end)
     {
       /* Skip sequence of multiple file name separators.  */
       while (*start == '/')

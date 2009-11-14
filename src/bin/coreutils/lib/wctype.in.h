@@ -3,7 +3,7 @@
 #line 1
 /* A substitute for ISO C99 <wctype.h>, for platforms that lack it.
 
-   Copyright (C) 2006-2008 Free Software Foundation, Inc.
+   Copyright (C) 2006-2009 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -87,6 +87,8 @@
 #  undef iswspace
 #  undef iswupper
 #  undef iswxdigit
+#  undef towlower
+#  undef towupper
 
 /* Linux libc5 has <wctype.h> and the functions but they are broken.  */
 #  if @REPLACE_ISWCNTRL@
@@ -102,6 +104,8 @@
 #   define iswspace rpl_iswspace
 #   define iswupper rpl_iswupper
 #   define iswxdigit rpl_iswxdigit
+#   define towlower rpl_towlower
+#   define towupper rpl_towupper
 #  endif
 
 static inline int
@@ -181,7 +185,50 @@ iswxdigit (wint_t wc)
 	  || ((wc & ~0x20) >= 'A' && (wc & ~0x20) <= 'F'));
 }
 
+static inline wint_t
+towlower (wint_t wc)
+{
+  return (wc >= 'A' && wc <= 'Z' ? wc - 'A' + 'a' : wc);
+}
+
+static inline wint_t
+towupper (wint_t wc)
+{
+  return (wc >= 'a' && wc <= 'z' ? wc - 'a' + 'A' : wc);
+}
+
 # endif /* ! HAVE_ISWCNTRL */
+
+# if defined __MINGW32__
+
+/* On native Windows, wchar_t is uint16_t, and wint_t is uint32_t.
+   The functions towlower and towupper are implemented in the MSVCRT library
+   to take a wchar_t argument and return a wchar_t result.  mingw declares
+   these functions to take a wint_t argument and return a wint_t result.
+   This means that:
+   1. When the user passes an argument outside the range 0x0000..0xFFFF, the
+      function will look only at the lower 16 bits.  This is allowed according
+      to POSIX.
+   2. The return value is returned in the lower 16 bits of the result register.
+      The upper 16 bits are random: whatever happened to be in that part of the
+      result register.  We need to fix this by adding a zero-extend from
+      wchar_t to wint_t after the call.  */
+
+static inline wint_t
+rpl_towlower (wint_t wc)
+{
+  return (wint_t) (wchar_t) towlower (wc);
+}
+#  define towlower rpl_towlower
+
+static inline wint_t
+rpl_towupper (wint_t wc)
+{
+  return (wint_t) (wchar_t) towupper (wc);
+}
+#  define towupper rpl_towupper
+
+# endif
 
 #endif /* _GL_WCTYPE_H */
 #endif /* _GL_WCTYPE_H */

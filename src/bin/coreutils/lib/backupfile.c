@@ -1,7 +1,7 @@
 /* backupfile.c -- make Emacs style backup file names
 
    Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-   1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software
+   1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 Free Software
    Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@
 
 #include <unistd.h>
 
-#include <dirent.h>
+#include "dirent--.h"
 #ifndef _D_EXACT_NAMLEN
 # define _D_EXACT_NAMLEN(dp) strlen ((dp)->d_name)
 #endif
@@ -79,11 +79,6 @@
    ISDIGIT unless it's important to use the locale's definition
    of `digit' even when the host does not conform to POSIX.  */
 #define ISDIGIT(c) ((unsigned int) (c) - '0' <= 9)
-
-/* The results of opendir() in this file are not used with dirfd and fchdir,
-   therefore save some unnecessary work in fchdir.c.  */
-#undef opendir
-#undef closedir
 
 /* The extension added to file names to produce a simple (as opposed
    to numbered) backup file name. */

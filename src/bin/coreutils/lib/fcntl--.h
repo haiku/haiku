@@ -1,6 +1,6 @@
 /* Like fcntl.h, but redefine some names to avoid glitches.
 
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,3 +25,8 @@
 
 #undef creat
 #define creat creat_safer
+
+#if GNULIB_OPENAT_SAFER
+# undef openat
+# define openat openat_safer
+#endif

@@ -24,10 +24,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#ifndef FD_CLOEXEC
-# define FD_CLOEXEC 1
-#endif
-
 /* Set the `FD_CLOEXEC' flag of DESC if VALUE is true,
    or clear the flag if VALUE is false.
    Return 0 on success, or -1 on error with `errno' set. */

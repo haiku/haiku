@@ -1,6 +1,6 @@
 /* Save and restore the working directory, possibly using a child process.
 
-   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2007, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,10 +33,6 @@
 
 #include "dirname.h"
 #include "fcntl-safer.h"
-
-#ifndef ESTALE
-# define ESTALE -1
-#endif
 
 /* Save the working directory into *WD, if it hasn't been saved
    already.  Return true if a child has been forked to do the real

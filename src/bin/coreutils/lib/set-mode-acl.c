@@ -234,7 +234,7 @@ qset_acl (char const *name, int desc, mode_t mode)
   acl_free (aclp);
   if (ret < 0)
     {
-      if (saved_errno == ENOSYS)
+      if (saved_errno == ENOSYS || saved_errno == EOPNOTSUPP)
 	return chmod_or_fchmod (name, desc, mode);
       errno = saved_errno;
       return -1;

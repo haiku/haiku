@@ -1,6 +1,6 @@
 /* Work around an fstatat bug on Solaris 9.
 
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,11 +19,13 @@
 
 #include <config.h>
 
-#define COMPILING_FSTATAT 1
-#include "openat.h"
+#include <sys/stat.h>
 
 #include <errno.h>
+#include <fcntl.h>
 #include <string.h>
+
+#undef fstatat
 
 /* fstatat should always follow symbolic links that end in /, but on
    Solaris 9 it doesn't if AT_SYMLINK_NOFOLLOW is specified.  This is

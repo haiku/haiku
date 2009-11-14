@@ -1,5 +1,5 @@
 /* Define an at-style functions like fstatat, unlinkat, fchownat, etc.
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,35 +16,58 @@
 
 /* written by Jim Meyering */
 
-#define CALL_FUNC(F)				\
-  (AT_FUNC_USE_F1_COND				\
+#ifdef AT_FUNC_USE_F1_COND
+# define CALL_FUNC(F)				\
+  (flag == AT_FUNC_USE_F1_COND			\
     ? AT_FUNC_F1 (F AT_FUNC_POST_FILE_ARGS)	\
     : AT_FUNC_F2 (F AT_FUNC_POST_FILE_ARGS))
+# define VALIDATE_FLAG(F)			\
+  if (flag & ~AT_FUNC_USE_F1_COND)		\
+    {						\
+      errno = EINVAL;				\
+      return -1;				\
+    }
+#else
+# define CALL_FUNC(F) (AT_FUNC_F1 (F AT_FUNC_POST_FILE_ARGS))
+# define VALIDATE_FLAG(F) /* empty */
+#endif
 
-/* Call AT_FUNC_F1 or AT_FUNC_F2 (testing AT_FUNC_USE_F1_COND to
-   determine which) to operate on FILE, which is in the directory
-   open on descriptor FD.  If possible, do it without changing the
+#ifdef AT_FUNC_RESULT
+# define FUNC_RESULT AT_FUNC_RESULT
+#else
+# define FUNC_RESULT int
+#endif
+
+/* Call AT_FUNC_F1 to operate on FILE, which is in the directory
+   open on descriptor FD.  If AT_FUNC_USE_F1_COND is defined to a value,
+   AT_FUNC_POST_FILE_PARAM_DECLS must inlude a parameter named flag;
+   call AT_FUNC_F2 if FLAG is 0 or fail if FLAG contains more bits than
+   AT_FUNC_USE_F1_COND.  If possible, do it without changing the
    working directory.  Otherwise, resort to using save_cwd/fchdir,
    then AT_FUNC_F?/restore_cwd.  If either the save_cwd or the restore_cwd
    fails, then give a diagnostic and exit nonzero.  */
-int
+FUNC_RESULT
 AT_FUNC_NAME (int fd, char const *file AT_FUNC_POST_FILE_PARAM_DECLS)
 {
+  /* Be careful to choose names unlikely to conflict with
+     AT_FUNC_POST_FILE_PARAM_DECLS.  */
   struct saved_cwd saved_cwd;
   int saved_errno;
-  int err;
+  FUNC_RESULT err;
+
+  VALIDATE_FLAG (flag);
 
   if (fd == AT_FDCWD || IS_ABSOLUTE_FILE_NAME (file))
     return CALL_FUNC (file);
 
   {
-    char buf[OPENAT_BUFFER_SIZE];
-    char *proc_file = openat_proc_name (buf, fd, file);
+    char proc_buf[OPENAT_BUFFER_SIZE];
+    char *proc_file = openat_proc_name (proc_buf, fd, file);
     if (proc_file)
       {
-	int proc_result = CALL_FUNC (proc_file);
+	FUNC_RESULT proc_result = CALL_FUNC (proc_file);
 	int proc_errno = errno;
-	if (proc_file != buf)
+	if (proc_file != proc_buf)
 	  free (proc_file);
 	/* If the syscall succeeds, or if it fails with an unexpected
 	   errno value, then return right away.  Otherwise, fall through
@@ -83,3 +106,4 @@ AT_FUNC_NAME (int fd, char const *file AT_FUNC_POST_FILE_PARAM_DECLS)
   return err;
 }
 #undef CALL_FUNC
+#undef FUNC_RESULT

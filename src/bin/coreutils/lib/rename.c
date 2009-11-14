@@ -3,7 +3,8 @@
    a trailing slash.  On mingw, rename fails when the destination
    exists.
 
-   Copyright (C) 2001, 2002, 2003, 2005, 2006, 2009 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2003, 2005, 2006, 2009 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,16 +22,20 @@
 /* written by Volker Borchert */
 
 #include <config.h>
+
+#include <stdio.h>
+
 #undef rename
 
-#if RENAME_DEST_EXISTS_BUG
-/* This replacement must come first, otherwise when cross
- * compiling to Windows we will guess that it has the trailing
- * slash bug and entirely miss this one. */
-#include <errno.h>
+#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+/* The mingw rename has problems with trailing slashes; it also
+   requires use of native Windows calls to allow atomic renames over
+   existing files.  */
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+# include <errno.h>
+
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
 
 /* Rename the file SRC to DST.  This replacement is necessary on
    Windows, on which the system rename function will not replace
@@ -114,10 +119,10 @@ rpl_rename (char const *src, char const *dst)
       errno = EPERM;        /* ? */
       break;
 
-#ifndef ERROR_FILE_TOO_LARGE
+# ifndef ERROR_FILE_TOO_LARGE
 /* This value is documented but not defined in all versions of windows.h. */
-#define ERROR_FILE_TOO_LARGE 223
-#endif
+#  define ERROR_FILE_TOO_LARGE 223
+# endif
     case ERROR_FILE_TOO_LARGE:
       errno = EFBIG;
       break;
@@ -129,13 +134,18 @@ rpl_rename (char const *src, char const *dst)
 
   return -1;
 }
-#elif RENAME_TRAILING_SLASH_BUG
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-#include "dirname.h"
-#include "xalloc.h"
+#else /* ! W32 platform */
+
+# if RENAME_DEST_EXISTS_BUG
+#  error Please report your platform and this message to bug-gnulib@gnu.org.
+# elif RENAME_TRAILING_SLASH_BUG
+#  include <stdio.h>
+#  include <stdlib.h>
+#  include <string.h>
+
+#  include "dirname.h"
+#  include "xalloc.h"
 
 /* Rename the file SRC to DST, removing any trailing
    slashes from SRC.  Needed for SunOS 4.1.1_U1.  */
@@ -162,4 +172,5 @@ rpl_rename (char const *src, char const *dst)
 
   return ret_val;
 }
-#endif /* RENAME_TRAILING_SLASH_BUG */
+# endif /* RENAME_TRAILING_SLASH_BUG */
+#endif /* ! W32 platform */

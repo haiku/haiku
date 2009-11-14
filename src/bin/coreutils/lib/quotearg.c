@@ -54,6 +54,12 @@ struct quoting_options
   /* Quote the characters indicated by this bit vector even if the
      quoting style would not normally require them to be quoted.  */
   unsigned int quote_these_too[(UCHAR_MAX / INT_BITS) + 1];
+
+  /* The left quote for custom_quoting_style.  */
+  char const *left_quote;
+
+  /* The right quote for custom_quoting_style.  */
+  char const *right_quote;
 };
 
 /* Names of quoting styles.  */
@@ -146,6 +152,19 @@ set_quoting_flags (struct quoting_options *o, int i)
   return r;
 }
 
+void
+set_custom_quoting (struct quoting_options *o,
+                    char const *left_quote, char const *right_quote)
+{
+  if (!o)
+    o = &default_quoting_options;
+  o->style = custom_quoting_style;
+  if (!left_quote || !right_quote)
+    abort ();
+  o->left_quote = left_quote;
+  o->right_quote = right_quote;
+}
+
 /* Return quoting options for STYLE, with no extra quoting.  */
 static struct quoting_options
 quoting_options_from_style (enum quoting_style style)
@@ -185,7 +204,9 @@ static size_t
 quotearg_buffer_restyled (char *buffer, size_t buffersize,
 			  char const *arg, size_t argsize,
 			  enum quoting_style quoting_style, int flags,
-			  unsigned int const *quote_these_too)
+			  unsigned int const *quote_these_too,
+			  char const *left_quote,
+			  char const *right_quote)
 {
   size_t i;
   size_t len = 0;
@@ -225,34 +246,37 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
 
     case locale_quoting_style:
     case clocale_quoting_style:
+    case custom_quoting_style:
       {
-	/* TRANSLATORS:
-	   Get translations for open and closing quotation marks.
+	if (quoting_style != custom_quoting_style)
+	  {
+	    /* TRANSLATORS:
+	       Get translations for open and closing quotation marks.
 
-	   The message catalog should translate "`" to a left
-	   quotation mark suitable for the locale, and similarly for
-	   "'".  If the catalog has no translation,
-	   locale_quoting_style quotes `like this', and
-	   clocale_quoting_style quotes "like this".
+	       The message catalog should translate "`" to a left
+	       quotation mark suitable for the locale, and similarly for
+	       "'".  If the catalog has no translation,
+	       locale_quoting_style quotes `like this', and
+	       clocale_quoting_style quotes "like this".
 
-	   For example, an American English Unicode locale should
-	   translate "`" to U+201C (LEFT DOUBLE QUOTATION MARK), and
-	   should translate "'" to U+201D (RIGHT DOUBLE QUOTATION
-	   MARK).  A British English Unicode locale should instead
-	   translate these to U+2018 (LEFT SINGLE QUOTATION MARK) and
-	   U+2019 (RIGHT SINGLE QUOTATION MARK), respectively.
+	       For example, an American English Unicode locale should
+	       translate "`" to U+201C (LEFT DOUBLE QUOTATION MARK), and
+	       should translate "'" to U+201D (RIGHT DOUBLE QUOTATION
+	       MARK).  A British English Unicode locale should instead
+	       translate these to U+2018 (LEFT SINGLE QUOTATION MARK)
+	       and U+2019 (RIGHT SINGLE QUOTATION MARK), respectively.
 
-	   If you don't know what to put here, please see
-	   <http://en.wikipedia.org/wiki/Quotation_mark#Glyphs>
-	   and use glyphs suitable for your language.  */
-
-	char const *left = gettext_quote (N_("`"), quoting_style);
-	char const *right = gettext_quote (N_("'"), quoting_style);
+	       If you don't know what to put here, please see
+	       <http://en.wikipedia.org/wiki/Quotation_mark#Glyphs>
+	       and use glyphs suitable for your language.  */
+	    left_quote = gettext_quote (N_("`"), quoting_style);
+	    right_quote = gettext_quote (N_("'"), quoting_style);
+	  }
 	if (!elide_outer_quotes)
-	  for (quote_string = left; *quote_string; quote_string++)
+	  for (quote_string = left_quote; *quote_string; quote_string++)
 	    STORE (*quote_string);
 	backslash_escapes = true;
-	quote_string = right;
+	quote_string = right_quote;
 	quote_string_len = strlen (quote_string);
       }
       break;
@@ -280,6 +304,7 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
     {
       unsigned char c;
       unsigned char esc;
+      bool is_right_quote = false;
 
       if (backslash_escapes
 	  && quote_string_len
@@ -288,7 +313,7 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
 	{
 	  if (elide_outer_quotes)
 	    goto force_outer_quoting_style;
-	  STORE ('\\');
+	  is_right_quote = true;
 	}
 
       c = arg[i];
@@ -300,12 +325,21 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
 	      if (elide_outer_quotes)
 		goto force_outer_quoting_style;
 	      STORE ('\\');
+	      /* If quote_string were to begin with digits, we'd need to
+	         test for the end of the arg as well.  However, it's
+		 hard to imagine any locale that would use digits in
+		 quotes, and set_custom_quoting is documented not to
+		 accept them.  */
 	      if (i + 1 < argsize && '0' <= arg[i + 1] && arg[i + 1] <= '9')
 		{
 		  STORE ('0');
 		  STORE ('0');
 		}
 	      c = '0';
+	      /* We don't have to worry that this last '0' will be
+		 backslash-escaped because, again, quote_string should
+		 not start with it and because quote_these_too is
+		 documented as not accepting it.  */
 	    }
 	  else if (flags & QA_ELIDE_NULL_BYTES)
 	    continue;
@@ -425,7 +459,15 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
 	case 'o': case 'p': case 'q': case 'r': case 's': case 't':
 	case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
 	  /* These characters don't cause problems, no matter what the
-	     quoting style is.  They cannot start multibyte sequences.  */
+	     quoting style is.  They cannot start multibyte sequences.
+	     A digit or a special letter would cause trouble if it
+	     appeared at the beginning of quote_string because we'd then
+	     escape by prepending a backslash.  However, it's hard to
+	     imagine any locale that would use digits or letters as
+	     quotes, and set_custom_quoting is documented not to accept
+	     them.  Also, a digit or a special letter would cause
+	     trouble if it appeared in quote_these_too, but that's also
+	     documented as not accepting them.  */
 	  break;
 
 	default:
@@ -521,6 +563,11 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
 			STORE ('0' + ((c >> 3) & 7));
 			c = '0' + (c & 7);
 		      }
+		    else if (is_right_quote)
+		      {
+			STORE ('\\');
+			is_right_quote = false;
+		      }
 		    if (ilim <= i + 1)
 		      break;
 		    STORE (c);
@@ -534,7 +581,8 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
 
       if (! ((backslash_escapes || elide_outer_quotes)
 	     && quote_these_too
-	     && quote_these_too[c / INT_BITS] & (1 << (c % INT_BITS))))
+	     && quote_these_too[c / INT_BITS] & (1 << (c % INT_BITS)))
+	  && !is_right_quote)
 	goto store_c;
 
     store_escape:
@@ -563,7 +611,8 @@ quotearg_buffer_restyled (char *buffer, size_t buffersize,
      sufficiently quotes the specified characters.  */
   return quotearg_buffer_restyled (buffer, buffersize, arg, argsize,
 				   quoting_style,
-				   flags & ~QA_ELIDE_OUTER_QUOTES, NULL);
+				   flags & ~QA_ELIDE_OUTER_QUOTES, NULL,
+				   left_quote, right_quote);
 }
 
 /* Place into buffer BUFFER (of size BUFFERSIZE) a quoted version of
@@ -583,7 +632,8 @@ quotearg_buffer (char *buffer, size_t buffersize,
   struct quoting_options const *p = o ? o : &default_quoting_options;
   int e = errno;
   size_t r = quotearg_buffer_restyled (buffer, buffersize, arg, argsize,
-				       p->style, p->flags, p->quote_these_too);
+				       p->style, p->flags, p->quote_these_too,
+				       p->left_quote, p->right_quote);
   errno = e;
   return r;
 }
@@ -611,10 +661,13 @@ quotearg_alloc_mem (char const *arg, size_t argsize, size_t *size,
   /* Elide embedded null bytes if we can't return a size.  */
   int flags = p->flags | (size ? 0 : QA_ELIDE_NULL_BYTES);
   size_t bufsize = quotearg_buffer_restyled (0, 0, arg, argsize, p->style,
-					     flags, p->quote_these_too) + 1;
+					     flags, p->quote_these_too,
+					     p->left_quote,
+					     p->right_quote) + 1;
   char *buf = xcharalloc (bufsize);
   quotearg_buffer_restyled (buf, bufsize, arg, argsize, p->style, flags,
-			    p->quote_these_too);
+			    p->quote_these_too,
+			    p->left_quote, p->right_quote);
   errno = e;
   if (size)
     *size = bufsize - 1;
@@ -703,7 +756,9 @@ quotearg_n_options (int n, char const *arg, size_t argsize,
     int flags = options->flags | QA_ELIDE_NULL_BYTES;
     size_t qsize = quotearg_buffer_restyled (val, size, arg, argsize,
 					     options->style, flags,
-					     options->quote_these_too);
+					     options->quote_these_too,
+					     options->left_quote,
+					     options->right_quote);
 
     if (size <= qsize)
       {
@@ -712,7 +767,9 @@ quotearg_n_options (int n, char const *arg, size_t argsize,
 	  free (val);
 	sv[n].val = val = xcharalloc (size);
 	quotearg_buffer_restyled (val, size, arg, argsize, options->style,
-				  flags, options->quote_these_too);
+				  flags, options->quote_these_too,
+				  options->left_quote,
+				  options->right_quote);
       }
 
     errno = e;
@@ -796,4 +853,37 @@ char *
 quotearg_colon_mem (char const *arg, size_t argsize)
 {
   return quotearg_char_mem (arg, argsize, ':');
+}
+
+char *
+quotearg_n_custom (int n, char const *left_quote,
+		   char const *right_quote, char const *arg)
+{
+  return quotearg_n_custom_mem (n, left_quote, right_quote, arg,
+				SIZE_MAX);
+}
+
+char *
+quotearg_n_custom_mem (int n, char const *left_quote,
+		       char const *right_quote,
+		       char const *arg, size_t argsize)
+{
+  struct quoting_options o = default_quoting_options;
+  set_custom_quoting (&o, left_quote, right_quote);
+  return quotearg_n_options (n, arg, argsize, &o);
+}
+
+char *
+quotearg_custom (char const *left_quote, char const *right_quote,
+		 char const *arg)
+{
+  return quotearg_n_custom (0, left_quote, right_quote, arg);
+}
+
+char *
+quotearg_custom_mem (char const *left_quote, char const *right_quote,
+		     char const *arg, size_t argsize)
+{
+  return quotearg_n_custom_mem (0, left_quote, right_quote, arg,
+				argsize);
 }

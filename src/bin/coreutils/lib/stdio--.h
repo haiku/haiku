@@ -1,6 +1,6 @@
 /* Like stdio.h, but redefine some names to avoid glitches.
 
-   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,8 +20,17 @@
 #include <stdio.h>
 #include "stdio-safer.h"
 
-#undef fopen
-#define fopen fopen_safer
+#if GNULIB_FOPEN_SAFER
+# undef fopen
+# define fopen fopen_safer
+#endif
 
-#undef tmpfile
-#define tmpfile tmpfile_safer
+#if GNULIB_TMPFILE_SAFER
+# undef tmpfile
+# define tmpfile tmpfile_safer
+#endif
+
+#if GNULIB_POPEN_SAFER
+# undef popen
+# define popen popen_safer
+#endif

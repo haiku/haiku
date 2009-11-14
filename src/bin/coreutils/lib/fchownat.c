@@ -4,7 +4,7 @@
    when the buggy fchownat-with-AT_SYMLINK_NOFOLLOW operates on a symlink, it
    mistakenly affects the symlink referent, rather than the symlink itself.
 
-   Copyright (C) 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,26 +23,25 @@
 
 #include <config.h>
 
-#include "openat.h"
-
 #include <unistd.h>
 
 #include "dirname.h" /* solely for definition of IS_ABSOLUTE_FILE_NAME */
-#include "save-cwd.h"
+#include "openat.h"
 #include "openat-priv.h"
+#include "save-cwd.h"
 
 /* Replacement for Solaris' function by the same name.
    Invoke chown or lchown on file, FILE, using OWNER and GROUP, in the
    directory open on descriptor FD.  If FLAG is AT_SYMLINK_NOFOLLOW, then
    use lchown, otherwise, use chown.  If possible, do it without changing
    the working directory.  Otherwise, resort to using save_cwd/fchdir,
-   then mkdir/restore_cwd.  If either the save_cwd or the restore_cwd
-   fails, then give a diagnostic and exit nonzero.  */
+   then (chown|lchown)/restore_cwd.  If either the save_cwd or the
+   restore_cwd fails, then give a diagnostic and exit nonzero.  */
 
 #define AT_FUNC_NAME fchownat
 #define AT_FUNC_F1 lchown
 #define AT_FUNC_F2 chown
-#define AT_FUNC_USE_F1_COND flag == AT_SYMLINK_NOFOLLOW
+#define AT_FUNC_USE_F1_COND AT_SYMLINK_NOFOLLOW
 #define AT_FUNC_POST_FILE_PARAM_DECLS , uid_t owner, gid_t group, int flag
 #define AT_FUNC_POST_FILE_ARGS        , owner, group
 #include "at-func.c"

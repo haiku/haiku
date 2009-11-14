@@ -100,7 +100,8 @@ enum quoting_style
     c_maybe_quoting_style,
 
     /* Like c_quoting_style except always omit the surrounding
-       double-quote characters (ls --quoting-style=escape).
+       double-quote characters and ignore QA_SPLIT_TRIGRAPHS
+       (ls --quoting-style=escape).
 
        quotearg_buffer:
        "simple", "\\0 \\t\\n'\"\\033??/\\\\", "a:b"
@@ -136,7 +137,8 @@ enum quoting_style
     locale_quoting_style,
 
     /* Like c_quoting_style except use quotation marks appropriate for
-       the locale (ls --quoting-style=clocale).
+       the locale and ignore QA_SPLIT_TRIGRAPHS
+       (ls --quoting-style=clocale).
 
        LC_MESSAGES=C
        quotearg_buffer:
@@ -157,7 +159,50 @@ enum quoting_style
        "\302\253simple\302\273",
        "\302\253\\0 \\t\\n'\"\\033??/\\\\\302\253", "\302\253a\\:b\302\273"
     */
-    clocale_quoting_style
+    clocale_quoting_style,
+
+    /* Like clocale_quoting_style except use the custom quotation marks
+       set by set_custom_quoting.  If custom quotation marks are not
+       set, the behavior is undefined.
+
+       left_quote = right_quote = "'"
+       quotearg_buffer:
+       "'simple'", "'\\0 \\t\\n\\'\"\\033??/\\\\'", "'a:b'"
+       quotearg:
+       "'simple'", "'\\0 \\t\\n\\'\"\\033??/\\\\'", "'a:b'"
+       quotearg_colon:
+       "'simple'", "'\\0 \\t\\n\\'\"\\033??/\\\\'", "'a\\:b'"
+
+       left_quote = "(" and right_quote = ")"
+       quotearg_buffer:
+       "(simple)", "(\\0 \\t\\n'\"\\033??/\\\\)", "(a:b)"
+       quotearg:
+       "(simple)", "(\\0 \\t\\n'\"\\033??/\\\\)", "(a:b)"
+       quotearg_colon:
+       "(simple)", "(\\0 \\t\\n'\"\\033??/\\\\)", "(a\\:b)"
+
+       left_quote = ":" and right_quote = " "
+       quotearg_buffer:
+       ":simple ", ":\\0\\ \\t\\n'\"\\033??/\\\\ ", ":a:b "
+       quotearg:
+       ":simple ", ":\\0\\ \\t\\n'\"\\033??/\\\\ ", ":a:b "
+       quotearg_colon:
+       ":simple ", ":\\0\\ \\t\\n'\"\\033??/\\\\ ", ":a\\:b "
+
+       left_quote = "\"'" and right_quote = "'\""
+       Notice that this is treated as a single level of quotes or two
+       levels where the outer quote need not be escaped within the inner
+       quotes.  For two levels where the outer quote must be escaped
+       within the inner quotes, you must use separate quotearg
+       invocations.
+       quotearg_buffer:
+       "\"'simple'\"", "\"'\\0 \\t\\n\\'\"\\033??/\\\\'\"", "\"'a:b'\""
+       quotearg:
+       "\"'simple'\"", "\"'\\0 \\t\\n\\'\"\\033??/\\\\'\"", "\"'a:b'\""
+       quotearg_colon:
+       "\"'simple'\"", "\"'\\0 \\t\\n\\'\"\\033??/\\\\'\"", "\"'a\\:b'\""
+    */
+    custom_quoting_style
   };
 
 /* Flags for use in set_quoting_flags.  */
@@ -210,7 +255,9 @@ void set_quoting_style (struct quoting_options *o, enum quoting_style s);
    set the value of the quoting options for character C to I.
    Return the old value.  Currently, the only values defined for I are
    0 (the default) and 1 (which means to quote the character even if
-   it would not otherwise be quoted).  */
+   it would not otherwise be quoted).  C must never be a digit or a
+   letter that has special meaning after a backslash (for example, "\t"
+   for tab).  */
 int set_char_quoting (struct quoting_options *o, char c, int i);
 
 /* In O (or in the default if O is null),
@@ -218,6 +265,19 @@ int set_char_quoting (struct quoting_options *o, char c, int i);
    bitwise combination of enum quoting_flags, or 0 for default
    behavior.  Return the old value.  */
 int set_quoting_flags (struct quoting_options *o, int i);
+
+/* In O (or in the default if O is null),
+   set the value of the quoting style to custom_quoting_style,
+   set the left quote to LEFT_QUOTE, and set the right quote to
+   RIGHT_QUOTE.  Each of LEFT_QUOTE and RIGHT_QUOTE must be
+   null-terminated and can be the empty string.  Because backslashes are
+   used for escaping, it does not make sense for RIGHT_QUOTE to contain
+   a backslash.  RIGHT_QUOTE must not begin with a digit or a letter
+   that has special meaning after a backslash (for example, "\t" for
+   tab).  */
+void set_custom_quoting (struct quoting_options *o,
+			 char const *left_quote,
+			 char const *right_quote);
 
 /* Place into buffer BUFFER (of size BUFFERSIZE) a quoted version of
    argument ARG (of size ARGSIZE), using O to control quoting.
@@ -287,7 +347,8 @@ char *quotearg_style (enum quoting_style s, char const *arg);
 char *quotearg_style_mem (enum quoting_style s,
 			  char const *arg, size_t argsize);
 
-/* Like quotearg (ARG), except also quote any instances of CH.  */
+/* Like quotearg (ARG), except also quote any instances of CH.
+   See set_char_quoting for a description of acceptable CH values.  */
 char *quotearg_char (char const *arg, char ch);
 
 /* Like quotearg_char (ARG, CH), except it can quote null bytes.  */
@@ -298,6 +359,29 @@ char *quotearg_colon (char const *arg);
 
 /* Like quotearg_colon (ARG), except it can quote null bytes.  */
 char *quotearg_colon_mem (char const *arg, size_t argsize);
+
+/* Like quotearg_n_style (N, S, ARG) but with S as custom_quoting_style
+   with left quote as LEFT_QUOTE and right quote as RIGHT_QUOTE.  See
+   set_custom_quoting for a description of acceptable LEFT_QUOTE and
+   RIGHT_QUOTE values.  */
+char *quotearg_n_custom (int n, char const *left_quote,
+			 char const *right_quote, char const *arg);
+
+/* Like quotearg_n_custom (N, LEFT_QUOTE, RIGHT_QUOTE, ARG) except it
+   can quote null bytes.  */
+char *quotearg_n_custom_mem (int n, char const *left_quote,
+			     char const *right_quote,
+			     char const *arg, size_t argsize);
+
+/* Equivalent to quotearg_n_custom (0, LEFT_QUOTE, RIGHT_QUOTE, ARG).  */
+char *quotearg_custom (char const *left_quote, char const *right_quote,
+		       char const *arg);
+
+/* Equivalent to quotearg_n_custom_mem (0, LEFT_QUOTE, RIGHT_QUOTE, ARG,
+					ARGSIZE).  */
+char *quotearg_custom_mem (char const *left_quote,
+			   char const *right_quote,
+			   char const *arg, size_t argsize);
 
 /* Free any dynamically allocated memory.  */
 void quotearg_free (void);

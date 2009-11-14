@@ -2,7 +2,7 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 #line 1
 /* Character set conversion.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@
 #define ICONV_FLAVOR_HPUX "iconv_open-hpux.h"
 #define ICONV_FLAVOR_IRIX "iconv_open-irix.h"
 #define ICONV_FLAVOR_OSF "iconv_open-osf.h"
+#define ICONV_FLAVOR_SOLARIS "iconv_open-solaris.h"
 
 #ifdef ICONV_FLAVOR
 # include ICONV_FLAVOR

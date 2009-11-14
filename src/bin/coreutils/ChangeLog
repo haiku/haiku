@@ -1,4 +1,576 @@
+2009-09-11  Jim Meyering  <meyering@redhat.com>
+
+	version 7.6
+	* NEWS: Record release date.
+
+2009-09-10  Jim Meyering  <meyering@redhat.com>
+
+	link,ln: use gnulib's link module to work around Solaris 10 deficiency
+	Before this change, :>f; ln -T f no-such/ would succeed on Solaris 10.
+	After it, ln fails, as it should: ln: accessing `z/': Not a directory
+	The command, link f no-such/, had the same problem on that system.
+	* bootstrap.conf (gnulib_modules): Add "link".
+	* tests/ln/slash-decorated-nonexistent-dest: New test.
+	* tests/Makefile.am (TESTS): Add it.
+	* NEWS (Portability): Mention the improvement.
+
+	build: update gnulib submodule to latest
+
+2009-09-10  Ondřej Vašík  <ovasik@redhat.com>
+
+	doc: improve various BLOCKSIZE and SIZE help
+	* doc/coreutils.texi (multiplierSuffixes): Mention that
+	the suffix can be specified without a leading number
+	* src/split.c (usage): Refactor SIZE help to within a function
+	* src/truncate.c (usage): Likewise
+	* src/ls.c (usage): Likewise
+	* src/df.c (usage): Likewise. Also add a function with BLOCKSIZE help
+	* src/du.c (usage): Likewise.
+	* src/system.h: Define 2 functions to emit common help text
+	This was prompted by https://bugzilla.redhat.com/show_bug.cgi?id=511188
+
+2009-09-10  Jim Meyering  <meyering@redhat.com>
+
+	dd conv=unblock: print final newline consistently
+	* src/dd.c (dd_copy) [C_UNBLOCK]: Always print the final newline for
+	non-empty output, not just when output size is a multiple of cbs.
+	* doc/coreutils.texi (dd invocation) [conv=unblock]: Mention that dd
+	prints a newline after each output record, not just when replacing
+	trailing spaces.
+	Reported by Ulrich Drepper.
+	* tests/dd/unblock: New file.  Test for this.
+	* tests/Makefile.am (TESTS): Add it.
+	* NEWS (Bug fixes): Mention it.
+
+2009-09-09  Jim Meyering  <meyering@redhat.com>
+
+	maint: make cfg.mk slightly more generic
+	* cfg.mk (url_dir_list): Don't hard-code "coreutils".  Use $(PACKAGE).
+
+2009-09-08  Jim Meyering  <meyering@redhat.com>
+
+	* gnulib: Update submodule to latest.
+
+	tail: make the new piped-stdin test as portable as the old one
+	* src/tail.c (main): Adapt piped-stdin test to use the same isapipe,
+	test as was used in the preceding POSIXLY_CORRECT condition.
+	Remove the now-subsumed POSIXLY_CORRECT test.
+	Reported by Pádraig Brady.
+	* doc/coreutils.texi (tail invocation): Document this change.
+	* NEWS (Changes in behavior): Reclassify, clarify.
+
+2009-09-08  Pádraig Brady  <P@draigBrady.com>
+
+	tests: tail-2/assert: reduce risk of race condition
+	* tests/tail2/assert: This reverts commit be853120, 25-08-2009,
+	"tests: tail-2/assert: avoid risk of race condition"
+	kill -0 doesn't send a signal and so will only confirm that the
+	background process was forked, which we know already because
+	we have its pid.
+
+	tests: address a race condition in misc/cat-buf
+	* tests/misc/cat-buf: Increase the delay between writes
+	to decrease the chance that dd will read both at once.
+	Since the test is inherently racy, print a warning via
+	skip_test_ rather than failing outright.
+	Reported by Jim Meyering.
+
+2009-09-07  Jim Meyering  <meyering@redhat.com>
+
+	tail: syntax-only: use "false", rather than equivalent, 0
+	* src/tail.c (record_open_fd): Initialize "->ignore" to false, not 0.
+
+	tail: ignore -f for piped-stdin, as POSIX requires
+	* src/tail.c (main): Tailing a pipe "forever" is not useful,
+	and POSIX specifies that tail ignore the -f when there is no
+	file argument and stdin is a FIFO or pipe.  So we do that.
+	In addition, GNU tail excludes "-" arguments from the list of files
+	to tail forever, when the associated file descriptor is connected
+	to a FIFO or pipe.  Before this change, ":|tail -f" would hang.
+	Reported by Ren Yang and Ulrich Drepper.
+	* tests/tail-2/pipe-f: Test for this.
+	* tests/tail-2/pipe-f2: Ensure tail doesn't exit early for a fifo.
+	* tests/Makefile.am (TESTS): Add these tests.
+	* NEWS (POSIX conformance): Mention it.
+
+2009-09-07  Pádraig Brady  <P@draigBrady.com>
+
+	tests: tail-2/flush-initial should not rely on stdbuf
+	* tests/tail-2/flush-initial: stdbuf is not built on all systems.
+	In any case it's redundant since stdout will automatically be buffered
+	since we're redirecting to file. So just call tail without using stdbuf.
+
+2009-09-07  Jim Meyering  <meyering@redhat.com>
+
+	tail: don't give up on inotify mode for an already-ignored "-"
+	* src/tail.c (main): Adjust today's change to honor the
+	F[i].ignore flag that may have been set in tail_file.
+
+	tests: misc/cat-buf: clean up syntax
+	* tests/misc/cat-buf: Don't suppress dd's stderr.
+	Remove useless quotes.
+
+	tests: ls/color-clear-to-eol: append NL to accommodate old sed
+	* tests/ls/color-clear-to-eol: Some vendor sed programs fail
+	to operate on lines that are not NL-terminated.
+	This affects at least Solaris 10's /bin/sed.
+	Reported by Pádraig Brady.
+
+	tests: tail-2/infloop-1: avoid rare test failure on a busy system
+	* tests/tail-2/infloop-1: Sleep 3 seconds, not 1, but in increments
+	of 0.1 second.  Before, this test would fail ~1 time in 20 via
+	"make -j9 check" on a quad-core system.
+	Correct comment.
+
+	build: update gnulib submodule to latest
+
+	doc: tweak NEWS
+	* NEWS (dd): Tweak wording.
+	Two blank lines between sections.
+
+	tail -f: handle "-"/stdin once again
+	* src/tail.c (main) [HAVE_INOTIFY]: When stdin (i.e., "-", or no args,
+	but not /dev/stdin) is specified on the command line, don't use inotify.
+	Reported by Bill Brelsford in <http://bugs.debian.org/545422>.
+	* tests/tail-2/follow-stdin: New file.  Test for this.
+	* tests/Makefile.am (TESTS): Add the test.
+	* NEWS (Bug fixes): Mention it.
+	This bug was introduced in coreutils-7.5 via commit ae494d4b,
+	2009-06-02, "tail: use inotify if it is available".
+
+2009-09-06  Jim Meyering  <meyering@redhat.com>
+
+	tests: tail-2/flush-initial: correct race avoidance code
+	* tests/tail-2/flush-initial: Wait for the file to be nonempty,
+	not for the process.  Based on a suggestion from Pádraig Brady.
+
+	tests: ls-misc: don't let a bogus umask cause test failure
+	* tests/misc/ls-misc: Set umask to 022.  A umask setting permitting
+	world-write access, e.g., umask o+w, would cause this test to fail.
+	Report by Mathias Brodala and analysis by Tom Fitzhenry in
+	<http://bugs.debian.org/544965>.
+
+	tail: flush initial output before possibly blocking
+	* src/tail.c (main): Flush any output from tail_file,
+	before calling tail_forever_inotify, which can block.
+	* tests/tail-2/flush-initial: New file.  Test for the bug.
+	* tests/Makefile.am (TESTS): Add tail-2/flush-initial.
+	* NEWS (Bug fixes): Mention it.
+	This bug was introduced in coreutils-7.5 via commit ae494d4b,
+	2009-06-02, "tail: use inotify if it is available".
+
+2009-09-05  Jim Meyering  <meyering@redhat.com>
+
+	maint: remove unused file: lib/fdopendir-glibc.c
+	* lib/fdopendir-glibc.c: Remove unused file.
+
+	2009-09-05  Jim Meyering  <meyering@redhat.com>
+
+	tests: ls/stat-vs-dirent: avoid spurious test failure
+	* tests/ls/stat-vs-dirent: Avoid test failure when run from a
+	directory whose name (or ancestor directory name) starts with ".".
+
+2009-09-05  Pádraig Brady  <P@draigBrady.com>
+
+	doc: make the tail --sleep-interval help less confusing
+	* src/tail.c (usage): I read "approximately S seconds"
+	as "approximately 5 seconds" for approximately 5 seconds.
+
+	maint: remove some tab indentation from copy.c
+	* src/copy.c (copy_internal): Remove tabs erroneously added
+	in commit 3346c0af.
+
+	tests: test old tail -f method even on systems with inotify
+	* src/tail.c (main): Add an undocumented ---disable-inotify option
+	to allow disabling inotify.
+	* tests/tail-2/pid: Run test in both normal and "disable_inotify" modes.
+	* tests/tail-2/tail-n0f: Likewise.
+	* tests/tail-2/wait: Likewise.
+	* tests/tail-2/append-only: Likewise.
+
+2009-09-05  Jim Meyering  <meyering@redhat.com>
+
+	build: update gnulib submodule to latest
+
+2009-09-05  Petr Salinger  <Petr.Salinger@seznam.cz>
+
+	stty: use TAB0, TAB1, and TAB2 only if defined
+	* src/stty.c (mode_info) [TAB0, TAB1, TAB2]: Guard each
+	entry with #ifdef.  Required for GNU/kFreeBSD.
+	Reported by Petr Salinger in http://bugs.debian.org/520368.
+
+2009-09-05  Eric Blake  <ebb9@byu.net>
+
+	build: update from gnulib
+	* gnulib: Update submodule to latest.
+
+2009-09-04  Eric Blake  <ebb9@byu.net>
+
+	ln: add comments related to POSIX 2008
+	* src/ln.c (ENABLE_HARD_LINK_TO_SYMLINK_WARNING): Delete.
+	(do_link): Update comments per POSIX; add FIXME for -L, -P.
+
+	mv, cp: tweak LINK_FOLLOWS_SYMLINKS logic
+	* gnulib: Update to latest gnulib.
+	* src/copy.c (copy_internal): Adjust comment in light of POSIX
+	2008, and deal with macro now being tri-state.
+
+2009-09-04  Petr Salinger  <Petr.Salinger@seznam.cz>
+
+	tests: fix a tail-2/pid failure on GNU/kFreeBSD
+	* tests/tail-2/wait: Increase the file name recheck frequency to
+	fix a failure on systems without inotify and a file timestamp precision
+	of 1 second (like GNU/kFreeBSD).
+
+2009-09-04  Pádraig Brady  <P@draigBrady.com>
+
+	tests: fix a failure when running tail-2/wait as root
+	* tests/tail-2/wait: Silently skip a portion of the test
+	when running as root, rather than failing the whole test.
+	This regression was introduced with commit 84b5844d, 2009-09-03,
+	"tests: simplify and fix a race in 2 tail --follow tests".
+
+2009-09-04  Mike Frysinger  <vapier@gentoo.org>
+
+	build: fix libcap configure flag handling
+	* m4/jm-macros.m4 (coreutils_MACROS): The code to handle configure-time
+	enabling or disabling of libcap support was broken.  It would treat any
+	libcap configure option as --disable-libcap because it doesn't check
+	$enableval at all.  This change makes sure we do the sane thing:
+	  --disable-libcap -> disable and don't run any tests
+	  --enable-libcap -> run tests and fail if not found
+	  default -> run tests and warn if not found
+
+2009-09-03  Jim Meyering  <meyering@redhat.com>
+
+	df: don't fail due to an unreadable argument
+	* src/df.c (main): If open or fstat fails when we're trying to ensure
+	that all arg-partitions are automounted, fall back on using stat.
+	Inspired by the report and patch from Olivier Fourdan in
+	http://bugzilla.redhat.com/520630.
+	* NEWS (Bug fixes): Mention it.
+	* tests/df/unreadable: New test for the above.
+	* tests/Makefile.am (TESTS): Add df/unreadable.
+	The bug was introduced in coreutils-7.3 via commit dbd17157,
+	2009-04-28, "df: use open(2), not stat, to trigger automounting".
+
+2009-09-03  Kamil Dudka  <kdudka@redhat.com>
+
+	doc: install -C: fix bug in the texi documentation
+	* doc/coreutils.texi: Move the documentation for install --compare (-C)
+	from the section on fmt to that for install.
+	Reported by Florian Schlichting.
+
+2009-09-03  Pádraig Brady  <P@draigBrady.com>
+
+	tests: simplify and fix a race in 2 tail --follow tests
+	* tests/tail-2/pid: Use the timeout command to determine process
+	longevity, rather than querying /proc/$pid/status.
+	The latter was racy in any case when inotify is used, as then
+	tail wakes up periodically even for unchanging files therefore
+	causing the check for "S (sleeping)" state to fail intermittently.
+	* tests/tail-2/wait: Likewise.
+
+2009-09-03  Ondřej Vašík  <ovasik@redhat.com>
+
+	cp: don't leak resources for each xattr preservation failure
+	* src/copy.c (copy_reg): Don't return from the function after an
+	unsuccessful and required preservation of extended attributes.
+	This resulted in leaking the copy buffer and file descriptors.
+	* NEWS (Bug fixes): Mention the fix.
+	The bug was introduced in coreutils-7.1 via commit 0889381c, 2009-01-23,
+	"cp/mv: add xattr support".
+
+2009-09-01  Pádraig Brady  <P@draigBrady.com>
+
+	chcon, chmod, chgrp, chown, du: report fts_close failure
+	* src/du.c (du_files): Don't fail silently upon fts_close failure.
+	* src/chcon.c (process_files): Likewise.
+	* src/chmod.c (process_files): Likewise.
+	* src/chown-core.c (chown_files): Likewise.
+
+2009-09-01  Jim Meyering  <meyering@redhat.com>
+
+	build: update from gnulib
+	* gnulib: Update submodule to latest.
+
+	chcon, chmod, chgrp, chown, du: do not ignore fts_close failure
+	This is probably never visible, but who knows...
+	* src/chcon.c (process_files): Don't ignore fts_close failure.
+	* src/chmod.c (process_files): Likewise.
+	* src/chown-core.c (chown_files): Likewise.
+	* src/du.c (du_files): Likewise.
+
+	maint: du: remove unnecessary initialization
+	* src/du.c (main): Don't set "skip_file" unnecessarily.
+
+	maint: chown, chgrp, chmod, chcon: remove unnecessary initialization
+	* src/chown-core.c: Include "ignore-value.h".
+	(change_file_owner): Don't set "ent" only to ignore it.
+	* src/chcon.c (process_file): Likewise.
+	* src/chmod.c: Include "ignore-value.h".
+	(process_file): Don't set "ent" only to ignore it.
+	After diagnosing root-dev/ino failure, return false immediately:
+	Now that we don't set "ent" we must be sure not to use it uninitialized,
+	and there's no point in issuing --verbose-related output in this case.
+
+	maint: shred: remove unnecessary initialization
+	* src/shred.c (genpattern): Value stored to "n" is never used.
+
+	maint: dd: remove unnecessary initialization
+	* src/dd.c (skip): Remove set-but-never-used variable, soffset.
+
+	maint: tail: remove unnecessary initialization
+	* src/tail.c (tail_bytes): Don't compute "diff" twice.
+
+	maint: mbsalign.c: remove unnecessary assignment
+	* gl/lib/mbsalign.c (mbsalign): Remove assignment, the result of which
+	is never used.
+
+2009-09-01  Pádraig Brady  <P@draigBrady.com>
+
+	timeout: remove a redundant assignment
+	* src/timeout.c (main): While keeping argc and argv in
+	sync may be marginally useful, it is redundant to update argc,
+	so just remove that to suppress the clang warning.
+
+	timeout: defensive handling of all wait() errors
+	* src/timeout.c (main): Handle all possible cases of unexpected
+	failures from wait().  This was prompted by the clang tool reporting
+	the possible non-initialization of the status variable.
+
+2009-09-01  Jim Meyering  <meyering@redhat.com>
+
+	ls -i: print consistent inode numbers also for mount points
+	On most unix- and linux-based kernels, ls -i DIR_CONTAINING_MOUNT_POINT
+	would print the wrong inode number for any entry that is a mount point.
+	It would do that by relying on readdir's dirent.d_ino values, while
+	most readdir implementations return the inode number of the underlying,
+	inaccessible directory.  Thus, it is not consistent with what you'd
+	get when applying stat to the same entry.  This bug led to surprising
+	results like "ls -i" and "ls -i --color" printing different numbers (ls
+	must usually "stat" a file to colorize its name).  This change makes it
+	so that on offending systems, ls must stat non-command-line-arguments
+	for which otherwise it would be able to use "for free" dirent.d_ino
+	values.  Regardless of this change, ls is already required to stat every
+	command-line argument.  Note: versions of GNU ls prior to coreutils-6.0
+	did not perform the invalid optimization, and hence always printed
+	correct inode numbers.  Thus, for the sake of correctness, ls -i is
+	forgoing the readdir optimization, for any kernel (including linux!)
+	with POSIX-nonconforming readdir.  Note that currently, only Cygwin has
+	been agile enough to conform.
+
+	* src/ls.c (RELIABLE_D_INO): Define.
+	(print_dir): Use it.
+	For plenty of discussion, see this long thread:
+	http://thread.gmane.org/gmane.comp.gnu.coreutils.bugs/14020
+	This bug was introduced by the 2006-02-26 commit, 33eb3efe:
+	"In ls, avoid calling stat for --inode (-i), when possible."
+	* tests/ls/readdir-mountpoint-inode: New test.
+	* tests/Makefile.am (TESTS): Add it.
+	* tests/ls/stat-vs-dirent: Don't suppress failure of this test,
+	now that ls -i is fixed.  Though note that it doesn't test well,
+	since it compares only the always-stat'd command-line arguments.
+	* NEWS (Bug fixes): Mention it.
+
+2009-08-31  Jim Meyering  <meyering@redhat.com>
+
+	maint: revert my stdbuf change: the result didn't even compile
+	This reverts commit c1e158489d88bad418d52ceadf37af0b6f5b2112.
+
+2009-08-30  Jim Meyering  <meyering@redhat.com>
+
+	maint: stdbuf: move a declaration; no-semantic-change
+	* src/stdbuf.c (set_program_path): Move a declaration down into
+	the scope where it's used.
+
+	build: quiet "make check" in src/
+	* src/Makefile.am (check-duplicate-no-install): Use $(AM_V_GEN).
+	(check-README): Likewise.  And $(AM_V_at).
+
+	doc: cp: update note on preserving symlink time stamps
+	* doc/coreutils.texi (cp invocation): Now, we *do* preserve time
+	stamps on symlinks, when possible.
+
+	build: update bootstrap from gnulib
+	* bootstrap: Merge from gnulib.
+
+2009-08-30  Pádraig Brady  <P@draigBrady.com>
+
+	tests: don't misbehave if $TMPDIR contains spaces
+	* tests/misc/xattr: Add quotes.
+	* tests/mv/acl: Likewise.
+	* tests/mv/backup-is-src: Likewise.
+	* tests/mv/hard-link-1: Likewise.
+	* tests/mv/leak-fd: Likewise.
+	* tests/mv/mv-special-1: Likewise.
+	* tests/mv/part-fail: Likewise.
+	* tests/mv/part-hardlink: Likewise.
+	* tests/mv/part-rename: Likewise.
+	* tests/mv/part-symlink: Likewise.
+	* tests/mv/partition-perm: Likewise.
+	* tests/mv/sticky-to-xpart: Likewise.
+
+2009-08-29  Jim Meyering  <meyering@redhat.com>
+
+	tests: other-fs-tmpdir: don't misbehave for quote-unfriendly $TMPDIR
+	* tests/other-fs-tmpdir: Quote uses of variables that might expand
+	to strings containing e.g., whitespace.
+
+	build: update from gnulib
+	* gnulib: Update submodule to latest.
+
+	tests: move a coreutils-specific test from maint.mk to Makefile.am
+	* Makefile.am (distcheck-hook): Make taint-distcheck here, since it's
+	no longer done via maint.mk.
+
+	tests: cp/reflink-auto guard against a pathological $TMPDIR
+	* tests/cp/reflink-auto: Add quotes.
+
+2009-08-29  Pádraig Brady  <P@draigBrady.com>
+
+	cp --reflink: preserve attributes on cloned files if asked
+	* src/copy.c (copy_reg): When cloning only skip the data copying
+	* tests/cp/reflink-perm: New test to check times and modes copied
+	* tests/Makefile.am: Reference the new test
+	* NEWS: Mention the fix
+
+	cp --reflink: add an "auto" parameter to fall back to a normal copy
+	* doc/coreutils.texi (cp invocation): Document the new
+	"auto" and "always" options to --reflink.
+	* src/copy.c (copy_reg): Fall back to a standard copy
+	when reflink() is not supported and --reflink=auto specified.
+	* src/copy.h [struct cp_options] (reflink): Change type s/bool/enum/.
+	* src/cp.c (usage): Describe the --reflink={always,auto} options
+	and expand a little on what --reflink does.
+	(main): parse the new parameters to --reflink and allow all
+	--sparse options with --reflink=auto.
+	* src/install.c (cp_option_init): Init the enum instead of bool.
+	* src/mv.c (cp_option_init): Likewise.
+	* tests/cp/reflink-auto: A new test for falling back to normal copy.
+	* tests/Makefile.am: Reference the new test.
+	* NEWS: Mention the new feature.
+
+	stdbuf: fix a small typo in --help output
+	* src/stdbuf.c (usage): s/then/the/
+
+2009-08-28  Eric Blake  <ebb9@byu.net>
+
+	build: avoid unused variable warnings on cygwin
+	* src/copy.c (clone_file, copy_attr_by_fd, copy_attr_by_name):
+	Mark up unused variables.
+	* src/remove.c (dirent_inode_sort_may_be_useful): Likewise.
+
+	dd: detect closed stderr
+	* src/dd.c (maybe_close_stdout): Always flush stderr; regression
+	introduced in commit 381e69ea.
+	* tests/misc/close-stdout (p): Use consistent style.
+	* tests/dd/stderr: New test, borrowing from misc/close-stdout.
+	* tests/Makefile.am (TESTS): Run it.
+	* NEWS: Mention this.
+
+2009-08-28  Jim Meyering  <meyering@redhat.com>
+
+	maint: ignore only man/*.1, not all *.1 files
+	* .gitignore: Ignore *.1 only in man/
+
+2009-08-27  Jim Meyering  <meyering@redhat.com>
+
+	build: prefix a few rules with $(AM_V_GEN)
+	* Makefile.am (.version, dist-hook, gen-ChangeLog): Use $(AM_V_GEN)
+	and $(AM_V_at), so that automake's silent-rules option (make V=1/V=0)
+	now controls whether the commands are printed at build time.
+	(THANKS-to-translators, check-ls-dircolors): Likewise.
+
+2009-08-26  Jim Meyering  <meyering@redhat.com>
+
+	build: stop earlier if touching ChangeLog fails
+	* bootstrap.conf: Exit right away if touching ChangeLog fails.
+	Otherwise, the touch failure message is buried under configure output.
+
+	tests: mkdir/selinux: avoid spurious failure on some SELinux systems
+	* tests/test-lib.sh (require_selinux_enforcing_): New function.
+	* tests/mkdir/selinux: Use it.
+	Otherwise, this test would fail on Rawhide with SELinux disabled.
+
+	tests: tail-2/assert: avoid risk of race condition
+	* tests/tail-2/assert: Avoid spurious failure due to race condition.
+	Rather than sleeping for 1 second and crossing fingers,
+	wait explicitly for backgrounded tail process to start.
+	Otherwise, this test would fail under heavy load.
+
+2009-08-25  Jim Meyering  <meyering@redhat.com>
+
+	maint: ensure we don't embed Emacs indent-tabs-mode setting lines
+	Now that we prohibit indentation via TABs, there's no need for
+	Emacs indent-tabs-mode setting lines, so prohibit those, too.
+	* cfg.mk (sc_prohibit_emacs__indent_tabs_mode__setting): New rule.
+
+	maint: remove Local Variables: indent-tabs-mode: nil from all sources
+	* src/getlimits.c: Likewise.
+	* src/group-list.c: Likewise.
+	* src/groups.c: Likewise.
+	* src/mktemp.c: Likewise.
+	* src/setuidgid.c: Likewise.
+	* src/stdbuf.c: Likewise.
+	* src/timeout.c: Likewise.
+	* src/truncate.c: Likewise.
+	* gl/lib/mbsalign.c: Likewise.
+	* tests/test-lib.sh: Likewise.
+	* bootstrap: Likewise.
+	* README-hacking: Likewise.
+
+	doc: HACKING: mention the new space-only indentation policy
+
+	maint: teach "make syntax-check" the space-only indentation rule
+	* cfg.mk (sc_prohibit_tab_based_indentation): New rule.
+	* .x-sc_prohibit_tab_based_indentation: New file.
+	* Makefile.am (syntax_check_exceptions): Add file,
+	.x-sc_prohibit_tab_based_indentation.
+
+	global: convert indentation-TABs to spaces
+	Transformed via this shell code:
+	t=$'\t'
+	git ls-files \
+	  | grep -vE '(^|/)((GNU)?[Mm]akefile|ChangeLog)|\.(am|mk)$' \
+	  | grep -vE 'tests/pr/|help2man' \
+	  | xargs grep -lE "^ *$t" \
+	  | xargs perl -MText::Tabs -ni -le \
+	    '$m=/^( *\t[ \t]*)(.*)/; print $m ? expand($1) . $2 : $_'
+
+2009-08-24  Jim Meyering  <meyering@redhat.com>
+
+	cp: ignore obscure failure to preserve symlink time stamps,
+	...when run on a kernel older than what was implied by headers and
+	libraries tested at configure time.
+	* src/copy.c (utimens_symlink): Ignore failure when errno == ENOSYS.
+	* NEWS (Bug fixes): Mention it.
+	Reported by Todd Zullinger and Kamil Dudka.
+	Details in this thread:
+	http://thread.gmane.org/gmane.linux.redhat.fedora.devel/119834
+
+2009-08-23  Jim Meyering  <meyering@redhat.com>
+
+	tests: skip (don't fail) a cp test, upon mount-related failure
+	* tests/cp/cp-mv-enotsup-xattr: Upon a set-up failiure, rather than
+	failing the test with a "framework failure" diagnostic, just skip it.
+	Russell Whitaker reported that this test failed on slackware.
+
+	build: update from *public* gnulib
+	* gnulib: Update submodule to latest.
+	Kamil Dudka reported that bootstrap was broken.
+
+2009-08-22  Jim Meyering  <meyering@redhat.com>
+
+	build: update from gnulib
+	* gnulib: Update submodule to latest.
+
 2009-08-20  Jim Meyering  <meyering@redhat.com>
+
+	post-release administrivia
+	* NEWS: Add header line for next release.
+	* .prev-version: Record previous version.
+	* cfg.mk (old_NEWS_hash): Auto-update.
 
 	version 7.5
 	* NEWS: Record release date.

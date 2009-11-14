@@ -58,6 +58,23 @@ extern int dirfd (DIR const *dir);
      dirfd (d))
 #endif
 
+#if @GNULIB_FDOPENDIR@
+# if !@HAVE_FDOPENDIR@
+/* Open a directory stream visiting the given directory file
+   descriptor.  Return NULL and set errno if fd is not visiting a
+   directory.  On success, this function consumes fd (it will be
+   implicitly closed either by this function or by a subsequent
+   closedir).  */
+extern DIR *fdopendir (int fd);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef fdopendir
+# define fdopendir(f) \
+    (GL_LINK_WARNING ("fdopendir is unportable - " \
+                      "use gnulib module fdopendir for portability"), \
+     fdopendir (f))
+#endif
+
 #if @GNULIB_SCANDIR@
 /* Scan the directory DIR, calling FILTER on each directory entry.
    Entries for which FILTER returns nonzero are individually malloc'd,

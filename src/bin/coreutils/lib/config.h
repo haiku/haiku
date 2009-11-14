@@ -1747,7 +1747,7 @@
 /* #undef LDBL_SIGNBIT_WORD */
 
 /* Define if `link(2)' dereferences symbolic links. */
-/* #undef LINK_FOLLOWS_SYMLINKS */
+#define LINK_FOLLOWS_SYMLINKS -1
 
 /* FIXME */
 /* #undef LOCALTIME_CACHE */

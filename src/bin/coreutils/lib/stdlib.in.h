@@ -207,6 +207,31 @@ extern char * mkdtemp (char * /*template*/);
 #endif
 
 
+#if @GNULIB_MKOSTEMP@
+# if !@HAVE_MKOSTEMP@
+/* Create a unique temporary file from TEMPLATE.
+   The last six characters of TEMPLATE must be "XXXXXX";
+   they are replaced with a string that makes the file name unique.
+   The flags are a bitmask, possibly including O_CLOEXEC (defined in <fcntl.h>)
+   and O_TEXT, O_BINARY (defined in "binary-io.h").
+   The file is then created, with the specified flags, ensuring it didn't exist
+   before.
+   The file is created read-write (mask at least 0600 & ~umask), but it may be
+   world-readable and world-writable (mask 0666 & ~umask), depending on the
+   implementation.
+   Returns the open file descriptor if successful, otherwise -1 and errno
+   set.  */
+extern int mkostemp (char * /*template*/, int /*flags*/);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef mkostemp
+# define mkostemp(t,f) \
+    (GL_LINK_WARNING ("mkostemp is unportable - " \
+                      "use gnulib module mkostemp for portability"), \
+     mkostemp (t, f))
+#endif
+
+
 #if @GNULIB_MKSTEMP@
 # if @REPLACE_MKSTEMP@
 /* Create a unique temporary file from TEMPLATE.

@@ -1,6 +1,6 @@
 /* Invoke stdio functions, but avoid some glitches.
 
-   Copyright (C) 2001, 2003, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003, 2006, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,4 +20,5 @@
 #include <stdio.h>
 
 FILE *fopen_safer (char const *, char const *);
+FILE *popen_safer (char const *, char const *);
 FILE *tmpfile_safer (void);

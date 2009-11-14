@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wctype.h>
 
 #include "exclude.h"
 #include "hash.h"
@@ -113,7 +114,7 @@ struct exclude
 bool
 fnmatch_pattern_has_wildcards (const char *str, int options)
 {
-  char *cset = "\\?*[]";
+  const char *cset = "\\?*[]";
   if (options & FNM_NOESCAPE)
     cset++;
   while (*str)
@@ -199,7 +200,7 @@ string_free (void *data)
 
 /* Create new exclude segment of given TYPE and OPTIONS, and attach it
    to the tail of list in EX */
-struct exclude_segment *
+static struct exclude_segment *
 new_exclude_segment (struct exclude *ex, enum exclude_type type, int options)
 {
   struct exclude_segment *sp = xzalloc (sizeof (struct exclude_segment));
@@ -328,7 +329,7 @@ exclude_fnmatch (char const *pattern, char const *f, int options)
 
 /* Return true if the exclude_pattern segment SEG excludes F.  */
 
-bool
+static bool
 excluded_file_pattern_p (struct exclude_segment const *seg, char const *f)
 {
   size_t exclude_count = seg->v.pat.exclude_count;
@@ -350,7 +351,7 @@ excluded_file_pattern_p (struct exclude_segment const *seg, char const *f)
 /* Return true if the exclude_hash segment SEG excludes F.
    BUFFER is an auxiliary storage of the same length as F (with nul
    terminator included) */
-bool
+static bool
 excluded_file_name_p (struct exclude_segment const *seg, char const *f,
 		      char *buffer)
 {

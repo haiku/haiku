@@ -1,6 +1,6 @@
 /* Create /proc/self/fd-related names for subfiles of open directories.
 
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,7 +34,10 @@
 #include "xalloc.h"
 
 /* The results of open() in this file are not used with fchdir,
-   therefore save some unnecessary work in fchdir.c.  */
+   and we do not leak fds to any single-threaded code that could use stdio,
+   therefore save some unnecessary work in fchdir.c.
+   FIXME - if the kernel ever adds support for multi-thread safety for
+   avoiding standard fds, then we should use open_safer.  */
 #undef open
 #undef close
 
@@ -53,6 +56,13 @@ char *
 openat_proc_name (char buf[OPENAT_BUFFER_SIZE], int fd, char const *file)
 {
   static int proc_status = 0;
+
+  /* Make sure the caller gets ENOENT when appropriate.  */
+  if (!*file)
+    {
+      buf[0] = '\0';
+      return buf;
+    }
 
   if (! proc_status)
     {

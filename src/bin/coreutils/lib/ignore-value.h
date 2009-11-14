@@ -1,6 +1,6 @@
-/* ignore a value to quiet a compiler warning
+/* ignore a function return without a compiler warning
 
-   Copyright (C) 2008 Free Software Foundation, Inc.
+   Copyright (C) 2008-2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,13 +17,7 @@
 
 /* Written by Jim Meyering.  */
 
-#ifndef __attribute__
-# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8)
-#  define __attribute__(x)
-# endif
-#endif
-
-/* Use this function to avoid a warning when using a function declared with
+/* Use these functions to avoid a warning when using a function declared with
    gcc's warn_unused_result attribute, but for which you really do want to
    ignore the result.  Traditionally, people have used a "(void)" cast to
    indicate that a function's return value is deliberately unused.  However,
@@ -38,8 +32,6 @@
    "copy.c:233: warning: ignoring return value of 'fchown',
    declared with attribute warn_unused_result".  */
 
-static inline void
-ignore_value (int i __attribute__ ((__unused__)))
-{
-  /* empty */
-}
+static inline void ignore_value (int i) { (void) i; }
+static inline void ignore_ptr (void* p) { (void) p; }
+/* FIXME: what about aggregate types? */

@@ -97,9 +97,6 @@
    language is requested. */
 #undef ENABLE_NLS
 
-/* Define if gnulib's fchdir() replacement is used. */
-#undef FCHDIR_REPLACEMENT
-
 /* Define on systems for which file names may have a so-called `drive letter'
    prefix, define this to compute the length of that prefix, including the
    colon. */
@@ -135,6 +132,9 @@
 /* Define as the word index where to find the sign of 'float'. */
 #undef FLT_SIGNBIT_WORD
 
+/* Define to 1 if fopen() fails to recognize a trailing slash. */
+#undef FOPEN_TRAILING_SLASH_BUG
+
 /* Define to 1 if ungetc is broken when used on arbitrary bytes. */
 #undef FUNC_UNGETC_BROKEN
 
@@ -158,6 +158,9 @@
 /* Define to 1 when using the gnulib module close-stream. */
 #undef GNULIB_CLOSE_STREAM
 
+/* Define to 1 when using the gnulib module dirent-safer. */
+#undef GNULIB_DIRENT_SAFER
+
 /* Define to 1 when using the gnulib module fcntl-safer. */
 #undef GNULIB_FCNTL_SAFER
 
@@ -179,11 +182,20 @@
 /* Define to 1 when using the gnulib module open. */
 #undef GNULIB_OPEN
 
+/* Define to 1 when using the gnulib module openat-safer. */
+#undef GNULIB_OPENAT_SAFER
+
 /* enable some gnulib portability checks */
 #undef GNULIB_PORTCHECK
 
 /* Define to indicate the 'realloc' module. */
 #undef GNULIB_REALLOC_GNU
+
+/* Define to 1 when using the gnulib module stdlib-safer. */
+#undef GNULIB_STDLIB_SAFER
+
+/* Define to 1 when using the gnulib module unistd-safer. */
+#undef GNULIB_UNISTD_SAFER
 
 /* Define to 1 when using the gnulib module unistr/u8-uctomb. */
 #undef GNULIB_UNISTR_U8_UCTOMB
@@ -322,7 +334,7 @@
    the CoreFoundation framework. */
 #undef HAVE_CFPREFERENCESCOPYAPPVALUE
 
-/* Define to 1 if your system has a working `chown' function. */
+/* Define to 1 if you have the `chown' function. */
 #undef HAVE_CHOWN
 
 /* Define to 1 if you have the `chroot' function. */
@@ -547,6 +559,10 @@
    don't. */
 #undef HAVE_DECL_MEMRCHR
 
+/* Define to 1 if you have the declaration of `program_invocation_name', and
+   to 0 if you don't. */
+#undef HAVE_DECL_PROGRAM_INVOCATION_NAME
+
 /* Define to 1 if you have the declaration of `putchar_unlocked', and to 0 if
    you don't. */
 #undef HAVE_DECL_PUTCHAR_UNLOCKED
@@ -687,6 +703,9 @@
 
 /* Define to 1 if you have the `euidaccess' function. */
 #undef HAVE_EUIDACCESS
+
+/* Define to 1 if you have the `faccessat' function. */
+#undef HAVE_FACCESSAT
 
 /* Define to 1 if you have the `fchdir' function. */
 #undef HAVE_FCHDIR
@@ -940,6 +959,9 @@
 
 /* Define to 1 if you have the `ypsec' library (-lypsec). */
 #undef HAVE_LIBYPSEC
+
+/* Define to 1 if you have the `link' function. */
+#undef HAVE_LINK
 
 /* Define to 1 if you have the `listmntent' function. */
 #undef HAVE_LISTMNTENT
@@ -1253,7 +1275,7 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
-/* Define if you have the strndup() function and it works. */
+/* Define to 1 if you have the `strndup' function. */
 #undef HAVE_STRNDUP
 
 /* Define to 1 if you have the `strnlen' function. */
@@ -1438,6 +1460,9 @@
 
 /* Define if struct stat has an st_dm_mode member. */
 #undef HAVE_ST_DM_MODE
+
+/* Define to 1 if you have the `symlink' function. */
+#undef HAVE_SYMLINK
 
 /* Define to 1 if you have the `sync' function. */
 #undef HAVE_SYNC
@@ -1745,7 +1770,8 @@
 /* Define as the word index where to find the sign of 'long double'. */
 #undef LDBL_SIGNBIT_WORD
 
-/* Define if `link(2)' dereferences symbolic links. */
+/* Define to 1 if `link(2)' dereferences symbolic links, 0 if it creates hard
+   links to symlinks, and -1 if unknown. */
 #undef LINK_FOLLOWS_SYMLINKS
 
 /* FIXME */
@@ -1962,6 +1988,13 @@
 /* Define to 1 if dup2 returns 0 instead of the target fd. */
 #undef REPLACE_DUP2
 
+/* Define to 1 if gnulib's fchdir() replacement is used. */
+#undef REPLACE_FCHDIR
+
+/* Define to 1 if open() should work around the inability to open a directory.
+   */
+#undef REPLACE_OPEN_DIRECTORY
+
 /* Define this to 1 if strerror is broken. */
 #undef REPLACE_STRERROR
 
@@ -2170,9 +2203,6 @@
    used. */
 #undef __GETOPT_PREFIX
 
-/* Define to rpl_ if the openat replacement function should be used. */
-#undef __OPENAT_PREFIX
-
 /* Define like PROTOTYPES; this can be used by system headers. */
 #undef __PROTOTYPES
 
@@ -2185,9 +2215,6 @@
 
 /* Define to rpl_calloc if the replacement function should be used. */
 #undef calloc
-
-/* Define to rpl_fchownat if the replacement function should be used. */
-#undef fchownat
 
 /* Define to a replacement function name for fnmatch(). */
 #undef fnmatch

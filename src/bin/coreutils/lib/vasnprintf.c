@@ -260,7 +260,7 @@ local_wcsnlen (const wchar_t *s, size_t maxlen)
 # ifndef decimal_point_char_defined
 #  define decimal_point_char_defined 1
 static char
-decimal_point_char ()
+decimal_point_char (void)
 {
   const char *point;
   /* Determine it in a multithread-safe way.  We know nl_langinfo is

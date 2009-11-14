@@ -69,8 +69,12 @@ static char sccsid[] = "@(#)fts.c	8.6 (Berkeley) 8/14/94";
 
 #if ! _LIBC
 # include "fcntl--.h"
-# include "openat.h"
+# include "dirent--.h"
 # include "unistd--.h"
+/* FIXME - use fcntl(F_DUPFD_CLOEXEC)/openat(O_CLOEXEC) once they are
+   supported.  */
+# include "cloexec.h"
+# include "openat.h"
 # include "same-inode.h"
 #endif
 
@@ -228,10 +232,6 @@ static void free_dir (FTS *fts) {}
 # define SIZE_MAX ((size_t) -1)
 #endif
 
-#ifndef O_DIRECTORY
-# define O_DIRECTORY 0
-#endif
-
 #define ISDOT(a)	(a[0] == '.' && (!a[1] || (a[1] == '.' && !a[2])))
 #define STREQ(a, b)	(strcmp ((a), (b)) == 0)
 
@@ -309,11 +309,13 @@ static inline DIR *
 internal_function
 opendirat (int fd, char const *dir)
 {
-  int new_fd = openat (fd, dir, O_RDONLY);
+  int new_fd = openat (fd, dir,
+		       O_RDONLY | O_DIRECTORY | O_NOCTTY | O_NONBLOCK);
   DIR *dirp;
 
   if (new_fd < 0)
     return NULL;
+  set_cloexec_flag (new_fd, true);
   dirp = fdopendir (new_fd);
   if (dirp == NULL)
     {
@@ -365,9 +367,12 @@ diropen (FTS const *sp, char const *dir)
   int open_flags = (O_RDONLY | O_DIRECTORY | O_NOCTTY | O_NONBLOCK
 		    | (ISSET (FTS_PHYSICAL) ? O_NOFOLLOW : 0));
 
-  return (ISSET (FTS_CWDFD)
-	  ? openat (sp->fts_cwd_fd, dir, open_flags)
-	  : open (dir, open_flags));
+  int fd = (ISSET (FTS_CWDFD)
+            ? openat (sp->fts_cwd_fd, dir, open_flags)
+            : open (dir, open_flags));
+  if (0 <= fd)
+    set_cloexec_flag (fd, true);
+  return fd;
 }
 
 FTS *
@@ -606,14 +611,20 @@ fts_close (FTS *sp)
 	if (ISSET(FTS_CWDFD))
 	  {
 	    if (0 <= sp->fts_cwd_fd)
-	      close (sp->fts_cwd_fd);
+	      if (close (sp->fts_cwd_fd))
+		saved_errno = errno;
 	  }
 	else if (!ISSET(FTS_NOCHDIR))
 	  {
 	    /* Return to original directory, save errno if necessary. */
 	    if (fchdir(sp->fts_rfd))
 	      saved_errno = errno;
-	    close(sp->fts_rfd);
+
+	    /* If close fails, record errno only if saved_errno is zero,
+	       so that we report the probably-more-meaningful fchdir errno.  */
+	    if (close (sp->fts_rfd))
+	      if (saved_errno == 0)
+		saved_errno = errno;
 	  }
 
 	fd_ring_clear (&sp->fts_fd_ring);
@@ -1302,7 +1313,10 @@ fts_build (register FTS *sp, int type)
 	if (nlinks || type == BREAD) {
 		int dir_fd = dirfd(dirp);
 		if (ISSET(FTS_CWDFD) && 0 <= dir_fd)
-		  dir_fd = dup (dir_fd);
+		  {
+		    dir_fd = dup (dir_fd);
+		    set_cloexec_flag (dir_fd, true);
+		  }
 		if (dir_fd < 0 || fts_safe_changedir(sp, cur, dir_fd, NULL)) {
 			if (nlinks && type == BREAD)
 				cur->fts_errno = errno;

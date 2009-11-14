@@ -1,6 +1,6 @@
 /* settime -- set the system clock
 
-   Copyright (C) 2002, 2004, 2005, 2006, 2007 Free Software
+   Copyright (C) 2002, 2004, 2005, 2006, 2007, 2009 Free Software
    Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -26,16 +26,6 @@
 #include <unistd.h>
 
 #include <errno.h>
-
-/* Some systems don't have ENOSYS.  */
-#ifndef ENOSYS
-# ifdef ENOTSUP
-#  define ENOSYS ENOTSUP
-# else
-/* Some systems don't have ENOTSUP either.  */
-#  define ENOSYS EINVAL
-# endif
-#endif
 
 /* Set the system time.  */
 

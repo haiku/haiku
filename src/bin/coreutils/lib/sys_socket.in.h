@@ -426,5 +426,32 @@ extern int rpl_shutdown (int, int);
 
 #endif /* HAVE_SYS_SOCKET_H */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if @GNULIB_ACCEPT4@
+/* Accept a connection on a socket, with specific opening flags.
+   The flags are a bitmask, possibly including O_CLOEXEC (defined in <fcntl.h>)
+   and O_TEXT, O_BINARY (defined in "binary-io.h").
+   See also the Linux man page at
+   <http://www.kernel.org/doc/man-pages/online/pages/man2/accept4.2.html>.  */
+# if @HAVE_ACCEPT4@
+#  define accept4 rpl_accept4
+# endif
+extern int accept4 (int sockfd, struct sockaddr *addr, socklen_t *addrlen,
+		    int flags);
+#elif defined GNULIB_POSIXCHECK
+# undef accept4
+# define accept4(s,a,l,f) \
+    (GL_LINK_WARNING ("accept4 is unportable - " \
+                      "use gnulib module accept4 for portability"), \
+     accept4 (s, a, l, f))
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* _GL_SYS_SOCKET_H */
 #endif /* _GL_SYS_SOCKET_H */

@@ -25,9 +25,15 @@
 #include <sys/stat.h>
 
 #include "dirname.h" /* solely for definition of IS_ABSOLUTE_FILE_NAME */
-#include "fcntl--.h"
 #include "openat-priv.h"
 #include "save-cwd.h"
+
+/* We can't use "fcntl--.h", so that openat_safer does not interfere.  */
+#if GNULIB_FCNTL_SAFER
+# include "fcntl-safer.h"
+# undef open
+# define open open_safer
+#endif
 
 /* Replacement for Solaris' openat function.
    <http://www.google.com/search?q=openat+site:docs.sun.com>
@@ -152,74 +158,6 @@ openat_needs_fchdir (void)
   return needs_fchdir;
 }
 
-#if !HAVE_FDOPENDIR
-
-/* Replacement for Solaris' function by the same name.
-   <http://www.google.com/search?q=fdopendir+site:docs.sun.com>
-   First, try to simulate it via opendir ("/proc/self/fd/FD").  Failing
-   that, simulate it by doing save_cwd/fchdir/opendir(".")/restore_cwd.
-   If either the save_cwd or the restore_cwd fails (relatively unlikely),
-   then give a diagnostic and exit nonzero.
-   Otherwise, this function works just like Solaris' fdopendir.
-
-   W A R N I N G:
-   Unlike the other fd-related functions here, this one
-   effectively consumes its FD parameter.  The caller should not
-   close or otherwise manipulate FD if this function returns successfully.  */
-DIR *
-fdopendir (int fd)
-{
-  struct saved_cwd saved_cwd;
-  int saved_errno;
-  DIR *dir;
-
-  char buf[OPENAT_BUFFER_SIZE];
-  char *proc_file = openat_proc_name (buf, fd, ".");
-  if (proc_file)
-    {
-      dir = opendir (proc_file);
-      saved_errno = errno;
-    }
-  else
-    {
-      dir = NULL;
-      saved_errno = EOPNOTSUPP;
-    }
-
-  /* If the syscall fails with an expected errno value, resort to
-     save_cwd/restore_cwd.  */
-  if (! dir && EXPECTED_ERRNO (saved_errno))
-    {
-      if (save_cwd (&saved_cwd) != 0)
-	openat_save_fail (errno);
-
-      if (fchdir (fd) != 0)
-	{
-	  dir = NULL;
-	  saved_errno = errno;
-	}
-      else
-	{
-	  dir = opendir (".");
-	  saved_errno = errno;
-
-	  if (restore_cwd (&saved_cwd) != 0)
-	    openat_restore_fail (errno);
-	}
-
-      free_cwd (&saved_cwd);
-    }
-
-  if (dir)
-    close (fd);
-  if (proc_file != buf)
-    free (proc_file);
-  errno = saved_errno;
-  return dir;
-}
-
-#endif
-
 /* Replacement for Solaris' function by the same name.
    <http://www.google.com/search?q=fstatat+site:docs.sun.com>
    First, try to simulate it via l?stat ("/proc/self/fd/FD/FILE").
@@ -231,7 +169,7 @@ fdopendir (int fd)
 #define AT_FUNC_NAME fstatat
 #define AT_FUNC_F1 lstat
 #define AT_FUNC_F2 stat
-#define AT_FUNC_USE_F1_COND flag == AT_SYMLINK_NOFOLLOW
+#define AT_FUNC_USE_F1_COND AT_SYMLINK_NOFOLLOW
 #define AT_FUNC_POST_FILE_PARAM_DECLS , struct stat *st, int flag
 #define AT_FUNC_POST_FILE_ARGS        , st
 #include "at-func.c"
@@ -253,7 +191,7 @@ fdopendir (int fd)
 #define AT_FUNC_NAME unlinkat
 #define AT_FUNC_F1 rmdir
 #define AT_FUNC_F2 unlink
-#define AT_FUNC_USE_F1_COND flag == AT_REMOVEDIR
+#define AT_FUNC_USE_F1_COND AT_REMOVEDIR
 #define AT_FUNC_POST_FILE_PARAM_DECLS , int flag
 #define AT_FUNC_POST_FILE_ARGS        /* empty */
 #include "at-func.c"

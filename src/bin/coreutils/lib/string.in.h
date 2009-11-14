@@ -206,11 +206,11 @@ extern char *strdup (char const *__s);
 
 /* Return a newly allocated copy of at most N bytes of STRING.  */
 #if @GNULIB_STRNDUP@
-# if ! @HAVE_STRNDUP@
+# if @REPLACE_STRNDUP@
 #  undef strndup
 #  define strndup rpl_strndup
 # endif
-# if ! @HAVE_STRNDUP@ || ! @HAVE_DECL_STRNDUP@
+# if @REPLACE_STRNDUP@ || ! @HAVE_DECL_STRNDUP@
 extern char *strndup (char const *__string, size_t __n);
 # endif
 #elif defined GNULIB_POSIXCHECK
@@ -402,7 +402,13 @@ extern char *strcasestr (const char *haystack, const char *needle)
 
    See also strsep().  */
 #if @GNULIB_STRTOK_R@
-# if ! @HAVE_DECL_STRTOK_R@
+# if @REPLACE_STRTOK_R@
+#  undef strtok_r
+#  define strtok_r rpl_strtok_r
+# elif @UNDEFINE_STRTOK_R@
+#  undef strtok_r
+# endif
+# if ! @HAVE_DECL_STRTOK_R@ || @REPLACE_STRTOK_R@
 extern char *strtok_r (char *restrict s, char const *restrict delim,
 		       char **restrict save_ptr);
 # endif

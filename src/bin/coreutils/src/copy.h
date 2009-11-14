@@ -43,6 +43,19 @@ enum Sparse_type
   SPARSE_ALWAYS
 };
 
+/* Control creation of COW files.  */
+enum Reflink_type
+{
+  /* Default to a standard copy.  */
+  REFLINK_NEVER,
+
+  /* Try a COW copy and fall back to a standard copy.  */
+  REFLINK_AUTO,
+
+  /* Require a COW copy and fail if not available.  */
+  REFLINK_ALWAYS
+};
+
 /* This type is used to help mv (via copy.c) distinguish these cases.  */
 enum Interactive
 {
@@ -72,6 +85,11 @@ enum Dereference_symlink
   ((Mode) == SPARSE_NEVER		\
    || (Mode) == SPARSE_AUTO		\
    || (Mode) == SPARSE_ALWAYS)
+
+# define VALID_REFLINK_MODE(Mode)	\
+  ((Mode) == REFLINK_NEVER		\
+   || (Mode) == REFLINK_AUTO		\
+   || (Mode) == REFLINK_ALWAYS)
 
 /* These options control how files are copied by at least the
    following programs: mv (when rename doesn't work), cp, install.
@@ -222,8 +240,8 @@ struct cp_options
      such a symlink) and returns false.  */
   bool open_dangling_dest_symlink;
 
-  /* If true, attempt to clone the file instead of copying it.  */
-  bool reflink;
+  /* Control creation of COW files.  */
+  enum Reflink_type reflink_mode;
 
   /* This is a set of destination name/inode/dev triples.  Each such triple
      represents a file we have created corresponding to a source file name
@@ -255,8 +273,8 @@ int rpl_rename (const char *, const char *);
 # endif
 
 bool copy (char const *src_name, char const *dst_name,
-	   bool nonexistent_dst, const struct cp_options *options,
-	   bool *copy_into_self, bool *rename_succeeded);
+           bool nonexistent_dst, const struct cp_options *options,
+           bool *copy_into_self, bool *rename_succeeded);
 
 void dest_info_init (struct cp_options *);
 void src_info_init (struct cp_options *);

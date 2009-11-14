@@ -1,6 +1,6 @@
 /* Invoke fcntl-like functions, but avoid some glitches.
 
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,3 +21,7 @@
 
 int open_safer (char const *, int, ...);
 int creat_safer (char const *, mode_t);
+
+#if GNULIB_OPENAT_SAFER
+int openat_safer (int, char const *, int, ...);
+#endif

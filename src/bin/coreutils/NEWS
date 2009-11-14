@@ -1,5 +1,72 @@
 GNU coreutils NEWS                                    -*- outline -*-
 
+* Noteworthy changes in release 7.6 (2009-09-11) [stable]
+
+** Bug fixes
+
+  cp, mv now ignore failure to preserve a symlink time stamp, when it is
+  due to their running on a kernel older than what was implied by headers
+  and libraries tested at configure time.
+  [bug introduced in coreutils-7.5]
+
+  cp --reflink --preserve now preserves attributes when cloning a file.
+  [bug introduced in coreutils-7.5]
+
+  cp --preserve=xattr no longer leaks resources on each preservation failure.
+  [bug introduced in coreutils-7.1]
+
+  dd now exits with non-zero status when it encounters a write error while
+  printing a summary to stderr.
+  [bug introduced in coreutils-6.11]
+
+  dd cbs=N conv=unblock would fail to print a final newline when the size
+  of the input was not a multiple of N bytes.
+  [the non-conforming behavior dates back to the initial implementation]
+
+  df no longer requires that each command-line argument be readable
+  [bug introduced in coreutils-7.3]
+
+  ls -i now prints consistent inode numbers also for mount points.
+  This makes ls -i DIR less efficient on systems with dysfunctional readdir,
+  because ls must stat every file in order to obtain a guaranteed-valid
+  inode number.  [bug introduced in coreutils-6.0]
+
+  tail -f (inotify-enabled) now flushes any initial output before blocking.
+  Before, this would print nothing and wait: stdbuf -o 4K tail -f /etc/passwd
+  Note that this bug affects tail -f only when its standard output is buffered,
+  which is relatively unusual.
+  [bug introduced in coreutils-7.5]
+
+  tail -f once again works with standard input.  inotify-enabled tail -f
+  would fail when operating on a nameless stdin.  I.e., tail -f < /etc/passwd
+  would say "tail: cannot watch `-': No such file or directory", yet the
+  relatively baroque tail -f /dev/stdin < /etc/passwd would work.  Now, the
+  offending usage causes tail to revert to its conventional sleep-based
+  (i.e., not inotify-based) implementation.
+  [bug introduced in coreutils-7.5]
+
+** Portability
+
+  ln, link: link f z/ would mistakenly succeed on Solaris 10, given an
+  existing file, f, and nothing named "z".  ln -T f z/ has the same problem.
+  Each would mistakenly create "z" as a link to "f".  Now, even on such a
+  system, each command reports the error, e.g.,
+  link: cannot create link `z/' to `f': Not a directory
+
+** New features
+
+  cp --reflink accepts a new "auto" parameter which falls back to
+  a standard copy if creating a copy-on-write clone is not possible.
+
+** Changes in behavior
+
+  tail -f now ignores "-" when stdin is a pipe or FIFO.
+  tail-with-no-args now ignores -f unconditionally when stdin is a pipe or FIFO.
+  Before, it would ignore -f only when no file argument was specified,
+  and then only when POSIXLY_CORRECT was set.  Now, :|tail -f - terminates
+  immediately.  Before, it would block indefinitely.
+
+
 * Noteworthy changes in release 7.5 (2009-08-20) [stable]
 
 ** Bug fixes

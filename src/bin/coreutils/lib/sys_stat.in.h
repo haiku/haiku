@@ -306,6 +306,77 @@ extern int rpl_lstat (const char *name, struct stat *buf);
 #endif
 
 
+#if @GNULIB_FCHMODAT@
+# if !@HAVE_FCHMODAT@
+extern int fchmodat (int fd, char const *file, mode_t mode, int flag);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef fchmodat
+# define fchmodat(d,n,m,f)                         \
+    (GL_LINK_WARNING ("fchmodat is not portable - " \
+                      "use gnulib module openat for portability"), \
+     fchmodat (d, n, m, f))
+#endif
+
+
+#if @GNULIB_FSTATAT@
+# if @REPLACE_FSTATAT@
+#  undef fstatat
+#  define fstatat rpl_fstatat
+# endif
+# if !@HAVE_FSTATAT@ || @REPLACE_FSTATAT@
+extern int fstatat (int fd, char const *name, struct stat *st, int flags);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef fstatat
+# define fstatat(d,n,s,f)                         \
+    (GL_LINK_WARNING ("fstatat is not portable - " \
+                      "use gnulib module openat for portability"), \
+     fstatat (d, n, s, f))
+#endif
+
+
+#if @GNULIB_MKDIRAT@
+# if !@HAVE_MKDIRAT@
+extern int mkdirat (int fd, char const *file, mode_t mode);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef mkdirat
+# define mkdirat(d,n,m)                         \
+    (GL_LINK_WARNING ("mkdirat is not portable - " \
+                      "use gnulib module openat for portability"), \
+     mkdirat (d, n, m))
+#endif
+
+#if @GNULIB_MKFIFOAT@
+# if !@HAVE_MKFIFOAT@
+int mkfifoat (int fd, char const *file, mode_t mode);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef mkfifoat
+# define mkfifoat(d,n,m)				     \
+    (GL_LINK_WARNING ("mkfifoat is not portable - " \
+                      "use gnulib module mkfifoat for portability"), \
+     mkfifoat (d, n, m))
+#endif
+
+#if @GNULIB_MKNODAT@
+# if !@HAVE_MKNODAT@
+int mknodat (int fd, char const *file, mode_t mode, dev_t dev);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef mknodat
+# define mknodat(f,n,m,d)			     \
+    (GL_LINK_WARNING ("mknodat is not portable - " \
+                      "use gnulib module mkfifoat for portability"), \
+     mknodat (f, n, m, d))
+#endif
+
+#if @REPLACE_FCHDIR@
+# define fstat rpl_fstat
+extern int fstat (int fd, struct stat *buf);
+#endif
+
 #if @REPLACE_MKDIR@
 # undef mkdir
 # define mkdir rpl_mkdir

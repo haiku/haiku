@@ -55,8 +55,25 @@ rpl_dup2 (int fd, int desired_fd)
     }
 # endif
   result = dup2 (fd, desired_fd);
+# ifdef __linux__
+  /* Correct a Linux return value.
+     <http://git.kernel.org/?p=linux/kernel/git/stable/linux-2.6.30.y.git;a=commitdiff;h=2b79bc4f7ebbd5af3c8b867968f9f15602d5f802>
+   */
+  if (fd == desired_fd && result == (unsigned int) -EBADF)
+    {
+      errno = EBADF;
+      result = -1;
+    }
+# endif
   if (result == 0)
     result = desired_fd;
+  /* Correct a cygwin 1.5.x errno value.  */
+  else if (result == -1 && errno == EMFILE)
+    errno = EBADF;
+#if REPLACE_FCHDIR
+  if (fd != desired_fd && result == desired_fd)
+    result = _gl_register_dup (fd, desired_fd);
+#endif
   return result;
 }
 
@@ -85,13 +102,19 @@ dupfd (int fd, int desired_fd)
 int
 dup2 (int fd, int desired_fd)
 {
+  int result;
   if (fd == desired_fd)
-    return fd;
+    return fcntl (fd, F_GETFL) < 0 ? -1 : fd;
   close (desired_fd);
 # ifdef F_DUPFD
-  return fcntl (fd, F_DUPFD, desired_fd);
+  result = fcntl (fd, F_DUPFD, desired_fd);
 # else
-  return dupfd (fd, desired_fd);
+  result = dupfd (fd, desired_fd);
 # endif
+#if REPLACE_FCHDIR
+  if (0 <= result)
+    result = _gl_register_dup (fd, desired_fd);
+#endif
+  return result;
 }
 #endif /* !REPLACE_DUP2 */

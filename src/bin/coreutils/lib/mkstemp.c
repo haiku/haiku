@@ -1,4 +1,4 @@
-/* Copyright (C) 1998, 1999, 2001, 2005, 2006, 2007 Free Software Foundation, Inc.
+/* Copyright (C) 1998, 1999, 2001, 2005, 2006, 2007, 2009 Free Software Foundation, Inc.
    This file is derived from the one in the GNU C Library.
 
    This program is free software: you can redistribute it and/or modify
@@ -40,5 +40,5 @@ int
 mkstemp (template)
      char *template;
 {
-  return __gen_tempname (template, __GT_FILE);
+  return __gen_tempname (template, 0, __GT_FILE);
 }

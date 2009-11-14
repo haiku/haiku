@@ -24,6 +24,7 @@
 
 #include <config.h>
 #include <alloca.h>
+#include <assert.h>
 
 #if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
 /* Native Win32.  */
@@ -78,6 +79,23 @@ typedef DWORD (WINAPI *PNtQueryInformationFile)
 #ifndef PIPE_BUF
 #define PIPE_BUF	512
 #endif
+
+#define IsConsoleHandle(h) (((long) (h) & 3) == 3)
+
+static BOOL
+IsSocketHandle(HANDLE h)
+{
+  WSANETWORKEVENTS ev;
+
+  if (IsConsoleHandle (h))
+    return FALSE;
+
+  /* Under Wine, it seems that getsockopt returns 0 for pipes too.
+     WSAEnumNetworkEvents instead distinguishes the two correctly.  */
+  ev.lNetworkEvents = 0xDEADBEEF;
+  WSAEnumNetworkEvents ((SOCKET) h, NULL, &ev);
+  return ev.lNetworkEvents != 0xDEADBEEF;
+}
 
 /* Compute output fd_sets for libc descriptor FD (whose Win32 handle is H).  */
 
@@ -141,19 +159,37 @@ win32_poll_handle (HANDLE h, int fd, struct bitset *rbits, struct bitset *wbits,
       break;
 
     case FILE_TYPE_CHAR:
-      ret = WaitForSingleObject (h, 0);
       write = TRUE;
+      if (!(rbits->in[fd / CHAR_BIT] & (1 << (fd & (CHAR_BIT - 1)))))
+	break;
+
+      ret = WaitForSingleObject (h, 0);
       if (ret == WAIT_OBJECT_0)
         {
+	  if (!IsConsoleHandle (h))
+	    {
+	      read = TRUE;
+	      break;
+	    }
+
 	  nbuffer = avail = 0;
 	  bRet = GetNumberOfConsoleInputEvents (h, &nbuffer);
-	  if (!bRet || nbuffer == 0)
-	    except = TRUE;
+
+	  /* Screen buffers handles are filtered earlier.  */
+	  assert (bRet);
+	  if (nbuffer == 0)
+	    {
+	      except = TRUE;
+	      break;
+	    }
 
 	  irbuffer = (INPUT_RECORD *) alloca (nbuffer * sizeof (INPUT_RECORD));
 	  bRet = PeekConsoleInput (h, irbuffer, nbuffer, &avail);
 	  if (!bRet || avail == 0)
-	    except = TRUE;
+	    {
+	      except = TRUE;
+	      break;
+	    }
 
 	  for (i = 0; i < avail; i++)
 	    if (irbuffer[i].EventType == KEY_EVENT)
@@ -202,7 +238,7 @@ rpl_select (int nfds, fd_set *rfds, fd_set *wfds, fd_set *xfds,
   fd_set handle_rfds, handle_wfds, handle_xfds;
   struct bitset rbits, wbits, xbits;
   unsigned char anyfds_in[FD_SETSIZE / CHAR_BIT];
-  DWORD ret, wait_timeout, nhandles, nsock;
+  DWORD ret, wait_timeout, nhandles, nsock, nbuffer;
   MSG msg;
   int i, fd, rc;
 
@@ -230,7 +266,10 @@ rpl_select (int nfds, fd_set *rfds, fd_set *wfds, fd_set *xfds,
   nhandles = 1;
   nsock = 0;
 
-  /* Copy descriptors to bitsets.  */
+  /* Copy descriptors to bitsets.  At the same time, eliminate
+     bits in the "wrong" direction for console input buffers
+     and screen buffers, because screen buffers are waitable
+     and they will block until a character is available.  */
   memset (&rbits, 0, sizeof (rbits));
   memset (&wbits, 0, sizeof (wbits));
   memset (&xbits, 0, sizeof (xbits));
@@ -239,6 +278,11 @@ rpl_select (int nfds, fd_set *rfds, fd_set *wfds, fd_set *xfds,
     for (i = 0; i < rfds->fd_count; i++)
       {
         fd = rfds->fd_array[i];
+	h = (HANDLE) _get_osfhandle (fd);
+	if (IsConsoleHandle (h)
+	    && !GetNumberOfConsoleInputEvents (h, &nbuffer))
+	  continue;
+
         rbits.in[fd / CHAR_BIT] |= 1 << (fd & (CHAR_BIT - 1));
         anyfds_in[fd / CHAR_BIT] |= 1 << (fd & (CHAR_BIT - 1));
       }
@@ -249,6 +293,11 @@ rpl_select (int nfds, fd_set *rfds, fd_set *wfds, fd_set *xfds,
     for (i = 0; i < wfds->fd_count; i++)
       {
         fd = wfds->fd_array[i];
+	h = (HANDLE) _get_osfhandle (fd);
+	if (IsConsoleHandle (h)
+	    && GetNumberOfConsoleInputEvents (h, &nbuffer))
+	  continue;
+
         wbits.in[fd / CHAR_BIT] |= 1 << (fd & (CHAR_BIT - 1));
         anyfds_in[fd / CHAR_BIT] |= 1 << (fd & (CHAR_BIT - 1));
       }
@@ -288,11 +337,7 @@ rpl_select (int nfds, fd_set *rfds, fd_set *wfds, fd_set *xfds,
 	  return -1;
         }
 
-      /* Under Wine, it seems that getsockopt returns 0 for pipes too.
-	 WSAEnumNetworkEvents instead distinguishes the two correctly.  */
-      ev.lNetworkEvents = 0xDEADBEEF;
-      WSAEnumNetworkEvents ((SOCKET) h, NULL, &ev);
-      if (ev.lNetworkEvents != 0xDEADBEEF)
+      if (IsSocketHandle (h))
         {
           int requested = FD_CLOSE;
 

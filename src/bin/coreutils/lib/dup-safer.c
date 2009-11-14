@@ -32,7 +32,7 @@
 int
 dup_safer (int fd)
 {
-#if defined F_DUPFD && !defined FCHDIR_REPLACEMENT
+#if defined F_DUPFD && !REPLACE_FCHDIR
   return fcntl (fd, F_DUPFD, STDERR_FILENO + 1);
 #else
   /* fd_safer calls us back, but eventually the recursion unwinds and
