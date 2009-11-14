@@ -85,6 +85,7 @@ extern int errno;
 
 /* Flags for the `pflags' argument to param_expand() */
 #define PF_NOCOMSUB	0x01	/* Do not perform command substitution */
+#define PF_IGNUNBOUND	0x02	/* ignore unbound vars even if -u set */
 
 /* These defs make it easier to use the editor. */
 #define LBRACE		'{'
@@ -222,6 +223,7 @@ static inline int skip_single_quoted __P((const char *, size_t, int));
 static int skip_double_quoted __P((char *, size_t, int));
 static char *extract_delimited_string __P((char *, int *, char *, char *, char *, int));
 static char *extract_dollar_brace_string __P((char *, int *, int, int));
+static int skip_matched_pair __P((const char *, int, int, int, int));
 
 static char *pos_params __P((char *, int, int, int));
 
@@ -262,7 +264,7 @@ static int valid_brace_expansion_word __P((char *, int));
 static int chk_atstar __P((char *, int, int *, int *));
 static int chk_arithsub __P((const char *, int));
 
-static WORD_DESC *parameter_brace_expand_word __P((char *, int, int));
+static WORD_DESC *parameter_brace_expand_word __P((char *, int, int, int));
 static WORD_DESC *parameter_brace_expand_indir __P((char *, int, int, int *, int *));
 static WORD_DESC *parameter_brace_expand_rhs __P((char *, char *, int, int, int *, int *));
 static void parameter_brace_expand_error __P((char *, char *));
@@ -1373,6 +1375,107 @@ unquote_bang (string)
 #endif
 
 #define CQ_RETURN(x) do { no_longjmp_on_fatal_error = 0; return (x); } while (0)
+
+/* This function assumes s[i] == open; returns with s[ret] == close; used to
+   parse array subscripts.  FLAGS currently unused. */
+static int
+skip_matched_pair (string, start, open, close, flags)
+     const char *string;
+     int start, open, close, flags;
+{
+  int i, pass_next, backq, si, c, count;
+  size_t slen;
+  char *temp, *ss;
+  DECLARE_MBSTATE;
+
+  slen = strlen (string + start) + start;
+  no_longjmp_on_fatal_error = 1;
+
+  i = start + 1;		/* skip over leading bracket */
+  count = 1;
+  pass_next = backq = 0;
+  ss = (char *)string;
+  while (c = string[i])
+    {
+      if (pass_next)
+	{
+	  pass_next = 0;
+	  if (c == 0)
+	    CQ_RETURN(i);
+	  ADVANCE_CHAR (string, slen, i);
+	  continue;
+	}
+      else if (c == '\\')
+	{
+	  pass_next = 1;
+	  i++;
+	  continue;
+	}
+      else if (backq)
+	{
+	  if (c == '`')
+	    backq = 0;
+	  ADVANCE_CHAR (string, slen, i);
+	  continue;
+	}
+      else if (c == '`')
+	{
+	  backq = 1;
+	  i++;
+	  continue;
+	}
+      else if (c == open)
+	{
+	  count++;
+	  i++;
+	  continue;
+	}
+      else if (c == close)
+	{
+	  count--;
+	  if (count == 0)
+	    break;
+	  i++;
+	  continue;
+	}
+      else if (c == '\'' || c == '"')
+	{
+	  i = (c == '\'') ? skip_single_quoted (ss, slen, ++i)
+			  : skip_double_quoted (ss, slen, ++i);
+	  /* no increment, the skip functions increment past the closing quote. */
+	}
+      else if (c == '$' && (string[i+1] == LPAREN || string[i+1] == LBRACE))
+	{
+	  si = i + 2;
+	  if (string[si] == '\0')
+	    CQ_RETURN(si);
+
+	  if (string[i+1] == LPAREN)
+	    temp = extract_delimited_string (ss, &si, "$(", "(", ")", SX_NOALLOC|SX_COMMAND); /* ) */
+	  else
+	    temp = extract_dollar_brace_string (ss, &si, 0, SX_NOALLOC);
+	  i = si;
+	  if (string[i] == '\0')	/* don't increment i past EOS in loop */
+	    break;
+	  i++;
+	  continue;
+	}
+      else
+	ADVANCE_CHAR (string, slen, i);
+    }
+
+  CQ_RETURN(i);
+}
+
+#if defined (ARRAY_VARS)
+int
+skipsubscript (string, start)
+     const char *string;
+     int start;
+{
+  return (skip_matched_pair (string, start, '[', ']', 0));
+}
+#endif
 
 /* Skip characters in STRING until we find a character in DELIMS, and return
    the index of that character.  START is the index into string at which we
@@ -5093,9 +5196,9 @@ chk_atstar (name, quoted, quoted_dollar_atp, contains_dollar_at)
    the shell, e.g., "@", "$", "*", etc.  QUOTED, if non-zero, means that
    NAME was found inside of a double-quoted expression. */
 static WORD_DESC *
-parameter_brace_expand_word (name, var_is_special, quoted)
+parameter_brace_expand_word (name, var_is_special, quoted, pflags)
      char *name;
-     int var_is_special, quoted;
+     int var_is_special, quoted, pflags;
 {
   WORD_DESC *ret;
   char *temp, *tt;
@@ -5127,7 +5230,7 @@ parameter_brace_expand_word (name, var_is_special, quoted)
       strcpy (tt + 1, name);
 
       ret = param_expand (tt, &sindex, quoted, (int *)NULL, (int *)NULL,
-			  (int *)NULL, (int *)NULL, 0);
+			  (int *)NULL, (int *)NULL, pflags);
       free (tt);
     }
 #if defined (ARRAY_VARS)
@@ -5188,7 +5291,7 @@ parameter_brace_expand_indir (name, var_is_special, quoted, quoted_dollar_atp, c
   char *temp, *t;
   WORD_DESC *w;
 
-  w = parameter_brace_expand_word (name, var_is_special, quoted);
+  w = parameter_brace_expand_word (name, var_is_special, quoted, PF_IGNUNBOUND);
   t = w->word;
   /* Have to dequote here if necessary */
   if (t)
@@ -5205,7 +5308,7 @@ parameter_brace_expand_indir (name, var_is_special, quoted, quoted_dollar_atp, c
   if (t == 0)
     return (WORD_DESC *)NULL;
 
-  w = parameter_brace_expand_word (t, SPECIAL_VAR(t, 0), quoted);
+  w = parameter_brace_expand_word (t, SPECIAL_VAR(t, 0), quoted, 0);
   free (t);
 
   return w;
@@ -6503,7 +6606,7 @@ parameter_brace_expand (string, indexp, quoted, quoted_dollar_atp, contains_doll
 	    *contains_dollar_at = 1;
 	}
       free (x);
-      free (xlist);
+      dispose_words (xlist);
       free (temp1);
       *indexp = sindex;
 
@@ -6556,7 +6659,7 @@ parameter_brace_expand (string, indexp, quoted, quoted_dollar_atp, contains_doll
   if (want_indir)
     tdesc = parameter_brace_expand_indir (name + 1, var_is_special, quoted, quoted_dollar_atp, contains_dollar_at);
   else
-    tdesc = parameter_brace_expand_word (name, var_is_special, quoted);
+    tdesc = parameter_brace_expand_word (name, var_is_special, quoted, PF_IGNUNBOUND);
 
   if (tdesc)
     {
@@ -6664,13 +6767,13 @@ parameter_brace_expand (string, indexp, quoted, quoted_dollar_atp, contains_doll
       return &expand_wdesc_error;
 
     case RBRACE:
-      if (var_is_set == 0 && unbound_vars_is_error)
+      if (var_is_set == 0 && unbound_vars_is_error && ((name[0] != '@' && name[0] != '*') || name[1]))
 	{
+	  last_command_exit_value = EXECUTION_FAILURE;
 	  err_unboundvar (name);
 	  FREE (value);
 	  FREE (temp);
 	  free (name);
-	  last_command_exit_value = EXECUTION_FAILURE;
 	  return (interactive_shell ? &expand_wdesc_error : &expand_wdesc_fatal);
 	}
       break;
@@ -6887,15 +6990,25 @@ param_expand (string, sindex, quoted, expanded_something,
     case '*':		/* `$*' */
       list = list_rest_of_args ();
 
-      if (list == 0 && unbound_vars_is_error)
+#if 0
+      /* According to austin-group posix proposal by Geoff Clare in
+	 <20090505091501.GA10097@squonk.masqnet> of 5 May 2009:
+
+ 	"The shell shall write a message to standard error and
+ 	 immediately exit when it tries to expand an unset parameter
+ 	 other than the '@' and '*' special parameters."
+      */
+
+      if (list == 0 && unbound_vars_is_error && (pflags & PF_IGNUNBOUND) == 0)
 	{
 	  uerror[0] = '$';
 	  uerror[1] = '*';
 	  uerror[2] = '\0';
-	  err_unboundvar (uerror);
 	  last_command_exit_value = EXECUTION_FAILURE;
+	  err_unboundvar (uerror);
 	  return (interactive_shell ? &expand_wdesc_error : &expand_wdesc_fatal);
 	}
+#endif
 
       /* If there are no command-line arguments, this should just
 	 disappear if there are other characters in the expansion,
@@ -6949,15 +7062,25 @@ param_expand (string, sindex, quoted, expanded_something,
     case '@':		/* `$@' */
       list = list_rest_of_args ();
 
-      if (list == 0 && unbound_vars_is_error)
+#if 0
+      /* According to austin-group posix proposal by Geoff Clare in
+	 <20090505091501.GA10097@squonk.masqnet> of 5 May 2009:
+
+ 	"The shell shall write a message to standard error and
+ 	 immediately exit when it tries to expand an unset parameter
+ 	 other than the '@' and '*' special parameters."
+      */
+
+      if (list == 0 && unbound_vars_is_error && (pflags & PF_IGNUNBOUND) == 0)
 	{
 	  uerror[0] = '$';
 	  uerror[1] = '@';
 	  uerror[2] = '\0';
-	  err_unboundvar (uerror);
 	  last_command_exit_value = EXECUTION_FAILURE;
+	  err_unboundvar (uerror);
 	  return (interactive_shell ? &expand_wdesc_error : &expand_wdesc_fatal);
 	}
+#endif
 
       /* We want to flag the fact that we saw this.  We can't turn
 	 off quoting entirely, because other characters in the

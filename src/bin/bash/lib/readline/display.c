@@ -512,6 +512,7 @@ rl_redisplay ()
   /* Block keyboard interrupts because this function manipulates global
      data structures. */
   _rl_block_sigint ();  
+  RL_SETSTATE (RL_STATE_REDISPLAYING);
 
   if (!rl_display_prompt)
     rl_display_prompt = "";
@@ -1188,15 +1189,24 @@ rl_redisplay ()
       if (t < out)
 	line[t - 1] = '>';
 
-      if (!rl_display_fixed || forced_display || lmargin != last_lmargin)
+      if (rl_display_fixed == 0 || forced_display || lmargin != last_lmargin)
 	{
 	  forced_display = 0;
+	  o_cpos = _rl_last_c_pos;
+	  cpos_adjusted = 0;
 	  update_line (&visible_line[last_lmargin],
 		       &invisible_line[lmargin],
 		       0,
 		       _rl_screenwidth + visible_wrap_offset,
 		       _rl_screenwidth + (lmargin ? 0 : wrap_offset),
 		       0);
+
+	  if ((MB_CUR_MAX > 1 && rl_byte_oriented == 0) &&
+	      cpos_adjusted == 0 &&
+	      _rl_last_c_pos != o_cpos &&
+	      _rl_last_c_pos > wrap_offset &&
+	      o_cpos < prompt_last_invisible)
+		_rl_last_c_pos -= prompt_invis_chars_first_line;	/* XXX - was wrap_offset */
 
 	  /* If the visible new line is shorter than the old, but the number
 	     of invisible characters is greater, and we are at the end of
@@ -1236,6 +1246,7 @@ rl_redisplay ()
       visible_wrap_offset = wrap_offset;
   }
 
+  RL_UNSETSTATE (RL_STATE_REDISPLAYING);
   _rl_release_sigint ();
 }
 
@@ -1772,7 +1783,7 @@ update_line (old, new, current_line, omax, nmax, inv_botlin)
 	     space_to_eol will insert too many spaces.  XXX - maybe we should
 	     adjust col_lendiff based on the difference between _rl_last_c_pos
 	     and _rl_screenwidth */
-	  if (col_lendiff && (_rl_last_c_pos < _rl_screenwidth))
+	  if (col_lendiff && ((MB_CUR_MAX == 1 || rl_byte_oriented) || (_rl_last_c_pos < _rl_screenwidth)))
 #endif
 	    {	  
 	      if (_rl_term_autowrap && current_line < inv_botlin)
@@ -1892,6 +1903,10 @@ _rl_move_cursor_relative (new, data)
 
   woff = WRAP_OFFSET (_rl_last_v_pos, wrap_offset);
   cpos = _rl_last_c_pos;
+
+  if (cpos == 0 && cpos == new)
+    return;
+
 #if defined (HANDLE_MULTIBYTE)
   /* If we have multibyte characters, NEW is indexed by the buffer point in
      a multibyte string, but _rl_last_c_pos is the display position.  In
@@ -1905,9 +1920,9 @@ _rl_move_cursor_relative (new, data)
 	 prompt string, since they're both buffer indices and DPOS is a
 	 desired display position. */
       if ((new > prompt_last_invisible) ||		/* XXX - don't use woff here */
-	  (prompt_physical_chars > _rl_screenwidth &&
+	  (prompt_physical_chars >= _rl_screenwidth &&
 	   _rl_last_v_pos == prompt_last_screen_line &&
-	   wrap_offset >= woff &&
+	   wrap_offset >= woff && dpos >= woff &&
 	   new > (prompt_last_invisible-(_rl_screenwidth*_rl_last_v_pos)-wrap_offset)))
 	   /* XXX last comparison might need to be >= */
 	{

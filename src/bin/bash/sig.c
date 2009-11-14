@@ -449,6 +449,48 @@ sighandler
 termsig_sighandler (sig)
      int sig;
 {
+  /* If we get called twice with the same signal before handling it,
+     terminate right away. */
+  if (
+#ifdef SIGHUP
+    sig != SIGHUP &&
+#endif
+#ifdef SIGINT
+    sig != SIGINT &&
+#endif
+#ifdef SIGDANGER
+    sig != SIGDANGER &&
+#endif
+#ifdef SIGPIPE
+    sig != SIGPIPE &&
+#endif
+#ifdef SIGALRM
+    sig != SIGALRM &&
+#endif
+#ifdef SIGTERM
+    sig != SIGTERM &&
+#endif
+#ifdef SIGXCPU
+    sig != SIGXCPU &&
+#endif
+#ifdef SIGXFSZ
+    sig != SIGXFSZ &&
+#endif
+#ifdef SIGVTALRM
+    sig != SIGVTALRM &&
+#endif
+#ifdef SIGLOST
+    sig != SIGLOST &&
+#endif
+#ifdef SIGUSR1
+    sig != SIGUSR1 &&
+#endif
+#ifdef SIGUSR2
+   sig != SIGUSR2 &&
+#endif
+   sig == terminating_signal)
+    terminate_immediately = 1;
+
   terminating_signal = sig;
 
   /* XXX - should this also trigger when interrupt_immediately is set? */

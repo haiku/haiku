@@ -356,7 +356,7 @@ finddirs (pat, sdir, flags, ep, np)
 	*np = 0;
       if (ep)
         *ep = 0;
-      if (r)
+      if (r && r != &glob_error_return)
 	free (r);
       return (struct globval *)0;
     }
@@ -665,7 +665,9 @@ glob_vector (pat, dir, flags)
       (void) closedir (d);
     }
 
-  /* compat: if GX_ALLDIRS, add the passed directory also */
+  /* compat: if GX_ADDCURDIR, add the passed directory also.  Add an empty
+     directory name as a placeholder if GX_NULLDIR (in which case the passed
+     directory name is "."). */
   if (add_current)
     {
       sdlen = strlen (dir);
@@ -917,11 +919,14 @@ glob_filename (pathname, flags)
 	{
 	  char **temp_results;
 
+	  /* XXX -- we've recursively scanned any directories resulting from
+	     a `**', so turn off the flag.  We turn it on again below if
+	     filename is `**' */
 	  /* Scan directory even on a NULL filename.  That way, `*h/'
 	     returns only directories ending in `h', instead of all
 	     files ending in `h' with a `/' appended. */
 	  dname = directories[i];
-	  dflags = flags & ~GX_MARKDIRS;
+	  dflags = flags & ~(GX_MARKDIRS|GX_ALLDIRS|GX_ADDCURDIR);
 	  if ((flags & GX_GLOBSTAR) && filename[0] == '*' && filename[1] == '*' && filename[2] == '\0')
 	    dflags |= GX_ALLDIRS|GX_ADDCURDIR;
 	  if (dname[0] == '\0' && filename[0])
@@ -942,7 +947,12 @@ glob_filename (pathname, flags)
 	      char **array;
 	      register unsigned int l;
 
-	      array = glob_dir_to_array (directories[i], temp_results, flags);
+	      /* If we're expanding **, we don't need to glue the directory
+		 name to the results; we've already done it in glob_vector */
+	      if ((dflags & GX_ALLDIRS) && filename[0] == '*' && filename[1] == '*' && filename[2] == '\0')
+		array = temp_results;
+	      else
+		array = glob_dir_to_array (directories[i], temp_results, flags);
 	      l = 0;
 	      while (array[l] != NULL)
 		++l;
@@ -959,7 +969,8 @@ glob_filename (pathname, flags)
 	      result[result_size - 1] = NULL;
 
 	      /* Note that the elements of ARRAY are not freed.  */
-	      free ((char *) array);
+	      if (array != temp_results)
+		free ((char *) array);
 	    }
 	}
       /* Free the directories.  */
@@ -1003,11 +1014,24 @@ glob_filename (pathname, flags)
 
       /* Just return what glob_vector () returns appended to the
 	 directory name. */
+      /* If flags & GX_ALLDIRS, we're called recursively */
       dflags = flags & ~GX_MARKDIRS;
       if (directory_len == 0)
 	dflags |= GX_NULLDIR;
       if ((flags & GX_GLOBSTAR) && filename[0] == '*' && filename[1] == '*' && filename[2] == '\0')
-	dflags |= GX_ALLDIRS|GX_ADDCURDIR;
+	{
+	  dflags |= GX_ALLDIRS|GX_ADDCURDIR;
+#if 0
+	  /* If we want all directories (dflags & GX_ALLDIRS) and we're not
+	     being called recursively as something like `echo ** /*.o'
+	     ((flags & GX_ALLDIRS) == 0), we want to prevent glob_vector from
+	     adding a null directory name to the front of the temp_results
+	     array.  We turn off ADDCURDIR if not called recursively and
+	     dlen == 0 */
+#endif
+	  if (directory_len == 0 && (flags & GX_ALLDIRS) == 0)
+	    dflags &= ~GX_ADDCURDIR;
+	}
       temp_results = glob_vector (filename,
 				  (directory_len == 0 ? "." : directory_name),
 				  dflags);

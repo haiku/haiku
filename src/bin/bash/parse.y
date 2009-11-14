@@ -1122,7 +1122,7 @@ pipeline:	pipeline '|' newline_list pipeline
 			  REDIRECTEE rd;
 			  REDIRECT *r;
 
-			  tc = $1;
+			  tc = $1->type == cm_simple ? (COMMAND *)$1->value.Simple : $1;
 			  rd.dest = 1;
 			  r = make_redirection (2, r_duplicating_output, rd);
 			  if (tc->redirects)
@@ -1615,10 +1615,11 @@ save_token_state ()
 {
   int *ret;
 
-  ret = (int *)xmalloc (3 * sizeof (int));
+  ret = (int *)xmalloc (4 * sizeof (int));
   ret[0] = last_read_token;
   ret[1] = token_before_that;
   ret[2] = two_tokens_ago;
+  ret[3] = current_token;
   return ret;
 }
 
@@ -1631,6 +1632,7 @@ restore_token_state (ts)
   last_read_token = ts[0];
   token_before_that = ts[1];
   two_tokens_ago = ts[2];
+  current_token = ts[3];
 }
 
 /*
@@ -1877,7 +1879,7 @@ read_secondary_line (remove_quoted_newline)
     prompt_again ();
   ret = read_a_line (remove_quoted_newline);
 #if defined (HISTORY)
-  if (remember_on_history && (parser_state & PST_HEREDOC))
+  if (ret && remember_on_history && (parser_state & PST_HEREDOC))
     {
       /* To make adding the the here-document body right, we need to rely
 	 on history_delimiting_chars() returning \n for the first line of
@@ -2668,6 +2670,7 @@ reset_parser ()
   FREE (word_desc_to_read);
   word_desc_to_read = (WORD_DESC *)NULL;
 
+  current_token = '\n';		/* XXX */
   last_read_token = '\n';
   token_to_read = '\n';
 }
@@ -2915,6 +2918,7 @@ tokword:
 #define P_DQUOTE	0x04
 #define P_COMMAND	0x08	/* parsing a command, so look for comments */
 #define P_BACKQUOTE	0x10	/* parsing a backquoted command substitution */
+#define P_ARRAYSUB	0x20	/* parsing a [...] array subscript for assignment */
 
 /* Lexical state while parsing a grouping construct or $(...). */
 #define LEX_WASDOL	0x001
@@ -2927,6 +2931,7 @@ tokword:
 #define LEX_INHEREDOC	0x080
 #define LEX_HEREDELIM	0x100		/* reading here-doc delimiter */
 #define LEX_STRIPDOC	0x200		/* <<- strip tabs from here doc delim */
+#define LEX_INWORD	0x400
 
 #define COMSUB_META(ch)		((ch) == ';' || (ch) == '&' || (ch) == '|')
 
@@ -3129,6 +3134,8 @@ parse_matched_pair (qc, open, close, lenp, flags)
 	      APPEND_NESTRET ();
 	      FREE (nestret);
 	    }
+	  else if ((flags & P_ARRAYSUB) && (tflags & LEX_WASDOL) && (ch == '(' || ch == '{' || ch == '['))	/* ) } ] */
+	    goto parse_dollar_word;
 	}
       /* Parse an old-style command substitution within double quotes as a
 	 single word. */
@@ -3145,6 +3152,7 @@ parse_matched_pair (qc, open, close, lenp, flags)
       else if MBTEST(open != '`' && (tflags & LEX_WASDOL) && (ch == '(' || ch == '{' || ch == '['))	/* ) } ] */
 	/* check for $(), $[], or ${} inside quoted string. */
 	{
+parse_dollar_word:
 	  if (open == ch)	/* undo previous increment */
 	    count--;
 	  if (ch == '(')		/* ) */
@@ -3179,7 +3187,7 @@ parse_comsub (qc, open, close, lenp, flags)
      int open, close;
      int *lenp, flags;
 {
-  int count, ch, peekc, tflags, lex_rwlen, lex_firstind;
+  int count, ch, peekc, tflags, lex_rwlen, lex_wlen, lex_firstind;
   int nestlen, ttranslen, start_lineno;
   char *ret, *nestret, *ttrans, *heredelim;
   int retind, retsize, rflags, hdlen;
@@ -3200,7 +3208,7 @@ parse_comsub (qc, open, close, lenp, flags)
   retind = 0;
 
   start_lineno = line_number;
-  lex_rwlen = 0;
+  lex_rwlen = lex_wlen = 0;
 
   heredelim = 0;
   lex_firstind = -1;
@@ -3267,6 +3275,46 @@ eof_error:
 	  continue;
 	}
 
+      if (tflags & LEX_PASSNEXT)		/* last char was backslash */
+	{
+/*itrace("parse_comsub:%d: lex_passnext -> 0 ch = `%c' (%d)", line_number, ch, __LINE__);*/
+	  tflags &= ~LEX_PASSNEXT;
+	  if (qc != '\'' && ch == '\n')	/* double-quoted \<newline> disappears. */
+	    {
+	      if (retind > 0)
+		retind--;	/* swallow previously-added backslash */
+	      continue;
+	    }
+
+	  RESIZE_MALLOCED_BUFFER (ret, retind, 2, retsize, 64);
+	  if MBTEST(ch == CTLESC || ch == CTLNUL)
+	    ret[retind++] = CTLESC;
+	  ret[retind++] = ch;
+	  continue;
+	}
+
+      /* If this is a shell break character, we are not in a word.  If not,
+	 we either start or continue a word. */
+      if MBTEST(shellbreak (ch))
+	{
+	  tflags &= ~LEX_INWORD;
+/*itrace("parse_comsub:%d: lex_inword -> 0 ch = `%c' (%d)", line_number, ch, __LINE__);*/
+	}
+      else
+	{
+	  if (tflags & LEX_INWORD)
+	    {
+	      lex_wlen++;
+/*itrace("parse_comsub:%d: lex_inword == 1 ch = `%c' lex_wlen = %d (%d)", line_number, ch, lex_wlen, __LINE__);*/
+	    }	      
+	  else
+	    {
+/*itrace("parse_comsub:%d: lex_inword -> 1 ch = `%c' (%d)", line_number, ch, __LINE__);*/
+	      tflags |= LEX_INWORD;
+	      lex_wlen = 0;
+	    }
+	}
+
       /* Skip whitespace */
       if MBTEST(shellblank (ch) && lex_rwlen == 0)
         {
@@ -3306,7 +3354,7 @@ eof_error:
 	}
 
       /* Meta-characters that can introduce a reserved word.  Not perfect yet. */
-      if MBTEST((tflags & LEX_RESWDOK) == 0 && (tflags & LEX_CKCASE) && (tflags & LEX_INCOMMENT) == 0 && shellmeta(ch))
+      if MBTEST((tflags & LEX_RESWDOK) == 0 && (tflags & LEX_CKCASE) && (tflags & LEX_INCOMMENT) == 0 && (shellmeta(ch) || ch == '\n'))
 	{
 	  /* Add this character. */
 	  RESIZE_MALLOCED_BUFFER (ret, retind, 1, retsize, 64);
@@ -3364,9 +3412,21 @@ eof_error:
 }	        
 	      tflags &= ~LEX_RESWDOK;
 	    }
-	  else if (shellbreak (ch) == 0)
+	  else if MBTEST((tflags & LEX_CKCOMMENT) && ch == '#' && (lex_rwlen == 0 || ((tflags & LEX_INWORD) && lex_wlen == 0)))
+	    ;	/* don't modify LEX_RESWDOK if we're starting a comment */
+	  else if MBTEST((tflags & LEX_INCASE) && ch != '\n')
+	    /* If we can read a reserved word and we're in case, we're at the
+	       point where we can read a new pattern list or an esac.  We
+	       handle the esac case above.  If we read a newline, we want to
+	       leave LEX_RESWDOK alone.  If we read anything else, we want to
+	       turn off LEX_RESWDOK, since we're going to read a pattern list. */
 {
-	      tflags &= ~LEX_RESWDOK;
+	    tflags &= ~LEX_RESWDOK;
+/*itrace("parse_comsub:%d: lex_incase == 1 found `%c', lex_reswordok -> 0", line_number, ch);*/
+}
+	  else if MBTEST(shellbreak (ch) == 0)
+{
+	    tflags &= ~LEX_RESWDOK;
 /*itrace("parse_comsub:%d: found `%c', lex_reswordok -> 0", line_number, ch);*/
 }
 	}
@@ -3394,36 +3454,23 @@ eof_error:
 		}
 	      else
 		shell_ungetc (peekc);
-	      tflags |= LEX_HEREDELIM;
-	      lex_firstind = -1;
+	      if (peekc != '<')
+		{
+		  tflags |= LEX_HEREDELIM;
+		  lex_firstind = -1;
+		}
 	      continue;
 	    }
 	  else
-	    ch = peekc;		/* fall through and continue XXX - this skips comments if peekc == '#' */
+	    ch = peekc;		/* fall through and continue XXX */
 	}
-      /* Not exactly right yet, should handle shell metacharacters, too.  If
-	 any changes are made to this test, make analogous changes to subst.c:
-	 extract_delimited_string(). */
-      else if MBTEST((tflags & LEX_CKCOMMENT) && (tflags & LEX_INCOMMENT) == 0 && ch == '#' && (retind == 0 || ret[retind-1] == '\n' || shellblank (ret[retind - 1])))
+      else if MBTEST((tflags & LEX_CKCOMMENT) && (tflags & LEX_INCOMMENT) == 0 && ch == '#' && (((tflags & LEX_RESWDOK) && lex_rwlen == 0) || ((tflags & LEX_INWORD) && lex_wlen == 0)))
+{
+/*itrace("parse_comsub:%d: lex_incomment -> 1 (%d)", line_number, __LINE__);*/
 	tflags |= LEX_INCOMMENT;
+}
 
-      if (tflags & LEX_PASSNEXT)		/* last char was backslash */
-	{
-	  tflags &= ~LEX_PASSNEXT;
-	  if (qc != '\'' && ch == '\n')	/* double-quoted \<newline> disappears. */
-	    {
-	      if (retind > 0)
-		retind--;	/* swallow previously-added backslash */
-	      continue;
-	    }
-
-	  RESIZE_MALLOCED_BUFFER (ret, retind, 2, retsize, 64);
-	  if MBTEST(ch == CTLESC || ch == CTLNUL)
-	    ret[retind++] = CTLESC;
-	  ret[retind++] = ch;
-	  continue;
-	}
-      else if MBTEST(ch == CTLESC || ch == CTLNUL)	/* special shell escapes */
+      if MBTEST(ch == CTLESC || ch == CTLNUL)	/* special shell escapes */
 	{
 	  RESIZE_MALLOCED_BUFFER (ret, retind, 2, retsize, 64);
 	  ret[retind++] = CTLESC;
@@ -4248,7 +4295,7 @@ read_token_word (character)
 		     ((token_index > 0 && assignment_acceptable (last_read_token) && token_is_ident (token, token_index)) ||
 		      (token_index == 0 && (parser_state&PST_COMPASSIGN))))
         {
-	  ttok = parse_matched_pair (cd, '[', ']', &ttoklen, 0);
+	  ttok = parse_matched_pair (cd, '[', ']', &ttoklen, P_ARRAYSUB);
 	  if (ttok == &matched_pair_error)
 	    return -1;		/* Bail immediately. */
 	  RESIZE_MALLOCED_BUFFER (token, token_index, ttoklen + 2,
@@ -4449,6 +4496,7 @@ reserved_word_acceptable (toksym)
     case '}':		/* XXX */
     case AND_AND:
     case BANG:
+    case BAR_AND:
     case DO:
     case DONE:
     case ELIF:

@@ -295,6 +295,13 @@ declare_internal (list, local_var)
       subscript_start = (char *)NULL;
       if (t = strchr (name, '['))	/* ] */
 	{
+	  /* If offset != 0 we have already validated any array reference */
+	  if (offset == 0 && valid_array_reference (name) == 0)
+	    {
+	      sh_invalidid (name);
+	      assign_error++;
+	      NEXT_VARIABLE ();
+	    }
 	  subscript_start = t;
 	  *t = '\0';
 	  making_array_special = 1;
@@ -484,7 +491,7 @@ declare_internal (list, local_var)
 	    }
 	  /* declare -a name[[n]] or declare name[n] makes name an indexed
 	     array variable. */
-	  else if ((making_array_special || (flags_on & att_array)) && array_p (var) == 0)
+	  else if ((making_array_special || (flags_on & att_array)) && array_p (var) == 0 && assoc_p (var) == 0)
 	    var = convert_var_to_array (var);
 #endif /* ARRAY_VARS */
 

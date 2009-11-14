@@ -442,7 +442,7 @@ restore_pipeline (discard)
   old_pipeline = the_pipeline;
   the_pipeline = saved_pipeline;
   already_making_children = saved_already_making_children;
-  if (discard)
+  if (discard && old_pipeline)
     discard_pipeline (old_pipeline);
 }
 
@@ -4200,6 +4200,25 @@ void
 close_pgrp_pipe ()
 {
   sh_closepipe (pgrp_pipe);
+}
+
+void
+save_pgrp_pipe (p, clear)
+     int *p;
+     int clear;
+{
+  p[0] = pgrp_pipe[0];
+  p[1] = pgrp_pipe[1];
+  if (clear)
+    pgrp_pipe[0] = pgrp_pipe[1] = -1;
+}
+
+void
+restore_pgrp_pipe (p)
+     int *p;
+{
+  pgrp_pipe[0] = p[0];
+  pgrp_pipe[1] = p[1];
 }
 
 #endif /* PGRP_PIPE */

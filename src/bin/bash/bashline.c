@@ -3398,7 +3398,6 @@ bash_execute_unix_command (count, key)
   Keymap xkmap;		/* unix command executing keymap */
   register int i;
   intmax_t mi;
-  int save_point;
   sh_parser_state_t ps;
   char *cmd, *value, *l;
   SHELL_VAR *v;
@@ -3442,7 +3441,6 @@ bash_execute_unix_command (count, key)
   if (v)
     VSETATTR (v, att_exported);
   l = value_cell (v);
-  save_point = rl_point;
   value = inttostr (rl_point, ibuf, sizeof (ibuf));
   v = bind_int_variable ("READLINE_POINT", value);
   if (v)
@@ -3460,7 +3458,7 @@ bash_execute_unix_command (count, key)
   if (v && legal_number (value_cell (v), &mi))
     {
       i = mi;
-      if (i != save_point)
+      if (i != rl_point)
 	{
 	  rl_point = i;
 	  if (rl_point > rl_end)

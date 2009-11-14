@@ -568,6 +568,7 @@ execute_command_internal (command, asynchronous, pipe_in, pipe_out,
 
       /* Fork a subshell, turn off the subshell bit, turn off job
 	 control and call execute_command () on the command again. */
+      line_number_for_err_trap = line_number;
       paren_pid = make_child (savestring (make_command_string (command)),
 			      asynchronous);
       if (paren_pid == 0)
@@ -610,7 +611,10 @@ execute_command_internal (command, asynchronous, pipe_in, pipe_out,
 	      if (user_subshell && was_error_trap && ignore_return == 0 && invert == 0 && exec_result != EXECUTION_SUCCESS)
 		{
 		  last_command_exit_value = exec_result;
+		  save_line_number = line_number;
+		  line_number = line_number_for_err_trap;
 		  run_error_trap ();
+		  line_number = save_line_number;
 		}
 
 	      if (user_subshell && ignore_return == 0 && invert == 0 && exit_immediately_on_error && exec_result != EXECUTION_SUCCESS)
@@ -766,7 +770,9 @@ execute_command_internal (command, asynchronous, pipe_in, pipe_out,
       if (was_error_trap && ignore_return == 0 && invert == 0 && pipe_in == NO_PIPE && pipe_out == NO_PIPE && exec_result != EXECUTION_SUCCESS)
 	{
 	  last_command_exit_value = exec_result;
+	  line_number = line_number_for_err_trap;
 	  run_error_trap ();
+	  line_number = save_line_number;
 	}
 
       if (ignore_return == 0 && invert == 0 &&
@@ -2105,6 +2111,7 @@ execute_connection (command, asynchronous, pipe_in, pipe_out, fds_to_close)
   REDIRECT *rp;
   COMMAND *tc, *second;
   int ignore_return, exec_result, was_error_trap, invert;
+  volatile int save_line_number;
 
   ignore_return = (command->flags & CMD_IGNORE_RETURN) != 0;
 
@@ -2174,12 +2181,16 @@ execute_connection (command, asynchronous, pipe_in, pipe_out, fds_to_close)
       invert = (command->flags & CMD_INVERT_RETURN) != 0;
       ignore_return = (command->flags & CMD_IGNORE_RETURN) != 0;
 
+      line_number_for_err_trap = line_number;
       exec_result = execute_pipeline (command, asynchronous, pipe_in, pipe_out, fds_to_close);
 
       if (was_error_trap && ignore_return == 0 && invert == 0 && exec_result != EXECUTION_SUCCESS)
 	{
 	  last_command_exit_value = exec_result;
+	  save_line_number = line_number;
+	  line_number = line_number_for_err_trap;
 	  run_error_trap ();
+	  line_number = save_line_number;
 	}
 
       if (ignore_return == 0 && invert == 0 && exit_immediately_on_error && exec_result != EXECUTION_SUCCESS)
@@ -2930,7 +2941,7 @@ execute_case_command (case_command)
 		  retval = execute_command (clauses->action);
 		}
 	      while ((clauses->flags & CASEPAT_FALLTHROUGH) && (clauses = clauses->next));
-	      if ((clauses->flags & CASEPAT_TESTNEXT) == 0)
+	      if (clauses == 0 || (clauses->flags & CASEPAT_TESTNEXT) == 0)
 		EXIT_CASE ();
 	      else
 		break;

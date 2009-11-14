@@ -235,6 +235,8 @@ extern void default_tty_job_signals __P((void));
 extern void init_job_stats __P((void));
 
 extern void close_pgrp_pipe __P((void));
+extern void save_pgrp_pipe __P((int *, int));
+extern void restore_pgrp_pipe __P((int *));
 
 #if defined (JOB_CONTROL)
 extern int job_control;

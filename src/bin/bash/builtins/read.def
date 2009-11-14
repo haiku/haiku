@@ -369,14 +369,14 @@ read_builtin (list)
       code = setjmp (alrmbuf);
       if (code)
 	{
-#if 0
+	  /* Tricky.  The top of the unwind-protect stack is the free of
+	     input_string.  We want to run all the rest and use input_string,
+	     so we have to remove it from the stack. */
+	  remove_unwind_protect ();
 	  run_unwind_frame ("read_builtin");
-	  return (EXECUTION_FAILURE);
-#else
 	  input_string[i] = '\0';	/* make sure it's terminated */
-	  retval = 128+SIGALRM;;
+	  retval = 128+SIGALRM;
 	  goto assign_vars;
-#endif
 	}
       old_alrm = set_signal_handler (SIGALRM, sigalrm);
       add_unwind_protect (reset_alarm, (char *)NULL);
@@ -763,7 +763,10 @@ assign_vars:
       if (*input_string == 0)
 	tofree = input_string = t;
       else
-	input_string = strip_trailing_ifs_whitespace (t1, ifs_chars, saw_escape);
+	{
+	  input_string = strip_trailing_ifs_whitespace (t1, ifs_chars, saw_escape);
+	  tofree = t;
+	}
     }
 #endif
 

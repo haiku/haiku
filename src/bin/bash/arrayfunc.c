@@ -98,7 +98,7 @@ convert_var_to_assoc (var)
   oldval = value_cell (var);
   hash = assoc_create (0);
   if (oldval)
-    assoc_insert (hash, "0", oldval);
+    assoc_insert (hash, savestring ("0"), oldval);
 
   FREE (value_cell (var));
   var_setassoc (var, hash);
@@ -604,64 +604,7 @@ quote_array_assignment_chars (list)
     }
 }
 
-/* This function assumes s[i] == '['; returns with s[ret] == ']' if
-   an array subscript is correctly parsed. */
-int
-skipsubscript (s, i)
-     const char *s;
-     int i;
-{
-  int count, c;
-#if defined (HANDLE_MULTIBYTE)
-  mbstate_t state, state_bak;
-  size_t slength, mblength;
-#endif
-
-#if defined (HANDLE_MULTIBYTE)
-  memset (&state, '\0', sizeof (mbstate_t));
-  slength = strlen (s + i);
-#endif
-  
-  count = 1;
-  while (count)
-    {
-      /* Advance one (possibly multibyte) character in S starting at I. */
-#if defined (HANDLE_MULTIBYTE)
-      if (MB_CUR_MAX > 1)
-	{
-	  state_bak = state;
-	  mblength = mbrlen (s + i, slength, &state);
-
-	  if (MB_INVALIDCH (mblength))
-	    {
-	      state = state_bak;
-	      i++;
-	      slength--;
-	    }
-	  else if (MB_NULLWCH (mblength))
-	    return i;
-	  else
-	    {
-	      i += mblength;
-	      slength -= mblength;
-	    }
-	}
-      else
-#endif
-      ++i;
-
-      c = s[i];
-
-      if (c == 0)
-	break;
-      else if (c == '[')
-	count++;
-      else if (c == ']')
-	count--;
-    }
-
-  return i;
-}
+/* skipsubscript moved to subst.c to use private functions. 2009/02/24. */
 
 /* This function is called with SUB pointing to just after the beginning
    `[' of an array subscript and removes the array element to which SUB

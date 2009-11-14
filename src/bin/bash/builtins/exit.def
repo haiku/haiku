@@ -113,7 +113,7 @@ exit_or_logout (list)
       for (i = stopmsg = 0; i < js.j_jobslots; i++)
 	if (jobs[i] && STOPPED (i))
 	  stopmsg = JSTOPPED;
-	else if (check_jobs_at_exit && stopmsg == 0 && RUNNING (i))
+	else if (check_jobs_at_exit && stopmsg == 0 && jobs[i] && RUNNING (i))
 	  stopmsg = JRUNNING;
 
       if (stopmsg == JSTOPPED)

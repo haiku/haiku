@@ -755,7 +755,7 @@ _run_trap_internal (sig, tag)
 	}
 
       flags = SEVAL_NONINT|SEVAL_NOHIST;
-      if (sig != DEBUG_TRAP && sig != RETURN_TRAP)
+      if (sig != DEBUG_TRAP && sig != RETURN_TRAP && sig != ERROR_TRAP)
 	flags |= SEVAL_RESETLINE;
       if (function_code == 0)
 	parse_and_execute (trap_command, tag, flags);
@@ -798,12 +798,36 @@ int
 run_debug_trap ()
 {
   int trap_exit_value;
+  pid_t save_pgrp;
+  int save_pipe[2];
 
   /* XXX - question:  should the DEBUG trap inherit the RETURN trap? */
   trap_exit_value = 0;
   if ((sigmodes[DEBUG_TRAP] & SIG_TRAPPED) && ((sigmodes[DEBUG_TRAP] & SIG_IGNORED) == 0) && ((sigmodes[DEBUG_TRAP] & SIG_INPROGRESS) == 0))
     {
+#if defined (JOB_CONTROL)
+      save_pgrp = pipeline_pgrp;
+      pipeline_pgrp = 0;
+      save_pipeline (1);
+#  if defined (PGRP_PIPE)
+      save_pgrp_pipe (save_pipe, 1);
+#  endif
+      stop_making_children ();
+#endif
+
       trap_exit_value = _run_trap_internal (DEBUG_TRAP, "debug trap");
+
+#if defined (JOB_CONTROL)
+      pipeline_pgrp = save_pgrp;
+      restore_pipeline (1);
+#  if defined (PGRP_PIPE)
+      close_pgrp_pipe ();
+      restore_pgrp_pipe (save_pipe);
+#  endif
+      if (pipeline_pgrp > 0)
+	give_terminal_to (pipeline_pgrp, 1);
+      notify_and_cleanup ();
+#endif
       
 #if defined (DEBUGGER)
       /* If we're in the debugger and the DEBUG trap returns 2 while we're in

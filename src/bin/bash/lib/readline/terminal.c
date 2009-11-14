@@ -355,7 +355,7 @@ rl_resize_terminal ()
       _rl_get_screen_size (fileno (rl_instream), 1);
       if (CUSTOM_REDISPLAY_FUNC ())
 	rl_forced_update_display ();
-      else
+      else if (RL_ISSTATE(RL_STATE_REDISPLAYING) == 0)
 	_rl_redisplay_after_sigwinch ();
     }
 }

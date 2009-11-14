@@ -1032,6 +1032,7 @@ gen_shell_function_matches (cs, text, line, ind, lwords, nw, cw)
   cmdlist = build_arg_list (funcname, text, lwords, cw);
 
   pps = &ps;
+  save_parser_state (pps);
   begin_unwind_frame ("gen-shell-function-matches");
   add_unwind_protect (restore_parser_state, (char *)pps);
   add_unwind_protect (dispose_words, (char *)cmdlist);
@@ -1174,13 +1175,15 @@ command_line_to_word_list (line, llen, sentinel, nwp, cwp)
 {
   WORD_LIST *ret;
   char *delims;
+  int i, j;
 
-#if 0
-  delims = "()<>;&| \t\n";	/* shell metacharacters break words */
-#else
-  delims = rl_completer_word_break_characters;
-#endif
+  delims = xmalloc (strlen (rl_completer_word_break_characters) + 1);
+  for (i = j = 0; rl_completer_word_break_characters[i]; i++)
+    if (rl_completer_word_break_characters[i] != '\'' && rl_completer_word_break_characters[i] != '"')
+      delims[j++] = rl_completer_word_break_characters[i];
+  delims[j] = '\0';
   ret = split_at_delims (line, llen, delims, sentinel, nwp, cwp);
+  free (delims);
   return (ret);
 }
 
