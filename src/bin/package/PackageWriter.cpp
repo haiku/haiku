@@ -27,6 +27,11 @@
 
 #include "FDCloser.h"
 #include "Stacker.h"
+#include "ZlibCompressor.h"
+
+
+// minimum length of data we require before trying to zlib compress them
+static const size_t kZlibCompressionSizeThreshold = 64;
 
 
 // #pragma mark - Data interface
@@ -536,7 +541,7 @@ PackageWriter::_Init(const char* fileName)
 		throw std::bad_alloc();
 
 	// allocate data buffer
-	fDataBufferSize = 128 * 1024;
+	fDataBufferSize = 2 * B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB;
 	fDataBuffer = malloc(fDataBufferSize);
 	if (fDataBuffer == NULL)
 		throw std::bad_alloc();
@@ -1144,13 +1149,51 @@ PackageWriter::_GetAttributeType(const char* attributeName, uint8 type)
 status_t
 PackageWriter::_AddData(Data& data, off_t size)
 {
-	uint64 dataOffset = fHeapEnd - fHeapOffset;
+	uint64 dataOffset = fHeapEnd;
 
+	uint64 compression = B_HPKG_COMPRESSION_NONE;
+	uint64 compressedSize;
+
+	status_t error = _WriteZlibCompressedData(data, size, dataOffset,
+		compressedSize);
+	if (error == B_OK) {
+		compression = B_HPKG_COMPRESSION_ZLIB;
+	} else {
+		error = _WriteUncompressedData(data, size, dataOffset);
+		compressedSize = size;
+	}
+	if (error != B_OK)
+		return error;
+
+	fHeapEnd = dataOffset + compressedSize;
+
+	// add data attribute
+	Attribute* dataAttribute = _AddDataAttribute(B_HPKG_ATTRIBUTE_NAME_DATA,
+		compressedSize, dataOffset - fHeapOffset);
+	Stacker<Attribute> attributeAttributeStacker(fTopAttribute, dataAttribute);
+
+	// if compressed, add compression attributes
+	if (compression != B_HPKG_COMPRESSION_NONE) {
+		_AddAttribute(B_HPKG_ATTRIBUTE_NAME_DATA_COMPRESSION, compression);
+		_AddAttribute(B_HPKG_ATTRIBUTE_NAME_DATA_SIZE, (uint64)size);
+		// uncompressed size
+	}
+
+	// TODO: Support inline data!
+
+	return B_OK;
+}
+
+
+status_t
+PackageWriter::_WriteUncompressedData(Data& data, off_t size,
+	uint64 writeOffset)
+{
 	// copy the data to the heap
 	off_t readOffset = 0;
 	off_t remainingSize = size;
 	while (remainingSize > 0) {
-		// read from FD
+		// read data
 		size_t toCopy = std::min(remainingSize, (off_t)fDataBufferSize);
 		ssize_t bytesRead = data.Read(fDataBuffer, toCopy, readOffset);
 		if (bytesRead < 0) {
@@ -1164,8 +1207,7 @@ PackageWriter::_AddData(Data& data, off_t size)
 		}
 
 		// write to heap
-		ssize_t bytesWritten = pwrite(fFD, fDataBuffer, bytesRead,
-			fHeapEnd);
+		ssize_t bytesWritten = pwrite(fFD, fDataBuffer, bytesRead, writeOffset);
 		if (bytesWritten < 0) {
 			fprintf(stderr, "Error: Failed to write data: %s\n",
 				strerror(errno));
@@ -1178,19 +1220,118 @@ PackageWriter::_AddData(Data& data, off_t size)
 
 		remainingSize -= bytesRead;
 		readOffset += bytesRead;
-		fHeapEnd += bytesRead;
+		writeOffset += bytesRead;
 	}
 
-	// add data attribute
-	Attribute* dataAttribute = _AddDataAttribute(B_HPKG_ATTRIBUTE_NAME_DATA,
-		size, dataOffset);
-	Stacker<Attribute> attributeAttributeStacker(fTopAttribute, dataAttribute);
+	return B_OK;
+}
 
-//	_AddAttribute(B_HPKG_ATTRIBUTE_NAME_DATA_SIZE, (uint64)size);
-		// uncompressed size -- not required for uncompressed data
 
-	// TODO: Support inline data!
-	// TODO: Support compression!
+status_t
+PackageWriter::_WriteZlibCompressedData(Data& data, off_t size,
+	uint64 writeOffset, uint64& _compressedSize)
+{
+	// Use zlib compression only for data large enough.
+	if (size < kZlibCompressionSizeThreshold)
+		return B_BAD_VALUE;
 
+	// fDataBuffer is 2 * B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB, so split it into
+	// two halves we can use for reading and compressing
+	const size_t chunkSize = B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB;
+	uint8* inputBuffer = (uint8*)fDataBuffer;
+	uint8* outputBuffer = (uint8*)fDataBuffer + chunkSize;
+
+	// account for the offset table
+	uint64 chunkCount = (size + (chunkSize - 1)) / chunkSize;
+	off_t offsetTableOffset = writeOffset;
+	uint64* offsetTable = NULL;
+	if (chunkCount > 1) {
+		offsetTable = new uint64[chunkCount - 1];
+		writeOffset = offsetTableOffset + (chunkCount - 1) * sizeof(uint64);
+	}
+	ArrayDeleter<uint64> offsetTableDeleter(offsetTable);
+
+	const uint64 dataOffset = writeOffset;
+	const uint64 dataEndLimit = offsetTableOffset + size;
+
+	// read the data, compress them and write them to the heap
+	off_t readOffset = 0;
+	off_t remainingSize = size;
+	uint64 chunkIndex = 0;
+	while (remainingSize > 0) {
+		// read data
+		size_t toCopy = std::min(remainingSize, (off_t)chunkSize);
+		ssize_t bytesRead = data.Read(inputBuffer, toCopy, readOffset);
+		if (bytesRead < 0) {
+			fprintf(stderr, "Error: Failed to read data: %s\n",
+				strerror(errno));
+			return errno;
+		}
+		if ((size_t)bytesRead != toCopy) {
+			fprintf(stderr, "Error: Failed to read all data\n");
+			return B_ERROR;
+		}
+
+		// compress
+		ZlibCompressor compressor;
+		size_t compressedSize;
+		status_t error = compressor.Compress(inputBuffer, bytesRead,
+			outputBuffer, bytesRead, compressedSize);
+
+		const void* writeBuffer;
+		size_t bytesToWrite;
+		if (error == B_OK) {
+			writeBuffer = outputBuffer;
+			bytesToWrite = compressedSize;
+		} else {
+			if (error != B_BUFFER_OVERFLOW)
+				return error;
+			writeBuffer = inputBuffer;
+			bytesToWrite = bytesRead;
+		}
+
+		// check the total compressed data size
+		if (writeOffset + bytesToWrite >= dataEndLimit)
+			return B_BUFFER_OVERFLOW;
+
+		if (chunkIndex > 0)
+			offsetTable[chunkIndex - 1] = writeOffset - dataOffset;
+
+		// write to heap
+		ssize_t bytesWritten = pwrite(fFD, writeBuffer, bytesToWrite,
+			writeOffset);
+		if (bytesWritten < 0) {
+			fprintf(stderr, "Error: Failed to write data: %s\n",
+				strerror(errno));
+			return errno;
+		}
+		if ((size_t)bytesWritten != bytesToWrite) {
+			fprintf(stderr, "Error: Failed to write all data\n");
+			return B_ERROR;
+		}
+
+		remainingSize -= bytesRead;
+		readOffset += bytesRead;
+		writeOffset += bytesToWrite;
+		chunkIndex++;
+	}
+
+	// write the offset table
+	if (chunkCount > 1) {
+		size_t bytesToWrite = (chunkCount - 1) * sizeof(uint64);
+		ssize_t bytesWritten = pwrite(fFD, offsetTable, bytesToWrite,
+			offsetTableOffset);
+		if (bytesWritten < 0) {
+			fprintf(stderr, "Error: Failed to write data: %s\n",
+				strerror(errno));
+			return errno;
+		}
+		if ((size_t)bytesWritten != bytesToWrite) {
+			fprintf(stderr, "Error: Failed to write all data\n");
+			return B_ERROR;
+		}
+	}
+
+	_compressedSize = writeOffset - dataOffset;
 	return B_OK;
 }

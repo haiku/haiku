@@ -83,6 +83,11 @@ private:
 									uint8 type);
 
 			status_t			_AddData(Data& data, off_t size);
+			status_t			_WriteUncompressedData(Data& data, off_t size,
+									uint64 writeOffset);
+			status_t			_WriteZlibCompressedData(Data& data, off_t size,
+									uint64 writeOffset,
+									uint64& _compressedSize);
 
 private:
 			const char*			fFileName;

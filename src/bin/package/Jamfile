@@ -1,10 +1,13 @@
 SubDir HAIKU_TOP src bin package ;
 
+UseLibraryHeaders zlib ;
 UsePrivateHeaders kernel shared ;
 UsePrivateHeaders haiku_package ;
 
 DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
 	# TODO: Remove when it is complete!
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) compression ] ;
 
 BinCommand package :
 	command_create.cpp
@@ -20,6 +23,12 @@ BinCommand package :
 	PackageReader.cpp
 	PackageWriter.cpp
 	Strings.cpp
+
+	# compression
+	ZlibCompressionBase.cpp
+	ZlibCompressor.cpp
+	ZlibDecompressor.cpp
 	:
+	z
 	$(TARGET_LIBSUPC++)
 ;

@@ -13,6 +13,7 @@ PackageData::PackageData()
 	:
 	fCompressedSize(0),
 	fUncompressedSize(0),
+	fChunkSize(0),
 	fCompression(B_HPKG_COMPRESSION_NONE),
 	fEncodedInline(true)
 {

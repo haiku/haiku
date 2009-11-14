@@ -19,6 +19,7 @@ public:
 									{ return fUncompressedSize; }
 			uint64				Offset() const			{ return fOffset; }
 			uint32				Compression() const		{ return fCompression; }
+			uint32				ChunkSize() const		{ return fChunkSize; }
 
 			bool				IsEncodedInline() const
 									{ return fEncodedInline; }
@@ -31,6 +32,8 @@ public:
 									{ fCompression = compression; }
 			void				SetUncompressedSize(uint64 size)
 									{ fUncompressedSize = size; }
+			void				SetChunkSize(uint32 size)
+									{ fChunkSize = size; }
 
 private:
 			uint64				fCompressedSize;
@@ -39,6 +42,7 @@ private:
 				uint64			fOffset;
 				uint8			fInlineData[B_HPKG_MAX_INLINE_DATA_SIZE];
 			};
+			uint32				fChunkSize;
 			uint32				fCompression;
 			bool				fEncodedInline;
 };

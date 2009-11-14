@@ -46,6 +46,7 @@ enum {
 	ATTRIBUTE_INDEX_DATA,
 	ATTRIBUTE_INDEX_DATA_SIZE,
 	ATTRIBUTE_INDEX_DATA_COMPRESSION,
+	ATTRIBUTE_INDEX_DATA_CHUNK_SIZE,
 	ATTRIBUTE_INDEX_SYMLINK_PATH
 };
 
@@ -78,6 +79,7 @@ static const standard_attribute_index_entry kStandardAttributeIndices[] = {
 	MAKE_ATTRIBUTE_INDEX_ENTRY(DATA, RAW),
 	MAKE_ATTRIBUTE_INDEX_ENTRY(DATA_SIZE, UINT),
 	MAKE_ATTRIBUTE_INDEX_ENTRY(DATA_COMPRESSION, UINT),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(DATA_CHUNK_SIZE, UINT),
 	MAKE_ATTRIBUTE_INDEX_ENTRY(SYMLINK_PATH, STRING),
 	{}
 };
@@ -250,6 +252,10 @@ struct PackageReader::DataAttributeHandler : AttributeHandler {
 				fData->SetCompression(value.unsignedInt);
 				return B_OK;
 			}
+
+			case ATTRIBUTE_INDEX_DATA_CHUNK_SIZE:
+				fData->SetChunkSize(value.unsignedInt);
+				return B_OK;
 		}
 
 		return AttributeHandler::HandleChildAttribute(context, type, typeIndex,
