@@ -68,6 +68,10 @@
 #  include "pcomplete.h"
 #endif
 
+#ifdef __HAIKU__
+#include <FindDirectory.h>
+#endif
+
 /* These should agree with the defines for emacs_mode and vi_mode in
    rldefs.h, even though that's not a public readline header file. */
 #ifndef EMACS_EDITING_MODE
@@ -634,10 +638,16 @@ static void
 initialize_hostname_list ()
 {
   char *temp;
+  char path[PATH_MAX];
 
   temp = get_string_value ("HOSTFILE");
   if (temp == 0)
     temp = get_string_value ("hostname_completion_file");
+  if (temp == 0 && find_directory(B_COMMON_SETTINGS_DIRECTORY, -1, false, path,
+    sizeof(path)) == B_OK) {
+    strlcat(path, "/network/hosts", sizeof(path));
+    temp = path;
+  }
   if (temp == 0)
     temp = DEFAULT_HOSTS_FILE;
 
