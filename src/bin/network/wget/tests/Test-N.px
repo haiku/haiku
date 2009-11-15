@@ -1,6 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
 use HTTPTest;
 
@@ -24,7 +25,7 @@ my %urls = (
     },
 );
 
-my $cmdline = $WgetTest::WGETPATH . " -N http://localhost:8080/dummy.txt";
+my $cmdline = $WgetTest::WGETPATH . " -N http://localhost:{{port}}/dummy.txt";
 
 my $expected_error_code = 0;
 
@@ -38,9 +39,9 @@ my %expected_downloaded_files = (
 ###############################################################################
 
 my $the_test = HTTPTest->new (name => "Test-N",
-                              input => \%urls, 
-                              cmdline => $cmdline, 
-                              errcode => $expected_error_code, 
+                              input => \%urls,
+                              cmdline => $cmdline,
+                              errcode => $expected_error_code,
                               output => \%expected_downloaded_files);
 exit $the_test->run();
 

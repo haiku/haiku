@@ -1,6 +1,6 @@
 /* Messages logging.
    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008 Free Software Foundation, Inc.
+   2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -40,11 +40,23 @@ as that of the covered work.  */
 #include <assert.h>
 #include <errno.h>
 
-#include "wget.h"
 #include "utils.h"
 #include "log.h"
 
-/* This file impplement support for "logging".  Logging means printing
+/* 2005-10-25 SMS.
+   VMS log files are often VFC record format, not stream, so fputs() can
+   produce multiple records, even when there's no newline terminator in
+   the buffer.  The result is unsightly output with spurious newlines.
+   Using fprintf() instead of fputs(), along with inhibiting some
+   fflush() activity below, seems to solve the problem.
+*/
+#ifdef __VMS
+# define FPUTS( s, f) fprintf( (f), "%s", (s))
+#else /* def __VMS */
+# define FPUTS( s, f) fputs( (s), (f))
+#endif /* def __VMS [else] */
+
+/* This file implements support for "logging".  Logging means printing
    output, plus several additional features:
 
    - Cataloguing output by importance.  You can specify that a log
@@ -308,7 +320,7 @@ logputs (enum log_options o, const char *s)
     return;
   CHECK_VERBOSE (o);
 
-  fputs (s, fp);
+  FPUTS (s, fp);
   if (save_context_p)
     saved_append (s);
   if (flush_log_p)
@@ -398,7 +410,7 @@ log_vprintf_internal (struct logvprintf_state *state, const char *fmt,
 
   /* Writing succeeded. */
   saved_append (write_ptr);
-  fputs (write_ptr, fp);
+  FPUTS (write_ptr, fp);
   if (state->bigmsg)
     xfree (state->bigmsg);
 
@@ -417,7 +429,19 @@ logflush (void)
 {
   FILE *fp = get_log_fp ();
   if (fp)
-    fflush (fp);
+    {
+/* 2005-10-25 SMS.
+   On VMS, flush only for a terminal.  See note at FPUTS macro, above.
+*/
+#ifdef __VMS
+      if (isatty( fileno( fp)))
+        {
+          fflush (fp);
+        }
+#else /* def __VMS */
+      fflush (fp);
+#endif /* def __VMS [else] */
+    }
   needs_flushing = false;
 }
 
@@ -584,20 +608,20 @@ log_dump_context (void)
     {
       struct log_ln *ln = log_lines + num;
       if (ln->content)
-        fputs (ln->content, fp);
+        FPUTS (ln->content, fp);
       ROT_ADVANCE (num);
     }
   while (num != log_line_current);
   if (trailing_line)
     if (log_lines[log_line_current].content)
-      fputs (log_lines[log_line_current].content, fp);
+      FPUTS (log_lines[log_line_current].content, fp);
   fflush (fp);
 }
 
 /* String escape functions. */
 
 /* Return the number of non-printable characters in SOURCE.
-   Non-printable characters are determined as per safe-ctype.c.  */
+   Non-printable characters are determined as per c-ctype.c.  */
 
 static int
 count_nonprint (const char *source)
@@ -605,7 +629,7 @@ count_nonprint (const char *source)
   const char *p;
   int cnt;
   for (p = source, cnt = 0; *p; p++)
-    if (!ISPRINT (*p))
+    if (!c_isprint (*p))
       ++cnt;
   return cnt;
 }
@@ -645,7 +669,7 @@ copy_and_escape (const char *source, char *dest, char escape, int base)
     {
     case 8:
       while ((c = *from++) != '\0')
-        if (ISPRINT (c))
+        if (c_isprint (c))
           *to++ = c;
         else
           {
@@ -657,7 +681,7 @@ copy_and_escape (const char *source, char *dest, char escape, int base)
       break;
     case 16:
       while ((c = *from++) != '\0')
-        if (ISPRINT (c))
+        if (c_isprint (c))
           *to++ = c;
         else
           {
@@ -763,7 +787,7 @@ escnonprint_uri (const char *str)
 void
 log_cleanup (void)
 {
-  int i;
+  size_t i;
   for (i = 0; i < countof (ring); i++)
     xfree_null (ring[i].buffer);
 }
@@ -782,8 +806,8 @@ redirect_output (void)
   logfp = unique_create (DEFAULT_LOGFILE, false, &logfile);
   if (logfp)
     {
-      fprintf (stderr, _("\n%s received, redirecting output to `%s'.\n"),
-               redirect_request_signal_name, logfile);
+      fprintf (stderr, _("\n%s received, redirecting output to %s.\n"),
+               redirect_request_signal_name, quote (logfile));
       xfree (logfile);
       /* Dump the context output to the newly opened log.  */
       log_dump_context ();

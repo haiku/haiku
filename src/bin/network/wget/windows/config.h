@@ -91,6 +91,9 @@
 /* Define to 1 if you have the <stdint.h> header file. */
 /* #undef HAVE_STDINT_H */
 
+/* Define to 1 if you have the <string.h> header file. */
+#define HAVE_STRING_H */
+
 /* Define to 1 if you have the `strcasecmp' function. */
 /* #undef HAVE_STRCASECMP */
 
@@ -158,7 +161,7 @@
 #define SIZEOF_LONG 4
 
 /* The size of a `long long', as computed by sizeof. */
-#define SIZEOF_LONG_LONG 0
+#define SIZEOF_LONG_LONG 8
 
 /* The size of a `off_t', as computed by sizeof. */
 #define SIZEOF_OFF_T 4
@@ -204,8 +207,10 @@
 /* Define to `unsigned' if <sys/types.h> does not define. */
 /* #undef size_t */
 
+#if !defined(_MSC_VER) || (defined(_MSC_VER) && (_MSC_VER < 1500))
 /* Define to int or size_t on systems without socklen_t. */
 #define socklen_t int
+#endif
 
 /* Define to empty if the keyword `volatile' does not work. Warning: valid
    code using `volatile' can become incorrect without. Disable with care. */
@@ -213,6 +218,4 @@
 
 /* Include compiler-specific defines. */
 #include "config-compiler.h"
-
-#include "config-post.h"
 

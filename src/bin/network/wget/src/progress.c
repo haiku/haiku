@@ -1,5 +1,5 @@
 /* Download progress.
-   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
+   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
    Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,7 +42,6 @@ as that of the covered work.  */
 # include <wchar.h>
 #endif
 
-#include "wget.h"
 #include "progress.h"
 #include "utils.h"
 #include "retr.h"
@@ -94,10 +93,10 @@ static int current_impl_locked;
 bool
 valid_progress_implementation_p (const char *name)
 {
-  int i;
+  size_t i;
   struct progress_implementation *pi = implementations;
   char *colon = strchr (name, ':');
-  int namelen = colon ? colon - name : strlen (name);
+  size_t namelen = colon ? (size_t) (colon - name) : strlen (name);
 
   for (i = 0; i < countof (implementations); i++, pi++)
     if (!strncmp (pi->name, name, namelen))
@@ -110,7 +109,7 @@ valid_progress_implementation_p (const char *name)
 void
 set_progress_implementation (const char *name)
 {
-  int i, namelen;
+  size_t i, namelen;
   struct progress_implementation *pi = implementations;
   const char *colon;
 
@@ -118,7 +117,7 @@ set_progress_implementation (const char *name)
     name = DEFAULT_PROGRESS_IMPLEMENTATION;
 
   colon = strchr (name, ':');
-  namelen = colon ? colon - name : strlen (name);
+  namelen = colon ? (size_t) (colon - name) : strlen (name);
 
   for (i = 0; i < countof (implementations); i++, pi++)
     if (!strncmp (pi->name, name, namelen))
@@ -454,8 +453,8 @@ dot_set_params (const char *params)
     }
   else
     fprintf (stderr,
-             _("Invalid dot style specification `%s'; leaving unchanged.\n"),
-             params);
+             _("Invalid dot style specification %s; leaving unchanged.\n"),
+             quote (params));
 }
 
 /* "Thermometer" (bar) progress. */
@@ -716,7 +715,7 @@ update_speed_ring (struct bar_progress *bp, wgint howmuch, double dltime)
   if (bp->stalled)
     {
       bp->stalled = false;
-      /* "recent_age" includes the the entired stalled period, which
+      /* "recent_age" includes the entired stalled period, which
          could be very long.  Don't update the speed ring with that
          value because the current bandwidth would start too small.
          Start with an arbitrary (but more reasonable) time value and
@@ -801,7 +800,7 @@ count_cols (const char *mbs)
 const char *
 get_eta (int *bcd)
 {
-  /* Translation note: "ETA" is English-centric, but this must
+  /* TRANSLATORS: "ETA" is English-centric, but this must
      be short, ideally 3 chars.  Abbreviate if necessary.  */
   static const char eta_str[] = N_("  eta %s");
   static const char *eta_trans;
@@ -1158,7 +1157,7 @@ eta_to_human_short (int secs, bool condensed)
   else if (secs < 48 * 3600)
     sprintf (buf, "%dh%s%dm", secs / 3600, space, (secs / 60) % 60);
   else if (secs < 100 * 86400)
-    sprintf (buf, "%dd%s%dh", secs / 86400, space, (secs / 3600) % 60);
+    sprintf (buf, "%dd%s%dh", secs / 86400, space, (secs / 3600) % 24);
   else
     /* even (2^31-1)/86400 doesn't overflow BUF. */
     sprintf (buf, "%dd", secs / 86400);

@@ -1,5 +1,6 @@
 /* Support for Robot Exclusion Standard (RES).
-   Copyright (C) 2001, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2006, 2007, 2008, 2009 Free Software Foundation,
+   Inc.
 
 This file is part of Wget.
 
@@ -67,9 +68,7 @@ as that of the covered work.  */
    res_match_path, res_register_specs, res_get_specs, and
    res_retrieve_file.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -77,7 +76,6 @@ as that of the covered work.  */
 #include <errno.h>
 #include <assert.h>
 
-#include "wget.h"
 #include "utils.h"
 #include "hash.h"
 #include "url.h"
@@ -181,7 +179,7 @@ prune_non_exact (struct robot_specs *specs)
 #define EOL(p) ((p) >= lineend)
 
 #define SKIP_SPACE(p) do {              \
-  while (!EOL (p) && ISSPACE (*p))      \
+  while (!EOL (p) && c_isspace (*p))      \
     ++p;                                \
 } while (0)
 
@@ -267,18 +265,18 @@ res_parse (const char *source, int length)
          lineend to a location preceding the first comment.  Real line
          ending remains in lineend_real.  */
       for (lineend = p; lineend < lineend_real; lineend++)
-        if ((lineend == p || ISSPACE (*(lineend - 1)))
+        if ((lineend == p || c_isspace (*(lineend - 1)))
             && *lineend == '#')
           break;
 
       /* Ignore trailing whitespace in the same way. */
-      while (lineend > p && ISSPACE (*(lineend - 1)))
+      while (lineend > p && c_isspace (*(lineend - 1)))
         --lineend;
 
       assert (!EOL (p));
 
       field_b = p;
-      while (!EOL (p) && (ISALNUM (*p) || *p == '-'))
+      while (!EOL (p) && (c_isalnum (*p) || *p == '-'))
         ++p;
       field_e = p;
 
@@ -416,7 +414,7 @@ free_specs (struct robot_specs *specs)
    advance the pointer.  */
 
 #define DECODE_MAYBE(c, ptr) do {                               \
-  if (c == '%' && ISXDIGIT (ptr[1]) && ISXDIGIT (ptr[2]))       \
+  if (c == '%' && c_isxdigit (ptr[1]) && c_isxdigit (ptr[2]))       \
     {                                                           \
       char decoded = X2DIGITS_TO_NUM (ptr[1], ptr[2]);          \
       if (decoded != '/')                                       \
@@ -466,9 +464,9 @@ res_match_path (const struct robot_specs *specs, const char *path)
     if (matches (specs->paths[i].path, path))
       {
         bool allowedp = specs->paths[i].allowedp;
-        DEBUGP (("%s path %s because of rule `%s'.\n",
+        DEBUGP (("%s path %s because of rule %s.\n",
                  allowedp ? "Allowing" : "Rejecting",
-                 path, specs->paths[i].path));
+                 path, quote (specs->paths[i].path)));
         return allowedp;
       }
   return true;
@@ -535,21 +533,44 @@ res_get_specs (const char *host, int port)
    Return true if robots were retrieved OK, false otherwise.  */
 
 bool
-res_retrieve_file (const char *url, char **file)
+res_retrieve_file (const char *url, char **file, struct iri *iri)
 {
+  struct iri *i = iri_new ();
   uerr_t err;
   char *robots_url = uri_merge (url, RES_SPECS_LOCATION);
   int saved_ts_val = opt.timestamping;
-  int saved_sp_val = opt.spider;
+  int saved_sp_val = opt.spider, url_err;
+  struct url * url_parsed;
+
+  /* Copy server URI encoding for a possible IDNA transformation, no need to
+     encode the full URI in UTF-8 because "robots.txt" is plain ASCII */
+  set_uri_encoding (i, iri->uri_encoding, false);
+  i->utf8_encode = false;
 
   logputs (LOG_VERBOSE, _("Loading robots.txt; please ignore errors.\n"));
   *file = NULL;
   opt.timestamping = false;
   opt.spider       = false;
-  err = retrieve_url (robots_url, file, NULL, NULL, NULL, false);
+
+  url_parsed = url_parse (robots_url, &url_err, iri, true);
+  if (!url_parsed)
+    {
+      char *error = url_error (robots_url, url_err);
+      logprintf (LOG_NOTQUIET, "%s: %s.\n", robots_url, error);
+      xfree (error);
+      err = URLERROR;
+    }
+  else
+    {
+      err = retrieve_url (url_parsed, robots_url, file, NULL, NULL, NULL,
+                          false, i, false);
+      url_free(url_parsed);
+    }
+
   opt.timestamping = saved_ts_val;
-  opt.spider       = saved_sp_val;  
+  opt.spider       = saved_sp_val;
   xfree (robots_url);
+  iri_free (i);
 
   if (err != RETROK && *file != NULL)
     {
@@ -569,7 +590,7 @@ is_robots_txt_url (const char *url)
   bool ret = are_urls_equal (url, robots_url);
 
   xfree (robots_url);
-  
+
   return ret;
 }
 
@@ -605,10 +626,10 @@ test_is_robots_txt_url()
     { "http://www.yoyodyne.com/somepath/", false },
     { "http://www.yoyodyne.com/somepath/robots.txt", false },
   };
-  
-  for (i = 0; i < sizeof(test_array)/sizeof(test_array[0]); ++i) 
+
+  for (i = 0; i < sizeof(test_array)/sizeof(test_array[0]); ++i)
     {
-      mu_assert ("test_is_robots_txt_url: wrong result", 
+      mu_assert ("test_is_robots_txt_url: wrong result",
                  is_robots_txt_url (test_array[i].url) == test_array[i].expected_result);
     }
 

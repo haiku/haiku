@@ -1,6 +1,6 @@
 /* Conversion of links to local files.
    Copyright (C) 2003, 2004, 2005, 2006, 2007,
-   2008 Free Software Foundation, Inc.
+   2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,8 +38,6 @@ as that of the covered work.  */
 #endif /* HAVE_UNISTD_H */
 #include <errno.h>
 #include <assert.h>
-
-#include "wget.h"
 #include "convert.h"
 #include "url.h"
 #include "recur.h"
@@ -47,50 +45,37 @@ as that of the covered work.  */
 #include "hash.h"
 #include "ptimer.h"
 #include "res.h"
+#include "html-url.h"
+#include "css-url.h"
 
 static struct hash_table *dl_file_url_map;
 struct hash_table *dl_url_file_map;
 
-/* Set of HTML files downloaded in this Wget run, used for link
+/* Set of HTML/CSS files downloaded in this Wget run, used for link
    conversion after Wget is done.  */
 struct hash_table *downloaded_html_set;
+struct hash_table *downloaded_css_set;
 
 static void convert_links (const char *, struct urlpos *);
 
-/* This function is called when the retrieval is done to convert the
-   links that have been downloaded.  It has to be called at the end of
-   the retrieval, because only then does Wget know conclusively which
-   URLs have been downloaded, and which not, so it can tell which
-   direction to convert to.
-
-   The "direction" means that the URLs to the files that have been
-   downloaded get converted to the relative URL which will point to
-   that file.  And the other URLs get converted to the remote URL on
-   the server.
-
-   All the downloaded HTMLs are kept in downloaded_html_files, and
-   downloaded URLs in urls_downloaded.  All the information is
-   extracted from these two lists.  */
 
 void
-convert_all_links (void)
+convert_links_in_hashtable (struct hash_table *downloaded_set,
+                            int is_css,
+                            int *file_count)
 {
   int i;
-  double secs;
-  int file_count = 0;
-
-  struct ptimer *timer = ptimer_new ();
 
   int cnt;
   char **file_array;
 
   cnt = 0;
-  if (downloaded_html_set)
-    cnt = hash_table_count (downloaded_html_set);
+  if (downloaded_set)
+    cnt = hash_table_count (downloaded_set);
   if (cnt == 0)
-    goto cleanup;
+    return;
   file_array = alloca_array (char *, cnt);
-  string_set_to_array (downloaded_html_set, file_array);
+  string_set_to_array (downloaded_set, file_array);
 
   for (i = 0; i < cnt; i++)
     {
@@ -98,7 +83,7 @@ convert_all_links (void)
       char *url;
       char *file = file_array[i];
 
-      /* Determine the URL of the HTML file.  get_urls_html will need
+      /* Determine the URL of the file.  get_urls_{html,css} will need
          it.  */
       url = hash_table_get (dl_file_url_map, file);
       if (!url)
@@ -109,8 +94,9 @@ convert_all_links (void)
 
       DEBUGP (("Scanning %s (from %s)\n", file, url));
 
-      /* Parse the HTML file...  */
-      urls = get_urls_html (file, url, NULL);
+      /* Parse the file...  */
+      urls = is_css ? get_urls_css_file (file, url) :
+                      get_urls_html (file, url, NULL, NULL);
 
       /* We don't respect meta_disallow_follow here because, even if
          the file is not followed, we might still want to convert the
@@ -162,27 +148,55 @@ convert_all_links (void)
 
       /* Convert the links in the file.  */
       convert_links (file, urls);
-      ++file_count;
+      ++*file_count;
 
       /* Free the data.  */
       free_urlpos (urls);
     }
+}
+
+/* This function is called when the retrieval is done to convert the
+   links that have been downloaded.  It has to be called at the end of
+   the retrieval, because only then does Wget know conclusively which
+   URLs have been downloaded, and which not, so it can tell which
+   direction to convert to.
+
+   The "direction" means that the URLs to the files that have been
+   downloaded get converted to the relative URL which will point to
+   that file.  And the other URLs get converted to the remote URL on
+   the server.
+
+   All the downloaded HTMLs are kept in downloaded_html_files, and
+   downloaded URLs in urls_downloaded.  All the information is
+   extracted from these two lists.  */
+
+void
+convert_all_links (void)
+{
+  double secs;
+  int file_count = 0;
+
+  struct ptimer *timer = ptimer_new ();
+
+  convert_links_in_hashtable (downloaded_html_set, 0, &file_count);
+  convert_links_in_hashtable (downloaded_css_set, 1, &file_count);
 
   secs = ptimer_measure (timer);
   logprintf (LOG_VERBOSE, _("Converted %d files in %s seconds.\n"),
              file_count, print_decimal (secs));
-cleanup:
+
   ptimer_destroy (timer);
 }
 
 static void write_backup_file (const char *, downloaded_file_t);
+static const char *replace_plain (const char*, int, FILE*, const char *);
 static const char *replace_attr (const char *, int, FILE *, const char *);
 static const char *replace_attr_refresh_hack (const char *, int, FILE *,
                                               const char *, int);
 static char *local_quote_string (const char *);
 static char *construct_relative (const char *, const char *);
 
-/* Change the links in one HTML file.  LINKS is a list of links in the
+/* Change the links in one file.  LINKS is a list of links in the
    document, along with their positions and the desired direction of
    the conversion.  */
 static void
@@ -232,8 +246,8 @@ convert_links (const char *file, struct urlpos *links)
      zeroes from the mmaped region.  */
   if (unlink (file) < 0 && errno != ENOENT)
     {
-      logprintf (LOG_NOTQUIET, _("Unable to delete `%s': %s\n"),
-                 file, strerror (errno));
+      logprintf (LOG_NOTQUIET, _("Unable to delete %s: %s\n"),
+                 quote (file), strerror (errno));
       read_file_free (fm);
       return;
     }
@@ -279,7 +293,9 @@ convert_links (const char *file, struct urlpos *links)
             char *newname = construct_relative (file, link->local_name);
             char *quoted_newname = local_quote_string (newname);
 
-            if (!link->link_refresh_p)
+            if (link->link_css_p)
+              p = replace_plain (p, link->size, fp, quoted_newname);
+            else if (!link->link_refresh_p)
               p = replace_attr (p, link->size, fp, quoted_newname);
             else
               p = replace_attr_refresh_hack (p, link->size, fp, quoted_newname,
@@ -298,7 +314,9 @@ convert_links (const char *file, struct urlpos *links)
             char *newlink = link->url->url;
             char *quoted_newlink = html_quote_string (newlink);
 
-            if (!link->link_refresh_p)
+            if (link->link_css_p)
+              p = replace_plain (p, link->size, fp, quoted_newlink);
+            else if (!link->link_refresh_p)
               p = replace_attr (p, link->size, fp, quoted_newlink);
             else
               p = replace_attr_refresh_hack (p, link->size, fp, quoted_newlink,
@@ -402,12 +420,14 @@ write_backup_file (const char *file, downloaded_file_t downloaded_file_return)
   /* Rather than just writing over the original .html file with the
      converted version, save the former to *.orig.  Note we only do
      this for files we've _successfully_ downloaded, so we don't
-     clobber .orig files sitting around from previous invocations. */
+     clobber .orig files sitting around from previous invocations.
+     On VMS, use "_orig" instead of ".orig".  See "wget.h". */
 
   /* Construct the backup filename as the original name plus ".orig". */
   size_t         filename_len = strlen (file);
   char*          filename_plus_orig_suffix;
 
+  /* TODO: hack this to work with css files */
   if (downloaded_file_return == FILE_DOWNLOADED_AND_HTML_EXTENSION_ADDED)
     {
       /* Just write "orig" over "html".  We need to do it this way
@@ -424,9 +444,9 @@ write_backup_file (const char *file, downloaded_file_t downloaded_file_return)
   else /* downloaded_file_return == FILE_DOWNLOADED_NORMALLY */
     {
       /* Append ".orig" to the name. */
-      filename_plus_orig_suffix = alloca (filename_len + sizeof (".orig"));
+      filename_plus_orig_suffix = alloca (filename_len + sizeof (ORIG_SFX));
       strcpy (filename_plus_orig_suffix, file);
-      strcpy (filename_plus_orig_suffix + filename_len, ".orig");
+      strcpy (filename_plus_orig_suffix + filename_len, ORIG_SFX);
     }
 
   if (!converted_files)
@@ -466,6 +486,15 @@ write_backup_file (const char *file, downloaded_file_t downloaded_file_return)
 }
 
 static bool find_fragment (const char *, int, const char **, const char **);
+
+/* Replace a string with NEW_TEXT.  Ignore quoting. */
+static const char *
+replace_plain (const char *p, int size, FILE *fp, const char *new_text)
+{
+  fputs (new_text, fp);
+  p += size;
+  return p;
+}
 
 /* Replace an attribute's original text with NEW_TEXT. */
 
@@ -562,15 +591,15 @@ find_fragment (const char *beg, int size, const char **bp, const char **ep)
 
    We quote ? as %3F to avoid passing part of the file name as the
    parameter when browsing the converted file through HTTP.  However,
-   it is safe to do this only when `--html-extension' is turned on.
+   it is safe to do this only when `--adjust-extension' is turned on.
    This is because converting "index.html?foo=bar" to
    "index.html%3Ffoo=bar" would break local browsing, as the latter
    isn't even recognized as an HTML file!  However, converting
    "index.html?foo=bar.html" to "index.html%3Ffoo=bar.html" should be
    safe for both local and HTTP-served browsing.
 
-   We always quote "#" as "%23" and "%" as "%25" because those
-   characters have special meanings in URLs.  */
+   We always quote "#" as "%23", "%" as "%25" and ";" as "%3B"
+   because those characters have special meanings in URLs.  */
 
 static char *
 local_quote_string (const char *file)
@@ -578,7 +607,7 @@ local_quote_string (const char *file)
   const char *from;
   char *newname, *to;
 
-  char *any = strpbrk (file, "?#%");
+  char *any = strpbrk (file, "?#%;");
   if (!any)
     return html_quote_string (file);
 
@@ -598,8 +627,13 @@ local_quote_string (const char *file)
         *to++ = '2';
         *to++ = '3';
         break;
+      case ';':
+        *to++ = '%';
+        *to++ = '3';
+        *to++ = 'B';
+        break;
       case '?':
-        if (opt.html_extension)
+        if (opt.adjust_extension)
           {
             *to++ = '%';
             *to++ = '3';
@@ -834,6 +868,16 @@ register_html (const char *url, const char *file)
   string_set_add (downloaded_html_set, file);
 }
 
+/* Register that FILE is a CSS file that has been downloaded. */
+
+void
+register_css (const char *url, const char *file)
+{
+  if (!downloaded_css_set)
+    downloaded_css_set = make_string_hash_table (0);
+  string_set_add (downloaded_css_set, file);
+}
+
 static void downloaded_files_free (void);
 
 /* Cleanup the data structures associated with this file.  */
@@ -874,7 +918,7 @@ static struct hash_table *downloaded_files_hash;
    However, our hash tables only accept pointers for keys and values.
    So when we need a pointer, we use the address of a
    downloaded_file_t variable of static storage.  */
-   
+
 static downloaded_file_t *
 downloaded_mode_to_ptr (downloaded_file_t mode)
 {

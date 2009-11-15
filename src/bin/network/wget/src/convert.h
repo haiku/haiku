@@ -1,5 +1,6 @@
 /* Declarations for convert.c
-   Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005, 2006, 2009 Free Software Foundation,
+   Inc.
 
 This file is part of GNU Wget.
 
@@ -33,6 +34,7 @@ as that of the covered work.  */
 struct hash_table;		/* forward decl */
 extern struct hash_table *dl_url_file_map;
 extern struct hash_table *downloaded_html_set;
+extern struct hash_table *downloaded_css_set;
 
 enum convert_options {
   CO_NOCONVERT = 0,		/* don't convert this URL */
@@ -64,7 +66,9 @@ struct urlpos {
   unsigned int link_complete_p	:1; /* the link was complete (had host name) */
   unsigned int link_base_p	:1; /* the url came from <base href=...> */
   unsigned int link_inline_p	:1; /* needed to render the page */
+  unsigned int link_css_p	:1; /* the url came from CSS */
   unsigned int link_expect_html	:1; /* expected to contain HTML */
+  unsigned int link_expect_css	:1; /* expected to contain CSS */
 
   unsigned int link_refresh_p	:1; /* link was received from
 				       <meta http-equiv=refresh content=...> */
@@ -98,6 +102,7 @@ downloaded_file_t downloaded_file (downloaded_file_t, const char *);
 void register_download (const char *, const char *);
 void register_redirection (const char *, const char *);
 void register_html (const char *, const char *);
+void register_css (const char *, const char *);
 void register_delete_file (const char *);
 void convert_all_links (void);
 void convert_cleanup (void);

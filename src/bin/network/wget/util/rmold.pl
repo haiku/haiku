@@ -1,6 +1,7 @@
 #! /usr/bin/perl -w
 
-# Copyright (C) 1995, 1996, 1997, 2007, 2008 Free Software Foundation, Inc.
+# Copyright (C) 1995, 1996, 1997, 2007, 2008, 2009 Free Software
+# Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,7 +46,7 @@ sub procdir
     local(@lcfiles, @lcdirs, %files, @fl);
 
     print STDERR "Processing directory '$dir':\n" if $verbose;
-    
+
     opendir(DH, $dir) || die("Cannot open $dir: $!\n");
     @lcfiles = ();
     @lcdirs = ();

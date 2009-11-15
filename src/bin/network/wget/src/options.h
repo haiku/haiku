@@ -1,6 +1,6 @@
 /* struct options.
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -59,6 +59,8 @@ struct options
   char *input_filename;		/* Input filename */
   bool force_html;		/* Is the input file an HTML file? */
 
+  char *default_page;           /* Alternative default page (index file) */
+
   bool spider;			/* Is Wget in spider mode? */
 
   char **accepts;		/* List of patterns to accept. */
@@ -85,7 +87,8 @@ struct options
 
   char *user;			/* Generic username */
   char *passwd;			/* Generic password */
-  
+  bool ask_passwd;              /* Ask for password? */
+
   bool always_rest;		/* Always use REST. */
   char *ftp_user;		/* FTP username */
   char *ftp_passwd;		/* FTP password */
@@ -121,10 +124,6 @@ struct options
   SUM_SIZE_INT quota;		/* Maximum file size to download and
 				   store. */
 
-  int numurls;			/* Number of successfully downloaded
-				   URLs #### should be removed because
-				   it's not a setting, but a global var */
-
   bool server_response;		/* Do we print server response? */
   bool save_headers;		/* Do we save headers together with
 				   file? */
@@ -133,7 +132,7 @@ struct options
   bool debug;			/* Debugging on/off */
 #endif
 
-#ifdef MSDOS
+#ifdef USE_WATT32
   bool wdebug;                  /* Watt-32 tcp/ip debugging on/off */
 #endif
 
@@ -163,7 +162,7 @@ struct options
   bool delete_after;		/* Whether the files will be deleted
 				   after download. */
 
-  bool html_extension;		/* Use ".html" extension on all text/html? */
+  bool adjust_extension;		/* Use ".html" extension on all text/html? */
 
   bool page_requisites;		/* Whether we need to download all files
 				   necessary to display a page properly. */
@@ -210,6 +209,8 @@ struct options
   bool restrict_files_ctrl;	/* non-zero if control chars in URLs
 				   are restricted from appearing in
 				   generated file names. */
+  bool restrict_files_nonascii; /* non-zero if bytes with values greater
+                                   than 127 are restricted. */
   enum {
     restrict_no_case_restriction,
     restrict_lowercase,
@@ -232,10 +233,19 @@ struct options
     prefer_none
   } prefer_family;		/* preferred address family when more
 				   than one type is available */
-  
+
   bool content_disposition;	/* Honor HTTP Content-Disposition header. */
   bool auth_without_challenge;  /* Issue Basic authentication creds without
                                    waiting for a challenge. */
+
+  bool enable_iri;
+  char *encoding_remote;
+  char *locale;
+
+#ifdef __VMS
+  int ftp_stmlf;                /* Force Stream_LF format for binary FTP. */
+#endif /* def __VMS */
+
 };
 
 extern struct options opt;

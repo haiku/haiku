@@ -1,8 +1,7 @@
-#!/usr/bin/perl -w
-
 package HTTPServer;
 
 use strict;
+use warnings;
 
 use HTTP::Daemon;
 use HTTP::Status;
@@ -23,11 +22,12 @@ sub run {
         if (!$initialized) {
             $synch_callback->();
             $initialized = 1;
-        }        
+        }
         my $con = $self->accept();
         print STDERR "Accepted a new connection\n" if $log;
         while (my $req = $con->get_request) {
-            my $url_path = $req->url->path;
+            #my $url_path = $req->url->path;
+            my $url_path = $req->url->as_string;
             if ($url_path =~ m{/$}) { # append 'index.html'
                 $url_path .= 'index.html';
             }
@@ -45,14 +45,14 @@ sub run {
             if (exists($urls->{$url_path})) {
                 print STDERR "Serving requested URL: ", $url_path, "\n" if $log;
                 next unless ($req->method eq "HEAD" || $req->method eq "GET");
-                
+
                 my $url_rec = $urls->{$url_path};
                 $self->send_response($req, $url_rec, $con);
             } else {
                 print STDERR "Requested wrong URL: ", $url_path, "\n" if $log;
                 $con->send_error($HTTP::Status::RC_FORBIDDEN);
                 last;
-            }            
+            }
         }
         print STDERR "Closing connection\n" if $log;
         $con->close;
@@ -68,6 +68,9 @@ sub send_response {
     if (exists $url_rec->{'auth_method'}) {
         ($send_content, $code, $msg, $headers) =
             $self->handle_auth($req, $url_rec);
+    } elsif (!$self->verify_request_headers ($req, $url_rec)) {
+        ($send_content, $code, $msg, $headers) =
+            ('', 400, 'Mismatch on expected headers', {});
     } else {
         ($code, $msg) = @{$url_rec}{'code', 'msg'};
         $headers = $url_rec->{headers};
@@ -92,24 +95,35 @@ sub send_response {
             print $con $content;
             next;
         }
-        if ($req->header("Range")) {
+        if ($req->header("Range") && !$url_rec->{'force_code'}) {
             $req->header("Range") =~ m/bytes=(\d*)-(\d*)/;
             my $content_len = length($content);
             my $start = $1 ? $1 : 0;
             my $end = $2 ? $2 : ($content_len - 1);
             my $len = $2 ? ($2 - $start) : ($content_len - $start);
-            $resp->header("Accept-Ranges" => "bytes");
-            $resp->header("Content-Length" => $len);
-            $resp->header("Content-Range" => "bytes $start-$end/$content_len");
-            $resp->header("Keep-Alive" => "timeout=15, max=100");
-            $resp->header("Connection" => "Keep-Alive");
-            $con->send_basic_header(206, "Partial Content", $resp->protocol);
-            print $con $resp->headers_as_string($CRLF);
-            print $con $CRLF;
-            print $con substr($content, $start, $len);
+            if ($len > 0) {
+                $resp->header("Accept-Ranges" => "bytes");
+                $resp->header("Content-Length" => $len);
+                $resp->header("Content-Range"
+                    => "bytes $start-$end/$content_len");
+                $resp->header("Keep-Alive" => "timeout=15, max=100");
+                $resp->header("Connection" => "Keep-Alive");
+                $con->send_basic_header(206,
+                    "Partial Content", $resp->protocol);
+                print $con $resp->headers_as_string($CRLF);
+                print $con $CRLF;
+                print $con substr($content, $start, $len);
+            } else {
+                $con->send_basic_header(416, "Range Not Satisfiable",
+                    $resp->protocol);
+                $resp->header("Keep-Alive" => "timeout=15, max=100");
+                $resp->header("Connection" => "Keep-Alive");
+                print $con $CRLF;
+            }
             next;
         }
         # fill in content
+        $content = $self->_substitute_port($content) if defined $content;
         $resp->content($content);
         print STDERR "HTTP::Response with content: \n", $resp->as_string if $log;
     }
@@ -133,8 +147,7 @@ sub handle_auth {
     my $authhdr = $req->header('Authorization');
 
     # Have we sent the challenge yet?
-    unless (defined $url_rec->{auth_challenged}
-        && $url_rec->{auth_challenged}) {
+    unless ($url_rec->{auth_challenged} || $url_rec->{auth_no_challenge}) {
         # Since we haven't challenged yet, we'd better not
         # have received authentication (for our testing purposes).
         if ($authhdr) {
@@ -155,6 +168,9 @@ sub handle_auth {
         # failed it.
         $code = 400;
         $msg  = "You didn't send auth after I sent challenge";
+        if ($url_rec->{auth_no_challenge}) {
+            $msg = "--auth-no-challenge but no auth sent."
+        }
     } else {
         my ($sent_method) = ($authhdr =~ /^(\S+)/g);
         unless ($sent_method eq $url_rec->{'auth_method'}) {
@@ -195,6 +211,30 @@ sub verify_auth_basic {
         $$msgref = "Wanted ${expected} got ${got}";
         return undef;
     }
+}
+
+sub verify_request_headers {
+    my ($self, $req, $url_rec) = @_;
+
+    return 1 unless exists $url_rec->{'request_headers'};
+    for my $hdrname (keys %{$url_rec->{'request_headers'}}) {
+        my $rhdr = $req->header ($hdrname);
+        my $ehdr = $url_rec->{'request_headers'}{$hdrname};
+        unless (defined $rhdr && $rhdr =~ $ehdr) {
+            $rhdr = '' unless defined $rhdr;
+            print STDERR "\n*** Mismatch on $hdrname: $rhdr =~ $ehdr\n";
+            return undef;
+        }
+    }
+
+    return 1;
+}
+
+sub _substitute_port {
+    my $self = shift;
+    my $ret = shift;
+    $ret =~ s/{{port}}/$self->sockport/eg;
+    return $ret;
 }
 
 1;

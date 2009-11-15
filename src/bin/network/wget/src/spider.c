@@ -1,5 +1,5 @@
 /* Keep track of visited URLs in spider mode.
-   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -27,13 +27,12 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <errno.h>
 #include <assert.h>
 
-#include "wget.h"
 #include "spider.h"
 #include "url.h"
 #include "utils.h"
@@ -69,26 +68,26 @@ print_broken_links (void)
 {
   hash_table_iterator iter;
   int num_elems;
-  
-  if (!nonexisting_urls_set) 
+
+  if (!nonexisting_urls_set)
     {
       logprintf (LOG_NOTQUIET, _("Found no broken links.\n\n"));
       return;
     }
-  
+
   num_elems = hash_table_count (nonexisting_urls_set);
   assert (num_elems > 0);
 
   logprintf (LOG_NOTQUIET, ngettext("Found %d broken link.\n\n",
                                     "Found %d broken links.\n\n", num_elems),
              num_elems);
-  
+
   for (hash_table_iterate (nonexisting_urls_set, &iter);
        hash_table_iter_next (&iter); )
     {
-      struct url_list *list;
+      /* Struct url_list *list; */
       const char *url = (const char *) iter.key;
-          
+
       logprintf (LOG_NOTQUIET, _("%s\n"), url);
     }
   logputs (LOG_NOTQUIET, "\n");

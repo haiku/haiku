@@ -1,5 +1,5 @@
 /* Read and parse the .netrc file to get hosts, accounts, and passwords.
-   Copyright (C) 1996, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -30,16 +30,13 @@ as that of the covered work.  */
 /* This file used to be kept in synch with the code in Fetchmail, but
    the latter has diverged since.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
-#include "wget.h"
 #include "utils.h"
 #include "netrc.h"
 #include "init.h"
@@ -68,6 +65,21 @@ search_netrc (const char *host, const char **acc, const char **passwd,
   /* Find ~/.netrc.  */
   if (!processed_netrc)
     {
+#ifdef __VMS
+
+      int err;
+      struct_stat buf;
+      char *path = "SYS$LOGIN:.netrc";
+
+      netrc_list = NULL;
+      processed_netrc = 1;
+
+      err = stat (path, &buf);
+      if (err == 0)
+        netrc_list = parse_netrc (path);
+
+#else /* def __VMS */
+
       char *home = home_dir ();
 
       netrc_list = NULL;
@@ -84,6 +96,8 @@ search_netrc (const char *host, const char **acc, const char **passwd,
           if (err == 0)
             netrc_list = parse_netrc (path);
         }
+
+#endif /* def __VMS [else] */
     }
   /* If nothing to do...  */
   if (!netrc_list)
@@ -239,7 +253,7 @@ static void
 shift_left(char *string)
 {
   char *p;
-  
+
   for (p=string; *p; ++p)
     *p = *(p+1);
 }
@@ -252,7 +266,7 @@ parse_netrc (const char *path)
   char *line, *p, *tok;
   const char *premature_token;
   acc_t *current, *retval;
-  int ln, quote;
+  int ln, qmark;
 
   /* The latest token we've seen in the file.  */
   enum
@@ -281,10 +295,10 @@ parse_netrc (const char *path)
 
       /* Parse the line.  */
       p = line;
-      quote = 0;
+      qmark = 0;
 
       /* Skip leading whitespace.  */
-      while (*p && ISSPACE (*p))
+      while (*p && c_isspace (*p))
         p ++;
 
       /* If the line is empty, then end any macro definition.  */
@@ -296,7 +310,7 @@ parse_netrc (const char *path)
       while (*p && last_token != tok_macdef)
         {
           /* Skip any whitespace.  */
-          while (*p && ISSPACE (*p))
+          while (*p && c_isspace (*p))
             p ++;
 
           /* Discard end-of-line comments; also, stop processing if
@@ -307,25 +321,25 @@ parse_netrc (const char *path)
           /* If the token starts with quotation mark, note this fact,
              and squash the quotation character */
           if (*p == '"'){
-            quote = 1;
+            qmark = 1;
             shift_left (p);
           }
 
           tok = p;
 
           /* Find the end of the token, handling quotes and escapes.  */
-          while (*p && (quote ? *p != '"' : !ISSPACE (*p))){
+          while (*p && (qmark ? *p != '"' : !c_isspace (*p))){
             if (*p == '\\')
               shift_left (p);
             p ++;
           }
 
           /* If field was quoted, squash the trailing quotation mark
-             and reset quote flag.  */
-          if (quote)
+             and reset qmark flag.  */
+          if (qmark)
             {
               shift_left (p);
-              quote = 0;
+              qmark = 0;
             }
 
           /* Null-terminate the token, if it isn't already.  */
@@ -374,8 +388,8 @@ parse_netrc (const char *path)
           if (premature_token)
             {
               fprintf (stderr, _("\
-%s: %s:%d: warning: \"%s\" token appears before any machine name\n"),
-                       exec_name, path, ln, premature_token);
+%s: %s:%d: warning: %s token appears before any machine name\n"),
+                       exec_name, path, ln, quote (premature_token));
               premature_token = NULL;
             }
 

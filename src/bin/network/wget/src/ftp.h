@@ -1,6 +1,6 @@
 /* Declarations for FTP support.
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -60,7 +60,7 @@ uerr_t ftp_type (int, int);
 uerr_t ftp_cwd (int, const char *);
 uerr_t ftp_retr (int, const char *);
 uerr_t ftp_rest (int, wgint);
-uerr_t ftp_list (int, const char *);
+uerr_t ftp_list (int, const char *, enum stype);
 uerr_t ftp_syst (int, enum stype *);
 uerr_t ftp_pwd (int, char **);
 uerr_t ftp_size (int, const char *, wgint *);

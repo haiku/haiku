@@ -2,1839 +2,2077 @@
 # Copyright (C) 1998 Free Software Foundation, Inc.
 # This file is distributed under the same license as the wget package.
 # Originally translated by Penguin Kun <penguin-kun@geocities.com>, 1998
-# Hiroshi Takekawa <sian@big.or.jp>, 2000-2008
+# Hiroshi Takekawa <sian@big.or.jp>, 2000-2009
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: wget 1.11.3\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-06-29 18:27-0700\n"
-"PO-Revision-Date: 2008-05-14 07:30+0900\n"
+"Project-Id-Version: wget 1.12-pre6\n"
+"Report-Msgid-Bugs-To: bug-wget@gnu.org\n"
+"POT-Creation-Date: 2009-09-22 09:40-0700\n"
+"PO-Revision-Date: 2009-09-10 06:13+0900\n"
 "Last-Translator: Hiroshi Takekawa <sian@big.or.jp>\n"
 "Language-Team: Japanese <translation-team-ja@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=EUC-JP\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=0;\n"
 
-#: src/connect.c:200
-#, c-format
-msgid "%s: unable to resolve bind address `%s'; disabling bind.\n"
-msgstr ""
-"%s: ¥Ğ¥¤¥ó¥É¤·¤è¤¦¤È¤·¤¿¥¢¥É¥ì¥¹ `%s' ¤ò²ò·è¤Ç¤­¤Ş¤»¤ó¤Ç¤·¤¿; ¥Ğ¥¤¥ó¥É¤ò¶Ø»ß"
-"¤·¤Ş¤¹¡£\n"
+#: lib/error.c:127
+msgid "Unknown system error"
+msgstr "ä¸æ˜ãªã‚·ã‚¹ãƒ†ãƒ ã‚¨ãƒ©ãƒ¼ã§ã™"
 
-#: src/connect.c:272
+#: lib/getopt.c:526 lib/getopt.c:542
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr "%s: ã‚ªãƒ—ã‚·ãƒ§ãƒ³ `%s' ã¯æ›–æ˜§ã§ã™\n"
+
+#: lib/getopt.c:575 lib/getopt.c:579
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr "%s: ã‚ªãƒ—ã‚·ãƒ§ãƒ³ `--%s' ã¯å¼•æ•°ã‚’å¿…è¦ã¨ã—ã¾ã›ã‚“\n"
+
+#: lib/getopt.c:588 lib/getopt.c:593
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr "%s: ã‚ªãƒ—ã‚·ãƒ§ãƒ³ `%c%s' ã¯å¼•æ•°ã‚’å¿…è¦ã¨ã—ã¾ã›ã‚“\n"
+
+#: lib/getopt.c:636 lib/getopt.c:655 lib/getopt.c:971 lib/getopt.c:990
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr "%s: ã‚ªãƒ—ã‚·ãƒ§ãƒ³ `%s' ã¯å¼•æ•°ã‚’å¿…è¦ã¨ã—ã¾ã™\n"
+
+#: lib/getopt.c:693 lib/getopt.c:696
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr "%s: `--%s' ã¯èªè­˜ã§ããªã„ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã§ã™\n"
+
+#: lib/getopt.c:704 lib/getopt.c:707
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr "%s: `%c%s' ã¯èªè­˜ã§ããªã„ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã§ã™\n"
+
+#: lib/getopt.c:759 lib/getopt.c:762
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: ä¸æ­£ãªã‚ªãƒ—ã‚·ãƒ§ãƒ³ã§ã™ -- %c\n"
+
+#: lib/getopt.c:768 lib/getopt.c:771
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr "%s: ä¸æ­£ãªã‚ªãƒ—ã‚·ãƒ§ãƒ³ã§ã™ -- %c\n"
+
+#: lib/getopt.c:823 lib/getopt.c:839 lib/getopt.c:1043 lib/getopt.c:1061
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã¯å¼•æ•°ã‚’å¿…è¦ã¨ã—ã¾ã™ -- %c\n"
+
+#: lib/getopt.c:892 lib/getopt.c:908
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr "%s: ã‚ªãƒ—ã‚·ãƒ§ãƒ³ `-W %s' ã¯æ›–æ˜§ã§ã™\n"
+
+#: lib/getopt.c:932 lib/getopt.c:950
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr "%s: ã‚ªãƒ—ã‚·ãƒ§ãƒ³ `-W %s' ã¯å¼•æ•°ã‚’å–ã‚Šã¾ã›ã‚“\n"
+
+#. TRANSLATORS:
+#. Get translations for open and closing quotation marks.
+#.
+#. The message catalog should translate "`" to a left
+#. quotation mark suitable for the locale, and similarly for
+#. "'".  If the catalog has no translation,
+#. locale_quoting_style quotes `like this', and
+#. clocale_quoting_style quotes "like this".
+#.
+#. For example, an American English Unicode locale should
+#. translate "`" to U+201C (LEFT DOUBLE QUOTATION MARK), and
+#. should translate "'" to U+201D (RIGHT DOUBLE QUOTATION
+#. MARK).  A British English Unicode locale should instead
+#. translate these to U+2018 (LEFT SINGLE QUOTATION MARK)
+#. and U+2019 (RIGHT SINGLE QUOTATION MARK), respectively.
+#.
+#. If you don't know what to put here, please see
+#. <http://en.wikipedia.org/wiki/Quotation_mark#Glyphs>
+#. and use glyphs suitable for your language.
+#: lib/quotearg.c:272
+msgid "`"
+msgstr "`"
+
+#: lib/quotearg.c:273
+msgid "'"
+msgstr "'"
+
+#: lib/xalloc-die.c:34
+msgid "memory exhausted"
+msgstr "ãƒ¡ãƒ¢ãƒªä¸è¶³"
+
+#: src/connect.c:207
+#, c-format
+msgid "%s: unable to resolve bind address %s; disabling bind.\n"
+msgstr ""
+"%s: ãƒã‚¤ãƒ³ãƒ‰ã—ã‚ˆã†ã¨ã—ãŸã‚¢ãƒ‰ãƒ¬ã‚¹ %s ã‚’è§£æ±ºã§ãã¾ã›ã‚“ã§ã—ãŸ; ãƒã‚¤ãƒ³ãƒ‰ã‚’ç¦æ­¢ã—"
+"ã¾ã™ã€‚\n"
+
+#: src/connect.c:291
 #, c-format
 msgid "Connecting to %s|%s|:%d... "
-msgstr "%s|%s|:%d ¤ËÀÜÂ³¤·¤Æ¤¤¤Ş¤¹... "
+msgstr "%s|%s|:%d ã«æ¥ç¶šã—ã¦ã„ã¾ã™... "
 
-#: src/connect.c:275
+#: src/connect.c:298
 #, c-format
 msgid "Connecting to %s:%d... "
-msgstr "%s:%d ¤ËÀÜÂ³¤·¤Æ¤¤¤Ş¤¹... "
+msgstr "%s:%d ã«æ¥ç¶šã—ã¦ã„ã¾ã™... "
 
-#: src/connect.c:335
+#: src/connect.c:358
 msgid "connected.\n"
-msgstr "ÀÜÂ³¤·¤Ş¤·¤¿¡£\n"
+msgstr "æ¥ç¶šã—ã¾ã—ãŸã€‚\n"
 
-#: src/connect.c:347 src/host.c:754 src/host.c:783
+#: src/connect.c:370 src/host.c:780 src/host.c:809
 #, c-format
 msgid "failed: %s.\n"
-msgstr "¼ºÇÔ¤·¤Ş¤·¤¿: %s.\n"
+msgstr "å¤±æ•—ã—ã¾ã—ãŸ: %s.\n"
 
-#: src/connect.c:371 src/http.c:1645
+#: src/connect.c:394 src/http.c:1674
 #, c-format
-msgid "%s: unable to resolve host address `%s'\n"
-msgstr "%s: ¥Û¥¹¥È¥¢¥É¥ì¥¹ `%s' ¤ò²ò·è¤Ç¤­¤Ş¤»¤ó¤Ç¤·¤¿¡£\n"
+msgid "%s: unable to resolve host address %s\n"
+msgstr "%s: ãƒ›ã‚¹ãƒˆã‚¢ãƒ‰ãƒ¬ã‚¹ %s ã‚’è§£æ±ºã§ãã¾ã›ã‚“ã§ã—ãŸã€‚\n"
 
-#: src/convert.c:172
+#: src/convert.c:185
 #, c-format
 msgid "Converted %d files in %s seconds.\n"
-msgstr "%d ¸Ä¤Î¥Õ¥¡¥¤¥ë¤ò %s ÉÃ¤ÇÊÑ´¹¤·¤Ş¤·¤¿¡£\n"
+msgstr "%d å€‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ %s ç§’ã§å¤‰æ›ã—ã¾ã—ãŸã€‚\n"
 
-#: src/convert.c:199
+#: src/convert.c:213
 #, c-format
 msgid "Converting %s... "
-msgstr "%s ¤òÊÑ´¹¤·¤Æ¤¤¤Ş¤¹... "
+msgstr "%s ã‚’å¤‰æ›ã—ã¦ã„ã¾ã™... "
 
-#: src/convert.c:212
+#: src/convert.c:226
 msgid "nothing to do.\n"
-msgstr "¤Ê¤Ë¤â¤¹¤ë¤³¤È¤¬¤¢¤ê¤Ş¤»¤ó¡£\n"
+msgstr "ãªã«ã‚‚ã™ã‚‹ã“ã¨ãŒã‚ã‚Šã¾ã›ã‚“ã€‚\n"
 
-#: src/convert.c:220 src/convert.c:244
+#: src/convert.c:234 src/convert.c:258
 #, c-format
 msgid "Cannot convert links in %s: %s\n"
-msgstr "`%s' Ãæ¤Î¥ê¥ó¥¯¤òÊÑ´¹¤Ç¤­¤Ş¤»¤ó: %s\n"
+msgstr "%s ä¸­ã®ãƒªãƒ³ã‚¯ã‚’å¤‰æ›ã§ãã¾ã›ã‚“: %s\n"
 
-#: src/convert.c:235
+#: src/convert.c:249
 #, c-format
-msgid "Unable to delete `%s': %s\n"
-msgstr "`%s' ¤Îºï½ü¤Ë¼ºÇÔ¤·¤Ş¤·¤¿: %s\n"
+msgid "Unable to delete %s: %s\n"
+msgstr "%s ã®å‰Šé™¤ã«å¤±æ•—ã—ã¾ã—ãŸ: %s\n"
 
-#: src/convert.c:444
+#: src/convert.c:464
 #, c-format
 msgid "Cannot back up %s as %s: %s\n"
-msgstr "%s ¤ò %s ¤È¤·¤Æ¥Ğ¥Ã¥¯¥¢¥Ã¥×¤Ç¤­¤Ş¤»¤ó: %s\n"
+msgstr "%s ã‚’ %s ã¨ã—ã¦ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã§ãã¾ã›ã‚“: %s\n"
 
-#: src/cookies.c:445
+#: src/cookies.c:443
 #, c-format
 msgid "Syntax error in Set-Cookie: %s at position %d.\n"
-msgstr "Set-Cookie: %s ¤Î°ÌÃÖ %d ¤Ë¤ÏÊ¸Ë¡¥¨¥é¡¼¤¬¤¢¤ê¤Ş¤¹¡£\n"
+msgstr "Set-Cookie: %s ã®ä½ç½® %d ã«ã¯æ–‡æ³•ã‚¨ãƒ©ãƒ¼ãŒã‚ã‚Šã¾ã™ã€‚\n"
 
-#: src/cookies.c:687
+#: src/cookies.c:686
 #, c-format
 msgid "Cookie coming from %s attempted to set domain to %s\n"
-msgstr "%s ¤«¤é¤Î¥¯¥Ã¥­¡¼¤¬¥É¥á¥¤¥ó¤ò %s ¤ËÀßÄê¤·¤è¤¦¤È¤·¤Ş¤·¤¿\n"
+msgstr "%s ã‹ã‚‰ã®ã‚¯ãƒƒã‚­ãƒ¼ãŒãƒ‰ãƒ¡ã‚¤ãƒ³ã‚’ %s ã«è¨­å®šã—ã‚ˆã†ã¨ã—ã¾ã—ãŸ\n"
 
 #: src/cookies.c:1134 src/cookies.c:1252
 #, c-format
-msgid "Cannot open cookies file `%s': %s\n"
-msgstr "¥¯¥Ã¥­¡¼¥Õ¥¡¥¤¥ë `%s' ¤ò³«¤±¤Ş¤»¤ó¤Ç¤·¤¿: %s\n"
+msgid "Cannot open cookies file %s: %s\n"
+msgstr "ã‚¯ãƒƒã‚­ãƒ¼ãƒ•ã‚¡ã‚¤ãƒ« %s ã‚’é–‹ã‘ã¾ã›ã‚“ã§ã—ãŸ: %s\n"
 
 #: src/cookies.c:1289
 #, c-format
-msgid "Error writing to `%s': %s\n"
-msgstr "`%s' ¤Ø½ñ¤­¹ş¤á¤Ş¤»¤ó: %s\n"
+msgid "Error writing to %s: %s\n"
+msgstr "%s ã¸æ›¸ãè¾¼ã‚ã¾ã›ã‚“: %s\n"
 
 #: src/cookies.c:1292
 #, c-format
-msgid "Error closing `%s': %s\n"
-msgstr "`%s' ¤òÊÄ¤¸¤ëºİ¤Ë¥¨¥é¡¼¤¬È¯À¸¤·¤Ş¤·¤¿: %s\n"
+msgid "Error closing %s: %s\n"
+msgstr "%s ã‚’é–‰ã˜ã‚‹éš›ã«ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ: %s\n"
 
-#: src/ftp-ls.c:838
+#: src/ftp-ls.c:1065
 msgid "Unsupported listing type, trying Unix listing parser.\n"
-msgstr "¥µ¥İ¡¼¥È¤·¤Æ¤¤¤Ê¤¤¥ê¥¹¥È·Á¼°¤Ç¤¹¡¢UNIX·Á¼°¤È¸«¤Æ²ò¼á¤·¤Æ¤ß¤Ş¤¹¡£\n"
+msgstr "ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ãªã„ãƒªã‚¹ãƒˆå½¢å¼ã§ã™ã€UNIXå½¢å¼ã¨è¦‹ã¦è§£é‡ˆã—ã¦ã¿ã¾ã™ã€‚\n"
 
-#: src/ftp-ls.c:884 src/ftp-ls.c:886
+#: src/ftp-ls.c:1116 src/ftp-ls.c:1118
 #, c-format
 msgid "Index of /%s on %s:%d"
-msgstr "/%s (%s:%d ¾å)¤Î¸«½Ğ¤·(index)¤Ç¤¹"
+msgstr "/%s (%s:%d ä¸Š)ã®è¦‹å‡ºã—(index)ã§ã™"
 
-#: src/ftp-ls.c:910
+#: src/ftp-ls.c:1143
 #, c-format
 msgid "time unknown       "
-msgstr "»ş´Ö¤¬ÉÔÌÀ¤Ç¤¹       "
+msgstr "æ™‚é–“ãŒä¸æ˜ã§ã™       "
 
-#: src/ftp-ls.c:914
+#: src/ftp-ls.c:1147
 #, c-format
 msgid "File        "
-msgstr "¥Õ¥¡¥¤¥ë        "
+msgstr "ãƒ•ã‚¡ã‚¤ãƒ«        "
 
-#: src/ftp-ls.c:917
+#: src/ftp-ls.c:1150
 #, c-format
 msgid "Directory   "
-msgstr "¥Ç¥£¥ì¥¯¥È¥ê   "
+msgstr "ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª   "
 
-#: src/ftp-ls.c:920
+#: src/ftp-ls.c:1153
 #, c-format
 msgid "Link        "
-msgstr "¥ê¥ó¥¯        "
+msgstr "ãƒªãƒ³ã‚¯        "
 
-#: src/ftp-ls.c:923
+#: src/ftp-ls.c:1156
 #, c-format
 msgid "Not sure    "
-msgstr "ÉÔ³Î¼Â    "
+msgstr "ä¸ç¢ºå®Ÿ    "
 
-#: src/ftp-ls.c:941
+#: src/ftp-ls.c:1179
 #, c-format
 msgid " (%s bytes)"
-msgstr " (%s ¥Ğ¥¤¥È)"
+msgstr " (%s ãƒã‚¤ãƒˆ)"
 
-#: src/ftp.c:215
+#: src/ftp.c:221
 #, c-format
 msgid "Length: %s"
-msgstr "Ä¹¤µ: %s"
+msgstr "é•·ã•: %s"
 
-#: src/ftp.c:221 src/http.c:2198
+#: src/ftp.c:227 src/http.c:2253
 #, c-format
 msgid ", %s (%s) remaining"
-msgstr ", %s (%s) »Ä¤Ã¤Æ¤¤¤Ş¤¹"
+msgstr ", %s (%s) æ®‹ã£ã¦ã„ã¾ã™"
 
-#: src/ftp.c:225 src/http.c:2202
+#: src/ftp.c:231 src/http.c:2257
 #, c-format
 msgid ", %s remaining"
-msgstr ", %s »Ä¤Ã¤Æ¤¤¤Ş¤¹"
+msgstr ", %s æ®‹ã£ã¦ã„ã¾ã™"
 
-#: src/ftp.c:228
+#: src/ftp.c:234
 msgid " (unauthoritative)\n"
-msgstr " (³Î¾Ú¤Ï¤¢¤ê¤Ş¤»¤ó)\n"
+msgstr " (ç¢ºè¨¼ã¯ã‚ã‚Šã¾ã›ã‚“)\n"
 
-#. Second: Login with proper USER/PASS sequence.
-#: src/ftp.c:304
+#: src/ftp.c:315
 #, c-format
 msgid "Logging in as %s ... "
-msgstr "%s ¤È¤·¤Æ¥í¥°¥¤¥ó¤·¤Æ¤¤¤Ş¤¹... "
+msgstr "%s ã¨ã—ã¦ãƒ­ã‚°ã‚¤ãƒ³ã—ã¦ã„ã¾ã™... "
 
-#: src/ftp.c:317 src/ftp.c:363 src/ftp.c:392 src/ftp.c:444 src/ftp.c:556
-#: src/ftp.c:602 src/ftp.c:631 src/ftp.c:688 src/ftp.c:749 src/ftp.c:809
-#: src/ftp.c:856
+#: src/ftp.c:329 src/ftp.c:375 src/ftp.c:404 src/ftp.c:469 src/ftp.c:699
+#: src/ftp.c:752 src/ftp.c:781 src/ftp.c:838 src/ftp.c:899 src/ftp.c:991
+#: src/ftp.c:1038
 msgid "Error in server response, closing control connection.\n"
-msgstr "¥µ¡¼¥Ğ¤Î±şÅú¤Ë¥¨¥é¡¼¤¬¤¢¤ë¤Î¤Ç¡¢ÀÜÂ³¤ò½ªÎ»¤·¤Ş¤¹¡£\n"
+msgstr "ã‚µãƒ¼ãƒã®å¿œç­”ã«ã‚¨ãƒ©ãƒ¼ãŒã‚ã‚‹ã®ã§ã€æ¥ç¶šã‚’çµ‚äº†ã—ã¾ã™ã€‚\n"
 
-#: src/ftp.c:324
+#: src/ftp.c:336
 msgid "Error in server greeting.\n"
-msgstr "¥µ¡¼¥Ğ¤Î½é´ü±şÅú¤Ë¥¨¥é¡¼¤¬¤¢¤ê¤Ş¤¹¡£\n"
+msgstr "ã‚µãƒ¼ãƒã®åˆæœŸå¿œç­”ã«ã‚¨ãƒ©ãƒ¼ãŒã‚ã‚Šã¾ã™ã€‚\n"
 
-#: src/ftp.c:331 src/ftp.c:452 src/ftp.c:564 src/ftp.c:639 src/ftp.c:698
-#: src/ftp.c:759 src/ftp.c:819 src/ftp.c:866
+#: src/ftp.c:343 src/ftp.c:477 src/ftp.c:707 src/ftp.c:789 src/ftp.c:848
+#: src/ftp.c:909 src/ftp.c:1001 src/ftp.c:1048
 msgid "Write failed, closing control connection.\n"
-msgstr "½ñ¤­¹ş¤ß¤Ë¼ºÇÔ¤·¤¿¤Î¤Ç¡¢ÀÜÂ³¤ò½ªÎ»¤·¤Ş¤¹¡£\n"
-
-#: src/ftp.c:337
-msgid "The server refuses login.\n"
-msgstr "¥µ¡¼¥Ğ¤¬¥í¥°¥¤¥ó¤òµñÈİ¤·¤Ş¤·¤¿¡£\n"
-
-#: src/ftp.c:343
-msgid "Login incorrect.\n"
-msgstr "¥í¥°¥¤¥ó¤Ë¼ºÇÔ¤·¤Ş¤·¤¿¡£\n"
+msgstr "æ›¸ãè¾¼ã¿ã«å¤±æ•—ã—ãŸã®ã§ã€æ¥ç¶šã‚’çµ‚äº†ã—ã¾ã™ã€‚\n"
 
 #: src/ftp.c:349
+msgid "The server refuses login.\n"
+msgstr "ã‚µãƒ¼ãƒãŒãƒ­ã‚°ã‚¤ãƒ³ã‚’æ‹’å¦ã—ã¾ã—ãŸã€‚\n"
+
+#: src/ftp.c:355
+msgid "Login incorrect.\n"
+msgstr "ãƒ­ã‚°ã‚¤ãƒ³ã«å¤±æ•—ã—ã¾ã—ãŸã€‚\n"
+
+#: src/ftp.c:361
 msgid "Logged in!\n"
-msgstr "¥í¥°¥¤¥ó¤·¤Ş¤·¤¿!\n"
+msgstr "ãƒ­ã‚°ã‚¤ãƒ³ã—ã¾ã—ãŸ!\n"
 
-#: src/ftp.c:371
+#: src/ftp.c:383
 msgid "Server error, can't determine system type.\n"
-msgstr "¥µ¡¼¥Ğ¥¨¥é¡¼¤Ç¡¢¥·¥¹¥Æ¥à¤¬¤Ê¤Ë¤«È½ÊÌ¤Ç¤­¤Ş¤»¤ó¡£\n"
+msgstr "ã‚µãƒ¼ãƒã‚¨ãƒ©ãƒ¼ã§ã€ã‚·ã‚¹ãƒ†ãƒ ãŒãªã«ã‹åˆ¤åˆ¥ã§ãã¾ã›ã‚“ã€‚\n"
 
-#: src/ftp.c:380 src/ftp.c:675 src/ftp.c:732 src/ftp.c:775
+#: src/ftp.c:392 src/ftp.c:825 src/ftp.c:882 src/ftp.c:925
 msgid "done.    "
-msgstr "´°Î»¤·¤Ş¤·¤¿¡£    "
+msgstr "å®Œäº†ã—ã¾ã—ãŸã€‚    "
 
-#: src/ftp.c:432 src/ftp.c:581 src/ftp.c:614 src/ftp.c:839 src/ftp.c:885
+#: src/ftp.c:457 src/ftp.c:724 src/ftp.c:764 src/ftp.c:1021 src/ftp.c:1067
 msgid "done.\n"
-msgstr "´°Î»¤·¤Ş¤·¤¿¡£\n"
+msgstr "å®Œäº†ã—ã¾ã—ãŸã€‚\n"
 
-#: src/ftp.c:459
+#: src/ftp.c:484
 #, c-format
 msgid "Unknown type `%c', closing control connection.\n"
-msgstr "`%c' ¤ÏÉÔÌÀ¤Ê¼ïÎà¤Ê¤Î¤Ç¡¢ÀÜÂ³¤ò½ªÎ»¤·¤Ş¤¹¡£\n"
+msgstr "`%c' ã¯ä¸æ˜ãªç¨®é¡ãªã®ã§ã€æ¥ç¶šã‚’çµ‚äº†ã—ã¾ã™ã€‚\n"
 
-#: src/ftp.c:471
+#: src/ftp.c:496
 msgid "done.  "
-msgstr "´°Î»¤·¤Ş¤·¤¿¡£  "
+msgstr "å®Œäº†ã—ã¾ã—ãŸã€‚  "
 
-#: src/ftp.c:477
+#: src/ftp.c:502
 msgid "==> CWD not needed.\n"
-msgstr "==> CWD ¤ÏÉ¬Í×¤¢¤ê¤Ş¤»¤ó¡£\n"
+msgstr "==> CWD ã¯å¿…è¦ã‚ã‚Šã¾ã›ã‚“ã€‚\n"
 
-#: src/ftp.c:570
+#: src/ftp.c:713
 #, c-format
 msgid ""
-"No such directory `%s'.\n"
+"No such directory %s.\n"
 "\n"
 msgstr ""
-"`%s' ¤È¤¤¤¦¥Ç¥£¥ì¥¯¥È¥ê¤Ï¤¢¤ê¤Ş¤»¤ó¡£\n"
+"%s ã¨ã„ã†ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã¯ã‚ã‚Šã¾ã›ã‚“ã€‚\n"
 "\n"
 
-#. do not CWD
-#: src/ftp.c:585
+#: src/ftp.c:734
 msgid "==> CWD not required.\n"
-msgstr "==> CWD ¤ÏÉ¬Í×¤¢¤ê¤Ş¤»¤ó¡£\n"
+msgstr "==> CWD ã¯å¿…è¦ã‚ã‚Šã¾ã›ã‚“ã€‚\n"
 
-#: src/ftp.c:645
+#: src/ftp.c:795
 msgid "Cannot initiate PASV transfer.\n"
-msgstr "PASVÅ¾Á÷¤Î½é´ü²½¤¬¤Ç¤­¤Ş¤»¤ó¡£\n"
+msgstr "PASVè»¢é€ã®åˆæœŸåŒ–ãŒã§ãã¾ã›ã‚“ã€‚\n"
 
-#: src/ftp.c:649
+#: src/ftp.c:799
 msgid "Cannot parse PASV response.\n"
-msgstr "PASV¤Î±şÅú¤ò²òÀÏ¤Ç¤­¤Ş¤»¤ó¡£\n"
+msgstr "PASVã®å¿œç­”ã‚’è§£æã§ãã¾ã›ã‚“ã€‚\n"
 
-#: src/ftp.c:666
+#: src/ftp.c:816
 #, c-format
 msgid "couldn't connect to %s port %d: %s\n"
-msgstr "%s:%d ¤ØÀÜÂ³¤Ç¤­¤Ş¤»¤ó¤Ç¤·¤¿: %s\n"
+msgstr "%s:%d ã¸æ¥ç¶šã§ãã¾ã›ã‚“ã§ã—ãŸ: %s\n"
 
-#: src/ftp.c:714
+#: src/ftp.c:864
 #, c-format
 msgid "Bind error (%s).\n"
-msgstr "¥Ğ¥¤¥ó¥É¥¨¥é¡¼¤Ç¤¹ (%s)¡£\n"
+msgstr "ãƒã‚¤ãƒ³ãƒ‰ã‚¨ãƒ©ãƒ¼ã§ã™ (%s)ã€‚\n"
 
-#: src/ftp.c:720
+#: src/ftp.c:870
 msgid "Invalid PORT.\n"
-msgstr "Ìµ¸ú¤Ê¥İ¡¼¥ÈÈÖ¹æ¤Ç¤¹¡£\n"
+msgstr "ç„¡åŠ¹ãªãƒãƒ¼ãƒˆç•ªå·ã§ã™ã€‚\n"
 
-#: src/ftp.c:766
+#: src/ftp.c:916
 msgid ""
 "\n"
 "REST failed, starting from scratch.\n"
 msgstr ""
 "\n"
-"REST¤Ë¼ºÇÔ¤·¤Ş¤·¤¿¡¢ºÇ½é¤«¤é»Ï¤á¤Ş¤¹¡£\n"
+"RESTã«å¤±æ•—ã—ã¾ã—ãŸã€æœ€åˆã‹ã‚‰å§‹ã‚ã¾ã™ã€‚\n"
 
-#: src/ftp.c:827
+#: src/ftp.c:957
+#, c-format
+msgid "File %s exists.\n"
+msgstr "%s ã¨ã„ã†ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ã¾ã™ã€‚\n"
+
+#: src/ftp.c:963
+#, c-format
+msgid "No such file %s.\n"
+msgstr "%s ã¨ã„ã†ãƒ•ã‚¡ã‚¤ãƒ«ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚\n"
+
+#: src/ftp.c:1009
 #, c-format
 msgid ""
-"No such file `%s'.\n"
+"No such file %s.\n"
 "\n"
 msgstr ""
-"`%s' ¤È¤¤¤¦¥Õ¥¡¥¤¥ë¤Ï¤¢¤ê¤Ş¤»¤ó¡£\n"
+"%s ã¨ã„ã†ãƒ•ã‚¡ã‚¤ãƒ«ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚\n"
 "\n"
 
-#: src/ftp.c:874
+#: src/ftp.c:1056
 #, c-format
 msgid ""
-"No such file or directory `%s'.\n"
+"No such file or directory %s.\n"
 "\n"
 msgstr ""
-"`%s' ¤È¤¤¤¦¥Õ¥¡¥¤¥ë¤Ş¤¿¤Ï¥Ç¥£¥ì¥¯¥È¥ê¤Ï¤¢¤ê¤Ş¤»¤ó¡£\n"
+"%s ã¨ã„ã†ãƒ•ã‚¡ã‚¤ãƒ«ã¾ãŸã¯ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã¯ã‚ã‚Šã¾ã›ã‚“ã€‚\n"
 "\n"
 
-#. We cannot just invent a new name and use it (which is
-#. what functions like unique_create typically do)
-#. because we told the user we'd use this name.
-#. Instead, return and retry the download.
-#: src/ftp.c:936 src/http.c:2260
+#: src/ftp.c:1187 src/http.c:2344
 #, c-format
 msgid "%s has sprung into existence.\n"
-msgstr "%s ¤¬Â¸ºß¤·¤Æ¤¤¤Ş¤¹¡£\n"
+msgstr "%s ãŒå­˜åœ¨ã—ã¦ã„ã¾ã™ã€‚\n"
 
-#: src/ftp.c:988
+#: src/ftp.c:1239
 #, c-format
 msgid "%s: %s, closing control connection.\n"
-msgstr "%s: %s¡¢ÀÜÂ³¤ò½ªÎ»¤·¤Ş¤¹¡£\n"
+msgstr "%s: %sã€æ¥ç¶šã‚’çµ‚äº†ã—ã¾ã™ã€‚\n"
 
-#: src/ftp.c:997
+#: src/ftp.c:1248
 #, c-format
 msgid "%s (%s) - Data connection: %s; "
-msgstr "%s (%s) - ¥Ç¡¼¥¿ÀÜÂ³: %s; "
+msgstr "%s (%s) - ãƒ‡ãƒ¼ã‚¿æ¥ç¶š: %s; "
 
-#: src/ftp.c:1012
+#: src/ftp.c:1263
 msgid "Control connection closed.\n"
-msgstr "À©¸æÍÑ¤ÎÀÜÂ³¤òÀÚÃÇ¤·¤Ş¤¹¡£\n"
+msgstr "åˆ¶å¾¡ç”¨ã®æ¥ç¶šã‚’åˆ‡æ–­ã—ã¾ã™ã€‚\n"
 
-#: src/ftp.c:1030
+#: src/ftp.c:1281
 msgid "Data transfer aborted.\n"
-msgstr "¥Ç¡¼¥¿Å¾Á÷¤òÃæÃÇ¤·¤Ş¤·¤¿¡£\n"
+msgstr "ãƒ‡ãƒ¼ã‚¿è»¢é€ã‚’ä¸­æ–­ã—ã¾ã—ãŸã€‚\n"
 
-#. Check if output file exists; if it does, exit.
-#: src/ftp.c:1100 src/main.c:906
+#: src/ftp.c:1381
 #, c-format
-msgid "File `%s' already there; not retrieving.\n"
-msgstr "¥Õ¥¡¥¤¥ë `%s' ¤Ï¤¹¤Ç¤ËÂ¸ºß¤¹¤ë¤Î¤Ç¡¢¼èÆÀ¤·¤Ş¤»¤ó¡£\n"
+msgid "File %s already there; not retrieving.\n"
+msgstr "ãƒ•ã‚¡ã‚¤ãƒ« %s ã¯ã™ã§ã«å­˜åœ¨ã™ã‚‹ã®ã§ã€å–å¾—ã—ã¾ã›ã‚“ã€‚\n"
 
-#: src/ftp.c:1170 src/http.c:2440
+#: src/ftp.c:1447 src/http.c:2529
 #, c-format
 msgid "(try:%2d)"
-msgstr "(»î¹Ô:%2d)"
+msgstr "(è©¦è¡Œ:%2d)"
 
-#: src/ftp.c:1240 src/http.c:2772
+#: src/ftp.c:1522 src/http.c:2873
 #, c-format
 msgid ""
-"%s (%s) - `%s' saved [%s]\n"
+"%s (%s) - written to stdout %s[%s]\n"
 "\n"
 msgstr ""
-"%s (%s) - `%s' ¤ØÊİÂ¸½ªÎ» [%s]\n"
+"%s (%s) - stdout ã¸å‡ºåŠ›ã—ã¾ã—ãŸ %s[%s]\n"
 "\n"
 
-#: src/ftp.c:1282 src/main.c:1025 src/recur.c:379 src/retr.c:861
+#: src/ftp.c:1523 src/http.c:2874
+#, c-format
+msgid ""
+"%s (%s) - %s saved [%s]\n"
+"\n"
+msgstr ""
+"%s (%s) - %s ã¸ä¿å­˜çµ‚äº† [%s]\n"
+"\n"
+
+#: src/ftp.c:1568 src/main.c:1301 src/recur.c:438 src/retr.c:990
 #, c-format
 msgid "Removing %s.\n"
-msgstr "%s ¤òºï½ü¤·¤Ş¤·¤¿¡£\n"
+msgstr "%s ã‚’å‰Šé™¤ã—ã¾ã—ãŸã€‚\n"
 
-#: src/ftp.c:1324
+#: src/ftp.c:1610
 #, c-format
-msgid "Using `%s' as listing tmp file.\n"
-msgstr "°ì»ş¥Õ¥¡¥¤¥ë¤ò¥ê¥¹¥È¤¹¤ë¤¿¤á¤Ë `%s' ¤ò»ÈÍÑ¤·¤Ş¤¹¡£\n"
+msgid "Using %s as listing tmp file.\n"
+msgstr "ãƒªã‚¹ãƒˆä¸€æ™‚ãƒ•ã‚¡ã‚¤ãƒ«ã« %s ã‚’ä½¿ç”¨ã—ã¾ã™ã€‚\n"
 
-#: src/ftp.c:1339
+#: src/ftp.c:1627
 #, c-format
-msgid "Removed `%s'.\n"
-msgstr "`%s' ¤òºï½ü¤·¤Ş¤·¤¿¡£\n"
+msgid "Removed %s.\n"
+msgstr "%s ã‚’å‰Šé™¤ã—ã¾ã—ãŸã€‚\n"
 
-#: src/ftp.c:1372
+#: src/ftp.c:1664
 #, c-format
 msgid "Recursion depth %d exceeded max. depth %d.\n"
-msgstr "ºÆµ¢¤¹¤ë¿¼¤µ %d ¤¬ºÇÂçÃÍ¤òÄ¶²á¤·¤Æ¤¤¤Ş¤¹¡£¿¼¤µ¤Ï %d ¤Ç¤¹¡£\n"
+msgstr "å†å¸°ã™ã‚‹æ·±ã• %d ãŒæœ€å¤§å€¤ã‚’è¶…éã—ã¦ã„ã¾ã™ã€‚æ·±ã•ã¯ %d ã§ã™ã€‚\n"
 
-#. Remote file is older, file sizes can be compared and
-#. are both equal.
-#: src/ftp.c:1442
+#: src/ftp.c:1734
 #, c-format
-msgid "Remote file no newer than local file `%s' -- not retrieving.\n"
+msgid "Remote file no newer than local file %s -- not retrieving.\n"
 msgstr ""
-"¥µ¡¼¥ĞÂ¦¤Î¥Õ¥¡¥¤¥ë¤è¤ê¥í¡¼¥«¥ë¤Î¥Õ¥¡¥¤¥ë `%s' ¤ÎÊı¤¬¿·¤·¤¤¤«Æ±¤¸¤Ê¤Î¤Ç¼èÆÀ¤·"
-"¤Ş¤»¤ó¡£\n"
+"ã‚µãƒ¼ãƒå´ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚ˆã‚Šãƒ­ãƒ¼ã‚«ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ« %s ã®æ–¹ãŒæ–°ã—ã„ã‹åŒã˜ãªã®ã§å–å¾—ã—ã¾"
+"ã›ã‚“ã€‚\n"
 
-#. Remote file is newer or sizes cannot be matched
-#: src/ftp.c:1449
+#: src/ftp.c:1741
 #, c-format
 msgid ""
-"Remote file is newer than local file `%s' -- retrieving.\n"
+"Remote file is newer than local file %s -- retrieving.\n"
 "\n"
 msgstr ""
-"¥µ¡¼¥ĞÂ¦¤Î¥Õ¥¡¥¤¥ë¤ÎÊı¤¬¥í¡¼¥«¥ë¤Î¥Õ¥¡¥¤¥ë `%s' ¤è¤ê¿·¤·¤¤¤Î¤Ç¼èÆÀ¤·¤Ş¤¹¡£\n"
+"ã‚µãƒ¼ãƒå´ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®æ–¹ãŒãƒ­ãƒ¼ã‚«ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ« %s ã‚ˆã‚Šæ–°ã—ã„ã®ã§å–å¾—ã—ã¾ã™ã€‚\n"
 "\n"
 
-#. Sizes do not match
-#: src/ftp.c:1456
+#: src/ftp.c:1748
 #, c-format
 msgid ""
 "The sizes do not match (local %s) -- retrieving.\n"
 "\n"
 msgstr ""
-"¥µ¥¤¥º¤¬¹ç¤ï¤Ê¤¤¤Î¤Ç(¥í¡¼¥«¥ë¤Ï %s)¡¢¼èÆÀ¤·¤Ş¤¹¡£\n"
+"ã‚µã‚¤ã‚ºãŒåˆã‚ãªã„ã®ã§(ãƒ­ãƒ¼ã‚«ãƒ«ã¯ %s)ã€å–å¾—ã—ã¾ã™ã€‚\n"
 "\n"
 
-#: src/ftp.c:1474
+#: src/ftp.c:1766
 msgid "Invalid name of the symlink, skipping.\n"
-msgstr "ÉÔÀµ¤Ê¥·¥ó¥Ü¥ê¥Ã¥¯¥ê¥ó¥¯Ì¾¤Ê¤Î¤Ç¡¢¤È¤Ğ¤·¤Ş¤¹¡£\n"
+msgstr "ä¸æ­£ãªã‚·ãƒ³ãƒœãƒªãƒƒã‚¯ãƒªãƒ³ã‚¯åãªã®ã§ã€ã¨ã°ã—ã¾ã™ã€‚\n"
 
-#: src/ftp.c:1491
+#: src/ftp.c:1783
 #, c-format
 msgid ""
 "Already have correct symlink %s -> %s\n"
 "\n"
 msgstr ""
-"¤¹¤Ç¤Ë %s -> %s ¤È¤¤¤¦Àµ¤·¤¤¥·¥ó¥Ü¥ê¥Ã¥¯¥ê¥ó¥¯¤¬¤¢¤ê¤Ş¤¹\n"
+"ã™ã§ã« %s -> %s ã¨ã„ã†æ­£ã—ã„ã‚·ãƒ³ãƒœãƒªãƒƒã‚¯ãƒªãƒ³ã‚¯ãŒã‚ã‚Šã¾ã™\n"
 "\n"
 
-#: src/ftp.c:1499
+#: src/ftp.c:1792
 #, c-format
 msgid "Creating symlink %s -> %s\n"
-msgstr "%s -> %s ¤È¤¤¤¦¥·¥ó¥Ü¥ê¥Ã¥¯¥ê¥ó¥¯¤òºîÀ®¤·¤Æ¤¤¤Ş¤¹\n"
+msgstr "%s -> %s ã¨ã„ã†ã‚·ãƒ³ãƒœãƒªãƒƒã‚¯ãƒªãƒ³ã‚¯ã‚’ä½œæˆã—ã¦ã„ã¾ã™\n"
 
-#: src/ftp.c:1509
+#: src/ftp.c:1802
 #, c-format
-msgid "Symlinks not supported, skipping symlink `%s'.\n"
+msgid "Symlinks not supported, skipping symlink %s.\n"
 msgstr ""
-"¥·¥ó¥Ü¥ê¥Ã¥¯¥ê¥ó¥¯¤ËÂĞ±ş¤·¤Æ¤¤¤Ê¤¤¤Î¤Ç¡¢¥·¥ó¥Ü¥ê¥Ã¥¯¥ê¥ó¥¯ `%s' ¤ò¤È¤Ğ¤·¤Ş"
-"¤¹¡£\n"
+"ã‚·ãƒ³ãƒœãƒªãƒƒã‚¯ãƒªãƒ³ã‚¯ã«å¯¾å¿œã—ã¦ã„ãªã„ã®ã§ã€ã‚·ãƒ³ãƒœãƒªãƒƒã‚¯ãƒªãƒ³ã‚¯ %s ã‚’ã¨ã°ã—ã¾"
+"ã™ã€‚\n"
 
-#: src/ftp.c:1521
+#: src/ftp.c:1814
 #, c-format
-msgid "Skipping directory `%s'.\n"
-msgstr "¥Ç¥£¥ì¥¯¥È¥ê `%s' ¤ò¤È¤Ğ¤·¤Ş¤¹¡£\n"
+msgid "Skipping directory %s.\n"
+msgstr "ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª %s ã‚’ã¨ã°ã—ã¾ã™ã€‚\n"
 
-#: src/ftp.c:1530
+#: src/ftp.c:1823
 #, c-format
 msgid "%s: unknown/unsupported file type.\n"
-msgstr "%s: ÉÔÌÀ¤Ê¤Ş¤¿¤ÏÂĞ±ş¤·¤Æ¤¤¤Ê¤¤¥Õ¥¡¥¤¥ë¤Î¼ïÎà¤Ç¤¹¡£\n"
+msgstr "%s: ä¸æ˜ãªã¾ãŸã¯å¯¾å¿œã—ã¦ã„ãªã„ãƒ•ã‚¡ã‚¤ãƒ«ã®ç¨®é¡ã§ã™ã€‚\n"
 
-#: src/ftp.c:1557
+#: src/ftp.c:1860
 #, c-format
 msgid "%s: corrupt time-stamp.\n"
-msgstr "%s: ÆüÉÕ¤¬²õ¤ì¤Æ¤¤¤Ş¤¹¡£\n"
+msgstr "%s: æ—¥ä»˜ãŒå£Šã‚Œã¦ã„ã¾ã™ã€‚\n"
 
-#: src/ftp.c:1585
+#: src/ftp.c:1882
 #, c-format
 msgid "Will not retrieve dirs since depth is %d (max %d).\n"
-msgstr "¿¼¤µ¤¬ %d (ºÇÂç %d)¤Ê¤Î¤Ç¥Ç¥£¥ì¥¯¥È¥ê¤òÅ¾Á÷¤·¤Ş¤»¤ó¡£\n"
+msgstr "æ·±ã•ãŒ %d (æœ€å¤§ %d)ãªã®ã§ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’è»¢é€ã—ã¾ã›ã‚“ã€‚\n"
 
-#: src/ftp.c:1635
+#: src/ftp.c:1932
 #, c-format
-msgid "Not descending to `%s' as it is excluded/not-included.\n"
-msgstr "½ü³°¤µ¤ì¤Æ¤¤¤ë¤«´Ş¤Ş¤ì¤Æ¤¤¤Ê¤¤¤Î¤Ç `%s' ¤Ë°ÜÆ°¤·¤Ş¤»¤ó¡£\n"
+msgid "Not descending to %s as it is excluded/not-included.\n"
+msgstr "é™¤å¤–ã•ã‚Œã¦ã„ã‚‹ã‹å«ã¾ã‚Œã¦ã„ãªã„ã®ã§ %s ã«ç§»å‹•ã—ã¾ã›ã‚“ã€‚\n"
 
-#: src/ftp.c:1701 src/ftp.c:1715
+#: src/ftp.c:1998 src/ftp.c:2012
 #, c-format
-msgid "Rejecting `%s'.\n"
-msgstr "`%s' ¤ò½ü³°¤·¤Ş¤¹¡£\n"
+msgid "Rejecting %s.\n"
+msgstr "%s ã‚’é™¤å¤–ã—ã¾ã™ã€‚\n"
 
-#: src/ftp.c:1738
+#: src/ftp.c:2035
 #, c-format
 msgid "Error matching %s against %s: %s\n"
-msgstr "%s ¤Ï %s ¤ËÂĞ¤·¤Æ¥Ş¥Ã¥Á¤·¤Ş¤»¤ó¤Ç¤·¤¿: %s\n"
+msgstr "%s ã¯ %s ã«å¯¾ã—ã¦ãƒãƒƒãƒã—ã¾ã›ã‚“ã§ã—ãŸ: %s\n"
 
-#. No luck.
-#. #### This message SUCKS.  We should see what was the
-#. reason that nothing was retrieved.
-#: src/ftp.c:1779
+#: src/ftp.c:2091
 #, c-format
-msgid "No matches on pattern `%s'.\n"
-msgstr "¥Ñ¥¿¡¼¥ó `%s' ¤ËÅ¬¹ç¤¹¤ë¤â¤Î¤¬¤¢¤ê¤Ş¤»¤ó¡£\n"
+msgid "No matches on pattern %s.\n"
+msgstr "ãƒ‘ã‚¿ãƒ¼ãƒ³ %s ã«é©åˆã™ã‚‹ã‚‚ã®ãŒã‚ã‚Šã¾ã›ã‚“ã€‚\n"
 
-#: src/ftp.c:1845
+#: src/ftp.c:2162
 #, c-format
-msgid "Wrote HTML-ized index to `%s' [%s].\n"
-msgstr "`%s' [%s]¤ËÂĞ¤¹¤ëHTML²½¤µ¤ì¤¿¸«½Ğ¤·(index)¤ò½ñ¤­¤Ş¤·¤¿¡£\n"
+msgid "Wrote HTML-ized index to %s [%s].\n"
+msgstr "%s [%s]ã«HTMLåŒ–ã•ã‚ŒãŸã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’æ›¸ãã¾ã—ãŸã€‚\n"
 
-#: src/ftp.c:1850
+#: src/ftp.c:2167
 #, c-format
-msgid "Wrote HTML-ized index to `%s'.\n"
-msgstr "`%s' ¤ËÂĞ¤¹¤ëHTML²½¤µ¤ì¤¿¸«½Ğ¤·(index)¤ò½ñ¤­¤Ş¤·¤¿¡£\n"
+msgid "Wrote HTML-ized index to %s.\n"
+msgstr "%s ã«HTMLåŒ–ã•ã‚ŒãŸã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’æ›¸ãã¾ã—ãŸã€‚\n"
 
-#: src/getopt.c:670
+#: src/gnutls.c:220 src/openssl.c:495
+msgid "ERROR"
+msgstr "ã‚¨ãƒ©ãƒ¼"
+
+#: src/gnutls.c:220 src/openssl.c:495
+msgid "WARNING"
+msgstr "è­¦å‘Š"
+
+#: src/gnutls.c:226 src/openssl.c:504
 #, c-format
-msgid "%s: option `%s' is ambiguous\n"
-msgstr "%s: ¥ª¥×¥·¥ç¥ó `%s' ¤ÏÛ£Ëæ¤Ç¤¹\n"
+msgid "%s: No certificate presented by %s.\n"
+msgstr "%s: %s ã‹ã‚‰è¨¼æ˜æ›¸ã®æç¤ºãŒã‚ã‚Šã¾ã›ã‚“ã§ã—ãŸ\n"
 
-#: src/getopt.c:695
+#: src/gnutls.c:234
 #, c-format
-msgid "%s: option `--%s' doesn't allow an argument\n"
-msgstr "%s: ¥ª¥×¥·¥ç¥ó `--%s' ¤Ï°ú¿ô¤òÉ¬Í×¤È¤·¤Ş¤»¤ó\n"
+msgid "%s: The certificate of %s is not trusted.\n"
+msgstr "%s: %s ã®è¨¼æ˜æ›¸ã¯ä¿¡ç”¨ã•ã‚Œã¾ã›ã‚“ã€‚\n"
 
-#: src/getopt.c:700
+#: src/gnutls.c:240
 #, c-format
-msgid "%s: option `%c%s' doesn't allow an argument\n"
-msgstr "%s: ¥ª¥×¥·¥ç¥ó `%c%s' ¤Ï°ú¿ô¤òÉ¬Í×¤È¤·¤Ş¤»¤ó\n"
+msgid "%s: The certificate of %s hasn't got a known issuer.\n"
+msgstr "%s: %s ã®è¨¼æ˜æ›¸ã®ç™ºè¡Œè€…ãŒä¸æ˜ã§ã™ã€‚\n"
 
-#: src/getopt.c:718 src/getopt.c:891
+#: src/gnutls.c:246
 #, c-format
-msgid "%s: option `%s' requires an argument\n"
-msgstr "%s: ¥ª¥×¥·¥ç¥ó `%s' ¤Ï°ú¿ô¤òÉ¬Í×¤È¤·¤Ş¤¹\n"
+msgid "%s: The certificate of %s has been revoked.\n"
+msgstr "%s: %s ã®è¨¼æ˜æ›¸ã¯å¤±åŠ¹ã—ã¦ã„ã¾ã™ã€‚\n"
 
-#. --option
-#: src/getopt.c:747
+#: src/gnutls.c:260
 #, c-format
-msgid "%s: unrecognized option `--%s'\n"
-msgstr "%s: `--%s' ¤ÏÇ§¼±¤Ç¤­¤Ê¤¤¥ª¥×¥·¥ç¥ó¤Ç¤¹\n"
+msgid "Error initializing X509 certificate: %s\n"
+msgstr "X509 è¨¼æ˜æ›¸ã®åˆæœŸåŒ–ã«å¤±æ•—ã—ã¾ã—ãŸ: %s\n"
 
-#. +option or -option
-#: src/getopt.c:751
+#: src/gnutls.c:269
+msgid "No certificate found\n"
+msgstr "è¨¼æ˜æ›¸ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“\n"
+
+#: src/gnutls.c:276
 #, c-format
-msgid "%s: unrecognized option `%c%s'\n"
-msgstr "%s: `%c%s' ¤ÏÇ§¼±¤Ç¤­¤Ê¤¤¥ª¥×¥·¥ç¥ó¤Ç¤¹\n"
+msgid "Error parsing certificate: %s\n"
+msgstr "è¨¼æ˜æ›¸ã‚’è§£é‡ˆä¸­ã«ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ: %s\n"
 
-#. 1003.2 specifies the format of this message.
-#: src/getopt.c:777
+#: src/gnutls.c:283
+msgid "The certificate has not yet been activated\n"
+msgstr "è¨¼æ˜æ›¸ã¯ã¾ã æœ‰åŠ¹ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚\n"
+
+#: src/gnutls.c:288
+msgid "The certificate has expired\n"
+msgstr "è¨¼æ˜æ›¸ã¯å¤±åŠ¹ã—ã¦ã„ã¾ã™ã€‚\n"
+
+#: src/gnutls.c:294
 #, c-format
-msgid "%s: illegal option -- %c\n"
-msgstr "%s: ÉÔÀµ¤Ê¥ª¥×¥·¥ç¥ó¤Ç¤¹ -- %c\n"
+msgid "The certificate's owner does not match hostname %s\n"
+msgstr "è¨¼æ˜æ›¸ã®æ‰€æœ‰è€…ã®åå‰ã¨ãƒ›ã‚¹ãƒˆå %s ãŒä¸€è‡´ã—ã¾ã›ã‚“\n"
 
-#: src/getopt.c:780
-#, c-format
-msgid "%s: invalid option -- %c\n"
-msgstr "%s: ÉÔÀµ¤Ê¥ª¥×¥·¥ç¥ó¤Ç¤¹ -- %c\n"
-
-#. 1003.2 specifies the format of this message.
-#: src/getopt.c:810 src/getopt.c:940
-#, c-format
-msgid "%s: option requires an argument -- %c\n"
-msgstr "%s: ¥ª¥×¥·¥ç¥ó¤Ï°ú¿ô¤òÉ¬Í×¤È¤·¤Ş¤¹ -- %c\n"
-
-#: src/getopt.c:857
-#, c-format
-msgid "%s: option `-W %s' is ambiguous\n"
-msgstr "%s: ¥ª¥×¥·¥ç¥ó `-W %s' ¤ÏÛ£Ëæ¤Ç¤¹\n"
-
-#: src/getopt.c:875
-#, c-format
-msgid "%s: option `-W %s' doesn't allow an argument\n"
-msgstr "%s: ¥ª¥×¥·¥ç¥ó `-W %s' ¤Ï°ú¿ô¤ò¼è¤ê¤Ş¤»¤ó\n"
-
-#: src/host.c:349
+#: src/host.c:358
 msgid "Unknown host"
-msgstr "ÉÔÌÀ¤Ê¥Û¥¹¥È¤Ç¤¹"
+msgstr "ä¸æ˜ãªãƒ›ã‚¹ãƒˆã§ã™"
 
-#. Message modeled after what gai_strerror returns in similar
-#. circumstances.
-#: src/host.c:353
+#: src/host.c:362
 msgid "Temporary failure in name resolution"
-msgstr "Ì¾Á°²ò·èÃæ¤Ë°ì»şÅª¤Ê¼ºÇÔ¤¬È¯À¸¤·¤Ş¤·¤¿"
+msgstr "åå‰è§£æ±ºä¸­ã«ä¸€æ™‚çš„ãªå¤±æ•—ãŒç™ºç”Ÿã—ã¾ã—ãŸ"
 
-#: src/host.c:355
+#: src/host.c:364
 msgid "Unknown error"
-msgstr "ÉÔÌÀ¤Ê¥¨¥é¡¼¤Ç¤¹"
+msgstr "ä¸æ˜ãªã‚¨ãƒ©ãƒ¼ã§ã™"
 
-#: src/host.c:716
+#: src/host.c:737
 #, c-format
 msgid "Resolving %s... "
-msgstr "%s ¤òDNS¤ËÌä¤¤¤¢¤ï¤»¤Æ¤¤¤Ş¤¹... "
+msgstr "%s ã‚’DNSã«å•ã„ã‚ã‚ã›ã¦ã„ã¾ã™... "
 
-#: src/host.c:763
+#: src/host.c:789
 msgid "failed: No IPv4/IPv6 addresses for host.\n"
-msgstr "¼ºÇÔ: ¥Û¥¹¥È¤Ë IPv4/IPv6 ¥¢¥É¥ì¥¹¤¬¤¢¤ê¤Ş¤»¤ó¡£\n"
+msgstr "å¤±æ•—: ãƒ›ã‚¹ãƒˆã« IPv4/IPv6 ã‚¢ãƒ‰ãƒ¬ã‚¹ãŒã‚ã‚Šã¾ã›ã‚“ã€‚\n"
 
-#: src/host.c:786
+#: src/host.c:812
 msgid "failed: timed out.\n"
-msgstr "¼ºÇÔ¤·¤Ş¤·¤¿: ¥¿¥¤¥à¥¢¥¦¥È.\n"
+msgstr "å¤±æ•—ã—ã¾ã—ãŸ: ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆ.\n"
 
-#: src/html-url.c:290
+#: src/html-url.c:286
 #, c-format
 msgid "%s: Cannot resolve incomplete link %s.\n"
-msgstr "%s: ÉÔ´°Á´¤Ê¥ê¥ó¥¯ %s ¤ò²ò·è¤Ç¤­¤Ş¤»¤ó¡£\n"
+msgstr "%s: ä¸å®Œå…¨ãªãƒªãƒ³ã‚¯ %s ã‚’è§£æ±ºã§ãã¾ã›ã‚“ã€‚\n"
 
-#: src/html-url.c:697
+#: src/html-url.c:772
 #, c-format
 msgid "%s: Invalid URL %s: %s\n"
-msgstr "%s: %s ¤ÏÌµ¸ú¤Ê URL ¤Ç¤¹(%s)¡£\n"
+msgstr "%s: %s ã¯ç„¡åŠ¹ãª URL ã§ã™(%s)ã€‚\n"
 
-#: src/http.c:369
+#: src/http.c:377
 #, c-format
 msgid "Failed writing HTTP request: %s.\n"
-msgstr "HTTP ¤Ë¤è¤ëÀÜÂ³Í×µá¤ÎÁ÷¿®¤Ë¼ºÇÔ¤·¤Ş¤·¤¿: %s\n"
+msgstr "HTTP ã«ã‚ˆã‚‹æ¥ç¶šè¦æ±‚ã®é€ä¿¡ã«å¤±æ•—ã—ã¾ã—ãŸ: %s\n"
 
-#: src/http.c:746
+#: src/http.c:754
 msgid "No headers, assuming HTTP/0.9"
-msgstr "¥Ø¥Ã¥À¤¬¤Ê¤¤¤Î¤Ç¡¢HTTP/0.9 ¤À¤È²¾Äê¤·¤Ş¤¹"
+msgstr "ãƒ˜ãƒƒãƒ€ãŒãªã„ã®ã§ã€HTTP/0.9 ã ã¨ä»®å®šã—ã¾ã™"
 
-#: src/http.c:1430
+#: src/http.c:1456
 msgid "Disabling SSL due to encountered errors.\n"
-msgstr "¥¨¥é¡¼¤¬È¯À¸¤·¤¿¤Î¤Ç SSL ¤òÌµ¸ú¤Ë¤·¤Ş¤¹\n"
+msgstr "ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ãŸã®ã§ SSL ã‚’ç„¡åŠ¹ã«ã—ã¾ã™\n"
 
-#: src/http.c:1548
+#: src/http.c:1576
 #, c-format
-msgid "POST data file `%s' missing: %s\n"
-msgstr "POST ¥Ç¡¼¥¿¥Õ¥¡¥¤¥ë `%s' ¤¬¤¢¤ê¤Ş¤»¤ó: %s\n"
+msgid "POST data file %s missing: %s\n"
+msgstr "POST ãƒ‡ãƒ¼ã‚¿ãƒ•ã‚¡ã‚¤ãƒ« %s ãŒã‚ã‚Šã¾ã›ã‚“: %s\n"
 
-#: src/http.c:1632
+#: src/http.c:1660
 #, c-format
 msgid "Reusing existing connection to %s:%d.\n"
-msgstr "%s:%d ¤Ø¤ÎÀÜÂ³¤òºÆÍøÍÑ¤·¤Ş¤¹¡£\n"
+msgstr "%s:%d ã¸ã®æ¥ç¶šã‚’å†åˆ©ç”¨ã—ã¾ã™ã€‚\n"
 
-#: src/http.c:1700
+#: src/http.c:1729
 #, c-format
 msgid "Failed reading proxy response: %s\n"
-msgstr "¥×¥í¥¯¥·¤«¤é¤ÎÆÉ¤ß¹ş¤ß¤Ë¼ºÇÔ¤·¤Ş¤·¤¿: %s\n"
+msgstr "ãƒ—ãƒ­ã‚¯ã‚·ã‹ã‚‰ã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸ: %s\n"
 
-#: src/http.c:1720
+#: src/http.c:1750
 #, c-format
 msgid "Proxy tunneling failed: %s"
-msgstr "¥×¥í¥¯¥·¤Î¥È¥ó¥Í¥ê¥ó¥°¤Ë¼ºÇÔ¤·¤Ş¤·¤¿: %s"
+msgstr "ãƒ—ãƒ­ã‚¯ã‚·ã®ãƒˆãƒ³ãƒãƒªãƒ³ã‚°ã«å¤±æ•—ã—ã¾ã—ãŸ: %s"
 
-#: src/http.c:1765
+#: src/http.c:1800
 #, c-format
 msgid "%s request sent, awaiting response... "
-msgstr "%s ¤Ë¤è¤ëÀÜÂ³Í×µá¤òÁ÷¿®¤·¤Ş¤·¤¿¡¢±şÅú¤òÂÔ¤Ã¤Æ¤¤¤Ş¤¹... "
+msgstr "%s ã«ã‚ˆã‚‹æ¥ç¶šè¦æ±‚ã‚’é€ä¿¡ã—ã¾ã—ãŸã€å¿œç­”ã‚’å¾…ã£ã¦ã„ã¾ã™... "
 
-#: src/http.c:1776
+#: src/http.c:1811
 msgid "No data received.\n"
-msgstr "¥Ç¡¼¥¿¤¬¼õ¿®¤µ¤ì¤Ş¤»¤ó¤Ç¤·¤¿\n"
+msgstr "ãƒ‡ãƒ¼ã‚¿ãŒå—ä¿¡ã•ã‚Œã¾ã›ã‚“ã§ã—ãŸ\n"
 
-#: src/http.c:1783
+#: src/http.c:1818
 #, c-format
 msgid "Read error (%s) in headers.\n"
-msgstr "¥Ø¥Ã¥ÀÆâ¤ÇÆÉ¤ß¹ş¤ß¥¨¥é¡¼(%s)¤Ç¤¹\n"
+msgstr "ãƒ˜ãƒƒãƒ€å†…ã§èª­ã¿è¾¼ã¿ã‚¨ãƒ©ãƒ¼(%s)ã§ã™\n"
 
-#. If opt.noclobber is turned on and file already exists, do not
-#. retrieve the file. But if the output_document was given, then this
-#. test was already done and the file didn't exist. Hence the !opt.output_document
-#: src/http.c:1830 src/http.c:2384
+#: src/http.c:1932
+msgid "Unknown authentication scheme.\n"
+msgstr "ä¸æ˜ãªèªè¨¼å½¢å¼ã§ã™ã€‚\n"
+
+#: src/http.c:1966
+msgid "Authorization failed.\n"
+msgstr "èªè¨¼ã«å¤±æ•—ã—ã¾ã—ãŸã€‚\n"
+
+#: src/http.c:2004 src/http.c:2471
 #, c-format
 msgid ""
-"File `%s' already there; not retrieving.\n"
+"File %s already there; not retrieving.\n"
 "\n"
 msgstr ""
-"¥Õ¥¡¥¤¥ë `%s' ¤Ï¤¹¤Ç¤ËÂ¸ºß¤¹¤ë¤Î¤Ç¡¢¼èÆÀ¤·¤Ş¤»¤ó¡£\n"
+"ãƒ•ã‚¡ã‚¤ãƒ« %s ã¯ã™ã§ã«å­˜åœ¨ã™ã‚‹ã®ã§ã€å–å¾—ã—ã¾ã›ã‚“ã€‚\n"
 "\n"
 
-#. If the authentication header is missing or
-#. unrecognized, there's no sense in retrying.
-#: src/http.c:1984
-msgid "Unknown authentication scheme.\n"
-msgstr "ÉÔÌÀ¤ÊÇ§¾Ú·Á¼°¤Ç¤¹¡£\n"
-
-#: src/http.c:2015
-msgid "Authorization failed.\n"
-msgstr "Ç§¾Ú¤Ë¼ºÇÔ¤·¤Ş¤·¤¿¡£\n"
-
-#: src/http.c:2029
+#: src/http.c:2093
 msgid "Malformed status line"
-msgstr "´ñÌ¯¤Ê¥¹¥Æ¡¼¥¿¥¹¹Ô¤Ç¤¹"
+msgstr "å¥‡å¦™ãªã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹è¡Œã§ã™"
 
-#: src/http.c:2031
+#: src/http.c:2095
 msgid "(no description)"
-msgstr "(ÀâÌÀ¤Ê¤·)"
+msgstr "(èª¬æ˜ãªã—)"
 
-#: src/http.c:2097
+#: src/http.c:2154
 #, c-format
 msgid "Location: %s%s\n"
-msgstr "¾ì½ê: %s%s\n"
+msgstr "å ´æ‰€: %s%s\n"
 
-#: src/http.c:2098 src/http.c:2208
+#: src/http.c:2155 src/http.c:2263
 msgid "unspecified"
-msgstr "ÆÃÄê¤Ç¤­¤Ş¤»¤ó"
+msgstr "ç‰¹å®šã§ãã¾ã›ã‚“"
 
-#: src/http.c:2099
+#: src/http.c:2156
 msgid " [following]"
-msgstr " [Â³¤¯]"
+msgstr " [ç¶šã]"
 
-#. If `-c' is in use and the file has been fully downloaded (or
-#. the remote file has shrunk), Wget effectively requests bytes
-#. after the end of file and the server response with 416.
-#: src/http.c:2155
+#: src/http.c:2208
 msgid ""
 "\n"
 "    The file is already fully retrieved; nothing to do.\n"
 "\n"
 msgstr ""
 "\n"
-"    ¤³¤Î¥Õ¥¡¥¤¥ë¤Ï´û¤ËÁ´Éô¼èÆÀ¤·¤ª¤ï¤Ã¤Æ¤¤¤Ş¤¹¡£²¿¤â¤¹¤ë¤³¤È¤Ï¤¢¤ê¤Ş¤»¤ó¡£\n"
+"    ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯æ—¢ã«å…¨éƒ¨å–å¾—ã—ãŠã‚ã£ã¦ã„ã¾ã™ã€‚ä½•ã‚‚ã™ã‚‹ã“ã¨ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚\n"
 "\n"
 
-#. No need to print this output if the body won't be
-#. downloaded at all, or if the original server response is
-#. printed.
-#: src/http.c:2188
+#: src/http.c:2243
 msgid "Length: "
-msgstr "Ä¹¤µ: "
+msgstr "é•·ã•: "
 
-#: src/http.c:2208
+#: src/http.c:2263
 msgid "ignored"
-msgstr "Ìµ»ë¤·¤Ş¤·¤¿"
+msgstr "ç„¡è¦–ã—ã¾ã—ãŸ"
 
-#: src/http.c:2279
+#: src/http.c:2365
 #, c-format
-msgid "Saving to: `%s'\n"
-msgstr "`%s' ¤ËÊİÂ¸Ãæ\n"
+msgid "Saving to: %s\n"
+msgstr "%s ã«ä¿å­˜ä¸­\n"
 
-#: src/http.c:2360
+#: src/http.c:2447
 msgid "Warning: wildcards not supported in HTTP.\n"
-msgstr "·Ù¹ğ: HTTP¤Ï¥ï¥¤¥ë¥É¥«¡¼¥É¤ËÂĞ±ş¤·¤Æ¤¤¤Ş¤»¤ó¡£\n"
+msgstr "è­¦å‘Š: HTTPã¯ãƒ¯ã‚¤ãƒ«ãƒ‰ã‚«ãƒ¼ãƒ‰ã«å¯¾å¿œã—ã¦ã„ã¾ã›ã‚“ã€‚\n"
 
-#: src/http.c:2429
+#: src/http.c:2518
 msgid "Spider mode enabled. Check if remote file exists.\n"
 msgstr ""
-"¥¹¥Ñ¥¤¥À¡¼¥â¡¼¥É¤¬Í­¸ú¤Ç¤¹¡£¥ê¥â¡¼¥È¥Õ¥¡¥¤¥ë¤¬Â¸ºß¤·¤Æ¤ë¤«³ÎÇ§¤·¤Ş¤¹¡£\n"
+"ã‚¹ãƒ‘ã‚¤ãƒ€ãƒ¼ãƒ¢ãƒ¼ãƒ‰ãŒæœ‰åŠ¹ã§ã™ã€‚ãƒªãƒ¢ãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ã¦ã‚‹ã‹ç¢ºèªã—ã¾ã™ã€‚\n"
 
-#: src/http.c:2514
+#: src/http.c:2603
 #, c-format
-msgid "Cannot write to `%s' (%s).\n"
-msgstr "`%s' (%s)¤Ø½ñ¤­¹ş¤á¤Ş¤»¤ó¡£\n"
+msgid "Cannot write to %s (%s).\n"
+msgstr "%s ã¸æ›¸ãè¾¼ã‚ã¾ã›ã‚“(%s)ã€‚\n"
 
-#. Another fatal error.
-#: src/http.c:2523
+#: src/http.c:2612
 msgid "Unable to establish SSL connection.\n"
-msgstr "SSL ¤Ë¤è¤ëÀÜÂ³¤¬³ÎÎ©¤Ç¤­¤Ş¤»¤ó¡£\n"
+msgstr "SSL ã«ã‚ˆã‚‹æ¥ç¶šãŒç¢ºç«‹ã§ãã¾ã›ã‚“ã€‚\n"
 
-#: src/http.c:2531
+#: src/http.c:2620
 #, c-format
 msgid "ERROR: Redirection (%d) without location.\n"
-msgstr "¥¨¥é¡¼: ¾ì½ê¤¬Â¸ºß¤·¤Ê¤¤¥ê¥À¥¤¥ì¥¯¥·¥ç¥ó(%d)¤Ç¤¹¡£\n"
+msgstr "ã‚¨ãƒ©ãƒ¼: å ´æ‰€ãŒå­˜åœ¨ã—ãªã„ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³(%d)ã§ã™ã€‚\n"
 
-#: src/http.c:2577
+#: src/http.c:2668
 msgid "Remote file does not exist -- broken link!!!\n"
-msgstr "¥ê¥â¡¼¥È¥Õ¥¡¥¤¥ë¤¬Â¸ºß¤·¤Æ¤¤¤Ş¤»¤ó -- ¥ê¥ó¥¯¤¬²õ¤ì¤Æ¤¤¤Ş¤¹!!!\n"
+msgstr "ãƒªãƒ¢ãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ã¦ã„ã¾ã›ã‚“ -- ãƒªãƒ³ã‚¯ãŒå£Šã‚Œã¦ã„ã¾ã™!!!\n"
 
-#: src/http.c:2582
+#: src/http.c:2673
 #, c-format
 msgid "%s ERROR %d: %s.\n"
-msgstr "%s ¥¨¥é¡¼ %d: %s¡£\n"
+msgstr "%s ã‚¨ãƒ©ãƒ¼ %d: %sã€‚\n"
 
-#: src/http.c:2598
+#: src/http.c:2690
 msgid "Last-modified header missing -- time-stamps turned off.\n"
-msgstr "Last-modified ¥Ø¥Ã¥À¤¬¤¢¤ê¤Ş¤»¤ó -- ÆüÉÕ¤òÌµ¸ú¤Ë¤·¤Ş¤¹¡£\n"
+msgstr "Last-modified ãƒ˜ãƒƒãƒ€ãŒã‚ã‚Šã¾ã›ã‚“ -- æ—¥ä»˜ã‚’ç„¡åŠ¹ã«ã—ã¾ã™ã€‚\n"
 
-#: src/http.c:2606
+#: src/http.c:2698
 msgid "Last-modified header invalid -- time-stamp ignored.\n"
-msgstr "Last-modified ¥Ø¥Ã¥À¤¬Ìµ¸ú¤Ç¤¹ -- ÆüÉÕ¤òÌµ»ë¤·¤Ş¤¹¡£\n"
+msgstr "Last-modified ãƒ˜ãƒƒãƒ€ãŒç„¡åŠ¹ã§ã™ -- æ—¥ä»˜ã‚’ç„¡è¦–ã—ã¾ã™ã€‚\n"
 
-#: src/http.c:2636
+#: src/http.c:2728
 #, c-format
 msgid ""
-"Server file no newer than local file `%s' -- not retrieving.\n"
+"Server file no newer than local file %s -- not retrieving.\n"
 "\n"
 msgstr ""
-"¥µ¡¼¥ĞÂ¦¤Î¥Õ¥¡¥¤¥ë¤è¤ê¥í¡¼¥«¥ë¤Î¥Õ¥¡¥¤¥ë `%s' ¤ÎÊı¤¬¿·¤·¤¤¤Î¤Ç¼èÆÀ¤·¤Ş¤»"
-"¤ó¡£\n"
+"ã‚µãƒ¼ãƒå´ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚ˆã‚Šãƒ­ãƒ¼ã‚«ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ« %s ã®æ–¹ãŒæ–°ã—ã„ã®ã§å–å¾—ã—ã¾ã›ã‚“ã€‚\n"
 "\n"
 
-#: src/http.c:2644
+#: src/http.c:2736
 #, c-format
 msgid "The sizes do not match (local %s) -- retrieving.\n"
-msgstr "Âç¤­¤µ¤¬¹ç¤ï¤Ê¤¤¤Î¤Ç(¥í¡¼¥«¥ë¤Ï %s)¡¢Å¾Á÷¤·¤Ş¤¹¡£\n"
+msgstr "å¤§ãã•ãŒåˆã‚ãªã„ã®ã§(ãƒ­ãƒ¼ã‚«ãƒ«ã¯ %s)ã€è»¢é€ã—ã¾ã™ã€‚\n"
 
-#: src/http.c:2651
+#: src/http.c:2743
 msgid "Remote file is newer, retrieving.\n"
-msgstr "¥ê¥â¡¼¥È¥Õ¥¡¥¤¥ë¤Î¤Û¤¦¤¬¿·¤·¤¤¤Î¤Ç¡¢Å¾Á÷¤·¤Ş¤¹¡£\n"
+msgstr "ãƒªãƒ¢ãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã®ã»ã†ãŒæ–°ã—ã„ã®ã§ã€è»¢é€ã—ã¾ã™ã€‚\n"
 
-#: src/http.c:2667
+#: src/http.c:2760
 msgid ""
 "Remote file exists and could contain links to other resources -- "
 "retrieving.\n"
 "\n"
 msgstr ""
-"¥ê¥â¡¼¥È¥Õ¥¡¥¤¥ë¤¬Â¸ºß¤·¡¢Â¾¤Î¥ê¥½¡¼¥¹¤Ø¤Î¥ê¥ó¥¯¤¬¤¢¤ë¤«¤â¤·¤ì¤Ş¤»¤ó -- ¼èÆÀ"
-"Ãæ¡£\n"
+"ãƒªãƒ¢ãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ã€ä»–ã®ãƒªã‚½ãƒ¼ã‚¹ã¸ã®ãƒªãƒ³ã‚¯ãŒã‚ã‚‹ã‹ã‚‚ã—ã‚Œã¾ã›ã‚“ -- å–å¾—"
+"ä¸­ã€‚\n"
 "\n"
 
-#: src/http.c:2672
+#: src/http.c:2766
 msgid ""
 "Remote file exists but does not contain any link -- not retrieving.\n"
 "\n"
 msgstr ""
-"¥ê¥â¡¼¥È¥Õ¥¡¥¤¥ë¤ÏÂ¸ºß¤·¤Æ¤¤¤Ş¤¹¤¬¡¢¥ê¥ó¥¯¤ò´Ş¤ó¤Ç¤¤¤Ş¤»¤ó -- ¼èÆÀ¤·¤Ş¤»"
-"¤ó¡£\n"
+"ãƒªãƒ¢ãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã¯å­˜åœ¨ã—ã¦ã„ã¾ã™ãŒã€ãƒªãƒ³ã‚¯ã‚’å«ã‚“ã§ã„ã¾ã›ã‚“ -- å–å¾—ã—ã¾ã›"
+"ã‚“ã€‚\n"
 "\n"
 
-#: src/http.c:2682
+#: src/http.c:2775
 msgid ""
 "Remote file exists and could contain further links,\n"
 "but recursion is disabled -- not retrieving.\n"
 "\n"
 msgstr ""
-"¥ê¥â¡¼¥È¥Õ¥¡¥¤¥ë¤¬Â¸ºß¤·¡¢¤µ¤é¤Ê¤ë¥ê¥ó¥¯¤â¤¢¤êÆÀ¤Ş¤¹¤¬¡¢ºÆµ¢¤¬¶Ø»ß¤µ¤ì¤Æ¤¤¤Ş"
-"¤¹ -- ¼èÆÀ¤·¤Ş¤»¤ó¡£\n"
+"ãƒªãƒ¢ãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ã€ã•ã‚‰ãªã‚‹ãƒªãƒ³ã‚¯ã‚‚ã‚ã‚Šå¾—ã¾ã™ãŒã€å†å¸°ãŒç¦æ­¢ã•ã‚Œã¦ã„ã¾"
+"ã™ -- å–å¾—ã—ã¾ã›ã‚“ã€‚\n"
 "\n"
 
-#: src/http.c:2688
+#: src/http.c:2781
 msgid ""
 "Remote file exists.\n"
 "\n"
-msgstr "¥ê¥â¡¼¥È¥Õ¥¡¥¤¥ë¤¬Â¸ºß¤·¤Ş¤¹¡£\n"
+msgstr "ãƒªãƒ¢ãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ã¾ã™ã€‚\n"
 
-#: src/http.c:2741
+#: src/http.c:2790
+#, c-format
+msgid "%s URL: %s %2d %s\n"
+msgstr "%s URL: %s %2d %s\n"
+
+#: src/http.c:2837
 #, c-format
 msgid ""
-"%s (%s) - `%s' saved [%s/%s]\n"
+"%s (%s) - written to stdout %s[%s/%s]\n"
 "\n"
 msgstr ""
-"%s (%s) - `%s' ¤ØÊİÂ¸´°Î» [%s/%s]\n"
+"%s (%s) - stdout ã¸å‡ºåŠ›å®Œäº† %s[%s/%s]\n"
 "\n"
 
-#: src/http.c:2796
+#: src/http.c:2838
+#, c-format
+msgid ""
+"%s (%s) - %s saved [%s/%s]\n"
+"\n"
+msgstr ""
+"%s (%s) - %s ã¸ä¿å­˜å®Œäº† [%s/%s]\n"
+"\n"
+
+#: src/http.c:2899
 #, c-format
 msgid "%s (%s) - Connection closed at byte %s. "
-msgstr "%s (%s) - %s ¥Ğ¥¤¥È¤ÇÀÜÂ³¤¬½ªÎ»¤·¤Ş¤·¤¿¡£ "
+msgstr "%s (%s) - %s ãƒã‚¤ãƒˆã§æ¥ç¶šãŒçµ‚äº†ã—ã¾ã—ãŸã€‚ "
 
-#: src/http.c:2819
+#: src/http.c:2922
 #, c-format
 msgid "%s (%s) - Read error at byte %s (%s)."
-msgstr "%s (%s) - %s ¥Ğ¥¤¥È¤ÇÆÉ¤ß¹ş¤ß¥¨¥é¡¼¤¬È¯À¸¤·¤Ş¤·¤¿ (%s)¡£"
+msgstr "%s (%s) - %s ãƒã‚¤ãƒˆã§èª­ã¿è¾¼ã¿ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ (%s)ã€‚"
 
-#: src/http.c:2828
+#: src/http.c:2931
 #, c-format
 msgid "%s (%s) - Read error at byte %s/%s (%s). "
-msgstr "%s (%s) - %s/%s ¥Ğ¥¤¥È¤ÇÆÉ¤ß¹ş¤ß¥¨¥é¡¼¤¬È¯À¸¤·¤Ş¤·¤¿ (%s)¡£ "
+msgstr "%s (%s) - %s/%s ãƒã‚¤ãƒˆã§èª­ã¿è¾¼ã¿ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ (%s)ã€‚ "
 
-#: src/init.c:390
+#: src/init.c:406
 #, c-format
 msgid "%s: WGETRC points to %s, which doesn't exist.\n"
-msgstr "%s: WGETRC ¤¬ %s ¤ò»Ø¤·¤Æ¤¤¤Ş¤¹¤¬, Â¸ºß¤·¤Ş¤»¤ó¡£\n"
+msgstr "%s: WGETRC ãŒ %s ã‚’æŒ‡ã—ã¦ã„ã¾ã™ãŒ, å­˜åœ¨ã—ã¾ã›ã‚“ã€‚\n"
 
-#: src/init.c:453 src/netrc.c:268
+#: src/init.c:510 src/netrc.c:282
 #, c-format
 msgid "%s: Cannot read %s (%s).\n"
-msgstr "%s: %s (%s)¤òÆÉ¤ß¹ş¤á¤Ş¤»¤ó¡£\n"
-
-#: src/init.c:471
-#, c-format
-msgid "%s: Error in %s at line %d.\n"
-msgstr "%s: %s Æâ¤Î %d ¹Ô¤Ç¥¨¥é¡¼¤Ç¤¹\n"
-
-#: src/init.c:477
-#, c-format
-msgid "%s: Syntax error in %s at line %d.\n"
-msgstr "%s: %s Æâ¤Î %d ¹Ô¤ÇÊ¸Ë¡¥¨¥é¡¼¤¬È¯À¸¤·¤Ş¤·¤¿\n"
-
-#: src/init.c:482
-#, c-format
-msgid "%s: Unknown command `%s' in %s at line %d.\n"
-msgstr "%s: ¥³¥Ş¥ó¥É `%s' (%s Æâ¡¢%d¹ÔÌÜ) ¤ÏÉÔÌÀ¤Ç¤¹\n"
+msgstr "%s: %s (%s)ã‚’èª­ã¿è¾¼ã‚ã¾ã›ã‚“ã€‚\n"
 
 #: src/init.c:527
 #, c-format
-msgid "%s: Warning: Both system and user wgetrc point to `%s'.\n"
-msgstr "%s: ·Ù¹ğ: ¥·¥¹¥Æ¥à¤È¥æ¡¼¥¶¤Îwgetrc¤ÎÎ¾Êı¤¬ `%s' ¤ò»ØÄê¤·¤Æ¤¤¤Ş¤¹¡£\n"
+msgid "%s: Error in %s at line %d.\n"
+msgstr "%s: %s å†…ã® %d è¡Œã§ã‚¨ãƒ©ãƒ¼ã§ã™\n"
 
-#: src/init.c:680
+#: src/init.c:533
 #, c-format
-msgid "%s: Invalid --execute command `%s'\n"
-msgstr "%s: Ìµ¸ú¤Ê --execute »ØÄê `%s' ¤Ç¤¹¡£\n"
+msgid "%s: Syntax error in %s at line %d.\n"
+msgstr "%s: %s å†…ã® %d è¡Œã§æ–‡æ³•ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ\n"
 
-#: src/init.c:725
+#: src/init.c:538
 #, c-format
-msgid "%s: %s: Invalid boolean `%s'; use `on' or `off'.\n"
+msgid "%s: Unknown command %s in %s at line %d.\n"
+msgstr "%s: ã‚³ãƒãƒ³ãƒ‰ %s (%s ã® %dè¡Œç›®) ã¯ä¸æ˜ã§ã™\n"
+
+#: src/init.c:587
+#, c-format
+msgid "%s: Warning: Both system and user wgetrc point to %s.\n"
+msgstr "%s: è­¦å‘Š: ã‚·ã‚¹ãƒ†ãƒ ã¨ãƒ¦ãƒ¼ã‚¶ã® wgetrc ã®ä¸¡æ–¹ãŒ %s ã‚’æŒ‡å®šã—ã¦ã„ã¾ã™ã€‚\n"
+
+#: src/init.c:777
+#, c-format
+msgid "%s: Invalid --execute command %s\n"
+msgstr "%s: ç„¡åŠ¹ãª --execute æŒ‡å®š %s ã§ã™ã€‚\n"
+
+#: src/init.c:822
+#, c-format
+msgid "%s: %s: Invalid boolean %s; use `on' or `off'.\n"
 msgstr ""
-"%s: %s: `%s'¤Ï¥Ö¡¼¥ëÃÍ¤È¤·¤ÆÌµ¸ú¤Ç¤¹¡£on ¤« off ¤«¤ò»ØÄê¤·¤Æ¤¯¤À¤µ¤¤¡£\n"
+"%s: %s: %s ã¯ãƒ–ãƒ¼ãƒ«å€¤ã¨ã—ã¦ç„¡åŠ¹ã§ã™ã€‚`on' ã‹ `off' ã‚’æŒ‡å®šã—ã¦ãã ã•ã„ã€‚\n"
 
-#: src/init.c:742
+#: src/init.c:839
 #, c-format
-msgid "%s: %s: Invalid number `%s'.\n"
-msgstr "%s: %s: `%s'¤ÏÌµ¸ú¤Ê¿ô¤Ç¤¹¡£\n"
+msgid "%s: %s: Invalid number %s.\n"
+msgstr "%s: %s: %s ã¯ç„¡åŠ¹ãªæ•°ã§ã™ã€‚\n"
 
-#: src/init.c:973 src/init.c:992
+#: src/init.c:1044 src/init.c:1063
 #, c-format
-msgid "%s: %s: Invalid byte value `%s'\n"
-msgstr "%s: %s: `%s' ¤Ï¥Ğ¥¤¥ÈÃÍ¤Ç¤¹¡£\n"
+msgid "%s: %s: Invalid byte value %s\n"
+msgstr "%s: %s: %s ã¯ç„¡åŠ¹ãªãƒã‚¤ãƒˆå€¤ã§ã™ã€‚\n"
 
-#: src/init.c:1017
+#: src/init.c:1088
 #, c-format
-msgid "%s: %s: Invalid time period `%s'\n"
-msgstr "%s: %s: `%s' ¤ÏÌµ¸ú¤Ê»ş´Ö´Ö³Ö¤Ç¤¹¡£\n"
+msgid "%s: %s: Invalid time period %s\n"
+msgstr "%s: %s: %s ã¯ç„¡åŠ¹ãªæ™‚é–“é–“éš”ã§ã™ã€‚\n"
 
-#: src/init.c:1071 src/init.c:1161 src/init.c:1264 src/init.c:1289
+#: src/init.c:1142 src/init.c:1232 src/init.c:1340 src/init.c:1365
 #, c-format
-msgid "%s: %s: Invalid value `%s'.\n"
-msgstr "%s: %s: `%s'¤ÏÌµ¸ú¤ÊÃÍ¤Ç¤¹¡£\n"
+msgid "%s: %s: Invalid value %s.\n"
+msgstr "%s: %s: %s ã¯ç„¡åŠ¹ãªå€¤ã§ã™ã€‚\n"
 
-#: src/init.c:1108
+#: src/init.c:1179
 #, c-format
-msgid "%s: %s: Invalid header `%s'.\n"
-msgstr "%s: %s: `%s' ¤ÏÌµ¸ú¤Ê¥Ø¥Ã¥À¤Ç¤¹¡£\n"
+msgid "%s: %s: Invalid header %s.\n"
+msgstr "%s: %s: %s ã¯ç„¡åŠ¹ãªãƒ˜ãƒƒãƒ€ã§ã™ã€‚\n"
 
-#: src/init.c:1174
+#: src/init.c:1245
 #, c-format
-msgid "%s: %s: Invalid progress type `%s'.\n"
-msgstr "%s: %s: `%s' ¤ÏÌµ¸ú¤Ê·Ğ²áÉ½¼¨·Á¼°¤Ç¤¹¡£\n"
+msgid "%s: %s: Invalid progress type %s.\n"
+msgstr "%s: %s: %s ã¯ç„¡åŠ¹ãªçµŒéè¡¨ç¤ºå½¢å¼ã§ã™ã€‚\n"
 
-#: src/init.c:1233
+#: src/init.c:1306
 #, c-format
 msgid ""
-"%s: %s: Invalid restriction `%s', use [unix|windows],[lowercase|uppercase],"
-"[nocontrol].\n"
+"%s: %s: Invalid restriction %s,\n"
+"    use [unix|windows],[lowercase|uppercase],[nocontrol],[ascii].\n"
 msgstr ""
-"%s: %s: `%s'¤ÏÌµ¸ú¤Ç¤¹¡£unix ¤« windows¡¢lowercase ¤« uppercase¡¢nocontrol ¤ò"
-"»ØÄê¤·¤Æ¤¯¤À¤µ¤¤¡£\n"
+"%s: %s: %s ã¯ç„¡åŠ¹ã§ã™ã€‚unix ã‹ windowsã€lowercase ã‹ uppercaseã€nocontrol ã‚„ "
+"ascii ã‚’æŒ‡å®šã—ã¦ãã ã•ã„ã€‚\n"
 
-#: src/log.c:785
+#: src/iri.c:103
+#, c-format
+msgid "Encoding %s isn't valid\n"
+msgstr "ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ %s ã¯ç„¡åŠ¹ã§ã™\n"
+
+#: src/iri.c:131
+msgid "locale_to_utf8: locale is unset\n"
+msgstr "locale_to_utf8: ãƒ­ã‚±ãƒ¼ãƒ«ãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“\n"
+
+#: src/iri.c:141
+#, c-format
+msgid "Conversion from %s to %s isn't supported\n"
+msgstr "%s ã‹ã‚‰ %s ã¸ã®å¤‰æ›ã¯ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã¾ã›ã‚“\n"
+
+#: src/iri.c:182
+msgid "Incomplete or invalid multibyte sequence encountered\n"
+msgstr "ä¸å®Œå…¨ã‹ä¸æ­£ãªãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—åˆ—ã§ã™\n"
+
+#: src/iri.c:207
+#, c-format
+msgid "Unhandled errno %d\n"
+msgstr "å‡¦ç†ã•ã‚Œãªã„ã‚¨ãƒ©ãƒ¼ (errno %d)\n"
+
+#: src/iri.c:236
+#, c-format
+msgid "idn_encode failed (%d): %s\n"
+msgstr "idn_encode ã«å¤±æ•—ã—ã¾ã—ãŸ (%d): %s\n"
+
+#: src/iri.c:255
+#, c-format
+msgid "idn_decode failed (%d): %s\n"
+msgstr "idn_decode ã«å¤±æ•—ã—ã¾ã—ãŸ (%d): %s\n"
+
+#: src/log.c:809
 #, c-format
 msgid ""
 "\n"
-"%s received, redirecting output to `%s'.\n"
+"%s received, redirecting output to %s.\n"
 msgstr ""
 "\n"
-"%s ¤ò¼õ¿®¤·¤Ş¤·¤¿¡¢`%s' ¤Ë½ĞÎÏ¤ò¥ê¥À¥¤¥ì¥¯¥È¤·¤Ş¤¹¡£\n"
+"%s ã‚’å—ä¿¡ã—ã¾ã—ãŸã€%s ã«å‡ºåŠ›ã‚’ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆã—ã¾ã™ã€‚\n"
 
-#. Eek!  Opening the alternate log file has failed.  Nothing we
-#. can do but disable printing completely.
-#: src/log.c:795
+#: src/log.c:819
 #, c-format
 msgid ""
 "\n"
 "%s received.\n"
 msgstr ""
 "\n"
-"%s ¼õ¿®¤·¤Ş¤·¤¿\n"
+"%s å—ä¿¡ã—ã¾ã—ãŸ\n"
 
-#: src/log.c:796
+#: src/log.c:820
 #, c-format
 msgid "%s: %s; disabling logging.\n"
-msgstr "%s: %s; ¥í¥°¼è¤ê¤ò¶Ø»ß¤·¤Ş¤¹¡£\n"
+msgstr "%s: %s; ãƒ­ã‚°å–ã‚Šã‚’ç¦æ­¢ã—ã¾ã™ã€‚\n"
 
-#: src/main.c:360
+#: src/main.c:386
 #, c-format
 msgid "Usage: %s [OPTION]... [URL]...\n"
-msgstr "»È¤¤Êı: %s [¥ª¥×¥·¥ç¥ó]... [URL]...\n"
+msgstr "ä½¿ã„æ–¹: %s [ã‚ªãƒ—ã‚·ãƒ§ãƒ³]... [URL]...\n"
 
-#: src/main.c:372
+#: src/main.c:398
 msgid ""
 "Mandatory arguments to long options are mandatory for short options too.\n"
 "\n"
 msgstr ""
-"Ä¹¤¤¥ª¥×¥·¥ç¥ó¤ÇÉÔ²Ä·ç¤Ê°ú¿ô¤ÏÃ»¤¤¥ª¥×¥·¥ç¥ó¤Ç¤âÉÔ²Ä·ç¤Ç¤¹¡£\n"
+"é•·ã„ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã§ä¸å¯æ¬ ãªå¼•æ•°ã¯çŸ­ã„ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã§ã‚‚ä¸å¯æ¬ ã§ã™ã€‚\n"
 "\n"
 
-#: src/main.c:374
-msgid "Startup:\n"
-msgstr "¥¹¥¿¡¼¥È¥¢¥Ã¥×:\n"
-
-#: src/main.c:376
-msgid "  -V,  --version           display the version of Wget and exit.\n"
-msgstr "  -V,  --version           ¥Ğ¡¼¥¸¥ç¥ó¾ğÊó¤òÉ½¼¨¤·¤Æ½ªÎ»¤¹¤ë\n"
-
-#: src/main.c:378
-msgid "  -h,  --help              print this help.\n"
-msgstr "  -h,  --help              ¤³¤Î¥Ø¥ë¥×¤òÉ½¼¨¤¹¤ë\n"
-
-#: src/main.c:380
-msgid "  -b,  --background        go to background after startup.\n"
-msgstr "  -b,  --background        ¥¹¥¿¡¼¥È¸å¤Ë¥Ğ¥Ã¥¯¥°¥é¥¦¥ó¥É¤Ë°Ü¹Ô¤¹¤ë\n"
-
-#: src/main.c:382
-msgid "  -e,  --execute=COMMAND   execute a `.wgetrc'-style command.\n"
-msgstr "  -e,  --execute=COMMAND   `.wgetrc'·Á¼°¤Î¥³¥Ş¥ó¥É¤ò¼Â¹Ô¤¹¤ë\n"
-
-#: src/main.c:386
-msgid "Logging and input file:\n"
-msgstr "¥í¥°¤ÈÆşÎÏ¥Õ¥¡¥¤¥ë:\n"
-
-#: src/main.c:388
-msgid "  -o,  --output-file=FILE    log messages to FILE.\n"
-msgstr "  -o,  --output-file=FILE    ¥í¥°¤ò FILE ¤Ë½ĞÎÏ¤¹¤ë\n"
-
-#: src/main.c:390
-msgid "  -a,  --append-output=FILE  append messages to FILE.\n"
-msgstr "  -a,  --append-output=FILE  ¥á¥Ã¥»¡¼¥¸¤ò FILE ¤ËÄÉµ­¤¹¤ë\n"
-
-#: src/main.c:393
-msgid "  -d,  --debug               print lots of debugging information.\n"
-msgstr "  -d,  --debug               ¥Ç¥Ğ¥Ã¥°¾ğÊó¤òÉ½¼¨¤¹¤ë\n"
-
-#: src/main.c:397
-msgid "       --wdebug              print Watt-32 debug output.\n"
-msgstr "       --wdebug              Watt-32¥Ç¥Ğ¥Ã¥°¾ğÊó¤òÉ½¼¨¤¹¤ë\n"
-
 #: src/main.c:400
-msgid "  -q,  --quiet               quiet (no output).\n"
-msgstr "  -q,  --quiet               ²¿¤â½ĞÎÏ¤·¤Ê¤¤\n"
+msgid "Startup:\n"
+msgstr "ã‚¹ã‚¿ãƒ¼ãƒˆã‚¢ãƒƒãƒ—:\n"
 
 #: src/main.c:402
-msgid "  -v,  --verbose             be verbose (this is the default).\n"
-msgstr "  -v,  --verbose             ¾éÄ¹¤Ê½ĞÎÏ¤ò¤¹¤ë (¥Ç¥Õ¥©¥ë¥È)\n"
+msgid "  -V,  --version           display the version of Wget and exit.\n"
+msgstr "  -V,  --version           ãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±ã‚’è¡¨ç¤ºã—ã¦çµ‚äº†ã™ã‚‹\n"
 
 #: src/main.c:404
-msgid ""
-"  -nv, --no-verbose          turn off verboseness, without being quiet.\n"
-msgstr "  -nv, --no-verbose          ¾éÄ¹¤Ç¤Ï¤Ê¤¯¤¹¤ë\n"
+msgid "  -h,  --help              print this help.\n"
+msgstr "  -h,  --help              ã“ã®ãƒ˜ãƒ«ãƒ—ã‚’è¡¨ç¤ºã™ã‚‹\n"
 
 #: src/main.c:406
-msgid "  -i,  --input-file=FILE     download URLs found in FILE.\n"
-msgstr ""
-"  -i,  --input-file=FILE     FILE ¤ÎÃæ¤Ë»ØÄê¤µ¤ì¤¿ URL ¤ò¥À¥¦¥ó¥í¡¼¥É¤¹¤ë\n"
+msgid "  -b,  --background        go to background after startup.\n"
+msgstr "  -b,  --background        ã‚¹ã‚¿ãƒ¼ãƒˆå¾Œã«ãƒãƒƒã‚¯ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ã«ç§»è¡Œã™ã‚‹\n"
 
 #: src/main.c:408
-msgid "  -F,  --force-html          treat input file as HTML.\n"
-msgstr "  -F,  --force-html          ÆşÎÏ¥Õ¥¡¥¤¥ë¤ò HTML ¤È¤·¤Æ°·¤¦\n"
+msgid "  -e,  --execute=COMMAND   execute a `.wgetrc'-style command.\n"
+msgstr "  -e,  --execute=COMMAND   `.wgetrc'å½¢å¼ã®ã‚³ãƒãƒ³ãƒ‰ã‚’å®Ÿè¡Œã™ã‚‹\n"
 
-#: src/main.c:410
-msgid ""
-"  -B,  --base=URL            prepends URL to relative links in -F -i file.\n"
-msgstr ""
-"  -B,  --base=URL            ÁêÂĞ URL(-F -i »ÈÍÑ»ş) ¤Î¥Ù¡¼¥¹ URL ¤ò»ØÄê¤¹¤ë\n"
+#: src/main.c:412
+msgid "Logging and input file:\n"
+msgstr "ãƒ­ã‚°ã¨å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«:\n"
 
 #: src/main.c:414
-msgid "Download:\n"
-msgstr "¥À¥¦¥ó¥í¡¼¥É:\n"
+msgid "  -o,  --output-file=FILE    log messages to FILE.\n"
+msgstr "  -o,  --output-file=FILE    ãƒ­ã‚°ã‚’ FILE ã«å‡ºåŠ›ã™ã‚‹\n"
 
 #: src/main.c:416
+msgid "  -a,  --append-output=FILE  append messages to FILE.\n"
+msgstr "  -a,  --append-output=FILE  ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ FILE ã«è¿½è¨˜ã™ã‚‹\n"
+
+#: src/main.c:419
+msgid "  -d,  --debug               print lots of debugging information.\n"
+msgstr "  -d,  --debug               ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã‚’è¡¨ç¤ºã™ã‚‹\n"
+
+#: src/main.c:423
+msgid "       --wdebug              print Watt-32 debug output.\n"
+msgstr "       --wdebug              Watt-32ãƒ‡ãƒãƒƒã‚°æƒ…å ±ã‚’è¡¨ç¤ºã™ã‚‹\n"
+
+#: src/main.c:426
+msgid "  -q,  --quiet               quiet (no output).\n"
+msgstr "  -q,  --quiet               ä½•ã‚‚å‡ºåŠ›ã—ãªã„\n"
+
+#: src/main.c:428
+msgid "  -v,  --verbose             be verbose (this is the default).\n"
+msgstr "  -v,  --verbose             å†—é•·ãªå‡ºåŠ›ã‚’ã™ã‚‹ (ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ)\n"
+
+#: src/main.c:430
+msgid ""
+"  -nv, --no-verbose          turn off verboseness, without being quiet.\n"
+msgstr "  -nv, --no-verbose          å†—é•·ã§ã¯ãªãã™ã‚‹\n"
+
+#: src/main.c:432
+msgid ""
+"  -i,  --input-file=FILE     download URLs found in local or external FILE.\n"
+msgstr ""
+"  -i,  --input-file=FILE     FILE ã®ä¸­ã«æŒ‡å®šã•ã‚ŒãŸ URL ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹\n"
+
+#: src/main.c:434
+msgid "  -F,  --force-html          treat input file as HTML.\n"
+msgstr "  -F,  --force-html          å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ HTML ã¨ã—ã¦æ‰±ã†\n"
+
+#: src/main.c:436
+msgid ""
+"  -B,  --base=URL            resolves HTML input-file links (-i -F)\n"
+"                             relative to URL.\n"
+msgstr ""
+"  -B,  --base=URL            HTML ã§å…¥åŠ›ã•ã‚ŒãŸãƒ•ã‚¡ã‚¤ãƒ«(-i -F)ã®ãƒªãƒ³ã‚¯ã‚’\n"
+"                             æŒ‡å®šã—ãŸ URL ã®ç›¸å¯¾ URL ã¨ã—ã¦æ‰±ã†\n"
+
+#: src/main.c:441
+msgid "Download:\n"
+msgstr "ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰:\n"
+
+#: src/main.c:443
 msgid ""
 "  -t,  --tries=NUMBER            set number of retries to NUMBER (0 "
 "unlimits).\n"
 msgstr ""
-"  -t,  --tries=NUMBER            ¥ê¥È¥é¥¤²ó¿ô¤Î¾å¸Â¤ò»ØÄê (0 ¤ÏÌµÀ©¸Â).\n"
+"  -t,  --tries=NUMBER            ãƒªãƒˆãƒ©ã‚¤å›æ•°ã®ä¸Šé™ã‚’æŒ‡å®š (0 ã¯ç„¡åˆ¶é™).\n"
 
-#: src/main.c:418
+#: src/main.c:445
 msgid "       --retry-connrefused       retry even if connection is refused.\n"
-msgstr "       --retry-connrefused       ÀÜÂ³¤òµñÈİ¤µ¤ì¤Æ¤â¥ê¥È¥é¥¤¤¹¤ë\n"
+msgstr "       --retry-connrefused       æ¥ç¶šã‚’æ‹’å¦ã•ã‚Œã¦ã‚‚ãƒªãƒˆãƒ©ã‚¤ã™ã‚‹\n"
 
-#: src/main.c:420
+#: src/main.c:447
 msgid "  -O,  --output-document=FILE    write documents to FILE.\n"
-msgstr "  -O,  --output-document=FILE    FILE ¤ËÊ¸½ñ¤ò½ñ¤­¤³¤à\n"
+msgstr "  -O,  --output-document=FILE    FILE ã«æ–‡æ›¸ã‚’æ›¸ãã“ã‚€\n"
 
-#: src/main.c:422
+#: src/main.c:449
 msgid ""
 "  -nc, --no-clobber              skip downloads that would download to\n"
 "                                 existing files.\n"
 msgstr ""
-"  -nc, --no-clobber              Â¸ºß¤·¤Æ¤¤¤ë¥Õ¥¡¥¤¥ë¤ò¥À¥¦¥ó¥í¡¼¥É¤Ç¾å½ñ¤­¤·"
-"¤Ê¤¤\n"
+"  -nc, --no-clobber              å­˜åœ¨ã—ã¦ã„ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã§ä¸Šæ›¸ãã—"
+"ãªã„\n"
 
-#: src/main.c:425
+#: src/main.c:452
 msgid ""
 "  -c,  --continue                resume getting a partially-downloaded "
 "file.\n"
 msgstr ""
-"  -c,  --continue                ÉôÊ¬Åª¤Ë¥À¥¦¥ó¥í¡¼¥É¤·¤¿¥Õ¥¡¥¤¥ë¤ÎÂ³¤­¤«¤é»Ï"
-"¤á¤ë\n"
+"  -c,  --continue                éƒ¨åˆ†çš„ã«ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ãŸãƒ•ã‚¡ã‚¤ãƒ«ã®ç¶šãã‹ã‚‰å§‹"
+"ã‚ã‚‹\n"
 
-#: src/main.c:427
+#: src/main.c:454
 msgid "       --progress=TYPE           select progress gauge type.\n"
 msgstr ""
-"       --progress=TYPE           ¿Ê¹ÔÉ½¼¨¥²¡¼¥¸¤Î¼ïÎà¤ò TYPE ¤Ë»ØÄê¤¹¤ë\n"
+"       --progress=TYPE           é€²è¡Œè¡¨ç¤ºã‚²ãƒ¼ã‚¸ã®ç¨®é¡ã‚’ TYPE ã«æŒ‡å®šã™ã‚‹\n"
 
-#: src/main.c:429
+#: src/main.c:456
 msgid ""
 "  -N,  --timestamping            don't re-retrieve files unless newer than\n"
 "                                 local.\n"
 msgstr ""
-"  -N,  --timestamping            ¥í¡¼¥«¥ë¤Ë¤¢¤ë¥Õ¥¡¥¤¥ë¤è¤ê¤â¿·¤·¤¤¥Õ¥¡¥¤¥ë¤À"
-"¤±¼èÆÀ¤¹¤ë\n"
+"  -N,  --timestamping            ãƒ­ãƒ¼ã‚«ãƒ«ã«ã‚ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã‚ˆã‚Šã‚‚æ–°ã—ã„ãƒ•ã‚¡ã‚¤ãƒ«ã "
+"ã‘å–å¾—ã™ã‚‹\n"
 
-#: src/main.c:432
+#: src/main.c:459
 msgid "  -S,  --server-response         print server response.\n"
-msgstr "  -S,  --server-response         ¥µ¡¼¥Ğ¤Î±şÅú¤òÉ½¼¨¤¹¤ë\n"
+msgstr "  -S,  --server-response         ã‚µãƒ¼ãƒã®å¿œç­”ã‚’è¡¨ç¤ºã™ã‚‹\n"
 
-#: src/main.c:434
+#: src/main.c:461
 msgid "       --spider                  don't download anything.\n"
-msgstr "       --spider                  ²¿¤â¥À¥¦¥ó¥í¡¼¥É¤·¤Ê¤¤\n"
+msgstr "       --spider                  ä½•ã‚‚ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ãªã„\n"
 
-#: src/main.c:436
+#: src/main.c:463
 msgid "  -T,  --timeout=SECONDS         set all timeout values to SECONDS.\n"
 msgstr ""
-"  -T,  --timeout=SECONDS         Á´¤Æ¤Î¥¿¥¤¥à¥¢¥¦¥È¤ò SECONDS ÉÃ¤ËÀßÄê¤¹¤ë\n"
+"  -T,  --timeout=SECONDS         å…¨ã¦ã®ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã‚’ SECONDS ç§’ã«è¨­å®šã™ã‚‹\n"
 
-#: src/main.c:438
+#: src/main.c:465
 msgid "       --dns-timeout=SECS        set the DNS lookup timeout to SECS.\n"
 msgstr ""
-"       --dns-timeout=SECS        DNS Ìä¤¤¹ç¤ï¤»¤Î¥¿¥¤¥à¥¢¥¦¥È¤ò SECS ÉÃ¤ËÀßÄê"
-"¤¹¤ë\n"
+"       --dns-timeout=SECS        DNS å•ã„åˆã‚ã›ã®ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã‚’ SECS ç§’ã«è¨­å®š"
+"ã™ã‚‹\n"
 
-#: src/main.c:440
+#: src/main.c:467
 msgid "       --connect-timeout=SECS    set the connect timeout to SECS.\n"
 msgstr ""
-"       --connect-timeout=SECS    ÀÜÂ³¥¿¥¤¥à¥¢¥¦¥È¤ò SECS ÉÃ¤ËÀßÄê¤¹¤ë\n"
+"       --connect-timeout=SECS    æ¥ç¶šã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã‚’ SECS ç§’ã«è¨­å®šã™ã‚‹\n"
 
-#: src/main.c:442
+#: src/main.c:469
 msgid "       --read-timeout=SECS       set the read timeout to SECS.\n"
 msgstr ""
-"       --read-timeout=SECS       ÆÉ¤ß¹ş¤ß¥¿¥¤¥à¥¢¥¦¥È¤ò SECS ÉÃ¤ËÀßÄê¤¹¤ë\n"
+"       --read-timeout=SECS       èª­ã¿è¾¼ã¿ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã‚’ SECS ç§’ã«è¨­å®šã™ã‚‹\n"
 
-#: src/main.c:444
+#: src/main.c:471
 msgid "  -w,  --wait=SECONDS            wait SECONDS between retrievals.\n"
-msgstr "  -w,  --wait=SECONDS            ¥À¥¦¥ó¥í¡¼¥ÉËè¤Ë SECONDS ÉÃÂÔ¤Ä\n"
+msgstr "  -w,  --wait=SECONDS            ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰æ¯ã« SECONDS ç§’å¾…ã¤\n"
 
-#: src/main.c:446
+#: src/main.c:473
 msgid ""
 "       --waitretry=SECONDS       wait 1..SECONDS between retries of a "
 "retrieval.\n"
-msgstr "       --waitretry=SECONDS       ¥ê¥È¥é¥¤Ëè¤Ë 1¡ÁSECONDS ÉÃÂÔ¤Ä\n"
+msgstr "       --waitretry=SECONDS       ãƒªãƒˆãƒ©ã‚¤æ¯ã« 1ã€œSECONDS ç§’å¾…ã¤\n"
 
-#: src/main.c:448
+#: src/main.c:475
 msgid ""
 "       --random-wait             wait from 0...2*WAIT secs between "
 "retrievals.\n"
-msgstr "       --random-wait             ¥À¥¦¥ó¥í¡¼¥ÉËè¤Ë 0¡Á2*WAIT ÉÃÂÔ¤Ä\n"
+msgstr "       --random-wait             ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰æ¯ã« 0ã€œ2*WAIT ç§’å¾…ã¤\n"
 
-#: src/main.c:450
+#: src/main.c:477
 msgid "       --no-proxy                explicitly turn off proxy.\n"
-msgstr "       --no-proxy                ¥×¥í¥¯¥·¤ò»È¤ï¤Ê¤¤\n"
+msgstr "       --no-proxy                ãƒ—ãƒ­ã‚¯ã‚·ã‚’ä½¿ã‚ãªã„\n"
 
-#: src/main.c:452
+#: src/main.c:479
 msgid "  -Q,  --quota=NUMBER            set retrieval quota to NUMBER.\n"
 msgstr ""
-"  -Q,  --quota=NUMBER            ¥À¥¦¥ó¥í¡¼¥É¤¹¤ë¥Ğ¥¤¥È¿ô¤Î¾å¸Â¤ò»ØÄê¤¹¤ë\n"
+"  -Q,  --quota=NUMBER            ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ãƒã‚¤ãƒˆæ•°ã®ä¸Šé™ã‚’æŒ‡å®šã™ã‚‹\n"
 
-#: src/main.c:454
+#: src/main.c:481
 msgid ""
 "       --bind-address=ADDRESS    bind to ADDRESS (hostname or IP) on local "
 "host.\n"
 msgstr ""
-"       --bind-address=ADDRESS    ¥í¡¼¥«¥ë¥¢¥É¥ì¥¹¤È¤·¤Æ ADDRESS (¥Û¥¹¥ÈÌ¾¤« "
-"IP) ¤ò»È¤¦\n"
+"       --bind-address=ADDRESS    ãƒ­ãƒ¼ã‚«ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã¨ã—ã¦ ADDRESS (ãƒ›ã‚¹ãƒˆåã‹ "
+"IP) ã‚’ä½¿ã†\n"
 
-#: src/main.c:456
+#: src/main.c:483
 msgid "       --limit-rate=RATE         limit download rate to RATE.\n"
-msgstr "       --limit-rate=RATE         ¥À¥¦¥ó¥í¡¼¥ÉÂ®ÅÙ¤ò RATE ¤ËÀ©¸Â¤¹¤ë\n"
+msgstr "       --limit-rate=RATE         ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰é€Ÿåº¦ã‚’ RATE ã«åˆ¶é™ã™ã‚‹\n"
 
-#: src/main.c:458
+#: src/main.c:485
 msgid "       --no-dns-cache            disable caching DNS lookups.\n"
 msgstr ""
-"       --no-dns-cache            DNS ¤ÎÌä¤¤¹ç¤ï¤»·ë²Ì¤ò¥­¥ã¥Ã¥·¥å¤·¤Ê¤¤\n"
+"       --no-dns-cache            DNS ã®å•ã„åˆã‚ã›çµæœã‚’ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã—ãªã„\n"
 
-#: src/main.c:460
+#: src/main.c:487
 msgid ""
 "       --restrict-file-names=OS  restrict chars in file names to ones OS "
 "allows.\n"
-msgstr "       --restrict-file-names=OS  OS ¤¬µö¤·¤Æ¤¤¤ë¥Õ¥¡¥¤¥ëÌ¾¤ËÀ©¸Â¤¹¤ë\n"
+msgstr "       --restrict-file-names=OS  OS ãŒè¨±ã—ã¦ã„ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«åã«åˆ¶é™ã™ã‚‹\n"
 
-#: src/main.c:462
+#: src/main.c:489
 msgid ""
 "       --ignore-case             ignore case when matching files/"
 "directories.\n"
 msgstr ""
-"       --ignore-case             ¥Õ¥¡¥¤¥ëÌ¾/¥Ç¥£¥ì¥¯¥È¥êÌ¾¤ÎÈæ³Ó¤ÇÂçÊ¸»ú¾®Ê¸"
-"»ú¤òÌµ»ë¤¹¤ë\n"
+"       --ignore-case             ãƒ•ã‚¡ã‚¤ãƒ«å/ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªåã®æ¯”è¼ƒã§å¤§æ–‡å­—å°æ–‡"
+"å­—ã‚’ç„¡è¦–ã™ã‚‹\n"
 
-#: src/main.c:465
+#: src/main.c:492
 msgid "  -4,  --inet4-only              connect only to IPv4 addresses.\n"
-msgstr "  -4,  --inet4-only              IPv4 ¤À¤±¤ò»È¤¦\n"
+msgstr "  -4,  --inet4-only              IPv4 ã ã‘ã‚’ä½¿ã†\n"
 
-#: src/main.c:467
+#: src/main.c:494
 msgid "  -6,  --inet6-only              connect only to IPv6 addresses.\n"
-msgstr "  -6,  --inet6-only              IPv6 ¤À¤±¤ò»È¤¦\n"
+msgstr "  -6,  --inet6-only              IPv6 ã ã‘ã‚’ä½¿ã†\n"
 
-#: src/main.c:469
+#: src/main.c:496
 msgid ""
 "       --prefer-family=FAMILY    connect first to addresses of specified "
 "family,\n"
 "                                 one of IPv6, IPv4, or none.\n"
 msgstr ""
-"       --prefer-family=FAMILY    »ØÄê¤·¤¿¥Õ¥¡¥ß¥ê(IPv6, IPv4, none)¤ÇºÇ½é¤ËÀÜ"
-"Â³¤¹¤ë\n"
+"       --prefer-family=FAMILY    æŒ‡å®šã—ãŸãƒ•ã‚¡ãƒŸãƒª(IPv6, IPv4, none)ã§æœ€åˆã«æ¥"
+"ç¶šã™ã‚‹\n"
 
-#: src/main.c:473
+#: src/main.c:500
 msgid "       --user=USER               set both ftp and http user to USER.\n"
-msgstr "       --user=USER               ftp, http ¤Î¥æ¡¼¥¶Ì¾¤ò»ØÄê¤¹¤ë\n"
+msgstr "       --user=USER               ftp, http ã®ãƒ¦ãƒ¼ã‚¶åã‚’æŒ‡å®šã™ã‚‹\n"
 
-#: src/main.c:475
+#: src/main.c:502
 msgid ""
 "       --password=PASS           set both ftp and http password to PASS.\n"
-msgstr "       --password=PASS           ftp, http ¤Î¥Ñ¥¹¥ï¡¼¥É¤ò»ØÄê¤¹¤ë\n"
+msgstr "       --password=PASS           ftp, http ã®ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’æŒ‡å®šã™ã‚‹\n"
 
-#: src/main.c:479
+#: src/main.c:504
+msgid "       --ask-password            prompt for passwords.\n"
+msgstr "       --ask-password            ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’åˆ¥é€”å…¥åŠ›ã™ã‚‹\n"
+
+#: src/main.c:506
+msgid "       --no-iri                  turn off IRI support.\n"
+msgstr "       --no-iri                  IRI ã‚µãƒãƒ¼ãƒˆã‚’ä½¿ã‚ãªã„\n"
+
+#: src/main.c:508
+msgid ""
+"       --local-encoding=ENC      use ENC as the local encoding for IRIs.\n"
+msgstr ""
+"       --local-encoding=ENC      æŒ‡å®šã—ãŸ ENC ã‚’ IRI ã®ãƒ­ãƒ¼ã‚«ãƒ«ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³"
+"ã‚°ã«ã™ã‚‹\n"
+
+#: src/main.c:510
+msgid ""
+"       --remote-encoding=ENC     use ENC as the default remote encoding.\n"
+msgstr ""
+"       --remote-encoding=ENC     æŒ‡å®šã—ãŸ ENC ã‚’ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒªãƒ¢ãƒ¼ãƒˆã‚¨ãƒ³ã‚³ãƒ¼"
+"ãƒ‡ã‚£ãƒ³ã‚°ã«ã™ã‚‹\n"
+
+#: src/main.c:514
 msgid "Directories:\n"
-msgstr "¥Ç¥£¥ì¥¯¥È¥ê:\n"
+msgstr "ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª:\n"
 
-#: src/main.c:481
+#: src/main.c:516
 msgid "  -nd, --no-directories           don't create directories.\n"
-msgstr "  -nd, --no-directories           ¥Ç¥£¥ì¥¯¥È¥ê¤òºî¤é¤Ê¤¤\n"
+msgstr "  -nd, --no-directories           ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ä½œã‚‰ãªã„\n"
 
-#: src/main.c:483
+#: src/main.c:518
 msgid "  -x,  --force-directories        force creation of directories.\n"
-msgstr "  -x,  --force-directories        ¥Ç¥£¥ì¥¯¥È¥ê¤ò¶¯À©Åª¤Ëºî¤ë\n"
+msgstr "  -x,  --force-directories        ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’å¼·åˆ¶çš„ã«ä½œã‚‹\n"
 
-#: src/main.c:485
+#: src/main.c:520
 msgid "  -nH, --no-host-directories      don't create host directories.\n"
-msgstr "  -nH, --no-host-directories      ¥Û¥¹¥ÈÌ¾¤Î¥Ç¥£¥ì¥¯¥È¥ê¤òºî¤é¤Ê¤¤\n"
+msgstr "  -nH, --no-host-directories      ãƒ›ã‚¹ãƒˆåã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ä½œã‚‰ãªã„\n"
 
-#: src/main.c:487
+#: src/main.c:522
 msgid "       --protocol-directories     use protocol name in directories.\n"
-msgstr "       --protocol-directories     ¥×¥í¥È¥³¥ëÌ¾¤Î¥Ç¥£¥ì¥¯¥È¥ê¤òºî¤ë\n"
+msgstr "       --protocol-directories     ãƒ—ãƒ­ãƒˆã‚³ãƒ«åã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ä½œã‚‹\n"
 
-#: src/main.c:489
+#: src/main.c:524
 msgid "  -P,  --directory-prefix=PREFIX  save files to PREFIX/...\n"
-msgstr "  -P,  --directory-prefix=PREFIX  ¥Õ¥¡¥¤¥ë¤ò PREFIX/ °Ê²¼¤ËÊİÂ¸¤¹¤ë\n"
+msgstr "  -P,  --directory-prefix=PREFIX  ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ PREFIX/ ä»¥ä¸‹ã«ä¿å­˜ã™ã‚‹\n"
 
-#: src/main.c:491
+#: src/main.c:526
 msgid ""
 "       --cut-dirs=NUMBER          ignore NUMBER remote directory "
 "components.\n"
 msgstr ""
-"       --cut-dirs=NUMBER          ¥ê¥â¡¼¥È¥Ç¥£¥ì¥¯¥È¥êÌ¾¤Î NUMBER ³¬ÁØÊ¬¤òÌµ"
-"»ë¤¹¤ë\n"
+"       --cut-dirs=NUMBER          ãƒªãƒ¢ãƒ¼ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªåã® NUMBER éšå±¤åˆ†ã‚’ç„¡"
+"è¦–ã™ã‚‹\n"
 
-#: src/main.c:495
+#: src/main.c:530
 msgid "HTTP options:\n"
-msgstr "HTTP ¥ª¥×¥·¥ç¥ó:\n"
+msgstr "HTTP ã‚ªãƒ—ã‚·ãƒ§ãƒ³:\n"
 
-#: src/main.c:497
+#: src/main.c:532
 msgid "       --http-user=USER        set http user to USER.\n"
-msgstr "       --http-user=USER        http ¥æ¡¼¥¶Ì¾¤È¤·¤Æ USER ¤ò»È¤¦\n"
+msgstr "       --http-user=USER        http ãƒ¦ãƒ¼ã‚¶åã¨ã—ã¦ USER ã‚’ä½¿ã†\n"
 
-#: src/main.c:499
+#: src/main.c:534
 msgid "       --http-password=PASS    set http password to PASS.\n"
-msgstr "       --http-password=PASS    http ¥Ñ¥¹¥ï¡¼¥É¤È¤·¤Æ PASS ¤ò»È¤¦\n"
+msgstr "       --http-password=PASS    http ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã¨ã—ã¦ PASS ã‚’ä½¿ã†\n"
 
-#: src/main.c:501
+#: src/main.c:536
 msgid "       --no-cache              disallow server-cached data.\n"
 msgstr ""
-"       --no-cache              ¥µ¡¼¥Ğ¤¬¥­¥ã¥Ã¥·¥å¤·¤¿¥Ç¡¼¥¿¤òµö²Ä¤·¤Ê¤¤\n"
+"       --no-cache              ã‚µãƒ¼ãƒãŒã‚­ãƒ£ãƒƒã‚·ãƒ¥ã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’è¨±å¯ã—ãªã„\n"
 
-#: src/main.c:503
+#: src/main.c:538
 msgid ""
-"  -E,  --html-extension        save HTML documents with `.html' extension.\n"
-msgstr "  -E,  --html-extension        HTML Ê¸½ñ¤Ï `.html' ³ÈÄ¥»Ò¤ÇÊİÂ¸¤¹¤ë\n"
+"       --default-page=NAME     Change the default page name (normally\n"
+"                               this is `index.html'.).\n"
+msgstr ""
+"       --default-page=NAME     ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒšãƒ¼ã‚¸åã‚’ NAME ã«å¤‰æ›´ã—ã¾ã™\n"
+"                               é€šå¸¸ã¯ `index.html' ã§ã™\n"
 
-#: src/main.c:505
+#: src/main.c:541
+msgid ""
+"  -E,  --adjust-extension      save HTML/CSS documents with proper "
+"extensions.\n"
+msgstr ""
+"  -E,  --adjust-extension        HTML/CSS æ–‡æ›¸ã¯é©åˆ‡ãªæ‹¡å¼µå­ã§ä¿å­˜ã™ã‚‹\n"
+
+#: src/main.c:543
 msgid "       --ignore-length         ignore `Content-Length' header field.\n"
-msgstr "       --ignore-length         `Content-Length' ¥Ø¥Ã¥À¤òÌµ»ë¤¹¤ë\n"
+msgstr "       --ignore-length         `Content-Length' ãƒ˜ãƒƒãƒ€ã‚’ç„¡è¦–ã™ã‚‹\n"
 
-#: src/main.c:507
+#: src/main.c:545
 msgid "       --header=STRING         insert STRING among the headers.\n"
-msgstr "       --header=STRING         Á÷¿®¤¹¤ë¥Ø¥Ã¥À¤Ë STRING ¤òÄÉ²Ã¤¹¤ë\n"
+msgstr "       --header=STRING         é€ä¿¡ã™ã‚‹ãƒ˜ãƒƒãƒ€ã« STRING ã‚’è¿½åŠ ã™ã‚‹\n"
 
-#: src/main.c:509
+#: src/main.c:547
 msgid "       --max-redirect          maximum redirections allowed per page.\n"
-msgstr "       --max-redirect          ¥Ú¡¼¥¸¤Çµö²Ä¤¹¤ëºÇÂçÅ¾Á÷²ó¿ô\n"
+msgstr "       --max-redirect          ãƒšãƒ¼ã‚¸ã§è¨±å¯ã™ã‚‹æœ€å¤§è»¢é€å›æ•°\n"
 
-#: src/main.c:511
+#: src/main.c:549
 msgid "       --proxy-user=USER       set USER as proxy username.\n"
-msgstr "       --proxy-user=USER       ¥×¥í¥¯¥·¥æ¡¼¥¶Ì¾¤È¤·¤Æ USER ¤ò»È¤¦\n"
+msgstr "       --proxy-user=USER       ãƒ—ãƒ­ã‚¯ã‚·ãƒ¦ãƒ¼ã‚¶åã¨ã—ã¦ USER ã‚’ä½¿ã†\n"
 
-#: src/main.c:513
+#: src/main.c:551
 msgid "       --proxy-password=PASS   set PASS as proxy password.\n"
-msgstr "       --proxy-password=PASS   ¥×¥í¥¯¥·¥Ñ¥¹¥ï¡¼¥É¤È¤·¤Æ PASS ¤ò»È¤¦\n"
+msgstr "       --proxy-password=PASS   ãƒ—ãƒ­ã‚¯ã‚·ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã¨ã—ã¦ PASS ã‚’ä½¿ã†\n"
 
-#: src/main.c:515
+#: src/main.c:553
 msgid ""
 "       --referer=URL           include `Referer: URL' header in HTTP "
 "request.\n"
-msgstr "       --referer=URL           Referer ¤ò URL ¤ËÀßÄê¤¹¤ë\n"
+msgstr "       --referer=URL           Referer ã‚’ URL ã«è¨­å®šã™ã‚‹\n"
 
-#: src/main.c:517
+#: src/main.c:555
 msgid "       --save-headers          save the HTTP headers to file.\n"
-msgstr "       --save-headers          HTTP ¤Î¥Ø¥Ã¥À¤ò¥Õ¥¡¥¤¥ë¤ËÊİÂ¸¤¹¤ë\n"
+msgstr "       --save-headers          HTTP ã®ãƒ˜ãƒƒãƒ€ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã™ã‚‹\n"
 
-#: src/main.c:519
+#: src/main.c:557
 msgid ""
 "  -U,  --user-agent=AGENT      identify as AGENT instead of Wget/VERSION.\n"
 msgstr ""
-"  -U,  --user-agent=AGENT      User-Agent ¤È¤·¤Æ Wget/VERSION ¤Ç¤Ï¤Ê¤¯ AGENT "
-"¤ò»È¤¦\n"
+"  -U,  --user-agent=AGENT      User-Agent ã¨ã—ã¦ Wget/VERSION ã§ã¯ãªã AGENT "
+"ã‚’ä½¿ã†\n"
 
-#: src/main.c:521
+#: src/main.c:559
 msgid ""
 "       --no-http-keep-alive    disable HTTP keep-alive (persistent "
 "connections).\n"
 msgstr ""
-"       --no-http-keep-alive    HTTP ¤Î keep-alive (»ıÂ³ÅªÀÜÂ³) µ¡Ç½¤ò»È¤ï¤Ê"
-"¤¤\n"
+"       --no-http-keep-alive    HTTP ã® keep-alive (æŒç¶šçš„æ¥ç¶š) æ©Ÿèƒ½ã‚’ä½¿ã‚ãª"
+"ã„\n"
 
-#: src/main.c:523
+#: src/main.c:561
 msgid "       --no-cookies            don't use cookies.\n"
-msgstr "       --no-cookies            ¥¯¥Ã¥­¡¼¤ò»È¤ï¤Ê¤¤\n"
+msgstr "       --no-cookies            ã‚¯ãƒƒã‚­ãƒ¼ã‚’ä½¿ã‚ãªã„\n"
 
-#: src/main.c:525
+#: src/main.c:563
 msgid "       --load-cookies=FILE     load cookies from FILE before session.\n"
-msgstr "       --load-cookies=FILE     ¥¯¥Ã¥­¡¼¤ò FILE ¤«¤éÆÉ¤ß¤³¤à\n"
+msgstr "       --load-cookies=FILE     ã‚¯ãƒƒã‚­ãƒ¼ã‚’ FILE ã‹ã‚‰èª­ã¿ã“ã‚€\n"
 
-#: src/main.c:527
+#: src/main.c:565
 msgid "       --save-cookies=FILE     save cookies to FILE after session.\n"
-msgstr "       --save-cookies=FILE     ¥¯¥Ã¥­¡¼¤ò FILE ¤ËÊİÂ¸¤¹¤ë\n"
+msgstr "       --save-cookies=FILE     ã‚¯ãƒƒã‚­ãƒ¼ã‚’ FILE ã«ä¿å­˜ã™ã‚‹\n"
 
-#: src/main.c:529
+#: src/main.c:567
 msgid ""
 "       --keep-session-cookies  load and save session (non-permanent) "
 "cookies.\n"
 msgstr ""
-"       --keep-session-cookies  ¥»¥Ã¥·¥ç¥ó¤À¤±¤ÇÍÑ¤¤¤ë¥¯¥Ã¥­¡¼¤òÊİ»ı¤¹¤ë\n"
+"       --keep-session-cookies  ã‚»ãƒƒã‚·ãƒ§ãƒ³ã ã‘ã§ç”¨ã„ã‚‹ã‚¯ãƒƒã‚­ãƒ¼ã‚’ä¿æŒã™ã‚‹\n"
 
-#: src/main.c:531
+#: src/main.c:569
 msgid ""
 "       --post-data=STRING      use the POST method; send STRING as the "
 "data.\n"
 msgstr ""
-"       --post-data=STRING      POST ¥á¥½¥Ã¥É¤òÍÑ¤¤¤Æ STRING ¤òÁ÷¿®¤¹¤ë\n"
+"       --post-data=STRING      POST ãƒ¡ã‚½ãƒƒãƒ‰ã‚’ç”¨ã„ã¦ STRING ã‚’é€ä¿¡ã™ã‚‹\n"
 
-#: src/main.c:533
+#: src/main.c:571
 msgid ""
 "       --post-file=FILE        use the POST method; send contents of FILE.\n"
 msgstr ""
-"       --post-file=FILE        POST ¥á¥½¥Ã¥É¤òÍÑ¤¤¤Æ FILE ¤ÎÃæÌ£¤òÁ÷¿®¤¹¤ë\n"
+"       --post-file=FILE        POST ãƒ¡ã‚½ãƒƒãƒ‰ã‚’ç”¨ã„ã¦ FILE ã®ä¸­å‘³ã‚’é€ä¿¡ã™ã‚‹\n"
 
-#: src/main.c:535
+#: src/main.c:573
 msgid ""
 "       --content-disposition   honor the Content-Disposition header when\n"
 "                               choosing local file names (EXPERIMENTAL).\n"
 msgstr ""
-"       --content-disposition   Content-Disposition ¥Ø¥Ã¥À¤¬¤¢¤ì¤Ğ\n"
-"                               ¥í¡¼¥«¥ë¤Î¥Õ¥¡¥¤¥ëÌ¾¤È¤·¤ÆÍÑ¤¤¤ë (¼Â¸³Åª)\n"
+"       --content-disposition   Content-Disposition ãƒ˜ãƒƒãƒ€ãŒã‚ã‚Œã°\n"
+"                               ãƒ­ãƒ¼ã‚«ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«åã¨ã—ã¦ç”¨ã„ã‚‹ (å®Ÿé¨“çš„)\n"
 
-#: src/main.c:538
+#: src/main.c:576
 msgid ""
-"       --auth-no-challenge     Send Basic HTTP authentication information\n"
+"       --auth-no-challenge     send Basic HTTP authentication information\n"
 "                               without first waiting for the server's\n"
 "                               challenge.\n"
 msgstr ""
-"       --auth-no-challenge     ¥µ¡¼¥Ğ¤«¤é¤Î¥Á¥ã¥ì¥ó¥¸¤òÂÔ¤¿¤º¤Ë¡¢\n"
-"                               BasicÇ§¾Ú¤Î¾ğÊó¤òÁ÷¿®¤·¤Ş¤¹¡£\n"
+"       --auth-no-challenge     ã‚µãƒ¼ãƒã‹ã‚‰ã®ãƒãƒ£ãƒ¬ãƒ³ã‚¸ã‚’å¾…ãŸãšã«ã€\n"
+"                               Basicèªè¨¼ã®æƒ…å ±ã‚’é€ä¿¡ã—ã¾ã™ã€‚\n"
 
-#: src/main.c:545
+#: src/main.c:583
 msgid "HTTPS (SSL/TLS) options:\n"
-msgstr "HTTPS (SSL/TLS) ¥ª¥×¥·¥ç¥ó:\n"
+msgstr "HTTPS (SSL/TLS) ã‚ªãƒ—ã‚·ãƒ§ãƒ³:\n"
 
-#: src/main.c:547
+#: src/main.c:585
 msgid ""
 "       --secure-protocol=PR     choose secure protocol, one of auto, SSLv2,\n"
 "                                SSLv3, and TLSv1.\n"
 msgstr ""
-"       --secure-protocol=PR     ¥»¥­¥å¥¢¥×¥í¥È¥³¥ë¤òÁªÂò¤¹¤ë (auto, SSLv2, "
+"       --secure-protocol=PR     ã‚»ã‚­ãƒ¥ã‚¢ãƒ—ãƒ­ãƒˆã‚³ãƒ«ã‚’é¸æŠã™ã‚‹ (auto, SSLv2, "
 "SSLv3, TLSv1)\n"
 
-#: src/main.c:550
+#: src/main.c:588
 msgid ""
 "       --no-check-certificate   don't validate the server's certificate.\n"
-msgstr "       --no-check-certificate   ¥µ¡¼¥Ğ¾ÚÌÀ½ñ¤ò¸¡¾Ú¤·¤Ê¤¤\n"
+msgstr "       --no-check-certificate   ã‚µãƒ¼ãƒè¨¼æ˜æ›¸ã‚’æ¤œè¨¼ã—ãªã„\n"
 
-#: src/main.c:552
+#: src/main.c:590
 msgid "       --certificate=FILE       client certificate file.\n"
-msgstr "       --certificate=FILE       ¥¯¥é¥¤¥¢¥ó¥È¾ÚÌÀ½ñ¤È¤·¤Æ FILE ¤ò»È¤¦\n"
+msgstr "       --certificate=FILE       ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆè¨¼æ˜æ›¸ã¨ã—ã¦ FILE ã‚’ä½¿ã†\n"
 
-#: src/main.c:554
+#: src/main.c:592
 msgid "       --certificate-type=TYPE  client certificate type, PEM or DER.\n"
 msgstr ""
-"       --certificate-type=TYPE  ¥¯¥é¥¤¥¢¥ó¥È¾ÚÌÀ½ñ¤Î¼ïÎà¤ò TYPE (PEM, DER) ¤Ë"
-"ÀßÄê¤¹¤ë\n"
+"       --certificate-type=TYPE  ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆè¨¼æ˜æ›¸ã®ç¨®é¡ã‚’ TYPE (PEM, DER) ã«"
+"è¨­å®šã™ã‚‹\n"
 
-#: src/main.c:556
+#: src/main.c:594
 msgid "       --private-key=FILE       private key file.\n"
-msgstr "       --private-key=FILE       ÈëÌ©¸°¤È¤·¤Æ FILE ¤ò»È¤¦\n"
+msgstr "       --private-key=FILE       ç§˜å¯†éµã¨ã—ã¦ FILE ã‚’ä½¿ã†\n"
 
-#: src/main.c:558
+#: src/main.c:596
 msgid "       --private-key-type=TYPE  private key type, PEM or DER.\n"
 msgstr ""
-"       --private-key-type=TYPE  ÈëÌ©¸°¤Î¼ïÎà¤ò TYPE (PEM, DER) ¤ËÀßÄê¤¹¤ë\n"
+"       --private-key-type=TYPE  ç§˜å¯†éµã®ç¨®é¡ã‚’ TYPE (PEM, DER) ã«è¨­å®šã™ã‚‹\n"
 
-#: src/main.c:560
+#: src/main.c:598
 msgid "       --ca-certificate=FILE    file with the bundle of CA's.\n"
-msgstr "       --ca-certificate=FILE    CA ¾ÚÌÀ½ñ¤È¤·¤Æ FILE ¤ò»È¤¦\n"
+msgstr "       --ca-certificate=FILE    CA è¨¼æ˜æ›¸ã¨ã—ã¦ FILE ã‚’ä½¿ã†\n"
 
-#: src/main.c:562
+#: src/main.c:600
 msgid ""
 "       --ca-directory=DIR       directory where hash list of CA's is "
 "stored.\n"
 msgstr ""
-"       --ca-directory=DIR       CA ¤Î¥Ï¥Ã¥·¥å¥ê¥¹¥È¤¬Êİ»ı¤µ¤ì¤Æ¤¤¤ë¥Ç¥£¥ì¥¯¥È"
-"¥ê¤ò»ØÄê¤¹¤ë\n"
+"       --ca-directory=DIR       CA ã®ãƒãƒƒã‚·ãƒ¥ãƒªã‚¹ãƒˆãŒä¿æŒã•ã‚Œã¦ã„ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆ"
+"ãƒªã‚’æŒ‡å®šã™ã‚‹\n"
 
-#: src/main.c:564
+#: src/main.c:602
 msgid ""
 "       --random-file=FILE       file with random data for seeding the SSL "
 "PRNG.\n"
 msgstr ""
-"       --random-file=FILE       SSL PRNG ¤Î½é´ü²½¥Ç¡¼¥¿¤Ë»È¤¦¥Õ¥¡¥¤¥ë¤ò»ØÄê¤¹"
-"¤ë\n"
+"       --random-file=FILE       SSL PRNG ã®åˆæœŸåŒ–ãƒ‡ãƒ¼ã‚¿ã«ä½¿ã†ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æŒ‡å®šã™"
+"ã‚‹\n"
 
-#: src/main.c:566
+#: src/main.c:604
 msgid ""
 "       --egd-file=FILE          file naming the EGD socket with random "
 "data.\n"
-msgstr "       --egd-file=FILE          EGD ¥½¥±¥Ã¥È¤È¤·¤Æ FILE ¤ò»È¤¦\n"
+msgstr "       --egd-file=FILE          EGD ã‚½ã‚±ãƒƒãƒˆã¨ã—ã¦ FILE ã‚’ä½¿ã†\n"
 
-#: src/main.c:571
+#: src/main.c:609
 msgid "FTP options:\n"
-msgstr "FTP ¥ª¥×¥·¥ç¥ó:\n"
+msgstr "FTP ã‚ªãƒ—ã‚·ãƒ§ãƒ³:\n"
 
-#: src/main.c:573
+#: src/main.c:612
+msgid ""
+"       --ftp-stmlf             Use Stream_LF format for all binary FTP "
+"files.\n"
+msgstr ""
+"       --ftp-stmlf             ftp ã®å…¨ã¦ã®ãƒã‚¤ãƒŠãƒªãƒ•ã‚¡ã‚¤ãƒ«ã§ Stream_LF "
+"ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’ç”¨ã„ã¾ã™ã€‚\n"
+
+#: src/main.c:615
 msgid "       --ftp-user=USER         set ftp user to USER.\n"
-msgstr "       --ftp-user=USER         ftp ¥æ¡¼¥¶¤È¤·¤Æ USER ¤ò»È¤¦\n"
+msgstr "       --ftp-user=USER         ftp ãƒ¦ãƒ¼ã‚¶ã¨ã—ã¦ USER ã‚’ä½¿ã†\n"
 
-#: src/main.c:575
+#: src/main.c:617
 msgid "       --ftp-password=PASS     set ftp password to PASS.\n"
-msgstr "       --ftp-password=PASS     ftp ¥Ñ¥¹¥ï¡¼¥É¤È¤·¤Æ PASS ¤ò»È¤¦\n"
+msgstr "       --ftp-password=PASS     ftp ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã¨ã—ã¦ PASS ã‚’ä½¿ã†\n"
 
-#: src/main.c:577
+#: src/main.c:619
 msgid "       --no-remove-listing     don't remove `.listing' files.\n"
-msgstr "       --no-remove-listing     `.listing' ¥Õ¥¡¥¤¥ë¤òºï½ü¤·¤Ê¤¤\n"
+msgstr "       --no-remove-listing     `.listing' ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‰Šé™¤ã—ãªã„\n"
 
-#: src/main.c:579
+#: src/main.c:621
 msgid "       --no-glob               turn off FTP file name globbing.\n"
-msgstr "       --no-glob               FTP ¥Õ¥¡¥¤¥ëÌ¾¤Î¥°¥í¥Ö¤òÌµ¸ú¤Ë¤¹¤ë\n"
+msgstr "       --no-glob               FTP ãƒ•ã‚¡ã‚¤ãƒ«åã®ã‚°ãƒ­ãƒ–ã‚’ç„¡åŠ¹ã«ã™ã‚‹\n"
 
-#: src/main.c:581
+#: src/main.c:623
 msgid "       --no-passive-ftp        disable the \"passive\" transfer mode.\n"
-msgstr "       --no-passive-ftp        \"passive\" Å¾Á÷¥â¡¼¥É¤ò»È¤ï¤Ê¤¤\n"
+msgstr "       --no-passive-ftp        \"passive\" è»¢é€ãƒ¢ãƒ¼ãƒ‰ã‚’ä½¿ã‚ãªã„\n"
 
-#: src/main.c:583
+#: src/main.c:625
 msgid ""
 "       --retr-symlinks         when recursing, get linked-to files (not "
 "dir).\n"
 msgstr ""
-"       --retr-symlinks         ºÆµ¢¼èÆÀÃæ¤Ë¡¢¥·¥ó¥Ü¥ê¥Ã¥¯¥ê¥ó¥¯¤Ç¥ê¥ó¥¯¤µ¤ì¤¿"
-"Àè¤Î¥Õ¥¡¥¤¥ë¤ò¼èÆÀ¤¹¤ë\n"
+"       --retr-symlinks         å†å¸°å–å¾—ä¸­ã«ã€ã‚·ãƒ³ãƒœãƒªãƒƒã‚¯ãƒªãƒ³ã‚¯ã§ãƒªãƒ³ã‚¯ã•ã‚ŒãŸ"
+"å…ˆã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å–å¾—ã™ã‚‹\n"
 
-#: src/main.c:585
-msgid "       --preserve-permissions  preserve remote file permissions.\n"
-msgstr ""
-"       --preserve-permissions  ¥ê¥â¡¼¥È¥Õ¥¡¥¤¥ë¤Î¥Ñ¡¼¥ß¥Ã¥·¥ç¥ó¤òÊİÂ¸¤¹¤ë\n"
-
-#: src/main.c:589
+#: src/main.c:629
 msgid "Recursive download:\n"
-msgstr "ºÆµ¢¥À¥¦¥ó¥í¡¼¥É:\n"
+msgstr "å†å¸°ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰:\n"
 
-#: src/main.c:591
+#: src/main.c:631
 msgid "  -r,  --recursive          specify recursive download.\n"
-msgstr "  -r,  --recursive          ºÆµ¢¥À¥¦¥ó¥í¡¼¥É¤ò¹Ô¤¦\n"
+msgstr "  -r,  --recursive          å†å¸°ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã‚’è¡Œã†\n"
 
-#: src/main.c:593
+#: src/main.c:633
 msgid ""
 "  -l,  --level=NUMBER       maximum recursion depth (inf or 0 for "
 "infinite).\n"
 msgstr ""
-"  -l,  --level=NUMBER       ºÆµ¢»ş¤Î³¬ÁØ¤ÎºÇÂç¤Î¿¼¤µ¤ò NUMBER ¤ËÀßÄê¤¹¤ë (0 "
-"¤ÇÌµÀ©¸Â)\n"
+"  -l,  --level=NUMBER       å†å¸°æ™‚ã®éšå±¤ã®æœ€å¤§ã®æ·±ã•ã‚’ NUMBER ã«è¨­å®šã™ã‚‹ (0 "
+"ã§ç„¡åˆ¶é™)\n"
 
-#: src/main.c:595
+#: src/main.c:635
 msgid ""
 "       --delete-after       delete files locally after downloading them.\n"
 msgstr ""
-"       --delete-after       ¥À¥¦¥ó¥í¡¼¥É½ªÎ»¸å¡¢¥À¥¦¥ó¥í¡¼¥É¤·¤¿¥Õ¥¡¥¤¥ë¤òºï"
-"½ü¤¹¤ë\n"
+"       --delete-after       ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰çµ‚äº†å¾Œã€ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ãŸãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‰Š"
+"é™¤ã™ã‚‹\n"
 
-#: src/main.c:597
+#: src/main.c:637
 msgid ""
-"  -k,  --convert-links      make links in downloaded HTML point to local "
-"files.\n"
+"  -k,  --convert-links      make links in downloaded HTML or CSS point to\n"
+"                            local files.\n"
 msgstr ""
-"  -k,  --convert-links      HTML Ãæ¤Î¥ê¥ó¥¯¤ò¥í¡¼¥«¥ë¤ò»Ø¤¹¤è¤¦¤ËÊÑ¹¹¤¹¤ë\n"
+"  -k,  --convert-links      HTML ã‚„ CSS ä¸­ã®ãƒªãƒ³ã‚¯ã‚’ãƒ­ãƒ¼ã‚«ãƒ«ã‚’æŒ‡ã™ã‚ˆã†ã«å¤‰æ›´"
+"ã™ã‚‹\n"
 
-#: src/main.c:599
+#: src/main.c:641
+msgid ""
+"  -K,  --backup-converted   before converting file X, back up as X_orig.\n"
+msgstr ""
+"  -K,  --backup-converted   ãƒªãƒ³ã‚¯å¤‰æ›å‰ã®ãƒ•ã‚¡ã‚¤ãƒ« X ã‚’ X_orig ã¨ã—ã¦ä¿å­˜ã™"
+"ã‚‹\n"
+
+#: src/main.c:644
 msgid ""
 "  -K,  --backup-converted   before converting file X, back up as X.orig.\n"
 msgstr ""
-"  -K,  --backup-converted   ¥ê¥ó¥¯ÊÑ´¹Á°¤Î¥Õ¥¡¥¤¥ë¤ò .orig ¤È¤·¤ÆÊİÂ¸¤¹¤ë\n"
+"  -K,  --backup-converted   ãƒªãƒ³ã‚¯å¤‰æ›å‰ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ .orig ã¨ã—ã¦ä¿å­˜ã™ã‚‹\n"
 
-#: src/main.c:601
+#: src/main.c:647
 msgid ""
 "  -m,  --mirror             shortcut for -N -r -l inf --no-remove-listing.\n"
-msgstr "  -m,  --mirror             -N -r -l 0 --no-remove-listing ¤Î¾ÊÎ¬·Á\n"
+msgstr "  -m,  --mirror             -N -r -l 0 --no-remove-listing ã®çœç•¥å½¢\n"
 
-#: src/main.c:603
+#: src/main.c:649
 msgid ""
 "  -p,  --page-requisites    get all images, etc. needed to display HTML "
 "page.\n"
 msgstr ""
-"  -p,  --page-requisites    HTML ¤òÉ½¼¨¤¹¤ë¤Î¤ËÉ¬Í×¤ÊÁ´¤Æ¤Î²èÁüÅù¤â¼èÆÀ¤¹¤ë\n"
+"  -p,  --page-requisites    HTML ã‚’è¡¨ç¤ºã™ã‚‹ã®ã«å¿…è¦ãªå…¨ã¦ã®ç”»åƒç­‰ã‚‚å–å¾—ã™ã‚‹\n"
 
-#: src/main.c:605
+#: src/main.c:651
 msgid ""
 "       --strict-comments    turn on strict (SGML) handling of HTML "
 "comments.\n"
-msgstr "       --strict-comments    HTML Ãæ¤Î¥³¥á¥ó¥È¤Î½èÍı¤ò¸·Ì©¤Ë¤¹¤ë\n"
+msgstr "       --strict-comments    HTML ä¸­ã®ã‚³ãƒ¡ãƒ³ãƒˆã®å‡¦ç†ã‚’å³å¯†ã«ã™ã‚‹\n"
 
-#: src/main.c:609
+#: src/main.c:655
 msgid "Recursive accept/reject:\n"
-msgstr "ºÆµ¢¥À¥¦¥ó¥í¡¼¥É»ş¤Î¥Õ¥£¥ë¥¿:\n"
+msgstr "å†å¸°ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰æ™‚ã®ãƒ•ã‚£ãƒ«ã‚¿:\n"
 
-#: src/main.c:611
+#: src/main.c:657
 msgid ""
 "  -A,  --accept=LIST               comma-separated list of accepted "
 "extensions.\n"
 msgstr ""
-"  -A,  --accept=LIST               ¥À¥¦¥ó¥í¡¼¥É¤¹¤ë³ÈÄ¥»Ò¤ò¥³¥ó¥Ş¶èÀÚ¤ê¤Ç»ØÄê"
-"¤¹¤ë\n"
+"  -A,  --accept=LIST               ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹æ‹¡å¼µå­ã‚’ã‚³ãƒ³ãƒåŒºåˆ‡ã‚Šã§æŒ‡å®š"
+"ã™ã‚‹\n"
 
-#: src/main.c:613
+#: src/main.c:659
 msgid ""
 "  -R,  --reject=LIST               comma-separated list of rejected "
 "extensions.\n"
 msgstr ""
-"  -R,  --reject=LIST               ¥À¥¦¥ó¥í¡¼¥É¤·¤Ê¤¤³ÈÄ¥»Ò¤ò¥³¥ó¥Ş¶èÀÚ¤ê¤Ç»Ø"
-"Äê¤¹¤ë\n"
+"  -R,  --reject=LIST               ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ãªã„æ‹¡å¼µå­ã‚’ã‚³ãƒ³ãƒåŒºåˆ‡ã‚Šã§æŒ‡"
+"å®šã™ã‚‹\n"
 
-#: src/main.c:615
+#: src/main.c:661
 msgid ""
 "  -D,  --domains=LIST              comma-separated list of accepted "
 "domains.\n"
 msgstr ""
-"  -D,  --domains=LIST              ¥À¥¦¥ó¥í¡¼¥É¤¹¤ë¥É¥á¥¤¥ó¤ò¥³¥ó¥Ş¶èÀÚ¤ê¤Ç»Ø"
-"Äê¤¹¤ë\n"
+"  -D,  --domains=LIST              ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ãƒ‰ãƒ¡ã‚¤ãƒ³ã‚’ã‚³ãƒ³ãƒåŒºåˆ‡ã‚Šã§æŒ‡"
+"å®šã™ã‚‹\n"
 
-#: src/main.c:617
+#: src/main.c:663
 msgid ""
 "       --exclude-domains=LIST      comma-separated list of rejected "
 "domains.\n"
 msgstr ""
-"       --exclude-domains=LIST      ¥À¥¦¥ó¥í¡¼¥É¤·¤Ê¤¤¥É¥á¥¤¥ó¤ò¥³¥ó¥Ş¶èÀÚ¤ê¤Ç"
-"»ØÄê¤¹¤ë\n"
+"       --exclude-domains=LIST      ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ãªã„ãƒ‰ãƒ¡ã‚¤ãƒ³ã‚’ã‚³ãƒ³ãƒåŒºåˆ‡ã‚Šã§"
+"æŒ‡å®šã™ã‚‹\n"
 
-#: src/main.c:619
+#: src/main.c:665
 msgid ""
 "       --follow-ftp                follow FTP links from HTML documents.\n"
 msgstr ""
-"       --follow-ftp                HTML Ê¸½ñÃæ¤Î FTP ¥ê¥ó¥¯¤â¼èÆÀÂĞ¾İ¤Ë¤¹¤ë\n"
+"       --follow-ftp                HTML æ–‡æ›¸ä¸­ã® FTP ãƒªãƒ³ã‚¯ã‚‚å–å¾—å¯¾è±¡ã«ã™ã‚‹\n"
 
-#: src/main.c:621
+#: src/main.c:667
 msgid ""
 "       --follow-tags=LIST          comma-separated list of followed HTML "
 "tags.\n"
 msgstr ""
-"       --follow-tags=LIST          ¼èÆÀÂĞ¾İ¤Ë¤¹¤ë¥¿¥°Ì¾¤ò¥³¥ó¥Ş¶èÀÚ¤ê¤Ç»ØÄê¤¹"
-"¤ë\n"
+"       --follow-tags=LIST          å–å¾—å¯¾è±¡ã«ã™ã‚‹ã‚¿ã‚°åã‚’ã‚³ãƒ³ãƒåŒºåˆ‡ã‚Šã§æŒ‡å®šã™"
+"ã‚‹\n"
 
-#: src/main.c:623
+#: src/main.c:669
 msgid ""
 "       --ignore-tags=LIST          comma-separated list of ignored HTML "
 "tags.\n"
 msgstr ""
-"       --ignore-tags=LIST          ¼èÆÀÂĞ¾İ¤Ë¤·¤Ê¤¤¥¿¥°Ì¾¤ò¥³¥ó¥Ş¶èÀÚ¤ê¤Ç»ØÄê"
-"¤¹¤ë\n"
+"       --ignore-tags=LIST          å–å¾—å¯¾è±¡ã«ã—ãªã„ã‚¿ã‚°åã‚’ã‚³ãƒ³ãƒåŒºåˆ‡ã‚Šã§æŒ‡å®š"
+"ã™ã‚‹\n"
 
-#: src/main.c:625
+#: src/main.c:671
 msgid ""
 "  -H,  --span-hosts                go to foreign hosts when recursive.\n"
 msgstr ""
-"  -H,  --span-hosts                ºÆµ¢Ãæ¤ËÊÌ¤Î¥Û¥¹¥È¤â¥À¥¦¥ó¥í¡¼¥ÉÂĞ¾İ¤Ë¤¹"
-"¤ë\n"
+"  -H,  --span-hosts                å†å¸°ä¸­ã«åˆ¥ã®ãƒ›ã‚¹ãƒˆã‚‚ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰å¯¾è±¡ã«ã™"
+"ã‚‹\n"
 
-#: src/main.c:627
+#: src/main.c:673
 msgid "  -L,  --relative                  follow relative links only.\n"
-msgstr "  -L,  --relative                  ÁêÂĞ¥ê¥ó¥¯¤À¤±¼èÆÀÂĞ¾İ¤Ë¤¹¤ë\n"
+msgstr "  -L,  --relative                  ç›¸å¯¾ãƒªãƒ³ã‚¯ã ã‘å–å¾—å¯¾è±¡ã«ã™ã‚‹\n"
 
-#: src/main.c:629
+#: src/main.c:675
 msgid "  -I,  --include-directories=LIST  list of allowed directories.\n"
 msgstr ""
-"  -I,  --include-directories=LIST  ¼èÆÀÂĞ¾İ¤Ë¤¹¤ë¥Ç¥£¥ì¥¯¥È¥ê¤ò»ØÄê¤¹¤ë\n"
+"  -I,  --include-directories=LIST  å–å¾—å¯¾è±¡ã«ã™ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’æŒ‡å®šã™ã‚‹\n"
 
-#: src/main.c:631
+#: src/main.c:677
 msgid "  -X,  --exclude-directories=LIST  list of excluded directories.\n"
 msgstr ""
-"  -X,  --exclude-directories=LIST  ¼èÆÀÂĞ¾İ¤Ë¤·¤Ê¤¤¥Ç¥£¥ì¥¯¥È¥ê¤ò»ØÄê¤¹¤ë\n"
+"  -X,  --exclude-directories=LIST  å–å¾—å¯¾è±¡ã«ã—ãªã„ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’æŒ‡å®šã™ã‚‹\n"
 
-#: src/main.c:633
+#: src/main.c:679
 msgid ""
 "  -np, --no-parent                 don't ascend to the parent directory.\n"
-msgstr "  -np, --no-parent                 ¿Æ¥Ç¥£¥ì¥¯¥È¥ê¤ò¼èÆÀÂĞ¾İ¤Ë¤·¤Ê¤¤\n"
+msgstr "  -np, --no-parent                 è¦ªãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’å–å¾—å¯¾è±¡ã«ã—ãªã„\n"
 
-#: src/main.c:637
+#: src/main.c:683
 msgid "Mail bug reports and suggestions to <bug-wget@gnu.org>.\n"
-msgstr "¥Ğ¥°Êó¹ğ¤äÄó°Æ¤Ï<bug-wget@gnu.org>¤Ø\n"
+msgstr "ãƒã‚°å ±å‘Šã‚„ææ¡ˆã¯<bug-wget@gnu.org>ã¸\n"
 
-#: src/main.c:642
+#: src/main.c:688
 #, c-format
 msgid "GNU Wget %s, a non-interactive network retriever.\n"
-msgstr "GNU Wget %s, ÈóÂĞÏÃÅª¥Í¥Ã¥È¥ï¡¼¥¯Å¾Á÷¥½¥Õ¥È\n"
+msgstr "GNU Wget %s, éå¯¾è©±çš„ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯è»¢é€ã‚½ãƒ•ãƒˆ\n"
 
-#: src/main.c:682
-msgid "Copyright (C) 2008 Free Software Foundation, Inc.\n"
-msgstr "Copyright (C) 2008 Free Software Foundation, Inc.\n"
+#: src/main.c:728
+#, c-format
+msgid "Password for user %s: "
+msgstr "ãƒ¦ãƒ¼ã‚¶ %s ã®ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰: "
 
-#: src/main.c:684
+#: src/main.c:730
+#, c-format
+msgid "Password: "
+msgstr "ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰: "
+
+#: src/main.c:780
+msgid "Wgetrc: "
+msgstr "Wgetrc: "
+
+#: src/main.c:781
+msgid "Locale: "
+msgstr "ãƒ­ã‚±ãƒ¼ãƒ«: "
+
+#: src/main.c:782
+msgid "Compile: "
+msgstr "ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«: "
+
+#: src/main.c:783
+msgid "Link: "
+msgstr "ãƒªãƒ³ã‚¯: "
+
+#: src/main.c:789
+#, c-format
+msgid ""
+"GNU Wget %s built on VMS %s %s.\n"
+"\n"
+msgstr ""
+"GNU Wget %s built on VMS %s %s.\n"
+"\n"
+
+#: src/main.c:792
+#, c-format
+msgid ""
+"GNU Wget %s built on %s.\n"
+"\n"
+msgstr ""
+"GNU Wget %s built on %s.\n"
+"\n"
+
+#: src/main.c:815
+#, c-format
+msgid "    %s (env)\n"
+msgstr "    %s (env)\n"
+
+#: src/main.c:821
+#, c-format
+msgid "    %s (user)\n"
+msgstr "    %s (user)\n"
+
+#: src/main.c:825
+#, c-format
+msgid "    %s (system)\n"
+msgstr "    %s (system)\n"
+
+#. TRANSLATORS: When available, an actual copyright character
+#. (cirle-c) should be used in preference to "(C)".
+#: src/main.c:845
+msgid "Copyright (C) 2009 Free Software Foundation, Inc.\n"
+msgstr "Copyright (C) 2009 Free Software Foundation, Inc.\n"
+
+#: src/main.c:847
 msgid ""
 "License GPLv3+: GNU GPL version 3 or later\n"
 "<http://www.gnu.org/licenses/gpl.html>.\n"
 "This is free software: you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
-"¥é¥¤¥»¥ó¥¹ GPLv3+: GNU GPL ¥Ğ¡¼¥¸¥ç¥ó 3 ¤¢¤ë¤¤¤Ï¤½¤ì°Ê¹ß¤Î¥Ğ¡¼¥¸¥ç¥ó\n"
+"ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ GPLv3+: GNU GPL ãƒãƒ¼ã‚¸ãƒ§ãƒ³ 3 ã‚ã‚‹ã„ã¯ãã‚Œä»¥é™ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³\n"
 "<http://www.gnu.org/licenses/gpl.html>.\n"
-"¤³¤Î¥½¥Õ¥È¥¦¥§¥¢¤Ï¥Õ¥ê¡¼¥½¥Õ¥È¥¦¥§¥¢¤Ç¤¹¡£¼«Í³¤ËÊÑ¹¹¡¢ºÆÇÛÉÛ¤¬¤Ç¤­¤Ş¤¹¡£\n"
-"Ë¡Î§¤¬µö¤¹¤«¤®¤ê¡¢Á´¤¯¤ÎÌµÊİ¾Ú¤Ç¤¹¡£\n"
+"ã“ã®ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã¯ãƒ•ãƒªãƒ¼ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã§ã™ã€‚è‡ªç”±ã«å¤‰æ›´ã€å†é…å¸ƒãŒã§ãã¾ã™ã€‚\n"
+"æ³•å¾‹ãŒè¨±ã™ã‹ãã‚Šã€å…¨ãã®ç„¡ä¿è¨¼ã§ã™ã€‚\n"
 
-#: src/main.c:689
+#. TRANSLATORS: When available, please use the proper diacritics for
+#. names such as this one. See en_US.po for reference.
+#: src/main.c:854
 msgid ""
 "\n"
 "Originally written by Hrvoje Niksic <hniksic@xemacs.org>.\n"
 msgstr ""
 "\n"
-"Hrvoje Niksic <hniksic@xemacs.org> ¤Ë¤è¤Ã¤Æ½ñ¤«¤ì¤Ş¤·¤¿¡£\n"
+"Hrvoje Niksic <hniksic@xemacs.org> ã«ã‚ˆã£ã¦æ›¸ã‹ã‚Œã¾ã—ãŸã€‚\n"
 
-#: src/main.c:691
+#: src/main.c:856
 msgid "Currently maintained by Micah Cowan <micah@cowan.name>.\n"
 msgstr ""
-"¸½ºß¤Ï Micah Cowan <micah@cowan.name> ¤Ë¤è¤Ã¤Æ¥á¥ó¥Æ¥Ê¥ó¥¹¤µ¤ì¤Æ¤¤¤Ş¤¹¡£\n"
+"ç¾åœ¨ã¯ Micah Cowan <micah@cowan.name> ã«ã‚ˆã£ã¦ãƒ¡ãƒ³ãƒ†ãƒŠãƒ³ã‚¹ã•ã‚Œã¦ã„ã¾ã™ã€‚\n"
 
-#. #### Something nicer should be printed here -- similar to the
-#. pre-1.5 `--help' page.
-#: src/main.c:738 src/main.c:807 src/main.c:919
+#: src/main.c:858
+msgid "Please send bug reports and questions to <bug-wget@gnu.org>.\n"
+msgstr "ãƒã‚°å ±å‘Šã‚„è³ªå•ã¯<bug-wget@gnu.org>ã¸\n"
+
+#: src/main.c:908 src/main.c:977 src/main.c:1099
 #, c-format
 msgid "Try `%s --help' for more options.\n"
-msgstr "¾Ü¤·¤¤¥ª¥×¥·¥ç¥ó¤Ï `%s --help' ¤ò¼Â¹Ô¤·¤Æ¤¯¤À¤µ¤¤¡£\n"
+msgstr "è©³ã—ã„ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã¯ `%s --help' ã‚’å®Ÿè¡Œã—ã¦ãã ã•ã„ã€‚\n"
 
-#: src/main.c:804
+#: src/main.c:974
 #, c-format
 msgid "%s: illegal option -- `-n%c'\n"
-msgstr "%s: `-n%c' ¤ÏÉÔÀµ¤Ê¥ª¥×¥·¥ç¥ó»ØÄê¤Ç¤¹\n"
+msgstr "%s: `-n%c' ã¯ä¸æ­£ãªã‚ªãƒ—ã‚·ãƒ§ãƒ³æŒ‡å®šã§ã™\n"
 
-#: src/main.c:859
+#: src/main.c:1032
 #, c-format
 msgid "Can't be verbose and quiet at the same time.\n"
 msgstr ""
-"½ĞÎÏ¤ò¾ÜºÙ¤Ë¤¹¤ë¥ª¥×¥·¥ç¥ó¤È½ĞÎÏ¤òÍŞÀ©¤¹¤ë¥ª¥×¥·¥ç¥ó¤òÆ±»ş¤Ë¤Ï»ØÄê¤Ç¤­¤Ş¤»"
-"¤ó\n"
+"å‡ºåŠ›ã‚’è©³ç´°ã«ã™ã‚‹ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã¨å‡ºåŠ›ã‚’æŠ‘åˆ¶ã™ã‚‹ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’åŒæ™‚ã«ã¯æŒ‡å®šã§ãã¾ã›"
+"ã‚“\n"
 
-#: src/main.c:865
+#: src/main.c:1038
 #, c-format
 msgid "Can't timestamp and not clobber old files at the same time.\n"
-msgstr "-N¤È-nc¤È¤òÆ±»ş¤Ë¤Ï»ØÄê¤Ç¤­¤Ş¤»¤ó¡£\n"
+msgstr "-Nã¨-ncã¨ã‚’åŒæ™‚ã«ã¯æŒ‡å®šã§ãã¾ã›ã‚“ã€‚\n"
 
-#: src/main.c:873
+#: src/main.c:1046
 #, c-format
 msgid "Cannot specify both --inet4-only and --inet6-only.\n"
-msgstr "--inet4-only ¤È --inet6-only ¤òÎ¾Êı»ØÄê¤¹¤ë¤³¤È¤Ï¤Ç¤­¤Ş¤»¤ó\n"
+msgstr "--inet4-only ã¨ --inet6-only ã‚’ä¸¡æ–¹æŒ‡å®šã™ã‚‹ã“ã¨ã¯ã§ãã¾ã›ã‚“\n"
 
-#: src/main.c:883
+#: src/main.c:1056
 msgid ""
 "Cannot specify both -k and -O if multiple URLs are given, or in combination\n"
 "with -p or -r. See the manual for details.\n"
 "\n"
 msgstr ""
-"Ê£¿ô¤Î URL ¤ò»ØÄê¤¹¤ë¾ì¹ç¡¢¤¢¤ë¤¤¤Ï -p ¤ä -r ¤È»È¤¦¾ì¹ç¡¢\n"
-"-k ¤È -O ¤òÎ¾Êı»ØÄê¤¹¤ë¤³¤È¤Ï¤Ç¤­¤Ş¤»¤ó¡£¾Ü¤·¤¯¤Ï¥Ş¥Ë¥å¥¢¥ë¤ò»²¾È¤·¤Æ¤¯¤À¤µ"
-"¤¤¡£\n"
+"è¤‡æ•°ã® URL ã‚’æŒ‡å®šã™ã‚‹å ´åˆã€ã‚ã‚‹ã„ã¯ -p ã‚„ -r ã¨ä½¿ã†å ´åˆã€\n"
+"-k ã¨ -O ã‚’ä¸¡æ–¹æŒ‡å®šã™ã‚‹ã“ã¨ã¯ã§ãã¾ã›ã‚“ã€‚è©³ã—ãã¯ãƒãƒ‹ãƒ¥ã‚¢ãƒ«ã‚’å‚ç…§ã—ã¦ãã ã•"
+"ã„ã€‚\n"
 "\n"
 
-#: src/main.c:892
+#: src/main.c:1065
 msgid ""
 "WARNING: combining -O with -r or -p will mean that all downloaded content\n"
 "will be placed in the single file you specified.\n"
 "\n"
 msgstr ""
-"·Ù¹ğ: -r ¤ä -p ¤È -O ¤ò°ì½ï¤Ë»È¤¦¤È¡¢¥À¥¦¥ó¥í¡¼¥É¤·¤¿ÆâÍÆ¤Ï¡¢\n"
-"Á´¤Æ»ØÄê¤µ¤ì¤¿°ì¤Ä¤Î¥Õ¥¡¥¤¥ë¤ËÆş¤ë¤³¤È¤ò°ÕÌ£¤·¤Ş¤¹¡£\n"
+"è­¦å‘Š: -r ã‚„ -p ã¨ -O ã‚’ä¸€ç·’ã«ä½¿ã†ã¨ã€ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ãŸå†…å®¹ã¯ã€\n"
+"å…¨ã¦æŒ‡å®šã•ã‚ŒãŸä¸€ã¤ã®ãƒ•ã‚¡ã‚¤ãƒ«ã«å…¥ã‚‹ã“ã¨ã‚’æ„å‘³ã—ã¾ã™ã€‚\n"
 "\n"
 
-#: src/main.c:898
+#: src/main.c:1071
 msgid ""
 "WARNING: timestamping does nothing in combination with -O. See the manual\n"
 "for details.\n"
 "\n"
 msgstr ""
-"·Ù¹ğ: ¥¿¥¤¥à¥¹¥¿¥ó¥×¤ÎÈæ³Ó¤Ï -O ¤Ç¤ÏÌµ¸ú¤Ç¤¹¡£\n"
-"¾Ü¤·¤¯¤Ï¥Ş¥Ë¥å¥¢¥ë¤ò»²¾È¤·¤Æ¤¯¤À¤µ¤¤¡£\n"
+"è­¦å‘Š: ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—ã®æ¯”è¼ƒã¯ -O ã§ã¯ç„¡åŠ¹ã§ã™ã€‚\n"
+"è©³ã—ãã¯ãƒãƒ‹ãƒ¥ã‚¢ãƒ«ã‚’å‚ç…§ã—ã¦ãã ã•ã„ã€‚\n"
 "\n"
 
-#. No URL specified.
-#: src/main.c:914
+#: src/main.c:1079
+#, c-format
+msgid "File `%s' already there; not retrieving.\n"
+msgstr "ãƒ•ã‚¡ã‚¤ãƒ« `%s' ã¯ã™ã§ã«å­˜åœ¨ã™ã‚‹ã®ã§ã€å–å¾—ã—ã¾ã›ã‚“ã€‚\n"
+
+#: src/main.c:1086
+#, c-format
+msgid "Cannot specify both --ask-password and --password.\n"
+msgstr "--ask-password ã¨ --password ã‚’ä¸¡æ–¹æŒ‡å®šã™ã‚‹ã“ã¨ã¯ã§ãã¾ã›ã‚“\n"
+
+#: src/main.c:1094
 #, c-format
 msgid "%s: missing URL\n"
-msgstr "%s: URL¤¬¤¢¤ê¤Ş¤»¤ó\n"
+msgstr "%s: URLãŒã‚ã‚Šã¾ã›ã‚“\n"
 
-#: src/main.c:1040
+#: src/main.c:1119
+#, c-format
+msgid "This version does not have support for IRIs\n"
+msgstr "ã“ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã¯ IRI ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã¾ã›ã‚“\n"
+
+#: src/main.c:1183
+msgid ""
+"WARNING: Can't reopen standard output in binary mode;\n"
+"         downloaded file may contain inappropriate line endings.\n"
+msgstr ""
+"è­¦å‘Š: æ¨™æº–å‡ºåŠ›ã‚’ãƒã‚¤ãƒŠãƒªãƒ¢ãƒ¼ãƒ‰ã§å†ã‚ªãƒ¼ãƒ—ãƒ³ã§ãã¾ã›ã‚“ã€‚\n"
+"      ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ãŸãƒ•ã‚¡ã‚¤ãƒ«ã«æ­£ã—ããªã„è¡Œæœ«ã‚³ãƒ¼ãƒ‰ãŒå«ã¾ã‚Œã‚‹ã‹ã‚‚ã—ã‚Œã¾ã›"
+"ã‚“ã€‚\n"
+
+#: src/main.c:1318
 #, c-format
 msgid "No URLs found in %s.\n"
-msgstr "%s ¤Ë¤ÏURL¤¬¤¢¤ê¤Ş¤»¤ó¡£\n"
+msgstr "%s ã«ã¯URLãŒã‚ã‚Šã¾ã›ã‚“ã€‚\n"
 
-#: src/main.c:1058
+#: src/main.c:1336
 #, c-format
 msgid ""
 "FINISHED --%s--\n"
 "Downloaded: %d files, %s in %s (%s)\n"
 msgstr ""
-"½ªÎ»¤·¤Ş¤·¤¿ --%s--\n"
-"¥À¥¦¥ó¥í¡¼¥É´°Î»: %d ¥Õ¥¡¥¤¥ë¡¢%s ¥Ğ¥¤¥È¤ò %s ¤Ç¼èÆÀ (%s)\n"
+"çµ‚äº†ã—ã¾ã—ãŸ --%s--\n"
+"ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰å®Œäº†: %d ãƒ•ã‚¡ã‚¤ãƒ«ã€%s ãƒã‚¤ãƒˆã‚’ %s ã§å–å¾— (%s)\n"
 
-#: src/main.c:1067
+#: src/main.c:1345
 #, c-format
 msgid "Download quota of %s EXCEEDED!\n"
-msgstr "ÍÆÎÌÀ©¸Â(%s ¥Ğ¥¤¥È)¤òÄ¶²á¤·¤Ş¤¹!\n"
+msgstr "å®¹é‡åˆ¶é™(%s ãƒã‚¤ãƒˆ)ã‚’è¶…éã—ã¾ã™!\n"
 
-#: src/mswindows.c:99
+#: src/mswindows.c:98
 #, c-format
 msgid "Continuing in background.\n"
-msgstr "¥Ğ¥Ã¥¯¥°¥é¥¦¥ó¥É¤Ç·ÑÂ³¤·¤Ş¤¹¡£\n"
+msgstr "ãƒãƒƒã‚¯ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ã§ç¶™ç¶šã—ã¾ã™ã€‚\n"
 
-#: src/mswindows.c:292
+#: src/mswindows.c:291
 #, c-format
 msgid "Continuing in background, pid %lu.\n"
-msgstr "¥Ğ¥Ã¥¯¥°¥é¥¦¥ó¥É¤Ç·ÑÂ³¤·¤Ş¤¹¡¢pid¤Ï %lu¡£\n"
+msgstr "ãƒãƒƒã‚¯ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ã§ç¶™ç¶šã—ã¾ã™ã€pidã¯ %luã€‚\n"
 
-#: src/mswindows.c:294 src/utils.c:331
+#: src/mswindows.c:293 src/utils.c:472
 #, c-format
-msgid "Output will be written to `%s'.\n"
-msgstr "½ĞÎÏ¤ò `%s' ¤Ë½ñ¤­¹ş¤ß¤Ş¤¹¡£\n"
+msgid "Output will be written to %s.\n"
+msgstr "å‡ºåŠ›ã‚’ %s ã«æ›¸ãè¾¼ã¿ã¾ã™ã€‚\n"
 
-#: src/mswindows.c:462 src/mswindows.c:469
+#: src/mswindows.c:461 src/mswindows.c:468
 #, c-format
 msgid "%s: Couldn't find usable socket driver.\n"
-msgstr "%s: »ÈÍÑ²ÄÇ½¤Ê¥½¥±¥Ã¥È¥É¥é¥¤¥Ğ¤ò¸«¤Ä¤±¤é¤ì¤Ş¤»¤ó¡£\n"
+msgstr "%s: ä½¿ç”¨å¯èƒ½ãªã‚½ã‚±ãƒƒãƒˆãƒ‰ãƒ©ã‚¤ãƒã‚’è¦‹ã¤ã‘ã‚‰ã‚Œã¾ã›ã‚“ã€‚\n"
 
-#: src/netrc.c:376
+#: src/netrc.c:390
 #, c-format
-msgid "%s: %s:%d: warning: \"%s\" token appears before any machine name\n"
+msgid "%s: %s:%d: warning: %s token appears before any machine name\n"
 msgstr ""
-"%s: %s:%d: ·Ù¹ğ: ¶èÀÚ¤êµ­¹æ(token) \"%s\" ¤Ï¤¹¤Ù¤Æ¤Î¥Ş¥·¥óÌ¾¤ÎÁ°¤Ë¸½¤ï¤ì¤Ş"
-"¤¹\n"
+"%s: %s:%d: è­¦å‘Š: åŒºåˆ‡ã‚Šè¨˜å·(token) %s ã¯ã™ã¹ã¦ã®ãƒã‚·ãƒ³åã®å‰ã«ç¾ã‚ã‚Œã¾ã™\n"
 
-#: src/netrc.c:407
+#: src/netrc.c:421
 #, c-format
 msgid "%s: %s:%d: unknown token \"%s\"\n"
-msgstr "%s: %s:%d: \"%s\" ¤ÏÉÔÌÀ¤Ê¶èÀÚ¤êµ­¹æ(token)¤Ç¤¹\n"
+msgstr "%s: %s:%d: \"%s\" ã¯ä¸æ˜ãªåŒºåˆ‡ã‚Šè¨˜å·(token)ã§ã™\n"
 
-#: src/netrc.c:471
+#: src/netrc.c:485
 #, c-format
 msgid "Usage: %s NETRC [HOSTNAME]\n"
-msgstr "»È¤¤Êı: %s NETRC [¥Û¥¹¥ÈÌ¾]\n"
+msgstr "ä½¿ã„æ–¹: %s NETRC [ãƒ›ã‚¹ãƒˆå]\n"
 
-#: src/netrc.c:481
+#: src/netrc.c:495
 #, c-format
 msgid "%s: cannot stat %s: %s\n"
-msgstr "%s: %s¤Î¾ğÊó¤ò¼èÆÀ¤Ç¤­¤Ş¤»¤ó: %s\n"
+msgstr "%s: %sã®æƒ…å ±ã‚’å–å¾—ã§ãã¾ã›ã‚“: %s\n"
 
-#. Still not random enough, presumably because neither /dev/random
-#. nor EGD were available.  Try to seed OpenSSL's PRNG with libc
-#. PRNG.  This is cryptographically weak and defeats the purpose
-#. of using OpenSSL, which is why it is highly discouraged.
-#: src/openssl.c:114
+#: src/openssl.c:113
 msgid "WARNING: using a weak random seed.\n"
-msgstr "·Ù¹ğ: ¼å¤¤Íğ¿ô¤Î¼ï¤ò»ÈÍÑ¤·¤Æ¤¤¤Ş¤¹\n"
+msgstr "è­¦å‘Š: å¼±ã„ä¹±æ•°ã®ç¨®ã‚’ä½¿ç”¨ã—ã¦ã„ã¾ã™\n"
 
-#: src/openssl.c:174
+#: src/openssl.c:173
 msgid "Could not seed PRNG; consider using --random-file.\n"
-msgstr "PRNG¤Î½é´ü²½¤Ë¼ºÇÔ¤·¤Ş¤·¤¿¡£--random-file ¤Î»ÈÍÑ¤ò¸¡Æ¤¤·¤Æ¤¯¤À¤µ¤¤¡£\n"
+msgstr "PRNGã®åˆæœŸåŒ–ã«å¤±æ•—ã—ã¾ã—ãŸã€‚--random-file ã®ä½¿ç”¨ã‚’æ¤œè¨ã—ã¦ãã ã•ã„ã€‚\n"
 
-#. If the user has specified --no-check-cert, we still want to warn
-#. him about problems with the server's certificate.
-#: src/openssl.c:489
-msgid "ERROR"
-msgstr "¥¨¥é¡¼"
-
-#: src/openssl.c:489
-msgid "WARNING"
-msgstr "·Ù¹ğ"
-
-#: src/openssl.c:498
+#: src/openssl.c:526
 #, c-format
-msgid "%s: No certificate presented by %s.\n"
-msgstr "%s: %s ¤«¤é¾ÚÌÀ½ñ¤ÎÄó¼¨¤¬¤¢¤ê¤Ş¤»¤ó¤Ç¤·¤¿\n"
+msgid "%s: cannot verify %s's certificate, issued by %s:\n"
+msgstr "%s: %s ã®è¨¼æ˜æ›¸(ç™ºè¡Œè€…: %s)ã®æ¤œè¨¼ã«å¤±æ•—ã—ã¾ã—ãŸ:\n"
 
-#: src/openssl.c:519
-#, c-format
-msgid "%s: cannot verify %s's certificate, issued by `%s':\n"
-msgstr "%s: %s ¤Î¾ÚÌÀ½ñ(È¯¹Ô¼Ô: %s)¤Î¸¡¾Ú¤Ë¼ºÇÔ¤·¤Ş¤·¤¿:\n"
-
-#: src/openssl.c:527
+#: src/openssl.c:535
 msgid "  Unable to locally verify the issuer's authority.\n"
-msgstr "  È¯¹Ô¼Ô¤Î¸¢¸Â¤ò¸¡¾Ú¤Ç¤­¤Ş¤»¤ó¤Ç¤·¤¿¡£\n"
+msgstr "  ç™ºè¡Œè€…ã®æ¨©é™ã‚’æ¤œè¨¼ã§ãã¾ã›ã‚“ã§ã—ãŸã€‚\n"
 
-#: src/openssl.c:531
+#: src/openssl.c:539
 msgid "  Self-signed certificate encountered.\n"
-msgstr "  ¼«¸Ê½ğÌ¾¾ÚÌÀ½ñ¤Ç¤¹¡£\n"
+msgstr "  è‡ªå·±ç½²åè¨¼æ˜æ›¸ã§ã™ã€‚\n"
 
-#: src/openssl.c:534
+#: src/openssl.c:542
 msgid "  Issued certificate not yet valid.\n"
-msgstr "  È¯¹Ô¤µ¤ì¤¿¾ÚÌÀ½ñ¤Ï¤Ş¤ÀÍ­¸ú¤Ç¤Ï¤¢¤ê¤Ş¤»¤ó¡£\n"
+msgstr "  ç™ºè¡Œã•ã‚ŒãŸè¨¼æ˜æ›¸ã¯ã¾ã æœ‰åŠ¹ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚\n"
 
-#: src/openssl.c:537
+#: src/openssl.c:545
 msgid "  Issued certificate has expired.\n"
-msgstr "  È¯¹Ô¤µ¤ì¤¿¾ÚÌÀ½ñ¤Ï¼º¸ú¤·¤Æ¤¤¤Ş¤¹¡£\n"
+msgstr "  ç™ºè¡Œã•ã‚ŒãŸè¨¼æ˜æ›¸ã¯å¤±åŠ¹ã—ã¦ã„ã¾ã™ã€‚\n"
 
-#: src/openssl.c:569
+#: src/openssl.c:579
+#, c-format
+msgid "%s: certificate common name %s doesn't match requested host name %s.\n"
+msgstr "%s: è¨¼æ˜æ›¸ã«è¨˜è¼‰ã•ã‚Œã¦ã„ã‚‹åå‰ %s ã¨ãƒ›ã‚¹ãƒˆå %s ãŒä¸€è‡´ã—ã¾ã›ã‚“\n"
+
+#: src/openssl.c:610
 #, c-format
 msgid ""
-"%s: certificate common name `%s' doesn't match requested host name `%s'.\n"
-msgstr "%s: ¾ÚÌÀ½ñ¤Ëµ­ºÜ¤µ¤ì¤Æ¤¤¤ëÌ¾Á° `%s' ¤È¥Û¥¹¥ÈÌ¾ `%s' ¤¬°ìÃ×¤·¤Ş¤»¤ó\n"
+"%s: certificate common name is invalid (contains a NUL character).\n"
+"This may be an indication that the host is not who it claims to be\n"
+"(that is, it is not the real %s).\n"
+msgstr ""
+"%s: è¨¼æ˜æ›¸ã®åå‰ãŒä¸æ­£ã§ã™(NULæ–‡å­—ã‚’å«ã‚“ã§ã„ã¾ã™)ã€‚\n"
+"æ¥ç¶šå…ˆã®ã‚µãƒ¼ãƒãŒãªã‚Šã™ã¾ã—ã¦ã„ã‚‹å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚\n"
+"ã¤ã¾ã‚Šã€æœ¬ç‰©ã® %s ã§ã¯ãªã„ã‹ã‚‚ã—ã‚Œã¾ã›ã‚“ã€‚\n"
 
-#: src/openssl.c:582
+#: src/openssl.c:627
 #, c-format
 msgid "To connect to %s insecurely, use `--no-check-certificate'.\n"
 msgstr ""
-"%s ¤Ë°ÂÁ´¤Î³ÎÇ§¤ò¤·¤Ê¤¤¤ÇÀÜÂ³¤¹¤ë¤Ë¤Ï¡¢`--no-check-certificate' ¤ò»È¤Ã¤Æ¤¯¤À"
-"¤µ¤¤¡£\n"
+"%s ã«å®‰å…¨ã®ç¢ºèªã‚’ã—ãªã„ã§æ¥ç¶šã™ã‚‹ã«ã¯ã€`--no-check-certificate' ã‚’ä½¿ã£ã¦ãã "
+"ã•ã„ã€‚\n"
 
-#. Align the [ skipping ... ] line with the dots.  To do
-#. that, insert the number of spaces equal to the number of
-#. digits in the skipped amount in K.
-#: src/progress.c:243
+#: src/progress.c:242
 #, c-format
 msgid ""
 "\n"
 "%*s[ skipping %sK ]"
 msgstr ""
 "\n"
-"%*s[ %sK ¤È¤Ğ¤·¤Ş¤¹ ]"
+"%*s[ %sK ã¨ã°ã—ã¾ã™ ]"
 
-#: src/progress.c:457
+#: src/progress.c:456
 #, c-format
-msgid "Invalid dot style specification `%s'; leaving unchanged.\n"
-msgstr "`%s' ¤ÏÌµ¸ú¤Ê·Ğ²áÉ½¼¨·Á¼°¤Ê¤Î¤ÇÊÑ¹¹¤·¤Ş¤»¤ó¡£\n"
+msgid "Invalid dot style specification %s; leaving unchanged.\n"
+msgstr "%s ã¯ç„¡åŠ¹ãªãƒ‰ãƒƒãƒˆè¡¨ç¤ºå½¢å¼ãªã®ã§å¤‰æ›´ã—ã¾ã›ã‚“ã€‚\n"
 
-#. Translation note: "ETA" is English-centric, but this must
+#. TRANSLATORS: "ETA" is English-centric, but this must
 #. be short, ideally 3 chars.  Abbreviate if necessary.
-#: src/progress.c:806
+#: src/progress.c:805
 #, c-format
 msgid "  eta %s"
-msgstr "  »Ä¤ê%s"
+msgstr "  æ®‹ã‚Š%s"
 
-#. Note to translators: this should not take up more room than
-#. available here.  Abbreviate if necessary.
-#: src/progress.c:1051
+#: src/progress.c:1050
 msgid "   in "
-msgstr " »ş´Ö "
+msgstr " æ™‚é–“ "
 
-#. If no clock was found, it means that clock_getres failed for
-#. the realtime clock.
-#: src/ptimer.c:161
+#: src/ptimer.c:162
 #, c-format
 msgid "Cannot get REALTIME clock frequency: %s\n"
-msgstr "¥ê¥¢¥ë¥¿¥¤¥à¥¯¥í¥Ã¥¯¤Î¼şÇÈ¿ô¤ò¼èÆÀ¤Ç¤­¤Ş¤»¤ó: %s\n"
+msgstr "ãƒªã‚¢ãƒ«ã‚¿ã‚¤ãƒ ã‚¯ãƒ­ãƒƒã‚¯ã®å‘¨æ³¢æ•°ã‚’å–å¾—ã§ãã¾ã›ã‚“: %s\n"
 
-#: src/recur.c:380
+#: src/recur.c:439
 #, c-format
 msgid "Removing %s since it should be rejected.\n"
-msgstr "µñÈİ¤¹¤Ù¤­¤Ê¤Î¤Ç¡¢%s ¤òºï½ü¤·¤Ş¤·¤¿¡£\n"
+msgstr "æ‹’å¦ã™ã¹ããªã®ã§ã€%s ã‚’å‰Šé™¤ã—ã¾ã—ãŸã€‚\n"
 
-#: src/res.c:393
+#: src/res.c:391
 #, c-format
 msgid "Cannot open %s: %s"
-msgstr "%s ¤ò³«¤±¤Ş¤»¤ó: %s"
+msgstr "%s ã‚’é–‹ã‘ã¾ã›ã‚“: %s"
 
-#: src/res.c:545
+#: src/res.c:550
 msgid "Loading robots.txt; please ignore errors.\n"
-msgstr "robots.txt¤òÆÉ¤ß¹ş¤ó¤Ç¤¤¤Ş¤¹¡¢¥¨¥é¡¼¤ÏÌµ»ë¤·¤Æ¤¯¤À¤µ¤¤¡£\n"
+msgstr "robots.txtã‚’èª­ã¿è¾¼ã‚“ã§ã„ã¾ã™ã€ã‚¨ãƒ©ãƒ¼ã¯ç„¡è¦–ã—ã¦ãã ã•ã„ã€‚\n"
 
-#: src/retr.c:653
+#: src/retr.c:667
 #, c-format
 msgid "Error parsing proxy URL %s: %s.\n"
-msgstr "proxy URL %s ¤ò²ò¼áÃæ¤Ë¥¨¥é¡¼¤¬È¯À¸¤·¤Ş¤·¤¿: %s\n"
+msgstr "proxy URL %s ã‚’è§£é‡ˆä¸­ã«ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ: %s\n"
 
-#: src/retr.c:661
+#: src/retr.c:677
 #, c-format
 msgid "Error in proxy URL %s: Must be HTTP.\n"
-msgstr "proxy URL %s ¤Ë´Ö°ã¤¤¤¬¤¢¤ê¤Ş¤¹: HTTP¤Ç¤Ê¤±¤ì¤Ğ¤Ê¤ê¤Ş¤»¤ó¡£\n"
+msgstr "proxy URL %s ã«é–“é•ã„ãŒã‚ã‚Šã¾ã™: HTTPã§ãªã‘ã‚Œã°ãªã‚Šã¾ã›ã‚“ã€‚\n"
 
-#: src/retr.c:747
+#: src/retr.c:775
 #, c-format
 msgid "%d redirections exceeded.\n"
-msgstr "¥ê¥À¥¤¥ì¥¯¥·¥ç¥ó²ó¿ô¤¬ %d ¤ò±Û¤¨¤Ş¤·¤¿¡£\n"
+msgstr "ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³å›æ•°ãŒ %d ã‚’è¶Šãˆã¾ã—ãŸã€‚\n"
 
-#: src/retr.c:882
+#: src/retr.c:1014
 msgid ""
 "Giving up.\n"
 "\n"
 msgstr ""
-"Ãæ»ß¤·¤Ş¤·¤¿¡£\n"
+"ä¸­æ­¢ã—ã¾ã—ãŸã€‚\n"
 "\n"
 
-#: src/retr.c:882
+#: src/retr.c:1014
 msgid ""
 "Retrying.\n"
 "\n"
 msgstr ""
-"ºÆ»î¹Ô¤·¤Æ¤¤¤Ş¤¹¡£\n"
+"å†è©¦è¡Œã—ã¦ã„ã¾ã™ã€‚\n"
 "\n"
 
-#: src/spider.c:75
+#: src/spider.c:74
 msgid ""
 "Found no broken links.\n"
 "\n"
 msgstr ""
-"²õ¤ì¤¿¥ê¥ó¥¯¤Ï¤¢¤ê¤Ş¤»¤ó¤Ç¤·¤¿¡£\n"
+"å£Šã‚ŒãŸãƒªãƒ³ã‚¯ã¯ã‚ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚\n"
 "\n"
 
-#: src/spider.c:82
+#: src/spider.c:81
 #, c-format
 msgid ""
 "Found %d broken link.\n"
@@ -1843,61 +2081,80 @@ msgid_plural ""
 "Found %d broken links.\n"
 "\n"
 msgstr[0] ""
-"%d ¸Ä¤Î²õ¤ì¤¿¥ê¥ó¥¯¤ò¸«¤Ä¤±¤Ş¤·¤¿¡£\n"
+"%d å€‹ã®å£Šã‚ŒãŸãƒªãƒ³ã‚¯ã‚’è¦‹ã¤ã‘ã¾ã—ãŸã€‚\n"
 "\n"
 msgstr[1] ""
-"%d ¸Ä¤Î²õ¤ì¤¿¥ê¥ó¥¯¤ò¸«¤Ä¤±¤Ş¤·¤¿¡£\n"
+"%d å€‹ã®å£Šã‚ŒãŸãƒªãƒ³ã‚¯ã‚’è¦‹ã¤ã‘ã¾ã—ãŸã€‚\n"
 "\n"
 
-#: src/spider.c:92
+#: src/spider.c:91
 #, c-format
 msgid "%s\n"
 msgstr "%s\n"
 
-#: src/url.c:621
-msgid "No error"
-msgstr "¥¨¥é¡¼¤Ê¤·"
-
-#: src/url.c:623
-msgid "Unsupported scheme"
-msgstr "¥µ¥İ¡¼¥È¤µ¤ì¤Æ¤¤¤Ê¤¤¥¹¥­¡¼¥à"
-
-#: src/url.c:625
-msgid "Invalid host name"
-msgstr "¥Û¥¹¥ÈÌ¾¤¬ÉÔÀµ¤Ç¤¹"
-
-#: src/url.c:627
-msgid "Bad port number"
-msgstr "¥İ¡¼¥ÈÈÖ¹æ¤¬ÉÔÀµ¤Ç¤¹"
-
-#: src/url.c:629
-msgid "Invalid user name"
-msgstr "¥æ¡¼¥¶Ì¾¤¬ÉÔÀµ¤Ç¤¹"
-
-#: src/url.c:631
-msgid "Unterminated IPv6 numeric address"
-msgstr "IPv6 ¥¢¥É¥ì¥¹¤Îµ­½Ò¤¬½ªÎ»¤·¤Æ¤¤¤Ş¤»¤ó"
-
 #: src/url.c:633
-msgid "IPv6 addresses not supported"
-msgstr "IPv6 ¥¢¥É¥ì¥¹¤Ï¥µ¥İ¡¼¥È¤µ¤ì¤Æ¤¤¤Ş¤»¤ó"
+msgid "No error"
+msgstr "ã‚¨ãƒ©ãƒ¼ãªã—"
 
 #: src/url.c:635
+#, c-format
+msgid "Unsupported scheme %s"
+msgstr "%s ã¯ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ãªã„ã‚¹ã‚­ãƒ¼ãƒ ã§ã™"
+
+#: src/url.c:637
+msgid "Scheme missing"
+msgstr "ã‚¹ã‚­ãƒ¼ãƒ ãŒã‚ã‚Šã¾ã›ã‚“"
+
+#: src/url.c:639
+msgid "Invalid host name"
+msgstr "ãƒ›ã‚¹ãƒˆåãŒä¸æ­£ã§ã™"
+
+#: src/url.c:641
+msgid "Bad port number"
+msgstr "ãƒãƒ¼ãƒˆç•ªå·ãŒä¸æ­£ã§ã™"
+
+#: src/url.c:643
+msgid "Invalid user name"
+msgstr "ãƒ¦ãƒ¼ã‚¶åãŒä¸æ­£ã§ã™"
+
+#: src/url.c:645
+msgid "Unterminated IPv6 numeric address"
+msgstr "IPv6 ã‚¢ãƒ‰ãƒ¬ã‚¹ã®è¨˜è¿°ãŒçµ‚äº†ã—ã¦ã„ã¾ã›ã‚“"
+
+#: src/url.c:647
+msgid "IPv6 addresses not supported"
+msgstr "IPv6 ã‚¢ãƒ‰ãƒ¬ã‚¹ã¯ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã¾ã›ã‚“"
+
+#: src/url.c:649
 msgid "Invalid IPv6 numeric address"
-msgstr "IPv6 ¥¢¥É¥ì¥¹¤¬ÉÔÀµ¤Ç¤¹"
+msgstr "IPv6 ã‚¢ãƒ‰ãƒ¬ã‚¹ãŒä¸æ­£ã§ã™"
 
-#. parent, no error
-#: src/utils.c:329
+#: src/url.c:951
+msgid "HTTPS support not compiled in"
+msgstr "HTTPS ãŒã‚µãƒãƒ¼ãƒˆã•ã‚Œã‚‹ã‚ˆã†ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã•ã‚Œã¦ã„ã¾ã›ã‚“"
+
+#: src/utils.c:108
 #, c-format
-msgid "Continuing in background, pid %d.\n"
-msgstr "¥Ğ¥Ã¥¯¥°¥é¥¦¥ó¥É¤Ç·ÑÂ³¤·¤Ş¤¹¡¢pid¤Ï %d¡£\n"
+msgid "%s: %s: Failed to allocate enough memory; memory exhausted.\n"
+msgstr "%s: %s: ãƒ¡ãƒ¢ãƒªã®ç¢ºä¿ã«å¤±æ•—ã—ã¾ã—ãŸ; ãƒ¡ãƒ¢ãƒªãŒã„ã£ã±ã„ã§ã™\n"
 
-#: src/utils.c:377
-#, c-format
-msgid "Failed to unlink symlink `%s': %s\n"
-msgstr "¥·¥ó¥Ü¥ê¥Ã¥¯¥ê¥ó¥¯ `%s' ¤Îºï½ü¤Ë¼ºÇÔ¤·¤Ş¤·¤¿: %s\n"
-
-#: src/xmalloc.c:64
+#: src/utils.c:114
 #, c-format
 msgid "%s: %s: Failed to allocate %ld bytes; memory exhausted.\n"
-msgstr "%s: %s: %ld ¥Ğ¥¤¥È¤Î³ÎÊİ¤Ë¼ºÇÔ¤·¤Ş¤·¤¿; ¥á¥â¥ê¤¬¤¤¤Ã¤Ñ¤¤¤Ç¤¹\n"
+msgstr "%s: %s: %ld ãƒã‚¤ãƒˆã®ç¢ºä¿ã«å¤±æ•—ã—ã¾ã—ãŸ; ãƒ¡ãƒ¢ãƒªãŒã„ã£ã±ã„ã§ã™\n"
+
+#: src/utils.c:327
+#, c-format
+msgid "%s: aprintf: text buffer is too big (%ld bytes), aborting.\n"
+msgstr ""
+"%s: aprintf: ãƒ†ã‚­ã‚¹ãƒˆãƒãƒƒãƒ•ã‚¡ (%ld bytes) ã¯å¤§ãã™ãã‚‹ã®ã§ã€ä¸­æ­¢ã—ã¾ã™ã€‚\n"
+
+#: src/utils.c:470
+#, c-format
+msgid "Continuing in background, pid %d.\n"
+msgstr "ãƒãƒƒã‚¯ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ã§ç¶™ç¶šã—ã¾ã™ã€pidã¯ %dã€‚\n"
+
+#: src/utils.c:521
+#, c-format
+msgid "Failed to unlink symlink %s: %s\n"
+msgstr "ã‚·ãƒ³ãƒœãƒªãƒƒã‚¯ãƒªãƒ³ã‚¯ %s ã®å‰Šé™¤ã«å¤±æ•—ã—ã¾ã—ãŸ: %s\n"

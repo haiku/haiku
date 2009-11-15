@@ -1,6 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
 use HTTPTest;
 
@@ -10,15 +11,13 @@ use HTTPTest;
 my $oldversion = <<EOF;
 11111111111111111111111111111111111111111111111111
 222222222222222222222222222222222222222222222222222222222222
-EOF
-
-my $newversion = <<EOF;
-11111111111111111111111111111111111111111111111111
-222222222222222222222222222222222222222222222222222222222222
 3333333333333333333333333333333333333333333333333333333333333333333333
 444444444444444444444444444444444444444444444444444444444444
 55555555555555555555555555555555555555555555555555
 EOF
+
+my $newversion = $oldversion;
+$newversion =~ s/^(.{20}).(.*)$/$1x$2/s;
 
 # code, msg, headers, content
 my %urls = (
@@ -33,7 +32,7 @@ my %urls = (
     },
 );
 
-my $cmdline = $WgetTest::WGETPATH . " -N http://localhost:8080/somefile.txt";
+my $cmdline = $WgetTest::WGETPATH . " -N http://localhost:{{port}}/somefile.txt";
 
 my $expected_error_code = 0;
 
@@ -54,9 +53,9 @@ my %expected_downloaded_files = (
 ###############################################################################
 
 my $the_test = HTTPTest->new (name => "Test-N-old",
-                              input => \%urls, 
-                              cmdline => $cmdline, 
-                              errcode => $expected_error_code, 
+                              input => \%urls,
+                              cmdline => $cmdline,
+                              errcode => $expected_error_code,
                               existing => \%existing_files,
                               output => \%expected_downloaded_files);
 exit $the_test->run();

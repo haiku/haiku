@@ -1,6 +1,6 @@
 /* URL handling.
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,10 +39,13 @@ as that of the covered work.  */
 #include <errno.h>
 #include <assert.h>
 
-#include "wget.h"
 #include "utils.h"
 #include "url.h"
 #include "host.h"  /* for is_valid_ipv6_address */
+
+#ifdef __VMS
+#include "vms.h"
+#endif /* def __VMS */
 
 #ifdef TESTING
 #include "test.h"
@@ -184,7 +187,7 @@ url_unescape (char *s)
         {
           char c;
           /* Do nothing if '%' is not followed by two hex digits. */
-          if (!h[1] || !h[2] || !(ISXDIGIT (h[1]) && ISXDIGIT (h[2])))
+          if (!h[1] || !h[2] || !(c_isxdigit (h[1]) && c_isxdigit (h[2])))
             goto copychar;
           c = X2DIGITS_TO_NUM (h[1], h[2]);
           /* Don't unescape %00 because there is no way to insert it
@@ -253,6 +256,15 @@ url_escape (const char *s)
   return url_escape_1 (s, urlchr_unsafe, false);
 }
 
+/* URL-escape the unsafe and reserved characters (see urlchr_table) in
+   a given string, returning a freshly allocated string.  */
+
+char *
+url_escape_unsafe_and_reserved (const char *s)
+{
+  return url_escape_1 (s, urlchr_unsafe|urlchr_reserved, false);
+}
+
 /* URL-escape the unsafe characters (see urlchr_table) in a given
    string.  If no characters are unsafe, S is returned.  */
 
@@ -273,7 +285,7 @@ char_needs_escaping (const char *p)
 {
   if (*p == '%')
     {
-      if (ISXDIGIT (*(p + 1)) && ISXDIGIT (*(p + 2)))
+      if (c_isxdigit (*(p + 1)) && c_isxdigit (*(p + 2)))
         return false;
       else
         /* Garbled %.. sequence: encode `%'. */
@@ -429,7 +441,7 @@ url_scheme (const char *url)
   return SCHEME_INVALID;
 }
 
-#define SCHEME_CHAR(ch) (ISALNUM (ch) || (ch) == '-' || (ch) == '+')
+#define SCHEME_CHAR(ch) (c_isalnum (ch) || (ch) == '-' || (ch) == '+')
 
 /* Return 1 if the URL begins with any "scheme", 0 otherwise.  As
    currently implemented, it returns true if URL begins with
@@ -591,10 +603,10 @@ lowercase_str (char *str)
 {
   bool changed = false;
   for (; *str; str++)
-    if (ISUPPER (*str))
+    if (c_isupper (*str))
       {
         changed = true;
-        *str = TOLOWER (*str);
+        *str = c_tolower (*str);
       }
   return changed;
 }
@@ -620,18 +632,20 @@ static const char *parse_errors[] = {
 #define PE_NO_ERROR                     0
   N_("No error"),
 #define PE_UNSUPPORTED_SCHEME           1
-  N_("Unsupported scheme"),
-#define PE_INVALID_HOST_NAME            2
+  N_("Unsupported scheme %s"), /* support for format token only here */
+#define PE_MISSING_SCHEME               2
+  N_("Scheme missing"),
+#define PE_INVALID_HOST_NAME            3
   N_("Invalid host name"),
-#define PE_BAD_PORT_NUMBER              3
+#define PE_BAD_PORT_NUMBER              4
   N_("Bad port number"),
-#define PE_INVALID_USER_NAME            4
+#define PE_INVALID_USER_NAME            5
   N_("Invalid user name"),
-#define PE_UNTERMINATED_IPV6_ADDRESS    5
+#define PE_UNTERMINATED_IPV6_ADDRESS    6
   N_("Unterminated IPv6 numeric address"),
-#define PE_IPV6_NOT_SUPPORTED           6
+#define PE_IPV6_NOT_SUPPORTED           7
   N_("IPv6 addresses not supported"),
-#define PE_INVALID_IPV6_ADDRESS         7
+#define PE_INVALID_IPV6_ADDRESS         8
   N_("Invalid IPv6 numeric address")
 };
 
@@ -641,7 +655,7 @@ static const char *parse_errors[] = {
    error, and if ERROR is not NULL, also set *ERROR to the appropriate
    error code. */
 struct url *
-url_parse (const char *url, int *error)
+url_parse (const char *url, int *error, struct iri *iri, bool percent_encode)
 {
   struct url *u;
   const char *p;
@@ -660,19 +674,40 @@ url_parse (const char *url, int *error)
   int port;
   char *user = NULL, *passwd = NULL;
 
-  char *url_encoded = NULL;
+  const char *url_encoded = NULL;
+  char *new_url = NULL;
 
   int error_code;
 
   scheme = url_scheme (url);
   if (scheme == SCHEME_INVALID)
     {
-      error_code = PE_UNSUPPORTED_SCHEME;
+      if (url_has_scheme (url))
+        error_code = PE_UNSUPPORTED_SCHEME;
+      else
+        error_code = PE_MISSING_SCHEME;
       goto error;
     }
 
-  url_encoded = reencode_escapes (url);
+  if (iri && iri->utf8_encode)
+    {
+      iri->utf8_encode = remote_to_utf8 (iri, iri->orig_url ? iri->orig_url : url, (const char **) &new_url);
+      if (!iri->utf8_encode)
+        new_url = NULL;
+      else
+        iri->orig_url = xstrdup (url);
+    }
+
+  /* XXX XXX Could that change introduce (security) bugs ???  XXX XXX*/
+  if (percent_encode)
+    url_encoded = reencode_escapes (new_url ? new_url : url);
+  else
+    url_encoded = new_url ? new_url : url;
+
   p = url_encoded;
+
+  if (new_url && url_encoded != new_url)
+    xfree (new_url);
 
   p += strlen (supported_schemes[scheme].leading_string);
   uname_b = p;
@@ -770,7 +805,7 @@ url_parse (const char *url, int *error)
       if (port_b != port_e)
         for (port = 0, pp = port_b; pp < port_e; pp++)
           {
-            if (!ISDIGIT (*pp))
+            if (!c_isdigit (*pp))
               {
                 /* http://host:12randomgarbage/blah */
                 /*               ^                  */
@@ -843,6 +878,18 @@ url_parse (const char *url, int *error)
     {
       url_unescape (u->host);
       host_modified = true;
+
+      /* Apply IDNA regardless of iri->utf8_encode status */
+      if (opt.enable_iri && iri)
+        {
+          char *new = idn_encode (iri, u->host);
+          if (new)
+            {
+              xfree (u->host);
+              u->host = new;
+              host_modified = true;
+            }
+        }
     }
 
   if (params_b)
@@ -852,7 +899,7 @@ url_parse (const char *url, int *error)
   if (fragment_b)
     u->fragment = strdupdelim (fragment_b, fragment_e);
 
-  if (path_modified || u->fragment || host_modified || path_b == path_e)
+  if (opt.enable_iri || path_modified || u->fragment || host_modified || path_b == path_e)
     {
       /* If we suspect that a transformation has rendered what
          url_string might return different from URL_ENCODED, rebuild
@@ -867,7 +914,7 @@ url_parse (const char *url, int *error)
       if (url_encoded == url)
         u->url = xstrdup (url);
       else
-        u->url = url_encoded;
+        u->url = (char *) url_encoded;
     }
 
   return u;
@@ -875,7 +922,7 @@ url_parse (const char *url, int *error)
  error:
   /* Cleanup in case of error: */
   if (url_encoded && url_encoded != url)
-    xfree (url_encoded);
+    xfree ((char *) url_encoded);
 
   /* Transmit the error code to the caller, if the caller wants to
      know.  */
@@ -887,11 +934,29 @@ url_parse (const char *url, int *error)
 /* Return the error message string from ERROR_CODE, which should have
    been retrieved from url_parse.  The error message is translated.  */
 
-const char *
-url_error (int error_code)
+char *
+url_error (const char *url, int error_code)
 {
-  assert (error_code >= 0 && error_code < countof (parse_errors));
-  return _(parse_errors[error_code]);
+  assert (error_code >= 0 && ((size_t) error_code) < countof (parse_errors));
+
+  if (error_code == PE_UNSUPPORTED_SCHEME)
+    {
+      char *error, *p;
+      char *scheme = xstrdup (url);
+      assert (url_has_scheme (url));
+
+      if ((p = strchr (scheme, ':')))
+        *p = '\0';
+      if (!strcasecmp (scheme, "https"))
+        error = aprintf (_("HTTPS support not compiled in"));
+      else
+        error = aprintf (_(parse_errors[error_code]), quote (scheme));
+      xfree (scheme);
+
+      return error;
+    }
+  else
+    return xstrdup (_(parse_errors[error_code]));
 }
 
 /* Split PATH into DIR and FILE.  PATH comes from the URL and is
@@ -1226,7 +1291,9 @@ enum {
   filechr_control     = 4       /* a control character, e.g. 0-31 */
 };
 
-#define FILE_CHAR_TEST(c, mask) (filechr_table[(unsigned char)(c)] & (mask))
+#define FILE_CHAR_TEST(c, mask) \
+    ((opt.restrict_files_nonascii && !c_isascii ((unsigned char)(c))) || \
+    (filechr_table[(unsigned char)(c)] & (mask)))
 
 /* Shorthands for the table: */
 #define U filechr_not_unix
@@ -1365,7 +1432,7 @@ append_uri_pathel (const char *b, const char *e, bool escaped,
         }
       assert (q - TAIL (dest) == outlen);
     }
-  
+
   /* Perform inline case transformation if required.  */
   if (opt.restrict_files_case == restrict_lowercase
       || opt.restrict_files_case == restrict_uppercase)
@@ -1374,12 +1441,12 @@ append_uri_pathel (const char *b, const char *e, bool escaped,
       for (q = TAIL (dest); q < TAIL (dest) + outlen; ++q)
         {
           if (opt.restrict_files_case == restrict_lowercase)
-            *q = TOLOWER (*q);
+            *q = c_tolower (*q);
           else
-            *q = TOUPPER (*q);
+            *q = c_toupper (*q);
         }
     }
-          
+
   TAIL_INCR (dest, outlen);
 }
 
@@ -1431,10 +1498,16 @@ url_file_name (const struct url *u)
 
   const char *u_file, *u_query;
   char *fname, *unique;
+  char *index_filename = "index.html"; /* The default index file is index.html */
 
   fnres.base = NULL;
   fnres.size = 0;
   fnres.tail = 0;
+
+  /* If an alternative index file was defined, change index_filename */
+  if (opt.default_page)
+    index_filename = opt.default_page;
+
 
   /* Start with the directory prefix, if specified. */
   if (opt.dir_prefix)
@@ -1477,7 +1550,7 @@ url_file_name (const struct url *u)
   /* Add the file name. */
   if (fnres.tail)
     append_char ('/', &fnres);
-  u_file = *u->file ? u->file : "index.html";
+  u_file = *u->file ? u->file : index_filename;
   append_uri_pathel (u_file, u_file + strlen (u_file), false, &fnres);
 
   /* Append "?query" to the file name. */
@@ -1504,11 +1577,30 @@ url_file_name (const struct url *u)
 
   if ((opt.noclobber || opt.always_rest || opt.timestamping || opt.dirstruct)
       && !(file_exists_p (fname) && !file_non_directory_p (fname)))
-    return fname;
+    {
+      unique = fname;
+    }
+  else
+    {
+      unique = unique_name (fname, true);
+      if (unique != fname)
+        xfree (fname);
+    }
 
-  unique = unique_name (fname, true);
-  if (unique != fname)
-    xfree (fname);
+/* On VMS, alter the name as required. */
+#ifdef __VMS
+  {
+    char *unique2;
+
+    unique2 = ods_conform( unique);
+    if (unique2 != unique)
+      {
+        xfree (unique);
+        unique = unique2;
+      }
+  }
+#endif /* def __VMS */
+
   return unique;
 }
 
@@ -1927,7 +2019,7 @@ url_string (const struct url *url, enum url_auth_mode auth_mode)
 }
 
 /* Return true if scheme a is similar to scheme b.
- 
+
    Schemes are similar if they are equal.  If SSL is supported, schemes
    are also similar if one is http (SCHEME_HTTP) and the other is https
    (SCHEME_HTTPS).  */
@@ -1946,15 +2038,15 @@ schemes_are_similar_p (enum url_scheme a, enum url_scheme b)
 
 static int
 getchar_from_escaped_string (const char *str, char *c)
-{  
+{
   const char *p = str;
 
   assert (str && *str);
   assert (c);
-  
+
   if (p[0] == '%')
     {
-      if (!ISXDIGIT(p[1]) || !ISXDIGIT(p[2]))
+      if (!c_isxdigit(p[1]) || !c_isxdigit(p[2]))
         {
           *c = '%';
           return 1;
@@ -1996,12 +2088,12 @@ are_urls_equal (const char *u1, const char *u2)
   while (*p && *q
          && (pp = getchar_from_escaped_string (p, &ch1))
          && (qq = getchar_from_escaped_string (q, &ch2))
-         && (TOLOWER(ch1) == TOLOWER(ch2)))
+         && (c_tolower(ch1) == c_tolower(ch2)))
     {
       p += pp;
       q += qq;
     }
-  
+
   return (*p == 0 && *q == 0 ? true : false);
 }
 
@@ -2110,19 +2202,19 @@ test_append_uri_pathel()
   } test_array[] = {
     { "http://www.yoyodyne.com/path/", "somepage.html", false, "http://www.yoyodyne.com/path/somepage.html" },
   };
-  
-  for (i = 0; i < sizeof(test_array)/sizeof(test_array[0]); ++i) 
+
+  for (i = 0; i < sizeof(test_array)/sizeof(test_array[0]); ++i)
     {
       struct growable dest;
       const char *p = test_array[i].input;
-      
+
       memset (&dest, 0, sizeof (dest));
-      
+
       append_string (test_array[i].original_url, &dest);
       append_uri_pathel (p, p + strlen(p), test_array[i].escaped, &dest);
       append_char ('\0', &dest);
 
-      mu_assert ("test_append_uri_pathel: wrong result", 
+      mu_assert ("test_append_uri_pathel: wrong result",
                  strcmp (dest.base, test_array[i].expected_result) == 0);
     }
 
@@ -2145,10 +2237,10 @@ test_are_urls_equal()
     { "http://www.adomain.com/longer-path/", "http://www.adomain.com/path/",  false },
     { "http://www.adomain.com/path%2f", "http://www.adomain.com/path/",       false },
   };
-  
-  for (i = 0; i < sizeof(test_array)/sizeof(test_array[0]); ++i) 
+
+  for (i = 0; i < sizeof(test_array)/sizeof(test_array[0]); ++i)
     {
-      mu_assert ("test_are_urls_equal: wrong result", 
+      mu_assert ("test_are_urls_equal: wrong result",
                  are_urls_equal (test_array[i].url1, test_array[i].url2) == test_array[i].expected_result);
     }
 

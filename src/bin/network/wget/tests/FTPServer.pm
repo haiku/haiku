@@ -1,11 +1,10 @@
-#!/usr/bin/perl -w
-
 # Part of this code was borrowed from Richard Jones's Net::FTPServer
 # http://www.annexia.org/freeware/netftpserver
 
 package FTPServer;
 
 use strict;
+use warnings;
 
 use Cwd;
 use Socket;
@@ -20,36 +19,36 @@ my $GOT_SIGURG = 0;
 
 # connection states
 my %_connection_states = (
-    'NEWCONN'  => 0x01, 
-    'WAIT4PWD' => 0x02, 
+    'NEWCONN'  => 0x01,
+    'WAIT4PWD' => 0x02,
     'LOGGEDIN' => 0x04,
     'TWOSOCKS' => 0x08,
 );
 
 # subset of FTP commands supported by these server and the respective
 # connection states in which they are allowed
-my %_commands = ( 
+my %_commands = (
     # Standard commands from RFC 959.
     'CWD'  => $_connection_states{LOGGEDIN} |
-              $_connection_states{TWOSOCKS}, 
+              $_connection_states{TWOSOCKS},
 #   'EPRT' => $_connection_states{LOGGEDIN},
-#   'EPSV' => $_connection_states{LOGGEDIN}, 
-    'LIST' => $_connection_states{TWOSOCKS}, 
+#   'EPSV' => $_connection_states{LOGGEDIN},
+    'LIST' => $_connection_states{TWOSOCKS},
 #   'LPRT' => $_connection_states{LOGGEDIN},
-#   'LPSV' => $_connection_states{LOGGEDIN}, 
-    'PASS' => $_connection_states{WAIT4PWD}, 
-    'PASV' => $_connection_states{LOGGEDIN}, 
-    'PORT' => $_connection_states{LOGGEDIN}, 
+#   'LPSV' => $_connection_states{LOGGEDIN},
+    'PASS' => $_connection_states{WAIT4PWD},
+    'PASV' => $_connection_states{LOGGEDIN},
+    'PORT' => $_connection_states{LOGGEDIN},
     'PWD'  => $_connection_states{LOGGEDIN} |
-              $_connection_states{TWOSOCKS}, 
+              $_connection_states{TWOSOCKS},
     'QUIT' => $_connection_states{LOGGEDIN} |
-              $_connection_states{TWOSOCKS}, 
-    'REST' => $_connection_states{TWOSOCKS}, 
-    'RETR' => $_connection_states{TWOSOCKS}, 
+              $_connection_states{TWOSOCKS},
+    'REST' => $_connection_states{TWOSOCKS},
+    'RETR' => $_connection_states{TWOSOCKS},
     'SYST' => $_connection_states{LOGGEDIN},
     'TYPE' => $_connection_states{LOGGEDIN} |
               $_connection_states{TWOSOCKS},
-    'USER' => $_connection_states{NEWCONN}, 
+    'USER' => $_connection_states{NEWCONN},
     # From ftpexts Internet Draft.
     'SIZE' => $_connection_states{LOGGEDIN} |
               $_connection_states{TWOSOCKS},
@@ -62,136 +61,61 @@ my %_commands = (
 sub _CWD_command
 {
     my ($conn, $cmd, $path) = @_;
+    my $paths = $conn->{'paths'};
 
     local $_;
-    my $newdir = $conn->{dir};
-
-    # If the path starts with a "/" then it's an absolute path.
-    if (substr ($path, 0, 1) eq "/") {
-        $newdir = "";
-        $path =~ s,^/+,,;
-    }
+    my $new_path = FTPPaths::path_merge($conn->{'dir'}, $path);
 
     # Split the path into its component parts and process each separately.
-    my @elems = split /\//, $path;
-
-    foreach (@elems) {
-        if ($_ eq "" || $_ eq ".") { 
-            # Ignore these.
-            next;
-        } elsif ($_ eq "..") {
-            # Go to parent directory.
-            if ($newdir eq "") {
-                print {$conn->{socket}} "550 Directory not found.\r\n";
-                return;
-            }
-            $newdir = substr ($newdir, 0, rindex ($newdir, "/"));
-        } else {
-            # Go into subdirectory, if it exists.
-            $newdir .= ("/" . $_);
-            if (! -d $conn->{rootdir} . $newdir) {
-                print {$conn->{socket}} "550 Directory not found.\r\n";
-                return;
-            }
-        }
+    if (! $paths->dir_exists($new_path)) {
+        print {$conn->{socket}} "550 Directory not found.\r\n";
+        return;
     }
 
-    $conn->{dir} = $newdir;
+    $conn->{'dir'} = $new_path;
+    print {$conn->{socket}} "200 directory changed to $new_path.\r\n";
 }
 
 sub _LIST_command
 {
     my ($conn, $cmd, $path) = @_;
+    my $paths = $conn->{'paths'};
 
     # This is something of a hack. Some clients expect a Unix server
     # to respond to flags on the 'ls command line'. Remove these flags
     # and ignore them. This is particularly an issue with ncftp 2.4.3.
     $path =~ s/^-[a-zA-Z0-9]+\s?//;
 
-    my $dir = $conn->{dir};
+    my $dir = $conn->{'dir'};
 
     print STDERR "_LIST_command - dir is: $dir\n";
 
-    # Absolute path?
-    if (substr ($path, 0, 1) eq "/") {
-        $dir = "/";
-        $path =~ s,^/+,,;
-    }
-    
     # Parse the first elements of the path until we find the appropriate
     # working directory.
-    my @elems = split /\//, $path;
-    my ($wildcard, $filename);
     local $_;
 
-    for (my $i = 0; $i < @elems; ++$i) {
-        $_ = $elems[$i];
-        my $lastelement = $i == @elems-1;
-
-        if ($_ eq "" || $_ eq ".") { next } # Ignore these.
-        elsif ($_ eq "..") {
-            # Go to parent directory.
-            unless ($dir eq "/") {
-                $dir = substr ($dir, 0, rindex ($dir, "/"));
-            }
-        } else {
-            if (!$lastelement) { # These elements can only be directories.
-                unless (-d $conn->{rootdir} . $dir . $_) {
-                    print {$conn->{socket}} "550 File or directory not found.\r\n";
-                    return;
-                }
-                $dir .= $_;
-            } else { # It's the last element: check if it's a file, directory or wildcard.
-                if (-f $conn->{rootdir} . $dir . $_) { 
-                    # It's a file.
-                    $filename = $_;
-                } elsif (-d $conn->{rootdir} . $dir . $_) { 
-                    # It's a directory.
-                    $dir .= $_;
-                } elsif (/\*/ || /\?/) {
-                    # It is a wildcard.
-                    $wildcard = $_;
-                } else {
-                    print {$conn->{socket}} "550 File or directory not found.\r\n";
-                    return;
-                }
-            }
-        }
+    $dir = FTPPaths::path_merge($dir, $path);
+    my $listing = $paths->get_list($dir);
+    unless ($listing) {
+        print {$conn->{socket}} "550 File or directory not found.\r\n";
+        return;
     }
-    
+
     print STDERR "_LIST_command - dir is: $dir\n" if $log;
-    
+
     print {$conn->{socket}} "150 Opening data connection for file listing.\r\n";
 
     # Open a path back to the client.
     my $sock = __open_data_connection ($conn);
-
     unless ($sock) {
         print {$conn->{socket}} "425 Can't open data connection.\r\n";
         return;
     }
 
-    # If the path contains a directory name, extract it so that
-    # we can prefix it to every filename listed.
-    my $prefix = (($filename || $wildcard) && $path =~ /(.*\/).*/) ? $1 : "";
-    
-    print STDERR "_LIST_command - prefix is: $prefix\n" if $log;
-
-    # OK, we're either listing a full directory, listing a single
-    # file or listing a wildcard.
-    if ($filename) {            # Single file.
-        __list_file ($sock, $prefix . $filename);
-    } else {                    # Wildcard or full directory $dirh.
-        unless ($wildcard) {
-            # Synthesize (fake) "total" field for directory listing.
-            print $sock "total 1 \r\n";
-        }
-
-        foreach (__get_file_list ($conn->{rootdir} . $dir, $wildcard)) {
-            __list_file ($sock, $prefix . $_);
-        }
+    for my $item (@$listing) {
+        print $sock "$item\r\n";
     }
-    
+
     unless ($sock->close) {
         print {$conn->{socket}} "550 Error closing data connection: $!\r\n";
         return;
@@ -208,7 +132,7 @@ sub _PASS_command
 
     print STDERR "switching to LOGGEDIN state\n" if $log;
     $conn->{state} = $_connection_states{LOGGEDIN};
-    
+
     if ($conn->{username} eq "anonymous") {
         print {$conn->{socket}} "202 Anonymous user access is always granted.\r\n";
     } else {
@@ -219,7 +143,7 @@ sub _PASS_command
 sub _PASV_command
 {
     my ($conn, $cmd, $rest) = @_;
-    
+
     # Open a listening socket - but don't actually accept on it yet.
     "0" =~ /(0)/; # Perl 5.7 / IO::Socket::INET bug workaround.
     my $sock = IO::Socket::INET->new (LocalHost => '127.0.0.1',
@@ -246,7 +170,7 @@ sub _PASV_command
     my $p2 = $sockport % 256;
 
     $conn->{state} = $_connection_states{TWOSOCKS};
-    
+
     # We only accept connections from localhost.
     print {$conn->{socket}} "227 Entering Passive Mode (127,0,0,1,$p1,$p2)\r\n";
 }
@@ -294,7 +218,7 @@ sub _PORT_command
 sub _PWD_command
 {
     my ($conn, $cmd, $rest) = @_;
-    
+
     # See RFC 959 Appendix II and draft-ietf-ftpext-mlst-11.txt section 6.2.1.
     my $pathname = $conn->{dir};
     $pathname =~ s,/+$,, unless $pathname eq "/";
@@ -306,7 +230,7 @@ sub _PWD_command
 sub _REST_command
 {
     my ($conn, $cmd, $restart_from) = @_;
-    
+
     unless ($restart_from =~ /^([1-9][0-9]*|0)$/) {
         print {$conn->{socket}} "501 REST command needs a numeric argument.\r\n";
         return;
@@ -320,63 +244,18 @@ sub _REST_command
 sub _RETR_command
 {
     my ($conn, $cmd, $path) = @_;
-    
-    my $dir = $conn->{dir};
 
-    # Absolute path?
-    if (substr ($path, 0, 1) eq "/") {
-        $dir = "/";
-        $path =~ s,^/+,,;
-        $path = "." if $path eq "";
-    }
+    $path = FTPPaths::path_merge($conn->{dir}, $path);
+    my $info = $conn->{'paths'}->get_info($path);
 
-    # Parse the first elements of path until we find the appropriate
-    # working directory.
-    my @elems = split /\//, $path;
-    my $filename = pop @elems;
-
-    foreach (@elems) {
-        if ($_ eq "" || $_ eq ".") { 
-            next # Ignore these.
-        } elsif ($_ eq "..") {
-            # Go to parent directory.
-            unless ($dir eq "/") {
-                $dir = substr ($dir, 0, rindex ($dir, "/"));
-            }
-        } else {
-            unless (-d $conn->{rootdir} . $dir . $_) {
-                print {$conn->{socket}} "550 File or directory not found.\r\n";
-                return;
-            }
-            $dir .= $_;
-        }
-    }
-
-    unless (defined $filename && length $filename) {
-        print {$conn->{socket}} "550 File or directory not found.\r\n";
-	    return;
-    }
-
-    if ($filename eq "." || $filename eq "..") {
-        print {$conn->{socket}} "550 RETR command is not supported on directories.\r\n";
-	    return;
-    }
-    
-    my $fullname = $conn->{rootdir} . $dir . $filename;
-    unless (-f $fullname) {
-        print {$conn->{socket}} "550 RETR command is only supported on plain files.\r\n";
-        return;
-    }
-
-    # Try to open the file.
-    unless (open (FILE, '<', $fullname)) {
-        print {$conn->{socket}} "550 File or directory not found.\r\n";
+    unless ($info->{'_type'} eq 'f') {
+        print {$conn->{socket}} "550 File not found.\r\n";
         return;
     }
 
     print {$conn->{socket}} "150 Opening " .
         ($conn->{type} eq 'A' ? "ASCII mode" : "BINARY mode") .
-        " data connection for file $filename.\r\n";
+        " data connection.\r\n";
 
     # Open a path back to the client.
     my $sock = __open_data_connection ($conn);
@@ -386,26 +265,25 @@ sub _RETR_command
         return;
     }
 
+    my $content = $info->{'content'};
+
+    # Restart the connection from previous point?
+    if ($conn->{restart}) {
+        $content = substr($content, $conn->{restart});
+        $conn->{restart} = 0;
+    }
+
     # What mode are we sending this file in?
     unless ($conn->{type} eq 'A') # Binary type.
     {
         my ($r, $buffer, $n, $w);
 
-        # Restart the connection from previous point?
-        if ($conn->{restart}) {
-            # VFS seek method only required to support relative forward seeks
-            #
-            # In Perl = 5.00503, SEEK_CUR is exported by IO::Seekable,
-            # in Perl >= 5.6, SEEK_CUR is exported by both IO::Seekable
-            # and Fcntl. Hence we 'use IO::Seekable' at the top of the
-            # file to get this symbol reliably in both cases.
-            sysseek (FILE, $conn->{restart}, SEEK_CUR);
-            $conn->{restart} = 0;
-        }
 
         # Copy data.
-        while ($r = sysread (FILE, $buffer, 65536))
+        while ($buffer = substr($content, 0, 65536))
         {
+            $r = length $buffer;
+
             # Restart alarm clock timer.
             alarm $conn->{idle_timeout};
 
@@ -416,7 +294,6 @@ sub _RETR_command
                 # Cleanup and exit if there was an error.
                 unless (defined $w) {
                     close $sock;
-                    close FILE;
                     print {$conn->{socket}} "426 File retrieval error: $!. Data connection has been closed.\r\n";
                     return;
                 }
@@ -428,7 +305,6 @@ sub _RETR_command
             if ($GOT_SIGURG) {
                 $GOT_SIGURG = 0;
                 close $sock;
-                close FILE;
                 print {$conn->{socket}} "426 Transfer aborted. Data connection closed.\r\n";
                 return;
             }
@@ -437,21 +313,13 @@ sub _RETR_command
         # Cleanup and exit if there was an error.
         unless (defined $r) {
             close $sock;
-            close FILE;
             print {$conn->{socket}} "426 File retrieval error: $!. Data connection has been closed.\r\n";
             return;
         }
     } else { # ASCII type.
-        # Restart the connection from previous point?
-        if ($conn->{restart}) {
-            for (my $i = 0; $i < $conn->{restart}; ++$i) {
-                getc FILE;
-            }
-            $conn->{restart} = 0;
-        }
-
         # Copy data.
-        while (defined ($_ = <FILE>)) {
+        my @lines = split /\r\n?|\n/, $content;
+        for (@lines) {
             # Remove any native line endings.
             s/[\n\r]+$//;
 
@@ -465,14 +333,13 @@ sub _RETR_command
             if ($GOT_SIGURG) {
                 $GOT_SIGURG = 0;
                 close $sock;
-                close FILE;
                 print {$conn->{socket}} "426 Transfer aborted. Data connection closed.\r\n";
                 return;
             }
         }
     }
 
-    unless (close ($sock) && close (FILE)) {
+    unless (close ($sock)) {
         print {$conn->{socket}} "550 File retrieval error: $!.\r\n";
         return;
     }
@@ -483,67 +350,20 @@ sub _RETR_command
 sub _SIZE_command
 {
     my ($conn, $cmd, $path) = @_;
-    
-    my $dir = $conn->{dir};
 
-    # Absolute path?
-    if (substr ($path, 0, 1) eq "/") {
-        $dir = "/";
-        $path =~ s,^/+,,;
-        $path = "." if $path eq "";
-    }
-
-    # Parse the first elements of path until we find the appropriate
-    # working directory.
-    my @elems = split /\//, $path;
-    my $filename = pop @elems;
-
-    foreach (@elems) {
-        if ($_ eq "" || $_ eq ".") { 
-            next # Ignore these.
-        } elsif ($_ eq "..") {
-            # Go to parent directory.
-            unless ($dir eq "/") {
-                $dir = substr ($dir, 0, rindex ($dir, "/"));
-            }
-        } else {
-            unless (-d $conn->{rootdir} . $dir . $_) {
-                print {$conn->{socket}} "550 File or directory not found.\r\n";
-                return;
-            }
-            $dir .= $_;
-        }
-    }
-
-    unless (defined $filename && length $filename) {
+    $path = FTPPaths::path_merge($conn->{dir}, $path);
+    my $info = $conn->{'paths'}->get_info($path);
+    unless ($info) {
         print {$conn->{socket}} "550 File or directory not found.\r\n";
-	    return;
-    }
-
-    if ($filename eq "." || $filename eq "..") {
-        print {$conn->{socket}} "550 SIZE command is not supported on directories.\r\n";
-	    return;
-    }
-
-    my $fullname = $conn->{rootdir} . $dir . $filename;
-    unless (-f $fullname) {
-        print {$conn->{socket}} "550 SIZE command is only supported on plain files.\r\n";
         return;
     }
 
-    my $size = 0;
-    if ($conn->{type} eq 'A') {
-        # ASCII mode: we have to count the characters by hand.
-        unless (open (FILE, '<', $filename)) {
-            print {$conn->{socket}} "550 Cannot calculate size of $filename.\r\n";
-            return;
-        }
-        $size++ while (defined (getc(FILE)));
-        close FILE;
-    } else {
-        # BINARY mode: we can use stat
-        $size = (stat($filename))[7];
+    if ($info->{'_type'} eq 'd') {
+        print {$conn->{socket}} "550 SIZE command is not supported on directories.\r\n";
+        return;
     }
+
+    my $size = length $info->{'content'};
 
     print {$conn->{socket}} "213 $size\r\n";
 }
@@ -551,14 +371,14 @@ sub _SIZE_command
 sub _SYST_command
 {
     my ($conn, $cmd, $dummy) = @_;
-    
+
     print {$conn->{socket}} "215 UNIX Type: L8\r\n";
 }
 
 sub _TYPE_command
 {
     my ($conn, $cmd, $type) = @_;
-    
+
     # See RFC 959 section 5.3.2.
     if ($type =~ /^([AI])$/i) {
         $conn->{type} = 'A';
@@ -583,7 +403,7 @@ sub _USER_command
 
     print STDERR "switching to WAIT4PWD state\n" if $log;
     $conn->{state} = $_connection_states{WAIT4PWD};
-    
+
     if ($conn->{username} eq "anonymous") {
         print {$conn->{socket}} "230 Anonymous user access granted.\r\n";
     } else {
@@ -617,149 +437,27 @@ sub __open_data_connection
 }
 
 
-sub __list_file
-{
-    my $sock = shift;
-    my $filename = shift;
-
-    # Get the status information.
-    my ($dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size,
-        $atime, $mtime, $ctime, $blksize, $blocks)
-      = lstat $filename;
-
-    # If the file has been removed since we created this
-    # handle, then $dev will be undefined. Return immediately.
-    return unless defined $dev;
-
-    # Generate printable user/group.
-    my $user = getpwuid ($uid) || "-";
-    my $group = getgrgid ($gid) || "-";
-
-    # Permissions from mode.
-    my $perms = $mode & 0777;
-
-    # Work out the mode using special "_" operator which causes Perl
-    # to use the result of the previous stat call.
-    $mode = (-f _ ? 'f' :
-             (-d _ ? 'd' :
-              (-l _ ? 'l' :
-               (-p _ ? 'p' :
-                (-S _ ? 's' :
-                 (-b _ ? 'b' :
-                  (-c _ ? 'c' : '?')))))));
-
-    # Generate printable date (this logic is taken from GNU fileutils:
-    # src/ls.c: print_long_format).
-    my $time = time;
-    my $fmt;
-    if ($time > $mtime + 6 * 30 * 24 * 60 * 60 || $time < $mtime - 60 * 60) {
-        $fmt = "%b %e  %Y";
-    } else {
-        $fmt = "%b %e %H:%M";
-    }
-
-    my $fmt_time = strftime $fmt, localtime ($mtime);
-
-    # Generate printable permissions.
-    my $fmt_perms = join "",
-      ($perms & 0400 ? 'r' : '-'),
-      ($perms & 0200 ? 'w' : '-'),
-      ($perms & 0100 ? 'x' : '-'),
-      ($perms & 040 ? 'r' : '-'),
-      ($perms & 020 ? 'w' : '-'),
-      ($perms & 010 ? 'x' : '-'),
-      ($perms & 04 ? 'r' : '-'),
-      ($perms & 02 ? 'w' : '-'),
-      ($perms & 01 ? 'x' : '-');
-
-    # Printable file type.
-    my $fmt_mode = $mode eq 'f' ? '-' : $mode;
-
-    # If it's a symbolic link, display the link.
-    my $link;
-    if ($mode eq 'l') {
-        $link = readlink $filename;
-        die "readlink: $!" unless defined $link;
-    }
-    my $fmt_link = defined $link ? " -> $link" : "";
-
-    # Display the file.
-    my $line = sprintf
-      ("%s%s%4d %-8s %-8s %8d %s %s%s\r\n",
-       $fmt_mode,
-       $fmt_perms,
-       $nlink,
-       $user,
-       $group,
-       $size,
-       $fmt_time,
-       $filename,
-       $fmt_link);
-    $sock->print ($line);
-}
-
-
-sub __get_file_list
-{
-    my $dir = shift;
-    my $wildcard = shift;
-
-    opendir (DIRHANDLE, $dir)
-        or die "Cannot open directory!!!";
-
-    my @allfiles = readdir DIRHANDLE;
-    my @filenames = ();
-    
-    if ($wildcard) {
-        # Get rid of . and ..
-        @allfiles = grep !/^\.{1,2}$/, @allfiles;
-        
-        # Convert wildcard to a regular expression.
-        $wildcard = __wildcard_to_regex ($wildcard);
-
-        @filenames = grep /$wildcard/, @allfiles;
-    } else {
-        @filenames = @allfiles;
-    }
-
-    closedir (DIRHANDLE);
-
-    return sort @filenames;
-}
-
-
-sub __wildcard_to_regex
-{
-    my $wildcard = shift;
-
-    $wildcard =~ s,([^?*a-zA-Z0-9]),\\$1,g; # Escape punctuation.
-    $wildcard =~ s,\*,.*,g; # Turn * into .*
-    $wildcard =~ s,\?,.,g;  # Turn ? into .
-    $wildcard = "^$wildcard\$"; # Bracket it.
-
-    return $wildcard;
-}
-
-
 ###########################################################################
 # FTPSERVER CLASS
 ###########################################################################
 
 {
     my %_attr_data = ( # DEFAULT
-        _localAddr  => 'localhost',
-        _localPort  => 8021,
-        _reuseAddr  => 1,
-        _rootDir    => Cwd::getcwd(),
+        _input           => undef,
+        _localAddr       => 'localhost',
+        _localPort       => undef,
+        _reuseAddr       => 1,
+        _rootDir         => Cwd::getcwd(),
+        _server_behavior => {},
     );
-    
+
     sub _default_for
     {
         my ($self, $attr) = @_;
         $_attr_data{$attr};
     }
 
-    sub _standard_keys 
+    sub _standard_keys
     {
         keys %_attr_data;
     }
@@ -781,11 +479,21 @@ sub new {
             $self->{$attrname} = $self->_default_for($attrname);
         }
     }
+    # create server socket
+    "0" =~ /(0)/; # Perl 5.7 / IO::Socket::INET bug workaround.
+    $self->{_server_sock}
+                    = IO::Socket::INET->new (LocalHost => $self->{_localAddr},
+                                             LocalPort => $self->{_localPort},
+                                             Listen => 1,
+                                             Reuse => $self->{_reuseAddr},
+                                             Proto => 'tcp',
+                                             Type => SOCK_STREAM)
+                                        or die "bind: $!";
     return $self;
 }
 
 
-sub run 
+sub run
 {
     my ($self, $synch_callback) = @_;
     my $initialized = 0;
@@ -803,29 +511,21 @@ sub run
     my $old_ils = $/;
     $/ = "\r\n";
 
-    # create server socket
-    "0" =~ /(0)/; # Perl 5.7 / IO::Socket::INET bug workaround.
-    my $server_sock = IO::Socket::INET->new (LocalHost => $self->{_localAddr},
-                                             LocalPort => $self->{_localPort},
-                                             Listen => 1,
-                                             Reuse => $self->{_reuseAddr},
-                                             Proto => 'tcp',
-                                             Type => SOCK_STREAM) or die "bind: $!";
-
     if (!$initialized) {
         $synch_callback->();
         $initialized = 1;
     }
 
     $SIG{CHLD} = sub { wait };
+    my $server_sock = $self->{_server_sock};
 
     # the accept loop
     while (my $client_addr = accept (my $socket, $server_sock))
-    {    
+    {
         # turn buffering off on $socket
         select((select($socket), $|=1)[0]);
-        
-        # find out who connected    
+
+        # find out who connected
         my ($client_port, $client_ip) = sockaddr_in ($client_addr);
         my $client_ipnum = inet_ntoa ($client_ip);
 
@@ -833,18 +533,18 @@ sub run
         print STDERR "got a connection from: $client_ipnum\n" if $log;
 
         # fork off a process to handle this connection.
-        my $pid = fork();
-        unless (defined $pid) {
-            warn "fork: $!";
-            sleep 5; # Back off in case system is overloaded.
-            next;
-        }
+        # my $pid = fork();
+        # unless (defined $pid) {
+        #     warn "fork: $!";
+        #     sleep 5; # Back off in case system is overloaded.
+        #     next;
+        # }
 
-        if ($pid == 0) { # Child process.
+        if (1) { # Child process.
 
             # install signals
-            $SIG{URG}  = sub { 
-                $GOT_SIGURG  = 1; 
+            $SIG{URG}  = sub {
+                $GOT_SIGURG  = 1;
             };
 
             $SIG{PIPE} = sub {
@@ -856,21 +556,23 @@ sub run
                 print STDERR "Connection idle timeout expired. Closing server.\n";
                 exit;
             };
-            
+
             #$SIG{CHLD} = 'IGNORE';
 
 
             print STDERR "in child\n" if $log;
 
-            my $conn = { 
-                'socket'       => $socket, 
-                'state'        => $_connection_states{NEWCONN},
-                'dir'          => '/',
-                'restart'      => 0,
-                'idle_timeout' => 60, # 1 minute timeout
-                'rootdir'      => $self->{_rootDir},
+            my $conn = {
+                'paths'           => FTPPaths->new($self->{'_input'},
+                                        $self->{'_server_behavior'}),
+                'socket'          => $socket,
+                'state'           => $_connection_states{NEWCONN},
+                'dir'             => '/',
+                'restart'         => 0,
+                'idle_timeout'    => 60, # 1 minute timeout
+                'rootdir'         => $self->{_rootDir},
             };
-        
+
             print {$conn->{socket}} "220 GNU Wget Testing FTP Server ready.\r\n";
 
             # command handling loop
@@ -911,10 +613,17 @@ sub run
                     print {$conn->{socket}} "530 Not logged in.\r\n";
                     next;
                 }
-                
+
                 # Handle the QUIT command specially.
                 if ($cmd eq "QUIT") {
                     print {$conn->{socket}} "221 Goodbye. Service closing connection.\r\n";
+                    last;
+                }
+
+                if (defined ($self->{_server_behavior}{fail_on_pasv})
+                        && $cmd eq 'PASV') {
+                    undef $self->{_server_behavior}{fail_on_pasv};
+                    close $socket;
                     last;
                 }
 
@@ -924,12 +633,164 @@ sub run
         } else { # Father
             close $socket;
         }
-    } 
+    }
 
     $/ = $old_ils;
+}
+
+sub sockport {
+    my $self = shift;
+    return $self->{_server_sock}->sockport;
+}
+
+
+package FTPPaths;
+
+use POSIX qw(strftime);
+
+# not a method
+sub final_component {
+    my $path = shift;
+
+    $path =~ s|.*/||;
+    return $path;
+}
+
+# not a method
+sub path_merge {
+    my ($a, $b) = @_;
+
+    return $a unless $b;
+
+    if ($b =~ m.^/.) {
+        $a = '';
+        $b =~ s.^/..;
+    }
+    $a =~ s./$..;
+
+    my @components = split('/', $b);
+
+    foreach my $c (@components) {
+        if ($c =~ /^\.?$/) {
+            next;
+        } elsif ($c eq '..') {
+            next if $a eq '';
+            $a =~ s|/[^/]*$||;
+        } else {
+            $a .= "/$c";
+        }
+    }
+
+    return $a;
+}
+
+sub new {
+    my ($this, @args) = @_;
+    my $class = ref($this) || $this;
+    my $self = {};
+    bless $self, $class;
+    $self->initialize(@args);
+    return $self;
+}
+
+sub initialize {
+    my ($self, $urls, $behavior) = @_;
+    my $paths = {_type => 'd'};
+
+    # From a path like '/foo/bar/baz.txt', construct $paths such that
+    # $paths->{'foo'}->{'bar'}->{'baz.txt'} is
+    # $urls->{'/foo/bar/baz.txt'}.
+    for my $path (keys %$urls) {
+        my @components = split('/', $path);
+        shift @components;
+        my $x = $paths;
+        for my $c (@components) {
+            unless (exists $x->{$c}) {
+                $x->{$c} = {_type => 'd'};
+            }
+            $x = $x->{$c};
+        }
+        %$x = %{$urls->{$path}};
+        $x->{_type} = 'f';
+    }
+
+    $self->{'_paths'} = $paths;
+    $self->{'_behavior'} = $behavior;
+}
+
+sub get_info {
+    my ($self, $path, $node) = @_;
+    $node = $self->{'_paths'} unless $node;
+    my @components = split('/', $path);
+    shift @components if @components && $components[0] eq '';
+
+    for my $c (@components) {
+        if ($node->{'_type'} eq 'd') {
+            $node = $node->{$c};
+        } else {
+            return undef;
+        }
+    }
+    return $node;
+}
+
+sub dir_exists {
+    my ($self, $path) = @_;
+    return $self->exists($path, 'd');
+}
+
+sub exists {
+    # type is optional, in which case we don't check it.
+    my ($self, $path, $type) = @_;
+    my $paths = $self->{'_paths'};
+
+    die "Invalid path $path (not absolute).\n" unless $path =~ m.^/.;
+    my $info = $self->get_info($path);
+    return 0 unless defined($info);
+    return $info->{'_type'} eq $type if defined($type);
+    return 1;
+}
+
+sub _format_for_list {
+    my ($self, $name, $info) = @_;
+
+    # XXX: mode should be specifyable as part of the node info.
+    my $mode_str;
+    if ($info->{'_type'} eq 'd') {
+        $mode_str = 'dr-xr-xr-x';
+    } else {
+        $mode_str = '-r--r--r--';
+    }
+
+    my $size = 0;
+    if ($info->{'_type'} eq 'f') {
+        $size = length  $info->{'content'};
+        if ($self->{'_behavior'}{'bad_list'}) {
+            $size = 0;
+        }
+    }
+    my $date = strftime ("%b %e %H:%M", localtime);
+    return "$mode_str 1  0  0  $size $date $name";
+}
+
+sub get_list {
+    my ($self, $path) = @_;
+    my $info = $self->get_info($path);
+    return undef unless defined $info;
+    my $list = [];
+
+    if ($info->{'_type'} eq 'd') {
+        for my $item (keys %$info) {
+            next if $item =~ /^_/;
+            push @$list, $self->_format_for_list($item, $info->{$item});
+        }
+    } else {
+        push @$list, $self->_format_for_list(final_component($path), $info);
+    }
+
+    return $list;
 }
 
 1;
 
 # vim: et ts=4 sw=4
-

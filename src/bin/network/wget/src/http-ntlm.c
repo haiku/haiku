@@ -1,5 +1,6 @@
 /* NTLM code.
-   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation,
+   Inc.
    Contributed by Daniel Stenberg.
 
 This file is part of GNU Wget.
@@ -28,10 +29,10 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 /* NTLM details:
-   
+
    http://davenport.sourceforge.net/ntlm.html
    http://www.innovation.ch/java/ntlm.html
 
@@ -45,7 +46,6 @@ as that of the covered work.  */
 #include <openssl/md4.h>
 #include <openssl/opensslv.h>
 
-#include "wget.h"
 #include "utils.h"
 #include "http-ntlm.h"
 
@@ -122,7 +122,7 @@ ntlm_input (struct ntlmdata *ntlm, const char *header)
     return false;
 
   header += 4;
-  while (*header && ISSPACE(*header))
+  while (*header && c_isspace(*header))
     header++;
 
   if (*header)
@@ -246,9 +246,9 @@ mkhash(const char *password,
 
   if (len > 14)
     len = 14;
-  
+
   for (i=0; i<len; i++)
-    pw[i] = TOUPPER (password[i]);
+    pw[i] = c_toupper (password[i]);
 
   for (; i<14; i++)
     pw[i] = 0;
@@ -260,7 +260,7 @@ mkhash(const char *password,
     setup_des_key(pw, DESKEY(ks));
     DES_ecb_encrypt((DES_cblock *)magic, (DES_cblock *)lmbuffer,
                     DESKEY(ks), DES_ENCRYPT);
-  
+
     setup_des_key(pw+7, DESKEY(ks));
     DES_ecb_encrypt((DES_cblock *)magic, (DES_cblock *)(lmbuffer+8),
                     DESKEY(ks), DES_ENCRYPT);
@@ -324,7 +324,7 @@ ntlm_output (struct ntlmdata *ntlm, const char *user, const char *passwd,
 
   if(!passwd)
     passwd="";
-  
+
   switch(ntlm->state) {
   case NTLMSTATE_TYPE1:
   default: /* for the weird cases we (re)start here */
@@ -332,7 +332,7 @@ ntlm_output (struct ntlmdata *ntlm, const char *user, const char *passwd,
     domoff = hostoff + hostlen;
 
     DEBUGP (("Creating a type-1 NTLM message.\n"));
-    
+
     /* Create and send a type-1 message:
 
     Index Description          Content
@@ -385,7 +385,7 @@ ntlm_output (struct ntlmdata *ntlm, const char *user, const char *passwd,
 
     output = concat_strings ("NTLM ", base64, (char *) 0);
     break;
-    
+
   case NTLMSTATE_TYPE2:
     /* We received the type-2 already, create a type-3 message:
 
@@ -403,7 +403,7 @@ ntlm_output (struct ntlmdata *ntlm, const char *user, const char *passwd,
     52 (64) start of data block
 
     */
-  
+
   {
     int lmrespoff;
     int ntrespoff;
@@ -461,20 +461,20 @@ ntlm_output (struct ntlmdata *ntlm, const char *user, const char *passwd,
                      "%c%c"  /* domain allocated space */
                      "%c%c"  /* domain name offset */
                      "%c%c"  /* 2 zeroes */
-                    
+
                      "%c%c"  /* user length */
                      "%c%c"  /* user allocated space */
                      "%c%c"  /* user offset */
                      "%c%c"  /* 2 zeroes */
-                    
+
                      "%c%c"  /* host length */
                      "%c%c"  /* host allocated space */
                      "%c%c"  /* host offset */
                      "%c%c%c%c%c%c"  /* 6 zeroes */
-                    
+
                      "\xff\xff"  /* message length */
                      "%c%c"  /* 2 zeroes */
-                    
+
                      "\x01\x82" /* flags */
                      "%c%c"  /* 2 zeroes */
 
@@ -527,9 +527,9 @@ ntlm_output (struct ntlmdata *ntlm, const char *user, const char *passwd,
 
     /* Make sure that the user and domain strings fit in the target buffer
        before we copy them there. */
-    if(size + userlen + domlen >= sizeof(ntlmbuf))
+    if(((size_t) size + userlen + domlen) >= sizeof(ntlmbuf))
       return NULL;
-    
+
     memcpy(&ntlmbuf[size], domain, domlen);
     size += domlen;
 
@@ -543,7 +543,7 @@ ntlm_output (struct ntlmdata *ntlm, const char *user, const char *passwd,
     }
 
 #ifdef USE_NTRESPONSES
-    if(size < ((int)sizeof(ntlmbuf) - 0x18)) {      
+    if(size < ((int)sizeof(ntlmbuf) - 0x18)) {
       memcpy(&ntlmbuf[size], ntresp, 0x18);
       size += 0x18;
     }

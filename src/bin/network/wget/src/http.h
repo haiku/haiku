@@ -1,5 +1,6 @@
 /* Declarations for HTTP.
-   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation,
+   Inc.
 
 This file is part of GNU Wget.
 
@@ -33,7 +34,7 @@ as that of the covered work.  */
 struct url;
 
 uerr_t http_loop (struct url *, char **, char **, const char *, int *,
-		  struct url *);
+		  struct url *, struct iri *);
 void save_cookies (void);
 void http_cleanup (void);
 time_t http_atotm (const char *);

@@ -1,6 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
 use HTTPTest;
 
@@ -13,7 +14,7 @@ my $mainpage = <<EOF;
   <title>Main Page Title</title>
 </head>
 <body>
-  <a href="http://localhost:8080/subpage.php">Secondary Page</a>
+  <a href="http://localhost:{{port}}/subpage.php">Secondary Page</a>
 </body>
 </html>
 EOF
@@ -60,7 +61,7 @@ my %urls = (
     },
 );
 
-my $cmdline = $WgetTest::WGETPATH . " -d -r -nd -E -k -K http://localhost:8080/index.php";
+my $cmdline = $WgetTest::WGETPATH . " -d -r -nd -E -k -K http://localhost:{{port}}/index.php";
 
 my $expected_error_code = 0;
 
@@ -79,9 +80,9 @@ my %expected_downloaded_files = (
 ###############################################################################
 
 my $the_test = HTTPTest->new (name => "Test-E-k-K",
-                              input => \%urls, 
-                              cmdline => $cmdline, 
-                              errcode => $expected_error_code, 
+                              input => \%urls,
+                              cmdline => $cmdline,
+                              errcode => $expected_error_code,
                               output => \%expected_downloaded_files);
 exit $the_test->run();
 

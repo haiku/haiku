@@ -1,6 +1,6 @@
 /* File retrieval.
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,7 +39,7 @@ as that of the covered work.  */
 #include <string.h>
 #include <assert.h>
 
-#include "wget.h"
+#include "exits.h"
 #include "utils.h"
 #include "retr.h"
 #include "progress.h"
@@ -52,6 +52,8 @@ as that of the covered work.  */
 #include "hash.h"
 #include "convert.h"
 #include "ptimer.h"
+#include "html-url.h"
+#include "iri.h"
 
 /* Total size of downloaded files.  Used to enforce quota.  */
 SUM_SIZE_INT total_downloaded_bytes;
@@ -167,7 +169,18 @@ write_data (FILE *out, const char *buf, int bufsize, wgint *skip,
      performance: fast downloads will arrive in large 16K chunks
      (which stdio would write out immediately anyway), and slow
      downloads wouldn't be limited by disk speed.  */
+
+  /* 2005-04-20 SMS.
+     Perhaps it shouldn't hinder performance, but it sure does, at least
+     on VMS (more than 2X).  Rather than speculate on what it should or
+     shouldn't do, it might make more sense to test it.  Even better, it
+     might be nice to explain what possible benefit it could offer, as
+     it appears to be a clear invitation to poor performance with no
+     actual justification.  (Also, why 16K?  Anyone test other values?)
+  */
+#ifndef __VMS
   fflush (out);
+#endif /* ndef __VMS */
   return !ferror (out);
 }
 
@@ -226,7 +239,8 @@ fd_read_body (int fd, FILE *out, wgint toread, wgint startpos,
       /* If we're skipping STARTPOS bytes, pass 0 as the INITIAL
          argument to progress_create because the indicator doesn't
          (yet) know about "skipping" data.  */
-      progress = progress_create (skip ? 0 : startpos, startpos + toread);
+      wgint start = skip ? 0 : startpos;
+      progress = progress_create (start, start + toread);
       progress_interactive = progress_interactive_p (progress);
     }
 
@@ -393,7 +407,7 @@ fd_read_hunk (int fd, hunk_terminator_t terminator, long sizehint, long maxsize)
   char *hunk = xmalloc (bufsize);
   int tail = 0;                 /* tail position in HUNK */
 
-  assert (maxsize >= bufsize);
+  assert (!maxsize || maxsize >= bufsize);
 
   while (1)
     {
@@ -596,15 +610,17 @@ static char *getproxy (struct url *);
    multiple points. */
 
 uerr_t
-retrieve_url (const char *origurl, char **file, char **newloc,
-              const char *refurl, int *dt, bool recursive)
+retrieve_url (struct url * orig_parsed, const char *origurl, char **file,
+              char **newloc, const char *refurl, int *dt, bool recursive,
+              struct iri *iri, bool register_status)
 {
   uerr_t result;
   char *url;
   bool location_changed;
+  bool iri_fallbacked = 0;
   int dummy;
   char *mynewloc, *proxy;
-  struct url *u, *proxy_url;
+  struct url *u = orig_parsed, *proxy_url;
   int up_error_code;            /* url parse error code */
   char *local_file;
   int redirection_count = 0;
@@ -625,18 +641,11 @@ retrieve_url (const char *origurl, char **file, char **newloc,
   if (file)
     *file = NULL;
 
-  u = url_parse (url, &up_error_code);
-  if (!u)
-    {
-      logprintf (LOG_NOTQUIET, "%s: %s.\n", url, url_error (up_error_code));
-      xfree (url);
-      return URLERROR;
-    }
-
   if (!refurl)
     refurl = opt.referer;
 
  redirected:
+  /* (also for IRI fallbacking) */
 
   result = NOCONERROR;
   mynewloc = NULL;
@@ -646,15 +655,22 @@ retrieve_url (const char *origurl, char **file, char **newloc,
   proxy = getproxy (u);
   if (proxy)
     {
+      struct iri *pi = iri_new ();
+      set_uri_encoding (pi, opt.locale, true);
+      pi->utf8_encode = false;
+
       /* Parse the proxy URL.  */
-      proxy_url = url_parse (proxy, &up_error_code);
+      proxy_url = url_parse (proxy, &up_error_code, NULL, true);
       if (!proxy_url)
         {
+          char *error = url_error (proxy, up_error_code);
           logprintf (LOG_NOTQUIET, _("Error parsing proxy URL %s: %s.\n"),
-                     proxy, url_error (up_error_code));
+                     proxy, error);
           xfree (url);
+          xfree (error);
           RESTORE_POST_DATA;
-          return PROXERR;
+          result = PROXERR;
+          goto bail;
         }
       if (proxy_url->scheme != SCHEME_HTTP && proxy_url->scheme != u->scheme)
         {
@@ -662,7 +678,8 @@ retrieve_url (const char *origurl, char **file, char **newloc,
           url_free (proxy_url);
           xfree (url);
           RESTORE_POST_DATA;
-          return PROXERR;
+          result = PROXERR;
+          goto bail;
         }
     }
 
@@ -672,7 +689,7 @@ retrieve_url (const char *origurl, char **file, char **newloc,
 #endif
       || (proxy_url && proxy_url->scheme == SCHEME_HTTP))
     {
-      result = http_loop (u, &mynewloc, &local_file, refurl, dt, proxy_url);
+      result = http_loop (u, &mynewloc, &local_file, refurl, dt, proxy_url, iri);
     }
   else if (u->scheme == SCHEME_FTP)
     {
@@ -722,17 +739,28 @@ retrieve_url (const char *origurl, char **file, char **newloc,
       xfree (mynewloc);
       mynewloc = construced_newloc;
 
+      /* Reset UTF-8 encoding state, keep the URI encoding and reset
+         the content encoding. */
+      iri->utf8_encode = opt.enable_iri;
+      set_content_encoding (iri, NULL);
+      xfree_null (iri->orig_url);
+
       /* Now, see if this new location makes sense. */
-      newloc_parsed = url_parse (mynewloc, &up_error_code);
+      newloc_parsed = url_parse (mynewloc, &up_error_code, iri, true);
       if (!newloc_parsed)
         {
+          char *error = url_error (mynewloc, up_error_code);
           logprintf (LOG_NOTQUIET, "%s: %s.\n", escnonprint_uri (mynewloc),
-                     url_error (up_error_code));
-          url_free (u);
+                     error);
+          if (orig_parsed != u)
+            {
+              url_free (u);
+            }
           xfree (url);
           xfree (mynewloc);
+          xfree (error);
           RESTORE_POST_DATA;
-          return result;
+          goto bail;
         }
 
       /* Now mynewloc will become newloc_parsed->url, because if the
@@ -747,16 +775,23 @@ retrieve_url (const char *origurl, char **file, char **newloc,
           logprintf (LOG_NOTQUIET, _("%d redirections exceeded.\n"),
                      opt.max_redirect);
           url_free (newloc_parsed);
-          url_free (u);
+          if (orig_parsed != u)
+            {
+              url_free (u);
+            }
           xfree (url);
           xfree (mynewloc);
           RESTORE_POST_DATA;
-          return WRONGCODE;
+          result = WRONGCODE;
+          goto bail;
         }
 
       xfree (url);
       url = mynewloc;
-      url_free (u);
+      if (orig_parsed != u)
+        {
+          url_free (u);
+        }
       u = newloc_parsed;
 
       /* If we're being redirected from POST, we don't want to POST
@@ -770,8 +805,33 @@ retrieve_url (const char *origurl, char **file, char **newloc,
       goto redirected;
     }
 
-  if (local_file)
+  /* Try to not encode in UTF-8 if fetching failed */
+  if (!(*dt & RETROKF) && iri->utf8_encode)
     {
+      iri->utf8_encode = false;
+      if (orig_parsed != u)
+        {
+          url_free (u);
+        }
+      u = url_parse (origurl, NULL, iri, true);
+      if (u)
+        {
+          DEBUGP (("[IRI fallbacking to non-utf8 for %s\n", quote (url)));
+          url = xstrdup (u->url);
+          iri_fallbacked = 1;
+          goto redirected;
+        }
+      else
+          DEBUGP (("[Couldn't fallback to non-utf8 for %s\n", quote (url)));
+    }
+
+  if (local_file && *dt & RETROKF)
+    {
+      register_download (u->url, local_file);
+      if (redirection_count && 0 != strcmp (origurl, u->url))
+        register_redirection (origurl, u->url);
+      if (*dt & TEXTHTML)
+        register_html (u->url, local_file);
       if (*dt & RETROKF)
         {
           register_download (u->url, local_file);
@@ -779,6 +839,8 @@ retrieve_url (const char *origurl, char **file, char **newloc,
             register_redirection (origurl, u->url);
           if (*dt & TEXTHTML)
             register_html (u->url, local_file);
+          if (*dt & TEXTCSS)
+            register_css (u->url, local_file);
         }
     }
 
@@ -787,9 +849,12 @@ retrieve_url (const char *origurl, char **file, char **newloc,
   else
     xfree_null (local_file);
 
-  url_free (u);
+  if (orig_parsed != u)
+    {
+      url_free (u);
+    }
 
-  if (redirection_count)
+  if (redirection_count || iri_fallbacked)
     {
       if (newloc)
         *newloc = url;
@@ -805,6 +870,9 @@ retrieve_url (const char *origurl, char **file, char **newloc,
 
   RESTORE_POST_DATA;
 
+bail:
+  if (register_status)
+    inform_exit_status (result);
   return result;
 }
 
@@ -819,16 +887,65 @@ retrieve_from_file (const char *file, bool html, int *count)
 {
   uerr_t status;
   struct urlpos *url_list, *cur_url;
+  struct iri *iri = iri_new();
 
-  url_list = (html ? get_urls_html (file, NULL, NULL)
-              : get_urls_file (file));
+  char *input_file = NULL;
+  const char *url = file;
+
   status = RETROK;             /* Suppose everything is OK.  */
   *count = 0;                  /* Reset the URL count.  */
+
+  /* sXXXav : Assume filename and links in the file are in the locale */
+  set_uri_encoding (iri, opt.locale, true);
+  set_content_encoding (iri, opt.locale);
+
+  if (url_has_scheme (url))
+    {
+      int dt,url_err;
+      uerr_t status;
+      struct url * url_parsed = url_parse(url, &url_err, iri, true);
+
+      if (!url_parsed)
+        {
+          char *error = url_error (url, url_err);
+          logprintf (LOG_NOTQUIET, "%s: %s.\n", url, error);
+          xfree (error);
+          return URLERROR;
+        }
+
+      if (!opt.base_href)
+        opt.base_href = xstrdup (url);
+
+      status = retrieve_url (url_parsed, url, &input_file, NULL, NULL, &dt,
+                             false, iri, true);
+      if (status != RETROK)
+        return status;
+
+      if (dt & TEXTHTML)
+        html = true;
+
+      /* If we have a found a content encoding, use it.
+       * ( == is okay, because we're checking for identical object) */
+      if (iri->content_encoding != opt.locale)
+	  set_uri_encoding (iri, iri->content_encoding, false);
+
+      /* Reset UTF-8 encode status */
+      iri->utf8_encode = opt.enable_iri;
+      xfree_null (iri->orig_url);
+      iri->orig_url = NULL;
+    }
+  else
+    input_file = (char *) file;
+
+  url_list = (html ? get_urls_html (input_file, NULL, NULL, iri)
+              : get_urls_file (input_file));
 
   for (cur_url = url_list; cur_url; cur_url = cur_url->next, ++*count)
     {
       char *filename = NULL, *new_file = NULL;
       int dt;
+      struct iri *tmpiri = iri_dup (iri);
+      struct url *parsed_url = NULL;
 
       if (cur_url->ignore_when_downloading)
         continue;
@@ -838,21 +955,33 @@ retrieve_from_file (const char *file, bool html, int *count)
           status = QUOTEXC;
           break;
         }
+
+      /* Need to reparse the url, since it didn't have iri information. */
+      if (opt.enable_iri)
+          parsed_url = url_parse (cur_url->url->url, NULL, tmpiri, true);
+
       if ((opt.recursive || opt.page_requisites)
           && (cur_url->url->scheme != SCHEME_FTP || getproxy (cur_url->url)))
         {
           int old_follow_ftp = opt.follow_ftp;
 
           /* Turn opt.follow_ftp on in case of recursive FTP retrieval */
-          if (cur_url->url->scheme == SCHEME_FTP) 
+          if (cur_url->url->scheme == SCHEME_FTP)
             opt.follow_ftp = 1;
-          
-          status = retrieve_tree (cur_url->url->url);
+
+          status = retrieve_tree (parsed_url ? parsed_url : cur_url->url,
+                                  tmpiri);
 
           opt.follow_ftp = old_follow_ftp;
         }
       else
-        status = retrieve_url (cur_url->url->url, &filename, &new_file, NULL, &dt, opt.recursive);
+        status = retrieve_url (parsed_url ? parsed_url : cur_url->url,
+                               cur_url->url->url, &filename,
+                               &new_file, NULL, &dt, opt.recursive, tmpiri,
+                               true);
+
+      if (parsed_url)
+          url_free (parsed_url);
 
       if (filename && opt.delete_after && file_exists_p (filename))
         {
@@ -866,10 +995,13 @@ Removing file due to --delete-after in retrieve_from_file():\n"));
 
       xfree_null (new_file);
       xfree_null (filename);
+      iri_free (tmpiri);
     }
 
   /* Free the linked list of URL-s.  */
   free_urlpos (url_list);
+
+  iri_free (iri);
 
   return status;
 }
@@ -1020,14 +1152,12 @@ getproxy (struct url *u)
 /* Returns true if URL would be downloaded through a proxy. */
 
 bool
-url_uses_proxy (const char *url)
+url_uses_proxy (struct url * u)
 {
   bool ret;
-  struct url *u = url_parse (url, NULL);
   if (!u)
     return false;
   ret = getproxy (u) != NULL;
-  url_free (u);
   return ret;
 }
 
@@ -1039,4 +1169,17 @@ no_proxy_match (const char *host, const char **no_proxy)
     return false;
   else
     return sufmatch (no_proxy, host);
+}
+
+/* Set the file parameter to point to the local file string.  */
+void
+set_local_file (const char **file, const char *default_file)
+{
+  if (opt.output_document)
+    {
+      if (output_stream_regular)
+        *file = opt.output_document;
+    }
+  else
+    *file = default_file;
 }

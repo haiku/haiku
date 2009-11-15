@@ -1,6 +1,6 @@
 /* Declarations for retr.c.
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -31,6 +31,8 @@ as that of the covered work.  */
 #ifndef RETR_H
 #define RETR_H
 
+#include "url.h"
+
 /* These global vars should be made static to retr.c and exported via
    functions! */
 extern SUM_SIZE_INT total_downloaded_bytes;
@@ -51,7 +53,8 @@ typedef const char *(*hunk_terminator_t) (const char *, const char *, int);
 char *fd_read_hunk (int, hunk_terminator_t, long, long);
 char *fd_read_line (int);
 
-uerr_t retrieve_url (const char *, char **, char **, const char *, int *, bool);
+uerr_t retrieve_url (struct url *, const char *, char **, char **,
+                     const char *, int *, bool, struct iri *, bool);
 uerr_t retrieve_from_file (const char *, bool, int *);
 
 const char *retr_rate (wgint, double);
@@ -62,6 +65,8 @@ void sleep_between_retrievals (int);
 
 void rotate_backups (const char *);
 
-bool url_uses_proxy (const char *);
+bool url_uses_proxy (struct url *);
+
+void set_local_file (const char **, const char *);
 
 #endif /* RETR_H */

@@ -1,6 +1,6 @@
 /* Dirty system-dependent hacks.
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -34,12 +34,90 @@ as that of the covered work.  */
 #ifndef SYSDEP_H
 #define SYSDEP_H
 
+/* Testing for __sun is not enough because it's also defined on SunOS.  */
+#ifdef __sun
+# ifdef __SVR4
+#  define solaris
+# endif
+#endif
+
+#if defined(__INTERIX) && !defined(_ALL_SOURCE)
+# define _ALL_SOURCE
+#endif
+
+/* The "namespace tweaks" below attempt to set a friendly "compilation
+   environment" under popular operating systems.  Default compilation
+   environment often means that some functions that are "extensions"
+   are not declared -- `strptime' is one example.
+
+   But non-default environments can expose bugs in the system header
+   files, crippling compilation in _very_ non-obvious ways.  Because
+   of that, we define them only on well-tested architectures where we
+   know they will work.  */
+
+#undef NAMESPACE_TWEAKS
+
+#ifdef solaris
+# define NAMESPACE_TWEAKS
+#endif
+
+#if defined(__linux__) || defined(__GLIBC__)
+# define NAMESPACE_TWEAKS
+#endif
+
+#ifdef NAMESPACE_TWEAKS
+
+/* Request the "Unix 98 compilation environment". */
+#define _XOPEN_SOURCE 500
+
+/* For Solaris: request everything else that is available and doesn't
+   conflict with the above.  */
+/* #define __EXTENSIONS__ */ /* XXX clashes with config.h */
+
+/* For Linux: request features of 4.3BSD and SVID (System V Interface
+   Definition). */
+#define _SVID_SOURCE
+#define _BSD_SOURCE
+
+/* Under glibc-based systems we want all GNU extensions as well.  This
+   declares some unnecessary cruft, but also useful functions such as
+   timegm, FNM_CASEFOLD extension to fnmatch, memrchr, etc.  */
+/* #define _GNU_SOURCE */ /* XXX clashes with config.h */
+
+#endif /* NAMESPACE_TWEAKS */
+
+
+/* Alloca declaration, based on recommendation in the Autoconf manual.
+   These have to be after the above namespace tweaks, but before any
+   non-preprocessor code.  */
+
+#if HAVE_ALLOCA_H
+# include <alloca.h>
+#elif defined WINDOWS
+# include <malloc.h>
+# ifndef alloca
+#  define alloca _alloca
+# endif
+#elif defined __GNUC__
+# define alloca __builtin_alloca
+#elif defined _AIX
+# define alloca __alloca
+#else
+# include <stddef.h>
+# ifdef  __cplusplus
+extern "C"
+# endif
+void *alloca (size_t);
+#endif
+
 /* Must include these, so we can test for the missing stat macros and
    define them as necessary.  */
 #include <sys/types.h>
 #include <sys/stat.h>
 
 #ifdef HAVE_INTTYPES_H
+  /* Compaq C V6.5-303 (dtk) on HP Tru64 UNIX V5.1B (Rev. 2650) needs: */
+# include <stdint.h>
 # include <inttypes.h>
 #endif
 

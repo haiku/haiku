@@ -1,6 +1,6 @@
 /* Various utility functions.
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -81,13 +81,123 @@ as that of the covered work.  */
 # define USE_SIGNAL_TIMEOUT
 #endif
 
-#include "wget.h"
 #include "utils.h"
 #include "hash.h"
 
+#ifdef __VMS
+#include "vms.h"
+#endif /* def __VMS */
+
 #ifdef TESTING
 #include "test.h"
-#endif 
+#endif
+
+static void
+memfatal (const char *context, long attempted_size)
+{
+  /* Make sure we don't try to store part of the log line, and thus
+     call malloc.  */
+  log_set_save_context (false);
+
+  /* We have different log outputs in different situations:
+     1) output without bytes information
+     2) output with bytes information  */
+  if (attempted_size == UNKNOWN_ATTEMPTED_SIZE)
+    {
+      logprintf (LOG_ALWAYS,
+                 _("%s: %s: Failed to allocate enough memory; memory exhausted.\n"),
+                 exec_name, context);
+    }
+  else
+    {
+      logprintf (LOG_ALWAYS,
+                 _("%s: %s: Failed to allocate %ld bytes; memory exhausted.\n"),
+                 exec_name, context, attempted_size);
+    }
+
+  exit (1);
+}
+
+/* Character property table for (re-)escaping VMS ODS5 extended file
+   names.  Note that this table ignores Unicode.
+
+   ODS2 valid characters: 0-9 A-Z a-z $ - _ ~
+
+   ODS5 Invalid characters:
+      C0 control codes (0x00 to 0x1F inclusive)
+      Asterisk (*)
+      Question mark (?)
+
+   ODS5 Invalid characters only in VMS V7.2 (which no one runs, right?):
+      Double quotation marks (")
+      Backslash (\)
+      Colon (:)
+      Left angle bracket (<)
+      Right angle bracket (>)
+      Slash (/)
+      Vertical bar (|)
+
+   Characters escaped by "^":
+      SP  !  #  %  &  '  (  )  +  ,  .  ;  =  @  [  ]  ^  `  {  }  ~
+
+   Either "^_" or "^ " is accepted as a space.  Period (.) is a special
+   case.  Note that un-escaped < and > can also confuse a directory
+   spec.
+
+   Characters put out as ^xx:
+      7F (DEL)
+      80-9F (C1 control characters)
+      A0 (nonbreaking space)
+      FF (Latin small letter y diaeresis)
+
+   Other cases:
+      Unicode: "^Uxxxx", where "xxxx" is four hex digits.
+
+    Property table values:
+      Normal escape:    1
+      Space:            2
+      Dot:              4
+      Hex-hex escape:   8
+      ODS2 normal:     16
+      ODS2 lower case: 32
+      Hex digit:       64
+*/
+
+unsigned char char_prop[ 256] = {
+
+/* NUL SOH STX ETX EOT ENQ ACK BEL   BS  HT  LF  VT  FF  CR  SO  SI */
+    0,  0,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0,  0,  0,  0,  0,
+
+/* DLE DC1 DC2 DC3 DC4 NAK SYN ETB  CAN  EM SUB ESC  FS  GS  RS  US */
+    0,  0,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0,  0,  0,  0,  0,
+
+/*  SP  !   "   #   $   %   &   '    (   )   *   +   ,   -   .   /  */
+    2,  1,  0,  1, 16,  1,  1,  1,   1,  1,  0,  1,  1, 16,  4,  0,
+
+/*  0   1   2   3   4   5   6   7    8   9   :   ;   <   =   >   ?  */
+   80, 80, 80, 80, 80, 80, 80, 80,  80, 80,  0,  1,  1,  1,  1,  1,
+
+/*  @   A   B   C   D   E   F   G    H   I   J   K   L   M   N   O  */
+    1, 80, 80, 80, 80, 80, 80, 16,  16, 16, 16, 16, 16, 16, 16, 16,
+
+/*  P   Q   R   S   T   U   V   W    X   Y   Z   [   \   ]   ^   _  */
+   16, 16, 16, 16, 16, 16, 16, 16,  16, 16, 16,  1,  0,  1,  1, 16,
+
+/*  `   a   b   c   d   e   f   g    h   i   j   k   l   m   n   o  */
+    1, 96, 96, 96, 96, 96, 96, 32,  32, 32, 32, 32, 32, 32, 32, 32,
+
+/*  p   q   r   s   t   u   v   w    x   y   z   {   |   }   ~  DEL */
+   32, 32, 32, 32, 32, 32, 32, 32,  32, 32, 32,  1,  0,  1, 17,  8,
+
+    8,  8,  8,  8,  8,  8,  8,  8,   8,  8,  8,  8,  8,  8,  8,  8,
+    8,  8,  8,  8,  8,  8,  8,  8,   8,  8,  8,  8,  8,  8,  8,  8,
+    8,  0,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,   0,  0,  0,  0,  0,  0,  0,  8
+};
 
 /* Utility function: like xstrdup(), but also lowercases S.  */
 
@@ -97,7 +207,7 @@ xstrdup_lower (const char *s)
   char *copy = xstrdup (s);
   char *p = copy;
   for (; *p; p++)
-    *p = TOLOWER (*p);
+    *p = c_tolower (*p);
   return copy;
 }
 
@@ -136,7 +246,7 @@ sepstring (const char *s)
           res[++i] = NULL;
           ++s;
           /* Skip the blanks following the ','.  */
-          while (ISSPACE (*s))
+          while (c_isspace (*s))
             ++s;
           p = s;
         }
@@ -160,6 +270,13 @@ sepstring (const char *s)
    vsnprintf until the correct size is found.  Since Wget also ships a
    fallback implementation of vsnprintf, this should be portable.  */
 
+/* Constant is using for limits memory allocation for text buffer.
+   Applicable in situation when: vasprintf is not available in the system
+   and vsnprintf return -1 when long line is truncated (in old versions of
+   glibc and in other system where C99 doesn`t support) */
+
+#define FMT_MAX_LENGTH 1048576
+
 char *
 aprintf (const char *fmt, ...)
 {
@@ -172,7 +289,8 @@ aprintf (const char *fmt, ...)
   ret = vasprintf (&str, fmt, args);
   va_end (args);
   if (ret < 0 && errno == ENOMEM)
-    abort ();                   /* for consistency with xmalloc/xrealloc */
+    memfatal ("aprintf", UNKNOWN_ATTEMPTED_SIZE);  /* for consistency
+                                                      with xmalloc/xrealloc */
   else if (ret < 0)
     return NULL;
   return str;
@@ -202,8 +320,21 @@ aprintf (const char *fmt, ...)
       /* Else try again with a larger buffer. */
       if (n > -1)               /* C99 */
         size = n + 1;           /* precisely what is needed */
+      else if (size >= FMT_MAX_LENGTH)  /* We have a huge buffer, */
+        {                               /* maybe we have some wrong
+                                           format string? */
+          logprintf (LOG_ALWAYS,
+                     _("%s: aprintf: text buffer is too big (%ld bytes), "
+                       "aborting.\n"),
+                     exec_name, size);  /* printout a log message */
+          abort ();                     /* and abort... */
+        }
       else
-        size <<= 1;             /* twice the old size */
+        {
+          /* else, we continue to grow our
+           * buffer: Twice the old size. */
+          size <<= 1;
+        }
       str = xrealloc (str, size);
     }
 #endif /* not HAVE_VASPRINTF */
@@ -221,7 +352,7 @@ concat_strings (const char *str0, ...)
 
   const char *next_str;
   int total_length = 0;
-  int argcount;
+  size_t argcount;
 
   /* Calculate the length of and allocate the resulting string. */
 
@@ -294,6 +425,16 @@ datetime_str (time_t t)
 /* The Windows versions of the following two functions are defined in
    mswindows.c. On MSDOS this function should never be called. */
 
+#ifdef __VMS
+
+void
+fork_to_background (void)
+{
+  return;
+}
+
+#else /* def __VMS */
+
 #if !defined(WINDOWS) && !defined(MSDOS)
 void
 fork_to_background (void)
@@ -302,7 +443,7 @@ fork_to_background (void)
   /* Whether we arrange our own version of opt.lfilename here.  */
   bool logfile_changed = false;
 
-  if (!opt.lfilename)
+  if (!opt.lfilename && (!opt.quiet || opt.server_response))
     {
       /* We must create the file immediately to avoid either a race
          condition (which arises from using unique_name and failing to
@@ -328,7 +469,7 @@ fork_to_background (void)
       /* parent, no error */
       printf (_("Continuing in background, pid %d.\n"), (int) pid);
       if (logfile_changed)
-        printf (_("Output will be written to `%s'.\n"), opt.lfilename);
+        printf (_("Output will be written to %s.\n"), quote (opt.lfilename));
       exit (0);                 /* #### should we use _exit()? */
     }
 
@@ -339,6 +480,9 @@ fork_to_background (void)
   freopen ("/dev/null", "w", stderr);
 }
 #endif /* !WINDOWS && !MSDOS */
+
+#endif /* def __VMS [else] */
+
 
 /* "Touch" FILE, i.e. make its mtime ("modified time") equal the time
    specified with TM.  The atime ("access time") is set to the current
@@ -374,8 +518,8 @@ remove_link (const char *file)
       DEBUGP (("Unlinking %s (symlink).\n", file));
       err = unlink (file);
       if (err != 0)
-        logprintf (LOG_VERBOSE, _("Failed to unlink symlink `%s': %s\n"),
-                   file, strerror (errno));
+        logprintf (LOG_VERBOSE, _("Failed to unlink symlink %s: %s\n"),
+                   quote (file), strerror (errno));
     }
   return err;
 }
@@ -437,6 +581,14 @@ file_size (const char *filename)
 #endif
 }
 
+/* 2005-02-19 SMS.
+   If no UNIQ_SEP is defined (as on VMS), have unique_name() return the
+   original name.  With the VMS file systems' versioning, everything
+   should be fine, and appending ".NN" just causes trouble.
+*/
+
+#ifdef UNIQ_SEP
+
 /* stat file names named PREFIX.1, PREFIX.2, etc., until one that
    doesn't exist is found.  Return a freshly allocated copy of the
    unused file name.  */
@@ -450,7 +602,7 @@ unique_name_1 (const char *prefix)
   char *template_tail = template + plen;
 
   memcpy (template, prefix, plen);
-  *template_tail++ = '.';
+  *template_tail++ = UNIQ_SEP;
 
   do
     number_to_string (template_tail, count++);
@@ -464,6 +616,8 @@ unique_name_1 (const char *prefix)
    More precisely, if FILE doesn't exist, it is returned unmodified.
    If not, FILE.1 is tried, then FILE.2, etc.  The first FILE.<number>
    file name that doesn't exist is returned.
+
+   2005-02-19 SMS.  "." is now UNIQ_SEP, and may be different.
 
    The resulting file is not created, only verified that it didn't
    exist at the point in time when the function was called.
@@ -487,6 +641,20 @@ unique_name (const char *file, bool allow_passthrough)
      and return it.  */
   return unique_name_1 (file);
 }
+
+#else /* def UNIQ_SEP */
+
+/* Dummy unique_name() for VMS.  Return the original name as easily as
+   possible.
+*/
+char *
+unique_name (const char *file, bool allow_passthrough)
+{
+  /* Return the FILE itself, without modification, irregardful. */
+  return allow_passthrough ? (char *)file : xstrdup (file);
+}
+
+#endif /* def UNIQ_SEP [else] */
 
 /* Create a file based on NAME, except without overwriting an existing
    file with that name.  Providing O_EXCL is correctly implemented,
@@ -528,18 +696,67 @@ unique_create (const char *name, bool binary, char **opened_name)
    If opening the file fails for any reason, including the file having
    previously existed, this function returns NULL and sets errno
    appropriately.  */
-   
+
 FILE *
-fopen_excl (const char *fname, bool binary)
+fopen_excl (const char *fname, int binary)
 {
   int fd;
 #ifdef O_EXCL
+
+/* 2005-04-14 SMS.
+   VMS lacks O_BINARY, but makes up for it in weird and wonderful ways.
+   It also has file versions which obviate all the O_EXCL effort.
+   O_TRUNC (something of a misnomer) requests a new version.
+*/
+# ifdef __VMS
+/* Common open() optional arguments:
+   sequential access only, access callback function.
+*/
+#  define OPEN_OPT_ARGS "fop=sqo", "acc", acc_cb, &open_id
+
+  int open_id;
+  int flags = O_WRONLY | O_CREAT | O_TRUNC;
+
+  if (binary > 1)
+    {
+      open_id = 11;
+      fd = open( fname,                 /* File name. */
+       flags,                           /* Flags. */
+       0777,                            /* Mode for default protection. */
+       "ctx=bin,stm",                   /* Binary, stream access. */
+       "rfm=stmlf",                     /* Stream_LF. */
+       OPEN_OPT_ARGS);                  /* Access callback. */
+    }
+  else if (binary)
+    {
+      open_id = 12;
+      fd = open( fname,                 /* File name. */
+       flags,                           /* Flags. */
+       0777,                            /* Mode for default protection. */
+       "ctx=bin,stm",                   /* Binary, stream access. */
+       "rfm=fix",                       /* Fixed-length, */
+       "mrs=512",                       /* 512-byte records. */
+       OPEN_OPT_ARGS);                  /* Access callback. */
+    }
+  else
+    {
+      open_id = 13;
+      fd = open( fname,                 /* File name. */
+       flags,                           /* Flags. */
+       0777,                            /* Mode for default protection.
+*/
+       "rfm=stmlf",                     /* Stream_LF. */
+       OPEN_OPT_ARGS);                  /* Access callback. */
+    }
+# else /* def __VMS */
   int flags = O_WRONLY | O_CREAT | O_EXCL;
 # ifdef O_BINARY
   if (binary)
     flags |= O_BINARY;
 # endif
   fd = open (fname, flags, 0666);
+# endif /* def __VMS [else] */
+
   if (fd < 0)
     return NULL;
   return fdopen (fd, binary ? "wb" : "w");
@@ -637,10 +854,10 @@ fnmatch_nocase (const char *pattern, const char *string, int flags)
   char *strcopy = (char *) alloca (strlen (string) + 1);
   char *p;
   for (p = patcopy; *pattern; pattern++, p++)
-    *p = TOLOWER (*pattern);
+    *p = c_tolower (*pattern);
   *p = '\0';
   for (p = strcopy; *string; string++, p++)
-    *p = TOLOWER (*string);
+    *p = c_tolower (*string);
   *p = '\0';
   return fnmatch (patcopy, strcopy, flags);
 #endif
@@ -673,7 +890,7 @@ acceptable (const char *s)
 }
 
 /* Check if D2 is a subdirectory of D1.  E.g. if D1 is `/something', subdir_p()
-   will return true if and only if D2 begins with `/something/' or is exactly 
+   will return true if and only if D2 begins with `/something/' or is exactly
    '/something'.  */
 bool
 subdir_p (const char *d1, const char *d2)
@@ -684,9 +901,9 @@ subdir_p (const char *d1, const char *d2)
     for (; *d1 && *d2 && (*d1 == *d2); ++d1, ++d2)
       ;
   else
-    for (; *d1 && *d2 && (TOLOWER (*d1) == TOLOWER (*d2)); ++d1, ++d2)
+    for (; *d1 && *d2 && (c_tolower (*d1) == c_tolower (*d2)); ++d1, ++d2)
       ;
-  
+
   return *d1 == '\0' && (*d2 == '\0' || *d2 == '/');
 }
 
@@ -715,7 +932,7 @@ dir_matches_p (char **dirlist, const char *dir)
             break;
         }
     }
-      
+
   return *x ? true : false;
 }
 
@@ -769,7 +986,7 @@ match_tail (const char *string, const char *tail, bool fold_case)
   else
     {
       for (i = strlen (string), j = strlen (tail); i >= 0 && j >= 0; i--, j--)
-        if (TOLOWER (string[i]) != TOLOWER (tail[j]))
+        if (c_tolower (string[i]) != c_tolower (tail[j]))
           break;
     }
 
@@ -852,7 +1069,7 @@ has_wildcards_p (const char *s)
 /* Return true if FNAME ends with a typical HTML suffix.  The
    following (case-insensitive) suffixes are presumed to be HTML
    files:
-   
+
      html
      htm
      ?html (`?' matches one character)
@@ -1340,7 +1557,7 @@ human_readable (HR_NUMTYPE n)
       'E',                      /* exabyte,  2^60 bytes */
     };
   static char buf[8];
-  int i;
+  size_t i;
 
   /* If the quantity is smaller than 1K, just print it. */
   if (n < 1024)
@@ -1949,7 +2166,7 @@ base64_encode (const void *data, int length, char *dest)
    when end of string is reached.  */
 #define NEXT_CHAR(c, p) do {                    \
   c = (unsigned char) *p++;                     \
-} while (ISSPACE (c))
+} while (c_isspace (c))
 
 #define IS_ASCII(c) (((c) & 0x80) == 0)
 
@@ -2151,12 +2368,12 @@ test_subdir_p()
     { "/somedir", "/somedir/d2", true },
     { "/somedir/d1", "/somedir", false },
   };
-  
-  for (i = 0; i < countof(test_array); ++i) 
+
+  for (i = 0; i < countof(test_array); ++i)
     {
       bool res = subdir_p (test_array[i].d1, test_array[i].d2);
 
-      mu_assert ("test_subdir_p: wrong result", 
+      mu_assert ("test_subdir_p: wrong result",
                  res == test_array[i].result);
     }
 
@@ -2185,13 +2402,15 @@ test_dir_matches_p()
     { { "*/*COMPLETE", NULL, NULL }, "foo/!COMPLETE", true },
     { { "/dir with spaces", NULL, NULL }, "dir with spaces", true },
     { { "/dir*with*spaces", NULL, NULL }, "dir with spaces", true },
+    { { "/Tmp/has", NULL, NULL }, "/Tmp/has space", false },
+    { { "/Tmp/has", NULL, NULL }, "/Tmp/has,comma", false },
   };
-  
-  for (i = 0; i < countof(test_array); ++i) 
+
+  for (i = 0; i < countof(test_array); ++i)
     {
       bool res = dir_matches_p (test_array[i].dirlist, test_array[i].dir);
-      
-      mu_assert ("test_dir_matches_p: wrong result", 
+
+      mu_assert ("test_dir_matches_p: wrong result",
                  res == test_array[i].result);
     }
 

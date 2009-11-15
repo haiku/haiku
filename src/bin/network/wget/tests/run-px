@@ -1,0 +1,156 @@
+#!/usr/bin/env perl
+
+use 5.006;
+use strict;
+use warnings;
+
+use Term::ANSIColor;
+
+die "Please specify the top source directory.\n" if (!@ARGV);
+my $top_srcdir = shift @ARGV;
+
+my @tests = (
+    'Test-auth-basic.px',
+    'Test-auth-no-challenge.px',
+    'Test-auth-no-challenge-url.px',
+    'Test-auth-with-content-disposition.px',
+    'Test-cookies.px',
+    'Test-cookies-401.px',
+    'Test-proxy-auth-basic.px',
+    'Test-proxied-https-auth.px',
+    'Test-N-HTTP-Content-Disposition.px',
+    'Test--spider.px',
+    'Test-c-full.px',
+    'Test-c-partial.px',
+    'Test-c-shorter.px',
+    'Test-c.px',
+    'Test-E-k-K.px',
+    'Test-E-k.px',
+    'Test-ftp.px',
+    'Test-ftp-pasv-fail.px',
+    'Test-ftp-bad-list.px',
+    'Test-ftp-recursive.px',
+    'Test-ftp-iri.px',
+    'Test-ftp-iri-fallback.px',
+    'Test-ftp-iri-recursive.px',
+    'Test-ftp-iri-disabled.px',
+    'Test-HTTP-Content-Disposition-1.px',
+    'Test-HTTP-Content-Disposition-2.px',
+    'Test-HTTP-Content-Disposition.px',
+    'Test-idn-headers.px',
+    'Test-idn-meta.px',
+    'Test-idn-cmd.px',
+    'Test-idn-robots.px',
+    'Test-iri.px',
+    'Test-iri-percent.px',
+    'Test-iri-disabled.px',
+    'Test-iri-forced-remote.px',
+    'Test-iri-list.px',
+    'Test-k.px',
+    'Test-meta-robots.px',
+    'Test-N-current.px',
+    'Test-N-smaller.px',
+    'Test-N-no-info.px',
+    'Test-N--no-content-disposition.px',
+    'Test-N--no-content-disposition-trivial.px',
+    'Test--no-content-disposition.px',
+    'Test--no-content-disposition-trivial.px',
+    'Test-N-old.px',
+    'Test-nonexisting-quiet.px',
+    'Test-noop.px',
+    'Test-np.px',
+    'Test-N.px',
+    'Test-O-HTTP-Content-Disposition.px',
+    'Test-O--no-content-disposition.px',
+    'Test-O--no-content-disposition-trivial.px',
+    'Test-O-nonexisting.px',
+    'Test-O.px',
+    'Test-O-nc.px',
+    'Test-restrict-ascii.px',
+    'Test-Restrict-Lowercase.px',
+    'Test-Restrict-Uppercase.px',
+    'Test--spider-fail.px',
+    'Test--spider-r-HTTP-Content-Disposition.px',
+    'Test--spider-r--no-content-disposition.px',
+    'Test--spider-r--no-content-disposition-trivial.px',
+    'Test--spider-r.px',
+);
+
+foreach my $var (qw(SYSTEM_WGETRC WGETRC)) {
+    $ENV{$var} = '/dev/null';
+}
+
+my @tested;
+
+foreach my $test (@tests) {
+    print "Running $test\n\n";
+    system("$^X -I$top_srcdir/tests $top_srcdir/tests/$test $top_srcdir");
+    push @tested, { name => $test, result => $? >> 8 };
+}
+
+foreach my $var (qw(SYSTEM_WGETRC WGETRC)) {
+    delete $ENV{$var};
+}
+
+my %exit = (
+    pass    => 0,
+    fail    => 1,
+    skip    => 2,
+    unknown => 3, # or greater
+);
+
+my %colors = (
+    $exit{pass}    => colored('pass:',    'green'  ),
+    $exit{fail}    => colored('FAIL:',    'red'    ),
+    $exit{skip}    => colored('Skip:',    'yellow' ),
+    $exit{unknown} => colored('Unknown:', 'magenta'),
+);
+
+print "\n";
+foreach my $test (@tested) {
+    my $colored = exists $colors{$test->{result}}
+      ? $colors{$test->{result}}
+      : $colors{$exit{unknown}};
+    print "$colored $test->{name}\n";
+}
+
+my $count = sub
+{
+    return {
+      pass    => sub { scalar grep $_->{result} == $exit{pass},    @tested },
+      fail    => sub { scalar grep $_->{result} == $exit{fail},    @tested },
+      skip    => sub { scalar grep $_->{result} == $exit{skip},    @tested },
+      unknown => sub { scalar grep $_->{result} >= $exit{unknown}, @tested },
+    }->{$_[0]}->();
+};
+
+my $summary = sub
+{
+    my @lines = (
+        "${\scalar @tested} tests were run",
+        "${\$count->('pass')} PASS, ${\$count->('fail')} FAIL",
+        "${\$count->('skip')} SKIP, ${\$count->('unknown')} UNKNOWN",
+    );
+    my $len_longest = sub
+    {
+        local $_ = 0;
+        foreach my $line (@lines) {
+            if (length $line > $_) {
+                $_ = length $line;
+            }
+        }
+        return $_;
+    }->();
+    return join "\n",
+      '=' x $len_longest,
+      @lines,
+      '=' x $len_longest;
+}->();
+
+print "\n";
+print $count->('fail') || $count->('unknown')
+  ? colored($summary, 'red')
+  : colored($summary, 'green');
+print "\n";
+
+exit $count->('fail') + $count->('unknown');

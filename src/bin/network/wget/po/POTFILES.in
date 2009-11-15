@@ -1,25 +1,23 @@
 # List of files which containing translatable strings.
 # Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-# 2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+# 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 # Package source files
-src/cmpt.c
+lib/error.c
+lib/getopt.c
+lib/quotearg.c
+lib/xalloc-die.c
 src/connect.c
 src/convert.c
 src/cookies.c
-src/ftp-basic.c
 src/ftp-ls.c
-src/ftp-opie.c
 src/ftp.c
-src/gen-md5.c
-src/getopt.c
-src/gnu-md5.c
-src/hash.c
+src/gnutls.c
 src/host.c
-src/html-parse.c
 src/html-url.c
 src/http.c
 src/init.c
+src/iri.c
 src/log.c
 src/main.c
 src/mswindows.c
@@ -33,5 +31,3 @@ src/retr.c
 src/spider.c
 src/url.c
 src/utils.c
-src/version.c
-src/xmalloc.c

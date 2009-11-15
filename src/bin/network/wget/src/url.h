@@ -1,6 +1,6 @@
 /* Declarations for url.c.
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -83,9 +83,10 @@ struct url
 /* Function declarations */
 
 char *url_escape (const char *);
+char *url_escape_unsafe_and_reserved (const char *);
 
-struct url *url_parse (const char *, int *);
-const char *url_error (int);
+struct url *url_parse (const char *, int *, struct iri *iri, bool percent_encode);
+char *url_error (const char *, int);
 char *url_full_path (const struct url *);
 void url_set_dir (struct url *, const char *);
 void url_set_file (struct url *, const char *);

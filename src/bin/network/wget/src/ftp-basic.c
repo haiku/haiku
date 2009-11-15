@@ -1,6 +1,6 @@
 /* Basic FTP routines.
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -39,8 +39,6 @@ as that of the covered work.  */
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
-
-#include "wget.h"
 #include "utils.h"
 #include "connect.h"
 #include "host.h"
@@ -70,7 +68,7 @@ ftp_response (int fd, char **ret_line)
         return FTPRERR;
 
       /* Strip trailing CRLF before printing the line, so that
-         escnonprint doesn't include bogus \012 and \015. */
+         quotting doesn't include bogus \012 and \015. */
       p = strchr (line, '\0');
       if (p > line && p[-1] == '\n')
         *--p = '\0';
@@ -78,12 +76,13 @@ ftp_response (int fd, char **ret_line)
         *--p = '\0';
 
       if (opt.server_response)
-        logprintf (LOG_NOTQUIET, "%s\n", escnonprint (line));
+        logprintf (LOG_NOTQUIET, "%s\n",
+                   quotearg_style (escape_quoting_style, line));
       else
-        DEBUGP (("%s\n", escnonprint (line)));
+        DEBUGP (("%s\n", quotearg_style (escape_quoting_style, line)));
 
       /* The last line of output is the one that begins with "ddd ". */
-      if (ISDIGIT (line[0]) && ISDIGIT (line[1]) && ISDIGIT (line[2])
+      if (c_isdigit (line[0]) && c_isdigit (line[1]) && c_isdigit (line[2])
           && line[3] == ' ')
         {
           strncpy (ftp_last_respline, line, sizeof (ftp_last_respline));
@@ -118,7 +117,8 @@ ftp_request (const char *command, const char *value)
             if (*p == '\r' || *p == '\n')
               *p = ' ';
           DEBUGP (("\nDetected newlines in %s \"%s\"; changing to %s \"%s\"\n",
-                   command, escnonprint (value), command, escnonprint (defanged)));
+                   command, quotearg_style (escape_quoting_style, value),
+                   command, quotearg_style (escape_quoting_style, defanged)));
           /* Make VALUE point to the defanged copy of the string. */
           value = defanged;
         }
@@ -189,7 +189,7 @@ ftp_login (int csock, const char *acc, const char *pass)
       "331 s/key ",
       "331 opiekey "
     };
-    int i;
+    size_t i;
     const char *seed = NULL;
 
     for (i = 0; i < countof (skey_head); i++)
@@ -206,7 +206,7 @@ ftp_login (int csock, const char *acc, const char *pass)
         int skey_sequence = 0;
 
         /* Extract the sequence from SEED.  */
-        for (; ISDIGIT (*seed); seed++)
+        for (; c_isdigit (*seed); seed++)
           skey_sequence = 10 * skey_sequence + *seed - '0';
         if (*seed == ' ')
           ++seed;
@@ -246,7 +246,7 @@ ftp_login (int csock, const char *acc, const char *pass)
 }
 
 static void
-ip_address_to_port_repr (const ip_address *addr, int port, char *buf, 
+ip_address_to_port_repr (const ip_address *addr, int port, char *buf,
                          size_t buflen)
 {
   unsigned char *ptr;
@@ -322,7 +322,7 @@ ftp_port (int csock, int *local_sock)
 
 #ifdef ENABLE_IPV6
 static void
-ip_address_to_lprt_repr (const ip_address *addr, int port, char *buf, 
+ip_address_to_lprt_repr (const ip_address *addr, int port, char *buf,
                          size_t buflen)
 {
   unsigned char *ptr = IP_INADDR_DATA (addr);
@@ -331,18 +331,18 @@ ip_address_to_lprt_repr (const ip_address *addr, int port, char *buf,
   assert (buflen >= 21 * 4);
 
   /* Construct the argument of LPRT (of the form af,n,h1,h2,...,hn,p1,p2). */
-  switch (addr->family) 
+  switch (addr->family)
     {
-    case AF_INET: 
-      snprintf (buf, buflen, "%d,%d,%d,%d,%d,%d,%d,%d,%d", 4, 4, 
+    case AF_INET:
+      snprintf (buf, buflen, "%d,%d,%d,%d,%d,%d,%d,%d,%d", 4, 4,
                 ptr[0], ptr[1], ptr[2], ptr[3], 2,
                 (port & 0xff00) >> 8, port & 0xff);
       break;
-    case AF_INET6: 
+    case AF_INET6:
       snprintf (buf, buflen,
                 "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
                 6, 16,
-                ptr[0], ptr[1], ptr[2], ptr[3], ptr[4], ptr[5], ptr[6], ptr[7], 
+                ptr[0], ptr[1], ptr[2], ptr[3], ptr[4], ptr[5], ptr[6], ptr[7],
                 ptr[8], ptr[9], ptr[10], ptr[11], ptr[12], ptr[13], ptr[14], ptr[15],
                 2, (port & 0xff00) >> 8, port & 0xff);
       break;
@@ -410,15 +410,15 @@ ftp_lprt (int csock, int *local_sock)
 }
 
 static void
-ip_address_to_eprt_repr (const ip_address *addr, int port, char *buf, 
+ip_address_to_eprt_repr (const ip_address *addr, int port, char *buf,
                          size_t buflen)
 {
   int afnum;
 
-  /* buf must contain the argument of EPRT (of the form |af|addr|port|). 
-   * 4 chars for the | separators, INET6_ADDRSTRLEN chars for addr  
+  /* buf must contain the argument of EPRT (of the form |af|addr|port|).
+   * 4 chars for the | separators, INET6_ADDRSTRLEN chars for addr
    * 1 char for af (1-2) and 5 chars for port (0-65535) */
-  assert (buflen >= 4 + INET6_ADDRSTRLEN + 1 + 5); 
+  assert (buflen >= 4 + INET6_ADDRSTRLEN + 1 + 5);
 
   /* Construct the argument of EPRT (of the form |af|addr|port|). */
   afnum = (addr->family == AF_INET ? 1 : 2);
@@ -437,8 +437,8 @@ ftp_eprt (int csock, int *local_sock)
   ip_address addr;
   int nwritten;
   int port;
-  /* Must contain the argument of EPRT (of the form |af|addr|port|). 
-   * 4 chars for the | separators, INET6_ADDRSTRLEN chars for addr  
+  /* Must contain the argument of EPRT (of the form |af|addr|port|).
+   * 4 chars for the | separators, INET6_ADDRSTRLEN chars for addr
    * 1 char for af (1-2) and 5 chars for port (0-65535) */
   char bytes[4 + INET6_ADDRSTRLEN + 1 + 5 + 1];
 
@@ -522,14 +522,14 @@ ftp_pasv (int csock, ip_address *addr, int *port)
     }
   /* Parse the request.  */
   s = respline;
-  for (s += 4; *s && !ISDIGIT (*s); s++)
+  for (s += 4; *s && !c_isdigit (*s); s++)
     ;
   if (!*s)
     return FTPINVPASV;
   for (i = 0; i < 6; i++)
     {
       tmp[i] = 0;
-      for (; ISDIGIT (*s); s++)
+      for (; c_isdigit (*s); s++)
         tmp[i] = (*s - '0') + 10 * tmp[i];
       if (*s == ',')
         s++;
@@ -587,18 +587,18 @@ ftp_lpsv (int csock, ip_address *addr, int *port)
     {
       xfree (respline);
       return FTPNOPASV;
-    }  
+    }
 
   /* Parse the response.  */
   s = respline;
-  for (s += 4; *s && !ISDIGIT (*s); s++)
+  for (s += 4; *s && !c_isdigit (*s); s++)
     ;
   if (!*s)
     return FTPINVPASV;
 
   /* First, get the address family */
   af = 0;
-  for (; ISDIGIT (*s); s++)
+  for (; c_isdigit (*s); s++)
     af = (*s - '0') + 10 * af;
 
   if (af != 4 && af != 6)
@@ -615,7 +615,7 @@ ftp_lpsv (int csock, ip_address *addr, int *port)
 
   /* Then, get the address length */
   addrlen = 0;
-  for (; ISDIGIT (*s); s++)
+  for (; c_isdigit (*s); s++)
     addrlen = (*s - '0') + 10 * addrlen;
 
   if (!*s || *s++ != ',')
@@ -641,7 +641,7 @@ ftp_lpsv (int csock, ip_address *addr, int *port)
   for (i = 0; i < addrlen; i++)
     {
       tmp[i] = 0;
-      for (; ISDIGIT (*s); s++)
+      for (; c_isdigit (*s); s++)
         tmp[i] = (*s - '0') + 10 * tmp[i];
       if (*s == ',')
         s++;
@@ -654,7 +654,7 @@ ftp_lpsv (int csock, ip_address *addr, int *port)
 
   /* Now, get the port length */
   portlen = 0;
-  for (; ISDIGIT (*s); s++)
+  for (; c_isdigit (*s); s++)
     portlen = (*s - '0') + 10 * portlen;
 
   if (!*s || *s++ != ',')
@@ -671,7 +671,7 @@ ftp_lpsv (int csock, ip_address *addr, int *port)
 
   /* Finally, we get the port number */
   tmpprt[0] = 0;
-  for (; ISDIGIT (*s); s++)
+  for (; c_isdigit (*s); s++)
     tmpprt[0] = (*s - '0') + 10 * tmpprt[0];
 
   if (!*s || *s++ != ',')
@@ -681,7 +681,7 @@ ftp_lpsv (int csock, ip_address *addr, int *port)
     }
 
   tmpprt[1] = 0;
-  for (; ISDIGIT (*s); s++)
+  for (; c_isdigit (*s); s++)
     tmpprt[1] = (*s - '0') + 10 * tmpprt[1];
 
   assert (s != NULL);
@@ -750,7 +750,7 @@ ftp_epsv (int csock, ip_address *ip, int *port)
     {
       xfree (respline);
       return FTPNOPASV;
-    }  
+    }
 
   assert (respline != NULL);
 
@@ -765,7 +765,7 @@ ftp_epsv (int csock, ip_address *ip, int *port)
     {
       xfree (respline);
       return FTPINVPASV;
-    }  
+    }
 
   /* Skip the first two void fields */
   s = start + 1;
@@ -774,26 +774,26 @@ ftp_epsv (int csock, ip_address *ip, int *port)
     {
       xfree (respline);
       return FTPINVPASV;
-    }  
+    }
 
   for (i = 0; i < 2; i++)
     {
-      if (*s++ != delim) 
+      if (*s++ != delim)
         {
           xfree (respline);
         return FTPINVPASV;
-        }  
+        }
     }
 
   /* Finally, get the port number */
-  tport = 0; 
-  for (i = 1; ISDIGIT (*s); s++) 
+  tport = 0;
+  for (i = 1; c_isdigit (*s); s++)
     {
       if (i > 5)
         {
           xfree (respline);
           return FTPINVPASV;
-        }  
+        }
       tport = (*s - '0') + 10 * tport;
     }
 
@@ -802,13 +802,13 @@ ftp_epsv (int csock, ip_address *ip, int *port)
     {
       xfree (respline);
       return FTPINVPASV;
-    }  
+    }
 
   if (*s++ != ')')
     {
       xfree (respline);
       return FTPINVPASV;
-    }  
+    }
 
   *port = tport;
 
@@ -958,16 +958,23 @@ ftp_retr (int csock, const char *file)
 /* Sends the LIST command to the server.  If FILE is NULL, send just
    `LIST' (no space).  */
 uerr_t
-ftp_list (int csock, const char *file)
+ftp_list (int csock, const char *file, enum stype rs)
 {
   char *request, *respline;
   int nwritten;
   uerr_t err;
   bool ok = false;
-  int i = 0;
+  size_t i = 0;
   /* Try `LIST -a' first and revert to `LIST' in case of failure.  */
-  const char *list_commands[] = { "LIST -a", 
+  const char *list_commands[] = { "LIST -a",
                                   "LIST" };
+
+  /* 2008-01-29  SMS.  For a VMS FTP server, where "LIST -a" may not
+     fail, but will never do what is desired here, skip directly to the
+     simple "LIST" command (assumed to be the last one in the list).
+  */
+  if (rs == ST_VMS)
+    i = countof (list_commands)- 1;
 
   do {
     /* Send request.  */
@@ -992,7 +999,7 @@ ftp_list (int csock, const char *file)
             err = FTPOK;
             ok = true;
           }
-        else 
+        else
           {
             err = FTPRERR;
           }
@@ -1000,7 +1007,7 @@ ftp_list (int csock, const char *file)
       }
     ++i;
   } while (i < countof (list_commands) && !ok);
-  
+
   return err;
 }
 
@@ -1135,9 +1142,9 @@ ftp_size (int csock, const char *file, wgint *size)
     }
   if (*respline == '5')
     {
-      /* 
+      /*
        * Probably means SIZE isn't supported on this server.
-       * Error is nonfatal since SIZE isn't in RFC 959 
+       * Error is nonfatal since SIZE isn't in RFC 959
        */
       xfree (respline);
       *size = 0;
@@ -1148,7 +1155,7 @@ ftp_size (int csock, const char *file, wgint *size)
   *size = str_to_wgint (respline + 4, NULL, 10);
   if (errno)
     {
-      /* 
+      /*
        * Couldn't parse the response for some reason.  On the (few)
        * tests I've done, the response is 213 <SIZE> with nothing else -
        * maybe something a bit more resilient is necessary.  It's not a
@@ -1172,7 +1179,7 @@ ftp_process_type (const char *params)
   if (params
       && 0 == strncasecmp (params, "type=", 5)
       && params[5] != '\0')
-    return TOUPPER (params[5]);
+    return c_toupper (params[5]);
   else
     return 'I';
 }

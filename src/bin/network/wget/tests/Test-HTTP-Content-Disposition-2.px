@@ -1,6 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
 use HTTPTest;
 
@@ -37,7 +38,7 @@ my %urls = (
     },
 );
 
-my $cmdline = $WgetTest::WGETPATH . " --no-content-disposition http://localhost:8080/dummy.html";
+my $cmdline = $WgetTest::WGETPATH . " --no-content-disposition http://localhost:{{port}}/dummy.html";
 
 my $expected_error_code = 0;
 
@@ -65,9 +66,9 @@ my %expected_downloaded_files = (
 ###############################################################################
 
 my $the_test = HTTPTest->new (name => "Test-HTTP-Content-Disposition-2",
-                              input => \%urls, 
-                              cmdline => $cmdline, 
-                              errcode => $expected_error_code, 
+                              input => \%urls,
+                              cmdline => $cmdline,
+                              errcode => $expected_error_code,
                               existing => \%existing_files,
                               output => \%expected_downloaded_files);
 exit $the_test->run();

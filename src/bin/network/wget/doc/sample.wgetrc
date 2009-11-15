@@ -6,7 +6,7 @@
 ## avoid having to type many many command-line options. This file does
 ## not contain a comprehensive list of commands -- look at the manual
 ## to find out what you can put into this file.
-## 
+##
 ## Wget initialization file can reside in /usr/local/etc/wgetrc
 ## (global, for all users) or $HOME/.wgetrc (for a single user).
 ##
@@ -49,7 +49,7 @@
 # downloads, set waitretry to maximum number of seconds to wait (Wget
 # will use "linear backoff", waiting 1 second after the first failure
 # on a file, 2 seconds after the second failure, etc. up to this max).
-waitretry = 10
+#waitretry = 10
 
 
 ##
@@ -73,8 +73,9 @@ waitretry = 10
 # is *not* sent by default.
 #header = Accept-Language: en
 
-# You can set the default proxies for Wget to use for http and ftp.
+# You can set the default proxies for Wget to use for http, https, and ftp.
 # They will override the value in the environment.
+#https_proxy = http://proxy.yoyodyne.com:18023/
 #http_proxy = http://proxy.yoyodyne.com:18023/
 #ftp_proxy = http://proxy.yoyodyne.com:18023/
 
@@ -110,3 +111,15 @@ waitretry = 10
 # To have Wget follow FTP links from HTML files by default, set this
 # to on:
 #follow_ftp = off
+
+# To try ipv6 addresses first:
+#prefer-family = IPv6
+
+# Set default IRI support state
+#iri = off
+
+# Force the default system encoding
+#locale = UTF-8
+
+# Force the default remote server encoding
+#remoteencoding = UTF-8

@@ -1,6 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
 use HTTPTest;
 
@@ -14,7 +15,7 @@ my $mainpage = <<EOF;
 </head>
 <body>
   <p>
-    Some text and a link to a <a href="http://localhost:8080/firstlevel/secondpage.html">second page</a>.
+    Some text and a link to a <a href="http://localhost:{{port}}/firstlevel/secondpage.html">second page</a>.
   </p>
 </body>
 </html>
@@ -27,7 +28,7 @@ my $secondpage = <<EOF;
 </head>
 <body>
   <p>
-    Some text and a link to a <a href="http://localhost:8080/firstlevel/lowerlevel/thirdpage.html">third page</a>.
+    Some text and a link to a <a href="http://localhost:{{port}}/firstlevel/lowerlevel/thirdpage.html">third page</a>.
   </p>
 </body>
 </html>
@@ -40,7 +41,7 @@ my $thirdpage = <<EOF;
 </head>
 <body>
   <p>
-    Some text and a link to a <a href="http://localhost:8080/higherlevelpage.html">higher level page</a>.
+    Some text and a link to a <a href="http://localhost:{{port}}/higherlevelpage.html">higher level page</a>.
   </p>
 </body>
 </html>
@@ -54,7 +55,7 @@ my $fourthpage = <<EOF;
 <body>
   <p>
     This page is only linked by the higher level page. Therefore, it should not
-    be downloaded. 
+    be downloaded.
   </p>
 </body>
 </html>
@@ -68,8 +69,8 @@ my $higherlevelpage = <<EOF;
 <body>
   <p>
     This page is on a higher level in the URL path hierarchy. Therefore, it
-    should not be downloaded. Wget should not visit the following link to a 
-    <a href="http://localhost:8080/firstlevel/fourthpage.html">fourth page</a>.
+    should not be downloaded. Wget should not visit the following link to a
+    <a href="http://localhost:{{port}}/firstlevel/fourthpage.html">fourth page</a>.
   </p>
 </body>
 </html>
@@ -119,7 +120,7 @@ my %urls = (
     },
 );
 
-my $cmdline = $WgetTest::WGETPATH . " -np -nH -r http://localhost:8080/firstlevel/";
+my $cmdline = $WgetTest::WGETPATH . " -np -nH -r http://localhost:{{port}}/firstlevel/";
 
 my $expected_error_code = 0;
 
@@ -138,9 +139,9 @@ my %expected_downloaded_files = (
 ###############################################################################
 
 my $the_test = HTTPTest->new (name => "Test-np",
-                              input => \%urls, 
-                              cmdline => $cmdline, 
-                              errcode => $expected_error_code, 
+                              input => \%urls,
+                              cmdline => $cmdline,
+                              errcode => $expected_error_code,
                               output => \%expected_downloaded_files);
 exit $the_test->run();
 

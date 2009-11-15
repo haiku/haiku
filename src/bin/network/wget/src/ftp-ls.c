@@ -1,6 +1,6 @@
 /* Parsing FTP `ls' output.
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc. 
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,8 +38,6 @@ as that of the covered work.  */
 #endif
 #include <errno.h>
 #include <time.h>
-
-#include "wget.h"
 #include "utils.h"
 #include "ftp.h"
 #include "url.h"
@@ -74,12 +72,13 @@ static int
 clean_line(char *line)
 {
   int len = strlen (line);
-  if (!len) return 0; 
+  if (!len) return 0;
   if (line[len - 1] == '\n')
     line[--len] = '\0';
+  if (!len) return 0;
   if (line[len - 1] == '\r')
     line[--len] = '\0';
-  for ( ; *line ; line++ ) if (*line == '\t') *line = ' '; 
+  for ( ; *line ; line++ ) if (*line == '\t') *line = ' ';
   return len;
 }
 
@@ -253,10 +252,10 @@ ftp_parse_unix_ls (const char *file, int ignore_perms)
               year = 0;
               min = hour = sec = 0;
               /* We must deal with digits.  */
-              if (ISDIGIT (*tok))
+              if (c_isdigit (*tok))
                 {
                   /* Suppose it's year.  */
-                  for (; ISDIGIT (*tok); tok++)
+                  for (; c_isdigit (*tok); tok++)
                     year = (*tok - '0') + 10 * year;
                   if (*tok == ':')
                     {
@@ -265,13 +264,13 @@ ftp_parse_unix_ls (const char *file, int ignore_perms)
                       year = 0;
                       ++tok;
                       /* Get the minutes...  */
-                      for (; ISDIGIT (*tok); tok++)
+                      for (; c_isdigit (*tok); tok++)
                         min = (*tok - '0') + 10 * min;
                       if (*tok == ':')
                         {
                           /* ...and the seconds.  */
                           ++tok;
-                          for (; ISDIGIT (*tok); tok++)
+                          for (; c_isdigit (*tok); tok++)
                             sec = (*tok - '0') + 10 * sec;
                         }
                     }
@@ -488,9 +487,9 @@ ftp_parse_winnt_ls (const char *file)
       if (hour == 12)  hour  = 0;
       if (*tok == 'P') hour += 12;
 
-      DEBUGP(("YYYY/MM/DD HH:MM - %d/%02d/%02d %02d:%02d\n", 
+      DEBUGP(("YYYY/MM/DD HH:MM - %d/%02d/%02d %02d:%02d\n",
               year+1900, month, day, hour, min));
-      
+
       /* Build the time-stamp (copy & paste from above) */
       timestruct.tm_sec   = 0;
       timestruct.tm_min   = min;
@@ -559,27 +558,113 @@ ftp_parse_winnt_ls (const char *file)
   return dir;
 }
 
-/* Converts VMS symbolic permissions to number-style ones, e.g. string
-   RWED,RWE,RE to 755. "D" (delete) is taken to be equal to "W"
-   (write). Inspired by a patch of Stoyan Lekov <lekov@eda.bg>. */
-static int
-vmsperms (const char *s)
-{
-  int perms = 0;
 
-  do
+
+/* Convert the VMS-style directory listing stored in "file" to a
+   linked list of fileinfo (system-independent) entries.  The contents
+   of FILE are considered to be produced by the standard VMS
+   "DIRECTORY [/SIZE [= ALL]] /DATE [/OWNER] [/PROTECTION]" command,
+   more or less.  (Different VMS FTP servers may have different headers,
+   and may not supply the same data, but all should be subsets of this.)
+
+   VMS normally provides local (server) time and date information.
+   Define the logical name or environment variable
+   "WGET_TIMEZONE_DIFFERENTIAL" (seconds) to adjust the receiving local
+   times if different from the remote local times.
+
+   2005-02-23 SMS.
+   Added code to eliminate "^" escape characters from ODS5 extended file
+   names.  The TCPIP FTP server (V5.4) seems to prefer requests which do
+   not use the escaped names which it provides.
+*/
+
+#define VMS_DEFAULT_PROT_FILE 0644
+#define VMS_DEFAULT_PROT_DIR 0755
+
+/* 2005-02-23 SMS.
+   eat_carets().
+
+   Delete ODS5 extended file name escape characters ("^") in the
+   original buffer.
+   Note that the current scheme does not handle all EFN cases, but it
+   could be made more complicated.
+*/
+
+static void eat_carets( char *str)
+/* char *str;      Source pointer. */
+{
+  char *strd;   /* Destination pointer. */
+  char hdgt;
+  unsigned char uchr;
+  unsigned char prop;
+
+  /* Skip ahead to the first "^", if any. */
+  while ((*str != '\0') && (*str != '^'))
+     str++;
+
+  /* If no caret was found, quit early. */
+  if (*str != '\0')
+  {
+    /* Shift characters leftward as carets are found. */
+    strd = str;
+    while (*str != '\0')
     {
-      switch (*s) {
-        case ',': perms <<= 3; break;
-        case 'R': perms  |= 4; break;
-        case 'W': perms  |= 2; break;
-        case 'D': perms  |= 2; break;
-        case 'E': perms  |= 1; break;
-        default:  DEBUGP(("wrong VMS permissons!\n")); 
+      uchr = *str;
+      if (uchr == '^')
+      {
+        /* Found a caret.  Skip it, and check the next character. */
+        uchr = *(++str);
+        prop = char_prop[ uchr];
+        if (prop& 64)
+        {
+          /* Hex digit.  Get char code from this and next hex digit. */
+          if (uchr <= '9')
+          {
+            hdgt = uchr- '0';           /* '0' - '9' -> 0 - 9. */
+          }
+          else
+          {
+            hdgt = ((uchr- 'A')& 7)+ 10;    /* [Aa] - [Ff] -> 10 - 15. */
+          }
+          hdgt <<= 4;                   /* X16. */
+          uchr = *(++str);              /* Next char must be hex digit. */
+          if (uchr <= '9')
+          {
+            uchr = hdgt+ uchr- '0';
+          }
+          else
+          {
+            uchr = hdgt+ ((uchr- 'A')& 15)+ 10;
+          }
+        }
+        else if (uchr == '_')
+        {
+          /* Convert escaped "_" to " ". */
+          uchr = ' ';
+        }
+        else if (uchr == '/')
+        {
+          /* Convert escaped "/" (invalid Zip) to "?" (invalid VMS). */
+          /* Note that this is a left-over from Info-ZIP code, and is
+             probably of little value here, except perhaps to avoid
+             directory confusion which an unconverted slash might cause.
+          */
+          uchr = '?';
+        }
+        /* Else, not a hex digit.  Must be a simple escaped character
+           (or Unicode, which is not yet handled here).
+        */
       }
+      /* Else, not a caret.  Use as-is. */
+      *strd = uchr;
+
+      /* Advance destination and source pointers. */
+      strd++;
+      str++;
     }
-  while (*++s);
-  return perms;
+    /* Terminate the destination string. */
+    *strd = '\0';
+  }
 }
 
 
@@ -587,20 +672,16 @@ static struct fileinfo *
 ftp_parse_vms_ls (const char *file)
 {
   FILE *fp;
-  /* #### A third copy of more-or-less the same array ? */
-  static const char *months[] = {
-    "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
-    "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
-  };
-  int i;
-  int year, month, day;          /* for time analysis */
-  int hour, min, sec;
-  struct tm timestruct;
+  int dt, i, j, len;
+  int perms;
+  time_t timenow;
+  struct tm *timestruct;
+  char date_str[ 32];
 
-  char *line, *tok;              /* tokenizer */
+  char *line, *tok;		 /* tokenizer */
   struct fileinfo *dir, *l, cur; /* list creation */
 
-  fp = fopen (file, "rb");
+  fp = fopen (file, "r");
   if (!fp)
     {
       logprintf (LOG_NOTQUIET, "%s: %s\n", file, strerror (errno));
@@ -608,188 +689,334 @@ ftp_parse_vms_ls (const char *file)
     }
   dir = l = NULL;
 
-  /* Skip empty line. */
-  line = read_whole_line (fp);
-  xfree_null (line);
+  /* Skip blank lines, Directory heading, and more blank lines. */
 
-  /* Skip "Directory PUB$DEVICE[PUB]" */
-  line = read_whole_line (fp);
-  xfree_null (line);
+  j = 0; /* Expecting initial blank line(s). */
+  while (1)
+    {
+      line = read_whole_line (fp);
+      if (line == NULL)
+        {
+        break;
+        }
+      else
+        {
+          i = clean_line (line);
+          if (i <= 0)
+            {
+              xfree (line); /* Free useless line storage. */
+              continue; /* Blank line.  Keep looking. */
+            }
+          else
+            {
+              if ((j == 0) && (line[ i- 1] == ']'))
+                {
+                  /* Found Directory heading line.  Next non-blank line
+                  is significant.
+                  */
+                  j = 1;
+                }
+              else if (!strncmp (line, "Total of ", 9))
+                {
+                  /* Found "Total of ..." footing line.  No valid data
+                     will follow (empty directory).
+                  */
+                  xfree (line); /* Free useless line storage. */
+                  line = NULL; /* Arrange for early exit. */
+                  break;
+                }
+              else
+                {
+                  break; /* Must be significant data. */
+                }
+            }
+          xfree (line); /* Free useless line storage. */
+        }
+    }
 
-  /* Skip empty line. */
-  line = read_whole_line (fp);
-  xfree_null (line);
+  /* Read remainder of file until the next blank line or EOF. */
 
-  /* Line loop to end of file: */
-  while ((line = read_whole_line (fp)) != NULL)
+  while (line != NULL)
     {
       char *p;
-      i = clean_line (line);
-      if (!i)
-        {
-          xfree (line);
-          break;
-        }
 
-      /* First column: Name. A bit of black magic again. The name my be
-         either ABCD.EXT or ABCD.EXT;NUM and it might be on a separate
-         line. Therefore we will first try to get the complete name
-         until the first space character; if it fails, we assume that the name
-         occupies the whole line. After that we search for the version
-         separator ";", we remove it and check the extension of the file;
-         extension .DIR denotes directory. */
+      /* The first token is the file name.  After a long name, other
+         data may be on the following line.  A valid directory name ends
+         in ".DIR;1" (any case), although some VMS FTP servers may omit
+         the version number (";1").
+      */
 
       tok = strtok(line, " ");
       if (tok == NULL) tok = line;
-      DEBUGP(("file name: '%s'\n", tok));
-      for (p = tok ; *p && *p != ';' ; p++)
-        ;
-      if (*p == ';') *p = '\0';
-      p   = tok + strlen(tok) - 4;
-      if (!strcmp(p, ".DIR")) *p = '\0';
-      cur.name = xstrdup(tok);
-      DEBUGP(("Name: '%s'\n", cur.name));
+      DEBUGP(("file name:   '%s'\n", tok));
 
-      /* If the name ends on .DIR or .DIR;#, it's a directory. We also set
-         the file size to zero as the listing does tell us only the size in
-         filesystem blocks - for an integrity check (when mirroring, for
-         example) we would need the size in bytes. */
-      
-      if (! *p)
+      /* Stripping the version number on a VMS system would be wrong.
+         It may be foolish on a non-VMS system, too, but that's someone
+         else's problem.  (Define PRESERVE_VMS_VERSIONS for proper
+         operation on other operating systems.)
+
+         2005-02-23 SMS.
+         ODS5 extended file names may contain escaped semi-colons, so
+         the version number is identified as right-side decimal digits
+         led by a non-escaped semi-colon.  It may be absent.
+      */
+
+#if (!defined( __VMS) && !defined( PRESERVE_VMS_VERSIONS))
+      for (p = tok+ strlen( tok); (--p > tok) && c_isdigit( *p); );
+      if ((*p == ';') && (*(p- 1) != '^'))
         {
+          *p = '\0';
+        }
+#endif /* (!defined( __VMS) && !defined( PRESERVE_VMS_VERSIONS)) */
+
+      /* 2005-02-23 SMS.
+         Eliminate "^" escape characters from ODS5 extended file name.
+         (A caret is invalid in an ODS2 name, so this is always safe.)
+      */
+      eat_carets( tok);
+      DEBUGP(("file name-^: '%s'\n", tok));
+
+      /* Differentiate between a directory and any other file.  A VMS
+         listing may not include file protections (permissions).  Set a
+         default permissions value (according to the file type), which
+         may be overwritten later.  Store directory names without the
+         ".DIR;1" file type and version number, as the plain name is
+         what will work in a CWD command.
+      */
+      len = strlen( tok);
+      if (!strncasecmp( (tok+ (len- 4)), ".DIR", 4))
+        {
+          *(tok+ (len -= 4)) = '\0'; /* Discard ".DIR". */
           cur.type  = FT_DIRECTORY;
-          cur.size  = 0;
-          DEBUGP(("Directory\n"));
+          cur.perms = VMS_DEFAULT_PROT_DIR;
+          DEBUGP(("Directory (nv)\n"));
+        }
+      else if (!strncasecmp( (tok+ (len- 6)), ".DIR;1", 6))
+        {
+          *(tok+ (len -= 6)) = '\0'; /* Discard ".DIR;1". */
+          cur.type  = FT_DIRECTORY;
+          cur.perms = VMS_DEFAULT_PROT_DIR;
+          DEBUGP(("Directory (v)\n"));
         }
       else
         {
           cur.type  = FT_PLAINFILE;
+          cur.perms = VMS_DEFAULT_PROT_FILE;
           DEBUGP(("File\n"));
         }
+      cur.name = xstrdup(tok);
+      DEBUGP(("Name: '%s'\n", cur.name));
 
-      cur.size  = 0;
+      /* Null the date and time string. */
+      *date_str = '\0';
 
-      /* Second column, if exists, or the first column of the next line
-         contain file size in blocks. We will skip it. */
-
-      tok = strtok(NULL, " ");
-      if (tok == NULL) 
-      {
-        DEBUGP(("Getting additional line\n"));
-        xfree (line);
-        line = read_whole_line (fp);
-        if (!line)
-        {
-          DEBUGP(("empty line read, leaving listing parser\n"));
-          break;
-        }
-        i = clean_line (line);
-        if (!i) 
-        {
-          DEBUGP(("confusing VMS listing item, leaving listing parser\n"));
-          xfree (line);
-          break;
-        }
-        tok = strtok(line, " ");
-      }
-      DEBUGP(("second token: '%s'\n", tok));
-
-      /* Third/Second column: Date DD-MMM-YYYY. */
-
-      tok = strtok(NULL, "-");
-      if (tok == NULL) continue;
-      DEBUGP(("day: '%s'\n",tok));
-      day = atoi(tok);
-      tok = strtok(NULL, "-");
-      if (!tok)
-      {
-        /* If the server produces garbage like
-           'EA95_0PS.GZ;1      No privilege for attempted operation'
-           the first strtok(NULL, "-") will return everything until the end
-           of the line and only the next strtok() call will return NULL. */
-        DEBUGP(("nonsense in VMS listing, skipping this line\n"));
-        xfree (line);
-        break;
-      }
-      for (i=0; i<12; i++) if (!strcmp(tok,months[i])) break;
-      /* Uknown months are mapped to January */
-      month = i % 12 ; 
-      tok = strtok (NULL, " ");
-      if (tok == NULL) continue;
-      year = atoi (tok) - 1900;
-      DEBUGP(("date parsed\n"));
-
-      /* Fourth/Third column: Time hh:mm[:ss] */
-      tok = strtok (NULL, " ");
-      if (tok == NULL) continue;
-      min = sec = 0;
-      p = tok;
-      hour = atoi (p);
-      for (; *p && *p != ':'; ++p)
-        ;
-      if (*p)
-        min = atoi (++p);
-      for (; *p && *p != ':'; ++p)
-        ;
-      if (*p)
-        sec = atoi (++p);
-
-      DEBUGP(("YYYY/MM/DD HH:MM:SS - %d/%02d/%02d %02d:%02d:%02d\n", 
-              year+1900, month, day, hour, min, sec));
-      
-      /* Build the time-stamp (copy & paste from above) */
-      timestruct.tm_sec   = sec;
-      timestruct.tm_min   = min;
-      timestruct.tm_hour  = hour;
-      timestruct.tm_mday  = day;
-      timestruct.tm_mon   = month;
-      timestruct.tm_year  = year;
-      timestruct.tm_wday  = 0;
-      timestruct.tm_yday  = 0;
-      timestruct.tm_isdst = -1;
-      cur.tstamp = mktime (&timestruct); /* store the time-stamp */
-
-      DEBUGP(("Timestamp: %ld\n", cur.tstamp));
-
-      /* Skip the fifth column */
-
-      tok = strtok(NULL, " ");
-      if (tok == NULL) continue;
-
-      /* Sixth column: Permissions */
-
-      tok = strtok(NULL, ","); /* Skip the VMS-specific SYSTEM permissons */
-      if (tok == NULL) continue;
-      tok = strtok(NULL, ")");
-      if (tok == NULL)
-        {
-          DEBUGP(("confusing VMS permissions, skipping line\n"));
-          xfree (line);
-          continue;
-        }
-      /* Permissons have the format "RWED,RWED,RE" */
-      cur.perms = vmsperms(tok);
-      DEBUGP(("permissions: %s -> 0%o\n", tok, cur.perms));
-
+      /* VMS lacks symbolic links. */
       cur.linkto = NULL;
 
-      /* And put everything into the linked list */
+      /* VMS reports file sizes in (512-byte) disk blocks, not bytes,
+         hence useless for an integrity check based on byte-count.
+         Set size to unknown.
+      */
+      cur.size  = 0;
+
+      /* Get token 2, if any.  A long name may force all other data onto
+         a second line.  If needed, read the second line.
+      */
+
+      tok = strtok(NULL, " ");
+      if (tok == NULL)
+        {
+          DEBUGP(("Getting additional line.\n"));
+          xfree (line);
+          line = read_whole_line (fp);
+          if (!line)
+            {
+              DEBUGP(("EOF.  Leaving listing parser.\n"));
+              break;
+            }
+
+          /* Second line must begin with " ".  Otherwise, it's a first
+             line (and we may be confused).
+          */
+          if (i <= 0)
+	    {
+              /* Blank line.  End of significant file listing. */
+              DEBUGP(("Blank line.  Leaving listing parser.\n"));
+              xfree (line); /* Free useless line storage. */
+	      break;
+	    }
+          else if (line[ 0] != ' ')
+            {
+              DEBUGP(("Non-blank in column 1.  Must be a new file name?\n"));
+              continue;
+            }
+          else
+            {
+              tok = strtok (line, " ");
+              if (tok == NULL)
+                {
+                  /* Unexpected non-empty but apparently blank line. */
+                  DEBUGP(("Null token.  Leaving listing parser.\n"));
+                  xfree (line); /* Free useless line storage. */
+                  break;
+                }
+            }
+        }
+
+      /* Analyze tokens.  (Order is not significant, except date must
+         precede time.)
+
+         Size:       ddd or ddd/ddd (where "ddd" is a decimal number)
+         Date:       DD-MMM-YYYY
+         Time:       HH:MM or HH:MM:SS or HH:MM:SS.CC
+         Owner:      [user] or [user,group]
+         Protection: (ppp,ppp,ppp,ppp) (where "ppp" is "RWED" or some
+                     subset thereof, for System, Owner, Group, World.
+
+         If permission is lacking, info may be replaced by the string:
+         "No privilege for attempted operation".
+      */
+      while (tok != NULL)
+	{
+	  DEBUGP (("Token: >%s<: ", tok));
+
+	  if ((strlen( tok) < 12) && (strchr( tok, '-') != NULL))
+	    {
+	      /* Date. */
+	      DEBUGP (("Date.\n"));
+	      strcpy( date_str, tok);
+	      strcat( date_str, " ");
+	    }
+	  else if ((strlen( tok) < 12) && (strchr( tok, ':') != NULL))
+	    {
+	      /* Time. */
+	      DEBUGP (("Time. "));
+	      strncat( date_str,
+	       tok,
+	       (sizeof( date_str)- strlen( date_str)- 1));
+	      DEBUGP (("Date time: >%s<\n", date_str));
+	    }
+	  else if (strchr( tok, '[') != NULL)
+	    {
+	      /* Owner.  (Ignore.) */
+	      DEBUGP (("Owner.\n"));
+	    }
+	  else if (strchr( tok, '(') != NULL)
+	    {
+	      /* Protections (permissions). */
+	      perms = 0;
+	      j = 0;
+	      for (i = 0; i < strlen( tok); i++)
+		{
+		  switch (tok[ i])
+		    {
+		      case '(':
+		        break;
+		      case ')':
+		        break;
+		      case ',':
+		        if (j == 0)
+		          {
+		            perms = 0;
+		            j = 1;
+		          }
+		        else
+		          {
+		            perms <<= 3;
+		          }
+		        break;
+		    case 'R':
+		      perms |= 4;
+		      break;
+		    case 'W':
+		      perms |= 2;
+		      break;
+		    case 'E':
+		      perms |= 1;
+		      break;
+		    case 'D':
+		      perms |= 2;
+		      break;
+		    }
+		}
+	      cur.perms = perms;
+	      DEBUGP (("Prot.  perms = %0o.\n", cur.perms));
+	    }
+	  else
+	    {
+	      /* Nondescript.  Probably size(s), probably in blocks.
+                 Could be "No privilege ..." message.  (Ignore.)
+              */
+	      DEBUGP (("Ignored (size?).\n"));
+	    }
+
+	  tok = strtok (NULL, " ");
+	}
+
+      /* Tokens exhausted.  Interpret the data, and fill in the
+         structure.
+      */
+      /* Fill tm timestruct according to date-time string.  Fractional
+         seconds are ignored.  Default to current time, if conversion
+         fails.
+      */
+      timenow = time( NULL);
+      timestruct = localtime( &timenow );
+      strptime( date_str, "%d-%b-%Y %H:%M:%S", timestruct);
+
+      /* Convert struct tm local time to time_t local time. */
+      timenow = mktime (timestruct);
+      /* Offset local time according to environment variable (seconds). */
+      if ((tok = getenv( "WGET_TIMEZONE_DIFFERENTIAL")) != NULL)
+        {
+          dt = atoi( tok);
+          DEBUGP (("Time differential = %d.\n", dt));
+        }
+      else
+        {
+          dt = 0;
+        }
+
+      if (dt >= 0)
+        {
+          timenow += dt;
+        }
+      else
+        {
+          timenow -= (-dt);
+        }
+      cur.tstamp = timenow; /* Store the time-stamp. */
+      DEBUGP(("Timestamp: %ld\n", cur.tstamp));
+
+      /* Add the data for this item to the linked list, */
       if (!dir)
         {
-          l = dir = xnew (struct fileinfo);
+          l = dir = (struct fileinfo *)xmalloc (sizeof (struct fileinfo));
           memcpy (l, &cur, sizeof (cur));
           l->prev = l->next = NULL;
         }
       else
         {
           cur.prev = l;
-          l->next = xnew (struct fileinfo);
+          l->next = (struct fileinfo *)xmalloc (sizeof (struct fileinfo));
           l = l->next;
           memcpy (l, &cur, sizeof (cur));
           l->next = NULL;
         }
 
+      /* Free old line storage.  Read a new line. */
       xfree (line);
+      line = read_whole_line (fp);
+      if (line != NULL)
+        {
+          i = clean_line (line);
+          if (i <= 0)
+	    {
+              /* Blank line.  End of significant file listing. */
+              xfree (line); /* Free useless line storage. */
+	      break;
+	    }
+        }
     }
 
   fclose (fp);
@@ -851,7 +1078,9 @@ ftp_index (const char *file, struct url *u, struct fileinfo *f)
 {
   FILE *fp;
   char *upwd;
+  char *htcldir;                /* HTML-clean dir name */
   char *htclfile;               /* HTML-clean file name */
+  char *urlclfile;              /* URL-clean file name */
 
   if (!output_stream)
     {
@@ -879,12 +1108,16 @@ ftp_index (const char *file, struct url *u, struct fileinfo *f)
     }
   else
     upwd = xstrdup ("");
+
+  htcldir = html_quote_string (u->dir);
+
   fprintf (fp, "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n");
   fprintf (fp, "<html>\n<head>\n<title>");
-  fprintf (fp, _("Index of /%s on %s:%d"), u->dir, u->host, u->port);
+  fprintf (fp, _("Index of /%s on %s:%d"), htcldir, u->host, u->port);
   fprintf (fp, "</title>\n</head>\n<body>\n<h1>");
-  fprintf (fp, _("Index of /%s on %s:%d"), u->dir, u->host, u->port);
+  fprintf (fp, _("Index of /%s on %s:%d"), htcldir, u->host, u->port);
   fprintf (fp, "</h1>\n<hr>\n<pre>\n");
+
   while (f)
     {
       fprintf (fp, "  ");
@@ -924,13 +1157,18 @@ ftp_index (const char *file, struct url *u, struct fileinfo *f)
           break;
         }
       htclfile = html_quote_string (f->name);
+      urlclfile = url_escape_unsafe_and_reserved (f->name);
       fprintf (fp, "<a href=\"ftp://%s%s:%d", upwd, u->host, u->port);
       if (*u->dir != '/')
         putc ('/', fp);
-      fprintf (fp, "%s", u->dir);
+      /* XXX: Should probably URL-escape dir components here, rather
+       * than just HTML-escape, for consistency with the next bit where
+       * we use urlclfile for the file component. Anyway, this is safer
+       * than what we had... */
+      fprintf (fp, "%s", htcldir);
       if (*u->dir)
         putc ('/', fp);
-      fprintf (fp, "%s", htclfile);
+      fprintf (fp, "%s", urlclfile);
       if (f->type == FT_DIRECTORY)
         putc ('/', fp);
       fprintf (fp, "\">%s", htclfile);
@@ -943,9 +1181,11 @@ ftp_index (const char *file, struct url *u, struct fileinfo *f)
         fprintf (fp, "-> %s", f->linkto ? f->linkto : "(nil)");
       putc ('\n', fp);
       xfree (htclfile);
+      xfree (urlclfile);
       f = f->next;
     }
   fprintf (fp, "</pre>\n</body>\n</html>\n");
+  xfree (htcldir);
   xfree (upwd);
   if (!output_stream)
     fclose (fp);

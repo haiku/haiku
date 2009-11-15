@@ -1,6 +1,6 @@
 /* Declarations for utils.c.
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -31,6 +31,28 @@ as that of the covered work.  */
 #ifndef UTILS_H
 #define UTILS_H
 
+/* Constant is using when we don`t know attempted size exactly */
+#define UNKNOWN_ATTEMPTED_SIZE -3
+
+/* Macros that interface to malloc, but know about type sizes, and
+   cast the result to the appropriate type.  The casts are not
+   necessary in standard C, but Wget performs them anyway for the sake
+   of pre-standard environments and possibly C++.  */
+
+#define xnew(type) (xmalloc (sizeof (type)))
+#define xnew0(type) (xcalloc (1, sizeof (type)))
+#define xnew_array(type, len) (xmalloc ((len) * sizeof (type)))
+#define xnew0_array(type, len) (xcalloc ((len), sizeof (type)))
+
+#define alloca_array(type, size) ((type *) alloca ((size) * sizeof (type)))
+
+#define xfree free
+/* Free P if it is non-NULL.  C requires free() to behaves this way by
+   default, but Wget's code is historically careful not to pass NULL
+   to free.  This allows us to assert p!=NULL in xfree to check
+   additional errors.  (But we currently don't do that!)  */
+#define xfree_null(p) if (!(p)) ; else xfree (p)
+
 struct hash_table;
 
 struct file_memory {
@@ -43,10 +65,6 @@ struct file_memory {
 
 char *time_str (time_t);
 char *datetime_str (time_t);
-
-#ifdef DEBUG_MALLOC
-void print_malloc_debug_stats ();
-#endif
 
 char *xstrdup_lower (const char *);
 
@@ -66,7 +84,7 @@ wgint file_size (const char *);
 int make_directory (const char *);
 char *unique_name (const char *, bool);
 FILE *unique_create (const char *, bool, char **);
-FILE *fopen_excl (const char *, bool);
+FILE *fopen_excl (const char *, int);
 char *file_merge (const char *, const char *);
 
 int fnmatch_nocase (const char *, const char *, int);
@@ -125,5 +143,7 @@ int base64_decode (const char *, void *);
 void stable_sort (void *, size_t, size_t, int (*) (const void *, const void *));
 
 const char *print_decimal (double);
+
+extern unsigned char char_prop[];
 
 #endif /* UTILS_H */

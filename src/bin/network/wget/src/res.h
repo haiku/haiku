@@ -1,5 +1,5 @@
 /* Declarations for res.c.
-   Copyright (C) 2001, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of Wget.
 
@@ -40,7 +40,7 @@ bool res_match_path (const struct robot_specs *, const char *);
 void res_register_specs (const char *, int, struct robot_specs *);
 struct robot_specs *res_get_specs (const char *, int);
 
-bool res_retrieve_file (const char *, char **);
+bool res_retrieve_file (const char *, char **, struct iri *);
 
 bool is_robots_txt_url (const char *);
 

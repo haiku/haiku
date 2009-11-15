@@ -1,23 +1,35 @@
                                                            -*- text -*-
 
+*** NOTE: as of version 1.12, the building of Wget on Windows using
+*** these supplied Makefiles, is severely broken. HOWEVER, it is
+*** currently possible to build Wget on Windows using the standard
+    Unix-y "./configure && make", under MinGW + MSYS, though there are
+    some rough edges when you go beyond the basic build.
+
+    We expect to support this method for building Wget more fully in
+    future releases; the degree to which other Windows build methods
+    will be supported is not currently clear, as the cost of their
+    maintenance has grown significantly.
+
+
 You can configure the Windows port of Wget by running configure.bat (in
 the main Wget directory).  You can run it with no arguments to see the
 list of possible options.  Run it with the option corresponding to the
 compiler you intend to use to build Wget and follow the (brief)
 instructions printed on the screen.  The instructions bellow are for
 building Wget with Microsoft Visual C++ (MSVC); you may need to make
-appropriate substitutions for your compiler and build environment; 
-currently wget can be built at least with Visual Studio/.Net, the free 
+appropriate substitutions for your compiler and build environment;
+currently wget can be built at least with Visual Studio/.Net, the free
 Borland compiler, and the free mingw environment.  The instructions do
 *not* apply to the Cygwin environment, on which Wget is built with the
 procedure described in the INSTALL file in the top-level directory.
 
 To build Wget with MSVC run configure.bat (in the main Wget directory)
 with the argument --msvc, and then run nmake.  At a certain point in time
-Wget exposed some compiler bugs in MSVC 5.0; later Wget started to 
-expose (at least http.c, retr.c) some other compiler bugs in MSVC 6.0 
-SP6 (cl.exe version 12) which could/can be worked around by compiling 
-completely without optimization or at least partially (by using 
+Wget exposed some compiler bugs in MSVC 5.0; later Wget started to
+expose (at least http.c, retr.c) some other compiler bugs in MSVC 6.0
+SP6 (cl.exe version 12) which could/can be worked around by compiling
+completely without optimization or at least partially (by using
 #pragma optimize("g",on) and "off" around offending functions).
 However, read the rest of this document before continuing.
 
@@ -32,7 +44,7 @@ and from out32dll (in the OpenSSL directory) the two needed libraries
 (libeay32.lib and ssleay32.lib) to
 "C:\Program Files\Microsoft Visual Studio\VC98\lib".  These locations
 aren't exactly the best but will get you started if you don't know where
-to place these headers and libraries, you should find similar paths for 
+to place these headers and libraries, you should find similar paths for
 later compiler versions. Usually at run-time some OpenSSL
 libraries (currently ssleay32.dll and libeay32.dll) will need to be
 available in your environment PATH.

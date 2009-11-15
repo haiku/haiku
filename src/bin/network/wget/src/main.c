@@ -1,6 +1,6 @@
 /* Command line parsing.
    Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,14 +37,14 @@ as that of the covered work.  */
 #endif /* HAVE_UNISTD_H */
 #include <string.h>
 #include <signal.h>
-#ifdef HAVE_NLS
+#ifdef ENABLE_NLS
 # include <locale.h>
 #endif
 #include <assert.h>
 #include <errno.h>
 #include <time.h>
 
-#include "wget.h"
+#include "exits.h"
 #include "utils.h"
 #include "init.h"
 #include "retr.h"
@@ -56,8 +56,13 @@ as that of the covered work.  */
 #include "spider.h"
 #include "http.h"               /* for save_cookies */
 
-/* On GNU system this will include system-wide getopt.h. */
-#include "getopt.h"
+#include <getopt.h>
+#include <getpass.h>
+#include <quote.h>
+
+#ifdef __VMS
+#include "vms.h"
+#endif /* __VMS */
 
 #ifndef PATH_SEPARATOR
 # define PATH_SEPARATOR '/'
@@ -65,13 +70,25 @@ as that of the covered work.  */
 
 struct options opt;
 
+/* defined in version.c */
 extern char *version_string;
+extern char *compilation_string;
+extern char *system_getrc;
+extern char *link_string;
+/* defined in build_info.c */
+extern char *compiled_features[];
+/* Used for --version output in print_version */
+#define MAX_CHARS_PER_LINE      72
+#define TABULATION              4
 
 #if defined(SIGHUP) || defined(SIGUSR1)
 static void redirect_output_signal (int);
 #endif
 
 const char *exec_name;
+
+/* Number of successfully downloaded URLs */
+int numurls = 0;
 
 #ifndef TESTING
 /* Initialize I18N/L10N.  That amounts to invoking setlocale, and
@@ -81,14 +98,14 @@ const char *exec_name;
 static void
 i18n_initialize (void)
 {
-  /* HAVE_NLS implies existence of functions invoked here.  */
-#ifdef HAVE_NLS
+  /* ENABLE_NLS implies existence of functions invoked here.  */
+#ifdef ENABLE_NLS
   /* Set the current locale.  */
   setlocale (LC_ALL, "");
   /* Set the text message domain.  */
   bindtextdomain ("wget", LOCALEDIR);
   textdomain ("wget");
-#endif /* HAVE_NLS */
+#endif /* ENABLE_NLS */
 }
 
 /* Definition of command-line options. */
@@ -131,7 +148,9 @@ struct cmdline_option {
 static struct cmdline_option option_data[] =
   {
     { "accept", 'A', OPT_VALUE, "accept", -1 },
+    { "adjust-extension", 'E', OPT_BOOLEAN, "adjustextension", -1 },
     { "append-output", 'a', OPT__APPEND_OUTPUT, NULL, required_argument },
+    { "ask-password", 0, OPT_BOOLEAN, "askpassword", -1 },
     { "auth-no-challenge", 0, OPT_BOOLEAN, "authnochallenge", -1 },
     { "background", 'b', OPT_BOOLEAN, "background", -1 },
     { "backup-converted", 'K', OPT_BOOLEAN, "backupconverted", -1 },
@@ -152,6 +171,7 @@ static struct cmdline_option option_data[] =
     { "cookies", 0, OPT_BOOLEAN, "cookies", -1 },
     { "cut-dirs", 0, OPT_VALUE, "cutdirs", -1 },
     { WHEN_DEBUG ("debug"), 'd', OPT_BOOLEAN, "debug", -1 },
+    { "default-page", 0, OPT_VALUE, "defaultpage", -1 },
     { "delete-after", 0, OPT_BOOLEAN, "deleteafter", -1 },
     { "directories", 0, OPT_BOOLEAN, "dirstruct", -1 },
     { "directory-prefix", 'P', OPT_VALUE, "dirprefix", -1 },
@@ -159,7 +179,7 @@ static struct cmdline_option option_data[] =
     { "dns-timeout", 0, OPT_VALUE, "dnstimeout", -1 },
     { "domains", 'D', OPT_VALUE, "domains", -1 },
     { "dont-remove-listing", 0, OPT__DONT_REMOVE_LISTING, NULL, no_argument },
-    { "dot-style", 0, OPT_VALUE, "dotstyle", -1 },
+    { "dot-style", 0, OPT_VALUE, "dotstyle", -1 }, /* deprecated */
     { "egd-file", 0, OPT_VALUE, "egdfile", -1 },
     { "exclude-directories", 'X', OPT_VALUE, "excludedirectories", -1 },
     { "exclude-domains", 0, OPT_VALUE, "excludedomains", -1 },
@@ -169,12 +189,15 @@ static struct cmdline_option option_data[] =
     { "force-directories", 'x', OPT_BOOLEAN, "dirstruct", -1 },
     { "force-html", 'F', OPT_BOOLEAN, "forcehtml", -1 },
     { "ftp-password", 0, OPT_VALUE, "ftppassword", -1 },
+#ifdef __VMS
+    { "ftp-stmlf", 0, OPT_BOOLEAN, "ftpstmlf", -1 },
+#endif /* def __VMS */
     { "ftp-user", 0, OPT_VALUE, "ftpuser", -1 },
     { "glob", 0, OPT_BOOLEAN, "glob", -1 },
     { "header", 0, OPT_VALUE, "header", -1 },
     { "help", 'h', OPT_FUNCALL, (void *)print_help, no_argument },
     { "host-directories", 0, OPT_BOOLEAN, "addhostdir", -1 },
-    { "html-extension", 'E', OPT_BOOLEAN, "htmlextension", -1 },
+    { "html-extension", 'E', OPT_BOOLEAN, "adjustextension", -1 }, /* deprecated */
     { "htmlify", 0, OPT_BOOLEAN, "htmlify", -1 },
     { "http-keep-alive", 0, OPT_BOOLEAN, "httpkeepalive", -1 },
     { "http-passwd", 0, OPT_VALUE, "httppassword", -1 }, /* deprecated */
@@ -189,10 +212,12 @@ static struct cmdline_option option_data[] =
     { "inet6-only", '6', OPT_BOOLEAN, "inet6only", -1 },
 #endif
     { "input-file", 'i', OPT_VALUE, "input", -1 },
+    { "iri", 0, OPT_BOOLEAN, "iri", -1 },
     { "keep-session-cookies", 0, OPT_BOOLEAN, "keepsessioncookies", -1 },
     { "level", 'l', OPT_VALUE, "reclevel", -1 },
     { "limit-rate", 0, OPT_VALUE, "limitrate", -1 },
     { "load-cookies", 0, OPT_VALUE, "loadcookies", -1 },
+    { "local-encoding", 0, OPT_VALUE, "localencoding", -1 },
     { "max-redirect", 0, OPT_VALUE, "maxredirect", -1 },
     { "mirror", 'm', OPT_BOOLEAN, "mirror", -1 },
     { "no", 'n', OPT__NO, NULL, required_argument },
@@ -207,7 +232,7 @@ static struct cmdline_option option_data[] =
     { "post-data", 0, OPT_VALUE, "postdata", -1 },
     { "post-file", 0, OPT_VALUE, "postfile", -1 },
     { "prefer-family", 0, OPT_VALUE, "preferfamily", -1 },
-    { "preserve-permissions", 0, OPT_BOOLEAN, "preservepermissions", -1 },
+    { "preserve-permissions", 0, OPT_BOOLEAN, "preservepermissions", -1 }, /* deprecated */
     { IF_SSL ("private-key"), 0, OPT_VALUE, "privatekey", -1 },
     { IF_SSL ("private-key-type"), 0, OPT_VALUE, "privatekeytype", -1 },
     { "progress", 0, OPT_VALUE, "progress", -1 },
@@ -226,6 +251,7 @@ static struct cmdline_option option_data[] =
     { "referer", 0, OPT_VALUE, "referer", -1 },
     { "reject", 'R', OPT_VALUE, "reject", -1 },
     { "relative", 'L', OPT_BOOLEAN, "relativeonly", -1 },
+    { "remote-encoding", 0, OPT_VALUE, "remoteencoding", -1 },
     { "remove-listing", 0, OPT_BOOLEAN, "removelisting", -1 },
     { "restrict-file-names", 0, OPT_BOOLEAN, "restrictfilenames", -1 },
     { "retr-symlinks", 0, OPT_BOOLEAN, "retrsymlinks", -1 },
@@ -247,7 +273,7 @@ static struct cmdline_option option_data[] =
     { "version", 'V', OPT_FUNCALL, (void *) print_version, no_argument },
     { "wait", 'w', OPT_VALUE, "wait", -1 },
     { "waitretry", 0, OPT_VALUE, "waitretry", -1 },
-#ifdef MSDOS
+#ifdef USE_WATT32
     { "wdebug", 0, OPT_BOOLEAN, "wdebug", -1 },
 #endif
   };
@@ -293,7 +319,7 @@ static void
 init_switches (void)
 {
   char *p = short_options;
-  int i, o = 0;
+  size_t i, o = 0;
   for (i = 0; i < countof (option_data); i++)
     {
       struct cmdline_option *opt = &option_data[i];
@@ -393,7 +419,7 @@ Logging and input file:\n"),
     N_("\
   -d,  --debug               print lots of debugging information.\n"),
 #endif
-#ifdef MSDOS
+#ifdef USE_WATT32
     N_("\
        --wdebug              print Watt-32 debug output.\n"),
 #endif
@@ -404,11 +430,12 @@ Logging and input file:\n"),
     N_("\
   -nv, --no-verbose          turn off verboseness, without being quiet.\n"),
     N_("\
-  -i,  --input-file=FILE     download URLs found in FILE.\n"),
+  -i,  --input-file=FILE     download URLs found in local or external FILE.\n"),
     N_("\
   -F,  --force-html          treat input file as HTML.\n"),
     N_("\
-  -B,  --base=URL            prepends URL to relative links in -F -i file.\n"),
+  -B,  --base=URL            resolves HTML input-file links (-i -F)\n\
+                             relative to URL.\n"),
     "\n",
 
     N_("\
@@ -474,6 +501,14 @@ Download:\n"),
        --user=USER               set both ftp and http user to USER.\n"),
     N_("\
        --password=PASS           set both ftp and http password to PASS.\n"),
+    N_("\
+       --ask-password            prompt for passwords.\n"),
+    N_("\
+       --no-iri                  turn off IRI support.\n"),
+    N_("\
+       --local-encoding=ENC      use ENC as the local encoding for IRIs.\n"),
+    N_("\
+       --remote-encoding=ENC     use ENC as the default remote encoding.\n"),
     "\n",
 
     N_("\
@@ -500,8 +535,11 @@ HTTP options:\n"),
        --http-password=PASS    set http password to PASS.\n"),
     N_("\
        --no-cache              disallow server-cached data.\n"),
+    N_ ("\
+       --default-page=NAME     Change the default page name (normally\n\
+                               this is `index.html'.).\n"),
     N_("\
-  -E,  --html-extension        save HTML documents with `.html' extension.\n"),
+  -E,  --adjust-extension      save HTML/CSS documents with proper extensions.\n"),
     N_("\
        --ignore-length         ignore `Content-Length' header field.\n"),
     N_("\
@@ -536,7 +574,7 @@ HTTP options:\n"),
        --content-disposition   honor the Content-Disposition header when\n\
                                choosing local file names (EXPERIMENTAL).\n"),
     N_("\
-       --auth-no-challenge     Send Basic HTTP authentication information\n\
+       --auth-no-challenge     send Basic HTTP authentication information\n\
                                without first waiting for the server's\n\
                                challenge.\n"),
     "\n",
@@ -570,6 +608,10 @@ HTTPS (SSL/TLS) options:\n"),
 
     N_("\
 FTP options:\n"),
+#ifdef __VMS
+    N_("\
+       --ftp-stmlf             Use Stream_LF format for all binary FTP files.\n"),
+#endif /* def __VMS */
     N_("\
        --ftp-user=USER         set ftp user to USER.\n"),
     N_("\
@@ -582,8 +624,6 @@ FTP options:\n"),
        --no-passive-ftp        disable the \"passive\" transfer mode.\n"),
     N_("\
        --retr-symlinks         when recursing, get linked-to files (not dir).\n"),
-    N_("\
-       --preserve-permissions  preserve remote file permissions.\n"),
     "\n",
 
     N_("\
@@ -595,9 +635,15 @@ Recursive download:\n"),
     N_("\
        --delete-after       delete files locally after downloading them.\n"),
     N_("\
-  -k,  --convert-links      make links in downloaded HTML point to local files.\n"),
+  -k,  --convert-links      make links in downloaded HTML or CSS point to\n\
+                            local files.\n"),
+#ifdef __VMS
+    N_("\
+  -K,  --backup-converted   before converting file X, back up as X_orig.\n"),
+#else /* def __VMS */
     N_("\
   -K,  --backup-converted   before converting file X, back up as X.orig.\n"),
+#endif /* def __VMS [else] */
     N_("\
   -m,  --mirror             shortcut for -N -r -l inf --no-remove-listing.\n"),
     N_("\
@@ -637,7 +683,7 @@ Recursive accept/reject:\n"),
     N_("Mail bug reports and suggestions to <bug-wget@gnu.org>.\n")
   };
 
-  int i;
+  size_t i;
 
   printf (_("GNU Wget %s, a non-interactive network retriever.\n"),
           version_string);
@@ -675,32 +721,156 @@ secs_to_human_time (double interval)
   return buf;
 }
 
+static char *
+prompt_for_password (void)
+{
+  if (opt.user)
+    printf (_("Password for user %s: "), quote (opt.user));
+  else
+    printf (_("Password: "));
+  return getpass("");
+}
+
+/* Function that prints the line argument while limiting it
+   to at most line_length. prefix is printed on the first line
+   and an appropriate number of spaces are added on subsequent
+   lines.*/
+static void
+format_and_print_line (const char *prefix, const char *line,
+                       int line_length)
+{
+  int remaining_chars;
+  char *line_dup, *token;
+
+  assert (prefix != NULL);
+  assert (line != NULL);
+
+  line_dup = xstrdup (line);
+
+  if (line_length <= 0)
+    line_length = MAX_CHARS_PER_LINE - TABULATION;
+
+  printf ("%s", prefix);
+  remaining_chars = line_length;
+  /* We break on spaces. */
+  token = strtok (line_dup, " ");
+  while (token != NULL)
+    {
+      /* If however a token is much larger than the maximum
+         line length, all bets are off and we simply print the
+         token on the next line. */
+      if (remaining_chars <= strlen (token))
+        {
+          printf ("\n%*c", TABULATION, ' ');
+          remaining_chars = line_length - TABULATION;
+        }
+      printf ("%s ", token);
+      remaining_chars -= strlen (token) + 1;  /* account for " " */
+      token = strtok (NULL, " ");
+    }
+
+  printf ("\n");
+
+  xfree (line_dup);
+}
+
 static void
 print_version (void)
 {
-  printf ("GNU Wget %s\n\n", version_string);
+  const char *wgetrc_title  = _("Wgetrc: ");
+  const char *locale_title  = _("Locale: ");
+  const char *compile_title = _("Compile: ");
+  const char *link_title    = _("Link: ");
+  char *line;
+  char *env_wgetrc, *user_wgetrc;
+  int i;
+
+#ifdef __VMS
+  printf (_("GNU Wget %s built on VMS %s %s.\n\n"),
+   version_string, vms_arch(), vms_vers());
+#else /* def __VMS */
+  printf (_("GNU Wget %s built on %s.\n\n"), version_string, OS_TYPE);
+#endif /* def __VMS */
+  /* compiled_features is a char*[]. We limit the characters per
+     line to MAX_CHARS_PER_LINE and prefix each line with a constant
+     number of spaces for proper alignment. */
+  for (i = 0; compiled_features[i] != NULL; )
+    {
+      int line_length = MAX_CHARS_PER_LINE;
+      while ((line_length > 0) && (compiled_features[i] != NULL))
+        {
+          printf ("%s ", compiled_features[i]);
+          line_length -= strlen (compiled_features[i]) + 2;
+          i++;
+        }
+      printf ("\n");
+    }
+  printf ("\n");
+  /* Handle the case when $WGETRC is unset and $HOME/.wgetrc is
+     absent. */
+  printf ("%s\n", wgetrc_title);
+  env_wgetrc = wgetrc_env_file_name ();
+  if (env_wgetrc && *env_wgetrc)
+    {
+      printf (_("    %s (env)\n"), env_wgetrc);
+      xfree (env_wgetrc);
+    }
+  user_wgetrc = wgetrc_user_file_name ();
+  if (user_wgetrc)
+    {
+      printf (_("    %s (user)\n"), user_wgetrc);
+      xfree (user_wgetrc);
+    }
+#ifdef SYSTEM_WGETRC
+  printf (_("    %s (system)\n"), SYSTEM_WGETRC);
+#endif
+
+#ifdef ENABLE_NLS
+  format_and_print_line (locale_title,
+                        LOCALEDIR,
+                        MAX_CHARS_PER_LINE);
+#endif /* def ENABLE_NLS */
+
+  format_and_print_line (compile_title,
+			 compilation_string,
+			 MAX_CHARS_PER_LINE);
+
+  format_and_print_line (link_title,
+			 link_string,
+			 MAX_CHARS_PER_LINE);
+
+  printf ("\n");
+  /* TRANSLATORS: When available, an actual copyright character
+     (cirle-c) should be used in preference to "(C)". */
   fputs (_("\
-Copyright (C) 2008 Free Software Foundation, Inc.\n"), stdout);
+Copyright (C) 2009 Free Software Foundation, Inc.\n"), stdout);
   fputs (_("\
 License GPLv3+: GNU GPL version 3 or later\n\
 <http://www.gnu.org/licenses/gpl.html>.\n\
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n"), stdout);
+  /* TRANSLATORS: When available, please use the proper diacritics for
+     names such as this one. See en_US.po for reference. */
   fputs (_("\nOriginally written by Hrvoje Niksic <hniksic@xemacs.org>.\n"),
          stdout);
   fputs (_("Currently maintained by Micah Cowan <micah@cowan.name>.\n"),
          stdout);
+  fputs (_("Please send bug reports and questions to <bug-wget@gnu.org>.\n"),
+         stdout);
   exit (0);
 }
-
+
+char *program_name; /* Needed by lib/error.c. */
 
 int
-main (int argc, char *const *argv)
+main (int argc, char **argv)
 {
   char **url, **t;
   int i, ret, longindex;
   int nurl, status;
   bool append_to_log = false;
+
+  program_name = argv[0];
 
   i18n_initialize ();
 
@@ -817,9 +987,9 @@ main (int argc, char *const *argv)
                before passing the value to setoptval.  */
             bool flag = true;
             if (optarg)
-              flag = (*optarg == '1' || TOLOWER (*optarg) == 'y'
-                      || (TOLOWER (optarg[0]) == 'o'
-                          && TOLOWER (optarg[1]) == 'n'));
+              flag = (*optarg == '1' || c_tolower (*optarg) == 'y'
+                      || (c_tolower (optarg[0]) == 'o'
+                          && c_tolower (optarg[1]) == 'n'));
             setoptval (opt->type == OPT__PARENT ? "noparent" : "noclobber",
                        flag ? "0" : "1", opt->long_name);
             break;
@@ -838,7 +1008,10 @@ main (int argc, char *const *argv)
      interoption dependency checks. */
 
   if (opt.reclevel == 0)
-    opt.reclevel = INFINITE_RECURSION; /* see recur.h for commentary on this */
+      opt.reclevel = INFINITE_RECURSION; /* see recur.h for commentary */
+
+  if (opt.spider || opt.delete_after)
+      opt.no_dirstruct = true;
 
   if (opt.page_requisites && !opt.recursive)
     {
@@ -877,7 +1050,7 @@ Can't timestamp and not clobber old files at the same time.\n"));
 #endif
   if (opt.output_document)
     {
-      if (opt.convert_links 
+      if (opt.convert_links
           && (nurl > 1 || opt.page_requisites || opt.recursive))
         {
           fputs (_("\
@@ -900,12 +1073,19 @@ WARNING: timestamping does nothing in combination with -O. See the manual\n\
 for details.\n\n"));
           opt.timestamping = false;
         }
-      if (opt.noclobber && file_exists_p(opt.output_document)) 
-           { 
+      if (opt.noclobber && file_exists_p(opt.output_document))
+           {
               /* Check if output file exists; if it does, exit. */
               logprintf (LOG_VERBOSE, _("File `%s' already there; not retrieving.\n"), opt.output_document);
               exit(1);
-           }  
+           }
+    }
+
+  if (opt.ask_passwd && opt.passwd)
+    {
+      printf (_("Cannot specify both --ask-password and --password.\n"));
+      print_usage ();
+      exit (1);
     }
 
   if (!nurl && !opt.input_filename)
@@ -920,7 +1100,36 @@ for details.\n\n"));
       exit (1);
     }
 
-#ifdef MSDOS
+#ifdef ENABLE_IRI
+  if (opt.enable_iri)
+    {
+      if (opt.locale && !check_encoding_name (opt.locale))
+        opt.locale = NULL;
+
+      if (!opt.locale)
+        opt.locale = find_locale ();
+
+      if (opt.encoding_remote && !check_encoding_name (opt.encoding_remote))
+        opt.encoding_remote = NULL;
+    }
+#else
+  if (opt.enable_iri || opt.locale || opt.encoding_remote)
+    {
+      /* sXXXav : be more specific... */
+      printf(_("This version does not have support for IRIs\n"));
+      exit(1);
+    }
+#endif
+
+  if (opt.ask_passwd)
+    {
+      opt.passwd = prompt_for_password ();
+
+      if (opt.passwd == NULL || opt.passwd[0] == '\0')
+        exit (1);
+    }
+
+#ifdef USE_WATT32
   if (opt.wdebug)
      dbug_init();
   sock_init();
@@ -949,19 +1158,52 @@ for details.\n\n"));
   /* Initialize logging.  */
   log_init (opt.lfilename, append_to_log);
 
-  DEBUGP (("DEBUG output created by Wget %s on %s.\n\n", version_string,
-           OS_TYPE));
+  DEBUGP (("DEBUG output created by Wget %s on %s.\n\n",
+           version_string, OS_TYPE));
 
   /* Open the output filename if necessary.  */
+
+/* 2005-04-17 SMS.
+   Note that having the output_stream ("-O") file opened here for an FTP
+   URL rather than in getftp() (ftp.c) (and the http equivalent) rather
+   limits the ability in VMS to open the file differently for ASCII
+   versus binary FTP there.  (Of course, doing it here allows a open
+   failure to be detected immediately, without first connecting to the
+   server.)
+*/
   if (opt.output_document)
     {
       if (HYPHENP (opt.output_document))
-        output_stream = stdout;
+        {
+#ifdef WINDOWS
+          FILE *result;
+          result = freopen ("CONOUT$", "wb", stdout);
+          if (result == NULL)
+            {
+              logputs (LOG_NOTQUIET, _("\
+WARNING: Can't reopen standard output in binary mode;\n\
+         downloaded file may contain inappropriate line endings.\n"));
+            }
+#endif
+          output_stream = stdout;
+        }
       else
         {
           struct_fstat st;
+
+#ifdef __VMS
+/* Common fopen() optional arguments:
+   sequential access only, access callback function.
+*/
+# define FOPEN_OPT_ARGS , "fop=sqo", "acc", acc_cb, &open_id
+          int open_id = 7;
+#else /* def __VMS */
+# define FOPEN_OPT_ARGS
+#endif /* def __VMS [else] */
+
           output_stream = fopen (opt.output_document,
-                                 opt.always_rest ? "ab" : "wb");
+                                 opt.always_rest ? "ab" : "wb"
+                                 FOPEN_OPT_ARGS);
           if (output_stream == NULL)
             {
               perror (opt.output_document);
@@ -971,6 +1213,20 @@ for details.\n\n"));
             output_stream_regular = true;
         }
     }
+
+#ifdef __VMS
+  /* Set global ODS5 flag according to the specified destination (if
+     any), otherwise according to the current default device.
+  */
+  if (output_stream == NULL)
+    {
+      set_ods5_dest( "SYS$DISK");
+    }
+  else if (output_stream != stdout)
+    {
+      set_ods5_dest( opt.output_document);
+    }
+#endif /* def __VMS */
 
 #ifdef WINDOWS
   ws_startup ();
@@ -1001,34 +1257,56 @@ for details.\n\n"));
   for (t = url; *t; t++)
     {
       char *filename = NULL, *redirected_URL = NULL;
-      int dt;
+      int dt, url_err;
+      /* Need to do a new struct iri every time, because
+       * retrieve_url may modify it in some circumstances,
+       * currently. */
+      struct iri *iri = iri_new ();
+      struct url *url_parsed;
 
-      if ((opt.recursive || opt.page_requisites)
-          && (url_scheme (*t) != SCHEME_FTP || url_uses_proxy (*t)))
+      set_uri_encoding (iri, opt.locale, true);
+      url_parsed = url_parse (*t, &url_err, iri, true);
+
+      if (!url_parsed)
         {
-          int old_follow_ftp = opt.follow_ftp;
-
-          /* Turn opt.follow_ftp on in case of recursive FTP retrieval */
-          if (url_scheme (*t) == SCHEME_FTP) 
-            opt.follow_ftp = 1;
-          
-          status = retrieve_tree (*t);
-
-          opt.follow_ftp = old_follow_ftp;
+          char *error = url_error (*t, url_err);
+          logprintf (LOG_NOTQUIET, "%s: %s.\n",*t, error);
+          xfree (error);
+          status = URLERROR;
         }
       else
-        status = retrieve_url (*t, &filename, &redirected_URL, NULL, &dt, opt.recursive);
-
-      if (opt.delete_after && file_exists_p(filename))
         {
-          DEBUGP (("Removing file due to --delete-after in main():\n"));
-          logprintf (LOG_VERBOSE, _("Removing %s.\n"), filename);
-          if (unlink (filename))
-            logprintf (LOG_NOTQUIET, "unlink: %s\n", strerror (errno));
-        }
+          if ((opt.recursive || opt.page_requisites)
+              && (url_scheme (*t) != SCHEME_FTP || url_uses_proxy (url_parsed)))
+            {
+              int old_follow_ftp = opt.follow_ftp;
 
-      xfree_null (redirected_URL);
-      xfree_null (filename);
+              /* Turn opt.follow_ftp on in case of recursive FTP retrieval */
+              if (url_scheme (*t) == SCHEME_FTP)
+                opt.follow_ftp = 1;
+
+              status = retrieve_tree (url_parsed, NULL);
+
+              opt.follow_ftp = old_follow_ftp;
+            }
+          else
+          {
+            status = retrieve_url (url_parsed, *t, &filename, &redirected_URL,
+                                   NULL, &dt, opt.recursive, iri, true);
+          }
+
+          if (opt.delete_after && file_exists_p(filename))
+            {
+              DEBUGP (("Removing file due to --delete-after in main():\n"));
+              logprintf (LOG_VERBOSE, _("Removing %s.\n"), filename);
+              if (unlink (filename))
+                logprintf (LOG_NOTQUIET, "unlink: %s\n", strerror (errno));
+            }
+          xfree_null (redirected_URL);
+          xfree_null (filename);
+          url_free (url_parsed);
+        }
+      iri_free (iri);
     }
 
   /* And then from the input file, if any.  */
@@ -1046,7 +1324,7 @@ for details.\n\n"));
     {
       print_broken_links();
     }
-  
+
   /* Print the downloaded sum.  */
   if ((opt.recursive || opt.page_requisites
        || nurl > 1
@@ -1057,7 +1335,7 @@ for details.\n\n"));
       logprintf (LOG_NOTQUIET,
                  _("FINISHED --%s--\nDownloaded: %d files, %s in %s (%s)\n"),
                  datetime_str (time (NULL)),
-                 opt.numurls,
+                 numurls,
                  human_readable (total_downloaded_bytes),
                  secs_to_human_time (total_download_time),
                  retr_rate (total_downloaded_bytes, total_download_time));
@@ -1079,13 +1357,7 @@ for details.\n\n"));
     xfree (url[i]);
   cleanup ();
 
-#ifdef DEBUG_MALLOC
-  print_malloc_debug_stats ();
-#endif
-  if (status == RETROK)
-    return 0;
-  else
-    return 1;
+  return get_exit_status ();
 }
 #endif /* TESTING */
 

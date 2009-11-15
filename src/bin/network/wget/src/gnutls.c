@@ -1,5 +1,6 @@
 /* SSL support via GnuTLS library.
-   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation,
+   Inc.
 
 This file is part of GNU Wget.
 
@@ -27,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -40,7 +41,6 @@ as that of the covered work.  */
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
-#include "wget.h"
 #include "utils.h"
 #include "connect.h"
 #include "url.h"
@@ -181,7 +181,7 @@ static struct transport_implementation wgnutls_transport = {
 };
 
 bool
-ssl_connect (int fd) 
+ssl_connect (int fd)
 {
   static const int cert_type_priority[] = {
     GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0
@@ -224,27 +224,27 @@ ssl_check_certificate (int fd, const char *host)
   if (err < 0)
     {
       logprintf (LOG_NOTQUIET, _("%s: No certificate presented by %s.\n"),
-                 severity, escnonprint (host));
+                 severity, quotearg_style (escape_quoting_style, host));
       success = false;
       goto out;
     }
 
   if (status & GNUTLS_CERT_INVALID)
     {
-      logprintf (LOG_NOTQUIET, _("%s: The certificate of `%s' is not trusted.\n"),
-                 severity, escnonprint (host));
+      logprintf (LOG_NOTQUIET, _("%s: The certificate of %s is not trusted.\n"),
+                 severity, quote (host));
       success = false;
     }
   if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
     {
-      logprintf (LOG_NOTQUIET, _("%s: The certificate of `%s' hasn't got a known issuer.\n"),
-                 severity, escnonprint (host));
+      logprintf (LOG_NOTQUIET, _("%s: The certificate of %s hasn't got a known issuer.\n"),
+                 severity, quote (host));
       success = false;
     }
   if (status & GNUTLS_CERT_REVOKED)
     {
-      logprintf (LOG_NOTQUIET, _("%s: The certificate of `%s' has been revoked.\n"),
-                 severity, escnonprint (host));
+      logprintf (LOG_NOTQUIET, _("%s: The certificate of %s has been revoked.\n"),
+                 severity, quote (host));
       success = false;
     }
 
@@ -291,8 +291,8 @@ ssl_check_certificate (int fd, const char *host)
       if (!gnutls_x509_crt_check_hostname (cert, host))
         {
           logprintf (LOG_NOTQUIET,
-                     _("The certificate's owner does not match hostname '%s'\n"),
-                     host);
+                     _("The certificate's owner does not match hostname %s\n"),
+                     quote (host));
           success = false;
         }
       gnutls_x509_crt_deinit (cert);

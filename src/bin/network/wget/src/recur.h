@@ -1,6 +1,6 @@
 /* Declarations for recur.c.
    Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -31,6 +31,8 @@ as that of the covered work.  */
 #ifndef RECUR_H
 #define RECUR_H
 
+#include "url.h"
+
 /* For most options, 0 means no limits, but with -p in the picture,
    that causes a problem on the maximum recursion depth variable.  To
    retain backwards compatibility we allow users to consider "0" to be
@@ -42,11 +44,6 @@ as that of the covered work.  */
 struct urlpos;
 
 void recursive_cleanup (void);
-uerr_t retrieve_tree (const char *);
-
-/* These are really in html-url.c. */
-struct urlpos *get_urls_file (const char *);
-struct urlpos *get_urls_html (const char *, const char *, bool *);
-void free_urlpos (struct urlpos *);
+uerr_t retrieve_tree (struct url *, struct iri *);
 
 #endif /* RECUR_H */

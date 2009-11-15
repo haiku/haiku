@@ -1,6 +1,6 @@
 /* Collect URLs from HTML source.
    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008 Free Software Foundation, Inc.
+   2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -36,15 +36,14 @@ as that of the covered work.  */
 #include <errno.h>
 #include <assert.h>
 
-#include "wget.h"
 #include "html-parse.h"
 #include "url.h"
 #include "utils.h"
 #include "hash.h"
 #include "convert.h"
-#include "recur.h"              /* declaration of get_urls_html */
-
-struct map_context;
+#include "recur.h"
+#include "html-url.h"
+#include "css-url.h"
 
 typedef void (*tag_handler_t) (int, struct taginfo *, struct map_context *);
 
@@ -164,15 +163,20 @@ static struct {
    from the information above.  However, some places in the code refer
    to the attributes not mentioned here.  We add them manually.  */
 static const char *additional_attributes[] = {
-  "rel",                        /* used by tag_handle_link */
-  "http-equiv",                 /* used by tag_handle_meta */
-  "name",                       /* used by tag_handle_meta */
-  "content",                    /* used by tag_handle_meta */
-  "action"                      /* used by tag_handle_form */
+  "rel",                        /* used by tag_handle_link  */
+  "http-equiv",                 /* used by tag_handle_meta  */
+  "name",                       /* used by tag_handle_meta  */
+  "content",                    /* used by tag_handle_meta  */
+  "action",                     /* used by tag_handle_form  */
+  "style"                       /* used by check_style_attr */
 };
 
 static struct hash_table *interesting_tags;
 static struct hash_table *interesting_attributes;
+
+/* Will contains the (last) charset found in 'http-equiv=content-type'
+   meta tags  */
+static char *meta_charset;
 
 static void
 init_interesting (void)
@@ -186,7 +190,7 @@ init_interesting (void)
      matches the user's preferences as specified through --ignore-tags
      and --follow-tags.  */
 
-  int i;
+  size_t i;
   interesting_tags = make_nocase_string_hash_table (countof (known_tags));
 
   /* First, add all the tags we know hot to handle, mapped to their
@@ -247,28 +251,20 @@ find_attr (struct taginfo *tag, const char *name, int *attrind)
   return NULL;
 }
 
-struct map_context {
-  char *text;                   /* HTML text. */
-  char *base;                   /* Base URI of the document, possibly
-                                   changed through <base href=...>. */
-  const char *parent_base;      /* Base of the current document. */
-  const char *document_file;    /* File name of this document. */
-  bool nofollow;                /* whether NOFOLLOW was specified in a
-                                   <meta name=robots> tag. */
-
-  struct urlpos *head, *tail;   /* List of URLs that is being
-                                   built. */
-};
+/* used for calls to append_url */
+#define ATTR_POS(tag, attrind, ctx) \
+ (tag->attrs[attrind].value_raw_beginning - ctx->text)
+#define ATTR_SIZE(tag, attrind) \
+ (tag->attrs[attrind].value_raw_size)
 
 /* Append LINK_URI to the urlpos structure that is being built.
 
-   LINK_URI will be merged with the current document base.  TAG and
-   ATTRIND are the necessary context to store the position and
-   size.  */
+   LINK_URI will be merged with the current document base.
+*/
 
-static struct urlpos *
-append_url (const char *link_uri,
-            struct taginfo *tag, int attrind, struct map_context *ctx)
+struct urlpos *
+append_url (const char *link_uri, int position, int size,
+            struct map_context *ctx)
 {
   int link_has_scheme = url_has_scheme (link_uri);
   struct urlpos *newel;
@@ -292,7 +288,7 @@ append_url (const char *link_uri,
           return NULL;
         }
 
-      url = url_parse (link_uri, NULL);
+      url = url_parse (link_uri, NULL, NULL, false);
       if (!url)
         {
           DEBUGP (("%s: link \"%s\" doesn't parse.\n",
@@ -308,10 +304,13 @@ append_url (const char *link_uri,
 
       char *complete_uri = uri_merge (base, link_uri);
 
-      DEBUGP (("%s: merge(\"%s\", \"%s\") -> %s\n",
-               ctx->document_file, base, link_uri, complete_uri));
+      DEBUGP (("%s: merge(%s, %s) -> %s\n",
+               quotearg_n_style (0, escape_quoting_style, ctx->document_file),
+               quote_n (1, base),
+               quote_n (2, link_uri),
+               quotearg_n_style (3, escape_quoting_style, complete_uri)));
 
-      url = url_parse (complete_uri, NULL);
+      url = url_parse (complete_uri, NULL, NULL, false);
       if (!url)
         {
           DEBUGP (("%s: merged link \"%s\" doesn't parse.\n",
@@ -322,12 +321,12 @@ append_url (const char *link_uri,
       xfree (complete_uri);
     }
 
-  DEBUGP (("appending \"%s\" to urlpos.\n", url->url));
+  DEBUGP (("appending %s to urlpos.\n", quote (url->url)));
 
   newel = xnew0 (struct urlpos);
   newel->url = url;
-  newel->pos = tag->attrs[attrind].value_raw_beginning - ctx->text;
-  newel->size = tag->attrs[attrind].value_raw_size;
+  newel->pos = position;
+  newel->size = size;
 
   /* A URL is relative if the host is not named, and the name does not
      start with `/'.  */
@@ -347,6 +346,18 @@ append_url (const char *link_uri,
   return newel;
 }
 
+static void
+check_style_attr (struct taginfo *tag, struct map_context *ctx)
+{
+  int attrind;
+  char *style = find_attr (tag, "style", &attrind);
+  if (!style)
+    return;
+
+  /* raw pos and raw size include the quotes, hence the +1 -2 */
+  get_urls_css (ctx, ATTR_POS(tag,attrind,ctx)+1, ATTR_SIZE(tag,attrind)-2);
+}
+
 /* All the tag_* functions are called from collect_tags_mapper, as
    specified by KNOWN_TAGS.  */
 
@@ -356,7 +367,8 @@ append_url (const char *link_uri,
 static void
 tag_find_urls (int tagid, struct taginfo *tag, struct map_context *ctx)
 {
-  int i, attrind;
+  size_t i;
+  int attrind;
   int first = -1;
 
   for (i = 0; i < countof (tag_url_attributes); i++)
@@ -383,7 +395,7 @@ tag_find_urls (int tagid, struct taginfo *tag, struct map_context *ctx)
       /* Find whether TAG/ATTRIND is a combination that contains a
          URL. */
       char *link = tag->attrs[attrind].value;
-      const int size = countof (tag_url_attributes);
+      const size_t size = countof (tag_url_attributes);
 
       /* If you're cringing at the inefficiency of the nested loops,
          remember that they both iterate over a very small number of
@@ -394,7 +406,8 @@ tag_find_urls (int tagid, struct taginfo *tag, struct map_context *ctx)
           if (0 == strcasecmp (tag->attrs[attrind].name,
                                tag_url_attributes[i].attr_name))
             {
-              struct urlpos *up = append_url (link, tag, attrind, ctx);
+              struct urlpos *up = append_url (link, ATTR_POS(tag,attrind,ctx),
+                                              ATTR_SIZE(tag,attrind), ctx);
               if (up)
                 {
                   int flags = tag_url_attributes[i].flags;
@@ -419,7 +432,8 @@ tag_handle_base (int tagid, struct taginfo *tag, struct map_context *ctx)
   if (!newbase)
     return;
 
-  base_urlpos = append_url (newbase, tag, attrind, ctx);
+  base_urlpos = append_url (newbase, ATTR_POS(tag,attrind,ctx),
+                            ATTR_SIZE(tag,attrind), ctx);
   if (!base_urlpos)
     return;
   base_urlpos->ignore_when_downloading = 1;
@@ -440,9 +454,11 @@ tag_handle_form (int tagid, struct taginfo *tag, struct map_context *ctx)
 {
   int attrind;
   char *action = find_attr (tag, "action", &attrind);
+
   if (action)
     {
-      struct urlpos *up = append_url (action, tag, attrind, ctx);
+      struct urlpos *up = append_url (action, ATTR_POS(tag,attrind,ctx),
+                                      ATTR_SIZE(tag,attrind), ctx);
       if (up)
         up->ignore_when_downloading = 1;
     }
@@ -465,14 +481,23 @@ tag_handle_link (int tagid, struct taginfo *tag, struct map_context *ctx)
   */
   if (href)
     {
-      struct urlpos *up = append_url (href, tag, attrind, ctx);
+      struct urlpos *up = append_url (href, ATTR_POS(tag,attrind,ctx),
+                                      ATTR_SIZE(tag,attrind), ctx);
       if (up)
         {
           char *rel = find_attr (tag, "rel", NULL);
-          if (rel
-              && (0 == strcasecmp (rel, "stylesheet")
-                  || 0 == strcasecmp (rel, "shortcut icon")))
-            up->link_inline_p = 1;
+          if (rel)
+            {
+              if (0 == strcasecmp (rel, "stylesheet"))
+                {
+                  up->link_inline_p = 1;
+                  up->link_expect_css = 1;
+                }
+              else if (0 == strcasecmp (rel, "shortcut icon"))
+                {
+                  up->link_inline_p = 1;
+                }
+            }
           else
             /* The external ones usually point to HTML pages, such as
                <link rel="next" href="..."> */
@@ -510,29 +535,47 @@ tag_handle_meta (int tagid, struct taginfo *tag, struct map_context *ctx)
       if (!refresh)
         return;
 
-      for (p = refresh; ISDIGIT (*p); p++)
+      for (p = refresh; c_isdigit (*p); p++)
         timeout = 10 * timeout + *p - '0';
       if (*p++ != ';')
         return;
 
-      while (ISSPACE (*p))
+      while (c_isspace (*p))
         ++p;
-      if (!(   TOUPPER (*p)       == 'U'
-            && TOUPPER (*(p + 1)) == 'R'
-            && TOUPPER (*(p + 2)) == 'L'
+      if (!(   c_toupper (*p)       == 'U'
+            && c_toupper (*(p + 1)) == 'R'
+            && c_toupper (*(p + 2)) == 'L'
             &&          *(p + 3)  == '='))
         return;
       p += 4;
-      while (ISSPACE (*p))
+      while (c_isspace (*p))
         ++p;
 
-      entry = append_url (p, tag, attrind, ctx);
+      entry = append_url (p, ATTR_POS(tag,attrind,ctx),
+                          ATTR_SIZE(tag,attrind), ctx);
       if (entry)
         {
           entry->link_refresh_p = 1;
           entry->refresh_timeout = timeout;
           entry->link_expect_html = 1;
         }
+    }
+  else if (http_equiv && 0 == strcasecmp (http_equiv, "content-type"))
+    {
+      /* Handle stuff like:
+         <meta http-equiv="Content-Type" content="text/html; charset=CHARSET"> */
+
+      char *mcharset;
+      char *content = find_attr (tag, "content", NULL);
+      if (!content)
+        return;
+
+      mcharset = parse_charset (content);
+      if (!mcharset)
+        return;
+
+      xfree_null (meta_charset);
+      meta_charset = mcharset;
     }
   else if (name && 0 == strcasecmp (name, "robots"))
     {
@@ -547,15 +590,25 @@ tag_handle_meta (int tagid, struct taginfo *tag, struct map_context *ctx)
         {
           while (*content)
             {
-              /* Find the next occurrence of ',' or the end of
-                 the string.  */
-              char *end = strchr (content, ',');
-              if (end)
-                ++end;
-              else
-                end = content + strlen (content);
+              char *end;
+              /* Skip any initial whitespace. */
+              content += strspn (content, " \f\n\r\t\v");
+              /* Find the next occurrence of ',' or whitespace,
+               * or the end of the string.  */
+              end = content + strcspn (content, ", \f\n\r\t\v");
               if (!strncasecmp (content, "nofollow", end - content))
                 ctx->nofollow = true;
+              /* Skip past the next comma, if any. */
+              if (*end == ',')
+                ++end;
+              else
+                {
+                  end = strchr (end, ',');
+                  if (end)
+                    ++end;
+                  else
+                    end = content + strlen (content);
+                }
               content = end;
             }
         }
@@ -571,11 +624,26 @@ collect_tags_mapper (struct taginfo *tag, void *arg)
   struct map_context *ctx = (struct map_context *)arg;
 
   /* Find the tag in our table of tags.  This must not fail because
-     map_html_tags only returns tags found in interesting_tags.  */
-  struct known_tag *t = hash_table_get (interesting_tags, tag->name);
-  assert (t != NULL);
+     map_html_tags only returns tags found in interesting_tags.
 
-  t->handler (t->tagid, tag, ctx);
+     I've changed this for now, I'm passing NULL as interesting_tags
+     to map_html_tags.  This way we can check all tags for a style
+     attribute.
+  */
+  struct known_tag *t = hash_table_get (interesting_tags, tag->name);
+
+  if (t != NULL)
+    t->handler (t->tagid, tag, ctx);
+
+  check_style_attr (tag, ctx);
+
+  if (tag->end_tag_p && (0 == strcasecmp (tag->name, "style")) &&
+      tag->contents_begin && tag->contents_end)
+  {
+    /* parse contents */
+    get_urls_css (ctx, tag->contents_begin - ctx->text,
+                  tag->contents_end - tag->contents_begin);
+  }
 }
 
 /* Analyze HTML tags FILE and construct a list of URLs referenced from
@@ -583,7 +651,8 @@ collect_tags_mapper (struct taginfo *tag, void *arg)
    <base href=...> and does the right thing.  */
 
 struct urlpos *
-get_urls_html (const char *file, const char *url, bool *meta_disallow_follow)
+get_urls_html (const char *file, const char *url, bool *meta_disallow_follow,
+               struct iri *iri)
 {
   struct file_memory *fm;
   struct map_context ctx;
@@ -619,8 +688,13 @@ get_urls_html (const char *file, const char *url, bool *meta_disallow_follow)
   if (opt.strict_comments)
     flags |= MHT_STRICT_COMMENTS;
 
+  /* the NULL here used to be interesting_tags */
   map_html_tags (fm->content, fm->length, collect_tags_mapper, &ctx, flags,
-                 interesting_tags, interesting_attributes);
+                 NULL, interesting_attributes);
+
+  /* If meta charset isn't null, override content encoding */
+  if (iri && meta_charset)
+    set_content_encoding (iri, meta_charset);
 
   DEBUGP (("no-follow in %s: %d\n", file, ctx.nofollow));
   if (meta_disallow_follow)
@@ -669,9 +743,9 @@ get_urls_file (const char *file)
       text = line_end;
 
       /* Strip whitespace from the beginning and end of line. */
-      while (line_beg < line_end && ISSPACE (*line_beg))
+      while (line_beg < line_end && c_isspace (*line_beg))
         ++line_beg;
-      while (line_end > line_beg && ISSPACE (*(line_end - 1)))
+      while (line_end > line_beg && c_isspace (*(line_end - 1)))
         --line_end;
 
       if (line_beg == line_end)
@@ -691,12 +765,14 @@ get_urls_file (const char *file)
           url_text = merged;
         }
 
-      url = url_parse (url_text, &up_error_code);
+      url = url_parse (url_text, &up_error_code, NULL, false);
       if (!url)
         {
+          char *error = url_error (url_text, up_error_code);
           logprintf (LOG_NOTQUIET, _("%s: Invalid URL %s: %s\n"),
-                     file, url_text, url_error (up_error_code));
+                     file, url_text, error);
           xfree (url_text);
+          xfree (error);
           continue;
         }
       xfree (url_text);

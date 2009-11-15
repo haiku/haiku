@@ -1,6 +1,6 @@
 /* Reading/parsing the initialization file.
    Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,7 +43,6 @@ as that of the covered work.  */
 #endif
 #include <assert.h>
 
-#include "wget.h"
 #include "utils.h"
 #include "init.h"
 #include "host.h"
@@ -59,11 +58,6 @@ as that of the covered work.  */
 #include "test.h"
 #endif
 
-/* We want tilde expansion enabled only when reading `.wgetrc' lines;
-   otherwise, it will be performed by the shell.  This variable will
-   be set by the wgetrc-reading function.  */
-
-static bool enable_tilde_expansion;
 
 
 #define CMD_DECLARE(func) static bool func (const char *, const char *, void *)
@@ -113,7 +107,9 @@ static const struct {
   /* KEEP THIS LIST ALPHABETICALLY SORTED */
   { "accept",           &opt.accepts,           cmd_vector },
   { "addhostdir",       &opt.add_hostdir,       cmd_boolean },
+  { "adjustextension",  &opt.adjust_extension,  cmd_boolean },
   { "alwaysrest",       &opt.always_rest,       cmd_boolean }, /* deprecated */
+  { "askpassword",      &opt.ask_passwd,        cmd_boolean },
   { "authnochallenge",  &opt.auth_without_challenge,
                                                 cmd_boolean },
   { "background",       &opt.background,        cmd_boolean },
@@ -140,6 +136,7 @@ static const struct {
 #ifdef ENABLE_DEBUG
   { "debug",            &opt.debug,             cmd_boolean },
 #endif
+  { "defaultpage", 	&opt.default_page,      cmd_string},
   { "deleteafter",      &opt.delete_after,      cmd_boolean },
   { "dirprefix",        &opt.dir_prefix,        cmd_directory },
   { "dirstruct",        NULL,                   cmd_spec_dirstruct },
@@ -149,7 +146,7 @@ static const struct {
   { "dotbytes",         &opt.dot_bytes,         cmd_bytes },
   { "dotsinline",       &opt.dots_in_line,      cmd_number },
   { "dotspacing",       &opt.dot_spacing,       cmd_number },
-  { "dotstyle",         &opt.dot_style,         cmd_string },
+  { "dotstyle",         &opt.dot_style,         cmd_string }, /* deprecated */
 #ifdef HAVE_SSL
   { "egdfile",          &opt.egd_file,          cmd_file },
 #endif
@@ -161,10 +158,13 @@ static const struct {
   { "ftppasswd",        &opt.ftp_passwd,        cmd_string }, /* deprecated */
   { "ftppassword",      &opt.ftp_passwd,        cmd_string },
   { "ftpproxy",         &opt.ftp_proxy,         cmd_string },
+#ifdef __VMS
+  { "ftpstmlf",         &opt.ftp_stmlf,         cmd_boolean },
+#endif /* def __VMS */
   { "ftpuser",          &opt.ftp_user,          cmd_string },
   { "glob",             &opt.ftp_glob,          cmd_boolean },
   { "header",           NULL,                   cmd_spec_header },
-  { "htmlextension",    &opt.html_extension,    cmd_boolean },
+  { "htmlextension",    &opt.adjust_extension,  cmd_boolean }, /* deprecated */
   { "htmlify",          NULL,                   cmd_spec_htmlify },
   { "httpkeepalive",    &opt.http_keep_alive,   cmd_boolean },
   { "httppasswd",       &opt.http_passwd,       cmd_string }, /* deprecated */
@@ -181,9 +181,11 @@ static const struct {
   { "inet6only",        &opt.ipv6_only,         cmd_boolean },
 #endif
   { "input",            &opt.input_filename,    cmd_file },
+  { "iri",              &opt.enable_iri,        cmd_boolean },
   { "keepsessioncookies", &opt.keep_session_cookies, cmd_boolean },
   { "limitrate",        &opt.limit_rate,        cmd_bytes },
   { "loadcookies",      &opt.cookies_input,     cmd_file },
+  { "localencoding",    &opt.locale,            cmd_string },
   { "logfile",          &opt.lfilename,         cmd_file },
   { "login",            &opt.ftp_user,          cmd_string },/* deprecated*/
   { "maxredirect",      &opt.max_redirect,      cmd_number },
@@ -201,7 +203,7 @@ static const struct {
   { "postdata",         &opt.post_data,         cmd_string },
   { "postfile",         &opt.post_file_name,    cmd_file },
   { "preferfamily",     NULL,                   cmd_spec_prefer_family },
-  { "preservepermissions", &opt.preserve_perm,  cmd_boolean },
+  { "preservepermissions", &opt.preserve_perm,  cmd_boolean },/* deprecated */
 #ifdef HAVE_SSL
   { "privatekey",       &opt.private_key,       cmd_file },
   { "privatekeytype",   &opt.private_key_type,  cmd_cert_type },
@@ -223,6 +225,7 @@ static const struct {
   { "referer",          &opt.referer,           cmd_string },
   { "reject",           &opt.rejects,           cmd_vector },
   { "relativeonly",     &opt.relative_only,     cmd_boolean },
+  { "remoteencoding",   &opt.encoding_remote,   cmd_string },
   { "removelisting",    &opt.remove_listing,    cmd_boolean },
   { "restrictfilenames", NULL,                  cmd_spec_restrict_file_names },
   { "retrsymlinks",     &opt.retr_symlinks,     cmd_boolean },
@@ -246,7 +249,7 @@ static const struct {
   { "verbose",          NULL,                   cmd_spec_verbose },
   { "wait",             &opt.wait,              cmd_time },
   { "waitretry",        &opt.waitretry,         cmd_time },
-#ifdef MSDOS
+#ifdef USE_WATT32
   { "wdebug",           &opt.wdebug,            cmd_boolean },
 #endif
 };
@@ -301,6 +304,7 @@ defaults (void)
   tmp = getenv ("no_proxy");
   if (tmp)
     opt.no_proxy = sepstring (tmp);
+  opt.prefer_family = prefer_none;
   opt.allow_cache = true;
 
   opt.read_timeout = 900;
@@ -326,9 +330,20 @@ defaults (void)
   opt.restrict_files_os = restrict_unix;
 #endif
   opt.restrict_files_ctrl = true;
+  opt.restrict_files_nonascii = false;
   opt.restrict_files_case = restrict_no_case_restriction;
 
   opt.max_redirect = 20;
+
+  opt.waitretry = 10;
+
+#ifdef ENABLE_IRI
+  opt.enable_iri = true;
+#else
+  opt.enable_iri = false;
+#endif
+  opt.locale = NULL;
+  opt.encoding_remote = NULL;
 }
 
 /* Return the user's home directory (strdup-ed), or NULL if none is
@@ -336,53 +351,54 @@ defaults (void)
 char *
 home_dir (void)
 {
-  char *home = getenv ("HOME");
+  static char buf[PATH_MAX];
+  static char *home;
 
   if (!home)
     {
+      home = getenv ("HOME");
+      if (!home)
+        {
 #if defined(MSDOS)
-      /* Under MSDOS, if $HOME isn't defined, use the directory where
-         `wget.exe' resides.  */
-      const char *_w32_get_argv0 (void); /* in libwatt.a/pcconfig.c */
-      char *p, buf[PATH_MAX];
+          /* Under MSDOS, if $HOME isn't defined, use the directory where
+             `wget.exe' resides.  */
+          const char *_w32_get_argv0 (void); /* in libwatt.a/pcconfig.c */
+          char *p;
 
-      strcpy (buf, _w32_get_argv0 ());
-      p = strrchr (buf, '/');            /* djgpp */
-      if (!p)
-        p = strrchr (buf, '\\');          /* others */
-      assert (p);
-      *p = '\0';
-      home = buf;
+          strcpy (buf, _w32_get_argv0 ());
+          p = strrchr (buf, '/');            /* djgpp */
+          if (!p)
+            p = strrchr (buf, '\\');          /* others */
+          assert (p);
+          *p = '\0';
+          home = buf;
 #elif !defined(WINDOWS)
-      /* If HOME is not defined, try getting it from the password
-         file.  */
-      struct passwd *pwd = getpwuid (getuid ());
-      if (!pwd || !pwd->pw_dir)
-        return NULL;
-      home = pwd->pw_dir;
+          /* If HOME is not defined, try getting it from the password
+             file.  */
+          struct passwd *pwd = getpwuid (getuid ());
+          if (!pwd || !pwd->pw_dir)
+            return NULL;
+          strcpy (buf, pwd->pw_dir);
+          home = buf;
 #else  /* !WINDOWS */
-      /* Under Windows, if $HOME isn't defined, use the directory where
-         `wget.exe' resides.  */
-      home = ws_mypath ();
+          /* Under Windows, if $HOME isn't defined, use the directory where
+             `wget.exe' resides.  */
+          home = ws_mypath ();
 #endif /* WINDOWS */
+        }
     }
 
   return home ? xstrdup (home) : NULL;
 }
 
-/* Return the path to the user's .wgetrc.  This is either the value of
-   `WGETRC' environment variable, or `$HOME/.wgetrc'.
-
+/* Check the 'WGETRC' environment variable and return the file name
+   if  'WGETRC' is set and is a valid file.
    If the `WGETRC' variable exists but the file does not exist, the
    function will exit().  */
-static char *
-wgetrc_file_name (void)
+char *
+wgetrc_env_file_name (void)
 {
-  char *env, *home;
-  char *file = NULL;
-
-  /* Try the environment.  */
-  env = getenv ("WGETRC");
+  char *env = getenv ("WGETRC");
   if (env && *env)
     {
       if (!file_exists_p (env))
@@ -393,27 +409,26 @@ wgetrc_file_name (void)
         }
       return xstrdup (env);
     }
+  return NULL;
+}
 
-  /* If that failed, try $HOME/.wgetrc.  */
+/* Check for the existance of '$HOME/.wgetrc' and return it's path
+   if it exists and is set.  */
+char *
+wgetrc_user_file_name (void)
+{
+  char *home = home_dir ();
+  char *file = NULL;
+  /* If that failed, try $HOME/.wgetrc (or equivalent).  */
+
+#ifdef __VMS
+  file = "SYS$LOGIN:.wgetrc";
+#else /* def __VMS */
   home = home_dir ();
   if (home)
     file = aprintf ("%s/.wgetrc", home);
   xfree_null (home);
-
-#ifdef WINDOWS
-  /* Under Windows, if we still haven't found .wgetrc, look for the file
-     `wget.ini' in the directory where `wget.exe' resides; we do this for
-     backward compatibility with previous versions of Wget.
-     SYSTEM_WGETRC should not be defined under WINDOWS.  */
-  if (!file || !file_exists_p (file))
-    {
-      xfree_null (file);
-      file = NULL;
-      home = ws_mypath ();
-      if (home)
-        file = aprintf ("%s/wget.ini", home);
-    }
-#endif /* WINDOWS */
+#endif /* def __VMS [else] */
 
   if (!file)
     return NULL;
@@ -422,6 +437,47 @@ wgetrc_file_name (void)
       xfree (file);
       return NULL;
     }
+  return file;
+}
+
+/* Return the path to the user's .wgetrc.  This is either the value of
+   `WGETRC' environment variable, or `$HOME/.wgetrc'.
+
+   Additionally, for windows, look in the directory where wget.exe
+   resides.  */
+char *
+wgetrc_file_name (void)
+{
+  char *file = wgetrc_env_file_name ();
+  if (file && *file)
+    return file;
+
+  file = wgetrc_user_file_name ();
+
+#ifdef WINDOWS
+  /* Under Windows, if we still haven't found .wgetrc, look for the file
+     `wget.ini' in the directory where `wget.exe' resides; we do this for
+     backward compatibility with previous versions of Wget.
+     SYSTEM_WGETRC should not be defined under WINDOWS.  */
+  if (!file)
+    {
+      char *home = home_dir ();
+      xfree_null (file);
+      file = NULL;
+      home = ws_mypath ();
+      if (home)
+        {
+          file = aprintf ("%s/wget.ini", home);
+          if (!file_exists_p (file))
+            {
+              xfree (file);
+              file = NULL;
+            }
+          xfree (home);
+        }
+    }
+#endif /* WINDOWS */
+
   return file;
 }
 
@@ -435,6 +491,7 @@ enum parse_line {
 
 static enum parse_line parse_line (const char *, char **, char **, int *);
 static bool setval_internal (int, const char *, const char *);
+static bool setval_internal_tilde (int, const char *, const char *);
 
 /* Initialize variables from a wgetrc file.  Returns zero (failure) if
    there were errors in the file.  */
@@ -447,14 +504,13 @@ run_wgetrc (const char *file)
   int ln;
   int errcnt = 0;
 
-  fp = fopen (file, "rb");
+  fp = fopen (file, "r");
   if (!fp)
     {
       fprintf (stderr, _("%s: Cannot read %s (%s).\n"), exec_name,
                file, strerror (errno));
       return true;                      /* not a fatal error */
     }
-  enable_tilde_expansion = true;
   ln = 1;
   while ((line = read_whole_line (fp)) != NULL)
     {
@@ -466,7 +522,7 @@ run_wgetrc (const char *file)
         {
         case line_ok:
           /* If everything is OK, set the value.  */
-          if (!setval_internal (comind, com, val))
+          if (!setval_internal_tilde (comind, com, val))
             {
               fprintf (stderr, _("%s: Error in %s at line %d.\n"),
                        exec_name, file, ln);
@@ -479,8 +535,8 @@ run_wgetrc (const char *file)
           ++errcnt;
           break;
         case line_unknown_command:
-          fprintf (stderr, _("%s: Unknown command `%s' in %s at line %d.\n"),
-                   exec_name, com, file, ln);
+          fprintf (stderr, _("%s: Unknown command %s in %s at line %d.\n"),
+                   exec_name, quote (com), file, ln);
           ++errcnt;
           break;
         case line_empty:
@@ -493,7 +549,6 @@ run_wgetrc (const char *file)
       xfree (line);
       ++ln;
     }
-  enable_tilde_expansion = false;
   fclose (fp);
 
   return errcnt == 0;
@@ -504,15 +559,20 @@ run_wgetrc (const char *file)
 void
 initialize (void)
 {
-  char *file;
+  char *file, *env_sysrc;
   int ok = true;
 
   /* Load the hard-coded defaults.  */
   defaults ();
 
-  /* If SYSTEM_WGETRC is defined, use it.  */
+  /* Run a non-standard system rc file when the according environment
+     variable has been set. For internal testing purposes only!  */
+  env_sysrc = getenv ("SYSTEM_WGETRC");
+  if (env_sysrc && file_exists_p (env_sysrc))
+    ok &= run_wgetrc (env_sysrc);
+  /* Otherwise, if SYSTEM_WGETRC is defined, use it.  */
 #ifdef SYSTEM_WGETRC
-  if (file_exists_p (SYSTEM_WGETRC))
+  else if (file_exists_p (SYSTEM_WGETRC))
     ok &= run_wgetrc (SYSTEM_WGETRC);
 #endif
   /* Override it with your own, if one exists.  */
@@ -525,8 +585,8 @@ initialize (void)
   if (!strcmp (file, SYSTEM_WGETRC))
     {
       fprintf (stderr, _("\
-%s: Warning: Both system and user wgetrc point to `%s'.\n"),
-               exec_name, file);
+%s: Warning: Both system and user wgetrc point to %s.\n"),
+               exec_name, quote (file));
     }
   else
 #endif
@@ -539,7 +599,7 @@ initialize (void)
   xfree (file);
   return;
 }
-
+
 /* Remove dashes and underscores from S, modifying S in the
    process. */
 
@@ -579,9 +639,9 @@ parse_line (const char *line, char **com, char **val, int *comind)
   int ind;
 
   /* Skip leading and trailing whitespace.  */
-  while (*line && ISSPACE (*line))
+  while (*line && c_isspace (*line))
     ++line;
-  while (end > line && ISSPACE (end[-1]))
+  while (end > line && c_isspace (end[-1]))
     --end;
 
   /* Skip empty lines and comments.  */
@@ -591,17 +651,17 @@ parse_line (const char *line, char **com, char **val, int *comind)
   p = line;
 
   cmdstart = p;
-  while (p < end && (ISALNUM (*p) || *p == '_' || *p == '-'))
+  while (p < end && (c_isalnum (*p) || *p == '_' || *p == '-'))
     ++p;
   cmdend = p;
 
   /* Skip '=', as well as any space before or after it. */
-  while (p < end && ISSPACE (*p))
+  while (p < end && c_isspace (*p))
     ++p;
   if (p == end || *p != '=')
     return line_syntax_error;
   ++p;
-  while (p < end && ISSPACE (*p))
+  while (p < end && c_isspace (*p))
     ++p;
 
   valstart = p;
@@ -625,14 +685,51 @@ parse_line (const char *line, char **com, char **val, int *comind)
   return line_ok;
 }
 
+#if defined(WINDOWS) || defined(MSDOS)
+# define ISSEP(c) ((c) == '/' || (c) == '\\')
+#else
+# define ISSEP(c) ((c) == '/')
+#endif
+
 /* Run commands[comind].action. */
 
 static bool
 setval_internal (int comind, const char *com, const char *val)
 {
-  assert (0 <= comind && comind < countof (commands));
+  assert (0 <= comind && ((size_t) comind) < countof (commands));
   DEBUGP (("Setting %s (%s) to %s\n", com, commands[comind].name, val));
   return commands[comind].action (com, val, commands[comind].place);
+}
+
+static bool
+setval_internal_tilde (int comind, const char *com, const char *val)
+{
+  bool ret;
+  int homelen;
+  char *home;
+  char **pstring;
+  ret = setval_internal (comind, com, val);
+
+  /* We make tilde expansion for cmd_file and cmd_directory */
+  if (((commands[comind].action == cmd_file) ||
+       (commands[comind].action == cmd_directory))
+      && ret && (*val == '~' && ISSEP (val[1])))
+    {
+      pstring = commands[comind].place;
+      home = home_dir ();
+      if (home)
+	{
+	  homelen = strlen (home);
+	  while (homelen && ISSEP (home[homelen - 1]))
+            home[--homelen] = '\0';
+
+	  /* Skip the leading "~/". */
+	  for (++val; ISSEP (*val); val++)
+  	    ;
+	  *pstring = concat_strings (home, "/", val, (char *)0);
+	}
+    }
+  return ret;
 }
 
 /* Run command COM with value VAL.  If running the command produces an
@@ -677,8 +774,8 @@ run_command (const char *opt)
       xfree (val);
       break;
     default:
-      fprintf (stderr, _("%s: Invalid --execute command `%s'\n"),
-               exec_name, opt);
+      fprintf (stderr, _("%s: Invalid --execute command %s\n"),
+               exec_name, quote (opt));
       exit (2);
     }
 }
@@ -694,15 +791,15 @@ static bool decode_string (const char *, const struct decode_item *, int, int *)
 static bool simple_atoi (const char *, const char *, int *);
 static bool simple_atof (const char *, const char *, double *);
 
-#define CMP1(p, c0) (TOLOWER((p)[0]) == (c0) && (p)[1] == '\0')
+#define CMP1(p, c0) (c_tolower((p)[0]) == (c0) && (p)[1] == '\0')
 
-#define CMP2(p, c0, c1) (TOLOWER((p)[0]) == (c0)        \
-                         && TOLOWER((p)[1]) == (c1)     \
+#define CMP2(p, c0, c1) (c_tolower((p)[0]) == (c0)        \
+                         && c_tolower((p)[1]) == (c1)     \
                          && (p)[2] == '\0')
 
-#define CMP3(p, c0, c1, c2) (TOLOWER((p)[0]) == (c0)    \
-                     && TOLOWER((p)[1]) == (c1)         \
-                     && TOLOWER((p)[2]) == (c2)         \
+#define CMP3(p, c0, c1, c2) (c_tolower((p)[0]) == (c0)    \
+                     && c_tolower((p)[1]) == (c1)         \
+                     && c_tolower((p)[2]) == (c2)         \
                      && (p)[3] == '\0')
 
 
@@ -722,8 +819,8 @@ cmd_boolean (const char *com, const char *val, void *place)
   else
     {
       fprintf (stderr,
-               _("%s: %s: Invalid boolean `%s'; use `on' or `off'.\n"),
-               exec_name, com, val);
+               _("%s: %s: Invalid boolean %s; use `on' or `off'.\n"),
+               exec_name, com, quote (val));
       return false;
     }
 
@@ -739,8 +836,8 @@ cmd_number (const char *com, const char *val, void *place)
   if (!simple_atoi (val, val + strlen (val), place)
       || *(int *) place < 0)
     {
-      fprintf (stderr, _("%s: %s: Invalid number `%s'.\n"),
-               exec_name, com, val);
+      fprintf (stderr, _("%s: %s: Invalid number %s.\n"),
+               exec_name, com, quote (val));
       return false;
     }
   return true;
@@ -770,11 +867,6 @@ cmd_string (const char *com, const char *val, void *place)
   return true;
 }
 
-#if defined(WINDOWS) || defined(MSDOS)
-# define ISSEP(c) ((c) == '/' || (c) == '\\')
-#else
-# define ISSEP(c) ((c) == '/')
-#endif
 
 /* Like the above, but handles tilde-expansion when reading a user's
    `.wgetrc'.  In that case, and if VAL begins with `~', the tilde
@@ -788,28 +880,7 @@ cmd_file (const char *com, const char *val, void *place)
 
   /* #### If VAL is empty, perhaps should set *PLACE to NULL.  */
 
-  if (!enable_tilde_expansion || !(*val == '~' && ISSEP (val[1])))
-    {
-    noexpand:
-      *pstring = xstrdup (val);
-    }
-  else
-    {
-      int homelen;
-      char *home = home_dir ();
-      if (!home)
-        goto noexpand;
-
-      homelen = strlen (home);
-      while (homelen && ISSEP (home[homelen - 1]))
-        home[--homelen] = '\0';
-
-      /* Skip the leading "~/". */
-      for (++val; ISSEP (*val); val++)
-        ;
-
-      *pstring = concat_strings (home, "/", val, (char *) 0);
-    }
+  *pstring = xstrdup (val);
 
 #if defined(WINDOWS) || defined(MSDOS)
   /* Convert "\" to "/". */
@@ -910,12 +981,12 @@ parse_bytes_helper (const char *val, double *result)
     }
 
   /* Strip trailing whitespace.  */
-  while (val < end && ISSPACE (end[-1]))
+  while (val < end && c_isspace (end[-1]))
     --end;
   if (val == end)
     return false;
 
-  switch (TOLOWER (end[-1]))
+  switch (c_tolower (end[-1]))
     {
     case 'k':
       --end, mult = 1024.0;
@@ -936,9 +1007,9 @@ parse_bytes_helper (const char *val, double *result)
     }
 
   /* Skip leading and trailing whitespace. */
-  while (val < end && ISSPACE (*val))
+  while (val < end && c_isspace (*val))
     ++val;
-  while (val < end && ISSPACE (end[-1]))
+  while (val < end && c_isspace (end[-1]))
     --end;
   if (val == end)
     return false;
@@ -970,8 +1041,8 @@ cmd_bytes (const char *com, const char *val, void *place)
   double byte_value;
   if (!parse_bytes_helper (val, &byte_value))
     {
-      fprintf (stderr, _("%s: %s: Invalid byte value `%s'\n"),
-               exec_name, com, val);
+      fprintf (stderr, _("%s: %s: Invalid byte value %s\n"),
+               exec_name, com, quote (val));
       return false;
     }
   *(wgint *)place = (wgint)byte_value;
@@ -989,8 +1060,8 @@ cmd_bytes_sum (const char *com, const char *val, void *place)
   double byte_value;
   if (!parse_bytes_helper (val, &byte_value))
     {
-      fprintf (stderr, _("%s: %s: Invalid byte value `%s'\n"),
-               exec_name, com, val);
+      fprintf (stderr, _("%s: %s: Invalid byte value %s\n"),
+               exec_name, com, quote (val));
       return false;
     }
   *(SUM_SIZE_INT *) place = (SUM_SIZE_INT) byte_value;
@@ -1008,18 +1079,18 @@ cmd_time (const char *com, const char *val, void *place)
   const char *end = val + strlen (val);
 
   /* Strip trailing whitespace.  */
-  while (val < end && ISSPACE (end[-1]))
+  while (val < end && c_isspace (end[-1]))
     --end;
 
   if (val == end)
     {
     err:
-      fprintf (stderr, _("%s: %s: Invalid time period `%s'\n"),
-               exec_name, com, val);
+      fprintf (stderr, _("%s: %s: Invalid time period %s\n"),
+               exec_name, com, quote (val));
       return false;
     }
 
-  switch (TOLOWER (end[-1]))
+  switch (c_tolower (end[-1]))
     {
     case 's':
       --end, mult = 1;          /* seconds */
@@ -1043,9 +1114,9 @@ cmd_time (const char *com, const char *val, void *place)
     }
 
   /* Skip leading and trailing whitespace. */
-  while (val < end && ISSPACE (*val))
+  while (val < end && c_isspace (*val))
     ++val;
-  while (val < end && ISSPACE (end[-1]))
+  while (val < end && c_isspace (end[-1]))
     --end;
   if (val == end)
     goto err;
@@ -1068,7 +1139,7 @@ cmd_cert_type (const char *com, const char *val, void *place)
   };
   int ok = decode_string (val, choices, countof (choices), place);
   if (!ok)
-    fprintf (stderr, _("%s: %s: Invalid value `%s'.\n"), exec_name, com, val);
+    fprintf (stderr, _("%s: %s: Invalid value %s.\n"), exec_name, com, quote (val));
   return ok;
 }
 #endif
@@ -1105,8 +1176,8 @@ cmd_spec_header (const char *com, const char *val, void *place_ignored)
 
   if (!check_user_specified_header (val))
     {
-      fprintf (stderr, _("%s: %s: Invalid header `%s'.\n"),
-               exec_name, com, val);
+      fprintf (stderr, _("%s: %s: Invalid header %s.\n"),
+               exec_name, com, quote (val));
       return false;
     }
   opt.user_headers = vec_append (opt.user_headers, val);
@@ -1155,10 +1226,10 @@ cmd_spec_prefer_family (const char *com, const char *val, void *place_ignored)
     { "IPv6", prefer_ipv6 },
     { "none", prefer_none },
   };
-  int prefer_family = prefer_ipv4;
+  int prefer_family = prefer_none;
   int ok = decode_string (val, choices, countof (choices), &prefer_family);
   if (!ok)
-    fprintf (stderr, _("%s: %s: Invalid value `%s'.\n"), exec_name, com, val);
+    fprintf (stderr, _("%s: %s: Invalid value %s.\n"), exec_name, com, quote (val));
   opt.prefer_family = prefer_family;
   return ok;
 }
@@ -1171,8 +1242,8 @@ cmd_spec_progress (const char *com, const char *val, void *place_ignored)
 {
   if (!valid_progress_implementation_p (val))
     {
-      fprintf (stderr, _("%s: %s: Invalid progress type `%s'.\n"),
-               exec_name, com, val);
+      fprintf (stderr, _("%s: %s: Invalid progress type %s.\n"),
+               exec_name, com, quote (val));
       return false;
     }
   xfree_null (opt.progress_type);
@@ -1206,6 +1277,7 @@ cmd_spec_restrict_file_names (const char *com, const char *val, void *place_igno
   int restrict_os = opt.restrict_files_os;
   int restrict_ctrl = opt.restrict_files_ctrl;
   int restrict_case = opt.restrict_files_case;
+  int restrict_nonascii = opt.restrict_files_nonascii;
 
   const char *end;
 
@@ -1216,7 +1288,7 @@ cmd_spec_restrict_file_names (const char *com, const char *val, void *place_igno
       end = strchr (val, ',');
       if (!end)
         end = val + strlen (val);
-      
+
       if (VAL_IS ("unix"))
         restrict_os = restrict_unix;
       else if (VAL_IS ("windows"))
@@ -1227,15 +1299,18 @@ cmd_spec_restrict_file_names (const char *com, const char *val, void *place_igno
         restrict_case = restrict_uppercase;
       else if (VAL_IS ("nocontrol"))
         restrict_ctrl = false;
+      else if (VAL_IS ("ascii"))
+        restrict_nonascii = true;
       else
         {
-          fprintf (stderr,
-                   _("%s: %s: Invalid restriction `%s', use [unix|windows],[lowercase|uppercase],[nocontrol].\n"),
-                   exec_name, com, val);
+          fprintf (stderr, _("\
+%s: %s: Invalid restriction %s,\n\
+    use [unix|windows],[lowercase|uppercase],[nocontrol],[ascii].\n"),
+                   exec_name, com, quote (val));
           return false;
         }
 
-      if (*end) 
+      if (*end)
         val = end + 1;
     }
   while (*val && *end);
@@ -1245,7 +1320,8 @@ cmd_spec_restrict_file_names (const char *com, const char *val, void *place_igno
   opt.restrict_files_os = restrict_os;
   opt.restrict_files_ctrl = restrict_ctrl;
   opt.restrict_files_case = restrict_case;
-  
+  opt.restrict_files_nonascii = restrict_nonascii;
+
   return true;
 }
 
@@ -1261,7 +1337,7 @@ cmd_spec_secure_protocol (const char *com, const char *val, void *place)
   };
   int ok = decode_string (val, choices, countof (choices), place);
   if (!ok)
-    fprintf (stderr, _("%s: %s: Invalid value `%s'.\n"), exec_name, com, val);
+    fprintf (stderr, _("%s: %s: Invalid value %s.\n"), exec_name, com, quote (val));
   return ok;
 }
 #endif
@@ -1286,8 +1362,8 @@ cmd_spec_useragent (const char *com, const char *val, void *place_ignored)
   /* Disallow embedded newlines.  */
   if (strchr (val, '\n'))
     {
-      fprintf (stderr, _("%s: %s: Invalid value `%s'.\n"),
-               exec_name, com, val);
+      fprintf (stderr, _("%s: %s: Invalid value %s.\n"),
+               exec_name, com, quote (val));
       return false;
     }
   xfree_null (opt.useragent);
@@ -1324,7 +1400,7 @@ simple_atoi (const char *beg, const char *end, int *dest)
   bool negative = false;
   const char *p = beg;
 
-  while (p < end && ISSPACE (*p))
+  while (p < end && c_isspace (*p))
     ++p;
   if (p < end && (*p == '-' || *p == '+'))
     {
@@ -1338,7 +1414,7 @@ simple_atoi (const char *beg, const char *end, int *dest)
      negative integer cannot be represented as a positive number.  */
 
   if (!negative)
-    for (; p < end && ISDIGIT (*p); p++)
+    for (; p < end && c_isdigit (*p); p++)
       {
         int next = (10 * result) + (*p - '0');
         if (next < result)
@@ -1346,7 +1422,7 @@ simple_atoi (const char *beg, const char *end, int *dest)
         result = next;
       }
   else
-    for (; p < end && ISDIGIT (*p); p++)
+    for (; p < end && c_isdigit (*p); p++)
       {
         int next = (10 * result) - (*p - '0');
         if (next > result)
@@ -1378,7 +1454,7 @@ simple_atof (const char *beg, const char *end, double *dest)
 
   const char *p = beg;
 
-  while (p < end && ISSPACE (*p))
+  while (p < end && c_isspace (*p))
     ++p;
   if (p < end && (*p == '-' || *p == '+'))
     {
@@ -1389,7 +1465,7 @@ simple_atof (const char *beg, const char *end, double *dest)
   for (; p < end; p++)
     {
       char ch = *p;
-      if (ISDIGIT (ch))
+      if (c_isdigit (ch))
         {
           if (!seen_dot)
             result = (10 * result) + (ch - '0');
@@ -1425,7 +1501,7 @@ check_user_specified_header (const char *s)
 {
   const char *p;
 
-  for (p = s; *p && *p != ':' && !ISSPACE (*p); p++)
+  for (p = s; *p && *p != ':' && !c_isspace (*p); p++)
     ;
   /* The header MUST contain `:' preceded by at least one
      non-whitespace character.  */
@@ -1524,12 +1600,37 @@ cleanup (void)
   xfree_null (opt.cookies_output);
   xfree_null (opt.user);
   xfree_null (opt.passwd);
+  xfree_null (opt.base_href);
+
 #endif /* DEBUG_MALLOC */
 }
 
 /* Unit testing routines.  */
 
 #ifdef TESTING
+
+const char *
+test_commands_sorted()
+{
+  int prev_idx = 0, next_idx = 1;
+  int command_count = countof (commands) - 1;
+  int cmp = 0;
+  while (next_idx <= command_count)
+    {
+      cmp = strcasecmp (commands[prev_idx].name, commands[next_idx].name);
+      if (cmp > 0)
+        {
+          mu_assert ("FAILED", false);
+          break;
+        }
+      else
+        {
+          prev_idx ++;
+	  next_idx ++;
+        }
+    }
+  return NULL;
+}
 
 const char *
 test_cmd_spec_restrict_file_names()
@@ -1547,11 +1648,11 @@ test_cmd_spec_restrict_file_names()
     { "windows,lowercase", restrict_windows, true, restrict_lowercase, true },
     { "unix,nocontrol,lowercase,", restrict_unix, false, restrict_lowercase, true },
   };
-  
-  for (i = 0; i < sizeof(test_array)/sizeof(test_array[0]); ++i) 
+
+  for (i = 0; i < sizeof(test_array)/sizeof(test_array[0]); ++i)
     {
       bool res;
-      
+
       defaults();
       res = cmd_spec_restrict_file_names ("dummy", test_array[i].val, NULL);
 
@@ -1561,10 +1662,10 @@ test_cmd_spec_restrict_file_names()
       fprintf (stderr, "opt.restrict_files_ctrl: %d\n", opt.restrict_files_ctrl); fflush (stderr);
       fprintf (stderr, "opt.restrict_files_case: %d\n", opt.restrict_files_case); fflush (stderr);
       */
-      mu_assert ("test_cmd_spec_restrict_file_names: wrong result", 
+      mu_assert ("test_cmd_spec_restrict_file_names: wrong result",
                  res == test_array[i].result
-                 && opt.restrict_files_os   == test_array[i].expected_restrict_files_os 
-                 && opt.restrict_files_ctrl == test_array[i].expected_restrict_files_ctrl 
+                 && opt.restrict_files_os   == test_array[i].expected_restrict_files_os
+                 && opt.restrict_files_ctrl == test_array[i].expected_restrict_files_ctrl
                  && opt.restrict_files_case == test_array[i].expected_restrict_files_case);
     }
 

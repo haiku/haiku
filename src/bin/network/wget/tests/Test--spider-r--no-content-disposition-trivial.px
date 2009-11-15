@@ -1,6 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
 use HTTPTest;
 
@@ -14,8 +15,8 @@ my $mainpage = <<EOF;
 </head>
 <body>
   <p>
-    Some text and a link to a <a href="http://localhost:8080/secondpage.html">second page</a>.
-    Also, a <a href="http://localhost:8080/nonexistent">broken link</a>.
+    Some text and a link to a <a href="http://localhost:{{port}}/secondpage.html">second page</a>.
+    Also, a <a href="http://localhost:{{port}}/nonexistent">broken link</a>.
   </p>
 </body>
 </html>
@@ -28,8 +29,8 @@ my $secondpage = <<EOF;
 </head>
 <body>
   <p>
-    Some text and a link to a <a href="http://localhost:8080/thirdpage.html">third page</a>.
-    Also, a <a href="http://localhost:8080/nonexistent">broken link</a>.
+    Some text and a link to a <a href="http://localhost:{{port}}/thirdpage.html">third page</a>.
+    Also, a <a href="http://localhost:{{port}}/nonexistent">broken link</a>.
   </p>
 </body>
 </html>
@@ -42,8 +43,8 @@ my $thirdpage = <<EOF;
 </head>
 <body>
   <p>
-    Some text and a link to a <a href="http://localhost:8080/dummy.txt">text file</a>.
-    Also, another <a href="http://localhost:8080/againnonexistent">broken link</a>.
+    Some text and a link to a <a href="http://localhost:{{port}}/dummy.txt">text file</a>.
+    Also, another <a href="http://localhost:{{port}}/againnonexistent">broken link</a>.
   </p>
 </body>
 </html>
@@ -89,9 +90,9 @@ my %urls = (
     },
 );
 
-my $cmdline = $WgetTest::WGETPATH . " --spider -r --no-content-disposition http://localhost:8080/";
+my $cmdline = $WgetTest::WGETPATH . " --spider -r --no-content-disposition http://localhost:{{port}}/";
 
-my $expected_error_code = 0;
+my $expected_error_code = 8;
 
 my %expected_downloaded_files = (
 );
@@ -99,9 +100,9 @@ my %expected_downloaded_files = (
 ###############################################################################
 
 my $the_test = HTTPTest->new (name => "Test--spider-r--no-content-disposition-trivial",
-                              input => \%urls, 
-                              cmdline => $cmdline, 
-                              errcode => $expected_error_code, 
+                              input => \%urls,
+                              cmdline => $cmdline,
+                              errcode => $expected_error_code,
                               output => \%expected_downloaded_files);
 exit $the_test->run();
 

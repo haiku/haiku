@@ -16,9 +16,11 @@ compile Wget from source code on a Unix-like system, read on.
 
 The preferred form of building Wget is to get a release archive and
 unpack it (which you have presumably done, since you are reading
-this).  If you have obtained the source code via the Subversion
+this).  If you have obtained the source code via the Mercurial
 repository, please follow the instructions in `README.checkout' before
-continuing.
+continuing, as the sources from the Mercurial repository do not include
+some files that are present in official distributions; these additional
+files must be generated first.
 
 1. Dependencies
 ---------------
@@ -39,6 +41,8 @@ include:
 
   - OpenSSL -- for "https" URLs.
   - GNU gettext -- for translated messages.
+  - GNU libidn -- for IDN/IRI support.
+  - GNU libiconv -- for IDN/IRI support (not needed on GNU).
 
 To be usable for building Wget, the listed libraries must be installed
 with their "development" header files.  On GNU/Linux systems this
@@ -98,6 +102,9 @@ software Wget can link with, such as the SSL libraries.  Recognized
   --disable-largefile     omit support for large files
   --disable-ipv6          disable IPv6 support
   --disable-rpath         do not hardcode runtime library paths
+  --disable-iri           disable IDN/IRIs support
+
+For the full list, see the output of `./configure --help'.
 
 You can inspect decisions made by configure by editing the generated
 Makefiles and the `src/config.h' include file.  The defaults should
@@ -117,10 +124,12 @@ invoke configure like this:
 
 This assumes that `cc' is in your path -- if it is not, simply use
 CC=/path/to/cc instead.  Note that environment variables that affect
-configure can be set with the usual shell syntax `VAR=value
-./configure' (assuming sh syntax), but can also be specified as
-arguments to configure, as shown above.  The latter method, while
-being specific to configure, works unmodified in all shells.
+configure can be set with the usual shell syntax `VAR=value ./configure'
+(assuming sh syntax), but can also be specified as arguments to
+configure, as shown above.  The latter method, while being specific to
+configure, works unmodified in all shells, and in addition allows
+configure to detect when that setting has been changed across
+invocations.
 
 Environment variables that affect `configure' include: CFLAGS for C
 compiler flags, CPPFLAGS for C preprocessor flags, LDFLAGS for linker

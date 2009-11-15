@@ -1,6 +1,6 @@
 /* Hash tables.
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
+   2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -31,8 +31,8 @@ as that of the covered work.  */
 /* With -DSTANDALONE, this file can be compiled outside Wget source
    tree.  To test, also use -DTEST.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
+#ifndef STANDALONE
+# include "wget.h"
 #endif
 
 #include <stdio.h>
@@ -43,7 +43,6 @@ as that of the covered work.  */
 
 #ifndef STANDALONE
 /* Get Wget's utility headers. */
-# include "wget.h"
 # include "utils.h"
 #else
 /* Make do without them. */
@@ -55,9 +54,9 @@ as that of the covered work.  */
 #  define countof(x) (sizeof (x) / sizeof ((x)[0]))
 # endif
 # include <ctype.h>
-# define TOLOWER(x) tolower ((unsigned char) (x))
-# if __STDC_VERSION__ >= 199901L
-#  include <stdint.h>  /* for uintptr_t */
+# define c_tolower(x) tolower ((unsigned char) (x))
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
 # else
    typedef unsigned long uintptr_t;
 # endif
@@ -227,7 +226,7 @@ prime_size (int size, int *prime_offset)
     243370577, 316381771, 411296309, 534685237, 695090819, 903618083,
     1174703521, 1527114613, 1837299131, 2147483647
   };
-  int i;
+  size_t i;
 
   for (i = *prime_offset; i < countof (primes); i++)
     if (primes[i] >= size)
@@ -631,7 +630,7 @@ hash_table_count (const struct hash_table *ht)
  * Support for hash tables whose keys are strings.
  *
  */
-   
+
 /* Base 31 hash function.  Taken from Gnome's glib, modified to use
    standard C types.
 
@@ -644,11 +643,11 @@ hash_string (const void *key)
 {
   const char *p = key;
   unsigned int h = *p;
-  
+
   if (h)
     for (p += 1; *p != '\0'; p++)
       h = (h << 5) - h + *p;
-  
+
   return h;
 }
 
@@ -681,12 +680,12 @@ static unsigned long
 hash_string_nocase (const void *key)
 {
   const char *p = key;
-  unsigned int h = TOLOWER (*p);
-  
+  unsigned int h = c_tolower (*p);
+
   if (h)
     for (p += 1; *p != '\0'; p++)
-      h = (h << 5) - h + TOLOWER (*p);
-  
+      h = (h << 5) - h + c_tolower (*p);
+
   return h;
 }
 

@@ -1,5 +1,5 @@
 /* Support for various Windows compilation environments.
-   Copyright (C) 2005, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -83,6 +83,7 @@ as that of the covered work.  */
 
 /* MinGW and GCC support some POSIX and C99 features.  */
 #define HAVE_INTTYPES_H 1
+#define HAVE_STDINT_H 1
 
 #define HAVE__BOOL 1
 #undef SIZEOF_LONG_LONG		/* avoid redefinition warning */
@@ -128,6 +129,7 @@ as that of the covered work.  */
 #if _MSC_VER >= 1400
 #pragma warning ( disable : 4996 )
 #define _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_WARNINGS
 #endif
 
 
@@ -206,8 +208,13 @@ as that of the covered work.  */
 #define HAVE_STDINT_H 1
 #define HAVE_INTTYPES_H 1
 
-/* Watcom 1.6 do have <stdbool.h>, but definition of '_Bool' is missing! */
-/* #define HAVE_STDBOOL_H 1 */
+/* OpenWatcom 1.6 do have <stdbool.h>, but definition of '_Bool' is missing! */
+/* This was fixed in OpenWatcom 1.7 */
+#if __WATCOMC__ >= 1270
+#define HAVE_STDBOOL_H 1
+#define HAVE__BOOL 1
+#endif
+
 #define HAVE_STRTOLL 1
 #define HAVE_UINT32_T 1
 #undef HAVE_UTIME_H

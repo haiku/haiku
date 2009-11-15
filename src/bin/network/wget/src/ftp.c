@@ -1,6 +1,6 @@
 /* File Transfer Protocol support.
    Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,11 +28,12 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
@@ -40,7 +41,6 @@ as that of the covered work.  */
 #include <errno.h>
 #include <time.h>
 
-#include "wget.h"
 #include "utils.h"
 #include "url.h"
 #include "retr.h"
@@ -50,6 +50,11 @@ as that of the covered work.  */
 #include "netrc.h"
 #include "convert.h"            /* for downloaded_file */
 #include "recur.h"              /* for INFINITE_RECURSION */
+
+#ifdef __VMS
+# include "vms.h"
+#endif /* def __VMS */
+
 
 /* File where the "ls -al" listing will be saved.  */
 #ifdef MSDOS
@@ -64,12 +69,13 @@ typedef struct
   int cmd;                      /* command code */
   int csock;                    /* control connection socket */
   double dltime;                /* time of the download in msecs */
-  enum stype rs;                /* remote system reported by ftp server */ 
+  enum stype rs;                /* remote system reported by ftp server */
   char *id;                     /* initial directory */
   char *target;                 /* target file name */
   struct url *proxy;            /* FTWK-style proxy */
 } ccon;
 
+extern int numurls;
 
 /* Look for regexp "( *[0-9]+ *byte" (literal parenthesis) anywhere in
    the string S, and return the number converted to wgint, if found, 0
@@ -89,11 +95,11 @@ ftp_expected_bytes (const char *s)
       res = str_to_wgint (s, (char **) &s, 10);
       if (!*s)
         return 0;
-      while (*s && ISSPACE (*s))
+      while (*s && c_isspace (*s))
         ++s;
       if (!*s)
         return 0;
-      if (TOLOWER (*s) != 'b')
+      if (c_tolower (*s) != 'b')
         continue;
       if (strncasecmp (s, "byte", 4))
         continue;
@@ -104,7 +110,7 @@ ftp_expected_bytes (const char *s)
 }
 
 #ifdef ENABLE_IPV6
-/* 
+/*
  * This function sets up a passive data connection with the FTP server.
  * It is merely a wrapper around ftp_epsv, ftp_lpsv and ftp_pasv.
  */
@@ -119,8 +125,8 @@ ftp_do_pasv (int csock, ip_address *addr, int *port)
   if (!socket_ip_address (csock, addr, ENDPOINT_PEER))
     abort ();
 
-  /* If our control connection is over IPv6, then we first try EPSV and then 
-   * LPSV if the former is not supported. If the control connection is over 
+  /* If our control connection is over IPv6, then we first try EPSV and then
+   * LPSV if the former is not supported. If the control connection is over
    * IPv4, we simply issue the good old PASV request. */
   switch (addr->family)
     {
@@ -149,7 +155,7 @@ ftp_do_pasv (int csock, ip_address *addr, int *port)
   return err;
 }
 
-/* 
+/*
  * This function sets up an active data connection with the FTP server.
  * It is merely a wrapper around ftp_eprt, ftp_lprt and ftp_port.
  */
@@ -162,8 +168,8 @@ ftp_do_port (int csock, int *local_sock)
   if (!socket_ip_address (csock, &cip, ENDPOINT_PEER))
     abort ();
 
-  /* If our control connection is over IPv6, then we first try EPRT and then 
-   * LPRT if the former is not supported. If the control connection is over 
+  /* If our control connection is over IPv6, then we first try EPRT and then
+   * LPRT if the former is not supported. If the control connection is over
    * IPv4, we simply issue the good old PORT request. */
   switch (cip.family)
     {
@@ -217,7 +223,7 @@ print_length (wgint size, wgint start, bool authoritative)
     logprintf (LOG_VERBOSE, " (%s)", human_readable (size));
   if (start > 0)
     {
-      if (start >= 1024)
+      if (size - start >= 1024)
         logprintf (LOG_VERBOSE, _(", %s (%s) remaining"),
                    number_to_static_string (size - start),
                    human_readable (size - start));
@@ -228,11 +234,14 @@ print_length (wgint size, wgint start, bool authoritative)
   logputs (LOG_VERBOSE, !authoritative ? _(" (unauthoritative)\n") : "\n");
 }
 
+static uerr_t ftp_get_listing (struct url *, ccon *, struct fileinfo **);
+
 /* Retrieves a file with denoted parameters through opening an FTP
    connection to the server.  It always closes the data connection,
    and closes the control connection in case of error.  */
 static uerr_t
-getftp (struct url *u, wgint *len, wgint restval, ccon *con)
+getftp (struct url *u, wgint passed_expected_bytes, wgint *qtyread,
+        wgint restval, ccon *con)
 {
   int csock, dtsock, local_sock, res;
   uerr_t err = RETROK;          /* appease the compiler */
@@ -246,6 +255,7 @@ getftp (struct url *u, wgint *len, wgint restval, ccon *con)
   bool rest_failed = false;
   int flags;
   wgint rd_size;
+  char type_char;
 
   assert (con != NULL);
   assert (con->target != NULL);
@@ -256,6 +266,8 @@ getftp (struct url *u, wgint *len, wgint restval, ccon *con)
   assert (!((cmd & DO_LIST) && (cmd & DO_RETR)));
   /* Make sure that at least *something* is requested.  */
   assert ((cmd & (DO_LIST | DO_CWD | DO_RETR | DO_LOGIN)) != 0);
+
+  *qtyread = restval;
 
   user = u->user;
   passwd = u->passwd;
@@ -273,7 +285,6 @@ getftp (struct url *u, wgint *len, wgint restval, ccon *con)
     csock = con->csock;
   else                          /* cmd & DO_LOGIN */
     {
-      char type_char;
       char    *host = con->proxy ? con->proxy->host : u->host;
       int      port = con->proxy ? con->proxy->port : u->port;
       char *logname = user;
@@ -301,7 +312,8 @@ getftp (struct url *u, wgint *len, wgint restval, ccon *con)
         con->csock = -1;
 
       /* Second: Login with proper USER/PASS sequence.  */
-      logprintf (LOG_VERBOSE, _("Logging in as %s ... "), escnonprint (user));
+      logprintf (LOG_VERBOSE, _("Logging in as %s ... "),
+                 quotearg_style (escape_quoting_style, user));
       if (opt.server_response)
         logputs (LOG_ALWAYS, "\n");
       err = ftp_login (csock, logname, passwd);
@@ -405,8 +417,19 @@ Error in server response, closing control connection.\n"));
         default:
           abort ();
         }
+
+#if 0
+      /* 2004-09-17 SMS.
+         Don't help me out.  Please.
+         A reasonably recent VMS FTP server will cope just fine with
+         UNIX file specifications.  This code just spoils things.
+         Discarding the device name, for example, is not a wise move.
+         This code was disabled but left in as an example of what not
+         to do.
+      */
+
       /* VMS will report something like "PUB$DEVICE:[INITIAL.FOLDER]".
-         Convert it to "/INITIAL/FOLDER" */ 
+         Convert it to "/INITIAL/FOLDER" */
       if (con->rs == ST_VMS)
         {
           char *path = strchr (con->id, '[');
@@ -428,6 +451,8 @@ Error in server response, closing control connection.\n"));
               DEBUGP (("  new = '%s'\n\n", con->id));
             }
         }
+#endif /* 0 */
+
       if (!opt.server_response)
         logputs (LOG_VERBOSE, _("done.\n"));
 
@@ -477,6 +502,11 @@ Error in server response, closing control connection.\n"));
         logputs (LOG_VERBOSE, _("==> CWD not needed.\n"));
       else
         {
+          char *targ;
+	  int cwd_count;
+	  int cwd_end;
+	  int cwd_start;
+
           char *target = u->dir;
 
           DEBUGP (("changing working directory\n"));
@@ -495,11 +525,26 @@ Error in server response, closing control connection.\n"));
              in "bar", not in "foo/bar", as would be customary
              elsewhere.  */
 
+            /* 2004-09-20 SMS.
+               Why is this wise even on UNIX?  It certainly fouls VMS.
+               See below for a more reliable, more universal method.
+            */
+
+            /* 2008-04-22 MJC.
+               I'm not crazy about it either. I'm informed it's useful
+               for misconfigured servers that have some dirs in the path
+               with +x but -r, but this method is not RFC-conformant. I
+               understand the need to deal with crappy server
+               configurations, but it's far better to use the canonical
+               method first, and fall back to kludges second.
+            */
+
           if (target[0] != '/'
               && !(con->rs != ST_UNIX
-                   && ISALPHA (target[0])
+                   && c_isalpha (target[0])
                    && target[1] == ':')
-              && con->rs != ST_OS400)
+              && (con->rs != ST_OS400)
+              && (con->rs != ST_VMS))
             {
               int idlen = strlen (con->id);
               char *ntarget, *p;
@@ -518,6 +563,17 @@ Error in server response, closing control connection.\n"));
                        con->id, target, ntarget));
               target = ntarget;
             }
+
+#if 0
+          /* 2004-09-17 SMS.
+             Don't help me out.  Please.
+             A reasonably recent VMS FTP server will cope just fine with
+             UNIX file specifications.  This code just spoils things.
+             Discarding the device name, for example, is not a wise
+             move.
+             This code was disabled but left in as an example of what
+             not to do.
+          */
 
           /* If the FTP host runs VMS, we will have to convert the absolute
              directory path in UNIX notation to absolute directory path in
@@ -544,9 +600,96 @@ Error in server response, closing control connection.\n"));
               DEBUGP (("  Unix: '%s'\n  VMS: '%s'\n", target, ntarget));
               target = ntarget;
             }
+#endif /* 0 */
+
+          /* 2004-09-20 SMS.
+             A relative directory is relative to the initial directory.
+             Thus, what _is_ useful on VMS (and probably elsewhere) is
+             to CWD to the initial directory (ideally, whatever the
+             server reports, _exactly_, NOT badly UNIX-ixed), and then
+             CWD to the (new) relative directory.  This should probably
+             be restructured as a function, called once or twice, but
+             I'm lazy enough to take the badly indented loop short-cut
+             for now.
+          */
+
+          /* Decide on one pass (absolute) or two (relative).
+             The VMS restriction may be relaxed when the squirrely code
+             above is reformed.
+          */
+	  if ((con->rs == ST_VMS) && (target[0] != '/'))
+	    {
+	      cwd_start = 0;
+	      DEBUGP (("Using two-step CWD for relative path.\n"));
+	    }
+	  else
+	    {
+              /* Go straight to the target. */
+	      cwd_start = 1;
+	    }
+
+          /* At least one VMS FTP server (TCPware V5.6-2) can switch to
+             a UNIX emulation mode when given a UNIX-like directory
+             specification (like "a/b/c").  If allowed to continue this
+             way, LIST interpretation will be confused, because the
+             system type (SYST response) will not be re-checked, and
+             future UNIX-format directory listings (for multiple URLs or
+             "-r") will be horribly misinterpreted.
+
+             The cheap and nasty work-around is to do a "CWD []" after a
+             UNIX-like directory specification is used.  (A single-level
+             directory is harmless.)  This puts the TCPware server back
+             into VMS mode, and does no harm on other servers.
+
+             Unlike the rest of this block, this particular behavior
+             _is_ VMS-specific, so it gets its own VMS test.
+          */
+	  if ((con->rs == ST_VMS) && (strchr( target, '/') != NULL))
+            {
+              cwd_end = 3;
+	      DEBUGP (("Using extra \"CWD []\" step for VMS server.\n"));
+            }
+          else
+            {
+              cwd_end = 2;
+            }
+
+          /* 2004-09-20 SMS. */
+          /* Sorry about the deviant indenting.  Laziness. */
+
+	  for (cwd_count = cwd_start; cwd_count < cwd_end; cwd_count++)
+	{
+          switch (cwd_count)
+            {
+              case 0:
+	        /* Step one (optional): Go to the initial directory,
+	           exactly as reported by the server.
+	        */
+	        targ = con->id;
+                break;
+
+              case 1:
+	        /* Step two: Go to the target directory.  (Absolute or
+	           relative will work now.)
+	        */
+	        targ = target;
+                break;
+
+              case 2:
+                /* Step three (optional): "CWD []" to restore server
+                   VMS-ness.
+                */
+                targ = "[]";
+                break;
+
+              default:
+                /* Can't happen. */
+                assert (1);
+	    }
 
           if (!opt.server_response)
-            logprintf (LOG_VERBOSE, "==> CWD %s ... ", escnonprint (target));
+            logprintf (LOG_VERBOSE, "==> CWD (%d) %s ... ", cwd_count,
+                       quotearg_style (escape_quoting_style, target));
           err = ftp_cwd (csock, target);
           /* FTPRERR, WRITEFAILED, FTPNSFOD */
           switch (err)
@@ -567,8 +710,8 @@ Error in server response, closing control connection.\n"));
               return err;
             case FTPNSFOD:
               logputs (LOG_VERBOSE, "\n");
-              logprintf (LOG_NOTQUIET, _("No such directory `%s'.\n\n"),
-                         escnonprint (u->dir));
+              logprintf (LOG_NOTQUIET, _("No such directory %s.\n\n"),
+                         quote (u->dir));
               fd_close (csock);
               con->csock = -1;
               return err;
@@ -579,20 +722,27 @@ Error in server response, closing control connection.\n"));
             }
           if (!opt.server_response)
             logputs (LOG_VERBOSE, _("done.\n"));
-        }
+
+        } /* for */
+
+          /* 2004-09-20 SMS. */
+          /* End of deviant indenting. */
+
+        } /* else */
     }
   else /* do not CWD */
     logputs (LOG_VERBOSE, _("==> CWD not required.\n"));
 
-  if ((cmd & DO_RETR) && *len == 0)
+  if ((cmd & DO_RETR) && passed_expected_bytes == 0)
     {
       if (opt.verbose)
         {
           if (!opt.server_response)
-            logprintf (LOG_VERBOSE, "==> SIZE %s ... ", escnonprint (u->file));
+            logprintf (LOG_VERBOSE, "==> SIZE %s ... ",
+                       quotearg_style (escape_quoting_style, u->file));
         }
 
-      err = ftp_size (csock, u->file, len);
+      err = ftp_size (csock, u->file, &expected_bytes);
       /* FTPRERR */
       switch (err)
         {
@@ -611,8 +761,8 @@ Error in server response, closing control connection.\n"));
           abort ();
         }
         if (!opt.server_response)
-          logprintf (LOG_VERBOSE, *len ? "%s\n" : _("done.\n"),
-                     number_to_static_string (*len));
+          logprintf (LOG_VERBOSE, expected_bytes ? "%s\n" : _("done.\n"),
+                     number_to_static_string (expected_bytes));
     }
 
   /* If anything is to be retrieved, PORT (or PASV) must be sent.  */
@@ -655,7 +805,7 @@ Error in server response, closing control connection.\n"));
             }   /* switch (err) */
           if (err==FTPOK)
             {
-              DEBUGP (("trying to connect to %s port %d\n", 
+              DEBUGP (("trying to connect to %s port %d\n",
                       print_address (&passive_addr), passive_port));
               dtsock = connect_to_ip (&passive_addr, passive_port, NULL);
               if (dtsock < 0)
@@ -777,12 +927,43 @@ Error in server response, closing control connection.\n"));
 
   if (cmd & DO_RETR)
     {
-      /* If we're in spider mode, don't really retrieve anything.  The
-         fact that we got to this point should be proof enough that
-         the file exists, vaguely akin to HTTP's concept of a "HEAD"
-         request.  */
+      /* If we're in spider mode, don't really retrieve anything except
+	 the directory listing and verify whether the given "file" exists.  */
       if (opt.spider)
         {
+	  bool exists = false;
+	  uerr_t res;
+	  struct fileinfo *f;
+	  res = ftp_get_listing (u, con, &f);
+	  /* Set the DO_RETR command flag again, because it gets unset when
+	     calling ftp_get_listing() and would otherwise cause an assertion
+	     failure earlier on when this function gets repeatedly called
+	     (e.g., when recursing).  */
+	  con->cmd |= DO_RETR;
+	  if (res == RETROK)
+	    {
+	      while (f)
+		{
+		  if (!strcmp (f->name, u->file))
+		    {
+		      exists = true;
+		      break;
+		    }
+		  f = f->next;
+		}
+              if (exists)
+                {
+                  logputs (LOG_VERBOSE, "\n");
+                  logprintf (LOG_NOTQUIET, _("File %s exists.\n"),
+                             quote (u->file));
+                }
+	      else
+                {
+		  logputs (LOG_VERBOSE, "\n");
+		  logprintf (LOG_NOTQUIET, _("No such file %s.\n"),
+			     quote (u->file));
+		}
+	    }
           fd_close (csock);
           con->csock = -1;
           fd_close (dtsock);
@@ -796,7 +977,8 @@ Error in server response, closing control connection.\n"));
             {
               if (restval)
                 logputs (LOG_VERBOSE, "\n");
-              logprintf (LOG_VERBOSE, "==> RETR %s ... ", escnonprint (u->file));
+              logprintf (LOG_VERBOSE, "==> RETR %s ... ",
+                         quotearg_style (escape_quoting_style, u->file));
             }
         }
 
@@ -824,8 +1006,8 @@ Error in server response, closing control connection.\n"));
           return err;
         case FTPNSFOD:
           logputs (LOG_VERBOSE, "\n");
-          logprintf (LOG_NOTQUIET, _("No such file `%s'.\n\n"),
-                     escnonprint (u->file));
+          logprintf (LOG_NOTQUIET, _("No such file %s.\n\n"),
+                     quote (u->file));
           fd_close (dtsock);
           fd_close (local_sock);
           return err;
@@ -847,7 +1029,7 @@ Error in server response, closing control connection.\n"));
       /* As Maciej W. Rozycki (macro@ds2.pg.gda.pl) says, `LIST'
          without arguments is better than `LIST .'; confirmed by
          RFC959.  */
-      err = ftp_list (csock, NULL);
+      err = ftp_list (csock, NULL, con->rs);
       /* FTPRERR, WRITEFAILED */
       switch (err)
         {
@@ -871,8 +1053,8 @@ Error in server response, closing control connection.\n"));
           return err;
         case FTPNSFOD:
           logputs (LOG_VERBOSE, "\n");
-          logprintf (LOG_NOTQUIET, _("No such file or directory `%s'.\n\n"),
-                     ".");
+          logprintf (LOG_NOTQUIET, _("No such file or directory %s.\n\n"),
+                     quote ("."));
           fd_close (dtsock);
           fd_close (local_sock);
           return err;
@@ -891,11 +1073,11 @@ Error in server response, closing control connection.\n"));
 
   /* Some FTP servers return the total length of file after REST
      command, others just return the remaining size. */
-  if (*len && restval && expected_bytes
-      && (expected_bytes == *len - restval))
+  if (passed_expected_bytes && restval && expected_bytes
+      && (expected_bytes == passed_expected_bytes - restval))
     {
       DEBUGP (("Lying FTP server found, adjusting.\n"));
-      expected_bytes = *len;
+      expected_bytes = passed_expected_bytes;
     }
 
   /* If no transmission was required, then everything is OK.  */
@@ -908,22 +1090,91 @@ Error in server response, closing control connection.\n"));
       if (dtsock < 0)
         {
           logprintf (LOG_NOTQUIET, "accept: %s\n", strerror (errno));
-          return err;
+          return CONERROR;
         }
     }
 
   /* Open the file -- if output_stream is set, use it instead.  */
+
+  /* 2005-04-17 SMS.
+     Note that having the output_stream ("-O") file opened in main()
+     (main.c) rather limits the ability in VMS to open the file
+     differently for ASCII versus binary FTP here.  (Of course, doing it
+     there allows a open failure to be detected immediately, without first
+     connecting to the server.)
+  */
   if (!output_stream || con->cmd & DO_LIST)
     {
+/* On VMS, alter the name as required. */
+#ifdef __VMS
+      char *targ;
+
+      targ = ods_conform (con->target);
+      if (targ != con->target)
+        {
+          xfree (con->target);
+          con->target = targ;
+        }
+#endif /* def __VMS */
+
       mkalldirs (con->target);
       if (opt.backups)
         rotate_backups (con->target);
 
+/* 2005-04-15 SMS.
+   For VMS, define common fopen() optional arguments, and a handy macro
+   for use as a variable "binary" flag.
+   Elsewhere, define a constant "binary" flag.
+   Isn't it nice to have distinct text and binary file types?
+*/
+# define BIN_TYPE_TRANSFER (type_char != 'A')
+#ifdef __VMS
+# define FOPEN_OPT_ARGS "fop=sqo", "acc", acc_cb, &open_id
+# define FOPEN_OPT_ARGS_BIN "ctx=bin,stm", "rfm=fix", "mrs=512" FOPEN_OPT_ARGS
+# define BIN_TYPE_FILE (BIN_TYPE_TRANSFER && (opt.ftp_stmlf == 0))
+#else /* def __VMS */
+# define BIN_TYPE_FILE 1
+#endif /* def __VMS [else] */
+
       if (restval && !(con->cmd & DO_LIST))
-        fp = fopen (con->target, "ab");
+        {
+#ifdef __VMS
+          int open_id;
+
+          if (BIN_TYPE_FILE)
+            {
+              open_id = 3;
+              fp = fopen (con->target, "ab", FOPEN_OPT_ARGS_BIN);
+            }
+          else
+            {
+              open_id = 4;
+              fp = fopen (con->target, "a", FOPEN_OPT_ARGS);
+            }
+#else /* def __VMS */
+          fp = fopen (con->target, "ab");
+#endif /* def __VMS [else] */
+        }
       else if (opt.noclobber || opt.always_rest || opt.timestamping || opt.dirstruct
                || opt.output_document)
-        fp = fopen (con->target, "wb");
+        {
+#ifdef __VMS
+          int open_id;
+
+          if (BIN_TYPE_FILE)
+            {
+              open_id = 5;
+              fp = fopen (con->target, "wb", FOPEN_OPT_ARGS_BIN);
+            }
+          else
+            {
+              open_id = 6;
+              fp = fopen (con->target, "w", FOPEN_OPT_ARGS);
+            }
+#else /* def __VMS */
+          fp = fopen (con->target, "wb");
+#endif /* def __VMS [else] */
+        }
       else
         {
           fp = fopen_excl (con->target, true);
@@ -955,10 +1206,11 @@ Error in server response, closing control connection.\n"));
   else
     fp = output_stream;
 
-  if (*len)
+  if (passed_expected_bytes)
     {
-      print_length (*len, restval, true);
-      expected_bytes = *len;    /* for fd_read_body's progress bar */
+      print_length (passed_expected_bytes, restval, true);
+      expected_bytes = passed_expected_bytes;
+        /* for fd_read_body's progress bar */
     }
   else if (expected_bytes)
     print_length (expected_bytes, restval, false);
@@ -967,11 +1219,10 @@ Error in server response, closing control connection.\n"));
   flags = 0;
   if (restval && rest_failed)
     flags |= rb_skip_startpos;
-  *len = restval;
   rd_size = 0;
   res = fd_read_body (dtsock, fp,
                       expected_bytes ? expected_bytes - restval : 0,
-                      restval, &rd_size, len, &con->dltime, flags);
+                      restval, &rd_size, qtyread, &con->dltime, flags);
 
   tms = datetime_str (time (NULL));
   tmrate = retr_rate (rd_size, con->dltime);
@@ -1050,6 +1301,22 @@ Error in server response, closing control connection.\n"));
      print it out.  */
   if (opt.server_response && (con->cmd & DO_LIST))
     {
+/* 2005-02-25 SMS.
+   Much of this work may already have been done, but repeating it should
+   do no damage beyond wasting time.
+*/
+/* On VMS, alter the name as required. */
+#ifdef __VMS
+      char *targ;
+
+      targ = ods_conform( con->target);
+      if (targ != con->target)
+        {
+          xfree( con->target);
+          con->target = targ;
+        }
+#endif /* def __VMS */
+
       mkalldirs (con->target);
       fp = fopen (con->target, "r");
       if (!fp)
@@ -1064,7 +1331,8 @@ Error in server response, closing control connection.\n"));
               char *p = strchr (line, '\0');
               while (p > line && (p[-1] == '\n' || p[-1] == '\r'))
                 *--p = '\0';
-              logprintf (LOG_ALWAYS, "%s\n", escnonprint (line));
+              logprintf (LOG_ALWAYS, "%s\n",
+                         quotearg_style (escape_quoting_style, line));
               xfree (line);
             }
           fclose (fp);
@@ -1083,31 +1351,40 @@ static uerr_t
 ftp_loop_internal (struct url *u, struct fileinfo *f, ccon *con)
 {
   int count, orig_lp;
-  wgint restval, len = 0;
+  wgint restval, len = 0, qtyread = 0;
   char *tms, *locf;
   const char *tmrate = NULL;
   uerr_t err;
   struct_stat st;
 
-  if (!con->target)
-    con->target = url_file_name (u);
+  /* Get the target, and set the name for the message accordingly. */
+  if ((f == NULL) && (con->target))
+    {
+      /* Explicit file (like ".listing"). */
+      locf = con->target;
+    }
+  else
+    {
+      /* URL-derived file.  Consider "-O file" name. */
+      con->target = url_file_name (u);
+      if (!opt.output_document)
+        locf = con->target;
+      else
+        locf = opt.output_document;
+    }
 
   /* If the output_document was given, then this check was already done and
      the file didn't exist. Hence the !opt.output_document */
   if (opt.noclobber && !opt.output_document && file_exists_p (con->target))
     {
       logprintf (LOG_VERBOSE,
-                 _("File `%s' already there; not retrieving.\n"), con->target);
+                 _("File %s already there; not retrieving.\n"), quote (con->target));
       /* If the file is there, we suppose it's retrieved OK.  */
       return RETROK;
     }
 
   /* Remove it if it's a link.  */
   remove_link (con->target);
-  if (!opt.output_document)
-    locf = con->target;
-  else
-    locf = opt.output_document;
 
   count = 0;
 
@@ -1154,7 +1431,7 @@ ftp_loop_internal (struct url *u, struct fileinfo *f, ccon *con)
            first attempt to clobber existing data.)  */
         restval = st.st_size;
       else if (count > 1)
-        restval = len;          /* start where the previous run left off */
+        restval = qtyread;          /* start where the previous run left off */
       else
         restval = 0;
 
@@ -1168,8 +1445,8 @@ ftp_loop_internal (struct url *u, struct fileinfo *f, ccon *con)
           strcpy (tmp, "        ");
           if (count > 1)
             sprintf (tmp, _("(try:%2d)"), count);
-          logprintf (LOG_VERBOSE, "--%s--  %s\n  %s => `%s'\n",
-                     tms, hurl, tmp, locf);
+          logprintf (LOG_VERBOSE, "--%s--  %s\n  %s => %s\n",
+                     tms, hurl, tmp, quote (locf));
 #ifdef WINDOWS
           ws_changetitle (hurl);
 #endif
@@ -1180,7 +1457,7 @@ ftp_loop_internal (struct url *u, struct fileinfo *f, ccon *con)
         len = f->size;
       else
         len = 0;
-      err = getftp (u, &len, restval, con);
+      err = getftp (u, len, &qtyread, restval, con);
 
       if (con->csock == -1)
         con->st &= ~DONE_CWD;
@@ -1210,7 +1487,7 @@ ftp_loop_internal (struct url *u, struct fileinfo *f, ccon *con)
         case FTPRETRINT:
           /* If the control connection was closed, the retrieval
              will be considered OK if f->size == len.  */
-          if (!f || len != f->size)
+          if (!f || qtyread != f->size)
             {
               printwhat (count, opt.ntry);
               continue;
@@ -1225,7 +1502,7 @@ ftp_loop_internal (struct url *u, struct fileinfo *f, ccon *con)
         }
       tms = datetime_str (time (NULL));
       if (!opt.spider)
-        tmrate = retr_rate (len - restval, con->dltime);
+        tmrate = retr_rate (qtyread - restval, con->dltime);
 
       /* If we get out of the switch above without continue'ing, we've
          successfully downloaded a file.  Remember this fact. */
@@ -1237,8 +1514,17 @@ ftp_loop_internal (struct url *u, struct fileinfo *f, ccon *con)
           con->csock = -1;
         }
       if (!opt.spider)
-        logprintf (LOG_VERBOSE, _("%s (%s) - `%s' saved [%s]\n\n"),
-                   tms, tmrate, locf, number_to_static_string (len));
+        {
+          bool write_to_stdout = (opt.output_document && HYPHENP (opt.output_document));
+
+          logprintf (LOG_VERBOSE,
+                     write_to_stdout
+                     ? _("%s (%s) - written to stdout %s[%s]\n\n")
+                     : _("%s (%s) - %s saved [%s]\n\n"),
+                     tms, tmrate,
+                     write_to_stdout ? "" : quote (locf),
+                     number_to_static_string (qtyread));
+        }
       if (!opt.verbose && !opt.quiet)
         {
           /* Need to hide the password from the URL.  The `if' is here
@@ -1246,7 +1532,7 @@ ftp_loop_internal (struct url *u, struct fileinfo *f, ccon *con)
              time. */
           char *hurl = url_string (u, URL_AUTH_HIDE_PASSWD);
           logprintf (LOG_NONVERBOSE, "%s URL: %s [%s] -> \"%s\" [%d]\n",
-                     tms, hurl, number_to_static_string (len), locf, count);
+                     tms, hurl, number_to_static_string (qtyread), locf, count);
           xfree (hurl);
         }
 
@@ -1257,8 +1543,8 @@ ftp_loop_internal (struct url *u, struct fileinfo *f, ccon *con)
             /* --dont-remove-listing was specified, so do count this towards the
                number of bytes and files downloaded. */
             {
-              total_downloaded_bytes += len;
-              opt.numurls++;
+              total_downloaded_bytes += qtyread;
+              numurls++;
             }
 
           /* Deletion of listing files is not controlled by --delete-after, but
@@ -1272,8 +1558,8 @@ ftp_loop_internal (struct url *u, struct fileinfo *f, ccon *con)
              downloaded if they're going to be deleted.  People seeding proxies,
              for instance, may want to know how many bytes and files they've
              downloaded through it. */
-          total_downloaded_bytes += len;
-          opt.numurls++;
+          total_downloaded_bytes += qtyread;
+          numurls++;
 
           if (opt.delete_after)
             {
@@ -1321,23 +1607,28 @@ ftp_get_listing (struct url *u, ccon *con, struct fileinfo **f)
   uf = url_file_name (u);
   lf = file_merge (uf, LIST_FILENAME);
   xfree (uf);
-  DEBUGP ((_("Using `%s' as listing tmp file.\n"), lf));
+  DEBUGP ((_("Using %s as listing tmp file.\n"), quote (lf)));
 
-  con->target = lf;
+  con->target = xstrdup (lf);
+  xfree (lf);
   err = ftp_loop_internal (u, NULL, con);
+  lf = xstrdup (con->target);
+  xfree (con->target);
   con->target = old_target;
 
   if (err == RETROK)
-    *f = ftp_parse_ls (lf, con->rs);
+    {
+      *f = ftp_parse_ls (lf, con->rs);
+      if (opt.remove_listing)
+        {
+          if (unlink (lf))
+            logprintf (LOG_NOTQUIET, "unlink: %s\n", strerror (errno));
+          else
+            logprintf (LOG_VERBOSE, _("Removed %s.\n"), quote (lf));
+        }
+    }
   else
     *f = NULL;
-  if (opt.remove_listing)
-    {
-      if (unlink (lf))
-        logprintf (LOG_NOTQUIET, "unlink: %s\n", strerror (errno));
-      else
-        logprintf (LOG_VERBOSE, _("Removed `%s'.\n"), lf);
-    }
   xfree (lf);
   con->cmd &= ~DO_LIST;
   return err;
@@ -1363,7 +1654,8 @@ ftp_retrieve_list (struct url *u, struct fileinfo *f, ccon *con)
   struct fileinfo *orig;
   wgint local_size;
   time_t tml;
-  bool dlthis;
+  bool dlthis; /* Download this (file). */
+  const char *actual_target = NULL;
 
   /* Increase the depth.  */
   ++depth;
@@ -1440,15 +1732,15 @@ ftp_retrieve_list (struct url *u, struct fileinfo *f, ccon *con)
                   /* Remote file is older, file sizes can be compared and
                      are both equal. */
                   logprintf (LOG_VERBOSE, _("\
-Remote file no newer than local file `%s' -- not retrieving.\n"), con->target);
+Remote file no newer than local file %s -- not retrieving.\n"), quote (con->target));
                   dlthis = false;
                 }
               else if (eq_size)
                 {
                   /* Remote file is newer or sizes cannot be matched */
                   logprintf (LOG_VERBOSE, _("\
-Remote file is newer than local file `%s' -- retrieving.\n\n"),
-                             con->target);
+Remote file is newer than local file %s -- retrieving.\n\n"),
+                             quote (con->target));
                 }
               else
                 {
@@ -1490,14 +1782,15 @@ The sizes do not match (local %s) -- retrieving.\n\n"),
                             {
                               logprintf (LOG_VERBOSE, _("\
 Already have correct symlink %s -> %s\n\n"),
-                                         con->target, escnonprint (f->linkto));
+                                         quote (con->target),
+                                         quote (f->linkto));
                               dlthis = false;
                               break;
                             }
                         }
                     }
                   logprintf (LOG_VERBOSE, _("Creating symlink %s -> %s\n"),
-                             con->target, escnonprint (f->linkto));
+                             quote (con->target), quote (f->linkto));
                   /* Unlink before creating symlink!  */
                   unlink (con->target);
                   if (symlink (f->linkto, con->target) == -1)
@@ -1506,8 +1799,8 @@ Already have correct symlink %s -> %s\n\n"),
                 } /* have f->linkto */
 #else  /* not HAVE_SYMLINK */
               logprintf (LOG_NOTQUIET,
-                         _("Symlinks not supported, skipping symlink `%s'.\n"),
-                         con->target);
+                         _("Symlinks not supported, skipping symlink %s.\n"),
+                         quote (con->target));
 #endif /* not HAVE_SYMLINK */
             }
           else                /* opt.retr_symlinks */
@@ -1518,8 +1811,8 @@ Already have correct symlink %s -> %s\n\n"),
           break;
         case FT_DIRECTORY:
           if (!opt.recursive)
-            logprintf (LOG_NOTQUIET, _("Skipping directory `%s'.\n"),
-                       escnonprint (f->name));
+            logprintf (LOG_NOTQUIET, _("Skipping directory %s.\n"),
+                       quote (f->name));
           break;
         case FT_PLAINFILE:
           /* Call the retrieve loop.  */
@@ -1528,41 +1821,45 @@ Already have correct symlink %s -> %s\n\n"),
           break;
         case FT_UNKNOWN:
           logprintf (LOG_NOTQUIET, _("%s: unknown/unsupported file type.\n"),
-                     escnonprint (f->name));
+                     quote (f->name));
           break;
         }       /* switch */
+
+
+      /* 2004-12-15 SMS.
+       * Set permissions _before_ setting the times, as setting the
+       * permissions changes the modified-time, at least on VMS.
+       * Also, use the opt.output_document name here, too, as
+       * appropriate.  (Do the test once, and save the result.)
+       */
+
+      set_local_file (&actual_target, con->target);
+
+      /* If downloading a plain file, set valid (non-zero) permissions. */
+      if (dlthis && (actual_target != NULL) && (f->type == FT_PLAINFILE))
+        {
+          if (f->perms)
+            chmod (actual_target, f->perms);
+          else
+            DEBUGP (("Unrecognized permissions for %s.\n", actual_target));
+        }
 
       /* Set the time-stamp information to the local file.  Symlinks
          are not to be stamped because it sets the stamp on the
          original.  :( */
-      if (!(f->type == FT_SYMLINK && !opt.retr_symlinks)
-          && f->tstamp != -1
-          && dlthis
-          && file_exists_p (con->target))
+      if (actual_target != NULL)
         {
-          /* #### This code repeats in http.c and ftp.c.  Move it to a
-             function!  */
-          const char *fl = NULL;
-          if (opt.output_document)
+          if (!(f->type == FT_SYMLINK && !opt.retr_symlinks)
+              && f->tstamp != -1
+              && dlthis
+              && file_exists_p (con->target))
             {
-              if (output_stream_regular)
-                fl = opt.output_document;
+              touch (actual_target, f->tstamp);
             }
-          else
-            fl = con->target;
-          if (fl)
-            touch (fl, f->tstamp);
+          else if (f->tstamp == -1)
+            logprintf (LOG_NOTQUIET, _("%s: corrupt time-stamp.\n"),
+                       actual_target);
         }
-      else if (f->tstamp == -1)
-        logprintf (LOG_NOTQUIET, _("%s: corrupt time-stamp.\n"), con->target);
-
-      if (f->perms && f->type == FT_PLAINFILE && dlthis)
-        {
-          if (opt.preserve_perm)
-            chmod (con->target, f->perms);
-        }
-      else
-        DEBUGP (("Unrecognized permissions for %s.\n", con->target));
 
       xfree (con->target);
       con->target = old_target;
@@ -1633,8 +1930,8 @@ ftp_retrieve_dirs (struct url *u, struct fileinfo *f, ccon *con)
       if (!accdir (newdir))
         {
           logprintf (LOG_VERBOSE, _("\
-Not descending to `%s' as it is excluded/not-included.\n"),
-                     escnonprint (newdir));
+Not descending to %s as it is excluded/not-included.\n"),
+                     quote (newdir));
           continue;
         }
 
@@ -1698,8 +1995,8 @@ ftp_retrieve_glob (struct url *u, ccon *con, int action)
         {
           if (f->type != FT_DIRECTORY && !acceptable (f->name))
             {
-              logprintf (LOG_VERBOSE, _("Rejecting `%s'.\n"),
-                         escnonprint (f->name));
+              logprintf (LOG_VERBOSE, _("Rejecting %s.\n"),
+                         quote (f->name));
               f = delelement (f, &start);
             }
           else
@@ -1712,8 +2009,8 @@ ftp_retrieve_glob (struct url *u, ccon *con, int action)
     {
       if (has_insecure_name_p (f->name))
         {
-          logprintf (LOG_VERBOSE, _("Rejecting `%s'.\n"),
-                     escnonprint (f->name));
+          logprintf (LOG_VERBOSE, _("Rejecting %s.\n"),
+                     quote (f->name));
           f = delelement (f, &start);
         }
       else
@@ -1736,7 +2033,8 @@ ftp_retrieve_glob (struct url *u, ccon *con, int action)
               if (matchres == -1)
                 {
                   logprintf (LOG_NOTQUIET, _("Error matching %s against %s: %s\n"),
-                             u->file, escnonprint (f->name), strerror (errno));
+                             u->file, quotearg_style (escape_quoting_style, f->name),
+                             strerror (errno));
                   break;
                 }
               if (matchres == FNM_NOMATCH)
@@ -1752,8 +2050,22 @@ ftp_retrieve_glob (struct url *u, ccon *con, int action)
         }
       else if (action == GLOB_GETONE)
         {
+#ifdef __VMS
+          /* 2009-09-09 SMS.
+           * Odd-ball compiler ("HP C V7.3-009 on OpenVMS Alpha V7.3-2")
+           * bug causes spurious %CC-E-BADCONDIT complaint with this
+           * "?:" statement.  (Different linkage attributes for strcmp()
+           * and strcasecmp().)  Converting to "if" changes the
+           * complaint to %CC-W-PTRMISMATCH on "cmp = strcmp;".  Adding
+           * the senseless type cast clears the complaint, and looks
+           * harmless.
+           */
+          int (*cmp) (const char *, const char *)
+            = opt.ignore_case ? strcasecmp : (int (*)())strcmp;
+#else /* def __VMS */
           int (*cmp) (const char *, const char *)
             = opt.ignore_case ? strcasecmp : strcmp;
+#endif /* def __VMS [else] */
           f = start;
           while (f)
             {
@@ -1776,16 +2088,21 @@ ftp_retrieve_glob (struct url *u, ccon *con, int action)
           /* No luck.  */
           /* #### This message SUCKS.  We should see what was the
              reason that nothing was retrieved.  */
-          logprintf (LOG_VERBOSE, _("No matches on pattern `%s'.\n"),
-                     escnonprint (u->file));
+          logprintf (LOG_VERBOSE, _("No matches on pattern %s.\n"),
+                     quote (u->file));
         }
-      else if (*u->file) /* GLOB_GETONE or GLOB_GETALL */
+      else if (action == GLOB_GETONE) /* GLOB_GETONE or GLOB_GETALL */
         {
           /* Let's try retrieving it anyway.  */
           con->st |= ON_YOUR_OWN;
           res = ftp_loop_internal (u, NULL, con);
           return res;
         }
+
+      /* If action == GLOB_GETALL, and the file list is empty, there's
+         no point in trying to download anything or in complaining about
+         it.  (An empty directory should not cause complaints.)
+      */
     }
   freefileinfo (start);
   if (opt.quota && total_downloaded_bytes > opt.quota)
@@ -1842,13 +2159,13 @@ ftp_loop (struct url *u, int *dt, struct url *proxy, bool recursive, bool glob)
                       else
                         sz = -1;
                       logprintf (LOG_NOTQUIET,
-                                 _("Wrote HTML-ized index to `%s' [%s].\n"),
-                                 filename, number_to_static_string (sz));
+                                 _("Wrote HTML-ized index to %s [%s].\n"),
+                                 quote (filename), number_to_static_string (sz));
                     }
                   else
                     logprintf (LOG_NOTQUIET,
-                               _("Wrote HTML-ized index to `%s'.\n"),
-                               filename);
+                               _("Wrote HTML-ized index to %s.\n"),
+                               quote (filename));
                 }
               xfree (filename);
             }

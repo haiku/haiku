@@ -1,6 +1,6 @@
 /* mswindows.c -- Windows-specific support
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,18 +28,17 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#define INHIBIT_WRAP /* avoid wrapping of socket, bind, ... */
+
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <errno.h>
 #include <math.h>
 
-#define INHIBIT_WRAP /* avoid wrapping of socket, bind, ... */
 
-#include "wget.h"
 #include "utils.h"
 #include "url.h"
 
@@ -157,7 +156,7 @@ fake_fork_child (void)
   event = info->event;
 
   info->logfile_changed = false;
-  if (!opt.lfilename)
+  if (!opt.lfilename && (!opt.quiet || opt.server_response))
     {
       /* See utils:fork_to_background for explanation. */
       FILE *new_log_fp = unique_create (DEFAULT_LOGFILE, false, &opt.lfilename);
@@ -291,7 +290,7 @@ fake_fork (void)
 
   printf (_("Continuing in background, pid %lu.\n"), pi.dwProcessId);
   if (info->logfile_changed)
-    printf (_("Output will be written to `%s'.\n"), info->lfilename);
+    printf (_("Output will be written to %s.\n"), quote (info->lfilename));
 
   UnmapViewOfFile (info);
 

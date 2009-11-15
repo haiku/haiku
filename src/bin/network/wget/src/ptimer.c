@@ -1,5 +1,6 @@
 /* Portable timers.
-   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation,
+   Inc.
 
 This file is part of GNU Wget.
 
@@ -50,7 +51,7 @@ as that of the covered work.  */
      double secs = ptimer_measure ();
      printf ("The loop took %.2fs\n", secs);  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,7 +72,7 @@ as that of the covered work.  */
 # include <windows.h>
 #endif
 
-#include "wget.h"
+#include "utils.h"
 #include "ptimer.h"
 
 /* Depending on the OS, one and only one of PTIMER_POSIX,
@@ -133,7 +134,7 @@ posix_init (void)
 #endif
     { CLOCK_REALTIME, NO_SYSCONF_CHECK },
   };
-  int i;
+  size_t i;
 
   /* Determine the clock we can use.  For a clock to be usable, it
      must be confirmed with sysconf (where applicable) and with
@@ -352,7 +353,7 @@ ptimer_reset (struct ptimer *pt)
 }
 
 /* Measure the elapsed time since timer creation/reset.  This causes
-   the timer to internally call clock_gettime (or gettimeofday, etc.) 
+   the timer to internally call clock_gettime (or gettimeofday, etc.)
    to update its idea of current time.  The time is returned, but is
    also stored for later access through ptimer_read().
 

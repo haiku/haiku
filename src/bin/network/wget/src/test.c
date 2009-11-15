@@ -1,5 +1,6 @@
 /* Unit testing.
-   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation,
+   Inc.
 
 This file is part of GNU Wget.
 
@@ -38,6 +39,7 @@ as that of the covered work.  */
 const char *test_parse_content_disposition();
 const char *test_subdir_p();
 const char *test_dir_matches_p();
+const char *test_commands_sorted();
 const char *test_cmd_spec_restrict_file_names();
 const char *test_path_simplify ();
 const char *test_append_uri_pathel();
@@ -52,32 +54,38 @@ all_tests()
   mu_run_test (test_parse_content_disposition);
   mu_run_test (test_subdir_p);
   mu_run_test (test_dir_matches_p);
+  mu_run_test (test_commands_sorted);
   mu_run_test (test_cmd_spec_restrict_file_names);
   mu_run_test (test_path_simplify);
   mu_run_test (test_append_uri_pathel);
   mu_run_test (test_are_urls_equal);
   mu_run_test (test_is_robots_txt_url);
-  
+
   return NULL;
 }
 
+char *program_name; /* Needed by lib/error.c. */
 
 int
-main (void) 
+main (int argc, char *argv[])
 {
-  const char *result = all_tests();
-  
-  if (result != NULL) 
+  const char *result;
+
+  program_name = argv[0];
+
+  result = all_tests();
+
+  if (result != NULL)
     {
       puts (result);
     }
-  else 
+  else
     {
       printf ("ALL TESTS PASSED\n");
     }
-  
+
   printf ("Tests run: %d\n", tests_run);
- 
+
   return result != 0;
 }
 

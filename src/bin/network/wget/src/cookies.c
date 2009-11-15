@@ -1,6 +1,6 @@
 /* Support for cookies.
-   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
+   Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -43,7 +43,7 @@ as that of the covered work.  */
    sites that do send Set-Cookie2 also emit Set-Cookie for
    compatibility.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -51,8 +51,6 @@ as that of the covered work.  */
 #include <assert.h>
 #include <errno.h>
 #include <time.h>
-
-#include "wget.h"
 #include "utils.h"
 #include "hash.h"
 #include "cookies.h"
@@ -443,7 +441,8 @@ parse_set_cookie (const char *set_cookie, bool silent)
   if (!silent)
     logprintf (LOG_NOTQUIET,
                _("Syntax error in Set-Cookie: %s at position %d.\n"),
-               escnonprint (set_cookie), (int) (ptr - set_cookie));
+               quotearg_style (escape_quoting_style, set_cookie),
+               (int) (ptr - set_cookie));
   delete_cookie (cookie);
   return NULL;
 }
@@ -457,9 +456,9 @@ parse_set_cookie (const char *set_cookie, bool silent)
 
 
 #define REQUIRE_DIGITS(p) do {                  \
-  if (!ISDIGIT (*p))                            \
+  if (!c_isdigit (*p))                            \
     return false;                               \
-  for (++p; ISDIGIT (*p); p++)                  \
+  for (++p; c_isdigit (*p); p++)                  \
     ;                                           \
 } while (0)
 
@@ -588,7 +587,7 @@ check_domain_match (const char *cookie_domain, const char *host)
 
     if (dccount == 2)
       {
-        int i;
+        size_t i;
         int known_toplevel = false;
         static const char *known_toplevel_domains[] = {
           ".com", ".edu", ".net", ".org", ".gov", ".mil", ".int"
@@ -685,7 +684,8 @@ cookie_handle_set_cookie (struct cookie_jar *jar,
         {
           logprintf (LOG_NOTQUIET,
                      _("Cookie coming from %s attempted to set domain to %s\n"),
-                     escnonprint (host), escnonprint (cookie->domain));
+                     quotearg_style (escape_quoting_style, host),
+                     quotearg_style (escape_quoting_style, cookie->domain));
           xfree (cookie->domain);
           goto copy_domain;
         }
@@ -733,7 +733,7 @@ cookie_handle_set_cookie (struct cookie_jar *jar,
 /* Support for sending out cookies in HTTP requests, based on
    previously stored cookies.  Entry point is
    `build_cookies_request'.  */
-   
+
 /* Return a count of how many times CHR occurs in STRING. */
 
 static int
@@ -1103,7 +1103,7 @@ domain_port (const char *domain_b, const char *domain_e,
   const char *colon = memchr (domain_b, ':', domain_e - domain_b);
   if (!colon)
     return 0;
-  for (p = colon + 1; p < domain_e && ISDIGIT (*p); p++)
+  for (p = colon + 1; p < domain_e && c_isdigit (*p); p++)
     port = 10 * port + (*p - '0');
   if (p < domain_e)
     /* Garbage following port number. */
@@ -1131,8 +1131,8 @@ cookie_jar_load (struct cookie_jar *jar, const char *file)
   FILE *fp = fopen (file, "r");
   if (!fp)
     {
-      logprintf (LOG_NOTQUIET, _("Cannot open cookies file `%s': %s\n"),
-                 file, strerror (errno));
+      logprintf (LOG_NOTQUIET, _("Cannot open cookies file %s: %s\n"),
+                 quote (file), strerror (errno));
       return;
     }
   cookies_now = time (NULL);
@@ -1154,7 +1154,7 @@ cookie_jar_load (struct cookie_jar *jar, const char *file)
       char *value_b   = NULL, *value_e   = NULL;
 
       /* Skip leading white-space. */
-      while (*p && ISSPACE (*p))
+      while (*p && c_isspace (*p))
         ++p;
       /* Ignore empty lines.  */
       if (!*p || *p == '#')
@@ -1249,8 +1249,8 @@ cookie_jar_save (struct cookie_jar *jar, const char *file)
   fp = fopen (file, "w");
   if (!fp)
     {
-      logprintf (LOG_NOTQUIET, _("Cannot open cookies file `%s': %s\n"),
-                 file, strerror (errno));
+      logprintf (LOG_NOTQUIET, _("Cannot open cookies file %s: %s\n"),
+                 quote (file), strerror (errno));
       return;
     }
 
@@ -1286,11 +1286,11 @@ cookie_jar_save (struct cookie_jar *jar, const char *file)
     }
  out:
   if (ferror (fp))
-    logprintf (LOG_NOTQUIET, _("Error writing to `%s': %s\n"),
-               file, strerror (errno));
+    logprintf (LOG_NOTQUIET, _("Error writing to %s: %s\n"),
+               quote (file), strerror (errno));
   if (fclose (fp) < 0)
-    logprintf (LOG_NOTQUIET, _("Error closing `%s': %s\n"),
-               file, strerror (errno));
+    logprintf (LOG_NOTQUIET, _("Error closing %s: %s\n"),
+               quote (file), strerror (errno));
 
   DEBUGP (("Done saving cookies.\n"));
 }

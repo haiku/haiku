@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use HTTPTest;
+
+
+###############################################################################
+
+my $page1 = "Hello, world!\n";
+my $page2 = "Goodbye, Sam.\n";
+
+# code, msg, headers, content
+my %urls = (
+    '/one.txt' => {
+        code => "200",
+        msg => "Ok",
+        headers => {
+            "Content-type" => "text/plain",
+            "Set-Cookie" => "foo=bar",
+        },
+        content => $page1,
+    },
+    '/two.txt' => {
+        code => "200",
+        msg => "Ok",
+        content => $page2,
+        request_headers => {
+            "Cookie" => qr|foo=bar|,
+        },
+    },
+);
+
+my $cmdline = $WgetTest::WGETPATH . " http://localhost:{{port}}/one.txt"
+    . " http://localhost:{{port}}/two.txt";
+
+my $expected_error_code = 0;
+
+my %expected_downloaded_files = (
+    'one.txt' => {
+        content => $page1,
+    },
+    'two.txt' => {
+        content => $page2,
+    },
+);
+
+###############################################################################
+
+my $the_test = HTTPTest->new (name => "Test-cookies",
+                              input => \%urls,
+                              cmdline => $cmdline,
+                              errcode => $expected_error_code,
+                              output => \%expected_downloaded_files);
+exit $the_test->run();
+
+# vim: et ts=4 sw=4
+

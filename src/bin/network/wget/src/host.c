@@ -1,6 +1,6 @@
 /* Host name resolution and matching.
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,12 +36,17 @@ as that of the covered work.  */
 #include <assert.h>
 
 #ifndef WINDOWS
+# include <sys/types.h>
 # include <sys/socket.h>
 # include <netinet/in.h>
 # ifdef HAVE_ARPA_INET_H
 #  include <arpa/inet.h>
 # endif
-# include <netdb.h>
+# ifdef __VMS
+#  include "vms_ip.h"
+# else /* def __VMS */
+#  include <netdb.h>
+# endif /* def __VMS [else] */
 # define SET_H_ERRNO(err) ((void)(h_errno = (err)))
 #else  /* WINDOWS */
 # define SET_H_ERRNO(err) WSASetLastError (err)
@@ -49,7 +54,6 @@ as that of the covered work.  */
 
 #include <errno.h>
 
-#include "wget.h"
 #include "utils.h"
 #include "host.h"
 #include "url.h"
@@ -58,6 +62,11 @@ as that of the covered work.  */
 #ifndef NO_ADDRESS
 # define NO_ADDRESS NO_DATA
 #endif
+
+#if !HAVE_DECL_H_ERRNO
+extern int h_errno;
+#endif
+
 
 /* Lists of IP addresses that result from running DNS queries.  See
    lookup_host for details.  */
@@ -193,7 +202,7 @@ address_list_from_addrinfo (const struct addrinfo *ai)
 
   ip = al->addresses;
   for (ptr = ai; ptr != NULL; ptr = ptr->ai_next)
-    if (ptr->ai_family == AF_INET6) 
+    if (ptr->ai_family == AF_INET6)
       {
         const struct sockaddr_in6 *sin6 =
           (const struct sockaddr_in6 *)ptr->ai_addr;
@@ -203,7 +212,7 @@ address_list_from_addrinfo (const struct addrinfo *ai)
         ip->ipv6_scope = sin6->sin6_scope_id;
 #endif
         ++ip;
-      } 
+      }
     else if (ptr->ai_family == AF_INET)
       {
         const struct sockaddr_in *sin =
@@ -453,7 +462,7 @@ is_valid_ipv4_address (const char *str, const char *end)
     }
   if (octets < 4)
     return false;
-  
+
   return true;
 }
 
@@ -478,7 +487,7 @@ is_valid_ipv6_address (const char *str, const char *end)
 
   if (str == end)
     return false;
-  
+
   /* Leading :: requires some special handling. */
   if (*str == ':')
     {
@@ -496,7 +505,7 @@ is_valid_ipv6_address (const char *str, const char *end)
       int ch = *str++;
 
       /* if ch is a number, add it to val. */
-      if (ISXDIGIT (ch))
+      if (c_isxdigit (ch))
         {
           val <<= 4;
           val |= XDIGIT_TO_NUM (ch);
@@ -535,20 +544,20 @@ is_valid_ipv6_address (const char *str, const char *end)
           saw_xdigit = false;
           break;
         }
-    
+
       return false;
     }
 
   if (saw_xdigit)
     {
-      if (tp > ns_in6addrsz - ns_int16sz) 
+      if (tp > ns_in6addrsz - ns_int16sz)
         return false;
       tp += ns_int16sz;
     }
 
   if (colonp != NULL)
     {
-      if (tp == ns_in6addrsz) 
+      if (tp == ns_in6addrsz)
         return false;
       tp = ns_in6addrsz;
     }
@@ -713,7 +722,24 @@ lookup_host (const char *host, int flags)
   /* No luck with the cache; resolve HOST. */
 
   if (!silent && !numeric_address)
-    logprintf (LOG_VERBOSE, _("Resolving %s... "), escnonprint (host));
+    {
+      char *str = NULL, *name;
+
+      if (opt.enable_iri && (name = idn_decode ((char *) host)) != NULL)
+        {
+          int len = strlen (host) + strlen (name) + 4;
+          str = xmalloc (len);
+          snprintf (str, len, "%s (%s)", name, host);
+          str[len-1] = '\0';
+          xfree (name);
+        }
+
+      logprintf (LOG_VERBOSE, _("Resolving %s... "),
+                 quotearg_style (escape_quoting_style, str ? str : host));
+
+      if (str)
+        xfree (str);
+    }
 
 #ifdef ENABLE_IPV6
   {
@@ -849,7 +875,7 @@ sufmatch (const char **list, const char *what)
   for (i = 0; list[i]; i++)
     {
       for (j = strlen (list[i]), k = lw; j >= 0 && k >= 0; j--, k--)
-        if (TOLOWER (list[i][j]) != TOLOWER (what[k]))
+        if (c_tolower (list[i][j]) != c_tolower (what[k]))
           break;
       /* The domain must be first to reach to beginning.  */
       if (j == -1)

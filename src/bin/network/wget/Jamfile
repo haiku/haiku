@@ -6,7 +6,8 @@ local defines = [ FDefines HAVE_CONFIG_H=1 ] ;
 
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
-
+SubDirSysHdrs [ FDirName $(SUBDIR) lib ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) md5 ] ;
 
 # use OpenSSL, if enabled
 local sslSources ;
@@ -25,21 +26,29 @@ if $(HAIKU_OPENSSL_ENABLED) {
 }
 
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) md5 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) lib ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
 	# needs to be invoked after SetupFeatureObjectsDir
 
 
 BinCommand wget :
+	build_info.c
 	cmpt.c
 	connect.c
 	convert.c
 	cookies.c
+	css.c
+	css-url.c
+	error.c
+	exitfail.c
+	exits.c
 	ftp-basic.c
 	ftp-ls.c
 	ftp-opie.c
 	ftp.c
 	gen-md5.c
-	gnu-md5.c
+	getpass.c
 	hash.c
 	host.c
 	html-parse.c
@@ -49,18 +58,21 @@ BinCommand wget :
 	init.c
 	log.c
 	main.c
+	md5.c
 	netrc.c
 	progress.c
 	ptimer.c
+	quote.c
+	quotearg.c
 	recur.c
 	res.c
 	retr.c
-	safe-ctype.c
 	spider.c
 	url.c
 	utils.c
 	version.c
 	xmalloc.c
+	xalloc-die.c
 	$(sslSources)
 	: $(TARGET_NETWORK_LIBS) $(HAIKU_OPENSSL_LIBS)
 ;

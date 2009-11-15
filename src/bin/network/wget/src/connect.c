@@ -1,6 +1,6 @@
 /* Establishing and handling network connections.
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,7 +39,11 @@ as that of the covered work.  */
 
 #ifndef WINDOWS
 # include <sys/socket.h>
-# include <netdb.h>
+# ifdef __VMS
+#  include "vms_ip.h"
+# else /* def __VMS */
+#  include <netdb.h>
+# endif /* def __VMS [else] */
 # include <netinet/in.h>
 # ifdef HAVE_ARPA_INET_H
 #  include <arpa/inet.h>
@@ -54,12 +58,15 @@ as that of the covered work.  */
 #ifdef HAVE_SYS_TIME_H
 # include <sys/time.h>
 #endif
-
-#include "wget.h"
 #include "utils.h"
 #include "host.h"
 #include "connect.h"
 #include "hash.h"
+
+/* Apparently needed for Interix: */
+#ifdef HAVE_STDINT_H
+# include <stdint.h>
+#endif
 
 /* Define sockaddr_storage where unavailable (presumably on IPv4-only
    hosts).  */
@@ -197,8 +204,8 @@ resolve_bind_address (struct sockaddr *sa)
     {
       /* #### We should be able to print the error message here. */
       logprintf (LOG_NOTQUIET,
-                 _("%s: unable to resolve bind address `%s'; disabling bind.\n"),
-                 exec_name, opt.bind_address);
+                 _("%s: unable to resolve bind address %s; disabling bind.\n"),
+                 exec_name, quote (opt.bind_address));
       should_bind = false;
       return false;
     }
@@ -268,9 +275,25 @@ connect_to_ip (const ip_address *ip, int port, const char *print)
   if (print)
     {
       const char *txt_addr = print_address (ip);
-      if (print && 0 != strcmp (print, txt_addr))
-        logprintf (LOG_VERBOSE, _("Connecting to %s|%s|:%d... "),
-                   escnonprint (print), txt_addr, port);
+      if (0 != strcmp (print, txt_addr))
+        {
+				  char *str = NULL, *name;
+
+          if (opt.enable_iri && (name = idn_decode ((char *) print)) != NULL)
+            {
+              int len = strlen (print) + strlen (name) + 4;
+              str = xmalloc (len);
+              snprintf (str, len, "%s (%s)", name, print);
+              str[len-1] = '\0';
+              xfree (name);
+            }
+
+          logprintf (LOG_VERBOSE, _("Connecting to %s|%s|:%d... "),
+                     str ? str : escnonprint_uri (print), txt_addr, port);
+
+					if (str)
+					  xfree (str);
+        }
       else
         logprintf (LOG_VERBOSE, _("Connecting to %s:%d... "), txt_addr, port);
     }
@@ -289,7 +312,7 @@ connect_to_ip (const ip_address *ip, int port, const char *print)
     /* In case of error, we will go on anyway... */
     int err = setsockopt (sock, IPPROTO_IPV6, IPV6_V6ONLY, &on, sizeof (on));
     IF_DEBUG
-      if (err < 0) 
+      if (err < 0)
         DEBUGP (("Failed setting IPV6_V6ONLY: %s", strerror (errno)));
   }
 #endif
@@ -368,8 +391,8 @@ connect_to_host (const char *host, int port)
   if (!al)
     {
       logprintf (LOG_NOTQUIET,
-                 _("%s: unable to resolve host address `%s'\n"),
-                 exec_name, host);
+                 _("%s: unable to resolve host address %s\n"),
+                 exec_name, quote (host));
       return E_HOST;
     }
 
@@ -678,7 +701,7 @@ test_socket_open (int sock)
 
 /* Basic socket operations, mostly EINTR wrappers.  */
 
-#if defined(WINDOWS) || defined(MSDOS)
+#if defined(WINDOWS) || defined(USE_WATT32)
 # define read(fd, buf, cnt) recv (fd, buf, cnt, 0)
 # define write(fd, buf, cnt) send (fd, buf, cnt, 0)
 # define close(fd) closesocket (fd)

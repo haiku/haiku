@@ -1,0 +1,24 @@
+ENABLE_DIGEST  digest
+ENABLE_IPV6    ipv6
+ENABLE_NLS     nls
+ENABLE_NTLM    ntlm
+ENABLE_OPIE    opie
+HAVE_MD5
+HAVE_SSL       https
+HAVE_LIBGNUTLS gnutls
+HAVE_LIBSSL    openssl
+ENABLE_IRI     iri
+
+#ifdef HAVE_MD5
+#ifdef HAVE_BUILTIN_MD5
+  "+md5/builtin",
+#elif HAVE_OPENSSL_MD5
+  "+md5/openssl",
+#elif HAVE_SOLARIS_MD5
+  "+md5/solaris",
+#else
+#error "md5 set, but no library found!",
+#endif
+#else
+  "-md5",
+#endif

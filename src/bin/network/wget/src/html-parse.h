@@ -1,6 +1,6 @@
 /* Declarations for html-parse.c.
    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008 Free Software Foundation, Inc.
+   2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -52,6 +52,9 @@ struct taginfo {
 
   const char *start_position;	/* start position of tag */
   const char *end_position;	/* end position of tag */
+
+  const char *contents_begin;   /* delimiters of tag contents */
+  const char *contents_end;     /* only valid if end_tag_p */
 };
 
 struct hash_table;		/* forward declaration */

@@ -1,26 +1,186 @@
+2009-09-04  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi (Time-Stamping): "older" -> "not newer".
+
+	* Makefile.am (install.man, install.wgetrc): Use $(mkinstalldirs),
+	not $(top_srcdir)/mkinstalldirs.
+
+2009-08-27  Micah Cowan  <micah@cowan.name>
+
+	* texi2pod.pl: Handle @asis in table-element formatting.
+
+	* wget.texi (Exit Status): Document new exit codes.
+
+2009-08-02  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi (Option Syntax): "This is a complete equivalent of" ->
+	"This is completely equivalent to". Thanks to Reuben Thomas for
+	catching this.
+
+2009-07-28  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi (Download Options): Document "lowercase", "uppercase",
+	and the new "ascii" specifier for --restrict-file-names.
+	(HTTP Options): Rename --html-extension to --adjust-extension.
+	(Wgetrc Commands): Rename html_extension to adjust_extension.
+
+2009-07-26  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi (Download Options): Change --iri item to --no-iri;
+	rename --locale to --local-encoding.
+	(Wgetrc Commands): Document iri, local_encoding, remote_encoding,
+	ask_password, auth_no_challenge, and keep_session_cookies.
+
+2009-07-06  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi (Logging and Input File Options): Alter description of
+	--input-file, implying that --force-html isn't necessary when the
+	input is in HTML file. Improve accuracy of --base description.
+	(Wgetrc Commands): Improve accuracy of "base" description.
+	(HTTP Options): Clarify operation of --post-file.
+
+2009-07-03  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi (Download Options): --iri=no --> --no-iri
+	(Contributors): Add Saint Xavier.
+
+2009-06-20  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi (Contributors): Added Jay Krell.
+
+2009-06-14  Micah Cowan  <micah@cowan.name>
+
+	* Makefile.am (wget.pod): $(srcdir)/version.texi -> version.texi
+
+2009-06-12  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi (Download Options): More accuracy on what happens when
+	-nd is used with -r or -p.
+
+2009-06-11  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi (Contributors): Added Xin Zou, Benjamin Wolsley, and
+	Robert Millan.
+
+2009-06-11  Joao Ferreira  <joao@joaoff.com>
+
+	* wget.texi (Option Syntax): Fixed contradictory and confusing
+	explanation of --folow-ftp and negation.
+
+2009-06-10  Micah Cowan  <micah@cowan.name>
+
+	* sample.wgetrc: Add "https_proxy" to the proxy examples. Thanks
+	to Martin Paul <martin@par.univie.ac.at> for the suggestion.
+
+2008-11-15  Steven Schubiger  <stsc@members.fsf.org>
+
+	* sample.wgetrc: Comment the waitretry "default" value, 
+	because there is a global one now.
+
+	* wget.texi (Download Options): Mention the global 
+	default value.
+
+2008-11-10  Micah Cowan  <micah@cowan.name>
+
+	* Makefile.am (EXTRA_DIST): Removed no-longer-present
+	README.maint (shouldn't have been there in the first place).
+
+	* wget.texi (Mailing Lists): Added information aboug Gmane portal,
+	added subsection headings.
+
+	Update node pointers.
+	
+2008-11-05  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi: Move --no-http-keep-alive from FTP Options to HTTP
+	Options.
+	(Mailing List): Mention moderation for unsubscribed posts, and
+	archive location.
+
+2008-11-04  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi, fdl.texi: Updated to FDL version 1.3.
+
+2008-10-31  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi (Mailing List): Update info to reflect change to
+	bug-wget@gnu.org.
+
+2008-09-30  Steven Schubiger  <stsc@members.fsf.org>
+
+	* wget.texi (Wgetrc Commands): Add default_page, save_headers, 
+	spider and user_agent to the list of recognized commands.
+
+2008-09-10  Michael Kessler  <kessler.michael@aon.at>
+
+	* wget.texi (Robot Exclusion): Fixed typo "downloads" ->
+	"download"
+
+2008-08-03  Xavier Saint  <wget@sxav.eu>
+
+	* wget.texi : Add option descriptions for the three new
+	options --iri, --locale and --remote-encoding related to
+	IRI support.
+
+	* sample.wgetrc : Add commented lines for the three new
+	command iri, locale and encoding related to IRI support.
+
+2008-08-03  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi: Don't set UPDATED; already set by version.texi.
+	(HTTP Options): Add --default-page option.
+
+2008-07-17  Steven Schubiger  <stsc@members.fsf.org>
+
+	* wget.texi (Logging and Input File Options): Document
+	for --input-file and according remote input file URLs, the
+	implicit enforcement of treating a document as HTML and
+	the possible baseref assumption.
+
 2008-06-29  Micah Cowan  <micah@cowan.name>
 
-	* wget.texi <Contributors>: Added Joao Ferreira.
+	* wget.texi <Contributors>: Added Joao Ferreira, Mike Frysinger,
+	Alain, Guibert, Madhusudan Hosaagrahara, Jim Paris, Kenny
+	Parnell, Benno Schulenberg, and Pranab Shenoy. Added Steven
+	Schubiger to the "Special Thanks" section.
 
-	* version.texi: Bumped version to 1.11.4.
+2008-06-13  Micah Cowan  <micah@cowan.name>
 
-2008-05-28  Micah Cowan  <micah@cowan.name>
+	* wget.texi (Mailing List): The wget-notify mailing list no longer
+	receives commit notifications from the source repository.
+	(Internet Relay Chat): Activity isn't quite so low any more,
+	remove notice to that effect.
 
-	* version.texi: Bumped version to 1.11.3.
+2008-05-17  Steven Schubiger  <stsc@members.fsf.org>
+
+	* wget.texi (Download Options): Change documentation to reflect
+	the new default value for --prefer-family.
+	(Wgetrc Commands): Same, for prefer_family wgetrc command.
 
 2008-05-12  Micah Cowan  <micah@cowan.name>
 
 	* wget.texi (Download Options): -N with -O downgraded to a
 	warning.
 
-2008-04-30  Micah Cowan  <micah@cowan.name>
+2008-04-30  Steven Schubiger  <stsc@members.fsf.org>
 
-	* version.texi: Bumped version to 1.11.2.
+	* wget.texi <Download Options>: Document the --ask-password
+	option.
 
 2008-04-27  Micah Cowan  <micah@cowan.name>
 
 	* wget.texi (Download Options) <-O>: Elaborate on why certain
 	options make poor combinations with -O.
+
+2008-04-24  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi: Adjusted documentation to account for CSS support;
+	added Ted Mielczarek to contributors.
+
+2008-04-22  Mike Frysinger  <vapier@gentoo.org>
+
+	* sample.wgetrc: Added prefer_family example. Resolves bug
+	#22142.
 
 2008-04-11  Micah Cowan  <micah@cowan.name>
 
@@ -39,11 +199,6 @@
 	* wget.texi <Directory-Based Limits>: Mention importance of
 	trailing slashes to --no-parents.
 
-2008-02-14  Micah Cowan  <micah@cowan.name>
-
-	* Makefile.in: Install manpage from source dir, rather than
-	build dir.
-
 2008-02-10  Micah Cowan  <micah@cowan.name>
 
 	* wget.texi <HTTP Options>: Added documentation of
@@ -54,19 +209,13 @@
 	* wget.ṫexi <Overview>: Remove references to no-longer-supported
 	socks library.
 
-2008-01-30  Micah Cowan  <micah@cowan.name>
+2008-01-31  Micah Cowan  <micah@cowan.name>
 
-	* version.texi: Bumped version to 1.11.1-devel.
 	* wget.texi: Ensure that license info appears in the info
 	version of the manual.
 
 2008-01-25  Micah Cowan  <micah@cowan.name>
-
-	* wget.texi: Update the "last updated" setting.
-	* Makefile.in, wget.texi: Updated copyright year.
-	* Makefile.in: Mark wget.pod as secondary, to avoid regeneration
-	because of wget.1's dependency upon it.
-	* version.texi: Bumped version to 1.11.
+	* Makefile.am, wget.texi: Updated copyright year.
 
 2007-12-10  Micah Cowan  <micah@cowan.name>
 
@@ -91,6 +240,15 @@
 2007-10-10  Micah Cowan  <micah@cowan.name>
 
 	* wget.texi <Wgetrc Commands>: Fixed "doewnloads" typo.
+
+2007-10-08  Micah Cowan  <micah@cowan.name>
+
+	* wget.texi: Credit to Ralf Wildenhues for automakifying patches.
+
+2007-10-05  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* Makefile.in: Removed, replaced by Makefile.am.
+	* Makefile.am: Converted from Makefile.in.
 
 2007-10-03  Micah Cowan  <micah@cowan.name>
 
@@ -746,26 +904,26 @@
 2001-02-22  Dan Harkless  <wget@harkless.org>
 
 	* Makefile.in: Make wget man page and install it if we have
- 	pod2man.  Added some missing '$(srcdir)/'s.  Added missing
- 	dependencies on install targets (allowing you to just do `make
- 	install' rather than forcing you to do `make && make install').
-  	Also, Makefile rules should always use output file parameters if
- 	available rather than redirecting stdout with '>', or you falsely
- 	satisfy dependencies if the tool you're running is missing or
- 	fails -- fixed call of texi2pod.pl that did this wrong.
+	pod2man.  Added some missing '$(srcdir)/'s.  Added missing
+	dependencies on install targets (allowing you to just do `make
+	install' rather than forcing you to do `make && make install').
+	Also, Makefile rules should always use output file parameters if
+	available rather than redirecting stdout with '>', or you falsely
+	satisfy dependencies if the tool you're running is missing or
+	fails -- fixed call of texi2pod.pl that did this wrong.
 
 	* texi2pod.pl: Removed from CVS.  Now automatically generated.
 		
 	* texi2pod.pl.in: This new file is processed into texi2pod.pl,
- 	getting the appropriate path to the Perl 5+ executable on this
- 	system and becoming executable (CVS files, by contrast, don't
- 	arrive executable).
+	getting the appropriate path to the Perl 5+ executable on this
+	system and becoming executable (CVS files, by contrast, don't
+	arrive executable).
 	
 2001-02-19  Dan Harkless  <wget@harkless.org>
 
 	* wget.texi (Download Options): Further improvement to --continue
- 	documentation -- explain interaction with -r and -N, mention
- 	usefulness for downloading new sections of appended-to files, etc.
+	documentation -- explain interaction with -r and -N, mention
+	usefulness for downloading new sections of appended-to files, etc.
 
 2001-01-06  Jan Prikryl  <prikryl@cg.tuwien.ac.at>
 
@@ -788,7 +946,7 @@
 2001-01-09  Dan Harkless  <wget@harkless.org>
 
 	* wget.texi (Download Options): Did a bunch of clarification and
- 	correction to the description of --continue.
+	correction to the description of --continue.
 
 2001-01-06  Dan Harkless  <wget@harkless.org>
 
@@ -814,7 +972,7 @@
 	looking at the dates would make you think that things went into
 	1.6 that actually just went into the 1.7-dev branch.  Added "[Not
 	in 1.6 branch.]" where appropriate to clarify.
-        
+
 2000-12-10  Hrvoje Niksic  <hniksic@arsdigita.com>
 
 	* Makefile.in (install.info): Info files are *not* in $(srcdir),
@@ -902,22 +1060,22 @@
 2000-08-22  Dan Harkless  <wget@harkless.org>
 
 	* wget.texi (Download Options): --no-clobber's documentation was
- 	severely lacking -- ameliorated the situation.  Some of the
- 	previously-undocumented stuff (like the multiple-file-version
- 	numeric-suffixing) that's now mentioned for the first (and only)
- 	time in the -nc documentation should probably be mentioned
- 	elsewhere, but due to the way that wget.texi's hierarchy is laid
- 	out, I had a hard time finding anywhere else appropriate.
+	severely lacking -- ameliorated the situation.  Some of the
+	previously-undocumented stuff (like the multiple-file-version
+	numeric-suffixing) that's now mentioned for the first (and only)
+	time in the -nc documentation should probably be mentioned
+	elsewhere, but due to the way that wget.texi's hierarchy is laid
+	out, I had a hard time finding anywhere else appropriate.
 
 2000-07-17  Dan Harkless  <wget@harkless.org>
 
 	* wget.texi (HTTP Options): Minor clarification in "download a
- 	single HTML page and all files necessary to display it" example.
+	single HTML page and all files necessary to display it" example.
 
 2000-05-22  Dan Harkless  <wget@harkless.org>
 
 	* wget.texi (HTTP Options): Damir Dzeko <ddzeko@zesoi.fer.hr> did
- 	not document his new --referer option.  Did so.
+	not document his new --referer option.  Did so.
 
 2000-04-18  Dan Harkless  <wget@harkless.org>
 
@@ -940,27 +1098,27 @@
 2000-04-12  Dan Harkless  <wget@harkless.org>
 
 	* Makefile.in (install.wgetrc): I completely missed the message
- 	that the new wgetrc wasn't being installed the first couple of
- 	times I ran `make install' after changing sample.wgetrc.  Added
- 	blank lines around the message and a "<Hit RETURN to
- 	acknowledge>", and reworded the message to be a bit more clear.
+	that the new wgetrc wasn't being installed the first couple of
+	times I ran `make install' after changing sample.wgetrc.  Added
+	blank lines around the message and a "<Hit RETURN to
+	acknowledge>", and reworded the message to be a bit more clear.
 	
 	* sample.wgetrc: Added entries for backup_converted and waitretry.
 
 	* wget.texi (Download Options and Wgetrc Commands): Herold Heiko
- 	<Heiko.Herold@previnet.it>'s new --waitretry option was
- 	undocumented until now.  Reworded the suggested documentation he
- 	sent to the list.
+	<Heiko.Herold@previnet.it>'s new --waitretry option was
+	undocumented until now.  Reworded the suggested documentation he
+	sent to the list.
 
 2000-03-10  Dan Harkless  <wget@harkless.org>
 
 	* wget.texi (Recursive Retrieval Options): In -K description,
- 	added a link to the discussion of interaction with -N.
+	added a link to the discussion of interaction with -N.
 	(Recursive Accept/Reject Options): Did some alphabetizing and added
 	descriptions of new --follow-tags and -G / --ignore-tags options.
 	(Following Links): Changed "the loads of" to "loads of".
 	(Wgetrc Commands): Added descriptions of new follow_tags and
- 	ignore_tags commands.
+	ignore_tags commands.
 
 2000-03-02  Daniel S. Lewart  <d-lewart@uiuc.edu>
 
@@ -973,7 +1131,7 @@
 2000-03-01  Dan Harkless  <wget@harkless.org>
 
 	* wget.texi (HTTP Time-Stamping Internals): Added a note about my
- 	newly-implemented interaction between -K and -N.
+	newly-implemented interaction between -K and -N.
 
 2000-02-29  Dan Harkless  <wget@harkless.org>
 
@@ -984,7 +1142,7 @@
 2000-02-18  Dan Harkless  <wget@harkless.org>
 
 	* wget.texi (Recursive Retrieval Options): Documented my new -K /
- 	--backup-converted option.
+	--backup-converted option.
 	(Wgetrc Commands): Documented backup_converted equivalent.
 
 1998-09-10  Hrvoje Niksic  <hniksic@srce.hr>
@@ -1011,7 +1169,7 @@
 1998-05-02  Hrvoje Niksic  <hniksic@srce.hr>
 
 	* wget.texi (Recursive Retrieval): Fix typo.  Suggested by
- 	Francois Pinard.
+	Francois Pinard.
 
 1998-04-18  Hrvoje Niksic  <hniksic@srce.hr>
 
@@ -1028,7 +1186,7 @@
 1998-03-29  Hrvoje Niksic  <hniksic@srce.hr>
 
 	* wget.texi (Invoking): Split into more sections, analogous to
- 	output of `wget --help'.
+	output of `wget --help'.
 	(HTTP Options): Document --user-agent.
 
 1998-03-16  Hrvoje Niksic  <hniksic@srce.hr>
@@ -1079,7 +1237,7 @@
 1997-02-17  Hrvoje Niksic  <hniksic@srce.hr>
 
 	* wget.texi (Advanced Options): Document --proxy-user and
- 	--proxy-passwd.
+	--proxy-passwd.
 
 1997-02-14  Karl Eichwalder  <ke@ke.Central.DE>
 
@@ -1126,7 +1284,7 @@
 1996-12-12  Dieter Baron <dillo@danbala.tuwien.ac.at>
 
 	* wget.texi (Advanced Usage): Would reference prep instead of
- 	wuarchive.
+	wuarchive.
 
 1996-11-25  Hrvoje Niksic  <hniksic@srce.hr>
 
@@ -1139,7 +1297,7 @@
 1996-11-22  Hrvoje Niksic  <hniksic@srce.hr>
 
 	* wget.texi (Portability): Add IRIX and FreeBSD as the "regular"
- 	platforms.
+	platforms.
 
 1996-11-20  Hrvoje Niksic  <hniksic@srce.hr>
 

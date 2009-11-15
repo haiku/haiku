@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 
-#   Copyright (C) 1999, 2000, 2001, 2003, 2007 Free Software
+#   Copyright (C) 1999, 2000, 2001, 2003, 2007, 2009 Free Software
 #   Foundation, Inc.
 
 # This file is part of GCC.
@@ -231,7 +231,7 @@ while(<$inf>) {
 	$file = postprocess($1);
 
 	# Try cwd and $ibase.
-	open($inf, "<" . $file) 
+	open($inf, "<" . $file)
 	    or open($inf, "<" . $ibase . "/" . $file)
 		or die "cannot open $file or $ibase/$file: $!\n";
 	next;
@@ -288,8 +288,13 @@ while(<$inf>) {
 
     /^\@itemx?\s*(.+)?$/ and do {
 	if (defined $1) {
-	    # Entity escapes prevent munging by the <> processing below.
-	    $_ = "\n=item $ic\&LT;$1\&GT;\n";
+            my $thing = $1;
+            if ($ic =~ /\@asis/) {
+                $_ = "\n=item $thing\n";
+            } else {
+                # Entity escapes prevent munging by the <> processing below.
+                $_ = "\n=item $ic\&LT;$thing\&GT;\n";
+            }
 	} else {
 	    $_ = "\n=item $ic\n";
 	    $ic =~ y/A-Ya-y/B-Zb-z/;
@@ -309,11 +314,12 @@ die "No filename or title\n" unless defined $fn && defined $tl;
 $sects{NAME} = "$fn \- $tl\n";
 $sects{FOOTNOTES} .= "=back\n" if exists $sects{FOOTNOTES};
 
-for $sect (qw(NAME SYNOPSIS DESCRIPTION OPTIONS ENVIRONMENT FILES
-	      BUGS NOTES FOOTNOTES SEEALSO AUTHOR COPYRIGHT)) {
+for $sect (qw(NAME SYNOPSIS DESCRIPTION OPTIONS ENVIRONMENT EXITSTATUS
+           FILES BUGS NOTES FOOTNOTES SEEALSO AUTHOR COPYRIGHT)) {
     if(exists $sects{$sect}) {
 	$head = $sect;
 	$head =~ s/SEEALSO/SEE ALSO/;
+	$head =~ s/EXITSTATUS/EXIT STATUS/;
 	print "=head1 $head\n\n";
 	print scalar unmunge ($sects{$sect});
 	print "\n";

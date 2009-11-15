@@ -1,6 +1,6 @@
 /* HTML parser for Wget.
    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008 Free Software Foundation, Inc.
+   2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -89,7 +89,7 @@ as that of the covered work.  */
 /* To test as standalone, compile with `-DSTANDALONE -I.'.  You'll
    still need Wget headers to compile.  */
 
-#include <config.h>
+#include "wget.h"
 
 #ifdef STANDALONE
 # define I_REALLY_WANT_CTYPE_MACROS
@@ -100,7 +100,7 @@ as that of the covered work.  */
 #include <string.h>
 #include <assert.h>
 
-#include "wget.h"
+#include "utils.h"
 #include "html-parse.h"
 
 #ifdef STANDALONE
@@ -111,21 +111,21 @@ as that of the covered work.  */
 # define xrealloc realloc
 # define xfree free
 
-# undef ISSPACE
-# undef ISDIGIT
-# undef ISXDIGIT
-# undef ISALPHA
-# undef ISALNUM
-# undef TOLOWER
-# undef TOUPPER
+# undef c_isspace
+# undef c_isdigit
+# undef c_isxdigit
+# undef c_isalpha
+# undef c_isalnum
+# undef c_tolower
+# undef c_toupper
 
-# define ISSPACE(x) isspace (x)
-# define ISDIGIT(x) isdigit (x)
-# define ISXDIGIT(x) isxdigit (x)
-# define ISALPHA(x) isalpha (x)
-# define ISALNUM(x) isalnum (x)
-# define TOLOWER(x) tolower (x)
-# define TOUPPER(x) toupper (x)
+# define c_isspace(x) isspace (x)
+# define c_isdigit(x) isdigit (x)
+# define c_isxdigit(x) isxdigit (x)
+# define c_isalpha(x) isalpha (x)
+# define c_isalnum(x) isalnum (x)
+# define c_tolower(x) tolower (x)
+# define c_toupper(x) toupper (x)
 
 struct hash_table {
   int dummy;
@@ -259,7 +259,7 @@ struct pool {
    However, "&lt;foo" will work, as will "&lt!foo", "&lt", etc.  In
    other words an entity needs to be terminated by either a
    non-alphanumeric or the end of string.  */
-#define FITS(p, n) (p + n == end || (p + n < end && !ISALNUM (p[n])))
+#define FITS(p, n) (p + n == end || (p + n < end && !c_isalnum (p[n])))
 
 /* Macros that test entity names by returning true if P is followed by
    the specified characters.  */
@@ -271,6 +271,94 @@ struct pool {
    past the semicolon.  This ensures that e.g. "&lt;foo" is converted
    to "<foo", but "&lt,foo" to "<,foo".  */
 #define SKIP_SEMI(p, inc) (p += inc, p < end && *p == ';' ? ++p : p)
+
+struct tagstack_item {
+  const char *tagname_begin;
+  const char *tagname_end;
+  const char *contents_begin;
+  struct tagstack_item *prev;
+  struct tagstack_item *next;
+};
+
+struct tagstack_item *
+tagstack_push (struct tagstack_item **head, struct tagstack_item **tail)
+{
+  struct tagstack_item *ts = xmalloc(sizeof(struct tagstack_item));
+  if (*head == NULL)
+    {
+      *head = *tail = ts;
+      ts->prev = ts->next = NULL;
+    }
+  else
+    {
+      (*tail)->next = ts;
+      ts->prev = *tail;
+      *tail = ts;
+      ts->next = NULL;
+    }
+
+  return ts;
+}
+
+/* remove ts and everything after it from the stack */
+void
+tagstack_pop (struct tagstack_item **head, struct tagstack_item **tail,
+              struct tagstack_item *ts)
+{
+  if (*head == NULL)
+    return;
+
+  if (ts == *tail)
+    {
+      if (ts == *head)
+        {
+          xfree (ts);
+          *head = *tail = NULL;
+        }
+      else
+        {
+          ts->prev->next = NULL;
+          *tail = ts->prev;
+          xfree (ts);
+        }
+    }
+  else
+    {
+      if (ts == *head)
+        {
+          *head = NULL;
+        }
+      *tail = ts->prev;
+
+      if (ts->prev)
+        {
+          ts->prev->next = NULL;
+        }
+      while (ts)
+        {
+          struct tagstack_item *p = ts->next;
+          xfree (ts);
+          ts = p;
+        }
+    }
+}
+
+struct tagstack_item *
+tagstack_find (struct tagstack_item *tail, const char *tagname_begin,
+               const char *tagname_end)
+{
+  int len = tagname_end - tagname_begin;
+  while (tail)
+    {
+      if (len == (tail->tagname_end - tail->tagname_begin))
+        {
+          if (0 == strncasecmp (tail->tagname_begin, tagname_begin, len))
+            return tail;
+        }
+      tail = tail->prev;
+    }
+  return NULL;
+}
 
 /* Decode the HTML character entity at *PTR, considering END to be end
    of buffer.  It is assumed that the "&" character that marks the
@@ -297,10 +385,10 @@ decode_entity (const char **ptr, const char *end)
         int digits = 0;
         value = 0;
         if (*p == 'x')
-          for (++p; value < 256 && p < end && ISXDIGIT (*p); p++, digits++)
+          for (++p; value < 256 && p < end && c_isxdigit (*p); p++, digits++)
             value = (value << 4) + XDIGIT_TO_NUM (*p);
         else
-          for (; value < 256 && p < end && ISDIGIT (*p); p++, digits++)
+          for (; value < 256 && p < end && c_isdigit (*p); p++, digits++)
             value = (value * 10) + (*p - '0');
         if (!digits)
           return -1;
@@ -369,9 +457,9 @@ convert_and_copy (struct pool *pool, const char *beg, const char *end, int flags
      `&#32;'.  */
   if (flags & AP_TRIM_BLANKS)
     {
-      while (beg < end && ISSPACE (*beg))
+      while (beg < end && c_isspace (*beg))
         ++beg;
-      while (end > beg && ISSPACE (end[-1]))
+      while (end > beg && c_isspace (end[-1]))
         --end;
     }
 
@@ -426,7 +514,7 @@ convert_and_copy (struct pool *pool, const char *beg, const char *end, int flags
     {
       char *p = pool->contents + old_tail;
       for (; *p; p++)
-        *p = TOLOWER (*p);
+        *p = c_tolower (*p);
     }
 }
 
@@ -706,7 +794,7 @@ name_allowed (const struct hash_table *ht, const char *b, const char *e)
 /* Skip whitespace, if any. */
 
 #define SKIP_WS(p) do {                         \
-  while (ISSPACE (*p)) {                        \
+  while (c_isspace (*p)) {                        \
     ADVANCE (p);                                \
   }                                             \
 } while (0)
@@ -714,7 +802,7 @@ name_allowed (const struct hash_table *ht, const char *b, const char *e)
 /* Skip non-whitespace, if any. */
 
 #define SKIP_NON_WS(p) do {                     \
-  while (!ISSPACE (*p)) {                       \
+  while (!c_isspace (*p)) {                       \
     ADVANCE (p);                                \
   }                                             \
 } while (0)
@@ -756,6 +844,9 @@ map_html_tags (const char *text, int size,
   int attr_pair_size = countof (attr_pair_initial_storage);
   bool attr_pair_resized = false;
   struct attr_pair *pairs = attr_pair_initial_storage;
+
+  struct tagstack_item *head = NULL;
+  struct tagstack_item *tail = NULL;
 
   if (!size)
     return;
@@ -823,6 +914,18 @@ map_html_tags (const char *text, int size,
       goto look_for_tag;
     tag_name_end = p;
     SKIP_WS (p);
+
+    if (!end_tag)
+      {
+        struct tagstack_item *ts = tagstack_push (&head, &tail);
+        if (ts)
+          {
+            ts->tagname_begin  = tag_name_begin;
+            ts->tagname_end    = tag_name_end;
+            ts->contents_begin = NULL;
+          }
+      }
+
     if (end_tag && *p != '>')
       goto backout_tag;
 
@@ -937,7 +1040,7 @@ map_html_tags (const char *text, int size,
                    violated by, for instance, `%' in `width=75%'.
                    We'll be liberal and allow just about anything as
                    an attribute value.  */
-                while (!ISSPACE (*p) && *p != '>')
+                while (!c_isspace (*p) && *p != '>')
                   ADVANCE (p);
                 attr_value_end = p; /* <foo bar=baz qux=quix> */
                                     /*             ^          */
@@ -984,6 +1087,11 @@ map_html_tags (const char *text, int size,
         ++nattrs;
       }
 
+    if (!end_tag && tail && (tail->tagname_begin == tag_name_begin))
+      {
+        tail->contents_begin = p+1;
+      }
+
     if (uninteresting_tag)
       {
         ADVANCE (p);
@@ -995,6 +1103,7 @@ map_html_tags (const char *text, int size,
     {
       int i;
       struct taginfo taginfo;
+      struct tagstack_item *ts = NULL;
 
       taginfo.name      = pool.contents;
       taginfo.end_tag_p = end_tag;
@@ -1011,6 +1120,23 @@ map_html_tags (const char *text, int size,
       taginfo.attrs = pairs;
       taginfo.start_position = tag_start_position;
       taginfo.end_position   = p + 1;
+      taginfo.contents_begin = NULL;
+      taginfo.contents_end = NULL;
+
+      if (end_tag)
+        {
+          ts = tagstack_find (tail, tag_name_begin, tag_name_end);
+          if (ts)
+            {
+              if (ts->contents_begin)
+                {
+                  taginfo.contents_begin = ts->contents_begin;
+                  taginfo.contents_end   = tag_start_position;
+                }
+              tagstack_pop (&head, &tail, ts);
+            }
+        }
+
       mapfun (&taginfo, maparg);
       ADVANCE (p);
     }
@@ -1030,6 +1156,8 @@ map_html_tags (const char *text, int size,
   POOL_FREE (&pool);
   if (attr_pair_resized)
     xfree (pairs);
+  /* pop any tag stack that's left */
+  tagstack_pop (&head, &tail, head);
 }
 
 #undef ADVANCE

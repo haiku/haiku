@@ -1,6 +1,6 @@
 dnl Wget-specific Autoconf macros.
 dnl Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-dnl 2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+dnl 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -169,7 +169,7 @@ AC_DEFUN([TYPE_STRUCT_SOCKADDR_IN6],[
 
 AC_DEFUN([MEMBER_SIN6_SCOPE_ID],[
   AC_REQUIRE([TYPE_STRUCT_SOCKADDR_IN6])
-  
+
   wget_member_sin6_scope_id=
   if test "X$wget_have_sockaddr_in6" = "Xyes"; then
     AC_CHECK_MEMBER([struct sockaddr_in6.sin6_scope_id],[
@@ -231,145 +231,6 @@ dnl ************************************************************
 dnl END OF IPv6 AUTOCONFIGURATION SUPPORT MACROS
 dnl ************************************************************
 
-# This code originates from Ulrich Drepper's AM_WITH_NLS.
-
-AC_DEFUN([WGET_WITH_NLS],
-  [AC_MSG_CHECKING([whether NLS is requested])
-    dnl Default is enabled NLS
-    AC_ARG_ENABLE(nls,
-      [  --disable-nls           do not use Native Language Support],
-      HAVE_NLS=$enableval, HAVE_NLS=yes)
-    AC_MSG_RESULT($HAVE_NLS)
-
-    dnl If something goes wrong, we may still decide not to use NLS.
-    dnl For this reason, defer AC_SUBST'ing HAVE_NLS until the very
-    dnl last moment.
-
-    if test x"$HAVE_NLS" = xyes; then
-      dnl If LINGUAS is specified, use only those languages.  In fact,
-      dnl compute an intersection of languages in LINGUAS and
-      dnl ALL_LINGUAS, and use that.
-      if test x"$LINGUAS" != x; then
-        new_linguas=
-        for lang1 in $ALL_LINGUAS; do
-          for lang2 in $LINGUAS; do
-            if test "$lang1" = "$lang2"; then
-              new_linguas="$new_linguas $lang1"
-            fi
-          done
-        done
-        ALL_LINGUAS=$new_linguas
-      fi
-      AC_MSG_NOTICE([language catalogs: $ALL_LINGUAS])
-      AM_PATH_PROG_WITH_TEST(MSGFMT, msgfmt,
-	[test -z "`$ac_dir/$ac_word -h 2>&1 | grep 'dv '`"], msgfmt)
-      AM_PATH_PROG_WITH_TEST(XGETTEXT, xgettext,
-	  [test -z "`$ac_dir/$ac_word -h 2>&1 | grep '(HELP)'`"], :)
-      AC_SUBST(MSGFMT)
-      AC_PATH_PROG(GMSGFMT, gmsgfmt, $MSGFMT)
-      CATOBJEXT=.gmo
-      INSTOBJEXT=.mo
-      DATADIRNAME=share
-
-      dnl Test whether we really found GNU xgettext.
-      if test "$XGETTEXT" != ":"; then
-	dnl If it is no GNU xgettext we define it as : so that the
-	dnl Makefiles still can work.
-	if $XGETTEXT --omit-header /dev/null 2> /dev/null; then
-	  : ;
-	else
-	  AC_MSG_RESULT(
-	    [found xgettext programs is not GNU xgettext; ignore it])
-	  XGETTEXT=":"
-	fi
-      fi
-
-      AC_CHECK_HEADERS(libintl.h)
-
-      dnl Prefer gettext found in -lintl to the one in libc.
-      dnl Otherwise it can happen that we include libintl.h from
-      dnl /usr/local/lib, but fail to specify -lintl, which results in
-      dnl link or run-time failures.  (Symptom: libintl_bindtextdomain
-      dnl not found at link-time.)
-
-      AC_CHECK_LIB(intl, gettext, [
-        dnl gettext is in libintl; announce the fact manually.
-        LIBS="-lintl $LIBS"
-	AC_DEFINE([HAVE_GETTEXT], 1,
-                  [Define if you have the gettext function.])
-      ], [
-        AC_CHECK_FUNCS(gettext, [], [
-          AC_MSG_RESULT([gettext not found; disabling NLS])
-          HAVE_NLS=no
-        ])
-      ])
-
-      for lang in $ALL_LINGUAS; do
-	GMOFILES="$GMOFILES $lang.gmo"
-	POFILES="$POFILES $lang.po"
-      done
-      dnl Construct list of names of catalog files to be constructed.
-      for lang in $ALL_LINGUAS; do
-        CATALOGS="$CATALOGS ${lang}${CATOBJEXT}"
-      done
-
-      dnl Make all variables we use known to autoconf.
-      AC_SUBST(CATALOGS)
-      AC_SUBST(CATOBJEXT)
-      AC_SUBST(DATADIRNAME)
-      AC_SUBST(GMOFILES)
-      AC_SUBST(INSTOBJEXT)
-      AC_SUBST(INTLLIBS)
-      AC_SUBST(POFILES)
-    fi
-    AC_SUBST(HAVE_NLS)
-    dnl Some independently maintained files, such as po/Makefile.in,
-    dnl use `USE_NLS', so support it.
-    USE_NLS=$HAVE_NLS
-    AC_SUBST(USE_NLS)
-    if test "x$HAVE_NLS" = xyes; then
-      AC_DEFINE([HAVE_NLS], 1, [Define this if you want the NLS support.])
-    fi
-  ])
-
-dnl Generate list of files to be processed by xgettext which will
-dnl be included in po/Makefile.
-dnl
-dnl This is not strictly an Autoconf macro, because it is run from
-dnl within `config.status' rather than from within configure.  This
-dnl is why special rules must be applied for it.
-AC_DEFUN([WGET_PROCESS_PO],
-  [
-   dnl I wonder what the following several lines do...
-   if test "x$srcdir" != "x."; then
-     if test "x`echo $srcdir | sed 's@/.*@@'`" = "x"; then
-       posrcprefix="$srcdir/"
-     else
-       posrcprefix="../$srcdir/"
-     fi
-   else
-     posrcprefix="../"
-   fi
-   rm -f po/POTFILES
-   dnl Use `echo' rather than AC_MSG_RESULT, because this is run from
-   dnl `config.status'.
-   echo "generating po/POTFILES from $srcdir/po/POTFILES.in"
-   sed -e "/^#/d" -e "/^\$/d" -e "s,.*,	$posrcprefix& \\\\,"  \
-       -e "\$s/\(.*\) \\\\/\1/" \
-        < $srcdir/po/POTFILES.in > po/POTFILES
-   echo "creating po/Makefile"
-   sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile
-  ])
-
-# Search path for a program which passes the given test.
-# Ulrich Drepper <drepper@cygnus.com>, 1996.
-#
-# This file may be copied and used freely without restrictions.  It
-# can be used in projects which are not available under the GNU Public
-# License but which still want to provide support for the GNU gettext
-# functionality.  Please note that the actual code is *not* freely
-# available.
-
 dnl AM_PATH_PROG_WITH_TEST(VARIABLE, PROG-TO-CHECK-FOR,
 dnl   TEST-PERFORMED-ON-FOUND_PROGRAM [, VALUE-IF-NOT-FOUND [, PATH]])
 AC_DEFUN([AM_PATH_PROG_WITH_TEST],

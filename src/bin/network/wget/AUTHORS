@@ -42,3 +42,15 @@ Daniel Stenberg.  NTLM authentication in http-ntlm.c and http-ntlm.h
 originally written for curl donated for use in GNU Wget.
 
 Micah Cowan.  Current Wget maintainer, from mid-2007.
+
+Ralf Wildenhues.  Contributed patches to convert Wget to use Automake as
+part of its build process, and various bugfixes.
+
+Steven Schubiger.  Many helpful patches, bugfixes and improvements.
+Notably, conversion of Wget to use the Gnulib quotes and quoteargs
+modules, and the addition of password prompts at the console, via the
+Gnulib getpasswd-gnu module.
+
+Ted Mielczarek.  Support for parsing links from CSS.
+
+Saint Xavier.  Support for IRIs (RFC 3987).

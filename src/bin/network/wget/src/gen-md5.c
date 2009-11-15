@@ -1,6 +1,6 @@
 /* General MD5 support.
-   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
+   Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,13 +28,12 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
 #include "wget.h"
 
 #include "gen-md5.h"
 
 #ifdef HAVE_BUILTIN_MD5
-# include <gnu-md5.h>
+# include <md5.h>
 typedef struct md5_ctx gen_md5_context_imp;
 #endif
 

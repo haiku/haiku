@@ -1,6 +1,6 @@
 /* SSL support via OpenSSL library.
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
+   2009 Free Software Foundation, Inc.
    Originally contributed by Christian Fraenkel.
 
 This file is part of GNU Wget.
@@ -29,7 +29,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -43,7 +43,6 @@ as that of the covered work.  */
 #include <openssl/err.h>
 #include <openssl/rand.h>
 
-#include "wget.h"
 #include "utils.h"
 #include "connect.h"
 #include "url.h"
@@ -125,7 +124,7 @@ init_prng (void)
 /* Print errors in the OpenSSL error stack. */
 
 static void
-print_errors (void) 
+print_errors (void)
 {
   unsigned long err;
   while ((err = ERR_get_error ()) != 0)
@@ -210,6 +209,13 @@ ssl_init ()
      ssl_check_certificate, which provides much better diagnostics
      than examining the error stack after a failed SSL_connect.  */
   SSL_CTX_set_verify (ssl_ctx, SSL_VERIFY_NONE, NULL);
+
+  /* Use the private key from the cert file unless otherwise specified. */
+  if (opt.cert_file && !opt.private_key)
+    {
+      opt.private_key = opt.cert_file;
+      opt.private_key_type = opt.cert_type;
+    }
 
   if (opt.cert_file)
     if (SSL_CTX_use_certificate_file (ssl_ctx, opt.cert_file,
@@ -358,7 +364,7 @@ openssl_close (int fd, void *arg)
   xfree_null (ctx->last_error);
   xfree (ctx);
 
-#if defined(WINDOWS) || defined(MSDOS)
+#if defined(WINDOWS) || defined(USE_WATT32)
   closesocket (fd);
 #else
   close (fd);
@@ -384,7 +390,7 @@ static struct transport_implementation openssl_transport = {
    Returns true on success, false on failure.  */
 
 bool
-ssl_connect (int fd) 
+ssl_connect_wget (int fd)
 {
   SSL *conn;
   struct openssl_transport_context *ctx;
@@ -440,13 +446,13 @@ pattern_match (const char *pattern, const char *string)
 {
   const char *p = pattern, *n = string;
   char c;
-  for (; (c = TOLOWER (*p++)) != '\0'; n++)
+  for (; (c = c_tolower (*p++)) != '\0'; n++)
     if (c == '*')
       {
-        for (c = TOLOWER (*p); c == '*'; c = TOLOWER (*++p))
+        for (c = c_tolower (*p); c == '*'; c = c_tolower (*++p))
           ;
         for (; *n != '\0'; n++)
-          if (TOLOWER (*n) == c && pattern_match (p, n))
+          if (c_tolower (*n) == c && pattern_match (p, n))
             return true;
 #ifdef ASTERISK_EXCLUDES_DOT
           else if (*n == '.')
@@ -456,7 +462,7 @@ pattern_match (const char *pattern, const char *string)
       }
     else
       {
-        if (c != TOLOWER (*n))
+        if (c != c_tolower (*n))
           return false;
       }
   return *n == '\0';
@@ -467,7 +473,7 @@ pattern_match (const char *pattern, const char *string)
    its certificate, corresponds to HOST.  (HOST typically comes from
    the URL and is what the user thinks he's connecting to.)
 
-   This assumes that ssl_connect has successfully finished, i.e. that
+   This assumes that ssl_connect_wget has successfully finished, i.e. that
    the SSL handshake has been performed and that FD is connected to an
    SSL handle.
 
@@ -496,7 +502,7 @@ ssl_check_certificate (int fd, const char *host)
   if (!cert)
     {
       logprintf (LOG_NOTQUIET, _("%s: No certificate presented by %s.\n"),
-                 severity, escnonprint (host));
+                 severity, quotearg_style (escape_quoting_style, host));
       success = false;
       goto no_cert;             /* must bail out since CERT is NULL */
     }
@@ -506,7 +512,8 @@ ssl_check_certificate (int fd, const char *host)
       char *subject = X509_NAME_oneline (X509_get_subject_name (cert), 0, 0);
       char *issuer = X509_NAME_oneline (X509_get_issuer_name (cert), 0, 0);
       DEBUGP (("certificate:\n  subject: %s\n  issuer:  %s\n",
-               escnonprint (subject), escnonprint (issuer)));
+               quotearg_n_style (0, escape_quoting_style, subject),
+               quotearg_n_style (1, escape_quoting_style, issuer)));
       OPENSSL_free (subject);
       OPENSSL_free (issuer);
     }
@@ -516,8 +523,9 @@ ssl_check_certificate (int fd, const char *host)
     {
       char *issuer = X509_NAME_oneline (X509_get_issuer_name (cert), 0, 0);
       logprintf (LOG_NOTQUIET,
-                 _("%s: cannot verify %s's certificate, issued by `%s':\n"),
-                 severity, escnonprint (host), escnonprint (issuer));
+                 _("%s: cannot verify %s's certificate, issued by %s:\n"),
+                 severity, quotearg_n_style (0, escape_quoting_style, host),
+                 quote_n (1, issuer));
       /* Try to print more user-friendly (and translated) messages for
          the frequent verification errors.  */
       switch (vresult)
@@ -560,28 +568,65 @@ ssl_check_certificate (int fd, const char *host)
 
      - Ensure that ASN1 strings from the certificate are encoded as
        UTF-8 which can be meaningfully compared to HOST.  */
-
+  {
+  X509_NAME *xname = X509_get_subject_name(cert);
   common_name[0] = '\0';
-  X509_NAME_get_text_by_NID (X509_get_subject_name (cert),
-                             NID_commonName, common_name, sizeof (common_name));
+  X509_NAME_get_text_by_NID (xname, NID_commonName, common_name,
+                             sizeof (common_name));
+
   if (!pattern_match (common_name, host))
     {
       logprintf (LOG_NOTQUIET, _("\
-%s: certificate common name `%s' doesn't match requested host name `%s'.\n"),
-                 severity, escnonprint (common_name), escnonprint (host));
+%s: certificate common name %s doesn't match requested host name %s.\n"),
+                 severity, quote_n (0, common_name), quote_n (1, host));
       success = false;
     }
+  else
+    {
+      /* We now determine the length of the ASN1 string. If it differs from
+       * common_name's length, then there is a \0 before the string terminates.
+       * This can be an instance of a null-prefix attack.
+       *
+       * https://www.blackhat.com/html/bh-usa-09/bh-usa-09-archives.html#Marlinspike
+       * */
+
+      int i = -1, j;
+      X509_NAME_ENTRY *xentry;
+      ASN1_STRING *sdata;
+
+      if (xname) {
+        for (;;)
+          {
+            j = X509_NAME_get_index_by_NID (xname, NID_commonName, i);
+            if (j == -1) break;
+            i = j;
+          }
+      }
+
+      xentry = X509_NAME_get_entry(xname,i);
+      sdata = X509_NAME_ENTRY_get_data(xentry);
+      if (strlen (common_name) != ASN1_STRING_length (sdata))
+        {
+          logprintf (LOG_NOTQUIET, _("\
+%s: certificate common name is invalid (contains a NUL character).\n\
+This may be an indication that the host is not who it claims to be\n\
+(that is, it is not the real %s).\n"),
+                     severity, quote (host));
+          success = false;
+        }
+    }
+  }
 
   if (success)
     DEBUGP (("X509 certificate successfully verified and matches host %s\n",
-             escnonprint (host)));
+             quotearg_style (escape_quoting_style, host)));
   X509_free (cert);
 
  no_cert:
   if (opt.check_cert && !success)
     logprintf (LOG_NOTQUIET, _("\
 To connect to %s insecurely, use `--no-check-certificate'.\n"),
-               escnonprint (host));
+               quotearg_style (escape_quoting_style, host));
 
   /* Allow --no-check-cert to disable certificate checking. */
   return opt.check_cert ? success : true;

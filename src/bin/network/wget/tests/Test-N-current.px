@@ -1,6 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
 use HTTPTest;
 
@@ -15,6 +16,11 @@ my $currentversion = <<EOF;
 55555555555555555555555555555555555555555555555555
 EOF
 
+# The server should serve a slightly different content, but with the
+# same length, so we can test which version was downloaded.
+my $modifiedversion = $currentversion;
+$modifiedversion =~ s/^(.{20}).(.*)$/$1x$2/s;
+
 # code, msg, headers, content
 my %urls = (
     '/somefile.txt' => {
@@ -24,11 +30,11 @@ my %urls = (
             "Content-type" => "text/plain",
             "Last-Modified" => "Sat, 09 Oct 2004 08:30:00 GMT",
         },
-        content => $currentversion,
+        content => $modifiedversion,
     },
 );
 
-my $cmdline = $WgetTest::WGETPATH . " -N http://localhost:8080/somefile.txt";
+my $cmdline = $WgetTest::WGETPATH . " -N http://localhost:{{port}}/somefile.txt";
 
 my $expected_error_code = 0;
 
@@ -49,9 +55,9 @@ my %expected_downloaded_files = (
 ###############################################################################
 
 my $the_test = HTTPTest->new (name => "Test-N-current",
-                              input => \%urls, 
-                              cmdline => $cmdline, 
-                              errcode => $expected_error_code, 
+                              input => \%urls,
+                              cmdline => $cmdline,
+                              errcode => $expected_error_code,
                               existing => \%existing_files,
                               output => \%expected_downloaded_files);
 exit $the_test->run();

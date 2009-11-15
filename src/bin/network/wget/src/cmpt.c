@@ -1,6 +1,6 @@
 /* Replacements for routines missing on some systems.
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,8 +40,6 @@ as that of the covered work.  */
 #endif
 
 #include <errno.h>
-
-#include "wget.h"
 
 /* Some systems lack certain functions normally taken for granted.
    For example, Windows doesn't have strptime, and some systems don't
@@ -74,8 +72,8 @@ strcasecmp (const char *s1, const char *s2)
 
   do
     {
-      c1 = TOLOWER (*p1++);
-      c2 = TOLOWER (*p2++);
+      c1 = c_tolower (*p1++);
+      c2 = c_tolower (*p2++);
       if (c1 == '\0')
         break;
     }
@@ -103,8 +101,8 @@ strncasecmp (const char *s1, const char *s2, size_t n)
 
   do
     {
-      c1 = TOLOWER (*p1++);
-      c2 = TOLOWER (*p2++);
+      c1 = c_tolower (*p1++);
+      c2 = c_tolower (*p2++);
       if (c1 == '\0' || c1 != c2)
         return c1 - c2;
     } while (--n > 0);
@@ -433,9 +431,9 @@ strptime_internal (rp, fmt, tm, decided)
     {
       /* A white space in the format string matches 0 more or white
          space in the input string.  */
-      if (ISSPACE (*fmt))
+      if (c_isspace (*fmt))
         {
-          while (ISSPACE (*rp))
+          while (c_isspace (*rp))
             ++rp;
           ++fmt;
           continue;
@@ -655,7 +653,7 @@ strptime_internal (rp, fmt, tm, decided)
         case 'n':
         case 't':
           /* Match any white space.  */
-          while (ISSPACE (*rp))
+          while (c_isspace (*rp))
             ++rp;
           break;
         case 'p':
@@ -1368,7 +1366,7 @@ strtoll (const char *nptr, char **endptr, int base)
           nptr += 2;
           /* "0x" must be followed by at least one hex char.  If not,
              return 0 and place ENDPTR on 'x'. */
-          if (!ISXDIGIT (*nptr))
+          if (!c_isxdigit (*nptr))
             {
               --nptr;
               goto out;

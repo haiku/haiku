@@ -1,6 +1,6 @@
 /* Opie (s/key) support for FTP.
    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008 Free Software Foundation, Inc.
+   2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,13 +28,12 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "wget.h"
 #include "gen-md5.h"
 #include "ftp.h"
 
@@ -2158,7 +2157,7 @@ btoe (char *store, const unsigned char *c)
   memcpy (store, &Wp[extract (cp, 55, 11)][0], 4);
   store[4] = '\0';              /* make sure the string is terminated */
 
-  DEBUGP (("wrote `%s' to STORE\n", store_beg));
+  DEBUGP (("wrote %s to STORE\n", quote (store_beg)));
   return store_beg;
 }
 

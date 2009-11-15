@@ -1,5 +1,5 @@
 /* Configuration header file for MS-DOS/Watt-32
-   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 
    This file is part of GNU Wget.
 
@@ -42,8 +42,13 @@
 
 #include <sys/errno.h>
 
-#if defined(__WATCOMC__) && (__WATCOMC__ >= 1250)  /* OW 1.5+ */
+#if defined(__WATCOMC__)
+  #if (__WATCOMC__ >= 1250)  /* OW 1.5+ */
   #define OPENWATCOM_15
+  #endif
+  #if (__WATCOMC__ >= 1270)  /* OW 1.7+ */
+    #define OPENWATCOM_17
+  #endif
 #endif
 
 #if defined(__HIGHC__)
@@ -72,7 +77,8 @@
   #define HAVE_INT64_T        1
 
   #if (DJGPP_MINOR >= 4)
-    #include <stdbool.h>
+    #define HAVE_STDBOOL_H 1
+    #define HAVE_STDINT_H  1
     #define HAVE_SNPRINTF 1
     #define HAVE_VSNPRINTF 1
     #define HAVE_UINT32_T 1
@@ -85,10 +91,18 @@
 #endif
 
 #ifdef OPENWATCOM_15
+  #define HAVE_ALLOCA_H    1
   #define HAVE_INT64_T     1
+  #define HAVE_SNPRINTF    1
   #define HAVE_STRCASECMP  1
   #define HAVE_STRNCASECMP 1
+  #define HAVE_STDINT_H    1
   #define HAVE_UTIME_H     1
+#endif
+
+#ifdef OPENWATCOM_17
+  #define HAVE__BOOL       1
+  #define HAVE_STDBOOL_H   1
 #endif
 
 #define HAVE_PROCESS_H     1
@@ -116,6 +130,11 @@
   #define MSDOS
 #endif
 
+#if !defined(USE_WATT32)
+  #define USE_WATT32
+#endif
+
+#define LOCALEDIR ""
 #define OS_TYPE "DOS"
 
 #endif  /* CONFIG_DOS_H */

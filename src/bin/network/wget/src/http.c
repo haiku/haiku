@@ -1,6 +1,6 @@
 /* HTTP support.
    Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -28,7 +28,7 @@ Corresponding Source for a non-source form of such a combination
 shall include the source code for the parts of OpenSSL used as well
 as that of the covered work.  */
 
-#include <config.h>
+#include "wget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,7 +41,6 @@ as that of the covered work.  */
 #include <time.h>
 #include <locale.h>
 
-#include "wget.h"
 #include "hash.h"
 #include "http.h"
 #include "utils.h"
@@ -67,14 +66,20 @@ as that of the covered work.  */
 #include "test.h"
 #endif
 
+#ifdef __VMS
+# include "vms.h"
+#endif /* def __VMS */
+
 extern char *version_string;
 
 /* Forward decls. */
+struct http_stat;
 static char *create_authorization_line (const char *, const char *,
                                         const char *, const char *,
                                         const char *, bool *);
 static char *basic_authentication_encode (const char *, const char *);
 static bool known_authentication_scheme_p (const char *, const char *);
+static void ensure_extension (struct http_stat *, const char *, int *);
 static void load_cookies (void);
 
 #ifndef MIN
@@ -87,6 +92,7 @@ static struct cookie_jar *wget_cookie_jar;
 
 #define TEXTHTML_S "text/html"
 #define TEXTXHTML_S "application/xhtml+xml"
+#define TEXTCSS_S "text/css"
 
 /* Some status code validation macros: */
 #define H_20X(x)        (((x) >= 200) && ((x) < 300))
@@ -139,6 +145,8 @@ struct request {
   } *headers;
   int hcount, hcapacity;
 };
+
+extern int numurls;
 
 /* Create a new, empty request.  At least request_set_method must be
    called before the request can be used.  */
@@ -280,7 +288,7 @@ request_set_user_header (struct request *req, const char *header)
     return;
   BOUNDED_TO_ALLOCA (header, p, name);
   ++p;
-  while (ISSPACE (*p))
+  while (c_isspace (*p))
     ++p;
   request_set_header (req, xstrdup (name), (char *) p, rel_name);
 }
@@ -404,13 +412,13 @@ maybe_send_basic_creds (const char *hostname, const char *user,
   else if (basic_authed_hosts
       && hash_table_contains(basic_authed_hosts, hostname))
     {
-      DEBUGP(("Found `%s' in basic_authed_hosts.\n", hostname));
+      DEBUGP(("Found %s in basic_authed_hosts.\n", quote (hostname)));
       do_challenge = true;
     }
   else
     {
-      DEBUGP(("Host `%s' has not issued a general basic challenge.\n",
-              hostname));
+      DEBUGP(("Host %s has not issued a general basic challenge.\n",
+              quote (hostname)));
     }
   if (do_challenge)
     {
@@ -431,7 +439,7 @@ register_basic_auth_host (const char *hostname)
   if (!hash_table_contains(basic_authed_hosts, hostname))
     {
       hash_table_put (basic_authed_hosts, xstrdup(hostname), NULL);
-      DEBUGP(("Inserted `%s' into basic_authed_hosts\n", hostname));
+      DEBUGP(("Inserted %s into basic_authed_hosts\n", quote (hostname)));
     }
 }
 
@@ -662,9 +670,9 @@ resp_header_locate (const struct response *resp, const char *name, int start,
           && 0 == strncasecmp (b, name, name_len))
         {
           b += name_len + 1;
-          while (b < e && ISSPACE (*b))
+          while (b < e && c_isspace (*b))
             ++b;
-          while (b < e && ISSPACE (e[-1]))
+          while (b < e && c_isspace (e[-1]))
             --e;
           *begptr = b;
           *endptr = e;
@@ -763,17 +771,17 @@ resp_status (const struct response *resp, char **message)
   if (p < end && *p == '/')
     {
       ++p;
-      while (p < end && ISDIGIT (*p))
+      while (p < end && c_isdigit (*p))
         ++p;
       if (p < end && *p == '.')
-        ++p; 
-      while (p < end && ISDIGIT (*p))
+        ++p;
+      while (p < end && c_isdigit (*p))
         ++p;
     }
 
-  while (p < end && ISSPACE (*p))
+  while (p < end && c_isspace (*p))
     ++p;
-  if (end - p < 3 || !ISDIGIT (p[0]) || !ISDIGIT (p[1]) || !ISDIGIT (p[2]))
+  if (end - p < 3 || !c_isdigit (p[0]) || !c_isdigit (p[1]) || !c_isdigit (p[2]))
     return -1;
 
   status = 100 * (p[0] - '0') + 10 * (p[1] - '0') + (p[2] - '0');
@@ -781,9 +789,9 @@ resp_status (const struct response *resp, char **message)
 
   if (message)
     {
-      while (p < end && ISSPACE (*p))
+      while (p < end && c_isspace (*p))
         ++p;
-      while (p < end && ISSPACE (end[-1]))
+      while (p < end && c_isspace (end[-1]))
         --end;
       *message = strdupdelim (p, end);
     }
@@ -811,7 +819,8 @@ print_response_line(const char *prefix, const char *b, const char *e)
 {
   char *copy;
   BOUNDED_TO_ALLOCA(b, e, copy);
-  logprintf (LOG_VERBOSE, "%s%s\n", prefix, escnonprint(copy));
+  logprintf (LOG_ALWAYS, "%s%s\n", prefix,
+             quotearg_style (escape_quoting_style, copy));
 }
 
 /* Print the server response, line by line, omitting the trailing CRLF
@@ -854,29 +863,29 @@ parse_content_range (const char *hdr, wgint *first_byte_ptr,
          HTTP spec. */
       if (*hdr == ':')
         ++hdr;
-      while (ISSPACE (*hdr))
+      while (c_isspace (*hdr))
         ++hdr;
       if (!*hdr)
         return false;
     }
-  if (!ISDIGIT (*hdr))
+  if (!c_isdigit (*hdr))
     return false;
-  for (num = 0; ISDIGIT (*hdr); hdr++)
+  for (num = 0; c_isdigit (*hdr); hdr++)
     num = 10 * num + (*hdr - '0');
-  if (*hdr != '-' || !ISDIGIT (*(hdr + 1)))
+  if (*hdr != '-' || !c_isdigit (*(hdr + 1)))
     return false;
   *first_byte_ptr = num;
   ++hdr;
-  for (num = 0; ISDIGIT (*hdr); hdr++)
+  for (num = 0; c_isdigit (*hdr); hdr++)
     num = 10 * num + (*hdr - '0');
-  if (*hdr != '/' || !ISDIGIT (*(hdr + 1)))
+  if (*hdr != '/' || !c_isdigit (*(hdr + 1)))
     return false;
   *last_byte_ptr = num;
   ++hdr;
   if (*hdr == '*')
     num = -1;
   else
-    for (num = 0; ISDIGIT (*hdr); hdr++)
+    for (num = 0; c_isdigit (*hdr); hdr++)
       num = 10 * num + (*hdr - '0');
   *entity_length_ptr = num;
   return true;
@@ -951,7 +960,7 @@ extract_param (const char **source, param_token *name, param_token *value,
 {
   const char *p = *source;
 
-  while (ISSPACE (*p)) ++p;
+  while (c_isspace (*p)) ++p;
   if (!*p)
     {
       *source = p;
@@ -960,11 +969,11 @@ extract_param (const char **source, param_token *name, param_token *value,
 
   /* Extract name. */
   name->b = p;
-  while (*p && !ISSPACE (*p) && *p != '=' && *p != separator) ++p;
+  while (*p && !c_isspace (*p) && *p != '=' && *p != separator) ++p;
   name->e = p;
   if (name->b == name->e)
     return false;               /* empty name: error */
-  while (ISSPACE (*p)) ++p;
+  while (c_isspace (*p)) ++p;
   if (*p == separator || !*p)           /* no value */
     {
       xzero (*value);
@@ -977,7 +986,7 @@ extract_param (const char **source, param_token *name, param_token *value,
 
   /* *p is '=', extract value */
   ++p;
-  while (ISSPACE (*p)) ++p;
+  while (c_isspace (*p)) ++p;
   if (*p == '"')                /* quoted */
     {
       value->b = ++p;
@@ -986,7 +995,7 @@ extract_param (const char **source, param_token *name, param_token *value,
         return false;
       value->e = p++;
       /* Currently at closing quote; find the end of param. */
-      while (ISSPACE (*p)) ++p;
+      while (c_isspace (*p)) ++p;
       while (*p && *p != separator) ++p;
       if (*p == separator)
         ++p;
@@ -999,7 +1008,7 @@ extract_param (const char **source, param_token *name, param_token *value,
       value->b = p;
       while (*p && *p != separator) ++p;
       value->e = p;
-      while (value->e != value->b && ISSPACE (value->e[-1]))
+      while (value->e != value->b && c_isspace (value->e[-1]))
         --value->e;
       if (*p == separator) ++p;
     }
@@ -1050,12 +1059,12 @@ parse_content_disposition (const char *hdr, char **filename)
             bool add_slash = (opt.dir_prefix[prefix_length - 1] != '/');
             int total_length;
 
-            if (add_slash) 
+            if (add_slash)
               ++prefix_length;
-            total_length = prefix_length + (value.e - value.b);            
+            total_length = prefix_length + (value.e - value.b);
             *filename = xmalloc (total_length + 1);
             strcpy (*filename, opt.dir_prefix);
-            if (add_slash) 
+            if (add_slash)
               (*filename)[prefix_length - 1] = '/';
             memcpy (*filename + prefix_length, value.b, (value.e - value.b));
             (*filename)[total_length] = '\0';
@@ -1296,6 +1305,7 @@ struct http_stat
   char *remote_time;            /* remote time-stamp string */
   char *error;                  /* textual HTTP error */
   int statcode;                 /* status code */
+  char *message;                /* status message */
   wgint rd_size;                /* amount of data read from socket */
   double dltime;                /* time it took to download the data */
   const char *referer;          /* value of the referer header. */
@@ -1304,12 +1314,12 @@ struct http_stat
                                    existence after having begun to download
                                    (needed in gethttp for when connection is
                                    interrupted/restarted. */
-  bool timestamp_checked;       /* true if pre-download time-stamping checks 
+  bool timestamp_checked;       /* true if pre-download time-stamping checks
                                  * have already been performed */
   char *orig_file_name;         /* name of file to compare for time-stamping
                                  * (might be != local_file if -K is set) */
   wgint orig_file_size;         /* size of file to compare for time-stamping */
-  time_t orig_file_tstamp;      /* time-stamp of file to compare for 
+  time_t orig_file_tstamp;      /* time-stamp of file to compare for
                                  * time-stamping */
 };
 
@@ -1322,6 +1332,7 @@ free_hstat (struct http_stat *hs)
   xfree_null (hs->rderrmsg);
   xfree_null (hs->local_file);
   xfree_null (hs->orig_file_name);
+  xfree_null (hs->message);
 
   /* Guard against being called twice. */
   hs->newloc = NULL;
@@ -1331,16 +1342,30 @@ free_hstat (struct http_stat *hs)
 
 #define BEGINS_WITH(line, string_constant)                               \
   (!strncasecmp (line, string_constant, sizeof (string_constant) - 1)    \
-   && (ISSPACE (line[sizeof (string_constant) - 1])                      \
+   && (c_isspace (line[sizeof (string_constant) - 1])                      \
        || !line[sizeof (string_constant) - 1]))
 
+#ifdef __VMS
 #define SET_USER_AGENT(req) do {                                         \
   if (!opt.useragent)                                                    \
     request_set_header (req, "User-Agent",                               \
-                        aprintf ("Wget/%s", version_string), rel_value); \
+                        aprintf ("Wget/%s (VMS %s %s)",                  \
+                        version_string, vms_arch(), vms_vers()),         \
+                        rel_value);                                      \
   else if (*opt.useragent)                                               \
     request_set_header (req, "User-Agent", opt.useragent, rel_none);     \
 } while (0)
+#else /* def __VMS */
+#define SET_USER_AGENT(req) do {                                         \
+  if (!opt.useragent)                                                    \
+    request_set_header (req, "User-Agent",                               \
+                        aprintf ("Wget/%s (%s)",                         \
+                        version_string, OS_TYPE),                        \
+                        rel_value);                                      \
+  else if (*opt.useragent)                                               \
+    request_set_header (req, "User-Agent", opt.useragent, rel_none);     \
+} while (0)
+#endif /* def __VMS [else] */
 
 /* The flags that allow clobbering the file (opening with "wb").
    Defined here to avoid repetition later.  #### This will require
@@ -1359,7 +1384,8 @@ free_hstat (struct http_stat *hs)
    If PROXY is non-NULL, the connection will be made to the proxy
    server, and u->url will be requested.  */
 static uerr_t
-gethttp (struct url *u, struct http_stat *hs, int *dt, struct url *proxy)
+gethttp (struct url *u, struct http_stat *hs, int *dt, struct url *proxy,
+         struct iri *iri)
 {
   struct request *req;
 
@@ -1441,6 +1467,7 @@ gethttp (struct url *u, struct http_stat *hs, int *dt, struct url *proxy)
   hs->newloc = NULL;
   hs->remote_time = NULL;
   hs->error = NULL;
+  hs->message = NULL;
 
   conn = u;
 
@@ -1489,9 +1516,10 @@ gethttp (struct url *u, struct http_stat *hs, int *dt, struct url *proxy)
   user = user ? user : (opt.http_user ? opt.http_user : opt.user);
   passwd = passwd ? passwd : (opt.http_passwd ? opt.http_passwd : opt.passwd);
 
-  if (user && passwd
-      && !u->user) /* We only do "site-wide" authentication with "global"
-                      user/password values; URL user/password info overrides. */
+  /* We only do "site-wide" authentication with "global" user/password
+   * values unless --auth-no-challange has been requested; URL user/password
+   * info overrides. */
+  if (user && passwd && (!u->user || opt.auth_without_challenge))
     {
       /* If this is a host for which we've already received a Basic
        * challenge, we'll go ahead and send Basic authentication creds. */
@@ -1545,8 +1573,8 @@ gethttp (struct url *u, struct http_stat *hs, int *dt, struct url *proxy)
           post_data_size = file_size (opt.post_file_name);
           if (post_data_size == -1)
             {
-              logprintf (LOG_NOTQUIET, _("POST data file `%s' missing: %s\n"),
-                         opt.post_file_name, strerror (errno));
+              logprintf (LOG_NOTQUIET, _("POST data file %s missing: %s\n"),
+                         quote (opt.post_file_name), strerror (errno));
               post_data_size = 0;
             }
         }
@@ -1630,7 +1658,8 @@ gethttp (struct url *u, struct http_stat *hs, int *dt, struct url *proxy)
           sock = pconn.socket;
           using_ssl = pconn.ssl;
           logprintf (LOG_VERBOSE, _("Reusing existing connection to %s:%d.\n"),
-                     escnonprint (pconn.host), pconn.port);
+                     quotearg_style (escape_quoting_style, pconn.host),
+                     pconn.port);
           DEBUGP (("Reusing fd %d.\n", sock));
           if (pconn.authorized)
             /* If the connection is already authorized, the "Basic"
@@ -1642,8 +1671,8 @@ gethttp (struct url *u, struct http_stat *hs, int *dt, struct url *proxy)
         {
           request_free (req);
           logprintf(LOG_NOTQUIET,
-                    _("%s: unable to resolve host address `%s'\n"),
-                    exec_name, relevant->host);
+                    _("%s: unable to resolve host address %s\n"),
+                    exec_name, quote (relevant->host));
           return HOSTERR;
         }
     }
@@ -1712,13 +1741,14 @@ gethttp (struct url *u, struct http_stat *hs, int *dt, struct url *proxy)
 
           resp = resp_new (head);
           statcode = resp_status (resp, &message);
+          hs->message = xstrdup (message);
           resp_free (resp);
           xfree (head);
           if (statcode != 200)
             {
             failed_tunnel:
               logprintf (LOG_NOTQUIET, _("Proxy tunneling failed: %s"),
-                         message ? escnonprint (message) : "?");
+                         message ? quotearg_style (escape_quoting_style, message) : "?");
               xfree_null (message);
               return CONSSLERR;
             }
@@ -1732,10 +1762,15 @@ gethttp (struct url *u, struct http_stat *hs, int *dt, struct url *proxy)
 
       if (conn->scheme == SCHEME_HTTPS)
         {
-          if (!ssl_connect (sock) || !ssl_check_certificate (sock, u->host))
+          if (!ssl_connect_wget (sock))
             {
               fd_close (sock);
               return CONSSLERR;
+            }
+          else if (!ssl_check_certificate (sock, u->host))
+            {
+              fd_close (sock);
+              return VERIFCERTERR;
             }
           using_ssl = true;
         }
@@ -1794,120 +1829,14 @@ gethttp (struct url *u, struct http_stat *hs, int *dt, struct url *proxy)
   /* Check for status line.  */
   message = NULL;
   statcode = resp_status (resp, &message);
+  hs->message = xstrdup (message);
   if (!opt.server_response)
     logprintf (LOG_VERBOSE, "%2d %s\n", statcode,
-               message ? escnonprint (message) : "");
+               message ? quotearg_style (escape_quoting_style, message) : "");
   else
     {
       logprintf (LOG_VERBOSE, "\n");
       print_server_response (resp, "  ");
-    }
-
-  /* Determine the local filename if needed. Notice that if -O is used 
-   * hstat.local_file is set by http_loop to the argument of -O. */
-  if (!hs->local_file)
-    {
-      /* Honor Content-Disposition whether possible. */
-      if (!opt.content_disposition
-          || !resp_header_copy (resp, "Content-Disposition", 
-                                hdrval, sizeof (hdrval))
-          || !parse_content_disposition (hdrval, &hs->local_file))
-        {
-          /* The Content-Disposition header is missing or broken. 
-           * Choose unique file name according to given URL. */
-          hs->local_file = url_file_name (u);
-        }
-    }
-  
-  /* TODO: perform this check only once. */
-  if (!hs->existence_checked && file_exists_p (hs->local_file))
-    {
-      if (opt.noclobber && !opt.output_document)
-        {
-          /* If opt.noclobber is turned on and file already exists, do not
-             retrieve the file. But if the output_document was given, then this
-             test was already done and the file didn't exist. Hence the !opt.output_document */
-          logprintf (LOG_VERBOSE, _("\
-File `%s' already there; not retrieving.\n\n"), hs->local_file);
-          /* If the file is there, we suppose it's retrieved OK.  */
-          *dt |= RETROKF;
-
-          /* #### Bogusness alert.  */
-          /* If its suffix is "html" or "htm" or similar, assume text/html.  */
-          if (has_html_suffix_p (hs->local_file))
-            *dt |= TEXTHTML;
-
-          return RETRUNNEEDED;
-        }
-      else if (!ALLOW_CLOBBER)
-        {
-          char *unique = unique_name (hs->local_file, true);
-          if (unique != hs->local_file)
-            xfree (hs->local_file);
-          hs->local_file = unique;
-        }
-    }
-  hs->existence_checked = true;
-
-  /* Support timestamping */
-  /* TODO: move this code out of gethttp. */
-  if (opt.timestamping && !hs->timestamp_checked)
-    {
-      size_t filename_len = strlen (hs->local_file);
-      char *filename_plus_orig_suffix = alloca (filename_len + sizeof (".orig"));
-      bool local_dot_orig_file_exists = false;
-      char *local_filename = NULL;
-      struct_stat st;
-
-      if (opt.backup_converted)
-        /* If -K is specified, we'll act on the assumption that it was specified
-           last time these files were downloaded as well, and instead of just
-           comparing local file X against server file X, we'll compare local
-           file X.orig (if extant, else X) against server file X.  If -K
-           _wasn't_ specified last time, or the server contains files called
-           *.orig, -N will be back to not operating correctly with -k. */
-        {
-          /* Would a single s[n]printf() call be faster?  --dan
-
-             Definitely not.  sprintf() is horribly slow.  It's a
-             different question whether the difference between the two
-             affects a program.  Usually I'd say "no", but at one
-             point I profiled Wget, and found that a measurable and
-             non-negligible amount of time was lost calling sprintf()
-             in url.c.  Replacing sprintf with inline calls to
-             strcpy() and number_to_string() made a difference.
-             --hniksic */
-          memcpy (filename_plus_orig_suffix, hs->local_file, filename_len);
-          memcpy (filename_plus_orig_suffix + filename_len,
-                  ".orig", sizeof (".orig"));
-
-          /* Try to stat() the .orig file. */
-          if (stat (filename_plus_orig_suffix, &st) == 0)
-            {
-              local_dot_orig_file_exists = true;
-              local_filename = filename_plus_orig_suffix;
-            }
-        }      
-
-      if (!local_dot_orig_file_exists)
-        /* Couldn't stat() <file>.orig, so try to stat() <file>. */
-        if (stat (hs->local_file, &st) == 0)
-          local_filename = hs->local_file;
-
-      if (local_filename != NULL)
-        /* There was a local file, so we'll check later to see if the version
-           the server has is the same version we already have, allowing us to
-           skip a download. */
-        {
-          hs->orig_file_name = xstrdup (local_filename);
-          hs->orig_file_size = st.st_size;
-          hs->orig_file_tstamp = st.st_mtime;
-#ifdef WINDOWS
-          /* Modification time granularity is 2 seconds for Windows, so
-             increase local time by 1 second for later comparison. */
-          ++hs->orig_file_tstamp;
-#endif
-        }
     }
 
   if (!opt.ignore_length
@@ -1946,6 +1875,25 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
             keep_alive = true;
         }
     }
+
+  /* Handle (possibly multiple instances of) the Set-Cookie header. */
+  if (opt.cookies)
+    {
+      int scpos;
+      const char *scbeg, *scend;
+      /* The jar should have been created by now. */
+      assert (wget_cookie_jar != NULL);
+      for (scpos = 0;
+           (scpos = resp_header_locate (resp, "Set-Cookie", scpos,
+                                        &scbeg, &scend)) != -1;
+           ++scpos)
+        {
+          char *set_cookie; BOUNDED_TO_ALLOCA (scbeg, scend, set_cookie);
+          cookie_handle_set_cookie (wget_cookie_jar, u->host, u->port,
+                                    u->path, set_cookie);
+        }
+    }
+
   if (keep_alive)
     /* The server has promised that it will not close the connection
        when we're done.  This means that we can register it.  */
@@ -2004,6 +1952,9 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
                   register_basic_auth_host (u->host);
                 }
               xfree (pth);
+              xfree_null (message);
+              resp_free (resp);
+              xfree (head);
               goto retry_with_auth;
             }
           else
@@ -2014,6 +1965,9 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
         }
       logputs (LOG_NOTQUIET, _("Authorization failed.\n"));
       request_free (req);
+      xfree_null (message);
+      resp_free (resp);
+      xfree (head);
       return AUTHFAILED;
     }
   else /* statcode != HTTP_STATUS_UNAUTHORIZED */
@@ -2022,6 +1976,116 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
       if (ntlm_seen)
         pconn.authorized = true;
     }
+
+  /* Determine the local filename if needed. Notice that if -O is used
+   * hstat.local_file is set by http_loop to the argument of -O. */
+  if (!hs->local_file)
+    {
+      /* Honor Content-Disposition whether possible. */
+      if (!opt.content_disposition
+          || !resp_header_copy (resp, "Content-Disposition",
+                                hdrval, sizeof (hdrval))
+          || !parse_content_disposition (hdrval, &hs->local_file))
+        {
+          /* The Content-Disposition header is missing or broken.
+           * Choose unique file name according to given URL. */
+          hs->local_file = url_file_name (u);
+        }
+    }
+
+  /* TODO: perform this check only once. */
+  if (!hs->existence_checked && file_exists_p (hs->local_file))
+    {
+      if (opt.noclobber && !opt.output_document)
+        {
+          /* If opt.noclobber is turned on and file already exists, do not
+             retrieve the file. But if the output_document was given, then this
+             test was already done and the file didn't exist. Hence the !opt.output_document */
+          logprintf (LOG_VERBOSE, _("\
+File %s already there; not retrieving.\n\n"), quote (hs->local_file));
+          /* If the file is there, we suppose it's retrieved OK.  */
+          *dt |= RETROKF;
+
+          /* #### Bogusness alert.  */
+          /* If its suffix is "html" or "htm" or similar, assume text/html.  */
+          if (has_html_suffix_p (hs->local_file))
+            *dt |= TEXTHTML;
+
+          xfree (head);
+          xfree_null (message);
+          return RETRUNNEEDED;
+        }
+      else if (!ALLOW_CLOBBER)
+        {
+          char *unique = unique_name (hs->local_file, true);
+          if (unique != hs->local_file)
+            xfree (hs->local_file);
+          hs->local_file = unique;
+        }
+    }
+  hs->existence_checked = true;
+
+  /* Support timestamping */
+  /* TODO: move this code out of gethttp. */
+  if (opt.timestamping && !hs->timestamp_checked)
+    {
+      size_t filename_len = strlen (hs->local_file);
+      char *filename_plus_orig_suffix = alloca (filename_len + sizeof (ORIG_SFX));
+      bool local_dot_orig_file_exists = false;
+      char *local_filename = NULL;
+      struct_stat st;
+
+      if (opt.backup_converted)
+        /* If -K is specified, we'll act on the assumption that it was specified
+           last time these files were downloaded as well, and instead of just
+           comparing local file X against server file X, we'll compare local
+           file X.orig (if extant, else X) against server file X.  If -K
+           _wasn't_ specified last time, or the server contains files called
+           *.orig, -N will be back to not operating correctly with -k. */
+        {
+          /* Would a single s[n]printf() call be faster?  --dan
+
+             Definitely not.  sprintf() is horribly slow.  It's a
+             different question whether the difference between the two
+             affects a program.  Usually I'd say "no", but at one
+             point I profiled Wget, and found that a measurable and
+             non-negligible amount of time was lost calling sprintf()
+             in url.c.  Replacing sprintf with inline calls to
+             strcpy() and number_to_string() made a difference.
+             --hniksic */
+          memcpy (filename_plus_orig_suffix, hs->local_file, filename_len);
+          memcpy (filename_plus_orig_suffix + filename_len,
+                  ORIG_SFX, sizeof (ORIG_SFX));
+
+          /* Try to stat() the .orig file. */
+          if (stat (filename_plus_orig_suffix, &st) == 0)
+            {
+              local_dot_orig_file_exists = true;
+              local_filename = filename_plus_orig_suffix;
+            }
+        }
+
+      if (!local_dot_orig_file_exists)
+        /* Couldn't stat() <file>.orig, so try to stat() <file>. */
+        if (stat (hs->local_file, &st) == 0)
+          local_filename = hs->local_file;
+
+      if (local_filename != NULL)
+        /* There was a local file, so we'll check later to see if the version
+           the server has is the same version we already have, allowing us to
+           skip a download. */
+        {
+          hs->orig_file_name = xstrdup (local_filename);
+          hs->orig_file_size = st.st_size;
+          hs->orig_file_tstamp = st.st_mtime;
+#ifdef WINDOWS
+          /* Modification time granularity is 2 seconds for Windows, so
+             increase local time by 1 second for later comparison. */
+          ++hs->orig_file_tstamp;
+#endif
+        }
+    }
+
   request_free (req);
 
   hs->statcode = statcode;
@@ -2039,31 +2103,24 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
       char *tmp = strchr (type, ';');
       if (tmp)
         {
-          while (tmp > type && ISSPACE (tmp[-1]))
+          /* sXXXav: only needed if IRI support is enabled */
+          char *tmp2 = tmp + 1;
+
+          while (tmp > type && c_isspace (tmp[-1]))
             --tmp;
           *tmp = '\0';
+
+          /* Try to get remote encoding if needed */
+          if (opt.enable_iri && !opt.encoding_remote)
+            {
+              tmp = parse_charset (tmp2);
+              if (tmp)
+                set_content_encoding (iri, tmp);
+            }
         }
     }
   hs->newloc = resp_header_strdup (resp, "Location");
   hs->remote_time = resp_header_strdup (resp, "Last-Modified");
-
-  /* Handle (possibly multiple instances of) the Set-Cookie header. */
-  if (opt.cookies)
-    {
-      int scpos;
-      const char *scbeg, *scend;
-      /* The jar should have been created by now. */
-      assert (wget_cookie_jar != NULL);
-      for (scpos = 0;
-           (scpos = resp_header_locate (resp, "Set-Cookie", scpos,
-                                        &scbeg, &scend)) != -1;
-           ++scpos)
-        {
-          char *set_cookie; BOUNDED_TO_ALLOCA (scbeg, scend, set_cookie);
-          cookie_handle_set_cookie (wget_cookie_jar, u->host, u->port,
-                                    u->path, set_cookie);
-        }
-    }
 
   if (resp_header_copy (resp, "Content-Range", hdrval, sizeof (hdrval)))
     {
@@ -2102,6 +2159,7 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
           else
             CLOSE_INVALIDATE (sock);
           xfree_null (type);
+          xfree (head);
           return NEWLOCATION;
         }
     }
@@ -2111,47 +2169,42 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
      content-type.  */
   if (!type ||
         0 == strncasecmp (type, TEXTHTML_S, strlen (TEXTHTML_S)) ||
-        0 == strncasecmp (type, TEXTXHTML_S, strlen (TEXTXHTML_S)))    
+        0 == strncasecmp (type, TEXTXHTML_S, strlen (TEXTXHTML_S)))
     *dt |= TEXTHTML;
   else
     *dt &= ~TEXTHTML;
 
-  if (opt.html_extension && (*dt & TEXTHTML))
-    /* -E / --html-extension / html_extension = on was specified, and this is a
-       text/html file.  If some case-insensitive variation on ".htm[l]" isn't
-       already the file's suffix, tack on ".html". */
-    {
-      char *last_period_in_local_filename = strrchr (hs->local_file, '.');
+  if (type &&
+      0 == strncasecmp (type, TEXTCSS_S, strlen (TEXTCSS_S)))
+    *dt |= TEXTCSS;
+  else
+    *dt &= ~TEXTCSS;
 
-      if (last_period_in_local_filename == NULL
-          || !(0 == strcasecmp (last_period_in_local_filename, ".htm")
-               || 0 == strcasecmp (last_period_in_local_filename, ".html")))
+  if (opt.adjust_extension)
+    {
+      if (*dt & TEXTHTML)
+        /* -E / --adjust-extension / adjust_extension = on was specified,
+           and this is a text/html file.  If some case-insensitive
+           variation on ".htm[l]" isn't already the file's suffix,
+           tack on ".html". */
         {
-          int local_filename_len = strlen (hs->local_file);
-          /* Resize the local file, allowing for ".html" preceded by
-             optional ".NUMBER".  */
-          hs->local_file = xrealloc (hs->local_file,
-                                     local_filename_len + 24 + sizeof (".html"));
-          strcpy(hs->local_file + local_filename_len, ".html");
-          /* If clobbering is not allowed and the file, as named,
-             exists, tack on ".NUMBER.html" instead. */
-          if (!ALLOW_CLOBBER && file_exists_p (hs->local_file))
-            {
-              int ext_num = 1;
-              do
-                sprintf (hs->local_file + local_filename_len,
-                         ".%d.html", ext_num++);
-              while (file_exists_p (hs->local_file));
-            }
-          *dt |= ADDED_HTML_EXTENSION;
+          ensure_extension (hs, ".html", dt);
+        }
+      else if (*dt & TEXTCSS)
+        {
+          ensure_extension (hs, ".css", dt);
         }
     }
 
-  if (statcode == HTTP_STATUS_RANGE_NOT_SATISFIABLE)
+  if (statcode == HTTP_STATUS_RANGE_NOT_SATISFIABLE
+      || (hs->restval > 0 && statcode == HTTP_STATUS_OK
+          && contrange == 0 && hs->restval >= contlen)
+     )
     {
       /* If `-c' is in use and the file has been fully downloaded (or
          the remote file has shrunk), Wget effectively requests bytes
-         after the end of file and the server response with 416.  */
+         after the end of file and the server response with 416
+         (or 200 with a <= Content-Length.  */
       logputs (LOG_VERBOSE, _("\
 \n    The file is already fully retrieved; nothing to do.\n\n"));
       /* In case the caller inspects. */
@@ -2162,6 +2215,7 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
       xfree_null (type);
       CLOSE_INVALIDATE (sock);        /* would be CLOSE_FINISH, but there
                                    might be more bytes in the body. */
+      xfree (head);
       return RETRUNNEEDED;
     }
   if ((contrange != 0 && contrange != hs->restval)
@@ -2171,6 +2225,7 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
          Bail out.  */
       xfree_null (type);
       CLOSE_INVALIDATE (sock);
+      xfree (head);
       return RANGEERR;
     }
   if (contlen == -1)
@@ -2207,7 +2262,7 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
             logputs (LOG_VERBOSE,
                      opt.ignore_length ? _("ignored") : _("unspecified"));
           if (type)
-            logprintf (LOG_VERBOSE, " [%s]\n", escnonprint (type));
+            logprintf (LOG_VERBOSE, " [%s]\n", quotearg_style (escape_quoting_style, type));
           else
             logputs (LOG_VERBOSE, "\n");
         }
@@ -2234,8 +2289,19 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
         CLOSE_FINISH (sock);
       else
         CLOSE_INVALIDATE (sock);
+      xfree (head);
       return RETRFINISHED;
     }
+
+/* 2005-06-17 SMS.
+   For VMS, define common fopen() optional arguments.
+*/
+#ifdef __VMS
+# define FOPEN_OPT_ARGS "fop=sqo", "acc", acc_cb, &open_id
+# define FOPEN_BIN_FLAG 3
+#else /* def __VMS */
+# define FOPEN_BIN_FLAG true
+#endif /* def __VMS [else] */
 
   /* Open the local file.  */
   if (!output_stream)
@@ -2244,12 +2310,30 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
       if (opt.backups)
         rotate_backups (hs->local_file);
       if (hs->restval)
-        fp = fopen (hs->local_file, "ab");
+        {
+#ifdef __VMS
+          int open_id;
+
+          open_id = 21;
+          fp = fopen (hs->local_file, "ab", FOPEN_OPT_ARGS);
+#else /* def __VMS */
+          fp = fopen (hs->local_file, "ab");
+#endif /* def __VMS [else] */
+        }
       else if (ALLOW_CLOBBER)
-        fp = fopen (hs->local_file, "wb");
+        {
+#ifdef __VMS
+          int open_id;
+
+          open_id = 22;
+          fp = fopen (hs->local_file, "wb", FOPEN_OPT_ARGS);
+#else /* def __VMS */
+          fp = fopen (hs->local_file, "wb");
+#endif /* def __VMS [else] */
+        }
       else
         {
-          fp = fopen_excl (hs->local_file, true);
+          fp = fopen_excl (hs->local_file, FOPEN_BIN_FLAG);
           if (!fp && errno == EEXIST)
             {
               /* We cannot just invent a new name and use it (which is
@@ -2260,6 +2344,7 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
                          _("%s has sprung into existence.\n"),
                          hs->local_file);
               CLOSE_INVALIDATE (sock);
+              xfree (head);
               return FOPEN_EXCL_ERR;
             }
         }
@@ -2267,6 +2352,7 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
         {
           logprintf (LOG_NOTQUIET, "%s: %s\n", hs->local_file, strerror (errno));
           CLOSE_INVALIDATE (sock);
+          xfree (head);
           return FOPENERR;
         }
     }
@@ -2276,10 +2362,10 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
   /* Print fetch message, if opt.verbose.  */
   if (opt.verbose)
     {
-      logprintf (LOG_NOTQUIET, _("Saving to: `%s'\n"), 
-                 HYPHENP (hs->local_file) ? "STDOUT" : hs->local_file);
+      logprintf (LOG_NOTQUIET, _("Saving to: %s\n"),
+                 HYPHENP (hs->local_file) ? quote ("STDOUT") : quote (hs->local_file));
     }
-    
+
   /* This confuses the timestamping code that checks for file size.
      #### The timestamping code should be smarter about file size.  */
   if (opt.save_headers && hs->restval == 0)
@@ -2325,7 +2411,7 @@ File `%s' already there; not retrieving.\n\n"), hs->local_file);
    retried, and retried, and retried, and...  */
 uerr_t
 http_loop (struct url *u, char **newloc, char **local_file, const char *referer,
-           int *dt, struct url *proxy)
+           int *dt, struct url *proxy, struct iri *iri)
 {
   int count;
   bool got_head = false;         /* used for time-stamping and filename detection */
@@ -2336,16 +2422,17 @@ http_loop (struct url *u, char **newloc, char **local_file, const char *referer,
   uerr_t err, ret = TRYLIMEXC;
   time_t tmr = -1;               /* remote time-stamp */
   struct http_stat hstat;        /* HTTP status */
-  struct_stat st;  
+  struct_stat st;
   bool send_head_first = true;
+  char *file_name;
 
   /* Assert that no value for *LOCAL_FILE was passed. */
   assert (local_file == NULL || *local_file == NULL);
-  
+
   /* Set LOCAL_FILE parameter. */
   if (local_file && opt.output_document)
     *local_file = HYPHENP (opt.output_document) ? NULL : xstrdup (opt.output_document);
-  
+
   /* Reset NEWLOC parameter. */
   *newloc = NULL;
 
@@ -2382,8 +2469,8 @@ http_loop (struct url *u, char **newloc, char **local_file, const char *referer,
          retrieve the file. But if the output_document was given, then this
          test was already done and the file didn't exist. Hence the !opt.output_document */
       logprintf (LOG_VERBOSE, _("\
-File `%s' already there; not retrieving.\n\n"), 
-                 hstat.local_file);
+File %s already there; not retrieving.\n\n"),
+                 quote (hstat.local_file));
       /* If the file is there, we suppose it's retrieved OK.  */
       *dt |= RETROKF;
 
@@ -2398,33 +2485,35 @@ File `%s' already there; not retrieving.\n\n"),
 
   /* Reset the counter. */
   count = 0;
-  
+
   /* Reset the document type. */
   *dt = 0;
-  
+
   /* Skip preliminary HEAD request if we're not in spider mode AND
    * if -O was given or HTTP Content-Disposition support is disabled. */
   if (!opt.spider
       && (got_name || !opt.content_disposition))
     send_head_first = false;
 
-  /* Send preliminary HEAD request if -N is given and we have an existing 
+  /* Send preliminary HEAD request if -N is given and we have an existing
    * destination file. */
-  if (opt.timestamping 
+  file_name = url_file_name (u);
+  if (opt.timestamping
       && !opt.content_disposition
-      && file_exists_p (url_file_name (u)))
+      && file_exists_p (file_name))
     send_head_first = true;
-  
+  xfree (file_name);
+
   /* THE loop */
   do
     {
       /* Increment the pass counter.  */
       ++count;
       sleep_between_retrievals (count);
-      
+
       /* Get the current time string.  */
       tms = datetime_str (time (NULL));
-      
+
       if (opt.spider && !got_head)
         logprintf (LOG_VERBOSE, _("\
 Spider mode enabled. Check if remote file exists.\n"));
@@ -2433,20 +2522,20 @@ Spider mode enabled. Check if remote file exists.\n"));
       if (opt.verbose)
         {
           char *hurl = url_string (u, URL_AUTH_HIDE_PASSWD);
-          
-          if (count > 1) 
+
+          if (count > 1)
             {
               char tmp[256];
               sprintf (tmp, _("(try:%2d)"), count);
               logprintf (LOG_NOTQUIET, "--%s--  %s  %s\n",
                          tms, tmp, hurl);
             }
-          else 
+          else
             {
               logprintf (LOG_NOTQUIET, "--%s--  %s\n",
                          tms, hurl);
             }
-          
+
 #ifdef WINDOWS
           ws_changetitle (hurl);
 #endif
@@ -2456,7 +2545,7 @@ Spider mode enabled. Check if remote file exists.\n"));
       /* Default document type is empty.  However, if spider mode is
          on or time-stamping is employed, HEAD_ONLY commands is
          encoded within *dt.  */
-      if (send_head_first && !got_head) 
+      if (send_head_first && !got_head)
         *dt |= HEAD_ONLY;
       else
         *dt &= ~HEAD_ONLY;
@@ -2489,11 +2578,11 @@ Spider mode enabled. Check if remote file exists.\n"));
         *dt &= ~SEND_NOCACHE;
 
       /* Try fetching the document, or at least its head.  */
-      err = gethttp (u, &hstat, dt, proxy);
+      err = gethttp (u, &hstat, dt, proxy, iri);
 
       /* Time?  */
       tms = datetime_str (time (NULL));
-      
+
       /* Get the new location (with or without the redirection).  */
       if (hstat.newloc)
         *newloc = xstrdup (hstat.newloc);
@@ -2511,10 +2600,10 @@ Spider mode enabled. Check if remote file exists.\n"));
         case FWRITEERR: case FOPENERR:
           /* Another fatal error.  */
           logputs (LOG_VERBOSE, "\n");
-          logprintf (LOG_NOTQUIET, _("Cannot write to `%s' (%s).\n"),
-                     hstat.local_file, strerror (errno));
-        case HOSTERR: case CONIMPOSSIBLE: case PROXERR: case AUTHFAILED: 
-        case SSLINITFAILED: case CONTNOTSUPPORTED:
+          logprintf (LOG_NOTQUIET, _("Cannot write to %s (%s).\n"),
+                     quote (hstat.local_file), strerror (errno));
+        case HOSTERR: case CONIMPOSSIBLE: case PROXERR: case AUTHFAILED:
+        case SSLINITFAILED: case CONTNOTSUPPORTED: case VERIFCERTERR:
           /* Fatal errors just return from the function.  */
           ret = err;
           goto exit;
@@ -2532,7 +2621,7 @@ Spider mode enabled. Check if remote file exists.\n"));
                          hstat.statcode);
               ret = WRONGCODE;
             }
-          else 
+          else
             {
               ret = NEWLOCATION;
             }
@@ -2548,7 +2637,7 @@ Spider mode enabled. Check if remote file exists.\n"));
           /* All possibilities should have been exhausted.  */
           abort ();
         }
-      
+
       if (!(*dt & RETROKF))
         {
           char *hurl = NULL;
@@ -2567,11 +2656,13 @@ Spider mode enabled. Check if remote file exists.\n"));
               continue;
             }
           /* Maybe we should always keep track of broken links, not just in
-           * spider mode.  */
-          else if (opt.spider)
+           * spider mode.
+           * Don't log error if it was UTF-8 encoded because we will try
+           * once unencoded. */
+          else if (opt.spider && !iri->utf8_encode)
             {
               /* #### Again: ugly ugly ugly! */
-              if (!hurl) 
+              if (!hurl)
                 hurl = url_string (u, URL_AUTH_HIDE_PASSWD);
               nonexisting_url (hurl);
               logprintf (LOG_NOTQUIET, _("\
@@ -2580,7 +2671,8 @@ Remote file does not exist -- broken link!!!\n"));
           else
             {
               logprintf (LOG_NOTQUIET, _("%s ERROR %d: %s.\n"),
-                         tms, hstat.statcode, escnonprint (hstat.error));
+                         tms, hstat.statcode,
+                         quotearg_style (escape_quoting_style, hstat.error));
             }
           logputs (LOG_VERBOSE, "\n");
           ret = WRONGCODE;
@@ -2608,7 +2700,7 @@ Last-modified header invalid -- time-stamp ignored.\n"));
               if (*dt & HEAD_ONLY)
                 time_came_from_head = true;
             }
-      
+
           if (send_head_first)
             {
               /* The time-stamping section.  */
@@ -2619,7 +2711,7 @@ Last-modified header invalid -- time-stamp ignored.\n"));
                                                we're supposed to
                                                download already exists.  */
                     {
-                      if (hstat.remote_time && 
+                      if (hstat.remote_time &&
                           tmr != (time_t) (-1))
                         {
                           /* Now time-stamping can be used validly.
@@ -2630,12 +2722,12 @@ Last-modified header invalid -- time-stamp ignored.\n"));
                              download procedure is resumed.  */
                           if (hstat.orig_file_tstamp >= tmr)
                             {
-                              if (hstat.contlen == -1 
+                              if (hstat.contlen == -1
                                   || hstat.orig_file_size == hstat.contlen)
                                 {
                                   logprintf (LOG_VERBOSE, _("\
-Server file no newer than local file `%s' -- not retrieving.\n\n"),
-                                             hstat.orig_file_name);
+Server file no newer than local file %s -- not retrieving.\n\n"),
+                                             quote (hstat.orig_file_name));
                                   ret = RETROK;
                                   goto exit;
                                 }
@@ -2653,26 +2745,27 @@ The sizes do not match (local %s) -- retrieving.\n"),
                           logputs (LOG_VERBOSE, "\n");
                         }
                     }
-                  
+
                   /* free_hstat (&hstat); */
                   hstat.timestamp_checked = true;
                 }
-              
+
               if (opt.spider)
                 {
+                  bool finished = true;
                   if (opt.recursive)
                     {
                       if (*dt & TEXTHTML)
                         {
                           logputs (LOG_VERBOSE, _("\
 Remote file exists and could contain links to other resources -- retrieving.\n\n"));
+                          finished = false;
                         }
-                      else 
+                      else
                         {
                           logprintf (LOG_VERBOSE, _("\
 Remote file exists but does not contain any link -- not retrieving.\n\n"));
                           ret = RETROK; /* RETRUNNEEDED is not for caller. */
-                          goto exit;
                         }
                     }
                   else
@@ -2683,12 +2776,20 @@ Remote file exists but does not contain any link -- not retrieving.\n\n"));
 Remote file exists and could contain further links,\n\
 but recursion is disabled -- not retrieving.\n\n"));
                         }
-                      else 
+                      else
                         {
                           logprintf (LOG_VERBOSE, _("\
 Remote file exists.\n\n"));
                         }
                       ret = RETROK; /* RETRUNNEEDED is not for caller. */
+                    }
+
+                  if (finished)
+                    {
+                      logprintf (LOG_NONVERBOSE,
+                                 _("%s URL: %s %2d %s\n"),
+                                 tms, u->url, hstat.statcode,
+                                 hstat.message ? quotearg_style (escape_quoting_style, hstat.message) : "");
                       goto exit;
                     }
                 }
@@ -2699,21 +2800,13 @@ Remote file exists.\n\n"));
               continue;
             } /* send_head_first */
         } /* !got_head */
-          
+
       if ((tmr != (time_t) (-1))
           && ((hstat.len == hstat.contlen) ||
               ((hstat.res == 0) && (hstat.contlen == -1))))
         {
-          /* #### This code repeats in http.c and ftp.c.  Move it to a
-             function!  */
           const char *fl = NULL;
-          if (opt.output_document)
-            {
-              if (output_stream_regular)
-                fl = opt.output_document;
-            }
-          else
-            fl = hstat.local_file;
+          set_local_file (&fl, hstat.local_file);
           if (fl)
             {
               time_t newtmr = -1;
@@ -2722,7 +2815,7 @@ Remote file exists.\n\n"));
                   && hstat.remote_time && hstat.remote_time[0])
                 {
                   newtmr = http_atotm (hstat.remote_time);
-                  if (newtmr != -1)
+                  if (newtmr != (time_t)-1)
                     tmr = newtmr;
                 }
               touch (fl, tmr);
@@ -2737,9 +2830,14 @@ Remote file exists.\n\n"));
         {
           if (*dt & RETROKF)
             {
+              bool write_to_stdout = (opt.output_document && HYPHENP (opt.output_document));
+
               logprintf (LOG_VERBOSE,
-                         _("%s (%s) - `%s' saved [%s/%s]\n\n"),
-                         tms, tmrate, hstat.local_file,
+                         write_to_stdout
+                         ? _("%s (%s) - written to stdout %s[%s/%s]\n\n")
+                         : _("%s (%s) - %s saved [%s/%s]\n\n"),
+                         tms, tmrate,
+                         write_to_stdout ? "" : quote (hstat.local_file),
                          number_to_static_string (hstat.len),
                          number_to_static_string (hstat.contlen));
               logprintf (LOG_NONVERBOSE,
@@ -2749,7 +2847,7 @@ Remote file exists.\n\n"));
                          number_to_static_string (hstat.contlen),
                          hstat.local_file, count);
             }
-          ++opt.numurls;
+          ++numurls;
           total_downloaded_bytes += hstat.len;
 
           /* Remember that we downloaded the file for later ".orig" code. */
@@ -2764,20 +2862,25 @@ Remote file exists.\n\n"));
       else if (hstat.res == 0) /* No read error */
         {
           if (hstat.contlen == -1)  /* We don't know how much we were supposed
-                                       to get, so assume we succeeded. */ 
+                                       to get, so assume we succeeded. */
             {
               if (*dt & RETROKF)
                 {
+                  bool write_to_stdout = (opt.output_document && HYPHENP (opt.output_document));
+
                   logprintf (LOG_VERBOSE,
-                             _("%s (%s) - `%s' saved [%s]\n\n"),
-                             tms, tmrate, hstat.local_file,
+                             write_to_stdout
+                             ? _("%s (%s) - written to stdout %s[%s]\n\n")
+                             : _("%s (%s) - %s saved [%s]\n\n"),
+                             tms, tmrate,
+                             write_to_stdout ? "" : quote (hstat.local_file),
                              number_to_static_string (hstat.len));
                   logprintf (LOG_NONVERBOSE,
                              "%s URL:%s [%s] -> \"%s\" [%d]\n",
                              tms, u->url, number_to_static_string (hstat.len),
                              hstat.local_file, count);
                 }
-              ++opt.numurls;
+              ++numurls;
               total_downloaded_bytes += hstat.len;
 
               /* Remember that we downloaded the file for later ".orig" code. */
@@ -2785,7 +2888,7 @@ Remote file exists.\n\n"));
                 downloaded_file(FILE_DOWNLOADED_AND_HTML_EXTENSION_ADDED, hstat.local_file);
               else
                 downloaded_file(FILE_DOWNLOADED_NORMALLY, hstat.local_file);
-              
+
               ret = RETROK;
               goto exit;
             }
@@ -2839,10 +2942,10 @@ Remote file exists.\n\n"));
   while (!opt.ntry || (count < opt.ntry));
 
 exit:
-  if (ret == RETROK) 
+  if (ret == RETROK)
     *local_file = xstrdup (hstat.local_file);
   free_hstat (&hstat);
-  
+
   return ret;
 }
 
@@ -2859,11 +2962,11 @@ check_end (const char *p)
 {
   if (!p)
     return false;
-  while (ISSPACE (*p))
+  while (c_isspace (*p))
     ++p;
   if (!*p
       || (p[0] == 'G' && p[1] == 'M' && p[2] == 'T')
-      || ((p[0] == '+' || p[0] == '-') && ISDIGIT (p[1])))
+      || ((p[0] == '+' || p[0] == '-') && c_isdigit (p[1])))
     return true;
   else
     return false;
@@ -2914,13 +3017,24 @@ http_atotm (const char *time_string)
                                    Netscape cookie specification.) */
   };
   const char *oldlocale;
-  int i;
+  char savedlocale[256];
+  size_t i;
   time_t ret = (time_t) -1;
 
   /* Solaris strptime fails to recognize English month names in
      non-English locales, which we work around by temporarily setting
      locale to C before invoking strptime.  */
   oldlocale = setlocale (LC_TIME, NULL);
+  if (oldlocale)
+    {
+      size_t l = strlen (oldlocale);
+      if (l >= sizeof savedlocale)
+        savedlocale[0] = '\0';
+      else
+        memcpy (savedlocale, oldlocale, l);
+    }
+  else savedlocale[0] = '\0';
+
   setlocale (LC_TIME, "C");
 
   for (i = 0; i < countof (time_formats); i++)
@@ -2940,7 +3054,8 @@ http_atotm (const char *time_string)
     }
 
   /* Restore the previous locale. */
-  setlocale (LC_TIME, oldlocale);
+  if (savedlocale[0])
+    setlocale (LC_TIME, savedlocale);
 
   return ret;
 }
@@ -2979,7 +3094,7 @@ basic_authentication_encode (const char *user, const char *passwd)
 }
 
 #define SKIP_WS(x) do {                         \
-  while (ISSPACE (*(x)))                        \
+  while (c_isspace (*(x)))                        \
     ++(x);                                      \
 } while (0)
 
@@ -3025,10 +3140,12 @@ digest_authentication_encode (const char *au, const char *user,
   au += 6;                      /* skip over `Digest' */
   while (extract_param (&au, &name, &value, ','))
     {
-      int i;
+      size_t i;
+      size_t namelen = name.e - name.b;
       for (i = 0; i < countof (options); i++)
-        if (name.e - name.b == strlen (options[i].name)
-            && 0 == strncmp (name.b, options[i].name, name.e - name.b))
+        if (namelen == strlen (options[i].name)
+            && 0 == strncmp (name.b, options[i].name,
+                             namelen))
           {
             *options[i].variable = strdupdelim (value.b, value.e);
             break;
@@ -3108,10 +3225,11 @@ username=\"%s\", realm=\"%s\", nonce=\"%s\", uri=\"%s\", response=\"%s\"",
    first argument and are followed by whitespace or terminating \0.
    The comparison is case-insensitive.  */
 #define STARTS(literal, b, e)                           \
-  ((e) - (b) >= STRSIZE (literal)                       \
+  ((e > b) \
+   && ((size_t) ((e) - (b))) >= STRSIZE (literal)   \
    && 0 == strncasecmp (b, literal, STRSIZE (literal))  \
-   && ((e) - (b) == STRSIZE (literal)                   \
-       || ISSPACE (b[STRSIZE (literal)])))
+   && ((size_t) ((e) - (b)) == STRSIZE (literal)          \
+       || c_isspace (b[STRSIZE (literal)])))
 
 static bool
 known_authentication_scheme_p (const char *hdrbeg, const char *hdrend)
@@ -3140,7 +3258,7 @@ create_authorization_line (const char *au, const char *user,
 {
   /* We are called only with known schemes, so we can dispatch on the
      first letter. */
-  switch (TOUPPER (*au))
+  switch (c_toupper (*au))
     {
     case 'B':                   /* Basic */
       *finished = true;
@@ -3193,6 +3311,42 @@ http_cleanup (void)
     cookie_jar_delete (wget_cookie_jar);
 }
 
+void
+ensure_extension (struct http_stat *hs, const char *ext, int *dt)
+{
+  char *last_period_in_local_filename = strrchr (hs->local_file, '.');
+  char shortext[8];
+  int len = strlen (ext);
+  if (len == 5)
+    {
+      strncpy (shortext, ext, len - 1);
+      shortext[len - 2] = '\0';
+    }
+
+  if (last_period_in_local_filename == NULL
+      || !(0 == strcasecmp (last_period_in_local_filename, shortext)
+           || 0 == strcasecmp (last_period_in_local_filename, ext)))
+    {
+      int local_filename_len = strlen (hs->local_file);
+      /* Resize the local file, allowing for ".html" preceded by
+         optional ".NUMBER".  */
+      hs->local_file = xrealloc (hs->local_file,
+                                 local_filename_len + 24 + len);
+      strcpy (hs->local_file + local_filename_len, ext);
+      /* If clobbering is not allowed and the file, as named,
+         exists, tack on ".NUMBER.html" instead. */
+      if (!ALLOW_CLOBBER && file_exists_p (hs->local_file))
+        {
+          int ext_num = 1;
+          do
+            sprintf (hs->local_file + local_filename_len,
+                     ".%d%s", ext_num++, ext);
+          while (file_exists_p (hs->local_file));
+        }
+      *dt |= ADDED_HTML_EXTENSION;
+    }
+}
+
 
 #ifdef TESTING
 
@@ -3201,7 +3355,7 @@ test_parse_content_disposition()
 {
   int i;
   struct {
-    char *hdrval;    
+    char *hdrval;
     char *opt_dir_prefix;
     char *filename;
     bool result;
@@ -3215,8 +3369,8 @@ test_parse_content_disposition()
     { "attachment", NULL, NULL, false },
     { "attachment", "somedir", NULL, false },
   };
-  
-  for (i = 0; i < sizeof(test_array)/sizeof(test_array[0]); ++i) 
+
+  for (i = 0; i < sizeof(test_array)/sizeof(test_array[0]); ++i)
     {
       char *filename;
       bool res;
@@ -3224,9 +3378,9 @@ test_parse_content_disposition()
       opt.dir_prefix = test_array[i].opt_dir_prefix;
       res = parse_content_disposition (test_array[i].hdrval, &filename);
 
-      mu_assert ("test_parse_content_disposition: wrong result", 
+      mu_assert ("test_parse_content_disposition: wrong result",
                  res == test_array[i].result
-                 && (res == false 
+                 && (res == false
                      || 0 == strcmp (test_array[i].filename, filename)));
     }
 

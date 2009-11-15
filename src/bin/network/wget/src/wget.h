@@ -1,6 +1,6 @@
 /* Miscellaneous declarations.
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This file is part of GNU Wget.
 
@@ -36,6 +36,11 @@ as that of the covered work.  */
 #ifndef WGET_H
 #define WGET_H
 
+#include "config.h"
+
+/* Include these, so random files need not include them.  */
+#include "sysdep.h"
+
 /* Disable assertions when debug support is not compiled in. */
 #ifndef ENABLE_DEBUG
 # define NDEBUG
@@ -48,27 +53,8 @@ as that of the covered work.  */
 
 /* `gettext (FOO)' is long to write, so we use `_(FOO)'.  If NLS is
    unavailable, _(STRING) simply returns STRING.  */
-#ifdef HAVE_NLS
-# define _(string) gettext (string)
-# ifdef HAVE_LIBINTL_H
-#  include <libintl.h>
-# else  /* not HAVE_LIBINTL_H */
-   const char *gettext ();
-# endif /* not HAVE_LIBINTL_H */
-#else  /* not HAVE_NLS */
-# define _(string) (string)
-# define ngettext(sing, plur, num)  ((num) == 1 ? (sing) : (plur))
-# undef HAVE_WCHAR_H
-# undef HAVE_WCWIDTH
-# undef HAVE_MBTOWC
-#endif /* not HAVE_NLS */
-
-#if HAVE_WCWIDTH && HAVE_MBTOWC
-# define USE_NLS_PROGRESS_BAR 1
-#else
-/* Just to be a little paranoid about it. */
-# undef  USE_NLS_PROGRESS_BAR
-#endif
+#include "gettext.h"
+#define _(string)   gettext (string)
 
 /* A pseudo function call that serves as a marker for the automated
    extraction of messages, but does not call gettext().  The run-time
@@ -80,6 +66,19 @@ as that of the covered work.  */
    suitable as initializer for static 'char[]' or 'const char[]'
    variables.  -- explanation partly taken from GNU make.  */
 #define N_(string) string
+
+#if ! ENABLE_NLS
+# undef HAVE_WCHAR_H
+# undef HAVE_WCWIDTH
+# undef HAVE_MBTOWC
+#endif /* not ENABLE_NLS */
+
+#if HAVE_WCWIDTH && HAVE_MBTOWC
+# define USE_NLS_PROGRESS_BAR 1
+#else
+/* Just to be a little paranoid about it. */
+# undef  USE_NLS_PROGRESS_BAR
+#endif
 
 /* I18N NOTE: You will notice that none of the DEBUGP messages are
    marked as translatable.  This is intentional, for a few reasons:
@@ -96,11 +95,8 @@ as that of the covered work.  */
    debug problems with Wget.  If I get them in a language I don't
    understand, debugging will become a new challenge of its own!  */
 
-
-/* Include these, so random files need not include them.  */
-#include "sysdep.h"
 /* locale independent replacement for ctype.h */
-#include "safe-ctype.h"
+#include "c-ctype.h"
 
 /* Conditionalize the use of GCC's __attribute__((format)) and
    __builtin_expect features using macros.  */
@@ -159,7 +155,7 @@ as that of the covered work.  */
 #else
   /* Fall back to using long, which is always available and in most
      cases large enough. */
-typedef long off_t;
+  typedef long wgint;
 # define SIZEOF_WGINT SIZEOF_LONG
 #endif
 
@@ -212,11 +208,19 @@ typedef double SUM_SIZE_INT;
 #include "options.h"
 
 /* Everything uses this, so include them here directly.  */
-#include "xmalloc.h"
+#include <alloca.h>
+#include "xalloc.h"
 
 /* Likewise for logging functions.  */
 #include "log.h"
-
+
+/* Likewise for quoting functions.  */
+#include "quote.h"
+#include "quotearg.h"
+
+/* Likewise for struct iri definition */
+#include "iri.h"
+
 /* Useful macros used across the code: */
 
 /* The number of elements in an array.  For example:
@@ -233,7 +237,7 @@ typedef double SUM_SIZE_INT;
 /* Convert an ASCII hex digit to the corresponding number between 0
    and 15.  H should be a hexadecimal digit that satisfies isxdigit;
    otherwise, the result is undefined.  */
-#define XDIGIT_TO_NUM(h) ((h) < 'A' ? (h) - '0' : TOUPPER (h) - 'A' + 10)
+#define XDIGIT_TO_NUM(h) ((h) < 'A' ? (h) - '0' : c_toupper (h) - 'A' + 10)
 #define X2DIGITS_TO_NUM(h1, h2) ((XDIGIT_TO_NUM (h1) << 4) + XDIGIT_TO_NUM (h2))
 
 /* The reverse of the above: convert a number in the [0, 16) range to
@@ -316,7 +320,8 @@ enum
   HEAD_ONLY            = 0x0004,	/* only send the HEAD request */
   SEND_NOCACHE         = 0x0008,	/* send Pragma: no-cache directive */
   ACCEPTRANGES         = 0x0010,	/* Accept-ranges header was found */
-  ADDED_HTML_EXTENSION = 0x0020         /* added ".html" extension due to -E */
+  ADDED_HTML_EXTENSION = 0x0020,        /* added ".html" extension due to -E */
+  TEXTCSS              = 0x0040	        /* document is of type text/css */
 };
 
 /* Universal error type -- used almost everywhere.  Error reporting of
@@ -326,21 +331,53 @@ typedef enum
 {
   /*  0  */
   NOCONERROR, HOSTERR, CONSOCKERR, CONERROR, CONSSLERR,
-  CONIMPOSSIBLE, NEWLOCATION, NOTENOUGHMEM, CONPORTERR, CONCLOSED, 
+  CONIMPOSSIBLE, NEWLOCATION, NOTENOUGHMEM /* ! */,
+  CONPORTERR /* ! */, CONCLOSED /* ! */,
   /* 10  */
   FTPOK, FTPLOGINC, FTPLOGREFUSED, FTPPORTERR, FTPSYSERR,
-  FTPNSFOD, FTPRETROK, FTPUNKNOWNTYPE, FTPRERR, FTPREXC, 
+  FTPNSFOD, FTPRETROK /* ! */, FTPUNKNOWNTYPE, FTPRERR, FTPREXC /* ! */,
   /* 20  */
-  FTPSRVERR, FTPRETRINT, FTPRESTFAIL, URLERROR, FOPENERR, 
-  FOPEN_EXCL_ERR, FWRITEERR, HOK, HLEXC, HEOF,
+  FTPSRVERR, FTPRETRINT, FTPRESTFAIL, URLERROR, FOPENERR,
+  FOPEN_EXCL_ERR, FWRITEERR, HOK /* ! */, HLEXC /* ! */, HEOF,
   /* 30  */
-  HERR, RETROK, RECLEVELEXC, FTPACCDENIED, WRONGCODE,
-  FTPINVPASV, FTPNOPASV, CONTNOTSUPPORTED, RETRUNNEEDED, RETRFINISHED, 
+  HERR, RETROK, RECLEVELEXC, FTPACCDENIED /* ! */, WRONGCODE,
+  FTPINVPASV, FTPNOPASV, CONTNOTSUPPORTED, RETRUNNEEDED, RETRFINISHED,
   /* 40  */
-  READERR, TRYLIMEXC, URLBADPATTERN, FILEBADFILE, RANGEERR, 
-  RETRBADPATTERN, RETNOTSUP, ROBOTSOK, NOROBOTS, PROXERR, 
+  READERR, TRYLIMEXC, URLBADPATTERN /* ! */, FILEBADFILE /* ! */, RANGEERR,
+  RETRBADPATTERN, RETNOTSUP /* ! */, ROBOTSOK /* ! */, NOROBOTS /* ! */,
+  PROXERR,
   /* 50  */
-  AUTHFAILED, QUOTEXC, WRITEFAILED, SSLINITFAILED
+  AUTHFAILED, QUOTEXC, WRITEFAILED, SSLINITFAILED, VERIFCERTERR
 } uerr_t;
+
+/* 2005-02-19 SMS.
+   Select an appropriate "orig" suffix and a separator character for
+   adding a unique suffix to a file name.
+
+   A VMS ODS2 file system can not tolerate multiple dots.  An ODS5 file
+   system can, but even there not all dots are equal, and heroic effort
+   would be needed to get ".html^.orig" rather than (the less desirable)
+   "^.html.orig".  It's more satisfactory always to use "_orig" on VMS
+   (rather than including "vms.h", testing "ods5_dest", and acting
+   accordingly).
+
+   Note that code in various places assumes that this string is five
+   characters long.
+*/
+# ifdef __VMS
+#  define ORIG_SFX "_orig"
+# else /* def __VMS */
+#  define ORIG_SFX ".orig"
+# endif /* def __VMS [else] */
+
+/* ".NNN" unique-ifying suffix separator character for unique_name() in
+   url.c (and anywhere else).  Note that on VMS, the file system's
+   version numbers solve the problem that unique_name() is designed to
+   handle, obviating this whole exercise.  Other systems may specify a
+   character different from "." here, if desired.
+*/
+# ifndef __VMS
+#  define UNIQ_SEP '.'
+# endif /* ndef __VMS */
 
 #endif /* WGET_H */
