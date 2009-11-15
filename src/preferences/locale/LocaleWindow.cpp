@@ -317,10 +317,12 @@ LocaleWindow::LocaleWindow()
 	
 	{
 		// first list: available languages
-		LanguageListView* listView = new LanguageListView("available",
+		fLanguageListView = new LanguageListView("available",
 			B_MULTIPLE_SELECTION_LIST);
-		BScrollView* scrollView = new BScrollView("scroller", listView,
+		BScrollView* scrollView = new BScrollView("scroller", fLanguageListView,
 			B_WILL_DRAW | B_FRAME_EVENTS, false, true);
+
+		fLanguageListView->SetInvocationMessage(new BMessage(kMsgLangInvoked));
 
 		// Fill the language list from the LocaleRoster data
 		BMessage installedLanguages;
@@ -342,7 +344,7 @@ LocaleWindow::LocaleWindow()
 				languageFullName.toUTF8(bbs);
 				LanguageListItem* si
 					= new LanguageListItem(str, currentLanguage.String());
-				listView->AddItem(si);
+				fLanguageListView->AddItem(si);
 			}
 
 		} else {
@@ -360,6 +362,9 @@ LocaleWindow::LocaleWindow()
 		BScrollView* scrollViewEnabled = new BScrollView("scroller",
 			fPreferredListView, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
+		fPreferredListView
+			->SetInvocationMessage(new BMessage(kMsgPrefLangInvoked));
+
 		// get the preferred languages from the Settings. Move them here from
 		// the other list.
 		BMessage msg;
@@ -369,11 +374,12 @@ LocaleWindow::LocaleWindow()
 					== B_OK;
 				index++) {
 			for (int listPos = 0; LanguageListItem* lli
-					= static_cast<LanguageListItem*>(listView->ItemAt(listPos));
+					= static_cast<LanguageListItem*>
+						(fLanguageListView->ItemAt(listPos));
 					listPos++) {
 				if (langCode == lli->LanguageCode()) {
 					fPreferredListView->AddItem(lli);
-					listView->RemoveItem(lli);
+					fLanguageListView->RemoveItem(lli);
 				}
 			}
 		}
@@ -496,6 +502,37 @@ LocaleWindow::MessageReceived(BMessage* message)
 
 			BCountry* country = new BCountry(lli->LanguageCode());
 			fFormatView->SetCountry(country);
+			break;
+		}
+
+		case kMsgLangInvoked:
+		{
+			int32 index = 0;
+			if (message->FindInt32("index", &index) == B_OK) {
+				LanguageListItem* listItem
+					= static_cast<LanguageListItem*>
+						(fLanguageListView->RemoveItem(index));
+				fPreferredListView->AddItem(listItem);
+				fPreferredListView
+					->Invoke(new BMessage(kMsgPrefLanguagesChanged));
+			}
+			break;
+		}
+
+		case kMsgPrefLangInvoked:
+		{
+			if (fPreferredListView->CountItems() == 1)
+				break;
+
+			int32 index = 0;
+			if (message->FindInt32("index", &index) == B_OK) {
+				LanguageListItem* listItem
+					= static_cast<LanguageListItem*>
+						(fPreferredListView->RemoveItem(index));
+				fLanguageListView->AddItem(listItem);
+				fPreferredListView
+					->Invoke(new BMessage(kMsgPrefLanguagesChanged));
+			}
 			break;
 		}
 

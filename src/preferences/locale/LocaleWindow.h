@@ -22,6 +22,7 @@ public:
 
 private:
 			BButton*		fRevertButton;
+			BListView*		fLanguageListView;
 			BListView*		fPreferredListView;
 			FormatView*		fFormatView;
 };
