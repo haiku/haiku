@@ -468,6 +468,8 @@ LocaleWindow::QuitRequested()
 	be_app_messenger.SendMessage(&update);
 
 	be_app_messenger.SendMessage(B_QUIT_REQUESTED);
+	be_app_messenger.SendMessage(B_QUIT_REQUESTED);
+		// app eats the first message
 	return true;
 }
 

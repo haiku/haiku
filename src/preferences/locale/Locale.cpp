@@ -190,6 +190,12 @@ LocalePreflet::AboutRequested()
 bool
 LocalePreflet::QuitRequested()
 {
+	if (fLocaleWindow != NULL) {
+		fLocaleWindow->PostMessage(B_QUIT_REQUESTED);
+		fLocaleWindow = NULL;
+		return false;
+	}
+
 	return true;
 }
 
