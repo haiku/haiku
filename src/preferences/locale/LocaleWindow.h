@@ -17,8 +17,8 @@ class LocaleWindow : public BWindow {
 public:
 							LocaleWindow();
 
-	virtual	bool			QuitRequested();
 	virtual	void			MessageReceived(BMessage* message);
+	virtual	void			FrameMoved(BPoint newPosition);
 
 private:
 			BButton*		fRevertButton;

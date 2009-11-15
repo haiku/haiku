@@ -107,6 +107,7 @@ class LanguageListView: public BListView
 						fDropIndex = -1;
 					}
 				}
+				Invoke(new BMessage(kMsgPrefLanguagesChanged));
 			} else BListView::MessageReceived(message);
 		}
 	private:
@@ -297,7 +298,8 @@ LanguageListView::MouseMoved(BPoint where, uint32 transit, const BMessage* msg)
 LocaleWindow::LocaleWindow()
 	:
 	BWindow(BRect(0, 0, 0, 0), "Locale", B_TITLED_WINDOW, B_NOT_RESIZABLE
-		| B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
+		| B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
+		| B_QUIT_ON_WINDOW_CLOSE)
 {
 	BCountry* defaultCountry;
 	be_locale_roster->GetDefaultCountry(&defaultCountry);
@@ -453,27 +455,6 @@ LocaleWindow::LocaleWindow()
 }
 
 
-bool
-LocaleWindow::QuitRequested()
-{
-	BMessage update(kMsgSettingsChanged);
-	update.AddPoint("window_location", Frame().LeftTop());
-	int index = 0;
-	while (index < fPreferredListView->CountItems()) {
-		update.AddString("language", static_cast<LanguageListItem*>
-			(fPreferredListView->ItemAt(index))->LanguageCode());
-		index++;
-	}
-	// TODO also save Country tab settings
-	be_app_messenger.SendMessage(&update);
-
-	be_app_messenger.SendMessage(B_QUIT_REQUESTED);
-	be_app_messenger.SendMessage(B_QUIT_REQUESTED);
-		// app eats the first message
-	return true;
-}
-
-
 void
 LocaleWindow::MessageReceived(BMessage* message)
 {
@@ -485,6 +466,19 @@ LocaleWindow::MessageReceived(BMessage* message)
 		case kMsgRevert:
 			// TODO
 			break;
+
+		case kMsgPrefLanguagesChanged:
+		{
+				BMessage update(kMsgSettingsChanged);
+				int index = 0;
+				while (index < fPreferredListView->CountItems()) {
+					update.AddString("language", static_cast<LanguageListItem*>
+						(fPreferredListView->ItemAt(index))->LanguageCode());
+					index++;
+				}
+				be_app_messenger.SendMessage(&update);
+			break;
+		}
 
 		case kMsgCountrySelection:
 		{
@@ -509,5 +503,14 @@ LocaleWindow::MessageReceived(BMessage* message)
 			BWindow::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+LocaleWindow::FrameMoved(BPoint newPosition)
+{
+	BMessage update(kMsgSettingsChanged);
+	update.AddPoint("window_location", newPosition);
+	be_app_messenger.SendMessage(&update);
 }
 

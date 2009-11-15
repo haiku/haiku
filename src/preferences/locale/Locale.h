@@ -13,7 +13,7 @@ extern const char* kSignature;
 
 static const uint32 kMsgCountrySelection = 'csel';
 static const uint32 kMsgSettingsChanged = 'SeCh';
-static const uint32 kMsgSelectLanguage = 'slng';
+static const uint32 kMsgPrefLanguagesChanged = 'lang';
 static const uint32 kMsgDefaults = 'dflt';
 static const uint32 kMsgRevert = 'revt';
 

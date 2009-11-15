@@ -52,7 +52,6 @@ public:
 
 	virtual	void			MessageReceived(BMessage* message);
 	virtual	void			AboutRequested();
-	virtual	bool			QuitRequested();
 
 private:
 				Settings	fSettings;
@@ -184,19 +183,6 @@ LocalePreflet::AboutRequested()
 	authors[1] = "Adrien Destugues";
 	authors[2] = NULL;
 	(new BAboutWindow(TR("Locale"), 2005, authors))->Show();
-}
-
-
-bool
-LocalePreflet::QuitRequested()
-{
-	if (fLocaleWindow != NULL) {
-		fLocaleWindow->PostMessage(B_QUIT_REQUESTED);
-		fLocaleWindow = NULL;
-		return false;
-	}
-
-	return true;
 }
 
 
