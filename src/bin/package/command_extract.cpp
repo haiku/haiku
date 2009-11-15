@@ -259,7 +259,7 @@ private:
 			error = reader->ReadData(offset, fDataBuffer, toCopy);
 			if (error != B_OK) {
 				fprintf(stderr, "Error: Failed to read data: %s\n",
-					strerror(errno));
+					strerror(error));
 				return error;
 			}
 
