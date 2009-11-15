@@ -7,3 +7,6 @@ KernelAddon packagefs
 
 	: $(HAIKU_STATIC_LIBSUPC++)
 ;
+
+
+HaikuSubInclude userland ;
