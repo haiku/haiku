@@ -1094,13 +1094,15 @@ if $(HAIKU_GCC_VERSION[1]) = 2 {
 }
 
 if $(HAIKU_NO_WERROR) != 1 {
+	EnableWerror src add-ons kernel file_systems bfs ;
+	EnableWerror src add-ons kernel file_systems packagefs ;
+	EnableWerror src add-ons kernel file_systems userlandfs ;
+	EnableWerror src bin package ;
 	EnableWerror src kits app ;
 	EnableWerror src kits interface ;
 	EnableWerror src kits storage ;
 	EnableWerror src kits support ;
 	EnableWerror src system kernel ;
 	EnableWerror src system runtime_loader ;
-	EnableWerror src add-ons kernel file_systems bfs ;
-	EnableWerror src add-ons kernel file_systems userlandfs ;
 }
 
