@@ -170,6 +170,7 @@ TermView::TermView(BRect frame, int32 argc, const char** argv, int32 historySize
 	fColumns(COLUMNS_DEFAULT),
 	fRows(ROWS_DEFAULT),
 	fEncoding(M_UTF8),
+	fActive(false),
 	fScrBufSize(historySize),
 	fReportX10MouseEvent(false),
 	fReportNormalMouseEvent(false),
@@ -187,6 +188,7 @@ TermView::TermView(int rows, int columns, int32 argc, const char** argv,
 	fColumns(columns),
 	fRows(rows),
 	fEncoding(M_UTF8),
+	fActive(false),
 	fScrBufSize(historySize),
 	fReportX10MouseEvent(false),
 	fReportNormalMouseEvent(false),
@@ -215,6 +217,7 @@ TermView::TermView(BMessage* archive)
 	fColumns(COLUMNS_DEFAULT),
 	fRows(ROWS_DEFAULT),
 	fEncoding(M_UTF8),
+	fActive(false),
 	fScrBufSize(1000),
 	fReportX10MouseEvent(false),
 	fReportNormalMouseEvent(false),
@@ -752,6 +755,33 @@ TermView::_DetachShell()
 }
 
 
+void
+TermView::_Activate()
+{
+	fActive = true;
+	
+	if (fCursorBlinkRunner == NULL) {
+		BMessage blinkMessage(kBlinkCursor);
+		fCursorBlinkRunner = new (std::nothrow) BMessageRunner(
+			BMessenger(this), &blinkMessage, kCursorBlinkInterval);
+	}
+}
+
+
+void
+TermView::_Deactivate()
+{
+	// DoIMConfirm();
+	// make sure the cursor becomes visible
+	fCursorState = 0;
+	_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
+	delete fCursorBlinkRunner;
+	fCursorBlinkRunner = NULL;
+	
+	fActive = false;
+}
+
+
 //! Draw part of a line in the given view.
 void
 TermView::_DrawLinePart(int32 x1, int32 y1, uint16 attr, char *buf,
@@ -1111,21 +1141,27 @@ void
 TermView::WindowActivated(bool active)
 {
 	BView::WindowActivated(active);
-	if (active) {
-		// start cursor blinking
-		if (fCursorBlinkRunner == NULL) {
-			BMessage blinkMessage(kBlinkCursor);
-			fCursorBlinkRunner = new (std::nothrow) BMessageRunner(
-				BMessenger(this), &blinkMessage, kCursorBlinkInterval);
-		}
+	if (active && IsFocus()) {
+		if (!fActive)
+			_Activate();
 	} else {
-		// DoIMConfirm();
+		if (fActive)
+			_Deactivate();
+	}
+}
 
-		// make sure the cursor becomes visible
-		fCursorState = 0;
-		_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
-		delete fCursorBlinkRunner;
-		fCursorBlinkRunner = NULL;
+
+void
+TermView::MakeFocus(bool focusState)
+{
+	BView::MakeFocus(focusState);
+
+	if (focusState && Window() && Window()->IsActive()) {
+		if (!fActive)
+			_Activate();
+	} else {
+		if (fActive)
+			_Deactivate();
 	}
 }
 

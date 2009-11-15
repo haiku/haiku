@@ -90,6 +90,7 @@ protected:
 	virtual void			DetachedFromWindow();
 	virtual void			Draw(BRect updateRect);
 	virtual void			WindowActivated(bool active);
+	virtual void			MakeFocus(bool focusState = true);
 	virtual void			KeyDown(const char* bytes, int32 numBytes);
 
 	virtual void			MouseDown(BPoint where);
@@ -121,6 +122,9 @@ private:
 
 			status_t		_AttachShell(Shell* shell);
 			void			_DetachShell();
+
+			void			_Activate();
+			void			_Deactivate();
 
 			void			_AboutRequested();
 
@@ -217,7 +221,7 @@ private:
 			int				fRows;
 
 			int				fEncoding;
-
+			bool				fActive;
 			// Object pointer.
 			TerminalBuffer*	fTextBuffer;
 			BasicTerminalBuffer* fVisibleTextBuffer;
