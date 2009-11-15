@@ -1296,6 +1296,6 @@ PackageWriter::_WriteZlibCompressedData(DataReader& dataReader, off_t size,
 		}
 	}
 
-	_compressedSize = writeOffset - dataOffset;
+	_compressedSize = writeOffset - offsetTableOffset;
 	return B_OK;
 }
