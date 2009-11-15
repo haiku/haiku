@@ -4,39 +4,78 @@
  */
 
 
+#include "kernel_interface.h"
+
 #include <new>
 
 #include <fs_info.h>
 #include <fs_interface.h>
 #include <KernelExport.h>
 
+#include <AutoDeleter.h>
 
-extern fs_volume_ops gPackageFSVolumeOps;
-extern fs_vnode_ops gPackageFSVnodeOps;
+#include "DebugSupport.h"
+#include "Directory.h"
+#include "Volume.h"
+
+
+static const uint32 kOptimalIOSize = 64 * 1024;
 
 
 //	#pragma mark - Volume
 
 
 static status_t
-packagefs_mount(fs_volume* _volume, const char* device, uint32 flags,
-	const char* parameters, ino_t* rootID)
+packagefs_mount(fs_volume* fsVolume, const char* device, uint32 flags,
+	const char* parameters, ino_t* _rootID)
 {
-	return B_UNSUPPORTED;
+	FUNCTION("fsVolume: %p, device: \"%s\", flags: %#lx, parameters: \"%s\"\n",
+		fsVolume, device, flags, parameters);
+
+	// create a Volume object
+	Volume* volume = new(std::nothrow) Volume(fsVolume);
+	if (volume == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	ObjectDeleter<Volume> volumeDeleter(volume);
+
+	status_t error = volume->Mount();
+	if (error != B_OK)
+		return error;
+
+	// set return values
+	*_rootID = volume->RootDirectory()->ID();
+	fsVolume->private_volume = volumeDeleter.Detach();
+	fsVolume->ops = &gPackageFSVolumeOps;
+
+	return B_OK;
 }
 
 
 static status_t
-packagefs_unmount(fs_volume* fs)
+packagefs_unmount(fs_volume* fsVolume)
 {
-	return B_UNSUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	FUNCTION("volume: %p\n", volume);
+
+	volume->Unmount();
+	delete volume;
+
+	return B_OK;
 }
 
 
 static status_t
-packagefs_read_fs_info(fs_volume* fs, struct fs_info* info)
+packagefs_read_fs_info(fs_volume* fsVolume, struct fs_info* info)
 {
-	return B_UNSUPPORTED;
+	FUNCTION("volume: %p, info: %p\n", fsVolume->private_volume, info);
+
+	info->flags = B_FS_IS_READONLY;
+	info->block_size = 4096;
+	info->io_size = kOptimalIOSize;
+	info->total_blocks = info->free_blocks = 1;
+	strlcpy(info->volume_name, "Package FS", sizeof(info->volume_name));
+	return B_OK;
 }
 
 
@@ -44,17 +83,27 @@ packagefs_read_fs_info(fs_volume* fs, struct fs_info* info)
 
 
 static status_t
-packagefs_lookup(fs_volume* fs, fs_vnode* _dir, const char* entryName,
-	ino_t* vnid)
+packagefs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* entryName,
+	ino_t* _vnid)
 {
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* dir = (Node*)fsDir->private_node;
+
+	FUNCTION("volume: %p, dir: %p (%lld), entry: \"%s\"\n", volume, dir,
+		dir->ID(), entryName);
+
 	return B_UNSUPPORTED;
 }
 
 
 static status_t
-packagefs_get_vnode(fs_volume* fs, ino_t vnid, fs_vnode* node, int* _type,
-	uint32* _flags, bool reenter)
+packagefs_get_vnode(fs_volume* fsVolume, ino_t vnid, fs_vnode* fsNode,
+	int* _type, uint32* _flags, bool reenter)
 {
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	FUNCTION("volume: %p, vnid: %lld\n", volume, vnid);
+
 	return B_UNSUPPORTED;
 }
 
@@ -85,9 +134,26 @@ packagefs_access(fs_volume* fs, fs_vnode* _node, int mode)
 
 
 static status_t
-packagefs_read_stat(fs_volume* fs, fs_vnode* _node, struct stat* st)
+packagefs_read_stat(fs_volume* fsVolume, fs_vnode* fsNode, struct stat* st)
 {
-	return B_UNSUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+
+	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+
+// TODO: Fill in correctly!
+	st->st_mode = S_IFDIR;
+	st->st_nlink = 1;
+	st->st_uid = 0;
+	st->st_gid = 0;
+	st->st_size = 0;
+	st->st_blksize = kOptimalIOSize;
+	st->st_atime = 0;
+	st->st_mtime = 0;
+	st->st_ctime = 0;
+	st->st_crtime = 0;
+
+	return B_OK;
 }
 
 
@@ -170,9 +236,13 @@ packagefs_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
+			init_debugging();
+			PRINT("package_std_ops(): B_MODULE_INIT\n");
 			return B_OK;
 
 		case B_MODULE_UNINIT:
+			PRINT("package_std_ops(): B_MODULE_UNINIT\n");
+			exit_debugging();
 			return B_OK;
 
 		default:

@@ -4,9 +4,10 @@ SubDir HAIKU_TOP src add-ons kernel file_systems packagefs userland ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 
-Addon <userland>packagefs
-	:
-	kernel_interface.cpp
+UsePrivateHeaders shared ;
 
+
+Addon <userland>packagefs
+	: $(HAIKU_PACKAGE_FS_SOURCES)
 	: libuserlandfs_haiku_kernel.so $(TARGET_LIBSUPC++)
 ;
