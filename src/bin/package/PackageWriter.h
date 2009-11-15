@@ -13,6 +13,7 @@
 
 
 class DataReader;
+struct hpkg_header;
 
 
 class PackageWriter {
@@ -32,6 +33,10 @@ private:
 			struct Attribute;
 			struct AttributeTypeUsageGreater;
 			struct Entry;
+			struct DataWriter;
+			struct DummyDataWriter;
+			struct FDDataWriter;
+			struct ZlibDataWriter;
 
 			typedef BOpenHashTable<AttributeTypeHashDefinition>
 				AttributeTypeTable;
@@ -46,9 +51,14 @@ private:
 									const char* name, size_t nameLength,
 									bool isImplicit);
 
+			void				_WriteTOC(hpkg_header& header);
+			int32				_WriteTOCSections(uint64& _attributeTypesSize,
+									uint64& _stringsSize, uint64& _mainSize);
 			void				_WriteAttributeTypes();
 			int32				_WriteCachedStrings();
 			void				_WriteAttributeChildren(Attribute* attribute);
+
+			void				_WritePackageAttributes(hpkg_header& header);
 
 			void				_WriteAttributeValue(
 									const AttributeValue& value,
@@ -61,7 +71,6 @@ private:
 
 			void				_WriteBuffer(const void* buffer, size_t size,
 									off_t offset);
-	inline	void				_WriteBuffer(const void* buffer, size_t size);
 
 			void				_AddEntry(int dirFD, Entry* entry,
 									const char* fileName);
@@ -100,6 +109,8 @@ private:
 			void*				fDataBuffer;
 			size_t				fDataBufferSize;
 
+			DataWriter*			fDataWriter;
+
 			Entry*				fRootEntry;
 
 			Attribute*			fRootAttribute;
@@ -108,29 +119,6 @@ private:
 			CachedStringTable*	fCachedStrings;
 			AttributeTypeTable*	fAttributeTypes;
 };
-
-
-template<typename Type>
-inline void
-PackageWriter::_Write(const Type& value)
-{
-	_WriteBuffer(&value, sizeof(Type));
-}
-
-
-inline void
-PackageWriter::_WriteString(const char* string)
-{
-	_WriteBuffer(string, strlen(string) + 1);
-}
-
-
-inline void
-PackageWriter::_WriteBuffer(const void* buffer, size_t size)
-{
-	_WriteBuffer(buffer, size, fHeapEnd);
-	fHeapEnd += size;
-}
 
 
 #endif	// PACKAGE_WRITER_H

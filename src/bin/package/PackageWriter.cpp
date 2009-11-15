@@ -25,6 +25,7 @@
 
 #include <haiku_package.h>
 
+#include "DataOutput.h"
 #include "DataReader.h"
 #include "FDCloser.h"
 #include "Stacker.h"
@@ -373,7 +374,149 @@ private:
 };
 
 
-// #pragma mark - PackageWriter
+// #pragma mark - DataWriter
+
+
+struct PackageWriter::DataWriter {
+	DataWriter()
+		:
+		fBytesWritten(0)
+	{
+	}
+
+	virtual ~DataWriter()
+	{
+	}
+
+	uint64 BytesWritten() const
+	{
+		return fBytesWritten;
+	}
+
+	virtual status_t WriteDataNoThrow(const void* buffer, size_t size) = 0;
+
+	inline void WriteDataThrows(const void* buffer, size_t size)
+	{
+		status_t error = WriteDataNoThrow(buffer, size);
+		if (error != B_OK)
+			throw status_t(error);
+	}
+
+protected:
+	uint64	fBytesWritten;
+};
+
+
+struct PackageWriter::DummyDataWriter : DataWriter {
+	DummyDataWriter()
+	{
+	}
+
+	virtual status_t WriteDataNoThrow(const void* buffer, size_t size)
+	{
+		fBytesWritten += size;
+		return B_OK;
+	}
+};
+
+
+struct PackageWriter::FDDataWriter : DataWriter {
+	FDDataWriter(int fd, off_t offset)
+		:
+		fFD(fd),
+		fOffset(offset)
+	{
+	}
+
+	virtual status_t WriteDataNoThrow(const void* buffer, size_t size)
+	{
+		ssize_t bytesWritten = pwrite(fFD, buffer, size, fOffset);
+		if (bytesWritten < 0) {
+			fprintf(stderr, "_WriteBuffer(%p, %lu) failed to write data: %s\n",
+				buffer, size, strerror(errno));
+			return errno;
+		}
+		if ((size_t)bytesWritten != size) {
+			fprintf(stderr, "_WriteBuffer(%p, %lu) failed to write all data\n",
+				buffer, size);
+			return B_ERROR;
+		}
+
+		fOffset += size;
+		fBytesWritten += size;
+		return B_OK;
+	}
+
+	off_t Offset() const
+	{
+		return fOffset;
+	}
+
+private:
+	int		fFD;
+	off_t	fOffset;
+};
+
+
+struct PackageWriter::ZlibDataWriter : DataWriter, private DataOutput {
+	ZlibDataWriter(DataWriter* dataWriter)
+		:
+		fDataWriter(dataWriter),
+		fCompressor(this)
+	{
+	}
+
+	void Init()
+	{
+		status_t error = fCompressor.Init();
+		if (error != B_OK)
+			throw status_t(error);
+	}
+
+	void Finish()
+	{
+		status_t error = fCompressor.Finish();
+		if (error != B_OK)
+			throw status_t(error);
+	}
+
+	virtual status_t WriteDataNoThrow(const void* buffer, size_t size)
+	{
+		status_t error = fCompressor.CompressNext(buffer, size);
+		if (error == B_OK)
+			fBytesWritten += size;
+		return error;
+	}
+
+private:
+	// DataOutput
+	virtual status_t WriteData(const void* buffer, size_t size)
+	{
+		return fDataWriter->WriteDataNoThrow(buffer, size);
+	}
+
+private:
+	DataWriter*		fDataWriter;
+	ZlibCompressor	fCompressor;
+};
+
+
+// #pragma mark - PackageWriter (Inline Methods)
+
+
+template<typename Type>
+inline void
+PackageWriter::_Write(const Type& value)
+{
+	fDataWriter->WriteDataThrows(&value, sizeof(Type));
+}
+
+
+inline void
+PackageWriter::_WriteString(const char* string)
+{
+	fDataWriter->WriteDataThrows(string, strlen(string) + 1);
+}
 
 
 template<typename Type>
@@ -386,12 +529,16 @@ PackageWriter::_AddAttribute(const char* attributeName, Type value)
 }
 
 
+// #pragma mark - PackageWriter
+
+
 PackageWriter::PackageWriter()
 	:
 	fFileName(NULL),
 	fFD(-1),
 	fFinished(false),
 	fDataBuffer(NULL),
+	fDataWriter(NULL),
 	fRootEntry(NULL),
 	fRootAttribute(NULL),
 	fTopAttribute(NULL),
@@ -529,26 +676,11 @@ PackageWriter::_Finish()
 printf("header size:             %lu\n", sizeof(hpkg_header));
 printf("heap size:               %lld\n", fHeapEnd - sizeof(hpkg_header));
 
-	// write the attribute type abbreviations
-	off_t attributeTypesOffset = fHeapEnd;
-	_WriteAttributeTypes();
-printf("attributes types size:   %lld\n", fHeapEnd - attributeTypesOffset);
+	hpkg_header header;
 
-	// write the cached strings
-	off_t cachedStringsOffset = fHeapEnd;
-	int32 cachedStringsWritten = _WriteCachedStrings();
-printf("cached strings size:     %lld\n", fHeapEnd - cachedStringsOffset);
-
-	// write the TOC
-	off_t tocOffset = fHeapEnd;
-	_WriteAttributeChildren(fRootAttribute);
-printf("toc size:                %lld\n", fHeapEnd - tocOffset);
-
-	// write the package attributes
-	off_t packageAttributesOffset = fHeapEnd;
-	_Write<uint8>(0);
-		// TODO: Write them for real!
-printf("package attributes size: %lld\n", fHeapEnd - packageAttributesOffset);
+	// write the TOC and package attributes
+	_WriteTOC(header);
+	_WritePackageAttributes(header);
 
 	off_t totalSize = fHeapEnd;
 printf("total size:              %lld\n", totalSize);
@@ -556,37 +688,11 @@ printf("total size:              %lld\n", totalSize);
 	// prepare the header
 
 	// general
-	hpkg_header header;
 	header.magic = B_HOST_TO_BENDIAN_INT32(B_HPKG_MAGIC);
 	header.header_size = B_HOST_TO_BENDIAN_INT16(
 		(uint16)sizeof(hpkg_header));
 	header.version = B_HOST_TO_BENDIAN_INT16(B_HPKG_VERSION);
 	header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
-
-	// package attributes
-	header.attributes_compression = B_HOST_TO_BENDIAN_INT32(
-		B_HPKG_COMPRESSION_NONE);
-	header.attributes_length_compressed
-		= B_HOST_TO_BENDIAN_INT32(fHeapEnd - packageAttributesOffset);
-	header.attributes_length_uncompressed
-		= header.attributes_length_compressed;
-		// TODO: Support compression!
-
-	// TOC
-	header.toc_compression = B_HOST_TO_BENDIAN_INT32(B_HPKG_COMPRESSION_NONE);
-	header.toc_length_compressed = B_HOST_TO_BENDIAN_INT64(
-		packageAttributesOffset - attributeTypesOffset);
-	header.toc_length_uncompressed = header.toc_length_compressed;
-		// TODO: Support compression!
-
-	// TOC subsections
-	header.toc_attribute_types_length = B_HOST_TO_BENDIAN_INT64(
-		cachedStringsOffset - attributeTypesOffset);
-	header.toc_attribute_types_count = B_HOST_TO_BENDIAN_INT64(
-		fAttributeTypes->CountElements());
-	header.toc_strings_length = B_HOST_TO_BENDIAN_INT64(
-		tocOffset - cachedStringsOffset);
-	header.toc_strings_count = B_HOST_TO_BENDIAN_INT64(cachedStringsWritten);
 
 	// write the header
 	_WriteBuffer(&header, sizeof(hpkg_header), 0);
@@ -663,6 +769,79 @@ PackageWriter::_RegisterEntry(Entry* parent, const char* name,
 	}
 
 	return entry;
+}
+
+
+void
+PackageWriter::_WriteTOC(hpkg_header& header)
+{
+	// prepare the writer (zlib writer on top of a file writer)
+	off_t startOffset = fHeapEnd;
+	FDDataWriter realWriter(fFD, startOffset);
+	ZlibDataWriter zlibWriter(&realWriter);
+	fDataWriter = &zlibWriter;
+	zlibWriter.Init();
+
+	// write the sections
+	uint64 uncompressedAttributeTypesSize;
+	uint64 uncompressedStringsSize;
+	uint64 uncompressedMainSize;
+	int32 cachedStringsWritten = _WriteTOCSections(
+		uncompressedAttributeTypesSize, uncompressedStringsSize,
+		uncompressedMainSize);
+
+	// finish the writer
+	zlibWriter.Finish();
+	fHeapEnd = realWriter.Offset();
+	fDataWriter = NULL;
+
+printf("attributes types size:   %llu\n", uncompressedAttributeTypesSize);
+printf("cached strings size:     %llu\n", uncompressedStringsSize);
+printf("TOC main size:           %llu\n", uncompressedMainSize);
+	off_t endOffset = fHeapEnd;
+printf("total TOC size:          %llu (%llu)\n", endOffset - startOffset, zlibWriter.BytesWritten());
+
+	// update the header
+
+	// TOC
+	header.toc_compression = B_HOST_TO_BENDIAN_INT32(B_HPKG_COMPRESSION_ZLIB);
+	header.toc_length_compressed = B_HOST_TO_BENDIAN_INT64(
+		endOffset - startOffset);
+	header.toc_length_uncompressed = B_HOST_TO_BENDIAN_INT64(
+		zlibWriter.BytesWritten());
+
+	// TOC subsections
+	header.toc_attribute_types_length = B_HOST_TO_BENDIAN_INT64(
+		uncompressedAttributeTypesSize);
+	header.toc_attribute_types_count = B_HOST_TO_BENDIAN_INT64(
+		fAttributeTypes->CountElements());
+	header.toc_strings_length = B_HOST_TO_BENDIAN_INT64(
+		uncompressedStringsSize);
+	header.toc_strings_count = B_HOST_TO_BENDIAN_INT64(cachedStringsWritten);
+}
+
+
+int32
+PackageWriter::_WriteTOCSections(uint64& _attributeTypesSize,
+	uint64& _stringsSize, uint64& _mainSize)
+{
+	// write the attribute type abbreviations
+	uint64 attributeTypesOffset = fDataWriter->BytesWritten();
+	_WriteAttributeTypes();
+
+	// write the cached strings
+	uint64 cachedStringsOffset = fDataWriter->BytesWritten();
+	int32 cachedStringsWritten = _WriteCachedStrings();
+
+	// write the main TOC section
+	uint64 mainOffset = fDataWriter->BytesWritten();
+	_WriteAttributeChildren(fRootAttribute);
+
+	_attributeTypesSize = cachedStringsOffset - attributeTypesOffset;
+	_stringsSize = mainOffset - cachedStringsOffset;
+	_mainSize = fDataWriter->BytesWritten() - mainOffset;
+
+	return cachedStringsWritten;
 }
 
 
@@ -763,6 +942,34 @@ PackageWriter::_WriteAttributeChildren(Attribute* attribute)
 
 
 void
+PackageWriter::_WritePackageAttributes(hpkg_header& header)
+{
+	// write the package attributes
+	off_t startOffset = fHeapEnd;
+	FDDataWriter realWriter(fFD, startOffset);
+	fDataWriter = &realWriter;
+
+	_Write<uint8>(0);
+		// TODO: Write them for real!
+	fHeapEnd = realWriter.Offset();
+	fDataWriter = NULL;
+
+	off_t endOffset = fHeapEnd;
+
+printf("package attributes size: %lld\n", endOffset - startOffset);
+
+	// update the header
+	header.attributes_compression = B_HOST_TO_BENDIAN_INT32(
+		B_HPKG_COMPRESSION_NONE);
+	header.attributes_length_compressed
+		= B_HOST_TO_BENDIAN_INT32(endOffset - startOffset);
+	header.attributes_length_uncompressed
+		= header.attributes_length_compressed;
+		// TODO: Support compression!
+}
+
+
+void
 PackageWriter::_WriteAttributeValue(const AttributeValue& value, uint8 encoding)
 {
 	switch (value.type) {
@@ -815,7 +1022,7 @@ PackageWriter::_WriteAttributeValue(const AttributeValue& value, uint8 encoding)
 			if (encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP)
 				_WriteUnsignedLEB128(value.data.offset);
 			else
-				_WriteBuffer(value.data.raw, value.data.size);
+				fDataWriter->WriteDataThrows(value.data.raw, value.data.size);
 			break;
 		}
 
@@ -838,7 +1045,7 @@ PackageWriter::_WriteUnsignedLEB128(uint64 value)
 		bytes[count++] = byte | (value != 0 ? 0x80 : 0);
 	} while (value != 0);
 
-	_WriteBuffer(bytes, count);
+	fDataWriter->WriteDataThrows(bytes, count);
 }
 
 
@@ -1237,10 +1444,9 @@ PackageWriter::_WriteZlibCompressedData(DataReader& dataReader, off_t size,
 		}
 
 		// compress
-		ZlibCompressor compressor;
 		size_t compressedSize;
-		error = compressor.Compress(inputBuffer, toCopy, outputBuffer,
-			toCopy, compressedSize);
+		error = ZlibCompressor::CompressSingleBuffer(inputBuffer, toCopy,
+			outputBuffer, toCopy, compressedSize);
 
 		const void* writeBuffer;
 		size_t bytesToWrite;

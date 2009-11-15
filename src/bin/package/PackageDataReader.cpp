@@ -236,8 +236,9 @@ private:
 				return error;
 
 			size_t actuallyUncompressedSize;
-			error = ZlibDecompressor().Decompress(fReadBuffer, compressedSize,
-				fUncompressBuffer, uncompressedSize, actuallyUncompressedSize);
+			error = ZlibDecompressor::DecompressSingleBuffer(fReadBuffer,
+				compressedSize, fUncompressBuffer, uncompressedSize,
+				actuallyUncompressedSize);
 			if (error == B_OK && actuallyUncompressedSize != uncompressedSize)
 				error = B_BAD_DATA;
 		}

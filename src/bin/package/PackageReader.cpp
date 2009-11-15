@@ -14,19 +14,24 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <new>
 
 #include <ByteOrder.h>
 
 #include <haiku_package.h>
 
+#include "DataOutput.h"
 #include "PackageData.h"
 #include "PackageEntry.h"
 #include "PackageEntryAttribute.h"
+#include "ZlibDecompressor.h"
 
 
-// maximum TOC size, we support reading
+// maximum TOC size we support reading
 static const size_t kMaxTOCSize			= 64 * 1024 * 1024;
+
+static const size_t kScratchBufferSize	= 64 * 1024;
 
 
 enum {
@@ -604,7 +609,9 @@ PackageReader::PackageReader()
 	fFD(-1),
 	fTOCSection(NULL),
 	fAttributeTypes(NULL),
-	fStrings(NULL)
+	fStrings(NULL),
+	fScratchBuffer(NULL),
+	fScratchBufferSize(0)
 {
 }
 
@@ -614,6 +621,7 @@ PackageReader::~PackageReader()
 	if (fFD >= 0)
 		close(fFD);
 
+	delete[] fScratchBuffer;
 	delete[] fStrings;
 	delete[] fAttributeTypes;
 	delete[] fTOCSection;
@@ -641,7 +649,7 @@ PackageReader::Init(const char* fileName)
 
 	// read the header
 	hpkg_header header;
-	status_t error = _ReadBuffer(&header, sizeof(header), 0);
+	status_t error = _ReadBuffer(0, &header, sizeof(header));
 	if (error != B_OK)
 		return error;
 
@@ -751,6 +759,14 @@ PackageReader::Init(const char* fileName)
 		return B_UNSUPPORTED;
 	}
 
+	// allocate a scratch buffer
+	fScratchBuffer = new(std::nothrow) uint8[kScratchBufferSize];
+	if (fScratchBuffer == NULL) {
+		fprintf(stderr, "Error: Out of memory!\n");
+		return B_NO_MEMORY;
+	}
+	fScratchBufferSize = kScratchBufferSize;
+
 	// read in the complete TOC
 	fTOCSection = new(std::nothrow) uint8[fTOCUncompressedLength];
 	if (fTOCSection == NULL) {
@@ -758,7 +774,8 @@ PackageReader::Init(const char* fileName)
 		return B_NO_MEMORY;
 	}
 
-	error = _ReadBuffer(fTOCSection, fTOCUncompressedLength, fTOCSectionOffset);
+	error = _ReadCompressedBuffer(fTOCSectionOffset, fTOCSection,
+		fTOCCompressedLength, fTOCUncompressedLength, fTOCCompression);
 	if (error != B_OK)
 		return error;
 
@@ -1249,7 +1266,7 @@ PackageReader::_ReadTOCBuffer(void* buffer, size_t size)
 
 
 status_t
-PackageReader::_ReadBuffer(void* buffer, size_t size, off_t offset)
+PackageReader::_ReadBuffer(off_t offset, void* buffer, size_t size)
 {
 	ssize_t bytesRead = pread(fFD, buffer, size, offset);
 	if (bytesRead < 0) {
@@ -1264,6 +1281,59 @@ PackageReader::_ReadBuffer(void* buffer, size_t size, off_t offset)
 	}
 
 	return B_OK;
+}
+
+
+status_t
+PackageReader::_ReadCompressedBuffer(off_t offset, void* buffer,
+	size_t compressedSize, size_t uncompressedSize, uint32 compression)
+{
+	switch (compression) {
+		case B_HPKG_COMPRESSION_NONE:
+			return _ReadBuffer(offset, buffer, compressedSize);
+
+		case B_HPKG_COMPRESSION_ZLIB:
+		{
+			// init the decompressor
+			BufferDataOutput bufferOutput(buffer, uncompressedSize);
+			ZlibDecompressor decompressor(&bufferOutput);
+			status_t error = decompressor.Init();
+			if (error != B_OK)
+				return error;
+
+			while (compressedSize > 0) {
+				// read compressed buffer
+				size_t toRead = std::min(compressedSize, fScratchBufferSize);
+				error = _ReadBuffer(offset, fScratchBuffer, toRead);
+				if (error != B_OK)
+					return error;
+
+				// uncompress
+				error = decompressor.DecompressNext(fScratchBuffer, toRead);
+				if (error != B_OK)
+					return error;
+
+				compressedSize -= toRead;
+				offset += toRead;
+			}
+
+			error = decompressor.Finish();
+			if (error != B_OK)
+				return error;
+
+			// verify that all data have been read
+			if (bufferOutput.BytesWritten() != uncompressedSize) {
+				fprintf(stderr, "Error: Missing bytes in uncompressed "
+					"buffer!\n");
+				return B_BAD_DATA;
+			}
+
+			return B_OK;
+		}
+
+		default:
+			return B_BAD_DATA;
+	}
 }
 
 

@@ -104,8 +104,12 @@ private:
 									const void*& _buffer);
 			status_t			_ReadTOCBuffer(void* buffer, size_t size);
 
-			status_t			_ReadBuffer(void* buffer, size_t size,
-									off_t offset);
+			status_t			_ReadBuffer(off_t offset, void* buffer,
+									size_t size);
+			status_t			_ReadCompressedBuffer(off_t offset,
+									void* buffer, size_t compressedSize,
+									size_t uncompressedSize,
+									uint32 compression);
 
 	static	int8				_GetStandardIndex(const AttributeType* type);
 
@@ -141,6 +145,9 @@ private:
 			char**				fStrings;
 
 			AttributeHandlerList* fAttributeHandlerStack;
+
+			uint8*				fScratchBuffer;
+			size_t				fScratchBufferSize;
 };
 
 
