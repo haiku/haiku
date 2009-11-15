@@ -17,7 +17,8 @@ public:
 									{ return fCompressedSize; }
 			uint64				UncompressedSize() const
 									{ return fUncompressedSize; }
-			uint64				Offset() const			{ return fOffset; }
+			uint64				Offset() const
+									{ return fEncodedInline ? 0 : fOffset; }
 			uint32				Compression() const		{ return fCompression; }
 			uint32				ChunkSize() const		{ return fChunkSize; }
 
