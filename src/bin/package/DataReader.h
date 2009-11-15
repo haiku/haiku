@@ -30,6 +30,21 @@ private:
 };
 
 
+class AttributeDataReader : public DataReader {
+public:
+								AttributeDataReader(int fd,
+									const char* attribute, uint32 type);
+
+	virtual	status_t			ReadData(off_t offset, void* buffer,
+									size_t size);
+
+private:
+			int					fFD;
+			uint32				fType;
+			const char*			fAttribute;
+};
+
+
 class BufferDataReader : public DataReader {
 public:
 								BufferDataReader(const void* data, size_t size);

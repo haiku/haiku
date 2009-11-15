@@ -10,6 +10,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <fs_attr.h>
+
 
 // #pragma mark - DataReader
 
@@ -33,6 +35,30 @@ status_t
 FDDataReader::ReadData(off_t offset, void* buffer, size_t size)
 {
 	ssize_t bytesRead = pread(fFD, buffer, size, offset);
+	if (bytesRead < 0)
+		return errno;
+	return (size_t)bytesRead == size ? B_OK : B_ERROR;
+}
+
+
+// #pragma mark - AttributeDataReader
+
+
+AttributeDataReader::AttributeDataReader(int fd, const char* attribute,
+	uint32 type)
+	:
+	fFD(fd),
+	fType(type),
+	fAttribute(attribute)
+{
+}
+
+
+status_t
+AttributeDataReader::ReadData(off_t offset, void* buffer, size_t size)
+{
+	ssize_t bytesRead = fs_read_attr(fFD, fAttribute, fType, offset, buffer,
+		size);
 	if (bytesRead < 0)
 		return errno;
 	return (size_t)bytesRead == size ? B_OK : B_ERROR;
