@@ -12,7 +12,7 @@
 #include "Strings.h"
 
 
-class Data;
+class DataReader;
 
 
 class PackageWriter {
@@ -77,16 +77,18 @@ private:
 									const char* value);
 			Attribute*			_AddDataAttribute(const char* attributeName,
 									uint64 dataSize, uint64 dataOffset);
+			Attribute*			_AddDataAttribute(const char* attributeName,
+									uint64 dataSize, const uint8* data);
 
 			CachedString*		_GetCachedString(const char* value);
 			AttributeType*		_GetAttributeType(const char* attributeName,
 									uint8 type);
 
-			status_t			_AddData(Data& data, off_t size);
-			status_t			_WriteUncompressedData(Data& data, off_t size,
-									uint64 writeOffset);
-			status_t			_WriteZlibCompressedData(Data& data, off_t size,
-									uint64 writeOffset,
+			status_t			_AddData(DataReader& dataReader, off_t size);
+			status_t			_WriteUncompressedData(DataReader& dataReader,
+									off_t size, uint64 writeOffset);
+			status_t			_WriteZlibCompressedData(DataReader& dataReader,
+									off_t size, uint64 writeOffset,
 									uint64& _compressedSize);
 
 private:

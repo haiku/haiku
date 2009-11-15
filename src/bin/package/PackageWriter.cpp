@@ -25,6 +25,7 @@
 
 #include <haiku_package.h>
 
+#include "DataReader.h"
 #include "FDCloser.h"
 #include "Stacker.h"
 #include "ZlibCompressor.h"
@@ -32,58 +33,6 @@
 
 // minimum length of data we require before trying to zlib compress them
 static const size_t kZlibCompressionSizeThreshold = 64;
-
-
-// #pragma mark - Data interface
-
-
-struct Data {
-	virtual ~Data()
-	{
-	}
-
-	virtual ssize_t Read(void* buffer, size_t size, off_t offset) = 0;
-};
-
-
-struct FileData : public Data {
-	FileData(int fd)
-		:
-		fFD(fd)
-	{
-	}
-
-	virtual ssize_t Read(void* buffer, size_t size, off_t offset)
-	{
-		ssize_t bytesRead = pread(fFD, buffer, size, offset);
-		return bytesRead < 0 ? errno : bytesRead;
-	}
-
-private:
-	int	fFD;
-};
-
-
-struct AttributeData : public Data {
-	AttributeData(int fd, const char* attribute, uint32 type)
-		:
-		fFD(fd),
-		fAttribute(attribute)
-	{
-	}
-
-	virtual ssize_t Read(void* buffer, size_t size, off_t offset)
-	{
-		ssize_t bytesRead = fs_read_attr(fFD, fAttribute, fType, offset, buffer,
-			size);
-		return bytesRead < 0 ? errno : bytesRead;
-	}
-
-private:
-	int			fFD;
-	const char*	fAttribute;
-	uint32		fType;
-};
 
 
 // #pragma mark - Attributes
@@ -981,8 +930,8 @@ printf("PackageWriter::_AddEntry(%d, %p, \"%s\")\n", dirFD, entry, fileName);
 	if (S_ISREG(st.st_mode)) {
 		// regular file -- add data
 		if (st.st_size > 0) {
-			FileData data(fd);
-			status_t error = _AddData(data, st.st_size);
+			FDDataReader dataReader(fd);
+			status_t error = _AddData(dataReader, st.st_size);
 			if (error != B_OK)
 				throw status_t(error);
 		}
@@ -1025,8 +974,8 @@ printf("PackageWriter::_AddEntry(%d, %p, \"%s\")\n", dirFD, entry, fileName);
 				(uint32)attrInfo.type);
 
 			// add data
-			AttributeData data(fd, entry->d_name, attrInfo.type);
-			status_t error = _AddData(data, attrInfo.size);
+			AttributeDataReader dataReader(fd, entry->d_name, attrInfo.type);
+			status_t error = _AddData(dataReader, attrInfo.size);
 			if (error != B_OK)
 				throw status_t(error);
 		}
@@ -1105,6 +1054,16 @@ PackageWriter::_AddDataAttribute(const char* attributeName, uint64 dataSize,
 }
 
 
+PackageWriter::Attribute*
+PackageWriter::_AddDataAttribute(const char* attributeName, uint64 dataSize,
+	const uint8* data)
+{
+	AttributeValue attributeValue;
+	attributeValue.SetToData(dataSize, data);
+	return _AddAttribute(attributeName, attributeValue);
+}
+
+
 CachedString*
 PackageWriter::_GetCachedString(const char* value)
 {
@@ -1147,19 +1106,34 @@ PackageWriter::_GetAttributeType(const char* attributeName, uint8 type)
 
 
 status_t
-PackageWriter::_AddData(Data& data, off_t size)
+PackageWriter::_AddData(DataReader& dataReader, off_t size)
 {
+	// add short data inline
+	if (size <= B_HPKG_MAX_INLINE_DATA_SIZE) {
+		uint8 buffer[B_HPKG_MAX_INLINE_DATA_SIZE];
+		status_t error = dataReader.ReadData(0, buffer, size);
+		if (error != B_OK) {
+			fprintf(stderr, "Error: Failed to read data: %s\n",
+				strerror(error));
+			return error;
+		}
+
+		_AddDataAttribute(B_HPKG_ATTRIBUTE_NAME_DATA, size, buffer);
+		return B_OK;
+	}
+
+	// longer data -- try to compress
 	uint64 dataOffset = fHeapEnd;
 
 	uint64 compression = B_HPKG_COMPRESSION_NONE;
 	uint64 compressedSize;
 
-	status_t error = _WriteZlibCompressedData(data, size, dataOffset,
+	status_t error = _WriteZlibCompressedData(dataReader, size, dataOffset,
 		compressedSize);
 	if (error == B_OK) {
 		compression = B_HPKG_COMPRESSION_ZLIB;
 	} else {
-		error = _WriteUncompressedData(data, size, dataOffset);
+		error = _WriteUncompressedData(dataReader, size, dataOffset);
 		compressedSize = size;
 	}
 	if (error != B_OK)
@@ -1176,17 +1150,15 @@ PackageWriter::_AddData(Data& data, off_t size)
 	if (compression != B_HPKG_COMPRESSION_NONE) {
 		_AddAttribute(B_HPKG_ATTRIBUTE_NAME_DATA_COMPRESSION, compression);
 		_AddAttribute(B_HPKG_ATTRIBUTE_NAME_DATA_SIZE, (uint64)size);
-		// uncompressed size
+			// uncompressed size
 	}
-
-	// TODO: Support inline data!
 
 	return B_OK;
 }
 
 
 status_t
-PackageWriter::_WriteUncompressedData(Data& data, off_t size,
+PackageWriter::_WriteUncompressedData(DataReader& dataReader, off_t size,
 	uint64 writeOffset)
 {
 	// copy the data to the heap
@@ -1195,32 +1167,28 @@ PackageWriter::_WriteUncompressedData(Data& data, off_t size,
 	while (remainingSize > 0) {
 		// read data
 		size_t toCopy = std::min(remainingSize, (off_t)fDataBufferSize);
-		ssize_t bytesRead = data.Read(fDataBuffer, toCopy, readOffset);
-		if (bytesRead < 0) {
+		status_t error = dataReader.ReadData(readOffset, fDataBuffer, toCopy);
+		if (error != B_OK) {
 			fprintf(stderr, "Error: Failed to read data: %s\n",
-				strerror(errno));
-			return errno;
-		}
-		if ((size_t)bytesRead != toCopy) {
-			fprintf(stderr, "Error: Failed to read all data\n");
-			return B_ERROR;
+				strerror(error));
+			return error;
 		}
 
 		// write to heap
-		ssize_t bytesWritten = pwrite(fFD, fDataBuffer, bytesRead, writeOffset);
+		ssize_t bytesWritten = pwrite(fFD, fDataBuffer, toCopy, writeOffset);
 		if (bytesWritten < 0) {
 			fprintf(stderr, "Error: Failed to write data: %s\n",
 				strerror(errno));
 			return errno;
 		}
-		if (bytesWritten != bytesRead) {
+		if ((size_t)bytesWritten != toCopy) {
 			fprintf(stderr, "Error: Failed to write all data\n");
 			return B_ERROR;
 		}
 
-		remainingSize -= bytesRead;
-		readOffset += bytesRead;
-		writeOffset += bytesRead;
+		remainingSize -= toCopy;
+		readOffset += toCopy;
+		writeOffset += toCopy;
 	}
 
 	return B_OK;
@@ -1228,7 +1196,7 @@ PackageWriter::_WriteUncompressedData(Data& data, off_t size,
 
 
 status_t
-PackageWriter::_WriteZlibCompressedData(Data& data, off_t size,
+PackageWriter::_WriteZlibCompressedData(DataReader& dataReader, off_t size,
 	uint64 writeOffset, uint64& _compressedSize)
 {
 	// Use zlib compression only for data large enough.
@@ -1261,22 +1229,18 @@ PackageWriter::_WriteZlibCompressedData(Data& data, off_t size,
 	while (remainingSize > 0) {
 		// read data
 		size_t toCopy = std::min(remainingSize, (off_t)chunkSize);
-		ssize_t bytesRead = data.Read(inputBuffer, toCopy, readOffset);
-		if (bytesRead < 0) {
+		status_t error = dataReader.ReadData(readOffset, inputBuffer, toCopy);
+		if (error != B_OK) {
 			fprintf(stderr, "Error: Failed to read data: %s\n",
-				strerror(errno));
-			return errno;
-		}
-		if ((size_t)bytesRead != toCopy) {
-			fprintf(stderr, "Error: Failed to read all data\n");
-			return B_ERROR;
+				strerror(error));
+			return error;
 		}
 
 		// compress
 		ZlibCompressor compressor;
 		size_t compressedSize;
-		status_t error = compressor.Compress(inputBuffer, bytesRead,
-			outputBuffer, bytesRead, compressedSize);
+		error = compressor.Compress(inputBuffer, toCopy, outputBuffer,
+			toCopy, compressedSize);
 
 		const void* writeBuffer;
 		size_t bytesToWrite;
@@ -1287,7 +1251,7 @@ PackageWriter::_WriteZlibCompressedData(Data& data, off_t size,
 			if (error != B_BUFFER_OVERFLOW)
 				return error;
 			writeBuffer = inputBuffer;
-			bytesToWrite = bytesRead;
+			bytesToWrite = toCopy;
 		}
 
 		// check the total compressed data size
@@ -1310,8 +1274,8 @@ PackageWriter::_WriteZlibCompressedData(Data& data, off_t size,
 			return B_ERROR;
 		}
 
-		remainingSize -= bytesRead;
-		readOffset += bytesRead;
+		remainingSize -= toCopy;
+		readOffset += toCopy;
 		writeOffset += bytesToWrite;
 		chunkIndex++;
 	}
