@@ -16,6 +16,7 @@ class FormatView;
 class LocaleWindow : public BWindow {
 public:
 							LocaleWindow();
+							~LocaleWindow();
 
 	virtual	void			MessageReceived(BMessage* message);
 	virtual	void			FrameMoved(BPoint newPosition);
@@ -25,6 +26,7 @@ private:
 			BListView*		fLanguageListView;
 			BListView*		fPreferredListView;
 			FormatView*		fFormatView;
+			BMessage*		fMsgPrefLanguagesChanged;
 };
 
 #endif	// LOCALE_WINDOW_H

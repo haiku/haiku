@@ -54,12 +54,25 @@ class LanguageListItem: public BStringItem
 };
 
 
+static int
+compare_list_items(const void* _a, const void* _b)
+{
+	LanguageListItem* a = *(LanguageListItem**)_a;
+	LanguageListItem* b = *(LanguageListItem**)_b;
+	return strcasecmp(a->Text(), b->Text());
+}
+
+
 class LanguageListView: public BListView
 {
 	public:
 		LanguageListView(const char* name, list_view_type type)
-			: BListView(name, type)
+			:
+			BListView(name, type),
+			fMsgPrefLanguagesChanged(new BMessage(kMsgPrefLanguagesChanged))
 		{}
+
+		~LanguageListView() { delete fMsgPrefLanguagesChanged; }
 
 		bool InitiateDrag(BPoint point, int32 index, bool wasSelected);
 		void MouseMoved(BPoint where, uint32 transit, const BMessage* msg);
@@ -107,11 +120,12 @@ class LanguageListView: public BListView
 						fDropIndex = -1;
 					}
 				}
-				Invoke(new BMessage(kMsgPrefLanguagesChanged));
+				Invoke(fMsgPrefLanguagesChanged);
 			} else BListView::MessageReceived(message);
 		}
 	private:
-		int32 fDropIndex;
+		int32		fDropIndex;
+		BMessage*	fMsgPrefLanguagesChanged;
 };
 
 
@@ -299,7 +313,8 @@ LocaleWindow::LocaleWindow()
 	:
 	BWindow(BRect(0, 0, 0, 0), "Locale", B_TITLED_WINDOW, B_NOT_RESIZABLE
 		| B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
-		| B_QUIT_ON_WINDOW_CLOSE)
+		| B_QUIT_ON_WINDOW_CLOSE),
+	fMsgPrefLanguagesChanged(new BMessage(kMsgPrefLanguagesChanged))
 {
 	BCountry* defaultCountry;
 	be_locale_roster->GetDefaultCountry(&defaultCountry);
@@ -346,6 +361,9 @@ LocaleWindow::LocaleWindow()
 					= new LanguageListItem(str, currentLanguage.String());
 				fLanguageListView->AddItem(si);
 			}
+
+			fLanguageListView->SortItems(compare_list_items);
+				// see previous comment on sort using collators
 
 		} else {
 			BAlert* myAlert = new BAlert("Error",
@@ -461,6 +479,12 @@ LocaleWindow::LocaleWindow()
 }
 
 
+LocaleWindow::~LocaleWindow()
+{
+	delete fMsgPrefLanguagesChanged;
+}
+
+
 void
 LocaleWindow::MessageReceived(BMessage* message)
 {
@@ -496,9 +520,9 @@ LocaleWindow::MessageReceived(BMessage* message)
 			BListView* countryList = static_cast<BListView*>(ptr);
 			LanguageListItem* lli = static_cast<LanguageListItem*>
 				(countryList->ItemAt(countryList->CurrentSelection()));
-			BMessage* newMessage = new BMessage(kMsgSettingsChanged);
-			newMessage->AddString("country",lli->LanguageCode());
-			be_app_messenger.SendMessage(newMessage);
+			BMessage newMessage(kMsgSettingsChanged);
+			newMessage.AddString("country",lli->LanguageCode());
+			be_app_messenger.SendMessage(&newMessage);
 
 			BCountry* country = new BCountry(lli->LanguageCode());
 			fFormatView->SetCountry(country);
@@ -514,7 +538,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 						(fLanguageListView->RemoveItem(index));
 				fPreferredListView->AddItem(listItem);
 				fPreferredListView
-					->Invoke(new BMessage(kMsgPrefLanguagesChanged));
+					->Invoke(fMsgPrefLanguagesChanged);
 			}
 			break;
 		}
@@ -530,8 +554,10 @@ LocaleWindow::MessageReceived(BMessage* message)
 					= static_cast<LanguageListItem*>
 						(fPreferredListView->RemoveItem(index));
 				fLanguageListView->AddItem(listItem);
+				fLanguageListView->SortItems(compare_list_items);
+					// see previous comment on sort using collators
 				fPreferredListView
-					->Invoke(new BMessage(kMsgPrefLanguagesChanged));
+					->Invoke(fMsgPrefLanguagesChanged);
 			}
 			break;
 		}
