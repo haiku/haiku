@@ -4,26 +4,26 @@
  */
 
 
-#include "ZlibCompressor.h"
+#include "ZlibDecompressor.h"
 
 #include <errno.h>
 
 #include <zlib.h>
 
 
-ZlibCompressor::ZlibCompressor()
+ZlibDecompressor::ZlibDecompressor()
 {
 }
 
 
-ZlibCompressor::~ZlibCompressor()
+ZlibDecompressor::~ZlibDecompressor()
 {
 }
 
 
 status_t
-ZlibCompressor::Compress(const void* input, size_t inputSize, void* output,
-	size_t outputSize, size_t& _compressedSize)
+ZlibDecompressor::Decompress(const void* input, size_t inputSize, void* output,
+	size_t outputSize, size_t& _uncompressedSize)
 {
 	if (inputSize == 0 || outputSize == 0)
 		return B_BAD_VALUE;
@@ -46,13 +46,14 @@ ZlibCompressor::Compress(const void* input, size_t inputSize, void* output,
 		0							// reserved
 	};
 
-	int zlibError = deflateInit(&zStream, Z_BEST_COMPRESSION);
+	int zlibError = inflateInit(&zStream);
 	if (zlibError != Z_OK)
 		return TranslateZlibError(zlibError);
 
+
 	// deflate
 	status_t error = B_OK;
-	zlibError = deflate(&zStream, Z_FINISH);
+	zlibError = inflate(&zStream, Z_FINISH);
 	if (zlibError != Z_STREAM_END) {
 		if (zlibError == Z_OK)
 			error = B_BUFFER_OVERFLOW;
@@ -61,13 +62,13 @@ ZlibCompressor::Compress(const void* input, size_t inputSize, void* output,
 	}
 
 	// clean up
-	zlibError = deflateEnd(&zStream);
+	zlibError = inflateEnd(&zStream);
 	if (zlibError != Z_OK && error == B_OK)
 		error = TranslateZlibError(zlibError);
 
 	if (error != B_OK)
 		return error;
 
-	_compressedSize = zStream.total_out;
+	_uncompressedSize = zStream.total_out;
 	return B_OK;
 }
