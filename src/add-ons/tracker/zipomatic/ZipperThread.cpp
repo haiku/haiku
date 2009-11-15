@@ -15,7 +15,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <FindDirectory.h> 
+#include <Catalog.h>
+#include <FindDirectory.h>
+#include <Locale.h>
 #include <Locker.h>
 #include <Message.h>
 #include <Path.h>
@@ -23,6 +25,9 @@
 
 #include "ZipOMaticMisc.h"
 #include "ZipOMaticWindow.h"
+
+
+#define TR_CONTEXT "file:ZipperThread.cpp"
 
 
 ZipperThread::ZipperThread(BMessage* refsMessage, BWindow* window)
@@ -107,7 +112,7 @@ ZipperThread::ThreadStartup()
 	BString archiveName;
 
 	if (refCount > 1)
-		archiveName = "Archive";
+		archiveName = TR("Archive");
 	else
 		archiveName = lastRef.name;
 
@@ -165,7 +170,7 @@ ZipperThread::ThreadStartup()
 	_SendMessageToWindow(ZIPPO_TASK_DESCRIPTION, "archive_filename",
 		archiveName.String());
 	_SendMessageToWindow(ZIPPO_LINE_OF_STDOUT, "zip_output",
-		"Preparing to archive");
+		TR("Preparing to archive"));
 
 	return B_OK;
 }

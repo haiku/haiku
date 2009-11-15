@@ -17,6 +17,9 @@
 #include "ZipOMaticWindow.h"
 
 
+#define TR_CONTEXT "file:ZipOMatic.cpp"
+
+
 int
 main()
 {
@@ -33,6 +36,7 @@ ZipOMatic::ZipOMatic()
 	fGotRefs(false),
 	fInvoker(new BInvoker(new BMessage(ZIPPO_QUIT_OR_CONTINUE), NULL, this))
 {
+	be_locale->GetAppCatalog(&fCatalog);
 }
 
 
@@ -149,11 +153,15 @@ ZipOMatic::QuitRequested(void)
 		// in that zippers are not paused while the BAlert is up.
 
 		BString question;
-		question << "You have " << zippoCount;
-		question << " Zip-O-Matic running.\n\nDo you want to stop them?";
+		question << TR("You have %ld Zip-O-Matic running.\n\n");
+		question << TR("Do you want to stop them?");
+		
+		BString temp;
+		temp << zippoCount;
+		question.ReplaceFirst("%ld", temp.String());
 
-		BAlert* alert = new BAlert("Stop or Continue", question.String(),
-			"Stop them", "Let them continue", NULL, B_WIDTH_AS_USUAL,
+		BAlert* alert = new BAlert(NULL, question.String(),
+			TR("Stop them"), TR("Let them continue"), NULL, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
 		alert->Go(fInvoker);
 		alert->Activate();

@@ -9,6 +9,17 @@ Application ZipOMatic-Z :
 	ZipOMaticWindow.cpp
 	ZipperThread.cpp
 
-	: be tracker $(TARGET_LIBSUPC++)
+	: be tracker $(TARGET_LIBSUPC++) liblocale.so
 	: ZipOMatic.rdef
 ;
+
+DoCatalogs ZipOMatic-Z :
+	x-vnd.haiku.zip-o-matic
+	:
+	ZipOMatic.cpp
+	ZipOMaticWindow.cpp
+	ZipperThread.cpp
+	: en.catalog
+	: sv.catkeys
+	;
+

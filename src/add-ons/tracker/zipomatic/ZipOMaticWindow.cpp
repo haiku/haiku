@@ -14,11 +14,13 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <GroupLayout.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <Path.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -29,6 +31,9 @@
 #include "ZipOMaticActivity.h"
 #include "ZipOMaticMisc.h"
 #include "ZipperThread.h"
+
+
+#define TR_CONTEXT "file:ZipOMaticWindow.cpp"
 
 
 ZippoWindow::ZippoWindow(BList windowList, bool keepOpen)
@@ -50,11 +55,11 @@ ZippoWindow::ZippoWindow(BList windowList, bool keepOpen)
 	fArchiveNameView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 
-	fZipOutputView = new BStringView("output_text", "Drop files to zip.");
+	fZipOutputView = new BStringView("output_text", TR("Drop files to zip."));
 	fZipOutputView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 
-	fStopButton = new BButton("stop", "Stop", new BMessage(B_QUIT_REQUESTED));
+	fStopButton = new BButton("stop", TR("Stop"), new BMessage(B_QUIT_REQUESTED));
 	fStopButton->SetEnabled(false);
 	fStopButton->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
 		B_ALIGN_VERTICAL_UNSET));
@@ -102,9 +107,9 @@ ZippoWindow::MessageReceived(BMessage* message)
 			fStopButton->SetEnabled(false);
 			fArchiveNameView->SetText(" ");
 			if (fZippingWasStopped)
-				fZipOutputView->SetText("Stopped");
+				fZipOutputView->SetText(TR("Stopped"));
 			else
-				fZipOutputView->SetText("Archive created OK");
+				fZipOutputView->SetText(TR("Archive created OK"));
 				
 			_CloseWindowOrKeepOpen();
 			break;
@@ -115,16 +120,17 @@ ZippoWindow::MessageReceived(BMessage* message)
 			fActivityView->Stop();
 			fStopButton->SetEnabled(false);
 			fArchiveNameView->SetText("");
-			fZipOutputView->SetText("Error creating archive");
+			fZipOutputView->SetText(TR("Error creating archive"));
 			break;
 						
 		case ZIPPO_TASK_DESCRIPTION:
 		{
-			BString string;
-			if (message->FindString("archive_filename", &string) == B_OK) {
-				fArchiveName = string;
-				string.Prepend("Creating archive: ");
-				fArchiveNameView->SetText(string.String());
+			BString filename;
+			if (message->FindString("archive_filename", &filename) == B_OK) {
+				fArchiveName = filename;
+				BString temp(TR("Creating archive: %s"));
+				temp.ReplaceFirst("%s", filename.String());
+				fArchiveNameView->SetText(temp.String());
 			}
 			break;
 		}
@@ -133,8 +139,7 @@ ZippoWindow::MessageReceived(BMessage* message)
 		{
 			BString string;
 			if (message->FindString("zip_output", &string) == B_OK) {
-				if (string.FindFirst("Adding: ") == 0
-					|| string.FindFirst("Updating: ") == 0) {
+				if (string.FindFirst("Adding: ") == 0) {
 
 					// This is a workaround for the current window resizing
 					// behavior as the window resizes for each line of output.
@@ -143,22 +148,19 @@ ZippoWindow::MessageReceived(BMessage* message)
 					// being created (added to) or if we're updating an 
 					// already existing archive.
 
+					BString output;
 					fFileCount++;
-					BString countString;
-					countString << fFileCount;
+					BString count;
+					count << fFileCount;
 
-					if (fFileCount == 1)
-						countString << " file";
-					else
-						countString << " files";
+					if (fFileCount == 1) {
+						output << TR("1 file added.");
+					} else {
+						output << TR("%ld files added.");
+						output.ReplaceFirst("%ld", count.String());
+					}
 
-					if (string.FindFirst("Adding: ") == 0)
-						countString << " added.";
-
-					if (string.FindFirst("Updating: ") == 0)
-						countString << " updated.";
-
-					fZipOutputView->SetText(countString.String());
+					fZipOutputView->SetText(output.String());
 				} else {
 					fZipOutputView->SetText(string.String());
 				}
@@ -202,11 +204,14 @@ ZippoWindow::QuitRequested()
 		fActivityView->Pause();
 
 		BString message;
-		message << "Are you sure you want to stop creating this archive?\n\n";
-		message << "Filename: " << fArchiveName.String() << "\n";
+		message << TR("Are you sure you want to stop creating this archive?");
+		message << "\n\n";
+		message << TR("Filename: %s");
+		message << "\n";
+		message.ReplaceFirst("%s", fArchiveName.String());
 
-		BAlert* alert = new BAlert(NULL, message.String(), "Stop",
-			"Continue", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert(NULL, message.String(), TR("Stop"),
+			TR("Continue"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go(fWindowInvoker);
 
 		return false;
@@ -244,7 +249,7 @@ ZippoWindow::StopZipping()
 	fThread = NULL;
 
 	fArchiveNameView->SetText(" ");
-	fZipOutputView->SetText("Stopped");
+	fZipOutputView->SetText(TR("Stopped"));
 
 	_CloseWindowOrKeepOpen();
 }

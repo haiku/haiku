@@ -3,7 +3,9 @@
 
 
 #include <Application.h>
+#include <Catalog.h>
 #include <Invoker.h>
+#include <Locale.h>
 #include <Message.h>
 
 
@@ -26,6 +28,8 @@ private:
 
 			bool			fGotRefs;
 			BInvoker*		fInvoker;
+							
+			BCatalog		fCatalog;
 };
 
 #endif // _ZIPOMATIC_H_
