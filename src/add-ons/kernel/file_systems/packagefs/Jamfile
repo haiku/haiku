@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems packagefs ;
+
+
+KernelAddon packagefs
+	:
+	kernel_interface.cpp
+
+	: $(HAIKU_STATIC_LIBSUPC++)
+;
