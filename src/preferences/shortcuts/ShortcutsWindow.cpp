@@ -6,39 +6,37 @@
  *		Jeremy Friesner
  *		Fredrik Modéen
  */
- 
+
 
 #include "ShortcutsWindow.h"
-
 
 #include <math.h>
 #include <stdio.h>
 
-
 #include <Alert.h>
 #include <Application.h>
 #include <Clipboard.h>
-#include <MessageFilter.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <Input.h>
 #include <Menu.h>
-#include <MenuItem.h>
 #include <MenuBar.h>
+#include <MenuItem.h>
+#include <MessageFilter.h>
+#include <Path.h>
+#include <PopUpMenu.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
 #include <String.h>
-#include <Input.h>
-#include <PopUpMenu.h>
-#include <File.h>
-#include <Path.h>
-#include <FindDirectory.h>
 
 #include "ColumnListView.h"
 
-
 #include "KeyInfos.h"
-#include "ShortcutsSpec.h"
-#include "ParseCommandLine.h"
 #include "MetaKeyStateMap.h"
+#include "ParseCommandLine.h"
 #include "ShortcutsFilterConstants.h"
+#include "ShortcutsSpec.h"
+
 
 // Window sizing constraints
 #define MIN_WIDTH	600
@@ -71,6 +69,7 @@ static BPopUpMenu* CreateMetaPopUp(int col)
 	
 	return popup;
 }
+
 
 // Creates a pop-up that allows the user to choose a key-cap visually
 static BPopUpMenu* CreateKeysPopUp();
@@ -113,7 +112,8 @@ ShortcutsWindow::ShortcutsWindow()
 	fileMenu->AddItem(new BMenuItem("Save KeySet As...", 
 		new BMessage(SAVE_KEYSET_AS), 'S'));
 	fileMenu->AddItem(new BSeparatorItem);
-	fileMenu->AddItem(new BMenuItem("About Shortcuts", new BMessage(B_ABOUT_REQUESTED)));
+	fileMenu->AddItem(new BMenuItem("About Shortcuts",
+		new BMessage(B_ABOUT_REQUESTED)));
 	fileMenu->AddItem(new BSeparatorItem);
 	fileMenu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 
 		'Q'));
@@ -257,7 +257,7 @@ ShortcutsWindow::QuitRequested()
 	}
 
 	if (ret)
-		fColumnListView->DeselectAll(); // avoid mysterious crash on PPC!?
+		fColumnListView->DeselectAll();
 	return ret;
 }
 
@@ -720,3 +720,4 @@ ShortcutsWindow::DispatchMessage(BMessage* msg, BHandler* handler)
 		break;
 	}
 }
+

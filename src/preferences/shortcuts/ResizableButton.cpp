@@ -9,10 +9,11 @@
  
 #include "ResizableButton.h"
 
+
 ResizableButton::ResizableButton(BRect parentFrame, BRect frame, 
-	const char* name, const char* label, BMessage* msg)
+	const char* name, const char* label, BMessage* message)
 	:
-	BButton(frame, name, label, msg, B_FOLLOW_BOTTOM)
+	BButton(frame, name, label, message, B_FOLLOW_BOTTOM)
 {
 	float width = parentFrame.right - parentFrame.left;
 	float height = parentFrame.bottom - parentFrame.top;
@@ -33,3 +34,4 @@ ResizableButton::ChangeToNewSize(float newWidth, float newHeight)
 	ResizeTo(newW, b.bottom - b.top); 
 	Invalidate();
 }
+

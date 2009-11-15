@@ -6,19 +6,21 @@
  *		Jeremy Friesner
  *		Fredrik	Modéen
  */
-
-
 #ifndef ShortcutsApp_h
 #define ShortcutsApp_h
 
+
 #include <Application.h>
+
 
 class ShortcutsApp : public BApplication {
 public:
-						ShortcutsApp();
-						~ShortcutsApp();
-	virtual void 		ReadyToRun();
-	virtual	void		AboutRequested();
+							ShortcutsApp();
+							~ShortcutsApp();
+	virtual	void			ReadyToRun();
+	virtual	void			AboutRequested();
 };
 
+
 #endif
+

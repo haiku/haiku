@@ -9,28 +9,27 @@
 
 #include "ShortcutsSpec.h"
 
-
 #include <ctype.h>
 #include <stdio.h>
 
+#include <Beep.h>
+#include <Directory.h>
+#include <NodeInfo.h>
+#include <Path.h>
 #include <Region.h>
 #include <Window.h>
-#include <Directory.h>
-#include <Path.h>
-#include <NodeInfo.h>
-#include <Beep.h>
-
 
 #include "ColumnListView.h"
 
-
-#include "Colors.h"
-#include "MetaKeyStateMap.h"
 #include "BitFieldTesters.h"
+#include "Colors.h"
 #include "CommandActuators.h"
+#include "MetaKeyStateMap.h"
 #include "ParseCommandLine.h"
 
+
 #define CLASS "ShortcutsSpec : "
+
 
 const float _height = 20.0f;		
 
@@ -41,6 +40,7 @@ static bool _fontCached = false;
 static BFont _viewFont;
 static float _fontHeight;
 static BBitmap * _actuatorBitmaps[2];
+
 
 // These meta-keys are pretty standard
 #define SHIFT_NAME		"Shift"
@@ -58,9 +58,11 @@ static BBitmap * _actuatorBitmaps[2];
 #define ICON_BITMAP_RECT BRect(0.0f, 0.0f, 15.0f, 15.0f)
 #define ICON_BITMAP_SPACE B_COLOR_8_BIT
 
+
 // Returns the (pos)'th char in the string, or '\0' if (pos) if off the end of
 // the string
 static char GetLetterAt(const char* str, int pos);
+
 
 static char 
 GetLetterAt(const char* str, int pos)
@@ -281,16 +283,16 @@ static bool IsValidActuatorName(const char* c);
 static bool
 IsValidActuatorName(const char* c)
 {
-	return ((strcmp(c, "InsertString")	== 0) ||
-			(strcmp(c, "MoveMouse")		== 0) ||
-			(strcmp(c, "MoveMouseTo")	== 0) ||
-			(strcmp(c, "MouseButton")	== 0) ||
-			(strcmp(c, "LaunchHandler")	== 0) ||	// new for v1.21 --jaf
-			(strcmp(c, "Multi")			== 0) ||	// new for v1.24 --jaf
-			(strcmp(c, "MouseDown")		== 0) ||	// new for v1.24 --jaf
-			(strcmp(c, "MouseUp")		== 0) ||	// new for v1.24 --jaf
-			(strcmp(c, "SendMessage")	== 0) ||	// new for v1.25 --jaf
-			(strcmp(c, "Beep")			== 0));
+	return (strcmp(c, "InsertString") == 0
+		|| strcmp(c, "MoveMouse") == 0
+		|| strcmp(c, "MoveMouseTo")	== 0
+		|| strcmp(c, "MouseButton")	== 0
+		|| strcmp(c, "LaunchHandler") == 0
+		|| strcmp(c, "Multi") == 0
+		|| strcmp(c, "MouseDown") == 0
+		|| strcmp(c, "MouseUp")	== 0
+		|| strcmp(c, "SendMessage")	== 0
+		|| strcmp(c, "Beep") == 0);
 }
 
 
@@ -300,7 +302,7 @@ ShortcutsSpec::Instantiate(BMessage* from)
 	bool validateOK = false;
 	if (validate_instantiation(from, "ShortcutsSpec")) 
 		validateOK = true; 
-	else //test the old one.
+	else // test the old one.
 		if (validate_instantiation(from, "SpicyKeysSpec")) 
 			validateOK = true;
 
@@ -362,7 +364,8 @@ ShortcutsSpec::DrawItemColumn(BView* owner, BRect item_column_rect,
 		point.Set(item_column_rect.left + STRING_COLUMN_LEFT_MARGIN, 
 			item_column_rect.top + fTextOffset);
 		
-		item_column_rect.left = point.x;//keep text from drawing into icon area
+		item_column_rect.left = point.x;
+			// keep text from drawing into icon area
 
 		// scroll if too wide
 		float rectWidth = item_column_rect.Width() - STRING_COLUMN_LEFT_MARGIN;
@@ -668,7 +671,7 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 				case B_BACKSPACE: 
 				case B_DELETE:
 					if (fCommandNul > 0) {
-						//trim a char off the string
+						// trim a char off the string
 						fCommand[fCommandNul - 1] = '\0';
 						fCommandNul--;	// note new nul position
 						ret = true;
@@ -745,7 +748,8 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 							letter = toupper(letter); // convert to upper case
 						
 						if ((letter == B_BACKSPACE) || (letter == B_DELETE))
-							letter = '(';//so space bar will blank out an entry
+							letter = '(';
+								// so space bar will blank out an entry
 						
 						for (int i = 0; i < numStates; i++) {
 							const char* desc = map->GetNthStateDesc(i);
@@ -774,8 +778,8 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 
 
 int
-ShortcutsSpec::MyCompare(const CLVListItem* a_Item1, const CLVListItem* a_Item2
-	, int32 KeyColumn)
+ShortcutsSpec::MyCompare(const CLVListItem* a_Item1, const CLVListItem* a_Item2,
+	int32 KeyColumn)
 {
 	ShortcutsSpec* left = (ShortcutsSpec*) a_Item1;
 	ShortcutsSpec* right = (ShortcutsSpec*) a_Item2;
@@ -836,3 +840,4 @@ ShortcutsSpec::_UpdateIconBitmap()
 		}
 	}
 }
+

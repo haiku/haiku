@@ -5,26 +5,23 @@
  * Authors:
  *		Jeremy Friesner
  */
-
-
 #ifndef ShortcutsWindow_h
 #define ShortcutsWindow_h
 
-#include <Message.h>
-#include <Window.h>
-#include <Point.h>
+
 #include <Entry.h>
 #include <FilePanel.h>
-
+#include <Message.h>
+#include <Point.h>
+#include <Window.h>
 
 #include "ColumnListView.h"
 #include "ResizableButton.h"
 
+
 // This class defines our preferences/configuration window.
 class ShortcutsWindow : public BWindow {
 public:
-// If (optSaveTo) is non-NULL, settings will be loaded from the file it 
-// represents.
 							ShortcutsWindow();
 							~ShortcutsWindow();
 
@@ -81,4 +78,6 @@ private:
 			bool 				fLastOpenWasAppend;
 };
 
+
 #endif
+

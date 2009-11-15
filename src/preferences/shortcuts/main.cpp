@@ -7,12 +7,14 @@
  */
 
 
-#include "ShortcutsApp.h"
 #include "KeyInfos.h"
+#include "ShortcutsApp.h"
+
 
 int main(int argc, char** argv)
 {
 	InitKeyIndices();
-	(new ShortcutsApp)->Run();
-	delete be_app;
+	ShortcutsApp app;
+	app.Run();
 }
+

@@ -7,15 +7,16 @@
  *		Fredrik Modéen
  */
  
+
 #include "ShortcutsApp.h"
 
-
-#include "Alert.h"
-
+#include <Alert.h>
 
 #include "ShortcutsWindow.h"
 
-#define APPLICATION_SIGNATURE "application/x-vnd.ShortcutsKeys"
+
+#define APPLICATION_SIGNATURE "application/x-vnd.Haiku-Shortcuts"
+
 
 ShortcutsApp::ShortcutsApp()
 	:
@@ -34,7 +35,6 @@ ShortcutsApp::ReadyToRun()
 
 ShortcutsApp::~ShortcutsApp()
 { 
-
 }
 
 
@@ -42,7 +42,8 @@ void
 ShortcutsApp::AboutRequested()
 {
 	BAlert* alert = new BAlert("About Shortcuts", 
-		"Shortcuts v1.28(SpicyKeys v1.28)\nby Jeremy Friesner"
-		, "Ok");
+		"Shortcuts\n\n"
+		"Based on SpicyKeys for BeOS made by Jeremy Friesner.", "Ok");
 	alert->Go();
 }
+

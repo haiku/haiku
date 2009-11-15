@@ -5,26 +5,24 @@
  * Authors:
  *		Jeremy Friesner
  */
-
-
 #ifndef ResizableButton_h
 #define ResizableButton_h
 
-#include <Message.h>
-#include <Rect.h>
-#include <View.h>
+
 #include <Button.h>
 
-//Just like a regular BButton, but with a handy resize method added
+
 class ResizableButton : public BButton {
 public:
-						ResizableButton(BRect parentFrame, BRect frame, 
-							const char* name, const char* label, 
-							BMessage* msg);
+							ResizableButton(BRect parentFrame, BRect frame, 
+								const char* name, const char* label, 
+								BMessage* message);
 
-	virtual	void		ChangeToNewSize(float newWidth, float newHeight);
+	virtual	void			ChangeToNewSize(float newWidth, float newHeight);
 private:
-			BRect 		fPercentages;
+			BRect			fPercentages;
 };
 
+
 #endif
+

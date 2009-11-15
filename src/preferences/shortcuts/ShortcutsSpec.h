@@ -5,22 +5,23 @@
  * Authors:
  *		Jeremy Friesner
  */
-
-
 #ifndef ShortcutsSpec_h
 #define ShortcutsSpec_h
 
-#include <Bitmap.h>
 
+#include <Bitmap.h>
 
 #include "CLVListItem.h"
 #include "KeyInfos.h"
 
+
 class CommandActuator;
 class MetaKeyStateMap;
 
+
 MetaKeyStateMap & GetNthKeyMap(int which);
 void InitializeMetaMaps();
+
 
 /* Objects of this class represent one hotkey "entry" in the preferences 
  * ListView. Each ShortcutsSpec contains the info necessary to generate both 
@@ -41,7 +42,9 @@ public:
 	const 	char* 			GetCellText(int whichColumn) const;
 			void			SetCommand(const char* commandStr);
 			
-	virtual	void			DrawItemColumn(BView* owner, BRect item_column_rect, int32 column_index, bool columnSelected, bool complete);
+	virtual	void			DrawItemColumn(BView* owner, BRect item_column_rect,
+								int32 column_index, bool columnSelected,
+								bool complete);
 	
 	static	int				MyCompare(const CLVListItem* a_Item1, 
 								const CLVListItem* a_Item2, int32 KeyColumn);
@@ -97,8 +100,9 @@ private:
 			BPoint			fCursorPt1;
 			BPoint			fCursorPt2;
 			bool			fCursorPtsValid;
-			mutable char 	fScratch[50];
+	mutable	char			fScratch[50];
 			int32			fSelectedColumn;
 };
 
 #endif
+

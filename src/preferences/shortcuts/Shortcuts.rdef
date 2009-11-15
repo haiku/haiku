@@ -1,0 +1,19 @@
+
+resource app_signature "application/x-vnd.Haiku-Shortcuts";
+
+resource app_flags B_SINGLE_LAUNCH;
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 2,
+	internal = 0,
+
+	short_info = "Shortcuts",
+	long_info  = "Shortcuts ©1999-2009 Jeremy Friesner ©2009 Haiku Inc."
+};
+
