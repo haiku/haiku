@@ -86,7 +86,7 @@ private:
 									int& videoHeight) const;
 			int					_CurrentVideoSizeInPercent() const;
 			void				_ResizeWindow(int percent,
-									bool keepWidth = false,
+									bool useNoVideoWidth = false,
 									bool stayOnScreen = false);
 			void				_ResizeVideoView(int x, int y, int width,
 									int height);
@@ -142,9 +142,9 @@ private:
 			PlaylistObserver*	fPlaylistObserver;
 			Controller*			fController;
 			ControllerObserver*	fControllerObserver;
-			volatile bool		fIsFullscreen;
-			volatile bool		fAlwaysOnTop;
-			volatile bool		fNoInterface;
+	volatile bool				fIsFullscreen;
+	volatile bool				fAlwaysOnTop;
+	volatile bool				fNoInterface;
 			int					fSourceWidth;
 			int					fSourceHeight;
 			int					fWidthAspect;
@@ -153,6 +153,7 @@ private:
 			int					fMenuBarHeight;
 			int					fControlsHeight;
 			int					fControlsWidth;
+			int					fNoVideoWidth;
 			BRect				fSavedFrame;
 			bool				fMouseDownTracking;
 			BPoint				fMouseDownMousePos;
@@ -161,6 +162,8 @@ private:
 			ListenerAdapter		fGlobalSettingsListener;
 			bool				fCloseWhenDonePlayingMovie;
 			bool				fCloseWhenDonePlayingSound;
+
+	static	int					sNoVideoWidth;
 };
 
 #endif // __MAIN_WIN_H

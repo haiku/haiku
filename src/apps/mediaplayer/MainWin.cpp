@@ -57,6 +57,10 @@
 #define MIN_WIDTH 250
 
 
+int
+MainWin::sNoVideoWidth = MIN_WIDTH;
+
+
 // XXX TODO: why is lround not defined?
 #define lround(a) ((int)(0.99999 + (a)))
 
@@ -127,18 +131,26 @@ MainWin::MainWin(bool isFirstWindow)
 	fMouseDownTracking(false),
 	fGlobalSettingsListener(this)
 {
+	// Handle window position and size depending on whether this is the
+	// first window or not. Use the window size from the window that was
+	// last resized by the user.
 	static int pos = 0;
 	MoveBy(pos * 25, pos * 25);
 	pos = (pos + 1) % 15;
 
-	if (isFirstWindow) {
-		BRect frame = Settings::Default()
-			->CurrentSettings().audioPlayerWindowFrame;
-		if (frame.IsValid()) {
+	BRect frame = Settings::Default()->CurrentSettings()
+		.audioPlayerWindowFrame;
+	if (frame.IsValid()) {
+		if (isFirstWindow) {
 			MoveTo(frame.LeftTop());
 			ResizeTo(frame.Width(), frame.Height());
 		}
+		if (sNoVideoWidth == MIN_WIDTH)
+			sNoVideoWidth = frame.IntegerWidth();
+	} else if (sNoVideoWidth > MIN_WIDTH) {
+		ResizeTo(sNoVideoWidth, Bounds().Height());
 	}
+	fNoVideoWidth = sNoVideoWidth;
 
 	BRect rect = Bounds();
 
@@ -259,6 +271,9 @@ MainWin::FrameResized(float newWidth, float newHeight)
 
 //	printf("FrameResized enter: newWidth %.0f, newHeight %.0f\n",
 //		newWidth, newHeight);
+
+	if (!fHasVideo)
+		sNoVideoWidth = fNoVideoWidth = (int)newWidth;
 
 	int maxVideoWidth  = int(newWidth) + 1;
 	int maxVideoHeight = int(newHeight) + 1
@@ -719,7 +734,7 @@ MainWin::QuitRequested()
 		BAutolock controllerLocker(fController);
 		playlistArchive.AddInt64("position", fController->TimePosition());
 		controllerLocker.Unlock();
-		
+
 		BAutolock playlistLocker(fPlaylist);
 		if (fPlaylist->Archive(&playlistArchive) != B_OK
 			|| message.AddMessage("playlist", &playlistArchive) != B_OK) {
@@ -1210,7 +1225,7 @@ MainWin::_CurrentVideoSizeInPercent() const
 
 
 void
-MainWin::_ResizeWindow(int percent, bool keepWidth, bool stayOnScreen)
+MainWin::_ResizeWindow(int percent, bool useNoVideoWidth, bool stayOnScreen)
 {
 	// Get required window size
 	int videoWidth;
@@ -1226,8 +1241,8 @@ MainWin::_ResizeWindow(int percent, bool keepWidth, bool stayOnScreen)
 	_GetMinimumWindowSize(width, height);
 
 	width = max_c(width, videoWidth) - 1;
-	if (keepWidth)
-		width = max_c(width, (int)Frame().Width());
+	if (useNoVideoWidth)
+		width = max_c(width, fNoVideoWidth);
 	height = height + videoHeight - 1;
 
 	if (stayOnScreen) {
