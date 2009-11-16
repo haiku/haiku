@@ -1,0 +1,34 @@
+1	swedish	x-vnd.Haiku-Media	1721947718
+Show Volume Control on Deskbar	Media views		Visa volymkontrollen i Deskbar
+Audio Input:	Media views		Ljudingång:
+Restarting Media Services\nStarting Media Server…\n	Media Window		Startar om mediatjänster\nStartar mediaservern…\n
+Video Input:	Media views		Videoingång:
+Waiting for media_server to quit.	Media Window		Väntar på media_server ska stängas ner.
+Defaults	Media views		Förval
+Stopping Media Server…	Media Window		Avslutar mediaservern…
+Video Output:	Media views		Videoutgång:
+Enable Real-Time Audio	Media views		Aktivera realtidsljud
+Quit	Media Window		Avsluta
+OK	Media Window		Ok
+Enabling Real-Time Video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Genom att aktivera realtidsvideo låter du systemet behandla video så snabbt och jämnt som möjligt. Detta möjliggörs genom att mer minne används.\n\nAktivera bara detta om video är högprioriterat.
+Default Nodes	Media views		Förvalda noder
+Starting Media Server…	Media Window		Startar mediaservern…
+Restart the Media Server to apply changes.	Media views		Starta om mediaservern för att aktivera ändringarna.
+Done Shutting Down.	Media Window		Färdigavslutad.
+Cleaning Up.	Media Window		Städar upp.
+Telling media_addon_server to quit.	Media Window		Säger till media_addon_server att avsluta.
+Enable Real-Time Video	Media views		Aktivera realtidsvideo
+This hardware has no controls.	Media Window		Hårdvaran saknar kontroller.
+Restarting Media Services\nShutting down Media Server\n	Media Window		Startar om mediatjänster\nAvslutar mediaservern\n
+Audio Output:	Media views		Ljudutgång:
+Start Media Server	Media Window		Starta mediaservern
+Audio Settings	Media Window		Ljudinställningar
+Could not connect to the Media Server.\nWould you like to start it ?	Media Window		Kunde inte ansluta till mediaservern.\nVill du starta den ?
+Ready For Use…	Media Window		Redo att användas…
+Real-Time	Media views		Realtid
+Restart Media Services	Media views		Starta om mediatjänsterna
+Enabling Real-time Audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Genom att aktivera realtidsljud låter du systemet behandla ljud så snabbt och jämnt som möjligt. Detta möjliggörs genom att mer minne används.\n\nAktivera bara detta om ljud är högprioriterat.
+Couldn't remove Volume control in Deskbar: %s\n	Media Window		Kunde inte ta bort volymkontrollen från Deskbar: %s\n
+Couldn't add Volume control in Deskbar: %s\n	Media Window		Kunde inte lägga till volymkontrollen i Deskbar: %s\n
+Media	Media Window		Media
+Channel:	Media views		Kanal:
