@@ -1863,7 +1863,6 @@ TRoster::_LoadRosterSettings(const char* path)
 			status_t streamError;
 			char str[B_PATH_NAME_LENGTH];
 
-
 			// (RecentDoc | RecentFolder | RecentApp)
 			streamError = stream.GetString(str);
 			if (!streamError) {
@@ -1874,15 +1873,14 @@ TRoster::_LoadRosterSettings(const char* path)
 					etSomethingIsAmiss,
 				} type;
 
-				if (strcmp(str, "RecentDoc") == 0) {
+				if (strcmp(str, "RecentDoc") == 0)
 					type = etDoc;
-				} else if (strcmp(str, "RecentFolder") == 0) {
+				else if (strcmp(str, "RecentFolder") == 0)
 					type = etFolder;
-				} else if (strcmp(str, "RecentApp") == 0) {
+				else if (strcmp(str, "RecentApp") == 0)
 					type = etApp;
-				} else {
+				else
 					type = etSomethingIsAmiss;
-				}
 
 				switch (type) {
 					case etDoc:
@@ -1925,17 +1923,20 @@ TRoster::_LoadRosterSettings(const char* path)
 								streamError = entry ? B_OK : B_NO_MEMORY;
 							}
 							if (!streamError) {
-								printf("pushing entry, leaf == '%s', app == '%s', index == %ld\n",
-								       entry->ref.name, entry->sig.c_str(), entry->index);
+								D(printf("pushing entry, leaf == '%s', app == "
+									"'%s', index == %ld\n", entry->ref.name,
+									entry->sig.c_str(), entry->index));
 
 								list->push_back(entry);
 							}
 						}
 
 						if (streamError) {
-							printf("entry error 0x%lx\n", streamError);
-							if (streamError != RosterSettingsCharStream::kEndOfLine
-							    && streamError != RosterSettingsCharStream::kEndOfStream)
+							D(printf("entry error 0x%lx\n", streamError));
+							if (streamError
+									!= RosterSettingsCharStream::kEndOfLine
+							    && streamError
+							    	!= RosterSettingsCharStream::kEndOfStream)
 							stream.SkipLine();
 						}
 
@@ -1972,13 +1973,15 @@ TRoster::_LoadRosterSettings(const char* path)
 		fRecentDocuments.fEntryList.sort(larger_index);
 		fRecentFolders.fEntryList.sort(larger_index);
 
-		printf("----------------------------------------------------------------------\n");
-		fRecentDocuments.Print();
-		printf("----------------------------------------------------------------------\n");
-		fRecentFolders.Print();
-		printf("----------------------------------------------------------------------\n");
-		fRecentApps.Print();
-		printf("----------------------------------------------------------------------\n");
+		D(
+			printf("----------------------------------------------------------------------\n");
+			fRecentDocuments.Print();
+			printf("----------------------------------------------------------------------\n");
+			fRecentFolders.Print();
+			printf("----------------------------------------------------------------------\n");
+			fRecentApps.Print();
+			printf("----------------------------------------------------------------------\n");
+		);
 	}
 	if (error) {
 		D(PRINT(("WARNING: TRoster::_LoadRosterSettings(): error loading roster "
