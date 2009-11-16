@@ -100,10 +100,11 @@ enum {
 //#define printf(a...)
 
 
-MainWin::MainWin()
+MainWin::MainWin(bool isFirstWindow)
 	:
-	BWindow(BRect(100,100,400,300), NAME, B_TITLED_WINDOW,
+	BWindow(BRect(100, 100, 400, 300), NAME, B_TITLED_WINDOW,
  		B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */),
+ 	fCreationTime(system_time()),
 	fInfoWin(NULL),
 	fPlaylistWindow(NULL),
 	fHasFile(false),
@@ -129,6 +130,15 @@ MainWin::MainWin()
 	static int pos = 0;
 	MoveBy(pos * 25, pos * 25);
 	pos = (pos + 1) % 15;
+
+	if (isFirstWindow) {
+		BRect frame = Settings::Default()
+			->CurrentSettings().audioPlayerWindowFrame;
+		if (frame.IsValid()) {
+			MoveTo(frame.LeftTop());
+			ResizeTo(frame.Width(), frame.Height());
+		}
+	}
 
 	BRect rect = Bounds();
 
@@ -697,7 +707,26 @@ MainWin::WindowActivated(bool active)
 bool
 MainWin::QuitRequested()
 {
-	be_app->PostMessage(M_PLAYER_QUIT);
+	BMessage message(M_PLAYER_QUIT);
+	message.AddPointer("instance", this);
+	message.AddRect("window frame", Frame());
+	message.AddBool("audio only", !fHasVideo);
+	message.AddInt64("creation time", fCreationTime);
+	if (!fHasVideo && fHasAudio) {
+		// store playlist and position if this is audio
+		BMessage playlistArchive;
+
+		BAutolock controllerLocker(fController);
+		playlistArchive.AddInt64("position", fController->TimePosition());
+		controllerLocker.Unlock();
+		
+		BAutolock playlistLocker(fPlaylist);
+		if (fPlaylist->Archive(&playlistArchive) != B_OK
+			|| message.AddMessage("playlist", &playlistArchive) != B_OK) {
+			fprintf(stderr, "Failed to store current playlist.\n");
+		}
+	}
+	be_app->PostMessage(&message);
 	return true;
 }
 
@@ -917,7 +946,7 @@ MainWin::_SetupWindow()
 
 		if (!fIsFullscreen) {
 			// Resize to 100% but stay on screen
-			_ResizeWindow(100, true);
+			_ResizeWindow(100, !fHasVideo, true);
 		} else {
 			// Make sure we relayout the video view when in full screen mode
 			FrameResized(Frame().Width(), Frame().Height());
@@ -1181,7 +1210,7 @@ MainWin::_CurrentVideoSizeInPercent() const
 
 
 void
-MainWin::_ResizeWindow(int percent, bool stayOnScreen)
+MainWin::_ResizeWindow(int percent, bool keepWidth, bool stayOnScreen)
 {
 	// Get required window size
 	int videoWidth;
@@ -1197,6 +1226,8 @@ MainWin::_ResizeWindow(int percent, bool stayOnScreen)
 	_GetMinimumWindowSize(width, height);
 
 	width = max_c(width, videoWidth) - 1;
+	if (keepWidth)
+		width = max_c(width, (int)Frame().Width());
 	height = height + videoHeight - 1;
 
 	if (stayOnScreen) {

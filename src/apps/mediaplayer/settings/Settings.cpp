@@ -22,7 +22,8 @@ mpSettings::operator!=(const mpSettings& other) const
 		|| useOverlays != other.useOverlays
 		|| scaleBilinear != other.scaleBilinear
 		|| backgroundMovieVolumeMode != other.backgroundMovieVolumeMode
-		|| filePanelFolder != other.filePanelFolder;
+		|| filePanelFolder != other.filePanelFolder
+		|| audioPlayerWindowFrame != other.audioPlayerWindowFrame;
 }
 
 
@@ -58,6 +59,9 @@ Settings::LoadSettings(mpSettings& settings) const
 		// an "unset" entry_ref
 	settings.filePanelFolder = fSettingsMessage.GetValue(
 		"filePanelDirectory", defaultFilePanelFolder);
+
+	settings.audioPlayerWindowFrame = fSettingsMessage.GetValue(
+		"audioPlayerWindowFrame", BRect());
 }
 
 
@@ -83,6 +87,9 @@ Settings::SaveSettings(const mpSettings& settings)
 	fSettingsMessage.SetValue("filePanelDirectory",
 		settings.filePanelFolder);
 
+	fSettingsMessage.SetValue("audioPlayerWindowFrame",
+		settings.audioPlayerWindowFrame);
+
 	// Save at this point, although saving is also done on destruction,
 	// this will make sure the settings are saved even when the player
 	// crashes.
@@ -103,7 +110,7 @@ Settings::CurrentSettings()
 {
 	mpSettings settings;
 	sGlobalInstance.LoadSettings(settings);
-	return settings;	
+	return settings;
 }
 
 

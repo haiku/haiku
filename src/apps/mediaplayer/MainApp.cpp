@@ -46,7 +46,6 @@ const char* kAppSig = "application/x-vnd.Haiku-MediaPlayer";
 static const char* kMediaServerSig = B_MEDIA_SERVER_SIGNATURE;
 static const char* kMediaServerAddOnSig = "application/x-vnd.Be.addon-host";
 
-
 MainApp::MainApp()
 	:
 	BApplication(kAppSig),
@@ -59,7 +58,10 @@ MainApp::MainApp()
 	fLastFilePanelFolder(),
 
 	fMediaServerRunning(false),
-	fMediaAddOnServerRunning(false)
+	fMediaAddOnServerRunning(false),
+
+	fAudioWindowFrameSaved(false),
+	fLastSavedAudioWindowCreationTime(0)
 {
 	mpSettings settings = Settings::CurrentSettings();
 	fLastFilePanelFolder = settings.filePanelFolder;
@@ -107,7 +109,7 @@ MainApp::NewWindow()
 {
 	BAutolock _(this);
 	fPlayerCount++;
-	BWindow* window = new MainWin();
+	BWindow* window = new MainWin(fFirstWindow == NULL);
 	if (fFirstWindow == NULL)
 		fFirstWindow = window;
 	return window;
@@ -219,10 +221,36 @@ MainApp::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case M_PLAYER_QUIT:
+		{
+			// store the window settings of this instance
+			MainWin* window = NULL;
+			bool audioOnly = false;
+			BRect windowFrame;
+			bigtime_t creationTime;
+			if (message->FindPointer("instance", (void**)&window) == B_OK
+				&& message->FindBool("audio only", &audioOnly) == B_OK
+				&& message->FindRect("window frame", &windowFrame) == B_OK
+				&& message->FindInt64("creation time", &creationTime) == B_OK) {
+				if (window == fFirstWindow)
+					fFirstWindow = NULL;
+				if (audioOnly) {
+					if (!fAudioWindowFrameSaved
+						|| creationTime < fLastSavedAudioWindowCreationTime) {
+						fAudioWindowFrameSaved = true;
+						fLastSavedAudioWindowCreationTime = creationTime;
+						mpSettings settings
+							= Settings::Default()->CurrentSettings();
+						settings.audioPlayerWindowFrame = windowFrame;
+						Settings::Default()->SaveSettings(settings);
+					}
+				}
+			}
+			// quit if this was the last player window
 			fPlayerCount--;
 			if (fPlayerCount == 0)
 				PostMessage(B_QUIT_REQUESTED);
 			break;
+		}
 
 		case B_SOME_APP_LAUNCHED:
 		case B_SOME_APP_QUIT:
@@ -288,7 +316,8 @@ MainApp::MessageReceived(BMessage* message)
 		case M_SAVE_PANEL_RESULT:
 			_HandleSavePanelResult(message);
 			break;
-		case B_CANCEL: {
+		case B_CANCEL:
+		{
 			// The user canceled a file panel, but store at least the current
 			// file panel folder.
 			uint32 oldWhat;

@@ -32,6 +32,8 @@ struct mpSettings {
 			entry_ref			filePanelFolder;
 		
 			bool				operator!=(const mpSettings& other) const;
+
+			BRect				audioPlayerWindowFrame;
 };
 
 #define SETTINGS_FILENAME "MediaPlayer"

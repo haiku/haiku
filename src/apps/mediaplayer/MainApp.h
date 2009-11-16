@@ -96,6 +96,9 @@ private:
 
 			bool				fMediaServerRunning;
 			bool				fMediaAddOnServerRunning;
+
+			bool				fAudioWindowFrameSaved;
+			bigtime_t			fLastSavedAudioWindowCreationTime;
 };
 
 extern MainApp* gMainApp;

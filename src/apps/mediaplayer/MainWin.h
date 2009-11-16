@@ -43,7 +43,7 @@ class PlaylistWindow;
 
 class MainWin : public BWindow {
 public:
-								MainWin();
+								MainWin(bool isFirstWindow);
 	virtual						~MainWin();
 
 	virtual	void				FrameResized(float newWidth, float newHeight);
@@ -86,6 +86,7 @@ private:
 									int& videoHeight) const;
 			int					_CurrentVideoSizeInPercent() const;
 			void				_ResizeWindow(int percent,
+									bool keepWidth = false,
 									bool stayOnScreen = false);
 			void				_ResizeVideoView(int x, int y, int width,
 									int height);
@@ -113,6 +114,8 @@ private:
 									bool mark);
 
 			void				_AdoptGlobalSettings();
+
+			bigtime_t			fCreationTime;
 
 			BMenuBar*			fMenuBar;
 			BView*				fBackground;
