@@ -38,7 +38,6 @@ SharedLibrary libtracker.so :
 	FSClipboard.cpp
 	FSUndoRedo.cpp
 	FSUtils.cpp
-	FavoritesConfig.cpp
 	FavoritesMenu.cpp
 	FilePanel.cpp
 	FilePanelPriv.cpp

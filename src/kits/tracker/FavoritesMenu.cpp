@@ -74,18 +74,18 @@ FavoritesMenu::~FavoritesMenu()
 }
 
 
-bool 
+bool
 FavoritesMenu::StartBuildingItemList()
 {
 	// initialize the menu building state
-	
+
 	if (!fInitialItemCount)
 		fInitialItemCount = CountItems();
 	else {
 		// strip the old items so we can add new fresh ones
 		int32 count = CountItems() - fInitialItemCount;
 		// keep the items that were added by the FavoritesMenu creator
-		while (count--) 
+		while (count--)
 			delete RemoveItem(fInitialItemCount);
 	}
 
@@ -95,11 +95,11 @@ FavoritesMenu::StartBuildingItemList()
 }
 
 
-bool 
+bool
 FavoritesMenu::AddNextItem()
 {
 	// run the next chunk of code for a given item adding state
-	
+
 	if (fState == kStart) {
 		fState = kAddingFavorites;
 		fSectionItemCount = 0;
@@ -118,13 +118,13 @@ FavoritesMenu::AddNextItem()
 
 			if (!startModel.IsContainer())
 				throw B_ERROR;
-		
-			if (startModel.IsQuery()) 
+
+			if (startModel.IsQuery())
 				fContainer = new QueryEntryListCollection(&startModel);
 			else
 				fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory *>
 					(startModel.Node()));
-				
+
 			ThrowOnInitCheckError(fContainer);
 			ThrowOnError( fContainer->Rewind() );
 
@@ -133,13 +133,11 @@ FavoritesMenu::AddNextItem()
 			fContainer = NULL;
 		}
 	}
-	
 
-	if (fState == kAddingFavorites) {	
+
+	if (fState == kAddingFavorites) {
 		entry_ref ref;
-		// limit nav menus to 20 items only
 		if (fContainer
-			&& fSectionItemCount < 20
 			&& fContainer->GetNextRef(&ref) == B_OK) {
 			Model model(&ref, true);
 			if (model.InitCheck() != B_OK)
@@ -153,19 +151,19 @@ FavoritesMenu::AddNextItem()
 
 			if (!fAddedSeparatorForSection) {
 				fAddedSeparatorForSection = true;
-				AddItem(new TitledSeparatorItem("Favorite Folders"));
+				AddItem(new TitledSeparatorItem("Favorites"));
 			}
 			fUniqueRefCheck.push_back(*model.EntryRef());
 			AddItem(item);
 			fSectionItemCount++;
 			return true;
 		}
-	
+
 		// done with favorites, set up for adding recent files
 		fState = kAddingFiles;
-		
+
 		fAddedSeparatorForSection = false;
-		
+
 		app_info info;
 		be_app->GetAppInfo(&info);
 		fItems.MakeEmpty();
@@ -177,7 +175,7 @@ FavoritesMenu::AddNextItem()
 		fIndex = 0;
 		fSectionItemCount = 0;
 	}
-	
+
 	if (fState == kAddingFiles) {
 		//	if this is a Save panel, not an Open panel
 		//	then don't add the recent documents
@@ -189,7 +187,7 @@ FavoritesMenu::AddNextItem()
 				Model model(&ref, true);
 				if (model.InitCheck() != B_OK)
 					return true;
-	
+
 				BMenuItem *item = BNavMenu::NewModelItem(&model, fOpenFileMessage, fTarget);
 				if (item) {
 					if (!fAddedSeparatorForSection) {
@@ -202,10 +200,10 @@ FavoritesMenu::AddNextItem()
 				}
 			}
 		}
-		
+
 		// done with recent files, set up for adding recent folders
 		fState = kAddingFolders;
-			
+
 		fAddedSeparatorForSection = false;
 
 		app_info info;
@@ -218,16 +216,16 @@ FavoritesMenu::AddNextItem()
 		BRoster().GetRecentFolders(&fItems, folders, info.signature);
 		fIndex = 0;
 	}
-	
+
 	if (fState == kAddingFolders) {
 		for (;;) {
 			entry_ref ref;
 			if (fItems.FindRef("refs", fIndex++, &ref) != B_OK)
 				break;
-			
+
 			// don't add folders that are already in the GoTo section
 			if (find_if(fUniqueRefCheck.begin(), fUniqueRefCheck.end(),
-				bind2nd(std::equal_to<entry_ref>(), ref)) != fUniqueRefCheck.end()) 
+				bind2nd(std::equal_to<entry_ref>(), ref)) != fUniqueRefCheck.end())
 				continue;
 
 			Model model(&ref, true);
@@ -253,14 +251,14 @@ FavoritesMenu::AddNextItem()
 }
 
 
-void 
+void
 FavoritesMenu::DoneBuildingItemList()
 {
 	SetTargetForItems(fTarget);
 }
 
 
-void 
+void
 FavoritesMenu::ClearMenuBuildingState()
 {
 	delete fContainer;
@@ -300,12 +298,12 @@ RecentsMenu::DetachedFromWindow()
 {
 	//
 	//	BNavMenu::DetachedFromWindow sets the TypesList to NULL
-	//	
+	//
 	BMenu::DetachedFromWindow();
 }
 
 
-bool 
+bool
 RecentsMenu::StartBuildingItemList()
 {
 	int32 count = CountItems()-1;
@@ -327,7 +325,7 @@ RecentsMenu::StartBuildingItemList()
 }
 
 
-bool 
+bool
 RecentsMenu::AddNextItem()
 {
 	if (fRecentsCount > 0 && AddRecents(fRecentsCount))
@@ -344,7 +342,7 @@ RecentsMenu::AddRecents(int32 count)
 	if (fItemIndex == 0) {
 		fRecentList.MakeEmpty();
 		BRoster roster;
-		
+
 		switch(fWhich) {
 			case 0:
 				roster.GetRecentDocuments(&fRecentList, count);
@@ -388,7 +386,7 @@ RecentsMenu::AddRecents(int32 count)
 }
 
 
-void 
+void
 RecentsMenu::DoneBuildingItemList()
 {
 	//
@@ -407,7 +405,7 @@ RecentsMenu::DoneBuildingItemList()
 }
 
 
-void 
+void
 RecentsMenu::ClearMenuBuildingState()
 {
 	fMenuBuilt = false;

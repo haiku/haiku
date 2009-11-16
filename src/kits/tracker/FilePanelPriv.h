@@ -53,7 +53,6 @@ class BackgroundView;
 class BDirMenu;
 class AttributeStreamNode;
 class BFilePanelPoseView;
-class TFavoritesConfigWindow;
 
 class TFilePanel : public BContainerWindow {
 public:
@@ -67,7 +66,7 @@ public:
 		bool hideWhenDone = true);
 
 	virtual ~TFilePanel();
-	
+
 	BFilePanelPoseView *PoseView() const;
 
 	virtual	bool QuitRequested();
@@ -89,13 +88,13 @@ public:
 	void Refresh();
 	const BMessenger *Target() const;
 	BRefFilter *Filter() const;
-	
+
 	void SetTarget(BMessenger);
 	void SetMessage(BMessage *message);
-	
+
 	virtual	status_t GetNextEntryRef(entry_ref *);
 	virtual	void MessageReceived(BMessage *);
-	
+
 	void SetHideWhenDone(bool);
 	bool HidesWhenDone(void);
 
@@ -125,8 +124,8 @@ protected:
 	static filter_result MessageDropFilter(BMessage *, BHandler **, BMessageFilter *);
 	int32 ShowCenteredAlert(const char *text, const char *button1, const char *button2 = NULL,
 		const char *button3 = NULL);
-	
-	
+
+
 private:
 	bool SwitchDirToDesktopIfNeeded(entry_ref &ref);
 	bool CanOpenParent() const;
@@ -145,11 +144,10 @@ private:
 	BMessenger fTarget;
 	BFilePanel *fClientObject;
 	int32 fSelectionIterator;
-	BMessage *fMessage;		
+	BMessage *fMessage;
 	BString fButtonText;
 	bool fHideWhenDone;
 	bool fIsTrackingMenu;
-	TFavoritesConfigWindow *fConfigWindow;
 
 	typedef BContainerWindow _inherited;
 
@@ -163,7 +161,7 @@ public:
 
 	virtual bool IsFilePanel() const;
 	virtual bool FSNotification(const BMessage *);
-	
+
 	void SetIsDesktop(bool);
 
 protected:
@@ -189,7 +187,7 @@ private:
 		// this flags makes the distinction between the Desktop as the Root of
 		// the world and "/boot/home/Desktop" to which we might have navigated
 		// from the home dir
-		
+
 	typedef BPoseView _inherited;
 };
 
