@@ -34,7 +34,7 @@
 
 
 // debugging
-#define TRACE_AUDIO_PRODUCER
+//#define TRACE_AUDIO_PRODUCER
 #ifdef TRACE_AUDIO_PRODUCER
 # define TRACE(x...)		printf(x)
 # define TRACE_BUFFER(x...)
@@ -71,7 +71,7 @@ init_media_file(media_format format, BMediaTrack** _track)
 			if (strcmp(info.short_name, "raw-audio") == 0)
 				break;
 		}
-		
+
 		track = file->CreateTrack(&format, &info);
 		if (!track)
 			printf("failed to create track\n");
@@ -169,7 +169,7 @@ AudioProducer::AddOn(int32* internalId) const
 }
 
 
-status_t 
+status_t
 AudioProducer::FormatSuggestionRequested(media_type type, int32 quality,
 	media_format* _format)
 {
@@ -189,7 +189,7 @@ AudioProducer::FormatSuggestionRequested(media_type type, int32 quality,
 	return B_OK;
 }
 
-status_t 
+status_t
 AudioProducer::FormatProposal(const media_source& output, media_format* format)
 {
 	TRACE("%p->AudioProducer::FormatProposal()\n", this);
@@ -226,7 +226,7 @@ AudioProducer::FormatProposal(const media_source& output, media_format* format)
 }
 
 
-status_t 
+status_t
 AudioProducer::FormatChangeRequested(const media_source& source,
 	const media_destination& destination, media_format* ioFormat,
 	int32* _deprecated_)
@@ -250,7 +250,7 @@ AudioProducer::FormatChangeRequested(const media_source& source,
 }
 
 
-status_t 
+status_t
 AudioProducer::GetNextOutput(int32* cookie, media_output* _output)
 {
 	TRACE("%p->AudioProducer::GetNextOutput(%ld)\n", this, *cookie);
@@ -268,7 +268,7 @@ AudioProducer::GetNextOutput(int32* cookie, media_output* _output)
 }
 
 
-status_t 
+status_t
 AudioProducer::DisposeOutputCookie(int32 cookie)
 {
 	// do nothing because we don't use the cookie for anything special
@@ -276,7 +276,7 @@ AudioProducer::DisposeOutputCookie(int32 cookie)
 }
 
 
-status_t 
+status_t
 AudioProducer::SetBufferGroup(const media_source& forSource,
 	BBufferGroup* newGroup)
 {
@@ -308,7 +308,7 @@ AudioProducer::SetBufferGroup(const media_source& forSource,
 }
 
 
-status_t 
+status_t
 AudioProducer::GetLatency(bigtime_t* _latency)
 {
 	TRACE("%p->AudioProducer::GetLatency()\n", this);
@@ -319,7 +319,7 @@ AudioProducer::GetLatency(bigtime_t* _latency)
 }
 
 
-status_t 
+status_t
 AudioProducer::PrepareToConnect(const media_source& what,
 	const media_destination& where, media_format* format,
 	media_source* _source, char* _name)
@@ -393,7 +393,7 @@ estimate_internal_latency(const media_format& format)
 }
 
 
-void 
+void
 AudioProducer::Connect(status_t error, const media_source& source,
 	 const media_destination& destination, const media_format& format,
 	 char* _name)
@@ -458,7 +458,7 @@ AudioProducer::Connect(status_t error, const media_source& source,
 }
 
 
-void 
+void
 AudioProducer::Disconnect(const media_source& what,
 	const media_destination& where)
 {
@@ -480,7 +480,7 @@ AudioProducer::Disconnect(const media_source& what,
 }
 
 
-void 
+void
 AudioProducer::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 	bigtime_t performanceTime)
 {
@@ -506,7 +506,7 @@ AudioProducer::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 }
 
 
-void 
+void
 AudioProducer::EnableOutput(const media_source& what, bool enabled,
 	int32* _deprecated_)
 {
@@ -517,14 +517,14 @@ AudioProducer::EnableOutput(const media_source& what, bool enabled,
 }
 
 
-status_t 
+status_t
 AudioProducer::SetPlayRate(int32 numer, int32 denom)
 {
 	return B_ERROR;
 }
 
 
-status_t 
+status_t
 AudioProducer::HandleMessage(int32 message, const void *data, size_t size)
 {
 	TRACE("%p->AudioProducer::HandleMessage()\n", this);
@@ -532,7 +532,7 @@ AudioProducer::HandleMessage(int32 message, const void *data, size_t size)
 }
 
 
-void 
+void
 AudioProducer::AdditionalBufferRequested(const media_source& source,
 	media_buffer_id prevBuffer, bigtime_t prevTime,
 	const media_seek_tag *prevTag)
@@ -541,7 +541,7 @@ AudioProducer::AdditionalBufferRequested(const media_source& source,
 }
 
 
-void 
+void
 AudioProducer::LatencyChanged(const media_source& source,
 	const media_destination& destination, bigtime_t newLatency, uint32 flags)
 {
@@ -554,7 +554,7 @@ AudioProducer::LatencyChanged(const media_source& source,
 }
 
 
-void 
+void
 AudioProducer::NodeRegistered()
 {
 	TRACE("%p->AudioProducer::NodeRegistered()\n", this);
@@ -571,7 +571,7 @@ AudioProducer::NodeRegistered()
 }
 
 
-void 
+void
 AudioProducer::SetRunMode(run_mode mode)
 {
 	TRACE("%p->AudioProducer::SetRunMode()\n", this);
@@ -583,7 +583,7 @@ AudioProducer::SetRunMode(run_mode mode)
 }
 
 
-void 
+void
 AudioProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 	bool realTimeEvent)
 {
@@ -602,14 +602,14 @@ printf("B_START: start time: %lld\n", fStartTime);
 			}
 			TRACE("AudioProducer::HandleEvent(B_START) done\n");
 			break;
-	
+
 		case BTimedEventQueue::B_STOP:
 			TRACE("AudioProducer::HandleEvent(B_STOP)\n");
 			EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true,
 									  BTimedEventQueue::B_HANDLE_BUFFER);
 			TRACE("AudioProducer::HandleEvent(B_STOP) done\n");
 			break;
-	
+
 		case BTimedEventQueue::B_HANDLE_BUFFER: {
 			TRACE_BUFFER("AudioProducer::HandleEvent(B_HANDLE_BUFFER)\n");
 			if ((RunState() == BMediaEventLooper::B_STARTED)
@@ -629,7 +629,7 @@ printf("B_START: start time: %lld\n", fStartTime);
 				size_t nFrames = fOutput.format.u.raw_audio.buffer_size
 					/ (sampleSize * fOutput.format.u.raw_audio.channel_count);
 				fFramesSent += nFrames;
-	
+
 				bigtime_t nextEvent = fStartTime
 					+ bigtime_t(double(fFramesSent) * 1000000.0
 					  / double(fOutput.format.u.raw_audio.frame_rate));
@@ -728,7 +728,7 @@ AudioProducer::_SpecializeFormat(media_format* format)
 			= uint32(format->u.raw_audio.frame_rate / 25.0)
 				* (format->u.raw_audio.format
 					& media_raw_audio_format::B_AUDIO_SIZE_MASK);
-	
+
 		if (!fLowLatency)
 			format->u.raw_audio.buffer_size *= 3;
 
