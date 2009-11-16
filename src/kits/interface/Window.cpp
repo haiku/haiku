@@ -2035,16 +2035,16 @@ BWindow::Frame() const
 BRect
 BWindow::DecoratorFrame() const
 {
-	BRect decortatorFrame(Frame());
+	BRect decoratorFrame(Frame());
 	float borderWidth;
 	float tabHeight;
 	_GetDecoratorSize(&borderWidth, &tabHeight);
 	// TODO: Broken for tab on left window side windows...
-	decortatorFrame.top -= tabHeight;
-	decortatorFrame.left -= borderWidth;
-	decortatorFrame.right += borderWidth;
-	decortatorFrame.bottom += borderWidth;
-	return decortatorFrame;
+	decoratorFrame.top -= tabHeight;
+	decoratorFrame.left -= borderWidth;
+	decoratorFrame.right += borderWidth;
+	decoratorFrame.bottom += borderWidth;
+	return decoratorFrame;
 }
 
 
