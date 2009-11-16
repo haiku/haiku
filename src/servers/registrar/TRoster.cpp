@@ -141,7 +141,6 @@ TRoster::TRoster()
 	fLastToken(0),
 	fShuttingDown(false)
 {
-	_LoadRosterSettings();
 }
 
 
@@ -1189,21 +1188,18 @@ TRoster::ClearRecentApps()
 status_t
 TRoster::Init()
 {
-	status_t error = B_OK;
-
 	// check lock initialization
 	if (fLock.Sem() < 0)
 		return fLock.Sem();
 
 	// create the info
 	RosterAppInfo* info = new(nothrow) RosterAppInfo;
-	if (!info)
-		error = B_NO_MEMORY;
+	if (info == NULL)
+		return B_NO_MEMORY;
 
 	// get the app's ref
 	entry_ref ref;
-	if (error == B_OK)
-		error = get_app_ref(&ref);
+	status_t error = get_app_ref(&ref);
 
 	// init and add the info
 	if (error == B_OK) {
@@ -1215,8 +1211,11 @@ TRoster::Init()
 		error = AddApp(info);
 	}
 
+	if (error == B_OK)
+		_LoadRosterSettings();
+
 	// cleanup on error
-	if (error != B_OK && info)
+	if (error != B_OK)
 		delete info;
 
 	return error;
