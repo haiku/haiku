@@ -106,8 +106,7 @@ Controller::Controller()
 	fPosition(0),
 	fDuration(0),
 	fVideoFrameRate(25.0),
-	fSeekFrame(-1),
-	fLastSeekEventTime(LONGLONG_MIN),
+	fSeekRequested(false),
 
 	fGlobalSettingsListener(this),
 
@@ -316,6 +315,8 @@ Controller::SetTo(const PlaylistItemRef& item)
 		const media_format& audioTrackFormat = fAudioTrackSupplier->Format();
 		audioFrameRate = audioTrackFormat.u.raw_audio.frame_rate;
 		audioChannels = audioTrackFormat.u.raw_audio.channel_count;
+//		if (fVideoTrackSupplier == NULL)
+//			fVideoFrameRate = audioFrameRate;
 	}
 
 	if (InitCheck() != B_OK) {
@@ -659,13 +660,33 @@ Controller::SetPosition(float value)
 {
 	BAutolock _(this);
 
-	fSeekFrame = (int32)(Duration() * value);
+	SetFramePosition(Duration() * value);
+}
+
+
+void
+Controller::SetFramePosition(int32 value)
+{
+printf("Controller::SetFramePosition(%ld)\n", value);
+	BAutolock _(this);
+
+	int32 seekFrame = max_c(0, min_c(Duration(), value));
 	int32 currentFrame = CurrentFrame();
-	if (fSeekFrame != currentFrame) {
-		SetCurrentFrame(fSeekFrame);
-		fLastSeekEventTime = system_time();
-	} else
-		fSeekFrame = -1;
+	if (seekFrame != currentFrame) {
+printf("  adjusted seek frame\n");
+		fSeekFrame = seekFrame;
+		fSeekRequested = true;
+		SetCurrentFrame(seekFrame);
+	}
+}
+
+
+void
+Controller::SetTimePosition(bigtime_t value)
+{
+	BAutolock _(this);
+
+	SetPosition((float)value / TimeDuration());
 }
 
 
@@ -1009,11 +1030,11 @@ Controller::NotifyCurrentFrameChanged(int32 frame) const
 {
 	// check if we are still waiting to reach the seekframe,
 	// don't pass the event on to the listeners in that case
-	if ((system_time() - fLastSeekEventTime) < 1000000
-		&& fSeekFrame >= 0 && frame != fSeekFrame) {
+	if (fSeekRequested && fSeekFrame != frame)
 		return;
-	}
+
 	fSeekFrame = -1;
+	fSeekRequested = false;
 
 	float position = 0.0;
 	double duration = (double)fDuration * fVideoFrameRate / 1000000.0;
@@ -1043,5 +1064,13 @@ Controller::NotifyStopFrameReached() const
 	// Currently, this means we reached the end of the current
 	// file and should play the next file
 	_NotifyFileFinished();
+}
+
+
+void
+Controller::NotifySeekHandled() const
+{
+	fSeekRequested = false;
+	fSeekFrame = -1;
 }
 

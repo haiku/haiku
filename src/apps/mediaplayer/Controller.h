@@ -115,6 +115,8 @@ public:
 			void				VolumeDown();
 			void				ToggleMute();
 			void				SetPosition(float value);
+			void				SetFramePosition(int32 frame);
+			void				SetTimePosition(bigtime_t position);
 
 			bool				HasFile();
 			status_t			GetFileFormatInfo(
@@ -166,6 +168,7 @@ private:
 	virtual	void				NotifySpeedChanged(float speed) const;
 	virtual	void				NotifyFrameDropped() const;
 	virtual	void				NotifyStopFrameReached() const;
+	virtual	void				NotifySeekHandled() const;
 
 
 			VideoView*			fVideoView;
@@ -187,8 +190,9 @@ private:
 	mutable	bigtime_t			fPosition;
 			bigtime_t			fDuration;
 			float				fVideoFrameRate;
-	mutable	int32				fSeekFrame;
-			bigtime_t			fLastSeekEventTime;
+
+	mutable	bool				fSeekRequested;
+	mutable int32				fSeekFrame;
 
 			ListenerAdapter		fGlobalSettingsListener;
 

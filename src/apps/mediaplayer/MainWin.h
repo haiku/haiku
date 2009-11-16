@@ -56,6 +56,7 @@ public:
 	virtual	bool				QuitRequested();
 	virtual	void				MenusBeginning();
 
+			void				OpenPlaylist(const BMessage* playlistArchive);
 			void				OpenPlaylistItem(const PlaylistItemRef& item);
 
 			void				ShowFileInfo();
@@ -162,6 +163,7 @@ private:
 			ListenerAdapter		fGlobalSettingsListener;
 			bool				fCloseWhenDonePlayingMovie;
 			bool				fCloseWhenDonePlayingSound;
+			bigtime_t			fInitialSeekPosition;
 
 	static	int					sNoVideoWidth;
 };

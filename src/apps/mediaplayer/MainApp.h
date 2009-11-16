@@ -49,6 +49,10 @@ enum  {
 	M_MEDIA_SERVER_QUIT			= 'msqt'
 };
 
+
+#define NAME "MediaPlayer"
+
+
 class BFilePanel;
 class SettingsWindow;
 
@@ -58,8 +62,7 @@ public:
 								MainApp();
 	virtual						~MainApp();
 
-			BWindow*			FirstWindow();
-			BWindow*			NewWindow();
+			MainWin*			NewWindow();
 			int32				PlayerCount() const;
 
 private:
@@ -81,13 +84,20 @@ private:
 									const char* defaultTitle,
 									const char* defaultLabel);
 
-			void				_HandleOpenPanelResult(const BMessage* message);
-			void				_HandleSavePanelResult(const BMessage* message);
+			void				_HandleOpenPanelResult(
+									const BMessage* message);
+			void				_HandleSavePanelResult(
+									const BMessage* message);
 			void				_HandleFilePanelResult(BFilePanel* panel,
 									const BMessage* message);
 
+			void				_StoreCurrentPlaylist(
+									const BMessage* message) const;
+			status_t			_RestoreCurrentPlaylist(
+									BMessage* message) const;
+
+private:
 			int32				fPlayerCount;
-			BWindow*			fFirstWindow;
 			SettingsWindow*		fSettingsWindow;
 
 			BFilePanel*			fOpenFilePanel;

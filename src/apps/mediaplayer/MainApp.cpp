@@ -50,7 +50,6 @@ MainApp::MainApp()
 	:
 	BApplication(kAppSig),
 	fPlayerCount(0),
-	fFirstWindow(NULL),
 	fSettingsWindow(NULL),
 
 	fOpenFilePanel(NULL),
@@ -94,25 +93,12 @@ MainApp::QuitRequested()
 }
 
 
-BWindow*
-MainApp::FirstWindow()
-{
-	BAutolock _(this);
-	if (fFirstWindow != NULL)
-		return fFirstWindow;
-	return NewWindow();
-}
-
-
-BWindow*
+MainWin*
 MainApp::NewWindow()
 {
 	BAutolock _(this);
 	fPlayerCount++;
-	BWindow* window = new MainWin(fFirstWindow == NULL);
-	if (fFirstWindow == NULL)
-		fFirstWindow = window;
-	return window;
+	return new(std::nothrow) MainWin(fPlayerCount == 1);
 }
 
 
@@ -157,7 +143,18 @@ MainApp::ReadyToRun()
 	}
 
 	// make sure we have at least one window open
-	FirstWindow();
+	if (fPlayerCount == 0) {
+		MainWin* window = NewWindow();
+		if (window == NULL) {
+			PostMessage(B_QUIT_REQUESTED);
+			return;
+		}
+		BMessage lastPlaylistArchive;
+		if (_RestoreCurrentPlaylist(&lastPlaylistArchive) == B_OK)
+			window->OpenPlaylist(&lastPlaylistArchive);
+
+		window->Show();
+	}
 
 	// setup the settings window now, we need to have it
 	fSettingsWindow = new SettingsWindow(BRect(150, 150, 450, 520));
@@ -175,13 +172,13 @@ MainApp::RefsReceived(BMessage* message)
 	// ArgvReceived() but without MIME type check.
 	// For each file we create a new window and send it a
 	// B_REFS_RECEIVED message with a single file.
-	// If IsLaunching() is true, we use fFirstWindow as first
-	// window.
 	printf("MainApp::RefsReceived\n");
 
 	BWindow* window = NewWindow();
-	if (window)
+	if (window != NULL) {
+		window->Show();
 		window->PostMessage(message);
+	}
 }
 
 
@@ -231,8 +228,6 @@ MainApp::MessageReceived(BMessage* message)
 				&& message->FindBool("audio only", &audioOnly) == B_OK
 				&& message->FindRect("window frame", &windowFrame) == B_OK
 				&& message->FindInt64("creation time", &creationTime) == B_OK) {
-				if (window == fFirstWindow)
-					fFirstWindow = NULL;
 				if (audioOnly) {
 					if (!fAudioWindowFrameSaved
 						|| creationTime < fLastSavedAudioWindowCreationTime) {
@@ -245,6 +240,15 @@ MainApp::MessageReceived(BMessage* message)
 					}
 				}
 			}
+
+			// Store the playlist if there is one. Since the app is doing
+			// this, it is "atomic". If the user has multiple instances
+			// playing audio at the same time, the last instance which is
+			// quit wins.
+			BMessage playlistArchive;
+			if (message->FindMessage("playlist", &playlistArchive) == B_OK)
+				_StoreCurrentPlaylist(&playlistArchive);
+
 			// quit if this was the last player window
 			fPlayerCount--;
 			if (fPlayerCount == 0)
@@ -340,7 +344,13 @@ MainApp::MessageReceived(BMessage* message)
 void
 MainApp::AboutRequested()
 {
-	FirstWindow()->PostMessage(B_ABOUT_REQUESTED);
+	BAlert* alert = new BAlert("about", NAME"\n\n Written by Marcus Overhagen "
+		", Stephan Aßmus and Frederik Modéen", "Thanks");
+	alert->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
+		// Make sure it is on top of any player windows that may have the
+		// floating all window feel.
+	alert->Go(NULL);
+		// asynchronous mode
 }
 
 
@@ -505,6 +515,43 @@ MainApp::_HandleFilePanelResult(BFilePanel* panel, const BMessage* message)
 		targetMessage.AddRef("refs", &ref);
 
 	target.SendMessage(&targetMessage);
+}
+
+
+static const char* kCurrentPlaylistFilename = "MediaPlayer Current Playlist";
+
+
+void
+MainApp::_StoreCurrentPlaylist(const BMessage* message) const
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK
+		|| path.Append(kCurrentPlaylistFilename) != B_OK) {
+		return;
+	}
+
+	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if (file.InitCheck() != B_OK)
+		return;
+
+	message->Flatten(&file);
+}
+
+
+status_t
+MainApp::_RestoreCurrentPlaylist(BMessage* message) const
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK
+		|| path.Append(kCurrentPlaylistFilename) != B_OK) {
+		return B_ERROR;
+	}
+
+	BFile file(path.Path(), B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return B_ERROR;
+
+	return message->Unflatten(&file);
 }
 
 

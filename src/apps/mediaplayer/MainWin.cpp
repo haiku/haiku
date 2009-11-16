@@ -53,7 +53,6 @@
 #include "PlaylistWindow.h"
 #include "Settings.h"
 
-#define NAME "MediaPlayer"
 #define MIN_WIDTH 250
 
 
@@ -129,7 +128,8 @@ MainWin::MainWin(bool isFirstWindow)
 	fWidthAspect(0),
 	fHeightAspect(0),
 	fMouseDownTracking(false),
-	fGlobalSettingsListener(this)
+	fGlobalSettingsListener(this),
+	fInitialSeekPosition(0)
 {
 	// Handle window position and size depending on whether this is the
 	// first window or not. Use the window size from the window that was
@@ -218,8 +218,6 @@ MainWin::MainWin(bool isFirstWindow)
 	AddShortcut('y', B_COMMAND_KEY, new BMessage(B_UNDO));
 	AddShortcut('z', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(B_REDO));
 	AddShortcut('y', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(B_REDO));
-
-	Show();
 }
 
 
@@ -367,7 +365,7 @@ MainWin::DispatchMessage(BMessage *msg, BHandler *handler)
 
 
 void
-MainWin::MessageReceived(BMessage *msg)
+MainWin::MessageReceived(BMessage* msg)
 {
 //	msg->PrintToStream();
 	switch (msg->what) {
@@ -549,19 +547,8 @@ MainWin::MessageReceived(BMessage *msg)
 			ShowPlaylistWindow();
 			break;
 		case B_ABOUT_REQUESTED:
-		{
-			BAlert *alert;
-			alert = new BAlert("about", NAME"\n\n Written by Marcus Overhagen "
-				", Stephan Aßmus and Frederik Modéen", "Thanks");
-			if (fAlwaysOnTop) {
-				_ToggleAlwaysOnTop();
-				alert->Go(NULL);  // Asynchronous mode
-				_ToggleAlwaysOnTop();
-			} else {
-				alert->Go(NULL); // Asynchronous mode
-			}
+			be_app->PostMessage(msg);
 			break;
-		}
 		case M_FILE_CLOSE:
 			PostMessage(B_QUIT_REQUESTED);
 			break;
@@ -728,7 +715,7 @@ MainWin::QuitRequested()
 	message.AddBool("audio only", !fHasVideo);
 	message.AddInt64("creation time", fCreationTime);
 	if (!fHasVideo && fHasAudio) {
-		// store playlist and position if this is audio
+		// store playlist, current index and position if this is audio
 		BMessage playlistArchive;
 
 		BAutolock controllerLocker(fController);
@@ -737,6 +724,8 @@ MainWin::QuitRequested()
 
 		BAutolock playlistLocker(fPlaylist);
 		if (fPlaylist->Archive(&playlistArchive) != B_OK
+			|| playlistArchive.AddInt32("index",
+				fPlaylist->CurrentItemIndex()) != B_OK
 			|| message.AddMessage("playlist", &playlistArchive) != B_OK) {
 			fprintf(stderr, "Failed to store current playlist.\n");
 		}
@@ -754,6 +743,29 @@ MainWin::MenusBeginning()
 
 
 // #pragma mark -
+
+
+void
+MainWin::OpenPlaylist(const BMessage* playlistArchive)
+{
+	if (playlistArchive == NULL)
+		return;
+
+	BAutolock _(this);
+	BAutolock playlistLocker(fPlaylist);
+
+	if (fPlaylist->Unarchive(playlistArchive) != B_OK)
+		return;
+
+	int32 currentIndex;
+	if (playlistArchive->FindInt32("index", &currentIndex) != B_OK)
+		currentIndex = 0;
+	fPlaylist->SetCurrentItemIndex(currentIndex);
+
+	playlistLocker.Unlock();
+
+	playlistArchive->FindInt64("position", (int64*)&fInitialSeekPosition);
+}
 
 
 void
@@ -794,6 +806,8 @@ MainWin::OpenPlaylistItem(const PlaylistItemRef& item)
 		fHasVideo = fController->VideoTrackCount() != 0;
 		fHasAudio = fController->AudioTrackCount() != 0;
 		SetTitle(item->Name().String());
+		fController->SetTimePosition(fInitialSeekPosition);
+		fInitialSeekPosition = 0;
 	}
 	_SetupWindow();
 }

@@ -42,9 +42,32 @@ struct PlaybackManager::PlayingState {
 	int32		play_mode;
 	int32		loop_mode;
 	bool		looping_enabled;
+	bool		is_seek_request;
 	int64		current_frame;			// Playlist frame
 	int64		range_index;			// playing range index of current_frame
 	int64		activation_frame;		// absolute video frame
+
+	PlayingState()
+	{
+	}
+
+	PlayingState(const PlayingState& other)
+		:
+		start_frame(other.start_frame),
+		end_frame(other.end_frame),
+		frame_count(other.frame_count),
+		first_visible_frame(other.first_visible_frame),
+		last_visible_frame(other.last_visible_frame),
+		max_frame_count(other.max_frame_count),
+		play_mode(other.play_mode),
+		loop_mode(other.loop_mode),
+		looping_enabled(other.looping_enabled),
+		is_seek_request(false),
+		current_frame(other.current_frame),
+		range_index(other.range_index),
+		activation_frame(other.activation_frame)
+	{
+	}
 };
 
 
@@ -116,6 +139,7 @@ PlaybackManager::Init(float frameRate, int32 loopingMode, bool loopingEnabled,
 	state->play_mode = MODE_PLAYING_PAUSED_FORWARD;
 	state->loop_mode = loopingMode;
 	state->looping_enabled = loopingEnabled;
+	state->is_seek_request = false;
 	state->current_frame = currentFrame;
 	state->activation_frame = 0;
 	fStates.AddItem(state);
@@ -356,10 +380,13 @@ PlaybackManager::DurationChanged()
 void
 PlaybackManager::SetCurrentFrame(int64 frame)
 {
-	if (_LastState()->current_frame == frame)
+	if (_LastState()->current_frame == frame) {
+		NotifySeekHandled();
 		return;
+	}
 	PlayingState* newState = new PlayingState(*_LastState());
 	newState->current_frame = frame;
+	newState->is_seek_request = true;
 	_PushState(newState, false);
 }
 
@@ -731,7 +758,7 @@ PlaybackManager::GetPlaylistTimeInterval(bigtime_t startTime,
 	bigtime_t endTimeForFrame = TimeForFrame(endFrame);
 	endTime = min(endTime, endTimeForFrame);
 	bigtime_t intervalLength = endTime - startTime;
-	
+
 	// Finally determine the time bounds for the Playlist interval (depending
 	// on the playing direction).
 	switch (playingDirection) {
@@ -741,7 +768,7 @@ PlaybackManager::GetPlaylistTimeInterval(bigtime_t startTime,
 //			xStartTime = PlaylistTimeForFrame(xStartFrame)
 //						 + startTime - TimeForFrame(startFrame);
 //			xEndTime = xStartTime + intervalLength;
-			
+
 // TODO: The current method does not handle the times the same way.
 //       It may happen, that for the same performance time different
 //       Playlist times (within a frame) are returned when passing it
@@ -829,7 +856,7 @@ return result;
 
 
 /*!	Returns the Playlist frame for an Playlist time.
-	It holds PlaylistTimeForFrame(frame) <= time < 
+	It holds PlaylistTimeForFrame(frame) <= time <
 	PlaylistTimeForFrame(frame + 1). */
 int64
 PlaybackManager::PlaylistFrameForTime(bigtime_t time) const
@@ -1053,7 +1080,14 @@ PlaybackManager::NotifyFrameDropped() const
 void
 PlaybackManager::NotifyStopFrameReached() const
 {
-	// not currently implemented in PlaybackListener interface	
+	// not currently implemented in PlaybackListener interface
+}
+
+
+void
+PlaybackManager::NotifySeekHandled() const
+{
+	// not currently implemented in PlaybackListener interface
 }
 
 
@@ -1101,95 +1135,96 @@ PlaybackManager::_PushState(PlayingState* state, bool adjustCurrentFrame)
 //		debugger("PlaybackManager::_PushState() used before Init()\n");
 
 TRACE("PlaybackManager::_PushState()\n");
-	if (state) {
-		// unset fStopPlayingFrame
-		int64 oldStopPlayingFrame = fStopPlayingFrame;
-		fStopPlayingFrame = -1;
-		// get last state
-		PlayingState* lastState = _LastState();
-		int64 activationFrame = max(max(state->activation_frame,
-										lastState->activation_frame),
-									NextFrame());
+	if (state == NULL)
+		return;
+
+	// unset fStopPlayingFrame
+	int64 oldStopPlayingFrame = fStopPlayingFrame;
+	fStopPlayingFrame = -1;
+	// get last state
+	PlayingState* lastState = _LastState();
+	int64 activationFrame = max(max(state->activation_frame,
+									lastState->activation_frame),
+								NextFrame());
 TRACE("  state activation frame: %lld, last state activation frame: %lld, "
 "NextFrame(): %lld\n", state->activation_frame, lastState->activation_frame,
 NextFrame());
 
-		int64 currentFrame = 0;
-		// remember the current frame, if necessary
-		if (adjustCurrentFrame)
-			currentFrame = PlaylistFrameAtFrame(activationFrame);
-		// check whether it is active
-		// (NOTE: We may want to keep the last state, if it is not active,
-		//  but then the new state should become active after the last one.
-		//  Thus we had to replace `NextFrame()' with `activationFrame'.)
-		if (lastState->activation_frame >= NextFrame()) {
-			// it isn't -- remove it
-			fStates.RemoveItem(fStates.CountItems() - 1);
+	int64 currentFrame = 0;
+	// remember the current frame, if necessary
+	if (adjustCurrentFrame)
+		currentFrame = PlaylistFrameAtFrame(activationFrame);
+	// check whether it is active
+	// (NOTE: We may want to keep the last state, if it is not active,
+	//  but then the new state should become active after the last one.
+	//  Thus we had to replace `NextFrame()' with `activationFrame'.)
+	if (lastState->activation_frame >= NextFrame()) {
+		// it isn't -- remove it
+		fStates.RemoveItem(fStates.CountItems() - 1);
 TRACE("deleting last \n");
 PrintState(lastState);
-			delete lastState;
-		} else {
-			// it is -- keep it
-		}
-		// adjust the new state's current frame and activation frame
-		if (adjustCurrentFrame)
-			state->current_frame = currentFrame;
-		int32 playingDirection = _PlayingDirectionFor(state);
-		if (playingDirection != 0) {
-			state->current_frame
-				= _NextFrameInRange(state, state->current_frame);
-		} else {
-			// If not playing, we check at least, if the current frame lies
-			// within the interval [0, max_frame_count).
-			if (state->current_frame >= state->max_frame_count)
-				state->current_frame = state->max_frame_count - 1;
-			if (state->current_frame < 0)
-				state->current_frame = 0;
-		}
-		state->range_index = _RangeFrameForFrame(state, state->current_frame);
-		state->activation_frame = activationFrame;
-		fStates.AddItem(state);
+		delete lastState;
+	} else {
+		// it is -- keep it
+	}
+	// adjust the new state's current frame and activation frame
+	if (adjustCurrentFrame)
+		state->current_frame = currentFrame;
+	int32 playingDirection = _PlayingDirectionFor(state);
+	if (playingDirection != 0) {
+		state->current_frame
+			= _NextFrameInRange(state, state->current_frame);
+	} else {
+		// If not playing, we check at least, if the current frame lies
+		// within the interval [0, max_frame_count).
+		if (state->current_frame >= state->max_frame_count)
+			state->current_frame = state->max_frame_count - 1;
+		if (state->current_frame < 0)
+			state->current_frame = 0;
+	}
+	state->range_index = _RangeFrameForFrame(state, state->current_frame);
+	state->activation_frame = activationFrame;
+	fStates.AddItem(state);
 PrintState(state);
 TRACE("_PushState: state count: %ld\n", fStates.CountItems());
-		// push a new speed info
-		SpeedInfo* speedInfo = new SpeedInfo(*_LastSpeedInfo());
-		if (playingDirection == 0)
-			speedInfo->speed = 1.0;
-		else
-			speedInfo->speed = speedInfo->set_speed;
-		speedInfo->activation_frame = state->activation_frame;
-		_PushSpeedInfo(speedInfo);
-		// If the new state is a playing state and looping is turned off,
-		// determine when playing shall stop.
-		if (playingDirection != 0 && !state->looping_enabled) {
-			int64 startFrame, endFrame, frameCount;
-			_GetPlayingBoundsFor(state, startFrame, endFrame, frameCount);
-			if (playingDirection == -1)
-				swap(startFrame, endFrame);
-			// If we shall stop at the frame we start, set the current frame
-			// to the beginning of the range.
-			// We have to take care, since this state may equal the one
-			// before (or probably differs in just one (unimportant)
-			// parameter). This happens for instance, if the user changes the
-			// data or start/end frame... while playing. In this case setting
-			// the current frame to the start frame is unwanted. Therefore
-			// we check whether the previous state was intended to stop
-			// at the activation frame of this state.
-			if (oldStopPlayingFrame != state->activation_frame
-				&& state->current_frame == endFrame && frameCount > 1) {
-				state->current_frame = startFrame;
-				state->range_index
-					= _RangeFrameForFrame(state, state->current_frame);
-			}
-			if (playingDirection == 1) {	// forward
-				fStopPlayingFrame = state->activation_frame
-									+ frameCount - state->range_index - 1;
-			} else {						// backwards
-				fStopPlayingFrame = state->activation_frame
-									+ state->range_index;
-			}
-			_CheckStopPlaying();
+	// push a new speed info
+	SpeedInfo* speedInfo = new SpeedInfo(*_LastSpeedInfo());
+	if (playingDirection == 0)
+		speedInfo->speed = 1.0;
+	else
+		speedInfo->speed = speedInfo->set_speed;
+	speedInfo->activation_frame = state->activation_frame;
+	_PushSpeedInfo(speedInfo);
+	// If the new state is a playing state and looping is turned off,
+	// determine when playing shall stop.
+	if (playingDirection != 0 && !state->looping_enabled) {
+		int64 startFrame, endFrame, frameCount;
+		_GetPlayingBoundsFor(state, startFrame, endFrame, frameCount);
+		if (playingDirection == -1)
+			swap(startFrame, endFrame);
+		// If we shall stop at the frame we start, set the current frame
+		// to the beginning of the range.
+		// We have to take care, since this state may equal the one
+		// before (or probably differs in just one (unimportant)
+		// parameter). This happens for instance, if the user changes the
+		// data or start/end frame... while playing. In this case setting
+		// the current frame to the start frame is unwanted. Therefore
+		// we check whether the previous state was intended to stop
+		// at the activation frame of this state.
+		if (oldStopPlayingFrame != state->activation_frame
+			&& state->current_frame == endFrame && frameCount > 1) {
+			state->current_frame = startFrame;
+			state->range_index
+				= _RangeFrameForFrame(state, state->current_frame);
 		}
+		if (playingDirection == 1) {	// forward
+			fStopPlayingFrame = state->activation_frame
+								+ frameCount - state->range_index - 1;
+		} else {						// backwards
+			fStopPlayingFrame = state->activation_frame
+								+ state->range_index;
+		}
+		_CheckStopPlaying();
 	}
 TRACE("PlaybackManager::_PushState() done\n");
 }
@@ -1213,6 +1248,11 @@ PlaybackManager::_UpdateStates()
 TRACE("_UpdateStates: states removed: %ld, state count: %ld\n",
 firstActive, fStates.CountItems());
 }
+	PlayingState* currentState = _StateAt(firstActive);
+	if (currentState != NULL && currentState->is_seek_request) {
+		currentState->is_seek_request = false;
+		NotifySeekHandled();
+	}
 }
 
 

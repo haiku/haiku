@@ -1,6 +1,6 @@
 /*
- * Copyright 2008 Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 1998 Eric Shepherd.
+ * Copyright 2008, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 1998, Eric Shepherd.
  * All rights reserved. Distributed under the terms of the Be Sample Code
  * license.
  */
@@ -159,7 +159,7 @@ SettingsMessage::SetValue(const char* name, const BString& value)
 
 
 status_t
-SettingsMessage::SetValue(const char* name, const BPoint& value) 
+SettingsMessage::SetValue(const char* name, const BPoint& value)
 {
 	if (ReplacePoint(name, value) == B_OK)
 		return B_OK;
