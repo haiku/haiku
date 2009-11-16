@@ -970,17 +970,21 @@ mp3Reader::IsValidStream(uint8 *buffer, int size)
 	// that the length encoded in the header is correct,
 	// and also that mpeg version and layer do not change
 	int length1 = GetFrameLength(buffer);
+		
 	if (length1 < 0 || (length1 + 4) > size)
 		return false;
+
 	int version_index1 = (buffer[1] >> 3) & 0x03;
 	int layer_index1 = (buffer[1] >> 1) & 0x03;
 	int length2 = GetFrameLength(buffer + length1);
 	if (length2 < 0 || (length1 + length2 + 4) > size)
 		return false;
+
 	int version_index2 = (buffer[length1 + 1] >> 3) & 0x03;
 	int layer_index2 = (buffer[length1 + 1] >> 1) & 0x03;
 	if (version_index1 != version_index2 || layer_index1 != layer_index1)
 		return false;
+
 	int length3 = GetFrameLength(buffer + length1 + length2);
 	if (length3 < 0)
 		return false;
@@ -988,13 +992,16 @@ mp3Reader::IsValidStream(uint8 *buffer, int size)
 	int layer_index3 = (buffer[length1 + length2 + 1] >> 1) & 0x03;
 	if (version_index2 != version_index3 || layer_index2 != layer_index3)
 		return false;
+
 	int length4 = GetFrameLength(buffer + length1 + length2 + length3);
 	if (length4 < 0)
 		return false;
+
 	int version_index4 = (buffer[length1 + length2 + length3 + 1] >> 3) & 0x03;
 	int layer_index4 = (buffer[length1 + length2 + length3 + 1] >> 1) & 0x03;
 	if (version_index3 != version_index4 || layer_index3 != layer_index4)
 		return false;
+
 	return true;
 }
 
@@ -1002,18 +1009,22 @@ int
 mp3Reader::GetFrameLength(void *header)
 {
 	uint8 *h = (uint8 *)header;
+	bool lsf = false;
 
 	if (h[0] != 0xff)
 		return -1;
 	if ((h[1] & 0xe0) != 0xe0)
 		return -1;
-	
+
 	int mpeg_version_index = (h[1] >> 3) & 0x03;
 	int layer_index = (h[1] >> 1) & 0x03;
 	int bitrate_index = (h[2] >> 4) & 0x0f;
 	int sampling_rate_index = (h[2] >> 2) & 0x03;
 	int padding = (h[2] >> 1) & 0x01;
+	
 	/* not interested in the other bits */
+	
+	lsf = (mpeg_version_index == 0) || (mpeg_version_index == 2);
 	
 	int bitrate = bit_rate_table[mpeg_version_index][layer_index][bitrate_index];
 	int framerate = frame_rate_table[mpeg_version_index][sampling_rate_index];
@@ -1022,17 +1033,22 @@ mp3Reader::GetFrameLength(void *header)
 		return -1;
 
 	int length;	
-	if (layer_index == 3) // layer 1
-		length = ((144 * 1000 * bitrate) / framerate) + (padding * 4);
-	else // layer 2 & 3
+	if (layer_index == 3) { // layer 1
+		length = ((12 * 1000 * bitrate) / framerate + padding) * 4;
+	} else if (layer_index == 2) { // layer 2
 		length = ((144 * 1000 * bitrate) / framerate) + padding;
-
+	} else if (lsf) { // layer 3 with lsf
+		length = ((144 * 1000 * bitrate) / (framerate*2)) + padding;
+	} else { // layer 3 without lsf
+		length = ((144 * 1000 * bitrate) / framerate) + padding;
+	}
+		
 #if 0
-	TRACE("%s %s, %s crc, bit rate %d, frame rate %d, padding %d, frame length %d\n",
+	printf("%s %s, %s crc, bit rate %d, frame rate %d, padding %d, frame length %d lsf=%s\n",
 		mpeg_version_index == 0 ? "mpeg 2.5" : (mpeg_version_index == 2 ? "mpeg 2" : "mpeg 1"),
 		layer_index == 3 ? "layer 1" : (layer_index == 2 ? "layer 2" : "layer 3"),
 		(h[1] & 0x01) ? "no" : "has",
-		bitrate, framerate, padding, length);
+		bitrate, framerate, padding, length, (lsf ? "true" : "false"));
 #endif
 
 	return length;
