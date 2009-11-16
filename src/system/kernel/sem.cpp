@@ -1123,47 +1123,39 @@ _get_next_sem_info(team_id teamID, int32 *_cookie, struct sem_info *info,
 	if (team == NULL)
 		return B_BAD_TEAM_ID;
 
-	int32 id = *_cookie;
-	sem_entry* sem = NULL;
-
-	if (id != 0) {
-		// shortcut to the first entry
-		sem = &sSems[id % sMaxSems];
-		GRAB_SEM_LOCK(*sem);
-
-		// Check if the semaphore got deleted or reused in the mean time
-		if (sem->id != id)
-			sem = NULL;
-
-		RELEASE_SEM_LOCK(*sem);
-	}
-	if (sem == NULL)
-		sem = (sem_entry*)list_get_first_item(&team->sem_list);
-
+	// TODO: find a way to iterate the list that is more reliable
+	sem_entry* sem = (sem_entry*)list_get_first_item(&team->sem_list);
+	int32 newIndex = *_cookie;
+	int32 index = 0;
 	bool found = false;
 
 	while (!found) {
 		// find the next entry to be returned
-		while (sem != NULL && id >= sem->id)
+		while (sem != NULL && index < newIndex) {
 			sem = (sem_entry*)list_get_next_item(&team->sem_list, sem);
+			index++;
+		}
 
 		if (sem == NULL)
 			return B_BAD_VALUE;
 
 		GRAB_SEM_LOCK(*sem);
+
 		if (sem->id != -1 && sem->u.used.owner == team) {
 			// found one!
 			fill_sem_info(sem, info, size);
-			id = sem->id;
+			newIndex = index + 1;
 			found = true;
-		}
+		} else
+			newIndex++;
+
 		RELEASE_SEM_LOCK(*sem);
 	}
 
 	if (!found)
 		return B_BAD_VALUE;
 
-	*_cookie = id;
+	*_cookie = newIndex;
 	return B_OK;
 }
 
