@@ -377,6 +377,7 @@ int
 mp3Decoder::GetFrameLength(const void *header)
 {
 	const uint8 *h = static_cast<const uint8 *>(header);
+	bool lsf = false;
 
 	if (h[0] != 0xff) {
 		TRACE("No 0xff MP3 Header in chunk %x\n",h[0]);
@@ -396,8 +397,9 @@ mp3Decoder::GetFrameLength(const void *header)
 	
 	int bitrate = bit_rate_table[mpeg_version_index][layer_index][bitrate_index];
 	int framerate = frame_rate_table[mpeg_version_index][sampling_rate_index];
-	
-	TRACE("%s %s, %s crc, bit rate %d, frame rate %d, padding %d",
+	lsf = (mpeg_version_index == 0) || (mpeg_version_index == 2);
+
+	TRACE("%s %s, %s crc, bit rate %d, frame rate %d, padding %d\n",
 		mpeg_version_index == 0 ? "mpeg 2.5" : (mpeg_version_index == 2 ? "mpeg 2" : "mpeg 1"),
 		layer_index == 3 ? "layer 1" : (layer_index == 2 ? "layer 2" : "layer 3"),
 		(h[1] & 0x01) ? "no" : "has",
@@ -408,11 +410,16 @@ mp3Decoder::GetFrameLength(const void *header)
 		return -1;
 	}
 
-	int length;	
-	if (layer_index == 3) // layer 1
-		length = ((144 * 1000 * bitrate) / framerate) + (padding * 4);
-	else // layer 2 & 3
+	int length;
+	if (layer_index == 3) { // layer 1
+		length = ((12 * 1000 * bitrate) / framerate + padding) * 4;
+	} else if (layer_index == 2) { // layer 2
 		length = ((144 * 1000 * bitrate) / framerate) + padding;
+	} else if (lsf) { // layer 3 with lsf
+		length = ((144 * 1000 * bitrate) / (framerate*2)) + padding;
+	} else { // layer 3 without lsf
+		length = ((144 * 1000 * bitrate) / framerate) + padding;
+	}
 
 #if 0
 	TRACE("%s %s, %s crc, bit rate %d, frame rate %d, padding %d, frame length %d\n",
