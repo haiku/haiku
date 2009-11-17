@@ -7,6 +7,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include <arch/debug.h>
 #include <debug.h>
 #include <elf.h>
@@ -14,7 +15,6 @@
 #include <int.h>
 #include <kernel.h>
 #include <lock.h>
-#include <malloc.h>
 #include <signal.h>
 #include <string.h>
 #include <team.h>
@@ -308,11 +308,15 @@ dump_page(heap_page *page)
 static void
 dump_bin(heap_bin *bin)
 {
-	kprintf("\telement_size: %lu; max_free_count: %u; page_list %p;\n",
-		bin->element_size, bin->max_free_count, bin->page_list);
+	uint32 count = 0;
+	for (heap_page *page = bin->page_list; page != NULL; page = page->next)
+		count++;
 
-	for (heap_page *temp = bin->page_list; temp != NULL; temp = temp->next)
-		dump_page(temp);
+	kprintf("\telement_size: %lu; max_free_count: %u; page_list %p (%lu pages"
+		");\n", bin->element_size, bin->max_free_count, bin->page_list, count);
+
+	for (heap_page *page = bin->page_list; page != NULL; page = page->next)
+		dump_page(page);
 }
 
 
@@ -498,14 +502,18 @@ dump_allocations(int argc, char **argv)
 	team_id team = -1;
 	thread_id thread = -1;
 	addr_t caller = 0;
+	addr_t address = 0;
 	bool statsOnly = false;
+
 	for (int32 i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "team") == 0)
-			team = strtoul(argv[++i], NULL, 0);
+			team = parse_expression(argv[++i]);
 		else if (strcmp(argv[i], "thread") == 0)
-			thread = strtoul(argv[++i], NULL, 0);
+			thread = parse_expression(argv[++i]);
 		else if (strcmp(argv[i], "caller") == 0)
-			caller = strtoul(argv[++i], NULL, 0);
+			caller = parse_expression(argv[++i]);
+		else if (strcmp(argv[i], "address") == 0)
+			address = parse_expression(argv[++i]);
 		else if (strcmp(argv[i], "stats") == 0)
 			statsOnly = true;
 		else {
@@ -554,7 +562,8 @@ dump_allocations(int argc, char **argv)
 
 						if ((team == -1 || info->team == team)
 							&& (thread == -1 || info->thread == thread)
-							&& (caller == 0 || info->caller == caller)) {
+							&& (caller == 0 || info->caller == caller)
+							&& (address == 0 || base == address)) {
 							// interesting...
 							if (!statsOnly) {
 								kprintf("team: % 6ld; thread: % 6ld; "
@@ -583,7 +592,8 @@ dump_allocations(int argc, char **argv)
 
 					if ((team == -1 || info->team == team)
 						&& (thread == -1 || info->thread == thread)
-						&& (caller == 0 || info->caller == caller)) {
+						&& (caller == 0 || info->caller == caller)
+						&& (address == 0 || base == address)) {
 						// interesting...
 						if (!statsOnly) {
 							kprintf("team: % 6ld; thread: % 6ld;"
@@ -605,7 +615,8 @@ dump_allocations(int argc, char **argv)
 		}
 	}
 
-	kprintf("total allocations: %lu; total bytes: %lu\n", totalCount, totalSize);
+	kprintf("total allocations: %lu; total bytes: %lu\n", totalCount,
+		totalSize);
 	return 0;
 }
 
@@ -1922,11 +1933,11 @@ heap_init(addr_t base, size_t size)
 #else // !KERNEL_HEAP_LEAK_CHECK
 	add_debugger_command_etc("allocations", &dump_allocations,
 		"Dump current heap allocations",
-		"[(\"team\" | \"thread\") <id>] [ \"caller\" <address> ] [\"stats\"]\n"
+		"[(\"team\" | \"thread\") <id>] [\"caller\" <address>] [\"address\" <address>] [\"stats\"]\n"
 		"If no parameters are given, all current alloactions are dumped.\n"
-		"If \"team\", \"thread\", and/or \"caller\" is specified as the first\n"
-		"argument, only allocations matching the team id, thread id, or \n"
-		"caller address given in the second argument are printed.\n"
+		"If \"team\", \"thread\", \"caller\", and/or \"address\" is specified as the first\n"
+		"argument, only allocations matching the team ID, thread ID, caller\n"
+		"address or allocated address given in the second argument are printed.\n"
 		"If the optional argument \"stats\" is specified, only the allocation\n"
 		"counts and no individual allocations are printed\n", 0);
 	add_debugger_command_etc("allocations_per_caller",
