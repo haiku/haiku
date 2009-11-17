@@ -45,6 +45,8 @@ public:
 	virtual	mode_t				Mode() const = 0;
 	virtual	uid_t				UserID() const = 0;
 	virtual	gid_t				GroupID() const = 0;
+	virtual	timespec			ModifiedTime() const = 0;
+	virtual	off_t				FileSize() const = 0;
 
 	virtual	status_t			AddPackageNode(PackageNode* packageNode) = 0;
 

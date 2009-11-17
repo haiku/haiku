@@ -17,6 +17,8 @@ public:
 									const PackageData& data);
 	virtual						~PackageFile();
 
+	virtual	off_t				FileSize() const;
+
 private:
 			PackageData			fData;
 };

@@ -285,17 +285,17 @@ packagefs_read_stat(fs_volume* fsVolume, fs_vnode* fsNode, struct stat* st)
 
 	NodeReadLocker nodeLocker(node);
 
-// TODO: Fill in correctly!
 	st->st_mode = node->Mode();
 	st->st_nlink = 1;
-	st->st_uid = 0;
-	st->st_gid = 0;
-	st->st_size = 0;
+	st->st_uid = node->UserID();
+	st->st_gid = node->GroupID();
+	st->st_size = node->FileSize();
 	st->st_blksize = kOptimalIOSize;
-	st->st_atime = 0;
-	st->st_mtime = 0;
-	st->st_ctime = 0;
-	st->st_crtime = 0;
+	st->st_mtim = node->ModifiedTime();
+	st->st_atim = st->st_mtim;
+	st->st_ctim = st->st_mtim;
+		// TODO: Perhaps manage a changed time (particularly for directories)?
+	st->st_crtim = st->st_mtim;
 
 	return B_OK;
 }

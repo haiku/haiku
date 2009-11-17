@@ -6,6 +6,8 @@
 #define PACKAGE_NODE_H
 
 
+#include <sys/stat.h>
+
 #include <SupportDefs.h>
 
 #include <util/SinglyLinkedList.h>
@@ -33,12 +35,20 @@ public:
 			gid_t				GroupID() const			{ return fGroupID; }
 			void				SetGroupID(gid_t id)	{ fGroupID = id; }
 
+			void				SetModifiedTime(const timespec& time)
+									{ fModifiedTime = time; }
+			const timespec&		ModifiedTime() const
+									{ return fModifiedTime; }
+
+	virtual	off_t				FileSize() const;
+
 protected:
 			PackageDirectory*	fParent;
 			char*				fName;
 			mode_t				fMode;
 			uid_t				fUserID;
 			gid_t				fGroupID;
+			timespec			fModifiedTime;
 };
 
 

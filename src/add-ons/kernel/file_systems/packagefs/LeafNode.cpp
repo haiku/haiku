@@ -53,6 +53,26 @@ LeafNode::GroupID() const
 }
 
 
+timespec
+LeafNode::ModifiedTime() const
+{
+	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+		return packageNode->ModifiedTime();
+
+	timespec time = { 0, 0 };
+	return time;
+}
+
+
+off_t
+LeafNode::FileSize() const
+{
+	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+		return packageNode->FileSize();
+	return 0;
+}
+
+
 status_t
 LeafNode::AddPackageNode(PackageNode* packageNode)
 {

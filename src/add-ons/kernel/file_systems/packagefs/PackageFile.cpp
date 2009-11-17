@@ -18,3 +18,10 @@ PackageFile::PackageFile(mode_t mode, const PackageData& data)
 PackageFile::~PackageFile()
 {
 }
+
+
+off_t
+PackageFile::FileSize() const
+{
+	return fData.UncompressedSize();
+}

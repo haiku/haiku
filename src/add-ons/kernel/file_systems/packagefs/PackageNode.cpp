@@ -39,3 +39,10 @@ PackageNode::Init(PackageDirectory* parent, const char* name)
 
 	return B_OK;
 }
+
+
+off_t
+PackageNode::FileSize() const
+{
+	return 0;
+}

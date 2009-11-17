@@ -134,15 +134,17 @@ struct Volume::PackageLoaderContentHandler : PackageContentHandler {
 
 		status_t error;
 
+		// get the file mode -- filter out write permissions
+		mode_t mode = entry->Mode() & ~(mode_t)(S_IWUSR | S_IWGRP | S_IWOTH);
+
 		// create the package node
 		PackageNode* node;
-		if (S_ISREG(entry->Mode())) {
+		if (S_ISREG(mode)) {
 			// file
-			node = new(std::nothrow) PackageFile(entry->Mode(), entry->Data());
-		} else if (S_ISLNK(entry->Mode())) {
+			node = new(std::nothrow) PackageFile(mode, entry->Data());
+		} else if (S_ISLNK(mode)) {
 			// symlink
-			PackageSymlink* symlink = new(std::nothrow) PackageSymlink(
-				entry->Mode());
+			PackageSymlink* symlink = new(std::nothrow) PackageSymlink(mode);
 			if (symlink == NULL)
 				RETURN_ERROR(B_NO_MEMORY);
 
@@ -153,9 +155,9 @@ struct Volume::PackageLoaderContentHandler : PackageContentHandler {
 			}
 
 			node = symlink;
-		} else if (S_ISDIR(entry->Mode())) {
+		} else if (S_ISDIR(mode)) {
 			// directory
-			node = new(std::nothrow) PackageDirectory(entry->Mode());
+			node = new(std::nothrow) PackageDirectory(mode);
 		} else
 			RETURN_ERROR(B_BAD_DATA);
 
@@ -166,6 +168,8 @@ struct Volume::PackageLoaderContentHandler : PackageContentHandler {
 		error = node->Init(parentDir, entry->Name());
 		if (error != B_OK)
 			RETURN_ERROR(error);
+
+		node->SetModifiedTime(entry->ModifiedTime());
 
 		// add it to the parent directory
 		if (parentDir != NULL)

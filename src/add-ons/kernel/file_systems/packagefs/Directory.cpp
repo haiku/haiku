@@ -65,6 +65,24 @@ Directory::GroupID() const
 }
 
 
+timespec
+Directory::ModifiedTime() const
+{
+	if (PackageDirectory* packageDirectory = fPackageDirectories.Head())
+		return packageDirectory->ModifiedTime();
+
+	timespec time = { 0, 0 };
+	return time;
+}
+
+
+off_t
+Directory::FileSize() const
+{
+	return 0;
+}
+
+
 status_t
 Directory::AddPackageNode(PackageNode* packageNode)
 {
