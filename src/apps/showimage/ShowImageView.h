@@ -167,8 +167,6 @@ class ShowImageView : public BView {
 		static int _CompareEntries(const void* a, const void* b);
 		void _FreeEntries(BList* entries);
 		void _SetTrackerSelectionToCurrent();
-		bool _FindNextImageByDir(entry_ref *in_current, entry_ref *out_image,
-				bool next, bool rewind);
 		bool _FindNextImage(entry_ref *in_current, entry_ref *out_image,
 				bool next, bool rewind);
 		bool _ShowNextImage(bool next, bool rewind);

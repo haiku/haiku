@@ -2217,72 +2217,12 @@ ShowImageView::_SetTrackerSelectionToCurrent()
 
 
 bool
-ShowImageView::_FindNextImageByDir(entry_ref *in_current, entry_ref *out_image, bool next, bool rewind)
+ShowImageView::_FindNextImage(entry_ref *in_current, entry_ref *ref, bool next,
+	bool rewind)
 {
-	ASSERT(next || !rewind);
-	BEntry curImage(in_current);
-	entry_ref entry, *ref;
-	BDirectory parent;
-	BList entries;
-	bool found = false;
-	int32 cur;
-
-	if (curImage.GetParent(&parent) != B_OK) {
-		return false;
-	}
-
-	// insert current ref, so we can find it easily after sorting
-	entries.AddItem(in_current);
-
-	while (parent.GetNextRef(&entry) == B_OK) {
-		if (entry != *in_current) {
-			entries.AddItem(new entry_ref(entry));
-		}
-	}
-
-	entries.SortItems(_CompareEntries);
-
-	cur = entries.IndexOf(in_current);
-	ASSERT(cur >= 0);
-
-	// remove it so _FreeEntries() does not delete it
-	entries.RemoveItem(in_current);
-
-	if (next) {
-		// find the next image in the list
-		if (rewind) cur = 0; // start with first
-		for (; (ref = (entry_ref*)entries.ItemAt(cur)) != NULL; cur ++) {
-			if (_IsImage(ref)) {
-				found = true;
-				*out_image = (const entry_ref)*ref;
-				break;
-			}
-		}
-	} else {
-		// find the previous image in the list
-		cur --;
-		for (; cur >= 0; cur --) {
-			ref = (entry_ref*)entries.ItemAt(cur);
-			if (_IsImage(ref)) {
-				found = true;
-				*out_image = (const entry_ref)*ref;
-				break;
-			}
-		}
-	}
-
-	_FreeEntries(&entries);
-	return found;
-}
-
-bool
-ShowImageView::_FindNextImage(entry_ref *in_current, entry_ref *ref, bool next, bool rewind)
-{
-	// Based on similar function from BeMail!
+	// Based on GetTrackerWindowFile function from BeMail
 	if (!fTrackerMessenger.IsValid())
-		// If tracker scripting is not available,
-		// fall back on directory searching code
-		return _FindNextImageByDir(in_current, ref, next, rewind);
+		return false;
 
 	//
 	//	Ask the Tracker what the next/prev file in the window is.
@@ -2312,9 +2252,9 @@ ShowImageView::_FindNextImage(entry_ref *in_current, entry_ref *ref, bool next, 
 
 		BMessage reply;
 		if (fTrackerMessenger.SendMessage(&request, &reply) != B_OK)
-			return _FindNextImageByDir(in_current, ref, next, rewind);;
+			return false;
 		if (reply.FindRef("result", &nextRef) != B_OK)
-			return _FindNextImageByDir(in_current, ref, next, rewind);;
+			return false;
 
 		if (_IsImage(&nextRef))
 			foundRef = true;
