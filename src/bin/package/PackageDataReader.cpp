@@ -193,7 +193,7 @@ public:
 
 			// copy data to buffer
 			size_t toCopy = std::min(size, (size_t)fChunkSize - inChunkOffset);
-			memcpy(buffer, fUncompressBuffer, toCopy);
+			memcpy(buffer, fUncompressBuffer + inChunkOffset, toCopy);
 
 			buffer += toCopy;
 			size -= toCopy;
