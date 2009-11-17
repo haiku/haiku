@@ -4,7 +4,7 @@
  */
 
 
-#include "Node.h"
+#include "PackageNode.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -12,28 +12,22 @@
 #include "DebugSupport.h"
 
 
-Node::Node(ino_t id)
+PackageNode::PackageNode()
 	:
-	fID(id),
 	fParent(NULL),
-	fName(NULL),
-	fUserID(0),
-	fGroupID(0)
+	fName(NULL)
 {
-	rw_lock_init(&fLock, "packagefs node");
 }
 
 
-Node::~Node()
+PackageNode::~PackageNode()
 {
-PRINT("%p->Node::~Node()\n", this);
 	free(fName);
-	rw_lock_destroy(&fLock);
 }
 
 
 status_t
-Node::Init(Directory* parent, const char* name)
+PackageNode::Init(PackageDirectory* parent, const char* name)
 {
 	fParent = parent;
 	fName = strdup(name);

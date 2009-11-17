@@ -1,21 +1,56 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems packagefs ;
 
 
-UsePrivateHeaders shared ;
+UseLibraryHeaders zlib ;
+UsePrivateKernelHeaders ;
+UsePrivateHeaders haiku_package shared ;
+
+DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
+	# TODO: Remove when it is complete!
 
 
 HAIKU_PACKAGE_FS_SOURCES =
 	DebugSupport.cpp
 	Directory.cpp
+	File.cpp
 	kernel_interface.cpp
 	Node.cpp
+	Package.cpp
+	PackageDirectory.cpp
+	PackageDomain.cpp
+	PackageFile.cpp
+	PackageNode.cpp
+	PackageSymlink.cpp
+	Symlink.cpp
 	Volume.cpp
 ;
 
+HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
+	DataOutput.cpp
+	DataReader.cpp
+	ErrorOutput.cpp
+	PackageEntryAttribute.cpp
+	PackageData.cpp
+	PackageDataReader.cpp
+	PackageEntry.cpp
+	PackageReader.cpp
+
+	# compression
+	ZlibCompressionBase.cpp
+	ZlibDecompressor.cpp
+;
+
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package compression ] ;
+
 
 KernelAddon packagefs
-	: $(HAIKU_PACKAGE_FS_SOURCES)
-	: $(HAIKU_STATIC_LIBSUPC++)
+	:
+	$(HAIKU_PACKAGE_FS_SOURCES)
+	$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES)
+
+	: $(HAIKU_STATIC_LIBSUPC++) libz.a
 ;
 
 

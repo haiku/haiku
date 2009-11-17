@@ -1,13 +1,23 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems packagefs userland ;
 
 
+UseLibraryHeaders zlib ;
+UsePrivateKernelHeaders ;
+UsePrivateHeaders haiku_package shared ;
+
+DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
+	# TODO: Remove when it is complete!
+
+
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) ] ;
-
-
-UsePrivateHeaders shared ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package compression ] ;
 
 
 Addon <userland>packagefs
-	: $(HAIKU_PACKAGE_FS_SOURCES)
-	: libuserlandfs_haiku_kernel.so $(TARGET_LIBSUPC++)
+	:
+	$(HAIKU_PACKAGE_FS_SOURCES)
+	$(HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES)
+
+	: libuserlandfs_haiku_kernel.so $(TARGET_LIBSUPC++) libz.a
 ;

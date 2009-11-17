@@ -6,6 +6,8 @@
 
 #include "kernel_interface.h"
 
+#include <dirent.h>
+
 #include <new>
 
 #include <fs_info.h>
@@ -20,6 +22,38 @@
 
 
 static const uint32 kOptimalIOSize = 64 * 1024;
+
+
+// #pragma mark - helper functions
+
+
+static bool
+is_user_in_group(gid_t gid)
+{
+	gid_t groups[NGROUPS_MAX];
+	int groupCount = getgroups(NGROUPS_MAX, groups);
+	for (int i = 0; i < groupCount; i++) {
+		if (gid == groups[i])
+			return true;
+	}
+
+	return (gid == getegid());
+}
+
+
+static bool
+set_dirent_name(struct dirent* buffer, size_t bufferSize, const char* name,
+	size_t nameLen)
+{
+	size_t length = (buffer->d_name + nameLen + 1) - (char*)buffer;
+	if (length > bufferSize)
+		return false;
+
+	memcpy(buffer->d_name, name, nameLen);
+	buffer->d_name[nameLen] = '\0';
+	buffer->d_reclen = length;
+	return true;
+}
 
 
 //	#pragma mark - Volume
@@ -92,7 +126,34 @@ packagefs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* entryName,
 	FUNCTION("volume: %p, dir: %p (%lld), entry: \"%s\"\n", volume, dir,
 		dir->ID(), entryName);
 
-	return B_UNSUPPORTED;
+	if (!S_ISDIR(dir->Mode()))
+		return B_NOT_A_DIRECTORY;
+
+	// resolve "."
+	if (strcmp(entryName, ".") == 0) {
+		Node* node;
+		*_vnid = dir->ID();
+		return volume->GetVNode(*_vnid, node);
+	}
+
+	// resolve ".."
+	if (strcmp(entryName, "..") == 0) {
+		Node* node;
+		*_vnid = dir->Parent()->ID();
+		return volume->GetVNode(*_vnid, node);
+	}
+
+	// resolve normal entries -- look up the node
+	NodeReadLocker dirLocker(dir);
+	Node* node = dynamic_cast<Directory*>(dir)->FindChild(entryName);
+	if (node == NULL)
+		return B_ENTRY_NOT_FOUND;
+	BReference<Node> nodeReference(node);
+	dirLocker.Unlock();
+
+	// get the vnode reference
+	*_vnid = node->ID();
+	RETURN_ERROR(volume->GetVNode(*_vnid, node));
 }
 
 
@@ -104,14 +165,33 @@ packagefs_get_vnode(fs_volume* fsVolume, ino_t vnid, fs_vnode* fsNode,
 
 	FUNCTION("volume: %p, vnid: %lld\n", volume, vnid);
 
-	return B_UNSUPPORTED;
+	VolumeReadLocker volumeLocker(volume);
+	Node* node = volume->FindNode(vnid);
+	if (node == NULL)
+		return B_ENTRY_NOT_FOUND;
+	node->AcquireReference();
+
+	fsNode->private_node = node;
+	fsNode->ops = &gPackageFSVnodeOps;
+	*_type = node->Mode() & S_IFMT;
+	*_flags = 0;
+
+	return B_OK;
 }
 
 
 static status_t
-packagefs_put_vnode(fs_volume* fs, fs_vnode* _node, bool reenter)
+packagefs_put_vnode(fs_volume* fsVolume, fs_vnode* fsNode, bool reenter)
 {
-	return B_UNSUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+
+	FUNCTION("volume: %p, node: %p\n", volume, node);
+	TOUCH(volume);
+
+	node->ReleaseReference();
+
+	return B_OK;
 }
 
 
@@ -119,7 +199,7 @@ packagefs_put_vnode(fs_volume* fs, fs_vnode* _node, bool reenter)
 
 
 static status_t
-packagefs_read_symlink(fs_volume* fs, fs_vnode* _node, char* buffer,
+packagefs_read_symlink(fs_volume* fsVolume, fs_vnode* fsNode, char* buffer,
 	size_t* bufferSize)
 {
 	return B_UNSUPPORTED;
@@ -127,9 +207,46 @@ packagefs_read_symlink(fs_volume* fs, fs_vnode* _node, char* buffer,
 
 
 static status_t
-packagefs_access(fs_volume* fs, fs_vnode* _node, int mode)
+packagefs_access(fs_volume* fsVolume, fs_vnode* fsNode, int mode)
 {
-	return B_UNSUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+	TOUCH(volume);
+
+	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	TOUCH(volume);
+
+	// write access requested?
+	if (mode & W_OK)
+		return B_READ_ONLY_DEVICE;
+
+	// get node permissions
+	int userPermissions = (node->Mode() & S_IRWXU) >> 6;
+	int groupPermissions = (node->Mode() & S_IRWXG) >> 3;
+	int otherPermissions = node->Mode() & S_IRWXO;
+
+	// get the permissions for this uid/gid
+	int permissions = 0;
+	uid_t uid = geteuid();
+
+	if (uid == 0) {
+		// user is root
+		// root has always read/write permission, but at least one of the
+		// X bits must be set for execute permission
+		permissions = userPermissions | groupPermissions | otherPermissions
+			| S_IROTH | S_IWOTH;
+	} else if (uid == node->UserID()) {
+		// user is node owner
+		permissions = userPermissions;
+	} else if (is_user_in_group(node->GroupID())) {
+		// user is in owning group
+		permissions = groupPermissions;
+	} else {
+		// user is one of the others
+		permissions = otherPermissions;
+	}
+
+	return (mode & ~permissions) ? B_NOT_ALLOWED : B_OK;
 }
 
 
@@ -140,9 +257,10 @@ packagefs_read_stat(fs_volume* fsVolume, fs_vnode* fsNode, struct stat* st)
 	Node* node = (Node*)fsNode->private_node;
 
 	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	TOUCH(volume);
 
 // TODO: Fill in correctly!
-	st->st_mode = S_IFDIR;
+	st->st_mode = node->Mode();
 	st->st_nlink = 1;
 	st->st_uid = 0;
 	st->st_gid = 0;
@@ -161,23 +279,35 @@ packagefs_read_stat(fs_volume* fsVolume, fs_vnode* fsNode, struct stat* st)
 
 
 static status_t
-packagefs_open(fs_volume* fs, fs_vnode* _node, int openMode, void** cookie)
+packagefs_open(fs_volume* fsVolume, fs_vnode* fsNode, int openMode,
+	void** _cookie)
 {
-	return B_UNSUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+
+	FUNCTION("volume: %p, node: %p (%lld), openMode %#x\n", volume, node,
+		node->ID(), openMode);
+	TOUCH(volume);
+	TOUCH(node);
+
+// TODO: Implement it for real!
+	*_cookie = NULL;
+
+	return B_OK;
 }
 
 
 static status_t
 packagefs_close(fs_volume* fs, fs_vnode* _node, void* cookie)
 {
-	return B_UNSUPPORTED;
+	return B_OK;
 }
 
 
 static status_t
 packagefs_free_cookie(fs_volume* fs, fs_vnode* _node, void* cookie)
 {
-	return B_UNSUPPORTED;
+	return B_OK;
 }
 
 
@@ -192,39 +322,218 @@ packagefs_read(fs_volume* fs, fs_vnode* _node, void* cookie, off_t pos,
 // #pragma mark - Directories
 
 
+struct DirectoryCookie : DirectoryIterator {
+	Directory*	directory;
+	int32		state;
+	bool		registered;
+
+	DirectoryCookie(Directory* directory)
+		:
+		directory(directory),
+		state(0),
+		registered(false)
+	{
+		Rewind();
+	}
+
+	~DirectoryCookie()
+	{
+		if (registered)
+			directory->RemoveDirectoryIterator(this);
+	}
+
+	void Rewind()
+	{
+		if (registered)
+			directory->RemoveDirectoryIterator(this);
+		registered = false;
+
+		state = 0;
+		node = directory;
+	}
+
+	Node* Current(const char*& _name) const
+	{
+		if (node == NULL)
+			return NULL;
+
+		if (state == 0)
+			_name = ".";
+		else if (state == 1)
+			_name = "..";
+		else
+			_name = node->Name();
+
+		return node;
+	}
+
+	Node* Next()
+	{
+		if (state == 0) {
+			state = 1;
+			node = directory->Parent();
+			if (node == NULL)
+				node = directory;
+			return node;
+		}
+
+		if (state == 1) {
+			node = directory->FirstChild();
+			state = 2;
+		} else {
+			if (node != NULL)
+				node = directory->NextChild(node);
+		}
+
+		if (node == NULL) {
+			if (registered) {
+				directory->RemoveDirectoryIterator(this);
+				registered = false;
+			}
+
+			return NULL;
+		}
+
+		if (!registered) {
+			directory->AddDirectoryIterator(this);
+			registered = true;
+		}
+
+		return node;
+	}
+};
+
+
 static status_t
-packagefs_open_dir(fs_volume* fs, fs_vnode* _node, void** cookie)
+packagefs_open_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 {
-	return B_UNSUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+
+	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+
+	if (!S_ISDIR(node->Mode()))
+		return B_NOT_A_DIRECTORY;
+
+	Directory* dir = dynamic_cast<Directory*>(node);
+
+	// create a cookie
+	DirectoryCookie* cookie = new(std::nothrow) DirectoryCookie(dir);
+	if (cookie == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	*_cookie = cookie;
+	return B_OK;
 }
 
 
 static status_t
-packagefs_close_dir(fs_volume* fs, fs_vnode* _node, void* cookie)
+packagefs_close_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 {
-	return B_UNSUPPORTED;
+	return B_OK;
 }
 
 
 static status_t
-packagefs_free_dir_cookie(fs_volume* fs, fs_vnode* _node, void* cookie)
+packagefs_free_dir_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 {
-	return B_UNSUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+	DirectoryCookie* cookie = (DirectoryCookie*)_cookie;
+
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+		node->ID(), cookie);
+	TOUCH(volume);
+	TOUCH(node);
+
+	NodeWriteLocker dirLocker(node);
+	delete cookie;
+
+	return B_OK;
 }
 
 
 static status_t
-packagefs_read_dir(fs_volume* fs, fs_vnode* _node, void* cookie,
-	struct dirent* buffer, size_t bufferSize, uint32* count)
+packagefs_read_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
+	struct dirent* buffer, size_t bufferSize, uint32* _count)
 {
-	return B_UNSUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+	DirectoryCookie* cookie = (DirectoryCookie*)_cookie;
+
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+		node->ID(), cookie);
+	TOUCH(volume);
+	TOUCH(node);
+
+	NodeWriteLocker dirLocker(cookie->directory);
+
+	uint32 maxCount = *_count;
+	uint32 count = 0;
+
+	dirent* previousEntry = NULL;
+
+	const char* name;
+	while (Node* child = cookie->Current(name)) {
+		// don't read more entries than requested
+		if (count >= maxCount)
+			break;
+
+		// align the buffer for subsequent entries
+		if (count > 0) {
+			addr_t offset = (addr_t)buffer % 8;
+			if (offset > 0) {
+				offset = 8 - offset;
+				if (bufferSize <= offset)
+					break;
+
+				previousEntry->d_reclen += offset;
+				buffer = (dirent*)((addr_t)buffer + offset);
+				bufferSize -= offset;
+			}
+		}
+
+		// fill in the entry name -- checks whether the entry fits into the
+		// buffer
+		if (!set_dirent_name(buffer, bufferSize, name, strlen(name))) {
+			if (count == 0)
+				RETURN_ERROR(B_BUFFER_OVERFLOW);
+			break;
+		}
+
+		// fill in the other data
+		buffer->d_dev = volume->ID();
+		buffer->d_ino = child->ID();
+
+		count++;
+		previousEntry = buffer;
+		bufferSize -= buffer->d_reclen;
+		buffer = (dirent*)((addr_t)buffer + buffer->d_reclen);
+
+		cookie->Next();
+	}
+
+	*_count = count;
+	return B_OK;
 }
 
 
 static status_t
-packagefs_rewind_dir(fs_volume* fs, fs_vnode* _node, void* cookie)
+packagefs_rewind_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 {
-	return B_UNSUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+	DirectoryCookie* cookie = (DirectoryCookie*)_cookie;
+
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+		node->ID(), cookie);
+	TOUCH(volume);
+	TOUCH(node);
+
+	NodeWriteLocker dirLocker(node);
+	cookie->Rewind();
+
+	return B_OK;
 }
 
 
@@ -292,7 +601,7 @@ fs_vnode_ops gPackageFSVnodeOps = {
 	&packagefs_lookup,
 	NULL,	// get_vnode_name,
 	&packagefs_put_vnode,
-	NULL,	// remove_vnode,
+	&packagefs_put_vnode,	// remove_vnode -- same as put_vnode
 
 	/* VM file access */
 	NULL,	// can_page,
