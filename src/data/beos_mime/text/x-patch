@@ -4,7 +4,7 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 resource(1, "META:TYPE") "text/x-patch";
 
 resource(2, "META:SNIFF_RULE") #'CSTR' array {
-	"0.30          ([0:100]\"diff \" | [0:100]\"--- \" | [0:100]\"+++ \" | [0:100]\"@@ -\")"
+	"0.30          ([0:100]\"Index: \" | [0:100]\"--- \" | [0:100]\"+++ \" | [0:100]\"@@ -\")"
 };
 
 resource(3, "META:S:DESC") #'MSDC' "Patch";
