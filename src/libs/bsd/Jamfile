@@ -18,4 +18,5 @@ SharedLibrary libbsd.so :
 	unvis.c
 	usershell.c
 	vis.c
+	wait.c
 ;
