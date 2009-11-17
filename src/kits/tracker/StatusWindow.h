@@ -31,9 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef	STATUS_WINDOW_H
 #define STATUS_WINDOW_H
+
 
 #include <Window.h>
 #include <View.h>
@@ -43,7 +43,9 @@ All rights reserved.
 
 #include "ObjectList.h"
 
+
 namespace BPrivate {
+
 
 enum StatusWindowState {
 	kCopyState,
@@ -57,82 +59,96 @@ enum StatusWindowState {
 
 class BStatusView;
 
+
 class BStatusWindow : public BWindow {
 public:
-	BStatusWindow();
-	~BStatusWindow();
-	void CreateStatusItem(thread_id, StatusWindowState);
-	void InitStatusItem(thread_id, int32 totalItems, off_t totalSize,
-		const entry_ref *destDir = NULL, bool showCount = true);
-	void UpdateStatus(thread_id, const char *curItem, off_t itemSize, bool optional = false);
-		// if true is passed in <optional> status will only
-		// be updated if 0.2 seconds elapsed since the last update
-	void RemoveStatusItem(thread_id);
-	bool HasStatus(thread_id);
-	bool CheckCanceledOrPaused(thread_id);
-	void UpdateButtonState();
-	
-	bool AttemptToQuit();
-		// called by the tracker app during quit time, before
-		// inherited QuitRequested; kills all the copy/move/empty trash
-		// threads in a clean way by issuing a cancel
-protected:
-	virtual	void WindowActivated(bool state);
-	
-private:
-	BObjectList<BStatusView> fViewList;
-	BMessageFilter *fMouseDownFilter;
-	
-	bool fRetainDesktopFocus;
+								BStatusWindow();
+	virtual						~BStatusWindow();
 
-	typedef BWindow _inherited;
+			void				CreateStatusItem(thread_id,
+									StatusWindowState);
+			void				InitStatusItem(thread_id, int32 totalItems,
+									off_t totalSize,
+									const entry_ref* destDir = NULL,
+									bool showCount = true);
+			void				UpdateStatus(thread_id, const char* curItem,
+									off_t itemSize, bool optional = false);
+									// If true is passed in <optional> status
+									// will only be updated if 0.2 seconds
+									// elapsed since the last update
+			void				RemoveStatusItem(thread_id);
+			bool				HasStatus(thread_id);
+
+			bool				CheckCanceledOrPaused(thread_id);
+
+			bool				AttemptToQuit();
+									// Called by the tracker app during quit
+									// time, before inherited QuitRequested;
+									// kills all the copy/move/empty trash
+									// threads in a clean way by issuing a
+									// cancel.
+protected:
+	virtual	void				WindowActivated(bool state);
+
+private:
+			BObjectList<BStatusView> fViewList;
+			BMessageFilter*		fMouseDownFilter;
+
+			bool				fRetainDesktopFocus;
+
+			typedef BWindow		_inherited;
 };
+
 
 class BStatusView : public BView {
 public:
-	BStatusView(BRect, thread_id, StatusWindowState);
-	virtual ~BStatusView();
-	
-	void Init();
-	
-	void InitStatus(int32 totalItems, off_t totalSize, const entry_ref *destDir,
-		bool showCount);
-	
-	// BView overrides
-	virtual	void Draw(BRect);
-	virtual	void AttachedToWindow();
-	virtual	void MessageReceived(BMessage *);
-	void UpdateStatus(const char *curItem, off_t itemSize, bool optional = false);
-		// if true is passed in <optional> status will only
-		// be updated if 0.2 seconds elapsed since the last update
-	
-	bool WasCanceled() const;
-	bool IsPaused() const;
-	thread_id Thread() const;
-	
-	void ForceQuit();
-	void SetWasCanceled();
-	// called by AboutToQuit
-	
-private:
-	BStatusBar *fStatusBar;
-	off_t fTotalSize;
-	off_t fItemSize;
-	int32 fCurItem;
-	int32 fType;
-	BBitmap *fBitmap;
-	BButton *fStopButton;
-	BButton *fPauseButton;
-	thread_id fThread;
-	float fLastUpdateTime;
-	bool fShowCount;
-	bool fWasCanceled;
-	bool fIsPaused;
-	BString fDestDir;
-	char fPendingStatusString[128];
+								BStatusView(BRect frame, thread_id,
+									StatusWindowState state);
+	virtual						~BStatusView();
 
-	typedef BView _inherited;
+			void				Init();
+
+			void				InitStatus(int32 totalItems, off_t totalSize,
+									const entry_ref* destDir, bool showCount);
+
+	// BView overrides
+	virtual	void				Draw(BRect updateRect);
+	virtual	void				AttachedToWindow();
+	virtual	void				MessageReceived(BMessage* message);
+
+			void				UpdateStatus(const char* currentItem,
+									off_t itemSize, bool optional = false);
+									// If true is passed in <optional> status
+									// will only be updated if 0.2 seconds
+									// elapsed since the last update.
+
+			bool				WasCanceled() const;
+			bool				IsPaused() const;
+			thread_id			Thread() const;
+
+			void				SetWasCanceled();
+									// called by AboutToQuit
+
+private:
+			BStatusBar*			fStatusBar;
+			off_t				fTotalSize;
+			off_t				fItemSize;
+			int32				fCurItem;
+			int32				fType;
+			BBitmap*			fBitmap;
+			BButton*			fStopButton;
+			BButton*			fPauseButton;
+			thread_id			fThread;
+			float				fLastUpdateTime;
+			bool				fShowCount;
+			bool				fWasCanceled;
+			bool				fIsPaused;
+			BString				fDestDir;
+			char				fPendingStatusString[128];
+
+			typedef BView		_inherited;
 };
+
 
 inline bool
 BStatusView::IsPaused() const
@@ -140,11 +156,13 @@ BStatusView::IsPaused() const
 	return fIsPaused;
 }
 
+
 inline bool
 BStatusView::WasCanceled() const
 {
 	return fWasCanceled;
 }
+
 
 inline thread_id
 BStatusView::Thread() const
@@ -152,10 +170,12 @@ BStatusView::Thread() const
 	return fThread;
 }
 
+
 extern BStatusWindow *gStatusWindow;
+
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif
+#endif // STATUS_WINDOW_H

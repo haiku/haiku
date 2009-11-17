@@ -32,8 +32,10 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-//					A subclass of BWindow that is used to display
-//					the status of the tracker (Copying, Deleting, etc.).
+/*!	A subclass of BWindow that is used to display the status of the Tracker
+	operations (copying, deleting, etc.).
+*/
+
 
 #include <Application.h>
 #include <Button.h>
@@ -58,20 +60,18 @@ const BRect kStatusRect(200, 200, 550, 200);
 
 
 class TCustomButton : public BButton {
-	public:
-		TCustomButton(BRect frame, uint32 command);
-		virtual	void Draw(BRect);
-	private:
-		typedef BButton _inherited;
+public:
+								TCustomButton(BRect frame, uint32 command);
+	virtual	void				Draw(BRect updateRect);
+private:
+			typedef BButton _inherited;
 };
 
+
 class BStatusMouseFilter : public BMessageFilter {
-	public:
-		BStatusMouseFilter()
-			:	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_MOUSE_DOWN)
-			{}
-	
-		virtual	filter_result Filter(BMessage *message, BHandler **target);
+public:
+								BStatusMouseFilter();
+	virtual	filter_result		Filter(BMessage* message, BHandler** target);
 };
 
 
@@ -80,15 +80,24 @@ BStatusWindow *gStatusWindow = NULL;
 }
 
 
-filter_result
-BStatusMouseFilter::Filter(BMessage *, BHandler **target)
+BStatusMouseFilter::BStatusMouseFilter()
+	:
+	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_MOUSE_DOWN)
 {
-	if ((*target)->Name()
+}
+
+
+filter_result
+BStatusMouseFilter::Filter(BMessage* message, BHandler** target)
+{
+	// If the target is the status bar, make sure the message goes to the
+	// parent view instead.
+	if ((*target)->Name() != NULL
 		&& strcmp((*target)->Name(), "StatusBar") == 0) {
-		BView *view = dynamic_cast<BView *>(*target);
-		if (view)
+		BView* view = dynamic_cast<BView*>(*target);
+		if (view != NULL)
 			view = view->Parent();
-		if (view)
+		if (view != NULL)
 			*target = view;
 	}
 
@@ -97,8 +106,9 @@ BStatusMouseFilter::Filter(BMessage *, BHandler **target)
 
 
 TCustomButton::TCustomButton(BRect frame, uint32 what)
-	:	BButton(frame, "", "", new BMessage(what), B_FOLLOW_LEFT | B_FOLLOW_TOP,
-			B_WILL_DRAW)
+	:
+	BButton(frame, "", "", new BMessage(what), B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		B_WILL_DRAW)
 {
 }
 
@@ -135,10 +145,11 @@ TCustomButton::Draw(BRect updateRect)
 
 
 BStatusWindow::BStatusWindow()
-	:	BWindow(kStatusRect, "Tracker Status", B_TITLED_WINDOW,
-			B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_NOT_ZOOMABLE,
-			B_ALL_WORKSPACES),
-		fRetainDesktopFocus(false)
+	:
+	BWindow(kStatusRect, "Tracker Status", B_TITLED_WINDOW,
+		B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_NOT_ZOOMABLE,
+		B_ALL_WORKSPACES),
+	fRetainDesktopFocus(false)
 {
 	SetSizeLimits(0, 100000, 0, 100000);
 	fMouseDownFilter = new BStatusMouseFilter();
@@ -146,81 +157,17 @@ BStatusWindow::BStatusWindow()
 
 	BRect bounds(Bounds());
 
-	BView *view = new BView(bounds, "BackView", B_FOLLOW_ALL, B_WILL_DRAW);
+	BView* view = new BView(bounds, "BackView", B_FOLLOW_ALL, B_WILL_DRAW);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(view);
 
-	Run();
+	Hide();
+	Show();
 }
 
 
 BStatusWindow::~BStatusWindow()
 {
-}
-
-
-bool
-BStatusWindow::CheckCanceledOrPaused(thread_id thread)
-{
-	bool wasCanceled = false;
-	bool isPaused = false;
-
-	BStatusView *view = NULL;
-
-	for (;;) {
-		
-		AutoLock<BWindow> lock(this);
-		// check if cancel or pause hit
-		for (int32 index = fViewList.CountItems() - 1; index >= 0; index--) {
-			
-			view = fViewList.ItemAt(index);
-			if (view && view->Thread() == thread) {
-				isPaused = view->IsPaused();
-				wasCanceled = view->WasCanceled();
-				break;
-			}
-		}
-		lock.Unlock();
-		
-		if (wasCanceled || !isPaused)
-			break;
-
-		if (isPaused && view) {
-			AutoLock<BWindow> lock(this);
-			// say we are paused
-			view->Invalidate();
-			lock.Unlock();
-			
-			ASSERT(find_thread(NULL) == view->Thread());
-			
-			// and suspend ourselves
-			// we will get resumend from BStatusView::MessageReceived
-			suspend_thread(view->Thread());
-		}
-		break;
-
-	}
-	
-	return wasCanceled;
-}
-
-
-bool
-BStatusWindow::AttemptToQuit()
-{
-	// called when tracker is quitting
-	// try to cancel all the move/copy/empty trash threads in a nice way
-	// by issuing cancels
-	int32 count = fViewList.CountItems();
-
-	if (count == 0)
-		return true;
-	
-	for (int32 index = 0; index < count; index++)
-		fViewList.ItemAt(index)->SetWasCanceled();
-	
-	// maybe next time everything will have been canceled
-	return false;
 }
 
 
@@ -234,7 +181,7 @@ BStatusWindow::CreateStatusItem(thread_id thread, StatusWindowState type)
 		rect.top = lastView->Frame().bottom + 1;
 	rect.bottom = rect.top + kDefaultStatusViewHeight - 1;
 
-	BStatusView *view = new BStatusView(rect, thread, type);
+	BStatusView* view = new BStatusView(rect, thread, type);
 	// the BStatusView will resize itself if needed in its constructor
 	ChildAt(0)->AddChild(view);
 	fViewList.AddItem(view);
@@ -267,13 +214,38 @@ BStatusWindow::CreateStatusItem(thread_id thread, StatusWindowState type)
 }
 
 
-void 
-BStatusWindow::WindowActivated(bool state)
+void
+BStatusWindow::InitStatusItem(thread_id thread, int32 totalItems,
+	off_t totalSize, const entry_ref* destDir, bool showCount)
 {
-	if (!state)
-		fRetainDesktopFocus = false;
+	AutoLock<BWindow> lock(this);
 
-	return _inherited::WindowActivated(state);
+	int32 numItems = fViewList.CountItems();
+	for (int32 index = 0; index < numItems; index++) {
+		BStatusView* view = fViewList.ItemAt(index);
+		if (view->Thread() == thread) {
+			view->InitStatus(totalItems, totalSize, destDir, showCount);
+			break;
+		}
+	}
+
+}
+
+
+void
+BStatusWindow::UpdateStatus(thread_id thread, const char* curItem,
+	off_t itemSize, bool optional)
+{
+	AutoLock<BWindow> lock(this);
+
+	int32 numItems = fViewList.CountItems();
+	for (int32 index = 0; index < numItems; index++) {
+		BStatusView* view = fViewList.ItemAt(index);
+		if (view->Thread() == thread) {
+			view->UpdateStatus(curItem, itemSize, optional);
+			break;
+		}
+	}
 }
 
 
@@ -281,49 +253,51 @@ void
 BStatusWindow::RemoveStatusItem(thread_id thread)
 {
 	AutoLock<BWindow> lock(this);
-	BStatusView *winner = NULL;
+	BStatusView* winner = NULL;
 
 	int32 numItems = fViewList.CountItems();
 	int32 index;
 	for (index = 0; index < numItems; index++) {
-		BStatusView *view = fViewList.ItemAt(index);
+		BStatusView* view = fViewList.ItemAt(index);
 		if (view->Thread() == thread) {
 			winner = view;
 			break;
 		}
 	}
 
-	if (winner) {
-		// the height by which the other views will have to be moved (in pixel count)
+	if (winner != NULL) {
+		// The height by which the other views will have to be moved (in pixel
+		// count).
 		float height = winner->Bounds().Height() + 1;
 		fViewList.RemoveItem(winner);
 		winner->RemoveSelf();
 		delete winner;
 
 		if (--numItems == 0 && !IsHidden()) {
-			BDeskWindow *desktop = NULL;
+			BDeskWindow* desktop = NULL;
 			if (fRetainDesktopFocus) {
 				AutoLock<BLooper> lock(be_app);
 				int32 count = be_app->CountWindows();
 				for (int32 index = 0; index < count; index++) {
-					desktop = dynamic_cast<BDeskWindow *>(be_app->WindowAt(index));
-					if (desktop)
+					desktop = dynamic_cast<BDeskWindow*>(
+						be_app->WindowAt(index));
+					if (desktop != NULL)
 						break;
 				}
 			}
 			Hide();
-			if (desktop)
+			if (desktop != NULL) {
 				// desktop was active when we first started,
 				// make it active again
 				desktop->Activate();
+			}
 		}
-		
-		for (; index < numItems; index++) 
+
+		for (; index < numItems; index++)
 			fViewList.ItemAt(index)->MoveBy(0, -height);
 
 		ResizeTo(Bounds().Width(), Bounds().Height() - height);
 	}
-
 }
 
 
@@ -334,8 +308,8 @@ BStatusWindow::HasStatus(thread_id thread)
 
 	int32 numItems = fViewList.CountItems();
 	for (int32 index = 0; index < numItems; index++) {
-		BStatusView *view = fViewList.ItemAt(index);
-		if (view->Thread() == thread) 
+		BStatusView* view = fViewList.ItemAt(index);
+		if (view->Thread() == thread)
 			return true;
 
 	}
@@ -344,50 +318,93 @@ BStatusWindow::HasStatus(thread_id thread)
 }
 
 
-void
-BStatusWindow::UpdateStatus(thread_id thread, const char *curItem, off_t itemSize,
-	bool optional)
+bool
+BStatusWindow::CheckCanceledOrPaused(thread_id thread)
 {
-	AutoLock<BWindow> lock(this);
+	bool wasCanceled = false;
+	bool isPaused = false;
 
-	int32 numItems = fViewList.CountItems();
-	for (int32 index = 0; index < numItems; index++) {
-		BStatusView *view = fViewList.ItemAt(index);
-		if (view->Thread() == thread) {
-			view->UpdateStatus(curItem, itemSize, optional);
-			break;
+	BStatusView* view = NULL;
+
+	for (;;) {
+
+		AutoLock<BWindow> lock(this);
+		// check if cancel or pause hit
+		for (int32 index = fViewList.CountItems() - 1; index >= 0; index--) {
+
+			view = fViewList.ItemAt(index);
+			if (view && view->Thread() == thread) {
+				isPaused = view->IsPaused();
+				wasCanceled = view->WasCanceled();
+				break;
+			}
 		}
+		lock.Unlock();
+
+		if (wasCanceled || !isPaused)
+			break;
+
+		if (isPaused && view != NULL) {
+			AutoLock<BWindow> lock(this);
+			// say we are paused
+			view->Invalidate();
+			lock.Unlock();
+
+			ASSERT(find_thread(NULL) == view->Thread());
+
+			// and suspend ourselves
+			// we will get resumend from BStatusView::MessageReceived
+			suspend_thread(view->Thread());
+		}
+		break;
+
 	}
 
+	return wasCanceled;
+}
+
+
+bool
+BStatusWindow::AttemptToQuit()
+{
+	// called when tracker is quitting
+	// try to cancel all the move/copy/empty trash threads in a nice way
+	// by issuing cancels
+	int32 count = fViewList.CountItems();
+
+	if (count == 0)
+		return true;
+
+	for (int32 index = 0; index < count; index++)
+		fViewList.ItemAt(index)->SetWasCanceled();
+
+	// maybe next time everything will have been canceled
+	return false;
 }
 
 
 void
-BStatusWindow::InitStatusItem(thread_id thread, int32 totalItems,  off_t totalSize,
-	const entry_ref *destDir, bool showCount)
+BStatusWindow::WindowActivated(bool state)
 {
-	AutoLock<BWindow> lock(this);
-	
-	int32 numItems = fViewList.CountItems();
-	for (int32 index = 0; index < numItems; index++) {
-		BStatusView *view = fViewList.ItemAt(index);
-		if (view->Thread() == thread) {
-			view->InitStatus(totalItems, totalSize, destDir, showCount);
-			break;
-		}
-	}
+	if (!state)
+		fRetainDesktopFocus = false;
 
+	return _inherited::WindowActivated(state);
 }
 
 
-BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
-	:	BView(bounds, "StatusView", B_FOLLOW_NONE, B_WILL_DRAW),
-		fBitmap(NULL)
+// #pragma mark - BStatusView
+
+
+BStatusView::BStatusView(BRect bounds, thread_id thread,
+	StatusWindowState type)
+	:
+	BView(bounds, "StatusView", B_FOLLOW_NONE, B_WILL_DRAW),
+	fType(type),
+	fBitmap(NULL),
+	fThread(thread)
 {
 	Init();
-
-	fThread = thread;
-	fType = type;
 
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
@@ -404,8 +421,7 @@ BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
 	rect.top += 6;
 	rect.bottom = rect.top + 15;
 
-
-	const char *caption = NULL;
+	const char* caption = NULL;
 	int32 id = 0;
 
 	switch (type) {
@@ -429,7 +445,6 @@ BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
 			id = kResTrashStatusBitmap;
 			break;
 
-
 		case kVolumeState:
 			caption = "Searching for disks to mount" B_UTF8_ELLIPSIS;
 			break;
@@ -438,17 +453,17 @@ BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
 			caption = "Preparing to delete items" B_UTF8_ELLIPSIS;
 			id = kResTrashStatusBitmap;
 			break;
-	
+
 		case kRestoreFromTrashState:
 			caption = "Preparing to restore items" B_UTF8_ELLIPSIS;
 			break;
-	
+
 		default:
 			TRESPASS();
 			break;
 	}
 
-	if (caption) {
+	if (caption != NULL) {
 		fStatusBar = new BStatusBar(rect, "StatusBar", caption);
 		fStatusBar->SetBarHeight(12);
 		float width, height;
@@ -456,16 +471,18 @@ BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
 		fStatusBar->ResizeTo(fStatusBar->Frame().Width(), height);
 		AddChild(fStatusBar);
 
-		// figure out how much room we need to display
-		// the additional status message below the bar
+		// Figure out how much room we need to display the additional status
+		// message below the bar
 		font_height fh;
 		GetFontHeight(&fh);
 		BRect f = fStatusBar->Frame();
-		// height is 3 x the "room from the top" + bar height + room for string
-		ResizeTo(Bounds().Width(), f.top + f.Height() + fh.leading + fh.ascent + fh.descent + f.top);
+		// Height is 3 x the "room from the top" + bar height + room for
+		// string.
+		ResizeTo(Bounds().Width(), f.top + f.Height() + fh.leading + fh.ascent
+			+ fh.descent + f.top);
 	}
 
-	if (id)
+	if (id != 0)
 	 	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE, id, &fBitmap);
 
 	rect = Bounds();
@@ -505,16 +522,8 @@ BStatusView::Init()
 
 
 void
-BStatusView::AttachedToWindow()
-{
-	fPauseButton->SetTarget(this);
-	fStopButton->SetTarget(this);
-}
-
-
-void
 BStatusView::InitStatus(int32 totalItems, off_t totalSize,
-	const entry_ref *destDir, bool showCount)
+	const entry_ref* destDir, bool showCount)
 {
 	Init();
 	fTotalSize = totalSize;
@@ -526,11 +535,11 @@ BStatusView::InitStatus(int32 totalItems, off_t totalSize,
 		entry.GetName(name);
 		fDestDir = name;
 	}
-	
+
 	BString buffer;
-	if (totalItems > 0) 
+	if (totalItems > 0)
 		buffer << "of " << totalItems;
-	
+
 	switch (fType) {
 		case kCopyState:
 			fStatusBar->Reset("Copying: ", buffer.String());
@@ -545,7 +554,8 @@ BStatusView::InitStatus(int32 totalItems, off_t totalSize,
 			break;
 
 		case kTrashState:
-			fStatusBar->Reset("Emptying Trash" B_UTF8_ELLIPSIS " ", buffer.String());
+			fStatusBar->Reset("Emptying Trash" B_UTF8_ELLIPSIS " ",
+				buffer.String());
 			break;
 
 		case kDeleteState:
@@ -563,93 +573,6 @@ BStatusView::InitStatus(int32 totalItems, off_t totalSize,
 	fStatusBar->SetMaxValue(1);
 		// SetMaxValue has to be here because Reset changes it to 100
 	Invalidate();
-}
-
-
-void
-BStatusView::UpdateStatus(const char *curItem, off_t itemSize, bool optional)
-{
-	float currentTime = system_time();
-
-	if (fShowCount) {
-	
-		if (curItem)
-			fCurItem++;
-	
-		fItemSize += itemSize;
-
-		if (!optional || ((currentTime - fLastUpdateTime) > kUpdateGrain)) {
-			if (curItem != NULL || fPendingStatusString[0]) {
-				// forced update or past update time
-				
-				BString buffer;
-				buffer <<  fCurItem << " ";
-				
-				// if we don't have curItem, take the one from the stash
-				const char *statusItem = curItem != NULL 
-					? curItem : fPendingStatusString;
-
-				fStatusBar->Update((float)fItemSize / fTotalSize, statusItem,
-					buffer.String());
-
-				// we already displayed this item, clear the stash
-				fPendingStatusString[0] =  '\0';
-
-				fLastUpdateTime = currentTime;
-			}
-			else 
-				// don't have a file to show, just update the bar
-				fStatusBar->Update((float)fItemSize / fTotalSize);
-
-			fItemSize = 0;
-		} else if (curItem != NULL) {
-			// stash away the name of the item we are currently processing
-			// so we can show it when the time comes
-			strncpy(fPendingStatusString, curItem, 127);
-			fPendingStatusString[127] = '0';
-		}
-	} else {
-		fStatusBar->Update((float)fItemSize / fTotalSize);
-		fItemSize = 0;
-	}
-}
-
-
-void
-BStatusView::MessageReceived(BMessage *message)
-{
-	switch (message->what) {
-		case kPauseButton:
-			fIsPaused = !fIsPaused;
-			fPauseButton->SetValue(fIsPaused ? B_CONTROL_ON : B_CONTROL_OFF);
-			if (!fIsPaused) {
-				
-				// force window update
-				Invalidate();
-				
-				// let 'er rip
-				resume_thread(Thread());
-			}
-			break;
-
-		case kStopButton:
-			fWasCanceled = true;
-			if (fIsPaused) {
-				// resume so that the copy loop gets a chance to finish up
-				fIsPaused = false;
-				
-				// force window update
-				Invalidate();
-				
-				// let 'er rip
-				resume_thread(Thread());
-			}
-			break;
-
-		default:
-			_inherited::MessageReceived(message);
-			break;
-	}
 }
 
 
@@ -698,6 +621,101 @@ BStatusView::Draw(BRect updateRect)
 		buffer << "To: " << fDestDir;
 		SetHighColor(0, 0, 0);
 		DrawString(buffer.String(), tp);
+	}
+}
+
+
+void
+BStatusView::AttachedToWindow()
+{
+	fPauseButton->SetTarget(this);
+	fStopButton->SetTarget(this);
+}
+
+
+void
+BStatusView::MessageReceived(BMessage *message)
+{
+	switch (message->what) {
+		case kPauseButton:
+			fIsPaused = !fIsPaused;
+			fPauseButton->SetValue(fIsPaused ? B_CONTROL_ON : B_CONTROL_OFF);
+			if (!fIsPaused) {
+
+				// force window update
+				Invalidate();
+
+				// let 'er rip
+				resume_thread(Thread());
+			}
+			break;
+
+		case kStopButton:
+			fWasCanceled = true;
+			if (fIsPaused) {
+				// resume so that the copy loop gets a chance to finish up
+				fIsPaused = false;
+
+				// force window update
+				Invalidate();
+
+				// let 'er rip
+				resume_thread(Thread());
+			}
+			break;
+
+		default:
+			_inherited::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
+BStatusView::UpdateStatus(const char *curItem, off_t itemSize, bool optional)
+{
+	float currentTime = system_time();
+
+	if (fShowCount) {
+
+		if (curItem)
+			fCurItem++;
+
+		fItemSize += itemSize;
+
+		if (!optional || ((currentTime - fLastUpdateTime) > kUpdateGrain)) {
+			if (curItem != NULL || fPendingStatusString[0]) {
+				// forced update or past update time
+
+				BString buffer;
+				buffer <<  fCurItem << " ";
+
+				// if we don't have curItem, take the one from the stash
+				const char *statusItem = curItem != NULL
+					? curItem : fPendingStatusString;
+
+				fStatusBar->Update((float)fItemSize / fTotalSize, statusItem,
+					buffer.String());
+
+				// we already displayed this item, clear the stash
+				fPendingStatusString[0] =  '\0';
+
+				fLastUpdateTime = currentTime;
+			}
+			else
+				// don't have a file to show, just update the bar
+				fStatusBar->Update((float)fItemSize / fTotalSize);
+
+			fItemSize = 0;
+		} else if (curItem != NULL) {
+			// stash away the name of the item we are currently processing
+			// so we can show it when the time comes
+			strncpy(fPendingStatusString, curItem, 127);
+			fPendingStatusString[127] = '0';
+		}
+	} else {
+		fStatusBar->Update((float)fItemSize / fTotalSize);
+		fItemSize = 0;
 	}
 }
 
