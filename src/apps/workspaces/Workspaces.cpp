@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <InterfacePrivate.h>
 #include <ViewPrivate.h>
 #include <WindowPrivate.h>
 
@@ -208,10 +209,34 @@ WorkspacesSettings::WorkspacesSettings()
 			&& screen.Frame().left - 5 <= fWindowFrame.left
 			&& screen.Frame().top - 5 <= fWindowFrame.top)) {
 		// set to some usable defaults
+		float screenWidth = screen.Frame().Width();
+		float screenHeight = screen.Frame().Height();
+		float aspectRatio = screenWidth / screenHeight;
+
+		uint32 columns, rows;
+		BPrivate::get_workspaces_layout(&columns, &rows);
+
+		// default size of ~1/10 of screen width
+		float workspaceWidth = screenWidth / 10;
+		float workspaceHeight = workspaceWidth / aspectRatio;
+
+		float width = floor(workspaceWidth * columns);
+		float height = floor(workspaceHeight * rows);
+
+		float tabHeight = 20;
+			// TODO: find tabHeight without being a window
+
+		// shrink to fit more
+		while (width + 2 * kScreenBorderOffset > screenWidth
+			|| height + 2 * kScreenBorderOffset + tabHeight > screenHeight) {
+			width = floor(0.95 * width);
+			height = floor(0.95 * height);
+		}
+
 		fWindowFrame = fScreenFrame;
 		fWindowFrame.OffsetBy(-kScreenBorderOffset, -kScreenBorderOffset);
-		fWindowFrame.left = fWindowFrame.right - 160;
-		fWindowFrame.top = fWindowFrame.bottom - 140;
+		fWindowFrame.left = fWindowFrame.right - width;
+		fWindowFrame.top = fWindowFrame.bottom - height;
 	}
 }
 
@@ -602,6 +627,26 @@ WorkspacesWindow::FrameMoved(BPoint origin)
 void
 WorkspacesWindow::FrameResized(float width, float height)
 {
+	if (!modifiers() & B_SHIFT_KEY) {
+		BWindow::FrameResized(width, height);
+		return;
+	}
+
+	uint32 columns, rows;
+	BPrivate::get_workspaces_layout(&columns, &rows);
+
+	BScreen screen;
+	float screenWidth = screen.Frame().Width();
+	float screenHeight = screen.Frame().Height();
+
+	float windowAspectRatio
+		= (columns * screenWidth) / (rows * screenHeight);
+
+	float newHeight = width / windowAspectRatio;
+
+	if (height != newHeight)
+		ResizeTo(width, newHeight);
+
 	fSettings->SetWindowFrame(Frame());
 }
 
@@ -610,9 +655,32 @@ void
 WorkspacesWindow::Zoom(BPoint origin, float width, float height)
 {
 	BScreen screen;
+	float screenWidth = screen.Frame().Width();
+	float screenHeight = screen.Frame().Height();
+	float aspectRatio = screenWidth / screenHeight;
+
+	uint32 columns, rows;
+	BPrivate::get_workspaces_layout(&columns, &rows);
+
+	float workspaceWidth = screenWidth / 10;
+	float workspaceHeight = workspaceWidth / aspectRatio;
+
+	width = floor(workspaceWidth * columns);
+	height = floor(workspaceHeight * rows);
+
+	float tabHeight = Frame().top - DecoratorFrame().top;
+
+	while (width + 2 * kScreenBorderOffset > screenWidth
+		|| height + 2 * kScreenBorderOffset + tabHeight > screenHeight) {
+		width = floor(0.95 * width);
+		height = floor(0.95 * height);
+	}
+
+	ResizeTo(width, height);
+
 	origin = screen.Frame().RightBottom();
-	origin.x -= kScreenBorderOffset + fSettings->WindowFrame().Width();
-	origin.y -= kScreenBorderOffset + fSettings->WindowFrame().Height();
+	origin.x -= kScreenBorderOffset + width;
+	origin.y -= kScreenBorderOffset + height;
 
 	MoveTo(origin);
 }
