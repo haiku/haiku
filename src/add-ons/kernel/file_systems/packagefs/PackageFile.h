@@ -6,13 +6,19 @@
 #define PACKAGE_FILE_H
 
 
-#include "PackageNode.h"
+#include "PackageData.h"
+
+#include "PackageLeafNode.h"
 
 
-class PackageFile : public PackageNode {
+class PackageFile : public PackageLeafNode {
 public:
-								PackageFile();
+								PackageFile(mode_t mode,
+									const PackageData& data);
 	virtual						~PackageFile();
+
+private:
+			PackageData			fData;
 };
 
 

@@ -6,13 +6,20 @@
 #define PACKAGE_SYMLINK_H
 
 
-#include "PackageNode.h"
+#include "PackageLeafNode.h"
 
 
-class PackageSymlink : public PackageNode {
+class PackageSymlink : public PackageLeafNode {
 public:
-								PackageSymlink();
+								PackageSymlink(mode_t mode);
 	virtual						~PackageSymlink();
+
+			status_t			SetSymlinkPath(const char* path);
+
+	virtual	const char*			SymlinkPath() const;
+
+private:
+				char*			fSymlinkPath;
 };
 
 

@@ -7,14 +7,12 @@
 #include "Directory.h"
 
 #include "DebugSupport.h"
-#include "PackageDirectory.h"
 
 
 Directory::Directory(ino_t id)
 	:
 	Node(id)
 {
-	fMode = S_IFDIR | S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 }
 
 
@@ -40,13 +38,43 @@ Directory::Init(Directory* parent, const char* name)
 }
 
 
+mode_t
+Directory::Mode() const
+{
+	if (PackageDirectory* packageDirectory = fPackageDirectories.Head())
+		return packageDirectory->Mode();
+	return S_IFDIR | S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
+}
+
+
+uid_t
+Directory::UserID() const
+{
+	if (PackageDirectory* packageDirectory = fPackageDirectories.Head())
+		return packageDirectory->UserID();
+	return 0;
+}
+
+
+gid_t
+Directory::GroupID() const
+{
+	if (PackageDirectory* packageDirectory = fPackageDirectories.Head())
+		return packageDirectory->GroupID();
+	return 0;
+}
+
+
 status_t
 Directory::AddPackageNode(PackageNode* packageNode)
 {
 	if (!S_ISDIR(packageNode->Mode()))
 		return B_BAD_VALUE;
 
-// TODO:...
+	PackageDirectory* packageDirectory
+		= dynamic_cast<PackageDirectory*>(packageNode);
+
+	fPackageDirectories.Add(packageDirectory);
 
 	return B_OK;
 }

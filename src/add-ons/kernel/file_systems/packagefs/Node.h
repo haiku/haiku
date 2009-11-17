@@ -40,11 +40,11 @@ public:
 			Node*&				IDHashTableNext()
 									{ return fIDHashTableNext; }
 
-			mode_t				Mode() const	{ return fMode; }
-			uid_t				UserID() const	{ return fUserID; }
-			gid_t				GroupID() const	{ return fGroupID; }
-
 	virtual	status_t			Init(Directory* parent, const char* name);
+
+	virtual	mode_t				Mode() const = 0;
+	virtual	uid_t				UserID() const = 0;
+	virtual	gid_t				GroupID() const = 0;
 
 	virtual	status_t			AddPackageNode(PackageNode* packageNode) = 0;
 

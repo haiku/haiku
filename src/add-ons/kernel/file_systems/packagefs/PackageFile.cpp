@@ -7,7 +7,10 @@
 #include "PackageFile.h"
 
 
-PackageFile::PackageFile()
+PackageFile::PackageFile(mode_t mode, const PackageData& data)
+	:
+	PackageLeafNode(mode),
+	fData(data)
 {
 }
 

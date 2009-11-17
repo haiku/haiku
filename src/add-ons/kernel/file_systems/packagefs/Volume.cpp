@@ -25,12 +25,11 @@
 
 #include "DebugSupport.h"
 #include "Directory.h"
-#include "File.h"
+#include "LeafNode.h"
 #include "kernel_interface.h"
 #include "PackageDirectory.h"
 #include "PackageFile.h"
 #include "PackageSymlink.h"
-#include "Symlink.h"
 
 
 // node ID of the root directory
@@ -133,14 +132,30 @@ struct Volume::PackageLoaderContentHandler : PackageContentHandler {
 				RETURN_ERROR(B_BAD_DATA);
 		}
 
+		status_t error;
+
 		// create the package node
 		PackageNode* node;
 		if (S_ISREG(entry->Mode())) {
-			node = new(std::nothrow) PackageFile;
+			// file
+			node = new(std::nothrow) PackageFile(entry->Mode(), entry->Data());
 		} else if (S_ISLNK(entry->Mode())) {
-			node = new(std::nothrow) PackageSymlink;
+			// symlink
+			PackageSymlink* symlink = new(std::nothrow) PackageSymlink(
+				entry->Mode());
+			if (symlink == NULL)
+				RETURN_ERROR(B_NO_MEMORY);
+
+			error = symlink->SetSymlinkPath(entry->SymlinkPath());
+			if (error != B_OK) {
+				delete symlink;
+				return error;
+			}
+
+			node = symlink;
 		} else if (S_ISDIR(entry->Mode())) {
-			node = new(std::nothrow) PackageDirectory;
+			// directory
+			node = new(std::nothrow) PackageDirectory(entry->Mode());
 		} else
 			RETURN_ERROR(B_BAD_DATA);
 
@@ -148,11 +163,9 @@ struct Volume::PackageLoaderContentHandler : PackageContentHandler {
 			RETURN_ERROR(B_NO_MEMORY);
 		ObjectDeleter<PackageNode> nodeDeleter(node);
 
-		status_t error = node->Init(parentDir, entry->Name());
+		error = node->Init(parentDir, entry->Name());
 		if (error != B_OK)
 			RETURN_ERROR(error);
-
-		node->SetMode(entry->Mode());
 
 		// add it to the parent directory
 		if (parentDir != NULL)
@@ -579,10 +592,8 @@ Volume::_CreateNode(mode_t mode, Directory* parent, const char* name,
 	Node*& _node)
 {
 	Node* node;
-	if (S_ISREG(mode))
-		node = new(std::nothrow) File(fNextNodeID++);
-	else if (S_ISLNK(mode))
-		node = new(std::nothrow) Symlink(fNextNodeID++);
+	if (S_ISREG(mode) || S_ISLNK(mode))
+		node = new(std::nothrow) LeafNode(fNextNodeID++);
 	else if (S_ISDIR(mode))
 		node = new(std::nothrow) Directory(fNextNodeID++);
 	else

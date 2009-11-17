@@ -12,16 +12,16 @@ DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
 HAIKU_PACKAGE_FS_SOURCES =
 	DebugSupport.cpp
 	Directory.cpp
-	File.cpp
 	kernel_interface.cpp
+	LeafNode.cpp
 	Node.cpp
 	Package.cpp
 	PackageDirectory.cpp
 	PackageDomain.cpp
 	PackageFile.cpp
+	PackageLeafNode.cpp
 	PackageNode.cpp
 	PackageSymlink.cpp
-	Symlink.cpp
 	Volume.cpp
 ;
 

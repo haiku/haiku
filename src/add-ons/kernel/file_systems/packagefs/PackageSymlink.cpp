@@ -6,12 +6,37 @@
 
 #include "PackageSymlink.h"
 
+#include <stdlib.h>
+#include <string.h>
 
-PackageSymlink::PackageSymlink()
+
+PackageSymlink::PackageSymlink(mode_t mode)
+	:
+	PackageLeafNode(mode),
+	fSymlinkPath(NULL)
 {
 }
 
 
 PackageSymlink::~PackageSymlink()
 {
+	free(fSymlinkPath);
+}
+
+
+status_t
+PackageSymlink::SetSymlinkPath(const char* path)
+{
+	if (path == NULL)
+		return B_OK;
+
+	fSymlinkPath = strdup(path);
+	return fSymlinkPath != NULL ? B_OK : B_NO_MEMORY;
+}
+
+
+const char*
+PackageSymlink::SymlinkPath() const
+{
+	return fSymlinkPath;
 }

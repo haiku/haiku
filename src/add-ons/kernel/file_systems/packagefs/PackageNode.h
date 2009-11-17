@@ -16,7 +16,7 @@ class PackageDirectory;
 
 class PackageNode : public SinglyLinkedListLinkImpl<PackageNode> {
 public:
-								PackageNode();
+								PackageNode(mode_t mode);
 	virtual						~PackageNode();
 
 			PackageDirectory*	Parent() const	{ return fParent; }
@@ -25,13 +25,20 @@ public:
 	virtual	status_t			Init(PackageDirectory* parent,
 									const char* name);
 
-			void				SetMode(mode_t mode)	{ fMode = mode; }
 			mode_t				Mode() const			{ return fMode; }
 
-private:
+			uid_t				UserID() const			{ return fUserID; }
+			void				SetUserID(uid_t id)		{ fUserID = id; }
+
+			gid_t				GroupID() const			{ return fGroupID; }
+			void				SetGroupID(gid_t id)	{ fGroupID = id; }
+
+protected:
 			PackageDirectory*	fParent;
 			char*				fName;
 			mode_t				fMode;
+			uid_t				fUserID;
+			gid_t				fGroupID;
 };
 
 

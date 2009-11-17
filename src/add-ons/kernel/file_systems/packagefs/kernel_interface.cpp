@@ -8,6 +8,7 @@
 
 #include <dirent.h>
 
+#include <algorithm>
 #include <new>
 
 #include <fs_info.h>
@@ -18,6 +19,7 @@
 
 #include "DebugSupport.h"
 #include "Directory.h"
+#include "LeafNode.h"
 #include "Volume.h"
 
 
@@ -200,9 +202,30 @@ packagefs_put_vnode(fs_volume* fsVolume, fs_vnode* fsNode, bool reenter)
 
 static status_t
 packagefs_read_symlink(fs_volume* fsVolume, fs_vnode* fsNode, char* buffer,
-	size_t* bufferSize)
+	size_t* _bufferSize)
 {
-	return B_UNSUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+
+	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	TOUCH(volume);
+
+	NodeReadLocker nodeLocker(node);
+
+	if (!S_ISLNK(node->Mode()))
+		return B_BAD_VALUE;
+
+	const char* linkPath = dynamic_cast<LeafNode*>(node)->SymlinkPath();
+	if (linkPath == NULL) {
+		*_bufferSize = 0;
+		return B_OK;
+	}
+
+	size_t toCopy = std::min(strlen(linkPath), *_bufferSize);
+	memcpy(buffer, linkPath, toCopy);
+	*_bufferSize = toCopy;
+
+	return B_OK;
 }
 
 
@@ -211,7 +234,6 @@ packagefs_access(fs_volume* fsVolume, fs_vnode* fsNode, int mode)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
-	TOUCH(volume);
 
 	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
 	TOUCH(volume);
@@ -219,6 +241,8 @@ packagefs_access(fs_volume* fsVolume, fs_vnode* fsNode, int mode)
 	// write access requested?
 	if (mode & W_OK)
 		return B_READ_ONLY_DEVICE;
+
+	NodeReadLocker nodeLocker(node);
 
 	// get node permissions
 	int userPermissions = (node->Mode() & S_IRWXU) >> 6;
@@ -258,6 +282,8 @@ packagefs_read_stat(fs_volume* fsVolume, fs_vnode* fsNode, struct stat* st)
 
 	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
 	TOUCH(volume);
+
+	NodeReadLocker nodeLocker(node);
 
 // TODO: Fill in correctly!
 	st->st_mode = node->Mode();
@@ -418,6 +444,7 @@ packagefs_open_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 	Directory* dir = dynamic_cast<Directory*>(node);
 
 	// create a cookie
+	NodeWriteLocker dirLocker(dir);
 	DirectoryCookie* cookie = new(std::nothrow) DirectoryCookie(dir);
 	if (cookie == NULL)
 		RETURN_ERROR(B_NO_MEMORY);

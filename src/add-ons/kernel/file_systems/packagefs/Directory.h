@@ -7,6 +7,7 @@
 
 
 #include "Node.h"
+#include "PackageDirectory.h"
 
 
 
@@ -30,6 +31,10 @@ public:
 
 	virtual	status_t			Init(Directory* parent, const char* name);
 
+	virtual	mode_t				Mode() const;
+	virtual	uid_t				UserID() const;
+	virtual	gid_t				GroupID() const;
+
 	virtual	status_t			AddPackageNode(PackageNode* packageNode);
 
 			void				AddChild(Node* node);
@@ -47,6 +52,7 @@ public:
 private:
 			NodeNameHashTable	fChildTable;
 			NodeList			fChildList;
+			PackageDirectoryList fPackageDirectories;
 			DirectoryIteratorList fIterators;
 };
 

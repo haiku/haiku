@@ -6,12 +6,15 @@
 #define PACKAGE_DIRECTORY_H
 
 
+#include <util/DoublyLinkedList.h>
+
 #include "PackageNode.h"
 
 
-class PackageDirectory : public PackageNode {
+class PackageDirectory : public PackageNode,
+	public DoublyLinkedListLinkImpl<PackageDirectory> {
 public:
-								PackageDirectory();
+								PackageDirectory(mode_t mode);
 	virtual						~PackageDirectory();
 
 			void				AddChild(PackageNode* node);
@@ -40,6 +43,9 @@ PackageDirectory::NextChild(PackageNode* node) const
 {
 	return fChildren.GetNext(node);
 }
+
+
+typedef DoublyLinkedList<PackageDirectory> PackageDirectoryList;
 
 
 #endif	// PACKAGE_DIRECTORY_H

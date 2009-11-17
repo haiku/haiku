@@ -12,10 +12,13 @@
 #include "DebugSupport.h"
 
 
-PackageNode::PackageNode()
+PackageNode::PackageNode(mode_t mode)
 	:
 	fParent(NULL),
-	fName(NULL)
+	fName(NULL),
+	fMode(mode),
+	fUserID(0),
+	fGroupID(0)
 {
 }
 
