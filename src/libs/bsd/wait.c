@@ -19,7 +19,9 @@ wait3(int *status, int options, struct rusage *rusage) {
 pid_t
 wait4(pid_t pid, int *status, int options, struct rusage *rusage) {
   pid_t waitPid = waitpid(pid, status, options);
-  getrusage(RUSAGE_CHILDREN, rusage);
+  if (waitPid != -1) {
+  	getrusage(RUSAGE_CHILDREN, rusage);
+  }
 
   return waitPid;
 }
