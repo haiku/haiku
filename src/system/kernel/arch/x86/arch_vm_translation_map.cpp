@@ -85,90 +85,6 @@ static status_t early_query(addr_t va, addr_t *out_physical);
 static void flush_tmap(vm_translation_map *map);
 
 
-void *
-i386_translation_map_get_pgdir(vm_translation_map *map)
-{
-	return map->arch_data->pgdir_phys;
-}
-
-
-void
-x86_update_all_pgdirs(int index, page_directory_entry e)
-{
-	unsigned int state = disable_interrupts();
-
-	acquire_spinlock(&sTMapListLock);
-
-	ArchTMapList::Iterator it = sTMapList.GetIterator();
-	while (vm_translation_map_arch_info* info = it.Next())
-		info->pgdir_virt[index] = e;
-
-	release_spinlock(&sTMapListLock);
-	restore_interrupts(state);
-}
-
-
-// XXX currently assumes this translation map is active
-
-static status_t
-early_query(addr_t va, addr_t *_physicalAddress)
-{
-	page_table_entry *pentry;
-
-	if (sPageHolePageDir[VADDR_TO_PDENT(va)].present == 0) {
-		// no pagetable here
-		return B_ERROR;
-	}
-
-	pentry = sPageHole + va / B_PAGE_SIZE;
-	if (pentry->present == 0) {
-		// page mapping not valid
-		return B_ERROR;
-	}
-
-	*_physicalAddress = pentry->addr << 12;
-	return B_OK;
-}
-
-
-/*!	Acquires the map's recursive lock, and resets the invalidate pages counter
-	in case it's the first locking recursion.
-*/
-static status_t
-lock_tmap(vm_translation_map *map)
-{
-	TRACE(("lock_tmap: map %p\n", map));
-
-	recursive_lock_lock(&map->lock);
-	if (recursive_lock_get_recursion(&map->lock) == 1) {
-		// we were the first one to grab the lock
-		TRACE(("clearing invalidated page count\n"));
-		map->arch_data->num_invalidate_pages = 0;
-	}
-
-	return B_OK;
-}
-
-
-/*!	Unlocks the map, and, if we'll actually losing the recursive lock,
-	flush all pending changes of this map (ie. flush TLB caches as
-	needed).
-*/
-static status_t
-unlock_tmap(vm_translation_map *map)
-{
-	TRACE(("unlock_tmap: map %p\n", map));
-
-	if (recursive_lock_get_recursion(&map->lock) == 1) {
-		// we're about to release it for the last time
-		flush_tmap(map);
-	}
-
-	recursive_lock_unlock(&map->lock);
-	return B_OK;
-}
-
-
 vm_translation_map_arch_info::vm_translation_map_arch_info()
 	:
 	pgdir_virt(NULL),
@@ -208,6 +124,135 @@ vm_translation_map_arch_info::Delete()
 }
 
 
+//	#pragma mark -
+
+
+//! TODO: currently assumes this translation map is active
+static status_t
+early_query(addr_t va, addr_t *_physicalAddress)
+{
+	page_table_entry *pentry;
+
+	if (sPageHolePageDir[VADDR_TO_PDENT(va)].present == 0) {
+		// no pagetable here
+		return B_ERROR;
+	}
+
+	pentry = sPageHole + va / B_PAGE_SIZE;
+	if (pentry->present == 0) {
+		// page mapping not valid
+		return B_ERROR;
+	}
+
+	*_physicalAddress = pentry->addr << 12;
+	return B_OK;
+}
+
+
+static void
+put_page_table_entry_in_pgtable(page_table_entry *entry,
+	addr_t physicalAddress, uint32 attributes, bool globalPage)
+{
+	page_table_entry page;
+	init_page_table_entry(&page);
+
+	page.addr = ADDR_SHIFT(physicalAddress);
+
+	// if the page is user accessible, it's automatically
+	// accessible in kernel space, too (but with the same
+	// protection)
+	page.user = (attributes & B_USER_PROTECTION) != 0;
+	if (page.user)
+		page.rw = (attributes & B_WRITE_AREA) != 0;
+	else
+		page.rw = (attributes & B_KERNEL_WRITE_AREA) != 0;
+	page.present = 1;
+
+	if (globalPage)
+		page.global = 1;
+
+	// put it in the page table
+	update_page_table_entry(entry, &page);
+}
+
+
+//	#pragma mark -
+
+
+void *
+i386_translation_map_get_pgdir(vm_translation_map *map)
+{
+	return map->arch_data->pgdir_phys;
+}
+
+
+void
+x86_update_all_pgdirs(int index, page_directory_entry e)
+{
+	unsigned int state = disable_interrupts();
+
+	acquire_spinlock(&sTMapListLock);
+
+	ArchTMapList::Iterator it = sTMapList.GetIterator();
+	while (vm_translation_map_arch_info* info = it.Next())
+		info->pgdir_virt[index] = e;
+
+	release_spinlock(&sTMapListLock);
+	restore_interrupts(state);
+}
+
+
+void
+x86_put_pgtable_in_pgdir(page_directory_entry *entry,
+	addr_t pgtable_phys, uint32 attributes)
+{
+	page_directory_entry table;
+	// put it in the pgdir
+	init_page_directory_entry(&table);
+	table.addr = ADDR_SHIFT(pgtable_phys);
+
+	// ToDo: we ignore the attributes of the page table - for compatibility
+	//	with BeOS we allow having user accessible areas in the kernel address
+	//	space. This is currently being used by some drivers, mainly for the
+	//	frame buffer. Our current real time data implementation makes use of
+	//	this fact, too.
+	//	We might want to get rid of this possibility one day, especially if
+	//	we intend to port it to a platform that does not support this.
+	table.user = 1;
+	table.rw = 1;
+	table.present = 1;
+	update_page_directory_entry(entry, &table);
+}
+
+
+void
+x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
+	size_t size)
+{
+	memset(pageTables, 0, B_PAGE_SIZE * (size / (B_PAGE_SIZE * 1024)));
+
+	// put the array of pgtables directly into the kernel pagedir
+	// these will be wired and kept mapped into virtual space to be easy to get
+	// to
+	{
+		addr_t virtualTable = (addr_t)pageTables;
+
+		for (size_t i = 0; i < (size / (B_PAGE_SIZE * 1024));
+				i++, virtualTable += B_PAGE_SIZE) {
+			addr_t physicalTable = 0;
+			early_query(virtualTable, &physicalTable);
+			page_directory_entry* entry = &sPageHolePageDir[
+				(address / (B_PAGE_SIZE * 1024)) + i];
+			x86_put_pgtable_in_pgdir(entry, physicalTable,
+				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		}
+	}
+}
+
+
+// #pragma mark - VM ops
+
+
 static void
 destroy_tmap(vm_translation_map *map)
 {
@@ -240,53 +285,41 @@ destroy_tmap(vm_translation_map *map)
 }
 
 
-void
-x86_put_pgtable_in_pgdir(page_directory_entry *entry,
-	addr_t pgtable_phys, uint32 attributes)
+/*!	Acquires the map's recursive lock, and resets the invalidate pages counter
+	in case it's the first locking recursion.
+*/
+static status_t
+lock_tmap(vm_translation_map *map)
 {
-	page_directory_entry table;
-	// put it in the pgdir
-	init_page_directory_entry(&table);
-	table.addr = ADDR_SHIFT(pgtable_phys);
+	TRACE(("lock_tmap: map %p\n", map));
 
-	// ToDo: we ignore the attributes of the page table - for compatibility
-	//	with BeOS we allow having user accessible areas in the kernel address
-	//	space. This is currently being used by some drivers, mainly for the
-	//	frame buffer. Our current real time data implementation makes use of
-	//	this fact, too.
-	//	We might want to get rid of this possibility one day, especially if
-	//	we intend to port it to a platform that does not support this.
-	table.user = 1;
-	table.rw = 1;
-	table.present = 1;
-	update_page_directory_entry(entry, &table);
+	recursive_lock_lock(&map->lock);
+	if (recursive_lock_get_recursion(&map->lock) == 1) {
+		// we were the first one to grab the lock
+		TRACE(("clearing invalidated page count\n"));
+		map->arch_data->num_invalidate_pages = 0;
+	}
+
+	return B_OK;
 }
 
 
-static void
-put_page_table_entry_in_pgtable(page_table_entry *entry,
-	addr_t physicalAddress, uint32 attributes, bool globalPage)
+/*!	Unlocks the map, and, if we'll actually losing the recursive lock,
+	flush all pending changes of this map (ie. flush TLB caches as
+	needed).
+*/
+static status_t
+unlock_tmap(vm_translation_map *map)
 {
-	page_table_entry page;
-	init_page_table_entry(&page);
+	TRACE(("unlock_tmap: map %p\n", map));
 
-	page.addr = ADDR_SHIFT(physicalAddress);
+	if (recursive_lock_get_recursion(&map->lock) == 1) {
+		// we're about to release it for the last time
+		flush_tmap(map);
+	}
 
-	// if the page is user accessible, it's automatically
-	// accessible in kernel space, too (but with the same
-	// protection)
-	page.user = (attributes & B_USER_PROTECTION) != 0;
-	if (page.user)
-		page.rw = (attributes & B_WRITE_AREA) != 0;
-	else
-		page.rw = (attributes & B_KERNEL_WRITE_AREA) != 0;
-	page.present = 1;
-
-	if (globalPage)
-		page.global = 1;
-
-	// put it in the page table
-	update_page_table_entry(entry, &page);
+	recursive_lock_unlock(&map->lock);
+	return B_OK;
 }
 
 
@@ -435,39 +468,6 @@ restart:
 
 
 static status_t
-query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical,
-	uint32 *_flags)
-{
-	page_directory_entry *pd = map->arch_data->pgdir_virt;
-	page_table_entry *pt;
-	addr_t physicalPageTable;
-	int32 index;
-
-	*_physical = 0;
-
-	index = VADDR_TO_PDENT(va);
-	if (pd[index].present == 0) {
-		// no pagetable here
-		return B_ERROR;
-	}
-
-	// map page table entry
-	physicalPageTable = ADDR_REVERSE_SHIFT(pd[index].addr);
-	pt = gPhysicalPageMapper->InterruptGetPageTableAt(physicalPageTable);
-
-	index = VADDR_TO_PTENT(va);
-	*_physical = ADDR_REVERSE_SHIFT(pt[index].addr);
-
-	*_flags |= ((pt[index].rw ? B_KERNEL_WRITE_AREA : 0) | B_KERNEL_READ_AREA)
-		| (pt[index].dirty ? PAGE_MODIFIED : 0)
-		| (pt[index].accessed ? PAGE_ACCESSED : 0)
-		| (pt[index].present ? PAGE_PRESENT : 0);
-
-	return B_OK;
-}
-
-
-static status_t
 query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical,
 	uint32 *_flags)
 {
@@ -506,6 +506,39 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical,
 	pinner.Unlock();
 
 	TRACE(("query_tmap: returning pa 0x%lx for va 0x%lx\n", *_physical, va));
+
+	return B_OK;
+}
+
+
+static status_t
+query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical,
+	uint32 *_flags)
+{
+	page_directory_entry *pd = map->arch_data->pgdir_virt;
+	page_table_entry *pt;
+	addr_t physicalPageTable;
+	int32 index;
+
+	*_physical = 0;
+
+	index = VADDR_TO_PDENT(va);
+	if (pd[index].present == 0) {
+		// no pagetable here
+		return B_ERROR;
+	}
+
+	// map page table entry
+	physicalPageTable = ADDR_REVERSE_SHIFT(pd[index].addr);
+	pt = gPhysicalPageMapper->InterruptGetPageTableAt(physicalPageTable);
+
+	index = VADDR_TO_PTENT(va);
+	*_physical = ADDR_REVERSE_SHIFT(pt[index].addr);
+
+	*_flags |= ((pt[index].rw ? B_KERNEL_WRITE_AREA : 0) | B_KERNEL_READ_AREA)
+		| (pt[index].dirty ? PAGE_MODIFIED : 0)
+		| (pt[index].accessed ? PAGE_ACCESSED : 0)
+		| (pt[index].present ? PAGE_PRESENT : 0);
 
 	return B_OK;
 }
@@ -704,36 +737,7 @@ static vm_translation_map_ops tmap_ops = {
 };
 
 
-//	#pragma mark -
-
-
-void
-x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
-	size_t size)
-{
-	memset(pageTables, 0, B_PAGE_SIZE * (size / (B_PAGE_SIZE * 1024)));
-
-	// put the array of pgtables directly into the kernel pagedir
-	// these will be wired and kept mapped into virtual space to be easy to get
-	// to
-	{
-		addr_t virtualTable = (addr_t)pageTables;
-
-		for (size_t i = 0; i < (size / (B_PAGE_SIZE * 1024));
-				i++, virtualTable += B_PAGE_SIZE) {
-			addr_t physicalTable = 0;
-			early_query(virtualTable, &physicalTable);
-			page_directory_entry* entry = &sPageHolePageDir[
-				(address / (B_PAGE_SIZE * 1024)) + i];
-			x86_put_pgtable_in_pgdir(entry, physicalTable,
-				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		}
-	}
-}
-
-
-//	#pragma mark -
-//	VM API
+// #pragma mark - VM API
 
 
 status_t
