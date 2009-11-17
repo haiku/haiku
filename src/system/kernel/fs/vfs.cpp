@@ -7518,6 +7518,22 @@ fs_next_device(int32* _cookie)
 }
 
 
+ssize_t
+fs_read_attr(int fd, const char *attribute, uint32 type, off_t pos,
+	void *buffer, size_t readBytes)
+{
+	int attrFD = attr_open(fd, NULL, attribute, O_RDONLY, true);
+	if (attrFD < 0)
+		return attrFD;
+
+	ssize_t bytesRead = _kern_read(attrFD, pos, buffer, readBytes);
+
+	_kern_close(attrFD);
+
+	return bytesRead;
+}
+
+
 static status_t
 get_cwd(char* buffer, size_t size, bool kernel)
 {
