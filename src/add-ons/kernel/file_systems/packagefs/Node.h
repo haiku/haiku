@@ -42,6 +42,9 @@ public:
 
 	virtual	status_t			Init(Directory* parent, const char* name);
 
+	virtual	status_t			VFSInit(dev_t deviceID) = 0;
+	virtual	void				VFSUninit() = 0;
+
 	virtual	mode_t				Mode() const = 0;
 	virtual	uid_t				UserID() const = 0;
 	virtual	gid_t				GroupID() const = 0;
@@ -49,6 +52,9 @@ public:
 	virtual	off_t				FileSize() const = 0;
 
 	virtual	status_t			AddPackageNode(PackageNode* packageNode) = 0;
+
+	virtual	status_t			Read(off_t offset, void* buffer,
+									size_t* bufferSize) = 0;
 
 protected:
 			rw_lock				fLock;

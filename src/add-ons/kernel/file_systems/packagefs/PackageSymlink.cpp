@@ -10,9 +10,9 @@
 #include <string.h>
 
 
-PackageSymlink::PackageSymlink(mode_t mode)
+PackageSymlink::PackageSymlink(Package* package, mode_t mode)
 	:
-	PackageLeafNode(mode),
+	PackageLeafNode(package, mode),
 	fSymlinkPath(NULL)
 {
 }

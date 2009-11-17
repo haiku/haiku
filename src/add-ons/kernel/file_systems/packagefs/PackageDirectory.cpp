@@ -7,9 +7,9 @@
 #include "PackageDirectory.h"
 
 
-PackageDirectory::PackageDirectory(mode_t mode)
+PackageDirectory::PackageDirectory(Package* package, mode_t mode)
 	:
-	PackageNode(mode)
+	PackageNode(package, mode)
 {
 }
 

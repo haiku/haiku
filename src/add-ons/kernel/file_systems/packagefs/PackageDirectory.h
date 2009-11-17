@@ -14,7 +14,7 @@
 class PackageDirectory : public PackageNode,
 	public DoublyLinkedListLinkImpl<PackageDirectory> {
 public:
-								PackageDirectory(mode_t mode);
+								PackageDirectory(Package* package, mode_t mode);
 	virtual						~PackageDirectory();
 
 			void				AddChild(PackageNode* node);

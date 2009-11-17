@@ -6,11 +6,99 @@
 
 #include "PackageFile.h"
 
+#include <algorithm>
+#include <new>
 
-PackageFile::PackageFile(mode_t mode, const PackageData& data)
+#include <fs_cache.h>
+
+#include "DataReader.h"
+#include "PackageDataReader.h"
+
+#include "DebugSupport.h"
+#include "Package.h"
+
+
+// #pragma mark - DataAccessor
+
+
+struct PackageFile::DataAccessor {
+	DataAccessor(PackageData* data)
+		:
+		fData(data),
+		fDataReader(NULL),
+		fReader(NULL),
+		fFileCache(NULL)
+	{
+	}
+
+	~DataAccessor()
+	{
+		file_cache_delete(fFileCache);
+		delete fReader;
+		delete fDataReader;
+	}
+
+	status_t Init(dev_t deviceID, ino_t nodeID, int fd)
+	{
+		// create a DataReader for the compressed data
+		if (fData->IsEncodedInline()) {
+			fDataReader = new(std::nothrow) BufferDataReader(
+				fData->InlineData(), fData->CompressedSize());
+		} else
+			fDataReader = new(std::nothrow) FDDataReader(fd);
+
+		if (fDataReader == NULL)
+			RETURN_ERROR(B_NO_MEMORY);
+
+		// create a PackageDataReader
+		status_t error = PackageDataReaderFactory::CreatePackageDataReader(
+			fDataReader, *fData, fReader);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		// create a file cache
+		fFileCache = file_cache_create(deviceID, nodeID,
+			fData->UncompressedSize());
+		if (fFileCache == NULL)
+			RETURN_ERROR(B_NO_MEMORY);
+
+		return B_OK;
+	}
+
+	status_t ReadData(off_t offset, void* buffer, size_t* bufferSize)
+	{
+		if (offset < 0 || (uint64)offset > fData->UncompressedSize())
+			return B_BAD_VALUE;
+
+		size_t toRead = std::min((uint64)*bufferSize,
+			fData->UncompressedSize() - offset);
+
+		if (toRead > 0) {
+			status_t error = fReader->ReadData(offset, buffer, toRead);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+		}
+
+		*bufferSize = toRead;
+		return B_OK;
+	}
+
+private:
+	PackageData*		fData;
+	DataReader*			fDataReader;
+	PackageDataReader*	fReader;
+	void*				fFileCache;
+};
+
+
+// #pragma mark - PackageFile
+
+
+PackageFile::PackageFile(Package* package, mode_t mode, const PackageData& data)
 	:
-	PackageLeafNode(mode),
-	fData(data)
+	PackageLeafNode(package, mode),
+	fData(data),
+	fDataAccessor(NULL)
 {
 }
 
@@ -20,8 +108,54 @@ PackageFile::~PackageFile()
 }
 
 
+status_t
+PackageFile::VFSInit(dev_t deviceID, ino_t nodeID)
+{
+	// open the package
+	int fd = fPackage->Open();
+	if (fd < 0)
+		RETURN_ERROR(fd);
+	PackageCloser packageCloser(fPackage);
+
+	// create the data accessor
+	fDataAccessor = new(std::nothrow) DataAccessor(&fData);
+	if (fDataAccessor == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	status_t error = fDataAccessor->Init(deviceID, nodeID, fd);
+	if (error != B_OK) {
+		delete fDataAccessor;
+		fDataAccessor = NULL;
+		return error;
+	}
+
+	packageCloser.Detach();
+	return B_OK;
+}
+
+
+void
+PackageFile::VFSUninit()
+{
+	if (fDataAccessor != NULL) {
+		fPackage->Close();
+		delete fDataAccessor;
+		fDataAccessor = NULL;
+	}
+}
+
+
 off_t
 PackageFile::FileSize() const
 {
 	return fData.UncompressedSize();
+}
+
+
+status_t
+PackageFile::Read(off_t offset, void* buffer, size_t* bufferSize)
+{
+	if (fDataAccessor == NULL)
+		return B_BAD_VALUE;
+	return fDataAccessor->ReadData(offset, buffer, bufferSize);
 }

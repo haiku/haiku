@@ -11,7 +11,7 @@
 
 class PackageSymlink : public PackageLeafNode {
 public:
-								PackageSymlink(mode_t mode);
+								PackageSymlink(Package* package, mode_t mode);
 	virtual						~PackageSymlink();
 
 			status_t			SetSymlinkPath(const char* path);

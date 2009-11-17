@@ -13,12 +13,13 @@
 #include <util/SinglyLinkedList.h>
 
 
+class Package;
 class PackageDirectory;
 
 
 class PackageNode : public SinglyLinkedListLinkImpl<PackageNode> {
 public:
-								PackageNode(mode_t mode);
+								PackageNode(Package* package, mode_t mode);
 	virtual						~PackageNode();
 
 			PackageDirectory*	Parent() const	{ return fParent; }
@@ -26,6 +27,9 @@ public:
 
 	virtual	status_t			Init(PackageDirectory* parent,
 									const char* name);
+
+	virtual	status_t			VFSInit(dev_t deviceID, ino_t nodeID);
+	virtual	void				VFSUninit();
 
 			mode_t				Mode() const			{ return fMode; }
 
@@ -43,6 +47,7 @@ public:
 	virtual	off_t				FileSize() const;
 
 protected:
+			Package*			fPackage;
 			PackageDirectory*	fParent;
 			char*				fName;
 			mode_t				fMode;

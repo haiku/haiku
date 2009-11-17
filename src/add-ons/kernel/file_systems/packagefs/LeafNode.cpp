@@ -26,6 +26,23 @@ LeafNode::Init(Directory* parent, const char* name)
 }
 
 
+status_t
+LeafNode::VFSInit(dev_t deviceID)
+{
+	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+		return packageNode->VFSInit(deviceID, fID);
+	return B_OK;
+}
+
+
+void
+LeafNode::VFSUninit()
+{
+	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+		packageNode->VFSUninit();
+}
+
+
 mode_t
 LeafNode::Mode() const
 {
@@ -82,6 +99,15 @@ LeafNode::AddPackageNode(PackageNode* packageNode)
 	fPackageNodes.Add(dynamic_cast<PackageLeafNode*>(packageNode));
 
 	return B_OK;
+}
+
+
+status_t
+LeafNode::Read(off_t offset, void* buffer, size_t* bufferSize)
+{
+	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+		return packageNode->Read(offset, buffer, bufferSize);
+	return B_ERROR;
 }
 
 

@@ -141,10 +141,11 @@ struct Volume::PackageLoaderContentHandler : PackageContentHandler {
 		PackageNode* node;
 		if (S_ISREG(mode)) {
 			// file
-			node = new(std::nothrow) PackageFile(mode, entry->Data());
+			node = new(std::nothrow) PackageFile(fPackage, mode, entry->Data());
 		} else if (S_ISLNK(mode)) {
 			// symlink
-			PackageSymlink* symlink = new(std::nothrow) PackageSymlink(mode);
+			PackageSymlink* symlink = new(std::nothrow) PackageSymlink(
+				fPackage, mode);
 			if (symlink == NULL)
 				RETURN_ERROR(B_NO_MEMORY);
 
@@ -157,7 +158,7 @@ struct Volume::PackageLoaderContentHandler : PackageContentHandler {
 			node = symlink;
 		} else if (S_ISDIR(mode)) {
 			// directory
-			node = new(std::nothrow) PackageDirectory(mode);
+			node = new(std::nothrow) PackageDirectory(fPackage, mode);
 		} else
 			RETURN_ERROR(B_BAD_DATA);
 
@@ -476,16 +477,12 @@ status_t
 Volume::_LoadPackage(Package* package)
 {
 	// open package file
-	int fd = openat(package->Domain()->DirectoryFD(), package->Name(),
-		O_RDONLY);
-	if (fd < 0) {
-		ERROR("Failed to open package file \"%s\"\n", package->Name());
-		return errno;
-	}
-// TODO: Verify that it's still the same file.
-	FDCloser fdCloser(fd);
+	int fd = package->Open();
+	if (fd < 0)
+		RETURN_ERROR(fd);
+	PackageCloser packageCloser(package);
 
-	// open package
+	// initialize package reader
 	PackageLoaderErrorOutput errorOutput(package);
 	PackageReader packageReader(&errorOutput);
 	status_t error = packageReader.Init(fd, false);

@@ -12,8 +12,9 @@
 #include "DebugSupport.h"
 
 
-PackageNode::PackageNode(mode_t mode)
+PackageNode::PackageNode(Package* package, mode_t mode)
 	:
+	fPackage(package),
 	fParent(NULL),
 	fName(NULL),
 	fMode(mode),
@@ -38,6 +39,19 @@ PackageNode::Init(PackageDirectory* parent, const char* name)
 		RETURN_ERROR(B_NO_MEMORY);
 
 	return B_OK;
+}
+
+
+status_t
+PackageNode::VFSInit(dev_t deviceID, ino_t nodeID)
+{
+	return B_OK;
+}
+
+
+void
+PackageNode::VFSUninit()
+{
 }
 
 

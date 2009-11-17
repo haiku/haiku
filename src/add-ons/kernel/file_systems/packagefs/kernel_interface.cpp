@@ -58,6 +58,43 @@ set_dirent_name(struct dirent* buffer, size_t bufferSize, const char* name,
 }
 
 
+static status_t
+check_access(Node* node, int mode)
+{
+	// write access requested?
+	if (mode & W_OK)
+		return B_READ_ONLY_DEVICE;
+
+	// get node permissions
+	int userPermissions = (node->Mode() & S_IRWXU) >> 6;
+	int groupPermissions = (node->Mode() & S_IRWXG) >> 3;
+	int otherPermissions = node->Mode() & S_IRWXO;
+
+	// get the permissions for this uid/gid
+	int permissions = 0;
+	uid_t uid = geteuid();
+
+	if (uid == 0) {
+		// user is root
+		// root has always read/write permission, but at least one of the
+		// X bits must be set for execute permission
+		permissions = userPermissions | groupPermissions | otherPermissions
+			| S_IROTH | S_IWOTH;
+	} else if (uid == node->UserID()) {
+		// user is node owner
+		permissions = userPermissions;
+	} else if (is_user_in_group(node->GroupID())) {
+		// user is in owning group
+		permissions = groupPermissions;
+	} else {
+		// user is one of the others
+		permissions = otherPermissions;
+	}
+
+	return (mode & ~permissions) == 0 ? B_OK : B_NOT_ALLOWED;
+}
+
+
 //	#pragma mark - Volume
 
 
@@ -171,9 +208,16 @@ packagefs_get_vnode(fs_volume* fsVolume, ino_t vnid, fs_vnode* fsNode,
 	Node* node = volume->FindNode(vnid);
 	if (node == NULL)
 		return B_ENTRY_NOT_FOUND;
-	node->AcquireReference();
+	BReference<Node> nodeReference(node);
+	volumeLocker.Unlock();
 
-	fsNode->private_node = node;
+	NodeWriteLocker nodeLocker(node);
+	status_t error = node->VFSInit(volume->ID());
+	if (error != B_OK)
+		RETURN_ERROR(error);
+	nodeLocker.Unlock();
+
+	fsNode->private_node = nodeReference.Detach();
 	fsNode->ops = &gPackageFSVnodeOps;
 	*_type = node->Mode() & S_IFMT;
 	*_flags = 0;
@@ -191,10 +235,26 @@ packagefs_put_vnode(fs_volume* fsVolume, fs_vnode* fsNode, bool reenter)
 	FUNCTION("volume: %p, node: %p\n", volume, node);
 	TOUCH(volume);
 
+	NodeWriteLocker nodeLocker(node);
+	node->VFSUninit();
+	nodeLocker.Unlock();
+
 	node->ReleaseReference();
 
 	return B_OK;
 }
+
+
+// #pragma mark - Request I/O
+
+
+#if 0
+static status_t
+packagefs_io(fs_volume* volume, fs_vnode* vnode, void* cookie,
+	io_request* request)
+{
+}
+#endif
 
 
 // #pragma mark - Nodes
@@ -238,39 +298,8 @@ packagefs_access(fs_volume* fsVolume, fs_vnode* fsNode, int mode)
 	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
 	TOUCH(volume);
 
-	// write access requested?
-	if (mode & W_OK)
-		return B_READ_ONLY_DEVICE;
-
 	NodeReadLocker nodeLocker(node);
-
-	// get node permissions
-	int userPermissions = (node->Mode() & S_IRWXU) >> 6;
-	int groupPermissions = (node->Mode() & S_IRWXG) >> 3;
-	int otherPermissions = node->Mode() & S_IRWXO;
-
-	// get the permissions for this uid/gid
-	int permissions = 0;
-	uid_t uid = geteuid();
-
-	if (uid == 0) {
-		// user is root
-		// root has always read/write permission, but at least one of the
-		// X bits must be set for execute permission
-		permissions = userPermissions | groupPermissions | otherPermissions
-			| S_IROTH | S_IWOTH;
-	} else if (uid == node->UserID()) {
-		// user is node owner
-		permissions = userPermissions;
-	} else if (is_user_in_group(node->GroupID())) {
-		// user is in owning group
-		permissions = groupPermissions;
-	} else {
-		// user is one of the others
-		permissions = otherPermissions;
-	}
-
-	return (mode & ~permissions) ? B_NOT_ALLOWED : B_OK;
+	return check_access(node, mode);
 }
 
 
@@ -304,6 +333,17 @@ packagefs_read_stat(fs_volume* fsVolume, fs_vnode* fsNode, struct stat* st)
 // #pragma mark - Files
 
 
+struct FileCookie {
+	int	openMode;
+
+	FileCookie(int openMode)
+		:
+		openMode(openMode)
+	{
+	}
+};
+
+
 static status_t
 packagefs_open(fs_volume* fsVolume, fs_vnode* fsNode, int openMode,
 	void** _cookie)
@@ -314,10 +354,26 @@ packagefs_open(fs_volume* fsVolume, fs_vnode* fsNode, int openMode,
 	FUNCTION("volume: %p, node: %p (%lld), openMode %#x\n", volume, node,
 		node->ID(), openMode);
 	TOUCH(volume);
-	TOUCH(node);
 
-// TODO: Implement it for real!
-	*_cookie = NULL;
+	NodeReadLocker nodeLocker(node);
+
+	// check the open mode and permissions
+	if (S_ISDIR(node->Mode()) && (openMode & O_RWMASK) != O_RDONLY)
+		return B_IS_A_DIRECTORY;
+
+	if ((openMode & O_RWMASK) != O_RDONLY)
+		return B_NOT_ALLOWED;
+
+	status_t error = check_access(node, R_OK);
+	if (error != B_OK)
+		return error;
+
+	// allocate the cookie
+	FileCookie* cookie = new(std::nothrow) FileCookie(openMode);
+	if (cookie == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	*_cookie = cookie;
 
 	return B_OK;
 }
@@ -331,17 +387,40 @@ packagefs_close(fs_volume* fs, fs_vnode* _node, void* cookie)
 
 
 static status_t
-packagefs_free_cookie(fs_volume* fs, fs_vnode* _node, void* cookie)
+packagefs_free_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 {
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+	FileCookie* cookie = (FileCookie*)_cookie;
+
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+		node->ID(), cookie);
+	TOUCH(volume);
+	TOUCH(node);
+
+	delete cookie;
+
 	return B_OK;
 }
 
 
 static status_t
-packagefs_read(fs_volume* fs, fs_vnode* _node, void* cookie, off_t pos,
-	void* buffer, size_t* bufferSize)
+packagefs_read(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
+	off_t offset, void* buffer, size_t* bufferSize)
 {
-	return B_UNSUPPORTED;
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+	FileCookie* cookie = (FileCookie*)_cookie;
+
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, offset: %lld, "
+		"buffer: %p, size: %lu\n", volume, node, node->ID(), cookie, offset,
+		buffer, *bufferSize);
+	TOUCH(volume);
+
+	if ((cookie->openMode & O_RWMASK) != O_RDONLY)
+		return EBADF;
+
+	return node->Read(offset, buffer, bufferSize);
 }
 
 
@@ -635,7 +714,7 @@ fs_vnode_ops gPackageFSVnodeOps = {
 	NULL,	// read_pages,
 	NULL,	// write_pages,
 
-	NULL,	// io()
+	NULL,	// &packagefs_io,
 	NULL,	// cancel_io()
 
 	NULL,	// get_file_map,

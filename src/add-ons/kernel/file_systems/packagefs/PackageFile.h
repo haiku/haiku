@@ -13,14 +13,24 @@
 
 class PackageFile : public PackageLeafNode {
 public:
-								PackageFile(mode_t mode,
+								PackageFile(Package* package, mode_t mode,
 									const PackageData& data);
 	virtual						~PackageFile();
 
+	virtual	status_t			VFSInit(dev_t deviceID, ino_t nodeID);
+	virtual	void				VFSUninit();
+
 	virtual	off_t				FileSize() const;
+
+	virtual	status_t			Read(off_t offset, void* buffer,
+									size_t* bufferSize);
+
+private:
+			struct DataAccessor;
 
 private:
 			PackageData			fData;
+			DataAccessor*		fDataAccessor;
 };
 
 

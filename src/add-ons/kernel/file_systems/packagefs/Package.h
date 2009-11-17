@@ -9,6 +9,8 @@
 #include <util/khash.h>
 #include <util/OpenHashTable.h>
 
+#include <lock.h>
+
 #include "PackageNode.h"
 
 
@@ -30,16 +32,45 @@ public:
 
 			void				AddNode(PackageNode* node);
 
+			int					Open();
+			void				Close();
+
 			const PackageNodeList&	Nodes() const
 									{ return fNodes; }
 
 private:
+			mutex				fLock;
 			PackageDomain*		fDomain;
 			char*				fName;
+			int					fFD;
+			uint32				fOpenCount;
 			Package*			fHashTableNext;
 			ino_t				fNodeID;
 			dev_t				fDeviceID;
 			PackageNodeList		fNodes;
+};
+
+
+struct PackageCloser {
+	PackageCloser(Package* package)
+		:
+		fPackage(package)
+	{
+	}
+
+	~PackageCloser()
+	{
+		if (fPackage != NULL)
+			fPackage->Close();
+	}
+
+	void Detach()
+	{
+		fPackage = NULL;
+	}
+
+private:
+	Package*	fPackage;
 };
 
 

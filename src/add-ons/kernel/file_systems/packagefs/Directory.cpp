@@ -38,6 +38,19 @@ Directory::Init(Directory* parent, const char* name)
 }
 
 
+status_t
+Directory::VFSInit(dev_t deviceID)
+{
+	return B_OK;
+}
+
+
+void
+Directory::VFSUninit()
+{
+}
+
+
 mode_t
 Directory::Mode() const
 {
@@ -95,6 +108,13 @@ Directory::AddPackageNode(PackageNode* packageNode)
 	fPackageDirectories.Add(packageDirectory);
 
 	return B_OK;
+}
+
+
+status_t
+Directory::Read(off_t offset, void* buffer, size_t* bufferSize)
+{
+	return B_IS_A_DIRECTORY;
 }
 
 

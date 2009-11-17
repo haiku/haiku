@@ -7,9 +7,9 @@
 #include "PackageLeafNode.h"
 
 
-PackageLeafNode::PackageLeafNode(mode_t mode)
+PackageLeafNode::PackageLeafNode(Package* package, mode_t mode)
 	:
-	PackageNode(mode)
+	PackageNode(package, mode)
 {
 }
 
@@ -23,4 +23,11 @@ const char*
 PackageLeafNode::SymlinkPath() const
 {
 	return NULL;
+}
+
+
+status_t
+PackageLeafNode::Read(off_t offset, void* buffer, size_t* bufferSize)
+{
+	return EBADF;
 }
