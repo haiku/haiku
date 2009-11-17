@@ -153,8 +153,22 @@ keyboard_handle_int(ps2_dev *dev)
 			emergencyKeyStatus &= EMERGENCY_SYS_REQ;
 	} else if (emergencyKeyStatus > EMERGENCY_SYS_REQ
 		&& debug_emergency_key_pressed(kUnshiftedKeymap[scancode])) {
+		static const int kKeys[] = {LEFT_ALT_KEY, RIGHT_ALT_KEY, SYS_REQ_KEY};
+		int i;
+
 		// we probably have lost some keys, so reset our key states
 		emergencyKeyStatus = 0;
+
+		// send key ups for alt-sysreq
+		keyInfo.timestamp = system_time();
+		keyInfo.is_keydown = false;
+		for (i = 0; i < sizeof(kKeys) / sizeof(kKeys[0]); i++) {
+			keyInfo.scancode = kKeys[i];
+			if (packet_buffer_write(sKeyBuffer, (uint8 *)&keyInfo,
+					sizeof(keyInfo)) != 0)
+				release_sem_etc(sKeyboardSem, 1, B_DO_NOT_RESCHEDULE);
+		}
+
 		return B_HANDLED_INTERRUPT;
 	}
 
