@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -7,6 +7,7 @@
  */
 #ifndef _KERNEL_ARCH_X86_PAGING_H
 #define _KERNEL_ARCH_X86_PAGING_H
+
 
 #include <SupportDefs.h>
 
@@ -16,8 +17,8 @@
 
 #define PAGE_INVALIDATE_CACHE_SIZE 64
 
-#define ADDR_SHIFT(x) ((x)>>12)
-#define ADDR_REVERSE_SHIFT(x) ((x)<<12)
+#define ADDR_SHIFT(x) ((x) >> 12)
+#define ADDR_REVERSE_SHIFT(x) ((x) << 12)
 
 #define VADDR_TO_PDENT(va) (((va) / B_PAGE_SIZE) / 1024)
 #define VADDR_TO_PTENT(va) (((va) / B_PAGE_SIZE) % 1024)
@@ -56,14 +57,14 @@ typedef struct page_directory_entry {
 
 
 struct vm_translation_map_arch_info : DeferredDeletable {
-	struct page_directory_entry*		pgdir_virt;
-	struct page_directory_entry*		pgdir_phys;
-	TranslationMapPhysicalPageMapper*	page_mapper;
-	vint32 ref_count;
-	vint32 active_on_cpus;
+	page_directory_entry*		pgdir_virt;
+	page_directory_entry*		pgdir_phys;
+	TranslationMapPhysicalPageMapper* page_mapper;
+	vint32						ref_count;
+	vint32						active_on_cpus;
 		// mask indicating on which CPUs the map is currently used
-	int num_invalidate_pages;
-	addr_t pages_to_invalidate[PAGE_INVALIDATE_CACHE_SIZE];
+	int							num_invalidate_pages;
+	addr_t						pages_to_invalidate[PAGE_INVALIDATE_CACHE_SIZE];
 
 								vm_translation_map_arch_info();
 	virtual						~vm_translation_map_arch_info();
