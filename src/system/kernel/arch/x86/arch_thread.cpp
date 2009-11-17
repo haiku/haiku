@@ -383,6 +383,10 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 		atomic_and(&activeMap->active_on_cpus, ~((uint32)1 << cpu));
 		atomic_or(&toMap->active_on_cpus, (uint32)1 << cpu);
 
+		activeMap->RemoveReference();
+			// this might causes the map to be deferred deleted - ie. it won't
+			// be deleted when it is still in use
+
 		// assign the new map to the CPU
 		toMap->AddReference();
 		cpuData->arch.active_translation_map = toMap;
@@ -390,15 +394,12 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 		// get the new page directory
 		newPageDirectory = (addr_t)toMap->pgdir_phys;
 	} else {
-		activeMap = NULL;
 		newPageDirectory = 0;
+			// this means no change
 	}
 
 	gX86SwapFPUFunc(from->arch_info.fpu_state, to->arch_info.fpu_state);
 	i386_context_switch(&from->arch_info, &to->arch_info, newPageDirectory);
-
-	if (activeMap != NULL)
-		activeMap->RemoveReference();
 }
 
 
