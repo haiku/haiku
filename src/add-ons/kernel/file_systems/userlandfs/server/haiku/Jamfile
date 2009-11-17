@@ -37,6 +37,7 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 	block_cache.cpp
 	file_map.cpp
 	khash.c
+	Referenceable.cpp
 
 	# emulation
 	entry_cache.cpp
@@ -62,3 +63,7 @@ SEARCH on [ FGristFiles
 SEARCH on [ FGristFiles
 		khash.c
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+
+SEARCH on [ FGristFiles
+		Referenceable.cpp
+	] = [ FDirName $(HAIKU_TOP) src kits support ] ;
