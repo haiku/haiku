@@ -16,6 +16,7 @@ BinCommand package :
 	command_list.cpp
 	DataOutput.cpp
 	DataReader.cpp
+	ErrorOutput.cpp
 	package.cpp
 	PackageData.cpp
 	PackageDataReader.cpp
@@ -23,6 +24,7 @@ BinCommand package :
 	PackageEntryAttribute.cpp
 	PackageReader.cpp
 	PackageWriter.cpp
+	StandardErrorOutput.cpp
 	Strings.cpp
 
 	# compression

@@ -17,6 +17,7 @@
 #include "PackageEntry.h"
 #include "PackageEntryAttribute.h"
 #include "PackageReader.h"
+#include "StandardErrorOutput.h"
 
 
 struct PackageContentDumpHandler : LowLevelPackageContentHandler {
@@ -135,7 +136,8 @@ command_dump(int argc, const char* const* argv)
 	const char* packageFileName = argv[optind++];
 
 	// open package
-	PackageReader packageReader;
+	StandardErrorOutput errorOutput;
+	PackageReader packageReader(&errorOutput);
 	status_t error = packageReader.Init(packageFileName);
 printf("Init(): %s\n", strerror(error));
 	if (error != B_OK)

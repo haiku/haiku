@@ -22,10 +22,15 @@
 #include <haiku_package.h>
 
 #include "DataOutput.h"
+#include "ErrorOutput.h"
 #include "PackageData.h"
 #include "PackageEntry.h"
 #include "PackageEntryAttribute.h"
 #include "ZlibDecompressor.h"
+
+
+//#define TRACE(format...)	printf(format)
+#define TRACE(format...)	do {} while (false)
 
 
 // maximum TOC size we support reading
@@ -128,6 +133,7 @@ struct PackageReader::AttributeTypeReference {
 
 
 struct PackageReader::AttributeHandlerContext {
+	ErrorOutput*			errorOutput;
 	union {
 		PackageContentHandler*			packageContentHandler;
 		LowLevelPackageContentHandler*	lowLevelPackageContentHandler;
@@ -138,16 +144,19 @@ struct PackageReader::AttributeHandlerContext {
 	uint64					heapSize;
 
 
-	AttributeHandlerContext(PackageContentHandler* packageContentHandler)
+	AttributeHandlerContext(ErrorOutput* errorOutput,
+		PackageContentHandler* packageContentHandler)
 		:
+		errorOutput(errorOutput),
 		packageContentHandler(packageContentHandler),
 		hasLowLevelHandler(false)
 	{
 	}
 
-	AttributeHandlerContext(
+	AttributeHandlerContext(ErrorOutput* errorOutput,
 		LowLevelPackageContentHandler* lowLevelPackageContentHandler)
 		:
+		errorOutput(errorOutput),
 		lowLevelPackageContentHandler(lowLevelPackageContentHandler),
 		hasLowLevelHandler(true)
 	{
@@ -179,7 +188,7 @@ struct PackageReader::AttributeHandler
 		AttributeType* type, int8 typeIndex, const AttributeValue& value,
 		AttributeHandler** _handler)
 	{
-printf("%*signored attribute \"%s\" (%u)\n", fLevel * 2, "", type->name, type->type);
+TRACE("%*signored attribute \"%s\" (%u)\n", fLevel * 2, "", type->name, type->type);
 		return B_OK;
 	}
 
@@ -249,8 +258,9 @@ struct PackageReader::DataAttributeHandler : AttributeHandler {
 					case B_HPKG_COMPRESSION_ZLIB:
 						break;
 					default:
-						fprintf(stderr, "Error: Invalid compression type for "
-							"data (%llu)\n", value.unsignedInt);
+						context->errorOutput->PrintError("Error: Invalid "
+							"compression type for data (%llu)\n",
+							value.unsignedInt);
 						return B_BAD_DATA;
 				}
 
@@ -320,28 +330,30 @@ private:
 
 
 struct PackageReader::EntryAttributeHandler : AttributeHandler {
-	EntryAttributeHandler(PackageEntry* parentEntry, const char* name)
+	EntryAttributeHandler(AttributeHandlerContext* context,
+		PackageEntry* parentEntry, const char* name)
 		:
 		fEntry(parentEntry, name),
 		fNotified(false)
 	{
-		_SetFileType(B_HPKG_DEFAULT_FILE_TYPE);
+		_SetFileType(context, B_HPKG_DEFAULT_FILE_TYPE);
 	}
 
-	static status_t Create(PackageEntry* parentEntry, const char* name,
+	static status_t Create(AttributeHandlerContext* context,
+		PackageEntry* parentEntry, const char* name,
 		AttributeHandler*& _handler)
 	{
 		// check name
 		if (name[0] == '\0' || strcmp(name, ".") == 0
 			|| strcmp(name, "..") == 0 || strchr(name, '/') != NULL) {
-			fprintf(stderr, "Error: Invalid package: Invalid entry name: "
-				"\"%s\"\n", name);
+			context->errorOutput->PrintError("Error: Invalid package: Invalid "
+				"entry name: \"%s\"\n", name);
 			return B_BAD_DATA;
 		}
 
 		// create handler
 		EntryAttributeHandler* handler = new(std::nothrow)
-			EntryAttributeHandler(parentEntry, name);
+			EntryAttributeHandler(context, parentEntry, name);
 		if (handler == NULL)
 			return B_NO_MEMORY;
 
@@ -360,16 +372,16 @@ struct PackageReader::EntryAttributeHandler : AttributeHandler {
 				if (error != B_OK)
 					return error;
 
-//printf("%*sentry \"%s\"\n", fLevel * 2, "", value.string);
+//TRACE("%*sentry \"%s\"\n", fLevel * 2, "", value.string);
 				if (_handler != NULL) {
-					return EntryAttributeHandler::Create(&fEntry, value.string,
-						*_handler);
+					return EntryAttributeHandler::Create(context, &fEntry,
+						value.string, *_handler);
 				}
 				return B_OK;
 			}
 
 			case ATTRIBUTE_INDEX_FILE_TYPE:
-				return _SetFileType(value.unsignedInt);
+				return _SetFileType(context, value.unsignedInt);
 
 			case ATTRIBUTE_INDEX_FILE_PERMISSIONS:
 				fEntry.SetPermissions(value.unsignedInt);
@@ -469,7 +481,7 @@ private:
 		return context->packageContentHandler->HandleEntry(&fEntry);
 	}
 
-	status_t _SetFileType(uint64 fileType)
+	status_t _SetFileType(AttributeHandlerContext* context, uint64 fileType)
 	{
 		switch (fileType) {
 			case B_HPKG_FILE_TYPE_FILE:
@@ -485,8 +497,8 @@ private:
 				fEntry.SetPermissions(B_HPKG_DEFAULT_SYMLINK_PERMISSIONS);
 				break;
 			default:
-				fprintf(stderr, "Error: Invalid file type for package "
-					"entry (%llu)\n", fileType);
+				context->errorOutput->PrintError("Error: Invalid file type for "
+					"package entry (%llu)\n", fileType);
 				return B_BAD_DATA;
 		}
 		return B_OK;
@@ -504,10 +516,10 @@ struct PackageReader::RootAttributeHandler : AttributeHandler {
 		AttributeHandler** _handler)
 	{
 		if (typeIndex == ATTRIBUTE_INDEX_DIRECTORY_ENTRY) {
-//printf("%*sentry \"%s\"\n", fLevel * 2, "", value.string);
+//TRACE("%*sentry \"%s\"\n", fLevel * 2, "", value.string);
 			if (_handler != NULL) {
-				return EntryAttributeHandler::Create(NULL, value.string,
-					*_handler);
+				return EntryAttributeHandler::Create(context, NULL,
+					value.string, *_handler);
 			}
 			return B_OK;
 		}
@@ -604,9 +616,11 @@ PackageReader::_PopAttributeHandler()
 }
 
 
-PackageReader::PackageReader()
+PackageReader::PackageReader(ErrorOutput* errorOutput)
 	:
+	fErrorOutput(errorOutput),
 	fFD(-1),
+	fOwnsFD(false),
 	fTOCSection(NULL),
 	fAttributeTypes(NULL),
 	fStrings(NULL),
@@ -618,7 +632,7 @@ PackageReader::PackageReader()
 
 PackageReader::~PackageReader()
 {
-	if (fFD >= 0)
+	if (fOwnsFD && fFD >= 0)
 		close(fFD);
 
 	delete[] fScratchBuffer;
@@ -632,18 +646,28 @@ status_t
 PackageReader::Init(const char* fileName)
 {
 	// open file
-	fFD = open(fileName, O_RDONLY);
-	if (fFD < 0) {
-		fprintf(stderr, "Error: Failed to open package file \"%s\": %s\n",
-			fileName, strerror(errno));
+	int fd = open(fileName, O_RDONLY);
+	if (fd < 0) {
+		fErrorOutput->PrintError("Error: Failed to open package file \"%s\": "
+			"%s\n", fileName, strerror(errno));
 		return errno;
 	}
+
+	return Init(fd, true);
+}
+
+
+status_t
+PackageReader::Init(int fd, bool keepFD)
+{
+	fFD = fd;
+	fOwnsFD = keepFD;
 
 	// stat it
 	struct stat st;
 	if (fstat(fFD, &st) < 0) {
-		fprintf(stderr, "Error: Failed to access package file \"%s\": %s\n",
-			fileName, strerror(errno));
+		fErrorOutput->PrintError("Error: Failed to access package file: %s\n",
+			strerror(errno));
 		return errno;
 	}
 
@@ -657,33 +681,32 @@ PackageReader::Init(const char* fileName)
 
 	// magic
 	if (B_BENDIAN_TO_HOST_INT32(header.magic) != B_HPKG_MAGIC) {
-		fprintf(stderr, "Error: File \"%s\" is not a valid package file: "
-			"Invalid magic\n", fileName);
+		fErrorOutput->PrintError("Error: Invalid package file: Invalid "
+			"magic\n");
 		return B_BAD_DATA;
 	}
 
 	// header size
 	fHeapOffset = B_BENDIAN_TO_HOST_INT16(header.header_size);
 	if ((size_t)fHeapOffset < sizeof(hpkg_header)) {
-		fprintf(stderr, "Error: File \"%s\" is not a valid package file: "
-			"Invalid header size (%llu)\n", fileName, fHeapOffset);
+		fErrorOutput->PrintError("Error: Invalid package file: Invalid header "
+			"size (%llu)\n", fHeapOffset);
 		return B_BAD_DATA;
 	}
 
 	// version
 	if (B_BENDIAN_TO_HOST_INT16(header.version) != B_HPKG_VERSION) {
-		fprintf(stderr, "Error: Can't read package file \"%s\": "
-			"Invalid/unsupported version (%d)\n", fileName,
-			B_BENDIAN_TO_HOST_INT16(header.version));
+		fErrorOutput->PrintError("Error: Invalid/unsupported package file "
+			"version (%d)\n", B_BENDIAN_TO_HOST_INT16(header.version));
 		return B_BAD_DATA;
 	}
 
 	// total size
 	fTotalSize = B_BENDIAN_TO_HOST_INT64(header.total_size);
 	if (fTotalSize != (uint64)st.st_size) {
-		fprintf(stderr, "Error: File \"%s\" is not a valid package file: "
-			"Total size in header (%llu) doesn't agree with total file size "
-			"(%lld)\n", fileName, fTotalSize, st.st_size);
+		fErrorOutput->PrintError("Error: Invalid package file: Total size in "
+			"header (%llu) doesn't agree with total file size (%lld)\n",
+			fTotalSize, st.st_size);
 		return B_BAD_DATA;
 	}
 
@@ -698,8 +721,8 @@ PackageReader::Init(const char* fileName)
 	if (const char* errorString = _CheckCompression(
 			fPackageAttributesCompression, fPackageAttributesCompressedLength,
 			fPackageAttributesUncompressedLength)) {
-		fprintf(stderr, "Error: File \"%s\" is not a valid package file: "
-			"package attributes section: %s\n", fileName, errorString);
+		fErrorOutput->PrintError("Error: Invalid package file: package "
+			"attributes section: %s\n", errorString);
 		return B_BAD_DATA;
 	}
 
@@ -712,8 +735,8 @@ PackageReader::Init(const char* fileName)
 
 	if (const char* errorString = _CheckCompression(fTOCCompression,
 			fTOCCompressedLength, fTOCUncompressedLength)) {
-		fprintf(stderr, "Error: File \"%s\" is not a valid package file: "
-			"TOC section: %s\n", fileName, errorString);
+		fErrorOutput->PrintError("Error: Invalid package file: TOC section: "
+			"%s\n", errorString);
 		return B_BAD_DATA;
 	}
 
@@ -729,8 +752,8 @@ PackageReader::Init(const char* fileName)
 		|| fTOCStringsLength > fTOCUncompressedLength - fTOCAttributeTypesLength
 		|| fTOCAttributeTypesCount > fTOCAttributeTypesLength
 		|| fTOCStringsCount > fTOCStringsLength) {
-		fprintf(stderr, "Error: File \"%s\" is not a valid package file: "
-			"Invalid TOC subsections description\n", fileName);
+		fErrorOutput->PrintError("Error: Invalid package file: Invalid TOC "
+			"subsections description\n");
 		return B_BAD_DATA;
 	}
 
@@ -741,9 +764,8 @@ PackageReader::Init(const char* fileName)
 		|| fHeapOffset
 			> fTotalSize - fPackageAttributesCompressedLength
 				- fTOCCompressedLength) {
-		fprintf(stderr, "Error: File \"%s\" is not a valid package file: "
-			"The sum of the sections sizes is greater than the package size\n",
-			fileName);
+		fErrorOutput->PrintError("Error: Invalid package file: The sum of the "
+			"sections sizes is greater than the package size\n");
 		return B_BAD_DATA;
 	}
 
@@ -753,8 +775,8 @@ PackageReader::Init(const char* fileName)
 
 	// TOC size sanity check
 	if (fTOCUncompressedLength > kMaxTOCSize) {
-		fprintf(stderr, "Error: Package file \"%s\" has a TOC section size of "
-			"%llu bytes. This is beyond the reader's sanity limit\n", fileName,
+		fErrorOutput->PrintError("Error: Package file TOC section size "
+			"is %llu bytes. This is beyond the reader's sanity limit\n",
 			fTOCUncompressedLength);
 		return B_UNSUPPORTED;
 	}
@@ -762,7 +784,7 @@ PackageReader::Init(const char* fileName)
 	// allocate a scratch buffer
 	fScratchBuffer = new(std::nothrow) uint8[kScratchBufferSize];
 	if (fScratchBuffer == NULL) {
-		fprintf(stderr, "Error: Out of memory!\n");
+		fErrorOutput->PrintError("Error: Out of memory!\n");
 		return B_NO_MEMORY;
 	}
 	fScratchBufferSize = kScratchBufferSize;
@@ -770,7 +792,7 @@ PackageReader::Init(const char* fileName)
 	// read in the complete TOC
 	fTOCSection = new(std::nothrow) uint8[fTOCUncompressedLength];
 	if (fTOCSection == NULL) {
-		fprintf(stderr, "Error: Out of memory!\n");
+		fErrorOutput->PrintError("Error: Out of memory!\n");
 		return B_NO_MEMORY;
 	}
 
@@ -801,7 +823,7 @@ PackageReader::Init(const char* fileName)
 status_t
 PackageReader::ParseContent(PackageContentHandler* contentHandler)
 {
-	AttributeHandlerContext context(contentHandler);
+	AttributeHandlerContext context(fErrorOutput, contentHandler);
 	RootAttributeHandler rootAttributeHandler;
 	return _ParseContent(&context, &rootAttributeHandler);
 }
@@ -810,7 +832,7 @@ PackageReader::ParseContent(PackageContentHandler* contentHandler)
 status_t
 PackageReader::ParseContent(LowLevelPackageContentHandler* contentHandler)
 {
-	AttributeHandlerContext context(contentHandler);
+	AttributeHandlerContext context(fErrorOutput, contentHandler);
 	PackageAttributeHandler rootAttributeHandler;
 	return _ParseContent(&context, &rootAttributeHandler);
 }
@@ -848,7 +870,7 @@ PackageReader::_ParseTOCAttributeTypes()
 	fAttributeTypes = new(std::nothrow) AttributeTypeReference[
 		fTOCAttributeTypesCount];
 	if (fAttributeTypes == NULL) {
-		fprintf(stderr, "Error: Out of memory!\n");
+		fErrorOutput->PrintError("Error: Out of memory!\n");
 		return B_NO_MEMORY;
 	}
 
@@ -858,7 +880,8 @@ PackageReader::_ParseTOCAttributeTypes()
 	uint32 index = 0;
 	while (true) {
 		if (position >= sectionEnd) {
-			fprintf(stderr, "Error: Malformed TOC attribute types section\n");
+			fErrorOutput->PrintError("Error: Malformed TOC attribute types "
+				"section\n");
 			return B_BAD_DATA;
 		}
 
@@ -866,15 +889,15 @@ PackageReader::_ParseTOCAttributeTypes()
 
 		if (type->type == 0) {
 			if (position + 1 != sectionEnd) {
-				fprintf(stderr, "Error: Excess bytes in TOC attribute types "
-					"section\n");
-printf("position: %p, sectionEnd: %p\n", position, sectionEnd);
+				fErrorOutput->PrintError("Error: Excess bytes in TOC attribute "
+					"types section\n");
+TRACE("position: %p, sectionEnd: %p\n", position, sectionEnd);
 				return B_BAD_DATA;
 			}
 
 			if (index != fTOCAttributeTypesCount) {
-				fprintf(stderr, "Error: Invalid TOC attribute types section: "
-					"Less types than specified in the header\n");
+				fErrorOutput->PrintError("Error: Invalid TOC attribute types "
+					"section: Less types than specified in the header\n");
 				return B_BAD_DATA;
 			}
 
@@ -882,8 +905,8 @@ printf("position: %p, sectionEnd: %p\n", position, sectionEnd);
 		}
 
 		if (index >= fTOCAttributeTypesCount) {
-			fprintf(stderr, "Error: Invalid TOC attribute types section: "
-				"More types than specified in the header\n");
+			fErrorOutput->PrintError("Error: Invalid TOC attribute types "
+				"section: More types than specified in the header\n");
 			return B_BAD_DATA;
 		}
 
@@ -893,7 +916,7 @@ printf("position: %p, sectionEnd: %p\n", position, sectionEnd);
 		fAttributeTypes[index].type = type;
 		fAttributeTypes[index].standardIndex = _GetStandardIndex(type);
 		index++;
-printf("type: %u, \"%s\"\n", type->type, type->name);
+TRACE("type: %u, \"%s\"\n", type->type, type->name);
 	}
 }
 
@@ -904,7 +927,7 @@ PackageReader::_ParseTOCStrings()
 	// allocate table
 	fStrings = new(std::nothrow) char*[fTOCStringsCount];
 	if (fStrings == NULL) {
-		fprintf(stderr, "Error: Out of memory!\n");
+		fErrorOutput->PrintError("Error: Out of memory!\n");
 		return B_NO_MEMORY;
 	}
 
@@ -914,7 +937,7 @@ PackageReader::_ParseTOCStrings()
 	uint32 index = 0;
 	while (true) {
 		if (position >= sectionEnd) {
-			fprintf(stderr, "Error: Malformed TOC strings section\n");
+			fErrorOutput->PrintError("Error: Malformed TOC strings section\n");
 			return B_BAD_DATA;
 		}
 
@@ -922,13 +945,14 @@ PackageReader::_ParseTOCStrings()
 
 		if (stringLength == 0) {
 			if (position + 1 != sectionEnd) {
-				fprintf(stderr, "Error: Excess bytes in TOC strings section\n");
-printf("position: %p, sectionEnd: %p\n", position, sectionEnd);
+				fErrorOutput->PrintError("Error: Excess bytes in TOC strings "
+					"section\n");
+TRACE("position: %p, sectionEnd: %p\n", position, sectionEnd);
 				return B_BAD_DATA;
 			}
 
 			if (index != fTOCStringsCount) {
-				fprintf(stderr, "Error: Invalid TOC strings section: "
+				fErrorOutput->PrintError("Error: Invalid TOC strings section: "
 					"Less strings than specified in the header\n");
 				return B_BAD_DATA;
 			}
@@ -937,13 +961,13 @@ printf("position: %p, sectionEnd: %p\n", position, sectionEnd);
 		}
 
 		if (index >= fTOCStringsCount) {
-			fprintf(stderr, "Error: Invalid TOC strings section: "
+			fErrorOutput->PrintError("Error: Invalid TOC strings section: "
 				"More strings than specified in the header\n");
 			return B_BAD_DATA;
 		}
 
 		fStrings[index++] = position;
-printf("string: \"%s\"\n", position);
+TRACE("string: \"%s\"\n", position);
 		position += stringLength + 1;
 	}
 }
@@ -969,8 +993,8 @@ PackageReader::_ParseContent(AttributeHandlerContext* context,
 	status_t error = _ParseAttributeTree(context);
 	if (error == B_OK) {
 		if (fCurrentTOCOffset < fTOCUncompressedLength) {
-			fprintf(stderr, "Error: %llu excess byte(s) in TOC section\n",
-				fTOCUncompressedLength - fCurrentTOCOffset);
+			fErrorOutput->PrintError("Error: %llu excess byte(s) in TOC "
+				"section\n", fTOCUncompressedLength - fCurrentTOCOffset);
 			error = B_BAD_DATA;
 		}
 	}
@@ -1015,7 +1039,7 @@ PackageReader::_ParseAttributeTree(AttributeHandlerContext* context)
 		// get the type
 		uint64 typeIndex = B_HPKG_ATTRIBUTE_TAG_INDEX(tag);
 		if (typeIndex >= fTOCAttributeTypesCount) {
-			fprintf(stderr, "Error: Invalid TOC section: "
+			fErrorOutput->PrintError("Error: Invalid TOC section: "
 				"Invalid attribute type index\n");
 			return B_BAD_DATA;
 		}
@@ -1042,7 +1066,7 @@ PackageReader::_ParseAttributeTree(AttributeHandlerContext* context)
 			if (childHandler == NULL) {
 				childHandler = new(std::nothrow) IgnoreAttributeHandler;
 				if (childHandler == NULL) {
-					fprintf(stderr, "Error: Out of memory!\n");
+					fErrorOutput->PrintError("Error: Out of memory!\n");
 					return B_NO_MEMORY;
 				}
 			}
@@ -1097,9 +1121,10 @@ PackageReader::_ReadAttributeValue(uint8 type, uint8 encoding,
 				}
 				default:
 				{
-					fprintf(stderr, "Error: Invalid TOC section: invalid "
-						"encoding %d for int value type %d\n", encoding, type);
-					throw status_t(B_BAD_VALUE);
+					fErrorOutput->PrintError("Error: Invalid TOC section: "
+						"invalid encoding %d for int value type %d\n", encoding,
+						type);
+					return B_BAD_VALUE;
 				}
 			}
 
@@ -1123,8 +1148,8 @@ PackageReader::_ReadAttributeValue(uint8 type, uint8 encoding,
 					return error;
 
 				if (index > fTOCStringsCount) {
-					fprintf(stderr, "Error: Invalid TOC section: string "
-						"reference out of bounds\n");
+					fErrorOutput->PrintError("Error: Invalid TOC section: "
+						"string reference out of bounds\n");
 					return B_BAD_DATA;
 				}
 
@@ -1137,8 +1162,8 @@ PackageReader::_ReadAttributeValue(uint8 type, uint8 encoding,
 
 				_value.SetTo(string);
 			} else {
-				fprintf(stderr, "Error: Invalid TOC section: invalid string "
-					"encoding (%u)\n", encoding);
+				fErrorOutput->PrintError("Error: Invalid TOC section: invalid "
+					"string encoding (%u)\n", encoding);
 				return B_BAD_DATA;
 			}
 
@@ -1159,16 +1184,16 @@ PackageReader::_ReadAttributeValue(uint8 type, uint8 encoding,
 					return error;
 
 				if (offset > fHeapSize || size > fHeapSize - offset) {
-					fprintf(stderr, "Error: Invalid TOC section: invalid data "
-						"reference\n");
+					fErrorOutput->PrintError("Error: Invalid TOC section: "
+						"invalid data reference\n");
 					return B_BAD_DATA;
 				}
 
 				_value.SetToData(size, fHeapOffset + offset);
 			} else if (encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE) {
 				if (size > B_HPKG_MAX_INLINE_DATA_SIZE) {
-					fprintf(stderr, "Error: Invalid TOC section: inline data "
-						"too long\n");
+					fErrorOutput->PrintError("Error: Invalid TOC section: "
+						"inline data too long\n");
 					return B_BAD_DATA;
 				}
 
@@ -1178,8 +1203,8 @@ PackageReader::_ReadAttributeValue(uint8 type, uint8 encoding,
 					return error;
 				_value.SetToData(size, buffer);
 			} else {
-				fprintf(stderr, "Error: Invalid TOC section: invalid raw "
-					"encoding (%u)\n", encoding);
+				fErrorOutput->PrintError("Error: Invalid TOC section: invalid "
+					"raw encoding (%u)\n", encoding);
 				return B_BAD_DATA;
 			}
 
@@ -1187,8 +1212,8 @@ PackageReader::_ReadAttributeValue(uint8 type, uint8 encoding,
 		}
 
 		default:
-			fprintf(stderr, "Error: Invalid TOC section: invalid value type: "
-				"%d\n", type);
+			fErrorOutput->PrintError("Error: Invalid TOC section: invalid "
+				"value type: %d\n", type);
 			return B_BAD_DATA;
 	}
 }
@@ -1224,7 +1249,8 @@ PackageReader::_ReadString(const char*& _string, size_t* _stringLength)
 		fTOCUncompressedLength - fCurrentTOCOffset);
 
 	if (stringLength == fTOCUncompressedLength - fCurrentTOCOffset) {
-		fprintf(stderr, "_ReadString(): string extends beyond TOC end\n");
+		fErrorOutput->PrintError("_ReadString(): string extends beyond TOC "
+			"end\n");
 		return B_BAD_DATA;
 	}
 
@@ -1241,7 +1267,8 @@ status_t
 PackageReader::_GetTOCBuffer(size_t size, const void*& _buffer)
 {
 	if (size > fTOCUncompressedLength - fCurrentTOCOffset) {
-		fprintf(stderr, "_GetTOCBuffer(%lu): read beyond TOC end\n", size);
+		fErrorOutput->PrintError("_GetTOCBuffer(%lu): read beyond TOC end\n",
+			size);
 		return B_BAD_DATA;
 	}
 
@@ -1255,7 +1282,8 @@ status_t
 PackageReader::_ReadTOCBuffer(void* buffer, size_t size)
 {
 	if (size > fTOCUncompressedLength - fCurrentTOCOffset) {
-		fprintf(stderr, "_ReadTOCBuffer(%lu): read beyond TOC end\n", size);
+		fErrorOutput->PrintError("_ReadTOCBuffer(%lu): read beyond TOC end\n",
+			size);
 		return B_BAD_DATA;
 	}
 
@@ -1270,13 +1298,13 @@ PackageReader::_ReadBuffer(off_t offset, void* buffer, size_t size)
 {
 	ssize_t bytesRead = pread(fFD, buffer, size, offset);
 	if (bytesRead < 0) {
-		fprintf(stderr, "_ReadBuffer(%p, %lu) failed to read data: %s\n",
-			buffer, size, strerror(errno));
+		fErrorOutput->PrintError("_ReadBuffer(%p, %lu) failed to read data: "
+			"%s\n", buffer, size, strerror(errno));
 		return errno;
 	}
 	if ((size_t)bytesRead != size) {
-		fprintf(stderr, "_ReadBuffer(%p, %lu) failed to read all data\n",
-			buffer, size);
+		fErrorOutput->PrintError("_ReadBuffer(%p, %lu) failed to read all "
+			"data\n", buffer, size);
 		return B_ERROR;
 	}
 
@@ -1323,7 +1351,7 @@ PackageReader::_ReadCompressedBuffer(off_t offset, void* buffer,
 
 			// verify that all data have been read
 			if (bufferOutput.BytesWritten() != uncompressedSize) {
-				fprintf(stderr, "Error: Missing bytes in uncompressed "
+				fErrorOutput->PrintError("Error: Missing bytes in uncompressed "
 					"buffer!\n");
 				return B_BAD_DATA;
 			}

@@ -13,6 +13,7 @@
 #include "PackageAttributeValue.h"
 
 
+class ErrorOutput;
 class PackageEntry;
 class PackageEntryAttribute;
 
@@ -47,10 +48,11 @@ public:
 
 class PackageReader {
 public:
-								PackageReader();
+								PackageReader(ErrorOutput* errorOutput);
 								~PackageReader();
 
 			status_t			Init(const char* fileName);
+			status_t			Init(int fd, bool keepFD);
 			status_t			ParseContent(
 									PackageContentHandler* contentHandler);
 			status_t			ParseContent(
@@ -119,7 +121,9 @@ private:
 	inline	AttributeHandler*	_PopAttributeHandler();
 
 private:
+			ErrorOutput*		fErrorOutput;
 			int					fFD;
+			bool				fOwnsFD;
 
 			uint64				fTotalSize;
 			uint64				fHeapOffset;
