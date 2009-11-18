@@ -17,7 +17,7 @@ PackageDirectory::PackageDirectory(Package* package, mode_t mode)
 PackageDirectory::~PackageDirectory()
 {
 	while (PackageNode* child = fChildren.RemoveHead())
-		delete child;
+		child->ReleaseReference();
 }
 
 
@@ -25,6 +25,7 @@ void
 PackageDirectory::AddChild(PackageNode* node)
 {
 	fChildren.Add(node);
+	node->AcquireReference();
 }
 
 
@@ -32,4 +33,5 @@ void
 PackageDirectory::RemoveChild(PackageNode* node)
 {
 	fChildren.Remove(node);
+	node->ReleaseReference();
 }

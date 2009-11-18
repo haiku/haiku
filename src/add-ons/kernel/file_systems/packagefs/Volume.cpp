@@ -21,6 +21,7 @@
 #include "ErrorOutput.h"
 #include "FDCloser.h"
 #include "PackageEntry.h"
+#include "PackageEntryAttribute.h"
 #include "PackageReader.h"
 
 #include "DebugSupport.h"
@@ -164,7 +165,7 @@ struct Volume::PackageLoaderContentHandler : PackageContentHandler {
 
 		if (node == NULL)
 			RETURN_ERROR(B_NO_MEMORY);
-		ObjectDeleter<PackageNode> nodeDeleter(node);
+		BReference<PackageNode> nodeReference(node, true);
 
 		error = node->Init(parentDir, entry->Name());
 		if (error != B_OK)
@@ -178,7 +179,6 @@ struct Volume::PackageLoaderContentHandler : PackageContentHandler {
 		else
 			fPackage->AddNode(node);
 
-		nodeDeleter.Detach();
 		entry->SetUserToken(node);
 
 		return B_OK;
@@ -187,7 +187,24 @@ struct Volume::PackageLoaderContentHandler : PackageContentHandler {
 	virtual status_t HandleEntryAttribute(PackageEntry* entry,
 		PackageEntryAttribute* attribute)
 	{
-		// TODO:...
+		if (fErrorOccurred)
+			return B_OK;
+
+		PackageNode* node = (PackageNode*)entry->UserToken();
+
+		PackageNodeAttribute* nodeAttribute = new(std::nothrow)
+			PackageNodeAttribute(node, attribute->Type(), attribute->Data());
+		if (nodeAttribute == NULL)
+			RETURN_ERROR(B_NO_MEMORY)
+
+		status_t error = nodeAttribute->Init(attribute->Name());
+		if (error != B_OK) {
+			delete nodeAttribute;
+			RETURN_ERROR(error);
+		}
+
+		node->AddAttribute(nodeAttribute);
+
 		return B_OK;
 	}
 
@@ -230,6 +247,14 @@ Volume::~Volume()
 
 	while (PackageDomain* packageDomain = fPackageDomains.RemoveHead())
 		delete packageDomain;
+
+	// remove all nodes from the ID hash table
+	Node* node = fNodes.Clear(true);
+	while (node != NULL) {
+		Node* next = node->IDHashTableNext();
+		node->ReleaseReference();
+		node = next;
+	}
 
 	if (fRootDirectory != NULL)
 		fRootDirectory->ReleaseReference();
@@ -444,7 +469,7 @@ Volume::_AddPackageDomain(PackageDomain* domain)
 			st.st_ino);
 		if (package == NULL)
 			RETURN_ERROR(B_NO_MEMORY);
-		ObjectDeleter<Package> packageDeleter(package);
+		BReference<Package> packageReference(package, true);
 
 		status_t error = package->Init(entry->d_name);
 		if (error != B_OK)
@@ -454,7 +479,7 @@ Volume::_AddPackageDomain(PackageDomain* domain)
 		if (error != B_OK)
 			continue;
 
-		domain->AddPackage(packageDeleter.Detach());
+		domain->AddPackage(package);
 	}
 
 	// add the packages to the node tree
@@ -602,7 +627,7 @@ Volume::_CreateNode(mode_t mode, Directory* parent, const char* name,
 
 	if (node == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
-	ObjectDeleter<Node> nodeDeleter(node);
+	BReference<Node> nodeReference(node, true);
 
 	status_t error = node->Init(parent, name);
 	if (error != B_OK)
@@ -611,8 +636,9 @@ Volume::_CreateNode(mode_t mode, Directory* parent, const char* name,
 	parent->AddChild(node);
 
 	fNodes.Insert(node);
+	nodeReference.Detach();
 		// we keep the initial node reference for this table
 
-	_node = nodeDeleter.Detach();
+	_node = node;
 	return B_OK;
 }

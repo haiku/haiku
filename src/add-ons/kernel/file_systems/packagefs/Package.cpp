@@ -34,7 +34,7 @@ Package::Package(PackageDomain* domain, dev_t deviceID, ino_t nodeID)
 Package::~Package()
 {
 	while (PackageNode* node = fNodes.RemoveHead())
-		delete node;
+		node->ReleaseReference();
 
 	free(fName);
 
@@ -57,6 +57,7 @@ void
 Package::AddNode(PackageNode* node)
 {
 	fNodes.Add(node);
+	node->AcquireReference();
 }
 
 

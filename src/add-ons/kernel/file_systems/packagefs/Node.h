@@ -53,6 +53,8 @@ public:
 
 	virtual	status_t			AddPackageNode(PackageNode* packageNode) = 0;
 
+	virtual	PackageNode*		GetPackageNode() = 0;
+
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize) = 0;
 

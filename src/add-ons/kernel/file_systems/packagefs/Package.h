@@ -6,6 +6,8 @@
 #define PACKAGE_H
 
 
+#include <Referenceable.h>
+
 #include <util/khash.h>
 #include <util/OpenHashTable.h>
 
@@ -17,7 +19,7 @@
 class PackageDomain;
 
 
-class Package {
+class Package : public BReferenceable {
 public:
 								Package(PackageDomain* domain, dev_t deviceID,
 									ino_t nodeID);

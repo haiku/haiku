@@ -523,6 +523,10 @@ packagefs_open_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 
 	Directory* dir = dynamic_cast<Directory*>(node);
 
+	status_t error = check_access(dir, R_OK);
+	if (error != B_OK)
+		return error;
+
 	// create a cookie
 	NodeWriteLocker dirLocker(dir);
 	DirectoryCookie* cookie = new(std::nothrow) DirectoryCookie(dir);
@@ -644,6 +648,361 @@ packagefs_rewind_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 }
 
 
+// #pragma mark - Attribute Directories
+
+
+struct AttributeDirectoryCookie {
+	Node*					node;
+	PackageNode*			packageNode;
+	PackageNodeAttribute*	attribute;
+
+	AttributeDirectoryCookie(Node* node)
+		:
+		node(node),
+		packageNode(node->GetPackageNode()),
+		attribute(NULL)
+	{
+		if (packageNode != NULL) {
+			packageNode->AcquireReference();
+			attribute = packageNode->Attributes().Head();
+		}
+	}
+
+	~AttributeDirectoryCookie()
+	{
+		if (packageNode != NULL)
+			packageNode->ReleaseReference();
+	}
+
+	PackageNodeAttribute* Current() const
+	{
+		return attribute;
+	}
+
+	void Next()
+	{
+		if (attribute == NULL)
+			return;
+
+		attribute = packageNode->Attributes().GetNext(attribute);
+	}
+
+	void Rewind()
+	{
+		if (packageNode != NULL)
+			attribute = packageNode->Attributes().Head();
+	}
+};
+
+
+status_t
+packagefs_open_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+
+	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+
+	status_t error = check_access(node, R_OK);
+	if (error != B_OK)
+		return error;
+
+	// create a cookie
+	NodeReadLocker nodeLocker(node);
+	AttributeDirectoryCookie* cookie
+		= new(std::nothrow) AttributeDirectoryCookie(node);
+	if (cookie == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	*_cookie = cookie;
+	return B_OK;
+}
+
+
+status_t
+packagefs_close_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
+{
+	return B_OK;
+}
+
+
+status_t
+packagefs_free_attr_dir_cookie(fs_volume* fsVolume, fs_vnode* fsNode,
+	void* _cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+	AttributeDirectoryCookie* cookie = (AttributeDirectoryCookie*)_cookie;
+
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+		node->ID(), cookie);
+	TOUCH(volume);
+	TOUCH(node);
+
+	delete cookie;
+
+	return B_OK;
+}
+
+
+status_t
+packagefs_read_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
+	struct dirent* buffer, size_t bufferSize, uint32* _count)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+	AttributeDirectoryCookie* cookie = (AttributeDirectoryCookie*)_cookie;
+
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+		node->ID(), cookie);
+	TOUCH(volume);
+	TOUCH(node);
+
+	uint32 maxCount = *_count;
+	uint32 count = 0;
+
+	dirent* previousEntry = NULL;
+
+	while (PackageNodeAttribute* attribute = cookie->Current()) {
+		// don't read more entries than requested
+		if (count >= maxCount)
+			break;
+
+		// align the buffer for subsequent entries
+		if (count > 0) {
+			addr_t offset = (addr_t)buffer % 8;
+			if (offset > 0) {
+				offset = 8 - offset;
+				if (bufferSize <= offset)
+					break;
+
+				previousEntry->d_reclen += offset;
+				buffer = (dirent*)((addr_t)buffer + offset);
+				bufferSize -= offset;
+			}
+		}
+
+		// fill in the entry name -- checks whether the entry fits into the
+		// buffer
+		const char* name = attribute->Name();
+		if (!set_dirent_name(buffer, bufferSize, name, strlen(name))) {
+			if (count == 0)
+				RETURN_ERROR(B_BUFFER_OVERFLOW);
+			break;
+		}
+
+		// fill in the other data
+		buffer->d_dev = volume->ID();
+		buffer->d_ino = node->ID();
+
+		count++;
+		previousEntry = buffer;
+		bufferSize -= buffer->d_reclen;
+		buffer = (dirent*)((addr_t)buffer + buffer->d_reclen);
+
+		cookie->Next();
+	}
+
+	*_count = count;
+	return B_OK;
+}
+
+
+status_t
+packagefs_rewind_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+	AttributeDirectoryCookie* cookie = (AttributeDirectoryCookie*)_cookie;
+
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+		node->ID(), cookie);
+	TOUCH(volume);
+	TOUCH(node);
+
+	cookie->Rewind();
+
+	return B_OK;
+}
+
+
+// #pragma mark - Attribute Operations
+
+
+struct AttributeCookie {
+	PackageNode*			packageNode;
+	Package*				package;
+	PackageNodeAttribute*	attribute;
+	int						openMode;
+
+	AttributeCookie(PackageNode* packageNode, PackageNodeAttribute* attribute,
+		int openMode)
+		:
+		packageNode(packageNode),
+		package(packageNode->GetPackage()),
+		attribute(attribute),
+		openMode(openMode)
+	{
+		packageNode->AcquireReference();
+		package->AcquireReference();
+	}
+
+	~AttributeCookie()
+	{
+		packageNode->ReleaseReference();
+		package->ReleaseReference();
+	}
+};
+
+
+status_t
+packagefs_open_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
+	int openMode, void** _cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+
+	FUNCTION("volume: %p, node: %p (%lld), name: \"%s\", openMode %#x\n",
+		volume, node, node->ID(), name, openMode);
+	TOUCH(volume);
+
+	NodeReadLocker nodeLocker(node);
+
+	// check the open mode and permissions
+	if ((openMode & O_RWMASK) != O_RDONLY)
+		return B_NOT_ALLOWED;
+
+	status_t error = check_access(node, R_OK);
+	if (error != B_OK)
+		return error;
+
+	// get the package node and the respectively named attribute
+	PackageNode* packageNode = node->GetPackageNode();
+	PackageNodeAttribute* attribute = packageNode != NULL
+		? packageNode->FindAttribute(name) : NULL;
+	if (attribute == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// allocate the cookie
+	AttributeCookie* cookie = new(std::nothrow) AttributeCookie(packageNode,
+		attribute, openMode);
+	if (cookie == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	*_cookie = cookie;
+
+	return B_OK;
+}
+
+
+status_t
+packagefs_close_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
+{
+	return B_OK;
+}
+
+
+status_t
+packagefs_free_attr_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+	AttributeCookie* cookie = (AttributeCookie*)_cookie;
+
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+		node->ID(), cookie);
+	TOUCH(volume);
+	TOUCH(node);
+
+	delete cookie;
+
+	return B_OK;
+}
+
+
+static status_t
+read_package_data(const PackageData& data, DataReader* dataReader, off_t offset,
+	void* buffer, size_t* bufferSize)
+{
+	// create a PackageDataReader
+	PackageDataReader* reader;
+	status_t error = GlobalFactory::Default()->CreatePackageDataReader(
+		dataReader, data, reader);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+	ObjectDeleter<PackageDataReader> readerDeleter(reader);
+
+	// check the offset
+	if (offset < 0 || (uint64)offset > data.UncompressedSize())
+		return B_BAD_VALUE;
+
+	// clamp the size
+	size_t toRead = std::min((uint64)*bufferSize,
+		data.UncompressedSize() - offset);
+
+	// read
+	if (toRead > 0) {
+		status_t error = reader->ReadData(offset, buffer, toRead);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+	}
+
+	*bufferSize = toRead;
+	return B_OK;
+}
+
+
+status_t
+packagefs_read_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
+	off_t offset, void* buffer, size_t* bufferSize)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+	AttributeCookie* cookie = (AttributeCookie*)_cookie;
+
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+		node->ID(), cookie);
+	TOUCH(volume);
+	TOUCH(node);
+
+	const PackageData& data = cookie->attribute->Data();
+	if (data.IsEncodedInline()) {
+		// inline data
+		BufferDataReader dataReader(data.InlineData(), data.CompressedSize());
+		return read_package_data(data, &dataReader, offset, buffer, bufferSize);
+	}
+
+	// data not inline -- open the package
+	int fd = cookie->package->Open();
+	if (fd < 0)
+		RETURN_ERROR(fd);
+	PackageCloser packageCloser(cookie->package);
+
+	FDDataReader dataReader(fd);
+	return read_package_data(data, &dataReader, offset, buffer, bufferSize);
+}
+
+
+status_t
+packagefs_read_attr_stat(fs_volume* fsVolume, fs_vnode* fsNode,
+	void* _cookie, struct stat* st)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+	AttributeCookie* cookie = (AttributeCookie*)_cookie;
+
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+		node->ID(), cookie);
+	TOUCH(volume);
+	TOUCH(node);
+
+	st->st_size = cookie->attribute->Data().UncompressedSize();
+	st->st_type = cookie->attribute->Type();
+
+	return B_OK;
+}
+
+
 // #pragma mark - Module Interface
 
 
@@ -717,13 +1076,13 @@ fs_volume_ops gPackageFSVolumeOps = {
 
 
 fs_vnode_ops gPackageFSVnodeOps = {
-	/* vnode operations */
+	// vnode operations
 	&packagefs_lookup,
 	NULL,	// get_vnode_name,
 	&packagefs_put_vnode,
 	&packagefs_put_vnode,	// remove_vnode -- same as put_vnode
 
-	/* VM file access */
+	// VM file access
 	NULL,	// can_page,
 	NULL,	// read_pages,
 	NULL,	// write_pages,
@@ -750,7 +1109,7 @@ fs_vnode_ops gPackageFSVnodeOps = {
 	&packagefs_read_stat,
 	NULL,	// write_stat,
 
-	/* file operations */
+	// file operations
 	NULL,	// create,
 	&packagefs_open,
 	&packagefs_close,
@@ -758,17 +1117,35 @@ fs_vnode_ops gPackageFSVnodeOps = {
 	&packagefs_read,
 	NULL,	// write,
 
-	/* directory operations */
+	// directory operations
 	NULL,	// create_dir,
 	NULL,	// remove_dir,
 	&packagefs_open_dir,
 	&packagefs_close_dir,
 	&packagefs_free_dir_cookie,
 	&packagefs_read_dir,
-	&packagefs_rewind_dir
+	&packagefs_rewind_dir,
 
-	// TODO: attribute directory operations
-	// TODO: attribute operations
+	// attribute directory operations
+	&packagefs_open_attr_dir,
+	&packagefs_close_attr_dir,
+	&packagefs_free_attr_dir_cookie,
+	&packagefs_read_attr_dir,
+	&packagefs_rewind_attr_dir,
+
+	// attribute operations
+	NULL,	// create_attr,
+	&packagefs_open_attr,
+	&packagefs_close_attr,
+	&packagefs_free_attr_cookie,
+	&packagefs_read_attr,
+	NULL,	// write_attr,
+
+	&packagefs_read_attr_stat,
+	NULL,	// write_attr_stat,
+	NULL,	// rename_attr,
+	NULL	// remove_attr,
+
 	// TODO: FS layer operations
 };
 

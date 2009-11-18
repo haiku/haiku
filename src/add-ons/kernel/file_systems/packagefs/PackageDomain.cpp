@@ -27,7 +27,7 @@ PackageDomain::~PackageDomain()
 	Package* package = fPackages.Clear(true);
 	while (package != NULL) {
 		Package* next = package->HashTableNext();
-		delete package;
+		package->ReleaseReference();
 		package = next;
 	}
 
@@ -70,6 +70,7 @@ void
 PackageDomain::AddPackage(Package* package)
 {
 	fPackages.Insert(package);
+	package->AcquireReference();
 }
 
 
@@ -77,4 +78,5 @@ void
 PackageDomain::RemovePackage(Package* package)
 {
 	fPackages.Remove(package);
+	package->ReleaseReference();
 }

@@ -111,6 +111,13 @@ Directory::AddPackageNode(PackageNode* packageNode)
 }
 
 
+PackageNode*
+Directory::GetPackageNode()
+{
+	return fPackageDirectories.Head();
+}
+
+
 status_t
 Directory::Read(off_t offset, void* buffer, size_t* bufferSize)
 {
@@ -123,6 +130,7 @@ Directory::AddChild(Node* node)
 {
 	fChildTable.Insert(node);
 	fChildList.Add(node);
+	node->AcquireReference();
 }
 
 
@@ -133,6 +141,7 @@ Directory::RemoveChild(Node* node)
 
 	fChildTable.Remove(node);
 	fChildList.Remove(node);
+	node->ReleaseReference();
 
 	// adjust directory iterators pointing to the removed child
 	for (DirectoryIteratorList::Iterator it = fIterators.GetIterator();

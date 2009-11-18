@@ -102,6 +102,13 @@ LeafNode::AddPackageNode(PackageNode* packageNode)
 }
 
 
+PackageNode*
+LeafNode::GetPackageNode()
+{
+	return fPackageNodes.Head();
+}
+
+
 status_t
 LeafNode::Read(off_t offset, void* buffer, size_t* bufferSize)
 {

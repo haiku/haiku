@@ -26,6 +26,9 @@ PackageNode::PackageNode(Package* package, mode_t mode)
 
 PackageNode::~PackageNode()
 {
+	while (PackageNodeAttribute* attribute = fAttributes.RemoveHead())
+		delete attribute;
+
 	free(fName);
 }
 
@@ -59,4 +62,31 @@ off_t
 PackageNode::FileSize() const
 {
 	return 0;
+}
+
+
+void
+PackageNode::AddAttribute(PackageNodeAttribute* attribute)
+{
+	fAttributes.Add(attribute);
+}
+
+
+void
+PackageNode::RemoveAttribute(PackageNodeAttribute* attribute)
+{
+	fAttributes.Remove(attribute);
+}
+
+
+PackageNodeAttribute*
+PackageNode::FindAttribute(const char* name) const
+{
+	for (PackageNodeAttributeList::ConstIterator it = fAttributes.GetIterator();
+			PackageNodeAttribute* attribute = it.Next();) {
+		if (strcmp(attribute->Name(), name) == 0)
+			return attribute;
+	}
+
+	return NULL;
 }

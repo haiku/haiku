@@ -23,6 +23,7 @@ HAIKU_PACKAGE_FS_SOURCES =
 	PackageFile.cpp
 	PackageLeafNode.cpp
 	PackageNode.cpp
+	PackageNodeAttribute.cpp
 	PackageSymlink.cpp
 	Volume.cpp
 ;

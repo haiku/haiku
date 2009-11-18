@@ -8,22 +8,26 @@
 
 #include <sys/stat.h>
 
-#include <SupportDefs.h>
+#include <Referenceable.h>
 
 #include <util/SinglyLinkedList.h>
+
+#include "PackageNodeAttribute.h"
 
 
 class Package;
 class PackageDirectory;
 
 
-class PackageNode : public SinglyLinkedListLinkImpl<PackageNode> {
+class PackageNode : public BReferenceable,
+	public SinglyLinkedListLinkImpl<PackageNode> {
 public:
 								PackageNode(Package* package, mode_t mode);
 	virtual						~PackageNode();
 
-			PackageDirectory*	Parent() const	{ return fParent; }
-			const char*			Name() const	{ return fName; }
+			Package*			GetPackage() const	{ return fPackage; }
+			PackageDirectory*	Parent() const		{ return fParent; }
+			const char*			Name() const		{ return fName; }
 
 	virtual	status_t			Init(PackageDirectory* parent,
 									const char* name);
@@ -46,6 +50,15 @@ public:
 
 	virtual	off_t				FileSize() const;
 
+			void				AddAttribute(PackageNodeAttribute* attribute);
+			void				RemoveAttribute(
+									PackageNodeAttribute* attribute);
+
+			const PackageNodeAttributeList& Attributes() const
+									{ return fAttributes; }
+
+			PackageNodeAttribute* FindAttribute(const char* name) const;
+
 protected:
 			Package*			fPackage;
 			PackageDirectory*	fParent;
@@ -54,6 +67,7 @@ protected:
 			uid_t				fUserID;
 			gid_t				fGroupID;
 			timespec			fModifiedTime;
+			PackageNodeAttributeList fAttributes;
 };
 
 
