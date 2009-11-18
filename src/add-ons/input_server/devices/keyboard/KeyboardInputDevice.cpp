@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2006, Jérôme Duval. All rights reserved.
- * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2008-2009, Stephan Aßmus, superstippi@gmx.de.
  *
  * Distributed under the terms of the MIT License.
@@ -27,50 +27,52 @@
 
 
 #undef TRACE
+
 //#define TRACE_KEYBOARD_DEVICE
 #ifdef TRACE_KEYBOARD_DEVICE
 
-	class FunctionTracer {
-	public:
-		FunctionTracer(const void* pointer, const char* className,
-				const char* functionName,
-				int32& depth)
-			: fFunctionName(),
-			  fPrepend(),
-			  fFunctionDepth(depth),
-			  fPointer(pointer)
-		{
-			fFunctionDepth++;
-			fPrepend.Append(' ', fFunctionDepth * 2);
-			fFunctionName << className << "::" << functionName << "()";
+class FunctionTracer {
+public:
+	FunctionTracer(const void* pointer, const char* className,
+			const char* functionName)
+		:
+		fFunctionName(),
+		fPrepend(),
+		fPointer(pointer)
+	{
+		sFunctionDepth++;
+		fPrepend.Append(' ', sFunctionDepth * 2);
+		fFunctionName << className << "::" << functionName << "()";
 
-			debug_printf("%p -> %s%s {\n", fPointer, fPrepend.String(),
-				fFunctionName.String());
-		}
+		debug_printf("%p -> %s%s {\n", fPointer, fPrepend.String(),
+			fFunctionName.String());
+	}
 
-		 ~FunctionTracer()
-		{
-			debug_printf("%p -> %s}\n", fPointer, fPrepend.String());
-			fFunctionDepth--;
-		}
+	 ~FunctionTracer()
+	{
+		debug_printf("%p -> %s}\n", fPointer, fPrepend.String());
+		sFunctionDepth--;
+	}
 
-	private:
-		BString	fFunctionName;
-		BString	fPrepend;
-		int32&	fFunctionDepth;
-		const void* fPointer;
-	};
+	static int32 Depth() const { return sFunctionDepth; }
 
+private:
+			BString		fFunctionName;
+			BString		fPrepend;
+			const void* fPointer;
 
-	static int32 sFunctionDepth = -1;
-#	define KD_CALLED(x...)	FunctionTracer _ft(this, "KeyboardDevice", \
-								__FUNCTION__, sFunctionDepth)
-#	define KID_CALLED(x...)	FunctionTracer _ft(this, "KeyboardInputDevice", \
-								__FUNCTION__, sFunctionDepth)
-#	define TRACE(x...)	do { BString _to; \
-							_to.Append(' ', (sFunctionDepth + 1) * 2); \
-							debug_printf("%p -> %s", this, _to.String()); \
-							debug_printf(x); } while (0)
+	static	int32		sFunctionDepth = -1;
+};
+
+#	define KD_CALLED(x...) \
+		FunctionTracer _ft(this, "KeyboardDevice", __FUNCTION__)
+#	define KID_CALLED(x...)	\
+		FunctionTracer _ft(this, "KeyboardInputDevice", __FUNCTION__)
+#	define TRACE(x...) \
+		do { BString _to; \
+			_to.Append(' ', (FunctionTracer::Depth() + 1) * 2); \
+			debug_printf("%p -> %s", this, _to.String()); \
+			debug_printf(x); } while (0)
 #	define LOG_EVENT(text...) do {} while (0)
 #	define LOG_ERR(text...) TRACE(text)
 #else
@@ -713,7 +715,8 @@ KeyboardDevice::_ControlThread()
 			char* string = NULL;
 			char* rawString = NULL;
 			int32 numBytes = 0, rawNumBytes = 0;
-			fKeymap.GetChars(keycode, fModifiers, activeDeadKey, &string, &numBytes);
+			fKeymap.GetChars(keycode, fModifiers, activeDeadKey, &string,
+				&numBytes);
 			fKeymap.GetChars(keycode, 0, 0, &rawString, &rawNumBytes);
 
 			BMessage* msg = new BMessage;
@@ -1085,12 +1088,3 @@ KeyboardInputDevice::_RecursiveScan(const char* directory)
 			_AddDevice(path.Path());
 	}
 }
-
-
-
-
-
-
-
-
-
