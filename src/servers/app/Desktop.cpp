@@ -3236,11 +3236,10 @@ Desktop::_SetWorkspace(int32 index)
 		delete region;
 	}
 
-	// Set new focus to the front window, but keep focus to a floating
-	// window if still visible
+	// Set new focus, but keep focus to a floating window if still visible
 	if (!_Windows(index).HasWindow(FocusWindow())
 		|| !FocusWindow()->IsFloating())
-		SetFocusWindow(FrontWindow());
+		SetFocusWindow();
 
 	_WindowChanged(NULL);
 	MarkDirty(dirty);
