@@ -711,55 +711,57 @@ KeyboardDevice::_ControlThread()
 		if (activeDeadKey == 0 || !isKeyDown)
 			newDeadKey = fKeymap.IsDeadKey(keycode, fModifiers);
 
+		char* string = NULL;
+		char* rawString = NULL;
+		int32 numBytes = 0, rawNumBytes = 0;
 		if (newDeadKey == 0) {
-			char* string = NULL;
-			char* rawString = NULL;
-			int32 numBytes = 0, rawNumBytes = 0;
 			fKeymap.GetChars(keycode, fModifiers, activeDeadKey, &string,
 				&numBytes);
-			fKeymap.GetChars(keycode, 0, 0, &rawString, &rawNumBytes);
+		}
+		fKeymap.GetChars(keycode, 0, 0, &rawString, &rawNumBytes);
 
-			BMessage* msg = new BMessage;
-			if (msg == NULL) {
-				delete[] string;
+		BMessage* msg = new BMessage;
+		if (msg == NULL) {
+			delete[] string;
+			delete[] rawString;
+			continue;
+		}
+
+		if (numBytes > 0)
+			msg->what = isKeyDown ? B_KEY_DOWN : B_KEY_UP;
+		else
+			msg->what = isKeyDown ? B_UNMAPPED_KEY_DOWN : B_UNMAPPED_KEY_UP;
+
+		msg->AddInt64("when", timestamp);
+		msg->AddInt32("key", keycode);
+		msg->AddInt32("modifiers", fModifiers);
+		msg->AddData("states", B_UINT8_TYPE, states, 16);
+		if (numBytes > 0) {
+			for (int i = 0; i < numBytes; i++)
+				msg->AddInt8("byte", (int8)string[i]);
+			msg->AddData("bytes", B_STRING_TYPE, string, numBytes + 1);
+
+			if (rawNumBytes <= 0) {
+				rawNumBytes = 1;
 				delete[] rawString;
-				continue;
-			}
-
-			if (numBytes > 0)
-				msg->what = isKeyDown ? B_KEY_DOWN : B_KEY_UP;
-			else
-				msg->what = isKeyDown ? B_UNMAPPED_KEY_DOWN : B_UNMAPPED_KEY_UP;
-
-			msg->AddInt64("when", timestamp);
-			msg->AddInt32("key", keycode);
-			msg->AddInt32("modifiers", fModifiers);
-			msg->AddData("states", B_UINT8_TYPE, states, 16);
-			if (numBytes > 0) {
-				for (int i = 0; i < numBytes; i++)
-					msg->AddInt8("byte", (int8)string[i]);
-				msg->AddData("bytes", B_STRING_TYPE, string, numBytes + 1);
-
-				if (rawNumBytes <= 0) {
-					rawNumBytes = 1;
-					delete[] rawString;
-					rawString = string;
-				} else
-					delete[] string;
-
-				if (isKeyDown && lastKeyCode == keycode) {
-					repeatCount++;
-					msg->AddInt32("be:key_repeat", repeatCount);
-				} else
-					repeatCount = 1;
+				rawString = string;
 			} else
 				delete[] string;
 
-			if (rawNumBytes > 0)
-				msg->AddInt32("raw_char", (uint32)((uint8)rawString[0] & 0x7f));
+			if (isKeyDown && lastKeyCode == keycode) {
+				repeatCount++;
+				msg->AddInt32("be:key_repeat", repeatCount);
+			} else
+				repeatCount = 1;
+		} else
+			delete[] string;
 
-			delete[] rawString;
+		if (rawNumBytes > 0)
+			msg->AddInt32("raw_char", (uint32)((uint8)rawString[0] & 0x7f));
 
+		delete[] rawString;
+
+		if (newDeadKey == 0) {
 			if (isKeyDown && !modifiers && activeDeadKey != 0) {
 				// a dead key was completed
 				activeDeadKey = 0;
@@ -768,22 +770,25 @@ KeyboardDevice::_ControlThread()
 						string, true, msg);
 					_EnqueueInlineInputMethod(B_INPUT_METHOD_STOPPED);
 					fInputMethodStarted = false;
-				} else if (fOwner->EnqueueMessage(msg) != B_OK)
-					delete msg;
-			} else if (fOwner->EnqueueMessage(msg) != B_OK)
-				delete msg;
-		} else if (isKeyDown) {
-			// start of a dead key
-			if (_EnqueueInlineInputMethod(B_INPUT_METHOD_STARTED) == B_OK) {
-				char* string = NULL;
-				int32 numBytes = 0;
-				fKeymap.GetChars(keycode, fModifiers, 0, &string, &numBytes);
-
-				if (_EnqueueInlineInputMethod(B_INPUT_METHOD_CHANGED, string) == B_OK)
-					fInputMethodStarted = true;
-				activeDeadKey = newDeadKey;
+					msg = NULL;
+				}
 			}
+		} else if (isKeyDown
+			&& _EnqueueInlineInputMethod(B_INPUT_METHOD_STARTED) == B_OK) {
+			// start of a dead key
+			char* string = NULL;
+			int32 numBytes = 0;
+			fKeymap.GetChars(keycode, fModifiers, 0, &string, &numBytes);
+
+			if (_EnqueueInlineInputMethod(B_INPUT_METHOD_CHANGED, string)
+					== B_OK)
+				fInputMethodStarted = true;
+
+			activeDeadKey = newDeadKey;
 		}
+
+		if (msg != NULL && fOwner->EnqueueMessage(msg) != B_OK)
+			delete msg;
 
 		lastKeyCode = isKeyDown ? keycode : 0;
 	}

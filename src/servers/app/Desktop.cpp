@@ -157,7 +157,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 	int32 key = 0;
 	int32 modifiers;
 
-	if (message->what == B_KEY_DOWN
+	if ((message->what == B_KEY_DOWN || message->what == B_UNMAPPED_KEY_DOWN)
 		&& message->FindInt32("key", &key) == B_OK
 		&& message->FindInt32("modifiers", &modifiers) == B_OK) {
 		// Check for safe video mode (cmd + ctrl + escape)
