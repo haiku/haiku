@@ -9,6 +9,7 @@
 #include "DataReader.h"
 
 
+class BufferCache;
 class PackageData;
 
 
@@ -29,9 +30,15 @@ protected:
 
 class PackageDataReaderFactory {
 public:
-	static	status_t			CreatePackageDataReader(DataReader* dataReader,
+								PackageDataReaderFactory(
+									BufferCache* bufferCache);
+
+			status_t			CreatePackageDataReader(DataReader* dataReader,
 									const PackageData& data,
 									PackageDataReader*& _reader);
+
+private:
+			BufferCache*		fBufferCache;
 };
 
 

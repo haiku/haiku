@@ -13,6 +13,7 @@
 
 #include <haiku_package.h>
 
+#include "BufferCache.h"
 #include "PackageData.h"
 #include "ZlibDecompressor.h"
 
@@ -94,18 +95,20 @@ private:
 
 class ZlibPackageDataReader : public PackageDataReader {
 public:
-	ZlibPackageDataReader(DataReader* dataReader)
+	ZlibPackageDataReader(DataReader* dataReader, BufferCache* bufferCache)
 		:
 		PackageDataReader(dataReader),
-		fOffsetTable(NULL),
-		fReadBuffer(NULL)
+		fBufferCache(bufferCache),
+		fUncompressBuffer(NULL),
+		fOffsetTable(NULL)
 	{
 	}
 
 	~ZlibPackageDataReader()
 	{
 		delete[] fOffsetTable;
-		free(fReadBuffer);
+
+		fBufferCache->PutBuffer(&fUncompressBuffer);
 	}
 
 	status_t Init(const PackageData& data)
@@ -142,14 +145,8 @@ public:
 		} else
 			fChunkSize = fUncompressedSize;
 
-		// allocate the read/uncompress buffer
-		fReadBuffer = (uint8*)malloc(fChunkSize * 2);
-		if (fReadBuffer == NULL)
-			return B_NO_MEMORY;
-
-		fUncompressBuffer = fReadBuffer + fChunkSize;
+		// mark uncompressed content invalid
 		fUncompressedChunk = -1;
-			// mark content invalid
 
 		return B_OK;
 	}
@@ -180,6 +177,17 @@ public:
 			return B_BAD_VALUE;
 		}
 
+		// get our uncompressed chunk buffer back, if possible
+		bool newBuffer;
+		if (fBufferCache->GetBuffer(fChunkSize, &fUncompressBuffer, &newBuffer)
+				== NULL) {
+			return B_NO_MEMORY;
+		}
+		CachedBufferPutter uncompressBuffer(fBufferCache, &fUncompressBuffer);
+
+		if (newBuffer)
+			fUncompressedChunk = -1;
+
 		// uncompress
 		int64 chunkIndex = offset / fChunkSize;
 		off_t chunkOffset = chunkIndex * fChunkSize;
@@ -193,7 +201,8 @@ public:
 
 			// copy data to buffer
 			size_t toCopy = std::min(size, (size_t)fChunkSize - inChunkOffset);
-			memcpy(buffer, fUncompressBuffer + inChunkOffset, toCopy);
+			memcpy(buffer, (uint8*)fUncompressBuffer->Buffer() + inChunkOffset,
+				toCopy);
 
 			buffer += toCopy;
 			size -= toCopy;
@@ -227,17 +236,24 @@ private:
 		if (compressedSize == uncompressedSize) {
 			// the chunk is not compressed -- read it directly into the
 			// uncompressed buffer
-			error = fDataReader->ReadData(offset, fUncompressBuffer,
+			error = fDataReader->ReadData(offset, fUncompressBuffer->Buffer(),
 				compressedSize);
 		} else {
-			// read to the read buffer and uncompress
-			error = fDataReader->ReadData(offset, fReadBuffer, compressedSize);
+			// read to a read buffer and uncompress
+			CachedBuffer* readBuffer = fBufferCache->GetBuffer(fChunkSize);
+			if (readBuffer == NULL)
+				return B_NO_MEMORY;
+			CachedBufferPutter readBufferPutter(fBufferCache, readBuffer);
+
+			error = fDataReader->ReadData(offset, readBuffer->Buffer(),
+				compressedSize);
 			if (error != B_OK)
 				return error;
 
 			size_t actuallyUncompressedSize;
-			error = ZlibDecompressor::DecompressSingleBuffer(fReadBuffer,
-				compressedSize, fUncompressBuffer, uncompressedSize,
+			error = ZlibDecompressor::DecompressSingleBuffer(
+				readBuffer->Buffer(), compressedSize,
+				fUncompressBuffer->Buffer(), uncompressedSize,
 				actuallyUncompressedSize);
 			if (error == B_OK && actuallyUncompressedSize != uncompressedSize)
 				error = B_BAD_DATA;
@@ -321,25 +337,33 @@ private:
 	}
 
 private:
-	uint64	fOffset;
-	uint64	fUncompressedSize;
-	uint64	fCompressedSize;
-	uint64	fOffsetTableSize;
-	uint64	fChunkCount;
-	uint32	fChunkSize;
-	uint32	fOffsetTableBufferEntryCount;
-	uint64*	fOffsetTable;
-	int32	fOffsetTableIndex;
-	uint8*	fReadBuffer;
-	uint8*	fUncompressBuffer;
-	int64	fUncompressedChunk;
+	BufferCache*	fBufferCache;
+	CachedBuffer*	fUncompressBuffer;
+	int64			fUncompressedChunk;
+
+	uint64			fOffset;
+	uint64			fUncompressedSize;
+	uint64			fCompressedSize;
+	uint64			fOffsetTableSize;
+	uint64			fChunkCount;
+	uint32			fChunkSize;
+	uint32			fOffsetTableBufferEntryCount;
+	uint64*			fOffsetTable;
+	int32			fOffsetTableIndex;
 };
 
 
 // #pragma mark - PackageDataReaderFactory
 
 
-/*static*/ status_t
+PackageDataReaderFactory::PackageDataReaderFactory(BufferCache* bufferCache)
+	:
+	fBufferCache(bufferCache)
+{
+}
+
+
+status_t
 PackageDataReaderFactory::CreatePackageDataReader(DataReader* dataReader,
 	const PackageData& data, PackageDataReader*& _reader)
 {
@@ -351,7 +375,8 @@ PackageDataReaderFactory::CreatePackageDataReader(DataReader* dataReader,
 				dataReader);
 			break;
 		case B_HPKG_COMPRESSION_ZLIB:
-			reader = new(std::nothrow) ZlibPackageDataReader(dataReader);
+			reader = new(std::nothrow) ZlibPackageDataReader(dataReader,
+				fBufferCache);
 			break;
 		default:
 			return B_BAD_VALUE;

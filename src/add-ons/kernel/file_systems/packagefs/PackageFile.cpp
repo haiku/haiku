@@ -15,6 +15,7 @@
 #include "PackageDataReader.h"
 
 #include "DebugSupport.h"
+#include "GlobalFactory.h"
 #include "Package.h"
 
 
@@ -29,6 +30,7 @@ struct PackageFile::DataAccessor {
 		fReader(NULL),
 		fFileCache(NULL)
 	{
+		mutex_init(&fLock, "file data accessor");
 	}
 
 	~DataAccessor()
@@ -36,6 +38,7 @@ struct PackageFile::DataAccessor {
 		file_cache_delete(fFileCache);
 		delete fReader;
 		delete fDataReader;
+		mutex_destroy(&fLock);
 	}
 
 	status_t Init(dev_t deviceID, ino_t nodeID, int fd)
@@ -51,7 +54,7 @@ struct PackageFile::DataAccessor {
 			RETURN_ERROR(B_NO_MEMORY);
 
 		// create a PackageDataReader
-		status_t error = PackageDataReaderFactory::CreatePackageDataReader(
+		status_t error = GlobalFactory::Default()->CreatePackageDataReader(
 			fDataReader, *fData, fReader);
 		if (error != B_OK)
 			RETURN_ERROR(error);
@@ -74,6 +77,7 @@ struct PackageFile::DataAccessor {
 			fData->UncompressedSize() - offset);
 
 		if (toRead > 0) {
+			MutexLocker locker(fLock);
 			status_t error = fReader->ReadData(offset, buffer, toRead);
 			if (error != B_OK)
 				RETURN_ERROR(error);
@@ -84,6 +88,7 @@ struct PackageFile::DataAccessor {
 	}
 
 private:
+	mutex				fLock;
 	PackageData*		fData;
 	DataReader*			fDataReader;
 	PackageDataReader*	fReader;

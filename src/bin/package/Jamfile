@@ -10,6 +10,8 @@ DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) compression ] ;
 
 BinCommand package :
+	BlockBufferCache.cpp
+	BufferCache.cpp
 	command_create.cpp
 	command_dump.cpp
 	command_extract.cpp

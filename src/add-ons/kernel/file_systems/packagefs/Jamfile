@@ -10,8 +10,10 @@ DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
 
 
 HAIKU_PACKAGE_FS_SOURCES =
+	BlockBufferCacheKernel.cpp
 	DebugSupport.cpp
 	Directory.cpp
+	GlobalFactory.cpp
 	kernel_interface.cpp
 	LeafNode.cpp
 	Node.cpp
@@ -26,6 +28,8 @@ HAIKU_PACKAGE_FS_SOURCES =
 ;
 
 HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
+	BlockBufferCache.cpp
+	BufferCache.cpp
 	DataOutput.cpp
 	DataReader.cpp
 	ErrorOutput.cpp

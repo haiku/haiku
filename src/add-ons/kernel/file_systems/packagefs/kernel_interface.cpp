@@ -19,6 +19,7 @@
 
 #include "DebugSupport.h"
 #include "Directory.h"
+#include "GlobalFactory.h"
 #include "LeafNode.h"
 #include "Volume.h"
 
@@ -651,14 +652,27 @@ packagefs_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
+		{
 			init_debugging();
 			PRINT("package_std_ops(): B_MODULE_INIT\n");
+
+			status_t error = GlobalFactory::CreateDefault();
+			if (error != B_OK) {
+				ERROR("Failed to init GlobalFactory\n");
+				exit_debugging();
+				return error;
+			}
+
 			return B_OK;
+		}
 
 		case B_MODULE_UNINIT:
+		{
 			PRINT("package_std_ops(): B_MODULE_UNINIT\n");
+			GlobalFactory::DeleteDefault();
 			exit_debugging();
 			return B_OK;
+		}
 
 		default:
 			return B_ERROR;

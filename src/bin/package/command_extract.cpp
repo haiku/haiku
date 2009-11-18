@@ -23,6 +23,7 @@
 
 #include <AutoDeleter.h>
 
+#include "BlockBufferCache.h"
 #include "FDCloser.h"
 #include "package.h"
 #include "PackageDataReader.h"
@@ -35,6 +36,7 @@
 struct PackageContentExtractHandler : PackageContentHandler {
 	PackageContentExtractHandler(int packageFileFD)
 		:
+		fBufferCache(B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB, 2),
 		fPackageFileReader(packageFileFD),
 		fDataBuffer(NULL),
 		fDataBufferSize(0),
@@ -49,6 +51,10 @@ struct PackageContentExtractHandler : PackageContentHandler {
 
 	status_t Init()
 	{
+		status_t error = fBufferCache.Init();
+		if (error != B_OK)
+			return error;
+
 		fDataBufferSize = 64 * 1024;
 		fDataBuffer = malloc(fDataBufferSize);
 		if (fDataBuffer == NULL)
@@ -245,8 +251,8 @@ private:
 	{
 		// create a PackageDataReader
 		PackageDataReader* reader;
-		status_t error = PackageDataReaderFactory::CreatePackageDataReader(
-			dataReader, data, reader);
+		status_t error = PackageDataReaderFactory(&fBufferCache)
+			.CreatePackageDataReader(dataReader, data, reader);
 		if (error != B_OK)
 			return error;
 		ObjectDeleter<PackageDataReader> readerDeleter(reader);
@@ -284,10 +290,11 @@ private:
 	}
 
 private:
-	FDDataReader	fPackageFileReader;
-	void*			fDataBuffer;
-	size_t			fDataBufferSize;
-	bool			fErrorOccurred;
+	BlockBufferCacheNoLock	fBufferCache;
+	FDDataReader			fPackageFileReader;
+	void*					fDataBuffer;
+	size_t					fDataBufferSize;
+	bool					fErrorOccurred;
 };
 
 
