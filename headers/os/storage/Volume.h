@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2009, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _VOLUME_H
@@ -34,6 +34,7 @@ public:
 
 			off_t			Capacity() const;
 			off_t			FreeBytes() const;
+			off_t			BlockSize() const;
 
 			status_t		GetName(char* name) const;
 			status_t		SetName(const char* name);

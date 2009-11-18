@@ -232,6 +232,30 @@ BVolume::FreeBytes() const
 	return (error == B_OK ? info.free_blocks * info.block_size : error);
 }
 
+
+/*!	\brief Returns the size of one block (in bytes). It depends on the
+		underlying file system what this means exactly.
+	\return
+	- The block size in bytes.
+	- \c B_NO_INIT if the volume is not initialized.
+	- Other errors forwarded from the file system.
+*/
+off_t
+BVolume::BlockSize() const
+{
+	// check initialization
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	// get FS stat
+	fs_info info;
+	if (fs_stat_dev(fDevice, &info) != 0)
+		return errno;
+
+	return info.block_size;
+}
+
+
 // GetName
 /*!	\brief Returns the name of the volume.
 
