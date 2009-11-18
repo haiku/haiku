@@ -77,7 +77,6 @@ public:
 									// will only be updated if 0.2 seconds
 									// elapsed since the last update
 			void				RemoveStatusItem(thread_id);
-			bool				HasStatus(thread_id);
 
 			bool				CheckCanceledOrPaused(thread_id);
 
@@ -171,7 +170,7 @@ BStatusView::Thread() const
 }
 
 
-extern BStatusWindow *gStatusWindow;
+extern BStatusWindow* gStatusWindow;
 
 
 } // namespace BPrivate

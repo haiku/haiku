@@ -199,9 +199,8 @@ void
 TrackerCopyLoopControl::UpdateStatus(const char *name, entry_ref, int32 count,
 	bool optional)
 {
-	if (gStatusWindow && gStatusWindow->HasStatus(fThread))
-		gStatusWindow->UpdateStatus(fThread, const_cast<char *>(name),
-			count, optional);
+	if (gStatusWindow)
+		gStatusWindow->UpdateStatus(fThread, name, count, optional);
 }
 
 
@@ -817,7 +816,7 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList, u
 
 				// update the status because item got skipped and the status
 				// will not get updated by the move call
-				if (gStatusWindow && gStatusWindow->HasStatus(thread))
+				if (gStatusWindow)
 					gStatusWindow->UpdateStatus(thread, srcRef->name, 1);
 
 				continue;
@@ -1478,7 +1477,7 @@ MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc, uint32 moveMode,
 			// size is irrelevant when simply moving to a new folder
 
 			thread_id thread = find_thread(NULL);
-			if (gStatusWindow && gStatusWindow->HasStatus(thread))
+			if (gStatusWindow)
 				gStatusWindow->UpdateStatus(thread, ref.name, 1);
 			if (entry->IsDirectory())
 				return RecursiveMove(entry, destDir);

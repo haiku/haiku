@@ -302,23 +302,6 @@ BStatusWindow::RemoveStatusItem(thread_id thread)
 
 
 bool
-BStatusWindow::HasStatus(thread_id thread)
-{
-	AutoLock<BWindow> lock(this);
-
-	int32 numItems = fViewList.CountItems();
-	for (int32 index = 0; index < numItems; index++) {
-		BStatusView* view = fViewList.ItemAt(index);
-		if (view->Thread() == thread)
-			return true;
-
-	}
-
-	return false;
-}
-
-
-bool
 BStatusWindow::CheckCanceledOrPaused(thread_id thread)
 {
 	bool wasCanceled = false;
