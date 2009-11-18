@@ -64,6 +64,8 @@
 
 #define _MINIMIZE_			'_WMZ'
 #define _ZOOM_				'_WZO'
+#define _SEND_BEHIND_		'_WSB'
+#define _SEND_TO_FRONT_		'_WSF'
 #define _SWITCH_WORKSPACE_	'_SWS'
 
 
@@ -594,11 +596,11 @@ BWindow::Minimize(bool minimize)
 status_t
 BWindow::SendBehind(const BWindow* window)
 {
-	if (!window || !Lock())
+	if (!Lock())
 		return B_ERROR;
 
 	fLink->StartMessage(AS_SEND_BEHIND);
-	fLink->Attach<int32>(_get_object_token_(window));
+	fLink->Attach<int32>(window != NULL ? _get_object_token_(window) : -1);
 	fLink->Attach<team_id>(Team());
 
 	status_t status = B_ERROR;
@@ -882,6 +884,14 @@ BWindow::DispatchMessage(BMessage* msg, BHandler* target)
 			// Used by the zoom shortcut
 			if ((Flags() & B_NOT_ZOOMABLE) == 0)
 				Zoom();
+			break;
+
+		case _SEND_BEHIND_:
+			SendBehind(NULL);
+			break;
+
+		case _SEND_TO_FRONT_:
+			Activate();
 			break;
 
 		case _SWITCH_WORKSPACE_:
@@ -2708,6 +2718,10 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 		new BMessage(_ZOOM_), NULL);
 	AddShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY,
 		new BMessage(B_HIDE_APPLICATION), NULL);
+	AddShortcut('F', B_COMMAND_KEY | B_CONTROL_KEY,
+		new BMessage(_SEND_TO_FRONT_), NULL);
+	AddShortcut('B', B_COMMAND_KEY | B_CONTROL_KEY,
+		new BMessage(_SEND_BEHIND_), NULL);
 
 	// Workspace modifier keys
 	BMessage* message;

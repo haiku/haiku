@@ -665,13 +665,13 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			link.Read<int32>(&token);
 			if (link.Read<team_id>(&teamID) == B_OK) {
-				::Window *behindOf = fDesktop->FindWindowByClientToken(token,
+				::Window* behindOf = fDesktop->FindWindowByClientToken(token,
 					teamID);
 
 				DTRACE(("ServerWindow %s: Message AS_SEND_BEHIND %s\n",
-					Title(), behindOf ? behindOf->Title() : "NULL"));
+					Title(), behindOf != NULL ? behindOf->Title() : "NULL"));
 
-				if (behindOf != NULL) {
+				if (behindOf != NULL || token == -1) {
 					fDesktop->SendWindowBehind(fWindow, behindOf);
 					status = B_OK;
 				} else
