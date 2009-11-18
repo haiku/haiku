@@ -11,14 +11,19 @@
 #define KEYBOARD_H
 
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 class KeyboardApplication : public BApplication 
 {
 public:
-			KeyboardApplication();
+	KeyboardApplication();
 	
-	void	MessageReceived(BMessage *message);
+	void	MessageReceived(BMessage* message);
 	void	AboutRequested(void);
+	
+private:
+	BCatalog fCatalog;
 };
 
 #endif

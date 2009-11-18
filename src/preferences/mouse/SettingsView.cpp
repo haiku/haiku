@@ -14,10 +14,12 @@
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <InterfaceDefs.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -62,6 +64,8 @@ focus_follows_mouse_mode_to_index(mode_focus_follows_mouse mode)
 
 //	#pragma mark -
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "SettingsView"
 
 SettingsView::SettingsView(MouseSettings &settings)
 	: BBox("main_view"),
@@ -69,48 +73,53 @@ SettingsView::SettingsView(MouseSettings &settings)
 {
 	// Add the "Mouse Type" pop up menu
 	fTypeMenu = new BPopUpMenu("unknown");
-	fTypeMenu->AddItem(new BMenuItem("1-Button", new BMessage(kMsgMouseType)));
-	fTypeMenu->AddItem(new BMenuItem("2-Button", new BMessage(kMsgMouseType)));
-	fTypeMenu->AddItem(new BMenuItem("3-Button", new BMessage(kMsgMouseType)));
+	fTypeMenu->AddItem(new BMenuItem(TR("1-Button"),
+		new BMessage(kMsgMouseType)));
+	fTypeMenu->AddItem(new BMenuItem(TR("2-Button"),
+		new BMessage(kMsgMouseType)));
+	fTypeMenu->AddItem(new BMenuItem(TR("3-Button"),
+		new BMessage(kMsgMouseType)));
 
-	BMenuField *fTypeField = new BMenuField("Mouse type:", fTypeMenu, NULL);
+	BMenuField *fTypeField = new BMenuField(TR("Mouse type:"),
+		fTypeMenu, NULL);
 	fTypeField->SetAlignment(B_ALIGN_RIGHT);
 
 	// Create the "Double-click speed slider...
-	fClickSpeedSlider = new BSlider("double_click_speed", "Double-click speed",
-		new BMessage(kMsgDoubleClickSpeed), 0, 1000, B_HORIZONTAL);
+	fClickSpeedSlider = new BSlider("double_click_speed",
+		TR("Double-click speed"), new BMessage(kMsgDoubleClickSpeed),
+		0, 1000, B_HORIZONTAL);
 	fClickSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fClickSpeedSlider->SetHashMarkCount(5);
-	fClickSpeedSlider->SetLimitLabels("Slow", "Fast");
+	fClickSpeedSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
 
 	// Create the "Mouse Speed" slider...
-	fMouseSpeedSlider = new BSlider("mouse_speed", "Mouse Speed", 
+	fMouseSpeedSlider = new BSlider("mouse_speed", TR("Mouse Speed"), 
 		new BMessage(kMsgMouseSpeed), 0, 1000, B_HORIZONTAL);
 	fMouseSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fMouseSpeedSlider->SetHashMarkCount(7);
-	fMouseSpeedSlider->SetLimitLabels("Slow", "Fast");
+	fMouseSpeedSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
 
 	// Create the "Mouse Acceleration" slider...
 	fAccelerationSlider = new BSlider("mouse_acceleration",
-		"Mouse Acceleration", new BMessage(kMsgAccelerationFactor),
+		TR("Mouse Acceleration"), new BMessage(kMsgAccelerationFactor),
 		0, 1000, B_HORIZONTAL);
 	fAccelerationSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fAccelerationSlider->SetHashMarkCount(5);
-	fAccelerationSlider->SetLimitLabels("Slow", "Fast");
+	fAccelerationSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
 
 	// Mouse image...
 	fMouseView = new MouseView(fSettings);
 
 	// Create the "Double-click test area" text box...
 	BTextControl *fDoubleClick = new BTextControl(NULL,
-		"Double-click test area", NULL);
+		TR("Double-click test area"), NULL);
 	fDoubleClick->SetAlignment(B_ALIGN_LEFT, B_ALIGN_CENTER);
 
 	// Add the "Mouse focus mode" pop up menu
-	fFocusMenu = new BPopUpMenu("Click to Activate");
+	fFocusMenu = new BPopUpMenu(TR("Click to Activate"));
 	
-	const char *focusLabels[] = {"Click to Activate", "Click to Focus",
-									"Focus Follows Mouse"};
+	const char *focusLabels[] = {TR_MARK("Click to Activate"),
+		TR_MARK("Click to Focus"),TR_MARK("Focus Follows Mouse")};
 	const mode_mouse focusModes[] = {B_NORMAL_MOUSE, B_CLICK_TO_FOCUS_MOUSE,
 										B_FOCUS_FOLLOWS_MOUSE};
 
@@ -118,16 +127,18 @@ SettingsView::SettingsView(MouseSettings &settings)
 		BMessage *message = new BMessage(kMsgMouseFocusMode);
 		message->AddInt32("mode", focusModes[i]);
 
-		fFocusMenu->AddItem(new BMenuItem(focusLabels[i], message));
+		fFocusMenu->AddItem(new BMenuItem(TR(focusLabels[i]), message));
 	}
 
-	BMenuField *fFocusField = new BMenuField("Focus mode:", fFocusMenu, NULL);
+	BMenuField *fFocusField = new BMenuField(TR("Focus mode:"),
+		fFocusMenu, NULL);
 	fFocusField->SetAlignment(B_ALIGN_RIGHT);
 	
 	// Add the "Focus follows mouse mode" pop up menu
-	fFocusFollowsMouseMenu = new BPopUpMenu("Normal");
+	fFocusFollowsMouseMenu = new BPopUpMenu(TR("Normal"));
 	
-	const char *focusFollowsMouseLabels[] = {"Normal", "Warp", "Instant Warp"};
+	const char *focusFollowsMouseLabels[] = {TR_MARK("Normal"),
+		TR_MARK("Warp"), TR_MARK("Instant Warp")};
 	const mode_focus_follows_mouse focusFollowsMouseModes[] =
 		{B_NORMAL_FOCUS_FOLLOWS_MOUSE, B_WARP_FOCUS_FOLLOWS_MOUSE,
 			B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE};
@@ -138,7 +149,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 			focusFollowsMouseModes[i]);
 
 		fFocusFollowsMouseMenu->AddItem(new BMenuItem(
-			focusFollowsMouseLabels[i], message));
+			TR(focusFollowsMouseLabels[i]), message));
 	}
 
 	BMenuField *fFocusFollowsMouseField = new BMenuField(
@@ -146,7 +157,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 	fFocusFollowsMouseField->SetAlignment(B_ALIGN_RIGHT);
 
 	// Add the "Click-through" check box
-	fAcceptFirstClickBox = new BCheckBox("Accept first click",
+	fAcceptFirstClickBox = new BCheckBox(TR("Accept first click"),
 		new BMessage(kMsgAcceptFirstClick));
 
 	// dividers

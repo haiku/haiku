@@ -1,0 +1,24 @@
+1	french	x-vnd.Haiku-Mouse	3306943515
+Mouse type:	SettingsView		Type de souris :
+Warp	SettingsView		Téléporter
+2-Button	SettingsView		2 boutons
+Double-click test area	SettingsView		Zone de test du double clic
+Revert	MouseWindow		Défaire
+...by Andrew Edward McCall	MouseApplication		...par Andrew Edward McCall
+Focus Follows Mouse	SettingsView		Le focus suit le pointeur
+Mouse Acceleration	SettingsView		Accélération de la souris
+Click to Focus	SettingsView		Cliquer pour focus
+3-Button	SettingsView		3 boutons
+Focus mode:	SettingsView		Méthode de focus :
+Mouse Speed	SettingsView		Vitesse de la souris
+Dig Deal	MouseApplication		Dig Deal
+1-Button	SettingsView		1 bouton
+Double-click speed	SettingsView		Vitesse du double clic
+Instant Warp	SettingsView		Téléportation instantanée
+Defaults	MouseWindow		Défauts
+Accept first click	SettingsView		Accepter le premier clic
+Fast	SettingsView		Rapide
+Normal	SettingsView		Normal
+Mouse	MouseWindow		Souris
+Slow	SettingsView		Lent
+Click to Activate	SettingsView		Cliquer pour activer

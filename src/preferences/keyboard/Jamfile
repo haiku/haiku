@@ -14,6 +14,16 @@ Preference Keyboard :
 	KeyboardSettings.cpp 
 	KeyboardView.cpp 
 	KeyboardWindow.cpp
-	: translation be $(TARGET_LIBSUPC++)
+	: translation be $(TARGET_LIBSUPC++) liblocale.so
 	: Keyboard.rdef
+	;
+
+DoCatalogs Keyboard :
+	x-vnd.Haiku-Keyboard
+	:
+	Keyboard.cpp
+	KeyboardWindow.cpp
+	KeyboardView.cpp
+	: en.catalog
+	: fr.catkeys
 	;

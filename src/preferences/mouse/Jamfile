@@ -8,7 +8,16 @@ Preference Mouse :
 	MouseWindow.cpp
 	MouseView.cpp 
 	SettingsView.cpp
-	: translation be $(TARGET_LIBSUPC++)
+	: translation be $(TARGET_LIBSUPC++) liblocale.so
 	: Mouse.rdef
 	;
 
+DoCatalogs Mouse :
+	x-vnd.Haiku-Mouse
+	:
+	Mouse.cpp
+	MouseWindow.cpp
+	SettingsView.cpp
+	: en.catalog
+	: fr.catkeys
+	;

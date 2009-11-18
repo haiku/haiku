@@ -10,6 +10,7 @@
 #ifndef KEYBOARD_WINDOW_H
 #define KEYBOARD_WINDOW_H
 
+#include <Button.h>
 #include <Window.h>
 
 #include "KeyboardSettings.h"
@@ -21,11 +22,13 @@ public:
 			KeyboardWindow();
 	
 	bool	QuitRequested();
-	void	MessageReceived(BMessage *message);
+	void	MessageReceived(BMessage* message);
 	
 private:
-	KeyboardView		*fView;
+	KeyboardView	*fSettingsView;
 	KeyboardSettings	fSettings;
+	BButton		*fDefaultsButton;
+	BButton		*fRevertButton;
 };
 
 #endif

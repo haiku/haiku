@@ -11,23 +11,23 @@
 #define KEYBOARD_VIEW_H
 
 
-#include <Box.h>
+#include <GroupView.h>
 #include <Slider.h>
 #include <SupportDefs.h>
 #include <InterfaceDefs.h>
 #include <Application.h>
 
-class KeyboardView : public BView
+
+class KeyboardView : public BGroupView
 {
 public:
-			KeyboardView(BRect frame);
+	KeyboardView();
+	virtual ~KeyboardView();
 	void	Draw(BRect frame);
-	void	AttachedToWindow(void);
-	
+
 private:
 	BBitmap		*fIconBitmap;
 	BBitmap		*fClockBitmap;
-	BBox		*fBox;
 	BSlider		*fDelaySlider;
 	BSlider		*fRepeatSlider;
 };

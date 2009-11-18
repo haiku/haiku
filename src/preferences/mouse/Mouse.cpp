@@ -15,6 +15,8 @@
 #include <Alert.h>
 #include <Screen.h>
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "MouseApplication"
 
 const char* kSignature = "application/x-vnd.Haiku-Mouse";
 
@@ -23,6 +25,8 @@ MouseApplication::MouseApplication()
 	:
 	BApplication(kSignature)					
 {
+	be_locale->GetAppCatalog(&fCatalog);
+	
 	BRect rect(0, 0, 397, 293);
 	MouseWindow *window = new MouseWindow(rect);
 	window->Show();
@@ -32,7 +36,8 @@ MouseApplication::MouseApplication()
 void
 MouseApplication::AboutRequested()
 {
-	(new BAlert("about", "...by Andrew Edward McCall", "Dig Deal"))->Go();
+	(new BAlert("about", TR("...by Andrew Edward McCall"),
+		TR("Dig Deal")))->Go();
 }
 
 

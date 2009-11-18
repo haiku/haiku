@@ -15,10 +15,13 @@
 
 #include <Alert.h>
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "KeyboardApplication"
 
 KeyboardApplication::KeyboardApplication()
 	: BApplication("application/x-vnd.Haiku-Keyboard")
 {
+	be_locale->GetAppCatalog(&fCatalog);
 	new KeyboardWindow();
 }
 
@@ -26,11 +29,11 @@ KeyboardApplication::KeyboardApplication()
 void
 KeyboardApplication::MessageReceived(BMessage* message)
 {
-	switch(message->what) {
+	switch (message->what) {
 		case ERROR_DETECTED:
 		{
-			BAlert *errorAlert = new BAlert("Error", "Something has gone wrong!",
-				"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
+			BAlert* errorAlert = new BAlert("Error", TR("Something has gone wrong!"),
+				TR("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
 				B_WARNING_ALERT);
 			errorAlert->Go();
 			be_app->PostMessage(B_QUIT_REQUESTED);
@@ -46,7 +49,7 @@ KeyboardApplication::MessageReceived(BMessage* message)
 void
 KeyboardApplication::AboutRequested()
 {
-	(new BAlert("about", "Written by Andrew Edward McCall", "OK"))->Go();
+	(new BAlert("about", TR("Written by Andrew Edward McCall"), TR("OK")))->Go();
 }
 
 

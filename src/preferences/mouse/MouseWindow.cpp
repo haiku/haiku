@@ -14,8 +14,10 @@
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <Debug.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -27,10 +29,12 @@
 #include "MouseConstants.h"
 #include "SettingsView.h"
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "MouseWindow"
 
 MouseWindow::MouseWindow(BRect _rect)
 	: 
-		BWindow(_rect, "Mouse", B_TITLED_WINDOW, 
+		BWindow(_rect, TR("Mouse"), B_TITLED_WINDOW, 
 			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS |
 				B_AUTO_UPDATE_SIZE_LIMITS)
 {
@@ -40,11 +44,11 @@ MouseWindow::MouseWindow(BRect _rect)
 	fSettingsBox->AddChild(fSettingsView);
 
 	// Add the "Default" button
-	fDefaultsButton = new BButton("Defaults", new BMessage(kMsgDefaults));
+	fDefaultsButton = new BButton(TR("Defaults"), new BMessage(kMsgDefaults));
 	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
 
 	// Add the "Revert" button
-	fRevertButton = new BButton("Revert", new BMessage(kMsgRevert));
+	fRevertButton = new BButton(TR("Revert"), new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
 
 	SetPulseRate(100000);

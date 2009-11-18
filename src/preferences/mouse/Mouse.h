@@ -12,6 +12,8 @@
 
 
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 
 class MouseApplication : public BApplication {
@@ -19,6 +21,8 @@ public:
 		MouseApplication();
 
 		virtual void AboutRequested();
+private:
+		BCatalog fCatalog;
 };
 
 #endif	/* MOUSE_H */
