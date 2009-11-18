@@ -185,6 +185,7 @@ public:
 			void				EndViewTransaction();
 									// referred as CommitViewTransaction()
 									// in BeBook
+			bool				InViewTransaction() const;
 
 			BRect				Bounds() const;
 			BRect				Frame() const;

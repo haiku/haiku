@@ -683,6 +683,14 @@ BWindow::EndViewTransaction()
 
 
 bool
+BWindow::InViewTransaction() const
+{
+	BAutolock locker(const_cast<BWindow*>(this));
+	return fInTransaction;
+}
+
+
+bool
 BWindow::IsFront() const
 {
 	BAutolock locker(const_cast<BWindow*>(this));
