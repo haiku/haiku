@@ -171,19 +171,23 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 			// workspace change
 
 #if !TEST_MODE
-			if (modifiers & B_COMMAND_KEY)
+			if ((modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY))
+					== B_COMMAND_KEY)
 #else
-			if (modifiers & B_CONTROL_KEY)
+			if ((modifiers & B_CONTROL_KEY) != 0)
 #endif
 			{
 				STRACE(("Set Workspace %ld\n", key - 1));
 
-				fDesktop->SetWorkspaceAsync(key - 2);
+				fDesktop->SetWorkspaceAsync(key - 2,
+					(modifiers & B_SHIFT_KEY) != 0);
 				return B_SKIP_MESSAGE;
 			}
-		} if (key == 0x11 && (modifiers & B_COMMAND_KEY) != 0) {
+		} if (key == 0x11
+			&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY))
+					== B_COMMAND_KEY) {
 			// switch to previous workspace (command + `)
-			fDesktop->SetWorkspaceAsync(-1);
+			fDesktop->SetWorkspaceAsync(-1, (modifiers & B_SHIFT_KEY) != 0);
 			return B_SKIP_MESSAGE;
 		}
 	}
@@ -726,11 +730,12 @@ Desktop::UnlockDirectScreen(team_id team)
 /*!	Changes the current workspace to the one specified by \a index.
 */
 void
-Desktop::SetWorkspaceAsync(int32 index)
+Desktop::SetWorkspaceAsync(int32 index, bool moveFocusWindow)
 {
 	BPrivate::LinkSender link(MessagePort());
 	link.StartMessage(AS_ACTIVATE_WORKSPACE);
 	link.Attach<int32>(index);
+	link.Attach<bool>(moveFocusWindow);
 	link.Flush();
 }
 
@@ -739,7 +744,7 @@ Desktop::SetWorkspaceAsync(int32 index)
 	You must not hold any window lock when calling this method.
 */
 void
-Desktop::SetWorkspace(int32 index)
+Desktop::SetWorkspace(int32 index, bool moveFocusWindow)
 {
 	LockAllWindows();
 	DesktopSettings settings(this);
@@ -750,7 +755,7 @@ Desktop::SetWorkspace(int32 index)
 		return;
 	}
 
-	_SetWorkspace(index);
+	_SetWorkspace(index, moveFocusWindow);
 	UnlockAllWindows();
 
 	_SendFakeMouseMoved();
@@ -2324,11 +2329,13 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			int32 index;
 			link.Read<int32>(&index);
-
 			if (index == -1)
 				index = fPreviousWorkspace;
 
-			SetWorkspace(index);
+			bool moveFocusWindow;
+			link.Read<bool>(&moveFocusWindow);
+
+			SetWorkspace(index, moveFocusWindow);
 			break;
 		}
 
@@ -3070,25 +3077,28 @@ Desktop::_SetCurrentWorkspaceConfiguration()
 	You must hold the all window lock when calling this method.
 */
 void
-Desktop::_SetWorkspace(int32 index)
+Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 {
 	ASSERT_MULTI_WRITE_LOCKED(fWindowLock);
 
 	int32 previousIndex = fCurrentWorkspace;
 	rgb_color previousColor = fWorkspaces[fCurrentWorkspace].Color();
 	bool movedMouseEventWindow = false;
+	Window* movedWindow = fMouseEventWindow;
+	if (movedWindow == NULL && moveFocusWindow)
+		movedWindow = FocusWindow();
 
-	if (fMouseEventWindow != NULL) {
-		if (fMouseEventWindow->IsNormal()) {
-			if (!fMouseEventWindow->InWorkspace(index)) {
+	if (movedWindow != NULL) {
+		if (movedWindow->IsNormal()) {
+			if (!movedWindow->InWorkspace(index)) {
 				// The window currently being dragged will follow us to this
 				// workspace if it's not already on it.
 				// But only normal windows are following
-				uint32 oldWorkspaces = fMouseEventWindow->Workspaces();
+				uint32 oldWorkspaces = movedWindow->Workspaces();
 
-				_Windows(previousIndex).RemoveWindow(fMouseEventWindow);
-				_Windows(index).AddWindow(fMouseEventWindow,
-					fMouseEventWindow->Frontmost(_Windows(index).FirstWindow(),
+				_Windows(previousIndex).RemoveWindow(movedWindow);
+				_Windows(index).AddWindow(movedWindow,
+					movedWindow->Frontmost(_Windows(index).FirstWindow(),
 					index));
 
 				// TODO: subset windows will always flicker this way
@@ -3096,19 +3106,18 @@ Desktop::_SetWorkspace(int32 index)
 				movedMouseEventWindow = true;
 
 				// send B_WORKSPACES_CHANGED message
-				fMouseEventWindow->WorkspacesChanged(oldWorkspaces,
-					fMouseEventWindow->Workspaces());
+				movedWindow->WorkspacesChanged(oldWorkspaces,
+					movedWindow->Workspaces());
 			} else {
 				// make sure it's frontmost
-				_Windows(index).RemoveWindow(fMouseEventWindow);
-				_Windows(index).AddWindow(fMouseEventWindow,
-					fMouseEventWindow->Frontmost(_Windows(index).FirstWindow(),
+				_Windows(index).RemoveWindow(movedWindow);
+				_Windows(index).AddWindow(movedWindow,
+					movedWindow->Frontmost(_Windows(index).FirstWindow(),
 					index));
 			}
 		}
 
-		fMouseEventWindow->Anchor(index).position
-			= fMouseEventWindow->Frame().LeftTop();
+		movedWindow->Anchor(index).position = movedWindow->Frame().LeftTop();
 	}
 
 	// build region of windows that are no longer visible in the new workspace
@@ -3197,7 +3206,7 @@ Desktop::_SetWorkspace(int32 index)
 
 	_UpdateFronts(false);
 	_UpdateFloating(previousIndex, index,
-		movedMouseEventWindow ? fMouseEventWindow : NULL);
+		movedMouseEventWindow ? movedWindow : NULL);
 
 	BRegion stillAvailableOnScreen;
 	_RebuildClippingForAllWindows(stillAvailableOnScreen);
@@ -3215,9 +3224,9 @@ Desktop::_SetWorkspace(int32 index)
 		}
 
 		if (window->InWorkspace(previousIndex) || window->IsHidden()
-			|| (window == fMouseEventWindow && fMouseEventWindow->IsNormal())
+			|| (window == movedWindow && movedWindow->IsNormal())
 			|| (!window->IsNormal()
-				&& window->HasInSubset(fMouseEventWindow))) {
+				&& window->HasInSubset(movedWindow))) {
 			// This window was visible before, and is already handled in the
 			// above loop
 			continue;

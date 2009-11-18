@@ -146,8 +146,10 @@ public:
 
 	// Workspace methods
 
-			void				SetWorkspaceAsync(int32 index);
-			void				SetWorkspace(int32 index);
+			void				SetWorkspaceAsync(int32 index,
+									bool moveFocusWindow = false);
+			void				SetWorkspace(int32 index,
+									bool moveFocusWindow = false);
 			int32				CurrentWorkspace()
 									{ return fCurrentWorkspace; }
 			Workspace::Private&	WorkspaceAt(int32 index)
@@ -292,7 +294,8 @@ private:
 
 			void				_ScreenChanged(Screen* screen);
 			void				_SetCurrentWorkspaceConfiguration();
-			void				_SetWorkspace(int32 index);
+			void				_SetWorkspace(int32 index,
+									bool moveFocusWindow = false);
 
 private:
 	friend class DesktopSettings;
