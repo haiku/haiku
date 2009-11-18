@@ -331,10 +331,8 @@ TExpandoMenuBar::MouseDown(BPoint where)
 	if (message != NULL && message->FindInt32("clicks", &clicks) == B_OK
 		&& clicks > 1) {
 		if (item == menuItem && item == fLastClickItem) {
-			// bring this team's window to the front
-			BMessage showMessage(kBringTeamToFront);
-			showMessage.AddInt32("itemIndex", IndexOf(item));
-			Window()->PostMessage(&showMessage, this);
+			// activate this team
+			be_roster->ActivateApp((team_id)item->Teams()->ItemAt(0));
 			return;
 		}
 	} else
