@@ -64,6 +64,32 @@ MainApp::MainApp()
 {
 	mpSettings settings = Settings::CurrentSettings();
 	fLastFilePanelFolder = settings.filePanelFolder;
+
+	// Now tell the application roster, that we're interested
+	// in getting notifications of apps being launched or quit.
+	// In this way we are going to detect a media_server restart.
+	be_roster->StartWatching(BMessenger(this, this),
+		B_REQUEST_LAUNCHED | B_REQUEST_QUIT);
+	// we will keep track of the status of media_server
+	// and media_addon_server
+	fMediaServerRunning = be_roster->IsRunning(kMediaServerSig);
+	fMediaAddOnServerRunning = be_roster->IsRunning(kMediaServerAddOnSig);
+
+	if (!fMediaServerRunning || !fMediaAddOnServerRunning) {
+		BAlert* alert = new BAlert("start_media_server",
+			"It appears the Media Server is not running.\n"
+			"Would you like to start it ?", "Quit", "Start Media Server", NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (alert->Go() == 0) {
+			PostMessage(B_QUIT_REQUESTED);
+			return;
+		}
+
+		launch_media_server();
+
+		fMediaServerRunning = be_roster->IsRunning(kMediaServerSig);
+		fMediaAddOnServerRunning = be_roster->IsRunning(kMediaServerAddOnSig);
+	}
 }
 
 
@@ -116,32 +142,7 @@ MainApp::PlayerCount() const
 void
 MainApp::ReadyToRun()
 {
-	// Now tell the application roster, that we're interested
-	// in getting notifications of apps being launched or quit.
-	// In this way we are going to detect a media_server restart.
-	be_roster->StartWatching(BMessenger(this, this),
-		B_REQUEST_LAUNCHED | B_REQUEST_QUIT);
-	// we will keep track of the status of media_server
-	// and media_addon_server
-	fMediaServerRunning = be_roster->IsRunning(kMediaServerSig);
-	fMediaAddOnServerRunning = be_roster->IsRunning(kMediaServerAddOnSig);
-
-	if (!fMediaServerRunning || !fMediaAddOnServerRunning) {
-		BAlert* alert = new BAlert("start_media_server",
-			"It appears the Media Server is not running.\n"
-			"Would you like to start it ?", "Quit", "Start Media Server", NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		if (alert->Go() == 0) {
-			PostMessage(B_QUIT_REQUESTED);
-			return;
-		}
-
-		launch_media_server();
-
-		fMediaServerRunning = be_roster->IsRunning(kMediaServerSig);
-		fMediaAddOnServerRunning = be_roster->IsRunning(kMediaServerAddOnSig);
-	}
-
+printf("MainApp::ReadyToRun()\n");
 	// make sure we have at least one window open
 	if (fPlayerCount == 0) {
 		MainWin* window = NewWindow();
@@ -150,10 +151,11 @@ MainApp::ReadyToRun()
 			return;
 		}
 		BMessage lastPlaylistArchive;
-		if (_RestoreCurrentPlaylist(&lastPlaylistArchive) == B_OK)
-			window->OpenPlaylist(&lastPlaylistArchive);
-
-		window->Show();
+		if (_RestoreCurrentPlaylist(&lastPlaylistArchive) == B_OK) {
+			lastPlaylistArchive.what = M_OPEN_PREVIOUS_PLAYLIST;
+			window->PostMessage(&lastPlaylistArchive);
+		} else
+			window->Show();
 	}
 
 	// setup the settings window now, we need to have it

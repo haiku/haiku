@@ -218,6 +218,9 @@ MainWin::MainWin(bool isFirstWindow)
 	AddShortcut('y', B_COMMAND_KEY, new BMessage(B_UNDO));
 	AddShortcut('z', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(B_REDO));
 	AddShortcut('y', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(B_REDO));
+
+	Hide();
+	Show();
 }
 
 
@@ -383,6 +386,9 @@ MainWin::MessageReceived(BMessage* msg)
 				}
 				_RefsReceived(msg);
 			}
+			break;
+		case M_OPEN_PREVIOUS_PLAYLIST:
+			OpenPlaylist(msg);
 			break;
 
 		case B_UNDO:
@@ -765,6 +771,9 @@ MainWin::OpenPlaylist(const BMessage* playlistArchive)
 	playlistLocker.Unlock();
 
 	playlistArchive->FindInt64("position", (int64*)&fInitialSeekPosition);
+
+	if (IsHidden())
+		Show();
 }
 
 
@@ -1305,9 +1314,9 @@ MainWin::_ResizeWindow(int percent, bool useNoVideoWidth, bool stayOnScreen)
 				else if (frame.right > screenFrame.right)
 					offsetX = (int)(screenFrame.right - frame.right);
 				if (frame.top < screenFrame.top)
-					offsetX = (int)(screenFrame.top - frame.top);
+					offsetY = (int)(screenFrame.top - frame.top);
 				else if (frame.bottom > screenFrame.bottom)
-					offsetX = (int)(screenFrame.bottom - frame.bottom);
+					offsetY = (int)(screenFrame.bottom - frame.bottom);
 				MoveBy(offsetX, offsetY);
 			}
 		}

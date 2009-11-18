@@ -46,7 +46,9 @@ enum  {
 	M_SAVE_PANEL_RESULT			= 'sprs',
 
 	M_MEDIA_SERVER_STARTED		= 'msst',
-	M_MEDIA_SERVER_QUIT			= 'msqt'
+	M_MEDIA_SERVER_QUIT			= 'msqt',
+
+	M_OPEN_PREVIOUS_PLAYLIST	= 'oppp'
 };
 
 
