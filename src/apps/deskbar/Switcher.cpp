@@ -1190,12 +1190,12 @@ TSwitchManager::SwitchWindow(team_id team, bool, bool activate)
 		client_window_info* windowInfo = get_window_info(tokens[i]);
 		if (windowInfo && IsVisibleInCurrentWorkspace(windowInfo)
 			&& teamGroup->TeamList()->HasItem((void*)windowInfo->team)) {
-				fWindowID = windowInfo->server_token;
-				if (activate)
-					ActivateWindow(windowInfo->server_token);
+			fWindowID = windowInfo->server_token;
+			if (activate)
+				ActivateWindow(windowInfo->server_token);
 
-				free(windowInfo);
-				break;
+			free(windowInfo);
+			break;
 		}
 		free(windowInfo);
 	}
@@ -1243,11 +1243,12 @@ TSwitchManager::GroupList()
 
 
 TBox::TBox(BRect bounds, TSwitchManager* manager, TSwitcherWindow* window,
-		TIconView* iview)
-	: BBox(bounds, "top", B_FOLLOW_NONE, B_WILL_DRAW, B_NO_BORDER),
+		TIconView* iconView)
+	:
+	BBox(bounds, "top", B_FOLLOW_NONE, B_WILL_DRAW, B_NO_BORDER),
 	fManager(manager),
 	fWindow(window),
-	fIconView(iview),
+	fIconView(iconView),
 	fLeftScroller(false),
 	fRightScroller(false)
 {
