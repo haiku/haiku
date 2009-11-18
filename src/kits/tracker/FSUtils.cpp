@@ -108,20 +108,23 @@ status_t DuplicateTask(BObjectList<entry_ref> *srcList);
 static status_t MoveTask(BObjectList<entry_ref> *, BEntry *, BList *, uint32);
 static status_t _DeleteTask(BObjectList<entry_ref> *, bool);
 static status_t _RestoreTask(BObjectList<entry_ref> *);
-status_t CalcItemsAndSize(BObjectList<entry_ref> *refList, int32 *totalCount, off_t *totalSize);
+status_t CalcItemsAndSize(BObjectList<entry_ref> *refList, size_t blockSize,
+	int32 *totalCount, off_t *totalSize);
 status_t MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc,
 	uint32 moveMode, const char *newName, Undo &undo);
-ConflictCheckResult PreFlightNameCheck(BObjectList<entry_ref> *srcList, const BDirectory *destDir,
-	int32 *collisionCount, uint32 moveMode);
-status_t CheckName(uint32 moveMode, const BEntry *srcEntry, const BDirectory *destDir,
-	bool multipleCollisions, ConflictCheckResult &);
+ConflictCheckResult PreFlightNameCheck(BObjectList<entry_ref> *srcList,
+	const BDirectory *destDir, int32 *collisionCount, uint32 moveMode);
+status_t CheckName(uint32 moveMode, const BEntry *srcEntry,
+	const BDirectory *destDir, bool multipleCollisions, ConflictCheckResult &);
 void CopyAttributes(CopyLoopControl *control, BNode *srcNode, BNode* destNode, void *buffer,
 	size_t bufsize);
 void CopyPoseLocation(BNode *src, BNode *dest);
 bool DirectoryMatchesOrContains(const BEntry *, directory_which);
-bool DirectoryMatchesOrContains(const BEntry *, const char *additionalPath, directory_which);
+bool DirectoryMatchesOrContains(const BEntry *, const char *additionalPath,
+	directory_which);
 bool DirectoryMatches(const BEntry *, directory_which);
-bool DirectoryMatches(const BEntry *, const char *additionalPath, directory_which);
+bool DirectoryMatches(const BEntry *, const char *additionalPath,
+	directory_which);
 
 status_t empty_trash(void *);
 
@@ -566,8 +569,8 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 	int32 numItems = srcList->CountItems();
 	int32 askOnceOnly = kNotConfirmed;
 	for (int32 index = 0; index < numItems; index++) {
-		// we could check for this while iterating through items in each of the copy
-		// loops, except it takes forever to call CalcItemsAndSize
+		// we could check for this while iterating through items in each of
+		// the copy loops, except it takes forever to call CalcItemsAndSize
 		BEntry entry((entry_ref *)srcList->ItemAt(index));
 		if (IsDisksWindowIcon(&entry)) {
 
@@ -606,15 +609,19 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 		case kDuplicateSelection:
 		case kMoveSelectionTo:
 			{
-				if (gStatusWindow)
+				if (gStatusWindow) {
 					gStatusWindow->CreateStatusItem(thread,
-						moveMode == kMoveSelectionTo ? kMoveState : kCopyState);
+						moveMode == kMoveSelectionTo ? kMoveState
+							: kCopyState);
+				}
 
 				int32 totalItems = 0;
 				off_t totalSize = 0;
 				if (needSizeCalculation) {
-					if (CalcItemsAndSize(srcList, &totalItems, &totalSize) != B_OK)
+					if (CalcItemsAndSize(srcList, dstVol->BlockSize(),
+						&totalItems, &totalSize) != B_OK) {
 						return B_ERROR;
+					}
 
 					// check for free space before starting copy
 					if ((totalSize + (4 * kKBSize)) >= dstVol->FreeBytes()) {
@@ -626,9 +633,10 @@ InitCopy(uint32 moveMode, BObjectList<entry_ref> *srcList, thread_id thread,
 					}
 				}
 
-				if (gStatusWindow)
-					gStatusWindow->InitStatusItem(thread, totalItems, totalSize,
-						destRef);
+				if (gStatusWindow) {
+					gStatusWindow->InitStatusItem(thread, totalItems,
+						totalSize, destRef);
+				}
 				break;
 			}
 
@@ -2118,10 +2126,33 @@ FSRecursiveCalcSize(BInfoWindow *wind, BDirectory *dir, off_t *running_size,
 
 
 status_t
-CalcItemsAndSize(BObjectList<entry_ref> *refList, int32 *totalCount, off_t *totalSize)
+CalcItemsAndSize(BObjectList<entry_ref> *refList, size_t blockSize,
+	int32 *totalCount, off_t *totalSize)
 {
 	int32 fileCount = 0;
 	int32 dirCount = 0;
+
+	// check block size for sanity
+	if (blockSize < 0) {
+		// This would point at an error to retrieve the block size from
+		// the target volume. The code below cannot be used, it is only
+		// meant to get the block size when item operations happen on
+		// the source volume.
+		blockSize = 2048;
+	} else if (blockSize < 1024) {
+		blockSize = 1024;
+		if (entry_ref* ref = refList->ItemAt(0)) {
+			// TODO: This assumes all entries in the list share the same
+			// volume...
+			BVolume volume(ref->device);
+			if (volume.InitCheck() == B_OK)
+				blockSize = volume.BlockSize();
+		}
+	}
+	// File systems like ReiserFS may advertize a large block size, but
+	// stuff is still packed into blocks, so clamp maximum block size.
+	if (blockSize > 8192)
+		blockSize = 8192;
 
 	thread_id tid = find_thread(NULL);
 
@@ -2138,14 +2169,15 @@ CalcItemsAndSize(BObjectList<entry_ref> *refList, int32 *totalCount, off_t *tota
 		if (S_ISDIR(statbuf.st_mode)) {
 			BDirectory dir(&entry);
 			dirCount++;
-			(*totalSize) += 1024;
+			(*totalSize) += blockSize;
 			status_t result;
-			if ((result = FSRecursiveCalcSize(NULL, &dir, totalSize, &fileCount,
-				&dirCount)) != B_OK)
+			if ((result = FSRecursiveCalcSize(NULL, &dir, totalSize,
+				&fileCount, &dirCount)) != B_OK) {
 				return result;
+			}
 		} else {
 			fileCount++;
-			(*totalSize) += statbuf.st_size + 1024;
+			(*totalSize) += statbuf.st_size + blockSize;
 		}
 	}
 
@@ -2471,7 +2503,8 @@ empty_trash(void *)
 		entry_ref ref;
 		entry.GetRef(&ref);
 		srcList.AddItem(&ref);
-		err = CalcItemsAndSize(&srcList, &totalCount, &totalSize);
+		err = CalcItemsAndSize(&srcList, volume.BlockSize(), &totalCount,
+			&totalSize);
 		if (err != B_OK)
 			break;
 
@@ -2560,7 +2593,7 @@ _DeleteTask(BObjectList<entry_ref> *list, bool confirm)
 	int32 totalItems = 0;
 	int64 totalSize = 0;
 
-	status_t err = CalcItemsAndSize(list, &totalItems, &totalSize);
+	status_t err = CalcItemsAndSize(list, 0, &totalItems, &totalSize);
 	if (err == B_OK) {
 		if (gStatusWindow)
 			gStatusWindow->InitStatusItem(thread, totalItems, totalItems);
@@ -2630,7 +2663,7 @@ _RestoreTask(BObjectList<entry_ref> *list)
 	int32 totalItems = 0;
 	int64 totalSize = 0;
 
-	status_t err = CalcItemsAndSize(list, &totalItems, &totalSize);
+	status_t err = CalcItemsAndSize(list, 0, &totalItems, &totalSize);
 	if (err == B_OK) {
 		if (gStatusWindow)
 			gStatusWindow->InitStatusItem(thread, totalItems, totalItems);
