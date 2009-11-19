@@ -75,7 +75,8 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space, uint32 flags,
 	fBytesPerRow(0),
 	fSpace(space),
 	fFlags(flags),
-	fOwner(NULL)
+	fOwner(NULL),
+	fHasClientReference(true)
 	// fToken is initialized (if used) by the BitmapManager
 {
 	int32 minBytesPerRow = get_bytes_per_row(space, fWidth);
@@ -91,7 +92,8 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bitmap)
 	fAllocationCookie(NULL),
 	fOverlay(NULL),
 	fBuffer(NULL),
-	fReferenceCount(1)
+	fReferenceCount(1),
+	fHasClientReference(false)
 {
 	if (bitmap) {
 		fWidth = bitmap->fWidth;
@@ -217,6 +219,18 @@ ServerApp*
 ServerBitmap::Owner() const
 {
 	return fOwner;
+}
+
+
+bool
+ServerBitmap::ReleaseClientReference()
+{
+	if (!fHasClientReference)
+		return false;
+
+	fHasClientReference = false;
+	ReleaseReference();
+	return true;
 }
 
 

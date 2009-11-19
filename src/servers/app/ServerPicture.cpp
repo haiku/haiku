@@ -784,7 +784,8 @@ ServerPicture::ServerPicture()
 	fFile(NULL),
 	fPictures(NULL),
 	fUsurped(NULL),
-	fOwner(NULL)
+	fOwner(NULL),
+	fHasClientReference(true)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 	fData = new(std::nothrow) BMallocIO();
@@ -799,7 +800,8 @@ ServerPicture::ServerPicture(const ServerPicture& picture)
 	fData(NULL),
 	fPictures(NULL),
 	fUsurped(NULL),
-	fOwner(NULL)
+	fOwner(NULL),
+	fHasClientReference(false)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
@@ -826,7 +828,8 @@ ServerPicture::ServerPicture(const char* fileName, int32 offset)
 	fData(NULL),
 	fPictures(NULL),
 	fUsurped(NULL),
-	fOwner(NULL)
+	fOwner(NULL),
+	fHasClientReference(true)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
@@ -874,6 +877,18 @@ ServerPicture::SetOwner(ServerApp* owner)
 	}
 
 	return false;
+}
+
+
+bool
+ServerPicture::ReleaseClientReference()
+{
+	if (!fHasClientReference)
+		return false;
+
+	fHasClientReference = false;
+	ReleaseReference();
+	return true;
 }
 
 

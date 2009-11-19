@@ -72,6 +72,8 @@ public:
 			bool			SetOwner(ServerApp* owner);
 			ServerApp*		Owner() const;
 
+			bool			ReleaseClientReference();
+
 	//! Does a shallow copy of the bitmap passed to it
 	inline	void			ShallowCopy(const ServerBitmap *from);
 
@@ -112,6 +114,7 @@ protected:
 
 			ServerApp*		fOwner;
 			int32			fToken;
+			bool			fHasClientReference;
 };
 
 class UtilityBitmap : public ServerBitmap {

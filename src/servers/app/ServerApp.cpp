@@ -784,7 +784,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", Signature(),
 					token));
 
-				bitmap->ReleaseReference();
+				bitmap->ReleaseClientReference();
 			}
 
 			fMapLocker.Unlock();
@@ -872,7 +872,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 				ServerPicture* picture = _FindPicture(token);
 				if (picture != NULL)
-					picture->ReleaseReference();
+					picture->ReleaseClientReference();
 			}
 			break;
 		}

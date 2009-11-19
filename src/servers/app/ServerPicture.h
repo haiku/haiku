@@ -39,6 +39,8 @@ public:
 			int32				Token() { return fToken; }
 			bool				SetOwner(ServerApp* owner);
 
+			bool				ReleaseClientReference();
+
 			void				EnterStateChange();
 			void				ExitStateChange();
 
@@ -69,6 +71,7 @@ private:
 			PictureList*		fPictures;
 			ServerPicture*		fUsurped;
 			ServerApp*			fOwner;
+			bool				fHasClientReference;
 };
 
 #endif	// SERVER_PICTURE_H
