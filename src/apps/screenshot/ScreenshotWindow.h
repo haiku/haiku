@@ -56,7 +56,7 @@ private:
 								BString& label, int32 index, bool markItem);
 
 			void			_UpdatePreviewPanel();
-	const	char*			_FindValidFileName(const char* name);
+			BString			_FindValidFileName(const char* name);
 			int32			_PathIndexInMenu(const BString& path) const;
 
 			BMessage		_ReadSettings() const;

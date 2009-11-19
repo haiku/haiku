@@ -169,7 +169,7 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 		case kImageOutputFormat:
 			message->FindInt32("be:type", &fImageFileType);
 			message->FindInt32("be:translator", &fTranslator);
-			fNameControl->SetText(_FindValidFileName(fNameControl->Text()));
+			fNameControl->SetText(_FindValidFileName(fNameControl->Text()).String());
 			break;
 		
 		case kLocationChanged:
@@ -178,7 +178,7 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			if (message->FindPointer("source", &source) == B_OK)
 				fLastSelectedPath = static_cast<BMenuItem*> (source);
 
-			fNameControl->SetText(_FindValidFileName(fNameControl->Text()));
+			fNameControl->SetText(_FindValidFileName(fNameControl->Text()).String());
 			break;
 		}
 		
@@ -377,7 +377,7 @@ ScreenshotWindow::_SetupSecondLayoutItem(BCardLayout* layout)
 	_SetupOutputPathMenu(new BMenu("Please select"), settings);
 	BMenuField* menuField2 = new BMenuField("Save in:", fOutputPathMenu);
 	
-	fNameControl->SetText(_FindValidFileName("screenshot1"));
+	fNameControl->SetText(_FindValidFileName("screenshot1").String());
 
 	_SetupTranslatorMenu(new BMenu("Please select"), settings);
 	BMenuField* menuField = new BMenuField("Save as:", fTranslatorMenu);
@@ -557,7 +557,7 @@ ScreenshotWindow::_UpdatePreviewPanel()
 }
 
 
-const char*
+BString
 ScreenshotWindow::_FindValidFileName(const char* name)
 {
 	BString baseName(name);
@@ -616,7 +616,7 @@ ScreenshotWindow::_FindValidFileName(const char* name)
 		entry.SetTo(outputPath.Path());
 	} while (entry.Exists());
 
-	return BString(filename).String();
+	return BString(filename);
 }
 
 
@@ -772,7 +772,7 @@ ScreenshotWindow::_SaveScreenshot()
 		return B_ERROR;
 
 	if (fSaveScreenshotSilent)	
-		path.Append(_FindValidFileName("screenshot1"));
+		path.Append(_FindValidFileName("screenshot1").String());
 	else
 		path.Append(fNameControl->Text());
 	
