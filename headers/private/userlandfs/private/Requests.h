@@ -234,6 +234,10 @@ enum {
 	// I/O
 	DO_ITERATIVE_FD_IO_REQUEST,
 	DO_ITERATIVE_FD_IO_REPLY,
+	READ_FROM_IO_REQUEST_REQUEST,
+	READ_FROM_IO_REQUEST_REPLY,
+	WRITE_TO_IO_REQUEST_REQUEST,
+	WRITE_TO_IO_REQUEST_REPLY,
 	NOTIFY_IO_REQUEST_REQUEST,
 	NOTIFY_IO_REQUEST_REPLY,
 
@@ -340,6 +344,14 @@ public:
 
 	dev_t		nsid;
 	ino_t		vnid;
+};
+
+class IORequestRequest : public Request {
+public:
+	IORequestRequest(uint32 type) : Request(type) {}
+
+	dev_t		nsid;
+	int32		request;
 };
 
 
@@ -1831,15 +1843,46 @@ public:
 	DoIterativeFDIOReply() : ReplyRequest(DO_ITERATIVE_FD_IO_REPLY) {}
 };
 
-// NotifyIORequestRequest
-class NotifyIORequestRequest : public Request {
+// ReadFromIORequestRequest
+class ReadFromIORequestRequest : public IORequestRequest {
 public:
-	NotifyIORequestRequest() : Request(NOTIFY_IO_REQUEST_REQUEST) {}
+	ReadFromIORequestRequest()
+		: IORequestRequest(READ_FROM_IO_REQUEST_REQUEST) {}
+
+	size_t		size;
+};
+
+// ReadFromIORequestReply
+class ReadFromIORequestReply : public ReplyRequest {
+public:
+	ReadFromIORequestReply() : ReplyRequest(READ_FROM_IO_REQUEST_REPLY) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	Address		buffer;
+};
+
+// WriteToIORequestRequest
+class WriteToIORequestRequest : public IORequestRequest {
+public:
+	WriteToIORequestRequest() : IORequestRequest(WRITE_TO_IO_REQUEST_REQUEST) {}
+	status_t GetAddressInfos(AddressInfo* infos, int32* count);
+
+	Address		buffer;
+};
+
+// WriteToIORequestReply
+class WriteToIORequestReply : public ReplyRequest {
+public:
+	WriteToIORequestReply() : ReplyRequest(WRITE_TO_IO_REQUEST_REPLY) {}
+};
+
+// NotifyIORequestRequest
+class NotifyIORequestRequest : public IORequestRequest {
+public:
+	NotifyIORequestRequest() : IORequestRequest(NOTIFY_IO_REQUEST_REQUEST) {}
 
 	enum { MAX_VECS = 8 };
 
-	dev_t		nsid;
-	int32		request;
 	status_t	status;
 };
 
@@ -2248,6 +2291,14 @@ do_for_request(Request* request, Task& task)
 			return task((DoIterativeFDIORequest*)request);
 		case DO_ITERATIVE_FD_IO_REPLY:
 			return task((DoIterativeFDIOReply*)request);
+		case READ_FROM_IO_REQUEST_REQUEST:
+			return task((ReadFromIORequestRequest*)request);
+		case READ_FROM_IO_REQUEST_REPLY:
+			return task((ReadFromIORequestReply*)request);
+		case WRITE_TO_IO_REQUEST_REQUEST:
+			return task((WriteToIORequestRequest*)request);
+		case WRITE_TO_IO_REQUEST_REPLY:
+			return task((WriteToIORequestReply*)request);
 		case NOTIFY_IO_REQUEST_REQUEST:
 			return task((NotifyIORequestRequest*)request);
 		case NOTIFY_IO_REQUEST_REPLY:
@@ -2475,6 +2526,10 @@ using UserlandFSUtil::FileCacheWriteReply;
 // I/O
 using UserlandFSUtil::DoIterativeFDIORequest;
 using UserlandFSUtil::DoIterativeFDIOReply;
+using UserlandFSUtil::ReadFromIORequestRequest;
+using UserlandFSUtil::ReadFromIORequestReply;
+using UserlandFSUtil::WriteToIORequestRequest;
+using UserlandFSUtil::WriteToIORequestReply;
 using UserlandFSUtil::NotifyIORequestRequest;
 using UserlandFSUtil::NotifyIORequestReply;
 // general reply
