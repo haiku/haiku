@@ -1415,24 +1415,12 @@ GenericAttributeText::FitValue(BString *result, const BPoseView *view)
 			break;
 
 		case B_FLOAT_TYPE:
-			if (fabs(fValue.floatt) >= 10000
-				|| fabs(fValue.floatt) < 0.01)
-			// The %f conversion can possibly overflow 'buffer' if the value is
-			// too big, since it doesn't print in exponent form. Ever.
-				sprintf(buffer, "%.3e", fValue.floatt);
-			else
-				sprintf(buffer, "%.3f", fValue.floatt);
+			snprintf(buffer, sizeof(buffer), "%g", fValue.floatt);
 			fFullValueText = buffer;
 			break;
 
 		case B_DOUBLE_TYPE:
-			if (fabs(fValue.doublet) >= 10000
-				|| fabs(fValue.doublet) < 0.01)
-			// The %f conversion can possibly overflow 'buffer' if the value is
-			// too big, since it doesn't print in exponent form. Ever.
-				sprintf(buffer, "%.3e", fValue.doublet);
-			else
-				sprintf(buffer, "%.3f", fValue.doublet);
+			snprintf(buffer, sizeof(buffer), "%g", fValue.doublet);
 			fFullValueText = buffer;
 			break;
 
