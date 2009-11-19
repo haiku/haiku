@@ -667,13 +667,11 @@ Controller::SetPosition(float value)
 void
 Controller::SetFramePosition(int32 value)
 {
-printf("Controller::SetFramePosition(%ld)\n", value);
 	BAutolock _(this);
 
 	int32 seekFrame = max_c(0, min_c(Duration(), value));
 	int32 currentFrame = CurrentFrame();
 	if (seekFrame != currentFrame) {
-printf("  adjusted seek frame\n");
 		fSeekFrame = seekFrame;
 		fSeekRequested = true;
 		SetCurrentFrame(seekFrame);
