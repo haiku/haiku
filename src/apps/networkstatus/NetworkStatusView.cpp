@@ -511,7 +511,7 @@ void
 NetworkStatusView::_OpenNetworksPreferences()
 {
 	status_t status = be_roster->Launch("application/x-vnd.Haiku-Network");
-	if (status < B_OK) {
+	if (status != B_OK && status != B_ALREADY_RUNNING) {
 		BString errorMessage("Launching the Network preflet failed.\n\n"
 			"Error: ");
 		errorMessage << strerror(status);
