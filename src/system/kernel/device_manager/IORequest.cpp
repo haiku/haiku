@@ -120,8 +120,8 @@ IOBuffer::SetVecs(size_t firstVecOffset, const iovec* vecs, uint32 count,
 
 	fVecCount = count;
 	fLength = length;
-	fUser = IS_USER_ADDRESS(vecs[0].iov_base);
 	fPhysical = (flags & B_PHYSICAL_IO_REQUEST) != 0;
+	fUser = !fPhysical && IS_USER_ADDRESS(vecs[0].iov_base);
 }
 
 
