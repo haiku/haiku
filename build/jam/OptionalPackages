@@ -252,8 +252,8 @@ if [ IsOptionalHaikuImagePackageAdded CMake ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package CMake available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage cmake-2.8.0-rc3-x86-gcc2-2009-10-27
-			: $(baseURL)/cmake-2.8.0-rc3-x86-gcc2-2009-10-27.zip
+		InstallOptionalHaikuImagePackage cmake-2.8.0-x86-gcc2-2009-11-15
+			: $(baseURL)/cmake-2.8.0-x86-gcc2-2009-11-15.zip
 			:
 			: true
 		;
@@ -300,8 +300,8 @@ if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 		: $(baseURL)/automake-1.11-r1a1-x86-gcc2-2009-08-27.zip
 		:
 		: true ;
-	InstallOptionalHaikuImagePackage libtool-2.2.6a-r1a1-x86-gcc2-2009-08-28
-		: $(baseURL)/libtool-2.2.6a-r1a1-x86-gcc2-2009-08-28.zip
+	InstallOptionalHaikuImagePackage libtool-2.2.6b-x86-gcc2-2009-11-18
+		: $(baseURL)/libtool-2.2.6b-x86-gcc2-2009-11-18.zip
 		:
 		: true ;
 	InstallOptionalHaikuImagePackage texinfo-4.13a-r1a1-x86-gcc2-2009-08-30
