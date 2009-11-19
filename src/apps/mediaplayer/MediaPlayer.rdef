@@ -16,6 +16,7 @@ resource app_flags B_SINGLE_LAUNCH;
 resource file_types message {
 	"types" = "application/ogg",
 	"types" = "application/x-ogg",
+	"types" = "application/x-asf",
 	"types" = "audio",
 	"types" = "audio/32kadpcm",
 	"types" = "audio/aac",
