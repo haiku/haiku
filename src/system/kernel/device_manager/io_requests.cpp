@@ -13,22 +13,24 @@
 
 static status_t
 transfer_io_request_data(io_request* request, void* buffer, size_t size,
-	bool isWrite)
+	bool writeToRequest)
 {
-	if (isWrite != request->IsWrite() || request->RemainingBytes() < size)
+	if (writeToRequest == request->IsWrite()
+		|| request->RemainingBytes() < size) {
 		return B_BAD_VALUE;
+	}
 
 	// lock the request buffer memory, if it is user memory
 	IOBuffer* ioBuffer = request->Buffer();
 	if (ioBuffer->IsUser() && !ioBuffer->IsMemoryLocked()) {
-		status_t error = ioBuffer->LockMemory(request->Team(), isWrite);
+		status_t error = ioBuffer->LockMemory(request->Team(), !writeToRequest);
 		if (error != B_OK)
 			return error;
 	}
 
 	// read/write
 	off_t offset = request->Offset() + request->TransferredBytes();
-	status_t error = isWrite
+	status_t error = writeToRequest
 		? request->CopyData(buffer, offset, size)
 		: request->CopyData(offset, buffer, size);
 	if (error != B_OK)
