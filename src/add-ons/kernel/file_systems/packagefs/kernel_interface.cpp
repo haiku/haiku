@@ -14,6 +14,7 @@
 #include <fs_info.h>
 #include <fs_interface.h>
 #include <KernelExport.h>
+#include <io_requests.h>
 
 #include <AutoDeleter.h>
 
@@ -249,13 +250,24 @@ packagefs_put_vnode(fs_volume* fsVolume, fs_vnode* fsNode, bool reenter)
 // #pragma mark - Request I/O
 
 
-#if 0
 static status_t
-packagefs_io(fs_volume* volume, fs_vnode* vnode, void* cookie,
+packagefs_io(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	io_request* request)
 {
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)fsNode->private_node;
+
+	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, request: %p\n", volume,
+		node, node->ID(), cookie, request);
+	TOUCH(volume);
+
+	if (io_request_is_write(request))
+		RETURN_ERROR(B_READ_ONLY_DEVICE);
+
+	status_t error = node->Read(request);
+	notify_io_request(request, error);
+	return error;
 }
-#endif
 
 
 // #pragma mark - Nodes
@@ -517,6 +529,7 @@ packagefs_open_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 	Node* node = (Node*)fsNode->private_node;
 
 	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	TOUCH(volume);
 
 	if (!S_ISDIR(node->Mode()))
 		return B_NOT_A_DIRECTORY;
@@ -702,6 +715,7 @@ packagefs_open_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 	Node* node = (Node*)fsNode->private_node;
 
 	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	TOUCH(volume);
 
 	status_t error = check_access(node, R_OK);
 	if (error != B_OK)
@@ -1087,7 +1101,7 @@ fs_vnode_ops gPackageFSVnodeOps = {
 	NULL,	// read_pages,
 	NULL,	// write_pages,
 
-	NULL,	// &packagefs_io,
+	&packagefs_io,
 	NULL,	// cancel_io()
 
 	NULL,	// get_file_map,

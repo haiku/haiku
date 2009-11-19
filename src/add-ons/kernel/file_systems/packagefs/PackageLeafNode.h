@@ -8,6 +8,8 @@
 
 #include "PackageNode.h"
 
+#include <io_requests.h>
+
 
 class PackageData;
 
@@ -21,6 +23,7 @@ public:
 
 	virtual	status_t			Read(off_t offset, void* buffer,
 									size_t* bufferSize);
+	virtual	status_t			Read(io_request* request);
 
 public:
 			SinglyLinkedListLink<PackageLeafNode> fListLink;

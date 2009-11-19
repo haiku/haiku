@@ -125,6 +125,13 @@ Directory::Read(off_t offset, void* buffer, size_t* bufferSize)
 }
 
 
+status_t
+Directory::Read(io_request* request)
+{
+	return B_IS_A_DIRECTORY;
+}
+
+
 void
 Directory::AddChild(Node* node)
 {

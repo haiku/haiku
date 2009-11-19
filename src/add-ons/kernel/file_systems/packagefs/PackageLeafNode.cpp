@@ -31,3 +31,10 @@ PackageLeafNode::Read(off_t offset, void* buffer, size_t* bufferSize)
 {
 	return EBADF;
 }
+
+
+status_t
+PackageLeafNode::Read(io_request* request)
+{
+	return EBADF;
+}

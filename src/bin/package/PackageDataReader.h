@@ -10,6 +10,7 @@
 
 
 class BufferCache;
+class DataOutput;
 class PackageData;
 
 
@@ -19,6 +20,11 @@ public:
 	virtual						~PackageDataReader();
 
 	virtual	status_t			Init(const PackageData& data) = 0;
+
+	virtual	status_t			ReadData(off_t offset, void* buffer,
+									size_t size);
+	virtual	status_t			ReadDataToOutput(off_t offset, size_t size,
+									DataOutput* output) = 0;
 
 	virtual	uint64				Size() const = 0;
 	virtual	size_t				BlockSize() const = 0;

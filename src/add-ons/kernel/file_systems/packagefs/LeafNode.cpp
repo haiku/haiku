@@ -118,6 +118,15 @@ LeafNode::Read(off_t offset, void* buffer, size_t* bufferSize)
 }
 
 
+status_t
+LeafNode::Read(io_request* request)
+{
+	if (PackageLeafNode* packageNode = fPackageNodes.Head())
+		return packageNode->Read(request);
+	return EBADF;
+}
+
+
 const char*
 LeafNode::SymlinkPath() const
 {

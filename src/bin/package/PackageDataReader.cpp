@@ -14,6 +14,7 @@
 #include <haiku_package.h>
 
 #include "BufferCache.h"
+#include "DataOutput.h"
 #include "PackageData.h"
 #include "ZlibDecompressor.h"
 
@@ -24,6 +25,9 @@ static const size_t kMaxSaneZlibChunkSize = 10 * 1024 * 1024;
 
 // maximum number of entries in the zlib offset table buffer
 static const uint32 kMaxZlibOffsetTableBufferSize = 512;
+
+static const size_t kUncompressedReaderBufferSize
+	= B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB;
 
 
 // #pragma mark - PackageDataReader
@@ -41,14 +45,24 @@ PackageDataReader::~PackageDataReader()
 }
 
 
+status_t
+PackageDataReader::ReadData(off_t offset, void* buffer, size_t size)
+{
+	BufferDataOutput output(buffer, size);
+	return ReadDataToOutput(offset, size, &output);
+}
+
+
 // #pragma mark - UncompressedPackageDataReader
 
 
 class UncompressedPackageDataReader : public PackageDataReader {
 public:
-	UncompressedPackageDataReader(DataReader* dataReader)
+	UncompressedPackageDataReader(DataReader* dataReader,
+		BufferCache* bufferCache)
 		:
-		PackageDataReader(dataReader)
+		PackageDataReader(dataReader),
+		fBufferCache(bufferCache)
 	{
 	}
 
@@ -84,9 +98,49 @@ public:
 		return fDataReader->ReadData(fOffset + offset, buffer, size);
 	}
 
+	virtual status_t ReadDataToOutput(off_t offset, size_t size,
+		DataOutput* output)
+	{
+		if (size == 0)
+			return B_OK;
+
+		if (offset < 0)
+			return B_BAD_VALUE;
+
+		if ((uint64)offset > fSize || size > fSize - offset)
+			return B_BAD_VALUE;
+
+		// get a temporary buffer
+		CachedBuffer* buffer = fBufferCache->GetBuffer(
+			kUncompressedReaderBufferSize);
+		if (buffer == NULL)
+			return B_NO_MEMORY;
+		CachedBufferPutter bufferPutter(fBufferCache, &buffer);
+
+		while (size > 0) {
+			// read into the buffer
+			size_t toRead = std::min(size, buffer->Size());
+			status_t error = fDataReader->ReadData(fOffset + offset,
+				buffer->Buffer(), toRead);
+			if (error != B_OK)
+				return error;
+
+			// write to the output
+			error = output->WriteData(buffer->Buffer(), toRead);
+			if (error != B_OK)
+				return error;
+
+			offset += toRead;
+			size -= toRead;
+		}
+
+		return B_OK;
+	}
+
 private:
-	uint64	fOffset;
-	uint64	fSize;
+	BufferCache*	fBufferCache;
+	uint64			fOffset;
+	uint64			fSize;
 };
 
 
@@ -161,10 +215,9 @@ public:
 		return fChunkSize;
 	}
 
-	virtual status_t ReadData(off_t offset, void* _buffer, size_t size)
+	virtual status_t ReadDataToOutput(off_t offset, size_t size,
+		DataOutput* output)
 	{
-		uint8* buffer = (uint8*)_buffer;
-
 		// check offset and size
 		if (size == 0)
 			return B_OK;
@@ -183,7 +236,8 @@ public:
 				== NULL) {
 			return B_NO_MEMORY;
 		}
-		CachedBufferPutter uncompressBuffer(fBufferCache, &fUncompressBuffer);
+		CachedBufferPutter uncompressBufferPutter(fBufferCache,
+			&fUncompressBuffer);
 
 		if (newBuffer)
 			fUncompressedChunk = -1;
@@ -199,12 +253,13 @@ public:
 			if (error != B_OK)
 				return error;
 
-			// copy data to buffer
+			// write data to output
 			size_t toCopy = std::min(size, (size_t)fChunkSize - inChunkOffset);
-			memcpy(buffer, (uint8*)fUncompressBuffer->Buffer() + inChunkOffset,
-				toCopy);
+			error = output->WriteData(
+				(uint8*)fUncompressBuffer->Buffer() + inChunkOffset, toCopy);
+			if (error != B_OK)
+				return error;
 
-			buffer += toCopy;
 			size -= toCopy;
 
 			chunkIndex++;
@@ -372,7 +427,7 @@ PackageDataReaderFactory::CreatePackageDataReader(DataReader* dataReader,
 	switch (data.Compression()) {
 		case B_HPKG_COMPRESSION_NONE:
 			reader = new(std::nothrow) UncompressedPackageDataReader(
-				dataReader);
+				dataReader, fBufferCache);
 			break;
 		case B_HPKG_COMPRESSION_ZLIB:
 			reader = new(std::nothrow) ZlibPackageDataReader(dataReader,

@@ -11,6 +11,7 @@
 
 #include <fs_cache.h>
 
+#include "DataOutput.h"
 #include "DataReader.h"
 #include "PackageDataReader.h"
 
@@ -20,6 +21,24 @@
 
 
 // #pragma mark - DataAccessor
+
+
+struct PackageFile::IORequestOutput : DataOutput {
+public:
+	IORequestOutput(io_request* request)
+		:
+		fRequest(request)
+	{
+	}
+
+	virtual status_t WriteData(const void* buffer, size_t size)
+	{
+		RETURN_ERROR(write_to_io_request(fRequest, buffer, size));
+	}
+
+private:
+	io_request*	fRequest;
+};
 
 
 struct PackageFile::DataAccessor {
@@ -73,17 +92,31 @@ struct PackageFile::DataAccessor {
 		if (offset < 0 || (uint64)offset > fData->UncompressedSize())
 			return B_BAD_VALUE;
 
-		size_t toRead = std::min((uint64)*bufferSize,
+		*bufferSize = std::min((uint64)*bufferSize,
+			fData->UncompressedSize() - offset);
+
+		return file_cache_read(fFileCache, NULL, offset, buffer, bufferSize);
+	}
+
+	status_t ReadData(io_request* request)
+	{
+		off_t offset = io_request_offset(request);
+		size_t size = io_request_length(request);
+
+		if (offset < 0 || (uint64)offset > fData->UncompressedSize())
+			RETURN_ERROR(B_BAD_VALUE);
+
+		size_t toRead = std::min((uint64)size,
 			fData->UncompressedSize() - offset);
 
 		if (toRead > 0) {
+			IORequestOutput output(request);
 			MutexLocker locker(fLock);
-			status_t error = fReader->ReadData(offset, buffer, toRead);
+			status_t error = fReader->ReadDataToOutput(offset, toRead, &output);
 			if (error != B_OK)
 				RETURN_ERROR(error);
 		}
 
-		*bufferSize = toRead;
 		return B_OK;
 	}
 
@@ -163,4 +196,13 @@ PackageFile::Read(off_t offset, void* buffer, size_t* bufferSize)
 	if (fDataAccessor == NULL)
 		return B_BAD_VALUE;
 	return fDataAccessor->ReadData(offset, buffer, bufferSize);
+}
+
+
+status_t
+PackageFile::Read(io_request* request)
+{
+	if (fDataAccessor == NULL)
+		return B_BAD_VALUE;
+	return fDataAccessor->ReadData(request);
 }
