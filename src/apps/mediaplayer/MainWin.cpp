@@ -157,7 +157,7 @@ MainWin::MainWin(bool isFirstWindow)
 	// background
 	fBackground = new BView(rect, "background", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
-	fBackground->SetViewColor(0,0,0);
+	fBackground->SetViewColor(0, 0, 0);
 	AddChild(fBackground);
 
 	// menu
@@ -184,10 +184,6 @@ MainWin::MainWin(bool isFirstWindow)
 	fControlsHeight = (int)fControls->Frame().Height() + 1;
 	fControlsWidth = (int)fControls->Frame().Width() + 1;
 	fControls->SetResizingMode(B_FOLLOW_BOTTOM | B_FOLLOW_LEFT_RIGHT);
-//	fControls->MoveTo(0, fBackground->Bounds().bottom - fControlsHeight + 1);
-
-//	fVideoView->ResizeTo(fBackground->Bounds().Width(),
-//		fBackground->Bounds().Height() - fMenuBarHeight - fControlsHeight);
 
 	fPlaylist->AddListener(fPlaylistObserver);
 	fController->SetVideoView(fVideoView);
@@ -195,10 +191,6 @@ MainWin::MainWin(bool isFirstWindow)
 	PeakView* peakView = fControls->GetPeakView();
 	peakView->SetPeakNotificationWhat(MSG_PEAK_NOTIFICATION);
 	fController->SetPeakListener(peakView);
-
-//	printf("fMenuBarHeight %d\n", fMenuBarHeight);
-//	printf("fControlsHeight %d\n", fControlsHeight);
-//	printf("fControlsWidth %d\n", fControlsWidth);
 
 	_SetupWindow();
 
@@ -286,33 +278,33 @@ MainWin::FrameResized(float newWidth, float newHeight)
 	int y = 0;
 
 	if (noMenu) {
-		if (!fMenuBar->IsHidden())
+		if (!fMenuBar->IsHidden(fMenuBar))
 			fMenuBar->Hide();
 	} else {
 		fMenuBar->MoveTo(0, y);
 		fMenuBar->ResizeTo(newWidth, fMenuBarHeight - 1);
-		if (fMenuBar->IsHidden())
+		if (fMenuBar->IsHidden(fMenuBar))
 			fMenuBar->Show();
 		y += fMenuBarHeight;
 	}
 
 	if (maxVideoHeight == 0) {
-		if (!fVideoView->IsHidden())
+		if (!fVideoView->IsHidden(fVideoView))
 			fVideoView->Hide();
 	} else {
 		_ResizeVideoView(0, y, maxVideoWidth, maxVideoHeight);
-		if (fVideoView->IsHidden())
+		if (fVideoView->IsHidden(fVideoView))
 			fVideoView->Show();
 		y += maxVideoHeight;
 	}
 
 	if (noControls) {
-		if (!fControls->IsHidden())
+		if (!fControls->IsHidden(fControls))
 			fControls->Hide();
 	} else {
 		fControls->MoveTo(0, y);
 		fControls->ResizeTo(newWidth, fControlsHeight - 1);
-		if (fControls->IsHidden())
+		if (fControls->IsHidden(fControls))
 			fControls->Show();
 //		y += fControlsHeight;
 	}
