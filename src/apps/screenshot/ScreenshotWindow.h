@@ -1,14 +1,21 @@
 /*
  * Copyright Karsten Heimrich, host.haiku@gmx.de. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Karsten Heimrich
+ *		Fredrik Modéen
  */
+#ifndef SCREENSHOT_WINDOW_H
+#define SCREENSHOT_WINDOW_H
+
+
 #include <String.h>
 #include <Window.h>
+#include <TranslatorFormats.h>
 
-#include "PreviewView.h"
 
 class BBitmap;
-class BBox;
 class BButton;
 class BCardLayout;
 class BCheckBox;
@@ -17,6 +24,8 @@ class BMenu;
 class BRadioButton;
 class BTextControl;
 class BTextView;
+class BPath;
+class PreviewView;
 
 
 class ScreenshotWindow : public BWindow {
@@ -26,13 +35,16 @@ public:
 								bool includeMouse = false,
 								bool grabActiveWindow = false,
 								bool showConfigWindow = false,
-								bool saveScreenshotSilent = false);
+								bool saveScreenshotSilent = false,
+								int32 imageFileType = B_PNG_FORMAT,
+								int32 translator = 8);
 	virtual					~ScreenshotWindow();
 
 	virtual	void			MessageReceived(BMessage* message);
 
 private:
 			void			_InitWindow();
+			BPath			_GetDirectory();
 			void			_SetupFirstLayoutItem(BCardLayout* layout);
 			void			_SetupSecondLayoutItem(BCardLayout* layout);
 			void			_DisallowChar(BTextView* textView);
@@ -42,10 +54,9 @@ private:
 								const BMessage& settings);
 			void			_AddItemToPathMenu(const char* path,
 								BString& label, int32 index, bool markItem);
-			void			_CenterAndShow();
 
 			void			_UpdatePreviewPanel();
-			BString			_FindValidFileName(const char* name);
+	const	char*			_FindValidFileName(const char* name);
 			int32			_PathIndexInMenu(const BString& path) const;
 
 			BMessage		_ReadSettings() const;
@@ -56,9 +67,7 @@ private:
 			void			_MakeTabSpaceTransparent(BRect* frame);
 
 			status_t		_SaveScreenshot();
-			void			_SaveScreenshotSilent() const;
 
-private:
 			PreviewView*	fPreview;
 			BRadioButton*	fActiveWindow;
 			BRadioButton*	fWholeDesktop;
@@ -81,8 +90,11 @@ private:
 			bool			fIncludeMouse;
 			bool			fGrabActiveWindow;
 			bool			fShowConfigWindow;
+			bool			fSaveScreenshotSilent;
 			BString			fExtension;
 
 			int32			fTranslator;
 			int32			fImageFileType;
 };
+
+#endif	/* SCREENSHOT_WINDOW_H */

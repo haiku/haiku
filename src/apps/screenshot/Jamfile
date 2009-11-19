@@ -1,15 +1,14 @@
 SubDir HAIKU_TOP src apps screenshot ;
 
-UseLibraryHeaders png zlib ;
+UseLibraryHeaders zlib ;
 UsePrivateHeaders interface ;
 
 Application Screenshot :
 	main.cpp
-	PNGDump.cpp
 	PreviewView.cpp
 	Screenshot.cpp
 	ScreenshotWindow.cpp
-	: be tracker translation libpng.so libz.so $(TARGET_LIBSUPC++)
+	: be tracker translation libz.so $(TARGET_LIBSUPC++)
 	: Screenshot.rdef
 ;
 

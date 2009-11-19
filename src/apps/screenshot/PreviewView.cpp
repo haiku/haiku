@@ -4,11 +4,14 @@
  */
 
 #include "PreviewView.h"
+
+
 #include <ControlLook.h>
 
 
 PreviewView::PreviewView() 
-	: BView("preview", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
+	: 
+	BView("preview", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
 {
 }
 
@@ -22,6 +25,6 @@ void
 PreviewView::Draw(BRect updateRect)
 {
 	BRect rect = Frame();
-	be_control_look->DrawTextControlBorder(this, rect, rect, 
+	be_control_look->DrawTextControlBorder(this, rect, rect,
 		ui_color(B_PANEL_BACKGROUND_COLOR));
 }
