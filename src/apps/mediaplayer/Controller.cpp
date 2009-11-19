@@ -70,7 +70,7 @@ HandleError(const char *text, status_t err)
 Controller::Listener::Listener() {}
 Controller::Listener::~Listener() {}
 void Controller::Listener::FileFinished() {}
-void Controller::Listener::FileChanged() {}
+void Controller::Listener::FileChanged(PlaylistItem* item, status_t result) {}
 void Controller::Listener::VideoTrackChanged(int32) {}
 void Controller::Listener::AudioTrackChanged(int32) {}
 void Controller::Listener::VideoStatsChanged() {}
@@ -82,6 +82,11 @@ void Controller::Listener::MutedChanged(bool) {}
 
 
 // #pragma mark - Controller
+
+
+enum {
+	MSG_SET_TO = 'stto'
+};
 
 
 Controller::Controller()
@@ -139,6 +144,20 @@ Controller::MessageReceived(BMessage* message)
 			// the global settings instance...
 			_AdoptGlobalSettings();
 			break;
+
+		case MSG_SET_TO:
+		{
+			PlaylistItem* item;
+			if (message->FindPointer("item", (void**)&item) == B_OK) {
+				PlaylistItemRef itemRef(item, true);
+					// The reference was passed with the message.
+				SetTo(itemRef);
+			} else
+				_NotifyFileChanged(NULL, B_BAD_VALUE);
+
+			break;
+		}
+
 		default:
 			NodeManager::MessageReceived(message);
 	}
@@ -179,6 +198,27 @@ Controller::CreateAudioSupplier()
 
 
 // #pragma mark -
+
+
+status_t
+Controller::SetToAsync(const PlaylistItemRef& item)
+{
+	PlaylistItemRef additionalReference(item);
+
+	BMessage message(MSG_SET_TO);
+	status_t ret = message.AddPointer("item", item.Get());
+	if (ret != B_OK)
+		return ret;
+
+	ret = PostMessage(&message);
+	if (ret != B_OK)
+		return ret;
+
+	// The additional reference is now passed along with the message...
+	additionalReference.Detach();
+
+	return B_OK;
+}
 
 
 status_t
@@ -230,14 +270,14 @@ Controller::SetTo(const PlaylistItemRef& item)
 	status_t err = mf->InitCheck();
 	if (err != B_OK) {
 		printf("Controller::SetTo: initcheck failed\n");
-		_NotifyFileChanged();
+		_NotifyFileChanged(item.Get(), err);
 		return err;
 	}
 
 	int trackcount = mf->CountTracks();
 	if (trackcount <= 0) {
 		printf("Controller::SetTo: trackcount %d\n", trackcount);
-		_NotifyFileChanged();
+		_NotifyFileChanged(item.Get(), B_MEDIA_NO_HANDLER);
 		return B_MEDIA_NO_HANDLER;
 	}
 
@@ -280,7 +320,7 @@ Controller::SetTo(const PlaylistItemRef& item)
 	if (fAudioTrackSupplier == NULL && fVideoTrackSupplier == NULL) {
 		printf("Controller::SetTo: no audio or video tracks found or "
 			"no decoders\n");
-		_NotifyFileChanged();
+		_NotifyFileChanged(item.Get(), B_MEDIA_NO_HANDLER);
 		delete fMediaFile;
 		fMediaFile = NULL;
 		return B_MEDIA_NO_HANDLER;
@@ -329,7 +369,7 @@ Controller::SetTo(const PlaylistItemRef& item)
 			useOverlays);
 	}
 
-	_NotifyFileChanged();
+	_NotifyFileChanged(item.Get(), B_OK);
 
 	SetPosition(0.0);
 	if (fAutoplay)
@@ -342,7 +382,8 @@ Controller::SetTo(const PlaylistItemRef& item)
 void
 Controller::PlayerActivated(bool active)
 {
-	BAutolock _(this);
+	if (LockWithTimeout(5000) != B_OK)
+		return;
 
 	if (active && gMainApp->PlayerCount() > 1) {
 		if (fActiveVolume != fVolume)
@@ -362,6 +403,8 @@ Controller::PlayerActivated(bool active)
 					break;
 			}
 	}
+
+	Unlock();
 }
 
 
@@ -870,13 +913,13 @@ Controller::_PlaybackState(int32 playingMode) const
 
 
 void
-Controller::_NotifyFileChanged() const
+Controller::_NotifyFileChanged(PlaylistItem* item, status_t result) const
 {
 	BList listeners(fListeners);
 	int32 count = listeners.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		Listener* listener = (Listener*)listeners.ItemAtFast(i);
-		listener->FileChanged();
+		listener->FileChanged(item, result);
 	}
 }
 

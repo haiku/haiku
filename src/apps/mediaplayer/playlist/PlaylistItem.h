@@ -90,6 +90,10 @@ public:
 	// playback
 	virtual	BMediaFile*			CreateMediaFile() const = 0;
 
+			void				SetPlaybackFailed();
+			bool				PlaybackFailed() const
+									{ return fPlaybackFailed; }
+
 	// listener support
 			bool				AddListener(Listener* listener);
 			void				RemoveListener(Listener* listener);
@@ -99,6 +103,7 @@ protected:
 
 private:
 			BList				fListeners;
+			bool				fPlaybackFailed;
 };
 
 typedef Reference<PlaylistItem> PlaylistItemRef;

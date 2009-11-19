@@ -120,11 +120,11 @@ MainApp::QuitRequested()
 
 
 MainWin*
-MainApp::NewWindow()
+MainApp::NewWindow(BMessage* message)
 {
 	BAutolock _(this);
 	fPlayerCount++;
-	return new(std::nothrow) MainWin(fPlayerCount == 1);
+	return new(std::nothrow) MainWin(fPlayerCount == 1, message);
 }
 
 
@@ -173,11 +173,7 @@ MainApp::RefsReceived(BMessage* message)
 	// ArgvReceived() but without MIME type check.
 	// For each file we create a new window and send it a
 	// B_REFS_RECEIVED message with a single file.
-	BWindow* window = NewWindow();
-	if (window != NULL) {
-		window->Show();
-		window->PostMessage(message);
-	}
+	NewWindow(message);
 }
 
 

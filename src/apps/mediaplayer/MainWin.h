@@ -43,7 +43,8 @@ class PlaylistWindow;
 
 class MainWin : public BWindow {
 public:
-								MainWin(bool isFirstWindow);
+								MainWin(bool isFirstWindow,
+									BMessage* message = NULL);
 	virtual						~MainWin();
 
 	virtual	void				FrameResized(float newWidth, float newHeight);
@@ -73,6 +74,9 @@ public:
 
 private:
 			void				_RefsReceived(BMessage* message);
+			void				_PlaylistItemOpened(
+									const PlaylistItemRef& item,
+									status_t result);
 
 			void				_SetupWindow();
 			void				_CreateMenu();
@@ -103,6 +107,7 @@ private:
 			void				_ToggleFullscreen();
 			void				_ToggleAlwaysOnTop();
 			void				_ToggleNoInterface();
+			void				_ShowIfNeeded();
 
 			void				_SetFileAttributes();
 			void				_UpdateControlsEnabledStatus();
@@ -156,6 +161,7 @@ private:
 			int					fControlsWidth;
 			int					fNoVideoWidth;
 			BRect				fSavedFrame;
+			BRect				fNoVideoFrame;
 			bool				fMouseDownTracking;
 			BPoint				fMouseDownMousePos;
 			BPoint				fMouseDownWindowPos;

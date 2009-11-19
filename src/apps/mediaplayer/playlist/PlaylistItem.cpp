@@ -31,6 +31,8 @@ static vint32 sInstanceCount = 0;
 
 
 PlaylistItem::PlaylistItem()
+	:
+	fPlaybackFailed(false)
 {
 #ifdef DEBUG_INSTANCE_COUNT
 	atomic_add(&sInstanceCount, 1);
@@ -115,6 +117,13 @@ PlaylistItem::Duration() const
 	if (GetAttribute(ATTR_INT64_DURATION, duration) != B_OK)
 		duration = 0;
 	return duration;
+}
+
+
+void
+PlaylistItem::SetPlaybackFailed()
+{
+	fPlaybackFailed = true;
 }
 
 

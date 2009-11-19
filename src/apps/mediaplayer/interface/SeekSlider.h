@@ -1,16 +1,18 @@
 /*
- * Copyright © 2006-2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright © 2006-2009 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef SEEK_SLIDER_H
 #define SEEK_SLIDER_H
 
+
 #include <Box.h>
 #include <Control.h>
+#include <String.h>
+
 
 class SeekSlider : public BControl {
- public:
+public:
 								SeekSlider(BRect frame,
 									const char* name, BMessage* message,
 									int32 minValue, int32 maxValue);
@@ -31,6 +33,7 @@ class SeekSlider : public BControl {
 	// SeekSlider
 			void				SetPosition(float position);
 			bool				IsTracking() const;
+			void				SetDisabledString(const char* string);
 
 private:
 			int32				_ValueFor(float x) const;
@@ -41,12 +44,14 @@ private:
 									rgb_color right, rgb_color bottom);
 			void				_SetKnobPosition(int32 knobPos);
 
-
+private:
 			bool				fTracking;
 			bigtime_t			fLastTrackTime;
 			int32				fKnobPos;
 			int32				fMinValue;
 			int32				fMaxValue;
+
+			BString				fDisabledString;
 };
 
 

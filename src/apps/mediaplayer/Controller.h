@@ -55,7 +55,8 @@ public:
 		virtual					~Listener();
 
 		virtual	void			FileFinished();
-		virtual	void			FileChanged();
+		virtual	void			FileChanged(PlaylistItem* item,
+									status_t result);
 
 		virtual	void			VideoTrackChanged(int32 index);
 		virtual	void			AudioTrackChanged(int32 index);
@@ -82,6 +83,7 @@ public:
 	virtual	AudioSupplier*		CreateAudioSupplier();
 
 	// Controller
+			status_t			SetToAsync(const PlaylistItemRef& item);
 			status_t			SetTo(const PlaylistItemRef& item);
 			const PlaylistItem*	Item() const
 									{ return fItem.Get(); }
@@ -143,7 +145,8 @@ private:
 
 			uint32				_PlaybackState(int32 playingMode) const;
 
-			void				_NotifyFileChanged() const;
+			void				_NotifyFileChanged(PlaylistItem* item,
+									status_t result) const;
 			void				_NotifyFileFinished() const;
 			void				_NotifyVideoTrackChanged(int32 index) const;
 			void				_NotifyAudioTrackChanged(int32 index) const;

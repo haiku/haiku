@@ -28,13 +28,16 @@ const char* kDisabledSeekMessage = "Drop files to play";
 
 SeekSlider::SeekSlider(BRect frame, const char* name, BMessage* message,
 					   int32 minValue, int32 maxValue)
-	: BControl(frame, name, NULL, message, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-			   B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
-	, fTracking(false)
-	, fLastTrackTime(0)
-	, fKnobPos(_KnobPosFor(Bounds(), Value()))
-	, fMinValue(minValue)
-	, fMaxValue(maxValue)
+	:
+	BControl(frame, name, NULL, message, B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		   B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+	fTracking(false),
+	fLastTrackTime(0),
+	fKnobPos(_KnobPosFor(Bounds(), Value())),
+	fMinValue(minValue),
+	fMaxValue(maxValue),
+
+	fDisabledString(kDisabledSeekMessage)
 {
 	BFont font(be_plain_font);
 	font.SetSize(9.0);
@@ -78,7 +81,7 @@ SeekSlider::SetValue(int32 value)
 void
 SeekSlider::Draw(BRect updateRect)
 {
-	BRect r(Bounds());	
+	BRect r(Bounds());
 
 	// draw both sides (the original from Be doesn't seem
 	// to make a difference for enabled/disabled state)
@@ -217,7 +220,7 @@ SeekSlider::Draw(BRect updateRect)
 		SetHighColor(darkShadow);
 		SetLowColor(shadow);
 		// stripes
-		float width = floorf(StringWidth(kDisabledSeekMessage));
+		float width = floorf(StringWidth(fDisabledString.String()));
 		float textPos = r.left + r.Width() / 2.0 - width / 2.0;
 		pattern stripes = { { 0xc7, 0x8f, 0x1f, 0x3e, 0x7c, 0xf8, 0xf1, 0xe3 } };
 		BRect stripesRect(r);
@@ -234,7 +237,8 @@ SeekSlider::Draw(BRect updateRect)
 		SetLowColor(darkShadow);
 		font_height fh;
 		GetFontHeight(&fh);
-		DrawString(kDisabledSeekMessage, BPoint(textPos, r.top + ceilf(fh.ascent) - 1.0));
+		DrawString(fDisabledString.String(),
+			BPoint(textPos, r.top + ceilf(fh.ascent) - 1.0));
 	}
 }
 
@@ -272,7 +276,7 @@ SeekSlider::MouseUp(BPoint where)
 void
 SeekSlider::ResizeToPreferred()
 {
-	float width = 15.0 + StringWidth(kDisabledSeekMessage) + 15.0;
+	float width = 15.0 + StringWidth(fDisabledString.String()) + 15.0;
 	ResizeTo(width, 17.0);
 }
 
@@ -301,6 +305,22 @@ SeekSlider::IsTracking() const
 	if (fTracking)
 		return true;
 	return system_time() - fLastTrackTime < 250000;
+}
+
+
+void
+SeekSlider::SetDisabledString(const char* string)
+{
+	if (string == NULL)
+		string = kDisabledSeekMessage;
+
+	if (fDisabledString == string)
+		return;
+
+	fDisabledString = string;
+
+	if (!IsEnabled())
+		Invalidate();
 }
 
 

@@ -35,6 +35,7 @@
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <MessageRunner.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
 #include <RecentItems.h>
@@ -97,13 +98,15 @@ enum {
 
 	M_SET_PLAYLIST_POSITION,
 
-	M_FILE_DELETE
+	M_FILE_DELETE,
+
+	M_SHOW_IF_NEEDED
 };
 
 //#define printf(a...)
 
 
-MainWin::MainWin(bool isFirstWindow)
+MainWin::MainWin(bool isFirstWindow, BMessage* message)
 	:
 	BWindow(BRect(100, 100, 400, 300), NAME, B_TITLED_WINDOW,
  		B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */),
@@ -127,6 +130,8 @@ MainWin::MainWin(bool isFirstWindow)
 	fSourceHeight(-1),
 	fWidthAspect(0),
 	fHeightAspect(0),
+	fSavedFrame(),
+	fNoVideoFrame(),
 	fMouseDownTracking(false),
 	fGlobalSettingsListener(this),
 	fInitialSeekPosition(0)
@@ -142,8 +147,14 @@ MainWin::MainWin(bool isFirstWindow)
 		.audioPlayerWindowFrame;
 	if (frame.IsValid()) {
 		if (isFirstWindow) {
-			MoveTo(frame.LeftTop());
-			ResizeTo(frame.Width(), frame.Height());
+			if (message == NULL) {
+				MoveTo(frame.LeftTop());
+				ResizeTo(frame.Width(), frame.Height());
+			} else {
+				// Delay moving to the initial position, since we don't
+				// know if we will be playing audio at all.
+				message->AddRect("window frame", frame);
+			}
 		}
 		if (sNoVideoWidth == MIN_WIDTH)
 			sNoVideoWidth = frame.IntegerWidth();
@@ -213,6 +224,9 @@ MainWin::MainWin(bool isFirstWindow)
 
 	Hide();
 	Show();
+
+	if (message != NULL)
+		PostMessage(message);
 }
 
 
@@ -462,11 +476,22 @@ MainWin::MessageReceived(BMessage* msg)
 			break;
 		}
 		case MSG_CONTROLLER_FILE_CHANGED:
-			// TODO: move all other GUI changes as a reaction to this
-			// notification
-//			_UpdatePlaylistMenu();
-			_SetFileAttributes();
+		{
+			status_t result = B_ERROR;
+			msg->FindInt32("result", &result);
+			PlaylistItemRef itemRef;
+			PlaylistItem* item;
+			if (msg->FindPointer("item", (void**)&item) == B_OK) {
+				itemRef.SetTo(item, true);
+					// The reference was passed along with the message.
+			} else {
+				BAutolock _(fPlaylist);
+				itemRef.SetTo(fPlaylist->ItemAt(
+					fPlaylist->CurrentItemIndex()));
+			}
+			_PlaylistItemOpened(itemRef, result);
 			break;
+		}
 		case MSG_CONTROLLER_VIDEO_TRACK_CHANGED:
 		{
 			int32 index;
@@ -680,6 +705,10 @@ MainWin::MessageReceived(BMessage* msg)
 			_AdoptGlobalSettings();
 			break;
 
+		case M_SHOW_IF_NEEDED:
+			_ShowIfNeeded();
+			break;
+
 		default:
 			if (msg->what >= M_SELECT_AUDIO_TRACK
 				&& msg->what <= M_SELECT_AUDIO_TRACK_END) {
@@ -772,45 +801,24 @@ MainWin::OpenPlaylist(const BMessage* playlistArchive)
 void
 MainWin::OpenPlaylistItem(const PlaylistItemRef& item)
 {
-	printf("MainWin::OpenPlaylistItem\n");
-
-	status_t err = fController->SetTo(item);
-	if (err != B_OK) {
-		BAutolock _(fPlaylist);
-		if (fPlaylist->CountItems() == 1) {
-			// display error if this is the only file we're supposed to play
-			BString message;
-			message << "The file '";
-			message << item->Name();
-			message << "' could not be opened.\n\n";
-
-			if (err == B_MEDIA_NO_HANDLER) {
-				// give a more detailed message for the most likely of all
-				// errors
-				message << "There is no decoder installed to handle the "
-					"file format, or the decoder has trouble with the specific "
-					"version of the format.";
-			} else {
-				message << "Error: " << strerror(err);
-			}
-			(new BAlert("error", message.String(), "OK"))->Go();
-		} else {
-			// just go to the next file and don't bother user
-			fPlaylist->SetCurrentItemIndex(fPlaylist->CurrentItemIndex() + 1);
-		}
-		fHasFile = false;
-		fHasVideo = false;
-		fHasAudio = false;
-		SetTitle(NAME);
+	status_t ret = fController->SetToAsync(item);
+	if (ret != B_OK) {
+		fprintf(stderr, "MainWin::OpenPlaylistItem() - Failed to send message "
+			"to Controller.\n");
+		(new BAlert("error", NAME" encountered an internal error. "
+			"The file could not be opened.", "OK"))->Go();
+		_PlaylistItemOpened(item, ret);
 	} else {
-		fHasFile = true;
-		fHasVideo = fController->VideoTrackCount() != 0;
-		fHasAudio = fController->AudioTrackCount() != 0;
-		SetTitle(item->Name().String());
-		fController->SetTimePosition(fInitialSeekPosition);
-		fInitialSeekPosition = 0;
+		BString string;
+		string << "Opening '" << item->Name() << "'.";
+		fControls->SetDisabledString(string.String());
+
+		if (IsHidden()) {
+			BMessage showMessage(M_SHOW_IF_NEEDED);
+			BMessageRunner::StartSending(BMessenger(this), &showMessage,
+				150000, 1);
+		}
 	}
-	_SetupWindow();
 }
 
 
@@ -923,7 +931,7 @@ MainWin::VideoFormatChange(int width, int height, int widthAspect,
 
 
 void
-MainWin::_RefsReceived(BMessage* msg)
+MainWin::_RefsReceived(BMessage* message)
 {
 	// the playlist is replaced by dropped files
 	// or the dropped files are appended to the end
@@ -931,11 +939,73 @@ MainWin::_RefsReceived(BMessage* msg)
 	BAutolock _(fPlaylist);
 	int32 appendIndex = modifiers() & B_SHIFT_KEY ?
 		fPlaylist->CountItems() : -1;
-	msg->AddInt32("append_index", appendIndex);
+	message->AddInt32("append_index", appendIndex);
 
 	// forward the message to the playlist window,
 	// so that undo/redo is used for modifying the playlist
-	fPlaylistWindow->PostMessage(msg);
+	fPlaylistWindow->PostMessage(message);
+
+	if (message->FindRect("window frame", &fNoVideoFrame) != B_OK) {
+		fNoVideoFrame = BRect();
+		_ShowIfNeeded();
+	}
+}
+
+
+void
+MainWin::_PlaylistItemOpened(const PlaylistItemRef& item, status_t result)
+{
+	if (result != B_OK) {
+		BAutolock _(fPlaylist);
+
+		item->SetPlaybackFailed();
+		bool allItemsFailed = true;
+		int32 count = fPlaylist->CountItems();
+		for (int32 i = 0; i < count; i++) {
+			if (!fPlaylist->ItemAtFast(i)->PlaybackFailed()) {
+				allItemsFailed = false;
+				break;
+			}
+		}
+
+		if (allItemsFailed) {
+			// Display error if all files failed to play.
+			BString message;
+			message << "The file '";
+			message << item->Name();
+			message << "' could not be opened.\n\n";
+
+			if (result == B_MEDIA_NO_HANDLER) {
+				// give a more detailed message for the most likely of all
+				// errors
+				message << "There is no decoder installed to handle the "
+					"file format, or the decoder has trouble with the "
+					"specific version of the format.";
+			} else {
+				message << "Error: " << strerror(result);
+			}
+			(new BAlert("error", message.String(), "OK"))->Go();
+		} else {
+			// Just go to the next file and don't bother user (yet)
+			fPlaylist->SetCurrentItemIndex(fPlaylist->CurrentItemIndex() + 1);
+		}
+
+		fHasFile = false;
+		fHasVideo = false;
+		fHasAudio = false;
+		SetTitle(NAME);
+	} else {
+		fHasFile = true;
+		fHasVideo = fController->VideoTrackCount() != 0;
+		fHasAudio = fController->AudioTrackCount() != 0;
+		SetTitle(item->Name().String());
+		fController->SetTimePosition(fInitialSeekPosition);
+		fInitialSeekPosition = 0;
+	}
+	_SetupWindow();
+
+	if (result == B_OK)
+		_SetFileAttributes();
 }
 
 
@@ -965,6 +1035,13 @@ MainWin::_SetupWindow()
 		fHeightAspect = 1;
 	}
 	_UpdateControlsEnabledStatus();
+
+	if (!fHasVideo && fNoVideoFrame.IsValid()) {
+		MoveTo(fNoVideoFrame.LeftTop());
+		ResizeTo(fNoVideoFrame.Width(), fNoVideoFrame.Height());
+	}
+	fNoVideoFrame = BRect();
+	_ShowIfNeeded();
 
 	// Adopt the size and window layout if necessary
 	if (previousSourceWidth != fSourceWidth
@@ -1740,6 +1817,19 @@ MainWin::_ToggleNoInterface()
 }
 
 
+void
+MainWin::_ShowIfNeeded()
+{
+	if (find_thread(NULL) != Thread())
+		return;
+
+	if (IsHidden()) {
+		Show();
+		UpdateIfNeeded();
+	}
+}
+
+
 // #pragma mark -
 
 
@@ -1751,6 +1841,8 @@ MainWin::_SetFileAttributes()
 {
 	const FilePlaylistItem* item
 		= dynamic_cast<const FilePlaylistItem*>(fController->Item());
+	if (item == NULL)
+		return;
 
 	if (!fHasVideo && fHasAudio) {
 		BNode node(&item->Ref());

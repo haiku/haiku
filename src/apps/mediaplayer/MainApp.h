@@ -64,7 +64,7 @@ public:
 								MainApp();
 	virtual						~MainApp();
 
-			MainWin*			NewWindow();
+			MainWin*			NewWindow(BMessage* message = NULL);
 			int32				PlayerCount() const;
 
 private:

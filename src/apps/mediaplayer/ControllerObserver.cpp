@@ -11,6 +11,8 @@
 
 #include <Message.h>
 
+#include "PlaylistItem.h"
+
 
 ControllerObserver::ControllerObserver(BHandler* target, uint32 observeFlags)
 	:
@@ -38,12 +40,18 @@ ControllerObserver::FileFinished()
 
 
 void
-ControllerObserver::FileChanged()
+ControllerObserver::FileChanged(PlaylistItem* item, status_t result)
 {
 	if (!(fObserveFlags & OBSERVE_FILE_CHANGES))
 		return;
 
+	PlaylistItemRef reference(item);
+		// pass the reference along with the message
+
 	BMessage message(MSG_CONTROLLER_FILE_CHANGED);
+	message.AddInt32("result", result);
+	if (message.AddPointer("item", item) == B_OK)
+		reference.Detach();
 
 	DeliverMessage(message);
 }

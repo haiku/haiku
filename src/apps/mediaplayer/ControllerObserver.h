@@ -50,7 +50,7 @@ public:
 
 	// Controller::Listener interface
 	virtual	void		FileFinished();
-	virtual	void		FileChanged();
+	virtual	void		FileChanged(PlaylistItem* item, status_t result);
 
 	virtual	void		VideoTrackChanged(int32 index);
 	virtual	void		AudioTrackChanged(int32 index);

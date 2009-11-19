@@ -72,6 +72,8 @@ public:
 			PeakView*			GetPeakView() const
 									{ return fPeakView; }
 
+			void				SetDisabledString(const char* string);
+
 private:
 			void				_LayoutControls(BRect frame) const;
 			BRect				_MinFrame() const;
