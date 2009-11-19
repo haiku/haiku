@@ -11,7 +11,7 @@
 // #pragma mark - static helpers
 
 
-status_t
+static status_t
 transfer_io_request_data(io_request* request, void* buffer, size_t size,
 	bool isWrite)
 {
