@@ -16,7 +16,7 @@
 
 using std::nothrow;
 
-#define TRACE_AUDIO_ADAPTER
+//#define TRACE_AUDIO_ADAPTER
 #ifdef TRACE_AUDIO_ADAPTER
 # define TRACE(x...)	printf(x)
 #else
