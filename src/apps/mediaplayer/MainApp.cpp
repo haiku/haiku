@@ -142,7 +142,6 @@ MainApp::PlayerCount() const
 void
 MainApp::ReadyToRun()
 {
-printf("MainApp::ReadyToRun()\n");
 	// make sure we have at least one window open
 	if (fPlayerCount == 0) {
 		MainWin* window = NewWindow();
@@ -174,8 +173,6 @@ MainApp::RefsReceived(BMessage* message)
 	// ArgvReceived() but without MIME type check.
 	// For each file we create a new window and send it a
 	// B_REFS_RECEIVED message with a single file.
-	printf("MainApp::RefsReceived\n");
-
 	BWindow* window = NewWindow();
 	if (window != NULL) {
 		window->Show();
